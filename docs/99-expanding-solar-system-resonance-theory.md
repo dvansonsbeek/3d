@@ -611,7 +611,7 @@ The framework reveals not just *that* the Moon drifts away, but *why it must*.
 
 ### The structural cause
 
-The framework's structural invariant `H × days/yr = 122,471,920` is preserved across geological time (verified to <0.1% across 12 paleontological measurements). This requires:
+The framework's structural near-invariant `H × days/yr ≈ TOTAL_DAYS_IN_H = 122,471,920` (exact at J2000; drifting −71 ppm at Devonian and −850 ppm at Hadean via Driver 2 / solar mass loss) is preserved at the modern epoch and varies smoothly with geological time. This requires:
 - Earth's rotation rate (LOD) must slowly change
 - The orbital year length (in seconds) must stay fixed
 - Therefore `days/yr = year_seconds / LOD` must change inversely with LOD
@@ -664,7 +664,7 @@ da_M/dt = (4π · I_E · √a_M · dLOD/dt_lunar) / (LOD² · M_M · √(GM · (
 
 where:
 - `dLOD/dt_lunar` is the **lunar-only contribution** to LOD slowdown (NOT the total observed rate)
-- `I_E` is Earth's moment of inertia (8.014×10³⁷ kg·m²)
+- `I_E` is Earth's moment of inertia (8.034×10³⁷ kg·m², using IERS α = 0.3306947)
 - `M_M` is Moon's mass (7.342×10²² kg)
 - `GM` is the Earth-Moon gravitational parameter (4.035×10¹⁴ m³/s²)
 - `a_M` is Moon's current semi-major axis (3.844×10⁸ m)
@@ -860,14 +860,16 @@ These refinements don't change any current framework predictions materially. The
 
 Combining the framework's relations:
 ```
-H × days_per_year = 122,471,920 = constant      [structural]
-H = H_now × LOD / LOD_now                       [Fibonacci coupling]
-L_E + L_M = constant                            [angular momentum]
+H × days_per_year ≈ 122,471,920 = TOTAL_DAYS_IN_H   [structural, near-invariant; drifts −71 ppm at Devonian]
+H(t) = H_now × LOD(t) / LOD_now_H13                 [Fibonacci coupling]
+L_E + L_M = L_total = const                         [angular momentum]
 ```
 
-These three equations together **derive the Moon's drift as a necessary consequence of the framework's structural invariant**. The Moon drifts not because of an arbitrary tidal coupling constant, but because the structural invariant requires it.
+These three equations together **derive the Moon's drift as a necessary consequence of the framework's structural near-invariant**. The Moon drifts not because of an arbitrary tidal coupling constant, but because the structural near-invariant requires it.
 
 **This is the framework's contribution to lunar dynamics**: the recognition that lunar recession is structurally necessary, not contingent. The exact rate depends on tidal Q and solar contribution; the *fact* of recession is required by the structural lattice.
+
+(Note: Drivers 1 and 2 are independent in physics. Driver 1 — tidal coupling — drives Moon recession. Driver 2 — solar mass loss — drives planetary year-second drift. The structural identity ties them together at the per-epoch observational level, but the underlying physical channels are separate.)
 
 ---
 
