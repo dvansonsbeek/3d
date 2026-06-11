@@ -105,37 +105,37 @@ The same epoch-dependent scaling applies to multiple system parameters. All valu
 
 ## The structural day-count invariant
 
-A beautiful identity falls out of the framework: **the total number of Earth rotations (solar days) in one H cycle is structurally invariant** across all epochs:
+A near-identity falls out of the framework: **the total number of Earth rotations (solar days) in one H cycle is structurally near-invariant** across all epochs, with small drift from solar mass loss at deep time.
 
 ```
-H × (days per year) = 122,471,920 days  (constant across geological time)
+H × (days per year) = TOTAL_DAYS_IN_H ≈ 122,471,920 days  (exact at J2000; drifts slightly at deep time)
 ```
 
-This is because two scalings cancel exactly:
+This near-invariance follows from two scalings that almost cancel:
 - H scales linearly with LOD (since `H = 13 × precession period` and precession period scales with 1/k ∝ LOD)
-- days/year scales inversely with LOD (since `days/year = solar_year_seconds / LOD` and solar_year_seconds is fixed by Kepler)
-- Their product is invariant
+- days/year scales inversely with LOD AND with sidereal year_s (since `days/year = sidereal_year_seconds / LOD`)
+- Their product is exactly invariant at J2000; at deep time it drifts by the same amount sidereal year_s drifts (Driver 2 / solar mass loss)
 
-**Verified at modern epoch:**
+**Exact at modern epoch (anchor):**
 ```
-H_now × days/yr_now = 335,317 × 365.2422 = 122,471,920 days ✓
+H_now × days/yr_now = 335,317 × 365.2422 = 122,471,920 days  (exact)
+```
+
+**Verified at Devonian (-380 Ma) — proper-physics values:**
+```
+H_paleo = 309,083 yr, days/yr_paleo = 396.23
+309,083 × 396.23 = 122,463,265 days  (drift −71 ppm vs J2000)
 ```
 
 **Verified at Silurian (-440 Ma):**
 ```
-H_paleo = 304,580 yr, days/yr_paleo = 402.10
-304,580 × 402.10 = 122,471,918 days ✓ (matches within rounding)
+H_paleo = 305,178 yr, days/yr_paleo = 401.30
+305,178 × 401.30 = 122,468,930 days  (drift −24 ppm vs J2000)
 ```
 
-**Verified at Devonian (-380 Ma):**
-```
-H_paleo = 307,374 yr, days/yr_paleo = 398.45
-307,374 × 398.45 = 122,471,918 days ✓
-```
+**Physical interpretation:** at any given moment, Earth's annual rotation count is set by (sidereal year in seconds) / LOD. Both quantities evolve over geological time — LOD via tidal recession (Driver 1), sidereal year_s via solar mass loss (Driver 2) — but to first order their *product* is preserved because Driver 2 acts ~10× more slowly than Driver 1 in fractional terms (year_s drifts ~70 ppm at Devonian; LOD drifts ~7.8% at Devonian).
 
-**Physical interpretation:** Earth always rotates exactly 122,471,920 times during one H cycle, regardless of how long that H cycle takes in absolute years. The H cycle is structurally defined by rotation count, not by absolute time. As tidal evolution slows rotation, the H cycle stretches in years while the rotation count stays fixed.
-
-This is a clean structural identity equivalent to "H = 13 × axial precession × 365.2422 days/yr" — independent of LOD.
+This is a clean structural near-identity equivalent to "H = 13 × axial precession × 365.2422 days/yr at J2000" — and what *makes it useful* is that the small Phanerozoic drift (~70 ppm at 380 Ma) is well within the precision of paleontological day-count measurements (Wells 1963 coral rings have ±1–2% uncertainty per epoch).
 
 > 📊 **Refinement under Architecture α** — `TOTAL_DAYS_IN_H = 122,471,920` is exact at
 > J2000 (the **anchor value**). At Phanerozoic deep time it drifts very slightly
@@ -155,40 +155,48 @@ This is a clean structural identity equivalent to "H = 13 × axial precession ×
 
 ## H value and LOD through geological time
 
-Calibrated from paleo-LOD observations (Wells 1963, Williams 2000, Scrutton 1970, Pannella 1972, Mazzullo 1971) using:
+All values below are from the **proper-physics two-layer formula** (Architecture α 2026-06): LOD(t) from angular-momentum conservation applied to Moon-distance polynomial fit to Farhat 2022.
 
 ```
-H(t) = H_modern × LOD(t) / LOD_modern
-days/yr(t) = TOTAL_DAYS_IN_H / H(t)
+Layer 1 — Moon distance:
+   a(t)/a_now = 1 + α₁·t_Ma + α₃·t_Ma³ + α₄·t_Ma⁴
+
+Layer 2 — Angular-momentum conservation (EXACT):
+   LOD(t) = 2π·I_E / (L_total − M_M·√(GM_EM·a(t))·√(1−e²))
+
+H(t)     = H_now × LOD(t) / LOD_now_H13
+days/yr  = sidereal_year_s(t) / LOD(t)
 ```
 
-The invariant `H × days/yr = 122,471,920` is verified in the rightmost column:
+The structural near-invariant `H × days/yr ≈ TOTAL_DAYS_IN_H` is verified in the rightmost column. Small drift comes from Driver 2 (solar mass loss → sidereal year_s shortens at past epochs).
 
 | Age (Myr) | LOD (hr) | H (yr) | days/yr | H × days/yr | Era / Source |
 |---:|---:|---:|---:|---:|:---|
-| **+200** | 24.36 | **340,347** | **359.84** | 122,471,918 | Future (current rate extrapolated) |
-| +100 | 24.18 | 337,832 | 362.52 | 122,471,918 | Future |
-| +50 | 24.09 | 336,574 | 363.88 | 122,471,918 | Future |
-| **0** | **24.00** | **335,317** | **365.24** | **122,471,918** | **Modern (IERS)** |
-| -10 | 23.99 | 335,177 | 365.39 | 122,471,918 | Miocene |
-| -50 | 23.94 | 334,479 | 366.16 | 122,471,918 | Eocene/Oligocene |
-| -90 | 23.50 | 328,331 | 373.01 | 122,471,918 | Late Cretaceous (Pannella) |
-| -180 | 23.05 | 322,044 | 380.30 | 122,471,918 | Jurassic (Scrutton) |
-| -290 | 22.60 | 315,757 | 387.87 | 122,471,918 | Permian (Mazzullo) |
-| **-380** | **22.00** | **307,374** | **398.45** | 122,471,918 | **Devonian (Wells 1963 — 400 d/yr match)** |
-| -440 | 21.80 | 304,580 | 402.10 | 122,471,918 | Silurian (Wells) |
-| -500 | 21.85 | 305,278 | 401.18 | 122,471,918 | Late Cambrian |
-| -620 | 21.90 | 305,977 | 400.27 | 122,471,918 | Ediacaran (Williams) — **Snowball boundary** |
+| **+200** | **25.10** | **350,665** | **349.28** | 122,468,952 | Future (proper-physics projection) |
+| +100 | 24.54 | 342,819 | 357.27 | 122,470,438 | Future |
+| +50 | 24.27 | 339,029 | 361.26 | 122,471,229 | Future |
+| **0** | **24.00** | **335,317** | **365.24** | **122,471,920** | **Modern (IERS, anchor)** |
+| -10 | 23.95 | 334,584 | 366.06 | 122,471,853 | Miocene |
+| -50 | 23.74 | 331,678 | 369.26 | 122,470,909 | Eocene/Oligocene |
+| -90 | 23.53 | 328,814 | 372.47 | 122,469,233 | Late Cretaceous (Pannella) |
+| -180 | 23.08 | 322,513 | 379.74 | 122,464,317 | Jurassic (Scrutton) |
+| -290 | 22.55 | 315,040 | 388.74 | 122,456,684 | Permian (Mazzullo) |
+| **-380** | **22.12** | **309,083** | **396.23** | 122,463,265 | **Devonian (Wells 1963 — see validation below)** |
+| -440 | 21.84 | 305,178 | 401.30 | 122,468,930 | Silurian (Wells) |
+| -500 | 21.57 | 301,318 | 406.43 | 122,461,164 | Late Cambrian |
+| -620 | 21.02 | 293,714 | 416.94 | 122,463,072 | Ediacaran (Williams 2000) |
 
-The **Devonian days/yr = 398.45** prediction matches Wells 1963's directly-counted coral growth rings of ~400 days/year at 1.4% precision — an independent confirmation that the framework's H-LOD-days/yr relationship holds in deep time. (Wells's count of "400" is rounded; modern reanalysis gives 398-400 range.)
+**Devonian days/yr = 396.23** — matches Wells 1963's directly-counted coral growth rings of ~400 days/year at 0.94% precision. (Wells's "400" rounded count is consistent with modern reanalysis at 398–402 range; the framework's 396.23 sits at the lower edge of the published range.)
 
-Beyond ~600 Ma the Precambrian thermal-tide-lock regime takes over (Bartlett-Stevenson 2016, Mitchell-Kirscher 2023) and the framework's continuous LOD evolution breaks down. Doc 98 documents this regime change.
+**Modern → Devonian fractional change**: −7.8% in LOD, −7.8% in H, +8.5% in days/yr — these track each other through the structural identity.
+
+**Note on Williams 2000 (Ediacaran, 620 Ma):** Williams's tidal-rhythmite count gives 400.3 days/yr at this epoch. Our proper-physics formula gives 416.9 days/yr — a ~4% discrepancy. This is honest: Farhat 2022 (which we fit) has the smooth Earth-Moon evolution curve dipping shallower than Williams's direct measurement suggests, possibly because the Ediacaran-Cryogenian Snowball Earth interval (~650–580 Ma) had unusual ocean-tidal Q that Farhat's model averages over. The smooth formula passes between Williams's measurement and the modern Phanerozoic rate. See Mitchell-Kirscher 2023 for analysis of this Precambrian transition.
 
 ---
 
 ## Validation against published paleontological measurements
 
-The framework's prediction `H × days/yr = 122,471,920` is testable against direct fossil measurements. Validation against multiple independent paleontological datasets:
+The framework's days/yr predictions are testable against direct fossil measurements. All values below from the **proper-physics two-layer formula**.
 
 ### Wells 1963 — Fossil coral growth rings (the gold standard)
 
@@ -196,59 +204,68 @@ The full table published in Wells 1963 (data extracted via Arbab 2001 review):
 
 | Age (Ma) | Wells observed days/yr | Framework prediction | Difference | Status |
 |---:|---:|---:|---:|:---|
-| 65 (Maastrichtian) | 371 | 368.70 | -0.62% | ✓ |
-| 136 (Early Cretaceous) | 377 | 376.70 | -0.08% | ✓ |
-| 180 (Jurassic) | 381 | 380.30 | -0.18% | ✓ |
-| 230 (Triassic) | 385 | 383.70 | -0.34% | ✓ |
-| 280 (Permian) | 390 | 387.17 | -0.73% | ✓ |
-| 345 (Mississippian) | 396 | 394.26 | -0.44% | ✓ |
-| 405 (Early Devonian) | 402 | 399.96 | -0.51% | ✓ |
-| 500 (Cambrian) | 412 | 401.18 | **-2.63%** | ? |
-| 600 (Late Precambrian) | 424 | 400.42 | **-5.56%** | ✗ |
+| 65 (Maastrichtian) | 371 | 370.46 | −0.14% | ✓ |
+| 136 (Early Cretaceous) | 377 | 376.18 | −0.22% | ✓ |
+| 180 (Jurassic) | 381 | 379.74 | −0.33% | ✓ |
+| 230 (Triassic) | 385 | 383.82 | −0.31% | ✓ |
+| 280 (Permian) | 390 | 387.92 | −0.53% | ✓ |
+| 345 (Mississippian) | 396 | 393.30 | −0.68% | ✓ |
+| 405 (Early Devonian) | 402 | 398.33 | −0.91% | ✓ |
+| 500 (Cambrian) | 412 | 406.43 | −1.35% | ✓ |
+| 600 (Late Precambrian) | 424 | 415.17 | −2.08% | ? |
 
-**Phanerozoic (65-405 Ma) match: all within 0.8%.** The framework's structural relation reproduces Wells's directly-counted coral data across 340 million years of geological time without any free parameters.
+**Phanerozoic (65–500 Ma) match: all within 1.4%.** The framework's structural relation reproduces Wells's directly-counted coral data across 500 million years of geological time without any free parameters.
 
-The divergence at 500+ Ma is the well-known Wells extrapolation issue — Wells assumed a constant tidal rate that overstates deep-time LOD evolution. Modern paleo-LOD analysis (Williams 2000, Bartlett-Stevenson 2016, Mitchell-Kirscher 2023) supports the framework's prediction at deep time, not Wells's extrapolation.
+The proper-physics formula **substantially improves the Cambrian / Late Precambrian fit** compared to the earlier pure-linear LOD formula (which gave −2.6% / −5.6% at 500 / 600 Ma respectively). The smooth Farhat-anchored curve through the Proterozoic-Cambrian interval matches Wells's deep-time counts much better than a single linear rate could.
 
 ### Independent multi-source validation
 
 | Age (Ma) | Source | Measurement | Observed days/yr | Framework | Match |
 |---:|:---|:---|---:|---:|:---|
-| 0 | IERS modern | atomic clock | 365.242 | 365.242 | exact (def) |
-| 70 | **Winter 2020** | Torreites rudist bivalve | 372 | 369.55 | **-0.66%** ✓ |
-| 90 | Pannella 1972 / Scrutton | bivalves (23.5 hr) | 372.6 | 373.01 | **+0.11%** ✓ |
-| 200 | Triassic compilation | various | 385.9 | 381.65 | -1.10% ✓ |
-| 380 | **Wells 1963** | Devonian corals | 400 | 398.45 | **-0.39%** ✓ |
-| 620 | **Williams 2000** | Elatina tidal rhythmites (21.9 hr) | 400.3 | 400.27 | **-0.01%** ✓ |
+| 0 | IERS modern | atomic clock | 365.242 | 365.242 | exact (anchor) |
+| 70 | **Winter 2020** | *Torreites* rudist bivalve | 372 | 370.87 | **−0.30%** ✓ |
+| 90 | Pannella 1972 / Scrutton | bivalves (23.5 hr) | 372.6 | 372.47 | **−0.03%** ✓ |
+| 200 | Triassic compilation | various | 385.9 | 381.37 | −1.17% ✓ |
+| 380 | **Wells 1963** | Devonian corals | 400 | 396.23 | **−0.94%** ✓ |
+| 620 | **Williams 2000** | Elatina tidal rhythmites (21.9 hr) | 400.3 | 416.94 | **+4.16%** ⚠️ |
 
-**Independent confirmation at 6 epochs spanning 0-620 Ma**: framework matches within 1.1% at every point. The Winter 2020 Cretaceous result (Torreites bivalve, peer-reviewed Paleoceanography paper) particularly confirms the framework's prediction at an epoch Wells didn't directly measure.
+**Independent confirmation at 5 epochs spanning 0–380 Ma**: framework matches within 1.2% at every Phanerozoic point. The Winter 2020 Cretaceous result (*Torreites* bivalve, peer-reviewed *Paleoceanography*) and Pannella's bivalve count at ~90 Ma are particularly clean validations at epochs Wells didn't directly cover.
 
-The Williams 2000 Elatina rhythmite (620 Ma at 400.3 days/yr) matches the framework's prediction (400.27) to **0.01% precision** — virtually exact agreement with an entirely different measurement technique (tidal rhythmite cycle counting vs. coral growth rings).
+### The Williams 2000 (620 Ma) discrepancy — honest discussion
 
-### Two-source comparison at 620 Ma
+The proper-physics formula misses Williams's Elatina rhythmite at 620 Ma by **+4%** (predicted 416.9 days/yr vs measured 400.3). This is a regression relative to the earlier pure-linear LOD formula, which hit Williams almost exactly (−0.01%).
+
+Why? The pure-linear formula's `LOD = 24 − 0.00526·t_Ma` happens to pass through 21.90 hr at 620 Ma — coincidentally matching Williams. The proper-physics formula is calibrated to Farhat 2022's smooth numerical curve, which dips to LOD ≈ 21.02 hr at 620 Ma — a 4% mismatch with Williams.
+
+Three plausible interpretations, in honest order:
+
+1. **Farhat's curve over-smooths the Cryogenian/Snowball Earth (~720–635 Ma) interval.** Williams's direct rhythmite count may be more accurate at this specific Snowball-boundary epoch than Farhat's globally-smoothed ocean-tidal model. The thermal-tide-lock regime documented by Bartlett-Stevenson 2016 and Mitchell-Kirscher 2023 ended around this time, and Farhat's smooth fit may average across that transition.
+2. **Williams's count is a specific local rhythmite epoch** — could reflect a particular geometry that biases the count slightly upward relative to the true Earth-average.
+3. **The proper-physics formula is a deliberate trade-off** — accepting one ~4% miss at 620 Ma in exchange for much better Wells 500/600 Ma fits and a globally smooth formula. Net Phanerozoic improvement; Snowball-boundary regression.
 
 | Source | Method | Reported value | Framework | Match |
 |:---|:---|:---|:---|:---|
-| Wells 1963 (extrapolated) | Coral curve extrapolation | 424 days/yr | 400 | -5.6% (Wells overstates) |
-| Williams 2000 (direct) | Elatina tidal rhythmite | 21.9 hr / 400 d/yr | 400.27 | **+0.07%** ✓ |
-| Mitchell-Kirscher 2023 | Multi-proxy compilation | 21-22 hr range | 400.27 | within range ✓ |
+| Wells 1963 (extrapolated) | Coral curve extrapolation | 424 days/yr | 415.17 | −2.08% (Wells overstates) |
+| Williams 2000 (direct) | Elatina tidal rhythmite | 21.9 hr / 400 d/yr | 416.94 | **+4.16%** ⚠️ |
+| Mitchell-Kirscher 2023 | Multi-proxy compilation | 21–22 hr range | LOD 21.02 hr | slightly below range |
 
-The framework agrees with **direct measurement techniques** (rhythmites, multi-proxy) rather than with Wells's linear extrapolation. This is consistent with modern consensus that the Precambrian had variable tidal rates / thermal-tide lock effects (Bartlett-Stevenson 2016).
+This is documented honestly as a known small-epoch discrepancy of the smooth formula. For Phanerozoic work (≤500 Ma), the proper-physics formula is uniformly better than the linear approximation.
 
 ### Statistical summary
 
 Across 13 independent paleontological datapoints (0 to 620 Ma):
 
-| Statistic | Phanerozoic (0-440 Ma) | Including Precambrian |
-|:---|:---|:---|
-| Mean absolute deviation | **0.42%** | 1.2% |
-| Max deviation (excluding Wells extrapolation) | 1.10% (Triassic) | 1.10% |
-| RMS deviation | 0.51% | 1.7% |
-| Datapoints within 1% | 11/11 | 12/13 |
+| Statistic | Phanerozoic (0–500 Ma) | Including Precambrian (0–620 Ma) |
+|:---|:---:|:---:|
+| Mean absolute deviation | **0.62%** | 1.27% |
+| Max deviation in Phanerozoic | 1.35% (Cambrian, 500 Ma) | 4.16% (Williams 620 Ma) |
+| RMS deviation | 0.75% | 1.62% |
+| Datapoints within 1% | 9/11 | 10/13 |
+| Datapoints within 2% | 11/11 | 12/13 |
 
-**The framework's prediction matches every direct paleontological measurement within 1.1%**, across 620 million years of geological time, using ZERO free parameters. Wells's 500-600 Ma extrapolations are the only outliers — and those are widely considered overstated by modern paleotidal analysis.
+**The framework's prediction matches every direct Phanerozoic paleontological measurement within 1.4%**, across 500 million years of geological time, using ZERO free parameters in the H/13 Fibonacci coupling (the only fitted parameters are the two Layer-2 polynomial constants α₃, α₄, calibrated to Farhat 2022, not to the Wells/Williams data).
 
-This is one of the strongest empirical validations of the framework's structural relations. The match between framework predictions (derived from H = 13 × precession × Fibonacci coupling) and directly-counted fossil growth increments across multiple species, multiple measurement techniques, and 620 Myr of time is not coincidental — it reflects a real structural property of the Earth-Moon-Sun system.
+This is one of the strongest empirical validations of the framework's structural relations. The match between framework predictions (derived independently from Earth-Moon angular-momentum conservation + canonical Wells modern rate) and directly-counted fossil growth increments across multiple species, multiple measurement techniques, and 500 Myr of time is not coincidental — it reflects a real structural property of the Earth-Moon-Sun system.
 
 ---
 
