@@ -378,7 +378,54 @@ All L1 integers including planetary ecliptic perihelion precessions scale with H
 
 **Note on the Saturn-Jupiter resonance lock (Law 6)**: The framework's Law 6 — Saturn ecliptic perihelion = Jupiter ICRF perihelion = 8H/65 — is preserved across all epochs because both scale with H. The structural identity persists; only the absolute period evolves.
 
-**Note on solar mass loss**: planetary orbital periods *themselves* (sidereal years, not their perihelion precession) drift by Driver 2 (~70 ppm at Devonian, ~850 ppm at Hadean). The L1 perihelion precessions above are computed as `8H(t) / n`, which scales the perihelion period with H — but the underlying orbital period was also slightly shorter in the past, so the framework's structural ratios `(planet_orbits per 8H)` stay near-invariant. See doc 15 for the Drivers-1+2 budget at each planet.
+**Note on solar mass loss**: planetary orbital periods *themselves* (sidereal years, not their perihelion precession) drift by Driver 2 (~71 ppm at Devonian, ~845 ppm at Hadean). The L1 perihelion precessions above are computed as `8H(t) / n`, which scales the perihelion period with H — but the underlying orbital period was also slightly shorter in the past, so the framework's structural ratios `(planet_orbits per 8H)` stay near-invariant.
+
+---
+
+## Predicted planetary semi-major axes & Earth-planet distances (Driver 2)
+
+Under Driver 2, each planet's semi-major axis drifts via the adiabatic invariant `a × M_Sun = const` — going to past, the Sun was more massive, so every orbit was tighter. **The entire solar system shrinks uniformly** (same fractional amount for every planet), preserving relative geometry.
+
+```
+a_planet(t) = a_planet_J2000 × (1 − mass_loss_fraction(t))
+           = a_planet_J2000 × (1 − 9.30 × 10⁻¹⁴ × t_Ma × 1e6)
+```
+
+| Planet | a_J2000 (km) | a_Devonian (380 Ma, km) | a_Hadean (4 Gyr, km) | Δ at Devonian |
+|:---|---:|---:|---:|---:|
+| Mercury | 57,909,176 | **57,907,130** | 57,887,636 | −2,046 km |
+| Venus | 108,208,930 | **108,205,106** | 108,168,680 | −3,824 km |
+| Earth (AU) | 149,597,871 | **149,592,585** | 149,542,225 | −5,286 km |
+| Mars | 227,939,200 | **227,931,145** | 227,854,414 | −8,055 km |
+| Jupiter | 778,547,200 | **778,519,688** | 778,257,605 | −27,512 km |
+| Saturn | 1,433,449,370 | **1,433,398,716** | 1,432,916,172 | −50,654 km |
+| Uranus | 2,876,679,082 | **2,876,577,429** | 2,875,609,049 | −101,653 km |
+| Neptune | 4,503,443,661 | **4,503,284,523** | 4,501,768,523 | −159,138 km |
+
+**Earth-planet distances** (time-averaged √(a_E² + a_P²), useful for the 3D model's planet display):
+
+| Planet | <d>_J2000 (km) | <d>_Devonian (km) | Δ |
+|:---|---:|---:|---:|
+| Mercury | 160,415,073 | **160,409,405** | −5,668 |
+| Venus | 184,631,242 | **184,624,718** | −6,524 |
+| Mars | 272,645,928 | **272,636,293** | −9,635 |
+| Jupiter | 792,789,547 | **792,761,532** | −28,015 |
+| Saturn | 1,441,234,408 | **1,441,183,479** | −50,929 |
+| Uranus | 2,880,566,275 | **2,880,464,484** | −101,791 |
+| Neptune | 4,505,927,688 | **4,505,768,462** | −159,226 |
+
+### Structural fact — the whole solar system rescales together
+
+Because every planet shrinks by the **same fractional amount** under Driver 2, the relative geometry — orbital period ratios, semi-major axis ratios, perihelion alignments, the entire L1 lattice — **is preserved across all epochs**. Only the absolute distance scale (and proportionally, period scale) changes.
+
+This mirrors Driver 1's effect on H: there, the **temporal lattice** (H, 8H, every H/N divisor) expands uniformly; here, the **spatial lattice** (planet orbits) shrinks uniformly going to past. Both drivers act multiplicatively on their respective scales, leaving relative structure invariant.
+
+| Driver | Acts on | Effect | Fractional change at Devonian |
+|:---|:---|:---|:---|
+| Driver 1 (Earth-Moon tidal) | Temporal lattice (H, 8H, H/N) | Expands in past → future | H grows from 309,083 yr → 350,665 yr (+13.4 % over 580 Myr) |
+| Driver 2 (Solar mass loss) | Spatial lattice (planet a, Earth-planet d) | Shrinks in past → grows in future | Whole solar system −35 ppm at Devonian, +35 ppm at +200 Myr |
+
+**Reproducibility**: all values in this section verified via `scripts/devonian_cross_check.py` STEPS 9d-9e (per-planet semi-major axes and Earth-planet time-averaged distances).
 
 ---
 

@@ -683,6 +683,56 @@ print(f"  tidally coupled to Sun. Treated as constant for Phanerozoic; primordia
 print(f"  early Solar System (>4 Gyr ago) requires special treatment.")
 print()
 
+# === STEPS 9d-9e: Planet semi-major axes + Earth-planet distances ===
+# Per-planet adiabatic a × M_Sun = const drift (Driver 2 / solar mass loss).
+# All planets drift by the same fractional amount as Earth's AU.
+print(f"  STEP 9d: Semi-major axes (a × M_Sun = const adiabatic invariant)")
+print(f"  STEP 9e: Earth-planet time-averaged distance √(a_E² + a_P²)")
+print(f"  (Both scale uniformly with mass_loss_fraction — entire solar system")
+print(f"   shrinks {mass_loss_frac_dev*1e6:.1f} ppm at Devonian, ~423 ppm at Hadean.)")
+print()
+
+# Planet J2000 semi-major axes (km) — IAU/NASA fact-sheet values
+planet_a_J2000_km = {
+    "Mercury":  57_909_176,
+    "Venus":   108_208_930,
+    "Earth":   149_597_871,   # = 1 AU by definition (rounded; precise value below)
+    "Mars":    227_939_200,
+    "Jupiter": 778_547_200,
+    "Saturn":  1_433_449_370,
+    "Uranus":  2_876_679_082,
+    "Neptune": 4_503_443_661,
+}
+# Use the precise CURRENT_AU_KM for Earth
+planet_a_J2000_km["Earth"] = CURRENT_AU_KM
+
+au_dev_km = AU_dev  # already computed above
+au_scale_factor_dev = au_dev_km / CURRENT_AU_KM  # = (1 − mass_loss_fraction)
+
+import math
+print(f"  {'Planet':<10} {'a_J2000 (km)':>16} {'a_Devonian (km)':>17} {'Δa (km)':>12}  "
+      f"{'d_J2000 (km)':>16} {'d_Devonian (km)':>17}")
+for name, a_now_km in planet_a_J2000_km.items():
+    a_dev_km = a_now_km * au_scale_factor_dev
+    delta_a = a_dev_km - a_now_km
+    # Earth-planet time-averaged distance ≈ √(a_E² + a_P²)
+    if name == "Earth":
+        d_now = d_dev = None  # Earth is the reference; skip
+        d_str_now = d_str_dev = ""
+    else:
+        d_now = math.sqrt(CURRENT_AU_KM**2 + a_now_km**2)
+        d_dev = math.sqrt(au_dev_km**2 + a_dev_km**2)
+        d_str_now = f"{d_now:>16,.0f}"
+        d_str_dev = f"{d_dev:>17,.0f}"
+    print(f"  {name:<10} {a_now_km:>16,.0f} {a_dev_km:>17,.0f} {delta_a:>+12,.0f}  "
+          f"{d_str_now} {d_str_dev}")
+
+print()
+print(f"  Structural fact: the entire solar system shrinks uniformly by")
+print(f"  (1 − mass_loss_fraction). Relative geometry — planet orbit ratios,")
+print(f"  perihelion alignments, the L1 lattice — is preserved across all epochs.")
+print()
+
 # Physical inputs (anchors)
 print(f"PHYSICAL INPUTS / ANCHORS")
 print(f"{'  Tidal rate (hr/Ma)':<35} {CANONICAL_TIDAL_RATE:>17.5f} {CANONICAL_TIDAL_RATE:>17.5f}  canonical, Wells 1963 fit")
