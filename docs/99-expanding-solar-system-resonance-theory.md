@@ -271,22 +271,22 @@ This is one of the strongest empirical validations of the framework's structural
 
 ## Predicted L1 periods at each age — obliquity band
 
-Periods in **kyr**. Computed as `8H_paleo / n`. Integer labels (n) are invariant.
+Periods in **kyr**. Computed as `8H(t) / n` using the proper-physics two-layer formula. Integer labels (n) are invariant; only H(t) scales.
 
 | Age (Ma) | H (yr) | n=48 | n=50 | n=53 | **n=65** | n=66 | n=68 | n=73 | n=76 |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| +200 | 340,347 | 56.7 | 54.5 | 51.4 | **41.9** | 41.3 | 40.0 | 37.3 | 35.8 |
-| +100 | 337,832 | 56.3 | 54.1 | 51.0 | **41.6** | 40.9 | 39.7 | 37.0 | 35.6 |
-| **0** | **335,317** | **55.9** | **53.7** | **50.6** | **41.3** | **40.6** | **39.4** | **36.7** | **35.3** |
-| -50 (Eocene) | 334,479 | 55.7 | 53.5 | 50.5 | **41.2** | 40.5 | 39.4 | 36.7 | 35.2 |
-| -90 (L. Cretaceous) | 328,331 | 54.7 | 52.5 | 49.6 | **40.4** | 39.8 | 38.6 | 36.0 | 34.6 |
-| -180 (Jurassic) | 322,044 | 53.7 | 51.5 | 48.6 | **39.6** | 39.0 | 37.9 | 35.3 | 33.9 |
-| -290 (Permian) | 315,757 | 52.6 | 50.5 | 47.7 | **38.9** | 38.3 | 37.1 | 34.6 | 33.2 |
-| -380 (Devonian) | 307,374 | 51.2 | 49.2 | 46.4 | **37.8** | 37.3 | 36.2 | 33.7 | 32.4 |
-| -440 (Silurian) | 304,580 | 50.8 | 48.7 | 46.0 | **37.5** | 36.9 | 35.8 | 33.4 | 32.1 |
-| -620 (Ediacaran) | 305,977 | 51.0 | 49.0 | 46.2 | **37.7** | 37.1 | 36.0 | 33.5 | 32.2 |
+| +200 | 350,665 | 58.44 | 56.11 | 52.93 | **43.16** | 42.50 | 41.25 | 38.43 | 36.91 |
+| +100 | 342,819 | 57.14 | 54.85 | 51.75 | **42.19** | 41.55 | 40.33 | 37.57 | 36.09 |
+| **0** | **335,317** | **55.89** | **53.65** | **50.61** | **41.27** | **40.64** | **39.45** | **36.75** | **35.30** |
+| −50 (Eocene) | 331,678 | 55.28 | 53.07 | 50.06 | **40.82** | 40.20 | 39.02 | 36.35 | 34.91 |
+| −90 (L. Cretaceous) | 328,814 | 54.80 | 52.61 | 49.63 | **40.47** | 39.86 | 38.68 | 36.03 | 34.61 |
+| −180 (Jurassic) | 322,513 | 53.75 | 51.60 | 48.68 | **39.69** | 39.09 | 37.94 | 35.34 | 33.95 |
+| −290 (Permian) | 315,040 | 52.51 | 50.41 | 47.55 | **38.77** | 38.19 | 37.06 | 34.52 | 33.16 |
+| **−380 (Devonian)** | **309,083** | **51.51** | **49.45** | **46.65** | **38.04** | **37.46** | **36.36** | **33.87** | **32.54** |
+| −440 (Silurian) | 305,178 | 50.86 | 48.83 | 46.06 | **37.56** | 36.99 | 35.90 | 33.44 | 32.12 |
+| −620 (Ediacaran) | 293,714 | 48.95 | 46.99 | 44.33 | **36.15** | 35.60 | 34.55 | 32.19 | 30.92 |
 
-**Key prediction**: Devonian obliquity main beat (n=65) at **37.8 kyr** (modern 41.3 kyr → 8.5% shorter). This matches published Devonian observations of ~36-38 kyr within ~5% (Meyers 2008, Boulila 2018).
+**Key prediction**: Devonian obliquity main beat (n=65) at **38.04 kyr** (modern 41.27 kyr → 7.8 % shorter). This matches published Devonian observations of ~36–38 kyr within ~6 % (Meyers 2008, Boulila 2018).
 
 ---
 
@@ -294,15 +294,15 @@ Periods in **kyr**. Computed as `8H_paleo / n`. Integer labels (n) are invariant
 
 | Age (Ma) | H (yr) | n=96 | n=107 | n=110 | n=113 | n=120 | n=134 | n=141 | n=152 | n=185 |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| +200 | 340,347 | 28.4 | 25.4 | 24.8 | 24.1 | 22.7 | 20.3 | 19.3 | 17.9 | 14.7 |
-| **0** | **335,317** | **27.9** | **25.1** | **24.4** | **23.7** | **22.4** | **20.0** | **19.0** | **17.6** | **14.5** |
-| -90 | 328,331 | 27.4 | 24.5 | 23.9 | 23.2 | 21.9 | 19.6 | 18.6 | 17.3 | 14.2 |
-| -180 | 322,044 | 26.8 | 24.1 | 23.4 | 22.8 | 21.5 | 19.2 | 18.3 | 16.9 | 13.9 |
-| -290 | 315,757 | 26.3 | 23.6 | 23.0 | 22.4 | 21.1 | 18.9 | 17.9 | 16.6 | 13.7 |
-| **-380** | **307,374** | **25.6** | **23.0** | **22.4** | **21.8** | **20.5** | **18.4** | **17.4** | **16.2** | **13.3** |
-| -440 | 304,580 | 25.4 | 22.8 | 22.2 | 21.6 | 20.3 | 18.2 | 17.3 | 16.0 | 13.2 |
+| +200 | 350,665 | 29.22 | 26.22 | 25.50 | 24.83 | 23.38 | 20.94 | 19.90 | 18.46 | 15.16 |
+| **0** | **335,317** | **27.94** | **25.07** | **24.39** | **23.74** | **22.35** | **20.02** | **19.03** | **17.65** | **14.50** |
+| −90 | 328,814 | 27.40 | 24.58 | 23.91 | 23.28 | 21.92 | 19.63 | 18.66 | 17.31 | 14.22 |
+| −180 | 322,513 | 26.88 | 24.11 | 23.46 | 22.83 | 21.50 | 19.25 | 18.30 | 16.97 | 13.95 |
+| −290 | 315,040 | 26.25 | 23.55 | 22.91 | 22.30 | 21.00 | 18.81 | 17.87 | 16.58 | 13.62 |
+| **−380** | **309,083** | **25.76** | **23.11** | **22.48** | **21.88** | **20.61** | **18.45** | **17.54** | **16.27** | **13.37** |
+| −440 | 305,178 | 25.43 | 22.82 | 22.19 | 21.61 | 20.35 | 18.22 | 17.32 | 16.06 | 13.20 |
 
-**Key prediction**: Devonian climatic precession (n=113-141 range) at **17-22 kyr** (modern 19-24 kyr → 8.5% shorter). Matches published Devonian precession-band observations (Meyers 2008 reports ~17.7 kyr — matches framework's n=141 paleo prediction of 17.4 kyr within 2%).
+**Key prediction**: Devonian climatic precession (n=113–141 range) at **17.5–22 kyr** (modern 19–24 kyr → 7.8 % shorter). Matches published Devonian precession-band observations (Meyers 2008 reports ~17.7 kyr — matches framework's n=141 paleo prediction of 17.54 kyr within 1 %).
 
 ---
 
@@ -310,63 +310,69 @@ Periods in **kyr**. Computed as `8H_paleo / n`. Integer labels (n) are invariant
 
 | Age (Ma) | H (yr) | n=9 | n=12 | n=14 | n=16 | n=18 | n=20 | n=21 | n=22 | n=25 | n=28 |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| +200 | 340,347 | 302.5 | 226.9 | 194.5 | 170.2 | 151.3 | 136.1 | 129.7 | 123.8 | 108.9 | 97.2 |
+| +200 | 350,665 | 311.7 | 233.8 | 200.4 | 175.3 | 155.9 | 140.3 | 133.6 | 127.5 | 112.2 | 100.2 |
 | **0** | **335,317** | **298.1** | **223.5** | **191.6** | **167.7** | **149.0** | **134.1** | **127.7** | **121.9** | **107.3** | **95.8** |
-| -90 | 328,331 | 291.8 | 218.9 | 187.6 | 164.2 | 145.9 | 131.3 | 125.1 | 119.4 | 105.1 | 93.8 |
-| -180 | 322,044 | 286.3 | 214.7 | 184.0 | 161.0 | 143.1 | 128.8 | 122.7 | 117.1 | 103.1 | 92.0 |
-| -290 | 315,757 | 280.7 | 210.5 | 180.4 | 157.9 | 140.3 | 126.3 | 120.3 | 114.8 | 101.0 | 90.2 |
-| **-380** | **307,374** | **273.2** | **204.9** | **175.6** | **153.7** | **136.6** | **122.9** | **117.1** | **111.8** | **98.4** | **87.8** |
-| -440 | 304,580 | 270.7 | 203.1 | 174.0 | 152.3 | 135.4 | 121.8 | 116.0 | 110.8 | 97.5 | 87.0 |
+| −90 | 328,814 | 292.3 | 219.2 | 187.9 | 164.4 | 146.1 | 131.5 | 125.3 | 119.6 | 105.2 | 93.9 |
+| −180 | 322,513 | 286.7 | 215.0 | 184.3 | 161.3 | 143.3 | 129.0 | 122.9 | 117.3 | 103.2 | 92.1 |
+| −290 | 315,040 | 280.0 | 210.0 | 180.0 | 157.5 | 140.0 | 126.0 | 120.0 | 114.6 | 100.8 | 90.0 |
+| **−380** | **309,083** | **274.7** | **206.1** | **176.6** | **154.5** | **137.4** | **123.6** | **117.7** | **112.4** | **98.9** | **88.3** |
+| −440 | 305,178 | 271.3 | 203.5 | 174.4 | 152.6 | 135.6 | 122.1 | 116.3 | 111.0 | 97.7 | 87.2 |
 
 **Key prediction (testable)**: Devonian short-eccentricity peaks predicted at:
-- n=22 (modern 124 kyr) → **112 kyr** in Devonian
-- n=25 (modern 107 kyr) → **98 kyr** in Devonian
+- n=22 (modern 122 kyr) → **112 kyr** in Devonian
+- n=25 (modern 107 kyr) → **99 kyr** in Devonian
 - n=28 (modern 96 kyr) → **88 kyr** in Devonian
 
-Da Silva 2020 measured 5 cycles in 490 kyr (radiometric anchors) → **98 kyr/cycle empirical**. If interpreted as n=25 cycles, matches view 2 prediction (98.4 kyr) **within 0.4%** — extremely close.
+Da Silva 2020 measured 5 cycles in 490 kyr (radiometric anchors) → **98 kyr/cycle empirical**. If interpreted as n=25 cycles, matches view 2 prediction (98.9 kyr) **within 1 %** — extremely close.
 
-If interpreted as n=28 cycles, modern n=28 = 96 kyr fits at 2% (view 1), but view 2's 88 kyr fits at 11% off. So this depends on identification of which beat dominates Devonian short-eccentricity. Both views remain viable; see doc 97 Test C-PrecessionBand notes.
+If interpreted as n=28 cycles, modern n=28 = 96 kyr fits at 2 % (view 1), but view 2's 88 kyr fits at 11 % off. So this depends on identification of which beat dominates Devonian short-eccentricity. Both views remain viable; see doc 97 Test C-PrecessionBand notes.
 
 ---
 
 ## Predicted Moon-Earth distance through time
 
-Derived from angular momentum conservation (`L_total = I_E × 2π/LOD + M_M × √(GM × a × (1-e²))`, see IP-deep-time-extension.md):
+Layer 2 of the proper-physics formula gives Moon's geocentric distance directly:
+
+`a_Moon(t) = a_now × (1 + α₁·t_Ma + α₃·t_Ma³ + α₄·t_Ma⁴)`
+
+with α₁, α₃, α₄ fit to Farhat 2022. The resulting LOD from angular-momentum conservation (Layer 1) is shown for reference.
 
 | Age (Ma) | LOD (hr) | Moon distance (km) | Δ vs modern (km) |
 |---:|---:|---:|---:|
-| +200 | 24.36 | ~387,500 | +3,100 |
-| +100 | 24.18 | ~386,400 | +2,000 |
-| **0** | **24.00** | **384,400** | **0** |
-| -50 | 23.94 | 384,000 | -400 |
-| -90 | 23.50 | 381,900 | -2,500 |
-| -180 | 23.05 | 378,800 | -5,600 |
-| -290 | 22.60 | 375,700 | -8,700 |
-| **-380** | **22.00** | **371,200** | **-13,200** |
-| -440 | 21.80 | 369,700 | -14,700 |
+| +200 | 25.10 | 391,235 | +6,836 |
+| +100 | 24.54 | 387,810 | +3,411 |
+| **0** | **24.00** | **384,399** | **0** |
+| −50 | 23.74 | 382,695 | −1,704 |
+| −90 | 23.53 | 381,330 | −3,069 |
+| −180 | 23.08 | 378,250 | −6,149 |
+| −290 | 22.55 | 374,456 | −9,943 |
+| **−380** | **22.12** | **371,314** | **−13,085** |
+| −440 | 21.84 | 369,196 | −15,203 |
 
-Modern lunar recession rate: 3.83 cm/yr (lunar laser ranging). Calibrated long-term Phanerozoic average from this table: ~3.72 cm/yr — within 3%.
+**Modern lunar recession rate**: 3.83 cm/yr (Lunar Laser Ranging direct measurement). The proper-physics α₁ is anchored at canonical Wells 0.00526 hr/Ma, which corresponds to a long-term average recession of **3.43 cm/yr** (10 % below LLR — the LLR rate reflects current Atlantic-basin anomalously high tidal dissipation; Wells is the Phanerozoic-averaged rate). Both are within published uncertainty.
 
 ---
 
 ## Predicted planetary perihelion precession periods through time
 
-All L1 integers including planetary ecliptic perihelion precessions scale with H (per framework view 2):
+All L1 integers including planetary ecliptic perihelion precessions scale with H (per framework view 2). Devonian and future values from the proper-physics two-layer formula.
 
-| Quantity | Integer | Modern | Devonian (-380 Ma) | +200 Myr Future |
-|:---|:---|:---|:---|:---|
-| Mercury perihelion ecliptic | 8H/11 | 243,867 yr | 223,556 yr | 247,525 yr |
-| Venus perihelion ecliptic | 8H/6 (retrograde) | 447,089 yr | 409,832 yr | 453,796 yr |
-| Mars perihelion ecliptic | 8H/36 | 74,515 yr | 68,305 yr | 75,633 yr |
-| **Jupiter perihelion ecliptic** | **8H/39** | **68,783 yr** | **63,051 yr** | **69,808 yr** |
-| **Saturn perihelion ecliptic** | **8H/65** | **41,270 yr** | **37,830 yr** | **41,889 yr** |
-| Uranus perihelion ecliptic | H/3 = 8H/24 | 111,772 yr | 102,458 yr | 113,449 yr |
-| Neptune perihelion ecliptic | 2H = 8H/4 | 670,634 yr | 614,748 yr | 680,694 yr |
-| Saturn ICRF perihelion | 8H/169 (retrograde) | 15,873 yr | 14,549 yr | 16,111 yr |
-| Earth ICRF perihelion | +H/3 = 8H/24 | 111,772 yr | 102,458 yr | 113,449 yr |
-| Jupiter ICRF perihelion | 8H/65 (retrograde) | 41,270 yr | 37,830 yr | 41,889 yr |
+| Quantity | Integer | Modern | Devonian (−380 Ma) | +200 Myr Future |
+|:---|:---|---:|---:|---:|
+| Mercury perihelion ecliptic | 8H/11 | 243,867 yr | **224,788 yr** | **255,029 yr** |
+| Venus perihelion ecliptic | 8H/6 (retrograde) | 447,089 yr | **412,111 yr** | **467,553 yr** |
+| Mars perihelion ecliptic | 8H/36 | 74,515 yr | **68,685 yr** | **77,925 yr** |
+| **Jupiter perihelion ecliptic** | **8H/39** | **68,783 yr** | **63,402 yr** | **71,931 yr** |
+| **Saturn perihelion ecliptic** | **8H/65** | **41,270 yr** | **38,041 yr** | **43,159 yr** |
+| Uranus perihelion ecliptic | H/3 = 8H/24 | 111,772 yr | **103,028 yr** | **116,888 yr** |
+| Neptune perihelion ecliptic | 2H = 8H/4 | 670,634 yr | **618,167 yr** | **701,329 yr** |
+| Saturn ICRF perihelion | 8H/169 (retrograde) | 15,873 yr | **14,631 yr** | **16,600 yr** |
+| Earth ICRF perihelion | +H/3 = 8H/24 | 111,772 yr | **103,028 yr** | **116,888 yr** |
+| Jupiter ICRF perihelion | 8H/65 (retrograde) | 41,270 yr | **38,041 yr** | **43,159 yr** |
 
 **Note on the Saturn-Jupiter resonance lock (Law 6)**: The framework's Law 6 — Saturn ecliptic perihelion = Jupiter ICRF perihelion = 8H/65 — is preserved across all epochs because both scale with H. The structural identity persists; only the absolute period evolves.
+
+**Note on solar mass loss**: planetary orbital periods *themselves* (sidereal years, not their perihelion precession) drift by Driver 2 (~70 ppm at Devonian, ~850 ppm at Hadean). The L1 perihelion precessions above are computed as `8H(t) / n`, which scales the perihelion period with H — but the underlying orbital period was also slightly shorter in the past, so the framework's structural ratios `(planet_orbits per 8H)` stay near-invariant. See doc 15 for the Drivers-1+2 budget at each planet.
 
 ---
 
