@@ -777,10 +777,10 @@ The framework's invariants are:
 3. The closure of the 8H lattice (with appropriate paleo-correction)
 
 The framework's epoch-dependent quantities:
-1. The specific value of H (335,317 yr now, was ~307,000 yr in Devonian)
-2. The specific value of 8H (2.68 Myr now, was 2.46 Myr in Devonian)
+1. The specific value of H (335,317 yr now, was ~309,000 yr in Devonian under the proper-physics two-layer formula — see doc 99 § "Proper-physics LOD formula")
+2. The specific value of 8H (2.68 Myr now, was 2.47 Myr in Devonian)
 3. The specific L1 integer labels (n=65 for obliquity main now, n=68
-   in Devonian)
+   in Devonian — i.e., the obliquity period shifts to a different lattice integer at deep time)
 
 This makes the framework's claim *both more specific and more testable*:
 the integer structure is invariant; the period labels track LOD
