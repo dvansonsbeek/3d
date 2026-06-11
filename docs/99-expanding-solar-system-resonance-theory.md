@@ -472,7 +472,7 @@ Other useful conversions (all anchored at canonical Wells 0.00526 hr/Ma):
 - **Per 100 million years**: 2.19 % per 100 Myr
 - **Per Gyr**: 21.9 % per Gyr
 
-So in 1 Gyr (1,000 Myr), H grows by about **22 %**. This means **1 Gyr ago H was ~78 % of current** — consistent with Farhat 2022's tabulated value of 75 % (within ~3 %).
+So in 1 Gyr (1,000 Myr), H would grow by about **22 %** under the linear approximation. This means **linear extrapolation: 1 Gyr ago H ≈ 78 % of current**. The proper-physics formula (with the α₃·t³ + α₄·t⁴ curvature) gives a more nuanced value: H at 1 Gyr ago = **80.6 %** of current. Farhat 2022's full ocean-tidal model gives **75 %**. All three are within ~3–5 % of each other — close enough that for narrative purposes "about 75–80 % of modern" is the right framing.
 
 **Each 8H cycle (~2.68 Myr) the framework's structure stretches by ~197 years in H (or ~1,580 years in 8H).** Over ~3,200 cycles since Earth-Moon genesis, this compounds to the full ~21 % → 100 % increase.
 
@@ -1039,7 +1039,7 @@ Proper-physics formula's bounded future projections:
 | +2 Gyr | 52.3 hr (=2.18 d) | 473,136 km | 730,622 yr | 5.85 Myr | within formula |
 | **+3 Gyr** | **beyond a_lock** | — | — | — | **formula horizon** |
 | +5 Gyr (Sun's red giant) | — | — | — | — | beyond formula domain |
-| ~50 Gyr (true tidal lock) | ~47 days | 555,623 km | ~640 Myr | ~5.1 Gyr | only via L_total-extrapolation |
+| ~50 Gyr (true tidal lock) | ~47 days | 555,623 km | ~15.8 Myr | ~126 Myr | only via L_total-extrapolation |
 
 **Sun's red giant phase (+5 Gyr) is beyond our formula's predictive horizon.** The Layer-2 polynomial saturates 2 Gyr before the Sun's main-sequence ends. For physically realistic projections past ~+2.5 Gyr, one would need either a more careful Layer-2 model (with explicit tidal-Q asymptotic slowdown), or direct integration of the angular-momentum equations from t = +2 Gyr forward.
 
@@ -1056,7 +1056,7 @@ A: The proper-physics formula reaches `a_lock` at approximately +3 Gyr. Beyond t
 A: **Never**. LOD has been monotonically increasing for ~4.5 Gyr (Layer 2) and will continue to. Going backward, the canonical Wells rate's linear extrapolation gives LOD = 0 at 4.56 Gyr ago — within 0.5 % of Patterson's Earth age (4.54 Gyr) — but the proper-physics formula naturally stops at the Roche-limit Moon distance (3.0 R_E, 4.54 Gyr ago) rather than reaching LOD = 0.
 
 **Q: When will days/year = 1?**
-A: **Never** with the Moon present. The bounded tidal-lock equilibrium is ~5 hours per Moon-orbit cycle (~47 days per Earth day), which corresponds to a few days per year — well above "1 day per year" but well below current 365. Days/year decreases monotonically: 365 (now) → 349 (+200 Myr) → ~280 (+1 Gyr) → much smaller at tidal lock.
+A: **Never** with the Moon present. The bounded tidal-lock equilibrium has Earth's day = Moon's orbital period = **~47 days** (in current units), which gives ~7.8 days/year — well above "1 day per year" but well below current 365. Days/year decreases monotonically: 365 (now) → 349 (+200 Myr) → ~280 (+1 Gyr) → ~7.8 at tidal-lock asymptote.
 
 ### The framework's effective lifespan
 
