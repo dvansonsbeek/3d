@@ -1086,7 +1086,7 @@ If ESSRT is correct, here's what should happen over the next 100–1000 Myr (all
 
 ### Next 200 Myr (early Mesozoic-equivalent future)
 - Moon distance: **+6,836 km** further out (391,235 km — 61.4 R_E vs modern 60.3 R_E)
-- LOD: **25.10 hr** (66 extra minutes per day, ~3.5 ms/century net rate)
+- LOD: **25.10 hr** (66 extra minutes per day, ~2.0 ms/century net rate over the 200 Myr — slightly above the canonical 1.9 ms/century Wells rate due to the formula's small future curvature)
 - H: **350,665 yr** (+15,348 yr, +4.6 %)
 - Obliquity main beat (n=65): **43.16 kyr** (currently 41.27 kyr — 1.9 kyr longer)
 - Short eccentricity (n=28): **100.2 kyr** (currently 95.8)
