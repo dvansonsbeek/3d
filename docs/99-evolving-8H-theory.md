@@ -448,6 +448,55 @@ Replaces the earlier piecewise (Phanerozoic-linear + Proterozoic-stall + Hadean-
 
 **Devonian shift note**: the +0.55 % shift from the previous canonical H_dev = 307,391 yr (pure-linear LOD) to the new H_dev = 309,083 yr (proper physics) actually improves the match to Wells 1963's paleontological days-per-year data (99.2 % vs 98.6 % under pure linear). The curvature term that builds up inside Phanerozoic was missing from the linear approximation.
 
+### How unique is this formula? Honest positioning
+
+The framework's value here is **distillation**, not discovery: we take well-established physics components and package them into a single Excel-pasteable expression with the right asymptotics in both directions. Each ingredient is standard; the synthesis appears to be new.
+
+**Standard (used by everyone since the 1960s):**
+
+| Component | Source |
+|:---|:---|
+| Angular-momentum conservation (Layer 2) | Newtonian — textbook physics, used in every tidal-evolution paper |
+| Kaula tidal recession (`da/dt = K/a^(11/2)` → `a^(13/2) ∝ t`) | Kaula 1964 |
+| Canonical Wells rate (0.00526 hr/Ma, Phanerozoic average) | Wells 1963 |
+| Numerical deep-time anchors (LOD at 0.35–4.42 Gyr) | Farhat et al. 2022 |
+| Earth moment of inertia α = 0.3306947 | IERS Conventions 2010 |
+
+**Specific choices unique to our synthesis:**
+
+1. **Polynomial form `a(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴` with no t² term.** Skipping the quadratic was an explicit design choice to keep curvature out of the Phanerozoic — preserving the canonical Wells rate exactly at t = 0 while still capturing Farhat's deep-time curve via the cubic/quartic.
+2. **Three-constraint calibration.** Modern LOD anchor + canonical Wells rate at t = 0 + LSQ fit of α₃, α₄ to Farhat 2022's eight deep-time anchors. Standard Kaula calibration fits a single K parameter; we fit two polynomial coefficients to a published reference curve.
+3. **Closed-form single expression** combining all of the above. Standard treatments are either pure-Kaula analytical (singular at Hadean), full-numerical (Touma & Wisdom 1994; Farhat 2022 — no closed form), or piecewise (Phanerozoic + Proterozoic-stall + Hadean-linear).
+
+**The published landscape — what's actually out there:**
+
+| Source | Approach | Closed form? | Past + future? | Phanerozoic exact? |
+|:---|:---|:---:|:---:|:---:|
+| Kaula 1964 | `a^(13/2)` linear in t | ✓ | partial | no (singularity) |
+| Stephenson & Morrison 1995 | linear LOD fit to eclipses | ✓ | past only | yes |
+| Touma & Wisdom 1994 | N-body integration | ✗ | both | yes |
+| Williams 2000 | empirical paleo fits | ✗ | past only | partial |
+| Néron de Surgy & Laskar 1997 | secular ODEs | ✗ | both | yes |
+| Farhat et al. 2022 | full ocean tidal model | ✗ | both | yes |
+| **This framework (Architecture α)** | polynomial + ang. mom. | **✓ single** | **✓ both** | **✓ exact at modern** |
+
+As far as we can tell, **no published closed-form formula combines:**
+- Single algebraic expression (Excel-friendly, JavaScript-friendly)
+- Smooth ≤7 % match to Farhat 2022 across 4.5 Gyr
+- Phanerozoic linearity preserved exactly at the modern epoch
+- Future PHYSICALLY BOUNDED by the tidal-lock asymptote
+- Hadean Moon position emerging naturally at the Roche limit (NOT constrained by the fit)
+
+**Honest caveats:**
+
+1. The α₃, α₄ values are FIT parameters, not derived from first-principles Kaula. A more rigorous derivation would compute Q(t) variations through Earth history — Farhat 2022 does this numerically.
+2. The 7 % max error vs Farhat reflects this simplification. Farhat captures complex ocean-basin tidal resonance effects (Atlantic anomaly, Snowball Earth, supercontinent assembly) that smooth polynomials can't resolve.
+3. The synthesis is novel; the components aren't. This is engineering — useful, defensible, but not a fundamental physics discovery.
+
+**How to cite this in publications:**
+
+> *"We derive an analytical two-layer formula combining standard angular-momentum conservation (Touma & Wisdom 1994, and earlier) with a polynomial parametrization of Moon-distance evolution calibrated to Farhat 2022's published deep-time anchors. The polynomial form (without quadratic term) preserves Phanerozoic linearity at the modern epoch while smoothly transitioning to the proper tidal-lock asymptote at far future, matching Farhat's detailed numerical model within 7 % across 4.5 Gyr — a closed-form approximation that, to our knowledge, has not been previously published."*
+
 ---
 
 ## Why does the Moon drift away? The structural cause
