@@ -195,7 +195,7 @@ Physical mechanism behind the 8H lattice: Chirikov resonance overlap, action-ang
 
 ### Doc 99 — Deep-time canonical 9-step chain
 
-The deep-time extension framework (Architecture α) — canonical 9-step chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, planet orbital + synodic periods. See [Doc 99](../docs/99-evolving-8H-theory.md).
+The deep-time extension framework (Architecture α) — canonical 9-step chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, planet orbital + synodic periods. See [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](../docs/99-expanding-solar-system-resonance-theory.md).
 
 | Script | Description |
 |--------|-------------|

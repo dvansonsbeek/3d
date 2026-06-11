@@ -1,18 +1,18 @@
-# Doc 99 — The Evolving 8H Lattice Theory
+# Doc 99 — The Expanding Solar System Resonance Theory (ESSRT)
 
 ## Status
-Active theory draft. Started 2026-06-08. Builds on docs 91-92 (L1 lattice), 97 (Test C series), 98 (mechanism — action-angle closure), and IP-deep-time-extension.
+Active theory draft. Started 2026-06-08. Renamed 2026-06-11 from "Evolving 8H Lattice Theory" to "Expanding Solar System Resonance Theory (ESSRT)" — reflects the full scope (lattice expansion driven by Earth-Moon tidal evolution AND solar mass loss across all 8 planets, not just the 8H cycle). Builds on docs 91-92 (L1 lattice), 97 (Test C series), 98 (mechanism — action-angle closure), and IP-deep-time-extension.
 
 ---
 
 ## Core thesis
 
-**The 8H balance is structural and invariant; the H value itself evolves with geological time.**
+**The Solar System Resonance Cycle (8H) and the integer-divisor lattice it closes are structural invariants of solar-system dynamics; the period H(t) itself expands monotonically with geological time, driven by Earth-Moon tidal evolution and solar mass loss.**
 
-The L1 integer LABELS are scale-invariant constants of the system (n=9, 12, ..., 65, 66, 68, ..., 185). Their LITERAL PERIODS scale with the current value of H. As Earth-Moon-Sun tidal evolution slowly changes Earth's precession constant k, the framework's structural relation `H = 13 × precession period` forces H to evolve too — and with it, all L1 periods, planetary perihelion precessions, and the framework's other scaling quantities.
+The L1 integer LABELS are scale-invariant constants of the system (n=9, 12, ..., 65, 66, 68, ..., 185). Their LITERAL PERIODS scale with the current value of H. As Earth's length-of-day grows under tidal recession of the Moon — and as solar mass loss slowly enlarges every planet's orbit via Kepler's third law — the framework's H value, the Solar System Resonance Cycle 8H, and every H/N divisor period expand together. The integer structure stays fixed; only the unit of time within the lattice scales.
 
-> **In the past, H was smaller (~305,000 yr at 380 Ma vs 335,317 yr today).**
-> **In the future, H will be larger (~340,000 yr in 200 Myr, increasing further).**
+> **In the past, H was smaller (~309,083 yr at 380 Ma vs 335,317 yr today).**
+> **In the future, H will be larger (~350,665 yr in 200 Myr, growing asymptotically toward the tidal-lock limit).**
 > **The integer structure (n=65 for obliquity main, n=39 for Jupiter perihelion ecliptic, etc.) remains fixed across all epochs.**
 
 > 📐 **Mean values vs actual values** — All quantities tabulated in this document
@@ -29,23 +29,25 @@ The L1 integer LABELS are scale-invariant constants of the system (n=9, 12, ...,
 > deterministic chain from `t_Ma` through `LOD(t)`, `H(t)`, AU(t), `T_sidereal(t)`,
 > Moon distance, Moon period, anomalistic year, and stellar/sidereal day. The
 > tables in doc 99 use rounded LOD inputs for narrative clarity; the IP doc provides
-> the full-precision values (e.g., `H_dev = 307,390.68 yr` rather than the rounded
-> 307,374 yr below).
+> the full-precision values (e.g., `H_dev = 309,083.39 yr` under the proper-physics
+> two-layer formula — see § "Proper-physics LOD formula" below).
 
 ---
 
 ## The unified scaling principle
 
-Earth's spin slows over time (tidal recession of the Moon). This causes:
+ESSRT has **two physically independent drivers** that together expand the lattice. Both act simultaneously, and the framework's `H × days/year = TOTAL_DAYS_IN_H` invariant ties them together.
+
+### Driver 1 — Earth-Moon tidal evolution (controls Earth's spin → H)
 
 ```
-LOD increases (24 hr now, was 22 hr in Devonian, will be ~24.4 hr in 200 Myr)
+LOD increases (24 hr now, was 22.12 hr in Devonian, will be 25.10 hr in 200 Myr)
     ↓
 Earth's spin angular velocity ω = 2π/LOD decreases
     ↓
 Earth's precession constant k ∝ ω decreases
     ↓
-Precession period = 2π/k increases (25,771 yr now, 23,484 yr Devonian, ~26,000 yr future)
+Precession period = 2π/k increases (25,794 yr now, 23,776 yr Devonian, 26,974 yr in 200 Myr)
     ↓
 H = 13 × precession period increases (Fibonacci coupling, structural)
     ↓
@@ -57,20 +59,47 @@ All k-involving beats AND all planetary g_i±g_j, s_i±s_j beats scale
     (under view 2 — the framework's claim that all L1 are 8H-lattice beats)
 ```
 
+### Driver 2 — Solar mass loss (controls every planet's orbital period)
+
+```
+Sun loses mass via radiation + solar wind (~6×10⁹ kg/s = 9.3×10⁻¹⁴ /yr)
+    ↓
+For each planet (Mercury → Neptune), adiabatic invariant a·M_Sun = const
+    ↓
+Semi-major axis a expands as central mass decreases
+    ↓
+Kepler's 3rd law: T² ∝ a³/M_Sun  →  dT/T = −2·dM/M
+    ↓
+Every planetary orbital period (sidereal year_s) was SHORTER in past, longer in future
+    ↓
+At Devonian (380 Ma): T_Earth was 2,230 s (37 min) shorter than now
+At Hadean (4.5 Gyr): T_Earth was ~26,655 s (7.4 hr) shorter than now
+```
+
+### How the two drivers interact through the structural invariant
+
+The two drivers act independently in physics — tidal coupling cares about Earth-Moon angular momentum; mass loss cares about Sun→planet gravitational binding. But ESSRT's structural identity `H × days/year = TOTAL_DAYS_IN_H` couples them at the per-planet observational level:
+
+- Earth's *rotation* slows (Driver 1) → fewer day-rotations per year_s
+- Earth's *orbit period* shrinks toward past (Driver 2) → fewer year_s in absolute time
+- Their ratio `H × days/year` stays anchored to the J2000 day-count (122,471,920) to ~70 ppm at Devonian, ~850 ppm at Hadean
+
+So both drivers reshape the lattice; the structural invariant constrains how they trade off.
+
 ## Comparable parallel scalings
 
-The same epoch-dependent scaling applies to multiple system parameters:
+The same epoch-dependent scaling applies to multiple system parameters. All values below are from the proper-physics two-layer formula (Architecture α 2026-06, see §  "Proper-physics LOD formula").
 
-| Quantity | Modern | Devonian (380 Ma) | Future (+200 Myr) | Scaling source |
-|:---|:---|:---|:---|:---|
-| H (Earth Fundamental Cycle) | 335,317 yr | 307,374 yr | 340,347 yr | k(LOD) via Fibonacci coupling |
-| 8H (Solar System Resonance Cycle) | 2,682,536 yr | 2,458,992 yr | 2,722,776 yr | Direct scaling of H |
-| Moon-Earth distance | 384,400 km | ~370,000 km | ~387,500 km | Angular momentum conservation |
-| Obliquity main beat (n=65) | 41.3 kyr | 37.8 kyr | 41.9 kyr | 8H/65 scales with H |
-| Jupiter perihelion ecliptic (8H/39) | 68,783 yr | 63,051 yr | 69,808 yr | 8H/39 scales with H |
-| Saturn perihelion ecliptic (8H/65) | 41,270 yr | 37,830 yr | 41,889 yr | 8H/65 scales with H |
-| Earth axial precession (H/13) | 25,794 yr | 23,644 yr | 26,180 yr | H/13 scales with H |
-| Earth obliquity cycle (H/8) | 41,915 yr | 38,422 yr | 42,543 yr | H/8 scales with H |
+| Quantity | Modern (J2000) | Devonian (380 Ma) | Future (+200 Myr) | Scaling source |
+|:---|---:|---:|---:|:---|
+| H (Earth Fundamental Cycle) | 335,317 yr | **309,083 yr** | **350,665 yr** | LOD via two-layer formula × H/13 Fibonacci coupling |
+| 8H (Solar System Resonance Cycle) | 2,682,536 yr | **2,472,667 yr** | **2,805,317 yr** | Direct scaling of H |
+| Moon-Earth distance (a_apparent) | 384,399 km | **371,314 km** | **391,235 km** | Layer 2 polynomial (Farhat-anchored) |
+| Obliquity main beat (n=65) | 41.27 kyr | **38.04 kyr** | **43.16 kyr** | 8H/65 scales with H |
+| Jupiter perihelion ecliptic (8H/39) | 68,783 yr | **63,402 yr** | **71,931 yr** | 8H/39 scales with H |
+| Saturn perihelion ecliptic (8H/65) | 41,270 yr | **38,041 yr** | **43,159 yr** | 8H/65 scales with H |
+| Earth axial precession (H/13) | 25,794 yr | **23,776 yr** | **26,974 yr** | H/13 scales with H |
+| Earth obliquity cycle (H/8) | 41,915 yr | **38,635 yr** | **43,833 yr** | H/8 scales with H |
 
 ---
 
@@ -392,6 +421,31 @@ So in 1 Gyr (1,000 Myr), H grows by about 27%. This is consistent with the back-
 **Each 8H cycle (~2.68 Myr) the framework's structure stretches by 1,920 years (0.072%).** Over 3,307 cycles, this compounds to the full ~22%→100% increase from Moon formation to now.
 
 **Important caveat: the rate isn't constant.** It was much higher at Moon formation (Earth-Moon system far from equilibrium, strong tidal coupling) and will slow as Earth-Moon approaches the eventual equilibrium. The 0.072%/cycle is the *current* rate, not a time-average.
+
+### 🌌 The Expanding-Universe parallel
+
+The name "Expanding Solar System Resonance Theory" deliberately echoes Hubble's **Expanding Universe Theory**. The structural parallels are striking — and useful for situating ESSRT within established cosmological language:
+
+| Property | Expanding Universe Theory | Expanding Solar System Resonance Theory (ESSRT) |
+|:---|:---|:---|
+| **What expands** | Distances between galaxies | Periods within the solar-system lattice (H, 8H, every H/N divisor) |
+| **Direction of change** | Monotonic — distances grow | Monotonic — periods grow |
+| **Driving mechanism** | Metric expansion of space (dark energy / Λ) | Earth-Moon tidal evolution + solar mass loss |
+| **Beginning** | Big Bang (~13.8 Gyr ago) | Moon formation (~4.51 Gyr ago) |
+| **Asymptotic future** | Heat death (de Sitter expansion forever) | Earth-Moon tidal lock (LOD → ∞ at a_Moon → 555,623 km, ~50 Gyr ahead) |
+| **Defining constant** | Hubble parameter `H₀ ≈ 70 km/s/Mpc` | Earth Fundamental Cycle `H_now = 335,317 yr`, rate `dH/dt ≈ 0.0716 %/8H cycle` |
+| **Measurement anchor** | Cosmic Microwave Background + redshift surveys | LOD (J2000) + Farhat 2022 deep-time + paleontological day counts (Wells 1963) |
+| **Domain of validity** | Post-Planck era through far future | Post-Moon-formation through tidal-lock asymptote |
+| **Structure preserved** | Statistical homogeneity + isotropy on large scales | Integer-divisor lattice (32 climate-relevant L1 integers, all 8 planet orbital counts) |
+| **What does *not* change** | Underlying laws of physics, dimensionless ratios | L1 integer labels (n = 9, 12, ..., 65, 66, 68, ..., 185), planet orbit counts per 8H |
+
+**Where the parallel breaks down (important to acknowledge):**
+
+1. **Scale.** Cosmic expansion is universal and dominates large-scale dynamics. ESSRT is bounded to the solar system and acts on geological-to-astronomical timescales — relevant to paleoclimate and orbital evolution, not to the cosmos at large.
+2. **Mechanism.** The Expanding Universe is driven by a *fundamental* property of spacetime (dark energy / cosmological constant). ESSRT is driven by *standard* mechanics (Newton's laws + tidal Q + Sun's mass-loss rate). It's a structural consequence of well-understood physics, not a new fundamental force.
+3. **Reversibility.** Cosmic expansion is one-way (no contraction in our universe's life-cycle). ESSRT is also one-way over its domain, but the underlying physics (tidal friction, solar mass loss) are dissipative processes specific to the solar system — different category from spacetime expansion.
+
+The parallel is rhetorical and pedagogical, not physical equivalence. ESSRT borrows the *language* of expansion because the **structural fact** — a monotonically growing scale parameter governing a richly structured system — is the same shape of claim.
 
 ### 🛠️ Proper-physics LOD formula (Architecture α, 2026-06)
 
