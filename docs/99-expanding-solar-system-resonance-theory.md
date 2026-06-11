@@ -121,16 +121,16 @@ This near-invariance follows from two scalings that almost cancel:
 H_now × days/yr_now = 335,317 × 365.2422 = 122,471,920 days  (exact)
 ```
 
-**Verified at Devonian (-380 Ma) — proper-physics values:**
+**Verified at Devonian (−380 Ma) — proper-physics values:**
 ```
-H_paleo = 309,083 yr, days/yr_paleo = 396.23
-309,083 × 396.23 = 122,463,265 days  (drift −71 ppm vs J2000)
+H_paleo = 309,083 yr, days/yr_paleo (tropical) = 396.21
+309,083 × 396.21 = 122,463,264 days  (drift −71 ppm vs J2000)
 ```
 
-**Verified at Silurian (-440 Ma):**
+**Verified at Silurian (−440 Ma):**
 ```
-H_paleo = 305,178 yr, days/yr_paleo = 401.30
-305,178 × 401.30 = 122,468,930 days  (drift −24 ppm vs J2000)
+H_paleo = 305,178 yr, days/yr_paleo (tropical) = 401.28
+305,178 × 401.28 = 122,461,897 days  (drift −82 ppm vs J2000)
 ```
 
 **Physical interpretation:** at any given moment, Earth's annual rotation count is set by (sidereal year in seconds) / LOD. Both quantities evolve over geological time — LOD via tidal recession (Driver 1), sidereal year_s via solar mass loss (Driver 2) — but to first order their *product* is preserved because Driver 2 acts ~10× more slowly than Driver 1 in fractional terms (year_s drifts ~70 ppm at Devonian; LOD drifts ~7.8% at Devonian).
@@ -138,20 +138,24 @@ H_paleo = 305,178 yr, days/yr_paleo = 401.30
 This is a clean structural near-identity equivalent to "H = 13 × axial precession × 365.2422 days/yr at J2000" — and what *makes it useful* is that the small Phanerozoic drift (~70 ppm at 380 Ma) is well within the precision of paleontological day-count measurements (Wells 1963 coral rings have ±1–2% uncertainty per epoch).
 
 > 📊 **Refinement under Architecture α** — `TOTAL_DAYS_IN_H = 122,471,920` is exact at
-> J2000 (the **anchor value**). At Phanerozoic deep time it drifts very slightly
-> (−74 ppm at Devonian, growing to ~−850 ppm at Hadean) because the sidereal
-> year in seconds also evolves via AU drift (solar mass loss). The drift is
-> negligible at Phanerozoic for narrative purposes but is real at Gyr scale —
-> see `IP-deep-time-extension.md` for the full deep-time treatment. The
-> "invariance" claim above holds to <100 ppm across the Phanerozoic, which is
-> well within the precision of paleontological day-count measurements.
+> J2000 (the **anchor value**). At deep time it drifts very slightly because the
+> tropical (and sidereal) year in seconds also evolves via solar mass loss
+> (Driver 2): `drift in H × d/yr = −2 × mass_loss_fraction = −1.86 × 10⁻⁷ × t_Ma`.
+> The drift is negligible at Phanerozoic for narrative purposes but grows
+> linearly at Gyr scale — see `IP-deep-time-extension.md` for the full
+> deep-time treatment. The "near-invariance" claim above holds to <100 ppm
+> across the Phanerozoic, which is well within the precision of paleontological
+> day-count measurements.
 
 | Era | TOTAL_DAYS_IN_H diagnostic value | Drift vs J2000 |
 |:---|---:|---:|
-| J2000 (anchor) | **122,471,920** | — |
-| Devonian (380 Ma) | 122,462,833 | −74 ppm |
-| Cambrian (1 Gyr) | ~122,366,000 | −860 ppm |
-| Hadean (4 Gyr) | ~122,167,000 | −2,500 ppm |
+| J2000 (anchor) | **122,471,920** | 0 ppm |
+| Devonian (380 Ma) | 122,463,264 | **−71 ppm** |
+| Late Cambrian (500 Ma) | 122,460,530 | −93 ppm |
+| Mesoproterozoic (1 Gyr) | ~122,449,150 | **−186 ppm** |
+| Archean (2.5 Gyr) | ~122,415,300 | −463 ppm |
+| Hadean (4 Gyr) | ~122,380,840 | **−744 ppm** |
+| Earth age (4.54 Gyr) | ~122,368,460 | **−845 ppm** |
 
 ## H value and LOD through geological time
 
@@ -170,23 +174,23 @@ days/yr  = sidereal_year_s(t) / LOD(t)
 
 The structural near-invariant `H × days/yr ≈ TOTAL_DAYS_IN_H` is verified in the rightmost column. Small drift comes from Driver 2 (solar mass loss → sidereal year_s shortens at past epochs).
 
-| Age (Myr) | LOD (hr) | H (yr) | days/yr | H × days/yr | Era / Source |
+| Age (Myr) | LOD (hr) | H (yr) | days/yr (tropical) | H × days/yr | Era / Source |
 |---:|---:|---:|---:|---:|:---|
-| **+200** | **25.10** | **350,665** | **349.28** | 122,468,952 | Future (proper-physics projection) |
-| +100 | 24.54 | 342,819 | 357.27 | 122,470,438 | Future |
-| +50 | 24.27 | 339,029 | 361.26 | 122,471,229 | Future |
+| **+200** | **25.10** | **350,665** | **349.27** | 122,476,475 | Future (proper-physics projection) |
+| +100 | 24.54 | 342,819 | 357.26 | 122,474,197 | Future |
+| +50 | 24.27 | 339,029 | 361.25 | 122,473,058 | Future |
 | **0** | **24.00** | **335,317** | **365.24** | **122,471,920** | **Modern (IERS, anchor)** |
-| -10 | 23.95 | 334,584 | 366.06 | 122,471,853 | Miocene |
-| -50 | 23.74 | 331,678 | 369.26 | 122,470,909 | Eocene/Oligocene |
-| -90 | 23.53 | 328,814 | 372.47 | 122,469,233 | Late Cretaceous (Pannella) |
-| -180 | 23.08 | 322,513 | 379.74 | 122,464,317 | Jurassic (Scrutton) |
-| -290 | 22.55 | 315,040 | 388.74 | 122,456,684 | Permian (Mazzullo) |
-| **-380** | **22.12** | **309,083** | **396.23** | 122,463,265 | **Devonian (Wells 1963 — see validation below)** |
-| -440 | 21.84 | 305,178 | 401.30 | 122,468,930 | Silurian (Wells) |
-| -500 | 21.57 | 301,318 | 406.43 | 122,461,164 | Late Cambrian |
-| -620 | 21.02 | 293,714 | 416.94 | 122,463,072 | Ediacaran (Williams 2000) |
+| −10 | 23.95 | 334,584 | 366.04 | 122,471,691 | Miocene |
+| −50 | 23.74 | 331,678 | 369.25 | 122,470,780 | Eocene/Oligocene |
+| −90 | 23.53 | 328,814 | 372.46 | 122,469,869 | Late Cretaceous (Pannella) |
+| −180 | 23.08 | 322,513 | 379.73 | 122,467,819 | Jurassic (Scrutton) |
+| −290 | 22.55 | 315,040 | 388.73 | 122,465,314 | Permian (Mazzullo) |
+| **−380** | **22.12** | **309,083** | **396.21** | 122,463,264 | **Devonian (Wells 1963 — see validation below)** |
+| −440 | 21.84 | 305,178 | 401.28 | 122,461,897 | Silurian (Wells) |
+| −500 | 21.57 | 301,318 | 406.42 | 122,460,530 | Late Cambrian |
+| −620 | 21.02 | 293,714 | 416.93 | 122,457,797 | Ediacaran (Williams 2000) |
 
-**Devonian days/yr = 396.23** — matches Wells 1963's directly-counted coral growth rings of ~400 days/year at 0.94% precision. (Wells's "400" rounded count is consistent with modern reanalysis at 398–402 range; the framework's 396.23 sits at the lower edge of the published range.)
+**Devonian days/yr = 396.21** (tropical) — matches Wells 1963's directly-counted coral growth rings of ~400 days/year at 0.95 % precision. (Wells's "400" rounded count is consistent with modern reanalysis at 398–402 range; the framework's 396.21 sits at the lower edge of the published range.)
 
 **Modern → Devonian fractional change**: −7.8% in LOD, −7.8% in H, +8.5% in days/yr — these track each other through the structural identity.
 
@@ -548,7 +552,7 @@ Replaces the earlier piecewise (Phanerozoic-linear + Proterozoic-stall + Hadean-
 | **−1,000 (+1 Gyr future)** | 112,210.7 | 31.170 | 420,999 | 435,488 | 3.484 |
 | **−3,000 (+3 Gyr future)** | — | — | — | — | beyond tidal lock |
 
-**Past → future range:** the formula naturally **stops** past the tidal-lock asymptote (a → 555,623 km at t ≈ −3 Gyr from present), where LOD → ∞ and the Earth-Moon system reaches synchronous rotation. Pure-linear extrapolations would predict LOD = 39 hr at +3 Gyr — physically wrong.
+**Past → future range:** the formula's polynomial extrapolation naturally **reaches the tidal-lock distance** (a → 555,623 km) at t ≈ −3 Gyr from present, beyond which the formula returns `null`. This is a FORMULA horizon, not a physical event: in reality, Earth-Moon approaches true synchronous rotation over ~50 Gyr (the proper-physics polynomial doesn't model the future tidal-Q decay that slows the recession). For projections past +2.5 Gyr a more careful tidal-Q model is required. By comparison, pure-linear extrapolations would predict LOD = 39 hr at +3 Gyr — also physically wrong, but in the opposite direction (linear has no asymptote at all).
 
 **Hadean validation**: Moon distance at 4.543 Gyr ago = **20,532 km** (3.22 R_E) — naturally lands ~10 % outside the Roche limit (18,500 km = 2.9 R_E). The physics validates itself: no Hadean LOD constraint was used in the fit, yet the formula puts the Moon exactly where it physically must have been just after the giant impact.
 
@@ -1067,7 +1071,7 @@ A: **Never** with the Moon present. The bounded tidal-lock equilibrium is ~5 hou
 If ESSRT is correct, here's what should happen over the next 100–1000 Myr (all values from the proper-physics two-layer formula):
 
 ### Next 50 Myr (Cenozoic-future)
-- Moon distance: **+1,704 km** further out (385,103 km vs current 384,399)
+- Moon distance: **+1,704 km** further out (386,103 km vs current 384,399)
 - LOD: **+15.8 minutes** longer day (24.27 hr)
 - H: **+3,712 yr** longer (339,029 yr)
 - Climate cycles: 1.1 % longer periods (essentially unchanged at human timescales)
@@ -1142,24 +1146,25 @@ The proper-physics formula naturally places Moon at **20,532 km ≈ 3.22 R_E** a
 
 ## Summary table — ESSRT's full deep-time prediction
 
-All values from the proper-physics two-layer formula. The `H × days/yr` near-invariant is shown to reveal Driver 2 (solar mass loss) drift, not held as a constraint.
+All values from the proper-physics two-layer formula. The `H × days/yr` near-invariant is shown to reveal Driver 2 (solar mass loss) drift, not held as a constraint. Epochs chosen to match canonical Wells/Williams paleo anchors.
 
-| Quantity | Modern (J2000) | −200 Ma (Jurassic) | −400 Ma (Devonian-ish) | +200 Myr |
+| Quantity | Modern (J2000) | −180 Ma (Jurassic) | −380 Ma (Devonian) | +200 Myr |
 |:---|---:|---:|---:|---:|
-| **LOD (hr)** | **24.00** | 23.08 | 21.95 | **25.10** |
-| **days/year** | **365.24** | 379.74 | 399.27 | **349.28** |
-| H × days/yr  | 122,471,920 | 122,464,317 | 122,463,144 | 122,468,952 |
-| H (yr) | 335,317 | 322,513 | 306,720 | 350,665 |
-| 8H (Myr) | 2.683 | 2.580 | 2.454 | 2.805 |
-| Moon distance (km) | 384,399 | 378,250 | 370,228 | 391,235 |
-| Obliquity main (n=65, kyr) | 41.27 | 39.69 | 37.75 | 43.16 |
-| Short ecc dominant (n=28, kyr) | 95.80 | 92.12 | 87.62 | 100.2 |
+| **LOD (hr)** | **24.00** | 23.08 | 22.12 | **25.10** |
+| **days/year (tropical)** | **365.24** | 379.73 | 396.21 | **349.27** |
+| H × days/yr  | 122,471,920 | 122,467,819 | 122,463,264 | 122,476,475 |
+| (drift ppm vs J2000) | (0) | (−33) | (−71) | (+37) |
+| H (yr) | 335,317 | 322,513 | 309,083 | 350,665 |
+| 8H (Myr) | 2.683 | 2.580 | 2.473 | 2.805 |
+| Moon distance (km) | 384,399 | 378,250 | 371,314 | 391,235 |
+| Obliquity main (n=65, kyr) | 41.27 | 39.69 | 38.04 | 43.16 |
+| Short ecc dominant (n=28, kyr) | 95.80 | 92.12 | 88.31 | 100.2 |
 | Long ecc 405 (L2, NOT scaled, kyr) | 405 | 405 | 405 | 405 |
-| Axial precession (H/13, yr) | 25,794 | 24,809 | 23,594 | 26,974 |
-| Jupiter perihelion ecliptic (8H/39, yr) | 68,783 | 66,154 | 62,917 | 71,931 |
-| Saturn perihelion ecliptic (8H/65, yr) | 41,270 | 39,693 | 37,750 | 43,159 |
+| Axial precession (H/13, yr) | 25,794 | 24,809 | 23,776 | 26,974 |
+| Jupiter perihelion ecliptic (8H/39, yr) | 68,783 | 66,156 | 63,402 | 71,931 |
+| Saturn perihelion ecliptic (8H/65, yr) | 41,270 | 39,694 | 38,041 | 43,159 |
 
-**Key observation**: the bottom rows (periods) all expand together with H(t), reflecting Driver 1 (tidal evolution). The structural near-invariant `H × days/year ≈ TOTAL_DAYS_IN_H` drifts slightly (~50–60 ppm at −400 Ma) under Driver 2 (solar mass loss) — small but real. This combination of strict structural lattice scaling + tracked Driver 2 drift is ESSRT's deepest self-consistency check.
+**Key observation**: the bottom rows (periods) all expand together with H(t), reflecting Driver 1 (tidal evolution). The structural near-invariant `H × days/year ≈ TOTAL_DAYS_IN_H` drifts smoothly with t_Ma under Driver 2 (solar mass loss): −33 ppm at Jurassic, −71 ppm at Devonian, +37 ppm at +200 Myr future (year_s shifts longer in future because Sun has lost more mass). The drift is monotonic and small but real — about 5 ppm per 50 Ma. This combination of strict structural lattice scaling + tracked Driver 2 drift is ESSRT's deepest self-consistency check.
 
 ---
 
