@@ -113,29 +113,31 @@ H × (days per year) = TOTAL_DAYS_IN_H ≈ 122,471,920 days  (exact at J2000; dr
 
 This near-invariance follows from two scalings that almost cancel:
 - H scales linearly with LOD (since `H = 13 × precession period` and precession period scales with 1/k ∝ LOD)
-- days/year scales inversely with LOD AND with sidereal year_s (since `days/year = sidereal_year_seconds / LOD`)
-- Their product is exactly invariant at J2000; at deep time it drifts by the same amount sidereal year_s drifts (Driver 2 / solar mass loss)
+- days/year scales inversely with LOD AND with tropical year_s (since `days/year = tropical_year_seconds / LOD`)
+- Their product is exactly invariant at J2000; at deep time it drifts by the same amount tropical year_s drifts (Driver 2 / solar mass loss). Sidereal and tropical year are essentially indistinguishable here (differ by 1,223 s/yr out of 31.6 Ms, ≈ 39 ppm) — both work at the precision shown.
 
 **Exact at modern epoch (anchor):**
 ```
-H_now × days/yr_now = 335,317 × 365.2422 = 122,471,920 days  (exact)
+H_now × days/yr_now = 335,317 × 365.2422036 = 122,471,920 days  (exact at IAU year length)
 ```
+
+(Using the rounded 365.2422 gives 122,471,919 — the integer anchor TOTAL_DAYS_IN_H = 122,471,920 corresponds to mean solar year = 365.2422036, slightly more precise than 4-decimal rounding.)
 
 **Verified at Devonian (−380 Ma) — proper-physics values:**
 ```
-H_paleo = 309,083 yr, days/yr_paleo (tropical) = 396.21
-309,083 × 396.21 = 122,463,264 days  (drift −71 ppm vs J2000)
+H_paleo = 309,083.4 yr, days/yr_paleo (tropical) = 396.214
+309,083.4 × 396.214 ≈ 122,463,260 days  (drift −71 ppm vs J2000)
 ```
 
 **Verified at Silurian (−440 Ma):**
 ```
-H_paleo = 305,178 yr, days/yr_paleo (tropical) = 401.28
-305,178 × 401.28 = 122,461,897 days  (drift −82 ppm vs J2000)
+H_paleo = 305,178 yr, days/yr_paleo (tropical) = 401.281
+305,178 × 401.281 ≈ 122,461,890 days  (drift −82 ppm vs J2000)
 ```
 
-**Physical interpretation:** at any given moment, Earth's annual rotation count is set by (sidereal year in seconds) / LOD. Both quantities evolve over geological time — LOD via tidal recession (Driver 1), sidereal year_s via solar mass loss (Driver 2) — but to first order their *product* is preserved because Driver 2 acts ~10× more slowly than Driver 1 in fractional terms (year_s drifts ~70 ppm at Devonian; LOD drifts ~7.8% at Devonian).
+**Physical interpretation:** at any given moment, Earth's annual rotation count is set by (tropical year in seconds) / LOD. Both quantities evolve over geological time — LOD via tidal recession (Driver 1), tropical year_s via solar mass loss (Driver 2) — but to first order their *product* is preserved because Driver 2 acts ~10× more slowly than Driver 1 in fractional terms (year_s drifts ~70 ppm at Devonian; LOD drifts ~7.8 % at Devonian).
 
-This is a clean structural near-identity equivalent to "H = 13 × axial precession × 365.2422 days/yr at J2000" — and what *makes it useful* is that the small Phanerozoic drift (~70 ppm at 380 Ma) is well within the precision of paleontological day-count measurements (Wells 1963 coral rings have ±1–2% uncertainty per epoch).
+This is a clean structural near-identity equivalent to "TOTAL_DAYS_IN_H = 13 × axial precession (yr) × 365.2422 days/yr at J2000" — and what *makes it useful* is that the small Phanerozoic drift (~70 ppm at 380 Ma) is well within the precision of paleontological day-count measurements (Wells 1963 coral rings have ±1–2 % uncertainty per epoch).
 
 > 📊 **Refinement under Architecture α** — `TOTAL_DAYS_IN_H = 122,471,920` is exact at
 > J2000 (the **anchor value**). At deep time it drifts very slightly because the
@@ -169,10 +171,10 @@ Layer 2 — Angular-momentum conservation (EXACT):
    LOD(t) = 2π·I_E / (L_total − M_M·√(GM_EM·a(t))·√(1−e²))
 
 H(t)     = H_now × LOD(t) / LOD_now_H13
-days/yr  = sidereal_year_s(t) / LOD(t)
+days/yr  = tropical_year_s(t) / LOD(t)
 ```
 
-The structural near-invariant `H × days/yr ≈ TOTAL_DAYS_IN_H` is verified in the rightmost column. Small drift comes from Driver 2 (solar mass loss → sidereal year_s shortens at past epochs).
+The structural near-invariant `H × days/yr ≈ TOTAL_DAYS_IN_H` is verified in the rightmost column. Small drift comes from Driver 2 (solar mass loss → tropical year_s shortens at past epochs).
 
 | Age (Myr) | LOD (hr) | H (yr) | days/yr (tropical) | H × days/yr | Era / Source |
 |---:|---:|---:|---:|---:|:---|
@@ -227,19 +229,19 @@ The proper-physics formula **substantially improves the Cambrian / Late Precambr
 | Age (Ma) | Source | Measurement | Observed days/yr | Framework | Match |
 |---:|:---|:---|---:|---:|:---|
 | 0 | IERS modern | atomic clock | 365.242 | 365.242 | exact (anchor) |
-| 70 | **Winter 2020** | *Torreites* rudist bivalve | 372 | 370.87 | **−0.30%** ✓ |
-| 90 | Pannella 1972 / Scrutton | bivalves (23.5 hr) | 372.6 | 372.47 | **−0.03%** ✓ |
-| 200 | Triassic compilation | various | 385.9 | 381.37 | −1.17% ✓ |
-| 380 | **Wells 1963** | Devonian corals | 400 | 396.23 | **−0.94%** ✓ |
-| 620 | **Williams 2000** | Elatina tidal rhythmites (21.9 hr) | 400.3 | 416.94 | **+4.16%** ⚠️ |
+| 70 | **Winter 2020** | *Torreites* rudist bivalve | 372 | 370.85 | **−0.31%** ✓ |
+| 90 | Pannella 1972 / Scrutton | bivalves (23.5 hr) | 372.6 | 372.46 | **−0.04%** ✓ |
+| 200 | Triassic compilation | various | 385.9 | 381.36 | −1.18% ✓ |
+| 380 | **Wells 1963** | Devonian corals | 400 | 396.21 | **−0.95%** ✓ |
+| 620 | **Williams 2000** | Elatina tidal rhythmites (21.9 hr) | 400.3 | 416.93 | **+4.16%** ⚠️ |
 
 **Independent confirmation at 5 epochs spanning 0–380 Ma**: framework matches within 1.2% at every Phanerozoic point. The Winter 2020 Cretaceous result (*Torreites* bivalve, peer-reviewed *Paleoceanography*) and Pannella's bivalve count at ~90 Ma are particularly clean validations at epochs Wells didn't directly cover.
 
 ### The Williams 2000 (620 Ma) discrepancy — honest discussion
 
-The proper-physics formula misses Williams's Elatina rhythmite at 620 Ma by **+4%** (predicted 416.9 days/yr vs measured 400.3). This is a regression relative to the earlier pure-linear LOD formula, which hit Williams almost exactly (−0.01%).
+The proper-physics formula misses Williams's Elatina rhythmite at 620 Ma by **+4 %** (predicted 416.9 days/yr vs measured 400.3). This is a regression relative to the earlier pure-linear LOD formula, which hit Williams almost exactly (−0.01 %).
 
-Why? The pure-linear formula's `LOD = 24 − 0.00526·t_Ma` happens to pass through 21.90 hr at 620 Ma — coincidentally matching Williams. The proper-physics formula is calibrated to Farhat 2022's smooth numerical curve, which dips to LOD ≈ 21.02 hr at 620 Ma — a 4% mismatch with Williams.
+Why? The pure-linear formula's `LOD = 24 − 0.00526·t_Ma` happens to pass through 21.90 hr at 620 Ma — coincidentally matching Williams. The proper-physics formula is calibrated to Farhat 2022's smooth numerical curve, which dips to LOD ≈ 21.02 hr at 620 Ma — a 4 % mismatch with Williams.
 
 Three plausible interpretations, in honest order:
 
@@ -487,9 +489,9 @@ The name "Expanding Solar System Resonance Theory" deliberately echoes Hubble's 
 | **What expands** | Distances between galaxies | Periods within the solar-system lattice (H, 8H, every H/N divisor) |
 | **Direction of change** | Monotonic — distances grow | Monotonic — periods grow |
 | **Driving mechanism** | Metric expansion of space (dark energy / Λ) | Earth-Moon tidal evolution + solar mass loss |
-| **Beginning** | Big Bang (~13.8 Gyr ago) | Moon formation (~4.51 Gyr ago) |
+| **Beginning** | Big Bang (~13.8 Gyr ago) | Earth-Moon genesis (~4.54 Gyr ago, Patterson Pb-Pb age — where the proper-physics formula naturally places Moon at the Roche limit) |
 | **Asymptotic future** | Heat death (de Sitter expansion forever) | Earth-Moon tidal lock (LOD → ∞ at a_Moon → 555,623 km, ~50 Gyr ahead) |
-| **Defining constant** | Hubble parameter `H₀ ≈ 70 km/s/Mpc` | Earth Fundamental Cycle `H_now = 335,317 yr`, rate `dH/dt ≈ 0.0716 %/8H cycle` |
+| **Defining constant** | Hubble parameter `H₀ ≈ 70 km/s/Mpc` | Earth Fundamental Cycle `H_now = 335,317 yr`, rate `dH/dt ≈ 0.022 %/Myr` (= 0.059 %/8H cycle, canonical Wells anchor) |
 | **Measurement anchor** | Cosmic Microwave Background + redshift surveys | LOD (J2000) + Farhat 2022 deep-time + paleontological day counts (Wells 1963) |
 | **Domain of validity** | Post-Planck era through far future | Post-Moon-formation through tidal-lock asymptote |
 | **Structure preserved** | Statistical homogeneity + isotropy on large scales | Integer-divisor lattice (32 climate-relevant L1 integers, all 8 planet orbital counts) |
@@ -669,7 +671,7 @@ da_M/dt = (4π · I_E · √a_M · dLOD/dt_lunar) / (LOD² · M_M · √(GM · (
 where:
 - `dLOD/dt_lunar` is the **lunar-only contribution** to LOD slowdown (NOT the total observed rate)
 - `I_E` is Earth's moment of inertia (8.034×10³⁷ kg·m², using IERS α = 0.3306947)
-- `M_M` is Moon's mass (7.342×10²² kg)
+- `M_M` is Moon's mass (7.346×10²² kg, from GM_Moon/G)
 - `GM` is the Earth-Moon gravitational parameter (4.035×10¹⁴ m³/s²)
 - `a_M` is Moon's current semi-major axis (3.844×10⁸ m)
 - `e` is Moon's orbital eccentricity (0.0549)
@@ -693,14 +695,14 @@ Only the **lunar-only** ~2.16 ms/century transfers to Moon's orbit. The solar co
 Using `dLOD/dt_lunar = 2.16 ms/century = 2.16 × 10⁻⁵ s/yr`:
 
 ```
-da_M/dt = 4π × 8.014×10³⁷ × √3.844×10⁸ × 2.16×10⁻⁵
+da_M/dt = 4π × 8.034×10³⁷ × √3.844×10⁸ × 2.16×10⁻⁵
          ──────────────────────────────────────────────
-          86400² × 7.342×10²² × √(4.035×10¹⁴ × 0.99699)
+          86400² × 7.346×10²² × √(4.035×10¹⁴ × 0.99699)
          
-        = 3.89 × 10⁻² m/yr  =  3.89 cm/yr
+        = 3.90 × 10⁻² m/yr  =  3.90 cm/yr
 ```
 
-**Lunar laser ranging measures: 3.83 cm/yr.** The framework's formula matches modern observation within **1.5%** when the correct lunar-only input is used.
+**Lunar laser ranging measures: 3.83 cm/yr.** The framework's formula matches modern observation within **1.8 %** when the correct lunar-only input is used (and the tighter IERS α = 0.3306947 moment of inertia).
 
 Using the total observed `dLOD/dt = 2.3 ms/century` overstates the Moon drift to 4.14 cm/yr (8% high), because it incorrectly attributes solar-tide and post-glacial-rebound contributions to Moon recession.
 
@@ -747,13 +749,15 @@ So as we go back in time (more massive Sun), Earth's orbital period was **shorte
 
 **Magnitude across geological time:**
 
-| Era | t_Ma | ΔAU | Δyear_s | ΔH contribution |
+| Era | t_Ma | ΔAU | Δyear_s | ΔTOTAL_DAYS_IN_H drift (Driver 2 only) |
 |:---|---:|---:|---:|---:|
-| Cretaceous | 100 | −1,391 km | −587 s | +6.2 yr (+19 ppm) |
-| **Devonian** | **380** | **−5,285 km** | **−2,230 s** | **+21.7 yr (+71 ppm)** |
-| Cambrian | 1,000 | −13,907 km | −5,867 s | +62.4 yr (+186 ppm) |
-| Mesoproterozoic | 2,000 | −27,814 km | −11,735 s | +124.7 yr (+372 ppm) |
-| Hadean | 4,543 | −63,178 km | −26,655 s | +283.5 yr (+845 ppm) |
+| Cretaceous | 100 | −1,391 km | −587 s | −19 ppm |
+| **Devonian** | **380** | **−5,285 km** | **−2,230 s** | **−71 ppm** |
+| Cambrian | 1,000 | −13,907 km | −5,867 s | −186 ppm |
+| Mesoproterozoic | 2,000 | −27,814 km | −11,735 s | −372 ppm |
+| Hadean | 4,543 | −63,178 km | −26,655 s | −845 ppm |
+
+Under Architecture α (proper-physics formulation), H(t) scales strictly with LOD (Driver 1); Driver 2's effect appears as a drift in the structural near-invariant `H × days/yr = TOTAL_DAYS_IN_H` rather than as a shift in H itself. The sign convention is: TOTAL_DAYS_IN_H is *smaller* at past epochs because year_s is *shorter* (Sun was more massive).
 
 ### Architectural choice: explicit treatment via three time-dependent functions
 
@@ -787,12 +791,15 @@ tropicalYearSecondsAtAge(t_Ma)
 Δ = sidereal − tropical = 31,558,149.764 − 31,556,926.395 = 1,223.4 s/yr
 ```
 
-The structural invariant `TOTAL_DAYS_IN_H = 122,471,920` is preserved by construction. H itself is **derived**:
+Under Architecture α (the proper-physics formulation, 2026-06 onwards), H(t) is derived directly from the angular-momentum-conservation Layer 1:
 ```
-H(t)  =  TOTAL_DAYS_IN_H × LOD(t) / year_s_tropical(t)
+H(t)  =  H_now × LOD(t) / LOD_now_H13         [strict — H scales with LOD only]
+TOTAL_DAYS_IN_H(t) = H(t) × year_s_tropical(t) / LOD(t)
+                  ≈ TOTAL_DAYS_IN_H_J2000 × (1 − 2 · mass_loss_fraction(t))
+                                              [drifts smoothly via Driver 2]
 ```
 
-When `year_s(t)` drifts shorter (past), H(t) grows slightly to maintain the invariant.
+The pre-2026 formulation (which derived H from a constant TOTAL_DAYS_IN_H = 122,471,920 and let H absorb the year_s drift) gave essentially the same Phanerozoic values but was structurally less honest about Driver 2. The current formulation is preferred because it makes Driver 1 (LOD via tidal evolution) and Driver 2 (year_s via solar mass loss) explicitly separate.
 
 ### So what does the framework say about AU?
 
@@ -801,9 +808,9 @@ When `year_s(t)` drifts shorter (past), H(t) grows slightly to maintain the inva
 | AU drifts outward | ✓ Yes (~1.42 cm/yr from solar mass loss) |
 | AU drift is dominated by solar tides | ✗ No — mass loss dominates by 5000× |
 | Framework treats AU and year_s as constants | ✗ No — explicit via `auAtAge()`, `siderealYearSecondsAtAge()`, `tropicalYearSecondsAtAge()` |
-| Framework's structural invariant TOTAL_DAYS_IN_H = const | ✓ Yes — H itself adjusts to maintain this |
-| AU drift effect on H at Phanerozoic | Small (~70 ppm at Devonian) but tracked |
-| AU drift effect on H at Hadean (4.5 Gyr) | Significant (~850 ppm); critical for that scope |
+| Framework's structural identity TOTAL_DAYS_IN_H ≈ 122,471,920 | ✓ Near-invariant; drifts smoothly via Driver 2 (year_s shortens at past) |
+| AU drift effect on TOTAL_DAYS_IN_H at Phanerozoic | Small (−71 ppm drift at Devonian) but tracked |
+| AU drift effect on TOTAL_DAYS_IN_H at Hadean (4.5 Gyr) | Significant (−845 ppm); critical for that scope |
 
 The framework's architecture is the **same at any timescale**: two physical inputs (solar mass loss, tidal recession) with one structural invariant (rotations per H), and everything else derives. The Phanerozoic-vs-Hadean difference is only in the magnitude of the corrections, not in the formulae used.
 
