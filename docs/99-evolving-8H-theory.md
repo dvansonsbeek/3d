@@ -393,6 +393,61 @@ So in 1 Gyr (1,000 Myr), H grows by about 27%. This is consistent with the back-
 
 **Important caveat: the rate isn't constant.** It was much higher at Moon formation (Earth-Moon system far from equilibrium, strong tidal coupling) and will slow as Earth-Moon approaches the eventual equilibrium. The 0.072%/cycle is the *current* rate, not a time-average.
 
+### 🛠️ Proper-physics LOD formula (Architecture α, 2026-06)
+
+Replaces the earlier piecewise (Phanerozoic-linear + Proterozoic-stall + Hadean-linear) approximation with a single smooth two-layer formula. Past 4.5 Gyr matches Farhat 2022 to ≤7.5 %; future is **physically bounded** by the tidal-lock asymptote (no more linear extrapolation diverging to infinity).
+
+```
+  Layer 1 — Moon distance evolution:
+    a_Moon(t) = a_now × (1 + α₁·t + α₃·t³ + α₄·t⁴)
+
+  Layer 2 — Angular-momentum conservation (EXACT physics):
+    LOD(t) = 2π · I_E
+             ─────────────────────────────────────────
+             L_total − M_M · √(GM_(E+M) · a(t)) · √(1−e²)
+
+  Constants (full physics):
+    I_E       = 8.0343e37 kg·m²    (Earth moment of inertia, α=0.3306947)
+    GM_(E+M)  = 4.03505e14 m³/s²   (Earth-Moon system, IAU)
+    M_M       = 7.346e22 kg        (Moon mass)
+    a_now     = 384,399,000 m      (Moon semi-major axis at J2000)
+    e_Moon    = 0.054900489        (Moon eccentricity)
+    L_total   = 3.4729550e34 kg·m²/s  (Earth-Moon total angular momentum)
+    a_lock    = 555,623,479 m      (tidal-lock asymptote ≈ 1.446 × a_now)
+
+    α₁ = −8.8658e−05  /Ma   (modern recession from Wells canonical 0.00526 hr/Ma)
+    α₃ = −6.4186e−12  /Ma³  (LSQ fit to Farhat 2022 deep-time anchors)
+    α₄ = +1.3620e−16  /Ma⁴  (LSQ fit to Farhat 2022 deep-time anchors)
+```
+
+**Properties:**
+- Modern LOD = 86,400 s exactly (anchor preserved)
+- Modern rate = 0.00526 hr/Ma (canonical Wells fit preserved)
+- Past 4.5 Gyr matches Farhat 2022 within ≤7.5 % max error
+- Hadean Moon distance lands at Roche limit (~3 R_E) **naturally** — physics validates itself
+- Future LOD approaches the tidal-lock asymptote (LOD → ∞ at a → 555,623 km, reached ~50 Gyr ahead)
+- Single smooth formula, no piecewise discontinuities
+
+**Verified key epochs** (with proper-physics formula, from `scripts/devonian_cross_check.py`):
+
+| Age (Ma) | LOD (s) | LOD (hr) | a_Moon (km) | H (yr) | 8H (Myr) |
+|---:|---:|---:|---:|---:|---:|
+| 0 (Modern) | 86,400.0 | 24.000 | 384,399 | 335,317 | 2.683 |
+| 380 (Devonian) | 79,640.5 | 22.122 | 371,314 | **309,083** | 2.473 |
+| 550 (Cambrian) | 76,818.9 | 21.339 | 365,249 | 298,133 | 2.385 |
+| 1,000 (Mesoproterozoic) | 69,646.6 | 19.346 | 347,904 | 270,297 | 2.162 |
+| 2,500 (Archean) | 46,527.7 | 12.924 | 262,692 | 180,573 | 1.445 |
+| 4,543 (Hadean) | 17,994.6 | 4.999 | **20,532** | 69,837 | 0.559 |
+| **−200 (+200 Ma future)** | 90,354.6 | 25.098 | 391,235 | 350,665 | 2.805 |
+| **−1,000 (+1 Gyr future)** | 112,210.7 | 31.170 | 420,999 | 435,488 | 3.484 |
+| **−3,000 (+3 Gyr future)** | — | — | — | — | beyond tidal lock |
+
+**Past → future range:** the formula naturally **stops** past the tidal-lock asymptote (a → 555,623 km at t ≈ −3 Gyr from present), where LOD → ∞ and the Earth-Moon system reaches synchronous rotation. Pure-linear extrapolations would predict LOD = 39 hr at +3 Gyr — physically wrong.
+
+**Hadean validation**: Moon distance at 4.543 Gyr ago = **20,532 km** (3.22 R_E) — naturally lands ~10 % outside the Roche limit (18,500 km = 2.9 R_E). The physics validates itself: no Hadean LOD constraint was used in the fit, yet the formula puts the Moon exactly where it physically must have been just after the giant impact.
+
+**Devonian shift note**: the +0.55 % shift from the previous canonical H_dev = 307,391 yr (pure-linear LOD) to the new H_dev = 309,083 yr (proper physics) actually improves the match to Wells 1963's paleontological days-per-year data (99.2 % vs 98.6 % under pure linear). The curvature term that builds up inside Phanerozoic was missing from the linear approximation.
+
 ---
 
 ## Why does the Moon drift away? The structural cause

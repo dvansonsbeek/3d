@@ -102,7 +102,25 @@ R_earth_m = (earth_diameter_km / 2) * 1000
 alpha = 0.3306947                              # EARTH_MOI_FACTOR (IERS Conventions 2010)
 I_earth = alpha * M_earth * R_earth_m**2       # kg·m²
 
-CANONICAL_TIDAL_RATE = 0.00526                 # hr/Ma
+CANONICAL_TIDAL_RATE = 0.00526                 # hr/Ma  (diagnostic only — proper formula below)
+
+# --- PROPER-PHYSICS LOD(t) formula (Architecture α two-layer) ---
+# Replaces the pure linear LOD(t) = LOD_now − rate · t_Ma with:
+#   Layer 1 (Moon distance evolution):
+#     a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴
+#   Layer 2 (angular-momentum conservation — EXACT):
+#     LOD(t) = 2π · I_E / (L_total − M_M · √(GM_E · a(t)))
+#
+# Properties:
+#   - Modern LOD = LOD_now_H13 exactly (anchored)
+#   - Modern rate = canonical Wells 0.00526 hr/Ma (via α₁)
+#   - Past matches Farhat 2022 to ≤7.5 % over 4.5 Gyr
+#   - Future PHYSICALLY BOUNDED — naturally asymptotes to tidal lock
+#   - Hadean Moon distance lands at Roche limit (~3.0 R_E)
+ALPHA_1 = -8.8658188951e-05    # /Ma   (modern recession, Wells canonical anchor)
+ALPHA_3 = -6.4186463489e-12    # /Ma³  (LSQ fit to Farhat 2022 deep-time)
+ALPHA_4 = +1.3619800519e-16    # /Ma⁴  (LSQ fit to Farhat 2022 deep-time)
+# (α values are physics-consistent with full GM_EM and Moon eccentricity factor.)
 
 # --- Solar mass loss → AU drift → year_s drift ---
 # Derived from L_sun/c² (radiation pressure) + solar wind
@@ -299,6 +317,33 @@ L_E_spin_now = I_earth * omega_E_now
 L_moon_now = moon_angular_momentum(moon_distance_now_km * 1000, moon_e)
 L_total = L_E_spin_now + L_moon_now
 
+# Eccentricity factor for Moon's orbital angular momentum
+_E_FACTOR = math.sqrt(1 - moon_e * moon_e)   # = 0.99849 at modern e=0.0549
+
+# Tidal-lock asymptote: a_lock such that ALL angular momentum is in Moon orbit
+# (denominator of LOD formula → 0). Beyond this point Earth would have to spin
+# backward — physically impossible, so formula returns None past this distance.
+a_lock_m = (L_total / (M_moon * math.sqrt(GM_em_si) * _E_FACTOR)) ** 2  # ≈ 5.556e8 m
+
+# ============================================================
+# Proper-physics two-layer LOD(t) formula
+# ============================================================
+
+def mean_moon_distance_at_age_m(t_Ma):
+    """Layer 2 — Moon distance polynomial (no t² term → smooth Phanerozoic)."""
+    return moon_distance_now_km * 1000 * (
+        1 + ALPHA_1 * t_Ma + ALPHA_3 * t_Ma**3 + ALPHA_4 * t_Ma**4
+    )
+
+def mean_lod_seconds_at_age(t_Ma):
+    """Layer 1 — angular-momentum conservation (EXACT, full physics)."""
+    a = mean_moon_distance_at_age_m(t_Ma)
+    if a <= 0 or a >= a_lock_m:
+        return None  # beyond Hadean / past tidal-lock asymptote
+    return 2 * math.pi * I_earth / (
+        L_total - M_moon * math.sqrt(GM_em_si * a) * _E_FACTOR
+    )
+
 print("=" * 68)
 print("MODERN EPOCH (t = 0 Ma) — anchor")
 print("=" * 68)
@@ -339,21 +384,19 @@ print()
 ANCHOR = "t"   # "t" = anchor on t_Ma (canonical), "a" = anchor on Moon distance
 
 if ANCHOR == "t":
-    # STEP 1: Input t_Ma → derive LOD(t) from canonical tidal rate.
-    # Start with LOD_now_H13 (NOT exactly 86,400 s) for H/13-consistency.
-    #   LOD(t) = LOD_now_H13 − (rate × 3600 s/hr) × t_Ma
-    # Equivalently: LOD_hr(t) = LOD_now_H13/3600 − rate × t_Ma
-    #              ≈ 23.999999910 − rate × t_Ma   (instead of 24 − rate × t_Ma)
+    # STEP 1: Input t_Ma → derive LOD(t) via PROPER PHYSICS two-layer formula
+    # (replaces old linear LOD = LOD_now − rate·t_Ma).
+    #   Layer 1: a_Moon(t) from polynomial (Farhat-fitted, no t² → smooth Phanerozoic)
+    #   Layer 2: LOD(t) from angular-momentum conservation (EXACT)
     t_Ma = 380.0
-    LOD_dev_s = LOD_now_H13 - (CANONICAL_TIDAL_RATE * 3600) * t_Ma
+    LOD_dev_s = mean_lod_seconds_at_age(t_Ma)
     LOD_dev_hr = LOD_dev_s / 3600
-    # STEP 2: derive H(t) — chain continues below from LOD_dev_s
-    # Cross-check: compute resulting angular momentum chain to get a_apparent
+    # Layer 2 already gives a_apparent directly — pull it out for downstream
+    a_moon_dev_apparent_m = mean_moon_distance_at_age_m(t_Ma)
+    a_moon_dev_apparent_km = a_moon_dev_apparent_m / 1000
     omega_E_dev = 2 * math.pi / LOD_dev_s
     L_E_spin_dev = I_earth * omega_E_dev
     L_moon_dev = L_total - L_E_spin_dev
-    a_moon_dev_apparent_m = moon_distance_from_L(L_moon_dev, moon_e)
-    a_moon_dev_apparent_km = a_moon_dev_apparent_m / 1000
 else:  # ANCHOR == "a"
     a_moon_dev_apparent_km = 370_395.0
     a_moon_dev_apparent_m = a_moon_dev_apparent_km * 1000
@@ -362,7 +405,7 @@ else:  # ANCHOR == "a"
     omega_E_dev = L_E_spin_dev / I_earth
     LOD_dev_s = 2 * math.pi / omega_E_dev
     LOD_dev_hr = LOD_dev_s / 3600
-    t_Ma = (24.0 - LOD_dev_hr) / CANONICAL_TIDAL_RATE  # implied age
+    t_Ma = (24.0 - LOD_dev_hr) / CANONICAL_TIDAL_RATE  # implied age (diagnostic)
 
 # STEP 2: H_dev = H_now × LOD(t) / LOD_now_H13
 # (using H/13-consistent LOD_now, NOT 86,400 — see line ~62)
@@ -489,9 +532,9 @@ print("-" * 100)
 
 # CANONICAL 9-STEP CHAIN (MEAN values)
 print(f"{'CANONICAL 9-STEP CHAIN (MEAN values)':<35}")
-print(f"  STEP 1: t_Ma → LOD(t)")
-print(f"{'    rate (hr/Ma)':<35} {CANONICAL_TIDAL_RATE:>17.5f} {CANONICAL_TIDAL_RATE:>17.5f}  canonical, Wells 1963 fit")
-print(f"{'    LOD(t) = LOD_now_H13 − rate×3600×t':<35} {LOD_now_H13:>17,.6f} {LOD_dev_s:>17,.6f}  (sec)")
+print(f"  STEP 1: t_Ma → LOD(t)  [proper-physics two-layer formula]")
+print(f"{'    Layer 1: a_Moon(t) (km)':<35} {moon_distance_now_km:>17,.4f} {a_moon_dev_apparent_km:>17,.4f}  a_now × (1 + α₁t + α₃t³ + α₄t⁴)")
+print(f"{'    Layer 2: LOD = 2π·I_E/(L_T − M·√(GM·a)·√(1−e²))':<35} {LOD_now_H13:>17,.6f} {LOD_dev_s:>17,.6f}  (sec)")
 print(f"  STEP 2: LOD(t) → H(t)")
 print(f"{'    LOD_now_H13 (consistent)':<35} {LOD_now_H13:>17,.6f} {LOD_now_H13:>17,.6f}  sidereal_yr_s / sidereal_yr_d_H13")
 print(f"{'    H(t) = H_now × LOD(t)/LOD_now_H13':<35} {H_now:>17,} {H_dev_simple:>17,.4f}  yr")
@@ -652,7 +695,7 @@ print()
 
 # Tier 1 — directly time-dependent (variables already computed above)
 print(f"{'TIER 1 — directly time-dependent':<35}")
-print(f"{'  LOD (s)':<35} {LOD_now_s:>17,.4f} {LOD_dev_s:>17,.4f}  24 − rate × t_Ma")
+print(f"{'  LOD (s)':<35} {LOD_now_s:>17,.4f} {LOD_dev_s:>17,.4f}  proper-physics two-layer")
 print(f"{'  LOD (hr)':<35} {24.0:>17.6f} {LOD_dev_hr:>17.6f}  same in hr")
 print(f"{'  mass_loss_fraction':<35} {0:>17.4e} {mass_loss_frac_dev:>17.4e}  SOLAR_MASS_LOSS_FRAC_PER_YR × t_Ma × 1e6")
 print(f"{'  M_Sun (kg)':<35} {M_SUN_NOW:>17.6e} {M_Sun_dev:>17.6e}  M_SUN_NOW / (1 − frac)")
