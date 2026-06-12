@@ -4358,6 +4358,308 @@ const halleysPerihelionDistance = halleysRealOrbitalEccentricity*halleysOrbitDis
 const halleysSpeed = (halleysOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/halleysSolarYearCount))/24;
 const halleysRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/2.2));
 
+// ═════════════════════════════════════════════════════════════════
+// DEEP-TIME CHAIN — ESSRT Architecture α  (PHASE 0: mean*AtAge funcs)
+// ═════════════════════════════════════════════════════════════════
+// Implements the canonical 2-step chain from doc 99 (ESSRT) and the
+// implementation plan in docs/hidden/IP-deep-time-extension.md.
+//   STEP 1: t_Ma → LOD(t) via proper-physics two-layer formula
+//           Layer 2 — Moon distance polynomial (Farhat 2022 LSQ fit)
+//           Layer 1 — Angular-momentum conservation (exact)
+//   STEP 2: H(t) = H_now × LOD(t) / LOD_now_H13
+//   STEPs 3-9: AU(t), year_s(t), Moon distance/months, anomalistic
+//              year, stellar/sidereal day, per-planet semi-major axes
+//              and Earth-planet distances.
+//
+// PHASE 0 — pure additions. Every function returns the existing modern
+// constant exactly at t_Ma = 0 (zero behaviour change anywhere). Later
+// phases (1-4) will convert select const→let and wire setEpoch(t_Ma)
+// into the animation loop.
+//
+// Verified against scripts/devonian_cross_check.py at modern + Devonian
+// (t_Ma = 380): LOD = 22.12 hr, H = 309,083 yr, Moon a = 371,314 km.
+// ═════════════════════════════════════════════════════════════════
+
+// ───── Tidal evolution rates ─────
+const CANONICAL_TIDAL_RATE_HR_PER_MA = 0.00526;     // Wells 1963 Phanerozoic / Patterson inverse
+const MODERN_TIDAL_RATE_HR_PER_MA    = 0.006;       // LLR-measured lunar-only (≈ 2.16 ms/century)
+
+// ───── Earth physical constants ─────
+const EARTH_MOI_FACTOR = 0.3306947;                 // IERS Conventions 2010, dimensionless
+const R_EARTH_M        = (diameters.earthDiameter / 2) * 1000;        // km → m
+const I_EARTH          = EARTH_MOI_FACTOR * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
+                       // ≈ 8.034 × 10³⁷ kg·m²
+
+// ───── Solar physics constants (Driver 2 — mass loss) ─────
+const L_SUN_W              = 3.828e26;              // IAU 2015 nominal solar luminosity (W)
+const SOLAR_WIND_KG_PER_S  = 1.6e9;                 // Ulysses/ACE/Wind measurements
+const C_SI_M_PER_S         = speedOfLight * 1000;   // km/s → m/s (exact IAU c)
+const dM_dt_radiation_kg_s = L_SUN_W / (C_SI_M_PER_S * C_SI_M_PER_S);  // ≈ 4.26 × 10⁹
+const dM_dt_total_kg_s     = dM_dt_radiation_kg_s + SOLAR_WIND_KG_PER_S;  // ≈ 5.86 × 10⁹
+const SOLAR_MASS_LOSS_FRAC_PER_YR =
+      dM_dt_total_kg_s * meansiderealyearlengthinSeconds / M_SUN;     // ≈ 9.30 × 10⁻¹⁴ /yr
+
+// ───── LOD anchor consistent with the H/13 Fibonacci coupling ─────
+// = 31,558,149.7640640 / 365.256364373822 ≈ 86,399.999677 s
+// (3.7 ppb less than 86,400; reconciles IAU sidereal year with H/13 coupling)
+const LOD_NOW_H13_S = meansiderealyearlengthinSeconds / meansiderealyearlengthinDays;
+
+// ───── Layer-1 / Layer-2 constants (Architecture α proper physics) ─────
+const A_MOON_NOW_M    = moonDistance * 1000;        // km → m
+const E_FACTOR_MOON   = Math.sqrt(1 - moonOrbitalEccentricityBase * moonOrbitalEccentricityBase);
+const GM_EM_M3S2      = GM_EARTH_MOON_SYSTEM * 1e9; // km³/s² → m³/s²
+const L_TOTAL_EM_KGM2_S = (I_EARTH * 2 * Math.PI / LOD_NOW_H13_S)
+                        + (M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * A_MOON_NOW_M) * E_FACTOR_MOON);
+                       // ≈ 3.473 × 10³⁴ kg·m²/s (Earth-Moon total angular momentum)
+const A_LOCK_M        = (L_TOTAL_EM_KGM2_S / (M_MOON_ALONE * Math.sqrt(GM_EM_M3S2) * E_FACTOR_MOON)) ** 2;
+                       // ≈ 555,623 km (tidal-lock asymptote, 87.1 R_E, reached ~50 Gyr ahead)
+
+// Farhat 2022 LSQ polynomial coefficients — Moon distance evolution
+// a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴   (no α₂; preserves modern Wells rate)
+const ALPHA_1 = -8.8658188951e-05;   // /Ma   (modern recession, Wells 0.00526 hr/Ma anchor)
+const ALPHA_3 = -6.4186463489e-12;   // /Ma³  (LSQ fit to Farhat 2022 deep-time anchors)
+const ALPHA_4 = +1.3619800519e-16;   // /Ma⁴  (LSQ fit to Farhat 2022 deep-time anchors)
+
+// ───── Structural diagnostic (J2000 anchor — drifts at deep time) ─────
+// Earth solar-day rotations per H cycle at J2000 = 122,471,920 (Wells 1963
+// validated to <0.01% across 12 paleo measurements). Under Architecture α
+// this drifts smoothly via Driver 2 (~71 ppm at Devonian, ~850 ppm at Hadean).
+// Do NOT use as an input to compute H(t) at deep time.
+const TOTAL_DAYS_IN_H = holisticyearLength * meansolaryearlengthinDays;
+
+const ORBITS_PER_H = {
+  earth_rotations: TOTAL_DAYS_IN_H,
+  moon_months:     Math.round(TOTAL_DAYS_IN_H / moonSiderealMonthInput),
+  mercury:         mercurySolarYearCount,
+  venus:           venusSolarYearCount,
+  mars:            marsSolarYearCount,
+  jupiter:         jupiterSolarYearCount,
+  saturn:          saturnSolarYearCount,
+  uranus:          uranusSolarYearCount,
+  neptune:         neptuneSolarYearCount,
+};
+
+// ───── LAYER 2 — Moon distance evolution ─────
+/** Moon semi-major axis at given geological age (METRES). t_Ma > 0 = past. */
+function meanMoonDistanceMetresAtAge(t_Ma) {
+  const t = t_Ma;
+  return A_MOON_NOW_M * (1 + ALPHA_1*t + ALPHA_3*t*t*t + ALPHA_4*t*t*t*t);
+}
+
+// ───── LAYER 1 — Angular-momentum-conservation LOD ─────
+/** LOD in seconds at given age. Returns null past the tidal-lock asymptote. */
+function meanLodSecondsAtAge(t_Ma) {
+  const a = meanMoonDistanceMetresAtAge(t_Ma);
+  if (a <= 0 || a >= A_LOCK_M) return null;
+  return (2 * Math.PI * I_EARTH) /
+         (L_TOTAL_EM_KGM2_S - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
+}
+
+/** LOD in hours at given age. */
+function meanLodHoursAtAge(t_Ma) {
+  const s = meanLodSecondsAtAge(t_Ma);
+  return (s === null) ? null : s / 3600;
+}
+
+// ───── STEP 2 — Earth Fundamental Cycle H(t) ─────
+/** H(t) in years. Returns holisticyearLength exactly at t_Ma = 0. */
+function meanHAtAge(t_Ma) {
+  const LOD_s = meanLodSecondsAtAge(t_Ma);
+  if (LOD_s === null) return null;
+  return holisticyearLength * LOD_s / LOD_NOW_H13_S;
+}
+
+// ───── Driver 2 — AU and year_s ─────
+/** Earth semi-major axis in km at given epoch (adiabatic a × M = const). */
+function meanAuAtAge(t_Ma) {
+  if (t_Ma === 0) return currentAUDistance;
+  const mass_loss_fraction = SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6;
+  return currentAUDistance * (1 - mass_loss_fraction);
+}
+
+/** Sidereal year in seconds (Kepler, dT/T = −2 dM/M). */
+function meanSiderealYearSecondsAtAge(t_Ma) {
+  if (t_Ma === 0) return meansiderealyearlengthinSeconds;
+  const mass_loss_fraction = SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6;
+  return meansiderealyearlengthinSeconds * (1 - 2 * mass_loss_fraction);
+}
+
+/** Tropical year in seconds. */
+function meanTropicalYearSecondsAtAge(t_Ma) {
+  const tropical_now_s = meansolaryearlengthinDays * meanlengthofday;
+  if (t_Ma === 0) return tropical_now_s;
+  const mass_loss_fraction = SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6;
+  return tropical_now_s * (1 - 2 * mass_loss_fraction);
+}
+
+/** Diagnostic: days/year at epoch (tropical year ÷ LOD at epoch). */
+function meanYearInDaysAtAge(t_Ma) {
+  const LOD_s = meanLodSecondsAtAge(t_Ma);
+  if (LOD_s === null) return null;
+  return meanTropicalYearSecondsAtAge(t_Ma) / LOD_s;
+}
+
+// ───── Moon distance correction + Kepler month ─────
+/** Solar Δa correction (km) for Moon's apparent semi-major axis (doc 24). */
+function meanSolarDeltaAAtAge(t_Ma, a_apparent_km) {
+  const LOD_s = meanLodSecondsAtAge(t_Ma);
+  if (LOD_s === null) return null;
+  const T_sid_d_at_epoch = meanSiderealYearSecondsAtAge(t_Ma) / LOD_s;
+  return a_apparent_km * (1 / (MASS_RATIO_EARTH_MOON + 1)) *
+         (moonSiderealMonthInput / T_sid_d_at_epoch);
+}
+
+/** Moon apparent distance in km (Layer-2 output, geometric Earth-Moon). */
+function meanMoonDistanceAtAge(t_Ma) {
+  return meanMoonDistanceMetresAtAge(t_Ma) / 1000;
+}
+
+/** Moon Kepler-effective distance in km (a_apparent + Solar Δa). */
+function meanMoonDistanceCorrectedAtAge(t_Ma) {
+  const a_app = meanMoonDistanceAtAge(t_Ma);
+  const dA    = meanSolarDeltaAAtAge(t_Ma, a_app);
+  return (dA === null) ? null : a_app + dA;
+}
+
+/** Moon sidereal month in seconds (Kepler on corrected a). */
+function meanMoonSiderealMonthAtAge(t_Ma) {
+  const a_corr_km = meanMoonDistanceCorrectedAtAge(t_Ma);
+  if (a_corr_km === null) return null;
+  return 2 * Math.PI * Math.sqrt(Math.pow(a_corr_km * 1000, 3) / GM_EM_M3S2);
+}
+
+/** Moon synodic month in seconds (Moon-Sun alignment cycle). */
+function meanSynodicMonthAtAge(t_Ma) {
+  const T_sm = meanMoonSiderealMonthAtAge(t_Ma);
+  if (T_sm === null) return null;
+  const T_yr = meanSiderealYearSecondsAtAge(t_Ma);
+  return T_sm * T_yr / (T_yr - T_sm);
+}
+
+/** Moon tropical month in seconds (equinox-referenced). */
+function meanTropicalMonthAtAge(t_Ma) {
+  const T_sm = meanMoonSiderealMonthAtAge(t_Ma);
+  if (T_sm === null) return null;
+  const T_yr = meanSiderealYearSecondsAtAge(t_Ma);
+  const H_t  = meanHAtAge(t_Ma);
+  return T_sm * (1 - 13 * T_sm / (H_t * T_yr));
+}
+
+/** Lunar perigee precession period in seconds (Brouwer-Clemence scaling). */
+function meanLunarPerigeePrecessionAtAge(t_Ma) {
+  const T_apsidal_J2000_days =
+    (1 / ((moonAnomalisticMonthInput / moonSiderealMonthInput) - 1))
+    * moonAnomalisticMonthInput;
+  const T_apsidal_J2000_s = T_apsidal_J2000_days * meanlengthofday;
+  if (t_Ma === 0) return T_apsidal_J2000_s;
+  const T_sm_now = moonSiderealMonthInput * meanlengthofday;
+  const T_yr_now = meansiderealyearlengthinSeconds;
+  const T_sm_t   = meanMoonSiderealMonthAtAge(t_Ma);
+  const T_yr_t   = meanSiderealYearSecondsAtAge(t_Ma);
+  if (T_sm_t === null) return null;
+  return T_apsidal_J2000_s * Math.pow(T_yr_t / T_yr_now, 2) * (T_sm_now / T_sm_t);
+}
+
+/** Lunar nodal precession period in seconds (Brouwer-Clemence scaling). */
+function meanLunarNodePrecessionAtAge(t_Ma) {
+  const T_nodal_J2000_days =
+    (moonSiderealMonthInput / (moonSiderealMonthInput - moonNodalMonthInput))
+    * moonNodalMonthInput;
+  const T_nodal_J2000_s = T_nodal_J2000_days * meanlengthofday;
+  if (t_Ma === 0) return T_nodal_J2000_s;
+  const T_sm_now = moonSiderealMonthInput * meanlengthofday;
+  const T_yr_now = meansiderealyearlengthinSeconds;
+  const T_sm_t   = meanMoonSiderealMonthAtAge(t_Ma);
+  const T_yr_t   = meanSiderealYearSecondsAtAge(t_Ma);
+  if (T_sm_t === null) return null;
+  return T_nodal_J2000_s * Math.pow(T_yr_t / T_yr_now, 2) * (T_sm_now / T_sm_t);
+}
+
+/** Moon anomalistic month in seconds (perigee-to-perigee). */
+function meanAnomalisticMonthAtAge(t_Ma) {
+  const T_sm  = meanMoonSiderealMonthAtAge(t_Ma);
+  const T_per = meanLunarPerigeePrecessionAtAge(t_Ma);
+  if (T_sm === null || T_per === null) return null;
+  return T_sm * T_per / (T_per - T_sm);
+}
+
+/** Moon nodal (draconic) month in seconds. */
+function meanNodalMonthAtAge(t_Ma) {
+  const T_sm   = meanMoonSiderealMonthAtAge(t_Ma);
+  const T_node = meanLunarNodePrecessionAtAge(t_Ma);
+  if (T_sm === null || T_node === null) return null;
+  return T_sm * T_node / (T_node + T_sm);
+}
+
+// ───── Anomalistic year + stellar/sidereal days ─────
+/** Anomalistic year in seconds (Fibonacci coupling H/(H−16)). */
+function meanAnomalisticYearSecondsAtAge(t_Ma) {
+  const H_t      = meanHAtAge(t_Ma);
+  const T_sid_s  = meanSiderealYearSecondsAtAge(t_Ma);
+  const T_trop_s = T_sid_s * (H_t - 13) / H_t;
+  return T_trop_s * H_t / (H_t - 16);
+}
+
+/** Stellar day in seconds (Earth rotation vs fixed stars). */
+function meanStellarDayAtAge(t_Ma) {
+  const T_sid_s = meanSiderealYearSecondsAtAge(t_Ma);
+  const LOD_s   = meanLodSecondsAtAge(t_Ma);
+  if (LOD_s === null) return null;
+  return T_sid_s / (T_sid_s / LOD_s + 1);
+}
+
+/** Sidereal day in seconds (Earth rotation vs precessing equinox). */
+function meanSiderealDayAtAge(t_Ma) {
+  const T_sid_s = meanSiderealYearSecondsAtAge(t_Ma);
+  const LOD_s   = meanLodSecondsAtAge(t_Ma);
+  if (LOD_s === null) return null;
+  const H_t = meanHAtAge(t_Ma);
+  return T_sid_s / (T_sid_s / LOD_s + 1 + 13 / H_t);
+}
+
+// ───── Per-planet semi-major axes + Earth-planet distances (Driver 2) ─────
+function meanMercurySemiMajorAxisAtAge(t_Ma) { return mercuryOrbitDistance * meanAuAtAge(t_Ma); }
+function meanVenusSemiMajorAxisAtAge(t_Ma)   { return venusOrbitDistance   * meanAuAtAge(t_Ma); }
+function meanEarthSemiMajorAxisAtAge(t_Ma)   { return meanAuAtAge(t_Ma); }
+function meanMarsSemiMajorAxisAtAge(t_Ma)    { return marsOrbitDistance    * meanAuAtAge(t_Ma); }
+function meanJupiterSemiMajorAxisAtAge(t_Ma) { return jupiterOrbitDistance * meanAuAtAge(t_Ma); }
+function meanSaturnSemiMajorAxisAtAge(t_Ma)  { return saturnOrbitDistance  * meanAuAtAge(t_Ma); }
+function meanUranusSemiMajorAxisAtAge(t_Ma)  { return uranusOrbitDistance  * meanAuAtAge(t_Ma); }
+function meanNeptuneSemiMajorAxisAtAge(t_Ma) { return neptuneOrbitDistance * meanAuAtAge(t_Ma); }
+
+function _earthPlanetDist(a_E, a_P) { return Math.sqrt(a_E*a_E + a_P*a_P); }
+function meanEarthMercuryDistanceAtAge(t_Ma) { return _earthPlanetDist(meanAuAtAge(t_Ma), meanMercurySemiMajorAxisAtAge(t_Ma)); }
+function meanEarthVenusDistanceAtAge(t_Ma)   { return _earthPlanetDist(meanAuAtAge(t_Ma), meanVenusSemiMajorAxisAtAge(t_Ma)); }
+function meanEarthMarsDistanceAtAge(t_Ma)    { return _earthPlanetDist(meanAuAtAge(t_Ma), meanMarsSemiMajorAxisAtAge(t_Ma)); }
+function meanEarthJupiterDistanceAtAge(t_Ma) { return _earthPlanetDist(meanAuAtAge(t_Ma), meanJupiterSemiMajorAxisAtAge(t_Ma)); }
+function meanEarthSaturnDistanceAtAge(t_Ma)  { return _earthPlanetDist(meanAuAtAge(t_Ma), meanSaturnSemiMajorAxisAtAge(t_Ma)); }
+function meanEarthUranusDistanceAtAge(t_Ma)  { return _earthPlanetDist(meanAuAtAge(t_Ma), meanUranusSemiMajorAxisAtAge(t_Ma)); }
+function meanEarthNeptuneDistanceAtAge(t_Ma) { return _earthPlanetDist(meanAuAtAge(t_Ma), meanNeptuneSemiMajorAxisAtAge(t_Ma)); }
+
+/** Planet orbital period in seconds at given age (Kepler with mass loss). */
+function meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s) {
+  if (t_Ma === 0) return T_p_J2000_s;
+  const mass_loss_fraction = SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6;
+  return T_p_J2000_s * Math.pow(1 - mass_loss_fraction, 2);
+}
+
+/** Earth-planet synodic period in seconds. */
+function meanEarthPlanetSynodicPeriodAtAge(t_Ma, T_p_J2000_s) {
+  const T_p_t  = meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s);
+  const T_yr_t = meanSiderealYearSecondsAtAge(t_Ma);
+  return T_p_t * T_yr_t / Math.abs(T_p_t - T_yr_t);
+}
+
+/** Planet rotation period in seconds. Earth follows LOD(t); others constant. */
+function meanPlanetRotationPeriodAtAge(planetName, t_Ma, T_rot_J2000_s = null) {
+  if (planetName === 'Earth') return meanLodSecondsAtAge(t_Ma);
+  return T_rot_J2000_s;
+}
+
+// ═════════════════════════════════════════════════════════════════
+// END DEEP-TIME CHAIN — Phase 0
+// ═════════════════════════════════════════════════════════════════
+
 /* formats numbers with X decimals and a custom thousands separator */
 const fmtNum = (n, dec = 6, sep = ',') =>
   Number(n).toLocaleString('en-US', {
