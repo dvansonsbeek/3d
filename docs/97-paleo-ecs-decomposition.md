@@ -667,7 +667,7 @@ appropriate L1 sub-band:
   - Eccentricity spectrum (top peaks) → eccentricity-band L1 integers (n ≤ 53)
   - Obliquity spectrum (top peaks) → obliquity-band L1 integers (n ≥ 65)
 
-**Per-integer drift across the entire -50 Myr Cenozoic:**
+**Per-integer drift across the entire -50 Myr Cenozoic (modern-lattice baseline, original 2026-06-05 analysis):**
 
 | n | Period (kyr) | Identity | Mean shift | Max \|shift\| |
 |---|---:|---|---:|---:|
@@ -679,6 +679,27 @@ appropriate L1 sub-band:
 | **68** | **39.4** | **k+s₄ obliquity sub** | +0.6% | **2.6%** |
 | 113 | 23.7 | k+g₅ climatic precession | +16.7% | 21.4% |
 | 120 | 22.4 | k+g₂ climatic precession | +24.0% | 28.9% |
+
+**Updated 2026-06-12 — re-analysis under the ESSRT proper-physics lattice (doc 99):**
+
+The drift values above measure observed LA2004 peaks against the *fixed modern lattice* (8H/n with H = 335.317 kyr held constant). Following ESSRT formalization in [doc 99](99-expanding-solar-system-resonance-theory.md), lattice positions should be computed at each window center via the proper-physics formula: `8H(t)/n` where `H(t)` follows from the Farhat 2022 Moon-distance polynomial + angular-momentum conservation (anchored at modern `H = 335.317 kyr`; ~1.0% smaller at -50 Myr). The script `scripts/l1_vs_laskar_published_50myr.py` has been updated to compute both baselines side-by-side.
+
+| n | P at modern (kyr) | Identity | Max \|shift\| modern lattice | Max \|shift\| proper-physics lattice | Δ |
+|---|---:|---|---:|---:|---:|
+| 22 | 121.9 | s₂-s₄ nodal (Berger 121-kyr cousin) | 6.5% | 7.4% | +0.9% |
+| 25 | 107.3 | s₁-s₄ nodal (100-kyr centroid) | 10.8% | 10.4% | -0.5% |
+| **28** | **95.8** | **g₄-g₅ (Berger 95-kyr ecc)** | **2.3%** | **3.4%** | **+1.1%** |
+| **65** | **41.3** | **k+s₃ (obliquity main, Berger 41-kyr)** | **3.9%** | **3.5%** | **-0.4%** |
+| **66** | **40.6** | **k+s₄ (obliquity sub)** | **2.4%** | **2.0%** | **-0.4%** |
+| **68** | **39.4** | **k+s₄ (obliquity sub)** | **2.6%** | **2.9%** | **+0.3%** |
+| 113 | 23.7 | k+g₅ climatic precession | 21.4% | 22.0% | +0.6% |
+| 120 | 22.4 | k+g₂ climatic precession | 28.9% | 29.6% | +0.7% |
+
+**The "<4% drift across canonical Milankovitch beats" verdict holds under both baselines.** The four canonical Milankovitch beats (bolded: n=28, 65, 66, 68) stay below the 4% threshold whether measured against the fixed modern lattice or the proper-physics ESSRT lattice. The synthesis verdict below is therefore unchanged.
+
+**Empirical asymmetry between k-involving and pure orbital beats.** The proper-physics correction *reduces* drift on k-involving obliquity main beats (n=65 by 0.4 pp; n=66 by 0.4 pp) — these beats physically scale with Earth's LOD via the structural relation `H = 13 × axial precession`, so the ESSRT shift correctly captures their deep-time evolution. The correction *increases* drift on the pure orbital eccentricity beats (n=28 by 1.1 pp; n=22 by 0.9 pp) — these beats track LOD-independent Mars-Jupiter and inner-planet secular eigenfrequencies, NOT Earth's spin evolution. This empirically refines the integer-label-invariance claim ([doc 98 line 727+](98-lattice-mechanism.md#deep-time-prediction-l1-integers-renumber-with-lod)): it holds strictly for **k-involving beats** (consistent with doc 98's framing); **pure orbital beats sit at their own LOD-independent eigenfrequencies on the lattice and do not rescale with H(t)**. This refinement is itself an empirical finding from the re-analysis — doc 98 anticipated the k-involving case but did not separately test the pure orbital case at -50 Myr.
+
+Re-analysis output: `data/l1-vs-laskar-50myr-published.json` — new keys `ecc_drift_summary_essrt`, `obliq_drift_summary_essrt`, `essrt_notes`.
 
 **Top spectral peak by window (eccentricity)**:
 

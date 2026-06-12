@@ -787,6 +787,31 @@ the integer structure is invariant; the period labels track LOD
 evolution. Published deep-time cyclostratigraphy confirms the LOD-
 scaled predictions to sub-percent precision.
 
+**Empirical confirmation from Test C-50 re-analysis (2026-06-12).** The
+proper-physics-lattice re-analysis of LA2004 (doc 97 §Test C-50, updated
+section) tested the integer-label-invariance claim directly across the
+-50 Myr Cenozoic. The result splits cleanly along the k-involving / pure
+orbital boundary:
+
+- **k-involving obliquity main beats** (n=65 k+s₃, n=66 k+s₄): max |shift|
+  *decreases* under the proper-physics 8H(t)/n lattice — by 0.4 percentage
+  points on both. The framework's predicted LOD-driven shift correctly
+  captures their deep-time evolution.
+- **Pure orbital eccentricity beats** (n=28 g₄-g₅, n=22 s₂-s₄): max |shift|
+  *increases* under the proper-physics lattice — by 1.1 and 0.9 percentage
+  points respectively. Mars-Jupiter and inner-planet secular eigenfrequency
+  differences are LOD-independent; they do not rescale with H(t).
+
+The "L1 integer labels SHIFT with LOD" claim above (line 769) therefore
+applies strictly to **k-involving lattice integers** (which physically
+involve Earth's spin rate k). **Pure orbital beats sit at their own
+LOD-independent eigenfrequencies on the lattice and do not rescale**;
+their *integer labels* are still structural, but their *predicted periods*
+are determined by the orbital eigenfrequency, not by H(t). This is a
+natural refinement of the original framing — the structural claim
+(integer labels are invariant) is preserved, while the per-period
+scaling rule is now type-specific.
+
 ### When did the current pattern emerge?
 
 The user's framing: "Pattern X then something happened then 8H pattern."

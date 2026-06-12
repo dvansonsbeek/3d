@@ -1401,6 +1401,107 @@
       "max_abs_shift_pct": 28.902996663618907
     }
   },
+  "ecc_drift_summary_essrt": {
+    "9": {
+      "mean_shift_essrt_pct": 2.3445678335809372,
+      "std_shift_essrt_pct": 29.38439487136828,
+      "max_abs_shift_essrt_pct": 38.08408457885255,
+      "delta_vs_modern_pct": 1.1564947695236683
+    },
+    "14": {
+      "mean_shift_essrt_pct": -2.739658751860764,
+      "std_shift_essrt_pct": 2.586672630264449,
+      "max_abs_shift_essrt_pct": 7.775717801650591,
+      "delta_vs_modern_pct": -0.6727332457964392
+    },
+    "22": {
+      "mean_shift_essrt_pct": 4.412993618241527,
+      "std_shift_essrt_pct": 1.494754300725177,
+      "max_abs_shift_essrt_pct": 7.3981344428624976,
+      "delta_vs_modern_pct": 0.8994909233644535
+    },
+    "25": {
+      "mean_shift_essrt_pct": -7.144825917551023,
+      "std_shift_essrt_pct": 2.3777976195273065,
+      "max_abs_shift_essrt_pct": 10.367017739734898,
+      "delta_vs_modern_pct": -0.4595378979785121
+    },
+    "28": {
+      "mean_shift_essrt_pct": 1.6768024636612449,
+      "std_shift_essrt_pct": 1.4232767541880589,
+      "max_abs_shift_essrt_pct": 3.4111596382617897,
+      "delta_vs_modern_pct": 1.0889986780795544
+    },
+    "38": {
+      "mean_shift_essrt_pct": 3.3808970358153507,
+      "std_shift_essrt_pct": 5.709435341058252,
+      "max_abs_shift_essrt_pct": 10.060537183180202,
+      "delta_vs_modern_pct": 0.27901383188326356
+    },
+    "65": {
+      "mean_shift_essrt_pct": 17.02224430991462,
+      "std_shift_essrt_pct": 14.17748143312768,
+      "max_abs_shift_essrt_pct": 33.8091287079499,
+      "delta_vs_modern_pct": 0.6860238740940119
+    },
+    "66": {
+      "mean_shift_essrt_pct": 18.822586530067156,
+      "std_shift_essrt_pct": 14.39559653209888,
+      "max_abs_shift_essrt_pct": 35.86773068807223,
+      "delta_vs_modern_pct": 0.6965780875416172
+    },
+    "68": {
+      "mean_shift_essrt_pct": 21.167210136012837,
+      "std_shift_essrt_pct": 16.314257524338448,
+      "max_abs_shift_essrt_pct": 39.98493464831683,
+      "delta_vs_modern_pct": 0.7176865144368136
+    },
+    "113": {
+      "mean_shift_essrt_pct": 101.35139331425663,
+      "std_shift_essrt_pct": 27.110457356621243,
+      "max_abs_shift_essrt_pct": 132.6220237538206,
+      "delta_vs_modern_pct": 1.1926261195787902
+    },
+    "120": {
+      "mean_shift_essrt_pct": 113.82448847531677,
+      "std_shift_essrt_pct": 28.78986621942079,
+      "max_abs_shift_essrt_pct": 147.03223761467677,
+      "delta_vs_modern_pct": 1.2665056137120416
+    }
+  },
+  "obliq_drift_summary_essrt": {
+    "65": {
+      "mean_shift_essrt_pct": -1.123714109758144,
+      "std_shift_essrt_pct": 1.6398033591443748,
+      "max_abs_shift_essrt_pct": 3.46556985966951,
+      "delta_vs_modern_pct": -0.3899948979956611
+    },
+    "66": {
+      "mean_shift_essrt_pct": -0.22563032479374628,
+      "std_shift_essrt_pct": 0.9648393876303752,
+      "max_abs_shift_essrt_pct": 1.9804247805874964,
+      "delta_vs_modern_pct": -0.3959948195032841
+    },
+    "68": {
+      "mean_shift_essrt_pct": 1.1681089304183492,
+      "std_shift_essrt_pct": 1.0206488652516008,
+      "max_abs_shift_essrt_pct": 2.9216579817582877,
+      "delta_vs_modern_pct": 0.30371536000953103
+    },
+    "113": {
+      "mean_shift_essrt_pct": 17.40722877731648,
+      "std_shift_essrt_pct": 2.821561656856036,
+      "max_abs_shift_essrt_pct": 22.00918210886011,
+      "delta_vs_modern_pct": 0.6255269172856401
+    },
+    "120": {
+      "mean_shift_essrt_pct": 24.680242949362636,
+      "std_shift_essrt_pct": 2.996348662148005,
+      "max_abs_shift_essrt_pct": 29.567273035957655,
+      "delta_vs_modern_pct": 0.6642763723387475
+    }
+  },
+  "essrt_notes": "ESSRT-corrected drift uses time-varying lattice 8H(t)/n with H(t) from the proper-physics formula: Moon-distance polynomial (Farhat 2022 quartic) + angular-momentum conservation. Anchored at modern 335.317 kyr, validated against Devonian (380 Ma) 309.083 kyr. Across Cenozoic (-50 Myr), H shrinks smoothly from 335.317 to ~331.86 kyr (-1.03%). All 32 L1 integer predictions track this expansion via 8H(t)/n; per the framework's integer-label-invariance claim (doc 98), the integer labels stay the same while the absolute periods rescale with H(t).",
   "ecc_match_by_epoch": {
     "modern_pct": 83.33333333333333,
     "mid_pct": 75.0,

@@ -58,6 +58,86 @@ TRACK_N_OBLIQ = [65, 66, 68, 113, 120]    # tracked in obliquity spectrum
 TRACK_N = TRACK_N_ECC + TRACK_N_OBLIQ
 
 
+# ===========================================================================
+# ESSRT proper-physics H(t) — for ESSRT-corrected drift comparison
+# (Mirrors devonian_cross_check.py; validated against modern + Devonian anchors)
+# ===========================================================================
+
+# Framework canonical constants
+ESSRT_H_NOW_KYR = 335.317
+ESSRT_LOD_NOW_S = 86_400.0
+
+# Earth-Moon system
+ESSRT_MOON_DIST_NOW_KM = 384_399.07
+ESSRT_MOON_E = 0.054900489
+ESSRT_MOON_T_INPUT_D = 27.32166156
+ESSRT_SIDEREAL_YR_J2000_D = 365.25636301
+
+# Farhat 2022 quartic polynomial — Layer 1 (Moon distance evolution)
+ESSRT_ALPHA_1 = -8.8658188951e-05    # /Ma   (modern recession anchor, Wells canonical)
+ESSRT_ALPHA_3 = -6.4186463489e-12    # /Ma³  (LSQ fit to Farhat 2022 deep-time)
+ESSRT_ALPHA_4 = +1.3619800519e-16    # /Ma⁴  (LSQ fit to Farhat 2022 deep-time)
+
+# Physical constants
+ESSRT_G_CONSTANT = 6.6743e-20         # km³/(kg·s²)
+ESSRT_MASS_RATIO_EM = 81.30056816
+ESSRT_EARTH_DIAMETER_KM = 12_756.27
+ESSRT_EARTH_MOI_FACTOR = 0.3306947    # IERS 2010
+
+# Derive framework constants self-consistently
+_H_OVER_8 = ESSRT_H_NOW_KYR * 1000 / 8
+_MEAN_SOLAR_D = round(365.2422 * _H_OVER_8) / _H_OVER_8
+_MEAN_SIDEREAL_YR_S = ESSRT_SIDEREAL_YR_J2000_D * ESSRT_LOD_NOW_S
+_MEAN_SIDEREAL_YR_D_H13 = (
+    _MEAN_SOLAR_D * (ESSRT_H_NOW_KYR * 1000 / 13) / ((ESSRT_H_NOW_KYR * 1000 / 13) - 1)
+)
+_LOD_NOW_H13_S = _MEAN_SIDEREAL_YR_S / _MEAN_SIDEREAL_YR_D_H13   # ≈ 86,399.999677 s
+
+_N_MOON = round((ESSRT_H_NOW_KYR * 1000 * _MEAN_SOLAR_D) / ESSRT_MOON_T_INPUT_D)
+_MOON_T_DAYS = (ESSRT_H_NOW_KYR * 1000 * _MEAN_SOLAR_D) / _N_MOON
+
+_MOON_SHIFT_KM = (
+    ESSRT_MOON_DIST_NOW_KM * (1 / (ESSRT_MASS_RATIO_EM + 1))
+    * (_MOON_T_DAYS / ESSRT_SIDEREAL_YR_J2000_D)
+)
+_MOON_DIST_CORR_KM = ESSRT_MOON_DIST_NOW_KM + _MOON_SHIFT_KM
+
+_GM_EM_KMS = (4 * math.pi**2 * _MOON_DIST_CORR_KM**3) / (_MOON_T_DAYS * ESSRT_LOD_NOW_S)**2
+_GM_EM_SI = _GM_EM_KMS * 1e9                                            # m³/s²
+
+_M_EARTH = (_GM_EM_KMS * ESSRT_MASS_RATIO_EM / (ESSRT_MASS_RATIO_EM + 1)) / ESSRT_G_CONSTANT
+_M_MOON = (_GM_EM_KMS / (ESSRT_MASS_RATIO_EM + 1)) / ESSRT_G_CONSTANT
+
+_R_EARTH_M = (ESSRT_EARTH_DIAMETER_KM / 2) * 1000
+_I_EARTH = ESSRT_EARTH_MOI_FACTOR * _M_EARTH * _R_EARTH_M**2
+
+_OMEGA_E_NOW = 2 * math.pi / ESSRT_LOD_NOW_S
+_L_E_SPIN_NOW = _I_EARTH * _OMEGA_E_NOW
+_E_FACTOR = math.sqrt(1 - ESSRT_MOON_E**2)
+_L_MOON_NOW = _M_MOON * math.sqrt(_GM_EM_SI * ESSRT_MOON_DIST_NOW_KM * 1000) * _E_FACTOR
+_L_TOTAL = _L_E_SPIN_NOW + _L_MOON_NOW
+
+_A_LOCK_M = (_L_TOTAL / (_M_MOON * math.sqrt(_GM_EM_SI) * _E_FACTOR)) ** 2
+
+
+def H_kyr_at_age(t_Myr):
+    """ESSRT proper-physics H(t) — Moon-distance polynomial + angular-momentum conservation.
+
+    Returns H in kyr at age t_Myr (Myr) before present. None past tidal-lock asymptote.
+    Validated: modern 335.317 (exact); Devonian (380 Ma) 309.083 (matches V-tag to 4 decimals).
+    """
+    if t_Myr <= 0:
+        return ESSRT_H_NOW_KYR
+    a_factor = 1 + ESSRT_ALPHA_1 * t_Myr + ESSRT_ALPHA_3 * t_Myr**3 + ESSRT_ALPHA_4 * t_Myr**4
+    a_m = ESSRT_MOON_DIST_NOW_KM * 1000 * a_factor
+    if a_m <= 0 or a_m >= _A_LOCK_M:
+        return None
+    lod_s = 2 * math.pi * _I_EARTH / (
+        _L_TOTAL - _M_MOON * math.sqrt(_GM_EM_SI * a_m) * _E_FACTOR
+    )
+    return ESSRT_H_NOW_KYR * lod_s / _LOD_NOW_H13_S
+
+
 def load_la2004():
     """Parse INSOLN.LA2004.BTL.ASC. Columns: time(kyr), ecc, obliq(rad), perihelion(rad)."""
     ages_kyr = []
@@ -128,6 +208,7 @@ def main():
 
     window_results = []
     track_results = {n: [] for n in TRACK_N}
+    track_results_essrt = {n: [] for n in TRACK_N}    # ESSRT-corrected (time-varying lattice)
 
     for s in starts:
         mask = (ages_yr >= s) & (ages_yr < s + WINDOW_MYR * 1e6)
@@ -140,6 +221,11 @@ def main():
                            min_P_yr=15_000, max_P_yr=500_000)
         if not peaks:
             continue
+
+        # ESSRT H(t) at this window center (kyr)
+        center_Myr_for_essrt = abs((s + WINDOW_MYR * 1e6 / 2) / 1e6)
+        H_essrt_kyr = H_kyr_at_age(center_Myr_for_essrt)
+        eight_H_essrt_yr = 8 * H_essrt_kyr * 1000  # for ESSRT lattice predictions in yr
 
         peak_records = []
         for P_peak, pw in peaks:
@@ -165,16 +251,25 @@ def main():
         med_l1 = float(np.median(l1_errs))
         med_las = float(np.median(las_errs))
 
-        # Track specific integers
+        # Track specific integers (BOTH modern-baseline and ESSRT-corrected)
         for n in TRACK_N:
-            P_lattice = EIGHT_H * 1000.0 / n
+            P_lattice = EIGHT_H * 1000.0 / n                  # modern baseline (fixed)
+            P_lattice_essrt = eight_H_essrt_yr / n            # ESSRT (time-varying H(t))
             closest = min(peak_records, key=lambda p: abs(p["peak_P_yr"] - P_lattice))
             shift = (closest["peak_P_yr"] - P_lattice) / P_lattice * 100
+            shift_essrt = (closest["peak_P_yr"] - P_lattice_essrt) / P_lattice_essrt * 100
             track_results[n].append({
                 "window_center_Myr": (s + WINDOW_MYR * 1e6 / 2) / 1e6,
                 "observed_peak_P_yr": closest["peak_P_yr"],
                 "shift_pct": float(shift),
                 "L1_err_pct": closest["L1_err_pct"],
+            })
+            track_results_essrt[n].append({
+                "window_center_Myr": (s + WINDOW_MYR * 1e6 / 2) / 1e6,
+                "observed_peak_P_yr": closest["peak_P_yr"],
+                "H_essrt_kyr": float(H_essrt_kyr),
+                "P_lattice_essrt_yr": float(P_lattice_essrt),
+                "shift_essrt_pct": float(shift_essrt),
             })
 
         center_Myr = (s + WINDOW_MYR * 1e6 / 2) / 1e6
@@ -224,6 +319,7 @@ def main():
           f"{'<2%':>8}{'med L1 err':>13}")
     obliq_window_results = []
     obliq_track = {n: [] for n in TRACK_N_OBLIQ}
+    obliq_track_essrt = {n: [] for n in TRACK_N_OBLIQ}    # ESSRT-corrected
     for s in starts:
         mask = (ages_yr >= s) & (ages_yr < s + WINDOW_MYR * 1e6)
         if mask.sum() < 1000: continue
@@ -232,6 +328,10 @@ def main():
         peaks = find_peaks(freqs, psd, n_peaks=12,
                            min_P_yr=15_000, max_P_yr=100_000)
         if not peaks: continue
+        # ESSRT H(t) at this window center (kyr)
+        center_Myr_for_essrt = abs((s + WINDOW_MYR * 1e6 / 2) / 1e6)
+        H_essrt_kyr = H_kyr_at_age(center_Myr_for_essrt)
+        eight_H_essrt_yr = 8 * H_essrt_kyr * 1000
         peak_records = []
         for P_peak, pw in peaks:
             best_n = min(L1_OBLIQ_BAND,
@@ -255,14 +355,23 @@ def main():
               f"{match5:>13}/{len(peak_records)}{match2:>4}/{len(peak_records)}"
               f"{med_l1:>12.2f}%")
         for n in TRACK_N_OBLIQ:
-            P_lattice = EIGHT_H * 1000.0 / n
+            P_lattice = EIGHT_H * 1000.0 / n                  # modern baseline
+            P_lattice_essrt = eight_H_essrt_yr / n            # ESSRT-corrected
             closest = min(peak_records, key=lambda p: abs(p["peak_P_yr"] - P_lattice))
             shift = (closest["peak_P_yr"] - P_lattice) / P_lattice * 100
+            shift_essrt = (closest["peak_P_yr"] - P_lattice_essrt) / P_lattice_essrt * 100
             obliq_track[n].append({
                 "window_center_Myr": center_Myr,
                 "observed_peak_P_yr": closest["peak_P_yr"],
                 "shift_pct": float(shift),
                 "L1_err_pct": closest["L1_err_pct"],
+            })
+            obliq_track_essrt[n].append({
+                "window_center_Myr": center_Myr,
+                "observed_peak_P_yr": closest["peak_P_yr"],
+                "H_essrt_kyr": float(H_essrt_kyr),
+                "P_lattice_essrt_yr": float(P_lattice_essrt),
+                "shift_essrt_pct": float(shift_essrt),
             })
         obliq_window_results.append({
             "window_center_Myr": float(center_Myr),
@@ -287,6 +396,64 @@ def main():
               f"{std_d:>11.2f}%{max_abs:>13.2f}%")
         obliq_drift[n] = {"mean_shift_pct": mean_d, "std_shift_pct": std_d,
                           "max_abs_shift_pct": max_abs}
+
+    # ── ESSRT-CORRECTED drift summaries (time-varying lattice 8H(t)/n) ──
+    print()
+    print("  =" * 46)
+    print("  ESSRT-corrected drift: peak shift relative to TIME-VARYING lattice 8H(t)/n")
+    print("  (uses proper-physics H(t) — Moon-distance polynomial + angular-momentum)")
+    print("  =" * 46)
+    print()
+    print(f"  ── Eccentricity-spectrum (modern vs ESSRT-corrected) per tracked L1 integer ──")
+    print(f"  {'n':>4}{'P_modern (kyr)':>16}{'modern max|shift|':>20}"
+          f"{'ESSRT max|shift|':>20}{'Δ':>10}")
+    ecc_drift_essrt = {}
+    for n in TRACK_N:
+        hist_essrt = track_results_essrt[n]
+        hist_modern = track_results[n]
+        if not hist_essrt or not hist_modern: continue
+        shifts_essrt = np.array([h["shift_essrt_pct"] for h in hist_essrt])
+        max_abs_essrt = float(np.max(np.abs(shifts_essrt)))
+        mean_essrt = float(np.mean(shifts_essrt))
+        std_essrt = float(np.std(shifts_essrt))
+        max_abs_modern = float(np.max(np.abs(
+            np.array([h["shift_pct"] for h in hist_modern])
+        )))
+        delta = max_abs_essrt - max_abs_modern
+        print(f"  {n:>4}{EIGHT_H*1000/n/1000:>15.1f}k{max_abs_modern:>19.2f}%"
+              f"{max_abs_essrt:>19.2f}%{delta:>+9.2f}%")
+        ecc_drift_essrt[n] = {
+            "mean_shift_essrt_pct": mean_essrt,
+            "std_shift_essrt_pct": std_essrt,
+            "max_abs_shift_essrt_pct": max_abs_essrt,
+            "delta_vs_modern_pct": delta,
+        }
+
+    print()
+    print(f"  ── Obliquity-spectrum (modern vs ESSRT-corrected) per tracked L1 integer ──")
+    print(f"  {'n':>4}{'P_modern (kyr)':>16}{'modern max|shift|':>20}"
+          f"{'ESSRT max|shift|':>20}{'Δ':>10}")
+    obliq_drift_essrt = {}
+    for n in TRACK_N_OBLIQ:
+        hist_essrt = obliq_track_essrt[n]
+        hist_modern = obliq_track[n]
+        if not hist_essrt or not hist_modern: continue
+        shifts_essrt = np.array([h["shift_essrt_pct"] for h in hist_essrt])
+        max_abs_essrt = float(np.max(np.abs(shifts_essrt)))
+        mean_essrt = float(np.mean(shifts_essrt))
+        std_essrt = float(np.std(shifts_essrt))
+        max_abs_modern = float(np.max(np.abs(
+            np.array([h["shift_pct"] for h in hist_modern])
+        )))
+        delta = max_abs_essrt - max_abs_modern
+        print(f"  {n:>4}{EIGHT_H*1000/n/1000:>15.1f}k{max_abs_modern:>19.2f}%"
+              f"{max_abs_essrt:>19.2f}%{delta:>+9.2f}%")
+        obliq_drift_essrt[n] = {
+            "mean_shift_essrt_pct": mean_essrt,
+            "std_shift_essrt_pct": std_essrt,
+            "max_abs_shift_essrt_pct": max_abs_essrt,
+            "delta_vs_modern_pct": delta,
+        }
 
     # ── Match-fraction by epoch ──
     print()
@@ -368,6 +535,19 @@ def main():
         "tracked_integers_obliq": TRACK_N_OBLIQ,
         "ecc_drift_summary": drift_summary,
         "obliq_drift_summary": obliq_drift,
+        "ecc_drift_summary_essrt": ecc_drift_essrt,
+        "obliq_drift_summary_essrt": obliq_drift_essrt,
+        "essrt_notes": (
+            "ESSRT-corrected drift uses time-varying lattice 8H(t)/n with "
+            "H(t) from the proper-physics formula: Moon-distance polynomial "
+            "(Farhat 2022 quartic) + angular-momentum conservation. "
+            "Anchored at modern 335.317 kyr, validated against Devonian "
+            "(380 Ma) 309.083 kyr. Across Cenozoic (-50 Myr), H shrinks "
+            "smoothly from 335.317 to ~331.86 kyr (-1.03%). All 32 L1 integer "
+            "predictions track this expansion via 8H(t)/n; per the framework's "
+            "integer-label-invariance claim (doc 98), the integer labels stay "
+            "the same while the absolute periods rescale with H(t)."
+        ),
         "ecc_match_by_epoch": {
             "modern_pct": float(modern_match),
             "mid_pct": float(mid_match),
