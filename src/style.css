@@ -3914,6 +3914,27 @@ details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
   font-style: italic;
 }
 
+.vfp-model-note {
+  margin: 10px 6px 0;
+  padding: 8px 12px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid rgba(240, 176, 64, 0.6);
+  border-radius: 0 4px 4px 0;
+}
+.vfp-model-note strong { color: rgba(255, 255, 255, 0.9); }
+.vfp-model-note .vfp-note-label {
+  display: inline-block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(240, 176, 64, 0.85);
+  font-weight: 600;
+  margin-right: 6px;
+}
+
 .vfp-j2000 td:last-child {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.45);
