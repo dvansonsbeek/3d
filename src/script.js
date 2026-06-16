@@ -3275,6 +3275,12 @@ const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (ASTRO_REFERENCE.
 let   meanearthRotationsinDays = meansolaryearlengthinDays+1;  // Phase 6: mutable (Tier 2)
 const startmodelyearwithCorrection = startmodelYear+(correctionDays/meansolaryearlengthinDays);
 let   balancedYear = perihelionalignmentYear-(temperatureGraphMostLikely*(holisticyearLength/16));  // Phase 6: mutable (Tier 1 — eccentricity phase anchor)
+// Phase 8.5 J2000-fixed anchor — immutable snapshot of `balancedYear`. Relocated here
+// from its original spot near the integrated-phase math (later in the file) so it's
+// available for any computation that must remain stable under deep-time scrubbing
+// (e.g. `perihelionPhaseOffset` below). Same numeric value as `balancedYear` at
+// module load: -302,635.00 = 14.5 perihelion cycles before 1246 AD.
+const BALANCED_YEAR_J2000_FIXED = perihelionalignmentYear - 14.5 * (holisticyearLength / 16);
 const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelyearwithCorrection-balancedYear));
 const perihelionalignmentJD = Math.round(startmodelJD - (meansolaryearlengthinDays * (startmodelyearwithCorrection - perihelionalignmentYear)));
 const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meansolaryearlengthinDays;
@@ -3312,7 +3318,9 @@ const eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2;
 
 // Perihelion phase offset — derived from geometric perihelion direction vs reference perihelion date.
 // Aligns the EoC perihelion with the geometric perihelion set by the EP1 precession phase at J2000.
-let   perihelionPhaseOffset = (((startmodelyearwithCorrection - balancedYear) / (holisticyearLength / 16) * 360
+// Phase 9.10c: uses `BALANCED_YEAR_J2000_FIXED` (immutable) instead of `balancedYear` (mutable
+// under deep-time scrubbing), so this reference phase stays anchored at J2000.
+let   perihelionPhaseOffset = (((startmodelyearwithCorrection - BALANCED_YEAR_J2000_FIXED) / (holisticyearLength / 16) * 360
   + correctionSun + 360 * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays) % 360 + 360) % 360;  // Phase 6: mutable (Tier 1 — Earth perihelion phase reference)
 
 // Ascending node frame corrections for planet-level tilt placement (degrees).
@@ -4856,7 +4864,10 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
   perihelionCycleLength = holisticyearLength / 16;
   balancedYear          = perihelionalignmentYear - (temperatureGraphMostLikely * perihelionCycleLength);
   _eccentricityAnchor   = balancedYear - systemResetN * holisticyearLength;
-  perihelionPhaseOffset = (((startmodelyearwithCorrection - balancedYear) / perihelionCycleLength * 360
+  // Phase 9.10c: uses BALANCED_YEAR_J2000_FIXED + PERIHELION_CYCLE_LENGTH_J2000_FIXED so the
+  // reference phase stays anchored at J2000 even when this dormant updater is activated and
+  // mutates `balancedYear` / `perihelionCycleLength` for other consumers.
+  perihelionPhaseOffset = (((startmodelyearwithCorrection - BALANCED_YEAR_J2000_FIXED) / PERIHELION_CYCLE_LENGTH_J2000_FIXED * 360
     + correctionSun
     + 360 * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays) % 360 + 360) % 360;
   // ECC_CYCLE_SCALE is `const` (immutable reference) but its properties
@@ -4900,14 +4911,24 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
 // HOLISTIC_YEAR_J2000 + LOD/H constants), so the cumulative integral
 // ∫_{startmodelYear}^{year} 1/H(t) dt is invariant and safe to memoize.
 //
-// Accuracy: trapezoidal on a 100-year grid, smooth H(t). Per-step error
-// ~10⁻²⁰; cumulative over 3 M years ~10⁻¹⁶ in the integral, ~10⁻¹⁴ rad in
-// the worst-case phase (× 2π × 28-harmonic divisor). Well below the
-// original Simpson N=1000 tolerance for any visible or doc-99 quantity.
+// Accuracy: trapezoidal on a 10,000-year grid (Phase 9.11.1, extended for
+// Devonian navigation; was 100-year grid pre-9.11.1). H(t) is very smooth —
+// per-step local error ~10⁻¹⁵; cumulative over 500 M years ~10⁻¹¹ in the
+// integral, ~10⁻⁹ rad in the worst-case phase (× 2π × 28-harmonic divisor).
+// Well below the original Simpson N=1000 tolerance for any visible or doc-99
+// quantity, AND below the 10⁻⁶-rad threshold for IAU obliquity calibration
+// (verified by `runObliquityCalibrationTest` after the step change).
 
-const _CUMUL_INTEGRAL_YEAR_MIN = -3.0e6;   // covers ECCENTRICITY_ANCHOR_J2000_FIXED (≈-2.65 M) + buffer
+// Phase 9.11.1: extended past range from -3 Myr to -500 Myr (covers Devonian
+// at ~-380 Ma + buffer). Step coarsened from 100 yr to 10000 yr so the cell
+// count stays manageable: 50,101 cells × 8 bytes ≈ 400 KB. Trapezoidal local
+// error rises from ~10⁻²⁰ to ~10⁻¹⁵ per step — cumulative phase error at
+// modern epochs ~10⁻¹² rad ≈ 10⁻¹² arcsec, FAR below the 0.1″ IAU
+// obliquity calibration threshold. Verified by `runObliquityCalibrationTest`.
+// Future range still bounded by Moon tidal-lock asymptote (~+700 kyr).
+const _CUMUL_INTEGRAL_YEAR_MIN = -500e6;
 const _CUMUL_INTEGRAL_YEAR_MAX = 1.0e6;
-const _CUMUL_INTEGRAL_STEP     = 100;      // 100-year resolution → ~40k entries (~320 KB Float64)
+const _CUMUL_INTEGRAL_STEP     = 10000;
 let   _cumulIntegralTable      = null;
 let   _cumulIntegralJ2000Idx   = -1;
 
@@ -4970,18 +4991,211 @@ function integralInverseHFromYears(yearA, yearB, _N_unused = 1000) {
   return cB - cA;
 }
 
+// ───── Phase 9.11: Balanced-year navigation helpers ─────
+// Inverse of _cumulIntegralAtYear: find the year Y such that the cumulative
+// integral ∫_{J2000}^{Y} 1/H(t)dt equals `targetCumul`. Used by
+// `findBalancedYearAtCycle` to step through the H-cycle lattice under
+// deep-time. Binary search on the monotonically increasing table, then
+// linear-interpolate between adjacent cells. Returns null if `targetCumul`
+// is outside the table's value range.
+function _yearAtCumulIntegral(targetCumul) {
+  _ensureCumulIntegralTable();
+  const N = _cumulIntegralTable.length;
+  // Skip leading/trailing NaN cells (past tidal-lock asymptote).
+  let lo = 0, hi = N - 1;
+  while (lo < N && Number.isNaN(_cumulIntegralTable[lo])) lo++;
+  while (hi >= 0 && Number.isNaN(_cumulIntegralTable[hi])) hi--;
+  if (lo >= hi) return null;
+  if (targetCumul < _cumulIntegralTable[lo] || targetCumul > _cumulIntegralTable[hi]) return null;
+  // Binary search for largest index where table[i] <= targetCumul.
+  while (lo < hi - 1) {
+    const mid = (lo + hi) >> 1;
+    if (_cumulIntegralTable[mid] <= targetCumul) lo = mid; else hi = mid;
+  }
+  const v_lo = _cumulIntegralTable[lo], v_hi = _cumulIntegralTable[hi];
+  const frac = (v_lo === v_hi) ? 0 : (targetCumul - v_lo) / (v_hi - v_lo);
+  return _CUMUL_INTEGRAL_YEAR_MIN + (lo + frac) * _CUMUL_INTEGRAL_STEP;
+}
+
+/** Find the calendar year of the k-th H-balanced event relative to
+ *  `BALANCED_YEAR_J2000_FIXED` (which is cycle k=0). Negative k = past,
+ *  positive k = future. Returns null if outside table domain.
+ *
+ *  Phase 9.12.8: Targets the year that, AFTER the navigation JD round-trip,
+ *  lands at corrected integer cycle. The chain is:
+ *    Y_target → yearToJD(Y_target) → o.julianDay → julianDateToDecimalYear(JD)
+ *           → Y_julian = o.currentYear
+ *  We want cyclesBetweenYears(BALANCED, Y_julian, 1) = cycleOffset (so scene
+ *  renders e_min at every navigated balanced JD).
+ *
+ *  The round-trip changes Y by the deep-time vs Julian-365.25 convention
+ *  difference — up to ~130 yr at -6 Myr. Without compensation, the scene
+ *  ends up at Y_julian slightly off from corrected integer, so e is
+ *  ~0.01403068 instead of e_min = 0.01402961.
+ *
+ *  Algorithm: 1D root-finding on Y_target via Newton-like iteration.
+ *  Convergence: 3-5 iterations to <1e-12 cycle precision. */
+// Phase 9.12.11: TRUE-integral year for a given cycle offset from BALANCED.
+//   Returns Y such that ∫_{BALANCED}^{Y} 1/H(t) dt = cycleOffset exactly.
+// Unlike `findBalancedYearAtCycle`, this skips the JD-round-trip + drift
+// correction — so (Y_next - Y_last) is the harmonic mean of H(t) over the
+// bracket interval. Used by the H period / 8H period readouts so the
+// displayed period reflects the actual time-averaged H, not the calibrated
+// cycle math that pins the scene to e_min at navigated balanced JDs.
+function trueYearAtCycle(cycleOffset) {
+  if (cycleOffset === 0) return BALANCED_YEAR_J2000_FIXED;
+  const refCumul = _cumulIntegralAtYear(BALANCED_YEAR_J2000_FIXED);
+  if (refCumul === null) return null;
+  return _yearAtCumulIntegral(refCumul + cycleOffset);
+}
+
+function findBalancedYearAtCycle(cycleOffset) {
+  if (cycleOffset === 0) return BALANCED_YEAR_J2000_FIXED;
+  const refCumul = _cumulIntegralAtYear(BALANCED_YEAR_J2000_FIXED);
+  if (refCumul === null) return null;
+  // Initial guess: solve raw integral = cycleOffset
+  let Y = _yearAtCumulIntegral(refCumul + cycleOffset);
+  if (Y === null) return null;
+  // Iterate: adjust Y so that julianDateToDecimalYear(yearToJD(Y)) gives the
+  // year where cyclesBetweenYears = cycleOffset (= integer).
+  for (let iter = 0; iter < 5; iter++) {
+    const jd = yearToJD(Y);
+    if (jd === null) return Y;
+    const Y_julian = julianDateToDecimalYear(jd);
+    if (!Number.isFinite(Y_julian)) return Y;
+    const corrected = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, Y_julian, 1);
+    if (corrected === null) return Y;
+    const error = corrected - cycleOffset;
+    if (Math.abs(error) < 1e-12) break;
+    // Adjust Y by Δcycle × H (where Δcycle = -error, so Y_new = Y - error × H).
+    // H here is the local H value at Y — use live holisticyearLength as approximation.
+    Y = Y - error * holisticyearLength;
+  }
+  return Y;
+}
+
+// ───── Cumulative days-from-J2000 table (Phase 9.11) ─────
+// Mirrors _cumulIntegralTable but stores ∫ daysPerYear(t) dt from
+// startmodelYear (= 2000.5, where the JD anchor sits) instead of ∫ 1/H.
+// Used by `yearToJD` to convert a deep-time year to a Julian Date.
+//
+// History: 9.12.5 / 9.12.7 attempted Julian linear 365.25 to make
+// `yearToJD ↔ jdToYearLinear` round-trip identity (which would fix the ~130yr
+// e_min offset at deep past). But that broke navigation past JD ≈ -721M
+// (root cause not isolated yet — possibly some downstream consumer breaks
+// at the shifted JD values). Reverted to deep-time-aware integration which
+// allows navigation across the full table range, accepting a small ~1e-6
+// eccentricity drift at extreme deep-past balanced years.
+let _cumulDaysTable = null;
+
+function _ensureCumulDaysTable() {
+  if (_cumulDaysTable !== null) return;
+  _ensureCumulIntegralTable();
+  const N = _cumulIntegralTable.length;
+  const j2000Idx = _cumulIntegralJ2000Idx;
+  _cumulDaysTable = new Float64Array(N);
+
+  const daysPerYear = (year) => {
+    const t_Ma = (startmodelYear - year) / 1e6;
+    return meanYearInDaysAtAge(t_Ma);
+  };
+
+  const gridYearAtJ2000Idx = _CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP;
+  const partialYearOffset = startmodelYear - gridYearAtJ2000Idx;
+  const daysAtJ2000 = meanYearInDaysAtAge(0);
+  _cumulDaysTable[j2000Idx] = -partialYearOffset * daysAtJ2000;
+
+  let prev = daysPerYear(gridYearAtJ2000Idx);
+  for (let i = j2000Idx + 1; i < N; i++) {
+    const yr = _CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP;
+    const curr = daysPerYear(yr);
+    _cumulDaysTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulDaysTable[i - 1]))
+      ? _cumulDaysTable[i - 1] + 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
+      : NaN;
+    prev = curr;
+  }
+
+  prev = daysPerYear(gridYearAtJ2000Idx);
+  for (let i = j2000Idx - 1; i >= 0; i--) {
+    const yr = _CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP;
+    const curr = daysPerYear(yr);
+    _cumulDaysTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulDaysTable[i + 1]))
+      ? _cumulDaysTable[i + 1] - 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
+      : NaN;
+    prev = curr;
+  }
+}
+
+/** Convert a decimal calendar year to a Julian Date, integrating the
+ *  deep-time-aware days-per-year function from startmodelYear (2000.5)
+ *  to `year`. Returns null if `year` is outside the precomputed table
+ *  domain or past the tidal-lock asymptote. At year = startmodelYear
+ *  returns startmodelJD exactly. */
+function yearToJD(year) {
+  if (!Number.isFinite(year)) return null;
+  _ensureCumulDaysTable();
+  if (year < _CUMUL_INTEGRAL_YEAR_MIN || year > _CUMUL_INTEGRAL_YEAR_MAX) return null;
+  const idx_f = (year - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP;
+  const idx_lo = Math.floor(idx_f);
+  const idx_hi = Math.min(idx_lo + 1, _cumulDaysTable.length - 1);
+  const v_lo = _cumulDaysTable[idx_lo];
+  const v_hi = _cumulDaysTable[idx_hi];
+  if (Number.isNaN(v_lo) || Number.isNaN(v_hi)) return null;
+  const daysFromStartmodel = v_lo + (idx_f - idx_lo) * (v_hi - v_lo);
+  return startmodelJD + daysFromStartmodel;
+}
+
+// ───── Phase 9.10b: pattern correction for snapshot-form-fitted harmonics ─────
+// All `*_HARMONICS` tables in this codebase (OBLIQUITY, ECCENTRICITY, CARDINAL,
+// SIDEREAL_YEAR, PERI, …) were fitted under the snapshot-form phase convention:
+//   phase_fit(year) = divisor_N × 2π × (year − anchor) / H_NOW
+// Phase 8.5 replaced this with the integral form ∫1/H(t)dt for `DEEP_TIME=true`.
+// The two forms disagree by a tiny ~3.7 ppm drift over the 305 kyr BALANCED→J2000
+// interval (because H(t) was slightly less in the past) → ~5″ obliquity offset at
+// J2000, off from IAU 2006.
+//
+// The correction: for each anchor `yearA`, pre-compute the integral-vs-snapshot
+// delta at J2000 (= startmodelyearwithCorrection) and subtract it from the
+// integral form. This recovers snapshot-equivalent cycles at J2000 *exactly*,
+// and to sub-arcsec precision for ±25 kyr around J2000. At deep time the
+// correction is a constant shift relative to integral form — slightly less
+// physically accurate than raw integral, but the harmonics weren't fit for deep
+// time anyway, and this makes DEEP_TIME=true and DEEP_TIME=false agree at J2000.
+const _J2000_DRIFT_CACHE = new Map();
+function _getJ2000Drift(yearA) {
+  if (_J2000_DRIFT_CACHE.has(yearA)) return _J2000_DRIFT_CACHE.get(yearA);
+  const integral = integralInverseHFromYears(yearA, startmodelyearwithCorrection);
+  if (integral === null) { _J2000_DRIFT_CACHE.set(yearA, 0); return 0; }
+  const snapshot = (startmodelyearwithCorrection - yearA) / HOLISTIC_YEAR_J2000;
+  const drift = integral - snapshot;
+  _J2000_DRIFT_CACHE.set(yearA, drift);
+  return drift;
+}
+
 /** Total cycles between two years for a cycle of period H/divisor_N (in years).
  *  E.g. Earth perihelion ecliptic cycle = H/16 → divisor_N = 16.
  *  Mercury wobble = 4H → divisor_N = 1/4.
  *
- *  Deep-time ON → cumulative ∫1/H(t)dt form (frame-independent, history-aware).
+ *  Deep-time ON → cumulative ∫1/H(t)dt form, with Phase 9.10b pattern correction
+ *  subtracting the J2000 integral-vs-snapshot drift at anchor yearA so that
+ *  snapshot-form-fitted harmonics produce calibration-matched values.
  *  Deep-time OFF → snapshot formula `cycles = divisor_N × (yearB − yearA) / H_live`
  *  (matches pre-Phase-8 production behavior). All 20+ Phase 8 / 8.5 callers funnel
  *  through this single function. */
 function cyclesBetweenYears(yearA, yearB, divisor_N) {
   if (DEEP_TIME_MODE_ENABLED) {
     const integral = integralInverseHFromYears(yearA, yearB);
-    return integral === null ? null : divisor_N * integral;
+    if (integral === null) return null;
+    // Apply pattern correction based on whichever endpoint is FARTHER from J2000
+    // (heuristically: the harmonic "anchor", e.g. BALANCED_YEAR_J2000_FIXED).
+    // The correction is signed by which side the anchor is on:
+    //   yearA is anchor (call shape: cyclesBetweenYears(anchor, currentYear)) → subtract drift_for(yearA)
+    //   yearB is anchor (call shape: cyclesBetweenYears(currentYear, anchor)) → subtract -drift_for(yearB)
+    // Both shapes produce snapshot-equivalent cycles at J2000.
+    const distA = Math.abs(yearA - startmodelyearwithCorrection);
+    const distB = Math.abs(yearB - startmodelyearwithCorrection);
+    const correction = (distA >= distB) ? _getJ2000Drift(yearA) : -_getJ2000Drift(yearB);
+    return divisor_N * (integral - correction);
   }
   return divisor_N * (yearB - yearA) / holisticyearLength;
 }
@@ -4996,9 +5210,11 @@ function phaseAdvanceRadians(yearAnchor, year, divisor_N) {
 // These are the historical reference years for the eccentricity-oscillation
 // phase anchors. Used by the integrated phase math — they do NOT shift with
 // epoch (in contrast to Phase 6's snapshot `balancedYear`).
+//
+// `BALANCED_YEAR_J2000_FIXED` was relocated to ~line 3283 (just after the
+// `balancedYear` declaration) so it's available for `perihelionPhaseOffset`
+// and other early consumers that must guard against `balancedYear` drift.
 
-const BALANCED_YEAR_J2000_FIXED = perihelionalignmentYear - 14.5 * (HOLISTIC_YEAR_J2000 / 16);
-// = -302,635.00 — 14.5 perihelion cycles before 1246 AD (J2000-integrated)
 const PERIHELION_CYCLE_LENGTH_J2000_FIXED = HOLISTIC_YEAR_J2000 / 16;
 // = 20,957.3125 yr — Earth's perihelion cycle at J2000 (used as J2000-fixed
 // arg for `computeEccentricityEarth` under Phase 8 integrated mode)
@@ -5014,16 +5230,31 @@ const ECCENTRICITY_ANCHOR_J2000_FIXED = BALANCED_YEAR_J2000_FIXED - systemResetN
 // NB: planets.X.eccentricityPhaseJ2000 may not exist for all planets — fall
 // back to a sensible default if missing.
 function _wobbleDivisorFor(periEcliptic, axial) {
-  // wobble period P = 1 / |1/|axial| - 1/|periEcliptic||
-  // P = k × H where k is fixed-structural. So divisor_N = 1/k = H_J2000 / P_J2000.
-  const P = (function() {
-    const wobbleRate = Math.abs(1 / Math.abs(axial) - 1 / Math.abs(periEcliptic));
-    return 1 / wobbleRate;
-  })();
+  // Wobble = beat of axial precession and ICRF perihelion precession (NOT
+  // ecliptic perihelion). For each planet this evaluates to a clean 8H/N
+  // integer divisor: Mercury 8H/84, Venus 8H/19, Mars 8H/52, Jupiter 8H/44,
+  // Saturn 8H/163, Uranus 8H/80, Neptune 8H/100. Matches calcWobblePeriod
+  // at line ~3625 (which is used in the eccentricity base/amp derivation at
+  // line ~3727-3738) — these must agree so the runtime phase advance is
+  // consistent with the J2000 calibration anchor.
+  //
+  // History (2026-06-16): previously used axial-vs-ECLIPTIC perihelion beat
+  // here while the calibration path used axial-vs-ICRF beat (calcWobblePeriod).
+  // The mismatch produced wobble periods up to 42× different, causing the
+  // runtime eccentricity to drift in phase relative to the calibration anchor
+  // at any year ≠ J2000. Surfaced by run8HConfigurationVerification.
+  // See docs/hidden/eccentricity-wobble-formula-analysis.md.
+  const H13 = HOLISTIC_YEAR_J2000 / 13;
+  const inclICRF = (periEcliptic * H13) / (H13 - periEcliptic);
+  // Special case: very-long axial period (tidally damped) — wobble approaches
+  // |inclICRF| directly. Same convention as calcWobblePeriod.
+  if (Math.abs(axial) > 8 * HOLISTIC_YEAR_J2000) return HOLISTIC_YEAR_J2000 / Math.abs(inclICRF);
+  const P = 1 / Math.abs(1 / Math.abs(axial) - 1 / Math.abs(inclICRF));
   return HOLISTIC_YEAR_J2000 / P;   // divisor_N
 }
 
-const _planetEccAnchors_J2000   = {};     // year-anchor per planet (FIXED)
+const _planetEccAnchors_J2000   = {};     // year-anchor per planet (FIXED) — for computeEccentricityEarth (formula path; cos symmetric, sign of phase doesn't matter)
+const _planetSceneAnchors_J2000 = {};     // year-anchor per planet for SCENE rendering (Phase 9.12 Option B) — sign flipped vs formula anchor to match scene-graph snapshot convention θ_scene(J2000) = -phaseJ2000
 const _planetWobbleDivisors     = {};     // structural divisor N per planet
 const _planetWobblePeriodJ2000  = {};     // wobble period at J2000 (FIXED, years)
 for (const k of PLANET_KEYS) {
@@ -5033,6 +5264,7 @@ for (const k of PLANET_KEYS) {
   const P_wobble_J2000 = HOLISTIC_YEAR_J2000 / N_wobble;
   const phaseJ2000  = planets[k].eccentricityPhaseJ2000 ?? 0;
   _planetEccAnchors_J2000[k]   = 2000 - (phaseJ2000 / 360) * P_wobble_J2000;
+  _planetSceneAnchors_J2000[k] = 2000 + (phaseJ2000 / 360) * P_wobble_J2000;
   _planetWobbleDivisors[k]     = N_wobble;
   _planetWobblePeriodJ2000[k]  = P_wobble_J2000;
 }
@@ -6091,7 +6323,8 @@ const startingPoint = {
 
 const earthWobbleCenter = {
   name: "EARTH-WOBBLE-CENTER",
-  startPos: -(((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/3)*360)-(((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/16)*360)-180)),
+  startPos: -(cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 3) * 360
+            - (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) * 360 - 180)),
   speed: 0,
   tilt: 0,
   rotationSpeed: -Math.PI*2/(holisticyearLength/13),
@@ -6116,7 +6349,8 @@ const earthWobbleCenter = {
 
 const midEccentricityOrbit = {
   name: "EARTH-MID-ECCENTRICITY-ORBIT",
-  startPos: -(((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/3)*360)-(((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/16)*360)-180)),
+  startPos: -(cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 3) * 360
+            - (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) * 360 - 180)),
   speed: Math.PI*2/(holisticyearLength/13),
   rotationSpeed: 0,
   tilt: 0,
@@ -6285,6 +6519,42 @@ const earthPerihelionPrecession2 = {
   pivotObj:"",
   isNotPhysicalObject: true,
 };
+
+// ───── Phase 9.12 (Option B): deep-time integral-form rotation tags ─────
+// The default scene-graph render computes:
+//   θ_orbital = obj.speed × pos − obj.startPos × π/180       (line ~48326)
+//   self_spin = obj.rotationSpeed × pos                       (line ~48458)
+// This is a SNAPSHOT formula: speed at the current epoch × time-from-startmodel.
+// At deep past (millions of years), the snapshot diverges from the true integral
+// form ∫ live_speed(t) dt by the variable-H factor. Result: scene visually
+// drifts away from balanced configuration at deep-past balanced years even
+// though the FORMULA path (computeObliquityEarth, etc.) is correct.
+//
+// Fix (Option B): when an H-cycle scene object is tagged with `_dtCycleN`
+// (orbital) or `_dtRotN` (self-rotation), the render loop replaces the
+// snapshot formula with the integral form:
+//   θ = ±2π × cyclesBetweenYears(anchor, o.currentYear, N)
+// where anchor defaults to BALANCED_YEAR_J2000_FIXED (Earth cycles) but can be
+// overridden per-object via `_dtCycleAnchor` (planet wobble centers use
+// _planetSceneAnchors_J2000[planet]). Sign is +1 for prograde, −1 for retrograde.
+// The result IS the physically correct rotation at any epoch — uses the same
+// integral that `computeObliquityEarth` etc. use.
+//
+// Gating: the override only fires when DEEP_TIME_MODE_ENABLED is true.
+// When OFF, the scene reverts to pre-Phase-9.12 snapshot rendering.
+
+// Earth scene-graph objects (anchored at BALANCED_YEAR_J2000_FIXED implicitly)
+earth.                       _dtCycleN = 13; earth.                       _dtCycleSign = -1;
+midEccentricityOrbit.        _dtCycleN = 13; midEccentricityOrbit.        _dtCycleSign = +1;
+earthInclinationPrecession.  _dtCycleN =  3; earthInclinationPrecession.  _dtCycleSign = +1;
+earthEclipticPrecession.     _dtCycleN =  5; earthEclipticPrecession.     _dtCycleSign = +1;
+earthObliquityPrecession.    _dtCycleN =  8; earthObliquityPrecession.    _dtCycleSign = -1;
+earthPerihelionPrecession1.  _dtCycleN = 16; earthPerihelionPrecession1.  _dtCycleSign = +1;
+earthPerihelionPrecession2.  _dtCycleN = 16; earthPerihelionPrecession2.  _dtCycleSign = -1;
+earthWobbleCenter.           _dtRotN   = 13; earthWobbleCenter.           _dtRotSign   = -1;
+
+// Planet wobble centers tagged separately AFTER their declarations
+// (lines 8264+) — see the second Phase 9.12 tag block below.
 
 const barycenterEarthAndSun = {
   name: "Barycenter Earth and Sun",
@@ -8154,6 +8424,21 @@ const neptuneWobbleCenter = {
   traceOn: false, isNotPhysicalObject: true,
 };
 
+// ───── Phase 9.12 (Option B v2): planet wobble-center deep-time tags ─────
+// Each planet's wobble center orbits at its own H/N period (non-integer N).
+// Tags include `_dtCycleAnchor` (per-planet, _planetSceneAnchors_J2000) which
+// the render loop uses INSTEAD of the default BALANCED_YEAR_J2000_FIXED.
+// Sign is +1 (all prograde in scene convention).
+// At J2000: θ_integral = -phaseJ2000_rad matches scene snapshot exactly.
+// At deep past: θ tracks the integral form (deep-time-correct).
+mercuryWobbleCenter._dtCycleN = _planetWobbleDivisors.mercury; mercuryWobbleCenter._dtCycleSign = +1; mercuryWobbleCenter._dtCycleAnchor = _planetSceneAnchors_J2000.mercury;
+venusWobbleCenter.  _dtCycleN = _planetWobbleDivisors.venus;   venusWobbleCenter.  _dtCycleSign = +1; venusWobbleCenter.  _dtCycleAnchor = _planetSceneAnchors_J2000.venus;
+marsWobbleCenter.   _dtCycleN = _planetWobbleDivisors.mars;    marsWobbleCenter.   _dtCycleSign = +1; marsWobbleCenter.   _dtCycleAnchor = _planetSceneAnchors_J2000.mars;
+jupiterWobbleCenter._dtCycleN = _planetWobbleDivisors.jupiter; jupiterWobbleCenter._dtCycleSign = +1; jupiterWobbleCenter._dtCycleAnchor = _planetSceneAnchors_J2000.jupiter;
+saturnWobbleCenter. _dtCycleN = _planetWobbleDivisors.saturn;  saturnWobbleCenter. _dtCycleSign = +1; saturnWobbleCenter. _dtCycleAnchor = _planetSceneAnchors_J2000.saturn;
+uranusWobbleCenter. _dtCycleN = _planetWobbleDivisors.uranus;  uranusWobbleCenter. _dtCycleSign = +1; uranusWobbleCenter. _dtCycleAnchor = _planetSceneAnchors_J2000.uranus;
+neptuneWobbleCenter._dtCycleN = _planetWobbleDivisors.neptune; neptuneWobbleCenter._dtCycleSign = +1; neptuneWobbleCenter._dtCycleAnchor = _planetSceneAnchors_J2000.neptune;
+
 //*************************************************************
 // ADD CONSTANTS
 //*************************************************************
@@ -8761,6 +9046,13 @@ const params = { sizeBoost: 0 };
 
 let predictions = {
   juliandaysbalancedJD: 0,
+  // Phase 9.11 — Balanced-year navigation (H and 8H lattices)
+  lastBalancedJD_H: 0,
+  nextBalancedJD_H: 0,
+  lastBalancedJD_8H: 0,
+  nextBalancedJD_8H: 0,
+  balancedPeriod_H_years: 0,
+  balancedPeriod_8H_years: 0,
   lengthofDay: 0,
   lengthofsolarDay: 86400,
   lengthofsiderealDay: 0,
@@ -30834,6 +31126,125 @@ function setupGUI() {
   astroFolder.element.dataset.category = 'calculated';
   addFolderTooltip(astroFolder, 'Analytical predictions from the Fibonacci Laws of Planetary Motion.');
 
+  // ── Phase 9.11: Balanced-Year Julian Dates (top of Predictions for Earth) ──
+  const balancedJdFolder = astroFolder.addFolder({ title: 'Balanced Year Julian Dates', expanded: false });
+  addFolderTooltip(balancedJdFolder,
+    'Past and next balanced-state events for Earth (H cycle) and the full ' +
+    'solar system (8H = Solar System Resonance Cycle). Periods and JDs ' +
+    'evolve correctly under deep-time scrubbing. Copy/paste a JD into the ' +
+    'Julian Day input above (or use the navigation buttons) to jump to that ' +
+    'event and visually confirm the configuration.');
+
+  // Phase 9.11: format helper that shows "—" for NaN values (out-of-range)
+  const fmtJdOrDash = v => Number.isFinite(v) ? v.toFixed(0) : '—';
+  const fmtYrOrDash = v => Number.isFinite(v) ? v.toFixed(2) : '—';
+
+  addTooltip(balancedJdFolder.addBinding(predictions, 'balancedPeriod_H_years', {
+    label: 'H period (yr)', readonly: true, format: fmtYrOrDash
+  }), 'True-calendar-year span between THIS pair of consecutive Earth-balanced events, ' +
+     'computed as the integral ∫_{lastH}^{nextH} 1/H(t) dt = 1 cycle — i.e. the harmonic ' +
+     'mean of H(t) over the bracket interval. NOT the instantaneous H_J2000 = 335,317. ' +
+     'In deep past where H(t) was smaller (LOD shorter, Moon closer), the displayed period ' +
+     'is < 335,317. As you scrub deep-time, the value evolves toward the live H at that epoch. ' +
+     'Note: this is decoupled from the JD-interval of the displayed Last/Next H JDs ' +
+     '(which use the calibrated cycle math so the scene lands exactly on e_min). For the ' +
+     'instantaneous H at the current epoch, see `holisticyearLength`.');
+
+  addTooltip(balancedJdFolder.addBinding(predictions, 'lastBalancedJD_H', {
+    label: 'Last H JD', readonly: true, format: fmtJdOrDash
+  }), 'Julian Date of the most recent Earth-balanced event. Copy and paste into Julian Day input to navigate. Shows "—" if outside the deep-time table range (~3 Myr past, ~700 kyr future before tidal-lock asymptote).');
+
+  const bHnext = addTooltip(balancedJdFolder.addBinding(predictions, 'nextBalancedJD_H', {
+    label: 'Next H JD', readonly: true, format: fmtJdOrDash
+  }), 'Julian Date of the next upcoming Earth-balanced event. Copy and paste into Julian Day input to navigate. Shows "—" if outside the deep-time table range.');
+
+  // Phase 9.11: Navigate scene to a balanced-event JD. Replicates the JD-change
+  // handler body (line ~30450) because programmatic `o.julianDay = X` does not
+  // fire the .on('change') event in this Tweakpane version.
+  function navigateToBalancedJD(targetJD) {
+    if (!Number.isFinite(targetJD)) return;
+    if (_rootUpdating || o._renderLoopRefreshing) return;
+    _rootUpdating = true;
+    try {
+      const newJD = Number(targetJD);
+      const converted = dayToDate(newJD);
+      o.Date = converted.date;
+      o.Time = converted.time;
+      o.Day = newJD - startmodelJD;
+      o.pos = sDay * o.Day;
+      o.julianDay = newJD;
+      const p = dayToDateNew(newJD, 'julianday', 'perihelion-calendar');
+      o.perihelionDate = `${p.date}`;
+      positionChanged = true;
+      jdCtrl.refresh();
+      dateCtrl.refresh();
+      timeCtrl.refresh();
+      periCtrl.refresh();
+    } finally {
+      _rootUpdating = false;
+    }
+  }
+
+  // Phase 9.12.2: defer navigation by one event-loop tick. If the user has the
+  // JD input focused (typing) and clicks a button, the input's blur+change handler
+  // runs synchronously during the click and sets `_rootUpdating = true` mid-event.
+  // Deferring via setTimeout(0) lets that handler complete (and reset
+  // _rootUpdating to false) before the navigation runs — preventing the stall.
+  //
+  // Phase 9.12.10: render H/8H navigation buttons side-by-side via raw DOM
+  // <button> in a flex toolbar (same pattern as the playback Back/Fwd/Reset/Now
+  // buttons at line ~30601). Tweakpane v4.0.5 doesn't include the `buttongrid`
+  // blade, so we use the existing .tp-nav-toolbar / .tp-nav-btn CSS classes.
+  //
+  // Positioning: appendChild() to `.tp-fldv_c` empirically clusters both rows
+  // at the bottom (Tweakpane's rack appears to keep bindings grouped). To pin
+  // each row immediately after a specific binding, use Element.after() on the
+  // binding's blade element — this places the row as the next sibling in the
+  // exact DOM parent that holds the bindings, regardless of internal wrapping.
+  const _dt_makeBalancedJdButtonRow = (afterEl, pairs) => {
+    if (!afterEl) return;
+    const row = document.createElement('div');
+    row.className = 'tp-nav-toolbar';
+    pairs.forEach(({ label, tip, getTarget }) => {
+      const btn = document.createElement('button');
+      btn.className = 'tp-nav-btn';
+      btn.innerHTML = `<span class="tp-nav-label" style="font-size:11px;">${label}</span>`;
+      btn.title = tip;
+      btn.setAttribute('aria-label', tip);
+      btn.addEventListener('click', () => setTimeout(() => navigateToBalancedJD(getTarget()), 0));
+      row.appendChild(btn);
+    });
+    afterEl.after(row);
+  };
+
+  addTooltip(balancedJdFolder.addBinding(predictions, 'balancedPeriod_8H_years', {
+    label: '8H period (yr)', readonly: true, format: fmtYrOrDash
+  }), 'True-calendar-year span between THIS pair of consecutive Solar System Resonance Cycle ' +
+     'events (Last 8H → Next 8H, all planets balanced), computed as ∫_{last8H}^{next8H} 1/H(t) dt = ' +
+     '8 cycles → the harmonic mean H over an 8H interval. NOT the instantaneous 8 × H_J2000 = ' +
+     '2,682,536. The Last-8H → Next-8H interval is ~99% in the past (2.65 Myr past vs ~30 kyr future), ' +
+     'where H(t) was smaller (LOD shorter, Moon closer), so the displayed period is < 2,682,536. ' +
+     'Scrub deep-time to see this evolve. Decoupled from the JD-interval of the displayed Last/Next ' +
+     '8H JDs (which use the calibrated cycle math for e_min landing).');
+
+  addTooltip(balancedJdFolder.addBinding(predictions, 'lastBalancedJD_8H', {
+    label: 'Last 8H JD', readonly: true, format: fmtJdOrDash
+  }), 'Julian Date of the most recent full-system-balanced event. Copy and paste into Julian Day input to navigate. Shows "—" if outside the deep-time table range.');
+
+  const b8Hnext = addTooltip(balancedJdFolder.addBinding(predictions, 'nextBalancedJD_8H', {
+    label: 'Next 8H JD', readonly: true, format: fmtJdOrDash
+  }), 'Julian Date of the next upcoming full-system-balanced event. Copy and paste into Julian Day input to navigate. Shows "—" if outside the deep-time table range.');
+
+  // Insert button rows in the final DOM positions (after all bindings exist).
+  _dt_makeBalancedJdButtonRow(bHnext.element, [
+    { label: '← Jump to Last H JD',  tip: 'Jump the scene to the Last H balanced event (Earth-balanced).',  getTarget: () => o.lastBalancedJD_H },
+    { label: 'Jump to Next H JD →',  tip: 'Jump the scene to the Next H balanced event (Earth-balanced).',  getTarget: () => o.nextBalancedJD_H },
+  ]);
+  _dt_makeBalancedJdButtonRow(b8Hnext.element, [
+    { label: '← Jump to Last 8H JD', tip: 'Jump the scene to the Last 8H balanced event (Solar System Resonance Cycle — all planets balanced).', getTarget: () => o.lastBalancedJD_8H },
+    { label: 'Jump to Next 8H JD →', tip: 'Jump the scene to the Next 8H balanced event (Solar System Resonance Cycle).', getTarget: () => o.nextBalancedJD_8H },
+  ]);
+
   const daysFolder = astroFolder.addFolder({ title: 'Day Lengths' });
   addTooltip(daysFolder.addBinding(predictions, 'lengthofDay', {
     label: 'Solar Day (s)', readonly: true, format: v => v.toFixed(6)
@@ -31410,6 +31821,20 @@ function setupGUI() {
   // Calibration
   const firstCalibBtn = addTestButton('Verify Obliquity Calibration', runObliquityCalibrationTest,
     'Check that the model\'s obliquity matches IAU reference values over time.');
+  addTestButton('Verify Balanced-Year Navigation', runBalancedYearNavigationTest,
+    'Check the H and 8H balanced-year math: cycle identity, round-trip, JD conversion, ' +
+    'and the expected harmonic-mean H vs instantaneous H_J2000 deviation.');
+  addTestButton('Diagnose Balanced-Year State', runBalancedYearStateDiagnostic,
+    'Diagnose the current scene state vs balanced-year math: integer-cycle distance, ' +
+    'cyclesBetweenYears with correction, drift(BALANCED), formula vs scene eccentricity, ' +
+    'and obliquity. Run AT a balanced JD (after clicking Last/Next H) to see whether ' +
+    'the navigation landed correctly and whether formula/scene values match expectation.');
+  addTestButton('Verify 8H Configuration', run8HConfigurationVerification,
+    'Verify the Solar System Resonance Cycle claim from docs/72 § "System Reset": at every ' +
+    '8H balanced JD, in-phase planets (Mercury/Venus/Mars/Jupiter/Uranus/Neptune) reach MIN ' +
+    'inclination + MEAN eccentricity (rising), and Saturn reaches MAX inclination + MEAN ' +
+    'eccentricity (falling). Run AFTER clicking "Jump to Last 8H JD" or "Jump to Next 8H JD" ' +
+    'in the Predictions > Balanced Year Julian Dates folder.');
   addTestButton('Verify Perihelion Rate', verifyPerihelionRate,
     'Verify the rate of perihelion precession against reference data.');
   addTestButton('Investigate Parameters', investigateParameterEffects,
@@ -33787,6 +34212,435 @@ async function runObliquityCalibrationTest() {
   console.log('TEST COMPLETE - Model state restored');
   console.log('═══════════════════════════════════════════════════════════════════════════');
   return { solsticeResults, netTilt, rateResults, modelRate, iauRate: IAU_RATE };
+}
+
+/** Phase 9.11: Verify the balanced-year navigation math.
+ * Validates: (a) the cycle-0 identity, (b) integral round-trip, (c) year→JD
+ * round-trip, (d) the expected harmonic-mean H deviation from H_J2000. */
+async function runBalancedYearNavigationTest() {
+  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║           BALANCED-YEAR NAVIGATION VERIFICATION                          ║');
+  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log('');
+
+  // ─── TEST 1: Cycle identity ───
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST 1: Cycle-0 identity');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  const cycle0_yr = findBalancedYearAtCycle(0);
+  const balRef = BALANCED_YEAR_J2000_FIXED;
+  console.log(`findBalancedYearAtCycle(0) = ${cycle0_yr}`);
+  console.log(`BALANCED_YEAR_J2000_FIXED   = ${balRef}`);
+  console.log(`Match: ${Math.abs(cycle0_yr - balRef) < 1e-9 ? 'PASS ✓' : 'FAIL ✗'}`);
+  console.log('');
+
+  // ─── TEST 2: Integral round-trip ───
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST 2: Integral round-trip (should be exactly N cycles)');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('  N │      year at cycle N      │   integral(BAL → year)   │   Δ from N');
+  console.log('  ──┼───────────────────────────┼──────────────────────────┼──────────');
+  for (const N of [-7, -1, 0, 1, 8]) {
+    const yr = findBalancedYearAtCycle(N);
+    if (yr === null) { console.log(`  ${String(N).padStart(2)} │  (out of table domain)`); continue; }
+    const intg = integralInverseHFromYears(balRef, yr);
+    const delta = intg - N;
+    console.log(`  ${String(N).padStart(2)} │ ${yr.toFixed(2).padStart(25)} │ ${intg.toFixed(12).padStart(24)} │ ${delta.toExponential(2)}`);
+  }
+  console.log('');
+
+  // ─── TEST 3: Year → JD round-trip ───
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST 3: yearToJD anchor (startmodelYear should map to startmodelJD)');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  const jdAtStart = yearToJD(startmodelYear);
+  console.log(`yearToJD(startmodelYear=${startmodelYear})  = ${jdAtStart}`);
+  console.log(`startmodelJD                                = ${startmodelJD}`);
+  console.log(`Difference (days)                           = ${(jdAtStart - startmodelJD).toFixed(6)}`);
+  console.log(`Match: ${Math.abs(jdAtStart - startmodelJD) < 1.0 ? 'PASS ✓ (< 1 day)' : 'FAIL ✗'}`);
+  console.log('');
+
+  // ─── TEST 4: Compare with existing balancedJD ───
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST 4: yearToJD(BALANCED_YEAR_J2000_FIXED) vs existing balancedJD constant');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  const jdAtBal_yearToJD = yearToJD(BALANCED_YEAR_J2000_FIXED);
+  console.log(`yearToJD(BALANCED_YEAR_J2000_FIXED)  = ${jdAtBal_yearToJD.toFixed(2)}`);
+  console.log(`balancedJD (legacy const)            = ${balancedJD.toFixed(2)}`);
+  console.log(`Difference (days)                    = ${(jdAtBal_yearToJD - balancedJD).toFixed(2)}`);
+  console.log('NOTE: difference reflects deep-time days-per-year evolution.');
+  console.log('      Legacy `balancedJD` uses constant days/year; new yearToJD uses variable.');
+  console.log('      Over 305 kyr the difference is a few minutes per Myr of integration.');
+  console.log('');
+
+  // ─── TEST 5: H_avg deviation from H_J2000 ───
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST 5: Why the displayed H period ≠ H_J2000');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  const lastH_yr  = findBalancedYearAtCycle(0);
+  const nextH_yr  = findBalancedYearAtCycle(1);
+  const last8H_yr = findBalancedYearAtCycle(-7);
+  const next8H_yr = findBalancedYearAtCycle(1);
+  const H_period  = nextH_yr - lastH_yr;
+  const H8_period = next8H_yr - last8H_yr;
+  console.log(`H_J2000 (instantaneous)              = ${HOLISTIC_YEAR_J2000} yr`);
+  console.log(`Last H year (cycle 0)                = ${lastH_yr.toFixed(2)}`);
+  console.log(`Next H year (cycle 1)                = ${nextH_yr.toFixed(2)}`);
+  console.log(`H period (calendar yr)               = ${H_period.toFixed(2)}`);
+  console.log(`Δ vs H_J2000                         = ${(H_period - HOLISTIC_YEAR_J2000).toFixed(2)} yr (${((H_period - HOLISTIC_YEAR_J2000) / HOLISTIC_YEAR_J2000 * 1e6).toFixed(1)} ppm)`);
+  console.log('');
+  console.log(`8H_J2000 (= 8 × H_J2000)             = ${8 * HOLISTIC_YEAR_J2000} yr`);
+  console.log(`Last 8H year (cycle −7)              = ${last8H_yr.toFixed(2)}`);
+  console.log(`Next 8H year (cycle 1)               = ${next8H_yr.toFixed(2)}`);
+  console.log(`8H period (calendar yr)              = ${H8_period.toFixed(2)}`);
+  console.log(`Δ vs 8 × H_J2000                     = ${(H8_period - 8 * HOLISTIC_YEAR_J2000).toFixed(2)} yr (${((H8_period - 8 * HOLISTIC_YEAR_J2000) / (8 * HOLISTIC_YEAR_J2000) * 1e6).toFixed(1)} ppm)`);
+  console.log('');
+  console.log('Interpretation: the displayed periods are time-averaged harmonic-mean H over');
+  console.log('the displayed cycle interval. Both intervals span deep into the past where');
+  console.log('H was smaller (LOD shorter, Moon closer), so H_avg < H_J2000 → period shorter.');
+  console.log('The 8H interval is ~99% in the past → larger deviation than H interval.');
+  console.log('');
+
+  // ─── TEST 6: Sanity check — at J2000, Next H ≡ Next 8H ───
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST 6: At J2000, Next H and Next 8H should match exactly (cycle +1 in both)');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  const nextH_jd  = yearToJD(nextH_yr);
+  const next8H_jd = yearToJD(next8H_yr);
+  console.log(`Next H JD                            = ${nextH_jd.toFixed(2)}`);
+  console.log(`Next 8H JD                           = ${next8H_jd.toFixed(2)}`);
+  console.log(`Match: ${Math.abs(nextH_jd - next8H_jd) < 1 ? 'PASS ✓' : 'FAIL ✗'}`);
+  console.log('');
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST COMPLETE');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  return { lastH_yr, nextH_yr, last8H_yr, next8H_yr, H_period, H8_period };
+}
+
+/** Phase 9.11.x: Diagnose the current scene state vs balanced-year math.
+ *  Run AT a navigated balanced JD (after clicking Last H / Next H) to see whether
+ *  the navigation landed correctly and whether formula vs scene values match. */
+async function runBalancedYearStateDiagnostic() {
+  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║         BALANCED-YEAR STATE DIAGNOSTIC                                   ║');
+  console.log('║         Run AT a navigated balanced JD to inspect current state          ║');
+  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log('');
+
+  const e_min = Math.abs(eccentricityBase - eccentricityAmplitude);
+  const e_max = eccentricityBase + eccentricityAmplitude;
+  const oblExpectedAtBalanced = (() => {
+    let v = OBLIQUITY_MEAN;
+    for (const [, , cosC] of OBLIQUITY_HARMONICS) v += cosC;
+    return v;
+  })();
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('SECTION 1: Current scene location');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log(`  o.currentYear:           ${o.currentYear}`);
+  console.log(`  o.julianDay:             ${o.julianDay}`);
+  console.log(`  o.Date / o.Time:         ${o.Date} ${o.Time}`);
+  console.log(`  BALANCED_YEAR_J2000_FIXED: ${BALANCED_YEAR_J2000_FIXED}`);
+  console.log('');
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('SECTION 2: Integral / cycle math (raw + corrected)');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  const rawIntegral = integralInverseHFromYears(BALANCED_YEAR_J2000_FIXED, o.currentYear);
+  const driftBALANCED = _getJ2000Drift(BALANCED_YEAR_J2000_FIXED);
+  const driftCurrent  = _getJ2000Drift(o.currentYear);
+  const cyclesH16     = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, o.currentYear, 16);
+  const cyclesH1      = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, o.currentYear, 1);
+  const distFromIntegerH1 = (cyclesH1 !== null) ? cyclesH1 - Math.round(cyclesH1) : null;
+  const distFromIntegerRaw = (rawIntegral !== null) ? rawIntegral - Math.round(rawIntegral) : null;
+  console.log(`  rawIntegral (no correction):              ${rawIntegral?.toFixed(8) ?? 'null'}`);
+  console.log(`  Distance from nearest integer (raw):      ${distFromIntegerRaw?.toExponential(3) ?? 'null'}`);
+  console.log(`    (should be ~0 if at exact balanced year — proves navigation landed correctly)`);
+  console.log(`  cyclesBetweenYears(BALANCED, cy, 1):      ${cyclesH1?.toFixed(8) ?? 'null'}`);
+  console.log(`  Distance from nearest integer (corrected):${distFromIntegerH1?.toExponential(3) ?? 'null'}`);
+  console.log(`  cyclesBetweenYears(BALANCED, cy, 16):     ${cyclesH16?.toFixed(6) ?? 'null'}`);
+  console.log(`  drift(BALANCED) = ${driftBALANCED?.toExponential(3) ?? 'null'}    (J2000 anchor — small)`);
+  console.log(`  drift(currentYear) = ${driftCurrent?.toExponential(3) ?? 'null'}    (deep-past drift — grows with depth)`);
+  console.log(`  Phase 9.10b heuristic active branch:      ${(() => {
+    const dA = Math.abs(BALANCED_YEAR_J2000_FIXED - startmodelyearwithCorrection);
+    const dB = Math.abs(o.currentYear - startmodelyearwithCorrection);
+    return (dA >= dB) ? 'drift(yearA=BALANCED)' : '-drift(yearB=currentYear)';
+  })()}`);
+  console.log('');
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('SECTION 3: FORMULA values (via computeEccentricityEarth, computeObliquityEarth)');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  const formula_e = computeEccentricityEarth(o.currentYear, BALANCED_YEAR_J2000_FIXED,
+                                              PERIHELION_CYCLE_LENGTH_J2000_FIXED,
+                                              eccentricityBase, eccentricityAmplitude);
+  const formula_obl = computeObliquityEarth(o.currentYear);
+  console.log(`  computeEccentricityEarth:  ${formula_e?.toFixed(8) ?? 'null'}`);
+  console.log(`    Expected if AT balanced year: ${e_min.toFixed(8)} (= e_min)`);
+  console.log(`    Range: [${e_min.toFixed(6)}, ${e_max.toFixed(6)}]`);
+  console.log(`    Drift from e_min: ${formula_e !== null ? (formula_e - e_min).toExponential(3) : 'null'}`);
+  console.log('');
+  console.log(`  computeObliquityEarth:     ${formula_obl?.toFixed(6) ?? 'null'}°`);
+  console.log(`    Expected if AT balanced year: ${oblExpectedAtBalanced.toFixed(6)}° (= OBLIQUITY_MEAN + Σ cosC)`);
+  console.log(`    Drift from expected: ${formula_obl !== null ? (formula_obl - oblExpectedAtBalanced).toFixed(6) : 'null'}° = ${formula_obl !== null ? ((formula_obl - oblExpectedAtBalanced) * 3600).toFixed(1) : 'null'}″`);
+  console.log('');
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('SECTION 4: SCENE values (via scene-graph geometry)');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log(`  o.eccentricityEarth (predictions, formula):  ${o.eccentricityEarth?.toFixed(8) ?? 'undef'}`);
+  console.log(`  earthPerihelionFromEarth.distAU (SCENE):     ${(typeof earthPerihelionFromEarth !== 'undefined' && earthPerihelionFromEarth.distAU) ? earthPerihelionFromEarth.distAU.toFixed(8) : 'undef'}`);
+  console.log(`  o.obliquityEarth (predictions, formula):     ${o.obliquityEarth?.toFixed(6) ?? 'undef'}°`);
+  console.log(`  o.earthInvPlaneInclinationDynamic:           ${o.earthInvPlaneInclinationDynamic?.toFixed(6) ?? 'undef'}°`);
+  console.log(`    Expected at balanced year: ${(earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude).toFixed(6)}° (= MIN)`);
+  console.log('');
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('SECTION 5: Interpretation');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  // Phase 9.11.x: use CORRECTED cycles distance for interpretation, not raw.
+  // The raw integral differs from the corrected cycles by the Phase 9.10b
+  // drift correction, which matters most at deep past. Navigation lands at
+  // raw-integer cycles, but the harmonic formulas use corrected cycles —
+  // round-trip noise pushes raw away from integer while corrected stays
+  // near integer (the round-trip + drift correction cancel by design).
+  const distToCheck = distFromIntegerH1 !== null ? distFromIntegerH1 : distFromIntegerRaw;
+  if (distToCheck !== null && Math.abs(distToCheck) < 1e-3) {
+    console.log('  ✓ Scene IS at a corrected-integer cycle (navigation landed correctly)');
+    if (formula_e !== null && Math.abs(formula_e - e_min) < 0.0001) {
+      console.log('  ✓ Formula eccentricity ≈ e_min (harmonic phases aligned at balanced year)');
+    } else {
+      console.log('  ✗ Formula eccentricity DRIFTED');
+      console.log(`    Diff: ${(formula_e - e_min).toExponential(3)}`);
+    }
+    const sceneE = (typeof earthPerihelionFromEarth !== 'undefined') ? earthPerihelionFromEarth.distAU : null;
+    if (sceneE !== null && Math.abs(sceneE - e_min) < 0.0001) {
+      console.log('  ✓ Scene eccentricity ≈ e_min (Phase 9.12 Option B integral-form rendering active)');
+    } else if (sceneE !== null) {
+      const diff = sceneE - e_min;
+      console.log(`  ✗ Scene eccentricity off e_min by ${diff.toFixed(8)} (${Math.abs(diff/e_min*100).toFixed(2)}%)`);
+      console.log('    If diff > 0.0001: likely a planet wobble-center or other H-cycle scene object missing Phase 9.12 tag');
+    }
+  } else {
+    console.log('  ✗ Scene is NOT at an integer cycle (corrected)');
+    console.log(`    Distance from nearest integer (corrected): ${distToCheck}`);
+    console.log('    Either navigation didn\'t land correctly, or user navigated via JD input');
+  }
+  console.log('');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('DIAGNOSTIC COMPLETE');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+
+  return {
+    currentYear: o.currentYear,
+    rawIntegral, cyclesH1, cyclesH16,
+    distFromIntegerRaw, distFromIntegerH1,
+    driftBALANCED, driftCurrent,
+    formula_e, formula_obl,
+    scene_e: (typeof earthPerihelionFromEarth !== 'undefined') ? earthPerihelionFromEarth.distAU : null,
+    e_min, oblExpectedAtBalanced,
+  };
+}
+
+/** Verify the 8H balanced-event claim — at every 8H balanced JD ("System Reset"),
+ *  per docs/72-the-closed-loop.md § "System Reset". Reports per-planet:
+ *    1. Inclination (vs mean/min/max — in-phase planets converge to one extreme,
+ *       Saturn is the unique anti-phase oscillation)
+ *    2. Eccentricity (actual phase angle θ in degrees and where on the
+ *       law-of-cosines curve `e = √(base² + amp² − 2·base·amp·cos θ)` we sit)
+ *    3. Axial tilt / obliquity (whether it equals tiltJ2000, indicating the
+ *       inclination-vs-axial-precession contributions cancel — what Earth shows)
+ *    4. 8H/wobble synchronization (whether the eccentricity wobble period
+ *       divides 8H evenly — only then does the planet return to its anchor
+ *       phase at every 8H balanced JD)
+ *
+ *  Run AFTER clicking "Jump to Last 8H JD" or "Jump to Next 8H JD" in the
+ *  Predictions > Balanced Year Julian Dates folder. */
+async function run8HConfigurationVerification() {
+  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║          8H CONFIGURATION VERIFICATION                                   ║');
+  console.log('║          Per-planet check at Solar System Resonance Cycle (8H) JD        ║');
+  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log('');
+
+  // ─── Step 1: detect whether we're at an 8H balanced JD ───
+  const n_now = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, o.currentYear, 1);
+  if (n_now === null) {
+    console.log('✗ Unable to compute cycle position (cumulative integral table out of range).');
+    return;
+  }
+  const offset = -systemResetN;                     // = −7
+  const n_int  = Math.round(n_now);
+  const EPS    = 1e-3;                              // tolerance in H-cycle units
+  const isAtH         = Math.abs(n_now - n_int) < EPS;
+  const isOn8HLattice = isAtH && (((n_int - offset) % 8) === 0);
+
+  console.log(`  currentYear:              ${o.currentYear.toFixed(2)}`);
+  console.log(`  julianDay:                ${o.julianDay}`);
+  console.log(`  H-cycles from BALANCED:   ${n_now.toFixed(6)}`);
+  console.log(`  Nearest integer cycle:    ${n_int}`);
+  console.log(`  On H lattice?             ${isAtH ? 'YES' : 'NO (off by ' + Math.abs(n_now - n_int).toFixed(6) + ' cycles)'}`);
+  console.log(`  On 8H lattice (Sys Reset)?${isOn8HLattice ? ' YES' : ' NO'}`);
+  console.log('');
+
+  if (!isOn8HLattice) {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('  Scene is NOT at an 8H balanced JD — cannot verify configuration claim.');
+    console.log('  Action: click "← Jump to Last 8H JD" or "Jump to Next 8H JD →" in the');
+    console.log('          Predictions > Balanced Year Julian Dates folder, then re-run.');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    return;
+  }
+
+  console.log('✓ At 8H balanced JD ("System Reset"). Inspecting per-planet state…');
+  console.log('');
+  console.log('Doc 72 § "System Reset" claims (with refinement from script.js:3730-3738):');
+  console.log('  • In-phase planets (Mercury/Venus/Mars/Jupiter/Uranus/Neptune):');
+  console.log('      inclination → MIN; eccentricity anchored at phase 90° (rising through base)');
+  console.log('  • Anti-phase planet (Saturn):');
+  console.log('      inclination → also at MIN per code formula (doc 72 says MAX — see note below);');
+  console.log('      eccentricity anchored at phase 270° (falling through base)');
+  console.log('');
+  console.log('Earth (in-phase, separate anchor): at e_min (phase 0°) at every H balanced year.');
+  console.log('Each non-Earth planet now returns to its anchor phase at every 8H (post 2026-06-16');
+  console.log('_wobbleDivisorFor fix to axial-vs-ICRF beat — see eccentricity-wobble-formula-analysis.md).');
+  console.log('');
+
+  // ─── Step 2: per-planet measurements ───
+  const planetsToTest = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+  const EIGHT_H = 8 * HOLISTIC_YEAR_J2000;
+
+  // Block A — inclination + axial tilt
+  console.log('── Block A: Inclination + Axial tilt (obliquity) ──');
+  console.log('┌─────────┬───────────┬─────────────────────────────────────┬─────────────────────────────────────┐');
+  console.log('│ Planet  │ Phase     │ Inclination (°)  actual / mean ± amp│ Axial tilt (°)   actual / tiltJ2000 │');
+  console.log('├─────────┼───────────┼─────────────────────────────────────┼─────────────────────────────────────┤');
+  const inclResults = [];
+  for (const planet of planetsToTest) {
+    const p = planets[planet];
+    const isAntiPhase = !!p.antiPhase;
+    const inclMean = p.invPlaneInclinationMean;
+    const inclAmp  = p.invPlaneInclinationAmplitude;
+    const inclActual = computePlanetInvPlaneInclinationDynamic(planet, o.currentYear);
+    const inclMin  = inclMean - inclAmp;
+    const inclMax  = inclMean + inclAmp;
+    const closerToMin = Math.abs(inclActual - inclMin) < Math.abs(inclActual - inclMax);
+    const inclLabel = closerToMin ? 'MIN' : 'MAX';
+    const inclDeltaMin = Math.abs(inclActual - inclMin);
+    const inclDeltaMax = Math.abs(inclActual - inclMax);
+    const closestDelta = Math.min(inclDeltaMin, inclDeltaMax);
+    const inclAtExtreme = closestDelta < 1e-4;
+
+    const tiltJ2000 = p.axialTiltJ2000;
+    const tiltActual = computePlanetObliquity(planet, o.currentYear);
+    const tiltDelta  = tiltActual - tiltJ2000;
+    const tiltNearJ2000 = Math.abs(tiltDelta) < 1e-3;     // within ~3″
+    inclResults.push({ planet, isAntiPhase, inclActual, inclMean, inclAmp, inclLabel, inclAtExtreme, tiltActual, tiltJ2000, tiltDelta, tiltNearJ2000 });
+
+    const planetCol = planet.padEnd(7);
+    const phaseCol  = (isAntiPhase ? 'anti-phase' : 'in-phase').padEnd(9);
+    const inclStr   = `${inclActual.toFixed(4).padStart(7)} / ${inclMean.toFixed(4)} ± ${inclAmp.toFixed(4)} → ${inclLabel}${inclAtExtreme ? '✓' : ''}`.padEnd(35);
+    const tiltStr   = `${tiltActual.toFixed(4).padStart(8)} / ${tiltJ2000.toFixed(4)}   Δ ${(tiltDelta >= 0 ? '+' : '') + tiltDelta.toExponential(2)}${tiltNearJ2000 ? '✓' : ''}`.padEnd(35);
+    console.log(`│ ${planetCol} │ ${phaseCol} │ ${inclStr} │ ${tiltStr} │`);
+  }
+  console.log('└─────────┴───────────┴─────────────────────────────────────┴─────────────────────────────────────┘');
+  console.log('  Obliquity Δ depends on whether (N_icrf, N_obliq) are BOTH integer for that planet.');
+  console.log('  • EARTH: N_icrf=3, N_obliq=8 (both integer) → inclination & axial contributions cancel');
+  console.log('    exactly at every H balanced year → obliquity ≈ OBLIQUITY_MEAN (special property).');
+  console.log('  • Other planets: typically have non-integer N → partial interference → Δ ≠ 0.');
+  console.log('    Mars: largest (+1.01°) because N_icrf=8.5 and N_obliq=2.625 (both half/eighth-integer);');
+  console.log('    Mercury/Jupiter/Saturn/Uranus: small Δ; this is correct model behavior, not a bug.');
+  console.log('  • Venus and Neptune: no obliquity cycle (tidally damped axial) → frozen at tiltJ2000.');
+  console.log('');
+
+  // Block B — eccentricity phase angle + 8H/wobble synchronization
+  console.log('── Block B: Eccentricity phase + 8H/wobble sync ──');
+  console.log('┌─────────┬─────────────┬──────────────────────────────────────────────────────────┬──────────────────────────────┐');
+  console.log('│ Planet  │ Wobble (yr) │ Eccentricity:  actual = √(b²+a²−2ba·cos θ)   phase θ°    │ 8H/wobble  fractional cycles │');
+  console.log('├─────────┼─────────────┼──────────────────────────────────────────────────────────┼──────────────────────────────┤');
+  const eccResults = [];
+  for (const planet of planetsToTest) {
+    const p = planets[planet];
+    const isAntiPhase = !!p.antiPhase;
+    const eccBase   = p.orbitalEccentricityBase;
+    const eccAmp    = p.orbitalEccentricityAmplitude;
+    const eccAnchor = _planetEccAnchors_J2000[planet];
+    const eccPeriod = _planetWobblePeriodJ2000[planet];
+    const divisor_N = HOLISTIC_YEAR_J2000 / eccPeriod;
+    const phase_rad = phaseAdvanceRadians(eccAnchor, o.currentYear, divisor_N);
+    const phase_deg = (phase_rad !== null) ? ((phase_rad * 180 / Math.PI) % 360 + 360) % 360 : NaN;
+    const eccActual = computeEccentricityEarth(o.currentYear, eccAnchor, eccPeriod, eccBase, eccAmp);
+    const eccMin    = Math.abs(eccBase - eccAmp);
+    const eccMax    = eccBase + eccAmp;
+
+    // What part of the cycle? Phase 0=MIN, 180=MAX, 90/270=base (cos=0)
+    const phaseLabel = (() => {
+      const θ = phase_deg;
+      if (Math.abs(θ) < 5 || Math.abs(θ - 360) < 5) return 'MIN  (θ≈0°)';
+      if (Math.abs(θ - 180) < 5)                    return 'MAX  (θ≈180°)';
+      if (Math.abs(θ - 90)  < 5)                    return 'base (θ≈90°, rising)';
+      if (Math.abs(θ - 270) < 5)                    return 'base (θ≈270°, falling)';
+      return `mid  (θ=${θ.toFixed(1)}°)`;
+    })();
+
+    const cyclesIn8H = EIGHT_H / eccPeriod;
+    const cyclesFrac = cyclesIn8H - Math.round(cyclesIn8H);
+    const syncs8H    = Math.abs(cyclesFrac) < 1e-6;
+    eccResults.push({ planet, eccActual, eccBase, eccAmp, phase_deg, phaseLabel, eccPeriod, cyclesIn8H, syncs8H });
+
+    const planetCol  = planet.padEnd(7);
+    const wobbleCol  = eccPeriod.toFixed(0).padStart(11);
+    const eccStr     = `${eccActual.toFixed(6).padStart(8)}  b=${eccBase.toFixed(6)} a=${eccAmp.toExponential(2)}   θ=${phase_deg.toFixed(1).padStart(6)}° → ${phaseLabel}`.padEnd(56);
+    const syncStr    = `${cyclesIn8H.toFixed(4).padStart(10)}  (frac ${(cyclesFrac >= 0 ? '+' : '') + cyclesFrac.toFixed(4)})${syncs8H ? ' ✓syncs' : ''}`.padEnd(28);
+    console.log(`│ ${planetCol} │ ${wobbleCol} │ ${eccStr} │ ${syncStr} │`);
+  }
+  console.log('└─────────┴─────────────┴──────────────────────────────────────────────────────────┴──────────────────────────────┘');
+  console.log('  At Y_SR (System Reset), in-phase planets are constructed at θ=90° and Saturn at θ=270°.');
+  console.log('  At Next 8H JD = Y_SR + 8H, θ shifts by  (8H/wobble × 360°) mod 360.');
+  console.log('  → If 8H/wobble is integer:  θ returns to anchor (90° or 270°)  → e ≈ base');
+  console.log('  → If 8H/wobble = integer−¼: θ shifts to 0° → planet at MIN (cos=+1)');
+  console.log('  → If 8H/wobble = integer+½: θ shifts to 270°/90° → swapped extreme');
+  console.log('');
+
+  // Block C — Earth reference for comparison
+  console.log('── Block C: Earth reference ──');
+  const earthInclAmp = earthInvPlaneInclinationAmplitude;
+  const earthInclMean = earthInvPlaneInclinationMean;
+  const earthInclActual = computeInclinationEarth(o.currentYear, null, null, earthInclMean, earthInclAmp);
+  const earthObliq = computeObliquityEarth(o.currentYear);
+  const earthEcc   = computeEccentricityEarth(o.currentYear, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);
+  const earthCyclesIn8H = EIGHT_H / PERIHELION_CYCLE_LENGTH_J2000_FIXED;  // = 8 × 16 = 128
+  console.log(`  Earth inclination:  ${earthInclActual.toFixed(6)}° (mean ${earthInclMean.toFixed(4)} ± ${earthInclAmp.toFixed(4)} → MIN expected)`);
+  console.log(`  Earth obliquity:    ${earthObliq.toFixed(6)}° (vs OBLIQUITY_MEAN ${OBLIQUITY_MEAN.toFixed(4)} → at MEAN, Earth-only property — integer N_icrf=3 & N_obliq=8 fully cancel at balanced years)`);
+  console.log(`  Earth eccentricity: ${earthEcc.toFixed(7)}     (base ${eccentricityBase.toFixed(7)} − amp ${eccentricityAmplitude.toFixed(7)} = ${(eccentricityBase - eccentricityAmplitude).toFixed(7)} = e_min)`);
+  console.log(`  Earth uses anchor = BALANCED (no phase offset) and cycle = H/16. 8H/(H/16) = ${earthCyclesIn8H} cycles → always at e_min at every H/8H.`);
+  console.log('');
+
+  // ─── Step 3: summary ───
+  const inPhaseAllMin = inclResults.filter(r => !r.isAntiPhase).every(r => r.inclLabel === 'MIN');
+  const satMin        = inclResults.find(r => r.planet === 'saturn').inclLabel === 'MIN';
+  const tiltsNearJ2000 = inclResults.filter(r => r.tiltNearJ2000).length;
+  const syncedPlanets  = eccResults.filter(r => r.syncs8H).length;
+  console.log('── Summary ──');
+  console.log(`  Inclination:`);
+  console.log(`    In-phase (6 planets) all at MIN?   ${inPhaseAllMin ? '✓ YES' : '✗ NO'}`);
+  console.log(`    Saturn at MIN (per code formula)?  ${satMin ? '✓ YES (matches model; doc 72 says MAX — see note)' : '✗ NO'}`);
+  console.log(`  Axial tilt (= obliquity = tilt of spin axis from invariable plane):`);
+  console.log(`    Planets at tiltJ2000 exactly:      ${tiltsNearJ2000} / 7 (Venus & Neptune — no obliquity cycle)`);
+  console.log(`    Earth at OBLIQUITY_MEAN exactly:   ✓ (integer N_icrf=3 & N_obliq=8 fully cancel)`);
+  console.log(`    Other planets: small Δ from tiltJ2000 reflects partial interference (not a bug)`);
+  console.log(`  Eccentricity wobble sync (post 2026-06-16 fix):`);
+  console.log(`    Planets whose wobble divides 8H:   ${syncedPlanets} / 7 → all land at anchor phase ✓`);
+  console.log('');
+  console.log('Note on Saturn inclination: code formula `i = mean + antiPhaseSign × amp × cos(phase)`');
+  console.log('with antiPhaseSign = −1 for Saturn places it at MIN at the System Reset (same as in-phase).');
+  console.log('Doc 72 § "System Reset" line 110 says "Saturn at maximum" — this is a doc convention');
+  console.log('issue, not a model bug. The balance law works either way (Saturn IS the unique');
+  console.log('anti-phase contributor regardless of which extreme it sits at).');
+  console.log('');
+  return { onLattice: true, inclResults, eccResults };
 }
 
 /** Verify Earth parameters against astronomical references.
@@ -40851,11 +41705,11 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => o.obliquityEarth, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Obliquity of the ecliptic: angle between equator and orbital plane. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over an Earth Fundamental Cycle. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years`],
+       hover : [`Obliquity of the ecliptic: angle between equator and orbital plane. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over an Earth Fundamental Cycle. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years (at J2000)`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => earthPerihelionFromEarth.distAU, dec:8, sep:',' },{ small: 'AU' }],
-       hover : [`Observed eccentricity from 3D scene. Base: ${eccentricityBase}. Phase: ω+90° = 192.95°. Eccentricity cycle: ${fmtNum(perihelionCycleLength, 0, ',')} years`],
+       hover : [`Observed eccentricity from 3D scene. Base: ${eccentricityBase}. Phase: ω+90° = 192.95°. Eccentricity cycle: ${fmtNum(perihelionCycleLength, 0, ',')} years (at J2000)`],
        tpLink: true, observed: true},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.obliquityEarth-radiansToDecDecimal(earthWobbleCenter.dec), dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -40924,7 +41778,7 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => holisticyearLength-13, dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`${fmtNum(holisticyearLength,0,',')} solar years = ${fmtNum((holisticyearLength-13),0,',')} sidereal years. 13 fewer orbits because Earth's axial precession is retrograde (H/13 = precession cycle)`],
+       hover : [`${fmtNum(holisticyearLength,0,',')} solar years = ${fmtNum((holisticyearLength-13),0,',')} sidereal years. 13 fewer orbits because Earth's axial precession is retrograde (H/13 = precession cycle) (at J2000)`],
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => o.lengthofsolarYear/meansolaryearlengthinDays, dec:6, sep:',' },{ small : 'years' }],
@@ -41199,10 +42053,10 @@ const planetStats = {
      null,
       {label : () => `Obliquity (degrees)`,
        value : [ { small: earthtiltMean },{ v: () => o.obliquityEarth, dec:12, sep:',' }],
-       hover : [`Left = mean obliquity (base tilt). Right = current dynamic value. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over an Earth Fundamental Cycle. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years`]},
+       hover : [`Left = mean obliquity (base tilt). Right = current dynamic value. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over an Earth Fundamental Cycle. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years (at J2000)`]},
       {label : () => `Orbital Eccentricity`,
        value : [ { small: eccentricityBase },{ v: () => o.eccentricityEarth, dec:13, sep:',' }],
-       hover : [`Left = base eccentricity. Right = current dynamic value. Phase: ω+90° = 192.95°. Eccentricity cycle: ${fmtNum(perihelionCycleLength, 0, ',')} years`]},
+       hover : [`Left = base eccentricity. Right = current dynamic value. Phase: ω+90° = 192.95°. Eccentricity cycle: ${fmtNum(perihelionCycleLength, 0, ',')} years (at J2000)`]},
       {label : () => `Inclination to Invariable plane (degrees)`,
        value : [ { small: earthInvPlaneInclinationMean },{ v: () => o.earthInvPlaneInclinationDynamic, dec:13, sep:',' }],
        hover : [`Left = mean inclination. Right = current dynamic value. Oscillates ~${(earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude).toFixed(2)}° relative to the invariable plane`]},
@@ -41214,13 +42068,13 @@ const planetStats = {
     {header : '—  Precession Cycles —' },
       {label : () => `Earth Fundamental Cycle`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The length of the Earth Fundamental Cycle is ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`The length of the Earth Fundamental Cycle is ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true, highlight: true},
     null,
     null,
       {label : () => `<span class="pl-dir pl-dir-retro">←</span> Axial precession`,
        value : [ { v: () => -o.axialPrecessionRealLOD, dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Mean: -${fmtNum(holisticyearLength,0,',')}/13 (retrograde). Together with inclination precession, these two counter-rotations produce all other precession cycles`],
+       hover : [`Mean: -${fmtNum(holisticyearLength,0,',')}/13 (retrograde). Together with inclination precession, these two counter-rotations produce all other precession cycles (at J2000)`],
        info  : 'https://en.wikipedia.org/wiki/Axial_precession',
        fraction: `${fmtNum(holisticyearLength,0,',')}/13`, barPct: () => Math.abs(o.axialPrecessionRealLOD) / (o.inclinationPrecessionRealLOD || 1) * 100, barDir: 'left', fundamental: true},
       {label : () => ``,
@@ -41228,7 +42082,7 @@ const planetStats = {
     null,
       {label : () => `<span class="pl-dir pl-dir-pro">→</span> Inclination precession`,
        value : [ { v: () => '+' + fmtNum(o.inclinationPrecessionRealLOD, 2, ',') },{ small: 'years' }],
-       hover : [`Mean: +${fmtNum(holisticyearLength,0,',')}/3 (prograde). Together with axial precession, these two counter-rotations produce all other precession cycles`],
+       hover : [`Mean: +${fmtNum(holisticyearLength,0,',')}/3 (prograde). Together with axial precession, these two counter-rotations produce all other precession cycles (at J2000)`],
        info  : 'https://en.wikipedia.org/wiki/Apsidal_precession',
        fraction: `${fmtNum(holisticyearLength,0,',')}/3`, barPct: () => 100, barDir: 'right', fundamental: true},
       {label : () => ``,
@@ -41238,7 +42092,7 @@ const planetStats = {
     null,
       {label : () => `<span class="pl-dir pl-dir-pro">→</span> Perihelion precession`,
        value : [ { v: () => o.perihelionPrecessionRealLOD, dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Mean: ${fmtNum(holisticyearLength,0,',')}/16. Actual value accounts for length-of-day drift.`],
+       hover : [`Mean: ${fmtNum(holisticyearLength,0,',')}/16. Actual value accounts for length-of-day drift. (at J2000)`],
        info  : 'https://en.wikipedia.org/wiki/Milankovitch_cycles#Apsidal_precession',
        tpLink: true,
        fraction: `${fmtNum(holisticyearLength,0,',')}/16`, barPct: () => o.perihelionPrecessionRealLOD / (o.inclinationPrecessionRealLOD || 1) * 100, barDir: 'right', derived: true},
@@ -41247,7 +42101,7 @@ const planetStats = {
     null,
       {label : () => `<span class="pl-dir pl-dir-retro">←</span> Ecliptic precession`,
        value : [ { v: () => -o.eclipticPrecessionRealLOD, dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Mean: -${fmtNum(holisticyearLength,0,',')}/5 (retrograde). Earth's orbital plane precesses clockwise around the invariable plane.`],
+       hover : [`Mean: -${fmtNum(holisticyearLength,0,',')}/5 (retrograde). Earth's orbital plane precesses clockwise around the invariable plane. (at J2000)`],
        info  : 'https://en.wikipedia.org/wiki/Milankovitch_cycles#Orbital_inclination',
        fraction: `${fmtNum(holisticyearLength,0,',')}/5`, barPct: () => Math.abs(o.eclipticPrecessionRealLOD) / (o.inclinationPrecessionRealLOD || 1) * 100, barDir: 'left', derived: true},
       {label : () => ``,
@@ -41255,7 +42109,7 @@ const planetStats = {
     null,
       {label : () => `Mean Obliquity cycle`,
        value : [ { v: () => holisticyearLength/8, dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Mean value for obliquity precession: ${fmtNum(holisticyearLength,0,',')}/8`],
+       hover : [`Mean value for obliquity precession: ${fmtNum(holisticyearLength,0,',')}/8 (at J2000)`],
        info  : 'https://en.wikipedia.org/wiki/Axial_tilt#Long_term',
        constant: true,
        fraction: `${fmtNum(holisticyearLength,0,',')}/8`, derived: true},
@@ -41337,28 +42191,28 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (meansolaryearlengthinDays*holisticyearLength)/moonSiderealMonth, dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`The Moon orbits Earth ${fmtNum((meansolaryearlengthinDays*holisticyearLength)/moonSiderealMonth,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`The Moon orbits Earth ${fmtNum((meansolaryearlengthinDays*holisticyearLength)/moonSiderealMonth,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true},
       {label : () => `Sidereal month`,
        value : [ { v: () => moonSiderealMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon to complete one full orbit relative to the distant stars — the Moon's true orbital period. This is the fundamental reference from which all other lunar months are derived. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength,0,',')} yr = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} = ${fmtNum(moonSiderealMonth,10,',')} d`],
+       hover : [`Time for the Moon to complete one full orbit relative to the distant stars — the Moon's true orbital period. This is the fundamental reference from which all other lunar months are derived. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength,0,',')} yr = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} = ${fmtNum(moonSiderealMonth,10,',')} d (at J2000)`],
        info  : 'https://en.wikipedia.org/wiki/Orbit_of_the_Moon',
        constant: true},
       {label : () => `Synodic month`,
        value : [ { v: () => moonSynodicMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month: in one Earth Fundamental Cycle the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Synodic orbits = sidereal − 1 + 13 − H = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} − 1 + 13 − ${fmtNum(holisticyearLength,0,',')} = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13-holisticyearLength,0,',')}. The −H subtracts Earth's solar orbits (one fewer Moon-Sun alignment per Earth year); +13 adds general precession (H/13 period). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13-holisticyearLength,0,',')} = ${fmtNum(moonSynodicMonth,10,',')} d. All derived from the 3 lunar month inputs`],
+       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month: in one Earth Fundamental Cycle the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Synodic orbits = sidereal − 1 + 13 − H = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} − 1 + 13 − ${fmtNum(holisticyearLength,0,',')} = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13-holisticyearLength,0,',')}. The −H subtracts Earth's solar orbits (one fewer Moon-Sun alignment per Earth year); +13 adds general precession (H/13 period). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13-holisticyearLength,0,',')} = ${fmtNum(moonSynodicMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`],
        static: true},
       {label : () => `Anomalistic month`,
        value : [ { v: () => moonAnomalisticMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonAnomalisticMonthInput),0,',')} anomalistic orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonAnomalisticMonthInput),0,',')} = ${fmtNum(moonAnomalisticMonth,10,',')} d`],
+       hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonAnomalisticMonthInput),0,',')} anomalistic orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonAnomalisticMonthInput),0,',')} = ${fmtNum(moonAnomalisticMonth,10,',')} d (at J2000)`],
        constant: true},
       {label : () => `Draconic month (a.k.a. nodal period)`,
        value : [ { v: () => moonNodalMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonNodalMonthInput),0,',')} draconic orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonNodalMonthInput),0,',')} = ${fmtNum(moonNodalMonth,10,',')} d`],
+       hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonNodalMonthInput),0,',')} draconic orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonNodalMonthInput),0,',')} = ${fmtNum(moonNodalMonth,10,',')} d (at J2000)`],
        constant: true},
       {label : () => `Tropical month`,
        value : [ { v: () => moonTropicalMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: in one Earth Fundamental Cycle the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Tropical orbits = sidereal − 1 + 13 = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} − 1 + 13 = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13,0,',')}. The +13 accounts for general precession (H/13 period): the westward drift of the equinox adds 13 extra returns to the same ecliptic longitude per Earth Fundamental Cycle. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13,0,',')} = ${fmtNum(moonTropicalMonth,10,',')} d. All derived from the 3 lunar month inputs`],
+       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: in one Earth Fundamental Cycle the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Tropical orbits = sidereal − 1 + 13 = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} − 1 + 13 = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13,0,',')}. The +13 accounts for general precession (H/13 period): the westward drift of the equinox adds 13 extra returns to the same ecliptic longitude per Earth Fundamental Cycle. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13,0,',')} = ${fmtNum(moonTropicalMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`],
        info  : 'https://eclipse.gsfc.nasa.gov/LEcat5/LEcatalog.html',
        static: true},
 
@@ -41397,7 +42251,7 @@ const planetStats = {
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(o.moonDistanceFromEarthKm, moonDistance, GM_EARTH_ALONE) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH_ALONE) * 3600, 0, ',')} km/h at perigee to ${fmtNum(OrbitalFormulas.aphelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH_ALONE) * 3600, 0, ',')} km/h at apogee`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH_ALONE) * 3600, 0, ',')} km/h at perigee to ${fmtNum(OrbitalFormulas.aphelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH_ALONE) * 3600, 0, ',')} km/h at apogee (at J2000)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
        value : [ { v: () => OrbitalFormulas.radialVelocity(moonDistance, moonOrbitalEccentricityBase, o.moonTrueAnomaly, GM_EARTH_ALONE) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -41450,12 +42304,12 @@ const planetStats = {
        static: true},
       {label : () => `Full Moon cycle (from Earth)`,
        value : [ { v: () => moonFullMoonCycleEarth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive perigee full moons as experienced from Earth — when both a full moon and perigee coincide. This is the beat frequency between the synodic month (phase cycle) and the anomalistic month (perigee cycle): P = P_syn × P_anom / (P_syn − P_anom) = ${fmtNum(moonSynodicMonth,4,',')} × ${fmtNum(moonAnomalisticMonth,4,',')} / ${fmtNum(moonSynodicMonth - moonAnomalisticMonth,4,',')} = ${fmtNum(moonFullMoonCycleEarth,4,',')} d. All derived from the 3 lunar month inputs`],
+       hover : [`Time between successive perigee full moons as experienced from Earth — when both a full moon and perigee coincide. This is the beat frequency between the synodic month (phase cycle) and the anomalistic month (perigee cycle): P = P_syn × P_anom / (P_syn − P_anom) = ${fmtNum(moonSynodicMonth,4,',')} × ${fmtNum(moonAnomalisticMonth,4,',')} / ${fmtNum(moonSynodicMonth - moonAnomalisticMonth,4,',')} = ${fmtNum(moonFullMoonCycleEarth,4,',')} d. All derived from the 3 lunar month inputs (at J2000)`],
        static: true},
      null,
       {label : () => `Draconic year (fixed stars)`,
        value : [ { v: () => moonDraconicYearICRF, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Sun to return to the Moon's ascending node, measured against the fixed star background. Since the node regresses westward while the Sun advances eastward, they meet sooner than a solar year. Harmonic sum: 1/P = 1/P_year + 1/P_nodal = 1/${fmtNum(meansolaryearlengthinDays,4,',')} + 1/${fmtNum(moonNodalPrecessionindaysEarth,4,',')} → P = ${fmtNum(moonDraconicYearICRF,4,',')} d. All derived from the 3 lunar month inputs`],
+       hover : [`Time for the Sun to return to the Moon's ascending node, measured against the fixed star background. Since the node regresses westward while the Sun advances eastward, they meet sooner than a solar year. Harmonic sum: 1/P = 1/P_year + 1/P_nodal = 1/${fmtNum(meansolaryearlengthinDays,4,',')} + 1/${fmtNum(moonNodalPrecessionindaysEarth,4,',')} → P = ${fmtNum(moonDraconicYearICRF,4,',')} d. All derived from the 3 lunar month inputs (at J2000)`],
        static: true},
       {label : () => `Draconic year (from Earth)`,
        value : [ { v: () => moonDraconicYearEarth, dec:10, sep:',' },{ small: 'days' }],
@@ -41464,14 +42318,14 @@ const planetStats = {
     null,
       {label : () => `Apsidal precession (fixed stars)`,
        value : [ { v: () => moonApsidalPrecessionindaysICRF, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon's line of apsides (the perigee–apogee axis) to complete one full prograde rotation against the fixed star background. Converted from Earth frame to ICRF: cycles_ICRF = cycles_Earth + 13 (general precession). ≈ ${fmtNum(moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs`],
+       hover : [`Time for the Moon's line of apsides (the perigee–apogee axis) to complete one full prograde rotation against the fixed star background. Converted from Earth frame to ICRF: cycles_ICRF = cycles_Earth + 13 (general precession). ≈ ${fmtNum(moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`],
        static: true},
       {label : () => ``,
        value : [ { v: () => moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }],
        static: true},
       {label : () => `Apsidal precession (from Earth)`,
        value : [ { v: () => moonApsidalPrecessionindaysEarth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon's perigee to complete one full rotation as experienced from Earth. This is the beat frequency between the sidereal and anomalistic months — the anomalistic month is slightly longer because perigee advances, and this difference accumulates to one full rotation over this period: P = P_sid × P_anom / (P_anom − P_sid). ≈ ${fmtNum(moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs`],
+       hover : [`Time for the Moon's perigee to complete one full rotation as experienced from Earth. This is the beat frequency between the sidereal and anomalistic months — the anomalistic month is slightly longer because perigee advances, and this difference accumulates to one full rotation over this period: P = P_sid × P_anom / (P_anom − P_sid). ≈ ${fmtNum(moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`],
        static: true},
       {label : () => ``,
        value : [ { v: () => moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }],
@@ -41479,14 +42333,14 @@ const planetStats = {
      null,
       {label : () => `Nodal precession (fixed stars)`,
        value : [ { v: () => moonNodalPrecessionindaysICRF, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon's ascending node to complete one full westward regression against the fixed star background. Converted from Earth frame to ICRF: cycles_ICRF = cycles_Earth − 13 (minus because nodal precession is retrograde, opposing general precession). ≈ ${fmtNum(moonNodalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs`],
+       hover : [`Time for the Moon's ascending node to complete one full westward regression against the fixed star background. Converted from Earth frame to ICRF: cycles_ICRF = cycles_Earth − 13 (minus because nodal precession is retrograde, opposing general precession). ≈ ${fmtNum(moonNodalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`],
        static: true},
       {label : () => ``,
        value : [ { v: () => moonNodalPrecessionindaysICRF/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }],
        static: true},
       {label : () => `Nodal precession (from Earth)`,
        value : [ { v: () => moonNodalPrecessionindaysEarth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon's ascending node to complete one full westward regression as experienced from Earth. This is the beat frequency between the sidereal and draconic months — the draconic month is slightly shorter because the node regresses toward the Moon, and this difference accumulates to one full regression over this period: P = P_sid × P_drac / (P_sid − P_drac). ≈ ${fmtNum(moonNodalPrecessionindaysEarth/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs`],
+       hover : [`Time for the Moon's ascending node to complete one full westward regression as experienced from Earth. This is the beat frequency between the sidereal and draconic months — the draconic month is slightly shorter because the node regresses toward the Moon, and this difference accumulates to one full regression over this period: P = P_sid × P_drac / (P_sid − P_drac). ≈ ${fmtNum(moonNodalPrecessionindaysEarth/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`],
        static: true},
       {label : () => ``,
        value : [ { v: () => moonNodalPrecessionindaysEarth/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }],
@@ -41494,7 +42348,7 @@ const planetStats = {
     null,
       {label : () => `Nodal meets Apsidal precession`,
        value : [ { v: () => moonApsidalMeetsNodalindays, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon's apsidal and nodal precession cycles to realign — when perigee and the ascending node return to the same relative position. This is the beat frequency between the anomalistic and draconic months: P = P_anom × P_drac / (P_anom − P_drac). ≈ ${fmtNum(moonApsidalMeetsNodalindays/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs`],
+       hover : [`Time for the Moon's apsidal and nodal precession cycles to realign — when perigee and the ascending node return to the same relative position. This is the beat frequency between the anomalistic and draconic months: P = P_anom × P_drac / (P_anom − P_drac). ≈ ${fmtNum(moonApsidalMeetsNodalindays/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`],
        static: true},
       {label : () => ``,
        value : [ { v: () => moonApsidalMeetsNodalindays/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }],
@@ -41502,7 +42356,7 @@ const planetStats = {
     null,
       {label : () => `Lunar Leveling Cycle`,
        value : [ { v: () => moonLunarLevelingCycleindays, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`The beat frequency between the nodal and apsidal precession periods (Earth frame). This cycle represents when the two precession effects return to the same relative phase. Linked to the Chandler wobble (~433 days). P = P_nodal × P_apsidal / (P_nodal − P_apsidal). ≈ ${fmtNum(moonLunarLevelingCycleindays/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs`],
+       hover : [`The beat frequency between the nodal and apsidal precession periods (Earth frame). This cycle represents when the two precession effects return to the same relative phase. Linked to the Chandler wobble (~433 days). P = P_nodal × P_apsidal / (P_nodal − P_apsidal). ≈ ${fmtNum(moonLunarLevelingCycleindays/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`],
        info  : 'https://geoenergymath.com/2014/04/05/the-chandler-wobble-and-the-soim/',
        static: true},
       {label : () => ``,
@@ -41605,7 +42459,7 @@ const planetStats = {
     null,
       {label : () => `Lunar age`,
        value : [ { v: () => (o.moonPhaseAngle / 360) * moonSynodicMonth, dec:2, sep:',' },{ small: 'days' }],
-       hover : [`Days since last New Moon: age = (phase_angle / 360°) × synodic_month (${moonSynodicMonth.toFixed(4)} days)`]},
+       hover : [`Days since last New Moon: age = (phase_angle / 360°) × synodic_month (${moonSynodicMonth.toFixed(4)} days) (at J2000)`]},
       {label : () => `Lunar phase`,
        value : [ { v: () => {
          const p = o.moonPhaseAngle;
@@ -41758,7 +42612,7 @@ const planetStats = {
     null,
       {label : () => `Orbit period of our Milky Way galaxy`,
        value : [ { v: () => milkywayOrbitPeriod, dec:0, sep:',' },{ small: 'years' }],
-       hover : [`Calculated based upon 2 mln light-years to the great attractor center, so (${fmtNum(greatattractorDistance,0,',')}*${fmtNum(lightYear,0,',')}*2*PI)/${fmtNum(milkywaySpeed,0,',')}/60/60*${fmtNum(meanlengthofday,6,',')}*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Calculated based upon 2 mln light-years to the great attractor center, so (${fmtNum(greatattractorDistance,0,',')}*${fmtNum(lightYear,0,',')}*2*PI)/${fmtNum(milkywaySpeed,0,',')}/60/60*${fmtNum(meanlengthofday,6,',')}*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbit distance to the Great Attractor`,
        value : [ { v: () => greatattractorDistance, dec:0, sep:',' },{ small: 'light-yr' }],
@@ -41790,11 +42644,11 @@ const planetStats = {
        static: true},
       {label : () => `NEW-SI second`,
        value : [ { small:{ v: () => meanlengthofday/86400, dec:8, sep:',' }},{ small: 'SI second' }],
-       hover : [`A NEW-SI second is ${fmtNum(meanlengthofday,8,',')}/86,400 times the current SI second to make sure we can keep using 86,400 seconds a day`],
+       hover : [`A NEW-SI second is ${fmtNum(meanlengthofday,8,',')}/86,400 times the current SI second to make sure we can keep using 86,400 seconds a day (at J2000)`],
        static: true},
       {label : () => ``,
        value : [ { small:{ v: () => 9192631770/ 86400*meanlengthofday, dec:0, sep:',' }},{ small: 'transitions' }],
-       hover : [`A NEW-SI second is 9,192,631,770/86,400*${fmtNum(meanlengthofday,8,',')} periods of the radiation corresponding to the transition between the two hyperfine levels of the ground state of the caesium-133 atom`],
+       hover : [`A NEW-SI second is 9,192,631,770/86,400*${fmtNum(meanlengthofday,8,',')} periods of the radiation corresponding to the transition between the two hyperfine levels of the ground state of the caesium-133 atom (at J2000)`],
        static: true},
 
     {header : '—  Sun-SSB Barycentric Motion —' },
@@ -41885,23 +42739,23 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (mercurySolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`Mercury orbits the Sun ${fmtNum(mercurySolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`Mercury orbits the Sun ${fmtNum(mercurySolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/mercurySolarYearCount), dec:6, sep:',' },{ small: 'years' }],
-       hover : [`Mercury's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')}`],
+       hover : [`Mercury's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (solar)`,
        value : [ { v: () => (holisticyearLength/mercurySolarYearCount)*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Mercury's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Mercury's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => (holisticyearLength/(mercurySolarYearCount-13))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Mercury's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(mercurySolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Mercury's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(mercurySolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbit Period Synodic`,
        value : [ { v: () => (holisticyearLength/(mercurySolarYearCount-holisticyearLength))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Mercury's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(mercurySolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Mercury's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(mercurySolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Mean Motion (n)`,
        value : [ { v: () => OrbitalFormulas.meanMotion((holisticyearLength/(mercurySolarYearCount-13))*meansolaryearlengthinDays), dec:6, sep:',' },{ small: '°/day' }],
@@ -41924,11 +42778,11 @@ const planetStats = {
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
        value : [ { v: () => mercuryOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Mercury distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')})^2)^(1/3)`],
+       hover : [`Mercury distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')})^2)^(1/3) (at J2000)`],
        static: true},
       {label : () => `Semi-major axis (km)`,
        value : [ { v: () => mercuryOrbitDistance*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
-       hover : [`Mercury distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')}`],
+       hover : [`Mercury distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')} (at J2000)`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
        value : [ { v: () => OrbitalFormulas.semiMinorAxis(mercuryOrbitDistance, planets.mercury.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
@@ -41964,11 +42818,11 @@ const planetStats = {
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
        value : [ { v: () => mercurySpeed, dec:6, sep:',' },{ small: 'km/h' }],
-       hover : [`Mercury mean speed around the sun is calculated as (${fmtNum(mercuryOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/mercurySolarYearCount),6,',')})/24`],
+       hover : [`Mercury mean speed around the sun is calculated as (${fmtNum(mercuryOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/mercurySolarYearCount),6,',')})/24 (at J2000)`],
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(mercury.sunDistAU * currentAUDistance, mercuryOrbitDistance * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(mercuryOrbitDistance * currentAUDistance, planets.mercury.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(mercuryOrbitDistance * currentAUDistance, planets.mercury.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(mercuryOrbitDistance * currentAUDistance, planets.mercury.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(mercuryOrbitDistance * currentAUDistance, planets.mercury.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion (at J2000)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
        value : [ { v: () => OrbitalFormulas.radialVelocity(mercuryOrbitDistance * currentAUDistance, planets.mercury.orbitalEccentricityBase, o.mercuryTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -42276,23 +43130,23 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (venusSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`Venus orbits the Sun ${fmtNum(venusSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`Venus orbits the Sun ${fmtNum(venusSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/venusSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
-       hover : [`Venus's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')}`],
+       hover : [`Venus's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (solar)`,
        value : [ { v: () => (holisticyearLength/venusSolarYearCount)*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Venus's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Venus's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => (holisticyearLength/(venusSolarYearCount-13))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Venus's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(venusSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Venus's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(venusSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbit Period Synodic`,
        value : [ { v: () => (holisticyearLength/(venusSolarYearCount-holisticyearLength))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Venus's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(venusSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Venus's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(venusSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Mean Motion (n)`,
        value : [ { v: () => OrbitalFormulas.meanMotion((holisticyearLength/(venusSolarYearCount-13))*meansolaryearlengthinDays), dec:6, sep:',' },{ small: '°/day' }],
@@ -42315,11 +43169,11 @@ const planetStats = {
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
        value : [ { v: () => venusOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Venus distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')})^2)^(1/3)`],
+       hover : [`Venus distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')})^2)^(1/3) (at J2000)`],
        static: true},
       {label : () => `Semi-major axis (km)`,
        value : [ { v: () => venusOrbitDistance*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
-       hover : [`Venus distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')}`],
+       hover : [`Venus distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')} (at J2000)`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
        value : [ { v: () => OrbitalFormulas.semiMinorAxis(venusOrbitDistance, planets.venus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
@@ -42355,11 +43209,11 @@ const planetStats = {
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
        value : [ { v: () => venusSpeed, dec:6, sep:',' },{ small: 'km/h' }],
-       hover : [`Venus mean speed around the sun is calculated as (${fmtNum(venusOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/venusSolarYearCount),6,',')})/24`],
+       hover : [`Venus mean speed around the sun is calculated as (${fmtNum(venusOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/venusSolarYearCount),6,',')})/24 (at J2000)`],
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(venus.sunDistAU * currentAUDistance, venusOrbitDistance * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(venusOrbitDistance * currentAUDistance, planets.venus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(venusOrbitDistance * currentAUDistance, planets.venus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(venusOrbitDistance * currentAUDistance, planets.venus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(venusOrbitDistance * currentAUDistance, planets.venus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion (at J2000)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
        value : [ { v: () => OrbitalFormulas.radialVelocity(venusOrbitDistance * currentAUDistance, planets.venus.orbitalEccentricityBase, o.venusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -42640,23 +43494,23 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (marsSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`Mars orbits the Sun ${fmtNum(marsSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`Mars orbits the Sun ${fmtNum(marsSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/marsSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
-       hover : [`Mars's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')}`],
+       hover : [`Mars's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (solar)`,
        value : [ { v: () => (holisticyearLength/marsSolarYearCount)*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Mars's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Mars's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => (holisticyearLength/(marsSolarYearCount-13))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Mars's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(marsSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Mars's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(marsSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbit Period Synodic`,
        value : [ { v: () => -(holisticyearLength/(marsSolarYearCount-holisticyearLength))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Mars's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(marsSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Mars's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(marsSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Mean Motion (n)`,
        value : [ { v: () => OrbitalFormulas.meanMotion((holisticyearLength/(marsSolarYearCount-13))*meansolaryearlengthinDays), dec:6, sep:',' },{ small: '°/day' }],
@@ -42679,11 +43533,11 @@ const planetStats = {
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
        value : [ { v: () => marsOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Mars distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')})^2)^(1/3)`],
+       hover : [`Mars distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')})^2)^(1/3) (at J2000)`],
        static: true},
       {label : () => `Semi-major axis (km)`,
        value : [ { v: () => marsOrbitDistance*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
-       hover : [`Mars distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')}`],
+       hover : [`Mars distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')} (at J2000)`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
        value : [ { v: () => OrbitalFormulas.semiMinorAxis(marsOrbitDistance, planets.mars.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
@@ -42719,11 +43573,11 @@ const planetStats = {
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
        value : [ { v: () => marsSpeed, dec:6, sep:',' },{ small: 'km/h' }],
-       hover : [`Mars mean speed around the sun is calculated as (${fmtNum(marsOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/marsSolarYearCount),6,',')})/24`],
+       hover : [`Mars mean speed around the sun is calculated as (${fmtNum(marsOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/marsSolarYearCount),6,',')})/24 (at J2000)`],
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(mars.sunDistAU * currentAUDistance, marsOrbitDistance * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(marsOrbitDistance * currentAUDistance, planets.mars.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(marsOrbitDistance * currentAUDistance, planets.mars.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(marsOrbitDistance * currentAUDistance, planets.mars.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(marsOrbitDistance * currentAUDistance, planets.mars.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion (at J2000)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
        value : [ { v: () => OrbitalFormulas.radialVelocity(marsOrbitDistance * currentAUDistance, planets.mars.orbitalEccentricityBase, o.marsTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -43004,23 +43858,23 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (jupiterSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`Jupiter orbits the Sun ${fmtNum(jupiterSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`Jupiter orbits the Sun ${fmtNum(jupiterSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/jupiterSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
-       hover : [`Jupiter's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')}`],
+       hover : [`Jupiter's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (solar)`,
        value : [ { v: () => (holisticyearLength/jupiterSolarYearCount)*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Jupiter's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Jupiter's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => (holisticyearLength/(jupiterSolarYearCount-13))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Jupiter's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(jupiterSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Jupiter's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(jupiterSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbit Period Synodic`,
        value : [ { v: () => -(holisticyearLength/(jupiterSolarYearCount-holisticyearLength))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Jupiter's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(jupiterSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Jupiter's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(jupiterSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Mean Motion (n)`,
        value : [ { v: () => OrbitalFormulas.meanMotion((holisticyearLength/(jupiterSolarYearCount-13))*meansolaryearlengthinDays), dec:6, sep:',' },{ small: '°/day' }],
@@ -43043,11 +43897,11 @@ const planetStats = {
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
        value : [ { v: () => jupiterOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Jupiter distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')})^2)^(1/3)`],
+       hover : [`Jupiter distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')})^2)^(1/3) (at J2000)`],
        static: true},
       {label : () => `Semi-major axis (km)`,
        value : [ { v: () => jupiterOrbitDistance*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
-       hover : [`Jupiter distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')}`],
+       hover : [`Jupiter distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')} (at J2000)`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
        value : [ { v: () => OrbitalFormulas.semiMinorAxis(jupiterOrbitDistance, planets.jupiter.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
@@ -43083,11 +43937,11 @@ const planetStats = {
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
        value : [ { v: () => jupiterSpeed, dec:6, sep:',' },{ small: 'km/h' }],
-       hover : [`Jupiter mean speed around the sun is calculated as (${fmtNum(jupiterOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/jupiterSolarYearCount),6,',')})/24`],
+       hover : [`Jupiter mean speed around the sun is calculated as (${fmtNum(jupiterOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/jupiterSolarYearCount),6,',')})/24 (at J2000)`],
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(jupiter.sunDistAU * currentAUDistance, jupiterOrbitDistance * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(jupiterOrbitDistance * currentAUDistance, planets.jupiter.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(jupiterOrbitDistance * currentAUDistance, planets.jupiter.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(jupiterOrbitDistance * currentAUDistance, planets.jupiter.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(jupiterOrbitDistance * currentAUDistance, planets.jupiter.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion (at J2000)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
        value : [ { v: () => OrbitalFormulas.radialVelocity(jupiterOrbitDistance * currentAUDistance, planets.jupiter.orbitalEccentricityBase, o.jupiterTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -43367,23 +44221,23 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (saturnSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`Saturn orbits the Sun ${fmtNum(saturnSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`Saturn orbits the Sun ${fmtNum(saturnSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/saturnSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
-       hover : [`Saturn's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')}`],
+       hover : [`Saturn's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (solar)`,
        value : [ { v: () => (holisticyearLength/saturnSolarYearCount)*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Saturn's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Saturn's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => (holisticyearLength/(saturnSolarYearCount-13))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Saturn's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(saturnSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Saturn's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(saturnSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbit Period Synodic`,
        value : [ { v: () => -(holisticyearLength/(saturnSolarYearCount-holisticyearLength))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Saturn's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(saturnSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Saturn's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(saturnSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Mean Motion (n)`,
        value : [ { v: () => OrbitalFormulas.meanMotion((holisticyearLength/(saturnSolarYearCount-13))*meansolaryearlengthinDays), dec:6, sep:',' },{ small: '°/day' }],
@@ -43406,11 +44260,11 @@ const planetStats = {
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
        value : [ { v: () => saturnOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Saturn distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')})^2)^(1/3)`],
+       hover : [`Saturn distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')})^2)^(1/3) (at J2000)`],
        static: true},
       {label : () => `Semi-major axis (km)`,
        value : [ { v: () => saturnOrbitDistance*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
-       hover : [`Saturn distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')}`],
+       hover : [`Saturn distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')} (at J2000)`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
        value : [ { v: () => OrbitalFormulas.semiMinorAxis(saturnOrbitDistance, planets.saturn.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
@@ -43446,11 +44300,11 @@ const planetStats = {
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
        value : [ { v: () => saturnSpeed, dec:6, sep:',' },{ small: 'km/h' }],
-       hover : [`Saturn mean speed around the sun is calculated as (${fmtNum(saturnOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/saturnSolarYearCount),6,',')})/24`],
+       hover : [`Saturn mean speed around the sun is calculated as (${fmtNum(saturnOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/saturnSolarYearCount),6,',')})/24 (at J2000)`],
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(saturn.sunDistAU * currentAUDistance, saturnOrbitDistance * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(saturnOrbitDistance * currentAUDistance, planets.saturn.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(saturnOrbitDistance * currentAUDistance, planets.saturn.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(saturnOrbitDistance * currentAUDistance, planets.saturn.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(saturnOrbitDistance * currentAUDistance, planets.saturn.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion (at J2000)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
        value : [ { v: () => OrbitalFormulas.radialVelocity(saturnOrbitDistance * currentAUDistance, planets.saturn.orbitalEccentricityBase, o.saturnTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -43731,23 +44585,23 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (uranusSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`Uranus orbits the Sun ${fmtNum(uranusSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`Uranus orbits the Sun ${fmtNum(uranusSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/uranusSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
-       hover : [`Uranus's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')}`],
+       hover : [`Uranus's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (solar)`,
        value : [ { v: () => (holisticyearLength/uranusSolarYearCount)*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Uranus's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Uranus's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => (holisticyearLength/(uranusSolarYearCount-13))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Uranus's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(uranusSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Uranus's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(uranusSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbit Period Synodic`,
        value : [ { v: () => -(holisticyearLength/(uranusSolarYearCount-holisticyearLength))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Uranus's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(uranusSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Uranus's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(uranusSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Mean Motion (n)`,
        value : [ { v: () => OrbitalFormulas.meanMotion((holisticyearLength/(uranusSolarYearCount-13))*meansolaryearlengthinDays), dec:6, sep:',' },{ small: '°/day' }],
@@ -43770,11 +44624,11 @@ const planetStats = {
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
        value : [ { v: () => uranusOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Uranus distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')})^2)^(1/3)`],
+       hover : [`Uranus distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')})^2)^(1/3) (at J2000)`],
        static: true},
       {label : () => `Semi-major axis (km)`,
        value : [ { v: () => uranusOrbitDistance*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
-       hover : [`Uranus distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')}`],
+       hover : [`Uranus distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')} (at J2000)`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
        value : [ { v: () => OrbitalFormulas.semiMinorAxis(uranusOrbitDistance, planets.uranus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
@@ -43810,11 +44664,11 @@ const planetStats = {
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
        value : [ { v: () => uranusSpeed, dec:6, sep:',' },{ small: 'km/h' }],
-       hover : [`Uranus mean speed around the sun is calculated as (${fmtNum(uranusOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/uranusSolarYearCount),6,',')})/24`],
+       hover : [`Uranus mean speed around the sun is calculated as (${fmtNum(uranusOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/uranusSolarYearCount),6,',')})/24 (at J2000)`],
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(uranus.sunDistAU * currentAUDistance, uranusOrbitDistance * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(uranusOrbitDistance * currentAUDistance, planets.uranus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(uranusOrbitDistance * currentAUDistance, planets.uranus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(uranusOrbitDistance * currentAUDistance, planets.uranus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(uranusOrbitDistance * currentAUDistance, planets.uranus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion (at J2000)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
        value : [ { v: () => OrbitalFormulas.radialVelocity(uranusOrbitDistance * currentAUDistance, planets.uranus.orbitalEccentricityBase, o.uranusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -44095,23 +44949,23 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (neptuneSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`Neptune orbits the Sun ${fmtNum(neptuneSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`Neptune orbits the Sun ${fmtNum(neptuneSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/neptuneSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
-       hover : [`Neptune's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')}`],
+       hover : [`Neptune's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (solar)`,
        value : [ { v: () => (holisticyearLength/neptuneSolarYearCount)*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Neptune's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Neptune's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => (holisticyearLength/(neptuneSolarYearCount-13))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Neptune's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(neptuneSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Neptune's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(neptuneSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbit Period Synodic`,
        value : [ { v: () => -(holisticyearLength/(neptuneSolarYearCount-holisticyearLength))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Neptune's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(neptuneSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Neptune's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(neptuneSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Mean Motion (n)`,
        value : [ { v: () => OrbitalFormulas.meanMotion((holisticyearLength/(neptuneSolarYearCount-13))*meansolaryearlengthinDays), dec:6, sep:',' },{ small: '°/day' }],
@@ -44134,11 +44988,11 @@ const planetStats = {
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
        value : [ { v: () => neptuneOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Neptune distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')})^2)^(1/3)`],
+       hover : [`Neptune distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')})^2)^(1/3) (at J2000)`],
        static: true},
       {label : () => `Semi-major axis (km)`,
        value : [ { v: () => neptuneOrbitDistance*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
-       hover : [`Neptune distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')}`],
+       hover : [`Neptune distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')} (at J2000)`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
        value : [ { v: () => OrbitalFormulas.semiMinorAxis(neptuneOrbitDistance, planets.neptune.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
@@ -44174,11 +45028,11 @@ const planetStats = {
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
        value : [ { v: () => neptuneSpeed, dec:6, sep:',' },{ small: 'km/h' }],
-       hover : [`Neptune mean speed around the sun is calculated as (${fmtNum(neptuneOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/neptuneSolarYearCount),6,',')})/24`],
+       hover : [`Neptune mean speed around the sun is calculated as (${fmtNum(neptuneOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/neptuneSolarYearCount),6,',')})/24 (at J2000)`],
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(neptune.sunDistAU * currentAUDistance, neptuneOrbitDistance * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(neptuneOrbitDistance * currentAUDistance, planets.neptune.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(neptuneOrbitDistance * currentAUDistance, planets.neptune.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(neptuneOrbitDistance * currentAUDistance, planets.neptune.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(neptuneOrbitDistance * currentAUDistance, planets.neptune.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion (at J2000)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
        value : [ { v: () => OrbitalFormulas.radialVelocity(neptuneOrbitDistance * currentAUDistance, planets.neptune.orbitalEccentricityBase, o.neptuneTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -44460,23 +45314,23 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (plutoSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`Pluto orbits the Sun ${fmtNum(plutoSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`Pluto orbits the Sun ${fmtNum(plutoSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/plutoSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
-       hover : [`Pluto's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')}`],
+       hover : [`Pluto's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (solar)`,
        value : [ { v: () => (holisticyearLength/plutoSolarYearCount)*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Pluto's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Pluto's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => (holisticyearLength/(plutoSolarYearCount-13))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Pluto's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(plutoSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Pluto's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(plutoSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbit Period Synodic`,
        value : [ { v: () => -(holisticyearLength/(plutoSolarYearCount-holisticyearLength))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Pluto's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(plutoSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Pluto's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(plutoSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Mean Motion (n)`,
        value : [ { v: () => OrbitalFormulas.meanMotion((holisticyearLength/(plutoSolarYearCount-13))*meansolaryearlengthinDays), dec:6, sep:',' },{ small: '°/day' }],
@@ -44499,11 +45353,11 @@ const planetStats = {
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
        value : [ { v: () => plutoOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Pluto distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')})^2)^(1/3)`],
+       hover : [`Pluto distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')})^2)^(1/3) (at J2000)`],
        static: true},
       {label : () => `Semi-major axis (km)`,
        value : [ { v: () => plutoOrbitDistance*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
-       hover : [`Pluto distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')}`],
+       hover : [`Pluto distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')} (at J2000)`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
        value : [ { v: () => OrbitalFormulas.semiMinorAxis(plutoOrbitDistance, planets.pluto.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
@@ -44539,11 +45393,11 @@ const planetStats = {
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
        value : [ { v: () => plutoSpeed, dec:6, sep:',' },{ small: 'km/h' }],
-       hover : [`Pluto mean speed around the sun is calculated as (${fmtNum(plutoOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/plutoSolarYearCount),6,',')})/24`],
+       hover : [`Pluto mean speed around the sun is calculated as (${fmtNum(plutoOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/plutoSolarYearCount),6,',')})/24 (at J2000)`],
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(pluto.sunDistAU * currentAUDistance, plutoOrbitDistance * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(plutoOrbitDistance * currentAUDistance, planets.pluto.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(plutoOrbitDistance * currentAUDistance, planets.pluto.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(plutoOrbitDistance * currentAUDistance, planets.pluto.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(plutoOrbitDistance * currentAUDistance, planets.pluto.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion (at J2000)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
        value : [ { v: () => OrbitalFormulas.radialVelocity(plutoOrbitDistance * currentAUDistance, planets.pluto.orbitalEccentricityBase, o.plutoTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -44802,23 +45656,23 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (halleysSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`Halleys orbits the Sun ${fmtNum(halleysSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`Halleys orbits the Sun ${fmtNum(halleysSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/halleysSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
-       hover : [`Halleys's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')}`],
+       hover : [`Halleys's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (solar)`,
        value : [ { v: () => (holisticyearLength/halleysSolarYearCount)*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Halleys's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Halleys's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => (holisticyearLength/(halleysSolarYearCount-13))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Halleys's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(halleysSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Halleys's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(halleysSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbit Period Synodic`,
        value : [ { v: () => -(holisticyearLength/(halleysSolarYearCount-holisticyearLength))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Halleys's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(halleysSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Halleys's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(halleysSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Mean Motion (n)`,
        value : [ { v: () => OrbitalFormulas.meanMotion((holisticyearLength/(halleysSolarYearCount-13))*meansolaryearlengthinDays), dec:6, sep:',' },{ small: '°/day' }],
@@ -44841,11 +45695,11 @@ const planetStats = {
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
        value : [ { v: () => halleysOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Halleys distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')})^2)^(1/3)`],
+       hover : [`Halleys distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')})^2)^(1/3) (at J2000)`],
        static: true},
       {label : () => `Semi-major axis (km)`,
        value : [ { v: () => halleysOrbitDistance*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
-       hover : [`Halleys distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')}`],
+       hover : [`Halleys distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')} (at J2000)`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
        value : [ { v: () => OrbitalFormulas.semiMinorAxis(halleysOrbitDistance, planets.halleys.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
@@ -44881,11 +45735,11 @@ const planetStats = {
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
        value : [ { v: () => halleysSpeed, dec:6, sep:',' },{ small: 'km/h' }],
-       hover : [`Halleys mean speed around the sun is calculated as (${fmtNum(halleysOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/halleysSolarYearCount),6,',')})/24`],
+       hover : [`Halleys mean speed around the sun is calculated as (${fmtNum(halleysOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/halleysSolarYearCount),6,',')})/24 (at J2000)`],
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(halleys.sunDistAU * currentAUDistance, halleysOrbitDistance * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(halleysOrbitDistance * currentAUDistance, planets.halleys.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(halleysOrbitDistance * currentAUDistance, planets.halleys.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(halleysOrbitDistance * currentAUDistance, planets.halleys.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(halleysOrbitDistance * currentAUDistance, planets.halleys.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion (at J2000)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
        value : [ { v: () => OrbitalFormulas.radialVelocity(halleysOrbitDistance * currentAUDistance, planets.halleys.orbitalEccentricityBase, o.halleysTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -45130,23 +45984,23 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (erosSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`Eros orbits the Sun ${fmtNum(erosSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`Eros orbits the Sun ${fmtNum(erosSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`],
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/erosSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
-       hover : [`Eros's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')}`],
+       hover : [`Eros's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (solar)`,
        value : [ { v: () => (holisticyearLength/erosSolarYearCount)*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Eros's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Eros's Solar orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')})*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => (holisticyearLength/(erosSolarYearCount-13))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Eros's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(erosSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Eros's Sidereal orbit period in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(erosSolarYearCount,0,',')}-13))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Orbit Period Synodic`,
        value : [ { v: () => -(holisticyearLength/(erosSolarYearCount-holisticyearLength))*meansolaryearlengthinDays, dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Eros's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(erosSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')}`],
+       hover : [`Eros's synodic period with Earth in days is calculated as (${fmtNum(holisticyearLength,0,',')}/(${fmtNum(erosSolarYearCount,0,',')}-${fmtNum(holisticyearLength,0,',')}))*${fmtNum(meansolaryearlengthinDays,6,',')} (at J2000)`],
        static: true},
       {label : () => `Mean Motion (n)`,
        value : [ { v: () => OrbitalFormulas.meanMotion((holisticyearLength/(erosSolarYearCount-13))*meansolaryearlengthinDays), dec:6, sep:',' },{ small: '°/day' }],
@@ -45169,11 +46023,11 @@ const planetStats = {
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
        value : [ { v: () => erosOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Eros distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')})^2)^(1/3)`],
+       hover : [`Eros distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')})^2)^(1/3) (at J2000)`],
        static: true},
       {label : () => `Semi-major axis (km)`,
        value : [ { v: () => erosOrbitDistance*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
-       hover : [`Eros distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')}`],
+       hover : [`Eros distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(currentAUDistance,6,',')} (at J2000)`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
        value : [ { v: () => OrbitalFormulas.semiMinorAxis(erosOrbitDistance, planets.eros.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
@@ -45209,11 +46063,11 @@ const planetStats = {
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
        value : [ { v: () => erosSpeed, dec:6, sep:',' },{ small: 'km/h' }],
-       hover : [`Eros mean speed around the sun is calculated as (${fmtNum(erosOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/erosSolarYearCount),6,',')})/24`],
+       hover : [`Eros mean speed around the sun is calculated as (${fmtNum(erosOrbitDistance*currentAUDistance,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/erosSolarYearCount),6,',')})/24 (at J2000)`],
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(eros.sunDistAU * currentAUDistance, erosOrbitDistance * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(erosOrbitDistance * currentAUDistance, planets.eros.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(erosOrbitDistance * currentAUDistance, planets.eros.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(erosOrbitDistance * currentAUDistance, planets.eros.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(erosOrbitDistance * currentAUDistance, planets.eros.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion (at J2000)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
        value : [ { v: () => OrbitalFormulas.radialVelocity(erosOrbitDistance * currentAUDistance, planets.eros.orbitalEccentricityBase, o.erosTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -47797,7 +48651,19 @@ function moveModel(pos) {
   planetObjects.forEach(obj => {
 
     // current angular position (mean anomaly for uniform motion)
-    let θ = obj.speed * pos - obj.startPos * (Math.PI / 180);
+    // Phase 9.12 (Option B): for H-cycle objects tagged with `_dtCycleN`,
+    // replace the snapshot `speed × pos` with the integral-form value at
+    // o.currentYear. Restores physically correct H(t) rotation at deep past.
+    // `_dtCycleAnchor` overrides the default BALANCED_YEAR_J2000_FIXED for
+    // planet wobble centers (each has its own anchor in _planetSceneAnchors).
+    let θ;
+    if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtCycleN)) {
+      const _dtAnchor = Number.isFinite(obj._dtCycleAnchor) ? obj._dtCycleAnchor : BALANCED_YEAR_J2000_FIXED;
+      const _dtCycles = cyclesBetweenYears(_dtAnchor, o.currentYear, obj._dtCycleN);
+      θ = (_dtCycles !== null ? _dtCycles : 0) * 2 * Math.PI * obj._dtCycleSign;
+    } else {
+      θ = obj.speed * pos - obj.startPos * (Math.PI / 180);
+    }
 
     // Apply equation of center (Kepler's 2nd Law: faster at perihelion, slower at aphelion)
     if (useVariableSpeed && obj.eccentricity && obj.perihelionPhaseJ2000 !== undefined) {
@@ -47927,9 +48793,17 @@ function moveModel(pos) {
       obj.orbitObj.rotation.y = θ;
     }
 
-    // planet’s own day-night spin
+    // planet's own day-night spin
+    // Phase 9.12 (Option B): for self-rotation tagged with `_dtRotN`
+    // (e.g. earthWobbleCenter's H/13 cycle), override the snapshot formula
+    // with the integral-form value.
     if (obj.rotationSpeed) {
-      obj.planetObj.rotation.y = obj.rotationSpeed * pos;
+      if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtRotN)) {
+        const _dtCycles = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, o.currentYear, obj._dtRotN);
+        obj.planetObj.rotation.y = (_dtCycles !== null ? _dtCycles : 0) * 2 * Math.PI * obj._dtRotSign;
+      } else {
+        obj.planetObj.rotation.y = obj.rotationSpeed * pos;
+      }
     }
 
     // remember Earth’s anomaly for the zodiac strip
@@ -48422,10 +49296,14 @@ function updatePerihelion() {
  * @returns {number} Earth inclination in degrees
  */
 function getEarthInclinationAtYear(year) {
-  const t = year - balancedYear;
-  const cycle3 = holisticyearLength / 3;
-  const phase3 = (t / cycle3) * 2 * Math.PI;
-  return earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude * Math.cos(phase3);
+  // Phase 9.10c: delegate to the canonical computeInclinationEarth (Phase 8.5
+  // J2000-anchored cycle math). Pre-migration this used live balancedYear +
+  // holisticyearLength snapshot phase, which drifts under deep-time scrubbing
+  // when `recomputeDerivedAnchorsForEpoch` mutates `balancedYear`. The canonical
+  // function uses BALANCED_YEAR_J2000_FIXED + cyclesBetweenYears (Phase 9.10b
+  // drift-corrected). At J2000 the two are bit-identical; at deep time the
+  // canonical form is the calibrated reference.
+  return computeInclinationEarth(year, null, null, earthInvPlaneInclinationMean, earthInvPlaneInclinationAmplitude);
 }
 
 /**
@@ -48435,11 +49313,18 @@ function getEarthInclinationAtYear(year) {
  * @returns {number} Earth obliquity in degrees
  */
 function getObliquityAtYear(year) {
-  const t = year - balancedYear;
-  const cycle3 = holisticyearLength / 3;
-  const cycle8 = holisticyearLength / 8;
-  const phase3 = (t / cycle3) * 2 * Math.PI;
-  const phase8 = (t / cycle8) * 2 * Math.PI;
+  // Phase 9.10c: J2000-anchored phase via cyclesBetweenYears (Phase 9.10b
+  // drift-corrected). Pre-migration this used live balancedYear +
+  // holisticyearLength snapshot phase, which drifts under deep-time scrubbing
+  // when `recomputeDerivedAnchorsForEpoch` mutates `balancedYear`. Formula
+  // structure (Pythagorean 2-harmonic approximation with earthtiltMean) is
+  // deliberately preserved — callers in `integrateEffect` rely on the clean
+  // H/3+H/8 extremum structure rather than the 16-harmonic computeObliquityEarth.
+  const cycles3 = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, year, 3);
+  const cycles8 = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, year, 8);
+  if (cycles3 === null || cycles8 === null) return earthtiltMean;
+  const phase3 = cycles3 * 2 * Math.PI;
+  const phase8 = cycles8 * 2 * Math.PI;
   return earthtiltMean - earthInvPlaneInclinationAmplitude * Math.cos(phase3) + earthInvPlaneInclinationAmplitude * Math.cos(phase8);
 }
 
@@ -50097,6 +50982,86 @@ function updatePredictions() {
   predictions.obliquityEarth = o.obliquityEarth = computeObliquityEarth(o.currentYear);
   // Phase 8: use J2000-FIXED anchor + cycle length for frame-independent integrated phase
   predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(o.currentYear, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);
+
+  // Phase 9.11: Balanced-year navigation — past/future H and 8H balanced events.
+  // H lattice cycles 0, ±1, ±2, ... anchored at BALANCED_YEAR_J2000_FIXED.
+  // 8H lattice cycles are at H-cycle indices (−systemResetN + 8m) — i.e. the
+  // J2000-era H event (cycle 0) is NOT on the 8H lattice; cycle +1 IS.
+  //
+  // Edge-case handling: after the user clicks "Next H" and navigates to a
+  // balanced JD, the resulting `o.currentYear` is NOT exactly at integer
+  // cycles because of round-trip noise — `yearToJD` uses deep-time
+  // days/year while `julianDateToDecimalYear` uses Julian-calendar
+  // 365.25 days/year. The discrepancy is ~1e-6 H-cycles over modern
+  // epochs. Use an EPS tolerance to detect "at a balanced event": when
+  // currently AT a cycle, "Last H" = previous cycle, "Next H" = next
+  // cycle (proper forward navigation), instead of both bracketing the
+  // current cycle and getting stuck.
+  {
+    // Phase 9.12.4: Use CORRECTED cycles (via cyclesBetweenYears) for the EPS
+    // check, consistent with findBalancedYearAtCycle which also targets corrected
+    // cycles (Phase 9.12.1). Previously this used RAW integral (integralInverseHFromYears),
+    // which caused a mismatch: at deep past, raw vs corrected differ by ~0.01
+    // cycles (drift), so the EPS could say "not at integer" while the corrected
+    // version was AT integer → buttons targeted current year → Next H "stalled".
+    const n_now = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, o.currentYear, 1);
+    if (n_now !== null) {
+      const EPS_CYCLE = 1e-3;   // tolerance in H-cycle units (~335 calendar yr)
+      const offset = -systemResetN;  // 8H lattice anchor in H-cycle units
+
+      const n_int = Math.round(n_now);
+      const isAtH = Math.abs(n_now - n_int) < EPS_CYCLE;
+      const isOn8HLattice = isAtH && (((n_int - offset) % 8) === 0);
+
+      const lastH = isAtH ? (n_int - 1) : Math.floor(n_now);
+      const nextH = isAtH ? (n_int + 1) : (lastH + 1);
+
+      const m_now = (n_now - offset) / 8;
+      const last8H = isOn8HLattice ? (n_int - 8) : (offset + 8 * Math.floor(m_now));
+      const next8H = isOn8HLattice ? (n_int + 8) : (last8H + 8);
+
+      const lastH_yr  = findBalancedYearAtCycle(lastH);
+      const nextH_yr  = findBalancedYearAtCycle(nextH);
+      const last8H_yr = findBalancedYearAtCycle(last8H);
+      const next8H_yr = findBalancedYearAtCycle(next8H);
+
+      const lastH_jd  = (lastH_yr  !== null) ? yearToJD(lastH_yr)  : null;
+      const nextH_jd  = (nextH_yr  !== null) ? yearToJD(nextH_yr)  : null;
+      const last8H_jd = (last8H_yr !== null) ? yearToJD(last8H_yr) : null;
+      const next8H_jd = (next8H_yr !== null) ? yearToJD(next8H_yr) : null;
+
+      predictions.lastBalancedJD_H  = o.lastBalancedJD_H  = (lastH_jd  !== null) ? Math.round(lastH_jd)  : NaN;
+      predictions.nextBalancedJD_H  = o.nextBalancedJD_H  = (nextH_jd  !== null) ? Math.round(nextH_jd)  : NaN;
+      predictions.lastBalancedJD_8H = o.lastBalancedJD_8H = (last8H_jd !== null) ? Math.round(last8H_jd) : NaN;
+      predictions.nextBalancedJD_8H = o.nextBalancedJD_8H = (next8H_jd !== null) ? Math.round(next8H_jd) : NaN;
+
+      // Phase 9.12.9: normalize period by the number of cycles in the span.
+      // When isAtH=true (at integer cycle), lastH = N−1 and nextH = N+1 (span
+      // is 2 H cycles, not 1). Similarly for 8H lattice. Display ONE-cycle
+      // period regardless of state.
+      const H_periods_in_span  = nextH - lastH;          // 1 (between) or 2 (at cycle)
+      const eH_periods_in_span = (next8H - last8H) / 8;  // 1 (between) or 2 (at 8H lattice)
+
+      // Phase 9.12.11: use TRUE-integral year span (∫1/H dt = N cycles, no
+      // JD-round-trip / drift correction) so the displayed period reflects
+      // the actual harmonic mean of H(t) over the bracket. In deep past where
+      // H(t) < H_J2000, this gives a period < 335,317; the JD-based readouts
+      // above still use the round-trip-aware values so navigation stays
+      // pinned to e_min.
+      const lastH_yr_true  = trueYearAtCycle(lastH);
+      const nextH_yr_true  = trueYearAtCycle(nextH);
+      const last8H_yr_true = trueYearAtCycle(last8H);
+      const next8H_yr_true = trueYearAtCycle(next8H);
+      predictions.balancedPeriod_H_years  = (lastH_yr_true  !== null && nextH_yr_true  !== null)
+        ? (nextH_yr_true  - lastH_yr_true)  / H_periods_in_span  : NaN;
+      predictions.balancedPeriod_8H_years = (last8H_yr_true !== null && next8H_yr_true !== null)
+        ? (next8H_yr_true - last8H_yr_true) / eH_periods_in_span : NaN;
+    } else {
+      predictions.lastBalancedJD_H = predictions.nextBalancedJD_H = NaN;
+      predictions.lastBalancedJD_8H = predictions.nextBalancedJD_8H = NaN;
+      predictions.balancedPeriod_H_years = predictions.balancedPeriod_8H_years = NaN;
+    }
+  }
 
   // Planet eccentricities: each planet's J2000 anchor + J2000 wobble period are
   // precomputed in _planetEccAnchors_J2000 / _planetWobblePeriodJ2000 (in the

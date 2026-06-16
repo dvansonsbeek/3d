@@ -80,6 +80,8 @@ The period for each planet's spin axis to precess around its orbit normal. For E
 
 The beat frequency of the inclination and axial cycles: 1/P_obliquity = |1/P_inclination − 1/P_axial|. Since inclination and axial tilt share the same amplitude (from PSI), the obliquity oscillation is their interference pattern. Confirmed for Mercury (0.2% vs observed), Earth (2%), and Mars (0.7%).
 
+**Obliquity at balanced years — Earth-only complete cancellation.** When both N_icrf (inclination cycles per H) and N_obliq (obliquity cycles per H) are *integer*, the inclination and axial contributions cancel exactly at every H balanced year, leaving obliquity = `OBLIQUITY_MEAN`. **Only Earth** satisfies this with `N_icrf = 3` and `N_obliq = 8` (both integer Fibonacci divisors). Mercury (N_icrf = 11.625, N_obliq = 0.375), Mars (N_icrf = 8.5, N_obliq = 2.625), and the other planets have non-integer N values → partial interference → their obliquity at a balanced year deviates from `tiltJ2000` by a small but non-zero amount (Mars largest at ≈ +1°). This is correct model behavior, not a bug — it reflects the structural fact that Earth's H/3 + H/8 obliquity decomposition is uniquely clean among the planets. Venus and Neptune have tidally-damped axial precession (no obliquity cycle at all) — their obliquity is frozen at `tiltJ2000` exactly.
+
 ### 4. Eccentricity cycle (perihelion wobble)
 
 The eccentricity oscillates around its base value with the K-derived amplitude at the **ecliptic perihelion precession period**. For Earth this is H/16 (20,957 yr). The ecliptic perihelion rate is the sum of the ICRF perihelion rate and the general precession: 1/(H/16) = 1/(H/3) + 1/(H/13), or equivalently 3 + 13 = 16 in the Fibonacci framework.
@@ -107,11 +109,13 @@ The base eccentricities (mean eccentricities around which each planet oscillates
 The System Reset epoch is the year where all 7 non-Earth planets simultaneously reach their inclination extremes. For the default configuration, it falls at anchor n=7 within the Solar System Resonance Cycle (≈ −2,649,854). Other viable configurations may have a different optimal anchor (n ∈ {0..7}); the deep analysis in `balance-search.js` determines the best n for each. **Each candidate's eccentricity balance is computed using its OWN bases** — recomputed with the candidate's d-values, anti-phase assignments, and optimal anchor — not the default config's bases. This makes the ranking a fair physical comparison.
 
 - In-phase planets (Mercury, Venus, Mars, Jupiter, Uranus, Neptune): all at **minimum** inclination
-- Anti-phase planet (Saturn): at **maximum** inclination
+- Anti-phase planet (Saturn): also at **minimum** inclination in the model's sign convention. The "anti-phase" designation refers to Saturn's *opposite contribution to the angular-momentum-weighted balance sum*, not the opposite inclination extreme. Concretely: the model formula `i(t) = mean + antiPhaseSign × amp × cos(ω̃ − cycleAnchor)` uses `antiPhaseSign = −1` for Saturn so that its oscillation enters the balance sum with reversed sign; at the System Reset all 7 planets land at MIN inclination simultaneously, and Saturn's reversed sign is what makes the weighted sum cancel to ≈ 99.998%.
 
 The System Reset also defines the **eccentricity phase alignment**:
-- In-phase planets: at **mean** eccentricity, **rising** (phase 90°)
-- Anti-phase (Saturn): at **mean** eccentricity, **falling** (phase 270°)
+- In-phase planets: at **base** eccentricity, **rising** (phase 90°)
+- Anti-phase (Saturn): at **base** eccentricity, **falling** (phase 270°)
+
+(Verified empirically post 2026-06-16 via `run8HConfigurationVerification` in the model — see also `docs/hidden/old-documents/eccentricity-wobble-formula-analysis.md` for the formula reconciliation that made all 7 planets land at exactly these phases at every 8H.)
 
 This is the physically motivated symmetry: at n=7, every cycle type (inclination, eccentricity) reaches its reference state simultaneously. The direction of eccentricity change (rising vs falling) encodes the balance group — the same grouping that produces the 99.9975% inclination balance.
 
