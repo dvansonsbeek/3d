@@ -1,7 +1,7 @@
 # Fibonacci Laws of Planetary Motion — Interactive 3D Solar System Simulation
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-8-green.svg)](https://github.com/dvansonsbeek/3d)
+[![Version](https://img.shields.io/badge/version-9-green.svg)](https://github.com/dvansonsbeek/3d)
 [![Three.js](https://img.shields.io/badge/Three.js-0.183-orange.svg)](https://threejs.org/)
 
 ![Solar System Simulation](https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/readme.png)
@@ -27,7 +27,7 @@ The model starts from a single observation: two of Earth's precession motions ro
 
 These two counter-rotating motions interact in a **Fibonacci ratio of 3:13**. From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and the orbital-forcing component of climate (the timing of glacial-interglacial cycles).
 
-Everything comes together in the **Earth Fundamental Cycle (H)**: a 335,317-year master cycle from which Earth's major precession periods emerge as Fibonacci divisions (H/3, H/5, H/8, H/13) — and this simulation visualizes it all in one interactive view.
+Everything comes together in the **Earth Fundamental Cycle (H)**: a 335,317-year master cycle at J2000 (H slowly evolves on geological timescales via Earth-Moon tidal evolution — see the deep-time section below) from which Earth's major precession periods emerge as Fibonacci divisions (H/3, H/5, H/8, H/13) — and this simulation visualizes it all in one interactive view.
 
 ---
 
@@ -181,7 +181,7 @@ The pipeline runs across 6 phases: Sun geometry → planet alignment → perihel
 
 ## Quick Facts
 
-- **Master cycle**: 335,317 years (the Earth Fundamental Cycle, H)
+- **Master cycle**: 335,317 years at J2000 (the Earth Fundamental Cycle, H; slowly evolves under deep-time tidal evolution)
 - **Axial precession**: ~25,794 years (H/13)
 - **Inclination precession**: ~111,772 years (H/3)
 - **Perihelion precession**: ~20,957 years (H/16)

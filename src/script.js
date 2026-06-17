@@ -5,7 +5,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRe
 import { Pane } from 'tweakpane';
 
 /*
-  Fibonacci Laws of Planetary Motion — Holistic Universe Model v8
+  Fibonacci Laws of Planetary Motion — Holistic Universe Model v9
 
   This software is licensed under the GNU General Public License (GPL-3.0).
   For more information, visit <https://www.gnu.org/licenses/>.
@@ -13,10 +13,13 @@ import { Pane } from 'tweakpane';
   Interactive 3D simulation of the solar system modelled from a geo-heliocentric
   frame of reference. Six Fibonacci Laws and only 6 free parameters describe the
   precession, eccentricity, inclination, obliquity and perihelion movements of
-  all planets. The Earth Fundamental Cycle (H) unifies axial precession
-  (H/13), inclination precession (H/3) and perihelion precession (H/16) through
-  Fibonacci number ratios. 70 model parameters (Earth 11, Moon 3, 7 planets x 8)
-  and 75 calibration inputs from astronomical observations (astro-reference.json).
+  all planets. The Earth Fundamental Cycle (H = 335,317 yr at J2000) unifies
+  axial precession (H/13), inclination precession (H/3) and perihelion precession
+  (H/16) through Fibonacci number ratios; under deep-time mode H slowly evolves
+  via Earth-Moon tidal evolution, and the scene renders the integrated state
+  via cumulative ∫1/H(t)dt cycle math. 70 model parameters (Earth 11, Moon 3,
+  7 planets x 8) and 75 calibration inputs from astronomical observations
+  (astro-reference.json).
 
   Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v4
   Website:  https://holisticuniverse.com
@@ -6543,8 +6546,24 @@ const earthPerihelionPrecession2 = {
 // Gating: the override only fires when DEEP_TIME_MODE_ENABLED is true.
 // When OFF, the scene reverts to pre-Phase-9.12 snapshot rendering.
 
-// Earth scene-graph objects (anchored at BALANCED_YEAR_J2000_FIXED implicitly)
+// Earth scene-graph objects (anchored at BALANCED_YEAR_J2000_FIXED implicitly,
+// except `earth` itself — see below).
+//
+// `earth` has startPos = 0 (calibrated for snapshot mode where pos=0 at
+// startmodel gives the J2000 reference scene with the Sun between Gemini and
+// Taurus). The other tagged precession objects have startPos = ±cyclesBetween(
+// startmodel, BALANCED, N) × 360, which makes their snapshot θ at pos=0
+// numerically equal to the BALANCED-anchored override's value at startmodel.
+// Earth doesn't have that compensation, so a BALANCED-anchored override would
+// rotate earth by cyclesBetween(BALANCED, startmodel, 13) × 2π × −1 ≈ +292°
+// (= −68°) at startmodel, shifting the Sun by 68° into Leo. Setting
+// `_dtCycleAnchor = startmodelyearwithCorrection` makes the override anchor
+// earth's cycle at startmodel instead, giving θ = 0 there → matches snapshot.
+// Earth's overall rotation doesn't affect the eccentricity scalar (rotation-
+// invariant), so `e_min` at navigated balanced JDs is preserved under
+// DEEP_TIME=true.
 earth.                       _dtCycleN = 13; earth.                       _dtCycleSign = -1;
+earth.                       _dtCycleAnchor = startmodelyearwithCorrection;
 midEccentricityOrbit.        _dtCycleN = 13; midEccentricityOrbit.        _dtCycleSign = +1;
 earthInclinationPrecession.  _dtCycleN =  3; earthInclinationPrecession.  _dtCycleSign = +1;
 earthEclipticPrecession.     _dtCycleN =  5; earthEclipticPrecession.     _dtCycleSign = +1;
@@ -30070,7 +30089,7 @@ function setupGUI() {
   if (titleEl) {
     const versionEl = document.createElement('div');
     versionEl.style.cssText = 'font-size: 9px; font-weight: 400; letter-spacing: 0.05em; opacity: 0.60; margin-top: 2px;';
-    versionEl.textContent = 'Holistic Universe Model v8';
+    versionEl.textContent = 'Holistic Universe Model v9';
     titleEl.appendChild(versionEl);
   }
 
@@ -31901,7 +31920,7 @@ if (!o.Performance) stats.dom.style.display = 'none';
 /* Watermark / branding — bottom-right */
 const sceneWatermark = document.createElement('div');
 sceneWatermark.id = 'sceneWatermark';
-sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">v8</span>';
+sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">v9</span>';
 document.body.appendChild(sceneWatermark);
 
 /* Simulation date HUD — bottom-left */
@@ -50977,11 +50996,25 @@ function updatePredictions() {
       predictions[key] = o[key];
     }
   }
-  
+
+  // Scene-aligned year for the cycle-phase formulas below. Under DEEP_TIME=true
+  // the scene uses integral-form rendering (Phase 9.12 Option B render-loop
+  // override) and `o.currentYear` (Julian-Meeus) is the right input. Under
+  // DEEP_TIME=false the scene uses snapshot rendering driven by `pos = sDay ×
+  // o.Day` with `sDay = 1/meansolaryearlengthinDays`, so the formula must use
+  // the SAME meansol-based JD↔year convention to match scene state — otherwise
+  // the 21 ppm Julian-Meeus vs meansol mismatch produces a tiny drift in
+  // formula obliquity/eccentricity at deep past navigated balanced JDs (e.g.,
+  // ~0.0001° obliquity drift at year −6 Myr). Scoped to this block; does not
+  // affect `o.currentYear` or `julianDateToDecimalYear` globally.
+  const yearForFormula = DEEP_TIME_MODE_ENABLED
+    ? o.currentYear
+    : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
+
   // Compute obliquity and eccentricity first - needed for year calculations
-  predictions.obliquityEarth = o.obliquityEarth = computeObliquityEarth(o.currentYear);
+  predictions.obliquityEarth = o.obliquityEarth = computeObliquityEarth(yearForFormula);
   // Phase 8: use J2000-FIXED anchor + cycle length for frame-independent integrated phase
-  predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(o.currentYear, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);
+  predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(yearForFormula, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);
 
   // Phase 9.11: Balanced-year navigation — past/future H and 8H balanced events.
   // H lattice cycles 0, ±1, ±2, ... anchored at BALANCED_YEAR_J2000_FIXED.
@@ -51020,21 +51053,6 @@ function updatePredictions() {
       const last8H = isOn8HLattice ? (n_int - 8) : (offset + 8 * Math.floor(m_now));
       const next8H = isOn8HLattice ? (n_int + 8) : (last8H + 8);
 
-      const lastH_yr  = findBalancedYearAtCycle(lastH);
-      const nextH_yr  = findBalancedYearAtCycle(nextH);
-      const last8H_yr = findBalancedYearAtCycle(last8H);
-      const next8H_yr = findBalancedYearAtCycle(next8H);
-
-      const lastH_jd  = (lastH_yr  !== null) ? yearToJD(lastH_yr)  : null;
-      const nextH_jd  = (nextH_yr  !== null) ? yearToJD(nextH_yr)  : null;
-      const last8H_jd = (last8H_yr !== null) ? yearToJD(last8H_yr) : null;
-      const next8H_jd = (next8H_yr !== null) ? yearToJD(next8H_yr) : null;
-
-      predictions.lastBalancedJD_H  = o.lastBalancedJD_H  = (lastH_jd  !== null) ? Math.round(lastH_jd)  : NaN;
-      predictions.nextBalancedJD_H  = o.nextBalancedJD_H  = (nextH_jd  !== null) ? Math.round(nextH_jd)  : NaN;
-      predictions.lastBalancedJD_8H = o.lastBalancedJD_8H = (last8H_jd !== null) ? Math.round(last8H_jd) : NaN;
-      predictions.nextBalancedJD_8H = o.nextBalancedJD_8H = (next8H_jd !== null) ? Math.round(next8H_jd) : NaN;
-
       // Phase 9.12.9: normalize period by the number of cycles in the span.
       // When isAtH=true (at integer cycle), lastH = N−1 and nextH = N+1 (span
       // is 2 H cycles, not 1). Similarly for 8H lattice. Display ONE-cycle
@@ -51042,20 +51060,79 @@ function updatePredictions() {
       const H_periods_in_span  = nextH - lastH;          // 1 (between) or 2 (at cycle)
       const eH_periods_in_span = (next8H - last8H) / 8;  // 1 (between) or 2 (at 8H lattice)
 
-      // Phase 9.12.11: use TRUE-integral year span (∫1/H dt = N cycles, no
-      // JD-round-trip / drift correction) so the displayed period reflects
-      // the actual harmonic mean of H(t) over the bracket. In deep past where
-      // H(t) < H_J2000, this gives a period < 335,317; the JD-based readouts
-      // above still use the round-trip-aware values so navigation stays
-      // pinned to e_min.
-      const lastH_yr_true  = trueYearAtCycle(lastH);
-      const nextH_yr_true  = trueYearAtCycle(nextH);
-      const last8H_yr_true = trueYearAtCycle(last8H);
-      const next8H_yr_true = trueYearAtCycle(next8H);
-      predictions.balancedPeriod_H_years  = (lastH_yr_true  !== null && nextH_yr_true  !== null)
-        ? (nextH_yr_true  - lastH_yr_true)  / H_periods_in_span  : NaN;
-      predictions.balancedPeriod_8H_years = (last8H_yr_true !== null && next8H_yr_true !== null)
-        ? (next8H_yr_true - last8H_yr_true) / eH_periods_in_span : NaN;
+      // Deep-time toggle gating: the helper functions `findBalancedYearAtCycle`,
+      // `yearToJD`, and `trueYearAtCycle` are pure integral-form / deep-time tools
+      // (always use the cumulative integral table). When DEEP_TIME is OFF the user
+      // expects static H = HOLISTIC_YEAR_J2000 values across all four readouts, so
+      // we branch here and use snapshot arithmetic. Snapshot JD conversion uses
+      // the Julian-Meeus 365.25 d/yr identity (round-trip clean with
+      // julianDateToDecimalYear).
+      let lastH_yr, nextH_yr, last8H_yr, next8H_yr;
+      let lastH_jd, nextH_jd, last8H_jd, next8H_jd;
+      let period_H_yr, period_8H_yr;
+
+      if (DEEP_TIME_MODE_ENABLED) {
+        lastH_yr  = findBalancedYearAtCycle(lastH);
+        nextH_yr  = findBalancedYearAtCycle(nextH);
+        last8H_yr = findBalancedYearAtCycle(last8H);
+        next8H_yr = findBalancedYearAtCycle(next8H);
+
+        lastH_jd  = (lastH_yr  !== null) ? yearToJD(lastH_yr)  : null;
+        nextH_jd  = (nextH_yr  !== null) ? yearToJD(nextH_yr)  : null;
+        last8H_jd = (last8H_yr !== null) ? yearToJD(last8H_yr) : null;
+        next8H_jd = (next8H_yr !== null) ? yearToJD(next8H_yr) : null;
+
+        // Phase 9.12.11: TRUE-integral year span (∫1/H dt = N cycles, no
+        // JD-round-trip / drift correction) — displays the actual harmonic
+        // mean of H(t) over the bracket; < 335,317 in deep past.
+        const lastH_yr_true  = trueYearAtCycle(lastH);
+        const nextH_yr_true  = trueYearAtCycle(nextH);
+        const last8H_yr_true = trueYearAtCycle(last8H);
+        const next8H_yr_true = trueYearAtCycle(next8H);
+        period_H_yr  = (lastH_yr_true  !== null && nextH_yr_true  !== null)
+          ? (nextH_yr_true  - lastH_yr_true)  / H_periods_in_span  : NaN;
+        period_8H_yr = (last8H_yr_true !== null && next8H_yr_true !== null)
+          ? (next8H_yr_true - last8H_yr_true) / eH_periods_in_span : NaN;
+      } else {
+        // Snapshot form: integer-cycle distance × H_J2000 from the J2000-fixed anchor.
+        lastH_yr  = BALANCED_YEAR_J2000_FIXED + lastH  * HOLISTIC_YEAR_J2000;
+        nextH_yr  = BALANCED_YEAR_J2000_FIXED + nextH  * HOLISTIC_YEAR_J2000;
+        last8H_yr = BALANCED_YEAR_J2000_FIXED + last8H * HOLISTIC_YEAR_J2000;
+        next8H_yr = BALANCED_YEAR_J2000_FIXED + next8H * HOLISTIC_YEAR_J2000;
+
+        // JD conversion uses `meansolaryearlengthinDays` — this matches the
+        // scene's pos↔JD ratio (`pos = sDay × o.Day` with `sDay = 1/meansol`
+        // under DEEP_TIME=false). Navigating to one of these JDs lands the
+        // scene at pos = (Y − startmodelyearwithCorrection), which is an
+        // integer number of H cycles from BALANCED → the 5 Earth precession
+        // objects all rotate by integer cycles → scene eccentricity = e_min
+        // at every navigated balanced JD. This is the **snapshot-mode analog
+        // of Phase 9.12.8** (the DEEP_TIME=true round-trip-aware fix): same
+        // scene-correctness goal, different conversion math because the
+        // snapshot path's pos↔JD ratio is fixed at `meansol`.
+        //
+        // Using Julian-Meeus 365.25 here would clean up the year-display
+        // round-trip via `julianDateToDecimalYear` but introduce a ~21 ppm
+        // mismatch with the scene's `meansol`-based pos. That accumulates to
+        // ~0.123° of perihelion direction per H cycle (≈ 2° at cycle −17 /
+        // year −6 Myr), producing the visible eccentricity drift the user
+        // reported at deep past balanced JDs.
+        lastH_jd  = startmodelJD + (lastH_yr  - startmodelyearwithCorrection) * meansolaryearlengthinDays;
+        nextH_jd  = startmodelJD + (nextH_yr  - startmodelyearwithCorrection) * meansolaryearlengthinDays;
+        last8H_jd = startmodelJD + (last8H_yr - startmodelyearwithCorrection) * meansolaryearlengthinDays;
+        next8H_jd = startmodelJD + (next8H_yr - startmodelyearwithCorrection) * meansolaryearlengthinDays;
+
+        // Period is exactly H_J2000 (snapshot form gives constant cycle length).
+        period_H_yr  = HOLISTIC_YEAR_J2000;
+        period_8H_yr = 8 * HOLISTIC_YEAR_J2000;
+      }
+
+      predictions.lastBalancedJD_H  = o.lastBalancedJD_H  = (lastH_jd  !== null) ? Math.round(lastH_jd)  : NaN;
+      predictions.nextBalancedJD_H  = o.nextBalancedJD_H  = (nextH_jd  !== null) ? Math.round(nextH_jd)  : NaN;
+      predictions.lastBalancedJD_8H = o.lastBalancedJD_8H = (last8H_jd !== null) ? Math.round(last8H_jd) : NaN;
+      predictions.nextBalancedJD_8H = o.nextBalancedJD_8H = (next8H_jd !== null) ? Math.round(next8H_jd) : NaN;
+      predictions.balancedPeriod_H_years  = period_H_yr;
+      predictions.balancedPeriod_8H_years = period_8H_yr;
     } else {
       predictions.lastBalancedJD_H = predictions.nextBalancedJD_H = NaN;
       predictions.lastBalancedJD_8H = predictions.nextBalancedJD_8H = NaN;
@@ -51067,13 +51144,13 @@ function updatePredictions() {
   // precomputed in _planetEccAnchors_J2000 / _planetWobblePeriodJ2000 (in the
   // deep-time block). At Devonian etc., the integrated phase gives the actual
   // physical eccentricity instead of the snapshot J2000-frame value.
-  predictions.eccentricityMercury = o.eccentricityMercury = computeEccentricityEarth(o.currentYear, _planetEccAnchors_J2000.mercury, _planetWobblePeriodJ2000.mercury, planets.mercury.orbitalEccentricityBase, planets.mercury.orbitalEccentricityAmplitude);
-  predictions.eccentricityVenus   = o.eccentricityVenus   = computeEccentricityEarth(o.currentYear, _planetEccAnchors_J2000.venus,   _planetWobblePeriodJ2000.venus,   planets.venus.orbitalEccentricityBase,   planets.venus.orbitalEccentricityAmplitude);
-  predictions.eccentricityMars    = o.eccentricityMars    = computeEccentricityEarth(o.currentYear, _planetEccAnchors_J2000.mars,    _planetWobblePeriodJ2000.mars,    planets.mars.orbitalEccentricityBase,    planets.mars.orbitalEccentricityAmplitude);
-  predictions.eccentricityJupiter = o.eccentricityJupiter = computeEccentricityEarth(o.currentYear, _planetEccAnchors_J2000.jupiter, _planetWobblePeriodJ2000.jupiter, planets.jupiter.orbitalEccentricityBase, planets.jupiter.orbitalEccentricityAmplitude);
-  predictions.eccentricitySaturn  = o.eccentricitySaturn  = computeEccentricityEarth(o.currentYear, _planetEccAnchors_J2000.saturn,  _planetWobblePeriodJ2000.saturn,  planets.saturn.orbitalEccentricityBase,  planets.saturn.orbitalEccentricityAmplitude);
-  predictions.eccentricityUranus  = o.eccentricityUranus  = computeEccentricityEarth(o.currentYear, _planetEccAnchors_J2000.uranus,  _planetWobblePeriodJ2000.uranus,  planets.uranus.orbitalEccentricityBase,  planets.uranus.orbitalEccentricityAmplitude);
-  predictions.eccentricityNeptune = o.eccentricityNeptune = computeEccentricityEarth(o.currentYear, _planetEccAnchors_J2000.neptune, _planetWobblePeriodJ2000.neptune, planets.neptune.orbitalEccentricityBase, planets.neptune.orbitalEccentricityAmplitude);
+  predictions.eccentricityMercury = o.eccentricityMercury = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.mercury, _planetWobblePeriodJ2000.mercury, planets.mercury.orbitalEccentricityBase, planets.mercury.orbitalEccentricityAmplitude);
+  predictions.eccentricityVenus   = o.eccentricityVenus   = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.venus,   _planetWobblePeriodJ2000.venus,   planets.venus.orbitalEccentricityBase,   planets.venus.orbitalEccentricityAmplitude);
+  predictions.eccentricityMars    = o.eccentricityMars    = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.mars,    _planetWobblePeriodJ2000.mars,    planets.mars.orbitalEccentricityBase,    planets.mars.orbitalEccentricityAmplitude);
+  predictions.eccentricityJupiter = o.eccentricityJupiter = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.jupiter, _planetWobblePeriodJ2000.jupiter, planets.jupiter.orbitalEccentricityBase, planets.jupiter.orbitalEccentricityAmplitude);
+  predictions.eccentricitySaturn  = o.eccentricitySaturn  = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.saturn,  _planetWobblePeriodJ2000.saturn,  planets.saturn.orbitalEccentricityBase,  planets.saturn.orbitalEccentricityAmplitude);
+  predictions.eccentricityUranus  = o.eccentricityUranus  = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.uranus,  _planetWobblePeriodJ2000.uranus,  planets.uranus.orbitalEccentricityBase,  planets.uranus.orbitalEccentricityAmplitude);
+  predictions.eccentricityNeptune = o.eccentricityNeptune = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.neptune, _planetWobblePeriodJ2000.neptune, planets.neptune.orbitalEccentricityBase, planets.neptune.orbitalEccentricityAmplitude);
 
   // Dynamic Fibonacci balance (uses eccentricities computed above)
   computeDynamicFibonacciBalance();
