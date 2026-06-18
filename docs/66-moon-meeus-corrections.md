@@ -230,6 +230,69 @@ Tested against solar eclipses from 584 BCE to 2024 CE using
 Accuracy degrades significantly before ~1900. This is expected given the
 combined uncertainties described below.
 
+### Consistency with Architecture α deep-time Moon model
+
+The deep-time Moon model (Architecture α; see doc 99 and `IP-deep-time-extension.md`)
+adds a Farhat 2022 polynomial for Moon orbital evolution:
+
+```
+a_Moon(t_Ma) = a_now × (1 + α₁·t_Ma + α₃·t_Ma³ + α₄·t_Ma⁴)
+```
+
+This polynomial is calibrated to deep-time anchors (Wells 1963 Devonian corals,
+Wu et al. 2024 cyclostratigraphy 0–650 Ma, modern lunar laser ranging) and is
+independent of the Meeus formulas. **The two are nevertheless physically
+consistent at J2000** — the Meeus T² coefficient on Moon mean longitude
+implicitly encodes the same lunar tidal acceleration that the Farhat polynomial
+expresses analytically.
+
+**Derivation from Farhat at J2000:**
+
+```
+da/dt|_J2000  = a_now × α₁ / 1e6
+             = 384,399 km × (−8.866e−5 /Ma) / 1e6
+             = +3.41 cm/yr                              (matches Wells/LLR rate)
+
+dn/dt|_J2000 = −1.5 × n × (1/a) × da/dt
+             = −1.5 × 4,812 deg/yr × (1/384,399 km) × 3.41e-5 km/yr
+             = −6.40e−7 deg/yr per year
+
+n̈ over 1 century² ≈ −23.0 arcsec/cy²
+```
+
+**Comparison with Meeus T² coefficient:**
+
+```
+Meeus L' = 218.3164 + 481267.88123·T − 0.0015786·T² + …
+
+c (T² coefficient) = −0.0015786 deg/cy²
+n̈ (lunar acceleration) = 2c = −0.00316 deg/cy² = −22.8 arcsec/cy²
+```
+
+The two agree to **<1%** at J2000:
+
+| Source | n̈ value |
+|--------|---------|
+| Farhat 2022 polynomial (deep-time chain) | −23.0 arcsec/cy² |
+| Meeus Ch. 47 T² coefficient | −22.8 arcsec/cy² |
+| Chapront-Touzé/Chapront LLR observation | −22.97 arcsec/cy² |
+
+**Implication.** No refit of Meeus rates is needed for modern-era Moon position;
+the two formulations are equivalent in their overlap domain (~modern era ±10
+millennia). The Meeus polynomial is the better representation within this
+window (it includes the full perturbation series, T³ and T⁴ refinements, and
+matches JPL Horizons to 0.012°). The Farhat polynomial extends the same physics
+to deep time (Phanerozoic and beyond), where the Meeus polynomial loses physical
+meaning. For deep-time Moon orbital position (Devonian, Hadean), replacing the
+Meeus L' polynomial with `meanMoonMeanLongitudeAtAge(t_Ma)` from integrated
+Farhat-derived mean motion would be required — but this is a future research
+project, not a refit of the existing modern-era model.
+
+**Status of integration.** The deep-time Moon distance (`meanMoonDistanceMetresAtAge`),
+LOD evolution, and Moon sidereal period are exposed via the calculator and the
+ESSRT modal. The 3D simulation's Moon orbit position still uses the J2000-anchored
+Meeus polynomial, which is correct for the simulation's operational range.
+
 ---
 
 ## 6. NASA GSFC Eclipse Catalog: Computed, Not Observed

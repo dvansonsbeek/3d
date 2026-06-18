@@ -1582,6 +1582,50 @@ a:link {
 .pl-info{ margin-right:.25em; text-decoration:none; opacity:.8; cursor:help; }
 .pl-info:hover{ opacity:1; }
 
+/* Historical Solar Eclipses prev/next/jump buttons in the Moon section */
+.pl-ecl-prev, .pl-ecl-next, .pl-ecl-jump{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.18);
+  color:#cfe6ff;
+  border-radius:3px;
+  padding:0 6px;
+  font-size:.9em;
+  font-family:inherit;
+  cursor:pointer;
+  line-height:1.4;
+  vertical-align:middle;
+}
+.pl-ecl-prev:hover, .pl-ecl-next:hover, .pl-ecl-jump:hover{
+  background:rgba(110,229,255,.18);
+  border-color:rgba(110,229,255,.5);
+  color:#fff;
+}
+.pl-ecl-prev:active, .pl-ecl-next:active, .pl-ecl-jump:active{
+  transform:scale(.94);
+}
+.pl-ecl-name{
+  display:inline-block;
+  min-width:8em;
+  padding:0 .35em;
+  font-weight:600;
+  color:#fff;
+}
+.pl-ecl-idx{
+  font-size:.85em;
+  opacity:.65;
+  margin-left:.4em;
+}
+.pl-ecl-jump{
+  font-weight:500;
+  background:rgba(255,206,75,.10);
+  border-color:rgba(255,206,75,.4);
+  color:#ffce4b;
+}
+.pl-ecl-jump:hover{
+  background:rgba(255,206,75,.25);
+  color:#fff;
+}
+
 /* ─── emphasis helpers inside value cells ─── */
 .pl-val strong, .pl-alt strong{ font-weight:600; color:#fff; }
 .pl-val em,     .pl-alt em    { font-style:italic; opacity:.9; }

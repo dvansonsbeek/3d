@@ -291,8 +291,8 @@ The verification data above is consumed in two distinct ways:
 
 | Script | Purpose |
 |---|---|
-| [`tools/fit/measure-rms-by-epoch.js`](../tools/fit/measure-rms-by-epoch.js) | Buckets the standalone scene-graph's residuals against the JPL Horizons cache (`data/jpl-cache.json`) by 100-year epoch. Surfaces how the model's match against JPL evolves outside the 1800-2200 calibration window. |
-| [`tools/fit/measure-rms-historical-vs-jpl.js`](../tools/fit/measure-rms-historical-vs-jpl.js) | Compares the model against **independent historical observations** (Tier 1: Tycho Brahe, NASA/Espenak transit catalogs, Project Pluto mutual occultations) and against **model-derived data** (Tier 2: JPL DE441 / IMCCE INPOP19) at the same epochs. Frame-aware (handles of-date vs J2000 ICRF), with sign-flip detection and data-quality patches for known transcription bugs in Tycho's Opera Omnia. |
+| [`tools/verify/measure-rms-by-epoch.js`](../tools/verify/measure-rms-by-epoch.js) | Buckets the standalone scene-graph's residuals against the JPL Horizons cache (`data/jpl-cache.json`) by 100-year epoch. Surfaces how the model's match against JPL evolves outside the 1800-2200 calibration window. |
+| [`tools/verify/measure-rms-historical-vs-jpl.js`](../tools/verify/measure-rms-historical-vs-jpl.js) | Compares the model against **independent historical observations** (Tier 1: Tycho Brahe, NASA/Espenak transit catalogs, Project Pluto mutual occultations) and against **model-derived data** (Tier 2: JPL DE441 / IMCCE INPOP19) at the same epochs. Frame-aware (handles of-date vs J2000 ICRF), with sign-flip detection and data-quality patches for known transcription bugs in Tycho's Opera Omnia. |
 
 Both scripts are re-runnable — invoke after any model change to re-validate.
 

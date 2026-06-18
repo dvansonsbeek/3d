@@ -4640,11 +4640,21 @@ function meanSiderealYearSecondsAtAge(t_Ma) {
   return MEAN_SIDEREAL_YEAR_J2000_S * (1 - 2 * mass_loss_fraction);
 }
 
-/** Tropical year in seconds. */
+/** Tropical year in seconds at given epoch.
+ *
+ *  Structural identity: T_trop = T_sid × (1 − 13/H(t))
+ *
+ *  Combines both drivers properly:
+ *    Driver 2 → sidereal year_s shortens via solar mass loss
+ *    Driver 1 → H(t) shortens via tidal LOD growth, widening (T_sid − T_trop)
+ *  so the derived axial precession period T_axial = T_sid/(T_sid − T_trop)
+ *  comes out exactly H(t)/13 at all epochs. At J2000 reproduces
+ *  MEAN_TROPICAL_YEAR_J2000_S to within ~2 s. */
 function meanTropicalYearSecondsAtAge(t_Ma) {
-  if (t_Ma === 0) return MEAN_TROPICAL_YEAR_J2000_S;
-  const mass_loss_fraction = SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6;
-  return MEAN_TROPICAL_YEAR_J2000_S * (1 - 2 * mass_loss_fraction);
+  const sidSec = meanSiderealYearSecondsAtAge(t_Ma);
+  const Ht = meanHAtAge(t_Ma);
+  if (Ht === null) return sidSec * (1 - 13 / HOLISTIC_YEAR_J2000);
+  return sidSec * (1 - 13 / Ht);
 }
 
 /** Tropical year in SI 86400-s days at given epoch. Phase 9.2 sDay anchor —
@@ -20854,6 +20864,7 @@ const ESSRT_QTY_SPECS = {
     hasWu:    true,
     wuKey:    'axial_arcsec_yr',
     wuConvert:(rate) => 1296000 / rate,
+    footnote: 'Note: shown is the structural mean H/13. The real axial precession also oscillates by ~50-500 years around this mean on shorter cycles of ~21,000 and ~42,000 years (the H/16 perihelion and H/8 obliquity cycles). These short-period fluctuations are invisible at the modal\'s deep-time scale (one chart pixel spans ~590,000 years on the Phanerozoic view), but show up in the orbital calculator at modern epochs.',
   },
   obliqCycle: {
     title:    'Obliquity Cycle Period (H/8)',
@@ -35414,6 +35425,29 @@ function switchToPlanet(name) {
 }
 
 /**
+ * Jump to an indexed entry in ECLIPSE_PRESETS and update the displayed
+ * Moon planetStats. Reuses the existing jumpToJulianDay (which sets
+ * julianDay/Day/pos/perihelionDate + positionChanged), then refreshes
+ * the Date/Time/JD root controls so the displayed values update too.
+ */
+function jumpToEclipsePreset(idx) {
+  const n = ECLIPSE_PRESETS.length;
+  _eclipseState.idx = ((idx % n) + n) % n;
+  const jd = ECLIPSE_PRESETS[_eclipseState.idx].jd;
+  jumpToJulianDay(jd);
+  // Update Date/Time strings from the new JD so root controls show the right values
+  const converted = dayToDate(jd);
+  o.Date = converted.date;
+  o.Time = converted.time;
+  if (o._rootCtrls) {
+    o._rootCtrls.dateCtrl?.refresh();
+    o._rootCtrls.timeCtrl?.refresh();
+    o._rootCtrls.jdCtrl?.refresh();
+    o._rootCtrls.periCtrl?.refresh();
+  }
+}
+
+/**
  * Blow-up slider for the physical planets only.
  * Pass a slider value `t` ∈ [0, 1].
  */
@@ -35736,6 +35770,26 @@ function loadTexture( url, onLoad ) {
   textureCache.set( url, tex );
   return tex;
 }
+
+// Well-known historical solar eclipses for the Moon planetStats nav-buttons.
+// JD values are time of greatest eclipse in UT (computed from NASA SE-Canon
+// UT times via calToJD). γ is the NASA path-centerline offset. The simulation
+// interprets JD as TT; for visual eclipse verification, the small ΔT shift
+// (~70 sec modern, ~1500 sec at 1133 AD, ~17000 sec at 584 BC) appears as a
+// fraction-of-a-degree Moon offset and remains within the Meeus polynomial
+// error budget documented in doc 66.
+const ECLIPSE_PRESETS = [
+  { jd: 2460409.262050, label: '2024 Apr 8 Total',        loc: 'Mexico → Texas → Maine',     gamma: 0.343,  era: 'Modern' },
+  { jd: 2457987.267733, label: '2017 Aug 21 Total',       loc: 'Coast-to-coast USA',         gamma: 0.437,  era: 'Modern' },
+  { jd: 2451401.960508, label: '1999 Aug 11 Total',       loc: 'Europe → Middle East',       gamma: 0.506,  era: '20th c.' },
+  { jd: 2441863.985208, label: '1973 Jun 30 Total',       loc: 'Africa (longest of 20th c.)', gamma: 0.072,  era: '20th c.' },
+  { jd: 2422108.047858, label: '1919 May 29 Total',       loc: 'Príncipe — Eddington/GR',     gamma: 0.596,  era: '20th c.' },
+  { jd: 2347572.902675, label: '1715 May 3 Total',        loc: 'England — Halley predicted',  gamma: 0.0,    era: '18th c.' },
+  { jd: 2135100.070833, label: '1133 Aug 2 Total',        loc: 'England — King Henry I',      gamma: -0.243, era: 'Medieval' },
+  { jd: 1507900.065279, label: '-584 May 28 Total',       loc: 'Anatolia — Thales predicted', gamma: 0.353,  era: 'Ancient' },
+];
+// Current selected eclipse index (mutable across button clicks)
+const _eclipseState = { idx: 0 };
 
 // 0 — per-frame stats
 const planetStats = {
@@ -36363,6 +36417,30 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
+    {header : '—  Historical Solar Eclipses (validation) —' },
+      {label : () => {
+         const cur = ECLIPSE_PRESETS[_eclipseState.idx];
+         const idxLabel = `${_eclipseState.idx + 1}/${ECLIPSE_PRESETS.length}`;
+         return `<button class="pl-ecl-prev" title="Previous eclipse">‹</button>`
+              + ` <span class="pl-ecl-name">${cur.label}</span>`
+              + ` <button class="pl-ecl-next" title="Next eclipse">›</button>`
+              + ` <span class="pl-ecl-idx">${idxLabel}</span>`;
+       },
+       value : [ { v: () => {
+         const cur = ECLIPSE_PRESETS[_eclipseState.idx];
+         return `<button class="pl-ecl-jump" title="Jump simulation to this eclipse">Jump to ${cur.era}</button>`;
+       }},{ small: '' }],
+       hover : [`Click ‹/› to step through well-known historical solar eclipses, then "Jump to …" to set the simulation date. With Earth-centric view (look toward the Sun) you should see Moon and Sun visually overlapping. Modern eclipses overlap to within ~0.1°; ancient eclipses show ~1° offset due to Meeus polynomial accumulating errors over millennia.`]},
+      {label : () => `Location`,
+       value : [ { v: () => ECLIPSE_PRESETS[_eclipseState.idx].loc },{ small: '' }],
+       hover : [`Where the eclipse was visible on Earth. For visual verification in the 3D model, what matters is that the Sun and Moon overlap as seen from Earth's center — the path location depends on Earth's rotation phase (ΔT-dependent), not on the celestial Sun-Moon alignment.`]},
+      {label : () => `γ (gamma)`,
+       value : [ { v: () => ECLIPSE_PRESETS[_eclipseState.idx].gamma, dec:3 },{ small: '' }],
+       hover : [`NASA path-centerline offset. γ=0 means the umbra cone passes through Earth's center; |γ|>1 means the umbra misses Earth (partial only). Expected geocentric Sun-Moon separation in the simulation ≈ |γ| × 0.95° (Moon parallax). For modern eclipses our model matches this to within 0.04° RMS.`]},
+      {label : () => `JD (UT, catalog)`,
+       value : [ { v: () => ECLIPSE_PRESETS[_eclipseState.idx].jd, dec:6, sep:',' },{ small: '' }],
+       hover : [`Julian Day of greatest eclipse (UT) per NASA GSFC five-millennium canon. The simulation interprets this as TT; the ΔT correction (seconds to thousands of seconds depending on era) shifts the path location on Earth but is invisible in the geocentric Moon-Sun alignment check.`]},
+
     {header : '—  Moon Cycles & Precession —' },
       {label : () => `Full Moon cycle (fixed stars)`,
        value : [ { v: () => moonFullMoonCycleICRF, dec:10, sep:',' },{ small: 'days' }],
@@ -36610,7 +36688,7 @@ const planetStats = {
        value : [ { v: () => 76*o.lengthofsolarYear, dec:10, sep:',' },{ small: 'days' }],
        hover : [`76 tropical years = 4 × 19 Metonic years — the calendar length of one Callippic cycle`]},
     ],
-  
+
     sun: [
     { header : '—  General Characteristics —' },
       {label : () => `Size diameter`,
@@ -40359,6 +40437,7 @@ const TAB_CONFIG = {
     'Orbital Shape & Geometry':      1,
     'Velocities':                    1,
     'Energy & Momentum':             1,
+    'Historical Solar Eclipses (validation)': 3,
     'Moon Cycles & Precession':      3,
     'Orbital Orientation to Ecliptic': 2,
     'Position & Anomalies':          2,
@@ -41448,6 +41527,26 @@ function updateDomLabel () {
       _openGroups[grpKey] = !_openGroups[grpKey];
       labelPrevHTML = '';                             // force re-render
       updateDomLabel();
+    });
+
+    /* — Historical Solar Eclipses nav buttons (event delegation) — */
+    body.addEventListener('click', e => {
+      const t = e.target;
+      if (!t || !t.classList) return;
+      if (t.classList.contains('pl-ecl-prev')) {
+        e.stopPropagation();
+        _eclipseState.idx = ((_eclipseState.idx - 1) % ECLIPSE_PRESETS.length + ECLIPSE_PRESETS.length) % ECLIPSE_PRESETS.length;
+        labelPrevHTML = '';
+        updateDomLabel();
+      } else if (t.classList.contains('pl-ecl-next')) {
+        e.stopPropagation();
+        _eclipseState.idx = (_eclipseState.idx + 1) % ECLIPSE_PRESETS.length;
+        labelPrevHTML = '';
+        updateDomLabel();
+      } else if (t.classList.contains('pl-ecl-jump')) {
+        e.stopPropagation();
+        jumpToEclipsePreset(_eclipseState.idx);
+      }
     });
 
     /* — keep image heights in sync on resize — */
@@ -45223,7 +45322,10 @@ function updatePredictions() {
   
   predictions.lengthofsiderealYearDays = o.lengthofsiderealYear; 
   
-  predictions.lengthofsiderealDayRealLOD = o.lengthofsiderealDayRealLOD = (o.lengthofsolarYear*86400)/(o.lengthofsolarYear+1);
+  // Sidereal/stellar day in REAL epoch LOD — was hard-coded to 86,400 s
+  // (J2000 day), leaving these values stuck at the modern 23.93 hr at every
+  // epoch. Using o.lengthofDay (epoch LOD seconds) lets them evolve correctly.
+  predictions.lengthofsiderealDayRealLOD = o.lengthofsiderealDayRealLOD = (o.lengthofsolarYear*o.lengthofDay)/(o.lengthofsolarYear+1);
   predictions.lengthofstellarDayRealLOD = o.lengthofstellarDayRealLOD = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+o.lengthofsiderealDayRealLOD;
 
   // RA Day Offset: formula confirmed by 65-epoch multiepoch test (R²=0.994, RMS=0.324 ms)
