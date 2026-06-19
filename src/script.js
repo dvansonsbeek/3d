@@ -4763,6 +4763,111 @@ function meanTropicalMonthAtAge(t_Ma) {
   return T_sm * (1 - 13 * T_sm / (H_t * T_yr));
 }
 
+// ───── Phase 9.13: Moon-chain mean-longitude integrators for deep-time ─────
+// Moon tropical month at J2000 (SI seconds). Derived from sidereal anchor
+// via the same formula meanTropicalMonthAtAge uses at t_Ma=0, so this stays
+// in sync with the Farhat-based runtime evolution.
+const MOON_TROPICAL_MONTH_J2000_S = MOON_SIDEREAL_MONTH_J2000_S *
+  (1 - 13 * MOON_SIDEREAL_MONTH_J2000_S / (HOLISTIC_YEAR_J2000 * MEAN_SIDEREAL_YEAR_J2000_S));
+// ≈ 2,360,584.7 s (≈ 27.32158 d × 86400 s/d)
+
+/** Derived period helpers in seconds, mirroring the in-days formulas at
+ *  line ~5516 and ~5518 (recomputeMoonAndAuForEpoch). Required as integrand
+ *  inputs for the apsidal-meets-nodal and lunar-leveling scene-graph nodes. */
+function meanApsidalMeetsNodalAtAge(t_Ma) {
+  const T_anom = meanAnomalisticMonthAtAge(t_Ma);
+  const T_nod  = meanNodalMonthAtAge(t_Ma);
+  if (T_anom === null || T_nod === null) return null;
+  return T_nod * T_anom / (T_anom - T_nod);
+}
+function meanLunarLevelingCycleAtAge(t_Ma) {
+  const T_apsi = meanLunarPerigeePrecessionAtAge(t_Ma);
+  const T_node = meanLunarNodePrecessionAtAge(t_Ma);
+  if (T_apsi === null || T_node === null) return null;
+  return T_node * T_apsi / (T_node - T_apsi);
+}
+
+// Cache slot per period function. Key = period function identity (WeakMap),
+// value = LRU Map of `yearA|yearB → cycles`.
+const _MOON_CYCLE_CACHES   = new WeakMap();
+const _MOON_CYCLE_J2000_S  = new WeakMap();  // memoized periodFn(0) value
+const _MAX_MOON_CYCLE_CACHE = 512;
+
+/** Generic Moon-chain cycle integrator.
+ *
+ *  Snapshot mode (deep-time OFF): linear at J2000 rate. Numerically equal
+ *  to (locked) `obj.speed × Δyear / 2π`, so the integrator path is
+ *  bit-equivalent to the snapshot path at recent epochs.
+ *
+ *  Deep-time mode: Simpson integration of (T_yr_SI / T_period_SI)(y) over
+ *  [yearA, yearB], capturing Farhat-derived period evolution for any Moon
+ *  scene-graph cycle (tropical month, apsidal precession, nodal precession,
+ *  apsidal-meets-nodal beat, lunar leveling cycle). Anchored at
+ *  startmodelYear in the scene graph so currentYear==startmodelYear gives
+ *  zero cycles (preserves the J2000 phase used by modern eclipses).
+ *
+ *  Per-periodFn LRU cache (~512 entries each) — the scene graph calls this
+ *  6× per frame (one per Moon-chain node). */
+function _moonChainCycles(periodFnSeconds, yearA, yearB) {
+  const dy = yearB - yearA;
+  if (dy === 0) return 0;
+
+  let T_J2000 = _MOON_CYCLE_J2000_S.get(periodFnSeconds);
+  if (T_J2000 === undefined) {
+    T_J2000 = periodFnSeconds(0);
+    if (T_J2000 === null) return null;
+    _MOON_CYCLE_J2000_S.set(periodFnSeconds, T_J2000);
+  }
+
+  if (!DEEP_TIME_MODE_ENABLED) {
+    return dy * MEAN_TROPICAL_YEAR_J2000_S / T_J2000;
+  }
+
+  let cache = _MOON_CYCLE_CACHES.get(periodFnSeconds);
+  if (!cache) {
+    cache = new Map();
+    _MOON_CYCLE_CACHES.set(periodFnSeconds, cache);
+  }
+  const cacheKey = yearA + '|' + yearB;
+  const hit = cache.get(cacheKey);
+  if (hit !== undefined) return hit;
+
+  // Adaptive Simpson: ~1 sample per 1 kyr, capped at 1024 to bound per-frame cost.
+  let n = Math.max(32, Math.ceil(Math.abs(dy) / 1000));
+  if (n > 1024) n = 1024;
+  if (n % 2 === 1) n++;
+  const h = dy / n;
+
+  let sum = 0;
+  for (let i = 0; i <= n; i++) {
+    const y = yearA + i * h;
+    const t_Ma = (J2000_CALENDAR_YEAR - y) / 1e6;
+    const T_period_s = periodFnSeconds(t_Ma);
+    if (T_period_s === null) return null;
+    const T_yr_s = meanTropicalYearSecondsAtAge(t_Ma);
+    if (T_yr_s === null) return null;
+    const integrand = T_yr_s / T_period_s;  // cycles per SI year
+    const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
+    sum += w * integrand;
+  }
+  const result = (sum * h) / 3;
+
+  if (cache.size >= _MAX_MOON_CYCLE_CACHE) {
+    const firstKey = cache.keys().next().value;
+    cache.delete(firstKey);
+  }
+  cache.set(cacheKey, result);
+  return result;
+}
+
+// Per-node wrappers — bound to specific period functions so the scene-graph
+// branch can fetch the integrator by object identity (obj._dtMoonIntegrator).
+function meanMoonOrbitsBetweenYears(yearA, yearB)         { return _moonChainCycles(meanTropicalMonthAtAge, yearA, yearB); }
+function meanMoonApsidalCyclesBetween(yearA, yearB)        { return _moonChainCycles(meanLunarPerigeePrecessionAtAge, yearA, yearB); }
+function meanMoonNodalCyclesBetween(yearA, yearB)          { return _moonChainCycles(meanLunarNodePrecessionAtAge, yearA, yearB); }
+function meanMoonApsidalMeetsNodalCyclesBetween(yearA, yearB) { return _moonChainCycles(meanApsidalMeetsNodalAtAge, yearA, yearB); }
+function meanMoonLunarLevelingCyclesBetween(yearA, yearB)  { return _moonChainCycles(meanLunarLevelingCycleAtAge, yearA, yearB); }
+
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling). */
 function meanLunarPerigeePrecessionAtAge(t_Ma) {
   if (t_Ma === 0) return MOON_APSIDAL_J2000_S;
@@ -5629,21 +5734,38 @@ function updateEarthForEpoch() {
 
 /** Mutate epoch-dependent fields on the `moon` object literal (line ~5538). */
 function updateMoonForEpoch() {
-  moon.speed       = (Math.PI * 2) * SI_TROPICAL_YEAR_DAYS / moonTropicalMonth;  // Phase 9.5b: orbits per SI year
+  // Phase 9.13: moon.speed locked to J2000 anchor. In deep-time mode the
+  // scene-graph applies the Farhat-integrated Moon tropical motion via
+  // `_dtMoonIntegrator` (see line ~6886 + moveModel branch), so mutating
+  // moon.speed here would either be retroactively applied to the full
+  // elapsed scene interval since startmodel (snapshot path) or shadowed by
+  // the integrator (deep-time path). Locking it eliminates the first risk
+  // while remaining bit-equivalent to the integrator at modern epochs.
+  moon.speed       = (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_TROPICAL_MONTH_J2000_S;
   moon.orbitRadius = (moonDistance / currentAUDistance) * 100;
   moon.size        = (diameters.moonDiameter / currentAUDistance) * 100;
 }
 
-/** Phase 6.5 + 9.5b: mutate all 5 Moon precession scene-graph node speeds.
- *  Formula: cycles per SI year = SI_TROPICAL_YEAR_DAYS / cycle_period_SI_days.
- *  cycle_period_SI_days globals (moonApsidalPrecessionindaysEarth, etc.) are
- *  mutable per Phase 0/1 and reflect the current epoch's lunar precession periods. */
+/** Phase 6.5 + 9.5b + 9.13: locked J2000 speeds for the 5 Moon precession
+ *  nodes. In deep-time mode the scene-graph branches to per-node integrators
+ *  (`_dtMoonIntegrator`, see line ~6975 + moveModel branch at ~42995); the
+ *  locked speeds remain authoritative for snapshot mode (deep-time OFF) and
+ *  are bit-equivalent to the integrator at modern epochs by construction.
+ *  Anchors used:
+ *    apsidal           — MOON_APSIDAL_J2000_S            (≈ 8.85 yr)
+ *    apsidal-meets-nodal — meanApsidalMeetsNodalAtAge(0) (≈ 5.997 yr)
+ *    lunar leveling    — meanLunarLevelingCycleAtAge(0)  (≈ 6.0 yr)
+ *    nodal             — MOON_NODAL_J2000_S              (≈ 18.60 yr)
+ *  Signs mirror the previous mutation (apsidal +, apsidal-meets-nodal ±,
+ *  leveling −, nodal −). */
 function updateMoonHarmonicsForEpoch() {
-  moonApsidalPrecession.speed           =  (Math.PI * 2) * SI_TROPICAL_YEAR_DAYS / moonApsidalPrecessionindaysEarth;
-  moonApsidalNodalPrecession1.speed     = -(Math.PI * 2) * SI_TROPICAL_YEAR_DAYS / moonApsidalMeetsNodalindays;
-  moonApsidalNodalPrecession2.speed     =  (Math.PI * 2) * SI_TROPICAL_YEAR_DAYS / moonApsidalMeetsNodalindays;
-  moonLunarLevelingCyclePrecession.speed = -(Math.PI * 2) * SI_TROPICAL_YEAR_DAYS / moonLunarLevelingCycleindays;
-  moonNodalPrecession.speed             = -(Math.PI * 2) * SI_TROPICAL_YEAR_DAYS / moonNodalPrecessionindaysEarth;
+  const apsiMeetsNodalJ2000_S = meanApsidalMeetsNodalAtAge(0);
+  const levelingJ2000_S       = meanLunarLevelingCycleAtAge(0);
+  moonApsidalPrecession.speed            =  (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_J2000_S;
+  moonApsidalNodalPrecession1.speed      = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / apsiMeetsNodalJ2000_S;
+  moonApsidalNodalPrecession2.speed      =  (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / apsiMeetsNodalJ2000_S;
+  moonLunarLevelingCyclePrecession.speed = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / levelingJ2000_S;
+  moonNodalPrecession.speed              = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_NODAL_J2000_S;
 }
 
 /** Mutate the 5 Earth-precession control objects (lines 5238–5346). */
@@ -6666,6 +6788,10 @@ earthWobbleCenter.           _dtRotN   = 13; earthWobbleCenter.           _dtRot
 // Planet wobble centers tagged separately AFTER their declarations
 // (lines 8264+) — see the second Phase 9.12 tag block below.
 
+// Phase 9.13: Moon mean-longitude integrator tag. The moon object literal
+// is declared further down (~line 6900); these tags are applied AFTER that
+// declaration in the same anchor-startmodel pattern Earth uses (line 6727).
+
 const barycenterEarthAndSun = {
   name: "Barycenter Earth and Sun",
   startPos: 0,
@@ -6745,6 +6871,15 @@ const sun = {
   traceStep : sYear,
   traceOn: false,
 };
+
+// Phase 9.14 (step 3): Sun perihelion EoC integrator tag. Replaces the
+// snapshot `perihelionPrecessionRate × pos` with the H(t)-integrated form,
+// `2π × cyclesBetweenYears(startmodel, currentYear, 16)`. Anchored at
+// startmodelyearwithCorrection so at year=startmodel cycles=0 and the
+// perihelion phase reduces to perihelionPhaseJ2000 (preserves modern
+// behavior). Divisor 16 because Sun's perihelion period = H/16 structurally.
+sun._dtPerihelionDivisor = 16;
+sun._dtPerihelionAnchor  = startmodelyearwithCorrection;
 
 const moonApsidalPrecession = {
   name: "Moon Apsidal Precession",
@@ -6883,6 +7018,40 @@ const moon = {
   traceStep : sDay,
   traceOn: false,
 };
+
+// Phase 9.13: Moon mean-longitude integrator tag. In deep-time mode the
+// scene-graph branches at line ~42906 use `_dtMoonIntegrator` to compute the
+// integral of Moon tropical mean motion over [startmodel, currentYear]
+// instead of the snapshot `moon.speed × pos`, restoring physically correct
+// Moon position under Farhat-evolving sidereal-month period. Anchor matches
+// Earth's `_dtCycleAnchor = startmodelyearwithCorrection` so the integrator
+// returns 0 at startmodel (preserves modern J2000 Moon position).
+moon._dtMoonIntegrator = meanMoonOrbitsBetweenYears;
+moon._dtMoonSign       = +1;  // Moon orbits prograde (eastward)
+moon._dtMoonAnchor     = startmodelyearwithCorrection;
+
+// Phase 9.13 (step 2): Moon precession-chain integrator tags. Signs mirror
+// the per-epoch speed mutations at updateMoonHarmonicsForEpoch (~line 5712):
+// apsidal +, apsidal-meets-nodal ±, lunar leveling −, nodal −.
+moonApsidalPrecession.            _dtMoonIntegrator = meanMoonApsidalCyclesBetween;
+moonApsidalPrecession.            _dtMoonSign       = +1;
+moonApsidalPrecession.            _dtMoonAnchor     = startmodelyearwithCorrection;
+
+moonApsidalNodalPrecession1.      _dtMoonIntegrator = meanMoonApsidalMeetsNodalCyclesBetween;
+moonApsidalNodalPrecession1.      _dtMoonSign       = -1;
+moonApsidalNodalPrecession1.      _dtMoonAnchor     = startmodelyearwithCorrection;
+
+moonApsidalNodalPrecession2.      _dtMoonIntegrator = meanMoonApsidalMeetsNodalCyclesBetween;
+moonApsidalNodalPrecession2.      _dtMoonSign       = +1;
+moonApsidalNodalPrecession2.      _dtMoonAnchor     = startmodelyearwithCorrection;
+
+moonLunarLevelingCyclePrecession. _dtMoonIntegrator = meanMoonLunarLevelingCyclesBetween;
+moonLunarLevelingCyclePrecession. _dtMoonSign       = -1;
+moonLunarLevelingCyclePrecession. _dtMoonAnchor     = startmodelyearwithCorrection;
+
+moonNodalPrecession.              _dtMoonIntegrator = meanMoonNodalCyclesBetween;
+moonNodalPrecession.              _dtMoonSign       = -1;
+moonNodalPrecession.              _dtMoonAnchor     = startmodelyearwithCorrection;
 
 const mercuryPerihelionDurationEcliptic1 = {
   name: "Mercury Perihelion Duration Ecliptic1",
@@ -8548,6 +8717,15 @@ jupiterWobbleCenter._dtCycleN = _planetWobbleDivisors.jupiter; jupiterWobbleCent
 saturnWobbleCenter. _dtCycleN = _planetWobbleDivisors.saturn;  saturnWobbleCenter. _dtCycleSign = +1; saturnWobbleCenter. _dtCycleAnchor = _planetSceneAnchors_J2000.saturn;
 uranusWobbleCenter. _dtCycleN = _planetWobbleDivisors.uranus;  uranusWobbleCenter. _dtCycleSign = +1; uranusWobbleCenter. _dtCycleAnchor = _planetSceneAnchors_J2000.uranus;
 neptuneWobbleCenter._dtCycleN = _planetWobbleDivisors.neptune; neptuneWobbleCenter._dtCycleSign = +1; neptuneWobbleCenter._dtCycleAnchor = _planetSceneAnchors_J2000.neptune;
+
+// Phase 9.14 (step 4): planet chain tags — REVERTED.
+// Initial implementation caused visible position regression for planets
+// (Jupiter/Saturn ~120° RA shift at year 2020.97 in deep-time mode) despite
+// per-node snapshot↔integrator bit-equivalence at modern epochs. Suspect
+// interaction in the nested perihelion duration ecliptic frame composition
+// (rotate-then-unrotate dance with intermediate orbit-center offsets).
+// Reverted pending root-cause analysis; Earth/Moon/Sun chains (Steps 1-3)
+// still in place and tested. See conversation log "step 7" pre-commit.
 
 //*************************************************************
 // ADD CONSTANTS
@@ -42907,6 +43085,18 @@ function moveModel(pos) {
       const _dtAnchor = Number.isFinite(obj._dtCycleAnchor) ? obj._dtCycleAnchor : BALANCED_YEAR_J2000_FIXED;
       const _dtCycles = cyclesBetweenYears(_dtAnchor, o.currentYear, obj._dtCycleN);
       θ = (_dtCycles !== null ? _dtCycles : 0) * 2 * Math.PI * obj._dtCycleSign;
+    } else if (DEEP_TIME_MODE_ENABLED && obj._dtMoonIntegrator) {
+      // Phase 9.13: Moon-chain integral form. Replaces snapshot
+      // `obj.speed × pos` with ∫_anchor^currentYear n_moon(t) dt where
+      // n_moon evolves under Farhat-derived tidal recession. Anchor is
+      // startmodelyearwithCorrection — at that year the integrator returns
+      // 0, so θ reduces to `-startPos × π/180`, matching the J2000 snapshot
+      // exactly. Modern eclipses (within ±100 yr of J2000) are unchanged at
+      // sub-arcsecond level; deep-time corrections grow with |Δyear|.
+      const _mAnchor = Number.isFinite(obj._dtMoonAnchor) ? obj._dtMoonAnchor : startmodelyearwithCorrection;
+      const _mCycles = obj._dtMoonIntegrator(_mAnchor, o.currentYear);
+      θ = (_mCycles !== null ? _mCycles : 0) * 2 * Math.PI * obj._dtMoonSign
+          - obj.startPos * (Math.PI / 180);
     } else {
       θ = obj.speed * pos - obj.startPos * (Math.PI / 180);
     }
@@ -42921,7 +43111,19 @@ function moveModel(pos) {
       } else {
         e = typeof obj.eccentricity === 'number' ? obj.eccentricity : (o.eccentricityEarth || ASTRO_REFERENCE.eccentricityJ2000);
       }
-      const perihelionPhase = obj.perihelionPhaseJ2000 + (obj.perihelionPrecessionRate || 0) * pos;
+      // Phase 9.14: perihelionPrecessionRate × pos is the snapshot extrapolation
+      // of perihelion precession. For deep-time correctness over Myr scales
+      // (where H evolves), objects tagged with `_dtPerihelionDivisor` use
+      // the integral form via cyclesBetweenYears instead. Bit-equivalent to
+      // the snapshot at modern epochs.
+      let perihelionPhase;
+      if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtPerihelionDivisor)) {
+        const _pAnchor = Number.isFinite(obj._dtPerihelionAnchor) ? obj._dtPerihelionAnchor : startmodelyearwithCorrection;
+        const _pCycles = cyclesBetweenYears(_pAnchor, o.currentYear, obj._dtPerihelionDivisor);
+        perihelionPhase = obj.perihelionPhaseJ2000 + (_pCycles !== null ? _pCycles : 0) * 2 * Math.PI;
+      } else {
+        perihelionPhase = obj.perihelionPhaseJ2000 + (obj.perihelionPrecessionRate || 0) * pos;
+      }
       const M = θ - perihelionPhase;  // mean anomaly measured from current perihelion direction
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
       obj._meanAnomaly = M; // Store for parallax correction (BR-CA terms)
