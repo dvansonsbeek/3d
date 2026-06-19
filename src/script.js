@@ -4657,6 +4657,51 @@ function meanTropicalYearSecondsAtAge(t_Ma) {
   return sidSec * (1 - 13 / Ht);
 }
 
+// ───── ΔT integrator — used for proper Earth rotation in scene graph ─────
+const _DELTA_T_CACHE = new Map();
+const _MAX_DELTA_T_CACHE = 512;
+
+/** ΔT = TT − UT1 in SI seconds at a given geological age (relative to
+ *  ΔT(J2000) = 0). Positive on BOTH sides of J2000.
+ *
+ *  Convention: positive ΔT means TT runs ahead of UT (= Earth has rotated
+ *  MORE than a constant-86400-s clock would predict). Equivalently:
+ *  Earth orientation needs +ΔT/86400 rotations of CORRECTION on top of the
+ *  constant-rate model to match physical reality.
+ *
+ *  Used by Strategy A in updateEarthForEpoch: add (ΔT/86400) × 2π radians
+ *  to the constant-rate scene rotation so the eclipse appears at the
+ *  geographically correct location at deep historical past. */
+function meanDeltaTSecondsAtAge(t_Ma) {
+  if (t_Ma === 0) return 0;
+  const hit = _DELTA_T_CACHE.get(t_Ma);
+  if (hit !== undefined) return hit;
+
+  const absSpan = Math.abs(t_Ma);
+  let n = Math.max(32, Math.ceil(absSpan * 10));
+  if (n > 1024) n = 1024;
+  if (n % 2 === 1) n++;
+  const h = t_Ma / n;
+
+  let sum = 0;
+  for (let i = 0; i <= n; i++) {
+    const tau = i * h;
+    const lod = meanLodSecondsAtAge(tau);
+    if (lod === null) return NaN;
+    const yearS = meanTropicalYearSecondsAtAge(tau);
+    const integrand = (86400 - lod) * yearS * 1e6 / 86400;
+    const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
+    sum += w * integrand;
+  }
+  const result = (sum * h) / 3;
+  if (_DELTA_T_CACHE.size >= _MAX_DELTA_T_CACHE) {
+    const firstKey = _DELTA_T_CACHE.keys().next().value;
+    _DELTA_T_CACHE.delete(firstKey);
+  }
+  _DELTA_T_CACHE.set(t_Ma, result);
+  return result;
+}
+
 /** Tropical year in SI 86400-s days at given epoch. Phase 9.2 sDay anchor —
  *  used so scene orbital periods in JD are Kepler-invariant across epochs
  *  (mass-loss correction only; essentially constant). */
@@ -5555,11 +5600,30 @@ function recomputePlanetCyclesForEpoch(t_Ma) {
 /** Mutate epoch-dependent fields on the `earth` object literal (line ~5212). */
 function updateEarthForEpoch() {
   earth.speed         = -Math.PI * 2 / (holisticyearLength / 13);
-  // Phase 9.5b: sidereal rotations per SI year (LOD-aware).
-  // = SI_year_seconds / sidereal_day_seconds, where sidereal_day = LOD × N/(N+1).
-  // At J2000 ≡ 2π × (meansol + 1) to ~1 ppm; at deep time captures LOD evolution.
-  const _siderealDaySec = meanlengthofday * meansolaryearlengthinDays / (meansolaryearlengthinDays + 1);
-  earth.rotationSpeed = Math.PI * 2 * SI_TROPICAL_YEAR_DAYS * 86400 / _siderealDaySec;
+  // Earth rotation rate is locked to the J2000 sidereal day.
+  //
+  // Background: the scene graph applies `earth.rotationSpeed` as a single
+  // multiplier (`rotation = pos × rate`) rather than as the proper integral
+  // (`rotation = ∫_J2000^pos (1/LOD(t)) dt`). When deep-time mutates the
+  // rate to the local epoch's value, that local rate gets retroactively
+  // applied to the full elapsed interval since J2000, accumulating a large
+  // (~163°) drift over multi-millennium spans — the eclipse-over-America
+  // moves to noon-over-Turkey at year −584, etc.
+  //
+  // Locking the rate at J2000 here gives a stable JD ↔ Earth-orientation
+  // mapping consistent with the (pre-deep-time) "live" production behavior.
+  // It does NOT introduce ΔT physics into the scene graph (which would
+  // require the proper integration), but it removes the spurious drift.
+  // Deep-time LOD/H/year-length evolution remains correctly visible in
+  // calculator displays and the ESSRT modal, which use
+  // `meanLodSecondsAtAge()` / `meanHAtAge()` directly.
+  //
+  // Reference values used (all module-load `const`, never mutated):
+  //   inputmeanlengthsolaryearindays — 365.2422 tropical days per year
+  //   86400                          — J2000 mean solar day in seconds
+  //   SI_TROPICAL_YEAR_DAYS          — captured at module init from J2000
+  const _siderealDaySec_J2000 = 86400 * inputmeanlengthsolaryearindays / (inputmeanlengthsolaryearindays + 1);
+  earth.rotationSpeed = Math.PI * 2 * SI_TROPICAL_YEAR_DAYS * 86400 / _siderealDaySec_J2000;
   earth.size          = (diameters.earthDiameter / currentAUDistance) * 100;
 }
 
@@ -5764,6 +5828,23 @@ function updateAllObjectsForEpoch() {
 // disableDeepTimeMode() or flip this flag directly.
 
 const J2000_CALENDAR_YEAR = startmodelYear;   // 2000.5
+
+/** Earth rotation correction (radians) at given Julian Day, relative to the
+ *  constant-J2000-rate scene rotation. This is the ΔT/86400 × 2π term that
+ *  brings the scene graph's Earth orientation into agreement with the
+ *  geographically-correct location of historical eclipses. Returns 0 when
+ *  deep-time mode is off OR at J2000 anchor. */
+function earthRotationCorrectionRadians(jd) {
+  if (!DEEP_TIME_MODE_ENABLED) return 0;
+  // Convert JD to t_Ma (positive = past). julianDateToDecimalYear gives a
+  // calendar-year-equivalent for the JD, which we then convert to t_Ma.
+  const decYear = julianDateToDecimalYear(jd);
+  const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+  if (Math.abs(t_Ma) < 1e-9) return 0;
+  const deltaT_sec = meanDeltaTSecondsAtAge(t_Ma);
+  if (!Number.isFinite(deltaT_sec)) return 0;
+  return (deltaT_sec / 86400) * 2 * Math.PI;
+}
 let   currentEpoch_t_Ma   = 0;
 let   DEEP_TIME_MODE_ENABLED = true;
 
@@ -42967,7 +43048,21 @@ function moveModel(pos) {
         const _dtCycles = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, o.currentYear, obj._dtRotN);
         obj.planetObj.rotation.y = (_dtCycles !== null ? _dtCycles : 0) * 2 * Math.PI * obj._dtRotSign;
       } else {
-        obj.planetObj.rotation.y = obj.rotationSpeed * pos;
+        let spinAngle = obj.rotationSpeed * pos;
+        // Earth day-night spin: add ΔT correction so Earth orientation in
+        // the scene matches its physical orientation at the given JD. The
+        // constant-J2000-rate (obj.rotationSpeed × pos) gives the rotation
+        // count as if Earth had always spun at 86,400 s/day; the correction
+        // ΔT/86400 × 2π adds the cumulative extra rotation that Earth has
+        // actually completed because LOD was shorter in the past (Farhat
+        // 2022 polynomial integrated to ΔT via meanDeltaTSecondsAtAge).
+        // ~0 at modern era (ΔT < 1s); ~71° at year -584 (Thales era).
+        // Only applied when deep-time mode is ON, and only to Earth (the
+        // helper returns 0 when deep-time is off).
+        if (obj.name === 'Earth') {
+          spinAngle += earthRotationCorrectionRadians(o.julianDay);
+        }
+        obj.planetObj.rotation.y = spinAngle;
       }
     }
 
