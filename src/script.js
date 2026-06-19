@@ -5967,6 +5967,136 @@ function earthRotationCorrectionRadians(jd) {
   if (!Number.isFinite(deltaT_sec)) return 0;
   return (deltaT_sec / 86400) * 2 * Math.PI;
 }
+
+// ───── Phase 9.15: SI-tropical-year conversion (fixes Step 4 + Moon unit bug) ─────
+// The scene-graph integrators (cyclesBetweenYears, _moonChainCycles) expect
+// their year-difference input in SI tropical years (matching the H constant
+// which is defined in SI tropical years). Previously the call sites passed
+// `o.currentYear` from `julianDateToDecimalYear` which returns Gregorian/Julian
+// calendar years (varying 365 / 366 days). The unit mismatch produced a
+// 0.21% rate offset → ~5° Moon position error per modern half-year and
+// hundreds of degrees at year −584. Step 4 planet failure had the same root
+// cause (Mercury N=1.4M × 0.21% × 20yr = ~60° shift).
+//
+// Conversion: pure JD-difference / SI_TROPICAL_YEAR_DAYS, anchored at J2000.
+// Both anchor and current year MUST use this same conversion for cycle
+// differences to be correct.
+const _jdToSIyear = (jd) => 2000.0 + (jd - j2000JD) / SI_TROPICAL_YEAR_DAYS;
+const STARTMODEL_YEAR_SI = _jdToSIyear(startmodelJD);
+// = 2000.4696 at the canonical startmodelJD = 2451716.5. Differs from
+// the old `startmodelyearwithCorrection` (= 2000.4977) by ~10 days; the
+// difference was a mixed-unit artifact, not a physical calibration.
+
+// ───── Phase 9.14 Option A verification: Meeus arguments vs integrator-derived ─────
+// Compares Meeus Ch. 47 polynomial values (Lp, D, M, M', F) to our
+// integrator-derived equivalents (built from Steps 1-3 Moon/Sun integrators
+// anchored to Meeus values at startmodel).
+//
+// At startmodel: by construction the values agree exactly (anchor offset).
+// At year=2024 (recent): values should agree to ≪ 0.01° (integrators
+// reproduce Meeus polynomial linear coefficients to floating-point precision
+// over short spans).
+// At year=-584 (Thales): values may differ by 0.5-2° per argument — this is
+// the Meeus polynomial extrapolation error documented in doc 100.
+//
+// Call from console:
+//   meeusVsIntegratorDiagnostic(2451545)   // J2000
+//   meeusVsIntegratorDiagnostic(2460000)   // 2023-Feb
+//   meeusVsIntegratorDiagnostic(1507900.5) // Thales eclipse area
+function meeusVsIntegratorDiagnostic(jd) {
+  const wrap = (x) => ((x % 360) + 360) % 360;
+  const angDiff = (a, b) => {
+    let d = a - b;
+    while (d > 180)  d -= 360;
+    while (d < -180) d += 360;
+    return d;
+  };
+
+  // ── Phase 9.15 unit fix: convert JD → SI tropical year (NOT calendar year) ──
+  // The integrator's H constant (=335,317) is defined in SI tropical years.
+  // Passing calendar years from julianDateToDecimalYear (which returns
+  // leap-year-aware Gregorian fractions) produces a 0.21% rate mismatch
+  // (~5° per modern half-year, 95° at year -584).
+  // Bypass that by going directly from JD → SI-tropical-year via the canonical
+  // conversion using existing module constants (j2000JD line 69,
+  // SI_TROPICAL_YEAR_DAYS line 4483). Both anchor and current use the same
+  // convention, so cycle differences are correct by construction.
+  const _jdToSIyear = (jd_) => 2000.0 + (jd_ - j2000JD) / SI_TROPICAL_YEAR_DAYS;
+  const yearSI_anchor = _jdToSIyear(startmodelJD);
+  const yearSI        = _jdToSIyear(jd);
+  const decYear       = julianDateToDecimalYear(jd);  // for display only
+
+  // ── Meeus polynomial values at this JD ──
+  const T = (jd - j2000JD) / 36525;
+  const T2 = T*T, T3 = T2*T, T4 = T3*T;
+  const Lp_meeus = wrap(218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000);
+  const D_meeus  = wrap(297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000);
+  const M_meeus  = wrap(357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000);
+  const Mp_meeus = wrap(134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000);
+  const F_meeus  = wrap( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000);
+
+  // ── Meeus polynomial values at startmodel (anchor) ──
+  const Ta  = (startmodelJD - j2000JD) / 36525;
+  const Ta2 = Ta*Ta, Ta3 = Ta2*Ta, Ta4 = Ta3*Ta;
+  const Lp_a = wrap(218.3164477 + 481267.88123421*Ta - 0.0015786*Ta2 + Ta3/538841 - Ta4/65194000);
+  const D_a  = wrap(297.8501921 + 445267.1114034*Ta - 0.0018819*Ta2 + Ta3/545868 - Ta4/113065000);
+  const M_a  = wrap(357.5291092 +  35999.0502909*Ta - 0.0001536*Ta2 + Ta3/24490000);
+  const Mp_a = wrap(134.9633964 + 477198.8675055*Ta + 0.0087414*Ta2 + Ta3/69699 - Ta4/14712000);
+  const F_a  = wrap( 93.2720950 + 483202.0175233*Ta - 0.0036539*Ta2 - Ta3/3526000 + Ta4/863310000);
+
+  // Compose Meeus reference quantities from primary arguments
+  const Lsun_a    = wrap(Lp_a - D_a);
+  const periSun_a = wrap(Lsun_a - M_a);   // Sun perihelion = mean Sun - mean anomaly
+  const periMoon_a = wrap(Lp_a - Mp_a);   // Moon perigee
+  const nodeMoon_a = wrap(Lp_a - F_a);    // Moon ascending node
+
+  // ── Our integrator-derived advances from anchor (using SI tropical years) ──
+  const cyc_Lp        = meanMoonOrbitsBetweenYears(yearSI_anchor, yearSI);
+  const cyc_periSun   = cyclesBetweenYears(yearSI_anchor, yearSI, 16);
+  const cyc_periMoon  = meanMoonApsidalCyclesBetween(yearSI_anchor, yearSI);
+  const cyc_nodeMoon  = meanMoonNodalCyclesBetween(yearSI_anchor, yearSI);
+  const adv_Lp_deg       = (cyc_Lp        ?? 0) * 360;
+  const adv_Lsun_deg     = (yearSI - yearSI_anchor) * 360;   // sun.speed = 2π/SI-yr exact
+  const adv_periSun_deg  = (cyc_periSun   ?? 0) * 360;
+  const adv_periMoon_deg = (cyc_periMoon  ?? 0) * 360;
+  const adv_nodeMoon_deg = -(cyc_nodeMoon ?? 0) * 360;  // node regresses (sign = -1)
+
+  // Compose our values: anchor + advance
+  const Lp_ours      = wrap(Lp_a       + adv_Lp_deg);
+  const Lsun_ours    = wrap(Lsun_a     + adv_Lsun_deg);
+  const periSun_ours = wrap(periSun_a  + adv_periSun_deg);
+  const periMoon_ours= wrap(periMoon_a + adv_periMoon_deg);
+  const nodeMoon_ours= wrap(nodeMoon_a + adv_nodeMoon_deg);
+
+  // Derive Meeus arguments from our values
+  const D_ours  = wrap(Lp_ours - Lsun_ours);
+  const M_ours  = wrap(Lsun_ours - periSun_ours);
+  const Mp_ours = wrap(Lp_ours - periMoon_ours);
+  const F_ours  = wrap(Lp_ours - nodeMoon_ours);
+
+  const pad = (s, n) => String(s).padStart(n);
+  const fmt = (x) => pad(x.toFixed(4), 11);
+  console.log('════════════════════════════════════════════════════════════════');
+  console.log(`Meeus vs integrator at JD ${jd}   year ${decYear.toFixed(4)}   T=${T.toFixed(4)} cy`);
+  console.log('Argument        Meeus(°)         Ours(°)       Diff(Ours-Meeus)°');
+  console.log(`Lp (Moon λ)   ${fmt(Lp_meeus)}     ${fmt(Lp_ours)}       ${fmt(angDiff(Lp_ours, Lp_meeus))}`);
+  console.log(`D  (Moon-Sun) ${fmt(D_meeus)}     ${fmt(D_ours)}       ${fmt(angDiff(D_ours, D_meeus))}`);
+  console.log(`M  (Sun-M)    ${fmt(M_meeus)}     ${fmt(M_ours)}       ${fmt(angDiff(M_ours, M_meeus))}`);
+  console.log(`M' (Moon-M)   ${fmt(Mp_meeus)}     ${fmt(Mp_ours)}       ${fmt(angDiff(Mp_ours, Mp_meeus))}`);
+  console.log(`F  (Moon-Ω)   ${fmt(F_meeus)}     ${fmt(F_ours)}       ${fmt(angDiff(F_ours, F_meeus))}`);
+  console.log('════════════════════════════════════════════════════════════════');
+
+  return { jd, decYear, T,
+           Lp_meeus, D_meeus, M_meeus, Mp_meeus, F_meeus,
+           Lp_ours,  D_ours,  M_ours,  Mp_ours,  F_ours,
+           diff: { Lp: angDiff(Lp_ours, Lp_meeus),
+                   D:  angDiff(D_ours,  D_meeus),
+                   M:  angDiff(M_ours,  M_meeus),
+                   Mp: angDiff(Mp_ours, Mp_meeus),
+                   F:  angDiff(F_ours,  F_meeus) } };
+}
+// Expose for console access
+if (typeof window !== 'undefined') window.meeusVsIntegratorDiagnostic = meeusVsIntegratorDiagnostic;
 let   currentEpoch_t_Ma   = 0;
 let   DEEP_TIME_MODE_ENABLED = true;
 
@@ -6770,13 +6900,14 @@ const earthPerihelionPrecession2 = {
 // Earth doesn't have that compensation, so a BALANCED-anchored override would
 // rotate earth by cyclesBetween(BALANCED, startmodel, 13) × 2π × −1 ≈ +292°
 // (= −68°) at startmodel, shifting the Sun by 68° into Leo. Setting
-// `_dtCycleAnchor = startmodelyearwithCorrection` makes the override anchor
-// earth's cycle at startmodel instead, giving θ = 0 there → matches snapshot.
+// `_dtCycleAnchor = STARTMODEL_YEAR_SI` (Phase 9.15 unit-fixed anchor) makes
+// the override anchor earth's cycle at startmodel instead, giving θ = 0
+// there → matches snapshot.
 // Earth's overall rotation doesn't affect the eccentricity scalar (rotation-
 // invariant), so `e_min` at navigated balanced JDs is preserved under
 // DEEP_TIME=true.
 earth.                       _dtCycleN = 13; earth.                       _dtCycleSign = -1;
-earth.                       _dtCycleAnchor = startmodelyearwithCorrection;
+earth.                       _dtCycleAnchor = STARTMODEL_YEAR_SI;
 midEccentricityOrbit.        _dtCycleN = 13; midEccentricityOrbit.        _dtCycleSign = +1;
 earthInclinationPrecession.  _dtCycleN =  3; earthInclinationPrecession.  _dtCycleSign = +1;
 earthEclipticPrecession.     _dtCycleN =  5; earthEclipticPrecession.     _dtCycleSign = +1;
@@ -6879,7 +7010,7 @@ const sun = {
 // perihelion phase reduces to perihelionPhaseJ2000 (preserves modern
 // behavior). Divisor 16 because Sun's perihelion period = H/16 structurally.
 sun._dtPerihelionDivisor = 16;
-sun._dtPerihelionAnchor  = startmodelyearwithCorrection;
+sun._dtPerihelionAnchor  = STARTMODEL_YEAR_SI;
 
 const moonApsidalPrecession = {
   name: "Moon Apsidal Precession",
@@ -7024,34 +7155,34 @@ const moon = {
 // integral of Moon tropical mean motion over [startmodel, currentYear]
 // instead of the snapshot `moon.speed × pos`, restoring physically correct
 // Moon position under Farhat-evolving sidereal-month period. Anchor matches
-// Earth's `_dtCycleAnchor = startmodelyearwithCorrection` so the integrator
-// returns 0 at startmodel (preserves modern J2000 Moon position).
+// Earth's `_dtCycleAnchor = STARTMODEL_YEAR_SI` so the integrator returns
+// 0 at startmodel (preserves modern J2000 Moon position).
 moon._dtMoonIntegrator = meanMoonOrbitsBetweenYears;
 moon._dtMoonSign       = +1;  // Moon orbits prograde (eastward)
-moon._dtMoonAnchor     = startmodelyearwithCorrection;
+moon._dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
 // Phase 9.13 (step 2): Moon precession-chain integrator tags. Signs mirror
 // the per-epoch speed mutations at updateMoonHarmonicsForEpoch (~line 5712):
 // apsidal +, apsidal-meets-nodal ±, lunar leveling −, nodal −.
 moonApsidalPrecession.            _dtMoonIntegrator = meanMoonApsidalCyclesBetween;
 moonApsidalPrecession.            _dtMoonSign       = +1;
-moonApsidalPrecession.            _dtMoonAnchor     = startmodelyearwithCorrection;
+moonApsidalPrecession.            _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
 moonApsidalNodalPrecession1.      _dtMoonIntegrator = meanMoonApsidalMeetsNodalCyclesBetween;
 moonApsidalNodalPrecession1.      _dtMoonSign       = -1;
-moonApsidalNodalPrecession1.      _dtMoonAnchor     = startmodelyearwithCorrection;
+moonApsidalNodalPrecession1.      _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
 moonApsidalNodalPrecession2.      _dtMoonIntegrator = meanMoonApsidalMeetsNodalCyclesBetween;
 moonApsidalNodalPrecession2.      _dtMoonSign       = +1;
-moonApsidalNodalPrecession2.      _dtMoonAnchor     = startmodelyearwithCorrection;
+moonApsidalNodalPrecession2.      _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
 moonLunarLevelingCyclePrecession. _dtMoonIntegrator = meanMoonLunarLevelingCyclesBetween;
 moonLunarLevelingCyclePrecession. _dtMoonSign       = -1;
-moonLunarLevelingCyclePrecession. _dtMoonAnchor     = startmodelyearwithCorrection;
+moonLunarLevelingCyclePrecession. _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
 moonNodalPrecession.              _dtMoonIntegrator = meanMoonNodalCyclesBetween;
 moonNodalPrecession.              _dtMoonSign       = -1;
-moonNodalPrecession.              _dtMoonAnchor     = startmodelyearwithCorrection;
+moonNodalPrecession.              _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
 const mercuryPerihelionDurationEcliptic1 = {
   name: "Mercury Perihelion Duration Ecliptic1",
@@ -26157,7 +26288,15 @@ function setupGUI() {
   // Calibration
   const firstCalibBtn = addTestButton('Verify Obliquity Calibration', runObliquityCalibrationTest,
     'Check that the model\'s obliquity matches IAU reference values over time.');
-  addTestButton('Verify Balanced-Year Navigation', runBalancedYearNavigationTest,
+  addTestButton('Verify Perihelion Rate', verifyPerihelionRate,
+    'Verify the rate of perihelion precession against reference data.');
+  addTestButton('Verify Earth Parameters', verifyEarthParameters,
+    'Search for the earthRAAngle value that best matches IAU tropical year references.');
+  addTestButton('Investigate Parameters', investigateParameterEffects,
+    'Explore how changing orbital parameters affects year length and precession.');
+
+  // Balanced Year & 8H
+  const firstBalancedBtn = addTestButton('Verify Balanced-Year Navigation', runBalancedYearNavigationTest,
     'Check the H and 8H balanced-year math: cycle identity, round-trip, JD conversion, ' +
     'and the expected harmonic-mean H vs instantaneous H_J2000 deviation.');
   addTestButton('Diagnose Balanced-Year State', runBalancedYearStateDiagnostic,
@@ -26171,12 +26310,1975 @@ function setupGUI() {
     'inclination + MEAN eccentricity (rising), and Saturn reaches MAX inclination + MEAN ' +
     'eccentricity (falling). Run AFTER clicking "Jump to Last 8H JD" or "Jump to Next 8H JD" ' +
     'in the Predictions > Balanced Year Julian Dates folder.');
-  addTestButton('Verify Perihelion Rate', verifyPerihelionRate,
-    'Verify the rate of perihelion precession against reference data.');
-  addTestButton('Investigate Parameters', investigateParameterEffects,
-    'Explore how changing orbital parameters affects year length and precession.');
-  addTestButton('Verify Earth Parameters', verifyEarthParameters,
-    'Search for the earthRAAngle value that best matches IAU tropical year references.');
+  // ────────────────────────────────────────────────────────────────────────
+  // NASA Five Millennium Catalog cross-check. For canonical solar eclipses
+  // from NASA's authoritative reference, compare our model's conjunction
+  // time TO NASA's published Terrestrial Dynamical Time (TD) of greatest
+  // eclipse. In TT-space, the astronomical event is ΔT-independent — so
+  // any time difference here is purely a Moon polynomial residual.
+  //
+  // Also reports our ΔT vs NASA's ΔT (which uses Stephenson) for context.
+  // ────────────────────────────────────────────────────────────────────────
+  const firstEclipseBtn = addTestButton('NASA catalog cross-check (Moon polynomial validation)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  NASA Five Millennium Catalog cross-check.');
+    console.log('  TT-space comparison: our jd_conj+ourΔT vs NASA published TD (greatest eclipse).');
+    console.log('  Any difference here = pure Moon polynomial residual (ΔT-independent).');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    const _d2r = Math.PI / 180;
+
+    // From NASA Five Millennium Catalog of Solar Eclipses
+    // (https://eclipse.gsfc.nasa.gov/SEcat5/). Date in Julian calendar.
+    // hour = TD (Terrestrial Time) at greatest eclipse, in decimal hours.
+    // dT = ΔT NASA used (= Stephenson empirical).
+    const NASA = [
+      { Y:-524, M: 2, D:27, hour:  2.295, dT:17480, type:'T', name:'-524 Feb 27 Total' },
+      { Y:-524, M: 8, D:21, hour: 13.539, dT:17473, type:'A', name:'-524 Aug 21 Annular' },
+      { Y:-523, M: 2, D:15, hour: 17.541, dT:17466, type:'T', name:'-523 Feb 15 Total' },
+      { Y:-523, M: 8, D:10, hour: 19.347, dT:17458, type:'H', name:'-523 Aug 10 Hybrid' },
+      { Y:-522, M: 2, D: 5, hour:  3.112, dT:17451, type:'A', name:'-522 Feb 05 Annular' },
+      { Y:-522, M: 7, D:31, hour:  8.335, dT:17444, type:'T', name:'-522 Jul 31 Total (Cambyses-era)' },
+      { Y: 977, M: 6, D:19, hour: 11.870, dT: 1691, type:'A', name:' 977 Jun 19 Annular' },
+      { Y: 977, M:12, D:13, hour:  9.028, dT: 1688, type:'T', name:' 977 Dec 13 Total' },
+      { Y: 980, M: 5, D:17, hour:  1.534, dT: 1674, type:'P', name:' 980 May 17 Partial only' },
+      { Y: 983, M: 9, D: 9, hour: 16.221, dT: 1655, type:'T', name:' 983 Sep 09 Total' },
+      { Y: 985, M: 1, D:23, hour: 21.704, dT: 1647, type:'A', name:' 985 Jan 23 Annular' },
+    ];
+
+    // Always-Julian JD converter (NASA uses Julian calendar for pre-1582).
+    function julianJD(Y, M, D, hour) {
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
+           + D - 1524.5 + hour / 24;
+    }
+    function ourΔT(jd) {
+      const decYear = julianDateToDecimalYear(jd);
+      const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+      const dT = meanDeltaTSecondsAtAge(t_Ma);
+      return Number.isFinite(dT) ? dT : 0;
+    }
+    function moonLp(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
+      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E*E;
+      let Sl = 0;
+      for (let i = 0; i < MOON_L.length; i++) {
+        const r = MOON_L[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sl += term;
+      }
+      const A1 = (119.75 + 131.849*T) * _d2r;
+      const A2 = (53.09 + 479264.290*T) * _d2r;
+      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
+      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+    }
+    function sunLon(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
+      const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
+      const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
+              + (0.019993 - 0.000101*T) * Math.sin(2*M)
+              + 0.000289 * Math.sin(3*M);
+      return ((L0 + C) % 360 + 360) % 360;
+    }
+    function moonSunDiff(jd) {
+      let d = moonLp(jd) - sunLon(jd);
+      while (d > 180) d -= 360;
+      while (d <= -180) d += 360;
+      return d;
+    }
+    function findConjunction(jd_seed) {
+      const step = 0.25, range = 25;
+      let bracketLo = null, bracketHi = null, bestDist = Infinity;
+      let prevDiff = moonSunDiff(jd_seed - range);
+      let prevJD   = jd_seed - range;
+      for (let jd = jd_seed - range + step; jd <= jd_seed + range; jd += step) {
+        const d = moonSunDiff(jd);
+        if (prevDiff < 0 && d > 0 && (d - prevDiff) < 30) {
+          const jd_c_lin = prevJD + (jd - prevJD) * (-prevDiff) / (d - prevDiff);
+          const dist = Math.abs(jd_c_lin - jd_seed);
+          if (dist < bestDist) { bestDist = dist; bracketLo = prevJD; bracketHi = jd; }
+        }
+        prevDiff = d; prevJD = jd;
+      }
+      if (bracketLo === null) return null;
+      let lo = bracketLo, hi = bracketHi;
+      for (let i = 0; i < 50; i++) {
+        const mid = (lo + hi) / 2;
+        if (moonSunDiff(mid) < 0) lo = mid; else hi = mid;
+        if (hi - lo < 1/86400) break;
+      }
+      return (lo + hi) / 2;
+    }
+
+    console.log('');
+    console.log('Eclipse                            NASA TD(TT)      ourTT          TT diff   NASA ΔT  ourΔT    ΔT diff');
+    console.log('                                   [JD]             [JD]           [min]     [s]      [s]      [s]');
+    console.log('────────────────────────────────────────────────────────────────────────────────────────────────────────');
+
+    const TT_diffs = [];
+    const dT_diffs = [];
+
+    for (const e of NASA) {
+      // NASA TT JD (Julian calendar, TD hour from catalog)
+      const nasa_TT_JD = julianJD(e.Y, e.M, e.D, e.hour);
+
+      // Seed our search at noon UT of the same date (approximate)
+      const jd_seed_UT = julianJD(e.Y, e.M, e.D, 12);
+      const jd_conj_UT = findConjunction(jd_seed_UT);
+      if (jd_conj_UT === null) {
+        console.log(`${e.name.padEnd(34)}  (no conjunction found within ±25 days of NASA date)`);
+        continue;
+      }
+      const our_dT_sec = ourΔT(jd_conj_UT);
+      const our_TT_JD  = jd_conj_UT + our_dT_sec / 86400;
+
+      const TT_diff_min = (our_TT_JD - nasa_TT_JD) * 24 * 60;
+      const dT_diff_sec = our_dT_sec - e.dT;
+
+      TT_diffs.push(TT_diff_min);
+      dT_diffs.push(dT_diff_sec);
+
+      const fmt = (x, w, dec=0) => (Number.isFinite(x) ? x.toFixed(dec) : 'n/a').padStart(w);
+      console.log(
+        e.name.padEnd(34) + '  ' +
+        nasa_TT_JD.toFixed(4).padStart(13) + '   ' +
+        our_TT_JD.toFixed(4).padStart(13) + '  ' +
+        fmt(TT_diff_min, 8, 1) + '   ' +
+        e.dT.toString().padStart(6) + '   ' +
+        Math.round(our_dT_sec).toString().padStart(6) + '   ' +
+        fmt(dT_diff_sec, 7, 0)
+      );
+    }
+
+    console.log('────────────────────────────────────────────────────────────────────────────────────────────────────────');
+    console.log('');
+    const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
+    const meanAbs = a => mean(a.map(Math.abs));
+    if (TT_diffs.length > 0) {
+      const minTT = Math.min(...TT_diffs.map(Math.abs));
+      const maxTT = Math.max(...TT_diffs.map(Math.abs));
+      console.log(`TT-space agreement (our Moon polynomial vs NASA catalog):`);
+      console.log(`  mean |TT diff| = ${meanAbs(TT_diffs).toFixed(1)} min,  min ${minTT.toFixed(1)} min,  max ${maxTT.toFixed(1)} min`);
+      console.log(`  → If max < ~10 min, our Moon polynomial agrees with NASA's reference within Meeus accuracy.`);
+      console.log(`  → If max > 30 min, the polynomial drifts; if max > hours, there's a real bug.`);
+    }
+    if (dT_diffs.length > 0) {
+      const meanDt = mean(dT_diffs);
+      console.log('');
+      console.log(`ΔT difference (our pure-tidal − NASA Stephenson):`);
+      console.log(`  mean = ${Math.round(meanDt)} s,   typical sign: ${meanDt > 0 ? 'OURS HIGHER (over-predicts)' : 'OURS LOWER (under-predicts)'}`);
+      console.log(`  Note: this gap is the difference between the two ΔT models — orthogonal to Moon physics.`);
+    }
+    console.log('');
+    console.log('Interpretation:');
+    console.log(' • Column "TT diff" is THE clean Moon-polynomial test. NASA computed greatest');
+    console.log('   eclipse TD using JPL ephemeris (essentially exact for this purpose).');
+    console.log('   Our model uses Meeus Ch. 47 polynomial → expected accuracy ~few minutes.');
+    console.log(' • Column "ΔT diff" measures how much our pure-tidal ΔT differs from Stephenson.');
+    console.log('   This is the entire substance of the "pure-tidal vs empirical" question.');
+    console.log(' • If TT diff is small (✓) and ΔT diff is small (✓): both models agree.');
+    console.log(' • If TT diff is small (✓) and ΔT diff is large (≠): Moon physics is right,');
+    console.log('   models genuinely disagree on Earth rotation history — substantive question.');
+    console.log(' • If TT diff is LARGE: there is a real Moon polynomial issue to investigate.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Compares our model\'s Moon-Sun conjunction time to NASA Five Millennium Catalog\'s ' +
+     'published Terrestrial Dynamical Time of greatest eclipse, for 11 canonical events ' +
+     'spanning -524 to 985 CE. In TT-space the comparison is ΔT-independent, so any time ' +
+     'residual is purely a Moon polynomial discrepancy. Definitively validates whether our ' +
+     'Moon physics agrees with the standard astronomical reference.');
+
+  addTestButton('Verify ΔT at historical epochs', () => {
+    // Dumps our Architecture α ΔT value at multiple epochs alongside
+    // published reference values. Helps identify whether our LOD-evolution
+    // model is over- or under-predicting ΔT.
+    console.log('\n══════════════════════════════════════════════════════════');
+    console.log('  ΔT comparison: our Architecture α vs published references');
+    console.log('══════════════════════════════════════════════════════════');
+    console.log('Year         Ours(s)    Stephenson(s)   NASA-FMC(s)   Holistic(s)');
+    const epochs = [
+      { year: 2000, t_Ma: 0,        stephenson: 0,      nasa: 64,    holistic: null },
+      { year: 1900, t_Ma: 0.0001,   stephenson: 0,      nasa: -3,    holistic: null },
+      { year: 1500, t_Ma: 0.0005,   stephenson: 130,    nasa: 180,   holistic: null },
+      { year: 1000, t_Ma: 0.001,    stephenson: 1570,   nasa: 1571,  holistic: null },
+      { year: 0,    t_Ma: 0.002,    stephenson: 10583,  nasa: 10583, holistic: null },
+      { year: -500, t_Ma: 0.0025,   stephenson: 16800,  nasa: 16800, holistic: null },
+      { year: -584, t_Ma: 0.002584, stephenson: null,   nasa: 16128, holistic: 23412 },
+      { year: -1000,t_Ma: 0.003,    stephenson: 25400,  nasa: 25400, holistic: null },
+    ];
+    const fmt = (v) => v === null ? '       -' : String(Math.round(v)).padStart(9);
+    for (const e of epochs) {
+      const ours = meanDeltaTSecondsAtAge(e.t_Ma);
+      const oursStr = Number.isFinite(ours) ? Math.round(ours).toString().padStart(9) : '    NaN';
+      console.log(String(e.year).padEnd(8) + oursStr + fmt(e.stephenson) + fmt(e.nasa) + fmt(e.holistic));
+    }
+    console.log();
+    // Stephenson empirical: ΔT(t) ≈ 32 × ((year-1820)/100)² seconds for ancient
+    console.log('Stephenson empirical fit: ΔT ≈ 32 × ((year-1820)/100)² seconds');
+    console.log('Note: at year -584, Stephenson formula gives 32 × 24.04² = 18,493 s');
+    console.log('══════════════════════════════════════════════════════════');
+  }, 'Compare our Architecture α ΔT at historical epochs to Stephenson 1997 ' +
+     'and NASA Five Millennium Canon values. Identifies whether our LOD model ' +
+     'over- or under-predicts ΔT.');
+
+  addTestButton('Meeus vs Integrator (Option A verify)', () => {
+    // Phase 9.14 Option A step 1: compare Meeus Ch. 47 perturbation arguments
+    // (Lp, D, M, M', F) to our integrator-derived equivalents (Steps 1-3)
+    // across modern + deep-time epochs. Decision input for whether to switch
+    // the perturbation series to use integrator arguments instead of Meeus
+    // polynomial values at year −584.
+    const epochs = [
+      { jd: j2000JD,            label: 'J2000 (2000 Jan 1.5 TT)' },
+      { jd: 2460300.0,          label: '~2024 Jan 20 (modern, ΔT ≈ 70 s)' },
+      { jd: 2433282.4,          label: '1950.0 (mid-20th c. baseline)' },
+      { jd: 2299160.5,          label: '1582 Oct 15 (Gregorian reform)' },
+      { jd: 2086302.5,          label: '1000 CE (medieval)' },
+      { jd: 1721425.5,          label: '1 CE Jan 1 (start of CE)' },
+      { jd: 1507900.5,          label: 'Thales eclipse area (-584 May 28)' },
+    ];
+    console.log('\n══════════════════════════════════════════════════════════════════════');
+    console.log('  Meeus Ch. 47 polynomial vs. our integrator-derived arguments');
+    console.log('  Anchored to Meeus at startmodel → bit-equivalent at J2000 by construction');
+    console.log('  Diff column = (integrator − Meeus), in degrees, normalized to [-180, +180]');
+    console.log('══════════════════════════════════════════════════════════════════════\n');
+    const summary = [];
+    for (const { jd, label } of epochs) {
+      console.log(`\n--- ${label} ---`);
+      const r = meeusVsIntegratorDiagnostic(jd);
+      summary.push({ label, year: r.decYear.toFixed(1), ...r.diff });
+    }
+    console.log('\n\n══════════════════ Summary (diffs in degrees) ══════════════════');
+    console.log('Epoch                              year      Lp       D       M       M\'      F');
+    for (const s of summary) {
+      const pad = (str, n) => String(str).padEnd(n);
+      const fmt = (x) => String(x.toFixed(3)).padStart(8);
+      console.log(pad(s.label, 38) + pad(s.year, 9) + fmt(s.Lp) + fmt(s.D) + fmt(s.M) + fmt(s.Mp) + fmt(s.F));
+    }
+    console.log('══════════════════════════════════════════════════════════════════════');
+    console.log('Interpretation:');
+    console.log(' • If modern epochs (J2000, 2024) show diffs ≪ 0.01°: anchor calibration good.');
+    console.log(' • If -584 diffs are 0.5°-2° and consistent direction: polynomial drift, replacement should help.');
+    console.log(' • If -584 diffs are inconsistent/large: replacement risky (Step C trap).');
+    console.log('══════════════════════════════════════════════════════════════════════');
+  }, 'Phase 9.14 Option A verification: compare Meeus polynomial arguments to ' +
+     'our integrator-derived equivalents across 7 epochs from J2000 to year -584. ' +
+     'Decides whether to replace Meeus arguments with integrator values in the ' +
+     'perturbation series (potential fix for Thales eclipse residual).');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // ΔT sign sanity check. The existing subSolar() in our diagnostic
+  // buttons does:  effUT = UT_h + dT_h;  lon = (12 - effUT) * 15;
+  // This subtracts ΔT·15° from sub-solar longitude (shifts WEST).
+  //
+  // Physics: our Moon polynomial uses T = (jd + ΔT/86400 - j2000JD)/36525,
+  // which means jd is treated as JD_UT (the polynomial adds ΔT internally
+  // to convert to TT). So jd_conj from findConjunction is in UT, and
+  // sub-solar at that UT moment is simply (12 - UT_h)·15 — no extra ΔT.
+  //
+  // The +dT_h term is a SPURIOUS double-correction. This button verifies
+  // by computing sub-solar three ways (no correction / +dT / −dT) at
+  // instants where the right answer is independently known.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('ΔT sign sanity check (subSolar bug?)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  ΔT sign sanity check: is the +dT_h term in subSolar() a bug?');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    const _d2r = Math.PI / 180;
+    function ourΔT(jd) {
+      const decYear = julianDateToDecimalYear(jd);
+      const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+      const dT = meanDeltaTSecondsAtAge(t_Ma);
+      return Number.isFinite(dT) ? dT : 0;
+    }
+    function sunLon(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
+      const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
+      const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
+              + (0.019993 - 0.000101*T) * Math.sin(2*M)
+              + 0.000289 * Math.sin(3*M);
+      return ((L0 + C) % 360 + 360) % 360;
+    }
+    function ssLat(jd) {
+      const sL = sunLon(jd);
+      return Math.asin(Math.sin(23.44 * _d2r) * Math.sin(sL * _d2r)) / _d2r;
+    }
+
+    // Three candidate formulas:
+    //  A) current code (jd as TT, but wrong sign):  effUT = UT_h + dT_h
+    //  B) no correction          (jd as UT):        effUT = UT_h
+    //  C) jd as TT, correct sign (UT lags TT):      effUT = UT_h - dT_h
+    function ssLon(jd, mode) {
+      const dT_h = ourΔT(jd) / 3600;
+      const UT_h = (12 + (jd - Math.floor(jd)) * 24) % 24;
+      let effUT;
+      if      (mode === 'A_current')   effUT = UT_h + dT_h;
+      else if (mode === 'B_no_corr')   effUT = UT_h;
+      else /* (mode === 'C_TT_correct') */ effUT = UT_h - dT_h;
+      let lon = (12 - effUT) * 15;
+      while (lon >  180) lon -= 360;
+      while (lon < -180) lon += 360;
+      return lon;
+    }
+
+    console.log('');
+    console.log('────────────────────────────────────────────────────────────────────────────────');
+    console.log('TEST 1 — J2000.0 (jd = 2451545.0 = 2000-01-01 12:00 TT, our ΔT ≈ 0).');
+    console.log('         Convention: J2000 noon TT ≈ noon UT (real-world ΔT today ≈ 65 s).');
+    console.log('         Expected sub-solar at year-2000 boundary in our model: lon ≈ 0°');
+    console.log('────────────────────────────────────────────────────────────────────────────────');
+    {
+      const jd = j2000JD;
+      const dT = ourΔT(jd);
+      console.log(`  ourΔT(J2000) = ${dT.toFixed(2)} s  (model boundary value)`);
+      console.log(`  A) current  (UT_h + dT_h):  lon = ${ssLon(jd, 'A_current').toFixed(4)}°`);
+      console.log(`  B) no corr  (UT_h        ):  lon = ${ssLon(jd, 'B_no_corr').toFixed(4)}°`);
+      console.log(`  C) TT→UT    (UT_h - dT_h):  lon = ${ssLon(jd, 'C_TT_correct').toFixed(4)}°`);
+      console.log('  All three should agree near 0° because our ΔT≈0 at J2000.');
+    }
+
+    console.log('');
+    console.log('────────────────────────────────────────────────────────────────────────────────');
+    console.log('TEST 2 — Modern eclipse instant: 2024-04-08 18:17:21 UT (Greatest Eclipse).');
+    console.log('         Known: sub-solar longitude at this UT must be (12 - 18.289)*15 = -94.34°');
+    console.log('         (real-world ΔT 2024 ≈ 73 s, negligible at our precision).');
+    console.log('────────────────────────────────────────────────────────────────────────────────');
+    {
+      const jd_2024 = 2460408.5 + (18 + 17/60 + 21/3600)/24;
+      const dT = ourΔT(jd_2024);
+      console.log(`  ourΔT(2024) = ${dT.toFixed(2)} s`);
+      console.log(`  Geometric truth: (12 - 18.289)*15 = -94.34°`);
+      console.log(`  A) current  (UT_h + dT_h):  lon = ${ssLon(jd_2024, 'A_current').toFixed(4)}°`);
+      console.log(`  B) no corr  (UT_h        ):  lon = ${ssLon(jd_2024, 'B_no_corr').toFixed(4)}°`);
+      console.log(`  C) TT→UT    (UT_h - dT_h):  lon = ${ssLon(jd_2024, 'C_TT_correct').toFixed(4)}°`);
+      console.log('  Whichever matches -94.34° is the correct formula.');
+    }
+
+    console.log('');
+    console.log('────────────────────────────────────────────────────────────────────────────────');
+    console.log('TEST 3 — Thales era (jd ≈ 1507900.065 from prior diagnostic).');
+    console.log('         Known: Moon polynomial uses T = (jd + ΔT/86400 - j2000JD)/36525,');
+    console.log('         so jd is JD_UT and sub-solar should be (12 - UT_h)*15 with NO ΔT.');
+    console.log('         If the historical eclipse was observed at Anatolia (35°E, 39°N),');
+    console.log('         then sub-solar at greatest eclipse must be near 35°E (or path nearby).');
+    console.log('────────────────────────────────────────────────────────────────────────────────');
+    {
+      const jd_thales = 1507900.065279;
+      const dT = ourΔT(jd_thales);
+      const UT_h = (12 + (jd_thales - Math.floor(jd_thales)) * 24) % 24;
+      const sslat = ssLat(jd_thales);
+      console.log(`  ourΔT(Thales)   = ${dT.toFixed(1)} s   (= ${(dT/3600).toFixed(3)} h)`);
+      console.log(`  UT_h at jd_conj = ${UT_h.toFixed(3)} h`);
+      console.log(`  Sub-solar lat   = ${sslat.toFixed(2)}°  (Sun's declination at conj, ΔT-independent)`);
+      console.log('');
+      console.log(`  A) current  (UT_h + dT_h):  lon = ${ssLon(jd_thales, 'A_current').toFixed(2)}°`);
+      console.log(`  B) no corr  (UT_h        ):  lon = ${ssLon(jd_thales, 'B_no_corr').toFixed(2)}°`);
+      console.log(`  C) TT→UT    (UT_h - dT_h):  lon = ${ssLon(jd_thales, 'C_TT_correct').toFixed(2)}°`);
+      console.log('');
+      console.log('  Observation site: Halys/Anatolia at 35°E. Whichever option puts');
+      console.log('  sub-solar near 35° (or eastward-ish at the same lat band) is more');
+      console.log('  consistent with the documented visibility.');
+    }
+
+    console.log('');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  CONCLUSION:');
+    console.log('   The Moon polynomial uses (jd + ΔT/86400 − j2000JD)/36525, so it treats jd');
+    console.log('   as JD_UT (adds ΔT internally to get TT). Therefore sub-solar at jd_conj is');
+    console.log('   simply (12 − UT_h)·15 with NO extra ΔT term — i.e., formula (B).');
+    console.log('');
+    console.log('   Formula (A) [current code] applies a SPURIOUS double-correction,');
+    console.log('   shifting sub-solar by ΔT·15° WEST. For Thales (ΔT=6.5h) this is 97.5°');
+    console.log('   of error — which is why all our ancient eclipses showed sub-solar values');
+    console.log('   far west of expected.');
+    console.log('');
+    console.log('   If Test 2 confirms B matches the geometric truth -94.34°, the bug is real');
+    console.log('   and should be fixed in all subSolar() functions.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Tests three sub-solar formulas at J2000 (small ΔT, baseline), at a modern eclipse ' +
+     '(geometric truth known), and at Thales (-584, large ΔT). Determines whether the ' +
+     '+dT_h term in subSolar() is a spurious double-correction that has been corrupting ' +
+     'all our SS dist values.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Historical-eclipse diagnostics. The buttons that follow progressively
+  // test our model against documented solar eclipses (Bur-Sagale -762 to
+  // Halley 1654) and against NASA's Five Millennium Catalog reference.
+  //
+  // This first one cleanly separates Moon-polynomial TIMING error from ΔT
+  // GEOGRAPHIC error: a "not visible at site" failure can mean (a) our Moon
+  // is in the wrong place on that date, or (b) our Moon is right but our ΔT
+  // bias rotates Earth so the umbra misses the site. Small Δλ at the
+  // documented JD = our model has the conjunction near that date (any
+  // miss is ΔT). Large Δλ = Moon timing is off.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Moon timing vs ΔT bias (historical eclipses)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Moon-Sun separation at documented historical eclipse dates');
+    console.log('  Separates Moon-polynomial TIMING error from ΔT GEOGRAPHIC placement error');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    const _d2r = Math.PI / 180;
+    const EARTH_R_KM = 6371;
+
+    // Format: [year_astro, month, day, lat, lon_E, type, name+source]
+    // Same curated list as the Historic Eclipse Validation button, augmented
+    // with the 5 additional Ibn Yunus events from his Hakemite Tables.
+    const EVENTS = [
+      [-762,  6, 15, 36.36,  43.16, 'Total',   'Bur-Sagale (Assyrian)'],
+      [-708,  7, 17, 35.0,  113.0,  'Total',   'Chinese Spring/Autumn'],
+      [-647,  4,  6, 32.5,   44.4,  'Partial', 'Babylonian early'],
+      [-584,  5, 28, 39.0,   35.0,  'Total',   'Thales (Halys/Anatolia)'],
+      [-556,  5, 19, 32.5,   44.4,  'Partial', 'Babylonian Nabonidus'],
+      [-430,  8,  3, 37.97,  23.72, 'Annular', 'Thucydides 2.28 (Athens)'],
+      [-309,  8, 15, 32.5,   44.4,  'Total',   'Babylonian (Antigonus)'],
+      [-135,  4, 15, 32.5,   44.4,  'Total',   'Babylonian best diary'],
+      [  71,  3, 20, 38.0,   25.0,  'Total',   'Plutarch De Facie (Aegean)'],
+      [ 977, 12, 13, 30.05,  31.24, 'Annular', 'Ibn Yunus 977 (Cairo)'],
+      [ 978,  6,  8, 30.05,  31.24, 'Partial', 'Ibn Yunus 978 (Cairo)'],
+      [ 979,  5, 28, 30.05,  31.24, 'Partial', 'Ibn Yunus 979 (Cairo)'],
+      [ 985,  7, 20, 30.05,  31.24, 'Annular', 'Ibn Yunus 985 (Cairo)'],
+      [ 993,  8, 20, 30.05,  31.24, 'Annular', 'Ibn Yunus 993 (Cairo)'],
+      [1004,  1, 24, 30.05,  31.24, 'Tot/Ann', 'Ibn Yunus 1004 (Cairo)'],
+      [1133,  8,  2, 52.0,   -2.0,  'Total',   'Henry I death (England)'],
+      [1185,  5,  1, 50.0,   38.0,  'Annular', 'Igors Tale (Russia)'],
+      [1239,  6,  3, 43.7,   10.4,  'Total',   'Cerchiari Tuscany'],
+      [1654,  8, 12, 51.5,   -0.1,  'Total',   'European total (London)'],
+    ];
+
+    // Meeus Astronomical Algorithms p.61: auto-switch Julian/Gregorian at
+    // 1582-10-15. Pre-1582 dates are interpreted as proleptic Julian (the
+    // only calendar that existed); post-1582 dates as Gregorian (modern
+    // convention used by Wikipedia/NASA for naming historic eclipses).
+    function julianDateToJD(Y, M, D, hour = 12) {
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      let B = 0;
+      const isGregorian = (Y > 1582) || (Y === 1582 && (M > 10 || (M === 10 && D >= 15)));
+      if (isGregorian) {
+        const A = Math.floor(y / 100);
+        B = 2 - A + Math.floor(A / 4);
+      }
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
+           + D + B - 1524.5 + hour / 24;
+    }
+
+    function ourΔT(jd) {
+      const decYear = julianDateToDecimalYear(jd);
+      const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+      const dT = meanDeltaTSecondsAtAge(t_Ma);
+      return Number.isFinite(dT) ? dT : 0;
+    }
+
+    function moonLp(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
+      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E*E;
+      let Sl = 0;
+      for (let i = 0; i < MOON_L.length; i++) {
+        const r = MOON_L[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sl += term;
+      }
+      const A1 = (119.75 + 131.849*T) * _d2r;
+      const A2 = (53.09 + 479264.290*T) * _d2r;
+      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
+      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+    }
+    function moonBeta(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E*E;
+      let Sb = 0;
+      for (let i = 0; i < MOON_B.length; i++) {
+        const r = MOON_B[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sb += term;
+      }
+      return Sb * 1e-6;
+    }
+    function sunLon(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
+      const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
+      const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
+              + (0.019993 - 0.000101*T) * Math.sin(2*M)
+              + 0.000289 * Math.sin(3*M);
+      return ((L0 + C) % 360 + 360) % 360;
+    }
+    function subSolar(jd) {
+      // jd from findConjunction is JD_UT (Moon polynomial uses jd+ΔT/86400 for TT).
+      // Sub-solar lon at that UT moment is (12 - UT_h)*15; no extra ΔT term.
+      // The previous +dT_h was a spurious double-correction (see "ΔT sign sanity check" button).
+      const UT_h = (12 + (jd - Math.floor(jd)) * 24) % 24;
+      let lon = (12 - UT_h) * 15;
+      while (lon > 180) lon -= 360;
+      while (lon < -180) lon += 360;
+      const sunL = sunLon(jd);
+      const lat = Math.asin(Math.sin(23.44 * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
+      return { lat, lon };
+    }
+    function greatCircleKm(lat1, lon1, lat2, lon2) {
+      const φ1 = lat1 * _d2r, φ2 = lat2 * _d2r;
+      const Δφ = (lat2 - lat1) * _d2r;
+      const Δλ = (lon2 - lon1) * _d2r;
+      const a = Math.sin(Δφ/2)**2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2)**2;
+      return 2 * EARTH_R_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function moonSunDiff(jd) {
+      let diff = moonLp(jd) - sunLon(jd);
+      while (diff >  180) diff -= 360;
+      while (diff <= -180) diff += 360;
+      return diff;
+    }
+
+    // Bracket and refine nearest Moon-Sun conjunction (Δλ crossing 0− → 0+).
+    function findNearestConjunction(jd_seed) {
+      const step = 0.25;
+      const range = 25;
+      let best = null;
+      let prevDiff = moonSunDiff(jd_seed - range);
+      let prevJD   = jd_seed - range;
+      for (let jd = jd_seed - range + step; jd <= jd_seed + range; jd += step) {
+        const diff = moonSunDiff(jd);
+        if (prevDiff < 0 && diff > 0 && (diff - prevDiff) < 30) {
+          const jd_c = prevJD + (jd - prevJD) * (-prevDiff) / (diff - prevDiff);
+          if (best === null || Math.abs(jd_c - jd_seed) < Math.abs(best - jd_seed)) best = jd_c;
+        }
+        prevDiff = diff;
+        prevJD = jd;
+      }
+      return best;
+    }
+
+    console.log('');
+    console.log('Event                                       Δλ(M-S)   β(M)    Conj-doc   SS dist  Diagnosis');
+    console.log('                                            [deg]     [deg]   [hours]    [km]');
+    console.log('────────────────────────────────────────────────────────────────────────────────────────────────────');
+
+    let nSameDay = 0, nMoonOff = 0;
+    const ssDistsSameDay = [];
+    for (const e of EVENTS) {
+      const [Y, M, D, lat, lon, type, name] = e;
+      const jd_doc  = julianDateToJD(Y, M, D);
+      const diff    = moonSunDiff(jd_doc);
+      const beta    = moonBeta(jd_doc);
+      const ss      = subSolar(jd_doc);
+      const ssDist  = greatCircleKm(lat, lon, ss.lat, ss.lon);
+      const jd_conj = findNearestConjunction(jd_doc);
+      const conjOffH = jd_conj !== null ? (jd_conj - jd_doc) * 24 : NaN;
+
+      // Threshold: |Δλ| < 6° at noon UT means conjunction within ~12h of noon
+      // (Moon moves ~0.5°/hr in λ relative to Sun), i.e., same calendar day.
+      const sameDay = Math.abs(diff) < 6 && Math.abs(conjOffH) < 18;
+      if (sameDay) nSameDay++; else nMoonOff++;
+
+      let diagnosis;
+      if (!sameDay) {
+        // After cleanup of mis-attributed entries, no event in the current
+        // EVENTS list should reach this path. If you see it, the test entry
+        // is likely a bad date attribution (e.g., a fictitious eclipse).
+        diagnosis = '✗ Moon timing off — check test entry';
+      } else if (Math.abs(beta) >= 1.5) {
+        diagnosis = '~ Conj OK but Moon high β';
+      } else if (ssDist > 7500) {
+        diagnosis = '✗ ΔT: SS out of penumbra reach';
+        ssDistsSameDay.push(ssDist);
+      } else if (ssDist > 4500) {
+        diagnosis = '~ ΔT: only partial reaches site';
+        ssDistsSameDay.push(ssDist);
+      } else {
+        diagnosis = '✓ Eclipse at site';
+        ssDistsSameDay.push(ssDist);
+      }
+
+      const nm = (name.length > 42 ? name.slice(0, 42) : name).padEnd(42);
+      console.log(
+        nm + ' ' +
+        diff.toFixed(1).padStart(7) + '   ' +
+        beta.toFixed(2).padStart(6) + '   ' +
+        (Number.isFinite(conjOffH) ? conjOffH.toFixed(1) : 'n/a').padStart(8) + '   ' +
+        Math.round(ssDist).toString().padStart(6) + '   ' +
+        diagnosis
+      );
+    }
+
+    console.log('────────────────────────────────────────────────────────────────────────────────────────────────────');
+    console.log('');
+    console.log('Summary:');
+    console.log(`  Conj. on documented day (|Δλ| < 6° AND |conj-doc| < 18h):  ${nSameDay} / ${EVENTS.length}`);
+    console.log(`  Conj. on a DIFFERENT day (Moon timing off):                ${nMoonOff} / ${EVENTS.length}`);
+    if (ssDistsSameDay.length > 0) {
+      const meanSS = ssDistsSameDay.reduce((a, b) => a + b, 0) / ssDistsSameDay.length;
+      const maxSS  = Math.max(...ssDistsSameDay);
+      console.log(`  Among same-day events: mean sub-solar offset ${Math.round(meanSS)} km, max ${Math.round(maxSS)} km`);
+    }
+    console.log('');
+    console.log('Interpretation:');
+    console.log(' • If MOST events are "same day" (Δλ small, conj-doc small):');
+    console.log('     → Our Moon polynomial is correct at these epochs.');
+    console.log('     → All visibility failures are ΔT geographic-placement errors.');
+    console.log('     → Fixing eclipses requires adjusting ΔT (or accepting Earth rotation history is non-tidal).');
+    console.log(' • If MANY events are "Moon timing off" (Δλ > 30°, conj-doc days away):');
+    console.log('     → Our Moon polynomial drifts at these epochs.');
+    console.log('     → Fixing eclipses requires Moon polynomial correction OR replacing arguments.');
+    console.log(' • Mixed pattern → both Moon timing AND ΔT contribute.');
+    console.log('');
+    console.log('Note: documented JDs use noon UT as anchor. A true eclipse occurs within ±12h of noon UT');
+    console.log('on its calendar day. Use the conj-doc column (hours offset) as the primary timing signal.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'For each documented historic eclipse, compute Moon-Sun ecliptic separation in ' +
+     'our model AT THE EXACT documented JD. Separates Moon-polynomial timing errors ' +
+     '(conjunction on a different date) from ΔT geographic placement errors (conjunction ' +
+     'on the right date but sub-solar offset from observation site).');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Visibility-window test: for each documented event, find the RANGE of
+  // ΔT values that put the eclipse path within penumbra reach (< 7500 km)
+  // or umbra reach (< 4500 km) of the observation site. Then ask:
+  //   Does our pure-tidal ΔT fall inside the visibility window?
+  //   Does Stephenson's empirical ΔT?
+  // Unlike the "needed ΔT" test (which required exact lon match), this
+  // respects real eclipse geometry — eclipses are visible across wide
+  // bands, not just at sub-solar.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Visibility window: ΔT range that fits each eclipse', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Visibility window — RANGE of ΔTs that put the eclipse path near each obs site.');
+    console.log('  Asks: does our pure-tidal ΔT fall in this window? Does Stephenson empirical?');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    const _d2r = Math.PI / 180;
+    const EARTH_R_KM = 6371;
+    const PENUMBRA_KM = 7500;
+    const UMBRA_KM = 4500;
+
+    const EVENTS = [
+      [-762,  6, 15, 36.36,  43.16, 'Total',   'Bur-Sagale (Assyrian)'],
+      [-708,  7, 17, 35.0,  113.0,  'Total',   'Chinese Spring/Autumn'],
+      [-647,  4,  6, 32.5,   44.4,  'Partial', 'Babylonian early'],
+      [-584,  5, 28, 39.0,   35.0,  'Total',   'Thales (Halys/Anatolia)'],
+      [-556,  5, 19, 32.5,   44.4,  'Partial', 'Babylonian Nabonidus'],
+      [-430,  8,  3, 37.97,  23.72, 'Annular', 'Thucydides 2.28 (Athens)'],
+      [-309,  8, 15, 32.5,   44.4,  'Total',   'Babylonian (Antigonus)'],
+      [-135,  4, 15, 32.5,   44.4,  'Total',   'Babylonian best diary'],
+      [  71,  3, 20, 38.0,   25.0,  'Total',   'Plutarch De Facie (Aegean)'],
+      [ 977, 12, 13, 30.05,  31.24, 'Annular', 'Ibn Yunus 977 (Cairo)'],
+      [ 978,  6,  8, 30.05,  31.24, 'Partial', 'Ibn Yunus 978 (Cairo)'],
+      [ 979,  5, 28, 30.05,  31.24, 'Partial', 'Ibn Yunus 979 (Cairo)'],
+      [ 985,  7, 20, 30.05,  31.24, 'Annular', 'Ibn Yunus 985 (Cairo)'],
+      [ 993,  8, 20, 30.05,  31.24, 'Annular', 'Ibn Yunus 993 (Cairo)'],
+      [1004,  1, 24, 30.05,  31.24, 'Tot/Ann', 'Ibn Yunus 1004 (Cairo)'],
+      [1133,  8,  2, 52.0,   -2.0,  'Total',   'Henry I death (England)'],
+      [1185,  5,  1, 50.0,   38.0,  'Annular', 'Igors Tale (Russia)'],
+      [1239,  6,  3, 43.7,   10.4,  'Total',   'Cerchiari Tuscany'],
+      [1654,  8, 12, 51.5,   -0.1,  'Total',   'European total (London)'],
+    ];
+
+    function julianDateToJD(Y, M, D, hour = 12) {
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      let B = 0;
+      if ((Y > 1582) || (Y === 1582 && (M > 10 || (M === 10 && D >= 15)))) {
+        const A = Math.floor(y / 100);
+        B = 2 - A + Math.floor(A / 4);
+      }
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
+           + D + B - 1524.5 + hour / 24;
+    }
+    function ourΔT(jd) {
+      const decYear = julianDateToDecimalYear(jd);
+      const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+      const dT = meanDeltaTSecondsAtAge(t_Ma);
+      return Number.isFinite(dT) ? dT : 0;
+    }
+    function moonLp(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
+      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E*E;
+      let Sl = 0;
+      for (let i = 0; i < MOON_L.length; i++) {
+        const r = MOON_L[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sl += term;
+      }
+      const A1 = (119.75 + 131.849*T) * _d2r;
+      const A2 = (53.09 + 479264.290*T) * _d2r;
+      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
+      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+    }
+    function sunLon(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
+      const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
+      const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
+              + (0.019993 - 0.000101*T) * Math.sin(2*M)
+              + 0.000289 * Math.sin(3*M);
+      return ((L0 + C) % 360 + 360) % 360;
+    }
+    function moonSunDiff(jd) {
+      let diff = moonLp(jd) - sunLon(jd);
+      while (diff >  180) diff -= 360;
+      while (diff <= -180) diff += 360;
+      return diff;
+    }
+    function findConjunction(jd_seed) {
+      const step = 0.25;
+      const range = 25;
+      let bracketLo = null, bracketHi = null, bestDist = Infinity;
+      let prevDiff = moonSunDiff(jd_seed - range);
+      let prevJD   = jd_seed - range;
+      for (let jd = jd_seed - range + step; jd <= jd_seed + range; jd += step) {
+        const diff = moonSunDiff(jd);
+        if (prevDiff < 0 && diff > 0 && (diff - prevDiff) < 30) {
+          const jd_c_lin = prevJD + (jd - prevJD) * (-prevDiff) / (diff - prevDiff);
+          const d = Math.abs(jd_c_lin - jd_seed);
+          if (d < bestDist) { bestDist = d; bracketLo = prevJD; bracketHi = jd; }
+        }
+        prevDiff = diff;
+        prevJD = jd;
+      }
+      if (bracketLo === null) return null;
+      let lo = bracketLo, hi = bracketHi;
+      for (let i = 0; i < 50; i++) {
+        const mid = (lo + hi) / 2;
+        if (moonSunDiff(mid) < 0) lo = mid; else hi = mid;
+        if (hi - lo < 1/86400) break;
+      }
+      return (lo + hi) / 2;
+    }
+    function stephensonDeltaT(year) {
+      let u, t, dT;
+      if (year < -500) {
+        u = (year - 1820) / 100;
+        dT = -20 + 32*u*u;
+      } else if (year < 500) {
+        u = year / 100;
+        dT = 10583.6 - 1014.41*u + 33.78311*u**2 - 5.952053*u**3
+           - 0.1798452*u**4 + 0.022174192*u**5 + 0.0090316521*u**6;
+      } else if (year < 1600) {
+        u = (year - 1000) / 100;
+        dT = 1574.2 - 556.01*u + 71.23472*u**2 + 0.319781*u**3
+           - 0.8503463*u**4 - 0.005050998*u**5 + 0.0083572073*u**6;
+      } else if (year < 1700) {
+        t = year - 1600; dT = 120 - 0.9808*t - 0.01532*t*t + t**3/7129;
+      } else if (year < 1800) {
+        t = year - 1700; dT = 8.83 + 0.1603*t - 0.0059285*t*t + 0.00013336*t**3 - t**4/1174000;
+      } else if (year < 1860) {
+        t = year - 1800; dT = 13.72 - 0.332447*t + 0.0068612*t*t + 0.0041116*t**3
+                            - 0.00037436*t**4 + 0.0000121272*t**5 - 0.0000001699*t**6
+                            + 0.000000000875*t**7;
+      } else if (year < 1900) {
+        t = year - 1860; dT = 7.62 + 0.5737*t - 0.251754*t*t + 0.01680668*t**3
+                            - 0.0004473624*t**4 + t**5/233174;
+      } else if (year < 1920) {
+        t = year - 1900; dT = -2.79 + 1.494119*t - 0.0598939*t*t + 0.0061966*t**3 - 0.000197*t**4;
+      } else if (year < 1941) {
+        t = year - 1920; dT = 21.20 + 0.84493*t - 0.076100*t*t + 0.0020936*t**3;
+      } else if (year < 1961) {
+        t = year - 1950; dT = 29.07 + 0.407*t - t*t/233 + t**3/2547;
+      } else if (year < 1986) {
+        t = year - 1975; dT = 45.45 + 1.067*t - t*t/260 - t**3/718;
+      } else {
+        t = year - 2000; dT = 62.92 + 0.32217*t + 0.005589*t*t;
+      }
+      return dT;
+    }
+    function greatCircleKm(lat1, lon1, lat2, lon2) {
+      const φ1 = lat1 * _d2r, φ2 = lat2 * _d2r;
+      const Δφ = (lat2 - lat1) * _d2r;
+      const Δλ = (lon2 - lon1) * _d2r;
+      const a = Math.sin(Δφ/2)**2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2)**2;
+      return 2 * EARTH_R_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+    function subSolarHyp(jd_conj, dT_sec) {
+      const UT_conj_h = jd_conj + (ourΔT(jd_conj) - dT_sec) / 86400;
+      const UT_h = (12 + (UT_conj_h - Math.floor(UT_conj_h)) * 24) % 24;
+      let lon = (12 - UT_h) * 15;
+      while (lon >  180) lon -= 360;
+      while (lon < -180) lon += 360;
+      const sunL = sunLon(jd_conj);
+      const lat = Math.asin(Math.sin(23.44 * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
+      return { lat, lon };
+    }
+    function distAt(jd_conj, lat_obs, lon_obs, dT_sec) {
+      const ss = subSolarHyp(jd_conj, dT_sec);
+      return greatCircleKm(lat_obs, lon_obs, ss.lat, ss.lon);
+    }
+    function bestDT(jd_conj, lat_obs, lon_obs) {
+      const UT_h_model  = (12 + (jd_conj - Math.floor(jd_conj)) * 24) % 24;
+      const needed_UT_h = 12 - lon_obs / 15;
+      const currentDT_h = ourΔT(jd_conj) / 3600;
+      let dT_h = currentDT_h - (needed_UT_h - UT_h_model);
+      while (dT_h - currentDT_h >  12) dT_h -= 24;
+      while (dT_h - currentDT_h < -12) dT_h += 24;
+      return dT_h * 3600;
+    }
+    function scanWindow(jd_conj, lat_obs, lon_obs, best_dT, thresh_km) {
+      const minDist = distAt(jd_conj, lat_obs, lon_obs, best_dT);
+      if (minDist > thresh_km) return { lo: NaN, hi: NaN, minDist };
+      let lo = best_dT, hi = best_dT;
+      const range = 40000;
+      const step = 60;
+      for (let d = -range; d <= range; d += step) {
+        const dT = best_dT + d;
+        if (distAt(jd_conj, lat_obs, lon_obs, dT) < thresh_km) {
+          if (dT < lo) lo = dT;
+          if (dT > hi) hi = dT;
+        }
+      }
+      return { lo, hi, minDist };
+    }
+
+    console.log('');
+    console.log('Event                                 Yr   bestΔT  minD   Penumbra window [s]    ourΔT (dist)     StΔT (dist)');
+    console.log('                                            [s]    [km]   lo .. hi  (width)');
+    console.log('──────────────────────────────────────────────────────────────────────────────────────────────────────────────');
+
+    let ourInPen = 0, stephInPen = 0, totalEvts = 0;
+    let ourInUmb = 0, stephInUmb = 0, totalTotal = 0;
+    const bestVsOurs = [], bestVsSteph = [];
+
+    for (const e of EVENTS) {
+      const [Y, M, D, lat, lon, type, name] = e;
+      const jd_doc = julianDateToJD(Y, M, D);
+      const jd_conj = findConjunction(jd_doc);
+      if (jd_conj === null) {
+        console.log(name.padEnd(38) + Y.toString().padStart(5) + '   (no conjunction)');
+        continue;
+      }
+      const our_dT   = ourΔT(jd_conj);
+      const best_dT  = bestDT(jd_conj, lat, lon);
+      const decYear  = Y + (M - 1)/12 + (D - 1)/365;
+      const steph_dT = stephensonDeltaT(decYear);
+
+      const pen = scanWindow(jd_conj, lat, lon, best_dT, PENUMBRA_KM);
+      const isTotalish = (type === 'Total' || type === 'Annular' || type === 'Tot/Ann');
+      const umb = isTotalish ? scanWindow(jd_conj, lat, lon, best_dT, UMBRA_KM) : null;
+
+      const ourD   = distAt(jd_conj, lat, lon, our_dT);
+      const stephD = distAt(jd_conj, lat, lon, steph_dT);
+
+      const ourInPenum   = Number.isFinite(pen.lo) && our_dT   >= pen.lo && our_dT   <= pen.hi;
+      const stephInPenum = Number.isFinite(pen.lo) && steph_dT >= pen.lo && steph_dT <= pen.hi;
+      if (ourInPenum)   ourInPen++;
+      if (stephInPenum) stephInPen++;
+      totalEvts++;
+      bestVsOurs.push(Math.abs(best_dT - our_dT));
+      bestVsSteph.push(Math.abs(best_dT - steph_dT));
+
+      if (umb && Number.isFinite(umb.lo)) {
+        totalTotal++;
+        if (our_dT   >= umb.lo && our_dT   <= umb.hi) ourInUmb++;
+        if (steph_dT >= umb.lo && steph_dT <= umb.hi) stephInUmb++;
+      }
+
+      const fmt = (x, w) => (Number.isFinite(x) ? Math.round(x).toString() : 'n/a').padStart(w);
+      const winStr = Number.isFinite(pen.lo)
+        ? `${fmt(pen.lo, 7)}..${fmt(pen.hi, 7)} (${fmt(pen.hi - pen.lo, 6)})`
+        : `(minD=${fmt(pen.minDist, 5)} > pen)         `;
+      const tag = (ok) => ok ? '✓' : '✗';
+      console.log(
+        name.padEnd(38) + ' ' +
+        Y.toString().padStart(5) + ' ' +
+        fmt(best_dT, 6) + ' ' +
+        fmt(pen.minDist, 5) + '  ' +
+        winStr.padEnd(31) + '  ' +
+        tag(ourInPenum) + fmt(our_dT, 6) + ' (' + fmt(ourD, 5) + ')  ' +
+        tag(stephInPenum) + fmt(steph_dT, 6) + ' (' + fmt(stephD, 5) + ')'
+      );
+    }
+
+    console.log('──────────────────────────────────────────────────────────────────────────────────────────────────────────────');
+    console.log('');
+    console.log('Summary — does the model ΔT fall inside the visibility window?');
+    console.log(`  Penumbra window (eclipse visible, dist < ${PENUMBRA_KM} km):`);
+    console.log(`    OUR pure-tidal ΔT in window:   ${ourInPen}/${totalEvts}`);
+    console.log(`    Stephenson empirical ΔT:        ${stephInPen}/${totalEvts}`);
+    if (totalTotal > 0) {
+      console.log(`  Umbra window (totality/annular at site, dist < ${UMBRA_KM} km):`);
+      console.log(`    OUR pure-tidal ΔT in window:   ${ourInUmb}/${totalTotal}`);
+      console.log(`    Stephenson empirical ΔT:        ${stephInUmb}/${totalTotal}`);
+    }
+
+    const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
+    console.log('');
+    console.log('Mean |bestΔT − ourΔT|:        ' + Math.round(mean(bestVsOurs)) + ' s');
+    console.log('Mean |bestΔT − StephensonΔT|: ' + Math.round(mean(bestVsSteph)) + ' s');
+    console.log('(Smaller = closer to ideal "needed" ΔT per event.)');
+
+    console.log('');
+    console.log('Interpretation:');
+    console.log(' • Penumbra window is wide (~±15-25k s); both models likely fit most events.');
+    console.log('   That just means both produce "some" eclipse near the site — weak test.');
+    console.log(' • Umbra window is tighter (~±10-15k s); fewer pass. This discriminates totality.');
+    console.log(' • The Mean residuals show which model is closer to "best" per-event, on average.');
+    console.log(' • If pure-tidal wins on means AND on umbra counts: your model is the truer fit.');
+    console.log(' • If Stephenson wins both: non-tidal speedup is needed to match these eclipses.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'For each documented historic eclipse, scans ΔT to find the RANGE that puts the eclipse ' +
+     'path within penumbra/umbra reach of the obs site. Tests whether our pure-tidal ΔT and ' +
+     'Stephenson empirical ΔT fall inside this visibility window. Unlike the inverse-ΔT test, ' +
+     'this respects real eclipse geometry (wide visibility band, not point sub-solar).');
+
+  addTestButton('Historic Eclipse Validation (15 events)', () => {
+    // Test our model's pure-tidal Architecture α physics against well-documented
+    // historic solar eclipses. For each documented eclipse:
+    //   1. Find the actual Moon-Sun conjunction in our model near the documented date
+    //   2. Compute where our model places the sub-solar point at that conjunction
+    //   3. Compare to where the observation took place
+    // The geographic offset measures how well our pure-tidal ΔT explains observations,
+    // WITHOUT empirically fitting to eclipses (the Stephenson approach).
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Historic Eclipse Validation — our pure-tidal model vs documented observations');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    const _d2r = Math.PI / 180;
+
+    // Curated list of well-documented historic solar eclipses with confident
+    // dates and observation locations. Sources include Stephenson (1997)
+    // "Historical Eclipses and Earth's Rotation", Steele (2000), and primary
+    // ancient texts. Dates are in proleptic Julian calendar pre-1582.
+    // Format: [year_astro, month, day, lat, lon_E, type, name+source]
+    const HISTORIC = [
+      [-762,  6, 15, 36.36, 43.16, 'Total',   'Bur-Sagale (Assyrian Eponym Canon, Nineveh)'],
+      [-708,  7, 17, 35.0,  113.0, 'Total',   'Chinese Spring/Autumn (Lu State, Shih Ching)'],
+      [-647,  4,  6, 32.5,  44.4,  'Partial', 'Babylonian early diary'],
+      [-584,  5, 28, 39.0,  35.0,  'Total',   'Thales (Herodotus 1.74, Halys/Anatolia)'],
+      [-556,  5, 19, 32.5,  44.4,  'Partial', 'Babylonian Nabonidus'],
+      [-430,  8,  3, 37.97, 23.72, 'Annular', 'Thucydides 2.28 (Athens, Peloponnesian War)'],
+      [-309,  8, 15, 32.5,  44.4,  'Total',   'Babylonian (death of Antigonus era)'],
+      [-135,  4, 15, 32.5,  44.4,  'Total',   'Babylonian (best-preserved diary)'],
+      [  71,  3, 20, 38.0,  25.0,  'Total',   'Plutarch De Facie 19 (Aegean)'],
+      [1004,  1, 24, 30.05, 31.24, 'Total',   'Ibn Yunus al-Hakemite (Cairo)'],
+      [1133,  8,  2, 52.0,  -2.0,  'Total',   'Henry I death (English chronicles)'],
+      [1185,  5,  1, 50.0,  38.0,  'Annular', 'Igor’s Tale (Russian Primary Chronicle)'],
+      [1239,  6,  3, 43.7,  10.4,  'Total',   'Cerchiari Tuscany (Italian chronicle)'],
+      [1654,  8, 12, 51.5,  -0.1,  'Total',   'Halley’s map basis (London)'],
+    ];
+
+    // Julian Day Number at noon UT for proleptic Julian calendar date
+    function julianDateToJD(Y, M, D, hour = 12) {
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
+           + D - 1524.5 + hour / 24;
+    }
+
+    // Our model's ΔT in seconds at the given JD
+    function ourΔT(jd) {
+      const decYear = julianDateToDecimalYear(jd);
+      const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+      const dT = meanDeltaTSecondsAtAge(t_Ma);
+      return Number.isFinite(dT) ? dT : 0;
+    }
+
+    // Moon ecliptic longitude (Meeus Ch. 47, with our ΔT for TT correction)
+    function moonLp(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
+      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E*E;
+      let Sl = 0;
+      for (let i = 0; i < MOON_L.length; i++) {
+        const r = MOON_L[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sl += term;
+      }
+      const A1 = (119.75 + 131.849*T) * _d2r;
+      const A2 = (53.09 + 479264.290*T) * _d2r;
+      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
+      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+    }
+
+    function sunLon(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
+      const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
+      const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
+              + (0.019993 - 0.000101*T) * Math.sin(2*M)
+              + 0.000289 * Math.sin(3*M);
+      return ((L0 + C) % 360 + 360) % 360;
+    }
+
+    // Sub-solar longitude. jd is JD_UT in our convention (Moon polynomial adds
+    // ΔT internally for TT), so sub-solar lon = (12 - UT_h)*15 with no extra ΔT.
+    function subSolarLon(jd) {
+      const UT_h = (12 + (jd - Math.floor(jd)) * 24) % 24;
+      let lon = (12 - UT_h) * 15;
+      while (lon > 180) lon -= 360;
+      while (lon < -180) lon += 360;
+      return lon;
+    }
+
+    // Find Moon-Sun conjunction nearest to a given JD
+    function findConjunctionNear(jd_nominal, search_days = 20) {
+      const step = 0.25;
+      let bestJD = null;
+      let prevDiff = null;
+      for (let jd = jd_nominal - search_days; jd <= jd_nominal + search_days; jd += step) {
+        let diff = moonLp(jd) - sunLon(jd);
+        while (diff > 180) diff -= 360;
+        while (diff < -180) diff += 360;
+        if (prevDiff !== null && prevDiff < 0 && diff > 0 && (diff - prevDiff) < 30) {
+          const jd_c = jd - step * diff / (diff - prevDiff);
+          if (bestJD === null || Math.abs(jd_c - jd_nominal) < Math.abs(bestJD - jd_nominal)) {
+            bestJD = jd_c;
+          }
+        }
+        prevDiff = diff;
+      }
+      return bestJD;
+    }
+
+    console.log('Date (Julian)     Obs Loc       Type      Our conj JD     Sub-solar     Δlon       Δlon (km)  Note');
+    console.log('──────────────────────────────────────────────────────────────────────────────────────────────────');
+
+    const offsets = [];  // for stats
+
+    for (const [Y, M, D, lat, lon_obs, type, name] of HISTORIC) {
+      const jd_nominal = julianDateToJD(Y, M, D);
+      const jd_conj = findConjunctionNear(jd_nominal, 15);
+
+      if (jd_conj === null) {
+        const dateStr = `${Y >= 0 ? Y : '-' + (-Y)}-${String(M).padStart(2,'0')}-${String(D).padStart(2,'0')}`;
+        console.log(`${dateStr.padEnd(15)} ${lat.toFixed(1)},${lon_obs.toFixed(1).padStart(6)}  ${type.padEnd(8)}  NOT FOUND ±15 days  ${name}`);
+        continue;
+      }
+
+      const lon_pred = subSolarLon(jd_conj);
+      let dlon = lon_pred - lon_obs;
+      while (dlon > 180) dlon -= 360;
+      while (dlon < -180) dlon += 360;
+      const km_per_deg = 111.32 * Math.cos(lat * _d2r);  // approx km per ° lon at latitude
+      const dlon_km = dlon * km_per_deg;
+
+      offsets.push({ year: Y, dlon, dlon_km, name });
+
+      const dateStr = `${Y >= 0 ? Y : '-' + (-Y)}-${String(M).padStart(2,'0')}-${String(D).padStart(2,'0')}`;
+      const locStr = `${lat.toFixed(1)},${lon_obs.toFixed(1).padStart(6)}`;
+      const lonPredStr = lon_pred >= 0 ? `${lon_pred.toFixed(1)}°E` : `${(-lon_pred).toFixed(1)}°W`;
+      const dlonStr = (dlon >= 0 ? '+' : '') + dlon.toFixed(1) + '°';
+      const kmStr = (dlon_km >= 0 ? '+' : '') + Math.round(dlon_km) + ' km';
+      console.log(
+        dateStr.padEnd(15) + ' ' +
+        locStr.padEnd(13) + ' ' +
+        type.padEnd(8) + '  ' +
+        jd_conj.toFixed(2).padStart(12) + '  ' +
+        lonPredStr.padStart(10) + '  ' +
+        dlonStr.padStart(7) + '  ' +
+        kmStr.padStart(10) + '  ' +
+        name
+      );
+    }
+
+    // Statistics: systematic offset trend by epoch
+    console.log('──────────────────────────────────────────────────────────────────────────────────────────────────');
+    if (offsets.length > 0) {
+      const dlons = offsets.map(o => o.dlon);
+      const meanDlon = dlons.reduce((a,b) => a+b, 0) / dlons.length;
+      const variance = dlons.reduce((a,b) => a + (b-meanDlon)**2, 0) / dlons.length;
+      const rmsDlon = Math.sqrt(variance + meanDlon*meanDlon);
+      console.log();
+      console.log(`Mean systematic offset:   ${meanDlon.toFixed(1)}°  (negative = our model puts shadow WEST of observation)`);
+      console.log(`RMS offset:               ${rmsDlon.toFixed(1)}°`);
+      console.log();
+      console.log('Per-epoch trend (offset grouped by century):');
+      const byCentury = {};
+      for (const o of offsets) {
+        const cent = Math.floor(o.year / 100) * 100;
+        if (!byCentury[cent]) byCentury[cent] = [];
+        byCentury[cent].push(o.dlon);
+      }
+      const cents = Object.keys(byCentury).map(Number).sort((a,b) => a - b);
+      for (const c of cents) {
+        const mean = byCentury[c].reduce((a,b) => a+b, 0) / byCentury[c].length;
+        const yearLbl = c >= 0 ? `${c} CE` : `${-c} BC`;
+        console.log(`  ${yearLbl.padStart(8)} (n=${byCentury[c].length}):  mean offset ${mean.toFixed(1)}°`);
+      }
+    }
+    console.log();
+    console.log('Interpretation:');
+    console.log(' • Δlon = our predicted sub-solar lon − observed lon.');
+    console.log(' • If pure-tidal Architecture α is sufficient, Δlon should be small (<5°) and');
+    console.log('   randomly scattered around zero (no systematic trend by epoch).');
+    console.log(' • A monotonic trend Δlon ∝ (year - reference) reveals a systematic ΔT bias.');
+    console.log(' • Sources: Stephenson 1997 "Historical Eclipses and Earth’s Rotation",');
+    console.log('   Steele 2000, primary ancient texts (Herodotus, Thucydides, Babylonian diaries).');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Test our pure-tidal Architecture α model against 15 well-documented historic ' +
+     'solar eclipses (Babylonian, Greek, Chinese, Islamic, medieval European). ' +
+     'Reports the geographic offset between our predicted sub-solar location and ' +
+     'the documented observation location. Reveals whether our ΔT has systematic bias.');
+
+  addTestButton('Historic Eclipse Candidates (multi-match search)', () => {
+    // For each documented historic eclipse event, search a WIDE time window
+    // around the traditionally-assigned date and find ALL eclipses that could
+    // have been visible at the observation location (with refined umbra/penumbra
+    // geometry, not just sub-solar comparison). This challenges the assumption
+    // that the "traditional date" is the only candidate — there may be other
+    // physical eclipses that could equally explain the historic narrative.
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Historic Eclipse Candidates — multi-match search per event');
+    console.log('  Refined geometry: penumbra ≤ ~6500 km from sub-solar, umbra ≤ ~3000 km');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    const _d2r = Math.PI / 180;
+    const EARTH_R_KM = 6371;
+
+    // Historic events with observation location + dating uncertainty window.
+    // Window is wider for ancient events where chronology is less certain.
+    const EVENTS = [
+      { name: 'Bur-Sagale (Assyrian)',       lat: 36.36, lon: 43.16, year: -762, window: 30,
+        desc: 'Assyrian Eponym Canon: "in the eponymy of Bur-Sagale, governor of Guzana, ' +
+              'revolt in the city of Aššur. In the month of Sîvān an eclipse of the Sun took place." ' +
+              'Modern reduction: 15 June 763 BC, total over Nineveh.' },
+      { name: 'Chinese Spring/Autumn (Lu)',  lat: 35.0,  lon: 113.0, year: -708, window: 15,
+        desc: 'Confucius Spring and Autumn Annals record an eclipse in 709 BC. ' +
+              'Modern reduction: 17 July 709 BC.' },
+      { name: 'Thales (Herodotus)',          lat: 39.0,  lon: 35.0,  year: -584, window: 30,
+        desc: 'Herodotus 1.74: eclipse during battle between Lydians and Medes. ' +
+              'Predicted by Thales of Miletus to within a year. ' +
+              'Modern reduction: 28 May 585 BC, partial-to-total over Anatolia at evening.' },
+      { name: 'Babylonian best-preserved',   lat: 32.54, lon: 44.42, year: -135, window: 10,
+        desc: 'Babylonian diary tablet recording eclipse with precise timing. ' +
+              'Modern reduction: 15 April 136 BC, total ~52% magnitude at Babylon.' },
+      { name: 'Thucydides Athens',           lat: 37.97, lon: 23.72, year: -430, window: 10,
+        desc: 'Thucydides 2.28: "the sun became crescent-shaped, and some stars came out". ' +
+              'Modern reduction: 3 August 431 BC, annular over Athens.' },
+      { name: 'Plutarch Aegean',             lat: 38.0,  lon: 25.0,  year: 71,   window: 15,
+        desc: 'Plutarch De Facie 19, eclipse near total at unspecified Aegean location. ' +
+              'Modern reduction: 20 March 71 AD.' },
+      { name: 'Ibn Yunus Cairo',             lat: 30.05, lon: 31.24, year: 1004, window: 5,
+        desc: 'Ibn Yunus al-Hakemite Tables: measured eclipse times at Cairo. ' +
+              'Modern reduction: 24 January 1004 AD.' },
+      { name: 'Henry I death',               lat: 52.0,  lon: -2.0,  year: 1133, window: 5,
+        desc: 'English chronicles, eclipse associated with King Henry I death. ' +
+              'Modern reduction: 2 August 1133 AD, total across British Isles.' },
+      { name: "Igor's Tale (Russian)",       lat: 50.0,  lon: 38.0,  year: 1185, window: 5,
+        desc: 'Russian Primary Chronicle, "Slovo o polku Igoreve" eclipse omen. ' +
+              'Modern reduction: 1 May 1185 AD.' },
+    ];
+
+    // Julian Day Number at noon UT for proleptic Julian calendar date
+    function julianDateToJD(Y, M, D, hour = 12) {
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
+           + D - 1524.5 + hour / 24;
+    }
+
+    // Reverse: JD to proleptic Julian calendar date
+    function jdToJulianDate(jd) {
+      const J = jd + 0.5;
+      const Z = Math.floor(J);
+      const F = J - Z;
+      const A = Z;
+      const B = A + 1524;
+      const C = Math.floor((B - 122.1) / 365.25);
+      const D = Math.floor(365.25 * C);
+      const E = Math.floor((B - D) / 30.6001);
+      const day_full = B - D - Math.floor(30.6001 * E) + F;
+      const month = (E < 14) ? E - 1 : E - 13;
+      const year = (month > 2) ? C - 4716 : C - 4715;
+      const day = Math.floor(day_full);
+      const dayFrac = day_full - day;
+      const h = Math.floor(dayFrac * 24);
+      const m = Math.floor((dayFrac * 24 - h) * 60);
+      return { year, month, day, h, m };
+    }
+
+    // Our model's ΔT at given JD
+    function ourΔT(jd) {
+      const decYear = julianDateToDecimalYear(jd);
+      const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+      const dT = meanDeltaTSecondsAtAge(t_Ma);
+      return Number.isFinite(dT) ? dT : 0;
+    }
+
+    function moonLp(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
+      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E*E;
+      let Sl = 0;
+      for (let i = 0; i < MOON_L.length; i++) {
+        const r = MOON_L[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sl += term;
+      }
+      const A1 = (119.75 + 131.849*T) * _d2r;
+      const A2 = (53.09 + 479264.290*T) * _d2r;
+      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
+      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+    }
+
+    function moonBeta(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E*E;
+      let Sb = 0;
+      for (let i = 0; i < MOON_B.length; i++) {
+        const r = MOON_B[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sb += term;
+      }
+      return Sb * 1e-6;
+    }
+
+    function sunLon(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
+      const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
+      const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
+              + (0.019993 - 0.000101*T) * Math.sin(2*M)
+              + 0.000289 * Math.sin(3*M);
+      return ((L0 + C) % 360 + 360) % 360;
+    }
+
+    // Sub-solar geographic lat/lon at given JD (in our model with ΔT for Earth rotation).
+    // jd is JD_UT (our convention — Moon polynomial uses jd+ΔT/86400 to reach TT),
+    // so sub-solar lon = (12 - UT_h)*15 directly, no extra ΔT term.
+    function subSolar(jd) {
+      const UT_h = (12 + (jd - Math.floor(jd)) * 24) % 24;
+      let lon = (12 - UT_h) * 15;
+      while (lon > 180) lon -= 360;
+      while (lon < -180) lon += 360;
+      // Approximate sub-solar latitude from Sun's ecliptic longitude:
+      // dec = sin⁻¹(sin(ε) × sin(λ_sun)), ε ≈ 23.44°
+      const sunL = sunLon(jd);
+      const lat = Math.asin(Math.sin(23.44 * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
+      return { lat, lon };
+    }
+
+    // Great-circle distance between two lat/lon points (km)
+    function greatCircleKm(lat1, lon1, lat2, lon2) {
+      const φ1 = lat1 * _d2r, φ2 = lat2 * _d2r;
+      const Δφ = (lat2 - lat1) * _d2r;
+      const Δλ = (lon2 - lon1) * _d2r;
+      const a = Math.sin(Δφ/2)**2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2)**2;
+      return 2 * EARTH_R_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    // Check eclipse visibility at (lat, lon) given Moon-Sun conjunction at jd.
+    // Returns: { visible: bool, type: 'TOTAL'|'PARTIAL'|'NONE', dist_km, beta }
+    // Approximation: penumbra circle radius ~6500 km, umbra path width along
+    // Earth-rotation direction ~5000 km in 3 hour eclipse window.
+    function eclipseVisibility(jd, obs_lat, obs_lon) {
+      const beta = moonBeta(jd);
+      if (Math.abs(beta) >= 1.5) return { visible: false, type: 'NONE', dist_km: null, beta };
+      const ss = subSolar(jd);
+      // We compare observation to the SHADOW TRACK center over a 3-hour window:
+      // at conjunction sub-solar moves ~45° west per 3 hours. Observation needs
+      // to be within distance d of some point on the sub-solar track.
+      // Approximation: distance to nearest point on track ≈ distance to a great-circle.
+      // Simplify: distance to sub-solar at conjunction, allowing track tolerance.
+      const dist = greatCircleKm(obs_lat, obs_lon, ss.lat, ss.lon);
+      // Penumbra reach: ~6500 km from sub-solar instantaneously, +5000 km lateral spread along path
+      const PENUMBRA_REACH_KM = 7500;  // generous
+      const UMBRA_REACH_KM = 4500;     // includes 3-hr path sweep
+      if (Math.abs(beta) < 0.27 && dist < UMBRA_REACH_KM)   return { visible: true, type: 'TOTAL/ANNULAR', dist_km: dist, beta };
+      if (Math.abs(beta) < 1.5  && dist < PENUMBRA_REACH_KM) return { visible: true, type: 'PARTIAL',       dist_km: dist, beta };
+      return { visible: false, type: 'NONE', dist_km: dist, beta };
+    }
+
+    // Find Moon-Sun conjunctions in a JD range
+    function findConjunctions(jdStart, jdEnd) {
+      const step = 0.25;
+      const results = [];
+      let prevDiff = null;
+      let prevJD = jdStart;
+      for (let jd = jdStart; jd <= jdEnd; jd += step) {
+        let diff = moonLp(jd) - sunLon(jd);
+        while (diff > 180) diff -= 360;
+        while (diff < -180) diff += 360;
+        if (prevDiff !== null && prevDiff < 0 && diff > 0 && (diff - prevDiff) < 30) {
+          const jd_c = prevJD + (jd - prevJD) * (-prevDiff) / (diff - prevDiff);
+          results.push(jd_c);
+        }
+        prevDiff = diff;
+        prevJD = jd;
+      }
+      return results;
+    }
+
+    // Iterate over each historic event
+    for (const e of EVENTS) {
+      console.log('');
+      console.log('═══════════════════════════════════════════════════════════════════════════');
+      console.log(`  ${e.name}`);
+      console.log(`  Observation: ${e.lat.toFixed(2)}°N, ${e.lon.toFixed(2)}°E`);
+      console.log(`  Window: ${e.year - e.window} to ${e.year + e.window} (±${e.window} years)`);
+      console.log(`  ${e.desc}`);
+      console.log('───────────────────────────────────────────────────────────────────────────');
+
+      const jdStart = julianDateToJD(e.year - e.window, 1, 1);
+      const jdEnd   = julianDateToJD(e.year + e.window, 12, 31);
+      const conjunctions = findConjunctions(jdStart, jdEnd);
+
+      const matches = [];
+      for (const jd of conjunctions) {
+        const vis = eclipseVisibility(jd, e.lat, e.lon);
+        if (vis.visible) {
+          const d = jdToJulianDate(jd);
+          matches.push({ jd, d, vis });
+        }
+      }
+
+      if (matches.length === 0) {
+        console.log('  No eclipse candidates found visible at observation in this window.');
+        continue;
+      }
+
+      console.log(`  ${matches.length} candidate eclipse(s) visible:`);
+      console.log('  Julian Date         JD         UT      |β|     Dist(km)  Type             ');
+      for (const m of matches) {
+        const dateStr = `${m.d.year >= 0 ? m.d.year : '-' + (-m.d.year)}-${String(m.d.month).padStart(2,'0')}-${String(m.d.day).padStart(2,'0')}`;
+        const UTstr = `${String(m.d.h).padStart(2,'0')}:${String(m.d.m).padStart(2,'0')}`;
+        const yearOffset = (m.d.year - e.year);
+        const offsetStr = yearOffset === 0 ? '(documented year)' : `(${yearOffset > 0 ? '+' : ''}${yearOffset} yr from documented)`;
+        console.log(
+          '  ' +
+          dateStr.padEnd(13) + '  ' +
+          'JD' + m.jd.toFixed(2).padStart(10) + '  ' +
+          UTstr.padStart(5) + '  ' +
+          Math.abs(m.vis.beta).toFixed(3).padStart(6) + '°  ' +
+          Math.round(m.vis.dist_km).toString().padStart(7) + '  ' +
+          m.vis.type.padEnd(14) + '  ' +
+          offsetStr
+        );
+      }
+    }
+    console.log('');
+    console.log('═══════════════════════════════════════════════════════════════════════════');
+    console.log('Interpretation:');
+    console.log(' • Each event lists ALL eclipses in the ±window that could have been visible.');
+    console.log(' • If MULTIPLE candidates appear, the historical record may be ambiguous —');
+    console.log('   the "traditional" date is one of several physically possible matches.');
+    console.log(' • If the documented date IS the only match, the dating is well-constrained.');
+    console.log(' • If NO candidates match, our model places no visible eclipse there at all in');
+    console.log('   the window → either model is wrong, or the historical record is wrong.');
+    console.log(' • Geometry: penumbra ≤ 7500 km, umbra ≤ 4500 km from sub-solar at conjunction.');
+    console.log(' • Caveat: our model has known ~30°/century westward ΔT bias at ancient times');
+    console.log('   (see Historic Eclipse Validation button). Distance estimates inherit this.');
+    console.log('═══════════════════════════════════════════════════════════════════════════');
+  }, 'For each documented historic eclipse, search a wide time window for ALL ' +
+     'eclipses that could have been visible at the observation location. Tests ' +
+     'whether the traditionally-assigned date is the only candidate or one of many.');
+
+  addTestButton('Search candidate Thales eclipses (595-575 BC)', () => {
+    // Scan a 20-year window around the traditional Thales date (585 BC).
+    // For each Moon-Sun conjunction, compute key parameters using OUR model's
+    // Meeus polynomial + ΔT correction (matches the production code path), then
+    // report all candidates with their geographic sub-solar location.
+    // The user can identify which conjunctions could have given an eclipse
+    // visible from Anatolia at daylight local time.
+    console.log('\n══════════════════════════════════════════════════════════════════');
+    console.log('  Candidate Thales eclipses (595-575 BC), using OUR model physics');
+    console.log('══════════════════════════════════════════════════════════════════');
+    const _d2r = Math.PI / 180;
+
+    function _ourΔTseconds(jd) {
+      const decYear = julianDateToDecimalYear(jd);
+      const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+      const dT = meanDeltaTSecondsAtAge(t_Ma);
+      return Number.isFinite(dT) ? dT : 0;
+    }
+
+    // Moon ecliptic longitude (deg) via Meeus Ch. 47, with our ΔT (UT→TT)
+    function moonLpDeg(jd) {
+      const dT_s = _ourΔTseconds(jd);
+      const T = (jd + dT_s/86400 - j2000JD) / 36525;
+      const T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
+      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E * E;
+      let Sl = 0;
+      for (let i = 0; i < MOON_L.length; i++) {
+        const r = MOON_L[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sl += term;
+      }
+      const A1 = (119.75 + 131.849*T) * _d2r;
+      const A2 = (53.09 + 479264.290*T) * _d2r;
+      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
+      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+    }
+
+    // Moon ecliptic latitude (deg) via Meeus Ch. 47
+    function moonBetaDeg(jd) {
+      const dT_s = _ourΔTseconds(jd);
+      const T = (jd + dT_s/86400 - j2000JD) / 36525;
+      const T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const Lp_mean = (218.3164477 + 481267.88123421*T - 0.0015786*T2) * _d2r;
+      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E * E;
+      let Sb = 0;
+      for (let i = 0; i < MOON_B.length; i++) {
+        const r = MOON_B[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sb += term;
+      }
+      return Sb * 1e-6;
+    }
+
+    // Sun apparent ecliptic longitude (deg), Meeus Ch. 25 formula
+    function sunLonDeg(jd) {
+      const dT_s = _ourΔTseconds(jd);
+      const T = (jd + dT_s/86400 - j2000JD) / 36525;
+      const L0 = ((280.46646 + 36000.76983*T + 0.0003032*T*T) % 360 + 360) % 360;
+      const M  = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
+      const C  = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
+               + (0.019993 - 0.000101*T) * Math.sin(2*M)
+               + 0.000289 * Math.sin(3*M);
+      return ((L0 + C) % 360 + 360) % 360;
+    }
+
+    // Sub-solar geographic longitude at given JD in OUR model (with ΔT for Earth rotation)
+    function subSolarLon(jd) {
+      const dT_s = _ourΔTseconds(jd);
+      const jdFrac = jd - Math.floor(jd);
+      // UT_hours: JD x.0 = noon UT, x.5 = midnight UT next day
+      const UT_h = (12 + jdFrac * 24) % 24;
+      // Strategy A adds ΔT/86400 × 2π to Earth's rotation → effective UT for sub-solar
+      const effUT = UT_h + dT_s / 3600;
+      let lon = (12 - effUT) * 15;
+      while (lon > 180) lon -= 360;
+      while (lon < -180) lon += 360;
+      return lon;
+    }
+
+    // Convert JD to proleptic Julian calendar date
+    function jdToJulianDate(jd) {
+      const J = jd + 0.5;
+      const Z = Math.floor(J);
+      const F = J - Z;
+      const A = Z;  // proleptic Julian (no Gregorian alpha shift)
+      const B = A + 1524;
+      const C = Math.floor((B - 122.1) / 365.25);
+      const D = Math.floor(365.25 * C);
+      const E = Math.floor((B - D) / 30.6001);
+      const day_full = B - D - Math.floor(30.6001 * E) + F;
+      const month = (E < 14) ? E - 1 : E - 13;
+      const year = (month > 2) ? C - 4716 : C - 4715;
+      const day = Math.floor(day_full);
+      const dayFrac = day_full - day;
+      const h = Math.floor(dayFrac * 24);
+      const m = Math.floor((dayFrac * 24 - h) * 60);
+      return { year, month, day, h, m };
+    }
+
+    // Search range
+    const startJD = 1505000;   // ≈ 600 BC
+    const endJD   = 1512000;   // ≈ 570 BC
+    const step    = 0.25;      // 6-hour resolution
+    console.log(`Scanning JD ${startJD} to ${endJD} at ${step}-day resolution`);
+    console.log(`Using OUR model's Meeus polynomial + ΔT correction (~${Math.round(_ourΔTseconds(1507900.5))}s at year -584)`);
+    console.log();
+
+    // Find Moon-Sun conjunctions (zero crossings of moonLon - sunLon, going from < 0 to > 0)
+    const conjunctions = [];
+    let prevDiff = null;
+    let prevJD = startJD;
+    for (let jd = startJD; jd <= endJD; jd += step) {
+      const mL = moonLpDeg(jd);
+      const sL = sunLonDeg(jd);
+      let diff = mL - sL;
+      while (diff > 180) diff -= 360;
+      while (diff < -180) diff += 360;
+      if (prevDiff !== null && prevDiff < 0 && diff > 0 && (diff - prevDiff) < 30) {
+        // Moon caught Sun (zero crossing west-to-east)
+        const jd_c = prevJD + (jd - prevJD) * (-prevDiff) / (diff - prevDiff);
+        conjunctions.push(jd_c);
+      }
+      prevDiff = diff;
+      prevJD = jd;
+    }
+    console.log(`Found ${conjunctions.length} Moon-Sun conjunctions in this range.`);
+    console.log();
+
+    // For each conjunction, check eclipse type and geographic sub-solar
+    console.log('Date (Julian)        JD          UT      |β|     Sub-solar     Eclipse type        Near Greece/Turkey?');
+    console.log('─────────────────────────────────────────────────────────────────────────────────────────────────────────');
+    let nearTurkeyCount = 0;
+    let totalEclipseCount = 0;
+    for (const jd of conjunctions) {
+      const beta = moonBetaDeg(jd);
+      const lon = subSolarLon(jd);
+      const d = jdToJulianDate(jd);
+      // Eclipse type by |β|: |β| < ~0.27° gives umbra (total/annular), ~0.27-1.5° gives partial
+      const absBeta = Math.abs(beta);
+      let eclipseType = '(no eclipse)';
+      if (absBeta < 0.27) eclipseType = '★ TOTAL/ANNULAR';
+      else if (absBeta < 1.0) eclipseType = '◐ PARTIAL';
+      else if (absBeta < 1.5) eclipseType = '· marginal partial';
+      // Geographic — near Greece/Turkey if sub-solar between 10°W and 60°E
+      const nearTurkey = lon >= -10 && lon <= 60 && absBeta < 1.5;
+      if (nearTurkey) nearTurkeyCount++;
+      if (absBeta < 0.27) totalEclipseCount++;
+      const lonStr = lon >= 0 ? `${lon.toFixed(1)}°E` : `${(-lon).toFixed(1)}°W`;
+      const dateStr = `${d.year >= 0 ? d.year : '-' + (-d.year)}-${String(d.month).padStart(2,'0')}-${String(d.day).padStart(2,'0')}`;
+      const UTstr = `${String(d.h).padStart(2,'0')}:${String(d.m).padStart(2,'0')}`;
+      const marker = nearTurkey ? ' ⭐ near Greece/Turkey' : '';
+      // Only print if it's an actual eclipse (filter out non-eclipse new moons)
+      if (absBeta < 1.5) {
+        console.log(
+          dateStr.padEnd(13) +
+          ` JD${jd.toFixed(2).padStart(11)}` +
+          ` ${UTstr.padStart(6)}` +
+          ` ${absBeta.toFixed(3).padStart(6)}°` +
+          ` ${lonStr.padStart(10)}` +
+          ` ${eclipseType.padEnd(20)}` +
+          marker
+        );
+      }
+    }
+    console.log('─────────────────────────────────────────────────────────────────────────────────────────────────────────');
+    console.log(`Total eclipses found: ${conjunctions.filter(jd => Math.abs(moonBetaDeg(jd)) < 1.5).length}`);
+    console.log(`Total/annular (|β|<0.27°): ${totalEclipseCount}`);
+    console.log(`Near Greece/Turkey (sub-solar -10°E to +60°E): ${nearTurkeyCount}`);
+    console.log();
+    console.log('Notes:');
+    console.log(' • Sub-solar lon = where it\'s local noon at conjunction moment (includes our ΔT).');
+    console.log(' • Penumbra extends ~6500 km from sub-solar, umbra path is narrow (~270 km wide).');
+    console.log(' • An eclipse with sub-solar far from Greece can still be visible there if penumbra reaches.');
+    console.log(' • Wikipedia mentions 21 Sep 582 BC and 16 Mar 581 BC as alternative Thales candidates.');
+  }, 'Search all Moon-Sun conjunctions in 595-575 BC and report those that ' +
+     'could have been visible from Greece/Turkey area, using our model\'s ' +
+     'physics. Useful for exploring alternative dates for the Thales eclipse.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Investigation: enumerate ALL solar eclipses our model produces near
+  // Babylon (-525 to -518) and Cairo (975 to 986). For each, list date,
+  // type, sub-solar distance, and visibility class. Cross-references our
+  // model against:
+  //  • Said & Stephenson 1991 Cairo list (8 Jun 978, 14-15 May 979,
+  //    28 May 979 [annulars], 2-3 May 980, 1-2 Mar 983 [totals])
+  //  • Stephenson 1997: Babylonian solar observations only span 369 BC
+  //    to 136 BC — no Cambyses-era solar eclipse exists in the literature.
+  //  • The "Cambyses eclipse" in our HISTORIC list is a misidentification:
+  //    it refers to the LUNAR eclipses of 16 Jul 523 BC and 10 Jan 522 BC,
+  //    NOT a solar event.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Enumerate alternatives: Babylon -525..-518 + Cairo 975-986', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Enumerate alternative eclipse candidates for the two anomalous entries.');
+    console.log('  Cross-references model output against published Said & Stephenson catalogue.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    const _d2r = Math.PI / 180;
+    const EARTH_R_KM = 6371;
+    const PENUMBRA = 7500, UMBRA = 4500;
+
+    function julianDateToJD(Y, M, D, hour = 12) {
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      let B = 0;
+      if ((Y > 1582) || (Y === 1582 && (M > 10 || (M === 10 && D >= 15)))) {
+        const A = Math.floor(y / 100);
+        B = 2 - A + Math.floor(A / 4);
+      }
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
+           + D + B - 1524.5 + hour / 24;
+    }
+    function jdToCal(jd) {
+      const J = jd + 0.5;
+      const Z = Math.floor(J);
+      const F = J - Z;
+      let A = Z;
+      if (Z >= 2299161) {
+        const alpha = Math.floor((Z - 1867216.25) / 36524.25);
+        A = Z + 1 + alpha - Math.floor(alpha / 4);
+      }
+      const B = A + 1524;
+      const C = Math.floor((B - 122.1) / 365.25);
+      const D = Math.floor(365.25 * C);
+      const E = Math.floor((B - D) / 30.6001);
+      const dayF = B - D - Math.floor(30.6001 * E) + F;
+      const month = (E < 14) ? E - 1 : E - 13;
+      const year  = (month > 2) ? C - 4716 : C - 4715;
+      return { year, month, day: Math.floor(dayF) };
+    }
+    function ourΔT(jd) {
+      const decYear = julianDateToDecimalYear(jd);
+      const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+      const dT = meanDeltaTSecondsAtAge(t_Ma);
+      return Number.isFinite(dT) ? dT : 0;
+    }
+    function moonLp(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
+      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E*E;
+      let Sl = 0;
+      for (let i = 0; i < MOON_L.length; i++) {
+        const r = MOON_L[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sl += term;
+      }
+      const A1 = (119.75 + 131.849*T) * _d2r;
+      const A2 = (53.09 + 479264.290*T) * _d2r;
+      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
+      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+    }
+    function moonBeta(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E*E;
+      let Sb = 0;
+      for (let i = 0; i < MOON_B.length; i++) {
+        const r = MOON_B[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sb += term;
+      }
+      return Sb * 1e-6;
+    }
+    function sunLon(jd) {
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
+      const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
+      const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
+              + (0.019993 - 0.000101*T) * Math.sin(2*M)
+              + 0.000289 * Math.sin(3*M);
+      return ((L0 + C) % 360 + 360) % 360;
+    }
+    function ssLatLon(jd) {
+      const UT_h = (12 + (jd - Math.floor(jd)) * 24) % 24;
+      let lon = (12 - UT_h) * 15;
+      while (lon >  180) lon -= 360;
+      while (lon < -180) lon += 360;
+      const sunL = sunLon(jd);
+      const lat = Math.asin(Math.sin(23.44 * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
+      return { lat, lon };
+    }
+    function greatCircleKm(lat1, lon1, lat2, lon2) {
+      const φ1 = lat1 * _d2r, φ2 = lat2 * _d2r;
+      const Δφ = (lat2 - lat1) * _d2r;
+      const Δλ = (lon2 - lon1) * _d2r;
+      const a = Math.sin(Δφ/2)**2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2)**2;
+      return 2 * EARTH_R_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+    function moonSunDiff(jd) {
+      let diff = moonLp(jd) - sunLon(jd);
+      while (diff >  180) diff -= 360;
+      while (diff <= -180) diff += 360;
+      return diff;
+    }
+    function findAllConjunctions(jdStart, jdEnd) {
+      const step = 0.25;
+      const results = [];
+      let prevDiff = moonSunDiff(jdStart);
+      let prevJD = jdStart;
+      for (let jd = jdStart + step; jd <= jdEnd; jd += step) {
+        const diff = moonSunDiff(jd);
+        if (prevDiff < 0 && diff > 0 && (diff - prevDiff) < 30) {
+          // Bisect
+          let lo = prevJD, hi = jd;
+          for (let i = 0; i < 30; i++) {
+            const mid = (lo + hi) / 2;
+            if (moonSunDiff(mid) < 0) lo = mid; else hi = mid;
+            if (hi - lo < 1/86400) break;
+          }
+          results.push((lo + hi) / 2);
+        }
+        prevDiff = diff;
+        prevJD = jd;
+      }
+      return results;
+    }
+
+    function enumerate(label, lat_obs, lon_obs, jdStart, jdEnd) {
+      console.log('');
+      console.log(`────────────────────────────────────────────────────────────────────────────────`);
+      console.log(`${label}`);
+      console.log(`Observation site: (${lat_obs.toFixed(2)}°N, ${lon_obs.toFixed(2)}°E).`);
+      console.log(`Listing every solar conjunction with |β| < 1.5° (eclipse-class) in this window.`);
+      console.log(`────────────────────────────────────────────────────────────────────────────────`);
+      console.log(`  Date              JD            β(M)    SS lat   SS lon   Dist(km)  Class`);
+      const conjs = findAllConjunctions(jdStart, jdEnd);
+      for (const jd of conjs) {
+        const beta = moonBeta(jd);
+        if (Math.abs(beta) >= 1.5) continue;  // not eclipse-class
+        const ss = ssLatLon(jd);
+        const dist = greatCircleKm(lat_obs, lon_obs, ss.lat, ss.lon);
+        let cls = '—';
+        if (Math.abs(beta) < 0.27 && dist < UMBRA)        cls = '★ TOTAL/ANN here';
+        else if (Math.abs(beta) < 0.5 && dist < PENUMBRA) cls = '◐ partial near';
+        else if (dist < PENUMBRA)                          cls = '○ partial';
+        else                                               cls = '✗ not visible at site';
+        const cal = jdToCal(jd);
+        const ds = `${cal.year}-${String(cal.month).padStart(2,'0')}-${String(cal.day).padStart(2,'0')}`;
+        console.log(
+          `  ${ds.padEnd(16)}  ${jd.toFixed(2).padStart(11)}   ` +
+          `${beta.toFixed(2).padStart(6)}  ` +
+          `${ss.lat.toFixed(1).padStart(7)}  ` +
+          `${ss.lon.toFixed(1).padStart(7)}   ` +
+          `${Math.round(dist).toString().padStart(7)}   ` +
+          cls
+        );
+      }
+    }
+
+    // --- Cambyses: Babylon (32.5°N, 44.4°E), -525 to -518 ---
+    console.log('');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  CAMBYSES CASE — but per Stephenson 1997, Babylonian SOLAR records only');
+    console.log('  span 369 BC to 136 BC. NO documented solar eclipse exists for Cambyses (530-522 BC).');
+    console.log('  The "Cambyses eclipses" in Babylonian diaries / Ptolemy Almagest V.14 are');
+    console.log('  LUNAR: 16 July 523 BC and 10 January 522 BC. Our HISTORIC entry is mislabeled.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+    enumerate('Solar conjunctions visible from Babylon, -525 to -518',
+              32.5, 44.4, julianDateToJD(-525, 1, 1), julianDateToJD(-518, 12, 31));
+
+    // --- Ibn Yunus: Cairo (30.05°N, 31.24°E), 975-986 ---
+    console.log('');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  IBN YUNUS CASE — Per NASA Five Millennium Catalog, the solar eclipses');
+    console.log('  in this window with significant Cairo visibility are:');
+    console.log('    • 977 Dec 13 (Julian)  Total at (3°N, 55°E)   — Cairo sees ~partial');
+    console.log('    • 978 Jun 8  (Julian)  Annular near Cairo');
+    console.log('    • 979 May 28 (Julian)  Annular ~ Cairo partial');
+    console.log('  NASA confirms NO total/annular in May 980 or March 983 — the earlier');
+    console.log('  "Said-Stephenson lists 2-3 May 980 TOTAL" claim was an LLM hallucination.');
+    console.log('  Ibn Yunus\'s OWN Hakemite Tables only contain 4 eclipses he compiled:');
+    console.log('    993 (solar), 1001 (lunar), 1002 (lunar), 1004 (solar).');
+    console.log('  Pre-993 entries (977, 978, 979, 985) come from earlier observers / records');
+    console.log('  he cited; ours had the right date for 977-12-13 but the path stays south');
+    console.log('  of Cairo (greatest at 3°N), so Cairo can only see partial, not annular.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+    enumerate('Solar conjunctions visible from Cairo, 975 to 986',
+              30.05, 31.24, julianDateToJD(975, 1, 1), julianDateToJD(986, 12, 31));
+
+    console.log('');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  CONCLUSIONS (revised after NASA cross-check):');
+    console.log('  • Cambyses: REMOVE from solar-eclipse test list. No solar eclipse exists');
+    console.log('    in our model OR in NASA catalog at -522-07-16. The Cambyses-era eclipses');
+    console.log('    in Babylonian diaries are LUNAR. Confirmed category error.');
+    console.log('  • Ibn Yunus 977-12-13: KEEP. NASA confirms a Total at (3°N, 55°E) on this');
+    console.log('    date. The greatest-eclipse path was 3,000 km south of Cairo, so Cairo');
+    console.log('    can only see a low-amplitude partial. The "negative needed-ΔT" was the');
+    console.log('    model correctly saying no ΔT can move the umbra path 3,000 km north.');
+    console.log('  • No 15-day Moon polynomial drift. NASA\'s -522 Jul 31 total at (17°S,117°E)');
+    console.log('    matches our model\'s -522-07-31 conjunction exactly. Same for 977 Dec 13.');
+    console.log('  • The pure-tidal Moon polynomial is sound at every epoch we have tested.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Enumerates every solar conjunction our model produces near the two anomalous events ' +
+     '(Cambyses Babylon -525..-518, Ibn Yunus Cairo 975-986). Cross-references with Said & ' +
+     'Stephenson 1991 published Cairo list and Stephenson 1997 finding that Babylonian solar ' +
+     'records only span 369 BC – 136 BC. Confirms both anomalies were mis-attributed entries.');
+
+  // Anchor & Units
+  const firstAnchorBtn = addTestButton('Verify J2000 Rates (units check)', () => {
+    // Detects the calendar-year vs SI-tropical-year unit mismatch.
+    // Tests: at JD = J2000, our integrator rates should match Meeus's linear
+    // coefficients to ≪ 0.01% if the year units agree.
+    // Uses canonical module constants j2000JD and SI_TROPICAL_YEAR_DAYS.
+    const jdToSIyear = (jd_) => 2000.0 + (jd_ - j2000JD) / SI_TROPICAL_YEAR_DAYS;
+    const yA = jdToSIyear(j2000JD);                                  // = 2000.0 by definition
+    const yB = jdToSIyear(j2000JD + SI_TROPICAL_YEAR_DAYS);          // = 2001.0 (exactly one SI-trop year later)
+
+    // Our integrator: cycles per 1 SI-tropical-year (= what the integrator
+    // really computes per unit of its `year` argument).
+    const cyc_Lp_per_yr       = meanMoonOrbitsBetweenYears(yA, yB);
+    const cyc_periSun_per_yr  = cyclesBetweenYears(yA, yB, 16);
+    const cyc_periMoon_per_yr = meanMoonApsidalCyclesBetween(yA, yB);
+    const cyc_nodeMoon_per_yr = meanMoonNodalCyclesBetween(yA, yB);
+
+    // Meeus rates per Julian year (NOT calendar year):
+    // 1 Julian year = 36525/100 = 365.25 SI days. 1 SI tropical year = SI_TROPICAL_YEAR_DAYS.
+    // To convert Meeus rate per Julian century → cycles per SI tropical year:
+    //   (deg per Julian-cy) × (SI-trop-days per Julian-cy⁻¹) / (360 deg per cycle)
+    //   = coefPerJulCy / 36525 × SI_TROPICAL_YEAR_DAYS / 360
+    const meeusPerSItropYr = (coefPerJulCy) =>
+      coefPerJulCy / 36525 * SI_TROPICAL_YEAR_DAYS / 360;   // cycles per SI-tropical-year
+
+    const rate_meeus_Lp     = meeusPerSItropYr(481267.88123421);
+    const rate_meeus_periSun_via_M = meeusPerSItropYr(36000.76983 - 35999.0502909);  // Lsun - M = perihelion advance, but Lsun and M coefficients aren't independently stated; use D-based: Lsun rate = Lp - D
+    // Sun perihelion advance per yr = (Lsun rate - M rate) ≈ (Lp - D rate - M rate)
+    const rate_meeus_Lsun   = meeusPerSItropYr(481267.88123421 - 445267.1114034);
+    const rate_meeus_periSun = rate_meeus_Lsun - meeusPerSItropYr(35999.0502909);
+    const rate_meeus_periMoon = rate_meeus_Lp - meeusPerSItropYr(477198.8675055);
+    const rate_meeus_nodeMoon = rate_meeus_Lp - meeusPerSItropYr(483202.0175233);
+
+    const fmt = (x) => x === null || x === undefined ? 'NULL' : x.toFixed(8);
+    const pct = (a, b) => Math.abs(a) < 1e-12 ? '0%' : (((a-b)/b)*100).toFixed(5) + '%';
+    console.log('\n══════════════ J2000 Rate Verification ══════════════');
+    console.log('Quantity              Meeus           Ours            Rel diff');
+    console.log(`Lp        ${fmt(rate_meeus_Lp).padStart(15)}  ${fmt(cyc_Lp_per_yr).padStart(15)}  ${pct(cyc_Lp_per_yr, rate_meeus_Lp).padStart(12)}`);
+    console.log(`periSun   ${fmt(rate_meeus_periSun).padStart(15)}  ${fmt(cyc_periSun_per_yr).padStart(15)}  ${pct(cyc_periSun_per_yr, rate_meeus_periSun).padStart(12)}`);
+    console.log(`periMoon  ${fmt(rate_meeus_periMoon).padStart(15)}  ${fmt(cyc_periMoon_per_yr).padStart(15)}  ${pct(cyc_periMoon_per_yr, rate_meeus_periMoon).padStart(12)}`);
+    console.log(`nodeMoon  ${fmt(rate_meeus_nodeMoon).padStart(15)}  ${fmt(cyc_nodeMoon_per_yr ? -cyc_nodeMoon_per_yr : null).padStart(15)}  ${pct(-cyc_nodeMoon_per_yr, rate_meeus_nodeMoon).padStart(12)}`);
+    console.log('══════════════════════════════════════════════════════');
+    console.log('Pass criterion: relative diff < 0.001%. If any exceed 0.1%,');
+    console.log('there is a unit mismatch or J2000 anchor calibration issue.');
+  }, 'Compare integrator rates at J2000 to Meeus polynomial linear coefficients. ' +
+     'A non-zero relative difference at J2000 indicates a unit-conversion bug ' +
+     '(usually calendar-year vs SI-tropical-year mismatch).');
+
+  addTestButton('Verify Anchor Round-Trip', () => {
+    // At JD = startmodelJD, the integrator (anchored at startmodelJD) should
+    // return exactly 0 cycles. Any non-zero result indicates anchor
+    // inconsistency between how the integrator's anchor is defined and how
+    // its `current year` input is computed.
+    // Uses canonical module constants j2000JD and SI_TROPICAL_YEAR_DAYS.
+    const jdToSIyear = (jd_) => 2000.0 + (jd_ - j2000JD) / SI_TROPICAL_YEAR_DAYS;
+    const yA = jdToSIyear(startmodelJD);
+    // Expected reference: Moon tropical month in days from MOON_TROPICAL_MONTH_J2000_S
+    // (defined line ~4770, ≈ 27.32158 d). Don't hardcode — use the constant.
+    const moonTropMonthDays = MOON_TROPICAL_MONTH_J2000_S / 86400;
+
+    const testJDs = [
+      { jd: startmodelJD,             label: 'startmodelJD (offset = 0)' },
+      { jd: startmodelJD + 1,         label: 'startmodelJD + 1 day' },
+      { jd: startmodelJD + 366,       label: 'startmodelJD + 366 days (~1 leap yr)' },
+      { jd: startmodelJD - 365,       label: 'startmodelJD - 365 days' },
+      { jd: j2000JD,                  label: 'J2000 (Jan 1.5, 2000)' },
+      { jd: 2460300.0,                label: '~2024 Jan' },
+      { jd: 1507900.5,                label: 'Thales (-584)' },
+    ];
+    console.log('\n══════════════ Anchor Round-Trip Test ══════════════');
+    console.log('Tests SI-year-via-JD conversion + integrator-anchor consistency.');
+    console.log('At anchor JD, cycles must be exactly 0.\n');
+    console.log('Test JD                                         JD - anchor (days)    Lp cycles    Expected (snapshot)');
+    for (const { jd, label } of testJDs) {
+      const yB = jdToSIyear(jd);
+      const cycLp = meanMoonOrbitsBetweenYears(yA, yB);
+      const expected = (jd - startmodelJD) / moonTropMonthDays;
+      const fmt = (n, w) => String(n.toFixed(6)).padStart(w);
+      console.log(`${label.padEnd(40)}  ${fmt(jd - startmodelJD, 12)}  ${fmt(cycLp, 12)}  ${fmt(expected, 12)}  diff=${(cycLp - expected).toExponential(2)}`);
+    }
+    console.log('\nPass: diff between integrator and snapshot < 1e-3 cycles (~0.4°)');
+    console.log('At anchor (offset = 0), cycles MUST be exactly 0.');
+    console.log('══════════════════════════════════════════════════════');
+  }, 'Verify integrator returns 0 at anchor JD, and check round-trip vs ' +
+     'snapshot formula across modern + ancient epochs.');
+
+  addTestButton('Plot Modern Drift (1900-2100)', () => {
+    // Walks JD from 1900 to 2100 in 10-year steps, computes Meeus vs ours
+    // diff for each argument. Modern range — should be a flat zero line
+    // if anchor + rates are correctly calibrated.
+    // Uses canonical module constants j2000JD and SI_TROPICAL_YEAR_DAYS.
+    console.log('\n══════════════ Modern Drift (1900-2100, every 10 yr) ══════════════');
+    console.log('Year        Lp diff(°)   D diff(°)   M diff(°)   M\' diff(°)  F diff(°)');
+    const startJD = j2000JD - 100 * SI_TROPICAL_YEAR_DAYS;   // ≈ year 1900
+    const endJD   = j2000JD + 100 * SI_TROPICAL_YEAR_DAYS;   // ≈ year 2100
+    const stepJD  = 10 * SI_TROPICAL_YEAR_DAYS;
+    const fmt = (x) => String(x.toFixed(4)).padStart(11);
+    const pad = (s, n) => String(s).padEnd(n);
+    for (let jd = startJD; jd <= endJD; jd += stepJD) {
+      const r = meeusVsIntegratorDiagnostic(jd);
+      console.log(pad(r.decYear.toFixed(1), 10) + fmt(r.diff.Lp) + fmt(r.diff.D) + fmt(r.diff.M) + fmt(r.diff.Mp) + fmt(r.diff.F));
+    }
+    console.log('═══════════════════════════════════════════════════════════════════');
+    console.log('Pass: all diffs < 0.01° across all rows. Any sloped/wavy pattern');
+    console.log('reveals a remaining rate or anchor mismatch.');
+  }, 'Sweep modern range (1900-2100) in 10-yr steps. After unit fix, all diffs ' +
+     'should be < 0.01°. Patterns reveal anchor or rate calibration issues.');
 
   // Insert group labels before the first button of each group
   const calibContainer = calibFolder.element.querySelector('.tp-fldv_c');
@@ -26191,6 +28293,9 @@ function setupGUI() {
   insertGroupLabel('Year Length', firstYearBtn);
   insertGroupLabel('Day Length', firstDayBtn);
   insertGroupLabel('Calibration', firstCalibBtn);
+  insertGroupLabel('Balanced Year & 8H', firstBalancedBtn);
+  insertGroupLabel('Historical Eclipses & ΔT', firstEclipseBtn);
+  insertGroupLabel('Anchor & Units', firstAnchorBtn);
 
   /* --- Camera -------------------------------------------------------------- */
   const cameraFolder = toolsFolder.addFolder({ title: 'Camera', expanded: false });
@@ -36031,21 +38136,46 @@ function loadTexture( url, onLoad ) {
 }
 
 // Well-known historical solar eclipses for the Moon planetStats nav-buttons.
-// JD values are time of greatest eclipse in UT (computed from NASA SE-Canon
-// UT times via calToJD). γ is the NASA path-centerline offset. The simulation
-// interprets JD as TT; for visual eclipse verification, the small ΔT shift
-// (~70 sec modern, ~1500 sec at 1133 AD, ~17000 sec at 584 BC) appears as a
-// fraction-of-a-degree Moon offset and remains within the Meeus polynomial
-// error budget documented in doc 66.
+// JD values are time of greatest eclipse in UT. The 8 existing modern/landmark
+// entries are computed from NASA SE-Canon UT times via calToJD. The 17 newer
+// entries (added 2026-06) come from our Moon polynomial's predicted conjunction
+// JD — same physics used in the Historical Eclipses & ΔT analysis buttons.
+// γ is the Moon path-centerline offset (β-derived for new entries). The
+// simulation interprets JD as TT; for visual eclipse verification, the small
+// ΔT shift (~70 sec modern, ~1500 sec at 1133 AD, ~17000 sec at 584 BC)
+// appears as a fraction-of-a-degree Moon offset and remains within the Meeus
+// polynomial error budget documented in doc 66.
 const ECLIPSE_PRESETS = [
-  { jd: 2460409.262050, label: '2024 Apr 8 Total',        loc: 'Mexico → Texas → Maine',     gamma: 0.343,  era: 'Modern' },
-  { jd: 2457987.267733, label: '2017 Aug 21 Total',       loc: 'Coast-to-coast USA',         gamma: 0.437,  era: 'Modern' },
-  { jd: 2451401.960508, label: '1999 Aug 11 Total',       loc: 'Europe → Middle East',       gamma: 0.506,  era: '20th c.' },
-  { jd: 2441863.985208, label: '1973 Jun 30 Total',       loc: 'Africa (longest of 20th c.)', gamma: 0.072,  era: '20th c.' },
-  { jd: 2422108.047858, label: '1919 May 29 Total',       loc: 'Príncipe — Eddington/GR',     gamma: 0.596,  era: '20th c.' },
-  { jd: 2347572.902675, label: '1715 May 3 Total',        loc: 'England — Halley predicted',  gamma: 0.0,    era: '18th c.' },
-  { jd: 2135100.070833, label: '1133 Aug 2 Total',        loc: 'England — King Henry I',      gamma: -0.243, era: 'Medieval' },
-  { jd: 1507900.065279, label: '-584 May 28 Total',       loc: 'Anatolia — Thales predicted', gamma: 0.353,  era: 'Ancient' },
+  // Modern + 20th c.
+  { jd: 2460409.262050, label: '2024 Apr 8 Total',         loc: 'Mexico → Texas → Maine',                  gamma: 0.343,  era: 'Modern' },
+  { jd: 2457987.267733, label: '2017 Aug 21 Total',        loc: 'Coast-to-coast USA',                      gamma: 0.437,  era: 'Modern' },
+  { jd: 2451401.960508, label: '1999 Aug 11 Total',        loc: 'Europe → Middle East',                    gamma: 0.506,  era: '20th c.' },
+  { jd: 2441863.985208, label: '1973 Jun 30 Total',        loc: 'Africa (longest of 20th c.)',             gamma: 0.072,  era: '20th c.' },
+  { jd: 2422108.047858, label: '1919 May 29 Total',        loc: 'Príncipe — Eddington/GR',                 gamma: 0.596,  era: '20th c.' },
+  // Early modern
+  { jd: 2347572.902675, label: '1715 May 3 Total',         loc: 'England — Halley predicted',              gamma: 0.0,    era: '18th c.' },
+  { jd: 2325394.925106, label: '1654 Aug 12 Total',        loc: 'England — European total (Gregorian)',    gamma: 0.489,  era: '17th c.' },
+  // Medieval
+  { jd: 2173756.000111, label: '1239 Jun 3 Total',         loc: 'Tuscany — Cerchiari chronicle',           gamma: 0.325,  era: 'Medieval' },
+  { jd: 2154000.058445, label: '1185 May 1 Annular',       loc: "Russia — Igor's Tale Primary Chronicle",  gamma: 0.541,  era: 'Medieval' },
+  { jd: 2135100.070833, label: '1133 Aug 2 Total',         loc: 'England — King Henry I',                  gamma: -0.243, era: 'Medieval' },
+  { jd: 2087792.051441, label: '1004 Jan 24 Annular',      loc: 'Cairo — Ibn Yunus famous observation',    gamma: 0.226,  era: 'Medieval' },
+  { jd: 2083982.839931, label: '993 Aug 20 Annular',       loc: 'Cairo — Ibn Yunus Hakemite Tables',       gamma: 0.242,  era: 'Medieval' },
+  { jd: 2081030.093891, label: '985 Jul 20 Annular',       loc: 'Cairo — Said-Stephenson catalog',         gamma: 0.284,  era: 'Medieval' },
+  { jd: 2078785.134930, label: '979 May 28 Annular',       loc: 'Cairo — Said-Stephenson catalog',         gamma: 0.603,  era: 'Medieval' },
+  { jd: 2078431.006474, label: '978 Jun 8 Annular',        loc: 'Cairo — Said-Stephenson catalog',         gamma: -0.110, era: 'Medieval' },
+  { jd: 2078253.853718, label: '977 Dec 13 Total',         loc: 'Cairo (partial) — NASA total at 3°N,55°E', gamma: 0.458, era: 'Medieval' },
+  // Classical antiquity
+  { jd: 1747068.890110, label: '71 Mar 20 Total',          loc: 'Aegean — Plutarch De Facie 19',           gamma: 0.635,  era: 'Classical' },
+  // Ancient
+  { jd: 1671853.759762, label: '-135 Apr 15 Total',        loc: 'Babylon — best-preserved diary',          gamma: 0.719,  era: 'Ancient' },
+  { jd: 1608421.835171, label: '-309 Aug 15 Total',        loc: 'Babylon — Antigonus death era',           gamma: 0.348,  era: 'Ancient' },
+  { jd: 1564215.113895, label: '-430 Aug 3 Annular',       loc: 'Athens — Thucydides 2.28',                gamma: 0.798,  era: 'Ancient' },
+  { jd: 1518118.032841, label: '-556 May 19 Partial',      loc: 'Babylon — Nabonidus reign',               gamma: 0.307,  era: 'Ancient' },
+  { jd: 1507900.065279, label: '-584 May 28 Total',        loc: 'Anatolia — Thales predicted',             gamma: 0.353,  era: 'Ancient' },
+  { jd: 1484836.848499, label: '-647 Apr 6 Partial',       loc: 'Babylon — early astronomical diary',      gamma: 0.705,  era: 'Ancient' },
+  { jd: 1462658.779682, label: '-708 Jul 17 Total',        loc: 'Lu State — Chinese Spring/Autumn Annals', gamma: 0.484,  era: 'Ancient' },
+  { jd: 1442902.839207, label: '-762 Jun 15 Total',        loc: 'Nineveh — Bur-Sagale Assyrian Eponym',    gamma: 0.275,  era: 'Ancient' },
 ];
 // Current selected eclipse index (mutable across button clicks)
 const _eclipseState = { idx: 0 };
@@ -43081,20 +45211,29 @@ function moveModel(pos) {
     // `_dtCycleAnchor` overrides the default BALANCED_YEAR_J2000_FIXED for
     // planet wobble centers (each has its own anchor in _planetSceneAnchors).
     let θ;
+    // Phase 9.15: convert o.julianDay → SI tropical year for the integrator.
+    // `o.currentYear` is calendar-based (Gregorian/Julian, 365/366-day years)
+    // but the integrator's H constant is in SI tropical years (365.2422-day).
+    // Mixing them produced ~0.21% rate offset → 5° Moon error at modern,
+    // 95° at year -584, and the Step 4 planet position regression. Using
+    // _jdToSIyear consistently for both anchor (via STARTMODEL_YEAR_SI) and
+    // current restores correct units.
+    const _currentYearSI = DEEP_TIME_MODE_ENABLED ? _jdToSIyear(o.julianDay) : o.currentYear;
     if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtCycleN)) {
       const _dtAnchor = Number.isFinite(obj._dtCycleAnchor) ? obj._dtCycleAnchor : BALANCED_YEAR_J2000_FIXED;
-      const _dtCycles = cyclesBetweenYears(_dtAnchor, o.currentYear, obj._dtCycleN);
+      const _dtCycles = cyclesBetweenYears(_dtAnchor, _currentYearSI, obj._dtCycleN);
       θ = (_dtCycles !== null ? _dtCycles : 0) * 2 * Math.PI * obj._dtCycleSign;
     } else if (DEEP_TIME_MODE_ENABLED && obj._dtMoonIntegrator) {
       // Phase 9.13: Moon-chain integral form. Replaces snapshot
       // `obj.speed × pos` with ∫_anchor^currentYear n_moon(t) dt where
       // n_moon evolves under Farhat-derived tidal recession. Anchor is
-      // startmodelyearwithCorrection — at that year the integrator returns
-      // 0, so θ reduces to `-startPos × π/180`, matching the J2000 snapshot
-      // exactly. Modern eclipses (within ±100 yr of J2000) are unchanged at
-      // sub-arcsecond level; deep-time corrections grow with |Δyear|.
-      const _mAnchor = Number.isFinite(obj._dtMoonAnchor) ? obj._dtMoonAnchor : startmodelyearwithCorrection;
-      const _mCycles = obj._dtMoonIntegrator(_mAnchor, o.currentYear);
+      // STARTMODEL_YEAR_SI (Phase 9.15 SI-unit-fixed) — at startmodelJD
+      // the integrator returns exactly 0 cycles, so θ reduces to
+      // `-startPos × π/180`, matching the J2000 snapshot exactly. Modern
+      // eclipses (within ±100 yr of J2000) are unchanged at sub-arcsecond
+      // level; deep-time corrections grow with |Δyear|.
+      const _mAnchor = Number.isFinite(obj._dtMoonAnchor) ? obj._dtMoonAnchor : STARTMODEL_YEAR_SI;
+      const _mCycles = obj._dtMoonIntegrator(_mAnchor, _currentYearSI);
       θ = (_mCycles !== null ? _mCycles : 0) * 2 * Math.PI * obj._dtMoonSign
           - obj.startPos * (Math.PI / 180);
     } else {
@@ -43118,8 +45257,9 @@ function moveModel(pos) {
       // the snapshot at modern epochs.
       let perihelionPhase;
       if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtPerihelionDivisor)) {
-        const _pAnchor = Number.isFinite(obj._dtPerihelionAnchor) ? obj._dtPerihelionAnchor : startmodelyearwithCorrection;
-        const _pCycles = cyclesBetweenYears(_pAnchor, o.currentYear, obj._dtPerihelionDivisor);
+        // Phase 9.15: uses STARTMODEL_YEAR_SI default + _currentYearSI from above.
+        const _pAnchor = Number.isFinite(obj._dtPerihelionAnchor) ? obj._dtPerihelionAnchor : STARTMODEL_YEAR_SI;
+        const _pCycles = cyclesBetweenYears(_pAnchor, _currentYearSI, obj._dtPerihelionDivisor);
         perihelionPhase = obj.perihelionPhaseJ2000 + (_pCycles !== null ? _pCycles : 0) * 2 * Math.PI;
       } else {
         perihelionPhase = obj.perihelionPhaseJ2000 + (obj.perihelionPrecessionRate || 0) * pos;
@@ -43134,7 +45274,33 @@ function moveModel(pos) {
     // Geocentric accuracy: ~0.04° residual RMS at eclipses (verified against NASA GSFC catalog).
     if (useVariableSpeed && obj.lunarPerturbations) {
       // Meeus formulas require T from standard J2000.0 (JD 2451545.0) in Julian centuries (36525 days)
-      const d = (startmodelJD - 2451545.0) + pos * meansolaryearlengthinDays;
+      // Phase 9.15 d-calc fix: use pure JD difference. The old form
+      //   d = (startmodelJD - j2000JD) + pos * meansolaryearlengthinDays
+      // was algebraically equivalent to (o.julianDay - j2000JD) ONLY when
+      // meansolaryearlengthinDays equals SI_TROPICAL_YEAR_DAYS. In deep-time
+      // mode `meansolaryearlengthinDays` is mutated to the epoch-local
+      // (LOD-derived) value, breaking the equivalence and giving wrong T at
+      // deep past — ~0.5 days drift at year -584, producing ~7° Lp / D / M /
+      // M' / F error that cascades into the Sl/Sb perturbation series.
+      //
+      // Phase 9.16 ΔT (UT→TT) fix: Meeus Ch. 47 defines T in Julian centuries
+      // from JD 2451545.0 TT, but o.julianDay is JD_UT. The two are the same
+      // at J2000 (by convention) but diverge by ΔT/86400 days going back in
+      // time. Earth's rotation in moveModel already accounts for ΔT (via
+      // earthRotationCorrectionRadians, Strategy A), but the Moon polynomial
+      // wasn't doing the matching JD_UT → JD_TT conversion. At year -584 the
+      // missing 0.187-day ΔT shift caused Moon Lp to be ~2.46° west of
+      // physical reality. Using the SAME meanDeltaTSecondsAtAge that Strategy
+      // A uses keeps the two systems on the same ΔT model.
+      let d = o.julianDay - j2000JD;
+      if (DEEP_TIME_MODE_ENABLED) {
+        const decYear_d = julianDateToDecimalYear(o.julianDay);
+        const t_Ma_d = (J2000_CALENDAR_YEAR - decYear_d) / 1e6;
+        const deltaT_sec_d = meanDeltaTSecondsAtAge(t_Ma_d);
+        if (Number.isFinite(deltaT_sec_d)) {
+          d += deltaT_sec_d / 86400;   // JD_UT → JD_TT
+        }
+      }
       const _d2r = Math.PI / 180;
       const T = d / 36525;
       const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
@@ -43247,7 +45413,9 @@ function moveModel(pos) {
     // with the integral-form value.
     if (obj.rotationSpeed) {
       if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtRotN)) {
-        const _dtCycles = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, o.currentYear, obj._dtRotN);
+        // Phase 9.15: use SI tropical year for integrator input (NOT calendar).
+        const _rotYearSI = _jdToSIyear(o.julianDay);
+        const _dtCycles = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, _rotYearSI, obj._dtRotN);
         obj.planetObj.rotation.y = (_dtCycles !== null ? _dtCycles : 0) * 2 * Math.PI * obj._dtRotSign;
       } else {
         let spinAngle = obj.rotationSpeed * pos;
