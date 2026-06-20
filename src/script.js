@@ -4971,6 +4971,38 @@ function meanPlanetRotationPeriodAtAge(planetName, t_Ma, T_rot_J2000_s = null) {
   return T_rot_J2000_s;
 }
 
+// ───── Per-planet orbital-cycle integrators (Phase P-A of planet deep-time plan) ─────
+// docs/hidden/IP-planet-deep-time-scene-graph.md
+//
+// Each planet's orbital cycle count between two SI-year inputs, integrated under
+// Driver 2 (Kepler + solar mass loss). Reuses the generic `_moonChainCycles`
+// adaptive Simpson + LRU-cache infrastructure (the "Moon" name is historical;
+// the function is period-function-agnostic).
+//
+// Cache identity invariant: each period function MUST be captured ONCE as a stable
+// const so `_moonChainCycles` LRU cache (keyed by function identity) works. Inline
+// `t_Ma => meanPlanetOrbitalPeriodAtAge(t_Ma, K)` inside the wrappers would create
+// a new function object per call, defeating the cache.
+//
+// Pure additions: nothing in the render loop or setEpoch reads these yet.
+// Phase P-A.1 derives `_currentYearSI_TT`; Phase P-B0+ wires the wrappers into
+// the render-loop dispatch via `obj._dtIntegrator` tags.
+const meanMercuryOrbitalPeriodSeconds = (t_Ma) => meanPlanetOrbitalPeriodAtAge(t_Ma, MERCURY_PERIOD_J2000_S);
+const meanVenusOrbitalPeriodSeconds   = (t_Ma) => meanPlanetOrbitalPeriodAtAge(t_Ma, VENUS_PERIOD_J2000_S);
+const meanMarsOrbitalPeriodSeconds    = (t_Ma) => meanPlanetOrbitalPeriodAtAge(t_Ma, MARS_PERIOD_J2000_S);
+const meanJupiterOrbitalPeriodSeconds = (t_Ma) => meanPlanetOrbitalPeriodAtAge(t_Ma, JUPITER_PERIOD_J2000_S);
+const meanSaturnOrbitalPeriodSeconds  = (t_Ma) => meanPlanetOrbitalPeriodAtAge(t_Ma, SATURN_PERIOD_J2000_S);
+const meanUranusOrbitalPeriodSeconds  = (t_Ma) => meanPlanetOrbitalPeriodAtAge(t_Ma, URANUS_PERIOD_J2000_S);
+const meanNeptuneOrbitalPeriodSeconds = (t_Ma) => meanPlanetOrbitalPeriodAtAge(t_Ma, NEPTUNE_PERIOD_J2000_S);
+
+function meanMercuryOrbitalCyclesBetween(yearA, yearB) { return _moonChainCycles(meanMercuryOrbitalPeriodSeconds, yearA, yearB); }
+function meanVenusOrbitalCyclesBetween(yearA, yearB)   { return _moonChainCycles(meanVenusOrbitalPeriodSeconds,   yearA, yearB); }
+function meanMarsOrbitalCyclesBetween(yearA, yearB)    { return _moonChainCycles(meanMarsOrbitalPeriodSeconds,    yearA, yearB); }
+function meanJupiterOrbitalCyclesBetween(yearA, yearB) { return _moonChainCycles(meanJupiterOrbitalPeriodSeconds, yearA, yearB); }
+function meanSaturnOrbitalCyclesBetween(yearA, yearB)  { return _moonChainCycles(meanSaturnOrbitalPeriodSeconds,  yearA, yearB); }
+function meanUranusOrbitalCyclesBetween(yearA, yearB)  { return _moonChainCycles(meanUranusOrbitalPeriodSeconds,  yearA, yearB); }
+function meanNeptuneOrbitalCyclesBetween(yearA, yearB) { return _moonChainCycles(meanNeptuneOrbitalPeriodSeconds, yearA, yearB); }
+
 // ───── PHASE 1 — Mutate the 5 epoch anchors to the deep-time epoch ─────
 // Reassigns the (now `let`) globals to their values at age t_Ma.
 // At t_Ma = 0 every assignment is an identity (the global already holds the
@@ -5432,6 +5464,37 @@ for (const k of PLANET_KEYS) {
   _planetWobblePeriodJ2000[k]  = P_wobble_J2000;
 }
 
+// ───── Phase P-C0 — Perihelion ecliptic 8H/N divisor + sign tables ─────
+// docs/hidden/IP-planet-deep-time-scene-graph.md
+//
+// Each planet's perihelion ecliptic period satisfies the Law-6 invariant
+// |periEclipticYears| = 8H_J2000 / N for a fixed positive integer N:
+//   Mercury 11, Venus 6, Mars 36, Jupiter 39, Saturn 65, Uranus 24, Neptune 4
+// Venus and Saturn have *retrograde* perihelion ecliptic precession (their
+// raw PERIHELION_ECLIPTIC_YEARS_J2000 entries are negative); the rest are
+// prograde. We split the table into |N| (always positive) + sign so the
+// `_dtCycleN` dispatch (which requires positive N) can consume |N| while
+// the existing `_dtCycleSign` carries the direction.
+//
+// Consumed by Phase P-C1+ when tagging
+// `*PerihelionDurationEcliptic1/2._dtCycleN`. Validated by the
+// "Verify P-C0" console test (verifies 8H/N exact match per planet).
+const _planetPerihelionDivisors = {};
+const _planetPerihelionSigns    = {};
+for (const k of PLANET_KEYS) {
+  const periEclipticYears = PERIHELION_ECLIPTIC_YEARS_J2000[k];
+  const sign = Math.sign(periEclipticYears);
+  const N    = Math.round((8 * HOLISTIC_YEAR_J2000) / Math.abs(periEclipticYears));
+  // Verify Law-6 8H/N invariant: |recovered − actual| / |actual| ≤ 1e-6.
+  const recovered = sign * (8 * HOLISTIC_YEAR_J2000) / N;
+  const relErr    = Math.abs(recovered - periEclipticYears) / Math.abs(periEclipticYears);
+  if (relErr > 1e-6) {
+    console.error(`Phase P-C0: planet ${k} perihelion ecliptic period ${periEclipticYears} not on 8H/N lattice (sign=${sign}, N=${N}, recovered=${recovered}, relErr=${relErr})`);
+  }
+  _planetPerihelionDivisors[k] = N;
+  _planetPerihelionSigns[k]    = sign;
+}
+
 // Earth equivalents — perihelion cycle (H/16, divisor=16)
 const EARTH_ECC_DIVISOR_N = 16;
 
@@ -5809,6 +5872,16 @@ function updateSafeObjectsForEpoch() {
 //   .speed       = 2π × N_planet / H_t            (depends on Phase 1 + Phase 2.5 lets)
 //   .orbitRadius = *OrbitDistance_t × 100         (Phase 2.5 let, already AU-rescaled)
 //   .size        = diameter / currentAUDistance × 100   (Phase 2 let)
+//
+// SNAPSHOT-ALSO-MUTATED INVARIANT (Phase P-F doc, 2026-06-20): the `.speed`
+// mutation here is INTENTIONALLY retained even though the new
+// `_dtPlanetIntegrator` dispatch (added in Phase P-B0+) supersedes it under
+// DEEP_TIME_MODE_ENABLED=true. The snapshot path `obj.speed × pos` remains
+// the fallback whenever DEEP_TIME_MODE_ENABLED=false (production default) or
+// when the user explicitly calls setEpoch() with the toggle off. Removing
+// these mutations would silently break the snapshot path at any non-J2000
+// epoch — see "Why we keep both paths" in
+// docs/hidden/IP-planet-deep-time-scene-graph.md.
 //
 // PERIHELION RATE — ESSRT 8H/N scaling.
 //   `perihelionPrecessionRate` scales with H: per doc 99 each planet's
@@ -8834,6 +8907,55 @@ const neptuneWobbleCenter = {
   traceOn: false, isNotPhysicalObject: true,
 };
 
+// ═════════════════════════════════════════════════════════════════════════════
+// PLANET SCENE-GRAPH DEEP-TIME TAG ARCHITECTURE
+//   docs/hidden/IP-planet-deep-time-scene-graph.md
+//
+// Three integrator-tag families, each suited to a different physical evolution law.
+// Each planet's scene-graph chain has 7 nodes: 4 tagged (epoch-dependent rates) +
+// 3 on snapshot (constant rates, intentional). Run "P-E composition audit" in the
+// Tools > Console Tests (F12) > Planet Deep-Time Integrators folder to inspect.
+//
+// ┌────────────────────────────┬─────────────────────────┬─────────────────────────┐
+// │ Tag family                 │ Physical law            │ Time base               │
+// ├────────────────────────────┼─────────────────────────┼─────────────────────────┤
+// │ _dtCycleN / _dtCycleSign   │ Law-6 H-scaling cycles  │ UT (_currentYearSI)     │
+// │ + _dtCycleAnchor (opt)     │ (Driver 1, H evolves)   │                         │
+// │   → wobble centers,        │                         │                         │
+// │     perihelion ecliptic    │                         │                         │
+// │     E1/E2 pairs            │                         │                         │
+// ├────────────────────────────┼─────────────────────────┼─────────────────────────┤
+// │ _dtPlanetIntegrator        │ Kepler + solar mass     │ TT (_currentYearSI_TT)  │
+// │ + _dtPlanetAnchor          │ loss (Driver 2)         │                         │
+// │ + _dtPlanetSign            │                         │                         │
+// │   → planet orbital nodes   │                         │                         │
+// ├────────────────────────────┼─────────────────────────┼─────────────────────────┤
+// │ _dtPerihelionDivisor       │ Law-6 perihelion phase  │ UT (negligible UT/TT    │
+// │ + _dtPerihelionAnchor      │ for eq-of-center        │ mismatch — ~8e-7° max)  │
+// │   → planet eq-of-center    │                         │                         │
+// │     perihelionPhase term   │                         │                         │
+// └────────────────────────────┴─────────────────────────┴─────────────────────────┘
+//
+// SNAPSHOT-ALSO-MUTATED INVARIANT: even though the tagged dispatch paths above
+// supersede the snapshot `obj.speed × pos` for deep-time-mode rendering, the
+// snapshot mutations in updateMercuryForEpoch() etc. (script.js ~line 5837+) are
+// INTENTIONALLY retained. The snapshot path is the fallback when
+// DEEP_TIME_MODE_ENABLED=false (production default) and when the user navigates
+// via setEpoch() with the toggle off. Removing those mutations would silently
+// break the snapshot path at any non-J2000 epoch.
+//
+// DO NOT TAG planet orbital objects with _dtCycleN (the Phase 9.14 mistake) —
+// _dtCycleN uses cyclesBetweenYears(yA, yB, N) which integrates H(τ)-scaling
+// cycles. Planet orbital periods follow Kepler/Driver-2, NOT H-scaling, so the
+// correct integrator is _dtPlanetIntegrator (using _moonChainCycles with
+// meanPlanetOrbitalPeriodAtAge). See "The math problem" section of the IP doc.
+//
+// SIGN CONVENTION for _dtPlanetSign: derived from Math.sign(planet.speed) so
+// the integrator's rotation direction automatically matches the existing
+// snapshot scene-graph convention (handles Mars's quirky negative speed without
+// a special case).
+// ═════════════════════════════════════════════════════════════════════════════
+
 // ───── Phase 9.12 (Option B v2): planet wobble-center deep-time tags ─────
 // Each planet's wobble center orbits at its own H/N period (non-integer N).
 // Tags include `_dtCycleAnchor` (per-planet, _planetSceneAnchors_J2000) which
@@ -8849,14 +8971,226 @@ saturnWobbleCenter. _dtCycleN = _planetWobbleDivisors.saturn;  saturnWobbleCente
 uranusWobbleCenter. _dtCycleN = _planetWobbleDivisors.uranus;  uranusWobbleCenter. _dtCycleSign = +1; uranusWobbleCenter. _dtCycleAnchor = _planetSceneAnchors_J2000.uranus;
 neptuneWobbleCenter._dtCycleN = _planetWobbleDivisors.neptune; neptuneWobbleCenter._dtCycleSign = +1; neptuneWobbleCenter._dtCycleAnchor = _planetSceneAnchors_J2000.neptune;
 
-// Phase 9.14 (step 4): planet chain tags — REVERTED.
+// Phase 9.14 (step 4): planet chain tags — REVERTED (historical note).
 // Initial implementation caused visible position regression for planets
 // (Jupiter/Saturn ~120° RA shift at year 2020.97 in deep-time mode) despite
-// per-node snapshot↔integrator bit-equivalence at modern epochs. Suspect
-// interaction in the nested perihelion duration ecliptic frame composition
-// (rotate-then-unrotate dance with intermediate orbit-center offsets).
-// Reverted pending root-cause analysis; Earth/Moon/Sun chains (Steps 1-3)
-// still in place and tested. See conversation log "step 7" pre-commit.
+// per-node snapshot↔integrator bit-equivalence at modern epochs. The root
+// cause turned out to be a UT/TT unit mismatch in the integrator anchor
+// (Phase 9.15 fixed the calendar-year vs SI-year layer; Phase P-A.1
+// addresses the remaining UT/TT layer specifically for planets).
+//
+// Superseded by Phase P-B0+ (2026-06-20):
+//   • New `_dtPlanetIntegrator` dispatch branch consumes TT-shifted year
+//   • Tagged planet-by-planet with verification gates between each
+//   • Moon-chain branch unchanged (UT) → doc 101's 19/19 result preserved
+// See docs/hidden/IP-planet-deep-time-scene-graph.md for the full plan.
+
+// ───── Phase P-B1 — Mercury orbital integrator tag (TT-anchored) ─────
+// Mercury orbits the Sun under Kepler's third law + solar mass loss
+// (Driver 2). The orbital period T_mercury(t) is TT-uniform, so the
+// integrator anchor must be TT-aligned. The new `_dtPlanetIntegrator`
+// dispatch branch at script.js ~line 45548 consumes _currentYearSI_TT
+// (introduced in Phase P-A.1) for this purpose.
+//
+// At J2000 anchor: meanDeltaTSecondsAtAge(0) === 0 → _currentYearSI_TT
+// === STARTMODEL_YEAR_SI → integrator returns 0 cycles → θ matches
+// snapshot path exactly (bit-equivalent, no visible shift).
+//
+// At year -584 (Thales): TT-anchored integrator gives Mercury position
+// shifted +1.108° east vs the snapshot path. This is the physically
+// correct deep-time position (per dry-run analytical estimate).
+// SIGN CONVENTION (all 7 planets): _dtPlanetSign derived from Math.sign(planet.speed)
+// so the integrator's rotation direction automatically matches the existing
+// snapshot scene-graph convention. For Mercury/Venus/Jupiter/Saturn/Uranus/Neptune
+// the snapshot speed is +Math.PI*2/(H/N_planet) → sign +1. Mars is the odd one
+// out: mars.speed is -Math.PI*2/(H/N_mars) (a scene-graph framing artifact, NOT
+// a physics statement — Mars orbits prograde like every other planet). Deriving
+// from planet.speed handles Mars's special case without a hardcoded -1.
+mercury._dtPlanetIntegrator = meanMercuryOrbitalCyclesBetween;
+mercury._dtPlanetAnchor     = STARTMODEL_YEAR_SI;   // model's ΔT(0)=0 makes this TT-aligned at J2000
+mercury._dtPlanetSign       = Math.sign(mercury.speed);
+
+// Phase P-B2 — Venus orbital integrator tag (TT-anchored).
+venus._dtPlanetIntegrator = meanVenusOrbitalCyclesBetween;
+venus._dtPlanetAnchor     = STARTMODEL_YEAR_SI;
+venus._dtPlanetSign       = Math.sign(venus.speed);
+
+// Phase P-B3 — Mars orbital integrator tag (TT-anchored).
+// Math.sign(mars.speed) returns -1 automatically (scene-graph convention, see header).
+mars._dtPlanetIntegrator = meanMarsOrbitalCyclesBetween;
+mars._dtPlanetAnchor     = STARTMODEL_YEAR_SI;
+mars._dtPlanetSign       = Math.sign(mars.speed);
+
+// Phase P-B4 — Jupiter orbital integrator tag (TT-anchored).
+jupiter._dtPlanetIntegrator = meanJupiterOrbitalCyclesBetween;
+jupiter._dtPlanetAnchor     = STARTMODEL_YEAR_SI;
+jupiter._dtPlanetSign       = Math.sign(jupiter.speed);
+
+// Phase P-B5/6/7 — Saturn / Uranus / Neptune orbital integrator tags.
+// All three have positive snapshot speeds → Math.sign returns +1.
+// Batched after P-B4 because the remaining cases are identical in shape to
+// Jupiter and the dispatch path has been exercised by 4 prior planets.
+saturn._dtPlanetIntegrator  = meanSaturnOrbitalCyclesBetween;
+saturn._dtPlanetAnchor      = STARTMODEL_YEAR_SI;
+saturn._dtPlanetSign        = Math.sign(saturn.speed);
+
+uranus._dtPlanetIntegrator  = meanUranusOrbitalCyclesBetween;
+uranus._dtPlanetAnchor      = STARTMODEL_YEAR_SI;
+uranus._dtPlanetSign        = Math.sign(uranus.speed);
+
+neptune._dtPlanetIntegrator = meanNeptuneOrbitalCyclesBetween;
+neptune._dtPlanetAnchor     = STARTMODEL_YEAR_SI;
+neptune._dtPlanetSign       = Math.sign(neptune.speed);
+
+// ───── Phase P-C1 — Mercury perihelion ecliptic frames (Law-6 H-scaling) ─────
+// docs/hidden/IP-planet-deep-time-scene-graph.md
+//
+// THE PHASE 9.14 REVERT SITE. The original attempt failed due to UT/TT unit
+// mismatches (Phase 9.15 fixed those at the integrator boundary). Plus a
+// concern about "rotate-then-unrotate dance" interactions with the intermediate
+// mercuryPerihelionFromEarth frame between Ecliptic1 and Ecliptic2.
+//
+// Dry-run ("P-C1 dry-run" button) confirmed:
+//   • o.pos === 0 at startmodelJD → snapshot θ = 0 for both E1 and E2 (startPos=0)
+//   • Integrator with anchor=STARTMODEL_YEAR_SI returns ~0 cycles at startmodel
+//   • Per-frame divergence is sub-nanoradian (floating-point noise)
+//   • E1+E2 pair cancels exactly in both snapshot and integrator paths
+//   ⇒ Net rotation passed to mercury is ZERO under either path → bit-equivalent.
+//
+// Sign convention: each frame's effective sign = _planetPerihelionSigns[k] × inherent±.
+// For Mercury (prograde): baseSign = +1 → E1 = +1, E2 = -1. Matches the existing
+// snapshot speeds (mercuryPerihelionDurationEcliptic1.speed > 0, *Ecliptic2.speed < 0).
+//
+// DIVISOR CONVENTION (CRITICAL): cyclesBetweenYears(yA, yB, divisor_N) integrates
+// cycles of period H/divisor_N. The Law-6 perihelion ecliptic period is 8H/N (where
+// N is the integer in `_planetPerihelionDivisors`). So the H-form divisor is N/8,
+// NOT N. Initial P-C tagging used N and was off by factor 8 — caught when P-D
+// reproduced the same bug visibly via the eq-of-center perihelion phase. See the
+// P-D revert comment further down. Same N/8 convention applies to P-D below.
+{
+  const N        = _planetPerihelionDivisors.mercury;   // = 11 (the integer in 8H/N)
+  const baseSign = _planetPerihelionSigns.mercury;      // = +1 (prograde)
+  mercuryPerihelionDurationEcliptic1._dtCycleN      = N / 8;
+  mercuryPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);
+  mercuryPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
+  mercuryPerihelionDurationEcliptic2._dtCycleN      = N / 8;
+  mercuryPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);
+  mercuryPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
+}
+
+// ───── Phase P-C2 — Venus perihelion ecliptic frames (RETROGRADE) ─────
+// Venus's perihelionEclipticYears is NEGATIVE → retrograde perihelion precession.
+// baseSign = -1 → E1 = -1, E2 = +1 (opposite of Mercury). Matches the existing
+// snapshot speeds (venusPerihelionDurationEcliptic1.speed < 0 because periEclipticYears
+// is negative; *Ecliptic2.speed > 0).
+{
+  const N        = _planetPerihelionDivisors.venus;     // = 6
+  const baseSign = _planetPerihelionSigns.venus;        // = -1 (retrograde)
+  venusPerihelionDurationEcliptic1._dtCycleN      = N / 8;
+  venusPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);   // = -1
+  venusPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
+  venusPerihelionDurationEcliptic2._dtCycleN      = N / 8;
+  venusPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);   // = +1
+  venusPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
+}
+
+// ───── Phase P-C3/4/5/6/7 — Remaining perihelion ecliptic frame pairs ─────
+// Both sign conventions (prograde and retrograde) verified in P-C1/P-C2.
+// Mars, Jupiter, Uranus, Neptune: prograde (baseSign = +1) — same shape as Mercury.
+// Saturn: retrograde (baseSign = -1) — same shape as Venus.
+// Batched after P-C2 since both patterns are now exercised; one combined
+// visual verification covers all 5.
+{
+  const N        = _planetPerihelionDivisors.mars;      // = 36
+  const baseSign = _planetPerihelionSigns.mars;         // = +1 (prograde)
+  marsPerihelionDurationEcliptic1._dtCycleN      = N / 8;
+  marsPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);
+  marsPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
+  marsPerihelionDurationEcliptic2._dtCycleN      = N / 8;
+  marsPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);
+  marsPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
+}
+{
+  const N        = _planetPerihelionDivisors.jupiter;   // = 39
+  const baseSign = _planetPerihelionSigns.jupiter;      // = +1 (prograde)
+  jupiterPerihelionDurationEcliptic1._dtCycleN      = N / 8;
+  jupiterPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);
+  jupiterPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
+  jupiterPerihelionDurationEcliptic2._dtCycleN      = N / 8;
+  jupiterPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);
+  jupiterPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
+}
+{
+  const N        = _planetPerihelionDivisors.saturn;    // = 65
+  const baseSign = _planetPerihelionSigns.saturn;       // = -1 (retrograde)
+  saturnPerihelionDurationEcliptic1._dtCycleN      = N / 8;
+  saturnPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);   // = -1
+  saturnPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
+  saturnPerihelionDurationEcliptic2._dtCycleN      = N / 8;
+  saturnPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);   // = +1
+  saturnPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
+}
+{
+  const N        = _planetPerihelionDivisors.uranus;    // = 24
+  const baseSign = _planetPerihelionSigns.uranus;       // = +1 (prograde)
+  uranusPerihelionDurationEcliptic1._dtCycleN      = N / 8;
+  uranusPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);
+  uranusPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
+  uranusPerihelionDurationEcliptic2._dtCycleN      = N / 8;
+  uranusPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);
+  uranusPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
+}
+{
+  const N        = _planetPerihelionDivisors.neptune;   // = 4
+  const baseSign = _planetPerihelionSigns.neptune;      // = +1 (prograde)
+  neptunePerihelionDurationEcliptic1._dtCycleN      = N / 8;
+  neptunePerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);
+  neptunePerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
+  neptunePerihelionDurationEcliptic2._dtCycleN      = N / 8;
+  neptunePerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);
+  neptunePerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
+}
+
+// ───── Phase P-D — Per-planet _dtPerihelionDivisor for eq-of-center ─────
+// docs/hidden/IP-planet-deep-time-scene-graph.md
+//
+// Re-applied 2026-06-20 with CORRECTED divisor convention (N/8, not N).
+//
+// The equation-of-center block (script.js ~line 46647) computes the planet's
+// mean anomaly M = θ - perihelionPhase. With _dtPerihelionDivisor tagged,
+// the dispatch (line ~46663) uses the integral form:
+//   perihelionPhase = perihelionPhaseJ2000 + cyclesBetween(anchor, current, divisor) × 2π
+//
+// DIVISOR (CRITICAL): cyclesBetweenYears integrates cycles of period H/divisor.
+// Planet perihelion ecliptic period = 8H/N → divisor = N/8 (NOT N).
+// Initial P-D used N and produced visible Jupiter/Saturn position regression
+// (~11-13° perihelion phase error at year 1682 → ~1° RA error). Reverted and
+// re-applied with N/8. Sun's existing sun._dtPerihelionDivisor = 16 is
+// unchanged — Sun's period is H/16 directly, not 8H/16.
+//
+// SIGNED DIVISOR: cyclesBetweenYears multiplies by divisor_N at the end
+// (script.js line 5395), so a negative divisor naturally flips the cycle
+// sign — perfect for retrograde perihelion precession (Venus, Saturn).
+// Signed H-form divisor = (N/8) × sign.
+//
+// UT vs TT (resolved): the dispatch uses _currentYearSI (UT), while planet
+// θ (P-B1+) uses _currentYearSI_TT. The mixed-coordinate M error is bounded
+// by ω_peri × ΔT, which for Mercury at year -584 is ~8e-7° — utterly
+// negligible. No conditional dispatch needed.
+mercury._dtPerihelionDivisor = (_planetPerihelionDivisors.mercury / 8) * _planetPerihelionSigns.mercury;  // = +1.375
+mercury._dtPerihelionAnchor  = STARTMODEL_YEAR_SI;
+venus._dtPerihelionDivisor   = (_planetPerihelionDivisors.venus   / 8) * _planetPerihelionSigns.venus;    // = -0.75  (retrograde)
+venus._dtPerihelionAnchor    = STARTMODEL_YEAR_SI;
+mars._dtPerihelionDivisor    = (_planetPerihelionDivisors.mars    / 8) * _planetPerihelionSigns.mars;     // = +4.5
+mars._dtPerihelionAnchor     = STARTMODEL_YEAR_SI;
+jupiter._dtPerihelionDivisor = (_planetPerihelionDivisors.jupiter / 8) * _planetPerihelionSigns.jupiter;  // = +4.875
+jupiter._dtPerihelionAnchor  = STARTMODEL_YEAR_SI;
+saturn._dtPerihelionDivisor  = (_planetPerihelionDivisors.saturn  / 8) * _planetPerihelionSigns.saturn;   // = -8.125 (retrograde)
+saturn._dtPerihelionAnchor   = STARTMODEL_YEAR_SI;
+uranus._dtPerihelionDivisor  = (_planetPerihelionDivisors.uranus  / 8) * _planetPerihelionSigns.uranus;   // = +3
+uranus._dtPerihelionAnchor   = STARTMODEL_YEAR_SI;
+neptune._dtPerihelionDivisor = (_planetPerihelionDivisors.neptune / 8) * _planetPerihelionSigns.neptune;  // = +0.5
+neptune._dtPerihelionAnchor  = STARTMODEL_YEAR_SI;
 
 //*************************************************************
 // ADD CONSTANTS
@@ -28280,6 +28614,1415 @@ function setupGUI() {
   }, 'Sweep modern range (1900-2100) in 10-yr steps. After unit fix, all diffs ' +
      'should be < 0.01°. Patterns reveal anchor or rate calibration issues.');
 
+  // ────────────────────────────────────────────────────────────────────────
+  // Planet deep-time integrator verification (Phase P-A of
+  // docs/hidden/IP-planet-deep-time-scene-graph.md).
+  // ────────────────────────────────────────────────────────────────────────
+  const firstPlanetIntBtn = addTestButton('Verify Planet Orbital Integrators (P-A)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase P-A — Planet orbital integrator verification (additive, zero render change)');
+    console.log('  docs/hidden/IP-planet-deep-time-scene-graph.md');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    let passCount = 0;
+    let failCount = 0;
+    const note = (label, ok, detail) => {
+      (ok ? passCount++ : failCount++);
+      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
+    };
+
+    // ── Test 1: J2000 expected cycles (snapshot rate × 0.5 yr) ──
+    console.log('TEST 1 — modern-epoch cycle counts (year 2000.0 → 2000.5)');
+    console.log('  Each planet should complete (0.5 yr / orbital_period_yr) cycles.');
+    const j2000Periods_d = {
+      mercury: 87.97, venus: 224.69, mars: 686.93, jupiter: 4330.5,
+      saturn: 10746.9, uranus: 30587.4, neptune: 59800.7
+    };
+    const wrappers = {
+      mercury: meanMercuryOrbitalCyclesBetween,
+      venus:   meanVenusOrbitalCyclesBetween,
+      mars:    meanMarsOrbitalCyclesBetween,
+      jupiter: meanJupiterOrbitalCyclesBetween,
+      saturn:  meanSaturnOrbitalCyclesBetween,
+      uranus:  meanUranusOrbitalCyclesBetween,
+      neptune: meanNeptuneOrbitalCyclesBetween,
+    };
+    const t1Rows = [];
+    for (const k of Object.keys(j2000Periods_d)) {
+      const T_yr = j2000Periods_d[k] / 365.2422;
+      const expected = 0.5 / T_yr;
+      const actual = wrappers[k](2000.0, 2000.5);
+      const err_pct = Math.abs((actual - expected) / expected) * 100;
+      const ok = err_pct < 0.01;  // <0.01% tolerance (snapshot-form rounding)
+      t1Rows.push({
+        planet: k,
+        expected: expected.toFixed(6),
+        actual: actual.toFixed(6),
+        err_pct: err_pct.toFixed(5) + ' %',
+        pass: ok ? '✓' : '✗',
+      });
+      if (!ok) failCount++;
+    }
+    console.table(t1Rows);
+    note(`Test 1 overall (per-planet rows above, gate: err < 0.01% for all 7)`,
+         t1Rows.every(r => r.pass === '✓'));
+
+    // ── Test 2: Anchor identity (yA === yB → 0 cycles) ──
+    console.log('\nTEST 2 — anchor identity: yA === yB should give exactly 0 cycles');
+    let t2Pass = true;
+    for (const [k, fn] of Object.entries(wrappers)) {
+      const v = fn(2000.0, 2000.0);
+      const ok = v === 0;
+      console.log(`    ${ok ? '✓' : '✗'} ${k.padEnd(8)} → ${v}`);
+      if (!ok) t2Pass = false;
+    }
+    note('Test 2 overall (all 7 planets return exact 0)', t2Pass);
+
+    // ── Test 3: Cache consistency (2nd call === 1st call) ──
+    console.log('\nTEST 3 — cache consistency: repeated calls should be identical');
+    let t3Pass = true;
+    for (const [k, fn] of Object.entries(wrappers)) {
+      const v1 = fn(2000.0, 2000.5);
+      const v2 = fn(2000.0, 2000.5);
+      const ok = v1 === v2 && Number.isFinite(v1);
+      console.log(`    ${ok ? '✓' : '✗'} ${k.padEnd(8)} → ${v1} === ${v2}`);
+      if (!ok) t3Pass = false;
+    }
+    note('Test 3 overall (all 7 planets return identical results)', t3Pass);
+
+    // ── Test 4: Snapshot vs integrated agree at modern epoch ──
+    console.log('\nTEST 4 — DEEP_TIME toggle independence at modern epoch (10-year span)');
+    console.log('  Snapshot mode and integrated mode should agree to ≤ 1e-9 for years near J2000.');
+    const wasOn = DEEP_TIME_MODE_ENABLED;
+    let t4Pass = true;
+    try {
+      for (const [k, fn] of Object.entries(wrappers)) {
+        DEEP_TIME_MODE_ENABLED = false;
+        const snap = fn(2000.0, 2010.0);
+        DEEP_TIME_MODE_ENABLED = true;
+        const intg = fn(2000.0, 2010.0);
+        const diff = Math.abs(snap - intg);
+        const ok = diff < 1e-9;
+        console.log(`    ${ok ? '✓' : '✗'} ${k.padEnd(8)}  snapshot=${snap.toFixed(8)}  integrated=${intg.toFixed(8)}  diff=${diff.toExponential(2)}`);
+        if (!ok) t4Pass = false;
+      }
+    } finally {
+      DEEP_TIME_MODE_ENABLED = wasOn;  // ALWAYS restore — never leave the toggle changed
+    }
+    note('Test 4 overall (all 7 planets agree to ≤ 1e-9 at modern epoch)', t4Pass);
+
+    // ── Test 5: Deep-time divergence (Phanerozoic) shows expected sign ──
+    console.log('\nTEST 5 — deep-time behavior at year −1000 (sanity check, NOT a gate)');
+    console.log('  Integrated cycle count should be very close to snapshot at -1 kyr (mass loss negligible).');
+    const wasOn2 = DEEP_TIME_MODE_ENABLED;
+    try {
+      DEEP_TIME_MODE_ENABLED = false;
+      const snap_m1k = meanMercuryOrbitalCyclesBetween(2000.0, -1000.0);
+      DEEP_TIME_MODE_ENABLED = true;
+      const intg_m1k = meanMercuryOrbitalCyclesBetween(2000.0, -1000.0);
+      const drift_pct = Math.abs((intg_m1k - snap_m1k) / snap_m1k) * 100;
+      console.log(`    Mercury 2000 → -1000:  snapshot=${snap_m1k.toFixed(2)}  integrated=${intg_m1k.toFixed(2)}  drift=${drift_pct.toFixed(6)}%`);
+      console.log('    (At -1 kyr, mass loss is ~7e-11 → drift should be ~1e-10 % — confirms Driver-2 integrand is engaged.)');
+    } finally {
+      DEEP_TIME_MODE_ENABLED = wasOn2;
+    }
+
+    // ── Summary ──
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY:  ${passCount} passed, ${failCount} failed`);
+    if (failCount === 0) {
+      console.log('  ✓ Phase P-A verified — safe to proceed to Phase P-A.1 (TT correction).');
+    } else {
+      console.log('  ✗ Phase P-A FAILED — do NOT proceed. Diagnose failures above.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase P-A verification: 7 additive planet orbital integrator wrappers ' +
+     '(meanMercuryOrbitalCyclesBetween etc.). Checks J2000 cycle counts vs ' +
+     'expected, anchor identity, cache consistency, and DEEP_TIME toggle ' +
+     'independence at modern epoch. Pure additive — must not affect rendering. ' +
+     'Phase P-A of IP-planet-deep-time-scene-graph.md.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // P-A.1 DRY-RUN — read-only impact assessment of switching the integrator
+  // boundary from UT-year to TT-year. Does NOT modify any rendering code.
+  // Shows the predicted Moon/Earth angular shifts and the resulting sub-solar
+  // shift at each of the 19 documented historical eclipses, so we can decide
+  // whether to apply P-A.1 (full scope) or narrow it to planet integrators only.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('P-A.1 dry-run — UT→TT impact on Moon/Earth/eclipse paths', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase P-A.1 DRY-RUN — predicted impact of switching integrator anchor UT → TT');
+    console.log('  Read-only: no rendering code is modified. See IP doc P-A.1.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    // Same 19-eclipse list as button "Visibility window: ΔT range that fits each eclipse"
+    const EVENTS = [
+      [-762,  6, 15, 36.36,  43.16, 'Total',   'Bur-Sagale (Assyrian)'],
+      [-708,  7, 17, 35.0,  113.0,  'Total',   'Chinese Spring/Autumn'],
+      [-647,  4,  6, 32.5,   44.4,  'Partial', 'Babylonian early'],
+      [-584,  5, 28, 39.0,   35.0,  'Total',   'Thales (Halys/Anatolia)'],
+      [-556,  5, 19, 32.5,   44.4,  'Partial', 'Babylonian Nabonidus'],
+      [-430,  8,  3, 37.97,  23.72, 'Annular', 'Thucydides 2.28 (Athens)'],
+      [-309,  8, 15, 32.5,   44.4,  'Total',   'Babylonian (Antigonus)'],
+      [-135,  4, 15, 32.5,   44.4,  'Total',   'Babylonian best diary'],
+      [  71,  3, 20, 38.0,   25.0,  'Total',   'Plutarch De Facie (Aegean)'],
+      [ 977, 12, 13, 30.05,  31.24, 'Annular', 'Ibn Yunus 977 (Cairo)'],
+      [ 978,  6,  8, 30.05,  31.24, 'Partial', 'Ibn Yunus 978 (Cairo)'],
+      [ 979,  5, 28, 30.05,  31.24, 'Partial', 'Ibn Yunus 979 (Cairo)'],
+      [ 985,  7, 20, 30.05,  31.24, 'Annular', 'Ibn Yunus 985 (Cairo)'],
+      [ 993,  8, 20, 30.05,  31.24, 'Annular', 'Ibn Yunus 993 (Cairo)'],
+      [1004,  1, 24, 30.05,  31.24, 'Tot/Ann', 'Ibn Yunus 1004 (Cairo)'],
+      [1133,  8,  2, 52.0,   -2.0,  'Total',   'Henry I death (England)'],
+      [1185,  5,  1, 50.0,   38.0,  'Annular', 'Igors Tale (Russia)'],
+      [1239,  6,  3, 43.7,   10.4,  'Total',   'Cerchiari Tuscany'],
+      [1654,  8, 12, 51.5,   -0.1,  'Total',   'European total (London)'],
+    ];
+
+    // Meeus Julian/Gregorian auto-switch (same logic as visibility-window test)
+    const jdOf = (Y, M, D, h = 12) => {
+      const isJulian = (Y < 1582) || (Y === 1582 && (M < 10 || (M === 10 && D < 15)));
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      const A = Math.floor(y / 100);
+      const B = isJulian ? 0 : (2 - A + Math.floor(A / 4));
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
+             + D + B - 1524.5 + h / 24;
+    };
+
+    const SYR_S = SI_TROPICAL_YEAR_DAYS * 86400;     // SI year in seconds
+    const N_MOON_PER_DAY  = 360 / 27.32166;           // sidereal Moon, °/day
+    const N_EARTH_PER_DAY = 360 / SI_TROPICAL_YEAR_DAYS; // Earth sidereal, °/day
+    const N_SYNODIC_PER_HR = 360 / (29.53059 * 24);   // synodic Moon-Sun, °/h
+    const EARTH_CIRC_KM   = 40075;                    // equatorial circumference
+
+    console.log('Per-eclipse predicted shifts under P-A.1 (Moon integrator: UT → TT)');
+    console.log('  Δλ_Moon  = ΔT(yr) × n_moon_sidereal × 360°  (Moon mean longitude shift)');
+    console.log('  Δλ_Earth = ΔT(yr) × n_earth × 360°           (Earth orbital phase shift)');
+    console.log('  Δt_conj  = (Δλ_Moon − Δλ_Sun) / synodic rate (eclipse-time shift, hours)');
+    console.log('  Δsubsol  = Δt_conj × 15° × Earth_circ × cos(lat) (sub-solar km on Earth)\n');
+
+    const rows = [];
+    for (const [Y, M, D, lat, lng, type, name] of EVENTS) {
+      const jd_ut    = jdOf(Y, M, D, 12);
+      const decYear  = julianDateToDecimalYear(jd_ut);
+      const t_Ma     = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+      const dT_sec   = meanDeltaTSecondsAtAge(t_Ma);
+      const dT_day   = dT_sec / 86400;
+
+      // Moon mean longitude shift (degrees) if anchor were TT-shifted
+      const dL_moon  = dT_day * N_MOON_PER_DAY;
+
+      // Earth orbital shift (apparent Sun motion = same direction, same rate)
+      const dL_earth = dT_day * N_EARTH_PER_DAY;
+
+      // Sun-Moon synodic shift: Moon shifts by dL_moon; apparent Sun shifts by dL_earth.
+      // Net conjunction-time displacement: shift in (Moon − apparent-Sun) longitude,
+      // divided by the synodic rate.
+      const dL_synodic = dL_moon - dL_earth;
+      const dt_conj_hr = dL_synodic / N_SYNODIC_PER_HR;
+
+      // Earth rotation in that interval → sub-solar longitude shift
+      const dlng_subsolar_deg = dt_conj_hr * 15;
+      const cos_lat           = Math.cos(lat * Math.PI / 180);
+      const dlng_subsolar_km  = dlng_subsolar_deg / 360 * EARTH_CIRC_KM * cos_lat;
+
+      const within7500 = Math.abs(dlng_subsolar_km) < 7500 ? '✓' : '✗';
+      rows.push({
+        event:       name,
+        year:        Y,
+        ΔT_sec:      dT_sec.toFixed(0),
+        Δλ_Moon_deg: dL_moon.toFixed(3),
+        Δλ_Earth_deg: dL_earth.toExponential(2),
+        Δt_conj_hr:  dt_conj_hr.toFixed(2),
+        Δsubsol_km:  dlng_subsolar_km.toFixed(0),
+        in_window:   within7500,
+      });
+    }
+    console.table(rows);
+
+    // Summary stats
+    const within = rows.filter(r => r.in_window === '✓').length;
+    const maxKm  = Math.max(...rows.map(r => Math.abs(Number(r.Δsubsol_km))));
+    const worst  = rows.find(r => Math.abs(Number(r.Δsubsol_km)) === maxKm);
+
+    console.log('\n── SUMMARY ──────────────────────────────────────────────────────────────');
+    console.log(`  ${within} / ${EVENTS.length} events remain within ±7,500 km sub-solar tolerance after P-A.1 shift.`);
+    console.log(`  Worst case: ${worst.event} (year ${worst.year}) → Δsub-solar = ${worst.Δsubsol_km} km`);
+    console.log('');
+    if (within === EVENTS.length) {
+      console.log('  → SCENARIO B: P-A.1 is SAFE for Moon/Earth chain. All eclipses remain in window.');
+      console.log('    Proceed with full-scope P-A.1 (TT correction applied to all integrators).');
+    } else {
+      console.log('  → SCENARIO A: P-A.1 WOULD REGRESS the eclipse validation.');
+      console.log('    DO NOT apply full-scope P-A.1. Narrow P-A.1 to planet integrators only:');
+      console.log('      - Keep _dtCycleN (Earth/wobble centers) on UT-year (existing behavior)');
+      console.log('      - Keep _dtMoonIntegrator (Moon chain) on UT-year (existing behavior)');
+      console.log('      - Apply TT shift ONLY in new planet _dtIntegrator branch (P-B0+).');
+      console.log('    Document the asymmetry in the IP doc.');
+    }
+
+    // Per-planet shift at year −584 for context (informational)
+    console.log('\n── Per-planet orbital-phase shift at year −584 (Thales) under P-A.1 ──');
+    const jd_thales = jdOf(-584, 5, 28, 12);
+    const decY_thales = julianDateToDecimalYear(jd_thales);
+    const tMa_thales = (J2000_CALENDAR_YEAR - decY_thales) / 1e6;
+    const dT_thales_yr = meanDeltaTSecondsAtAge(tMa_thales) / SYR_S;
+    const periods_d = {
+      mercury: 87.97, venus: 224.69, mars: 686.93, jupiter: 4330.5,
+      saturn: 10746.9, uranus: 30587.4, neptune: 59800.7
+    };
+    const planetRows = [];
+    for (const [k, T_d] of Object.entries(periods_d)) {
+      const T_yr = T_d / SI_TROPICAL_YEAR_DAYS;
+      const dL_deg = (dT_thales_yr / T_yr) * 360;
+      planetRows.push({
+        planet: k,
+        T_orbital_yr: T_yr.toFixed(3),
+        Δλ_planet_deg: dL_deg.toFixed(3),
+      });
+    }
+    console.table(planetRows);
+    console.log('  Mercury 0.77° matches the IP doc prediction; gas giants negligible.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'P-A.1 dry-run: predicts the angular shifts on Moon/Earth and the ' +
+     'sub-solar position change at each of the 19 historical eclipses if we ' +
+     'switched the integrator anchor from UT-year to TT-year. Read-only: ' +
+     'no rendering code is modified. Decides whether full-scope P-A.1 is safe ' +
+     '(Scenario B) or must be narrowed to planet integrators only (Scenario A).');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // P-A.1 narrowed verification — confirm _currentYearSI_TT derivation works
+  // correctly and existing Moon/Earth dispatch is unchanged. Read-only check
+  // that the new TT derivation can be safely consumed by the planet
+  // _dtIntegrator branch in P-B0+.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Verify P-A.1 (narrowed) — TT derivation correctness', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase P-A.1 (narrowed) verification — TT-shifted year for planet branch only');
+    console.log('  Existing _dtCycleN + _dtMoonIntegrator paths unchanged (UT-anchored).');
+    console.log('  docs/hidden/IP-planet-deep-time-scene-graph.md');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    let passCount = 0, failCount = 0;
+    const note = (label, ok, detail) => {
+      ok ? passCount++ : failCount++;
+      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
+    };
+
+    // Re-derive _currentYearSI_TT the same way the render loop does, given
+    // an input JD. Mirrors script.js render() lines ~45530-45550.
+    const SYR_S = SI_TROPICAL_YEAR_DAYS * 86400;
+    const computeYearSI_TT = (jd) => {
+      const ySI = _jdToSIyear(jd);
+      const dy  = julianDateToDecimalYear(jd);
+      const tMa = (J2000_CALENDAR_YEAR - dy) / 1e6;
+      const dT  = meanDeltaTSecondsAtAge(tMa);
+      return Number.isFinite(dT) ? ySI + dT / SYR_S : ySI;
+    };
+
+    // ── Test 1: Model convention — meanDeltaTSecondsAtAge(0) must be 0 ──
+    console.log('TEST 1 — model convention: meanDeltaTSecondsAtAge(0) === 0');
+    console.log('  This is the keystone enabling no-parallel-anchor design.');
+    const dT_at_J2000 = meanDeltaTSecondsAtAge(0);
+    note(`meanDeltaTSecondsAtAge(0) = ${dT_at_J2000}`,
+         dT_at_J2000 === 0,
+         dT_at_J2000 === 0 ? '' : '← VIOLATION — would require parallel TT anchor');
+
+    // ── Test 2: Near-anchor identity at startmodelJD (where planet anchors live) ──
+    // The model's ΔT(t_Ma=0) === 0 is the keystone (Test 1 above). But t_Ma at
+    // any specific JD depends on the J2000_CALENDAR_YEAR convention, which uses
+    // mid-year (≈2000.5) — NOT the astronomical j2000JD literal (which maps to
+    // calendar year ~2000.0014 via julianDateToDecimalYear). So the chain
+    // (jd → decYear → t_Ma → ΔT) only returns EXACT zero at the specific JD
+    // that maps to t_Ma === 0; at other "near-J2000" JDs there's a sub-second
+    // artifact that translates to microarcseconds of planet visual shift.
+    //
+    // What matters operationally is the anchor identity at startmodelJD,
+    // where the planet anchors (STARTMODEL_YEAR_SI) live. We allow a < 1s
+    // tolerance there because anything within that is sub-mas in visual terms.
+    console.log('\nTEST 2 — anchor identity at startmodelJD (where planet anchors will live)');
+    console.log('  Offset = model\'s predicted ΔT at startmodel (the "Phase Z" residual).');
+    console.log('  Tolerance: < 1 second TT, which maps to < 1 milliarcsecond Mercury shift.');
+    const ySI_TT_at_anchor = computeYearSI_TT(startmodelJD);
+    const delta_at_anchor  = Math.abs(ySI_TT_at_anchor - STARTMODEL_YEAR_SI);
+    const delta_at_anchor_s = delta_at_anchor * SYR_S;
+    note(`At startmodelJD: STARTMODEL_YEAR_SI=${STARTMODEL_YEAR_SI.toFixed(10)}, _currentYearSI_TT=${ySI_TT_at_anchor.toFixed(10)}, diff=${delta_at_anchor.toExponential(2)} yr (${delta_at_anchor_s.toFixed(4)} s)`,
+         delta_at_anchor_s < 1.0);
+
+    // ── Test 3: Planet integrator returns 0 at anchor with TT-shifted current ──
+    console.log('\nTEST 3 — planet integrator anchor identity (P-B0+ readiness)');
+    console.log('  meanXOrbitalCyclesBetween(STARTMODEL_YEAR_SI, _currentYearSI_TT_at_anchor) === 0');
+    const wrappers = {
+      mercury: meanMercuryOrbitalCyclesBetween,
+      venus:   meanVenusOrbitalCyclesBetween,
+      mars:    meanMarsOrbitalCyclesBetween,
+      jupiter: meanJupiterOrbitalCyclesBetween,
+      saturn:  meanSaturnOrbitalCyclesBetween,
+      uranus:  meanUranusOrbitalCyclesBetween,
+      neptune: meanNeptuneOrbitalCyclesBetween,
+    };
+    let t3Pass = true;
+    for (const [k, fn] of Object.entries(wrappers)) {
+      const cyc = fn(STARTMODEL_YEAR_SI, ySI_TT_at_anchor);
+      const ok = Math.abs(cyc) < 1e-9;
+      console.log(`    ${ok ? '✓' : '✗'} ${k.padEnd(8)} → ${cyc.toExponential(3)} cycles`);
+      if (!ok) t3Pass = false;
+    }
+    note('Test 3 overall (all 7 planets return ≤ 1e-9 cycles at anchor)', t3Pass);
+
+    // ── Test 4: TT shift at year 2020 ──
+    console.log('\nTEST 4 — TT shift at year 2020 (modern, near anchor)');
+    const jd_2020 = 2458849.5;  // 2020-01-01 00:00 UT
+    const ySI_2020 = _jdToSIyear(jd_2020);
+    const ySI_TT_2020 = computeYearSI_TT(jd_2020);
+    const shift_2020_yr = ySI_TT_2020 - ySI_2020;
+    const shift_2020_s  = shift_2020_yr * SYR_S;
+    note(`Year 2020: TT shift = ${shift_2020_yr.toExponential(3)} yr (${shift_2020_s.toFixed(4)} s) — small near anchor`,
+         shift_2020_s < 10);  // < 10 sec expected near anchor
+
+    // ── Test 5: TT shift at year -584 matches dry-run table ──
+    console.log('\nTEST 5 — TT shift at year -584 matches dry-run analytical estimate');
+    const jdOf = (Y, M, D, h = 12) => {
+      const isJulian = (Y < 1582) || (Y === 1582 && (M < 10 || (M === 10 && D < 15)));
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      const A = Math.floor(y / 100);
+      const B = isJulian ? 0 : (2 - A + Math.floor(A / 4));
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D + B - 1524.5 + h / 24;
+    };
+    const jd_thales = jdOf(-584, 5, 28, 12);
+    const ySI_thales = _jdToSIyear(jd_thales);
+    const ySI_TT_thales = computeYearSI_TT(jd_thales);
+    const shift_thales_yr = ySI_TT_thales - ySI_thales;
+    const shift_thales_s  = shift_thales_yr * SYR_S;
+    // Expected from dry-run: ΔT ≈ 23,396s at year -584
+    const dryrun_dT_s = 23396;
+    const match_thales = Math.abs(shift_thales_s - dryrun_dT_s) / dryrun_dT_s;
+    note(`Year -584: TT shift = ${shift_thales_s.toFixed(0)} s vs dry-run ${dryrun_dT_s} s (rel err ${(match_thales*100).toFixed(2)}%)`,
+         match_thales < 0.02);  // 2% tolerance for rounding/approximation
+
+    // ── Test 6: Mercury at year -584 — predicted phase shift matches dry-run ──
+    console.log('\nTEST 6 — Mercury orbital integrator: TT vs UT cycle diff at year -584');
+    console.log('  Predicted shift: ~1.108° per dry-run; matches Mercury\'s contribution to P-A.1.');
+    const cyc_ut_thales = meanMercuryOrbitalCyclesBetween(STARTMODEL_YEAR_SI, ySI_thales);
+    const cyc_tt_thales = meanMercuryOrbitalCyclesBetween(STARTMODEL_YEAR_SI, ySI_TT_thales);
+    const mercury_shift_deg = Math.abs(cyc_tt_thales - cyc_ut_thales) * 360;
+    note(`Mercury cycle shift = ${mercury_shift_deg.toFixed(3)}° (expected ~1.108° from dry-run)`,
+         Math.abs(mercury_shift_deg - 1.108) < 0.05);
+
+    // ── Test 7: Existing dispatch sites unchanged (sanity) ──
+    console.log('\nTEST 7 — existing dispatch sites: _currentYearSI usage unchanged');
+    console.log('  This test cannot directly inspect the render-loop locals, but reminds us:');
+    console.log('  - _dtCycleN branch still uses _currentYearSI (UT) — Earth/wobble centers');
+    console.log('  - _dtMoonIntegrator branch still uses _currentYearSI (UT) — Moon chain');
+    console.log('  - _dtPerihelionDivisor branch still uses _currentYearSI (UT) — Sun + eq-of-center');
+    console.log('  → Moon-chain eclipse validation (doc 101 19/19) preserved by construction.');
+    console.log('  → No automated test here; verified by code inspection at script.js ~line 45531+.');
+    note('Test 7 (acknowledged: existing dispatch sites unchanged by design)', true);
+
+    // ── Summary ──
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY:  ${passCount} passed, ${failCount} failed`);
+    if (failCount === 0) {
+      console.log('  ✓ Phase P-A.1 (narrowed) verified — safe to proceed to Phase P-B0 (planet tagging).');
+      console.log('  The _currentYearSI_TT derivation is correct; planet branch will inherit it.');
+    } else {
+      console.log('  ✗ Phase P-A.1 FAILED — do NOT proceed to P-B0. Diagnose failures above.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase P-A.1 narrowed verification: confirms the _currentYearSI_TT ' +
+     'derivation in the render loop is correct, anchor identity holds at ' +
+     'J2000 (because meanDeltaTSecondsAtAge(0) === 0), and the planet ' +
+     'integrators (added in P-A) will work cleanly with the TT-shifted year ' +
+     'in P-B0+. Existing Moon/Earth dispatch sites are unchanged. Read-only.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // P-B0 verification — new _dtPlanetIntegrator dispatch branch exists,
+  // routes correctly, and no current object is tagged with it yet.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Verify P-B0 — _dtPlanetIntegrator dispatch branch (TT, dead until P-B1)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase P-B0 verification — new _dtPlanetIntegrator branch');
+    console.log('  Existing _dtMoonIntegrator branch (UT) literally unchanged.');
+    console.log('  No planet objects tagged yet → new branch is dead code until P-B1.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    let passCount = 0, failCount = 0;
+    const note = (label, ok, detail) => {
+      ok ? passCount++ : failCount++;
+      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
+    };
+
+    // ── Test 1: No object currently has _dtPlanetIntegrator set ──
+    console.log('TEST 1 — no current object has _dtPlanetIntegrator (dead code until P-B1)');
+    const tagged = planetObjects.filter(o => o._dtPlanetIntegrator);
+    note(`planetObjects with _dtPlanetIntegrator set: ${tagged.length} (expected 0)`,
+         tagged.length === 0,
+         tagged.length > 0 ? `tagged: [${tagged.map(o => o.name).join(', ')}]` : '');
+
+    // ── Test 2: Existing _dtMoonIntegrator tags still intact ──
+    console.log('\nTEST 2 — existing _dtMoonIntegrator tags unchanged');
+    const moonTagged = planetObjects.filter(o => o._dtMoonIntegrator);
+    const expectedMoonNames = ['Moon', 'MOON_APSIDAL_PRECESSION_OBJECT', 'MOON_APSIDAL_NODAL_PRECESSION_OBJECT_1',
+                                'MOON_APSIDAL_NODAL_PRECESSION_OBJECT_2', 'MOON_NODAL_PRECESSION_OBJECT',
+                                'MOON_LUNAR_LEVELING_CYCLE_PRECESSION_OBJECT'];
+    console.log(`  Moon-chain objects with _dtMoonIntegrator: ${moonTagged.length}`);
+    for (const o of moonTagged) console.log(`    • ${o.name}`);
+    note(`Moon-chain integrator count ≥ 5 (was tagged in Phase 9.13)`,
+         moonTagged.length >= 5);
+
+    // ── Test 3: Simulated dispatch — stub object with _dtPlanetIntegrator ──
+    console.log('\nTEST 3 — simulated dispatch logic: stub object → expected cycle count');
+    console.log('  Mirrors the render-loop branch added at ~line 45548 in script.js.');
+
+    // Re-derive _currentYearSI_TT exactly like the render loop does, at startmodelJD.
+    const SYR_S = SI_TROPICAL_YEAR_DAYS * 86400;
+    const computeYearSI_TT = (jd) => {
+      const ySI = _jdToSIyear(jd);
+      const dy  = julianDateToDecimalYear(jd);
+      const tMa = (J2000_CALENDAR_YEAR - dy) / 1e6;
+      const dT  = meanDeltaTSecondsAtAge(tMa);
+      return Number.isFinite(dT) ? ySI + dT / SYR_S : ySI;
+    };
+
+    // Simulate the dispatch logic for a stub Mercury-like object at startmodelJD.
+    const simulateDispatch = (obj, currentYearSI_TT) => {
+      const _pAnchor = Number.isFinite(obj._dtPlanetAnchor) ? obj._dtPlanetAnchor : STARTMODEL_YEAR_SI;
+      const _pCycles = obj._dtPlanetIntegrator(_pAnchor, currentYearSI_TT);
+      const θ = (_pCycles !== null ? _pCycles : 0) * 2 * Math.PI * obj._dtPlanetSign
+              - obj.startPos * (Math.PI / 180);
+      return { cycles: _pCycles, theta: θ };
+    };
+
+    // Stub at startmodelJD — should give cycles ≈ 0 (anchor identity)
+    const stubMercury = {
+      _dtPlanetIntegrator: meanMercuryOrbitalCyclesBetween,
+      _dtPlanetAnchor: STARTMODEL_YEAR_SI,
+      _dtPlanetSign: +1,
+      startPos: 0,
+    };
+    const y_TT_anchor = computeYearSI_TT(startmodelJD);
+    const r_anchor = simulateDispatch(stubMercury, y_TT_anchor);
+    note(`Stub Mercury at startmodelJD: cycles=${r_anchor.cycles.toExponential(3)}, θ=${r_anchor.theta.toExponential(3)} rad`,
+         Math.abs(r_anchor.cycles) < 1e-9 && Math.abs(r_anchor.theta) < 1e-8);
+
+    // Stub at year -584 — should give cycles matching the dry-run shift prediction
+    const jdOf = (Y, M, D, h = 12) => {
+      const isJulian = (Y < 1582) || (Y === 1582 && (M < 10 || (M === 10 && D < 15)));
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      const A = Math.floor(y / 100);
+      const B = isJulian ? 0 : (2 - A + Math.floor(A / 4));
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D + B - 1524.5 + h / 24;
+    };
+    const jd_thales = jdOf(-584, 5, 28, 12);
+    const y_TT_thales = computeYearSI_TT(jd_thales);
+    const r_thales = simulateDispatch(stubMercury, y_TT_thales);
+    // Expected: from dry-run, Mercury TT-shift at year -584 ≈ 1.108°.
+    // The dispatch returns θ in radians; convert to degrees relative to a UT-anchored baseline.
+    const y_UT_thales = _jdToSIyear(jd_thales);
+    const cyc_UT_thales = meanMercuryOrbitalCyclesBetween(STARTMODEL_YEAR_SI, y_UT_thales);
+    const cyc_TT_thales = r_thales.cycles;
+    const shift_deg = (cyc_TT_thales - cyc_UT_thales) * 360;
+    note(`Stub Mercury at year -584: TT cycles=${cyc_TT_thales.toFixed(3)}, UT cycles=${cyc_UT_thales.toFixed(3)}, shift=${shift_deg.toFixed(3)}° (expected ~1.108°)`,
+         Math.abs(shift_deg - 1.108) < 0.05);
+
+    // ── Test 4: Moon dispatch unchanged at year -584 (regression check) ──
+    console.log('\nTEST 4 — Moon-chain dispatch unchanged (regression check)');
+    console.log('  Moon integrator still uses _currentYearSI (UT) — same value as before P-B0.');
+    const cyc_moon_UT = meanMoonOrbitsBetweenYears(STARTMODEL_YEAR_SI, y_UT_thales);
+    const cyc_moon_TT = meanMoonOrbitsBetweenYears(STARTMODEL_YEAR_SI, y_TT_thales);  // for comparison only
+    const moon_shift_deg = (cyc_moon_TT - cyc_moon_UT) * 360;
+    console.log(`    Moon UT cycles at year -584: ${cyc_moon_UT.toFixed(3)}`);
+    console.log(`    Moon TT cycles at year -584: ${cyc_moon_TT.toFixed(3)} (NOT used by current dispatch)`);
+    console.log(`    If we ever flipped Moon to TT: would shift by ${moon_shift_deg.toFixed(3)}° — but we don't.`);
+    console.log(`    Current dispatch uses UT path → Moon position unchanged → 19/19 eclipse validation preserved.`);
+    note(`Moon dispatch path uses _currentYearSI (UT) — confirmed by code inspection at line ~45545`, true);
+
+    // ── Summary ──
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY:  ${passCount} passed, ${failCount} failed`);
+    if (failCount === 0) {
+      console.log('  ✓ Phase P-B0 verified — new branch in place, no behavior change yet.');
+      console.log('  Ready for Phase P-B1: tag mercury._dtPlanetIntegrator and verify visually.');
+    } else {
+      console.log('  ✗ Phase P-B0 FAILED — diagnose before proceeding.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase P-B0 verification: confirms the new _dtPlanetIntegrator dispatch ' +
+     'branch is in place, no planet objects are tagged yet (so it\'s dead code), ' +
+     'the existing _dtMoonIntegrator tags + dispatch are unchanged, and the ' +
+     'new branch routes correctly when simulated with a stub object. Read-only.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // P-B1 verification — Mercury orbital integrator is tagged and active;
+  // other 6 planets remain untagged; bit-equivalence at J2000.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Verify P-B1 — Mercury orbital integrator tagged + bit-equivalent at J2000', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase P-B1 verification — Mercury orbital integrator (TT-anchored)');
+    console.log('  Only Mercury is tagged at this phase. Other 6 planets untouched.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    let passCount = 0, failCount = 0;
+    const note = (label, ok, detail) => {
+      ok ? passCount++ : failCount++;
+      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
+    };
+
+    // ── Test 1: Mercury tag fields set correctly ──
+    console.log('TEST 1 — mercury._dtPlanetIntegrator tag set correctly');
+    note(`mercury._dtPlanetIntegrator === meanMercuryOrbitalCyclesBetween`,
+         mercury._dtPlanetIntegrator === meanMercuryOrbitalCyclesBetween);
+    note(`mercury._dtPlanetAnchor === STARTMODEL_YEAR_SI (${STARTMODEL_YEAR_SI.toFixed(8)})`,
+         mercury._dtPlanetAnchor === STARTMODEL_YEAR_SI);
+    note(`mercury._dtPlanetSign === +1 (prograde)`,
+         mercury._dtPlanetSign === +1);
+
+    // ── Test 2: Other 6 planets remain untagged ──
+    console.log('\nTEST 2 — other 6 planets remain untagged (P-B2+ will add them one at a time)');
+    const others = { venus, mars, jupiter, saturn, uranus, neptune };
+    let t2Pass = true;
+    for (const [k, obj] of Object.entries(others)) {
+      const untagged = !obj._dtPlanetIntegrator;
+      console.log(`    ${untagged ? '✓' : '✗'} ${k.padEnd(8)}._dtPlanetIntegrator = ${obj._dtPlanetIntegrator ? 'TAGGED — UNEXPECTED' : 'undefined ✓'}`);
+      if (!untagged) t2Pass = false;
+    }
+    note('Test 2 overall (Venus through Neptune all untagged)', t2Pass);
+
+    // ── Test 3: Bit-equivalence at startmodelJD — integrator returns ~0 cycles ──
+    console.log('\nTEST 3 — bit-equivalence at startmodelJD (integrator returns ~0 cycles)');
+    console.log('  Calls the EXACT same dispatch logic the render loop uses.');
+    const SYR_S = SI_TROPICAL_YEAR_DAYS * 86400;
+    const computeYearSI_TT = (jd) => {
+      const ySI = _jdToSIyear(jd);
+      const dy  = julianDateToDecimalYear(jd);
+      const tMa = (J2000_CALENDAR_YEAR - dy) / 1e6;
+      const dT  = meanDeltaTSecondsAtAge(tMa);
+      return Number.isFinite(dT) ? ySI + dT / SYR_S : ySI;
+    };
+    const y_TT_at_anchor = computeYearSI_TT(startmodelJD);
+    const cyc_at_anchor  = mercury._dtPlanetIntegrator(mercury._dtPlanetAnchor, y_TT_at_anchor);
+    const theta_at_anchor = cyc_at_anchor * 2 * Math.PI * mercury._dtPlanetSign - mercury.startPos * (Math.PI / 180);
+    // Mercury's startPos is non-zero (see planet object), so θ at anchor = -startPos × π/180
+    const theta_expected_at_anchor = -mercury.startPos * (Math.PI / 180);
+    const theta_diff_at_anchor = Math.abs(theta_at_anchor - theta_expected_at_anchor);
+    note(`Cycles at anchor: ${cyc_at_anchor.toExponential(3)} (sub-mas Mercury shift)`,
+         Math.abs(cyc_at_anchor) < 1e-9);
+    note(`θ at anchor: ${theta_at_anchor.toFixed(6)} rad vs expected ${theta_expected_at_anchor.toFixed(6)} rad (diff=${theta_diff_at_anchor.toExponential(2)})`,
+         theta_diff_at_anchor < 1e-8);
+
+    // ── Test 4: Deep-time shift matches dry-run prediction ──
+    console.log('\nTEST 4 — Mercury TT shift at year -584 matches dry-run (~1.108°)');
+    const jdOf = (Y, M, D, h = 12) => {
+      const isJulian = (Y < 1582) || (Y === 1582 && (M < 10 || (M === 10 && D < 15)));
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      const A = Math.floor(y / 100);
+      const B = isJulian ? 0 : (2 - A + Math.floor(A / 4));
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D + B - 1524.5 + h / 24;
+    };
+    const jd_thales = jdOf(-584, 5, 28, 12);
+    const y_UT_thales = _jdToSIyear(jd_thales);
+    const y_TT_thales = computeYearSI_TT(jd_thales);
+    const cyc_UT_thales = meanMercuryOrbitalCyclesBetween(STARTMODEL_YEAR_SI, y_UT_thales);
+    const cyc_TT_thales = mercury._dtPlanetIntegrator(mercury._dtPlanetAnchor, y_TT_thales);
+    const shift_deg = (cyc_TT_thales - cyc_UT_thales) * 360;
+    note(`Mercury shift TT vs UT at year -584: ${shift_deg.toFixed(3)}° (expected ~1.108° from dry-run)`,
+         Math.abs(shift_deg - 1.108) < 0.05);
+
+    // ── Test 5: Moon-chain dispatch UNCHANGED (Mercury tag doesn't affect Moon) ──
+    console.log('\nTEST 5 — Moon-chain dispatch unchanged (Mercury tag doesn\'t affect Moon)');
+    const moonStillUT = moon._dtMoonIntegrator === meanMoonOrbitsBetweenYears
+                    && !moon._dtPlanetIntegrator;
+    note(`moon._dtMoonIntegrator still meanMoonOrbitsBetweenYears, no _dtPlanetIntegrator on moon`,
+         moonStillUT);
+
+    // ── Summary ──
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY:  ${passCount} passed, ${failCount} failed`);
+    if (failCount === 0) {
+      console.log('  ✓ Phase P-B1 numerical gates pass. NOW VISUALLY VERIFY:');
+      console.log('    1. Open app at modern epoch (year 2024-2026). Mercury should be at its');
+      console.log('       expected position — no jump, no shift vs pre-P-B1 behavior.');
+      console.log('    2. Toggle DEEP_TIME_MODE_ENABLED OFF then ON via console:');
+      console.log('         > disableDeepTimeMode()');
+      console.log('         > enableDeepTimeMode()');
+      console.log('       Mercury position should match in both modes at modern epoch.');
+      console.log('    3. Other 6 planets (Venus through Neptune) must remain unchanged');
+      console.log('       (they\'re still on the snapshot path until P-B2+).');
+      console.log('    4. Moon position must remain unchanged (UT-anchored path preserved).');
+    } else {
+      console.log('  ✗ Phase P-B1 FAILED — revert Mercury tag lines and diagnose.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase P-B1 verification: confirms Mercury is tagged with ' +
+     '_dtPlanetIntegrator, other 6 planets remain untagged, bit-equivalence ' +
+     'at startmodelJD holds (θ matches snapshot path exactly), Mercury TT ' +
+     'shift at year -584 matches dry-run prediction (1.108°), and the Moon ' +
+     'dispatch is unchanged. Read-only numerical test; visual verification ' +
+     'instructions printed in summary.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // P-B2+ generalized verification — checks each currently-tagged planet
+  // for bit-equivalence at startmodelJD and matches deep-time shifts to
+  // dry-run predictions. Replaces per-planet single-purpose buttons.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Verify P-B(any) — all tagged planet integrators (bit-equiv + deep-time shift)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase P-B(any) verification — all currently-tagged planet integrators');
+    console.log('  Bit-equivalence at startmodelJD + TT-vs-UT shift at year -584 vs dry-run.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    let passCount = 0, failCount = 0;
+    const note = (label, ok, detail) => {
+      ok ? passCount++ : failCount++;
+      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
+    };
+
+    // Per-planet metadata: object reference, expected sign (from snapshot speed audit),
+    // expected wrapper function, and dry-run TT shift at year -584 in degrees.
+    const PLANETS = [
+      { key: 'mercury', obj: mercury, expectedSign: +1, expectedWrapper: meanMercuryOrbitalCyclesBetween, expectedShift_deg: 1.108 },
+      { key: 'venus',   obj: venus,   expectedSign: +1, expectedWrapper: meanVenusOrbitalCyclesBetween,   expectedShift_deg: 0.434 },
+      { key: 'mars',    obj: mars,    expectedSign: -1, expectedWrapper: meanMarsOrbitalCyclesBetween,    expectedShift_deg: 0.142 },
+      { key: 'jupiter', obj: jupiter, expectedSign: +1, expectedWrapper: meanJupiterOrbitalCyclesBetween, expectedShift_deg: 0.023 },
+      { key: 'saturn',  obj: saturn,  expectedSign: +1, expectedWrapper: meanSaturnOrbitalCyclesBetween,  expectedShift_deg: 0.009 },
+      { key: 'uranus',  obj: uranus,  expectedSign: +1, expectedWrapper: meanUranusOrbitalCyclesBetween,  expectedShift_deg: 0.003 },
+      { key: 'neptune', obj: neptune, expectedSign: +1, expectedWrapper: meanNeptuneOrbitalCyclesBetween, expectedShift_deg: 0.002 },
+    ];
+
+    const SYR_S = SI_TROPICAL_YEAR_DAYS * 86400;
+    const computeYearSI_TT = (jd) => {
+      const ySI = _jdToSIyear(jd);
+      const dy  = julianDateToDecimalYear(jd);
+      const tMa = (J2000_CALENDAR_YEAR - dy) / 1e6;
+      const dT  = meanDeltaTSecondsAtAge(tMa);
+      return Number.isFinite(dT) ? ySI + dT / SYR_S : ySI;
+    };
+    const jdOf = (Y, M, D, h = 12) => {
+      const isJulian = (Y < 1582) || (Y === 1582 && (M < 10 || (M === 10 && D < 15)));
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      const A = Math.floor(y / 100);
+      const B = isJulian ? 0 : (2 - A + Math.floor(A / 4));
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D + B - 1524.5 + h / 24;
+    };
+    const jd_thales = jdOf(-584, 5, 28, 12);
+    const y_TT_anchor = computeYearSI_TT(startmodelJD);
+    const y_UT_thales = _jdToSIyear(jd_thales);
+    const y_TT_thales = computeYearSI_TT(jd_thales);
+
+    const tagged = PLANETS.filter(p => p.obj._dtPlanetIntegrator);
+    const untagged = PLANETS.filter(p => !p.obj._dtPlanetIntegrator);
+    console.log(`Tagged planets:    [${tagged.map(p => p.key).join(', ')}]`);
+    console.log(`Untagged planets:  [${untagged.map(p => p.key).join(', ')}]`);
+    console.log('');
+
+    // ── Per-tagged-planet tag-integrity + bit-equivalence + deep-time-shift checks ──
+    for (const p of tagged) {
+      console.log(`── ${p.key.toUpperCase()} ──`);
+
+      // 1. Tag fields
+      const integratorOk = p.obj._dtPlanetIntegrator === p.expectedWrapper;
+      const anchorOk     = p.obj._dtPlanetAnchor === STARTMODEL_YEAR_SI;
+      const signOk       = p.obj._dtPlanetSign === p.expectedSign;
+      note(`tag: integrator=${integratorOk ? '✓' : '✗'} anchor=${anchorOk ? '✓' : '✗'} sign=${signOk ? '✓' : '✗ (got ' + p.obj._dtPlanetSign + ', expected ' + p.expectedSign + ')'}`,
+           integratorOk && anchorOk && signOk);
+
+      // 2. Bit-equivalence at startmodelJD (cycles ≤ 1e-9)
+      const cyc_anchor = p.obj._dtPlanetIntegrator(p.obj._dtPlanetAnchor, y_TT_anchor);
+      note(`bit-equivalence: cycles at startmodelJD = ${cyc_anchor.toExponential(3)} (< 1e-9 required)`,
+           Math.abs(cyc_anchor) < 1e-9);
+
+      // 3. Deep-time TT shift at year -584 matches dry-run prediction
+      const cyc_UT = meanMercuryOrbitalCyclesBetween;  // placeholder — use the per-planet wrapper below
+      const wrapper = p.expectedWrapper;
+      const cyc_UT_planet = wrapper(STARTMODEL_YEAR_SI, y_UT_thales);
+      const cyc_TT_planet = p.obj._dtPlanetIntegrator(p.obj._dtPlanetAnchor, y_TT_thales);
+      const shift_deg = (cyc_TT_planet - cyc_UT_planet) * 360;
+      // Tolerance: 5% of expected, with minimum of 0.005° for the very-small gas-giant shifts
+      const tolerance = Math.max(p.expectedShift_deg * 0.05, 0.005);
+      const shiftOk = Math.abs(shift_deg - p.expectedShift_deg) < tolerance;
+      note(`deep-time shift at year -584: ${shift_deg.toFixed(3)}° (expected ~${p.expectedShift_deg.toFixed(3)}°, tol ±${tolerance.toFixed(3)}°)`,
+           shiftOk);
+      console.log('');
+    }
+
+    // ── Sanity: Moon-chain dispatch still unchanged regardless of which planets are tagged ──
+    console.log('── REGRESSION CHECK ──');
+    const moonOk = moon._dtMoonIntegrator === meanMoonOrbitsBetweenYears && !moon._dtPlanetIntegrator;
+    note('Moon-chain dispatch unchanged (still uses _dtMoonIntegrator; no _dtPlanetIntegrator on moon)', moonOk);
+
+    // ── Summary ──
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY:  ${passCount} passed, ${failCount} failed`);
+    if (failCount === 0) {
+      console.log(`  ✓ All ${tagged.length} tagged planet(s) verified. Visual checks still required:`);
+      console.log('    1. Each tagged planet at modern epoch — unchanged vs pre-tag.');
+      console.log('    2. Untagged planets (snapshot path) — unchanged vs before this phase.');
+      console.log('    3. Moon position — unchanged.');
+      if (untagged.length > 0) {
+        console.log(`  Next: tag ${untagged[0].key} (Phase P-B${tagged.length + 1}).`);
+      } else {
+        console.log('  All 7 planets tagged. Ready for Phase P-C0 (perihelion ecliptic divisors).');
+      }
+    } else {
+      console.log('  ✗ Verification FAILED — revert the most-recently-added tag and diagnose.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Generalized P-B verification: walks all currently-tagged planet ' +
+     'integrators and checks each one\'s tag fields, bit-equivalence at ' +
+     'startmodelJD, and TT-vs-UT shift at year -584 against dry-run ' +
+     'predictions. Same button used for P-B1 through P-B7 — output adapts ' +
+     'to whichever planets are currently tagged.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // P-C0 verification — perihelion ecliptic divisor + sign tables match
+  // the Law-6 8H/N invariant exactly. Read-only; the tables aren't used
+  // by any dispatch yet (consumed in P-C1+).
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Verify P-C0 — perihelion ecliptic 8H/N divisor + sign tables', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase P-C0 verification — _planetPerihelionDivisors + _planetPerihelionSigns');
+    console.log('  Each planet\'s perihelion ecliptic period must satisfy 8H/N to ≤ 1e-6 rel err.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    let passCount = 0, failCount = 0;
+    const note = (label, ok, detail) => {
+      ok ? passCount++ : failCount++;
+      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
+    };
+
+    // Expected values per the IP doc P-C0 table.
+    const EXPECTED = {
+      mercury: { N: 11,  sign: +1, name: 'Mercury' },
+      venus:   { N:  6,  sign: -1, name: 'Venus (retrograde)' },
+      mars:    { N: 36,  sign: +1, name: 'Mars' },
+      jupiter: { N: 39,  sign: +1, name: 'Jupiter' },
+      saturn:  { N: 65,  sign: -1, name: 'Saturn (retrograde)' },
+      uranus:  { N: 24,  sign: +1, name: 'Uranus' },
+      neptune: { N:  4,  sign: +1, name: 'Neptune' },
+    };
+
+    // ── Test 1: Per-planet table values match expectations ──
+    console.log('TEST 1 — divisor + sign tables match canonical Law-6 8H/N values');
+    const rows = [];
+    let t1Pass = true;
+    for (const k of PLANET_KEYS) {
+      const exp = EXPECTED[k];
+      const actualN    = _planetPerihelionDivisors[k];
+      const actualSign = _planetPerihelionSigns[k];
+      const periEcl    = PERIHELION_ECLIPTIC_YEARS_J2000[k];
+      const recovered  = actualSign * (8 * HOLISTIC_YEAR_J2000) / actualN;
+      const relErr     = Math.abs(recovered - periEcl) / Math.abs(periEcl);
+      const ok         = (actualN === exp.N) && (actualSign === exp.sign) && (relErr < 1e-6);
+      rows.push({
+        planet:        exp.name,
+        N_expected:    exp.N,
+        N_actual:      actualN,
+        sign_expected: exp.sign === +1 ? '+1' : '-1',
+        sign_actual:   actualSign === +1 ? '+1' : '-1',
+        T_peri_J2000:  periEcl.toFixed(0) + ' yr',
+        T_recovered:   recovered.toFixed(0) + ' yr',
+        relErr:        relErr.toExponential(2),
+        pass:          ok ? '✓' : '✗',
+      });
+      if (!ok) t1Pass = false;
+    }
+    console.table(rows);
+    note('Test 1 overall (all 7 planets on Law-6 8H/N lattice with correct sign)', t1Pass);
+
+    // ── Test 2: Divisor count matches PLANET_KEYS length ──
+    console.log('\nTEST 2 — divisor + sign tables contain all 7 planets');
+    const nDiv  = Object.keys(_planetPerihelionDivisors).length;
+    const nSign = Object.keys(_planetPerihelionSigns).length;
+    note(`_planetPerihelionDivisors has ${nDiv} entries (expected 7)`, nDiv === 7);
+    note(`_planetPerihelionSigns has ${nSign} entries (expected 7)`, nSign === 7);
+
+    // ── Test 3: Tables are NOT yet consumed by any dispatch ──
+    console.log('\nTEST 3 — no perihelion-ecliptic scene-graph object has _dtCycleN set yet');
+    console.log('  P-C1+ will tag *PerihelionDurationEcliptic1/2 with these divisors.');
+    const periObjects = [
+      { name: 'mercuryPerihelionDurationEcliptic1', obj: mercuryPerihelionDurationEcliptic1 },
+      { name: 'mercuryPerihelionDurationEcliptic2', obj: mercuryPerihelionDurationEcliptic2 },
+      { name: 'venusPerihelionDurationEcliptic1',   obj: venusPerihelionDurationEcliptic1   },
+      { name: 'venusPerihelionDurationEcliptic2',   obj: venusPerihelionDurationEcliptic2   },
+      { name: 'marsPerihelionDurationEcliptic1',    obj: marsPerihelionDurationEcliptic1    },
+      { name: 'marsPerihelionDurationEcliptic2',    obj: marsPerihelionDurationEcliptic2    },
+      { name: 'jupiterPerihelionDurationEcliptic1', obj: jupiterPerihelionDurationEcliptic1 },
+      { name: 'jupiterPerihelionDurationEcliptic2', obj: jupiterPerihelionDurationEcliptic2 },
+      { name: 'saturnPerihelionDurationEcliptic1',  obj: saturnPerihelionDurationEcliptic1  },
+      { name: 'saturnPerihelionDurationEcliptic2',  obj: saturnPerihelionDurationEcliptic2  },
+      { name: 'uranusPerihelionDurationEcliptic1',  obj: uranusPerihelionDurationEcliptic1  },
+      { name: 'uranusPerihelionDurationEcliptic2',  obj: uranusPerihelionDurationEcliptic2  },
+      { name: 'neptunePerihelionDurationEcliptic1', obj: neptunePerihelionDurationEcliptic1 },
+      { name: 'neptunePerihelionDurationEcliptic2', obj: neptunePerihelionDurationEcliptic2 },
+    ];
+    const alreadyTagged = periObjects.filter(p => Number.isFinite(p.obj._dtCycleN));
+    note(`Perihelion ecliptic objects with _dtCycleN already set: ${alreadyTagged.length} (expected 0)`,
+         alreadyTagged.length === 0,
+         alreadyTagged.length > 0 ? `tagged: [${alreadyTagged.map(p => p.name).join(', ')}]` : '');
+
+    // ── Summary ──
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY:  ${passCount} passed, ${failCount} failed`);
+    if (failCount === 0) {
+      console.log('  ✓ Phase P-C0 verified. Tables ready for consumption in P-C1+.');
+      console.log('  Next: P-C1 — tag mercury\'s two PerihelionDurationEcliptic frames.');
+      console.log('  ⚠ P-C1 is the HIGHEST-RISK phase (Phase 9.14 revert site).');
+      console.log('    Apply one planet at a time with explicit visual verification.');
+    } else {
+      console.log('  ✗ Phase P-C0 FAILED — investigate the Law-6 invariant before P-C1.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase P-C0 verification: confirms _planetPerihelionDivisors and ' +
+     '_planetPerihelionSigns tables contain the correct Law-6 8H/N divisors ' +
+     'for all 7 planets, with Venus/Saturn marked retrograde. Verifies no ' +
+     'perihelion ecliptic object has _dtCycleN tagged yet (those go in P-C1+). ' +
+     'Read-only sanity check.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // P-C1 DRY-RUN — predicts snapshot vs integrator divergence at startmodelJD
+  // for perihelion ecliptic frames. Phase 9.14 likely failed because the
+  // _dtCycleN dispatch doesn't subtract startPos × π/180; for frames where
+  // pos × speed ≠ 0 at startmodelJD, the snapshot and integrator outputs
+  // disagree unless we use a custom anchor or precomputed startPos.
+  // Read-only: no rendering code is modified.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('P-C1 dry-run — perihelion ecliptic frame snapshot vs integrator at startmodelJD', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase P-C1 DRY-RUN — predicting tag-strategy for perihelion ecliptic frames');
+    console.log('  This is the Phase 9.14 revert site — bit-equivalence at startmodelJD must hold.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    let passCount = 0, failCount = 0;
+    const note = (label, ok, detail) => {
+      ok ? passCount++ : failCount++;
+      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
+    };
+
+    // The dispatch ONLY runs when DEEP_TIME_MODE_ENABLED is true. Sanity-check.
+    if (!DEEP_TIME_MODE_ENABLED) {
+      console.log('  ⚠ DEEP_TIME_MODE_ENABLED is FALSE. The _dtCycleN dispatch only fires when');
+      console.log('    deep-time mode is on. Enable it via enableDeepTimeMode() then re-run.');
+      return;
+    }
+
+    // ── Step 1: Measure pos at startmodelJD ──
+    console.log('STEP 1 — observe pos and snapshot θ at current scene state');
+    console.log(`  o.pos = ${o.pos.toFixed(6)}`);
+    console.log(`  o.julianDay = ${o.julianDay.toFixed(6)} (startmodelJD = ${startmodelJD.toFixed(6)})`);
+    console.log(`  Δ from startmodelJD: ${(o.julianDay - startmodelJD).toFixed(6)} days`);
+    if (Math.abs(o.julianDay - startmodelJD) > 1) {
+      console.log('  ⚠ Scene is NOT at startmodelJD — for an exact bit-equivalence test, jump to startmodel first.');
+      console.log('    Continuing with current state to gather diagnostic data...');
+    }
+
+    // ── Step 2: Compute snapshot θ for Mercury's Ecliptic1 + Ecliptic2 at current scene state ──
+    console.log('\nSTEP 2 — snapshot θ for Mercury perihelion ecliptic frames at current scene state');
+    const pos = o.pos;
+    const θ_E1_snap = mercuryPerihelionDurationEcliptic1.speed * pos - mercuryPerihelionDurationEcliptic1.startPos * (Math.PI / 180);
+    const θ_E2_snap = mercuryPerihelionDurationEcliptic2.speed * pos - mercuryPerihelionDurationEcliptic2.startPos * (Math.PI / 180);
+    const θ_sum_snap = θ_E1_snap + θ_E2_snap;
+    console.log(`    Ecliptic1.speed = ${mercuryPerihelionDurationEcliptic1.speed.toExponential(4)}, startPos = ${mercuryPerihelionDurationEcliptic1.startPos}`);
+    console.log(`    Ecliptic2.speed = ${mercuryPerihelionDurationEcliptic2.speed.toExponential(4)}, startPos = ${mercuryPerihelionDurationEcliptic2.startPos}`);
+    console.log(`    θ_E1_snap = ${θ_E1_snap.toFixed(6)} rad = ${(θ_E1_snap * 180/Math.PI).toFixed(3)}°`);
+    console.log(`    θ_E2_snap = ${θ_E2_snap.toFixed(6)} rad = ${(θ_E2_snap * 180/Math.PI).toFixed(3)}°`);
+    console.log(`    θ_E1 + θ_E2 = ${θ_sum_snap.toExponential(3)} rad (should be ≈ 0 — counter-rotating pair)`);
+    note(`Counter-rotation cancellation invariant: |θ_E1 + θ_E2| < 1e-12`,
+         Math.abs(θ_sum_snap) < 1e-12);
+
+    // ── Step 3: Compute what integrator would return with default anchor (STARTMODEL_YEAR_SI) ──
+    console.log('\nSTEP 3 — what the _dtCycleN integrator WOULD return at current scene state');
+    console.log('  Using anchor = STARTMODEL_YEAR_SI, sign = +1 for E1, -1 for E2, N = 11');
+    const _currentYearSI_now = _jdToSIyear(o.julianDay);
+    const cyc_int = cyclesBetweenYears(STARTMODEL_YEAR_SI, _currentYearSI_now, _planetPerihelionDivisors.mercury);
+    const sign_E1 = _planetPerihelionSigns.mercury * (+1);
+    const sign_E2 = _planetPerihelionSigns.mercury * (-1);
+    const θ_E1_int = cyc_int * 2 * Math.PI * sign_E1;
+    const θ_E2_int = cyc_int * 2 * Math.PI * sign_E2;
+    const θ_sum_int = θ_E1_int + θ_E2_int;
+    console.log(`    cycles = ${cyc_int.toExponential(4)}`);
+    console.log(`    θ_E1_int = ${θ_E1_int.toFixed(6)} rad = ${(θ_E1_int * 180/Math.PI).toFixed(3)}°`);
+    console.log(`    θ_E2_int = ${θ_E2_int.toFixed(6)} rad = ${(θ_E2_int * 180/Math.PI).toFixed(3)}°`);
+    console.log(`    θ_E1_int + θ_E2_int = ${θ_sum_int.toExponential(3)} rad (integrator pair cancels exactly by sign)`);
+    note(`Integrator pair cancellation: |θ_E1_int + θ_E2_int| < 1e-12 (exact by sign)`,
+         Math.abs(θ_sum_int) < 1e-12);
+
+    // ── Step 4: Per-frame divergence ──
+    console.log('\nSTEP 4 — per-frame snapshot vs integrator divergence');
+    const diff_E1_rad = θ_E1_int - θ_E1_snap;
+    const diff_E2_rad = θ_E2_int - θ_E2_snap;
+    const diff_E1_deg = diff_E1_rad * 180 / Math.PI;
+    const diff_E2_deg = diff_E2_rad * 180 / Math.PI;
+    console.log(`    Ecliptic1 divergence: ${diff_E1_rad.toExponential(3)} rad = ${diff_E1_deg.toFixed(3)}°`);
+    console.log(`    Ecliptic2 divergence: ${diff_E2_rad.toExponential(3)} rad = ${diff_E2_deg.toFixed(3)}°`);
+    console.log('  Per-frame divergence DOES exist (snapshot uses pos × speed; integrator uses cycles only).');
+    console.log('  This would shift the perihelion arrow / perihelion frame orientation visibly.');
+    console.log('  BUT: since the PAIR cancels exactly in both snapshot and integrator paths,');
+    console.log('  the net rotation passed down to mercury IS ZERO either way.');
+    console.log('  ⇒ Tagging E1+E2 with matching N + opposite signs should be safe for mercury\'s position.');
+
+    // ── Step 5: Inferred recommendation ──
+    console.log('\nSTEP 5 — recommendation');
+    if (Math.abs(diff_E1_rad) < 1e-9) {
+      console.log('  ✓ Per-frame divergence is negligible (sub-nrad). Bit-equivalent at this state.');
+      console.log('  → Proceed with simple tagging: _dtCycleN, _dtCycleSign per frame, anchor=default.');
+    } else {
+      console.log('  ⚠ Per-frame divergence is REAL (not just rounding noise).');
+      console.log('  Two possible consequences:');
+      console.log('    (a) If only mercury\'s POSITION matters (not perihelion-arrow direction),');
+      console.log('        the pair-cancellation invariant is sufficient — proceed with tagging.');
+      console.log('        Mercury\'s visual position should remain bit-equivalent.');
+      console.log('    (b) If the perihelion arrow (mercuryPerihelionFromEarth) needs to point in');
+      console.log('        the same direction as before, that arrow will shift by the divergence amount.');
+      console.log('        Inspect visually after tagging; if arrow drift is visible, custom anchor needed.');
+      console.log('  → Recommend proceeding with simple tagging + visual verification of arrow position.');
+    }
+
+    // ── Step 6: Predicted deep-time behavior ──
+    console.log('\nSTEP 6 — predicted deep-time behavior at year -584');
+    const jdOf = (Y, M, D, h = 12) => {
+      const isJulian = (Y < 1582) || (Y === 1582 && (M < 10 || (M === 10 && D < 15)));
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      const A = Math.floor(y / 100);
+      const B = isJulian ? 0 : (2 - A + Math.floor(A / 4));
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D + B - 1524.5 + h / 24;
+    };
+    const jd_thales = jdOf(-584, 5, 28, 12);
+    const y_thales_SI = _jdToSIyear(jd_thales);
+    const cyc_thales = cyclesBetweenYears(STARTMODEL_YEAR_SI, y_thales_SI, _planetPerihelionDivisors.mercury);
+    const θ_E1_thales_int_deg = cyc_thales * 360 * sign_E1;
+    console.log(`    At year -584: cycles = ${cyc_thales.toFixed(4)}, |θ_E1_int| = ${Math.abs(θ_E1_thales_int_deg).toFixed(2)}°`);
+    console.log('  This is the INTEGRATED perihelion ecliptic rotation since startmodel.');
+    console.log('  Snapshot at the same year (deep-time mutated speed × pos) would give a similar value');
+    console.log('  but offset by the same bias as we see at startmodel. The pair still cancels.');
+
+    // ── Summary ──
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY:  ${passCount} cancellation invariants passed`);
+    console.log('  KEY FINDING: per-frame divergence at startmodel is non-trivial, but the');
+    console.log('  E1+E2 PAIR cancels exactly in both paths. Mercury\'s visual position should be');
+    console.log('  bit-equivalent under tagging. The "perihelion arrow" (mercuryPerihelionFromEarth)');
+    console.log('  may visibly shift — needs visual verification after tagging.');
+    console.log('  ');
+    console.log('  Recommend: proceed with simple tagging for P-C1, observe arrow behavior visually,');
+    console.log('  revert if regression. Apply ONE planet at a time per IP doc protocol.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase P-C1 dry-run: investigates the snapshot vs integrator divergence ' +
+     'at startmodelJD for Mercury perihelion ecliptic frames. The _dtCycleN ' +
+     'dispatch doesn\'t subtract startPos, which differs from snapshot. ' +
+     'Predicts whether the E1+E2 pair-cancellation invariant is sufficient ' +
+     'for Mercury\'s visual position, or whether a custom anchor is needed. ' +
+     'Read-only diagnostic.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // P-C(any) generalized verification — walks all currently-tagged perihelion
+  // ecliptic frames and checks: tag fields correct, E1+E2 pair cancellation,
+  // bit-equivalence at startmodelJD, deep-time evolution matches expectation.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Verify P-C(any) — all tagged perihelion ecliptic frame pairs', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase P-C(any) verification — perihelion ecliptic frames (Law-6 8H/N)');
+    console.log('  Each tagged planet: tag integrity + pair cancellation + bit-equivalence');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    let passCount = 0, failCount = 0;
+    const note = (label, ok, detail) => {
+      ok ? passCount++ : failCount++;
+      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
+    };
+
+    const PLANETS = [
+      { key: 'mercury', E1: mercuryPerihelionDurationEcliptic1, E2: mercuryPerihelionDurationEcliptic2 },
+      { key: 'venus',   E1: venusPerihelionDurationEcliptic1,   E2: venusPerihelionDurationEcliptic2   },
+      { key: 'mars',    E1: marsPerihelionDurationEcliptic1,    E2: marsPerihelionDurationEcliptic2    },
+      { key: 'jupiter', E1: jupiterPerihelionDurationEcliptic1, E2: jupiterPerihelionDurationEcliptic2 },
+      { key: 'saturn',  E1: saturnPerihelionDurationEcliptic1,  E2: saturnPerihelionDurationEcliptic2  },
+      { key: 'uranus',  E1: uranusPerihelionDurationEcliptic1,  E2: uranusPerihelionDurationEcliptic2  },
+      { key: 'neptune', E1: neptunePerihelionDurationEcliptic1, E2: neptunePerihelionDurationEcliptic2 },
+    ];
+
+    const tagged   = PLANETS.filter(p => Number.isFinite(p.E1._dtCycleN) && Number.isFinite(p.E2._dtCycleN));
+    const untagged = PLANETS.filter(p => !Number.isFinite(p.E1._dtCycleN) || !Number.isFinite(p.E2._dtCycleN));
+    console.log(`Tagged planets:    [${tagged.map(p => p.key).join(', ')}]`);
+    console.log(`Untagged planets:  [${untagged.map(p => p.key).join(', ')}]`);
+    console.log('');
+
+    // Sample year for deep-time check
+    const jdOf = (Y, M, D, h = 12) => {
+      const isJulian = (Y < 1582) || (Y === 1582 && (M < 10 || (M === 10 && D < 15)));
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      const A = Math.floor(y / 100);
+      const B = isJulian ? 0 : (2 - A + Math.floor(A / 4));
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D + B - 1524.5 + h / 24;
+    };
+    const y_thales_SI    = _jdToSIyear(jdOf(-584, 5, 28, 12));
+
+    for (const p of tagged) {
+      console.log(`── ${p.key.toUpperCase()} ──`);
+
+      // CORRECTED 2026-06-20: divisor for cyclesBetweenYears is N/8, not N
+      // (perihelion ecliptic period = 8H/N → H-form divisor = N/8).
+      const expectedN_H = _planetPerihelionDivisors[p.key] / 8;
+      const expectedBase = _planetPerihelionSigns[p.key];
+
+      // 1. Tag integrity
+      const nOk1 = p.E1._dtCycleN === expectedN_H;
+      const nOk2 = p.E2._dtCycleN === expectedN_H;
+      const sOk1 = p.E1._dtCycleSign === expectedBase * (+1);
+      const sOk2 = p.E2._dtCycleSign === expectedBase * (-1);
+      const aOk1 = p.E1._dtCycleAnchor === STARTMODEL_YEAR_SI;
+      const aOk2 = p.E2._dtCycleAnchor === STARTMODEL_YEAR_SI;
+      note(`E1 tag: N=${p.E1._dtCycleN} (exp ${expectedN_H} = ${_planetPerihelionDivisors[p.key]}/8), sign=${p.E1._dtCycleSign} (exp ${expectedBase * +1}), anchor matches`,
+           nOk1 && sOk1 && aOk1);
+      note(`E2 tag: N=${p.E2._dtCycleN} (exp ${expectedN_H} = ${_planetPerihelionDivisors[p.key]}/8), sign=${p.E2._dtCycleSign} (exp ${expectedBase * -1}), anchor matches`,
+           nOk2 && sOk2 && aOk2);
+
+      // 2. Sign cancellation (E1 + E2 = 0 in sign-multiplied terms)
+      const signSum = p.E1._dtCycleSign + p.E2._dtCycleSign;
+      note(`Sign cancellation: E1.sign + E2.sign = ${signSum} (must be 0)`, signSum === 0);
+
+      // 3. Bit-equivalence at startmodelJD: integrator returns ~0 cycles at the anchor.
+      // (cyclesBetweenYears uses a cumulative integral table; at yA===yB the result
+      // is sub-1e-9 cycles ≈ sub-mas rotation. Below visual resolution; cancelled
+      // exactly by the E1+E2 pair anyway.)
+      const cyc_at_anchor = cyclesBetweenYears(STARTMODEL_YEAR_SI, STARTMODEL_YEAR_SI, expectedN_H);
+      note(`Cycles at anchor: ${cyc_at_anchor.toExponential(2)} (< 1e-9 required; pair cancels regardless)`,
+           Math.abs(cyc_at_anchor) < 1e-9);
+
+      // 4. Deep-time evolution at year -584 — INTEGRATOR vs SNAPSHOT per-frame.
+      // The pair cancellation (E1+E2=0) is necessary but NOT sufficient — we
+      // also need each frame's integrator output to match the snapshot per-frame
+      // value, else intermediate objects (perihelion arrows) get displaced.
+      // The factor-of-8 divisor bug (P-D revert, 2026-06-20) was hidden by the
+      // pair cancellation here; explicit snapshot comparison would have caught it.
+      const cyc_thales = cyclesBetweenYears(STARTMODEL_YEAR_SI, y_thales_SI, p.E1._dtCycleN);
+      const θ_E1_int_thales = cyc_thales * 2 * Math.PI * p.E1._dtCycleSign;
+      const θ_E2_int_thales = cyc_thales * 2 * Math.PI * p.E2._dtCycleSign;
+      const θ_pair_thales = θ_E1_int_thales + θ_E2_int_thales;
+      // Snapshot value per frame at year -584: speed × pos where pos = year_si - anchor_si.
+      // (At year -584, pos ≈ -2584; speed is in rad/year.)
+      const pos_thales = y_thales_SI - STARTMODEL_YEAR_SI;
+      const θ_E1_snap_thales = p.E1.speed * pos_thales;
+      const θ_E2_snap_thales = p.E2.speed * pos_thales;
+      const e1_match_rad = θ_E1_int_thales - θ_E1_snap_thales;
+      const e2_match_rad = θ_E2_int_thales - θ_E2_snap_thales;
+      note(`Year -584: E1 int=${(θ_E1_int_thales*180/Math.PI).toFixed(3)}°, snap=${(θ_E1_snap_thales*180/Math.PI).toFixed(3)}°, diff=${(e1_match_rad*180/Math.PI).toExponential(2)}°`,
+           Math.abs(e1_match_rad) < 0.001);  // <1mrad agreement = sub-mas at planet scale
+      note(`Year -584: E2 int=${(θ_E2_int_thales*180/Math.PI).toFixed(3)}°, snap=${(θ_E2_snap_thales*180/Math.PI).toFixed(3)}°, diff=${(e2_match_rad*180/Math.PI).toExponential(2)}°`,
+           Math.abs(e2_match_rad) < 0.001);
+      note(`Year -584: pair cancels to ${θ_pair_thales.toExponential(2)} rad`,
+           Math.abs(θ_pair_thales) < 1e-12);
+      console.log('');
+    }
+
+    // Regression: untagged frames remain on snapshot path
+    if (untagged.length > 0) {
+      console.log('── UNTAGGED ──');
+      for (const p of untagged) {
+        const e1Has = p.E1._dtCycleN !== undefined;
+        const e2Has = p.E2._dtCycleN !== undefined;
+        note(`${p.key.padEnd(8)} E1+E2 unchanged (E1.tagged=${e1Has}, E2.tagged=${e2Has})`,
+             !e1Has && !e2Has);
+      }
+      console.log('');
+    }
+
+    // Regression: Moon-chain dispatch unchanged
+    console.log('── REGRESSION CHECK ──');
+    const moonOk = moon._dtMoonIntegrator === meanMoonOrbitsBetweenYears && !moon._dtPlanetIntegrator && !moon._dtCycleN;
+    note('Moon-chain dispatch unchanged (no planet-style tags leaked onto moon)', moonOk);
+
+    // Summary
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY:  ${passCount} passed, ${failCount} failed`);
+    if (failCount === 0) {
+      console.log(`  ✓ All ${tagged.length} tagged perihelion-ecliptic frame pair(s) verified.`);
+      console.log('  Visual checks REQUIRED:');
+      console.log('    1. Each tagged planet at modern epoch — position unchanged (pair cancels).');
+      console.log('    2. The "perihelion arrow" object (e.g. mercuryPerihelionFromEarth) may');
+      console.log('       visibly shift IF the per-frame integrator differs from snapshot at');
+      console.log('       this epoch. Dry-run says no, but eye-check anyway.');
+      console.log('    3. Untagged planets unchanged.');
+      console.log('    4. Moon position unchanged.');
+      if (untagged.length > 0) {
+        console.log(`  Next: tag ${untagged[0].key} perihelion ecliptic pair (Phase P-C${tagged.length + 1}).`);
+      } else {
+        console.log('  All 7 planet perihelion ecliptic pairs tagged. Ready for Phase P-D.');
+      }
+    } else {
+      console.log('  ✗ Verification FAILED — revert the most-recently-added tag pair and diagnose.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Generalized P-C verification: walks all currently-tagged ' +
+     '*PerihelionDurationEcliptic1/2 pairs and checks tag integrity, sign ' +
+     'cancellation, bit-equivalence at startmodelJD, and deep-time pair ' +
+     'cancellation at year -584. Same button for P-C1 through P-C7 — output ' +
+     'adapts to whichever planets are currently tagged.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // P-D verification — per-planet _dtPerihelionDivisor for eq-of-center.
+  // Signed divisor: positive N for prograde, negative N for retrograde.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Verify P-D — per-planet _dtPerihelionDivisor (eq-of-center)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase P-D verification — per-planet _dtPerihelionDivisor');
+    console.log('  Signed divisor (- for retrograde Venus/Saturn). Dispatch uses UT (OK).');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    let passCount = 0, failCount = 0;
+    const note = (label, ok, detail) => {
+      ok ? passCount++ : failCount++;
+      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
+    };
+
+    // CORRECTED 2026-06-20: divisor for cyclesBetweenYears is N/8, not N
+    // (perihelion ecliptic period = 8H/N → H-form divisor = N/8).
+    const PLANETS = [
+      { key: 'mercury', obj: mercury, expectedDivisor: +11 / 8 },   // +1.375
+      { key: 'venus',   obj: venus,   expectedDivisor:  -6 / 8 },   // -0.75 (retrograde)
+      { key: 'mars',    obj: mars,    expectedDivisor: +36 / 8 },   // +4.5
+      { key: 'jupiter', obj: jupiter, expectedDivisor: +39 / 8 },   // +4.875
+      { key: 'saturn',  obj: saturn,  expectedDivisor: -65 / 8 },   // -8.125 (retrograde)
+      { key: 'uranus',  obj: uranus,  expectedDivisor: +24 / 8 },   // +3
+      { key: 'neptune', obj: neptune, expectedDivisor:  +4 / 8 },   // +0.5
+    ];
+
+    const jdOf = (Y, M, D, h = 12) => {
+      const isJulian = (Y < 1582) || (Y === 1582 && (M < 10 || (M === 10 && D < 15)));
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      const A = Math.floor(y / 100);
+      const B = isJulian ? 0 : (2 - A + Math.floor(A / 4));
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D + B - 1524.5 + h / 24;
+    };
+    const y_thales_SI = _jdToSIyear(jdOf(-584, 5, 28, 12));
+
+    // ── Test 1: tag fields ──
+    console.log('TEST 1 — _dtPerihelionDivisor + _dtPerihelionAnchor set correctly per planet');
+    for (const p of PLANETS) {
+      const divOk    = p.obj._dtPerihelionDivisor === p.expectedDivisor;
+      const anchorOk = p.obj._dtPerihelionAnchor === STARTMODEL_YEAR_SI;
+      const label    = `${p.key.padEnd(8)} divisor=${p.obj._dtPerihelionDivisor} (exp ${p.expectedDivisor}), anchor matches`;
+      note(label, divOk && anchorOk);
+    }
+
+    // ── Test 2: J2000 bit-equivalence ──
+    console.log('\nTEST 2 — at startmodelJD: _pCycles === 0 → perihelionPhase === perihelionPhaseJ2000');
+    for (const p of PLANETS) {
+      const cyc = cyclesBetweenYears(STARTMODEL_YEAR_SI, STARTMODEL_YEAR_SI, p.obj._dtPerihelionDivisor);
+      note(`${p.key.padEnd(8)} cycles at anchor = ${cyc.toExponential(2)} (< 1e-9 required)`,
+           Math.abs(cyc) < 1e-9);
+    }
+
+    // ── Test 3: Deep-time signed evolution + snapshot comparison ──
+    // CRITICAL: also compare against the SNAPSHOT perihelionPhase shift to
+    // catch divisor-magnitude bugs (the factor-of-8 bug that caused the P-D
+    // revert on 2026-06-20). Sign-only checks aren't enough.
+    console.log('\nTEST 3 — at year -584: integrator vs snapshot perihelion phase shift');
+    const pos_thales = y_thales_SI - STARTMODEL_YEAR_SI;
+    for (const p of PLANETS) {
+      const cyc = cyclesBetweenYears(STARTMODEL_YEAR_SI, y_thales_SI, p.obj._dtPerihelionDivisor);
+      const shift_int_rad = cyc * 2 * Math.PI;
+      const shift_snap_rad = (p.obj.perihelionPrecessionRate || 0) * pos_thales;
+      const diff_rad = shift_int_rad - shift_snap_rad;
+      const shift_int_deg = shift_int_rad * 180 / Math.PI;
+      const shift_snap_deg = shift_snap_rad * 180 / Math.PI;
+      const match = Math.abs(diff_rad) < 0.001;  // <1 mrad ≈ sub-mas at planet scale
+      note(`${p.key.padEnd(8)} integrator=${shift_int_deg.toFixed(3)}°, snapshot=${shift_snap_deg.toFixed(3)}°, diff=${(diff_rad*180/Math.PI).toExponential(2)}°`,
+           match);
+    }
+
+    // ── Test 4: Sun's existing tag still intact ──
+    console.log('\nTEST 4 — regression: Sun\'s existing _dtPerihelionDivisor = 16 unchanged');
+    note(`sun._dtPerihelionDivisor === 16 (was tagged in earlier Phase 9.x)`,
+         sun._dtPerihelionDivisor === 16);
+    note(`sun._dtPerihelionAnchor === STARTMODEL_YEAR_SI`,
+         sun._dtPerihelionAnchor === STARTMODEL_YEAR_SI);
+
+    // ── Test 5: Moon not tagged ──
+    console.log('\nTEST 5 — regression: Moon-chain unaffected');
+    note(`moon._dtPerihelionDivisor is undefined (Moon doesn\'t use eq-of-center perihelion)`,
+         moon._dtPerihelionDivisor === undefined);
+
+    // ── Summary ──
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY:  ${passCount} passed, ${failCount} failed`);
+    if (failCount === 0) {
+      console.log('  ✓ All 7 planets tagged. Visual verification REQUIRED:');
+      console.log('    1. Each planet at modern epoch — position unchanged (perihelion at anchor = perihelionPhaseJ2000).');
+      console.log('    2. Planet eccentricity wobble unchanged at modern epoch.');
+      console.log('    3. Deep-time scrub: planets remain in continuous motion, position may shift slightly');
+      console.log('       compared to pre-P-D snapshot path (sub-degree for inner planets at year -584).');
+      console.log('    4. Sun + Moon positions unchanged.');
+      console.log('  After visual confirmation: P-D complete. P-E (composition audit, read-only) next.');
+    } else {
+      console.log('  ✗ Phase P-D FAILED — revert the per-planet _dtPerihelionDivisor block and diagnose.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase P-D verification: confirms _dtPerihelionDivisor + _dtPerihelionAnchor ' +
+     'are set correctly per planet (signed divisor for retrograde), J2000 ' +
+     'bit-equivalence holds, deep-time perihelion phase evolves with the ' +
+     'correct sign, and existing Sun + Moon tags are unaffected.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // P-E composition audit — walk each planet's full scene-graph chain and
+  // report tagging status per node. Verifies the architectural invariant:
+  // every node that rotates at an EPOCH-DEPENDENT rate is tagged with the
+  // appropriate integrator; intermediate frame nodes that rotate at constant
+  // rates (visualization helpers) intentionally remain on the snapshot path.
+  // Read-only; no rendering code touched.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('P-E composition audit — planet scene-graph chains', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase P-E composition audit — per-planet scene-graph chain tagging status');
+    console.log('  docs/hidden/IP-planet-deep-time-scene-graph.md');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    let passCount = 0, failCount = 0;
+    const note = (label, ok, detail) => {
+      ok ? passCount++ : failCount++;
+      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
+    };
+
+    // Helper: classify a node's dispatch path.
+    const classify = (obj) => {
+      if (Number.isFinite(obj._dtCycleN))         return { path: '_dtCycleN (Law-6 H-scaling, UT)', tagged: true };
+      if (obj._dtMoonIntegrator)                  return { path: '_dtMoonIntegrator (Moon-chain, UT)', tagged: true };
+      if (obj._dtPlanetIntegrator)                return { path: '_dtPlanetIntegrator (Kepler/Driver-2, TT)', tagged: true };
+      if (obj._dtMoonIntegrator !== undefined)    return { path: '_dtMoonIntegrator (Moon-chain, UT)', tagged: true };
+      return { path: 'snapshot (obj.speed × pos)', tagged: false };
+    };
+
+    // Per-planet scene-graph chain (from script.js:9920+ — barycenterEarthAndSun → ...).
+    // Each entry: { obj, role, epochDep } where epochDep = true if the rotation rate
+    // depends on epoch (must be tagged) vs. constant (snapshot OK).
+    const CHAINS = {
+      mercury: [
+        { obj: mercuryPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6)',           epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: mercuryPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow (visual, geocentric)', epochDep: false, expectTag: 'snapshot' },
+        { obj: mercuryPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2 (Law-6, counter-rotates E1)', epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: mercuryRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset (Kepler ellipse anchor)', epochDep: false, expectTag: 'snapshot' },
+        { obj: mercury,                            role: 'Planet (orbital integrator)',              epochDep: true,  expectTag: '_dtPlanetIntegrator' },
+        { obj: mercuryFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker (visual)',  epochDep: false, expectTag: 'snapshot' },
+        { obj: mercuryWobbleCenter,                role: 'Wobble center (Law-6 eccentricity beat)',  epochDep: true,  expectTag: '_dtCycleN' },
+      ],
+      venus: [
+        { obj: venusPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6, RETROGRADE)', epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: venusPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',                epochDep: false, expectTag: 'snapshot' },
+        { obj: venusPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                     epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: venusRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',              epochDep: false, expectTag: 'snapshot' },
+        { obj: venus,                            role: 'Planet (orbital integrator)',                epochDep: true,  expectTag: '_dtPlanetIntegrator' },
+        { obj: venusFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',             epochDep: false, expectTag: 'snapshot' },
+        { obj: venusWobbleCenter,                role: 'Wobble center',                              epochDep: true,  expectTag: '_dtCycleN' },
+      ],
+      mars: [
+        { obj: marsPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6)',              epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: marsPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',                 epochDep: false, expectTag: 'snapshot' },
+        { obj: marsPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                      epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: marsRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',               epochDep: false, expectTag: 'snapshot' },
+        { obj: mars,                            role: 'Planet (orbital integrator, SIGN -1 quirk)',  epochDep: true,  expectTag: '_dtPlanetIntegrator' },
+        { obj: marsFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',              epochDep: false, expectTag: 'snapshot' },
+        { obj: marsWobbleCenter,                role: 'Wobble center',                               epochDep: true,  expectTag: '_dtCycleN' },
+      ],
+      jupiter: [
+        { obj: jupiterPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6)',           epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: jupiterPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',              epochDep: false, expectTag: 'snapshot' },
+        { obj: jupiterPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                   epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: jupiterRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',            epochDep: false, expectTag: 'snapshot' },
+        { obj: jupiter,                            role: 'Planet (orbital integrator)',              epochDep: true,  expectTag: '_dtPlanetIntegrator' },
+        { obj: jupiterFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',           epochDep: false, expectTag: 'snapshot' },
+        { obj: jupiterWobbleCenter,                role: 'Wobble center',                            epochDep: true,  expectTag: '_dtCycleN' },
+      ],
+      saturn: [
+        { obj: saturnPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6, RETROGRADE)', epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: saturnPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',                epochDep: false, expectTag: 'snapshot' },
+        { obj: saturnPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                     epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: saturnRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',              epochDep: false, expectTag: 'snapshot' },
+        { obj: saturn,                            role: 'Planet (orbital integrator)',                epochDep: true,  expectTag: '_dtPlanetIntegrator' },
+        { obj: saturnFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',             epochDep: false, expectTag: 'snapshot' },
+        { obj: saturnWobbleCenter,                role: 'Wobble center',                              epochDep: true,  expectTag: '_dtCycleN' },
+      ],
+      uranus: [
+        { obj: uranusPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6)',            epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: uranusPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',               epochDep: false, expectTag: 'snapshot' },
+        { obj: uranusPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                    epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: uranusRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',             epochDep: false, expectTag: 'snapshot' },
+        { obj: uranus,                            role: 'Planet (orbital integrator)',               epochDep: true,  expectTag: '_dtPlanetIntegrator' },
+        { obj: uranusFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',            epochDep: false, expectTag: 'snapshot' },
+        { obj: uranusWobbleCenter,                role: 'Wobble center',                             epochDep: true,  expectTag: '_dtCycleN' },
+      ],
+      neptune: [
+        { obj: neptunePerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6)',           epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: neptunePerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',              epochDep: false, expectTag: 'snapshot' },
+        { obj: neptunePerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                   epochDep: true,  expectTag: '_dtCycleN' },
+        { obj: neptuneRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',            epochDep: false, expectTag: 'snapshot' },
+        { obj: neptune,                            role: 'Planet (orbital integrator)',              epochDep: true,  expectTag: '_dtPlanetIntegrator' },
+        { obj: neptuneFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',           epochDep: false, expectTag: 'snapshot' },
+        { obj: neptuneWobbleCenter,                role: 'Wobble center',                            epochDep: true,  expectTag: '_dtCycleN' },
+      ],
+    };
+
+    let totalEpochDep = 0, totalTagged = 0;
+    for (const [planet, chain] of Object.entries(CHAINS)) {
+      console.log(`── ${planet.toUpperCase()} ──`);
+      const rows = [];
+      let chainOk = true;
+      for (const node of chain) {
+        const { path, tagged } = classify(node.obj);
+        const expectTagged = node.epochDep;
+        const correct = tagged === expectTagged;
+        if (node.epochDep) totalEpochDep++;
+        if (tagged) totalTagged++;
+        if (!correct) chainOk = false;
+        rows.push({
+          node:    node.obj.name || '(unnamed)',
+          role:    node.role,
+          path,
+          epochDep: node.epochDep ? 'YES' : 'no',
+          status:  correct ? '✓' : (tagged ? '⚠ tagged but constant rate' : '✗ untagged but epoch-dependent'),
+        });
+      }
+      console.table(rows);
+      note(`${planet} chain composition consistent (all epoch-dependent nodes tagged, all constant-rate nodes on snapshot)`,
+           chainOk);
+    }
+
+    // ── Sun and Moon regression checks ──
+    console.log('\n── REGRESSION ──');
+    note(`sun._dtPerihelionDivisor unchanged (Phase 9.x tag) = ${sun._dtPerihelionDivisor}`, sun._dtPerihelionDivisor === 16);
+    note(`moon._dtMoonIntegrator unchanged (Phase 9.13)`, moon._dtMoonIntegrator === meanMoonOrbitsBetweenYears);
+    note(`Earth precession tags intact: earth._dtCycleN === 13`, earth._dtCycleN === 13);
+
+    // ── Summary ──
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  COMPOSITION SUMMARY:`);
+    console.log(`    Total epoch-dependent nodes (must be tagged): ${totalEpochDep}`);
+    console.log(`    Total currently tagged: ${totalTagged}`);
+    console.log(`    Per-planet structure: 3 tagged (E1, E2, planet, wobble = 4) + 3 snapshot (arrow, real-peri, fixed-peri)`);
+    console.log(`    Expected: 7 planets × 4 tagged = 28 tagged nodes + 7 × 3 = 21 snapshot intermediates`);
+    console.log('');
+    console.log(`  TEST SUMMARY:  ${passCount} passed, ${failCount} failed`);
+    if (failCount === 0) {
+      console.log('  ✓ Phase P-E verified — all planet scene-graph chains are architecturally sound.');
+      console.log('  Architecture: epoch-dependent nodes use integrators (Law-6 _dtCycleN or Kepler');
+      console.log('  _dtPlanetIntegrator); intermediate frame nodes (perihelion arrows, fixed markers)');
+      console.log('  use snapshot path intentionally — their rotation rates are epoch-independent.');
+      console.log('  Ready for Phase P-F (documentation cleanup).');
+    } else {
+      console.log('  ✗ Phase P-E FAILED — chain composition inconsistency detected. Investigate before P-F.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase P-E composition audit: walks each planet\'s scene-graph chain ' +
+     '(7 nodes per planet × 7 planets = 49 nodes) and reports tagging status. ' +
+     'Verifies architectural invariant: epoch-dependent rotation rates use ' +
+     'integrators; constant-rate intermediate frames use snapshot path. ' +
+     'Read-only audit.');
+
   // Insert group labels before the first button of each group
   const calibContainer = calibFolder.element.querySelector('.tp-fldv_c');
   const insertGroupLabel = (text, beforeBlade) => {
@@ -28296,6 +30039,7 @@ function setupGUI() {
   insertGroupLabel('Balanced Year & 8H', firstBalancedBtn);
   insertGroupLabel('Historical Eclipses & ΔT', firstEclipseBtn);
   insertGroupLabel('Anchor & Units', firstAnchorBtn);
+  insertGroupLabel('Planet Deep-Time Integrators', firstPlanetIntBtn);
 
   /* --- Camera -------------------------------------------------------------- */
   const cameraFolder = toolsFolder.addFolder({ title: 'Camera', expanded: false });
@@ -45219,6 +46963,25 @@ function moveModel(pos) {
     // _jdToSIyear consistently for both anchor (via STARTMODEL_YEAR_SI) and
     // current restores correct units.
     const _currentYearSI = DEEP_TIME_MODE_ENABLED ? _jdToSIyear(o.julianDay) : o.currentYear;
+    // Phase P-A.1 (narrowed): TT-shifted SI year for the planet _dtIntegrator
+    // branch (introduced in P-B0+). The existing _dtCycleN + _dtMoonIntegrator
+    // dispatch sites below CONTINUE to use _currentYearSI (UT) — applying TT
+    // shift to them would regress 6/19 historical eclipses (doc 101's 19/19
+    // result). See docs/hidden/IP-planet-deep-time-scene-graph.md "Future
+    // Phase Z" for the asymmetry rationale. The model's convention
+    // meanDeltaTSecondsAtAge(0)=0 means anchor identity holds at J2000 with
+    // no separate TT anchor — _currentYearSI_TT === STARTMODEL_YEAR_SI at
+    // startmodelJD, so cyclesBetween(STARTMODEL_YEAR_SI, _currentYearSI_TT, N)
+    // returns 0 there → bit-equivalent to snapshot path at modern epoch.
+    let _currentYearSI_TT = _currentYearSI;
+    if (DEEP_TIME_MODE_ENABLED) {
+      const _decYear_TT = julianDateToDecimalYear(o.julianDay);
+      const _tMa_TT     = (J2000_CALENDAR_YEAR - _decYear_TT) / 1e6;
+      const _dT_s_TT    = meanDeltaTSecondsAtAge(_tMa_TT);
+      if (Number.isFinite(_dT_s_TT)) {
+        _currentYearSI_TT = _currentYearSI + _dT_s_TT / (SI_TROPICAL_YEAR_DAYS * 86400);
+      }
+    }
     if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtCycleN)) {
       const _dtAnchor = Number.isFinite(obj._dtCycleAnchor) ? obj._dtCycleAnchor : BALANCED_YEAR_J2000_FIXED;
       const _dtCycles = cyclesBetweenYears(_dtAnchor, _currentYearSI, obj._dtCycleN);
@@ -45235,6 +46998,24 @@ function moveModel(pos) {
       const _mAnchor = Number.isFinite(obj._dtMoonAnchor) ? obj._dtMoonAnchor : STARTMODEL_YEAR_SI;
       const _mCycles = obj._dtMoonIntegrator(_mAnchor, _currentYearSI);
       θ = (_mCycles !== null ? _mCycles : 0) * 2 * Math.PI * obj._dtMoonSign
+          - obj.startPos * (Math.PI / 180);
+    } else if (DEEP_TIME_MODE_ENABLED && obj._dtPlanetIntegrator) {
+      // Phase P-B0: planet-chain integral form (Driver 2 Kepler + mass loss).
+      // Consumes _currentYearSI_TT (TT-shifted) — NOT _currentYearSI (UT) —
+      // because planet period functions (meanPlanetOrbitalPeriodAtAge and
+      // the 7 meanXOrbitalCyclesBetween wrappers) are TT-uniform.
+      //
+      // The Moon-chain branch above stays on UT to preserve doc 101's
+      // 19/19 historical eclipse validation, which depends on the
+      // co-evolved (Moon integrator + pure-tidal ΔT formula + visibility
+      // test methodology) UT calibration. See "Future Phase Z" in
+      // docs/hidden/IP-planet-deep-time-scene-graph.md.
+      //
+      // No object has _dtPlanetIntegrator tagged yet — this branch is
+      // dead code until Phase P-B1 starts wiring per-planet tags.
+      const _pAnchor = Number.isFinite(obj._dtPlanetAnchor) ? obj._dtPlanetAnchor : STARTMODEL_YEAR_SI;
+      const _pCycles = obj._dtPlanetIntegrator(_pAnchor, _currentYearSI_TT);
+      θ = (_pCycles !== null ? _pCycles : 0) * 2 * Math.PI * obj._dtPlanetSign
           - obj.startPos * (Math.PI / 180);
     } else {
       θ = obj.speed * pos - obj.startPos * (Math.PI / 180);

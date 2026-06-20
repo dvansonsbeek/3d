@@ -1,7 +1,9 @@
 # ΔT model validation via historical solar eclipses
 
-**Date**: 2026-06-18
-**Status**: Step B complete — first quantitative comparison of our ΔT against published formulas
+**Date**: 2026-06-18 (initial); 2026-06-20 (cross-references to doc 101 added)
+**Status**: Step B complete — first quantitative comparison of our ΔT against published formulas. Companion analysis with a different methodology now exists at [doc 101](101-pure-tidal-eclipses.md).
+
+> **Companion analysis (added 2026-06-20)**: This document uses a **residual-RMS methodology** — Moon-Sun geocentric separation in degrees, evaluated across 35 historical solar eclipses. [Doc 101](101-pure-tidal-eclipses.md) presents a complementary **visibility-window methodology** on a focused, cleaner 19-event dataset (-762 to 1654 CE). The two analyses surface different aspects of the same picture and reach consistent conclusions; see [Related work](#related-work--visibility-window-methodology-doc-101) below for the synthesis. **Numerical baselines in this document are unchanged**; verify-pipeline confirms no Moon/Sun position regression since 2026-06-18 (Moon RMS 0.0015°, Sun RMS 0.0033°).
 
 ---
 
@@ -184,6 +186,42 @@ table reproduced above. Runtime: ~5 seconds.
 
 ---
 
+## Related work — visibility-window methodology (doc 101)
+
+The June 2026 analysis presented above was extended on 2026-06-20 by [doc 101](101-pure-tidal-eclipses.md), which applies a different methodology to a focused subset of the same broader historical record.
+
+**Methodology differences:**
+
+| | Doc 100 (this document) | Doc 101 |
+|---|---|---|
+| Metric | Moon-Sun geocentric separation (degrees) | Sub-solar geographic distance from observation site (km) |
+| Pass/fail | Smallest \|residual\| wins | ΔT within visibility window (penumbra ≤ 7,500 km / umbra ≤ 4,500 km) |
+| Dataset | 35 eclipses (584 BCE — 2024 CE) | 19 well-localized events (-762 — 1654 CE) |
+| Reference | Geocentric parallax `\|γ\| × 0.95°` | Sub-solar geometric distance at conjunction |
+| Foundation | Meeus Ch. 47 polynomial | Same, plus NASA TT-space cross-check (±15 min, n=11 events) |
+
+**Verdict comparison:**
+
+| | Doc 100 (RMS residual) | Doc 101 (visibility window) |
+|---|---|---|
+| Our model vs Stephenson | 16 / 9 / 7 wins (~2° RMS each, statistically indistinguishable) | 19/19 vs 17/19 penumbra; 8,658 s vs 8,789 s mean residual (pure-tidal wins both) |
+| Verdict | All three ΔT formulas equally good at the noise floor | Pure-tidal slightly outperforms on per-event visibility |
+
+The two analyses are **complementary, not contradictory**:
+
+- Doc 100's RMS test is a broad aggregate — averages residuals across an inhomogeneous dataset that includes events where geographic localization is impossible (γ outside ±1, modern eclipses with negligible ΔT contribution, etc.). This is appropriate for the "are all three ΔT formulas in the same noise band" question.
+- Doc 101's visibility-window test is sharper per-event — uses only the events where geographic localization is meaningful, and asks the discrete question "is the model's eclipse path within penumbra reach of the documented site?" rather than the continuous question "how close is the separation". This surfaces small-but-real pure-tidal-vs-Stephenson differences that doc 100's aggregate RMS smooths over.
+
+Both verdicts are consistent with the broader thesis: **pure-tidal Farhat physics is sufficient to explain the historical eclipse record without requiring a non-tidal Earth-rotation speedup component**. Doc 100 establishes the "not worse than empirical fits" floor; doc 101 establishes the "slightly better on the per-event question" ceiling. Together they bracket the strength of the pure-tidal claim.
+
+Three things doc 101 does that doc 100 does not:
+
+1. **NASA TT-space cross-check of the underlying Moon polynomial** (n=11 events, ±15 min mean residual). Doc 100 implicitly assumes the polynomial is accurate; doc 101 independently verifies this.
+2. **Identifies one mis-attributed entry in earlier datasets**: "Cambyses (-522)" was a category error (no documented Babylonian solar eclipse from his reign; the diary references are lunar). Doc 100's 35-event dataset never included this entry, so its results are unaffected — but this clarifies the historical record.
+3. **Surfaces a candidate alternative date for the Thales eclipse** (-581 March 28 / 582 BC March 28) where the model's umbra path runs directly across Anatolia. Doc 100 used the traditional -584 May 28 date; doc 101 flags this as an open question for paleo-astronomy.
+
+---
+
 ## References
 
 - Stephenson, F.R., & Morrison, L.V. (2004). *Long-term fluctuations in the Earth's rotation: 700 BC to AD 1990.*
@@ -191,5 +229,8 @@ table reproduced above. Runtime: ~5 seconds.
 - Stephenson, F.R., Morrison, L.V., & Hohenkerk, C.Y. (2016). *Measurement of the Earth's rotation: 720 BC to AD 2015.* Proc. R. Soc. A.
 - Farhat, M., Auclair-Desrotour, P., Boué, G., & Laskar, J. (2022). *The resonant tidal evolution of the Earth-Moon distance.* A&A 665, L1.
 - Wu, J., Meyers, S.R., Hinnov, L.A., et al. (2024). *A 650-Myr history of Earth's axial precession frequency from cyclostratigraphy.* Sci. Adv. 10, eado2412.
+- Stephenson, F.R. (1997). *Historical Eclipses and Earth's Rotation.* Cambridge University Press. (Cited in doc 101 for the Babylonian solar-eclipse window 369-136 BC.)
+- Panchenko, D. (1994). *Thales's Prediction of a Solar Eclipse.* J. Hist. Astron. 25(4), 275ff. doi:10.1177/002182869402500402. (Cited in doc 101 for the Thales eclipse-date dating discussion.)
 - Doc 66: `docs/66-moon-meeus-corrections.md` (Moon implementation reference)
 - Doc 99: `docs/99-expanding-solar-system-resonance-theory.md` (ESSRT framework)
+- Doc 101: `docs/101-pure-tidal-eclipses.md` (companion visibility-window analysis on 19-event dataset, 2026-06-20)

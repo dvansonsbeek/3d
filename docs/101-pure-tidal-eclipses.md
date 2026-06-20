@@ -126,7 +126,7 @@ Eclipse at site".
 
 **Question**: For each event, what RANGE of ΔT values would place our
 model's eclipse path within penumbra reach (< 7,500 km) of the observation
-site? Do either of (a) our pure-tidal ΔT or (b) Stephenson's empirical ΔT
+site? Does either (a) our pure-tidal ΔT or (b) Stephenson's empirical ΔT
 fall inside that range?
 
 **Method**: For each event, scan ΔT_hypothetical from -40,000 to +40,000 s
@@ -183,22 +183,24 @@ by an amount that scales linearly with time:
 | Year -524 (Cambyses-era catalog cross-check) | 22,320 | 17,470 | 4,850 | 2,524 | 1.92 |
 | Year 977 (Ibn Yunus) | 3,738 | 1,690 | 2,048 | 1,023 | 2.00 |
 
-**The excess scales as ~1.96 s/yr ≈ 6 ms/century** integrated linearly
-into the past — exactly the signature you would expect if the difference
-between pure-tidal Farhat and Stephenson's observational fit is a
-**constant non-tidal Earth-rotation rate** of that magnitude.
+**The excess scales as ~1.96 s/yr** integrated linearly into the past.
+A linear-in-time slope of this magnitude corresponds geometrically to a
+**constant Length-of-Day difference of ~5-6 ms** between the two models —
+exactly the signature you would expect if the difference between pure-tidal
+Farhat and Stephenson's observational fit is a constant non-tidal
+Earth-rotation rate of that magnitude.
 
-This number is suspiciously close to the canonical Munk-MacDonald
+This constant-LOD gap is suspiciously close to the canonical Munk-MacDonald
 "non-tidal Earth-rotation speedup" estimate from glacial isostatic
 adjustment + core-mantle coupling (~5-6 ms/cy in the literature).
 
 ### Two readings of this result
 
-**Mainstream reading**: Earth has a real, ~6 ms/cy non-tidal rotation
+**Standard reading**: Earth has a real, ~6 ms/cy non-tidal rotation
 contribution; Stephenson's empirical curve captures it; pure-tidal alone
 is incomplete by that amount.
 
-**Our reading**: Stephenson's empirical fit was calibrated against the
+**Model reading**: Stephenson's empirical fit was calibrated against the
 same eclipse data we are testing here, plus a Munk-MacDonald-style
 mechanical assumption baked into the fit's structure. If you remove that
 assumption and let the data speak for itself, pure-tidal Farhat physics
@@ -218,7 +220,7 @@ them rests on:
 - Aesthetic preferences about parsimony
 
 What this validation establishes is that **pure-tidal is in the running**.
-It is not falsified by the historical eclipse record. The 40-year
+It is not falsified by the historical eclipse record. The longstanding
 consensus that "non-tidal speedup is needed to fit eclipses" is, on
 this evidence, not actually required.
 
@@ -252,8 +254,8 @@ What we are NOT claiming:
   that a constant ~6 ms/cy non-tidal component cannot be detected vs.
   absorbed-into-pure-tidal-fits at this resolution.
 - That solar-eclipse data alone settles this. Lunar-eclipse timing
-  (geographic-noise-independent) and high-precision LOD reconstructions
-  are stronger constraints.
+  (which doesn't depend on geographic localization) and high-precision
+  LOD reconstructions are stronger constraints.
 
 ---
 
@@ -269,10 +271,10 @@ Caveats the reader should keep in mind:
    approximations; the actual visibility depends on Moon's parallax and
    shadow projection geometry which we model as sub-solar-point distance.
 
-3. **Ancient observation sites** often have lat-err > umbra reach
-   (e.g., 977 Dec 13: Cairo is 3,000 km north of the umbra path
-   regardless of ΔT). For these events, the test only tells us about
-   penumbra visibility, not totality.
+3. **Ancient observation sites** often have a latitude error larger
+   than the umbra reach (e.g., 977 Dec 13: Cairo is 3,000 km north of
+   the umbra path regardless of ΔT). For these events, the test only
+   tells us about penumbra visibility, not totality.
 
 4. **The visibility-window methodology cannot detect ΔT differences
    smaller than ~50 s** because the penumbra window is wide (~30,000 s
@@ -295,8 +297,8 @@ in the standard scholarly candidate list:
 |---|---|---|---|
 | **-584 May 28** | 585 BCE May 28 | Sub-solar 5,223 km from Anatolia → **penumbra-only, weak partial** | Traditional (Stephenson 1997) — used in our test data |
 | -582 Sep 21 | 583 BCE Sep 21 | — | Hind (1853) alternative |
-| -581 Mar 16 | 582 BCE Mar 16 | — | Schoch (1924) alternative |
-| **-582 Mar 28** | 583 BCE Mar 28 | Umbra path **directly across Turkey/Greece** (JD 1508933.72) | **Surfaced by our model — not in scholarly list** |
+| -580 Mar 16 | 581 BCE Mar 16 | — | Schoch (1924) alternative |
+| **-581 Mar 28** | 582 BCE Mar 28 | Umbra path **directly across Turkey/Greece** (JD 1508933.64) | **Surfaced by our model — not in scholarly list** |
 
 Herodotus 1.74 describes the Thales eclipse as a dramatic event that
 darkened the sky enough to halt the Battle of Halys between the Lydians
@@ -304,26 +306,26 @@ and Medes. A penumbra-only partial of magnitude ~0.5 (which is what the
 traditional -584 May 28 date gives in our model under any plausible ΔT)
 is geometrically inconsistent with that account.
 
-The -582 March 28 candidate, by contrast, places the **umbra centerline
+The -581 March 28 candidate, by contrast, places the **umbra centerline
 directly across the conflict zone** in our model. That is the physical
 geometry Herodotus's account requires.
 
 This finding is **suggestive but not definitive**:
 
 - We did not exhaustively check whether NASA's Five Millennium Catalog
-  agrees with our model on this -582 March 28 path location.
+  agrees with our model on this -581 March 28 path location.
 - A path passing over Anatolia doesn't automatically mean *this* event
   was the Thales eclipse — another eclipse a few years away from the
   traditionally-accepted year could be coincidentally over the right
   region. Lunar position uncertainty grows at deep time.
 - Wikipedia's *Eclipse of Thales* article lists Hind 1853 and Schoch 1924
-  as the standard alternatives. Our -582 March 28 candidate does not
+  as the standard alternatives. Our -581 March 28 candidate does not
   appear in either.
 
 Accordingly, **we have NOT changed the test data**. The analysis tools
 and ECLIPSE_PRESETS still use the traditional -584 May 28 entry.
 
-If the -582 March 28 candidate were promoted to the test entry, the
+If the -581 March 28 candidate were promoted to the test entry, the
 visibility-window result for Thales would shift from "penumbra-only at
 site" to "umbra-at-site" — strengthening our headline numbers slightly.
 But we don't yet have enough independent confirmation to make that
