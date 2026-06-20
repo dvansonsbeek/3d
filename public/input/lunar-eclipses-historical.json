@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "description": "Curated historical lunar eclipses for validating the pure-tidal Moon model. Mirrors the structure of ECLIPSE_PRESETS (solar) embedded in src/script.js. Initial seed of 14 NASA-Lunar-Canon-verified events in the 2020-2025 window — the same events the Verify Lunar Eclipse Finder console test cross-checks the predictive finder against. Expansion to earlier eras is planned via Phase L-3 (NASA Lunar Canon import for -2000 to +3000 range) and via the Discover Lunar Eclipses console helper button.",
+    "schema_version": "1.1",
+    "history": "1.1 (2026-06-21): trimmed unverified Early-Modern/Medieval/Classical/Ancient draft entries that had mis-curated JDs (e.g. JD 2086877.5 labeled '1001 Sep 5' actually decodes to 1001 Jul 24). Catalog now contains only NASA-published JDs that the model's predictive finder agrees with to <2 days.",
+    "field_definitions": {
+      "jd":              "Julian Date (UT) of greatest eclipse, from NASA Lunar Canon (Espenak/Meeus 2009).",
+      "label":           "Display string: 'YYYY Mon DD Type'.",
+      "type":            "NASA classification: 'Total', 'Partial', or 'Penumbral'.",
+      "magnitude_umbral": "Fraction of Moon diameter within umbra at greatest eclipse. >1 for Total, (0,1) for Partial, 0 for Penumbral-only.",
+      "visibility":      "Continents/regions where Moon was above horizon during eclipse (lunar eclipses are visible from entire night-side hemisphere — much broader than solar paths).",
+      "era":             "Time category: 'Modern' / 'Medieval' / 'Classical' / 'Ancient'.",
+      "source":          "Documentary/reference source for this entry."
+    },
+    "sources": [
+      "NASA Five Millennium Canon of Lunar Eclipses (Espenak & Meeus 2009)",
+      "Said, S.S. & Stephenson, F.R. (1996). Solar and Lunar Eclipse Measurements by Medieval Muslim Astronomers, I: Background. J. Hist. Astronomy 27, 259-273.",
+      "Stephenson, F.R. (1997). Historical Eclipses and Earth's Rotation."
+    ],
+    "expansion_workflow": [
+      "1. Run console test 'Discover lunar eclipses in a year range' (default 1000-1010 CE) to list every model-predicted opposition.",
+      "2. Cross-reference candidate JDs against NASA Lunar Canon and Stephenson 1997 to confirm the event was historically observed/documented.",
+      "3. Add the verified entry to LUNAR_ECLIPSE_PRESETS in src/script.js and this JSON.",
+      "4. Run console test 'Validate LUNAR_ECLIPSE_PRESETS catalog entries' to confirm JD↔label↔model match."
+    ]
+  },
+  "entries": [
+    { "jd": 2460926.2582, "label": "2025 Sep 7 Total",     "type": "Total",     "magnitude_umbral": 1.367, "visibility": "Europe, Africa, Asia, Australia",                  "era": "Modern", "source": "NASA Lunar Canon" },
+    { "jd": 2460748.7908, "label": "2025 Mar 14 Total",    "type": "Total",     "magnitude_umbral": 1.183, "visibility": "Americas, Western Europe, West Africa",            "era": "Modern", "source": "NASA Lunar Canon" },
+    { "jd": 2460571.6140, "label": "2024 Sep 18 Partial",  "type": "Partial",   "magnitude_umbral": 0.085, "visibility": "Americas, Europe, Africa",                         "era": "Modern", "source": "NASA Lunar Canon — shallow partial" },
+    { "jd": 2460394.8006, "label": "2024 Mar 25 Penumbral","type": "Penumbral", "magnitude_umbral": 0,     "visibility": "Americas, Europe, Africa",                         "era": "Modern", "source": "NASA Lunar Canon — Worm Moon penumbral" },
+    { "jd": 2460246.3431, "label": "2023 Oct 28 Partial",  "type": "Partial",   "magnitude_umbral": 0.122, "visibility": "Europe, Africa, Asia, Australia",                  "era": "Modern", "source": "NASA Lunar Canon — shallow partial" },
+    { "jd": 2460070.2246, "label": "2023 May 5 Penumbral", "type": "Penumbral", "magnitude_umbral": 0,     "visibility": "Africa, Asia, Australia",                          "era": "Modern", "source": "NASA Lunar Canon — deep penumbral" },
+    { "jd": 2459891.9577, "label": "2022 Nov 8 Total",     "type": "Total",     "magnitude_umbral": 1.359, "visibility": "Asia, Australia, Pacific, Americas",               "era": "Modern", "source": "NASA Lunar Canon" },
+    { "jd": 2459715.6747, "label": "2022 May 16 Total",    "type": "Total",     "magnitude_umbral": 1.414, "visibility": "Americas, Europe, Africa",                         "era": "Modern", "source": "NASA Lunar Canon" },
+    { "jd": 2459537.8770, "label": "2021 Nov 19 Partial",  "type": "Partial",   "magnitude_umbral": 0.974, "visibility": "Americas, Northern Europe, Eastern Asia, Pacific", "era": "Modern", "source": "NASA Lunar Canon — near-total Beaver Moon" },
+    { "jd": 2459360.9713, "label": "2021 May 26 Total",    "type": "Total",     "magnitude_umbral": 1.009, "visibility": "Pacific, Americas, Eastern Asia, Australia",       "era": "Modern", "source": "NASA Lunar Canon — Super Flower Blood Moon (perigee, 14-min totality)" },
+    { "jd": 2459183.9047, "label": "2020 Nov 30 Penumbral","type": "Penumbral", "magnitude_umbral": 0,     "visibility": "Americas, Pacific, Eastern Asia, Australia",       "era": "Modern", "source": "NASA Lunar Canon — Beaver Moon penumbral" },
+    { "jd": 2459035.6879, "label": "2020 Jul 5 Penumbral", "type": "Penumbral", "magnitude_umbral": 0,     "visibility": "Americas, Western Africa",                         "era": "Modern", "source": "NASA Lunar Canon" },
+    { "jd": 2459006.3091, "label": "2020 Jun 5 Penumbral", "type": "Penumbral", "magnitude_umbral": 0,     "visibility": "Europe, Africa, Asia, Australia",                  "era": "Modern", "source": "NASA Lunar Canon" },
+    { "jd": 2458859.2987, "label": "2020 Jan 10 Penumbral","type": "Penumbral", "magnitude_umbral": 0,     "visibility": "Europe, Africa, Asia, Australia",                  "era": "Modern", "source": "NASA Lunar Canon — Wolf Moon penumbral" }
+  ]
+}
