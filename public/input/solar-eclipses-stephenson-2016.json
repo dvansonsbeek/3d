@@ -1,0 +1,674 @@
+{
+  "_meta": {
+    "description": "Timed solar eclipse observations from Stephenson, Morrison & Hohenkerk (2016), Proc. Roy. Soc. A 472:20160404 — supplementary tables S03, S06, S08. Each row is a single primary-source observation reduced by the Stephenson team to an implied ΔT value (seconds). Phase L-7 uses this as an INDEPENDENT cross-check (separate from the L-5b lunar 270-event validation in doc 102) that the GIA viscoelastic α(t) correction holds up against the solar observation record.",
+    "source_paper": "Stephenson, F.R., Morrison, L.V., Hohenkerk, C.Y. (2016) Proc. Roy. Soc. A 472:20160404",
+    "source_url": "https://royalsocietypublishing.org/doi/10.1098/rspa.2016.0404",
+    "time_range": "-356 to 1277",
+    "count": 89,
+    "tables_included": {
+      "S03": "Babylonian solar eclipses",
+      "S06": "Chinese timed solar eclipses",
+      "S08": "Arab timed solar eclipses"
+    },
+    "generator": "scripts/parse_stephenson_solar.py",
+    "field_definitions": {
+      "source_table": "Table id in Stephenson supplementary (S03, S06, S08).",
+      "source_table_name": "Descriptive name from Stephenson 2016.",
+      "year": "Calendar year of observation (negative for BCE; proleptic Julian).",
+      "dt_observed_sec": "ΔT in seconds derived by Stephenson from this observation.",
+      "weight": "Observation weight assigned by Stephenson (higher = more reliable; 0 = lowest).",
+      "degree": "S03 only: qualitative magnitude / phase description from cuneiform record."
+    },
+    "note_on_completeness": "Stephenson 2016 also has untimed solar eclipse tables S10 (total/annular at site), S11 (partial at site), S12 (sunrise/sunset eclipsed). These are NOT reduced to a single ΔT value per observation (they yield ΔT BOUNDS instead) so they require a different validation methodology than the timed-observation tables above."
+  },
+  "entries": [
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -356,
+      "dt_observed_sec": 15600,
+      "weight": 1,
+      "degree": "-76"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -321,
+      "dt_observed_sec": 14200,
+      "weight": 12,
+      "degree": "-3"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -280,
+      "dt_observed_sec": 13300,
+      "weight": 11,
+      "degree": "+6"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -280,
+      "dt_observed_sec": 12950,
+      "weight": 6,
+      "degree": "+20"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -253,
+      "dt_observed_sec": 11400,
+      "weight": 1,
+      "degree": "-56"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -253,
+      "dt_observed_sec": 11500,
+      "weight": 2,
+      "degree": "-44"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -253,
+      "dt_observed_sec": 11650,
+      "weight": 4,
+      "degree": "-33"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -248,
+      "dt_observed_sec": 13800,
+      "weight": 1,
+      "degree": "+90"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -189,
+      "dt_observed_sec": 12900,
+      "weight": 4,
+      "degree": "+30"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -189,
+      "dt_observed_sec": 13400,
+      "weight": 2,
+      "degree": "+45"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -189,
+      "dt_observed_sec": 14150,
+      "weight": 1,
+      "degree": "+60"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -169,
+      "dt_observed_sec": 12300,
+      "weight": 6,
+      "degree": "-20"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -169,
+      "dt_observed_sec": 12200,
+      "weight": 10,
+      "degree": "-8"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -135,
+      "dt_observed_sec": 12600,
+      "weight": 5,
+      "degree": "+24"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -135,
+      "dt_observed_sec": 12100,
+      "weight": 2,
+      "degree": "+42"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -135,
+      "dt_observed_sec": 12300,
+      "weight": 1,
+      "degree": "+59"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -132,
+      "dt_observed_sec": 11500,
+      "weight": 2,
+      "degree": "-50"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -132,
+      "dt_observed_sec": 11700,
+      "weight": 4,
+      "degree": "-30"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -132,
+      "dt_observed_sec": 11700,
+      "weight": 10,
+      "degree": "-12"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -88,
+      "dt_observed_sec": 9200,
+      "weight": 2,
+      "degree": "+45"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -88,
+      "dt_observed_sec": 10100,
+      "weight": 1,
+      "degree": "+57"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -88,
+      "dt_observed_sec": 10900,
+      "weight": 1,
+      "degree": "+69"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -9,
+      "dt_observed_sec": 9900,
+      "weight": 1,
+      "degree": "-90"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -9,
+      "dt_observed_sec": 9300,
+      "weight": 1,
+      "degree": "-67"
+    },
+    {
+      "source_table": "S03",
+      "source_table_name": "Babylonian solar eclipses",
+      "year": -9,
+      "dt_observed_sec": 8100,
+      "weight": 2,
+      "degree": "-42"
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 586,
+      "dt_observed_sec": 3700,
+      "weight": 1
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 586,
+      "dt_observed_sec": 6700,
+      "weight": 1
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 586,
+      "dt_observed_sec": 4900,
+      "weight": 1
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 594,
+      "dt_observed_sec": 6300,
+      "weight": 1
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 680,
+      "dt_observed_sec": 2450,
+      "weight": 1
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 691,
+      "dt_observed_sec": 1000,
+      "weight": 0
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 702,
+      "dt_observed_sec": 2350,
+      "weight": 1
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 761,
+      "dt_observed_sec": 2300,
+      "weight": 1
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 761,
+      "dt_observed_sec": 3600,
+      "weight": 1
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 761,
+      "dt_observed_sec": 2650,
+      "weight": 1
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 829,
+      "dt_observed_sec": 850,
+      "weight": 0
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 829,
+      "dt_observed_sec": 2250,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 866,
+      "dt_observed_sec": 2200,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 866,
+      "dt_observed_sec": 2500,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 866,
+      "dt_observed_sec": 2450,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 891,
+      "dt_observed_sec": 1650,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 901,
+      "dt_observed_sec": 1700,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 901,
+      "dt_observed_sec": 1550,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 923,
+      "dt_observed_sec": 1900,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 923,
+      "dt_observed_sec": 1600,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 928,
+      "dt_observed_sec": 1800,
+      "weight": 4
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 937,
+      "dt_observed_sec": 2100,
+      "weight": 2
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 977,
+      "dt_observed_sec": 1800,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 977,
+      "dt_observed_sec": 2000,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 978,
+      "dt_observed_sec": 1250,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 978,
+      "dt_observed_sec": 2000,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 979,
+      "dt_observed_sec": 1450,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 985,
+      "dt_observed_sec": 1500,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 985,
+      "dt_observed_sec": 750,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 993,
+      "dt_observed_sec": 2000,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 993,
+      "dt_observed_sec": 1400,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 1004,
+      "dt_observed_sec": 1450,
+      "weight": 4
+    },
+    {
+      "source_table": "S08",
+      "source_table_name": "Arab timed solar eclipses",
+      "year": 1004,
+      "dt_observed_sec": 1150,
+      "weight": 4
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1040,
+      "dt_observed_sec": 2850,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1046,
+      "dt_observed_sec": 2100,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1052,
+      "dt_observed_sec": 2900,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1053,
+      "dt_observed_sec": 2450,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1054,
+      "dt_observed_sec": 1900,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1059,
+      "dt_observed_sec": 2400,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1066,
+      "dt_observed_sec": 1650,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1068,
+      "dt_observed_sec": 1600,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1068,
+      "dt_observed_sec": 1200,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1068,
+      "dt_observed_sec": 850,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1069,
+      "dt_observed_sec": 500,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1080,
+      "dt_observed_sec": 0,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1094,
+      "dt_observed_sec": 1200,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1094,
+      "dt_observed_sec": 2650,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1107,
+      "dt_observed_sec": 1050,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1107,
+      "dt_observed_sec": 1700,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1107,
+      "dt_observed_sec": 1150,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1173,
+      "dt_observed_sec": 650,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1173,
+      "dt_observed_sec": 1950,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1173,
+      "dt_observed_sec": 1400,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1183,
+      "dt_observed_sec": 800,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1195,
+      "dt_observed_sec": 850,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1202,
+      "dt_observed_sec": 700,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1202,
+      "dt_observed_sec": 1500,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1216,
+      "dt_observed_sec": 400,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1243,
+      "dt_observed_sec": 350,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1245,
+      "dt_observed_sec": 1350,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1260,
+      "dt_observed_sec": 350,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1277,
+      "dt_observed_sec": 300,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1277,
+      "dt_observed_sec": 500,
+      "weight": 2
+    },
+    {
+      "source_table": "S06",
+      "source_table_name": "Chinese timed solar eclipses",
+      "year": 1277,
+      "dt_observed_sec": 600,
+      "weight": 2
+    }
+  ]
+}
