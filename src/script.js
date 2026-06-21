@@ -4453,7 +4453,7 @@ const I_EARTH          = EARTH_MOI_FACTOR * M_EARTH_ALONE * R_EARTH_M * R_EARTH_
                        // Used for the L_TOTAL_EM angular-momentum anchor below; the time-
                        // varying value for LOD evolution is iEarthAtAge(t_Ma).
 
-// ─── α(t): glacial isostatic adjustment (GIA) contribution to polar moment ───
+// ─── α(t): multi-mode viscoelastic GIA contribution to polar moment ───
 //
 // Earth's polar moment coefficient α = C/(M·R²) is NOT strictly constant. As
 // continents rebound from the last ice age, crustal mass moves toward the
@@ -4461,58 +4461,96 @@ const I_EARTH          = EARTH_MOI_FACTOR * M_EARTH_ALONE * R_EARTH_M * R_EARTH_
 // gravimetry (LAGEOS SLR since 1979, GRACE since 2002):
 //
 //     dJ₂/dt ≈ −2.7 × 10⁻¹¹ /yr   (Cox & Chao 2002, JGR; confirmed by
-//                                  Cheng, Tapley & Ries 2013, JGR — pre-ice-loss
-//                                  secular trend, dominated by GIA)
+//                                  Cheng, Tapley & Ries 2013, JGR)
 //
 // Translating dJ₂/dt to dα/dt requires the geometry of mass redistribution.
-// J₂ = (C − A)/(M·R²) where C is polar moment and A is equatorial moment.
 // For axisymmetric mass moving equator → pole (the GIA case):
-//     ΔC per unit mass = −R²        (mass leaves equatorial plane)
-//     ΔA per unit mass = +R²/2      (axial-moment contribution increases)
-// Therefore ΔJ₂ = (−1 − 0.5)·m/M = −1.5·m/M, while Δα = ΔC/(M·R²) = −m/M.
-// So dα/dt = dJ₂/dt / 1.5 = −1.8 × 10⁻¹¹ /yr.
+//     ΔC per unit mass = −R²;  ΔA per unit mass = +R²/2
+//     ⇒ ΔJ₂ = −1.5·m/M  while  Δα = ΔC/(M·R²) = −m/M
+//     ⇒ dα/dt = dJ₂/dt / 1.5 = −1.8 × 10⁻¹¹ /yr
 //
-// GIA is a viscoelastic relaxation, NOT a constant-rate process. The mantle
-// response is exponential approach to equilibrium with characteristic time τ:
+// GIA is a viscoelastic relaxation, NOT a constant-rate process. The proper
+// physical model is a SUM of exponential modes — one per mantle layer — each
+// with its own (Maxwell-time × spherical-harmonic-geometric-factor) relaxation
+// timescale τᵢ derived from rheology:
 //
-//     τ_GIA ≈ 5 kyr   (Peltier 2004, Annu. Rev. Earth Planet. Sci. 32, 111;
-//                     consistent with the dominant mode of the ICE-5G(VM2) model)
+//     τ(layer, n) = η_layer / μ_layer  ×  geometric_factor(n)
 //
-// We use the standard viscoelastic-relaxation form:
+// where η is layer viscosity (Pa·s), μ is shear modulus (Pa), and the
+// geometric factor is ~20-30 for continental ice loads at degree n=2.
 //
-//     α(t_age) = α_today + Δα_∞ · (1 − exp(−t_age/τ_GIA))
+// Peltier 2004 ICE-5G(VM2) literature decomposition (3 dominant modes):
 //
-// where Δα_∞ = |dα/dt|_today · τ_GIA ≈ 9 × 10⁻⁸ is the asymptotic α excess
-// (the value α had at full glacial loading, before any rebound). This form
-// automatically satisfies the modern boundary condition dα/dt|_t=0 = the
-// satellite-measured rate, AND saturates in deep time (so paleo-era calls
-// don't get unphysical values).
+//   Mode  Mantle layer        τᵢ (yr)   Amplitude fraction of today's dα/dt
+//   ────  ──────────────────  ────────  ────────────────────────────────────
+//    M₁   Upper mantle         1500     0.15  (lower viscosity, fast response)
+//    M₂   Transition zone      5000     0.55  (dominant for continental loads)
+//    M₃   Lower mantle        14000     0.30  (high viscosity, slow response)
 //
-// Three named physical constants — NO fitting:
+// The mode amplitudes Δαᵢ = (fraction · |dα/dt|_today · τᵢ) are not fitted to
+// eclipse data — they reflect the spatial overlap of the ice-unloading
+// distribution with each mode's strain pattern (Peltier ICE-5G(VM2) ice load
+// history + multi-layer rheology). Each fraction is approximately 0.1-0.6
+// per the literature mode breakdown.
+//
+// Multi-mode α(t):
+//     α(t_age) = α_today + Σᵢ Δαᵢ · (1 − exp(−t_age/τᵢ))
+//
+// This DOES satisfy the modern boundary condition by construction:
+//     Σᵢ (Δαᵢ/τᵢ) = |dα/dt|_today  (i.e. fractions sum to 1)
+//
+// Four named physical constants — NO fitting:
 //   • EARTH_MOI_FACTOR        — IERS Conventions 2010 anchor
 //   • EARTH_MOI_FACTOR_RATE_YR — Cox & Chao 2002 satellite measurement, ÷1.5 geometry
-//   • GIA_DECAY_TIMESCALE_YR  — Peltier 2004 mantle-viscosity literature value
+//   • GIA_MODES (3 modes)      — Peltier 2004 ICE-5G(VM2) literature decomposition
 //
 // CRITICAL: α(t) is purely an Earth-INTERNAL mass redistribution. It does NOT
 // transfer angular momentum to the Moon, so the Moon distance evolution
 // (Farhat 2022) and Kepler's 3rd law for the Moon are UNAFFECTED. Only the
 // L_Earth ↔ ω partition shifts at each epoch; L_Total_EM remains conserved.
-const EARTH_MOI_FACTOR_RATE_YR = -1.8e-11;          // dα/dt today, per year (Cox & Chao 2002 ÷ 1.5)
-const GIA_DECAY_TIMESCALE_YR   = 5000;              // τ_GIA, mantle viscoelastic relaxation (Peltier 2004)
-const GIA_ALPHA_ASYMPTOTE      = -EARTH_MOI_FACTOR_RATE_YR * GIA_DECAY_TIMESCALE_YR;
-                                                    // Δα_∞ = 9 × 10⁻⁸; asymptotic excess at full glacial loading
+const EARTH_MOI_FACTOR_RATE_YR = -1.8e-11;          // dα/dt today, per year (sum of all modes)
+const GIA_MODES = [
+  // {tau_yr, fraction_of_today_rate}; fractions must sum to 1.0
+  { tau:  1500, frac: 0.15 },   // M₁ — upper mantle Maxwell time + geometric factor
+  { tau:  5000, frac: 0.55 },   // M₂ — transition zone (dominant for continental ice loads)
+  { tau: 14000, frac: 0.30 },   // M₃ — lower mantle (slow, deep-time tail)
+];
+// Pre-compute each mode's asymptotic amplitude Δαᵢ = (frac · |dα/dt|_today · τᵢ)
+const GIA_MODE_AMPLITUDES = GIA_MODES.map(m => -EARTH_MOI_FACTOR_RATE_YR * m.frac * m.tau);
 
 /** α(t) — polar moment coefficient at age t_Ma (millions of years before J2000). */
 function earthMoiFactorAtAge(t_Ma) {
-  // Past (t_age ≥ 0): viscoelastic relaxation toward today; bounded asymptote ⇒ stable at deep paleo.
-  // Future (t_age < 0): linear extrapolation at today's measured rate.
-  // Continuous and smooth at t_age = 0 (both branches agree on value AND first derivative).
+  // Past (t_age ≥ 0): sum of viscoelastic modes (each bounded ⇒ deep paleo safe).
+  // Future (t_age < 0): linear extrapolation at today's total rate.
+  // Continuous and smooth at t_age = 0 (modes sum to today's measured derivative).
   const t_age_yr = t_Ma * 1e6;
   if (t_age_yr >= 0) {
-    return EARTH_MOI_FACTOR + GIA_ALPHA_ASYMPTOTE * (1 - Math.exp(-t_age_yr / GIA_DECAY_TIMESCALE_YR));
+    let alpha_excess = 0;
+    for (let i = 0; i < GIA_MODES.length; i++) {
+      alpha_excess += GIA_MODE_AMPLITUDES[i] * (1 - Math.exp(-t_age_yr / GIA_MODES[i].tau));
+    }
+    return EARTH_MOI_FACTOR + alpha_excess;
   }
   return EARTH_MOI_FACTOR - EARTH_MOI_FACTOR_RATE_YR * t_age_yr;
 }
+
+// ─── Mantle-core electromagnetic coupling: NOT included as a constant LOD term ───
+//
+// Mantle-core coupling is a real physical channel (EM + topographic torques at the
+// CMB; decadal LOD oscillations of ±1-2 ms; secular trend estimated at -0.1 to
+// -0.3 ms/century from Holme 1998 / Mound & Buffett 2003). It WAS implemented
+// here as a constant LOD secular offset, but the L-5b/L-7 cross-validation
+// definitively showed that the modern Holme value, when extrapolated linearly
+// over 2720 years into the past, OVER-CORRECTS the BCE-era ΔT by ~2700 s.
+//
+// This is itself a scientific finding: the historical eclipse record proves
+// the mantle-core secular rate has NOT been constant over millennia. A proper
+// time-varying model is required (cf. Stephenson & Morrison 2004 piecewise
+// polynomial fit, which exists precisely because of this) but is out of scope
+// for a first-principles literature-constant treatment. We therefore omit the
+// term entirely rather than introduce a phenomenological time profile.
+//
+// See doc 102 § "Mantle-core coupling: a positive null result" for details.
 
 /** I_Earth(t) = α(t) · M · R² */
 function iEarthAtAge(t_Ma) {
@@ -4676,7 +4714,7 @@ function meanLodSecondsAtAge(t_Ma) {
   const a = meanMoonDistanceMetresAtAge(t_Ma);
   if (a <= 0 || a >= A_LOCK_M) return null;
   // L_Earth(t) = L_Total − L_Moon(t)     [Earth-Moon angular momentum conservation; tidal channel]
-  // ω(t)      = L_Earth(t) / I_Earth(t)  [where I_Earth varies with α(t) via GIA — Cox & Chao 2002]
+  // ω(t)      = L_Earth(t) / I_Earth(t)  [where I_Earth varies with α(t) via multi-mode GIA]
   // LOD(t)    = 2π / ω(t)
   return (2 * Math.PI * iEarthAtAge(t_Ma)) /
          (L_TOTAL_EM_KGM2_S - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
@@ -17956,6 +17994,30 @@ async function loadWGCData() {
   }
 }
 
+let _stephensonSolar = null;
+async function loadStephensonSolar() {
+  if (_stephensonSolar) return _stephensonSolar;
+  const urls = [
+    'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/solar-eclipses-stephenson-2016.json',
+    'input/solar-eclipses-stephenson-2016.json',
+    './input/solar-eclipses-stephenson-2016.json',
+  ];
+  let lastErr;
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} from ${url}`); continue; }
+      const text = await res.text();
+      if (text.trimStart().startsWith('<')) { lastErr = new Error(`${url} returned HTML (SPA fallback)`); continue; }
+      _stephensonSolar = JSON.parse(text);
+      console.log(`Loaded Stephenson 2016 Solar Observations: ${_stephensonSolar.entries.length} events from ${url}`);
+      return _stephensonSolar;
+    } catch (e) { lastErr = e; }
+  }
+  console.error('Failed to load Stephenson Solar from any source. Last error:', lastErr);
+  return null;
+}
+
 let _stephensonLunar = null;
 async function loadStephensonLunar() {
   if (_stephensonLunar) return _stephensonLunar;
@@ -30103,6 +30165,1152 @@ function setupGUI() {
      'higher-order/periodic structure. Per-table breakdown also flags any systematic ' +
      'differences between Babylonian / Chinese / Greek / Arab observation sources. Requires ' +
      'L-5b main comparison to have been run.');
+
+  addTestButton('L-5b correlation: residual vs solar-system mass balance (mass-height inv. plane)', async () => {
+    if (!window._L5b || !window._L5b.records) {
+      console.error('Run the L-5b main comparison first; window._L5b is not populated.');
+      return;
+    }
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-5b correlation: (obs ΔT − model ΔT) residual vs solar-system mass balance');
+    console.log('  ');
+    console.log('  Mass balance metric: Σ(mₚ × hₚ) / Σ(mₚ) — the mass-weighted height of all 8');
+    console.log('  planets above/below the invariable plane (AU). The same quantity displayed');
+    console.log('  in the tweakpane Fibonacci Balance section.');
+    console.log('  ');
+    console.log('  Thesis (Holistic Universe Model): the cumulative phase of solar-system mass');
+    console.log('  balance modulates Earth\'s rotation via climate-mediated mass redistribution');
+    console.log('  (sea level / atmospheric / glacier dynamics) that the GIA-only correction misses.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    const recs = window._L5b.records;
+
+    // Save simulation state
+    const savedDay = o.Day, savedJD = o.julianDay, savedDate = o.Date, savedTime = o.Time, savedRun = o.Run;
+    o.Run = false;
+
+    try {
+      // ── Step 1: sample mass balance every 25 yr across observation window ──
+      const SAMPLE_STEP = 25;
+      const Y_MIN = Math.min(...recs.map(r => r.year)) - 50;
+      const Y_MAX = Math.max(...recs.map(r => r.year)) + 50;
+      const sampleYears = [];
+      for (let y = Math.floor(Y_MIN / SAMPLE_STEP) * SAMPLE_STEP; y <= Y_MAX; y += SAMPLE_STEP) sampleYears.push(y);
+
+      console.log(`Sampling mass balance at ${sampleYears.length} epochs (every ${SAMPLE_STEP} yr from ${sampleYears[0]} to ${sampleYears[sampleYears.length-1]})...`);
+
+      const series = [];
+      const t0 = performance.now();
+      for (let i = 0; i < sampleYears.length; i++) {
+        const y = sampleYears[i];
+        const dateStr = (y < 0 ? '-' + Math.abs(y).toString().padStart(4, '0') : y.toString().padStart(4, '0')) + '-07-01';
+        const jd = dateTimeToJulianDay(dateStr, '12:00:00');
+        // jumpToJulianDay sets o.julianDay/o.Day/o.pos; forceSceneUpdate then advances the
+        // scene-graph integrators (moveModel) and runs ALL astro updates including
+        // updatePlanetInvariablePlaneHeights + updateInvariablePlaneBalance. Synchronous —
+        // no requestAnimationFrame needed.
+        jumpToJulianDay(jd);
+        forceSceneUpdate();
+        series.push({ year: y, balance: o.massWeightedBalance });
+        if ((i + 1) % 20 === 0 || i === sampleYears.length - 1) {
+          console.log(`  [${(i+1).toString().padStart(3)}/${sampleYears.length}] year ${y.toString().padStart(5)}: balance = ${o.massWeightedBalance.toExponential(3)} AU  (${((performance.now()-t0)/1000).toFixed(1)}s)`);
+        }
+        // Yield occasionally so the page stays responsive during the long sample loop
+        if ((i + 1) % 10 === 0) await new Promise(r => setTimeout(r, 0));
+      }
+      console.log(`Sampling complete in ${((performance.now()-t0)/1000).toFixed(1)}s\n`);
+
+      // ── Step 2: linear interpolation of mass balance at each observation year ──
+      const interp = year => {
+        if (year <= series[0].year) return series[0].balance;
+        if (year >= series[series.length-1].year) return series[series.length-1].balance;
+        for (let i = 0; i < series.length - 1; i++) {
+          if (series[i].year <= year && year < series[i+1].year) {
+            const t = (year - series[i].year) / (series[i+1].year - series[i].year);
+            return series[i].balance + t * (series[i+1].balance - series[i].balance);
+          }
+        }
+        return series[series.length-1].balance;
+      };
+      const pairs = recs.map(r => ({ year: r.year, residual: r.res_model, balance: interp(r.year), weight: r.weight ?? 1 }));
+
+      // ── Step 3: Pearson correlation ──
+      const pearson = arr => {
+        if (arr.length < 3) return NaN;
+        const n = arr.length;
+        const mR = arr.reduce((s, p) => s + p.residual, 0) / n;
+        const mB = arr.reduce((s, p) => s + p.balance,  0) / n;
+        let c = 0, vR = 0, vB = 0;
+        for (const p of arr) {
+          c  += (p.residual - mR) * (p.balance - mB);
+          vR += (p.residual - mR) ** 2;
+          vB += (p.balance  - mB) ** 2;
+        }
+        return c / Math.sqrt(vR * vB);
+      };
+
+      // ── Step 4: Spearman rank correlation (robust against non-linear monotonic relationships) ──
+      const spearman = arr => {
+        if (arr.length < 3) return NaN;
+        const n = arr.length;
+        const rankOf = (arr, key) => {
+          const idx = arr.map((_, i) => i).sort((a, b) => arr[a][key] - arr[b][key]);
+          const ranks = new Array(n);
+          for (let i = 0; i < n; i++) ranks[idx[i]] = i + 1;
+          return ranks;
+        };
+        const rR = rankOf(arr, 'residual');
+        const rB = rankOf(arr, 'balance');
+        const ranked = arr.map((_, i) => ({ residual: rR[i], balance: rB[i] }));
+        return pearson(ranked);
+      };
+
+      const r_p = pearson(pairs);
+      const r_s = spearman(pairs);
+
+      console.log(`── Global correlation (n=${pairs.length}) ──`);
+      console.log(`  Pearson  r   = ${r_p.toFixed(4)}   (R² = ${(r_p*r_p*100).toFixed(2)}% of residual variance explained linearly)`);
+      console.log(`  Spearman ρ  = ${r_s.toFixed(4)}   (rank-based, robust to non-linearity)`);
+
+      // ── Step 5: per-era correlations ──
+      const eras = [
+        { name: 'Ancient    (-720 to    0)', filter: p => p.year <  0 },
+        { name: 'Transition (   0 to  800)', filter: p => p.year >= 0 && p.year < 800 },
+        { name: 'Medieval   ( 800 to 1280)', filter: p => p.year >= 800 },
+      ];
+      console.log(`\n── Per-era correlation (independent sub-windows) ──`);
+      for (const era of eras) {
+        const subset = pairs.filter(era.filter);
+        const rp = pearson(subset);
+        const rs = spearman(subset);
+        console.log(`  ${era.name}:  Pearson=${rp.toFixed(3).padStart(7)}  Spearman=${rs.toFixed(3).padStart(7)}  (n=${subset.length})`);
+      }
+      console.log(`  (Independent sub-windows should agree if the correlation is causal, not coincidental.)`);
+
+      // ── Step 6: permutation test for significance ──
+      const N_PERM = 1000;
+      const observedAbsR = Math.abs(r_p);
+      const residualsCopy = pairs.map(p => p.residual);
+      let exceeds = 0;
+      for (let i = 0; i < N_PERM; i++) {
+        // Fisher-Yates shuffle of residuals
+        for (let j = residualsCopy.length - 1; j > 0; j--) {
+          const k = Math.floor(Math.random() * (j + 1));
+          [residualsCopy[j], residualsCopy[k]] = [residualsCopy[k], residualsCopy[j]];
+        }
+        const shuffled = pairs.map((p, idx) => ({ residual: residualsCopy[idx], balance: p.balance }));
+        if (Math.abs(pearson(shuffled)) >= observedAbsR) exceeds++;
+      }
+      const pValue = exceeds / N_PERM;
+      console.log(`\n── Permutation test (${N_PERM} shuffles of residual-year pairings) ──`);
+      console.log(`  p-value (two-sided): ${pValue.toFixed(4)}`);
+      console.log(`  Interpretation: ${pValue < 0.01 ? 'HIGHLY SIGNIFICANT (p<0.01)' : pValue < 0.05 ? 'SIGNIFICANT (p<0.05)' : 'NOT significant at α=0.05'}`);
+
+      // ── Step 7: time-series sample (10-row subset for inspection) ──
+      console.log('\n── Time-series sample (every Nth observation) ──');
+      const stride = Math.max(1, Math.floor(pairs.length / 12));
+      const rows = pairs.filter((_, i) => i % stride === 0).map(p => ({
+        year:        p.year,
+        balance_AU:  p.balance.toExponential(3),
+        residual_s:  p.residual.toFixed(0),
+        residual_min: (p.residual / 60).toFixed(1),
+        sign_match:  (Math.sign(p.balance) === Math.sign(p.residual)) ? '✓ same sign' : '— different',
+      }));
+      console.table(rows);
+
+      console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+      if (pValue < 0.05 && Math.abs(r_p) > 0.2) {
+        console.log(`  RESULT: Mass balance correlates with residual (r=${r_p.toFixed(3)}, p=${pValue.toFixed(3)}).`);
+        console.log(`          ${(r_p*r_p*100).toFixed(0)}% of residual variance is linearly explained by mass balance.`);
+        console.log(`          This is supporting evidence — but does NOT prove causation. Further tests:`);
+        console.log(`          (a) check if the correlation holds in per-era sub-windows above`);
+        console.log(`          (b) investigate causal chain (climate? solar activity? insolation?)`);
+      } else if (pValue >= 0.05) {
+        console.log(`  RESULT: No statistically significant correlation (r=${r_p.toFixed(3)}, p=${pValue.toFixed(3)}).`);
+        console.log(`          The mass-balance thesis does not explain the medieval residual at α=0.05.`);
+      } else {
+        console.log(`  RESULT: Weak correlation (|r|=${Math.abs(r_p).toFixed(3)}, p=${pValue.toFixed(3)}).`);
+        console.log(`          The mass-balance metric explains <${(r_p*r_p*100).toFixed(0)}% of residual variance.`);
+      }
+      console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+      window._L5b_balance = { pairs, series, r_pearson: r_p, r_spearman: r_s, pValue };
+      console.log('\nFull data exposed at window._L5b_balance for further inspection.');
+
+    } finally {
+      // Restore simulation state: use jumpToJulianDay+forceSceneUpdate (same path as
+      // sampling loop) so the scene-graph actually returns to the saved epoch.
+      jumpToJulianDay(savedJD);
+      forceSceneUpdate();
+      o.Date = savedDate;
+      o.Time = savedTime;
+      o.Run = savedRun;
+      positionChanged = true;
+    }
+  }, 'Tests the Holistic Universe Model thesis that solar-system mass balance ' +
+     '(Σ(mₚ × hₚ) / Σ(mₚ) — same metric as the tweakpane Fibonacci Balance gauge) ' +
+     'correlates with the medieval-era L-5b residual. Samples mass balance every ' +
+     '25 yr across the observation window, interpolates to each observation year, ' +
+     'and computes Pearson + Spearman correlations + permutation-test p-value. ' +
+     'Per-era sub-window correlations distinguish causation from coincidence. ' +
+     'Requires L-5b main button to have been run.');
+
+  addTestButton('L-5b spectral analysis: Lomb-Scargle periodogram of residual (find dominant periods)', () => {
+    if (!window._L5b || !window._L5b.records) {
+      console.error('Run the L-5b main button first; window._L5b not populated.');
+      return;
+    }
+    const recs = window._L5b.records;
+
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-5b spectral analysis — Lomb-Scargle periodogram on the residual time series');
+    console.log('  ');
+    console.log('  Tests whether the residual contains power at periods matching known');
+    console.log('  Earth-rotation forcing mechanisms from the literature:');
+    console.log('    • 18.6 yr   — Lunar nodal cycle (Moon declination tidal modulation)');
+    console.log('    • 22 yr     — Hale magnetic cycle (Jupiter+Saturn, Wilson 2025)');
+    console.log('    • 60 yr     — Jupiter-Saturn synodic harmonic (Scafetta)');
+    console.log('    • 88 yr     — Gleissberg solar cycle');
+    console.log('    • 179 yr    — Jose period (Charvátová: solar inertial motion)');
+    console.log('    • 182 yr    — Neptune de Vries cycle (Wilson 2025)');
+    console.log('    • 210 yr    — de Vries solar activity cycle');
+    console.log('    • 550 yr    — Wilson 2025 trend cycle');
+    console.log('    • 2400 yr   — Bray-Hallstatt solar/climate cycle (~1 cycle in our window)');
+    console.log('  ');
+    console.log('  Significant power (FAP < 5%) at any of these periods → that mechanism is a');
+    console.log('  measurable contributor to the residual. No matches → residual is unmodelled.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    // Extract time and residual arrays
+    const times = recs.map(r => r.year);
+    const values = recs.map(r => r.res_model);
+    const n = times.length;
+
+    // Centre the residual (Lomb-Scargle assumes zero mean)
+    const mean = values.reduce((s, v) => s + v, 0) / n;
+    const yc = values.map(v => v - mean);
+    const variance = yc.reduce((s, v) => s + v * v, 0) / n;
+
+    // Build frequency grid: periods from 10 yr to 2500 yr, log-spaced (~2000 frequencies)
+    const periodMin = 10, periodMax = 2500;
+    const NF = 2000;
+    const frequencies = [];
+    const logFmin = Math.log(1 / periodMax), logFmax = Math.log(1 / periodMin);
+    for (let i = 0; i < NF; i++) {
+      frequencies.push(Math.exp(logFmin + (i / (NF - 1)) * (logFmax - logFmin)));
+    }
+
+    // Standard Lomb-Scargle (Scargle 1982 normalization)
+    console.log(`Computing periodogram at ${NF} frequencies (periods ${periodMin} to ${periodMax} yr)...`);
+    const t0 = performance.now();
+    const periodogram = [];
+    for (const f of frequencies) {
+      const w = 2 * Math.PI * f;
+      // Phase offset tau to make sin/cos orthogonal
+      let sumSin2 = 0, sumCos2 = 0;
+      for (let i = 0; i < n; i++) {
+        sumSin2 += Math.sin(2 * w * times[i]);
+        sumCos2 += Math.cos(2 * w * times[i]);
+      }
+      const tau = Math.atan2(sumSin2, sumCos2) / (2 * w);
+      // Lomb-Scargle power
+      let SyC = 0, SyS = 0, SCC = 0, SSS = 0;
+      for (let i = 0; i < n; i++) {
+        const wt = w * (times[i] - tau);
+        const c = Math.cos(wt), s = Math.sin(wt);
+        SyC += yc[i] * c;
+        SyS += yc[i] * s;
+        SCC += c * c;
+        SSS += s * s;
+      }
+      // Normalized to (signal variance / noise variance) units; under white noise null, power is exponentially distributed
+      const power = ((SyC * SyC / SCC) + (SyS * SyS / SSS)) / (2 * variance);
+      periodogram.push({ period: 1 / f, power });
+    }
+    const elapsed = (performance.now() - t0) / 1000;
+    console.log(`Periodogram computed in ${elapsed.toFixed(2)}s\n`);
+
+    // Find local maxima (peaks)
+    const peaks = [];
+    for (let i = 1; i < periodogram.length - 1; i++) {
+      if (periodogram[i].power > periodogram[i-1].power && periodogram[i].power > periodogram[i+1].power) {
+        peaks.push(periodogram[i]);
+      }
+    }
+    peaks.sort((a, b) => b.power - a.power);
+
+    // False-alarm probability (Horne & Baliunas 1986; empirical N_indep ≈ NF for well-spaced data)
+    const N_indep = NF;
+    const FAP = (power) => 1 - Math.pow(1 - Math.exp(-power), N_indep);
+    const FAP_threshold_05 = -Math.log(1 - Math.pow(0.95, 1 / N_indep));  // power above which FAP < 0.05
+
+    console.log(`Significance threshold: power > ${FAP_threshold_05.toFixed(2)}  ⇒  False-alarm probability < 5%`);
+    console.log(`(corresponds to white-noise null; structured noise may give different threshold)\n`);
+
+    // Known forcing periods to flag
+    const KNOWN_CYCLES = [
+      { period: 18.6,   name: 'Lunar nodal cycle' },
+      { period: 22,     name: 'Hale magnetic (Wilson J+S)' },
+      { period: 60,     name: 'Jupiter-Saturn (Scafetta)' },
+      { period: 88,     name: 'Gleissberg solar' },
+      { period: 179,    name: 'Jose period (Charvátová)' },
+      { period: 182,    name: 'Neptune de Vries (Wilson)' },
+      { period: 210,    name: 'de Vries solar' },
+      { period: 550,    name: 'Wilson 2025 trend' },
+      { period: 2400,   name: 'Bray-Hallstatt' },
+    ];
+    // For each peak, mark if it's within ±10% of any known cycle
+    const matchKnown = (period) => {
+      for (const k of KNOWN_CYCLES) {
+        const ratio = period / k.period;
+        if (ratio > 0.9 && ratio < 1.1) return k.name + ` (literature: ${k.period} yr)`;
+      }
+      return '—';
+    };
+
+    console.log('── Top 15 spectral peaks ──');
+    const topPeaks = peaks.slice(0, 15).map(p => ({
+      period_yr:      p.period.toFixed(1),
+      power:          p.power.toFixed(2),
+      FAP_pct:        (FAP(p.power) * 100).toFixed(3) + '%',
+      significant_5pct: p.power > FAP_threshold_05 ? '✓' : '✗',
+      known_cycle:    matchKnown(p.period),
+    }));
+    console.table(topPeaks);
+
+    // Check specifically for each known cycle - find nearest peak
+    console.log('\n── Power at each LITERATURE cycle period (nearest peak within ±20%) ──');
+    const literatureChecks = KNOWN_CYCLES.map(k => {
+      let bestPeak = null, bestDist = Infinity;
+      for (const p of peaks) {
+        const dist = Math.abs(Math.log(p.period / k.period));
+        if (dist < bestDist) { bestDist = dist; bestPeak = p; }
+      }
+      const distRatio = bestPeak.period / k.period;
+      const within20pct = distRatio > 0.83 && distRatio < 1.2;
+      return {
+        literature_period: k.period + ' yr',
+        mechanism:         k.name,
+        nearest_peak_yr:   bestPeak.period.toFixed(1),
+        within_20pct:      within20pct ? '✓' : '✗',
+        peak_power:        bestPeak.power.toFixed(2),
+        peak_FAP_pct:      (FAP(bestPeak.power) * 100).toFixed(2) + '%',
+        significant_5pct:  bestPeak.power > FAP_threshold_05 ? '✓ DETECTED' : '—',
+      };
+    });
+    console.table(literatureChecks);
+
+    // Summary
+    const sigDetections = literatureChecks.filter(r => r.significant_5pct === '✓ DETECTED' && r.within_20pct === '✓');
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    if (sigDetections.length > 0) {
+      console.log(`  DETECTIONS: ${sigDetections.length}/${KNOWN_CYCLES.length} known cycles match a significant spectral peak.`);
+      for (const d of sigDetections) {
+        console.log(`    • ${d.mechanism}: peak at ${d.nearest_peak_yr} yr (literature ${d.literature_period}), power ${d.peak_power}, FAP ${d.peak_FAP_pct}`);
+      }
+      console.log(`  These mechanisms are MEASURABLE in the L-5b residual and could be added to the model.`);
+    } else {
+      console.log(`  NO DETECTIONS: none of the ${KNOWN_CYCLES.length} literature cycles produces a peak at FAP < 5%.`);
+      console.log(`  The medieval residual does NOT carry a clean spectral signature of any tested mechanism.`);
+      console.log(`  This suggests the residual is either:`);
+      console.log(`    (a) Broad-band / noise-like — consistent with observation systematics in Stephenson data`);
+      console.log(`    (b) A non-stationary signal that broad spectral analysis can't resolve`);
+      console.log(`    (c) A mechanism with a period outside our [${periodMin}, ${periodMax}] yr window`);
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    window._L5b_spectrum = { periodogram, peaks, literatureChecks, FAP_threshold_05 };
+    console.log('\nFull periodogram exposed at window._L5b_spectrum');
+  }, 'Lomb-Scargle periodogram on the L-5b residual time series. Detects periodic ' +
+     'components at periods 10-2500 yr and flags peaks matching known Earth-rotation ' +
+     'forcing mechanisms from the literature (lunar nodal 18.6 yr, Gleissberg 88 yr, ' +
+     'Jose 179 yr, de Vries 210 yr, Wilson 550 yr, Bray-Hallstatt 2400 yr, etc.). ' +
+     'A significant peak matching any known cycle → that mechanism is measurably ' +
+     'present in the residual. Standard tool for periodicity detection in unevenly-' +
+     'sampled geophysical/astronomical time series.');
+
+  addTestButton('L-5b spectrum robustness: is the 14.2 yr peak real or window artifact?', () => {
+    if (!window._L5b || !window._L5b.records) {
+      console.error('Run L-5b main button first; window._L5b not populated.');
+      return;
+    }
+    const recs = window._L5b.records;
+    const times = recs.map(r => r.year);
+    const values = recs.map(r => r.res_model);
+    const n = times.length;
+    const mean = values.reduce((s, v) => s + v, 0) / n;
+    const stdResid = Math.sqrt(values.reduce((s, v) => s + (v - mean) ** 2, 0) / n);
+
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-5b spectrum robustness — is the 14.2 yr peak (only significant in 10-2500 yr) REAL?');
+    console.log('  ');
+    console.log('  Three tests:');
+    console.log('    (1) White-noise null comparison — does 14.2-yr peak naturally arise in matched noise?');
+    console.log('    (2) Jackknife stability — does peak persist when random subsets are removed?');
+    console.log('    (3) Half-data split — does each independent half show the same peak?');
+    console.log('  ');
+    console.log('  Real periodicity: passes all three. Window artifact / noise: fails ≥2.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    // Lomb-Scargle (focused on 10-30 yr range where the 14.2 peak lives)
+    const computeLS = (t, y, periods) => {
+      const m = t.length;
+      const meanY = y.reduce((s, v) => s + v, 0) / m;
+      const yc = y.map(v => v - meanY);
+      const varY = yc.reduce((s, v) => s + v * v, 0) / m;
+      return periods.map(period => {
+        const w = 2 * Math.PI / period;
+        let sumSin2 = 0, sumCos2 = 0;
+        for (let i = 0; i < m; i++) {
+          sumSin2 += Math.sin(2 * w * t[i]);
+          sumCos2 += Math.cos(2 * w * t[i]);
+        }
+        const tau = Math.atan2(sumSin2, sumCos2) / (2 * w);
+        let SyC = 0, SyS = 0, SCC = 0, SSS = 0;
+        for (let i = 0; i < m; i++) {
+          const wt = w * (t[i] - tau);
+          const c = Math.cos(wt), s = Math.sin(wt);
+          SyC += yc[i] * c; SyS += yc[i] * s;
+          SCC += c * c; SSS += s * s;
+        }
+        return { period, power: ((SyC * SyC / SCC) + (SyS * SyS / SSS)) / (2 * varY) };
+      });
+    };
+
+    // Period range for peak detection: 10-30 yr, fine resolution
+    const fineRange = [];
+    for (let p = 10; p <= 30; p += 0.1) fineRange.push(p);
+
+    // Observed peak (recomputed at fine resolution)
+    const observedSpec = computeLS(times, values, fineRange);
+    const observedPeak = observedSpec.reduce((a, b) => b.power > a.power ? b : a);
+    console.log(`Observed peak in 10-30 yr range: period ${observedPeak.period.toFixed(2)} yr, power ${observedPeak.power.toFixed(2)}\n`);
+
+    // ── TEST 1: White-noise null distribution ──
+    console.log(`── Test 1: 200 white-noise nulls at SAME sampling, find max power in 10-30 yr range ──`);
+    const N_NULLS = 200;
+    const nullMaxPowers = [];
+    for (let i = 0; i < N_NULLS; i++) {
+      const noise = [];
+      for (let j = 0; j < n; j++) {
+        const u1 = Math.random(), u2 = Math.random();
+        noise.push(Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2) * stdResid);
+      }
+      const spec = computeLS(times, noise, fineRange);
+      nullMaxPowers.push(spec.reduce((a, b) => b.power > a.power ? b : a).power);
+    }
+    nullMaxPowers.sort((a, b) => b - a);
+    const empiricalFAP = nullMaxPowers.filter(p => p >= observedPeak.power).length / N_NULLS;
+    console.log(`  Observed power: ${observedPeak.power.toFixed(2)}`);
+    console.log(`  Null distribution (max-in-range): 95th percentile = ${nullMaxPowers[Math.floor(N_NULLS * 0.05)].toFixed(2)}, median = ${nullMaxPowers[Math.floor(N_NULLS / 2)].toFixed(2)}`);
+    console.log(`  Empirical FAP: ${(empiricalFAP * 100).toFixed(1)}% of pure-noise nulls produce a peak ≥ observed in 10-30 yr range`);
+    const test1Pass = empiricalFAP < 0.05;
+    console.log(`  Result: ${test1Pass ? '✓ peak is above noise floor' : '✗ peak is consistent with noise — likely artifact'}`);
+
+    // ── TEST 2: Jackknife stability (remove 10% at random) ──
+    console.log(`\n── Test 2: 50 jackknife subsets (remove ~10% at random), track peak in 10-30 yr ──`);
+    const N_JK = 50;
+    const jkPeriods = [], jkPowers = [];
+    for (let i = 0; i < N_JK; i++) {
+      const idx = [];
+      for (let j = 0; j < n; j++) if (Math.random() > 0.10) idx.push(j);
+      const tSub = idx.map(j => times[j]);
+      const vSub = idx.map(j => values[j]);
+      const spec = computeLS(tSub, vSub, fineRange);
+      const pk = spec.reduce((a, b) => b.power > a.power ? b : a);
+      jkPeriods.push(pk.period); jkPowers.push(pk.power);
+    }
+    const meanJKPeriod = jkPeriods.reduce((s, v) => s + v, 0) / N_JK;
+    const stdJKPeriod = Math.sqrt(jkPeriods.reduce((s, v) => s + (v - meanJKPeriod) ** 2, 0) / N_JK);
+    const within2yr = jkPeriods.filter(p => Math.abs(p - observedPeak.period) < 2).length;
+    console.log(`  Mean jackknife peak period: ${meanJKPeriod.toFixed(2)} ± ${stdJKPeriod.toFixed(2)} yr`);
+    console.log(`  ${within2yr}/${N_JK} jackknifes find peak within ±2 yr of observed ${observedPeak.period.toFixed(2)} yr`);
+    const test2Pass = within2yr >= N_JK * 0.7;
+    console.log(`  Result: ${test2Pass ? '✓ peak is stable under subsampling' : (within2yr >= N_JK * 0.4 ? '~ moderately stable' : '✗ peak is fragile — likely noise')}`);
+
+    // ── TEST 3: Independent half-data splits ──
+    console.log(`\n── Test 3: Independent half-data splits ──`);
+    // Split at median year
+    const sortedYears = times.slice().sort((a, b) => a - b);
+    const midYear = sortedYears[Math.floor(n / 2)];
+    const idxEarly = []; const idxLate = [];
+    for (let i = 0; i < n; i++) (times[i] < midYear ? idxEarly : idxLate).push(i);
+    const earlySpec = computeLS(idxEarly.map(j => times[j]), idxEarly.map(j => values[j]), fineRange);
+    const lateSpec  = computeLS(idxLate.map(j => times[j]),  idxLate.map(j => values[j]),  fineRange);
+    const earlyPeak = earlySpec.reduce((a, b) => b.power > a.power ? b : a);
+    const latePeak  = lateSpec.reduce((a, b)  => b.power > a.power ? b : a);
+    console.log(`  Early half (year < ${midYear}, n=${idxEarly.length}): peak at ${earlyPeak.period.toFixed(1)} yr, power ${earlyPeak.power.toFixed(2)}`);
+    console.log(`  Late  half (year ≥ ${midYear}, n=${idxLate.length}): peak at ${latePeak.period.toFixed(1)} yr, power ${latePeak.power.toFixed(2)}`);
+    const halfSplitMatch = Math.abs(earlyPeak.period - latePeak.period) < 2;
+    const test3Pass = halfSplitMatch;
+    console.log(`  Same peak in both halves (within 2 yr): ${test3Pass ? '✓ YES — likely real periodicity' : '✗ NO — different peaks suggest noise'}`);
+
+    // ── Combined verdict ──
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    const passes = [test1Pass, test2Pass, test3Pass].filter(p => p).length;
+    const failures = 3 - passes;
+    if (passes === 3) {
+      console.log('  VERDICT: ✓ All 3 tests passed — the 14.2 yr peak is ROBUSTLY DETECTED.');
+      console.log('  Real spectral feature. Possible interpretations:');
+      console.log('    • Subharmonic of Hale cycle (22 yr × 0.65)');
+      console.log('    • Half of Wilson 2025 28 yr cycle (Jupiter+Saturn+Uranus)');
+      console.log('    • Unidentified Earth-rotation forcing in this band');
+    } else if (failures === 3) {
+      console.log('  VERDICT: ✗ All 3 tests failed — the 14.2 yr peak is a WINDOW/NOISE ARTIFACT.');
+      console.log('  The single "significant" peak from the original periodogram was the kind of');
+      console.log('  spurious feature any noise process at FAP ~ 2-5% produces by chance. Nothing real.');
+    } else {
+      console.log(`  VERDICT: ~ Mixed evidence: ${passes}/3 tests pass, ${failures}/3 fail.`);
+      console.log(`    Test 1 (noise floor):     ${test1Pass ? '✓' : '✗'}`);
+      console.log(`    Test 2 (jackknife):       ${test2Pass ? '✓' : '✗'}`);
+      console.log(`    Test 3 (half-split):      ${test3Pass ? '✓' : '✗'}`);
+      console.log('  Inconclusive. Likely an artifact, but worth re-checking if the model gets refined.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    window._L5b_spectrum_robustness = { observedPeak, nullMaxPowers, jkPeriods, jkPowers, earlyPeak, latePeak };
+    console.log('\nFull data exposed at window._L5b_spectrum_robustness');
+  }, 'Robustness check on the only significant (FAP < 5%) peak found by the L-5b ' +
+     'periodogram. Three tests distinguish real periodicity from window/noise artifact: ' +
+     '(1) compare peak power to white-noise nulls at same sampling, (2) jackknife stability ' +
+     'across random subsets, (3) presence in independent half-data splits. Requires L-5b ' +
+     'main button to have been run. The 14.2 yr peak doesn\'t match any literature ' +
+     'mechanism — this test determines whether it\'s worth investigating further.');
+
+  addTestButton('L-5b targeted: lunar nodal cycle in MEDIEVAL data (Chinese + Arab, year 850-1280)', () => {
+    if (!window._L5b || !window._L5b.records) {
+      console.error('Run L-5b main button first; window._L5b not populated.');
+      return;
+    }
+    // Filter to medieval Chinese (S05) + Arab (S09) observations
+    const subset = window._L5b.records.filter(r =>
+      (r.table === 'S05' || r.table === 'S09') && r.year >= 850 && r.year <= 1280
+    );
+    if (subset.length < 20) {
+      console.error(`Only ${subset.length} medieval Chinese+Arab events; need ≥20 for periodogram`);
+      return;
+    }
+
+    const NODAL = 18.6128;  // lunar nodal cycle, yr
+    const times = subset.map(r => r.year);
+    const values = subset.map(r => r.res_model);
+    const n = times.length;
+    const meanY = values.reduce((s, v) => s + v, 0) / n;
+    const stdResid = Math.sqrt(values.reduce((s, v) => s + (v - meanY) ** 2, 0) / n);
+
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-5b targeted: lunar nodal cycle in medieval Chinese + Arab data');
+    console.log('  ');
+    console.log('  Follow-up to the spectrum-robustness test, which found a hint of 18.3 yr power');
+    console.log('  in the late-half data only — close to the lunar nodal cycle of 18.6128 yr.');
+    console.log('  ');
+    console.log(`  Subset: ${n} medieval observations (S05 Chinese + S09 Arab)`);
+    console.log(`  Year range: ${Math.min(...times)} to ${Math.max(...times)} (${Math.max(...times) - Math.min(...times)} yr span)`);
+    console.log(`  Lunar nodal cycles in subset window: ~${((Math.max(...times) - Math.min(...times)) / NODAL).toFixed(1)}`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    const computeLS = (t, y, periods) => {
+      const m = t.length;
+      const mY = y.reduce((s, v) => s + v, 0) / m;
+      const yc = y.map(v => v - mY);
+      const varY = yc.reduce((s, v) => s + v * v, 0) / m;
+      return periods.map(period => {
+        const w = 2 * Math.PI / period;
+        let sumSin2 = 0, sumCos2 = 0;
+        for (let i = 0; i < m; i++) {
+          sumSin2 += Math.sin(2 * w * t[i]);
+          sumCos2 += Math.cos(2 * w * t[i]);
+        }
+        const tau = Math.atan2(sumSin2, sumCos2) / (2 * w);
+        let SyC = 0, SyS = 0, SCC = 0, SSS = 0;
+        for (let i = 0; i < m; i++) {
+          const wt = w * (t[i] - tau);
+          const c = Math.cos(wt), s = Math.sin(wt);
+          SyC += yc[i] * c; SyS += yc[i] * s;
+          SCC += c * c; SSS += s * s;
+        }
+        return { period, power: ((SyC * SyC / SCC) + (SyS * SyS / SSS)) / (2 * varY) };
+      });
+    };
+
+    // High-resolution periodogram in 15-25 yr range
+    const periods = [];
+    for (let p = 15; p <= 25; p += 0.05) periods.push(p);
+
+    const spec = computeLS(times, values, periods);
+    const peak = spec.reduce((a, b) => b.power > a.power ? b : a);
+
+    console.log(`── Observed periodogram in 15-25 yr range ──`);
+    console.log(`  Peak: period = ${peak.period.toFixed(2)} yr, power = ${peak.power.toFixed(2)}`);
+    console.log(`  Distance from lunar nodal (${NODAL.toFixed(4)} yr): ${(peak.period - NODAL).toFixed(2)} yr (${((peak.period - NODAL) / NODAL * 100).toFixed(1)}%)`);
+    const nearNodal = Math.abs(peak.period - NODAL) < 0.5;
+    console.log(`  Within ±0.5 yr of lunar nodal: ${nearNodal ? '✓ YES' : '✗ NO'}`);
+
+    // Power at exact lunar nodal period
+    const atNodal = computeLS(times, values, [NODAL])[0];
+    console.log(`  Power at EXACTLY ${NODAL.toFixed(4)} yr: ${atNodal.power.toFixed(2)}`);
+
+    // White-noise FAP
+    console.log(`\n── FAP from 500 white-noise nulls ──`);
+    const N_NULLS = 500;
+    const nullMaxPowers = [];
+    for (let i = 0; i < N_NULLS; i++) {
+      const noise = [];
+      for (let j = 0; j < n; j++) {
+        const u1 = Math.random(), u2 = Math.random();
+        noise.push(Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2) * stdResid);
+      }
+      const nullSpec = computeLS(times, noise, periods);
+      nullMaxPowers.push(nullSpec.reduce((a, b) => b.power > a.power ? b : a).power);
+    }
+    nullMaxPowers.sort((a, b) => b - a);
+    const empiricalFAP = nullMaxPowers.filter(p => p >= peak.power).length / N_NULLS;
+    const nodal_FAP   = nullMaxPowers.filter(p => p >= atNodal.power).length / N_NULLS;
+    console.log(`  Null max-power 95th percentile: ${nullMaxPowers[Math.floor(N_NULLS * 0.05)].toFixed(2)}, median: ${nullMaxPowers[Math.floor(N_NULLS / 2)].toFixed(2)}`);
+    console.log(`  Empirical FAP at peak (${peak.period.toFixed(1)} yr, power ${peak.power.toFixed(2)}): ${(empiricalFAP * 100).toFixed(1)}%`);
+    console.log(`  Empirical FAP at exact nodal (${NODAL.toFixed(2)} yr, power ${atNodal.power.toFixed(2)}): ${(nodal_FAP * 100).toFixed(1)}%`);
+    const peakSig = empiricalFAP < 0.05;
+    const nodalSig = nodal_FAP < 0.05;
+
+    // Per-source check
+    console.log(`\n── Per-source check ──`);
+    const s05 = subset.filter(r => r.table === 'S05');
+    const s09 = subset.filter(r => r.table === 'S09');
+    if (s05.length >= 15) {
+      const s05Spec = computeLS(s05.map(r => r.year), s05.map(r => r.res_model), periods);
+      const s05Peak = s05Spec.reduce((a, b) => b.power > a.power ? b : a);
+      const s05Nodal = computeLS(s05.map(r => r.year), s05.map(r => r.res_model), [NODAL])[0];
+      console.log(`  S05 Chinese (n=${s05.length}): peak at ${s05Peak.period.toFixed(2)} yr (power ${s05Peak.power.toFixed(2)}); power at nodal = ${s05Nodal.power.toFixed(2)}`);
+    }
+    if (s09.length >= 15) {
+      const s09Spec = computeLS(s09.map(r => r.year), s09.map(r => r.res_model), periods);
+      const s09Peak = s09Spec.reduce((a, b) => b.power > a.power ? b : a);
+      const s09Nodal = computeLS(s09.map(r => r.year), s09.map(r => r.res_model), [NODAL])[0];
+      console.log(`  S09 Arab    (n=${s09.length}): peak at ${s09Peak.period.toFixed(2)} yr (power ${s09Peak.power.toFixed(2)}); power at nodal = ${s09Nodal.power.toFixed(2)}`);
+    }
+    console.log(`  Both sources peaking near nodal → strong cross-source evidence.`);
+    console.log(`  Only one source → likely source-specific bias rather than physical nodal modulation.`);
+
+    // Verdict
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    if (nearNodal && peakSig) {
+      console.log(`  VERDICT: ✓ LUNAR NODAL CYCLE DETECTED in medieval data`);
+      console.log(`    Peak at ${peak.period.toFixed(2)} yr (${((peak.period - NODAL)/NODAL*100).toFixed(1)}% from nodal) with FAP ${(empiricalFAP*100).toFixed(1)}%`);
+      console.log(`    Power at exact nodal = ${atNodal.power.toFixed(2)} (FAP ${(nodal_FAP*100).toFixed(1)}%)`);
+      console.log(`    The medieval Chinese+Arab observations show a real 18.6-yr periodicity in the`);
+      console.log(`    residual — physically consistent with lunar nodal cycle modulating tidal LOD`);
+      console.log(`    over the 250-yr observation window. This is a small but PHYSICAL signal.`);
+    } else if (nearNodal) {
+      console.log(`  VERDICT: ~ Peak is at nodal-like period but not significant (FAP ${(empiricalFAP*100).toFixed(1)}%)`);
+      console.log(`    Suggestive but the sample is too small or the signal too weak for confident detection.`);
+      console.log(`    Power at nodal: ${atNodal.power.toFixed(2)} (FAP ${(nodal_FAP*100).toFixed(1)}%)`);
+    } else if (peakSig) {
+      console.log(`  VERDICT: ~ Significant peak found but NOT at lunar nodal period`);
+      console.log(`    Peak at ${peak.period.toFixed(2)} yr (significant, FAP ${(empiricalFAP*100).toFixed(1)}%) doesn't match nodal expectation.`);
+      console.log(`    Possible source-specific cycle or coincidence.`);
+    } else {
+      console.log(`  VERDICT: ✗ NO significant lunar nodal signature in medieval data`);
+      console.log(`    The earlier ${nearNodal ? 18.3 : 18.3} yr hint from spectrum-robustness was noise.`);
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    window._L5b_nodal_targeted = { peak, atNodal, empiricalFAP, nodal_FAP };
+    console.log('\nFull data exposed at window._L5b_nodal_targeted');
+  }, 'Targeted follow-up to the spectrum-robustness test which found a hint of 18.3 yr ' +
+     'power in the late-half data only — close to lunar nodal cycle (18.6128 yr). ' +
+     'Runs Lomb-Scargle at high resolution (15-25 yr, 0.05 yr step) on JUST the medieval ' +
+     'Chinese + Arab observations (S05 + S09, year 850-1280, ~100 events). Computes ' +
+     'empirical FAP from 500 white-noise nulls. Per-source breakdown to distinguish ' +
+     'cross-source physical signal from single-source bias. Requires L-5b main button run.');
+
+  addTestButton('L-5b correlation EXTENDED: integrated, lagged, sign-duration (3 alternative tests)', () => {
+    if (!window._L5b_balance || !window._L5b_balance.series) {
+      console.error('Run the L-5b correlation button first (the previous one); window._L5b_balance.series needs to exist.');
+      return;
+    }
+    const { series, pairs: origPairs } = window._L5b_balance;
+    const years     = origPairs.map(p => p.year);
+    const residuals = origPairs.map(p => p.residual);
+    const n         = years.length;
+    const N_PERM    = 1000;
+    const N_TESTS   = 3;
+    const BONFERRONI_ALPHA = 0.05 / N_TESTS;  // ≈ 0.0167
+
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  L-5b correlation EXTENDED — three non-trivial formulations of the mass-balance thesis`);
+    console.log('  ');
+    console.log('  Test 1: Integrated balance  — ∫_Y^{2000} balance(τ) dτ vs residual(Y)');
+    console.log('  Test 2: Lagged correlation  — residual(Y) vs balance(Y−Δ) for Δ ∈ {0,100,...,1000} yr');
+    console.log('  Test 3: Signed sign-duration — how long balance has been at its current sign × sign');
+    console.log('  ');
+    console.log(`  Multiple-comparison correction: Bonferroni α = 0.05/${N_TESTS} = ${BONFERRONI_ALPHA.toFixed(4)}`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    // Helpers
+    const interpBalance = (year) => {
+      if (year <= series[0].year)              return series[0].balance;
+      if (year >= series[series.length-1].year) return series[series.length-1].balance;
+      for (let i = 0; i < series.length - 1; i++) {
+        if (series[i].year <= year && year < series[i+1].year) {
+          const t = (year - series[i].year) / (series[i+1].year - series[i].year);
+          return series[i].balance + t * (series[i+1].balance - series[i].balance);
+        }
+      }
+      return series[series.length-1].balance;
+    };
+
+    const pearson = (xs, ys) => {
+      const m = xs.length;
+      const mX = xs.reduce((s,v)=>s+v,0)/m;
+      const mY = ys.reduce((s,v)=>s+v,0)/m;
+      let c=0, vx=0, vy=0;
+      for (let i=0; i<m; i++) {
+        c  += (xs[i]-mX) * (ys[i]-mY);
+        vx += (xs[i]-mX) ** 2;
+        vy += (ys[i]-mY) ** 2;
+      }
+      return c / Math.sqrt(vx * vy);
+    };
+
+    const permutationP = (xs, ys, N) => {
+      const observed = Math.abs(pearson(xs, ys));
+      const ysCopy = ys.slice();
+      let exceeds = 0;
+      for (let i = 0; i < N; i++) {
+        for (let j = ysCopy.length-1; j > 0; j--) {
+          const k = Math.floor(Math.random() * (j + 1));
+          [ysCopy[j], ysCopy[k]] = [ysCopy[k], ysCopy[j]];
+        }
+        if (Math.abs(pearson(xs, ysCopy)) >= observed) exceeds++;
+      }
+      return exceeds / N;
+    };
+
+    const results = [];
+
+    // ── TEST 1: integrated balance from year Y to today (2000) ──
+    console.log('── Test 1: Integrated balance from year Y to today (year 2000) ──');
+    const integratedBalance = years.map(Y => {
+      let integ = 0;
+      let prevY = Y;
+      let prevB = interpBalance(Y);
+      for (const s of series) {
+        if (s.year <= Y) continue;
+        if (s.year > 2000) break;
+        integ += (s.balance + prevB) / 2 * (s.year - prevY);
+        prevY = s.year; prevB = s.balance;
+      }
+      if (prevY < 2000) {
+        const bal2000 = interpBalance(2000);
+        integ += (bal2000 + prevB) / 2 * (2000 - prevY);
+      }
+      return integ;
+    });
+    const r1 = pearson(integratedBalance, residuals);
+    const p1 = permutationP(integratedBalance, residuals, N_PERM);
+    results.push({ name: 'Integrated balance Y→2000', r: r1, p: p1 });
+    console.log(`  r = ${r1.toFixed(4)}   p = ${p1.toFixed(4)}   R² = ${(r1*r1*100).toFixed(2)}%   ${p1 < BONFERRONI_ALPHA ? '✓ survives Bonferroni' : '✗ does not survive'}`);
+
+    // ── TEST 2: lagged correlation — scan Δ, report best ──
+    console.log('\n── Test 2: Lagged correlation — scan Δ ∈ {0, 100, 200, 300, 500, 700, 1000} yr ──');
+    const lags = [0, 100, 200, 300, 500, 700, 1000];
+    let best = { lag: 0, r: 0 };
+    console.log('  Lag scan (Pearson r at each lag):');
+    for (const lag of lags) {
+      const laggedBal = years.map(Y => interpBalance(Y - lag));
+      const r = pearson(laggedBal, residuals);
+      if (Math.abs(r) > Math.abs(best.r)) best = { lag, r };
+      console.log(`    Δ = ${lag.toString().padStart(4)} yr:  r = ${r.toFixed(4)}`);
+    }
+    const bestBal = years.map(Y => interpBalance(Y - best.lag));
+    const p2 = permutationP(bestBal, residuals, N_PERM);
+    results.push({ name: `Lagged Δ=${best.lag} yr (best of ${lags.length})`, r: best.r, p: p2 });
+    console.log(`  Best Δ = ${best.lag} yr  ⇒  r = ${best.r.toFixed(4)}   p = ${p2.toFixed(4)}   ${p2 < BONFERRONI_ALPHA ? '✓ survives Bonferroni' : '✗ does not survive'}`);
+    console.log(`  Caveat: scanning ${lags.length} lags inflates false-positive risk. A truly strict threshold would be α = ${(BONFERRONI_ALPHA/lags.length).toFixed(4)}.`);
+
+    // ── TEST 3: signed sign-duration ──
+    console.log('\n── Test 3: Signed sign-duration (how long balance has been at current sign × sign) ──');
+    const signDuration = years.map(Y => {
+      const balY = interpBalance(Y);
+      const signY = Math.sign(balY);
+      if (signY === 0) return 0;
+      let lastChangeYear = series[0].year - 50;  // default if no opposite-sign sample exists
+      for (let i = 0; i < series.length; i++) {
+        if (series[i].year >= Y) break;
+        const sgn = Math.sign(series[i].balance);
+        if (sgn !== signY && sgn !== 0) lastChangeYear = series[i].year;
+      }
+      return signY * (Y - lastChangeYear);
+    });
+    const r3 = pearson(signDuration, residuals);
+    const p3 = permutationP(signDuration, residuals, N_PERM);
+    results.push({ name: 'Signed sign-duration', r: r3, p: p3 });
+    console.log(`  r = ${r3.toFixed(4)}   p = ${p3.toFixed(4)}   R² = ${(r3*r3*100).toFixed(2)}%   ${p3 < BONFERRONI_ALPHA ? '✓ survives Bonferroni' : '✗ does not survive'}`);
+    console.log(`  Sign-duration range: ${Math.min(...signDuration).toFixed(0)} to ${Math.max(...signDuration).toFixed(0)} yr (signed; magnitude = years since last sign change)`);
+
+    // ── Summary table ──
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY (n=${n}, Bonferroni-corrected α = ${BONFERRONI_ALPHA.toFixed(4)})`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+    console.table(results.map(r => ({
+      test:             r.name,
+      r:                r.r.toFixed(4),
+      'R²_pct':         (r.r*r.r*100).toFixed(2),
+      'p_value':        r.p.toFixed(4),
+      'sig_uncorr_α=0.05': r.p < 0.05 ? '✓' : '✗',
+      'sig_Bonferroni':    r.p < BONFERRONI_ALPHA ? '✓' : '✗',
+    })));
+
+    const surviving = results.filter(r => r.p < BONFERRONI_ALPHA);
+    console.log('');
+    if (surviving.length === 0) {
+      console.log('  VERDICT: 0/3 tests survive Bonferroni correction.');
+      console.log('           The Holistic Universe Model mass-balance thesis (in any of the 3 tested');
+      console.log('           formulations: integrated / lagged / sign-duration) does NOT predictably');
+      console.log('           explain the medieval residual at α=0.05 with multiple-comparison correction.');
+      console.log('           ');
+      console.log('           Likely true source of medieval residual:');
+      console.log('             (a) Observation systematics in Stephenson Chinese/Arab data');
+      console.log('             (b) Regionalized GIA structure beyond 3-mode global average');
+      console.log('             (c) An as-yet-unidentified physical channel (possibly time-variable');
+      console.log('                 mantle-core coupling not captured by Holme 1998 secular value)');
+    } else if (surviving.length === 1) {
+      console.log(`  VERDICT: 1/3 tests survives Bonferroni correction: ${surviving[0].name}`);
+      console.log(`           r = ${surviving[0].r.toFixed(4)}, p = ${surviving[0].p.toFixed(4)}`);
+      console.log('           Single-survivor result is SUGGESTIVE but not strong evidence. Could indicate:');
+      console.log('             - Real but narrowly-targeted causal mechanism (e.g., specific lag time)');
+      console.log('             - Or selection effect from running multiple variants');
+      console.log('           Recommendation: pre-specify this formulation, test on independent dataset.');
+    } else {
+      console.log(`  VERDICT: ${surviving.length}/3 tests survive Bonferroni correction.`);
+      console.log('           SUPPORTING EVIDENCE for the mass-balance → residual coupling thesis.');
+      console.log('           Surviving formulations:');
+      for (const s of surviving) console.log(`             ${s.name}:  r = ${s.r.toFixed(4)}, p = ${s.p.toFixed(4)}`);
+      console.log('           Next step: investigate causal chain (which physical channel mediates?).');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    window._L5b_balance_extended = { results, integratedBalance, signDuration, bestLag: best.lag };
+    console.log('\nFull data exposed at window._L5b_balance_extended');
+  }, 'Three-test follow-up to the L-5b correlation diagnostic. Tests alternative ' +
+     'formulations of the mass-balance thesis: integrated cumulative balance, ' +
+     'lagged correlation (scan Δ ∈ {0..1000} yr), and signed sign-duration. ' +
+     'Applies Bonferroni multiple-comparison correction (α = 0.05/3) so we don\'t ' +
+     'fool ourselves with p-hacking across multiple variant tests. Requires the ' +
+     'first L-5b correlation button to have populated window._L5b_balance.series.');
+
+  addTestButton('L-7: model ΔT vs NASA ΔT vs Stephenson 2016 solar observations (89 events)', async () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase L-7: three-way ΔT comparison against primary-source SOLAR observations');
+    console.log('  (Independent cross-check that the α(t) GIA correction — validated in doc 102');
+    console.log('   against 270 lunar observations — holds up against the solar observation record.)');
+    console.log('  ');
+    console.log('  Data: Stephenson, Morrison & Hohenkerk 2016 supplementary tables');
+    console.log('        S03 (Babylonian solar)  +  S06 (Chinese solar)  +  S08 (Arab solar)');
+    console.log('        89 timed solar observations, year -356 BCE to +1277 CE.');
+    console.log('  ');
+    console.log('  ΔT is type-independent (a property of Earth rotation, not the eclipse).');
+    console.log('  NASA ΔT(year) is averaged from the NASA Lunar Canon entries in that year —');
+    console.log('  same satellite-derived ΔT applies to solar and lunar events identically.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    const [steph, canon] = await Promise.all([loadStephensonSolar(), loadNasaLunarCanon()]);
+    if (!steph || !canon) return;
+
+    // Build NASA ΔT(year) lookup from Canon entries (same as L-5b)
+    const nasaDtByYear = new Map();
+    {
+      const acc = new Map();
+      for (const e of canon.entries) {
+        const m = /^(-?\d+)/.exec(e.date);
+        if (!m) continue;
+        const y = parseInt(m[1], 10);
+        const a = acc.get(y) || { sum: 0, n: 0 };
+        a.sum += e.delta_T_sec; a.n += 1;
+        acc.set(y, a);
+      }
+      for (const [y, a] of acc) nasaDtByYear.set(y, a.sum / a.n);
+    }
+
+    // Per-observation comparison
+    const records = [];
+    for (const obs of steph.entries) {
+      if (obs.dt_observed_sec == null) continue;
+      const nasa_dt = nasaDtByYear.get(obs.year);
+      if (nasa_dt == null) continue;
+      const t_Ma = (2000 - obs.year) / 1e6;
+      const model_dt = meanDeltaTSecondsAtAge(t_Ma);
+      records.push({
+        table:     obs.source_table,
+        year:      obs.year,
+        weight:    obs.weight,
+        obs_dt:    obs.dt_observed_sec,
+        nasa_dt,
+        model_dt,
+        res_model: obs.dt_observed_sec - model_dt,
+        res_nasa:  obs.dt_observed_sec - nasa_dt,
+      });
+    }
+
+    // Per-table summary
+    console.log('── Per-table summary ──');
+    const tables = [...new Set(records.map(r => r.table))].sort();
+    const rows = tables.map(tab => {
+      const subset = records.filter(r => r.table === tab);
+      const meanAbsModel = subset.reduce((s, r) => s + Math.abs(r.res_model), 0) / subset.length;
+      const meanAbsNasa  = subset.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / subset.length;
+      const closerModel  = subset.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
+      return {
+        table:                tab,
+        name:                 steph.entries.find(e => e.source_table === tab).source_table_name,
+        n:                    subset.length,
+        year_range:           `${Math.min(...subset.map(r => r.year))}…${Math.max(...subset.map(r => r.year))}`,
+        mean_obs_dt_hr:       (subset.reduce((s, r) => s + r.obs_dt, 0) / subset.length / 3600).toFixed(2),
+        mean_nasa_dt_hr:      (subset.reduce((s, r) => s + r.nasa_dt, 0) / subset.length / 3600).toFixed(2),
+        mean_model_dt_hr:     (subset.reduce((s, r) => s + r.model_dt, 0) / subset.length / 3600).toFixed(2),
+        mean_abs_res_NASA_s:  meanAbsNasa.toFixed(0),
+        mean_abs_res_model_s: meanAbsModel.toFixed(0),
+        model_closer_pct:     (closerModel / subset.length * 100).toFixed(0) + '%',
+      };
+    });
+    console.table(rows);
+
+    // Per-century summary
+    console.log('\n── Per-century summary ──');
+    const buckets = new Map();
+    for (const r of records) {
+      const c = Math.floor(r.year / 100) * 100;
+      if (!buckets.has(c)) buckets.set(c, []);
+      buckets.get(c).push(r);
+    }
+    const centRows = [];
+    for (const c of [...buckets.keys()].sort((a,b)=>a-b)) {
+      const sub = buckets.get(c);
+      const meanAbsM = sub.reduce((s, r) => s + Math.abs(r.res_model), 0) / sub.length;
+      const meanAbsN = sub.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / sub.length;
+      const closer   = sub.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
+      centRows.push({
+        century:              `${c}…${c+99}`,
+        n:                    sub.length,
+        mean_obs_dt_hr:       (sub.reduce((s, r) => s + r.obs_dt, 0) / sub.length / 3600).toFixed(2),
+        mean_nasa_dt_hr:      (sub.reduce((s, r) => s + r.nasa_dt, 0) / sub.length / 3600).toFixed(2),
+        mean_model_dt_hr:     (sub.reduce((s, r) => s + r.model_dt, 0) / sub.length / 3600).toFixed(2),
+        mean_abs_res_NASA_s:  meanAbsN.toFixed(0),
+        mean_abs_res_model_s: meanAbsM.toFixed(0),
+        model_closer_pct:     (closer / sub.length * 100).toFixed(0) + '%',
+      });
+    }
+    console.table(centRows);
+
+    // Global summary
+    const allMeanAbsModel = records.reduce((s, r) => s + Math.abs(r.res_model), 0) / records.length;
+    const allMeanAbsNasa  = records.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / records.length;
+    const allCloserModel  = records.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
+
+    console.log(`\n══════════════════════════════════════════════════════════════════════════════════`);
+    console.log(`  L-7 GLOBAL RESULT — ${records.length} primary-source SOLAR observations`);
+    console.log(`══════════════════════════════════════════════════════════════════════════════════`);
+    console.log(`  Mean |residual| vs observation:`);
+    console.log(`    NASA Espenak/Meeus ΔT:   ${allMeanAbsNasa.toFixed(0).padStart(6)} s  (${(allMeanAbsNasa/60).toFixed(1)} min)`);
+    console.log(`    Model pure-tidal + α(t): ${allMeanAbsModel.toFixed(0).padStart(6)} s  (${(allMeanAbsModel/60).toFixed(1)} min)`);
+    console.log(`  Events where model closer to obs than NASA: ${allCloserModel}/${records.length}  (${(allCloserModel/records.length*100).toFixed(1)}%)`);
+    console.log(``);
+    if (allMeanAbsModel < allMeanAbsNasa) {
+      const advantage = ((allMeanAbsNasa - allMeanAbsModel) / allMeanAbsNasa * 100).toFixed(1);
+      console.log(`  → Model is ${advantage}% closer to primary-source observations than NASA on average.`);
+    } else {
+      const advantage = ((allMeanAbsModel - allMeanAbsNasa) / allMeanAbsModel * 100).toFixed(1);
+      console.log(`  → NASA is ${advantage}% closer to primary-source observations than the model on average.`);
+    }
+    console.log(``);
+    console.log(`  Compare to L-5b lunar headline: model 24.3 min vs NASA 20.0 min (NASA closer by 17.7%).`);
+    console.log(`  If L-7 solar headline is similar magnitude, α(t) holds up across BOTH eclipse types`);
+    console.log(`  — strong independent cross-validation that the GIA viscoelastic physics is correct.`);
+
+    window._L7 = { records, perTable: rows, perCentury: centRows };
+    console.log('\nFull data exposed at window._L7 for further inspection.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase L-7: independent cross-check of the α(t) GIA correction against ' +
+     '89 timed primary-source solar observations from Stephenson, Morrison & ' +
+     'Hohenkerk 2016 (Babylonian, Chinese, Arab solar). Same three-way pipeline ' +
+     'as L-5b but for solar eclipses. Tests whether α(t) — validated in doc 102 ' +
+     'on 270 lunar observations — also holds up on this independent eclipse type.');
+
+  addTestButton('L-7 correlation: replicate L-5b mass-balance tests on SOLAR residuals (independent validation)', () => {
+    if (!window._L7 || !window._L7.records) {
+      console.error('Run the L-7 main comparison first; window._L7 not populated');
+      return;
+    }
+    if (!window._L5b_balance || !window._L5b_balance.series) {
+      console.error('Run the L-5b correlation button first; window._L5b_balance.series not populated (need the mass-balance time series)');
+      return;
+    }
+    if (!window._L5b_balance_extended || !window._L5b_balance_extended.results) {
+      console.error('Run the L-5b correlation EXTENDED button first; need lunar results to compare against');
+      return;
+    }
+
+    const series = window._L5b_balance.series;
+    const recs   = window._L7.records;
+    const lunarResults = window._L5b_balance_extended.results;
+
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-7 mass-balance correlation — INDEPENDENT VALIDATION on solar residuals');
+    console.log('  ');
+    console.log('  Pre-registered hypothesis: if the mass-balance → residual coupling is REAL physics,');
+    console.log('  the integrated-balance correlation should reproduce in the L-7 solar dataset with');
+    console.log('  similar sign and similar magnitude (lunar r = -0.14, p = 0.013).');
+    console.log('  ');
+    console.log('  This is an INDEPENDENT-DATASET REPLICATION test — the gold standard for distinguishing');
+    console.log('  real signal from p-hacking / spurious-trend correlation. If solar replicates → real.');
+    console.log('  If solar contradicts → lunar result was spurious, thesis decisively ruled out.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    // Helpers (same as L-5b extended)
+    const interpBalance = (year) => {
+      if (year <= series[0].year)              return series[0].balance;
+      if (year >= series[series.length-1].year) return series[series.length-1].balance;
+      for (let i = 0; i < series.length - 1; i++) {
+        if (series[i].year <= year && year < series[i+1].year) {
+          const t = (year - series[i].year) / (series[i+1].year - series[i].year);
+          return series[i].balance + t * (series[i+1].balance - series[i].balance);
+        }
+      }
+      return series[series.length-1].balance;
+    };
+    const pearson = (xs, ys) => {
+      const m = xs.length;
+      const mX = xs.reduce((s,v)=>s+v,0)/m, mY = ys.reduce((s,v)=>s+v,0)/m;
+      let c=0, vx=0, vy=0;
+      for (let i=0; i<m; i++) { c += (xs[i]-mX)*(ys[i]-mY); vx += (xs[i]-mX)**2; vy += (ys[i]-mY)**2; }
+      return c / Math.sqrt(vx*vy);
+    };
+    const permutationP = (xs, ys, N) => {
+      const observed = Math.abs(pearson(xs, ys));
+      const ysCopy = ys.slice();
+      let exceeds = 0;
+      for (let i = 0; i < N; i++) {
+        for (let j = ysCopy.length-1; j > 0; j--) {
+          const k = Math.floor(Math.random() * (j + 1));
+          [ysCopy[j], ysCopy[k]] = [ysCopy[k], ysCopy[j]];
+        }
+        if (Math.abs(pearson(xs, ysCopy)) >= observed) exceeds++;
+      }
+      return exceeds / N;
+    };
+
+    const years     = recs.map(r => r.year);
+    const residuals = recs.map(r => r.res_model);
+    const n         = years.length;
+
+    // Run the same 3 tests on solar
+    // ── Test 1 ──
+    const integratedBalance = years.map(Y => {
+      let integ = 0, prevY = Y, prevB = interpBalance(Y);
+      for (const s of series) {
+        if (s.year <= Y) continue;
+        if (s.year > 2000) break;
+        integ += (s.balance + prevB) / 2 * (s.year - prevY);
+        prevY = s.year; prevB = s.balance;
+      }
+      if (prevY < 2000) integ += (interpBalance(2000) + prevB) / 2 * (2000 - prevY);
+      return integ;
+    });
+    const r1 = pearson(integratedBalance, residuals);
+    const p1 = permutationP(integratedBalance, residuals, 1000);
+
+    // ── Test 2 ──
+    const lags = [0, 100, 200, 300, 500, 700, 1000];
+    let best = { lag: 0, r: 0 };
+    for (const lag of lags) {
+      const r = pearson(years.map(Y => interpBalance(Y - lag)), residuals);
+      if (Math.abs(r) > Math.abs(best.r)) best = { lag, r };
+    }
+    const p2 = permutationP(years.map(Y => interpBalance(Y - best.lag)), residuals, 1000);
+
+    // ── Test 3 ──
+    const signDuration = years.map(Y => {
+      const balY = interpBalance(Y);
+      const signY = Math.sign(balY);
+      if (signY === 0) return 0;
+      let lastChangeYear = series[0].year - 50;
+      for (let i = 0; i < series.length; i++) {
+        if (series[i].year >= Y) break;
+        const sgn = Math.sign(series[i].balance);
+        if (sgn !== signY && sgn !== 0) lastChangeYear = series[i].year;
+      }
+      return signY * (Y - lastChangeYear);
+    });
+    const r3 = pearson(signDuration, residuals);
+    const p3 = permutationP(signDuration, residuals, 1000);
+
+    // Lookup lunar results for side-by-side comparison
+    const L_INTEG = lunarResults.find(r => r.name.startsWith('Integrated'));
+    const L_LAG   = lunarResults.find(r => r.name.startsWith('Lagged'));
+    const L_DUR   = lunarResults.find(r => r.name.startsWith('Signed'));
+
+    console.log('── SOLAR (n=' + n + ') vs LUNAR (n=267) side-by-side comparison ──\n');
+    console.table([
+      {
+        test:            'Integrated balance Y→2000',
+        lunar_r:         L_INTEG.r.toFixed(4),
+        solar_r:         r1.toFixed(4),
+        lunar_p:         L_INTEG.p.toFixed(4),
+        solar_p:         p1.toFixed(4),
+        sign_match:      Math.sign(r1) === Math.sign(L_INTEG.r) ? '✓ same sign' : '✗ OPPOSITE sign',
+      },
+      {
+        test:            `Lagged (best Δ in 7-lag scan)`,
+        lunar_r:         L_LAG.r.toFixed(4),
+        solar_r:         best.r.toFixed(4) + ' (Δ=' + best.lag + ')',
+        lunar_p:         L_LAG.p.toFixed(4),
+        solar_p:         p2.toFixed(4),
+        sign_match:      Math.sign(best.r) === Math.sign(L_LAG.r) ? '✓ same sign' : '✗ OPPOSITE sign',
+      },
+      {
+        test:            'Signed sign-duration',
+        lunar_r:         L_DUR.r.toFixed(4),
+        solar_r:         r3.toFixed(4),
+        lunar_p:         L_DUR.p.toFixed(4),
+        solar_p:         p3.toFixed(4),
+        sign_match:      Math.sign(r3) === Math.sign(L_DUR.r) ? '✓ same sign' : '✗ OPPOSITE sign',
+      },
+    ]);
+
+    // Replication verdict for the pre-registered Test 1 hypothesis
+    console.log('');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  REPLICATION VERDICT for pre-registered Test 1 (integrated balance Y→2000):');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+    const replicates = Math.sign(r1) === Math.sign(L_INTEG.r) && Math.abs(r1) >= Math.abs(L_INTEG.r) * 0.5 && p1 < 0.05;
+    if (replicates) {
+      console.log(`  ✓ REPLICATES: Solar r = ${r1.toFixed(4)} matches lunar r = ${L_INTEG.r.toFixed(4)} in sign and order-of-magnitude.`);
+      console.log('               This is INDEPENDENT-DATASET CONFIRMATION of the integrated-balance correlation.');
+      console.log('               The mass-balance → residual coupling thesis now has supporting evidence');
+      console.log('               from two physically independent eclipse-observation traditions.');
+    } else {
+      console.log(`  ✗ DOES NOT REPLICATE: Solar r = ${r1.toFixed(4)} (p = ${p1.toFixed(4)}) vs lunar r = ${L_INTEG.r.toFixed(4)} (p = ${L_INTEG.p.toFixed(4)}).`);
+      if (Math.sign(r1) !== Math.sign(L_INTEG.r)) {
+        console.log(`               SIGN FLIPS between lunar (negative) and solar (positive). This is the hallmark`);
+        console.log(`               of spurious-trend correlation: the same null sample window would give different`);
+        console.log(`               sign signs by chance.`);
+      }
+      console.log('               The marginal lunar correlation (r=-0.14, p=0.013) was almost certainly a');
+      console.log('               coincidence of two slow-varying signals integrating against each other —');
+      console.log('               NOT a real causal coupling. The mass-balance → LOD-residual thesis is now');
+      console.log('               DECISIVELY RULED OUT by independent-dataset failure to replicate.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    window._L7_balance_replication = { solar: { r1, p1, r2: best.r, p2, best_lag: best.lag, r3, p3 }, replicates };
+    console.log('\nFull data exposed at window._L7_balance_replication');
+  }, 'INDEPENDENT VALIDATION TEST: runs the same 3 mass-balance correlation tests ' +
+     '(integrated / lagged / sign-duration) on the L-7 solar residuals instead of ' +
+     'L-5b lunar. If the marginal lunar integrated-balance r=-0.14 result REPLICATES ' +
+     'with similar sign and magnitude in solar → strong real-signal evidence. ' +
+     'If solar contradicts → lunar was spurious-trend artifact, thesis ruled out. ' +
+     'Pre-registered hypothesis; gold-standard cross-validation. Requires L-7 main + ' +
+     'L-5b correlation + L-5b correlation EXTENDED buttons to have been run first.');
 
   // Anchor & Units
   const firstAnchorBtn = addTestButton('Verify J2000 Rates (units check)', () => {

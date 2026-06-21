@@ -3,6 +3,7 @@
 **Date**: 2026-06-20
 **Status**: Validation complete — Moon polynomial confirmed against NASA's authoritative reference; pure-tidal ΔT shown competitive with (or slightly preferred over) Stephenson empirical fit across 19 documented historical eclipses spanning -762 to 1654 CE.
 **Prior baseline**: [`doc 100`](100-deltat-validation.md) — RMS-residual comparison of three ΔT formulas across 35 eclipses, June 2026.
+**Sequel**: [`doc 102`](102-gia-alpha-lunar-validation.md) — extends the analysis from 19 solar eclipses to 270 primary-source lunar observations (Stephenson, Morrison & Hohenkerk 2016), adds an explicit GIA viscoelastic α(t) correction derived from satellite gravimetry (Cox & Chao 2002 + Peltier 2004), and refines the "non-tidal contribution required?" conclusion below. The solar-resolution test in this doc (19 eclipses) cannot discriminate the ~6 ms/century non-tidal effect; the lunar-timing resolution test in doc 102 (270 events) can — and identifies the non-tidal contribution as GIA, with the smaller (~0.6 ms/century) magnitude rather than the larger Munk-MacDonald estimate this doc critiques.
 
 ---
 
@@ -337,12 +338,23 @@ This open question is preserved as a future investigation track.
 
 ## What's next
 
-The natural extension is **lunar eclipses**. They are visible across
-Earth's entire night side, so geographic placement is irrelevant —
-the constraint reduces to *timing of penumbra entry/exit* at the
-observation site. Ibn Yunus alone recorded ~30 lunar eclipses with
+The natural extension is **lunar eclipses** — **now done in [doc 102](102-gia-alpha-lunar-validation.md)**.
+They are visible across Earth's entire night side, so geographic placement
+is irrelevant — the constraint reduces to *timing of penumbra entry/exit*
+at the observation site. Ibn Yunus alone recorded ~30 lunar eclipses with
 altitude measurements at Cairo; adding 10-20 well-documented lunar
 events would tighten the case dramatically.
+
+Doc 102 implements this with **270 primary-source observations**
+(Stephenson, Morrison & Hohenkerk 2016 supplementary tables; Babylonian,
+Greek, Chinese, Arab; -720 BCE to 1280 CE). Refines the "non-tidal
+contribution required?" question above: the lunar-timing test
+*does* detect a non-tidal contribution, and identifies it as GIA
+viscoelastic relaxation with the magnitude measured by Cox & Chao 2002
+satellite gravimetry (~0.6 ms/century), NOT the larger Munk-MacDonald
+phenomenological estimate this doc critiques. Three named physical
+constants, zero fitting parameters; model agrees with NASA's empirical
+polynomial to within 4 minutes on a 20-minute observation noise floor.
 
 Other directions:
 
@@ -389,9 +401,13 @@ Each button opens its full output in the browser console. Buttons 1, 5,
 6 produce the headline numbers cited above.
 
 The 19 documented historical eclipses used by buttons 5 and 6 are also
-exposed as **planetStats nav buttons** under Moon → *Historical Solar
-Eclipses (validation)*, where the user can step through each event and
-visually verify Moon-Sun alignment in the 3D scene.
+exposed in the tweakpane menu under **Solar & Lunar Eclipses → Solar
+Eclipses**, where the user can step through each event with the
+Prev/Next buttons. The camera auto-switches to Earth view on each jump
+so the observer perspective is correct for visually verifying the
+eclipse — moved from the previous Moon planetStats location (2026-06-20),
+where the Moon-centric view obscured what the eclipse actually looks like
+from Earth.
 
 ---
 
