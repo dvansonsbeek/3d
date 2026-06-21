@@ -1,0 +1,26 @@
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table S07: Greek timed lunar and solar eclipses
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table   Year    DT(s)            Weight
+   07   -200    12400              3
+   07   -199    11800              3
+   07   -199    12650              3
+   07   -199    13550              3
+   07   -173    11000              3
+   07   -173    10750              3
+   07   -140     8550              0
+   07    125    10350              3
+   07    364     6800              3
+   07    364     6100              3
+   07    364     6000              3
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Notes:
+     DT(s)  : Correction to the Earth's clock in seconds.
+     Weight : Weight assigned to observation.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This table of observations is from the paper "Measurement of the Earth's
+Rotation: 720 BC to AD 2015", Stephenson, F.R., Morrison, L.V., and
+Hohenkerk, C.Y., published by Royal Society Proceedings A and available
+from their website at
+http://rspa.royalsocietypublishing.org/lookup/doi/10.1098/rspa.2016.0404
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

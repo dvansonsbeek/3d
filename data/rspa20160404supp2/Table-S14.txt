@@ -1,0 +1,20 @@
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table S14: Untimed lunar eclipses: estimates of degree of obscuration at rising or setting
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table   Year    DT(s)             Region
+   14   -536    18150             Babylon
+   14   -363    15250             Babylon
+   14   -352    14500             Babylon
+   14   -189    12200             Babylon
+   14   - 98    12800             Babylon
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Notes:
+     DT(s)  : Correction to the Earth's clock in seconds.
+     Weight : Weight assigned to observation.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This table of observations is from the paper "Measurement of the Earth's
+Rotation: 720 BC to AD 2015", Stephenson, F.R., Morrison, L.V., and
+Hohenkerk, C.Y., published by Royal Society Proceedings A and available
+from their website at
+http://rspa.royalsocietypublishing.org/lookup/doi/10.1098/rspa.2016.0404
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

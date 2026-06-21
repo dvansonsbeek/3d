@@ -1,0 +1,47 @@
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table S09: Arab timed lunar eclipses
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table   Year    DT(s)            Weight
+   09    854     3150              1
+   09    854     2500              1
+   09    854     1300              1
+   09    856     2300              1
+   09    883      900              1
+   09    901      400              1
+   09    923     1200              1
+   09    923     2000              1
+   09    925     2700              1
+   09    925     2300              1
+   09    927     2900              1
+   09    933     2350              1
+   09    979     1500              1
+   09    979     1900              1
+   09    979     1300              1
+   09    980     2100              1
+   09    981     2000              1
+   09    981     2350              1
+   09    981     1500              1
+   09    983     1200              1
+   09    986      800              1
+   09    990     3500              1
+   09   1001      450              1
+   09   1002     1750              1
+   09   1002     1950              1
+   09   1003     1450              1
+   09   1003      650              1
+   09   1004     2600              1
+   09   1019     1900              1
+   09   1019     1700              1
+   09   1019     1750              1
+   09   1019     1550              1
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Notes:
+     DT(s)  : Correction to the Earth's clock in seconds.
+     Weight : Weight assigned to observation.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This table of observations is from the paper "Measurement of the Earth's
+Rotation: 720 BC to AD 2015", Stephenson, F.R., Morrison, L.V., and
+Hohenkerk, C.Y., published by Royal Society Proceedings A and available
+from their website at
+http://rspa.royalsocietypublishing.org/lookup/doi/10.1098/rspa.2016.0404
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

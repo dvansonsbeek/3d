@@ -1,0 +1,57 @@
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table S06: Chinese timed solar eclipses
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table   Year    DT(s)            Weight
+   06    586     3700              1
+   06    586     6700              1
+   06    586     4900              1
+   06    594     6300              1
+   06    680     2450              1
+   06    691     1000              0
+   06    702     2350              1
+   06    761     2300              1
+   06    761     3600              1
+   06    761     2650              1
+   06    937     2100              2
+   06   1040     2850              2
+   06   1046     2100              2
+   06   1052     2900              2
+   06   1053     2450              2
+   06   1054     1900              2
+   06   1059     2400              2
+   06   1066     1650              2
+   06   1068     1600              2
+   06   1068     1200              2
+   06   1068      850              2
+   06   1069      500              2
+   06   1080        0              2
+   06   1094     1200              2
+   06   1094     2650              2
+   06   1107     1050              2
+   06   1107     1700              2
+   06   1107     1150              2
+   06   1173      650              2
+   06   1173     1950              2
+   06   1173     1400              2
+   06   1183      800              2
+   06   1195      850              2
+   06   1202      700              2
+   06   1202     1500              2
+   06   1216      400              2
+   06   1243      350              2
+   06   1245     1350              2
+   06   1260      350              2
+   06   1277      300              2
+   06   1277      500              2
+   06   1277      600              2
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Notes:
+     DT(s)  : Correction to the Earth's clock in seconds.
+     Weight : Weight assigned to observation.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This table of observations is from the paper "Measurement of the Earth's
+Rotation: 720 BC to AD 2015", Stephenson, F.R., Morrison, L.V., and
+Hohenkerk, C.Y., published by Royal Society Proceedings A and available
+from their website at
+http://rspa.royalsocietypublishing.org/lookup/doi/10.1098/rspa.2016.0404
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

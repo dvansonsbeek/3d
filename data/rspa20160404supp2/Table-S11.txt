@@ -1,0 +1,42 @@
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table S11: Untimed partial solar eclipses
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table   Year  DT-L(s)  DT-U(s)    Region
+   11   -430    12620   [11760]   Greek
+   11   -393    14280   [12640]   Greek
+   11   -241    12260   [11680]   Babylon
+   11   -187   [14100]   13780    China
+   11   - 79     8460   [ 8160]   China
+   11   - 27     9480   [ 8050]   China
+   11    120     8980     8140    China
+   11    360   [ 9420]    7100    China
+   11    494   [ 6600]    5980    China
+   11    702     2720   [ 1440]   China
+   11    729     1180   [  400]   China
+   11    822    - - -     4000    China
+   11   1004     1980     1760    Arab
+   11   1133      ...     1440    Europe
+   11   1135   [ 3800]    1840    China
+   11   1147      ...     1660    Europe
+   11   1178      ...     1140    Europe
+   11   1330   [ 1220]     900    Europe
+   11   1361   [ 1760]     500    China
+   11   1605    - - -     1060    Europe
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Notes:
+     DT(s)  : Correction to the Earth's clock in seconds.
+     DT-L(s): DT Lower bound limit, seconds
+     DT-U(s): DT Upper bound limit, seconds
+              Upper/lower bound limits on DT depend on the
+              eclipse phenomena.
+     [     ]: Uncritical limit (see section 3e).
+      ...   : Redundant limit (see section 3e).
+      - - - : Only one viable limit (see section 3e).
+     Region : Where the eclipse was observed.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This table of observations is from the paper "Measurement of the Earth's
+Rotation: 720 BC to AD 2015", Stephenson, F.R., Morrison, L.V., and
+Hohenkerk, C.Y., published by Royal Society Proceedings A and available
+from their website at
+http://rspa.royalsocietypublishing.org/lookup/doi/10.1098/rspa.2016.0404
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

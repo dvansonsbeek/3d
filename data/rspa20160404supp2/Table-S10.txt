@@ -1,0 +1,53 @@
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table S10: Untimed total and annular solar eclipses
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table   Year  DT-U(s)   DT-L(s)   Region
+   10   -708    21100    20160    China
+   10   -600    21900    21120    China
+   10   -548    21640    16160    China
+   10   -309    17160    13300    Greek
+   10   -180    12700    11780    China
+   10   -135    12140    11220    Babylon
+   10   -  9    10720     8640    Babylon
+   10     71     9440     9830    Greek
+   10    454     7900     6120    China
+   10    761     3260     1700    China
+   10    840     6800     1940    Europe
+   10    873     3740     1820    Arab
+   10    912     2580      840    Arab
+   10    968     2620     1560    Europe
+   10    975     4480     1160    Japan
+   10   1061     2140      800    Arab
+   10   1124     2700      980    Europe
+   10   1133     1160      520    Europe
+   10   1147     1160      280    Europe
+   10   1176     1600      600    Arab
+   10   1178     1900      780    Europe
+   10   1185    10500    -2100    Europe
+   10   1221      960    -9600     China
+   10   1239     1420    - 500    Europe
+   10   1241     1380      620    Europe
+   10   1267      800    - 900    Europe
+   10   1275     1280    - 740    China
+   10   1292     1820    -  60    China
+   10   1406      740      160    Europe
+   10   1415      680    - 800    Europe
+   10   1431      680    - 200    Europe
+   10   1485      780    -5500    Europe
+   10   1560      210    - 480    Europe
+   10   1567      165      145    Europe
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Notes:
+     DT(s)  : Correction to the Earth's clock in seconds.
+     DT-U(s): DT Upper bound limit, seconds
+     DT-L(s): DT Lower bound limit, seconds
+              Upper/lower bound limits on DT depend on the
+              eclipse phenomena.
+     Region : Where the eclipse was observed.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This table of observations is from the paper "Measurement of the Earth's
+Rotation: 720 BC to AD 2015", Stephenson, F.R., Morrison, L.V., and
+Hohenkerk, C.Y., published by Royal Society Proceedings A and available
+from their website at
+http://rspa.royalsocietypublishing.org/lookup/doi/10.1098/rspa.2016.0404
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

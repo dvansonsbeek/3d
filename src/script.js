@@ -4446,10 +4446,78 @@ const CANONICAL_TIDAL_RATE_HR_PER_MA = 0.00526;     // Wells 1963 Phanerozoic / 
 const MODERN_TIDAL_RATE_HR_PER_MA    = 0.006;       // LLR-measured lunar-only (≈ 2.16 ms/century)
 
 // ───── Earth physical constants ─────
-const EARTH_MOI_FACTOR = 0.3306947;                 // IERS Conventions 2010, dimensionless
+const EARTH_MOI_FACTOR = 0.3306947;                 // IERS Conventions 2010, dimensionless — α at J2000
 const R_EARTH_M        = (diameters.earthDiameter / 2) * 1000;        // km → m
 const I_EARTH          = EARTH_MOI_FACTOR * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
-                       // ≈ 8.034 × 10³⁷ kg·m²
+                       // ≈ 8.034 × 10³⁷ kg·m² — anchor value of Earth's polar moment at J2000.
+                       // Used for the L_TOTAL_EM angular-momentum anchor below; the time-
+                       // varying value for LOD evolution is iEarthAtAge(t_Ma).
+
+// ─── α(t): glacial isostatic adjustment (GIA) contribution to polar moment ───
+//
+// Earth's polar moment coefficient α = C/(M·R²) is NOT strictly constant. As
+// continents rebound from the last ice age, crustal mass moves toward the
+// rotation axis, reducing C and hence α. The rate is measured from satellite
+// gravimetry (LAGEOS SLR since 1979, GRACE since 2002):
+//
+//     dJ₂/dt ≈ −2.7 × 10⁻¹¹ /yr   (Cox & Chao 2002, JGR; confirmed by
+//                                  Cheng, Tapley & Ries 2013, JGR — pre-ice-loss
+//                                  secular trend, dominated by GIA)
+//
+// Translating dJ₂/dt to dα/dt requires the geometry of mass redistribution.
+// J₂ = (C − A)/(M·R²) where C is polar moment and A is equatorial moment.
+// For axisymmetric mass moving equator → pole (the GIA case):
+//     ΔC per unit mass = −R²        (mass leaves equatorial plane)
+//     ΔA per unit mass = +R²/2      (axial-moment contribution increases)
+// Therefore ΔJ₂ = (−1 − 0.5)·m/M = −1.5·m/M, while Δα = ΔC/(M·R²) = −m/M.
+// So dα/dt = dJ₂/dt / 1.5 = −1.8 × 10⁻¹¹ /yr.
+//
+// GIA is a viscoelastic relaxation, NOT a constant-rate process. The mantle
+// response is exponential approach to equilibrium with characteristic time τ:
+//
+//     τ_GIA ≈ 5 kyr   (Peltier 2004, Annu. Rev. Earth Planet. Sci. 32, 111;
+//                     consistent with the dominant mode of the ICE-5G(VM2) model)
+//
+// We use the standard viscoelastic-relaxation form:
+//
+//     α(t_age) = α_today + Δα_∞ · (1 − exp(−t_age/τ_GIA))
+//
+// where Δα_∞ = |dα/dt|_today · τ_GIA ≈ 9 × 10⁻⁸ is the asymptotic α excess
+// (the value α had at full glacial loading, before any rebound). This form
+// automatically satisfies the modern boundary condition dα/dt|_t=0 = the
+// satellite-measured rate, AND saturates in deep time (so paleo-era calls
+// don't get unphysical values).
+//
+// Three named physical constants — NO fitting:
+//   • EARTH_MOI_FACTOR        — IERS Conventions 2010 anchor
+//   • EARTH_MOI_FACTOR_RATE_YR — Cox & Chao 2002 satellite measurement, ÷1.5 geometry
+//   • GIA_DECAY_TIMESCALE_YR  — Peltier 2004 mantle-viscosity literature value
+//
+// CRITICAL: α(t) is purely an Earth-INTERNAL mass redistribution. It does NOT
+// transfer angular momentum to the Moon, so the Moon distance evolution
+// (Farhat 2022) and Kepler's 3rd law for the Moon are UNAFFECTED. Only the
+// L_Earth ↔ ω partition shifts at each epoch; L_Total_EM remains conserved.
+const EARTH_MOI_FACTOR_RATE_YR = -1.8e-11;          // dα/dt today, per year (Cox & Chao 2002 ÷ 1.5)
+const GIA_DECAY_TIMESCALE_YR   = 5000;              // τ_GIA, mantle viscoelastic relaxation (Peltier 2004)
+const GIA_ALPHA_ASYMPTOTE      = -EARTH_MOI_FACTOR_RATE_YR * GIA_DECAY_TIMESCALE_YR;
+                                                    // Δα_∞ = 9 × 10⁻⁸; asymptotic excess at full glacial loading
+
+/** α(t) — polar moment coefficient at age t_Ma (millions of years before J2000). */
+function earthMoiFactorAtAge(t_Ma) {
+  // Past (t_age ≥ 0): viscoelastic relaxation toward today; bounded asymptote ⇒ stable at deep paleo.
+  // Future (t_age < 0): linear extrapolation at today's measured rate.
+  // Continuous and smooth at t_age = 0 (both branches agree on value AND first derivative).
+  const t_age_yr = t_Ma * 1e6;
+  if (t_age_yr >= 0) {
+    return EARTH_MOI_FACTOR + GIA_ALPHA_ASYMPTOTE * (1 - Math.exp(-t_age_yr / GIA_DECAY_TIMESCALE_YR));
+  }
+  return EARTH_MOI_FACTOR - EARTH_MOI_FACTOR_RATE_YR * t_age_yr;
+}
+
+/** I_Earth(t) = α(t) · M · R² */
+function iEarthAtAge(t_Ma) {
+  return earthMoiFactorAtAge(t_Ma) * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
+}
 
 // ───── Solar physics constants (Driver 2 — mass loss) ─────
 const L_SUN_W              = 3.828e26;              // IAU 2015 nominal solar luminosity (W)
@@ -4607,7 +4675,10 @@ function meanMoonDistanceMetresAtAge(t_Ma) {
 function meanLodSecondsAtAge(t_Ma) {
   const a = meanMoonDistanceMetresAtAge(t_Ma);
   if (a <= 0 || a >= A_LOCK_M) return null;
-  return (2 * Math.PI * I_EARTH) /
+  // L_Earth(t) = L_Total − L_Moon(t)     [Earth-Moon angular momentum conservation; tidal channel]
+  // ω(t)      = L_Earth(t) / I_Earth(t)  [where I_Earth varies with α(t) via GIA — Cox & Chao 2002]
+  // LOD(t)    = 2π / ω(t)
+  return (2 * Math.PI * iEarthAtAge(t_Ma)) /
          (L_TOTAL_EM_KGM2_S - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
 }
 
@@ -4700,6 +4771,229 @@ function meanDeltaTSecondsAtAge(t_Ma) {
   }
   _DELTA_T_CACHE.set(t_Ma, result);
   return result;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// MODULE-LEVEL ASTRONOMY HELPERS FOR ECLIPSE FINDING
+//
+// Module-level versions of the Meeus Ch. 47 Moon polynomial + Meeus Ch. 25
+// Sun polynomial used by `findLunarEclipsesInRange` (and a future
+// `findSolarEclipsesInRange`). The existing Console Tests F12 buttons each
+// have their own LOCAL copies of these functions (~4 duplicates), historical
+// reasons. Future work could refactor those to use these module-level versions
+// — but for now they coexist (the module-level versions are isolated under
+// `_ecl*` names to avoid scope collisions with the local copies).
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Pure-tidal ΔT at given JD, in seconds. Wraps meanDeltaTSecondsAtAge for
+ *  callers that have a JD instead of a t_Ma. Returns 0 if formula undefined. */
+function _eclDeltaT(jd) {
+  const decYear = julianDateToDecimalYear(jd);
+  const t_Ma    = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+  const dT      = meanDeltaTSecondsAtAge(t_Ma);
+  return Number.isFinite(dT) ? dT : 0;
+}
+
+/** Sun's geocentric ecliptic longitude in degrees (0–360) at given JD.
+ *  Meeus Ch. 25 low-precision formula. Accepts JD_UT; converts internally to
+ *  JD_TT via _eclDeltaT. */
+function _eclSunLon(jd) {
+  const _d2r = Math.PI / 180;
+  const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
+  const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+  const M  = (357.52911 + 35999.05029 * T - 0.0001537 * T * T) * _d2r;
+  const C  = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
+           + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
+           + 0.000289 * Math.sin(3 * M);
+  return ((L0 + C) % 360 + 360) % 360;
+}
+
+/** Moon's geocentric ecliptic longitude in degrees (0–360). Meeus Ch. 47 full
+ *  series (60 longitude terms from MOON_L). Geocentric accuracy ~0.04° RMS
+ *  near J2000. Accepts JD_UT; converts internally to JD_TT via _eclDeltaT. */
+function _eclMoonLon(jd) {
+  const _d2r = Math.PI / 180;
+  const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
+  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+  const Lp_mean = 218.3164477 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841 - T4 / 65194000;
+  const Dr  = ((297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000) % 360) * _d2r;
+  const Mr  = ((357.5291092 +  35999.0502909 * T - 0.0001536 * T2 + T3 / 24490000) % 360) * _d2r;
+  const Mpr = ((134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000) % 360) * _d2r;
+  const Fr  = (( 93.2720950 + 483202.0175233 * T - 0.0036539 * T2 - T3 / 3526000 + T4 / 863310000) % 360) * _d2r;
+  const E = 1 - 0.002516 * T - 0.0000074 * T2;
+  const E2 = E * E;
+  let Sl = 0;
+  for (let i = 0; i < MOON_L.length; i++) {
+    const r = MOON_L[i];
+    const arg = r[0] * Dr + r[1] * Mr + r[2] * Mpr + r[3] * Fr;
+    let term = r[4] * Math.sin(arg);
+    const absM = r[1] < 0 ? -r[1] : r[1];
+    if (absM === 1) term *= E;
+    else if (absM === 2) term *= E2;
+    Sl += term;
+  }
+  const A1 = (119.75 +    131.849 * T) * _d2r;
+  const A2 = ( 53.09 + 479264.290 * T) * _d2r;
+  Sl += 3958 * Math.sin(A1) + 1962 * Math.sin(Lp_mean * _d2r - Fr) + 318 * Math.sin(A2);
+  return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+}
+
+/** Moon's instantaneous geocentric distance in km. First-order harmonic
+ *  approximation: D ≈ a × (1 − e × cos M'), accurate to ~0.1% (well within
+ *  the ~1% range that affects lunar-eclipse type classification at the umbra
+ *  boundary). Uses model-level moonDistance (mean, mutable for deep-time) and
+ *  moonOrbitalEccentricityBase plus the Meeus mean lunar anomaly M' at JD.
+ *  Refinement (future): full Meeus Ch. 47 distance series for ~10-km accuracy. */
+function _eclMoonDistance(jd) {
+  const _d2r = Math.PI / 180;
+  const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
+  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+  const Mpr = ((134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000) % 360) * _d2r;
+  return moonDistance * (1 - moonOrbitalEccentricityBase * Math.cos(Mpr));
+}
+
+/** Moon's geocentric ecliptic latitude in degrees. Meeus Ch. 47 (MOON_B). */
+function _eclMoonBeta(jd) {
+  const _d2r = Math.PI / 180;
+  const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
+  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+  const Dr  = ((297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000) % 360) * _d2r;
+  const Mr  = ((357.5291092 +  35999.0502909 * T - 0.0001536 * T2 + T3 / 24490000) % 360) * _d2r;
+  const Mpr = ((134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000) % 360) * _d2r;
+  const Fr  = (( 93.2720950 + 483202.0175233 * T - 0.0036539 * T2 - T3 / 3526000 + T4 / 863310000) % 360) * _d2r;
+  const E = 1 - 0.002516 * T - 0.0000074 * T2;
+  const E2 = E * E;
+  let Sb = 0;
+  for (let i = 0; i < MOON_B.length; i++) {
+    const r = MOON_B[i];
+    const arg = r[0] * Dr + r[1] * Mr + r[2] * Mpr + r[3] * Fr;
+    let term = r[4] * Math.sin(arg);
+    const absM = r[1] < 0 ? -r[1] : r[1];
+    if (absM === 1) term *= E;
+    else if (absM === 2) term *= E2;
+    Sb += term;
+  }
+  return Sb * 1e-6;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// LUNAR ECLIPSE PREDICTIVE FINDER
+//
+// Scans a JD range and returns all lunar-eclipse-class oppositions where the
+// Moon enters Earth's shadow. All geometry derived from model constants
+// (moonDistance, currentAUDistance, R_EARTH_M, diameters.moonDiameter) so the
+// thresholds auto-update under deep-time mode (Moon was closer at Devonian →
+// slightly different angular shadow sizes).
+//
+// Classification (geocentric Moon ecliptic latitude β at opposition):
+//   |β| ≤ (umbra_R − moon_R)   → Total umbral
+//   |β| ≤ (umbra_R + moon_R)   → Partial umbral
+//   |β| ≤ (penumbra_R + moon_R) → Penumbral only
+//   |β| larger                  → No eclipse
+//
+// Umbral magnitude (fraction of Moon diameter within umbra at maximum):
+//   m_umbral = (umbra_R + moon_R − |β|) / (2 × moon_R)
+//
+// EPOCH SENSITIVITY: thresholds are computed once at function entry from the
+// CURRENT scene-state values of moonDistance/currentAUDistance. For a one-shot
+// scan near the simulation's current epoch this is correct. For deep-time
+// bidirectional NASA comparison spanning −2000 to +3000 (Phase L-4), per-event
+// geometry recomputation is the better choice — see TODO below.
+//
+// Returns array of {jd, beta, type, magnitudeUmbral, magnitudePenumbral}.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Find all lunar-eclipse-class oppositions in [jdStart, jdEnd]. */
+function findLunarEclipsesInRange(jdStart, jdEnd) {
+  // Step size: small fraction of synodic month for reliable zero-crossing
+  // detection. Synodic motion ≈ 360° / moonSynodicMonth ≈ 12.19°/day at J2000.
+  // moonSynodicMonth/60 ≈ 0.49 d → ~6° diff change per step (well clear of the
+  // 30° wrap-filter threshold).
+  const STEP_DAYS = moonSynodicMonth / 60;
+
+  // Per-event-distance geometry — body sizes are model constants; the shadow
+  // angular radii are computed PER OPPOSITION using each event's Moon distance
+  // (perigee vs apogee varies the threshold by ~5.5%, which dominates the
+  // type-classification at boundary cases). Sun distance variation (~0.5%
+  // from Earth orbital eccentricity) is currently neglected — uses scene-state
+  // currentAUDistance — refinement deferred (Phase L-4).
+  const _rad2deg   = 180 / Math.PI;
+  const R_EARTH_KM = R_EARTH_M / 1000;
+  const R_MOON_KM  = diameters.moonDiameter / 2;
+  const R_SUN_KM   = diameters.sunDiameter / 2;
+  const D_SUN_KM   = currentAUDistance;
+  const umbraApex_rad    = Math.atan((R_SUN_KM - R_EARTH_KM) / D_SUN_KM);
+  const penumbraApex_rad = Math.atan((R_SUN_KM + R_EARTH_KM) / D_SUN_KM);
+
+  // Compute classification thresholds (in degrees) for a given Moon distance D.
+  // Returns {moonR, umbraR, penumbraR, totalMax, partialMax, penumMax}.
+  const _shadowGeometry = (D_MOON_KM) => {
+    const moonR   = Math.atan(R_MOON_KM / D_MOON_KM) * _rad2deg;
+    const umbraR  = Math.atan((R_EARTH_KM - D_MOON_KM * Math.tan(umbraApex_rad))    / D_MOON_KM) * _rad2deg;
+    const penumR  = Math.atan((R_EARTH_KM + D_MOON_KM * Math.tan(penumbraApex_rad)) / D_MOON_KM) * _rad2deg;
+    return {
+      moonR, umbraR, penumR,
+      totalMax:   umbraR - moonR,
+      partialMax: umbraR + moonR,
+      penumMax:   penumR + moonR,
+    };
+  };
+
+  // Wrapped opposition diff: 0 means Moon at opposition (Sun + 180°)
+  const oppDiff = (jd) => {
+    let d = _eclMoonLon(jd) - _eclSunLon(jd) - 180;
+    while (d > 180) d -= 360;
+    while (d <= -180) d += 360;
+    return d;
+  };
+
+  const results = [];
+  let prevJD   = jdStart;
+  let prevDiff = oppDiff(prevJD);
+
+  for (let jd = jdStart + STEP_DAYS; jd <= jdEnd; jd += STEP_DAYS) {
+    const d = oppDiff(jd);
+    // Zero-crossing detection: sign change from − to + with no wrap discontinuity
+    if (prevDiff < 0 && d >= 0 && (d - prevDiff) < 30) {
+      // Bisect to refine opposition to ~1-second precision
+      let lo = prevJD, hi = jd;
+      for (let i = 0; i < 40; i++) {
+        const mid = (lo + hi) / 2;
+        if (oppDiff(mid) < 0) lo = mid; else hi = mid;
+        if (hi - lo < 1 / 86400) break;
+      }
+      const jdOpp = (lo + hi) / 2;
+      const beta  = _eclMoonBeta(jdOpp);
+      const absB  = Math.abs(beta);
+
+      // Per-event shadow geometry using actual Moon distance at this opposition.
+      // Closes the ~5.5% perigee/apogee variation in classification threshold.
+      const D_moon_jd = _eclMoonDistance(jdOpp);
+      const G = _shadowGeometry(D_moon_jd);
+
+      let type = null;
+      if      (absB <= G.totalMax)   type = 'Total';
+      else if (absB <= G.partialMax) type = 'Partial';
+      else if (absB <= G.penumMax)   type = 'Penumbral';
+
+      if (type) {
+        const magUmbral    = Math.max(0, (G.partialMax - absB) / (2 * G.moonR));
+        const magPenumbral = Math.max(0, (G.penumMax   - absB) / (2 * G.moonR));
+        results.push({
+          jd:                 jdOpp,
+          beta:               beta,
+          moonDistance_km:    D_moon_jd,
+          type:               type,
+          magnitudeUmbral:    magUmbral,    // 0 for Penumbral-only; (0,1) Partial; ≥1 Total
+          magnitudePenumbral: magPenumbral,
+        });
+      }
+    }
+    prevDiff = d;
+    prevJD   = jd;
+  }
+
+  return results;
 }
 
 /** Tropical year in SI 86400-s days at given epoch. Phase 9.2 sDay anchor —
@@ -17662,6 +17956,84 @@ async function loadWGCData() {
   }
 }
 
+let _stephensonLunar = null;
+async function loadStephensonLunar() {
+  if (_stephensonLunar) return _stephensonLunar;
+  const urls = [
+    'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/lunar-eclipses-stephenson-2016.json',
+    'input/lunar-eclipses-stephenson-2016.json',
+    './input/lunar-eclipses-stephenson-2016.json',
+  ];
+  let lastErr;
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} from ${url}`); continue; }
+      const text = await res.text();
+      if (text.trimStart().startsWith('<')) { lastErr = new Error(`${url} returned HTML (SPA fallback)`); continue; }
+      _stephensonLunar = JSON.parse(text);
+      console.log(`Loaded Stephenson 2016 Lunar Observations: ${_stephensonLunar.entries.length} events from ${url}`);
+      return _stephensonLunar;
+    } catch (e) { lastErr = e; }
+  }
+  console.error('Failed to load Stephenson Lunar from any source. Last error:', lastErr);
+  return null;
+}
+
+let _documentedLunar = null;
+async function loadDocumentedLunarEclipses() {
+  if (_documentedLunar) return _documentedLunar;
+  const urls = [
+    'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/lunar-eclipses-documented.json',
+    'input/lunar-eclipses-documented.json',
+    './input/lunar-eclipses-documented.json',
+  ];
+  let lastErr;
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} from ${url}`); continue; }
+      const text = await res.text();
+      if (text.trimStart().startsWith('<')) { lastErr = new Error(`${url} returned HTML (SPA fallback)`); continue; }
+      _documentedLunar = JSON.parse(text);
+      console.log(`Loaded Documented Lunar Eclipses: ${_documentedLunar.entries.length} events from ${url}`);
+      return _documentedLunar;
+    } catch (e) { lastErr = e; }
+  }
+  console.error('Failed to load Documented Lunar Eclipses from any source. Last error:', lastErr);
+  return null;
+}
+
+let _nasaLunarCanon = null;
+async function loadNasaLunarCanon() {
+  if (_nasaLunarCanon) return _nasaLunarCanon;
+  // Order: GitHub raw (canonical, works in production), local Parcel paths (work
+  // in dev when public/ is symlinked or the file is copied into src/). Parcel's
+  // SPA fallback returns index.html with HTTP 200 for unknown paths, so we must
+  // also catch JSON.parse failures rather than trusting res.ok alone.
+  const urls = [
+    'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/lunar-eclipses-nasa.json',
+    'input/lunar-eclipses-nasa.json',
+    './input/lunar-eclipses-nasa.json',
+  ];
+  let lastErr;
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} from ${url}`); continue; }
+      const text = await res.text();
+      if (text.trimStart().startsWith('<')) { lastErr = new Error(`${url} returned HTML (SPA fallback)`); continue; }
+      _nasaLunarCanon = JSON.parse(text);
+      console.log(`Loaded NASA Lunar Canon: ${_nasaLunarCanon.entries.length} events from ${url}`);
+      return _nasaLunarCanon;
+    } catch (e) { lastErr = e; }
+  }
+  console.error('Failed to load NASA Lunar Canon from any source. Last error:', lastErr);
+  console.error('Fix: commit public/input/lunar-eclipses-nasa.json to GitHub (main branch)');
+  console.error('  or symlink it into src/ so Parcel dev server can serve it.');
+  return null;
+}
+
 function wgcUnwrap(angles) {
   const out = [angles[0]];
   for (let i = 1; i < angles.length; i++) {
@@ -24836,6 +25208,99 @@ o.julianDay      = dateTimeToJulianDay(o.Date, o.Time);
 const pInit      = dayToDateNew(o.julianDay, 'julianday', 'perihelion-calendar');
 o.perihelionDate = `${pInit.date} ${pInit.time}`;
 
+// Well-known historical solar eclipses — consumed by the Solar & Lunar Eclipses
+// tweakpane folder constructed inside setupGUI() below. Must be declared BEFORE
+// the setupGUI() call so the const isn't in temporal dead zone when the folder's
+// _solarEclRefresh() runs at GUI construction time.
+// JD values are time of greatest eclipse in UT. The 8 modern/landmark entries
+// are computed from NASA SE-Canon UT times via calToJD. The 17 ancient entries
+// (added 2026-06) come from our Moon polynomial's predicted conjunction JD —
+// same physics used in the Historical Eclipses & ΔT analysis buttons.
+// γ is the Moon path-centerline offset (β-derived for new entries). The
+// simulation interprets JD as TT; for visual eclipse verification, the small
+// ΔT shift (~70 sec modern, ~1500 sec at 1133 AD, ~17000 sec at 584 BC)
+// appears as a fraction-of-a-degree Moon offset and remains within the Meeus
+// polynomial error budget documented in doc 66.
+const ECLIPSE_PRESETS = [
+  // Modern + 20th c.
+  { jd: 2460409.262050, label: '2024 Apr 8 Total',         loc: 'Mexico → Texas → Maine',                  gamma: 0.343,  era: 'Modern' },
+  { jd: 2457987.267733, label: '2017 Aug 21 Total',        loc: 'Coast-to-coast USA',                      gamma: 0.437,  era: 'Modern' },
+  { jd: 2451401.960508, label: '1999 Aug 11 Total',        loc: 'Europe → Middle East',                    gamma: 0.506,  era: '20th c.' },
+  { jd: 2441863.985208, label: '1973 Jun 30 Total',        loc: 'Africa (longest of 20th c.)',             gamma: 0.072,  era: '20th c.' },
+  { jd: 2422108.047858, label: '1919 May 29 Total',        loc: 'Príncipe — Eddington/GR',                 gamma: 0.596,  era: '20th c.' },
+  // Early modern
+  { jd: 2347572.902675, label: '1715 May 3 Total',         loc: 'England — Halley predicted',              gamma: 0.0,    era: '18th c.' },
+  { jd: 2325394.925106, label: '1654 Aug 12 Total',        loc: 'England — European total (Gregorian)',    gamma: 0.489,  era: '17th c.' },
+  // Medieval
+  { jd: 2173756.000111, label: '1239 Jun 3 Total',         loc: 'Tuscany — Cerchiari chronicle',           gamma: 0.325,  era: 'Medieval' },
+  { jd: 2154000.058445, label: '1185 May 1 Annular',       loc: "Russia — Igor's Tale Primary Chronicle",  gamma: 0.541,  era: 'Medieval' },
+  { jd: 2135100.070833, label: '1133 Aug 2 Total',         loc: 'England — King Henry I',                  gamma: -0.243, era: 'Medieval' },
+  { jd: 2087792.051441, label: '1004 Jan 24 Annular',      loc: 'Cairo — Ibn Yunus famous observation',    gamma: 0.226,  era: 'Medieval' },
+  { jd: 2083982.839931, label: '993 Aug 20 Annular',       loc: 'Cairo — Ibn Yunus Hakemite Tables',       gamma: 0.242,  era: 'Medieval' },
+  { jd: 2081030.093891, label: '985 Jul 20 Annular',       loc: 'Cairo — Said-Stephenson catalog',         gamma: 0.284,  era: 'Medieval' },
+  { jd: 2078785.134930, label: '979 May 28 Annular',       loc: 'Cairo — Said-Stephenson catalog',         gamma: 0.603,  era: 'Medieval' },
+  { jd: 2078431.006474, label: '978 Jun 8 Annular',        loc: 'Cairo — Said-Stephenson catalog',         gamma: -0.110, era: 'Medieval' },
+  { jd: 2078253.853718, label: '977 Dec 13 Total',         loc: 'Cairo (partial) — NASA total at 3°N,55°E', gamma: 0.458, era: 'Medieval' },
+  // Classical antiquity
+  { jd: 1747068.890110, label: '71 Mar 20 Total',          loc: 'Aegean — Plutarch De Facie 19',           gamma: 0.635,  era: 'Classical' },
+  // Ancient
+  { jd: 1671853.759762, label: '-135 Apr 15 Total',        loc: 'Babylon — best-preserved diary',          gamma: 0.719,  era: 'Ancient' },
+  { jd: 1608421.835171, label: '-309 Aug 15 Total',        loc: 'Babylon — Antigonus death era',           gamma: 0.348,  era: 'Ancient' },
+  { jd: 1564215.113895, label: '-430 Aug 3 Annular',       loc: 'Athens — Thucydides 2.28',                gamma: 0.798,  era: 'Ancient' },
+  { jd: 1518118.032841, label: '-556 May 19 Partial',      loc: 'Babylon — Nabonidus reign',               gamma: 0.307,  era: 'Ancient' },
+  { jd: 1507900.065279, label: '-584 May 28 Total',        loc: 'Anatolia — Thales predicted',             gamma: 0.353,  era: 'Ancient' },
+  { jd: 1484836.848499, label: '-647 Apr 6 Partial',       loc: 'Babylon — early astronomical diary',      gamma: 0.705,  era: 'Ancient' },
+  { jd: 1462658.779682, label: '-708 Jul 17 Total',        loc: 'Lu State — Chinese Spring/Autumn Annals', gamma: 0.484,  era: 'Ancient' },
+  { jd: 1442902.839207, label: '-762 Jun 15 Total',        loc: 'Nineveh — Bur-Sagale Assyrian Eponym',    gamma: 0.275,  era: 'Ancient' },
+];
+// Current selected eclipse index (mutable across button clicks)
+const _eclipseState = { idx: 0 };
+
+// Curated historical lunar eclipses — canonical source is
+// public/input/lunar-eclipses-historical.json; embedded here for synchronous
+// access at setupGUI() time (same TDZ avoidance pattern as ECLIPSE_PRESETS).
+// 13 events spanning −721 BCE to 2025 CE. Sourced from NASA Lunar Canon
+// (modern), Said & Stephenson 1996 (Ibn Yunus), and Stephenson 1997 (ancient).
+// Expansion via NASA Lunar Canon subset is Commit 3 (Phase L-3).
+// Schema: { jd, label, type, magnitude_umbral, visibility, era, source }
+//   - jd:               Julian Date (UT) of greatest eclipse
+//   - type:             'Total' / 'Partial' / 'Penumbral' (NASA classification)
+//   - magnitude_umbral: Fraction of Moon diameter within umbra at maximum
+//   - visibility:       Continents/regions where Moon was above horizon
+//   - era:              'Modern' / 'Medieval' / 'Classical' / 'Ancient' (display tag)
+//   - source:           Documentary reference
+// NOTE: This seed catalog contains ONLY directly NASA-Lunar-Canon-verified events from
+// the 2020-2025 window — the same events the "Verify Lunar Eclipse Finder" console test
+// cross-checks our predictive finder against. The previous draft had unverified Early-
+// Modern / Medieval / Classical / Ancient entries with mis-curated JDs (e.g., JD 2086877.5
+// labeled "1001 Sep 5" actually decodes to 1001 Jul 24). Those have been removed.
+//
+// To safely expand the catalog:
+//   1. Run console test "Discover lunar eclipses in a year range" to list model-predicted
+//      oppositions in a given era (default 1000-1010 CE).
+//   2. Cross-reference the model-predicted JDs against an authoritative source (NASA Lunar
+//      Canon, Stephenson 1997, Said & Stephenson 1996) to confirm the event was documented.
+//   3. Add the verified entry below.
+//   4. Run "Validate LUNAR_ECLIPSE_PRESETS catalog entries" to confirm JD↔label↔model match.
+// Phase L-3 (NASA Lunar Canon JSON import) will systematize this for the -2000…+3000 range.
+const LUNAR_ECLIPSE_PRESETS = [
+  { jd: 2460926.2582, label: '2025 Sep 7 Total',    type: 'Total',     magnitude_umbral: 1.367, visibility: 'Europe, Africa, Asia, Australia',                era: 'Modern', source: 'NASA Lunar Canon' },
+  { jd: 2460748.7908, label: '2025 Mar 14 Total',   type: 'Total',     magnitude_umbral: 1.183, visibility: 'Americas, Western Europe, West Africa',          era: 'Modern', source: 'NASA Lunar Canon' },
+  { jd: 2460571.6140, label: '2024 Sep 18 Partial', type: 'Partial',   magnitude_umbral: 0.085, visibility: 'Americas, Europe, Africa',                       era: 'Modern', source: 'NASA Lunar Canon — shallow partial' },
+  { jd: 2460394.8006, label: '2024 Mar 25 Penumbral', type: 'Penumbral', magnitude_umbral: 0,   visibility: 'Americas, Europe, Africa',                       era: 'Modern', source: 'NASA Lunar Canon — Worm Moon penumbral' },
+  { jd: 2460246.3431, label: '2023 Oct 28 Partial', type: 'Partial',   magnitude_umbral: 0.122, visibility: 'Europe, Africa, Asia, Australia',                era: 'Modern', source: 'NASA Lunar Canon — shallow partial' },
+  { jd: 2460070.2246, label: '2023 May 5 Penumbral', type: 'Penumbral', magnitude_umbral: 0,    visibility: 'Africa, Asia, Australia',                        era: 'Modern', source: 'NASA Lunar Canon — deep penumbral' },
+  { jd: 2459891.9577, label: '2022 Nov 8 Total',    type: 'Total',     magnitude_umbral: 1.359, visibility: 'Asia, Australia, Pacific, Americas',             era: 'Modern', source: 'NASA Lunar Canon' },
+  { jd: 2459715.6747, label: '2022 May 16 Total',   type: 'Total',     magnitude_umbral: 1.414, visibility: 'Americas, Europe, Africa',                       era: 'Modern', source: 'NASA Lunar Canon' },
+  { jd: 2459537.8770, label: '2021 Nov 19 Partial', type: 'Partial',   magnitude_umbral: 0.974, visibility: 'Americas, Northern Europe, Eastern Asia, Pacific', era: 'Modern', source: 'NASA Lunar Canon — near-total Beaver Moon' },
+  { jd: 2459360.9713, label: '2021 May 26 Total',   type: 'Total',     magnitude_umbral: 1.009, visibility: 'Pacific, Americas, Eastern Asia, Australia',     era: 'Modern', source: 'NASA Lunar Canon — Super Flower Blood Moon (perigee, 14-min totality)' },
+  { jd: 2459183.9047, label: '2020 Nov 30 Penumbral', type: 'Penumbral', magnitude_umbral: 0,   visibility: 'Americas, Pacific, Eastern Asia, Australia',     era: 'Modern', source: 'NASA Lunar Canon — Beaver Moon penumbral' },
+  { jd: 2459035.6879, label: '2020 Jul 5 Penumbral', type: 'Penumbral', magnitude_umbral: 0,    visibility: 'Americas, Western Africa',                       era: 'Modern', source: 'NASA Lunar Canon' },
+  { jd: 2459006.3091, label: '2020 Jun 5 Penumbral', type: 'Penumbral', magnitude_umbral: 0,    visibility: 'Europe, Africa, Asia, Australia',                era: 'Modern', source: 'NASA Lunar Canon' },
+  { jd: 2458859.2987, label: '2020 Jan 10 Penumbral', type: 'Penumbral', magnitude_umbral: 0,   visibility: 'Europe, Africa, Asia, Australia',                era: 'Modern', source: 'NASA Lunar Canon — Wolf Moon penumbral' },
+];
+const _lunarEclipseState = { idx: 0 };
+
 setupGUI()
 function setupGUI() {
   const gui = new Pane({ title: 'Fibonacci Laws of Planetary Motion', expanded: true });
@@ -25742,6 +26207,229 @@ function setupGUI() {
     const dt = periDetailEls[geoKey];
     if (dt && dt.bladeEl) dt.bladeEl.after(dt.row);
   });
+
+  // ── Solar & Lunar Eclipses — top-level, observed category ──
+  // Catalog of well-known historical eclipses with Prev/Next navigation that
+  // jumps the simulation to the eclipse JD and switches the camera to Earth
+  // view (so the user sees the eclipse from the right vantage point — the
+  // previous planetStats-Moon UI showed the Moon perspective which is wrong).
+  // Data: ECLIPSE_PRESETS at ~line 39006; nav: jumpToEclipsePreset(idx).
+  const eclipsesFolder = gui.addFolder({ title: 'Solar & Lunar Eclipses', expanded: false });
+  eclipsesFolder.element.dataset.category = 'observed';
+  addFolderTooltip(eclipsesFolder, 'Well-known historical solar and lunar eclipses. Prev/Next jumps the simulation to that eclipse moment and auto-switches the camera to Earth view (the eclipse-observer perspective).');
+
+  // ── Solar Eclipses subfolder (expanded by default) ──
+  const solarEclFolder = eclipsesFolder.addFolder({
+    title: 'Solar Eclipses (' + ECLIPSE_PRESETS.length + ' entries)',
+    expanded: true,
+  });
+
+  // Improvement B: narrower label column (30%) for this folder so the value
+  // column has more room for long Location / Eclipse Details strings. Default
+  // is 40% (set in style.css as --tp-blade-label-width). CSS variable cascades
+  // only to descendants of this folder's root element, so other folders are
+  // unaffected.
+  solarEclFolder.element.style.setProperty('--tp-blade-label-width', '30%');
+
+  // Improvement A: dynamic folder title. After first navigation, the title
+  // shows the position counter ("Solar Eclipses · 7 of 25") instead of cramming
+  // "(7/25)" into the Eclipse Details value (which was getting truncated).
+  const _solarEclTitleEl = solarEclFolder.element.querySelector('.tp-fldv_t');
+  const _updateSolarEclTitle = () => {
+    if (!_solarEclTitleEl) return;
+    _solarEclTitleEl.textContent = _eclipseNavigated
+      ? `Solar Eclipses · ${_eclipseState.idx + 1} of ${ECLIPSE_PRESETS.length}`
+      : `Solar Eclipses (${ECLIPSE_PRESETS.length} entries)`;
+  };
+
+  // Storage for the 4 read-only display fields. Initialized with placeholder
+  // strings so the panel doesn't pretend the simulation is at any specific
+  // eclipse on app load (the actual sim date is whatever the user navigated to
+  // last). Real values are populated on the first Prev/Next click via
+  // _navigateSolarEcl below. Stored as strings (already-formatted) so the
+  // bindings can render the "—" placeholder cleanly.
+  o.eclipseSolarLabel = '— (click ‹ Prev / Next › to navigate) —';
+  o.eclipseSolarLoc   = '—';
+  o.eclipseSolarGamma = '—';
+  o.eclipseSolarJD    = '—';
+
+  const solarEclBindings = [
+    solarEclFolder.addBinding(o, 'eclipseSolarLabel', { label: 'Eclipse Details', readonly: true }),
+    solarEclFolder.addBinding(o, 'eclipseSolarLoc',   { label: 'Location',        readonly: true }),
+    solarEclFolder.addBinding(o, 'eclipseSolarGamma', { label: 'γ',               readonly: true }),
+    solarEclFolder.addBinding(o, 'eclipseSolarJD',    { label: 'JD (UT)',         readonly: true }),
+  ];
+
+  // Indices in solarEclBindings of the fields whose values can exceed the
+  // visible value-column width even after Improvement B (Eclipse Details and
+  // Location). These get a hover tooltip with the full text — see
+  // _solarEclRefresh below.
+  const _eclLongFieldIdx = [0, 1];
+
+  // Track whether the user has navigated at least once. Until they have, the
+  // panel shows the placeholder strings above (avoiding the confusing state
+  // where the display says "2024 Apr 8 Total" but the sim is at a different
+  // date). First Prev → wraps to oldest entry; first Next → goes to most recent.
+  let _eclipseNavigated = false;
+
+  const _solarEclRefresh = () => {
+    const cur = ECLIPSE_PRESETS[_eclipseState.idx];
+    o.eclipseSolarLabel = cur.label;  // Improvement A: counter moved to folder title; just show eclipse name here.
+    o.eclipseSolarLoc   = cur.loc;
+    o.eclipseSolarGamma = cur.gamma.toFixed(3);
+    o.eclipseSolarJD    = cur.jd.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 });
+    solarEclBindings.forEach(b => b.refresh());
+    // After refresh, update hover tooltips for the long-text fields so the user
+    // can read the full Eclipse Details / Location even when they get visually
+    // truncated by the value column's fixed width.
+    _eclLongFieldIdx.forEach(i => {
+      solarEclBindings[i].element.title =
+        (i === 0) ? o.eclipseSolarLabel : o.eclipseSolarLoc;
+    });
+    // Improvement A: update folder title with current position counter.
+    _updateSolarEclTitle();
+  };
+
+  // Navigate to ±1 from the current eclipse and jump the simulation to that JD.
+  // ECLIPSE_PRESETS is ordered most-recent-first (idx 0 = 2024, idx N-1 = -762),
+  // so "forward in time" = idx DECREMENT and "backward in time" = idx INCREMENT.
+  // Pass delta=+1 for backward-in-time (Prev), delta=-1 for forward-in-time (Next).
+  // First-click bootstrap: first Prev → idx 0 (most recent), first Next → idx N-1
+  // (oldest) — so subsequent clicks step naturally in the chosen time direction.
+  // Wrap: Next at most-recent (2024) wraps to oldest (-762); Prev at oldest wraps
+  // to most recent. Does NOT change planet/camera selection.
+  const _navigateSolarEcl = (delta) => {
+    let targetIdx;
+    if (!_eclipseNavigated) {
+      // First click: Prev (delta +1) → most recent; Next (delta -1) → oldest.
+      targetIdx = (delta > 0) ? 0 : ECLIPSE_PRESETS.length - 1;
+      _eclipseNavigated = true;
+    } else {
+      targetIdx = _eclipseState.idx + delta;
+    }
+    jumpToEclipsePreset(targetIdx);  // handles modulo wrap + updates _eclipseState.idx
+    _solarEclRefresh();
+  };
+
+  // Side-by-side button row (same pattern as the Balanced Year JD nav buttons,
+  // see _dt_makeBalancedJdButtonRow at line ~26120). Tweakpane's addButton()
+  // stacks vertically; this custom row uses Element.after() to inject a 2-button
+  // toolbar immediately after the last binding's blade.
+  const _eclLastBladeEl = solarEclBindings[solarEclBindings.length - 1].element;
+  const _eclBtnRow = document.createElement('div');
+  _eclBtnRow.className = 'tp-nav-toolbar';
+  const _mkEclBtn = (labelHTML, tip, onClick) => {
+    const btn = document.createElement('button');
+    btn.className = 'tp-nav-btn';
+    btn.innerHTML = `<span class="tp-nav-label" style="font-size:11px;">${labelHTML}</span>`;
+    btn.title = tip;
+    btn.setAttribute('aria-label', tip);
+    btn.addEventListener('click', onClick);
+    return btn;
+  };
+  _eclBtnRow.appendChild(_mkEclBtn('‹ Jump to Prev',
+    'Jump to the previous (older) historical solar eclipse and navigate the simulation to that date.',
+    () => _navigateSolarEcl(+1)));
+  _eclBtnRow.appendChild(_mkEclBtn('Jump to Next ›',
+    'Jump to the next (more recent) historical solar eclipse and navigate the simulation to that date.',
+    () => _navigateSolarEcl(-1)));
+  _eclLastBladeEl.after(_eclBtnRow);
+
+  // ── Lunar Eclipses subfolder (collapsed by default; mirrors Solar layout) ──
+  // Data: LUNAR_ECLIPSE_PRESETS (canonical source in public/input/lunar-eclipses-historical.json).
+  // Schema differences from Solar:
+  //   - "Location" → "Visibility" (lunar = whole night-side hemisphere, not a single path)
+  //   - "γ" → "Magnitude (umbral)" (NASA-standard lunar metric)
+  const lunarEclFolder = eclipsesFolder.addFolder({
+    title: 'Lunar Eclipses (' + LUNAR_ECLIPSE_PRESETS.length + ' entries)',
+    expanded: false,
+  });
+
+  // Narrower label column to match Solar subfolder (Improvement B for both).
+  lunarEclFolder.element.style.setProperty('--tp-blade-label-width', '30%');
+
+  // Dynamic folder title with position counter after first navigation.
+  const _lunarEclTitleEl = lunarEclFolder.element.querySelector('.tp-fldv_t');
+  const _updateLunarEclTitle = () => {
+    if (!_lunarEclTitleEl) return;
+    _lunarEclTitleEl.textContent = _lunarEclNavigated
+      ? `Lunar Eclipses · ${_lunarEclipseState.idx + 1} of ${LUNAR_ECLIPSE_PRESETS.length}`
+      : `Lunar Eclipses (${LUNAR_ECLIPSE_PRESETS.length} entries)`;
+  };
+
+  // Placeholder values shown before user navigates.
+  o.eclipseLunarLabel       = '— (click ‹ Prev / Next › to navigate) —';
+  o.eclipseLunarVisibility  = '—';
+  o.eclipseLunarType        = '—';
+  o.eclipseLunarMagUmbral   = '—';
+  o.eclipseLunarJD          = '—';
+
+  const lunarEclBindings = [
+    lunarEclFolder.addBinding(o, 'eclipseLunarLabel',      { label: 'Eclipse Details',     readonly: true }),
+    lunarEclFolder.addBinding(o, 'eclipseLunarVisibility', { label: 'Visibility',          readonly: true }),
+    lunarEclFolder.addBinding(o, 'eclipseLunarType',       { label: 'Type',                readonly: true }),
+    lunarEclFolder.addBinding(o, 'eclipseLunarMagUmbral',  { label: 'Magnitude (umbral)',  readonly: true }),
+    lunarEclFolder.addBinding(o, 'eclipseLunarJD',         { label: 'JD (UT)',             readonly: true }),
+  ];
+
+  // Indices in lunarEclBindings whose values may overflow column width
+  // (Eclipse Details, Visibility) — get hover tooltip with full text.
+  const _lunarEclLongFieldIdx = [0, 1];
+
+  // Track first-navigation flag — same UX pattern as solar.
+  let _lunarEclNavigated = false;
+
+  const _lunarEclRefresh = () => {
+    const cur = LUNAR_ECLIPSE_PRESETS[_lunarEclipseState.idx];
+    o.eclipseLunarLabel      = cur.label;
+    o.eclipseLunarVisibility = cur.visibility;
+    o.eclipseLunarType       = cur.type;
+    o.eclipseLunarMagUmbral  = cur.magnitude_umbral.toFixed(3);
+    o.eclipseLunarJD         = cur.jd.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 });
+    lunarEclBindings.forEach(b => b.refresh());
+    _lunarEclLongFieldIdx.forEach(i => {
+      lunarEclBindings[i].element.title =
+        (i === 0) ? o.eclipseLunarLabel : o.eclipseLunarVisibility;
+    });
+    _updateLunarEclTitle();
+  };
+
+  // Navigation: same time-direction convention as solar.
+  //   "Next" (forward in time) → idx DECREMENT (LUNAR_ECLIPSE_PRESETS is ordered most-recent-first)
+  //   "Prev" (backward in time) → idx INCREMENT
+  //   First Prev → idx 0 (most recent); first Next → idx N-1 (oldest)
+  const _navigateLunarEcl = (delta) => {
+    let targetIdx;
+    if (!_lunarEclNavigated) {
+      targetIdx = (delta > 0) ? 0 : LUNAR_ECLIPSE_PRESETS.length - 1;
+      _lunarEclNavigated = true;
+    } else {
+      targetIdx = _lunarEclipseState.idx + delta;
+    }
+    jumpToLunarEclipsePreset(targetIdx);
+    _lunarEclRefresh();
+  };
+
+  // Side-by-side button row (same pattern as solar).
+  const _lunarEclLastBladeEl = lunarEclBindings[lunarEclBindings.length - 1].element;
+  const _lunarEclBtnRow = document.createElement('div');
+  _lunarEclBtnRow.className = 'tp-nav-toolbar';
+  const _mkLunarEclBtn = (labelHTML, tip, onClick) => {
+    const btn = document.createElement('button');
+    btn.className = 'tp-nav-btn';
+    btn.innerHTML = `<span class="tp-nav-label" style="font-size:11px;">${labelHTML}</span>`;
+    btn.title = tip;
+    btn.setAttribute('aria-label', tip);
+    btn.addEventListener('click', onClick);
+    return btn;
+  };
+  _lunarEclBtnRow.appendChild(_mkLunarEclBtn('‹ Jump to Prev',
+    'Jump to the previous (older) historical lunar eclipse and navigate the simulation to that date.',
+    () => _navigateLunarEcl(+1)));
+  _lunarEclBtnRow.appendChild(_mkLunarEclBtn('Jump to Next ›',
+    'Jump to the next (more recent) historical lunar eclipse and navigate the simulation to that date.',
+    () => _navigateLunarEcl(-1)));
+  _lunarEclLastBladeEl.after(_lunarEclBtnRow);
 
   // ── Positions (Invariable Plane) — top-level, calculated category ──
   const invPlaneFolder = gui.addFolder({ title: 'Positions (Invariable Plane)', expanded: false });
@@ -28509,6 +29197,913 @@ function setupGUI() {
      'Stephenson 1991 published Cairo list and Stephenson 1997 finding that Babylonian solar ' +
      'records only span 369 BC – 136 BC. Confirms both anomalies were mis-attributed entries.');
 
+  // ────────────────────────────────────────────────────────────────────────
+  // Lunar Eclipses & Validation
+  // First commit of the lunar eclipse track. The predictive finder
+  // (findLunarEclipsesInRange) scans Earth-Sun-Moon oppositions and classifies
+  // them by Moon geocentric ecliptic latitude vs Earth's shadow geometry.
+  // Future buttons (Commits 3-4): NASA Lunar Canon cross-check, model⇄NASA
+  // bidirectional comparison (per IP doc Phase L-2 / L-4).
+  // ────────────────────────────────────────────────────────────────────────
+  const firstLunarBtn = addTestButton('Verify Lunar Eclipse Finder (predictive finder + sanity check)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Lunar Eclipse Predictive Finder — sanity check');
+    console.log('  Scans [2020-01-01, 2026-01-01] (~6 years) and lists model-predicted oppositions');
+    console.log('  classified by geocentric Moon latitude vs Earth shadow geometry.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    // JD range: 2020-01-01 to 2026-01-01 (NASA Canon era — well-validated)
+    const jdStart = 2458849.5;   // 2020-01-01 00:00 UT
+    const jdEnd   = 2461041.5;   // 2026-01-01 00:00 UT
+
+    const t0 = performance.now();
+    const events = findLunarEclipsesInRange(jdStart, jdEnd);
+    const elapsed_ms = performance.now() - t0;
+
+    console.log(`Scan complete in ${elapsed_ms.toFixed(0)} ms — found ${events.length} lunar-eclipse-class events.\n`);
+
+    // Print events as a table with NASA-comparison-ready columns
+    const rows = events.map(e => {
+      const dy = julianDateToDecimalYear(e.jd);
+      const y = Math.floor(dy);
+      const dt = dayToDate(e.jd);
+      return {
+        date:           dt.date,
+        time_UT:        dt.time,
+        jd:             e.jd.toFixed(4),
+        type:           e.type,
+        beta_deg:       e.beta.toFixed(4),
+        moon_dist_km:   Math.round(e.moonDistance_km).toLocaleString('en-US'),
+        mag_umbral:     e.magnitudeUmbral.toFixed(3),
+        mag_penumbral:  e.magnitudePenumbral.toFixed(3),
+      };
+    });
+    console.table(rows);
+
+    // Known NASA Lunar Canon events for the 2020-2025 era — sanity-check that
+    // the finder hits all of them. Year+month is enough at this resolution;
+    // exact dates within ±1 day count as a match (Moon polynomial residual).
+    const NASA_KNOWN = [
+      { date: '2020-01-10', type: 'Penumbral' },
+      { date: '2020-06-05', type: 'Penumbral' },
+      { date: '2020-07-05', type: 'Penumbral' },
+      { date: '2020-11-30', type: 'Penumbral' },
+      { date: '2021-05-26', type: 'Total'     },
+      { date: '2021-11-19', type: 'Partial'   },
+      { date: '2022-05-16', type: 'Total'     },
+      { date: '2022-11-08', type: 'Total'     },
+      { date: '2023-05-05', type: 'Penumbral' },
+      { date: '2023-10-28', type: 'Partial'   },
+      { date: '2024-03-25', type: 'Penumbral' },
+      { date: '2024-09-18', type: 'Partial'   },
+      { date: '2025-03-14', type: 'Total'     },
+      { date: '2025-09-07', type: 'Total'     },
+    ];
+
+    console.log('\nCross-check vs NASA Lunar Canon known events (14 events 2020-2025):');
+    let matched = 0, typeOk = 0;
+    const unmatched = [];
+    for (const k of NASA_KNOWN) {
+      // Find the model event closest in date (allow ±2 days for Moon polynomial residual)
+      const kJD = (() => { const [y, m, d] = k.date.split('-').map(Number); return dateTimeToJulianDay(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`, '00:00:00'); })();
+      const hit = events.find(e => Math.abs(e.jd - kJD) < 2);
+      if (hit) {
+        matched++;
+        const typeMatch = (hit.type === k.type);
+        if (typeMatch) typeOk++;
+        const dayDiff = (hit.jd - kJD).toFixed(2);
+        const status = typeMatch ? '✓' : `⚠ type ${hit.type} vs NASA ${k.type}`;
+        console.log(`  ${status}  ${k.date} ${k.type.padEnd(10)} → model: ${dayDiff} d, β=${hit.beta.toFixed(3)}°`);
+      } else {
+        unmatched.push(k);
+        console.log(`  ✗  ${k.date} ${k.type.padEnd(10)} → MODEL DID NOT PREDICT (within ±2 days)`);
+      }
+    }
+
+    console.log(`\nSUMMARY: ${matched}/${NASA_KNOWN.length} NASA events found by model`);
+    console.log(`         ${typeOk}/${matched} type classifications agree`);
+    console.log(`         ${events.length - matched} model-predicted events NOT in this NASA subset`);
+    console.log(`         ${unmatched.length} NASA events MISSED by model`);
+    console.log('\nNote: this 14-event subset is for sanity-check only. The full NASA Lunar Canon');
+    console.log('comparison (model⇄NASA bidirectional) is the next commit (Phase L-3/L-4).');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Predictive lunar eclipse finder (Commit 1 of the lunar eclipse track). ' +
+     'Runs findLunarEclipsesInRange on the 2020-2026 window, classifies events ' +
+     'by Moon latitude vs Earth shadow geometry, and cross-checks against 14 ' +
+     'known NASA Lunar Canon events as a sanity test. Should find ~13-16 events ' +
+     'and match 14/14 NASA known events with correct type classification.');
+
+  addTestButton('Validate LUNAR_ECLIPSE_PRESETS catalog entries', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Validate LUNAR_ECLIPSE_PRESETS catalog — checks each entry for:');
+    console.log('  1. JD ↔ label date consistency (does JD actually correspond to the label date?)');
+    console.log('  2. JD is an actual lunar eclipse opposition (within ±2 days of nearest opposition)');
+    console.log('  3. Label\'s claimed type matches model classification');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    let passCount = 0, failCount = 0;
+    const note = (label, ok, detail) => {
+      ok ? passCount++ : failCount++;
+      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? ` — ${detail}` : ''));
+    };
+
+    for (let i = 0; i < LUNAR_ECLIPSE_PRESETS.length; i++) {
+      const e = LUNAR_ECLIPSE_PRESETS[i];
+      console.log(`\n── Entry ${i+1}: "${e.label}" ──`);
+
+      // Check 1: JD ↔ date consistency
+      const actualDate = dayToDate(e.jd);
+      // Parse year/month/day from label (rough — label format varies)
+      const labelDateMatch = /(-?\d{1,4})\s+(\w{3,})\s+(\d{1,2})/.exec(e.label);
+      if (!labelDateMatch) {
+        note(`Could not parse date from label`, false, 'label format unexpected');
+      } else {
+        const monthMap = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12 };
+        const labelY = parseInt(labelDateMatch[1], 10);
+        const labelM = monthMap[labelDateMatch[2]];
+        const labelD = parseInt(labelDateMatch[3], 10);
+        const actualParts = /(-?\d+)-(\d+)-(\d+)/.exec(actualDate.date);
+        if (actualParts) {
+          const actY = parseInt(actualParts[1], 10);
+          const actM = parseInt(actualParts[2], 10);
+          const actD = parseInt(actualParts[3], 10);
+          const sameDate = (labelY === actY) && (labelM === actM) && (labelD === actD);
+          note(`Date consistency: JD ${e.jd} = ${actualDate.date} (label says ${labelY}-${String(labelM).padStart(2,'0')}-${String(labelD).padStart(2,'0')})`,
+               sameDate, sameDate ? '' : `MISMATCH — label and JD disagree`);
+        }
+      }
+
+      // Check 2 & 3: Is this an actual lunar eclipse? What type does model predict?
+      const events = findLunarEclipsesInRange(e.jd - 5, e.jd + 5);
+      const nearest = events.length === 0 ? null : events.reduce((a, b) => Math.abs(b.jd - e.jd) < Math.abs(a.jd - e.jd) ? b : a);
+      if (!nearest) {
+        note(`NO lunar eclipse opposition found within ±5 days of JD ${e.jd}`, false, 'this entry is NOT a real lunar eclipse at this JD');
+      } else {
+        const diffDays = nearest.jd - e.jd;
+        const closeEnough = Math.abs(diffDays) < 2;
+        note(`Nearest model opposition: JD ${nearest.jd.toFixed(4)} (${diffDays >= 0 ? '+' : ''}${diffDays.toFixed(2)} d), type=${nearest.type}, β=${nearest.beta.toFixed(3)}°, mag=${nearest.magnitudeUmbral.toFixed(3)}`,
+             closeEnough, closeEnough ? '' : 'JD is more than 2 days off');
+        const typeMatches = (e.type === nearest.type);
+        note(`Type: catalog "${e.type}" vs model "${nearest.type}"`, typeMatches, typeMatches ? '' : 'mismatch (boundary case or wrong type)');
+      }
+    }
+
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY: ${passCount} passed, ${failCount} failed across ${LUNAR_ECLIPSE_PRESETS.length} entries`);
+    console.log('  Entries with ✗ marks need correction in LUNAR_ECLIPSE_PRESETS + the source JSON.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Validates each LUNAR_ECLIPSE_PRESETS entry: (1) JD ↔ label date consistency, ' +
+     '(2) the JD is within ±2 days of an actual model-predicted lunar eclipse, ' +
+     '(3) catalog type matches model classification. Use to identify mis-curated entries.');
+
+  addTestButton('Discover lunar eclipses in a year range (catalog expansion helper)', () => {
+    // Default range: 1000-1010 CE (Ibn Yunus era). User can edit START_YEAR / END_YEAR.
+    const START_YEAR = 1000;
+    const END_YEAR   = 1010;
+
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  Discover lunar eclipses in [${START_YEAR}, ${END_YEAR}] CE`);
+    console.log('  Use to find authoritative dates/JDs for catalog expansion. Edit START_YEAR /');
+    console.log('  END_YEAR in script.js to scan other eras.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    // Convert year range to JD range. Use proleptic Julian for ancient years.
+    const jdStart = dateTimeToJulianDay(`${START_YEAR}-01-01`, '00:00:00');
+    const jdEnd   = dateTimeToJulianDay(`${END_YEAR}-12-31`, '23:59:59');
+
+    const t0 = performance.now();
+    const events = findLunarEclipsesInRange(jdStart, jdEnd);
+    const elapsed = performance.now() - t0;
+
+    console.log(`Scan complete in ${elapsed.toFixed(0)} ms — found ${events.length} lunar eclipses.\n`);
+    const rows = events.map(e => {
+      const dt = dayToDate(e.jd);
+      return {
+        date:           dt.date,
+        time_UT:        dt.time,
+        jd:             e.jd.toFixed(4),
+        type:           e.type,
+        beta_deg:       e.beta.toFixed(4),
+        mag_umbral:     e.magnitudeUmbral.toFixed(3),
+        mag_penumbral:  e.magnitudePenumbral.toFixed(3),
+        moon_dist_km:   Math.round(e.moonDistance_km).toLocaleString('en-US'),
+      };
+    });
+    console.table(rows);
+
+    console.log('\nTo add an event to LUNAR_ECLIPSE_PRESETS, copy values from a row above and');
+    console.log('include the documentary source (Stephenson 1997, Said & Stephenson 1996, NASA Canon, etc.).');
+    console.log('Cross-check against an authoritative reference before adding — the model produces');
+    console.log('ALL oppositions in range, not just those that were historically observed/documented.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Lists every lunar eclipse opposition the model predicts in a year range ' +
+     '(default 1000-1010 CE — Ibn Yunus era). Use to populate the historical ' +
+     'catalog with verified JDs. Edit START_YEAR/END_YEAR in script.js to scan ' +
+     'other eras.');
+
+  addTestButton('Load & cross-check NASA Lunar Canon (Phase L-3)', async () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Load NASA Lunar Canon (12,064 events, -1999 BCE to +3000 CE) and cross-check');
+    console.log('  each LUNAR_ECLIPSE_PRESETS entry against the NASA-published JD.');
+    console.log('  Source: public/input/lunar-eclipses-nasa.json (scraped via fetch_nasa_lunar_canon.py)');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    const canon = await loadNasaLunarCanon();
+    if (!canon) {
+      console.error('NASA Canon JSON failed to load. If running local dev: ensure Parcel is serving');
+      console.error('public/. Otherwise commit lunar-eclipses-nasa.json to GitHub so the raw URL works.');
+      return;
+    }
+
+    // Stats
+    const typeCounts = canon.entries.reduce((acc, e) => { acc[e.type] = (acc[e.type] || 0) + 1; return acc; }, {});
+    console.log(`Loaded: ${canon.entries.length.toLocaleString('en-US')} events`);
+    console.log(`Type breakdown: Total=${typeCounts.Total}  Partial=${typeCounts.Partial}  Penumbral=${typeCounts.Penumbral}`);
+    console.log(`Range: JD ${canon.entries[0].jd} (${canon.entries[0].date}) — JD ${canon.entries[canon.entries.length-1].jd} (${canon.entries[canon.entries.length-1].date})\n`);
+
+    // Cross-check each historical catalog entry
+    console.log('── Cross-check our 14 historical catalog entries vs NASA Canon ──');
+    const rows = LUNAR_ECLIPSE_PRESETS.map(h => {
+      let nearest = canon.entries[0];
+      let minDiff = Math.abs(nearest.jd - h.jd);
+      for (let i = 1; i < canon.entries.length; i++) {
+        const d = Math.abs(canon.entries[i].jd - h.jd);
+        if (d < minDiff) { minDiff = d; nearest = canon.entries[i]; }
+      }
+      const dt_sec = (nearest.jd - h.jd) * 86400;
+      return {
+        label:        h.label,
+        our_jd:       h.jd.toFixed(4),
+        nasa_jd:      nearest.jd.toFixed(4),
+        delta_sec:    dt_sec.toFixed(1),
+        our_type:     h.type,
+        nasa_type:    nearest.type,
+        match:        (h.type === nearest.type && Math.abs(dt_sec) < 60) ? '✓' : '✗',
+      };
+    });
+    console.table(rows);
+
+    const passed = rows.filter(r => r.match === '✓').length;
+    console.log(`\nResult: ${passed}/${rows.length} catalog entries match NASA Canon (JD within ±60s AND same type)`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Loads the NASA 5-Millennium Canon of Lunar Eclipses (12,064 events) from ' +
+     'public/input/lunar-eclipses-nasa.json and cross-checks every entry in our ' +
+     'LUNAR_ECLIPSE_PRESETS historical catalog against NASA-published JDs. ' +
+     'All 14 should match within ±60s. Phase L-3 deliverable; sets up Phase L-4 ' +
+     '(bidirectional model⇄NASA scan over -1999 to +3000).');
+
+  addTestButton('Compare model vs NASA Canon — bidirectional scan (Phase L-4)', async () => {
+    const START_YEAR = -1999;
+    const END_YEAR   = 3000;
+    // PHYSICAL-EVENT threshold. The 15-min initial gate revealed (via the diagnostic
+    // button) that the bulk model⇄NASA disagreement is a smooth, monotonic ΔT offset
+    // — both sides see the same physical opposition, but their UT clocks diverge by
+    // up to 2.6h at -2000 CE. A 3h gate cleanly separates "did we predict the event?"
+    // (this scan) from "do our ΔT models agree?" (the diagnostic). Modern-era 15-min
+    // tightness is reported as a sub-statistic.
+    const MATCH_THRESHOLD_MIN = 180;
+    const TIGHT_MIN = 15;
+
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  Phase L-4: bidirectional model⇄NASA comparison over [${START_YEAR}, ${END_YEAR}]`);
+    console.log(`  PHYSICAL-EVENT match: |Δjd| ≤ ${MATCH_THRESHOLD_MIN} min (3h) AND identical type.`);
+    console.log(`  3h absorbs the pure-tidal vs Espenak/Meeus ΔT divergence in deep time so we`);
+    console.log(`  isolate "model missed the opposition entirely" from "model predicts the same`);
+    console.log(`  opposition but at a different UT due to ΔT". Tight (15-min) match also reported.`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    const canon = await loadNasaLunarCanon();
+    if (!canon) return;
+
+    const jdStart = dateTimeToJulianDay(`${START_YEAR}-01-01`, '00:00:00');
+    const jdEnd   = dateTimeToJulianDay(`${END_YEAR}-12-31`,   '23:59:59');
+    const matchThreshDays = MATCH_THRESHOLD_MIN / (24 * 60);
+
+    // STEP 1: run the model finder century-by-century so we can yield to the UI
+    console.log('── Scanning model predictions (5000 years, ~50 chunks) ──');
+    const modelEvents = [];
+    const t0 = performance.now();
+    for (let yr = START_YEAR; yr < END_YEAR; yr += 100) {
+      const yrEnd = Math.min(yr + 99, END_YEAR);
+      const cStart = dateTimeToJulianDay(`${yr}-01-01`,    '00:00:00');
+      const cEnd   = dateTimeToJulianDay(`${yrEnd}-12-31`, '23:59:59');
+      const events = findLunarEclipsesInRange(cStart, cEnd);
+      modelEvents.push(...events);
+      const elapsed = (performance.now() - t0) / 1000;
+      console.log(`  [${yr.toString().padStart(5)}…${yrEnd.toString().padStart(5)}]  +${events.length.toString().padStart(3)} events  (running total ${modelEvents.length.toString().padStart(6)}, ${elapsed.toFixed(1)}s)`);
+      await new Promise(r => setTimeout(r, 0));  // yield to UI
+    }
+    modelEvents.sort((a, b) => a.jd - b.jd);
+    console.log(`\nModel scan complete: ${modelEvents.length.toLocaleString('en-US')} events in ${((performance.now()-t0)/1000).toFixed(1)}s\n`);
+
+    // STEP 2: restrict NASA Canon to the same range
+    const nasaInRange = canon.entries.filter(e => e.jd >= jdStart && e.jd <= jdEnd);
+    console.log(`NASA Canon in range: ${nasaInRange.length.toLocaleString('en-US')} events`);
+
+    // STEP 3: greedy nearest-neighbor matching via binary search on NASA JDs
+    const bsearch = jd => {
+      let lo = 0, hi = nasaInRange.length;
+      while (lo < hi) {
+        const mid = (lo + hi) >>> 1;
+        if (nasaInRange[mid].jd < jd) lo = mid + 1;
+        else hi = mid;
+      }
+      return lo;
+    };
+
+    const matched = [];        // type agrees AND |Δjd| ≤ threshold
+    const typeMismatch = [];   // |Δjd| ≤ threshold but type differs
+    const modelOnly = [];      // no NASA event within threshold
+    const nasaUsed = new Uint8Array(nasaInRange.length);
+
+    for (const m of modelEvents) {
+      const i = bsearch(m.jd);
+      // Look at the three nearest candidates (i-1, i, i+1) to handle ordering edge cases
+      let best = -1, bestDiff = Infinity;
+      for (let k = -1; k <= 1; k++) {
+        const j = i + k;
+        if (j < 0 || j >= nasaInRange.length) continue;
+        if (nasaUsed[j]) continue;
+        const d = Math.abs(nasaInRange[j].jd - m.jd);
+        if (d < bestDiff) { bestDiff = d; best = j; }
+      }
+      if (best >= 0 && bestDiff <= matchThreshDays) {
+        const n = nasaInRange[best];
+        nasaUsed[best] = 1;
+        const rec = { m, n, diffMin: bestDiff * 1440 };
+        if (m.type === n.type) matched.push(rec);
+        else                    typeMismatch.push(rec);
+      } else {
+        modelOnly.push(m);
+      }
+    }
+    const nasaOnly = [];
+    for (let j = 0; j < nasaInRange.length; j++) if (!nasaUsed[j]) nasaOnly.push(nasaInRange[j]);
+
+    // STEP 4: report
+    // Tight-threshold subset: matched events also within ±TIGHT_MIN minutes
+    const matchedTight = matched.filter(r => r.diffMin <= TIGHT_MIN);
+
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  L-4 RESULT — PHYSICAL-EVENT match (|Δjd| ≤ ${MATCH_THRESHOLD_MIN} min, same type)`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  Matched (JD ≤${MATCH_THRESHOLD_MIN}m and type agree):    ${matched.length.toString().padStart(6)}`);
+    console.log(`     ↳ of which ≤${TIGHT_MIN}m (tight):              ${matchedTight.length.toString().padStart(6)}`);
+    console.log(`  Type-mismatch (JD agrees only):  ${typeMismatch.length.toString().padStart(6)}`);
+    console.log(`  Model-only (NASA missing):       ${modelOnly.length.toString().padStart(6)}`);
+    console.log(`  NASA-only (model missing):       ${nasaOnly.length.toString().padStart(6)}`);
+    console.log(`  ─────────────────────────────────────────`);
+    console.log(`  Model events total:              ${modelEvents.length.toString().padStart(6)}`);
+    console.log(`  NASA events in range:            ${nasaInRange.length.toString().padStart(6)}`);
+    const recall      = (matched.length + typeMismatch.length) / nasaInRange.length * 100;
+    const recallTight = matchedTight.length / nasaInRange.length * 100;
+    const typeAcc     = matched.length / (matched.length + typeMismatch.length) * 100;
+    console.log(`  Physical-event recall (3h):      ${recall.toFixed(2)}%   ← does the model find the opposition?`);
+    console.log(`  Tight UT recall (15 min):        ${recallTight.toFixed(2)}%   ← does our ΔT match NASA's?`);
+    console.log(`  Type accuracy on matched events: ${typeAcc.toFixed(2)}%`);
+
+    const sample = (arr, n) => arr.slice(0, n);
+
+    if (typeMismatch.length) {
+      console.log(`\n── Type-mismatch sample (first 10 of ${typeMismatch.length}) ──`);
+      console.table(sample(typeMismatch, 10).map(({m, n, diffMin}) => ({
+        date:        n.date,
+        delta_min:   diffMin.toFixed(2),
+        model_type:  m.type,
+        nasa_type:   n.type,
+        model_mag_u: m.magnitudeUmbral.toFixed(3),
+        nasa_mag_u:  n.magnitude_umbral.toFixed(3),
+        nasa_gamma:  n.gamma.toFixed(3),
+      })));
+    }
+    if (modelOnly.length) {
+      console.log(`\n── Model-only sample (first 10 of ${modelOnly.length}) — predicted by model, absent from NASA ──`);
+      console.table(sample(modelOnly, 10).map(m => {
+        const dt = dayToDate(m.jd);
+        return {
+          date:       dt.date,
+          time_UT:    dt.time,
+          jd:         m.jd.toFixed(4),
+          type:       m.type,
+          beta_deg:   m.beta.toFixed(4),
+          mag_umbral: m.magnitudeUmbral.toFixed(3),
+        };
+      }));
+    }
+    if (nasaOnly.length) {
+      console.log(`\n── NASA-only sample (first 10 of ${nasaOnly.length}) — in NASA Canon, missed by model ──`);
+      console.table(sample(nasaOnly, 10).map(n => ({
+        date:       n.date,
+        time_TD:    n.time_TD,
+        jd:         n.jd.toFixed(4),
+        type:       n.type,
+        gamma:      n.gamma.toFixed(3),
+        mag_umbral: n.magnitude_umbral.toFixed(3),
+        saros:      n.saros,
+      })));
+    }
+
+    window._L4 = { matched, typeMismatch, modelOnly, nasaOnly, modelEvents, nasaInRange, threshold_min: MATCH_THRESHOLD_MIN };
+    console.log('\nFull result arrays exposed at window._L4 = { matched, typeMismatch, modelOnly, nasaOnly, ... } for further inspection.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase L-4: scans every model-predicted lunar opposition across [-1999, 3000] ' +
+     'and matches against the NASA Lunar Canon (12,064 events) by JD ±3 h ' +
+     '(PHYSICAL-EVENT recall). Reports matched / model-only / NASA-only counts, ' +
+     'plus tight (15-min) sub-recall and type accuracy. The 3h gate absorbs the ' +
+     'pure-tidal vs Espenak/Meeus ΔT divergence so missed-event recall is separated ' +
+     'from ΔT-clock disagreement. Full result arrays exposed on window._L4. ' +
+     'Runtime ~15-30s; logs progress per 100-year chunk.');
+
+  addTestButton('L-4 diagnostic: per-century Δjd distribution (ΔT divergence test)', () => {
+    if (!window._L4 || !window._L4.modelEvents || !window._L4.nasaInRange) {
+      console.error('Run the L-4 bidirectional scan first; window._L4 is not populated.');
+      return;
+    }
+    const { modelEvents, nasaInRange } = window._L4;
+
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-4 diagnostic: signed Δjd distribution per century');
+    console.log('  Δ = (NASA UT JD) − (model UT JD), expressed in minutes.');
+    console.log('  Since both sides observe the same physical opposition (TT moment), the signed');
+    console.log('  difference equals (model effective ΔT) − (NASA published ΔT). Positive Δ means');
+    console.log('  our model puts the opposition EARLIER in UT than NASA — i.e. our ΔT is larger.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    // Binary search nearest NASA event for each model event (NO threshold filter)
+    const bsearch = jd => {
+      let lo = 0, hi = nasaInRange.length;
+      while (lo < hi) {
+        const mid = (lo + hi) >>> 1;
+        if (nasaInRange[mid].jd < jd) lo = mid + 1;
+        else hi = mid;
+      }
+      return lo;
+    };
+
+    const offsets = [];  // { year, offsetMin (signed), modelDeltaT_sec, nasaDeltaT_sec }
+    for (const m of modelEvents) {
+      const i = bsearch(m.jd);
+      let best = -1, bestDiff = Infinity;
+      for (let k = -1; k <= 1; k++) {
+        const j = i + k;
+        if (j < 0 || j >= nasaInRange.length) continue;
+        const d = Math.abs(nasaInRange[j].jd - m.jd);
+        if (d < bestDiff) { bestDiff = d; best = j; }
+      }
+      if (best < 0) continue;
+      const n = nasaInRange[best];
+      const yrMatch = /^(-?\d+)/.exec(dayToDate(m.jd).date);
+      if (!yrMatch) continue;
+      const offsetMin = (n.jd - m.jd) * 1440;
+      // Model's effective ΔT for this event = NASA's ΔT + (offsetMin × 60). They share the
+      // same physical TD moment, so the UT-difference IS the ΔT-difference.
+      offsets.push({
+        year:              parseInt(yrMatch[1], 10),
+        offsetMin,
+        nasaDeltaT_sec:    n.delta_T_sec,
+        modelDeltaT_sec:   n.delta_T_sec + offsetMin * 60,
+        model:             m,
+        nasa:              n,
+      });
+    }
+
+    // Bucket by century
+    const buckets = new Map();
+    for (const o of offsets) {
+      const cent = Math.floor(o.year / 100) * 100;
+      if (!buckets.has(cent)) buckets.set(cent, []);
+      buckets.get(cent).push(o);
+    }
+    const fmtCent = c => c < 0 ? `${c}…${c + 99}` : `${(c + (c === 0 ? 1 : 0)).toString().padStart(4)}…${c + 99}`;
+
+    const median = arr => arr.length ? arr.slice().sort((a,b)=>a-b)[Math.floor(arr.length/2)] : 0;
+    const pct    = (arr, p) => arr.length ? arr.slice().sort((a,b)=>a-b)[Math.min(arr.length-1, Math.floor(arr.length * p))] : 0;
+
+    const rows = [...buckets.keys()].sort((a,b)=>a-b).map(cent => {
+      const bucket = buckets.get(cent);
+      const signedMin = bucket.map(o => o.offsetMin);
+      const absMin    = signedMin.map(Math.abs);
+      const meanNasaDT  = bucket.reduce((s, o) => s + o.nasaDeltaT_sec,  0) / bucket.length;
+      const meanModelDT = bucket.reduce((s, o) => s + o.modelDeltaT_sec, 0) / bucket.length;
+      return {
+        century:           fmtCent(cent),
+        n:                 bucket.length,
+        signed_mean_min:   (signedMin.reduce((a,b)=>a+b,0) / signedMin.length).toFixed(2),
+        signed_median_min: median(signedMin).toFixed(2),
+        abs_median_min:    median(absMin).toFixed(2),
+        abs_p95_min:       pct(absMin, 0.95).toFixed(2),
+        within_15min_pct:  (absMin.filter(x => x <= 15).length / absMin.length * 100).toFixed(0) + '%',
+        nasa_ΔT_hr:        (meanNasaDT  / 3600).toFixed(2),
+        model_ΔT_hr:       (meanModelDT / 3600).toFixed(2),
+        ΔT_excess_hr:      ((meanModelDT - meanNasaDT) / 3600).toFixed(2),
+      };
+    });
+
+    console.table(rows);
+
+    // Global summary
+    const allAbs    = offsets.map(o => Math.abs(o.offsetMin)).sort((a,b)=>a-b);
+    const allSigned = offsets.map(o => o.offsetMin);
+    console.log(`\nGlobal stats over ${offsets.length.toLocaleString('en-US')} model events:`);
+    console.log(`  Signed mean Δ:      ${(allSigned.reduce((a,b)=>a+b,0) / allSigned.length).toFixed(2)} min`);
+    console.log(`  Signed median Δ:    ${median(allSigned).toFixed(2)} min  ← positive = model ΔT > NASA ΔT (more tidal recession)`);
+    console.log(`  |Δ| median:         ${allAbs[Math.floor(allAbs.length/2)].toFixed(2)} min`);
+    console.log(`  |Δ| p95:            ${allAbs[Math.floor(allAbs.length * 0.95)].toFixed(2)} min`);
+    console.log(`  |Δ| max:            ${allAbs[allAbs.length - 1].toFixed(2)} min`);
+    const within = t => (offsets.filter(o => Math.abs(o.offsetMin) <= t).length / offsets.length * 100).toFixed(1) + '%';
+    console.log(`\n  Cumulative recall at looser thresholds:`);
+    console.log(`    ≤ 15 min:    ${within(15)}`);
+    console.log(`    ≤ 60 min:    ${within(60)}`);
+    console.log(`    ≤ 3 hours:   ${within(180)}`);
+    console.log(`    ≤ 6 hours:   ${within(360)}`);
+    console.log(`    ≤ 12 hours:  ${within(720)}`);
+
+    window._L4_offsets = offsets;
+    console.log('\nFull offsets array (with paired model/nasa refs and per-event ΔT pairs)');
+    console.log('exposed at window._L4_offsets for further inspection / plotting.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Post-L-4 diagnostic. For each model event, computes the signed UT-offset to its ' +
+     'nearest NASA event (no threshold) and bins by century. Reports per-century mean/median ' +
+     'offset and the implied model-effective ΔT vs NASA-published ΔT — directly tests whether ' +
+     'the L-4 recall gap is driven by our pure-tidal ΔT diverging from NASA\'s empirical fit. ' +
+     'Requires L-4 to have been run (uses window._L4). Output exposed on window._L4_offsets.');
+
+  addTestButton('Compare model vs NASA vs documented observations (Phase L-5)', async () => {
+    const TIGHT_MIN = 15;
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase L-5: comparison against NASA\'s curated "Lunar Eclipses of Historical Interest"');
+    console.log('  list (28 famous documented events, -746 BCE to 2001 CE).');
+    console.log('  ');
+    console.log('  Two columns of disagreement get reported:');
+    console.log(`    • Δ_model_vs_NASA: same as L-4 (compares two ΔT-derived clocks; non-zero in deep time)`);
+    console.log(`    • Δ_model_vs_obs:  ONLY for entries whose 'observed_time_ut' L-5b placeholder is filled.`);
+    console.log('  Tight threshold: ±15 min for the ✓/✗ flag.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    const [documented, canon] = await Promise.all([loadDocumentedLunarEclipses(), loadNasaLunarCanon()]);
+    if (!documented || !canon) return;
+
+    // Index NASA Canon by date_iso for O(1) lookup
+    const nasaByDate = new Map();
+    for (const n of canon.entries) nasaByDate.set(n.date, n);
+
+    const rows = [];
+    let withObs = 0, modelTightMatch = 0;
+    for (const doc of documented.entries) {
+      // Match NASA Canon by exact date
+      const nasa = nasaByDate.get(doc.date_iso);
+      if (!nasa) {
+        rows.push({ date: doc.date_iso, event: doc.description.slice(0, 50), error: 'no NASA Canon match for this date' });
+        continue;
+      }
+      // Run model finder ±2 days around the NASA JD to find our prediction
+      const modelEvents = findLunarEclipsesInRange(nasa.jd - 2, nasa.jd + 2);
+      const modelEvt = modelEvents.length
+        ? modelEvents.reduce((a, b) => Math.abs(b.jd - nasa.jd) < Math.abs(a.jd - nasa.jd) ? b : a)
+        : null;
+      if (!modelEvt) {
+        rows.push({ date: doc.date_iso, event: doc.description.slice(0, 50), error: 'model finder produced no opposition ±2d of NASA' });
+        continue;
+      }
+      const dMN_min = (nasa.jd - modelEvt.jd) * 1440;
+
+      // L-5b: if observation transcribed, compute Δ to observed UT
+      let dMO_min = null, dNO_min = null;
+      if (doc.observed_time_ut) {
+        // Convert observed local time → UT (if location provided) or treat as already-UT
+        const [oh, om, os] = doc.observed_time_ut.split(':').map(Number);
+        const lngHrs = (doc.observation_lng != null) ? doc.observation_lng / 15 : 0;  // local→UT = local - lngHrs
+        const obsJdUt = dateTimeToJulianDay(doc.date_iso, `${String(oh).padStart(2,'0')}:${String(om||0).padStart(2,'0')}:${String(os||0).padStart(2,'0')}`) - lngHrs / 24;
+        dMO_min = (obsJdUt - modelEvt.jd) * 1440;
+        dNO_min = (obsJdUt - nasa.jd) * 1440;
+        withObs++;
+      }
+      if (Math.abs(dMN_min) <= TIGHT_MIN) modelTightMatch++;
+
+      rows.push({
+        date:        doc.date_iso,
+        event:       doc.description.length > 50 ? doc.description.slice(0, 47) + '...' : doc.description,
+        type_doc:    doc.type,
+        type_model:  modelEvt.type,
+        nasa_jd:     nasa.jd.toFixed(4),
+        model_jd:    modelEvt.jd.toFixed(4),
+        ΔMN_min:     dMN_min.toFixed(2),
+        ΔMO_min:     dMO_min !== null ? dMO_min.toFixed(2) : '—',
+        ΔNO_min:     dNO_min !== null ? dNO_min.toFixed(2) : '—',
+        obs_loc:     doc.observation_location || '—',
+        tight15:     Math.abs(dMN_min) <= TIGHT_MIN ? '✓' : '✗',
+      });
+    }
+
+    console.table(rows);
+
+    console.log(`\n── L-5a (model vs NASA across 28 documented events) ──`);
+    console.log(`  Within ±${TIGHT_MIN} min:                ${modelTightMatch}/${documented.entries.length}`);
+    console.log(`  Expected pattern: tight matches cluster in modern era (~1700+);`);
+    console.log(`  ancient events show 1-3h offset matching the ΔT divergence found in L-4 diagnostic.`);
+
+    console.log(`\n── L-5b (model vs observed time, vs NASA vs observed time) ──`);
+    if (withObs === 0) {
+      console.log(`  0 of ${documented.entries.length} events have a transcribed observed_time_ut.`);
+      console.log(`  L-5b is the next deliverable: transcribe observed contact times from primary sources`);
+      console.log(`  (Stephenson 1997, Said & Stephenson 1996, Sachs & Hunger) into the L-5b placeholders`);
+      console.log(`  in public/input/lunar-eclipses-documented.json. Then this button shows whether our`);
+      console.log(`  model is CLOSER or FURTHER than NASA from the actual primary-source observations.`);
+    } else {
+      const filledRows = rows.filter(r => r.ΔMO_min !== '—');
+      const closerModel = filledRows.filter(r => Math.abs(+r.ΔMO_min) < Math.abs(+r.ΔNO_min)).length;
+      console.log(`  ${withObs} events have transcribed observations.`);
+      console.log(`  Model closer to obs than NASA: ${closerModel}/${withObs}`);
+      console.log(`  Mean |Δ_model_vs_obs|: ${(filledRows.reduce((s, r) => s + Math.abs(+r.ΔMO_min), 0) / withObs).toFixed(2)} min`);
+      console.log(`  Mean |Δ_NASA_vs_obs|:  ${(filledRows.reduce((s, r) => s + Math.abs(+r.ΔNO_min), 0) / withObs).toFixed(2)} min`);
+    }
+
+    window._L5 = { rows, documented, withObs };
+    console.log(`\nFull rows exposed at window._L5 = { rows, documented, withObs }.`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase L-5: compares each of 28 NASA-curated "Historical Interest" lunar eclipses ' +
+     'against (a) NASA Canon JD and (b) model finder prediction. Reports per-event Δ in ' +
+     'minutes. If a documented event has a transcribed observed_time_ut (L-5b placeholder), ' +
+     'also compares both model and NASA against the primary-source observation — that is ' +
+     'the true ground-truth test independent of NASA\'s ΔT polynomial.');
+
+  addTestButton('L-5b: model ΔT vs NASA ΔT vs Stephenson 2016 observations (270 events)', async () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase L-5b: three-way ΔT comparison against primary-source observations');
+    console.log('  ');
+    console.log('  Data: Stephenson, Morrison & Hohenkerk 2016 (Proc. Roy. Soc. A 472:20160404)');
+    console.log('        supplementary tables S01 (Babylonian) + S02 (ziqpu) + S04 (Almagest) +');
+    console.log('        S05 (Chinese) + S07 (Greek) + S09 (Arab) — 270 timed lunar observations,');
+    console.log('        each reduced by Stephenson to an implied ΔT (seconds) at observation year.');
+    console.log('  ');
+    console.log('  For each observation:');
+    console.log('    obs_ΔT   = Stephenson-derived ΔT from the primary-source observation');
+    console.log('    nasa_ΔT  = mean ΔT of NASA Canon entries in the observation year (Espenak/Meeus)');
+    console.log('    model_ΔT = our pure-tidal meanDeltaTSecondsAtAge((2000-year)/1e6)  [Farhat 2022]');
+    console.log('  ');
+    console.log('  Bottom line: which clock sits closer to the actual observations?');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    const [steph, canon] = await Promise.all([loadStephensonLunar(), loadNasaLunarCanon()]);
+    if (!steph || !canon) return;
+
+    // Build NASA ΔT(year) lookup from Canon: average ΔT of all events in a calendar year
+    const nasaDtByYear = new Map();
+    {
+      const acc = new Map();  // year → {sum, n}
+      for (const e of canon.entries) {
+        const m = /^(-?\d+)/.exec(e.date);
+        if (!m) continue;
+        const y = parseInt(m[1], 10);
+        const a = acc.get(y) || { sum: 0, n: 0 };
+        a.sum += e.delta_T_sec; a.n += 1;
+        acc.set(y, a);
+      }
+      for (const [y, a] of acc) nasaDtByYear.set(y, a.sum / a.n);
+    }
+
+    // Per-observation comparison
+    const records = [];
+    for (const obs of steph.entries) {
+      if (obs.dt_observed_sec == null) continue;  // skip S04 bounds-only rows
+      const nasa_dt = nasaDtByYear.get(obs.year);
+      if (nasa_dt == null) continue;
+      const t_Ma = (2000 - obs.year) / 1e6;
+      const model_dt = meanDeltaTSecondsAtAge(t_Ma);
+      records.push({
+        table:        obs.source_table,
+        year:         obs.year,
+        weight:       obs.weight,
+        obs_dt:       obs.dt_observed_sec,
+        nasa_dt,
+        model_dt,
+        res_model:    obs.dt_observed_sec - model_dt,
+        res_nasa:     obs.dt_observed_sec - nasa_dt,
+      });
+    }
+
+    // Per-table summary
+    console.log('── Per-table summary ──');
+    const tables = [...new Set(records.map(r => r.table))].sort();
+    const rows = [];
+    for (const tab of tables) {
+      const subset = records.filter(r => r.table === tab);
+      const meanAbsModel = subset.reduce((s, r) => s + Math.abs(r.res_model), 0) / subset.length;
+      const meanAbsNasa  = subset.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / subset.length;
+      const closerModel  = subset.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
+      rows.push({
+        table:            tab,
+        name:             steph.entries.find(e => e.source_table === tab).source_table_name,
+        n:                subset.length,
+        year_range:       `${Math.min(...subset.map(r => r.year))}…${Math.max(...subset.map(r => r.year))}`,
+        mean_obs_dt_hr:   (subset.reduce((s, r) => s + r.obs_dt, 0) / subset.length / 3600).toFixed(2),
+        mean_nasa_dt_hr:  (subset.reduce((s, r) => s + r.nasa_dt, 0) / subset.length / 3600).toFixed(2),
+        mean_model_dt_hr: (subset.reduce((s, r) => s + r.model_dt, 0) / subset.length / 3600).toFixed(2),
+        mean_abs_res_NASA_s: meanAbsNasa.toFixed(0),
+        mean_abs_res_model_s: meanAbsModel.toFixed(0),
+        model_closer_pct: (closerModel / subset.length * 100).toFixed(0) + '%',
+      });
+    }
+    console.table(rows);
+
+    // Per-century summary
+    console.log('\n── Per-century summary ──');
+    const buckets = new Map();
+    for (const r of records) {
+      const c = Math.floor(r.year / 100) * 100;
+      if (!buckets.has(c)) buckets.set(c, []);
+      buckets.get(c).push(r);
+    }
+    const centRows = [];
+    for (const c of [...buckets.keys()].sort((a,b)=>a-b)) {
+      const sub = buckets.get(c);
+      const meanAbsM = sub.reduce((s, r) => s + Math.abs(r.res_model), 0) / sub.length;
+      const meanAbsN = sub.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / sub.length;
+      const closer   = sub.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
+      centRows.push({
+        century:               `${c}…${c+99}`,
+        n:                     sub.length,
+        mean_obs_dt_hr:        (sub.reduce((s, r) => s + r.obs_dt, 0) / sub.length / 3600).toFixed(2),
+        mean_nasa_dt_hr:       (sub.reduce((s, r) => s + r.nasa_dt, 0) / sub.length / 3600).toFixed(2),
+        mean_model_dt_hr:      (sub.reduce((s, r) => s + r.model_dt, 0) / sub.length / 3600).toFixed(2),
+        mean_abs_res_NASA_s:   meanAbsN.toFixed(0),
+        mean_abs_res_model_s:  meanAbsM.toFixed(0),
+        model_closer_pct:      (closer / sub.length * 100).toFixed(0) + '%',
+      });
+    }
+    console.table(centRows);
+
+    // Global summary
+    const allMeanAbsModel = records.reduce((s, r) => s + Math.abs(r.res_model), 0) / records.length;
+    const allMeanAbsNasa  = records.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / records.length;
+    const allCloserModel  = records.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
+
+    console.log(`\n══════════════════════════════════════════════════════════════════════════════════`);
+    console.log(`  L-5b GLOBAL RESULT — ${records.length} primary-source observations`);
+    console.log(`══════════════════════════════════════════════════════════════════════════════════`);
+    console.log(`  Mean |residual| vs observation:`);
+    console.log(`    NASA Espenak/Meeus ΔT:   ${allMeanAbsNasa.toFixed(0).padStart(6)} s  (${(allMeanAbsNasa/60).toFixed(1)} min)`);
+    console.log(`    Model pure-tidal ΔT:     ${allMeanAbsModel.toFixed(0).padStart(6)} s  (${(allMeanAbsModel/60).toFixed(1)} min)`);
+    console.log(`  Events where model closer to obs than NASA: ${allCloserModel}/${records.length}  (${(allCloserModel/records.length*100).toFixed(1)}%)`);
+    console.log(``);
+    if (allMeanAbsModel < allMeanAbsNasa) {
+      const advantage = ((allMeanAbsNasa - allMeanAbsModel) / allMeanAbsNasa * 100).toFixed(1);
+      console.log(`  → Model is ${advantage}% closer to primary-source observations than NASA on average.`);
+    } else {
+      const advantage = ((allMeanAbsModel - allMeanAbsNasa) / allMeanAbsModel * 100).toFixed(1);
+      console.log(`  → NASA is ${advantage}% closer to primary-source observations than the model on average.`);
+    }
+    console.log(`  This is the ground-truth test independent of either model's ΔT polynomial.`);
+
+    window._L5b = { records, perTable: rows, perCentury: centRows };
+    console.log('\nFull data exposed at window._L5b for further inspection.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase L-5b: compares our pure-tidal ΔT model and NASA\'s Espenak/Meeus polynomial ' +
+     'against 270 primary-source observation-derived ΔT values from Stephenson, Morrison ' +
+     '& Hohenkerk 2016 (Babylonian, Chinese, Greek, Arab). For each historical observation, ' +
+     'reports both clocks\' residual and which one sits closer to the actual observation. ' +
+     'This is the ground-truth validation independent of NASA\'s ΔT fit.');
+
+  addTestButton('L-5b regression: residual structure (secular vs periodic vs noise)', () => {
+    if (!window._L5b || !window._L5b.records) {
+      console.error('Run the L-5b comparison button first; window._L5b is not populated.');
+      return;
+    }
+    const recs = window._L5b.records;
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  L-5b regression: structure of (obs ΔT − model ΔT) residual vs year`);
+    console.log(`  ${recs.length} observations from -720 BCE to 1280 CE.`);
+    console.log('  ');
+    console.log('  Fits linear / quadratic / cubic polynomials in year to the residual.');
+    console.log('  - Linear fit good       → constant LOD bias (add one number to the model)');
+    console.log('  - Quadratic needed      → constant LOD-acceleration bias (revisit Farhat rate)');
+    console.log('  - Higher-order / scatter→ multiple physical contributions or unmodelled noise');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    // Weighted polynomial fit via normal equations: solve (X^T W X) β = X^T W y
+    // where W is diag(weights). Implemented by hand to keep code self-contained.
+    const fit = (degree) => {
+      const n = recs.length;
+      const X = recs.map(r => {
+        const row = []; for (let p = 0; p <= degree; p++) row.push(Math.pow(r.year - 1000, p) / Math.pow(1000, p));
+        return row;  // center on year 1000 + scale to keep matrix conditioning manageable
+      });
+      const y = recs.map(r => r.res_model);
+      // Weight: Stephenson 'weight' field. weight = 0 means least reliable; use max(weight, 0.5) to keep them in.
+      const w = recs.map(r => Math.max(r.weight ?? 1, 0.5));
+      const k = degree + 1;
+      // M = X^T W X (k×k), b = X^T W y (k)
+      const M = Array.from({length: k}, () => new Array(k).fill(0));
+      const b = new Array(k).fill(0);
+      for (let i = 0; i < n; i++) for (let p = 0; p < k; p++) {
+        b[p] += X[i][p] * w[i] * y[i];
+        for (let q = 0; q < k; q++) M[p][q] += X[i][p] * w[i] * X[i][q];
+      }
+      // Gaussian elimination
+      const beta = new Array(k).fill(0);
+      const A = M.map((row, i) => [...row, b[i]]);
+      for (let p = 0; p < k; p++) {
+        // partial pivot
+        let pivot = p;
+        for (let r = p + 1; r < k; r++) if (Math.abs(A[r][p]) > Math.abs(A[pivot][p])) pivot = r;
+        [A[p], A[pivot]] = [A[pivot], A[p]];
+        for (let r = p + 1; r < k; r++) {
+          const f = A[r][p] / A[p][p];
+          for (let c = p; c <= k; c++) A[r][c] -= f * A[p][c];
+        }
+      }
+      for (let p = k - 1; p >= 0; p--) {
+        let s = A[p][k];
+        for (let c = p + 1; c < k; c++) s -= A[p][c] * beta[c];
+        beta[p] = s / A[p][p];
+      }
+      // R² (weighted)
+      const ymean = y.reduce((s, v, i) => s + v * w[i], 0) / w.reduce((s, v) => s + v, 0);
+      let ssRes = 0, ssTot = 0;
+      const predicted = X.map(row => row.reduce((s, v, p) => s + v * beta[p], 0));
+      for (let i = 0; i < n; i++) {
+        ssRes += w[i] * (y[i] - predicted[i]) ** 2;
+        ssTot += w[i] * (y[i] - ymean) ** 2;
+      }
+      // RMS of residual (unweighted) after detrending
+      const detrended = y.map((v, i) => v - predicted[i]);
+      const rms = Math.sqrt(detrended.reduce((s, v) => s + v * v, 0) / n);
+      return { beta, rSquared: 1 - ssRes / ssTot, rms, predicted, detrended };
+    };
+
+    console.log('── Fits ──\n');
+    for (const deg of [1, 2, 3]) {
+      const f = fit(deg);
+      const terms = f.beta.map((b, p) => {
+        const coef = b.toFixed(0);
+        if (p === 0) return `${coef} s`;
+        if (p === 1) return `${coef} s · ((y−1000)/1000)`;
+        return `${coef} s · ((y−1000)/1000)^${p}`;
+      }).join(' + ');
+      console.log(`  Degree ${deg}:  R² = ${f.rSquared.toFixed(4)},  RMS residual = ${f.rms.toFixed(0)} s`);
+      console.log(`              fit = ${terms}`);
+    }
+
+    // Examine linear fit in detail
+    const lin = fit(1);
+    const intercept_at_y1000 = lin.beta[0];           // s at year 1000
+    const slope_per_1000yr  = lin.beta[1];            // s per 1000 yr offset from year 1000
+    const slope_per_yr      = slope_per_1000yr / 1000;
+    console.log(`\n── Linear interpretation ──`);
+    console.log(`  Mean residual at year 1000: ${intercept_at_y1000.toFixed(0)} s  (${(intercept_at_y1000/60).toFixed(1)} min)`);
+    console.log(`  Slope:                       ${slope_per_yr.toFixed(3)} s/yr`);
+    console.log(`  → Pure-tidal model overshoots observations by ${(-slope_per_yr).toFixed(3)} s for every year deeper in the past.`);
+    console.log(`  → Equivalent constant LOD bias: ${(-slope_per_yr * 86400 / 365.25 / 86400 * 1e6).toFixed(2)} μs/day`);
+    console.log(`    (i.e., reducing modelled LOD by this much eliminates the linear trend)`);
+
+    // Detrended residual statistics
+    const d = lin.detrended;
+    const dStd = Math.sqrt(d.reduce((s, v) => s + v*v, 0) / d.length);
+    const dMax = Math.max(...d.map(Math.abs));
+    console.log(`\n── Detrended (residual after linear fit) ──`);
+    console.log(`  RMS scatter:  ${dStd.toFixed(0)} s  (${(dStd/60).toFixed(1)} min)`);
+    console.log(`  Max |dev|:    ${dMax.toFixed(0)} s  (${(dMax/60).toFixed(1)} min)`);
+    console.log(`  Observation-noise floor (NASA |residual| from L-5b): ~1200 s`);
+    console.log(`  → If RMS scatter ≈ noise floor, linear fit captures all structure.`);
+    console.log(`  → If RMS scatter ≫ noise floor, higher-order or periodic structure remains.`);
+
+    // Per-table residual to spot systematic offsets between observation sources
+    const tables = [...new Set(recs.map(r => r.table))].sort();
+    const tableRows = tables.map(tab => {
+      const sub = recs.filter(r => r.table === tab);
+      const meanRes = sub.reduce((s, r) => s + r.res_model, 0) / sub.length;
+      const subDet = sub.map(r => {
+        const X = [1, (r.year - 1000) / 1000];
+        const pred = X.reduce((s, v, p) => s + v * lin.beta[p], 0);
+        return r.res_model - pred;
+      });
+      const subDetMean = subDet.reduce((s, v) => s + v, 0) / subDet.length;
+      return {
+        table:                    tab,
+        n:                        sub.length,
+        mean_raw_residual_s:      meanRes.toFixed(0),
+        mean_detrended_residual_s: subDetMean.toFixed(0),
+        rms_detrended_s:          Math.sqrt(subDet.reduce((s, v) => s + v*v, 0) / sub.length).toFixed(0),
+      };
+    });
+    console.log(`\n── Per-table detrended residual (after linear fit removed) ──`);
+    console.table(tableRows);
+
+    console.log(`\n══════════════════════════════════════════════════════════════════════════════════`);
+    console.log('  Interpretation guide:');
+    console.log(`    • Compare R² values: jump from linear to quadratic > 0.05 ⇒ acceleration bias matters`);
+    console.log(`    • Per-table detrended residuals near 0 ⇒ all sources agree (systematic, not regional)`);
+    console.log(`    • Per-table |detrended residuals| > 1000 s ⇒ some sources biased (Babylonian vs Chinese etc.)`);
+    console.log(`══════════════════════════════════════════════════════════════════════════════════`);
+    window._L5b_fits = { linear: lin, quadratic: fit(2), cubic: fit(3) };
+    console.log('Full fit coefficients exposed at window._L5b_fits.');
+  }, 'L-5b regression diagnostic. Fits linear/quadratic/cubic polynomials to the ' +
+     '(obs − model) ΔT residual vs year, reports R² and RMS. Tells us whether the model ' +
+     'shortfall is a single LOD bias (linear), an acceleration bias (quadratic), or has ' +
+     'higher-order/periodic structure. Per-table breakdown also flags any systematic ' +
+     'differences between Babylonian / Chinese / Greek / Arab observation sources. Requires ' +
+     'L-5b main comparison to have been run.');
+
   // Anchor & Units
   const firstAnchorBtn = addTestButton('Verify J2000 Rates (units check)', () => {
     // Detects the calendar-year vs SI-tropical-year unit mismatch.
@@ -29152,6 +30747,7 @@ function setupGUI() {
   insertGroupLabel('Calibration', firstCalibBtn);
   insertGroupLabel('Balanced Year & 8H', firstBalancedBtn);
   insertGroupLabel('Historical Eclipses & ΔT', firstEclipseBtn);
+  insertGroupLabel('Lunar Eclipses & Validation', firstLunarBtn);
   insertGroupLabel('Anchor & Units', firstAnchorBtn);
   insertGroupLabel('Planet Deep-Time Integrators', firstPlanetIntBtn);
 
@@ -38669,6 +40265,26 @@ function jumpToEclipsePreset(idx) {
   }
 }
 
+/** Parallel to jumpToEclipsePreset but for LUNAR_ECLIPSE_PRESETS. Updates
+ *  _lunarEclipseState.idx (wraps via modulo) and warps the simulation to the
+ *  selected lunar eclipse's JD. Camera/planet selection unchanged — user keeps
+ *  their current view (same convention as the solar Prev/Next buttons). */
+function jumpToLunarEclipsePreset(idx) {
+  const n = LUNAR_ECLIPSE_PRESETS.length;
+  _lunarEclipseState.idx = ((idx % n) + n) % n;
+  const jd = LUNAR_ECLIPSE_PRESETS[_lunarEclipseState.idx].jd;
+  jumpToJulianDay(jd);
+  const converted = dayToDate(jd);
+  o.Date = converted.date;
+  o.Time = converted.time;
+  if (o._rootCtrls) {
+    o._rootCtrls.dateCtrl?.refresh();
+    o._rootCtrls.timeCtrl?.refresh();
+    o._rootCtrls.jdCtrl?.refresh();
+    o._rootCtrls.periCtrl?.refresh();
+  }
+}
+
 /**
  * Blow-up slider for the physical planets only.
  * Pass a slider value `t` ∈ [0, 1].
@@ -38993,50 +40609,10 @@ function loadTexture( url, onLoad ) {
   return tex;
 }
 
-// Well-known historical solar eclipses for the Moon planetStats nav-buttons.
-// JD values are time of greatest eclipse in UT. The 8 existing modern/landmark
-// entries are computed from NASA SE-Canon UT times via calToJD. The 17 newer
-// entries (added 2026-06) come from our Moon polynomial's predicted conjunction
-// JD — same physics used in the Historical Eclipses & ΔT analysis buttons.
-// γ is the Moon path-centerline offset (β-derived for new entries). The
-// simulation interprets JD as TT; for visual eclipse verification, the small
-// ΔT shift (~70 sec modern, ~1500 sec at 1133 AD, ~17000 sec at 584 BC)
-// appears as a fraction-of-a-degree Moon offset and remains within the Meeus
-// polynomial error budget documented in doc 66.
-const ECLIPSE_PRESETS = [
-  // Modern + 20th c.
-  { jd: 2460409.262050, label: '2024 Apr 8 Total',         loc: 'Mexico → Texas → Maine',                  gamma: 0.343,  era: 'Modern' },
-  { jd: 2457987.267733, label: '2017 Aug 21 Total',        loc: 'Coast-to-coast USA',                      gamma: 0.437,  era: 'Modern' },
-  { jd: 2451401.960508, label: '1999 Aug 11 Total',        loc: 'Europe → Middle East',                    gamma: 0.506,  era: '20th c.' },
-  { jd: 2441863.985208, label: '1973 Jun 30 Total',        loc: 'Africa (longest of 20th c.)',             gamma: 0.072,  era: '20th c.' },
-  { jd: 2422108.047858, label: '1919 May 29 Total',        loc: 'Príncipe — Eddington/GR',                 gamma: 0.596,  era: '20th c.' },
-  // Early modern
-  { jd: 2347572.902675, label: '1715 May 3 Total',         loc: 'England — Halley predicted',              gamma: 0.0,    era: '18th c.' },
-  { jd: 2325394.925106, label: '1654 Aug 12 Total',        loc: 'England — European total (Gregorian)',    gamma: 0.489,  era: '17th c.' },
-  // Medieval
-  { jd: 2173756.000111, label: '1239 Jun 3 Total',         loc: 'Tuscany — Cerchiari chronicle',           gamma: 0.325,  era: 'Medieval' },
-  { jd: 2154000.058445, label: '1185 May 1 Annular',       loc: "Russia — Igor's Tale Primary Chronicle",  gamma: 0.541,  era: 'Medieval' },
-  { jd: 2135100.070833, label: '1133 Aug 2 Total',         loc: 'England — King Henry I',                  gamma: -0.243, era: 'Medieval' },
-  { jd: 2087792.051441, label: '1004 Jan 24 Annular',      loc: 'Cairo — Ibn Yunus famous observation',    gamma: 0.226,  era: 'Medieval' },
-  { jd: 2083982.839931, label: '993 Aug 20 Annular',       loc: 'Cairo — Ibn Yunus Hakemite Tables',       gamma: 0.242,  era: 'Medieval' },
-  { jd: 2081030.093891, label: '985 Jul 20 Annular',       loc: 'Cairo — Said-Stephenson catalog',         gamma: 0.284,  era: 'Medieval' },
-  { jd: 2078785.134930, label: '979 May 28 Annular',       loc: 'Cairo — Said-Stephenson catalog',         gamma: 0.603,  era: 'Medieval' },
-  { jd: 2078431.006474, label: '978 Jun 8 Annular',        loc: 'Cairo — Said-Stephenson catalog',         gamma: -0.110, era: 'Medieval' },
-  { jd: 2078253.853718, label: '977 Dec 13 Total',         loc: 'Cairo (partial) — NASA total at 3°N,55°E', gamma: 0.458, era: 'Medieval' },
-  // Classical antiquity
-  { jd: 1747068.890110, label: '71 Mar 20 Total',          loc: 'Aegean — Plutarch De Facie 19',           gamma: 0.635,  era: 'Classical' },
-  // Ancient
-  { jd: 1671853.759762, label: '-135 Apr 15 Total',        loc: 'Babylon — best-preserved diary',          gamma: 0.719,  era: 'Ancient' },
-  { jd: 1608421.835171, label: '-309 Aug 15 Total',        loc: 'Babylon — Antigonus death era',           gamma: 0.348,  era: 'Ancient' },
-  { jd: 1564215.113895, label: '-430 Aug 3 Annular',       loc: 'Athens — Thucydides 2.28',                gamma: 0.798,  era: 'Ancient' },
-  { jd: 1518118.032841, label: '-556 May 19 Partial',      loc: 'Babylon — Nabonidus reign',               gamma: 0.307,  era: 'Ancient' },
-  { jd: 1507900.065279, label: '-584 May 28 Total',        loc: 'Anatolia — Thales predicted',             gamma: 0.353,  era: 'Ancient' },
-  { jd: 1484836.848499, label: '-647 Apr 6 Partial',       loc: 'Babylon — early astronomical diary',      gamma: 0.705,  era: 'Ancient' },
-  { jd: 1462658.779682, label: '-708 Jul 17 Total',        loc: 'Lu State — Chinese Spring/Autumn Annals', gamma: 0.484,  era: 'Ancient' },
-  { jd: 1442902.839207, label: '-762 Jun 15 Total',        loc: 'Nineveh — Bur-Sagale Assyrian Eponym',    gamma: 0.275,  era: 'Ancient' },
-];
-// Current selected eclipse index (mutable across button clicks)
-const _eclipseState = { idx: 0 };
+// ECLIPSE_PRESETS + _eclipseState moved earlier in the file (~line 24830)
+// so they're available when setupGUI() runs at line ~24839 and constructs
+// the Solar & Lunar Eclipses tweakpane folder. Keeping them here would put
+// them in temporal-dead-zone at GUI construction time.
 
 // 0 — per-frame stats
 const planetStats = {
@@ -39664,29 +41240,10 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
-    {header : '—  Historical Solar Eclipses (validation) —' },
-      {label : () => {
-         const cur = ECLIPSE_PRESETS[_eclipseState.idx];
-         const idxLabel = `${_eclipseState.idx + 1}/${ECLIPSE_PRESETS.length}`;
-         return `<button class="pl-ecl-prev" title="Previous eclipse">‹</button>`
-              + ` <span class="pl-ecl-name">${cur.label}</span>`
-              + ` <button class="pl-ecl-next" title="Next eclipse">›</button>`
-              + ` <span class="pl-ecl-idx">${idxLabel}</span>`;
-       },
-       value : [ { v: () => {
-         const cur = ECLIPSE_PRESETS[_eclipseState.idx];
-         return `<button class="pl-ecl-jump" title="Jump simulation to this eclipse">Jump to ${cur.era}</button>`;
-       }},{ small: '' }],
-       hover : [`Click ‹/› to step through well-known historical solar eclipses, then "Jump to …" to set the simulation date. With Earth-centric view (look toward the Sun) you should see Moon and Sun visually overlapping. Modern eclipses overlap to within ~0.1°; ancient eclipses show ~1° offset due to Meeus polynomial accumulating errors over millennia.`]},
-      {label : () => `Location`,
-       value : [ { v: () => ECLIPSE_PRESETS[_eclipseState.idx].loc },{ small: '' }],
-       hover : [`Where the eclipse was visible on Earth. For visual verification in the 3D model, what matters is that the Sun and Moon overlap as seen from Earth's center — the path location depends on Earth's rotation phase (ΔT-dependent), not on the celestial Sun-Moon alignment.`]},
-      {label : () => `γ (gamma)`,
-       value : [ { v: () => ECLIPSE_PRESETS[_eclipseState.idx].gamma, dec:3 },{ small: '' }],
-       hover : [`NASA path-centerline offset. γ=0 means the umbra cone passes through Earth's center; |γ|>1 means the umbra misses Earth (partial only). Expected geocentric Sun-Moon separation in the simulation ≈ |γ| × 0.95° (Moon parallax). For modern eclipses our model matches this to within 0.04° RMS.`]},
-      {label : () => `JD (UT, catalog)`,
-       value : [ { v: () => ECLIPSE_PRESETS[_eclipseState.idx].jd, dec:6, sep:',' },{ small: '' }],
-       hover : [`Julian Day of greatest eclipse (UT) per NASA GSFC five-millennium canon. The simulation interprets this as TT; the ΔT correction (seconds to thousands of seconds depending on era) shifts the path location on Earth but is invisible in the geocentric Moon-Sun alignment check.`]},
+    // Historical Solar Eclipses navigation moved (2026-06-20) to the top-level
+    // tweakpane folder "Solar & Lunar Eclipses" so jumping to an eclipse can
+    // auto-switch the camera to Earth view (the eclipse-observer perspective)
+    // rather than leaving it on the Moon (where the eclipse is invisible).
 
     {header : '—  Moon Cycles & Precession —' },
       {label : () => `Full Moon cycle (fixed stars)`,
@@ -44774,26 +46331,6 @@ function updateDomLabel () {
       _openGroups[grpKey] = !_openGroups[grpKey];
       labelPrevHTML = '';                             // force re-render
       updateDomLabel();
-    });
-
-    /* — Historical Solar Eclipses nav buttons (event delegation) — */
-    body.addEventListener('click', e => {
-      const t = e.target;
-      if (!t || !t.classList) return;
-      if (t.classList.contains('pl-ecl-prev')) {
-        e.stopPropagation();
-        _eclipseState.idx = ((_eclipseState.idx - 1) % ECLIPSE_PRESETS.length + ECLIPSE_PRESETS.length) % ECLIPSE_PRESETS.length;
-        labelPrevHTML = '';
-        updateDomLabel();
-      } else if (t.classList.contains('pl-ecl-next')) {
-        e.stopPropagation();
-        _eclipseState.idx = (_eclipseState.idx + 1) % ECLIPSE_PRESETS.length;
-        labelPrevHTML = '';
-        updateDomLabel();
-      } else if (t.classList.contains('pl-ecl-jump')) {
-        e.stopPropagation();
-        jumpToEclipsePreset(_eclipseState.idx);
-      }
     });
 
     /* — keep image heights in sync on resize — */

@@ -1,0 +1,36 @@
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table S02: Babylonian lunar eclipses, culmination of ziqpu star
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table   Year    DT(s)            Weight
+   02   -225    15500              3
+   02   -193    14000              3
+   02   -189    10400              1
+   02   -182    10100              3
+   02   -177    13200              3
+   02   -162    10400              3
+   02   -159    12700              3
+   02   -149    11400              3
+   02   -142    12750              3
+   02   -135    11800              3
+   02   -134    11900              3
+   02   -133    11500              3
+   02   -128    11350              3
+   02   -122    14000              3
+   02   -119    11900              3
+   02   -104    12000              3
+   02   - 95    11600              3
+   02   - 93     9800              3
+   02   - 86    12000              3
+   02   - 80    10350              3
+   02   - 79    11300              3
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Notes:
+     DT(s)  : Correction to the Earth's clock in seconds.
+     Weight : Weight assigned to observation.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This table of observations is from the paper "Measurement of the Earth's
+Rotation: 720 BC to AD 2015", Stephenson, F.R., Morrison, L.V., and
+Hohenkerk, C.Y., published by Royal Society Proceedings A and available
+from their website at
+http://rspa.royalsocietypublishing.org/lookup/doi/10.1098/rspa.2016.0404
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

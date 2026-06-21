@@ -1,0 +1,37 @@
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table S08: Arab timed solar eclipses
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table   Year    DT(s)            Weight
+   08    829      850              0
+   08    829     2250              4
+   08    866     2200              4
+   08    866     2500              4
+   08    866     2450              4
+   08    891     1650              4
+   08    901     1700              4
+   08    901     1550              4
+   08    923     1900              4
+   08    923     1600              4
+   08    928     1800              4
+   08    977     1800              4
+   08    977     2000              4
+   08    978     1250              4
+   08    978     2000              4
+   08    979     1450              4
+   08    985     1500              4
+   08    985      750              4
+   08    993     2000              4
+   08    993     1400              4
+   08   1004     1450              4
+   08   1004     1150              4
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Notes:
+     DT(s)  : Correction to the Earth's clock in seconds.
+     Weight : Weight assigned to observation.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This table of observations is from the paper "Measurement of the Earth's
+Rotation: 720 BC to AD 2015", Stephenson, F.R., Morrison, L.V., and
+Hohenkerk, C.Y., published by Royal Society Proceedings A and available
+from their website at
+http://rspa.royalsocietypublishing.org/lookup/doi/10.1098/rspa.2016.0404
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

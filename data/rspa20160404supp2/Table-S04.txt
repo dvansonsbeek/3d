@@ -1,0 +1,40 @@
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table S04: Babylonian lunar eclipses in the Almagest
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table   Year  DT-L(s)  DT-U(s)    Note
+   04   -382    15700   [21450]   Short duration - limits defined by
+                                  first contact and Moon set eclipsed
+                                  (see notes below).
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   04   -719     ...     21670    First contact after moonrise.
+   04   -381     ...     17850    First contact after sunset.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Discrete results from timing of contacts or maximal phase
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table   Year    DT(s)             Measurement                   Weight
+   04   -720    21900   began 1.5 equal hours after moonrise      3
+   04   -719    19050   max exactly at midnight                   1
+   04   -620    17800   began 11 seasonal hours after sunset      1
+   04   -522    19250   max 1 equal hour before midnight          1
+   04   -501    18950   max 6 and 1/3 equal hours after sunset    1
+   04   -490    13850   max 0.5 seasonal hour before midnight     1
+   04   -382    17800   began 0.5 seasonal hour before sunrise    3
+   04   -381    16400   began 0.5 seasonal hour after sunset      3
+   04   -381    16050   began 2.5 seasonal hours before midnight  1
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Notes:
+     DT(s)  : Correction to the Earth's clock in seconds.
+     DT-L(s): DT Lower bound limit, seconds
+     DT-U(s): DT Upper bound limit, seconds
+              Short duration - limits defined by first contact
+              and Moon set eclipsed.
+     [     ]: Uncritical limit (see section 3e)
+      ...   : redundant limit (see section 3e)
+ Measurement: Comment on how the observations was timed.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This table of observations is from the paper "Measurement of the Earth's
+Rotation: 720 BC to AD 2015", Stephenson, F.R., Morrison, L.V., and
+Hohenkerk, C.Y., published by Royal Society Proceedings A and available
+from their website at
+http://rspa.royalsocietypublishing.org/lookup/doi/10.1098/rspa.2016.0404
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

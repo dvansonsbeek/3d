@@ -1,0 +1,42 @@
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table S03: Babylonian solar eclipses
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Table   Year    DT(s)  Degree    Weight
+   03   -356    15600     -76      1
+   03   -321    14200     - 3     12
+   03   -280    13300     + 6     11
+   03   -280    12950     +20      6
+   03   -253    11400     -56      1
+   03   -253    11500     -44      2
+   03   -253    11650     -33      4
+   03   -248    13800     +90      1
+   03   -189    12900     +30      4
+   03   -189    13400     +45      2
+   03   -189    14150     +60      1
+   03   -169    12300     -20      6
+   03   -169    12200     - 8     10
+   03   -135    12600     +24      5
+   03   -135    12100     +42      2
+   03   -135    12300     +59      1
+   03   -132    11500     -50      2
+   03   -132    11700     -30      4
+   03   -132    11700     -12     10
+   03   - 88     9200     +45      2
+   03   - 88    10100     +57      1
+   03   - 88    10900     +69      1
+   03   -  9     9900     -90      1
+   03   -  9     9300     -67      1
+   03   -  9     8100     -42      2
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Notes:
+     DT(s)  : Correction to the Earth's clock in seconds.
+     Degree : Babylonian clock interval in degrees.
+              1 degree equals 4 minutes of time.
+     Weight : Weight assigned to observation.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This table of observations is from the paper "Measurement of the Earth's
+Rotation: 720 BC to AD 2015", Stephenson, F.R., Morrison, L.V., and
+Hohenkerk, C.Y., published by Royal Society Proceedings A and available
+from their website at
+http://rspa.royalsocietypublishing.org/lookup/doi/10.1098/rspa.2016.0404
+-+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
