@@ -5034,6 +5034,110 @@ function findLunarEclipsesInRange(jdStart, jdEnd) {
   return results;
 }
 
+// ═════════════════════════════════════════════════════════════════════════════
+// SOLAR ECLIPSE PREDICTIVE FINDER
+//
+// Scans a JD range and returns all solar-eclipse-class conjunctions where the
+// Moon's disk (as seen from somewhere on Earth's surface) covers part of the Sun.
+// Geocentric scan: returns events where some observer on Earth would see at
+// least a partial eclipse. Per-event geometry uses each conjunction's actual
+// Moon distance (perigee vs apogee shifts the central limit and the total↔
+// annular boundary by ~6%).
+//
+// Classification (geocentric Moon ecliptic latitude β at conjunction):
+//   |β| ≤ centralLim   → Total (topocentric Moon disk > Sun disk) or
+//                        Annular (topocentric Moon disk < Sun disk)
+//   |β| ≤ partialLim   → Partial (somewhere on Earth)
+//   |β| larger         → no eclipse
+//
+// "Topocentric" Moon size = at the sub-Moon point an observer is 1 Earth-radius
+// closer than the geocenter. Ratio (topo R / geo R) ≈ 1.017 → this is what
+// distinguishes total from annular when geocentric Moon ≈ Sun in size.
+//
+// Returns array of {jd, beta, moonDistance_km, type, moonAppR_topo, sunAppR,
+// moonSunRatio}.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Find all solar-eclipse-class conjunctions in [jdStart, jdEnd]. */
+function findSolarEclipsesInRange(jdStart, jdEnd) {
+  const STEP_DAYS = moonSynodicMonth / 60;
+  const _rad2deg   = 180 / Math.PI;
+  const R_EARTH_KM = R_EARTH_M / 1000;
+  const R_MOON_KM  = diameters.moonDiameter / 2;
+  const R_SUN_KM   = diameters.sunDiameter / 2;
+  const D_SUN_KM   = currentAUDistance;
+  const sunAppR    = Math.atan(R_SUN_KM / D_SUN_KM) * _rad2deg;  // ~0.266°
+
+  // Per-event geometry computed at conjunction.
+  // Eclipse limits (Meeus Ch. 54 simplified geocentric form):
+  //   Partial: any observer on Earth sees partial overlap
+  //   Central: Moon's umbra/antumbra cone reaches Earth's surface
+  const _solarGeometry = (D_MOON_KM) => {
+    const moonAppR_geo  = Math.atan(R_MOON_KM / D_MOON_KM) * _rad2deg;
+    const moonAppR_topo = Math.atan(R_MOON_KM / (D_MOON_KM - R_EARTH_KM)) * _rad2deg;
+    const parallax      = Math.atan(R_EARTH_KM / D_MOON_KM) * _rad2deg;  // ~0.95°
+    return {
+      moonAppR_geo, moonAppR_topo, parallax, sunAppR,
+      partialLim: sunAppR + moonAppR_geo + parallax,
+      centralLim: parallax - Math.abs(moonAppR_topo - sunAppR),
+      isTotal:    moonAppR_topo > sunAppR,
+    };
+  };
+
+  // Wrapped conjunction diff: 0 means Moon at conjunction (same ecl. lon. as Sun)
+  const conjDiff = (jd) => {
+    let d = _eclMoonLon(jd) - _eclSunLon(jd);
+    while (d >  180) d -= 360;
+    while (d <= -180) d += 360;
+    return d;
+  };
+
+  const results = [];
+  let prevJD   = jdStart;
+  let prevDiff = conjDiff(prevJD);
+
+  for (let jd = jdStart + STEP_DAYS; jd <= jdEnd; jd += STEP_DAYS) {
+    const d = conjDiff(jd);
+    if (prevDiff < 0 && d >= 0 && (d - prevDiff) < 30) {
+      // Bisect to ~1-second precision
+      let lo = prevJD, hi = jd;
+      for (let i = 0; i < 40; i++) {
+        const mid = (lo + hi) / 2;
+        if (conjDiff(mid) < 0) lo = mid; else hi = mid;
+        if (hi - lo < 1 / 86400) break;
+      }
+      const jdConj = (lo + hi) / 2;
+      const beta   = _eclMoonBeta(jdConj);
+      const absB   = Math.abs(beta);
+      const D_moon = _eclMoonDistance(jdConj);
+      const G      = _solarGeometry(D_moon);
+
+      let type = null;
+      if (absB <= G.centralLim) {
+        type = G.isTotal ? 'Total' : 'Annular';
+      } else if (absB <= G.partialLim) {
+        type = 'Partial';
+      }
+
+      if (type) {
+        results.push({
+          jd:               jdConj,
+          beta:             beta,
+          moonDistance_km:  D_moon,
+          type:             type,
+          moonAppR_topo:    G.moonAppR_topo,
+          sunAppR:          G.sunAppR,
+          moonSunRatio:     G.moonAppR_topo / G.sunAppR,
+        });
+      }
+    }
+    prevDiff = d;
+    prevJD   = jd;
+  }
+
+  return results;
+}
+
 /** Tropical year in SI 86400-s days at given epoch. Phase 9.2 sDay anchor —
  *  used so scene orbital periods in JD are Kepler-invariant across epochs
  *  (mass-loss correction only; essentially constant). */
@@ -29499,6 +29603,95 @@ function setupGUI() {
      '(default 1000-1010 CE — Ibn Yunus era). Use to populate the historical ' +
      'catalog with verified JDs. Edit START_YEAR/END_YEAR in script.js to scan ' +
      'other eras.');
+
+  addTestButton('Predictive SOLAR eclipse finder — validate + predict beyond NASA Canon', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Predictive solar eclipse finder');
+    console.log('  ');
+    console.log('  Scans Sun-Moon conjunctions in two windows:');
+    console.log('    Window A: 2026-01-01 to 2036-12-31   → cross-check against published NASA list');
+    console.log('    Window B: 3001-01-01 to 3050-12-31   → genuine predictions outside NASA Canon');
+    console.log('                                            (NASA Canon ends at year 3000 CE)');
+    console.log('  ');
+    console.log('  Classification per event:');
+    console.log('    Total     — topocentric Moon disk > Sun disk, |β| ≤ central limit (~1°)');
+    console.log('    Annular   — topocentric Moon disk < Sun disk, |β| ≤ central limit');
+    console.log('    Partial   — |β| ≤ partial limit (~1.5°), but no central alignment');
+    console.log('  ');
+    console.log('  All geometry derived from model constants — no astronomical-library calls.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    // ─── Window A: validation (compare to your NASA reference) ───
+    const tA = performance.now();
+    const jdA0 = dateTimeToJulianDay('2026-01-01', '00:00:00');
+    const jdA1 = dateTimeToJulianDay('2036-12-31', '23:59:59');
+    const eventsA = findSolarEclipsesInRange(jdA0, jdA1);
+    const elapsedA = performance.now() - tA;
+    console.log(`── Window A (validation: 2026-2036 CE) — ${eventsA.length} events found in ${elapsedA.toFixed(0)} ms ──`);
+    console.log(`   Cross-check at https://eclipse.gsfc.nasa.gov/SEcat5/SE2001-2100.html`);
+    console.table(eventsA.map(e => {
+      const dt = dayToDate(e.jd);
+      return {
+        date:           dt.date,
+        time_UT:        dt.time,
+        jd:             e.jd.toFixed(4),
+        type:           e.type,
+        beta_deg:       e.beta.toFixed(4),
+        moon_size_R:    e.moonAppR_topo.toFixed(4),
+        sun_size_R:     e.sunAppR.toFixed(4),
+        moon_sun_ratio: e.moonSunRatio.toFixed(4),
+        moon_dist_km:   Math.round(e.moonDistance_km).toLocaleString('en-US'),
+      };
+    }));
+
+    // ─── Window B: genuine prediction beyond NASA Canon ───
+    const tB = performance.now();
+    const jdB0 = dateTimeToJulianDay('3001-01-01', '00:00:00');
+    const jdB1 = dateTimeToJulianDay('3050-12-31', '23:59:59');
+    const eventsB = findSolarEclipsesInRange(jdB0, jdB1);
+    const elapsedB = performance.now() - tB;
+    console.log(`\n── Window B (genuine prediction: 3001-3050 CE) — ${eventsB.length} events found in ${elapsedB.toFixed(0)} ms ──`);
+    console.log(`   NASA's 5,000-Year Canon of Solar Eclipses (Espenak/Meeus) covers -1999 to +3000 CE.`);
+    console.log(`   Events below are predicted by THIS framework alone — no NASA reference exists.`);
+    console.table(eventsB.map(e => {
+      const dt = dayToDate(e.jd);
+      return {
+        date:           dt.date,
+        time_UT:        dt.time,
+        jd:             e.jd.toFixed(4),
+        type:           e.type,
+        beta_deg:       e.beta.toFixed(4),
+        moon_size_R:    e.moonAppR_topo.toFixed(4),
+        sun_size_R:     e.sunAppR.toFixed(4),
+        moon_sun_ratio: e.moonSunRatio.toFixed(4),
+        moon_dist_km:   Math.round(e.moonDistance_km).toLocaleString('en-US'),
+      };
+    }));
+
+    // ─── Summary ───
+    const aTypes = eventsA.reduce((acc, e) => (acc[e.type] = (acc[e.type] || 0) + 1, acc), {});
+    const bTypes = eventsB.reduce((acc, e) => (acc[e.type] = (acc[e.type] || 0) + 1, acc), {});
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log(`  SUMMARY — solar eclipses found:`);
+    console.log(`    2026-2036 (11 yr):  ${eventsA.length} events  (Total: ${aTypes.Total||0}, Annular: ${aTypes.Annular||0}, Partial: ${aTypes.Partial||0})`);
+    console.log(`    3001-3050 (50 yr):  ${eventsB.length} events  (Total: ${bTypes.Total||0}, Annular: ${bTypes.Annular||0}, Partial: ${bTypes.Partial||0})`);
+    console.log(`    Expected rate per decade: ~24 solar eclipses (any type, geocentric)`);
+    console.log(`  `);
+    console.log(`  Accuracy caveats for window B:`);
+    console.log(`    • DATES should be accurate to within minutes (lunar/solar ephemeris is well-defined)`);
+    console.log(`    • Type classification may differ for borderline cases at the total↔annular boundary`);
+    console.log(`    • UT TIME-OF-DAY depends on ΔT(year), which our model predicts but is uncertain by`);
+    console.log(`      ±10-20 min in the post-2200 extrapolation (no future ΔT validation data exists)`);
+    console.log(`    • Visibility (which part of Earth sees the eclipse) NOT computed — geocentric scan only`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    // Expose for inspection
+    window._solarEclipses = { windowA: eventsA, windowB: eventsB };
+    console.log('Full event arrays exposed at window._solarEclipses.{windowA, windowB}');
+  }, 'Predictive solar eclipse finder. Scans 2026-2036 for validation against ' +
+     'NASA\'s published list, then 3001-3050 for genuine predictions beyond NASA\'s ' +
+     'Canon (which ends at year 3000). Reports date/time/type/Moon-Sun size ratio. ' +
+     'All geometry from model constants.');
 
   addTestButton('Load & cross-check NASA Lunar Canon (Phase L-3)', async () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
