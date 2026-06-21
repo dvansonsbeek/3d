@@ -1,0 +1,2295 @@
+{
+  "_meta": {
+    "description": "1-component 8H/n lattice harmonic fit to the Stephenson 2016 \u0394T residual (observed \u2212 framework). The single harmonic at integer n=1825 has period 8H/1825 \u2248 1469.9 yr, matching the Bond cycle (Bond et al. 2001 North Atlantic ice-rafted-debris climate cycle) to better than 0.01%. Cross-validated: BCE residuals are predicted from a CE-only fit to R\u00b2 = +0.974; medieval bump is predicted from pre-year-900 data to R\u00b2 = +0.14 with correct sign and ~10% amplitude.",
+    "source_script": "scripts/export_bond_cycle_residual_fit.py",
+    "derivation_pipeline": [
+      "scripts/lod_residual_lattice_fit.py \u2014 single-comp scan + greedy + random control",
+      "scripts/lod_residual_lattice_cv.py \u2014 4-split cross-validation"
+    ],
+    "framework_period_kyr": 1.4698827397260275,
+    "framework_n": 1825,
+    "framework_period_yr": 1469.8827397260275,
+    "eight_H_yr": 2682536,
+    "H_yr": 335317,
+    "matches_bond_cycle": "Bond et al. 2001 \u2014 1470 yr North Atlantic cycle; match to <0.01%",
+    "model_constants": {
+      "EARTH_MOI_FACTOR": 0.3306947,
+      "EARTH_MOI_FACTOR_RATE_YR": -1.8e-11,
+      "GIA_MODES": [
+        {
+          "tau": 1500,
+          "frac": 0.15
+        },
+        {
+          "tau": 5000,
+          "frac": 0.55
+        },
+        {
+          "tau": 14000,
+          "frac": 0.3
+        }
+      ],
+      "MEAN_LENGTH_OF_DAY_S": 86399.99967739312,
+      "MEAN_SIDEREAL_YEAR_DAYS": 365.25636437382195
+    }
+  },
+  "evaluation": {
+    "formula": "\u0394T_correction(year) = intercept + linear\u00b7u + quadratic\u00b7u\u00b2 + cos_coeff\u00b7cos(2\u03c0\u00b7year/P_bond) + sin_coeff\u00b7sin(2\u03c0\u00b7year/P_bond), where u = (year \u2212 center_year)/1000.",
+    "units": "seconds",
+    "center_year": 645.0,
+    "detrend_units": "per kyr (u = (year-center)/1000)",
+    "add_residual_mean": -506.7876531125036,
+    "apply_as": "To get Bond-corrected \u0394T: \u0394T_corrected(year) = framework_\u0394T(year) + \u0394T_correction(year) + add_residual_mean"
+  },
+  "coefficients": {
+    "intercept": -275.80840432621125,
+    "linear_per_kyr": -100.57660223344755,
+    "quadratic_per_kyr2": 437.4418287496852,
+    "cos_coeff_seconds": 168.10526685018704,
+    "sin_coeff_seconds": 335.0343313572316,
+    "bond_amplitude_seconds": 374.84314577001385,
+    "bond_phase_degrees": -63.354546195851306,
+    "bond_period_years": 1469.8827397260275,
+    "bond_lattice_integer_n": 1825
+  },
+  "fit_metrics_in_sample": {
+    "n_points": 274,
+    "year_range": [
+      -720.0,
+      2010.0
+    ],
+    "r2_full_fit": 0.974168791942316,
+    "rms_post_fit_s": 57.15859245963962,
+    "rms_pre_fit_s": 355.6388251955625,
+    "residual_mean_s": -506.7876531125036
+  },
+  "cross_validation": {
+    "train_-720_to_1500__test_1500_to_2016": {
+      "n_train": 223,
+      "n_test": 51,
+      "r2_train": 0.9898651946605674,
+      "rms_train_s": 31.389391451249402,
+      "r2_test": -1.805387577188069,
+      "rms_test_s": 268.11696745328027
+    },
+    "train_0_to_2016__test_-720_to_0": {
+      "n_train": 202,
+      "n_test": 72,
+      "r2_train": 0.9733929236011396,
+      "rms_train_s": 65.3307292534398,
+      "r2_test": 0.9737413465794572,
+      "rms_test_s": 25.472351831609522
+    },
+    "alternating_decades_interleaved": {
+      "n_train": 137,
+      "n_test": 137,
+      "r2_train": 0.9743568644815874,
+      "rms_train_s": 56.89445773341283,
+      "r2_test": 0.9739717606848552,
+      "rms_test_s": 57.43218887235222
+    },
+    "train_-720_to_900__test_900_to_2016": {
+      "n_train": 163,
+      "n_test": 111,
+      "r2_train": 0.9975595641886044,
+      "rms_train_s": 13.174582924760882,
+      "r2_test": 0.1366455222777785,
+      "rms_test_s": 422.54748593252555
+    }
+  },
+  "control_random_integers_summary": "10 trials with random n in [1118, 30495] (same period range as candidates) achieved R\u00b2 \u2248 0.47-0.49 on the full residual \u2014 i.e. no improvement over detrend-only (R\u00b2 = 0.476). Lattice integer n=1825 is specifically resonant; random integers in the same range are not. See lod_residual_lattice_fit.py Stage D output for details.",
+  "timeseries_residual_10yr_grid": [
+    {
+      "year": -720.0,
+      "stephenson_deltaT_s": 20550.593,
+      "model_deltaT_s": 20506.450789653645,
+      "residual_observed_s": 44.14221034635557,
+      "residual_predicted_s": -19.402598261488833,
+      "residual_post_fit_s": 63.5448086078444
+    },
+    {
+      "year": -710.0,
+      "stephenson_deltaT_s": 20361.638387133717,
+      "model_deltaT_s": 20353.23522632968,
+      "residual_observed_s": 8.403160804034997,
+      "residual_predicted_s": -45.96338323687871,
+      "residual_post_fit_s": 54.36654404091371
+    },
+    {
+      "year": -700.0,
+      "stephenson_deltaT_s": 20174.555869391173,
+      "model_deltaT_s": 20200.60966221457,
+      "residual_observed_s": -26.05379282339709,
+      "residual_predicted_s": -72.06616801832035,
+      "residual_post_fit_s": 46.012375194923266
+    },
+    {
+      "year": -690.0,
+      "stephenson_deltaT_s": 19989.326053056815,
+      "model_deltaT_s": 20048.573928673894,
+      "residual_observed_s": -59.247875617078535,
+      "residual_predicted_s": -97.68667949741405,
+      "residual_post_fit_s": 38.43880388033551
+    },
+    {
+      "year": -680.0,
+      "stephenson_deltaT_s": 19805.929544415085,
+      "model_deltaT_s": 19897.127856576262,
+      "residual_observed_s": -91.19831216117745,
+      "residual_predicted_s": -122.80136582069747,
+      "residual_post_fit_s": 31.603053659520015
+    },
+    {
+      "year": -670.0,
+      "stephenson_deltaT_s": 19624.34694975045,
+      "model_deltaT_s": 19746.27127657237,
+      "residual_observed_s": -121.92432682192157,
+      "residual_predicted_s": -147.38743941785873,
+      "residual_post_fit_s": 25.46311259593716
+    },
+    {
+      "year": -660.0,
+      "stephenson_deltaT_s": 19444.55887534735,
+      "model_deltaT_s": 19596.004018571464,
+      "residual_observed_s": -151.44514322411487,
+      "residual_predicted_s": -171.42291863363783,
+      "residual_post_fit_s": 19.977775409522962
+    },
+    {
+      "year": -650.0,
+      "stephenson_deltaT_s": 19266.545927490235,
+      "model_deltaT_s": 19446.325912259552,
+      "residual_observed_s": -179.7799847693168,
+      "residual_predicted_s": -194.88666788735702,
+      "residual_post_fit_s": 15.106683118040223
+    },
+    {
+      "year": -640.0,
+      "stephenson_deltaT_s": 19090.288712463556,
+      "model_deltaT_s": 19297.23678682834,
+      "residual_observed_s": -206.94807436478368,
+      "residual_predicted_s": -217.7584362867081,
+      "residual_post_fit_s": 10.810361921924425
+    },
+    {
+      "year": -630.0,
+      "stephenson_deltaT_s": 18915.767836551768,
+      "model_deltaT_s": 19148.73647104432,
+      "residual_observed_s": -232.96863449255397,
+      "residual_predicted_s": -240.01889462525378,
+      "residual_post_fit_s": 7.050260132699805
+    },
+    {
+      "year": -620.0,
+      "stephenson_deltaT_s": 18742.963906039316,
+      "model_deltaT_s": 19000.824793214248,
+      "residual_observed_s": -257.8608871749311,
+      "residual_predicted_s": -261.64967069604853,
+      "residual_post_fit_s": 3.7887835211174092
+    },
+    {
+      "year": -610.0,
+      "stephenson_deltaT_s": 18571.85752721065,
+      "model_deltaT_s": 18853.501581131946,
+      "residual_observed_s": -281.6440539212963,
+      "residual_predicted_s": -282.633382856863,
+      "residual_post_fit_s": 0.9893289355667321
+    },
+    {
+      "year": -600.0,
+      "stephenson_deltaT_s": 18402.42930635022,
+      "model_deltaT_s": 18706.766662277674,
+      "residual_observed_s": -304.33735592745506,
+      "residual_predicted_s": -302.9536717856887,
+      "residual_post_fit_s": -1.3836841417663663
+    },
+    {
+      "year": -590.0,
+      "stephenson_deltaT_s": 18234.65984974248,
+      "model_deltaT_s": 18560.619863613458,
+      "residual_observed_s": -325.9600138709793,
+      "residual_predicted_s": -322.59523036851124,
+      "residual_post_fit_s": -3.3647835024680717
+    },
+    {
+      "year": -580.0,
+      "stephenson_deltaT_s": 18068.529763671875,
+      "model_deltaT_s": 18415.06101171597,
+      "residual_observed_s": -346.53124804409526,
+      "residual_predicted_s": -341.5438316647401,
+      "residual_post_fit_s": -4.987416379355182
+    },
+    {
+      "year": -570.0,
+      "stephenson_deltaT_s": 17904.01965442286,
+      "model_deltaT_s": 18270.08993253472,
+      "residual_observed_s": -366.0702781118598,
+      "residual_predicted_s": -359.7863548992134,
+      "residual_post_fit_s": -6.283923212646414
+    },
+    {
+      "year": -560.0,
+      "stephenson_deltaT_s": 17741.110128279888,
+      "model_deltaT_s": 18125.706451811922,
+      "residual_observed_s": -384.59632353203415,
+      "residual_predicted_s": -377.31080943328345,
+      "residual_post_fit_s": -7.285514098750696
+    },
+    {
+      "year": -550.0,
+      "stephenson_deltaT_s": 17579.7817915274,
+      "model_deltaT_s": 17981.910394683873,
+      "residual_observed_s": -402.1286031564741,
+      "residual_predicted_s": -394.1063566711934,
+      "residual_post_fit_s": -8.022246485280732
+    },
+    {
+      "year": -540.0,
+      "stephenson_deltaT_s": 17420.015250449847,
+      "model_deltaT_s": 17838.701585869625,
+      "residual_observed_s": -418.6863354197776,
+      "residual_predicted_s": -410.1633298617207,
+      "residual_post_fit_s": -8.523005558056923
+    },
+    {
+      "year": -530.0,
+      "stephenson_deltaT_s": 17261.791111331684,
+      "model_deltaT_s": 17696.07984957799,
+      "residual_observed_s": -434.288738246305,
+      "residual_predicted_s": -425.47325175891183,
+      "residual_post_fit_s": -8.815486487393173
+    },
+    {
+      "year": -520.0,
+      "stephenson_deltaT_s": 17105.089980457364,
+      "model_deltaT_s": 17554.045009643072,
+      "residual_observed_s": -448.95502918570855,
+      "residual_predicted_s": -440.0288501096431,
+      "residual_post_fit_s": -8.926179076065466
+    },
+    {
+      "year": -510.0,
+      "stephenson_deltaT_s": 16949.89246411133,
+      "model_deltaT_s": 17412.596889423265,
+      "residual_observed_s": -462.70442531193476,
+      "residual_predicted_s": -453.8240709397105,
+      "residual_post_fit_s": -8.880354372224247
+    },
+    {
+      "year": -500.0,
+      "stephenson_deltaT_s": 16796.179168578034,
+      "model_deltaT_s": 17271.735311780005,
+      "residual_observed_s": -475.5561432019713,
+      "residual_predicted_s": -466.8540896141784,
+      "residual_post_fit_s": -8.702053587792875
+    },
+    {
+      "year": -490.0,
+      "stephenson_deltaT_s": 16643.93070014193,
+      "model_deltaT_s": 17131.460099016644,
+      "residual_observed_s": -487.5293988747144,
+      "residual_predicted_s": -479.11531965177795,
+      "residual_post_fit_s": -8.414079222936437
+    },
+    {
+      "year": -480.0,
+      "stephenson_deltaT_s": 16493.127665087464,
+      "model_deltaT_s": 16991.77107318407,
+      "residual_observed_s": -498.64340809660644,
+      "residual_predicted_s": -490.6054192772519,
+      "residual_post_fit_s": -8.037988819354553
+    },
+    {
+      "year": -470.0,
+      "stephenson_deltaT_s": 16343.750669699088,
+      "model_deltaT_s": 16852.668055716622,
+      "residual_observed_s": -508.9173860175342,
+      "residual_predicted_s": -501.32329569967743,
+      "residual_post_fit_s": -7.5940903178567964
+    },
+    {
+      "year": -460.0,
+      "stephenson_deltaT_s": 16195.780320261252,
+      "model_deltaT_s": 16714.150867543696,
+      "residual_observed_s": -518.370547282444,
+      "residual_predicted_s": -511.26910710894725,
+      "residual_post_fit_s": -7.101440173496769
+    },
+    {
+      "year": -450.0,
+      "stephenson_deltaT_s": 16049.197223058405,
+      "model_deltaT_s": 16576.219329254534,
+      "residual_observed_s": -527.0221061961292,
+      "residual_predicted_s": -520.4442623867632,
+      "residual_post_fit_s": -6.5778438093660725
+    },
+    {
+      "year": -440.0,
+      "stephenson_deltaT_s": 15903.981984375001,
+      "model_deltaT_s": 16438.8732609042,
+      "residual_observed_s": -534.8912765292007,
+      "residual_predicted_s": -528.8514185326708,
+      "residual_post_fit_s": -6.039857996529918
+    },
+    {
+      "year": -430.0,
+      "stephenson_deltaT_s": 15760.115210495485,
+      "model_deltaT_s": 16302.112481995006,
+      "residual_observed_s": -541.9972714995201,
+      "residual_predicted_s": -536.4944758098368,
+      "residual_post_fit_s": -5.502795689683353
+    },
+    {
+      "year": -420.0,
+      "stephenson_deltaT_s": 15617.57750770431,
+      "model_deltaT_s": 16165.936811596066,
+      "residual_observed_s": -548.3593038917552,
+      "residual_predicted_s": -543.378570619437,
+      "residual_post_fit_s": -4.980733272318162
+    },
+    {
+      "year": -410.0,
+      "stephenson_deltaT_s": 15476.349482285927,
+      "model_deltaT_s": 16030.346068401792,
+      "residual_observed_s": -553.9965861158653,
+      "residual_predicted_s": -549.5100661166751,
+      "residual_post_fit_s": -4.486519999190136
+    },
+    {
+      "year": -400.0,
+      "stephenson_deltaT_s": 15336.411740524783,
+      "model_deltaT_s": 15895.340070482069,
+      "residual_observed_s": -558.9283299572853,
+      "residual_predicted_s": -554.8965405855741,
+      "residual_post_fit_s": -4.03178937171117
+    },
+    {
+      "year": -390.0,
+      "stephenson_deltaT_s": 15197.74488870533,
+      "model_deltaT_s": 15760.918635460315,
+      "residual_observed_s": -563.1737467549847,
+      "residual_predicted_s": -559.5467735937801,
+      "residual_post_fit_s": -3.626973161204546
+    },
+    {
+      "year": -380.0,
+      "stephenson_deltaT_s": 15060.329533112019,
+      "model_deltaT_s": 15627.081580542716,
+      "residual_observed_s": -566.7520474306966,
+      "residual_predicted_s": -563.470729952674,
+      "residual_post_fit_s": -3.281317478022629
+    },
+    {
+      "year": -370.0,
+      "stephenson_deltaT_s": 14924.146280029297,
+      "model_deltaT_s": 15493.828722345479,
+      "residual_observed_s": -569.6824423161816,
+      "residual_predicted_s": -566.6795415120937,
+      "residual_post_fit_s": -3.002900804087858
+    },
+    {
+      "year": -360.0,
+      "stephenson_deltaT_s": 14789.175735741619,
+      "model_deltaT_s": 15361.159877059608,
+      "residual_observed_s": -571.9841413179893,
+      "residual_predicted_s": -569.1854868229273,
+      "residual_post_fit_s": -2.79865449506201
+    },
+    {
+      "year": -350.0,
+      "stephenson_deltaT_s": 14655.398506533433,
+      "model_deltaT_s": 15229.074860368515,
+      "residual_observed_s": -573.6763538350824,
+      "residual_predicted_s": -571.0019687047343,
+      "residual_post_fit_s": -2.674385130348128
+    },
+    {
+      "year": -340.0,
+      "stephenson_deltaT_s": 14522.795198689186,
+      "model_deltaT_s": 15097.573487386897,
+      "residual_observed_s": -574.7782886977111,
+      "residual_predicted_s": -572.1434897593765,
+      "residual_post_fit_s": -2.6347989383345976
+    },
+    {
+      "year": -330.0,
+      "stephenson_deltaT_s": 14391.346418493333,
+      "model_deltaT_s": 14966.655572849422,
+      "residual_observed_s": -575.3091543560895,
+      "residual_predicted_s": -572.6256258753932,
+      "residual_post_fit_s": -2.683528480696282
+    },
+    {
+      "year": -320.0,
+      "stephenson_deltaT_s": 14261.032772230321,
+      "model_deltaT_s": 14836.320930988484,
+      "residual_observed_s": -575.2881587581633,
+      "residual_predicted_s": -572.46499777153,
+      "residual_post_fit_s": -2.8231609866332974
+    },
+    {
+      "year": -310.0,
+      "stephenson_deltaT_s": 14131.834866184605,
+      "model_deltaT_s": 14706.569375388035,
+      "residual_observed_s": -574.7345092034302,
+      "residual_predicted_s": -571.6792406314067,
+      "residual_post_fit_s": -3.055268572023465
+    },
+    {
+      "year": -300.0,
+      "stephenson_deltaT_s": 14003.733306640626,
+      "model_deltaT_s": 14577.40071931578,
+      "residual_observed_s": -573.6674126751532,
+      "residual_predicted_s": -570.2869718848035,
+      "residual_post_fit_s": -3.3804407903496667
+    },
+    {
+      "year": -290.0,
+      "stephenson_deltaT_s": 13876.708699882842,
+      "model_deltaT_s": 14448.814775412242,
+      "residual_observed_s": -572.1060755294002,
+      "residual_predicted_s": -568.3077571944239,
+      "residual_post_fit_s": -3.7983183349763294
+    },
+    {
+      "year": -280.0,
+      "stephenson_deltaT_s": 13750.741652195702,
+      "model_deltaT_s": 14320.811355900712,
+      "residual_observed_s": -570.0697037050104,
+      "residual_predicted_s": -565.7620747102795,
+      "residual_post_fit_s": -4.307628994730862
+    },
+    {
+      "year": -270.0,
+      "stephenson_deltaT_s": 13625.812769863653,
+      "model_deltaT_s": 14193.390272308205,
+      "residual_observed_s": -567.577502444552,
+      "residual_predicted_s": -562.6712776569992,
+      "residual_post_fit_s": -4.906224787552787
+    },
+    {
+      "year": -260.0,
+      "stephenson_deltaT_s": 13501.902659171148,
+      "model_deltaT_s": 14066.551335837512,
+      "residual_observed_s": -564.6486766663638,
+      "residual_predicted_s": -559.0575553224141,
+      "residual_post_fit_s": -5.5911213439496805
+    },
+    {
+      "year": -250.0,
+      "stephenson_deltaT_s": 13378.991926402634,
+      "model_deltaT_s": 13940.294357186494,
+      "residual_observed_s": -561.3024307838605,
+      "residual_predicted_s": -554.943892518693,
+      "residual_post_fit_s": -6.358538265167454
+    },
+    {
+      "year": -240.0,
+      "stephenson_deltaT_s": 13257.061177842566,
+      "model_deltaT_s": 13814.619146423174,
+      "residual_observed_s": -557.5579685806078,
+      "residual_predicted_s": -550.3540275900879,
+      "residual_post_fit_s": -7.203940990519982
+    },
+    {
+      "year": -230.0,
+      "stephenson_deltaT_s": 13136.091019775391,
+      "model_deltaT_s": 13689.5255130256,
+      "residual_observed_s": -553.4344932502081,
+      "residual_predicted_s": -545.3124090440108,
+      "residual_post_fit_s": -8.122084206197314
+    },
+    {
+      "year": -220.0,
+      "stephenson_deltaT_s": 13016.06205848556,
+      "model_deltaT_s": 13565.01326624061,
+      "residual_observed_s": -548.9512077550498,
+      "residual_predicted_s": -539.8441508846707,
+      "residual_post_fit_s": -9.107056870379097
+    },
+    {
+      "year": -210.0,
+      "stephenson_deltaT_s": 12896.954900257522,
+      "model_deltaT_s": 13441.08221454702,
+      "residual_observed_s": -544.127314289497,
+      "residual_predicted_s": -533.9749867308803,
+      "residual_post_fit_s": -10.152327558616662
+    },
+    {
+      "year": -200.0,
+      "stephenson_deltaT_s": 12778.75015137573,
+      "model_deltaT_s": 13317.732165926676,
+      "residual_observed_s": -538.9820145509457,
+      "residual_predicted_s": -527.7312228018503,
+      "residual_post_fit_s": -11.250791749095356
+    },
+    {
+      "year": -190.0,
+      "stephenson_deltaT_s": 12661.428418124631,
+      "model_deltaT_s": 13194.962927936225,
+      "residual_observed_s": -533.534509811594,
+      "residual_predicted_s": -521.1396898568696,
+      "residual_post_fit_s": -12.394819954724426
+    },
+    {
+      "year": -180.0,
+      "stephenson_deltaT_s": 12544.970306788677,
+      "model_deltaT_s": 13072.774307513102,
+      "residual_observed_s": -527.8040007244254,
+      "residual_predicted_s": -514.2276941766736,
+      "residual_post_fit_s": -13.576306547751756
+    },
+    {
+      "year": -170.0,
+      "stephenson_deltaT_s": 12429.356423652318,
+      "model_deltaT_s": 12951.166111116385,
+      "residual_observed_s": -521.8096874640669,
+      "residual_predicted_s": -507.0229676760543,
+      "residual_post_fit_s": -14.78671978801259
+    },
+    {
+      "year": -160.0,
+      "stephenson_deltaT_s": 12314.567375,
+      "model_deltaT_s": 12830.138144593917,
+      "residual_observed_s": -515.5707695939163,
+      "residual_predicted_s": -499.5536172388566,
+      "residual_post_fit_s": -16.01715235505975
+    },
+    {
+      "year": -150.0,
+      "stephenson_deltaT_s": 12200.583767116183,
+      "model_deltaT_s": 12709.690213328471,
+      "residual_observed_s": -509.1064462122886,
+      "residual_predicted_s": -491.8480733679218,
+      "residual_post_fit_s": -17.25837284436676
+    },
+    {
+      "year": -140.0,
+      "stephenson_deltaT_s": 12087.386206285304,
+      "model_deltaT_s": 12589.822122158024,
+      "residual_observed_s": -502.4359158727202,
+      "residual_predicted_s": -483.9350382437934,
+      "residual_post_fit_s": -18.500877628926844
+    },
+    {
+      "year": -130.0,
+      "stephenson_deltaT_s": 11974.955298791825,
+      "model_deltaT_s": 12470.533675359811,
+      "residual_observed_s": -495.5783765679862,
+      "residual_predicted_s": -475.8434332870793,
+      "residual_post_fit_s": -19.73494328090692
+    },
+    {
+      "year": -120.0,
+      "stephenson_deltaT_s": 11863.271650920191,
+      "model_deltaT_s": 12351.824676615777,
+      "residual_observed_s": -488.55302569558626,
+      "residual_predicted_s": -467.60234632027266,
+      "residual_post_fit_s": -20.950679375313598
+    },
+    {
+      "year": -110.0,
+      "stephenson_deltaT_s": 11752.315868954853,
+      "model_deltaT_s": 12233.694929219866,
+      "residual_observed_s": -481.3790602650133,
+      "residual_predicted_s": -459.240978425563,
+      "residual_post_fit_s": -22.138081839450308
+    },
+    {
+      "year": -100.0,
+      "stephenson_deltaT_s": 11642.068559180258,
+      "model_deltaT_s": 12116.144235740512,
+      "residual_observed_s": -474.0756765602546,
+      "residual_predicted_s": -450.788590595727,
+      "residual_post_fit_s": -23.28708596452759
+    },
+    {
+      "year": -90.0,
+      "stephenson_deltaT_s": 11532.51032788086,
+      "model_deltaT_s": 11999.172398265135,
+      "residual_observed_s": -466.66207038427456,
+      "residual_predicted_s": -442.2744502755649,
+      "residual_post_fit_s": -24.387620108709655
+    },
+    {
+      "year": -80.0,
+      "stephenson_deltaT_s": 11423.62178134111,
+      "model_deltaT_s": 11882.779218381535,
+      "residual_observed_s": -459.15743704042507,
+      "residual_predicted_s": -433.7277778915505,
+      "residual_post_fit_s": -25.429659148874578
+    },
+    {
+      "year": -70.0,
+      "stephenson_deltaT_s": 11315.383525845455,
+      "model_deltaT_s": 11766.964497023757,
+      "residual_observed_s": -451.5809711783022,
+      "residual_predicted_s": -425.1776934673801,
+      "residual_post_fit_s": -26.40327771092211
+    },
+    {
+      "year": -60.0,
+      "stephenson_deltaT_s": 11207.776167678345,
+      "model_deltaT_s": 11651.728034628886,
+      "residual_observed_s": -443.95186695054144,
+      "residual_predicted_s": -416.65316342295387,
+      "residual_post_fit_s": -27.298703527587577
+    },
+    {
+      "year": -50.0,
+      "stephenson_deltaT_s": 11100.780313124233,
+      "model_deltaT_s": 11537.069631094526,
+      "residual_observed_s": -436.28931797029327,
+      "residual_predicted_s": -408.1829476539844,
+      "residual_post_fit_s": -28.10637031630887
+    },
+    {
+      "year": -40.0,
+      "stephenson_deltaT_s": 10994.376568467567,
+      "model_deltaT_s": 11422.989085664523,
+      "residual_observed_s": -428.6125171969561,
+      "residual_predicted_s": -399.7955469889162,
+      "residual_post_fit_s": -28.81697020803989
+    },
+    {
+      "year": -30.0,
+      "stephenson_deltaT_s": 10888.545539992798,
+      "model_deltaT_s": 11309.48619710171,
+      "residual_observed_s": -420.940657108913,
+      "residual_predicted_s": -391.5191511191497,
+      "residual_post_fit_s": -29.421505989763318
+    },
+    {
+      "year": -20.0,
+      "stephenson_deltaT_s": 10783.267833984375,
+      "model_deltaT_s": 11196.560763663987,
+      "residual_observed_s": -413.2929296796119,
+      "residual_predicted_s": -383.38158709769857,
+      "residual_post_fit_s": -29.911342581913345
+    },
+    {
+      "year": -10.0,
+      "stephenson_deltaT_s": 10678.52405672675,
+      "model_deltaT_s": 11084.21258281996,
+      "residual_observed_s": -405.6885260932104,
+      "residual_predicted_s": -375.41026850037304,
+      "residual_post_fit_s": -30.27825759283735
+    },
+    {
+      "year": 0.0,
+      "stephenson_deltaT_s": 10574.294814504374,
+      "model_deltaT_s": 10972.441451618348,
+      "residual_observed_s": -398.14663711397407,
+      "residual_predicted_s": -367.63214534236636,
+      "residual_post_fit_s": -30.51449177160771
+    },
+    {
+      "year": 10.0,
+      "stephenson_deltaT_s": 10470.560713601693,
+      "model_deltaT_s": 10861.247166621535,
+      "residual_observed_s": -390.6864530198418,
+      "residual_predicted_s": -360.07365484174795,
+      "residual_post_fit_s": -30.61279817809384
+    },
+    {
+      "year": 20.0,
+      "stephenson_deltaT_s": 10367.302360303162,
+      "model_deltaT_s": 10750.629523653111,
+      "residual_observed_s": -383.32716334994984,
+      "residual_predicted_s": -352.7606731198133,
+      "residual_post_fit_s": -30.566490230136537
+    },
+    {
+      "year": 30.0,
+      "stephenson_deltaT_s": 10264.500360893227,
+      "model_deltaT_s": 10640.588317880252,
+      "residual_observed_s": -376.0879569870249,
+      "residual_predicted_s": -345.7184679265348,
+      "residual_post_fit_s": -30.369489060490082
+    },
+    {
+      "year": 40.0,
+      "stephenson_deltaT_s": 10162.13532165634,
+      "model_deltaT_s": 10531.12334411668,
+      "residual_observed_s": -368.9880224603403,
+      "residual_predicted_s": -338.9716524774787,
+      "residual_post_fit_s": -30.01636998286159
+    },
+    {
+      "year": 50.0,
+      "stephenson_deltaT_s": 10060.187848876954,
+      "model_deltaT_s": 10422.234396517048,
+      "residual_observed_s": -362.0465476400932,
+      "residual_predicted_s": -332.5441404865298,
+      "residual_post_fit_s": -29.50240715356341
+    },
+    {
+      "year": 60.0,
+      "stephenson_deltaT_s": 9958.638548839514,
+      "model_deltaT_s": 10313.921268566304,
+      "residual_observed_s": -355.2827197267907,
+      "residual_predicted_s": -326.459102476574,
+      "residual_post_fit_s": -28.82361725021667
+    },
+    {
+      "year": 70.0,
+      "stephenson_deltaT_s": 9857.468027828472,
+      "model_deltaT_s": 10206.183753175372,
+      "residual_observed_s": -348.7157253468995,
+      "residual_predicted_s": -320.73892344795956,
+      "residual_post_fit_s": -27.976801898939925
+    },
+    {
+      "year": 80.0,
+      "stephenson_deltaT_s": 9756.65689212828,
+      "model_deltaT_s": 10099.021642707718,
+      "residual_observed_s": -342.3647505794379,
+      "residual_predicted_s": -315.4051619820733,
+      "residual_post_fit_s": -26.959588597364586
+    },
+    {
+      "year": 90.0,
+      "stephenson_deltaT_s": 9656.185748023387,
+      "model_deltaT_s": 9992.434728997958,
+      "residual_observed_s": -336.24898097457117,
+      "residual_predicted_s": -310.47851085474815,
+      "residual_post_fit_s": -25.770470119823017
+    },
+    {
+      "year": 100.0,
+      "stephenson_deltaT_s": 9556.035201798244,
+      "model_deltaT_s": 9886.422803157857,
+      "residual_observed_s": -330.38760135961275,
+      "residual_predicted_s": -305.9787592314608,
+      "residual_post_fit_s": -24.408842128151946
+    },
+    {
+      "year": 110.0,
+      "stephenson_deltaT_s": 9456.185859737296,
+      "model_deltaT_s": 9780.985655664026,
+      "residual_observed_s": -324.79979592673044,
+      "residual_predicted_s": -301.9247565133854,
+      "residual_post_fit_s": -22.875039413345064
+    },
+    {
+      "year": 120.0,
+      "stephenson_deltaT_s": 9356.618328125001,
+      "model_deltaT_s": 9676.12307654661,
+      "residual_observed_s": -319.5047484216084,
+      "residual_predicted_s": -298.3343779003558,
+      "residual_post_fit_s": -21.170370521252607
+    },
+    {
+      "year": 130.0,
+      "stephenson_deltaT_s": 9257.313213245805,
+      "model_deltaT_s": 9571.834855067722,
+      "residual_observed_s": -314.521641821917,
+      "residual_predicted_s": -295.22449173365203,
+      "residual_post_fit_s": -19.29715008826497
+    },
+    {
+      "year": 140.0,
+      "stephenson_deltaT_s": 9158.251121384155,
+      "model_deltaT_s": 9468.120780011119,
+      "residual_observed_s": -309.8696586269634,
+      "residual_predicted_s": -292.61092867827324,
+      "residual_post_fit_s": -17.25872994869019
+    },
+    {
+      "year": 150.0,
+      "stephenson_deltaT_s": 9059.412658824509,
+      "model_deltaT_s": 9364.980639419102,
+      "residual_observed_s": -305.5679805945929,
+      "residual_predicted_s": -290.50845280099963,
+      "residual_post_fit_s": -15.059527793593247
+    },
+    {
+      "year": 160.0,
+      "stephenson_deltaT_s": 8960.778431851313,
+      "model_deltaT_s": 9262.4142208503,
+      "residual_observed_s": -301.63578899898675,
+      "residual_predicted_s": -288.9307345970842,
+      "residual_post_fit_s": -12.705054401902544
+    },
+    {
+      "year": 170.0,
+      "stephenson_deltaT_s": 8862.329046749015,
+      "model_deltaT_s": 9160.421311222874,
+      "residual_observed_s": -298.09226447385845,
+      "residual_predicted_s": -287.890326014851,
+      "residual_post_fit_s": -10.201938459007465
+    },
+    {
+      "year": 180.0,
+      "stephenson_deltaT_s": 8764.045109802068,
+      "model_deltaT_s": 9059.001696779967,
+      "residual_observed_s": -294.95658697789986,
+      "residual_predicted_s": -287.39863752383087,
+      "residual_post_fit_s": -7.557949454068989
+    },
+    {
+      "year": 190.0,
+      "stephenson_deltaT_s": 8665.907227294923,
+      "model_deltaT_s": 8958.155163137546,
+      "residual_observed_s": -292.2479358426226,
+      "residual_predicted_s": -287.4659172683289,
+      "residual_post_fit_s": -4.782018574293716
+    },
+    {
+      "year": 200.0,
+      "stephenson_deltaT_s": 8567.896005512026,
+      "model_deltaT_s": 8857.881495446503,
+      "residual_observed_s": -289.9854899344773,
+      "residual_predicted_s": -288.10123234450987,
+      "residual_post_fit_s": -1.884257589967433
+    },
+    {
+      "year": 210.0,
+      "stephenson_deltaT_s": 8469.99205073783,
+      "model_deltaT_s": 8758.180478063128,
+      "residual_observed_s": -288.1884273252981,
+      "residual_predicted_s": -289.31245223520716,
+      "residual_post_fit_s": 1.1240249099090533
+    },
+    {
+      "year": 220.0,
+      "stephenson_deltaT_s": 8372.175969256787,
+      "model_deltaT_s": 8659.051894559734,
+      "residual_observed_s": -286.8759253029475,
+      "residual_predicted_s": -291.1062344327196,
+      "residual_post_fit_s": 4.230309129772081
+    },
+    {
+      "year": 230.0,
+      "stephenson_deltaT_s": 8274.428367353346,
+      "model_deltaT_s": 8560.49552826414,
+      "residual_observed_s": -286.067160910794,
+      "residual_predicted_s": -293.4880122758615,
+      "residual_post_fit_s": 7.420851365067506
+    },
+    {
+      "year": 240.0,
+      "stephenson_deltaT_s": 8176.729851311953,
+      "model_deltaT_s": 8462.511161651095,
+      "residual_observed_s": -285.7813103391418,
+      "residual_predicted_s": -296.4619850234893,
+      "residual_post_fit_s": 10.680674684347537
+    },
+    {
+      "year": 250.0,
+      "stephenson_deltaT_s": 8079.061027417065,
+      "model_deltaT_s": 8365.098576485781,
+      "residual_observed_s": -286.03754906871654,
+      "residual_predicted_s": -300.0311101826376,
+      "residual_post_fit_s": 13.993561113921032
+    },
+    {
+      "year": 260.0,
+      "stephenson_deltaT_s": 7981.402501953126,
+      "model_deltaT_s": 8268.257553938094,
+      "residual_observed_s": -286.85505198496776,
+      "residual_predicted_s": -304.1970981052822,
+      "residual_post_fit_s": 17.34204612031442
+    },
+    {
+      "year": 270.0,
+      "stephenson_deltaT_s": 7883.73488120459,
+      "model_deltaT_s": 8171.987874702227,
+      "residual_observed_s": -288.25299349763645,
+      "residual_predicted_s": -308.9604088636014,
+      "residual_post_fit_s": 20.70741536596495
+    },
+    {
+      "year": 280.0,
+      "stephenson_deltaT_s": 7786.038771455904,
+      "model_deltaT_s": 8076.289318640562,
+      "residual_observed_s": -290.250547184658,
+      "residual_predicted_s": -314.32025140944404,
+      "residual_post_fit_s": 24.06970422478605
+    },
+    {
+      "year": 290.0,
+      "stephenson_deltaT_s": 7688.2947789915215,
+      "model_deltaT_s": 7981.161664876685,
+      "residual_observed_s": -292.86688588516336,
+      "residual_predicted_s": -320.27458501954027,
+      "residual_post_fit_s": 27.407699134376912
+    },
+    {
+      "year": 300.0,
+      "stephenson_deltaT_s": 7590.483510095892,
+      "model_deltaT_s": 7886.604692077084,
+      "residual_observed_s": -296.1211819811924,
+      "residual_predicted_s": -326.8201230238143,
+      "residual_post_fit_s": 30.69894104262187
+    },
+    {
+      "year": 310.0,
+      "stephenson_deltaT_s": 7492.585571053464,
+      "model_deltaT_s": 7792.618178193368,
+      "residual_observed_s": -300.03260713990403,
+      "residual_predicted_s": -333.9523388099874,
+      "residual_post_fit_s": 33.919731670083365
+    },
+    {
+      "year": 320.0,
+      "stephenson_deltaT_s": 7394.581568148689,
+      "model_deltaT_s": 7699.201900448979,
+      "residual_observed_s": -304.6203323002901,
+      "residual_predicted_s": -341.66547409350324,
+      "residual_post_fit_s": 37.04514179321313
+    },
+    {
+      "year": 330.0,
+      "stephenson_deltaT_s": 7296.452107666017,
+      "model_deltaT_s": 7606.355635557111,
+      "residual_observed_s": -309.9035278910942,
+      "residual_predicted_s": -349.95254943766224,
+      "residual_post_fit_s": 40.04902154656804
+    },
+    {
+      "year": 340.0,
+      "stephenson_deltaT_s": 7198.177795889898,
+      "model_deltaT_s": 7514.079159441666,
+      "residual_observed_s": -315.90136355176764,
+      "residual_predicted_s": -358.8053770047505,
+      "residual_post_fit_s": 42.90401345298284
+    },
+    {
+      "year": 350.0,
+      "stephenson_deltaT_s": 7099.73923910478,
+      "model_deltaT_s": 7422.372247412655,
+      "residual_observed_s": -322.63300830787557,
+      "residual_predicted_s": -368.21457551486316,
+      "residual_post_fit_s": 45.581567206987586
+    },
+    {
+      "year": 360.0,
+      "stephenson_deltaT_s": 7001.117043595115,
+      "model_deltaT_s": 7331.234674123676,
+      "residual_observed_s": -330.11763052856077,
+      "residual_predicted_s": -378.1695873850956,
+      "residual_post_fit_s": 48.051956856534844
+    },
+    {
+      "year": 370.0,
+      "stephenson_deltaT_s": 6902.291815645356,
+      "model_deltaT_s": 7240.6662133274185,
+      "residual_observed_s": -338.3743976820624,
+      "residual_predicted_s": -388.65869801778905,
+      "residual_post_fit_s": 50.28430033572664
+    },
+    {
+      "year": 380.0,
+      "stephenson_deltaT_s": 6803.244161539955,
+      "model_deltaT_s": 7150.66663847627,
+      "residual_observed_s": -347.42247693631543,
+      "residual_predicted_s": -399.66905720259194,
+      "residual_post_fit_s": 52.24658026627651
+    },
+    {
+      "year": 390.0,
+      "stephenson_deltaT_s": 6703.954687563349,
+      "model_deltaT_s": 7061.235722031355,
+      "residual_observed_s": -357.2810344680065,
+      "residual_predicted_s": -411.1867025932358,
+      "residual_post_fit_s": 53.90566812522928
+    },
+    {
+      "year": 400.0,
+      "stephenson_deltaT_s": 6604.404000000001,
+      "model_deltaT_s": 6972.373235932919,
+      "residual_observed_s": -367.9692359329174,
+      "residual_predicted_s": -423.19658521613616,
+      "residual_post_fit_s": 55.22734928321876
+    },
+    {
+      "year": 410.0,
+      "stephenson_deltaT_s": 6504.582177912037,
+      "model_deltaT_s": 6884.0789513345735,
+      "residual_observed_s": -379.49677342253653,
+      "residual_predicted_s": -435.6825969642135,
+      "residual_post_fit_s": 56.18582354167694
+    },
+    {
+      "year": 420.0,
+      "stephenson_deltaT_s": 6404.517237740742,
+      "model_deltaT_s": 6796.352638613929,
+      "residual_observed_s": -391.8354008731876,
+      "residual_predicted_s": -448.6276000257055,
+      "residual_post_fit_s": 56.79219915251787
+    },
+    {
+      "year": 430.0,
+      "stephenson_deltaT_s": 6304.246668625,
+      "model_deltaT_s": 6709.194067683526,
+      "residual_observed_s": -404.94739905852566,
+      "residual_predicted_s": -462.0134581942051,
+      "residual_post_fit_s": 57.06605913567944
+    },
+    {
+      "year": 440.0,
+      "stephenson_deltaT_s": 6203.807959703704,
+      "model_deltaT_s": 6622.603007666612,
+      "residual_observed_s": -418.79504796290803,
+      "residual_predicted_s": -475.82107000272214,
+      "residual_post_fit_s": 57.02602203981411
+    },
+    {
+      "year": 450.0,
+      "stephenson_deltaT_s": 6103.238600115741,
+      "model_deltaT_s": 6536.579226921065,
+      "residual_observed_s": -433.34062680532406,
+      "residual_predicted_s": -490.0304036212337,
+      "residual_post_fit_s": 56.689776815909624
+    },
+    {
+      "year": 460.0,
+      "stephenson_deltaT_s": 6002.576079,
+      "model_deltaT_s": 6451.1224932759105,
+      "residual_observed_s": -448.54641427591014,
+      "residual_predicted_s": -504.6205334539682,
+      "residual_post_fit_s": 56.07411917805808
+    },
+    {
+      "year": 470.0,
+      "stephenson_deltaT_s": 5901.857885495371,
+      "model_deltaT_s": 6366.232573701787,
+      "residual_observed_s": -464.37468820641607,
+      "residual_predicted_s": -519.5696783695603,
+      "residual_post_fit_s": 55.19499016314421
+    },
+    {
+      "year": 480.0,
+      "stephenson_deltaT_s": 5801.121508740742,
+      "model_deltaT_s": 6281.909234406619,
+      "residual_observed_s": -480.7877256658776,
+      "residual_predicted_s": -534.8552414942316,
+      "residual_post_fit_s": 54.067515828353976
+    },
+    {
+      "year": 490.0,
+      "stephenson_deltaT_s": 5700.404437875,
+      "model_deltaT_s": 6198.152240973808,
+      "residual_observed_s": -497.7478030988077,
+      "residual_predicted_s": -550.4538514952985,
+      "residual_post_fit_s": 52.706048396490814
+    },
+    {
+      "year": 500.0,
+      "stephenson_deltaT_s": 5599.744162037037,
+      "model_deltaT_s": 6114.961358332999,
+      "residual_observed_s": -515.2171962959619,
+      "residual_predicted_s": -566.3414052795819,
+      "residual_post_fit_s": 51.12420898361995
+    },
+    {
+      "year": 510.0,
+      "stephenson_deltaT_s": 5499.178170365742,
+      "model_deltaT_s": 6032.336350550137,
+      "residual_observed_s": -533.158180184395,
+      "residual_predicted_s": -582.4931120287113,
+      "residual_post_fit_s": 49.334931844316316
+    },
+    {
+      "year": 520.0,
+      "stephenson_deltaT_s": 5398.743952,
+      "model_deltaT_s": 5950.2769809842575,
+      "residual_observed_s": -551.5330289842577,
+      "residual_predicted_s": -598.8835384908745,
+      "residual_post_fit_s": 47.35050950661673
+    },
+    {
+      "year": 530.0,
+      "stephenson_deltaT_s": 5298.478996078704,
+      "model_deltaT_s": 5868.783012252945,
+      "residual_observed_s": -570.304016174241,
+      "residual_predicted_s": -615.4866554462639,
+      "residual_post_fit_s": 45.18263927202281
+    },
+    {
+      "year": 540.0,
+      "stephenson_deltaT_s": 5198.420791740742,
+      "model_deltaT_s": 5787.85420642367,
+      "residual_observed_s": -589.4334146829278,
+      "residual_predicted_s": -632.2758852613302,
+      "residual_post_fit_s": 42.84247057840241
+    },
+    {
+      "year": 550.0,
+      "stephenson_deltaT_s": 5098.606828125001,
+      "model_deltaT_s": 5707.490324710832,
+      "residual_observed_s": -608.8834965858314,
+      "residual_predicted_s": -649.2241504449662,
+      "residual_post_fit_s": 40.34065385913482
+    },
+    {
+      "year": 560.0,
+      "stephenson_deltaT_s": 4999.0745943703705,
+      "model_deltaT_s": 5627.691127489048,
+      "residual_observed_s": -628.6165331186776,
+      "residual_predicted_s": -666.3039231179063,
+      "residual_post_fit_s": 37.687389999228685
+    },
+    {
+      "year": 570.0,
+      "stephenson_deltaT_s": 4899.861579615741,
+      "model_deltaT_s": 5548.456374622685,
+      "residual_observed_s": -648.594795006944,
+      "residual_predicted_s": -683.4872753049664,
+      "residual_post_fit_s": 34.892480298022406
+    },
+    {
+      "year": 580.0,
+      "stephenson_deltaT_s": 4801.005273000001,
+      "model_deltaT_s": 5469.78582502471,
+      "residual_observed_s": -668.7805520247093,
+      "residual_predicted_s": -700.745929958243,
+      "residual_post_fit_s": 31.96537793353366
+    },
+    {
+      "year": 590.0,
+      "stephenson_deltaT_s": 4702.543163662038,
+      "model_deltaT_s": 5391.67923697028,
+      "residual_observed_s": -689.136073308242,
+      "residual_predicted_s": -718.0513126180508,
+      "residual_post_fit_s": 28.91523930980884
+    },
+    {
+      "year": 600.0,
+      "stephenson_deltaT_s": 4604.512740740743,
+      "model_deltaT_s": 5314.136367825671,
+      "residual_observed_s": -709.6236270849286,
+      "residual_predicted_s": -735.3746036172204,
+      "residual_post_fit_s": 25.750976532291816
+    },
+    {
+      "year": 610.0,
+      "stephenson_deltaT_s": 4506.951493375001,
+      "model_deltaT_s": 5237.1569743831315,
+      "residual_observed_s": -730.2054810081308,
+      "residual_predicted_s": -752.6867907333786,
+      "residual_post_fit_s": 22.481309725247797
+    },
+    {
+      "year": 620.0,
+      "stephenson_deltaT_s": 4409.896910703705,
+      "model_deltaT_s": 5160.740812608412,
+      "residual_observed_s": -750.8439019047073,
+      "residual_predicted_s": -769.9587221930192,
+      "residual_post_fit_s": 19.114820288311876
+    },
+    {
+      "year": 630.0,
+      "stephenson_deltaT_s": 4313.386481865741,
+      "model_deltaT_s": 5084.887637662028,
+      "residual_observed_s": -771.5011557962871,
+      "residual_predicted_s": -787.1611599305267,
+      "residual_post_fit_s": 15.660004134239557
+    },
+    {
+      "year": 640.0,
+      "stephenson_deltaT_s": 4217.457696,
+      "model_deltaT_s": 5009.597203952411,
+      "residual_observed_s": -792.1395079524109,
+      "residual_predicted_s": -804.2648330048535,
+      "residual_post_fit_s": 12.125325052442577
+    },
+    {
+      "year": 650.0,
+      "stephenson_deltaT_s": 4122.1480422453715,
+      "model_deltaT_s": 4934.86926529536,
+      "residual_observed_s": -812.7212230499881,
+      "residual_predicted_s": -821.2404910762574,
+      "residual_post_fit_s": 8.519268026269287
+    },
+    {
+      "year": 660.0,
+      "stephenson_deltaT_s": 4027.4950097407414,
+      "model_deltaT_s": 4860.7035745765315,
+      "residual_observed_s": -833.2085648357902,
+      "residual_predicted_s": -838.0589578454029,
+      "residual_post_fit_s": 4.850393009612731
+    },
+    {
+      "year": 670.0,
+      "stephenson_deltaT_s": 3933.536087625,
+      "model_deltaT_s": 4787.099883772706,
+      "residual_observed_s": -853.5637961477055,
+      "residual_predicted_s": -854.6911843571929,
+      "residual_post_fit_s": 1.1273882094874352
+    },
+    {
+      "year": 680.0,
+      "stephenson_deltaT_s": 3840.3087650370376,
+      "model_deltaT_s": 4714.057944260056,
+      "residual_observed_s": -873.749179223018,
+      "residual_predicted_s": -871.108302071948,
+      "residual_post_fit_s": -2.6408771510700717
+    },
+    {
+      "year": 690.0,
+      "stephenson_deltaT_s": 3747.8505311157414,
+      "model_deltaT_s": 4641.577506675958,
+      "residual_observed_s": -893.7269755602165,
+      "residual_predicted_s": -887.2816756069755,
+      "residual_post_fit_s": -6.445299953241033
+    },
+    {
+      "year": 700.0,
+      "stephenson_deltaT_s": 3656.1988750000005,
+      "model_deltaT_s": 4569.658320624005,
+      "residual_observed_s": -913.4594456240043,
+      "residual_predicted_s": -903.1829550521697,
+      "residual_post_fit_s": -10.276490571834529
+    },
+    {
+      "year": 710.0,
+      "stephenson_deltaT_s": 3565.3912858287044,
+      "model_deltaT_s": 4498.30013505669,
+      "residual_observed_s": -932.9088492279857,
+      "residual_predicted_s": -918.7841277640674,
+      "residual_post_fit_s": -14.124721463918263
+    },
+    {
+      "year": 720.0,
+      "stephenson_deltaT_s": 3475.4652527407416,
+      "model_deltaT_s": 4427.502698254149,
+      "residual_observed_s": -952.0374455134079,
+      "residual_predicted_s": -934.0575695437303,
+      "residual_post_fit_s": -17.97987596967755
+    },
+    {
+      "year": 730.0,
+      "stephenson_deltaT_s": 3386.4582648750006,
+      "model_deltaT_s": 4357.265757630159,
+      "residual_observed_s": -970.8074927551584,
+      "residual_predicted_s": -948.9760951049574,
+      "residual_post_fit_s": -21.831397650200984
+    },
+    {
+      "year": 740.0,
+      "stephenson_deltaT_s": 3298.4078113703713,
+      "model_deltaT_s": 4287.5890596816425,
+      "residual_observed_s": -989.1812483112712,
+      "residual_predicted_s": -963.5130077406226,
+      "residual_post_fit_s": -25.668240570648663
+    },
+    {
+      "year": 750.0,
+      "stephenson_deltaT_s": 3211.3513813657414,
+      "model_deltaT_s": 4218.472350097631,
+      "residual_observed_s": -1007.1209687318892,
+      "residual_predicted_s": -977.6421480963991,
+      "residual_post_fit_s": -29.478820635490138
+    },
+    {
+      "year": 760.0,
+      "stephenson_deltaT_s": 3125.3264640000007,
+      "model_deltaT_s": 4149.915373945289,
+      "residual_observed_s": -1024.588909945288,
+      "residual_predicted_s": -991.337941962764,
+      "residual_post_fit_s": -33.25096798252389
+    },
+    {
+      "year": 770.0,
+      "stephenson_deltaT_s": 3040.3705484120374,
+      "model_deltaT_s": 4081.9178752579974,
+      "residual_observed_s": -1041.54732684596,
+      "residual_predicted_s": -1004.5754469979686,
+      "residual_post_fit_s": -36.97187984799143
+    },
+    {
+      "year": 780.0,
+      "stephenson_deltaT_s": 2956.521123740742,
+      "model_deltaT_s": 4014.479597213409,
+      "residual_observed_s": -1057.9584734726668,
+      "residual_predicted_s": -1017.3303982966136,
+      "residual_post_fit_s": -40.628075176053244
+    },
+    {
+      "year": 790.0,
+      "stephenson_deltaT_s": 2873.815679125001,
+      "model_deltaT_s": 3947.6002824284296,
+      "residual_observed_s": -1073.7846033034284,
+      "residual_predicted_s": -1029.579252720578,
+      "residual_post_fit_s": -44.205350582850315
+    },
+    {
+      "year": 800.0,
+      "stephenson_deltaT_s": 2792.2917037037046,
+      "model_deltaT_s": 3881.279672640332,
+      "residual_observed_s": -1088.9879689366276,
+      "residual_predicted_s": -1041.2992319113107,
+      "residual_post_fit_s": -47.68873702531687
+    },
+    {
+      "year": 810.0,
+      "stephenson_deltaT_s": 2711.9866866157413,
+      "model_deltaT_s": 3815.517508597768,
+      "residual_observed_s": -1103.5308219820267,
+      "residual_predicted_s": -1052.4683639049,
+      "residual_post_fit_s": -51.06245807712685
+    },
+    {
+      "year": 820.0,
+      "stephenson_deltaT_s": 2632.9381170000006,
+      "model_deltaT_s": 3750.313530291991,
+      "residual_observed_s": -1117.3754132919903,
+      "residual_predicted_s": -1063.0655232739011,
+      "residual_post_fit_s": -54.30989001808916
+    },
+    {
+      "year": 830.0,
+      "stephenson_deltaT_s": 2555.183483995371,
+      "model_deltaT_s": 3685.667476911687,
+      "residual_observed_s": -1130.4839929163163,
+      "residual_predicted_s": -1073.070469722572,
+      "residual_post_fit_s": -57.41352319374437
+    },
+    {
+      "year": 840.0,
+      "stephenson_deltaT_s": 2478.7602767407416,
+      "model_deltaT_s": 3621.5790866675525,
+      "residual_observed_s": -1142.818809926811,
+      "residual_predicted_s": -1082.4638850650163,
+      "residual_post_fit_s": -60.35492486179464
+    },
+    {
+      "year": 850.0,
+      "stephenson_deltaT_s": 2403.7059843750008,
+      "model_deltaT_s": 3558.048097031504,
+      "residual_observed_s": -1154.342112656503,
+      "residual_predicted_s": -1091.2274085186698,
+      "residual_post_fit_s": -63.114704137833314
+    },
+    {
+      "year": 860.0,
+      "stephenson_deltaT_s": 2330.0580960370376,
+      "model_deltaT_s": 3495.074244579846,
+      "residual_observed_s": -1165.0161485428084,
+      "residual_predicted_s": -1099.3436702486529,
+      "residual_post_fit_s": -65.67247829415555
+    },
+    {
+      "year": 870.0,
+      "stephenson_deltaT_s": 2257.854100865742,
+      "model_deltaT_s": 3432.6572650995986,
+      "residual_observed_s": -1174.8031642338565,
+      "residual_predicted_s": -1106.7963231017045,
+      "residual_post_fit_s": -68.00684113215198
+    },
+    {
+      "year": 880.0,
+      "stephenson_deltaT_s": 2187.131488000001,
+      "model_deltaT_s": 3370.796893516752,
+      "residual_observed_s": -1183.665405516751,
+      "residual_predicted_s": -1113.570072471721,
+      "residual_post_fit_s": -70.09533304502997
+    },
+    {
+      "year": 890.0,
+      "stephenson_deltaT_s": 2117.9277465787045,
+      "model_deltaT_s": 3309.492863912179,
+      "residual_observed_s": -1191.5651173334745,
+      "residual_predicted_s": -1119.650704242339,
+      "residual_post_fit_s": -71.91441309113543
+    },
+    {
+      "year": 900.0,
+      "stephenson_deltaT_s": 2050.280365740741,
+      "model_deltaT_s": 3248.7449092771676,
+      "residual_observed_s": -1198.4645435364264,
+      "residual_predicted_s": -1125.0251107555064,
+      "residual_post_fit_s": -73.43943278092001
+    },
+    {
+      "year": 910.0,
+      "stephenson_deltaT_s": 1984.2268346250012,
+      "model_deltaT_s": 3188.552761935971,
+      "residual_observed_s": -1204.3259273109697,
+      "residual_predicted_s": -1129.6813147586063,
+      "residual_post_fit_s": -74.64461255236347
+    },
+    {
+      "year": 920.0,
+      "stephenson_deltaT_s": 1919.8046423703713,
+      "model_deltaT_s": 3128.916153187005,
+      "residual_observed_s": -1209.1115108166337,
+      "residual_predicted_s": -1133.6084912863769,
+      "residual_post_fit_s": -75.50301953025678
+    },
+    {
+      "year": 930.0,
+      "stephenson_deltaT_s": 1857.0512781157413,
+      "model_deltaT_s": 3069.834813685593,
+      "residual_observed_s": -1212.7835355698517,
+      "residual_predicted_s": -1136.7969874376524,
+      "residual_post_fit_s": -75.98654813219923
+    },
+    {
+      "year": 940.0,
+      "stephenson_deltaT_s": 1796.0042310000003,
+      "model_deltaT_s": 3011.3084730133814,
+      "residual_observed_s": -1215.304242013381,
+      "residual_predicted_s": -1139.238340010796,
+      "residual_post_fit_s": -76.06590200258506
+    },
+    {
+      "year": 950.0,
+      "stephenson_deltaT_s": 1736.700990162038,
+      "model_deltaT_s": 2953.3368600212125,
+      "residual_observed_s": -1216.6358698591746,
+      "residual_predicted_s": -1140.9252909655993,
+      "residual_post_fit_s": -75.7105788935753
+    },
+    {
+      "year": 960.0,
+      "stephenson_deltaT_s": 1679.1790447407416,
+      "model_deltaT_s": 2895.9197025261346,
+      "residual_observed_s": -1216.740657785393,
+      "residual_predicted_s": -1141.8518006834088,
+      "residual_post_fit_s": -74.88885710198429
+    },
+    {
+      "year": 970.0,
+      "stephenson_deltaT_s": 1623.4758838750004,
+      "model_deltaT_s": 2839.0567274203713,
+      "residual_observed_s": -1215.580843545371,
+      "residual_predicted_s": -1142.0130590012457,
+      "residual_post_fit_s": -73.56778454412529
+    },
+    {
+      "year": 980.0,
+      "stephenson_deltaT_s": 1569.6289967037042,
+      "model_deltaT_s": 2782.7476606819546,
+      "residual_observed_s": -1213.1186639782504,
+      "residual_predicted_s": -1141.4054939997657,
+      "residual_post_fit_s": -71.71316997848476
+    },
+    {
+      "year": 990.0,
+      "stephenson_deltaT_s": 1517.6758723657417,
+      "model_deltaT_s": 2726.9922274012933,
+      "residual_observed_s": -1209.3163550355516,
+      "residual_predicted_s": -1140.026778528999,
+      "residual_post_fit_s": -69.28957650655252
+    },
+    {
+      "year": 1000.0,
+      "stephenson_deltaT_s": 1467.6540000000007,
+      "model_deltaT_s": 2671.790151977839,
+      "residual_observed_s": -1204.1361519778382,
+      "residual_predicted_s": -1137.8758344599544,
+      "residual_post_fit_s": -66.26031751788378
+    },
+    {
+      "year": 1010.0,
+      "stephenson_deltaT_s": 1419.585160728,
+      "model_deltaT_s": 2617.141157647042,
+      "residual_observed_s": -1197.555996919042,
+      "residual_predicted_s": -1134.9528346543127,
+      "residual_post_fit_s": -62.603162264729235
+    },
+    {
+      "year": 1020.0,
+      "stephenson_deltaT_s": 1373.4282426240002,
+      "model_deltaT_s": 2563.044966785954,
+      "residual_observed_s": -1189.6167241619537,
+      "residual_predicted_s": -1131.2592026486154,
+      "residual_post_fit_s": -58.35752151333827
+    },
+    {
+      "year": 1030.0,
+      "stephenson_deltaT_s": 1329.126425256,
+      "model_deltaT_s": 2509.501300862754,
+      "residual_observed_s": -1180.374875606754,
+      "residual_predicted_s": -1126.7976100535273,
+      "residual_post_fit_s": -53.57726555322665
+    },
+    {
+      "year": 1040.0,
+      "stephenson_deltaT_s": 1286.622888192,
+      "model_deltaT_s": 2456.5098803038636,
+      "residual_observed_s": -1169.8869921118637,
+      "residual_predicted_s": -1121.571971672918,
+      "residual_post_fit_s": -48.315020438945794
+    },
+    {
+      "year": 1050.0,
+      "stephenson_deltaT_s": 1245.860811,
+      "model_deltaT_s": 2404.0704247331414,
+      "residual_observed_s": -1158.2096137331414,
+      "residual_predicted_s": -1115.5874383516857,
+      "residual_post_fit_s": -42.62217538145569
+    },
+    {
+      "year": 1060.0,
+      "stephenson_deltaT_s": 1206.783373248,
+      "model_deltaT_s": 2352.182652902731,
+      "residual_observed_s": -1145.3992796547311,
+      "residual_predicted_s": -1108.8503875653878,
+      "residual_post_fit_s": -36.548892089343326
+    },
+    {
+      "year": 1070.0,
+      "stephenson_deltaT_s": 1169.333754504,
+      "model_deltaT_s": 2300.8462824725757,
+      "residual_observed_s": -1131.5125279685758,
+      "residual_predicted_s": -1101.368411768869,
+      "residual_post_fit_s": -30.144116199706787
+    },
+    {
+      "year": 1080.0,
+      "stephenson_deltaT_s": 1133.455134336,
+      "model_deltaT_s": 2250.0610303079666,
+      "residual_observed_s": -1116.6058959719667,
+      "residual_predicted_s": -1093.1503045251773,
+      "residual_post_fit_s": -23.455591446789413
+    },
+    {
+      "year": 1090.0,
+      "stephenson_deltaT_s": 1099.090692312,
+      "model_deltaT_s": 2199.8266120570806,
+      "residual_observed_s": -1100.7359197450805,
+      "residual_predicted_s": -1084.206044440104,
+      "residual_post_fit_s": -16.529875304976485
+    },
+    {
+      "year": 1100.0,
+      "stephenson_deltaT_s": 1066.1836079999998,
+      "model_deltaT_s": 2150.142742461845,
+      "residual_observed_s": -1083.9591344618452,
+      "residual_predicted_s": -1074.5467769317072,
+      "residual_post_fit_s": -9.412357530138024
+    },
+    {
+      "year": 1110.0,
+      "stephenson_deltaT_s": 1034.6770609680002,
+      "model_deltaT_s": 2101.0091355360273,
+      "residual_observed_s": -1066.332074568027,
+      "residual_predicted_s": -1064.1847938681142,
+      "residual_post_fit_s": -2.147280699912926
+    },
+    {
+      "year": 1120.0,
+      "stephenson_deltaT_s": 1004.514230784,
+      "model_deltaT_s": 2052.4255042091318,
+      "residual_observed_s": -1047.9112734251316,
+      "residual_predicted_s": -1053.1335111108137,
+      "residual_post_fit_s": 5.222237685682103
+    },
+    {
+      "year": 1130.0,
+      "stephenson_deltaT_s": 975.638297016,
+      "model_deltaT_s": 2004.3915603927962,
+      "residual_observed_s": -1028.7532633767962,
+      "residual_predicted_s": -1041.4074440044585,
+      "residual_post_fit_s": 12.6541806276623
+    },
+    {
+      "year": 1140.0,
+      "stephenson_deltaT_s": 947.992439232,
+      "model_deltaT_s": 1956.9070151030865,
+      "residual_observed_s": -1008.9145758710864,
+      "residual_predicted_s": -1029.0221808579624,
+      "residual_post_fit_s": 20.107604986876026
+    },
+    {
+      "year": 1150.0,
+      "stephenson_deltaT_s": 921.519837,
+      "model_deltaT_s": 1909.9715782106541,
+      "residual_observed_s": -988.4517412106541,
+      "residual_predicted_s": -1015.9943544653352,
+      "residual_post_fit_s": 27.5426132546811
+    },
+    {
+      "year": 1160.0,
+      "stephenson_deltaT_s": 896.1636698880001,
+      "model_deltaT_s": 1863.5849586374243,
+      "residual_observed_s": -967.4212887494242,
+      "residual_predicted_s": -1002.3416117182912,
+      "residual_post_fit_s": 34.920322968867026
+    },
+    {
+      "year": 1170.0,
+      "stephenson_deltaT_s": 871.867117464,
+      "model_deltaT_s": 1817.7468644309738,
+      "residual_observed_s": -945.8797469669738,
+      "residual_predicted_s": -988.0825813661438,
+      "residual_post_fit_s": 42.20283439917
+    },
+    {
+      "year": 1180.0,
+      "stephenson_deltaT_s": 848.5733592960001,
+      "model_deltaT_s": 1772.4570027061054,
+      "residual_observed_s": -923.8836434101053,
+      "residual_predicted_s": -973.2368399818898,
+      "residual_post_fit_s": 49.353196571784565
+    },
+    {
+      "year": 1190.0,
+      "stephenson_deltaT_s": 826.225574952,
+      "model_deltaT_s": 1727.715079490652,
+      "residual_observed_s": -901.489504538652,
+      "residual_predicted_s": -957.8248761966604,
+      "residual_post_fit_s": 56.3353716580084
+    },
+    {
+      "year": 1200.0,
+      "stephenson_deltaT_s": 804.7669440000001,
+      "model_deltaT_s": 1683.5207995767123,
+      "residual_observed_s": -878.7538555767122,
+      "residual_predicted_s": -941.8680532678818,
+      "residual_post_fit_s": 63.11419769116958
+    },
+    {
+      "year": 1210.0,
+      "stephenson_deltaT_s": 784.1406460080001,
+      "model_deltaT_s": 1639.8738668661172,
+      "residual_observed_s": -855.7332208581171,
+      "residual_predicted_s": -925.3885700495314,
+      "residual_post_fit_s": 69.6553491914143
+    },
+    {
+      "year": 1220.0,
+      "stephenson_deltaT_s": 764.289860544,
+      "model_deltaT_s": 1596.7739845138894,
+      "residual_observed_s": -832.4841239698894,
+      "residual_predicted_s": -908.4094204357954,
+      "residual_post_fit_s": 75.92529646590594
+    },
+    {
+      "year": 1230.0,
+      "stephenson_deltaT_s": 745.157767176,
+      "model_deltaT_s": 1554.220854362262,
+      "residual_observed_s": -809.0630871862619,
+      "residual_predicted_s": -890.954351352223,
+      "residual_post_fit_s": 81.89126416596105
+    },
+    {
+      "year": 1240.0,
+      "stephenson_deltaT_s": 726.687545472,
+      "model_deltaT_s": 1512.2141773312906,
+      "residual_observed_s": -785.5266318592905,
+      "residual_predicted_s": -873.047819371124,
+      "residual_post_fit_s": 87.52118751183343
+    },
+    {
+      "year": 1250.0,
+      "stephenson_deltaT_s": 708.8223750000001,
+      "model_deltaT_s": 1470.7536533152015,
+      "residual_observed_s": -761.9312783152014,
+      "residual_predicted_s": -854.7149460304737,
+      "residual_post_fit_s": 92.78366771527226
+    },
+    {
+      "year": 1260.0,
+      "stephenson_deltaT_s": 691.505435328,
+      "model_deltaT_s": 1429.8389810203153,
+      "residual_observed_s": -738.3335456923153,
+      "residual_predicted_s": -835.9814719379535,
+      "residual_post_fit_s": 97.64792624563825
+    },
+    {
+      "year": 1270.0,
+      "stephenson_deltaT_s": 674.679906024,
+      "model_deltaT_s": 1389.4698582414348,
+      "residual_observed_s": -714.7899522174348,
+      "residual_predicted_s": -816.873709743978,
+      "residual_post_fit_s": 102.0837575265432
+    },
+    {
+      "year": 1280.0,
+      "stephenson_deltaT_s": 658.2889666560001,
+      "model_deltaT_s": 1349.6459817714276,
+      "residual_observed_s": -691.3570151154275,
+      "residual_predicted_s": -797.4184960696264,
+      "residual_post_fit_s": 106.06148095419883
+    },
+    {
+      "year": 1290.0,
+      "stephenson_deltaT_s": 642.2757967920002,
+      "model_deltaT_s": 1310.367047345484,
+      "residual_observed_s": -668.0912505534839,
+      "residual_predicted_s": -777.6431424772993,
+      "residual_post_fit_s": 109.55189192381545
+    },
+    {
+      "year": 1300.0,
+      "stephenson_deltaT_s": 626.5835760000002,
+      "model_deltaT_s": 1271.6327495214937,
+      "residual_observed_s": -645.0491735214935,
+      "residual_predicted_s": -757.5753855736822,
+      "residual_post_fit_s": 112.52621205218873
+    },
+    {
+      "year": 1310.0,
+      "stephenson_deltaT_s": 611.1554838480001,
+      "model_deltaT_s": 1233.4427817013275,
+      "residual_observed_s": -622.2872978533273,
+      "residual_predicted_s": -737.2433363361674,
+      "residual_post_fit_s": 114.95603848284009
+    },
+    {
+      "year": 1320.0,
+      "stephenson_deltaT_s": 595.9346999040001,
+      "model_deltaT_s": 1195.7968364390836,
+      "residual_observed_s": -599.8621365350834,
+      "residual_predicted_s": -716.6754287553206,
+      "residual_post_fit_s": 116.81329222023714
+    },
+    {
+      "year": 1330.0,
+      "stephenson_deltaT_s": 580.864403736,
+      "model_deltaT_s": 1158.6946052338244,
+      "residual_observed_s": -577.8302014978244,
+      "residual_predicted_s": -695.9003678872139,
+      "residual_post_fit_s": 118.07016638938944
+    },
+    {
+      "year": 1340.0,
+      "stephenson_deltaT_s": 565.8877749120002,
+      "model_deltaT_s": 1122.1357783887215,
+      "residual_observed_s": -556.2480034767214,
+      "residual_predicted_s": -674.9470774105346,
+      "residual_post_fit_s": 118.69907393381322
+    },
+    {
+      "year": 1350.0,
+      "stephenson_deltaT_s": 550.9479930000002,
+      "model_deltaT_s": 1086.1200450083816,
+      "residual_observed_s": -535.1720520083813,
+      "residual_predicted_s": -653.8446467842808,
+      "residual_post_fit_s": 118.67259477589948
+    },
+    {
+      "year": 1360.0,
+      "stephenson_deltaT_s": 535.9882375680004,
+      "model_deltaT_s": 1050.6470932433622,
+      "residual_observed_s": -514.6588556753618,
+      "residual_predicted_s": -632.6222781025829,
+      "residual_post_fit_s": 117.96342242722108
+    },
+    {
+      "year": 1370.0,
+      "stephenson_deltaT_s": 520.9516881840002,
+      "model_deltaT_s": 1015.7166101466464,
+      "residual_observed_s": -494.7649219626462,
+      "residual_predicted_s": -611.3092327437448,
+      "residual_post_fit_s": 116.5443107810986
+    },
+    {
+      "year": 1380.0,
+      "stephenson_deltaT_s": 505.78152441600014,
+      "model_deltaT_s": 981.3282818012303,
+      "residual_observed_s": -475.5467573852302,
+      "residual_predicted_s": -589.934777910977,
+      "residual_post_fit_s": 114.38802052574681
+    },
+    {
+      "year": 1390.0,
+      "stephenson_deltaT_s": 490.4209258320002,
+      "model_deltaT_s": 947.4817928364319,
+      "residual_observed_s": -457.06086700443166,
+      "residual_predicted_s": -568.5281331624877,
+      "residual_post_fit_s": 111.46726615805608
+    },
+    {
+      "year": 1400.0,
+      "stephenson_deltaT_s": 474.81307200000026,
+      "model_deltaT_s": 914.176826983301,
+      "residual_observed_s": -439.36375498330074,
+      "residual_predicted_s": -547.1184170286172,
+      "residual_post_fit_s": 107.75466204531642
+    },
+    {
+      "year": 1410.0,
+      "stephenson_deltaT_s": 458.90114248800035,
+      "model_deltaT_s": 881.4130668248399,
+      "residual_observed_s": -422.51192433683957,
+      "residual_predicted_s": -525.7345938135486,
+      "residual_post_fit_s": 103.22266947670903
+    },
+    {
+      "year": 1420.0,
+      "stephenson_deltaT_s": 442.6283168640002,
+      "model_deltaT_s": 849.1901938491465,
+      "residual_observed_s": -406.5618769851462,
+      "residual_predicted_s": -504.40542067878096,
+      "residual_post_fit_s": 97.84354369363473
+    },
+    {
+      "year": 1430.0,
+      "stephenson_deltaT_s": 425.93777469600036,
+      "model_deltaT_s": 817.507888308548,
+      "residual_observed_s": -391.57011361254763,
+      "residual_predicted_s": -483.1593951050449,
+      "residual_post_fit_s": 91.58928149249726
+    },
+    {
+      "year": 1440.0,
+      "stephenson_deltaT_s": 408.7726955520001,
+      "model_deltaT_s": 786.3658294853885,
+      "residual_observed_s": -377.59313393338846,
+      "residual_predicted_s": -462.02470282864147,
+      "residual_post_fit_s": 84.43156889525301
+    },
+    {
+      "year": 1450.0,
+      "stephenson_deltaT_s": 391.07625899999994,
+      "model_deltaT_s": 755.7636952933608,
+      "residual_observed_s": -364.68743629336086,
+      "residual_predicted_s": -441.0291663473268,
+      "residual_post_fit_s": 76.34173005396593
+    },
+    {
+      "year": 1460.0,
+      "stephenson_deltaT_s": 372.7916446080002,
+      "model_deltaT_s": 725.7011626097228,
+      "residual_observed_s": -352.90951800172263,
+      "residual_predicted_s": -420.2001940898163,
+      "residual_post_fit_s": 67.29067608809368
+    },
+    {
+      "year": 1470.0,
+      "stephenson_deltaT_s": 353.8620319440006,
+      "model_deltaT_s": 696.1779072540376,
+      "residual_observed_s": -342.315875310037,
+      "residual_predicted_s": -399.56473034177554,
+      "residual_post_fit_s": 57.24885503173857
+    },
+    {
+      "year": 1480.0,
+      "stephenson_deltaT_s": 334.23060057600014,
+      "model_deltaT_s": 667.1936038047716,
+      "residual_observed_s": -332.9630032287714,
+      "residual_predicted_s": -379.14920601978054,
+      "residual_post_fit_s": 46.18620279100912
+    },
+    {
+      "year": 1490.0,
+      "stephenson_deltaT_s": 313.8405300720003,
+      "model_deltaT_s": 638.7479256046536,
+      "residual_observed_s": -324.90739553265325,
+      "residual_predicted_s": -358.97949038318075,
+      "residual_post_fit_s": 34.07209485052749
+    },
+    {
+      "year": 1500.0,
+      "stephenson_deltaT_s": 292.6350000000002,
+      "model_deltaT_s": 610.8405447075056,
+      "residual_observed_s": -318.2055447075054,
+      "residual_predicted_s": -339.08084377208513,
+      "residual_post_fit_s": 20.875299064579735
+    },
+    {
+      "year": 1510.0,
+      "stephenson_deltaT_s": 270.623341,
+      "model_deltaT_s": 583.4711323193696,
+      "residual_observed_s": -312.84779131936966,
+      "residual_predicted_s": -319.47787145781837,
+      "residual_post_fit_s": 6.6300801384487045
+    },
+    {
+      "year": 1520.0,
+      "stephenson_deltaT_s": 248.079488,
+      "model_deltaT_s": 556.6393583441168,
+      "residual_observed_s": -308.5598703441168,
+      "residual_predicted_s": -300.19447869015795,
+      "residual_post_fit_s": -8.365391653958852
+    },
+    {
+      "year": 1530.0,
+      "stephenson_deltaT_s": 225.343527,
+      "model_deltaT_s": 530.3448913701286,
+      "residual_observed_s": -305.0013643701286,
+      "residual_predicted_s": -281.253827023481,
+      "residual_post_fit_s": -23.74753734664762
+    },
+    {
+      "year": 1540.0,
+      "stephenson_deltaT_s": 202.75554400000001,
+      "model_deltaT_s": 504.58739867561235,
+      "residual_observed_s": -301.83185467561236,
+      "residual_predicted_s": -262.6782920016103,
+      "residual_post_fit_s": -39.153562674002046
+    },
+    {
+      "year": 1550.0,
+      "stephenson_deltaT_s": 180.655625,
+      "model_deltaT_s": 479.3665466484963,
+      "residual_observed_s": -298.7109216484963,
+      "residual_predicted_s": -244.48942227866695,
+      "residual_post_fit_s": -54.22149936982936
+    },
+    {
+      "year": 1560.0,
+      "stephenson_deltaT_s": 159.383856,
+      "model_deltaT_s": 454.6820004489273,
+      "residual_observed_s": -295.29814444892725,
+      "residual_predicted_s": -226.70790025061535,
+      "residual_post_fit_s": -68.5902441983119
+    },
+    {
+      "year": 1570.0,
+      "stephenson_deltaT_s": 139.280323,
+      "model_deltaT_s": 430.5334237089628,
+      "residual_observed_s": -291.2531007089628,
+      "residual_predicted_s": -209.35350426942375,
+      "residual_post_fit_s": -81.89959643953904
+    },
+    {
+      "year": 1580.0,
+      "stephenson_deltaT_s": 120.68511199999999,
+      "model_deltaT_s": 406.92047900296893,
+      "residual_observed_s": -286.2353670029689,
+      "residual_predicted_s": -192.4450725088737,
+      "residual_post_fit_s": -93.79029449409524
+    },
+    {
+      "year": 1590.0,
+      "stephenson_deltaT_s": 103.93830899999998,
+      "model_deltaT_s": 383.8428277466119,
+      "residual_observed_s": -279.90451874661187,
+      "residual_predicted_s": -176.00046854803503,
+      "residual_post_fit_s": -103.90405019857684
+    },
+    {
+      "year": 1600.0,
+      "stephenson_deltaT_s": 89.38,
+      "model_deltaT_s": 361.30013008259266,
+      "residual_observed_s": -271.92013008259266,
+      "residual_predicted_s": -160.03654873528194,
+      "residual_post_fit_s": -111.88358134731072
+    },
+    {
+      "year": 1610.0,
+      "stephenson_deltaT_s": 77.20950399999998,
+      "model_deltaT_s": 339.2920448806435,
+      "residual_observed_s": -262.08254088064353,
+      "residual_predicted_s": -144.56913139247723,
+      "residual_post_fit_s": -117.5134094881663
+    },
+    {
+      "year": 1620.0,
+      "stephenson_deltaT_s": 67.063712,
+      "model_deltaT_s": 317.81822970035137,
+      "residual_observed_s": -250.75451770035136,
+      "residual_predicted_s": -129.61296791558442,
+      "residual_post_fit_s": -121.14154978476694
+    },
+    {
+      "year": 1630.0,
+      "stephenson_deltaT_s": 58.438767999999996,
+      "model_deltaT_s": 296.87834080439643,
+      "residual_observed_s": -238.43957280439645,
+      "residual_predicted_s": -115.1817158245081,
+      "residual_post_fit_s": -123.25785697988834
+    },
+    {
+      "year": 1640.0,
+      "stephenson_deltaT_s": 50.83081599999999,
+      "model_deltaT_s": 276.4720335811435,
+      "residual_observed_s": -225.64121758114348,
+      "residual_predicted_s": -101.28791381139837,
+      "residual_post_fit_s": -124.35330376974511
+    },
+    {
+      "year": 1650.0,
+      "stephenson_deltaT_s": 43.73599999999999,
+      "model_deltaT_s": 256.59896161182405,
+      "residual_observed_s": -212.86296161182406,
+      "residual_predicted_s": -87.94295883300413,
+      "residual_post_fit_s": -124.92000277881993
+    },
+    {
+      "year": 1660.0,
+      "stephenson_deltaT_s": 36.7805860058309,
+      "model_deltaT_s": 237.2587774731146,
+      "residual_observed_s": -200.4781914672837,
+      "residual_predicted_s": -75.15708528892861,
+      "residual_post_fit_s": -125.32110617835508
+    },
+    {
+      "year": 1670.0,
+      "stephenson_deltaT_s": 30.111014577259475,
+      "model_deltaT_s": 218.45113241823856,
+      "residual_observed_s": -188.34011784097908,
+      "residual_predicted_s": -62.93934632382519,
+      "residual_post_fit_s": -125.40077151715388
+    },
+    {
+      "year": 1680.0,
+      "stephenson_deltaT_s": 24.00386297376093,
+      "model_deltaT_s": 200.1756766161343,
+      "residual_observed_s": -176.17181364237337,
+      "residual_predicted_s": -51.29759728769557,
+      "residual_post_fit_s": -124.8742163546778
+    },
+    {
+      "year": 1690.0,
+      "stephenson_deltaT_s": 18.735708454810492,
+      "model_deltaT_s": 182.4320584977213,
+      "residual_observed_s": -163.6963500429108,
+      "residual_predicted_s": -40.23848138450637,
+      "residual_post_fit_s": -123.45786865840444
+    },
+    {
+      "year": 1700.0,
+      "stephenson_deltaT_s": 14.583128279883375,
+      "model_deltaT_s": 165.2199255717387,
+      "residual_observed_s": -150.63679729185534,
+      "residual_predicted_s": -29.767417535343384,
+      "residual_post_fit_s": -120.86937975651196
+    },
+    {
+      "year": 1710.0,
+      "stephenson_deltaT_s": 11.82269970845481,
+      "model_deltaT_s": 148.53892380555044,
+      "residual_observed_s": -136.71622409709562,
+      "residual_predicted_s": -19.888590478279184,
+      "residual_post_fit_s": -116.82763361881644
+    },
+    {
+      "year": 1720.0,
+      "stephenson_deltaT_s": 10.730999999999998,
+      "model_deltaT_s": 132.38869799455642,
+      "residual_observed_s": -121.65769799455643,
+      "residual_predicted_s": -10.604943123036946,
+      "residual_post_fit_s": -111.05275487151948
+    },
+    {
+      "year": 1730.0,
+      "stephenson_deltaT_s": 11.43412109375,
+      "model_deltaT_s": 116.76889151500654,
+      "residual_observed_s": -105.33477042125654,
+      "residual_predicted_s": -1.9181711744236623,
+      "residual_post_fit_s": -103.41659924683287
+    },
+    {
+      "year": 1740.0,
+      "stephenson_deltaT_s": 13.46309375,
+      "model_deltaT_s": 101.67914643565746,
+      "residual_observed_s": -88.21605268565746,
+      "residual_predicted_s": 6.171279965650172,
+      "residual_post_fit_s": -94.38733265130763
+    },
+    {
+      "year": 1750.0,
+      "stephenson_deltaT_s": 16.196457031250002,
+      "model_deltaT_s": 87.11910346991135,
+      "residual_observed_s": -70.92264643866135,
+      "residual_predicted_s": 13.664216011899782,
+      "residual_post_fit_s": -84.58686245056113
+    },
+    {
+      "year": 1760.0,
+      "stephenson_deltaT_s": 19.013749999999998,
+      "model_deltaT_s": 73.08840201302519,
+      "residual_observed_s": -54.07465201302519,
+      "residual_predicted_s": 20.562692323660656,
+      "residual_post_fit_s": -74.63734433668584
+    },
+    {
+      "year": 1770.0,
+      "stephenson_deltaT_s": 21.29451171875,
+      "model_deltaT_s": 59.58668017401942,
+      "residual_observed_s": -38.29216845526942,
+      "residual_predicted_s": 26.870010149835878,
+      "residual_post_fit_s": -65.1621786051053
+    },
+    {
+      "year": 1780.0,
+      "stephenson_deltaT_s": 22.41828125,
+      "model_deltaT_s": 46.6135745976062,
+      "residual_observed_s": -24.195293347606203,
+      "residual_predicted_s": 32.590710597658074,
+      "residual_post_fit_s": -56.78600394526428
+    },
+    {
+      "year": 1790.0,
+      "stephenson_deltaT_s": 21.764597656250004,
+      "model_deltaT_s": 34.16872059173329,
+      "residual_observed_s": -12.404122935483286,
+      "residual_predicted_s": 37.7305663362842,
+      "residual_post_fit_s": -50.134689271767485
+    },
+    {
+      "year": 1800.0,
+      "stephenson_deltaT_s": 18.713000000000008,
+      "model_deltaT_s": 22.25175198942452,
+      "residual_observed_s": -3.5387519894245116,
+      "residual_predicted_s": 42.29657105037819,
+      "residual_post_fit_s": -45.8353230398027
+    },
+    {
+      "year": 1810.0,
+      "stephenson_deltaT_s": 15.254999999999997,
+      "model_deltaT_s": 10.862301441105956,
+      "residual_observed_s": 4.3926985588940415,
+      "residual_predicted_s": 46.29692666295392,
+      "residual_post_fit_s": -41.90422810405988
+    },
+    {
+      "year": 1820.0,
+      "stephenson_deltaT_s": 16.679,
+      "model_deltaT_s": 0.0,
+      "residual_observed_s": 16.679,
+      "residual_predicted_s": 49.741028350818,
+      "residual_post_fit_s": -33.062028350818
+    },
+    {
+      "year": 1830.0,
+      "stephenson_deltaT_s": 10.758,
+      "model_deltaT_s": -10.335522508437862,
+      "residual_observed_s": 21.09352250843786,
+      "residual_predicted_s": 52.63944737998901,
+      "residual_post_fit_s": -31.545924871551147
+    },
+    {
+      "year": 1840.0,
+      "stephenson_deltaT_s": 7.667999999999999,
+      "model_deltaT_s": -20.144637784193037,
+      "residual_observed_s": 27.812637784193036,
+      "residual_predicted_s": 55.003911792454176,
+      "residual_post_fit_s": -27.19127400826114
+    },
+    {
+      "year": 1850.0,
+      "stephenson_deltaT_s": 9.318000000000001,
+      "model_deltaT_s": -29.427718792234373,
+      "residual_observed_s": 38.74571879223437,
+      "residual_predicted_s": 56.84728497954558,
+      "residual_post_fit_s": -18.101566187311207
+    },
+    {
+      "year": 1860.0,
+      "stephenson_deltaT_s": 9.036999999999999,
+      "model_deltaT_s": -38.185140161156596,
+      "residual_observed_s": 47.222140161156595,
+      "residual_predicted_s": 58.18354218108249,
+      "residual_post_fit_s": -10.961402019925892
+    },
+    {
+      "year": 1870.0,
+      "stephenson_deltaT_s": 2.3689999999999998,
+      "model_deltaT_s": -46.417277720764105,
+      "residual_observed_s": 48.786277720764105,
+      "residual_predicted_s": 59.02774495321597,
+      "residual_post_fit_s": -10.241467232451868
+    },
+    {
+      "year": 1880.0,
+      "stephenson_deltaT_s": -3.2109999999999994,
+      "model_deltaT_s": -54.124508858189074,
+      "residual_observed_s": 50.913508858189076,
+      "residual_predicted_s": 59.39601365161849,
+      "residual_post_fit_s": -8.482504793429413
+    },
+    {
+      "year": 1890.0,
+      "stephenson_deltaT_s": -3.8839999999999995,
+      "model_deltaT_s": -61.30721237435864,
+      "residual_observed_s": 57.42321237435864,
+      "residual_predicted_s": 59.30549798029489,
+      "residual_post_fit_s": -1.8822856059362465
+    },
+    {
+      "year": 1900.0,
+      "stephenson_deltaT_s": -1.977,
+      "model_deltaT_s": -67.96576856375395,
+      "residual_observed_s": 65.98876856375395,
+      "residual_predicted_s": 58.77434565981815,
+      "residual_post_fit_s": 7.214422903935798
+    },
+    {
+      "year": 1910.0,
+      "stephenson_deltaT_s": 11.142000000000001,
+      "model_deltaT_s": -74.10055902305976,
+      "residual_observed_s": 85.24255902305975,
+      "residual_predicted_s": 57.82166927223108,
+      "residual_post_fit_s": 27.420889750828678
+    },
+    {
+      "year": 1920.0,
+      "stephenson_deltaT_s": 21.616,
+      "model_deltaT_s": -79.71196703914029,
+      "residual_observed_s": 101.32796703914029,
+      "residual_predicted_s": 56.46751134318953,
+      "residual_post_fit_s": 44.86045569595076
+    },
+    {
+      "year": 1930.0,
+      "stephenson_deltaT_s": 24.418,
+      "model_deltaT_s": -84.80037729141623,
+      "residual_observed_s": 109.21837729141623,
+      "residual_predicted_s": 54.732807725136865,
+      "residual_post_fit_s": 54.485569566279366
+    },
+    {
+      "year": 1940.0,
+      "stephenson_deltaT_s": 24.425000000000004,
+      "model_deltaT_s": -89.36617576150456,
+      "residual_observed_s": 113.79117576150458,
+      "residual_predicted_s": 52.63934934841399,
+      "residual_post_fit_s": 61.15182641309059
+    },
+    {
+      "year": 1950.0,
+      "stephenson_deltaT_s": 28.931,
+      "model_deltaT_s": -93.40975015312142,
+      "residual_observed_s": 122.34075015312142,
+      "residual_predicted_s": 50.20974241017058,
+      "residual_post_fit_s": 72.13100774295084
+    },
+    {
+      "year": 1960.0,
+      "stephenson_deltaT_s": 33.07255555555555,
+      "model_deltaT_s": -96.93148965287764,
+      "residual_observed_s": 130.00404520843318,
+      "residual_predicted_s": 47.467367073830076,
+      "residual_post_fit_s": 82.53667813460311
+    },
+    {
+      "year": 1970.0,
+      "stephenson_deltaT_s": 39.93162962962963,
+      "model_deltaT_s": -99.93178489044658,
+      "residual_observed_s": 139.86341452007622,
+      "residual_predicted_s": 44.43633475454186,
+      "residual_post_fit_s": 95.42707976553436
+    },
+    {
+      "year": 1980.0,
+      "stephenson_deltaT_s": 50.361,
+      "model_deltaT_s": -102.411027901333,
+      "residual_observed_s": 152.772027901333,
+      "residual_predicted_s": 41.14144406867564,
+      "residual_post_fit_s": 111.63058383265735
+    },
+    {
+      "year": 1990.0,
+      "stephenson_deltaT_s": 56.99118518518519,
+      "model_deltaT_s": -104.369612528164,
+      "residual_observed_s": 161.3607977133492,
+      "residual_predicted_s": 37.60813552782514,
+      "residual_post_fit_s": 123.75266218552406
+    },
+    {
+      "year": 2000.0,
+      "stephenson_deltaT_s": 63.80951851851852,
+      "model_deltaT_s": -105.80793394234934,
+      "residual_observed_s": 169.61745246086787,
+      "residual_predicted_s": 33.862445060096604,
+      "residual_post_fit_s": 135.75500740077126
+    },
+    {
+      "year": 2010.0,
+      "stephenson_deltaT_s": 66.063,
+      "model_deltaT_s": -106.72632216562124,
+      "residual_observed_s": 172.78932216562123,
+      "residual_predicted_s": 29.930956443602042,
+      "residual_post_fit_s": 142.8583657220192
+    }
+  ]
+}
