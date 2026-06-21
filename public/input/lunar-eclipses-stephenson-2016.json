@@ -1,0 +1,2065 @@
+{
+  "_meta": {
+    "description": "Timed lunar eclipse observations from Stephenson, Morrison & Hohenkerk (2016), Proc. Roy. Soc. A 472:20160404 — supplementary tables S01, S02, S04, S05, S07, S09. Each row is a single primary-source observation reduced by the Stephenson team to an implied ΔT value (seconds). Phase L-5b uses this to compare our pure-tidal ΔT model and NASA's Espenak/Meeus polynomial directly against observation-derived ΔT.",
+    "source_paper": "Stephenson, F.R., Morrison, L.V., Hohenkerk, C.Y. (2016) Proc. Roy. Soc. A 472:20160404",
+    "source_url": "https://royalsocietypublishing.org/doi/10.1098/rspa.2016.0404",
+    "time_range": "-720 to 1280",
+    "count": 270,
+    "tables_included": {
+      "S01": "Babylonian lunar eclipses",
+      "S02": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "S04": "Babylonian lunar eclipses in the Almagest",
+      "S05": "Chinese timed lunar eclipses",
+      "S07": "Greek timed lunar and solar eclipses",
+      "S09": "Arab timed lunar eclipses"
+    },
+    "generator": "scripts/parse_stephenson_lunar.py",
+    "field_definitions": {
+      "source_table": "Table id in Stephenson supplementary (S01, S02, S04, S05, S07, S09).",
+      "source_table_name": "Descriptive name from Stephenson 2016.",
+      "year": "Calendar year of observation (negative for BCE; proleptic Julian).",
+      "dt_observed_sec": "ΔT in seconds derived by Stephenson from this observation. NULL for S04 bounds-only entries.",
+      "weight": "Observation weight assigned by Stephenson (higher = more reliable; 0 = lowest). NULL for bounds-only.",
+      "degree": "S01 only: umbral magnitude (or qualitative '?' suffix).",
+      "measurement": "S04 only: narrative description of how the contact was timed.",
+      "dt_lower_sec": "S04 bounds rows only: ΔT lower limit (s).",
+      "dt_upper_sec": "S04 bounds rows only: ΔT upper limit (s).",
+      "note": "S04 bounds rows only: source note."
+    }
+  },
+  "entries": [
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -720,
+      "dt_observed_sec": 21900,
+      "weight": 3,
+      "measurement": "began 1.5 equal hours after moonrise"
+    },
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -719,
+      "dt_observed_sec": null,
+      "dt_lower_sec": null,
+      "dt_upper_sec": 21670,
+      "weight": null,
+      "note": "First contact after moonrise."
+    },
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -719,
+      "dt_observed_sec": 19050,
+      "weight": 1,
+      "measurement": "max exactly at midnight"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -685,
+      "dt_observed_sec": 22500,
+      "weight": 1,
+      "degree": "+100"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -684,
+      "dt_observed_sec": 19100,
+      "weight": 6,
+      "degree": "+20"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -666,
+      "dt_observed_sec": 17550,
+      "weight": 0,
+      "degree": "+30?"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -666,
+      "dt_observed_sec": 17550,
+      "weight": 0,
+      "degree": "+30?"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -665,
+      "dt_observed_sec": 21100,
+      "weight": 12,
+      "degree": "+3"
+    },
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -620,
+      "dt_observed_sec": 17800,
+      "weight": 1,
+      "measurement": "began 11 seasonal hours after sunset"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -602,
+      "dt_observed_sec": 20300,
+      "weight": 2,
+      "degree": "+50?"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -602,
+      "dt_observed_sec": 20300,
+      "weight": 2,
+      "degree": "+50?"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -600,
+      "dt_observed_sec": 18000,
+      "weight": 1,
+      "degree": "+95"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -598,
+      "dt_observed_sec": 14400,
+      "weight": 1,
+      "degree": "+105"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -593,
+      "dt_observed_sec": 21700,
+      "weight": 10,
+      "degree": "+10"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -590,
+      "dt_observed_sec": 15600,
+      "weight": 3,
+      "degree": "+40"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -587,
+      "dt_observed_sec": 15700,
+      "weight": 6,
+      "degree": "-20"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -586,
+      "dt_observed_sec": 18850,
+      "weight": 3,
+      "degree": "-35"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -579,
+      "dt_observed_sec": 19100,
+      "weight": 2,
+      "degree": "+45"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -576,
+      "dt_observed_sec": 19200,
+      "weight": 1,
+      "degree": "+105"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -575,
+      "dt_observed_sec": 21050,
+      "weight": 3,
+      "degree": "-40"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -572,
+      "dt_observed_sec": 18050,
+      "weight": 1,
+      "degree": "+90"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -562,
+      "dt_observed_sec": 19400,
+      "weight": 11,
+      "degree": "+6"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -561,
+      "dt_observed_sec": 16000,
+      "weight": 1,
+      "degree": "+90"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -554,
+      "dt_observed_sec": 17800,
+      "weight": 1,
+      "degree": "+55"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -554,
+      "dt_observed_sec": 17550,
+      "weight": 1,
+      "degree": "+72"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -554,
+      "dt_observed_sec": 16900,
+      "weight": 1,
+      "degree": "+100"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -554,
+      "dt_observed_sec": 16100,
+      "weight": 1,
+      "degree": "+120"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -536,
+      "dt_observed_sec": 18800,
+      "weight": 8,
+      "degree": "-14"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -525,
+      "dt_observed_sec": 19300,
+      "weight": 1,
+      "degree": "+60"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -525,
+      "dt_observed_sec": 18400,
+      "weight": 1,
+      "degree": "+78"
+    },
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -522,
+      "dt_observed_sec": 19250,
+      "weight": 1,
+      "measurement": "max 1 equal hour before midnight"
+    },
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -501,
+      "dt_observed_sec": 18950,
+      "weight": 1,
+      "measurement": "max 6 and 1/3 equal hours after sunset"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -500,
+      "dt_observed_sec": 14950,
+      "weight": 1,
+      "degree": "+77"
+    },
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -490,
+      "dt_observed_sec": 13850,
+      "weight": 1,
+      "measurement": "max 0.5 seasonal hour before midnight"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -482,
+      "dt_observed_sec": 17300,
+      "weight": 10,
+      "degree": "-10"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -464,
+      "dt_observed_sec": 15600,
+      "weight": 6,
+      "degree": "+20"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -423,
+      "dt_observed_sec": 16700,
+      "weight": 2,
+      "degree": "+50"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -423,
+      "dt_observed_sec": 17050,
+      "weight": 1,
+      "degree": "+74"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -423,
+      "dt_observed_sec": 17050,
+      "weight": 1,
+      "degree": "+100"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -420,
+      "dt_observed_sec": 15400,
+      "weight": 6,
+      "degree": "+19"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -409,
+      "dt_observed_sec": 22400,
+      "weight": 1,
+      "degree": "+68"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -409,
+      "dt_observed_sec": 21600,
+      "weight": 1,
+      "degree": "+95"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -409,
+      "dt_observed_sec": 19400,
+      "weight": 1,
+      "degree": "+128"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -408,
+      "dt_observed_sec": 15200,
+      "weight": 10,
+      "degree": "+8"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -407,
+      "dt_observed_sec": 15250,
+      "weight": 8,
+      "degree": "+15"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -406,
+      "dt_observed_sec": 15000,
+      "weight": 2,
+      "degree": "-48"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -406,
+      "dt_observed_sec": 12500,
+      "weight": 0,
+      "degree": "-27?"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -406,
+      "dt_observed_sec": 12500,
+      "weight": 0,
+      "degree": "-27?"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -405,
+      "dt_observed_sec": 16500,
+      "weight": 8,
+      "degree": "-14"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -396,
+      "dt_observed_sec": 15500,
+      "weight": 2,
+      "degree": "+48"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -396,
+      "dt_observed_sec": 12900,
+      "weight": 1,
+      "degree": "+75"
+    },
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -382,
+      "dt_observed_sec": null,
+      "dt_lower_sec": 15700,
+      "dt_upper_sec": 21450,
+      "weight": null,
+      "note": "Short duration - limits defined by"
+    },
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -382,
+      "dt_observed_sec": 17800,
+      "weight": 3,
+      "measurement": "began 0.5 seasonal hour before sunrise"
+    },
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -381,
+      "dt_observed_sec": null,
+      "dt_lower_sec": null,
+      "dt_upper_sec": 17850,
+      "weight": null,
+      "note": "First contact after sunset."
+    },
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -381,
+      "dt_observed_sec": 16400,
+      "weight": 3,
+      "measurement": "began 0.5 seasonal hour after sunset"
+    },
+    {
+      "source_table": "S04",
+      "source_table_name": "Babylonian lunar eclipses in the Almagest",
+      "year": -381,
+      "dt_observed_sec": 16050,
+      "weight": 1,
+      "measurement": "began 2.5 seasonal hours before midnight"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -377,
+      "dt_observed_sec": 16000,
+      "weight": 3,
+      "degree": "+37"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -377,
+      "dt_observed_sec": 16200,
+      "weight": 2,
+      "degree": "+52"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -377,
+      "dt_observed_sec": 15750,
+      "weight": 1,
+      "degree": "+73"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -377,
+      "dt_observed_sec": 14950,
+      "weight": 1,
+      "degree": "+92"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -370,
+      "dt_observed_sec": 12800,
+      "weight": 1,
+      "degree": "+66"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -370,
+      "dt_observed_sec": 16100,
+      "weight": 4,
+      "degree": "+30"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -370,
+      "dt_observed_sec": 15150,
+      "weight": 2,
+      "degree": "+52"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -370,
+      "dt_observed_sec": 15500,
+      "weight": 1,
+      "degree": "+72"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -370,
+      "dt_observed_sec": 14500,
+      "weight": 1,
+      "degree": "+92"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -366,
+      "dt_observed_sec": 19600,
+      "weight": 1,
+      "degree": "-56"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -363,
+      "dt_observed_sec": 14100,
+      "weight": 10,
+      "degree": "+10"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -363,
+      "dt_observed_sec": 16400,
+      "weight": 3,
+      "degree": "-40"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -363,
+      "dt_observed_sec": 15300,
+      "weight": 8,
+      "degree": "-14"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -362,
+      "dt_observed_sec": 15800,
+      "weight": 3,
+      "degree": "-41"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -362,
+      "dt_observed_sec": 15500,
+      "weight": 1,
+      "degree": "+64"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -352,
+      "dt_observed_sec": 15950,
+      "weight": 2,
+      "degree": "-47"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -352,
+      "dt_observed_sec": 14550,
+      "weight": 5,
+      "degree": "-24"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -352,
+      "dt_observed_sec": 15250,
+      "weight": 11,
+      "degree": "-6"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -316,
+      "dt_observed_sec": 15600,
+      "weight": 10,
+      "degree": "+10"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -316,
+      "dt_observed_sec": 16650,
+      "weight": 2,
+      "degree": "+44"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -316,
+      "dt_observed_sec": 16200,
+      "weight": 1,
+      "degree": "+63"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -307,
+      "dt_observed_sec": 14150,
+      "weight": 10,
+      "degree": "-10"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -239,
+      "dt_observed_sec": 14300,
+      "weight": 12,
+      "degree": "-3"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -238,
+      "dt_observed_sec": 8850,
+      "weight": 1,
+      "degree": "+80"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -238,
+      "dt_observed_sec": 8300,
+      "weight": 1,
+      "degree": "+100"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -238,
+      "dt_observed_sec": 7800,
+      "weight": 1,
+      "degree": "+120"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -225,
+      "dt_observed_sec": 17600,
+      "weight": 2,
+      "degree": "+52"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -225,
+      "dt_observed_sec": 17550,
+      "weight": 1,
+      "degree": "+69"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -225,
+      "dt_observed_sec": 19000,
+      "weight": 1,
+      "degree": "+79"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -225,
+      "dt_observed_sec": 19400,
+      "weight": 1,
+      "degree": "+94"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -225,
+      "dt_observed_sec": 15500,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -214,
+      "dt_observed_sec": 14200,
+      "weight": 4,
+      "degree": "+30"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -214,
+      "dt_observed_sec": 12900,
+      "weight": 2,
+      "degree": "+51"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -214,
+      "dt_observed_sec": 14050,
+      "weight": 1,
+      "degree": "+67"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -214,
+      "dt_observed_sec": 13300,
+      "weight": 1,
+      "degree": "+86"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -211,
+      "dt_observed_sec": 21300,
+      "weight": 0,
+      "degree": "+28"
+    },
+    {
+      "source_table": "S07",
+      "source_table_name": "Greek timed lunar and solar eclipses",
+      "year": -200,
+      "dt_observed_sec": 12400,
+      "weight": 3
+    },
+    {
+      "source_table": "S07",
+      "source_table_name": "Greek timed lunar and solar eclipses",
+      "year": -199,
+      "dt_observed_sec": 11800,
+      "weight": 3
+    },
+    {
+      "source_table": "S07",
+      "source_table_name": "Greek timed lunar and solar eclipses",
+      "year": -199,
+      "dt_observed_sec": 12650,
+      "weight": 3
+    },
+    {
+      "source_table": "S07",
+      "source_table_name": "Greek timed lunar and solar eclipses",
+      "year": -199,
+      "dt_observed_sec": 13550,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -193,
+      "dt_observed_sec": 13600,
+      "weight": 10,
+      "degree": "-12"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -193,
+      "dt_observed_sec": 14000,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -189,
+      "dt_observed_sec": 10800,
+      "weight": 4,
+      "degree": "-30"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -189,
+      "dt_observed_sec": 11300,
+      "weight": 10,
+      "degree": "-10"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -189,
+      "dt_observed_sec": 10400,
+      "weight": 1
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -188,
+      "dt_observed_sec": 10800,
+      "weight": 3,
+      "degree": "-34"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -188,
+      "dt_observed_sec": 11350,
+      "weight": 6,
+      "degree": "-18"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -182,
+      "dt_observed_sec": 10100,
+      "weight": 3
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -177,
+      "dt_observed_sec": 13200,
+      "weight": 3
+    },
+    {
+      "source_table": "S07",
+      "source_table_name": "Greek timed lunar and solar eclipses",
+      "year": -173,
+      "dt_observed_sec": 11000,
+      "weight": 3
+    },
+    {
+      "source_table": "S07",
+      "source_table_name": "Greek timed lunar and solar eclipses",
+      "year": -173,
+      "dt_observed_sec": 10750,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -162,
+      "dt_observed_sec": 9500,
+      "weight": 1,
+      "degree": "-85"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -162,
+      "dt_observed_sec": 9650,
+      "weight": 1,
+      "degree": "-75"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -162,
+      "dt_observed_sec": 9750,
+      "weight": 1,
+      "degree": "-65"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -162,
+      "dt_observed_sec": 10400,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -159,
+      "dt_observed_sec": 14100,
+      "weight": 2,
+      "degree": "+48"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -159,
+      "dt_observed_sec": 12700,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -153,
+      "dt_observed_sec": 12700,
+      "weight": 11,
+      "degree": "+4"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -153,
+      "dt_observed_sec": 13200,
+      "weight": 5,
+      "degree": "+27"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -153,
+      "dt_observed_sec": 13150,
+      "weight": 2,
+      "degree": "+48"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -149,
+      "dt_observed_sec": 11100,
+      "weight": 4,
+      "degree": "-32"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -149,
+      "dt_observed_sec": 11150,
+      "weight": 10,
+      "degree": "-12"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -149,
+      "dt_observed_sec": 11400,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -142,
+      "dt_observed_sec": 12600,
+      "weight": 11,
+      "degree": "+7"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -142,
+      "dt_observed_sec": 11250,
+      "weight": 4,
+      "degree": "+30"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -142,
+      "dt_observed_sec": 12750,
+      "weight": 3
+    },
+    {
+      "source_table": "S07",
+      "source_table_name": "Greek timed lunar and solar eclipses",
+      "year": -140,
+      "dt_observed_sec": 8550,
+      "weight": 0
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -135,
+      "dt_observed_sec": 11800,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -134,
+      "dt_observed_sec": 10700,
+      "weight": 1,
+      "degree": "-65"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -134,
+      "dt_observed_sec": 7500,
+      "weight": 0,
+      "degree": "-35"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -134,
+      "dt_observed_sec": 10350,
+      "weight": 11,
+      "degree": "-5"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -134,
+      "dt_observed_sec": 11900,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -133,
+      "dt_observed_sec": 11000,
+      "weight": 10,
+      "degree": "-9"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -133,
+      "dt_observed_sec": 11600,
+      "weight": 4,
+      "degree": "+32"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -133,
+      "dt_observed_sec": 11500,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -128,
+      "dt_observed_sec": 11900,
+      "weight": 1,
+      "degree": "-55"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -128,
+      "dt_observed_sec": 12000,
+      "weight": 4,
+      "degree": "-34"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -128,
+      "dt_observed_sec": 12600,
+      "weight": 8,
+      "degree": "-15"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -128,
+      "dt_observed_sec": 11350,
+      "weight": 3
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -122,
+      "dt_observed_sec": 14000,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -119,
+      "dt_observed_sec": 12500,
+      "weight": 1,
+      "degree": "+66"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -119,
+      "dt_observed_sec": 11750,
+      "weight": 1,
+      "degree": "+93"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -119,
+      "dt_observed_sec": 10950,
+      "weight": 1,
+      "degree": "+120"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -119,
+      "dt_observed_sec": 11900,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -109,
+      "dt_observed_sec": 14600,
+      "weight": 5,
+      "degree": "+25"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -108,
+      "dt_observed_sec": 12100,
+      "weight": 10,
+      "degree": "+8"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -105,
+      "dt_observed_sec": 10500,
+      "weight": 1,
+      "degree": "+66"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -105,
+      "dt_observed_sec": 8900,
+      "weight": 1,
+      "degree": "+126"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -105,
+      "dt_observed_sec": 12900,
+      "weight": 2,
+      "degree": "-50"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -105,
+      "dt_observed_sec": 11850,
+      "weight": 4,
+      "degree": "-29"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -105,
+      "dt_observed_sec": 12950,
+      "weight": 10,
+      "degree": "-8"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -104,
+      "dt_observed_sec": 11750,
+      "weight": 5,
+      "degree": "-26"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -104,
+      "dt_observed_sec": 12050,
+      "weight": 10,
+      "degree": "-12"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -104,
+      "dt_observed_sec": 12000,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -95,
+      "dt_observed_sec": 13200,
+      "weight": 1,
+      "degree": "+57"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -95,
+      "dt_observed_sec": 11600,
+      "weight": 3
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -93,
+      "dt_observed_sec": 9800,
+      "weight": 3
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -86,
+      "dt_observed_sec": 12000,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -80,
+      "dt_observed_sec": 8900,
+      "weight": 1,
+      "degree": "+60"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -80,
+      "dt_observed_sec": 10350,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -79,
+      "dt_observed_sec": 11500,
+      "weight": 3,
+      "degree": "-40"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -79,
+      "dt_observed_sec": 10850,
+      "weight": 8,
+      "degree": "-16"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -79,
+      "dt_observed_sec": 12100,
+      "weight": 4,
+      "degree": "+30"
+    },
+    {
+      "source_table": "S02",
+      "source_table_name": "Babylonian lunar eclipses, culmination of ziqpu star",
+      "year": -79,
+      "dt_observed_sec": 11300,
+      "weight": 3
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -72,
+      "dt_observed_sec": 12900,
+      "weight": 3,
+      "degree": "-37"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -72,
+      "dt_observed_sec": 12150,
+      "weight": 8,
+      "degree": "-17"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -66,
+      "dt_observed_sec": 10100,
+      "weight": 5,
+      "degree": "+23"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -65,
+      "dt_observed_sec": 9500,
+      "weight": 9,
+      "degree": "+13"
+    },
+    {
+      "source_table": "S01",
+      "source_table_name": "Babylonian lunar eclipses",
+      "year": -65,
+      "dt_observed_sec": 9900,
+      "weight": 3,
+      "degree": "+32"
+    },
+    {
+      "source_table": "S07",
+      "source_table_name": "Greek timed lunar and solar eclipses",
+      "year": 125,
+      "dt_observed_sec": 10350,
+      "weight": 3
+    },
+    {
+      "source_table": "S07",
+      "source_table_name": "Greek timed lunar and solar eclipses",
+      "year": 364,
+      "dt_observed_sec": 6800,
+      "weight": 3
+    },
+    {
+      "source_table": "S07",
+      "source_table_name": "Greek timed lunar and solar eclipses",
+      "year": 364,
+      "dt_observed_sec": 6100,
+      "weight": 3
+    },
+    {
+      "source_table": "S07",
+      "source_table_name": "Greek timed lunar and solar eclipses",
+      "year": 364,
+      "dt_observed_sec": 6000,
+      "weight": 3
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 434,
+      "dt_observed_sec": 1750,
+      "weight": 0
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 434,
+      "dt_observed_sec": 2800,
+      "weight": 0
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 437,
+      "dt_observed_sec": 7400,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 437,
+      "dt_observed_sec": 6000,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 437,
+      "dt_observed_sec": 6550,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 440,
+      "dt_observed_sec": 6200,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 440,
+      "dt_observed_sec": 8100,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 543,
+      "dt_observed_sec": 4600,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 585,
+      "dt_observed_sec": 5900,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 585,
+      "dt_observed_sec": 5600,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 585,
+      "dt_observed_sec": 7100,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 592,
+      "dt_observed_sec": 5850,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 593,
+      "dt_observed_sec": 4700,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 595,
+      "dt_observed_sec": 5400,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 595,
+      "dt_observed_sec": 4000,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 595,
+      "dt_observed_sec": 3500,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 596,
+      "dt_observed_sec": 4200,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 596,
+      "dt_observed_sec": 4800,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 854,
+      "dt_observed_sec": 3150,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 854,
+      "dt_observed_sec": 2500,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 854,
+      "dt_observed_sec": 1300,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 856,
+      "dt_observed_sec": 2300,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 883,
+      "dt_observed_sec": 900,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 901,
+      "dt_observed_sec": 400,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 923,
+      "dt_observed_sec": 1200,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 923,
+      "dt_observed_sec": 2000,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 925,
+      "dt_observed_sec": 2700,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 925,
+      "dt_observed_sec": 2300,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 927,
+      "dt_observed_sec": 2900,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 933,
+      "dt_observed_sec": 2350,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 948,
+      "dt_observed_sec": 4450,
+      "weight": 0
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 979,
+      "dt_observed_sec": 1500,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 979,
+      "dt_observed_sec": 1900,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 979,
+      "dt_observed_sec": 1300,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 980,
+      "dt_observed_sec": 2100,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 981,
+      "dt_observed_sec": 2000,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 981,
+      "dt_observed_sec": 2350,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 981,
+      "dt_observed_sec": 1500,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 983,
+      "dt_observed_sec": 1200,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 986,
+      "dt_observed_sec": 800,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 990,
+      "dt_observed_sec": 3500,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 1001,
+      "dt_observed_sec": 450,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 1002,
+      "dt_observed_sec": 1750,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 1002,
+      "dt_observed_sec": 1950,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 1003,
+      "dt_observed_sec": 1450,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 1003,
+      "dt_observed_sec": 650,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 1004,
+      "dt_observed_sec": 2600,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 1019,
+      "dt_observed_sec": 1900,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 1019,
+      "dt_observed_sec": 1700,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 1019,
+      "dt_observed_sec": 1750,
+      "weight": 1
+    },
+    {
+      "source_table": "S09",
+      "source_table_name": "Arab timed lunar eclipses",
+      "year": 1019,
+      "dt_observed_sec": 1550,
+      "weight": 1
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1052,
+      "dt_observed_sec": 2100,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1063,
+      "dt_observed_sec": 3150,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1069,
+      "dt_observed_sec": 2650,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1069,
+      "dt_observed_sec": 1700,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1069,
+      "dt_observed_sec": 750,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1071,
+      "dt_observed_sec": 450,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1071,
+      "dt_observed_sec": 300,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1071,
+      "dt_observed_sec": 900,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1073,
+      "dt_observed_sec": 1000,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1073,
+      "dt_observed_sec": 1400,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1073,
+      "dt_observed_sec": 750,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1074,
+      "dt_observed_sec": 1600,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1074,
+      "dt_observed_sec": 500,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1078,
+      "dt_observed_sec": 300,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1078,
+      "dt_observed_sec": 700,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1081,
+      "dt_observed_sec": 1350,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1082,
+      "dt_observed_sec": 1650,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1082,
+      "dt_observed_sec": 1150,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1082,
+      "dt_observed_sec": 1200,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1085,
+      "dt_observed_sec": 150,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1085,
+      "dt_observed_sec": 250,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1088,
+      "dt_observed_sec": 650,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1088,
+      "dt_observed_sec": 150,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1089,
+      "dt_observed_sec": 1100,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1092,
+      "dt_observed_sec": 700,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1099,
+      "dt_observed_sec": 1150,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1099,
+      "dt_observed_sec": 1050,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1099,
+      "dt_observed_sec": 600,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1099,
+      "dt_observed_sec": 250,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1106,
+      "dt_observed_sec": 200,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1106,
+      "dt_observed_sec": 950,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1168,
+      "dt_observed_sec": 0,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1168,
+      "dt_observed_sec": 100,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1270,
+      "dt_observed_sec": -400,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1270,
+      "dt_observed_sec": 400,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1270,
+      "dt_observed_sec": 700,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1272,
+      "dt_observed_sec": 700,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1272,
+      "dt_observed_sec": 100,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1272,
+      "dt_observed_sec": 100,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1277,
+      "dt_observed_sec": 450,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1277,
+      "dt_observed_sec": -50,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1277,
+      "dt_observed_sec": 900,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1277,
+      "dt_observed_sec": 200,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1279,
+      "dt_observed_sec": 450,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1279,
+      "dt_observed_sec": -150,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1279,
+      "dt_observed_sec": -400,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1279,
+      "dt_observed_sec": 700,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1279,
+      "dt_observed_sec": 900,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1279,
+      "dt_observed_sec": 500,
+      "weight": 2
+    },
+    {
+      "source_table": "S05",
+      "source_table_name": "Chinese timed lunar eclipses",
+      "year": 1280,
+      "dt_observed_sec": 1100,
+      "weight": 2
+    }
+  ]
+}
