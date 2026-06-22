@@ -1,9 +1,11 @@
 # ΔT model validation via historical solar eclipses
 
-**Date**: 2026-06-18 (initial); 2026-06-20 (cross-references to doc 101 added)
-**Status**: Step B complete — first quantitative comparison of our ΔT against published formulas. Companion analysis with a different methodology now exists at [doc 101](101-pure-tidal-eclipses.md).
+**Date**: 2026-06-18 (initial); 2026-06-20 (cross-references to doc 101 added); 2026-06-22 (citation + numbers synced to post-α(t) canonical state)
+**Status**: Step B complete — first quantitative comparison of our ΔT against published formulas. Companion analyses with different methodologies now exist at [doc 101](101-pure-tidal-eclipses.md) (solar visibility window) and [doc 102](102-gia-alpha-lunar-validation.md) (lunar timing test + α(t) GIA correction).
 
-> **Companion analysis (added 2026-06-20)**: This document uses a **residual-RMS methodology** — Moon-Sun geocentric separation in degrees, evaluated across 35 historical solar eclipses. [Doc 101](101-pure-tidal-eclipses.md) presents a complementary **visibility-window methodology** on a focused, cleaner 19-event dataset (-762 to 1654 CE). The two analyses surface different aspects of the same picture and reach consistent conclusions; see [Related work](#related-work--visibility-window-methodology-doc-101) below for the synthesis. **Numerical baselines in this document are unchanged**; verify-pipeline confirms no Moon/Sun position regression since 2026-06-18 (Moon RMS 0.0015°, Sun RMS 0.0033°).
+> **Snapshot note (2026-06-22)**: This document records the **original pre-α(t) RMS-residual test** (35 events, 584 BCE – 2024 CE) from 2026-06-18. The live model was subsequently extended with an α(t) viscoelastic GIA correction (doc 102, 2026-06-22), shifting the canonical solar mean-residual from 8,658 → 8,682 s (drift of 0.3% — see [doc 101](101-pure-tidal-eclipses.md) line 13). The headline "model vs Stephenson" RMS-residual conclusion is unchanged at the noise floor. The "pure-tidal without non-tidal speedup" framing used below predates the α(t) work; the current canonical framing — Munk-MacDonald-scale (~5-6 ms/cy) non-tidal speedup rejected, GIA-scale (~0.6 ms/cy) contribution included via α(t) — lives in [doc 102](102-gia-alpha-lunar-validation.md) and the website's [Lunar Eclipse Validation](https://holisticuniverse.com/model/lunar-eclipse-validation) page.
+
+> **Companion analyses (added 2026-06-20)**: This document uses a **residual-RMS methodology** — Moon-Sun geocentric separation in degrees, evaluated across 35 historical solar eclipses. [Doc 101](101-pure-tidal-eclipses.md) presents a complementary **visibility-window methodology** on a focused, cleaner 19-event dataset (-762 to 1654 CE). [Doc 102](102-gia-alpha-lunar-validation.md) (2026-06-22) presents a higher-resolution **lunar timing test** on 270 primary-source observations from Stephenson 2016 — the validation that motivated the α(t) GIA addition to the live model. The three analyses surface different aspects of the same picture and reach consistent conclusions; see [Related work](#related-work--visibility-window-methodology-doc-101) below for the synthesis. **Numerical baselines in this document have been synced to post-α(t) canonical values** (8,658 → 8,682 s); verify-pipeline confirms no Moon/Sun position regression since 2026-06-18 (Moon RMS 0.0015°, Sun RMS 0.0033°).
 
 ---
 
@@ -126,10 +128,10 @@ This validation **confirms** that framing empirically. Neither approach
 "wins" the comparison; both produce historical eclipse predictions within
 the same accuracy band, set by the shared Meeus Ch. 47 lunar theory.
 
-Our model's advantage:
+Our model's advantage (as characterized in this pre-α(t) snapshot — see doc 102 for the current α(t)-GIA extension):
 - Independent grounding (Wells 1963, Wu et al. 2024 cyclostratigraphy, modern LLR)
 - Extends to deep time (Phanerozoic, Hadean) where no observational fit exists
-- No fitted parameters; pure secular tidal physics
+- No fitted parameters; pure secular tidal physics (now plus α(t) GIA from independent satellite gravimetry — see doc 102)
 
 Published fits' advantage:
 - Calibrated on the very eclipse record used here
@@ -204,7 +206,7 @@ The June 2026 analysis presented above was extended on 2026-06-20 by [doc 101](1
 
 | | Doc 100 (RMS residual) | Doc 101 (visibility window) |
 |---|---|---|
-| Our model vs Stephenson | 16 / 9 / 7 wins (~2° RMS each, statistically indistinguishable) | 19/19 vs 17/19 penumbra; 8,658 s vs 8,789 s mean residual (pure-tidal wins both) |
+| Our model vs Stephenson | 16 / 9 / 7 wins (~2° RMS each, statistically indistinguishable) | 19/19 vs 17/19 penumbra; 8,682 s vs 8,789 s mean residual (model wins both) |
 | Verdict | All three ΔT formulas equally good at the noise floor | Pure-tidal slightly outperforms on per-event visibility |
 
 The two analyses are **complementary, not contradictory**:
@@ -228,9 +230,10 @@ Three things doc 101 does that doc 100 does not:
 - Espenak, F., & Meeus, J. (2006). *Five Millennium Canon of Solar Eclipses: -1999 to +3000.* NASA TP-2006-214141.
 - Stephenson, F.R., Morrison, L.V., & Hohenkerk, C.Y. (2016). *Measurement of the Earth's rotation: 720 BC to AD 2015.* Proc. R. Soc. A.
 - Farhat, M., Auclair-Desrotour, P., Boué, G., & Laskar, J. (2022). *The resonant tidal evolution of the Earth-Moon distance.* A&A 665, L1.
-- Wu, J., Meyers, S.R., Hinnov, L.A., et al. (2024). *A 650-Myr history of Earth's axial precession frequency from cyclostratigraphy.* Sci. Adv. 10, eado2412.
+- Wu, Y., Malinverno, A., Meyers, S.R., & Hinnov, L.A. (2024). *A 650-Myr history of Earth's axial precession frequency and the evolution of the Earth-Moon system derived from cyclostratigraphy.* Sci. Adv. 10(42), eado2412. doi:10.1126/sciadv.ado2412
 - Stephenson, F.R. (1997). *Historical Eclipses and Earth's Rotation.* Cambridge University Press. (Cited in doc 101 for the Babylonian solar-eclipse window 369-136 BC.)
 - Panchenko, D. (1994). *Thales's Prediction of a Solar Eclipse.* J. Hist. Astron. 25(4), 275ff. doi:10.1177/002182869402500402. (Cited in doc 101 for the Thales eclipse-date dating discussion.)
 - Doc 66: `docs/66-moon-meeus-corrections.md` (Moon implementation reference)
 - Doc 99: `docs/99-expanding-solar-system-resonance-theory.md` (ESSRT framework)
 - Doc 101: `docs/101-pure-tidal-eclipses.md` (companion visibility-window analysis on 19-event dataset, 2026-06-20)
+- Doc 102: `docs/102-gia-alpha-lunar-validation.md` (higher-resolution lunar timing test on 270 primary-source observations + α(t) viscoelastic GIA correction derivation, 2026-06-22)

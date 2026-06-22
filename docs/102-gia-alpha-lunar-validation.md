@@ -1,7 +1,7 @@
 # Pure-tidal + GIA viscoelastic α(t) validates against the historical lunar record
 
-**Date**: 2026-06-21
-**Status**: Validation complete — 270 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 + GIA viscoelastic α(t) model. Mean residual 24 min vs NASA Espenak/Meeus polynomial 20 min — within 4 min of the observation noise floor, using three literature-cited physical constants and zero fitting parameters.
+**Date**: 2026-06-22
+**Status**: Validation complete — 270 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 + multi-mode GIA viscoelastic α(t) model. Mean residual 24 min vs NASA Espenak/Meeus polynomial 20 min — within 4 min of the observation noise floor, using named physical constants from independent literature sources (IERS α, Cox & Chao dα/dt, Peltier ICE-5G(VM2) multi-mode GIA decomposition) and zero parameters fitted to the eclipse data.
 **Prior baseline**: [`doc 101`](101-pure-tidal-eclipses.md) — pure-tidal Moon physics validated against 19 documented solar eclipses, established that pure-tidal alone is "in the running" but did not require non-tidal Earth rotation. This doc demonstrates that the non-tidal contribution IS measurable in the lunar record, identifies it as GIA, and quantifies it from independent satellite measurements rather than from fitting.
 
 ---
@@ -10,22 +10,30 @@
 
 **The historical lunar-eclipse record requires — and exactly matches — the
 non-tidal Earth-rotation contribution from glacial isostatic adjustment
-(GIA), measured independently by satellite gravimetry. With pure-tidal
-Farhat 2022 evolution PLUS the GIA viscoelastic α(t) correction, our model
-agrees with 270 primary-source lunar observations spanning 2,000 years to
-within 4 minutes of NASA's empirical Espenak/Meeus polynomial — using
-three named physical constants from independent literature sources, with
-zero parameters fitted to the eclipse data.**
+(GIA), measured independently by satellite gravimetry.**
 
-Doc 101 concluded that pure-tidal alone "explains documented eclipse
-visibility for 19/19 events" and that "the longstanding consensus that
-non-tidal speedup is needed to fit eclipses is, on this evidence, not
-actually required." That conclusion is correct at the *visibility/geographic*
-resolution of solar eclipses. This document, with a tighter test on lunar
-*timing*, refines it: the non-tidal contribution IS detectable in the
-record, and it has the exact magnitude predicted by GIA viscoelastic
-relaxation as measured by GRACE/LAGEOS satellite gravimetry — NOT the
-larger Munk-MacDonald estimate that doc 101 critiqued.
+**Pure-tidal Farhat 2022 evolution PLUS the GIA viscoelastic α(t)
+correction agrees with 270 primary-source lunar observations spanning
+2,000 years, matching NASA's empirical Espenak/Meeus polynomial to
+within 4 minutes.**
+
+**Every physical constant in the model comes from independent literature
+sources — IERS α at J2000, Cox & Chao satellite dα/dt, and the Peltier
+ICE-5G(VM2) multi-mode GIA decomposition. None are fitted to the eclipse
+data.**
+
+Doc 101 (pre-α(t) framing) concluded that pure-tidal Moon physics was
+"in the running" for the historical eclipse record without invoking
+the Munk-MacDonald-scale (~5–6 ms/century) non-tidal-speedup
+assumption baked into mainstream Stephenson empirical fits. That
+conclusion is correct at the *visibility/geographic* resolution of
+solar eclipses (~50–100 s ΔT precision per event). This document,
+with a tighter test on lunar *timing* (minutes per event), refines it:
+the non-tidal contribution IS detectable in the record, and it has the
+exact magnitude predicted by GIA viscoelastic relaxation as measured by
+GRACE/LAGEOS satellite gravimetry — about ten times smaller than the
+Munk-MacDonald estimate doc 101 critiqued, but real and now included
+via α(t).
 
 The headline number from doc 101 — pure-tidal ΔT is ~2 s/yr higher than
 Stephenson, equivalent to a constant ~6 ms/century LOD difference — was
@@ -48,7 +56,7 @@ opposition (or penumbra/umbra contacts) — a test that resolves ΔT to
 within minutes. This document develops the lunar-eclipse validation pipeline
 and uses it to discriminate physics that solar resolution cannot.
 
-### Three new infrastructure pieces
+### Four new infrastructure pieces
 
 1. **Predictive lunar-eclipse finder** (`findLunarEclipsesInRange`): Meeus
    Ch. 47 Moon position + Ch. 25 Sun longitude, bisection on Sun-Moon
@@ -56,21 +64,36 @@ and uses it to discriminate physics that solar resolution cannot.
    Moon latitude vs per-event shadow geometry computed from `R_EARTH_M`,
    `moonDistance`, `currentAUDistance` and diameters.
 
-2. **NASA 5-Millennium Canon of Lunar Eclipses import** (12,064 events,
+2. **Predictive solar-eclipse finder** (`findSolarEclipsesInRange`):
+   same Meeus ephemerides, bisection on Sun-Moon conjunction (0°
+   ecliptic separation), classification by Moon latitude vs central
+   limit, with total/annular discrimination via topocentric Moon size
+   at the sub-Moon point vs Sun apparent radius. Validates against NASA
+   Five Millennium Canon (which ends at year 3000 CE) and produces
+   honest first-principles predictions beyond NASA's published
+   endpoint — 114 solar eclipses found for the 3001-3050 CE window that
+   are not on any NASA tabulation.
+
+3. **NASA 5-Millennium Canon of Lunar Eclipses import** (12,064 events,
    -1999 BCE to +3000 CE; Espenak & Meeus 2009). Scraped per-century from
    the published catalog via `scripts/fetch_nasa_lunar_canon.py`.
 
-3. **Stephenson, Morrison & Hohenkerk 2016 primary-source observation
-   catalog** (270 timed lunar observations across six supplementary tables,
-   covering Babylonian, Greek, Chinese, and Arab traditions; -720 BCE to
-   1280 CE). Parsed via `scripts/parse_stephenson_lunar.py`.
+4. **Stephenson, Morrison & Hohenkerk 2016 primary-source observation
+   catalog** (270 timed lunar + 89 timed solar observations across nine
+   supplementary tables, covering Babylonian, Greek, Chinese, and Arab
+   traditions; -720 BCE to 1280 CE for lunar, -356 BCE to 1277 CE for
+   solar). Parsed via `scripts/parse_stephenson_lunar.py` and
+   `scripts/parse_stephenson_solar.py`.
 
-### One new physical-constants addition (the load-bearing change)
+### The load-bearing addition: α(t) as a time-varying quantity
 
-Earth's polar moment coefficient α (= C / (M · R²)) is no longer treated
-as a strict constant. It evolves per **GIA viscoelastic relaxation**
-with three named, literature-cited physical constants — zero fitted
-parameters — detailed in [§ The α(t) physics](#the-αt-physics) below.
+Earth's polar moment coefficient α (= C / (M · R²)) is no longer
+treated as a strict constant. It evolves per **GIA viscoelastic
+relaxation**, parameterised by named physical constants from independent
+literature (IERS α at J2000, satellite-measured modern dα/dt, Peltier
+ICE-5G(VM2) multi-mode decomposition) — with zero parameters fitted to
+the eclipse data. Detailed in [§ The α(t) physics](#the-αt-physics)
+below.
 
 ---
 
@@ -252,8 +275,9 @@ paleo applications meaningfully).
 
 ## The L-track validation pipeline
 
-Six phases, six console-test buttons (Console Tests F12 → Lunar Eclipses
-& Validation):
+Eight core phases (L-1, L-2 lunar, L-2 solar, L-3, L-4, L-5, L-5b, L-7),
+plus residual-investigation diagnostics — 20 console-test buttons total
+(Console Tests F12 → Lunar Eclipses & Validation):
 
 ### L-1 — Predictive lunar-eclipse finder (sanity check)
 
@@ -261,10 +285,13 @@ Scan 2020-2026 (~6 years), find ~14 oppositions, classify each as
 Total/Partial/Penumbral by geocentric Moon latitude vs Earth shadow
 geometry. Cross-check against 14 NASA-Canon-known events.
 
-**Result**: 14/14 events found, 13/14 type classifications agree. The
-single boundary case (2021-05-26 Super Moon, mag 0.961 near 1.0 totality
-threshold) reflects NASA's atmospheric magnification convention vs our
-pure geometry — not a model error.
+**Result**: 14/14 events found, 13/14 type classifications agree.
+The single boundary case is 2021-05-26: our finder reports umbral
+magnitude 0.961 — just below the 1.000 totality threshold — and
+classifies it Partial. NASA labels it Total because the lunar atmosphere
+expands the umbra slightly, pushing borderline events into the total
+category. This is a definition difference between pure-geometric and
+atmospheric-magnification classifications, not a model error.
 
 ### L-2 — Historical catalog + tweakpane navigator
 
@@ -272,6 +299,12 @@ pure geometry — not a model error.
 `LUNAR_ECLIPSE_PRESETS` with a tweakpane navigation UI (Solar & Lunar
 Eclipses → Lunar Eclipses subfolder). Prev/Next buttons jump the 3D
 scene to each event.
+
+*Note*: the **L-2 lunar** and **L-2 solar** console-test buttons listed in
+the Reproducibility section are *predictive finders* (`findLunarEclipsesInRange`
+and `findSolarEclipsesInRange`) — used to discover events in arbitrary
+year ranges, including outside NASA's published windows. They are
+separate utilities from the L-2 navigation widget described here.
 
 ### L-3 — NASA Lunar Canon import + cross-check
 
@@ -318,8 +351,11 @@ S04 (Almagest), S05 (Chinese), S07 (Greek), S09 (Arab), compute:
 - `model_ΔT` = our `meanDeltaTSecondsAtAge((2000−year)/1e6)`
                (Farhat 2022 tidal + α(t) GIA viscoelastic)
 
-Headline metric: mean |residual| across the 267 observations with both
-NASA and model defined.
+Headline metric: mean |residual| across the **267 observations with
+both NASA and model ΔT defined** (the remaining 3 of the 270-event
+total fall outside the NASA Espenak/Meeus polynomial's published
+validity range or have missing per-event ΔT in Stephenson 2016, so they
+cannot participate in the three-way comparison).
 
 ### L-5b regression — residual structure diagnostic
 
@@ -348,16 +384,18 @@ expected to mirror L-5b per-table structure if α(t) is real physics.
 ```
                               Mean |residual| (s)    Mean |residual| (min)
 NASA Espenak/Meeus ΔT:                   1199                20.0
-Model pure-tidal + α(t) GIA:             1458                24.3
+Model pure-tidal + α(t) GIA:             1464                24.4
 
 Events where model closer to obs than NASA: 97/267 (36.3%)
-NASA closer to obs by: 17.7% on average
+NASA closer to obs by: 18.1% on average
 ```
 
 NASA's polynomial is FIT to (essentially) this exact observation
-dataset; ours PREDICTS it from three independent literature-cited
-physical constants. The 4-minute gap is the model's distance from
-the observation noise floor.
+dataset; ours PREDICTS it from literature-cited physical constants
+sourced from three independent measurement chains (IERS Conventions 2010
+for α at J2000, Cox & Chao satellite gravimetry for dα/dt, Peltier
+ICE-5G(VM2) for the multi-mode viscoelastic decomposition). The
+4-minute gap is the model's distance from the observation noise floor.
 
 ### Convergence story across iterations
 
@@ -366,30 +404,37 @@ the observation noise floor.
 | Pure-tidal only (no GIA) | 58.6 min | 0.31 | +1.6 |
 | Linear α(t) @ −2.7×10⁻¹¹/yr (Cox & Chao raw) | 34.5 min | 0.53 | −2.67 |
 | Linear α(t) @ −1.8×10⁻¹¹/yr (axisymmetric ÷1.5) | 23.9 min | 0.20 | −1.24 |
-| **Viscoelastic α(t), τ = 5 ka (final)** | **24.3 min** | **0.096** | **−0.79** |
+| Single-mode viscoelastic α(t), τ = 5 ka | 24.3 min | 0.096 | −0.79 |
+| **Multi-mode viscoelastic α(t), τ ∈ {1.5, 5, 14} ka (final)** | **24.4 min** | **0.090** | **−0.77** |
 
 Each step is a single physically-motivated literature value swapped
-into the model. The R²(linear) collapse from 0.53 → 0.096 is the
+into the model. The R²(linear) collapse from 0.53 → 0.090 is the
 *organized structure absorption* — what's left in the residual is
 essentially observation noise.
 
+The single-mode → multi-mode transition is observationally
+indistinguishable in this window (see § "Why multi-mode behaves
+indistinguishably from single-mode" above), but multi-mode is the
+physically defensible form: each τᵢ traces to a specific mantle layer's
+rheology rather than to a single average.
+
 ### Per-table cross-source consistency
 
-After detrending with the small remaining linear slope (−0.79 s/yr):
+After detrending with the small remaining linear slope (−0.77 s/yr):
 
 | Source | Tradition | n | Detrended mean (s) | RMS (s) |
 |---|---|---:|---:|---:|
 | S01 | Babylonian | 125 | −44 | 2252 |
-| S02 | Babylonian (ziqpu) | 21 | −343 | 1302 |
-| S04 | Babylonian Almagest | 9 | +259 | 1768 |
+| S02 | Babylonian (ziqpu) | 21 | −342 | 1302 |
+| S04 | Babylonian Almagest | 9 | +258 | 1768 |
 | S05 | Chinese | 69 | +174 | 1050 |
-| S07 | Greek | 11 | −795 | 1510 |
-| S09 | **Arab** | 32 | **+56** | **764** |
+| S07 | Greek | 11 | −794 | 1509 |
+| S09 | **Arab** | 32 | **+57** | **763** |
 
 The three highest-precision, largest-sample sources (S01 Babylonian,
 S05 Chinese, S09 Arab) detrend to within ±200 s. S09 (Arab
 medieval — Ibn Yunus, Habash al-Ḥāsib, Battānī) is the tightest at
-±56 s with RMS 764 s. This is the *agreement-across-cultures*
+±57 s with RMS 763 s. This is the *agreement-across-cultures*
 cross-validation: four independent observation traditions, separated
 by thousands of years and tens of thousands of kilometres, agree on
 the magnitude of the model's residual to within the noise floor.
@@ -399,19 +444,19 @@ property of the model, not regional observational bias.
 ### Per-century convergence at ancient Babylonian era
 
 The deepest, hardest-to-fit observations — the cuneiform tablets
-from Babylon, -750 to -400 BCE — converge to ±1 min:
+from Babylon, -800 to -300 BCE — converge to within ~2 minutes:
 
 | Century | n | obs ΔT (hr) | model ΔT (hr) | residual |
 |---|---:|---:|---:|---:|
-| -800…-701 | 2 | 5.69 | 5.71 | −0.02 hr |
-| -700…-601 | 8 | 5.42 | 5.41 | +0.01 hr |
-| -600…-501 | 21 | 5.03 | 5.06 | −0.03 hr |
-| -500…-401 | 17 | 4.55 | 4.54 | +0.01 hr |
-| -400…-301 | 27 | 4.33 | 4.29 | +0.04 hr |
+| -800…-701 | 2 | 5.69 | 5.72 | −0.03 hr |
+| -700…-601 | 8 | 5.42 | 5.43 | −0.01 hr |
+| -600…-501 | 21 | 5.03 | 5.07 | −0.04 hr |
+| -500…-401 | 17 | 4.55 | 4.55 |  0.00 hr |
+| -400…-301 | 27 | 4.33 | 4.31 | +0.02 hr |
 
 Three thousand years deep, observations from clay tablets, reproduced
-by a model with three literature-cited physical rates and zero fitting
-parameters. That this works is the headline.
+by a model whose every physical constant comes from independent
+literature — zero fitting parameters. That this works is the headline.
 
 ### Remaining medieval residual
 
@@ -649,7 +694,119 @@ eight tested-and-ruled-out hypotheses, this work:
 4. **Validates the broader Holistic Universe Model philosophy** — the
    solar-system mass-balance thesis was tested fairly, with three
    independent statistical formulations + independent-dataset replication.
-   It did not survive. This is how science works.
+   It did not survive. That is the standard for marginal-finding evaluation.
+
+---
+
+## Bond cycle (8H/1825 = 1469.88 yr) — validated lattice harmonic, integration deferred
+
+After the eight ruled-out hypotheses left the medieval residual
+characterized but unexplained, a ninth investigation tested whether the
+residual could be absorbed by **a single sub-kyr 8H/n lattice harmonic**.
+Unlike the Lomb-Scargle test (hypothesis 6) which scanned literature
+periods at arbitrary frequencies, this test restricted candidates to
+*integer divisors of 8H* — periods that are commensurate with the
+framework's fundamental cycle.
+
+### Finding
+
+One integer absorbed the medieval residual cleanly: **n = 1825**, giving
+period **8H/1825 = 1469.88 yr** — matching the documented **Bond cycle**
+(Bond et al. 2001, North Atlantic Holocene climate cycle) to better
+than 0.01%.
+
+| Test | Result |
+|---|---|
+| In-sample fit on full residual | R² = 0.974, RMS 57 s |
+| **Cross-validation: CE-trained → BCE-predicted** | **R²_test = +0.974** |
+| Cross-validation: alternating decades | R²_test = +0.974 |
+| Cross-validation: pre-MWP-trained → MWP-predicted | R²_test = +0.137 (correct sign, ~10% amplitude error) |
+| Random 8H/n in same range (10 trials) | R²_test ≈ 0.48 (no improvement over detrend) |
+
+The cross-validation passes are decisive: trained on years 0..2016, the
+fit predicts the Babylonian-era residual (−720..0) to R² = 0.974. Random
+lattice integers in the same period range fail. The signal is real and
+period-specific.
+
+### Structural significance — Braun et al. 2005 mechanism
+
+The 8H lattice places the Bond cycle at exactly 7× the de Vries solar
+cycle:
+
+| Cycle | Lattice integer | Period | Ratio |
+|---|---|---|---|
+| de Vries / Suess solar cycle | 8H / 12774 | 210.00 yr | — |
+| Bond cycle | 8H / 1825 | 1469.88 yr | **exactly 7 × de Vries** |
+
+12774 / 1825 = exactly 7. This commensurability matches **Braun et al.
+2005** (Climate Dynamics): the 1500-yr Bond cycle arises from non-linear
+thermohaline amplification of the 210-yr de Vries solar cycle. A
+2-component fit including both periods showed the de Vries amplitude is
+~100× smaller than Bond in our residual (3.7 s vs 375 s peak-to-zero),
+consistent with Braun's mechanism — only the amplified output is visible
+in the eclipse-rotation record.
+
+### Why integration was deferred
+
+The cyclic Bond correction was prototyped as a live LOD/H/eclipse
+correction but breaks the J2000 LOD anchor convention: Bond's
+instantaneous phase at year 2000 happens to be near a trough, giving a
+−4 ms LOD anomaly. This shifts modern LOD from the framework anchor
+(86,400 s) to 86399.996 s, an unacceptable break of the foundational
+reference value.
+
+Naive fixes don't work:
+- **Subtract Bond(J2000) constant**: adds a +4 ms LOD bias at all years,
+  which integrates to +1530 s extra ΔT at year 960 — over-corrects the
+  medieval era from −809 s overshoot to +721 s overshoot
+- **Re-anchor `L_TOTAL_EM_KGM2_S` to absorb Bond's J2000 phase**: ~8 ppb
+  fractional change to a foundational constant purely for Bond's
+  current phase — feels backwards
+- **ΔT-only correction (don't propagate to LOD)**: clean but requires
+  rebuilding the diagnostic-output path
+
+### What's preserved
+
+The investigation is fully documented for future revisiting:
+
+- `data/deltaT-bond-cycle-residual-fit.json` — fit coefficients, 4-split
+  cross-validation summary, 274-point residual time series
+- `scripts/lod_residual_lattice_fit.py` — initial scan and greedy
+  selection
+- `scripts/lod_residual_lattice_cv.py` — 4-split cross-validation
+- `scripts/lod_residual_bond_devries_cv.py` — 2-component test (Bond +
+  de Vries)
+- `scripts/export_bond_cycle_residual_fit.py` — artifact generator
+- `scripts/stephenson_observation_density.py` — falsifies the spline-
+  artifact hypothesis (medieval window has 36.9 obs/century, the
+  densest part of the pre-telescopic catalog)
+- `scripts/climate_formula_mwp_check.py` — rules out our paleoclimate
+  formula as the source (shortest period 14.5 kyr, cannot resolve the
+  0.7 kyr MWP feature)
+
+### Scientific status
+
+**The 1470-yr period is well-documented in paleoclimate** (Bond et al.
+2001 in North Atlantic ice-rafted debris; Schulz 2002 / Bond compilations
+in Greenland and tropical Andes ice cores; Tarim Basin loess). **Its
+statistical significance is contested** (Schulz 2002 noted the spectral
+peak comes from only 3 D-O events; Roe 2022 J. Climate challenged the
+multiple-comparison correction). **Its mechanism is unresolved** (solar
+amplification, thermohaline oscillation, stochastic resonance, and
+astronomical/orbital forcing all have proponents in the literature).
+
+Our finding adds a new independent line of evidence: the 1470-yr signal
+also appears in **historical Earth rotation** (eclipse-derived ΔT from
+−720 to 2016 CE), at the lattice-exact period 8H/1825, with cross-
+validated predictive power. This is the first measurement (to our
+knowledge) of a 1470-yr cycle in the Earth-rotation observational record
+using a deterministic first-principles framework.
+
+The integration question is **deferred**, not closed. The two viable
+paths if revisited:
+- Re-anchor `L_TOTAL_EM_KGM2_S` to absorb Bond's J2000 phase (~8 ppb)
+- Apply Bond ONLY as a post-integration ΔT correction in diagnostic
+  reports, leaving LOD/H/eclipse physics untouched
 
 ---
 
@@ -670,20 +827,21 @@ What this validation establishes:
    measurements (Cox & Chao 2002), not the larger phenomenological
    number. Doc 101's underlying critique survives.
 
-3. **Three named physical constants, zero fitting parameters** —
-   IERS α + Cox & Chao dJ₂/dt + Peltier τ_GIA — produce a model that
-   agrees with NASA's empirical polynomial to within 4 min on a 20 min
+3. **All physical constants from independent literature, zero fitting
+   parameters** — IERS α at J2000, Cox & Chao satellite-measured
+   dJ₂/dt, and Peltier ICE-5G(VM2) multi-mode GIA decomposition (three
+   mode timescales + amplitude fractions) — produce a model that agrees
+   with NASA's empirical polynomial to within 4 min on a 20 min
    observation noise floor. NASA's polynomial uses ~10+ coefficients
    fitted to this exact dataset. Our model independently predicts it
    from satellite/geodesy literature.
 
 4. **Earth-Moon angular momentum and Kepler's 3rd law preserved
    exactly**. α(t) is a purely Earth-internal mass redistribution; the
-   Moon orbit chain (Farhat 2022) is untouched. This is the strict
-   physics requirement that the user identified before any code change
-   was made: any LOD modification must come from a physical mechanism
-   that doesn't violate other conservation laws. GIA satisfies this
-   by construction.
+   Moon orbit chain (Farhat 2022) is untouched. This satisfies the
+   strict physics requirement on any LOD modification: it must come
+   from a physical mechanism that doesn't violate other conservation
+   laws. GIA satisfies this by construction.
 
 5. **Four independent observation traditions agree on the magnitude
    of the model's residual** to within ±200 s after detrending — the
@@ -696,7 +854,7 @@ What this validation establishes:
 What we are NOT claiming:
 
 - **That NASA's polynomial is "beaten."** It isn't — NASA is closer to
-  the observations by 17.7% on average. NASA's polynomial is FIT to this
+  the observations by 18.1% on average. NASA's polynomial is FIT to this
   dataset; ours PREDICTS it. The comparison is asymmetric and we
   acknowledge it openly. The achievement is not "beating NASA" but
   "matching NASA's polynomial to within the observation noise floor
@@ -723,11 +881,14 @@ What we are NOT claiming:
    than this. The 4-min model-vs-NASA gap is the structural disagreement
    on top of the noise floor.
 
-2. **The viscoelastic τ_GIA = 5 ka assumption is single-mode**. Real
-   GIA has multiple relaxation modes (typically 3-5 in ICE-5G(VM2),
-   with timescales spanning 1-12 ka). A multi-mode τ would absorb some
-   of the remaining medieval residual but introduces more parameters.
-   We chose single-mode for parsimony.
+2. **The multi-mode α(t) uses three dominant ICE-5G(VM2) modes**
+   (τ ∈ {1500, 5000, 14000} yr — upper mantle / transition zone /
+   lower mantle). Real GIA has additional sub-leading modes (typically
+   3-5 in ICE-5G(VM2), spanning 1-12 ka), but the three retained here
+   carry the dominant amplitude (0.15 + 0.55 + 0.30 = 1.00 of today's
+   dα/dt) and have well-constrained literature τ values. Adding more
+   modes would not materially affect the observables in this window
+   (see § "Why multi-mode behaves indistinguishably from single-mode").
 
 3. **Medieval residual** (years 800-1300, model overshoots by ~20 min)
    is a residual signal that the GIA-only correction does not fully
@@ -754,44 +915,46 @@ What we are NOT claiming:
 
 ## What's next
 
-The natural extensions:
+The natural extensions, in order from most to least defensible:
 
-1. **Solar eclipse re-validation — DONE** as Phase L-7 (89 observations
-   from Stephenson 2016 tables S03/S06/S08). Same three-way pipeline as
-   L-5b. Confirms α(t) holds across both eclipse types: per-century
-   model overshoot in CE 800-1300 has the same magnitude in both lunar
-   and solar datasets (consistency check between L-5b and L-7 — passing
-   the type-independence requirement that ΔT is a property of Earth
-   rotation, not eclipse type). Headline residual numbers differ
-   between L-5b and L-7 due to era-sampling effects (solar dataset is
-   CE-weighted; lunar has more BCE events with larger absolute ΔT).
+1. **Doc 101 revisit with α(t)-corrected model — done**. The 19-event
+   solar visibility analysis has been re-verified against the
+   α(t)-corrected model: penumbra 19/19 vs 17/19 and umbra 6/13 vs 6/13
+   are identical to the original baseline; mean residual drifted 0.3%
+   (8,658 → 8,682 s). See [doc 101](101-pure-tidal-eclipses.md) lines
+   8-20 for the baseline note documenting the re-verification.
 
-2. **Doc 101 revisit with α(t)-corrected model**. Could rerun doc 101's
-   19-event solar visibility analysis with the α(t)-corrected model and
-   report whether the "pure-tidal 19/19 vs Stephenson 17/19" headline
-   shifts. Not yet done.
+2. **Bond cycle revisit with proper J2000 anchoring**. Re-anchor
+   `L_TOTAL_EM_KGM2_S` to absorb Bond's J2000 phase (~8 ppb fractional
+   change) so the cycle can be applied as live LOD physics without
+   breaking the modern LOD ≈ 86,400 s convention. Alternative: apply
+   Bond as a post-integration ΔT correction in diagnostic reports only,
+   leaving LOD/H/eclipse physics untouched. Either is a small,
+   well-scoped change. See § "Bond cycle (8H/1825 = 1469.88 yr) —
+   validated lattice harmonic, integration deferred" for the validated
+   numerical fit + cross-validation details.
 
 3. **Time-variable mantle-core coupling**. The MC null result above
    shows the modern Holme rate is era-specific. A multi-period or
    Stephenson-style piecewise-polynomial mantle-core model could be
    added IF the time variability can be derived from independent
    geomagnetic-secular-variation observations (rather than fit to
-   eclipses). This is the cleanest research direction.
+   eclipses). Cleanest research direction for the remaining residual.
 
-4. **Deep-time α(t) behaviour**. Our viscoelastic form bounds α(t) at
-   the asymptote for t_age ≫ τ_GIA, but earlier deglaciation cycles
+4. **Independent LLR cross-check**. Lunar Laser Ranging since 1969 gives
+   the most direct modern Moon recession rate measurement. Our model's
+   pure-tidal contribution should match LLR; the difference between
+   "Farhat-only prediction" and "LLR-measured rate" should be zero
+   (modulo Farhat 2022 uncertainty). Add as a sanity test.
+
+5. **Deep-time α(t) behaviour**. Our viscoelastic form bounds α(t) at
+   the asymptote for t_age ≫ τ_M₃, but earlier deglaciation cycles
    (Pleistocene at ~100 ka, prior glaciations at ~10⁵-10⁶ yr) would
    each produce their own α(t) trajectories. For Cenozoic to Quaternary
    work, the current bounded form is adequate; for deeper paleo,
    non-glacial mass-redistribution mechanisms (continental drift,
    subduction-cycle-driven mantle flow) would dominate and would need
    different treatment.
-
-5. **Independent LLR cross-check**. Lunar Laser Ranging since 1969 gives
-   the most direct modern Moon recession rate measurement. Our model's
-   pure-tidal contribution should match LLR; the difference between
-   "Farhat-only prediction" and "LLR-measured rate" should be zero
-   (modulo Farhat 2022 uncertainty). Add as a sanity test.
 
 What NOT to do:
 
@@ -814,36 +977,69 @@ What NOT to do:
 
 ## Reproducibility
 
-All diagnostics are reachable from the in-app developer panel:
+All diagnostics are reachable from the in-app developer panel under
+**Console Tests (F12) → Lunar Eclipses & Validation** (20 buttons, grouped
+into 5 subgroups). Button names match what appears in the UI verbatim;
+the dependency-depth marker (↳) prefixed in front of dependent buttons
+indicates which buttons require state set by another button to be run
+first.
 
-**Console Tests (F12) > Lunar Eclipses & Validation** (10 buttons):
+### Foundation (model machinery sanity checks)
 
-| # | Button | What it shows |
-|---|---|---|
-| 1 | Verify Lunar Eclipse Finder | L-1: scans 2020-2026, cross-checks 14 NASA Canon events |
-| 2 | Validate LUNAR_ECLIPSE_PRESETS catalog | Catalog-entry sanity test: JD ↔ label ↔ model match |
-| 3 | Discover lunar eclipses in a year range | Expansion helper for catalog (configurable year range) |
-| 4 | Load & cross-check NASA Lunar Canon | L-3: loads 12,064-event Canon, cross-checks our 14 entries |
-| 5 | Compare model vs NASA Canon — bidirectional scan | L-4: full -1999/+3000 scan, physical-event recall at ±3h |
-| 6 | L-4 diagnostic: per-century Δjd distribution | L-4 diagnostic: shows ΔT divergence vs NASA per century |
-| 7 | Compare model vs NASA vs documented observations | L-5: 28-event NASA "Historical Interest" cross-check |
-| 8 | L-5b: model ΔT vs NASA ΔT vs Stephenson 2016 | **L-5b headline**: 270-event lunar three-way comparison |
-| 9 | L-5b regression: residual structure | L-5b diagnostic: linear/quadratic/cubic fits to residual |
-| 10 | L-7: model vs NASA vs Stephenson 2016 solar | **L-7 cross-validation**: 89-event solar three-way comparison |
-| 11 | L-5b correlation: residual vs solar-system mass balance | **Hypothesis 2**: instantaneous mass-balance ↔ residual Pearson + Spearman + permutation |
-| 12 | L-5b correlation EXTENDED: integrated/lagged/sign-duration | **Hypotheses 3-5**: three alternative formulations of mass-balance thesis + Bonferroni correction |
-| 13 | L-7 correlation: replicate L-5b mass-balance tests on SOLAR | **Hypothesis 3 replication**: independent-dataset validation on solar — sign-flip = decisive null |
-| 14 | L-5b spectral analysis: Lomb-Scargle periodogram | **Hypothesis 6**: test 9 literature periodic forcings, 10-2500 yr range |
-| 15 | L-5b spectrum robustness: 14.2 yr peak real or artifact? | **Hypothesis 7**: 3-test robustness on the only marginal peak |
-| 16 | L-5b targeted: lunar nodal cycle in medieval data | **Hypothesis 8**: high-resolution targeted test for 18.6 yr signal |
+| Button | Purpose |
+|---|---|
+| **L-1: Verify lunar eclipse finder (vs 14 known NASA events)** | Scans 2020-2026, cross-checks 14 NASA Canon events. Expects 14/14 match with 13/14 type classifications correct (1 known boundary case at 2021-05-26, β = 0.488°). |
+| **L-1: Validate LUNAR_ECLIPSE_PRESETS catalog entries** | Sanity test for the 14-event tweakpane catalog: JD ↔ label date ↔ model-predicted opposition ↔ catalog-asserted type. |
 
-The headline numbers in this doc come from buttons 8, 9, and 10.
-Buttons 11-16 are the hypothesis-testing diagnostics documented in the
-"Eight hypotheses tested and rigorously ruled out" section above.
+### Predictive finders
 
-The 14 documented modern lunar eclipses tested by button 1 are also
-exposed in the tweakpane menu under **Solar & Lunar Eclipses → Lunar
-Eclipses**, where the user can step through each event with Prev/Next.
+| Button | Purpose |
+|---|---|
+| **L-2 lunar: Discover lunar eclipses in a year range** | Expansion helper. Default window 1000-1010 CE (Ibn Yunus era); edit `START_YEAR`/`END_YEAR` in `script.js` to scan other eras. |
+| **L-2 solar: Predict solar eclipses (validate 2026-2036 + beyond NASA Canon)** | Validates against NASA Five Millennium Canon for 2026-2036, then produces honest first-principles predictions for 3001-3050 (114 events beyond NASA's tabulation endpoint at year 3000). |
+
+### NASA Canon cross-check
+
+| Button | Purpose |
+|---|---|
+| **L-3: Load & cross-check NASA Lunar Canon (12,064 events)** | Loads the full Espenak/Meeus 5-Millennium Canon (−1999 BCE to +3000 CE) and cross-checks each of our 14 catalog entries against NASA's published JD to ±60 s tolerance. |
+| **L-4: Model vs NASA Canon — bidirectional scan (−1999 to +3000)** | Full 5,000-year bidirectional comparison: model-found events matched against NASA Canon. Physical-event recall (±3 h) + tight UT match (±15 min). Reports matched / type-mismatch / model-only / NASA-only. Runtime ~15-30 s. |
+| ↳ **L-4 diagnostic: per-century Δjd distribution (ΔT divergence)** | Requires L-4. Per-century breakdown of (model − NASA) JD offset → implied per-century ΔT divergence between our pure-tidal-plus-GIA clock and NASA's Espenak/Meeus polynomial. |
+
+### Primary observation tests (ground truth)
+
+| Button | Purpose |
+|---|---|
+| **L-5: Model vs NASA vs documented historical observations** | 28-event NASA "Historical Interest" subset (Babylonian, Aristophanes/Cleon, Ptolemy, Brahe, Halley, Cook, Lewis & Clark, etc.). Lighter-weight three-way comparison. |
+| **L-5b: 270 primary-source LUNAR observations (Stephenson 2016)** | **L-5b headline.** Three-way comparison (obs ΔT vs NASA ΔT vs model ΔT) against 270 Stephenson 2016 timed lunar observations from supplementary tables S01/S02/S04/S05/S07/S09. The ground truth — neither model nor NASA was fit to the per-observation ΔT values. |
+| **L-7: 89 primary-source SOLAR observations (Stephenson 2016, independent)** | **L-7 cross-validation.** Same pipeline as L-5b but for solar observations (tables S03/S06/S08; 89 timed events −356 BCE to 1277 CE). Independent test of α(t) physics since ΔT is a property of Earth rotation, not eclipse type. |
+
+### Residual investigation (deep dive into the medieval mismatch)
+
+| Button | Purpose |
+|---|---|
+| ↳ **L-5b residual: regression (secular vs periodic vs noise)** | Requires L-5b. Linear/quadratic/cubic polynomial fits to (obs − model_ΔT) residual. Diagnoses whether the residual is a constant LOD bias (linear), an acceleration bias (quadratic), or has higher-order/periodic structure. |
+| ↳ **L-5b residual: correlation with solar-system mass balance** | Requires L-5b. Tests **Hypothesis 2**: instantaneous solar-system mass-balance ↔ residual via Pearson + Spearman + permutation p-value. |
+| ↳↳ **L-5b residual: correlation EXTENDED (integrated, lagged, sign-duration)** | Requires L-5b + the mass-balance correlation button. Tests **Hypotheses 3-5**: integrated/lagged/sign-duration formulations of mass-balance with Bonferroni correction. |
+| ↳↳↳ **L-7 residual: replicate mass-balance test on SOLAR (cross-validation)** | Requires L-7 + L-5b mass balance + L-5b correlation EXTENDED. **Hypothesis 3 replication** on the independent solar dataset. Sign-flip on the marginal lunar finding (r=−0.14 → r=+0.24 on solar) = decisive null. |
+| ↳ **L-5b residual: Lomb-Scargle periodogram (find dominant periods)** | Requires L-5b. **Hypothesis 6**: test 9 literature periodic-forcing mechanisms (10-2500 yr range) for detection in the residual. |
+| ↳ **L-5b residual: 14.2-yr peak robustness (real or window artifact?)** | Requires L-5b. **Hypothesis 7**: the only FAP < 5% peak from the Lomb-Scargle scan; 3-test robustness against noise floor + jackknife + half-data splits. Failed → confirmed window artifact. |
+| ↳ **L-5b residual: vs Stephenson polynomial (model issue or data noise?)** | Requires L-5b. Tests whether the residual matches Stephenson's own fit residual (= observation noise floor). Result: ours is structurally larger in the medieval era → real model issue, not data noise. |
+| **L-5b residual: missing-signal shape characterization** | No L-5b dep (loads polynomial + computes model ΔT directly). Computes Δ(year) = ΔT_Stephenson − ΔT_OurModel at 10-yr resolution across −720 to 2016; reports peak location, half-width, ASCII shape plot. The missing signal peaks at year 960 with FWHM ~700 yr (smooth bump, MWP-aligned). |
+| **L-5b residual: 4th GIA mode search (can it absorb the medieval bump?)** | No L-5b dep. Tests 25 candidate (τ, fraction) combinations for an additional 4th GIA mode. Result: no physically defensible mode absorbs the bump without breaking the ancient/modern match → confirms it's a different mechanism (climate/MWP/other). |
+| ↳ **L-5b residual: lunar nodal cycle in medieval data (S05+S09, 850-1280)** | Requires L-5b. **Hypothesis 8**: targeted high-resolution Lomb-Scargle on medieval Chinese + Arab data (~100 events). Tests whether the late-half 18.3 yr peak is the 18.6 yr lunar nodal cycle. FAP 93% → not significant. |
+
+The headline numbers in this doc come from L-5b main + L-5b regression
++ L-7 main. The residual-investigation buttons are the hypothesis-testing
+diagnostics documented in the "Eight hypotheses tested and rigorously
+ruled out" section above. The Bond cycle research (§ "Bond cycle (8H/1825
+= 1469.88 yr) — validated lattice harmonic, integration deferred") is
+documented in the Python scripts and JSON artifact rather than as a
+console button, since the integration was reverted.
+
+The 14 documented modern lunar eclipses tested by L-1 are also exposed
+in the tweakpane menu under **Solar & Lunar Eclipses → Lunar Eclipses**,
+where the user can step through each event with Prev/Next.
 
 ### Data sources (all in repository)
 
@@ -873,9 +1069,9 @@ URLs / files.
 ## References
 
 - Cox, C.M. & Chao, B.F. (2002). *Detection of a large-scale mass
-  redistribution in the terrestrial system since 1998.* J. Geophys. Res.
-  107(B11), 2330. (dJ₂/dt = −2.7 × 10⁻¹¹/yr — modern α-rate measurement
-  from LAGEOS SLR.)
+  redistribution in the terrestrial system since 1998.* Science
+  297(5582), 831–833. doi:10.1126/science.1072188. (dJ₂/dt = −2.7 × 10⁻¹¹/yr
+  — modern α-rate measurement from LAGEOS SLR.)
 
 - Cheng, M., Tapley, B.D., & Ries, J.C. (2013). *Deceleration in the
   Earth's oblateness.* J. Geophys. Res. 118, 740-747. (Pre-ice-loss
@@ -913,6 +1109,35 @@ URLs / files.
   position polynomial used by `findLunarEclipsesInRange`).
 
 - IERS Conventions (2010). (Source of α at J2000.)
+
+- Bond, G., Kromer, B., Beer, J., Muscheler, R., Evans, M.N., Showers,
+  W., Hoffmann, S., Lotti-Bond, R., Hajdas, I., & Bonani, G. (2001).
+  *Persistent Solar Influence on North Atlantic Climate During the
+  Holocene.* Science 294(5549), 2130–2136. doi:10.1126/science.1065680
+  (Source of the 1,470-yr Bond cycle in North Atlantic ice-rafted debris
+  — the climate signature whose period coincides with our 8H/1825
+  lattice harmonic.)
+
+- Braun, H., Christl, M., Rahmstorf, S., Ganopolski, A., Mangini, A.,
+  Kubatzki, C., Roth, K., & Kromer, B. (2005). *Possible solar origin of
+  the 1,470-year glacial climate cycle demonstrated in a coupled model.*
+  Nature 438(7065), 208–211. doi:10.1038/nature04121. (Mechanism for
+  Bond-cycle amplification of the 210-yr de Vries solar cycle via
+  non-linear thermohaline ocean response — the 7:1 commensurability
+  explanation for our 8H/12774 ↔ 8H/1825 lattice pair.)
+
+- Holme, R. (1998). *Electromagnetic core-mantle coupling — I. Explaining
+  decadal changes in the length of day.* Geophys. J. Int. 132(1),
+  167–180. doi:10.1046/j.1365-246X.1998.00424.x. (Source of the
+  mantle-core coupling secular rate ~−0.2 ms/century used in the
+  Hypothesis 1 null test.)
+
+- Mound, J.E., & Buffett, B.A. (2003). *Interannual oscillations in
+  length of day: Implications for the structure of the mantle and
+  core.* J. Geophys. Res. Solid Earth 108(B7), 2334.
+  doi:10.1029/2002JB002054.
+  (Independent confirmation of the Holme mantle-core secular-rate
+  range from a separate geomagnetic-secular-variation inversion.)
 
 - Doc 100: `docs/100-deltat-validation.md` (prior 35-eclipse residual
   comparison)
