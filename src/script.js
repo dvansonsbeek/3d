@@ -27479,8 +27479,16 @@ function setupGUI() {
   calibFolder.addBinding(o, 'calibrationYearEnd', { label: 'End year', step: 1 });
 
   // Helper for console test buttons with optional tooltip
-  const addTestButton = (title, fn, tooltip) => {
-    const btn = calibFolder.addButton({ title }).on('click', async () => {
+  // depth (optional, 0-3): visual indent level for prerequisite-dependent buttons.
+  // depth N means the button reads state set by N buttons above it in the chain.
+  // Visual: prepended with (2N NBSP) + "↳ " to the title.
+  const addTestButton = (title, fn, tooltip, depth) => {
+    let displayTitle = title;
+    if (depth && depth > 0) {
+      const pad = '  '.repeat(depth);
+      displayTitle = pad + '↳ ' + title;
+    }
+    const btn = calibFolder.addButton({ title: displayTitle }).on('click', async () => {
       if (o._calibrationBusy) return;
       o._calibrationBusy = true;
       try { console.clear(); await fn(); } finally { o._calibrationBusy = false; }
@@ -29408,7 +29416,7 @@ function setupGUI() {
   // Future buttons (Commits 3-4): NASA Lunar Canon cross-check, model⇄NASA
   // bidirectional comparison (per IP doc Phase L-2 / L-4).
   // ────────────────────────────────────────────────────────────────────────
-  const firstLunarBtn = addTestButton('Verify Lunar Eclipse Finder (predictive finder + sanity check)', () => {
+  const firstLunarBtn = addTestButton('L-1: Verify lunar eclipse finder (vs 14 known NASA events)', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Lunar Eclipse Predictive Finder — sanity check');
     console.log('  Scans [2020-01-01, 2026-01-01] (~6 years) and lists model-predicted oppositions');
@@ -29496,7 +29504,7 @@ function setupGUI() {
      'known NASA Lunar Canon events as a sanity test. Should find ~13-16 events ' +
      'and match 14/14 NASA known events with correct type classification.');
 
-  addTestButton('Validate LUNAR_ECLIPSE_PRESETS catalog entries', () => {
+  addTestButton('L-1: Validate LUNAR_ECLIPSE_PRESETS catalog entries', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Validate LUNAR_ECLIPSE_PRESETS catalog — checks each entry for:');
     console.log('  1. JD ↔ label date consistency (does JD actually correspond to the label date?)');
@@ -29559,7 +29567,7 @@ function setupGUI() {
      '(2) the JD is within ±2 days of an actual model-predicted lunar eclipse, ' +
      '(3) catalog type matches model classification. Use to identify mis-curated entries.');
 
-  addTestButton('Discover lunar eclipses in a year range (catalog expansion helper)', () => {
+  const firstPredictiveBtn = addTestButton('L-2 lunar: Discover lunar eclipses in a year range', () => {
     // Default range: 1000-1010 CE (Ibn Yunus era). User can edit START_YEAR / END_YEAR.
     const START_YEAR = 1000;
     const END_YEAR   = 1010;
@@ -29604,7 +29612,7 @@ function setupGUI() {
      'catalog with verified JDs. Edit START_YEAR/END_YEAR in script.js to scan ' +
      'other eras.');
 
-  addTestButton('Predictive SOLAR eclipse finder — validate + predict beyond NASA Canon', () => {
+  addTestButton('L-2 solar: Predict solar eclipses (validate 2026-2036 + beyond NASA Canon)', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Predictive solar eclipse finder');
     console.log('  ');
@@ -29693,7 +29701,7 @@ function setupGUI() {
      'Canon (which ends at year 3000). Reports date/time/type/Moon-Sun size ratio. ' +
      'All geometry from model constants.');
 
-  addTestButton('Load & cross-check NASA Lunar Canon (Phase L-3)', async () => {
+  const firstCanonBtn = addTestButton('L-3: Load & cross-check NASA Lunar Canon (12,064 events)', async () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Load NASA Lunar Canon (12,064 events, -1999 BCE to +3000 CE) and cross-check');
     console.log('  each LUNAR_ECLIPSE_PRESETS entry against the NASA-published JD.');
@@ -29744,7 +29752,7 @@ function setupGUI() {
      'All 14 should match within ±60s. Phase L-3 deliverable; sets up Phase L-4 ' +
      '(bidirectional model⇄NASA scan over -1999 to +3000).');
 
-  addTestButton('Compare model vs NASA Canon — bidirectional scan (Phase L-4)', async () => {
+  addTestButton('L-4: Model vs NASA Canon — bidirectional scan (−1999 to +3000)', async () => {
     const START_YEAR = -1999;
     const END_YEAR   = 3000;
     // PHYSICAL-EVENT threshold. The 15-min initial gate revealed (via the diagnostic
@@ -29906,7 +29914,7 @@ function setupGUI() {
      'from ΔT-clock disagreement. Full result arrays exposed on window._L4. ' +
      'Runtime ~15-30s; logs progress per 100-year chunk.');
 
-  addTestButton('L-4 diagnostic: per-century Δjd distribution (ΔT divergence test)', () => {
+  addTestButton('L-4 diagnostic: per-century Δjd distribution (ΔT divergence)', () => {
     if (!window._L4 || !window._L4.modelEvents || !window._L4.nasaInRange) {
       console.error('Run the L-4 bidirectional scan first; window._L4 is not populated.');
       return;
@@ -30018,9 +30026,9 @@ function setupGUI() {
      'nearest NASA event (no threshold) and bins by century. Reports per-century mean/median ' +
      'offset and the implied model-effective ΔT vs NASA-published ΔT — directly tests whether ' +
      'the L-4 recall gap is driven by our pure-tidal ΔT diverging from NASA\'s empirical fit. ' +
-     'Requires L-4 to have been run (uses window._L4). Output exposed on window._L4_offsets.');
+     'Requires L-4 to have been run (uses window._L4). Output exposed on window._L4_offsets.', 1);
 
-  addTestButton('Compare model vs NASA vs documented observations (Phase L-5)', async () => {
+  const firstPrimaryBtn = addTestButton('L-5: Model vs NASA vs documented historical observations', async () => {
     const TIGHT_MIN = 15;
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Phase L-5: comparison against NASA\'s curated "Lunar Eclipses of Historical Interest"');
@@ -30119,7 +30127,7 @@ function setupGUI() {
      'also compares both model and NASA against the primary-source observation — that is ' +
      'the true ground-truth test independent of NASA\'s ΔT polynomial.');
 
-  addTestButton('L-5b: model ΔT vs NASA ΔT vs Stephenson 2016 observations (270 events)', async () => {
+  addTestButton('L-5b: 270 primary-source LUNAR observations (Stephenson 2016)', async () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Phase L-5b: three-way ΔT comparison against primary-source observations');
     console.log('  ');
@@ -30256,7 +30264,144 @@ function setupGUI() {
      'reports both clocks\' residual and which one sits closer to the actual observation. ' +
      'This is the ground-truth validation independent of NASA\'s ΔT fit.');
 
-  addTestButton('L-5b regression: residual structure (secular vs periodic vs noise)', () => {
+  addTestButton('L-7: 89 primary-source SOLAR observations (Stephenson 2016, independent)', async () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Phase L-7: three-way ΔT comparison against primary-source SOLAR observations');
+    console.log('  (Independent cross-check that the α(t) GIA correction — validated in doc 102');
+    console.log('   against 270 lunar observations — holds up against the solar observation record.)');
+    console.log('  ');
+    console.log('  Data: Stephenson, Morrison & Hohenkerk 2016 supplementary tables');
+    console.log('        S03 (Babylonian solar)  +  S06 (Chinese solar)  +  S08 (Arab solar)');
+    console.log('        89 timed solar observations, year -356 BCE to +1277 CE.');
+    console.log('  ');
+    console.log('  ΔT is type-independent (a property of Earth rotation, not the eclipse).');
+    console.log('  NASA ΔT(year) is averaged from the NASA Lunar Canon entries in that year —');
+    console.log('  same satellite-derived ΔT applies to solar and lunar events identically.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    const [steph, canon] = await Promise.all([loadStephensonSolar(), loadNasaLunarCanon()]);
+    if (!steph || !canon) return;
+
+    // Build NASA ΔT(year) lookup from Canon entries (same as L-5b)
+    const nasaDtByYear = new Map();
+    {
+      const acc = new Map();
+      for (const e of canon.entries) {
+        const m = /^(-?\d+)/.exec(e.date);
+        if (!m) continue;
+        const y = parseInt(m[1], 10);
+        const a = acc.get(y) || { sum: 0, n: 0 };
+        a.sum += e.delta_T_sec; a.n += 1;
+        acc.set(y, a);
+      }
+      for (const [y, a] of acc) nasaDtByYear.set(y, a.sum / a.n);
+    }
+
+    // Per-observation comparison
+    const records = [];
+    for (const obs of steph.entries) {
+      if (obs.dt_observed_sec == null) continue;
+      const nasa_dt = nasaDtByYear.get(obs.year);
+      if (nasa_dt == null) continue;
+      const t_Ma = (2000 - obs.year) / 1e6;
+      const model_dt = meanDeltaTSecondsAtAge(t_Ma);
+      records.push({
+        table:     obs.source_table,
+        year:      obs.year,
+        weight:    obs.weight,
+        obs_dt:    obs.dt_observed_sec,
+        nasa_dt,
+        model_dt,
+        res_model: obs.dt_observed_sec - model_dt,
+        res_nasa:  obs.dt_observed_sec - nasa_dt,
+      });
+    }
+
+    // Per-table summary
+    console.log('── Per-table summary ──');
+    const tables = [...new Set(records.map(r => r.table))].sort();
+    const rows = tables.map(tab => {
+      const subset = records.filter(r => r.table === tab);
+      const meanAbsModel = subset.reduce((s, r) => s + Math.abs(r.res_model), 0) / subset.length;
+      const meanAbsNasa  = subset.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / subset.length;
+      const closerModel  = subset.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
+      return {
+        table:                tab,
+        name:                 steph.entries.find(e => e.source_table === tab).source_table_name,
+        n:                    subset.length,
+        year_range:           `${Math.min(...subset.map(r => r.year))}…${Math.max(...subset.map(r => r.year))}`,
+        mean_obs_dt_hr:       (subset.reduce((s, r) => s + r.obs_dt, 0) / subset.length / 3600).toFixed(2),
+        mean_nasa_dt_hr:      (subset.reduce((s, r) => s + r.nasa_dt, 0) / subset.length / 3600).toFixed(2),
+        mean_model_dt_hr:     (subset.reduce((s, r) => s + r.model_dt, 0) / subset.length / 3600).toFixed(2),
+        mean_abs_res_NASA_s:  meanAbsNasa.toFixed(0),
+        mean_abs_res_model_s: meanAbsModel.toFixed(0),
+        model_closer_pct:     (closerModel / subset.length * 100).toFixed(0) + '%',
+      };
+    });
+    console.table(rows);
+
+    // Per-century summary
+    console.log('\n── Per-century summary ──');
+    const buckets = new Map();
+    for (const r of records) {
+      const c = Math.floor(r.year / 100) * 100;
+      if (!buckets.has(c)) buckets.set(c, []);
+      buckets.get(c).push(r);
+    }
+    const centRows = [];
+    for (const c of [...buckets.keys()].sort((a,b)=>a-b)) {
+      const sub = buckets.get(c);
+      const meanAbsM = sub.reduce((s, r) => s + Math.abs(r.res_model), 0) / sub.length;
+      const meanAbsN = sub.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / sub.length;
+      const closer   = sub.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
+      centRows.push({
+        century:              `${c}…${c+99}`,
+        n:                    sub.length,
+        mean_obs_dt_hr:       (sub.reduce((s, r) => s + r.obs_dt, 0) / sub.length / 3600).toFixed(2),
+        mean_nasa_dt_hr:      (sub.reduce((s, r) => s + r.nasa_dt, 0) / sub.length / 3600).toFixed(2),
+        mean_model_dt_hr:     (sub.reduce((s, r) => s + r.model_dt, 0) / sub.length / 3600).toFixed(2),
+        mean_abs_res_NASA_s:  meanAbsN.toFixed(0),
+        mean_abs_res_model_s: meanAbsM.toFixed(0),
+        model_closer_pct:     (closer / sub.length * 100).toFixed(0) + '%',
+      });
+    }
+    console.table(centRows);
+
+    // Global summary
+    const allMeanAbsModel = records.reduce((s, r) => s + Math.abs(r.res_model), 0) / records.length;
+    const allMeanAbsNasa  = records.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / records.length;
+    const allCloserModel  = records.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
+
+    console.log(`\n══════════════════════════════════════════════════════════════════════════════════`);
+    console.log(`  L-7 GLOBAL RESULT — ${records.length} primary-source SOLAR observations`);
+    console.log(`══════════════════════════════════════════════════════════════════════════════════`);
+    console.log(`  Mean |residual| vs observation:`);
+    console.log(`    NASA Espenak/Meeus ΔT:   ${allMeanAbsNasa.toFixed(0).padStart(6)} s  (${(allMeanAbsNasa/60).toFixed(1)} min)`);
+    console.log(`    Model pure-tidal + α(t): ${allMeanAbsModel.toFixed(0).padStart(6)} s  (${(allMeanAbsModel/60).toFixed(1)} min)`);
+    console.log(`  Events where model closer to obs than NASA: ${allCloserModel}/${records.length}  (${(allCloserModel/records.length*100).toFixed(1)}%)`);
+    console.log(``);
+    if (allMeanAbsModel < allMeanAbsNasa) {
+      const advantage = ((allMeanAbsNasa - allMeanAbsModel) / allMeanAbsNasa * 100).toFixed(1);
+      console.log(`  → Model is ${advantage}% closer to primary-source observations than NASA on average.`);
+    } else {
+      const advantage = ((allMeanAbsModel - allMeanAbsNasa) / allMeanAbsModel * 100).toFixed(1);
+      console.log(`  → NASA is ${advantage}% closer to primary-source observations than the model on average.`);
+    }
+    console.log(``);
+    console.log(`  Compare to L-5b lunar headline: model 24.3 min vs NASA 20.0 min (NASA closer by 17.7%).`);
+    console.log(`  If L-7 solar headline is similar magnitude, α(t) holds up across BOTH eclipse types`);
+    console.log(`  — strong independent cross-validation that the GIA viscoelastic physics is correct.`);
+
+    window._L7 = { records, perTable: rows, perCentury: centRows };
+    console.log('\nFull data exposed at window._L7 for further inspection.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Phase L-7: independent cross-check of the α(t) GIA correction against ' +
+     '89 timed primary-source solar observations from Stephenson, Morrison & ' +
+     'Hohenkerk 2016 (Babylonian, Chinese, Arab solar). Same three-way pipeline ' +
+     'as L-5b but for solar eclipses. Tests whether α(t) — validated in doc 102 ' +
+     'on 270 lunar observations — also holds up on this independent eclipse type.');
+
+  const firstResidualBtn = addTestButton('L-5b residual: regression (secular vs periodic vs noise)', () => {
     if (!window._L5b || !window._L5b.records) {
       console.error('Run the L-5b comparison button first; window._L5b is not populated.');
       return;
@@ -30394,9 +30539,9 @@ function setupGUI() {
      'shortfall is a single LOD bias (linear), an acceleration bias (quadratic), or has ' +
      'higher-order/periodic structure. Per-table breakdown also flags any systematic ' +
      'differences between Babylonian / Chinese / Greek / Arab observation sources. Requires ' +
-     'L-5b main comparison to have been run.');
+     'L-5b main comparison to have been run.', 1);
 
-  addTestButton('L-5b correlation: residual vs solar-system mass balance (mass-height inv. plane)', async () => {
+  addTestButton('L-5b residual: correlation with solar-system mass balance', async () => {
     if (!window._L5b || !window._L5b.records) {
       console.error('Run the L-5b main comparison first; window._L5b is not populated.');
       return;
@@ -30583,9 +30728,9 @@ function setupGUI() {
      '25 yr across the observation window, interpolates to each observation year, ' +
      'and computes Pearson + Spearman correlations + permutation-test p-value. ' +
      'Per-era sub-window correlations distinguish causation from coincidence. ' +
-     'Requires L-5b main button to have been run.');
+     'Requires L-5b main button to have been run.', 1);
 
-  addTestButton('L-5b spectral analysis: Lomb-Scargle periodogram of residual (find dominant periods)', () => {
+  addTestButton('L-5b residual: Lomb-Scargle periodogram (find dominant periods)', () => {
     if (!window._L5b || !window._L5b.records) {
       console.error('Run the L-5b main button first; window._L5b not populated.');
       return;
@@ -30757,9 +30902,9 @@ function setupGUI() {
      'Jose 179 yr, de Vries 210 yr, Wilson 550 yr, Bray-Hallstatt 2400 yr, etc.). ' +
      'A significant peak matching any known cycle → that mechanism is measurably ' +
      'present in the residual. Standard tool for periodicity detection in unevenly-' +
-     'sampled geophysical/astronomical time series.');
+     'sampled geophysical/astronomical time series. Requires L-5b main button to have been run.', 1);
 
-  addTestButton('L-5b spectrum robustness: is the 14.2 yr peak real or window artifact?', () => {
+  addTestButton('L-5b residual: 14.2-yr peak robustness (real or window artifact?)', () => {
     if (!window._L5b || !window._L5b.records) {
       console.error('Run L-5b main button first; window._L5b not populated.');
       return;
@@ -30905,9 +31050,9 @@ function setupGUI() {
      '(1) compare peak power to white-noise nulls at same sampling, (2) jackknife stability ' +
      'across random subsets, (3) presence in independent half-data splits. Requires L-5b ' +
      'main button to have been run. The 14.2 yr peak doesn\'t match any literature ' +
-     'mechanism — this test determines whether it\'s worth investigating further.');
+     'mechanism — this test determines whether it\'s worth investigating further.', 1);
 
-  addTestButton('L-5b vs Stephenson polynomial: is the medieval residual in OUR model or in the DATA?', async () => {
+  addTestButton('L-5b residual: vs Stephenson polynomial (model issue or data noise?)', async () => {
     if (!window._L5b || !window._L5b.records) {
       console.error('Run L-5b main button first; window._L5b not populated.');
       return;
@@ -31042,9 +31187,9 @@ function setupGUI() {
      'globally and per-century, the medieval "bump" is in the DATA, not our model — ' +
      'we\'re at the natural noise floor. If our residual is structurally larger ' +
      'in medieval era specifically, our model has a fixable issue there. ' +
-     'Requires L-5b main button to have been run.');
+     'Requires L-5b main button to have been run.', 1);
 
-  addTestButton('L-5b missing-signal shape: Stephenson polynomial − our model, characterized', async () => {
+  addTestButton('L-5b residual: missing-signal shape characterization', async () => {
     const poly = await loadStephensonDtPolynomial();
     if (!poly) return;
 
@@ -31165,7 +31310,7 @@ function setupGUI() {
      'could explain the gap between our first-principles model and the empirically-fit ' +
      'polynomial. No dependency on L-5b main button (uses polynomial + our model directly).');
 
-  addTestButton('L-5b 4th-GIA-mode search: can an intermediate-τ mode absorb the medieval bump?', async () => {
+  addTestButton('L-5b residual: 4th GIA mode search (can it absorb the medieval bump?)', async () => {
     const poly = await loadStephensonDtPolynomial();
     if (!poly) return;
 
@@ -31339,7 +31484,7 @@ function setupGUI() {
      'defensible mode works → our 3-mode model is incomplete. If no mode works → the bump ' +
      'is a different physical mechanism (climate/MWP/other).');
 
-  addTestButton('L-5b targeted: lunar nodal cycle in MEDIEVAL data (Chinese + Arab, year 850-1280)', () => {
+  addTestButton('L-5b residual: lunar nodal cycle in medieval data (S05+S09, 850-1280)', () => {
     if (!window._L5b || !window._L5b.records) {
       console.error('Run L-5b main button first; window._L5b not populated.');
       return;
@@ -31483,9 +31628,9 @@ function setupGUI() {
      'Runs Lomb-Scargle at high resolution (15-25 yr, 0.05 yr step) on JUST the medieval ' +
      'Chinese + Arab observations (S05 + S09, year 850-1280, ~100 events). Computes ' +
      'empirical FAP from 500 white-noise nulls. Per-source breakdown to distinguish ' +
-     'cross-source physical signal from single-source bias. Requires L-5b main button run.');
+     'cross-source physical signal from single-source bias. Requires L-5b main button run.', 1);
 
-  addTestButton('L-5b correlation EXTENDED: integrated, lagged, sign-duration (3 alternative tests)', () => {
+  addTestButton('L-5b residual: correlation EXTENDED (integrated, lagged, sign-duration)', () => {
     if (!window._L5b_balance || !window._L5b_balance.series) {
       console.error('Run the L-5b correlation button first (the previous one); window._L5b_balance.series needs to exist.');
       return;
@@ -31659,146 +31804,9 @@ function setupGUI() {
      'lagged correlation (scan Δ ∈ {0..1000} yr), and signed sign-duration. ' +
      'Applies Bonferroni multiple-comparison correction (α = 0.05/3) so we don\'t ' +
      'fool ourselves with p-hacking across multiple variant tests. Requires the ' +
-     'first L-5b correlation button to have populated window._L5b_balance.series.');
+     'first L-5b correlation button to have populated window._L5b_balance.series.', 2);
 
-  addTestButton('L-7: model ΔT vs NASA ΔT vs Stephenson 2016 solar observations (89 events)', async () => {
-    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Phase L-7: three-way ΔT comparison against primary-source SOLAR observations');
-    console.log('  (Independent cross-check that the α(t) GIA correction — validated in doc 102');
-    console.log('   against 270 lunar observations — holds up against the solar observation record.)');
-    console.log('  ');
-    console.log('  Data: Stephenson, Morrison & Hohenkerk 2016 supplementary tables');
-    console.log('        S03 (Babylonian solar)  +  S06 (Chinese solar)  +  S08 (Arab solar)');
-    console.log('        89 timed solar observations, year -356 BCE to +1277 CE.');
-    console.log('  ');
-    console.log('  ΔT is type-independent (a property of Earth rotation, not the eclipse).');
-    console.log('  NASA ΔT(year) is averaged from the NASA Lunar Canon entries in that year —');
-    console.log('  same satellite-derived ΔT applies to solar and lunar events identically.');
-    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
-
-    const [steph, canon] = await Promise.all([loadStephensonSolar(), loadNasaLunarCanon()]);
-    if (!steph || !canon) return;
-
-    // Build NASA ΔT(year) lookup from Canon entries (same as L-5b)
-    const nasaDtByYear = new Map();
-    {
-      const acc = new Map();
-      for (const e of canon.entries) {
-        const m = /^(-?\d+)/.exec(e.date);
-        if (!m) continue;
-        const y = parseInt(m[1], 10);
-        const a = acc.get(y) || { sum: 0, n: 0 };
-        a.sum += e.delta_T_sec; a.n += 1;
-        acc.set(y, a);
-      }
-      for (const [y, a] of acc) nasaDtByYear.set(y, a.sum / a.n);
-    }
-
-    // Per-observation comparison
-    const records = [];
-    for (const obs of steph.entries) {
-      if (obs.dt_observed_sec == null) continue;
-      const nasa_dt = nasaDtByYear.get(obs.year);
-      if (nasa_dt == null) continue;
-      const t_Ma = (2000 - obs.year) / 1e6;
-      const model_dt = meanDeltaTSecondsAtAge(t_Ma);
-      records.push({
-        table:     obs.source_table,
-        year:      obs.year,
-        weight:    obs.weight,
-        obs_dt:    obs.dt_observed_sec,
-        nasa_dt,
-        model_dt,
-        res_model: obs.dt_observed_sec - model_dt,
-        res_nasa:  obs.dt_observed_sec - nasa_dt,
-      });
-    }
-
-    // Per-table summary
-    console.log('── Per-table summary ──');
-    const tables = [...new Set(records.map(r => r.table))].sort();
-    const rows = tables.map(tab => {
-      const subset = records.filter(r => r.table === tab);
-      const meanAbsModel = subset.reduce((s, r) => s + Math.abs(r.res_model), 0) / subset.length;
-      const meanAbsNasa  = subset.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / subset.length;
-      const closerModel  = subset.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
-      return {
-        table:                tab,
-        name:                 steph.entries.find(e => e.source_table === tab).source_table_name,
-        n:                    subset.length,
-        year_range:           `${Math.min(...subset.map(r => r.year))}…${Math.max(...subset.map(r => r.year))}`,
-        mean_obs_dt_hr:       (subset.reduce((s, r) => s + r.obs_dt, 0) / subset.length / 3600).toFixed(2),
-        mean_nasa_dt_hr:      (subset.reduce((s, r) => s + r.nasa_dt, 0) / subset.length / 3600).toFixed(2),
-        mean_model_dt_hr:     (subset.reduce((s, r) => s + r.model_dt, 0) / subset.length / 3600).toFixed(2),
-        mean_abs_res_NASA_s:  meanAbsNasa.toFixed(0),
-        mean_abs_res_model_s: meanAbsModel.toFixed(0),
-        model_closer_pct:     (closerModel / subset.length * 100).toFixed(0) + '%',
-      };
-    });
-    console.table(rows);
-
-    // Per-century summary
-    console.log('\n── Per-century summary ──');
-    const buckets = new Map();
-    for (const r of records) {
-      const c = Math.floor(r.year / 100) * 100;
-      if (!buckets.has(c)) buckets.set(c, []);
-      buckets.get(c).push(r);
-    }
-    const centRows = [];
-    for (const c of [...buckets.keys()].sort((a,b)=>a-b)) {
-      const sub = buckets.get(c);
-      const meanAbsM = sub.reduce((s, r) => s + Math.abs(r.res_model), 0) / sub.length;
-      const meanAbsN = sub.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / sub.length;
-      const closer   = sub.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
-      centRows.push({
-        century:              `${c}…${c+99}`,
-        n:                    sub.length,
-        mean_obs_dt_hr:       (sub.reduce((s, r) => s + r.obs_dt, 0) / sub.length / 3600).toFixed(2),
-        mean_nasa_dt_hr:      (sub.reduce((s, r) => s + r.nasa_dt, 0) / sub.length / 3600).toFixed(2),
-        mean_model_dt_hr:     (sub.reduce((s, r) => s + r.model_dt, 0) / sub.length / 3600).toFixed(2),
-        mean_abs_res_NASA_s:  meanAbsN.toFixed(0),
-        mean_abs_res_model_s: meanAbsM.toFixed(0),
-        model_closer_pct:     (closer / sub.length * 100).toFixed(0) + '%',
-      });
-    }
-    console.table(centRows);
-
-    // Global summary
-    const allMeanAbsModel = records.reduce((s, r) => s + Math.abs(r.res_model), 0) / records.length;
-    const allMeanAbsNasa  = records.reduce((s, r) => s + Math.abs(r.res_nasa),  0) / records.length;
-    const allCloserModel  = records.filter(r => Math.abs(r.res_model) < Math.abs(r.res_nasa)).length;
-
-    console.log(`\n══════════════════════════════════════════════════════════════════════════════════`);
-    console.log(`  L-7 GLOBAL RESULT — ${records.length} primary-source SOLAR observations`);
-    console.log(`══════════════════════════════════════════════════════════════════════════════════`);
-    console.log(`  Mean |residual| vs observation:`);
-    console.log(`    NASA Espenak/Meeus ΔT:   ${allMeanAbsNasa.toFixed(0).padStart(6)} s  (${(allMeanAbsNasa/60).toFixed(1)} min)`);
-    console.log(`    Model pure-tidal + α(t): ${allMeanAbsModel.toFixed(0).padStart(6)} s  (${(allMeanAbsModel/60).toFixed(1)} min)`);
-    console.log(`  Events where model closer to obs than NASA: ${allCloserModel}/${records.length}  (${(allCloserModel/records.length*100).toFixed(1)}%)`);
-    console.log(``);
-    if (allMeanAbsModel < allMeanAbsNasa) {
-      const advantage = ((allMeanAbsNasa - allMeanAbsModel) / allMeanAbsNasa * 100).toFixed(1);
-      console.log(`  → Model is ${advantage}% closer to primary-source observations than NASA on average.`);
-    } else {
-      const advantage = ((allMeanAbsModel - allMeanAbsNasa) / allMeanAbsModel * 100).toFixed(1);
-      console.log(`  → NASA is ${advantage}% closer to primary-source observations than the model on average.`);
-    }
-    console.log(``);
-    console.log(`  Compare to L-5b lunar headline: model 24.3 min vs NASA 20.0 min (NASA closer by 17.7%).`);
-    console.log(`  If L-7 solar headline is similar magnitude, α(t) holds up across BOTH eclipse types`);
-    console.log(`  — strong independent cross-validation that the GIA viscoelastic physics is correct.`);
-
-    window._L7 = { records, perTable: rows, perCentury: centRows };
-    console.log('\nFull data exposed at window._L7 for further inspection.');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-  }, 'Phase L-7: independent cross-check of the α(t) GIA correction against ' +
-     '89 timed primary-source solar observations from Stephenson, Morrison & ' +
-     'Hohenkerk 2016 (Babylonian, Chinese, Arab solar). Same three-way pipeline ' +
-     'as L-5b but for solar eclipses. Tests whether α(t) — validated in doc 102 ' +
-     'on 270 lunar observations — also holds up on this independent eclipse type.');
-
-  addTestButton('L-7 correlation: replicate L-5b mass-balance tests on SOLAR residuals (independent validation)', () => {
+  addTestButton('L-7 residual: replicate mass-balance test on SOLAR (cross-validation)', () => {
     if (!window._L7 || !window._L7.records) {
       console.error('Run the L-7 main comparison first; window._L7 not populated');
       return;
@@ -31972,7 +31980,7 @@ function setupGUI() {
      'with similar sign and magnitude in solar → strong real-signal evidence. ' +
      'If solar contradicts → lunar was spurious-trend artifact, thesis ruled out. ' +
      'Pre-registered hypothesis; gold-standard cross-validation. Requires L-7 main + ' +
-     'L-5b correlation + L-5b correlation EXTENDED buttons to have been run first.');
+     'L-5b correlation + L-5b correlation EXTENDED buttons to have been run first.', 3);
 
   // Anchor & Units
   const firstAnchorBtn = addTestButton('Verify J2000 Rates (units check)', () => {
@@ -32612,12 +32620,23 @@ function setupGUI() {
     lbl.textContent = text;
     calibContainer.insertBefore(lbl, beforeBlade.element);
   };
+  const insertSubGroupLabel = (text, beforeBlade) => {
+    const lbl = document.createElement('div');
+    lbl.className = 'trace-subgroup-label';
+    lbl.textContent = '· ' + text;
+    calibContainer.insertBefore(lbl, beforeBlade.element);
+  };
   insertGroupLabel('Year Length', firstYearBtn);
   insertGroupLabel('Day Length', firstDayBtn);
   insertGroupLabel('Calibration', firstCalibBtn);
   insertGroupLabel('Balanced Year & 8H', firstBalancedBtn);
   insertGroupLabel('Historical Eclipses & ΔT', firstEclipseBtn);
   insertGroupLabel('Lunar Eclipses & Validation', firstLunarBtn);
+  // Subgroups within Lunar Eclipses & Validation
+  insertSubGroupLabel('Predictive finders',         firstPredictiveBtn);
+  insertSubGroupLabel('NASA Canon cross-check',     firstCanonBtn);
+  insertSubGroupLabel('Primary observation tests',  firstPrimaryBtn);
+  insertSubGroupLabel('Residual investigation',     firstResidualBtn);
   insertGroupLabel('Anchor & Units', firstAnchorBtn);
   insertGroupLabel('Planet Deep-Time Integrators', firstPlanetIntBtn);
 
