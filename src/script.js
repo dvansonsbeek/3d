@@ -29438,8 +29438,10 @@ function setupGUI() {
 
     const _d2r = Math.PI / 180;
     const _r2d = 180 / Math.PI;
-    const EARTH_R_KM = 6371;
-    const OBLIQUITY_DEG = 23.4393;
+    // Earth radius from the codebase's diameter constant. Obliquity is
+    // time-varying (precesses) → computed per JD inside umbraCenterGeo
+    // via computeObliquityEarth(julianDateToDecimalYear(jd_TT)).
+    const R_E_KM = diameters.earthDiameter / 2;
 
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log(`  Umbra path trace — ${UMBRA_TRACE_DATE_ISO}`);
@@ -29490,9 +29492,10 @@ function setupGUI() {
       g = ((g % 360) + 360) % 360;
       return g;
     }
-    function eclToRaDec(lam_deg, beta_deg) {
+    function eclToRaDec(lam_deg, beta_deg, jd_TT) {
       const lam = lam_deg * _d2r, beta = beta_deg * _d2r;
-      const eps = OBLIQUITY_DEG * _d2r;
+      // Live obliquity at jd_TT — varies over millennia
+      const eps = computeObliquityEarth(julianDateToDecimalYear(jd_TT)) * _d2r;
       const sinDec = Math.sin(beta) * Math.cos(eps) + Math.cos(beta) * Math.sin(lam) * Math.sin(eps);
       const dec = Math.asin(sinDec);
       const y = Math.cos(beta) * Math.sin(lam) * Math.cos(eps) - Math.sin(beta) * Math.sin(eps);
@@ -29531,7 +29534,7 @@ function setupGUI() {
       // Solve |M + s·D|² = R_Earth² for the smallest positive s
       const MdotD = Mx*Dx + My*Dy + Mz*Dz;
       const MdotM = Mx*Mx + My*My + Mz*Mz;
-      const R_E   = EARTH_R_KM;
+      const R_E   = R_E_KM;
       const disc  = MdotD*MdotD - (MdotM - R_E*R_E);
       if (disc < 0) return null;   // umbra misses Earth's globe at this instant
 
@@ -29541,8 +29544,8 @@ function setupGUI() {
       const Pz = Mz + s*Dz;
 
       // Convert from geocentric ecliptic cartesian to equatorial cartesian
-      // (rotate about x-axis by obliquity ε)
-      const eps = OBLIQUITY_DEG * _d2r;
+      // (rotate about x-axis by live obliquity ε at this JD)
+      const eps = computeObliquityEarth(julianDateToDecimalYear(jd_TT)) * _d2r;
       const cosEps = Math.cos(eps), sinEps = Math.sin(eps);
       const ex = Px;
       const ey = Py * cosEps - Pz * sinEps;
@@ -29555,7 +29558,14 @@ function setupGUI() {
       if (ra < 0) ra += 360;
 
       // RA → geographic longitude using GMST(UT)
-      const jd_UT = jd_TT - _eclDeltaT(jd_TT) / 86400;
+      // Input parameter is named jd_TT for legacy reasons but is actually
+      // a UT JD (matching _eclSunLon's convention — see _eclSunLon at line
+      // ~4838 which treats its input as UT and adds ΔT internally to get TT).
+      // Previously we subtracted ΔT here, giving UT − ΔT to gmstDeg(), which
+      // shifted the umbra longitude by ΔT × 15°/h east of the correct
+      // position — invisible (~1°) at modern dates, catastrophic (~75°) at
+      // -584 BCE where ΔT ~5 hours.
+      const jd_UT = jd_TT;
       const gmst = gmstDeg(jd_UT);
       let lon = ra - gmst;
       while (lon >  180) lon -= 360;
@@ -29564,8 +29574,15 @@ function setupGUI() {
     }
     function subSolarGeo(jd_TT) {
       const lam_S = _eclSunLon(jd_TT);
-      const { ra, dec } = eclToRaDec(lam_S, 0);
-      const jd_UT = jd_TT - _eclDeltaT(jd_TT) / 86400;
+      const { ra, dec } = eclToRaDec(lam_S, 0, jd_TT);
+      // Input parameter is named jd_TT for legacy reasons but is actually
+      // a UT JD (matching _eclSunLon's convention — see _eclSunLon at line
+      // ~4838 which treats its input as UT and adds ΔT internally to get TT).
+      // Previously we subtracted ΔT here, giving UT − ΔT to gmstDeg(), which
+      // shifted the umbra longitude by ΔT × 15°/h east of the correct
+      // position — invisible (~1°) at modern dates, catastrophic (~75°) at
+      // -584 BCE where ΔT ~5 hours.
+      const jd_UT = jd_TT;
       const gmst = gmstDeg(jd_UT);
       let lon = ra - gmst;
       while (lon >  180) lon -= 360;
@@ -29577,7 +29594,7 @@ function setupGUI() {
       const df = (lat2 - lat1) * _d2r;
       const dl = (lon2 - lon1) * _d2r;
       const a = Math.sin(df / 2) ** 2 + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) ** 2;
-      return 2 * EARTH_R_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return 2 * R_E_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
     function moonSunSepDeg(jd_TT) {
       let d_lon = _eclMoonLon(jd_TT) - _eclSunLon(jd_TT);
@@ -29695,6 +29712,306 @@ function setupGUI() {
      'misses Earth are marked "umbra off Earth". The (lat, lon) output is directly comparable ' +
      'to NASA Five Millennium Canon path maps and Stephenson 1997 path-centerline tables.');
 
+  // ────────────────────────────────────────────────────────────────────────
+  // Audit all 25 solar eclipse presets — single-shot table output
+  //
+  // For each ECLIPSE_PRESETS entry this reports FOUR pieces of information,
+  // which together separate the kinds of issue a preset can have:
+  //
+  //   1. Preset UT          — documented time
+  //   2. Model greatest UT  — via findSolarEclipsesInRange(preset.jd ± 1)
+  //   3. Gap@PrsUT          — site↔model-umbra distance at preset UT
+  //   4. BestΔUT + BestGap  — closest umbra↔site over ±4h scan
+  //
+  // Five-way verdict — describes what OUR FRAMEWORK predicts about each preset,
+  // NOT a judgement of the documented record (which is treated as ground truth):
+  //
+  //   ✓ confirmed                     — framework agrees on UT and geography
+  //   ↻ off-peak observer             — framework agrees on UT; site on path but
+  //                                       observer wasn't at greatest moment
+  //   ◇ ΔT-signal (umbra@MdlUT)        — framework predicts same eclipse at a
+  //                                       different UT; umbra DOES land at site
+  //                                       at framework UT. The ΔJD is the LOD/ΔT
+  //                                       data point (framework's deep-time
+  //                                       Earth-rotation prediction vs convention).
+  //   ◇⚠ ΔT-signal + geographic offset — framework predicts different UT AND
+  //                                       umbra is far from site even at framework
+  //                                       UT (two co-occurring issues).
+  //   ⚠ geographic (no timing offset)  — framework agrees on UT, but umbra > 300 km
+  //                                       from site at every scanned moment. Could
+  //                                       be partial-zone observer, wrong eclipse
+  //                                       attribution (e.g. Thales-class), or real
+  //                                       framework deep-time drift.
+  //
+  // Output is the punch list for the historical-eclipse-preset audit: which
+  // of the 25 presets need attention vs. which already match.
+  //
+  // Site coordinates are embedded here (vs. on each ECLIPSE_PRESETS entry)
+  // to keep this an audit tool — adding the data to ECLIPSE_PRESETS could
+  // be done later if the same coordinates are needed elsewhere.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Audit all 25 solar eclipse presets', () => {
+    const _d2r = Math.PI / 180;
+    const _r2d = 180 / Math.PI;
+    // Earth radius from the codebase's diameter constant (consistent with
+    // the rest of the project — diameters.earthDiameter / 2). Obliquity
+    // is time-varying (precesses) → computed per JD inside umbraCenterGeo
+    // via computeObliquityEarth(julianDateToDecimalYear(jd_TT)).
+    const R_E_KM = diameters.earthDiameter / 2;
+    const GAP_OK_KM = 300;          // ≤ this → considered a match
+    const SCAN_WIN_H = 4;           // sweep ±4 hours for best-fit ΔUT
+    const SCAN_STEP_MIN = 2;
+
+    // Site coordinates for each preset, keyed by preset JD. Pulled from the
+    // existing per-event eclipse tests where available; modern entries
+    // sourced from NASA Five Millennium Canon path-centerline data.
+    const SITES = new Map([
+      [2460409.262050, { name: 'Dallas–central path',     lat: 32.78, lon: -96.80 }],
+      [2457987.267733, { name: 'Carbondale, IL',          lat: 37.73, lon: -89.22 }],
+      [2451401.960508, { name: 'Constanța, Romania',      lat: 44.18, lon:  28.65 }],
+      [2441863.985208, { name: 'Niger',                   lat: 16.00, lon:   8.00 }],
+      [2422108.047858, { name: 'Príncipe (Eddington)',    lat:  1.60, lon:   7.40 }],
+      [2347572.902675, { name: 'London (Halley)',         lat: 51.50, lon:  -0.10 }],
+      [2325394.925106, { name: 'London (European total)', lat: 51.50, lon:  -0.10 }],
+      [2173756.000111, { name: 'Tuscany (Cerchiari)',     lat: 43.70, lon:  10.40 }],
+      [2154000.058445, { name: 'Russia (Igor’s Tale)',    lat: 50.00, lon:  38.00 }],
+      [2135100.070833, { name: 'England (Henry I)',       lat: 52.00, lon:  -2.00 }],
+      [2087792.051441, { name: 'Cairo (Ibn Yunus)',       lat: 30.05, lon:  31.24 }],
+      [2083982.839931, { name: 'Cairo (Ibn Yunus)',       lat: 30.05, lon:  31.24 }],
+      [2081030.093891, { name: 'Cairo (Said-Stephenson)', lat: 30.05, lon:  31.24 }],
+      [2078785.134930, { name: 'Cairo (Said-Stephenson)', lat: 30.05, lon:  31.24 }],
+      [2078431.006474, { name: 'Cairo (Said-Stephenson)', lat: 30.05, lon:  31.24 }],
+      [2078253.853718, { name: 'Cairo (Ibn Yunus)',       lat: 30.05, lon:  31.24 }],
+      [1747068.890110, { name: 'Aegean (Plutarch)',       lat: 38.00, lon:  25.00 }],
+      [1671853.759762, { name: 'Babylon',                 lat: 32.50, lon:  44.40 }],
+      [1608421.835171, { name: 'Babylon (Antigonus)',     lat: 32.50, lon:  44.40 }],
+      [1564215.113895, { name: 'Athens (Thucydides)',     lat: 37.97, lon:  23.72 }],
+      [1518118.032841, { name: 'Babylon (Nabonidus)',     lat: 32.50, lon:  44.40 }],
+      [1507900.065279, { name: 'Anatolia (Thales/Halys)', lat: 39.00, lon:  35.00 }],
+      [1484836.848499, { name: 'Babylon (early diary)',   lat: 32.50, lon:  44.40 }],
+      [1462658.779682, { name: 'Lu State (Chinese)',      lat: 35.60, lon: 117.00 }],
+      [1442902.839207, { name: 'Nineveh (Bur-Sagale)',    lat: 36.36, lon:  43.16 }],
+    ]);
+
+    function gmstDeg(jd_UT) {
+      const T = (jd_UT - j2000JD) / 36525;
+      let g = 280.46061837 + 360.98564736629 * (jd_UT - j2000JD)
+            + 0.000387933 * T * T - T * T * T / 38710000;
+      g = ((g % 360) + 360) % 360;
+      return g;
+    }
+
+    function umbraCenterGeo(jd_TT) {
+      const lam_S  = _eclSunLon(jd_TT)  * _d2r;
+      const lam_M  = _eclMoonLon(jd_TT) * _d2r;
+      const beta_M = _eclMoonBeta(jd_TT) * _d2r;
+      const d_S    = currentAUDistance;
+      const d_M    = _eclMoonDistance(jd_TT);
+
+      const Sx = d_S * Math.cos(lam_S);
+      const Sy = d_S * Math.sin(lam_S);
+      const cosB = Math.cos(beta_M);
+      const Mx = d_M * cosB * Math.cos(lam_M);
+      const My = d_M * cosB * Math.sin(lam_M);
+      const Mz = d_M * Math.sin(beta_M);
+
+      const dx = Mx - Sx, dy = My - Sy, dz = Mz;
+      const dLen = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      const Dx = dx / dLen, Dy = dy / dLen, Dz = dz / dLen;
+
+      const MdotD = Mx*Dx + My*Dy + Mz*Dz;
+      const MdotM = Mx*Mx + My*My + Mz*Mz;
+      const disc = MdotD*MdotD - (MdotM - R_E_KM * R_E_KM);
+      if (disc < 0) return null;
+
+      const s = -MdotD - Math.sqrt(disc);
+      const Px = Mx + s*Dx;
+      const Py = My + s*Dy;
+      const Pz = Mz + s*Dz;
+
+      // Live obliquity at this JD — varies over centuries/millennia
+      const eps = computeObliquityEarth(julianDateToDecimalYear(jd_TT)) * _d2r;
+      const cosEps = Math.cos(eps), sinEps = Math.sin(eps);
+      const ex = Px;
+      const ey = Py * cosEps - Pz * sinEps;
+      const ez = Py * sinEps + Pz * cosEps;
+      const r = Math.sqrt(ex*ex + ey*ey + ez*ez);
+      const dec = Math.asin(ez / r) * _r2d;
+      let ra = Math.atan2(ey, ex) * _r2d;
+      if (ra < 0) ra += 360;
+
+      // Input parameter is named jd_TT for legacy reasons but is actually
+      // a UT JD (matching _eclSunLon's convention — see _eclSunLon at line
+      // ~4838 which treats its input as UT and adds ΔT internally to get TT).
+      // Previously we subtracted ΔT here, giving UT − ΔT to gmstDeg(), which
+      // shifted the umbra longitude by ΔT × 15°/h east of the correct
+      // position — invisible (~1°) at modern dates, catastrophic (~75°) at
+      // -584 BCE where ΔT ~5 hours.
+      const jd_UT = jd_TT;
+      const gmst = gmstDeg(jd_UT);
+      let lon = ra - gmst;
+      while (lon >  180) lon -= 360;
+      while (lon < -180) lon += 360;
+      return { lat: dec, lon };
+    }
+
+    function gcKm(lat1, lon1, lat2, lon2) {
+      const f1 = lat1 * _d2r, f2 = lat2 * _d2r;
+      const df = (lat2 - lat1) * _d2r;
+      const dl = (lon2 - lon1) * _d2r;
+      const a = Math.sin(df/2)**2 + Math.cos(f1) * Math.cos(f2) * Math.sin(dl/2)**2;
+      return 2 * R_E_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    // Format helpers
+    function jdToHMM(jd) {
+      const frac = (jd + 0.5) - Math.floor(jd + 0.5);
+      const totalMin = Math.round(frac * 24 * 60);
+      const h = Math.floor(totalMin / 60) % 24;
+      const m = totalMin % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+    function fmtDt(dtMin) {
+      const sign = dtMin >= 0 ? '+' : '−';
+      const absDt = Math.abs(dtMin);
+      const h = Math.floor(absDt / 60);
+      const m = Math.round(absDt - h * 60);
+      return `${sign}${h}h${String(m).padStart(2, '0')}`;
+    }
+
+    const PRESET_JD_OFF_MIN = 30;   // ΔJD > this → preset JD is off
+    const stepDays = (SCAN_STEP_MIN / 60) / 24;
+    const halfWin  = SCAN_WIN_H / 24;
+
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Audit: all 25 solar eclipse presets — model vs documented record');
+    console.log('  PrsUT = preset documented UT   |   MdlUT = model\'s nearest eclipse UT   |   ΔJD = MdlUT − PrsUT');
+    console.log('  Gap@PrsUT / Gap@MdlUT = distance from site to model umbra at preset UT / model\'s UT');
+    console.log('  BestΔUT / BestGap / Umbra@Best = closest umbra↔site over ±4h scan, with umbra coords at that moment');
+    console.log('  Preset = documented scientific record (NOT judged "wrong" — used as ground truth).');
+    console.log('  Verdicts describe what OUR FRAMEWORK predicts about each record, not corrections to the record.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Preset                        Site                       PrsUT  MdlUT    ΔJD     Gap@PrsUT   Gap@MdlUT   BestΔUT  BestGap   Umbra@Best          Verdict');
+    console.log('  ' + '─'.repeat(176));
+
+    let nConfirm = 0, nOffPeak = 0, nDtSignal = 0, nGeo = 0, nDtAndGeo = 0, nNoSite = 0;
+
+    for (const preset of ECLIPSE_PRESETS) {
+      const site = SITES.get(preset.jd);
+      const labelPad = preset.label.padEnd(28).slice(0, 28);
+      if (!site) {
+        console.log(`  ${labelPad}  <no site coords>`);
+        nNoSite++;
+        continue;
+      }
+      const sitePad = (site.name).padEnd(25).slice(0, 25);
+
+      // 1. Model's nearest eclipse within ±1 day of preset JD
+      let nearestModelJD = preset.jd;
+      let foundAny = false;
+      try {
+        const events = findSolarEclipsesInRange(preset.jd - 1, preset.jd + 1);
+        let minDiff = Infinity;
+        for (const evt of events) {
+          const diff = Math.abs(evt.jd - preset.jd);
+          if (diff < minDiff) { minDiff = diff; nearestModelJD = evt.jd; foundAny = true; }
+        }
+      } catch (e) { /* no events found — use preset.jd as fallback */ }
+      const deltaJD_min = (nearestModelJD - preset.jd) * 24 * 60;
+
+      // 2. Umbra at preset's documented UT
+      const um0 = umbraCenterGeo(preset.jd);
+      const gap0 = (um0 === null) ? null : gcKm(site.lat, site.lon, um0.lat, um0.lon);
+
+      // 2b. Umbra at MODEL's nearest eclipse UT (separates "ΔT signal alone"
+      //     from "ΔT signal + geographic offset")
+      const umMdl = foundAny ? umbraCenterGeo(nearestModelJD) : null;
+      const gapMdl = (umMdl === null) ? null : gcKm(site.lat, site.lon, umMdl.lat, umMdl.lon);
+
+      // 3. Sweep ±SCAN_WIN_H around preset.jd for best-fit umbra-to-site time
+      let bestGap = Infinity, bestDt = 0, bestUm = null;
+      for (let dt = -halfWin; dt <= halfWin + 1e-9; dt += stepDays) {
+        const um = umbraCenterGeo(preset.jd + dt);
+        if (um === null) continue;
+        const g = gcKm(site.lat, site.lon, um.lat, um.lon);
+        if (g < bestGap) { bestGap = g; bestDt = dt; bestUm = um; }
+      }
+
+      // 4. Verdict — descriptive of the model's prediction, NOT a judgement
+      //    of the preset. Two independent signals can co-occur:
+      //      * ◇ ΔT-signal: model places this eclipse at a different UT than
+      //        the record (the LOD/ΔT data point — our framework's contribution
+      //        to the deep-time-rotation debate)
+      //      * ⚠ geographic: model umbra is far from documented site even when
+      //        evaluated at model's own predicted UT (alternate-eclipse / wrong-
+      //        attribution / partial-observer / framework-drift question)
+      const timingOff = foundAny && Math.abs(deltaJD_min) > PRESET_JD_OFF_MIN;
+      const geoAtPrsOk = (gap0 !== null && gap0 <= GAP_OK_KM);
+      const geoAtMdlOk = (gapMdl !== null && gapMdl <= GAP_OK_KM);
+      const geoBestOk  = (bestGap <= GAP_OK_KM);
+
+      let verdict;
+      if (!timingOff && geoAtPrsOk) {
+        verdict = '✓ confirmed';
+        nConfirm++;
+      } else if (!timingOff && geoBestOk) {
+        verdict = '↻ off-peak observer';
+        nOffPeak++;
+      } else if (timingOff && geoAtMdlOk) {
+        verdict = '◇ ΔT-signal (umbra at site at MdlUT)';
+        nDtSignal++;
+      } else if (timingOff) {
+        verdict = '◇⚠ ΔT-signal + geographic offset';
+        nDtAndGeo++;
+      } else {
+        verdict = '⚠ geographic (umbra ≠ site even with timing scan)';
+        nGeo++;
+      }
+
+      // Format columns
+      const prsUT     = jdToHMM(preset.jd);
+      const mdlUT     = foundAny ? jdToHMM(nearestModelJD) : '  —  ';
+      const dJDStr    = foundAny ? fmtDt(deltaJD_min) : '   —   ';
+      const gapPresStr= (gap0 === null) ? ' off Earth' : `${gap0.toFixed(0).padStart(6)} km`;
+      const gapMdlStr = (gapMdl === null) ? ' off Earth' : `${gapMdl.toFixed(0).padStart(6)} km`;
+      const bestDtStr = fmtDt(bestDt * 24 * 60);
+      const bestGapStr= `${bestGap.toFixed(0).padStart(5)} km`;
+      const bestUmStr = bestUm
+        ? `(${bestUm.lat.toFixed(1).padStart(5)},${bestUm.lon.toFixed(1).padStart(7)})`
+        : '              ';
+
+      console.log(`  ${labelPad}  ${sitePad}  ${prsUT}  ${mdlUT}   ${dJDStr.padStart(7)}   ${gapPresStr.padStart(9)}   ${gapMdlStr.padStart(9)}   ${bestDtStr.padStart(7)}  ${bestGapStr}  ${bestUmStr}   ${verdict}`);
+    }
+
+    console.log('  ' + '─'.repeat(158));
+    console.log(`  Summary:  ${nConfirm} confirmed · ${nOffPeak} off-peak · ${nDtSignal} ΔT-signal · ${nDtAndGeo} ΔT-signal+geo · ${nGeo} geographic · ${nNoSite} no-site-coords`);
+    console.log('');
+    console.log('  Interpretation — what each verdict means about OUR FRAMEWORK\'s prediction (the record itself is treated as ground truth):');
+    console.log('    ✓ confirmed                       → framework agrees with record on both UT and geography.');
+    console.log('    ↻ off-peak observer               → framework agrees with record on UT; site is on the path');
+    console.log('                                        but the documented observer wasn\'t at greatest-eclipse moment.');
+    console.log('    ◇ ΔT-signal (umbra at site at MdlUT) → framework predicts the same eclipse at a different UT');
+    console.log('                                        than the record. At the framework\'s predicted UT, the umbra');
+    console.log('                                        DOES land at the documented site. The ΔJD is the LOD/ΔT data');
+    console.log('                                        point — what our framework says about Earth-rotation history');
+    console.log('                                        at this epoch, independent of conventional ΔT models.');
+    console.log('    ◇⚠ ΔT-signal + geographic offset   → framework predicts different UT AND its umbra is far from');
+    console.log('                                        documented site even at framework UT. Two separate findings');
+    console.log('                                        co-occur; needs case-by-case investigation.');
+    console.log('    ⚠ geographic (no timing offset)    → framework agrees with record on UT, but places umbra > 300 km');
+    console.log('                                        from the site at every scanned moment. Possible causes:');
+    console.log('                                        (a) observer was in partial zone, not totality;');
+    console.log('                                        (b) preset attribution refers to a different eclipse — the');
+    console.log('                                            documented event may need re-identification (e.g. Thales);');
+    console.log('                                        (c) genuine framework deep-time drift places umbra elsewhere.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+  }, 'Iterates all 25 entries in ECLIPSE_PRESETS, ray-traces the model umbra at each preset\'s ' +
+     'documented UT, compares to the documented observation site, and sweeps ±4 hours of UT in ' +
+     '2-minute steps to find the time offset that minimises the gap. Outputs a single table with ' +
+     'a verdict per preset: matches as-is, fixable with a small ΔUT correction, or structurally ' +
+     'misaligned (suspect site/UT). Site coordinates are embedded in the button — derived from ' +
+     'the existing per-event historical-eclipse tests where available, plus NASA Canon centerline ' +
+     'data for the modern presets.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Toggle expected-umbra + sub-Sun markers in scene
@@ -29716,8 +30033,9 @@ function setupGUI() {
   addTestButton('Toggle expected umbra + sub-Sun markers in scene', () => {
     const _d2r = Math.PI / 180;
     const _r2d = 180 / Math.PI;
-    const OBLIQUITY_DEG = 23.4393;
-    const EARTH_R_KM = 6371;
+    // Earth radius from codebase constant; obliquity is time-varying — use the
+    // live computeObliquityEarth(year) at the current scene JD.
+    const R_E_KM = diameters.earthDiameter / 2;
 
     // Toggle: remove existing markers if any
     const existing = earth.planetObj.getObjectByName('EclipseMarkers');
@@ -29737,7 +30055,7 @@ function setupGUI() {
 
     // ───── 1. Astronomical sub-Sun (lat, lon) ─────
     const lam_S = _eclSunLon(jd) * _d2r;
-    const eps = OBLIQUITY_DEG * _d2r;
+    const eps = computeObliquityEarth(julianDateToDecimalYear(jd)) * _d2r;
 
     const sin_dec_S = Math.sin(eps) * Math.sin(lam_S);
     const subSun_lat = Math.asin(Math.max(-1, Math.min(1, sin_dec_S))) * _r2d;
@@ -29774,7 +30092,7 @@ function setupGUI() {
 
     const MdotD = Mx*Dx + My*Dy + Mz*Dz;
     const MdotM = Mx*Mx + My*My + Mz*Mz;
-    const disc  = MdotD*MdotD - (MdotM - EARTH_R_KM * EARTH_R_KM);
+    const disc  = MdotD*MdotD - (MdotM - R_E_KM * R_E_KM);
 
     let umbra_lat = null, umbra_lon = null;
     if (disc >= 0) {
@@ -29948,9 +30266,9 @@ function setupGUI() {
     if (sceneMoon_distance_km !== null) {
       console.log(`  Scene Moon distance from Earth:        ${sceneMoon_distance_km.toFixed(0)} km`);
       console.log(`  Meeus  Moon distance from Earth:       ${d_M.toFixed(0)} km`);
-      console.log(`  Scene Moon ⊥ distance from Sun-Earth:  ${sceneMoon_dPerp_km.toFixed(0)} km  (gamma = ${(sceneMoon_dPerp_km/EARTH_R_KM).toFixed(3)} R_E)`);
+      console.log(`  Scene Moon ⊥ distance from Sun-Earth:  ${sceneMoon_dPerp_km.toFixed(0)} km  (gamma = ${(sceneMoon_dPerp_km/R_E_KM).toFixed(3)} R_E)`);
       const _meeus_perp = d_M * Math.sin(Math.sqrt((lam_M_rad - lam_S)*(lam_M_rad - lam_S) + beta_M_rad*beta_M_rad));
-      console.log(`  Meeus Moon ⊥ distance from Sun-Earth:  ${_meeus_perp.toFixed(0)} km  (gamma = ${(_meeus_perp/EARTH_R_KM).toFixed(3)} R_E)`);
+      console.log(`  Meeus Moon ⊥ distance from Sun-Earth:  ${_meeus_perp.toFixed(0)} km  (gamma = ${(_meeus_perp/R_E_KM).toFixed(3)} R_E)`);
     }
     console.log('');
     console.log('  Three-way diagnostic (UV layout: Pacific-centered, Greenwich at u=0/u=1 seam):');
@@ -53788,18 +54106,19 @@ function makeRealisticEarth(pd){
      * scratch variables so the per-frame call performs ZERO allocations
      * (no GC pressure). Cost per frame: ~6 vector ops + 1 quaternion
      * setFromUnitVectors — well under 0.1 ms on modern hardware. */
-    const _udcSun     = new THREE.Vector3();
-    const _udcMoon    = new THREE.Vector3();
-    const _udcEarth   = new THREE.Vector3();
-    const _udcMoonGeo = new THREE.Vector3();
-    const _udcSunGeo  = new THREE.Vector3();
-    const _udcDir     = new THREE.Vector3();
-    const _udcHit     = new THREE.Vector3();
-    const _udcLocal   = new THREE.Vector3();
-    const _udcNormal  = new THREE.Vector3();
-    const _udcQuat    = new THREE.Quaternion();
-    const _udcQuatInv = new THREE.Quaternion();
-    const _udcZAxis   = new THREE.Vector3(0, 0, 1);
+    const _udcSun       = new THREE.Vector3();
+    const _udcMoon      = new THREE.Vector3();
+    const _udcEarth     = new THREE.Vector3();
+    const _udcMoonGeo   = new THREE.Vector3();
+    const _udcSunGeo    = new THREE.Vector3();
+    const _udcDir       = new THREE.Vector3();
+    const _udcHit       = new THREE.Vector3();
+    const _udcMoonToHit = new THREE.Vector3();
+    const _udcLocal     = new THREE.Vector3();
+    const _udcNormal    = new THREE.Vector3();
+    const _udcQuat      = new THREE.Quaternion();
+    const _udcQuatInv   = new THREE.Quaternion();
+    const _udcZAxis     = new THREE.Vector3(0, 0, 1);
 
     function updateUmbraDisc() {
         if (!sun.planetObj || !moon.planetObj) {
@@ -53836,17 +54155,28 @@ function makeRealisticEarth(pd){
         /* True umbra width via umbra-cone apex geometry (NOT the parallel-
          * ray approximation that Three.js renders). For a Moon-cone apex
          * at distance D_apex from the Moon, the umbra radius at an
-         * observer at distance D_M from the Moon is:
-         *     R_umbra = R_Moon × (1 − D_M / D_apex)
-         * where D_apex = R_Moon × D_Sun_Moon / R_Sun. Negative values are
-         * antumbra (annular eclipse) — use abs for visualization. */
+         * observer at distance D from the Moon is:
+         *     R_umbra = R_Moon × (1 − D / D_apex)
+         * where D_apex = R_Moon × D_Sun_Moon / R_Sun.
+         *
+         * IMPORTANT: D is the Moon-to-umbra-HIT-POINT distance on Earth's
+         * SURFACE (not Earth's center). For gamma > 0, the surface hit
+         * point is ~R_Earth × cos(arcsin(gamma)) closer to the Moon than
+         * Earth's center. Using D_M_at_hit_km here (rather than the
+         * geocentric D_M_km) matches NASA-published path widths instead
+         * of underestimating them by up to 2× for mid-gamma total
+         * eclipses (e.g. 2017 Aug 21 at gamma 0.44: 100 km vs 46 km).
+         *
+         * Negative values are antumbra (annular eclipse) — use abs. */
         const km_per_unit = currentAUDistance / 100;
-        const D_M_km    = _udcMoonGeo.length() * km_per_unit;
+        _udcMoonToHit.copy(_udcHit).sub(_udcMoonGeo);
+        const D_M_at_hit_km = _udcMoonToHit.length() * km_per_unit;
         const D_S_km    = _udcSunGeo .length() * km_per_unit;
+        const D_M_km    = _udcMoonGeo.length() * km_per_unit;
         const R_Moon_km = diameters.moonDiameter / 2;
         const R_Sun_km  = diameters.sunDiameter  / 2;
         const D_apex    = R_Moon_km * (D_S_km - D_M_km) / R_Sun_km;
-        const umbraR_km    = Math.abs(R_Moon_km * (1 - D_M_km / D_apex));
+        const umbraR_km    = Math.abs(R_Moon_km * (1 - D_M_at_hit_km / D_apex));
         const umbraR_scene = umbraR_km / km_per_unit;
 
         /* Position disc + halo just above shadow shell (× 1.04, below
