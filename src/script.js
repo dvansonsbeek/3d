@@ -29695,249 +29695,6 @@ function setupGUI() {
      'misses Earth are marked "umbra off Earth". The (lat, lon) output is directly comparable ' +
      'to NASA Five Millennium Canon path maps and Stephenson 1997 path-centerline tables.');
 
-  // ────────────────────────────────────────────────────────────────────────
-  // Moon position diagnostic: 3D scene vs Meeus polynomial
-  //
-  // Reads the 3D Moon mesh's world position at the CURRENT scene time and
-  // compares it to what the Meeus Ch. 47 polynomial gives at the same JD.
-  // The key comparison is the perpendicular distance of the Moon from the
-  // Sun-Earth axis — that quantity directly determines where the eclipse
-  // umbra lands on Earth's surface (= gamma in eclipse terms).
-  //
-  // If the 3D scene's Moon perpendicular ≠ Meeus's, the visible shadow
-  // lands at a different geographic location than the umbra-trace data
-  // predicts — explaining any mismatch between the visual and the analysis.
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Moon position diagnostic: 3D scene vs Meeus', () => {
-    const _r2d = 180 / Math.PI;
-    const _d2r = Math.PI / 180;
-
-    // ───── Current scene state ─────
-    const jd = o.julianDay;
-
-    // ───── Meeus values at current JD ─────
-    const lam_M = _eclMoonLon(jd);
-    const beta_M = _eclMoonBeta(jd);
-    const d_M_meeus = _eclMoonDistance(jd);
-    const lam_S = _eclSunLon(jd);
-
-    // ───── 3D scene Moon + Sun + Earth world positions ─────
-    const moonW = new THREE.Vector3();
-    const sunW  = new THREE.Vector3();
-    const earthW = new THREE.Vector3();
-    moon.pivotObj.getWorldPosition(moonW);
-    sun.planetObj.getWorldPosition(sunW);
-    earth.pivotObj.getWorldPosition(earthW);
-    // Also try other Moon nodes — in case pivotObj isn't the actual mesh
-    const moonContainerW = new THREE.Vector3();
-    const moonOrbitW = new THREE.Vector3();
-    const moonPlanetW = new THREE.Vector3();
-    if (moon.containerObj) moon.containerObj.getWorldPosition(moonContainerW);
-    if (moon.orbitObj)     moon.orbitObj.getWorldPosition(moonOrbitW);
-    if (moon.planetObj)    moon.planetObj.getWorldPosition(moonPlanetW);
-
-    // ALL positions need to be made geocentric by subtracting Earth's world position
-    const moonGeo = moonW.clone().sub(earthW);
-    const sunGeo  = sunW.clone().sub(earthW);
-
-    // Scale: 100 scene units = 1 AU
-    const scaleKmPerUnit = currentAUDistance / 100;
-    const d_M_scene = moonGeo.length() * scaleKmPerUnit;
-    const d_M_scene_naive = moonW.length() * scaleKmPerUnit;  // wrong if Earth not at origin
-
-    // 3D scene Sun-Moon angular separation (FROM EARTH)
-    const moonNorm = moonGeo.clone().normalize();
-    const sunNorm  = sunGeo.clone().normalize();
-    const cosSep = Math.max(-1, Math.min(1, moonNorm.dot(sunNorm)));
-    const sep3D = Math.acos(cosSep) * _r2d;
-
-    // Moon's perpendicular distance from Sun-Earth axis (rotation-invariant, geocentric)
-    const moonAlongSun = sunNorm.clone().multiplyScalar(moonGeo.dot(sunNorm));
-    const moonPerpSun  = moonGeo.clone().sub(moonAlongSun);
-    const perpKm_scene = moonPerpSun.length() * scaleKmPerUnit;
-
-    // ───── Meeus-derived sep + perpendicular ─────
-    let d_lon = lam_M - lam_S;
-    while (d_lon >  180) d_lon -= 360;
-    while (d_lon <= -180) d_lon += 360;
-    const sep_meeus = Math.sqrt(d_lon * d_lon + beta_M * beta_M);
-    const perpKm_meeus = d_M_meeus * Math.sin(sep_meeus * _d2r);
-
-    // ───── Output ─────
-    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Moon position diagnostic — 3D scene vs Meeus polynomial');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-    console.log(`  Current scene JD: ${jd.toFixed(6)}  (set via o.julianDay)`);
-    console.log('');
-    console.log('───── Moon distance from Earth ─────');
-    console.log(`  Meeus polynomial:  ${d_M_meeus.toFixed(0)} km`);
-    console.log(`  3D scene:          ${d_M_scene.toFixed(0)} km`);
-    console.log(`  Difference:        ${(d_M_scene - d_M_meeus).toFixed(0)} km  (${((d_M_scene/d_M_meeus - 1) * 100).toFixed(3)}%)`);
-    console.log('');
-    console.log('───── Sun-Moon angular separation (the key eclipse geometry) ─────');
-    console.log(`  Meeus  (√(Δλ² + β²)):     ${sep_meeus.toFixed(4)}°`);
-    console.log(`  3D scene (3D arc angle):  ${sep3D.toFixed(4)}°`);
-    console.log(`  Difference:               ${(sep3D - sep_meeus).toFixed(4)}°`);
-    console.log('');
-    console.log('───── Moon\'s perpendicular distance from Sun-Earth axis ─────');
-    console.log('  (This determines WHERE the umbra lands on Earth — gamma in eclipse terms.)');
-    console.log(`  Earth radius for reference: 6371 km (R_E)`);
-    console.log(`  Meeus:    ${perpKm_meeus.toFixed(0)} km   (gamma = ${(perpKm_meeus / 6371).toFixed(3)} R_E)`);
-    console.log(`  3D scene: ${perpKm_scene.toFixed(0)} km   (gamma = ${(perpKm_scene / 6371).toFixed(3)} R_E)`);
-    console.log(`  Difference: ${(perpKm_scene - perpKm_meeus).toFixed(0)} km`);
-    console.log('');
-    console.log('───── Meeus ecliptic components ─────');
-    console.log(`  λ_Sun:    ${lam_S.toFixed(4)}°`);
-    console.log(`  λ_Moon:   ${lam_M.toFixed(4)}°`);
-    console.log(`  Δλ:       ${d_lon.toFixed(4)}°`);
-    console.log(`  β_Moon:   ${beta_M.toFixed(4)}°`);
-    console.log('');
-    console.log('───── 3D scene raw positions (world coords, scene units; 100 units = 1 AU) ─────');
-    console.log(`  Earth world:     (${earthW.x.toExponential(3)}, ${earthW.y.toExponential(3)}, ${earthW.z.toExponential(3)})`);
-    console.log(`  Sun world:       (${sunW.x.toFixed(3)}, ${sunW.y.toFixed(3)}, ${sunW.z.toFixed(3)})`);
-    console.log(`  Moon pivotObj:   (${moonW.x.toExponential(3)}, ${moonW.y.toExponential(3)}, ${moonW.z.toExponential(3)})`);
-    console.log(`  Moon containerObj: (${moonContainerW.x.toExponential(3)}, ${moonContainerW.y.toExponential(3)}, ${moonContainerW.z.toExponential(3)})`);
-    console.log(`  Moon orbitObj:   (${moonOrbitW.x.toExponential(3)}, ${moonOrbitW.y.toExponential(3)}, ${moonOrbitW.z.toExponential(3)})`);
-    console.log(`  Moon planetObj:  (${moonPlanetW.x.toExponential(3)}, ${moonPlanetW.y.toExponential(3)}, ${moonPlanetW.z.toExponential(3)})`);
-    console.log('');
-    console.log(`  Earth-Moon distance (geocentric, subtracting Earth):  ${d_M_scene.toFixed(0)} km`);
-    console.log(`  Earth-Moon distance (naive, from scene origin):       ${d_M_scene_naive.toFixed(0)} km`);
-    console.log(`  Difference (= |Earth world position|):                ${Math.abs(d_M_scene - d_M_scene_naive).toFixed(0)} km`);
-    console.log('');
-    console.log('───── Interpretation ─────');
-    console.log('  • If perpendicular distances agree (within ~100 km), the 3D Moon has the');
-    console.log('    same β as Meeus → shadow lands where the umbra-trace data predicts.');
-    console.log('  • If they differ by 1000+ km, the 3D Moon has a different β than Meeus.');
-    console.log('    The visible shadow in the 3D scene lands at the 3D-Moon-determined');
-    console.log('    location; the umbra-trace data (which uses Meeus) predicts a different');
-    console.log('    location. That gap is the source of any visual ↔ data mismatch.');
-    console.log('  • For 1715-05-03 conjunction: Meeus β ≈ 0.727° → Meeus perpendicular ≈ 4600 km.');
-    console.log('    If 3D scene shows perpendicular ≪ 4600 km, that confirms 3D Moon β ≠ Meeus β.');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-  }, 'Compares the 3D scene Moon\'s position to the Meeus polynomial Moon position at ' +
-     'the current scene time (o.julianDay). Reports Moon distance, Sun-Moon angular ' +
-     'separation, and the perpendicular offset of Moon from the Sun-Earth axis (= gamma, ' +
-     'the parameter that determines WHERE the umbra lands on Earth\'s surface). Use to ' +
-     'verify whether visual shadow ↔ umbra-trace data mismatches come from the 3D Moon\'s ' +
-     'position differing from Meeus (e.g., missing perturbation terms).');
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Sub-Sun diagnostic: scene vs astronomical
-  //
-  // The Moon position diagnostic confirmed the 3D Moon is at the correct
-  // astronomical position. So the Three.js shadow falls at the correct
-  // WORLD COORDINATE on Earth's surface. But the visual shadow appears at
-  // the wrong geographic location → Earth's rotation/tilt in the scene
-  // must be offset from astronomical truth.
-  //
-  // This button finds the offset by comparing:
-  //   - 3D scene's sub-Sun: where on the Earth texture is the Sun at zenith?
-  //   - Astronomical sub-Sun: from Sun's declination + GMST(UT)
-  // If they differ, that's the Earth-rotation drift to fix.
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Sub-Sun diagnostic: scene vs astronomical', () => {
-    const _r2d = 180 / Math.PI;
-    const _d2r = Math.PI / 180;
-    const OBLIQUITY_DEG = 23.4393;
-
-    const jd = o.julianDay;
-
-    // ───── 1. Scene's sub-Sun ─────
-    // Get Sun direction in world coords (Earth → Sun), then transform into
-    // Earth's local mesh frame (where the texture is fixed).
-    const sunW   = new THREE.Vector3();
-    const earthW = new THREE.Vector3();
-    sun.planetObj.getWorldPosition(sunW);
-    earth.planetObj.getWorldPosition(earthW);
-    const sunDirWorld = sunW.clone().sub(earthW).normalize();
-
-    const earthQuat = new THREE.Quaternion();
-    earth.planetObj.getWorldQuaternion(earthQuat);
-    const earthQuatInv = earthQuat.clone().invert();
-    const sunDirLocal = sunDirWorld.clone().applyQuaternion(earthQuatInv);
-
-    // public/Earth.jpg is a Pacific-centered equirectangular texture: Greenwich
-    // sits at u=0 / u=1 (the texture seam), date line at u=0.5 (center). Combined
-    // with the Three.js SphereGeometry vertex layout this gives:
-    //   -X local = Greenwich (lon =   0°)
-    //   +Z local = 90°E    (lon = +90°)
-    //   +X local = ±180°   (date line)
-    //   -Z local = 90°W    (lon = -90°)
-    //   +Y local = North pole
-    const sceneLat = Math.asin(Math.max(-1, Math.min(1, sunDirLocal.y))) * _r2d;
-    const sceneLon = Math.atan2(sunDirLocal.z, -sunDirLocal.x) * _r2d;
-
-    // ───── 2. Astronomical sub-Sun ─────
-    const lam_S = _eclSunLon(jd) * _d2r;       // Sun's ecliptic longitude (rad)
-    const eps   = OBLIQUITY_DEG * _d2r;
-
-    // Sun's declination (β_Sun = 0)
-    const sin_dec_S = Math.sin(eps) * Math.sin(lam_S);
-    const astroLat  = Math.asin(Math.max(-1, Math.min(1, sin_dec_S))) * _r2d;
-
-    // Sun's right ascension (ecliptic-to-equatorial transform)
-    let sunRA = Math.atan2(Math.cos(eps) * Math.sin(lam_S), Math.cos(lam_S)) * _r2d;
-    if (sunRA < 0) sunRA += 360;
-
-    // GMST at UT (Meeus Ch. 12 / IAU 1982)
-    const jd_UT = jd - _eclDeltaT(jd) / 86400;
-    const T = (jd_UT - j2000JD) / 36525;
-    let gmst = 280.46061837 + 360.98564736629 * (jd_UT - j2000JD)
-             + 0.000387933 * T * T - T * T * T / 38710000;
-    gmst = ((gmst % 360) + 360) % 360;
-
-    // Astronomical sub-Sun longitude (East positive)
-    let astroLon = sunRA - gmst;
-    while (astroLon >  180) astroLon -= 360;
-    while (astroLon < -180) astroLon += 360;
-
-    // ───── 3. Offset ─────
-    let dLat = sceneLat - astroLat;
-    let dLon = sceneLon - astroLon;
-    while (dLon >  180) dLon -= 360;
-    while (dLon < -180) dLon += 360;
-
-    // ───── 4. Output ─────
-    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Sub-Sun diagnostic — 3D scene vs astronomical');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-    console.log(`  Current scene JD: ${jd.toFixed(6)}`);
-    console.log('');
-    console.log('───── Sub-Sun geographic location ─────');
-    console.log(`  Astronomical (Meeus + GMST):    lat = ${astroLat.toFixed(3).padStart(8)}°N, lon = ${astroLon.toFixed(3).padStart(8)}°E`);
-    console.log(`  3D scene (Earth mesh frame):    lat = ${sceneLat.toFixed(3).padStart(8)}°N, lon = ${sceneLon.toFixed(3).padStart(8)}°E`);
-    console.log(`  Difference (scene − astronomical): Δlat = ${dLat.toFixed(3)}°, Δlon = ${dLon.toFixed(3)}°`);
-    console.log('');
-    console.log('───── Astronomical components ─────');
-    console.log(`  λ_Sun:      ${(lam_S * _r2d).toFixed(4)}°  (ecliptic longitude)`);
-    console.log(`  Sun RA:     ${sunRA.toFixed(4)}°  (equatorial right ascension)`);
-    console.log(`  Sun Dec:    ${astroLat.toFixed(4)}°N  (= sub-Sun latitude)`);
-    console.log(`  GMST:       ${gmst.toFixed(4)}°  (Greenwich sidereal time)`);
-    console.log(`  ΔT used:    ${_eclDeltaT(jd).toFixed(2)} s`);
-    console.log('');
-    console.log('───── 3D scene raw direction ─────');
-    console.log(`  Sun world:        (${sunW.x.toFixed(3)}, ${sunW.y.toFixed(3)}, ${sunW.z.toFixed(3)})`);
-    console.log(`  Earth world:      (${earthW.x.toFixed(3)}, ${earthW.y.toFixed(3)}, ${earthW.z.toFixed(3)})`);
-    console.log(`  Sun dir (world):  (${sunDirWorld.x.toFixed(4)}, ${sunDirWorld.y.toFixed(4)}, ${sunDirWorld.z.toFixed(4)})`);
-    console.log(`  Sun dir (local):  (${sunDirLocal.x.toFixed(4)}, ${sunDirLocal.y.toFixed(4)}, ${sunDirLocal.z.toFixed(4)})`);
-    console.log('');
-    console.log('───── Interpretation ─────');
-    console.log('  • If |Δlat| and |Δlon| are both < ~1°: Earth\'s rotation in scene is');
-    console.log('    astronomically correct. Three.js shadow lands at the correct geographic');
-    console.log('    location automatically — no fix needed for the eclipse rendering.');
-    console.log('  • If Δlon is large (~30°): sidereal-day rate or ΔT correction issue. The');
-    console.log('    Sun appears overhead at the wrong longitude; shadow inherits the same shift.');
-    console.log('  • If Δlat is large: Earth\'s tilt direction or axial-precession layer is off.');
-    console.log('  • If both are large: multiple chained errors in Earth\'s rotation transform.');
-    console.log('  • UV mapping: public/Earth.jpg is Pacific-centered → Greenwich at the texture');
-    console.log('    seam (u=0/u=1), so -X local = Greenwich, +Z local = 90°E, +Y = north pole.');
-    console.log('    sceneLon = atan2(z, -x) inverts that mapping.');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-  }, 'Compares the 3D scene\'s sub-Sun geographic location (where the Sun is at zenith on ' +
-     'the Earth texture) to the astronomical sub-Sun (from Sun declination + GMST). If they ' +
-     'disagree, Earth\'s rotation/tilt orientation in the scene has an offset — which is what ' +
-     'causes the Three.js shadow to appear at the wrong geographic location even when the ' +
-     'Moon\'s world position is astronomically correct.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Toggle expected-umbra + sub-Sun markers in scene
@@ -33712,8 +33469,9 @@ function render(now) {
     updateLightingForFocus();
     updateFlares();
   }
-  if (earth._updateSunDirFunc) earth._updateSunDirFunc(sun.planetObj);
-  if (earth._updateEraFunc)    earth._updateEraFunc(o.julianDay);
+  if (earth._updateSunDirFunc)    earth._updateSunDirFunc(sun.planetObj);
+  if (earth._updateEraFunc)       earth._updateEraFunc(o.julianDay);
+  if (earth._updateUmbraDiscFunc) earth._updateUmbraDiscFunc();
   updateSunGlow();
 
   // 8d) Throttle astro-heavy updates (10 Hz)
@@ -53894,15 +53652,29 @@ function makeRealisticEarth(pd){
     core.castShadow    = true;        // (you probably set this elsewhere)
     core.receiveShadow = false;       // <— let the shell handle darkening
 
-    /* ───────────────── Shadow-receiver shell ────────────────── */
-    const shellGeom = new THREE.SphereGeometry(radius * 1.01, 64, 64);
+    /* ───────────────── Shadow-receiver shell ──────────────────
+     * Placed at radius × 1.025 — ABOVE the cloud shell (1.02), below the
+     * atmosphere (1.05). Set depthWrite:false so the shell doesn't block
+     * cloud rendering behind it (otherwise transparent shadow-fragments
+     * would still write depth and cull the cloud shell sitting at smaller
+     * radius). renderOrder:10 ensures the shadow shell draws AFTER the
+     * default-order clouds, so the dark eclipse umbra reads on TOP of
+     * cloud cover rather than being hidden beneath it. */
+    const shellGeom = new THREE.SphereGeometry(radius * 1.025, 64, 64);
     const shellMat  = new THREE.ShadowMaterial({
-      opacity: 1.0          // 0 = invisible, 1 = pitch-black; tweak to taste
+      opacity: 0.7          // 0.7 → penumbra reads as a clearly visible
+                            // semi-transparent gray (0 = invisible, 1 = pitch
+                            // black). 0.7 strikes a balance: dark enough to
+                            // see the shadow without hiding the underlying
+                            // texture/clouds, and provides good contrast for
+                            // the pure-black true-umbra disc on top.
     });
+    shellMat.depthWrite = false;
     const shadowShell = new THREE.Mesh(shellGeom, shellMat);
 
     shadowShell.receiveShadow = true; // darken where the shadow map says so
     shadowShell.castShadow    = false;/* planet already casts its own shadow */
+    shadowShell.renderOrder   = 10;   // render after clouds + core (default 0)
   
     /* ------------------------------------------------ clouds ---------- */
     const cloudMat = new THREE.ShaderMaterial({
@@ -53932,9 +53704,64 @@ function makeRealisticEarth(pd){
         })
     );
 
+    /* ───────────────── Eclipse umbra disc ──────────────────────
+     * Always-on visualization of the TRUE total-eclipse umbra. Computed
+     * automatically every frame from Sun-Moon-Earth scene positions; hidden
+     * when the Moon's shadow misses Earth. Sized to the actual umbra width
+     * at Earth's surface (umbra-cone apex geometry), NOT the parallel-ray
+     * approximation that Three.js's DirectionalLight shadow renders. Placed
+     * at radius × 1.04 (above the shadow shell at 1.025) and rendered with
+     * renderOrder:20 so it draws on top — making the totality zone clearly
+     * visible regardless of cloud cover or terminator. Parented to `core`
+     * so it inherits Earth's daily spin (the umbra moves across geographic
+     * locations as Earth rotates). */
+    const umbraDisc = new THREE.Mesh(
+      new THREE.CircleGeometry(1, 64),       // unit radius; scaled per-frame
+      new THREE.MeshBasicMaterial({
+        color       : 0x000000,              // pure black — totality (Sun fully blocked)
+        transparent : true,                  // must be transparent so renderOrder works across
+                                             // the transparent-pass shells (shadow shell, atm)
+        opacity     : 1.0,
+        side        : THREE.DoubleSide,
+        depthWrite  : false
+      })
+    );
+    umbraDisc.visible       = false;
+    umbraDisc.renderOrder   = 20;            // renders after shadowShell(10), atmosphere, clouds
+    umbraDisc.castShadow    = false;
+    umbraDisc.receiveShadow = false;
+
+    /* White halo ring around the umbra disc. At typical total-eclipse umbra
+     * widths (~50–250 km on a 6,371 km Earth) the black disc is only a
+     * couple of pixels across at normal zoom — easy to miss. The halo
+     * (a thin annulus from 1.1× to 1.5× the disc radius, with a small
+     * gap between disc and halo so the umbra reads as a distinct shape)
+     * gives the totality location a clearly visible outline, similar to
+     * how NASA eclipse maps draw the path of totality. Opacity 0.75 keeps
+     * the halo a subtle visual aid rather than a dominant element.
+     * Sized + positioned in sync with the disc; rendered just under it
+     * (renderOrder 19 vs disc's 20) so the disc sits on top in the center
+     * while the halo extends outward. */
+    const umbraHalo = new THREE.Mesh(
+      new THREE.RingGeometry(1.1, 1.5, 64),
+      new THREE.MeshBasicMaterial({
+        color       : 0xfff8c0,            // pale corona-tint yellow
+        transparent : true,
+        opacity     : 0.75,
+        side        : THREE.DoubleSide,
+        depthWrite  : false
+      })
+    );
+    umbraHalo.visible       = false;
+    umbraHalo.renderOrder   = 19;
+    umbraHalo.castShadow    = false;
+    umbraHalo.receiveShadow = false;
+
     /* ------------------------------------------------ container ------- */
     const container = new THREE.Object3D();
     core.add(clouds);                        // clouds follow core spin 1-to-1
+    core.add(umbraDisc);                     // umbra disc also follows core spin
+    core.add(umbraHalo);                     // and its halo
     container.add(core, atm, shadowShell);   // atmosphere can stay a sibling
 
     /* ------------------------------------------------ helpers --------- */
@@ -53949,6 +53776,94 @@ function makeRealisticEarth(pd){
 
     function updateClouds(deltaTime = 0.016){       // seconds
         clouds.rotation.y += deltaTime * DRIFT_RATE * o.speed;
+    }
+
+    /* Per-frame update for the always-on umbra disc. Ray-traces from Sun
+     * through Moon to Earth's mesh sphere; if the ray hits Earth, positions
+     * the disc at the hit point (in core's local frame) tangent to the
+     * sphere, and scales it to the true total-eclipse umbra width computed
+     * from umbra-cone geometry. Otherwise hides the disc.
+     *
+     * All Vector3/Quaternion intermediates are pre-allocated as closure
+     * scratch variables so the per-frame call performs ZERO allocations
+     * (no GC pressure). Cost per frame: ~6 vector ops + 1 quaternion
+     * setFromUnitVectors — well under 0.1 ms on modern hardware. */
+    const _udcSun     = new THREE.Vector3();
+    const _udcMoon    = new THREE.Vector3();
+    const _udcEarth   = new THREE.Vector3();
+    const _udcMoonGeo = new THREE.Vector3();
+    const _udcSunGeo  = new THREE.Vector3();
+    const _udcDir     = new THREE.Vector3();
+    const _udcHit     = new THREE.Vector3();
+    const _udcLocal   = new THREE.Vector3();
+    const _udcNormal  = new THREE.Vector3();
+    const _udcQuat    = new THREE.Quaternion();
+    const _udcQuatInv = new THREE.Quaternion();
+    const _udcZAxis   = new THREE.Vector3(0, 0, 1);
+
+    function updateUmbraDisc() {
+        if (!sun.planetObj || !moon.planetObj) {
+            umbraDisc.visible = false;
+            umbraHalo.visible = false;
+            return;
+        }
+        sun .planetObj.getWorldPosition(_udcSun);
+        moon.planetObj.getWorldPosition(_udcMoon);
+        core          .getWorldPosition(_udcEarth);
+
+        _udcMoonGeo.copy(_udcMoon).sub(_udcEarth);
+        _udcSunGeo .copy(_udcSun) .sub(_udcEarth);
+        _udcDir    .copy(_udcMoonGeo).sub(_udcSunGeo).normalize();
+
+        const R_E   = radius;                        // mesh radius (= captured pd.size)
+        const MdotD = _udcMoonGeo.dot(_udcDir);
+        const MdotM = _udcMoonGeo.dot(_udcMoonGeo);
+        const disc_ = MdotD * MdotD - (MdotM - R_E * R_E);
+
+        if (disc_ < 0) {                             // umbra misses Earth — no eclipse
+            umbraDisc.visible = false;
+            umbraHalo.visible = false;
+            return;
+        }
+
+        const s = -MdotD - Math.sqrt(disc_);
+        _udcHit.copy(_udcDir).multiplyScalar(s).add(_udcMoonGeo);
+
+        core.getWorldQuaternion(_udcQuat);
+        _udcQuatInv.copy(_udcQuat).invert();
+        _udcLocal.copy(_udcHit).applyQuaternion(_udcQuatInv);
+
+        /* True umbra width via umbra-cone apex geometry (NOT the parallel-
+         * ray approximation that Three.js renders). For a Moon-cone apex
+         * at distance D_apex from the Moon, the umbra radius at an
+         * observer at distance D_M from the Moon is:
+         *     R_umbra = R_Moon × (1 − D_M / D_apex)
+         * where D_apex = R_Moon × D_Sun_Moon / R_Sun. Negative values are
+         * antumbra (annular eclipse) — use abs for visualization. */
+        const km_per_unit = currentAUDistance / 100;
+        const D_M_km    = _udcMoonGeo.length() * km_per_unit;
+        const D_S_km    = _udcSunGeo .length() * km_per_unit;
+        const R_Moon_km = diameters.moonDiameter / 2;
+        const R_Sun_km  = diameters.sunDiameter  / 2;
+        const D_apex    = R_Moon_km * (D_S_km - D_M_km) / R_Sun_km;
+        const umbraR_km    = Math.abs(R_Moon_km * (1 - D_M_km / D_apex));
+        const umbraR_scene = umbraR_km / km_per_unit;
+
+        /* Position disc + halo just above shadow shell (× 1.04, below
+         * atmosphere at 1.05) and orient tangent to the sphere — +Z axis
+         * (the mesh normal) aligns with the outward radial direction. */
+        _udcNormal.copy(_udcLocal).normalize();
+        _udcLocal .copy(_udcNormal).multiplyScalar(R_E * 1.04);
+
+        umbraDisc.position.copy(_udcLocal);
+        umbraDisc.quaternion.setFromUnitVectors(_udcZAxis, _udcNormal);
+        umbraDisc.scale.setScalar(umbraR_scene);
+        umbraDisc.visible = true;
+
+        umbraHalo.position.copy(_udcLocal);
+        umbraHalo.quaternion.copy(umbraDisc.quaternion);
+        umbraHalo.scale.setScalar(umbraR_scene);
+        umbraHalo.visible = true;
     }
   
     // ------------------------------------------------ era / map switcher -- 
@@ -53975,7 +53890,8 @@ function makeRealisticEarth(pd){
         coreMesh          : core,
         updateSunDir,
         updateClouds,
-        updateEra
+        updateEra,
+        updateUmbraDisc
     };
 }
 
@@ -54027,9 +53943,10 @@ function createPlanet(pd) {           // pd = Planet Data
   /* preserve your world-access references so nothing else breaks */
   pd.planetObj         = earthPack.coreMesh;
   pd.planetMaterial    = earthPack.coreMesh.material;
-  pd._updateSunDirFunc = earthPack.updateSunDir;
-  pd._updateCloudsFunc = earthPack.updateClouds;
-  pd._updateEraFunc    = earthPack.updateEra;
+  pd._updateSunDirFunc    = earthPack.updateSunDir;
+  pd._updateCloudsFunc    = earthPack.updateClouds;
+  pd._updateEraFunc       = earthPack.updateEra;
+  pd._updateUmbraDiscFunc = earthPack.updateUmbraDisc;
     
   } else {
     /*  ---------- all other planets  ---------- */
