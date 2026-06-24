@@ -1,6 +1,6 @@
 # Moon Meeus Corrections -- Implementation Reference
 
-**Date**: 2026-03-07 (updated 2026-03-07)
+**Date**: 2026-03-07 (last update 2026-06-25 — added Layer 1b for Meeus empirical accuracy at -135 per doc 103)
 **Status**: Complete (full Meeus Ch. 47: 60L+60B terms, RA+Dec override, JPL-verified)
 
 ---
@@ -232,7 +232,7 @@ combined uncertainties described below.
 
 ### Consistency with Architecture α deep-time Moon model
 
-The deep-time Moon model (Architecture α; see doc 99 and `IP-deep-time-extension.md`)
+The deep-time Moon model (Architecture α; see doc 99 and `docs/hidden/old-documents/IP-deep-time-extension.md`)
 adds a Farhat 2022 polynomial for Moon orbital evolution:
 
 ```
@@ -316,7 +316,7 @@ its predictions.
 
 ### Three layers of uncertainty for ancient eclipses
 
-**Layer 1: ELP-2000/82 lunar theory accuracy**
+**Layer 1: ELP-2000/82 lunar theory accuracy (NASA's polynomial)**
 
 ELP-2000/82 is a semi-analytical theory fitted to the DE200 numerical
 ephemeris. Its internal precision degrades with time distance from J2000:
@@ -332,6 +332,47 @@ ephemeris. Its internal precision degrades with time distance from J2000:
 The polynomial terms (T², T³, T⁴) in the fundamental arguments accumulate
 errors for large |T|. The theory was designed for high accuracy near the
 present epoch, not for millennia-scale extrapolation.
+
+**Layer 1b: Meeus Ch. 47 (the framework's polynomial) — empirical accuracy at deep time**
+
+The framework uses Meeus Ch. 47 (a truncated ~60-term form of ELP-2000/82)
+via the `_eclMoonLon`, `_eclMoonBeta`, `_eclMoonDistance` helpers. Because
+this is a truncation of the full ~37,000-term ELP-2000/82, its residual at
+deep time is *larger* than the Layer 1 floor — sometimes substantially so,
+because the truncated perturbation series can sum constructively at specific
+JDs even when the full series cancels.
+
+The empirical -135 Babylonian case study (doc 103) measured Meeus' β
+(ecliptic latitude) residual:
+
+| Source | β at -135-04-15 |
+|---|---|
+| Meeus Ch. 47 (framework's polynomial) | 0.728° |
+| ELP-2000/82 effective (back-calculated from NASA Five Millennium Canon) | ≈ 0.66° |
+| **Residual** | **~0.07° = ~250 arcsec** |
+
+**This is roughly 10× the Layer 1 floor for the same era** (Layer 1's
+"~10-30 arcsec at 0 CE" was for *full* ELP-2000/82; Meeus at the same
+era is event-dependent and can reach hundreds of arcsec when
+truncation-residuals constructively interfere).
+
+Adjacent Hellenistic events the framework was tested against (-584 Thales,
+-309 Sicily, -762 Bur-Sagale) have much smaller residual (≤0.12°
+β_diff per the Babylonian-era Meeus residual sweep), confirming the -135
+case is *event-specific* truncation behavior — not a systematic
+degradation across the era. Most deep-time eclipses match cleanly;
+specific JDs can have substantially larger residuals than the Layer 1
+table would suggest.
+
+**Forward path:** [`docs/hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md)
+proposes optionally adding the full ELP-2000/82 series as an alternative
+polynomial path. With ELP-2000/82, framework's -135 β residual would drop
+from 0.07° to the Layer 1 floor (~10-30 arcsec), and -135's BestGap to
+Babylon would close from 1159 km to ~270 km (with ΔT residual remaining)
+or ~50-150 km (with both ELP-2000/82 + α(t) tuning). Not currently
+prioritized; doc 103's Interpretation 1 (Babylon saw deep partial; framework's
+Meeus-residual-driven path through Saudi Arabia is correct *given its
+polynomial*) is the project's official position.
 
 **Layer 2: Delta-T (Earth rotation) uncertainty**
 

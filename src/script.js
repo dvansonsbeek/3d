@@ -5408,7 +5408,7 @@ function meanPlanetRotationPeriodAtAge(planetName, t_Ma, T_rot_J2000_s = null) {
 }
 
 // ───── Per-planet orbital-cycle integrators (Phase P-A of planet deep-time plan) ─────
-// docs/hidden/IP-planet-deep-time-scene-graph.md
+// docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md
 //
 // Each planet's orbital cycle count between two SI-year inputs, integrated under
 // Driver 2 (Kepler + solar mass loss). Reuses the generic `_moonChainCycles`
@@ -5901,7 +5901,7 @@ for (const k of PLANET_KEYS) {
 }
 
 // ───── Phase P-C0 — Perihelion ecliptic 8H/N divisor + sign tables ─────
-// docs/hidden/IP-planet-deep-time-scene-graph.md
+// docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md
 //
 // Each planet's perihelion ecliptic period satisfies the Law-6 invariant
 // |periEclipticYears| = 8H_J2000 / N for a fixed positive integer N:
@@ -6319,7 +6319,7 @@ function updateSafeObjectsForEpoch() {
 // when the user explicitly calls setEpoch() with the toggle off. Removing
 // these mutations would silently break the snapshot path at any non-J2000
 // epoch — see "Why we keep both paths" in
-// docs/hidden/IP-planet-deep-time-scene-graph.md.
+// docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md.
 //
 // PERIHELION RATE — ESSRT 8H/N scaling.
 //   `perihelionPrecessionRate` scales with H: per doc 99 each planet's
@@ -6484,7 +6484,7 @@ const J2000_CALENDAR_YEAR = startmodelYear;   // 2000.5
  *    orientation, which matches doc 101's validation pipeline. Users who
  *    want Stephenson-matching visualization can toggle via the
  *    "Toggle Strategy A" test button. See:
- *    `docs/hidden/IP-strategy-z-earth-rotation-integration.md`. */
+ *    `docs/hidden/old-documents/IP-strategy-z-earth-rotation-integration.md`. */
 let STRATEGY_A_DISABLED = true;
 
 function earthRotationCorrectionRadians(jd) {
@@ -9368,7 +9368,7 @@ const neptuneWobbleCenter = {
 
 // ═════════════════════════════════════════════════════════════════════════════
 // PLANET SCENE-GRAPH DEEP-TIME TAG ARCHITECTURE
-//   docs/hidden/IP-planet-deep-time-scene-graph.md
+//   docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md
 //
 // Three integrator-tag families, each suited to a different physical evolution law.
 // Each planet's scene-graph chain has 7 nodes: 4 tagged (epoch-dependent rates) +
@@ -9443,7 +9443,7 @@ neptuneWobbleCenter._dtCycleN = _planetWobbleDivisors.neptune; neptuneWobbleCent
 //   • New `_dtPlanetIntegrator` dispatch branch consumes TT-shifted year
 //   • Tagged planet-by-planet with verification gates between each
 //   • Moon-chain branch unchanged (UT) → doc 101's 19/19 result preserved
-// See docs/hidden/IP-planet-deep-time-scene-graph.md for the full plan.
+// See docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md for the full plan.
 
 // ───── Phase P-B1 — Mercury orbital integrator tag (TT-anchored) ─────
 // Mercury orbits the Sun under Kepler's third law + solar mass loss
@@ -9503,7 +9503,7 @@ neptune._dtPlanetAnchor     = STARTMODEL_YEAR_SI;
 neptune._dtPlanetSign       = Math.sign(neptune.speed);
 
 // ───── Phase P-C1 — Mercury perihelion ecliptic frames (Law-6 H-scaling) ─────
-// docs/hidden/IP-planet-deep-time-scene-graph.md
+// docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md
 //
 // THE PHASE 9.14 REVERT SITE. The original attempt failed due to UT/TT unit
 // mismatches (Phase 9.15 fixed those at the integrator boundary). Plus a
@@ -9612,7 +9612,7 @@ neptune._dtPlanetSign       = Math.sign(neptune.speed);
 }
 
 // ───── Phase P-D — Per-planet _dtPerihelionDivisor for eq-of-center ─────
-// docs/hidden/IP-planet-deep-time-scene-graph.md
+// docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md
 //
 // Re-applied 2026-06-20 with CORRECTED divisor convention (N/8, not N).
 //
@@ -27968,32 +27968,202 @@ function setupGUI() {
      'and OFF to see the empirical effect of the toggle.');
 
   // ────────────────────────────────────────────────────────────────────────
-  // Button 3: Strategy A impact summary — automated A/B sweep
-  //
-  // Runs the comparison automatically: measures deep-time umbra-centerline
-  // distance with Strategy A ON, then OFF, then ON again (to restore state).
-  // Reports the per-event impact. Saves the user from having to manually
-  // toggle + re-run + remember + compare.
+  // REMOVED 2026-06-25: "Strategy A impact summary (auto A/B sweep)" button.
+  // The empirical Strategy A ON-vs-OFF table it produced is documented in
+  // docs/hidden/old-documents/IP-strategy-z-earth-rotation-integration.md
+  // and the doc 101 2026-06-24 update box. Strategy A is now disabled by
+  // default; for ad-hoc A/B verification use "Toggle Strategy A" +
+  // "Sun position diagnostic" together.
   // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Strategy A impact summary (auto A/B sweep)', async () => {
+  // (Original 130-line button removed; for ad-hoc A/B verification see
+  // "Toggle Strategy A" + "Sun position diagnostic".)
+
+
+  // ────────────────────────────────────────────────────────────────────────
+  // -135 Babylonian root-cause diagnostic
+  //
+  // The -135 event is the single persistent anomaly in the framework's
+  // historical eclipse predictions. Diary attribution is rock-solid
+  // (BM 45745 + LBAT 1285, 4-planet fingerprint, double-dated Arsacid/
+  // Seleucid). With Strategy A disabled, framework still places umbra
+  // ~1150 km from Babylon. The 75% improvement at other deep-time events
+  // is real, but this specific event resists.
+  //
+  // This diagnostic decomposes the framework's prediction error at
+  // -135-04-15 conjunction into orthogonal sources:
+  //   1. Sun ecliptic-longitude error (framework vs Meeus Ch. 25)
+  //   2. Moon ecliptic-longitude error (framework vs Meeus Ch. 47 polynomial)
+  //   3. Moon ecliptic-latitude error (β perturbation accuracy)
+  //   4. Sun-Moon distance ratio (umbra cone geometry)
+  //   5. Earth orientation phase (framework's effective ΔT vs reference)
+  //
+  // Each source's contribution to umbra-position error is quantified in km.
+  // The sum should reconcile with the observed 1150 km offset.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('-135 Babylonian root-cause diagnostic', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Strategy A impact summary — automated A/B sweep at 11 historical events');
-    console.log('  Measures umbra-centerline distance from documented site, with Strategy A ON and OFF.');
+    console.log('  -135 Babylonian root-cause diagnostic');
+    console.log('  Documented: 15 April 136 BCE (= JD 1671853.76 UT), totality at Babylon (32.5°N, 44.4°E)');
+    console.log('  Per agent research: BM 45745 + LBAT 1285, 4-planet fingerprint, double-dated.');
+    console.log(`  Strategy A is currently: ${STRATEGY_A_DISABLED ? 'DISABLED' : 'ENABLED'}`);
     console.log('══════════════════════════════════════════════════════════════════════════════════');
 
-    const EVENTS = [
-      { Y: 1860, M:  7, D: 18, lat: 42.70,  lon:  -3.00, label: '1860 Rivabellosa' },
-      { Y: 1851, M:  7, D: 28, lat: 54.70,  lon:  20.50, label: '1851 Königsberg' },
-      { Y: 1842, M:  7,  D:  8, lat: 48.21,  lon:  16.37, label: '1842 Vienna' },
-      { Y: 1715, M:  5,  D:  3, lat: 51.50,  lon:  -0.13, label: '1715 London' },
-      { Y: 1239, M:  6,  D:  3, lat: 43.70,  lon:  10.40, label: '1239 Tuscany' },
-      { Y: 1133, M:  8,  D:  2, lat: 52.00,  lon:  -2.00, label: '1133 England' },
-      { Y: -135, M:  4, D: 15, lat: 32.50,  lon:  44.40, label: '-135 Babylonian' },
-      { Y: -309, M:  8, D: 15, lat: 37.00,  lon:  14.00, label: '-309 Sicily' },
-      { Y: -584, M:  5, D: 28, lat: 39.00,  lon:  35.00, label: '-584 Anatolia' },
-      { Y: -708, M:  7, D: 17, lat: 35.60,  lon: 116.98, label: '-708 Qufu' },
-      { Y: -762, M:  6, D: 15, lat: 36.36,  lon:  43.16, label: '-762 Nineveh' },
-    ];
+    const _d2r = Math.PI / 180;
+    const _r2d = 180 / Math.PI;
+    const JD_135 = 1671853.759762;
+    const babylon_lat = 32.50;
+    const babylon_lon = 44.40;
+
+    const _saveJD = o.julianDay;
+
+    // ─── Step 1: framework scene-state Sun + Moon positions at this JD ───
+    jumpToJulianDay(JD_135);
+    forceSceneUpdate('light');
+    const sun_ws    = new THREE.Vector3();
+    const moon_ws   = new THREE.Vector3();
+    const earth_ws  = new THREE.Vector3();
+    sun.planetObj  .getWorldPosition(sun_ws);
+    moon.planetObj .getWorldPosition(moon_ws);
+    earth.planetObj.getWorldPosition(earth_ws);
+
+    const sun_geo  = sun_ws .clone().sub(earth_ws);
+    const moon_geo = moon_ws.clone().sub(earth_ws);
+    const sun_dist  = sun_geo .length();
+    const moon_dist = moon_geo.length();
+    const scaleKmPerUnit = currentAUDistance / 100;
+    const sun_dist_km  = sun_dist  * scaleKmPerUnit;
+    const moon_dist_km = moon_dist * scaleKmPerUnit;
+
+    // ─── Step 2: Meeus standalone Sun + Moon positions at same JD ───
+    const dT = _eclDeltaT(JD_135);
+    const meeus_sun_lon  = _eclSunLon(JD_135);
+    const meeus_moon_lon = _eclMoonLon(JD_135);
+    const meeus_moon_beta= _eclMoonBeta(JD_135);
+    const meeus_moon_dist = _eclMoonDistance(JD_135);
+
+    console.log('');
+    console.log('  Step 1: Framework scene-state at -135-04-15 conjunction');
+    console.log(`    Sun geocentric distance:  ${sun_dist_km.toFixed(0)} km (Meeus AU ≈ 149,600,000)`);
+    console.log(`    Moon geocentric distance: ${moon_dist_km.toFixed(0)} km (Meeus Ch. 47: ${meeus_moon_dist.toFixed(0)} km)`);
+    console.log(`    Moon distance ratio:      framework/Meeus = ${(moon_dist_km/meeus_moon_dist).toFixed(6)}`);
+
+    console.log('');
+    console.log('  Step 2: Meeus Ch. 25 + Ch. 47 standalone at -135-04-15');
+    console.log(`    Sun ecliptic longitude:   ${meeus_sun_lon.toFixed(4)}°`);
+    console.log(`    Moon ecliptic longitude:  ${meeus_moon_lon.toFixed(4)}°`);
+    console.log(`    Moon ecliptic latitude β: ${meeus_moon_beta.toFixed(4)}°`);
+    console.log(`    Sun-Moon separation:      ${((meeus_moon_lon - meeus_sun_lon + 540) % 360 - 180).toFixed(4)}° (should be ≈ 0 at conjunction)`);
+    console.log(`    ΔT framework (= used):    ${Math.round(dT)} sec`);
+
+    // ─── Step 3: where SHOULD the umbra be per Meeus + standard GMST(UT1)? ───
+    // Compute Meeus' sub-solar lat/lon, then add Moon-β leverage offset
+    // to get the umbra approximate location.
+    const eps = (23.4392911 - 0.0130042 * (JD_135 - j2000JD) / 36525) * _d2r;
+    const sin_dec = Math.sin(eps) * Math.sin(meeus_sun_lon * _d2r);
+    const sun_dec  = Math.asin(sin_dec) * _r2d;
+    let sun_RA = Math.atan2(Math.cos(eps) * Math.sin(meeus_sun_lon * _d2r), Math.cos(meeus_sun_lon * _d2r)) * _r2d;
+    if (sun_RA < 0) sun_RA += 360;
+    const T_UT = (JD_135 - j2000JD) / 36525;
+    let gmst = (280.46061837 + 360.98564736629 * (JD_135 - j2000JD)
+              + 0.000387933 * T_UT * T_UT) % 360;
+    if (gmst < 0) gmst += 360;
+    let sub_solar_lon_meeus = sun_RA - gmst;
+    while (sub_solar_lon_meeus > 180)  sub_solar_lon_meeus -= 360;
+    while (sub_solar_lon_meeus < -180) sub_solar_lon_meeus += 360;
+
+    // Umbra offset from sub-solar via Moon's β:
+    // umbra_offset ≈ β × d_Moon / (R_Earth × geometric_factor)
+    const moon_dist_meeus_km = meeus_moon_dist;
+    const R_E_km = diameters.earthDiameter / 2;
+    const umbra_offset_deg = meeus_moon_beta * (moon_dist_meeus_km / R_E_km);
+    console.log('');
+    console.log('  Step 3: Where Meeus + standard GMST(UT1) put the umbra at this JD');
+    console.log(`    Sun declination:                 ${sun_dec.toFixed(3)}°N`);
+    console.log(`    Sun RA - GMST = sub-solar lon:   ${sub_solar_lon_meeus.toFixed(3)}°E`);
+    console.log(`    Moon β-induced umbra offset:     ${umbra_offset_deg.toFixed(3)}°  (north if β>0)`);
+    console.log(`    Predicted umbra (Meeus method):  (${(sun_dec + umbra_offset_deg).toFixed(2)}°N, ${sub_solar_lon_meeus.toFixed(2)}°E)`);
+    console.log(`    Babylon (target):                (${babylon_lat.toFixed(2)}°N, ${babylon_lon.toFixed(2)}°E)`);
+    const meeus_predicted_lat = sun_dec + umbra_offset_deg;
+    const meeus_dist_km = gcKmFromLatLon(babylon_lat, babylon_lon, meeus_predicted_lat, sub_solar_lon_meeus);
+    console.log(`    Meeus prediction distance to Babylon: ${meeus_dist_km.toFixed(0)} km`);
+
+    // ─── Step 4: framework's actual umbra position (umbraFromSceneAtJd) ───
+    const fw_umbra = umbraFromSceneAtJd(JD_135);
+    const fw_subsolar = subSolarFromSceneAtJd(JD_135);
+    console.log('');
+    console.log('  Step 4: Framework scene umbra at this JD');
+    console.log(`    Framework umbra:           (${fw_umbra ? fw_umbra.lat.toFixed(2) : 'off Earth'}°N, ${fw_umbra ? fw_umbra.lon.toFixed(2) : '?'}°E)`);
+    console.log(`    Framework sub-solar:       (${fw_subsolar.lat.toFixed(2)}°N, ${fw_subsolar.lon.toFixed(2)}°E)`);
+    if (fw_umbra) {
+      const fw_dist_km = gcKmFromLatLon(babylon_lat, babylon_lon, fw_umbra.lat, fw_umbra.lon);
+      console.log(`    Framework prediction distance to Babylon: ${fw_dist_km.toFixed(0)} km`);
+      console.log(`    Δ(framework − Meeus) sub-solar lon: ${(fw_subsolar.lon - sub_solar_lon_meeus).toFixed(3)}°  (= ${((fw_subsolar.lon - sub_solar_lon_meeus) * 111 * Math.cos(babylon_lat*_d2r)).toFixed(0)} km @ Babylon lat)`);
+    }
+
+    // ─── Step 5: ΔT comparison ───
+    console.log('');
+    console.log('  Step 5: ΔT comparison framework vs Stephenson');
+    const stephenson_dT = 32 * Math.pow((-135 - 1820) / 100, 2);  // Stephenson empirical formula
+    console.log(`    Framework pure-tidal ΔT:   ${Math.round(dT)} sec`);
+    console.log(`    Stephenson empirical ΔT:   ${Math.round(stephenson_dT)} sec`);
+    console.log(`    Difference:                ${Math.round(dT - stephenson_dT)} sec`);
+    console.log(`    Expected lon shift:        ${((dT - stephenson_dT) * 15 / 3600).toFixed(3)}° at equator`);
+    console.log(`    Expected km shift:         ${Math.abs((dT - stephenson_dT) * 15 / 3600 * 111 * Math.cos(babylon_lat*_d2r)).toFixed(0)} km @ Babylon`);
+
+    jumpToJulianDay(_saveJD);
+    forceSceneUpdate('light');
+
+    console.log('');
+    console.log('  ──────────────────────────────────────────────────────────────────────────────');
+    console.log('  Interpretation:');
+    console.log('   • If Meeus method gives umbra near Babylon but framework doesn\'t,');
+    console.log('     framework\'s scene-graph composition has an issue (Sun/Moon/Earth position).');
+    console.log('   • If Meeus method ALSO puts umbra far from Babylon, the documented');
+    console.log('     attribution may genuinely not correspond to pure-tidal physics —');
+    console.log('     i.e., conventional Stephenson ΔT fits this event by absorbing the');
+    console.log('     non-tidal acceleration that the framework leaves out.');
+    console.log('   • The ΔT difference quantifies how much "non-tidal correction" Stephenson');
+    console.log('     applies that framework\'s pure-tidal model does not.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Root-cause diagnostic for the -135 Babylonian anomaly. Decomposes the ' +
+     'framework\'s umbra-position error into Sun ecliptic position, Moon ecliptic ' +
+     'longitude/latitude, distance ratio, and Earth orientation. Tells us WHICH ' +
+     'component (if any) is the source of the ~1150 km offset.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Babylonian-era Meeus residual sweep
+  //
+  // The -135 root-cause diagnostic showed that Meeus standalone analytics
+  // (β = 0.7284° at -135) places umbra 4000 km from Babylon, vs NASA's
+  // confirmed path-through-Mesopotamia. Meeus polynomial residual in
+  // Moon β appears to be ~0.09° at -135, much larger than doc 66's
+  // estimate of ~30 arcsec for this epoch range.
+  //
+  // This sweep tests the SAME approximation across 9 historical
+  // Babylonian-era events (including -135 plus 8 reference points) so
+  // we can see if the residual is:
+  //   - Isolated to -135 (suggests data-specific issue)
+  //   - Systematic across -200 to -50 BCE (suggests epoch-localized
+  //     polynomial residual)
+  //   - Smooth with |T| (suggests doc 66's polynomial-extrapolation
+  //     model is correct but optimistic)
+  //
+  // Output: for each event, framework's Moon β at conjunction, predicted
+  // umbra offset from sub-solar, and predicted distance to Babylon. The
+  // pattern reveals the polynomial behavior across the era.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Babylonian-era Meeus residual sweep (8 events)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Babylonian-era Meeus residual sweep — 8 documented totalities/annulars');
+    console.log('  For each, compares Meeus-standalone Moon β to "expected β" needed for umbra at Babylon');
+    console.log('  (= Babylon\'s latitude offset from Sun\'s sub-solar at conjunction × R_E / d_Moon)');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    const _d2r = Math.PI / 180;
+    const _r2d = 180 / Math.PI;
+    const babylon_lat = 32.50;
+    const babylon_lon = 44.40;
+    const R_E_km = diameters.earthDiameter / 2;
 
     function julianDateToJDlocal(Y, M, D, hour = 12) {
       let y = Y, m = M;
@@ -28002,109 +28172,267 @@ function setupGUI() {
            + D - 1524.5 + hour / 24;
     }
 
-    // Min-distance scan ±3h around each event's conjunction
-    function measureMinDist(jdNominal, lat_obs, lon_obs) {
-      const events = findSolarEclipsesInRange(jdNominal - 15, jdNominal + 15);
-      if (events.length === 0) return null;
-      let evt = events[0];
-      let bestΔ = Math.abs(events[0].jd - jdNominal);
-      for (const e of events) {
-        const δ = Math.abs(e.jd - jdNominal);
-        if (δ < bestΔ) { bestΔ = δ; evt = e; }
-      }
-      const isCentral = (evt.type === 'Total' || evt.type === 'Annular' || evt.type === 'Hybrid');
-      const stepDays = 5 / 60 / 24;
-      const halfWin  = 3 / 24;
-      let minDist = Infinity;
-      for (let dt = -halfWin; dt <= halfWin + 1e-9; dt += stepDays) {
-        const jd = evt.jd + dt;
-        const pt = isCentral ? (umbraFromSceneAtJd(jd) || subSolarFromSceneAtJd(jd)) : subSolarFromSceneAtJd(jd);
-        if (pt === null) continue;
-        const d = gcKmFromLatLon(lat_obs, lon_obs, pt.lat, pt.lon);
-        if (d < minDist) minDist = d;
-      }
-      return minDist === Infinity ? null : minDist;
-    }
+    // Curated Babylonian-era events. Mix of documented diary entries
+    // (HISTORIC list) and reference events from older/younger eras for
+    // comparison. Times are approximate (noon UT) — the diagnostic
+    // measures Meeus β at the conjunction JD which is roughly date-independent.
+    const events = [
+      { Y: -762, M: 6,  D: 15, hour:  8, label: '-762 Nineveh (Bur-Sagale)' },
+      { Y: -708, M: 7,  D: 17, hour:  6, label: '-708 Lu State (Chinese, NOT Babylon — reference)' },
+      { Y: -584, M: 5,  D: 28, hour: 14, label: '-584 Anatolia (Thales — control: matched at ★ TOTAL)' },
+      { Y: -556, M: 5,  D: 19, hour: 13, label: '-556 Babylon (Nabonidus diary)' },
+      { Y: -430, M: 8,  D:  3, hour: 15, label: '-430 Athens (Thucydides)' },
+      { Y: -309, M: 8,  D: 15, hour:  8, label: '-309 Sicily (Agathocles — matched at ★ TOTAL)' },
+      { Y: -189, M: 3,  D: 14, hour: 12, label: '-189 Hipparchus eclipse era' },
+      { Y: -135, M: 4,  D: 15, hour:  6, label: '-135 Babylon (BM 45745 + LBAT 1285 — ★ ANOMALY)' },
+    ];
+
+    console.log('  Year   Label                                          β_meeus    sun_dec  ssLon_meeus  Δlat→Bab  β_needed  β_diff');
+    console.log('  ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────');
 
     const _saveJD = o.julianDay;
-    const _saveStrategyA = STRATEGY_A_DISABLED;
-    console.log('  Scanning... (~30s, doing 11 events × 2 sweeps each)');
-
-    const results_ON  = [];
-    const results_OFF = [];
-
     try {
-      // ─── Sweep with Strategy A ENABLED ───
-      STRATEGY_A_DISABLED = false;
-      forceSceneUpdate('light');
-      for (const e of EVENTS) {
-        const jdNom = julianDateToJDlocal(e.Y, e.M, e.D);
-        const d = measureMinDist(jdNom, e.lat, e.lon);
-        results_ON.push({ ...e, dist: d });
-      }
+      for (const e of events) {
+        const jd = julianDateToJDlocal(e.Y, e.M, e.D, e.hour);
+        const meeus_moon_beta = _eclMoonBeta(jd);
+        const meeus_sun_lon   = _eclSunLon(jd);
+        const dT_sec = _eclDeltaT(jd);
+        const T = (jd + dT_sec / 86400 - j2000JD) / 36525;
+        const eps = (23.4392911 - 0.0130042 * T) * _d2r;
+        const sun_dec = Math.asin(Math.sin(eps) * Math.sin(meeus_sun_lon * _d2r)) * _r2d;
+        let sun_RA = Math.atan2(Math.cos(eps) * Math.sin(meeus_sun_lon * _d2r),
+                                Math.cos(meeus_sun_lon * _d2r)) * _r2d;
+        if (sun_RA < 0) sun_RA += 360;
+        const T_UT = (jd - j2000JD) / 36525;
+        let gmst = (280.46061837 + 360.98564736629 * (jd - j2000JD)
+                  + 0.000387933 * T_UT * T_UT) % 360;
+        if (gmst < 0) gmst += 360;
+        let ssLon = sun_RA - gmst;
+        while (ssLon > 180)  ssLon -= 360;
+        while (ssLon < -180) ssLon += 360;
 
-      // ─── Sweep with Strategy A DISABLED ───
-      STRATEGY_A_DISABLED = true;
-      forceSceneUpdate('light');
-      for (const e of EVENTS) {
-        const jdNom = julianDateToJDlocal(e.Y, e.M, e.D);
-        const d = measureMinDist(jdNom, e.lat, e.lon);
-        results_OFF.push({ ...e, dist: d });
+        // What β would be needed for umbra to be at Babylon's lat at conjunction?
+        // Approximation: umbra offset from sub-solar = β × (d_Moon / R_E) degrees
+        // For umbra at Babylon: lat_diff = Babylon's lat - sun_dec
+        // β_needed = lat_diff / (d_Moon / R_E)
+        const meeus_moon_dist = _eclMoonDistance(jd);
+        const lat_diff_to_babylon = babylon_lat - sun_dec;
+        const beta_needed = lat_diff_to_babylon / (meeus_moon_dist / R_E_km);
+        const beta_diff = meeus_moon_beta - beta_needed;
+
+        const yearStr = String(e.Y).padStart(5);
+        const labStr  = e.label.padEnd(48);
+        console.log(`  ${yearStr}  ${labStr}  ${meeus_moon_beta.toFixed(3).padStart(7)}°  ${sun_dec.toFixed(2).padStart(6)}°  ${ssLon.toFixed(2).padStart(8)}°  ${lat_diff_to_babylon.toFixed(2).padStart(7)}°  ${beta_needed.toFixed(3).padStart(7)}°  ${beta_diff.toFixed(3).padStart(7)}°`);
       }
     } finally {
-      STRATEGY_A_DISABLED = _saveStrategyA;
       jumpToJulianDay(_saveJD);
       forceSceneUpdate('light');
     }
+    console.log('  ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────');
+    console.log('');
+    console.log('  How to interpret:');
+    console.log('   • β_meeus = framework\'s Meeus Ch. 47 polynomial value at conjunction');
+    console.log('   • β_needed = what β would have to be for umbra centerline to be at Babylon\'s lat');
+    console.log('     (assumes sub-solar at correct lon; only tests lat offset)');
+    console.log('   • β_diff = β_meeus - β_needed; positive means Meeus β puts umbra NORTH of Babylon');
+    console.log('   ');
+    console.log('   • If β_diff varies smoothly with epoch → Meeus polynomial residual at deep time');
+    console.log('     (doc 66\'s estimate of ~30 arcsec at -135 may be optimistic; could be 0.1-0.2°)');
+    console.log('   • If β_diff is ~0 at events that matched (-584, -309) but ~0.1° at -135 → -135 is');
+    console.log('     genuinely a specific bad-luck event for the polynomial');
+    console.log('   • If β_diff is ~0.1° at multiple Hellenistic events → systematic polynomial');
+    console.log('     residual in this era; framework would need a refined Moon polynomial');
+    console.log('     OR Stephenson\'s empirical fit IS absorbing this residual into ΔT');
+    console.log('     (= our project\'s "Munk-MacDonald vs GIA" question revisited)');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Sweep test: computes Meeus standalone Moon β at 8 Babylonian-era events ' +
+     '(-762 to -135 BCE). Reports the β needed for umbra at Babylon vs the β Meeus ' +
+     'gives. Reveals whether the -135 anomaly is isolated or part of a systematic ' +
+     'Meeus polynomial residual pattern in the Hellenistic era.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // α(t) GIA coefficient tuning sweep at -135 Babylonian
+  //
+  // Tests scale factors on EARTH_MOI_FACTOR_RATE_YR within Peltier ICE-5G vs
+  // ICE-6G literature uncertainty bounds (~20-30%). For each scale factor:
+  //  1. Recomputes α(t) at -135 with scaled rate
+  //  2. Integrates ΔT(-135) with the modified α(t)
+  //  3. Predicts Meeus-standalone umbra position with the modified ΔT
+  //  4. Reports distance to Babylon
+  //
+  // Reveals: how much of the 1159 km gap is closable by α(t) tuning alone
+  // (= the bound set by GIA literature uncertainty) vs what residual remains
+  // (= Moon polynomial residual that ELP-2000/82 would have to address).
+  //
+  // NASA Five Millennium Canon (Espenak) uses ΔT = 11,969s at -135.
+  // Stephenson 2016 empirical fit uses ΔT ≈ 12,200s.
+  // Framework's pure-tidal + α(t) ICE-5G gives ΔT = 12,638s.
+  //
+  // Reference: NASA's path-through-Babylon at ΔT = 11,969s; we're +669s over.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('α(t) GIA tuning sweep at -135 Babylonian', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  α(t) GIA tuning sweep at -135 — how much of the 1159 km Babylon gap is closable?');
+    console.log('  Tests scaled EARTH_MOI_FACTOR_RATE_YR within Peltier ICE-5G vs ICE-6G uncertainty');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    const _d2r = Math.PI / 180;
+    const _r2d = 180 / Math.PI;
+    const R_E_km = diameters.earthDiameter / 2;
+    const babylon_lat = 32.50;
+    const babylon_lon = 44.40;
+
+    const jd_UT = 1671853.76;  // -135 Apr 15 06:14 UT (preset value in ECLIPSE_PRESETS)
+    const decYear = julianDateToDecimalYear(jd_UT);
+    const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
+
+    // ── Parametrized α(t) chain ──
+    function _alphaScaled(t_age_yr, scale) {
+      const rate = EARTH_MOI_FACTOR_RATE_YR * scale;
+      if (t_age_yr >= 0) {
+        let alpha_excess = 0;
+        for (let i = 0; i < GIA_MODES.length; i++) {
+          const amp = -rate * GIA_MODES[i].frac * GIA_MODES[i].tau;
+          alpha_excess += amp * (1 - Math.exp(-t_age_yr / GIA_MODES[i].tau));
+        }
+        return EARTH_MOI_FACTOR + alpha_excess;
+      }
+      return EARTH_MOI_FACTOR - rate * t_age_yr;
+    }
+    function _iEarthScaled(t_Ma, scale) {
+      return _alphaScaled(t_Ma * 1e6, scale) * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
+    }
+    function _lodScaled(t_Ma, scale) {
+      const a = meanMoonDistanceMetresAtAge(t_Ma);
+      if (a <= 0 || a >= A_LOCK_M) return null;
+      return (2 * Math.PI * _iEarthScaled(t_Ma, scale)) /
+             (L_TOTAL_EM_KGM2_S - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
+    }
+    function _hScaled(t_Ma, scale) {
+      const lod = _lodScaled(t_Ma, scale);
+      return lod === null ? null : HOLISTIC_YEAR_J2000 * lod / LOD_NOW_H13_S;
+    }
+    function _tropYearScaled(t_Ma, scale) {
+      const sidSec = meanSiderealYearSecondsAtAge(t_Ma);
+      const Ht = _hScaled(t_Ma, scale);
+      return Ht === null ? sidSec * (1 - 13 / HOLISTIC_YEAR_J2000) : sidSec * (1 - 13 / Ht);
+    }
+    function _deltaTScaled(t_Ma, scale) {
+      if (t_Ma === 0) return 0;
+      const absSpan = Math.abs(t_Ma);
+      let n = Math.max(32, Math.ceil(absSpan * 10));
+      if (n > 1024) n = 1024;
+      if (n % 2 === 1) n++;
+      const h = t_Ma / n;
+      let sum = 0;
+      for (let i = 0; i <= n; i++) {
+        const tau = i * h;
+        const lod = _lodScaled(tau, scale);
+        if (lod === null) return NaN;
+        const yearS = _tropYearScaled(tau, scale);
+        const integrand = (86400 - lod) * yearS * 1e6 / 86400;
+        const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
+        sum += w * integrand;
+      }
+      return (sum * h) / 3;
+    }
+
+    // Predict umbra at preset JD with a given ΔT (uses Meeus + simple
+    // β × (d_M / R_E) leverage; matches Step 3 of root-cause diagnostic)
+    function _predictUmbra(jd_UT, deltaT_sec) {
+      const framework_dT = _eclDeltaT(jd_UT);
+      const synthetic_jd = jd_UT + (deltaT_sec - framework_dT) / 86400;
+      const sunLon = _eclSunLon(synthetic_jd);
+      const moonBeta = _eclMoonBeta(synthetic_jd);
+      const moonDist = _eclMoonDistance(synthetic_jd);
+      const T = (synthetic_jd + framework_dT/86400 - j2000JD) / 36525;
+      const eps = (23.4392911 - 0.0130042 * T) * _d2r;
+      const sunDec = Math.asin(Math.sin(eps) * Math.sin(sunLon * _d2r)) * _r2d;
+      let sunRA = Math.atan2(Math.cos(eps) * Math.sin(sunLon * _d2r),
+                             Math.cos(sunLon * _d2r)) * _r2d;
+      if (sunRA < 0) sunRA += 360;
+      const T_UT = (jd_UT - j2000JD) / 36525;
+      let gmst = (280.46061837 + 360.98564736629 * (jd_UT - j2000JD)
+                + 0.000387933 * T_UT * T_UT) % 360;
+      if (gmst < 0) gmst += 360;
+      let ssLon = sunRA - gmst;
+      while (ssLon > 180)  ssLon -= 360;
+      while (ssLon < -180) ssLon += 360;
+      const umbra_lat = sunDec + moonBeta * (moonDist / R_E_km);
+      const umbra_lon = ssLon;
+      return { lat: umbra_lat, lon: umbra_lon, beta: moonBeta, sunDec, moonDist };
+    }
+
+    function _haversineKm(lat1, lon1, lat2, lon2) {
+      const dlat = (lat2 - lat1) * _d2r;
+      const dlon = (lon2 - lon1) * _d2r;
+      const a = Math.sin(dlat/2)**2 + Math.cos(lat1*_d2r) * Math.cos(lat2*_d2r) * Math.sin(dlon/2)**2;
+      return 2 * R_E_km * Math.asin(Math.sqrt(a));
+    }
+
+    const factors = [
+      { name: '0.50× (extreme low — exceeds ICE uncertainty)', scale: 0.50 },
+      { name: '0.70× (aggressive low)',                       scale: 0.70 },
+      { name: '0.80× (ICE-6G-like)',                          scale: 0.80 },
+      { name: '0.85× (literature low end)',                   scale: 0.85 },
+      { name: '0.90× (moderate reduction)',                   scale: 0.90 },
+      { name: '0.95× (modest reduction)',                     scale: 0.95 },
+      { name: '1.00× (Peltier ICE-5G default — current)',     scale: 1.00 },
+      { name: '1.10× (literature high end)',                  scale: 1.10 },
+    ];
+
+    console.log(`  At -135-04-15 (t_Ma = ${t_Ma.toFixed(6)}, ${(decYear).toFixed(0)} CE):`);
+    console.log('');
+    console.log('   scale     ΔT(s)    ΔT vs frame   ΔT vs NASA   umbra@preset    Babylon gap    notes');
+    console.log('  ─────────────────────────────────────────────────────────────────────────────────────────────');
+
+    const frameworkDT = 12638;
+    const nasaDT = 11969;
+
+    let bestScale = 1.00, bestGap = Infinity;
+    for (const f of factors) {
+      const dT = _deltaTScaled(t_Ma, f.scale);
+      const u = _predictUmbra(jd_UT, dT);
+      const dist = _haversineKm(babylon_lat, babylon_lon, u.lat, u.lon);
+      if (dist < bestGap) { bestGap = dist; bestScale = f.scale; }
+      const dTvsFrame = dT - frameworkDT;
+      const dTvsNasa  = dT - nasaDT;
+      const scaleStr  = f.scale.toFixed(2).padStart(5);
+      const dTstr     = dT.toFixed(0).padStart(6);
+      const dvF       = (dTvsFrame >= 0 ? '+' : '') + dTvsFrame.toFixed(0);
+      const dvN       = (dTvsNasa  >= 0 ? '+' : '') + dTvsNasa.toFixed(0);
+      const latStr    = u.lat.toFixed(1).padStart(5);
+      const lonStr    = u.lon.toFixed(1).padStart(5);
+      const distStr   = dist.toFixed(0).padStart(5);
+      console.log(`   ${scaleStr}×  ${dTstr}s   ${dvF.padStart(7)}s    ${dvN.padStart(7)}s   (${latStr}°N, ${lonStr}°E)   ${distStr} km   ${f.name}`);
+    }
+
+    // Reference targets
+    console.log('  ─────────────────────────────────────────────────────────────────────────────────────────────');
+    const u_nasa  = _predictUmbra(jd_UT, nasaDT);
+    const d_nasa  = _haversineKm(babylon_lat, babylon_lon, u_nasa.lat, u_nasa.lon);
+    const u_steph = _predictUmbra(jd_UT, 12200);
+    const d_steph = _haversineKm(babylon_lat, babylon_lon, u_steph.lat, u_steph.lon);
+    console.log(`   [REF]    ${nasaDT}s     -669s          0s    (${u_nasa.lat.toFixed(1)}°N, ${u_nasa.lon.toFixed(1)}°E)   ${d_nasa.toFixed(0).padStart(5)} km   NASA Five Millennium Canon (ΔT_target)`);
+    console.log(`   [REF]    12200s     -438s       +231s    (${u_steph.lat.toFixed(1)}°N, ${u_steph.lon.toFixed(1)}°E)   ${d_steph.toFixed(0).padStart(5)} km   Stephenson 2016 empirical fit`);
 
     console.log('');
-    console.log('  Year   Label                Strategy A ON     Strategy A OFF     Δ        Better?');
-    console.log('  ───────────────────────────────────────────────────────────────────────────────────');
-    let total_on  = 0;
-    let total_off = 0;
-    let n_off_better = 0;
-    let n_on_better  = 0;
-    for (let i = 0; i < EVENTS.length; i++) {
-      const on  = results_ON[i].dist;
-      const off = results_OFF[i].dist;
-      if (on === null || off === null) continue;
-      total_on  += on;
-      total_off += off;
-      const delta = off - on;
-      const better = delta < -10 ? 'OFF' : delta > 10 ? 'ON' : '≈';
-      if (delta < -10) n_off_better++;
-      else if (delta > 10) n_on_better++;
-      const yearStr = String(EVENTS[i].Y).padStart(5);
-      const labStr  = EVENTS[i].label.padEnd(20);
-      const onStr   = Math.round(on).toString().padStart(7) + ' km';
-      const offStr  = Math.round(off).toString().padStart(7) + ' km';
-      const dStr    = (delta >= 0 ? '+' : '') + Math.round(delta).toString().padStart(6) + ' km';
-      console.log(`  ${yearStr}  ${labStr} ${onStr}         ${offStr}    ${dStr}    ${better}`);
-    }
-    console.log('  ───────────────────────────────────────────────────────────────────────────────────');
-    console.log(`  Totals:            ${Math.round(total_on).toString().padStart(7)} km        ${Math.round(total_off).toString().padStart(7)} km    Δ ${Math.round(total_off - total_on)} km`);
+    console.log(`  Best result: scale ${bestScale.toFixed(2)}× → ${bestGap.toFixed(0)} km gap to Babylon`);
     console.log('');
-    console.log(`  ${n_off_better} events improved with Strategy A OFF`);
-    console.log(`  ${n_on_better}  events better with Strategy A ON`);
-    console.log(`  ${EVENTS.length - n_off_better - n_on_better} events essentially unchanged (Δ ≤ 10 km)`);
+    console.log('  Interpretation:');
+    console.log('   • α(t) tuning + 1.00× current → 1159 km baseline (framework default)');
+    console.log('   • α(t) tuning within ICE-5G/ICE-6G uncertainty (0.80–1.10×) → closes this much');
+    console.log('   • Residual gap at best α(t) scale = Moon polynomial residual (β/Lp at -135)');
+    console.log('     This is what ELP-2000/82 or a refined Meeus polynomial would have to address');
     console.log('');
-    console.log('  Verdict:');
-    if (total_off < total_on * 0.5) {
-      console.log('  → Strategy A OFF reduces total deep-time offset by >50%. Strongly suggests the');
-      console.log('    framework should run with Strategy A disabled for historical eclipse accuracy.');
-    } else if (total_off < total_on * 0.9) {
-      console.log('  → Strategy A OFF reduces total deep-time offset by 10-50%. Mixed signal — the');
-      console.log('    medieval regressions may or may not be acceptable depending on use case.');
-    } else {
-      console.log('  → Strategy A ON and OFF give comparable totals. The improvement is event-specific.');
-    }
-    console.log('');
-    console.log('  Note: doc 101\'s 19/19 penumbra criterion uses Meeus subSolar in the test buttons,');
-    console.log('  independent of Strategy A. Either toggle setting passes doc 101 validation.');
+    console.log('  Caveat: simplified umbra position (sub-solar + β × d_M/R_E leverage).');
+    console.log('  Framework\'s real ray-trace via umbraFromSceneAtJd gives a slightly different');
+    console.log('  number (audit shows 1159 km BestGap), but the qualitative scaling is correct.');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
-  }, 'Automated A/B sweep: measures umbra-centerline distance at 11 historical ' +
-     'events twice (with Strategy A ON, then OFF). Per-event comparison + total ' +
-     'and verdict. Restores original Strategy A state when done.');
+  }, 'Sweeps α(t) GIA rate scale factors (0.5×–1.1×) at -135-04-15 to quantify ' +
+     'how much of the ~1159 km Babylon gap is closable by α(t) tuning within ' +
+     'Peltier ICE-5G/ICE-6G literature uncertainty. The residual gap at best ' +
+     'scale = Moon polynomial residual (ELP-2000/82 territory).');
 
   addTestButton('Meeus vs Integrator (Option A verify)', () => {
     // Phase 9.14 Option A step 1: compare Meeus Ch. 47 perturbation arguments
@@ -28119,6 +28447,14 @@ function setupGUI() {
       { jd: 2299160.5,          label: '1582 Oct 15 (Gregorian reform)' },
       { jd: 2086302.5,          label: '1000 CE (medieval)' },
       { jd: 1721425.5,          label: '1 CE Jan 1 (start of CE)' },
+      // Hellenistic-era epochs added 2026-06-24 for -135 anomaly investigation.
+      // The -135 Babylonian event is the single historical eclipse where the
+      // framework's pure-tidal physics doesn't match the diary's gold-standard
+      // attribution; this diagnostic should reveal whether Moon arguments
+      // (Lp, D, M, M', F) have a specific drift around this epoch.
+      { jd: 1683636.5,          label: '-103 Jul 19 (Hellenistic neighbour)' },
+      { jd: 1671853.759762,     label: '-135 Apr 15 Babylonian (★ ANOMALY)' },
+      { jd: 1657295.5,          label: '-175 Jun 06 (Hipparchus area)' },
       { jd: 1507900.5,          label: 'Thales eclipse area (-584 May 28)' },
     ];
     console.log('\n══════════════════════════════════════════════════════════════════════');
@@ -33741,7 +34077,7 @@ function setupGUI() {
   addTestButton('Audit Planet Scene-Graph Composition', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Phase P-E composition audit — per-planet scene-graph chain tagging status');
-    console.log('  docs/hidden/IP-planet-deep-time-scene-graph.md');
+    console.log('  docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md');
     console.log('══════════════════════════════════════════════════════════════════════════════════\n');
 
     let passCount = 0, failCount = 0;
@@ -50881,7 +51217,7 @@ function moveModel(pos) {
     // branch (introduced in P-B0+). The existing _dtCycleN + _dtMoonIntegrator
     // dispatch sites below CONTINUE to use _currentYearSI (UT) — applying TT
     // shift to them would regress 6/19 historical eclipses (doc 101's 19/19
-    // result). See docs/hidden/IP-planet-deep-time-scene-graph.md "Future
+    // result). See docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md "Future
     // Phase Z" for the asymmetry rationale. The model's convention
     // meanDeltaTSecondsAtAge(0)=0 means anchor identity holds at J2000 with
     // no separate TT anchor — _currentYearSI_TT === STARTMODEL_YEAR_SI at
@@ -50923,7 +51259,7 @@ function moveModel(pos) {
       // 19/19 historical eclipse validation, which depends on the
       // co-evolved (Moon integrator + pure-tidal ΔT formula + visibility
       // test methodology) UT calibration. See "Future Phase Z" in
-      // docs/hidden/IP-planet-deep-time-scene-graph.md.
+      // docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md.
       //
       // No object has _dtPlanetIntegrator tagged yet — this branch is
       // dead code until Phase P-B1 starts wiring per-planet tags.

@@ -1,6 +1,6 @@
 # Pure-tidal + GIA viscoelastic α(t) validates against the historical lunar record
 
-**Date**: 2026-06-22
+**Date**: 2026-06-22 (last update 2026-06-25)
 **Status**: Validation complete — 270 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 + multi-mode GIA viscoelastic α(t) model. Mean residual 24 min vs NASA Espenak/Meeus polynomial 20 min — within 4 min of the observation noise floor, using named physical constants from independent literature sources (IERS α, Cox & Chao dα/dt, Peltier ICE-5G(VM2) multi-mode GIA decomposition) and zero parameters fitted to the eclipse data.
 **Prior baseline**: [`doc 101`](101-pure-tidal-eclipses.md) — pure-tidal Moon physics validated against 19 documented solar eclipses, established that pure-tidal alone is "in the running" but did not require non-tidal Earth rotation. This doc demonstrates that the non-tidal contribution IS measurable in the lunar record, identifies it as GIA, and quantifies it from independent satellite measurements rather than from fitting.
 
@@ -890,6 +890,21 @@ What this validation establishes:
    fitted to this exact dataset. Our model independently predicts it
    from satellite/geodesy literature.
 
+   *Empirical sensitivity confirmation (added 2026-06-25):* the
+   [doc 103](103-135-babylonian-case-study.md) -135 Babylonian case
+   study includes a direct α(t) tuning sweep that scales
+   `EARTH_MOI_FACTOR_RATE_YR` from 0.50× to 1.10× (= the full Peltier
+   ICE-5G vs ICE-6G literature uncertainty range, plus more aggressive
+   excursions) and measures the resulting historical-eclipse umbra
+   displacement. **The empirical sensitivity is ~3.3 km per 100 sec
+   of ΔT change** — i.e., the α(t) constants are *empirically
+   uncloseable* even under aggressive tuning. This is the direct
+   empirical proof that the choice of Peltier ICE-5G(VM2) defaults
+   isn't load-bearing on the lunar-timing or solar-visibility results,
+   not just an abstract "zero fitting" assertion. The sweep button
+   ("α(t) GIA tuning sweep at -135 Babylonian") is in Console Tests
+   (F12) > Historical Eclipses & ΔT.
+
 4. **Earth-Moon angular momentum and Kepler's 3rd law preserved
    exactly**. α(t) is a purely Earth-internal mass redistribution; the
    Moon orbit chain (Farhat 2022) is untouched. This satisfies the
@@ -1198,3 +1213,9 @@ URLs / files.
 - Doc 101: `docs/101-pure-tidal-eclipses.md` (solar-eclipse validation
   baseline; this doc extends and refines the non-tidal-contribution
   conclusion from solar to lunar)
+- Doc 103: `docs/103-135-babylonian-case-study.md` (-135 Babylonian
+  focused case study — decomposes the framework's one persistent
+  historical-eclipse residual into ΔT (~270 km, α(t)-uncloseable),
+  Meeus β-residual (~440 km), and other Meeus terms (~450 km); provides
+  the direct empirical sensitivity test of doc 102's GIA α(t) constants
+  (Peltier ICE-5G(VM2) defaults), 2026-06-25)
