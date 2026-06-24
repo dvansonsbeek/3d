@@ -28859,6 +28859,484 @@ function setupGUI() {
      'reveals where the framework\'s deep-time Moon-precession / ΔT predictions diverge from ' +
      'the pure-tidal baseline.');
 
+  // ────────────────────────────────────────────────────────────────────────
+  // Divergence trend by epoch — does framework diverge gradually or abruptly?
+  //
+  // Curated list of well-documented eclipses spanning -762 to 1860, anchored
+  // by 19th-century photographic-era events that can't be mis-attributed
+  // (Spain 1860, Sweden 1851, Pavia 1842, plus Halley 1715). For each event:
+  // navigate the scene to the documented JD, read framework's umbra / sub-
+  // solar, compute great-circle distance to documented site. Output is the
+  // trend of distance vs epoch — answers two questions:
+  //
+  //   1. R² of linear fit (dist ~ slope·(2000 − year)):
+  //        high R² (> 0.7) → MONOTONIC divergence → ΔT-issue signature
+  //                          (Earth-rotation prediction drifts smoothly
+  //                          with age — the kind of thing a wrong ΔT does)
+  //        low  R² (< 0.3) → SCATTERED divergence → chronology-issue
+  //                          signature (some events miss badly, others fit
+  //                          perfectly at the same epoch — looks like
+  //                          per-event mis-attribution, not bulk drift)
+  //
+  //   2. Per-millennium mean distance + std-dev:
+  //        large std-dev within a millennium → event-specific, supports
+  //          chronology hypothesis (re-date individual outliers)
+  //        small std-dev + monotonic increase → bulk ΔT signal, supports
+  //          "framework's pure-tidal ΔT is right, conventional ΔT is wrong"
+  //
+  // Designed to discriminate between "framework is wrong" vs "conventional
+  // eclipse attributions are wrong" — see the discussion that motivated
+  // this button (post-audit interpretation, June 2026).
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Divergence trend by epoch (framework vs documented)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Divergence trend by epoch — does framework diverge gradually or abruptly?');
+    console.log('  Tests: ΔT-issue (monotonic with age) vs Chronology-issue (scattered, event-specific)');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    // Curated list of well-documented eclipses where the observation site
+    // is on the central (umbra/antumbra) path — so framework umbra-to-site
+    // distance directly measures prediction error. Partials and off-path
+    // events are excluded: a partial-at-site has umbra naturally thousands
+    // of km away by construction, which would inject noise into the trend.
+    //
+    // All entries cross-checked against NASA Five Millennium Canon (Espenak
+    // & Meeus 2006), Stephenson 1997 "Historical Eclipses and Earth's
+    // Rotation", and (for -708) Hayakawa et al. 2025 ApJL Qufu reanalysis.
+    //
+    // Format: [year, month, day, lat, lon, type, name]
+    const EVENTS = [
+      // ─── 19th c. scientific-observation era (4 anchors) ───
+      [1860,  7, 18, 42.70,  -3.00, 'Total',   'Great Eclipse 1860 (Rivabellosa, Spain — De La Rue/Kew expedition)'],
+      [1851,  7, 28, 54.70,  20.50, 'Total',   '1851 Total (Königsberg — Berkowski first eclipse photograph)'],
+      [1842,  7,  8, 48.21,  16.37, 'Total',   '1842 Total (Vienna — Littrow observation, central path)'],
+      [1715,  5,  3, 51.50,  -0.13, 'Total',   "Halley's eclipse 1715 (London — predicted path map)"],
+      // ─── Late-medieval ───
+      [1239,  6,  3, 43.70,  10.40, 'Total',   "1239 Total (Tuscany — Ristoro d'Arezzo, Italian chronicle)"],
+      [1133,  8,  2, 52.00,  -2.00, 'Total',   '1133 Total (England — eclipse of Henry I era chronicle)'],
+      // ─── Hellenistic / classical (off-path partials 1004 Cairo, 71 Aegean,
+      //                              -430 Athens dropped — see header note) ───
+      [-135,  4, 15, 32.50,  44.40, 'Total',   '-135 Babylonian (best-preserved diary, central path, ΔT gold-standard)'],
+      // -309 Agathocles eclipse — Diodorus 20.5.5 observed at sea off Sicily
+      // during Agathocles' voyage to Africa. Coords relocated from the prior
+      // Babylonian attribution (no LBAT/ADART cuneiform record exists).
+      [-309,  8, 15, 37.00,  14.00, 'Total',   '-309 Agathocles eclipse (off Sicily — Diodorus 20.5.5, central path)'],
+      // ─── Ancient (-584 Thales kept but contested per literature) ───
+      [-584,  5, 28, 39.00,  35.00, 'Total',   '-584 Thales (Herodotus 1.74, Anatolia — CONTESTED attribution)'],
+      // -708 coords updated to Qufu palace (Lu State capital) per Hayakawa
+      // et al. 2025 ApJL — 35.60°N, 116.98°E confirmed inside totality band.
+      [-708,  7, 17, 35.60, 116.98, 'Total',   '-708 Chinese Spring/Autumn (Qufu — Hayakawa 2025 ApJL anchor)'],
+      [-762,  6, 15, 36.36,  43.16, 'Total',   '-762 Bur-Sagale (Nineveh — Assyrian Eponym Canon, ΔT anchor)'],
+      // Omitted from trend (still in 25-event audit / Validation buttons):
+      //   1654 Aug 12 London   — path crossed N Europe / Scotland, not London
+      //   1185 May  1 Russia   — annular path far east; Igor saw partial
+      //   1004 Jan 24 Cairo    — NASA Hybrid; Cairo saw deep PARTIAL
+      //   71   Mar 20 Aegean   — NASA Hybrid; Aegean ~4° north of central line
+      //   -430 Aug  3 Athens   — Annular globally, but antumbra never reached
+      //                          Athens; deep partial ~0.85 mag at site
+      //   -647 Apr  6 Babylon  — Partial at site by Babylonian record
+      //   -556 May 19 Babylon  — Partial at site by Babylonian record
+    ];
+
+    function julianDateToJD(Y, M, D, hour = 12) {
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
+           + D - 1524.5 + hour / 24;
+    }
+
+    // ─── Per-event min-distance scan ±3h around greatest (Stephenson method) ───
+    // Greatest eclipse is one instant; the observer was in the umbra at a
+    // possibly different instant. Sweep ±3h at 5-min steps and report the
+    // CLOSEST approach of the framework's umbra to the observation site —
+    // that's the meaningful test of "did the framework's shadow path pass
+    // near where the observer actually was?" This matches Stephenson 1997's
+    // path-coincidence method.
+    //
+    // Cost: ~72 scene-graph navigations per event × ~11 events ≈ 800 calls.
+    // Slow (~30-60s) but the only meaningful measurement.
+    console.log('  Scanning ±3h at 5-min steps around each conjunction — this takes ~30-60 seconds...');
+    const stepDays   = 5 / 60 / 24;        // 5 min in days
+    const halfWindow = 3 / 24;             // ±3 hours
+    const results = [];
+    const _saveJD = o.julianDay;
+    try {
+      for (const [Y, M, D, lat_obs, lon_obs, type, name] of EVENTS) {
+        const jd_nominal = julianDateToJD(Y, M, D);
+        const events = findSolarEclipsesInRange(jd_nominal - 15, jd_nominal + 15);
+        if (events.length === 0) {
+          results.push({ year: Y, type, dist: null, kind: '—', name });
+          continue;
+        }
+        let evt = events[0];
+        let bestΔ = Math.abs(events[0].jd - jd_nominal);
+        for (const e of events) {
+          const δ = Math.abs(e.jd - jd_nominal);
+          if (δ < bestΔ) { bestΔ = δ; evt = e; }
+        }
+
+        const isCentral = (evt.type === 'Total' || evt.type === 'Annular' || evt.type === 'Hybrid');
+        let minDist = Infinity, minPoint = null, minKind = '', minOffsetMin = 0;
+        for (let dt = -halfWindow; dt <= halfWindow + 1e-9; dt += stepDays) {
+          const jd = evt.jd + dt;
+          let point = null, kind = '';
+          if (isCentral) { point = umbraFromSceneAtJd(jd); kind = 'umbra'; }
+          if (point === null) { point = subSolarFromSceneAtJd(jd); kind = 'sub-solar'; }
+          const dist = gcKmFromLatLon(lat_obs, lon_obs, point.lat, point.lon);
+          if (dist < minDist) {
+            minDist = dist;
+            minPoint = point;
+            minKind = kind;
+            minOffsetMin = Math.round(dt * 24 * 60);
+          }
+        }
+        results.push({
+          year: Y, type, dist: minDist, kind: minKind, name,
+          point: minPoint, offsetMin: minOffsetMin, jd: evt.jd,
+        });
+      }
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
+    }
+
+    // Sort chronologically (modern → ancient)
+    results.sort((a, b) => b.year - a.year);
+
+    // ─── Per-event table ───
+    console.log('  Year     Type      MinDist(km)   Δt(min)   Kind       Event');
+    console.log('  ─────────────────────────────────────────────────────────────────────────────────────');
+    for (const r of results) {
+      const yearStr = `${r.year}`.padStart(5);
+      const distStr = r.dist === null ? '    —    ' : Math.round(r.dist).toString().padStart(7);
+      const offStr  = r.dist === null ? '   —    ' : ((r.offsetMin >= 0 ? '+' : '') + r.offsetMin).padStart(7);
+      console.log(`  ${yearStr}   ${r.type.padEnd(9)}  ${distStr}    ${offStr}   ${r.kind.padEnd(9)}  ${r.name}`);
+    }
+
+    // ─── Per-millennium bucket analysis ───
+    const buckets = [
+      { name: '1500 – 2000 CE',   lo: 1500,  hi: 2000  },
+      { name: '1000 – 1500 CE',   lo: 1000,  hi: 1500  },
+      { name: '   0 – 1000 CE',   lo: 0,     hi: 1000  },
+      { name: '-500 –    0 BCE',  lo: -500,  hi: 0     },
+      { name: '-1000 – -500 BCE', lo: -1000, hi: -500  },
+    ];
+    console.log('  ─────────────────────────────────────────────────────────────────────────────────');
+    console.log('  Epoch bucket          n   mean dist (km)   std-dev (km)   range (km)');
+    console.log('  ─────────────────────────────────────────────────────────────────────────────────');
+    for (const b of buckets) {
+      const inBucket = results.filter(r => r.dist !== null && r.year > b.lo && r.year <= b.hi);
+      if (inBucket.length === 0) continue;
+      const ds = inBucket.map(r => r.dist);
+      const mean = ds.reduce((a, b) => a + b, 0) / ds.length;
+      const variance = ds.reduce((a, b) => a + (b - mean) ** 2, 0) / ds.length;
+      const std = Math.sqrt(variance);
+      const dmin = Math.min(...ds), dmax = Math.max(...ds);
+      console.log(
+        `  ${b.name.padEnd(20)} ${ds.length.toString().padStart(2)}   ${Math.round(mean).toString().padStart(8)}        ${Math.round(std).toString().padStart(7)}      ${Math.round(dmin)}-${Math.round(dmax)}`
+      );
+    }
+
+    // ─── Linear fit: dist = a + b·(2000 - year) ───
+    const valid = results.filter(r => r.dist !== null);
+    const xs = valid.map(r => 2000 - r.year);
+    const ys = valid.map(r => r.dist);
+    const n  = xs.length;
+    const meanX = xs.reduce((a, b) => a + b, 0) / n;
+    const meanY = ys.reduce((a, b) => a + b, 0) / n;
+    let Sxy = 0, Sxx = 0, Syy = 0;
+    for (let i = 0; i < n; i++) {
+      const dx = xs[i] - meanX, dy = ys[i] - meanY;
+      Sxy += dx * dy; Sxx += dx * dx; Syy += dy * dy;
+    }
+    const slope = Sxy / Sxx;
+    const intercept = meanY - slope * meanX;
+    const ssRes = ys.reduce((a, _, i) => a + (ys[i] - (intercept + slope * xs[i])) ** 2, 0);
+    const ssTot = Syy;
+    const r2 = 1 - ssRes / ssTot;
+
+    console.log('  ─────────────────────────────────────────────────────────────────────────────────');
+    console.log(`  Linear fit  dist = ${intercept.toFixed(0)} + ${slope.toFixed(2)}·(2000 − year)`);
+    console.log(`              slope = ${slope.toFixed(2)} km/yr   intercept = ${Math.round(intercept)} km   R² = ${r2.toFixed(3)}`);
+    console.log('  ─────────────────────────────────────────────────────────────────────────────────');
+
+    // ─── Within-bucket outlier scan (>2σ from same-bucket mean) ───
+    const outliers = [];
+    for (const b of buckets) {
+      const inBucket = valid.filter(r => r.year > b.lo && r.year <= b.hi);
+      if (inBucket.length < 3) continue;
+      const ds = inBucket.map(r => r.dist);
+      const mean = ds.reduce((a, b) => a + b, 0) / ds.length;
+      const std  = Math.sqrt(ds.reduce((a, b) => a + (b - mean) ** 2, 0) / ds.length);
+      for (const r of inBucket) {
+        if (Math.abs(r.dist - mean) > 2 * std) outliers.push({ ...r, bucket: b.name, mean, std });
+      }
+    }
+    if (outliers.length > 0) {
+      console.log('  Outliers (> 2σ from same-bucket mean — candidates for chronological re-dating):');
+      for (const o of outliers) {
+        console.log(`    ${o.year}  dist ${Math.round(o.dist)} km vs bucket mean ${Math.round(o.mean)} km — ${o.name}`);
+      }
+      console.log('  ─────────────────────────────────────────────────────────────────────────────────');
+    }
+
+    // ─── Verdict ───
+    console.log('');
+    console.log('  Verdict:');
+    if (r2 > 0.7) {
+      console.log(`    R² = ${r2.toFixed(3)} > 0.7 → MONOTONIC divergence.`);
+      console.log('    Signal is consistent with a ΔT-theory issue: framework\'s Earth-rotation');
+      console.log('    prediction drifts smoothly with age relative to conventional ΔT. The');
+      console.log('    bulk pattern argues for "framework\'s pure-tidal ΔT differs systematically');
+      console.log('    from conventional fitted ΔT" — i.e., conventional ΔT may itself be the');
+      console.log('    biased model. Either reading (framework wrong, or conventional wrong)');
+      console.log('    fits a smooth-divergence pattern; cannot distinguish from this test alone.');
+    } else if (r2 < 0.3) {
+      console.log(`    R² = ${r2.toFixed(3)} < 0.3 → SCATTERED divergence.`);
+      console.log('    Signal is consistent with a chronology issue: distance is event-specific');
+      console.log('    rather than smoothly age-dependent. Some events fit perfectly while');
+      console.log('    same-epoch neighbours miss badly → strongly suggests per-event mis-');
+      console.log('    attribution in the historical record (calendar conversion errors,');
+      console.log('    regnal-year ambiguity, wrong eclipse picked for a chronicle entry).');
+      console.log('    Outliers listed above are the prime candidates for chronological re-dating.');
+    } else {
+      console.log(`    R² = ${r2.toFixed(3)} ∈ [0.3, 0.7] → MIXED signal.`);
+      console.log('    Both a partial ΔT drift AND event-specific mis-attribution are likely');
+      console.log('    contributors. The bulk trend reveals systematic drift; outliers (listed');
+      console.log('    above) reveal individual mis-datings on top of the trend.');
+      console.log('    This is the most realistic scenario for the historical eclipse corpus:');
+      console.log('    conventional ΔT is partially circular (fit to partly mis-dated eclipses),');
+      console.log('    AND some events are demonstrably attributed to the wrong eclipse.');
+    }
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Trend analysis: framework vs documented distance across ' +
+     '~18 well-dated eclipses spanning -762 to 1860, anchored by 19th-century ' +
+     'photographic-era events that cannot be mis-attributed. Reports per-event ' +
+     'distance, per-millennium bucket statistics, linear fit + R², and outlier ' +
+     'flags. Discriminates between "framework\'s ΔT is wrong" (monotonic ' +
+     'divergence with age, high R²) and "conventional eclipse attributions are ' +
+     'wrong" (scattered, event-specific, low R²). Designed to answer the post-' +
+     'audit interpretation question: is the model wrong, or is the history wrong?');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Chronology candidates — framework-best alternative dates for the
+  // deep-time outliers from the Divergence trend.
+  //
+  // For each deep-time event that misfit in the trend test, scan ±15 years
+  // around the documented date and find every eclipse-class conjunction
+  // whose framework umbra comes within 1500 km of the documented observation
+  // site (using the same ±3h min-distance method as the trend button).
+  //
+  // A two-stage filter keeps runtime reasonable: cheap first-pass at the
+  // conjunction moment rejects obviously-off candidates; the expensive ±3h
+  // scan only runs for candidates within 3000 km at conjunction. Reports
+  // each outlier's BEST alternative date — these are the chronology
+  // proposals our framework's pure-tidal physics points to.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Chronology candidates: framework alternatives for deep-time outliers', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Framework-best alternative dates for deep-time outliers');
+    console.log('  Filters: Total/Annular/Hybrid only · |β|≤0.7° (excludes grazing) · umbra-on-Earth');
+    console.log('  Method: ±N yr window per event, two-stage filter (cheap conjunction → full ±5h scan)');
+    console.log('  Reports all candidates with min umbra→site distance ≤ 1500 km, graded by class:');
+    console.log('    ★ TOTAL    (≤  200 km)  — umbra centerline through site, matches precise totality records');
+    console.log('    ◐ near-T   (≤  500 km)  — near-totality at site, matches central-path records');
+    console.log('    ○ partial  (≤ 1500 km)  — deep partial at site, matches vague records ("battle darkened" etc.)');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    // Outliers from the Divergence trend: events where framework's umbra
+    // misses the documented site by > 1500 km at the documented date.
+    // Each entry can override the default window (windowYr).
+    //
+    // Hellenistic-Babylonian probe: -189 / -132 / -107 / -88 added to test
+    // whether the framework's ~2500 km offset at -135 is systematic across
+    // the era (suggesting a real framework prediction issue at -200 to -50
+    // BCE) or isolated to the single -135 event. All four are Babylon-coord
+    // probes — if the framework places NO Total/Annular umbra within 200 km
+    // of Babylon in ANY of these ±15 yr windows, the offset is systematic.
+    const OUTLIERS = [
+      // ─── Original deep-time outliers ───
+      { docY: -135, M:  4, D: 15, lat: 32.50, lon:  44.40, windowYr: 30, name: '-135 Babylonian (best-preserved diary, ΔT gold-standard)' },
+      { docY: -584, M:  5, D: 28, lat: 39.00, lon:  35.00,               name: '-584 Thales (Herodotus 1.74, Anatolia)' },
+      { docY: -708, M:  7, D: 17, lat: 35.60, lon: 116.98,               name: '-708 Lu State (Qufu — Hayakawa 2025)' },
+      { docY: -762, M:  6, D: 15, lat: 36.36, lon:  43.16,               name: '-762 Bur-Sagale (Nineveh)' },
+      // ─── Hellenistic-Babylonian probe (test for systematic ~2500 km offset) ───
+      { docY: -189, M:  3, D: 14, lat: 32.50, lon:  44.40,               name: '-189 Hipparchus eclipse era (testing at Babylon coords)' },
+      { docY: -132, M:  4, D: 15, lat: 32.50, lon:  44.40,               name: '-132 Hellenistic Babylon probe' },
+      { docY: -107, M:  4, D: 15, lat: 32.50, lon:  44.40,               name: '-107 Hellenistic Babylon probe' },
+      { docY:  -88, M:  4, D: 15, lat: 32.50, lon:  44.40,               name:  '-88 Late-Hellenistic Babylon probe' },
+    ];
+
+    const WINDOW_YR_DEFAULT = 15;    // default ±years around documented date
+    const NEAR_KM           = 1500;  // report threshold — graded interpretation:
+                                     //     ≤ 200 km : umbra centerline through site
+                                     //               (matches "totality at site"
+                                     //               records — Babylonian diary etc)
+                                     //   200-500 km : near-totality at site
+                                     //               (matches central-path records
+                                     //               that don't require totality)
+                                     //   500-1500km : deep partial at site
+                                     //               (matches vague records like
+                                     //               "battle darkened" / "eclipse
+                                     //               occurred" — Herodotus, Eponym
+                                     //               Canon, Chunqiu)
+    const PROMISING_KM      = 8000;  // do full scan if conjunction is within this
+                                     //   — long-path eclipses (low-β central, low-
+                                     //   latitude) can have greatest 5000+ km from
+                                     //   obs site yet still cross the site earlier
+                                     //   or later on the path. 8000 km covers worst
+                                     //   case (umbra ~1500 km/h × ±5h window)
+    const SCAN_HALF_HOURS   = 5;     // ±5 h scan window — covers long-path eclipses
+    const SCAN_STEP_MIN     = 5;     // 5-min step
+    const MAX_BETA_DEG      = 0.7;   // exclude grazing Totals (|β|>0.7°) — umbra
+                                     //   path is brief / narrow, shadow-axis hit
+                                     //   doesn't correspond to visible umbra path
+
+    function julianDateToJD(Y, M, D, hour = 12) {
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
+           + D - 1524.5 + hour / 24;
+    }
+    function jdToCal(jd) {
+      const J = jd + 0.5;
+      const Z = Math.floor(J);
+      const F = J - Z;
+      const A = Z;
+      const B = A + 1524;
+      const C = Math.floor((B - 122.1) / 365.25);
+      const D = Math.floor(365.25 * C);
+      const E = Math.floor((B - D) / 30.6001);
+      const day_full = B - D - Math.floor(30.6001 * E) + F;
+      const month = (E < 14) ? E - 1 : E - 13;
+      const year  = (month > 2) ? C - 4716 : C - 4715;
+      return { year, month, day: Math.floor(day_full) };
+    }
+
+    function pointAt(jd, isCentral) {
+      let point = null;
+      if (isCentral) point = umbraFromSceneAtJd(jd);
+      if (point === null) point = subSolarFromSceneAtJd(jd);
+      return point;
+    }
+
+    const stepDays   = SCAN_STEP_MIN / 60 / 24;
+    const halfWindow = SCAN_HALF_HOURS / 24;
+    const _saveJD    = o.julianDay;
+
+    try {
+      for (const out of OUTLIERS) {
+        const W = out.windowYr || WINDOW_YR_DEFAULT;
+        const jdStart = julianDateToJD(out.docY - W, 1, 1);
+        const jdEnd   = julianDateToJD(out.docY + W, 12, 31);
+        const events  = findSolarEclipsesInRange(jdStart, jdEnd);
+
+        console.log('');
+        console.log('────────────────────────────────────────────────────────────────────────────────');
+        console.log(`  ${out.name}`);
+        console.log(`  Observation site: (${out.lat.toFixed(2)}°N, ${out.lon.toFixed(2)}°E)`);
+        console.log(`  Documented: ${out.docY}-${String(out.M).padStart(2,'0')}-${String(out.D).padStart(2,'0')}   Window: ±${W} years   Scanning ${events.length} conjunctions...`);
+        console.log('────────────────────────────────────────────────────────────────────────────────');
+
+        const candidates = [];
+        for (const evt of events) {
+          // ─── Filters before any scanning ───
+          // 1. Skip Partial eclipses (cannot match a documented Total/Annular
+          //    record — there is NO umbra/antumbra path on Earth's surface).
+          // 2. Skip grazing Totals with |β| > 0.7° — for these the umbra
+          //    cone barely grazes Earth, the path on Earth's surface is
+          //    brief and narrow, and the shadow-axis intersection can land
+          //    in places the visible umbra never actually reached.
+          const isCentral = (evt.type === 'Total' || evt.type === 'Annular' || evt.type === 'Hybrid');
+          if (!isCentral) continue;
+          if (Math.abs(evt.beta) > MAX_BETA_DEG) continue;
+
+          // ─── Cheap first-pass at the conjunction moment ───
+          const pt0 = pointAt(evt.jd, isCentral);
+          if (pt0 === null) continue;                  // umbra off Earth at greatest — skip
+          const dist0 = gcKmFromLatLon(out.lat, out.lon, pt0.lat, pt0.lon);
+          if (dist0 > PROMISING_KM) continue;          // reject obviously-off candidates
+
+          // ─── Full ±3h min-distance scan ───
+          // Only count moments when the umbra is ACTUALLY on Earth (umbraFromSceneAtJd
+          // returned a real hit, not the sub-solar fallback). For an isCentral event
+          // a null means the umbra missed Earth at that instant — those moments
+          // aren't valid path positions.
+          let minDist = Infinity, minPoint = null, minOffsetMin = 0;
+          for (let dt = -halfWindow; dt <= halfWindow + 1e-9; dt += stepDays) {
+            const jd = evt.jd + dt;
+            const pt = umbraFromSceneAtJd(jd);          // umbra only — no sub-solar fallback
+            if (pt === null) continue;
+            const d  = gcKmFromLatLon(out.lat, out.lon, pt.lat, pt.lon);
+            if (d < minDist) { minDist = d; minPoint = pt; minOffsetMin = Math.round(dt * 24 * 60); }
+          }
+
+          if (minDist <= NEAR_KM) {
+            const cal = jdToCal(evt.jd);
+            const yrOffset = cal.year - out.docY;
+            candidates.push({
+              jd: evt.jd, cal, yrOffset, type: evt.type, beta: evt.beta,
+              minDist, minOffsetMin, minPoint,
+            });
+          }
+        }
+
+        if (candidates.length === 0) {
+          console.log(`  No framework candidates within ${NEAR_KM} km of the documented site in this window.`);
+          continue;
+        }
+
+        candidates.sort((a, b) => a.minDist - b.minDist);
+        console.log('  Candidates (sorted by min umbra→site distance):');
+        console.log('    Class  Year-MM-DD    JD          Type      MinDist   Δt(min)   |β|     Δyr   Umbra(lat°,lon°)');
+        for (const c of candidates) {
+          const dateStr = `${c.cal.year >= 0 ? c.cal.year : c.cal.year}-${String(c.cal.month).padStart(2,'0')}-${String(c.cal.day).padStart(2,'0')}`;
+          const yrStr   = `${c.yrOffset >= 0 ? '+' : ''}${c.yrOffset}`;
+          const offStr  = `${c.minOffsetMin >= 0 ? '+' : ''}${c.minOffsetMin}`;
+          const ptStr   = `(${c.minPoint.lat.toFixed(1).padStart(5)},${c.minPoint.lon.toFixed(1).padStart(7)})`;
+          // Class: matches a Babylonian-style precise totality record (★) vs
+          // a vague record like "battle darkened" or "eclipse occurred" (○ / ◐)
+          let cls = '○ partial';
+          if (c.minDist <= 200) cls = '★ TOTAL  ';
+          else if (c.minDist <= 500) cls = '◐ near-T ';
+          console.log(
+            `    ${cls}  ${dateStr.padEnd(13)} ${c.jd.toFixed(2).padStart(10)}  ${c.type.padEnd(8)}  ${Math.round(c.minDist).toString().padStart(6)}    ${offStr.padStart(6)}   ${Math.abs(c.beta).toFixed(3)}°  ${yrStr.padStart(4)}   ${ptStr}`
+          );
+        }
+        const best = candidates[0];
+        console.log('');
+        console.log(`  ★ Framework's best candidate: ${best.cal.year}-${String(best.cal.month).padStart(2,'0')}-${String(best.cal.day).padStart(2,'0')} (${best.yrOffset >= 0 ? '+' : ''}${best.yrOffset} yr from documented), ${Math.round(best.minDist)} km from site`);
+      }
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
+    }
+
+    console.log('');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Interpretation:');
+    console.log('   • For each outlier, the candidate(s) listed are eclipses where the framework');
+    console.log('     places its umbra near the documented observation site at some moment in a');
+    console.log('     ±3h window. These are the framework\'s "what eclipse did the chronicler');
+    console.log('     actually observe?" proposals.');
+    console.log('   • A clean candidate at a small year-offset from documented (±15 yr) suggests');
+    console.log('     a chronological re-attribution: the historical record refers to a real');
+    console.log('     eclipse at a slightly different year (calendar conversion / regnal-year /');
+    console.log('     eponym list ambiguity).');
+    console.log('   • No candidate found → either window is too small, the framework genuinely');
+    console.log('     has no nearby eclipse, OR the event isn\'t a single solar eclipse at all');
+    console.log('     (literary trope, lunar eclipse, comet, etc.).');
+    console.log('   • Cross-check candidates against historical / archaeological context: does');
+    console.log('     the proposed year fit the chronicler\'s regnal-year or eponym sequence?');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'For each deep-time outlier from the Divergence trend (-135, -584, -708, -762), ' +
+     'scan ±15 years around the documented date and find every eclipse where the ' +
+     'framework\'s umbra comes within 1500 km of the documented site (using ±3h ' +
+     'min-distance scan). Reports the framework\'s best alternative dates — these are ' +
+     'the chronology proposals the framework\'s pure-tidal physics points to. ' +
+     'A clean candidate ~10 years off the documented date strongly suggests calendar/' +
+     'regnal-year mis-attribution in the historical record.');
+
   const firstInvestigationEclipseBtn = addTestButton('Historic Eclipse Candidates (multi-match search)', () => {
     // For each documented historic eclipse event, search a WIDE time window
     // around the traditionally-assigned date and find ALL eclipses our
