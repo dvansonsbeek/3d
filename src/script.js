@@ -28706,18 +28706,16 @@ function setupGUI() {
 
   const firstInvestigationEclipseBtn = addTestButton('Historic Eclipse Candidates (multi-match search)', () => {
     // For each documented historic eclipse event, search a WIDE time window
-    // around the traditionally-assigned date and find ALL eclipses that could
-    // have been visible at the observation location (with refined umbra/penumbra
-    // geometry, not just sub-solar comparison). This challenges the assumption
-    // that the "traditional date" is the only candidate — there may be other
-    // physical eclipses that could equally explain the historic narrative.
+    // around the traditionally-assigned date and find ALL eclipses our
+    // framework places near the documented observation location. For each
+    // candidate, navigates the framework's SCENE-GRAPH and reads the umbra
+    // (for central eclipses) or sub-solar point (for partials). This
+    // challenges the assumption that the "traditional date" is the only
+    // candidate.
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Historic Eclipse Candidates — multi-match search per event');
-    console.log('  Refined geometry: penumbra ≤ ~6500 km from sub-solar, umbra ≤ ~3000 km');
+    console.log('  Historic Eclipse Candidates — multi-match search per event (framework SCENE STATE)');
+    console.log('  Geometry: umbra ≤ ~4500 km, penumbra ≤ ~7500 km from documented site');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
-
-    const _d2r = Math.PI / 180;
-    const EARTH_R_KM = 6371;
 
     // Historic events with observation location + dating uncertainty window.
     // Window is wider for ancient events where chronology is less certain.
@@ -28753,15 +28751,12 @@ function setupGUI() {
               'Modern reduction: 1 May 1185 AD.' },
     ];
 
-    // Julian Day Number at noon UT for proleptic Julian calendar date
     function julianDateToJD(Y, M, D, hour = 12) {
       let y = Y, m = M;
       if (m <= 2) { y -= 1; m += 12; }
       return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
            + D - 1524.5 + hour / 24;
     }
-
-    // Reverse: JD to proleptic Julian calendar date
     function jdToJulianDate(jd) {
       const J = jd + 0.5;
       const Z = Math.floor(J);
@@ -28781,301 +28776,116 @@ function setupGUI() {
       return { year, month, day, h, m };
     }
 
-    // Our model's ΔT at given JD
-    function ourΔT(jd) {
-      const decYear = julianDateToDecimalYear(jd);
-      const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
-      const dT = meanDeltaTSecondsAtAge(t_Ma);
-      return Number.isFinite(dT) ? dT : 0;
-    }
+    const PENUMBRA_KM = 7500;
+    const UMBRA_NEAR_KM = 4500;
 
-    function moonLp(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
-      const T2 = T*T, T3 = T2*T, T4 = T3*T;
-      const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
-      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
-      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
-      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
-      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
-      const E = 1 - 0.002516*T - 0.0000074*T2;
-      const E2 = E*E;
-      let Sl = 0;
-      for (let i = 0; i < MOON_L.length; i++) {
-        const r = MOON_L[i];
-        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
-        let term = r[4] * Math.sin(arg);
-        const absM = r[1] < 0 ? -r[1] : r[1];
-        if (absM === 1) term *= E;
-        else if (absM === 2) term *= E2;
-        Sl += term;
-      }
-      const A1 = (119.75 + 131.849*T) * _d2r;
-      const A2 = (53.09 + 479264.290*T) * _d2r;
-      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
-      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
-    }
+    // Iterate over each historic event. Save/restore scene state once
+    // around the whole audit to minimise jump cost (each candidate still
+    // navigates inside umbraFromSceneAtJd / subSolarFromSceneAtJd).
+    const _saveJD = o.julianDay;
+    try {
+      for (const e of EVENTS) {
+        console.log('');
+        console.log('═══════════════════════════════════════════════════════════════════════════');
+        console.log(`  ${e.name}`);
+        console.log(`  Observation: ${e.lat.toFixed(2)}°N, ${e.lon.toFixed(2)}°E`);
+        console.log(`  Window: ${e.year - e.window} to ${e.year + e.window} (±${e.window} years)`);
+        console.log(`  ${e.desc}`);
+        console.log('───────────────────────────────────────────────────────────────────────────');
 
-    function moonBeta(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
-      const T2 = T*T, T3 = T2*T, T4 = T3*T;
-      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
-      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
-      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
-      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
-      const E = 1 - 0.002516*T - 0.0000074*T2;
-      const E2 = E*E;
-      let Sb = 0;
-      for (let i = 0; i < MOON_B.length; i++) {
-        const r = MOON_B[i];
-        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
-        let term = r[4] * Math.sin(arg);
-        const absM = r[1] < 0 ? -r[1] : r[1];
-        if (absM === 1) term *= E;
-        else if (absM === 2) term *= E2;
-        Sb += term;
-      }
-      return Sb * 1e-6;
-    }
+        const jdStart = julianDateToJD(e.year - e.window, 1, 1);
+        const jdEnd   = julianDateToJD(e.year + e.window, 12, 31);
+        const events = findSolarEclipsesInRange(jdStart, jdEnd);
 
-    function sunLon(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
-      const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
-      const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
-      const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
-              + (0.019993 - 0.000101*T) * Math.sin(2*M)
-              + 0.000289 * Math.sin(3*M);
-      return ((L0 + C) % 360 + 360) % 360;
-    }
-
-    // Sub-solar geographic lat/lon at given JD (in our model with ΔT for Earth rotation).
-    // jd is JD_UT (our convention — Moon polynomial uses jd+ΔT/86400 to reach TT),
-    // so sub-solar lon = (12 - UT_h)*15 directly, no extra ΔT term.
-    function subSolar(jd) {
-      const UT_h = (12 + (jd - Math.floor(jd)) * 24) % 24;
-      let lon = (12 - UT_h) * 15;
-      while (lon > 180) lon -= 360;
-      while (lon < -180) lon += 360;
-      // Approximate sub-solar latitude from Sun's ecliptic longitude:
-      // dec = sin⁻¹(sin(ε) × sin(λ_sun)), ε ≈ 23.44°
-      const sunL = sunLon(jd);
-      const lat = Math.asin(Math.sin(23.44 * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
-      return { lat, lon };
-    }
-
-    // Great-circle distance between two lat/lon points (km)
-    function greatCircleKm(lat1, lon1, lat2, lon2) {
-      const φ1 = lat1 * _d2r, φ2 = lat2 * _d2r;
-      const Δφ = (lat2 - lat1) * _d2r;
-      const Δλ = (lon2 - lon1) * _d2r;
-      const a = Math.sin(Δφ/2)**2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2)**2;
-      return 2 * EARTH_R_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-
-    // Check eclipse visibility at (lat, lon) given Moon-Sun conjunction at jd.
-    // Returns: { visible: bool, type: 'TOTAL'|'PARTIAL'|'NONE', dist_km, beta }
-    // Approximation: penumbra circle radius ~6500 km, umbra path width along
-    // Earth-rotation direction ~5000 km in 3 hour eclipse window.
-    function eclipseVisibility(jd, obs_lat, obs_lon) {
-      const beta = moonBeta(jd);
-      if (Math.abs(beta) >= 1.5) return { visible: false, type: 'NONE', dist_km: null, beta };
-      const ss = subSolar(jd);
-      // We compare observation to the SHADOW TRACK center over a 3-hour window:
-      // at conjunction sub-solar moves ~45° west per 3 hours. Observation needs
-      // to be within distance d of some point on the sub-solar track.
-      // Approximation: distance to nearest point on track ≈ distance to a great-circle.
-      // Simplify: distance to sub-solar at conjunction, allowing track tolerance.
-      const dist = greatCircleKm(obs_lat, obs_lon, ss.lat, ss.lon);
-      // Penumbra reach: ~6500 km from sub-solar instantaneously, +5000 km lateral spread along path
-      const PENUMBRA_REACH_KM = 7500;  // generous
-      const UMBRA_REACH_KM = 4500;     // includes 3-hr path sweep
-      if (Math.abs(beta) < 0.27 && dist < UMBRA_REACH_KM)   return { visible: true, type: 'TOTAL/ANNULAR', dist_km: dist, beta };
-      if (Math.abs(beta) < 1.5  && dist < PENUMBRA_REACH_KM) return { visible: true, type: 'PARTIAL',       dist_km: dist, beta };
-      return { visible: false, type: 'NONE', dist_km: dist, beta };
-    }
-
-    // Find Moon-Sun conjunctions in a JD range
-    function findConjunctions(jdStart, jdEnd) {
-      const step = 0.25;
-      const results = [];
-      let prevDiff = null;
-      let prevJD = jdStart;
-      for (let jd = jdStart; jd <= jdEnd; jd += step) {
-        let diff = moonLp(jd) - sunLon(jd);
-        while (diff > 180) diff -= 360;
-        while (diff < -180) diff += 360;
-        if (prevDiff !== null && prevDiff < 0 && diff > 0 && (diff - prevDiff) < 30) {
-          const jd_c = prevJD + (jd - prevJD) * (-prevDiff) / (diff - prevDiff);
-          results.push(jd_c);
+        const matches = [];
+        for (const evt of events) {
+          const jd = evt.jd;
+          const beta = evt.beta;
+          const isCentral = (evt.type === 'Total' || evt.type === 'Annular' || evt.type === 'Hybrid');
+          let point = null;
+          let pointKind = '';
+          if (isCentral) {
+            point = umbraFromSceneAtJd(jd);
+            pointKind = 'umbra';
+          }
+          if (point === null) {
+            point = subSolarFromSceneAtJd(jd);
+            pointKind = 'sub-solar';
+          }
+          const dist = gcKmFromLatLon(e.lat, e.lon, point.lat, point.lon);
+          let cls = null;
+          if (isCentral && dist < UMBRA_NEAR_KM) cls = 'TOTAL/ANNULAR';
+          else if (dist < PENUMBRA_KM)           cls = 'PARTIAL';
+          if (cls === null) continue;             // not visible at site
+          matches.push({ jd, d: jdToJulianDate(jd), beta, type: cls, dist, point, pointKind });
         }
-        prevDiff = diff;
-        prevJD = jd;
-      }
-      return results;
-    }
 
-    // Iterate over each historic event
-    for (const e of EVENTS) {
-      console.log('');
-      console.log('═══════════════════════════════════════════════════════════════════════════');
-      console.log(`  ${e.name}`);
-      console.log(`  Observation: ${e.lat.toFixed(2)}°N, ${e.lon.toFixed(2)}°E`);
-      console.log(`  Window: ${e.year - e.window} to ${e.year + e.window} (±${e.window} years)`);
-      console.log(`  ${e.desc}`);
-      console.log('───────────────────────────────────────────────────────────────────────────');
+        if (matches.length === 0) {
+          console.log('  No eclipse candidates whose framework umbra/sub-solar lands near observer in this window.');
+          continue;
+        }
 
-      const jdStart = julianDateToJD(e.year - e.window, 1, 1);
-      const jdEnd   = julianDateToJD(e.year + e.window, 12, 31);
-      const conjunctions = findConjunctions(jdStart, jdEnd);
-
-      const matches = [];
-      for (const jd of conjunctions) {
-        const vis = eclipseVisibility(jd, e.lat, e.lon);
-        if (vis.visible) {
-          const d = jdToJulianDate(jd);
-          matches.push({ jd, d, vis });
+        console.log(`  ${matches.length} candidate eclipse(s) visible (framework scene state):`);
+        console.log('  Julian Date         JD         UT      |β|     Scene point             Dist(km)  Type           ');
+        for (const m of matches) {
+          const dateStr = `${m.d.year >= 0 ? m.d.year : '-' + (-m.d.year)}-${String(m.d.month).padStart(2,'0')}-${String(m.d.day).padStart(2,'0')}`;
+          const UTstr   = `${String(m.d.h).padStart(2,'0')}:${String(m.d.m).padStart(2,'0')}`;
+          const yearOffset = (m.d.year - e.year);
+          const offsetStr = yearOffset === 0 ? '(documented year)' : `(${yearOffset > 0 ? '+' : ''}${yearOffset} yr from documented)`;
+          const pointStr  = `(${m.point.lat.toFixed(1).padStart(5)},${m.point.lon.toFixed(1).padStart(7)}) ${m.pointKind.padEnd(8)}`;
+          console.log(
+            '  ' +
+            dateStr.padEnd(13) + '  ' +
+            'JD' + m.jd.toFixed(2).padStart(10) + '  ' +
+            UTstr.padStart(5) + '  ' +
+            Math.abs(m.beta).toFixed(3).padStart(6) + '°  ' +
+            pointStr + '  ' +
+            Math.round(m.dist).toString().padStart(7) + '  ' +
+            m.type.padEnd(14) + '  ' +
+            offsetStr
+          );
         }
       }
-
-      if (matches.length === 0) {
-        console.log('  No eclipse candidates found visible at observation in this window.');
-        continue;
-      }
-
-      console.log(`  ${matches.length} candidate eclipse(s) visible:`);
-      console.log('  Julian Date         JD         UT      |β|     Dist(km)  Type             ');
-      for (const m of matches) {
-        const dateStr = `${m.d.year >= 0 ? m.d.year : '-' + (-m.d.year)}-${String(m.d.month).padStart(2,'0')}-${String(m.d.day).padStart(2,'0')}`;
-        const UTstr = `${String(m.d.h).padStart(2,'0')}:${String(m.d.m).padStart(2,'0')}`;
-        const yearOffset = (m.d.year - e.year);
-        const offsetStr = yearOffset === 0 ? '(documented year)' : `(${yearOffset > 0 ? '+' : ''}${yearOffset} yr from documented)`;
-        console.log(
-          '  ' +
-          dateStr.padEnd(13) + '  ' +
-          'JD' + m.jd.toFixed(2).padStart(10) + '  ' +
-          UTstr.padStart(5) + '  ' +
-          Math.abs(m.vis.beta).toFixed(3).padStart(6) + '°  ' +
-          Math.round(m.vis.dist_km).toString().padStart(7) + '  ' +
-          m.vis.type.padEnd(14) + '  ' +
-          offsetStr
-        );
-      }
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
     }
     console.log('');
     console.log('═══════════════════════════════════════════════════════════════════════════');
     console.log('Interpretation:');
-    console.log(' • Each event lists ALL eclipses in the ±window that could have been visible.');
+    console.log(' • Each event lists ALL eclipses in the ±window the framework places near the');
+    console.log('   documented observation site (umbra for central, sub-solar for partials).');
     console.log(' • If MULTIPLE candidates appear, the historical record may be ambiguous —');
     console.log('   the "traditional" date is one of several physically possible matches.');
     console.log(' • If the documented date IS the only match, the dating is well-constrained.');
-    console.log(' • If NO candidates match, our model places no visible eclipse there at all in');
-    console.log('   the window → either model is wrong, or the historical record is wrong.');
-    console.log(' • Geometry: penumbra ≤ 7500 km, umbra ≤ 4500 km from sub-solar at conjunction.');
-    console.log(' • Caveat: our model has known ~30°/century westward ΔT bias at ancient times');
-    console.log('   (see Historic Eclipse Validation button). Distance estimates inherit this.');
+    console.log(' • If NO candidates match, the framework places no eclipse near the site in');
+    console.log('   that window → potential ΔT signal or wrong attribution.');
+    console.log(' • Geometry: penumbra ≤ 7500 km, umbra ≤ 4500 km from observer.');
+    console.log(' • Scene points come from the framework\'s scene-graph (matches the always-on');
+    console.log('   umbra disc / GREEN-marker). At ancient times this includes our deep-time');
+    console.log('   ΔT/Moon-perturbation predictions, which can disagree with conventional ΔT.');
     console.log('═══════════════════════════════════════════════════════════════════════════');
-  }, 'For each documented historic eclipse, search a wide time window for ALL ' +
-     'eclipses that could have been visible at the observation location. Tests ' +
-     'whether the traditionally-assigned date is the only candidate or one of many.');
+  }, 'For each documented historic eclipse, search a wide time window. For every ' +
+     'eclipse-class conjunction navigates the framework\'s scene-graph and reads ' +
+     'the umbra (or sub-solar for partials) — matches the always-on umbra disc / ' +
+     'GREEN-marker exactly. Lists every framework eclipse near the documented site.');
 
   addTestButton('Search candidate Thales eclipses (595-575 BC)', () => {
-    // Scan a 20-year window around the traditional Thales date (585 BC).
-    // For each Moon-Sun conjunction, compute key parameters using OUR model's
-    // Meeus polynomial + ΔT correction (matches the production code path), then
-    // report all candidates with their geographic sub-solar location.
-    // The user can identify which conjunctions could have given an eclipse
-    // visible from Anatolia at daylight local time.
-    console.log('\n══════════════════════════════════════════════════════════════════');
-    console.log('  Candidate Thales eclipses (595-575 BC), using OUR model physics');
-    console.log('══════════════════════════════════════════════════════════════════');
-    const _d2r = Math.PI / 180;
+    // Scan 20 years around the traditional Thales date (585 BC). Find all
+    // Moon-Sun conjunctions (via findSolarEclipsesInRange — Meeus-based
+    // timing is fine for IDENTIFYING events). For each, navigate the
+    // framework's SCENE-GRAPH to the conjunction JD and read where our
+    // framework places the umbra (matches the always-on disc / GREEN-marker).
+    // The user can then see which conjunction the framework places over
+    // Anatolia → that's the framework's candidate for Thales' eclipse.
+    //
+    // Anatolia (Halys river region) ≈ (39°N, 35°E). We flag any conjunction
+    // whose framework umbra lands within 1000 km of this point.
+    console.log('\n══════════════════════════════════════════════════════════════════════════════');
+    console.log('  Candidate Thales eclipses (595–575 BC) — framework SCENE STATE');
+    console.log('  Anatolia reference: (39°N, 35°E) Halys river region (Herodotus 1.74)');
+    console.log('══════════════════════════════════════════════════════════════════════════════');
 
-    function _ourΔTseconds(jd) {
-      const decYear = julianDateToDecimalYear(jd);
-      const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
-      const dT = meanDeltaTSecondsAtAge(t_Ma);
-      return Number.isFinite(dT) ? dT : 0;
-    }
-
-    // Moon ecliptic longitude (deg) via Meeus Ch. 47, with our ΔT (UT→TT)
-    function moonLpDeg(jd) {
-      const dT_s = _ourΔTseconds(jd);
-      const T = (jd + dT_s/86400 - j2000JD) / 36525;
-      const T2 = T*T, T3 = T2*T, T4 = T3*T;
-      const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
-      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
-      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
-      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
-      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
-      const E = 1 - 0.002516*T - 0.0000074*T2;
-      const E2 = E * E;
-      let Sl = 0;
-      for (let i = 0; i < MOON_L.length; i++) {
-        const r = MOON_L[i];
-        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
-        let term = r[4] * Math.sin(arg);
-        const absM = r[1] < 0 ? -r[1] : r[1];
-        if (absM === 1) term *= E;
-        else if (absM === 2) term *= E2;
-        Sl += term;
-      }
-      const A1 = (119.75 + 131.849*T) * _d2r;
-      const A2 = (53.09 + 479264.290*T) * _d2r;
-      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
-      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
-    }
-
-    // Moon ecliptic latitude (deg) via Meeus Ch. 47
-    function moonBetaDeg(jd) {
-      const dT_s = _ourΔTseconds(jd);
-      const T = (jd + dT_s/86400 - j2000JD) / 36525;
-      const T2 = T*T, T3 = T2*T, T4 = T3*T;
-      const Lp_mean = (218.3164477 + 481267.88123421*T - 0.0015786*T2) * _d2r;
-      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
-      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
-      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
-      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
-      const E = 1 - 0.002516*T - 0.0000074*T2;
-      const E2 = E * E;
-      let Sb = 0;
-      for (let i = 0; i < MOON_B.length; i++) {
-        const r = MOON_B[i];
-        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
-        let term = r[4] * Math.sin(arg);
-        const absM = r[1] < 0 ? -r[1] : r[1];
-        if (absM === 1) term *= E;
-        else if (absM === 2) term *= E2;
-        Sb += term;
-      }
-      return Sb * 1e-6;
-    }
-
-    // Sun apparent ecliptic longitude (deg), Meeus Ch. 25 formula
-    function sunLonDeg(jd) {
-      const dT_s = _ourΔTseconds(jd);
-      const T = (jd + dT_s/86400 - j2000JD) / 36525;
-      const L0 = ((280.46646 + 36000.76983*T + 0.0003032*T*T) % 360 + 360) % 360;
-      const M  = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
-      const C  = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
-               + (0.019993 - 0.000101*T) * Math.sin(2*M)
-               + 0.000289 * Math.sin(3*M);
-      return ((L0 + C) % 360 + 360) % 360;
-    }
-
-    // Sub-solar geographic longitude at given JD in OUR model (with ΔT for Earth rotation)
-    function subSolarLon(jd) {
-      const dT_s = _ourΔTseconds(jd);
-      const jdFrac = jd - Math.floor(jd);
-      // UT_hours: JD x.0 = noon UT, x.5 = midnight UT next day
-      const UT_h = (12 + jdFrac * 24) % 24;
-      // Strategy A adds ΔT/86400 × 2π to Earth's rotation → effective UT for sub-solar
-      const effUT = UT_h + dT_s / 3600;
-      let lon = (12 - effUT) * 15;
-      while (lon > 180) lon -= 360;
-      while (lon < -180) lon += 360;
-      return lon;
-    }
-
-    // Convert JD to proleptic Julian calendar date
     function jdToJulianDate(jd) {
       const J = jd + 0.5;
       const Z = Math.floor(J);
@@ -29087,7 +28897,7 @@ function setupGUI() {
       const E = Math.floor((B - D) / 30.6001);
       const day_full = B - D - Math.floor(30.6001 * E) + F;
       const month = (E < 14) ? E - 1 : E - 13;
-      const year = (month > 2) ? C - 4716 : C - 4715;
+      const year  = (month > 2) ? C - 4716 : C - 4715;
       const day = Math.floor(day_full);
       const dayFrac = day_full - day;
       const h = Math.floor(dayFrac * 24);
@@ -29095,84 +28905,77 @@ function setupGUI() {
       return { year, month, day, h, m };
     }
 
-    // Search range
+    const ANATOLIA = { lat: 39.0, lon: 35.0 };
+    const NEAR_KM  = 1000;   // umbra within 1000 km of Halys → flag as candidate
+
     const startJD = 1505000;   // ≈ 600 BC
     const endJD   = 1512000;   // ≈ 570 BC
-    const step    = 0.25;      // 6-hour resolution
-    console.log(`Scanning JD ${startJD} to ${endJD} at ${step}-day resolution`);
-    console.log(`Using OUR model's Meeus polynomial + ΔT correction (~${Math.round(_ourΔTseconds(1507900.5))}s at year -584)`);
+
+    // Step 1: Meeus timing → list of all eclipse-class conjunctions
+    const events = findSolarEclipsesInRange(startJD, endJD);
+    console.log(`Found ${events.length} eclipse-class conjunctions (Meeus timing); now scanning each via scene state.`);
     console.log();
 
-    // Find Moon-Sun conjunctions (zero crossings of moonLon - sunLon, going from < 0 to > 0)
-    const conjunctions = [];
-    let prevDiff = null;
-    let prevJD = startJD;
-    for (let jd = startJD; jd <= endJD; jd += step) {
-      const mL = moonLpDeg(jd);
-      const sL = sunLonDeg(jd);
-      let diff = mL - sL;
-      while (diff > 180) diff -= 360;
-      while (diff < -180) diff += 360;
-      if (prevDiff !== null && prevDiff < 0 && diff > 0 && (diff - prevDiff) < 30) {
-        // Moon caught Sun (zero crossing west-to-east)
-        const jd_c = prevJD + (jd - prevJD) * (-prevDiff) / (diff - prevDiff);
-        conjunctions.push(jd_c);
+    // Step 2: scene-state lookup for each. Save/restore scene state.
+    const _saveJD = o.julianDay;
+    const candidates = [];
+    try {
+      for (const evt of events) {
+        const um = umbraFromSceneAtJd(evt.jd);
+        const d  = jdToJulianDate(evt.jd);
+        let dist = null;
+        if (um !== null) {
+          dist = gcKmFromLatLon(ANATOLIA.lat, ANATOLIA.lon, um.lat, um.lon);
+        }
+        candidates.push({ jd: evt.jd, evt, d, um, dist });
       }
-      prevDiff = diff;
-      prevJD = jd;
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
     }
-    console.log(`Found ${conjunctions.length} Moon-Sun conjunctions in this range.`);
-    console.log();
 
-    // For each conjunction, check eclipse type and geographic sub-solar
-    console.log('Date (Julian)        JD          UT      |β|     Sub-solar     Eclipse type        Near Greece/Turkey?');
-    console.log('─────────────────────────────────────────────────────────────────────────────────────────────────────────');
-    let nearTurkeyCount = 0;
-    let totalEclipseCount = 0;
-    for (const jd of conjunctions) {
-      const beta = moonBetaDeg(jd);
-      const lon = subSolarLon(jd);
-      const d = jdToJulianDate(jd);
-      // Eclipse type by |β|: |β| < ~0.27° gives umbra (total/annular), ~0.27-1.5° gives partial
-      const absBeta = Math.abs(beta);
-      let eclipseType = '(no eclipse)';
-      if (absBeta < 0.27) eclipseType = '★ TOTAL/ANNULAR';
-      else if (absBeta < 1.0) eclipseType = '◐ PARTIAL';
-      else if (absBeta < 1.5) eclipseType = '· marginal partial';
-      // Geographic — near Greece/Turkey if sub-solar between 10°W and 60°E
-      const nearTurkey = lon >= -10 && lon <= 60 && absBeta < 1.5;
-      if (nearTurkey) nearTurkeyCount++;
-      if (absBeta < 0.27) totalEclipseCount++;
-      const lonStr = lon >= 0 ? `${lon.toFixed(1)}°E` : `${(-lon).toFixed(1)}°W`;
-      const dateStr = `${d.year >= 0 ? d.year : '-' + (-d.year)}-${String(d.month).padStart(2,'0')}-${String(d.day).padStart(2,'0')}`;
-      const UTstr = `${String(d.h).padStart(2,'0')}:${String(d.m).padStart(2,'0')}`;
-      const marker = nearTurkey ? ' ⭐ near Greece/Turkey' : '';
-      // Only print if it's an actual eclipse (filter out non-eclipse new moons)
-      if (absBeta < 1.5) {
-        console.log(
-          dateStr.padEnd(13) +
-          ` JD${jd.toFixed(2).padStart(11)}` +
-          ` ${UTstr.padStart(6)}` +
-          ` ${absBeta.toFixed(3).padStart(6)}°` +
-          ` ${lonStr.padStart(10)}` +
-          ` ${eclipseType.padEnd(20)}` +
-          marker
-        );
-      }
+    // Print table
+    console.log('  Date (Julian)        JD          UT     Type        |β|      Umbra@scene             Dist→Anatolia');
+    console.log('  ──────────────────────────────────────────────────────────────────────────────────────────────────────');
+    let nearAnatolia = 0;
+    for (const c of candidates) {
+      const dateStr = `${c.d.year >= 0 ? c.d.year : '-' + (-c.d.year)}-${String(c.d.month).padStart(2,'0')}-${String(c.d.day).padStart(2,'0')}`;
+      const UTstr = `${String(c.d.h).padStart(2,'0')}:${String(c.d.m).padStart(2,'0')}`;
+      const absBeta = Math.abs(c.evt.beta);
+      const typeStr = c.evt.type || '—';
+      const umStr   = (c.um === null) ? '   off Earth   ' : `(${c.um.lat.toFixed(1).padStart(5)},${c.um.lon.toFixed(1).padStart(7)})`;
+      const distStr = (c.dist === null) ? '       —' : `${c.dist.toFixed(0).padStart(6)} km`;
+      const isNear  = (c.dist !== null && c.dist <= NEAR_KM);
+      const marker  = isNear ? ' ⭐ CANDIDATE — framework places umbra near Anatolia' : '';
+      if (isNear) nearAnatolia++;
+      console.log(
+        `  ${dateStr.padEnd(13)}` +
+        ` JD${c.jd.toFixed(2).padStart(11)}` +
+        ` ${UTstr}` +
+        ` ${typeStr.padEnd(10)}` +
+        ` ${absBeta.toFixed(3).padStart(6)}°` +
+        ` ${umStr}` +
+        `  ${distStr}` +
+        marker
+      );
     }
-    console.log('─────────────────────────────────────────────────────────────────────────────────────────────────────────');
-    console.log(`Total eclipses found: ${conjunctions.filter(jd => Math.abs(moonBetaDeg(jd)) < 1.5).length}`);
-    console.log(`Total/annular (|β|<0.27°): ${totalEclipseCount}`);
-    console.log(`Near Greece/Turkey (sub-solar -10°E to +60°E): ${nearTurkeyCount}`);
+    console.log('  ──────────────────────────────────────────────────────────────────────────────────────────────────────');
+    console.log(`  Summary:  ${candidates.length} conjunctions · ${nearAnatolia} candidates whose framework umbra lands within ${NEAR_KM} km of Anatolia (39°N, 35°E)`);
     console.log();
-    console.log('Notes:');
-    console.log(' • Sub-solar lon = where it\'s local noon at conjunction moment (includes our ΔT).');
-    console.log(' • Penumbra extends ~6500 km from sub-solar, umbra path is narrow (~270 km wide).');
-    console.log(' • An eclipse with sub-solar far from Greece can still be visible there if penumbra reaches.');
-    console.log(' • Wikipedia mentions 21 Sep 582 BC and 16 Mar 581 BC as alternative Thales candidates.');
-  }, 'Search all Moon-Sun conjunctions in 595-575 BC and report those that ' +
-     'could have been visible from Greece/Turkey area, using our model\'s ' +
-     'physics. Useful for exploring alternative dates for the Thales eclipse.');
+    console.log('  Notes:');
+    console.log('   • Umbra coordinates are from the framework\'s scene-graph (matches what you see in the simulator).');
+    console.log('   • A ⭐ CANDIDATE is an eclipse the framework places over Thales\' region. Cross-check the date');
+    console.log('     against historical sources to see if it fits Herodotus\' description (battle between Lydians');
+    console.log('     and Medes interrupted by sudden daytime darkness, 28 May -584 traditionally).');
+    console.log('   • Type Total/Annular = central eclipse with umbra reaching Earth. Partial = umbra misses,');
+    console.log('     but partial obscuration still visible from a wide area (penumbra extends thousands of km).');
+    console.log('   • Wikipedia mentions 21 Sep 582 BC and 16 Mar 581 BC as alternative Thales candidates.');
+    console.log('══════════════════════════════════════════════════════════════════════════════');
+  }, 'Search all Moon-Sun conjunctions in 595-575 BC. For each, navigates the ' +
+     'framework\'s scene-graph to that JD and reports where the framework places ' +
+     'the umbra. Flags conjunctions whose umbra lands within 1000 km of Anatolia ' +
+     '(39°N, 35°E) as candidate dates for the historical Thales eclipse. ' +
+     'Matches the always-on umbra disc / GREEN-marker positions exactly.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Investigation: enumerate ALL solar eclipses our model produces near
@@ -29190,12 +28993,12 @@ function setupGUI() {
   addTestButton('Enumerate alternatives: Babylon -525..-518 + Cairo 975-986', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Enumerate alternative eclipse candidates for the two anomalous entries.');
-    console.log('  Cross-references model output against published Said & Stephenson catalogue.');
+    console.log('  Each conjunction is checked by navigating the framework\'s SCENE-GRAPH (same');
+    console.log('  data path as the always-on umbra disc / GREEN-marker). Reports framework');
+    console.log('  umbra position; for partials, reports sub-solar (where penumbra is centred).');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
 
-    const _d2r = Math.PI / 180;
-    const EARTH_R_KM = 6371;
-    const PENUMBRA = 7500, UMBRA = 4500;
+    const PENUMBRA_KM = 7500, UMBRA_NEAR_KM = 4500;
 
     function julianDateToJD(Y, M, D, hour = 12) {
       let y = Y, m = M;
@@ -29226,141 +29029,59 @@ function setupGUI() {
       const year  = (month > 2) ? C - 4716 : C - 4715;
       return { year, month, day: Math.floor(dayF) };
     }
-    function ourΔT(jd) {
-      const decYear = julianDateToDecimalYear(jd);
-      const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
-      const dT = meanDeltaTSecondsAtAge(t_Ma);
-      return Number.isFinite(dT) ? dT : 0;
-    }
-    function moonLp(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
-      const T2 = T*T, T3 = T2*T, T4 = T3*T;
-      const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
-      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
-      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
-      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
-      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
-      const E = 1 - 0.002516*T - 0.0000074*T2;
-      const E2 = E*E;
-      let Sl = 0;
-      for (let i = 0; i < MOON_L.length; i++) {
-        const r = MOON_L[i];
-        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
-        let term = r[4] * Math.sin(arg);
-        const absM = r[1] < 0 ? -r[1] : r[1];
-        if (absM === 1) term *= E;
-        else if (absM === 2) term *= E2;
-        Sl += term;
-      }
-      const A1 = (119.75 + 131.849*T) * _d2r;
-      const A2 = (53.09 + 479264.290*T) * _d2r;
-      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
-      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
-    }
-    function moonBeta(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
-      const T2 = T*T, T3 = T2*T, T4 = T3*T;
-      const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
-      const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
-      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
-      const Fr  = (( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
-      const E = 1 - 0.002516*T - 0.0000074*T2;
-      const E2 = E*E;
-      let Sb = 0;
-      for (let i = 0; i < MOON_B.length; i++) {
-        const r = MOON_B[i];
-        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
-        let term = r[4] * Math.sin(arg);
-        const absM = r[1] < 0 ? -r[1] : r[1];
-        if (absM === 1) term *= E;
-        else if (absM === 2) term *= E2;
-        Sb += term;
-      }
-      return Sb * 1e-6;
-    }
-    function sunLon(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
-      const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
-      const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
-      const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
-              + (0.019993 - 0.000101*T) * Math.sin(2*M)
-              + 0.000289 * Math.sin(3*M);
-      return ((L0 + C) % 360 + 360) % 360;
-    }
-    function ssLatLon(jd) {
-      const UT_h = (12 + (jd - Math.floor(jd)) * 24) % 24;
-      let lon = (12 - UT_h) * 15;
-      while (lon >  180) lon -= 360;
-      while (lon < -180) lon += 360;
-      const sunL = sunLon(jd);
-      const lat = Math.asin(Math.sin(23.44 * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
-      return { lat, lon };
-    }
-    function greatCircleKm(lat1, lon1, lat2, lon2) {
-      const φ1 = lat1 * _d2r, φ2 = lat2 * _d2r;
-      const Δφ = (lat2 - lat1) * _d2r;
-      const Δλ = (lon2 - lon1) * _d2r;
-      const a = Math.sin(Δφ/2)**2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2)**2;
-      return 2 * EARTH_R_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-    function moonSunDiff(jd) {
-      let diff = moonLp(jd) - sunLon(jd);
-      while (diff >  180) diff -= 360;
-      while (diff <= -180) diff += 360;
-      return diff;
-    }
-    function findAllConjunctions(jdStart, jdEnd) {
-      const step = 0.25;
-      const results = [];
-      let prevDiff = moonSunDiff(jdStart);
-      let prevJD = jdStart;
-      for (let jd = jdStart + step; jd <= jdEnd; jd += step) {
-        const diff = moonSunDiff(jd);
-        if (prevDiff < 0 && diff > 0 && (diff - prevDiff) < 30) {
-          // Bisect
-          let lo = prevJD, hi = jd;
-          for (let i = 0; i < 30; i++) {
-            const mid = (lo + hi) / 2;
-            if (moonSunDiff(mid) < 0) lo = mid; else hi = mid;
-            if (hi - lo < 1/86400) break;
-          }
-          results.push((lo + hi) / 2);
-        }
-        prevDiff = diff;
-        prevJD = jd;
-      }
-      return results;
-    }
 
     function enumerate(label, lat_obs, lon_obs, jdStart, jdEnd) {
       console.log('');
       console.log(`────────────────────────────────────────────────────────────────────────────────`);
       console.log(`${label}`);
       console.log(`Observation site: (${lat_obs.toFixed(2)}°N, ${lon_obs.toFixed(2)}°E).`);
-      console.log(`Listing every solar conjunction with |β| < 1.5° (eclipse-class) in this window.`);
+      console.log(`Listing every eclipse-class conjunction in this window. Umbra/sub-solar from scene.`);
       console.log(`────────────────────────────────────────────────────────────────────────────────`);
-      console.log(`  Date              JD            β(M)    SS lat   SS lon   Dist(km)  Class`);
-      const conjs = findAllConjunctions(jdStart, jdEnd);
-      for (const jd of conjs) {
-        const beta = moonBeta(jd);
-        if (Math.abs(beta) >= 1.5) continue;  // not eclipse-class
-        const ss = ssLatLon(jd);
-        const dist = greatCircleKm(lat_obs, lon_obs, ss.lat, ss.lon);
-        let cls = '—';
-        if (Math.abs(beta) < 0.27 && dist < UMBRA)        cls = '★ TOTAL/ANN here';
-        else if (Math.abs(beta) < 0.5 && dist < PENUMBRA) cls = '◐ partial near';
-        else if (dist < PENUMBRA)                          cls = '○ partial';
-        else                                               cls = '✗ not visible at site';
-        const cal = jdToCal(jd);
-        const ds = `${cal.year}-${String(cal.month).padStart(2,'0')}-${String(cal.day).padStart(2,'0')}`;
-        console.log(
-          `  ${ds.padEnd(16)}  ${jd.toFixed(2).padStart(11)}   ` +
-          `${beta.toFixed(2).padStart(6)}  ` +
-          `${ss.lat.toFixed(1).padStart(7)}  ` +
-          `${ss.lon.toFixed(1).padStart(7)}   ` +
-          `${Math.round(dist).toString().padStart(7)}   ` +
-          cls
-        );
+      console.log(`  Date              JD            β(M)    Scene point             Dist(km)  Class`);
+
+      // Use findSolarEclipsesInRange for timing — Meeus is fine for identifying
+      // candidate conjunctions. Then for each one, navigate the SCENE to get
+      // the framework's actual umbra or sub-solar geographic position.
+      const events = findSolarEclipsesInRange(jdStart, jdEnd);
+      const _saveJD = o.julianDay;
+      try {
+        for (const evt of events) {
+          const jd = evt.jd;
+          const beta = evt.beta;
+          // For central eclipses (T/A), use the umbra hit point.
+          // For partials / non-central, use the sub-solar point as a proxy
+          // (penumbra is centred there).
+          const isCentral = (evt.type === 'Total' || evt.type === 'Annular' || evt.type === 'Hybrid');
+          let point = null;
+          let pointKind = '';
+          if (isCentral) {
+            point = umbraFromSceneAtJd(jd);
+            pointKind = 'umbra';
+          }
+          if (point === null) {
+            point = subSolarFromSceneAtJd(jd);
+            pointKind = 'sub-solar';
+          }
+          const dist = gcKmFromLatLon(lat_obs, lon_obs, point.lat, point.lon);
+          let cls = '—';
+          if (isCentral && dist < UMBRA_NEAR_KM)          cls = '★ TOTAL/ANN near site';
+          else if (Math.abs(beta) < 0.5 && dist < PENUMBRA_KM) cls = '◐ partial near';
+          else if (dist < PENUMBRA_KM)                    cls = '○ partial';
+          else                                            cls = '✗ not visible at site';
+          const cal = jdToCal(jd);
+          const ds = `${cal.year}-${String(cal.month).padStart(2,'0')}-${String(cal.day).padStart(2,'0')}`;
+          const pointStr = `(${point.lat.toFixed(1).padStart(5)},${point.lon.toFixed(1).padStart(7)}) ${pointKind.padEnd(8)}`;
+          console.log(
+            `  ${ds.padEnd(16)}  ${jd.toFixed(2).padStart(11)}   ` +
+            `${beta.toFixed(2).padStart(6)}  ` +
+            `${pointStr}  ` +
+            `${Math.round(dist).toString().padStart(7)}   ` +
+            cls
+          );
+        }
+      } finally {
+        jumpToJulianDay(_saveJD);
+        forceSceneUpdate();
       }
     }
 
@@ -29416,15 +29137,10 @@ function setupGUI() {
   // ────────────────────────────────────────────────────────────────────────
   // Umbra path trace — geographic centerline of an eclipse over time
   //
-  // Walks time around greatest eclipse and computes the actual umbra
-  // centerline at each step by ray-tracing from the Sun through the Moon
-  // to Earth's surface (proper cartesian geometry — NOT sub-Moon, which is
-  // wrong by the Moon-distance-leverage factor β × d_Moon / R_Earth, i.e.
-  // β=0.7° produces ~40° latitude offset from sub-Moon to umbra center).
-  // Use this to verify that the model's predicted path matches the visual
-  // umbra in the 3D scene and to compare against literature path maps
-  // (Stephenson 1997 / NASA Five Millennium Canon) when auditing the 25
-  // solar presets.
+  // Walks time around greatest eclipse and, at each step, navigates the
+  // framework's SCENE-GRAPH to that JD and reads where the framework
+  // places the umbra. This matches the always-on umbra disc / GREEN-marker
+  // exactly (same data path: scene Sun/Moon/Earth positions → ray-trace).
   //
   // Configuration constants at the top of the button — edit to inspect
   // any of the 25 solar presets.
@@ -29436,20 +29152,12 @@ function setupGUI() {
     const UMBRA_TRACE_STEP_MIN  = 5;                                       // sample interval
     const UMBRA_TRACE_NEAR_SITE = { name: 'London', lat: 51.5074, lon: -0.1278 };
 
-    const _d2r = Math.PI / 180;
-    const _r2d = 180 / Math.PI;
-    // Earth radius from the codebase's diameter constant. Obliquity is
-    // time-varying (precesses) → computed per JD inside umbraCenterGeo
-    // via computeObliquityEarth(julianDateToDecimalYear(jd_TT)).
-    const R_E_KM = diameters.earthDiameter / 2;
-
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log(`  Umbra path trace — ${UMBRA_TRACE_DATE_ISO}`);
+    console.log(`  Umbra path trace — ${UMBRA_TRACE_DATE_ISO}  (framework SCENE STATE)`);
     console.log(`  Window: greatest eclipse ± ${UMBRA_TRACE_WINDOW_HR} h, step ${UMBRA_TRACE_STEP_MIN} min`);
     console.log(`  Near site: ${UMBRA_TRACE_NEAR_SITE.name} (${UMBRA_TRACE_NEAR_SITE.lat}°, ${UMBRA_TRACE_NEAR_SITE.lon}°)`);
     console.log('══════════════════════════════════════════════════════════════════════════════════\n');
 
-    // ───── Helpers ─────
     function julianDateToJDLocal(Y, M, D, hour = 12) {
       let y = Y, m = M;
       if (m <= 2) { y -= 1; m += 12; }
@@ -29485,124 +29193,6 @@ function setupGUI() {
         : String(year).padStart(5, ' ');
       return `${yearStr}-${String(month).padStart(2, '0')}-${String(Math.floor(day)).padStart(2, '0')} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
     }
-    function gmstDeg(jd_UT) {
-      const T = (jd_UT - j2000JD) / 36525;
-      let g = 280.46061837 + 360.98564736629 * (jd_UT - j2000JD)
-            + 0.000387933 * T * T - T * T * T / 38710000;
-      g = ((g % 360) + 360) % 360;
-      return g;
-    }
-    function eclToRaDec(lam_deg, beta_deg, jd_TT) {
-      const lam = lam_deg * _d2r, beta = beta_deg * _d2r;
-      // Live obliquity at jd_TT — varies over millennia
-      const eps = computeObliquityEarth(julianDateToDecimalYear(jd_TT)) * _d2r;
-      const sinDec = Math.sin(beta) * Math.cos(eps) + Math.cos(beta) * Math.sin(lam) * Math.sin(eps);
-      const dec = Math.asin(sinDec);
-      const y = Math.cos(beta) * Math.sin(lam) * Math.cos(eps) - Math.sin(beta) * Math.sin(eps);
-      const x = Math.cos(beta) * Math.cos(lam);
-      let ra = Math.atan2(y, x) * _r2d;
-      if (ra < 0) ra += 360;
-      return { ra, dec: dec * _r2d };
-    }
-    // Proper umbra-axis ray-trace: find where the line from Sun through Moon
-    // (extended) intersects Earth's surface. Returns null if the umbra misses
-    // Earth (no central path at this instant). This is the actual umbra
-    // centerline — NOT the sub-Moon point. They differ by ~β × d_Moon / R_Earth
-    // in latitude (β=0.7° → ~40° latitude offset), which is the whole point
-    // of doing the geometry correctly.
-    function umbraCenterGeo(jd_TT) {
-      const lam_S  = _eclSunLon(jd_TT)  * _d2r;
-      const lam_M  = _eclMoonLon(jd_TT) * _d2r;
-      const beta_M = _eclMoonBeta(jd_TT) * _d2r;
-      const d_S    = currentAUDistance;        // Earth–Sun distance, km
-      const d_M    = _eclMoonDistance(jd_TT);  // Earth–Moon distance, km
-
-      // Geocentric ecliptic cartesian (km), x toward vernal equinox
-      const Sx = d_S * Math.cos(lam_S);
-      const Sy = d_S * Math.sin(lam_S);
-      const Sz = 0;
-      const cosB = Math.cos(beta_M);
-      const Mx = d_M * cosB * Math.cos(lam_M);
-      const My = d_M * cosB * Math.sin(lam_M);
-      const Mz = d_M * Math.sin(beta_M);
-
-      // Light direction = from Sun toward Moon, normalized
-      const dx = Mx - Sx, dy = My - Sy, dz = Mz - Sz;
-      const dLen = Math.sqrt(dx*dx + dy*dy + dz*dz);
-      const Dx = dx / dLen, Dy = dy / dLen, Dz = dz / dLen;
-
-      // Solve |M + s·D|² = R_Earth² for the smallest positive s
-      const MdotD = Mx*Dx + My*Dy + Mz*Dz;
-      const MdotM = Mx*Mx + My*My + Mz*Mz;
-      const R_E   = R_E_KM;
-      const disc  = MdotD*MdotD - (MdotM - R_E*R_E);
-      if (disc < 0) return null;   // umbra misses Earth's globe at this instant
-
-      const s = -MdotD - Math.sqrt(disc);   // smaller root = day-side hit
-      const Px = Mx + s*Dx;
-      const Py = My + s*Dy;
-      const Pz = Mz + s*Dz;
-
-      // Convert from geocentric ecliptic cartesian to equatorial cartesian
-      // (rotate about x-axis by live obliquity ε at this JD)
-      const eps = computeObliquityEarth(julianDateToDecimalYear(jd_TT)) * _d2r;
-      const cosEps = Math.cos(eps), sinEps = Math.sin(eps);
-      const ex = Px;
-      const ey = Py * cosEps - Pz * sinEps;
-      const ez = Py * sinEps + Pz * cosEps;
-
-      // Equatorial cartesian → (RA, Dec) on a unit sphere of radius R_E
-      const r = Math.sqrt(ex*ex + ey*ey + ez*ez);
-      const dec = Math.asin(ez / r) * _r2d;
-      let ra = Math.atan2(ey, ex) * _r2d;
-      if (ra < 0) ra += 360;
-
-      // RA → geographic longitude using GMST(UT)
-      // Input parameter is named jd_TT for legacy reasons but is actually
-      // a UT JD (matching _eclSunLon's convention — see _eclSunLon at line
-      // ~4838 which treats its input as UT and adds ΔT internally to get TT).
-      // Previously we subtracted ΔT here, giving UT − ΔT to gmstDeg(), which
-      // shifted the umbra longitude by ΔT × 15°/h east of the correct
-      // position — invisible (~1°) at modern dates, catastrophic (~75°) at
-      // -584 BCE where ΔT ~5 hours.
-      const jd_UT = jd_TT;
-      const gmst = gmstDeg(jd_UT);
-      let lon = ra - gmst;
-      while (lon >  180) lon -= 360;
-      while (lon < -180) lon += 360;
-      return { lat: dec, lon };
-    }
-    function subSolarGeo(jd_TT) {
-      const lam_S = _eclSunLon(jd_TT);
-      const { ra, dec } = eclToRaDec(lam_S, 0, jd_TT);
-      // Input parameter is named jd_TT for legacy reasons but is actually
-      // a UT JD (matching _eclSunLon's convention — see _eclSunLon at line
-      // ~4838 which treats its input as UT and adds ΔT internally to get TT).
-      // Previously we subtracted ΔT here, giving UT − ΔT to gmstDeg(), which
-      // shifted the umbra longitude by ΔT × 15°/h east of the correct
-      // position — invisible (~1°) at modern dates, catastrophic (~75°) at
-      // -584 BCE where ΔT ~5 hours.
-      const jd_UT = jd_TT;
-      const gmst = gmstDeg(jd_UT);
-      let lon = ra - gmst;
-      while (lon >  180) lon -= 360;
-      while (lon < -180) lon += 360;
-      return { lat: dec, lon };
-    }
-    function gcKm(lat1, lon1, lat2, lon2) {
-      const f1 = lat1 * _d2r, f2 = lat2 * _d2r;
-      const df = (lat2 - lat1) * _d2r;
-      const dl = (lon2 - lon1) * _d2r;
-      const a = Math.sin(df / 2) ** 2 + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) ** 2;
-      return 2 * R_E_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-    function moonSunSepDeg(jd_TT) {
-      let d_lon = _eclMoonLon(jd_TT) - _eclSunLon(jd_TT);
-      while (d_lon >  180) d_lon -= 360;
-      while (d_lon <= -180) d_lon += 360;
-      const d_lat = _eclMoonBeta(jd_TT);
-      return Math.sqrt(d_lon * d_lon + d_lat * d_lat);
-    }
 
     // ───── Parse ISO date (supports negative years) ─────
     let Y, M, D;
@@ -29615,7 +29205,7 @@ function setupGUI() {
     }
     const jdNoon = julianDateToJDLocal(Y, M, D, 12);
 
-    // ───── Find the eclipse closest to the input date ─────
+    // ───── Find the eclipse closest to the input date (Meeus timing) ─────
     const events = findSolarEclipsesInRange(jdNoon - 15, jdNoon + 15);
     if (events.length === 0) {
       console.log(`  No solar eclipse found within ±15 days of ${UMBRA_TRACE_DATE_ISO}.`);
@@ -29628,59 +29218,62 @@ function setupGUI() {
       const d = Math.abs(e.jd - jdNoon);
       if (d < bestDist) { bestDist = d; evt = e; }
     }
-    const jdGreatest_TT = evt.jd;
+    const jdGreatest = evt.jd;   // treated as UT JD (matches scene-state path)
 
-    // ───── Walk time and build the path ─────
+    // ───── Walk time and build the path, navigating the scene at each step ─────
     const stepDays = (UMBRA_TRACE_STEP_MIN / 60) / 24;
     const halfWindow = UMBRA_TRACE_WINDOW_HR / 24;
     const rows = [];
-    let minSiteDist = Infinity, minSepRow = null, bestRow = null;
-    for (let dt = -halfWindow; dt <= halfWindow + 1e-9; dt += stepDays) {
-      const jd_TT = jdGreatest_TT + dt;
-      const um = umbraCenterGeo(jd_TT);   // null when umbra misses Earth
-      const ss = subSolarGeo(jd_TT);
-      const sep = moonSunSepDeg(jd_TT);
-      const dist_site = (um === null)
-        ? null
-        : gcKm(UMBRA_TRACE_NEAR_SITE.lat, UMBRA_TRACE_NEAR_SITE.lon, um.lat, um.lon);
-      const ut = jdToUTString(jd_TT - _eclDeltaT(jd_TT) / 86400);
-      const row = {
-        jd_TT, ut,
-        um_lat: um ? um.lat : null,
-        um_lon: um ? um.lon : null,
-        ss_lat: ss.lat, ss_lon: ss.lon,
-        sep, dist_site,
-      };
-      rows.push(row);
-      if (dist_site !== null && dist_site < minSiteDist) { minSiteDist = dist_site; bestRow = row; }
-      if (!minSepRow || sep < minSepRow.sep) minSepRow = row;
+    let minSiteDist = Infinity, bestRow = null;
+    const _saveJD = o.julianDay;
+    try {
+      for (let dt = -halfWindow; dt <= halfWindow + 1e-9; dt += stepDays) {
+        const jd = jdGreatest + dt;
+        const um = umbraFromSceneAtJd(jd);    // null when umbra misses Earth
+        const ss = subSolarFromSceneAtJd(jd);
+        const dist_site = (um === null)
+          ? null
+          : gcKmFromLatLon(UMBRA_TRACE_NEAR_SITE.lat, UMBRA_TRACE_NEAR_SITE.lon, um.lat, um.lon);
+        const ut = jdToUTString(jd);
+        const row = {
+          jd, ut,
+          um_lat: um ? um.lat : null,
+          um_lon: um ? um.lon : null,
+          ss_lat: ss.lat, ss_lon: ss.lon,
+          dist_site,
+        };
+        rows.push(row);
+        if (dist_site !== null && dist_site < minSiteDist) { minSiteDist = dist_site; bestRow = row; }
+      }
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
     }
 
     // ───── Print summary header ─────
     console.log(`Event (from findSolarEclipsesInRange):`);
     console.log(`  type:          ${evt.type}`);
     console.log(`  β at max:      ${evt.beta.toFixed(4)}°  (smaller |β| → more central)`);
-    console.log(`  greatest UT:   ${jdToUTString(jdGreatest_TT - _eclDeltaT(jdGreatest_TT) / 86400)}`);
-    console.log(`  greatest TT:   JD ${jdGreatest_TT.toFixed(6)}`);
+    console.log(`  greatest UT:   ${jdToUTString(jdGreatest)}`);
+    console.log(`  greatest JD:   ${jdGreatest.toFixed(6)}`);
     console.log(`  Moon r:        ${evt.moonDistance_km.toFixed(0)} km  (apparent radius ${evt.moonAppR_topo.toFixed(4)}°)`);
     console.log(`  Sun r:         ${evt.sunAppR.toFixed(4)}°  (ratio ${(evt.moonSunRatio).toFixed(4)})`);
     console.log('');
 
     // ───── Print path table ─────
-    console.log('  UT (date time)         UMBRA CENTER (lat°, lon°)   sub-Sun (lat°, lon°)       sep°    dist to ' + UMBRA_TRACE_NEAR_SITE.name + ' (km)');
-    console.log('  ────────────────────────────────────────────────────────────────────────────────────────────────────────────');
+    console.log('  UT (date time)         UMBRA CENTER (lat°, lon°)   sub-Sun (lat°, lon°)       dist to ' + UMBRA_TRACE_NEAR_SITE.name + ' (km)');
+    console.log('  ────────────────────────────────────────────────────────────────────────────────────────────────────');
     for (const r of rows) {
-      const tag = (r === bestRow) ? ' ★ closest to site' : (r === minSepRow ? ' ◇ min Sun-Moon sep' : '');
+      const tag = (r === bestRow) ? ' ★ closest to site' : '';
       const umStr = (r.um_lat === null)
         ? '   ( umbra off Earth )    '
         : `(${r.um_lat.toFixed(2).padStart(7)}, ${r.um_lon.toFixed(2).padStart(8)})`;
       const ssLat = r.ss_lat.toFixed(2).padStart(7);
       const ssLon = r.ss_lon.toFixed(2).padStart(8);
-      const sep = r.sep.toFixed(3).padStart(7);
       const dist = (r.dist_site === null) ? '       —' : r.dist_site.toFixed(0).padStart(8);
-      console.log(`  ${r.ut}     ${umStr}     (${ssLat}, ${ssLon})    ${sep}    ${dist}${tag}`);
+      console.log(`  ${r.ut}     ${umStr}     (${ssLat}, ${ssLon})    ${dist}${tag}`);
     }
-    console.log('  ────────────────────────────────────────────────────────────────────────────────────────────────────────────');
+    console.log('  ────────────────────────────────────────────────────────────────────────────────────────────────────');
     console.log('');
 
     // ───── Summary ─────
@@ -29692,25 +29285,22 @@ function setupGUI() {
       console.log(`  Umbra never reaches Earth's surface during this window`);
       console.log(`  (event is partial-only at all sampled instants — gamma > 1 in eclipse terms).`);
     }
-    console.log(`  Minimum Sun-Moon separation in window: ${minSepRow.sep.toFixed(3)}° at UT ${minSepRow.ut}`);
     console.log('');
     console.log(`Interpretation:`);
-    console.log(`  • Compare these (lat, lon) points to the 3D scene's umbra circle at the same UT.`);
-    console.log(`    If they agree, the model's data matches its visual output.`);
-    console.log(`  • Then compare to NASA Five Millennium Canon path-map coordinates and Stephenson`);
-    console.log(`    1997 published path centerline. If model ≈ NASA ≈ Stephenson but the documented`);
-    console.log(`    site (preset 'loc' field) differs, the eyewitness historiography is uncertain.`);
-    console.log(`  • If the model's path diverges from NASA/Stephenson, that's a real ΔT or Moon`);
-    console.log(`    polynomial question worth investigating.`);
+    console.log(`  • Each (lat, lon) is the framework's umbra position at that UT — same data`);
+    console.log(`    path as the always-on umbra disc you see in the scene.`);
+    console.log(`  • Compare to NASA Five Millennium Canon path-map coordinates and Stephenson`);
+    console.log(`    1997 published path centerline. Divergence is the framework's deep-time`);
+    console.log(`    Earth-rotation / Moon-perturbation signal vs the documented record.`);
     console.log('══════════════════════════════════════════════════════════════════════════════════');
-  }, 'Trace the umbra centerline geographic latitude/longitude over a window around greatest ' +
-     'eclipse, sampled every few minutes. Configuration constants at the top of the button: ' +
-     'edit the date, window, step, and near-site to inspect any of the 25 solar presets. The ' +
-     'umbra center at each instant is computed by ray-tracing from the Sun through the Moon ' +
-     'to Earth\'s surface (proper cartesian geometry, not sub-Moon) using Meeus Ch. 47 Moon ' +
-     'position + currentAUDistance for Sun + model ΔT for UT. Output rows where the umbra ' +
-     'misses Earth are marked "umbra off Earth". The (lat, lon) output is directly comparable ' +
-     'to NASA Five Millennium Canon path maps and Stephenson 1997 path-centerline tables.');
+  }, 'Trace the framework\'s umbra centerline geographic (lat, lon) over a window around ' +
+     'greatest eclipse, sampled every few minutes. Configuration constants at the top of ' +
+     'the button: edit the date, window, step, and near-site to inspect any of the 25 ' +
+     'solar presets. At each instant the framework\'s scene-graph is navigated to that JD ' +
+     'and the umbra position is read by ray-tracing scene Sun/Moon/Earth — matches the ' +
+     'always-on umbra disc / GREEN-marker exactly. The (lat, lon) output is directly ' +
+     'comparable to NASA Five Millennium Canon path maps and Stephenson 1997 path ' +
+     'centerline tables.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Audit all 25 solar eclipse presets — single-shot table output
@@ -29794,87 +29384,12 @@ function setupGUI() {
       [1442902.839207, { name: 'Nineveh (Bur-Sagale)',    lat: 36.36, lon:  43.16 }],
     ]);
 
-    // Scene-state umbra computation. Navigates the framework's scene-graph to
-    // the requested JD, reads sun/moon/earth world positions, and ray-traces
-    // the Sun→Moon→Earth shadow axis to find where it intersects Earth's
-    // mesh sphere. Then transforms the hit point into Earth's local frame
-    // via Earth's world quaternion → (lat, lon) on the texture.
-    //
-    // This MATCHES what the user sees in the scene (always-on umbra disc,
-    // GREEN marker in the markers button) for ALL epochs — modern AND deep
-    // time — because it uses the same data path: framework's scene-graph
-    // Moon position + framework's Earth rotation + framework's ΔT.
-    //
-    // (The previous Meeus-based version of this function diverged from the
-    // scene at deep time because Meeus polynomials don't capture the
-    // framework's deep-time Moon-precession corrections. Verified at 1654
-    // Aug 12: framework's scene-graph places umbra at London 1h before
-    // preset UT (visible via markers button), but the Meeus calculation
-    // was 662 km off.)
-    //
-    // Scratch vectors pre-allocated outside this function for zero
-    // per-call allocations — important since the scan does ~6000 calls.
-    const _aSun     = new THREE.Vector3();
-    const _aMoon    = new THREE.Vector3();
-    const _aEarth   = new THREE.Vector3();
-    const _aMoonGeo = new THREE.Vector3();
-    const _aSunGeo  = new THREE.Vector3();
-    const _aDirSM   = new THREE.Vector3();
-    const _aHit     = new THREE.Vector3();
-    const _aLocal   = new THREE.Vector3();
-    const _aQuat    = new THREE.Quaternion();
-    const _aQuatInv = new THREE.Quaternion();
-
-    function umbraFromScene(jd) {
-      // 1. Navigate the framework's scene-graph to this JD (sync — no waiting).
-      //    Must use 'light' mode (not 'minimal') because the Moon's full Meeus
-      //    Ch. 47 latitude perturbation (~5° at conjunctions) is applied inside
-      //    updatePositions() via _meeusLatRad → moon.pivotObj.position. With
-      //    'minimal' the Moon ends up at the wrong geocentric position and the
-      //    umbra ray-trace incorrectly reports "off Earth" for every preset.
-      jumpToJulianDay(jd);
-      forceSceneUpdate('light');
-
-      // 2. Read framework's actual world positions
-      sun  .planetObj.getWorldPosition(_aSun);
-      moon .planetObj.getWorldPosition(_aMoon);
-      earth.planetObj.getWorldPosition(_aEarth);
-
-      _aMoonGeo.copy(_aMoon).sub(_aEarth);
-      _aSunGeo .copy(_aSun) .sub(_aEarth);
-      _aDirSM  .copy(_aMoonGeo).sub(_aSunGeo).normalize();
-
-      // 3. Ray-trace Sun→Moon→Earth: solve |moonGeo + s·dir|² = R_E_scene²
-      const R_E = earth.size;                              // mesh radius in scene units
-      const MdotD = _aMoonGeo.dot(_aDirSM);
-      const MdotM = _aMoonGeo.dot(_aMoonGeo);
-      const disc  = MdotD * MdotD - (MdotM - R_E * R_E);
-      if (disc < 0) return null;                           // umbra misses Earth
-
-      const s = -MdotD - Math.sqrt(disc);
-      _aHit.copy(_aDirSM).multiplyScalar(s).add(_aMoonGeo);
-
-      // 4. Transform hit point into Earth's local mesh frame
-      earth.planetObj.getWorldQuaternion(_aQuat);
-      _aQuatInv.copy(_aQuat).invert();
-      _aLocal.copy(_aHit).applyQuaternion(_aQuatInv);
-
-      // 5. Local cartesian → (lat, lon). UV convention: −X local = Greenwich,
-      //    +Z local = 90°E, +Y = north pole (per public/Earth.jpg, which is
-      //    Pacific-centered with Greenwich at the u=0/u=1 seam).
-      const r = _aLocal.length();
-      const lat = Math.asin(Math.max(-1, Math.min(1, _aLocal.y / r))) * _r2d;
-      const lon = Math.atan2(_aLocal.z, -_aLocal.x) * _r2d;
-      return { lat, lon };
-    }
-
-    function gcKm(lat1, lon1, lat2, lon2) {
-      const f1 = lat1 * _d2r, f2 = lat2 * _d2r;
-      const df = (lat2 - lat1) * _d2r;
-      const dl = (lon2 - lon1) * _d2r;
-      const a = Math.sin(df/2)**2 + Math.cos(f1) * Math.cos(f2) * Math.sin(dl/2)**2;
-      return 2 * R_E_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
+    // Use the shared file-level helpers `umbraFromSceneAtJd` and
+    // `gcKmFromLatLon` defined near forceSceneUpdate (~line 41680).
+    // They navigate the scene-graph + ray-trace exactly like the
+    // always-on umbra disc and GREEN marker.
+    const umbraFromScene = umbraFromSceneAtJd;
+    const gcKm           = gcKmFromLatLon;
 
     // Format helpers
     function jdToHMM(jd) {
@@ -30086,24 +29601,18 @@ function setupGUI() {
   //
   // Places two small spheres as children of earth.planetObj so they rotate
   // with Earth's mesh and stay anchored to specific texture pixels:
-  //   • YELLOW = astronomical sub-Sun (where Sun is overhead per Meeus + GMST)
-  //   • RED    = umbra centerline    (where Three.js shadow should appear)
+  //   • YELLOW = sub-Sun  (from scene-state subSolarFromSceneAtJd)
+  //   • GREEN  = umbra    (from scene-state umbraFromSceneAtJd)
   //
-  // Both are placed via the standard Three.js SphereGeometry UV convention
-  // (+X local = Greenwich, +Y = north pole). The visual test answers:
-  //   1. Is the YELLOW marker at the correct continent in the texture?
-  //        → confirms or refutes the UV-convention assumption
-  //   2. Does the rendered shadow coincide with the RED marker?
-  //        → confirms or refutes shadow-rendering correctness
+  // Both are derived from the framework's actual scene-graph world positions
+  // (same data path as the always-on umbra disc). If the GREEN marker lands
+  // at the rendered shadow's centre and the YELLOW marker sits at the
+  // brightest-illuminated point, the visual model matches the data.
   //
   // Click the button a second time to remove the markers.
   // ────────────────────────────────────────────────────────────────────────
   addTestButton('Toggle expected umbra + sub-Sun markers in scene', () => {
     const _d2r = Math.PI / 180;
-    const _r2d = 180 / Math.PI;
-    // Earth radius from codebase constant; obliquity is time-varying — use the
-    // live computeObliquityEarth(year) at the current scene JD.
-    const R_E_KM = diameters.earthDiameter / 2;
 
     // Toggle: remove existing markers if any
     const existing = earth.planetObj.getObjectByName('EclipseMarkers');
@@ -30121,126 +29630,19 @@ function setupGUI() {
 
     const jd = o.julianDay;
 
-    // ───── 1. Astronomical sub-Sun (lat, lon) ─────
-    const lam_S = _eclSunLon(jd) * _d2r;
-    const eps = computeObliquityEarth(julianDateToDecimalYear(jd)) * _d2r;
+    // Both points come from the shared scene-state helpers (same data path
+    // as the always-on umbra disc). umbraFromSceneAtJd returns null when
+    // the umbra misses Earth at this instant; subSolarFromSceneAtJd always
+    // returns a value.
+    const ss   = subSolarFromSceneAtJd(jd);
+    const umbra = umbraFromSceneAtJd(jd);
 
-    const sin_dec_S = Math.sin(eps) * Math.sin(lam_S);
-    const subSun_lat = Math.asin(Math.max(-1, Math.min(1, sin_dec_S))) * _r2d;
-    let sunRA = Math.atan2(Math.cos(eps) * Math.sin(lam_S), Math.cos(lam_S)) * _r2d;
-    if (sunRA < 0) sunRA += 360;
-
-    const jd_UT = jd - _eclDeltaT(jd) / 86400;
-    const T = (jd_UT - j2000JD) / 36525;
-    let gmst = 280.46061837 + 360.98564736629 * (jd_UT - j2000JD)
-             + 0.000387933 * T * T - T * T * T / 38710000;
-    gmst = ((gmst % 360) + 360) % 360;
-
-    let subSun_lon = sunRA - gmst;
-    while (subSun_lon >  180) subSun_lon -= 360;
-    while (subSun_lon < -180) subSun_lon += 360;
-
-    // ───── 2. Astronomical umbra (lat, lon) via ray-trace from Sun→Moon→Earth ─────
-    const lam_M_rad  = _eclMoonLon(jd)      * _d2r;
-    const beta_M_rad = _eclMoonBeta(jd)     * _d2r;
-    const d_S = currentAUDistance;
-    const d_M = _eclMoonDistance(jd);
-
-    const Sx = d_S * Math.cos(lam_S);
-    const Sy = d_S * Math.sin(lam_S);
-    const Sz = 0;
-    const cosB = Math.cos(beta_M_rad);
-    const Mx = d_M * cosB * Math.cos(lam_M_rad);
-    const My = d_M * cosB * Math.sin(lam_M_rad);
-    const Mz = d_M * Math.sin(beta_M_rad);
-
-    const dx = Mx - Sx, dy = My - Sy, dz = Mz - Sz;
-    const dLen = Math.sqrt(dx*dx + dy*dy + dz*dz);
-    const Dx = dx / dLen, Dy = dy / dLen, Dz = dz / dLen;
-
-    const MdotD = Mx*Dx + My*Dy + Mz*Dz;
-    const MdotM = Mx*Mx + My*My + Mz*Mz;
-    const disc  = MdotD*MdotD - (MdotM - R_E_KM * R_E_KM);
-
-    let umbra_lat = null, umbra_lon = null;
-    if (disc >= 0) {
-      const s = -MdotD - Math.sqrt(disc);
-      const Px = Mx + s*Dx, Py = My + s*Dy, Pz = Mz + s*Dz;
-      const cosEps = Math.cos(eps), sinEps = Math.sin(eps);
-      const ex = Px;
-      const ey = Py * cosEps - Pz * sinEps;
-      const ez = Py * sinEps + Pz * cosEps;
-      const r = Math.sqrt(ex*ex + ey*ey + ez*ez);
-      umbra_lat = Math.asin(ez / r) * _r2d;
-      let ra = Math.atan2(ey, ex) * _r2d;
-      if (ra < 0) ra += 360;
-      umbra_lon = ra - gmst;
-      while (umbra_lon >  180) umbra_lon -= 360;
-      while (umbra_lon < -180) umbra_lon += 360;
-    }
-
-    // ───── 2b. SCENE-Moon umbra via ray-trace from actual scene world positions ─────
-    // Uses moon.planetObj (the mesh Three.js casts shadows from), sun.planetObj,
-    // earth.planetObj — and Earth's actual world-space rotation to transform the
-    // hit point back into the texture's (lat, lon). If this differs from the
-    // Meeus umbra above → the 3D Moon position differs from Meeus. If it agrees
-    // with Meeus but the rendered shadow lands elsewhere → the shadow-rendering
-    // pipeline is the issue (Moon position correct, but Three.js places the dark
-    // patch at a different world coord than the ray-trace predicts).
-    const _sunWS_M   = new THREE.Vector3();
-    const _moonWS_M  = new THREE.Vector3();
-    const _earthWS_M = new THREE.Vector3();
-    sun.planetObj.getWorldPosition(_sunWS_M);
-    moon.planetObj.getWorldPosition(_moonWS_M);
-    earth.planetObj.getWorldPosition(_earthWS_M);
-
-    const _moonGeo_M = _moonWS_M.clone().sub(_earthWS_M);
-    const _sunGeo_M  = _sunWS_M.clone().sub(_earthWS_M);
-    const _D_M = _moonGeo_M.clone().sub(_sunGeo_M).normalize();
-
-    const _R_E_scene = earth.size;
-    const _MdotD_M = _moonGeo_M.dot(_D_M);
-    const _MdotM_M = _moonGeo_M.dot(_moonGeo_M);
-    const _disc_M  = _MdotD_M * _MdotD_M - (_MdotM_M - _R_E_scene * _R_E_scene);
-
-    let sceneUmbra_lat = null, sceneUmbra_lon = null;
-    let sceneMoon_dPerp_km = null, sceneMoon_distance_km = null;
-    {
-      const _scaleKmPerUnit = currentAUDistance / 100;
-      sceneMoon_distance_km = _moonGeo_M.length() * _scaleKmPerUnit;
-      // Perpendicular component of moonGeo relative to Sun-Earth axis
-      const _sunUnit  = _sunGeo_M.clone().normalize();
-      const _moonAlong = _sunUnit.clone().multiplyScalar(_moonGeo_M.dot(_sunUnit));
-      const _moonPerp  = _moonGeo_M.clone().sub(_moonAlong);
-      sceneMoon_dPerp_km = _moonPerp.length() * _scaleKmPerUnit;
-    }
-
-    if (_disc_M >= 0) {
-      const _s = -_MdotD_M - Math.sqrt(_disc_M);
-      const _Pgeo = _moonGeo_M.clone().add(_D_M.clone().multiplyScalar(_s));
-
-      const _earthQuat_M = new THREE.Quaternion();
-      earth.planetObj.getWorldQuaternion(_earthQuat_M);
-      const _Plocal = _Pgeo.clone().applyQuaternion(_earthQuat_M.clone().invert());
-
-      const _r_local = _Plocal.length();
-      sceneUmbra_lat = Math.asin(Math.max(-1, Math.min(1, _Plocal.y / _r_local))) * _r2d;
-      sceneUmbra_lon = Math.atan2(_Plocal.z, -_Plocal.x) * _r2d;
-    }
-
-    // ───── 3. Convert (lat, lon) → local mesh coords ─────
+    // ───── Convert (lat, lon) → local mesh coords ─────
     // public/Earth.jpg is Pacific-centered (Greenwich at the u=0/u=1 seam,
     // date line at u=0.5). The Three.js SphereGeometry vertex layout gives:
     //   -X local = Greenwich (lon  0°)    +X local = ±180° (date line)
     //   +Z local = 90°E                  -Z local = 90°W
     //   +Y local = north pole
-    //
-    // For this UV layout:
-    //   u = lon / 360  →  theta = u·2π  →  theta = lon·(π/180)
-    //   v = (90 - lat) / 180  →  phi = v·π
-    //   x = -R·cos(theta)·sin(phi)
-    //   y =  R·cos(phi)
-    //   z =  R·sin(theta)·sin(phi)
     function latLonToLocal(lat, lon, radius) {
       const phi   = (90 - lat) * _d2r;
       const theta = lon         * _d2r;
@@ -30255,45 +29657,30 @@ function setupGUI() {
     const surfaceR = R * 1.005;     // just above the day/night shader sphere
     const markerR  = R * 0.04;       // ~510 km in physical scene units
 
-    // ───── 4. Build marker group (children of earth.planetObj) ─────
+    // ───── Build marker group (children of earth.planetObj) ─────
     const group = new THREE.Group();
     group.name = 'EclipseMarkers';
 
     const markerGeom = new THREE.SphereGeometry(markerR, 16, 16);
 
-    // YELLOW = sub-Sun
+    // YELLOW = sub-Sun (from scene state)
     const ssMarker = new THREE.Mesh(
       markerGeom,
       new THREE.MeshBasicMaterial({ color: 0xffff00 })
     );
-    ssMarker.position.copy(latLonToLocal(subSun_lat, subSun_lon, surfaceR));
+    ssMarker.position.copy(latLonToLocal(ss.lat, ss.lon, surfaceR));
     ssMarker.castShadow    = false;
     ssMarker.receiveShadow = false;
     ssMarker.name          = 'SubSunMarker';
     group.add(ssMarker);
 
-    // RED = umbra centerline (where the analytical Meeus ray-trace predicts the shadow)
-    if (umbra_lat !== null) {
-      const umMarker = new THREE.Mesh(
-        markerGeom,
-        new THREE.MeshBasicMaterial({ color: 0xff0000 })
-      );
-      umMarker.position.copy(latLonToLocal(umbra_lat, umbra_lon, surfaceR));
-      umMarker.castShadow    = false;
-      umMarker.receiveShadow = false;
-      umMarker.name          = 'UmbraMarker';
-      group.add(umMarker);
-    }
-
-    // GREEN = umbra centerline computed from the 3D SCENE Moon position
-    // If GREEN ≈ rendered shadow → Moon position is the source of any RED↔shadow gap.
-    // If GREEN ≈ RED but shadow is elsewhere → shadow-rendering pipeline is the issue.
-    if (sceneUmbra_lat !== null) {
+    // GREEN = umbra centerline (from scene state)
+    if (umbra !== null) {
       const sceneUmMarker = new THREE.Mesh(
         markerGeom,
         new THREE.MeshBasicMaterial({ color: 0x00ff00 })
       );
-      sceneUmMarker.position.copy(latLonToLocal(sceneUmbra_lat, sceneUmbra_lon, surfaceR));
+      sceneUmMarker.position.copy(latLonToLocal(umbra.lat, umbra.lon, surfaceR));
       sceneUmMarker.castShadow    = false;
       sceneUmMarker.receiveShadow = false;
       sceneUmMarker.name          = 'SceneUmbraMarker';
@@ -30302,64 +29689,33 @@ function setupGUI() {
 
     earth.planetObj.add(group);
 
-    // ───── 5. Console summary ─────
+    // ───── Console summary ─────
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Eclipse markers placed in scene  (click button again to remove)');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
     console.log(`  Scene JD: ${jd.toFixed(6)}`);
     console.log('');
-    console.log(`  YELLOW marker — astronomical sub-Sun (Sun overhead):`);
-    console.log(`    lat = ${subSun_lat.toFixed(3)}°N, lon = ${subSun_lon.toFixed(3)}°E`);
-    if (umbra_lat !== null) {
-      console.log(`  RED marker — Meeus-analytical umbra centerline:`);
-      console.log(`    lat = ${umbra_lat.toFixed(3)}°N, lon = ${umbra_lon.toFixed(3)}°E`);
+    console.log(`  YELLOW marker — framework sub-Sun (Sun overhead at this scene instant):`);
+    console.log(`    lat = ${ss.lat.toFixed(3)}°N, lon = ${ss.lon.toFixed(3)}°E`);
+    if (umbra !== null) {
+      console.log(`  GREEN marker — framework umbra centerline (ray-traced through scene Sun→Moon→Earth):`);
+      console.log(`    lat = ${umbra.lat.toFixed(3)}°N, lon = ${umbra.lon.toFixed(3)}°E`);
     } else {
-      console.log(`  RED marker NOT placed — Meeus umbra misses Earth at this instant.`);
-    }
-    if (sceneUmbra_lat !== null) {
-      console.log(`  GREEN marker — umbra centerline from 3D SCENE Moon (ray-traced through scene world positions):`);
-      console.log(`    lat = ${sceneUmbra_lat.toFixed(3)}°N, lon = ${sceneUmbra_lon.toFixed(3)}°E`);
-      if (umbra_lat !== null) {
-        const _dLat = sceneUmbra_lat - umbra_lat;
-        let _dLon = sceneUmbra_lon - umbra_lon;
-        while (_dLon >  180) _dLon -= 360;
-        while (_dLon < -180) _dLon += 360;
-        console.log(`    Δ vs RED (Meeus): Δlat = ${_dLat.toFixed(3)}°, Δlon = ${_dLon.toFixed(3)}°`);
-      }
-    } else {
-      console.log(`  GREEN marker NOT placed — scene-Moon umbra misses Earth at this instant.`);
+      console.log(`  GREEN marker NOT placed — scene umbra misses Earth at this instant (no central eclipse).`);
     }
     console.log('');
-    console.log('───── Scene Moon vs Sun-Earth axis ─────');
-    if (sceneMoon_distance_km !== null) {
-      console.log(`  Scene Moon distance from Earth:        ${sceneMoon_distance_km.toFixed(0)} km`);
-      console.log(`  Meeus  Moon distance from Earth:       ${d_M.toFixed(0)} km`);
-      console.log(`  Scene Moon ⊥ distance from Sun-Earth:  ${sceneMoon_dPerp_km.toFixed(0)} km  (gamma = ${(sceneMoon_dPerp_km/R_E_KM).toFixed(3)} R_E)`);
-      const _meeus_perp = d_M * Math.sin(Math.sqrt((lam_M_rad - lam_S)*(lam_M_rad - lam_S) + beta_M_rad*beta_M_rad));
-      console.log(`  Meeus Moon ⊥ distance from Sun-Earth:  ${_meeus_perp.toFixed(0)} km  (gamma = ${(_meeus_perp/R_E_KM).toFixed(3)} R_E)`);
-    }
-    console.log('');
-    console.log('  Three-way diagnostic (UV layout: Pacific-centered, Greenwich at u=0/u=1 seam):');
-    console.log('    • RED   = Meeus says umbra here');
-    console.log('    • GREEN = 3D scene Moon position says umbra here (ray-trace through scene world coords)');
-    console.log('    • dark eclipse shadow in scene = what Three.js actually renders');
-    console.log('');
-    console.log('  GREEN ≈ rendered shadow, GREEN ≠ RED  →  Scene Moon position differs from Meeus.');
-    console.log('     Bug is in the scene-graph Moon chain (precession harmonics, β perturbation, etc.)');
-    console.log('  GREEN ≈ RED, rendered shadow elsewhere →  Moon position is correct, but Three.js');
-    console.log('     places the shadow at a different world coord than the geometric ray-trace.');
-    console.log('     Bug is in the shadow-rendering pipeline (DirectionalLight, shadow camera, etc.)');
-    console.log('  GREEN ≈ RED ≈ rendered shadow         →  Model is correct at this epoch.');
+    console.log('  Both markers use the framework\'s scene-graph world positions — same data');
+    console.log('  path as the always-on umbra disc. They should coincide with the rendered');
+    console.log('  shadow / brightest-illumination point. Divergence is a rendering-pipeline');
+    console.log('  issue (DirectionalLight target, shadow camera, etc.), not a data issue.');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
   },
-  'Places up to three visible markers on the Earth mesh:  YELLOW = astronomical sub-Sun (Sun ' +
-  'overhead per Meeus + GMST),  RED = Meeus-analytical umbra centerline,  GREEN = umbra centerline ' +
-  'computed from the 3D scene\'s actual Moon world position (ray-traced through scene Sun, Moon, ' +
-  'and Earth world positions). Markers are children of Earth\'s mesh so they rotate with the ' +
-  'spin/tilt/precession and stay anchored to specific texture pixels. Click again to remove. ' +
-  'Three-way comparison localizes the source of any rendered-shadow ↔ Meeus mismatch:  GREEN at ' +
-  'rendered shadow but GREEN ≠ RED → Moon position bug;  GREEN at RED but shadow elsewhere → ' +
-  'shadow-rendering bug.');
+  'Places two visible markers on the Earth mesh: YELLOW = framework sub-Sun, ' +
+  'GREEN = framework umbra centerline. Both derived from the scene-graph world ' +
+  'positions (same data path as the always-on umbra disc). Markers are children ' +
+  'of Earth\'s mesh so they rotate with the spin/tilt/precession and stay ' +
+  'anchored to specific texture pixels. Click again to remove. Useful for ' +
+  'verifying the rendered shadow lands where the framework\'s data says it should.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Lunar Eclipses & Validation
@@ -41658,6 +41014,102 @@ function forceSceneUpdate (mode) {
   calculateInvariablePlaneFromAngularMomentum();
   updateOrbitOrientations();
   labelPrevHTML = '';                 // invalidate panel cache so next render picks up fresh values
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Scene-state umbra / sub-solar helpers — used by the audit and other
+ * eclipse-investigation buttons. They NAVIGATE THE SCENE (modify global
+ * o.julianDay + scene-graph rotations), so callers MUST save/restore
+ * scene state around blocks of calls:
+ *
+ *   const _save = o.julianDay;
+ *   try { ... umbraFromSceneAtJd(jd) ...; }
+ *   finally { jumpToJulianDay(_save); forceSceneUpdate(); }
+ *
+ * Use 'light' mode internally because the Moon's Meeus Ch. 47 latitude
+ * perturbation (~5° at conjunctions) is applied inside updatePositions()
+ * via _meeusLatRad → moon.pivotObj.position. With 'minimal' the Moon
+ * stays at the wrong geocentric position and the ray-trace fails.
+ * ───────────────────────────────────────────────────────────────────── */
+const _sceneUmbraSun     = new THREE.Vector3();
+const _sceneUmbraMoon    = new THREE.Vector3();
+const _sceneUmbraEarth   = new THREE.Vector3();
+const _sceneUmbraMoonGeo = new THREE.Vector3();
+const _sceneUmbraSunGeo  = new THREE.Vector3();
+const _sceneUmbraDir     = new THREE.Vector3();
+const _sceneUmbraHit     = new THREE.Vector3();
+const _sceneUmbraLocal   = new THREE.Vector3();
+const _sceneUmbraQuat    = new THREE.Quaternion();
+const _sceneUmbraQuatInv = new THREE.Quaternion();
+
+/** Navigate the scene-graph to `jd` and return the umbra centerline
+ * geographic (lat, lon) — matches the always-on umbra disc + GREEN-marker
+ * positions exactly. Returns null if the umbra misses Earth at this JD.
+ * UV convention: -X local = Greenwich, +Z local = 90°E, +Y = north pole
+ * (per public/Earth.jpg, which is Pacific-centered). */
+function umbraFromSceneAtJd(jd) {
+  jumpToJulianDay(jd);
+  forceSceneUpdate('light');
+
+  sun  .planetObj.getWorldPosition(_sceneUmbraSun);
+  moon .planetObj.getWorldPosition(_sceneUmbraMoon);
+  earth.planetObj.getWorldPosition(_sceneUmbraEarth);
+
+  _sceneUmbraMoonGeo.copy(_sceneUmbraMoon).sub(_sceneUmbraEarth);
+  _sceneUmbraSunGeo .copy(_sceneUmbraSun) .sub(_sceneUmbraEarth);
+  _sceneUmbraDir    .copy(_sceneUmbraMoonGeo).sub(_sceneUmbraSunGeo).normalize();
+
+  const R_E = earth.size;
+  const MdotD = _sceneUmbraMoonGeo.dot(_sceneUmbraDir);
+  const MdotM = _sceneUmbraMoonGeo.dot(_sceneUmbraMoonGeo);
+  const disc  = MdotD * MdotD - (MdotM - R_E * R_E);
+  if (disc < 0) return null;
+
+  const s = -MdotD - Math.sqrt(disc);
+  _sceneUmbraHit.copy(_sceneUmbraDir).multiplyScalar(s).add(_sceneUmbraMoonGeo);
+
+  earth.planetObj.getWorldQuaternion(_sceneUmbraQuat);
+  _sceneUmbraQuatInv.copy(_sceneUmbraQuat).invert();
+  _sceneUmbraLocal.copy(_sceneUmbraHit).applyQuaternion(_sceneUmbraQuatInv);
+
+  const r = _sceneUmbraLocal.length();
+  const lat = Math.asin(Math.max(-1, Math.min(1, _sceneUmbraLocal.y / r))) * (180 / Math.PI);
+  const lon = Math.atan2(_sceneUmbraLocal.z, -_sceneUmbraLocal.x) * (180 / Math.PI);
+  return { lat, lon };
+}
+
+/** Navigate the scene to `jd` and return the sub-solar geographic point
+ * (where the Sun is at zenith) per scene-graph. Same convention as
+ * umbraFromSceneAtJd. */
+function subSolarFromSceneAtJd(jd) {
+  jumpToJulianDay(jd);
+  forceSceneUpdate('light');
+
+  sun  .planetObj.getWorldPosition(_sceneUmbraSun);
+  earth.planetObj.getWorldPosition(_sceneUmbraEarth);
+
+  _sceneUmbraSunGeo.copy(_sceneUmbraSun).sub(_sceneUmbraEarth).normalize();
+
+  earth.planetObj.getWorldQuaternion(_sceneUmbraQuat);
+  _sceneUmbraQuatInv.copy(_sceneUmbraQuat).invert();
+  _sceneUmbraLocal.copy(_sceneUmbraSunGeo).applyQuaternion(_sceneUmbraQuatInv);
+
+  const lat = Math.asin(Math.max(-1, Math.min(1, _sceneUmbraLocal.y))) * (180 / Math.PI);
+  const lon = Math.atan2(_sceneUmbraLocal.z, -_sceneUmbraLocal.x) * (180 / Math.PI);
+  return { lat, lon };
+}
+
+/** Great-circle distance in km between two (lat, lon) points. Uses
+ * diameters.earthDiameter/2 for consistency with the rest of the
+ * codebase. */
+function gcKmFromLatLon(lat1, lon1, lat2, lon2) {
+  const _d2r = Math.PI / 180;
+  const R_E_km = diameters.earthDiameter / 2;
+  const f1 = lat1 * _d2r, f2 = lat2 * _d2r;
+  const df = (lat2 - lat1) * _d2r;
+  const dl = (lon2 - lon1) * _d2r;
+  const a = Math.sin(df / 2) ** 2 + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) ** 2;
+  return 2 * R_E_km * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 /*  Load SheetJS the first time we need it  */
