@@ -31,6 +31,20 @@ Everything comes together in the **Earth Fundamental Cycle (H)**: a 335,317-year
 
 ---
 
+## The Solar System Resonance Cycle (8H) — ESSRT
+
+Earth's H is the model's master cycle, but it isn't the largest. **Eight Earth Fundamental Cycles — 8H = 2,682,536 years at J2000 — is the Solar System Resonance Cycle**: the super-period at which every major planetary cycle (axial precession, perihelion precession, inclination oscillation, ascending node regression, obliquity oscillation, eccentricity oscillation) across all eight planets divides evenly as an integer. This is the **8H integer-divisor lattice** that the climate work (docs 90–92) demonstrates from the LR04 + CENOGRID paleoclimate records, the Fibonacci Laws use (Law 6 lock at 8H/65, axial precession H/13 = 8H/104), and the deep-time framework expands across geological time.
+
+The unifying theory is the **Expanding Solar System Resonance Theory (ESSRT)** ([Doc 99](docs/99-expanding-solar-system-resonance-theory.md)):
+
+- The **L1 integer labels** (n = 9, 12, …, 65, 66, 68, …, 185 — 32 components in total) are **scale-invariant** structural constants of the solar system. Same integers at every epoch.
+- The **literal periods** scale with the current value of H(t): in the Devonian H ≈ 309,083 yr, today H = 335,317 yr, in 200 Myr H ≈ 350,665 yr — but `8H/65` is still the obliquity beat, `8H/104` is still axial precession, etc.
+- Two physically independent drivers expand H(t): **Driver 1** is Earth-Moon tidal evolution (Moon recedes ~3.4 cm/yr, Earth's length-of-day grows); **Driver 2** is solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). Both act simultaneously; the structural invariant `H × days/year ≈ 122,471,920` couples them at the per-planet observational level.
+
+ESSRT therefore unifies the **modern-era 8H climate lattice** (docs 90–92), the **deep-time predictions** (see deep-time section below), and the **future projections** (tidal-lock asymptote at ~87 R_⊕) into a single coherent framework with the **same 6 free parameters** throughout. The Solar System Resonance Cycle Period Table is in [Doc 55](docs/55-solar-system-resonance-cycle-periods.md).
+
+---
+
 ## The Six Fibonacci Laws
 
 The model implements six laws — anchored on Earth and extending to all eight planets through Fibonacci numbers:
@@ -124,6 +138,20 @@ npm run build
 
 ---
 
+## Deep-Time Implementation — Hadean to +200 Myr
+
+The simulation is not limited to the modern era. The model's 6 free parameters apply at **all epochs from the Hadean (4.5 Gyr ago, Moon at the Roche limit) through J2000 and into the future tidal-lock asymptote at ~87 R_⊕**. A toggle in the developer panel enables deep-time mode, after which the time slider can be scrubbed across geological timescales and the entire scene graph — Earth, Moon, all seven planets, plus the perihelion-ecliptic frames — updates in real time to the physically correct positions for the target epoch.
+
+The framework is documented in [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](docs/99-expanding-solar-system-resonance-theory.md): a canonical 9-step chain from `t_Ma` through length-of-day (LOD), the Earth Fundamental Cycle H(t), AU, solar mass loss, Kepler year, Moon distance, Moon synodic month, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods. The chain is anchored to modern Lunar Laser Ranging and the [Farhat 2022](https://www.aanda.org/articles/aa/full_html/2022/09/aa44329-22/aa44329-22.html) lunar-distance evolution polynomial; deep-time outputs are then independently validated against three external anchors that the model was **not** fit against:
+
+- **Wells 1963** (Devonian coral growth bands at 380 Ma): predicted Earth Fundamental Cycle H ≈ 309,083 yr matches Wells's paleontological day-count to ~1.4 %
+- **Wu et al. 2024** (650-Myr cyclostratigraphy from sedimentary records): predicted H(t) matches Wu's reconstruction across the entire Phanerozoic to within ~1 %
+- **Patterson 1956 Pb-Pb Earth age** (4.55 Gyr): the model places the Moon at the Roche limit at that epoch — **no Hadean constraint was used in the fit**; the result emerges from the same proper-physics chain that produces the modern Moon distance
+
+Because the 6 free parameters are fit against modern J2000 data and then projected backward and forward via the proper-physics chain, the deep-time match is a **falsifiable prediction, not a fit**. The same 6 free parameters that reproduce the modern solar system to JPL Horizons precision (~1800–2200 AD) also reproduce paleontological day-counts at Devonian, cyclostratigraphic precession at 650 Ma, and the Hadean Moon-distance constraint at Earth formation — internally consistent across **the full 4.5-Gyr lifetime of the solar system**.
+
+---
+
 ## Related Findings — Mass Calibration Chain
 
 The model's gravitational parameters (`GM_Sun`, `GM_Earth`, `GM_Moon`, `GM_planet`) are computed from a self-consistent chain rather than copied from a reference table. The chain re-parameterizes classical 19th–20th century perturbation results (Hill 1878, Brown 1908, Brouwer 1959) into compact closed forms and verifies the synthesis against JPL DE440 reference data. The physics is classical; the contribution is **synthesis and presentation**:
@@ -152,11 +180,14 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 | 50–59 | UI & Tools | [UI Panels](docs/50-ui-panels-reference.md), [Balance Explorer](docs/53-balance-explorer-reference.md) |
 | 60–69 | Optimization & Fitting | [Overview](docs/60-optimization-tool-overview.md), [Fitting Pipeline](tools/fit/README.md) |
 | 70–79 | Verification | [Ascending Node Limitations](docs/70-ascending-node-limitations.md) |
-| 80–99 | Appendices | Code scripts and data spreadsheets |
+| 80–89 | Per-Planet Setup | [Mercury Scene Graph Setup](docs/80-mercury-setup.md) |
+| 90–99 | Climate Analysis | [Climate Formula (Doc 92)](docs/92-climate-formula.md), [Climate Summary (Doc 95)](docs/95-climate-summary.md), [ESSRT (Doc 99)](docs/99-expanding-solar-system-resonance-theory.md) |
+| 100–109 | ΔT & Historical Eclipse Validation | [Pure-tidal solar eclipses (Doc 101)](docs/101-pure-tidal-eclipses.md), [GIA α(t) lunar validation (Doc 102)](docs/102-gia-alpha-lunar-validation.md), [-135 Babylonian case study (Doc 103)](docs/103-135-babylonian-case-study.md) |
 
 **Investigation & Verification:**
 - [Python Scripts](scripts/) — Statistical significance tests, exoplanet Fibonacci tests, eccentricity analysis, Milankovitch paleoclimate tests
 - [Milankovitch Framework (Doc 90)](docs/90-milankovitch-language.md), [Milankovitch Evidence & Hypothesis Tests (Doc 91)](docs/91-milankovitch-evidence.md), and [LR04 / CENOGRID Variance Decomposition + Canonical Climate Formula + Modal Implementation (Doc 92)](docs/92-climate-formula.md) — Spectral analysis of LR04 + Cheng 2016 U-Th-dated speleothems + Westerhold 2020 CENOGRID 67-Myr Cenozoic record + Bereiter 2015 EPICA Dome C CO₂ + CenCO2PIP Consortium 2023 deep-time CO₂. Doc 90 states the framework; doc 91 covers the canonical 32-component **8H Orbital Forcing Formula**, per-planet contributions, the 100-kyr-band centroid (Mercury–Mars s₁−s₄ nodal beat at 107 kyr), the pre-registered super-cycle hypothesis test (NULL), fourteen falsifiable follow-up tests (16 positive / 2 partials / 5 nulls), and the dedicated 405-kyr off-lattice characterization (carbon-cycle silicate-weathering thermostat resonance). Doc 92 documents the canonical L1 + L2 + L3 modular formula with sequential ridge fitting per regime (post-MPT, iNHG-MPT, pre-iNHG, lr04-full, CENOGRID δ¹⁸O / δ¹³C, EPICA CO₂, CenCO2PIP), stitched per-regime evaluation, the Climate Formula Explorer modal (8 tabs in `src/script.js`), and the full reproducing pipeline
+- [Historical Eclipse Validation (Doc 100)](docs/100-deltat-validation.md), [Pure-tidal Solar Eclipses (Doc 101)](docs/101-pure-tidal-eclipses.md), [GIA α(t) Lunar Validation (Doc 102)](docs/102-gia-alpha-lunar-validation.md), and [-135 Babylonian Case Study (Doc 103)](docs/103-135-babylonian-case-study.md) — The model's ΔT formula (pure-tidal Farhat 2022 Moon-distance evolution + a viscoelastic α(t) GIA correction from independent satellite gravimetry — Cox & Chao 2002 + Peltier ICE-5G(VM2), **zero parameters fitted to eclipse data**) tested directly against the historical eclipse record. **Doc 101**: visibility-window methodology on 19 cleanly-attributed solar eclipses (-762 to 1654 CE) — model beats Stephenson's empirical fit on penumbra count (19/19 vs 17/19) and per-event mean residual (8,682 vs 8,789 s). A 2026-06-24 tighter umbra-centerline criterion further gives **★ TOTAL matches at conventional documented dates** for -584 Thales/Anatolia (73 km, vindicating Herodotus), -762 Bur-Sagale/Nineveh (85 km, vindicating the Assyrian Eponym Canon), -708 Confucius (with chronology re-attribution, 176 km), -309 Sicily/Agathocles. **Doc 102**: higher-resolution lunar-timing test on 270 primary-source observations (Stephenson, Morrison & Hohenkerk 2016; Babylonian + Greek + Chinese + Arab traditions, -720 BCE to 1280 CE) — mean residual 24.4 min vs NASA Espenak/Meeus polynomial 20.0 min (within 4 min of the observation noise floor); four independent observation traditions agree on the model's residual to ±200 s after detrending — the **cross-cultural validation argument**. The Munk-MacDonald-scale (~5-6 ms/cy) non-tidal Earth-rotation assumption is **rejected**; the smaller GIA-scale (~0.6 ms/cy) contribution survives and is included as α(t). **Doc 103**: focused case study of the framework's one persistent residual (the -135 Babylonian eclipse, 1,159 km BestGap), decomposed into ~270 km α(t)-uncloseable ΔT + ~440 km Meeus Ch. 47 polynomial residual in Moon β + ~450 km other Meeus terms — establishes the framework's prediction (deep partial at Babylon, centerline over Saudi Arabia) as the correct prediction given its Meeus polynomial. Doc 100 provides the prior RMS-residual baseline (35 eclipses, all three ΔT formulas statistically indistinguishable at ~2° RMS)
 - [Fitting Pipeline](tools/fit/README.md) — Pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, solar measurements, obliquity/cardinal-point/year-length harmonics
 - [Predictive Formula Guide](tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — ~2421-term physical-beat ML system for planetary precession prediction (R² > 0.99999 per planet; superseded the 429-term unified system on 2026-04-20)
 
