@@ -28704,6 +28704,161 @@ function setupGUI() {
      'Reports the geographic offset between our predicted sub-solar location and ' +
      'the documented observation location. Reveals whether our ΔT has systematic bias.');
 
+  // ────────────────────────────────────────────────────────────────────────
+  // Historic Eclipse Validation — SCENE STATE variant
+  //
+  // Same 14-event curated list as the Meeus-based button above, but the
+  // geographic position at each conjunction is read from the framework's
+  // scene-graph (jumpToJulianDay + forceSceneUpdate, then ray-trace
+  // sun.planetObj/moon.planetObj/earth.planetObj). This is the framework's
+  // ACTUAL prediction including all deep-time corrections (Moon-precession
+  // harmonics, β perturbation, framework ΔT applied through the scene
+  // hierarchy), not the pure-tidal Meeus baseline.
+  //
+  // Use side-by-side with the Meeus version: agreement at modern times
+  // (1654 London, 1185 Russia) cross-validates the Moon polynomial;
+  // divergence at deep time (Bur-Sagale, Thales, Babylonian) is the
+  // framework's deep-time signal — the data point the 25-event audit
+  // also surfaces.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Historic Eclipse Validation (scene state)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Historic Eclipse Validation — framework SCENE STATE prediction vs documented observations');
+    console.log('  Each event: navigate the scene-graph to the conjunction JD, read umbra (central) or');
+    console.log('  sub-solar (partial), and report great-circle distance to the documented observation site.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    // Same curated list as the Meeus-based Historic Eclipse Validation button.
+    // Format: [year_astro, month, day, lat, lon_E, type, name+source]
+    const HISTORIC = [
+      [-762,  6, 15, 36.36, 43.16, 'Total',   'Bur-Sagale (Assyrian Eponym Canon, Nineveh)'],
+      [-708,  7, 17, 35.0,  113.0, 'Total',   'Chinese Spring/Autumn (Lu State, Shih Ching)'],
+      [-647,  4,  6, 32.5,  44.4,  'Partial', 'Babylonian early diary'],
+      [-584,  5, 28, 39.0,  35.0,  'Total',   'Thales (Herodotus 1.74, Halys/Anatolia)'],
+      [-556,  5, 19, 32.5,  44.4,  'Partial', 'Babylonian Nabonidus'],
+      [-430,  8,  3, 37.97, 23.72, 'Annular', 'Thucydides 2.28 (Athens, Peloponnesian War)'],
+      [-309,  8, 15, 32.5,  44.4,  'Total',   'Babylonian (death of Antigonus era)'],
+      [-135,  4, 15, 32.5,  44.4,  'Total',   'Babylonian (best-preserved diary)'],
+      [  71,  3, 20, 38.0,  25.0,  'Total',   'Plutarch De Facie 19 (Aegean)'],
+      [1004,  1, 24, 30.05, 31.24, 'Total',   'Ibn Yunus al-Hakemite (Cairo)'],
+      [1133,  8,  2, 52.0,  -2.0,  'Total',   'Henry I death (English chronicles)'],
+      [1185,  5,  1, 50.0,  38.0,  'Annular', "Igor's Tale (Russian Primary Chronicle)"],
+      [1239,  6,  3, 43.7,  10.4,  'Total',   'Cerchiari Tuscany (Italian chronicle)'],
+      [1654,  8, 12, 51.5,  -0.1,  'Total',   "Halley's map basis (London)"],
+    ];
+
+    function julianDateToJD(Y, M, D, hour = 12) {
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
+           + D - 1524.5 + hour / 24;
+    }
+
+    console.log('Date (Julian)     Obs Loc       Type      Conj JD         Scene point             Dist(km)   Kind       Note');
+    console.log('────────────────────────────────────────────────────────────────────────────────────────────────────────────────');
+
+    const distances = [];   // for stats
+    const _saveJD = o.julianDay;
+    try {
+      for (const [Y, M, D, lat_obs, lon_obs, type, name] of HISTORIC) {
+        const jd_nominal = julianDateToJD(Y, M, D);
+        // Find candidate conjunctions in a wide window so we can pick the
+        // one closest to the documented date.
+        const events = findSolarEclipsesInRange(jd_nominal - 15, jd_nominal + 15);
+
+        const dateStr = `${Y >= 0 ? Y : '-' + (-Y)}-${String(M).padStart(2,'0')}-${String(D).padStart(2,'0')}`;
+        const locStr  = `${lat_obs.toFixed(1)},${lon_obs.toFixed(1).padStart(6)}`;
+
+        if (events.length === 0) {
+          console.log(`${dateStr.padEnd(15)} ${locStr.padEnd(13)} ${type.padEnd(8)}  NOT FOUND ±15 days  ${name}`);
+          continue;
+        }
+
+        // Pick the event closest to the nominal documented date
+        let evt = events[0];
+        let bestΔ = Math.abs(events[0].jd - jd_nominal);
+        for (const e of events) {
+          const δ = Math.abs(e.jd - jd_nominal);
+          if (δ < bestΔ) { bestΔ = δ; evt = e; }
+        }
+
+        // Read framework's geographic position: umbra for central eclipses,
+        // sub-solar for partials (or central eclipses where umbra misses Earth).
+        const isCentral = (evt.type === 'Total' || evt.type === 'Annular' || evt.type === 'Hybrid');
+        let point = null;
+        let kind = '';
+        if (isCentral) {
+          point = umbraFromSceneAtJd(evt.jd);
+          kind = 'umbra';
+        }
+        if (point === null) {
+          point = subSolarFromSceneAtJd(evt.jd);
+          kind = 'sub-solar';
+        }
+        const dist = gcKmFromLatLon(lat_obs, lon_obs, point.lat, point.lon);
+        distances.push({ year: Y, dist, kind, name });
+
+        const pointStr = `(${point.lat.toFixed(1).padStart(5)},${point.lon.toFixed(1).padStart(7)})`;
+        console.log(
+          dateStr.padEnd(15) + ' ' +
+          locStr.padEnd(13) + ' ' +
+          type.padEnd(8) + '  ' +
+          evt.jd.toFixed(2).padStart(12) + '  ' +
+          pointStr.padEnd(20) + '  ' +
+          Math.round(dist).toString().padStart(7) + '   ' +
+          kind.padEnd(9) + '  ' +
+          name
+        );
+      }
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
+    }
+
+    // Statistics: mean / RMS distance, and per-century trend
+    console.log('────────────────────────────────────────────────────────────────────────────────────────────────────────────────');
+    if (distances.length > 0) {
+      const ds = distances.map(o => o.dist);
+      const meanD = ds.reduce((a,b) => a+b, 0) / ds.length;
+      const variance = ds.reduce((a,b) => a + (b-meanD)**2, 0) / ds.length;
+      const rmsD = Math.sqrt(variance + meanD*meanD);
+      console.log();
+      console.log(`Mean distance:   ${meanD.toFixed(0)} km`);
+      console.log(`RMS  distance:   ${rmsD.toFixed(0)} km`);
+      console.log();
+      console.log('Per-epoch trend (mean distance grouped by century):');
+      const byCentury = {};
+      for (const o of distances) {
+        const cent = Math.floor(o.year / 100) * 100;
+        if (!byCentury[cent]) byCentury[cent] = [];
+        byCentury[cent].push(o.dist);
+      }
+      const cents = Object.keys(byCentury).map(Number).sort((a,b) => a - b);
+      for (const c of cents) {
+        const arr  = byCentury[c];
+        const mean = arr.reduce((a,b) => a+b, 0) / arr.length;
+        const yearLbl = c >= 0 ? `${c} CE` : `${-c} BC`;
+        console.log(`  ${yearLbl.padStart(8)} (n=${arr.length}):  mean dist ${Math.round(mean)} km`);
+      }
+    }
+    console.log();
+    console.log('Interpretation:');
+    console.log(' • Distance = great-circle from documented observation site to the framework\'s');
+    console.log('   scene-graph umbra (central) or sub-solar (partial) at the conjunction JD.');
+    console.log(' • Matches the always-on umbra disc / GREEN-marker exactly — same data path.');
+    console.log(' • Compare to the Meeus-based "Historic Eclipse Validation (15 events)" button:');
+    console.log('     – Modern epochs (1654, 1185): both should agree (cross-validates Moon polynomial).');
+    console.log('     – Deep time (Bur-Sagale, Thales): divergence is the framework\'s deep-time signal.');
+    console.log(' • Distances are reported as DISTANCES, not Δlon — the framework\'s scene position can');
+    console.log('   differ from documented in BOTH lat and lon (Meeus Δlon was lon-only by construction).');
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+  }, 'Same 14-event curated historic-eclipse list as the Meeus-based Historic Eclipse ' +
+     'Validation button, but each conjunction\'s geographic position is read from the ' +
+     'framework\'s scene-graph (matches the always-on umbra disc / GREEN-marker). Reports ' +
+     'great-circle distance to documented observation. Side-by-side with the Meeus version, ' +
+     'reveals where the framework\'s deep-time Moon-precession / ΔT predictions diverge from ' +
+     'the pure-tidal baseline.');
+
   const firstInvestigationEclipseBtn = addTestButton('Historic Eclipse Candidates (multi-match search)', () => {
     // For each documented historic eclipse event, search a WIDE time window
     // around the traditionally-assigned date and find ALL eclipses our
