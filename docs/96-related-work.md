@@ -9,12 +9,14 @@
 > communities. This doc positions HUM relative to that wave.
 >
 > **Bottom line.** The integer-divisor unification under a single fundamental
-> period (8H = 2,682,536 yr) and the dual-attribution structure are the
+> period (8H = 2,682,536 yr at J2000) and the dual-attribution structure are the
 > *genuinely novel* contributions. The gravitational-coupling-as-source claim,
 > the R² ≈ 0.6–0.9 multi-tone-fit magnitudes, and the specific Grand cycles
 > are aligned with or already anticipated by mainstream 2024 research.
 
 **Related synthesis:** [Doc 95 — Climate summary](95-climate-summary.md) — the conclusion this doc situates.
+
+> **Scope note (ESSRT).** This document positions the framework against external literature; the comparative claims (integer-divisor unification, dual attribution, ΔR² = 0 with Laskar substitution) are structural and scale-invariant. The literal 8H = 2,682,536 yr value and the 13H = 9.04 Myr reference are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler); the external papers cited here (Boulila 2019 9-Myr cycle, Dutkiewicz 2024 2.4-Myr cycle, Zeebe-Lantink 2024 g₂−g₅ disruption) all operate in present-epoch comparison space, so the positioning is epoch-consistent without further adjustment.
 
 ---
 
@@ -132,7 +134,7 @@ Reviewers will (correctly) note that several HUM claims overlap with recent peer
 
 | HUM contribution | Why novel |
 |------------------|-----------|
-| **Single fundamental period 8H = 2,682,536 yr** with all climate cycles as integer divisors | No paper proposes a unified fundamental-period structure of this form. Cyclostratigraphy uses independent Laskar eigenmode beats; nothing pulls them into a single integer-divisor lattice. |
+| **Single fundamental period 8H = 2,682,536 yr at J2000** with all climate cycles as integer divisors | No paper proposes a unified fundamental-period structure of this form. Cyclostratigraphy uses independent Laskar eigenmode beats; nothing pulls them into a single integer-divisor lattice. |
 | **Dual attribution** (every L1 integer has Berger-eigenmode-beat AND Earth-planet-beat origin) | Not in any paper surveyed. Existing work typically attributes each peak to one mechanism (Berger eigenmode beat OR planet harmonic). |
 | **Empirical ΔR² = 0 test** with Laskar 2010 substitution | The specific test — "add Berger insolation to a fitted lattice basis and measure ΔR²" — has not been performed in any paper surveyed. The result (ΔR² = 0 with Laskar e) sets a strong empirical anchor for the "lattice subsumes Berger insolation" claim. |
 | **L1 + L2 + L3 modular formula architecture** | The decomposition into orbital lattice + carbon-cycle thermostat + boundary-condition step components, with explicit per-layer ΔR² accounting, is HUM-specific. |
@@ -173,7 +175,7 @@ When discussing this framework with paleoclimate or solar-system-dynamics audien
 
 ### 8.1 The framing that lands
 
-> "We propose a unified integer-divisor lattice (32 integers under 8H = 2,682,536 yr) as a more complete decomposition basis than the classical 4-feature Berger insolation parameterization. Empirically, adding Berger features to the fitted lattice yields ΔR² ≈ 0 on LR04 and EPICA CO₂ — the lattice already contains the information the projection produces. The framework is structurally compatible with recent revisions to classical Milankovitch theory (Zeebe-Lantink 2024, Dutkiewicz 2024) and extends them by providing a unified parameterization basis."
+> "We propose a unified integer-divisor lattice (32 integers under 8H = 2,682,536 yr at J2000) as a more complete decomposition basis than the classical 4-feature Berger insolation parameterization. Empirically, adding Berger features to the fitted lattice yields ΔR² ≈ 0 on LR04 and EPICA CO₂ — the lattice already contains the information the projection produces. The framework is structurally compatible with recent revisions to classical Milankovitch theory (Zeebe-Lantink 2024, Dutkiewicz 2024) and extends them by providing a unified parameterization basis."
 
 ### 8.2 The framing that does not land
 
@@ -186,7 +188,7 @@ This invites immediate, well-grounded pushback:
 
 ### 8.3 Genuinely novel claims to lead with
 
-1. **The 8H = 2,682,536 yr fundamental period** as a physical resonance structure (not a mathematical fit artifact)
+1. **The 8H = 2,682,536 yr (at J2000) fundamental period** as a physical resonance structure (not a mathematical fit artifact)
 2. **The dual-attribution finding** (every L1 integer has two independent physical interpretations)
 3. **The empirical test** with ΔR² = 0 under Laskar 2010 substitution
 
@@ -216,3 +218,4 @@ These are where the framework's specific contribution lies. The R² values and t
 - [Doc 92 — Climate formula](92-climate-formula.md) — canonical L1+L2+L3 architecture
 - [Doc 91 — Milankovitch evidence](91-milankovitch-evidence.md) — 14 hypothesis tests
 - [Doc 90 — Milankovitch language](90-milankovitch-language.md) — terminology primer
+- [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); the literal 8H period evolves at deep time per Drivers 1 and 2

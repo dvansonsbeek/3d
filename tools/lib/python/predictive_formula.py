@@ -54,10 +54,16 @@ from constants_scripts import (
 ANCHOR_YEAR = BALANCE_YEAR      # from constants_scripts (1246 - 14.5*(H/16))
 J2000 = 2000                    # J2000 epoch (perihelion reference)
 
-# --- Day & Year constants (all derived in constants_scripts) ---
+# --- Day & Year constants (all derived in constants_scripts; J2000-anchored) ---
+# Note: these are J2000 snapshot values. The predictive-formula system is
+# scoped to the modern era (±2 kyr around J2000), where ESSRT-driven drift
+# in H, LOD, and the sidereal year is sub-ppm and well below the formula's
+# noise floor. For deep-time epochs, use src/script.js helpers
+# meanSiderealYearSecondsAtAge(t_Ma), meanLodSecondsAtAge(t_Ma),
+# meanHAtAge(t_Ma) instead — see docs/99-expanding-solar-system-resonance-theory.md.
 MEAN_SOLAR_YEAR_DAYS = _MEAN_SOLAR_YEAR_DAYS
-SIDEREAL_YEAR_SECONDS = _SIDEREAL_YEAR_S
-MEAN_DAY_LENGTH = _MEAN_LENGTH_OF_DAY
+SIDEREAL_YEAR_SECONDS = _SIDEREAL_YEAR_S        # J2000 snapshot
+MEAN_DAY_LENGTH = _MEAN_LENGTH_OF_DAY            # J2000 snapshot
 MEAN_ANOM_YEAR_DAYS = _MEAN_ANOM_YEAR_DAYS
 
 # --- RA solar day offset (measured, Fourier fit) ---
@@ -509,9 +515,16 @@ def calc_day_length(year: int) -> float:
 
     Formula: D = Y_sid(seconds) / Y_sid(days)
 
-    The sidereal year in SI seconds is fixed (31,558,149.724 s).
-    As the sidereal year in days changes, the day length adjusts
-    accordingly.
+    The sidereal year in SI seconds is held at its J2000 snapshot value
+    (31,558,149.724 s) throughout this formula's modern-era scope (±2 kyr
+    around J2000). As the sidereal year in days changes, the day length
+    adjusts accordingly.
+
+    Deep-time note: under ESSRT (docs/99-expanding-solar-system-resonance-theory.md),
+    the sidereal year in SI seconds drifts at deep time via Driver 2
+    (solar mass loss → Kepler). For epochs outside ±2 kyr, use
+    src/script.js helper meanSiderealYearSecondsAtAge(t_Ma) instead of
+    the J2000 constant SIDEREAL_YEAR_SECONDS used here.
     """
     sid_days = calc_sidereal_year(year)
     return SIDEREAL_YEAR_SECONDS / sid_days
@@ -558,9 +571,16 @@ def calc_sidereal_year_seconds(year: int) -> float:
     """
     Calculate the length of the sidereal year in SI seconds.
 
-    The sidereal year in SI seconds is fixed at 31,558,149.724 s.
-    This function exists for API consistency so that all year-length
-    outputs are available in the same units.
+    The sidereal year in SI seconds is held at its J2000 snapshot value
+    (31,558,149.724 s) throughout this formula's modern-era scope (±2 kyr
+    around J2000). This function exists for API consistency so that all
+    year-length outputs are available in the same units.
+
+    Deep-time note: under ESSRT (docs/99-expanding-solar-system-resonance-theory.md),
+    the sidereal year in SI seconds drifts at deep time via Driver 2
+    (solar mass loss → Kepler) — see src/script.js helper
+    meanSiderealYearSecondsAtAge(t_Ma) for epoch-correct values outside
+    the modern-era ±2 kyr window.
     """
     return SIDEREAL_YEAR_SECONDS
 

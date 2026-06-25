@@ -10,7 +10,10 @@ This glossary defines the key terms used throughout the documentation. For a com
 A geo-heliocentric framework that models the solar system through two interacting forces: axial precession (clockwise) and inclination precession (counter-clockwise). These opposing movements generate all observable precession phenomena.
 
 ### Earth Fundamental Cycle
-The grand cycle (H) where all precession movements complete and realign. Comprises 13 axial precession cycles, 3 inclination precession cycles, and 16 perihelion precession cycles. See [Constants Reference](20-constants-reference.md) for the current value of H.
+The grand cycle (H) where all precession movements complete and realign. Comprises 13 axial precession cycles, 3 inclination precession cycles, and 16 perihelion precession cycles. See [Constants Reference](20-constants-reference.md) for the current value of H. Under [ESSRT](#expanding-solar-system-resonance-theory-essrt), H(t) evolves at deep time — the integer divisors above (13, 3, 16) stay constant; only the literal year count of H scales.
+
+### Solar System Resonance Cycle (8H)
+Eight Earth Fundamental Cycles. The fundamental super-period of the solar system at which every major planetary cycle (axial precession, perihelion precession, inclination oscillation, ascending node regression, obliquity oscillation, eccentricity oscillation) across all 8 planets divides evenly as an integer. The 32-component **L1 integer-divisor lattice** lives here. At J2000 8H = 2,682,536 years; see [Doc 55 — Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) for the complete 8H/N period table and [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the theoretical framework.
 
 ### EARTH-WOBBLE-CENTER
 A gravitational control point around which Earth's axis wobbles over approximately H/13 years. This creates the precession of the equinoxes. Visualized as "The Death Star" in the simulation.
@@ -101,13 +104,13 @@ A coordinate system centered on Earth.
 ## Time Measurements
 
 ### Solar Year (Tropical Year)
-The time for the Sun to return to the same position relative to the vernal equinox. Approximately 365.2422 days. This is the year of the seasons.
+The time for the Sun to return to the same position relative to the vernal equinox. Approximately 365.2422 days (at J2000). This is the year of the seasons. Under ESSRT the value shifts at deep time via Driver 1 (LOD growth).
 
 ### Sidereal Year
-The time for the Sun to return to the same position relative to the fixed stars. Approximately 365.2564 days. About 20 minutes longer than the solar year due to precession.
+The time for the Sun to return to the same position relative to the fixed stars. Approximately 365.2564 days (at J2000). About 20 minutes longer than the solar year due to precession. Under ESSRT this evolves at deep time via Driver 2 (solar mass loss → Kepler).
 
 ### Anomalistic Year
-The time between successive perihelion passages. Approximately 365.2596 days.
+The time between successive perihelion passages. Approximately 365.2596 days (at J2000).
 
 ### Julian Day (JD)
 A continuous count of days since January 1, 4713 BC. Used in astronomy to avoid calendar complexities. J2000 = JD 2451545.0.
@@ -138,6 +141,9 @@ The angle between Earth's rotational axis and the perpendicular to its orbital p
 
 ## Scientific References
 
+### Expanding Solar System Resonance Theory (ESSRT)
+The unifying theoretical framework for the model's deep-time / scale-invariant structure. Two physically independent drivers expand the solar system's master cycles across geological time: **Driver 1** — Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** — solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). The **L1 integer-divisor lattice** (32 components, n = 9, 12, ..., 65, 66, 68, ..., 185) and the [Solar System Resonance Cycle](#solar-system-resonance-cycle-8h) (8H) are scale-invariant structural constants; only the literal year counts scale with H(t). At J2000 H = 335,317 yr; at Devonian (380 Ma) H ≈ 309,083 yr; at +200 Myr H ≈ 350,665 yr. Validated against Wells 1963 (Devonian coral growth bands), Wu et al. 2024 (650-Myr cyclostratigraphy), Patterson 1956 (Pb-Pb Earth age → Hadean Moon at Roche limit). Full theory: [Doc 99](99-expanding-solar-system-resonance-theory.md).
+
 ### Souami & Souchay (2012)
 A scientific paper providing high-precision values for planetary orbital inclinations and ascending nodes relative to the invariable plane. Used extensively in this model's invariable plane calculations.
 
@@ -145,7 +151,7 @@ A scientific paper providing high-precision values for planetary orbital inclina
 A secular perturbation theory describing how planetary orbital elements oscillate over long timescales due to mutual gravitational interactions.
 
 ### Milankovitch Cycles
-Long-term variations in Earth's orbital parameters (eccentricity, obliquity, precession) that affect climate. The Holistic Model provides a unified framework for these cycles.
+Long-term variations in Earth's orbital parameters (eccentricity, obliquity, precession) that affect climate. The Holistic Model provides a unified framework for these cycles — see [Doc 90](90-milankovitch-language.md) (framework), [Doc 91](91-milankovitch-evidence.md) (evidence + 14 hypothesis tests), and [Doc 92](92-climate-formula.md) (canonical L1+L2+L3 climate formula). Under [ESSRT](#expanding-solar-system-resonance-theory-essrt) the same lattice extends across geological time.
 
 ---
 

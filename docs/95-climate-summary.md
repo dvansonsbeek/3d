@@ -17,6 +17,8 @@
 **Status:** synthesis of the doc 90–94 cluster.
 No new measurements in this document — all R² values are computed in the cited scripts and reproduced from `data/milankovitch-climate-formula.json`, `data/insolation-extension-results.json`, and `data/insolation-laskar-check-results.json`.
 
+> **Scope note (ESSRT).** The two-paradigm comparison and the structural argument that the L1 lattice strictly subsumes the Berger insolation parameterization are scale-invariant — they hold at any epoch. The literal year counts (8H = 2,682,536 yr; the 405-kyr L2 family) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally — sub-percent over the LR04/EPICA windows where the empirical case is made. The "climate is gravitational coupling, not insolation" thesis is structural and therefore epoch-independent; the numerical R² values are present-epoch measurements.
+
 ---
 
 ## 1. The two paradigms
@@ -35,7 +37,7 @@ These three are themselves derived from the gravitational coupling among the pla
 
 ### 1.2 The 8H-lattice paradigm (this framework)
 
-Climate is driven by the **gravitational rhythm of the entire solar system**, parameterized as integer divisors of the 8H = 2,682,536-yr Solar System Resonance Cycle. Each integer corresponds to a specific planet–planet beat or a direct planet-cycle harmonic. The full L1 set is 32 integers (see [doc 93](93-l1-attribution-reference.md) for per-integer attribution).
+Climate is driven by the **gravitational rhythm of the entire solar system**, parameterized as integer divisors of the 8H = 2,682,536-yr (at J2000) Solar System Resonance Cycle. Each integer corresponds to a specific planet–planet beat or a direct planet-cycle harmonic. The full L1 set is 32 integers (see [doc 93](93-l1-attribution-reference.md) for per-integer attribution).
 
 The two paradigms are **not contradictory** — they describe the same gravitational physics. They differ in:
 
@@ -124,7 +126,7 @@ The conventional summary "climate is driven by Milankovitch insolation forcing" 
 
 ### 5.2 For solar-system dynamics
 
-- The 8H = 2,682,536-yr period **is a real resonance period** for the solar system, not a mathematical artifact. Every L1 integer corresponds to a specific planet–planet beat or planet-cycle harmonic; the lattice is dense at low n (frequencies coalesce around obliquity, precession, and eccentricity bands) and sparse at high n.
+- The 8H = 2,682,536-yr (at J2000) period **is a real resonance period** for the solar system, not a mathematical artifact. Every L1 integer corresponds to a specific planet–planet beat or planet-cycle harmonic; the lattice is dense at low n (frequencies coalesce around obliquity, precession, and eccentricity bands) and sparse at high n.
 - Earth's orbital elements are not independent — they are determined by the secular coupling with the other seven planets. This is well-known (Laskar 2004 derives it explicitly); what this work adds is that the **integer-divisor structure of the resonance period maps directly onto climate variance**.
 - The lattice exposes that Berger's "Venus precession", "Jupiter precession", etc., are not separate phenomena — they are individual integer divisors of the same fundamental 8H period.
 
@@ -174,7 +176,7 @@ Each row is a measured quantity with a script that reproduces it:
 
 | Quantity | Value | Source / script |
 |----------|-------|-----------------|
-| 8H Solar System Resonance Cycle | 2,682,536 yr | [doc 55](55-solar-system-resonance-cycle-periods.md), `model-parameters.json` |
+| 8H Solar System Resonance Cycle | 2,682,536 yr (at J2000) | [doc 55](55-solar-system-resonance-cycle-periods.md), `model-parameters.json` |
 | L1 lattice integers | 32 | [doc 93](93-l1-attribution-reference.md) |
 | L1 alone, post-MPT LR04 | R² = 0.870 | `scripts/milankovitch_climate_formula.py` |
 | L1+L2+L3, post-MPT LR04 | R² = 0.8735 | `data/milankovitch-climate-formula.json` |
@@ -210,3 +212,4 @@ For how this conclusion relates to recent peer-reviewed work — Zeebe & Lantink
 - [Doc 96 — Related work](96-related-work.md) — position of this framework in the 2024 climate-forcing literature
 - [Doc 55 — Solar System Resonance Cycle periods](55-solar-system-resonance-cycle-periods.md) — what each L1 integer is
 - [Doc 10 — Fibonacci laws of planetary motion](10-fibonacci-laws.md) — the structural identities the integer divisors encode
+- [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); the structural "gravity not insolation" thesis is epoch-independent

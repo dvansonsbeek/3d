@@ -11,6 +11,8 @@ This is the analytical twin of the [WebGeoCalc Explorer](56-webgeocalc-explorer.
 
 Together the two panels let you check the model from two independent directions: does it match what JPL *measures*, and does it match what textbook celestial mechanics *predicts*?
 
+> **Scope note (ESSRT).** The default ±12,000 yr comparison range is modern-era for ESSRT purposes — H(t) drift over this span is sub-ppm and well below the noise floor of the published polynomial and trigonometric formulas being compared. The Export Cycles long-baseline plots (−248,000 BC to +102,000 AD, ~350 kyr) push into the regime where ESSRT scaling becomes marginally non-negligible (~0.04% H drift over 250 kyr per Drivers 1 and 2 — see [doc 99](99-expanding-solar-system-resonance-theory.md)), but Laskar's La2004/La2010 N-body integrations the model is compared against also do not incorporate this drift, so any discrepancy at long range reflects framework differences rather than ESSRT scaling. The Fibonacci structure the model formulas test is intrinsically scale-invariant.
+
 ## The nine categories
 
 Each category has: the quantity being plotted, the unit of the y-axis, a primary reference (highlighted on the J2000 table as the comparison baseline), and a list of secondary references. The model's curve is always drawn in amber (`#f0b040`) as the top layer; each reference gets its own colour.
@@ -149,6 +151,7 @@ Cases where the model *disagrees* with a reference are also documented in the pa
 - [Perihelion Precession](12-perihelion-precession.md) — the three internal computation methods used by the simulation for ϖ, one of which (`calcEarthPerihelionPredictive`) is what this panel plots for category 5.
 - [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) — reference-frame discussion (ecliptic vs ICRF) that applies to category 4's ascending-node comparison and category 5's perihelion.
 - [Orbital Formulas Reference](21-orbital-formulas-reference.md) — the `OrbitalFormulas` library referenced by the model formulas.
+- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); becomes marginally relevant at the Export Cycles 350-kyr baseline.
 
 ## Code Location
 

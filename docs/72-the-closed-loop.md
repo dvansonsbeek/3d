@@ -2,6 +2,8 @@
 
 Every orbital oscillation in the model — inclination, eccentricity, and obliquity — derives from two empirical constants and a set of observed J2000 anchor values. Nothing is fitted per planet. The loop is fully closed.
 
+> **Scope note (ESSRT).** The closed-loop derivation chain is structurally scale-invariant: Fibonacci divisors (3, 5, 8, 13, 21, 34), 8H/N lattice integers, balance-law forms (Law 3 vector, Law 5 scalar), and the PSI/K formula structures hold at any epoch. The numerical values of the constants — PSI (3.307×10⁻³), K (3.415×10⁻⁶), the mean obliquity (23.4135°), Earth's inclination amplitude (0.6360°) — and the literal year counts (H = 335,317; 8H = 2,682,536; H/13 = 25,794; H/16 = 20,957; System Reset year ≈ −2,649,854) are J2000-anchored. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling the literal year counts proportionally; PSI and K, being derived from J2000 Earth, would be re-evaluated at any other epoch by the same closed loop using that epoch's Earth values. The architecture of the loop — what derives from what — is permanent; the numerical snapshot is the J2000 instance.
+
 ## The Two Constants
 
 Both constants are derived from Earth alone:
@@ -115,19 +117,19 @@ The System Reset also defines the **eccentricity phase alignment**:
 - In-phase planets: at **base** eccentricity, **rising** (phase 90°)
 - Anti-phase (Saturn): at **base** eccentricity, **falling** (phase 270°)
 
-(Verified empirically post 2026-06-16 via `run8HConfigurationVerification` in the model — see also `docs/hidden/old-documents/eccentricity-wobble-formula-analysis.md` for the formula reconciliation that made all 7 planets land at exactly these phases at every 8H.)
+(Verified empirically via `run8HConfigurationVerification` in the model — see also `docs/hidden/old-documents/eccentricity-wobble-formula-analysis.md` for the formula reconciliation that made all 7 planets land at exactly these phases at every 8H.)
 
 This is the physically motivated symmetry: at n=7, every cycle type (inclination, eccentricity) reaches its reference state simultaneously. The direction of eccentricity change (rising vs falling) encodes the balance group — the same grouping that produces the 99.9975% inclination balance.
 
 The inclination cycle anchors are a direct consequence: each planet's cycle anchor equals its ICRF perihelion longitude at the System Reset (minus 180° for in-phase planets). This is not a coincidence — the System Reset defines the phase geometry. The cycle anchors are derived, not fitted.
 
-The System Reset occurs once per Solar System Resonance Cycle (8H = 2,682,536 years). It is the moment when the inclination oscillation "resets" — all planets return to their extreme positions simultaneously, like the hands of a clock aligning at midnight.
+The System Reset occurs once per Solar System Resonance Cycle (8H = 2,682,536 years at J2000). It is the moment when the inclination oscillation "resets" — all planets return to their extreme positions simultaneously, like the hands of a clock aligning at midnight.
 
 ## The Complete Picture
 
 The model has 6 free parameters:
 
-1. **H** — the Earth Fundamental Cycle (335,317 years) — 1 DOF
+1. **H** — the Earth Fundamental Cycle (335,317 years at J2000) — 1 DOF
 2. **Fibonacci divisors** — {3, 5, 8, 13, 21, 34} — 3 DOF (assumed, not derived)
 3. **Mean obliquity** — Earth's mean axial tilt (23.4135°) — 1 DOF
 4. **Inclination amplitude** — Earth's invariable-plane amplitude (0.6360°) — 1 DOF
@@ -137,7 +139,7 @@ From these free parameters, the model derives:
 
 **From Law 1 (Earth's Fibonacci cycle hierarchy) and the 8H scaffold:**
 - Earth's ecliptic perihelion (H/16), inclination (H/3), ecliptic precession (H/5), obliquity (H/8), and axial precession (H/13) — all H/Fibonacci by Law 1
-- Jupiter's and Saturn's perihelion — kinematic Fibonacci anchors (Jupiter H/5 ecliptic, H/8 ICRF; Saturn H/8 ecliptic, H/21 ICRF) refined dynamically to 8H/39, 8H/65, 8H/169 by Law 6 (the gas-giant perihelion lock at 8H/65; H/5 and H/8 are Earth's own ecliptic and obliquity anchors, not the planets')
+- Jupiter's and Saturn's perihelion — Fibonacci anchors (Jupiter H/5 ecliptic, H/8 ICRF; Saturn H/8 ecliptic, H/21 ICRF) refined to 8H-lattice secular periods 8H/39, 8H/65, 8H/169 by Law 6 (the gas-giant perihelion lock at 8H/65; H/5 and H/8 are Earth's own ecliptic and obliquity anchors, not the planets')
 - Other planets' precession periods — integer divisors of 8H (the Solar System Resonance Cycle), mostly non-Fibonacci
 - Axial precession periods (H × d-combinations, some predicted)
 
@@ -154,3 +156,16 @@ From these free parameters, the model derives:
 - All ascending node cycles (integer divisors of 8H)
 
 The J2000 observed values serve as anchors — the model does not predict them, but uses them as boundary conditions to solve for means and phases. The test is whether two constants (PSI and K) derived from Earth alone correctly predict the amplitudes for the other seven planets. They do.
+
+---
+
+## Related Documents
+
+| Document | Purpose |
+|----------|---------|
+| [10 - Fibonacci Laws](10-fibonacci-laws.md) | The six laws (PSI in Law 2, balance laws 3 and 5, K in Law 4, gas-giant lock in Law 6) |
+| [36 - Tilt & Balance Calculations](36-tilt-and-definitive-balance-calculations.md) | Per-planet balance computations and weight contributions |
+| [38 - Eccentricity Balance Scale](38-eccentricity-scale.md) | Interactive view of the eccentricity balance |
+| [39 - Eccentricity Structure Exploration](39-eccentricity-structure-exploration.md) | Two-component decomposition + mirror-pair conservation laws |
+| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Complete 8H/N period table; System Reset structure |
+| [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t); the architecture vs. snapshot distinction |

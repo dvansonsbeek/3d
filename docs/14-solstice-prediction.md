@@ -8,7 +8,7 @@ points (VE, SS, AE, WS) using **24 harmonics** per cardinal point:
 nonlinear interactions between the precession cycles.
 
 These harmonics replace the conventional Meeus polynomial approach, extending
-the valid prediction range from ±2,000 years to the full **335,317-year** Earth Fundamental Cycle.
+the valid prediction range from ±2,000 years to the full **335,317-year** Earth Fundamental Cycle (at J2000).
 
 Three formulas are provided for each cardinal point:
 
@@ -18,7 +18,7 @@ Three formulas are provided for each cardinal point:
 
 **Key result:** With one astronomical observation per cardinal point (the J2000 date)
 and the model's existing constants, all cardinal point dates across the full
-335,317-year Earth Fundamental Cycle can be predicted to **0.05–1.0 minutes** accuracy.
+335,317-year Earth Fundamental Cycle (at J2000) can be predicted to **0.05–1.0 minutes** accuracy.
 The RA position requires **zero observations** — it is fully derived from model parameters.
 
 | Cardinal Point | Detection | RMSE (JD) | J2000 Anchor |
@@ -27,6 +27,8 @@ The RA position requires **zero observations** — it is fully derived from mode
 | **VE** (Vernal Equinox) | Dec crosses 0° ascending | **0.05 min** | 2451623.738 (Mar 20, 05:42 UTC) |
 | **AE** (Autumnal Equinox) | Dec crosses 0° descending | **0.6 min** | 2451810.304 (Sep 22, 19:18 UTC) |
 | **WS** (Winter Solstice) | Min declination | **1.0 min** | 2451900.067 (Dec 21, 01:37 UTC) |
+
+> **Scope note (ESSRT).** This document describes cardinal-point prediction within a single Earth Fundamental Cycle evaluated at J2000. The Fibonacci divisors (H/3, H/5, H/8, H/13, H/16, …) are scale-invariant L1 lattice structure — they remain integer divisors at any epoch. The literal year counts (335,317; 20,957; mean year length `meanSolarYearDays`) and the 14,579-point harmonic fits are J2000-anchored: under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) and `meanSolarYearSeconds` evolve via Driver 1 (Earth-Moon tidal LOD growth) and Driver 2 (solar mass loss → Kepler), so the absolute timings would shift at deep time even though the harmonic structure does not. See [doc 20](20-constants-reference.md) for the J2000 → `meanSiderealYearSecondsAtAge` / `meanHAtAge` helper map.
 
 ---
 
@@ -162,7 +164,7 @@ cardinal point**, which includes the full equation-of-center modulation.
 
 The ~98-second spread between cardinal point year lengths documented in
 [doc 11](11-length-day-year-formulas.md) manifests here as the H/16 amplitude of
-±1.77–1.81 days accumulated over the 20,957-year perihelion precession cycle.
+±1.77–1.81 days accumulated over the 20,957-year (at J2000) perihelion precession cycle.
 
 ---
 
@@ -204,7 +206,7 @@ with many being sums or multiples of the fundamentals (e.g., 6=3+3, 11=3+8, 24=8
 The variable-speed effect (equation of center) creates a timing shift that rotates
 with perihelion precession. At SS it's sin-dominated, at VE it's cos-dominated,
 at AE it's −cos, at WS it's −sin. This is the perihelion precession "sweeping"
-through the cardinal points over the 20,957-year H/16 cycle.
+through the cardinal points over the 20,957-year (at J2000) H/16 cycle.
 
 ### 4. Obliquity mean is derived from the Pythagorean tilt model
 
@@ -240,7 +242,7 @@ of the Fibonacci precession hierarchy.
 
 Over the full Earth Fundamental Cycle, the solstice RA drifts by 6.3° (25 minutes of RA).
 The "summer solstice at 6h RA" is a temporary coincidence of our epoch.
-At the balanced year, the solstice occurs at 5h 47m RA. In ~80,000 years, it will
+At the balanced year, the solstice occurs at 5h 47m RA. In ~80,000 years (at J2000-evaluated H), it will
 be at 5h 35m RA (the minimum).
 
 ---

@@ -2,6 +2,8 @@
 
 This document describes how planet heights above and below the invariable plane are calculated in the Holistic Universe Model.
 
+> **Scope note (ESSRT).** The height formula (`h = sin(i) × sin(angleFromNode) × distance`) and the Ω regression rule (`Ω(t) = Ω_J2000 + (360 / period) × (t − 2000)`) are scale-invariant. Period denominators are written as Fibonacci divisors (`−H/5`, `−(8H)/N`) that stay constant at any epoch. Literal year-count values in the Ω regression table, the Earth-perihelion ~6,500-yr fluctuation period, and the J2000 ascending-node calibration constants are J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling every literal year count proportionally while leaving the divisor structure intact.
+
 ---
 
 ## Overview
@@ -179,7 +181,7 @@ function updatePlanetInvariablePlaneHeights() {
 
 ### Linear Precession on the Invariable Plane
 
-Each body's ascending node Ω on the invariable plane precesses linearly at a body-specific rate. These rates are **distinct from** the inclination-oscillation cycle (which is driven by the ICRF perihelion ϖ_ICRF) — Ω and the inclination are independent angles evolving at independent rates.
+Each body's ascending node Ω on the invariable plane precesses linearly at a body-specific rate. These rates are **distinct from** the inclination-oscillation cycle (which is driven by the ICRF perihelion ϖ_ICRF) — Ω and the inclination are independent angles evolving at independent rates. Literal Ω period values shown are J2000-evaluated; the divisor integers N stay constant at any epoch:
 
 | Body | N | Ω Period | Notes |
 |------|---|----------|-------|
@@ -192,7 +194,7 @@ Each body's ascending node Ω on the invariable plane precesses linearly at a bo
 | Uranus | 11 | −243,867 yr | |
 | Neptune | 3 | −894,179 yr | |
 
-The signed period is negative because Ω regresses (retrograde) for every body. The per-planet `N` integer is stored as `ascendingNodeCyclesIn8H` in `data/planets.json`; constants.js precomputes the corresponding signed period as `ascendingNodePeriod = -(8H)/N`. The integers were chosen by a 2026-04-09 audit to fit JPL ecliptic-inclination trends to <2″/century each in the J2000-fixed frame; see [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) for the full derivation.
+The signed period is negative because Ω regresses (retrograde) for every body. The per-planet `N` integer is stored as `ascendingNodeCyclesIn8H` in `data/planets.json`; constants.js precomputes the corresponding signed period as `ascendingNodePeriod = -(8H)/N`. The integers were chosen to fit JPL ecliptic-inclination trends to <2″/century each in the J2000-fixed frame; see [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) for the full derivation.
 
 ### Implementation
 
@@ -385,7 +387,10 @@ All invariable plane values in the planet stats panels show **ecliptic coordinat
 |----------|---------|
 | [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | Conceptual background |
 | [20 - Constants Reference](20-constants-reference.md) | All constants and values |
+| [31 - Ascending Node Calculations](31-ascending-node-calculations.md) | Ecliptic-frame ascending node dynamics |
 | [32 - Inclination Calculations](32-inclination-calculations.md) | Dynamic inclination oscillations |
+| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Complete 8H/N period table referenced for Ω regression integers |
+| [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t) for the literal periods listed here |
 
 ---
 

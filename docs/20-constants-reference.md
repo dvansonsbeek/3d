@@ -21,6 +21,29 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 
 ---
 
+### ESSRT epoch dependence — most tabulated values are J2000-anchored
+
+Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md), the model has two distinct categories of "constants":
+
+- **Scale-invariant integers** — Fibonacci divisors (3, 5, 8, 13, 16, 21, 34), L1 integer labels (n = 9, 12, ..., 65, 66, 68, ..., 185 — 32 components total), integer divisors of 8H. These are **the same at every epoch** — structural constants of the solar system.
+- **Epoch-dependent literal periods, lengths, and seconds-values** — these scale with the current value of H(t). **Most numeric values tabulated below** (H = 335,317 yr; sidereal year = 365.25636 days; LOD = 86,400 s; Moon distance = 384,399 km; planet orbital periods in years; etc.) are **J2000-epoch values** — the model's primary calibration anchor. They apply to the modern era; for deep-time / future-projection work, use the epoch-dependent helpers in `src/script.js`:
+
+| J2000-anchored constant in this doc | Epoch-dependent helper (accepts `t_Ma` argument) |
+|---|---|
+| `holisticyearLength` (H = 335,317 yr) | `meanHAtAge(t_Ma)` |
+| `meanLengthOfDay` (~86,400.0 s) | `meanLodSecondsAtAge(t_Ma)` |
+| `meanSiderealYearSeconds` (`siderealYearJ2000 × 86400`) | `meanSiderealYearSecondsAtAge(t_Ma)` |
+| Tropical year (from `meanSolarYearDays`) | `meanTropicalYearSecondsAtAge(t_Ma)` |
+| Moon distance (`moonDistance` = 384,399.07 km) | `meanMoonDistanceMetresAtAge(t_Ma)` |
+| Planet orbital periods (Part 4 `solarYearInput`) | `meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s)` |
+| α(t) GIA correction → ΔT | `meanDeltaTSecondsAtAge(t_Ma)` |
+
+H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ 309,083 yr; at J2000 H = 335,317 yr; at +200 Myr H ≈ 350,665 yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
+
+For the canonical 9-step derivation chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the canonical reference at `docs/hidden/old-documents/IP-deep-time-extension.md`. For the Solar System Resonance Cycle (8H = 2,682,536 yr at J2000) period table covering all major planetary cycles as integer divisors of 8H, see [Doc 55](55-solar-system-resonance-cycle-periods.md).
+
+---
+
 ## Parameter Summary (mirrors 3D scene → About panel)
 
 ### Free Parameters (6 DOF)

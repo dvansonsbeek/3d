@@ -1,7 +1,8 @@
 # Type I Inner Planets -- Mercury & Venus Implementation
 
-**Date**: 2026-03-08
 **Status**: Complete (e/(1+e) derivation, EoC with phase-optimized fractions, period calibration)
+
+> **Scope note (ESSRT).** The Type I geometric formulas (`realOrbitalEccentricity = e/(1+e)`, `perihelionDistance = orbitDistance × realOrbitalEccentricity × 100`, EoC speed variation) are scale-invariant. Perihelion-period denominators are Fibonacci/8H expressions (`H/(1+3/8)`, `−8H/6`) that stay constant at any epoch. Literal J2000-anchored values (the balanced year n=7 ≈ -2,649,854 BC, `solarYearCount` values 1,392,228 / 545,059, `perihelionRef_JD` constants, and the JPL 2000-2200 calibration baseline) reflect the present epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally. The Type I scene-graph configuration this document describes is therefore the J2000 snapshot of an underlying scale-invariant structure.
 
 ---
 
@@ -299,3 +300,15 @@ mirrorPair:                'neptune'     (paired planet)
 - `node tools/optimize.js baseline venus` -- Full JPL baseline with RMS
 - `node tools/optimize.js optimize <planet> startpos,angleCorrection` -- parameter optimization
 - `node tools/explore/test-circular-vs-variable-speed.js <planet>` -- circular vs elliptical orbit comparison (confirms true circular for Type I/II, EoC needed for Type III)
+
+---
+
+## Related Documents
+
+| Document | Purpose |
+|----------|---------|
+| [20 - Constants Reference](20-constants-reference.md) | H, balanced year, planet masses, J2000 orbital elements |
+| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Complete 8H/N period table; balanced-year structure (n=7 anchor) |
+| [63 - Type II Earth-Crossers](63-type-ii-earth-crossers.md) | Mars implementation (sibling of this doc) |
+| [64 - Type III Outer Planets](64-type-iii-outer-planets.md) | Jupiter–Neptune implementation; includes e/(1+e) derivation referenced here |
+| [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t) for the literal periods and counts used here |

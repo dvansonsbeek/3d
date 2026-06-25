@@ -1,9 +1,10 @@
 # Optimization Tool — Execution Plan
 
 **Status**: Complete — all phases and execution steps done
-**Date**: 2026-03-06 (infrastructure complete), 2026-03-09 (campaign complete)
 
 **Companion document:** [60-optimization-tool-overview.md](60-optimization-tool-overview.md) — Architecture, constraints, reference data, parameter classification
+
+> **Scope note (ESSRT).** This document is a historical execution-plan record of the optimization campaign — phase definitions, dataset choices, weighting policy, per-target baselines. The optimization framework and parameter classification are scale-invariant; the JPL/Horizons + Excel reference data used in the 1800–2200 training window are intrinsically present-epoch. The final-results baselines reported in §8 are J2000-anchored snapshots. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), but the modern-era training window sees sub-ppm drift well below the noise floor of the campaign's reference data.
 
 ---
 
@@ -345,12 +346,12 @@ Without the modified speed, Mars's negative planet speed would produce CW orbit 
 ##### Saturn — retrograde perihelion precession
 
 Saturn is unique among Type III planets:
-- `PerihelionEclipticYears = −8H/65` (dynamical secular value; kinematic Fibonacci anchor was −H/8. NEGATIVE → retrograde precession)
+- `PerihelionEclipticYears = −8H/65` (8H-lattice secular value; Fibonacci anchor was −H/8. NEGATIVE → retrograde precession)
 - `RealPerihelionAtSun.orbitRadius: −saturnElipticOrbit` (NEGATIVE radius → flips EO circle direction)
 - The negative PrecYears reverses the Ecliptic1/2 sandwich rotation directions:
   - Ecliptic1: speed = 2π/(−8H/65) = negative (opposite to other planets)
   - Ecliptic2: speed = −2π/(−8H/65) = positive
-- This correctly models Saturn's retrograde apsidal precession (~−3140 arcsec/century; closer to the observed ~−3400 than the kinematic anchor's −3092)
+- This correctly models Saturn's retrograde apsidal precession (~−3140 arcsec/century; closer to the observed ~−3400 than the Fibonacci anchor's −3092)
 - The negative orbitRadius ensures the EO offset is in the correct direction for the reversed precession
 
 ##### Planet speed and startPos conventions
@@ -410,7 +411,7 @@ All planets use `PerihelionDurationEcliptic1` (+ω_prec) and `PerihelionDuration
 | Uranus | H/3 | 3 | ~1,100 |
 | Neptune | H×2 | — | ~200 |
 
-Mercury and Mars use non-Fibonacci periods (rational fractions of H). Jupiter and Saturn use their *dynamical* secular periods (8H/39, −8H/65; one 8H-lattice integer off the clean kinematic Fibonacci anchors H/5, −H/8 — see Law 6); Uranus uses a clean Fibonacci division. Venus and Saturn both precess ecliptic-retrograde.
+Mercury and Mars use non-Fibonacci periods (rational fractions of H). Jupiter and Saturn use their *8H-lattice secular* periods (8H/39, −8H/65; one 8H-lattice integer off the clean Fibonacci anchors H/5, −H/8 — see Law 6); Uranus uses a clean Fibonacci division. Venus and Saturn both precess ecliptic-retrograde.
 
 ##### Assessment conclusion for planet chains
 
@@ -627,7 +628,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 - ALL Fibonacci beat frequency identities are **algebraically EXACT** (zero residual) — this is pure number theory (F(n) + F(n+1) = F(n+2))
 - Earth meeting frequency: 1/(H/13) + 1/(H/3) = 1/(H/16) — EXACT (16 = 13 + 3)
 - Psi-constant: ψ = (5 × 21²) / (2 × H) = 3.288 × 10⁻³ (H=335,317)
-- Perihelion precession: Uranus at clean Fibonacci H/3; Jupiter and Saturn at dynamical secular 8H/39 and −8H/65 (kinematic Fibonacci anchors H/5, −H/8). Others use rational fractions of H.
+- Perihelion precession: Uranus at clean Fibonacci H/3; Jupiter and Saturn at 8H-lattice secular 8H/39 and −8H/65 (Fibonacci anchors H/5, −H/8). Others use rational fractions of H.
 
 **3. Conjunction periods (conjunction-periods.js):**
 - Jupiter-Saturn great conjunction: **19.8601 years** (model) vs ~19.859 years (known) — 0.001 year difference
@@ -700,12 +701,12 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 - **2R**: JPL recent high-accuracy (1960–2025)
 - **3**: Ancient data (visual comparison only)
 
-**Data sources** (adopted 2026-03-25): Two independent ephemeris services, cross-checked to 0.04" agreement:
+**Data sources**: Two independent ephemeris services, cross-checked to 0.04" agreement:
 - **JPL Horizons DE441** (NASA/JPL): Primary source, covers 1600–2400
 - **IMCCE Miriade INPOP19** (OBSPM/CNRS, Paris): Independent source, fills Saturn 1600–1752 gap, extends all planets to 1200–2800
 - Total: ~175,000 data points spanning 1200–2800 CE
 
-**Weighting policy** (revised 2026-03-25): Train on 1800–2200, anchor to confirmed observations.
+**Weighting policy**: Train on 1800–2200, anchor to confirmed observations.
 - 1800–2200 JPL/IMCCE: weight 1.0 (~44k pts, primary training)
 - Mercury transits 1632–1799: weight 3.0 (23 observed events, NASA catalog)
 - Venus transits 1640–1769: weight 3.0 (4 observed events, NASA catalog)
@@ -869,7 +870,7 @@ Mars now has 923 Tier 1C observations (weight 5) vs 144 Tier 2 ephemeris entries
 
 #### Phase 5 Checkpoint
 
-**Status**: COMPLETE (2026-03-06)
+**Status**: COMPLETE
 
 **What was built:**
 
@@ -937,7 +938,7 @@ Mars now has 923 Tier 1C observations (weight 5) vs 144 Tier 2 ephemeris entries
 
 #### Phase 6 Checkpoint
 
-**Status**: COMPLETE (2026-03-06)
+**Status**: COMPLETE
 
 **What was built:**
 
@@ -1140,7 +1141,6 @@ node tools/optimize.js optimize <target> [params] [--max-iter=N]           # Nel
 ## 8. Execution Plan — Optimization Campaign
 
 **Status**: COMPLETE
-**Date**: 2026-03-06 (started), 2026-03-09 (completed)
 **Prerequisite**: All infrastructure phases (1-9) complete
 
 All tooling is built and validated. This section documents the execution plan and results from the systematic optimization campaign.
@@ -1355,7 +1355,7 @@ The remaining steps were executed as a systematic campaign covering:
 
 4. **IAU precession correction**: `tools/lib/precession.js` applies IAU 1976 precession to convert JPL J2000 RA/Dec to of-date frame before comparison, resolving the frame mismatch documented in Section 8.5.
 
-**Final results** (all 9 targets, ~1800–2200, current as of 2026-03-16):
+**Final results** (all 9 targets, ~1800–2200):
 
 | Target | Before | After | Improvement |
 |--------|--------|-------|-------------|
@@ -1531,3 +1531,13 @@ Once the tool is built, Claude runs this self-improving loop in two stages:
 10. **New perturbation terms**: Auto-add correction terms from pattern discovery, or report for manual review?
 
 11. **Integration with browser model**: Generate a patch file for `script.js` or output new constant values for manual update?
+
+---
+
+## Related Documents
+
+| Document | Purpose |
+|----------|---------|
+| [60 - Optimization Tool Overview](60-optimization-tool-overview.md) | Architecture, constraints, reference data, parameter classification |
+| [69 - Optimization Baseline](69-optimization-baseline.md) | Per-planet baseline measurements that feed into this execution plan |
+| [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t); optimization windows are present-epoch |

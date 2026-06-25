@@ -2,8 +2,6 @@
 
 This document describes the Three.js scene graph hierarchy used in the Holistic Universe Model simulation. Understanding this nested structure is essential because **all astronomical motions are implemented through composed rotations** of parent-child relationships.
 
-**Last Updated:** January 2026
-
 **Related Documents:**
 - [12 - Perihelion Precession](12-perihelion-precession.md) - How precession affects apparent measurements
 - [40 - Architecture](40-architecture.md) - Overall code structure
@@ -399,6 +397,50 @@ This applies throughout the model:
 │                                                                               │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Part 14: Deep-Time Mode (DEEP_TIME_MODE_ENABLED)
+
+The scene graph described above operates in two rendering modes, selected by the `DEEP_TIME_MODE_ENABLED` flag in `src/script.js`.
+
+### 14.1 Snapshot mode (default — `DEEP_TIME_MODE_ENABLED = false`)
+
+Modern-era / J2000-anchored simulation. Each frame's rotation is the standard snapshot multiplication described in §2.2:
+
+```
+θ = obj.speed × pos − obj.startPos × (π/180)
+```
+
+This is correct when the rate `obj.speed` has been constant since simulation start — i.e., across the modern era (~±10 millennia around J2000). The H/n divisors and per-planet periods are held at their J2000-anchored values.
+
+### 14.2 Integrator mode (`DEEP_TIME_MODE_ENABLED = true`)
+
+Deep-time / Phanerozoic / Hadean simulation. The same scene graph is rendered, but each frame's rotation is computed via **per-node integrator tags** that account for the epoch-dependent evolution of H(t), LOD(t), and planet orbital periods per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md). Four tag families cover the scene graph:
+
+| Tag | Time base | Used for | Integrator |
+|---|---|---|---|
+| `_dtCycleN`, `_dtCycleSign`, `_dtCycleAnchor` | UT (`_currentYearSI`) | Earth + 5 Earth precession layers + planet perihelion ecliptic frames + planet wobble centers (all H-scaling per Law 6) | `cyclesBetweenYears(anchor, year, N)` |
+| `_dtMoonIntegrator`, `_dtMoonAnchor`, `_dtMoonSign` | UT (`_currentYearSI`) | Moon-chain nodes (5 nodes) | `obj._dtMoonIntegrator(anchor, year)` |
+| `_dtPlanetIntegrator`, `_dtPlanetAnchor`, `_dtPlanetSign` | TT (`_currentYearSI_TT`) | Planet orbital nodes (Mercury–Neptune, 7 nodes) | `obj._dtPlanetIntegrator(anchor, year)` |
+| `_dtPerihelionDivisor`, `_dtPerihelionAnchor` | UT for Sun, TT for planets | Equation-of-center perihelion-phase term | `cyclesBetweenYears(anchor, year, divisor)` inline |
+
+The asymmetric time-base treatment (Moon-chain stays on UT, planet orbitals go to TT) is principled, not arbitrary: doc 101's eclipse-visibility validation (19/19) was co-developed under the Moon-chain UT convention, while planets have no analogous validation tied to the time-base choice. The full rationale is in [`hidden/old-documents/IP-planet-deep-time-scene-graph.md`](hidden/old-documents/IP-planet-deep-time-scene-graph.md) § "Why the asymmetry... is principled, not arbitrary".
+
+### 14.3 Both modes use the same scene graph
+
+The scene-graph hierarchy from Parts 3, 7, and 8 is identical in both modes. The only difference is **how each node's rotation is computed each frame**:
+
+- **Snapshot mode** reads `obj.speed` and `obj.startPos` directly (the J2000-anchored values mutated by `setEpoch()` if needed)
+- **Integrator mode** reads the `_dt*` tags and computes the integrated cycle count via the appropriate epoch-dependent helper (`meanLodSecondsAtAge`, `meanHAtAge`, `meanPlanetOrbitalPeriodAtAge`, etc. — see [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the full helper map)
+
+Integrator mode preserves bit-equivalence to snapshot mode at the J2000 anchor (`anchor === STARTMODEL_YEAR_SI` → integrator returns 0 cycles → composition reduces to the snapshot path). At deep time, integrator mode produces physically-correct positions while snapshot mode would silently apply the J2000 rate retroactively to the full simulated interval.
+
+### 14.4 References
+
+- [`hidden/old-documents/IP-planet-deep-time-scene-graph.md`](hidden/old-documents/IP-planet-deep-time-scene-graph.md) — full implementation history (Phases P-A through P-F) including the math problem, frame-composition risk, per-phase rollout, naming convention summary, and the "Future Phase Z" discussion of Moon-chain TT correctness
+- [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — canonical 9-step chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, planet orbital + synodic periods
+- [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) — J2000-constant → `mean*AtAge(t_Ma)` helper map
 
 ---
 

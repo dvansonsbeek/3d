@@ -6,6 +6,8 @@ This document records the exploratory analysis of planetary eccentricity structu
 
 The key conclusion: **no universal eccentricity constant exists** (analogous to the ψ-constant for inclination). Eccentricity base values are determined by the balance system (Laws 4 + 5), not by a single per-planet formula. However, the eccentricity *amplitude* does have a universal constant K.
 
+> **Scope note (ESSRT).** The two-component decomposition (`e_base = e_structural + e_amplitude`), the law-of-cosines time-variation formula, the mirror-pair conservation laws, and the multivariate regression are scale-invariant — they hold at any epoch. K, the structural eccentricities, and the H/16 period denominator used in the time-variation formula are J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling the literal period proportionally. Base eccentricities, amplitudes, and phases are derived at runtime from the balanced-year phase — see [The Closed Loop](72-the-closed-loop.md).
+
 ---
 
 ## Two-Component Decomposition
@@ -221,8 +223,11 @@ This fundamental difference explains why no single eccentricity constant exists.
 ## References
 
 - [Fibonacci Laws](10-fibonacci-laws.md) — Laws 4 and 5 (eccentricity constant and balance)
-- [Eccentricity Balance Scale](38-eccentricity-scale.md) — The balance scale visualization and interpretation
+- [Constants Reference](20-constants-reference.md) — K, base eccentricities, axial tilts, d-values
 - [Tilt and Balance Calculations](36-tilt-and-definitive-balance-calculations.md) — Detailed derivations
+- [Eccentricity Balance Scale](38-eccentricity-scale.md) — The balance scale visualization and interpretation
+- [The Closed Loop](72-the-closed-loop.md) — Full derivation chain for phase-derived base eccentricities (referenced in §"Eccentricity Time-Variation Formula" and Open Gap §5)
+- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t)
 - [fibonacci_eccentricity_structure.py](../scripts/fibonacci_eccentricity_structure.py) — Exhaustive 10-direction exploration with statistical significance tests
 - [fibonacci_eccentricity_scale.py](../scripts/fibonacci_eccentricity_scale.py) — Balance scale numerical exploration
 - **Interactive visualization**: Tools → "Eccentricity Balance Scale" in the 3D simulation

@@ -5,6 +5,8 @@ This document describes how planetary orbital inclinations are calculated in the
 1. **Inclination to the Invariable Plane** - How much each planet's orbital plane tilts relative to the solar system's fundamental reference plane (oscillates over time)
 2. **Inclination to the Ecliptic** - How much each planet's orbital plane tilts relative to Earth's orbital plane (changes as both planes move)
 
+> **Scope note (ESSRT).** The inclination oscillation formula (`i(t) = mean + amplitude × cos(ω̃_ICRF(t) − cycleAnchor)`) and the two-normal dot product for ecliptic inclination are scale-invariant. Period denominators are written as Fibonacci divisors (H/3, H/5, H/13, H/16, 8H/N) that stay constant at any epoch. Literal year-count values shown in the ICRF period and Ω regression tables, balanced-year anchors (-2,649,854 BC), the Earth inclination range (0.85°–2.12°), and the J2000 calibration constants are all J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), which scales every literal year count proportionally while leaving the divisor structure intact.
+
 ---
 
 ## Physical Background
@@ -70,7 +72,7 @@ For Saturn (anti-phase), the sign is flipped: MAX at balanced year (where others
 
 ### Per-Planet Cycle Anchors
 
-Each planet's inclination cycle anchor is the ICRF perihelion longitude where the planet reaches its inclination extremum (MAX for in-phase, MIN for Saturn). After a 2026-04-09 audit that re-fitted the JPL ecliptic-inclination trends in the J2000-fixed frame and adjusted the asc-node integers `ascendingNodeCyclesIn8H`, all seven fitted planets share the **same balanced-year anchor**: **n=7, year ≈ -2,649,854** (the oldest of the eight anchors in the current Solar System Resonance Cycle).
+Each planet's inclination cycle anchor is the ICRF perihelion longitude where the planet reaches its inclination extremum (MAX for in-phase, MIN for Saturn). The JPL ecliptic-inclination trends were re-fitted in the J2000-fixed frame, and the asc-node integers `ascendingNodeCyclesIn8H` adjusted accordingly; all seven fitted planets share the **same balanced-year anchor**: **n=7, year ≈ -2,649,854** (the oldest of the eight anchors in the current Solar System Resonance Cycle).
 
 | Planet | Cycle Anchor | Balance Group | n | Balanced Year | ICRF Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|----------|-------------|----------------|----------------------|
@@ -140,7 +142,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
 
 ### ICRF Perihelion Periods
 
-The inclination oscillation period equals the absolute ICRF perihelion period for each planet. The ICRF rate = ecliptic rate − general precession (H/13):
+The inclination oscillation period equals the absolute ICRF perihelion period for each planet. The ICRF rate = ecliptic rate − general precession (H/13). Literal year values shown are J2000-evaluated; the H/N and 8H/N divisors are scale-invariant:
 
 | Planet | Ecliptic Period | ICRF Period | ICRF Direction |
 |--------|----------------|-------------|----------------|
@@ -158,7 +160,7 @@ For computed period values, see [Constants Reference](20-constants-reference.md)
 
 ### Solar System Resonance Cycle (8H)
 
-All ICRF perihelion periods divide evenly into 8H = 2,682,536 years (the "Solar System Resonance Cycle"), ensuring all 8 planets return simultaneously to their balanced-year configuration. This is a structural consequence of the Fibonacci period ratios.
+All ICRF perihelion periods divide evenly into 8H = 2,682,536 years at J2000 (the "Solar System Resonance Cycle"), ensuring all 8 planets return simultaneously to their balanced-year configuration. This is a structural consequence of the Fibonacci period ratios.
 
 ---
 
@@ -211,13 +213,13 @@ Where:
 
 ### Time Evolution of Ω
 
-Both Earth's and each planet's ascending node on the invariable plane evolve linearly over time. They are **distinct angles from the ICRF perihelion** that drives the inclination oscillation, and they evolve at **different rates**. Each planet's Ω regression period is `−(8H)/N` for an integer N stored as `ascendingNodeCyclesIn8H` in `data/planets.json`. After the 2026-04-09 audit:
+Both Earth's and each planet's ascending node on the invariable plane evolve linearly over time. They are **distinct angles from the ICRF perihelion** that drives the inclination oscillation, and they evolve at **different rates**. Each planet's Ω regression period is `−(8H)/N` for an integer N stored as `ascendingNodeCyclesIn8H` in `data/planets.json`. Literal Ω period values shown are J2000-evaluated; the divisor integers N stay constant at any epoch:
 
 | Body | N | Ω period (yr) | Notes |
 |------|---|---------------|-------|
 | Earth | 40 | −H/5 ≈ −67,063 | Ecliptic precession rate (= −(8H)/40) |
 | Mercury | 9 | −298,060 | |
-| Venus | 1 | −2,682,536 (= −8H) | Full Solar System Resonance Cycle |
+| Venus | 1 | −2,682,536 (= −8H, at J2000) | Full Solar System Resonance Cycle |
 | Mars | 64 | −41,915 | |
 | Jupiter | 36 | −74,515 | Shared with Saturn (J+S lockstep) |
 | Saturn | 36 | −74,515 | Shared with Jupiter |
@@ -523,6 +525,8 @@ The planet information panels display four invariable plane values:
 | [20 - Constants Reference](20-constants-reference.md) | All inclination and ascending node constants |
 | [31 - Ascending Node Calculations](31-ascending-node-calculations.md) | Ascending node precession |
 | [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
+| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Complete 8H/N period table referenced for Ω regression integers |
+| [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t) for the literal periods listed here |
 | [Ascending Node Optimization](../tools/verify/ascending-node-optimization.js) | Numerical optimization to calculate ascending node values |
 | [Ascending Node Verification](../tools/verify/ascending-node-verification.js) | Verification that J2000-verified ascending nodes produce correct ecliptic inclinations |
 | [Ascending Node Souami-Souchay](../tools/verify/ascending-node-souami-souchay.js) | Comparison of S&S vs Verified ascending node accuracy |

@@ -1,7 +1,8 @@
 # Type III Planets -- Eccentricity Corrections & Calibration
 
-**Date**: 2026-03-08
 **Status**: Complete (dynamic implementation, e/(1+e), per-planet EoC, precession correction)
+
+> **Scope note (ESSRT).** The Type III geometric machinery (`elipticOrbit = 2 × e_Earth × sin(Δω)`, the `e/(1+e)` circular-orbit equivalent, per-planet EoC) is scale-invariant — the formulas hold at any epoch. Perihelion-period denominators are scale-invariant H/N expressions. J2000-anchored literal values (per-planet JPL perihelion reference JDs, `startpos` values, `eocFraction` values, IAU 1976 precession correction, the JPL DE441 calibration baseline) reflect the present epoch. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling the literal periods proportionally; the Type III implementation this document describes is the J2000 snapshot of an underlying scale-invariant structure.
 
 ---
 
@@ -181,7 +182,6 @@ correctly tracking the precessing perihelion longitudes.
 
 ## Perihelion Distance: Circular-Orbit Eccentricity e/(1+e)
 
-**Date**: 2026-03-08
 **Status**: Complete (all planet types)
 
 ### The Problem
@@ -361,7 +361,6 @@ These corrections are conceptually independent:
 
 ## Orbital Plane Tilt Placement Fix
 
-**Date**: 2026-03-07
 **Status**: Complete (tools and script.js)
 
 ### The Problem
@@ -520,3 +519,16 @@ For our 200-year range, the simpler IAU 1976 model is adequate.
   JPL Horizons opposition data
 - `tools/explore/conjunction-finder.js` -- validates great conjunctions and
   opposition dates
+
+---
+
+## Related Documents
+
+| Document | Purpose |
+|----------|---------|
+| [20 - Constants Reference](20-constants-reference.md) | H, planet masses, J2000 orbital elements |
+| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Complete 8H/N period table |
+| [62 - Type I Inner Planets](62-type-i-inner-planets.md) | Mercury & Venus implementation (sibling) |
+| [63 - Type II Earth-Crossers](63-type-ii-earth-crossers.md) | Mars implementation (sibling) |
+| [65 - Equation of Center](65-equation-of-center.md) | Sun EoC derivation referenced by the Type III §"Equation of Center" |
+| [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t) for the literal periods used here |

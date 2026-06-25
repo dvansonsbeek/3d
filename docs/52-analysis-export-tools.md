@@ -2,12 +2,13 @@
 
 This document describes all data export, report generation, and validation systems in the Holistic Universe Model simulation.
 
-**Last Updated:** March 2026
-
 **Related Documents:**
 - [51 - Planet Inspector Reference](51-planet-inspector-reference.md) - Planet inspector panel and where planet reports are displayed
 - [50 - UI Panels Reference](50-ui-panels-reference.md) - Panel system overview
 - [21 - Orbital Formulas Reference](21-orbital-formulas-reference.md) - Calculations used in exports
+- [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of H(t) and epoch helpers
+
+> **Scope note (ESSRT).** The export tooling and detection methods (declination-based cardinal-point detection, parabolic/linear interpolation, RA/Dec column generation) are scale-invariant — they operate against whatever simulation state is active at each date sample. When users scrub the report date range into deep time (millions of years), the simulation auto-applies ESSRT scaling per `DEEP_TIME_MODE_ENABLED` (LOD, H, year length, Moon distance, orbit periods), so exports remain consistent at any epoch. The IAU reference values catalogued in §"IAU Reference Values" are J2000-anchored.
 
 ---
 
@@ -163,7 +164,7 @@ Exports solstice and equinox timing data with RA and obliquity for a range of ye
 
 ### Location
 
-`Reports > Solstices & Equinoxes` *(hidden since 2026-03-29)*
+`Reports > Solstices & Equinoxes` *(hidden — superseded by Year Length Analysis declination detection)*
 
 ### Controls
 
@@ -196,7 +197,7 @@ Each cardinal point is found by its physical observable:
 | **Vernal Equinox (VE)** | Declination crosses zero ascending (neg → pos) | Linear at zero crossing |
 | **Autumnal Equinox (AE)** | Declination crosses zero descending (pos → neg) | Linear at zero crossing |
 
-Since 2026-03-29, the Year Length Analysis report (Part 3) also uses declination-based detection, making this report redundant.
+The Year Length Analysis report (Part 3) now also uses declination-based detection, making this standalone Solstices & Equinoxes report redundant.
 
 ### Output
 

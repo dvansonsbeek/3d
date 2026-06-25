@@ -2,6 +2,8 @@
 
 This document generalizes doc 24's Δa correction to a single closed-form formula that approximates DE440 mass ratios for **every moon-bearing planet** in the solar system — from Earth out to Pluto, with residuals ranging from 3 ppm (Neptune) to 340 ppm (Mars). The formula has two physically-motivated correction terms, both computable from observable quantities. Earth-Moon and the outer planets sit on opposite ends of the same curve, not as special cases.
 
+> *Scope: the verification tables here use modern-era / J2000-anchored orbital elements per moon; the universal formula itself is classical and applies at any epoch when given epoch-consistent inputs. For Earth-Moon deep-time evolution see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) (Farhat 2022 polynomial → `meanMoonDistanceMetresAtAge`). Other planets' moon systems would need analogous deep-time polynomials not currently in the framework.*
+
 **Related documents:**
 - [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md) — the Earth-Moon-Sun case (this doc generalizes it)
 - [26 — Universal Sun-side Δa Formula](26-universal-sun-side-delta-a.md) — the Sun-side mirror of this document: derives `T_planet` from `a_planet` for every planet using the exact symmetric Δa
@@ -325,4 +327,5 @@ The 1.5·J2·(R/a)² oblateness correction is the dominant term for outer-planet
 - [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md) — the Earth-Moon-Sun specialization, with the Δa = 349 km / 384,748 km derivation
 - [20 — Constants Reference](20-constants-reference.md) §1.3 — DE440 mass-ratio table
 - [21 — Orbital Formulas Reference §A.6.1](21-orbital-formulas-reference.md) — implementation
+- [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time Moon distance evolution (Earth-Moon only currently; the Δa formula here extends to any epoch given epoch-consistent inputs)
 - JPL DE440 SPICE kernel: [gm_de440.tpc](https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/gm_de440.tpc) — authoritative system GMs

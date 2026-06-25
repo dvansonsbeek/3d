@@ -1,6 +1,5 @@
 # Equation of Center -- Implementation Reference
 
-**Date**: 2026-03-07 (updated)
 **Status**: Complete (Sun + all planets with per-planet EoC fractions)
 
 ---

@@ -6,6 +6,8 @@ The **WebGeoCalc Explorer** is a modal panel in the Tools menu that shows the ac
 
 This is the panel that grounds the Holistic Universe Model's perihelion rates in *observation*, not theory. The model's Fibonacci ecliptic periods (`perihelionEclipticYears` per planet) are chosen to match what WebGeoCalc reports, not what any secular-theory textbook predicts. The Explorer makes that calibration visible.
 
+> **Scope note (ESSRT).** The Explorer is inherently a present-epoch observational tool — the 1900–2026 baseline is the densest, most accurate stretch of JPL/NAIF ephemerides (DE440/DE441). The Fibonacci ecliptic-period divisors shown in the comparison column (H × 8/11, 8H/39, −8H/65, H/13, …) are scale-invariant structural quantities, but their literal rate values in ″/century are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal rates proportionally; the structural match against WebGeoCalc is a present-epoch calibration of an underlying scale-invariant framework.
+
 ## Why the 1900–2026 baseline matters
 
 JPL/NAIF's WebGeoCalc service queries the planetary ephemerides DE440/DE441, which are themselves fits to millennia of astronomical observations backed up by modern radar, laser, and spacecraft ranging. The 1900–2026 window is the stretch where the underlying observations are densest and most accurate — older data is less trustworthy and future ephemeris values are extrapolations.
@@ -151,6 +153,7 @@ The yellow and blue curves tracking each other over 1900–2026 is the visual va
 - [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — The period table modal; shows each WebGeoCalc-observed rate next to the model's Fibonacci fraction.
 - [Perihelion Precession](12-perihelion-precession.md) — The three methods used inside the simulation for computing perihelion longitude and precession (scene-graph, ICRF analytical, predictive formula).
 - [Constants Reference § Observed trend rates](20-constants-reference.md) — The constants block that feeds the display.
+- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t) for the literal rates the Explorer compares.
 
 ## Code Location
 

@@ -6,6 +6,8 @@ The planetary eccentricities are determined by a balance scale — not by indivi
 
 The eccentricities used in this balance are the **base eccentricities** — the long-term mean values around which each planet's eccentricity oscillates over its eccentricity cycle. These differ slightly from the J2000 measured values (e.g., Earth's base = 0.015386 vs J2000 = 0.016710).
 
+> **Scope note (ESSRT).** The balance equation, weight formula `W_j = √(m_j/m_target × d_target/d_j × a_j/a_target)`, and amplitude formula `e_amp = K × sin(tilt) × √d / (√m × a^1.5)` are scale-invariant — they hold at any epoch. K, the base eccentricities, axial tilts, and Earth's ~20,957-yr eccentricity cycle (H/16) are J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally. The balance machinery this document describes therefore applies at any epoch with epoch-consistent inputs — Open Question §2 below already addresses temporal stability.
+
 The balance equation (Law 5) can be expressed as a physical scale:
 
 ```
@@ -304,7 +306,11 @@ A full-width planet nav bar with dropdown + left/right arrows switches between t
 ## References
 
 - [Fibonacci Laws](10-fibonacci-laws.md) — Laws 4 and 5 (eccentricity constant and balance)
+- [Constants Reference](20-constants-reference.md) — K, base eccentricities, axial tilts, d-values
 - [Tilt and Balance Calculations](36-tilt-and-definitive-balance-calculations.md) — Detailed derivations
+- [Planetary Precession Cycles](37-planets-precession-cycles.md) — Per-planet eccentricity cycle source
+- [The Closed Loop](72-the-closed-loop.md) — Full derivation chain for phase-derived base eccentricities (referenced in Open Question §1)
+- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t)
 - [Eccentricity Balance](../tools/verify/eccentricity-balance.js) — Static analysis
 - [fibonacci_eccentricity_scale.py](../scripts/fibonacci_eccentricity_scale.py) — Full numerical exploration
 - [fibonacci_eccentricity_structure.py](../scripts/fibonacci_eccentricity_structure.py) — Exhaustive search (10 directions)

@@ -126,6 +126,10 @@ This documentation extends the model with calculations based on Souami & Souchay
 
 The model is **heliocentric** (Earth orbits the Sun) but viewed from a **geocentric perspective** (Earth at the visual center). This produces identical predictions to standard heliocentric models while providing intuitive visualization of how things appear from Earth.
 
+### 5. Deep-Time Extension (ESSRT)
+
+The model also extends across geological time through the **Expanding Solar System Resonance Theory (ESSRT)**. The Fibonacci divisor structure (H/3, H/5, H/8, H/13, H/16, 8H/N) is scale-invariant; the literal year counts shown throughout this documentation are J2000 snapshots that evolve at deep time through two physically independent drivers — Earth-Moon tidal evolution (Driver 1, lengthens the day) and solar mass loss (Driver 2, expands every orbit via Kepler's third law). See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the full framework.
+
 ---
 
 ## Getting Started

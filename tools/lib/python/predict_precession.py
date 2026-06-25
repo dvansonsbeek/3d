@@ -163,7 +163,9 @@ def get_day_year_lengths(year: int) -> Dict[str, float]:
         solar_year_days: Solar (tropical) year in days
         solar_year_seconds: Solar year in SI seconds
         sidereal_year_days: Sidereal year in days
-        sidereal_year_seconds: Sidereal year in SI seconds (fixed)
+        sidereal_year_seconds: Sidereal year in SI seconds (J2000 snapshot;
+            modern-era scope — at deep time use src/script.js helper
+            meanSiderealYearSecondsAtAge(t_Ma) per ESSRT doc 99)
         anomalistic_year_days: Anomalistic year in days
         anomalistic_year_seconds: Anomalistic year in SI seconds
         day_length_seconds: Day length in SI seconds
@@ -250,7 +252,7 @@ def main():
     print(f"  Solar year:       {lengths['solar_year_days']:>16.9f} days")
     print(f"  Solar year:       {lengths['solar_year_seconds']:>16.3f} SI seconds")
     print(f"  Sidereal year:    {lengths['sidereal_year_days']:>16.9f} days")
-    print(f"  Sidereal year:    {lengths['sidereal_year_seconds']:>16.3f} SI seconds (fixed)")
+    print(f"  Sidereal year:    {lengths['sidereal_year_seconds']:>16.3f} SI seconds (J2000)")
     print(f"  Anomalistic year: {lengths['anomalistic_year_days']:>16.9f} days")
     print(f"  Anomalistic year: {lengths['anomalistic_year_seconds']:>16.3f} SI seconds")
     print(f"  Day length:       {lengths['day_length_seconds']:>16.6f} SI seconds")

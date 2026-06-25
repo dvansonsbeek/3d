@@ -4,8 +4,6 @@
 
 This document provides a complete reference for all orbital calculation functions available in the solar system simulation, including input variables, the `OrbitalFormulas` helper library, and implementation details.
 
-**Last Updated:** March 2026
-
 **Related Documents:**
 - [Dynamic Orbital Elements Overview](04-dynamic-elements-overview.md) - How dynamic systems work together
 - [Inclination Calculations](32-inclination-calculations.md) - Planet inclination oscillation (ICRF perihelion approach)
@@ -34,6 +32,8 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `speedofSuninKM` | Earth's orbital speed around Sun (km/h) |
 | `currentAUDistance` / `o.lengthofAU` | Astronomical Unit in km (dynamic) |
 | `lightYear` | Light year in km (derived) |
+
+> **ESSRT epoch dependence.** The variables above (`holisticyearLength`, `meansolaryearlengthinDays`, `meansiderealyearlengthinSeconds`, `meanlengthofday`, `meanSiderealday`, `meanStellarday`, `meanAnomalisticYearinDays`) hold **J2000-anchored values** — the model's primary calibration anchor. Under the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md), each of these is epoch-dependent: H(t) grows under Driver 1 (Earth-Moon tidal evolution → LOD growth) and the sidereal year in seconds shifts under Driver 2 (solar mass loss → Kepler's 3rd law). For deep-time / Phanerozoic / Hadean work, replace these globals with the corresponding `mean*AtAge(t_Ma)` helpers in `src/script.js` (`meanHAtAge`, `meanLodSecondsAtAge`, `meanSiderealYearSecondsAtAge`, `meanTropicalYearSecondsAtAge`, etc.) — see [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the complete J2000-constant → helper map.
 
 #### 1.1.2 Mathematical Constants
 

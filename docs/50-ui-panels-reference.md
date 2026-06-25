@@ -16,9 +16,13 @@ The simulation includes several interactive panels for inspecting planetary data
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
 | **Invariable Plane Balance Explorer** | Test Fibonacci Law assignments interactively |
 | **Eccentricity Balance Scale** | Visualize Law 5 balance per target planet (waterfall chart + buildup table) |
-| **Solar System Resonance Cycle** | All periods as integer divisors of 8H = 2,682,536 yr (8 planets × 6 cycles) |
-| **WebGeoCalc Explorer** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet |
-| **Formula Verification** | Model vs published celestial-mechanics formulas (±12,000 yr, 9 quantities) |
+| **Solar System Resonance Cycle** | All periods as integer divisors of 8H = 2,682,536 yr at J2000 (8 planets × 6 cycles) |
+| **WebGeoCalc Explorer** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet — see [doc 56](56-webgeocalc-explorer.md) |
+| **Climate Formula Explorer** | L1+L2+L3 climate formula visualized across LR04 / CENOGRID / EPICA / CenCO2PIP, multiple time windows — see [doc 58](58-climate-formula-explorer.md) |
+| **ESSRT Explorer** | Deep-time evolution of H, LOD, year length, Moon distance under Expanding Solar System Resonance Theory — see [doc 59](59-essrt-explorer.md) |
+| **Formula Verification** | Model vs published celestial-mechanics formulas (±12,000 yr, 9 quantities) — see [doc 57](57-formula-verification.md) |
+
+> **Scope note (ESSRT).** Each panel is intrinsically a present-epoch UI that reads from the live simulation state — what users see at any time reflects whatever date is currently active. When users scrub the simulation date by millions of years, the panels reflect ESSRT-evolved values automatically (per `DEEP_TIME_MODE_ENABLED` in `src/script.js`). The Solar System Resonance Cycle panel displays integer divisors (scale-invariant); the ESSRT Explorer is the dedicated visualization for how those divisors' literal year-counts evolve at deep time. See [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the formalism.
 
 ---
 
@@ -452,7 +456,7 @@ See [38 — The Eccentricity Balance Scale](38-eccentricity-scale.md) for the ph
 
 ### Purpose
 
-Shows all 8 planets × 6 cycle types (axial precession, ecliptic perihelion, ICRF perihelion / inclination, ascending node regression, obliquity oscillation, eccentricity cycle) as integer divisors of the Solar System Resonance Cycle 8H = 2,682,536 years. Every cycle for every planet divides 8H evenly — this is the super-period that resets the whole system once every ~2.68 million years.
+Shows all 8 planets × 6 cycle types (axial precession, ecliptic perihelion, ICRF perihelion / inclination, ascending node regression, obliquity oscillation, eccentricity cycle) as integer divisors of the Solar System Resonance Cycle 8H = 2,682,536 years (at J2000). Every cycle for every planet divides 8H evenly — this is the super-period that resets the whole system once every ~2.68 million years.
 
 ### Accessing the Panel
 
@@ -501,6 +505,66 @@ Shows the actual observed perihelion-precession history of each planet from JPL 
 ### Full Reference
 
 See [56 — WebGeoCalc Explorer](56-webgeocalc-explorer.md) for the complete observed-rate table, the data pipeline (`tools/explore/wgc-perihelion-rates.js` → `public/input/wgc-perihelion-data.json`), and why only Mercury and Mars have reliably resolvable trends from the 1900–2026 window. Saturn's direction stays retrograde across windows but its magnitude varies by ~2× (sliding-window range −1,800 to −3,600 ″/cy), so it is also flagged as un-determined.
+
+---
+
+## Climate Formula Explorer
+
+### Purpose
+
+Modal that visualizes the canonical **L1+L2+L3 climate formula** (see [doc 92](92-climate-formula.md)) overlaid on each of the four climate proxy records — CenCO2PIP (66 Myr), CENOGRID (67 Myr), LR04 (5.3 Myr) — with multiple sub-windows on LR04 (1.2 Myr post-MPT extended, 800 kyr EPICA, 700 kyr post-MPT, 200 kyr past, forward projection). Lets the user toggle each layer (Total / L1 / L2 / L3) and switch the CENOGRID proxy between δ¹⁸O and δ¹³C.
+
+### Accessing the Explorer
+
+1. Open the Tweakpane Tools folder
+2. Click "Climate Formula Explorer"
+3. Use the time-window tabs across the top to switch records
+4. Use the layer toggles (Total / L1 / L2 / L3) to add or remove formula layers
+5. On CENOGRID, use the δ¹⁸O / δ¹³C sub-toggle
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Eight time-window tabs** | CenCO2PIP 66M, CENOGRID 67M, LR04 5.3M, LR04 1.2M, EPICA 800k, LR04 700k, LR04 200k, forward projection |
+| **Layer toggles** | Total (baseline + L1 + L2 + L3), L1 only (orbital lattice — 31 integer divisors of 8H at J2000), L2 (carbon-cycle thermostat 405/202/135 kyr family), L3 (6 Heaviside step components at PETM/EOT/Mi-1/MMCT/iNHG/MPT) |
+| **Proxy chart** | Observed proxy data + the formula evaluated at the same timestamps |
+| **CENOGRID proxy sub-toggle** | δ¹⁸O vs δ¹³C |
+| **Forward projection tab** | Predicts climate forcing forward — Holocene correctly identified as interglacial; next natural glaciation predicted ~58 kyr ahead |
+| **Hover tooltips** | Per-layer breakdown at any timestamp with detailed L1 line composition |
+
+### Full Reference
+
+See [doc 58 — Climate Formula Explorer](58-climate-formula-explorer.md) for the complete panel reference (tab list, layer toggles, Y-axis conventions, R² breakdown, forward-projection markers, code locations). The underlying L1+L2+L3 architecture, per-regime ridge-fit R² values, 32 L1 integers + Berger/Holistic dual attribution, and variance-decomposition Tier B analyses live in [doc 92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md).
+
+---
+
+## ESSRT Explorer
+
+### Purpose
+
+Modal that visualizes the **Expanding Solar System Resonance Theory (ESSRT)** — how the Earth Fundamental Cycle H, length-of-day, sidereal year, Moon distance, and ΔT evolve across deep time. The Solar System Resonance Cycle (8H ≈ 2.68 Myr today) and its integer-divisor lattice are structural invariants, but H itself expands monotonically across geological time via two physically independent drivers: **Earth-Moon tidal evolution (Driver 1)** lengthens LOD; **solar mass loss (Driver 2)** expands every orbit via Kepler's third law. The integers in the lattice stay fixed; only the literal time unit scales.
+
+### Accessing the Explorer
+
+1. Open the Tweakpane Tools folder
+2. Click "ESSRT Explorer"
+3. Use the **Quantity** tabs (top row) to select what to plot: H, LOD, sidereal year, tropical year, Moon distance, ΔT, etc.
+4. Use the **Range** tabs (second row, teal accent) to select the time range: full Hadean → +1 Gyr, Phanerozoic 650 Ma, etc.
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Quantity tabs (gold)** | H(t), LOD, sidereal/tropical year length, Moon distance, ΔT — all derived from Farhat 2022 Moon-distance polynomial + angular-momentum conservation + Driver 2 solar mass loss |
+| **Range tabs (teal)** | Full deep-time (Hadean ~−4.54 Gyr → +1 Gyr), Phanerozoic 650 Ma, finer-grained sub-ranges |
+| **Hover tooltip** | Year and value at any point on the chart, with snap-to-nearest-sample |
+| **Export buttons** | "Export Full" and "Export Phanerozoic" — produce paper-style SVG (white background) for the selected quantity over those ranges |
+| **Validation references** | Curves pass through anchored data points from cyclostratigraphy (Wu 2024, Boulila 2018), tidal-rhythmite measurements (Williams 2000), Devonian coral growth bands (Wells 1963), and the Patterson 1956 Pb-Pb age constraint |
+
+### Full Reference
+
+See [doc 59 — ESSRT Explorer](59-essrt-explorer.md) for the complete panel reference (7 quantity tabs, 2 range tabs, era markers, Wu 2024 anchor overlay, hover tooltip, paper-export buttons, code locations). The underlying theory — Driver 1 (Farhat polynomial + angular-momentum conservation), Driver 2 (Kepler scaling under solar mass loss), the H(t) / LOD(t) / year(t) parameterizations, validation against the published cyclostratigraphy record (sub-percent agreement Hadean → present), and the per-frame integrator architecture (`_dtCycleN`, `_dtMoonIntegrator`, `_dtPlanetIntegrator`) — lives in [doc 99 — Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md).
 
 ---
 
@@ -584,6 +648,10 @@ This 99.994% accuracy validates that our orbital elements are consistent with pu
 | [55 - Solar System Resonance Cycle](55-solar-system-resonance-cycle-periods.md) | 8H period table for all planets × cycles |
 | [56 - WebGeoCalc Explorer](56-webgeocalc-explorer.md) | Observed perihelion-precession (JPL NAIF, 1900–2026) |
 | [57 - Formula Verification](57-formula-verification.md) | Model vs published celestial-mechanics formulas (±12 k yr) |
+| [58 - Climate Formula Explorer](58-climate-formula-explorer.md) | Dedicated panel reference for the Climate Formula Explorer modal |
+| [59 - ESSRT Explorer](59-essrt-explorer.md) | Dedicated panel reference for the ESSRT Explorer modal |
+| [92 - Climate Formula](92-climate-formula.md) | L1+L2+L3 architecture for the Climate Formula Explorer |
+| [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling framework for the ESSRT Explorer |
 
 ---
 

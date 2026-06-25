@@ -2,6 +2,8 @@
 
 This document provides a conceptual overview of the invariable plane and how the Holistic Universe Model uses it as a fundamental reference frame.
 
+> **Scope note (ESSRT).** The invariable plane itself (perpendicular to total angular momentum) is fixed in space; the angular-momentum conservation argument that defines it is scale-invariant. Period denominators (H/3, H/5, 8H/N) are scale-invariant Fibonacci/lattice divisors that stay constant at any epoch. The literal year values (67,063 yr ≈ −H/5, 111,772 yr ≈ H/3 in §"The Inclination Cycle") and the Year 50000 projection are J2000-evaluated; the J2000 invariable-plane orientation (1.578° inclination, 107.58° ascending node from Souami & Souchay 2012) is the present-epoch snapshot. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally; the structural picture this document describes holds at any epoch.
+
 ---
 
 ## What is the Invariable Plane?
@@ -347,6 +349,10 @@ For technical implementation details:
 
 For constants and data:
 - [20 - Constants Reference](20-constants-reference.md) - All invariable plane constants
+- [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) - Complete 8H/N period table for the per-planet Ω regression integers referenced in §"Orbital Plane Precession"
+
+For deep-time scaling:
+- [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of H(t)
 
 ---
 

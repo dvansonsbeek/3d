@@ -1,6 +1,8 @@
 # Climate Formula — Architecture, Variance Decomposition & Implementation
 
-> **TL;DR.** The canonical 8H climate formula is **32 integer divisors of 8H = 2,682,536 yr** (L1 lattice: 25 framework integers from Berger 1978 + Laskar 2004 eigenmode beats + framework direct planet cycles from doc 55, plus 6 precession-band sidebands surfaced by doc 91 §12.12 Test L, plus n=141 Berger-quintet completion added 2026-05-28) **+ a 3-line 405-kyr carbon thermostat family** (L2) **+ up to 6 Heaviside step terms** (L3), fitted per regime with sequential ridge regression. Per-regime fits reach **R² = 0.8735 post-MPT**, **R² = 0.8452 EPICA CO₂**, **R² = 0.7626 CenCO2PIP 0–66 Ma**; the full-LR04 fit is **R² = 0.2553** (L1+L2+L3). This doc decomposes the residual into a layered taxonomy — **(L1) orbital lattice**, **(L2) climate-system internal periodic** (canonical: 405-kyr silicate-weathering thermostat + its 202 / 135 kyr harmonics; investigated but not deployed: 13H Boulila libration, 9-Myr long-period carbon resonance), **(L3) boundary-condition shifts** (MPT regime change, iNHG, Cenozoic secular trend, tectonic gateways), **(L4) chronology**, **(L5) stochastic residual** — and reports measured ΔR² for each addition.
+> **TL;DR.** The canonical 8H climate formula is **32 integer divisors of 8H = 2,682,536 yr (at J2000)** (L1 lattice: 25 framework integers from Berger 1978 + Laskar 2004 eigenmode beats + framework direct planet cycles from doc 55, plus 6 precession-band sidebands surfaced by doc 91 §12.12 Test L, plus n=141 Berger-quintet completion) **+ a 3-line 405-kyr carbon thermostat family** (L2) **+ up to 6 Heaviside step terms** (L3), fitted per regime with sequential ridge regression. Per-regime fits reach **R² = 0.8735 post-MPT**, **R² = 0.8452 EPICA CO₂**, **R² = 0.7626 CenCO2PIP 0–66 Ma**; the full-LR04 fit is **R² = 0.2553** (L1+L2+L3). This doc decomposes the residual into a layered taxonomy — **(L1) orbital lattice**, **(L2) climate-system internal periodic** (canonical: 405-kyr silicate-weathering thermostat + its 202 / 135 kyr harmonics; investigated but not deployed: 13H Boulila libration, 9-Myr long-period carbon resonance), **(L3) boundary-condition shifts** (MPT regime change, iNHG, Cenozoic secular trend, tectonic gateways), **(L4) chronology**, **(L5) stochastic residual** — and reports measured ΔR² for each addition.
+
+> **Scope note (ESSRT).** The L1 lattice integer-divisor structure (32 integers, n = 11, 13, ..., 185) and the layered taxonomy (L1 orbital lattice / L2 carbon / L3 boundary shifts) are scale-invariant — they hold at any epoch. The literal year counts (8H = 2,682,536 yr; the per-line periods 8H/n in the L1 catalogues at §2.3; 13H = 4,359,121 yr; the 405-kyr / 202-kyr / 135-kyr L2 lines) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent over the LR04 5.3-Myr window covered by the post-MPT / iNHG-MPT / pre-iNHG ridge fits, modest over the 67-Myr CENOGRID window, and starting to matter for the 13H ≈ 4.36 Myr Boulila comparison. See doc 99 for the per-driver Δ-H formulas.
 >
 > **Canonical formula measurements** (`scripts/milankovitch_climate_formula.py`, 32-integer L1 + 3-line L2 + 6-step L3, sequential ridge λ=1):
 > - **LR04 regime split is the biggest single jump**: pre-iNHG (2.7–5.32 Ma) R² = **0.4298**, iNHG-MPT (1.0–2.7 Ma) R² = **0.7289**, post-MPT (0–1.0 Ma) R² = **0.8735** — the 8H lattice explains ~87% of post-MPT LR04 variance once the MPT regime change is removed.
@@ -111,7 +113,7 @@ Five of six sit in the precession band [17–28 kyr], consistent with sub-domina
 
 Reference table of all 32 L1 lattice members in ascending n order with their periods and physical interpretation. Notation: `g_i` = planet *i*'s apsidal-precession rate, `s_i` = planet *i*'s nodal-precession rate (Laskar 2004 secular eigenfrequencies); `k` = Earth's general precession in longitude (~50.4″/yr). "Direct" = planet's own axial / obliquity / apsidal / eccentricity period; "Eigenmode beat" = difference between two planets' secular rates; "Climatic precession" = `k + g_i` (Earth axial precession × planet *i*'s apsidal motion).
 
-The 25 canonical integers come from Berger 1978 + Laskar 2004 eigenmode beats + framework direct planet cycles from doc 55. The 6 precession-band sidebands (n = 96, 107, 110, 134, 152, 185) were added in this document's Tier B Round 1 (§8.2 A1) — MTM-significant lines that the canonical 25 missed. The 32nd integer (**n = 141**, k+g₃ Earth climatic precession at ~19 kyr) was added 2026-05-28 to complete the Berger precession quintet: subthreshold in LR04 (amp/median 2.03×, just below the 3σ cutoff) but **3σ-significant in the Cheng full Asian-monsoon speleothem record** (amp/median 3.60×). Its inclusion closes the canonical Wigley 1976 / Berger 1978 combination tone `1/95 ≈ 1/19 − 1/23.7` — n=141 beats with n=113 (k+g₅) to produce n=28 (the 95-kyr eccentricity peak), complementing the existing g-beat attribution.
+The 25 canonical integers come from Berger 1978 + Laskar 2004 eigenmode beats + framework direct planet cycles from doc 55. The 6 precession-band sidebands (n = 96, 107, 110, 134, 152, 185) were added in this document's Tier B Round 1 (§8.2 A1) — MTM-significant lines that the canonical 25 missed. The 32nd integer (**n = 141**, k+g₃ Earth climatic precession at ~19 kyr) was added to complete the Berger precession quintet: subthreshold in LR04 (amp/median 2.03×, just below the 3σ cutoff) but **3σ-significant in the Cheng full Asian-monsoon speleothem record** (amp/median 3.60×). Its inclusion closes the canonical Wigley 1976 / Berger 1978 combination tone `1/95 ≈ 1/19 − 1/23.7` — n=141 beats with n=113 (k+g₅) to produce n=28 (the 95-kyr eccentricity peak), complementing the existing g-beat attribution.
 
 | n | Period (kyr) | Category | Identity |
 |---:|---:|---|---|
@@ -144,15 +146,15 @@ The 25 canonical integers come from Berger 1978 + Laskar 2004 eigenmode beats + 
 | **113** | **23.7** | Climatic precession | k+g₅ Jupiter — **Berger 1978 classic 23.7-kyr peak** |
 | 120 | 22.4 | Climatic precession | k+g₂ Venus climatic precession = H/15 |
 | 134 | 20.0 | Precession sideband | k+g₅ Jupiter precession sub-peak (Round 1 A1 — added) |
-| **141** | **19.0** | Climatic precession (Berger quintet) | **k+g₃ Earth climatic precession — Berger 19-kyr peak**; subthreshold in LR04 (amp/median 2.03×) but **3σ in Cheng monsoon record** (3.60×). Beats with n=113 to form the 95-kyr eccentricity peak (n=28) per Wigley 1976. Added 2026-05-28. |
+| **141** | **19.0** | Climatic precession (Berger quintet) | **k+g₃ Earth climatic precession — Berger 19-kyr peak**; subthreshold in LR04 (amp/median 2.03×) but **3σ in Cheng monsoon record** (3.60×). Beats with n=113 to form the 95-kyr eccentricity peak (n=28) per Wigley 1976. |
 | 152 | 17.6 | Precession sideband | k+g₄ Mars climatic precession sub-peak (Round 1 A1 — added) |
 | 185 | 14.5 | Precession sideband | k+g₂ Venus precession sub-peak (Round 1 A1 — added) |
 
 **Three classic Berger peaks** anchor the lattice — n = 28 (95 kyr eccentricity), n = 65 (41 kyr obliquity), and n = 113 (23.7 kyr precession) — plus the empirical post-MPT 100-kyr-band centroid at n = 25, and the carbon-amplification champion at n = 22 (Round 1 C8 / §3.5 of this document).
 
-**Berger precession quintet** (added 2026-05-28): with n=141 now included, the model carries all five canonical Berger climatic-precession peaks — n=113 (k+g₅ Jupiter, 23.7 kyr), n=120 (k+g₂ Venus, 22.4 kyr), n=141 (k+g₃ Earth, 19.0 kyr), and the sideband-attributed n=152 (k+g₄ Mars, 17.6 kyr) and n=185 (k+g₂ Venus sub, 14.5 kyr). The Wigley 1976 combination tone `1/95 ≈ 1/141 − 1/113 = 1/28 → 95 kyr` (eccentricity at n=28) is now structurally explicit in the lattice.
+**Berger precession quintet**: with n=141 now included, the model carries all five canonical Berger climatic-precession peaks — n=113 (k+g₅ Jupiter, 23.7 kyr), n=120 (k+g₂ Venus, 22.4 kyr), n=141 (k+g₃ Earth, 19.0 kyr), and the sideband-attributed n=152 (k+g₄ Mars, 17.6 kyr) and n=185 (k+g₂ Venus sub, 14.5 kyr). The Wigley 1976 combination tone `1/95 ≈ 1/141 − 1/113 = 1/28 → 95 kyr` (eccentricity at n=28) is now structurally explicit in the lattice.
 
-**Composition summary**: 7 direct planetary periods (Mercury / Mars / Jupiter axial-obliquity-apsidal-eccentricity, obliquity centroid, Mars nodal harmonic) + 8 g-beats (eccentricity band) + 8 s-beats (nodal / obliquity band, including k+s₃ and k+s₄ which are climatic-precession-style additions to s-rates) + 2 canonical climatic-precession lines (n=113, n=120) + 6 MTM-significant sidebands added in Tier B Round 1 + **1 Berger-quintet completion (n=141, added 2026-05-28)** = **32 total**.
+**Composition summary**: 7 direct planetary periods (Mercury / Mars / Jupiter axial-obliquity-apsidal-eccentricity, obliquity centroid, Mars nodal harmonic) + 8 g-beats (eccentricity band) + 8 s-beats (nodal / obliquity band, including k+s₃ and k+s₄ which are climatic-precession-style additions to s-rates) + 2 canonical climatic-precession lines (n=113, n=120) + 6 MTM-significant sidebands added in Tier B Round 1 + **1 Berger-quintet completion (n=141)** = **32 total**.
 
 Source: `L1_LABELS` dict in `scripts/milankovitch_climate_formula.py`. The same labels populate the L1 hover-tooltip in the Climate Formula Explorer modal (see §13.2).
 
@@ -835,7 +837,7 @@ The canonical formula is **31 + 3 + 6 = 40 structural components**. The variance
 
 | Layer | Count | What | Investigation trail |
 |---|---:|---|---|
-| **L1** lattice | 32 integers | 25 canonical (Berger 1978 eigenmode beats + framework direct planet cycles from doc 55) + 6 precession-band sidebands (96, 107, 110, 134, 152, 185) + 1 Berger-quintet completion (141, added 2026-05-28) | Doc 91 §12.12 Test L MTM enrichment; doc 92 §2.1 Tier A1 sideband ΔR²; doc 92 §2.3 (n=141 closure) |
+| **L1** lattice | 32 integers | 25 canonical (Berger 1978 eigenmode beats + framework direct planet cycles from doc 55) + 6 precession-band sidebands (96, 107, 110, 134, 152, 185) + 1 Berger-quintet completion (141) | Doc 91 §12.12 Test L MTM enrichment; doc 92 §2.1 Tier A1 sideband ΔR²; doc 92 §2.3 (n=141 closure) |
 | **L2** thermostat | 3 lines | 405-kyr fundamental + 202-kyr 2nd harmonic + 135-kyr 3rd harmonic | Doc 91 §13 405-kyr investigation; doc 92 §3.1 Tier A2; doc 92 §3.4 Tier B1 nonlinear-silicate-weathering |
 | **L3** steps | 6 Heaviside | PETM (56 Ma), EOT (34 Ma), Mi-1 (23 Ma), MMCT (14 Ma), iNHG (2.7 Ma), MPT (1 Ma) | Doc 92 §4.1 Tier A5 regime split; doc 92 §8.3 B5 step components; doc 92 §11.3 CenCO2PIP cross-validation |
 
@@ -872,7 +874,7 @@ C(t) = c₀
 ```
 
 Where:
-- **L1 integers** (32 of 200 possible 8H/N divisors) = the canonical 25 (Berger eigenmode beats + Mars/Jupiter direct cycles from doc 55) plus 6 MTM-significant precession-band sidebands (96, 107, 110, 134, 152, 185) from Round 1 A1 plus 1 Berger-quintet-completion sideband (141 = k+g₃ Earth at ~19 kyr, added 2026-05-28; subthreshold in LR04 at amp/median 2.03×, 3σ in Cheng monsoon at 3.60×; closes the Wigley 1976 combination tone `1/95 ≈ 1/141 − 1/113`)
+- **L1 integers** (32 of 200 possible 8H/N divisors) = the canonical 25 (Berger eigenmode beats + Mars/Jupiter direct cycles from doc 55) plus 6 MTM-significant precession-band sidebands (96, 107, 110, 134, 152, 185) from Round 1 A1 plus 1 Berger-quintet-completion sideband (141 = k+g₃ Earth at ~19 kyr; subthreshold in LR04 at amp/median 2.03×, 3σ in Cheng monsoon at 3.60×; closes the Wigley 1976 combination tone `1/95 ≈ 1/141 − 1/113`)
 - **L2 periods** (3 lines, the silicate-weathering thermostat family) = 405-kyr fundamental + 202.25-kyr 2nd harmonic + 134.83-kyr 3rd harmonic — confirmed carbon-amplified across LR04, CENOGRID, and EPICA
 - **L3 transitions** (up to 6, applied only when inside the fit window) = PETM (56 Ma), EOT (34 Ma), Mi-1 (23 Ma), MMCT (14 Ma), iNHG (2.7 Ma), MPT (1 Ma)
 
@@ -1216,69 +1218,11 @@ Forward projection (next 250 kyr from today) is purely within the post-MPT regim
 
 ## 13. Climate Formula Explorer modal (`src/script.js`)
 
-The modal exposes the canonical formula and all per-regime fits in an interactive 8-tab UI.
+The interactive modal that visualizes the canonical formula across 8 time windows (CenCO2PIP 66M, CENOGRID 67M, LR04 5.3M, LR04 1.2M, EPICA 800k, LR04 700k, LR04 200k, LR04 forward) with layer toggles (Total / L1 / L2 / L3), per-regime R² breakdowns, forward-projection markers, and cross-proxy comparison tables, is documented in its own dedicated panel reference:
 
-### 13.1 Tab list (left → right)
+→ **[doc 58 — Climate Formula Explorer](58-climate-formula-explorer.md)** — complete tab list, layer toggles, Y-axis conventions, R² breakdown panel, forward-projection markers, cross-proxy comparison tables, forward-projection note (Ganopolski-vs-Caillon framing), and code locations.
 
-| Tab label | Window | Data source | Eval routing | Tab note |
-|---|---|---|---|---|
-| **CenCO2PIP · 66M** | 0–66 Ma | `public/input/cenco2pip-data.json` | `cenco2pip` regime only | Deep-time atmospheric CO₂ (Bayesian multi-proxy synthesis) |
-| **CENOGRID · 67M** | 0–67 Ma | `public/input/cenogrid-data.json` (δ¹⁸O / δ¹³C subtoggle) | δ¹⁸O: LR04 stitched for ≤ 5.3 Ma + cenogrid-d18o for > 5.3 Ma. δ¹³C: cenogrid-d13c only | Cenozoic benthic stack; L3 step terms dominate variance |
-| **LR04 · 5.3M** | 0–5.3 Ma | `public/input/lr04-data.json` | LR04 stitched (3 regimes) | Three regimes visible; full LR04 record |
-| **LR04 · 1.2M** | 0–1.2 Ma | LR04 | LR04 stitched, but only post-mpt + inhg-mpt inside window | Across the MPT transition (~1 Ma) |
-| **EPICA · 800k** | 0–800 kyr | `public/input/epica-co2-data.json` | `epica-co2` regime only | Cross-proxy validation: same lattice fits atmospheric CO₂ |
-| **LR04 · 700k** | 0–700 kyr | LR04 | `lr04-post-mpt` only | Post-MPT regime, the formula's best-fit window (R² = 0.87) |
-| **LR04 · 200k** | 0–200 kyr | LR04 | `lr04-post-mpt` only | Current glacial cycle in detail |
-| **LR04 · forward** | −250 → +250 kyr | LR04 (past only) + extrapolated formula | `lr04-post-mpt` only | Orbital-only projection; honest scope is post-MPT regime continues |
-
-### 13.2 Layer toggles (3 checkboxes)
-
-| Toggle | Curve displayed | Meaning |
-|---|---|---|
-| **Total** (white) | baseline + L1 + L2 + L3 | The complete formula's prediction |
-| **L1 alone** (yellow) | baseline + L1 + L3 | Orbital wiggles on top of the regime-defined baseline |
-| **L2 alone** (green) | baseline + L2 + L3 | Carbon-thermostat (405-kyr beat + harmonics) on top of the regime baseline |
-
-L3 step terms are included on every line so each curve follows the per-period regime baseline. The lines do not visually sum to Total (each carries the baseline once); the R² panel shows per-layer variance contributions.
-
-### 13.3 Y-axis conventions
-
-| Proxy | Y-axis | Orientation | Top label | Bottom label |
-|---|---|---|---|---|
-| δ¹⁸O (LR04 / CENOGRID δ¹⁸O) | ‰ | Inverted (paleoclimate convention) | ↑ warmer | ↓ colder |
-| δ¹³C (CENOGRID δ¹³C) | ‰ | Inverted | ↑ carbon released | ↓ carbon stored |
-| CO₂ (EPICA / CenCO2PIP) | ppm | Standard (non-inverted), floor clamped at 0 | ↑ high CO₂ (warm) | ↓ low CO₂ (glacial) |
-
-### 13.4 R² breakdown panel
-
-Collapsed by default, exposes a `<details>` block below the chart:
-
-- **Single-regime tabs** (LR04 700k, LR04 200k, EPICA, CenCO2PIP, CENOGRID δ¹³C): per-layer cumulative R² + ΔR² for L1, L2, L3 of that regime.
-- **Stitched tabs** (Full LR04, Post-MPT ext, CENOGRID δ¹⁸O): stitched curve R² computed against actual data + per-regime breakdown for each segment crossed.
-
-### 13.5 Forward projection markers
-
-On the forward tab, glacial maxima and interglacial peaks are auto-detected at render time:
-
-- Algorithm: `cfmFindExtrema(t, vals, type='max'|'min', prominence=0.3, halfWidth=32)`
-- Halfwidth = 32 samples (≈ 20 kyr at the forward tab's grid resolution) — wide enough to resolve 100-kyr glacial-cycle peaks.
-- Absolute thresholds: glacial requires δ¹⁸O ≥ 4.5 ‰; interglacial requires δ¹⁸O ≤ 3.7 ‰. Mid-cycle wobbles (4.0–4.4 ‰) are not labeled.
-- Glacial markers (blue) anchored at the bottom of the plot; interglacial markers (orange) at the top.
-
-### 13.6 Cross-proxy comparison tables
-
-Two tabs render additional collapsible tables below the R² panel:
-
-- **CENOGRID** tab → "L3 step amplitudes: ice (δ¹⁸O) vs carbon (δ¹³C)" — per-transition raw-‰ jumps for both proxies side-by-side, with interpretive notes.
-- **EPICA** tab → "L1 carbon-amplification ratio (EPICA / LR04 post-MPT)" — per-line ratio sorted descending; identifies which lattice members manifest primarily through carbon-cycle dynamics (see §10.3).
-
-### 13.7 Forward-projection note
-
-The forward tab carries an explicit caveat addressing the CO₂-causality debate:
-
-> *Orbital-only projection. Natural orbital + carbon-cycle + boundary terms only; no anthropogenic CO₂ forcing. Glacial / interglacial markers auto-detected from the curve. Under natural forcing the curve shows glacial inception in the next 20–30 kyr (next peak at ~58 kyr). Whether anthropogenic CO₂ alters this depends on CO₂'s causal role in glacial cycles — itself contested. If CO₂ drives temperature (Ganopolski et al. 2016), present cumulative emissions delay inception ~50 kyr (high-emission scenarios ~100 kyr). If CO₂ lags as a feedback (ice-core record, Caillon et al. 2003), the orbital projection largely holds. Honest scope: post-MPT regime continues.*
-
-This framing addresses the Ganopolski-vs-Caillon debate without endorsing either causal direction — the framework treats CO₂ as a feedback (L2 silicate-weathering thermostat is the natural carbon response), but the modal's forward projection is orbital-only and lets the reader decide which CO₂ view to overlay.
+The modal is read-only and reads coefficients from the embedded `CLIMATE_FORMULA_COEFFS` block (synced from `public/input/climate-formula-coefficients.json` via the §14 pipeline below).
 
 ---
 
@@ -1403,3 +1347,4 @@ All four scripts deterministic — no random seeds, identical output on rerun.
 - [10 — Fibonacci Laws](10-fibonacci-laws.md) — the underlying 8H lattice structure (Law 1)
 - [16 — Milankovitch Language](90-milankovitch-language.md) — framework terminology, Berger / Laskar eigenmode notation, 5 H-divisor periods
 - [17 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) — empirical 25/32-integer fit (§2), per-planet contributions (§3), 100-kyr-band centroid (§4), pre-MPT/post-MPT analysis (§5), pre-registered super-cycle null (§§8–11), 14 follow-up hypothesis tests (§12), 405-kyr off-lattice characterization (§13)
+- [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); per-driver Δ-H formulas relevant for the 13H Boulila comparison and the 67-Myr CENOGRID window

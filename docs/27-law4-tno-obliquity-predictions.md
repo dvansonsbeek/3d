@@ -13,8 +13,11 @@
 - [15 — Planet Nine Prediction](15-planet-nine-prediction.md) — same two-tier methodology applied to ETNO candidates
 - [19 — Dual-Balance Sensitivity Analysis](19-balance-sensitivity-analysis.md) — Approach 2 (Law-4 natural) reading of v-balance
 - [38 — Eccentricity Balance Scale](38-eccentricity-scale.md) — K constant in context
+- [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); the Law-4 bidirectional reading is structural and epoch-invariant
 - Code: [`scripts/tno_obliquity_prediction.py`](../scripts/tno_obliquity_prediction.py)
 - Output: [`data/tno-obliquity-predictions.json`](../data/tno-obliquity-predictions.json)
+
+> **Scope note (ESSRT).** Law 4 (`e_amp = K · sin(tilt) · √d / (√m · a^(3/2))`) is structurally scale-invariant — the bidirectional reading and the e_obs vs e_amp distinction hold at any epoch. K is derived from Earth at J2000; under [ESSRT](99-expanding-solar-system-resonance-theory.md), it would be re-evaluated at any other epoch by the same closed-loop derivation using that epoch's Earth values. The 200-year TNO ephemeris baseline used here is intrinsically present-epoch; deep-time TNO dynamics would require an analogous secular-amplitude treatment.
 
 ---
 

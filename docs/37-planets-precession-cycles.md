@@ -80,7 +80,7 @@ over longer timescales.
 
 **Notable patterns:**
 - **Earth = Uranus** (both H/3) — same period, same rate
-- **Jupiter = 8H/39**, **Saturn = −8H/65** (dynamical; kinematic Fibonacci anchors H/5, H/8 — consecutive Fibonacci denominators)
+- **Jupiter = 8H/39**, **Saturn = −8H/65** (8H-lattice secular; Fibonacci anchors H/5, H/8 — consecutive Fibonacci denominators)
 - Saturn's perihelion precesses obviously retrograde against the ecliptic
 - Mercury's H × 8/11: 8 is Fibonacci (F6), 11 is Lucas (L5)
 
@@ -293,7 +293,7 @@ The wobble is the **meeting frequency** of these two motions:
 | Uranus | 111,772 yr | H/3 | −33,532 yr | −H/10 | retro |
 | Neptune | 670,634 yr | H×2 | −26,825 yr | −2H/25 | retro |
 
-Notable ICRF patterns (dynamical): Jupiter = **8H/65**, Saturn = **8H/169** — at the kinematic level these sit at the Fibonacci anchors H/8 (F6) and H/21 (F8).
+Notable ICRF patterns (8H-lattice secular): Jupiter = **8H/65**, Saturn = **8H/169** — these sit near the Fibonacci anchors H/8 (F6) and H/21 (F8).
 Earth is the only planet with prograde perihelion ICRF.
 
 ### Part 2: Axial Precession (from research)
@@ -332,8 +332,8 @@ Calculation detail:
 - **Uranus**: 1/(H×610) + 10/H ≈ 10/H (axial negligible)
 - **Neptune**: |1/(68H) − 25/(2H)| ≈ 25/(2H) (axial negligible)
 
-Notable: Jupiter's eccentricity cycle = **8H/44 = 2H/11 = 60,967 yr** (dynamical;
-the kinematic Fibonacci-anchored value was 8H/43). For Uranus and Neptune
+Notable: Jupiter's eccentricity cycle = **8H/44 = 2H/11 = 60,967 yr** (8H-lattice secular;
+the Fibonacci-anchored value was 8H/43). For Uranus and Neptune
 the extremely slow axial precession makes the eccentricity cycle nearly equal to the
 perihelion ICRF rate.
 
@@ -362,15 +362,15 @@ Each planet's perihelion ecliptic rate has a known H-expression with a rate
 numerator N and a rate base. The Fibonacci decomposition N = A + B determines
 both the obliquity and ecliptic precession rates.
 
-> **Kinematic vs dynamical for Jupiter and Saturn.** This decomposition is a
-> *structural Fibonacci identity*: it works only with the clean kinematic anchors
+> **Fibonacci anchor vs 8H-lattice secular for Jupiter and Saturn.** This decomposition is a
+> *structural Fibonacci identity*: it works only with the clean Fibonacci anchors
 > (Jupiter H/5 ecliptic, H/8 ICRF; Saturn H/8 ecliptic, H/21 ICRF), because only
-> those integers split as Fibonacci sums (5 = 2 + 3, 8 = 5 + 3). The *dynamical*
+> those integers split as Fibonacci sums (5 = 2 + 3, 8 = 5 + 3). The *8H-lattice secular*
 > perihelion periods that the data tables and the simulation use — Jupiter 8H/39
-> ecliptic / 8H/65 ICRF, Saturn 8H/65 ecliptic / 8H/169 ICRF — are off-lattice
-> secular beats and do not Fibonacci-decompose. The two views coexist: the
-> kinematic anchor positions Jupiter and Saturn in Earth's Fibonacci hierarchy
-> (Law 6), while the dynamical value reproduces Laskar's secular theory and the
+> ecliptic / 8H/65 ICRF, Saturn 8H/65 ecliptic / 8H/169 ICRF — sit one 8H-lattice integer off the Fibonacci anchors
+> and do not Fibonacci-decompose. The two views coexist: the
+> Fibonacci anchor positions Jupiter and Saturn in Earth's Fibonacci hierarchy
+> (Law 6), while the 8H-lattice secular value reproduces Laskar's secular theory and the
 > climate record. See [10-fibonacci-laws.md](10-fibonacci-laws.md), Law 6.
 
 ### Three confirmed predictions
@@ -546,12 +546,12 @@ oscillations superimposed on the trend — would constitute a confirmation.
    Saturn's obliquity oscillates at H/3 = 111,772 yr. See [The Closed Loop](72-the-closed-loop.md).
 
 4. **Perihelion Fibonacci pattern**: The WebGeoCalc perihelion rates reveal a
-   striking *kinematic* Fibonacci structure: Jupiter≈H/5, Saturn≈H/8 (retrograde),
+   striking *Fibonacci-anchor* structure: Jupiter≈H/5, Saturn≈H/8 (retrograde),
    Earth=Uranus=H/3, Venus=−8H/6 (retrograde), Neptune=H×2. This extends the
-   Fibonacci framework beyond Earth. For Jupiter and Saturn the *dynamical* secular
+   Fibonacci framework beyond Earth. For Jupiter and Saturn the *8H-lattice secular*
    periods are slightly off these clean anchors — 8H/39 and −8H/65 — matching
    Laskar's secular theory and the climate record; the Fibonacci anchors and the
-   dynamical beats are two views of the same motion (see Law 6).
+   8H-lattice secular periods are two views of the same motion (see Law 6).
 
 5. **Frame dependence**: Axial precession is measured in ICRF. Inclination
    precession is measured against the ecliptic (or invariable plane). The

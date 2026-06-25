@@ -326,5 +326,4 @@ Both values are shown in the "Perihelion Planets" folder for each planet:
 
 ---
 
-*Document created: 2025-12-26*
 *Related to: Perihelion longitude calculations in script.js*

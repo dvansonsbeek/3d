@@ -1,7 +1,9 @@
 # Doc 98 — The Mechanism Behind the 8H/L1 Lattice
 
 ## Status
-Active research. Started 2026-06-08.
+Active research.
+
+> **Scope note (ESSRT).** This document is one of the foundational ESSRT-mechanism research docs — it asks *why* the 8H/L1 lattice exists as a real spectral structure, and discusses deep-time consequences directly: H(t) evolution under tidal LOD growth, the k-involving vs pure-orbital beat asymmetry, integer-label invariance vs period rescaling, the Snowball-Earth thermal-tide-lock break ~600 Ma as the one regime change between Precambrian and current dynamics. The literal values H = 335,317 yr and 8H = 2,682,536 yr in this doc are J2000-anchored; the deep-time scaling rule is given by [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) (Farhat 2022 polynomial + angular-momentum conservation), and the empirical 50-Myr test is in [doc 97 §4 Test C-50](97-paleo-ecs-decomposition.md). Findings here that the integer structure is *invariant* under H(t) drift but k-involving period labels *track* LOD evolution are themselves part of the ESSRT framework.
 
 ## Why this doc exists
 
@@ -292,7 +294,7 @@ breaks the periodicity.
 
 **Strongly supported, for the obliquity sector.** The mechanism behind
 the 8H lattice IS action-angle closure: the secular system has a
-closed-orbit period of 8H = 2,682,536 yr in the obliquity sector, and
+closed-orbit period of 8H = 2,682,536 yr (at J2000) in the obliquity sector, and
 the eigenfrequencies are commensurate at that period.
 
 This **directly explains the integer-divisor structure of L1**:
@@ -686,7 +688,7 @@ so, when did the transition happen?
 
 ### The structural relation: H = 13 × precession period
 
-The framework's H = 335,317 yr satisfies H ≈ 13 × 25,771 yr = 335,023 yr
+The framework's H = 335,317 yr (at J2000) satisfies H ≈ 13 × 25,771 yr = 335,023 yr
 (Earth's modern precession period times Fibonacci F₇ = 13), matching
 to 0.09%. This is almost certainly the structural definition: H is
 *tied to Earth's precession period via the Fibonacci coupling integer
@@ -787,9 +789,9 @@ the integer structure is invariant; the period labels track LOD
 evolution. Published deep-time cyclostratigraphy confirms the LOD-
 scaled predictions to sub-percent precision.
 
-**Empirical confirmation from Test C-50 re-analysis (2026-06-12).** The
-proper-physics-lattice re-analysis of LA2004 (doc 97 §Test C-50, updated
-section) tested the integer-label-invariance claim directly across the
+**Empirical confirmation from Test C-50 re-analysis.** The
+proper-physics-lattice re-analysis of LA2004 ([doc 97 §Test C-50](97-paleo-ecs-decomposition.md))
+tested the integer-label-invariance claim directly across the
 -50 Myr Cenozoic. The result splits cleanly along the k-involving / pure
 orbital boundary:
 
@@ -907,3 +909,17 @@ obliquity dynamics. The framework's claim is well-supported, with one
 honest qualifier: 8H may be the strongest natural low-integer
 commensurability period rather than the unique closed-orbit period of
 the whole system.
+
+---
+
+## Related Documents
+
+| Document | Purpose |
+|----------|---------|
+| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | The 8H/N integer divisor lattice this doc seeks the mechanism for |
+| [90 - Milankovitch Language](90-milankovitch-language.md) | Framework terminology and Berger/Laskar eigenmode notation |
+| [91 - Milankovitch Evidence](91-milankovitch-evidence.md) | Empirical L1 lattice fit (32 integers); foundational test data |
+| [92 - Climate Formula](92-climate-formula.md) | L1+L2+L3 canonical formula (32 integers + selection criteria for L1) |
+| [93 - L1 Lattice Attribution Reference](93-l1-attribution-reference.md) | Per-integer Berger vs Holistic attribution |
+| [97 - Paleo-ECS Decomposition](97-paleo-ecs-decomposition.md) | Test C-Invariant + Test C-Balance + Test C-Libration referenced in this doc's intro; Test C-50 ESSRT re-analysis |
+| [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t); the formalism behind the proper-physics lattice used in Test C-50 re-analysis |

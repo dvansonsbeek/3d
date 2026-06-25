@@ -6,12 +6,12 @@ This document describes the Fibonacci Laws of Planetary Motion as implemented in
 
 ## Overview
 
-The six Fibonacci Laws form a layered architecture:
+The six Fibonacci Laws form a symmetric architecture, organized by structural role rather than by physical domain:
 
-- **Law 1** (Fibonacci Cycle Hierarchy) — Earth's major precession periods divide H by Fibonacci numbers (H/3, H/5, H/8, H/13). A hierarchy unique to Earth.
-- **Laws 2–3** (Inclination Constant + Balance) — each planet's inclination amplitude is quantized by a Fibonacci divisor, and the mass-weighted amplitudes cancel between two phase groups (seven in-phase planets balanced against Saturn alone)
-- **Laws 4–5** (Eccentricity Amplitude Constant + Balance) — a single constant K predicts all 8 eccentricity amplitudes, and the base eccentricities satisfy an independent balance condition with the same Fibonacci divisors and phase groups as Law 3
-- **Law 6** (Saturn-Jupiter-Earth Resonance) — Jupiter's ICRF perihelion and Saturn's ecliptic perihelion lock to one period, 8H/65 (a structural balance, not a coincidence); this is the obliquity beat in Earth's climate record, one 8H-lattice step from Earth's Fibonacci obliquity H/8 (= 8H/64). The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock
+- **Law 1** — Earth's major precession periods are H divided by Fibonacci numbers — H/3, H/5, H/8, H/13 (an Earth-unique hierarchy).
+- **Laws 2 and 4** (Amplitude Constants) — A universal constant predicts every planet's inclination amplitude (ψ) and eccentricity amplitude (K) from Fibonacci divisors and mass — both derived from Earth, both predict all 8 planets with zero free parameters.
+- **Laws 3 and 5** (Balance Laws) — Angular-momentum-weighted oscillations of seven planets balance against Saturn's alone — same Fibonacci divisors and phase groups in both, distinct weight formulas (`w = √(m·a(1-e²))/d` for inclination, `v = √m × a^(3/2) × e / √d` for eccentricity).
+- **Law 6** (Saturn-Jupiter-Earth Resonance) — Jupiter's ICRF perihelion and Saturn's ecliptic perihelion lock to one period, 8H/65 — the climate-recorded obliquity beat. Earth's own obliquity sits one 8H-lattice step away at the Fibonacci value H/8 (= 8H/64). The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock.
 
 For detailed mathematical derivations and formula coefficient breakdowns, see [Formula Derivation](35-formula-derivation.md).
 
@@ -87,9 +87,9 @@ Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invari
 
 Beat frequency rule: `1/H(n) + 1/H(n+1) = 1/H(n+2)` — an algebraic identity from the Fibonacci recurrence (3+5=8, 5+8=13, 8+13=21, …).
 
-**Earth's H/Fibonacci hierarchy is unique.** Only Earth has all major precession periods at H divided by Fibonacci numbers. At the kinematic level, Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) coincide with some of these Fibonacci values; their dynamical secular periods sit one 8H-lattice integer away (8H/39, 8H/65, 8H/169). Both levels are the subject of Law 6. The other planets' precession periods divide the Solar System Resonance Cycle (8H) by various integers, mostly non-Fibonacci. See [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) for the all-planet 8H/N table.
+**Earth's H/Fibonacci hierarchy is unique.** Only Earth has all major precession periods at H divided by Fibonacci numbers. The gas giants' perihelions sit on the 8H lattice **one integer off** the nearest Fibonacci anchors: Jupiter's ecliptic perihelion is **8H/39** (Fibonacci anchor H/5 = 8H/40), Jupiter's ICRF perihelion is **8H/65** (anchor H/8 = 8H/64), Saturn's ecliptic perihelion is **−8H/65** (same anchor, retrograde), and Saturn's ICRF perihelion is **8H/169** (anchor H/21 = 8H/168). Jupiter's ICRF perihelion and Saturn's ecliptic perihelion share the same **8H/65** period — the **Law 6 gas-giant lock** that drives Earth's obliquity beat, one 8H-lattice step from Earth's Fibonacci anchor H/8 = 8H/64. The other planets' precession periods divide the Solar System Resonance Cycle (8H) by various integers, mostly non-Fibonacci. See [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) for the all-planet 8H/N table.
 
-### Law 2: The Inclination Amplitude Constant
+### Law 2: The Inclination Constant ψ
 
 A single constant ψ predicts all eight inclination amplitudes from Fibonacci divisors and mass alone:
 
@@ -119,7 +119,7 @@ where w_j = √(m_j × a_j(1-e_j²)) / d_j
 
 **Result: 99.9975% balance.** See [Inclination Balance Derivation](#inclination-balance-derivation) for the full treatment.
 
-### Law 4: The Eccentricity Amplitude Constant
+### Law 4: The Eccentricity Amplitude Constant K
 
 A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt:
 
@@ -171,12 +171,12 @@ The eccentricity amplitudes used in the balance are predicted by Law 4 (the K co
 
 Two levels (the gas-giant perihelion lock):
 
-| Object | Kinematic (Fibonacci anchor) | Dynamical (N-body secular) | Frame |
-|--------|------------------------------|----------------------------|-------|
+| Object | Fibonacci anchor | 8H-lattice secular period | Frame |
+|--------|------------------|---------------------------|-------|
 | Jupiter perihelion | H/8 | **8H/65** | ICRF |
 | Saturn perihelion | H/8 (retrograde) | **8H/65** (retrograde) | ecliptic |
 
-At the **dynamical** level the identity is exact and structural: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion *are* the same period, 8H/65. At the **kinematic** level both gas-giant anchors coincide with Earth's H/8 obliquity, closing Earth's hierarchy through 3 + 5 = 8. Earth's obliquity is the cycle this lock *drives*: its own (model) value is the Fibonacci H/8 = 8H/64, while the climate record (k+s₃) shows the gas-giant-driven 8H/65 — one lattice step off.
+At the **8H-lattice secular** level the identity is exact and structural: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion *are* the same period, 8H/65. At the **Fibonacci-anchor** level both gas-giant anchors coincide with Earth's H/8 obliquity, closing Earth's hierarchy through 3 + 5 = 8. Earth's obliquity is the cycle this lock *drives*: its own (model) value is the Fibonacci H/8 = 8H/64, while the climate record (k+s₃) shows the gas-giant-driven 8H/65 — one lattice step off.
 
 **Why Earth's obliquity is one step off (8H/64 vs 8H/65).** Earth's obliquity is the beat of its axial precession against the precession of the ecliptic plane: in 8H-integer terms, 104 (axial, H/13) − (ecliptic). With Law 1's Fibonacci ecliptic anchor H/5 = 40, the beat is 104 − 40 = 64 → H/8. With the gas giants' real ecliptic period 8H/39 = 39 (Laskar's s₃), it is 104 − 39 = 65 → 8H/65. The single-integer shift in the ecliptic period (40 → 39) propagates one-for-one into the obliquity beat (64 → 65). Law 1 sets Earth's Fibonacci hierarchy; Law 6 explains why the gas-giant-driven obliquity recorded in climate lands one step over.
 
@@ -235,7 +235,7 @@ The group assignment is constrained by: (1) each planet's oscillation range must
 | Uranus | H/3 |
 | Neptune | 2H |
 
-The inclination oscillation uses the **ICRF perihelion period** (ecliptic rate − general precession H/13). All ICRF periods divide 8H = 2,682,536 years (the Solar System Resonance Cycle).
+The inclination oscillation uses the **ICRF perihelion period** (ecliptic rate − general precession H/13). All ICRF periods divide 8H = 2,682,536 years at J2000 (the Solar System Resonance Cycle).
 
 ---
 
@@ -748,6 +748,8 @@ The key unresolved question is **why Fibonacci numbers work**: do they encode so
 | [32 - Inclination Calculations](32-inclination-calculations.md) | Inclination oscillation implementation |
 | [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
 | [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | Conceptual background |
+| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | The 8H/N integer-divisor period table — the broader lattice where the Six Laws' Fibonacci divisors sit |
+| [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | Unifying framework — the Fibonacci divisors and L1 integer labels are scale-invariant ESSRT structural constants; literal periods scale with H(t) at deep time |
 | [Inclination Optimization](../tools/verify/inclination-optimization.js) | Optimization script |
 | [Balance Search](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline producing 42 survivors with per-config optimised anchor, ascending nodes, and base eccentricities |
 | [Verify Laws](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions |

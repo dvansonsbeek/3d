@@ -2,12 +2,12 @@
 
 This document describes the coordinate reference frames and transformations used in the Holistic Universe Model simulation.
 
-**Last Updated:** January 2026
-
 **Related Documents:**
+- [20 - Constants Reference](20-constants-reference.md) - J2000-anchored constants + epoch helpers
 - [21 - Orbital Formulas Reference](21-orbital-formulas-reference.md) - Calculation functions
 - [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) - Height calculations
 - [31 - Ascending Node Calculations](31-ascending-node-calculations.md) - Node precession
+- [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of H(t) and ε
 
 ---
 
@@ -22,6 +22,8 @@ The simulation uses multiple coordinate reference frames to accurately represent
 | **Equatorial** | Earth | Earth's equator | RA/Dec positions |
 | **Invariable Plane** | Sun | Total angular momentum | Fundamental physics |
 | **Heliocentric** | Sun | Ecliptic or Invariable | Distance calculations |
+
+> **Scope note (ESSRT).** The coordinate-frame transformations in this document (ecliptic ↔ equatorial via obliquity ε; ecliptic ↔ ICRF via general precession H/13; orbital plane ↔ invariable plane) are inherently geometric and date-independent — the formulas hold at any epoch. The numeric values quoted (e.g. J2000 ascending node 107.58°, mean obliquity 23.44°, inclination ranges) are J2000-anchored snapshots. Under [ESSRT](99-expanding-solar-system-resonance-theory.md) both `H(t)` (and hence the H/N period denominators) and ε itself evolve at deep time via Driver 1 (Earth-Moon tidal LOD growth) and Driver 2 (solar mass loss → Kepler); see [doc 20](20-constants-reference.md) for the J2000 → `mean*AtAge` helper map.
 
 ---
 
@@ -92,7 +94,7 @@ The invariable plane is the most fundamental reference for the solar system.
 | Constant | Value | Description |
 |----------|-------|-------------|
 | Inclination to ecliptic | 1.578° | At J2000 |
-| Ascending node on ecliptic | 107.58° | Where invariable plane crosses up through ecliptic |
+| Ascending node on ecliptic | 107.58° | At J2000 (where invariable plane crosses up through ecliptic) |
 
 ### 1.5 Heliocentric Coordinates
 

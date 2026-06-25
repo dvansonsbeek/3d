@@ -1,6 +1,5 @@
 # Planet Geocentric Parallax Corrections — Implementation Reference
 
-**Date**: 2026-03-24
 **Status**: Complete (up to 78-term correction for inner planets, 68 for outer, JPL-verified)
 
 ---

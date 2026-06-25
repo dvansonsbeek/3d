@@ -30,6 +30,8 @@ The **JPL DE440 reference value** is `403,503.24 km³/s²`. The naive Kepler res
 
 This gap is **not** explained by the M+m correction (which we already split out via the Earth/Moon mass ratio). It is fundamentally caused by the **Sun's tidal perturbation** on the Moon's orbit. The Earth-Moon-Sun system is the classical 3-body problem (no closed-form solution since Poincaré 1890), so the simple Kepler formula needs a correction to match observations.
 
+> *Scope: this derivation uses J2000-anchored input values (Moon distance, sidereal month, sidereal year, LOD) to reproduce the modern-era JPL DE440 reference GMs. The same Δa machinery applies at any epoch when the inputs are taken from the corresponding epoch-dependent helpers; see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for deep-time Moon-distance evolution (Farhat 2022 polynomial) and [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the J2000-constant → helper map.*
+
 ## The Δa Correction
 
 The fix is to apply a physically-motivated shift to the Moon's semi-major axis **before** the Kepler computation:
@@ -246,3 +248,4 @@ The remaining ~3.7 ppm gap is the honest precision floor of any Kepler-from-Moon
 - [src/script.js §E2a](../src/script.js) — implementation (`moonOrbitalShift`, `moonDistanceCorrected`, `GM_EARTH_MOON_SYSTEM`)
 - [tools/lib/constants.js §9](../tools/lib/constants.js) — same chain in the tooling module
 - [21 — Orbital Formulas Reference §A.6.1](21-orbital-formulas-reference.md) — central GM/Mass reference table
+- [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time Moon distance evolution (Farhat 2022 polynomial → `meanMoonDistanceMetresAtAge`); the same Δa derivation here extends to any epoch by substituting the epoch-dependent Moon distance and sidereal year

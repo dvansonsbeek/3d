@@ -10,9 +10,12 @@
 - [10 — Fibonacci Laws](10-fibonacci-laws.md)
 - [32 — Inclination Calculations](32-inclination-calculations.md)
 - [38 — Eccentricity Scale](38-eccentricity-scale.md)
+- [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); how Milankovitch periods evolve under Drivers 1 and 2
 - Website: `Holistic/holisticuniverse/src/content/en/model/eigenfrequencies.mdx` — full eigenfrequency / divisor / Berger comparison
 - Website: `Holistic/holisticuniverse/src/content/en/model/supporting-evidence.mdx` §1 (100-kyr problem) and §12 (eigenfrequency convergence)
 - Source: `src/script.js` `perihelionCycleLength` (line 63) and `eclipticPrecessionPeriod` family
+
+> **Scope note (ESSRT).** The Fibonacci-closure algebra (13−5=8, 13+3=16, 8−5=3, 13−8=5) and the integer-divisor structure of H/N and 8H/N are scale-invariant — they hold at any epoch. The literal year counts (H = 335,317; 8H = 2,682,536; the five Milankovitch periods 111,772 / 67,063 / 41,915 / 25,794 / 20,957; deep-time multiples 3H = 1,005,951 and 13H = 4,359,121) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — so the periods shown in §§ 2 and 4 are present-epoch values, and the comparison with the geological record across the past 1.2 Myr (LR04, CENOGRID, EPICA) assumes drift over that window is sub-percent (verified ~0.05% over 1 Myr). For Boulila 2020's ~4.5 Myr resonance comparison (line 128) the cumulative drift starts to matter — see doc 99 for the per-driver Δ-H formulas.
 
 ---
 
@@ -35,12 +38,12 @@ The "100-kyr problem" is that standard eccentricity has *split* peaks at 95 & 12
 
 ## 2. The Model's Five Natural Milankovitch Periods
 
-**H = 335,317 years** is the **Earth Fundamental Cycle** — the model's master timescale, anchored observationally to the verified 1246 AD perihelion-solstice alignment. See [doc 10 — Fibonacci Laws](10-fibonacci-laws.md) and [website fundamental-cycles.mdx](../../Holistic/holisticuniverse/src/content/en/model/fundamental-cycles.mdx) for derivation.
+**H = 335,317 years (at J2000)** is the **Earth Fundamental Cycle** — the model's master timescale, anchored observationally to the verified 1246 AD perihelion-solstice alignment. See [doc 10 — Fibonacci Laws](10-fibonacci-laws.md) and [website fundamental-cycles.mdx](../../Holistic/holisticuniverse/src/content/en/model/fundamental-cycles.mdx) for derivation.
 
 | Cycle | Model formula | Years | Source |
 |---|---|---:|---|
 | **Inclination precession** | H/3 | **111,772** | Earth's orbital plane → invariable plane oscillation |
-| **Ecliptic precession** | H/5 | **67,063** | Earth's orbital plane regression around the invariable plane = **nodal regression** (`f_nodal` in §3); coincides with Jupiter's *kinematic* perihelion anchor (Jupiter's dynamical ecliptic perihelion is 8H/39 = 68,783 yr) |
+| **Ecliptic precession** | H/5 | **67,063** | Earth's orbital plane regression around the invariable plane = **nodal regression** (`f_nodal` in §3); coincides with Jupiter's *Fibonacci-anchor* perihelion (Jupiter's 8H-lattice secular ecliptic perihelion is 8H/39 = 68,783 yr) |
 | **Obliquity oscillation** | H/8 | **41,915** | Beat: f_axial − f_nodal (13 − 5 = 8 in H/n indices) |
 | **Axial precession** | H/13 | **25,794** | Earth's spin-axis equinox precession |
 | **Perihelion precession** | H/16 | **20,957** | Beat: f_axial + f_apsidal (13 + 3 = 16). Also the Berger climatic-precession centroid in the ~19–24 kyr band; dominant Berger peak is at 23.7 kyr (n=113, see §4.2). |
@@ -68,7 +71,7 @@ This is structural, not numerical fitting. The same Fibonacci numbers that organ
 
 ## 4. Comparison with Standard Secular Theory — Direct Matches
 
-> **A note on eigenmode labelling.** The secular eigenmodes g_j (apsidal) and s_j (nodal) are **mathematical objects** — eigenvalues of the Laplace-Lagrange perturbation matrix capturing gravitational coupling between all eight planets. Both Berger 1978 and the Holistic model accept the eigenmodes. What differs is **attribution**: Berger labels each g_j / s_j by the planet whose contribution dominates that mode (g₅ = "Jupiter", g₂ = "Venus", …), while the Holistic model treats the eigenmodes as **composite modes of the multi-planet system** and does not equate them to single-planet quantities. The model's planet-specific cycles live in the [doc 55 period table](55-solar-system-resonance-cycle-periods.md) (e.g., Jupiter ecliptic perihelion = 8H/39 = 68.78 kyr, Jupiter ICRF = 8H/65 = 41.27 kyr, Jupiter Axial = 8H/21 — three distinct cycles, none equal to 1/g₅; the kinematic Fibonacci anchors are H/5 and H/8). The "(Jupiter)" / "(Mercury)" / etc. labels in the tables that follow are Berger's convention, retained for consistency with the literature.
+> **A note on eigenmode labelling.** The secular eigenmodes g_j (apsidal) and s_j (nodal) are **mathematical objects** — eigenvalues of the Laplace-Lagrange perturbation matrix capturing gravitational coupling between all eight planets. Both Berger 1978 and the Holistic model accept the eigenmodes. What differs is **attribution**: Berger labels each g_j / s_j by the planet whose contribution dominates that mode (g₅ = "Jupiter", g₂ = "Venus", …), while the Holistic model treats the eigenmodes as **composite modes of the multi-planet system** and does not equate them to single-planet quantities. The model's planet-specific cycles live in the [doc 55 period table](55-solar-system-resonance-cycle-periods.md) (e.g., Jupiter ecliptic perihelion = 8H/39 = 68.78 kyr, Jupiter ICRF = 8H/65 = 41.27 kyr, Jupiter Axial = 8H/21 — three distinct cycles, none equal to 1/g₅; the Fibonacci anchors are H/5 and H/8). The "(Jupiter)" / "(Mercury)" / etc. labels in the tables that follow are Berger's convention, retained for consistency with the literature.
 
 ### 4.1 Standard Milankovitch periods
 
@@ -84,7 +87,7 @@ All five model periods are integer divisors of H with **zero free parameters** �
 
 ### 4.2 Berger 1978 climatic-precession spectrum
 
-The **Solar System Resonance Cycle** is 8H = **2,682,536 yr** — the smallest period in which every planet's principal precession cycles return to alignment simultaneously (each cycle's period divides 8H by some integer). See [website fundamental-cycles.mdx](../../Holistic/holisticuniverse/src/content/en/model/fundamental-cycles.mdx).
+The **Solar System Resonance Cycle** is 8H = **2,682,536 yr (at J2000)** — the smallest period in which every planet's principal precession cycles return to alignment simultaneously (each cycle's period divides 8H by some integer). See [website fundamental-cycles.mdx](../../Holistic/holisticuniverse/src/content/en/model/fundamental-cycles.mdx).
 
 The Berger climatic-precession spectrum is a **set of six** peaks from `g_j + k` beats (apsidal eigenfrequencies plus axial precession k). Every Berger peak matches integer divisors of 8H to within 0.4 %:
 

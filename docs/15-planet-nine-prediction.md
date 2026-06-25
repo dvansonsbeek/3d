@@ -10,7 +10,7 @@
 
 ---
 
-## 1. The Planet Nine Problem (current research status, 2026)
+## 1. The Planet Nine Problem (current research status)
 
 ### 1.1 The observation
 
@@ -333,5 +333,6 @@ This is the kind of testable, falsifiable prediction the Fibonacci framework nee
 
 - [10 — Fibonacci Laws](10-fibonacci-laws.md) — the underlying balance laws (3 & 5)
 - [26 — Universal Sun-side Δa Formula](26-universal-sun-side-delta-a.md) — Δa as 1/3 of Sun's barycentric pull
+- [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); the Law 4 prediction is structural and epoch-invariant
 - [`scripts/planet_nine_analysis.py`](../scripts/planet_nine_analysis.py) — the canonical 7.5M-config search implementation
 - [`tools/verify/balance-search.js`](../tools/verify/balance-search.js) — the authoritative balance-search code (source of the 767 surviving 8-planet configs)

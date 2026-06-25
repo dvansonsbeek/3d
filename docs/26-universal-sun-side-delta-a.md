@@ -2,6 +2,8 @@
 
 This document is the **Sun-side companion** to doc 25. Doc 25 generalized doc 24's Moon-side Δa to every moon-bearing planet (`GM_planet` from a moon's orbit). Doc 26 generalizes doc 24's Sun-side analog to every planet (`T_planet` from a heliocentric distance). Both are exact closed-form Kepler corrections built from the same algebraic identity.
 
+> *Scope: the verification tables here use modern-era / J2000-anchored planet semi-major axes and GMs; the symmetric Δa identity itself is purely algebraic and exact at any epoch given epoch-consistent inputs. Under ESSRT, `a_b` evolves at deep time via Driver 2 (solar mass loss → Kepler's 3rd law) and `μ_S` shifts correspondingly — see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the deep-time treatment. The Sun-SSB visualization in the model already integrates these epoch-dependent dynamics via live `o.<planet>` runtime state.*
+
 **Related documents:**
 - [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md) — Earth-Moon Δa and Earth's Sun-side Δa = 149.77 km (subtract from AU)
 - [25 — Universal Mass-from-Moon Formula](25-universal-mass-from-moon-formula.md) — Moon-side mirror: universal `GM_planet` from any moon
@@ -340,6 +342,7 @@ For every planet, both `T_col` forms produce the same value: Mercury 87.97 d, Ve
 
 - [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md) §Sun-side Analog — Earth's 149.77 km case (asymmetric form)
 - [25 — Universal Mass-from-Moon Formula](25-universal-mass-from-moon-formula.md) — Moon-side mirror of this document
+- [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time evolution of planet semi-major axes (Driver 2: solar mass loss) and `μ_S`; the symmetric Δa identity here is preserved at every epoch given epoch-consistent inputs
 - [src/script.js §E2 / OrbitalFormulas.keplerPeriod](../src/script.js) — implementation using the simple form
 - [src/script.js — `computeSunSSBOffset` / `buildSunSSBChart`](../src/script.js) — Sun-SSB visualization for the Sun > CYCLES tab
 - [Wikipedia — Barycenter (astronomy)](https://en.wikipedia.org/wiki/Barycenter_(astronomy)) — canonical reference linked from the in-model chart title

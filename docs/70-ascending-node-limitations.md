@@ -4,6 +4,8 @@
 
 This document describes the limitations of the current ascending node calculations in the Holistic Universe Model. The model calculates ascending node precession from a **geocentric** perspective, which produces values that differ significantly from JPL's published rates.
 
+> **Scope note (ESSRT).** The geometric formula `dΩ/dε = −sin(Ω)/tan(i)` and the rate comparison framework are scale-invariant — they apply at any epoch. JPL's published rates use a 1800-2050 fitting interval and the J2000-fixed ecliptic frame; the model's rates use the H-year obliquity cycle as driver. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-ppm over the modern-era comparison window used here, but conceptually relevant for understanding which side of the geocentric-vs-heliocentric distinction inherits epoch dependence.
+
 ## Current Implementation: Geocentric Perspective
 
 ### What the Model Calculates
@@ -211,10 +213,4 @@ The current model should be understood as calculating a **geocentric coordinate 
 - [Dynamic Ascending Node Calculation](31-ascending-node-calculations.md) - Implementation details
 - [Dynamic Elements Overview](04-dynamic-elements-overview.md) - Master overview of all dynamic systems
 - [Constants Reference](20-constants-reference.md) - All constants and source values
-
----
-
-## Document History
-
-- Created: 2026-02-05
-- Purpose: Document limitations and JPL discrepancy in ascending node calculations
+- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of H(t)

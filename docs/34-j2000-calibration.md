@@ -389,18 +389,10 @@ The differences between Souami & Souchay (2012) ascending nodes and our verified
 
 ## Note on Dynamic Inclinations
 
-Since January 2026, the ecliptic inclination calculation uses **dynamic planet inclinations** (`o.<planet>InvPlaneInclinationDynamic`) rather than fixed Souami & Souchay values. Each planet's inclination to the invariable plane now oscillates using the formula:
+The ecliptic inclination calculation uses **dynamic planet inclinations** (`o.<planet>InvPlaneInclinationDynamic`) rather than fixed Souami & Souchay values. Each planet's inclination to the invariable plane oscillates using the formula:
 
 ```
 i(t) = mean + A × cos(ω̃_ICRF(t) - cycleAnchor)
 ```
 
 This means the verified ascending nodes (for ecliptic plane normals) work together with the ICRF perihelion-based inclination oscillation to produce accurate ecliptic inclinations over long timescales.
-
-## Change Log
-
-| Date | Version | Description | Author |
-|------|---------|-------------|--------|
-| 2025-12-20 | 1.0 | Initial implementation document | Claude (Opus 4.5) |
-| 2026-01-01 | 1.1 | Added note on dynamic inclination integration | Claude (Opus 4.5) |
-| 2026-01-02 | 1.2 | Updated ascending node values to match current script.js (Earth=284.51°, etc.) | Claude (Opus 4.5) |

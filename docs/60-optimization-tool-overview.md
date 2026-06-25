@@ -3,6 +3,7 @@
 **Goal**: Build a standalone tool that Claude can run autonomously to tune the model (planets, Moon, and Sun) against scientific reference data
 
 **Related documents:**
+- [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) — 8H/N period table and Fibonacci anchors referenced throughout
 - [61-optimization-execution-plan.md](61-optimization-execution-plan.md) — Implementation phases, execution campaign, progress tracking
 - [62-type-i-inner-planets.md](62-type-i-inner-planets.md) — Type I eccentricity (Mercury, Venus)
 - [63-type-ii-earth-crossers.md](63-type-ii-earth-crossers.md) — Type II eccentricity (Mars, Eros)
@@ -12,6 +13,9 @@
 - [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) — Up to 42-parameter parallax correction
 - [68-orbital-period-calibration.md](68-orbital-period-calibration.md) — Ancient observation calibration
 - [69-optimization-baseline.md](69-optimization-baseline.md) — Baseline results
+- [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); optimization runs against modern-era JPL/Horizons reference data are present-epoch
+
+> **Scope note (ESSRT).** The optimization framework (Fibonacci orbit-count constraint, Kepler's 3rd law, parameter classification, optimizer architecture, reference-data ingestion) is scale-invariant. The literal H = 335,317 solar years value used in the orbit-count formula and the balanced-year anchor (n=7 ≈ -2,649,854 BC) referenced in the inclination cycle-anchor descriptions are J2000-anchored snapshots. Optimization campaigns run against modern-era JPL Horizons / Excel reference data are intrinsically present-epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), but the modern-era optimization window (1800–2200 typical) sees sub-ppm drift below the noise floor.
 
 ---
 
@@ -42,7 +46,7 @@ The model is fundamentally built on **Fibonacci number relationships between pla
 
 ### 2.1 How Orbit Counts Work
 
-Each planet has an integer orbit count in the Earth Fundamental Cycle (H = 335,317 solar years):
+Each planet has an integer orbit count in the Earth Fundamental Cycle (H = 335,317 solar years at J2000):
 
 ```
 SolarYearCount = round(H x meanSolarYear / SolarYearInput)
@@ -71,7 +75,7 @@ Documented in detail in `docs/10-fibonacci-laws.md`. Summary:
 | 21 | H/21 | Beat: axial + obliquity |
 | 34 | H/34 | Beat: axial + ecliptic |
 
-At the kinematic level, Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) coincide with some of these Fibonacci values; their dynamical secular periods sit one 8H-lattice integer away (8H/39, 8H/65, 8H/169). Both levels are the subject of Law 6, not Law 1. The remaining planets' precession periods divide 8H by various integers, mostly non-Fibonacci.
+The gas giants' perihelions sit on the 8H lattice **one integer off** the nearest Fibonacci anchors: Jupiter's ecliptic perihelion is **8H/39** (Fibonacci anchor H/5 = 8H/40), Jupiter's ICRF perihelion is **8H/65** (anchor H/8 = 8H/64), Saturn's ecliptic perihelion is **−8H/65** (same anchor, retrograde), and Saturn's ICRF perihelion is **8H/169** (anchor H/21 = 8H/168). Jupiter's ICRF perihelion and Saturn's ecliptic perihelion share the same **8H/65** period — the **Law 6 gas-giant lock**. The remaining planets' precession periods divide 8H by various integers, mostly non-Fibonacci.
 
 **Laws 2-3 -- Inclination Constant & Balance**: Each planet's inclination amplitude = `psi / (d x sqrt(m))` where d is a Fibonacci divisor and psi is a universal constant. The angular-momentum-weighted oscillations of the seven in-phase planets balance against Saturn alone (anti-phase) to **99.9975% balance**.
 
@@ -133,9 +137,9 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 | `AngleCorrection` | 0.9709 deg | Perihelion alignment fine-tune |
 | `PerihelionEclipticYears` | H/(1+3/8) | Perihelion precession period |
 | `Startpos` | 83.653 deg | Starting orbital position |
-| `InvPlaneInclinationMean` | 6.703207 deg | Inclination oscillation center (Mercury, after 2026-04-09 re-anchor) |
+| `InvPlaneInclinationMean` | 6.703207 deg | Inclination oscillation center (Mercury, post n=7 re-anchor) |
 | `InvPlaneInclinationAmplitude` | 0.386478 deg | Inclination oscillation range |
-| `InclinationCycleAnchor` | Per-planet | ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -2,649,854 BC (e.g. Mercury: 234.52°, after 2026-04-09 audit) |
+| `InclinationCycleAnchor` | Per-planet | ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -2,649,854 BC (e.g. Mercury: 234.52°) |
 
 ### 3.2 Perihelion Precession Periods (ecliptic frame, as used by the simulation)
 | Planet | Formula | Direction |
@@ -148,7 +152,7 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 | Uranus | H/3 | Prograde |
 | Neptune | Hx2 | Prograde |
 
-Jupiter and Saturn use their *dynamical* secular periods (Law 6); the clean kinematic Fibonacci anchors (H/5, −H/8) are one 8H-lattice integer away.
+Jupiter and Saturn use their *8H-lattice secular* periods (Law 6); the clean Fibonacci anchors (H/5, −H/8) are one 8H-lattice integer away.
 
 ### 3.3 How the Model Computes Planet Positions
 

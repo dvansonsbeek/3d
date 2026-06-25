@@ -1,7 +1,8 @@
 # Type II Mars -- Eccentricity Corrections & Calibration
 
-**Date**: 2026-03-08
 **Status**: Complete (dynamic implementation, sensitivity analysis done)
+
+> **Scope note (ESSRT).** The Type II hybrid formula (`eo = eccDist/2 − eo_geocentric/2`), the dynamic-geocentric update, and the `e/(1+e)` derivation are scale-invariant. The perihelion-period denominators (`H/(4+3/8)`, `H × 8/36`) stay constant at any epoch. Literal J2000-anchored values (H = 335,317 in the §"Perihelion precession" prose, the balanced year n=7 ≈ -2,649,854 BC, `solarYearCount` = 178,289, `perihelionRef_JD` = 2456505.6, and the JPL 2000-2200 + Tycho 1582-1600 calibration baselines) reflect the present epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally. The Mars implementation this document describes is the J2000 snapshot of an underlying scale-invariant structure.
 
 ---
 
@@ -142,7 +143,7 @@ Key differences from Type III:
 ### Perihelion precession
 
 Mars's perihelion precesses with period `H / (4 + 3/8)` years, where
-`H = 335317` solar years. This corresponds to the 4+3/8 Fibonacci-derived
+`H = 335317` solar years (at J2000). This corresponds to the 4+3/8 Fibonacci-derived
 divisor. The precession is split into two counter-rotating ecliptic layers
 that bracket the PerihelionFromEarth annual wobble, ensuring the perihelion
 direction tracks correctly in the ecliptic frame.
@@ -597,3 +598,15 @@ planetSpeed:               -0.00003529   (rad/solar year, negative)
 - `tools/explore/test-mars-eoc.js` -- Mars equation of center testing
 - `tools/explore/conjunction-finder.js` -- validates conjunction timing
 - `tools/explore/saturn-drift-analysis.js mars` -- RA/Dec/lat/lon vs JPL
+
+---
+
+## Related Documents
+
+| Document | Purpose |
+|----------|---------|
+| [20 - Constants Reference](20-constants-reference.md) | H, balanced year, planet masses, J2000 orbital elements |
+| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Complete 8H/N period table; balanced-year structure (n=7 anchor) |
+| [62 - Type I Inner Planets](62-type-i-inner-planets.md) | Mercury & Venus implementation (sibling of this doc) |
+| [64 - Type III Outer Planets](64-type-iii-outer-planets.md) | Jupiter–Neptune implementation; includes e/(1+e) derivation referenced here |
+| [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t) for the literal periods and counts used here |

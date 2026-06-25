@@ -1,10 +1,11 @@
 # Baseline Report — Before Optimization
 
-**Date**: 2026-03-06
 **Model epoch**: JD 2451716.5 (21 June 2000)
 **Comparison**: Model RA/Dec (standalone scene graph engine) vs JPL Horizons RA/Dec
 
 > **Note**: This document records the starting baseline before any optimization was applied. For current baselines after EoC, parallax correction, and parameter optimization, run `node tools/optimize.js baseline all` or see [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) §5.
+
+> **Scope note (ESSRT).** All baseline measurements in this document are present-epoch observational comparisons: JPL Horizons yearly samples 2000-2025; PLANET_TEST_DATES event-specific (transits, oppositions, conjunctions) spanning 1802-2200. The scene-graph engine these are computed from is scale-invariant; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time but the modern-era comparison windows here see sub-ppm drift, well below the noise floor of the RA/Dec differences tabulated.
 
 ---
 
@@ -119,4 +120,15 @@ Notes:
 | Uranus   | 1.372°            | 0.016°             | 86× |
 | Neptune  | 1.496°            | 0.004°             | 374× |
 
-Current baselines from `tools/results/baselines.json` (2026-03-29). Training window: 1800–2200 + observed pre-1800 anchors. The improvement factors range from 35× (Mars) to 3,134× (Moon).
+Current baselines from `tools/results/baselines.json`. Training window: 1800–2200 + observed pre-1800 anchors. The improvement factors range from 35× (Mars) to 3,134× (Moon).
+
+---
+
+## Related Documents
+
+| Document | Purpose |
+|----------|---------|
+| [60 - Optimization Tool Overview](60-optimization-tool-overview.md) | Optimizer architecture, parameter classification, reference data |
+| [61 - Optimization Execution Plan](61-optimization-execution-plan.md) | Execution-plan record that consumed these baselines |
+| [67 - Planet Parallax Corrections](67-planet-parallax-corrections.md) | Parallax-correction implementation that drove most baseline improvements |
+| [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t); baselines here are intrinsically present-epoch |

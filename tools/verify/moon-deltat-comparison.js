@@ -46,10 +46,13 @@ const EARTH_DIAMETER_KM = 12756.27;
 const EARTH_MOI_FACTOR = 0.3306947;
 const R_EARTH_M = (EARTH_DIAMETER_KM / 2) * 1000;
 const GM_SUN_KM3_S2 = 132712440041.93938;
-const SIDEREAL_YEAR_SECONDS = 31558149.764;
-const MEAN_SIDEREAL_YEAR_DAYS = 365.25636301;
+// J2000 snapshot values. Under ESSRT (docs/99) these drift at deep time via
+// Drivers 1 (LOD growth) and 2 (Kepler); this verify script compares against
+// modern-era ΔT data so the J2000 anchor is appropriate here.
+const SIDEREAL_YEAR_SECONDS = 31558149.764;       // J2000
+const MEAN_SIDEREAL_YEAR_DAYS = 365.25636301;     // J2000
 const MEAN_DAY_LENGTH = SIDEREAL_YEAR_SECONDS / MEAN_SIDEREAL_YEAR_DAYS;
-const MEAN_SOLAR_YEAR_DAYS = 365.2422;
+const MEAN_SOLAR_YEAR_DAYS = 365.2422;            // J2000
 const MEAN_TROPICAL_YEAR_J2000_S = MEAN_SOLAR_YEAR_DAYS * MEAN_DAY_LENGTH;
 
 // Farhat 2022 polynomial coefficients

@@ -6,6 +6,8 @@ The Invariable Plane Balance Explorer is an interactive modal for testing planet
 
 The explorer allows users to experiment with alternative configurations to understand why certain planetary assignments are uniquely constrained — for example, why the mirror-symmetric d-assignments are the only solution satisfying all six laws simultaneously.
 
+> **Scope note (ESSRT).** The balance machinery this explorer evaluates (Law 3 inclination balance, Law 5 eccentricity balance, the amplitude formula `ψ/(d·√m)`, the d-value choices) is scale-invariant — the formulas hold at any epoch. ψ, the balanced-year anchor (~302,635 BC), J2000 ICRF perihelion longitudes, JPL trend values (1900–2100), and H = 335,317 are J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts and the balanced-year date proportionally. The explorer's interactive UI is intrinsically a present-epoch exploration tool; the underlying structural laws it tests are not.
+
 **Related Documentation:**
 - [Fibonacci Laws of Planetary Motion](10-fibonacci-laws.md) — the six laws and their derivations
 - [UI Panels Reference](50-ui-panels-reference.md) — overview of all UI panels
@@ -436,6 +438,8 @@ fits = (mean − amplitude ≥ LL_min − 0.01) AND (mean + amplitude ≤ LL_max
 | [50 - UI Panels Reference](50-ui-panels-reference.md) | Overview of all UI panels |
 | [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height calculation formulas |
 | [20 - Constants Reference](20-constants-reference.md) | Planet masses and orbital elements |
+| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Complete 8H/N period table; ascending node integers referenced in §"Vector Balance Diagram" |
+| [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t) for the periods the explorer tests |
 
 ---
 
@@ -478,7 +482,7 @@ The vector balance diagram demonstrates an important subtlety: the multi-mode so
 | Scalar inclination balance (Law 3) = 100% | ✓ Real constraint, selects d-values | None |
 | Scalar eccentricity balance (Law 5) ≈ 99.9% | ✓ Independent constraint, same d-values | None |
 | Fibonacci d-values with mirror symmetry | ✓ Structural prediction | None |
-| 8H/N ascending node periods (re-fit 2026-04-09 to JPL trends) | ✓ JPL trend match for 7/7 fitted planets | Laskar's s₁–s₈ are no longer the target — see [55 § Notable Patterns](55-solar-system-resonance-cycle-periods.md#notable-patterns) |
+| 8H/N ascending node periods (fit to JPL trends) | ✓ JPL trend match for 7/7 fitted planets | Laskar's s₁–s₈ are no longer the target — see [55 § Notable Patterns](55-solar-system-resonance-cycle-periods.md#notable-patterns) |
 | J2000 positions and short-term rates | ✓ Match observations | ✓ Match observations |
 
 **What CANNOT be observationally verified:**

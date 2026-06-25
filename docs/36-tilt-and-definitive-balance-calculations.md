@@ -6,6 +6,8 @@ framework. It explains how the perihelion distance is fixed, how tilt and
 inclination oscillations produce a small eccentricity fluctuation, and how the
 eccentricity balance is maintained at every epoch.
 
+> **Scope note (ESSRT).** The balance laws themselves (Law 3 vector inclination balance, Law 5 scalar eccentricity balance with `δv = K · sin(tilt)`) are scale-invariant — they hold at any epoch. PSI, K, base eccentricities, axial tilts, the per-planet d-values, and the period denominators (H/N, 8H/N) are scale-invariant structural constants. The **literal year-count values** in the period tables (H = 335,317; H/16 = 20,957; 8H/65 = 41,270; the balanced-year anchor at -2,649,854 BC; the perihelion-precession periods 243,867 / 447,089 / 74,515 / 68,783 / 670,634 yr) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling every literal year count proportionally. The balance machinery this document describes therefore holds at any epoch with epoch-consistent inputs — §11 ("Why the Balance Holds at All Epochs") makes the temporal robustness explicit.
+
 ---
 
 ## 1. The Two Balance Laws
@@ -71,7 +73,7 @@ K is derived in Section 4 below.
 | Uranus  | 21 |  21.33       | In-phase   | Mercury     |
 | Neptune | 34 | 174.04       | In-phase   | Venus       |
 
-Phase angles re-anchored 2026-04-09 to balanced year n=7. d-values, antiPhase, mirror pairs unchanged.
+Phase angles anchored to balanced year n=7. d-values, antiPhase, mirror pairs unchanged.
 
 Mirror symmetry: Me-Ur (21), Ve-Ne (34), Ea-Sa (3), Ma-Ju (5).
 
@@ -237,7 +239,7 @@ The JPL J2000 values represent the actual eccentricity at that epoch:
 | Uranus  | 0.04725744    | 0.04725744    |  0.000%       |
 | Neptune | 0.00859048    | 0.00859048    |  0.000%       |
 
-At J2000, **Earth and Mars are above their base eccentricities** (Earth: 0.01671 vs base 0.01539; Mars: 0.09339 vs base 0.09147), while **Venus is below its base** (0.00678 vs 0.00771). The differences reflect each planet's phase in its own eccentricity oscillation at the J2000 epoch. The outer giants (Jupiter, Saturn, Uranus, Neptune) have base eccentricities calibrated very close to their J2000 values (differences ≤ 1.5×10⁻⁵, well below 0.1%), so their J2000 model values match the base values at the precision shown above. The post-2026 phase-derived calibration makes the outer-planet differences much smaller than in earlier model versions, where Laplace-Lagrange secular exchange was invoked to explain ~0.2–1.1% offsets (see Section 10).
+At J2000, **Earth and Mars are above their base eccentricities** (Earth: 0.01671 vs base 0.01539; Mars: 0.09339 vs base 0.09147), while **Venus is below its base** (0.00678 vs 0.00771). The differences reflect each planet's phase in its own eccentricity oscillation at the J2000 epoch. The outer giants (Jupiter, Saturn, Uranus, Neptune) have base eccentricities calibrated very close to their J2000 values (differences ≤ 1.5×10⁻⁵, well below 0.1%), so their J2000 model values match the base values at the precision shown above. The current phase-derived calibration makes the outer-planet differences much smaller than under earlier calibrations, where Laplace-Lagrange secular exchange was invoked to explain ~0.2–1.1% offsets (see Section 10).
 
 ### Law 5 Weight Contributions
 
@@ -440,7 +442,7 @@ the dominant source of eccentricity variation over each planet's eccentricity cy
 
 ### Outer Planets: Tilt Now Sufficient
 
-With the post-2026 phase-derived base recalibration, the J2000−base differences for the outer planets are small enough that the tilt-derived amplitude alone fits within the cos(φ) ∈ [−1, +1] range:
+With the phase-derived base recalibration, the J2000−base differences for the outer planets are small enough that the tilt-derived amplitude alone fits within the cos(φ) ∈ [−1, +1] range:
 
 | Planet  | e_J2000 − e_base | e_amplitude | cos(φ)  | In valid range? |
 |---------|------------------|-------------|---------|-----------------|
@@ -531,3 +533,17 @@ phase-derived eccentricities.
 
 Run `node tools/verify/balance-search.js` to perform exhaustive balance search across
 all Fibonacci d-value combinations.
+
+---
+
+## Related Documents
+
+| Document | Purpose |
+|----------|---------|
+| [10 - Fibonacci Laws](10-fibonacci-laws.md) | The six Fibonacci Laws (Law 2 ψ, Law 3 inclination balance, Law 4 K, Law 5 eccentricity balance, Law 6 gas-giant lock) |
+| [20 - Constants Reference](20-constants-reference.md) | H, PSI, K, base eccentricities, axial tilts, d-values |
+| [25 - Universal Mass-from-Moon Formula](25-universal-mass-from-moon-formula.md) | SYSTEM vs ALONE mass convention used in PSI calibration |
+| [37 - Planetary Precession Cycles](37-planets-precession-cycles.md) | Per-planet eccentricity cycle derivations referenced in §10 |
+| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Complete 8H/N period table; balanced-year structure (n=7 anchor) |
+| [72 - The Closed Loop](72-the-closed-loop.md) | Full derivation chain for phase-derived base eccentricities |
+| [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t) — balance laws hold at any epoch |

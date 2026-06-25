@@ -1,5 +1,7 @@
 # Year and Day Length Formulas
 
+> **Scope.** This document describes the **modern-era / within-H Fourier-harmonic picture** — the means derived from `inputmeanlengthsolaryearindays = 365.2422` and Earth Fundamental Cycle `H = 335,317 yr`, with Fourier oscillations fitted across one full H. At deep-time / Phanerozoic / Hadean epochs the **mean values themselves shift** per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md): H(t) grows under Driver 1 (Earth-Moon tidal evolution → LOD grows) while the sidereal year in seconds shifts under Driver 2 (solar mass loss → Kepler `dT/T = −2 dM/M`). For deep-time work use the epoch-dependent helpers (`meanLodSecondsAtAge`, `meanSiderealYearSecondsAtAge`, `meanHAtAge`, `meanTropicalYearSecondsAtAge`) — see [Doc 20 §"ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the J2000-constant → helper map.
+
 ## Architecture
 
 All year and day lengths are derived from a single input constant plus Fourier harmonic corrections. The means are **derived**, not fitted — only the harmonic coefficients are empirical.
@@ -209,7 +211,7 @@ This pattern reverses when perihelion precesses to July. The *mean* of all four 
 
 ### Self-Consistency of the Derivation Chain
 
-The formulas are self-consistent by construction:
+The formulas are self-consistent by construction. The identity
 
 ```
 siderealYear(seconds) = siderealYear(days) × dayLength
@@ -217,7 +219,9 @@ siderealYear(seconds) = siderealYear(days) × dayLength
                       = siderealYearSeconds  ✓
 ```
 
-No matter how year lengths vary over millennia, the sidereal year in SI seconds remains constant — it is the orbital period, determined by Kepler's 3rd law and the Sun's gravitational field.
+holds at every epoch — it is algebraically tautological. **Within the modern era** the sidereal year in SI seconds is treated as the calibration anchor (`siderealYearJ2000 × 86400`); the within-H Fourier harmonics describe oscillations of the day-count quantities around their means with the anchor held fixed.
+
+**At deep time**, both terms on the right-hand side scale: Driver 1 (Earth-Moon tidal evolution) changes `dayLength`; Driver 2 (solar mass loss) changes the sidereal year in seconds via Kepler's 3rd law (`dT/T = −2 dM/M`). The identity is preserved at every epoch, but neither factor is constant. See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the two-driver derivation and [Doc 20 §"ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the epoch-dependent helpers (`meanSiderealYearSecondsAtAge`, `meanLodSecondsAtAge`).
 
 ### The 9.1ms Stellar-Sidereal Day Offset (Axial Precession)
 

@@ -2,12 +2,12 @@
 
 This document describes the astronomical verification data embedded in the simulation for validating planetary positions against known historical events.
 
-**Last Updated:** June 2026
-
 **Related Documents:**
 - [52 - Analysis & Export Tools](52-analysis-export-tools.md) - Planet report generation and data export
 - [51 - Planet Inspector Reference](51-planet-inspector-reference.md) - Where reports are displayed
 - [20 - Constants Reference](20-constants-reference.md) - Orbital constants and sources
+- [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) - Deep-time integrator machinery referenced in the "Deep-time integration" subsection
+- [100 - ΔT model validation via historical solar eclipses](100-delta-t-model-validation.md) - Companion deep-time validation against historical solar eclipses
 
 ---
 
@@ -281,7 +281,7 @@ Larger errors at ancient dates are acceptable because:
 
 ---
 
-## Validation Against Independent Observations (June 2026)
+## Validation Against Independent Observations
 
 The verification data above is consumed in two distinct ways:
 - **Runtime planet reports** (the `generatePlanetReport()` flow described in [How Verification Data Is Used](#how-verification-data-is-used)) — interactive comparisons displayed in the UI.
@@ -345,7 +345,7 @@ The result is narrow and defensible. It is **not** the claim that "this model is
 
 ### Deep-time integration is not the lever here
 
-A natural follow-up question: would activating the model's deep-time machinery (Phase 9.11/9.12 — time-evolving H, AU, LOD, Moon distance) improve these residuals further? Direct calculation using the model's own constants (see [the deep-time formulas in `src/script.js:4600+`](../src/script.js)) shows the corrections at year 1583 are:
+A natural follow-up question: would activating the model's deep-time machinery (Phase 9.11/9.12 — time-evolving H, AU, LOD, Moon distance, see [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md)) improve these residuals further? Direct calculation using the model's own constants (see [the deep-time formulas in `src/script.js:4600+`](../src/script.js)) shows the corrections at year 1583 are:
 
 | Driver | Magnitude at year 1583 | Position impact |
 |---|---|---:|

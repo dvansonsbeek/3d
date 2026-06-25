@@ -1,8 +1,9 @@
 # Interactive 3D Solar System Simulation - Architecture Document
 
 **Version:** 2.1
-**Date:** 2026-03-05
 **Status:** Current Implementation Documentation
+
+> **Scope note (ESSRT).** This document describes the simulation's code architecture and rendering pipeline. The orbital-mechanics implementations (Keplerian solvers, precession cycles, predictive formula system, invariable plane calculations) are scale-invariant by construction. The current architecture additionally supports **deep-time mode** (`DEEP_TIME_MODE_ENABLED` in `src/script.js`, on by default): when the user scrubs the date by millions of years, per-frame integrators update length-of-day, the Earth Fundamental Cycle H, planet orbital periods, Moon distance, and ΔT according to the [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md). The deep-time integrators are tagged in the scene graph (`_dtCycleN`, `_dtMoonIntegrator`, `_dtPlanetIntegrator`, `_dtPerihelionDivisor`) — see [doc 41 §Part 14 — Deep-Time Mode](41-scene-graph-hierarchy.md) for the per-tag specifications.
 
 ---
 
@@ -763,20 +764,16 @@ The balance calculation lives inside `updateInvariablePlaneBalance()`, summing `
 
 ---
 
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-12-01 | Winston (Architect) | Initial proposal for refactoring |
-| 2.0 | 2025-12-29 | Claude (Opus 4.5) | Complete rewrite documenting actual implementation |
-
----
-
 ## References
 
+### External
 1. **Three.js Documentation** - https://threejs.org/docs/
 2. **Tweakpane v4** - https://tweakpane.github.io/docs/
 3. **Meeus, Jean** - "Astronomical Algorithms" (1998)
 4. **Souami & Souchay** - "The solar system's invariable plane" (2012)
 5. **NASA JPL Horizons** - https://ssd.jpl.nasa.gov/horizons/
 6. **Holistic Universe Model** - https://www.holisticuniverse.com
+
+### Internal
+- [41 — Scene Graph Hierarchy](41-scene-graph-hierarchy.md) — full scene-graph structure with §Part 14 covering deep-time integrator tags
+- [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time scaling formalism that the integrators implement

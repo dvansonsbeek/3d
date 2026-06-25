@@ -277,7 +277,7 @@ Key behavioral notes:
 | Uranus | H / 3 | 111,772 | 33,532 | Retrograde |
 | Neptune | H × 2 | 670,634 | 26,825 | Retrograde |
 
-The ICRF period is derived from the ecliptic period by subtracting the general precession rate (H/13): `1/P_ICRF = 1/P_ecliptic − 13/H`. Earth is the only planet with a prograde ICRF perihelion. All ICRF periods divide 8H = 2,682,536 years exactly (the Solar System Resonance Cycle). The inclination oscillation is driven by the ICRF period, not the ecliptic period.
+The ICRF period is derived from the ecliptic period by subtracting the general precession rate (H/13): `1/P_ICRF = 1/P_ecliptic − 13/H`. Earth is the only planet with a prograde ICRF perihelion. All ICRF periods divide 8H = 2,682,536 years at J2000 exactly (the Solar System Resonance Cycle). The inclination oscillation is driven by the ICRF period, not the ecliptic period.
 
 ### The Key Insight
 
@@ -369,8 +369,4 @@ The Y-rotations through the tilted apsidal frame cause the ascending node to pre
 
 ---
 
-*Document created: 2024-12-21*
-*Updated: 2024-12-31 - Added planet inclination oscillation approach*
-*Updated: 2026-04-03 - Migrated from Ω-based to ICRF perihelion approach with per-planet cycle anchors*
-*Updated: 2025-01-01 - Saturn anomaly resolved (phase offset 37.8°), fixed document references*
 *Part of the Holistic Universe Model documentation*

@@ -544,6 +544,8 @@ getMarsPrecessionBreakdown: (o) => {
 
 With the full formula including eccentricity and inclination corrections, we expect better accuracy than the simplified model.
 
+**Scope note:** The numeric ″/century values shown below for Fibonacci rates expressed as `8H/N` (e.g. `8H/39 = 1,884 ″/cy`, `−8H/65 = −3,140 ″/cy`) are evaluated at the J2000 epoch. The divisor itself (39, 65, …) is the scale-invariant structural quantity; the literal arcsec/century figure scales with `H(t)` at deep time under [ESSRT](99-expanding-solar-system-resonance-theory.md).
+
 ### 3.1 Mars Precession Breakdown
 
 | Perturber | Position | α ratio | Contribution | Percentage |
@@ -897,3 +899,13 @@ For Mercury, this breakdown historically demonstrated:
 - The ~43 arcsec/century discrepancy was unexplained until Einstein's General Relativity (1915)
 
 This feature brings that same analysis to all planets!
+
+---
+
+## Related Documents
+
+- [10-fibonacci-laws.md](10-fibonacci-laws.md) — Six Fibonacci Laws (incl. Saturn's ecliptic-retrograde discussion)
+- [12-perihelion-precession.md](12-perihelion-precession.md) — Earth-frame vs ecliptic-frame perihelion methods
+- [37-planets-precession-cycles.md](37-planets-precession-cycles.md) — Per-planet precession-cycle tabulation
+- [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) — Complete 8H/N period table (32-component L1 lattice)
+- [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — ESSRT: deep-time scaling of H(t)

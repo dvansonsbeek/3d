@@ -4,6 +4,8 @@
 
 This document describes the dynamic calculation of the longitude of ascending node for all planets in the Holistic Universe Model. The ascending node shifts over time as Earth's obliquity (axial tilt) changes, with the effect depending on the relationship between Earth's orbital inclination and each planet's orbital inclination.
 
+> **Scope note (ESSRT).** The integration is anchored at J2000 and integrates obliquity / inclination changes from epoch 2000 AD forward. The geometric formulas themselves (`dΩ/dε = −sin(Ω)/tan(i)`, tilt encoding via `orbitTilta`/`orbitTiltb`) are scale-invariant. The H/3 and H/8 period denominators used by `computeObliquityEarth(year)` are J2000-anchored; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), which lengthens H/3, H/8 and the per-planet perihelionEclipticYears values. Within the doc's primary modern-era scope (1800–2200) the drift is sub-ppm and below calibration precision.
+
 ## Implementation Status
 
 **Implemented** — The dynamic ascending node calculation is fully implemented in both `script.js` and `tools/lib/scene-graph.js`. It is used for:
@@ -139,7 +141,7 @@ const segmentEffect = segRate * inclDirection * deltaObl;
 
 ### Impact of Dynamic Planet Inclination
 
-Over the 200-year fitting window (1800–2200), the effect of dynamic planet inclination is small because the perihelion precession periods are very long (67,000–670,000 years). Over longer timescales, Mars is the most affected:
+Over the 200-year fitting window (1800–2200), the effect of dynamic planet inclination is small because the perihelion precession periods are very long (67,000–670,000 years at J2000). Over longer timescales, Mars is the most affected:
 
 | Timescale | Mars i range | Rate change |
 |-----------|-------------|-------------|
@@ -480,7 +482,7 @@ The dynamic ascending node calculation and the dynamic ecliptic inclination (`o.
 
 ### Dynamic Ecliptic Inclination in the Rate Formula
 
-As of 2026-03-24, the ascending node calculation uses the **dynamic ecliptic inclination** `computeEclipticInclination(planetName, year)` in the perturbation rate `1/tan(i)`. This is NOT double-counting — the obliquity change `dε` drives the AMOUNT of effect, while the dynamic `i(t)` modifies the RATE at which that effect converts into ascending node shift. These are independent roles:
+The ascending node calculation uses the **dynamic ecliptic inclination** `computeEclipticInclination(planetName, year)` in the perturbation rate `1/tan(i)`. This is NOT double-counting — the obliquity change `dε` drives the AMOUNT of effect, while the dynamic `i(t)` modifies the RATE at which that effect converts into ascending node shift. These are independent roles:
 
 | Role | Parameter | What it controls |
 |------|-----------|-----------------|
@@ -529,6 +531,7 @@ Both use the static `<planet>EclipticInclinationJ2000` as their base, but apply 
 - [Dynamic Elements Overview](04-dynamic-elements-overview.md) - Master overview of all dynamic systems
 - [Inclination Calculations](32-inclination-calculations.md) - Planet inclination oscillation using ICRF perihelion approach
 - [Constants Reference](20-constants-reference.md) - All constants and source values
+- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of H(t) and the obliquity / inclination cycles used here
 - [Ascending Node Optimization](../tools/verify/ascending-node-optimization.js) - Numerical optimization to calculate ascending nodes
 - [Ascending Node Verification](../tools/verify/ascending-node-verification.js) - Verifies J2000-verified ascending nodes
 - [Ascending Node Souami-Souchay](../tools/verify/ascending-node-souami-souchay.js) - Compares S&S vs Verified accuracy
