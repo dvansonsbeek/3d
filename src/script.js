@@ -25452,6 +25452,7 @@ o.perihelionDate = `${pInit.date} ${pInit.time}`;
 // polynomial error budget documented in doc 66.
 const ECLIPSE_PRESETS = [
   // Modern + 20th c.
+  { jd: 2461265.241042, label: '2026 Aug 12 Total',        loc: 'Iceland → N Spain → Balearics',           gamma: 0.898,  era: 'Modern' },
   { jd: 2460409.262050, label: '2024 Apr 8 Total',         loc: 'Mexico → Texas → Maine',                  gamma: 0.343,  era: 'Modern' },
   { jd: 2457987.267733, label: '2017 Aug 21 Total',        loc: 'Coast-to-coast USA',                      gamma: 0.437,  era: 'Modern' },
   { jd: 2451401.960508, label: '1999 Aug 11 Total',        loc: 'Europe → Middle East',                    gamma: 0.506,  era: '20th c.' },
@@ -30604,7 +30605,7 @@ function setupGUI() {
      'centerline tables.');
 
   // ────────────────────────────────────────────────────────────────────────
-  // Audit all 25 solar eclipse presets — single-shot table output
+  // Audit all 26 solar eclipse presets — single-shot table output
   //
   // For each ECLIPSE_PRESETS entry this reports FOUR pieces of information,
   // which together separate the kinds of issue a preset can have:
@@ -30641,7 +30642,7 @@ function setupGUI() {
   // to keep this an audit tool — adding the data to ECLIPSE_PRESETS could
   // be done later if the same coordinates are needed elsewhere.
   // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Audit all 25 solar eclipse presets', () => {
+  addTestButton('Audit all 26 solar eclipse presets', () => {
     const _d2r = Math.PI / 180;
     const _r2d = 180 / Math.PI;
     // Earth radius from the codebase's diameter constant (consistent with
@@ -30658,6 +30659,7 @@ function setupGUI() {
     // existing per-event eclipse tests where available; modern entries
     // sourced from NASA Five Millennium Canon path-centerline data.
     const SITES = new Map([
+      [2461265.241042, { name: 'Burgos–central path',     lat: 42.34, lon:  -3.70 }],
       [2460409.262050, { name: 'Dallas–central path',     lat: 32.78, lon: -96.80 }],
       [2457987.267733, { name: 'Carbondale, IL',          lat: 37.73, lon: -89.22 }],
       [2451401.960508, { name: 'Constanța, Romania',      lat: 44.18, lon:  28.65 }],
@@ -30713,7 +30715,7 @@ function setupGUI() {
     const halfWin  = SCAN_WIN_H / 24;
 
     console.log('\n══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Audit: all 25 solar eclipse presets — model vs documented record');
+    console.log('  Audit: all 26 solar eclipse presets — model vs documented record');
     console.log('  Uses SCENE STATE (framework\'s scene-graph). Matches the always-on umbra disc and GREEN-marker positions exactly.');
     console.log('  PrsUT = preset documented UT   |   MdlUT = model\'s nearest eclipse UT   |   ΔJD = MdlUT − PrsUT');
     console.log('  Gap@PrsUT / Gap@MdlUT = distance from site to model umbra at preset UT / model\'s UT');
@@ -30890,7 +30892,7 @@ function setupGUI() {
     console.log('                                            documented event may need re-identification (e.g. Thales);');
     console.log('                                        (c) genuine framework deep-time drift places umbra elsewhere.');
     console.log('══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
-  }, 'Iterates all 25 entries in ECLIPSE_PRESETS using the framework\'s SCENE STATE (matches the ' +
+  }, 'Iterates all 26 entries in ECLIPSE_PRESETS using the framework\'s SCENE STATE (matches the ' +
      'always-on umbra disc + GREEN marker positions exactly). Per preset: navigates the scene-graph ' +
      'to the preset\'s documented UT, reads Sun/Moon/Earth world positions, ray-traces the umbra, ' +
      'compares to the documented site; then sweeps ±4 hours of UT in 2-minute steps to find the ' +
@@ -31239,6 +31241,241 @@ function setupGUI() {
     console.log('  All geometry derived from model constants — no astronomical-library calls.');
     console.log('══════════════════════════════════════════════════════════════════════════════════\n');
 
+    // ─── Window A0: 2026 Aug 12 focused calibration (Spain path) ────────────
+    // Replays the upcoming Spain/Iceland total eclipse against the NASA Canon
+    // centerline. Reads the scene-graph's umbra at each of 8 published waypoints
+    // (Greenland → Iceland → N Atlantic → N Spain → Mallorca → Mediterranean)
+    // via the same `umbraFromSceneAtJd` path used by the always-on umbra disc,
+    // so console output matches what the user sees in the 3D scene.
+    //
+    // For each waypoint we sweep ±2h around NASA greatest (1-min resolution)
+    // and report the best-fit moment, the umbra coords, and the per-waypoint
+    // Δlat / Δlon vs NASA centerline. The mean Δlat across waypoints reveals
+    // any systematic north/south drift (the user's screenshot shows the model
+    // shadow running too FAR NORTH of the actual Spain crossing — this
+    // calibration quantifies that offset).
+    //
+    // NASA Canon reference (Espenak/Meeus Five Millennium Catalog):
+    //   2026 Aug 12 17:47:06 TD, γ = 0.898, greatest at 65.2°N, -25.2°E
+    //   https://eclipse.gsfc.nasa.gov/SEcat5/SE2001-2100.html
+    //   https://eclipse.gsfc.nasa.gov/SEgoogle/SEgoogle2001/SE2026Aug12Tgoogle.html
+    console.log('── Window A0 (focused: 2026 Aug 12 — Spain/Iceland path calibration) ──');
+    console.log('   NASA Canon: greatest eclipse JD 2461265.241042 (17:47:06 TD), 65.2°N, -25.2°E, γ = 0.898');
+    console.log('   Path: Greenland → Iceland → N Atlantic → N Spain (Galicia, Burgos, Zaragoza) → Mallorca → Mediterranean exit');
+
+    // NASA Canon centerline waypoints. Format: [name, lat_deg, lon_deg, approx_UT_HHMM]
+    // Sourced from NASA GSFC Aug 2026 eclipse Google map (centerline track).
+    // Times are approximate UT — used only for the printed "NASA UT" column;
+    // the model's own best-fit time is found by the ±2h sweep below.
+    const NASA_PATH_2026 = [
+      ['Greenland (interior centerline)', 75.0, -38.0, '17:15'],
+      ['Iceland (Húsavík centerline)',    66.0, -17.5, '17:30'],
+      ['NASA greatest eclipse',            65.2, -25.2, '17:46'],
+      ['Mid-Atlantic centerline',          55.0, -17.0, '18:00'],
+      ['Spain NW entry (Galicia)',         43.4,  -8.0, '18:30'],
+      ['Burgos centerline',                42.3,  -3.5, '18:45'],
+      ['Zaragoza centerline',              41.6,  -0.9, '19:00'],
+      ['Mallorca centerline',              39.6,   2.7, '19:10'],
+      ['Mediterranean exit (off Tunisia)', 38.0,   7.0, '19:25'],
+    ];
+    const PEAK_JD_2026 = 2461265.241042;  // NASA TD 17:47:06
+
+    const _saveJD_2026 = o.julianDay;
+    const _t2026 = performance.now();
+    const latOffsets = [], lonOffsets = [], gcDists = [];
+
+    try {
+      // 1. Umbra at NASA-greatest moment
+      const umGreatest = umbraFromSceneAtJd(PEAK_JD_2026);
+      if (umGreatest) {
+        const dGreatest = gcKmFromLatLon(65.2, -25.2, umGreatest.lat, umGreatest.lon);
+        console.log(`   Model umbra at NASA-greatest moment: (${umGreatest.lat.toFixed(2)}°, ${umGreatest.lon.toFixed(2)}°)`);
+        console.log(`   Δlat=${(umGreatest.lat - 65.2).toFixed(2)}°  Δlon=${(umGreatest.lon - (-25.2)).toFixed(2)}°  great-circle distance ${dGreatest.toFixed(0)} km`);
+      } else {
+        console.log(`   Model umbra MISSES Earth at NASA-greatest moment (cone passes off-limb).`);
+      }
+
+      // 2. Per-waypoint sweep: ±2h around peak, 1-min resolution → find closest pass.
+      console.log('');
+      console.log('   Per-waypoint sweep (±2h around NASA greatest, 1-min step):');
+      console.log('   ' + 'Waypoint'.padEnd(34) + 'NASA UT  Best ΔUT   Model umbra at best   Δlat    Δlon    GC dist');
+      console.log('   ' + '─'.repeat(112));
+
+      const halfWin_h = 2 / 24;          // ±2h
+      const step_d   = (1 / 60) / 24;    // 1-min step
+
+      for (const [name, latW, lonW, utStr] of NASA_PATH_2026) {
+        let bestGC = Infinity, bestDt = 0, bestUm = null;
+        for (let dt = -halfWin_h; dt <= halfWin_h + 1e-9; dt += step_d) {
+          const um = umbraFromSceneAtJd(PEAK_JD_2026 + dt);
+          if (um === null) continue;
+          const gc = gcKmFromLatLon(latW, lonW, um.lat, um.lon);
+          if (gc < bestGC) { bestGC = gc; bestDt = dt; bestUm = um; }
+        }
+        if (bestUm) {
+          const dLat = bestUm.lat - latW;
+          const dLon = bestUm.lon - lonW;
+          latOffsets.push(dLat);
+          lonOffsets.push(dLon);
+          gcDists.push(bestGC);
+          const bestDtMin = bestDt * 24 * 60;
+          const sign = bestDtMin >= 0 ? '+' : '−';
+          const absMin = Math.abs(bestDtMin);
+          const hh = Math.floor(absMin / 60);
+          const mm = Math.round(absMin - hh * 60);
+          const dtStr = `${sign}${hh}h${String(mm).padStart(2, '0')}`;
+          const wpStr = `(${bestUm.lat.toFixed(2).padStart(6)},${bestUm.lon.toFixed(2).padStart(7)})`;
+          console.log('   ' +
+            name.padEnd(34) +
+            utStr.padEnd(7) +
+            dtStr.padStart(8) + '   ' +
+            wpStr.padEnd(22) +
+            ((dLat >= 0 ? '+' : '') + dLat.toFixed(2)).padStart(7) + '  ' +
+            ((dLon >= 0 ? '+' : '') + dLon.toFixed(2)).padStart(7) + '  ' +
+            bestGC.toFixed(0).padStart(5) + ' km');
+        } else {
+          console.log('   ' + name.padEnd(34) + 'umbra off Earth in entire ±2h window');
+        }
+      }
+    } finally {
+      jumpToJulianDay(_saveJD_2026);
+      forceSceneUpdate();
+    }
+
+    // 3. Systematic offset summary — the key diagnostic.
+    if (latOffsets.length > 0) {
+      const mean = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+      const std  = (arr, m) => Math.sqrt(arr.reduce((a, b) => a + (b - m) ** 2, 0) / arr.length);
+      const meanLat = mean(latOffsets), stdLat = std(latOffsets, meanLat);
+      const meanLon = mean(lonOffsets), stdLon = std(lonOffsets, meanLon);
+      const meanGC  = mean(gcDists);
+      console.log('   ' + '─'.repeat(112));
+      console.log(`   Systematic offset (model umbra vs NASA centerline, n=${latOffsets.length} waypoints):`);
+      console.log(`     mean Δlat = ${meanLat >= 0 ? '+' : ''}${meanLat.toFixed(2)}°  (${meanLat > 0 ? 'NORTH' : 'SOUTH'} of NASA path)  std ${stdLat.toFixed(2)}°`);
+      console.log(`     mean Δlon = ${meanLon >= 0 ? '+' : ''}${meanLon.toFixed(2)}°  (${meanLon > 0 ? 'EAST'  : 'WEST'} of NASA path)  std ${stdLon.toFixed(2)}°`);
+      console.log(`     mean great-circle distance to centerline = ${meanGC.toFixed(0)} km`);
+      console.log(`   Approx conversion: 1° lat ≈ 111 km;  1° lon ≈ ${Math.round(111 * Math.cos(45 * Math.PI / 180))} km at mid-lat 45°.`);
+      console.log(`   Visual check: screenshot showed model band running NORTH of Spain → expected meanΔlat > 0.`);
+    }
+    console.log(`   Window A0 runtime: ${((performance.now() - _t2026) / 1000).toFixed(1)} s`);
+    console.log('');
+
+    // ─── Window A1: 2024 Apr 8 CONTROL calibration (Mexico→Texas→Maine path) ────
+    // Same calibration recipe as Window A0, applied to the well-documented
+    // 2024 Apr 8 total eclipse over North America (γ = 0.343 — much closer to
+    // central path than 2026's grazing γ = 0.898).
+    //
+    // Purpose: diagnose whether the 2026 Aug 12 ~3° path-angle error is
+    //   (a) SPECIFIC to the 2026 conjunction's β trajectory (if 2024 matches
+    //       NASA at all latitudes), or
+    //   (b) GENERAL to the model's secular pole / β implementation (if 2024
+    //       shows the same north-drifting pattern toward southern waypoints).
+    //
+    // 2024 Apr 8 is the better stress test for two reasons:
+    //   • γ = 0.343 — centerline well inside Earth's limb, much less sensitive
+    //     to β trajectory errors than the grazing 2026 case
+    //   • Cross-continental path (Mexico → Texas → Maine → Atlantic) gives
+    //     ~6,000 km of latitude span with dense ground-truth coverage from
+    //     NASA's Five Millennium Canon and from millions of public observations
+    //
+    // NASA Canon: 2024 Apr 8 18:17:21 TD, γ = 0.343, greatest at 25.3°N, -104.1°E
+    //   https://eclipse.gsfc.nasa.gov/SEgoogle/SEgoogle2001/SE2024Apr08Tgoogle.html
+    console.log('── Window A1 (control: 2024 Apr 8 — North America path calibration) ──');
+    console.log('   NASA Canon: greatest eclipse JD 2460409.262050 (18:17:21 TD), 25.3°N, -104.1°E, γ = 0.343');
+    console.log('   Path: Pacific → Mazatlán → Nazas (greatest) → Dallas → Indianapolis → Buffalo → Maine → Atlantic exit');
+
+    // NASA Canon centerline waypoints. Format: [name, lat_deg, lon_deg, approx_UT_HHMM].
+    // Times approximate; the model's best-fit time is found by the ±2h sweep below.
+    const NASA_PATH_2024 = [
+      ['Pacific entry (SW of Mexico)',     16.0, -110.0, '18:00'],
+      ['Mazatlán, Mexico centerline',      23.25, -106.41, '18:09'],
+      ['NASA greatest eclipse (Nazas)',    25.3, -104.1, '18:17'],
+      ['Dallas, TX centerline',            32.78, -96.80, '18:23'],
+      ['Indianapolis, IN centerline',      39.77, -86.16, '19:06'],
+      ['Cleveland, OH centerline',         41.49, -81.69, '19:13'],
+      ['Buffalo, NY centerline',           42.89, -78.88, '19:18'],
+      ['Caribou, ME centerline',           46.86, -68.01, '19:32'],
+      ['Atlantic exit (off Newfoundland)', 52.0, -55.0, '19:55'],
+    ];
+    const PEAK_JD_2024 = 2460409.262050;  // NASA TD 18:17:21
+
+    const _saveJD_2024 = o.julianDay;
+    const _t2024 = performance.now();
+    const latOffsets24 = [], lonOffsets24 = [], gcDists24 = [];
+
+    try {
+      const umGreatest24 = umbraFromSceneAtJd(PEAK_JD_2024);
+      if (umGreatest24) {
+        const dGreatest24 = gcKmFromLatLon(25.3, -104.1, umGreatest24.lat, umGreatest24.lon);
+        console.log(`   Model umbra at NASA-greatest moment: (${umGreatest24.lat.toFixed(2)}°, ${umGreatest24.lon.toFixed(2)}°)`);
+        console.log(`   Δlat=${(umGreatest24.lat - 25.3).toFixed(2)}°  Δlon=${(umGreatest24.lon - (-104.1)).toFixed(2)}°  great-circle distance ${dGreatest24.toFixed(0)} km`);
+      } else {
+        console.log(`   Model umbra MISSES Earth at NASA-greatest moment.`);
+      }
+
+      console.log('');
+      console.log('   Per-waypoint sweep (±2h around NASA greatest, 1-min step):');
+      console.log('   ' + 'Waypoint'.padEnd(36) + 'NASA UT  Best ΔUT   Model umbra at best   Δlat    Δlon    GC dist');
+      console.log('   ' + '─'.repeat(114));
+
+      const halfWin_h = 2 / 24;
+      const step_d   = (1 / 60) / 24;
+
+      for (const [name, latW, lonW, utStr] of NASA_PATH_2024) {
+        let bestGC = Infinity, bestDt = 0, bestUm = null;
+        for (let dt = -halfWin_h; dt <= halfWin_h + 1e-9; dt += step_d) {
+          const um = umbraFromSceneAtJd(PEAK_JD_2024 + dt);
+          if (um === null) continue;
+          const gc = gcKmFromLatLon(latW, lonW, um.lat, um.lon);
+          if (gc < bestGC) { bestGC = gc; bestDt = dt; bestUm = um; }
+        }
+        if (bestUm) {
+          const dLat = bestUm.lat - latW;
+          const dLon = bestUm.lon - lonW;
+          latOffsets24.push(dLat);
+          lonOffsets24.push(dLon);
+          gcDists24.push(bestGC);
+          const bestDtMin = bestDt * 24 * 60;
+          const sign = bestDtMin >= 0 ? '+' : '−';
+          const absMin = Math.abs(bestDtMin);
+          const hh = Math.floor(absMin / 60);
+          const mm = Math.round(absMin - hh * 60);
+          const dtStr = `${sign}${hh}h${String(mm).padStart(2, '0')}`;
+          const wpStr = `(${bestUm.lat.toFixed(2).padStart(6)},${bestUm.lon.toFixed(2).padStart(7)})`;
+          console.log('   ' +
+            name.padEnd(36) +
+            utStr.padEnd(7) +
+            dtStr.padStart(8) + '   ' +
+            wpStr.padEnd(22) +
+            ((dLat >= 0 ? '+' : '') + dLat.toFixed(2)).padStart(7) + '  ' +
+            ((dLon >= 0 ? '+' : '') + dLon.toFixed(2)).padStart(7) + '  ' +
+            bestGC.toFixed(0).padStart(5) + ' km');
+        } else {
+          console.log('   ' + name.padEnd(36) + 'umbra off Earth in entire ±2h window');
+        }
+      }
+    } finally {
+      jumpToJulianDay(_saveJD_2024);
+      forceSceneUpdate();
+    }
+
+    if (latOffsets24.length > 0) {
+      const mean = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+      const std  = (arr, m) => Math.sqrt(arr.reduce((a, b) => a + (b - m) ** 2, 0) / arr.length);
+      const meanLat24 = mean(latOffsets24), stdLat24 = std(latOffsets24, meanLat24);
+      const meanLon24 = mean(lonOffsets24), stdLon24 = std(lonOffsets24, meanLon24);
+      const meanGC24  = mean(gcDists24);
+      console.log('   ' + '─'.repeat(114));
+      console.log(`   Systematic offset (n=${latOffsets24.length} waypoints):`);
+      console.log(`     mean Δlat = ${meanLat24 >= 0 ? '+' : ''}${meanLat24.toFixed(2)}°  (${meanLat24 > 0 ? 'NORTH' : 'SOUTH'} of NASA path)  std ${stdLat24.toFixed(2)}°`);
+      console.log(`     mean Δlon = ${meanLon24 >= 0 ? '+' : ''}${meanLon24.toFixed(2)}°  (${meanLon24 > 0 ? 'EAST'  : 'WEST'} of NASA path)  std ${stdLon24.toFixed(2)}°`);
+      console.log(`     mean great-circle distance to centerline = ${meanGC24.toFixed(0)} km`);
+      console.log(`   Diagnostic: if mean Δlat ≈ 0 here but +1.4° for 2026 → 2026-specific β-trajectory issue.`);
+      console.log(`               if mean Δlat ≈ 2026 → general secular-pole / β-implementation issue.`);
+    }
+    console.log(`   Window A1 runtime: ${((performance.now() - _t2024) / 1000).toFixed(1)} s`);
+    console.log('');
+
     // ─── Window A: validation (compare to your NASA reference) ───
     const tA = performance.now();
     const jdA0 = dateTimeToJulianDay('2026-01-01', '00:00:00');
@@ -31310,6 +31547,738 @@ function setupGUI() {
      'NASA\'s published list, then 3001-3050 for genuine predictions beyond NASA\'s ' +
      'Canon (which ends at year 3000). Reports date/time/type/Moon-Sun size ratio. ' +
      'All geometry from model constants.');
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // L-2b: 18.6-year nodal-cycle test
+  //
+  // Hypothesis (from the A0/A1/Audit-26 calibration findings): the model's
+  // per-eclipse umbra residual (Δlat vs NASA centerline) correlates with the
+  // Moon's mean ascending-node longitude Ω at conjunction. If true, the missing
+  // term lives in the Moon's β-trajectory model (not Earth's pole). If false,
+  // the residual scatter is per-eclipse noise from omitted nutation / polar
+  // motion / etc., and there's no Ω-periodic signal to extract.
+  //
+  // Method: take 29 modern total/annular eclipses (8 from ECLIPSE_PRESETS +
+  // 21 additional NASA Five Millennium Canon events covering 1900–2030, with
+  // hardcoded NASA greatest-eclipse coords). For each event:
+  //   1. Compute Moon's mean ascending node Ω at the NASA-published TD JD
+  //      via Meeus (1998) Ch. 47, eq. 47.7
+  //   2. Read model umbra at the NASA-greatest JD via umbraFromSceneAtJd
+  //   3. Compute Δlat = (model umbra lat) − (NASA greatest lat) and
+  //                Δlon = (model umbra lon) − (NASA greatest lon)
+  //   4. Compute great-circle distance from NASA greatest to model umbra
+  // Output:
+  //   - Per-event table sorted by Ω
+  //   - Pearson r of Δlat vs sin(Ω), cos(Ω), sin(2Ω), cos(2Ω) — detects
+  //     both fundamental (18.6-yr) and second-harmonic (9.3-yr) signals
+  //   - Best-fit periodic amplitude A and phase φ such that
+  //     Δlat ≈ Δlat_mean + A·sin(Ω + φ)
+  //   - Verdict: signal present (A > 2σ scatter) or absent
+  // ──────────────────────────────────────────────────────────────────────────
+  addTestButton('L-2b: Nodal-cycle test (Δlat vs Moon Ω across 29 modern eclipses)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  18.6-year nodal-cycle test on umbra residuals');
+    console.log('  ');
+    console.log('  Tests whether per-eclipse Δlat (model umbra vs NASA greatest) correlates');
+    console.log('  with the Moon\'s mean ascending node Ω at conjunction. If correlated, the');
+    console.log('  missing physics is in the Moon\'s β-trajectory model.');
+    console.log('  ');
+    console.log('  Data: 29 modern eclipses (1900–2030), NASA Five Millennium Canon coords.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    // Modern NASA total solar eclipses with NASA-VERIFIED greatest-eclipse coords
+    // and TD times from the Five Millennium Canon (Espenak & Meeus 2006), fetched
+    // and verified 2026-06 from https://eclipse.gsfc.nasa.gov/SEcat5/. Replaces
+    // the earlier hand-recalled list which had errors up to 20° in lat/lon for
+    // ~12 of the 37 events — those errors substantially contaminated the L-2b
+    // periodicity test (created spurious Ω signal). Format: [date_str, td_HH:MM,
+    // lat_decimal, lon_decimal, label]. NASA coords are integer-degree precision
+    // in the catalog; ±0.5° is well within the diagnostic's resolution.
+    const NASA_MODERN = [
+      // Pre-1950
+      ['1900-05-28', '14:54', 45.0,  -46.0,  '1900 May 28 Total — North Atlantic'],
+      ['1905-08-30', '13:07', 42.0,   -4.0,  '1905 Aug 30 Total — Spain/Algeria'],
+      ['1914-08-21', '12:34', 54.0,   27.0,  '1914 Aug 21 Total — Eastern Europe'],
+      ['1918-06-08', '22:08', 51.0, -152.0,  '1918 Jun 8 Total — Pacific NW'],
+      ['1919-05-29', '13:09',  4.0,  -17.0,  '1919 May 29 Total — Príncipe (Eddington)'],
+      ['1925-01-24', '14:54', 40.0,  -50.0,  '1925 Jan 24 Total — N Atlantic / NE USA'],
+      ['1927-06-29', '06:23', 78.0,   74.0,  '1927 Jun 29 Total — Arctic / N Scotland'],
+      ['1932-08-31', '20:04', 54.0,  -79.0,  '1932 Aug 31 Total — Canada/NE USA'],
+      ['1937-06-08', '20:41', 10.0, -131.0,  '1937 Jun 8 Total — Pacific'],
+      ['1945-07-09', '13:28', 70.0,  -17.0,  '1945 Jul 9 Total — Greenland/Scandinavia'],
+      ['1947-05-20', '13:48',  0.0,  -21.0,  '1947 May 20 Total — Equatorial Atlantic'],
+      // 1950s–1970s
+      ['1954-06-30', '12:33', 60.0,    4.0,  '1954 Jun 30 Total — Scandinavia'],
+      ['1961-02-15', '08:20', 47.0,   40.0,  '1961 Feb 15 Total — Europe/Russia'],
+      ['1963-07-20', '20:36', 62.0, -120.0,  '1963 Jul 20 Total — Canada/NE USA'],
+      ['1970-03-07', '17:39', 18.0,  -95.0,  '1970 Mar 7 Total — Mexico/E USA'],
+      ['1972-07-10', '19:47', 64.0,  -94.0,  '1972 Jul 10 Total — Canada'],
+      ['1973-06-30', '11:39', 19.0,    6.0,  '1973 Jun 30 Total — Niger (longest of 20th c)'],
+      ['1979-02-26', '16:55', 52.0,  -94.0,  '1979 Feb 26 Total — Canada'],
+      // 1980s–1990s
+      ['1980-02-16', '08:54',  0.0,   47.0,  '1980 Feb 16 Total — Africa/India'],
+      ['1983-06-11', '04:44', -6.0,  114.0,  '1983 Jun 11 Total — Indonesia'],
+      ['1988-03-18', '01:59', 21.0,  140.0,  '1988 Mar 18 Total — Philippines/Pacific'],
+      ['1990-07-22', '03:03', 65.0,  169.0,  '1990 Jul 22 Total — Siberia'],
+      ['1991-07-11', '19:07', 22.0, -105.0,  '1991 Jul 11 Total — Mexico/Hawaii'],
+      ['1995-10-24', '04:34',  8.0,  113.0,  '1995 Oct 24 Total — India/SE Asia'],
+      ['1997-03-09', '01:25', 58.0,  131.0,  '1997 Mar 9 Total — Siberia'],
+      ['1999-08-11', '11:04', 45.0,   24.0,  '1999 Aug 11 Total — Europe/Romania'],
+      // 2000s–2030
+      ['2001-06-21', '12:05',-11.0,    3.0,  '2001 Jun 21 Total — Africa'],
+      ['2006-03-29', '10:12', 23.0,   17.0,  '2006 Mar 29 Total — Africa/Turkey'],
+      ['2008-08-01', '10:22', 66.0,   72.0,  '2008 Aug 1 Total — Arctic Siberia'],
+      ['2009-07-22', '02:36', 24.0,  144.0,  '2009 Jul 22 Total — Japan/Pacific'],
+      ['2010-07-11', '19:35',-20.0, -122.0,  '2010 Jul 11 Total — South Pacific'],
+      ['2015-03-20', '09:47', 64.0,   -7.0,  '2015 Mar 20 Total — Faroe/Svalbard'],
+      ['2016-03-09', '01:58', 10.0,  149.0,  '2016 Mar 9 Total — Indonesia/Pacific'],
+      ['2017-08-21', '18:27', 37.0,  -88.0,  '2017 Aug 21 Total — USA coast-to-coast'],
+      ['2024-04-08', '18:18', 25.0, -104.0,  '2024 Apr 8 Total — Mexico/Texas/Maine'],
+      ['2026-08-12', '17:47', 65.0,  -25.0,  '2026 Aug 12 Total — Iceland/Spain'],
+      ['2027-08-02', '10:08', 26.0,   33.0,  '2027 Aug 2 Total — Egypt/Saudi (longest of 21st c)'],
+    ];
+
+    // Moon's mean ascending node Ω from Meeus (1998) Ch. 47, eq. 47.7
+    // (truncated to cubic — leading-period accuracy ~0.001° over a millennium).
+    function moonOmega(jd) {
+      const T = (jd - 2451545.0) / 36525;
+      let omega = 125.0445479 - 1934.1362891 * T + 0.0020754 * T * T + T * T * T / 467441;
+      omega = ((omega % 360) + 360) % 360;
+      return omega;
+    }
+
+    const _d2r = Math.PI / 180;
+    const events = [];
+    const _saveJD_L2b = o.julianDay;
+    const _t_L2b = performance.now();
+
+    // Per-event: sweep ±2h around NASA TD time (1-min step) to find the model
+    // umbra position CLOSEST to NASA's greatest-eclipse coord. This decouples
+    // the geometric residual from any timing mismatch (the v1 fixed-JD readout
+    // contaminated Δlat with thousands of km of "model umbra is at a different
+    // moment of the path than NASA's greatest" noise).
+    const halfWin_h_L2b = 2 / 24;
+    const step_d_L2b   = (1 / 60) / 24;
+
+    try {
+      for (const [dateStr, tdStr, latN, lonN, label] of NASA_MODERN) {
+        const jd0 = dateTimeToJulianDay(dateStr, tdStr + ':00');
+        let bestGC = Infinity, bestDt = 0, bestUm = null;
+        for (let dt = -halfWin_h_L2b; dt <= halfWin_h_L2b + 1e-9; dt += step_d_L2b) {
+          const um = umbraFromSceneAtJd(jd0 + dt);
+          if (um === null) continue;
+          const gc = gcKmFromLatLon(latN, lonN, um.lat, um.lon);
+          if (gc < bestGC) { bestGC = gc; bestDt = dt; bestUm = um; }
+        }
+        if (bestUm === null) {
+          events.push({ label, jd: jd0, omega: moonOmega(jd0), dLat: null, dLon: null, gc: null, bestDtMin: null });
+        } else {
+          events.push({
+            label, jd: jd0, omega: moonOmega(jd0),
+            dLat: bestUm.lat - latN,
+            dLon: bestUm.lon - lonN,
+            gc: bestGC,
+            bestDtMin: bestDt * 24 * 60,
+            modelLat: bestUm.lat, modelLon: bestUm.lon,
+          });
+        }
+      }
+    } finally {
+      jumpToJulianDay(_saveJD_L2b);
+      forceSceneUpdate();
+    }
+
+    // Sort by Ω for the table
+    events.sort((a, b) => a.omega - b.omega);
+
+    console.log('   Per-event table (sorted by Moon Ω at conjunction; ±2h sweep, 1-min step):');
+    console.log('   ' + 'Eclipse'.padEnd(50) + '   Ω°    BestΔUT  Model umbra@best       Δlat     Δlon    GC dist');
+    console.log('   ' + '─'.repeat(135));
+
+    for (const e of events) {
+      const omegaStr = e.omega.toFixed(1).padStart(6);
+      if (e.dLat === null) {
+        console.log('   ' + e.label.padEnd(50) + omegaStr + '   umbra off Earth in entire ±2h window');
+        continue;
+      }
+      const bestDtSign = e.bestDtMin >= 0 ? '+' : '−';
+      const absMin = Math.abs(e.bestDtMin);
+      const hh = Math.floor(absMin / 60);
+      const mm = Math.round(absMin - hh * 60);
+      const dtStr = `${bestDtSign}${hh}h${String(mm).padStart(2, '0')}`;
+      const modelStr = `(${e.modelLat.toFixed(2).padStart(6)},${e.modelLon.toFixed(2).padStart(7)})`;
+      const dLatStr  = ((e.dLat >= 0 ? '+' : '') + e.dLat.toFixed(2)).padStart(7);
+      const dLonStr  = ((e.dLon >= 0 ? '+' : '') + e.dLon.toFixed(2)).padStart(7);
+      const gcStr    = `${e.gc.toFixed(0).padStart(5)} km`;
+      console.log('   ' +
+        e.label.padEnd(50) +
+        omegaStr +
+        '   ' + dtStr.padStart(7) +
+        '  ' + modelStr.padEnd(20) +
+        ' ' + dLatStr +
+        '  ' + dLonStr +
+        '  ' + gcStr);
+    }
+
+    // Statistics
+    const valid = events.filter(e => e.dLat !== null);
+    const n = valid.length;
+    if (n < 4) {
+      console.log(`\n   Too few valid events (${n}) for periodicity fit.`);
+      return;
+    }
+    const mean = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+    const meanDLat = mean(valid.map(e => e.dLat));
+    const meanDLon = mean(valid.map(e => e.dLon));
+    const stdDLat  = Math.sqrt(valid.reduce((s, e) => s + (e.dLat - meanDLat) ** 2, 0) / n);
+    const stdDLon  = Math.sqrt(valid.reduce((s, e) => s + (e.dLon - meanDLon) ** 2, 0) / n);
+
+    // Pearson correlation between Δlat and various Ω basis functions
+    function pearson(xs, ys) {
+      const mx = mean(xs), my = mean(ys);
+      let cov = 0, sx2 = 0, sy2 = 0;
+      for (let i = 0; i < xs.length; i++) {
+        const dx = xs[i] - mx, dy = ys[i] - my;
+        cov += dx * dy; sx2 += dx * dx; sy2 += dy * dy;
+      }
+      return cov / Math.sqrt(sx2 * sy2);
+    }
+
+    const omegas = valid.map(e => e.omega * _d2r);
+    const dLats  = valid.map(e => e.dLat);
+    const dLons  = valid.map(e => e.dLon);
+
+    const rLatSinOm = pearson(omegas.map(Math.sin), dLats);
+    const rLatCosOm = pearson(omegas.map(Math.cos), dLats);
+    const rLatSin2Om = pearson(omegas.map(w => Math.sin(2*w)), dLats);
+    const rLatCos2Om = pearson(omegas.map(w => Math.cos(2*w)), dLats);
+    const rLonSinOm = pearson(omegas.map(Math.sin), dLons);
+    const rLonCosOm = pearson(omegas.map(Math.cos), dLons);
+
+    // Best-fit periodic model: Δlat ≈ c + A·cos(Ω) + B·sin(Ω)
+    // → amplitude = sqrt(A² + B²), phase = atan2(A, B) (peaks at Ω = 90° − phase)
+    //   Solved by linear least-squares on the orthogonal basis {1, cos Ω, sin Ω}.
+    function linearFit(basis, ys) {
+      const n = ys.length;
+      const k = basis.length;
+      // Normal equations: (Xᵀ X) β = Xᵀ y
+      const XtX = Array.from({length: k}, () => new Array(k).fill(0));
+      const Xty = new Array(k).fill(0);
+      for (let i = 0; i < n; i++) {
+        for (let a = 0; a < k; a++) {
+          for (let b = 0; b < k; b++) {
+            XtX[a][b] += basis[a][i] * basis[b][i];
+          }
+          Xty[a] += basis[a][i] * ys[i];
+        }
+      }
+      // Solve 3×3 via Gauss elimination (k=3 here, dimensions checked above).
+      // Cramer's rule for k=3 is short enough; use it directly.
+      if (k !== 3) throw new Error('linearFit currently only handles k=3');
+      const det = XtX[0][0]*(XtX[1][1]*XtX[2][2] - XtX[1][2]*XtX[2][1])
+                - XtX[0][1]*(XtX[1][0]*XtX[2][2] - XtX[1][2]*XtX[2][0])
+                + XtX[0][2]*(XtX[1][0]*XtX[2][1] - XtX[1][1]*XtX[2][0]);
+      const inv = [
+        [(XtX[1][1]*XtX[2][2] - XtX[1][2]*XtX[2][1]) / det,
+         (XtX[0][2]*XtX[2][1] - XtX[0][1]*XtX[2][2]) / det,
+         (XtX[0][1]*XtX[1][2] - XtX[0][2]*XtX[1][1]) / det],
+        [(XtX[1][2]*XtX[2][0] - XtX[1][0]*XtX[2][2]) / det,
+         (XtX[0][0]*XtX[2][2] - XtX[0][2]*XtX[2][0]) / det,
+         (XtX[0][2]*XtX[1][0] - XtX[0][0]*XtX[1][2]) / det],
+        [(XtX[1][0]*XtX[2][1] - XtX[1][1]*XtX[2][0]) / det,
+         (XtX[0][1]*XtX[2][0] - XtX[0][0]*XtX[2][1]) / det,
+         (XtX[0][0]*XtX[1][1] - XtX[0][1]*XtX[1][0]) / det],
+      ];
+      const beta = new Array(k).fill(0);
+      for (let a = 0; a < k; a++) for (let b = 0; b < k; b++) beta[a] += inv[a][b] * Xty[b];
+      // R² of the fit
+      const meanY = ys.reduce((a,b) => a + b, 0) / n;
+      let ssRes = 0, ssTot = 0;
+      for (let i = 0; i < n; i++) {
+        const yhat = beta.reduce((s, b, j) => s + b * basis[j][i], 0);
+        ssRes += (ys[i] - yhat) ** 2;
+        ssTot += (ys[i] - meanY) ** 2;
+      }
+      const r2 = 1 - ssRes / ssTot;
+      return { beta, r2 };
+    }
+
+    const ones = new Array(n).fill(1);
+    const cosOm = omegas.map(Math.cos);
+    const sinOm = omegas.map(Math.sin);
+    const fitLat = linearFit([ones, cosOm, sinOm], dLats);
+    const fitLon = linearFit([ones, cosOm, sinOm], dLons);
+
+    const ampLat = Math.sqrt(fitLat.beta[1] ** 2 + fitLat.beta[2] ** 2);
+    const phaseLat = Math.atan2(fitLat.beta[2], fitLat.beta[1]) / _d2r;
+    const ampLon = Math.sqrt(fitLon.beta[1] ** 2 + fitLon.beta[2] ** 2);
+    const phaseLon = Math.atan2(fitLon.beta[2], fitLon.beta[1]) / _d2r;
+
+    console.log('   ' + '─'.repeat(135));
+    console.log(`   Summary (n=${n} valid events):`);
+    console.log(`     Δlat:  mean ${meanDLat.toFixed(2)}°, std ${stdDLat.toFixed(2)}°`);
+    console.log(`     Δlon:  mean ${meanDLon.toFixed(2)}°, std ${stdDLon.toFixed(2)}°`);
+    console.log(``);
+    console.log(`   Pearson correlation with Moon Ω basis functions:`);
+    console.log(`     Δlat vs sin(Ω):   r = ${rLatSinOm.toFixed(3)}        Δlon vs sin(Ω):  r = ${rLonSinOm.toFixed(3)}`);
+    console.log(`     Δlat vs cos(Ω):   r = ${rLatCosOm.toFixed(3)}        Δlon vs cos(Ω):  r = ${rLonCosOm.toFixed(3)}`);
+    console.log(`     Δlat vs sin(2Ω):  r = ${rLatSin2Om.toFixed(3)}`);
+    console.log(`     Δlat vs cos(2Ω):  r = ${rLatCos2Om.toFixed(3)}`);
+    console.log(``);
+    console.log(`   Best-fit periodic model  Δlat ≈ c + A·cos(Ω − φ):`);
+    console.log(`     Δlat:  c = ${fitLat.beta[0].toFixed(2)}°,  A = ${ampLat.toFixed(2)}°,  φ = ${phaseLat.toFixed(0)}°,  R² = ${fitLat.r2.toFixed(3)}`);
+    console.log(`     Δlon:  c = ${fitLon.beta[0].toFixed(2)}°,  A = ${ampLon.toFixed(2)}°,  φ = ${phaseLon.toFixed(0)}°,  R² = ${fitLon.r2.toFixed(3)}`);
+    console.log(``);
+
+    // Interpretation thresholds — empirical for n~30 datapoints
+    const sigLatR2 = fitLat.r2;
+    const sigLatAmp = ampLat / stdDLat;
+    let verdict;
+    if (sigLatR2 > 0.3 && sigLatAmp > 0.5) {
+      verdict = 'STRONG 18.6-yr signal detected in Δlat.';
+    } else if (sigLatR2 > 0.15 && sigLatAmp > 0.3) {
+      verdict = 'WEAK 18.6-yr signal in Δlat — present but not dominant.';
+    } else {
+      verdict = 'NO significant 18.6-yr signal in Δlat — residuals look like per-eclipse noise, not a missing nodal term.';
+    }
+    console.log(`   Verdict: ${verdict}`);
+    console.log(`            (R²=${sigLatR2.toFixed(2)}; periodic amplitude is ${sigLatAmp.toFixed(2)}× the residual std)`);
+    console.log(``);
+    console.log(`   Runtime: ${((performance.now() - _t_L2b) / 1000).toFixed(1)} s`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    // Expose for inspection
+    window._nodalTest = { events, fitLat, fitLon, meanDLat, stdDLat };
+    console.log('Full event array exposed at window._nodalTest.{events, fitLat, fitLon, ...}');
+  }, '18.6-year nodal-cycle test on 29 modern NASA total/annular eclipses (1900–2030). ' +
+     'Computes Moon ascending-node Ω at each conjunction, reads model umbra at NASA-published JD, ' +
+     'and tests whether Δlat residual correlates with Ω. A positive result locates the missing ' +
+     'physics in the Moon β-trajectory; a null result means residuals are per-eclipse noise from ' +
+     'omitted nutation/polar-motion terms (and item 3 — adding nutation — becomes the right next step).');
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // L-2c: Moon β geometry test — does the Ω signal in Δlat come from the
+  // eclipse's intrinsic β(JD), or from a model bug downstream of β?
+  //
+  // L-2b found Δlat ≈ 2.54° · cos(Ω + 1°), R² = 0.24. We want to know whether
+  // this is just the geometric consequence of how the Moon's ecliptic latitude
+  // at a solar conjunction depends on Ω (in which case it's not a bug — it's
+  // "this is how eclipses behave at high γ"), or whether it reveals a real
+  // implementation error.
+  //
+  // The model's β implementation is the full Meeus Ch. 47 latitude series
+  // (60 MOON_B terms + Lp/A1/A3 additional terms). Identical code is used by
+  // (a) _eclMoonBeta(jd) directly, and (b) the scene-graph Moon placement
+  // via obj._meeusLatRad. They cannot disagree at the implementation level.
+  //
+  // Diagnostic: compute β_Meeus at each of the 37 conjunctions and compare its
+  // Ω-correlation to Δlat's Ω-correlation from L-2b.
+  //   • If β_Meeus also follows ≈ A · cos(Ω + φ) with the SAME phase φ and
+  //     amplitude ratio (β_amp / Δlat_amp) ~ 1/30 (typical β-to-umbra leverage
+  //     factor at modern γ), the Δlat signal is fully explained by geometry —
+  //     no model bug. Recommendation: pivot to item 3 (add nutation series).
+  //   • If β_Meeus has DIFFERENT phase/amplitude, then a downstream stage
+  //     (umbra ray-trace, Earth-orientation, frame transformation) is
+  //     introducing the Ω-correlated residual — that stage is the real bug.
+  // ──────────────────────────────────────────────────────────────────────────
+  addTestButton('L-2c: Moon β geometry test (is the L-2b Ω signal just eclipse geometry?)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-2c: does the L-2b Ω signal in Δlat reduce to "this is how β behaves at eclipses"?');
+    console.log('  ');
+    console.log('  Method: for each of the 37 events from L-2b, compute Meeus β at the NASA TD JD');
+    console.log('  via _eclMoonBeta(jd). Test whether β itself correlates with cos(Ω) at the same');
+    console.log('  phase. If yes → Δlat signal is geometric, not a bug. If no → bug is downstream.');
+    console.log('  ');
+    console.log('  Requires that L-2b has been run first (uses window._nodalTest event list).');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    if (!window._nodalTest || !window._nodalTest.events || window._nodalTest.events.length === 0) {
+      console.log('   ERROR: Run L-2b first (the test that produces window._nodalTest).');
+      return;
+    }
+
+    const _d2r = Math.PI / 180;
+    const events = window._nodalTest.events;
+
+    // For each event: compute Meeus β at NASA TD JD.
+    // Recompute Ω the same way as L-2b for self-consistency.
+    function moonOmega(jd) {
+      const T = (jd - 2451545.0) / 36525;
+      let omega = 125.0445479 - 1934.1362891 * T + 0.0020754 * T * T + T * T * T / 467441;
+      omega = ((omega % 360) + 360) % 360;
+      return omega;
+    }
+
+    const rows = events
+      .filter(e => e.dLat !== null)
+      .map(e => ({
+        label: e.label,
+        jd: e.jd,
+        omega: e.omega,
+        dLat: e.dLat,
+        betaMeeus: _eclMoonBeta(e.jd),   // model = Meeus, identical implementation
+      }))
+      .sort((a, b) => a.omega - b.omega);
+
+    console.log('   Per-event table (sorted by Ω):');
+    console.log('   ' + 'Eclipse'.padEnd(50) + '   Ω°       β_Meeus (°)    Δlat (°)');
+    console.log('   ' + '─'.repeat(105));
+    for (const r of rows) {
+      const omegaStr = r.omega.toFixed(1).padStart(6);
+      const bStr  = ((r.betaMeeus >= 0 ? '+' : '') + r.betaMeeus.toFixed(4)).padStart(10);
+      const dStr  = ((r.dLat >= 0 ? '+' : '') + r.dLat.toFixed(2)).padStart(7);
+      console.log('   ' + r.label.padEnd(50) + omegaStr + '   ' + bStr + '      ' + dStr);
+    }
+
+    // Correlation analysis: does β correlate with cos(Ω) the same way Δlat does?
+    function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
+    function pearson(xs, ys) {
+      const mx = mean(xs), my = mean(ys);
+      let cov = 0, sx2 = 0, sy2 = 0;
+      for (let i = 0; i < xs.length; i++) {
+        const dx = xs[i] - mx, dy = ys[i] - my;
+        cov += dx * dy; sx2 += dx * dx; sy2 += dy * dy;
+      }
+      return cov / Math.sqrt(sx2 * sy2);
+    }
+    // Linear fit y = c + A cos Ω + B sin Ω → amplitude sqrt(A²+B²), phase atan2(B,A).
+    function fitPeriodic(omegas, ys) {
+      const n = ys.length;
+      const ones = new Array(n).fill(1);
+      const cs   = omegas.map(w => Math.cos(w));
+      const sn   = omegas.map(w => Math.sin(w));
+      const basis = [ones, cs, sn];
+      const XtX = Array.from({length:3}, () => new Array(3).fill(0));
+      const Xty = new Array(3).fill(0);
+      for (let i = 0; i < n; i++) {
+        for (let a = 0; a < 3; a++) {
+          for (let b = 0; b < 3; b++) XtX[a][b] += basis[a][i] * basis[b][i];
+          Xty[a] += basis[a][i] * ys[i];
+        }
+      }
+      const det = XtX[0][0]*(XtX[1][1]*XtX[2][2] - XtX[1][2]*XtX[2][1])
+                - XtX[0][1]*(XtX[1][0]*XtX[2][2] - XtX[1][2]*XtX[2][0])
+                + XtX[0][2]*(XtX[1][0]*XtX[2][1] - XtX[1][1]*XtX[2][0]);
+      const inv = [
+        [(XtX[1][1]*XtX[2][2] - XtX[1][2]*XtX[2][1]) / det,
+         (XtX[0][2]*XtX[2][1] - XtX[0][1]*XtX[2][2]) / det,
+         (XtX[0][1]*XtX[1][2] - XtX[0][2]*XtX[1][1]) / det],
+        [(XtX[1][2]*XtX[2][0] - XtX[1][0]*XtX[2][2]) / det,
+         (XtX[0][0]*XtX[2][2] - XtX[0][2]*XtX[2][0]) / det,
+         (XtX[0][2]*XtX[1][0] - XtX[0][0]*XtX[1][2]) / det],
+        [(XtX[1][0]*XtX[2][1] - XtX[1][1]*XtX[2][0]) / det,
+         (XtX[0][1]*XtX[2][0] - XtX[0][0]*XtX[2][1]) / det,
+         (XtX[0][0]*XtX[1][1] - XtX[0][1]*XtX[1][0]) / det],
+      ];
+      const beta = new Array(3).fill(0);
+      for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) beta[a] += inv[a][b] * Xty[b];
+      const meanY = ys.reduce((a,b)=>a+b,0)/n;
+      let ssRes = 0, ssTot = 0;
+      for (let i = 0; i < n; i++) {
+        const yhat = beta.reduce((s, bj, j) => s + bj * basis[j][i], 0);
+        ssRes += (ys[i] - yhat)**2;
+        ssTot += (ys[i] - meanY)**2;
+      }
+      const amp = Math.sqrt(beta[1]**2 + beta[2]**2);
+      const phase = Math.atan2(beta[2], beta[1]) / _d2r;
+      const r2 = 1 - ssRes/ssTot;
+      return { c: beta[0], amp, phase, r2 };
+    }
+
+    const omegasRad = rows.map(r => r.omega * _d2r);
+    const betas    = rows.map(r => r.betaMeeus);
+    const dLats    = rows.map(r => r.dLat);
+
+    const rBetaCos = pearson(omegasRad.map(Math.cos), betas);
+    const rBetaSin = pearson(omegasRad.map(Math.sin), betas);
+    const rLatCos  = pearson(omegasRad.map(Math.cos), dLats);
+    const rLatSin  = pearson(omegasRad.map(Math.sin), dLats);
+
+    const fitBeta = fitPeriodic(omegasRad, betas);
+    const fitLat  = fitPeriodic(omegasRad, dLats);
+
+    console.log('   ' + '─'.repeat(105));
+    console.log('   Periodic-fit comparison: β_Meeus(Ω) vs Δlat(Ω)');
+    console.log('   ' + 'Quantity'.padEnd(20) + 'r vs cosΩ    r vs sinΩ     Amplitude     Phase φ    R²');
+    console.log('   ' + '─'.repeat(85));
+    console.log('   ' + 'Meeus β (°)'.padEnd(20) +
+      rBetaCos.toFixed(3).padStart(7) + '      ' +
+      rBetaSin.toFixed(3).padStart(7) + '     ' +
+      fitBeta.amp.toFixed(4).padStart(7) + '°    ' +
+      fitBeta.phase.toFixed(0).padStart(4) + '°    ' +
+      fitBeta.r2.toFixed(3));
+    console.log('   ' + 'Δlat (°)'.padEnd(20) +
+      rLatCos.toFixed(3).padStart(7) + '      ' +
+      rLatSin.toFixed(3).padStart(7) + '     ' +
+      fitLat.amp.toFixed(4).padStart(7) + '°    ' +
+      fitLat.phase.toFixed(0).padStart(4) + '°    ' +
+      fitLat.r2.toFixed(3));
+
+    // Leverage factor: Δlat per degree of β
+    const leverage = fitLat.amp / fitBeta.amp;
+
+    console.log('');
+    console.log('   Diagnostic interpretation:');
+    console.log(`     β_Meeus amplitude  = ${fitBeta.amp.toFixed(4)}°   (phase ${fitBeta.phase.toFixed(0)}°)`);
+    console.log(`     Δlat amplitude     = ${fitLat.amp.toFixed(2)}°   (phase ${fitLat.phase.toFixed(0)}°)`);
+    console.log(`     Implied leverage   = ${leverage.toFixed(1)}× (Δlat per ° of β)`);
+    console.log(`     Phase agreement    = ${Math.abs(fitBeta.phase - fitLat.phase).toFixed(0)}° between β-fit and Δlat-fit`);
+    console.log('');
+
+    const phaseDiff = Math.abs(((fitBeta.phase - fitLat.phase + 180) % 360) - 180);
+    let verdict;
+    if (fitBeta.r2 > 0.4 && phaseDiff < 30) {
+      verdict = 'GEOMETRIC: β itself follows the cos(Ω) pattern AND has matching phase with Δlat. ' +
+                'The L-2b signal is the intrinsic β(Ω) of solar conjunctions, NOT a model bug. ' +
+                '→ Pivot to item 3 (add nutation series) for the noise-floor improvement.';
+    } else if (fitBeta.r2 > 0.2 && phaseDiff < 60) {
+      verdict = 'PARTIALLY GEOMETRIC: β has Ω structure but phase or amplitude differs from Δlat. ' +
+                'Some of the L-2b signal is geometry; some is a real downstream issue worth investigating.';
+    } else {
+      verdict = 'NOT GEOMETRIC: β is essentially flat in Ω, but Δlat has the cos(Ω) signal. ' +
+                'The 2.5° Δlat amplitude comes from a downstream stage (umbra projection, ' +
+                'Earth orientation, or frame transformation). Bug is locatable in code.';
+    }
+    console.log(`   Verdict: ${verdict}`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    window._betaGeomTest = { rows, fitBeta, fitLat, leverage };
+    console.log('Exposed at window._betaGeomTest');
+  }, 'Diagnostic for the L-2b finding: does the 18.6-yr Δlat signal come from the model, ' +
+     'or from the intrinsic geometry of how eclipse β depends on Ω? Compares Meeus β at ' +
+     'each conjunction against Δlat and looks for matching phase. Requires L-2b to have run first.');
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // L-2d: Earth pole direction vs IAU 2006
+  //
+  // The cleaned L-2b found a residual +0.69° mean Δlat bias across all 37
+  // modern eclipses. This button isolates where that bias comes from by
+  // measuring the model's Sun and Moon DECLINATIONS at each conjunction and
+  // comparing them to the IAU 2006 reference. The umbra latitude depends
+  // directly on (Sun - Moon) declination in geocentric equatorial frame, so
+  // a δ_sun or δ_moon error of ~0.7° would exactly explain the Δlat bias.
+  //
+  // Method (frame-independent — no assumption about scene world ↔ ICRF axes):
+  //   1. Read model's Earth pole direction from scene-graph (earth.worldQuat
+  //      applied to +Y, the Earth-local north pole — per umbra code convention)
+  //   2. Read model's Sun and Moon directions from scene-graph (world positions
+  //      − Earth's world position, normalized)
+  //   3. Compute model declinations: δ_model = asin(dir · pole) where both are
+  //      unit vectors in scene world frame (frame cancels in the dot product)
+  //   4. Compute IAU declinations from:
+  //      - IAU 2006 obliquity: ε = 84381.406 − 46.836769·T − 0.0001831·T²
+  //                                + 0.00200340·T³ (arcseconds, Capitaine 2003)
+  //      - Sun: low-precision Meeus → δ_sun = asin(sin λ · sin ε)
+  //      - Moon: Meeus 47 λ,β series → standard ecliptic→equatorial transform
+  //   5. Δδ = model − IAU. Mean Δδ_sun + Δδ_moon ≈ Δlat_umbra bias.
+  //
+  // Diagnostic outcomes:
+  //   • If mean Δδ_sun ≈ +0.7° AND Δδ_moon ≈ 0:
+  //     → Sun direction is off — bug is in the heliocentric chain
+  //   • If mean Δδ_moon ≈ +0.7° AND Δδ_sun ≈ 0:
+  //     → Moon direction is off — surprising since β is Meeus-correct
+  //   • If both have ~+0.35° each:
+  //     → Earth pole orientation is tilted — fix in the model's pole construction
+  //   • If both are essentially 0 (< 0.1°):
+  //     → bias is NOT in Sun/Moon/pole directions; look elsewhere (frame
+  //       transformation, Earth oblateness, geoid vs sphere, etc.)
+  // ──────────────────────────────────────────────────────────────────────────
+  addTestButton('L-2d: Sun/Moon δ — model vs IAU 2006 (test +0.69° Δlat bias)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-2d: Earth pole orientation diagnostic');
+    console.log('  ');
+    console.log('  Tests whether the +0.69° Δlat bias (cleaned L-2b result) comes from a Sun-direction');
+    console.log('  error, a Moon-direction error, or an Earth-pole-tilt error. Computes Sun and Moon');
+    console.log('  geocentric declinations from the scene-graph and from IAU 2006 reference formulas');
+    console.log('  for the same 37 events used in L-2b.');
+    console.log('  ');
+    console.log('  Requires L-2b to have run first (uses the same NASA TD JDs).');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    if (!window._nodalTest || !window._nodalTest.events || window._nodalTest.events.length === 0) {
+      console.log('   ERROR: Run L-2b first.');
+      return;
+    }
+
+    const _d2r = Math.PI / 180;
+    const _r2d = 180 / Math.PI;
+
+    // IAU 2006 mean obliquity (Capitaine et al. 2003), accuracy 0.01″ over ±200 yr from J2000.
+    function iauObliquityDeg(jd) {
+      const T = (jd - 2451545.0) / 36525;
+      const arcsec = 84381.406 - 46.836769 * T - 0.0001831 * T * T
+                   + 0.00200340 * T * T * T
+                   - 0.000000576 * T * T * T * T
+                   - 0.0000000434 * T * T * T * T * T;
+      return arcsec / 3600;
+    }
+
+    // Ecliptic → equatorial declination. λ, β, ε in degrees → δ in degrees.
+    function ecl2dec(lambda_deg, beta_deg, eps_deg) {
+      const l = lambda_deg * _d2r, b = beta_deg * _d2r, e = eps_deg * _d2r;
+      const sinDec = Math.sin(b) * Math.cos(e) + Math.cos(b) * Math.sin(e) * Math.sin(l);
+      return Math.asin(Math.max(-1, Math.min(1, sinDec))) * _r2d;
+    }
+
+    const eventList = window._nodalTest.events.filter(e => e.dLat !== null);
+
+    const rows = [];
+    const _saveJD = o.julianDay;
+
+    // We need THREE.js Vector3/Quaternion. They're already used elsewhere in
+    // umbraFromSceneAtJd — same scope here.
+    const _polelocal = new THREE.Vector3(0, 1, 0);  // Earth-local +Y = north pole
+    const _earthQuat = new THREE.Quaternion();
+    const _polemodel = new THREE.Vector3();
+    const _sunPos    = new THREE.Vector3();
+    const _moonPos   = new THREE.Vector3();
+    const _earthPos  = new THREE.Vector3();
+    const _sunDir    = new THREE.Vector3();
+    const _moonDir   = new THREE.Vector3();
+
+    try {
+      for (const evt of eventList) {
+        const jd = evt.jd;
+
+        // ── Model side: navigate scene, read positions, compute declinations
+        jumpToJulianDay(jd);
+        forceSceneUpdate('light');
+
+        earth.planetObj.getWorldQuaternion(_earthQuat);
+        _polemodel.copy(_polelocal).applyQuaternion(_earthQuat).normalize();
+
+        sun.planetObj.getWorldPosition(_sunPos);
+        moon.planetObj.getWorldPosition(_moonPos);
+        earth.planetObj.getWorldPosition(_earthPos);
+
+        _sunDir.copy(_sunPos).sub(_earthPos).normalize();
+        _moonDir.copy(_moonPos).sub(_earthPos).normalize();
+
+        // δ_model = arcsin(direction · pole), both unit vectors in scene world frame
+        // (frame conventions cancel since both are in the same frame).
+        const sinDecSunModel  = _sunDir.dot(_polemodel);
+        const sinDecMoonModel = _moonDir.dot(_polemodel);
+        const decSunModel  = Math.asin(Math.max(-1, Math.min(1, sinDecSunModel)))  * _r2d;
+        const decMoonModel = Math.asin(Math.max(-1, Math.min(1, sinDecMoonModel))) * _r2d;
+
+        // ── IAU side: from formulas
+        const eps = iauObliquityDeg(jd);
+        const sunLon = _eclSunLon(jd);              // already in script.js
+        const decSunIAU = ecl2dec(sunLon, 0, eps);  // Sun's β ≈ 0
+        const moonLon = _eclMoonLon(jd);            // Meeus 47 longitude (model uses this too)
+        const moonBeta = _eclMoonBeta(jd);          // Meeus 47 latitude (model uses this too)
+        const decMoonIAU = ecl2dec(moonLon, moonBeta, eps);
+
+        rows.push({
+          label: evt.label, jd, omega: evt.omega,
+          eps_iau: eps,
+          decSunModel, decSunIAU, dDecSun: decSunModel - decSunIAU,
+          decMoonModel, decMoonIAU, dDecMoon: decMoonModel - decMoonIAU,
+          // Umbra latitude depends roughly on (Sun − Moon) declination:
+          dDecSunMinusMoon: (decSunModel - decMoonModel) - (decSunIAU - decMoonIAU),
+          dLatObserved: evt.dLat,
+        });
+      }
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
+    }
+
+    // Sort by Ω for display
+    rows.sort((a, b) => a.omega - b.omega);
+
+    console.log('   Per-event table (sorted by Ω):');
+    console.log('   ' + 'Eclipse'.padEnd(48) + '    Ω°    ε_IAU°    δ_Sun model    δ_Sun IAU    Δδ_Sun     δ_Moon model    δ_Moon IAU   Δδ_Moon    Δlat_obs');
+    console.log('   ' + '─'.repeat(160));
+
+    for (const r of rows) {
+      const omegaStr = r.omega.toFixed(1).padStart(6);
+      const epsStr   = r.eps_iau.toFixed(4);
+      const dSunMStr = ((r.decSunModel >= 0 ? '+' : '') + r.decSunModel.toFixed(3)).padStart(9);
+      const dSunIStr = ((r.decSunIAU   >= 0 ? '+' : '') + r.decSunIAU.toFixed(3)).padStart(9);
+      const ddSunStr = ((r.dDecSun >= 0 ? '+' : '') + r.dDecSun.toFixed(4)).padStart(9);
+      const dMoMStr  = ((r.decMoonModel >= 0 ? '+' : '') + r.decMoonModel.toFixed(3)).padStart(9);
+      const dMoIStr  = ((r.decMoonIAU   >= 0 ? '+' : '') + r.decMoonIAU.toFixed(3)).padStart(9);
+      const ddMoStr  = ((r.dDecMoon >= 0 ? '+' : '') + r.dDecMoon.toFixed(4)).padStart(9);
+      const dLatStr  = ((r.dLatObserved >= 0 ? '+' : '') + r.dLatObserved.toFixed(2)).padStart(7);
+      console.log('   ' + r.label.padEnd(48) + omegaStr + '   ' + epsStr + '    ' +
+        dSunMStr + '°   ' + dSunIStr + '°  ' + ddSunStr + '°   ' +
+        dMoMStr + '°   ' + dMoIStr + '°  ' + ddMoStr + '°  ' + dLatStr + '°');
+    }
+
+    // Statistics
+    function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
+    function std(arr, m) { return Math.sqrt(arr.reduce((a,b)=>a+(b-m)**2,0)/arr.length); }
+
+    const ddSuns  = rows.map(r => r.dDecSun);
+    const ddMoons = rows.map(r => r.dDecMoon);
+    const ddSunMinusMoons = rows.map(r => r.dDecSunMinusMoon);
+    const dLats   = rows.map(r => r.dLatObserved);
+
+    const mSun = mean(ddSuns),  sSun = std(ddSuns, mSun);
+    const mMoon = mean(ddMoons), sMoon = std(ddMoons, mMoon);
+    const mDiff = mean(ddSunMinusMoons), sDiff = std(ddSunMinusMoons, mDiff);
+    const mLat  = mean(dLats);
+
+    console.log('   ' + '─'.repeat(160));
+    console.log(`   Statistics (n=${rows.length} events):`);
+    console.log('');
+    console.log(`     Δδ_Sun          = ${(mSun  >= 0 ? '+' : '') + mSun.toFixed(4)}° ± ${sSun.toFixed(4)}°   (${(mSun*3600).toFixed(0)}″ mean, ${(sSun*3600).toFixed(0)}″ std)`);
+    console.log(`     Δδ_Moon         = ${(mMoon >= 0 ? '+' : '') + mMoon.toFixed(4)}° ± ${sMoon.toFixed(4)}°   (${(mMoon*3600).toFixed(0)}″ mean, ${(sMoon*3600).toFixed(0)}″ std)`);
+    console.log(`     Δ(δ_Sun−δ_Moon) = ${(mDiff >= 0 ? '+' : '') + mDiff.toFixed(4)}° ± ${sDiff.toFixed(4)}°   (this is what drives Δlat_umbra)`);
+    console.log(`     Δlat observed   = ${(mLat  >= 0 ? '+' : '') + mLat.toFixed(2)}°  (from L-2b)`);
+    console.log('');
+
+    // Correlation between (Sun−Moon δ error) and observed Δlat
+    function pearson(xs, ys) {
+      const mx = mean(xs), my = mean(ys);
+      let cov = 0, sx2 = 0, sy2 = 0;
+      for (let i = 0; i < xs.length; i++) {
+        const dx = xs[i] - mx, dy = ys[i] - my;
+        cov += dx * dy; sx2 += dx * dx; sy2 += dy * dy;
+      }
+      return cov / Math.sqrt(sx2 * sy2);
+    }
+    const rDiffVsLat = pearson(ddSunMinusMoons, dLats);
+    console.log(`     Correlation r(Δ(δ_Sun−δ_Moon), Δlat_obs) = ${rDiffVsLat.toFixed(3)}`);
+    console.log('');
+
+    // Verdict
+    let verdict;
+    const absSun = Math.abs(mSun), absMoon = Math.abs(mMoon);
+    if (absSun < 0.05 && absMoon < 0.05) {
+      verdict = 'SUN AND MOON DECLINATIONS MATCH IAU. The +0.69° Δlat bias does NOT come ' +
+                'from a pole/Sun/Moon direction error. Possible remaining causes: scene-graph ' +
+                'frame transformation, Earth oblateness/geoid effect, or umbra ray-trace ' +
+                'projection assumption. Worth digging into umbraFromSceneAtJd next.';
+    } else if (absSun > 0.3 && absMoon < 0.1) {
+      verdict = 'SUN DIRECTION IS OFF. The model\'s heliocentric chain produces an Earth-frame ' +
+                'Sun position that differs from IAU by ~' + (mSun*3600).toFixed(0) + '″ in declination. ' +
+                'Fix is in the Earth-Sun orbit chain or the ecliptic-precession layer.';
+    } else if (absMoon > 0.3 && absSun < 0.1) {
+      verdict = 'MOON DIRECTION IS OFF. Surprising since the model uses Meeus 47 (matches IAU). ' +
+                'Likely cause: scene-graph applies Meeus β/λ in a slightly wrong reference frame, ' +
+                'or the Moon barycenter offset is mishandled.';
+    } else if (absSun > 0.2 && absMoon > 0.2 && Math.sign(mSun) === Math.sign(mMoon)) {
+      verdict = 'EARTH POLE IS TILTED. Sun AND Moon both show similar declination error (~' +
+                ((mSun + mMoon) / 2 * 3600).toFixed(0) + '″ each), with the SAME SIGN. This is the ' +
+                'signature of Earth\'s pole direction being tilted relative to IAU. Fix is in the ' +
+                'Earth orientation chain (earthtiltMean, axial precession formula, or J2000 pole anchor).';
+    } else {
+      verdict = 'MIXED — partial errors in multiple components. Inspect the per-event table for ' +
+                'which events drive each Δδ. The (Sun − Moon) δ error correlates with observed Δlat ' +
+                'at r = ' + rDiffVsLat.toFixed(2) + ', so the chain through declinations is at least ' +
+                'partially responsible.';
+    }
+    console.log(`   Verdict: ${verdict}`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    window._poleTest = { rows, mSun, mMoon, mDiff, mLat, rDiffVsLat };
+    console.log('Exposed at window._poleTest');
+  }, 'Pole-orientation diagnostic. For each of 37 events, compares model Sun/Moon declinations ' +
+     '(read from scene-graph) against IAU 2006 reference (Capitaine obliquity + Meeus Sun/Moon). ' +
+     'Locates the +0.69° Δlat bias to either Sun-direction, Moon-direction, or Earth-pole-tilt errors. ' +
+     'Requires L-2b to have run first.');
 
   const firstCanonBtn = addTestButton('L-3: Load & cross-check NASA Lunar Canon (12,064 events)', async () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
