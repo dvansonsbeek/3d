@@ -88,6 +88,8 @@ const STEPS = [
     cmd: 'node tools/fit/year-length-harmonics.js --write --type sidereal' },
   { id: '6e', phase: 2, name: 'Anomalistic year harmonics',
     cmd: 'node tools/fit/year-length-harmonics.js --write --type anomalistic' },
+  { id: '6f', phase: 2, name: 'Sun longitude harmonics (model − Meeus residual)',
+    cmd: 'node tools/fit/sun-longitude-harmonics.js --write' },
 
   // Phase 5b: Eccentricity amplitudes & balance law verification
   { id: '7a', phase: 2, name: 'Derive eccentricity amplitudes',

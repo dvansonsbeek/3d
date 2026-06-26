@@ -223,6 +223,14 @@ replaceArray('PERI_HARMONICS', fc.PERI_HARMONICS_RAW, fmtPeriHarmonics);
 // B4. Obliquity harmonics
 replaceArray('OBLIQUITY_HARMONICS', fc.SOLSTICE_OBLIQUITY_HARMONICS, fmtHarmonics3);
 
+// B4b. Sun longitude harmonics (model − Meeus residual)
+if (fc.SUN_LONGITUDE_MEAN !== undefined) {
+  replaceConst('SUN_LONGITUDE_MEAN', fc.SUN_LONGITUDE_MEAN);
+}
+if (fc.SUN_LONGITUDE_HARMONICS) {
+  replaceArray('SUN_LONGITUDE_HARMONICS', fc.SUN_LONGITUDE_HARMONICS, fmtHarmonics3);
+}
+
 // B5a. Cardinal point anchors
 if (fc.CARDINAL_POINT_ANCHORS_ADJUSTED) {
   const a = fc.CARDINAL_POINT_ANCHORS_ADJUSTED;

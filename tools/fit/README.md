@@ -19,6 +19,7 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-solar-measurements.csv` |
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
 | `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/02-solar-measurements.csv` |
+| `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (3 H-lattice terms) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV) |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |
 | `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
@@ -59,6 +60,13 @@ When model parameters change, refit in this order. The logic:
    obliquity mean; the second pass ensures all downstream steps use the
    corrected value. In practice the effect is small (~1.5" obliquity shift),
    but a second pass guarantees convergence.
+9. `SUN_LONGITUDE_HARMONICS` (Step 6f) also feeds back into the scene graph
+   via `moveModel`'s Sun branch, alongside the in-scene Sun T² polynomial
+   correction (Meeus Ch.25 +0.0003032°/T², not pipeline-fitted —
+   inlined directly in `moveModel`). Both shift the scene Sun, which means
+   the planet correction stack (Steps 5a, 5b) becomes slightly stale and
+   benefits from a follow-up rerun. Same convergence rationale as Step 6b
+   applies: two passes guarantee self-consistency.
 
 ```
 ── Phase 1: Sun optimizer & planet alignment ──────────────────────
@@ -192,6 +200,31 @@ Step 6d: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_
          anomalistic 0.002s over full H.
          Updates: fitted-coefficients.json (auto-updated by script)
 
+Step 6f: sun-longitude-harmonics.js           → SUN_LONGITUDE_MEAN + SUN_LONGITUDE_HARMONICS
+         Fits a 3-term H-lattice harmonic correction Δλ(t) to the residual
+         between the scene-graph Sun and the Meeus Ch.25 reference Sun.
+         Captures EoC residuals the analytical 2e·sin(M) + 1.25e²·sin(2M)
+         misses. Default fit range: ±100 yr around J2000 (modern eclipses).
+         RMSE 7.2" over 2400 points; ±3" at problem-eclipse dates (L-2h).
+         J2000-anchored: correction at J2000 exactly reproduces measured Δλ.
+         Updates: fitted-coefficients.json (auto-updated by script)
+         Pairs with the in-scene Sun T² polynomial correction
+         (0.0003032°/T², applied directly in moveModel for both
+         src/script.js and tools/lib/scene-graph.js — root-cause fix
+         that captures the secular drift linear scene motion misses).
+         Diagnostic buttons L-2b/L-2g/L-2h in the browser verify the
+         combined fix; expected: eclipse path RMS drops, finder timing
+         offset collapses, modern angular positions match IAU to ~3".
+         Standalone use:
+           node tools/fit/sun-longitude-harmonics.js              # dry run
+           node tools/fit/sun-longitude-harmonics.js --range 500  # ±500 yr
+           node tools/fit/sun-longitude-harmonics.js --write      # persist
+         CAVEAT: changing the scene Sun (T² or harmonics) shifts what the
+         planet correction stack (Steps 5a, 5b) sees. After running this
+         step, refit 5a/5b to close any planet baseline regressions —
+         Venus and Saturn are the most sensitive (inner+outer that lean
+         hardest on Sun-relative geometry in the correction stack).
+
 ── Phase 5b: Eccentricity amplitudes & balance law verification ──
 
 Step 7a: derive-eccentricity-amplitudes.js    → verification only (no output)
@@ -289,8 +322,10 @@ The cardinal-point-derived tropical year (Step 6c) is the authoritative runtime 
 | `earthtiltMean` | 1, 3→4d, 6a→6d |
 | `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a→6d |
 | `earthInvPlaneInclinationMean` | 3, 6a→6d |
-| `correctionSun` | 1, 6a→6d |
-| `eccentricityBase` / `eccentricityAmplitude` | 1, 3→4a, 6a→6d |
+| `correctionSun` | 1, 6a→6f |
+| `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | 6f, then 5a, 5b (shifts scene Sun → planet stack drifts) |
+| Sun T² polynomial coefficient (inline in `moveModel`) | 6f, then 5a, 5b (same cascade as SUN_LONGITUDE_HARMONICS) |
+| `eccentricityBase` / `eccentricityAmplitude` | 1, 3→4a, 6a→6f |
 | `correctionDays` | 3, 6a→6d |
 | `useVariableSpeed` | ALL (1→10) |
 | Planet `startpos` | 2 (re-solve angleCorrection), 5 |
@@ -376,6 +411,11 @@ node tools/fit/export-solar-measurements.js                                  # S
 node tools/fit/obliquity-harmonics.js --write                                # Step 6b
 node tools/fit/cardinal-point-harmonics.js --write                           # Step 6c
 node tools/fit/year-length-harmonics.js --write                              # Step 6d
+node tools/fit/sun-longitude-harmonics.js --write                            # Step 6f (~1 sec)
+# NOTE: After Step 6f, re-run 5a + 5b to re-fit planet corrections against
+# the (now slightly-shifted) scene Sun. Skipping leaves a Venus/Saturn ~14"
+# baseline regression (small but real). 6f itself is fast (~1 sec) and
+# improves modern eclipse accuracy by 50× at problem dates.
 
 # Phase 5b: Balance law verification
 node tools/verify/balance-search.js                                          # Step 7b (balance presets)

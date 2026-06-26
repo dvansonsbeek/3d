@@ -2975,6 +2975,34 @@ const OBLIQUITY_HARMONICS = [
   [27, -0.000001,  0.000004], [32,  0.000000, -0.000001],
 ];
 
+// ─── B4b. Sun longitude harmonics (fitted) ───────────────────────────────
+// Source: public/input/fitted-coefficients.json (tools/fit/sun-longitude-harmonics.js)
+// Periodic correction Δλ(t) added to model Sun longitude to bring it onto
+// the Meeus high-precision Sun. J2000-anchored: correction at J2000 equals
+// the measured Δλ at J2000 exactly. Divisors are H/N (period = H/N years).
+// First three terms = year-period EoC residuals (1 yr, ½ yr, ⅓ yr).
+const SUN_LONGITUDE_MEAN = -0.0011220252422476165;
+const SUN_LONGITUDE_HARMONICS = [
+  [335317,  0.076405,  0.013550], [670634,  0.002478,  0.000226],
+  [1005951,  0.000033,  0.000009], [168,  0.004832, -0.004998],
+];
+
+// Sun ecliptic longitude correction Δλ(jd) in degrees. Add −Δλ to the Sun's
+// scene-graph angle so the corrected longitude matches Meeus high-precision
+// Sun to ~3″ over 1900-2100. Year/balancedYear convention matches the fitter
+// (tools/fit/sun-longitude-harmonics.js): year = 2000 + (jd − j2000JD)/365.25.
+// References balancedYear + holisticyearLength resolved at call time.
+function sunLongitudeCorrection(jd) {
+  const year = 2000 + (jd - j2000JD) / 365.25;
+  const t = year - balancedYear;
+  let corr = SUN_LONGITUDE_MEAN;
+  for (const h of SUN_LONGITUDE_HARMONICS) {
+    const phase = 2 * Math.PI * t / (holisticyearLength / h[0]);
+    corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
+  }
+  return corr;
+}
+
 // ─── B5. Cardinal point harmonics (fitted) ───────────────────────────────
 // Source: public/input/fitted-coefficients.json
 const CARDINAL_POINT_ANCHORS = {
@@ -5092,6 +5120,64 @@ function findSolarEclipsesInRange(jdStart, jdEnd) {
     return d;
   };
 
+  // Geocentric γ (Earth-radii) at JD: perpendicular distance from Earth's
+  // center to the line through the Sun and Moon. NASA's "greatest eclipse"
+  // TD is the moment of MINIMUM γ — which differs from ecliptic-longitude
+  // conjunction (above) by typically 5-15 min, because at conjunction the
+  // Moon may still be moving in β-direction such that the axis keeps
+  // approaching Earth for a few more minutes. Bisecting on conjDiff alone
+  // would miss NASA TD by exactly that offset; refining for min γ here
+  // matches the NASA Five Millennium Canon convention.
+  const _d2r = Math.PI / 180;
+  const gammaAtJd = (jd) => {
+    const sunLonR  = _eclSunLon(jd)   * _d2r;
+    const moonLonR = _eclMoonLon(jd)  * _d2r;
+    const moonBetR = _eclMoonBeta(jd) * _d2r;
+    const D_moon = _eclMoonDistance(jd);
+    const D_sun  = D_SUN_KM;
+    const sX = D_sun * Math.cos(sunLonR),  sY = D_sun * Math.sin(sunLonR);
+    const cb = Math.cos(moonBetR);
+    const mX = D_moon * cb * Math.cos(moonLonR);
+    const mY = D_moon * cb * Math.sin(moonLonR);
+    const mZ = D_moon * Math.sin(moonBetR);
+    const dX = mX - sX, dY = mY - sY, dZ = mZ;
+    const dLen = Math.sqrt(dX*dX + dY*dY + dZ*dZ);
+    const ux = dX/dLen, uy = dY/dLen, uz = dZ/dLen;
+    // Perpendicular distance from origin (Earth center) to line through Moon along u
+    const proj = mX*ux + mY*uy + mZ*uz;
+    const perpX = mX - proj*ux, perpY = mY - proj*uy, perpZ = mZ - proj*uz;
+    return Math.sqrt(perpX*perpX + perpY*perpY + perpZ*perpZ) / R_EARTH_KM;
+  };
+
+  // Refine conjunction-JD to true min-γ JD. Coarse 1-min scan over ±20 min
+  // around conjunction (which bounds the conjunction-vs-greatest offset for
+  // any real eclipse), then parabolic interpolation on the 3 points around
+  // the discrete minimum for sub-minute precision in a single extra eval.
+  const refineMinGamma = (jdConj) => {
+    const stepMin = 1 / (24 * 60);
+    let bestJD = jdConj, bestG = gammaAtJd(jdConj);
+    for (let dt = -20; dt <= 20; dt++) {
+      if (dt === 0) continue;
+      const jd = jdConj + dt * stepMin;
+      const g = gammaAtJd(jd);
+      if (g < bestG) { bestG = g; bestJD = jd; }
+    }
+    // Parabolic refinement on the 3 samples bracketing bestJD
+    const yL = gammaAtJd(bestJD - stepMin);
+    const y0 = bestG;
+    const yR = gammaAtJd(bestJD + stepMin);
+    const denom = yL - 2*y0 + yR;
+    if (Math.abs(denom) > 1e-15) {
+      const delta = 0.5 * (yL - yR) / denom;  // fractional offset in [-1, +1]
+      if (Math.abs(delta) < 1) {
+        const refinedJD = bestJD + delta * stepMin;
+        const refinedG = gammaAtJd(refinedJD);
+        if (refinedG < bestG) return refinedJD;
+      }
+    }
+    return bestJD;
+  };
+
   const results = [];
   let prevJD   = jdStart;
   let prevDiff = conjDiff(prevJD);
@@ -5099,7 +5185,7 @@ function findSolarEclipsesInRange(jdStart, jdEnd) {
   for (let jd = jdStart + STEP_DAYS; jd <= jdEnd; jd += STEP_DAYS) {
     const d = conjDiff(jd);
     if (prevDiff < 0 && d >= 0 && (d - prevDiff) < 30) {
-      // Bisect to ~1-second precision
+      // Bisect to ~1-second precision on conjunction (Moon-Sun longitude alignment)
       let lo = prevJD, hi = jd;
       for (let i = 0; i < 40; i++) {
         const mid = (lo + hi) / 2;
@@ -5107,9 +5193,11 @@ function findSolarEclipsesInRange(jdStart, jdEnd) {
         if (hi - lo < 1 / 86400) break;
       }
       const jdConj = (lo + hi) / 2;
-      const beta   = _eclMoonBeta(jdConj);
+      // Refine to NASA's "greatest eclipse" convention (minimum γ).
+      const jdGreatest = refineMinGamma(jdConj);
+      const beta   = _eclMoonBeta(jdGreatest);
       const absB   = Math.abs(beta);
-      const D_moon = _eclMoonDistance(jdConj);
+      const D_moon = _eclMoonDistance(jdGreatest);
       const G      = _solarGeometry(D_moon);
 
       let type = null;
@@ -5121,7 +5209,7 @@ function findSolarEclipsesInRange(jdStart, jdEnd) {
 
       if (type) {
         results.push({
-          jd:               jdConj,
+          jd:               jdGreatest,
           beta:             beta,
           moonDistance_km:  D_moon,
           type:             type,
@@ -32703,6 +32791,559 @@ function setupGUI() {
      'dominant residual source (intrinsic to model design). Weak correlation means the residuals ' +
      'come from elsewhere (Moon RA error or systematic frame issue). Requires L-2b to have run first.');
 
+  // ──────────────────────────────────────────────────────────────────────────
+  // L-2g: Match-the-moments — is the residual TIMING or PATH GEOMETRY?
+  //
+  // L-2b compared model umbra at NASA-TD-JD against NASA's published coords
+  // and found ~460 km residual at 2026 Aug 12 (and similar at other high-γ).
+  // L-2b's "Best ΔUT" sweep found that for 2026, the model umbra was closest
+  // to NASA's coord at NASA-TD − 7 min, not at NASA-TD itself.
+  //
+  // Window A of the L-2 button also reports: model identifies the 2026 eclipse
+  // at JD 2461265.235 (17:38:26 UT), but NASA Canon's TD is JD 2461265.241042
+  // (17:47:06 TD). Difference: 8.6 minutes.
+  //
+  // NASA's "greatest eclipse" is defined as the instant when the shadow axis
+  // passes closest to Earth's center. If model and NASA disagree on WHICH JD
+  // that is by 8.6 min, we've been comparing model umbra at one moment to
+  // NASA umbra at a DIFFERENT moment of the same path — that's not a position
+  // residual, it's a TIMING residual.
+  //
+  // This button decouples the two by:
+  //   1. Using findSolarEclipsesInRange to find the MODEL'S OWN greatest-
+  //      eclipse JD near each event's NASA TD
+  //   2. Reading model umbra at THAT JD (model's idea of greatest)
+  //   3. Comparing to NASA's published coord (NASA's idea of greatest)
+  //   4. Reporting timing offset (model greatest − NASA TD) AND path-geometry
+  //      residual (distance from model umbra@model-greatest to NASA coord)
+  //
+  // Interpretation tree:
+  //   • Several-minute timing offsets, SMALL path residuals (< 50 km) →
+  //     model's umbra PATH matches NASA, just time-shifted. The fix is to
+  //     reconcile when each calls "greatest" (NOT in the umbra geometry).
+  //   • Several-minute timing offsets, LARGE path residuals → both issues
+  //     exist independently. Path geometry needs separate investigation.
+  //   • Near-zero timing offsets, LARGE path residuals → path is genuinely
+  //     shifted geometrically; investigation continues on Sun-Moon-Earth.
+  //
+  // Requires L-2b to have run first (uses window._nodalTest for the NASA
+  // TD JDs and published coords).
+  // ──────────────────────────────────────────────────────────────────────────
+  addTestButton('L-2g: Match-the-moments — is the residual TIMING or PATH GEOMETRY?', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-2g: match model\'s greatest-eclipse moment to NASA\'s, then compare positions');
+    console.log('  ');
+    console.log('  Decouples timing from path geometry. For each of 37 events:');
+    console.log('    (1) Find model\'s own greatest eclipse JD near NASA TD (via findSolarEclipsesInRange)');
+    console.log('    (2) Read model umbra at MODEL\'s greatest JD');
+    console.log('    (3) Compare to NASA coord — distance = path-geometry residual');
+    console.log('    (4) Timing offset = model greatest JD − NASA TD');
+    console.log('  ');
+    console.log('  Requires L-2b to have run first.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    if (!window._nodalTest || !window._nodalTest.events || window._nodalTest.events.length === 0) {
+      console.log('   ERROR: Run L-2b first.');
+      return;
+    }
+
+    const eventList = window._nodalTest.events.filter(e => e.dLat !== null);
+    const rows = [];
+    const _saveJD = o.julianDay;
+    const _t0 = performance.now();
+
+    try {
+      for (const evt of eventList) {
+        // Reconstruct NASA coord from L-2b's stored Δlat/Δlon and best-fit model umbra
+        const nasaLat = evt.modelLat - evt.dLat;
+        const nasaLon = evt.modelLon - evt.dLon;
+
+        // (1) Find model's nearest eclipse JD to NASA TD (within ±1 day)
+        let modelGreatestJD = NaN;
+        try {
+          const events = findSolarEclipsesInRange(evt.jd - 1, evt.jd + 1);
+          let minAbs = Infinity;
+          for (const e of events) {
+            const dt = Math.abs(e.jd - evt.jd);
+            if (dt < minAbs) { minAbs = dt; modelGreatestJD = e.jd; }
+          }
+        } catch (e) { /* no events found */ }
+
+        if (!isFinite(modelGreatestJD)) {
+          rows.push({ label: evt.label, jd_nasa: evt.jd, jd_model: NaN, timing_min: NaN,
+            modelLat: NaN, modelLon: NaN, nasaLat, nasaLon, pathGC: NaN, l2bGC: evt.gc });
+          continue;
+        }
+
+        // (2) Read model umbra at MODEL's greatest moment
+        const um = umbraFromSceneAtJd(modelGreatestJD);
+        if (um === null) {
+          rows.push({ label: evt.label, jd_nasa: evt.jd, jd_model: modelGreatestJD,
+            timing_min: (modelGreatestJD - evt.jd) * 24 * 60,
+            modelLat: NaN, modelLon: NaN, nasaLat, nasaLon, pathGC: NaN, l2bGC: evt.gc });
+          continue;
+        }
+
+        // (3, 4) Compute residuals
+        const timing_min = (modelGreatestJD - evt.jd) * 24 * 60;
+        const pathGC = gcKmFromLatLon(nasaLat, nasaLon, um.lat, um.lon);
+
+        rows.push({
+          label: evt.label, jd_nasa: evt.jd, jd_model: modelGreatestJD,
+          timing_min,
+          modelLat: um.lat, modelLon: um.lon, nasaLat, nasaLon,
+          pathGC, l2bGC: evt.gc,
+        });
+      }
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
+    }
+
+    // Get γ from window._gammaTest if available (sort high-γ first)
+    const gammaByJd = (window._gammaTest && window._gammaTest.rows)
+      ? Object.fromEntries(window._gammaTest.rows.map(r => [r.jd, r.gamma]))
+      : null;
+    if (gammaByJd) {
+      for (const r of rows) r.gamma = gammaByJd[r.jd_nasa];
+    }
+    rows.sort((a, b) => (b.gamma || 0) - (a.gamma || 0));  // descending γ if available
+
+    console.log('   Per-event table (sorted by γ descending if L-2f run, else by event order):');
+    console.log('   ' + 'Eclipse'.padEnd(50) + ' γ      Δt (min)   Path GC   L-2b GC   Improvement');
+    console.log('   ' + '─'.repeat(115));
+    for (const r of rows) {
+      const gStr = (r.gamma !== undefined && !isNaN(r.gamma)) ? r.gamma.toFixed(3).padStart(6) : ' n/a ';
+      const dtStr = isNaN(r.timing_min) ? ' n/a  ' : ((r.timing_min >= 0 ? '+' : '') + r.timing_min.toFixed(1)).padStart(8);
+      const pStr = isNaN(r.pathGC) ? ' n/a   ' : r.pathGC.toFixed(0).padStart(5) + ' km';
+      const l2bStr = r.l2bGC.toFixed(0).padStart(5) + ' km';
+      const impr = (r.l2bGC - r.pathGC);
+      const imprStr = isNaN(impr) ? ' n/a    ' : ((impr >= 0 ? '+' : '') + impr.toFixed(0)).padStart(5) + ' km';
+      const sign = isNaN(impr) ? '' : (impr > 30 ? '✓ better' : impr < -30 ? '✗ worse' : '~ same');
+      console.log('   ' + r.label.padEnd(50) + gStr + '  ' + dtStr + '   ' + pStr + '   ' + l2bStr + '   ' + imprStr + '   ' + sign);
+    }
+
+    // Statistics
+    const valid = rows.filter(r => !isNaN(r.timing_min) && !isNaN(r.pathGC));
+    const mean = arr => arr.length > 0 ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+    const std  = (arr, m) => arr.length > 0 ? Math.sqrt(arr.reduce((a,b)=>a+(b-m)**2,0)/arr.length) : 0;
+
+    const timings = valid.map(r => r.timing_min);
+    const absTimings = valid.map(r => Math.abs(r.timing_min));
+    const pathGCs = valid.map(r => r.pathGC);
+    const l2bGCs = valid.map(r => r.l2bGC);
+
+    const mTime = mean(timings), sTime = std(timings, mTime);
+    const mAbsTime = mean(absTimings);
+    const mPath = mean(pathGCs);
+    const mL2b = mean(l2bGCs);
+
+    const highG = valid.filter(r => r.gamma !== undefined && r.gamma > 0.85);
+    const lowG  = valid.filter(r => r.gamma !== undefined && r.gamma <= 0.85);
+
+    console.log('   ' + '─'.repeat(115));
+    console.log(`   Statistics (n=${valid.length} valid events):`);
+    console.log('');
+    console.log(`   Timing offset (model greatest − NASA TD):`);
+    console.log(`     mean = ${(mTime >= 0 ? '+' : '') + mTime.toFixed(2)} min,  std = ${sTime.toFixed(2)} min,  mean |Δt| = ${mAbsTime.toFixed(2)} min`);
+    console.log('');
+    console.log(`   Path-geometry residual:`);
+    console.log(`     mean (this test, match-the-moments) = ${mPath.toFixed(0)} km`);
+    console.log(`     mean (L-2b, NASA-TD ± 2h sweep)      = ${mL2b.toFixed(0)} km`);
+    console.log(`     mean improvement (L-2b − this test)  = ${(mL2b - mPath).toFixed(0)} km`);
+    console.log('');
+    if (highG.length > 0) {
+      const hPath = mean(highG.map(r => r.pathGC));
+      const hL2b = mean(highG.map(r => r.l2bGC));
+      console.log(`   High-γ events (γ > 0.85, n=${highG.length}):`);
+      console.log(`     mean Path GC = ${hPath.toFixed(0)} km   |   L-2b mean = ${hL2b.toFixed(0)} km   |   diff = ${(hL2b - hPath).toFixed(0)} km`);
+    }
+    if (lowG.length > 0) {
+      const lPath = mean(lowG.map(r => r.pathGC));
+      const lL2b = mean(lowG.map(r => r.l2bGC));
+      console.log(`   Low-γ events  (γ ≤ 0.85, n=${lowG.length}):`);
+      console.log(`     mean Path GC = ${lPath.toFixed(0)} km   |   L-2b mean = ${lL2b.toFixed(0)} km   |   diff = ${(lL2b - lPath).toFixed(0)} km`);
+    }
+    console.log('');
+
+    // Verdict
+    let verdict;
+    if (mAbsTime > 3 && mPath < 100 && mL2b - mPath > 100) {
+      verdict = 'TIMING-DOMINATED. Path geometry matches NASA well (mean ' + mPath.toFixed(0) + ' km, ' +
+                'vs L-2b\'s ' + mL2b.toFixed(0) + ' km). Model and NASA disagree on WHICH MOMENT is ' +
+                'greatest (mean |Δt| = ' + mAbsTime.toFixed(1) + ' min). The fix is in how the model ' +
+                'identifies the "greatest eclipse" moment — NOT in the umbra geometry. Next step: ' +
+                'investigate why findSolarEclipsesInRange picks a different JD than NASA Canon.';
+    } else if (mAbsTime > 3 && mPath > 200) {
+      verdict = 'BOTH TIMING AND PATH ARE OFF. Timing offset of ' + mAbsTime.toFixed(1) + ' min plus ' +
+                'remaining path residual of ' + mPath.toFixed(0) + ' km. Two separate issues. Fix ' +
+                'timing first, then look at path geometry.';
+    } else if (mAbsTime < 1 && mPath > 200) {
+      verdict = 'PATH-GEOMETRY ISSUE. Timing matches NASA well (|Δt| = ' + mAbsTime.toFixed(2) +
+                ' min) but model umbra at model\'s greatest still differs from NASA umbra at NASA\'s ' +
+                'greatest by ' + mPath.toFixed(0) + ' km. This is a real geometric path residual; ' +
+                'investigate Sun/Moon angular velocity or Earth pole orientation rate.';
+    } else if (mPath < 100) {
+      verdict = 'MATCHES NASA. Model umbra at its own greatest moment is within ~' + mPath.toFixed(0) +
+                ' km of NASA. The L-2b residuals were entirely about comparing at different moments. ' +
+                'Both this test and L-2b\'s ±2h sweep give similar results because the sweep finds ' +
+                'roughly the same model-greatest moment that this test computes directly.';
+    } else {
+      verdict = 'MIXED — inspect per-event table for the pattern.';
+    }
+    console.log(`   Verdict: ${verdict}`);
+    console.log(`   Runtime: ${((performance.now() - _t0) / 1000).toFixed(1)} s`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    window._matchMomentsTest = { rows, valid, mTime, sTime, mAbsTime, mPath, mL2b };
+    console.log('Exposed at window._matchMomentsTest');
+  }, 'Match-the-moments diagnostic. For each of 37 events, finds model\'s own greatest eclipse JD ' +
+     '(via findSolarEclipsesInRange) and reads the model umbra at THAT moment, then compares to NASA\'s ' +
+     'published coord. Decouples timing offset from path-geometry residual. Tells us whether the L-2b ' +
+     'residuals come from "wrong moment" or "wrong place". Requires L-2b to have run first.');
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // L-2h: At MODEL's true min-γ JD, compare model Sun/Moon angular positions
+  //       against IAU/Meeus reference at the SAME JD.
+  //
+  // L-2g (match-the-moments) showed model and NASA disagree on which moment
+  // is "greatest" by 5-9 min on average. That timing imprecision is in
+  // findSolarEclipsesInRange. This test answers a separate question:
+  //
+  //   AT the moment model identifies as truly minimum-γ (refined to sub-min
+  //   precision via parabolic interpolation around the coarse minimum),
+  //   how well do model's Sun/Moon angular positions match IAU's?
+  //
+  // If they match to L-2d-level precision (~50″ Sun, ~3″ Moon), the model
+  // is internally consistent at its own greatest moment, and the geometric
+  // path residual we've been chasing must come from something OTHER than
+  // Sun/Moon position errors at the model-identified greatest moment.
+  //
+  // If they DIFFER significantly, the model is identifying "greatest" at a
+  // moment where its own Sun/Moon are off from IAU — confirming a real
+  // angular-position root cause we'd need to chase.
+  //
+  // Reports six diff quantities per event (frame-independent):
+  //   • ΔDec_Sun, ΔDec_Moon (model vs IAU at model_greatest_JD)
+  //   • Δseparation (Sun-Moon 3D angular separation)
+  //   • Δ(RA_Moon − RA_Sun) — equatorial-plane RA difference between Sun and
+  //     Moon (frame-independent: same answer in any orthonormal frame)
+  //   • Δγ (perpendicular distance from Earth center to Sun-Moon axis, /R_E)
+  //   • Timing offset: model_greatest_JD − NASA_TD
+  //
+  // Requires L-2b to have run first (uses window._nodalTest for NASA TDs).
+  // Uses ITS OWN parallel refined min-γ finder — does NOT touch production
+  // findSolarEclipsesInRange.
+  // ──────────────────────────────────────────────────────────────────────────
+  addTestButton('L-2h: At model\'s true min-γ JD, compare Sun/Moon angular positions vs IAU', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-2h: refined min-γ + Sun/Moon angular position comparison');
+    console.log('  ');
+    console.log('  For each event:');
+    console.log('    (1) Scan model γ at sub-minute precision around NASA TD; find true min-γ JD');
+    console.log('    (2) Read model Sun/Moon angular positions at that JD (from scene)');
+    console.log('    (3) Compute IAU Sun/Moon angular positions at the SAME JD (Meeus)');
+    console.log('    (4) Report frame-independent differences');
+    console.log('  ');
+    console.log('  Requires L-2b to have run first.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    if (!window._nodalTest || !window._nodalTest.events || window._nodalTest.events.length === 0) {
+      console.log('   ERROR: Run L-2b first.');
+      return;
+    }
+
+    const _d2r = Math.PI / 180;
+    const _r2d = 180 / Math.PI;
+
+    // ── Parallel refined min-γ finder ─────────────────────────────────────
+    // Coarse: 1-min steps over ±30 min. Then parabolic interpolation on the 3
+    // values around the coarse minimum gives sub-minute precision in 1 more
+    // evaluation. Total: 61 scene navigations per event.
+    const _scratchSun  = new THREE.Vector3();
+    const _scratchMoon = new THREE.Vector3();
+    const _scratchEarth = new THREE.Vector3();
+    const _scratchMoonGeo = new THREE.Vector3();
+    const _scratchSunGeo  = new THREE.Vector3();
+    const _scratchDir = new THREE.Vector3();
+
+    function computeModelGammaAtJd(jd) {
+      jumpToJulianDay(jd);
+      forceSceneUpdate('light');
+      sun  .planetObj.getWorldPosition(_scratchSun);
+      moon .planetObj.getWorldPosition(_scratchMoon);
+      earth.planetObj.getWorldPosition(_scratchEarth);
+      _scratchMoonGeo.copy(_scratchMoon).sub(_scratchEarth);
+      _scratchSunGeo .copy(_scratchSun ).sub(_scratchEarth);
+      _scratchDir    .copy(_scratchMoonGeo).sub(_scratchSunGeo).normalize();
+      const R_E = earth.size;
+      const MdotD = _scratchMoonGeo.dot(_scratchDir);
+      const MdotM = _scratchMoonGeo.dot(_scratchMoonGeo);
+      const perpSq = MdotM - MdotD * MdotD;
+      const perp = perpSq > 0 ? Math.sqrt(perpSq) : 0;
+      return perp / R_E;
+    }
+
+    function refinedMinGammaJd(jdCenter) {
+      const coarseStep = 1 / (24 * 60);     // 1 min in days
+      const coarseHalfWin = 30 / (24 * 60); // ±30 min
+      const samples = [];
+      for (let dt = -coarseHalfWin; dt <= coarseHalfWin + 1e-9; dt += coarseStep) {
+        const jd = jdCenter + dt;
+        samples.push({ jd, gamma: computeModelGammaAtJd(jd) });
+      }
+      let minIdx = 0;
+      for (let i = 1; i < samples.length; i++) {
+        if (samples[i].gamma < samples[minIdx].gamma) minIdx = i;
+      }
+      // Parabolic refinement if minimum is interior.
+      if (minIdx > 0 && minIdx < samples.length - 1) {
+        const y0 = samples[minIdx - 1].gamma, y1 = samples[minIdx].gamma, y2 = samples[minIdx + 1].gamma;
+        const denom = y0 - 2*y1 + y2;
+        if (Math.abs(denom) > 1e-15) {
+          const delta = 0.5 * (y0 - y2) / denom;  // fractional step in [-1, +1]
+          const refinedJd = samples[minIdx].jd + delta * coarseStep;
+          const refinedGamma = computeModelGammaAtJd(refinedJd);
+          if (refinedGamma < samples[minIdx].gamma) {
+            return { jd: refinedJd, gamma: refinedGamma };
+          }
+        }
+      }
+      return { jd: samples[minIdx].jd, gamma: samples[minIdx].gamma };
+    }
+
+    // ── Model angular position extractor ──────────────────────────────────
+    // At the current scene state (caller is responsible for navigating to JD),
+    // compute Sun/Moon Dec, Sun-Moon angular separation, Sun-Moon equatorial
+    // ΔRA (all frame-independent), and γ.
+    const _earthQuat = new THREE.Quaternion();
+    const _polelocal = new THREE.Vector3(0, 1, 0);
+    const _poleworld = new THREE.Vector3();
+    const _sunDir = new THREE.Vector3();
+    const _moonDir = new THREE.Vector3();
+    const _sunEq  = new THREE.Vector3();
+    const _moonEq = new THREE.Vector3();
+    const _tmp = new THREE.Vector3();
+
+    function modelAngularPositions() {
+      sun  .planetObj.getWorldPosition(_scratchSun);
+      moon .planetObj.getWorldPosition(_scratchMoon);
+      earth.planetObj.getWorldPosition(_scratchEarth);
+      earth.planetObj.getWorldQuaternion(_earthQuat);
+
+      _poleworld.copy(_polelocal).applyQuaternion(_earthQuat).normalize();
+      _sunDir.copy(_scratchSun ).sub(_scratchEarth).normalize();
+      _moonDir.copy(_scratchMoon).sub(_scratchEarth).normalize();
+
+      // Dec = 90° − angle from pole = arcsin(direction · pole)
+      const decSun  = Math.asin(Math.max(-1, Math.min(1, _sunDir.dot(_poleworld)))) * _r2d;
+      const decMoon = Math.asin(Math.max(-1, Math.min(1, _moonDir.dot(_poleworld)))) * _r2d;
+
+      // Sun-Moon 3D angular separation
+      const cosSep = Math.max(-1, Math.min(1, _sunDir.dot(_moonDir)));
+      const sep    = Math.acos(cosSep) * _r2d;
+
+      // Sun-Moon RA difference (equatorial-plane projections)
+      _sunEq .copy(_sunDir ).sub(_tmp.copy(_poleworld).multiplyScalar(_sunDir.dot(_poleworld))).normalize();
+      _moonEq.copy(_moonDir).sub(_tmp.copy(_poleworld).multiplyScalar(_moonDir.dot(_poleworld))).normalize();
+      const cosRaDiff = Math.max(-1, Math.min(1, _sunEq.dot(_moonEq)));
+      // Signed RA diff: positive if Moon is east of Sun in equatorial plane.
+      // Sign = sign of (sunEq × moonEq) · poleDir
+      _tmp.crossVectors(_sunEq, _moonEq);
+      const signRaDiff = Math.sign(_tmp.dot(_poleworld));
+      const raDiff = signRaDiff * Math.acos(cosRaDiff) * _r2d;
+
+      return { decSun, decMoon, sep, raDiff };
+    }
+
+    // ── IAU angular positions via Meeus ───────────────────────────────────
+    function iauObliquityDeg(jd) {
+      const T = (jd - 2451545.0) / 36525;
+      const arcsec = 84381.406 - 46.836769 * T - 0.0001831 * T*T + 0.00200340 * T*T*T;
+      return arcsec / 3600;
+    }
+    function eclToRaDecRad(lambda_deg, beta_deg, eps_deg) {
+      const l = lambda_deg * _d2r, b = beta_deg * _d2r, e = eps_deg * _d2r;
+      const ra  = Math.atan2(Math.sin(l) * Math.cos(e) - Math.tan(b) * Math.sin(e), Math.cos(l));
+      const dec = Math.asin(Math.sin(b) * Math.cos(e) + Math.cos(b) * Math.sin(e) * Math.sin(l));
+      return { ra, dec };
+    }
+    function iauAngularPositions(jd) {
+      const eps = iauObliquityDeg(jd);
+      const sunLon = _eclSunLon(jd);
+      const moonLon = _eclMoonLon(jd);
+      const moonBeta = _eclMoonBeta(jd);
+      const sunEq  = eclToRaDecRad(sunLon, 0, eps);
+      const moonEq = eclToRaDecRad(moonLon, moonBeta, eps);
+
+      // Sun-Moon angular separation (spherical law of cosines)
+      const cosSep = Math.sin(sunEq.dec) * Math.sin(moonEq.dec)
+                   + Math.cos(sunEq.dec) * Math.cos(moonEq.dec) * Math.cos(moonEq.ra - sunEq.ra);
+      const sep = Math.acos(Math.max(-1, Math.min(1, cosSep))) * _r2d;
+
+      // RA diff (Moon − Sun), normalized to [-180, +180]
+      let raDiff = (moonEq.ra - sunEq.ra) * _r2d;
+      while (raDiff > 180) raDiff -= 360;
+      while (raDiff < -180) raDiff += 360;
+
+      return {
+        decSun: sunEq.dec * _r2d,
+        decMoon: moonEq.dec * _r2d,
+        sep, raDiff,
+        sunLon, moonLon, moonBeta, eps,
+      };
+    }
+
+    // ── Run for each event ────────────────────────────────────────────────
+    const eventList = window._nodalTest.events.filter(e => e.dLat !== null);
+    const rows = [];
+    const _saveJD = o.julianDay;
+    const _t0 = performance.now();
+
+    try {
+      for (const evt of eventList) {
+        // (1) Find model's true min-γ JD
+        const refined = refinedMinGammaJd(evt.jd);
+        const timing_min = (refined.jd - evt.jd) * 24 * 60;
+
+        // Scene is at refined JD after the parabolic step's last evaluation.
+        // Re-navigate to be safe before reading model angles.
+        jumpToJulianDay(refined.jd);
+        forceSceneUpdate('light');
+        const mPos = modelAngularPositions();
+        const mGamma = computeModelGammaAtJd(refined.jd); // re-confirm γ at refined JD
+
+        // (2) IAU values at the SAME JD
+        const iPos = iauAngularPositions(refined.jd);
+
+        // Compute IAU γ: needs Sun/Moon ECI positions. We have RA/Dec but not
+        // distances directly — use the existing _eclMoonDistance helper for Moon,
+        // and 1 AU for Sun (geometric, not exact).
+        // ECI position from RA/Dec/dist: (d*cos(dec)*cos(ra), d*cos(dec)*sin(ra), d*sin(dec))
+        const dSun_km  = currentAUDistance;
+        const dMoon_km = _eclMoonDistance(refined.jd);
+        const sunRA = iPos.sunLon - 0 + 0; // dummy; will re-derive from eclToRaDec
+        const sunEq2  = eclToRaDecRad(iPos.sunLon, 0, iPos.eps);
+        const moonEq2 = eclToRaDecRad(iPos.moonLon, iPos.moonBeta, iPos.eps);
+        const sunECI  = {
+          x: dSun_km  * Math.cos(sunEq2.dec) * Math.cos(sunEq2.ra),
+          y: dSun_km  * Math.cos(sunEq2.dec) * Math.sin(sunEq2.ra),
+          z: dSun_km  * Math.sin(sunEq2.dec),
+        };
+        const moonECI = {
+          x: dMoon_km * Math.cos(moonEq2.dec) * Math.cos(moonEq2.ra),
+          y: dMoon_km * Math.cos(moonEq2.dec) * Math.sin(moonEq2.ra),
+          z: dMoon_km * Math.sin(moonEq2.dec),
+        };
+        const dirX = moonECI.x - sunECI.x, dirY = moonECI.y - sunECI.y, dirZ = moonECI.z - sunECI.z;
+        const dirLen = Math.sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
+        const dx = dirX/dirLen, dy = dirY/dirLen, dz = dirZ/dirLen;
+        // Perpendicular distance from origin (Earth's center) to line through moonECI with direction (dx,dy,dz):
+        const dotMD = moonECI.x*dx + moonECI.y*dy + moonECI.z*dz;
+        const px = moonECI.x - dotMD*dx, py = moonECI.y - dotMD*dy, pz = moonECI.z - dotMD*dz;
+        const iauPerp_km = Math.sqrt(px*px + py*py + pz*pz);
+        const R_Earth_km = diameters.earthDiameter / 2;
+        const iGamma = iauPerp_km / R_Earth_km;
+
+        rows.push({
+          label: evt.label, nasaTD: evt.jd, refinedJD: refined.jd, timing_min,
+          mDecSun: mPos.decSun,    iDecSun: iPos.decSun,    dDecSun: mPos.decSun - iPos.decSun,
+          mDecMoon: mPos.decMoon,  iDecMoon: iPos.decMoon,  dDecMoon: mPos.decMoon - iPos.decMoon,
+          mSep: mPos.sep,          iSep: iPos.sep,          dSep: mPos.sep - iPos.sep,
+          mRaDiff: mPos.raDiff,    iRaDiff: iPos.raDiff,    dRaDiff: mPos.raDiff - iPos.raDiff,
+          mGamma,                  iGamma,                  dGamma: mGamma - iGamma,
+          l2bGC: evt.gc,
+        });
+      }
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
+    }
+
+    // ── Add γ for sorting (from L-2f if available) ────────────────────────
+    const gammaByJd = (window._gammaTest && window._gammaTest.rows)
+      ? Object.fromEntries(window._gammaTest.rows.map(r => [r.jd, r.gamma]))
+      : null;
+    if (gammaByJd) for (const r of rows) r.gammaForSort = gammaByJd[r.nasaTD];
+    rows.sort((a, b) => (b.gammaForSort || 0) - (a.gammaForSort || 0));
+
+    // ── Per-event table ───────────────────────────────────────────────────
+    console.log('   Per-event table (sorted by γ descending if L-2f run):');
+    console.log('   ' + 'Eclipse'.padEnd(45) + ' γ      Δt min   ΔDec_Sun"  ΔDec_Moon"  Δsep"   ΔRA_diff"  Δγ × 1000');
+    console.log('   ' + '─'.repeat(125));
+    for (const r of rows) {
+      const gStr = (r.gammaForSort !== undefined && !isNaN(r.gammaForSort))
+        ? r.gammaForSort.toFixed(3).padStart(6) : ' n/a ';
+      const tStr = ((r.timing_min >= 0 ? '+' : '') + r.timing_min.toFixed(2)).padStart(7);
+      const dDecS = (r.dDecSun  * 3600).toFixed(0).padStart(7);
+      const dDecM = (r.dDecMoon * 3600).toFixed(0).padStart(7);
+      const dSep  = (r.dSep     * 3600).toFixed(0).padStart(7);
+      const dRaD  = (r.dRaDiff  * 3600).toFixed(0).padStart(7);
+      const dGam  = (r.dGamma * 1000).toFixed(2).padStart(7);
+      console.log('   ' + r.label.padEnd(45) + gStr + '  ' + tStr + '  '
+                + dDecS + '″  ' + dDecM + '″  ' + dSep + '″  ' + dRaD + '″  ' + dGam);
+    }
+
+    // ── Statistics ────────────────────────────────────────────────────────
+    function mean(arr) { return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0; }
+    function std(arr, m) { return arr.length ? Math.sqrt(arr.reduce((a,b)=>a+(b-m)**2,0)/arr.length) : 0; }
+
+    const mDecS = mean(rows.map(r=>r.dDecSun*3600));
+    const mDecM = mean(rows.map(r=>r.dDecMoon*3600));
+    const mSep  = mean(rows.map(r=>r.dSep*3600));
+    const mRaD  = mean(rows.map(r=>r.dRaDiff*3600));
+    const mGam  = mean(rows.map(r=>r.dGamma*1000));
+    const mT    = mean(rows.map(r=>r.timing_min));
+    const sDecS = std(rows.map(r=>r.dDecSun*3600), mDecS);
+    const sDecM = std(rows.map(r=>r.dDecMoon*3600), mDecM);
+    const sSep  = std(rows.map(r=>r.dSep*3600), mSep);
+    const sRaD  = std(rows.map(r=>r.dRaDiff*3600), mRaD);
+    const sGam  = std(rows.map(r=>r.dGamma*1000), mGam);
+
+    console.log('   ' + '─'.repeat(125));
+    console.log(`   Statistics (n=${rows.length} events; values in arcseconds unless noted):`);
+    console.log('');
+    console.log(`     Timing offset (model true min-γ − NASA TD): mean ${mT.toFixed(2)} min, range ${(Math.min(...rows.map(r=>r.timing_min))).toFixed(1)} to ${(Math.max(...rows.map(r=>r.timing_min))).toFixed(1)} min`);
+    console.log('');
+    console.log(`     ΔDec_Sun  = ${(mDecS>=0?'+':'')+mDecS.toFixed(0)}″ ± ${sDecS.toFixed(0)}″`);
+    console.log(`     ΔDec_Moon = ${(mDecM>=0?'+':'')+mDecM.toFixed(0)}″ ± ${sDecM.toFixed(0)}″`);
+    console.log(`     Δsep      = ${(mSep>=0?'+':'')+mSep.toFixed(0)}″ ± ${sSep.toFixed(0)}″   (Sun-Moon 3D angular separation, frame-independent)`);
+    console.log(`     ΔRA_diff  = ${(mRaD>=0?'+':'')+mRaD.toFixed(0)}″ ± ${sRaD.toFixed(0)}″   (Moon-Sun equatorial RA difference, frame-independent)`);
+    console.log(`     Δγ × 1000 = ${(mGam>=0?'+':'')+mGam.toFixed(2)} ± ${sGam.toFixed(2)}   (γ in Earth-radii units)`);
+    console.log('');
+
+    // ── Verdict ───────────────────────────────────────────────────────────
+    let verdict;
+    const absDecS = Math.abs(mDecS), absDecM = Math.abs(mDecM), absSep = Math.abs(mSep), absRa = Math.abs(mRaD);
+    if (absDecS < 60 && absDecM < 60 && absSep < 60 && absRa < 60) {
+      verdict = 'MODEL POSITIONS MATCH IAU at model\'s true min-γ moment (all within ~1 arcminute). ' +
+                'The geometric path residual does NOT come from Sun/Moon angular position errors. ' +
+                'Investigation should pivot to NASA Canon\'s exact algorithm vs sphere-axis-intersection.';
+    } else if (absSep > 100 || absRa > 100) {
+      verdict = `SUN-MOON GEOMETRY IS OFF. ΔSep = ${absSep.toFixed(0)}″, ΔRA_diff = ${absRa.toFixed(0)}″. ` +
+                'These are frame-independent — the axis direction in inertial space differs from IAU. ' +
+                'That\'s a real angular error that propagates through grazing-amplification to the observed path residual.';
+    } else if (absDecS > 100 || absDecM > 100) {
+      verdict = `DECLINATION ERROR. ΔDec_Sun = ${absDecS.toFixed(0)}″, ΔDec_Moon = ${absDecM.toFixed(0)}″. ` +
+                'Sun-Moon directions are correct relative to each other, but Earth\'s pole orientation ' +
+                'in the model differs from IAU. Look at Earth pole calibration.';
+    } else if (Math.abs(mGam) > 10) {
+      verdict = `γ DISCREPANCY. Δγ × 1000 = ${mGam.toFixed(2)}. Sun-Moon distances may be off ` +
+                '(γ depends on both directions and distances). Check moonDistance and AU calibration.';
+    } else {
+      verdict = 'MIXED — inspect per-event table for the pattern.';
+    }
+    console.log(`   Verdict: ${verdict}`);
+    console.log(`   Runtime: ${((performance.now() - _t0) / 1000).toFixed(1)} s`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    window._angularTest = { rows, mDecS, mDecM, mSep, mRaD, mGam, mT };
+    console.log('Exposed at window._angularTest');
+  }, 'For each of 37 events, finds the model\'s TRUE min-γ moment (sub-minute precision via ' +
+     'parallel refined finder, NOT the production findSolarEclipsesInRange) and at that JD ' +
+     'compares model Sun/Moon angular positions (Dec, RA difference, separation, γ) to IAU ' +
+     'reference at the same JD. Frame-independent. Requires L-2b to have run first.');
+
   const firstCanonBtn = addTestButton('L-3: Load & cross-check NASA Lunar Canon (12,064 events)', async () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Load NASA Lunar Canon (12,064 events, -1999 BCE to +3000 CE) and cross-check');
@@ -52663,6 +53304,18 @@ function moveModel(pos) {
       θ = obj.speed * pos - obj.startPos * (Math.PI / 180);
     }
 
+    // Sun mean longitude quadratic correction — root-cause fix for slow drift.
+    // Scene moves Sun at a constant rate; the real Sun has a T² acceleration
+    // in mean longitude from planetary perturbations on Earth's orbit
+    // (Meeus Ch.25: +0.0003032°/T², T = Julian centuries from J2000 TT). At
+    // J2000 (T=0): no change. At deep time (|T| ≈ 10-20): cumulative correction
+    // reaches arcminutes, capturing the long-period structure that linear
+    // scene motion can't represent.
+    if (obj === sun) {
+      const T_jc = (o.julianDay - j2000JD) / 36525;
+      θ += 0.0003032 * T_jc * T_jc * (Math.PI / 180);
+    }
+
     // Apply equation of center (Kepler's 2nd Law: faster at perihelion, slower at aphelion)
     if (useVariableSpeed && obj.eccentricity && obj.perihelionPhaseJ2000 !== undefined) {
       let e;
@@ -52690,6 +53343,13 @@ function moveModel(pos) {
       const M = θ - perihelionPhase;  // mean anomaly measured from current perihelion direction
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
       obj._meanAnomaly = M; // Store for parallax correction (BR-CA terms)
+    }
+
+    // Sun longitude harmonic correction (fitted Δλ vs Meeus, ±100 yr around J2000).
+    // Captures EoC residuals the analytical 2e·sinM + 1.25e²·sin2M misses.
+    // Subtract: model thinks Sun is at θ_raw, true λ is θ_raw − Δλ → rotate back.
+    if (obj === sun) {
+      θ -= sunLongitudeCorrection(o.julianDay) * (Math.PI / 180);
     }
 
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude)
