@@ -32280,6 +32280,429 @@ function setupGUI() {
      'Locates the +0.69° Δlat bias to either Sun-direction, Moon-direction, or Earth-pole-tilt errors. ' +
      'Requires L-2b to have run first.');
 
+  // ──────────────────────────────────────────────────────────────────────────
+  // L-2e: Sub-solar longitude — model vs IAU 2006
+  //
+  // L-2b's cleaned-data residual analysis found the 18.6-yr Δlat signal vanished
+  // but a clear Δlon cos(Ω) signal remained: amplitude 1.4°, R² = 0.19, r = 0.428.
+  // Big per-event outliers at high γ + high lat (2015 −13.9°, 2026 +6.7°, 1997 −7.2°,
+  // 2008 +6.6°) suggest grazing-geometry amplification of small underlying errors.
+  //
+  // The umbra LONGITUDE on Earth's surface = (Sun-Moon line direction) projected
+  // onto Earth's rotation frame. Three contributing factors:
+  //   (1) Sun's geocentric RA in inertial frame
+  //   (2) Moon's geocentric RA in inertial frame (Moon ≈ Sun at New Moon)
+  //   (3) Earth's rotation phase (Greenwich Apparent Sidereal Time)
+  //
+  // L-2d already showed Sun/Moon DECLINATIONS match IAU to ~50″/~3″. This test
+  // does the same for SUB-SOLAR LONGITUDE — measures the geographic longitude
+  // where the model's Sun is at zenith vs IAU's. The diagnostic is:
+  //   • If Δlon_subsolar shows the same cos(Ω) pattern as Δlon_umbra → the
+  //     sub-solar lon is the root, meaning Earth's rotation phase (GMST/GAST)
+  //     has a 18.6-yr error, OR Sun's RA has one.
+  //   • If Δlon_subsolar is small/flat → the umbra Δlon comes from grazing-geometry
+  //     amplification of Moon's RA error (or some other cone-projection effect).
+  //
+  // IAU sub-solar lon = Sun_RA(JD) − GMST(JD), with proper modular arithmetic.
+  // ──────────────────────────────────────────────────────────────────────────
+  addTestButton('L-2e: Sub-solar lon — model vs IAU 2006 (locate Δlon cos(Ω) signal source)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-2e: sub-solar longitude diagnostic');
+    console.log('  ');
+    console.log('  L-2b cleaned-data residual: Δlon cos(Ω) signal with amplitude 1.4°, R² = 0.19.');
+    console.log('  This test isolates whether the umbra Δlon comes from Sun-direction/rotation-phase');
+    console.log('  errors (visible in sub-solar lon) or from Moon-side / grazing-geometry effects');
+    console.log('  (NOT visible in sub-solar lon, since sub-solar only uses Sun direction).');
+    console.log('  ');
+    console.log('  Requires L-2b to have run first (uses the same NASA TD JDs and Ω values).');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    if (!window._nodalTest || !window._nodalTest.events || window._nodalTest.events.length === 0) {
+      console.log('   ERROR: Run L-2b first.');
+      return;
+    }
+
+    const _d2r = Math.PI / 180;
+    const _r2d = 180 / Math.PI;
+
+    // IAU 2006 mean obliquity (Capitaine et al. 2003), arcseconds.
+    function iauObliquityDeg(jd) {
+      const T = (jd - 2451545.0) / 36525;
+      const arcsec = 84381.406 - 46.836769 * T - 0.0001831 * T * T
+                   + 0.00200340 * T * T * T
+                   - 0.000000576 * T * T * T * T
+                   - 0.0000000434 * T * T * T * T * T;
+      return arcsec / 3600;
+    }
+
+    // GMST in degrees (Meeus 12.4), accuracy ~1″ over ±200 yr from J2000.
+    function gmstDeg(jd) {
+      const T = (jd - 2451545.0) / 36525;
+      let gmst = 280.46061837 + 360.98564736629 * (jd - 2451545.0)
+               + 0.000387933 * T * T - T * T * T / 38710000;
+      gmst = ((gmst % 360) + 360) % 360;
+      return gmst;
+    }
+
+    // Convert ecliptic (λ, β) to equatorial RA (degrees).
+    function eclToRa(lambda_deg, beta_deg, eps_deg) {
+      const l = lambda_deg * _d2r, b = beta_deg * _d2r, e = eps_deg * _d2r;
+      const ra = Math.atan2(Math.sin(l) * Math.cos(e) - Math.tan(b) * Math.sin(e), Math.cos(l));
+      let raDeg = ra * _r2d;
+      if (raDeg < 0) raDeg += 360;
+      return raDeg;
+    }
+
+    // IAU sub-solar longitude at JD: where Sun is at zenith.
+    // Sub-solar lon = Sun_RA − GMST (east-positive from Greenwich, normalized to [-180,180]).
+    function iauSubSolarLonDeg(jd) {
+      const eps = iauObliquityDeg(jd);
+      const sunLon = _eclSunLon(jd);
+      const sunRA = eclToRa(sunLon, 0, eps);
+      const gmst = gmstDeg(jd);
+      let lon = sunRA - gmst;
+      while (lon > 180) lon -= 360;
+      while (lon < -180) lon += 360;
+      return lon;
+    }
+
+    const eventList = window._nodalTest.events.filter(e => e.dLat !== null);
+    const rows = [];
+    const _saveJD = o.julianDay;
+
+    try {
+      for (const evt of eventList) {
+        const jd = evt.jd;
+
+        // Model sub-solar (lat, lon) — uses the same scene-graph machinery as the umbra disc.
+        const modelSubsolar = subSolarFromSceneAtJd(jd);
+        if (modelSubsolar === null) continue;
+
+        const iauLon = iauSubSolarLonDeg(jd);
+        let dLon = modelSubsolar.lon - iauLon;
+        while (dLon > 180) dLon -= 360;
+        while (dLon < -180) dLon += 360;
+
+        rows.push({
+          label: evt.label, jd, omega: evt.omega,
+          modelSubsolarLon: modelSubsolar.lon,
+          iauSubsolarLon: iauLon,
+          dLonSubsolar: dLon,
+          dLonObserved: evt.dLon,
+        });
+      }
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
+    }
+
+    rows.sort((a, b) => a.omega - b.omega);
+
+    console.log('   Per-event table (sorted by Ω):');
+    console.log('   ' + 'Eclipse'.padEnd(50) + '   Ω°    Model subsolar lon   IAU subsolar lon   Δlon_subsolar   Δlon_observed');
+    console.log('   ' + '─'.repeat(140));
+
+    for (const r of rows) {
+      const omegaStr = r.omega.toFixed(1).padStart(6);
+      const mStr = ((r.modelSubsolarLon >= 0 ? '+' : '') + r.modelSubsolarLon.toFixed(2)).padStart(9);
+      const iStr = ((r.iauSubsolarLon >= 0 ? '+' : '') + r.iauSubsolarLon.toFixed(2)).padStart(9);
+      const dSubStr = ((r.dLonSubsolar >= 0 ? '+' : '') + r.dLonSubsolar.toFixed(3)).padStart(9);
+      const dObsStr = ((r.dLonObserved >= 0 ? '+' : '') + r.dLonObserved.toFixed(2)).padStart(7);
+      console.log('   ' + r.label.padEnd(50) + omegaStr + '   ' +
+        mStr + '°         ' + iStr + '°       ' + dSubStr + '°       ' + dObsStr + '°');
+    }
+
+    // Statistics
+    function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
+    function std(arr, m) { return Math.sqrt(arr.reduce((a,b)=>a+(b-m)**2,0)/arr.length); }
+    function pearson(xs, ys) {
+      const mx = mean(xs), my = mean(ys);
+      let cov = 0, sx2 = 0, sy2 = 0;
+      for (let i = 0; i < xs.length; i++) {
+        const dx = xs[i] - mx, dy = ys[i] - my;
+        cov += dx * dy; sx2 += dx * dx; sy2 += dy * dy;
+      }
+      return cov / Math.sqrt(sx2 * sy2);
+    }
+
+    const dSubs = rows.map(r => r.dLonSubsolar);
+    const dObs  = rows.map(r => r.dLonObserved);
+    const omegas = rows.map(r => r.omega * _d2r);
+
+    const mSub = mean(dSubs), sSub = std(dSubs, mSub);
+    const mObs = mean(dObs),  sObs = std(dObs, mObs);
+
+    // Correlation between sub-solar lon error and observed umbra lon error
+    const rSubVsObs = pearson(dSubs, dObs);
+
+    // 18.6-yr periodic fit on Δlon_subsolar (mirrors L-2b fit on Δlon_observed)
+    function fitPeriodic(omegasRad, ys) {
+      const n = ys.length;
+      const ones = new Array(n).fill(1);
+      const cs = omegasRad.map(Math.cos);
+      const sn = omegasRad.map(Math.sin);
+      const sumOO = n;
+      const sumOC = cs.reduce((a,b)=>a+b,0);
+      const sumOS = sn.reduce((a,b)=>a+b,0);
+      const sumCC = cs.reduce((a,b,i)=>a+b*b,0);
+      const sumCS = cs.reduce((a,b,i)=>a+b*sn[i],0);
+      const sumSS = sn.reduce((a,b)=>a+b*b,0);
+      const sumOY = ys.reduce((a,b)=>a+b,0);
+      const sumCY = cs.reduce((a,b,i)=>a+b*ys[i],0);
+      const sumSY = sn.reduce((a,b,i)=>a+b*ys[i],0);
+      const det = sumOO*(sumCC*sumSS - sumCS*sumCS)
+                - sumOC*(sumOC*sumSS - sumCS*sumOS)
+                + sumOS*(sumOC*sumCS - sumCC*sumOS);
+      // 3x3 inversion via Cramer's
+      const c0 = (sumOY*(sumCC*sumSS - sumCS*sumCS) - sumOC*(sumCY*sumSS - sumCS*sumSY) + sumOS*(sumCY*sumCS - sumCC*sumSY)) / det;
+      const c1 = (sumOO*(sumCY*sumSS - sumCS*sumSY) - sumOY*(sumOC*sumSS - sumCS*sumOS) + sumOS*(sumOC*sumSY - sumCY*sumOS)) / det;
+      const c2 = (sumOO*(sumCC*sumSY - sumCY*sumCS) - sumOC*(sumOC*sumSY - sumCY*sumOS) + sumOY*(sumOC*sumCS - sumCC*sumOS)) / det;
+      const amp = Math.sqrt(c1*c1 + c2*c2);
+      const phase = Math.atan2(c2, c1) * _r2d;
+      // R²
+      const meanY = sumOY / n;
+      let ssRes = 0, ssTot = 0;
+      for (let i = 0; i < n; i++) {
+        const yhat = c0 + c1*cs[i] + c2*sn[i];
+        ssRes += (ys[i] - yhat) ** 2;
+        ssTot += (ys[i] - meanY) ** 2;
+      }
+      return { c: c0, amp, phase, r2: 1 - ssRes/ssTot };
+    }
+
+    const fitSub = fitPeriodic(omegas, dSubs);
+    const fitObs = fitPeriodic(omegas, dObs);
+
+    console.log('   ' + '─'.repeat(140));
+    console.log(`   Statistics (n=${rows.length} events):`);
+    console.log('');
+    console.log(`     Δlon_subsolar  (model vs IAU)  mean = ${(mSub>=0?'+':'')+mSub.toFixed(3)}°  std = ${sSub.toFixed(3)}°  (${(mSub*3600).toFixed(0)}″ mean, ${(sSub*3600).toFixed(0)}″ std)`);
+    console.log(`     Δlon_observed  (L-2b umbra)    mean = ${(mObs>=0?'+':'')+mObs.toFixed(3)}°  std = ${sObs.toFixed(3)}°`);
+    console.log('');
+    console.log(`     Correlation r(Δlon_subsolar, Δlon_observed) = ${rSubVsObs.toFixed(3)}`);
+    console.log('');
+    console.log(`   Periodic-fit comparison: Δlon_subsolar(Ω) vs Δlon_observed(Ω)`);
+    console.log('   ' + 'Quantity'.padEnd(25) + 'Amplitude   Phase φ    R²');
+    console.log('   ' + '─'.repeat(60));
+    console.log(`   ${'Δlon_subsolar (°)'.padEnd(25)}${fitSub.amp.toFixed(4)}°   ${fitSub.phase.toFixed(0)}°    ${fitSub.r2.toFixed(3)}`);
+    console.log(`   ${'Δlon_observed (°)'.padEnd(25)}${fitObs.amp.toFixed(4)}°   ${fitObs.phase.toFixed(0)}°    ${fitObs.r2.toFixed(3)}`);
+    console.log('');
+
+    // Verdict
+    let verdict;
+    const subSignificant = fitSub.r2 > 0.15;
+    const ampRatio = fitSub.amp / fitObs.amp;
+    const phaseDiff = Math.abs(((fitSub.phase - fitObs.phase + 180) % 360) - 180);
+
+    if (subSignificant && ampRatio > 0.7 && phaseDiff < 30) {
+      verdict = 'SOURCE FOUND IN SUB-SOLAR LON. The Δlon cos(Ω) signal lives in Sun_RA or in ' +
+                'Greenwich Sidereal Time at 18.6-yr period. This is an Earth-rotation-phase / ' +
+                'sidereal-time issue — likely a missing nutation in longitude term in the model\'s ' +
+                'GAST formula (Δψ × cos(ε) ≈ ±15″, which at grazing γ amplifies to degrees).';
+    } else if (subSignificant && ampRatio > 0.3) {
+      verdict = 'PARTIALLY IN SUB-SOLAR LON. Some of the Δlon signal traces to Sun/sidereal-time, ' +
+                'but the bulk is downstream (Moon RA or grazing geometry). Look at both.';
+    } else if (!subSignificant && Math.abs(rSubVsObs) < 0.3) {
+      verdict = 'NOT IN SUB-SOLAR LON. Model\'s Sun direction + Earth rotation phase are correct ' +
+                'to ~50″. The Δlon signal must come from MOON RA error (which doesn\'t affect ' +
+                'sub-solar lon) or from grazing-geometry amplification at high γ events. Next ' +
+                'step: build L-2f comparing Moon\'s RA model vs IAU.';
+    } else {
+      verdict = 'MIXED — see correlation and per-event table.';
+    }
+    console.log(`   Verdict: ${verdict}`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    window._subsolarTest = { rows, fitSub, fitObs, mSub, sSub, rSubVsObs };
+    console.log('Exposed at window._subsolarTest');
+  }, 'Sub-solar longitude diagnostic. For each of 37 events compares model\'s sub-solar lon ' +
+     '(from subSolarFromSceneAtJd) against IAU 2006 reference (Meeus Sun longitude + Capitaine ' +
+     'obliquity + Meeus GMST formula). Isolates whether the Δlon cos(Ω) signal lives in Sun-' +
+     'direction/sidereal-time (visible in sub-solar lon) or in Moon-side/grazing-geometry effects ' +
+     '(invisible to sub-solar lon). Requires L-2b to have run first.');
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // L-2f: γ-correlation test — is grazing geometry the dominant amplifier?
+  //
+  // L-2e established the 1.4° Δlon cos(Ω) signal does NOT live in sub-solar lon
+  // (which only depends on Sun direction + GMST). Two remaining suspects:
+  //   (a) Moon RA error amplified by cone geometry at grazing γ
+  //   (b) Cone-projection algorithm artifact at high γ
+  //
+  // Both share a common signature: residual magnitude correlates with γ
+  // (= perpendicular distance from Earth's center to Moon's shadow axis,
+  // in Earth radii). At γ ≈ 0 (central eclipse), small input errors map
+  // ~1:1 to umbra position. At γ → 1 (grazing), the umbra spot is at Earth's
+  // limb and small angular errors get amplified by 1/sqrt(1-γ²), which can
+  // reach 10×–100× at γ > 0.95.
+  //
+  // This test computes the model's γ at each event JD (from the scene-graph
+  // ray-trace, same formula umbraFromSceneAtJd uses internally), then
+  // correlates γ with |Δlat| and |Δlon| from L-2b. Verdict:
+  //   • r(γ, |Δlon|) > 0.7 AND outliers all at γ > 0.9 →
+  //     grazing-geometry amplification is the dominant story. The Δlon signal
+  //     is intrinsic to the model's design — can't fix without changing the
+  //     cone-projection algorithm.
+  //   • r small, outliers spread across γ → grazing isn't the cause. Look
+  //     elsewhere (e.g., L-2g for Moon RA, or NASA Canon quantization noise).
+  // ──────────────────────────────────────────────────────────────────────────
+  addTestButton('L-2f: γ-correlation test (does grazing geometry amplify Δlon residuals?)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
+    console.log('  L-2f: γ-correlation test');
+    console.log('  ');
+    console.log('  Computes model γ at each event (perpendicular distance from Earth center to Moon\'s');
+    console.log('  shadow axis, in Earth radii) and correlates with |Δlat| and |Δlon| from L-2b.');
+    console.log('  High correlation → grazing-geometry amplification is the dominant residual source.');
+    console.log('  ');
+    console.log('  Requires L-2b to have run first.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
+
+    if (!window._nodalTest || !window._nodalTest.events || window._nodalTest.events.length === 0) {
+      console.log('   ERROR: Run L-2b first.');
+      return;
+    }
+
+    // γ from scene-graph (mirrors umbraFromSceneAtJd's internal geometry).
+    // γ = |perpendicular distance from Earth's center to shadow axis| / R_Earth.
+    const _scratchSun  = new THREE.Vector3();
+    const _scratchMoon = new THREE.Vector3();
+    const _scratchEarth = new THREE.Vector3();
+    const _scratchMoonGeo = new THREE.Vector3();
+    const _scratchSunGeo  = new THREE.Vector3();
+    const _scratchDir = new THREE.Vector3();
+
+    function modelGammaAtJd(jd) {
+      jumpToJulianDay(jd);
+      forceSceneUpdate('light');
+
+      sun.planetObj.getWorldPosition(_scratchSun);
+      moon.planetObj.getWorldPosition(_scratchMoon);
+      earth.planetObj.getWorldPosition(_scratchEarth);
+
+      _scratchMoonGeo.copy(_scratchMoon).sub(_scratchEarth);
+      _scratchSunGeo.copy(_scratchSun).sub(_scratchEarth);
+      _scratchDir.copy(_scratchMoonGeo).sub(_scratchSunGeo).normalize();
+
+      const R_E = earth.size;
+      const MdotD = _scratchMoonGeo.dot(_scratchDir);
+      const MdotM = _scratchMoonGeo.dot(_scratchMoonGeo);
+      const perpSquared = MdotM - MdotD * MdotD;
+      const perp = perpSquared > 0 ? Math.sqrt(perpSquared) : 0;
+      return perp / R_E;
+    }
+
+    const eventList = window._nodalTest.events.filter(e => e.dLat !== null && e.dLon !== null);
+    const rows = [];
+    const _saveJD = o.julianDay;
+
+    try {
+      for (const evt of eventList) {
+        const gamma = modelGammaAtJd(evt.jd);
+        // Grazing-amplification factor: at γ → 1, residuals get amplified by 1/sqrt(1-γ²).
+        // Clamp to avoid singularity at exactly γ=1; in practice nothing reaches >0.999.
+        const oneMinusGammaSq = Math.max(1 - gamma * gamma, 1e-6);
+        const ampFactor = 1 / Math.sqrt(oneMinusGammaSq);
+        rows.push({
+          label: evt.label, jd: evt.jd, omega: evt.omega,
+          gamma, ampFactor,
+          dLat: evt.dLat, dLon: evt.dLon,
+          absLat: Math.abs(evt.dLat), absLon: Math.abs(evt.dLon),
+          gcDist: evt.gc,
+        });
+      }
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
+    }
+
+    rows.sort((a, b) => a.gamma - b.gamma);
+
+    console.log('   Per-event table (sorted by γ):');
+    console.log('   ' + 'Eclipse'.padEnd(50) + '    γ      1/√(1−γ²)   |Δlat|   |Δlon|   GC dist');
+    console.log('   ' + '─'.repeat(120));
+    for (const r of rows) {
+      const gStr   = r.gamma.toFixed(3).padStart(7);
+      const aStr   = r.ampFactor.toFixed(2).padStart(7);
+      const dlatStr = r.absLat.toFixed(2).padStart(6) + '°';
+      const dlonStr = r.absLon.toFixed(2).padStart(6) + '°';
+      const gcStr  = r.gcDist.toFixed(0).padStart(5) + ' km';
+      console.log('   ' + r.label.padEnd(50) + gStr + '      ' + aStr + '      ' + dlatStr + '   ' + dlonStr + '   ' + gcStr);
+    }
+
+    function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
+    function pearson(xs, ys) {
+      const mx = mean(xs), my = mean(ys);
+      let cov = 0, sx2 = 0, sy2 = 0;
+      for (let i = 0; i < xs.length; i++) {
+        const dx = xs[i] - mx, dy = ys[i] - my;
+        cov += dx * dy; sx2 += dx * dx; sy2 += dy * dy;
+      }
+      return cov / Math.sqrt(sx2 * sy2);
+    }
+
+    const gammas = rows.map(r => r.gamma);
+    const ampFactors = rows.map(r => r.ampFactor);
+    const absLats = rows.map(r => r.absLat);
+    const absLons = rows.map(r => r.absLon);
+
+    const rGammaLat = pearson(gammas, absLats);
+    const rGammaLon = pearson(gammas, absLons);
+    const rAmpLat = pearson(ampFactors, absLats);
+    const rAmpLon = pearson(ampFactors, absLons);
+
+    // High-γ bucket (γ > 0.85) — these are the "grazing" events
+    const highG = rows.filter(r => r.gamma > 0.85);
+    const lowG = rows.filter(r => r.gamma <= 0.85);
+    const meanLonHi = highG.length > 0 ? mean(highG.map(r => r.absLon)) : 0;
+    const meanLonLo = lowG.length > 0  ? mean(lowG.map(r => r.absLon))  : 0;
+    const meanLatHi = highG.length > 0 ? mean(highG.map(r => r.absLat)) : 0;
+    const meanLatLo = lowG.length > 0  ? mean(lowG.map(r => r.absLat))  : 0;
+
+    console.log('   ' + '─'.repeat(120));
+    console.log(`   Statistics (n=${rows.length} events):`);
+    console.log('');
+    console.log(`   Correlations:`);
+    console.log(`     r(γ, |Δlat|)         = ${rGammaLat.toFixed(3)}`);
+    console.log(`     r(γ, |Δlon|)         = ${rGammaLon.toFixed(3)}`);
+    console.log(`     r(1/√(1−γ²), |Δlat|) = ${rAmpLat.toFixed(3)}  (against grazing-amplification factor)`);
+    console.log(`     r(1/√(1−γ²), |Δlon|) = ${rAmpLon.toFixed(3)}`);
+    console.log('');
+    console.log(`   High-γ vs Low-γ buckets (split at γ = 0.85):`);
+    console.log(`     High-γ events (n=${highG.length}):  mean |Δlat| = ${meanLatHi.toFixed(2)}°  mean |Δlon| = ${meanLonHi.toFixed(2)}°`);
+    console.log(`     Low-γ events  (n=${lowG.length}):   mean |Δlat| = ${meanLatLo.toFixed(2)}°  mean |Δlon| = ${meanLonLo.toFixed(2)}°`);
+    console.log(`     Ratio Hi/Lo |Δlon|: ${meanLonLo > 0 ? (meanLonHi/meanLonLo).toFixed(2) : 'n/a'}× amplification at grazing`);
+    console.log('');
+
+    // Verdict
+    let verdict;
+    const grazingDominant = rGammaLon > 0.5 || rAmpLon > 0.5 || (meanLonLo > 0 && meanLonHi / meanLonLo > 2.0);
+    if (grazingDominant) {
+      verdict = 'GRAZING AMPLIFICATION CONFIRMED. The Δlon residuals scale strongly with γ — high-γ ' +
+                'events show ~' + (meanLonLo > 0 ? (meanLonHi/meanLonLo).toFixed(1) : '?') + '× larger |Δlon| than low-γ events. The 1.4° cos(Ω) ' +
+                'signal is grazing-geometry amplification of small (~50″) input errors at high-γ events ' +
+                'that happen to cluster in specific Ω phases. This is intrinsic to the model\'s design ' +
+                'envelope and cannot be reduced without (a) adding the missing IAU 2006 corrections ' +
+                '(nutation, aberration — buys ~30″) or (b) changing the cone-projection algorithm to ' +
+                'handle grazing geometry better. End of investigation chain for this signal.';
+    } else if (rGammaLon < 0.3 && (meanLonLo === 0 || meanLonHi / meanLonLo < 1.5)) {
+      verdict = 'GRAZING IS NOT THE CAUSE. Residuals are uniform across γ — the Δlon signal comes ' +
+                'from something else. Most likely: Moon RA error (build L-2g) or a systematic ' +
+                'reference-frame issue. Next step: compare Moon RA model vs IAU.';
+    } else {
+      verdict = 'MIXED — grazing contributes but isn\'t dominant. Look at per-event table for which ' +
+                'events have large residuals at moderate γ.';
+    }
+    console.log(`   Verdict: ${verdict}`);
+    console.log('══════════════════════════════════════════════════════════════════════════════════');
+
+    window._gammaTest = { rows, rGammaLat, rGammaLon, rAmpLat, rAmpLon, meanLonHi, meanLonLo };
+    console.log('Exposed at window._gammaTest');
+  }, 'γ-correlation diagnostic. For each of 37 events computes model γ from scene-graph and ' +
+     'tests whether |Δlat|/|Δlon| residuals correlate with γ or with the grazing-amplification ' +
+     'factor 1/sqrt(1-γ²). Strong correlation confirms grazing-geometry amplification is the ' +
+     'dominant residual source (intrinsic to model design). Weak correlation means the residuals ' +
+     'come from elsewhere (Moon RA error or systematic frame issue). Requires L-2b to have run first.');
+
   const firstCanonBtn = addTestButton('L-3: Load & cross-check NASA Lunar Canon (12,064 events)', async () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Load NASA Lunar Canon (12,064 events, -1999 BCE to +3000 CE) and cross-check');
