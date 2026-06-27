@@ -1,0 +1,140 @@
+{
+  "H": 335317,
+  "totalDaysInH": 122471920,
+  "cycleCounts": {
+    "N_sid": 4482594,
+    "N_ano": 4444707,
+    "N_nod": 4500622,
+    "N_syn": 4147289,
+    "N_trop": 4482606,
+    "N_apsidalE": 37887,
+    "N_apsidalI": 37900,
+    "N_nodalE": 18028,
+    "N_nodalI": 18015
+  },
+  "derivedFromSidereal": {
+    "N_syn_derived": 4147289,
+    "N_syn_actual": 4147289,
+    "match_syn": true,
+    "N_trop_derived": 4482606,
+    "N_trop_actual": 4482606,
+    "match_trop": true
+  },
+  "brownImplied": {
+    "N_apsidal_implied": 37887,
+    "N_apsidal_actual": 37900,
+    "N_nodal_implied": 18028,
+    "N_nodal_actual": 18015
+  },
+  "hMeaningfulness": {
+    "N_sid": {
+      "value": 4482594,
+      "smallFactors": [
+        2,
+        3,
+        3,
+        3,
+        17,
+        19,
+        257
+      ],
+      "hFactorsDividing": [],
+      "gcdWithH": 1
+    },
+    "N_ano": {
+      "value": 4444707,
+      "smallFactors": [
+        3,
+        1481569
+      ],
+      "hFactorsDividing": [],
+      "gcdWithH": 1
+    },
+    "N_nod": {
+      "value": 4500622,
+      "smallFactors": [
+        2,
+        7,
+        321473
+      ],
+      "hFactorsDividing": [],
+      "gcdWithH": 1
+    },
+    "N_syn": {
+      "value": 4147289,
+      "smallFactors": [
+        4147289
+      ],
+      "hFactorsDividing": [],
+      "gcdWithH": 1
+    },
+    "N_trop": {
+      "value": 4482606,
+      "smallFactors": [
+        2,
+        3,
+        747101
+      ],
+      "hFactorsDividing": [],
+      "gcdWithH": 1
+    },
+    "N_apsidalE": {
+      "value": 37887,
+      "smallFactors": [
+        3,
+        73,
+        173
+      ],
+      "hFactorsDividing": [],
+      "gcdWithH": 1
+    },
+    "N_apsidalI": {
+      "value": 37900,
+      "smallFactors": [
+        2,
+        2,
+        5,
+        5,
+        379
+      ],
+      "hFactorsDividing": [],
+      "gcdWithH": 1
+    },
+    "N_nodalE": {
+      "value": 18028,
+      "smallFactors": [
+        2,
+        2,
+        4507
+      ],
+      "hFactorsDividing": [],
+      "gcdWithH": 1
+    },
+    "N_nodalI": {
+      "value": 18015,
+      "smallFactors": [
+        3,
+        5,
+        1201
+      ],
+      "hFactorsDividing": [],
+      "gcdWithH": 1
+    }
+  },
+  "deepTime": {
+    "j2000": {
+      "T_M": 27.321662412433515,
+      "T_S": 365.25636437382195,
+      "m": 0.0748013315504371,
+      "ratio_ano": 1.0085240714404797,
+      "ratio_nod": 0.9959943314501862,
+      "apsidalDimensionless": 0.00845492587550869,
+      "nodalDimensionless": 0.004018878354809737
+    },
+    "sensitivity": {
+      "dRatioAno_dT_M": 0.00030718697405316775,
+      "dRatioNod_dT_M": -0.00030718697405316775
+    },
+    "modeledInFramework": false
+  }
+}

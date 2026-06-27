@@ -19,28 +19,32 @@ console.log();
 
 const totalDays = C.totalDaysInH;
 
-// Integer cycle counts (the Math.ceil values)
-const siderealCycles = Math.ceil(totalDays / C.moonSiderealMonthInput);
-const anomalisticCycles = Math.ceil(totalDays / C.moonAnomalisticMonthInput);
-const nodalCycles = Math.ceil(totalDays / C.moonNodalMonthInput);
+// Integer cycle counts (Option C+ 2026-06: sidereal + precession periods as inputs)
+const siderealCycles  = C.N_sid;
+const apsidalCyclesI  = C.N_apsidalI;
+const nodalCyclesI    = C.N_nodalI;
+// Anomalistic and nodal months are KINEMATIC derivations now.
+const anomalisticCycles = C.N_sid - C.N_apsidalE;
+const nodalCycles       = C.N_sid + C.N_nodalE;
 
-console.log('  Input month lengths and integer cycle counts in H:');
+console.log('  Inputs and integer cycle counts in H (Option C+ 2026-06):');
 console.log();
 console.log(`  Total days in H = ${totalDays.toFixed(2)}`);
 console.log();
 console.log(`  Sidereal month:    input = ${C.moonSiderealMonthInput} d`);
-console.log(`    Exact cycles: ${(totalDays / C.moonSiderealMonthInput).toFixed(6)}`);
-console.log(`    Rounded (ceil): ${C.fmtInt(siderealCycles)}`);
+console.log(`    Cycles in H:  ${C.fmtInt(siderealCycles)}`);
 console.log(`    Model month:  ${C.moonSiderealMonth.toFixed(10)} d`);
 console.log();
-console.log(`  Anomalistic month: input = ${C.moonAnomalisticMonthInput} d`);
-console.log(`    Exact cycles: ${(totalDays / C.moonAnomalisticMonthInput).toFixed(6)}`);
-console.log(`    Rounded (ceil): ${C.fmtInt(anomalisticCycles)}`);
+console.log(`  Apsidal period:    input (ICRF) = ${C.moonApsidalPrecessionDaysInputICRF} d`);
+console.log(`    Cycles in H:  ${C.fmtInt(apsidalCyclesI)} (ICRF), ${C.fmtInt(C.N_apsidalE)} (Earth = ICRF − 13)`);
+console.log();
+console.log(`  Nodal period:      input (ICRF) = ${C.moonNodalPrecessionDaysInputICRF} d`);
+console.log(`    Cycles in H:  ${C.fmtInt(nodalCyclesI)} (ICRF), ${C.fmtInt(C.N_nodalE)} (Earth = ICRF + 13)`);
+console.log();
+console.log(`  Anomalistic month (KINEMATIC):  N_sid − N_apsidalE = ${C.fmtInt(anomalisticCycles)}`);
 console.log(`    Model month:  ${C.moonAnomalisticMonth.toFixed(10)} d`);
 console.log();
-console.log(`  Nodal month:       input = ${C.moonNodalMonthInput} d`);
-console.log(`    Exact cycles: ${(totalDays / C.moonNodalMonthInput).toFixed(6)}`);
-console.log(`    Rounded (ceil): ${C.fmtInt(nodalCycles)}`);
+console.log(`  Nodal (draconic) month (KINEMATIC):  N_sid + N_nodalE = ${C.fmtInt(nodalCycles)}`);
 console.log(`    Model month:  ${C.moonNodalMonth.toFixed(10)} d`);
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -51,10 +55,12 @@ console.log('─── 2. Derived Months — Model vs Known ──────�
 console.log();
 
 const kv = C.knownValues;
+// Note: anomalistic & nodal are now KINEMATIC, so "known" reference values
+// come from the literature IAU month values used at original framework setup.
 const monthComparisons = [
   { name: 'Sidereal month', model: C.moonSiderealMonth, known: C.moonSiderealMonthInput, unit: 'd' },
-  { name: 'Anomalistic month', model: C.moonAnomalisticMonth, known: C.moonAnomalisticMonthInput, unit: 'd' },
-  { name: 'Nodal (draconic) month', model: C.moonNodalMonth, known: C.moonNodalMonthInput, unit: 'd' },
+  { name: 'Anomalistic month', model: C.moonAnomalisticMonth, known: 27.55454988, unit: 'd' },
+  { name: 'Nodal (draconic) month', model: C.moonNodalMonth, known: 27.21222082, unit: 'd' },
   { name: 'Synodic month', model: C.moonSynodicMonth, known: kv.moonSynodicMonth, unit: 'd' },
   { name: 'Tropical month', model: C.moonTropicalMonth, known: kv.moonTropicalMonth, unit: 'd' },
 ];

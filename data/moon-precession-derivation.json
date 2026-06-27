@@ -1,0 +1,74 @@
+{
+  "inputs": {
+    "framework": {
+      "T_M": 27.321662412433515,
+      "T_S_sidereal": 365.25636437382195,
+      "n_M_radPerDay": 0.2299708272627013,
+      "m": 0.0748013315504371
+    },
+    "geometric": {
+      "e_M": 0.054900489,
+      "i_M_deg": 5.1453964,
+      "i_M_rad": 0.08980410850026317
+    },
+    "classical": {
+      "brownSeriesCoeffs": {
+        "apse": {
+          "m2": 0.75,
+          "m3": 7.03125,
+          "m4": 31.8046875,
+          "m5": 129.63525390625
+        },
+        "node": {
+          "m2": -0.75
+        }
+      },
+      "brouwerSecularFactors": {
+        "f_ecc_apse": 1.0106039640571571,
+        "f_inc_apse": 0.9879353185169405,
+        "f_ecc_node": 1.0060554910648605,
+        "cos_i": 0.9959703203465923,
+        "sin2_i": 0.008043120988706305
+      }
+    },
+    "empirical": {
+      "J2_E": 0.00108263,
+      "R_E_km": 6378.137,
+      "a_M_km": 384399,
+      "RoverA_squared": 0.0002753107620820721
+    }
+  },
+  "targets_ICRF": {
+    "moonApsidalPrecessionDaysICRF": 3231.4490765171504,
+    "moonNodalPrecessionDaysICRF": 6798.330280321954,
+    "apseDimensionless": 0.00845492587550869,
+    "nodeDimensionless": -0.004018878354809737
+  },
+  "apsidal": {
+    "termsDimensionless": {
+      "m² (Sun, secular, e²/i² corrected)": 0.004189762740049797,
+      "m³ (Sun, higher-order)": 0.0029427985028794377,
+      "m⁴ (Sun, higher-order)": 0.0009956998650017333,
+      "m⁵ (Sun, higher-order)": 0.00030357763061462326,
+      "J2-of-Earth (empirical, Brouwer–Kozai)": 8.905493375738878e-7
+    },
+    "sumDimensionless": 0.008432729287883165,
+    "matchPercent": 99.73747152899564,
+    "derivedPerSiderealYear": 40.58460565760076,
+    "targetPerSiderealYear": 40.69143225252308,
+    "derivedPeriodYears": 8.870358456534085,
+    "targetPeriodYears": 8.847071240105542
+  },
+  "nodal": {
+    "termsDimensionless": {
+      "m² (Sun, secular, cos(i) + e² corrected)": -0.00420482817589157,
+      "J2-of-Earth (empirical, Brouwer–Kozai)": -4.479843448725254e-7
+    },
+    "sumDimensionless": -0.004205276160236443,
+    "matchPercent": 104.63805542169813,
+    "derivedPerSiderealYear": -20.238936744920462,
+    "targetPerSiderealYear": -19.34185097702383,
+    "derivedPeriodYears": 17.787495684048338,
+    "targetPeriodYears": 18.612489592006664
+  }
+}

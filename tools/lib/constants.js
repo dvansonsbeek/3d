@@ -103,8 +103,8 @@ const perihelionRefJD = ASTRO_REFERENCE.perihelionPassageJ2000_JD;
 // ═══════════════════════════════════════════════════════════════════════════
 
 const moonSiderealMonthInput = astroRef.moonReference.moonSiderealMonthInput;
-const moonAnomalisticMonthInput = astroRef.moonReference.moonAnomalisticMonthInput;
-const moonNodalMonthInput = astroRef.moonReference.moonNodalMonthInput;
+const moonApsidalPrecessionDaysInputICRF = astroRef.moonReference.moonApsidalPrecessionDaysInputICRF;
+const moonNodalPrecessionDaysInputICRF = astroRef.moonReference.moonNodalPrecessionDaysInputICRF;
 const moonDistance = astroRef.moonReference.moonDistance;
 const moonEclipticInclinationJ2000 = astroRef.moonReference.moonEclipticInclinationJ2000;
 const moonOrbitalEccentricity = astroRef.moonReference.moonOrbitalEccentricityBase;
@@ -268,9 +268,26 @@ const perihelionPhaseOffset = (((startModelYearWithCorrection - balancedYear) / 
 // 7. MOON DERIVED CYCLES
 // ═══════════════════════════════════════════════════════════════════════════
 
-const moonSiderealMonth = totalDaysInH / Math.round(totalDaysInH / moonSiderealMonthInput);
-const moonAnomalisticMonth = totalDaysInH / (Math.round(totalDaysInH / moonAnomalisticMonthInput) - 1);
-const moonNodalMonth = totalDaysInH / Math.round(totalDaysInH / moonNodalMonthInput);
+// ───── Option C+ derivation chain (2026-06) ─────
+// J2000 cycle counts per H (from the three observational anchors):
+//   N_sid       — sidereal months per H
+//   N_apsidalI  — apsidal precession cycles per H (ICRF / inertial frame)
+//   N_apsidalE  — apsidal precession cycles per H (Earth frame) = N_apsidalI − 13
+//   N_nodalI    — nodal precession cycles per H (ICRF)
+//   N_nodalE    — nodal precession cycles per H (Earth frame) = N_nodalI + 13
+// The ±13 is the Earth-axial-precession offset (H/13 cycles per H).
+const N_sid      = Math.round(totalDaysInH / moonSiderealMonthInput);
+const N_apsidalI = Math.round(totalDaysInH / moonApsidalPrecessionDaysInputICRF);
+const N_apsidalE = N_apsidalI - 13;
+const N_nodalI   = Math.round(totalDaysInH / moonNodalPrecessionDaysInputICRF);
+const N_nodalE   = N_nodalI + 13;
+
+const moonSiderealMonth = totalDaysInH / N_sid;
+// Anomalistic and nodal months: KINEMATIC consequences of sidereal + precession,
+// not independent inputs. Reason: 1/T_ano = 1/T_M − 1/T_apsidalE (perigee advances)
+// and 1/T_nod_month = 1/T_M + 1/T_nodalE (node regresses).
+const moonAnomalisticMonth = totalDaysInH / (N_sid - N_apsidalE);
+const moonNodalMonth = totalDaysInH / (N_sid + N_nodalE);
 
 const moonSynodicMonth = totalDaysInH / (Math.round(totalDaysInH / moonSiderealMonthInput - 1) + 13 - H);
 const moonTropicalMonth = totalDaysInH / (Math.round(totalDaysInH / moonSiderealMonthInput - 1) + 13);
@@ -278,11 +295,10 @@ const moonTropicalMonth = totalDaysInH / (Math.round(totalDaysInH / moonSidereal
 const moonFullMoonCycleEarth = (moonSynodicMonth / (moonSynodicMonth - moonAnomalisticMonth)) * moonAnomalisticMonth;
 const moonFullMoonCycleICRF = totalDaysInH / ((totalDaysInH / moonFullMoonCycleEarth) + 13);
 
-const moonNodalPrecessionDaysEarth = (moonSiderealMonth / (moonSiderealMonth - moonNodalMonth)) * moonNodalMonth;
-const moonNodalPrecessionDaysICRF = totalDaysInH / ((totalDaysInH / moonNodalPrecessionDaysEarth) - 13);
-
-const moonApsidalPrecessionDaysEarth = (1 / ((moonAnomalisticMonth / moonSiderealMonth) - 1)) * moonAnomalisticMonth;
-const moonApsidalPrecessionDaysICRF = totalDaysInH / ((totalDaysInH / moonApsidalPrecessionDaysEarth) + 13);
+const moonApsidalPrecessionDaysEarth = totalDaysInH / N_apsidalE;
+const moonApsidalPrecessionDaysICRF = totalDaysInH / N_apsidalI;
+const moonNodalPrecessionDaysEarth = totalDaysInH / N_nodalE;
+const moonNodalPrecessionDaysICRF = totalDaysInH / N_nodalI;
 
 const moonApsidalMeetsNodalDays = (moonNodalMonth / (moonAnomalisticMonth - moonNodalMonth)) * moonAnomalisticMonth;
 const moonLunarLevelingCycleDays = (moonNodalPrecessionDaysEarth / (moonNodalPrecessionDaysEarth - moonApsidalPrecessionDaysEarth) * (moonApsidalPrecessionDaysEarth / meanSolarYearDays)) * meanSolarYearDays;
@@ -581,8 +597,10 @@ module.exports = {
 
   // Moon inputs
   moonSiderealMonthInput,
-  moonAnomalisticMonthInput,
-  moonNodalMonthInput,
+  moonApsidalPrecessionDaysInputICRF,
+  moonNodalPrecessionDaysInputICRF,
+  // Cycle counts per H (J2000 anchors; deep-time scales as H(t)²/H(today)²)
+  N_sid, N_apsidalI, N_apsidalE, N_nodalI, N_nodalE,
   moonDistance,
   moonEclipticInclinationJ2000,
   moonMeeusLpCorrection,

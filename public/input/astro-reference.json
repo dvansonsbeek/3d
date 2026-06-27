@@ -37,9 +37,10 @@
     "AE": 2451810.304796
   },
   "moonReference": {
+    "_comment": "Option C+ (2026-06): sidereal month + apsidal/nodal precession periods (ICRF) are the J2000 anchors. Anomalistic and nodal months are derived kinematically. Deep-time evolution: N_apsidal,N_nodal scale as H(t)^2 (T_apsidal*H = const law).",
     "moonSiderealMonthInput": 27.32166156,
-    "moonAnomalisticMonthInput": 27.55454988,
-    "moonNodalMonthInput": 27.21222082,
+    "moonApsidalPrecessionDaysInputICRF": 3231.449,
+    "moonNodalPrecessionDaysInputICRF": 6798.38,
     "moonDistance": 384399.07,
     "moonEclipticInclinationJ2000": 5.1453964,
     "moonOrbitalEccentricityBase": 0.054900489,

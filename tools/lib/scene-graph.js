@@ -682,27 +682,34 @@ function moveModel(graph, pos) {
       nodes._meanAnomaly = M; // Store for parallax correction use
     }
     // Sun mean longitude quadratic correction — root-cause fix for slow drift.
-    // Matches src/script.js: scene moves Sun linearly, real Sun has +0.0003032°/T²
-    // acceleration (Meeus Ch.25, T = Julian centuries from J2000 TT). At J2000:
-    // zero. At deep time: captures the long-period drift our linear motion misses.
-    if (nodes === graph.sunNodes) {
-      const jd = C.startmodelJD + pos * C.meanSolarYearDays;
-      const T_jc = (jd - C.j2000JD) / 36525;
-      θ += 0.0003032 * T_jc * T_jc * d2r;
-    }
-    // Sun longitude harmonic correction — fitted Δλ vs Meeus, matches
-    // src/script.js sunLongitudeCorrection. Year/balancedYear convention
-    // matches the fitter (tools/fit/sun-longitude-harmonics.js).
-    if (nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
-      const jd = C.startmodelJD + pos * C.meanSolarYearDays;
-      const year = 2000 + (jd - C.j2000JD) / 365.25;
-      const t = year - C.balancedYear;
-      let corr = C.SUN_LONGITUDE_MEAN || 0;
-      for (const h of C.SUN_LONGITUDE_HARMONICS) {
-        const phase = 2 * Math.PI * t / (C.H / h[0]);
-        corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
+    // ─── TEMPORARILY DISABLED 2026-06 ────────────────────────────────────
+    // Bug investigation: Sun-only angular corrections shift the visible Sun
+    // but leave planets in their original positions, so planets visibly orbit
+    // a "black spot" while the Sun has drifted. Flip `false → true` to re-enable
+    // once corrections are also propagated to planet scene-graph nodes.
+    if (false) {
+      // Matches src/script.js: scene moves Sun linearly, real Sun has +0.0003032°/T²
+      // acceleration (Meeus Ch.25, T = Julian centuries from J2000 TT). At J2000:
+      // zero. At deep time: captures the long-period drift our linear motion misses.
+      if (nodes === graph.sunNodes) {
+        const jd = C.startmodelJD + pos * C.meanSolarYearDays;
+        const T_jc = (jd - C.j2000JD) / 36525;
+        θ += 0.0003032 * T_jc * T_jc * d2r;
       }
-      θ -= corr * d2r;
+      // Sun longitude harmonic correction — fitted Δλ vs Meeus, matches
+      // src/script.js sunLongitudeCorrection. Year/balancedYear convention
+      // matches the fitter (tools/fit/sun-longitude-harmonics.js).
+      if (nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
+        const jd = C.startmodelJD + pos * C.meanSolarYearDays;
+        const year = 2000 + (jd - C.j2000JD) / 365.25;
+        const t = year - C.balancedYear;
+        let corr = C.SUN_LONGITUDE_MEAN || 0;
+        for (const h of C.SUN_LONGITUDE_HARMONICS) {
+          const phase = 2 * Math.PI * t / (C.H / h[0]);
+          corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
+        }
+        θ -= corr * d2r;
+      }
     }
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
     // Meeus formulas require T from standard J2000.0 (JD 2451545.0) in Julian centuries (36525 days)
@@ -1279,26 +1286,31 @@ function computeSunPositionFast(jd) {
       const M = θ - perihelionPhase;
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
     }
-    // Sun mean longitude quadratic correction — root-cause fix for slow drift.
-    // Matches src/script.js: scene moves Sun linearly, real Sun has +0.0003032°/T²
-    // acceleration (Meeus Ch.25, T = Julian centuries from J2000 TT). At J2000:
-    // zero. At deep time: captures the long-period drift our linear motion misses.
-    if (nodes === graph.sunNodes) {
-      const T_jc = (jd - C.j2000JD) / 36525;
-      θ += 0.0003032 * T_jc * T_jc * d2r;
-    }
-    // Sun longitude harmonic correction — fitted Δλ vs Meeus, ±100 yr around J2000.
-    // Matches src/script.js sunLongitudeCorrection. Year convention matches the
-    // fitter (tools/fit/sun-longitude-harmonics.js): year = 2000 + (jd − j2000JD)/365.25.
-    if (nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
-      const year = 2000 + (jd - C.j2000JD) / 365.25;
-      const t = year - C.balancedYear;
-      let corr = C.SUN_LONGITUDE_MEAN || 0;
-      for (const h of C.SUN_LONGITUDE_HARMONICS) {
-        const phase = 2 * Math.PI * t / (C.H / h[0]);
-        corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
+    // ─── TEMPORARILY DISABLED 2026-06 (Sun-only angular corrections) ─────
+    // Bug investigation: see matching block in moveModel() above. Flip
+    // `false → true` once corrections are propagated to planets too.
+    if (false) {
+      // Sun mean longitude quadratic correction — root-cause fix for slow drift.
+      // Matches src/script.js: scene moves Sun linearly, real Sun has +0.0003032°/T²
+      // acceleration (Meeus Ch.25, T = Julian centuries from J2000 TT). At J2000:
+      // zero. At deep time: captures the long-period drift our linear motion misses.
+      if (nodes === graph.sunNodes) {
+        const T_jc = (jd - C.j2000JD) / 36525;
+        θ += 0.0003032 * T_jc * T_jc * d2r;
       }
-      θ -= corr * d2r;
+      // Sun longitude harmonic correction — fitted Δλ vs Meeus, ±100 yr around J2000.
+      // Matches src/script.js sunLongitudeCorrection. Year convention matches the
+      // fitter (tools/fit/sun-longitude-harmonics.js): year = 2000 + (jd − j2000JD)/365.25.
+      if (nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
+        const year = 2000 + (jd - C.j2000JD) / 365.25;
+        const t = year - C.balancedYear;
+        let corr = C.SUN_LONGITUDE_MEAN || 0;
+        for (const h of C.SUN_LONGITUDE_HARMONICS) {
+          const phase = 2 * Math.PI * t / (C.H / h[0]);
+          corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
+        }
+        θ -= corr * d2r;
+      }
     }
     nodes.orbit.ry = θ;
   }

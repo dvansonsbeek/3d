@@ -46,8 +46,10 @@ Source: NASA GSFC Solar Eclipse Catalog (2000–2025)
 | Parameter                | Value         | Method                                     |
 |--------------------------|---------------|--------------------------------------------|
 | `moonSiderealMonthInput` | 27.32166156   | IAU reference                              |
-| `moonAnomalisticMonthInput` | 27.55454988 | IAU reference                             |
-| `moonNodalMonthInput`    | 27.21222082   | IAU reference                              |
+| `moonApsidalPrecessionDaysInputICRF` | 3231.449 | Meeus ≈ 8.85024 sid-yr — Option C+ 2026-06 |
+| `moonNodalPrecessionDaysInputICRF`   | 6798.38  | Meeus ≈ 18.6133 sid-yr — Option C+ 2026-06 |
+| `moonAnomalisticMonth` (derived)     | 27.55455421 d | Kinematic: H/(N_sid − N_apsidalE)    |
+| `moonNodalMonth` (derived)           | 27.21222089 d | Kinematic: H/(N_sid + N_nodalE)      |
 | `moonDistance`            | 384399.07 km  | IAU reference                              |
 | `moonEclipticInclinationJ2000` | 5.1453964° | IAU reference                           |
 | `moonOrbitalEccentricity`| 0.054900489   | IAU reference                              |

@@ -3,6 +3,45 @@
 All scripts that produce fitted coefficients or derived constants live here.
 Output values are stored in `public/input/fitted-coefficients.json`.
 
+## Design rule for scene-graph corrections
+
+**Any correction added to the framework's motion model (scene-graph rotations
+in `moveModel` or `tools/lib/scene-graph.js`) MUST be harmonic on H-lattice
+divisors. NO polynomial-in-T terms.**
+
+Concrete form: a correction must be expressible as
+
+```
+Σ Aₙ·sin(2π·t/(H/n)) + Bₙ·cos(2π·t/(H/n))     for integer n
+```
+
+where each n is an integer that ties to a known physical cycle (Earth annual
+= H, its harmonics 2H, 3H, planet perihelion period H/m for m matching the
+planet's lattice integer, etc.). Arbitrary fit frequencies and DC offsets
+are NOT allowed.
+
+**Why:** the framework is fundamentally cyclic — every period is H, a
+multiple of H, or H/N for integer N. The deep-time claim is that the *same
+lattice* describes motion across the full Solar System Resonance Cycle
+(2.68 Myr). Polynomial-in-T corrections (T, T², T³, …) are not cyclic:
+they grow without bound, compound across epochs, and silently destroy
+the framework's structural claims.
+
+**Failure case (2026-06):** A `+0.0003032·T_jc²` polynomial was added to the
+Sun's scene-graph angle (intended to match Meeus Ch.25 secular drift). It
+gives ~arcseconds at modern epochs but reaches ~30,000° (~83 rotations) at
+±10 Myr. Visible symptom: Sun displaced from planet-orbit center because
+the correction was applied only to the Sun, not to planets — disabled in
+4 locations and documented in `feedback_no_polynomial_corrections.md`.
+The accompanying `SUN_LONGITUDE_HARMONICS` 4th term (divisor=168, period
+1996 yr) had `gcd(168, H) = 1` — also a violation of this rule and should
+be excluded from any future re-enablement (see Step 6f below).
+
+**Allowed exception:** standalone consumer-side calls (e.g. `_eclSunLon`
+for one-off eclipse longitude reads) MAY keep Meeus polynomial terms —
+they are short-window calculations consumed at a single epoch, not part
+of the cyclic scene-graph motion.
+
 ## `--write` flag convention
 
 All fitting scripts support **dry run** by default (print results only).
@@ -19,7 +58,7 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-solar-measurements.csv` |
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
 | `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/02-solar-measurements.csv` |
-| `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (3 H-lattice terms) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV) |
+| `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (H-lattice terms; **see design rule above** — only divisors n where H/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). Status 2026-06: scene-graph consumers disabled, pending lattice-compatible re-fit |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |
 | `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
@@ -201,20 +240,42 @@ Step 6d: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_
          Updates: fitted-coefficients.json (auto-updated by script)
 
 Step 6f: sun-longitude-harmonics.js           → SUN_LONGITUDE_MEAN + SUN_LONGITUDE_HARMONICS
-         Fits a 3-term H-lattice harmonic correction Δλ(t) to the residual
+         Fits an H-lattice harmonic correction Δλ(t) to the residual
          between the scene-graph Sun and the Meeus Ch.25 reference Sun.
          Captures EoC residuals the analytical 2e·sin(M) + 1.25e²·sin(2M)
-         misses. Default fit range: ±100 yr around J2000 (modern eclipses).
+         misses.
+
+         ⚠ STATUS (2026-06): scene-graph Sun corrections are currently
+         DISABLED — applying them only to the Sun shifts the visible Sun
+         out from under the planet orbits (planets visibly orbit a "black
+         spot"). See `feedback_no_polynomial_corrections.md` for the
+         design-rule background. The eclipse finder uses the standalone
+         `_eclSunLon` Meeus formula directly, so disabling the scene-graph
+         corrections does NOT degrade eclipse accuracy.
+
+         If re-enabling: only harmonics with divisors that are integer
+         multiples of H (period = H, 2H, 3H, …) OR clean H/N divisors
+         tied to known planetary perihelion cycles are permitted. The
+         pre-2026-06 fitter included a 4th term with divisor=168 (period
+         ≈ 1996 yr) — gcd(168, H) = 1, no shared factors, no known physical
+         cycle — that term VIOLATES the design rule and must be excluded.
+         The DC `SUN_LONGITUDE_MEAN` should be ≈ 0 in a well-formed model;
+         if non-zero, investigate the root cause, do not absorb.
+
+         Original fit metrics (for reference, fit no longer applied):
+         Default fit range: ±100 yr around J2000 (modern eclipses).
          RMSE 7.2" over 2400 points; ±3" at problem-eclipse dates (L-2h).
          J2000-anchored: correction at J2000 exactly reproduces measured Δλ.
+
+         The Sun T² polynomial (`+0.0003032·T_jc²`) that previously paired
+         with this step has been REMOVED from the design — it is not
+         lattice-compatible (polynomial in T, not harmonic) and grows
+         without bound at deep time. See design rule near top of this README.
+
          Updates: fitted-coefficients.json (auto-updated by script)
-         Pairs with the in-scene Sun T² polynomial correction
-         (0.0003032°/T², applied directly in moveModel for both
-         src/script.js and tools/lib/scene-graph.js — root-cause fix
-         that captures the secular drift linear scene motion misses).
-         Diagnostic buttons L-2b/L-2g/L-2h in the browser verify the
-         combined fix; expected: eclipse path RMS drops, finder timing
-         offset collapses, modern angular positions match IAU to ~3".
+         Diagnostic buttons L-2b/L-2g/L-2h in the browser verify any future
+         re-enabled correction; expected: eclipse path RMS holds, finder
+         timing offset stays collapsed, modern angular positions match IAU.
          Standalone use:
            node tools/fit/sun-longitude-harmonics.js              # dry run
            node tools/fit/sun-longitude-harmonics.js --range 500  # ±500 yr
@@ -323,8 +384,8 @@ The cardinal-point-derived tropical year (Step 6c) is the authoritative runtime 
 | `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a→6d |
 | `earthInvPlaneInclinationMean` | 3, 6a→6d |
 | `correctionSun` | 1, 6a→6f |
-| `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | 6f, then 5a, 5b (shifts scene Sun → planet stack drifts) |
-| Sun T² polynomial coefficient (inline in `moveModel`) | 6f, then 5a, 5b (same cascade as SUN_LONGITUDE_HARMONICS) |
+| `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | 6f (currently disabled — see Step 6f notes; if re-enabled, then 5a, 5b — but lattice-compatible terms only) |
+| ~~Sun T² polynomial (inline in `moveModel`)~~ | **REMOVED 2026-06** — violates design rule (polynomial-in-T not cyclic). Do not re-introduce. |
 | `eccentricityBase` / `eccentricityAmplitude` | 1, 3→4a, 6a→6f |
 | `correctionDays` | 3, 6a→6d |
 | `useVariableSpeed` | ALL (1→10) |
