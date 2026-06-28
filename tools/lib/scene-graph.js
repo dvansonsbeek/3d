@@ -681,35 +681,46 @@ function moveModel(graph, pos) {
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
       nodes._meanAnomaly = M; // Store for parallax correction use
     }
-    // Sun mean longitude quadratic correction — root-cause fix for slow drift.
-    // ─── TEMPORARILY DISABLED 2026-06 ────────────────────────────────────
-    // Bug investigation: Sun-only angular corrections shift the visible Sun
-    // but leave planets in their original positions, so planets visibly orbit
-    // a "black spot" while the Sun has drifted. Flip `false → true` to re-enable
-    // once corrections are also propagated to planet scene-graph nodes.
-    if (false) {
-      // Matches src/script.js: scene moves Sun linearly, real Sun has +0.0003032°/T²
-      // acceleration (Meeus Ch.25, T = Julian centuries from J2000 TT). At J2000:
-      // zero. At deep time: captures the long-period drift our linear motion misses.
-      if (nodes === graph.sunNodes) {
-        const jd = C.startmodelJD + pos * C.meanSolarYearDays;
-        const T_jc = (jd - C.j2000JD) / 36525;
-        θ += 0.0003032 * T_jc * T_jc * d2r;
+    // Phase Z-B (2026-06): Sun longitude harmonics applied to SUN NODE only.
+    // ────────────────────────────────────────────────────────────────────
+    // The annual correction (~280" amplitude) closes the framework's
+    // 200" Sun-vs-Meeus residual to ~7" (96% reduction). It is derived
+    // from Earth-Sun geometry (framework eccentricityDerivedMean = 0.01545
+    // vs Meeus IAU J2000 = 0.01671) and is NOT physically applicable to
+    // planets — applying at the barycenter level rotates planets too,
+    // degrading their baselines by 30-180" each.
+    //
+    // For Node-side scene-graph (this file), Sun-only is the correct fix:
+    //   - No visualization concerns (the "black spot" visual bug only
+    //     manifests in the browser scene)
+    //   - Planet baselines stay pristine
+    //   - Sun gets the full 96% Meeus improvement
+    //
+    // For src/script.js (browser scene), a different mechanism will be
+    // needed to preserve visual integrity (e.g., barycenter-level + per-
+    // planet inverse corrections, or accept the visual artifact in deep
+    // zoom views). Mirror to script.js is deferred until that's resolved.
+    //
+    // Filter: only H-lattice-compliant terms (year-multiples, small
+    // precession divisors, lunar precession). The legacy [168] term is
+    // skipped here (gcd(168, H) = 1, design-rule violating).
+    const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
+    if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
+      const jd = C.startmodelJD + pos * C.meanSolarYearDays;
+      const year = 2000 + (jd - C.j2000JD) / 365.25;
+      const t = year - C.balancedYear;
+      let corr = C.SUN_LONGITUDE_MEAN || 0;
+      const H_round = Math.round(C.H);
+      for (const h of C.SUN_LONGITUDE_HARMONICS) {
+        const divisor = h[0];
+        const isYearMultiple = divisor >= H_round && divisor % H_round === 0;
+        const isPrecessionDivisor = divisor > 0 && divisor <= 20;
+        const isLunarPrecession = divisor === 18015 || divisor === 37900;
+        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession) continue;
+        const phase = 2 * Math.PI * t / (C.H / divisor);
+        corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
       }
-      // Sun longitude harmonic correction — fitted Δλ vs Meeus, matches
-      // src/script.js sunLongitudeCorrection. Year/balancedYear convention
-      // matches the fitter (tools/fit/sun-longitude-harmonics.js).
-      if (nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
-        const jd = C.startmodelJD + pos * C.meanSolarYearDays;
-        const year = 2000 + (jd - C.j2000JD) / 365.25;
-        const t = year - C.balancedYear;
-        let corr = C.SUN_LONGITUDE_MEAN || 0;
-        for (const h of C.SUN_LONGITUDE_HARMONICS) {
-          const phase = 2 * Math.PI * t / (C.H / h[0]);
-          corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
-        }
-        θ -= corr * d2r;
-      }
+      θ -= corr * d2r;
     }
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
     // Meeus formulas require T from standard J2000.0 (JD 2451545.0) in Julian centuries (36525 days)
@@ -1286,31 +1297,24 @@ function computeSunPositionFast(jd) {
       const M = θ - perihelionPhase;
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
     }
-    // ─── TEMPORARILY DISABLED 2026-06 (Sun-only angular corrections) ─────
-    // Bug investigation: see matching block in moveModel() above. Flip
-    // `false → true` once corrections are propagated to planets too.
-    if (false) {
-      // Sun mean longitude quadratic correction — root-cause fix for slow drift.
-      // Matches src/script.js: scene moves Sun linearly, real Sun has +0.0003032°/T²
-      // acceleration (Meeus Ch.25, T = Julian centuries from J2000 TT). At J2000:
-      // zero. At deep time: captures the long-period drift our linear motion misses.
-      if (nodes === graph.sunNodes) {
-        const T_jc = (jd - C.j2000JD) / 36525;
-        θ += 0.0003032 * T_jc * T_jc * d2r;
+    // Phase Z-B (2026-06): Sun longitude harmonics applied to SUN NODE only.
+    // Mirror of the moveModel() Sun-only block above. See there for full notes.
+    const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
+    if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
+      const year = 2000 + (jd - C.j2000JD) / 365.25;
+      const t = year - C.balancedYear;
+      let corr = C.SUN_LONGITUDE_MEAN || 0;
+      const H_round = Math.round(C.H);
+      for (const h of C.SUN_LONGITUDE_HARMONICS) {
+        const divisor = h[0];
+        const isYearMultiple = divisor >= H_round && divisor % H_round === 0;
+        const isPrecessionDivisor = divisor > 0 && divisor <= 20;
+        const isLunarPrecession = divisor === 18015 || divisor === 37900;
+        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession) continue;
+        const phase = 2 * Math.PI * t / (C.H / divisor);
+        corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
       }
-      // Sun longitude harmonic correction — fitted Δλ vs Meeus, ±100 yr around J2000.
-      // Matches src/script.js sunLongitudeCorrection. Year convention matches the
-      // fitter (tools/fit/sun-longitude-harmonics.js): year = 2000 + (jd − j2000JD)/365.25.
-      if (nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
-        const year = 2000 + (jd - C.j2000JD) / 365.25;
-        const t = year - C.balancedYear;
-        let corr = C.SUN_LONGITUDE_MEAN || 0;
-        for (const h of C.SUN_LONGITUDE_HARMONICS) {
-          const phase = 2 * Math.PI * t / (C.H / h[0]);
-          corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
-        }
-        θ -= corr * d2r;
-      }
+      θ -= corr * d2r;
     }
     nodes.orbit.ry = θ;
   }

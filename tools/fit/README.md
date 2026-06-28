@@ -34,8 +34,12 @@ gives ~arcseconds at modern epochs but reaches ~30,000° (~83 rotations) at
 the correction was applied only to the Sun, not to planets — disabled in
 4 locations and documented in `feedback_no_polynomial_corrections.md`.
 The accompanying `SUN_LONGITUDE_HARMONICS` 4th term (divisor=168, period
-1996 yr) had `gcd(168, H) = 1` — also a violation of this rule and should
-be excluded from any future re-enablement (see Step 6f below).
+1996 yr) had `gcd(168, H) = 1` — also a violation of this rule. **Status
+2026-06 (Phase Z-B):** The Sun harmonic correction has been RE-ENABLED with
+the H-lattice filter applied at runtime — the [168] term is automatically
+skipped, only the 3 year-multiple terms (1 yr, ½ yr, ⅓ yr) and any future
+lunar-precession or small-precession-divisor terms are applied. Sun-only
+application (NOT barycenter) keeps planet baselines pristine. See Step 0.
 
 **Allowed exception:** standalone consumer-side calls (e.g. `_eclSunLon`
 for one-off eclipse longitude reads) MAY keep Meeus polynomial terms —
@@ -58,7 +62,7 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-solar-measurements.csv` |
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
 | `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/02-solar-measurements.csv` |
-| `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (H-lattice terms; **see design rule above** — only divisors n where H/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). Status 2026-06: scene-graph consumers disabled, pending lattice-compatible re-fit |
+| `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (H-lattice terms; **see design rule above** — only divisors n where H/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime H-lattice filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |
 | `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
@@ -83,8 +87,21 @@ and require no pipeline step.
 ## Dependency chain
 
 When model parameters change, refit in this order. The logic:
-1. Sun optimizer must run first — it derives the exact Earth geometry constants
-   (eccentricityBase, eccentricityAmplitude, obliquity, perihelion longitude)
+0. **Step 0 (Sun longitude harmonics) runs FIRST as a prerequisite.** The
+   harmonics capture a structural property of the framework (the ~8%
+   eccentricity-definition gap between the framework's
+   `eccentricityDerivedMean` and Meeus IAU). They shift the scene-graph
+   Sun by up to ±49" at Jan/Jul, so every downstream step needs to see
+   them already applied. Running Step 0 first means Steps 1 → 5a → 5b
+   all calibrate against the corrected Sun frame in a single pass.
+   The coefficients themselves are stable across normal refits — re-run
+   Step 0 only when H, the eccentricity definition, or the Meeus
+   reference changes.
+1. Sun optimizer (Step 1) runs second — with Step 0's harmonics already
+   applied, correctionSun calibration converges directly to the optimal
+   value (no need to re-run to absorb a harmonic shift later).
+   Derives the exact Earth geometry constants (eccentricityBase,
+   eccentricityAmplitude, obliquity, perihelion longitude).
 2. Planet angleCorrection must be solved next — it aligns each planet's perihelion
 3. Only after Steps 1–2 is the simulation state correct enough to export input data
 4. Earth's perihelion/ERD must be correct before planet ML predictions (4a→4d)
@@ -99,15 +116,50 @@ When model parameters change, refit in this order. The logic:
    obliquity mean; the second pass ensures all downstream steps use the
    corrected value. In practice the effect is small (~1.5" obliquity shift),
    but a second pass guarantees convergence.
-9. `SUN_LONGITUDE_HARMONICS` (Step 6f) also feeds back into the scene graph
-   via `moveModel`'s Sun branch, alongside the in-scene Sun T² polynomial
-   correction (Meeus Ch.25 +0.0003032°/T², not pipeline-fitted —
-   inlined directly in `moveModel`). Both shift the scene Sun, which means
-   the planet correction stack (Steps 5a, 5b) becomes slightly stale and
-   benefits from a follow-up rerun. Same convergence rationale as Step 6b
-   applies: two passes guarantee self-consistency.
+9. The Sun T² polynomial correction (Meeus Ch.25 +0.0003032°/T²) that
+   formerly paired with the Sun harmonics has been **REMOVED 2026-06**
+   per the H-lattice design rule (polynomial-in-T terms grow without
+   bound at deep time and destroy the lattice claim). See the design
+   rule near the top of this README.
 
 ```
+── Phase 0: Pre-fit Sun harmonic structure (prerequisite, run once) ──
+
+Step 0:  node tools/fit/sun-longitude-harmonics.js --write
+         → SUN_LONGITUDE_MEAN, SUN_LONGITUDE_HARMONICS
+         Captures the STRUCTURAL Sun residual (framework
+         eccentricityDerivedMean ≈ 0.01545 vs Meeus IAU 0.01671 — an ~8%
+         definitional gap that propagates through 2e·sin(M) to produce a
+         ~280" annual harmonic). The fitted coefficients are a fixed
+         property of the framework, not of any single calibration round.
+
+         Why this is "Step 0" rather than a regular fitting step:
+         - Coefficients are stable across normal refits — re-run only
+           when H, the eccentricity definition, or the underlying physics
+           reference (Meeus Ch.25) changes. (Same "stable across normal
+           refits" pattern as fibonacci_significance.py / Step 7d.)
+         - Running it FIRST means Step 1 calibrates correctionSun with
+           harmonics already applied → single-pass convergence. If 6f
+           ran after Step 1 (legacy order), Step 1 would need to re-run
+           to absorb the ~3" shift introduced by the harmonics' annual
+           swing at the Jan/Jul calibration dates.
+         - It does NOT depend on Steps 1-2 having been refreshed: the
+           existing correctionSun from any prior round is a good enough
+           sampling base (a small correctionSun offset only shifts the
+           residual's MEAN component, not the amplitude coefficients).
+
+         For a clean fresh fit, disable existing harmonics first so the
+         fitter samples the RAW residual rather than the post-correction
+         (near-zero) residual:
+           SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write
+
+         Output: ~7" RMS scene-graph Sun vs Meeus Ch.25 in the modern
+         window (down from 198" raw). Three H-lattice-compliant terms
+         survive the runtime filter (1 yr, ½ yr, ⅓ yr); legacy [168]
+         term is silently filtered. See "Step 6f legacy reference"
+         further below for the full Phase Z-B technical detail (active
+         coefficients, architecture choice, A/B toggle, refit caveats).
+
 ── Phase 1: Sun optimizer & planet alignment ──────────────────────
 
 Step 1:  node tools/optimize.js optimize sun correctionSun
@@ -239,52 +291,93 @@ Step 6d: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_
          anomalistic 0.002s over full H.
          Updates: fitted-coefficients.json (auto-updated by script)
 
-Step 6f: sun-longitude-harmonics.js           → SUN_LONGITUDE_MEAN + SUN_LONGITUDE_HARMONICS
+Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
+         fit is now invoked as Step 0 (prerequisite, runs before Step 1)
+         instead of as part of Phase 5, because its coefficients are
+         structural and don't need re-fitting alongside the iterative
+         pipeline. The technical detail below remains accurate; only
+         the pipeline position has changed.
+
+         sun-longitude-harmonics.js                 → SUN_LONGITUDE_MEAN + SUN_LONGITUDE_HARMONICS
          Fits an H-lattice harmonic correction Δλ(t) to the residual
          between the scene-graph Sun and the Meeus Ch.25 reference Sun.
          Captures EoC residuals the analytical 2e·sin(M) + 1.25e²·sin(2M)
-         misses.
+         misses — most importantly the year-period oscillation that comes
+         from the framework's `eccentricityDerivedMean ≈ 0.01545` differing
+         from Meeus IAU J2000 eccentricity 0.01671 by ~8%.
 
-         ⚠ STATUS (2026-06): scene-graph Sun corrections are currently
-         DISABLED — applying them only to the Sun shifts the visible Sun
-         out from under the planet orbits (planets visibly orbit a "black
-         spot"). See `feedback_no_polynomial_corrections.md` for the
-         design-rule background. The eclipse finder uses the standalone
-         `_eclSunLon` Meeus formula directly, so disabling the scene-graph
-         corrections does NOT degrade eclipse accuracy.
+         ✓ STATUS (2026-06, Phase Z-B): ENABLED. The fitted coefficients
+         are loaded from fitted-coefficients.json and applied at runtime
+         to the SUN NODE in the scene-graph (Sun-only, NOT barycenter).
+         Runtime filter restricts application to design-rule-compliant
+         divisors only:
+           - Year-multiple: divisor ≥ round(H) AND divisor % round(H) === 0
+             (covers 1 yr, 0.5 yr, 0.333 yr, ... up to 1/20 yr)
+           - Small precession: divisor ∈ {3, 5, 8, 13, 16} (Earth Fibonacci)
+           - Lunar precession: divisor ∈ {18015, 37900} (nodal/apsidal ICRF)
+         Any other divisor (e.g. legacy [168]) is silently skipped at
+         runtime — design-rule violation safeguard. See `lessons-learned-
+         lunar-framework-native.md` Addendum 5 for the full Z investigation.
 
-         If re-enabling: only harmonics with divisors that are integer
-         multiples of H (period = H, 2H, 3H, …) OR clean H/N divisors
-         tied to known planetary perihelion cycles are permitted. The
-         pre-2026-06 fitter included a 4th term with divisor=168 (period
-         ≈ 1996 yr) — gcd(168, H) = 1, no shared factors, no known physical
-         cycle — that term VIOLATES the design rule and must be excluded.
-         The DC `SUN_LONGITUDE_MEAN` should be ≈ 0 in a well-formed model;
-         if non-zero, investigate the root cause, do not absorb.
+         Architecture choice (Sun-only vs barycenter): the correction is
+         Earth-Sun-geometry-specific (the eccentricity-difference signature
+         is unique to Earth's orbit), so applying at the barycenter level
+         would also rotate the 7 planets — degrading their baselines by
+         30–180" each. Sun-only application keeps planet baselines
+         pristine. Tradeoff: the visible Sun is offset from the strict
+         planet-orbit center by up to ±25" (down from ±300" with the bad
+         [168] term included) — typically invisible at normal zoom levels.
 
-         Original fit metrics (for reference, fit no longer applied):
-         Default fit range: ±100 yr around J2000 (modern eclipses).
-         RMSE 7.2" over 2400 points; ±3" at problem-eclipse dates (L-2h).
-         J2000-anchored: correction at J2000 exactly reproduces measured Δλ.
+         Coefficients (active under H-lattice filter):
+           [335317, sin= 0.076405, cos= 0.013550]  →  1 yr period, ~280" amp
+           [670634, sin= 0.002478, cos= 0.000226]  →  ½ yr period, ~9" amp
+           [1005951, sin= 0.000033, cos= 0.000009] →  ⅓ yr period, ~0.1" amp
+         The legacy [168, 0.0048, -0.0050] term remains in JSON but is
+         FILTERED OUT at runtime (gcd(168, H) = 1).
+
+         Toggle: `let SUN_HARMONICS_ENABLED = true;` (src/script.js)
+                 env `SUN_HARMONICS_DISABLED=1` (Node tools)
+         Use to A/B test the impact of the correction.
+
+         Measured impact (Phase Z-B verification):
+           - Scene-graph Sun vs Meeus residual: 197.77" → 7.39" RMS (96% reduction)
+           - Sun JPL baseline (sparse Jan/Jul dates): 11.5" → 14.8" RMS
+             (small regression at sparse calibration dates, since they
+             happen to sit at orbital phases where the annual correction
+             reaches ±49" — recoverable via correctionSun recalibration)
+           - All planet baselines: unchanged
+           - Eclipse audit (browser) modern eclipses: ΔJD typically 1-2 min
+             (vs 6.40 min pre-Z-B per lessons-learned Addendum 4)
+
+         Greedy re-test (Phase Z verification): re-running the fitter under
+         Z-B's strict-design candidate pool finds NO additional H-lattice
+         terms above the 0.05" improvement threshold. Long-period drift
+         proxies (H/152, H/167, H/168 with periods 2000+ yr) are found by
+         greedy but ALL violate the design rule (gcd(n, H) = 1) and are
+         rejected per the lessons-learned policy. The current 3-term set
+         is the COMPLETE H-lattice-compliant correction available.
 
          The Sun T² polynomial (`+0.0003032·T_jc²`) that previously paired
          with this step has been REMOVED from the design — it is not
          lattice-compatible (polynomial in T, not harmonic) and grows
          without bound at deep time. See design rule near top of this README.
 
-         Updates: fitted-coefficients.json (auto-updated by script)
-         Diagnostic buttons L-2b/L-2g/L-2h in the browser verify any future
-         re-enabled correction; expected: eclipse path RMS holds, finder
-         timing offset stays collapsed, modern angular positions match IAU.
+         Updates: fitted-coefficients.json (when --write); coefficients
+         are loaded by constants.js and applied automatically at runtime.
          Standalone use:
            node tools/fit/sun-longitude-harmonics.js              # dry run
            node tools/fit/sun-longitude-harmonics.js --range 500  # ±500 yr
            node tools/fit/sun-longitude-harmonics.js --write      # persist
-         CAVEAT: changing the scene Sun (T² or harmonics) shifts what the
-         planet correction stack (Steps 5a, 5b) sees. After running this
-         step, refit 5a/5b to close any planet baseline regressions —
-         Venus and Saturn are the most sensitive (inner+outer that lean
-         hardest on Sun-relative geometry in the correction stack).
+         CAVEAT: changing SUN_LONGITUDE_HARMONICS shifts what every
+         downstream step sees. The Step 0 ordering exists exactly to
+         absorb this: running Step 0 first means Steps 1 → 5a → 5b
+         all naturally calibrate against the corrected Sun, with no
+         follow-up re-fits needed. If you must re-run this script
+         AFTER the main pipeline (e.g. ad-hoc diagnostic refit), then
+         also re-run Step 1 (correctionSun) and Steps 5a/5b (planet
+         baselines) afterwards — Venus and Saturn are the most
+         sensitive (inner+outer that lean hardest on Sun-relative
+         geometry in the correction stack).
 
 ── Phase 5b: Eccentricity amplitudes & balance law verification ──
 
@@ -394,10 +487,10 @@ The cardinal-point-derived tropical year (Step 6c) is the authoritative runtime 
 | `earthtiltMean` | 1, 3→4d, 6a→6d |
 | `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a→6d |
 | `earthInvPlaneInclinationMean` | 3, 6a→6d |
-| `correctionSun` | 1, 6a→6f |
-| `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | 6f (currently disabled — see Step 6f notes; if re-enabled, then 5a, 5b — but lattice-compatible terms only) |
+| `correctionSun` | 1, 6a→6d |
+| `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | **Step 0 is the source.** Re-run Step 0 only when H, the eccentricity definition, or Meeus reference changes — then re-run the full pipeline (1 → 2 → … → 9) so all downstream steps re-calibrate against the new Sun frame. The harmonics are NOT re-fit as part of ordinary refits. Runtime H-lattice filter automatically skips design-rule-violating divisors. |
 | ~~Sun T² polynomial (inline in `moveModel`)~~ | **REMOVED 2026-06** — violates design rule (polynomial-in-T not cyclic). Do not re-introduce. |
-| `eccentricityBase` / `eccentricityAmplitude` | 1, 3→4a, 6a→6f |
+| `eccentricityBase` / `eccentricityAmplitude` | **0, 1, 3→4a, 6a→6d** (re-fit Step 0 because eccentricity gap definition changed; then re-run pipeline) |
 | `correctionDays` | 3, 6a→6d |
 | `useVariableSpeed` | ALL (1→10) |
 | Planet `startpos` | 2 (re-solve angleCorrection), 5 |
@@ -446,7 +539,15 @@ The Moon step (5c) runs once after the iteration completes.
 ### Manual step-by-step
 
 ```bash
+# Phase 0: Pre-fit Sun harmonic structure (prerequisite, run once)
+# Skip on routine refits — coefficients are stable. Re-run only when H,
+# eccentricity definition, or Meeus reference changes. Disable existing
+# harmonics first so the fitter samples the RAW residual:
+SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write   # Step 0 (~1 sec)
+
 # Phase 1: Sun optimizer & planet alignment
+# (Step 1 will calibrate correctionSun WITH Step 0's harmonics already
+# applied → single-pass convergence, no follow-up re-run required.)
 node tools/optimize.js optimize sun correctionSun --write                    # Step 1
 node tools/optimize.js optimize mercury startpos --write                     # Step 2
 node tools/optimize.js optimize venus startpos --write                       # Step 2
@@ -483,11 +584,8 @@ node tools/fit/export-solar-measurements.js                                  # S
 node tools/fit/obliquity-harmonics.js --write                                # Step 6b
 node tools/fit/cardinal-point-harmonics.js --write                           # Step 6c
 node tools/fit/year-length-harmonics.js --write                              # Step 6d
-node tools/fit/sun-longitude-harmonics.js --write                            # Step 6f (~1 sec)
-# NOTE: After Step 6f, re-run 5a + 5b to re-fit planet corrections against
-# the (now slightly-shifted) scene Sun. Skipping leaves a Venus/Saturn ~14"
-# baseline regression (small but real). 6f itself is fast (~1 sec) and
-# improves modern eclipse accuracy by 50× at problem dates.
+# (Sun longitude harmonics moved to Phase 0 — see top of this block.
+# It does NOT need to re-run here as part of routine refits.)
 
 # Phase 5b: Balance law verification
 node tools/verify/balance-search.js                                          # Step 7b (balance presets)

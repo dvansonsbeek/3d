@@ -15,6 +15,12 @@
  *
  * Step 3 (browser export) is always manual — the runner checks that
  * data/01-holistic-year-objects-data.xlsx exists before starting Phase 2.
+ *
+ * NOT INCLUDED in the standard runner:
+ *  - Step 0 (sun-longitude-harmonics.js) — structural prerequisite, run
+ *    once manually before the first pipeline pass; coefficients are
+ *    stable across normal refits. See tools/fit/README.md Phase 0.
+ *  - Step 5c (moon-eclipse-optimizer.js) — separate eclipse-anchored fit.
  */
 
 const { execSync } = require('child_process');
@@ -88,8 +94,9 @@ const STEPS = [
     cmd: 'node tools/fit/year-length-harmonics.js --write --type sidereal' },
   { id: '6e', phase: 2, name: 'Anomalistic year harmonics',
     cmd: 'node tools/fit/year-length-harmonics.js --write --type anomalistic' },
-  { id: '6f', phase: 2, name: 'Sun longitude harmonics (model − Meeus residual)',
-    cmd: 'node tools/fit/sun-longitude-harmonics.js --write' },
+  // Step 6f (sun-longitude-harmonics) intentionally OMITTED — see header
+  // comment. It runs once as Phase 0 prerequisite, not as part of the
+  // routine cascade.
 
   // Phase 5b: Eccentricity amplitudes & balance law verification
   { id: '7a', phase: 2, name: 'Derive eccentricity amplitudes',

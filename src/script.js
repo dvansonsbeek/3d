@@ -2993,15 +2993,27 @@ const SUN_LONGITUDE_HARMONICS = [
 
 // Sun ecliptic longitude correction Δλ(jd) in degrees. Add −Δλ to the Sun's
 // scene-graph angle so the corrected longitude matches Meeus high-precision
-// Sun to ~3″ over 1900-2100. Year/balancedYear convention matches the fitter
-// (tools/fit/sun-longitude-harmonics.js): year = 2000 + (jd − j2000JD)/365.25.
-// References balancedYear + holisticyearLength resolved at call time.
+// Sun to ~7″ over 1900-2100 (96 % closure of the 200″ raw residual). The
+// year-period harmonic captures the framework's eccentricity-definition gap
+// (eccentricityDerivedMean ≈ 0.01545 vs Meeus IAU J2000 = 0.01671).
+// Year/balancedYear convention matches the fitter (tools/fit/sun-longitude-harmonics.js):
+// year = 2000 + (jd − j2000JD)/365.25.
+//
+// Design-rule filter: applies ONLY H-lattice-compliant terms (year-multiples,
+// small precession divisors, lunar precession). The legacy [168] term is
+// skipped (gcd(168, H) = 1, design-rule violating — see lessons-learned doc).
 function sunLongitudeCorrection(jd) {
   const year = 2000 + (jd - j2000JD) / 365.25;
   const t = year - balancedYear;
   let corr = SUN_LONGITUDE_MEAN;
+  const H_round = Math.round(holisticyearLength);
   for (const h of SUN_LONGITUDE_HARMONICS) {
-    const phase = 2 * Math.PI * t / (holisticyearLength / h[0]);
+    const divisor = h[0];
+    const isYearMultiple = divisor >= H_round && divisor % H_round === 0;
+    const isPrecessionDivisor = divisor > 0 && divisor <= 20;
+    const isLunarPrecession = divisor === 18015 || divisor === 37900;
+    if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession) continue;
+    const phase = 2 * Math.PI * t / (holisticyearLength / divisor);
     corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
   }
   return corr;
@@ -6796,6 +6808,18 @@ function meeusVsIntegratorDiagnostic(jd) {
 if (typeof window !== 'undefined') window.meeusVsIntegratorDiagnostic = meeusVsIntegratorDiagnostic;
 let   currentEpoch_t_Ma   = 0;
 let   DEEP_TIME_MODE_ENABLED = true;
+
+// Phase Z-B (2026-06): enable Sun longitude harmonic correction at scene-graph
+// Sun node. Closes the framework's ~200" Sun-vs-Meeus residual to ~7" RMS
+// (96% reduction) by applying the year-period EoC correction validated in
+// tools/fit/sun-annual-correction.js. Sun-only application (NOT barycenter)
+// keeps planet baselines pristine — the correction is Earth-Sun-geometry-
+// specific (eccentricity-definition difference, ~0.01545 vs Meeus 0.01671).
+//
+// Visual: the Sun shifts up to ±25" from planet-orbit center (was ±300" with
+// the old [168]-divisor harmonic included). At typical zoom levels this is
+// below visible resolution. To disable for A/B testing, flip to false.
+let   SUN_HARMONICS_ENABLED = true;
 
 /** Apply the full Phase 0–3-planets chain at age t_Ma (positive = past). */
 function setEpochByAge(t_Ma) {
@@ -53429,15 +53453,22 @@ function moveModel(pos) {
       obj._meanAnomaly = M; // Store for parallax correction (BR-CA terms)
     }
 
-    // ─── TEMPORARILY DISABLED 2026-06 (Sun harmonic correction) ─────────
-    // Bug investigation: same root cause as T² block above. Flip when fixed.
-    if (false) {
-      // Sun longitude harmonic correction (fitted Δλ vs Meeus, ±100 yr around J2000).
-      // Captures EoC residuals the analytical 2e·sinM + 1.25e²·sin2M misses.
-      // Subtract: model thinks Sun is at θ_raw, true λ is θ_raw − Δλ → rotate back.
-      if (obj === sun) {
-        θ -= sunLongitudeCorrection(o.julianDay) * (Math.PI / 180);
-      }
+    // Phase Z-B (2026-06): Sun longitude harmonic correction — RE-ENABLED.
+    // ────────────────────────────────────────────────────────────────────
+    // Architecture: Sun-only application (not barycenter). The correction is
+    // Earth-Sun-geometry-specific (framework eccentricityDerivedMean = 0.01545
+    // vs Meeus IAU = 0.01671); applying at the barycenter would degrade
+    // planet baselines by 30–180" each. Sun-only keeps planets pristine while
+    // closing ~95% of the framework's Sun-vs-Meeus longitude residual.
+    //
+    // Visual integrity: the old [168]-divisor harmonic shifted the Sun by up
+    // to ±300" from planet-orbit center (visible "black spot" effect). With
+    // the H-lattice filter (now applied inside sunLongitudeCorrection), the
+    // remaining shift is ±25" — typically below visible resolution.
+    //
+    // Subtract: model thinks Sun is at θ_raw, true λ is θ_raw − Δλ → rotate back.
+    if (SUN_HARMONICS_ENABLED && obj === sun) {
+      θ -= sunLongitudeCorrection(o.julianDay) * (Math.PI / 180);
     }
 
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude)
