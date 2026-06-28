@@ -660,27 +660,22 @@ function computeEclipticInclination(planetName, currentYear) {
 
 /**
  * Compute axial precession (in years per full cycle).
- * Source: script.js computeAxialPrecession() ~line 33323
+ *
+ * Source: src/script.js:56123 — production uses ONLY the 3-arg RealLOD form
+ * (callers at lines 23607, 55952). The earlier 2-arg version here hardcoded
+ * 86400 as LOD which gave inconsistent precession when called with
+ * meanLengthOfDay-based siderealYearSec (off by ~22 yr at J2000, ~488 yr at
+ * deep time). Now: pass LOD explicitly; defaults to C.meanLengthOfDay for
+ * the non-deep-time case (matches production).
  *
  * @param {number} siderealYearSec - sidereal year in seconds
  * @param {number} solarYearDays - solar year in days
- * @returns {number} axial precession period in years
- */
-function computeAxialPrecession(siderealYearSec, solarYearDays) {
-  return siderealYearSec / (siderealYearSec - (solarYearDays * 86400));
-}
-
-/**
- * Compute axial precession with variable LOD.
- * Source: script.js computeAxialPrecessionRealLOD() ~line 33339
- *
- * @param {number} siderealYearSec - sidereal year in seconds
- * @param {number} solarYearDays - solar year in days
- * @param {number} lengthOfDay - seconds per solar day
+ * @param {number} [lengthOfDay] - seconds per solar day (defaults to C.meanLengthOfDay)
  * @returns {number} axial precession period in years
  */
 function computeAxialPrecessionRealLOD(siderealYearSec, solarYearDays, lengthOfDay) {
-  return siderealYearSec / (siderealYearSec - (solarYearDays * lengthOfDay));
+  const lod = lengthOfDay !== undefined ? lengthOfDay : C.meanLengthOfDay;
+  return siderealYearSec / (siderealYearSec - (solarYearDays * lod));
 }
 
 /**
@@ -812,43 +807,56 @@ function computeLengthOfSiderealYearSec() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Compute length of day (seconds per solar day).
- * LOD = sidereal year (seconds) / sidereal year (days)
- * Source: script.js ~line 33200
+ * Length of day in seconds. Production (src/script.js:3333) defines:
+ *   meanlengthofday = meansiderealyearlengthinSeconds / meansiderealyearlengthinDays
+ * Both inputs are CONSTANTS at module load — LOD is constant across years in
+ * non-deep-time mode. (For deep-time mode, src/script.js:5630 reassigns to
+ * meanLodSecondsAtAge(t_Ma) — that function is browser-only.) The dashboard
+ * year range (±300 kyr) gives <2 sec LOD variation under deep-time evolution
+ * — negligible at this scale — so we return the J2000 constant.
  *
- * @param {number} siderealYearDays - sidereal year in days
+ * Earlier version divided C.meanSiderealYearSeconds by the year-specific
+ * (Fourier-oscillating) siderealYearDays, which produced ~0.3 ms spurious
+ * variation that did not match production behavior.
+ *
  * @returns {number} length of day in seconds
  */
-function computeLengthOfDay(siderealYearDays) {
-  return C.meanSiderealYearSeconds / siderealYearDays;
+function computeLengthOfDay(t_Ma) {
+  if (t_Ma === undefined || t_Ma === 0) return C.meanLengthOfDay;
+  return require('./deep-time').meanLodSecondsAtAge(t_Ma);
 }
 
 /**
- * Compute sidereal day length in seconds.
- * siderealDay = solarYearSec / (solarYearDays + 1)
- * Source: script.js ~line 33208
+ * Sidereal day length in seconds. Production (src/script.js:3334 inline,
+ * constants.js:213) defines:
+ *   meanSiderealday = (meanSolarYearDays / (meanSolarYearDays + 1)) * meanLengthOfDay
+ * Constant across years. Earlier version `solarYearSec / (solarYearDays + 1)`
+ * with per-year solarYearSec/Days values was algebraically equivalent only if
+ * LOD is recomputed correctly — but coupled with the wrong LOD it introduced
+ * spurious variation.
  *
- * @param {number} solarYearSec - solar year in seconds (solarYearDays × LOD)
- * @param {number} solarYearDays - solar year in days
  * @returns {number} sidereal day in seconds
  */
-function computeSiderealDay(solarYearSec, solarYearDays) {
-  return solarYearSec / (solarYearDays + 1);
+function computeSiderealDay(t_Ma) {
+  if (t_Ma === undefined || t_Ma === 0) return C.meanSiderealDay;
+  return require('./deep-time').meanSiderealDayAtAge(t_Ma);
 }
 
 /**
- * Compute stellar day length in seconds.
- * Adds perihelion precession term to sidereal day.
- * Source: script.js ~line 33209
+ * Stellar day length in seconds. Production (src/script.js:3335,
+ * constants.js:214) defines:
+ *   meanStellarday = (meanSiderealday / (H / 13)) / (meanSolarYearDays + 1) + meanSiderealday
+ * The H/13 factor is the axial precession period in years.
  *
- * @param {number} siderealYearSec - sidereal year in seconds
- * @param {number} solarYearSec - solar year in seconds
- * @param {number} solarYearDays - solar year in days
- * @param {number} siderealDay - sidereal day in seconds
+ * Earlier version used `(siderealYearSec - solarYearSec) / (1/eccentricityAmplitude/13*16)`
+ * which gave a divisor of ~907 instead of H/13 ≈ 25,794 — completely wrong
+ * formula, off by factor ~28×. Stellar day was ~5 ms too low vs production.
+ *
  * @returns {number} stellar day in seconds
  */
-function computeStellarDay(siderealYearSec, solarYearSec, solarYearDays, siderealDay) {
-  return (((siderealYearSec - solarYearSec) / (1 / C.eccentricityAmplitude / 13 * 16)) / (solarYearDays + 1)) + siderealDay;
+function computeStellarDay(t_Ma) {
+  if (t_Ma === undefined || t_Ma === 0) return C.meanStellarDay;
+  return require('./deep-time').meanStellarDayAtAge(t_Ma);
 }
 
 /**
@@ -1264,21 +1272,27 @@ function predictPrecessionFluctuation(year, planetKey) {
  * @returns {object} all orbital elements
  */
 function computeEarthOrbitalElements(year) {
+  // Deep-time t_Ma (millions of years before J2000). Positive = past.
+  // Used to evolve LOD, H, year-length anchors via ESSRT chain (deep-time.js).
+  const t_Ma = (2000 - year) / 1e6;
+
   const eccentricity = computeEccentricityEarth(year);
   const obliquity = computeObliquityEarth(year);
   const inclination = computeInclinationEarth(year);
   const solarYearDays = computeLengthOfSolarYear(year);
   const siderealYearDays = computeLengthOfSiderealYear(year);
-  const siderealYearSec = siderealYearDays * C.meanLengthOfDay;
-  const precession = computeAxialPrecession(siderealYearSec, solarYearDays);
+
+  // Deep-time anchors + Fourier-varying year lengths
+  const lengthOfDay = computeLengthOfDay(t_Ma);
+  const siderealYearSec = siderealYearDays * lengthOfDay;
+  const precession = computeAxialPrecessionRealLOD(siderealYearSec, solarYearDays, lengthOfDay);
   const perihelionLong = calcEarthPerihelionPredictive(year);
   const erd = calcERD(year);
 
-  // Day length
-  const lengthOfDay = computeLengthOfDay(siderealYearDays);
+  // Day length values — deep-time aware
   const solarYearSec = solarYearDays * lengthOfDay;
-  const siderealDay = computeSiderealDay(solarYearSec, solarYearDays);
-  const stellarDay = computeStellarDay(siderealYearSec, solarYearSec, solarYearDays, siderealDay);
+  const siderealDay = computeSiderealDay(t_Ma);
+  const stellarDay = computeStellarDay(t_Ma);
   const raDayOffsetMs = computeRADayOffset(year);
   const measuredSolarDay = computeMeasuredSolarDay(lengthOfDay, raDayOffsetMs);
 
@@ -1337,7 +1351,6 @@ module.exports = {
   computeEclipticInclination,
 
   // Precession
-  computeAxialPrecession,
   computeAxialPrecessionRealLOD,
   computePerihelionPrecession,
   computeInclinationPrecessionPeriod,

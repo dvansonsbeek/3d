@@ -12,6 +12,7 @@ const path = require('path');
 const fs = require('fs');
 const C = require('./lib/constants');
 const OE = require('./lib/orbital-engine');
+const DT = require('./lib/deep-time');
 
 const OUTPUT_DIR = path.join(__dirname, '..', 'dashboard', 'data');
 
@@ -73,6 +74,8 @@ function exportEarth(years) {
   const aeJD = [], aeRA = [], aeYearLength = [];
   const solsticeObliquity = [];
   const perihelionDist = [], aphelionDist = [];
+  // Deep-time chain (ESSRT) — per-year evolution of H, AU, Moon distance
+  const holisticYearAtYear = [], auKmAtYear = [], moonDistanceKmAtYear = [];
 
   // Earth's ascending node precesses at -H/5 (retrograde, ecliptic precession rate)
   const earthAscNodePeriod = -C.H / 5;
@@ -144,6 +147,12 @@ function exportEarth(years) {
     // Argument of perihelion: ω = lon_perihelion - ascending_node
     const omega = ((el.perihelionLong - ascNode) % 360 + 360) % 360;
     argPerihelion.push(+omega.toFixed(4));
+
+    // Deep-time chain values (ESSRT): per-year H, AU, Moon distance evolution
+    const t_Ma = (2000 - year) / 1e6;
+    holisticYearAtYear.push(+DT.meanHAtAge(t_Ma).toFixed(4));
+    auKmAtYear.push(+DT.meanAuAtAge(t_Ma).toFixed(2));
+    moonDistanceKmAtYear.push(+DT.meanMoonDistanceAtAge(t_Ma).toFixed(2));
   }
 
   return {
@@ -163,6 +172,8 @@ function exportEarth(years) {
       aeJD, aeRA, aeYearLength,
       solsticeObliquity,
       perihelionDist, aphelionDist,
+      // Deep-time chain (ESSRT — doc 99) — per-year evolution
+      holisticYearAtYear, auKmAtYear, moonDistanceKmAtYear,
     },
     constants: {
       eccentricityBase: C.eccentricityBase,
@@ -260,8 +271,11 @@ function exportPlanet(planetName, years) {
     const omegaInv = OE.computeArgumentOfPerihelionInvPlane(lonPeri, ascInv);
     argPeriInvPlane.push(+omegaInv.toFixed(4));
 
-    // Perihelion/aphelion distance
-    const sma = OE.computeSemiMajorAxis(planetName);
+    // Perihelion/aphelion distance — semi-major axis evolves with Driver 2 (solar mass loss)
+    const t_Ma = (2000 - year) / 1e6;
+    const smaAU_J2000 = OE.computeSemiMajorAxis(planetName);
+    const smaKm = DT.meanPlanetSemiMajorAxisAtAge(planetName, t_Ma);
+    const sma = smaKm ? smaKm / C.currentAUDistance : smaAU_J2000;  // back to AU
     const dist = OE.computePerihelionAphelionDistance(ecc, sma);
     perihelionDist.push(+dist.perihelion.toFixed(8));
     aphelionDist.push(+dist.aphelion.toFixed(8));

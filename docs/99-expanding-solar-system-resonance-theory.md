@@ -159,6 +159,88 @@ This is a clean structural near-identity equivalent to "TOTAL_DAYS_IN_H = 13 × 
 | Hadean (4 Gyr) | ~122,380,840 | **−744 ppm** |
 | Earth age (4.54 Gyr) | ~122,368,460 | **−845 ppm** |
 
+## The Lunar Precession Invariant
+
+A second invariant falls out of the framework, this time governing the Moon's apsidal and nodal precession: **the count of apsidal (and nodal) cycles per H scales as H², so the precession period (in years) times H is structurally constant across all epochs.**
+
+```
+T_apsidal × H = const   (apsidal — perigee advance, ICRF frame, in years)
+T_nodal   × H = const   (nodal   — node regression, ICRF frame, in years)
+
+Equivalently:
+N_apsidal(t) = N_apsidal,J2000 × (H(t)/H₀)²
+N_nodal(t)   = N_nodal,J2000   × (H(t)/H₀)²
+```
+
+where `N_apsidal` and `N_nodal` are the number of full lunar apsidal / nodal cycles per H cycle in the ICRF frame, and `H₀` is the J2000 anchor value of H.
+
+**J2000 anchors and derived invariant value:**
+```
+Framework structural:    H₀ = 335,317 yr    (= 23 × 61 × 239)
+Observed (Meeus/IERS):   T_apsidal,J2000 ≈ 8.847 yr,  T_nodal,J2000 ≈ 18.613 yr
+Integer cycle counts:    N_apsidal = 37,900,  N_nodal = 18,015
+                         (= round(H₀ / T_observed); anchored in src/script.js,
+                          verified in tools/fit/audit-moon-months.js)
+
+J2000-anchored invariant value (held exact at every epoch by construction):
+    T_apsidal × H = H₀² / N_apsidal = 335,317² / 37,900 = 2,966,688 yr²
+    T_nodal   × H = H₀² / N_nodal   = 335,317² / 18,015 = 6,241,326 yr²
+```
+
+The VALUE 2,966,688 yr² is **empirically anchored** (one structural H, one observed T_apsidal); it is *not* a structurally-derived integer like `8H = 2,682,536 yr`. What is structural is the **claim** that this value is preserved at every epoch — the framework's `N(t) = N₀ × (H/H₀)²` scaling.
+
+### Where it comes from
+
+Brown's leading m² lunar perturbation theory gives the apsidal (and analogously nodal) rate as proportional to m² × n_Moon, where m = n_Sun / n_Moon ≈ 1/13.37 is the ratio of solar to lunar mean motion:
+
+```
+ω̇_apsidal ∝ m² × n_Moon   →   T_apsidal ∝ T_sm / m² ∝ T_yr² / T_sm
+(Brown m² scaling, leading order — equivalent Brouwer-Clemence period form)
+```
+
+This sets the **scaling form**; it does not by itself fix the magnitude. Brown m² leading order alone gives T_apsidal ≈ 17.8 yr — roughly double the observed 8.85 yr. This is the historical **Newton-Clairaut problem**: Newton's leading m² calculation in the *Principia* (1687) gave half the observed perigee rate, leading him to briefly doubt his gravitational theory. Clairaut showed in 1749 that the m³ and higher terms in the expansion approximately double the rate to recover the observed value. The framework therefore anchors the J2000 *magnitude* from observation and adopts the H² *scaling form* (consistent with Brown m² leading order) to propagate to deep time, with no polynomial corrections.
+
+**Aligning, not replacing.** The Lunar Precession Invariant does not compete with Brown's lunar theory but sharpens it: the m²-leading-order scaling is adopted as a structural law, with the J2000 magnitude anchored from observation and propagated to deep time without polynomial corrections. Where Brown's expansion derives the absolute period from the underlying m-series, ESSRT treats the period as one anchored input and the (H/H₀)² evolution as the structural claim — the two views agree on the scaling form by construction.
+
+Under Driver 1, the Moon recedes; angular-momentum conservation simultaneously slows Earth's spin (LOD grows), which propagates into a proportional growth of H via the H/13 axial-precession coupling. T_sm and H thus co-evolve, and in the ICRF cycles-per-H formulation `N_apsidal(t) = N₀ × (H/H₀)²` the product T_apsidal × H is held exact by construction.
+
+### Why it is structurally **exact** under Driver 1 (in year-units)
+
+Unlike the day-count near-invariant (`H × days/yr`), which drifts at deep time because tropical year_s evolves slowly under Driver 2 (solar mass loss), the Lunar Precession Invariant in its year-frame form (`T_apsidal_in_years × H_in_years`) is **structurally exact under Driver 1 alone** — the relation does not involve seconds, so Driver 2's effect on year_s is absent. It is therefore preserved at every epoch the framework spans, by construction in the deep-time chain:
+
+| Age (Ma) | H (yr) | N_apsidal (cyc/H) | T_apsidal (yr) | T_apsidal × H (yr²) | Drift vs J2000 |
+|---:|---:|---:|---:|---:|---:|
+| **+200** | 350,665 | 41,448.820 | 8.460185 | 2,966,688 | 0 ppm |
+| **+100** | 342,819 | 39,614.935 | 8.653793 | 2,966,688 | 0 ppm |
+| **0** (anchor) | **335,317** | **37,900.000** | **8.847414** | **2,966,688** | **0 ppm** |
+| −100 | 328,105 | 36,287.212 | 9.041889 | 2,966,688 | 0 ppm |
+| −380 (Devonian) | 309,084 | 32,201.770 | 9.598339 | 2,966,688 | 0 ppm |
+| −500 | 301,318 | 30,604.084 | 9.845693 | 2,966,688 | 0 ppm |
+| −1000 | 270,297 | 24,627.013 | 10.975646 | 2,966,688 | 0 ppm |
+| −2500 | 180,573 | 10,990.962 | 16.429264 | 2,966,688 | 0 ppm |
+
+The `T_apsidal × H` column is the **J2000-anchored value 2,966,688 yr²** (exact: H₀² / N_apsidal,J2000 = 2,966,688.40 yr²), held constant by the framework's `(H/H₀)²` scaling. N is real-valued (not rounded to integer except at the J2000 anchor). Both H (integer) and T_apsidal (6 decimals) are display-rounded, so the hand-reproduction `T × H ≈ 2,966,688` is accurate to within ±10 yr² (well below the displayed precision). Same pattern for nodal: `T_nodal × H = H₀² / N_nodal,J2000 = 6,241,326 yr²` at every age.
+
+### Physical interpretation
+
+The Moon's apsidal and nodal periods are not static anchors — they depend on Earth's spin rate and the Moon's orbit through Brown's m² perturbation physics. The framework sharpens this into a strict scaling claim: the precession period and H co-evolve such that their product is preserved.
+
+A modern observer sees the Moon's perigee advance once every ~8.85 yr; a Devonian observer would have seen it advance once every ~9.60 yr (slower because H was smaller and the Moon was closer). But measured in the framework's natural time unit, both observers count `N₀ × (H/H₀)²` lunar precession cycles per H — the same structural ratio at every epoch.
+
+> 📊 **Relation to Earth-frame perigee/node precession (in seconds).** The table above gives the ICRF-frame, year-units anchors. The Earth-frame precession periods (in seconds) used by the lunar engine — `meanLunarPerigeePrecessionAtAge(t)` and `meanLunarNodePrecessionAtAge(t)` — are computed via the equivalent Brouwer-Clemence form `T_per ∝ T_yr² / T_sm`, which folds in the year-length drift from Driver 2 (since T_yr is in seconds). The two formulations agree to <100 ppm across the Phanerozoic; the year-units ICRF form is the structurally exact statement, the seconds form is the working formula used by the lunar engine.
+
+### Position in the framework taxonomy
+
+This is the third member of the framework's family of **deep-time invariants** — relations that are preserved across epochs under the drivers, distinct from the Fibonacci Laws (which describe the structural identities at J2000):
+
+| Invariant | Form | Governed by | Drift at Hadean |
+|:---|:---|:---|---:|
+| Day-count near-invariant | `H × days/yr ≈ TOTAL_DAYS_IN_H` (122,471,920 at J2000 anchor) | Driver 1 + Driver 2 | ~−850 ppm (Driver 2 residual) |
+| Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | 0 ppm (definitional) |
+| **Lunar Precession Invariant** | **`T_apsidal × H = const`, `T_nodal × H = const`** | **Driver 1 + Brown m²** | **0 ppm (structural)** |
+
+Cross-references: deep-time implementation in `src/script.js` (`meanApsidalCyclesICRFAtAge`, `meanNodalCyclesICRFAtAge`) and `tools/lib/deep-time.js`; anchor verification in `tools/fit/audit-moon-months.js`; Earth-frame Brouwer-Clemence scaling in [Moon-Kepler Derivation](24-moon-kepler-derivation.md).
+
 ## H value and LOD through geological time
 
 All values below are from the **proper-physics two-layer formula** (Architecture α 2026-06): LOD(t) from angular-momentum conservation applied to Moon-distance polynomial fit to Farhat 2022.

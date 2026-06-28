@@ -15,6 +15,8 @@ The six Fibonacci Laws form a symmetric architecture, organized by structural ro
 
 For detailed mathematical derivations and formula coefficient breakdowns, see [Formula Derivation](35-formula-derivation.md).
 
+> **Note — these are J2000 structural identities.** The Fibonacci Laws describe how the lattice is *organized* at the anchor epoch. The framework's deep-time *evolution* of that lattice is governed by a separate family of relations — the **Deep-Time Invariants** (day-count, planetary adiabatic, and lunar precession) — described in [ESSRT (Doc 99)](99-expanding-solar-system-resonance-theory.md). The two layers compose: Laws 1–6 set the structure; the Invariants preserve it as H(t) expands under Driver 1 and Driver 2.
+
 The central formula for inclination amplitudes is:
 
 ```

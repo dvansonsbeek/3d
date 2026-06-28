@@ -673,10 +673,16 @@ module.exports = {
   // Mass, PSI, eccentricities
   GM_SUN,
   M_SUN,
+  GM_EARTH_ALONE,
+  GM_MOON_ALONE,
+  GM_EARTH_MOON_SYSTEM,
   massFraction,
   PSI,
   eccJ2000,
   fibonacci,
+
+  // Physical constants (needed by deep-time chain)
+  speedOfLight: astroRef.physicalConstants.speedOfLight,
 
   // Planet derived
   derived,

@@ -4561,20 +4561,20 @@ const GIA_MODES = [
 // Pre-compute each mode's asymptotic amplitude Δαᵢ = (frac · |dα/dt|_today · τᵢ)
 const GIA_MODE_AMPLITUDES = GIA_MODES.map(m => -EARTH_MOI_FACTOR_RATE_YR * m.frac * m.tau);
 
-/** α(t) — polar moment coefficient at age t_Ma (millions of years before J2000). */
+/** α(t) — polar moment coefficient at age t_Ma (millions of years before J2000).
+ *  Symmetric viscoelastic relaxation: GIA modes saturate in BOTH directions.
+ *  The 3 modes (τ = 1500/5000/14000 yr) fully relax within ~50,000 yr, so
+ *  for any |t_age| >> τ_max the asymptote is α_∞ = EARTH_MOI_FACTOR + Σ AMPᵢ
+ *  (≈ +130 ppb above J2000). Linear extrapolation in either direction would
+ *  be unphysical at deep time — today's measured dα/dt is dominated by
+ *  ongoing Pleistocene-deglaciation rebound, not a permanent secular trend. */
 function earthMoiFactorAtAge(t_Ma) {
-  // Past (t_age ≥ 0): sum of viscoelastic modes (each bounded ⇒ deep paleo safe).
-  // Future (t_age < 0): linear extrapolation at today's total rate.
-  // Continuous and smooth at t_age = 0 (modes sum to today's measured derivative).
-  const t_age_yr = t_Ma * 1e6;
-  if (t_age_yr >= 0) {
-    let alpha_excess = 0;
-    for (let i = 0; i < GIA_MODES.length; i++) {
-      alpha_excess += GIA_MODE_AMPLITUDES[i] * (1 - Math.exp(-t_age_yr / GIA_MODES[i].tau));
-    }
-    return EARTH_MOI_FACTOR + alpha_excess;
+  const t_abs_yr = Math.abs(t_Ma) * 1e6;
+  let alpha_excess = 0;
+  for (let i = 0; i < GIA_MODES.length; i++) {
+    alpha_excess += GIA_MODE_AMPLITUDES[i] * (1 - Math.exp(-t_abs_yr / GIA_MODES[i].tau));
   }
-  return EARTH_MOI_FACTOR - EARTH_MOI_FACTOR_RATE_YR * t_age_yr;
+  return EARTH_MOI_FACTOR + alpha_excess;
 }
 
 // ─── Mantle-core electromagnetic coupling: NOT included as a constant LOD term ───
@@ -5322,22 +5322,21 @@ function meanApsidalCyclesICRFAtAge(t_Ma) {
   if (H_t === null) return null;
   return N_apsidalI_J2000 * Math.pow(H_t / HOLISTIC_YEAR_J2000, 2);
 }
-/** Apsidal cycles per H at age t_Ma (Earth frame) = ICRF − 13. */
-function meanApsidalCyclesEarthAtAge(t_Ma) {
-  const N_I = meanApsidalCyclesICRFAtAge(t_Ma);
-  return N_I === null ? null : N_I - 13;
-}
 /** Nodal cycles per H at age t_Ma (ICRF frame). */
 function meanNodalCyclesICRFAtAge(t_Ma) {
   const H_t = meanHAtAge(t_Ma);
   if (H_t === null) return null;
   return N_nodalI_J2000 * Math.pow(H_t / HOLISTIC_YEAR_J2000, 2);
 }
-/** Nodal cycles per H at age t_Ma (Earth frame) = ICRF + 13. */
-function meanNodalCyclesEarthAtAge(t_Ma) {
-  const N_I = meanNodalCyclesICRFAtAge(t_Ma);
-  return N_I === null ? null : N_I + 13;
-}
+
+// NOTE: Earth-frame variants (meanApsidalCyclesEarthAtAge, meanNodalCyclesEarthAtAge,
+// meanApsidalPrecessionSecondsEarthAtAge, meanNodalPrecessionSecondsEarthAtAge)
+// were removed alongside the duplicate meanAnomalisticMonthAtAge /
+// meanNodalMonthAtAge declarations. They were called only by those duplicates;
+// after the duplicates were eliminated (strict-mode SyntaxError fix), this
+// entire chain was orphaned. The Phase 0 ESSRT versions below
+// (meanLunarPerigeePrecessionAtAge, meanLunarNodePrecessionAtAge) use
+// Brouwer-Clemence m² scaling and are the production model.
 
 /** Apsidal precession period in seconds (ICRF) at age t_Ma. */
 function meanApsidalPrecessionSecondsICRFAtAge(t_Ma) {
@@ -5347,14 +5346,6 @@ function meanApsidalPrecessionSecondsICRFAtAge(t_Ma) {
   if (N === null || H_t === null) return null;
   return H_t * T_yr_s / N;     // H in years × seconds/year / N
 }
-/** Apsidal precession period in seconds (Earth frame) at age t_Ma. */
-function meanApsidalPrecessionSecondsEarthAtAge(t_Ma) {
-  const N = meanApsidalCyclesEarthAtAge(t_Ma);
-  const H_t = meanHAtAge(t_Ma);
-  const T_yr_s = meanSiderealYearSecondsAtAge(t_Ma);
-  if (N === null || H_t === null) return null;
-  return H_t * T_yr_s / N;
-}
 /** Nodal precession period in seconds (ICRF) at age t_Ma. */
 function meanNodalPrecessionSecondsICRFAtAge(t_Ma) {
   const N = meanNodalCyclesICRFAtAge(t_Ma);
@@ -5363,32 +5354,15 @@ function meanNodalPrecessionSecondsICRFAtAge(t_Ma) {
   if (N === null || H_t === null) return null;
   return H_t * T_yr_s / N;
 }
-/** Nodal precession period in seconds (Earth frame) at age t_Ma. */
-function meanNodalPrecessionSecondsEarthAtAge(t_Ma) {
-  const N = meanNodalCyclesEarthAtAge(t_Ma);
-  const H_t = meanHAtAge(t_Ma);
-  const T_yr_s = meanSiderealYearSecondsAtAge(t_Ma);
-  if (N === null || H_t === null) return null;
-  return H_t * T_yr_s / N;
-}
 
-/** Anomalistic month in seconds at age t_Ma — kinematic from sidereal + apsidal:
- *  1/T_ano = 1/T_M − 1/T_apsidalE  (perigee advances prograde in Earth frame). */
-function meanAnomalisticMonthAtAge(t_Ma) {
-  const T_M_s = meanMoonSiderealMonthAtAge(t_Ma);
-  const T_apse_s = meanApsidalPrecessionSecondsEarthAtAge(t_Ma);
-  if (T_M_s === null || T_apse_s === null) return null;
-  return 1 / (1 / T_M_s - 1 / T_apse_s);
-}
-
-/** Nodal month (draconic) in seconds at age t_Ma — kinematic from sidereal + nodal:
- *  1/T_nod_month = 1/T_M + 1/T_nodalE  (node regresses retrograde in Earth frame). */
-function meanNodalMonthAtAge(t_Ma) {
-  const T_M_s = meanMoonSiderealMonthAtAge(t_Ma);
-  const T_nod_s = meanNodalPrecessionSecondsEarthAtAge(t_Ma);
-  if (T_M_s === null || T_nod_s === null) return null;
-  return 1 / (1 / T_M_s + 1 / T_nod_s);
-}
+// NOTE: meanAnomalisticMonthAtAge and meanNodalMonthAtAge are defined below
+// (~line 5503/5511) using Phase 0 ESSRT Brouwer-Clemence scaling via
+// meanLunarPerigeePrecessionAtAge / meanLunarNodePrecessionAtAge. The older
+// kinematic-from-Earth-frame versions that used to live here have been
+// removed — they were duplicate function declarations that broke strict-mode
+// deployment (SyntaxError: Identifier already declared). Last-declared wins
+// in non-strict JS, so the ESSRT versions were always the active runtime
+// behavior; the deletion is no-op semantically.
 
 // ───── Phase 9.13: Moon-chain mean-longitude integrators for deep-time ─────
 // Moon tropical month at J2000 (SI seconds). Derived from sidereal anchor
