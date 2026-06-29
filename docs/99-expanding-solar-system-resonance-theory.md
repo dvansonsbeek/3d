@@ -180,7 +180,7 @@ Framework structural:    H₀ = 335,317 yr    (= 23 × 61 × 239)
 Observed (Meeus/IERS):   T_apsidal,J2000 ≈ 8.847 yr,  T_nodal,J2000 ≈ 18.613 yr
 Integer cycle counts:    N_apsidal = 37,900,  N_nodal = 18,015
                          (= round(H₀ / T_observed); anchored in src/script.js,
-                          verified in tools/fit/audit-moon-months.js)
+                          verified in tools/explore/audit-moon-months.js)
 
 J2000-anchored invariant value (held exact at every epoch by construction):
     T_apsidal × H = H₀² / N_apsidal = 335,317² / 37,900 = 2,966,688 yr²
@@ -239,7 +239,7 @@ This is the third member of the framework's family of **deep-time invariants** �
 | Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | 0 ppm (definitional) |
 | **Lunar Precession Invariant** | **`T_apsidal × H = const`, `T_nodal × H = const`** | **Driver 1 + Brown m²** | **0 ppm (structural)** |
 
-Cross-references: deep-time implementation in `src/script.js` (`meanApsidalCyclesICRFAtAge`, `meanNodalCyclesICRFAtAge`) and `tools/lib/deep-time.js`; anchor verification in `tools/fit/audit-moon-months.js`; Earth-frame Brouwer-Clemence scaling in [Moon-Kepler Derivation](24-moon-kepler-derivation.md).
+Cross-references: deep-time implementation in `src/script.js` (`meanApsidalCyclesICRFAtAge`, `meanNodalCyclesICRFAtAge`) and `tools/lib/deep-time.js`; anchor verification in `tools/explore/audit-moon-months.js`; Earth-frame Brouwer-Clemence scaling in [Moon-Kepler Derivation](24-moon-kepler-derivation.md).
 
 ## H value and LOD through geological time
 

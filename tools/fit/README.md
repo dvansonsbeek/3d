@@ -80,9 +80,10 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `reclassify-tiers.js` | Tier reclassification + JPL enrichment of Tier 1 data | `data/reference-data.json` |
 | `verify-pipeline.js` | Pass/fail verification of all 9 targets + correction stack | Scene-graph simulation |
 
-Note: `eoc-constants.js` and `perihelion-offset.js` are **informational/exploratory** only —
-`eocEccentricity` and `perihelionPhaseOffset` are already derived analytically in `constants.js`
-and require no pipeline step.
+Note: `eocEccentricity` and `perihelionPhaseOffset` are derived analytically in
+`constants.js` and require no pipeline step. The historical numerical-verification
+scripts (`eoc-constants.js`, `perihelion-offset.js`) now live in
+[`tools/explore/`](../explore/).
 
 ## Dependency chain
 

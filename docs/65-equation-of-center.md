@@ -122,7 +122,7 @@ across all precession phases.
 
 **Previous hardcoded value was 0.0085** -- this overshot the total EoC effect
 by 310 arcsec. The correction was discovered through numerical analysis using
-the scene-graph tools (`tools/fit/eoc-constants.js`).
+the scene-graph tools (`tools/explore/eoc-constants.js`).
 
 ### perihelionPhaseOffset
 
@@ -294,7 +294,7 @@ re-optimized to absorb this offset.
   - moveModel: ~line 29200 (equation of center gate and formula)
 - `tools/lib/constants.js`: lines 208-216 (derived constants)
 - `tools/lib/scene-graph.js`: line 399 (Sun eccentricity), line 547 (moveModel)
-- `tools/fit/eoc-constants.js`: numerical verification script
+- `tools/explore/eoc-constants.js`: numerical verification script
 
 ---
 
@@ -515,7 +515,7 @@ the full pipeline integration.
   - `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (JSON source of truth)
 - `tools/fit/sun-longitude-harmonics.js`:
   - Greedy harmonic fitter (re-run produces fresh coefficients)
-- `tools/fit/sun-annual-correction.js`:
+- `tools/explore/sun-annual-correction.js`:
   - Standalone Z-B verification tool (re-runs the validation)
 
 ### Full investigation trail
@@ -545,7 +545,7 @@ After any future changes to this system:
 ### Phase Z-B (Sun Longitude Harmonics) verification
 
 10. Confirm `SUN_HARMONICS_ENABLED = true` in `src/script.js`
-11. Run `node tools/fit/sun-annual-correction.js` -- expect:
+11. Run `node tools/explore/sun-annual-correction.js` -- expect:
     - Raw residual ~198" RMS (without correction)
     - After current 3-term fit: ~7" RMS in modern window (96% closure)
     - L-2h problem-eclipse residuals all ≤ 10"

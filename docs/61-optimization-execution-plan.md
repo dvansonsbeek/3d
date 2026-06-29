@@ -1340,7 +1340,7 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 - Two free parameters eliminated: eocEccentricity and perihelionPhaseOffset are now pure physics derivations
 - Sun RMS: **0.003°** — 20× improvement from 0.065° (with IAU precession frame correction)
 - Validated across 600 years (1600-2200) with only ~0.23 arcsec/century drift from slight precession rate mismatch
-- Full derivation analysis: `tools/fit/eoc-constants.js`
+- Full derivation analysis: `tools/explore/eoc-constants.js`
 - Documentation: `docs/65-equation-of-center.md`
 
 **Steps 3-7 results — Planet optimization campaign:**

@@ -38,13 +38,13 @@
  *   - Coefficients: fitted-coefficients.json SUN_LONGITUDE_HARMONICS (unchanged)
  *
  * Disable for A/B testing:
- *   - Node: SUN_HARMONICS_DISABLED=1 node tools/fit/sun-annual-correction.js
+ *   - Node: SUN_HARMONICS_DISABLED=1 node tools/explore/sun-annual-correction.js
  *   - Browser console: SUN_HARMONICS_ENABLED = false; render();
  *
  * Usage:
- *   node tools/fit/sun-annual-correction.js
- *   node tools/fit/sun-annual-correction.js --range 200      # ±200 yr fit
- *   node tools/fit/sun-annual-correction.js --range 100 --oos 300  # fit ±100, test ±300
+ *   node tools/explore/sun-annual-correction.js
+ *   node tools/explore/sun-annual-correction.js --range 200      # ±200 yr fit
+ *   node tools/explore/sun-annual-correction.js --range 100 --oos 300  # fit ±100, test ±300
  */
 
 const C = require('../lib/constants');

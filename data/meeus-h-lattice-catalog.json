@@ -1,6 +1,6 @@
 {
   "_description": "Meeus Ch.47 Moon perturbation terms decoded into H-lattice divisors. Each Delaunay-argument linear combination (d·D + m·M + m'·M' + f·F) is mapped to its equivalent H/N divisor with rounding error. Phase A output of the framework-native Moon perturbation exploration.",
-  "_generated_by": "tools/fit/derive-moon-h-catalog.js",
+  "_generated_by": "tools/explore/derive-moon-h-catalog.js",
   "H": 335317,
   "fundamentalRates_degPerYr": {
     "D": 4452.671114034,

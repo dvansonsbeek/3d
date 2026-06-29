@@ -5325,7 +5325,7 @@ function meanTropicalMonthAtAge(t_Ma) {
 // with the H² scaling to ~0.7% over Phanerozoic.
 //
 // See: docs/99-expanding-solar-system-resonance-theory.md and the research
-// trail in tools/fit/ (audit-moon-months, derive-moon-precession-rates,
+// trail in tools/explore/ (audit-moon-months, derive-moon-precession-rates,
 // derive-moon-precession-deep-time, explore-scaling-N-proposal).
 
 /** Apsidal cycles per H at age t_Ma (ICRF frame). Returns N×(H/H₀)² (real-valued, not rounded). */
@@ -6812,7 +6812,7 @@ let   DEEP_TIME_MODE_ENABLED = true;
 // Phase Z-B (2026-06): enable Sun longitude harmonic correction at scene-graph
 // Sun node. Closes the framework's ~200" Sun-vs-Meeus residual to ~7" RMS
 // (96% reduction) by applying the year-period EoC correction validated in
-// tools/fit/sun-annual-correction.js. Sun-only application (NOT barycenter)
+// tools/explore/sun-annual-correction.js. Sun-only application (NOT barycenter)
 // keeps planet baselines pristine — the correction is Earth-Sun-geometry-
 // specific (eccentricity-definition difference, ~0.01545 vs Meeus 0.01671).
 //
