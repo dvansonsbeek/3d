@@ -189,7 +189,61 @@ Step 2-sync: node tools/fit/export-to-script.js --write
 Step 3:  Export from browser GUI              → data/01-holistic-year-objects-data.xlsx
          (Perihelion/precession data for all planets, 1-year steps over full H)
          Menu: Analysis → Export Objects Report
-         IMPORTANT: Run "Step 2-sync" above first. Reload the browser after syncing.
+
+         IMPORTANT — pre-export protocol (in this order):
+           1. Run "Step 2-sync" above first (so the browser reads the new
+              startpos / angleCorrection values).
+           2. Reload the browser tab after the sync.
+           3. In the browser console, run:
+                disableDeepTimeMode()
+              Confirm `isDeepTimeMode()` returns `false`. This is the ONLY
+              step in the entire pipeline that requires the toggle off —
+              all other steps run in Node or Python, which have no
+              deep-time chain and are J2000-locked by construction.
+              Step 10 (dashboard export) is intentionally deep-time-aware;
+              don't disable for that one.
+           4. Verify `holisticyearLength` returns `335317` (or
+              `335316.9999...` — the physics-derived J2000 value, see
+              memory note `meanlengthofday-j2000-value`; the ~1e-10 delta
+              is below ML training noise).
+           5. Set the range fields in the test panel:
+                Test mode:    Range
+                Range Start:  -108814024         (JD; model year -302635, date -302629-06-10)
+                Range End:     13657896          (JD; model year  +32682, date  32681-12-12)
+                Range Pieces:  335318            (= H + 1; first and last JD are the
+                                                 SAME phase position in the H cycle —
+                                                 H-period closure point, so 335,317
+                                                 unique year-steps + 1 endpoint repeat)
+           6. Click Analysis → Export Objects Report. Long-running (minutes
+              to hours depending on machine). Output is a TSV trio
+              `Holistic_objects_*.tsv` (large dataset path), since the
+              335,318-row export exceeds the 5000-row Excel threshold.
+           7. Rename / save the perihelion data as
+              `data/01-holistic-year-objects-data.xlsx` (overwriting the
+              existing file). The Python training scripts auto-downsample
+              by `stepYears = 23`, so 1-year resolution at export is correct
+              — don't pre-downsample in the browser.
+           8. AFTER the export completes, restore production state by
+              running `enableDeepTimeMode()` in the console.
+
+         Why the toggle off: the browser's render path applies deep-time
+         corrections per JD when `DEEP_TIME_MODE_ENABLED = true`. The ML
+         training pipeline (Step 4c, 4d) expects J2000-anchored kinematic
+         data; deep-time evolution is layered at runtime via the
+         `mean*AtAge` helpers AFTER ML output. Exporting with deep-time
+         on would bake the evolution into the coefficients, causing
+         double-counting at runtime and distorting the Fibonacci balance
+         laws (Step 7c). See gating audit and `disableDeepTimeMode()`
+         implementation in `src/script.js`.
+
+         Sanity check on the H-period closure:
+           Row 1 (year -302,635) and row 335,318 (year +32,682) sit at
+           the SAME phase position in the H cycle (they are H years
+           apart). The exported values — Earth perihelion longitude,
+           ascending node, eccentricity, obliquity, all planet
+           perihelion ICRF angles — should match between the two rows
+           to within numerical noise. This is the framework's cyclical
+           closure property and a quick correctness check on the export.
 
 ── Phase 3: Earth perihelion & ML training ────────────────────────
 
@@ -563,9 +617,16 @@ node tools/optimize.js optimize neptune startpos --write                     # S
 node tools/fit/export-to-script.js --write                                   # Step 2-sync
 
 # Phase 2: Generate input data (manual)
-# Reload the browser after Step 2-sync, THEN export.
+# Reload the browser after Step 2-sync, THEN:
+#   browser console: disableDeepTimeMode()   ← REQUIRED for J2000-locked export
+# Set range fields: Start=-108814024 End=13657896 Pieces=335318
+#   (JD coords; spans a full H period; first==last JD = phase closure)
 # Export from browser: Analysis → Export Objects Report                      # Step 3
+# After export: browser console: enableDeepTimeMode()   ← restore production
 # Save as data/01-holistic-year-objects-data.xlsx
+# (See Phase 2 detailed pre-export protocol earlier in this README for the
+#  full reasoning + sanity checks. This is the ONLY step requiring the
+#  toggle off — all Node/Python steps are J2000-locked by construction.)
 
 # Phase 3: Earth perihelion & ML training
 python3 tools/fit/python/fit_perihelion_harmonics.py --write                 # Step 4a

@@ -16,6 +16,19 @@
  * Step 3 (browser export) is always manual — the runner checks that
  * data/01-holistic-year-objects-data.xlsx exists before starting Phase 2.
  *
+ * IMPORTANT — Step 3 deep-time toggle protocol:
+ *   The browser export is the ONLY pipeline step that requires
+ *   DEEP_TIME_MODE_ENABLED = false. Before clicking Analysis →
+ *   Export Objects Report, run in the browser console:
+ *       disableDeepTimeMode()
+ *   After the export completes, restore production state:
+ *       enableDeepTimeMode()
+ *   All steps THIS runner executes (Phase 1 Steps 1-2, Phase 3-6
+ *   Steps 4a-10) run in Node/Python which have no deep-time chain
+ *   and are J2000-locked by construction — no toggle needed.
+ *   See tools/fit/README.md Step 3 for the full pre-export protocol
+ *   (range field values, sanity check, etc.).
+ *
  * NOT INCLUDED in the standard runner:
  *  - Step 0 (sun-longitude-harmonics.js) — structural prerequisite, run
  *    once manually before the first pipeline pass; coefficients are
