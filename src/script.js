@@ -56345,14 +56345,23 @@ function computeSolsticeJD(currentYear, type) {
 
 /** Compute cardinal point year length — time between consecutive events (days). */
 function computeSolsticeYearLength(currentYear, type) {
-  // Phase 8.5: derivative form. Phase via integrated form; omega uses
-  // instantaneous H(currentYear).
+  // Phase 8.5: derivative form. Phase via integrated form (toggle-gated
+  // through phaseAdvanceRadians → cyclesBetweenYears); omega = 2π × div / H.
+  // Under DEEP_TIME_MODE_ENABLED=true, H is the time-varying meanHAtAge(t_Ma).
+  // Under DEEP_TIME_MODE_ENABLED=false, H is the J2000-fixed HOLISTIC_YEAR_J2000
+  // constant — restores pre-Phase-8.5 snapshot behavior. Matches the gating
+  // pattern in cyclesBetweenYears.
   const cp = type || 'SS';
   const harmonics = CARDINAL_POINT_HARMONICS[cp];
   let length = meansolaryearlengthinDays;
-  const t_Ma = (J2000_CALENDAR_YEAR - currentYear) / 1e6;
-  const H_at_year = meanHAtAge(t_Ma);
-  if (H_at_year === null) return length;
+  let H_at_year;
+  if (DEEP_TIME_MODE_ENABLED) {
+    const t_Ma = (J2000_CALENDAR_YEAR - currentYear) / 1e6;
+    H_at_year = meanHAtAge(t_Ma);
+    if (H_at_year === null) return length;
+  } else {
+    H_at_year = HOLISTIC_YEAR_J2000;
+  }
   for (const [div, sinC, cosC] of harmonics) {
     const omega_at_year = 2 * Math.PI * div / H_at_year;
     const phase = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, currentYear, div);
@@ -56418,11 +56427,20 @@ function calcEarthPerihelionPredictive(year) {
 
 function calcERD(year) {
   // Phase 8.5: derivative of perihelion longitude at `year`. Integrated phase
-  // for the cosine/sine argument; omega evaluated at the instantaneous H(year).
+  // for the cosine/sine argument (toggle-gated through phaseAdvanceRadians →
+  // cyclesBetweenYears); omega = 2π × div / H. Under DEEP_TIME_MODE_ENABLED=true,
+  // H is the time-varying meanHAtAge(t_Ma); under false, H is the J2000-fixed
+  // HOLISTIC_YEAR_J2000 — restores pre-Phase-8.5 snapshot behavior. Matches the
+  // gating pattern in cyclesBetweenYears.
   let erd = 0;
-  const t_Ma = (J2000_CALENDAR_YEAR - year) / 1e6;
-  const H_at_year = meanHAtAge(t_Ma);
-  if (H_at_year === null) return 0;
+  let H_at_year;
+  if (DEEP_TIME_MODE_ENABLED) {
+    const t_Ma = (J2000_CALENDAR_YEAR - year) / 1e6;
+    H_at_year = meanHAtAge(t_Ma);
+    if (H_at_year === null) return 0;
+  } else {
+    H_at_year = HOLISTIC_YEAR_J2000;
+  }
   for (let i = 0; i < PERI_HARMONICS.length; i++) {
     const sinC = PERI_HARMONICS[i][1], cosC = PERI_HARMONICS[i][2];
     const div = HOLISTIC_YEAR_J2000 / PERI_HARMONICS_J2000_PERIODS[i];
