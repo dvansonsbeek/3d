@@ -35,17 +35,17 @@ const inputmeanlengthsolaryearindays = 365.2422;          // Mean tropical year 
 const startmodelJD = 2451716.5;                           // June 21, 2000 00:00 UTC (Julian Day)
 const startmodelYear = 2000.5;                            // Fractional year of model start
 const correctionDays = -0.828832119703292;                // Fine timing correction (optimizer-derived)
-const correctionSun = 0.4955138066654289;                 // Sun position correction angle (optimizer Step 1)
+const correctionSun = 0.4962174089002886;                 // Sun position correction angle (optimizer Step 1)
 const temperatureGraphMostLikely = 14.5;                  // Position in obliquity cycle (0–16)
 const startAngleModel = 89.91949879;                      // Start angle at 2000-06-21 00:00 UTC
 const systemResetN = 7;                                    // Eccentricity anchor offset (H-units): 0=balancedYear, 7=System Reset
 const useVariableSpeed = true;                            // Toggle equation of center
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
-const earthtiltMean = 23.413539781551208;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
-const earthInvPlaneInclinationAmplitude = 0.6360323695291299; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
-const eccentricityBase = 0.015385784722068436;                      // Law 5 balance-locked
-const eccentricityAmplitude = 0.0013561739058786768;      // Solved: e(J2000) = 0.01671022
+const earthtiltMean = 23.41353954485521;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
+const earthInvPlaneInclinationAmplitude = 0.6360382479440887; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
+const eccentricityBase = 0.015386008467191015;                      // Law 5 balance-locked
+const eccentricityAmplitude = 0.0013559452763729496;      // Solved: e(J2000) = 0.01671022
 // PSI is derived from Earth's inclination amplitude — see section E2c below
 // K is derived from Earth's eccentricity amplitude + mean obliquity — see section E2d below
 const earthAscendingNodeInvPlaneVerified = 284.51;        // Verified ascending node (Souami & Souchay 2012)
@@ -128,11 +128,11 @@ planets.mercury = {
   meanAnomaly: 156.6364301,
   trueAnomaly: 164.1669319,
   // Model parameters (from model-parameters.json)
-  angleCorrection: 0.9715968259721102,
+  angleCorrection: 0.971596949518652,
   perihelionEclipticYears: holisticyearLength/(1+(3/8)),
   axialPrecessionYears: -(8 * holisticyearLength / 9),
   obliquityCycle: holisticyearLength * 8 / 3,
-  startpos: 83.65315034119067,
+  startpos: 83.65069956530178,
   eocFraction: -0.527,
   perihelionRef_JD: 2460335.9,
   ascendingNodeInvPlane: 32.83,
@@ -154,7 +154,7 @@ planets.venus = {
   meanAnomaly: 324.9668371,
   trueAnomaly: 324.5198504,
   // Model parameters (from model-parameters.json)
-  angleCorrection: -2.750609612870612,
+  angleCorrection: -2.750623579168657,
   perihelionEclipticYears: -holisticyearLength*8/6,
   axialPrecessionYears: 8 * holisticyearLength / 91,
   // obliquityCycle derived below from |ICRF| (tidally damped)
@@ -180,7 +180,7 @@ planets.mars = {
   meanAnomaly: 109.2630844,
   trueAnomaly: 118.9501056,
   // Model parameters (from model-parameters.json)
-  angleCorrection: -2.110756350118468,
+  angleCorrection: -2.1102647702621056,
   perihelionEclipticYears: holisticyearLength*8/36,
   axialPrecessionYears: -holisticyearLength/2,
   obliquityCycle: 8 * holisticyearLength / 21,
@@ -206,7 +206,7 @@ planets.jupiter = {
   meanAnomaly: 32.47179744,
   trueAnomaly: 35.69428061,
   // Model parameters (from model-parameters.json)
-  angleCorrection: 0.9306755833382816,
+  angleCorrection: 0.9306123548502079,
   perihelionEclipticYears: holisticyearLength*8/39,
   axialPrecessionYears: -(8 * holisticyearLength / 21),
   obliquityCycle: holisticyearLength / 2,
@@ -232,11 +232,11 @@ planets.saturn = {
   meanAnomaly: 325.663876,
   trueAnomaly: 321.7910116,
   // Model parameters (from model-parameters.json)
-  angleCorrection: -0.17881068893228758,
+  angleCorrection: -0.17887364744733958,
   perihelionEclipticYears: -holisticyearLength*8/65,
   axialPrecessionYears: -holisticyearLength*4/3,
   obliquityCycle: holisticyearLength / 3,
-  startpos: 11.279516656942398,
+  startpos: 11.279681884237178,
   eocFraction: 0.54,
   perihelionRef_JD: 2452875.9,
   ascendingNodeInvPlane: 118.81,
@@ -258,7 +258,7 @@ planets.uranus = {
   meanAnomaly: 145.7292678,
   trueAnomaly: 148.5142459,
   // Model parameters (from model-parameters.json)
-  angleCorrection: -0.7329073036803848,
+  angleCorrection: -0.7329076449509166,
   perihelionEclipticYears: holisticyearLength/3,
   axialPrecessionYears: holisticyearLength*610,
   obliquityCycle: holisticyearLength / 2,
@@ -284,7 +284,7 @@ planets.neptune = {
   meanAnomaly: 262.5003424,
   trueAnomaly: 261.2242728,
   // Model parameters (from model-parameters.json)
-  angleCorrection: 2.332350155157439,
+  angleCorrection: 2.332350128743066,
   perihelionEclipticYears: holisticyearLength*2,
   axialPrecessionYears: -holisticyearLength*68,
   // obliquityCycle derived below from |ICRF| (tidally damped)
@@ -6687,14 +6687,26 @@ function earthRotationCorrectionRadians(jd) {
 // hundreds of degrees at year −584. Step 4 planet failure had the same root
 // cause (Mercury N=1.4M × 0.21% × 20yr = ~60° shift).
 //
-// Conversion: pure JD-difference / SI_TROPICAL_YEAR_DAYS, anchored at J2000.
-// Both anchor and current year MUST use this same conversion for cycle
-// differences to be correct.
-const _jdToSIyear = (jd) => 2000.0 + (jd - j2000JD) / SI_TROPICAL_YEAR_DAYS;
+// Conversion: pure JD-difference / SI_TROPICAL_YEAR_DAYS, anchored at
+// model start (NOT at J2000 epoch). Both anchor and current year MUST use
+// this same conversion for cycle differences to be correct.
+//
+// Anchor choice: `startmodelyearwithCorrection` at startmodelJD. The
+// alternative anchor (2000.0 at j2000JD) is also a valid SI-tropical-year
+// labeling, but it produces a constant 0.0281-year offset relative to the
+// calendar-year coordinate used elsewhere in the deep-time chain
+// (BALANCED_YEAR_J2000_FIXED in calendar yr, `_getJ2000Drift` reference =
+// startmodelyearwithCorrection in calendar yr). With the J2000-epoch anchor,
+// `cyclesBetweenYears(BALANCED, _currentYearSI, N)` accumulates a constant
+// ~N × 0.0281 / H cycle offset — visible as ~1.74" shift in Earth perihelion
+// display under DEEP_TIME=true. Anchoring at startmodelyearwithCorrection
+// aligns all year coordinates consistently and eliminates that shift.
+const _jdToSIyear = (jd) => startmodelyearwithCorrection + (jd - startmodelJD) / SI_TROPICAL_YEAR_DAYS;
 const STARTMODEL_YEAR_SI = _jdToSIyear(startmodelJD);
-// = 2000.4696 at the canonical startmodelJD = 2451716.5. Differs from
-// the old `startmodelyearwithCorrection` (= 2000.4977) by ~10 days; the
-// difference was a mixed-unit artifact, not a physical calibration.
+// = startmodelyearwithCorrection by construction (≈ 2000.4977 at the
+// canonical startmodelJD = 2451716.5). All cyclesBetweenYears callers that
+// reference STARTMODEL_YEAR_SI as anchor are automatically consistent with
+// the calendar-year drift correction.
 
 // ───── Phase 9.14 Option A verification: Meeus arguments vs integrator-derived ─────
 // Compares Meeus Ch. 47 polynomial values (Lp, D, M, M', F) to our
@@ -6727,10 +6739,10 @@ function meeusVsIntegratorDiagnostic(jd) {
   // leap-year-aware Gregorian fractions) produces a 0.21% rate mismatch
   // (~5° per modern half-year, 95° at year -584).
   // Bypass that by going directly from JD → SI-tropical-year via the canonical
-  // conversion using existing module constants (j2000JD line 69,
-  // SI_TROPICAL_YEAR_DAYS line 4483). Both anchor and current use the same
-  // convention, so cycle differences are correct by construction.
-  const _jdToSIyear = (jd_) => 2000.0 + (jd_ - j2000JD) / SI_TROPICAL_YEAR_DAYS;
+  // conversion using existing module constants (startmodelyearwithCorrection,
+  // startmodelJD, SI_TROPICAL_YEAR_DAYS). Anchored at model start so the
+  // calendar / SI coordinates align — see top-level _jdToSIyear comment block.
+  const _jdToSIyear = (jd_) => startmodelyearwithCorrection + (jd_ - startmodelJD) / SI_TROPICAL_YEAR_DAYS;
   const yearSI_anchor = _jdToSIyear(startmodelJD);
   const yearSI        = _jdToSIyear(jd);
   const decYear       = julianDateToDecimalYear(jd);  // for display only
