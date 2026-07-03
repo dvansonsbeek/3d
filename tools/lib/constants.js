@@ -71,7 +71,10 @@ const systemResetN = modelParams.foundational.systemResetN || 0;  // 0..7: eccen
 // ═══════════════════════════════════════════════════════════════════════════
 
 const currentAUDistance = astroRef.physicalConstants.currentAUDistance;
-const meanSiderealYearSeconds = astroRef.yearLengthRef.siderealYear * 86400;
+// Method B LOD anchor: multiplier is 86400.00001 (framework J2000 LOD), not 86400 SI.
+// Matches src/script.js:3355 so meanLengthOfDay derives to 86400.00001 exactly at J2000.
+// See memory `project_sim_website_alignment` for the invariant this preserves.
+const meanSiderealYearSeconds = astroRef.yearLengthRef.siderealYear * 86400.00001;
 const G_CONSTANT = astroRef.physicalConstants.G_CONSTANT;
 const MASS_RATIO_EARTH_MOON = astroRef.physicalConstants.MASS_RATIO_EARTH_MOON;
 const massRatioDE440 = astroRef.physicalConstants.massRatioDE440;
@@ -208,7 +211,11 @@ const balancedYear = perihelionalignmentYear - (temperatureGraphMostLikely * (H 
 const perihelionalignmentJD = Math.round(startmodelJD - (meanSolarYearDays * (startModelYearWithCorrection - perihelionalignmentYear)));
 const balancedJD = startmodelJD - (meanSolarYearDays * (startModelYearWithCorrection - balancedYear));
 const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meanSolarYearDays;
-const meanSiderealYearDays = meanSolarYearDays * (H / 13) / ((H / 13) - 1);
+// IAU sidereal-year J2000 anchor (365.256363004 d) instead of the kinematic
+// Fibonacci derivation. Matches src/script.js:3345 so meanLengthOfDay collapses
+// to the Method B LOD anchor 86400.00001 s exactly at J2000. The kinematic form
+// gave a ~150 ms/yr sidereal-year offset that leaked ~4 μs into meanLengthOfDay.
+const meanSiderealYearDays = astroRef.yearLengthRef.siderealYear;
 const meanLengthOfDay = meanSiderealYearSeconds / meanSiderealYearDays;
 const meanSiderealDay = (meanSolarYearDays / (meanSolarYearDays + 1)) * meanLengthOfDay;
 const meanStellarDay = (meanSiderealDay / (H / 13)) / (meanSolarYearDays + 1) + meanSiderealDay;

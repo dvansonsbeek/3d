@@ -25,7 +25,7 @@ Each category has: the quantity being plotted, the unit of the y-axis, a primary
 | 4 | Ascending Node on Invariable Plane | ° | `ascNodeModel(year)` (= −H/5 retrograde) | La2010 (Laskar 2011) |
 | 5 | Longitude of Perihelion | ° | `calcEarthPerihelionPredictive(year)` | Meeus 1991 (based on Simon 1994), La2004 |
 | 6 | Tropical Year | days | `computeLengthofsolarYear(year)` | Laskar 1986 |
-| 7 | Solar Day Length | s | `meansiderealyearlengthinSeconds / computeLengthofsiderealYear(year)` | Peters 2010 |
+| 7 | Solar Day Length | s | `meansiderealyearlengthinSeconds / computeLengthofsiderealYear(year)` | Bills & Ray 1999 |
 | 8 | Sidereal Year | days | `computeLengthofsiderealYear(year)` | Chapront 2002 |
 | 9 | Axial Precession Period | yr | `computeAxialPrecessionRealLOD(...)` | Capitaine 2003, Vondrák 2011 |
 
@@ -86,7 +86,7 @@ The panel implements the following closed-form formulas as JavaScript functions.
 | `perihelionMeeus(year)` | Meeus 1991 | Earth perihelion longitude |
 | `perihelionMeeusEarth(year)` | Meeus 1991 Table 31.A / Simon 1994 | Earth perihelion longitude |
 | `tropicalYearLaskar(year)` | Laskar 1986 | Tropical year length |
-| `solarDayPeters(year)` | Peters 2010 | Solar day length |
+| `solarDayPeters(year)` | Bills & Ray 1999 (linear tidal recession) | Solar day length |
 | `siderealYearChapront(year)` | Chapront 2002 | Sidereal year length |
 | `axialPrecessionCapitaine2009(year)` | Capitaine 2003 / IAU 2006 | Axial precession period |
 

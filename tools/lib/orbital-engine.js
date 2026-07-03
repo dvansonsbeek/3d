@@ -766,20 +766,44 @@ function computeLengthOfSolarYear(year) {
           computeSolsticeYearLength(year, 'AE')) / 4;
 }
 
-/** Compute sidereal year length in days. */
+/** Compute sidereal year length in days.
+ *  Deep-time base = T_sid_s(t_Ma) / LOD_s(t_Ma) — real-LOD days at year Y,
+ *  matching the simulator's tweakpane (which sees meansiderealyearlengthinDays
+ *  mutated by recomputeEpochAnchors). Falls back to the J2000 constant past
+ *  the tidal-lock asymptote. */
 function computeLengthOfSiderealYear(year) {
-  return evalYearFourier(year, C.meanSiderealYearDays, C.SIDEREAL_YEAR_HARMONICS);
+  const t_Ma = (2000 - year) / 1e6;
+  const dt = require('./deep-time');
+  const T_sid_s = dt.meanSiderealYearSecondsAtAge(t_Ma);
+  const LOD_s   = dt.meanLodSecondsAtAge(t_Ma);
+  const base    = (LOD_s === null) ? C.meanSiderealYearDays : (T_sid_s / LOD_s);
+  return evalYearFourier(year, base, C.SIDEREAL_YEAR_HARMONICS);
+}
+
+/** Deep-time anomalistic-year base in real-LOD days at year Y.
+ *  Anomalistic year is set by perihelion precession (H/16 cycle); with H
+ *  evolving under Driver 1, the anom/trop ratio shifts too. Uses the same
+ *  identity as J2000 form: anom = trop × (H/16) / (H/16 − 1). Matches the
+ *  website's anomalisticYearDaysBase (Holistic .../dayYear.ts). Falls back
+ *  to the J2000 constant past the tidal-lock asymptote. */
+function anomalisticYearDaysBase(year) {
+  const t_Ma = (2000 - year) / 1e6;
+  const dt = require('./deep-time');
+  const Ht    = dt.meanHAtAge(t_Ma);
+  const tropD = dt.meanYearInDaysAtAge(t_Ma);
+  if (Ht === null || tropD === null) return C.meanAnomalisticYearDays;
+  return (tropD * (Ht / 16)) / (Ht / 16 - 1);
 }
 
 /** Compute anomalistic year length with variable LOD, in seconds. */
 function computeLengthOfAnomalisticYearRealLOD(year, lengthOfDay) {
-  const anomDays = evalYearFourier(year, C.meanAnomalisticYearDays, C.ANOMALISTIC_YEAR_HARMONICS);
+  const anomDays = evalYearFourier(year, anomalisticYearDaysBase(year), C.ANOMALISTIC_YEAR_HARMONICS);
   return anomDays * lengthOfDay;
 }
 
 /** Compute anomalistic year length in days. */
 function computeLengthOfAnomalisticYearDays(year) {
-  return evalYearFourier(year, C.meanAnomalisticYearDays, C.ANOMALISTIC_YEAR_HARMONICS);
+  return evalYearFourier(year, anomalisticYearDaysBase(year), C.ANOMALISTIC_YEAR_HARMONICS);
 }
 
 /**
@@ -996,6 +1020,16 @@ function computeSolsticeYearLength(year, type) {
   const t = year - C.balancedYear;
   const harmonics = C.CARDINAL_POINT_HARMONICS[cp];
   let length = C.meanSolarYearDays;
+  // Deep-time (Option B) drift term — mirrors src/script.js:56704-56708
+  // computeSolsticeYearLength under DEEP_TIME_MODE_ENABLED. Keeps the
+  // dashboard's tropical year in the "real-LOD days at Y" convention that
+  // powers the tweakpane's lengthofsolarYear display, so the dashboard's
+  // deep-time curve tracks the "~400 days at the Devonian" story instead
+  // of freezing at the J2000 base. Result is not periodic in H — the
+  // secular LOD evolution surfaces through mSY_at_Y.
+  const t_Ma = (2000 - year) / 1e6;
+  const mSY_at = require('./deep-time').meanYearInDaysAtAge(t_Ma);
+  if (mSY_at !== null) length += (mSY_at - C.meanSolarYearDays);
   for (const [div, sinC, cosC] of harmonics) {
     const period = C.H / div;
     const omega = 2 * Math.PI / period;

@@ -46,6 +46,114 @@ for one-off eclipse longitude reads) MAY keep Meeus polynomial terms —
 they are short-window calculations consumed at a single epoch, not part
 of the cyclic scene-graph motion.
 
+## Runtime formula conventions
+
+The coefficients this pipeline produces feed **runtime evaluation formulas**
+in `src/script.js` and the Holistic website's `src/lib/orbital/`. Several
+design choices at the runtime layer must stay in sync with the basis those
+coefficients were fit on. Changing them does **not** require re-running any
+fit — but they must be identical in the simulator and the website or the
+two calculators drift apart.
+
+### Option A — Snapshot phase basis (RA, JD, year-length)
+
+Cardinal-point RA/JD/year-length harmonics are fit on the J2000-frozen
+scene-graph, which advances phase as
+
+```
+phase(year) = 2π · N · (year − ANCHOR_YEAR) / H
+```
+
+Runtime evaluation **must use this same snapshot form**. The earlier
+"Phase 9.10b integrated phase" form (`2π · N · ∫ 1/H(t) dt`) drifts by hours
+across ±12 kyr because integrated phase and snapshot phase only agree at
+the anchor year, not at every epoch. Both `computeSolsticeRA/JD/YearLength`
+(simulator) and `calcCardinalPointRA/JD/YearLen` + `calcSolarYear` (website)
+use snapshot phase.
+
+### Option B — Deep-time mSY drift
+
+Under deep-time (simulator: `DEEP_TIME_MODE_ENABLED`; website: any t_Ma ≠ 0),
+the linear term of the cardinal-point JD formula uses the **epoch-evolved
+mean tropical year** in place of the J2000 constant:
+
+```
+JD(Y) = anchor + mSY(t_Ma) · (Y − 2000) + Σ harmonics
+```
+
+This makes the JD track the deep-time-mutated year length instead of
+freezing at J2000. The correction is zero at J2000 by construction
+(mSY(0) = mSY_J2000) so it doesn't touch modern-era accuracy.
+`computeSolsticeYearLength`/`calcCardinalPointYearLen` apply the same shift
+to their base length (derivative of the drift is `≈ mSY(t_Ma) − mSY_J2000`).
+
+### mSY convention: epoch-local (`/LOD`), not SI (`/86400`)
+
+Days-per-year at epoch is computed as `T_tropical_s(t_Ma) / LOD_s(t_Ma)`
+— the **epoch-local** convention where a "day" tracks the actual rotation
+period. Both sides use this: simulator `meanYearInDaysAtAge`
+([src/script.js:5339](../../src/script.js#L5339)), website
+`meanTropicalYearInDaysAtAge`
+([Holistic .../deepTime.ts:387](../../../../Holistic/holisticuniverse/src/lib/orbital/deepTime.ts#L387)).
+At J2000 both equal the IAU anchor exactly; at deep time they diverge from
+the SI-anchored `/86400` form by a few percent at ±100 Myr.
+
+The simulator also exposes `meanTropicalYearDaysAtAge` (SI /86400) — that
+one is used deliberately by `recomputeTimeUnitsForEpoch` for a
+Kepler-invariant scene JD, and should **not** be substituted into the
+cardinal-point drift term.
+
+### Method B LOD anchor (86400.00001 s, not 86400 s)
+
+The J2000 length-of-day used to derive `meansiderealyearlengthinSeconds`
+and downstream period conversions is 86400.00001 s — the physics-derived
+value from the angular-momentum-conservation chain at J2000, not the SI
+definition. See project memory `meanlengthofday-j2000-value`. Both the
+simulator (`ASTRO_REFERENCE.siderealYearJ2000 × 86400.00001`) and the
+website (`SIDEREAL_YEAR_J2000_DAYS × 86400.00001`) agree on this
+convention.
+
+### Sidereal-year J2000 anchor: IAU 365.25636308 d
+
+Both the simulator's `meansiderealyearlengthinDays` and the website's
+`SIDEREAL_YEAR_J2000_DAYS` are anchored at the IAU J2000 value
+`365.25636308 d`. The earlier kinematic form
+`meansolaryearlengthinDays × (H/13) / ((H/13) − 1)` gave
+~365.256361 d — 150 ms/yr short of IAU — and caused a ~4 μs drift in
+the runtime-derived `meanlengthofday` off the Method B anchor. Under
+deep-time mode both bases are overwritten by `T_sid_s / LOD_s`, which
+naturally recovers the IAU anchor at J2000, so the fix only touches
+deep-time-OFF behaviour.
+
+## When does a coefficient re-fit actually need to run?
+
+The runtime formula conventions above are display-time concerns and **do
+not** require Step 6a / 6c / 6d to re-run. See the "What triggers a refit?"
+table further below for the full trigger list.
+
+Situations that do **not** require re-fitting the cardinal-point / year-
+length harmonics:
+
+- Switching between Option A snapshot phase and integrated phase for
+  RA/JD (this affects runtime evaluation only; the fit basis is fixed at
+  snapshot)
+- Adding/removing the Option B deep-time drift correction
+- Adjusting the LOD anchor between 86400 and 86400.00001 s
+- Switching the sidereal-year J2000 anchor between the kinematic form and
+  the IAU 365.25636308 d value
+- Changing which mSY convention (`/86400` vs `/LOD`) the drift term uses
+
+Situations that **do** require Step 6a → 6c → 6d to re-run (roughly:
+anything that changes what the scene-graph produces at 1-year steps over
+a full H):
+
+- `H` / `holisticyearLength`
+- `earthtiltMean` / `earthInvPlaneInclinationAmplitude` / `earthInvPlaneInclinationMean`
+- `correctionSun`
+- `perihelionalignmentYear`
+- `eccentricityBase` / `eccentricityAmplitude`
+- Anything else that would change `data/02-solar-measurements.csv`
+
 ## `--write` flag convention
 
 All fitting scripts support **dry run** by default (print results only).
@@ -336,6 +444,10 @@ Step 6c: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS + ANC
          Data-anchored at closest JD to IAU J2000 value, then derived to J2000.
          Tropical year = mean of 4 cardinal point derivatives (no separate step).
          Updates: fitted-coefficients.json (auto-updated by script)
+         Skip criteria: See "When does a coefficient re-fit actually need to
+         run?" near the top of this README — runtime formula tweaks (Option
+         A/B snapshot vs integrated phase, deep-time mSY drift, Method B
+         LOD anchor, IAU sidereal-year anchor) do NOT need Step 6c to re-run.
 
 Step 6d: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS
          Computes year lengths from raw events in 02-solar-measurements.csv:

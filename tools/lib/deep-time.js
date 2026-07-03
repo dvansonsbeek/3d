@@ -316,6 +316,106 @@ const meanSaturnSemiMajorAxisAtAge  = t => meanPlanetSemiMajorAxisAtAge('saturn'
 const meanUranusSemiMajorAxisAtAge  = t => meanPlanetSemiMajorAxisAtAge('uranus',  t);
 const meanNeptuneSemiMajorAxisAtAge = t => meanPlanetSemiMajorAxisAtAge('neptune', t);
 
+// ═══════════════════════════════════════════════════════════════════════════
+// INTEGRATED PHASE — cumulative ∫1/H(t')dt' machinery
+// Port of src/script.js lines 5752-6017. Used for Phase 9.12
+// integrated-phase rendering of Earth H-cycle precession objects.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const _CUMUL_INTEGRAL_YEAR_MIN = -500e6;   // -500 Myr
+const _CUMUL_INTEGRAL_YEAR_MAX =  1.0e6;   // +1 Myr
+const _CUMUL_INTEGRAL_STEP     = 10000;    // 10 kyr per cell (matches browser)
+
+let _cumulIntegralTable    = null;
+let _cumulIntegralJ2000Idx = -1;
+
+function _ensureCumulIntegralTable() {
+  if (_cumulIntegralTable !== null) return;
+  const N = Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP) + 1;
+  const table = new Float64Array(N);
+  const j2000Idx = Math.round((C.startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
+
+  const invH = (year) => {
+    const t_Ma = (C.startmodelYear - year) / 1e6;
+    const H = meanHAtAge(t_Ma);
+    return H === null ? null : 1 / H;
+  };
+
+  table[j2000Idx] = 0;
+  let prev = invH(_CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP);
+  for (let i = j2000Idx + 1; i < N; i++) {
+    const year_i = _CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP;
+    const curr = invH(year_i);
+    table[i] = (prev !== null && curr !== null)
+      ? table[i - 1] + 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
+      : NaN;
+    prev = curr;
+  }
+  prev = invH(_CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP);
+  for (let i = j2000Idx - 1; i >= 0; i--) {
+    const year_i = _CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP;
+    const curr = invH(year_i);
+    table[i] = (prev !== null && curr !== null)
+      ? table[i + 1] - 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
+      : NaN;
+    prev = curr;
+  }
+  _cumulIntegralTable    = table;
+  _cumulIntegralJ2000Idx = j2000Idx;
+}
+
+function _cumulIntegralAtYear(year) {
+  _ensureCumulIntegralTable();
+  if (year < _CUMUL_INTEGRAL_YEAR_MIN || year > _CUMUL_INTEGRAL_YEAR_MAX) return null;
+  const idx_f = (year - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP;
+  const idx_lo = Math.floor(idx_f);
+  const idx_hi = Math.min(idx_lo + 1, _cumulIntegralTable.length - 1);
+  const v_lo = _cumulIntegralTable[idx_lo];
+  const v_hi = _cumulIntegralTable[idx_hi];
+  if (Number.isNaN(v_lo) || Number.isNaN(v_hi)) return null;
+  return v_lo + (idx_f - idx_lo) * (v_hi - v_lo);
+}
+
+/** ∫_{yearA}^{yearB} 1/H(t') dt'. Returns null if either endpoint is outside
+ *  [-500 Myr, +1 Myr] or past the tidal-lock asymptote. */
+function integralInverseHFromYears(yearA, yearB) {
+  if (yearA === yearB) return 0;
+  const cA = _cumulIntegralAtYear(yearA);
+  const cB = _cumulIntegralAtYear(yearB);
+  if (cA === null || cB === null) return null;
+  return cB - cA;
+}
+
+// Phase 9.10b drift correction: for a harmonic anchored at yearA, the
+// integrated form differs from the snapshot form at J2000 by a small
+// constant (~3.7 ppm × interval). Subtracting the drift at anchor makes
+// the two forms agree at startModelYearWithCorrection, restoring
+// snapshot-fitted harmonic calibration at J2000 without changing the
+// integrated form's shape at deep time.
+const _J2000_DRIFT_CACHE = new Map();
+function _getJ2000Drift(yearA) {
+  if (_J2000_DRIFT_CACHE.has(yearA)) return _J2000_DRIFT_CACHE.get(yearA);
+  const integral = integralInverseHFromYears(yearA, C.startModelYearWithCorrection);
+  if (integral === null) { _J2000_DRIFT_CACHE.set(yearA, 0); return 0; }
+  const snapshot = (C.startModelYearWithCorrection - yearA) / HOLISTIC_YEAR_J2000;
+  const drift = integral - snapshot;
+  _J2000_DRIFT_CACHE.set(yearA, drift);
+  return drift;
+}
+
+/** Total cycles between two years for a cycle of period H/divisor_N.
+ *  Integrated form always (toggle at caller). Applies Phase 9.10b drift
+ *  correction relative to whichever endpoint is farther from J2000.
+ *  Returns null past tidal-lock asymptote. */
+function cyclesBetweenYears(yearA, yearB, divisor_N) {
+  const integral = integralInverseHFromYears(yearA, yearB);
+  if (integral === null) return null;
+  const distA = Math.abs(yearA - C.startModelYearWithCorrection);
+  const distB = Math.abs(yearB - C.startModelYearWithCorrection);
+  const correction = (distA >= distB) ? _getJ2000Drift(yearA) : -_getJ2000Drift(yearB);
+  return divisor_N * (integral - correction);
+}
+
 // ─── Exports ──────────────────────────────────────────────────────────────
 module.exports = {
   // Anchor constants (for callers that need them)
@@ -357,4 +457,6 @@ module.exports = {
   meanEarthSemiMajorAxisAtAge,   meanMarsSemiMajorAxisAtAge,
   meanJupiterSemiMajorAxisAtAge, meanSaturnSemiMajorAxisAtAge,
   meanUranusSemiMajorAxisAtAge,  meanNeptuneSemiMajorAxisAtAge,
+  // Integrated phase (Phase 9.12)
+  integralInverseHFromYears, cyclesBetweenYears,
 };

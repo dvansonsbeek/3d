@@ -10,8 +10,21 @@
 
 const C = require('./constants');
 const OE = require('./orbital-engine');
+const DT = require('./deep-time');
 const MEEUS_LUNAR = JSON.parse(require('fs').readFileSync(
   require('path').resolve(__dirname, '..', '..', 'public', 'input', 'meeus-lunar-tables.json'), 'utf8'));
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DEEP-TIME MODE (Option B, mirrors browser DEEP_TIME_MODE_ENABLED)
+// ═══════════════════════════════════════════════════════════════════════════
+// When SG_DEEP_TIME=1, each computePlanetPosition / computeSunPositionFast
+// call syncs a per-epoch snapshot of H, mSY, and derived quantities via
+// meanHAtAge(t_Ma) / meanTropicalYearDaysAtAge(t_Ma). Object .speed values
+// stay frozen at J2000 (matching browser scene-graph behavior); only the
+// JD↔pos conversion and derived-year math pick up the epoch shift. Toggle
+// OFF ⇒ bit-identical to prior J2000-only output. See doc
+// IP-deep-time-scene-graph-fitpipeline.md §5-6.
+const DEEP_TIME_ENABLED = process.env.SG_DEEP_TIME === '1';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MINIMAL MATRIX4 (column-major, matches Three.js convention)
@@ -248,11 +261,49 @@ function makeObjectNodes(name, def) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Pre-compute all the per-planet derived values we need
-const H = C.H;
+const H_J2000 = C.H;
+const MSY_J2000 = C.meanSolarYearDays;
 const d2r = Math.PI / 180;
-const sDay = 1 / C.meanSolarYearDays;
-const correctionYears = C.correctionDays / C.meanSolarYearDays;
+const sDay_J2000 = 1 / MSY_J2000;
+const correctionYears = C.correctionDays / MSY_J2000;
 const startModelYearWithCorrection = C.startmodelYear + correctionYears;
+
+// Per-JD epoch snapshot (Option B). When DEEP_TIME_ENABLED=false, always
+// returns J2000 values; when true, memoizes a per-epoch snapshot of
+// (H, mSY, sDay) keyed on t_Ma. The scene-setup speeds stay frozen at
+// J2000; only downstream JD↔pos conversions and H-derived periods pick
+// up the epoch shift. See IP-deep-time-scene-graph-fitpipeline.md §6.2.
+let _epochCache = { t_Ma: 0, H: H_J2000, mSY: MSY_J2000, sDay: sDay_J2000 };
+
+function _syncEpochForJD(jd) {
+  if (!DEEP_TIME_ENABLED) return _epochCache;
+  // Approximate year from JD using J2000 mSY (self-consistent iteration
+  // not needed at Step 6a's 1-year granularity — drift <10 s at ±150 kyr).
+  const yearApprox = 2000 + (jd - C.j2000JD) * sDay_J2000;
+  const t_Ma = (2000 - yearApprox) / 1e6;
+  if (Math.abs(t_Ma - _epochCache.t_Ma) < 1e-9) return _epochCache;
+  const H_t = DT.meanHAtAge(t_Ma);
+  // Use meanTropicalYearDaysAtAge (T_trop_s / 86400, SI-anchored). This is
+  // what the browser sets sDay to under DEEP_TIME_MODE_ENABLED
+  // (src/script.js:6179):
+  //   sDay = DEEP_TIME_MODE_ENABLED ? (1 / tropDays) : (1 / meansolaryearlengthinDays);
+  //   const tropDays = meanTropicalYearDaysAtAge(t_Ma);
+  // NOT meanYearInDaysAtAge (T_trop_s / LOD_s_at_epoch). meansolaryearlengthinDays
+  // does mutate to meanYearInDaysAtAge, but that's for display/report
+  // consumers, NOT for the scene's pos calculation. Using SI-anchored
+  // tropDays here matches browser scene rendering at all epochs.
+  const mSY_t = DT.meanTropicalYearDaysAtAge(t_Ma);
+  if (H_t === null || mSY_t === null) return _epochCache;   // stay on last-good if past tidal lock
+  _epochCache = { t_Ma, H: H_t, mSY: mSY_t, sDay: 1 / mSY_t };
+  return _epochCache;
+}
+
+// Backwards-compatible aliases — code that references bare `H`/`sDay`
+// at scene-setup time picks up the J2000 values (setup happens once at
+// module load). Runtime paths use `_epochCache.H` / `_epochCache.mSY`
+// / `_epochCache.sDay` and go through `_syncEpochForJD(jd)` first.
+const H = H_J2000;
+const sDay = sDay_J2000;
 
 // Ascending node frame corrections from ASTRO_REFERENCE (see constants.js)
 const ascNodeToolCorrection = C.ASTRO_REFERENCE.ascNodeTiltCorrection;
@@ -329,6 +380,7 @@ function buildSceneGraph() {
     tilt: -C.earthtiltMean,
     startPos: 0,
     speed: -Math.PI * 2 / (H / 13),
+    _dtCycleN: 13, _dtCycleSign: -1,   // Phase 9.12: H/13 axial precession, retrograde
   };
   const earthNodes = makeObjectNodes('earth', earthDef);
 
@@ -349,6 +401,7 @@ function buildSceneGraph() {
     tilt: 0,
     startPos: (C.balancedYear - startModelYearWithCorrection) / (H / 3) * 360,
     speed: Math.PI * 2 / (H / 3),
+    _dtCycleN: 3, _dtCycleSign: +1,   // Phase 9.12: H/3 inclination precession, prograde
   });
   earthNodes.pivot.addChild(earthInclPrec.container);
 
@@ -358,6 +411,7 @@ function buildSceneGraph() {
     tilt: 0,
     startPos: (C.balancedYear - startModelYearWithCorrection) / (H / 5) * 360,
     speed: Math.PI * 2 / (H / 5),
+    _dtCycleN: 5, _dtCycleSign: +1,   // Phase 9.12: H/5 ecliptic precession, prograde
   });
   earthInclPrec.pivot.addChild(earthEclipPrec.container);
 
@@ -367,6 +421,7 @@ function buildSceneGraph() {
     tilt: 0,
     startPos: -((C.balancedYear - startModelYearWithCorrection) / (H / 8) * 360),
     speed: -Math.PI * 2 / (H / 8),
+    _dtCycleN: 8, _dtCycleSign: -1,   // Phase 9.12: H/8 obliquity precession, retrograde
   });
   earthEclipPrec.pivot.addChild(earthObliqPrec.container);
 
@@ -376,6 +431,7 @@ function buildSceneGraph() {
     tilt: 0,
     startPos: (C.balancedYear - startModelYearWithCorrection) / (H / 16) * 360,
     speed: Math.PI * 2 / (H / 16),
+    _dtCycleN: 16, _dtCycleSign: +1,   // Phase 9.12: H/16 perihelion precession outer, prograde
   });
   earthObliqPrec.pivot.addChild(earthPeriPrec1.container);
 
@@ -386,6 +442,8 @@ function buildSceneGraph() {
     tilt: 0,
     startPos: -((C.balancedYear - startModelYearWithCorrection) / (H / 16) * 360),
     speed: -Math.PI * 2 / (H / 16),
+    _dtCycleN: 16, _dtCycleSign: -1,   // Phase 9.12: H/16 perihelion precession inner, retrograde
+
   });
   earthPeriPrec1.pivot.addChild(earthPeriPrec2.container);
 
@@ -655,7 +713,9 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
 
 function moveModel(graph, pos) {
   // Compute dynamic eccentricities for all planets (oscillate at H/16)
-  const currentYear = C.balancedYear + (C.startmodelJD + pos * C.meanSolarYearDays - C.balancedJD) / C.meanSolarYearDays;
+  // Uses _epochCache.mSY so the pos→JD→year round-trip is consistent with
+  // the caller's pos = _epochCache.sDay × (jd - C.startmodelJD).
+  const currentYear = C.balancedYear + (C.startmodelJD + pos * _epochCache.mSY - C.balancedJD) / _epochCache.mSY;
   const dynEcc = { earth: OE.computeEccentricity(currentYear, C.balancedYear, C.perihelionCycleLength, C.eccentricityBase, C.eccentricityAmplitude) };
   for (const [key, p] of Object.entries(C.planets)) {
     if (p.eccentricityPhaseJ2000 !== undefined) {
@@ -666,7 +726,18 @@ function moveModel(graph, pos) {
 
   // Update each "animated" object: orbit.ry = θ for circular, pivot.position for ellipse
   function animateObject(nodes, def) {
-    let θ = def.speed * pos - def.startPos * d2r;
+    let θ;
+    // Phase 9.12 (B-full): Earth H-cycle precession objects tagged with
+    // _dtCycleN / _dtCycleSign use integrated phase ∫1/H(t')dt' under
+    // deep-time. Under toggle-off (or untagged), falls through to
+    // J2000-snapshot form θ = speed × pos - startPos.
+    // Mirrors src/script.js:48326-48337.
+    if (DEEP_TIME_ENABLED && Number.isFinite(def._dtCycleN)) {
+      const cycles = DT.cyclesBetweenYears(C.balancedYear, currentYear, def._dtCycleN);
+      θ = (cycles !== null ? cycles : 0) * 2 * Math.PI * def._dtCycleSign;
+    } else {
+      θ = def.speed * pos - def.startPos * d2r;
+    }
     if (C.useVariableSpeed && def.eccentricity && def.perihelionPhaseJ2000 !== undefined) {
       let e;
       if (def._eccentricityKey && dynEcc[def._eccentricityKey] !== undefined) {
@@ -706,7 +777,10 @@ function moveModel(graph, pos) {
     // skipped here (gcd(168, H) = 1, design-rule violating).
     const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
     if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
-      const jd = C.startmodelJD + pos * C.meanSolarYearDays;
+      // Recover JD via epoch-consistent mSY so pos→jd round-trip is exact.
+      // Sun harmonic phase below uses C.H (J2000 fixed) because the table was
+      // fitted against J2000 mSY.
+      const jd = C.startmodelJD + pos * _epochCache.mSY;
       const year = 2000 + (jd - C.j2000JD) / 365.25;
       const t = year - C.balancedYear;
       let corr = C.SUN_LONGITUDE_MEAN || 0;
@@ -725,7 +799,8 @@ function moveModel(graph, pos) {
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
     // Meeus formulas require T from standard J2000.0 (JD 2451545.0) in Julian centuries (36525 days)
     if (C.useVariableSpeed && def.lunarPerturbations) {
-      const d = (C.startmodelJD - C.j2000JD) + pos * C.meanSolarYearDays;
+      // Recover JD via epoch-consistent mSY for pos→jd round-trip.
+      const d = (C.startmodelJD - C.j2000JD) + pos * _epochCache.mSY;
       const T = d / C.julianCenturyDays;
       const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
 
@@ -831,9 +906,12 @@ function moveModel(graph, pos) {
   const earthPeriPrec1Angle = graph.earthPeriPrec1.orbit.ry;
   const earthPeriEcl = ((earthPeriPrec1Angle + C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 * d2r) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
 
-  // Compute yearsSinceBalanced for dynamic ecliptic inclination
-  const currentJD = C.startmodelJD + pos * C.meanSolarYearDays;
-  const yearsSinceBalanced = (currentJD - C.balancedJD) / C.meanSolarYearDays;
+  // Compute yearsSinceBalanced for dynamic ecliptic inclination.
+  // Uses _epochCache.mSY for pos→jd round-trip; yearsSinceBalanced then
+  // uses the same mSY so the year count is epoch-consistent with the
+  // caller's JD input.
+  const currentJD = C.startmodelJD + pos * _epochCache.mSY;
+  const yearsSinceBalanced = (currentJD - C.balancedJD) / _epochCache.mSY;
 
   // Planets
   for (const key of Object.keys(graph.planetNodeMap)) {
@@ -862,7 +940,7 @@ function moveModel(graph, pos) {
     // Uses dynamic ascending node (matching script.js updateOrbitalPlaneRotations)
     if (pm.sceneData && pm.sceneData.p.ascendingNodeInvPlane !== undefined) {
       const dynamicIncl = computeDynamicEclipticInclination(key, yearsSinceBalanced);
-      const currentYear = C.startmodelYear + (currentJD - C.startmodelJD) / C.meanSolarYearDays;
+      const currentYear = C.startmodelYear + (currentJD - C.startmodelJD) / _epochCache.mSY;
       const dynamicAscNode = OE.calculateDynamicAscendingNodeFromTilts(
         pm.sceneData.p.orbitTilta, pm.sceneData.p.orbitTiltb, currentYear, key);
       const correctedAscNode = dynamicAscNode + (ascNodeToolCorrection[key] || 0);
@@ -906,8 +984,12 @@ function _invalidateGraph() {
 function computePlanetPosition(target, jd) {
   const graph = getGraph();
 
+  // Sync epoch cache from this JD (no-op when DEEP_TIME_ENABLED=false).
+  // Must precede pos computation so pos uses the epoch-appropriate mSY.
+  _syncEpochForJD(jd);
+
   // Convert JD to pos (script.js: pos = sDay * (jd - startmodelJD))
-  const pos = sDay * (jd - C.startmodelJD);
+  const pos = _epochCache.sDay * (jd - C.startmodelJD);
 
   // Animate all objects
   moveModel(graph, pos);
@@ -958,7 +1040,7 @@ function computePlanetPosition(target, jd) {
   //   where u = RA - ascendingNode(t), d = geocentric dist, s = sunDist, T = centuries from J2000
   if (target !== 'moon' && target !== 'sun') {
     const _p = C.planets[target];
-    const _currentYear = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
+    const _currentYear = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
     const ascNode = OE.calculateDynamicAscendingNodeFromTilts(_p.orbitTilta, _p.orbitTiltb, _currentYear, target);
     const u = (sph.theta / d2r - ascNode) * d2r;
     const invD = 1 / distAU;
@@ -971,7 +1053,7 @@ function computePlanetPosition(target, jd) {
     const sin3U = Math.sin(3*u), cos3U = Math.cos(3*u);
 
     // Conjunction phase for Jupiter-Saturn interaction terms (AR-AW)
-    const _yr = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
+    const _yr = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
     const conjPhase = 2 * Math.PI * (_yr - 2000) / C.tripleSynodicYears;
     const sinCP = Math.sin(conjPhase), cosCP = Math.cos(conjPhase);
     const sin2CP = Math.sin(2 * conjPhase), cos2CP = Math.cos(2 * conjPhase);
@@ -1084,7 +1166,7 @@ function computePlanetPosition(target, jd) {
   // Gravitation correction (per-planet synodic periods, planet-planet perturbations)
   const gravCorr = C.GRAVITATION_CORRECTION && C.GRAVITATION_CORRECTION[target];
   if (gravCorr) {
-    const _yr = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
+    const _yr = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
     for (const term of gravCorr) {
       const phase = 2 * Math.PI * (_yr - 2000) / term.period;
       const sp = Math.sin(phase), cp = Math.cos(phase);
@@ -1098,7 +1180,7 @@ function computePlanetPosition(target, jd) {
   const _elCorr = C.ELONGATION_CORRECTION && C.ELONGATION_CORRECTION[target];
   if (_elCorr) {
     const vc = _elCorr;
-    const _yr = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
+    const _yr = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
     // Compute Sun RA for elongation
     const _sunSph = computePlanetPosition('sun', jd, graph);
     const _sunRA = _sunSph.ra;  // radians
@@ -1250,7 +1332,8 @@ function thetaToRaHours(theta) {
  */
 function getSunWorldAngle(jd) {
   const graph = getGraph();
-  const pos = sDay * (jd - C.startmodelJD);
+  _syncEpochForJD(jd);
+  const pos = _epochCache.sDay * (jd - C.startmodelJD);
   moveModel(graph, pos);
   const sunWP = graph.sunNodes.pivot.getWorldPosition();
   let angle = Math.atan2(sunWP[2], sunWP[0]) * 180 / Math.PI;
@@ -1264,7 +1347,8 @@ function getSunWorldAngle(jd) {
  */
 function getWobbleSunDistAU(jd) {
   const graph = getGraph();
-  const pos = sDay * (jd - C.startmodelJD);
+  _syncEpochForJD(jd);
+  const pos = _epochCache.sDay * (jd - C.startmodelJD);
   moveModel(graph, pos);
   // WobbleCenter is at the scene origin (0,0,0)
   const sunWP = graph.sunNodes.pivot.getWorldPosition();
@@ -1280,15 +1364,25 @@ function getWobbleSunDistAU(jd) {
 
 function computeSunPositionFast(jd) {
   const graph = getGraph();
-  const pos = sDay * (jd - C.startmodelJD);
+  _syncEpochForJD(jd);
+  const pos = _epochCache.sDay * (jd - C.startmodelJD);
 
-  // Compute Earth eccentricity for EoC
-  const currentYear = C.balancedYear + (C.startmodelJD + pos * C.meanSolarYearDays - C.balancedJD) / C.meanSolarYearDays;
+  // Compute Earth eccentricity for EoC — epoch-consistent mSY for round-trip.
+  const currentYear = C.balancedYear + (C.startmodelJD + pos * _epochCache.mSY - C.balancedJD) / _epochCache.mSY;
   const earthEcc = OE.computeEccentricity(currentYear, C.balancedYear, C.perihelionCycleLength, C.eccentricityBase, C.eccentricityAmplitude);
 
   // Animate a single node: orbit.ry = θ (with EoC if applicable)
   function animateFast(nodes, def) {
-    let θ = def.speed * pos - def.startPos * d2r;
+    let θ;
+    // Phase 9.12 (B-full): tagged Earth H-cycle precession objects use
+    // integrated phase ∫1/H(t')dt' under deep-time. See animateObject in
+    // moveModel() for the identical branch.
+    if (DEEP_TIME_ENABLED && Number.isFinite(def._dtCycleN)) {
+      const cycles = DT.cyclesBetweenYears(C.balancedYear, currentYear, def._dtCycleN);
+      θ = (cycles !== null ? cycles : 0) * 2 * Math.PI * def._dtCycleSign;
+    } else {
+      θ = def.speed * pos - def.startPos * d2r;
+    }
     if (C.useVariableSpeed && def.eccentricity && def.perihelionPhaseJ2000 !== undefined) {
       const e = def._eocDerived
         ? earthEcc - C.eccentricityBase / 2

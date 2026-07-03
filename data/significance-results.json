@@ -1,15 +1,15 @@
 {
-  "generated": "2026-04-19T22:00:17.715244+00:00",
-  "trials": 1000000,
+  "generated": "2026-06-30T17:11:14.340169+00:00",
+  "trials": 100000,
   "seed": 42,
-  "git_sha": "549e61f9f18aadff436d85e400f9f6ec2e97bf8c",
+  "git_sha": "340cb0f4bca8e2c69ba4881b72c4edbd81169422",
   "method": {
     "headline": "joint_permutation.direct",
     "headline_description": "Direct joint permutation test: studentized T = \u03a3_i z_i with p = #{T_null \u2265 T_obs} / n. Model-independent; joint null captures inter-test correlation directly.",
     "empirical_correlation_permutation": 0.283,
     "empirical_correlation_log_uniform": 0.032,
     "empirical_correlation_uniform": 0.031,
-    "correlation_factor": 1.84787125078004,
+    "correlation_factor": 1.847779182308718,
     "correlation_assumption": "measured empirically from permutation null"
   },
   "counts": {
@@ -23,7 +23,7 @@
     "permutation": {
       "p": 0.000148805833188661,
       "sigma": 3.62,
-      "T_obs": 5.082581062283442,
+      "T_obs": 5.08516012865698,
       "n_samples": 40320,
       "tests_used": [
         "law3_incl_balance",
@@ -34,10 +34,10 @@
       "empirical_r": 0.283
     },
     "log_uniform": {
-      "p": 9.99999000001e-07,
-      "sigma": 4.75,
-      "T_obs": 26.95644231374416,
-      "n_samples": 1000000,
+      "p": 9.99990000099999e-06,
+      "sigma": 4.26,
+      "T_obs": 23.195827877417365,
+      "n_samples": 100000,
       "tests_used": [
         "law1_fib_denominators",
         "law3_incl_balance",
@@ -52,10 +52,10 @@
       "empirical_r": 0.032
     },
     "uniform": {
-      "p": 9.99999000001e-07,
-      "sigma": 4.75,
-      "T_obs": 28.21130120520076,
-      "n_samples": 1000000,
+      "p": 9.99990000099999e-06,
+      "sigma": 4.26,
+      "T_obs": 24.419937767899107,
+      "n_samples": 100000,
       "tests_used": [
         "law1_fib_denominators",
         "law3_incl_balance",
@@ -72,8 +72,8 @@
   },
   "jackknife_permutation": {
     "Mercury": {
-      "p": 0.03471533425907558,
-      "sigma": 1.82,
+      "p": 0.03590557429081531,
+      "sigma": 1.8,
       "n_samples": 5040,
       "tests_used": [
         "law3_incl_balance",
@@ -82,10 +82,10 @@
         "f4_saturn_prediction"
       ],
       "observed": {
-        "law3_incl_balance": 99.96344828744235,
-        "law5_ecc_balance": 99.84886609778857,
-        "f6_solo_planet": 0.003018116646766886,
-        "f4_saturn_prediction": 0.0030181166467668774
+        "law3_incl_balance": 99.96343338234817,
+        "law5_ecc_balance": 99.84935080855628,
+        "f6_solo_planet": 0.003008451620832697,
+        "f4_saturn_prediction": 0.0030084516208326306
       }
     },
     "Venus": {
@@ -99,15 +99,15 @@
         "f4_saturn_prediction"
       ],
       "observed": {
-        "law3_incl_balance": 99.8847026729291,
-        "law5_ecc_balance": 99.85903750187582,
-        "f6_solo_planet": 0.0028152814713925125,
-        "f4_saturn_prediction": 0.002815281471392428
+        "law3_incl_balance": 99.8846876901222,
+        "law5_ecc_balance": 99.85949962278646,
+        "f6_solo_planet": 0.002806065012343636,
+        "f4_saturn_prediction": 0.002806065012343484
       }
     },
     "Earth": {
-      "p": 0.0013886133703630231,
-      "sigma": 2.99,
+      "p": 0.0009918666931164452,
+      "sigma": 3.09,
       "n_samples": 5040,
       "tests_used": [
         "law3_incl_balance",
@@ -116,10 +116,10 @@
         "f4_saturn_prediction"
       ],
       "observed": {
-        "law3_incl_balance": 98.307006290878,
-        "law5_ecc_balance": 99.81322644688184,
-        "f6_solo_planet": 0.0037285071969930146,
-        "f4_saturn_prediction": 0.003728507196993136
+        "law3_incl_balance": 98.30699875692936,
+        "law5_ecc_balance": 99.81371080759429,
+        "f6_solo_planet": 0.0037188560212655353,
+        "f4_saturn_prediction": 0.0037188560212655375
       }
     },
     "Mars": {
@@ -133,14 +133,14 @@
         "f4_saturn_prediction"
       ],
       "observed": {
-        "law3_incl_balance": 99.59391679678554,
-        "law5_ecc_balance": 99.72131861050791,
-        "f6_solo_planet": 0.005558138292817422,
-        "f4_saturn_prediction": 0.005558138292817483
+        "law3_incl_balance": 99.59390842981173,
+        "law5_ecc_balance": 99.72152436168813,
+        "f6_solo_planet": 0.0055540461009060335,
+        "f4_saturn_prediction": 0.005554046100905929
       }
     },
     "Jupiter": {
-      "p": 0.31104939496131717,
+      "p": 0.31144614163856377,
       "sigma": 0.49,
       "n_samples": 5040,
       "tests_used": [
@@ -150,14 +150,14 @@
         "f4_saturn_prediction"
       ],
       "observed": {
-        "law3_incl_balance": 31.908304650952747,
-        "law5_ecc_balance": 65.30888133294826,
-        "f6_solo_planet": 0.5151211009362254,
-        "f4_saturn_prediction": 0.5151211009362255
+        "law3_incl_balance": 31.9082633599009,
+        "law5_ecc_balance": 65.30962638529783,
+        "f6_solo_planet": 0.5151128871902622,
+        "f4_saturn_prediction": 0.5151128871902622
       }
     },
     "Saturn": {
-      "p": 0.076175362031343,
+      "p": 0.07657210870858956,
       "sigma": 1.43,
       "n_samples": 5040,
       "tests_used": [
@@ -168,7 +168,7 @@
       "observed": {
         "law3_incl_balance": 0.0,
         "law5_ecc_balance": 0.0,
-        "f6_solo_planet": 0.0536872651864264
+        "f6_solo_planet": 0.05367391617248371
       }
     },
     "Uranus": {
@@ -182,10 +182,10 @@
         "f4_saturn_prediction"
       ],
       "observed": {
-        "law3_incl_balance": 95.87692602925006,
-        "law5_ecc_balance": 77.19144862975277,
-        "f6_solo_planet": 0.3714489115905825,
-        "f4_saturn_prediction": 0.37144891159058235
+        "law3_incl_balance": 95.87690983867897,
+        "law5_ecc_balance": 77.19205046180555,
+        "f6_solo_planet": 0.3714409307208724,
+        "f4_saturn_prediction": 0.3714409307208725
       }
     },
     "Neptune": {
@@ -199,32 +199,32 @@
         "f4_saturn_prediction"
       ],
       "observed": {
-        "law3_incl_balance": 96.55975850975518,
-        "law5_ecc_balance": 93.91546723250967,
-        "f6_solo_planet": 0.11471102542019088,
-        "f4_saturn_prediction": 0.11471102542019085
+        "law3_incl_balance": 96.55974252140048,
+        "law5_ecc_balance": 93.91598343709892,
+        "f6_solo_planet": 0.1147018516082231,
+        "f4_saturn_prediction": 0.1147018516082231
       }
     }
   },
   "fisher_combined": {
-    "permutation": 8.709248366694223e-08,
-    "log_uniform": 3.4241573179781243e-22,
-    "uniform": 8.916334190753596e-22
+    "permutation": 8.580610419450521e-08,
+    "log_uniform": 1.143824486663497e-17,
+    "uniform": 2.578593764083527e-17
   },
   "stouffer_combined": {
-    "permutation": 9.71343556756832e-09,
-    "log_uniform": 8.414918925445061e-24,
-    "uniform": 2.1125074855624214e-23
+    "permutation": 9.552521810010051e-09,
+    "log_uniform": 4.7596701731812386e-18,
+    "uniform": 9.699308003240372e-18
   },
   "stouffer_combined_corrected": {
-    "permutation": 1.797320068043472e-05,
-    "log_uniform": 2.4095239967852094e-19,
-    "uniform": 3.79714794907151e-19
+    "permutation": 1.779984598905647e-05,
+    "log_uniform": 9.956301642040715e-15,
+    "uniform": 1.461389965858411e-14
   },
   "stouffer_sigma_corrected": {
     "permutation": 4.1,
-    "log_uniform": 8.9,
-    "uniform": 8.9
+    "log_uniform": 7.7,
+    "uniform": 7.6
   },
   "headline_p": 0.000148805833188661,
   "headline_sigma": 3.6,
@@ -235,8 +235,8 @@
       "structural": true,
       "p_values": {
         "Permutation": 1.0,
-        "Log-uniform": 3.2e-05,
-        "Uniform": 3.9e-05
+        "Log-uniform": 0.15996,
+        "Uniform": 0.16087
       }
     },
     "law2_psi_full": {
@@ -254,9 +254,9 @@
       "category": "law",
       "structural": false,
       "p_values": {
-        "Permutation": 0.006746031746031746,
-        "Log-uniform": 8e-06,
-        "Uniform": 1.2e-05
+        "Permutation": 0.006795634920634921,
+        "Log-uniform": 0.0,
+        "Uniform": 0.0
       }
     },
     "law4_k_amplitude": {
@@ -275,8 +275,8 @@
       "structural": false,
       "p_values": {
         "Permutation": 0.0009672619047619048,
-        "Log-uniform": 0.000441,
-        "Uniform": 0.000519
+        "Log-uniform": 0.00038,
+        "Uniform": 0.00033
       }
     },
     "law6_ejs_resonance": {
@@ -285,8 +285,8 @@
       "structural": true,
       "p_values": {
         "Permutation": 1.0,
-        "Log-uniform": 0.032033,
-        "Uniform": 0.032
+        "Log-uniform": 0.1828,
+        "Uniform": 0.18365
       }
     },
     "f1_mirror_symmetry": {
@@ -295,8 +295,8 @@
       "structural": true,
       "p_values": {
         "Permutation": 1.0,
-        "Log-uniform": 0.000139,
-        "Uniform": 0.000144
+        "Log-uniform": 7e-05,
+        "Uniform": 0.00021
       }
     },
     "f1b_d_set_fib_pairs": {
@@ -305,8 +305,8 @@
       "structural": true,
       "p_values": {
         "Permutation": 1.0,
-        "Log-uniform": 0.019835,
-        "Uniform": 0.020023
+        "Log-uniform": 0.01993,
+        "Uniform": 0.02017
       }
     },
     "f4_saturn_prediction": {
@@ -315,8 +315,8 @@
       "structural": false,
       "p_values": {
         "Permutation": 0.0009672619047619048,
-        "Log-uniform": 0.000441,
-        "Uniform": 0.000519
+        "Log-uniform": 0.00038,
+        "Uniform": 0.00033
       }
     },
     "f6_solo_planet": {
@@ -324,9 +324,9 @@
       "category": "finding",
       "structural": false,
       "p_values": {
-        "Permutation": 0.005183531746031746,
-        "Log-uniform": 0.003366,
-        "Uniform": 0.003722
+        "Permutation": 0.00505952380952381,
+        "Log-uniform": 0.00334,
+        "Uniform": 0.00367
       }
     },
     "year_length_beat": {

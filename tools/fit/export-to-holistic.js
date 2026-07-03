@@ -545,28 +545,49 @@ if (fs.existsSync(PLANETS_PATH)) {
   }
 }
 
-// ── 6. model-values.ts ────────────────────────────────────────
+// ── 6. model-values (compute + generated JSON) ────────────────
+//
+// Website layout (2026-07): model-values.ts is a thin re-export of
+// model-values.generated.json. The heavy year-by-year scans live in
+// model-values.compute.ts and only run at codegen time (predev/prebuild
+// hooks call scripts/generate-model-values.mjs, which mtime-checks its
+// inputs and rewrites the JSON when constants.ts / lib/orbital changes).
+//
+// This exporter does NOT touch either file directly:
+//   - .compute.ts pulls its numbers via imports from orbital/constants.ts,
+//     which we already sync above → no string replacement needed.
+//   - .generated.json auto-refreshes on the next `pnpm run dev/build`
+//     because its mtime falls behind constants.ts.
+//
+// We just flag when the snapshot is stale so the exporter's output makes
+// the "you'll need to rebuild/regen the website" step obvious.
 
-const MV_PATH = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
-if (fs.existsSync(MV_PATH)) {
+const MV_COMPUTE = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.compute.ts');
+const MV_JSON    = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.generated.json');
+const MV_TS      = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
+
+if (fs.existsSync(MV_COMPUTE) && fs.existsSync(MV_JSON)) {
   console.log('');
-  console.log('  ── model-values.ts ──');
-  let mvTs = fs.readFileSync(MV_PATH, 'utf8');
-  let mvChanges = 0;
-
-  // All displayed values in model-values.ts now flow through imports from
-  // orbital/constants.ts (Earth scalars, INCL_*, ECC_*, CORRECTION_*, etc.).
-  // No direct string-literal replacement is needed — constants.ts is the single
-  // source of truth and is synced above.
-
-  if (mvChanges === 0) {
-    console.log('    ✓ All values match');
-  } else if (!WRITE) {
-    console.log(`    ${mvChanges} changes pending`);
+  console.log('  ── model-values (compute + JSON snapshot) ──');
+  const constantsMtime = fs.statSync(CONSTANTS_PATH).mtimeMs;
+  const jsonMtime      = fs.statSync(MV_JSON).mtimeMs;
+  const willBeStale = changeCount > 0 && WRITE;
+  const alreadyStale = jsonMtime < constantsMtime;
+  if (willBeStale || alreadyStale) {
+    const verb = alreadyStale ? 'is' : 'will be';
+    console.log(`    ⚠ model-values.generated.json ${verb} stale vs constants.ts`);
+    console.log('      Run `pnpm run values:generate` in the website repo (or just');
+    console.log('      start dev/build — predev/prebuild refresh it automatically).');
+  } else if (changeCount > 0) {
+    console.log('    ℹ JSON snapshot will need regen after --write (see above)');
   } else {
-    fs.writeFileSync(MV_PATH, mvTs);
-    console.log(`    ✓ Written ${mvChanges} changes to model-values.ts`);
+    console.log('    ✓ compute file untouched, JSON snapshot in sync');
   }
+} else if (fs.existsSync(MV_TS)) {
+  // Legacy pre-split layout — website not yet migrated to the JSON snapshot.
+  console.log('');
+  console.log('  ── model-values.ts (legacy layout) ──');
+  console.log('    ✓ All values match (via constants.ts single source of truth)');
 }
 
 console.log('');
