@@ -4849,16 +4849,23 @@ function meanLodSecondsAtAge(t_Ma) {
          (L_TOTAL_EM_KGM2_S - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
 }
 
-/** Same as meanLodSecondsAtAge but with α frozen at its J2000 value — i.e. no
- *  climate-driven GIA contribution. Isolates the pure tidal-recession LOD
- *  trajectory (Driver 1 only) so the α climate oscillation on top can be
- *  read off as the difference from meanLodSecondsAtAge. Used by the Solar
- *  Day chart's second reference curve. */
-function meanLodSecondsAtAgeNoAlpha(t_Ma) {
+/** Same as meanLodSecondsAtAge but with α held at its LONG-TERM (climate) MEAN
+ *  value. Since ⟨L1⟩ over orbital cycles → 0 (harmonic average), the mean α is
+ *      ⟨α⟩ = EARTH_MOI_FACTOR + ALPHA_CLIMATE_SCALE × L1(2000)
+ *  offset from the J2000 snapshot by −ALPHA_CLIMATE_SCALE × ⟨L1⟩ = 0, so the
+ *  net offset from EARTH_MOI_FACTOR is +ALPHA_CLIMATE_SCALE × L1(2000).
+ *  This curve traces the "climate-detrended" LOD trajectory — the wavy full
+ *  model curve oscillates around this line instead of around the J2000-snapshot
+ *  line. Used by the Solar Day chart's "α at climate mean" reference curve. */
+function meanLodSecondsAtAgeMeanAlpha(t_Ma) {
   const a = meanMoonDistanceMetresAtAge(t_Ma);
   if (a <= 0 || a >= A_LOCK_M) return null;
-  const I_Earth_J2000 = EARTH_MOI_FACTOR * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
-  return (2 * Math.PI * I_Earth_J2000) /
+  if (_alphaClimateL1_J2000 === null) {
+    _alphaClimateL1_J2000 = _evalClimateL1Orbital(2000);
+  }
+  const alpha_mean = EARTH_MOI_FACTOR + ALPHA_CLIMATE_SCALE * _alphaClimateL1_J2000;
+  const I_Earth_mean = alpha_mean * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
+  return (2 * Math.PI * I_Earth_mean) /
          (L_TOTAL_EM_KGM2_S - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
 }
 
@@ -23837,11 +23844,15 @@ const VFP_CATEGORIES = [
       fn: year => meanLodSecondsAtAge((startmodelYear - year) / 1e6) },
     references: [
       { name: 'Bills & Ray (1999)', color: '#4fc3f7', fn: solarDayPeters, sourceUrl: 'https://doi.org/10.1029/1999GL008348' },
-      // Pure Driver-1 (tidal recession) — same LOD formula but α held constant
-      // at its J2000 value. The gap between this curve and "This model" reveals
-      // the climate-driven α (GIA/Milankovitch) contribution.
-      { name: 'This model (α = J2000 const)', color: '#26a69a',
-        fn: year => meanLodSecondsAtAgeNoAlpha((startmodelYear - year) / 1e6) },
+      // Same LOD formula but with α held at its LONG-TERM (glacial-cycle) MEAN
+      // value. Since ⟨L1⟩ over orbital cycles → 0 (harmonic average), the mean
+      // α is  ⟨α⟩ = EARTH_MOI_FACTOR + ALPHA_CLIMATE_SCALE × L1(2000).
+      // At J2000 this line sits ~0.14 s ABOVE the model curve — J2000 is a warm
+      // interglacial (L1(2000) ≈ −1.04, near the L1 minimum), so α(J2000) is at
+      // an oscillation extremum, not the cycle mean. Dashed to signal "hypothet-
+      // ical climate-averaged trajectory," not a same-basis physical model.
+      { name: 'This model (long term mean)', color: '#d946ef', dash: true, preserveColor: true,
+        fn: year => meanLodSecondsAtAgeMeanAlpha((startmodelYear - year) / 1e6) },
     ],
     j2000extras: [
       { name: 'IAU (observed)', color: '#ef5350',
@@ -24091,7 +24102,8 @@ function renderVFPChart(category, currentYear) {
   let curvePaths = '';
   allCurves.forEach((curve, ci) => {
     const d = buildPath(samples[ci], yScale, category.wrap360);
-    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.5}" stroke-opacity="${ci === 0 ? 1 : 0.85}"/>`;
+    const dashAttr = curve.dash ? ' stroke-dasharray="6,4"' : '';
+    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.5}" stroke-opacity="${ci === 0 ? 1 : 0.85}"${dashAttr}/>`;
   });
 
   // Y-axis label
@@ -24141,7 +24153,8 @@ function renderVFPChart(category, currentYear) {
   let resPaths = '';
   scaledResiduals.forEach((r, ri) => {
     const d = buildPath(r, rScaleFn, category.wrap360);
-    resPaths += `<path d="${d}" fill="none" stroke="${category.references[ri].color}" stroke-width="1.2" stroke-opacity="0.8"/>`;
+    const dashAttr = category.references[ri].dash ? ' stroke-dasharray="6,4"' : '';
+    resPaths += `<path d="${d}" fill="none" stroke="${category.references[ri].color}" stroke-width="1.2" stroke-opacity="0.8"${dashAttr}/>`;
   });
 
   // Residual Y-axis label
@@ -24266,7 +24279,7 @@ function renderVFPPaperChart(category) {
   // Sample all curves
   const allCurves = [
     { ...category.model, color: modelColor },
-    ...category.references.map((r, i) => ({ ...r, color: refColors[i % refColors.length] }))
+    ...category.references.map((r, i) => ({ ...r, color: r.preserveColor ? r.color : refColors[i % refColors.length] }))
   ];
   const samples = allCurves.map(() => []);
   for (let i = 0; i <= nSamples; i++) {
@@ -24370,7 +24383,8 @@ function renderVFPPaperChart(category) {
   let curvePaths = '';
   allCurves.forEach((curve, ci) => {
     const d = buildPath(samples[ci]);
-    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}" clip-path="url(#vfp-paper-clip)"/>`;
+    const dashAttr = curve.dash ? ' stroke-dasharray="6,4"' : '';
+    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}" clip-path="url(#vfp-paper-clip)"${dashAttr}/>`;
   });
 
   // J2000 marker
@@ -24397,7 +24411,8 @@ function renderVFPPaperChart(category) {
   let legendX = (W - legendTotalW) / 2;
   let legendItems = '';
   allCurves.forEach((curve, ci) => {
-    legendItems += `<line x1="${legendX}" y1="${legendY}" x2="${legendX + 22}" y2="${legendY}" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}"/>`;
+    const dashAttr = curve.dash ? ' stroke-dasharray="6,4"' : '';
+    legendItems += `<line x1="${legendX}" y1="${legendY}" x2="${legendX + 22}" y2="${legendY}" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}"${dashAttr}/>`;
     legendItems += `<text x="${legendX + 28}" y="${legendY + 4}" fill="${textColor}" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${escapeXml(curve.name)}</text>`;
     legendX += legendItemWidths[ci];
   });
@@ -24438,7 +24453,7 @@ function renderVFPPaperChartAlt(category) {
     { ...category.model, color: modelColor },
     ...category.references
       .filter(r => !excludeSet.has(r.name))
-      .map((r, i) => ({ ...r, color: refColors[i % refColors.length] }))
+      .map((r, i) => ({ ...r, color: r.preserveColor ? r.color : refColors[i % refColors.length] }))
   ];
   const samples = allCurves.map(() => []);
   for (let i = 0; i <= nSamples; i++) {
@@ -24521,7 +24536,8 @@ function renderVFPPaperChartAlt(category) {
   let curvePaths = '';
   allCurves.forEach((curve, ci) => {
     const d = buildPath(samples[ci]);
-    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2 : 1.5}" clip-path="url(#vfp-paper-alt-clip)"/>`;
+    const dashAttr = curve.dash ? ' stroke-dasharray="6,4"' : '';
+    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2 : 1.5}" clip-path="url(#vfp-paper-alt-clip)"${dashAttr}/>`;
   });
 
   // Legend
@@ -24531,7 +24547,8 @@ function renderVFPPaperChartAlt(category) {
   let legendX = (W - legendTotalW) / 2;
   let legendItems = '';
   allCurves.forEach((curve, ci) => {
-    legendItems += `<line x1="${legendX}" y1="${legendY}" x2="${legendX + 22}" y2="${legendY}" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}"/>`;
+    const dashAttr = curve.dash ? ' stroke-dasharray="6,4"' : '';
+    legendItems += `<line x1="${legendX}" y1="${legendY}" x2="${legendX + 22}" y2="${legendY}" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}"${dashAttr}/>`;
     legendItems += `<text x="${legendX + 28}" y="${legendY + 4}" fill="${textColor}" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${escapeXml(curve.name)}</text>`;
     legendX += legendItemWidths[ci];
   });
