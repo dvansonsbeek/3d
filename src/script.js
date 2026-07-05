@@ -56177,9 +56177,11 @@ function updatePredictions() {
   // Dynamic Fibonacci balance (uses eccentricities computed above)
   computeDynamicFibonacciBalance();
 
-  // Year lengths from Fourier harmonics (fitted over ±25,000 years)
-  predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(o.currentYear);
-  predictions.lengthofsiderealYear = o.lengthofsiderealYear = computeLengthofsiderealYear(o.currentYear);
+  // Year lengths from Fourier harmonics (fitted over ±25,000 years).
+  // Use yearForFormula (SI-tropical under DT-ON) so cycle phases match the scene renderer
+  // at balanced clicks — otherwise leaks per-harmonic drift back in time (commit 27db4cc pattern).
+  predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(yearForFormula);
+  predictions.lengthofsiderealYear = o.lengthofsiderealYear = computeLengthofsiderealYear(yearForFormula);
 
   // Sidereal year in seconds is constant (the orbital period)
   predictions.lengthofsiderealYearInSeconds = o.lengthofsiderealYearInSeconds = meansiderealyearlengthinSeconds;
@@ -56206,7 +56208,8 @@ function updatePredictions() {
 
   // RA Day Offset: formula confirmed by 65-epoch multiepoch test (R²=0.994, RMS=0.324 ms)
   // offset(t) = −14.194 − 5.640·cos(2π·t/(H/16)) − 1.684·cos(2π·t/(H/8))  [ms/day]
-  const _raDayOffsetT = o.currentYear - balancedYear;
+  // yearForFormula (SI-tropical under DT-ON) keeps the time-offset in the scene's phase convention.
+  const _raDayOffsetT = yearForFormula - balancedYear;
   predictions.raDayOffsetMs = o.raDayOffsetMs =
     -14.194
     - 5.640 * Math.cos(2 * Math.PI * _raDayOffsetT / (holisticyearLength / 16))
@@ -56218,7 +56221,7 @@ function updatePredictions() {
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();
   
   predictions.lengthofsiderealYearDaysRealLOD = o.lengthofsiderealYear;
-  predictions.lengthofanomalisticYearSecRealLOD = o.lengthofanomalisticYearSecRealLOD = computeLengthofanomalisticYearRealLOD(o.currentYear, o.lengthofDay);
+  predictions.lengthofanomalisticYearSecRealLOD = o.lengthofanomalisticYearSecRealLOD = computeLengthofanomalisticYearRealLOD(yearForFormula, o.lengthofDay);
 
   predictions.lengthofanomalisticYearinDays = o.lengthofanomalisticYearinDays = o.lengthofanomalisticYearSecRealLOD/86400;
   predictions.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticYearSecRealLOD/o.lengthofDay;
@@ -56228,9 +56231,11 @@ function updatePredictions() {
   predictions.obliquityPrecessionRealLOD = o.obliquityPrecessionRealLOD = o.axialPrecessionRealLOD*13/8;
   predictions.eclipticPrecessionRealLOD =o.eclipticPrecessionRealLOD = o.axialPrecessionRealLOD*13/5;
   
-  // Note: obliquityEarth and eccentricityEarth are computed earlier (before lengthofsolarYear/lengthofsiderealYear) as they're needed for year length calculations
-  predictions.earthInvPlaneInclinationDynamic = o.earthInvPlaneInclinationDynamic = computeInclinationEarth(o.currentYear, balancedYear, holisticyearLength, earthInvPlaneInclinationMean, earthInvPlaneInclinationAmplitude);
-  predictions.longitudePerihelion = o.longitudePerihelion = calcEarthPerihelionPredictive(o.currentYear); // 11-harmonic Fourier formula from predictive_formula.py
+  // Note: obliquityEarth and eccentricityEarth are computed earlier (before lengthofsolarYear/lengthofsiderealYear) as they're needed for year length calculations.
+  // Inclination uses yearForFormula (same SI-tropical convention as obliquity/eccentricity) so the H/3 cycle phase matches
+  // the scene renderer at balanced clicks — otherwise leaks ~1e-6°/cycle back in time (commit 27db4cc pattern).
+  predictions.earthInvPlaneInclinationDynamic = o.earthInvPlaneInclinationDynamic = computeInclinationEarth(yearForFormula, balancedYear, holisticyearLength, earthInvPlaneInclinationMean, earthInvPlaneInclinationAmplitude);
+  predictions.longitudePerihelion = o.longitudePerihelion = calcEarthPerihelionPredictive(yearForFormula); // 11-harmonic Fourier formula from predictive_formula.py — SI-tropical convention matches scene at balanced clicks
   
   predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = longitudeToDateTime((((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360)-earthRAAngle-180), o.currentYear)
   predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(((earthPerihelionFromEarth.ra * 180 / Math.PI + 360)-earthRAAngle % 360), o.currentYear)
@@ -56242,7 +56247,9 @@ function updatePredictions() {
   // climate-driven refinement (doc 99 §prediction-7). Both anchored at 0 / J2000
   // exact by construction.
   {
-    const t_Ma_now = (J2000_CALENDAR_YEAR - o.currentYear) / 1e6;
+    // yearForFormula (SI-tropical under DT-ON) keeps t_Ma consistent with the scene's
+    // deep-time convention — otherwise a ~7 yr/H offset leaks into ΔT and α at balanced clicks.
+    const t_Ma_now = (J2000_CALENDAR_YEAR - yearForFormula) / 1e6;
     predictions.deltaTSeconds = o.deltaTSeconds = meanDeltaTSecondsAtAge(t_Ma_now);
     predictions.alphaMoiFactor = o.alphaMoiFactor = earthMoiFactorAtAge(t_Ma_now);
   }
