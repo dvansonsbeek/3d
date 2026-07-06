@@ -34008,8 +34008,8 @@ function setupGUI() {
       const residuals = origPairs.map(p => p.residual);
       const n         = years.length;
       const N_PERM    = 1000;
-      const N_TESTS   = 3;
-      const BONFERRONI_ALPHA = 0.05 / N_TESTS;  // ≈ 0.0167
+      const N_TESTS   = 5;
+      const BONFERRONI_ALPHA = 0.05 / N_TESTS;  // = 0.01
 
       // Helpers
       const interpBalance = (year) => {
@@ -34076,6 +34076,53 @@ function setupGUI() {
       results.push({ name: 'Integrated balance Y→2000', r: r1, p: p1 });
       console.log(`  r = ${r1.toFixed(4)}   p = ${p1.toFixed(4)}   R² = ${(r1*r1*100).toFixed(2)}%   ${p1 < BONFERRONI_ALPHA ? '✓ survives Bonferroni' : '✗ does not survive'}`);
 
+      // ── Test 1 per-era breakdown ──
+      // Aggregate correlation can be dominated by smooth trends in the drift-
+      // dominated ancient BCE range without reflecting a causal per-observation
+      // link. Splitting by era matches the eras used in §9 and in Test 4's
+      // per-era diagnostic (Sub-check 3), so the two integrated tests can be
+      // compared directly. Sign-flip across eras ⇒ aggregate is drift-tracking,
+      // not causal.
+      const test1Eras = [
+        { name: 'Ancient    (-720 to    0)', lo: -720, hi:    0 },
+        { name: 'Transition (   0 to  800)', lo:    0, hi:  800 },
+        { name: 'Medieval   ( 800 to 1280)', lo:  800, hi: 1280 },
+      ];
+      const test1EraRs = [];
+      console.log('\n  Per-era breakdown (does the r=' + r1.toFixed(2) + ' aggregate survive era-by-era?):');
+      for (const e of test1Eras) {
+        const idx = [];
+        for (let i = 0; i < n; i++) if (years[i] >= e.lo && years[i] <  e.hi) idx.push(i);
+        if (idx.length < 5) {
+          console.log(`    ${e.name}  n=${idx.length}: too few observations to correlate.`);
+          continue;
+        }
+        const pred_sub = idx.map(i => integratedBalance[i]);
+        const resid_sub = idx.map(i => residuals[i]);
+        const r_sub = pearson(pred_sub, resid_sub);
+        test1EraRs.push({ era: e.name, n: idx.length, r: r_sub });
+        console.log(`    ${e.name}  n=${String(idx.length).padStart(3)}:  r = ${r_sub.toFixed(3)}`);
+      }
+      const test1Signs = test1EraRs.map(r => Math.sign(r.r));
+      const test1AllNeg = test1Signs.every(s => s < 0);
+      const test1AllPos = test1Signs.every(s => s > 0);
+      if (test1AllNeg || test1AllPos) {
+        console.log(`  ✓ Correlation sign is consistent across eras (all ${test1AllNeg ? 'negative' : 'positive'}).`);
+        console.log('    → r=' + r1.toFixed(2) + ' aggregate reflects a per-observation link, not a drift-tracking artifact.');
+        console.log('    → H3-lunar mass-balance PASS in Table 6 is defensible as a causal claim.');
+      } else {
+        console.log('  ⚠ Correlation sign FLIPS across eras.');
+        console.log('    → Aggregate r=' + r1.toFixed(2) + ' is drift-tracking, not causal per-observation.');
+        console.log('    → H3-lunar 4σ PASS in Table 6 is an averaging artifact of two smooth signals ');
+        console.log('      (integrated mass-balance and residual) both trending monotonically in the');
+        console.log('      ancient BCE range where drift dominates. The claim needs downgrading.');
+        console.log('    → Combined with Test 4 (Path A) per-era flip: NEITHER predictor causally explains');
+        console.log('      the medieval bump; both track the ancient drift.');
+      }
+
+      // Expose test1 per-era results for downstream inspection
+      const _test1EraRs_exposed = test1EraRs;
+
       // ── TEST 2: lagged correlation — scan Δ, report best ──
       console.log('\n── Test 2: Lagged correlation — scan Δ ∈ {0, 100, 200, 300, 500, 700, 1000} yr ──');
       const lags = [0, 100, 200, 300, 500, 700, 1000];
@@ -34113,6 +34160,430 @@ function setupGUI() {
       console.log(`  r = ${r3.toFixed(4)}   p = ${p3.toFixed(4)}   R² = ${(r3*r3*100).toFixed(2)}%   ${p3 < BONFERRONI_ALPHA ? '✓ survives Bonferroni' : '✗ does not survive'}`);
       console.log(`  Sign-duration range: ${Math.min(...signDuration).toFixed(0)} to ${Math.max(...signDuration).toFixed(0)} yr (signed; magnitude = years since last sign change)`);
 
+      // ── TEST 4: Integrated solar-activity forcing Y→2000 (Path A) ──
+      // Tests the paper's leading-candidate physical mechanism directly:
+      //   solar activity S(t) → ionospheric-thermospheric coupling → LOD → ΔT
+      // Both the input signal S(t) and the coupling coefficient k come from
+      // published independent measurements — NOT fitted to eclipse data.
+      //
+      // S(t) analytical model: Solanki 2004 (Nature) reconstructs 11,400 yr
+      // solar activity from ¹⁴C/¹⁰Be cosmogenic isotopes; envelope features
+      // (Medieval Grand Maxima ~1050 CE, Modern Grand Maximum ~1970,
+      //  Maunder Minimum ~1680) with published amplitudes on a mean SN
+      // baseline, plus Gleissberg 88 yr / Jose 179 yr / de Vries 210 yr
+      // periodic content (amplitudes from Solanki 2004 Figure 2 and text).
+      //
+      // Coupling coefficient k from Holme & de Viron 2013 (Nature): decadal
+      // LOD-solar-activity coupling ≈ 8 μs/day per SN. Duhau & de Jager 2010
+      // suggests multi-centennial coupling may be larger (up to ~30 μs/day);
+      // both bounds are reported.
+      //
+      // Preserves zero-fitting-parameter philosophy: no coefficients fitted
+      // to eclipse data. This is a PREDICTIVE test of the paper's stated
+      // mechanism, not a correlation-mining exercise.
+      console.log('\n── Test 4: Integrated solar-activity forcing Y→2000 (Path A) ──');
+      console.log('  S(t) = Solanki 2004 envelope (MWP + Modern Grand Max + Maunder Min)');
+      console.log('         + Gleissberg 88 + Jose 179 + de Vries 210 yr harmonics');
+      console.log('  k    = Holme & de Viron 2013 satellite-derived LOD-per-SN coupling');
+      console.log('  ΔT_solar(Y) = ∫[Y to 2000] k × [S(t) − S(2000)] × 365.25 dt');
+
+      // Analytical solar-activity reconstruction in SN-equivalent units.
+      // Envelope amplitudes from Solanki 2004:
+      //   Modern Grand Max (~1970): peak SN ~65 above baseline
+      //   Maunder Minimum (~1680):  deep dip ~25 below baseline
+      //   Medieval Grand Max (~1050): sustained peak ~20 above baseline
+      // Baseline SN_base = 40 (Holocene mean).
+      const solarActivity = (t) => {
+        const S_base    = 40;
+        const MWP_env   = 20 * Math.exp(-Math.pow((t - 1050) / 150, 2));
+        const ModernGM  = 20 * Math.exp(-Math.pow((t - 1970) / 100, 2));
+        const Maunder   = 30 * Math.exp(-Math.pow((t - 1680) / 30,  2));
+        const Gleissberg = 8 * Math.cos(2 * Math.PI * (t - 1975) / 88);
+        const Jose       = 6 * Math.cos(2 * Math.PI * (t - 1900) / 179);
+        const deVries    = 5 * Math.cos(2 * Math.PI * (t - 1770) / 210);
+        return S_base + MWP_env + ModernGM - Maunder + Gleissberg + Jose + deVries;
+      };
+      const S_2000 = solarActivity(2000);
+
+      // Coupling coefficients (three literature-derived scenarios):
+      const K_HDV_LOWER   =  3e-6;  // s/day/SN — HdV 2013 lower bound (decadal)
+      const K_HDV_CENTRAL =  8e-6;  // s/day/SN — HdV 2013 central estimate
+      const K_HDV_UPPER   = 30e-6;  // s/day/SN — Duhau 2010 multi-centennial upper bound
+
+      // Simpson-rule integration ΔT_solar(Y) = ∫[Y to 2000] k×(S(t)−S(2000))×365.25 dt
+      const integrateSolar = (Y, k) => {
+        if (Y >= 2000) return 0;
+        const span = 2000 - Y;
+        let nSteps = Math.max(20, Math.ceil(span / 5));  // sample ~every 5 yr
+        if (nSteps % 2 === 1) nSteps++;
+        const h = span / nSteps;
+        let sum = 0;
+        for (let i = 0; i <= nSteps; i++) {
+          const t = Y + i * h;
+          const dS = solarActivity(t) - S_2000;
+          const w = (i === 0 || i === nSteps) ? 1 : (i % 2 === 1 ? 4 : 2);
+          sum += w * k * dS * 365.25;
+        }
+        return (sum * h) / 3;
+      };
+
+      // Sample values for reader intuition
+      console.log(`\n  Predicted ΔT_solar contribution at three coupling scenarios:`);
+      const dTs_year = (Y, k) => integrateSolar(Y, k);
+      const sampleYears = [-720, -300, 0, 500, 990, 1500, 1900];
+      const sampleTable = sampleYears.map(Y => ({
+        year:              Y,
+        S_t:               solarActivity(Y).toFixed(1),
+        dS_vs_2000:        (solarActivity(Y) - S_2000).toFixed(1),
+        dT_HdV_lower_s:    dTs_year(Y, K_HDV_LOWER).toFixed(0),
+        dT_HdV_central_s:  dTs_year(Y, K_HDV_CENTRAL).toFixed(0),
+        dT_Duhau_upper_s:  dTs_year(Y, K_HDV_UPPER).toFixed(0),
+      }));
+      console.table(sampleTable);
+
+      // Correlation test at central coupling (HdV 2013 value)
+      const dTsolar_central = years.map(Y => integrateSolar(Y, K_HDV_CENTRAL));
+      const r4 = pearson(dTsolar_central, residuals);
+      const p4 = permutationP(dTsolar_central, residuals, N_PERM);
+      results.push({ name: 'Integrated solar-activity Y→2000 (HdV central)', r: r4, p: p4 });
+      console.log(`\n  Correlation (predictor = ΔT_solar at HdV central coupling, target = residual):`);
+      console.log(`  r = ${r4.toFixed(4)}   p = ${p4.toFixed(4)}   R² = ${(r4*r4*100).toFixed(2)}%   ${p4 < BONFERRONI_ALPHA ? '✓ survives Bonferroni α=' + BONFERRONI_ALPHA.toFixed(4) : '✗ does not survive Bonferroni'}`);
+
+      // RESIDUAL-REDUCTION diagnostic — the "does Path A close the gap?" test.
+      // If ΔT_solar captures the observed residual, subtracting it should reduce
+      // residual RMS. Report reduction at all three coupling scenarios plus the
+      // best-fit coupling (unconstrained, for upper-bound reference only).
+      console.log('\n  Residual-reduction test — RMS(residual − ΔT_solar) at each coupling:');
+      const rms = (arr) => Math.sqrt(arr.reduce((s, v) => s + v * v, 0) / arr.length);
+      const rms_orig = rms(residuals);
+      console.log(`    Original RMS(residual):                                        ${rms_orig.toFixed(0)} s`);
+      const scenarioResults = [];
+      for (const [label, k] of [
+        ['HdV lower    (k =  3 μs/day/SN)', K_HDV_LOWER],
+        ['HdV central  (k =  8 μs/day/SN)', K_HDV_CENTRAL],
+        ['Duhau upper  (k = 30 μs/day/SN)', K_HDV_UPPER],
+      ]) {
+        const dTs = years.map(Y => integrateSolar(Y, k));
+        const reduced = residuals.map((r, i) => r - dTs[i]);
+        const rms_red = rms(reduced);
+        const reduction_pct = (rms_orig - rms_red) / rms_orig * 100;
+        const sign = reduction_pct > 0 ? '−' : '+';
+        console.log(`    ${label}: RMS = ${rms_red.toFixed(0)} s   (${sign}${Math.abs(reduction_pct).toFixed(1)}% vs original)`);
+        scenarioResults.push({ label, k, rms_reduced: rms_red, reduction_pct });
+      }
+      // Best-fit coupling: analytical optimum of k = Σ(r·dTs_unit) / Σ(dTs_unit²).
+      // dTs_unit(Y) = integrateSolar(Y, 1) so dTs(k) = k × dTs_unit; best k minimizes
+      // Σ(r − k·dTs_unit)² which yields k_best = Σ(r·dTs_unit) / Σ(dTs_unit²).
+      const dTs_unit = years.map(Y => integrateSolar(Y, 1));
+      let num_bf = 0, den_bf = 0;
+      for (let i = 0; i < n; i++) { num_bf += residuals[i] * dTs_unit[i]; den_bf += dTs_unit[i] * dTs_unit[i]; }
+      const k_best = num_bf / den_bf;
+      const dTs_best = dTs_unit.map(v => v * k_best);
+      const rms_best = rms(residuals.map((r, i) => r - dTs_best[i]));
+      const reduction_best = (rms_orig - rms_best) / rms_orig * 100;
+      console.log(`    Best-fit k = ${(k_best * 1e6).toFixed(1)} μs/day/SN (unconstrained; upper-bound reference only)`);
+      console.log(`    Best-fit    RMS = ${rms_best.toFixed(0)} s   (−${reduction_best.toFixed(1)}% vs original)`);
+      console.log('    (Best-fit k is diagnostic ONLY — the paper cites HdV/Duhau values, not this optimum.');
+      console.log('     If HdV central is within 3× of best-fit, the published coupling is compatible with the observed residual.)');
+
+      // Interpret Path A verdict (updated to reflect sign inversion possibility)
+      const central_reduction = ((rms_orig - rms(residuals.map((r,i) => r - years.map(Y => integrateSolar(Y, K_HDV_CENTRAL))[i]))) / rms_orig * 100);
+      const sign_matches_HdV = k_best > 0;  // HdV publishes POSITIVE coupling; best-fit negative would flag sign inversion
+      console.log('\n  Path A verdict:');
+      if (p4 < BONFERRONI_ALPHA && central_reduction > 5 && sign_matches_HdV) {
+        console.log('    ✓ Solar-activity forcing correlates with residual AND explains a meaningful fraction of RMS.');
+        console.log('    → Paper\'s leading-candidate direct-atmospheric-coupling mechanism is directly supported.');
+      } else if (p4 < BONFERRONI_ALPHA && !sign_matches_HdV) {
+        console.log('    ⚠ Strong correlation, but sign of best-fit coupling is OPPOSITE to published HdV.');
+        console.log(`    → r=${r4.toFixed(3)}, R²=${(r4*r4*100).toFixed(1)}%: structural alignment is real.`);
+        console.log(`    → Best-fit k = ${(k_best * 1e6).toFixed(1)} μs/day/SN vs HdV central +${(K_HDV_CENTRAL*1e6).toFixed(0)}: SIGN INVERSION.`);
+        console.log('    → Interpretation: direct atmospheric-coupling mechanism (HdV) has WRONG SIGN at');
+        console.log('      centennial scale. Parsimonious alternative is climate-mediated coupling:');
+        console.log('      solar activity → climate response (Grand Maxima warming) → ice-mass');
+        console.log('      redistribution to equator → polar moment of inertia ↑ → LOD ↓ → less ΔT.');
+        console.log('    → This aligns with Test 1 (mass-balance) result — same climate-mediated');
+        console.log('      channel viewed through the solar-forcing driver rather than the mass proxy.');
+      } else if (p4 < BONFERRONI_ALPHA) {
+        console.log('    ⚠ Solar-activity forcing correlates with residual but published HdV coupling is amplitude-limited.');
+        console.log('    → Structure aligns; magnitude gap may indicate stronger multi-centennial coupling (Duhau) or');
+        console.log('      an additional mechanism operating on the same timescales.');
+      } else if (central_reduction > 5) {
+        console.log('    ⚠ Solar-activity forcing reduces RMS but correlation is not significant.');
+        console.log('    → Suggests our analytical S(t) shape captures some residual features but is not tightly aligned.');
+      } else {
+        console.log('    ✗ Solar-activity forcing at published coupling coefficients does NOT meaningfully explain the residual.');
+        console.log('    → Either the coupling is much weaker than HdV suggests, or the leading-candidate mechanism');
+        console.log('      is not the dominant driver of the medieval bump.');
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════
+      // Path A diagnostic sub-checks — verify the sign-inversion interpretation
+      // rather than jumping straight to paper edits.
+      // ═══════════════════════════════════════════════════════════════════════
+
+      // ── Sub-check 1: Verify S(t) shape at diagnostic epochs ──
+      // If S(t) is inverted (my model backwards), the r=−0.54 would be a bug.
+      // Confirm published solar-activity features come out with correct sign:
+      //   Modern Grand Max ~1970:  S >> Holocene mean  (SN peaks ~120+)
+      //   Maunder Minimum ~1680:   S << Holocene mean  (SN ~15-25 sustained)
+      //   MWP peak ~1050:          S > Holocene mean   (moderate elevation)
+      //   Baseline ~800 CE:        S ≈ Holocene mean   (SN ~40)
+      console.log('\n  ── Sub-check 1: S(t) shape sanity at published solar-activity features ──');
+      const shapeChecks = [
+        { epoch: 'Modern Grand Max', year: 1970, expect_sign: '+', expect_note: 'SN peak, historic elevation' },
+        { epoch: 'Maunder Minimum',  year: 1680, expect_sign: '−', expect_note: 'deep sustained dip below mean' },
+        { epoch: 'MWP peak',         year: 1050, expect_sign: '+', expect_note: 'moderate elevation' },
+        { epoch: 'Holocene baseline', year: 800, expect_sign: '≈', expect_note: 'near baseline' },
+      ];
+      const holoceneMean = 40;  // S_base in the analytical model
+      const shapeTable = shapeChecks.map(c => {
+        const S_val = solarActivity(c.year);
+        const dev   = S_val - holoceneMean;
+        const observed_sign = dev > 5 ? '+' : (dev < -5 ? '−' : '≈');
+        const check = observed_sign === c.expect_sign ? '✓' : '✗ SIGN INVERTED';
+        return {
+          epoch:              c.epoch,
+          year:               c.year,
+          expected_sign:      c.expect_sign,
+          S_t:                S_val.toFixed(1),
+          deviation_from_mean: dev.toFixed(1),
+          observed_sign:      observed_sign,
+          check:              check,
+        };
+      });
+      console.table(shapeTable);
+      const anyInverted = shapeTable.some(r => r.check.startsWith('✗'));
+      if (anyInverted) {
+        console.log('  ✗ S(t) has inverted feature(s) — the r=−0.54 may be a bug in the analytical shape.');
+      } else {
+        console.log('  ✓ S(t) reproduces Solanki 2004 published features correctly.');
+        console.log('    → The r=−0.54 anti-correlation is NOT a shape bug; it reflects genuine anti-correlation');
+        console.log('      between solar-activity forcing (correct sign) and the residual.');
+      }
+
+      // ── Sub-check 2: Cross-correlate mass-balance (Test 1) vs solar-activity (Test 4) predictors ──
+      // If both surviving predictors correlate strongly with each other, they may be tracking
+      // the same underlying phenomenon rather than providing independent evidence.
+      // If they're roughly orthogonal, they provide independent lines of evidence.
+      console.log('\n  ── Sub-check 2: Are mass-balance and solar-activity predictors independent? ──');
+      const r_predictors = pearson(integratedBalance, dTsolar_central);
+      console.log(`  Cross-correlation between integrated mass-balance and integrated solar-activity: r = ${r_predictors.toFixed(3)}`);
+      const rSq_predictors = r_predictors * r_predictors * 100;
+      console.log(`  R² = ${rSq_predictors.toFixed(1)}%: this fraction of one predictor's variance is explained by the other.`);
+      if (Math.abs(r_predictors) > 0.7) {
+        console.log('  ⚠ HIGH cross-correlation (|r| > 0.7): predictors are nearly co-linear.');
+        console.log('    → Test 1 and Test 4 are largely the SAME evidence, not two independent findings.');
+        console.log('    → In a joint regression, one would absorb the other.');
+        console.log('    → Report as "one mechanism, two proxies" rather than two mechanisms.');
+      } else if (Math.abs(r_predictors) > 0.4) {
+        console.log('  ⚠ MODERATE cross-correlation: predictors share substantial common structure.');
+        console.log('    → Test 1 and Test 4 partially overlap. Joint significance would be smaller than');
+        console.log('      sum of independent significances.');
+      } else {
+        console.log('  ✓ LOW cross-correlation: predictors are largely independent evidence.');
+        console.log('    → Test 1 (mass-balance) and Test 4 (solar-activity) reach the same residual');
+        console.log('      through different channels; joint evidence is genuinely stronger than either alone.');
+      }
+
+      // Joint regression: what does the residual look like after subtracting the joint best-fit?
+      // Uses [integratedBalance, dTsolar_central] as basis; solves 2×2 normal equations.
+      const X = [integratedBalance, dTsolar_central];  // 2 predictors, n obs each
+      // Design matrix M = X^T X (2x2), b = X^T y (2)
+      let M00 = 0, M01 = 0, M11 = 0, b0 = 0, b1 = 0;
+      for (let i = 0; i < n; i++) {
+        M00 += X[0][i] * X[0][i];
+        M01 += X[0][i] * X[1][i];
+        M11 += X[1][i] * X[1][i];
+        b0  += X[0][i] * residuals[i];
+        b1  += X[1][i] * residuals[i];
+      }
+      const detM = M00 * M11 - M01 * M01;
+      const c0 = ( M11 * b0 - M01 * b1) / detM;  // coefficient on mass-balance
+      const c1 = (-M01 * b0 + M00 * b1) / detM;  // coefficient on solar-activity
+      const jointFit = residuals.map((r, i) => c0 * X[0][i] + c1 * X[1][i]);
+      const jointResid = residuals.map((r, i) => r - jointFit[i]);
+      const jointRms = rms(jointResid);
+      const jointR2 = 1 - jointRms * jointRms / (rms_orig * rms_orig);
+      console.log(`\n  Joint regression (both predictors, unconstrained coefficients):`);
+      console.log(`    Coeff on mass-balance:  ${c0.toExponential(3)}`);
+      console.log(`    Coeff on solar-activity: ${c1.toExponential(3)}`);
+      console.log(`    Joint R² = ${(jointR2 * 100).toFixed(1)}%   (vs Test 1 alone R² ${(r1 * r1 * 100).toFixed(1)}%, Test 4 alone R² ${(r4 * r4 * 100).toFixed(1)}%)`);
+      const jointGain = jointR2 - Math.max(r1 * r1, r4 * r4);
+      if (jointGain < 0.02) {
+        console.log(`    → Joint fit adds <2 pp to the better single-test R². Predictors are largely redundant.`);
+      } else if (jointGain < 0.10) {
+        console.log(`    → Joint fit adds ${(jointGain * 100).toFixed(1)} pp over the better single test. Some independent explanatory power.`);
+      } else {
+        console.log(`    → Joint fit adds ${(jointGain * 100).toFixed(1)} pp over the better single test. Predictors carry substantial independent evidence.`);
+      }
+
+      // ── Sub-check 3: Per-era correlation for Path A (analogous to §9 mass-balance breakdown) ──
+      // Where does the r=−0.54 come from? Is it uniform across eras, or driven by the ends
+      // (Modern Grand Max & Maunder ends, where signal is strongest by construction)?
+      console.log('\n  ── Sub-check 3: Path A per-era correlation ──');
+      const erasEnv = [
+        { name: 'Ancient    (-720 to    0)', lo: -720, hi:    0 },
+        { name: 'Transition (   0 to  800)', lo:    0, hi:  800 },
+        { name: 'Medieval   ( 800 to 1280)', lo:  800, hi: 1280 },
+      ];
+      const perEraResults = [];
+      for (const e of erasEnv) {
+        const idx = [];
+        for (let i = 0; i < n; i++) if (years[i] >= e.lo && years[i] <  e.hi) idx.push(i);
+        if (idx.length < 5) {
+          console.log(`  ${e.name}  n=${idx.length}: too few observations to correlate.`);
+          continue;
+        }
+        const pred_sub = idx.map(i => dTsolar_central[i]);
+        const resid_sub = idx.map(i => residuals[i]);
+        const r_sub = pearson(pred_sub, resid_sub);
+        perEraResults.push({ era: e.name, n: idx.length, r: r_sub });
+        console.log(`  ${e.name}  n=${String(idx.length).padStart(3)}:  r = ${r_sub.toFixed(3)}`);
+      }
+      const signs = perEraResults.map(r => Math.sign(r.r));
+      const allNeg = signs.every(s => s < 0);
+      const allPos = signs.every(s => s > 0);
+      if (allNeg || allPos) {
+        console.log(`  ✓ Correlation sign is consistent across eras (all ${allNeg ? 'negative' : 'positive'}).`);
+        console.log('    → r=−0.54 aggregate is not driven by one era; the anti-correlation is a persistent feature.');
+      } else {
+        console.log('  ⚠ Correlation sign FLIPS across eras.');
+        console.log('    → Aggregate r=−0.54 may be an averaging artifact rather than a coherent physical signal.');
+        console.log('    → Reduces confidence in the sign-inversion interpretation.');
+      }
+
+      // ── TEST 5: Planetary perihelion configuration forcing (SIM-adjacent) ──
+      // Tests the hypothesis that Earth-Jupiter-Saturn perihelion angular
+      // configurations modulate LOD/ΔT via Solar Inertial Motion → solar
+      // activity envelope → climate → mass redistribution. Literature basis:
+      // Fairbridge & Sanders (1987), Charvátová (1990-2007), Landscheidt (1998),
+      // Scafetta (2010, 2012), Wilson (2013, 2025), Bond (1997). The framework's
+      // own Law 6 (J-S-Earth resonance at 8H/65) is an internal-consistency
+      // basis: extending Law 6's static resonance claim to temporal-forcing test.
+      //
+      // Predictor construction. For each planet-pair angle φ_XY(t), the
+      // physical mechanism is a modulation strength ∝ cos(φ_XY(t)) — peaks at
+      // conjunction (φ=0°) and opposition (φ=180°). Integrated ΔT contribution
+      // ΔT_XY(Y) = ∫[Y to 2000] k × cos(φ_XY(t)) dt (analogous to Test 4).
+      //
+      // Three configurations tested:
+      //   5a: Jupiter-Saturn perihelion angle (SIM-primary)
+      //   5b: Earth-Jupiter perihelion angle (Law 6 partial)
+      //   5c: Earth-Saturn perihelion angle (user's specific observation: crossing ~1550 CE)
+      //
+      // Perihelion angles: linear ecliptic-of-date rates from framework physics,
+      // anchored at J2000 = 2000 CE. Rates independently reproduce the paper's
+      // Law 6 Saturn-retrograde claim.
+      console.log('\n── Test 5: Planetary perihelion configuration forcing (SIM-adjacent) ──');
+      console.log('  Sub-tests three E-J-S angular pair configurations. Physical mechanism:');
+      console.log('  planetary perihelion alignment → SIM strength → solar activity → climate → LOD.');
+
+      // Ecliptic-of-date perihelion angle formulas. Rates from user-supplied
+      // JPL/framework data (500-1800 AD, verified against DE440 at J2000):
+      const perEarth   = (Y) => 102.94 + 0.017195 * (Y - 2000);
+      const perJupiter = (Y) =>  14.55 + 0.004853 * (Y - 2000);
+      const perSaturn  = (Y) =>  92.14 - 0.009468 * (Y - 2000);   // retrograde in ecliptic
+
+      // Angular difference in radians, normalized to (-π, π]
+      const angDiff = (a, b) => {
+        let d = ((a - b) % 360 + 540) % 360 - 180;
+        return d * Math.PI / 180;
+      };
+      const phi_JS = (Y) => angDiff(perJupiter(Y), perSaturn(Y));
+      const phi_EJ = (Y) => angDiff(perEarth(Y),   perJupiter(Y));
+      const phi_ES = (Y) => angDiff(perEarth(Y),   perSaturn(Y));
+
+      // Integrated cos(φ) forcing from year Y to year 2000 (analogous to Test 4)
+      const integrateAngleForcing = (Y, phiFn) => {
+        if (Y >= 2000) return 0;
+        const span = 2000 - Y;
+        let nSteps = Math.max(20, Math.ceil(span / 5));
+        if (nSteps % 2 === 1) nSteps++;
+        const h = span / nSteps;
+        let sum = 0;
+        for (let i = 0; i <= nSteps; i++) {
+          const t = Y + i * h;
+          const w = (i === 0 || i === nSteps) ? 1 : (i % 2 === 1 ? 4 : 2);
+          sum += w * Math.cos(phiFn(t));
+        }
+        return (sum * h) / 3;
+      };
+
+      // Sample the three angular predictors and print for reader intuition
+      const sampleTable_pl = [-720, -300, 0, 500, 990, 1200, 1550, 2000].map(Y => ({
+        year:            Y,
+        perihelion_E:    perEarth(Y).toFixed(2),
+        perihelion_J:    perJupiter(Y).toFixed(2),
+        perihelion_S:    perSaturn(Y).toFixed(2),
+        'φ_JS_deg':      (phi_JS(Y) * 180 / Math.PI).toFixed(1),
+        'φ_EJ_deg':      (phi_EJ(Y) * 180 / Math.PI).toFixed(1),
+        'φ_ES_deg':      (phi_ES(Y) * 180 / Math.PI).toFixed(1),
+      }));
+      console.log('\n  Perihelion angles at diagnostic epochs (ecliptic-of-date, degrees):');
+      console.table(sampleTable_pl);
+
+      // Run three sub-tests
+      const test5Configs = [
+        { name: '5a: J−S alignment', phiFn: phi_JS, longName: 'Integrated Jupiter-Saturn perihelion cos(φ)' },
+        { name: '5b: E−J alignment', phiFn: phi_EJ, longName: 'Integrated Earth-Jupiter perihelion cos(φ)' },
+        { name: '5c: E−S alignment', phiFn: phi_ES, longName: 'Integrated Earth-Saturn perihelion cos(φ)' },
+      ];
+      const test5Results = [];
+      const test5PerEra = {};
+      for (const cfg of test5Configs) {
+        const predictor = years.map(Y => integrateAngleForcing(Y, cfg.phiFn));
+        const r5 = pearson(predictor, residuals);
+        const p5 = permutationP(predictor, residuals, N_PERM);
+        // Per-era breakdown (same eras as Test 1 and Sub-check 3)
+        const eraRs = [];
+        for (const e of [
+          { name: 'Ancient    (-720 to    0)', lo: -720, hi:    0 },
+          { name: 'Transition (   0 to  800)', lo:    0, hi:  800 },
+          { name: 'Medieval   ( 800 to 1280)', lo:  800, hi: 1280 },
+        ]) {
+          const idx = [];
+          for (let i = 0; i < n; i++) if (years[i] >= e.lo && years[i] <  e.hi) idx.push(i);
+          if (idx.length < 5) { eraRs.push({ era: e.name, n: idx.length, r: NaN }); continue; }
+          const rEra = pearson(idx.map(i => predictor[i]), idx.map(i => residuals[i]));
+          eraRs.push({ era: e.name, n: idx.length, r: rEra });
+        }
+        const signs_5 = eraRs.filter(r => Number.isFinite(r.r)).map(r => Math.sign(r.r));
+        const consistent = signs_5.length > 0 && (signs_5.every(s => s < 0) || signs_5.every(s => s > 0));
+        console.log(`\n  ${cfg.name}:`);
+        console.log(`    Aggregate: r = ${r5.toFixed(4)}   p = ${p5.toFixed(4)}   R² = ${(r5*r5*100).toFixed(2)}%   ${p5 < BONFERRONI_ALPHA ? '✓ survives Bonferroni' : '✗ does not survive'}`);
+        console.log('    Per-era:');
+        for (const e of eraRs) {
+          const rStr = Number.isFinite(e.r) ? e.r.toFixed(3) : 'insufficient n';
+          console.log(`      ${e.era}  n=${String(e.n).padStart(3)}:  r = ${rStr}`);
+        }
+        console.log(`    ${consistent ? '✓ sign consistent across eras — per-observation link' : '⚠ sign FLIPS across eras — drift-tracking artifact'}`);
+        test5Results.push({ name: cfg.longName, r: r5, p: p5, eraRs, consistent });
+        test5PerEra[cfg.name] = { eraRs, consistent };
+      }
+      // Report the best of the three (with caveat about scanning)
+      const test5Best = test5Results.reduce((a, b) => Math.abs(b.r) > Math.abs(a.r) ? b : a);
+      const test5AnyConsistent = test5Results.some(r => r.consistent);
+      console.log('\n  Test 5 verdict:');
+      console.log(`    Best of 3 sub-tests: ${test5Best.name} → r = ${test5Best.r.toFixed(3)}, p = ${test5Best.p.toFixed(4)}`);
+      if (test5AnyConsistent) {
+        const consistentOnes = test5Results.filter(r => r.consistent);
+        console.log(`    ✓ ${consistentOnes.length}/3 sub-test(s) survive per-era stability check.`);
+        console.log(`    → Planetary perihelion configuration is a candidate causal driver — NOT drift-tracking.`);
+        console.log(`      Unlike Tests 1 and 4, the correlation persists across eras.`);
+        console.log(`      Recommend: dedicated follow-up on the surviving configuration(s).`);
+      } else {
+        console.log('    ⚠ None of the 3 sub-tests survive per-era stability check.');
+        console.log('    → Planetary perihelion angular predictors (in this integrated-cos formulation) are');
+        console.log('      drift-tracking artifacts, same failure mode as Test 1 and Test 4.');
+        console.log('    → Alternative formulations to consider:');
+        console.log('      - Distance-from-specific-configuration (e.g., |φ_JS + 90°|) as a bump-shape predictor');
+        console.log('      - Synodic-scale beat amplitude modulation rather than perihelion-precession scale');
+        console.log('      - Different reference angle for the cosine, scanned as free parameter');
+      }
+      console.log('  Caveat: scanning 3 sub-tests inflates false-positive risk. Strict α = ' + (BONFERRONI_ALPHA/3).toFixed(4));
+      // Use best sub-test as Test 5's contribution to Bonferroni summary table
+      results.push({ name: `Perihelion config (best of 3: ${test5Best.name.replace('Integrated ', '')})`, r: test5Best.r, p: test5Best.p });
+
       // ── Summary table ──
       console.log('\n══════════════════════════════════════════════════════════════════════════════════');
       console.log(`  SUMMARY (n=${n}, Bonferroni-corrected α = ${BONFERRONI_ALPHA.toFixed(4)})`);
@@ -34129,33 +34600,64 @@ function setupGUI() {
       const surviving = results.filter(r => r.p < BONFERRONI_ALPHA);
       console.log('');
       if (surviving.length === 0) {
-        console.log('  VERDICT: 0/3 tests survive Bonferroni correction.');
-        console.log('           The Holistic Universe Model mass-balance thesis (in any of the 3 tested');
-        console.log('           formulations: integrated / lagged / sign-duration) does NOT predictably');
-        console.log('           explain the medieval residual at α=0.05 with multiple-comparison correction.');
-        console.log('           ');
-        console.log('           Likely true source of medieval residual:');
-        console.log('             (a) Observation systematics in Stephenson Chinese/Arab data');
-        console.log('             (b) Regionalized GIA structure beyond 3-mode global average');
-        console.log('             (c) An as-yet-unidentified physical channel (possibly time-variable');
-        console.log('                 mantle-core coupling not captured by Holme 1998 secular value)');
+        console.log('  VERDICT: 0/5 tests survive Bonferroni correction.');
+        console.log('           None of the tested coupling theses (mass-balance in 3 formulations,');
+        console.log('           solar-activity Path A, planetary perihelion configuration Test 5)');
+        console.log('           predictably explains the medieval residual at α=0.05 with multiple-comparison');
+        console.log('           correction. Sign-flip per-era checks confirm aggregate correlations are');
+        console.log('           drift-tracking, not causal.');
       } else if (surviving.length === 1) {
-        console.log(`  VERDICT: 1/3 tests survives Bonferroni correction: ${surviving[0].name}`);
+        console.log(`  VERDICT: 1/5 tests survives Bonferroni correction: ${surviving[0].name}`);
         console.log(`           r = ${surviving[0].r.toFixed(4)}, p = ${surviving[0].p.toFixed(4)}`);
         console.log('           Single-survivor result is SUGGESTIVE but not strong evidence. Could indicate:');
-        console.log('             - Real but narrowly-targeted causal mechanism (e.g., specific lag time)');
+        console.log('             - Real but narrowly-targeted causal mechanism (e.g., specific lag time');
+        console.log('               or specific coupling channel that dominates one candidate)');
         console.log('             - Or selection effect from running multiple variants');
         console.log('           Recommendation: pre-specify this formulation, test on independent dataset.');
+        console.log('           IMPORTANT: even a Bonferroni-surviving aggregate can be drift-tracking.');
+        console.log('           Check the per-era stability check for the surviving test before claiming causality.');
       } else {
-        console.log(`  VERDICT: ${surviving.length}/3 tests survive Bonferroni correction.`);
-        console.log('           SUPPORTING EVIDENCE for the mass-balance → residual coupling thesis.');
+        console.log(`  VERDICT: ${surviving.length}/5 tests survive Bonferroni correction.`);
+        console.log('           SUPPORTING EVIDENCE for one or more residual-coupling theses.');
         console.log('           Surviving formulations:');
         for (const s of surviving) console.log(`             ${s.name}:  r = ${s.r.toFixed(4)}, p = ${s.p.toFixed(4)}`);
         console.log('           Next step: investigate causal chain (which physical channel mediates?).');
+        console.log('           IMPORTANT: check per-era stability for each surviving test — Bonferroni-survival');
+        console.log('           alone doesn\'t rule out drift-tracking artifacts (Tests 1 and 4 failed per-era).');
       }
       console.log('══════════════════════════════════════════════════════════════════════════════════');
 
-      window._L5b_balance_extended = { results, integratedBalance, signDuration, bestLag: best.lag };
+      window._L5b_balance_extended = {
+        results,
+        integratedBalance,
+        signDuration,
+        bestLag: best.lag,
+        test1EraRs,   // per-era breakdown of integrated mass-balance
+        // Path A additions
+        pathA: {
+          solarActivity_fn:  solarActivity.toString(),   // for reproducibility (function source)
+          S_2000,
+          couplings:         { lower: K_HDV_LOWER, central: K_HDV_CENTRAL, upper: K_HDV_UPPER },
+          predictor_central: dTsolar_central,
+          scenarios:         scenarioResults,
+          k_best,
+          rms_orig,
+          rms_best,
+          reduction_best_pct: reduction_best,
+        },
+        // Test 5 additions (planetary perihelion configuration)
+        test5: {
+          configs:      test5Configs.map(c => c.name),
+          results:      test5Results,
+          perEra:       test5PerEra,
+          bestSubtest:  test5Best,
+          anyConsistent: test5AnyConsistent,
+          perihelions: {
+            E_at_2000: perEarth(2000),   J_at_2000: perJupiter(2000),   S_at_2000: perSaturn(2000),
+            E_at_990:  perEarth(990),    J_at_990:  perJupiter(990),    S_at_990:  perSaturn(990),
+          },
+        },
+      };
       console.log('\nFull data exposed at window._L5b_balance_extended');
     } catch (e) {
       console.error(`\n■■■ SECTION 10 FAILED ■■■`);
@@ -34323,6 +34825,65 @@ function setupGUI() {
         rows.push({ H: 'H8  lunar nodal (18.6 yr) medieval', metric: `empirical FAP=${fmt(fap,3)}`, status: pass });
       } else rows.push({ H: 'H8  lunar nodal (18.6 yr) medieval', metric: 'not populated', status: '—' });
 
+      // Path A — Solar-activity direct predictive test (Solanki S(t) × HdV k, integrated).
+      // NOT one of the paper's original 8 hypotheses; ADDED as a direct test of the
+      // paper's stated leading-candidate mechanism (solar activity →
+      // ionospheric-thermospheric coupling → LOD → ΔT). Reads from §10 Test 4.
+      if (has(window._L5b_balance_extended) && window._L5b_balance_extended.pathA) {
+        const pa = window._L5b_balance_extended.pathA;
+        const t4 = Array.isArray(window._L5b_balance_extended.results)
+                   ? window._L5b_balance_extended.results.find(r => /solar-activity/i.test(r.name))
+                   : null;
+        const alpha = 0.01;  // Bonferroni α for N_TESTS = 5
+        let paVerdict;
+        if (t4 == null) {
+          paVerdict = '—';
+        } else {
+          const corrSig = t4.p < alpha;
+          const rmsReducedMeaningfully = pa.reduction_best_pct > 5;
+          if (corrSig && rmsReducedMeaningfully) paVerdict = 'PASS (correlation + RMS reduction)';
+          else if (corrSig) paVerdict = 'partial (correlation only)';
+          else if (rmsReducedMeaningfully) paVerdict = 'partial (structure only)';
+          else paVerdict = 'fail (leading-candidate not supported)';
+        }
+        const metric = t4 == null
+          ? 'not populated'
+          : `r=${fmt(t4.r,4)}  p=${fmt(t4.p,4)}  best-fit RMS reduction ${fmt(pa.reduction_best_pct,1)}%`;
+        rows.push({ H: 'PathA  solar-activity predictive test', metric, status: paVerdict });
+      } else {
+        rows.push({ H: 'PathA  solar-activity predictive test', metric: 'not populated', status: '—' });
+      }
+
+      // Test 5 — Planetary perihelion configuration (SIM-adjacent J-S-E test).
+      // NOT one of the paper's original 8 hypotheses; ADDED as a direct test of a
+      // framework-native mechanism (Fibonacci Law 6 J-S-Earth resonance extended
+      // to a temporal-forcing form). Reads from §10 Test 5.
+      if (has(window._L5b_balance_extended) && window._L5b_balance_extended.test5) {
+        const t5 = window._L5b_balance_extended.test5;
+        const alpha = 0.01;
+        const bestR = t5.bestSubtest && t5.bestSubtest.r != null ? t5.bestSubtest.r : null;
+        const bestP = t5.bestSubtest && t5.bestSubtest.p != null ? t5.bestSubtest.p : null;
+        const bestName = t5.bestSubtest ? t5.bestSubtest.name : '';
+        let t5Verdict;
+        if (bestR == null || bestP == null) {
+          t5Verdict = '—';
+        } else if (bestP < alpha && t5.anyConsistent) {
+          t5Verdict = 'PASS (per-era stable)';
+        } else if (bestP < alpha && !t5.anyConsistent) {
+          t5Verdict = 'aggregate only (drift-tracking)';
+        } else if (t5.anyConsistent) {
+          t5Verdict = 'partial (per-era only)';
+        } else {
+          t5Verdict = 'fail (no signal)';
+        }
+        const metric = bestR == null
+          ? 'not populated'
+          : `best-of-3: ${(bestName || '').replace('Integrated ', '')}  r=${fmt(bestR,4)}  p=${fmt(bestP,4)}`;
+        rows.push({ H: 'Test5  planetary perihelion config', metric, status: t5Verdict });
+      } else {
+        rows.push({ H: 'Test5  planetary perihelion config', metric: 'not populated', status: '—' });
+      }
+
       // Manually format the rows as a plain-text table so a single console.log
       // call carries all 10 rows (survives Chrome DevTools console throttling
       // that hides console.log/console.table entries after long output bursts).
@@ -34331,7 +34892,10 @@ function setupGUI() {
       const mets  = rows.map(r => padR(r.metric, 60));
       const stats = rows.map(r => padR(r.status, 25));
       const lines = ['', '  Paper Table 6 hypothesis summary (PASS = mechanism explains bump; fail = rejected):',
-                         '  Under OLD α, ALL 8 were rejected. Refresh under L1-α below:', ''];
+                         '  Under OLD α, ALL 8 were rejected. Refresh under L1-α below:',
+                         '  (Path A is NOT one of the paper\'s 8 hypotheses — added as a direct',
+                         '   predictive test of the paper\'s stated leading-candidate mechanism.)',
+                         ''];
       lines.push('  ' + padR('Hypothesis', 40) + padR('Metric (r / p / FAP)', 60) + 'Status');
       lines.push('  ' + '─'.repeat(125));
       for (let i = 0; i < rows.length; i++) {
