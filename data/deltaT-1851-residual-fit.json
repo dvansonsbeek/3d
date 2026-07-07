@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "description": "Single-component 8H/n = 8H/1851 fit to Stephenson \u0394T residual. n=1851 corresponds to 73 \u00d7 Jupiter-Saturn synodic cycles (0.00% error) \u2014 the top-ranked 8H integer divisor in the sub-Milankovitch band per scripts/lod_residual_divisor_scan_jse.py. Structural interpretation is cleaner than the paper's original n=1825 (74 \u00d7 J-S synodic to 0.05% error). Amplitude and phase are FITTED to eclipse residual \u2014 turning this on in src/script.js violates the paper's zero-eclipse-fit claim. Long-term fix is to derive amplitude/phase from Bond 1997 IRD or equivalent paleoclimate.",
+    "source_script": "scripts/lod_residual_1851_refit.py",
+    "framework_n": 1851,
+    "framework_period_yr": 1449.2360886007564,
+    "j_s_synodic_yr": 19.852824801672995,
+    "j_s_synodic_multiple": 73,
+    "j_s_synodic_error_pct": 0.0013884309224395741,
+    "eight_H_yr": 2682536,
+    "H_yr": 335317
+  },
+  "coefficients_for_script_js": {
+    "BOND_LATTICE_N": 1851,
+    "BOND_COS_COEFF_S": 156.48439921860614,
+    "BOND_SIN_COEFF_S": 343.78858156076024,
+    "BOND_DT_RAW_AT_J2000": 121.18319938223085,
+    "BOND_AMPLITUDE_S": 377.72735671429416,
+    "BOND_PHASE_DEG": -65.52609884724494
+  },
+  "fit_metrics_in_sample": {
+    "n_points": 274,
+    "year_range": [
+      -720.0,
+      2010.0
+    ],
+    "r2": 0.9751078775548133,
+    "rms_pre": 355.6388251955625,
+    "rms_post": 56.109982242137974
+  },
+  "comparison_to_1825": {
+    "n_1825_r2": 0.974168791942316,
+    "n_1851_r2": 0.9751078775548133,
+    "delta_r2": 0.0009390856124973368
+  },
+  "polynomial_detrend_reference_only": {
+    "intercept": -276.4686089182528,
+    "linear_per_kyr": -102.08285673195843,
+    "quadratic_kyr2": 439.1045863868573,
+    "center_year": 645.0,
+    "residual_mean_removed": -506.7876531125036,
+    "note": "Polynomial coefficients are absorbed into the anchor calibration and are NOT propagated to src/script.js (per commit 67624c2 design decision). Only the cyclic cos/sin part is used as the \u0394T correction."
+  }
+}

@@ -4915,6 +4915,93 @@ function meanTropicalYearSecondsAtAge(t_Ma) {
   return sidSec * (1 - 13 / Ht);
 }
 
+// ═════════════════════════════════════════════════════════════════════════════
+// Bond-scale ΔT correction — 8H/1851 = 73 × Jupiter-Saturn synodic
+// (Option B research toggle, OFF by default)
+//
+// The Stephenson 2016 ΔT residual (Stephenson − our framework) over −720 to
+// +2016 CE has a dominant Bond-scale lattice component in the 500-5000 yr
+// band. A full 8H integer-divisor scan (scripts/lod_residual_divisor_scan_jse.py)
+// ranks divisors by ΔR² and identifies n=1851 as the top single component.
+//
+// STRUCTURAL INTERPRETATION at n=1851:
+//   Period 8H/1851 = 1449.236 yr
+//   = 73 × Jupiter-Saturn synodic (73 × 19.853 yr = 1449.26 yr, 0.001% error)
+//   = 168 ÷ Earth ecliptic perihelion (8H/11 = 243867 yr) (0.05% error)
+//   = 122 × Jupiter orbit (122 × 11.860 yr) (0.05% error)
+//
+//   All three interpretations converge on the same period within Fourier
+//   resolution. The J-S synodic count of 73 is exact within the framework's
+//   quantized Jupiter/Saturn periods — a framework-native derivation of the
+//   observed Bond-scale climate cycle from Jupiter-Saturn dynamics
+//   (matches Charvátová Solar Inertial Motion theory).
+//
+// HISTORICAL NOTE: paper's original single-term fit selected n=1825 (matching
+// documented Bond cycle from paleoclimate at 1470 yr, 74×J-S synodic to 0.05%
+// error). The 8H scan shows n=1825 ranks #50 in the sub-Milankovitch band;
+// n=1851 (73×J-S synodic to 0.001%) is optimal by ΔR² AND cleaner structurally.
+// R² difference is small (0.9751 vs 0.9742) but the interpretation is
+// dramatically stronger — Bond emerges from the framework's own Jupiter-Saturn
+// arithmetic rather than being imported from paleoclimate.
+//
+// IMPLEMENTATION HISTORY (Option A → Option B):
+//   commit 67624c2 (2026-06-22): integrated Bond directly into meanLodSecondsAtAge
+//   commit 137bef8: reverted because Bond's instantaneous LOD anomaly at J2000
+//     was ~−4 ms/day (phase happens to be near a trough at year 2000), shifting
+//     the framework's J2000 LOD anchor to 86399.9956 s.
+//   Option B (this implementation): keep meanLodSecondsAtAge PURE-PHYSICS, add
+//   the Bond ΔT correction directly to meanDeltaTSecondsAtAge as a post-
+//   integration term with the offset zeroed at J2000. Result:
+//     • LOD physics untouched; J2000 anchor preserved
+//     • ΔT gets Bond correction
+//     • Eclipse timing improves in Holocene window
+//     • Deep-time predictions untouched (Holocene taper)
+//
+// PHILOSOPHICAL CAVEAT: the amplitude/phase coefficients here are fitted to
+// the Stephenson ΔT residual, not to independent paleoclimate data. Turning
+// this ON therefore VIOLATES the paper's "zero coefficients fitted to eclipse
+// data" claim. Kept as a research toggle to measure the effect; long-term fix
+// is to calibrate amplitude/phase against Bond 1997 IRD or equivalent
+// independent proxy. See doc 102 "Bond cycle" section.
+//
+// Source: data/deltaT-1851-residual-fit.json (n=1851 refit, current)
+//         data/deltaT-bond-cycle-residual-fit.json (n=1825 original, archived)
+// ═════════════════════════════════════════════════════════════════════════════
+let   BOND_DT_CORRECTION_ENABLED = false;                       // Feature flag: OFF (measurement pass — comparison to Bond-ON baseline)
+const BOND_LATTICE_N              = 1851;                       // integer n in 8H/n — 73 × J-S synodic
+const BOND_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / BOND_LATTICE_N;  // 1449.236 yr
+const BOND_OMEGA                  = 2 * Math.PI / BOND_PERIOD_YR;
+const BOND_COS_COEFF_S            = 156.48439921860614;         // from data/deltaT-1851-residual-fit.json
+const BOND_SIN_COEFF_S            = 343.78858156076024;         // from data/deltaT-1851-residual-fit.json
+const BOND_TAPER_FULL_HALFWIDTH_YR  = 4500;                     // ±yr from J2000 = full strength
+const BOND_TAPER_TOTAL_HALFWIDTH_YR = 6000;                     // ±yr from J2000 = zero beyond
+// Anchor calibration constant: Bond cyclic value at exactly year 2000.
+// Subtracted from the raw cyclic evaluation so bondCycleDeltaTCorrection(2000) === 0.
+const BOND_DT_RAW_AT_J2000        = BOND_COS_COEFF_S * Math.cos(BOND_OMEGA * 2000)
+                                  + BOND_SIN_COEFF_S * Math.sin(BOND_OMEGA * 2000);
+
+/** Smooth cosine taper 1 → 0 between the full and total halfwidths from J2000. */
+function bondHoloceneTaper(year) {
+  const dy = Math.abs(year - 2000);
+  if (dy <= BOND_TAPER_FULL_HALFWIDTH_YR) return 1.0;
+  if (dy >= BOND_TAPER_TOTAL_HALFWIDTH_YR) return 0.0;
+  const u = (dy - BOND_TAPER_FULL_HALFWIDTH_YR)
+          / (BOND_TAPER_TOTAL_HALFWIDTH_YR - BOND_TAPER_FULL_HALFWIDTH_YR);
+  return 0.5 * (1.0 + Math.cos(Math.PI * u));
+}
+
+/** Anchored Bond cycle ΔT correction at calendar year (CE), in seconds.
+ *  Returns 0 when the feature flag is OFF, exactly 0 at year 2000 by
+ *  construction, and 0 outside the Holocene taper window. */
+function bondCycleDeltaTCorrection(year) {
+  if (!BOND_DT_CORRECTION_ENABLED) return 0;
+  const taper = bondHoloceneTaper(year);
+  if (taper <= 0) return 0;
+  const raw = BOND_COS_COEFF_S * Math.cos(BOND_OMEGA * year)
+            + BOND_SIN_COEFF_S * Math.sin(BOND_OMEGA * year);
+  return taper * (raw - BOND_DT_RAW_AT_J2000);
+}
+
 // ───── ΔT integrator — used for proper Earth rotation in scene graph ─────
 const _DELTA_T_CACHE = new Map();
 const _MAX_DELTA_T_CACHE = 512;
@@ -4929,10 +5016,16 @@ const _MAX_DELTA_T_CACHE = 512;
  *
  *  Used by Strategy A in updateEarthForEpoch: add (ΔT/86400) × 2π radians
  *  to the constant-rate scene rotation so the eclipse appears at the
- *  geographically correct location at deep historical past. */
+ *  geographically correct location at deep historical past.
+ *
+ *  If BOND_DT_CORRECTION_ENABLED is ON, an additional Bond-cycle correction
+ *  is added POST-INTEGRATION (see the Bond section above). LOD physics is
+ *  untouched; the J2000 LOD anchor is preserved. */
 function meanDeltaTSecondsAtAge(t_Ma) {
   if (t_Ma === 0) return 0;
-  const hit = _DELTA_T_CACHE.get(t_Ma);
+  // Cache key must include the Bond flag so toggling doesn't return stale values.
+  const cacheKey = BOND_DT_CORRECTION_ENABLED ? `bond:${t_Ma}` : `raw:${t_Ma}`;
+  const hit = _DELTA_T_CACHE.get(cacheKey);
   if (hit !== undefined) return hit;
 
   const absSpan = Math.abs(t_Ma);
@@ -4951,12 +5044,18 @@ function meanDeltaTSecondsAtAge(t_Ma) {
     const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
     sum += w * integrand;
   }
-  const result = (sum * h) / 3;
+  let result = (sum * h) / 3;
+  // Bond cycle ΔT correction (Option B). Post-integration additive term.
+  // Bond correction is anchored to 0 at J2000, so ΔT(J2000) remains exactly 0.
+  if (BOND_DT_CORRECTION_ENABLED) {
+    const yearY = 2000 - t_Ma * 1e6;
+    result += bondCycleDeltaTCorrection(yearY);
+  }
   if (_DELTA_T_CACHE.size >= _MAX_DELTA_T_CACHE) {
     const firstKey = _DELTA_T_CACHE.keys().next().value;
     _DELTA_T_CACHE.delete(firstKey);
   }
-  _DELTA_T_CACHE.set(t_Ma, result);
+  _DELTA_T_CACHE.set(cacheKey, result);
   return result;
 }
 
@@ -28389,6 +28488,61 @@ function setupGUI() {
      'which mode matches the documented historical eclipse record at the umbra-centerline level.');
 
   // ────────────────────────────────────────────────────────────────────────
+  // Toggle: Bond-scale ΔT correction (Option B research toggle)
+  //
+  // OFF by default. When ON, adds the top-ranked 8H integer-divisor harmonic
+  // at n=1851 (= 73 × Jupiter-Saturn synodic = 1449.24 yr) as a post-
+  // integration ΔT correction, anchored to 0 at J2000 so the framework's
+  // LOD physics is untouched. Amplitude/phase from the eclipse-residual fit
+  // (data/deltaT-1851-residual-fit.json) — TURNING THIS ON VIOLATES THE
+  // PAPER'S "zero coefficients fitted to eclipse data" claim. Kept as a
+  // research toggle to measure effect.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Toggle 8H/1851 ΔT correction (73×J-S synodic; violates zero-fit if ON)', () => {
+    BOND_DT_CORRECTION_ENABLED = !BOND_DT_CORRECTION_ENABLED;
+    // Clear the ΔT cache so all callers see the new state
+    _DELTA_T_CACHE.clear();
+    console.log('\n══════════════════════════════════════════════════════════════════');
+    console.log(`  8H/1851 ΔT correction is now: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (research toggle only; not for paper claims)' : 'DISABLED (default)'}`);
+    console.log('══════════════════════════════════════════════════════════════════');
+    if (BOND_DT_CORRECTION_ENABLED) {
+      console.log('  • Lattice harmonic 8H/1851 = ' + BOND_PERIOD_YR.toFixed(3) + ' yr');
+      console.log('  • Structural interpretation: 73 × Jupiter-Saturn synodic (0.001% error)');
+      console.log('    Also: 168 ÷ Earth ecliptic perihelion (8H/11), 122 × Jupiter orbit');
+      console.log('    (all three interpretations converge within Fourier resolution)');
+      console.log('  • Amplitude ~378 s peak; anchored to 0 at J2000 (LOD untouched)');
+      console.log('  • Holocene taper: full strength ±4500 yr from J2000, zero beyond ±6000 yr');
+      console.log('  • VIOLATES paper\'s zero-fit claim: coefficients fitted to Stephenson residual.');
+      console.log('  • Kept as a research toggle only — do not commit to paper claim without');
+      console.log('    independent amplitude/phase calibration from paleoclimate proxy.');
+    } else {
+      console.log('  Correction disabled — framework operates in default zero-fit mode.');
+      console.log('  ΔT computation reverts to pure Simpson integration of (86400 − LOD(τ)).');
+    }
+    console.log('  ');
+    console.log('  Preserved invariants (both states):');
+    console.log('   • meanLodSecondsAtAge(0) = 86400.00001 s (J2000 LOD anchor)');
+    console.log('   • meanDeltaTSecondsAtAge(0) = 0 s        (J2000 ΔT anchor)');
+    console.log('  ');
+    console.log('  Suggested follow-up:');
+    console.log('   • Re-run "L-5b LUNAR: primary observations + full residual investigation"');
+    console.log('     with ON, then OFF, compare medieval residual and Path A/Test 5 verdicts');
+    console.log('   • Sanity check: window._L5b.records[i].res_model should shrink dramatically');
+    console.log('     in the medieval window when ON');
+    console.log('   • Raw eval at J2000: ' + BOND_DT_RAW_AT_J2000.toFixed(2) + ' s');
+    console.log('     (subtracted by construction so ΔT(J2000) = 0 either way)');
+    // Sanity: confirm the LOD anchor still holds under toggle.
+    const lod_J2000 = meanLodSecondsAtAge(0);
+    const dt_J2000  = meanDeltaTSecondsAtAge(0);
+    console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
+    console.log('══════════════════════════════════════════════════════════════════');
+  }, 'Feature flag for the 8H/1851 ΔT correction (73 × J-S synodic = 1449.24 yr lattice harmonic). ' +
+     'OFF by default. When ON, adds ~±378 s correction to ΔT in the Holocene window; the ' +
+     'medieval bump reduces dramatically (in-sample R² = 0.975 vs Stephenson residual). Kept as a ' +
+     'research toggle only — the amplitude/phase are fitted to eclipse data and therefore ' +
+     'violate the paper\'s zero-fit claim. Compare L-5b results ON vs OFF to measure effect.');
+
+  // ────────────────────────────────────────────────────────────────────────
   // Button 2: Sun position diagnostic — scene vs Meeus
   //
   // Decomposes the framework's eclipse-prediction error into orthogonal
@@ -35191,19 +35345,1025 @@ function setupGUI() {
       console.error('  Stack:', e && e.stack);
       console.error('  Continuing to next section...\n');
     }
+
+    await new Promise(r => setTimeout(r, 200));  // let console flush
+    // Use console.warn for critical spine markers so Chrome DevTools throttling
+    // doesn't drop them after long log bursts from §1-§13 (same fix pattern used
+    // earlier for §5-§11 in this button).
+    console.warn('▶ Starting SECTION 14: 8H integer-divisor scan against residual (find next lattice harmonics)...');
+    console.log('\n══════════════════════════════════════════════════════════════════════════════');
+    console.log('  SECTION 14: 8H integer-divisor scan against residual');
+    console.log('══════════════════════════════════════════════════════════════════════════════');
+    try {
+      if (!window._L5b_missing_signal || !Array.isArray(window._L5b_missing_signal.samples)) {
+        console.error('§2 must run first; window._L5b_missing_signal not populated.');
+        throw new Error('missing _L5b_missing_signal');
+      }
+      const samples = window._L5b_missing_signal.samples;
+      const ys = samples.map(s => s.year);
+      const rs = samples.map(s => s.diff);   // Stephenson − our model
+      const nPts = ys.length;
+
+      console.log('  Scans 8H integer divisors for lattice-harmonic structure in the current');
+      console.log('  Stephenson − model residual, ranking by ΔR² gain over polynomial-only baseline.');
+      console.log('  ');
+      console.log('  The scanned residual REFLECTS the current toggle state:');
+      console.log('    • Toggle ON  → residual after 8H/1851 correction (this is what\'s LEFT to explain)');
+      console.log('    • Toggle OFF → raw residual (bare framework vs Stephenson)');
+      console.log('  ');
+
+      // ── Framework constants for J-S-E interpretation ────────────────────
+      const H_YR             = 335317;
+      const EIGHT_H_YR       = 8 * H_YR;
+      const JUPITER_PERIOD   = 11.8598;
+      const SATURN_PERIOD    = 29.4570;
+      const J_S_SYNODIC      = 1.0 / (1.0/JUPITER_PERIOD - 1.0/SATURN_PERIOD);  // ≈ 19.85 yr
+      const GREAT_CONJ_TRIGON = 3 * J_S_SYNODIC;   // ≈ 59.55 yr
+      const EARTH_PERI_ICRF  = H_YR / 16.0;         // ≈ 20957 yr
+      const EARTH_PERI_ECL   = EIGHT_H_YR / 11.0;   // ≈ 243867 yr
+      const JUPITER_PERI_ECL = EIGHT_H_YR / 39.0;   // ≈ 68782 yr
+      const SATURN_PERI_ECL  = EIGHT_H_YR / 65.0;   // ≈ 41270 yr (retrograde in ecliptic frame)
+      const AXIAL_PREC       = H_YR / 13.0;         // ≈ 25793 yr
+
+      const INTERPRETATIONS = [
+        ['Jupiter orbit',                       JUPITER_PERIOD],
+        ['Saturn orbit',                        SATURN_PERIOD],
+        ['J-S synodic',                         J_S_SYNODIC],
+        ['Great Conjunction trigon (3×J-S)',    GREAT_CONJ_TRIGON],
+        ['Gleissberg 88',                       88.0],
+        ['Jose 179',                            179.0],
+        ['de Vries 210',                        210.0],
+        ['Bond 1470',                           1470.0],
+        ['Earth ICRF perihelion (H/16)',        EARTH_PERI_ICRF],
+        ['Earth axial precession (H/13)',       AXIAL_PREC],
+        ['Earth ecliptic perihelion (8H/11)',   EARTH_PERI_ECL],
+        ['Jupiter ecliptic perihelion (8H/39)', JUPITER_PERI_ECL],
+        ['Saturn ecliptic perihelion (8H/65)',  SATURN_PERI_ECL],
+      ];
+
+      const interpretPeriod = (P) => {
+        const matches = [];
+        for (const [label, base] of INTERPRETATIONS) {
+          // Integer multiplier
+          const M = P / base;
+          const M_int = Math.round(M);
+          if (M_int >= 1) {
+            const err = Math.abs(M - M_int) / M * 100;
+            if (err < 2.0) matches.push({ label, op: '×', mult: M_int, err });
+          }
+          // Integer subharmonic
+          const N = base / P;
+          const N_int = Math.round(N);
+          if (N_int >= 2) {
+            const err = Math.abs(N - N_int) / N * 100;
+            if (err < 2.0) matches.push({ label, op: '÷', mult: N_int, err });
+          }
+        }
+        matches.sort((a, b) => a.err - b.err);
+        return matches.length > 0 ? matches[0] : null;
+      };
+
+      // ── OLS solver for the 5-parameter model (intercept + linear + quad + cos + sin) ──
+      // Symmetric 5×5 normal-equations system; solved via Gauss elimination.
+      const fitOLS_5 = (X, y) => {
+        const k = 5;
+        const XtX = Array.from({length: k}, () => new Array(k).fill(0));
+        const Xty = new Array(k).fill(0);
+        for (let i = 0; i < X.length; i++) {
+          for (let a = 0; a < k; a++) {
+            Xty[a] += X[i][a] * y[i];
+            for (let b = 0; b < k; b++) XtX[a][b] += X[i][a] * X[i][b];
+          }
+        }
+        // Augment X'X | X'y
+        const A = XtX.map((row, i) => [...row, Xty[i]]);
+        // Gauss elimination with partial pivot
+        for (let i = 0; i < k; i++) {
+          let maxRow = i;
+          for (let j = i + 1; j < k; j++) if (Math.abs(A[j][i]) > Math.abs(A[maxRow][i])) maxRow = j;
+          [A[i], A[maxRow]] = [A[maxRow], A[i]];
+          for (let j = i + 1; j < k; j++) {
+            const f = A[j][i] / A[i][i];
+            for (let a = i; a <= k; a++) A[j][a] -= f * A[i][a];
+          }
+        }
+        const beta = new Array(k).fill(0);
+        for (let i = k - 1; i >= 0; i--) {
+          let sum = A[i][k];
+          for (let j = i + 1; j < k; j++) sum -= A[i][j] * beta[j];
+          beta[i] = sum / A[i][i];
+        }
+        return beta;
+      };
+
+      const rssOf = (X, y, beta) => {
+        let s = 0;
+        for (let i = 0; i < X.length; i++) {
+          let pred = 0;
+          for (let a = 0; a < beta.length; a++) pred += X[i][a] * beta[a];
+          s += (y[i] - pred) ** 2;
+        }
+        return s;
+      };
+
+      // Center years, scale to kyr for numerical stability (matches Python script)
+      const yMean = ys.reduce((a, b) => a + b, 0) / nPts;
+      const t     = ys.map(y => (y - yMean) / 1000);
+
+      // Total sum-of-squares (for R² computation)
+      const meanR = rs.reduce((a, b) => a + b, 0) / nPts;
+      const tss   = rs.reduce((s, v) => s + (v - meanR) ** 2, 0);
+
+      // Baseline: polynomial-only (intercept + linear + quadratic + 0 + 0 dummy)
+      const X_base = ys.map((_, i) => [1, t[i], t[i]*t[i], 0, 0]);
+      // Use 3-param solve directly for baseline (fitOLS_5 with two dummy zeros would be singular)
+      const X_base3 = ys.map((_, i) => [1, t[i], t[i]*t[i]]);
+      const fitOLS_3 = (X, y) => {
+        const k = 3;
+        const XtX = Array.from({length: k}, () => new Array(k).fill(0));
+        const Xty = new Array(k).fill(0);
+        for (let i = 0; i < X.length; i++) {
+          for (let a = 0; a < k; a++) {
+            Xty[a] += X[i][a] * y[i];
+            for (let b = 0; b < k; b++) XtX[a][b] += X[i][a] * X[i][b];
+          }
+        }
+        const A = XtX.map((row, i) => [...row, Xty[i]]);
+        for (let i = 0; i < k; i++) {
+          let maxRow = i;
+          for (let j = i + 1; j < k; j++) if (Math.abs(A[j][i]) > Math.abs(A[maxRow][i])) maxRow = j;
+          [A[i], A[maxRow]] = [A[maxRow], A[i]];
+          for (let j = i + 1; j < k; j++) {
+            const f = A[j][i] / A[i][i];
+            for (let a = i; a <= k; a++) A[j][a] -= f * A[i][a];
+          }
+        }
+        const beta = new Array(k).fill(0);
+        for (let i = k - 1; i >= 0; i--) {
+          let sum = A[i][k];
+          for (let j = i + 1; j < k; j++) sum -= A[i][j] * beta[j];
+          beta[i] = sum / A[i][i];
+        }
+        return beta;
+      };
+      const beta_base = fitOLS_3(X_base3, rs);
+      const rss_base  = rssOf(X_base3, rs, beta_base);
+      const r2_base   = 1 - rss_base / tss;
+      console.log(`  Baseline (polynomial-only) R² = ${r2_base.toFixed(4)}   RMS = ${Math.sqrt(rss_base / nPts).toFixed(1)} s`);
+
+      // Scan — narrowed to n ∈ [500, 3000] (period 894 to 5365 yr) to keep
+      // this diagnostic fast in the browser. Longer periods are captured by
+      // the polynomial baseline; shorter periods (< 894 yr) rarely have
+      // enough cycles in the 2740-yr observation window to be fit reliably.
+      const N_LO = 500, N_HI = 3000;
+      console.warn(`  Scanning n ∈ [${N_LO}, ${N_HI}] (period range ${(EIGHT_H_YR/N_HI).toFixed(0)}–${(EIGHT_H_YR/N_LO).toFixed(0)} yr)...`);
+      const scanResults = [];
+      const scanStart = Date.now();
+      for (let nDiv = N_LO; nDiv <= N_HI; nDiv++) {
+        const P = EIGHT_H_YR / nDiv;
+        const omega = 2 * Math.PI / P;
+        const X = new Array(nPts);
+        for (let i = 0; i < nPts; i++) X[i] = [1, t[i], t[i]*t[i], Math.cos(omega * ys[i]), Math.sin(omega * ys[i])];
+        const beta = fitOLS_5(X, rs);
+        const r   = rssOf(X, rs, beta);
+        const r2  = 1 - r / tss;
+        const amp = Math.sqrt(beta[3] * beta[3] + beta[4] * beta[4]);
+        const phase = Math.atan2(-beta[4], beta[3]) * 180 / Math.PI;
+        scanResults.push({ n: nDiv, P, r2, dR2: r2 - r2_base, amp, phase });
+      }
+      console.warn(`  Scan complete in ${((Date.now() - scanStart) / 1000).toFixed(2)}s (${scanResults.length} divisors)`);
+      scanResults.sort((a, b) => b.dR2 - a.dR2);
+
+      // ── Report top 10 with J-S-E interpretations ──
+      // Build a single multi-line ASCII table so this critical output survives
+      // Chrome DevTools console throttling as ONE log call.
+      const padR = (s, n) => (String(s ?? '') + ' '.repeat(n)).slice(0, n);
+      const padL = (s, n) => (' '.repeat(n) + String(s ?? '')).slice(-n);
+      const top10 = scanResults.slice(0, 10);
+      const rank1851 = scanResults.findIndex(r => r.n === 1851) + 1;
+      const rank1825 = scanResults.findIndex(r => r.n === 1825) + 1;
+      const tableLines = [
+        '',
+        '  Top 10 8H integer divisors ranked by ΔR² gain (over polynomial-only baseline):',
+        '',
+        '    ' + padL('rank', 5) + '  ' + padL('n', 5) + '  ' + padL('P (yr)', 9) + '  ' +
+                 padL('amp (s)', 8) + '  ' + padL('ΔR²', 8) + '  ' + padR('best J-S-E interpretation', 45),
+        '    ' + '-'.repeat(5) + '  ' + '-'.repeat(5) + '  ' + '-'.repeat(9) + '  ' +
+                 '-'.repeat(8) + '  ' + '-'.repeat(8) + '  ' + '-'.repeat(45),
+      ];
+      for (let i = 0; i < top10.length; i++) {
+        const r = top10[i];
+        const interp = interpretPeriod(r.P);
+        const interpStr = interp ? `${interp.mult}${interp.op}${interp.label} (${interp.err.toFixed(2)}%)` : '(none <2%)';
+        tableLines.push(
+          '    ' + padL(i+1, 5) + '  ' + padL(r.n, 5) + '  ' + padL(r.P.toFixed(2), 9) + '  ' +
+                   padL(r.amp.toFixed(1), 8) + '  ' + padL(r.dR2.toFixed(4), 8) + '  ' + padR(interpStr, 45)
+        );
+      }
+      tableLines.push('');
+      tableLines.push(`  n=1851 (73×J-S synodic, currently in toggle):  rank #${rank1851}, ΔR² = ${scanResults[rank1851-1].dR2.toFixed(4)}, amp = ${scanResults[rank1851-1].amp.toFixed(1)} s`);
+      tableLines.push(`  n=1825 (paper's original Bond):                 rank #${rank1825}, ΔR² = ${scanResults[rank1825-1].dR2.toFixed(4)}, amp = ${scanResults[rank1825-1].amp.toFixed(1)} s`);
+
+      // Add verdict lines to the batched output
+      const top = scanResults[0];
+      const interpTop = interpretPeriod(top.P);
+      const distinctSecondary = scanResults.slice(1, 20).find(r => Math.abs(r.n - top.n) >= 20);
+      tableLines.push('');
+      tableLines.push('══════════════════════════════════════════════════════════════════════════════════');
+      if (top.dR2 > 0.10) {
+        tableLines.push('  VERDICT: STRONG lattice signal in residual — a new 8H/n harmonic would help substantially.');
+        tableLines.push(`           Best next divisor: n=${top.n}, P=${top.P.toFixed(1)} yr, ΔR²=+${top.dR2.toFixed(3)}, amp=${top.amp.toFixed(0)} s`);
+        if (interpTop) tableLines.push(`           Structural interpretation: ${interpTop.mult}${interpTop.op}${interpTop.label} (${interpTop.err.toFixed(2)}% error)`);
+        if (distinctSecondary) {
+          const interp2 = interpretPeriod(distinctSecondary.P);
+          tableLines.push(`           Second-distinct: n=${distinctSecondary.n}, P=${distinctSecondary.P.toFixed(1)} yr, ΔR²=+${distinctSecondary.dR2.toFixed(3)}${interp2 ? '  → ' + interp2.mult + interp2.op + interp2.label : ''}`);
+        }
+      } else if (top.dR2 > 0.02) {
+        tableLines.push('  VERDICT: MODEST lattice signal in residual — a new harmonic might help modestly.');
+        tableLines.push(`           Best next divisor: n=${top.n}, P=${top.P.toFixed(1)} yr, ΔR²=+${top.dR2.toFixed(3)}, amp=${top.amp.toFixed(0)} s`);
+        if (interpTop) tableLines.push(`           Structural interpretation: ${interpTop.mult}${interpTop.op}${interpTop.label} (${interpTop.err.toFixed(2)}% error)`);
+      } else {
+        tableLines.push('  VERDICT: NO further lattice signal above ΔR² > 0.02.');
+        tableLines.push('           Remaining residual doesn\'t decompose further on the 8H lattice.');
+        tableLines.push('           It\'s either observation noise + drift or off-lattice structure.');
+      }
+      tableLines.push('══════════════════════════════════════════════════════════════════════════════════');
+      console.log(tableLines.join('\n'));
+
+      window._L5b_lattice_scan = { results: scanResults, r2_baseline: r2_base, rank1851, rank1825 };
+      console.log('\nFull scan exposed at window._L5b_lattice_scan');
+    } catch (e) {
+      console.error(`\n■■■ SECTION 14 FAILED ■■■`);
+      console.error('  Error:', e && e.message);
+      console.error('  Stack:', e && e.stack);
+      console.error('  Continuing to next section...\n');
+    }
+
+    await new Promise(r => setTimeout(r, 200));  // let console flush
+    console.warn('▶ Starting SECTION 15: J2000 LOD anchor sensitivity — drift origin decomposition...');
+    console.log('\n══════════════════════════════════════════════════════════════════════════════');
+    console.log('  SECTION 15: J2000 LOD anchor sensitivity — drift origin decomposition');
+    console.log('══════════════════════════════════════════════════════════════════════════════');
+    try {
+      if (!window._L5b_missing_signal || !Array.isArray(window._L5b_missing_signal.samples)) {
+        console.error('§2 must run first; window._L5b_missing_signal not populated.');
+        throw new Error('missing _L5b_missing_signal');
+      }
+      const samples = window._L5b_missing_signal.samples;
+      const ys = samples.map(s => s.year);
+      const rs = samples.map(s => s.diff);   // Stephenson − model, current toggle state
+      const nPts = ys.length;
+
+      console.log('  Analyzes the DRIFT that remains after lattice correction (Bond toggle whatever state).');
+      console.log('  Answers: how much of the residual drift is J2000-anchor-attributable vs structural?');
+      console.log(`  Bond correction is currently: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (n=1851)' : 'DISABLED'}`);
+      console.log('  ');
+
+      // ── Fit linear + quadratic to current residual ──
+      // slope × 365.25 = equivalent constant LOD bias × 1e6 μs/day
+      const yMean = ys.reduce((a, b) => a + b, 0) / nPts;
+      const t = ys.map(y => y - yMean);
+      const meanR = rs.reduce((a, b) => a + b, 0) / nPts;
+
+      let sumTT = 0, sumTR = 0;
+      for (let i = 0; i < nPts; i++) {
+        sumTT += t[i] * t[i];
+        sumTR += t[i] * (rs[i] - meanR);
+      }
+      const linSlope     = sumTR / sumTT;                                     // s/yr
+      const linIntercept = meanR - linSlope * yMean;                          // s at year 0
+      const lodBiasEquiv = linSlope / 365.25 * 1e6;                           // μs/day
+      const residPred    = ys.map((y, i) => linIntercept + linSlope * y);
+      const rmsResid     = Math.sqrt(rs.reduce((s, v, i) => s + (v - residPred[i]) ** 2, 0) / nPts);
+      const rmsRaw       = Math.sqrt(rs.reduce((s, v) => s + (v - meanR) ** 2, 0) / nPts);
+
+      console.log('  ── Linear detrend of current residual ──');
+      console.log(`    slope     = ${linSlope.toFixed(4)} s/yr`);
+      console.log(`    intercept = ${linIntercept.toFixed(1)} s at year 0`);
+      console.log(`    RMS raw   = ${rmsRaw.toFixed(1)} s`);
+      console.log(`    RMS after linear detrend = ${rmsResid.toFixed(1)} s`);
+      console.log(`    ═> Equivalent constant LOD bias = ${lodBiasEquiv.toFixed(1)} μs/day`);
+      console.log(`       (model LOD is ${Math.abs(lodBiasEquiv).toFixed(0)} μs/day ${lodBiasEquiv < 0 ? 'BELOW' : 'ABOVE'} Stephenson-implied LOD)`);
+
+      // ── J2000 LOD anchor comparison ──
+      const MODEL_J2000_LOD = 86400.00001;   // Framework's Method B value
+      const IERS_J2000_LOD  = 86400.001;     // ~1 ms above SI, decadal average around 2000 CE (IERS Bulletin)
+      const anchorGapMicros = (MODEL_J2000_LOD - IERS_J2000_LOD) * 1e6;   // μs/day, negative (model below reality)
+      console.log('\n  ── J2000 LOD anchor comparison ──');
+      console.log(`    Model (framework Method B): ${MODEL_J2000_LOD.toFixed(6)} s`);
+      console.log(`    IERS Bulletin (~2000 CE):   ${IERS_J2000_LOD.toFixed(6)} s`);
+      console.log(`    Gap: model is ${Math.abs(anchorGapMicros).toFixed(0)} μs/day ${anchorGapMicros < 0 ? 'BELOW' : 'ABOVE'} IERS convention`);
+
+      // ── Sensitivity test: what would the drift look like at different anchor shifts? ──
+      // Physical transformation: increasing LOD by Δ (anchor UP) makes (86400-LOD)
+      // smaller, so model ΔT integrated backward DECREASES by Δ × 365.25 × (2000-Y).
+      // Residual = obs − model therefore INCREASES:
+      //   residual_new(Y) = residual_old(Y) + Δ × 365.25 × (2000 − Y)
+      // (Physical sign convention: Δ > 0 means anchor increased, which INCREASES
+      //  historical residuals since model ΔT drops in the past.)
+      const SHIFTS_MICROS = [-2500, -2000, -1500, -1000, -500, 0, 500, 1000, 1500, 2000, 2500];
+      const shiftResults = [];
+      for (const dMicros of SHIFTS_MICROS) {
+        const dLodSecsPerDay = dMicros * 1e-6;
+        const rsShifted = ys.map((y, i) => rs[i] + dLodSecsPerDay * 365.25 * (2000 - y));
+        // Refit linear
+        const meanShifted = rsShifted.reduce((a, b) => a + b, 0) / nPts;
+        let sTR2 = 0;
+        for (let i = 0; i < nPts; i++) sTR2 += t[i] * (rsShifted[i] - meanShifted);
+        const slopeShifted = sTR2 / sumTT;
+        const interceptShifted = meanShifted - slopeShifted * yMean;
+        const rawRmsShifted   = Math.sqrt(rsShifted.reduce((s, v) => s + (v - meanShifted) ** 2, 0) / nPts);
+        const detrRmsShifted  = Math.sqrt(rsShifted.reduce((s, v, i) => s + (v - (interceptShifted + slopeShifted * ys[i])) ** 2, 0) / nPts);
+        shiftResults.push({
+          shift_us:        dMicros,
+          shift_LOD_s:     MODEL_J2000_LOD + dLodSecsPerDay,
+          slope_s_per_yr:  slopeShifted,
+          intercept_s:     interceptShifted,
+          rms_raw:         rawRmsShifted,
+          rms_detrended:   detrRmsShifted,
+        });
+      }
+
+      // Batch-format for throttle-resilience
+      const padR2 = (s, n) => (String(s ?? '') + ' '.repeat(n)).slice(0, n);
+      const padL2 = (s, n) => (' '.repeat(n) + String(s ?? '')).slice(-n);
+      const sensLines = [
+        '',
+        '  ── Anchor sensitivity — what if we shifted J2000 LOD by Δ? ──',
+        '',
+        '    ' + padL2('Δ (μs/day)', 12) + '  ' + padL2('new anchor (s)', 16) + '  ' +
+                 padL2('slope (s/yr)', 14) + '  ' + padL2('|drift| RMS (s)', 16) + '  ' +
+                 padL2('detrended RMS (s)', 18),
+        '    ' + '-'.repeat(12) + '  ' + '-'.repeat(16) + '  ' + '-'.repeat(14) + '  ' +
+                 '-'.repeat(16) + '  ' + '-'.repeat(18),
+      ];
+      for (const r of shiftResults) {
+        sensLines.push(
+          '    ' + padL2(r.shift_us > 0 ? '+' + r.shift_us : r.shift_us, 12) + '  ' +
+                   padL2(r.shift_LOD_s.toFixed(6), 16) + '  ' +
+                   padL2(r.slope_s_per_yr.toFixed(4), 14) + '  ' +
+                   padL2(r.rms_raw.toFixed(1), 16) + '  ' +
+                   padL2(r.rms_detrended.toFixed(1), 18)
+        );
+      }
+
+      // ── Find optimal anchor shift (minimizes |slope|) via analytical formula ──
+      // Zero slope condition on r_shifted(Y) = r(Y) + Δ_LOD × 365.25 × (2000 - Y):
+      //   Σ t_i × [r_i + Δ_LOD × 365.25 × (2000 - Y_i)] = 0
+      //   Δ_LOD = − [Σ t_i × r_i] / [Σ t_i × 365.25 × (2000 - Y_i)]
+      let num_t_r = 0, den_t_ay = 0;
+      for (let i = 0; i < nPts; i++) {
+        num_t_r  += t[i] * rs[i];
+        den_t_ay += t[i] * 365.25 * (2000 - ys[i]);
+      }
+      const optimalShiftLodSecsPerDay = -num_t_r / den_t_ay;
+      const optimalShiftMicros = optimalShiftLodSecsPerDay * 1e6;
+      const optimalAnchor      = MODEL_J2000_LOD + optimalShiftLodSecsPerDay;
+      // Compute residual + RMS at optimal shift (uses same physical convention: +Δ)
+      const rsOpt = ys.map((y, i) => rs[i] + optimalShiftLodSecsPerDay * 365.25 * (2000 - y));
+      const meanOpt = rsOpt.reduce((a, b) => a + b, 0) / nPts;
+      const rmsOptRaw = Math.sqrt(rsOpt.reduce((s, v) => s + (v - meanOpt) ** 2, 0) / nPts);
+
+      sensLines.push('');
+      sensLines.push('  ── Optimal anchor shift (minimises drift slope analytically) ──');
+      sensLines.push(`    Δ_optimal      = ${optimalShiftMicros.toFixed(1)} μs/day`);
+      sensLines.push(`    New anchor     = ${optimalAnchor.toFixed(6)} s   (vs framework ${MODEL_J2000_LOD.toFixed(6)}, IERS ${IERS_J2000_LOD.toFixed(6)})`);
+      sensLines.push(`    Post-shift RMS = ${rmsOptRaw.toFixed(1)} s   (vs current ${rmsRaw.toFixed(1)} s)`);
+      const optCoverage = (rmsRaw*rmsRaw - rmsOptRaw*rmsOptRaw) / (rmsRaw*rmsRaw) * 100;
+      sensLines.push(`    Variance absorbed by anchor shift: ${optCoverage.toFixed(1)}%`);
+
+      // ── Attribution verdict ──
+      // How does adopting the IERS J2000 anchor value (86400.001 s) affect the drift?
+      // Physical shift: Δ = IERS - model = +990 μs/day (increase anchor).
+      // Under residual_new(Y) = residual_old(Y) + Δ × 365.25 × (2000-Y):
+      //   slope_new = slope_old − Δ × 365.25  (since (2000-Y) has slope −1 vs Y)
+      const iersShiftUs = (IERS_J2000_LOD - MODEL_J2000_LOD) * 1e6;   // ≈ +990 μs/day
+      const slopeIfIersAdopted = linSlope - iersShiftUs * 1e-6 * 365.25;
+      // Direction of improvement: does adopting IERS move slope TOWARD zero?
+      const iersMovesToward = Math.abs(slopeIfIersAdopted) < Math.abs(linSlope);
+      const iersFractionalChange = (Math.abs(linSlope) - Math.abs(slopeIfIersAdopted)) / Math.abs(linSlope) * 100;
+
+      sensLines.push('');
+      sensLines.push('══════════════════════════════════════════════════════════════════════════════════');
+      sensLines.push('  VERDICT — drift-origin decomposition:');
+      sensLines.push(`    Current residual drift slope:     ${linSlope.toFixed(4)} s/yr  (${lodBiasEquiv.toFixed(0)} μs/day equivalent)`);
+      sensLines.push(`    Analytical optimal shift:         ${optimalShiftMicros.toFixed(0)} μs/day`);
+      sensLines.push(`    → optimal new anchor:             ${optimalAnchor.toFixed(6)} s`);
+      sensLines.push(`    IERS anchor shift (+990 μs/day): would take slope to ${slopeIfIersAdopted.toFixed(4)} s/yr`);
+      sensLines.push('');
+      if (!iersMovesToward) {
+        sensLines.push('    ✗ IERS SHIFT MOVES DRIFT AWAY FROM ZERO.');
+        sensLines.push(`      Adopting IERS convention would make slope ${Math.abs(iersFractionalChange).toFixed(0)}% worse.`);
+        sensLines.push('      → J2000 anchor value is NOT the drift source. Nor is the answer a small anchor');
+        sensLines.push('        adjustment in the IERS direction.');
+        sensLines.push('');
+        sensLines.push(`    Optimal shift direction: ${optimalShiftMicros < 0 ? 'DECREASE' : 'INCREASE'} anchor by ${Math.abs(optimalShiftMicros).toFixed(0)} μs/day.`);
+        sensLines.push(`    Interpretation: to match Stephenson\'s ΔT trajectory via a UNIFORM anchor shift,`);
+        sensLines.push(`    the model\'s J2000 LOD would need to be ${optimalAnchor.toFixed(6)} s.`);
+        if (optimalShiftMicros < 0) {
+          sensLines.push('    This is BELOW the SI baseline of 86400 s — physically implausible as an ANCHOR change.');
+          sensLines.push('    The drift is really a SECULAR RATE issue, not an anchor issue:');
+          sensLines.push('      • Historical LOD averaged 20–40 ms/day BELOW modern (Earth spun faster');
+          sensLines.push('        historically) — an amount consistent with the Munk-MacDonald 5-6 ms/century');
+          sensLines.push('        secular non-tidal rate.');
+          sensLines.push('      • Framework\'s Cox-Chao rate (~0.23 ms/century) is much smaller.');
+          sensLines.push('      • The paper claims Munk-MacDonald is REJECTED. This diagnostic suggests');
+          sensLines.push('        a non-tidal SECULAR rate contribution IS present in the ΔT residual after Bond.');
+        } else {
+          sensLines.push('    A shift of this magnitude ABOVE SI is atypical but not physically implausible.');
+        }
+      } else if (iersFractionalChange > 70) {
+        sensLines.push('    → Anchor convention is the DOMINANT source of drift.');
+        sensLines.push('      Adopting IERS convention (86400.001 s at J2000) would close most of it.');
+      } else if (iersFractionalChange > 30) {
+        sensLines.push('    → Anchor convention is a SIGNIFICANT but not dominant contributor.');
+        sensLines.push(`      Remaining ${(100-iersFractionalChange).toFixed(0)}% needs a physical explanation.`);
+      } else {
+        sensLines.push('    → Anchor convention is a MINOR contributor.');
+        sensLines.push('      Drift is dominated by a structural (physical) source not currently modelled.');
+      }
+      sensLines.push('');
+      sensLines.push('    Note: this diagnostic tests a UNIFORM anchor shift — it does NOT test a secular');
+      sensLines.push('    RATE change. If reality has a Munk-MacDonald-scale ~5 ms/century secular non-tidal');
+      sensLines.push('    rate not in the framework, that would produce a QUADRATIC residual (not linear),');
+      sensLines.push('    and no uniform anchor shift can absorb it. That would require a separate rate');
+      sensLines.push('    correction (research path — see doc 102 H1 Holme mantle-core discussion).');
+      sensLines.push('══════════════════════════════════════════════════════════════════════════════════');
+
+      console.log(sensLines.join('\n'));
+
+      window._L5b_anchor_sensitivity = {
+        currentSlope:         linSlope,
+        currentLodBiasMicros: lodBiasEquiv,
+        modelAnchor:          MODEL_J2000_LOD,
+        iersAnchor:           IERS_J2000_LOD,
+        iersShiftMicros:      iersShiftUs,
+        iersMovesTowardZero:  iersMovesToward,
+        iersFractionalChange_pct: iersFractionalChange,
+        optimalShiftMicros,
+        optimalAnchor,
+        shiftResults,
+        bondEnabled:          BOND_DT_CORRECTION_ENABLED,
+      };
+      console.log('\nFull sensitivity data exposed at window._L5b_anchor_sensitivity');
+    } catch (e) {
+      console.error(`\n■■■ SECTION 15 FAILED ■■■`);
+      console.error('  Error:', e && e.message);
+      console.error('  Stack:', e && e.stack);
+      console.error('  Continuing to next section...\n');
+    }
+
+    await new Promise(r => setTimeout(r, 200));  // let console flush
+    console.warn('▶ Starting SECTION 16: Secular RATE sensitivity — distinguishes anchor from rate origin...');
+    console.log('\n══════════════════════════════════════════════════════════════════════════════');
+    console.log('  SECTION 16: Secular RATE sensitivity — anchor vs rate decomposition');
+    console.log('══════════════════════════════════════════════════════════════════════════════');
+    try {
+      if (!window._L5b_missing_signal || !Array.isArray(window._L5b_missing_signal.samples)) {
+        console.error('§2 must run first; window._L5b_missing_signal not populated.');
+        throw new Error('missing _L5b_missing_signal');
+      }
+      const samples = window._L5b_missing_signal.samples;
+      const ys = samples.map(s => s.year);
+      const rs = samples.map(s => s.diff);   // Stephenson − model, current toggle state
+      const nPts = ys.length;
+
+      console.log('  Companion to §15. §15 tested UNIFORM anchor shift (linear residual effect).');
+      console.log('  §16 tests SECULAR RATE mismatch (quadratic residual effect).');
+      console.log(`  Bond correction is currently: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (n=1851)' : 'DISABLED'}`);
+      console.log('  ');
+      console.log('  Physics: a rate mismatch δ_rate (ms/century difference between model\'s Cox-Chao');
+      console.log('  and reality\'s actual secular LOD rate) makes model LOD(Y) = reality LOD(Y) − δ_rate·(2000−Y).');
+      console.log('  Integrated over time, this contributes 0.5·δ_rate·365.25·(2000−Y)² to residual.');
+      console.log('  ');
+
+      // ── Joint fit: residual(Y) = a + b×x + c×x², where x = 2000-Y ──
+      // Solves 3x3 OLS via normal equations.
+      const x = ys.map(y => 2000 - y);
+      // Build design matrix rows: [1, x, x²]
+      const X = ys.map((_, i) => [1, x[i], x[i] * x[i]]);
+      // Normal equations A β = z where A = XᵀX, z = Xᵀr
+      const A = [[0,0,0],[0,0,0],[0,0,0]];
+      const z = [0, 0, 0];
+      for (let i = 0; i < nPts; i++) {
+        for (let a = 0; a < 3; a++) {
+          z[a] += X[i][a] * rs[i];
+          for (let b = 0; b < 3; b++) A[a][b] += X[i][a] * X[i][b];
+        }
+      }
+      // Solve via Gaussian elimination (3x3, no pivoting needed for well-conditioned monomial basis)
+      // Convert to augmented [A | z]
+      const M = [[A[0][0], A[0][1], A[0][2], z[0]],
+                 [A[1][0], A[1][1], A[1][2], z[1]],
+                 [A[2][0], A[2][1], A[2][2], z[2]]];
+      for (let i = 0; i < 3; i++) {
+        // Partial pivot
+        let maxRow = i;
+        for (let j = i+1; j < 3; j++) if (Math.abs(M[j][i]) > Math.abs(M[maxRow][i])) maxRow = j;
+        [M[i], M[maxRow]] = [M[maxRow], M[i]];
+        for (let j = i+1; j < 3; j++) {
+          const f = M[j][i] / M[i][i];
+          for (let a = i; a <= 3; a++) M[j][a] -= f * M[i][a];
+        }
+      }
+      const beta = [0, 0, 0];
+      for (let i = 2; i >= 0; i--) {
+        let sum = M[i][3];
+        for (let j = i+1; j < 3; j++) sum -= M[i][j] * beta[j];
+        beta[i] = sum / M[i][i];
+      }
+      const [coefA, coefB, coefC] = beta;
+
+      // Physical interpretation:
+      //   coefB: anchor mismatch equivalent. δ_LOD_anchor (μs/day) = coefB / 365.25 × 1e6
+      //   coefC: rate mismatch equivalent. δ_rate (ms/century) = 2 × coefC / 365.25 × 1e5
+      const anchorEquivMicros = coefB / 365.25 * 1e6;
+      const rateEquivMsPerCy  = 2 * coefC / 365.25 * 1e5;
+
+      console.log('  ── Joint fit: residual(Y) = a + b·x + c·x², where x = 2000 − Y ──');
+      console.log(`    a (intercept, residual at year 2000):  ${coefA.toFixed(2)} s`);
+      console.log(`    b (linear coefficient):                ${coefB.toFixed(4)} s/yr`);
+      console.log(`    c (quadratic coefficient):             ${coefC.toExponential(4)} s/yr²`);
+      console.log('  ');
+      console.log('  ── Physical interpretation ──');
+      console.log(`    Anchor-equivalent LOD bias  (from b):  ${anchorEquivMicros.toFixed(1)} μs/day`);
+      console.log(`    Rate-equivalent (from c):              ${rateEquivMsPerCy.toFixed(3)} ms/century`);
+      console.log('  ');
+      console.log('  ── Variance decomposition ──');
+      const meanR   = rs.reduce((s, v) => s + v, 0) / nPts;
+      const totalSS = rs.reduce((s, v) => s + (v - meanR) ** 2, 0);
+      const linearOnlyPred = ys.map((_, i) => coefA + coefB * x[i]);
+      const quadraticOnlyPred = ys.map((_, i) => coefA + coefC * x[i] * x[i]);
+      const jointPred = ys.map((_, i) => coefA + coefB * x[i] + coefC * x[i] * x[i]);
+      const ssLinear   = rs.reduce((s, v, i) => s + (v - linearOnlyPred[i]) ** 2, 0);
+      const ssQuadOnly = rs.reduce((s, v, i) => s + (v - quadraticOnlyPred[i]) ** 2, 0);
+      const ssJoint    = rs.reduce((s, v, i) => s + (v - jointPred[i]) ** 2, 0);
+      const r2Linear   = 1 - ssLinear   / totalSS;
+      const r2QuadOnly = 1 - ssQuadOnly / totalSS;
+      const r2Joint    = 1 - ssJoint    / totalSS;
+      console.log(`    R² (linear only, y = a + b·x):         ${r2Linear.toFixed(4)}`);
+      console.log(`    R² (quadratic only, y = a + c·x²):     ${r2QuadOnly.toFixed(4)}`);
+      console.log(`    R² (joint fit):                        ${r2Joint.toFixed(4)}`);
+      console.log(`    RMS (joint fit residual):              ${Math.sqrt(ssJoint / nPts).toFixed(1)} s`);
+      console.log('  ');
+      console.log('    Interpretation:');
+      if (r2QuadOnly > r2Linear + 0.05) {
+        console.log('      Quadratic dominates → drift is primarily a RATE mismatch.');
+      } else if (r2Linear > r2QuadOnly + 0.05) {
+        console.log('      Linear dominates → drift is primarily an ANCHOR mismatch.');
+      } else {
+        console.log('      Linear and quadratic are comparable → drift has BOTH anchor and rate components.');
+      }
+
+      // ── Sensitivity: apply δ_rate correction, report residual behaviour ──
+      // Transformation: residual_new(Y) = residual_old(Y) − 0.5·δ_rate_s_per_day_per_yr·365.25·x²
+      const RATES_MS_PER_CY = [-1.0, -0.5, -0.2, -0.1, 0.0, +0.1, +0.2, +0.5, +1.0];
+      const rateResults = [];
+      for (const dRateMsPerCy of RATES_MS_PER_CY) {
+        const dRateSecPerDayPerYr = dRateMsPerCy * 1e-5;   // 1 ms/century = 1e-5 s/day per year
+        const rsShifted = ys.map((y, i) => rs[i] - 0.5 * dRateSecPerDayPerYr * 365.25 * (2000 - y) * (2000 - y));
+        // Refit quadratic to see how much rate and quadratic curvature remain
+        const M2 = [[nPts, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+        for (let i = 0; i < nPts; i++) {
+          M2[0][1] += x[i]; M2[1][0] += x[i];
+          M2[0][2] += x[i]*x[i]; M2[2][0] += x[i]*x[i];
+          M2[1][1] += x[i]*x[i];
+          M2[1][2] += x[i]*x[i]*x[i]; M2[2][1] += x[i]*x[i]*x[i];
+          M2[2][2] += x[i]*x[i]*x[i]*x[i];
+          M2[0][3] += rsShifted[i];
+          M2[1][3] += x[i]*rsShifted[i];
+          M2[2][3] += x[i]*x[i]*rsShifted[i];
+        }
+        for (let i = 0; i < 3; i++) {
+          let maxRow = i;
+          for (let j = i+1; j < 3; j++) if (Math.abs(M2[j][i]) > Math.abs(M2[maxRow][i])) maxRow = j;
+          [M2[i], M2[maxRow]] = [M2[maxRow], M2[i]];
+          for (let j = i+1; j < 3; j++) {
+            const f = M2[j][i] / M2[i][i];
+            for (let a = i; a <= 3; a++) M2[j][a] -= f * M2[i][a];
+          }
+        }
+        const b2 = [0, 0, 0];
+        for (let i = 2; i >= 0; i--) {
+          let sum = M2[i][3];
+          for (let j = i+1; j < 3; j++) sum -= M2[i][j] * b2[j];
+          b2[i] = sum / M2[i][i];
+        }
+        const rmsRaw = Math.sqrt(rsShifted.reduce((s, v) => s + (v - rsShifted.reduce((a, b) => a + b, 0)/nPts) ** 2, 0) / nPts);
+        const jointPred2 = ys.map((_, i) => b2[0] + b2[1]*x[i] + b2[2]*x[i]*x[i]);
+        const rmsFit = Math.sqrt(rsShifted.reduce((s, v, i) => s + (v - jointPred2[i]) ** 2, 0) / nPts);
+        rateResults.push({
+          rate_ms_per_cy: dRateMsPerCy,
+          b_remaining:    b2[1],
+          c_remaining:    b2[2],
+          rms_raw:        rmsRaw,
+          rms_fit:        rmsFit,
+        });
+      }
+
+      // Analytical optimum for zero c after applying δ_rate:
+      //   c_new = c_old − 0.5·δ_rate·365.25 = 0 → δ_rate = 2c/365.25 (s/day per year)
+      const optimalRateSecPerDayPerYr = 2 * coefC / 365.25;
+      const optimalRateMsPerCy = optimalRateSecPerDayPerYr * 1e5;
+
+      // Batched output
+      const padR = (s, n) => (String(s ?? '') + ' '.repeat(n)).slice(0, n);
+      const padL = (s, n) => (' '.repeat(n) + String(s ?? '')).slice(-n);
+      const rateLines = [
+        '',
+        '  ── Rate sensitivity — what if we added secular non-tidal rate δ to model? ──',
+        '',
+        '    ' + padL('δ_rate (ms/cy)', 16) + '  ' + padL('b_remaining (s/yr)', 20) + '  ' +
+                 padL('c_remaining (s/yr²)', 22) + '  ' + padL('RMS raw (s)', 12) + '  ' + padL('RMS after fit (s)', 18),
+        '    ' + '-'.repeat(16) + '  ' + '-'.repeat(20) + '  ' + '-'.repeat(22) + '  ' + '-'.repeat(12) + '  ' + '-'.repeat(18),
+      ];
+      for (const r of rateResults) {
+        rateLines.push(
+          '    ' + padL(r.rate_ms_per_cy > 0 ? '+' + r.rate_ms_per_cy.toFixed(2) : r.rate_ms_per_cy.toFixed(2), 16) + '  ' +
+                   padL(r.b_remaining.toFixed(4), 20) + '  ' +
+                   padL(r.c_remaining.toExponential(3), 22) + '  ' +
+                   padL(r.rms_raw.toFixed(1), 12) + '  ' +
+                   padL(r.rms_fit.toFixed(1), 18)
+        );
+      }
+
+      rateLines.push('');
+      rateLines.push('  ── Analytical optimum for zero quadratic coefficient ──');
+      rateLines.push(`    Optimal δ_rate = ${optimalRateMsPerCy.toFixed(3)} ms/century`);
+      rateLines.push('    Comparison to literature:');
+      rateLines.push('      Cox & Chao 2002 (satellite modern, framework baseline):  ~+0.23 ms/century');
+      rateLines.push('      Munk-MacDonald 1960 non-tidal-speedup postulate:         +5 to +6 ms/century');
+      rateLines.push(`      This diagnostic\'s optimal:                                 ${optimalRateMsPerCy.toFixed(2)} ms/century`);
+      if (Math.abs(optimalRateMsPerCy) < 0.5) {
+        rateLines.push('    → Optimum is SUB-Cox-Chao. Framework\'s rate is essentially adequate;');
+        rateLines.push('      residual\'s quadratic curvature is small.');
+      } else if (Math.abs(optimalRateMsPerCy) < 3) {
+        rateLines.push('    → Optimum is between Cox-Chao and Munk-MacDonald. Consistent with a');
+        rateLines.push('      FRACTIONAL non-tidal rate contribution beyond Cox-Chao satellite value.');
+      } else {
+        rateLines.push('    → Optimum approaches Munk-MacDonald scale. The paper\'s clean');
+        rateLines.push('      "Munk-MacDonald rejected" claim may need to be softened to');
+        rateLines.push('      "Munk-MacDonald full-scale not required, but a fractional non-tidal');
+        rateLines.push('      secular rate IS present in the ΔT residual after Bond correction."');
+      }
+
+      // Verdict
+      rateLines.push('');
+      rateLines.push('══════════════════════════════════════════════════════════════════════════════════');
+      rateLines.push('  VERDICT — anchor vs rate decomposition:');
+      rateLines.push('');
+      const linearOnlyR2Fraction = r2Linear / Math.max(r2Joint, 1e-9);
+      const quadOnlyR2Fraction   = r2QuadOnly / Math.max(r2Joint, 1e-9);
+      rateLines.push(`    Linear (anchor-like)    coefficient b = ${coefB.toFixed(3)} s/yr  → ${anchorEquivMicros.toFixed(0)} μs/day equivalent anchor bias`);
+      rateLines.push(`    Quadratic (rate-like)   coefficient c = ${coefC.toExponential(3)} s/yr²  → ${rateEquivMsPerCy.toFixed(3)} ms/cy equivalent rate bias`);
+      rateLines.push(`    R² of joint fit         ${r2Joint.toFixed(4)}  (linear-only ${r2Linear.toFixed(4)}, quad-only ${r2QuadOnly.toFixed(4)})`);
+      rateLines.push('');
+      if (r2QuadOnly > r2Linear + 0.10) {
+        rateLines.push('    → RATE mismatch is the DOMINANT drift origin.');
+        rateLines.push(`      A secular non-tidal rate of ${optimalRateMsPerCy.toFixed(2)} ms/century, added to the framework,`);
+        rateLines.push('      would close most of the drift. This IS the Munk-MacDonald-adjacent channel');
+        rateLines.push('      (fractional, not full 5-6 ms/century).');
+      } else if (r2Linear > r2QuadOnly + 0.10) {
+        rateLines.push('    → ANCHOR mismatch is the DOMINANT drift origin.');
+        rateLines.push('      But §15 already showed that no physically-plausible anchor shift closes it.');
+        rateLines.push('      Consider: the "anchor" here may be an artifact of not capturing the');
+        rateLines.push('      Bond bump\'s ancient-side lobe properly.');
+      } else {
+        rateLines.push('    → BOTH anchor and rate contribute comparably.');
+        rateLines.push(`      Combined correction: anchor shift of ${anchorEquivMicros.toFixed(0)} μs/day AND rate addition of`);
+        rateLines.push(`      ${optimalRateMsPerCy.toFixed(2)} ms/century would close most of the drift.`);
+      }
+      rateLines.push('══════════════════════════════════════════════════════════════════════════════════');
+
+      console.log(rateLines.join('\n'));
+
+      window._L5b_rate_sensitivity = {
+        coefA, coefB, coefC,
+        anchorEquivMicros, rateEquivMsPerCy,
+        r2Linear, r2QuadOnly, r2Joint,
+        rateResults,
+        optimalRateMsPerCy,
+        bondEnabled: BOND_DT_CORRECTION_ENABLED,
+      };
+      console.log('\nFull data exposed at window._L5b_rate_sensitivity');
+    } catch (e) {
+      console.error(`\n■■■ SECTION 16 FAILED ■■■`);
+      console.error('  Error:', e && e.message);
+      console.error('  Stack:', e && e.stack);
+      console.error('  Continuing to next section...\n');
+    }
+
+    await new Promise(r => setTimeout(r, 200));  // let console flush
+    console.warn('▶ Starting SECTION 17: Higher-order polynomial + dual-harmonic decomposition...');
+    console.log('\n══════════════════════════════════════════════════════════════════════════════');
+    console.log('  SECTION 17: Higher-order polynomial + dual-harmonic decomposition');
+    console.log('══════════════════════════════════════════════════════════════════════════════');
+    try {
+      if (!window._L5b_missing_signal || !Array.isArray(window._L5b_missing_signal.samples)) {
+        console.error('§2 must run first; window._L5b_missing_signal not populated.');
+        throw new Error('missing _L5b_missing_signal');
+      }
+      const samples = window._L5b_missing_signal.samples;
+      const ys = samples.map(s => s.year);
+      const rs = samples.map(s => s.diff);
+      const nPts = ys.length;
+      const x = ys.map(y => 2000 - y);
+
+      console.log('  Companion to §15/§16. Investigates whether the LINEAR "anchor-like" component');
+      console.log('  in §16 is a GENUINE non-tidal signal or a POLYNOMIAL-ORDER artifact of the fit.');
+      console.log(`  Bond correction is currently: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (n=1851)' : 'DISABLED'}`);
+      console.log('  ');
+      console.log('  Part A: fits polynomial orders 1 through 5. If cubic/quartic terms are');
+      console.log('  significant, §16\'s -1.5 s/yr linear coefficient may be a polynomial artifact.');
+      console.log('  Part B: fits dual harmonic (n=1851 + n=1920) alongside polynomial. Tests whether');
+      console.log('  the two lattice candidates (73×J-S synodic AND 15÷Earth ICRF perihelion) are');
+      console.log('  independent lattice features or Fourier-degenerate.');
+      console.log('  ');
+
+      // General OLS solver for arbitrary-size symmetric normal equations
+      const solveOLS = (X, y) => {
+        const k = X[0].length;
+        const n = X.length;
+        const XtX = Array.from({length: k}, () => new Array(k).fill(0));
+        const Xty = new Array(k).fill(0);
+        for (let i = 0; i < n; i++) {
+          for (let a = 0; a < k; a++) {
+            Xty[a] += X[i][a] * y[i];
+            for (let b = 0; b < k; b++) XtX[a][b] += X[i][a] * X[i][b];
+          }
+        }
+        const M = XtX.map((row, i) => [...row, Xty[i]]);
+        // Gauss elimination with partial pivot
+        for (let i = 0; i < k; i++) {
+          let maxRow = i;
+          for (let j = i + 1; j < k; j++) if (Math.abs(M[j][i]) > Math.abs(M[maxRow][i])) maxRow = j;
+          [M[i], M[maxRow]] = [M[maxRow], M[i]];
+          for (let j = i + 1; j < k; j++) {
+            const f = M[j][i] / M[i][i];
+            for (let a = i; a <= k; a++) M[j][a] -= f * M[i][a];
+          }
+        }
+        const beta = new Array(k).fill(0);
+        for (let i = k - 1; i >= 0; i--) {
+          let sum = M[i][k];
+          for (let j = i + 1; j < k; j++) sum -= M[i][j] * beta[j];
+          beta[i] = sum / M[i][i];
+        }
+        return beta;
+      };
+
+      const rssOf = (X, y, beta) => {
+        let s = 0;
+        for (let i = 0; i < X.length; i++) {
+          let pred = 0;
+          for (let a = 0; a < beta.length; a++) pred += X[i][a] * beta[a];
+          s += (y[i] - pred) ** 2;
+        }
+        return s;
+      };
+
+      const meanR = rs.reduce((s, v) => s + v, 0) / nPts;
+      const tss = rs.reduce((s, v) => s + (v - meanR) ** 2, 0);
+
+      // ── Part A: polynomial orders 1 through 5 ──
+      // Uses xhat = x / 1000 to keep numerical values well-scaled for orders 3+
+      const xhat = x.map(v => v / 1000);
+      const partAResults = [];
+      let prevR2 = 0;
+      for (let order = 1; order <= 5; order++) {
+        const k = order + 1;
+        const X = ys.map((_, i) => {
+          const row = new Array(k);
+          row[0] = 1;
+          for (let j = 1; j <= order; j++) row[j] = xhat[i] ** j;
+          return row;
+        });
+        const beta = solveOLS(X, rs);
+        const rss = rssOf(X, rs, beta);
+        const r2 = 1 - rss / tss;
+        partAResults.push({
+          order,
+          r2,
+          dR2: r2 - prevR2,
+          rms: Math.sqrt(rss / nPts),
+          coefficients: beta.slice(),   // in units of s per (kyr)^order
+        });
+        prevR2 = r2;
+      }
+
+      // Format Part A as batched table
+      const padR = (s, n) => (String(s ?? '') + ' '.repeat(n)).slice(0, n);
+      const padL = (s, n) => (' '.repeat(n) + String(s ?? '')).slice(-n);
+
+      const partALines = [
+        '',
+        '  ── Part A: Polynomial order sensitivity ──',
+        '',
+        '    ' + padL('order', 6) + '  ' + padL('R²', 8) + '  ' + padL('ΔR² vs prev', 12) + '  ' +
+                 padL('RMS (s)', 10) + '  ' + padR('highest coefficient (per kyr^n)', 40),
+        '    ' + '-'.repeat(6) + '  ' + '-'.repeat(8) + '  ' + '-'.repeat(12) + '  ' + '-'.repeat(10) + '  ' + '-'.repeat(40),
+      ];
+      for (const r of partAResults) {
+        partALines.push(
+          '    ' + padL(r.order, 6) + '  ' + padL(r.r2.toFixed(4), 8) + '  ' +
+                   padL((r.dR2 >= 0 ? '+' : '') + r.dR2.toFixed(4), 12) + '  ' +
+                   padL(r.rms.toFixed(1), 10) + '  ' + padR(r.coefficients[r.order].toExponential(3), 40)
+        );
+      }
+
+      // Determine saturation point
+      const saturationOrder = partAResults.findIndex(r => r.dR2 < 0.005) + 1;   // +1 because index, want the order (already 1-based)
+      const satOrderMsg = saturationOrder > 0
+        ? `Saturates at order ${saturationOrder} (subsequent ΔR² < 0.005)`
+        : 'Does not saturate within tested range (order 1-5) — higher orders may still add explanatory power';
+      partALines.push('');
+      partALines.push(`    ${satOrderMsg}`);
+
+      // Interpret the linear coefficient across orders (does it change dramatically going 1 → 3?)
+      const linCoef_order1 = partAResults[0].coefficients[1];
+      const linCoef_order3 = partAResults[2].coefficients[1];
+      const linCoef_order5 = partAResults[4].coefficients[1];
+      partALines.push('');
+      partALines.push('  ── Linear coefficient across orders ──');
+      partALines.push(`    order 1:  b₁ = ${linCoef_order1.toFixed(3)} s/kyr  (${(linCoef_order1/1000).toFixed(3)} s/yr)`);
+      partALines.push(`    order 3:  b₁ = ${linCoef_order3.toFixed(3)} s/kyr  (${(linCoef_order3/1000).toFixed(3)} s/yr)`);
+      partALines.push(`    order 5:  b₁ = ${linCoef_order5.toFixed(3)} s/kyr  (${(linCoef_order5/1000).toFixed(3)} s/yr)`);
+      const linStability = Math.abs(linCoef_order5 - linCoef_order3) / Math.max(Math.abs(linCoef_order1), 1e-9);
+      if (linStability < 0.10) {
+        partALines.push(`    → Linear coefficient STABLE (Δ < 10% between orders 3 and 5) — genuine linear component.`);
+      } else if (linStability < 0.50) {
+        partALines.push(`    → Linear coefficient MODERATELY unstable — mix of genuine linear and polynomial artifact.`);
+      } else {
+        partALines.push(`    → Linear coefficient UNSTABLE (Δ ≥ 50%) — likely polynomial artifact, not genuine.`);
+        partALines.push('       §16\'s "anchor-like" component is probably a fit-order artifact of the residual\'s');
+        partALines.push('       true higher-order shape, not a physical anchor mismatch.');
+      }
+
+      console.log(partALines.join('\n'));
+
+      // ── Part B: Dual harmonic test ──
+      const H_YR = 335317;
+      const EIGHT_H = 8 * H_YR;
+      const n_A = 1851, n_B = 1920;
+      const P_A = EIGHT_H / n_A;   // 1449.24 yr
+      const P_B = EIGHT_H / n_B;   // 1397.15 yr
+      const omega_A = 2 * Math.PI / P_A;
+      const omega_B = 2 * Math.PI / P_B;
+
+      // Single-harmonic fit at n_A (polynomial + 1 harmonic pair)
+      const X_A = ys.map((_, i) => [
+        1, xhat[i], xhat[i] * xhat[i],
+        Math.cos(omega_A * ys[i]), Math.sin(omega_A * ys[i]),
+      ]);
+      const beta_A = solveOLS(X_A, rs);
+      const rss_A = rssOf(X_A, rs, beta_A);
+      const r2_A = 1 - rss_A / tss;
+      const amp_A = Math.sqrt(beta_A[3] ** 2 + beta_A[4] ** 2);
+      const phase_A = Math.atan2(-beta_A[4], beta_A[3]) * 180 / Math.PI;
+
+      // Single-harmonic fit at n_B
+      const X_B = ys.map((_, i) => [
+        1, xhat[i], xhat[i] * xhat[i],
+        Math.cos(omega_B * ys[i]), Math.sin(omega_B * ys[i]),
+      ]);
+      const beta_B = solveOLS(X_B, rs);
+      const rss_B = rssOf(X_B, rs, beta_B);
+      const r2_B = 1 - rss_B / tss;
+      const amp_B = Math.sqrt(beta_B[3] ** 2 + beta_B[4] ** 2);
+      const phase_B = Math.atan2(-beta_B[4], beta_B[3]) * 180 / Math.PI;
+
+      // Dual-harmonic fit (polynomial + 2 harmonic pairs)
+      const X_dual = ys.map((_, i) => [
+        1, xhat[i], xhat[i] * xhat[i],
+        Math.cos(omega_A * ys[i]), Math.sin(omega_A * ys[i]),
+        Math.cos(omega_B * ys[i]), Math.sin(omega_B * ys[i]),
+      ]);
+      const beta_dual = solveOLS(X_dual, rs);
+      const rss_dual = rssOf(X_dual, rs, beta_dual);
+      const r2_dual = 1 - rss_dual / tss;
+      const amp_A_dual = Math.sqrt(beta_dual[3] ** 2 + beta_dual[4] ** 2);
+      const amp_B_dual = Math.sqrt(beta_dual[5] ** 2 + beta_dual[6] ** 2);
+
+      const partBLines = [
+        '',
+        '  ── Part B: Dual-harmonic test (n=1851 vs n=1920 vs both) ──',
+        '',
+        '    Testing whether the two candidate lattice divisors (73×J-S synodic and',
+        '    15÷Earth ICRF perihelion) are independent or Fourier-degenerate.',
+        '',
+        `    Period n=1851 (73×J-S synodic):        ${P_A.toFixed(2)} yr`,
+        `    Period n=1920 (15÷Earth ICRF perihelion): ${P_B.toFixed(2)} yr`,
+        `    Period difference: ${(P_A - P_B).toFixed(2)} yr (${((P_A-P_B)/P_A*100).toFixed(2)}%)`,
+        `    Fourier resolution at ${(ys[nPts-1] - ys[0]).toFixed(0)}-yr window: ~${((P_A + P_B)/2 * ((P_A+P_B)/2) / (2*(ys[nPts-1] - ys[0]))).toFixed(0)} yr`,
+        '',
+        `    Single n=1851 alone: R² = ${r2_A.toFixed(4)}, amp = ${amp_A.toFixed(1)} s, phase = ${phase_A.toFixed(1)}°`,
+        `    Single n=1920 alone: R² = ${r2_B.toFixed(4)}, amp = ${amp_B.toFixed(1)} s, phase = ${phase_B.toFixed(1)}°`,
+        `    Dual n=1851 + n=1920: R² = ${r2_dual.toFixed(4)}`,
+        `      → amp at n=1851 in dual fit: ${amp_A_dual.toFixed(1)} s (was ${amp_A.toFixed(1)} s single)`,
+        `      → amp at n=1920 in dual fit: ${amp_B_dual.toFixed(1)} s (was ${amp_B.toFixed(1)} s single)`,
+        '',
+      ];
+
+      const dualGain = r2_dual - Math.max(r2_A, r2_B);
+      if (dualGain < 0.005) {
+        partBLines.push(`    → Dual fit adds ${(dualGain * 100).toFixed(2)} pp over the better single. Divisors are`);
+        partBLines.push(`      FOURIER-DEGENERATE: they describe the SAME peak with slightly different labels.`);
+        partBLines.push(`      Recommendation: pick either n=1851 (J-S synodic narrative) or n=1920 (Earth`);
+        partBLines.push(`      ICRF perihelion narrative). Fit quality is indistinguishable.`);
+      } else if (dualGain < 0.02) {
+        partBLines.push(`    → Dual fit adds ${(dualGain * 100).toFixed(2)} pp over the better single. Marginal independent`);
+        partBLines.push(`      contribution — divisors are near-degenerate but not identical.`);
+      } else {
+        partBLines.push(`    → Dual fit adds ${(dualGain * 100).toFixed(2)} pp over the better single. INDEPENDENT lattice`);
+        partBLines.push(`      contributions — using both harmonics genuinely closes more variance.`);
+      }
+
+      // Check amplitude splitting: if degenerate, the dual fit should split amp roughly between two harmonics
+      const totalSingleAmp = Math.max(amp_A, amp_B);
+      const totalDualAmp = Math.sqrt(amp_A_dual ** 2 + amp_B_dual ** 2);
+      partBLines.push('');
+      partBLines.push(`    Amplitude behavior:`);
+      partBLines.push(`      Single-best amp: ${totalSingleAmp.toFixed(1)} s`);
+      partBLines.push(`      Dual RSS amp:    ${totalDualAmp.toFixed(1)} s  (${(totalDualAmp/totalSingleAmp*100).toFixed(0)}% of single-best)`);
+      if (Math.abs(totalDualAmp - totalSingleAmp) / totalSingleAmp < 0.15) {
+        partBLines.push(`      → Amplitude is roughly PRESERVED under dual fit (Fourier-degenerate behavior).`);
+      } else {
+        partBLines.push(`      → Amplitude differs substantially between single and dual — genuine independent content.`);
+      }
+
+      console.log(partBLines.join('\n'));
+
+      // ── Verdict ──
+      const verdictLines = [
+        '',
+        '══════════════════════════════════════════════════════════════════════════════════',
+        '  VERDICT — completing the residual picture:',
+        '',
+      ];
+      const isPolyArtifact = linStability >= 0.50;
+      const isFourierDegenerate = dualGain < 0.005;
+
+      if (isPolyArtifact && isFourierDegenerate) {
+        verdictLines.push('    ✓ Linear coefficient is POLYNOMIAL ARTIFACT (unstable across orders).');
+        verdictLines.push('      → §16\'s "anchor-like -4200 μs/day" is not a real anchor mismatch; it\'s a fit-order');
+        verdictLines.push('        symptom of the residual\'s true cubic-or-higher shape.');
+        verdictLines.push('    ✓ n=1851 and n=1920 are FOURIER-DEGENERATE — same peak, different labels.');
+        verdictLines.push('      → Keep n=1851 for the J-S synodic narrative; adding n=1920 wouldn\'t help.');
+        verdictLines.push('');
+        verdictLines.push('    Full picture of the residual:');
+        verdictLines.push('      • Bond-scale oscillation at ~1450 yr (captured by n=1851 8H-lattice harmonic)');
+        verdictLines.push('      • Higher-order polynomial (cubic+) shape — not physical, likely fit artifact of');
+        verdictLines.push('        the Bond fit being imperfect in ancient BCE tail');
+        verdictLines.push('      • Fractional Munk-MacDonald ~0.5 ms/century secular rate (§16)');
+        verdictLines.push('      • ~62 s RMS observation noise + small unexplained structure');
+      } else if (isPolyArtifact) {
+        verdictLines.push('    ✓ Linear coefficient is POLYNOMIAL ARTIFACT.');
+        verdictLines.push('    ⚠ Dual harmonic test shows some independent content (dR² = ' + (dualGain*100).toFixed(2) + ' pp).');
+      } else if (isFourierDegenerate) {
+        verdictLines.push('    ⚠ Linear coefficient is STABLE across orders — genuine physical linear component.');
+        verdictLines.push('    ✓ n=1851 and n=1920 are FOURIER-DEGENERATE.');
+      } else {
+        verdictLines.push('    ⚠ Linear coefficient is STABLE — real linear component exists.');
+        verdictLines.push('    ⚠ n=1851 and n=1920 show some independence — both harmonics may contribute.');
+      }
+      verdictLines.push('══════════════════════════════════════════════════════════════════════════════════');
+
+      console.log(verdictLines.join('\n'));
+
+      window._L5b_higher_order = {
+        polyResults: partAResults,
+        dualFit: {
+          n_A, n_B, P_A, P_B, r2_A, r2_B, r2_dual,
+          amp_A, phase_A, amp_B, phase_B,
+          amp_A_dual, amp_B_dual, dualGain,
+        },
+        isPolyArtifact,
+        isFourierDegenerate,
+        bondEnabled: BOND_DT_CORRECTION_ENABLED,
+      };
+      console.log('\nFull data exposed at window._L5b_higher_order');
+    } catch (e) {
+      console.error(`\n■■■ SECTION 17 FAILED ■■■`);
+      console.error('  Error:', e && e.message);
+      console.error('  Stack:', e && e.stack);
+      console.error('  Continuing to next section...\n');
+    }
    } catch (e) {
      console.error('\n\n■■■ Merged Button A ABORTED with exception ■■■');
      console.error('Error message:', e && e.message);
      console.error('Stack trace:', e && e.stack);
      console.error('(this catch was added so silent errors don\'t hide behind an early `return`)');
    }
-  }, 'Unified L-5b/lunar residual investigation: 13 analyses in one pass — primary-observation ' +
+  }, 'Unified L-5b/lunar residual investigation: 17 analyses in one pass — primary-observation ' +
      'compare + per-catalog synthesis, missing-signal shape, 4th GIA mode search, regression, ' +
      'model-vs-Stephenson comparison, Lomb-Scargle spectrum + 1050-yr callout, 14.2-yr peak ' +
      'focused robustness, lunar-nodal medieval test, mass-balance correlation, extended ' +
      'correlation (integrated/lagged/sign-duration), paper Table 6 verdict, symmetry test ' +
-     'around crossover, reference-polynomial robustness. Absorbs 10 previously-separate ' +
-     'buttons; feeds paper\'s 8-hypothesis table + medieval bump characterization.');
+     'around crossover, reference-polynomial robustness, 8H-divisor scan against residual with ' +
+     'J-S-E interpretation, J2000 anchor sensitivity, secular RATE sensitivity for anchor-vs-rate ' +
+     'decomposition, higher-order polynomial + dual-harmonic decomposition to complete the ' +
+     'residual picture. Absorbs 10 previously-separate buttons; feeds paper\'s 8-hypothesis table + ' +
+     'medieval bump characterization.');
 
   addTestButton('L-7 SOLAR: primary observations + H3 cross-validation (89 events)', async () => {
    try {

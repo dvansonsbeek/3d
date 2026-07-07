@@ -1,0 +1,1804 @@
+{
+  "_meta": {
+    "description": "8H divisor scan against Stephenson \u0394T residual with J-S-E interpretation",
+    "source_script": "scripts/lod_residual_divisor_scan_jse.py",
+    "n_range": [
+      500,
+      5000
+    ],
+    "period_range": [
+      536.5072,
+      5365.072
+    ],
+    "H_yr": 335317,
+    "eight_H_yr": 2682536,
+    "jupiter_period_yr": 11.8598,
+    "saturn_period_yr": 29.457,
+    "j_s_synodic_yr": 19.852824801672995
+  },
+  "baseline": {
+    "r2_polynomial_only": 0.47637266104413734,
+    "rms_polynomial_only": 257.3477192096488
+  },
+  "top_20": [
+    {
+      "rank": 1,
+      "n": 1850,
+      "period_yr": 1450.0194594594595,
+      "amplitude_s": 377.6334013681579,
+      "phase_deg": -65.4429248298735,
+      "delta_r2": 0.4987367640453363,
+      "rms_post_s": 56.10823804591437,
+      "jse_interpretations": [
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.05263715133970901
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 168,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.10810810810809429
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.21543569219574765
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.45699107113567183
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.9189189189189083
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.1891891891892001
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.242704664541325
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.3592204449347225
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.3779498206175023
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.4217791081706672
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.6216216216216284
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "n": 1851,
+      "period_yr": 1449.2360886007564,
+      "amplitude_s": 377.72735671429416,
+      "phase_deg": -65.52609884724494,
+      "delta_r2": 0.498735216510676,
+      "rms_post_s": 56.109982242137974,
+      "jse_interpretations": [
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.0013884502001048535
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.1614980898672023
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 168,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.16207455429498027
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.40318403928223606
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.9724473257698507
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.1345218800648282
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.1893223427383743
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.3684935833642706
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.4125109795403858
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.4327487124124314
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.6747703943814216
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "n": 1849,
+      "period_yr": 1450.803677663602,
+      "amplitude_s": 377.53801361581066,
+      "phase_deg": -65.35972206821741,
+      "delta_r2": 0.4987352090663403,
+      "rms_post_s": 56.109990632372934,
+      "jse_interpretations": [
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 168,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.05408328826392798
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.10666275287952261
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.2693732945242863
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.5107981029891201
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.8653326122228201
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.2439156300703114
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.2960869863442657
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.3058722677821841
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.3231509288225687
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.475064632977073
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.5684153596538737
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "n": 1848,
+      "period_yr": 1451.5887445887445,
+      "amplitude_s": 377.4412026241245,
+      "phase_deg": -65.27649068494732,
+      "delta_r2": 0.49873056230530566,
+      "rms_post_s": 56.1152275798022,
+      "jse_interpretations": [
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 168,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.0
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.16068835441932902
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.32331089685281916
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.5646051348425359
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.8116883116883163
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.2524663545071866
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.26835203702766
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.298701298701294
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.349469308147199
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.5151515151515345
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.5283501577834477
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "n": 1852,
+      "period_yr": 1448.4535637149029,
+      "amplitude_s": 377.8198705130761,
+      "phase_deg": -65.60924399731651,
+      "delta_r2": 0.4987305558101973,
+      "rms_post_s": 56.11523489951409,
+      "jse_interpretations": [
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.055414051739925266
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.10756048753866171
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 168,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.21598272138227873
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.349377007428793
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 1.0259179265658638
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.0799136069114532
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.1359400209354182
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.315208058557882
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.4657439649725874
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.4875476042073612
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.7278617710583217
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "n": 1847,
+      "period_yr": 1452.3746616134272,
+      "amplitude_s": 377.3429775849693,
+      "phase_deg": -65.19323080238492,
+      "delta_r2": 0.49872283457213185,
+      "rms_post_s": 56.123935732413344,
+      "jse_interpretations": [
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 168,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.05414185165132802
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.21471395595915654
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.3772484991813744
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.6184121666959903
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.7579859231185679
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.1990026113314904
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.2135531452327242
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.3535462912831697
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.4028516299501725
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.4618299945858222
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.581635682589853
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "n": 1853,
+      "period_yr": 1447.671883432272,
+      "amplitude_s": 377.9109336498297,
+      "phase_deg": -65.69236015672875,
+      "delta_r2": 0.4987227713723672,
+      "rms_post_s": 56.124006944777655,
+      "jse_interpretations": [
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.05362288521011002
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.1094396532797441
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 168,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.26983270372369894
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.295569975575349
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 48,
+          "base_yr": 68782.97435897436,
+          "error_pct": 1.0253642741500157
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.0253642741500206
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.082557699132453
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.2619225337514852
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.518919494403265
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.5423464960022932
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 29,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.7269293038316054
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "n": 1846,
+      "period_yr": 1453.1614301191767,
+      "amplitude_s": 377.24334771447803,
+      "phase_deg": -65.1099425425061,
+      "delta_r2": 0.4987120367538259,
+      "rms_post_s": 56.13610121015438,
+      "jse_interpretations": [
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 168,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.10834236186349169
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.2687395574989796
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 123,
+          "base_yr": 11.8598,
+          "error_pct": 0.38495171733016637
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.6722191985494326
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.7042253521126661
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.1454809442736973
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.1587542534377886
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.4084507042253593
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.4084507042253724
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.4562339517531198
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.6349212073962491
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "n": 1854,
+      "period_yr": 1446.891046386192,
+      "amplitude_s": 378.0005370370872,
+      "phase_deg": -65.77544720177725,
+      "delta_r2": 0.4987118527074553,
+      "rms_post_s": 56.13630854511905,
+      "jse_interpretations": [
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.00031471711842153734
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.163465254819552
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.24176294372190982
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 169,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.2696871628910541
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 48,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.9708737864077785
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 0.9708737864077885
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.029175377329512
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.2086370089450897
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.5720376608032511
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.5971453877972133
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 29,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.6720604099244818
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "n": 1845,
+      "period_yr": 1453.9490514905149,
+      "amplitude_s": 377.14232225231916,
+      "phase_deg": -65.02662602693687,
+      "delta_r2": 0.49869817981332876,
+      "rms_post_s": 56.151709419156276,
+      "jse_interpretations": [
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 168,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.1626016260162648
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.3227651590387825
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 123,
+          "base_yr": 11.8598,
+          "error_pct": 0.3305720035071259
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.6504065040650384
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.7260262304028674
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.0919012591486543
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.1039553616428595
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.355013550135509
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.463414634146354
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.5096162735560656
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.6882067322026346
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "n": 1855,
+      "period_yr": 1446.111051212938,
+      "amplitude_s": 378.08867161532964,
+      "phase_deg": -65.85850500841738,
+      "delta_r2": 0.49869778940870624,
+      "rms_post_s": 56.15214910107589,
+      "jse_interpretations": [
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.054252319446967935
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.18795591186846755
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 169,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.21563342318059914
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.21749085635937296
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 48,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.9164420485175245
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 0.9164420485175295
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 0.9757930555265587
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.1553514841386958
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 29,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.6172506738544417
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.6250985569429894
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.6519442795921486
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "n": 1844,
+      "period_yr": 1454.7375271149674,
+      "amplitude_s": 377.03991046096894,
+      "phase_deg": -64.94328137695315,
+      "delta_r2": 0.4986812747883418,
+      "rms_post_s": 56.17074506278988,
+      "jse_interpretations": [
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 168,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.21691973969630157
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 123,
+          "base_yr": 11.8598,
+          "error_pct": 0.2761922896840876
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.37679076057860283
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.5965292841648644
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.7798332622562999
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.0382634615668382
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.0491564698479436
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.301518438177882
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.5184381778741913
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.562998595359007
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.7414922570090279
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "n": 1856,
+      "period_yr": 1445.3318965517242,
+      "amplitude_s": 378.17532835373066,
+      "phase_deg": -65.94153345226155,
+      "delta_r2": 0.4986805711535115,
+      "rms_post_s": 56.17153724013906,
+      "jse_interpretations": [
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.10818992177551279
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.1341488800150281
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 169,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.16163793103448734
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.2715164578991834
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 48,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.8620689655172382
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 0.8620689655172584
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 0.9224107337236149
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.1020659593323026
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 29,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.5624999999999944
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.6781022753929218
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.7067431713870682
+        }
+      ]
+    },
+    {
+      "rank": 14,
+      "n": 1843,
+      "period_yr": 1455.5268583830712,
+      "amplitude_s": 376.93612162498863,
+      "phase_deg": -64.85990871348018,
+      "delta_r2": 0.49866133279015334,
+      "rms_post_s": 56.19319215331199,
+      "jse_interpretations": [
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 123,
+          "base_yr": 11.8598,
+          "error_pct": 0.22181257586104522
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 168,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.27129679869778306
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.430816362118417
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.5425935973955488
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.8336402941097514
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 0.9845674569339294
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 0.9943575780530043
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.2479652740097746
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.5735214324471145
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.616380917161964
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.79477778181543
+        }
+      ]
+    },
+    {
+      "rank": 15,
+      "n": 1857,
+      "period_yr": 1444.5535810446956,
+      "amplitude_s": 378.26049825090325,
+      "phase_deg": -66.02453240858385,
+      "delta_r2": 0.49866018770458054,
+      "rms_post_s": 56.19448081108514,
+      "jse_interpretations": [
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.08034184816157962
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 169,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.10770059235324415
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.16212752410405862
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.32554205943900894
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 48,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.8077544426494242
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 0.8077544426494393
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 0.8690284119206516
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.0487804345258993
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 29,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.5078082929455932
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.7310489085241145
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.761542063182009
+        }
+      ]
+    },
+    {
+      "rank": 16,
+      "n": 1842,
+      "period_yr": 1456.317046688382,
+      "amplitude_s": 376.83096505030176,
+      "phase_deg": -64.7765081570918,
+      "delta_r2": 0.4986383650024666,
+      "rms_post_s": 56.219034024077715,
+      "jse_interpretations": [
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 123,
+          "base_yr": 11.8598,
+          "error_pct": 0.16743286203802266
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 167,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.2714440825190088
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.4848419636582382
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.4885993485342077
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.8874473259631868
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 0.9308131504501924
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 0.9395586862580891
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.1943539630836129
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.628664495114016
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.6697632389649215
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.8480633066218146
+        }
+      ]
+    },
+    {
+      "rank": 17,
+      "n": 1858,
+      "period_yr": 1443.7761033369213,
+      "amplitude_s": 378.34417233564693,
+      "phase_deg": -66.10750175231902,
+      "delta_r2": 0.4986366289111108,
+      "rms_post_s": 56.220986879045675,
+      "jse_interpretations": [
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.026534816308145866
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 169,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.05382131324004459
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.216065126432606
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.3795676609788275
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 0.7534983853605951
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 48,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.7534983853606001
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 0.8156460901176922
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 0.9954949097195126
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 29,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.4531754574811448
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.7839385485087504
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.8163409549769391
+        }
+      ]
+    },
+    {
+      "rank": 18,
+      "n": 1841,
+      "period_yr": 1457.108093427485,
+      "amplitude_s": 376.72445006347874,
+      "phase_deg": -64.69307982800875,
+      "delta_r2": 0.49861238268022723,
+      "rms_post_s": 56.24825334229522,
+      "jse_interpretations": [
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 123,
+          "base_yr": 11.8598,
+          "error_pct": 0.11305314821496541
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 167,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.21727322107550862
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.43454644215100335
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.5388675651980562
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 0.8770004471098514
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 0.8847597944631479
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.9412543578166263
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.1406844106463963
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.6838674633351456
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.7231455607678772
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.9013488314282199
+        }
+      ]
+    },
+    {
+      "rank": 19,
+      "n": 1859,
+      "period_yr": 1442.999462076385,
+      "amplitude_s": 378.4263416676962,
+      "phase_deg": -66.19044135806482,
+      "delta_r2": 0.49860988470995604,
+      "rms_post_s": 56.25106172132203,
+      "jse_interpretations": [
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 169,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.0
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.027272215545306972
+        },
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 122,
+          "base_yr": 11.8598,
+          "error_pct": 0.2700027287611459
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.43359326251865005
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 48,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.6993006993006893
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 0.6993006993006993
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 0.762263768314742
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 0.9422093849131076
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 29,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.398601398601381
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 1.8367712873207511
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 1.8711398467718636
+        }
+      ]
+    },
+    {
+      "rank": 20,
+      "n": 1840,
+      "period_yr": 1457.9,
+      "amplitude_s": 376.6165860110198,
+      "phase_deg": -64.60962384609746,
+      "delta_r2": 0.498583397148453,
+      "rms_post_s": 56.28083212229789,
+      "jse_interpretations": [
+        {
+          "label": "Jupiter orbit",
+          "op": "\u00d7",
+          "multiplier": 123,
+          "base_yr": 11.8598,
+          "error_pct": 0.05867343439192421
+        },
+        {
+          "label": "Earth ecliptic perihelion (8H/11)",
+          "op": "\u00f7",
+          "multiplier": 167,
+          "base_yr": 243866.9090909091,
+          "error_pct": 0.16304347826085722
+        },
+        {
+          "label": "Jupiter ecliptic perihelion (8H/39)",
+          "op": "\u00f7",
+          "multiplier": 47,
+          "base_yr": 68782.97435897436,
+          "error_pct": 0.3804347826086868
+        },
+        {
+          "label": "J-S synodic",
+          "op": "\u00d7",
+          "multiplier": 73,
+          "base_yr": 19.852824801672995,
+          "error_pct": 0.5928931667378736
+        },
+        {
+          "label": "Bond 1470",
+          "op": "\u00f7",
+          "multiplier": 1,
+          "base_yr": 1470.0,
+          "error_pct": 0.8231292517006841
+        },
+        {
+          "label": "de Vries 210",
+          "op": "\u00d7",
+          "multiplier": 7,
+          "base_yr": 210.0,
+          "error_pct": 0.829960902668216
+        },
+        {
+          "label": "Saturn orbit",
+          "op": "\u00d7",
+          "multiplier": 49,
+          "base_yr": 29.457,
+          "error_pct": 0.9950613896700843
+        },
+        {
+          "label": "Saturn ecliptic perihelion (8H/65)",
+          "op": "\u00f7",
+          "multiplier": 28,
+          "base_yr": 41269.78461538462,
+          "error_pct": 1.0869565217391266
+        },
+        {
+          "label": "Earth axial precession (H/13)",
+          "op": "\u00f7",
+          "multiplier": 18,
+          "base_yr": 25793.615384615383,
+          "error_pct": 1.7391304347826229
+        },
+        {
+          "label": "Jose 179",
+          "op": "\u00d7",
+          "multiplier": 8,
+          "base_yr": 179.0,
+          "error_pct": 1.7765278825708215
+        },
+        {
+          "label": "Great Conjunction trigon (3\u00d7J-S)",
+          "op": "\u00d7",
+          "multiplier": 24,
+          "base_yr": 59.558474405018984,
+          "error_pct": 1.9546343562346198
+        }
+      ]
+    }
+  ],
+  "families_in_top10": {
+    "J-S synodic": [
+      1850,
+      1851,
+      1852
+    ],
+    "Earth ecliptic perihelion (8H/11)": [
+      1849,
+      1848,
+      1847,
+      1846,
+      1845
+    ],
+    "Jupiter orbit": [
+      1853,
+      1854
+    ]
+  },
+  "bond_rank": 50
+}

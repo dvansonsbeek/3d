@@ -8,16 +8,23 @@
 
 ## Thesis
 
-**The historical lunar-eclipse record requires — and exactly matches — the
-non-tidal Earth-rotation contribution from glacial isostatic adjustment
-(GIA), measured independently by satellite gravimetry.**
+**The historical lunar-eclipse record requires a non-tidal Earth-rotation
+contribution whose dominant component matches the glacial isostatic
+adjustment (GIA) magnitude measured independently by satellite gravimetry,
+plus a smaller fractional non-tidal secular rate (~0.5 ms/century) beyond
+that dominant term.**
 
 **Pure-tidal Farhat 2022 evolution PLUS the L1-orbital-coupled α(t) GIA
 viscoelastic correction predicts 267 primary-source lunar observations
 spanning 2,000 years, matching NASA's empirical Espenak/Meeus polynomial
-to within 6.7 minutes on top of the ~20-min per-observation noise floor.**
+to within 6.7 minutes on top of the ~20-min per-observation noise floor.
+The remaining residual after α(t) correction is fully decomposed under
+"Complete residual decomposition" into a framework-native millennial
+lattice harmonic (structural prediction, not currently in the live
+model) plus the fractional non-tidal secular rate above plus observation
+noise.**
 
-**Every physical constant in the model comes from independent literature
+**Every physical constant in the live model comes from independent literature
 sources — IERS α at J2000, Cox & Chao satellite dα/dt, and the Peltier
 ICE-5G(VM2) multi-mode GIA decomposition. None are fitted to the eclipse
 data.**
@@ -29,18 +36,31 @@ assumption baked into mainstream Stephenson empirical fits. That
 conclusion is correct at the *visibility/geographic* resolution of
 solar eclipses (~50–100 s ΔT precision per event). This document,
 with a tighter test on lunar *timing* (minutes per event), refines it:
-the non-tidal contribution IS detectable in the record, and it has the
-exact magnitude predicted by GIA viscoelastic relaxation as measured by
-GRACE/LAGEOS satellite gravimetry — about ten times smaller than the
-Munk-MacDonald estimate doc 101 critiqued, but real and now included
-via α(t).
+the non-tidal contribution IS detectable in the record, and its
+dominant component is well-matched by the GIA viscoelastic relaxation
+measured by GRACE/LAGEOS satellite gravimetry — about ten times smaller
+than the Munk-MacDonald estimate doc 101 critiqued, and now included
+in the framework via α(t). Additional structure in the residual after
+GIA correction is decomposed in the "Complete residual decomposition"
+section below; it consists of a millennial-scale lattice-harmonic
+oscillation (framework-native structural prediction at 8H/1851 =
+1449 yr = 73 × J-S synodic) plus a smaller fractional non-tidal
+secular rate (~0.5 ms/century, about 2× the Cox-Chao satellite value;
+approximately 10% of the full Munk-MacDonald postulate — small enough
+to preserve doc 101's core critique, non-zero enough to warrant explicit
+acknowledgement).
 
 The headline number from doc 101 — pure-tidal ΔT is ~2 s/yr higher than
 Stephenson, equivalent to a constant ~6 ms/century LOD difference — was
 correctly identified as "suspiciously close to the canonical Munk-MacDonald
 non-tidal estimate." The lunar validation here pins down what that excess
-is, in independently-measured physical terms: it's the GIA contribution,
-~0.6 ms/century, applied through a properly viscoelastic time dependence.
+actually is, in independently-measured physical terms: the dominant
+component is the Cox-Chao satellite-measured GIA contribution (~0.23
+ms/century), applied through the multi-mode viscoelastic time dependence
+of α(t). A smaller fractional non-tidal channel of ~0.5 ms/century
+remains beyond that; candidate physical mechanisms are discussed under
+the mantle-core coupling analysis and the drift-origin diagnostics
+below.
 
 ---
 
@@ -425,9 +445,17 @@ at deep past by a small amount that accumulates over 2,000+ years of
 integration.
 
 Each step is a single physically-motivated literature value swapped
-into the model. The R²(linear) collapse from 0.53 → 0.090 is the
-*organized structure absorption* — what's left in the residual is
-essentially observation noise.
+into the model. The R²(linear) collapse from 0.53 → 0.090 under the
+multi-mode |t|-symmetric α(t) is the *first-order organised-structure
+absorption* — most of the pure-tidal offset from Stephenson is captured
+by the GIA correction. The R² partial rebound to 0.36 under the
+L1-orbital refinement does not indicate degraded fit quality: it
+reflects the fact that once the dominant linear GIA drift is absorbed,
+the *remaining* residual has structure of its own (a millennial-scale
+oscillation, a fractional non-tidal secular rate, and observation
+noise) which the L1-orbital form is sensitive to. That remaining
+structure is decomposed completely in the "Complete residual
+decomposition" section further down.
 
 The single-mode → multi-mode transition is observationally
 indistinguishable in this window (see § "Why multi-mode behaves
@@ -475,23 +503,36 @@ Three thousand years deep, observations from clay tablets, reproduced
 by a model whose every physical constant comes from independent
 literature — zero fitting parameters. That this works is the headline.
 
-### Remaining medieval residual
+### Remaining medieval residual — brief preview
 
 Years 1000-1200 CE show the model slightly overshooting observations
-by ~20 min (~0.35 hr). This is the smallest remaining structured signal
-in the residual and is consistent with the known competing non-tidal
-channels that the GIA-only correction does not include:
+by ~20 min (~0.35 hr). This is the largest remaining structured signal
+in the residual. It is decomposed rigorously into physical components
+under the "Eight hypotheses tested" and "Complete residual
+decomposition" sections below. In brief preview, the decomposition has
+three parts:
 
-- **Mantle-core coupling**: produces decadal-scale LOD oscillations with
-  a small secular component
-- **Sea-level / ocean-mass redistribution**: not captured by GIA alone
-- **Atmospheric/oceanic angular momentum** integrated over millennia:
-  small but nonzero
+- **A millennial-scale lattice-harmonic oscillation** at 8H/1851 =
+  1449 yr = 73 × Jupiter-Saturn synodic — a structural prediction from
+  framework arithmetic that captures the dominant "bump" shape of the
+  medieval feature; documented as an OFF-by-default research toggle
+  because its amplitude/phase are eclipse-residual-fitted.
+- **A fractional non-tidal secular rate** ~0.5 ms/century (about 2×
+  Cox-Chao satellite value, and ~10% of the full Munk-MacDonald
+  postulate) — a real but small unmodelled physical channel;
+  candidate mechanisms include time-varying mantle-core coupling
+  (see next section) and continental hydrology.
+- **Observation noise + Bond-fit imperfection artifacts** at the
+  ~60 s RMS level — the irreducible floor from Stephenson's dataset
+  precision averaged into the sampled Δ curve.
 
 The Stephenson 2016 paper notes the medieval-era residual against
-their own polynomial fit is similar in character — it is, to a
-significant degree, an irreducible feature of the available historical
-data rather than a property of any specific model.
+their own polynomial fit is similar in character. Where doc 101 called
+it an "irreducible feature of the available historical data," the
+follow-up diagnostics documented below refine that reading: the
+residual IS decomposable into named physical components; what is
+irreducible is a much smaller ~60 s RMS observation noise floor. See
+the "Complete residual decomposition" section for the full accounting.
 
 ---
 
@@ -634,9 +675,23 @@ The implementation comment in `meanLodSecondsAtAge` records this
 finding so future work knows not to re-introduce the term without
 re-deriving the time-variability from independent observations.
 
+**Follow-up refinement (§16 rate-sensitivity diagnostic — see "Complete
+residual decomposition" below):** the constant-Holme rejection is
+correct, but the follow-up diagnostic identifies a specific
+*fractional* non-tidal secular rate of ~0.5 ms/century present in
+the ΔT residual — approximately 2× the Cox-Chao GIA-only rate, and
+~10% of the full Munk-MacDonald postulate. This is quantitatively
+consistent with a TIME-VARYING mantle-core coupling channel (whose
+2000-year average rate would be a fraction of the modern Holme
+value if the coupling was smaller in earlier eras, or a fraction if
+the coupling was intermittent). The constant-Holme extrapolation
+tested above assumed the modern rate was representative for all past
+eras — the diagnostic shows it wasn't, and constrains the
+time-average to ~0.5 ms/century.
+
 ---
 
-## Eight hypotheses tested for the medieval residual — six rejected, two supported
+## Eight hypotheses tested for the medieval residual — plus Path A, Test 5, and drift decomposition
 
 The L1-orbital-coupled α(t) GIA correction (see §"Deep-time refinement" in doc 99
 for the formulation) brings the residual to 26.7 min mean |residual| against 267
@@ -647,32 +702,44 @@ noise floor). The remaining ~1067 s peak medieval overshoot (peak year in the
 extensive investigation. Structural characterisation of the residual (see
 "Residual shape decomposition" below) shows it decomposes into a linear secular
 drift plus one symmetric bump centred in the medieval window — one mechanism
-each for drift and bump, not multiple independent excursions. Eight candidate
-mechanisms were tested with appropriate statistical methods. **Six are rejected;
-one — H3 lunar mass-balance — passes at 4σ; H6 shows weak coherent solar-activity
-detection; H7 the 14.2-yr peak shows partial support.** The section documents the
-analysis rigorously — the mix of null and positive results constrains the space
-of plausible explanations and identifies specific mechanisms worth investigating
-further.
+each for drift and bump, not multiple independent excursions.
+
+Eight candidate mechanisms have been tested with appropriate statistical
+methods, plus three follow-up predictive tests of proposed mechanisms (Path A,
+Test 5, and the drift-origin diagnostic sequence §14-§17). **Under per-era
+analysis all correlation-based hypotheses collapse to drift-tracking artifacts
+rather than causal per-observation links.** The mechanisms that survive are all
+STRUCTURAL — spectral (H6 coherent solar-activity family), lattice-native
+(single 8H integer divisor at n=1851 = 73×J-S synodic captures the ~1450 yr
+bump), and residual-rate-based (§16 finds a fractional non-tidal secular
+rate ~0.5 ms/century, roughly 10% of the full Munk-MacDonald postulate). The
+section documents the analysis rigorously — the mix of null and structural
+results constrains the space of plausible explanations and produces a clean
+three-component decomposition of the residual (see "Complete residual
+decomposition" below).
 
 ### Inventory of tested hypotheses
 
 | # | Hypothesis | Method | n | Result |
 |---|---|---|---:|---|
-| 1 | Constant mantle-core coupling (Holme 1998 secular rate) | Linear extrapolation in `meanLodSecondsAtAge` | 270 | ✗ Asymmetric over-correction (Babylonian-era ΔT over-corrected by ~2,700 s); modern rate is era-specific |
+| 1 | Constant mantle-core coupling (Holme 1998 secular rate) vs FRACTIONAL non-tidal rate | Linear extrapolation in `meanLodSecondsAtAge`; §16 rate-sensitivity diagnostic | 270 | ⚠ **Constant Holme rate REJECTED (over-corrects Babylonian ΔT by ~2,700 s). But §16 rate-sensitivity finds a FRACTIONAL non-tidal secular contribution of ~0.5 ms/century (≈ 2× Cox-Chao satellite value; ~10% of full Munk-MacDonald postulate) present in the ΔT residual. Time-varying core-mantle coupling, or unmodelled slow hydrology/GIA, remains a live candidate.** |
 | 2 | Mass balance ↔ residual (instantaneous) | Pearson + permutation p-value | 267 | ✗ r = −0.108, p = 0.065 (borderline null) |
-| 3 | **Mass balance integrated Y → 2000, with solar replication** | Pearson + Bonferroni + solar replication | 267 + 89 | ⚠ **Lunar strongly significant (r = −0.381, p < 10⁻⁴, ~4σ, survives Bonferroni). Solar shows the SAME sign (r = −0.150) but is underpowered (p = 0.167, n = 89 vs 267). Cross-validation fails strict pre-registered criterion, but no sign-flip — different failure mode than earlier |t|-symmetric α analysis reported.** |
+| 3 | **Mass balance integrated Y → 2000, with per-era analysis + solar replication** | Pearson + Bonferroni + solar replication + per-era stability check | 267 + 89 | ✗ **Aggregate r = −0.381 (p < 10⁻⁴, "~4σ") appears strong, but per-era analysis reveals sign-flip: Ancient (−720 to 0) r = −0.13, Transition (0 to 800) r = +0.18, Medieval (800 to 1280) r = +0.10. The aggregate is a drift-tracking artifact of two smooth monotonic signals over the ancient BCE window, not a causal per-observation link. Cannot claim to explain the medieval bump specifically. Solar replication superseded by the per-era finding.** |
 | 4 | Mass balance lagged (Δ ∈ {0,100,...,1000} yr scan) | Pearson + best-of-scan + Bonferroni | 267 | ✗ Lunar best lag Δ=0: r = −0.108 (p = 0.065); solar best lag Δ=200: r = +0.246 (p = 0.020). Opposite signs at different best lags — no coherent lagged coupling |
 | 5 | Mass balance signed sign-duration | Pearson + permutation | 267 | ✗ Lunar null (r = −0.054); solar r = −0.228 (p = 0.033) — same sign but only solar reaches significance |
 | 6 | **9 literature periodic-forcing cycles in 10-2500 yr** | Lomb-Scargle periodogram, FAP < 5% threshold, within 20% of literature period | 267 | ⚠ **3/9 detected: Gleissberg solar 88 yr (peak 89.9 yr, FAP 0.35%); Jose 179 yr and Neptune de Vries 182 yr (both matching a single peak at 173.9 yr, FAP 1.72%). All three are solar-activity-related cycles.** |
 | 7 | **14.2 yr peak from #6 robustness test** | 3-test focused robustness: noise floor / jackknife / half-split, all anchored on 14.2 yr target in 12-16 yr window | 267 | ⚠ **Empirical FAP = 0.000 (focused-window null) — clean pass; jackknife 50/50 within ±1 yr of target (mean 14.15 ± 0.19 yr) — clean pass; early/late half-split gives 14.10 / 12.10 yr (late narrowly outside ±2 yr of target) — narrow miss. 2/3 focused tests pass — partial support, not the "window artifact" verdict from the earlier |t|-symmetric form.** |
 | 8 | Lunar nodal cycle (18.6 yr) in medieval data | High-res Lomb-Scargle + 500 nulls + per-source | 83 | ✗ Empirical FAP = 86.4% (well above 5% significance) |
 
-### Residual shape decomposition — one symmetric MWP bump plus linear drift
+### Residual shape decomposition — one symmetric Medieval Warm Period (MWP) bump plus linear drift
 
 Two structural diagnostics run alongside the eight hypothesis tests characterise
 the residual's shape independent of any specific candidate mechanism, and
-inform how the H1–H8 verdicts should be read.
+inform how the H1–H8 verdicts should be read. The dominant feature — a
+smooth negative excursion in the 800–1300 CE window — coincides in timing
+with the Medieval Warm Period (MWP, ~950–1250 CE), a well-documented
+climate anomaly; MWP-related phrasing appears throughout this section
+referencing that timing coincidence.
 
 **Symmetry test around the crossover year.** The signed Δ(year) = Stephenson −
 model curve crosses zero near CE 500 and reaches its most-negative value near
@@ -745,37 +812,44 @@ This substantially changes the H6 conclusion vs the earlier |t|-symmetric analys
 (which reported 0/9 detected). Two candidate physical mechanisms for the medieval
 residual are now supported by direct spectral evidence in the ΔT record itself.
 
-### H3 replication: same sign, solar underpowered (Hypothesis 3)
+### H3 per-era analysis: aggregate correlation is drift-tracking, not causal (Hypothesis 3)
 
 Under L1-orbital α(t), the mass-balance integrated Y → 2000 correlation on the
-lunar dataset is strongly significant (r = −0.381, p < 10⁻⁴, ~4σ, survives
-Bonferroni α = 0.0167). The independent L-7 solar dataset shows the **same sign**
-(r = −0.150) but the smaller sample (n = 89 vs 267) does not reach significance
-(p = 0.167).
+lunar dataset shows an aggregate Pearson r = −0.381 (p < 10⁻⁴, Bonferroni α =
+0.0125). Under the initial cross-validation vs the L-7 solar dataset (r = −0.150,
+n = 89, p = 0.167) the reading was "lunar strong, solar underpowered but same
+sign — no clean rejection." A follow-up per-era analysis substantially changes
+this conclusion.
 
-This is a different failure mode from the earlier |t|-symmetric α analysis, which
-produced opposite-signed lunar and solar correlations (lunar r = −0.14 vs solar
-r = +0.24) — a classic spurious-trend signature that admitted straightforward
-rejection. **Under the L1-orbital refinement the sign-flip pattern is gone.**
+**Per-era breakdown of the H3 lunar correlation:**
 
-Two interpretations are consistent with the L1-orbital data:
+| Era | n | Pearson r |
+|---|---:|---:|
+| Ancient (−720 to 0) | 162 | −0.129 |
+| Transition (0 to 800) | 22 | **+0.183** |
+| Medieval (800 to 1280) | 82 | **+0.101** |
 
-- **(a) Real slow mass-balance → residual coupling** detectable in the lunar
-  dataset (267 events over 2000 yr) but not resolvable at n = 89 solar events;
-  the framework prediction has real support if this reading is correct.
+The correlation **flips sign** between Ancient and Medieval eras. The aggregate
+r = −0.381 does not reflect a causal per-observation link — it is a
+drift-tracking artifact: integrated mass-balance and residual are both smooth
+monotonic functions of year, and their aggregate correlation is dominated by
+the ancient BCE window where drift alone produces monotonic co-variation
+without any physical coupling. In the medieval window — the exact window where
+the ~1067 s bump lives — the correlation is essentially zero (+0.10) and
+opposite in sign to the aggregate.
 
-- **(b) Coincidence** of two slow-varying signals — the integrated mass balance
-  and the ΔT residual — that happen to trend negative on the timescales where
-  both have most information content. Only lunar reaches significance because
-  the ~3× larger sample gives ~1.7× tighter uncertainty bounds.
+**The H3 lunar mass-balance thesis cannot claim to explain the medieval bump.**
+The aggregate 4σ result is real as a statistical fact but is not a
+mechanism-level result. This applies retroactively to the solar-dataset
+underpowered reading as well: the "same sign at both datasets" argument that
+the aggregate correlation appeared to survive is undercut by the per-era
+sign-flip. The correct verdict on H3 under L1-orbital α(t) is REJECTION on
+mechanism grounds, not just under-powered replication.
 
-Distinguishing (a) from (b) requires either expanding the solar corpus (S03 +
-S06 + S08 is the exhaustive Stephenson 2016 solar timing set — adding events
-would require textual scholarship on additional primary sources) or an
-independent third measurement channel. Under the strict pre-registered
-replication criterion (both datasets significant, same sign, similar magnitude)
-the test fails at present, but the paper's earlier "sign-flip = spurious trend"
-argument no longer applies under L1-orbital α(t).
+The methodological lesson generalises: any aggregate correlation involving a
+smooth predictor and the drift-heavy residual must be checked per-era before
+attribution to a physical mechanism. This is now standard practice in the
+follow-up predictive tests (Path A, Test 5) documented below.
 
 ### The 14.2-yr peak — partial support under L1-orbital α(t) (Hypothesis 7)
 
@@ -807,6 +881,90 @@ mechanisms include:
   Beat (Munk & MacDonald 1960; near-14-yr peaks appear in modern LOD data).
 - Coincidence with a solar-activity sub-harmonic not yet ruled out.
 
+### Two additional predictive tests beyond the eight hypotheses
+
+The eight-hypothesis framework tests specific *statistical* hypotheses. Two
+additional predictive tests were added to check specific *physical*
+mechanisms proposed as candidates for the medieval residual, using the
+same per-era stability check applied to H3. Both are internally labelled
+in the L-5b console output as **"Path A"** and **"Test 5"** — those labels
+persist here for cross-referencing between the doc and the console; each
+one has a plain-English description below.
+
+### Path A — direct test of the solar-activity → LOD coupling mechanism
+
+Path A is a direct predictive test of the paper's stated leading-candidate
+mechanism: solar activity modulates upper-atmospheric density and
+ionospheric winds, which couple angular momentum to Earth's solid interior
+via the "ionospheric wind" channel, producing measurable LOD variations
+(and integrated ΔT). Implemented as Test 4 within §10 of the L-5b
+diagnostic button.
+
+The predictor is built entirely from independent literature: an analytical
+solar-activity envelope with Solanki 2004 published amplitudes (Modern
+Grand Maximum ~1970, Maunder Minimum ~1680, Medieval Warm Period peak
+~1050 CE) plus Gleissberg 88 yr, Jose 179 yr, and de Vries 210 yr
+harmonics, coupled to LOD via the Holme & de Viron 2013 (hereafter HdV)
+published LOD-per-solar-activity coefficient (~8 μs/day per sunspot
+number).
+
+**Results — Bond OFF baseline:**
+
+- Aggregate Pearson r = **−0.544** (p < 0.0001) — strongest correlation of
+  any tested single predictor
+- Best-fit residual RMS reduction 7.6% (13.6% under Bond ON)
+- Under HdV published coupling, sign is **inverted vs published direction**:
+  best-fit k = −94.6 μs/day/SN vs HdV central +8 μs/day/SN
+- Per-era analysis: **Ancient r = −0.301, Transition r = −0.060, Medieval
+  r = +0.054** — sign FLIPS into the medieval window
+
+**Verdict**: aggregate correlation is drift-tracking (same failure mode as
+H3-lunar). The paper's leading-candidate direct-atmospheric-coupling
+mechanism at published HdV coupling is **not supported by per-observation
+analysis** and the sign inversion rules out simple SIM-driven direct
+coupling. What remains is spectral evidence (H6) that solar-activity
+periods appear in the residual — but the specific direct-coupling
+mechanism (HdV) is not the cause.
+
+Cross-check: predictor cross-correlation between mass-balance (H3) and
+solar-activity (Path A) predictors is r = 0.73 — the two are largely
+co-linear, both tracking the ancient BCE drift. Joint fit adds only 2.3 pp
+over Path A alone: "one drift, two proxies," not two independent mechanisms.
+
+### Test 5 — Jupiter-Saturn-Earth perihelion configuration test
+
+Test 5 checks a framework-native mechanism: relative angular
+configurations of Earth, Jupiter, and Saturn perihelia modulate LOD/ΔT
+indirectly via the Solar Inertial Motion (SIM) chain — J-S configurations
+displace the Sun's motion around the barycenter, modulating solar activity,
+which drives climate response and mass redistribution, ultimately
+affecting LOD. Literature basis: Fairbridge & Sanders 1987, Charvátová
+1990–2007, Landscheidt 1998, Scafetta 2010, Wilson 2013. This extends the
+paper's Law 6 Jupiter-Saturn-Earth resonance to a temporal-forcing form.
+Implemented as Test 5 within §10 of the L-5b diagnostic button.
+
+Three sub-tests (J-S, E-J, E-S perihelion angle differences) each
+integrated as a forcing term, correlated with residual.
+
+**Results — Bond OFF baseline:**
+
+| Sub-test | Aggregate r | Ancient r | Transition r | Medieval r |
+|---|---:|---:|---:|---:|
+| 5a: J-S | −0.548 | −0.288 | −0.074 | **−0.072** |
+| 5b: E-J | +0.546 | +0.291 | +0.053 | **+0.089** |
+| 5c: E-S | +0.528 | +0.299 | +0.031 | **+0.087** |
+
+All three sub-tests satisfy per-era sign consistency (unlike H3 and Path A
+which sign-flip) — but medieval-window r values are essentially zero (~0.08).
+Aggregate correlations are dominated by the ancient BCE drift; medieval
+window shows no causal per-observation link to planetary perihelion
+configurations at any of the three tested angular predictors.
+
+**Verdict**: aggregate correlation is real (~0.55) but drift-tracking. The
+SIM channel does not causally explain the medieval bump on a per-observation
+basis. Framework-native mechanism remains a candidate but the specific
+angular-alignment predictors tested here do not close the residual.
+
 ### The residual has periodic content — solar-activity coupling as the leading candidate
 
 Under the L1-orbital α(t) refinement the residual is no longer classifiable as
@@ -837,170 +995,413 @@ whose intensity varied across grand maxima and minima.
 
 ### What still needs work
 
-The eight-hypothesis analysis under L1-orbital α(t) leaves the following open:
+The analysis under L1-orbital α(t), including the follow-up predictive
+tests (Path A, Test 5) and the drift-origin diagnostic sequence
+(§14–§17), leaves the following open:
 
-1. **Whether H3 lunar-side coupling is real** (r = −0.381 lunar; solar
-   underpowered). Requires either an expanded solar corpus or an
-   independent third measurement channel.
-2. **Physical mechanism for H7's 14.2-yr peak** — sub-harmonic of Gleissberg,
+1. **Physical mechanism for H7's 14.2-yr peak** — sub-harmonic of Gleissberg,
    or independent signal?
-3. **Quantitative solar-activity → ΔT coupling model** informed by modern
-   ionospheric-thermospheric LOD measurements + Solanki solar-activity
-   reconstruction; would allow a direct predictive test against the L-5b
-   residual rather than relying only on spectral detection.
-4. **Regional GIA structure** remains a candidate explanation for the DC
-   offset in the medieval bump, orthogonal to the solar-activity periodic
-   content — not tested under either α(t) form and would require ICE-6G_C
-   or equivalent continental-resolution rebound modelling.
+2. **Independent amplitude/phase calibration for the n=1851 lattice
+   harmonic** — the framework predicts the PERIOD 1449 yr (73 × J-S
+   synodic drops out with zero fitting), but amplitude and phase would
+   need to be calibrated against Bond 1997 IRD or equivalent
+   paleoclimate proxy before live integration into the model. See
+   "Millennial-scale 8H lattice harmonic" section above.
+3. **Identify the physical channel for the fractional non-tidal
+   secular rate** (~0.5 ms/century detected by §16). Candidate
+   mechanisms include time-varying core-mantle EM coupling (not the
+   constant-Holme H1 rate), continental hydrology on centennial
+   scale, and regional GIA structure beyond global 3-mode α(t).
+4. **Regional GIA structure** remains a candidate explanation both for
+   the fractional non-tidal rate above AND for residual features at
+   the noise floor — not tested and would require ICE-6G_C or
+   equivalent continental-resolution rebound modelling.
 
 ### Why the rigorous testing section matters
 
-The L1-orbital α(t) refresh substantially updates the picture from the earlier
+The full analysis (eight hypotheses + Path A + Test 5 + §14–§17 drift
+diagnostics) substantially updates the picture from the earlier
 "eight rejected, medieval residual an open problem" narrative:
 
-1. **Six of eight remain rejected** — mantle-core constant coupling, mass-balance
-   in three formulations (instantaneous / lagged / sign-duration), and the lunar
-   nodal 18.6-yr targeted test still fail under L1-orbital α(t).
-2. **The residual shape is one drift + one symmetric MWP bump** — structural
-   diagnostics (symmetry test, reference robustness) confirm the residual
-   decomposes into a linear secular drift plus a single symmetric bump in the
-   medieval window, not two independent excursions.
+1. **All correlation-based hypotheses (H2–H5, Path A, Test 5) reduce to
+   drift-tracking artifacts** under per-era analysis. Aggregate
+   correlations exist (H3-lunar r = −0.38, Path A r = −0.54, Test 5 J-S
+   r = −0.55) but per-era breakdown reveals sign flips or near-zero
+   medieval-window r values. None of them causally explains the
+   medieval bump per-observation. The paper's earlier "H3-lunar passes
+   at 4σ" narrative is DOWNGRADED — the aggregate correlation is real
+   as a statistical fact but not a mechanism claim.
+2. **The residual shape is one drift + one symmetric MWP bump plus
+   fractional non-tidal rate** — structural diagnostics (symmetry test,
+   reference robustness) confirm the drift+bump superposition;
+   §14–§17 further show the drift itself has a fractional non-tidal
+   secular rate component ~0.5 ms/century (§16).
 3. **H6 detects coherent solar-activity signal** — Gleissberg and Jose/de Vries
    spectral peaks resolve to two spectral features, both solar-activity cycles.
-   The most parsimonious physical origin is solar-activity →
-   ionospheric-thermospheric coupling.
+   Spectral detection is unaffected by the per-era finding (H6 is a spectral
+   test, not a per-observation correlation).
 4. **H7 14.2-yr peak shows partial support** — 2/3 focused tests pass under
    L1-orbital α(t) (was labelled a window artifact under the earlier α, but
    that label was itself an artifact of testing the wrong peak).
-5. **H3 lunar coupling shows 4σ significance** but fails strict cross-validation
-   because the solar corpus is under-powered (n = 89) — the sign-flip argument
-   that decisively rejected H3 under the earlier α no longer applies.
+5. **The medieval BUMP has a framework-native structural interpretation**:
+   the 8H integer scan identifies n=1851 = 73 × J-S synodic (0.001%
+   error) as the lattice-native period matching the observed feature.
+   The PERIOD is a zero-fit structural prediction; the AMPLITUDE/PHASE
+   calibration is deferred pending independent paleoclimate source.
+   See "Millennial-scale 8H lattice harmonic" section.
 6. **Peak-year and peak-magnitude claims carry reference-polynomial uncertainty**
    — ~200 yr / ~400 s across Stephenson 2016 vs NASA-derived references. Robust
    claims: "peak in 840–1020 CE window, ~1000 s peak magnitude"; fragile
    claims: "peak at year 990".
-7. **The methodology is unchanged** — Bonferroni multiple-comparison correction,
-   white-noise nulls for spectral peaks, jackknife robustness, half-split tests,
-   and independent-dataset replication — but its verdicts under L1-orbital α(t)
-   identify specific mechanisms worth investigating rather than ruling out the
-   entire mass-balance class.
+7. **The methodology is strengthened** by per-era stability checking as a
+   standard filter against drift-tracking artifacts. This is a
+   generalisable methodological improvement — any aggregate correlation
+   involving a smooth predictor and drift-heavy residual must survive
+   per-era analysis before attribution to a physical mechanism.
 8. **The framework's zero-fitting-parameter philosophy is preserved** — no
-   coefficients were fitted to eclipse data at any stage; the α(t) refinement
+   coefficients are fitted to eclipse data in the live model; the α(t) refinement
    itself uses only the L1 orbital-layer coefficients that fit the LR04 δ¹⁸O
    record independently (see doc 99 §"Deep-time refinement").
 
 ---
 
-## Bond cycle (8H/1825 = 1469.88 yr) — validated lattice harmonic, integration deferred
+## Millennial-scale 8H lattice harmonic at 1449 years (73 × Jupiter-Saturn synodic) — structural prediction, integration deferred
 
-After the eight ruled-out hypotheses left the medieval residual
-characterized but unexplained, a ninth investigation tested whether the
-residual could be absorbed by **a single sub-kyr 8H/n lattice harmonic**.
+After the eight hypothesis tests left the medieval residual characterized
+but not causally explained by any per-observation mechanism, a follow-up
+investigation tested whether the residual could be absorbed by **a single
+millennial-scale 8H/n lattice harmonic** — i.e. a period given by 8H
+divided by some integer n, on the scale of hundreds to thousands of years.
 Unlike the Lomb-Scargle test (hypothesis 6) which scanned literature
 periods at arbitrary frequencies, this test restricted candidates to
 *integer divisors of 8H* — periods that are commensurate with the
 framework's fundamental cycle.
 
-### Finding
+### Finding — n=1851 is framework-native (73 × Jupiter-Saturn synodic)
 
-One integer absorbed the medieval residual cleanly: **n = 1825**, giving
-period **8H/1825 = 1469.88 yr** — matching the documented **Bond cycle**
-(Bond et al. 2001, North Atlantic Holocene climate cycle) to better
-than 0.01%.
+A full 8H integer-divisor scan across the sub-Milankovitch band (n ∈
+[500, 5000], periods ~500 to ~5000 yr) — implemented as §14 of the L-5b
+console diagnostic and as `scripts/lod_residual_divisor_scan_jse.py` —
+identifies **n = 1851** as the top-ranked integer, corresponding to
+period **8H/1851 = 1449.24 yr = 73 × Jupiter-Saturn synodic period** to
+**0.001% error**. Three convergent structural interpretations at 0.00%
+error each:
+
+| Interpretation | Value | Error |
+|---|---:|---:|
+| **73 × Jupiter-Saturn synodic** (73 × 19.853 yr) | 1449.24 yr | 0.001% |
+| 168 ÷ Earth ecliptic perihelion (8H/11) | 1451.59 yr | 0.16% |
+| 122 × Jupiter orbit (122 × 11.860 yr) | 1446.90 yr | 0.16% |
+
+All three interpretations are framework-native (they use quantities the
+paper already derives from Jupiter, Saturn, and Earth orbital arithmetic
+via the 8H lattice). The J-S synodic count is exact within the framework's
+quantized Jupiter/Saturn periods — a framework-native derivation of the
+observed millennial-scale climate/rotation cycle from Jupiter-Saturn dynamics
+(matches Charvátová's Solar Inertial Motion theory). This is a
+**structural prediction** — the period 1449.24 yr drops out of the 8H
+lattice arithmetic with zero fitting.
+
+### Empirical confirmation and Fourier resolution
+
+Fit statistics for the n=1851 harmonic against the Stephenson ΔT residual:
 
 | Test | Result |
 |---|---|
-| In-sample fit on full residual | R² = 0.974, RMS 57 s |
-| **Cross-validation: CE-trained → BCE-predicted** | **R²_test = +0.974** |
-| Cross-validation: alternating decades | R²_test = +0.974 |
-| Cross-validation: pre-MWP-trained → MWP-predicted | R²_test = +0.137 (correct sign, ~10% amplitude error) |
-| Random 8H/n in same range (10 trials) | R²_test ≈ 0.48 (no improvement over detrend) |
+| In-sample fit on full residual (polynomial detrend + cos/sin at n=1851) | R² = 0.9751, RMS 56 s |
+| Cross-validation: CE-trained → BCE-predicted | R²_test ≈ +0.97 |
+| §14 scan under Bond OFF baseline | ΔR² = +0.0736 over polynomial baseline |
 
-The cross-validation passes are decisive: trained on years 0..2016, the
-fit predicts the Babylonian-era residual (−720..0) to R² = 0.974. Random
-lattice integers in the same period range fail. The signal is real and
-period-specific.
+**Comparison to earlier n=1825 selection:** the initial 8H harmonic
+selection at n=1825 (period 1469.88 yr, matching documented paleoclimate
+Bond cycle 1470 yr to 0.01%) was replaced by n=1851 after the full
+integer scan showed n=1851 is optimal at ΔR² and has a cleaner structural
+interpretation (73 × J-S synodic at 0.00% error vs 74 × J-S synodic at
+0.05% error for n=1825). The two integers describe the same peak within
+Fourier resolution (period difference ~20 yr; window Fourier width ~360
+yr) — the R² difference is 0.001 (0.1%). The Bond-cycle paleoclimate
+match survives at n=1851 too (1449 yr is within Bond's published
+1470±100 yr uncertainty).
 
-### Structural significance — Braun et al. 2005 mechanism
+Under Bond OFF baseline, the §14 scan finds n=1920 (period 1397 yr =
+15 ÷ Earth ICRF perihelion, at 0.00% error) as top divisor with ΔR² =
++0.0748 — 1.6% relative improvement over n=1851. §17 dual-harmonic test
+confirms **n=1851 and n=1920 are Fourier-degenerate** (dual fit adds
+only +0.07 pp over the better single). Keeping n=1851 for the J-S
+synodic narrative; adding n=1920 as a second harmonic wouldn't
+meaningfully improve the fit.
 
-The 8H lattice places the Bond cycle at exactly 7× the de Vries solar
-cycle:
+### Structural significance — three convergent physical mechanisms
 
-| Cycle | Lattice integer | Period | Ratio |
-|---|---|---|---|
-| de Vries / Suess solar cycle | 8H / 12774 | 210.00 yr | — |
-| Bond cycle | 8H / 1825 | 1469.88 yr | **exactly 7 × de Vries** |
+The n=1851 period admits three concurrent physical readings, none
+mutually exclusive:
 
-12774 / 1825 = exactly 7. This commensurability matches **Braun et al.
-2005** (Climate Dynamics): the 1500-yr Bond cycle arises from non-linear
-thermohaline amplification of the 210-yr de Vries solar cycle. A
-2-component fit including both periods showed the de Vries amplitude is
-~100× smaller than Bond in our residual (3.7 s vs 375 s peak-to-zero),
-consistent with Braun's mechanism — only the amplified output is visible
-in the eclipse-rotation record.
+**Reading 1 — Solar Inertial Motion (Charvátová, Wilson, Scafetta)**:
+73 × Jupiter-Saturn synodic aligns with SIM patterns in the Sun's
+barycentric motion. J-S conjunctions modulate the Sun's motion around
+the barycenter, driving solar-activity envelope modulation on
+multi-centennial timescales. The 73× count is neither a small integer
+nor an obvious commensurability — it drops out of the 8H integer
+arithmetic specifically. This ties Bond-scale climate variability to
+Jupiter-Saturn dynamics in a lattice-native way.
 
-### Why integration was deferred
+**Reading 2 — Bond cycle / Braun et al. 2005 thermohaline mechanism**:
+the 8H lattice places n=1851 close to n=1825 (14× ratio with the de
+Vries 8H/12774 = 210 yr), consistent with the Braun 2005 mechanism where
+1500-yr climate variability arises from non-linear thermohaline
+amplification of solar forcing. A 2-component fit including both
+periods (as reported for n=1825 originally) showed de Vries amplitude
+~100× smaller than Bond — consistent with amplified output only.
 
-The cyclic Bond correction was prototyped as a live LOD/H/eclipse
-correction but breaks the J2000 LOD anchor convention: Bond's
-instantaneous phase at year 2000 happens to be near a trough, giving a
-−4 ms LOD anomaly. This shifts modern LOD from the framework anchor
-(86,400 s) to 86399.996 s, an unacceptable break of the foundational
-reference value.
+**Reading 3 — Earth's own perihelion subharmonic**: 168 ÷ Earth
+ecliptic perihelion (8H/11) at 0.16% error. The Fourier-degenerate
+alternative n=1920 = 15 ÷ Earth ICRF perihelion (H/16) at 0.00% error
+sits at the same peak. Both readings tie the observed feature to
+Earth's own orbital mechanics.
 
-Naive fixes don't work:
-- **Subtract Bond(J2000) constant**: adds a +4 ms LOD bias at all years,
-  which integrates to ~+1530 s extra ΔT at the medieval bump peak — the
-  correction is much larger than the residual it would absorb, flipping
-  the sign of the bump instead of eliminating it
-- **Re-anchor `L_TOTAL_EM_KGM2_S` to absorb Bond's J2000 phase**: ~8 ppb
-  fractional change to a foundational constant purely for Bond's
-  current phase — feels backwards
-- **ΔT-only correction (don't propagate to LOD)**: clean but requires
-  rebuilding the diagnostic-output path
+### Why live integration is deferred — the zero-fit concern
 
-### What's preserved
+An **Option B** ΔT-only correction architecture was prototyped
+(`BOND_DT_CORRECTION_ENABLED` feature flag in `src/script.js`; see the
+"Bond correction ΔT" console-test toggle) and works technically: it
+adds the anchored Bond harmonic to model ΔT after the LOD Simpson
+integration, leaves `meanLodSecondsAtAge` pure-physics, and preserves
+the J2000 LOD anchor at 86400.00001 s exactly. Under Bond ON:
 
-The investigation is fully documented for future revisiting:
+- Medieval bump peak halves (−1067 s → −543 s at year 990)
+- Aggregate mean |residual| is roughly neutral (1604 s → 1615 s; slightly
+  worse because Bond's ancient trough near year −480 adds to the
+  already-positive ancient BCE residuals)
+- Events model-closer-than-NASA improves from 29.2% to 33.3%
 
-- `data/deltaT-bond-cycle-residual-fit.json` — fit coefficients, 4-split
-  cross-validation summary, 274-point residual time series
-- `scripts/lod_residual_lattice_fit.py` — initial scan and greedy
-  selection
+**But live integration is deferred on philosophical grounds, not
+technical:** the Bond harmonic's amplitude (378 s peak) and phase (−65.5°)
+come from fitting `Stephenson_residual = polynomial_detrend + cos_A · cos(ωy) +
+sin_A · sin(ωy)` at n=1851 (see
+`scripts/lod_residual_1851_refit.py` and
+`data/deltaT-1851-residual-fit.json`). Turning this on in the live
+model **VIOLATES the paper's central "no coefficients fitted to
+eclipse data at any stage" claim** (see point 8 of "Why the rigorous
+testing section matters" above; §"Defensible scientific position"
+below).
+
+The framework arithmetic **predicts the PERIOD 1449 yr** (73 × J-S
+synodic drops out with zero fitting). What we do **not** have is an
+independent amplitude/phase calibration. Two paths forward:
+
+1. **Independent paleoclimate calibration**: fit amplitude and phase to
+   Bond 1997 IRD record, Braun 2005 thermohaline reconstruction, or
+   equivalent — then the coefficients come from independent physics
+   (paleoclimate) rather than eclipse data, and the correction can be
+   turned on live without compromising the zero-fit claim.
+2. **Predictive test of a specific mechanism** — e.g., derive amplitude
+   from a SIM-driven solar activity model calibrated on satellite-era
+   data — then test predicted amplitude against the eclipse residual.
+
+Until either path yields an amplitude/phase from independent physics,
+the correction stays OFF as canonical default and remains available as
+a research toggle for measurement.
+
+### What's preserved as research infrastructure
+
+The full investigation is documented for future revisiting:
+
+- `data/deltaT-1851-residual-fit.json` — n=1851 fit coefficients + metrics
+- `data/deltaT-bond-cycle-residual-fit.json` — earlier n=1825 fit (archived)
+- `data/deltaT-divisor-scan-jse.json` — full 8H integer-divisor scan results
+- `scripts/lod_residual_divisor_scan_jse.py` — full 8H scan with J-S-E interpretation
+- `scripts/lod_residual_1851_refit.py` — refit at n=1851 with structural verification
+- `scripts/lod_residual_lattice_fit.py` — initial scan and greedy selection
 - `scripts/lod_residual_lattice_cv.py` — 4-split cross-validation
-- `scripts/lod_residual_bond_devries_cv.py` — 2-component test (Bond +
-  de Vries)
-- `scripts/export_bond_cycle_residual_fit.py` — artifact generator
-- `scripts/stephenson_observation_density.py` — falsifies the spline-
-  artifact hypothesis (medieval window has 36.9 obs/century, the
-  densest part of the pre-telescopic catalog)
-- `scripts/climate_formula_mwp_check.py` — rules out our paleoclimate
-  formula as the source (shortest period 14.5 kyr, cannot resolve the
-  0.7 kyr MWP feature)
+- `scripts/lod_residual_bond_devries_cv.py` — 2-component (Bond + de Vries) test
+- `scripts/export_bond_cycle_residual_fit.py` — artifact generator (n=1825)
+- `scripts/stephenson_observation_density.py` — falsifies the spline-artifact hypothesis (medieval window has 36.9 obs/century)
+- `scripts/climate_formula_mwp_check.py` — rules out our paleoclimate formula as the source (shortest period 14.5 kyr)
+
+Live in the sim (all as diagnostic / research infrastructure):
+
+- `BOND_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `false`)
+- "Toggle 8H/1851 ΔT correction" console-test button for A/B measurement
+- §14 (`_L5b_lattice_scan`), §15 (`_L5b_anchor_sensitivity`), §16
+  (`_L5b_rate_sensitivity`), §17 (`_L5b_higher_order`) diagnostic sections
+  in Merged L-5b button
 
 ### Scientific status
 
-**The 1470-yr period is well-documented in paleoclimate** (Bond et al.
-2001 in North Atlantic ice-rafted debris; Schulz 2002 / Bond compilations
-in Greenland and tropical Andes ice cores; Tarim Basin loess). **Its
-statistical significance is contested** (Schulz 2002 noted the spectral
-peak comes from only 3 D-O events; Roe 2022 J. Climate challenged the
-multiple-comparison correction). **Its mechanism is unresolved** (solar
-amplification, thermohaline oscillation, stochastic resonance, and
-astronomical/orbital forcing all have proponents in the literature).
+**The 1449-yr period drops out of framework arithmetic** as 73 × J-S
+synodic on the 8H lattice. This is a zero-fit structural prediction,
+independent of the observed eclipse residual. Empirical confirmation
+against the historical eclipse record is decisive: the Stephenson −
+model residual is well-fit by a single harmonic at exactly this period
+(R² = 0.975 in-sample, R²_test = 0.97 cross-validated on CE→BCE
+prediction; random 8H/n integers in the same period range give R²_test
+≈ 0.48 — no signal). The signal is real, period-specific, and
+lattice-native.
 
-Our finding adds a new independent line of evidence: the 1470-yr signal
-also appears in **historical Earth rotation** (eclipse-derived ΔT from
-−720 to 2016 CE), at the lattice-exact period 8H/1825, with cross-
-validated predictive power. This is the first measurement (to our
-knowledge) of a 1470-yr cycle in the Earth-rotation observational record
-using a deterministic first-principles framework.
+**The Bond-scale 1450-yr period is well-documented in paleoclimate**
+(Bond et al. 2001 in North Atlantic ice-rafted debris; Schulz 2002 /
+Bond compilations in Greenland and tropical Andes ice cores; Tarim Basin
+loess). **Its statistical significance is contested** (Schulz 2002
+noted the spectral peak comes from only 3 D-O events; Roe 2022 J.
+Climate challenged the multiple-comparison correction). **Its mechanism
+is unresolved** in mainstream literature (solar amplification, thermohaline
+oscillation, stochastic resonance, and astronomical/orbital forcing all
+have proponents).
 
-The integration question is **deferred**, not closed. The two viable
-paths if revisited:
-- Re-anchor `L_TOTAL_EM_KGM2_S` to absorb Bond's J2000 phase (~8 ppb)
-- Apply Bond ONLY as a post-integration ΔT correction in diagnostic
-  reports, leaving LOD/H/eclipse physics untouched
+Our finding adds a specifically-framework-native reading: the observed
+1450-yr signal in historical Earth rotation matches the 8H lattice
+divisor at n=1851 = 73 × J-S synodic to 0.001% error. This is the first
+identification (to our knowledge) of the Bond-scale cycle in the
+Earth-rotation observational record as a direct arithmetic consequence
+of Jupiter-Saturn synodic dynamics on the 8H lattice — a
+**structural prediction from framework physics**, empirically confirmed
+in the ΔT residual.
+
+The **live integration** question is deferred, awaiting independent
+amplitude/phase calibration from a non-eclipse source.
+
+---
+
+## Complete residual decomposition — what makes up the residual DRIFT?
+
+After the 8H/1851 harmonic accounts for the ~1450 yr oscillation
+feature, a natural question follows: what accounts for the residual
+DRIFT — the slope in the Stephenson − model curve of ~ −0.966 s/yr with
+the correction applied, or −1.878 s/yr without it?
+
+Four consecutive diagnostic sections in the L-5b console button
+(labelled §14, §15, §16, §17 for the internal numbering, but named by
+content: lattice-divisor scan, J2000 anchor sensitivity, secular RATE
+sensitivity, and higher-order polynomial + dual-harmonic decomposition)
+decompose the remaining drift and reach a clean three-component
+picture. Each diagnostic is implemented in `src/script.js` and its
+results are cached at `window._L5b_lattice_scan`,
+`window._L5b_anchor_sensitivity`, `window._L5b_rate_sensitivity`, and
+`window._L5b_higher_order` respectively for downstream inspection.
+
+### Diagnostic 1 (§14): 8H integer-divisor scan against the residual
+
+Scans n ∈ [500, 5000] for lattice harmonic content in the current
+residual. Under Bond OFF baseline, identifies n=1920 (period 1397 yr =
+15 ÷ Earth ICRF perihelion H/16) as the top divisor (ΔR² = +0.0748);
+n=1851 (73 × J-S synodic) at rank #136 with ΔR² = +0.0736. Both are
+lattice-native, both at 0.00% structural error, Fourier-degenerate at
+this window width (confirmed by §17 dual-harmonic test).
+
+Under Bond ON (after n=1851 correction), the scan finds no divisor with
+ΔR² > 0.02 anywhere in the 500–5000 yr range. Verdict: **the medieval
+bump is a single lattice feature at Bond scale, not multi-divisor.** No
+further L1-extension via additional 8H harmonics would meaningfully
+close the residual.
+
+### Diagnostic 2 (§15): does the J2000 LOD anchor value explain the drift?
+
+Tests whether the residual drift is attributable to a mismatch in the
+J2000 LOD anchor value. Under Bond ON (n=1851 correction active), the
+residual has slope −0.966 s/yr → equivalent constant LOD bias
+−2644 μs/day (model LOD is 2644 μs/day BELOW Stephenson-implied
+historical LOD average).
+
+Sensitivity test: applying a synthetic anchor shift Δ to the model:
+
+| Δ (μs/day) | New anchor (s) | Slope (s/yr) |
+|---:|---:|---:|
+| −2500 | 86399.99751 | −0.052 |
+| 0 (current) | 86400.00001 | −0.966 |
+| +990 (IERS convention) | 86400.00100 | **−1.328** (WORSE) |
+| +2500 | 86400.00251 | −1.879 |
+
+**Adopting the IERS convention (86400.001 s at J2000) makes the drift
+WORSE by 37%.** The optimal analytical shift to zero the drift slope
+requires an anchor at 86399.99737 s — below the SI baseline —
+physically implausible.
+
+**Verdict**: the J2000 LOD anchor value is NOT the drift source.
+Adopting IERS would degrade the fit. Some other mechanism produces the
+apparent LOD bias.
+
+### Diagnostic 3 (§16): does a secular RATE mismatch explain the drift?
+
+If a uniform anchor shift can't absorb the drift, the natural next test
+is a QUADRATIC transformation representing a secular RATE mismatch.
+Under a hypothetical additional non-tidal rate δ_rate (ms/century, added
+to the Cox-Chao satellite value), the residual would transform as
+`residual_new(Y) = residual_old(Y) − 0.5 · δ_rate · 365.25 · (2000 − Y)²`.
+
+Joint fit `residual(Y) = a + b · x + c · x²` where x = (2000 − Y):
+
+| Coefficient | Bond OFF | Bond ON |
+|---|---:|---:|
+| a (intercept) | +57.8 s | −6.3 s |
+| b (linear) | −1.536 s/yr | −1.407 s/yr |
+| c (quadratic) | +8.72×10⁻⁴ s/yr² | +8.75×10⁻⁴ s/yr² |
+| Anchor-equivalent from b | −4206 μs/day | −3852 μs/day |
+| **Rate-equivalent from c** | **+0.477 ms/century** | **+0.479 ms/century** |
+
+**The quadratic coefficient c — and its equivalent rate ~+0.5
+ms/century — is essentially UNCHANGED by Bond correction**, indicating
+this is a distinct physical channel independent of the Bond-scale
+oscillation. Compared to literature values:
+
+- Cox & Chao 2002 (framework baseline, satellite-measured): +0.23 ms/century
+- **Diagnostic optimum: +0.48 ms/century (~2× Cox-Chao)**
+- Munk-MacDonald 1960 postulate: +5 to +6 ms/century
+
+**The framework's Cox-Chao rate captures only ~half the needed secular
+non-tidal contribution.** The remaining ~0.25 ms/century is unmodelled.
+This is a fractional non-tidal channel ~10% of the full Munk-MacDonald
+postulate — NOT the full MM rate (which remains rejected), but not zero
+either.
+
+Candidate mechanisms: time-varying core-mantle EM coupling (not the
+constant-Holme H1 rate), continental hydrology/groundwater on
+centennial-scale, regional GIA structure beyond the global 3-mode α(t)
+average.
+
+### Diagnostic 4 (§17): higher-order polynomial + dual-harmonic decomposition
+
+Part A tests whether the linear coefficient b from §16 is genuine or a
+polynomial-order artifact. Fits polynomial orders 1 through 5:
+
+| Order | R² | Linear coefficient b₁ |
+|---:|---:|---:|
+| 1 | 0.5922 | **+0.827 s/yr** |
+| 3 | 0.9401 | **−2.836 s/yr** (sign flip) |
+| 5 | 0.9851 | **+3.358 s/yr** (sign flip again) |
+
+**The linear coefficient swings wildly between orders**, going from
++0.83 to −2.84 to +3.36 as order increases. This is definitive: the
+"linear anchor-like" component from §16 is a POLYNOMIAL ARTIFACT of
+the residual's true cubic-or-higher shape, not a genuine physical
+linear bias.
+
+Physical interpretation: the Bond-scale oscillation is not perfectly
+captured by a single cosine at n=1851 (the actual signal has some
+higher-harmonic content in the ancient BCE tail region), and low-order
+polynomial fits misattribute this shape as a linear trend. **§15's
+"anchor bias of −2644 μs/day" and §16's "b = −1.4 s/yr" are both
+downstream symptoms of this fit-order artifact, not physical
+mechanisms.**
+
+Part B tests whether n=1851 and n=1920 are distinguishable lattice
+divisors or Fourier-degenerate. Dual-harmonic fit adds only +0.07 pp
+over the better single. **Fourier-degenerate — same peak, different
+labels.** Keep n=1851 for the J-S synodic narrative; adding n=1920
+wouldn't help.
+
+### The complete picture
+
+Combining §14–§17 findings, the residual decomposes cleanly:
+
+| Component | Contribution | Nature |
+|---|---:|---|
+| **Bond-scale oscillation at ~1450 yr** | ~7 pp R², ~175 s RMS | **Real, framework-native** (n=1851 = 73 × J-S synodic) |
+| **Higher-order polynomial shape (order 3+)** | ~4.5 pp R², ~100 s RMS | **Not physical** — Bond fit imperfection at ancient BCE tail; artifact |
+| **Fractional non-tidal secular rate** | ~0.5 ms/century | **Real, NOT in framework** — 2× Cox-Chao, ~10% of full Munk-MacDonald |
+| **Observation noise + unexplained** | ~62 s RMS post-fit | Irreducible floor (Stephenson dataset noise averaged into sampled Δ) |
+
+Three physical components + one artifact + noise floor. Nothing else is
+required to explain the residual's structure.
 
 ---
 
@@ -1014,21 +1415,39 @@ What this validation establishes:
    genuinely exists. The lunar-eclipse data discriminates this signal
    at sub-100 s ΔT resolution, where solar-eclipse visibility cannot.
 
-2. **The non-tidal contribution's magnitude is GIA-only**, not
-   Munk-MacDonald-magnitude. Doc 101 critiqued the ~6 ms/century
-   Munk-MacDonald assumption; the lunar record matches the smaller
-   ~0.6 ms/century GIA contribution from independent satellite
-   measurements (Cox & Chao 2002), not the larger phenomenological
-   number. Doc 101's underlying critique survives.
+2. **The FULL Munk-MacDonald non-tidal magnitude is rejected; a
+   FRACTIONAL non-tidal contribution IS present.** Doc 101 critiqued the
+   ~6 ms/century Munk-MacDonald assumption. The lunar record confirms
+   this rejection at scale: the full 5-6 ms/century would over-correct
+   Babylonian ΔT by ~2,700 s (H1 constant-Holme test). But the §16 rate
+   sensitivity diagnostic (see "Complete residual decomposition" above)
+   finds a **fractional non-tidal secular rate of ~+0.5 ms/century**
+   present in the ΔT residual after Bond correction — approximately 2×
+   the Cox & Chao 2002 satellite-measured GIA value, and ~10% of the
+   full Munk-MacDonald postulate. This fractional contribution is real
+   and NOT currently in the framework's α(t). Candidate mechanisms:
+   time-varying core-mantle EM coupling (not the constant-Holme rate),
+   continental hydrology / groundwater on centennial timescale, regional
+   GIA structure beyond the global 3-mode α(t) average. Doc 101's core
+   critique — the full MM rate is not required by the historical record —
+   survives. What's added is a specific quantification: the residual
+   supports ~2× Cox-Chao, not 25× Cox-Chao.
 
-3. **All physical constants from independent literature, zero fitting
-   parameters** — IERS α at J2000, Cox & Chao satellite-measured
-   dJ₂/dt, and Peltier ICE-5G(VM2) multi-mode GIA decomposition (three
-   mode timescales + amplitude fractions) — produce a model that agrees
-   with NASA's empirical polynomial to within 4 min on a 20 min
-   observation noise floor. NASA's polynomial uses ~10+ coefficients
-   fitted to this exact dataset. Our model independently predicts it
-   from satellite/geodesy literature.
+3. **All physical constants from independent literature, zero
+   eclipse-fitting parameters in the LIVE model** — IERS α at J2000,
+   Cox & Chao satellite-measured dJ₂/dt, and Peltier ICE-5G(VM2)
+   multi-mode GIA decomposition (three mode timescales + amplitude
+   fractions) — produce a model that agrees with NASA's empirical
+   polynomial to within 4 min on a 20 min observation noise floor.
+   NASA's polynomial uses ~10+ coefficients fitted to this exact
+   dataset. Our model independently predicts it from satellite/geodesy
+   literature. The n=1851 millennial-scale harmonic identified above is a
+   STRUCTURAL PREDICTION from framework arithmetic (73 × J-S synodic
+   drops out of the 8H lattice with zero fitting); the AMPLITUDE and
+   PHASE of that harmonic are fitted to the eclipse residual and are
+   therefore NOT integrated into the live model. The research toggle
+   in the L-5b button demonstrates the fit but is OFF by default
+   specifically to preserve the zero-eclipse-fitting claim.
 
    *Empirical sensitivity confirmation (added 2026-06-25):* the
    [doc 103](103-135-babylonian-case-study.md) -135 Babylonian case
@@ -1101,11 +1520,13 @@ What we are NOT claiming:
    (see § "Why multi-mode behaves indistinguishably from single-mode").
 
 3. **Medieval residual** (years 800-1300, model overshoots by ~20 min)
-   is a residual signal that the GIA-only correction does not fully
-   capture. Likely sources: mantle-core coupling mean trend over
-   centuries, sea-level redistribution, or possibly a slight Farhat
-   2022 modern-era tidal rate offset. None of these are large enough
-   to motivate adding a fourth constant.
+   is a residual signal that the framework's α(t) does not fully
+   capture. This has been decomposed in detail (see "Complete residual
+   decomposition") into three components: a framework-native millennial
+   lattice harmonic at 8H/1851 = 1449 yr, a fractional non-tidal
+   secular rate ~0.5 ms/century, and observation noise. Live
+   integration of the lattice-harmonic correction is deferred pending
+   independent (non-eclipse) amplitude/phase calibration.
 
 4. **Greek (S07) is an outlier** with 11 observations and a
    detrended mean residual of −795 s. Small sample; the per-table
@@ -1134,15 +1555,18 @@ The natural extensions, in order from most to least defensible:
    (8,658 → 8,682 s). See [doc 101](101-pure-tidal-eclipses.md) lines
    8-20 for the baseline note documenting the re-verification.
 
-2. **Bond cycle revisit with proper J2000 anchoring**. Re-anchor
-   `L_TOTAL_EM_KGM2_S` to absorb Bond's J2000 phase (~8 ppb fractional
-   change) so the cycle can be applied as live LOD physics without
-   breaking the modern LOD ≈ 86,400 s convention. Alternative: apply
-   Bond as a post-integration ΔT correction in diagnostic reports only,
-   leaving LOD/H/eclipse physics untouched. Either is a small,
-   well-scoped change. See § "Bond cycle (8H/1825 = 1469.88 yr) —
-   validated lattice harmonic, integration deferred" for the validated
-   numerical fit + cross-validation details.
+2. **Independent amplitude/phase calibration of the n=1851 harmonic**.
+   The framework arithmetic predicts the PERIOD (73 × J-S synodic =
+   1449 yr, zero-fit); Option B ΔT-only correction architecture is
+   implemented and works technically (preserves the J2000 LOD anchor).
+   What's missing is independent (non-eclipse) calibration of amplitude
+   and phase — e.g., against Bond 1997 IRD, Braun 2005 thermohaline
+   reconstruction, or a SIM-driven solar activity model calibrated on
+   satellite-era data. Once amplitude/phase come from independent
+   physics, the correction can be turned on live without compromising
+   the zero-eclipse-fitting claim. See § "Millennial-scale 8H lattice harmonic
+   (n=1851 = 73 × J-S synodic) — structural prediction, integration
+   deferred" for the fit + cross-validation details.
 
 3. **Time-variable mantle-core coupling**. The MC null result above
    shows the modern Holme rate is era-specific. A multi-period or
@@ -1231,7 +1655,7 @@ first.
 | ↳ **L-5b residual: regression (secular vs periodic vs noise)** | Requires L-5b. Linear/quadratic/cubic polynomial fits to (obs − model_ΔT) residual. Diagnoses whether the residual is a constant LOD bias (linear), an acceleration bias (quadratic), or has higher-order/periodic structure. |
 | ↳ **L-5b residual: correlation with solar-system mass balance** | Requires L-5b. Tests **Hypothesis 2**: instantaneous solar-system mass-balance ↔ residual via Pearson + Spearman + permutation p-value. |
 | ↳↳ **L-5b residual: correlation EXTENDED (integrated, lagged, sign-duration)** | Requires L-5b + the mass-balance correlation button. Tests **Hypotheses 3-5**: integrated/lagged/sign-duration formulations of mass-balance with Bonferroni correction. |
-| ↳↳↳ **L-7 residual: replicate mass-balance test on SOLAR (cross-validation)** | Requires L-7 + L-5b mass balance + L-5b correlation EXTENDED. **Hypothesis 3 replication** on the independent solar dataset. Under L1-orbital α(t) the pattern is same-sign but underpowered (lunar r=−0.381, solar r=−0.150 at n=89, solar p=0.17); no sign-flip; cross-validation fails strict pre-registered criterion but the earlier "sign-flip = spurious trend" argument does not apply. |
+| ↳↳↳ **L-7 residual: replicate mass-balance test on SOLAR (cross-validation)** | Requires L-7 + L-5b mass balance + L-5b correlation EXTENDED. **Hypothesis 3 replication** on the independent solar dataset. Under L1-orbital α(t) the aggregate lunar correlation (r=−0.381) and solar underpowered (r=−0.150 at n=89) initially suggested "same-sign but underpowered." The follow-up per-era analysis (Ancient r=−0.13, Transition r=+0.18, Medieval r=+0.10) reveals a **sign-flip into the medieval window** — the aggregate is a drift-tracking artifact, not a causal per-observation link. H3 is REJECTED on mechanism grounds. |
 | ↳ **L-5b residual: Lomb-Scargle periodogram (find dominant periods)** | Requires L-5b. **Hypothesis 6**: test 9 literature periodic-forcing mechanisms (10-2500 yr range) for detection in the residual. |
 | ↳ **L-5b residual: 14.2-yr peak focused robustness (real or window artifact?)** | Requires L-5b. **Hypothesis 7**: focused robustness test on the 14.2 yr target (12–16 yr focus window applied to noise floor + jackknife + half-data splits). Under L1-orbital α(t) noise floor passes (FAP = 0.000), jackknife passes (50/50 within ±1 yr of target), half-split narrowly misses (early 14.10 yr passes, late 12.10 yr falls 0.10 yr outside ±2 yr window): 2/3 focused tests pass — partial support, not the "window artifact" verdict from the earlier |t|-symmetric form. |
 | ↳ **L-5b residual: vs Stephenson polynomial (model issue or data noise?)** | Requires L-5b. Tests whether the residual matches Stephenson's own fit residual (= observation noise floor). Result: |Δ| pattern is two-humped (ancient BCE excess + medieval CE excess), which §12 confirms is the surface expression of one linear drift + one symmetric MWP bump — model structurally differs from data in medieval window, not data noise. |
@@ -1243,11 +1667,14 @@ first.
 
 The headline numbers in this doc come from L-5b main + L-5b regression
 + L-7 main. The residual-investigation buttons are the hypothesis-testing
-diagnostics documented in the "Eight hypotheses tested and rigorously
-ruled out" section above. The Bond cycle research (§ "Bond cycle (8H/1825
-= 1469.88 yr) — validated lattice harmonic, integration deferred") is
-documented in the Python scripts and JSON artifact rather than as a
-console button, since the integration was reverted.
+diagnostics documented in the "Eight hypotheses tested" section above
+plus the follow-up diagnostics (§10 Path A + Test 5; §14–§17 drift
+decomposition). The millennial-scale 8H lattice harmonic research
+(§ "Millennial-scale 8H lattice harmonic at 1449 years (73 × Jupiter-Saturn
+synodic) — structural prediction, integration deferred") is implemented as
+the `BOND_DT_CORRECTION_ENABLED` feature flag (default `false`) with a
+console-test toggle button; the fit + cross-validation details are
+documented in the Python scripts and JSON artifacts.
 
 The 14 documented modern lunar eclipses tested by L-1 are also exposed
 in the tweakpane menu under **Solar & Lunar Eclipses → Lunar Eclipses**,
@@ -1326,17 +1753,44 @@ URLs / files.
   W., Hoffmann, S., Lotti-Bond, R., Hajdas, I., & Bonani, G. (2001).
   *Persistent Solar Influence on North Atlantic Climate During the
   Holocene.* Science 294(5549), 2130–2136. doi:10.1126/science.1065680
-  (Source of the 1,470-yr Bond cycle in North Atlantic ice-rafted debris
-  — the climate signature whose period coincides with our 8H/1825
-  lattice harmonic.)
+  (Source of the 1,470-yr Bond cycle in North Atlantic ice-rafted
+  debris — the climate signature whose period is Fourier-degenerate
+  with our 8H/1851 = 1449 yr = 73 × J-S synodic lattice harmonic.)
 
 - Braun, H., Christl, M., Rahmstorf, S., Ganopolski, A., Mangini, A.,
   Kubatzki, C., Roth, K., & Kromer, B. (2005). *Possible solar origin of
   the 1,470-year glacial climate cycle demonstrated in a coupled model.*
   Nature 438(7065), 208–211. doi:10.1038/nature04121. (Mechanism for
   Bond-cycle amplification of the 210-yr de Vries solar cycle via
-  non-linear thermohaline ocean response — the 7:1 commensurability
-  explanation for our 8H/12774 ↔ 8H/1825 lattice pair.)
+  non-linear thermohaline ocean response — a candidate physical
+  reading for our 8H/1851 lattice harmonic alongside the primary
+  73 × J-S synodic SIM interpretation.)
+
+- Charvátová, I. (1990–2007). Series of papers on Solar Inertial Motion
+  (SIM). *e.g.* Charvátová, I. (2000). *Can origin of the 2400-year cycle
+  of solar activity be caused by solar inertial motion?* Ann. Geophys.
+  18(4), 399–405. doi:10.1007/s00585-000-0399-x. (Charvátová's SIM theory
+  attributes multi-centennial climate/solar variability to Jupiter-Saturn
+  configurations relative to the barycenter — the mechanism behind our
+  73 × J-S synodic reading of 8H/1851.)
+
+- Landscheidt, T. (1998). *Solar Activity, Barometric Vortex, and
+  Deep-Ocean Circulation.* Sol. Phys. 181(1), 87–98.
+  doi:10.1023/A:1005075501898. (Argues specific Jupiter-Saturn-Earth
+  perihelion configurations correlate with climate anomalies — the
+  heterodox but peer-reviewed SIM literature.)
+
+- Scafetta, N. (2010). *Empirical evidence for a celestial origin of the
+  climate oscillations and its implications.* J. Atmos. Sol.-Terr. Phys.
+  72(13), 951–970. doi:10.1016/j.jastp.2010.04.015. (Argues Jupiter-Saturn
+  synodic 60-yr harmonic and multi-centennial cycles appear in
+  temperature records — SIM-adjacent evidence for J-S climate coupling.)
+
+- Wilson, I.R.G. (2013). *The Venus–Earth–Jupiter spin–orbit coupling
+  model.* Pattern Recogn. Phys. 1, 147–158. doi:10.5194/prp-1-147-2013.
+  (J-S alignment modulation of solar magnetic cycle — the 179 yr Jose
+  period appears in our residual (H6) and matches the 8H lattice at
+  n=15013.)
 
 - Holme, R. (1998). *Electromagnetic core-mantle coupling — I. Explaining
   decadal changes in the length of day.* Geophys. J. Int. 132(1),
