@@ -39,7 +39,19 @@ const correctionSun = 0.4962174089002886;                 // Sun position correc
 const temperatureGraphMostLikely = 14.5;                  // Position in obliquity cycle (0–16)
 const startAngleModel = 89.91949879;                      // Start angle at 2000-06-21 00:00 UTC
 const systemResetN = 7;                                    // Eccentricity anchor offset (H-units): 0=balancedYear, 7=System Reset
-const useVariableSpeed = true;                            // Toggle equation of center
+
+// ─── A5. Research toggles ────────────────────────────────────────────────
+// Six user-facing feature flags, canonical defaults. Full rationale for each
+// (Bond ΔT correction, Strategy A / Earth rotation, deep-time mode, Sun
+// harmonics) lives in the doc-block at the original call site — the pointers
+// below reference those source-of-truth locations. This section collects the
+// declarations at the top of the file for discoverability.
+const useVariableSpeed           = true;   // Equation of Center on planet orbits — see moveModel (~L54142)
+const debugOn                    = false;  // Debug button flag (developer only)
+let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge (~L7080)
+let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction (Phase Z-B) — rationale ~L7066
+let   EARTH_ROTATION_DT_CORRECTION_ENABLED = false;  // ΔT-worth extra Earth rotation as a visualization overlay (formerly "Strategy A"; off by default since 2026-06-24 = pure-tidal physics matches GMST(UT1)) — rationale ~L6889
+let   BOND_DT_CORRECTION_ENABLED = false;  // Bond 8H/1851 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
 const earthtiltMean = 23.41353954485521;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
@@ -77,7 +89,7 @@ const tropicalCenturyDays = 100 * meansolaryearlengthinDays;  // 100 model tropi
 // ═══════════════════════════════════════════════════════════════════════════
 
 const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3=WS
-const debugOn = false;                                    // Debug button flag
+// debugOn moved to A5 Research toggles (near top)
 
 // ─── A3. Moon model parameters ───────────────────────────────────────────
 const moonStartposApsidal = 347.622;                      // Eclipse-optimizer tuned (Step 5b)
@@ -4967,7 +4979,7 @@ function meanTropicalYearSecondsAtAge(t_Ma) {
 // Source: data/deltaT-1851-residual-fit.json (n=1851 refit, current)
 //         data/deltaT-bond-cycle-residual-fit.json (n=1825 original, archived)
 // ═════════════════════════════════════════════════════════════════════════════
-let   BOND_DT_CORRECTION_ENABLED = false;                       // Feature flag: OFF (measurement pass — comparison to Bond-ON baseline)
+// BOND_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
 const BOND_LATTICE_N              = 1851;                       // integer n in 8H/n — 73 × J-S synodic
 const BOND_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / BOND_LATTICE_N;  // 1449.236 yr
 const BOND_OMEGA                  = 2 * Math.PI / BOND_PERIOD_YR;
@@ -6886,12 +6898,13 @@ const J2000_CALENDAR_YEAR = startmodelYear;   // 2000.5
  *  was added in Phase 9.5b to make scene-visualized eclipse paths match
  *  Stephenson's conventional eclipse-catalog locations.
  *
- *  Strategy A toggle — DISABLED by default (2026-06-24):
- *    Strategy A is a visualization-layer overlay; it adds ΔT-worth of
- *    extra rotation on top of the J2000-locked constant-rate spin. The
- *    rate lock alone (Phase 9.5b's other change) already prevents the
- *    163° spurious drift the original commit cited. Empirical testing
- *    shows that DISABLING Strategy A:
+ *  EARTH_ROTATION_DT_CORRECTION_ENABLED (formerly "Strategy A")
+ *    — OFF by default (2026-06-24):
+ *    This is a visualization-layer overlay; it adds ΔT-worth of extra
+ *    rotation on top of the J2000-locked constant-rate spin. The rate
+ *    lock alone (Phase 9.5b's other change) already prevents the 163°
+ *    spurious drift the original commit cited. Empirical testing shows
+ *    that leaving this correction OFF:
  *      - reduces total deep-time umbra-centerline offset by ~75%
  *      - brings -584 Thales to ★ TOTAL at the conventional documented date
  *      - preserves doc 101's 19/19 penumbra validation (which uses Meeus
@@ -6904,10 +6917,10 @@ const J2000_CALENDAR_YEAR = startmodelYear;   // 2000.5
  *    want Stephenson-matching visualization can toggle via the
  *    "Toggle Strategy A" test button. See:
  *    `docs/hidden/old-documents/IP-strategy-z-earth-rotation-integration.md`. */
-let STRATEGY_A_DISABLED = true;
+// EARTH_ROTATION_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
 
 function earthRotationCorrectionRadians(jd) {
-  if (STRATEGY_A_DISABLED) return 0;           // diagnostic A/B toggle
+  if (!EARTH_ROTATION_DT_CORRECTION_ENABLED) return 0;   // diagnostic A/B toggle (formerly "Strategy A")
   if (!DEEP_TIME_MODE_ENABLED) return 0;
   // Convert JD to t_Ma (positive = past). julianDateToDecimalYear gives a
   // calendar-year-equivalent for the JD, which we then convert to t_Ma.
@@ -7061,7 +7074,7 @@ function meeusVsIntegratorDiagnostic(jd) {
 // Expose for console access
 if (typeof window !== 'undefined') window.meeusVsIntegratorDiagnostic = meeusVsIntegratorDiagnostic;
 let   currentEpoch_t_Ma   = 0;
-let   DEEP_TIME_MODE_ENABLED = true;
+// DEEP_TIME_MODE_ENABLED (feature flag) declared in A5 Research toggles at top of file
 
 // Phase Z-B (2026-06): enable Sun longitude harmonic correction at scene-graph
 // Sun node. Closes the framework's ~200" Sun-vs-Meeus residual to ~7" RMS
@@ -7073,7 +7086,7 @@ let   DEEP_TIME_MODE_ENABLED = true;
 // Visual: the Sun shifts up to ±25" from planet-orbit center (was ±300" with
 // the old [168]-divisor harmonic included). At typical zoom levels this is
 // below visible resolution. To disable for A/B testing, flip to false.
-let   SUN_HARMONICS_ENABLED = true;
+// SUN_HARMONICS_ENABLED (feature flag) declared in A5 Research toggles at top of file
 
 /** Apply the full Phase 0–3-planets chain at age t_Ma (positive = past). */
 function setEpochByAge(t_Ma) {
@@ -28457,11 +28470,11 @@ function setupGUI() {
   // Button 1: Toggle Strategy A (the A/B switch)
   // ────────────────────────────────────────────────────────────────────────
   addTestButton('Toggle Strategy A (ΔT Earth-rotation correction)', () => {
-    STRATEGY_A_DISABLED = !STRATEGY_A_DISABLED;
+    EARTH_ROTATION_DT_CORRECTION_ENABLED = !EARTH_ROTATION_DT_CORRECTION_ENABLED;
     console.log('\n══════════════════════════════════════════════════════════════════');
-    console.log(`  Strategy A is now: ${STRATEGY_A_DISABLED ? 'DISABLED (default since 2026-06-24)' : 'ENABLED (legacy Stephenson-matching mode)'}`);
+    console.log(`  ΔT Earth-rotation correction (formerly "Strategy A") is now: ${EARTH_ROTATION_DT_CORRECTION_ENABLED ? 'ENABLED (legacy Stephenson-matching mode)' : 'DISABLED (default since 2026-06-24)'}`);
     console.log('══════════════════════════════════════════════════════════════════');
-    if (STRATEGY_A_DISABLED) {
+    if (!EARTH_ROTATION_DT_CORRECTION_ENABLED) {
       console.log('  Earth\'s scene rotation = constant-J2000-rate × JD-days');
       console.log('  Equivalent to standard GMST(UT1). This is the framework\'s default.');
       console.log('  Empirically matches the documented historical eclipse record at');
@@ -28560,7 +28573,7 @@ function setupGUI() {
   addTestButton('Sun position diagnostic (scene vs Meeus Ch. 25)', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════════');
     console.log('  Sun position diagnostic — framework scene vs Meeus Ch. 25');
-    console.log(`  Strategy A is currently: ${STRATEGY_A_DISABLED ? 'DISABLED' : 'ENABLED (default)'}`);
+    console.log(`  ΔT Earth-rotation correction (formerly "Strategy A") is currently: ${EARTH_ROTATION_DT_CORRECTION_ENABLED ? 'ENABLED' : 'DISABLED (default)'}`);
     console.log('    Δ(lat)            = Sun ecliptic-position error (Earth-rotation independent)');
     console.log('    Δ(lon)            = Sun position + Earth rotation/ΔT combined error');
     console.log('    ΔT × 360/86400    = expected contribution from Strategy A if ENABLED');
@@ -28709,7 +28722,7 @@ function setupGUI() {
     console.log('  -135 Babylonian case study — three-section unified diagnostic');
     console.log('  Documented: 15 April 136 BCE (JD 1671853.76 UT), totality at Babylon (32.5°N, 44.4°E)');
     console.log('  Attribution: BM 45745 + LBAT 1285, 4-planet fingerprint, double-dated Arsacid/Seleucid.');
-    console.log(`  Strategy A is currently: ${STRATEGY_A_DISABLED ? 'DISABLED' : 'ENABLED'}`);
+    console.log(`  ΔT Earth-rotation correction (formerly "Strategy A") is currently: ${EARTH_ROTATION_DT_CORRECTION_ENABLED ? 'ENABLED' : 'DISABLED'}`);
     console.log('══════════════════════════════════════════════════════════════════════════════════');
 
     // ═══════════════════════════════════════════════════════════════════════
