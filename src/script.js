@@ -42,7 +42,7 @@ const systemResetN = 7;                                    // Eccentricity ancho
 
 // ─── A5. Research toggles ────────────────────────────────────────────────
 // Six user-facing feature flags, canonical defaults. Full rationale for each
-// (Bond ΔT correction, Strategy A / Earth rotation, deep-time mode, Sun
+// (Bond ΔT correction, Earth-rotation ΔT correction, deep-time mode, Sun
 // harmonics) lives in the doc-block at the original call site — the pointers
 // below reference those source-of-truth locations. This section collects the
 // declarations at the top of the file for discoverability.
@@ -50,7 +50,7 @@ const useVariableSpeed           = true;   // Equation of Center on planet orbit
 const debugOn                    = false;  // Debug button flag (developer only)
 let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge (~L7080)
 let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction (Phase Z-B) — rationale ~L7066
-let   EARTH_ROTATION_DT_CORRECTION_ENABLED = false;  // ΔT-worth extra Earth rotation as a visualization overlay (formerly "Strategy A"; off by default since 2026-06-24 = pure-tidal physics matches GMST(UT1)) — rationale ~L6889
+let   EARTH_ROTATION_DT_CORRECTION_ENABLED = false;  // DIAGNOSTIC-ONLY — do NOT enable for eclipse validation. When ON, applies ΔT twice: Meeus wrappers already advance UT→TT internally for Sun/Moon positions (~L5107 `_eclSunLon` + ~L5157/5190/5199 `_meeusMoon*`) and the base Earth spin is already at UT-anchored rate (correct actual rotation). Enabling this adds ΔT to Earth's rotation on top of the already-correct scene → over-rotates Earth by ~47° at year -135. Kept as an A/B diagnostic to verify the Meeus internal TT conversion is working. Formerly "Strategy A"; rationale ~L6889
 let   BOND_DT_CORRECTION_ENABLED = false;  // Bond 8H/1851 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
@@ -81,6 +81,13 @@ let   meansolaryearlengthinDays = Math.round(inputmeanlengthsolaryearindays * (h
 const j2000JD = 2451545.0;            // Standard J2000.0 epoch: Jan 1.5, 2000 TT
 const julianCenturyDays = 36525;      // IAU Julian century (365.25 × 100 days)
 const tropicalCenturyDays = 100 * meansolaryearlengthinDays;  // 100 model tropical years
+// Sidereal day at J2000 (≈ 86164.09 s). Derived from `solarDay × N/(N+1)` where
+// N = tropical days per year — this is the standard relationship between mean
+// solar and mean sidereal day (Earth completes N sidereal rotations per year
+// in solar-day units, or N+1 rotations relative to inertial space).
+// Used by (a) earth.rotationSpeed (sidereal-frame base spin, ~L6663) and
+// (b) earthRotationCorrectionRadians (ΔT→radians in sidereal frame, ~L6923).
+const _siderealDaySec_J2000 = 86400 * inputmeanlengthsolaryearindays / (inputmeanlengthsolaryearindays + 1);
 // Triple synodic period (Jupiter-Saturn conjunction cycle incl. perihelion precession H/5, -H/8)
 // Computed after planets are defined — see section E2
 
@@ -5106,10 +5113,44 @@ function _eclSunLon(jd) {
   return ((L0 + C) % 360 + 360) % 360;
 }
 
+// ═════════════════════════════════════════════════════════════════════════════
+// Moon polynomial dispatchers — Meeus Ch. 47.
+//
+// The dispatcher pattern preserves a hook for future work: swapping in a
+// different Moon polynomial (e.g. VSOP87 Sun ↔ Meeus, or a higher-precision
+// lunar theory) would only require changing `_eclMoonLon/Beta/Distance` to
+// route to the alternative implementation.
+//
+// EMPIRICAL FINDING (2026-07): tested ELP-2000/82B (both 3,402-term truncated
+// and 37,863-term full) and ELP/MPP02 (both DE-fit and LLR-fit variants) at
+// year -135. All modern lunar theories converge to β ≈ 0.706° in the of-date
+// frame within 0.001° of each other and consistent with NASA's γ = 0.7119.
+// The Moon polynomial is NOT the source of the -135 Babylonian umbra
+// discrepancy vs NASA. Doc 103's earlier attribution (~440 km to Moon β
+// polynomial residual) is empirically incorrect; the residual comes from
+// elsewhere (Sun polynomial, ΔT convention, or ray-trace geometry).
+// See: docs/103-135-babylonian-case-study.md (updated 2026-07).
+//
+// Both wrappers accept JD_UT and internally convert to JD_TT via
+// `jd + _eclDeltaT(jd)/86400`.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Moon's geocentric ecliptic longitude in degrees (0–360). Dispatcher. */
+function _eclMoonLon(jd)      { return _meeusMoonLon(jd); }
+
+/** Moon's instantaneous geocentric distance in km. Dispatcher. */
+function _eclMoonDistance(jd) { return _meeusMoonDistance(jd); }
+
+/** Moon's geocentric ecliptic latitude in degrees. Dispatcher. */
+function _eclMoonBeta(jd)     { return _meeusMoonBeta(jd); }
+
+// ─── Meeus Ch. 47 implementations (canonical; ~60 terms each) ──────────────
+
 /** Moon's geocentric ecliptic longitude in degrees (0–360). Meeus Ch. 47 full
  *  series (60 longitude terms from MOON_L). Geocentric accuracy ~0.04° RMS
- *  near J2000. Accepts JD_UT; converts internally to JD_TT via _eclDeltaT. */
-function _eclMoonLon(jd) {
+ *  near J2000, ~0.07° at year -135. Accepts JD_UT; converts internally to
+ *  JD_TT via _eclDeltaT. */
+function _meeusMoonLon(jd) {
   const _d2r = Math.PI / 180;
   const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
@@ -5142,7 +5183,7 @@ function _eclMoonLon(jd) {
  *  boundary). Uses model-level moonDistance (mean, mutable for deep-time) and
  *  moonOrbitalEccentricityBase plus the Meeus mean lunar anomaly M' at JD.
  *  Refinement (future): full Meeus Ch. 47 distance series for ~10-km accuracy. */
-function _eclMoonDistance(jd) {
+function _meeusMoonDistance(jd) {
   const _d2r = Math.PI / 180;
   const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
@@ -5151,7 +5192,7 @@ function _eclMoonDistance(jd) {
 }
 
 /** Moon's geocentric ecliptic latitude in degrees. Meeus Ch. 47 (MOON_B). */
-function _eclMoonBeta(jd) {
+function _meeusMoonBeta(jd) {
   const _d2r = Math.PI / 180;
   const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
@@ -6659,7 +6700,7 @@ function updateEarthForEpoch() {
   //   inputmeanlengthsolaryearindays — 365.2422 tropical days per year
   //   86400                          — J2000 mean solar day in seconds
   //   SI_TROPICAL_YEAR_DAYS          — captured at module init from J2000
-  const _siderealDaySec_J2000 = 86400 * inputmeanlengthsolaryearindays / (inputmeanlengthsolaryearindays + 1);
+  // (_siderealDaySec_J2000 hoisted to module scope in section E1 at top of file)
   earth.rotationSpeed = Math.PI * 2 * SI_TROPICAL_YEAR_DAYS * 86400 / _siderealDaySec_J2000;
   earth.size          = (diameters.earthDiameter / 2 / currentAUDistance) * 100;
 }
@@ -6893,30 +6934,52 @@ function updateAllObjectsForEpoch() {
 
 const J2000_CALENDAR_YEAR = startmodelYear;   // 2000.5
 
-/** Earth rotation correction (radians) at given Julian Day, relative to the
- *  constant-J2000-rate scene rotation. This is the ΔT/86400 × 2π term that
- *  was added in Phase 9.5b to make scene-visualized eclipse paths match
- *  Stephenson's conventional eclipse-catalog locations.
+/** Earth rotation correction (radians) — DIAGNOSTIC-ONLY, canonical default = OFF.
  *
- *  EARTH_ROTATION_DT_CORRECTION_ENABLED (formerly "Strategy A")
- *    — OFF by default (2026-06-24):
- *    This is a visualization-layer overlay; it adds ΔT-worth of extra
- *    rotation on top of the J2000-locked constant-rate spin. The rate
- *    lock alone (Phase 9.5b's other change) already prevents the 163°
- *    spurious drift the original commit cited. Empirical testing shows
- *    that leaving this correction OFF:
- *      - reduces total deep-time umbra-centerline offset by ~75%
- *      - brings -584 Thales to ★ TOTAL at the conventional documented date
- *      - preserves doc 101's 19/19 penumbra validation (which uses Meeus
- *        subSolar in the test buttons, independent of scene state)
- *      - causes small medieval regressions (1133 +293 km, 1239 +87 km)
- *        that are within umbra width and represent the framework's
- *        honest pure-tidal physics
- *    The flip makes scene state agree with standard GMST(UT1) Earth
- *    orientation, which matches doc 101's validation pipeline. Users who
- *    want Stephenson-matching visualization can toggle via the
- *    "Toggle Strategy A" test button. See:
- *    `docs/hidden/old-documents/IP-strategy-z-earth-rotation-integration.md`. */
+ *  EARTH_ROTATION_DT_CORRECTION_ENABLED (formerly "Strategy A") — OFF by default.
+ *
+ *  ═══ IMPORTANT: this is a 2×-ΔT diagnostic, NOT a physically correct rendering ═══
+ *
+ *  When enabled, this function adds `ΔT × 2π / _siderealDaySec_J2000` radians to
+ *  Earth's day-night spin. This applies ΔT to Earth's rotation ON TOP OF a scene
+ *  that already correctly accounts for ΔT — because:
+ *
+ *    1. The Meeus polynomial wrappers `_eclSunLon` / `_eclMoonLon` / `_eclMoonBeta`
+ *       (~L5107, 5121, 5154, 5163) ALREADY convert JD_UT → JD_TT internally via
+ *       `jd + _eclDeltaT(jd) / 86400`. Sun and Moon inertial positions are given
+ *       at the correct TT-time evaluation of the polynomial.
+ *    2. Earth's base spin `pos × rotationSpeed` uses `pos ∝ jd_UT` (elapsed UT
+ *       years) times the sidereal-rate constant (2π × 366.256 per UT-year). By
+ *       the UT1 convention this gives Earth's ACTUAL rotation angle at that UT
+ *       moment — LOD history is automatically incorporated in the definition of
+ *       UT (see UT1 IAU definition).
+ *
+ *  With correction OFF, all three coordinates are correctly at the same absolute
+ *  moment: Sun+Moon at their inertial TT-positions, Earth at its UT-rotation. The
+ *  umbra geometry is astronomically correct.
+ *
+ *  With correction ON, ΔT is effectively applied a second time — the Earth is
+ *  over-rotated by ~47° at year -135, ~71° at Thales -584, etc. The scene falls
+ *  into a non-physical state where the umbra shifts west in Earth-fixed frame.
+ *
+ *  The 19/19 documented eclipse validation (doc 101) confirmed OFF is correct.
+ *
+ *  ═══ Why keep the toggle at all? ═══
+ *
+ *  Kept as a diagnostic A/B test for verifying that the Meeus internal TT
+ *  conversion is working correctly. If Sun/Moon positions ever drifted (e.g.
+ *  from a bug in `_eclDeltaT` or the `+ ΔT/86400` step), toggling this on and
+ *  off would produce an asymmetric umbra shift instead of the expected 2×-ΔT
+ *  double-apply. Also provides a "Stephenson-plotted-path visualization mode"
+ *  for cross-referencing Stephenson's own catalog plots (which appear to use
+ *  the same double-apply convention in some versions).
+ *
+ *  DO NOT enable for eclipse validation, published results, or production use.
+ *
+ *  See docs/hidden/old-documents/IP-strategy-z-earth-rotation-integration.md
+ *  for the historical Phase 9.5b context. The Phase 9.5b rate-lock change is
+ *  correct and still active; only the ΔT-add overlay (this function) turned
+ *  out to be misconceived. */
 // EARTH_ROTATION_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
 
 function earthRotationCorrectionRadians(jd) {
@@ -6929,7 +6992,14 @@ function earthRotationCorrectionRadians(jd) {
   if (Math.abs(t_Ma) < 1e-9) return 0;
   const deltaT_sec = meanDeltaTSecondsAtAge(t_Ma);
   if (!Number.isFinite(deltaT_sec)) return 0;
-  return (deltaT_sec / 86400) * 2 * Math.PI;
+  // Convert ΔT (SI seconds) → radians in the SIDEREAL frame. The base spin
+  // `earth.rotationSpeed × pos` is 2π radians per sidereal day (see rotationSpeed
+  // derivation ~L6670), so the correction must use the same frame — dividing by
+  // the sidereal day (~86164 s) not the mean solar day (86400 s). Using 86400
+  // here would leave a 0.274% frame-mismatch (~14 km on Earth's surface at
+  // year -135); the sidereal-frame denominator makes the base + correction
+  // internally consistent.
+  return (deltaT_sec / _siderealDaySec_J2000) * 2 * Math.PI;
 }
 
 // ───── Phase 9.15: SI-tropical-year conversion (fixes Step 4 + Moon unit bug) ─────
