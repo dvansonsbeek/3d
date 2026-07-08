@@ -65,6 +65,25 @@ NASA's γ = 0.7119 for this eclipse is consistent with β = 0.706° via the stan
 
 ---
 
+## Scene Moon distance internal drift (2026-07)
+
+The framework's scene-rendered Moon position was audited against its own Meeus polynomial output. The scene Moon **direction** (RA/Dec) was already Meeus-corrected via post-hoc override, but **distance** was not: `SPHERICAL.radius` retained the value set from the scene-graph orbital integration (`SPHERICAL.setFromVector3(LOCAL)`) while `SPHERICAL.theta` and `SPHERICAL.phi` were overwritten with Meeus values.
+
+At year -135 this internal drift was:
+
+| Quantity | Scene-graph value | Meeus polynomial | Δ |
+|---|---:|---:|---:|
+| Moon distance | 363,391 km | 368,219 km | −4,828 km (−1.3%) |
+| Effective β from ray-trace | 0.744° | 0.7071° | +0.037° |
+
+The 0.037° effective-β excess in the ray-trace was an artifact: the shadow projection used the wrong Moon distance, placing the umbra where a β = 0.744° Moon would cast it.
+
+**Fix**: added `obj._meeusDistKm = moonDistance * (1 - moonOrbitalEccentricityBase * Math.cos(Mpr))` in the Meeus block and set `SPHERICAL.radius = obj._meeusDistKm * 100 / currentAUDistance` before the ecliptic-to-scene transform. After fix: scene Moon distance ratio (framework/Meeus) = **1.000000**.
+
+**Effect on -135 residual**: umbra shifted +0.7° north (matches physical prediction β × Δd/R_E = 0.535°). Distance to NASA's greatest changed from 1236 km → 1233 km. Latitude gap to NASA closed by 500 km worth of leverage; longitude gap of ~15° eastward remained. The residual is therefore NOT a distance-drift issue either — the framework and Meeus polynomial now agree on Moon distance to seven decimal places, and the −135 gap is unchanged. Attribution shifts to the ray-trace vs Meeus-analytical umbra convention (the framework ray-trace places umbra ~8° west of sub-solar due to shadow-axis tilt at β = 0.7°; the Meeus-method analytical formula treats umbra_lon ≈ sub-solar_lon) and to the NASA γ = 0.7119 "greatest eclipse" convention for grazing partial events.
+
+---
+
 ## Empirical context — match record at all other tested deep-time events
 
 With Strategy A disabled (commit `4d44776`), framework's pure-tidal predictions match the documented record at ★ TOTAL or ◐ near-T level for nearly all tested events:
@@ -120,11 +139,11 @@ The decomposition (as originally framed 2026-06-24) concluded the 1159 km gap mu
 
 [`hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md) — the earlier proposal to add ELP-2000/82 was **empirically superseded** by the 2026-07 audit above. All modern lunar theories tested (ELP-2000/82B truncated and full, MPP02-DE, MPP02-LLR) converge with Meeus at year -135. Higher-precision Moon polynomial does not close the residual.
 
-The next promising avenues (in decreasing order of expected leverage):
+The next promising avenues (in decreasing order of expected leverage, after the 2026-07 distance-drift audit ruled out scene-vs-polynomial internal drift):
 
-1. **Sun polynomial upgrade** — replace Meeus Ch. 25 low-precision Sun with VSOP87 (or ELP/VSOP for both Sun and Moon consistency). Rough estimate: 8-16 hours, medium technical complexity.
-2. **ΔT convention audit** — verify UT1 vs UT0 vs TDB corrections match NASA's convention. Rough estimate: 4-8 hours.
-3. **Ray-trace geometry audit** — compare framework's greatest-eclipse definition against NASA's (γ minimum along shadow axis). Rough estimate: 4-8 hours.
+1. **NASA γ / greatest-eclipse convention audit** — at -135, NASA's γ = 0.7119 marks a grazing partial. The 15° longitude offset between framework ray-trace and NASA "greatest" resembles a definitional difference (sub-shadow-axis vs closest-approach vs tangent-of-shadow-axis-to-Earth-surface). Rough estimate: 4-8 hours. **Most likely source.**
+2. **Sun polynomial upgrade** — replace Meeus Ch. 25 low-precision Sun with VSOP87 (or ELP/VSOP for both Sun and Moon consistency). Rough estimate: 8-16 hours, medium technical complexity.
+3. **ΔT convention audit** — verify UT1 vs UT0 vs TDB corrections match NASA's convention. Rough estimate: 4-8 hours.
 
 None are currently prioritized; the deep-partial-at-Babylon reading remains the project's official position and is consistent with the diary text + the empirical match record at all other deep-time events.
 

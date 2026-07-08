@@ -28855,12 +28855,54 @@ function setupGUI() {
     const fw_umbra = umbraFromSceneAtJd(JD_135);
     const fw_subsolar = subSolarFromSceneAtJd(JD_135);
     console.log('');
-    console.log('    Framework scene ray-trace:');
+    console.log('    Framework scene ray-trace (at framework JD_135 = 1671853.7598 = 06:14:07 UT):');
     console.log(`      Umbra:     (${fw_umbra ? fw_umbra.lat.toFixed(2) : 'off Earth'}°N, ${fw_umbra ? fw_umbra.lon.toFixed(2) : '?'}°E)`);
     console.log(`      Sub-solar: (${fw_subsolar.lat.toFixed(2)}°N, ${fw_subsolar.lon.toFixed(2)}°E)`);
     if (fw_umbra) {
       const fw_dist_km = gcKmFromLatLon(babylon_lat, babylon_lon, fw_umbra.lat, fw_umbra.lon);
       console.log(`      → Distance to Babylon: ${fw_dist_km.toFixed(0)} km  (audit-26 uses ±4h sweep for BestGap)`);
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // NASA-UT convention test — 2026-07 diagnostic
+    //
+    // NASA's "greatest eclipse" per Five Millennium Canon methodology:
+    //   "The instant when the axis of the Moon's shadow passes closest to the
+    //    Earth's center." NASA uses VSOP87 (Sun) + ELP-2000/82 (Moon).
+    //
+    // For -135 Apr 15 (catalog 04438): greatest at TD 09:27:08, ΔT = 11969 s,
+    // greatest at (47°N, 59°E). Converting NASA's TD to UT:
+    //   UT = TD − ΔT/86400 = 09:27:08 − 11969/86400 = 06:07:39 UT
+    //   JD_UT = JD 1671853.5 + 0.2553 = JD 1671853.7553
+    //
+    // Framework's JD_135 = 1671853.759762 corresponds to 06:14:07 UT — that's
+    // ~6:28 AFTER NASA's greatest UT. This may account for part of the umbra
+    // location gap.
+    //
+    // This diagnostic runs the same ray-trace at NASA's greatest UT to test:
+    //   (a) If umbra lands near (47°N, 59°E): the residual was pure timing
+    //       offset, and updating JD_135 closes the case
+    //   (b) If umbra stays at ~(53°N, 78°E): framework's ray-trace uses a
+    //       different geometric convention than NASA's — need to align
+    // ────────────────────────────────────────────────────────────────────────
+    const NASA_TT_greatest = 9 + 27/60 + 8/3600;   // 09:27:08 hours (per catalog 04438)
+    const NASA_UT_greatest_JD = 1671853.5 + (NASA_TT_greatest - nasa_dT/3600) / 24;
+    const fw_umbra_nasaUT = umbraFromSceneAtJd(NASA_UT_greatest_JD);
+    const fw_subsolar_nasaUT = subSolarFromSceneAtJd(NASA_UT_greatest_JD);
+    console.log('');
+    console.log(`    Framework scene ray-trace at NASA's greatest UT (JD ${NASA_UT_greatest_JD.toFixed(6)} = 06:07:39 UT):`);
+    console.log(`      Umbra:     (${fw_umbra_nasaUT ? fw_umbra_nasaUT.lat.toFixed(2) : 'off Earth'}°N, ${fw_umbra_nasaUT ? fw_umbra_nasaUT.lon.toFixed(2) : '?'}°E)`);
+    console.log(`      Sub-solar: (${fw_subsolar_nasaUT.lat.toFixed(2)}°N, ${fw_subsolar_nasaUT.lon.toFixed(2)}°E)`);
+    if (fw_umbra_nasaUT) {
+      const fw_dist_nasaUT_km = gcKmFromLatLon(babylon_lat, babylon_lon, fw_umbra_nasaUT.lat, fw_umbra_nasaUT.lon);
+      const gap_to_nasa_km = gcKmFromLatLon(47.0, 59.0, fw_umbra_nasaUT.lat, fw_umbra_nasaUT.lon);
+      console.log(`      → Distance to Babylon: ${fw_dist_nasaUT_km.toFixed(0)} km`);
+      console.log(`      → Distance to NASA's greatest (47°N, 59°E): ${gap_to_nasa_km.toFixed(0)} km`);
+      console.log('');
+      console.log('    Interpretation of framework-vs-NASA gap at NASA-UT:');
+      console.log('      • < 200 km: gap was pure JD_135 timing offset — framework and NASA agree');
+      console.log('      • > 500 km: gap is a geometric-convention difference — need to align conventions');
+      console.log('      • 200-500 km: mixed cause — both factors contribute');
     }
 
     console.log('');
@@ -53992,9 +54034,13 @@ function updatePositions() {
       obj.ra  = newRA;                     // override RA
       obj.dec = Math.PI / 2 - newDec;      // override Dec (phi convention)
 
-      // Correct 3D visual position to match Meeus-corrected RA+Dec
+      // Correct 3D visual position to match Meeus-corrected RA+Dec+distance
       SPHERICAL.theta = obj.ra;
       SPHERICAL.phi = obj.dec;
+      if (obj._meeusDistKm !== undefined) {
+        // km → scene units (100 scene units = 1 AU)
+        SPHERICAL.radius = obj._meeusDistKm * 100 / currentAUDistance;
+      }
       _moonVisualCorrection.setFromSpherical(SPHERICAL);
       _moonVisualCorrection.applyMatrix4(earth.rotationAxis.matrixWorld);          // local → world
       _moonVisualMatrix.copy(obj.pivotObj.parent.matrixWorld).invert();
@@ -54465,6 +54511,8 @@ function moveModel(pos) {
                        + (1.25 * eocHalf * eocHalf / _d2r * 1e6) * Math.sin(2*Mpr);
       obj._meeusLonDeg = Lp / _d2r + fullSl * 1e-6 + moonMeeusLpCorrection;  // ecliptic longitude in degrees
       obj._meeusT = T;  // store T for obliquity computation
+      // Meeus Ch. 47 first-order distance (matches _meeusMoonDistance / eclipse dispatchers)
+      obj._meeusDistKm = moonDistance * (1 - moonOrbitalEccentricityBase * Math.cos(Mpr));
     }
 
     // Dynamic geocentric elipticOrbit for Type II + III planets
