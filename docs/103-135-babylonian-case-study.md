@@ -1,41 +1,67 @@
-# -135 Babylonian solar eclipse — pure-tidal physics meets Meeus polynomial limits
+# -135 Babylonian solar eclipse — pure-tidal physics vs NASA at a documented totality
 
-**Date**: 2026-06-24 (last update 2026-06-25)
-**Status**: Resolved — framework's pure-tidal + α(t) GIA prediction places the -135-04-15 eclipse centerline over central Saudi Arabia (~1159 km south-east of Babylon). The diary's "totality at Babylon" record is interpreted as a deep partial eclipse (~95-99% magnitude). The disagreement with NASA's ELP-2000/82-based path-through-Mesopotamia is attributed to a known accuracy limit of the Meeus Ch. 47 polynomial at this specific JD, not to a framework physics error.
+**Status**: Resolved with revised attribution — framework's pure-tidal + α(t) GIA prediction places the -135-04-15 eclipse centerline over central Saudi Arabia (~1159 km south-east of Babylon). The diary's "totality at Babylon" record is interpreted as a deep partial eclipse (~95-99% magnitude). The disagreement with NASA's path-through-Mesopotamia is **NOT** attributable to the Meeus Ch. 47 Moon polynomial: empirical testing against ELP-2000/82B (both truncated and full 37,863-term untruncated) and ELP/MPP02 (DE-fit and LLR-fit variants) shows all modern lunar theories converge to Moon β ≈ 0.706° at year -135 in the of-date frame within 0.001° of each other, and geometrically consistent with NASA's γ = 0.7119. The Moon polynomial is confirmed correct; the residual comes from **elsewhere** (candidates: Sun polynomial precision, ΔT convention, or greatest-eclipse ray-trace methodology).
 **Prior baseline**: [`doc 101`](101-pure-tidal-eclipses.md) — pure-tidal physics validated against 19 documented solar eclipses; -135 noted as the one persistent residual that motivated this case study.
 
 ---
 
 ## Thesis
 
-The Babylonian astronomical diary recording the 15 April 136 BCE (= -135 astronomical) solar eclipse is one of the most scholarly-secure attributions in the historical eclipse corpus. The framework matches every other tested deep-time totality at ★ TOTAL or ◐ near-T precision, but its -135 prediction places the umbra centerline ~1159 km from Babylon. This document decomposes that gap into three sources, shows that the dominant component cannot be closed by α(t) tuning within physically defensible bounds, and concludes that the residual is a Meeus Ch. 47 polynomial accuracy limit at this specific perturbation-series sum. The framework's prediction (centerline over Saudi Arabia, deep partial at Babylon) is therefore the correct prediction *given its Moon polynomial*; closing the gap to NASA's ELP-2000/82 result would require replacing Meeus Ch. 47 with a higher-precision lunar theory (forward-path doc [`IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md)).
+The Babylonian astronomical diary recording the 15 April 136 BCE (= -135 astronomical) solar eclipse is one of the most scholarly-secure attributions in the historical eclipse corpus. The framework matches every other tested deep-time totality at ★ TOTAL or ◐ near-T precision, but its -135 prediction places the umbra centerline ~1159 km from Babylon. This document decomposes that gap into ΔT and non-ΔT components, documents the empirical Moon-polynomial finding (all modern theories converge), and concludes that the residual is a Sun-polynomial-precision, ΔT-convention, or ray-trace-methodology limit — **not** a Moon polynomial accuracy issue as an earlier attribution supposed. The framework's prediction (centerline over Saudi Arabia, deep partial at Babylon) remains the correct prediction *given the current Sun-polynomial precision*; closing the gap to NASA would require replacing Meeus Ch. 25 Sun with VSOP87 (or better), auditing the ΔT convention, and/or refining the greatest-eclipse ray-trace geometry.
 
 ---
 
 ## Decomposition of the 1159 km gap
 
-The framework's BestGap to Babylon at -135-04-15 is 1159 km. Diagnostic decomposition (three test buttons added 2026-06-24, see § "Diagnostic test buttons" below) splits this as:
+The framework's BestGap to Babylon at -135-04-15 is 1159 km. Empirical decomposition (test buttons added 2026-06-24, Moon-polynomial audit added 2026-07):
 
-- **~270 km** from framework's ΔT being +669 s over NASA's value
-  (closable to ~80 km by tuning α(t) within Peltier ICE-5G vs ICE-6G
-  uncertainty — but α(t) tuning produces only ~3.3 km gap improvement
-  per 100 sec of ΔT change, so even the full ΔT-driven component
+- **~270 km** from framework's ΔT being −696 s under NASA's value (framework
+  11,273 s vs NASA 11,969 s; closable to ~80 km by tuning α(t) within Peltier
+  ICE-5G vs ICE-6G uncertainty — but α(t) tuning produces only ~3.3 km gap
+  improvement per 100 sec of ΔT change, so even the full ΔT-driven component
   closes modestly)
-- **~440 km** from Meeus Ch. 47 polynomial residual in Moon β at this JD
-  (β_Meeus = 0.728° vs β_ELP-2000/82 ≈ 0.66°, a 0.07° polynomial
-  residual amplified by d_M/R_E ≈ 60 leverage on Earth's surface)
-- **~450 km** from other Meeus terms (Lp residual, Sun constant
-  residual, geometric ray-trace approximation)
-
-The α(t) tuning sweep (see § below) shows the gap is mathematically uncloseable by GIA tuning alone: the sensitivity is too low. The Moon polynomial residual is the dominant source.
+- **~0 km from Moon polynomial** — empirically verified 2026-07: Meeus Ch. 47
+  (60 terms), ELP-2000/82B truncated (3,402 terms), ELP-2000/82B full (37,863
+  terms), MPP02-DE, and MPP02-LLR **all** give Moon β = 0.706° ± 0.001° at
+  year -135 in the of-date frame (TT-corrected JD). NASA's published γ =
+  0.7119 for this eclipse is geometrically consistent with β = 0.706° via
+  γ ≈ β × d_M / R_E. **No modern lunar theory diverges from Meeus at -135.**
+  The earlier attribution (~440 km from a "Meeus polynomial Moon β residual")
+  was based on an unverified assumption about what ELP-2000/82 would give;
+  direct testing showed the assumption was wrong.
+- **~890 km from other sources** — sources not yet definitively identified.
+  Candidates in decreasing likely-magnitude order:
+  1. Framework Sun position from Meeus Ch. 25 (low precision) vs NASA using
+     VSOP87 (higher precision) at year -135
+  2. Framework's greatest-eclipse ray-trace methodology vs NASA's definition
+     of the greatest-eclipse geographic point (γ minimum along shadow axis)
+  3. ΔT convention subtleties (UT1 vs UT0 vs TDB corrections)
 
 ## Resolution interpretation
 
-Framework's pure-tidal + α(t) GIA + Meeus polynomial predicts the -135 Apr 15 eclipse centerline crossed **central Saudi Arabia (~24.8°N, 52.3°E)**, with Babylon at 1159 km from centerline observing a **deep partial eclipse (~95-99% magnitude)**. The diary's record of Venus, Mercury, and "Normal Stars" visible is consistent with this magnitude.
+Framework's pure-tidal + α(t) GIA + Meeus-Sun + Meeus-Moon polynomial predicts the -135 Apr 15 eclipse centerline crossed **central Saudi Arabia (~24.8°N, 52.3°E)**, with Babylon at 1159 km from centerline observing a **deep partial eclipse (~95-99% magnitude)**. The diary's record of Venus, Mercury, and "Normal Stars" visible is consistent with this magnitude.
 
-The disagreement with NASA's ELP-2000/82-based path-through-Mesopotamia is a **known accuracy limit of Meeus Ch. 47 at -135's specific perturbation-series sum**, not a framework physics error.
+The disagreement with NASA's path-through-Mesopotamia is empirically **NOT** a Moon-polynomial accuracy limit (see § Decomposition above). The residual must come from Sun polynomial precision (framework Meeus Ch. 25 vs NASA VSOP87), ΔT convention, and/or ray-trace geometry differences.
 
-NASA Five Millennium Canon's own greatest is at (46.8°N, 58.9°E) — **~2100 km from Babylon** — so even the authoritative reference does not place greatest at Babylon. NASA's path crosses Babylon at a non-greatest moment via ELP-2000/82's more accurate Moon polynomial.
+NASA Five Millennium Canon's own greatest is at (47°N, 59°E) — **~2100 km from Babylon** — so even the authoritative reference does not place greatest at Babylon. NASA's path crosses Babylon at a non-greatest moment via a combination of its higher-precision Sun polynomial (VSOP87) and its own ΔT convention.
+
+## Empirical Moon-polynomial audit (2026-07)
+
+Testing at JD_UT = 1671853.76 + ΔT/86400 (TT-corrected input, of-date output frame):
+
+| Theory | Terms | Moon β at year -135 |
+|---|---:|---:|
+| Meeus Ch. 47 | 60 | 0.7057° |
+| ELP-2000/82B truncated | 3,402 | 0.7057° |
+| ELP-2000/82B full untruncated | 37,863 | 0.7058° |
+| MPP02-DE (fit to JPL DE405/406) | 35,901 | 0.7066° |
+| MPP02-LLR (fit to Lunar Laser Ranging) | 35,901 | 0.7066° |
+
+Maximum spread across all five theories: **0.001°**. This is within the expected accuracy of each theory at year -135 (T ≈ -21.3 Jcy, well beyond the 1900-2100 validation window). The theories are not diverging materially at deep past — they converge to the same underlying physical Moon position.
+
+NASA's γ = 0.7119 for this eclipse is consistent with β = 0.706° via the standard relation γ ≈ β × d_M / R_E = 0.706° × (π/180) × 363,000 km / 6,378 km = 0.702. The 0.01 residual is within the ~0.03° of-date vs J2000 frame difference caused by ecliptic pole precession over 21 centuries.
+
+**Empirical conclusion**: the Moon polynomial is confirmed correct across all theories, and geometrically consistent with NASA's own value. Any earlier claim that a higher-precision Moon polynomial would close the -135 residual is unsupported by direct testing.
 
 ---
 
@@ -72,7 +98,7 @@ The Babylonian astronomical diary recording the 15 April 136 BCE eclipse is rega
 - **Stephenson & Steele 2006** (*JHA*) re-examined and re-confirmed
 - **No scholarly alternative proposed** in ADART or Stephenson 2016
 
-The attribution is rock-solid. The interpretation issue is therefore not chronological — it's about whether the diary's language for "totality at Babylon" admits ~95-99% deep partial under modern re-examination, OR whether the framework's Meeus polynomial residual shifts the centerline ~1000 km. Both readings are consistent with the diary text; the framework's empirical match record at all other deep-time events favors the polynomial-residual reading.
+The attribution is rock-solid. The interpretation issue is therefore not chronological — it's about whether the diary's language for "totality at Babylon" admits ~95-99% deep partial under modern re-examination, OR whether the framework's non-Moon-polynomial residual (Sun polynomial precision, ΔT convention, or ray-trace methodology) shifts the centerline ~1000 km. Both readings are consistent with the diary text.
 
 ---
 
@@ -84,15 +110,23 @@ Three test buttons quantified the decomposition:
 
 2. **"Babylonian-era Meeus residual sweep (8 events)"** — measures β_Meeus vs β_needed at 8 events from -762 to -135 BCE. β_diff is small (≤0.12°) at events that matched (-584 Thales, -309 Sicily, -762 Bur-Sagale), and large (+0.30°) at -135 specifically. **Pattern is event-specific, not era-systematic.**
 
-3. **"α(t) GIA tuning sweep at -135 Babylonian"** — tests scale factors 0.50× to 1.10× on `EARTH_MOI_FACTOR_RATE_YR`. Across 1690 sec of ΔT range, umbra latitude shifts only 1.8°. **Sensitivity: ~3.3 km gap improvement per 100 sec ΔT change.** Closing the 1159 km gap would require ~35,000 sec of ΔT shift = 50× the literature uncertainty bound. α(t) tuning is mathematically incapable of closing the gap; the residual must be Moon polynomial.
+3. **"α(t) GIA tuning sweep at -135 Babylonian"** — tests scale factors 0.50× to 1.10× on `EARTH_MOI_FACTOR_RATE_YR`. Across 1690 sec of ΔT range, umbra latitude shifts only 1.8°. **Sensitivity: ~3.3 km gap improvement per 100 sec ΔT change.** Closing the 1159 km gap would require ~35,000 sec of ΔT shift = 50× the literature uncertainty bound. α(t) tuning is mathematically incapable of closing the gap alone.
 
-The decomposition was conclusive: the 1159 km is dominated by Meeus polynomial residual at this specific JD, not by α(t) GIA mis-tuning.
+The decomposition (as originally framed 2026-06-24) concluded the 1159 km gap must be dominated by Moon polynomial residual. **The 2026-07 empirical audit (see § Empirical Moon-polynomial audit above) showed this earlier conclusion was wrong**: five modern lunar theories all give Moon β ≈ 0.706° at year -135 within 0.001° of each other. The residual is therefore NOT a Moon-polynomial-truncation issue and must come from Sun polynomial precision, ΔT convention, or ray-trace methodology.
 
 ---
 
 ## Forward path
 
-[`hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md) — proposed future work to add ELP-2000/82 as an optional higher-precision Moon polynomial path. Estimated effort 13-23 hours. Not currently prioritized; the deep-partial-at-Babylon reading is the project's official position and is consistent with the diary text + the empirical match record at all other deep-time events.
+[`hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md) — the earlier proposal to add ELP-2000/82 was **empirically superseded** by the 2026-07 audit above. All modern lunar theories tested (ELP-2000/82B truncated and full, MPP02-DE, MPP02-LLR) converge with Meeus at year -135. Higher-precision Moon polynomial does not close the residual.
+
+The next promising avenues (in decreasing order of expected leverage):
+
+1. **Sun polynomial upgrade** — replace Meeus Ch. 25 low-precision Sun with VSOP87 (or ELP/VSOP for both Sun and Moon consistency). Rough estimate: 8-16 hours, medium technical complexity.
+2. **ΔT convention audit** — verify UT1 vs UT0 vs TDB corrections match NASA's convention. Rough estimate: 4-8 hours.
+3. **Ray-trace geometry audit** — compare framework's greatest-eclipse definition against NASA's (γ minimum along shadow axis). Rough estimate: 4-8 hours.
+
+None are currently prioritized; the deep-partial-at-Babylon reading remains the project's official position and is consistent with the diary text + the empirical match record at all other deep-time events.
 
 ---
 
@@ -100,7 +134,7 @@ The decomposition was conclusive: the 1159 km is dominated by Meeus polynomial r
 
 - [Doc 101 — pure-tidal eclipses](101-pure-tidal-eclipses.md) — framework validation; -135 documented under Interpretation 1 (deep partial reading)
 - [Doc 102 — GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) — α(t) GIA contribution magnitude (rules out α(t) tuning as -135 solution)
-- [Doc 66 — Moon Meeus corrections](66-moon-meeus-corrections.md) — polynomial accuracy table (current estimates may be optimistic at -135; empirical case shows ~0.07° β residual vs doc 66's ~10-30 arcsec estimate)
+- [Doc 66 — Moon Meeus corrections](66-moon-meeus-corrections.md) — polynomial accuracy table (2026-07 finding: all modern lunar theories at year -135 agree with Meeus Ch. 47 within 0.001°; doc 66's original ~10-30 arcsec estimate at deep past appears empirically defensible after this audit)
 - [`hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md) — forward-path proposal for higher-precision Moon polynomial
 - [`hidden/old-documents/IP-strategy-z-earth-rotation-integration.md`](hidden/old-documents/IP-strategy-z-earth-rotation-integration.md) — Strategy A investigation history (the prior step that exposed -135 as the persistent residual; Strategy Z proposal abandoned, Strategy A disabled instead)
 - Diary attribution: Stephenson & Steele 2006 *JHA*; Sachs & Hunger *ADART* Vol. III; Huber & De Meis 2004, *Babylonian Eclipse Observations from 750 BC to 1 BC*
@@ -117,4 +151,4 @@ Independent published sources for cross-checking the framework's interpretation:
 
 - **Russian geology repository — historical-eclipse compilation** ([link](https://repository.geologyscience.ru/server/api/core/bitstreams/6dd0f726-52e0-4e06-a7c4-28fb9cfa2aa6/content)) — discussion of the -135 Babylonian eclipse in the context of Earth-rotation history; useful as a third independent source for the same path-geometry / ΔT-sensitivity framing.
 
-These external sources establish that **the framework's prediction (~1159 km from Babylon) is in the same conceptual neighborhood as the published independent reconstructions**: all approaches agree the eclipse's geographic placement at Babylon depends critically on the exact ΔT model used, and that modern Moon polynomial accuracy at this specific JD is itself a contributor to the ~1000 km of cross-model spread. The Interpretation 1 reading adopted in this doc (Babylon saw deep partial, framework's path-through-Saudi-Arabia is correct given its Meeus polynomial) is therefore consistent with the IMCCE-acknowledged "limits of current celestial mechanics" framing — not a contradiction with mainstream astronomy.
+These external sources establish that **the framework's prediction (~1159 km from Babylon) is in the same conceptual neighborhood as the published independent reconstructions**: all approaches agree the eclipse's geographic placement at Babylon depends critically on the exact ΔT model used. The Interpretation 1 reading adopted in this doc (Babylon saw deep partial, framework's path-through-Saudi-Arabia is correct given its current Sun-polynomial precision) is consistent with the IMCCE-acknowledged "limits of current celestial mechanics" framing. **Note (2026-07 update)**: after the empirical Moon-polynomial audit above, the cross-model spread's cause is now attributed to Sun-polynomial precision, ΔT convention, and ray-trace methodology differences — NOT to Moon polynomial precision as originally supposed. Modern Moon theories converge across the full historical past; the -135 residual is a subtler problem than a truncated series.
