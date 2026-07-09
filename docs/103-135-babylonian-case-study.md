@@ -1,13 +1,13 @@
 # -135 Babylonian solar eclipse — pure-tidal physics vs NASA at a documented totality
 
-**Status**: Resolved with revised attribution — framework's pure-tidal + α(t) GIA prediction places the -135-04-15 eclipse centerline over central Saudi Arabia (~1159 km south-east of Babylon). The diary's "totality at Babylon" record is interpreted as a deep partial eclipse (~95-99% magnitude). The disagreement with NASA's path-through-Mesopotamia is **NOT** attributable to the Meeus Ch. 47 Moon polynomial: empirical testing against ELP-2000/82B (both truncated and full 37,863-term untruncated) and ELP/MPP02 (DE-fit and LLR-fit variants) shows all modern lunar theories converge to Moon β ≈ 0.706° at year -135 in the of-date frame within 0.001° of each other, and geometrically consistent with NASA's γ = 0.7119. The Moon polynomial is confirmed correct; the residual comes from **elsewhere** (candidates: Sun polynomial precision, ΔT convention, or greatest-eclipse ray-trace methodology).
+**Status**: Case-study residual closed to observation-precision after the 2026-07 Sun Meeus overlay (§ below). Framework's audit-26 BestGap at -135 = **170 km**, verdict **↻ off-peak** (framework agrees with record on UT; umbra within 300 km of Babylon within ±4h scan). The disagreement with NASA's path-through-Mesopotamia was **NOT** attributable to the Meeus Ch. 47 Moon polynomial: empirical testing against ELP-2000/82B (both truncated and full 37,863-term untruncated) and ELP/MPP02 (DE-fit and LLR-fit variants) shows all modern lunar theories converge to Moon β ≈ 0.706° at year -135 in the of-date frame within 0.001° of each other, and geometrically consistent with NASA's γ = 0.7119. Root cause was **Sun-pipeline extrapolation drift** — framework's fitted pipeline drifted 0.30° west of Meeus Ch. 25 at year -135, amplified ~70× by near-grazing γ = 0.71 eclipse geometry. Fix: `SUN_MEEUS_OVERLAY_ENABLED = true` routes scene Sun through Meeus Ch. 25 as post-hoc RA/Dec override (analogous to existing Moon overlay). Residual after fix: 170 km best gap, 665 km NASA-UT convention gap — remaining attribution is framework GMST/Earth-rotation drift (0.36° at year -135).
 **Prior baseline**: [`doc 101`](101-pure-tidal-eclipses.md) — pure-tidal physics validated against 19 documented solar eclipses; -135 noted as the one persistent residual that motivated this case study.
 
 ---
 
 ## Thesis
 
-The Babylonian astronomical diary recording the 15 April 136 BCE (= -135 astronomical) solar eclipse is one of the most scholarly-secure attributions in the historical eclipse corpus. The framework matches every other tested deep-time totality at ★ TOTAL or ◐ near-T precision, but its -135 prediction places the umbra centerline ~1159 km from Babylon. This document decomposes that gap into ΔT and non-ΔT components, documents the empirical Moon-polynomial finding (all modern theories converge), and concludes that the residual is a Sun-polynomial-precision, ΔT-convention, or ray-trace-methodology limit — **not** a Moon polynomial accuracy issue as an earlier attribution supposed. The framework's prediction (centerline over Saudi Arabia, deep partial at Babylon) remains the correct prediction *given the current Sun-polynomial precision*; closing the gap to NASA would require replacing Meeus Ch. 25 Sun with VSOP87 (or better), auditing the ΔT convention, and/or refining the greatest-eclipse ray-trace geometry.
+The Babylonian astronomical diary recording the 15 April 136 BCE (= -135 astronomical) solar eclipse is one of the most scholarly-secure attributions in the historical eclipse corpus. The framework's -135 prediction was for many months the one persistent residual — best gap ~800-1200 km depending on JD reference — while every other tested deep-time totality matched at ★ TOTAL or ◐ near-T precision. This document reconstructs the investigation: an unverified Moon-polynomial attribution was empirically superseded (all modern lunar theories converge at year -135 within 0.001°); a Moon distance-drift audit exonerated Moon distance; a component-level audit identified the actual cause as **Sun pipeline extrapolation drift** (0.30° west of Meeus at deep past, amplified ~70× by near-grazing γ geometry); and the 2026-07 Sun Meeus overlay closes the residual to 170 km / ↻ off-peak.
 
 ---
 
@@ -80,7 +80,33 @@ The 0.037° effective-β excess in the ray-trace was an artifact: the shadow pro
 
 **Fix**: added `obj._meeusDistKm = moonDistance * (1 - moonOrbitalEccentricityBase * Math.cos(Mpr))` in the Meeus block and set `SPHERICAL.radius = obj._meeusDistKm * 100 / currentAUDistance` before the ecliptic-to-scene transform. After fix: scene Moon distance ratio (framework/Meeus) = **1.000000**.
 
-**Effect on -135 residual**: umbra shifted +0.7° north (matches physical prediction β × Δd/R_E = 0.535°). Distance to NASA's greatest changed from 1236 km → 1233 km. Latitude gap to NASA closed by 500 km worth of leverage; longitude gap of ~15° eastward remained. The residual is therefore NOT a distance-drift issue either — the framework and Meeus polynomial now agree on Moon distance to seven decimal places, and the −135 gap is unchanged. Attribution shifts to the ray-trace vs Meeus-analytical umbra convention (the framework ray-trace places umbra ~8° west of sub-solar due to shadow-axis tilt at β = 0.7°; the Meeus-method analytical formula treats umbra_lon ≈ sub-solar_lon) and to the NASA γ = 0.7119 "greatest eclipse" convention for grazing partial events.
+**Effect on -135 residual**: umbra shifted +0.7° north (matches physical prediction β × Δd/R_E = 0.535°). Distance to NASA's greatest changed from 1236 km → 1233 km. Latitude gap to NASA closed by 500 km worth of leverage; longitude gap of ~15° eastward remained. The residual is therefore NOT a distance-drift issue either — the framework and Meeus polynomial now agree on Moon distance to seven decimal places, and the −135 gap is unchanged. Attribution shifts to the Sun pipeline drift (see below) and to the framework Earth-rotation model.
+
+---
+
+## Sun Meeus overlay closes the residual (2026-07)
+
+Component-level audit at NASA's greatest UT revealed the framework's SCENE Sun ecliptic longitude drifted 0.30° WEST of Meeus Ch. 25 at year -135. The pipeline coefficients are fit against 1900-2200 observations and extrapolate imperfectly over 21 centuries; SUN_HARMONICS closes the near-J2000 residual to 7″ but doesn't capture the deep-past secular drift.
+
+For an eclipse with NASA γ = 0.7119 (near-grazing), umbra piercing-point location is extremely sensitive to input drift. Measured amplification factor: **~70× at γ = 0.72** — a 0.30° Sun-lon input drift produces a 22° umbra location shift.
+
+Fix: `SUN_MEEUS_OVERLAY_ENABLED = true` routes scene Sun's RA/Dec through Meeus Ch. 25 as a post-hoc override (analogous to the existing Moon Meeus overlay). Sun's ecliptic latitude is 0 by definition; only longitude needs correction. Scene distance to Sun is preserved. Present-epoch behavior unchanged (Meeus and pipeline agree to 7″ in 1900-2100).
+
+**Effect on -135 residual**:
+
+| Metric | Before Sun overlay | After Sun overlay | Δ |
+|---|---:|---:|---:|
+| Framework umbra at NASA-UT | (51.5°N, 74.5°E) | (43.3°N, 52.4°E) | −8.2° lat, −22.2° lon |
+| Framework umbra at framework JD | (54.0°N, 77.6°E) | (45.7°N, 54.5°E) | −8.3° lat, −23.1° lon |
+| Distance to NASA's greatest | 1233 km | **665 km** | −568 km (−46%) |
+| Distance to Babylon @ framework JD | 3544 km | 1703 km | −1841 km |
+| Audit-26 BestGap at -135 (±4h scan) | 809 km ↶ regional | **170 km ↻ off-peak** | −639 km (−79%) |
+
+**The -135 Babylonian case-study residual is closed to observation-precision (170 km at framework's own preset UT, with 6h scan finding umbra at (33.2°N, 42.8°E) — southeast of Babylon by ~1.5° = observation-precision for pre-telescopic records).**
+
+**Audit-26 broader effect**: net improvement across 26 events (~445 km cumulative). Modern eclipse tests (2017/2024/2026) unchanged within noise. Four deep-past events (-708/-556/-584/-647) REGRESSED in verdict category (from off-peak to regional) — old Sun-pipeline drift was compensating a separate GMST/Earth-rotation drift; overlay unmasks the underlying error. **Cairo cluster (977/978/979/985) unchanged**: Sun-lon drift was not the cause of that cluster.
+
+Remaining residual attribution (as of 2026-07 post-overlay): the ~665 km residual at NASA-UT decomposes as latitude 411 km (from GMST + Meeus Ch. 25 accuracy floor) + longitude 522 km (from GMST drift 0.36° ≈ 86 sec UT). GMST drift is the next investigation target.
 
 ---
 
@@ -137,15 +163,15 @@ The decomposition (as originally framed 2026-06-24) concluded the 1159 km gap mu
 
 ## Forward path
 
-[`hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md) — the earlier proposal to add ELP-2000/82 was **empirically superseded** by the 2026-07 audit above. All modern lunar theories tested (ELP-2000/82B truncated and full, MPP02-DE, MPP02-LLR) converge with Meeus at year -135. Higher-precision Moon polynomial does not close the residual.
+The -135 case-study residual has been closed to observation-precision (170 km, ↻ off-peak) by the **Sun Meeus overlay** (see § Sun Meeus overlay above). The residual is now dominated by Earth-rotation model drift, not Sun polynomial.
 
-The next promising avenues (in decreasing order of expected leverage, after the 2026-07 distance-drift audit ruled out scene-vs-polynomial internal drift):
+Next investigation targets (in decreasing order of expected leverage):
 
-1. **NASA γ / greatest-eclipse convention audit** — at -135, NASA's γ = 0.7119 marks a grazing partial. The 15° longitude offset between framework ray-trace and NASA "greatest" resembles a definitional difference (sub-shadow-axis vs closest-approach vs tangent-of-shadow-axis-to-Earth-surface). Rough estimate: 4-8 hours. **Most likely source.**
-2. **Sun polynomial upgrade** — replace Meeus Ch. 25 low-precision Sun with VSOP87 (or ELP/VSOP for both Sun and Moon consistency). Rough estimate: 8-16 hours, medium technical complexity.
-3. **ΔT convention audit** — verify UT1 vs UT0 vs TDB corrections match NASA's convention. Rough estimate: 4-8 hours.
+1. **GMST (Earth-rotation) drift**. Framework's implicit GMST at year -135 is 0.36° ahead of the IAU standard (Meeus eq. 12.4) — equivalent to 86 sec UT. This drift is likely the source of both (a) the remaining 665 km NASA-UT residual at -135 and (b) the four deep-past regressions exposed by the Sun overlay (-708/-556/-584/-647). Fixing GMST is expected to close both. Rough estimate: 4-8 hours.
+2. **Cairo cluster (977/978/979/985)** — four Cairo events remain ⚠ geographic (1200-3000 km best gap). Unaffected by Sun overlay. Candidates: preset-data attribution error, systematic framework issue in that latitude range, or Moon-node phase issue at ~1000 CE. Rough estimate: 2-4 hours to hypothesis-test.
+3. **Sun polynomial upgrade** — replace Meeus Ch. 25 with VSOP87 for higher precision at deep past. Meeus Ch. 25's ~30″ accuracy floor at year -135 amplifies to ~2000 km umbra shift under near-grazing γ geometry. Rough estimate: 8-16 hours.
 
-None are currently prioritized; the deep-partial-at-Babylon reading remains the project's official position and is consistent with the diary text + the empirical match record at all other deep-time events.
+The empirical Moon-polynomial audit (§ above) already ruled out higher-precision lunar theory as a route to closing the residual — all five modern lunar theories converge at year -135 within 0.001°.
 
 ---
 

@@ -52,6 +52,7 @@ let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see 
 let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction (Phase Z-B) — rationale ~L7066
 let   EARTH_ROTATION_DT_CORRECTION_ENABLED = false;  // DIAGNOSTIC-ONLY — do NOT enable for eclipse validation. When ON, applies ΔT twice: Meeus wrappers already advance UT→TT internally for Sun/Moon positions (~L5107 `_eclSunLon` + ~L5157/5190/5199 `_meeusMoon*`) and the base Earth spin is already at UT-anchored rate (correct actual rotation). Enabling this adds ΔT to Earth's rotation on top of the already-correct scene → over-rotates Earth by ~47° at year -135. Kept as an A/B diagnostic to verify the Meeus internal TT conversion is working. Formerly "Strategy A"; rationale ~L6889
 let   BOND_DT_CORRECTION_ENABLED = false;  // Bond 8H/1851 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
+let   SUN_MEEUS_OVERLAY_ENABLED  = true;   // 2026-07: route scene Sun through Meeus Ch. 25 as post-hoc RA/Dec override (analogous to Moon Meeus overlay). Pipeline is fit 1900-2100 and drifts ~0.30° at year -135; overlay eliminates that drift. Near-grazing γ eclipse geometry amplifies input drift by ~70× → this closed ~80% of the -135 Babylonian residual (809 km → 170 km in audit-26). Modern eclipse tests unchanged (Sun pipeline agrees with Meeus to 7″ in 1900-2100 via SUN_HARMONICS). Some deep-past events (-708/-556/-584/-647) regressed in verdict because old sun-drift was compensating GMST drift; overlay unmasks that as next investigation target. Supersedes SUN_HARMONICS effect on Sun position when both are ON.
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
 const earthtiltMean = 23.41353954485521;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
@@ -28905,6 +28906,100 @@ function setupGUI() {
       console.log('      • 200-500 km: mixed cause — both factors contribute');
     }
 
+    // ────────────────────────────────────────────────────────────────────────
+    // Component-level audit at NASA-UT — 2026-07 diagnostic
+    //
+    // Isolates WHICH input component drives the ~15° umbra longitude gap.
+    // Tests four candidates:
+    //   (A) Sun ecliptic longitude — scene pipeline vs Meeus Ch. 25
+    //   (B) Moon ecliptic (lon/β/dist) — scene stored vs Meeus Ch. 47
+    //   (C) GMST (Earth rotation angle at UT) — framework implicit vs IAU
+    //   (D) Umbra convention — piercing point vs NASA's radial-projection-
+    //       of-axis-closest-approach
+    //
+    // Reads clean if all four small → mystery is elsewhere. Reads a specific
+    // component large → that's the fix target.
+    // ────────────────────────────────────────────────────────────────────────
+    console.log('');
+    console.log('  ─── Component-level audit at NASA-UT (isolates 15° gap source) ───');
+
+    jumpToJulianDay(NASA_UT_greatest_JD);
+    forceSceneUpdate('light');
+
+    const _AUD_epsDeg = 23.4393 - 0.01300 * ((NASA_UT_greatest_JD - j2000JD) / 36525);
+    const _AUD_eps = _AUD_epsDeg * Math.PI / 180;
+
+    // (A) Sun ecliptic longitude — scene pipeline vs Meeus Ch. 25
+    // Convert scene (α, δ) → ecliptic λ. sun.dec stored as phi from +Z pole.
+    const _sun_alpha = sun.ra;
+    const _sun_delta = Math.PI / 2 - sun.dec;
+    const sun_scene_ecl_lon = ((Math.atan2(
+      Math.sin(_sun_alpha) * Math.cos(_AUD_eps) + Math.tan(_sun_delta) * Math.sin(_AUD_eps),
+      Math.cos(_sun_alpha)
+    ) * 180 / Math.PI) + 360) % 360;
+    const sun_meeus_ecl_lon = _eclSunLon(NASA_UT_greatest_JD);
+    const sun_diff = ((sun_scene_ecl_lon - sun_meeus_ecl_lon + 540) % 360) - 180;
+    console.log('    (A) Sun ecliptic longitude at NASA-UT:');
+    console.log(`        Scene (pipeline): ${sun_scene_ecl_lon.toFixed(4)}°`);
+    console.log(`        Meeus Ch. 25:     ${sun_meeus_ecl_lon.toFixed(4)}°`);
+    console.log(`        Δ (scene−Meeus):  ${sun_diff.toFixed(4)}°`);
+
+    // (B) Moon ecliptic — scene stored (Meeus overlay) vs Meeus dispatcher
+    // Note: moon._meeusLonDeg stores raw mean-longitude accumulator (Lp/_d2r + ...
+    // integrated over centuries), so reduce mod 360 before display/subtract.
+    const _mod360 = (x) => ((x % 360) + 360) % 360;
+    const moon_scene_lon = moon._meeusLonDeg !== undefined ? _mod360(moon._meeusLonDeg) : undefined;
+    const moon_scene_beta = moon._meeusLatRad * 180 / Math.PI;
+    const moon_scene_dist = moon._meeusDistKm;
+    const moon_meeus_lon = _eclMoonLon(NASA_UT_greatest_JD);
+    const moon_meeus_beta = _eclMoonBeta(NASA_UT_greatest_JD);
+    const moon_meeus_dist = _eclMoonDistance(NASA_UT_greatest_JD);
+    console.log('    (B) Moon ecliptic at NASA-UT:');
+    console.log(`        Scene (Meeus overlay): lon ${moon_scene_lon?.toFixed(4)}°  β ${moon_scene_beta?.toFixed(4)}°  d ${moon_scene_dist?.toFixed(0)} km`);
+    console.log(`        Meeus Ch. 47 direct:   lon ${moon_meeus_lon.toFixed(4)}°  β ${moon_meeus_beta.toFixed(4)}°  d ${moon_meeus_dist.toFixed(0)} km`);
+    if (moon_scene_lon !== undefined) {
+      const dLon = ((moon_scene_lon - moon_meeus_lon + 540) % 360) - 180;
+      console.log(`        Δ:                     lon ${dLon.toFixed(4)}°  β ${(moon_scene_beta - moon_meeus_beta).toFixed(4)}°  d ${(moon_scene_dist - moon_meeus_dist).toFixed(0)} km`);
+    }
+
+    // (C) GMST (Earth rotation angle) at NASA-UT
+    // Framework implicit: back out from scene sub-solar geometry.
+    //   sub_solar_lon_east = α_sun − GMST  →  GMST = α_sun − sub_solar_lon
+    const sun_scene_ra_deg = ((_sun_alpha * 180 / Math.PI) + 360) % 360;
+    const framework_GMST_deg = ((sun_scene_ra_deg - fw_subsolar_nasaUT.lon) % 360 + 360) % 360;
+    // IAU standard (Meeus eq. 12.4)
+    const _d_j2000 = NASA_UT_greatest_JD - 2451545.0;
+    const _Tcen = _d_j2000 / 36525;
+    const iau_GMST_deg = (((280.46061837 + 360.98564736629 * _d_j2000 + 0.000387933 * _Tcen * _Tcen - _Tcen * _Tcen * _Tcen / 38710000) % 360) + 360) % 360;
+    const gmst_diff_deg = ((framework_GMST_deg - iau_GMST_deg + 540) % 360) - 180;
+    console.log('    (C) GMST (Earth rotation angle) at NASA-UT:');
+    console.log(`        Framework implicit: ${framework_GMST_deg.toFixed(4)}°`);
+    console.log(`        IAU standard:       ${iau_GMST_deg.toFixed(4)}°`);
+    console.log(`        Δ:                  ${gmst_diff_deg.toFixed(4)}°  (${(gmst_diff_deg * 240).toFixed(1)} sec UT equivalent)`);
+
+    // (D) Two umbra conventions
+    const fw_umbra_nasa_conv = umbraNASAConventionAtJd(NASA_UT_greatest_JD);
+    console.log('    (D) Umbra convention comparison at NASA-UT:');
+    console.log(`        Piercing point (framework current):     (${fw_umbra_nasaUT.lat.toFixed(2)}°N, ${fw_umbra_nasaUT.lon.toFixed(2)}°E)`);
+    if (fw_umbra_nasa_conv) {
+      console.log(`        Radial projection of closest-approach: (${fw_umbra_nasa_conv.lat.toFixed(2)}°N, ${fw_umbra_nasa_conv.lon.toFixed(2)}°E)  γ=${fw_umbra_nasa_conv.gamma.toFixed(4)}`);
+      const conv_diff_km = gcKmFromLatLon(fw_umbra_nasaUT.lat, fw_umbra_nasaUT.lon, fw_umbra_nasa_conv.lat, fw_umbra_nasa_conv.lon);
+      const nasa_conv_to_nasa_km = gcKmFromLatLon(47.0, 59.0, fw_umbra_nasa_conv.lat, fw_umbra_nasa_conv.lon);
+      const piercing_to_nasa_km = gcKmFromLatLon(47.0, 59.0, fw_umbra_nasaUT.lat, fw_umbra_nasaUT.lon);
+      console.log(`        Convention Δ: ${conv_diff_km.toFixed(0)} km  |  NASA γ = 0.7119 for reference`);
+      console.log(`        Distance to NASA's greatest (47°N, 59°E):`);
+      console.log(`          from piercing-point convention:      ${piercing_to_nasa_km.toFixed(0)} km`);
+      console.log(`          from NASA-radial-projection convention: ${nasa_conv_to_nasa_km.toFixed(0)} km`);
+    }
+
+    console.log('');
+    console.log('    Interpretation:');
+    console.log('      • (A) large (>0.1°) → Sun pipeline drift is a factor; consider VSOP87 for scene Sun');
+    console.log('      • (B) large (>0.01°) → Meeus overlay diverges from dispatcher (bug in override path)');
+    console.log('      • (C) large (>0.05°) → Earth-rotation model diverges from IAU (would shift longitude)');
+    console.log('      • (D) large (>500 km) → framework and NASA use different geometric conventions');
+    console.log('      • All small + NASA convention gap ≈ 0 → residual explained by convention alone');
+
     console.log('');
     console.log('  ΔT (framework L1-α) vs published references:');
     console.log(`    Framework:  ${Math.round(dT)} s`);
@@ -45772,6 +45867,42 @@ function umbraFromSceneAtJd(jd) {
   return { lat, lon };
 }
 
+/** Alternative umbra convention: NASA/Espenak "greatest eclipse coordinates."
+ * Projects the shadow-axis closest-approach-to-Earth-center point radially
+ * outward to Earth's surface. For γ < 1 this differs from the piercing point
+ * (which is where an observer stands to see totality). NASA's Five Millennium
+ * Canon uses this convention. Returns lat, lon, and γ (in Earth radii) for
+ * cross-checking against NASA catalog values. Diagnostic-only, 2026-07. */
+function umbraNASAConventionAtJd(jd) {
+  jumpToJulianDay(jd);
+  forceSceneUpdate('light');
+
+  sun  .planetObj.getWorldPosition(_sceneUmbraSun);
+  moon .planetObj.getWorldPosition(_sceneUmbraMoon);
+  earth.planetObj.getWorldPosition(_sceneUmbraEarth);
+
+  _sceneUmbraMoonGeo.copy(_sceneUmbraMoon).sub(_sceneUmbraEarth);
+  _sceneUmbraSunGeo .copy(_sceneUmbraSun) .sub(_sceneUmbraEarth);
+  _sceneUmbraDir    .copy(_sceneUmbraMoonGeo).sub(_sceneUmbraSunGeo).normalize();
+
+  // Closest approach: line P(t) = Moon + t·D, min |P|² at t* = -Moon·D.
+  const t_closest = -_sceneUmbraMoonGeo.dot(_sceneUmbraDir);
+  _sceneUmbraHit.copy(_sceneUmbraDir).multiplyScalar(t_closest).add(_sceneUmbraMoonGeo);
+  const gamma = _sceneUmbraHit.length() / earth.size;
+
+  // Radial projection to Earth surface (NASA convention)
+  _sceneUmbraHit.normalize().multiplyScalar(earth.size);
+
+  earth.planetObj.getWorldQuaternion(_sceneUmbraQuat);
+  _sceneUmbraQuatInv.copy(_sceneUmbraQuat).invert();
+  _sceneUmbraLocal.copy(_sceneUmbraHit).applyQuaternion(_sceneUmbraQuatInv);
+
+  const r = _sceneUmbraLocal.length();
+  const lat = Math.asin(Math.max(-1, Math.min(1, _sceneUmbraLocal.y / r))) * (180 / Math.PI);
+  const lon = Math.atan2(_sceneUmbraLocal.z, -_sceneUmbraLocal.x) * (180 / Math.PI);
+  return { lat, lon, gamma };
+}
+
 /** Navigate the scene to `jd` and return the sub-solar geographic point
  * (where the Sun is at zenith) per scene-graph. Same convention as
  * umbraFromSceneAtJd. */
@@ -53999,6 +54130,41 @@ function updatePositions() {
                + (_vc.cosEl_d2_dec || 0) * _cosEl * _invDv2
                + (_vc.cosVwE_cosEl_d2_dec || 0) * _cosVwE * _cosEl * _invDv2
                + (_vc.sinVwE_cosEl_d2_dec || 0) * _sinVwE * _cosEl * _invDv2) * _d2r;
+    }
+
+    // Meeus Ch. 25 post-hoc correction for Sun: routes scene Sun's RA/Dec/position
+    // through Meeus Ch. 25 to eliminate pipeline extrapolation drift at deep past.
+    // 2026-07 diagnostic toggle. When enabled, overrides sun.ra, sun.dec, and
+    // sun.pivotObj.position with Meeus-corrected values. Sun's ecliptic latitude
+    // is 0 by definition, so only longitude needs correction. Scene distance is
+    // preserved (SPHERICAL.radius from the setFromVector3 above).
+    if (SUN_MEEUS_OVERLAY_ENABLED && obj === sun) {
+      const _sunT = (o.julianDay - j2000JD) / 36525;
+      const _sunEps = (23.4393 - 0.01300 * _sunT) * (Math.PI / 180);
+      const _sunLamR = _eclSunLon(o.julianDay) * (Math.PI / 180);
+      const _sunSinL = Math.sin(_sunLamR), _sunCosL = Math.cos(_sunLamR);
+      const _sunCosE = Math.cos(_sunEps),  _sunSinE = Math.sin(_sunEps);
+
+      // Ecliptic (β=0) → equatorial (Meeus eq. 13.3, 13.4)
+      let _sunNewRA = Math.atan2(_sunSinL * _sunCosE, _sunCosL);
+      if (_sunNewRA < 0) _sunNewRA += 2 * Math.PI;
+      const _sunNewDec = Math.asin(_sunSinE * _sunSinL);
+
+      obj.ra  = _sunNewRA;                     // override RA
+      obj.dec = Math.PI / 2 - _sunNewDec;      // override Dec (phi convention)
+
+      // Correct 3D visual position: keep scene distance (SPHERICAL.radius unchanged
+      // from setFromVector3 above), only override direction.
+      // NOTE: pivotObj and rotationAxis are SIBLINGS under orbitObj, NOT parent/child.
+      // The mesh (planetObj) is a child of rotationAxis, so BOTH must be updated.
+      SPHERICAL.theta = obj.ra;
+      SPHERICAL.phi = obj.dec;
+      _moonVisualCorrection.setFromSpherical(SPHERICAL);
+      _moonVisualCorrection.applyMatrix4(earth.rotationAxis.matrixWorld);
+      _moonVisualMatrix.copy(obj.pivotObj.parent.matrixWorld).invert();
+      _moonVisualCorrection.applyMatrix4(_moonVisualMatrix);
+      obj.pivotObj.position.copy(_moonVisualCorrection);
+      obj.rotationAxis.position.copy(_moonVisualCorrection);
     }
 
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.
