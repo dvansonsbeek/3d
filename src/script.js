@@ -5102,7 +5102,16 @@ function _eclDeltaT(jd) {
 
 /** Sun's geocentric ecliptic longitude in degrees (0–360) at given JD.
  *  Meeus Ch. 25 low-precision formula. Accepts JD_UT; converts internally to
- *  JD_TT via _eclDeltaT. */
+ *  JD_TT via _eclDeltaT.
+ *
+ *  NOTE (2026-07): returns MEAN GEOMETRIC longitude, NOT apparent. An earlier
+ *  attempt to add aberration (-0.00569°) and nutation (-0.00478 sin Ω) made
+ *  modern events worse (2024 Dallas 12→24 km, 2026 Burgos 124→131 km).
+ *  Framework's SUN_HARMONICS was fitted against observed eclipses that already
+ *  include aberration/nutation effects → adding raw aberration on top double-
+ *  counted the correction at present epoch. To upgrade Sun to apparent
+ *  longitude cleanly, SUN_HARMONICS would need to be refit with the correction
+ *  active. Kept as MEAN for consistency with existing SUN_HARMONICS calibration. */
 function _eclSunLon(jd) {
   const _d2r = Math.PI / 180;
   const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
@@ -28926,8 +28935,10 @@ function setupGUI() {
     jumpToJulianDay(NASA_UT_greatest_JD);
     forceSceneUpdate('light');
 
-    const _AUD_epsDeg = 23.4393 - 0.01300 * ((NASA_UT_greatest_JD - j2000JD) / 36525);
-    const _AUD_eps = _AUD_epsDeg * Math.PI / 180;
+    // Use framework's obliquity (o.obliquityEarth, fresh from updatePositions above)
+    // to invert scene RA/Dec → ecl_lon. Must match the obliquity the Sun overlay
+    // used to compute those RA/Dec, otherwise this diagnostic reports a false Δ.
+    const _AUD_eps = o.obliquityEarth * Math.PI / 180;
 
     // (A) Sun ecliptic longitude — scene pipeline vs Meeus Ch. 25
     // Convert scene (α, δ) → ecliptic λ. sun.dec stored as phi from +Z pole.
@@ -29389,7 +29400,10 @@ function setupGUI() {
       while (lon > 180) lon -= 360;
       while (lon < -180) lon += 360;
       const sunL = sunLon(jd);
-      const lat = Math.asin(Math.sin(23.44 * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
+      // Framework obliquity for THIS jd (jd may differ from o.julianDay in sweeps).
+      // Was hardcoded 23.44 — drifted 0.28° at year -135 giving 40 km sub-solar error.
+      const epsDeg = computeObliquityEarth(julianDateToDecimalYear(jd));
+      const lat = Math.asin(Math.sin(epsDeg * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
       return { lat, lon };
     }
     function greatCircleKm(lat1, lon1, lat2, lon2) {
@@ -29683,7 +29697,10 @@ function setupGUI() {
       while (lon >  180) lon -= 360;
       while (lon < -180) lon += 360;
       const sunL = sunLon(jd_conj);
-      const lat = Math.asin(Math.sin(23.44 * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
+      // Framework obliquity for THIS jd_conj (may differ from o.julianDay in sweeps).
+      // Was hardcoded 23.44 — drifted 0.28° at year -135 giving 40 km sub-solar error.
+      const epsDeg = computeObliquityEarth(julianDateToDecimalYear(jd_conj));
+      const lat = Math.asin(Math.sin(epsDeg * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
       return { lat, lon };
     }
     function distAt(jd_conj, lat_obs, lon_obs, dT_sec) {
@@ -31285,7 +31302,7 @@ function setupGUI() {
     const GAP_OK_KM       = 300;    // ≤ this → site match (✓ or ↻)
     const GAP_REGIONAL_KM = 1000;   // ≤ this → umbra in same region as site (↶)
     const SCAN_WIN_H = 4;           // sweep ±4 hours for best-fit ΔUT
-    const SCAN_STEP_MIN = 2;
+    const SCAN_STEP_MIN = 0.5;      // 30-sec resolution (2026-07: was 2 min; sharpened to reduce sampling floor from 25-80 km to 6-20 km at umbra speeds)
 
     // Site coordinates for each preset, keyed by preset JD. Pulled from the
     // existing per-event eclipse tests where available; modern entries
@@ -31295,7 +31312,7 @@ function setupGUI() {
       [2460409.262050, { name: 'Dallas–central path',     lat: 32.78, lon: -96.80 }],
       [2457987.267733, { name: 'Carbondale, IL',          lat: 37.73, lon: -89.22 }],
       [2451401.960508, { name: 'Constanța, Romania',      lat: 44.18, lon:  28.65 }],
-      [2441863.985208, { name: 'Niger',                   lat: 16.00, lon:   8.00 }],
+      [2441863.985208, { name: 'Niger (Agadez)',          lat: 16.97, lon:   7.99 }],
       [2422108.047858, { name: 'Príncipe (Eddington)',    lat:  1.60, lon:   7.40 }],
       [2347572.902675, { name: 'London (Halley)',         lat: 51.50, lon:  -0.10 }],
       [2325394.925106, { name: 'London (European total)', lat: 51.50, lon:  -0.10 }],
@@ -31365,7 +31382,7 @@ function setupGUI() {
     // at the end so the user's view returns to where it was when they clicked.
     const _saveJD = o.julianDay;
     const _t0     = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-    console.log(`  Computing — ~6,000 scene-graph navigations with full Meeus β correction (full ±4h scan at 2-min resolution). May take 30-60 s...`);
+    console.log(`  Computing — ~25,000 scene-graph navigations with full Meeus β correction (full ±4h scan at 30-sec resolution). May take 45-90 s...`);
 
     try {
     for (const preset of ECLIPSE_PRESETS) {
@@ -53899,6 +53916,16 @@ function updatePositions() {
   earthWobbleCenter.planetObj.getWorldPosition(WOBBLE_POS);         // Sun   centre
   barycenterEarthAndSun.planetObj.getWorldPosition(PERIHELION_OF_EARTH_POS);         // PERIHELION-OF-EARTH   centre
 
+  // Keep o.obliquityEarth fresh in ALL modes (light + full). updatePredictions
+  // only runs in full mode, but the Sun/Moon Meeus overlays and other consumers
+  // need the current-epoch obliquity in 'light' mode too (audit-26, umbra scans).
+  // Uses the SAME yearForFormula formula as updatePredictions so all callers
+  // get identical values framework-wide.
+  const _yearForObliquity = DEEP_TIME_MODE_ENABLED
+    ? _jdToSIyear(o.julianDay)
+    : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
+  o.obliquityEarth = computeObliquityEarth(_yearForObliquity);
+
   // ───────────────────────── each planet ───────────────────────────
   for (let i = 0, L = tracePlanets.length; i < L; i++) {
     const obj = tracePlanets[i];
@@ -54139,8 +54166,11 @@ function updatePositions() {
     // is 0 by definition, so only longitude needs correction. Scene distance is
     // preserved (SPHERICAL.radius from the setFromVector3 above).
     if (SUN_MEEUS_OVERLAY_ENABLED && obj === sun) {
-      const _sunT = (o.julianDay - j2000JD) / 36525;
-      const _sunEps = (23.4393 - 0.01300 * _sunT) * (Math.PI / 180);
+      // Use framework's authoritative obliquity (o.obliquityEarth), kept fresh
+      // at top of updatePositions so it's valid in both 'light' and 'full' modes.
+      // Was: Meeus linear (23.4393 - 0.01300*T); framework has H/3+H/8 obliquity
+      // harmonics that diverge from linear by ~11″ at present epoch and ~4′ at year -135.
+      const _sunEps = o.obliquityEarth * (Math.PI / 180);
       const _sunLamR = _eclSunLon(o.julianDay) * (Math.PI / 180);
       const _sunSinL = Math.sin(_sunLamR), _sunCosL = Math.cos(_sunLamR);
       const _sunCosE = Math.cos(_sunEps),  _sunSinE = Math.sin(_sunEps);
@@ -54170,7 +54200,11 @@ function updatePositions() {
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.
     // The hierarchy provides the orbit ring visual; this puts the Moon mesh at the correct position.
     if (obj._meeusLonDeg !== undefined && obj._meeusLatRad !== undefined) {
-      const eps = (23.4393 - 0.01300 * (obj._meeusT || 0)) * (Math.PI / 180);
+      // Use framework's authoritative obliquity (o.obliquityEarth), kept fresh
+      // at top of updatePositions so it's valid in both 'light' and 'full' modes.
+      // Was: Meeus linear (23.4393 - 0.01300*T); framework has H/3+H/8 obliquity
+      // harmonics that diverge from linear by ~11″ at present epoch and ~4′ at year -135.
+      const eps = o.obliquityEarth * (Math.PI / 180);
       const cosE = Math.cos(eps), sinE = Math.sin(eps);
       const lamR = obj._meeusLonDeg * (Math.PI / 180);
       const betR = obj._meeusLatRad;
