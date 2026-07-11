@@ -234,13 +234,21 @@ When model parameters change, refit in this order. The logic:
 ```
 ── Phase 0: Pre-fit Sun harmonic structure (prerequisite, run once) ──
 
-Step 0:  node tools/fit/sun-longitude-harmonics.js --write
+Step 0:  SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write
          → SUN_LONGITUDE_MEAN, SUN_LONGITUDE_HARMONICS
          Captures the STRUCTURAL Sun residual (framework
          eccentricityDerivedMean ≈ 0.01545 vs Meeus IAU 0.01671 — an ~8%
          definitional gap that propagates through 2e·sin(M) to produce a
          ~280" annual harmonic). The fitted coefficients are a fixed
          property of the framework, not of any single calibration round.
+
+         The `SUN_HARMONICS_DISABLED=1` env var is REQUIRED for --write.
+         Without it the fit script measures a DELTA on top of the
+         currently applied correction (near-zero at modern epochs),
+         and overwriting stored with a delta would break the runtime.
+         The script refuses --write without the env var and exits with
+         a clear message. Dry-runs (no --write) don't need the env var
+         but the numbers won't be absolute either.
 
          Why this is "Step 0" rather than a regular fitting step:
          - Coefficients are stable across normal refits — re-run only
@@ -257,15 +265,10 @@ Step 0:  node tools/fit/sun-longitude-harmonics.js --write
            sampling base (a small correctionSun offset only shifts the
            residual's MEAN component, not the amplitude coefficients).
 
-         For a clean fresh fit, disable existing harmonics first so the
-         fitter samples the RAW residual rather than the post-correction
-         (near-zero) residual:
-           SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write
-
          Output: ~7" RMS scene-graph Sun vs Meeus Ch.25 in the modern
-         window (down from 198" raw). Three H-lattice-compliant terms
-         survive the runtime filter (1 yr, ½ yr, ⅓ yr); legacy [168]
-         term is silently filtered. See "Step 6f legacy reference"
+         window (1900-2100; down from 198" raw). Three H-lattice-compliant
+         terms survive the runtime filter (1 yr, ½ yr, ⅓ yr); legacy
+         [168] term is silently filtered. See "Step 6f legacy reference"
          further below for the full Phase Z-B technical detail (active
          coefficients, architecture choice, A/B toggle, refit caveats).
 
@@ -516,13 +519,15 @@ Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
            - Eclipse audit (browser) modern eclipses: ΔJD typically 1-2 min
              (vs 6.40 min pre-Z-B per lessons-learned Addendum 4)
 
-         Greedy re-test (Phase Z verification): re-running the fitter under
-         Z-B's strict-design candidate pool finds NO additional H-lattice
-         terms above the 0.05" improvement threshold. Long-period drift
-         proxies (H/152, H/167, H/168 with periods 2000+ yr) are found by
-         greedy but ALL violate the design rule (gcd(n, H) = 1) and are
-         rejected per the lessons-learned policy. The current 3-term set
-         is the COMPLETE H-lattice-compliant correction available.
+         Greedy re-test: the fit script now filters its candidate pool
+         through `_isRuntimeWhitelisted` (mirroring the runtime filter
+         above) before greedy selection, so long-period drift proxies
+         like H/152 / H/167 / H/168 (gcd(n, H) = 1 mid-range divisors)
+         never enter the search space. Under the whitelist, greedy adds
+         at most one slow-secular term (typically H/17, ~20 kyr period)
+         above the 3-term seed. The 3-term year-multiple set is the
+         dominant physical correction; the H/17 slow term captures
+         residual drift within the reference-trustworthy modern window.
 
          The Sun T² polynomial (`+0.0003032·T_jc²`) that previously paired
          with this step has been REMOVED from the design — it is not
@@ -532,9 +537,19 @@ Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
          Updates: fitted-coefficients.json (when --write); coefficients
          are loaded by constants.js and applied automatically at runtime.
          Standalone use:
-           node tools/fit/sun-longitude-harmonics.js              # dry run
-           node tools/fit/sun-longitude-harmonics.js --range 500  # ±500 yr
-           node tools/fit/sun-longitude-harmonics.js --write      # persist
+           node tools/fit/sun-longitude-harmonics.js              # dry run, 1800-2200 (default)
+           SUN_HARMONICS_DISABLED=1 \
+             node tools/fit/sun-longitude-harmonics.js --write    # structural refit + persist
+         --write REQUIRES `SUN_HARMONICS_DISABLED=1` — the script
+         refuses otherwise. See Step 0 above for the rationale.
+
+         Sample window is capped at ±500 yr around J2000 (MAX_RANGE_YEARS
+         in the script). Default is ±200 yr (1800-2200), matching the
+         Meeus Ch. 25 reference-trustworthy zone. `--range` >200 warns
+         about reference-degradation risk; `--range` >500 hard-refuses.
+         Do not `--write` at `--range` >200 — the fit will absorb Meeus
+         reference drift into its coefficients and regress modern
+         eclipse accuracy.
          CAVEAT: changing SUN_LONGITUDE_HARMONICS shifts what every
          downstream step sees. The Step 0 ordering exists exactly to
          absorb this: running Step 0 first means Steps 1 → 5a → 5b

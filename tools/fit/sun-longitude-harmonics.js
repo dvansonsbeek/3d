@@ -26,14 +26,35 @@
  *     5. With --write, persists SUN_LONGITUDE_HARMONICS to
  *        fitted-coefficients.json. Without it, dry-run output only.
  *
+ *   Runtime alignment:
+ *     The candidate pool is filtered by _isRuntimeWhitelisted (which
+ *     mirrors the divisor filter in src/script.js sunLongitudeCorrection
+ *     and tools/lib/scene-graph.js computeSunPositionFast). Fit-time and
+ *     runtime therefore agree on which harmonics are permitted; any
+ *     coefficient written by --write will actually be applied.
+ *
  *   The runtime application (in a follow-up step) adds this correction
  *   to the Sun's longitude in src/script.js and tools/lib/scene-graph.js,
  *   mirroring the obliquity-harmonics application pattern.
  *
  * Usage:
- *   node tools/fit/sun-longitude-harmonics.js              # dry run
- *   node tools/fit/sun-longitude-harmonics.js --write      # update JSON
- *   node tools/fit/sun-longitude-harmonics.js --range 4000 # ±4000 yr
+ *   node tools/fit/sun-longitude-harmonics.js              # dry run (default 1800-2200)
+ *   SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write
+ *                                                          # structural refit + persist
+ *
+ *   Sample-window guard (enforced by MAX_RANGE_YEARS = 500 in main()):
+ *     Default --range = 200 gives 1800-2200, matching the Meeus Ch. 25
+ *     reference-trustworthy modern window. Empirical RMS with stored
+ *     coefficients: 8" at ±100 yr, 16" at ±200 yr, 50" at ±250 yr,
+ *     134" at ±1000 yr. Past ±200 yr the fit absorbs Meeus reference
+ *     drift into its coefficients and regresses modern-eclipse accuracy.
+ *     --range >200 warns; --range >500 refuses to run.
+ *
+ *   --write also REQUIRES `SUN_HARMONICS_DISABLED=1`:
+ *     Without it, the fit script measures the residual AFTER the currently
+ *     stored SUN_LONGITUDE_HARMONICS have been applied — that's a DELTA on
+ *     top of stored, not an absolute fit. Overwriting stored with the delta
+ *     would break runtime. The script refuses --write without the env var.
  *
  * Reference accuracy notes:
  *   - Meeus Ch. 25 low-precision Sun: ~0.01° (~36") over ±2000 yr
@@ -262,6 +283,27 @@ function solveCholesky(A, b, n) {
   return x;
 }
 
+// ─── Runtime whitelist mirror ───────────────────────────────────────────────
+// The Sun-correction runtime application in src/script.js AND
+// tools/lib/scene-graph.js only applies harmonics whose divisor is:
+//   (a) a whole-year multiple of H (335317, 670634, 1005951, ...),
+//   (b) a small precession divisor (1..20),
+//   (c) or one of the two lunar precession divisors (18015, 37900).
+// Divisors outside this set are silently skipped at runtime — see commit
+// 9383161 ("sun: Phase Z-B harmonics integration"), which added the filter
+// with the rationale that "gcd(d, H) = 1" mid-range divisors are H-lattice
+// design-rule violating. If we fit terms outside the whitelist here, they
+// land in fitted-coefficients.json but are never applied — a plumbing trap.
+// This helper matches the runtime filter EXACTLY so the fit script never
+// picks a coefficient the runtime would ignore.
+const H_ROUND = Math.round(C.H);
+function _isRuntimeWhitelisted(divisor) {
+  const isYearMultiple      = divisor >= H_ROUND && divisor % H_ROUND === 0;
+  const isPrecessionDivisor = divisor > 0 && divisor <= 20;
+  const isLunarPrecession   = divisor === 18015 || divisor === 37900;
+  return isYearMultiple || isPrecessionDivisor || isLunarPrecession;
+}
+
 // ─── Greedy harmonic selection ──────────────────────────────────────────────
 // Initial seed = first 3 year-period harmonics. Then greedily add divisors
 // from a candidate set, picking whichever cuts RMSE the most each round.
@@ -315,8 +357,29 @@ function main() {
   console.log('  SUN LONGITUDE RESIDUAL HARMONIC FIT (model − Meeus, H-lattice)');
   console.log('═══════════════════════════════════════════════════════════════════════\n');
 
+  // ─── Sample window guard ──────────────────────────────────────────────
+  // Default 1800-2200 (±200 yr around J2000) — the Meeus Ch. 25 reference
+  // is only trustworthy in the modern window. Empirically measured RMS with
+  // stored coefficients: 8" at ±100 yr, 16" at ±200 yr, 50" at ±250 yr,
+  // 134" at ±1000 yr. Past ±200 yr the fit absorbs Meeus reference drift
+  // into its coefficients and regresses modern-eclipse accuracy.
+  // Hard cap: MAX_RANGE_YEARS = 500 (past this, Meeus reference dominates
+  // and the fit is meaningless). --range 201..500 is allowed but warns.
+  const MAX_RANGE_YEARS = 500;
   const rangeArg = process.argv.indexOf('--range');
-  const rangeYears = rangeArg > 0 ? parseInt(process.argv[rangeArg + 1], 10) : 1000;
+  const rangeYears = rangeArg > 0 ? parseInt(process.argv[rangeArg + 1], 10) : 200;
+  if (rangeYears > MAX_RANGE_YEARS) {
+    console.log(`✗ REFUSING TO RUN: --range ${rangeYears} exceeds MAX_RANGE_YEARS (${MAX_RANGE_YEARS}).`);
+    console.log(`  Past ±${MAX_RANGE_YEARS} yr, Meeus Ch. 25 polynomial degradation dominates the`);
+    console.log(`  residual and the fit picks up reference noise as if it were framework physics.`);
+    console.log(`  If you truly need wider sampling for diagnostics, edit MAX_RANGE_YEARS in the`);
+    console.log(`  script — but do NOT --write the result to fitted-coefficients.json.`);
+    process.exit(1);
+  }
+  if (rangeYears > 200) {
+    console.log(`⚠ WARNING: --range ${rangeYears} > 200 yr enters Meeus reference degradation zone.`);
+    console.log(`  Fit coefficients will absorb reference noise. Safe for diagnostics; DO NOT --write.\n`);
+  }
   const samplesPerYear = 12;  // every 30 days
 
   console.log(`Model parameters:`);
@@ -380,11 +443,13 @@ function main() {
   //   (A) Higher year-multiples (k×year periods): 4..20 harmonics of 1 yr
   //   (B) Planetary synodic periods (Jup-Sat, Mars-Earth, Venus-Earth, Mer-Earth):
   //       rounded to nearest H-lattice divisor.
-  //   (C) Slow secular drift: divisors 2..200 (precession scale, same range as
-  //       obliquity-harmonics) — filtered by Nyquist for sample range.
+  //   (C) Precession-scale divisors 2..20 (matches runtime whitelist upper bound).
+  //   (D) Lunar precession divisors (18015, 37900) — runtime-whitelisted.
   // Filter: only keep candidates whose period fits ≥3 full cycles in the sample
   // range. Precession-scale divisors require sample ranges of thousands of years
   // to fit safely; with --range 100 they cause rank-deficient design matrices.
+  // FINAL filter: apply the runtime whitelist so we never emit a coefficient
+  // the runtime would silently skip (see _isRuntimeWhitelisted rationale).
   const sampleSpanYears = yearEnd - yearStart;
   const synodicPeriodsYr = {
     'Jup-Sat': 19.859,
@@ -397,17 +462,26 @@ function main() {
   for (const p of Object.values(synodicPeriodsYr)) {
     allCandidates.add(Math.max(1, Math.round(C.H / p)));                     // (B) synodic
   }
-  for (let k = 2; k <= 200; k++) allCandidates.add(k);                       // (C) slow drift
+  for (let k = 2; k <= 20; k++) allCandidates.add(k);                        // (C) precession scale (runtime cap)
+  allCandidates.add(18015); allCandidates.add(37900);                        // (D) lunar precession
   // Two-tier filter:
   //   HIGH-frequency candidates (period ≤ sampleSpan) must fit ≥3 cycles (Nyquist).
   //   LOW-frequency candidates (period > sampleSpan) capture slow drift: kept up
   //   to period ≤ 10×sampleSpan (beyond that they're degenerate with mean/trend).
-  const candidates = [...allCandidates].filter(d => {
+  const preWhitelist = [...allCandidates].filter(d => {
     const period = C.H / d;
     if (period <= sampleSpanYears) return period * 3 <= sampleSpanYears;
     return period <= 10 * sampleSpanYears;
   });
-  console.log(`  Candidate pool: ${candidates.length} divisors (Nyquist for short-period, ≤10×span for long-period)`);
+  const candidates    = preWhitelist.filter(_isRuntimeWhitelisted);
+  const droppedByWhite = preWhitelist.filter(d => !_isRuntimeWhitelisted(d));
+  console.log(`  Candidate pool (Nyquist-filtered): ${preWhitelist.length} divisors`);
+  console.log(`  Runtime whitelist keeps ${candidates.length}, drops ${droppedByWhite.length} (mid-range divisors the runtime would silently skip)`);
+  if (droppedByWhite.length && droppedByWhite.length <= 20) {
+    console.log(`  Dropped: ${droppedByWhite.join(', ')}`);
+  } else if (droppedByWhite.length) {
+    console.log(`  Dropped: ${droppedByWhite.slice(0, 10).join(', ')}, ... (${droppedByWhite.length - 10} more)`);
+  }
 
   console.log('── Greedy H-lattice fit ──');
   // maxAmpArcsec guards against ill-conditioned terms: reject any candidate whose
@@ -474,6 +548,14 @@ function main() {
 
   // ─── Write to fitted-coefficients.json if --write ─────────────────────
   if (process.argv.includes('--write')) {
+    if (process.env.SUN_HARMONICS_DISABLED !== '1') {
+      console.log('\n  ✗ REFUSING TO WRITE: SUN_HARMONICS_DISABLED=1 is not set.');
+      console.log('    The residual you just fit is a DELTA on top of the currently stored');
+      console.log('    SUN_LONGITUDE_HARMONICS — replacing them with this delta would break');
+      console.log('    the runtime correction. Re-run with:');
+      console.log('      SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write');
+      process.exit(1);
+    }
     const jsonPath = path.join(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
     const fc = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
     fc.SUN_LONGITUDE_MEAN = adjustedMean;

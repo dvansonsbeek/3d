@@ -176,6 +176,56 @@ function meanYearInDaysAtAge(t_Ma) {
   return meanTropicalYearSecondsAtAge(t_Ma) / LOD_s;
 }
 
+// ─── Pure-tidal ΔT integrator (mirrors src/script.js meanDeltaTSecondsAtAge) ─
+// ΔT = TT − UT1 accumulated from LOD deviation via Simpson's rule.
+// Positive on both sides of J2000 (ΔT(0) = 0 exactly).
+// This is FRAMEWORK'S OWN ΔT (LOD-based), NOT the Espenak/Meeus polynomial.
+// At year 9000 gives potentially very different values from Espenak/Meeus tail.
+// NOTE: does NOT include Bond correction (browser-only research toggle).
+const _DELTA_T_CACHE = new Map();
+const _MAX_DELTA_T_CACHE = 512;
+
+function meanDeltaTSecondsAtAge(t_Ma) {
+  if (t_Ma === 0) return 0;
+  const cacheKey = `raw:${t_Ma}`;
+  const hit = _DELTA_T_CACHE.get(cacheKey);
+  if (hit !== undefined) return hit;
+
+  const absSpan = Math.abs(t_Ma);
+  let n = Math.max(32, Math.ceil(absSpan * 10));
+  if (n > 1024) n = 1024;
+  if (n % 2 === 1) n++;
+  const h = t_Ma / n;
+
+  let sum = 0;
+  for (let i = 0; i <= n; i++) {
+    const tau = i * h;
+    const lod = meanLodSecondsAtAge(tau);
+    if (lod === null) return NaN;
+    const yearS = meanTropicalYearSecondsAtAge(tau);
+    const integrand = (86400 - lod) * yearS * 1e6 / 86400;
+    const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
+    sum += w * integrand;
+  }
+  const result = (sum * h) / 3;
+  if (_DELTA_T_CACHE.size >= _MAX_DELTA_T_CACHE) {
+    const firstKey = _DELTA_T_CACHE.keys().next().value;
+    _DELTA_T_CACHE.delete(firstKey);
+  }
+  _DELTA_T_CACHE.set(cacheKey, result);
+  return result;
+}
+
+/** ΔT in seconds at a given JD. Wraps meanDeltaTSecondsAtAge for callers
+ *  that have a JD instead of t_Ma. Mirrors src/script.js _eclDeltaT.
+ *  Returns 0 if formula undefined (past tidal lock). */
+function frameworkDeltaT(jd) {
+  const decYear = C.jdToYear(jd);
+  const t_Ma = (C.startmodelYear - decYear) / 1e6;
+  const dT = meanDeltaTSecondsAtAge(t_Ma);
+  return Number.isFinite(dT) ? dT : 0;
+}
+
 // ─── Moon distance correction + Kepler month ──────────────────────────────
 function meanSolarDeltaAAtAge(t_Ma, a_apparent_km) {
   const LOD_s = meanLodSecondsAtAge(t_Ma);
@@ -441,6 +491,8 @@ module.exports = {
   // Driver 2
   meanAuAtAge, meanSiderealYearSecondsAtAge, meanTropicalYearSecondsAtAge,
   meanTropicalYearDaysAtAge, meanYearInDaysAtAge,
+  // ΔT
+  meanDeltaTSecondsAtAge, frameworkDeltaT,
   // Moon chain
   meanSolarDeltaAAtAge, meanMoonDistanceCorrectedAtAge,
   meanMoonSiderealMonthAtAge, meanSynodicMonthAtAge, meanTropicalMonthAtAge,

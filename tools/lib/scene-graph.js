@@ -15,6 +15,98 @@ const MEEUS_LUNAR = JSON.parse(require('fs').readFileSync(
   require('path').resolve(__dirname, '..', '..', 'public', 'input', 'meeus-lunar-tables.json'), 'utf8'));
 
 // ═══════════════════════════════════════════════════════════════════════════
+// FRAMEWORK-NATIVE SUN ECLIPTIC LONGITUDE — analytical utility
+// ═══════════════════════════════════════════════════════════════════════════
+// Reproduces what the scene graph computes for Sun at any JD, without needing
+// to run moveModel. Kepler + framework harmonics, no Meeus polynomial. Used
+// by diagnostic tools and available for external consumers.
+// See docs/hidden/IP-framework-native-sun-ecliptic-longitude.md.
+
+// ─── Mode-aware phase cycles helper ────────────────────────────────────────
+// In snapshot mode (DEEP_TIME_ENABLED=false): (year - anchor) × N / H_J2000
+// In integrated mode: DT.cyclesBetweenYears (integrates ∫N/H(t)dt properly)
+// Both agree at J2000; diverge at deep time per framework's H(t) drift.
+function _phaseCycles(year, divisor_N) {
+  if (DEEP_TIME_ENABLED) {
+    return DT.cyclesBetweenYears(C.balancedYear, year, divisor_N);
+  }
+  return (year - C.balancedYear) * divisor_N / C.H;
+}
+
+// ─── Framework-native Sun ecliptic longitude (Kepler + framework harmonics) ─
+// Returns Sun's ecliptic longitude in framework's ICRF (J2000-fixed) frame,
+// in degrees [0, 360). Uses:
+//   - Framework's tropical year (snapshot: fixed; integrated: mid-point of H(t) evolution)
+//   - Framework's eccentricity harmonic (varies at H/16 perihelion cycle)
+//   - Framework's perihelion precession (H/16)
+//   - Kepler higher-order Equation of Center (to e⁴)
+// NO Meeus polynomial. NO T²/T³ secular artifacts.
+// Deep-time-safe: bounded at all epochs. Mode-aware via _phaseCycles.
+function _frameworkSunLon(jd_ut) {
+  const _d2r = Math.PI / 180;
+  // Scene consistency: use jd_UT directly, no TT shift. Framework's scene Sun
+  // advances linearly in UT time (2π per T_trop UT days). Applying ΔT would
+  // put us at TT which mismatches scene by rate × ΔT (~12° drift at year 20000
+  // where framework ΔT ≈ 1M seconds). Empirically verified: scene at Y=+20000
+  // Jun 15 = 235.30°, no-ΔT formula = 235.22° (0.08° gap); with-ΔT was 246.65°.
+  // Meeus's own _eclSunLon still applies ΔT internally (canonical for eclipse
+  // detection where Sun-Moon geometry needs both bodies on the same TT clock).
+  const year = C.jdToYear(jd_ut);
+
+  // ── Mean longitude (linear rate; framework's tropical year) ────────────
+  const days_from_j2000 = jd_ut - C.j2000JD;
+  let T_tropical_days;
+  if (DEEP_TIME_ENABLED) {
+    // Midpoint approximation: (T_j2000 + T_now) / 2
+    // At Devonian ~71 ppm drift → sub-arcsec Sun position error over span
+    const t_Ma = (2000 - year) / 1e6;
+    const T_now = DT.meanTropicalYearDaysAtAge(t_Ma);
+    T_tropical_days = 0.5 * (C.meanSolarYearDays + (T_now || C.meanSolarYearDays));
+  } else {
+    T_tropical_days = C.meanSolarYearDays;
+  }
+  const L0_j2000_deg = 280.46646;   // Sun mean lon at J2000 (matches Meeus anchor)
+  const L_deg = L0_j2000_deg + 360 * days_from_j2000 / T_tropical_days;
+
+  // ── Perihelion longitude (H/16 cycle; framework's precession) ──────────
+  // Sun's geocentric perihelion = Earth's heliocentric perihelion + 180°
+  const perihelion_j2000_deg =
+    (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 + 180) % 360;
+  const cyclesNow_16   = _phaseCycles(year, 16);
+  const cyclesJ2000_16 = _phaseCycles(2000, 16);
+  const perihelion_deg = perihelion_j2000_deg
+                       + 360 * (cyclesNow_16 - cyclesJ2000_16);
+
+  // ── Mean anomaly ───────────────────────────────────────────────────────
+  const M_rad = (L_deg - perihelion_deg) * _d2r;
+
+  // ── Eccentricity (framework's law of cosines, matches computeEccentricityEarth) ──
+  // e(t) = √(base² + amp² − 2·base·amp·cos(θ)) where θ = (year - balancedYear)/H_16 × 2π
+  // NOT the additive form. At J2000 gives e ≈ 0.01671 (IAU) via specific phase.
+  const perihelionPhase_rad = 2 * Math.PI * _phaseCycles(year, 16);
+  const _base = C.eccentricityBase;
+  const _amp  = C.eccentricityAmplitude;
+  const e = Math.sqrt(_base * _base + _amp * _amp
+                    - 2 * _base * _amp * Math.cos(perihelionPhase_rad));
+
+  // ── Equation of Center (Kepler higher-order, to e⁴) ────────────────────
+  const e2 = e * e, e3 = e2 * e, e4 = e3 * e;
+  const _rad2deg = 180 / Math.PI;
+  const C_eq_deg = ((2 * e - e3 / 4) * Math.sin(M_rad)
+                 + (1.25 * e2 - 11 / 24 * e4) * Math.sin(2 * M_rad)
+                 + (13 / 12 * e3) * Math.sin(3 * M_rad)
+                 + (103 / 96 * e4) * Math.sin(4 * M_rad)) * _rad2deg;
+
+  // ── Sun ecliptic longitude ─────────────────────────────────────────────
+  // Result is in the same frame as framework's kinematic Sun (RA/Dec output
+  // of computeSunPositionFast converted via IAU obliquity). No extra H/5
+  // precession offset — framework's kinematic Sun's inertial position does
+  // not accumulate H/5 in its RA/Dec output at the precision this replaces.
+  const lambda = L_deg + C_eq_deg;
+  return ((lambda % 360) + 360) % 360;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // DEEP-TIME MODE (Option B, mirrors browser DEEP_TIME_MODE_ENABLED)
 // ═══════════════════════════════════════════════════════════════════════════
 // When SG_DEEP_TIME=1, each computePlanetPosition / computeSunPositionFast
@@ -1252,8 +1344,12 @@ function computePlanetPosition(target, jd) {
   // Full Meeus Ch. 47 post-hoc correction: override both RA and Dec
   if (target === 'moon' && C.useVariableSpeed &&
       graph.moonNodes._meeusLonDeg !== undefined && graph.moonNodes._meeusLatDeg !== undefined) {
-    const T = graph.moonNodes._meeusT || 0;
-    const eps = (C.ASTRO_REFERENCE.obliquityJ2000_deg - 0.01300 * T) * d2r;
+    // Use framework's authoritative obliquity (matches scene kinematic tilt).
+    // Was: Meeus linear (obliquityJ2000_deg - 0.01300*T); framework harmonics
+    // diverge by 11" at modern → sub-km Moon position effect at eclipse epochs.
+    // Consistent with src/script.js Moon Meeus overlay fix (commit 5443a55).
+    const currentYear = C.balancedYear + (jd - C.balancedJD) / _epochCache.mSY;
+    const eps = OE.computeObliquityEarth(currentYear) * d2r;
     const cosE = Math.cos(eps), sinE = Math.sin(eps);
     const lamR = graph.moonNodes._meeusLonDeg * d2r;
     const betR = graph.moonNodes._meeusLatDeg * d2r;

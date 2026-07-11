@@ -52,7 +52,6 @@ let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see 
 let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction (Phase Z-B) — rationale ~L7066
 let   EARTH_ROTATION_DT_CORRECTION_ENABLED = false;  // DIAGNOSTIC-ONLY — do NOT enable for eclipse validation. When ON, applies ΔT twice: Meeus wrappers already advance UT→TT internally for Sun/Moon positions (~L5107 `_eclSunLon` + ~L5157/5190/5199 `_meeusMoon*`) and the base Earth spin is already at UT-anchored rate (correct actual rotation). Enabling this adds ΔT to Earth's rotation on top of the already-correct scene → over-rotates Earth by ~47° at year -135. Kept as an A/B diagnostic to verify the Meeus internal TT conversion is working. Formerly "Strategy A"; rationale ~L6889
 let   BOND_DT_CORRECTION_ENABLED = false;  // Bond 8H/1851 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
-let   SUN_MEEUS_OVERLAY_ENABLED  = true;   // 2026-07: route scene Sun through Meeus Ch. 25 as post-hoc RA/Dec override (analogous to Moon Meeus overlay). Pipeline is fit 1900-2100 and drifts ~0.30° at year -135; overlay eliminates that drift. Near-grazing γ eclipse geometry amplifies input drift by ~70× → this closed ~80% of the -135 Babylonian residual (809 km → 170 km in audit-26). Modern eclipse tests unchanged (Sun pipeline agrees with Meeus to 7″ in 1900-2100 via SUN_HARMONICS). Some deep-past events (-708/-556/-584/-647) regressed in verdict because old sun-drift was compensating GMST drift; overlay unmasks that as next investigation target. Supersedes SUN_HARMONICS effect on Sun position when both are ON.
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
 const earthtiltMean = 23.41353954485521;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
@@ -5121,6 +5120,96 @@ function _eclSunLon(jd) {
            + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
            + 0.000289 * Math.sin(3 * M);
   return ((L0 + C) % 360 + 360) % 360;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Framework-native Sun ecliptic longitude — analytical utility
+//
+// Reproduces what the scene graph computes for Sun at any JD, without needing
+// to run moveModel. Kepler + framework harmonics, no Meeus polynomial. Used
+// by diagnostic tools and available for external consumers. The actual scene
+// Sun is driven by moveModel (not this function) — see docs/hidden/
+// IP-framework-native-sun-ecliptic-longitude.md.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Mode-aware phase cycles helper.
+ *  Snapshot mode (DEEP_TIME_MODE_ENABLED=false): (year - balancedYear) × N / H_J2000
+ *  Integrated mode: cyclesBetweenYears (integrates ∫N/H(t)dt properly)
+ *  Both agree at J2000; diverge at deep time per H(t) drift. */
+function _phaseCycles(year, divisor_N) {
+  if (DEEP_TIME_MODE_ENABLED) {
+    return cyclesBetweenYears(balancedYear, year, divisor_N);
+  }
+  return (year - balancedYear) * divisor_N / holisticyearLength;
+}
+
+/** Framework-native Sun ecliptic longitude in degrees [0, 360).
+ *  Uses:
+ *    - Framework's tropical year (snapshot/integrated via DEEP_TIME_MODE_ENABLED)
+ *    - Framework's eccentricity harmonic (varies at H/16 perihelion cycle)
+ *    - Framework's perihelion precession (H/16)
+ *    - Kepler higher-order Equation of Center (to e⁴)
+ *  NO Meeus polynomial. NO T²/T³ secular artifacts.
+ *  Deep-time-safe: bounded at all epochs.
+ *  Verified to match browser scene Sun to <0.02° across ±50 kyr. */
+function _frameworkSunLon(jd_ut) {
+  const _d2r = Math.PI / 180;
+  // Scene consistency: use jd_UT directly, no TT shift. Framework's scene Sun
+  // advances linearly in UT time (2π per T_trop UT days). Applying ΔT would
+  // put us at TT which mismatches scene by rate × ΔT (~12° drift at year 20000
+  // where framework ΔT ≈ 1M seconds). Empirically verified: scene at Y=+20000
+  // Jun 15 = 235.30°, no-ΔT formula = 235.22° (0.08° gap); with-ΔT was 246.65°.
+  // _eclSunLon still applies ΔT internally (canonical for eclipse detection).
+  const year = julianDateToDecimalYear(jd_ut);
+
+  // ── Mean longitude (linear rate; framework's tropical year) ────────────
+  const days_from_j2000 = jd_ut - j2000JD;
+  let T_tropical_days;
+  if (DEEP_TIME_MODE_ENABLED) {
+    const t_Ma = (2000 - year) / 1e6;
+    const T_now = meanTropicalYearDaysAtAge(t_Ma);
+    T_tropical_days = 0.5 * (meansolaryearlengthinDays + (T_now || meansolaryearlengthinDays));
+  } else {
+    T_tropical_days = meansolaryearlengthinDays;
+  }
+  const L0_j2000_deg = 280.46646;   // Sun mean lon at J2000 (matches Meeus anchor)
+  const L_deg = L0_j2000_deg + 360 * days_from_j2000 / T_tropical_days;
+
+  // ── Perihelion longitude (H/16 cycle; framework's precession) ──────────
+  const perihelion_j2000_deg =
+    (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + 180) % 360;
+  const cyclesNow_16   = _phaseCycles(year, 16);
+  const cyclesJ2000_16 = _phaseCycles(2000, 16);
+  const perihelion_deg = perihelion_j2000_deg
+                       + 360 * (cyclesNow_16 - cyclesJ2000_16);
+
+  // ── Mean anomaly ───────────────────────────────────────────────────────
+  const M_rad = (L_deg - perihelion_deg) * _d2r;
+
+  // ── Eccentricity (framework's law of cosines, matches computeEccentricityEarth) ──
+  // e(t) = √(base² + amp² − 2·base·amp·cos(θ)) where θ = (year - balancedYear)/H_16 × 2π
+  // NOT the additive form. At J2000 gives e ≈ 0.01671 (IAU) via specific phase.
+  const perihelionPhase_rad = 2 * Math.PI * _phaseCycles(year, 16);
+  const _e_base = eccentricityBase;
+  const _e_amp  = eccentricityAmplitude;
+  const e = Math.sqrt(_e_base * _e_base + _e_amp * _e_amp
+                    - 2 * _e_base * _e_amp * Math.cos(perihelionPhase_rad));
+
+  // ── Equation of Center (Kepler higher-order, to e⁴) ────────────────────
+  const e2 = e * e, e3 = e2 * e, e4 = e3 * e;
+  const _rad2deg = 180 / Math.PI;
+  const C_eq_deg = ((2 * e - e3 / 4) * Math.sin(M_rad)
+                 + (1.25 * e2 - 11 / 24 * e4) * Math.sin(2 * M_rad)
+                 + (13 / 12 * e3) * Math.sin(3 * M_rad)
+                 + (103 / 96 * e4) * Math.sin(4 * M_rad)) * _rad2deg;
+
+  // ── Sun ecliptic longitude ─────────────────────────────────────────────
+  // Result matches framework's kinematic Sun (RA/Dec output of scene, converted
+  // via IAU obliquity). No extra H/5 precession offset — framework's kinematic
+  // Sun's inertial position does not accumulate H/5 in its RA/Dec output at
+  // the precision this replaces.
+  const lambda = L_deg + C_eq_deg;
+  return ((lambda % 360) + 360) % 360;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -28766,7 +28855,237 @@ function setupGUI() {
   // (Original 130-line button removed; for ad-hoc A/B verification see
   // "Toggle Strategy A" + "Sun position diagnostic".)
 
+  // ────────────────────────────────────────────────────────────────────────
+  // Sun ecl_lon harmonic scan — samples scene Sun ecliptic longitude at
+  // many epochs (past + future), compares to Meeus Ch. 25, fits the drift
+  // pattern to candidate H-lattice periods to identify the missing harmonic
+  // that explains the observed deep-time Sun/planet-orbit-center offset.
+  // The scene's Sun is framework-native via moveModel (no overlay); scan reads it directly.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Sun ecl_lon harmonic scan (find missing period)', () => {
+    console.log('\n══════════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Sun ecliptic longitude — framework scene vs Meeus Ch. 25');
+    console.log('  Purpose: characterize framework Sun\'s deviation from Meeus across deep time.');
+    console.log('  Sampling: Jun-15 12:00 UT at each epoch.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════════');
 
+    const _d2r = Math.PI / 180;
+    const _r2d = 180 / Math.PI;
+    // Range chosen so Meeus's cumulative T² term keeps |Δ| < 180° everywhere —
+    // otherwise `delta -= 360` aliasing scrambles the signal. Empirically
+    // k ≈ -5.5e-4 °/Jcy² → safe zone is |T| < √(180/5.5e-4) ≈ 572 Jcy → ±57 kyr.
+    // ±50 kyr with 2.5-kyr steps (41 samples) gives fine resolution to distinguish:
+    //   H/3 = 112 kyr  — 45% cycle at ±50 kyr, clearest signature
+    //   405 kyr Laskar — 12% cycle, curvature diverges from T² noticeably
+    //   H = 335 kyr    — 15% cycle
+    // 8H = 2.68 Myr is NOT distinguishable at this range (2% cycle) but is
+    // testable by comparing k in this scan vs the prior ±20 kyr scan — if k
+    // is the same, drift is more polynomial-like; if k shrinks, drift is
+    // saturating (indicative of a long period).
+    const YEARS_START = -50000, YEARS_END = 50000, STEP = 2500;   // 41 samples
+    const MONTH = 6, DAY = 15, HOUR = 12;
+
+    function _jdFromYMD(Y, M, D, hour) {
+      let y = Y, m = M;
+      if (m <= 2) { y -= 1; m += 12; }
+      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
+           + D - 1524.5 + hour / 24;
+    }
+
+    const _saveJD = o.julianDay;
+    const samples = [];
+
+    try {
+      for (let Y = YEARS_START; Y <= YEARS_END; Y += STEP) {
+        const jd = _jdFromYMD(Y, MONTH, DAY, HOUR);
+        jumpToJulianDay(jd);
+        forceSceneUpdate('light');
+
+        // Scene Sun ecl_lon: (sun.ra, sun.dec) → λ using framework ε.
+        // sun.dec is phi-from-+Z-pole convention → δ_true = π/2 − sun.dec.
+        const _alpha = sun.ra;
+        const _delta = Math.PI / 2 - sun.dec;
+        const _eps = o.obliquityEarth * _d2r;
+        let sceneLam = Math.atan2(
+          Math.sin(_alpha) * Math.cos(_eps) + Math.tan(_delta) * Math.sin(_eps),
+          Math.cos(_alpha)
+        ) * _r2d;
+        sceneLam = ((sceneLam % 360) + 360) % 360;
+
+        const meeusLam = _eclSunLon(jd);
+        let delta = sceneLam - meeusLam;
+        while (delta >  180) delta -= 360;
+        while (delta < -180) delta += 360;
+
+        const T = (jd - j2000JD) / 36525;   // Julian centuries from J2000
+        samples.push({ Y, jd, T, sceneLam, meeusLam, delta });
+      }
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate('light');
+    }
+
+    // ── Aliasing check: if Δ jumps by >150° between adjacent samples, we
+    //    are in mod-360° wrap-around territory and the fits are meaningless.
+    let aliasingDetected = false;
+    for (let i = 1; i < samples.length; i++) {
+      if (Math.abs(samples[i].delta - samples[i - 1].delta) > 150) {
+        aliasingDetected = true;
+        break;
+      }
+    }
+    if (aliasingDetected) {
+      console.warn('  ⚠ WARNING: Δ jumps > 150° between adjacent samples — the sampling range');
+      console.warn('    is too wide, Meeus\'s T² term wraps mod 360° between steps, and the fits');
+      console.warn('    below are meaningless. Reduce the range constants at the top of this button.');
+      console.log('');
+    }
+
+    // ── Table of raw samples ────────────────────────────────────────────
+    console.log('  Year         T(Jcy)   Scene λ      Meeus λ      Δ(scene−Meeus)');
+    console.log('  ─────────────────────────────────────────────────────────────────');
+    for (const s of samples) {
+      const yr   = String(s.Y).padStart(8);
+      const T    = s.T.toFixed(3).padStart(8);
+      const sc   = s.sceneLam.toFixed(4).padStart(9);
+      const me   = s.meeusLam.toFixed(4).padStart(9);
+      const dSgn = s.delta >= 0 ? '+' : '';
+      const dStr = (dSgn + s.delta.toFixed(4)).padStart(9);
+      console.log(`  ${yr}   ${T}   ${sc}°   ${me}°   ${dStr}°`);
+    }
+    console.log('  ─────────────────────────────────────────────────────────────────');
+
+    // ── Candidate-period fits ───────────────────────────────────────────
+    // Each period: least-squares fit Δ_i ≈ A cos(2π yr_i / P) + B sin(2π yr_i / P)
+    // where yr_i = T_i × 100. Reports amplitude √(A²+B²) and RMS residual.
+    const H = holisticyearLength;
+    const candidates = [
+      { name: 'H/16 (peri.-cycle)',   P: H / 16 },
+      { name: 'H/13 (gen. prec.)',    P: H / 13 },
+      { name: 'H/8  (obliquity)',     P: H / 8  },
+      { name: 'H/5  (ecl. prec.)',    P: H / 5  },
+      { name: 'H/3  (inclination)',   P: H / 3  },
+      { name: 'H/2',                  P: H / 2  },
+      { name: 'H    (Fundamental)',   P: H      },
+      { name: '2H',                   P: 2 * H  },
+      { name: '8H   (Resonance)',     P: 8 * H  },
+      { name: '405 kyr (Laskar)',     P: 405000 },
+      { name: '8H/1825 (Bond ~1470)', P: 8 * H / 1825 },
+    ];
+
+    console.log('');
+    console.log('  Candidate periods — least-squares 2-parameter (A cos + B sin) fit:');
+    console.log('  ─────────────────────────────────────────────────────────────────');
+    console.log('  Period                    P (yr)        Amp (°)   Phase (°)   RMS residual (°)');
+    console.log('  ─────────────────────────────────────────────────────────────────');
+    const fits = [];
+    for (const c of candidates) {
+      let sumCC = 0, sumSS = 0, sumCS = 0, sumDC = 0, sumDS = 0;
+      for (const s of samples) {
+        const w = 2 * Math.PI * (s.T * 100) / c.P;
+        const cw = Math.cos(w), sw = Math.sin(w);
+        sumCC += cw * cw; sumSS += sw * sw; sumCS += cw * sw;
+        sumDC += s.delta * cw; sumDS += s.delta * sw;
+      }
+      const det = sumCC * sumSS - sumCS * sumCS;
+      const A = det !== 0 ? (sumSS * sumDC - sumCS * sumDS) / det : 0;
+      const B = det !== 0 ? (sumCC * sumDS - sumCS * sumDC) / det : 0;
+      const amp   = Math.sqrt(A * A + B * B);
+      const phase = Math.atan2(B, A) * _r2d;
+      let sq = 0;
+      for (const s of samples) {
+        const w = 2 * Math.PI * (s.T * 100) / c.P;
+        const fit = A * Math.cos(w) + B * Math.sin(w);
+        sq += (s.delta - fit) * (s.delta - fit);
+      }
+      const rms = Math.sqrt(sq / samples.length);
+      fits.push({ name: c.name, P: c.P, A, B, amp, phase, rms });
+      console.log(`  ${c.name.padEnd(24)}  ${c.P.toFixed(0).padStart(8)}   ${amp.toFixed(4).padStart(7)}   ${phase.toFixed(1).padStart(7)}     ${rms.toFixed(4).padStart(8)}`);
+    }
+
+    // Baseline reference: T² polynomial (Meeus's own model)
+    let sumT4 = 0, sumT2D = 0;
+    for (const s of samples) { sumT4 += Math.pow(s.T, 4); sumT2D += s.T * s.T * s.delta; }
+    const kT2 = sumT4 > 0 ? sumT2D / sumT4 : 0;
+    let sqT2 = 0;
+    for (const s of samples) { const f = kT2 * s.T * s.T; sqT2 += (s.delta - f) * (s.delta - f); }
+    const rmsT2 = Math.sqrt(sqT2 / samples.length);
+    console.log(`  T² polynomial (Δ=k·T²)     —          k=${kT2.toExponential(3)}     —         ${rmsT2.toFixed(4).padStart(8)}`);
+    console.log('  ─────────────────────────────────────────────────────────────────');
+
+    // ── Higher-order polynomial fit: Δ = a·T² + b·T³ + c·T⁴ ───────────
+    // The T² coefficient drifted from ±20 kyr to ±50 kyr scans (-5.51e-4 → -6.42e-4),
+    // meaning pure T² doesn't fit the whole shape. Adding T³ (asymmetry) and T⁴
+    // (quartic acceleration) via a 3-parameter least-squares fit exposes those
+    // higher-order contributions. Cramer's rule solves the 3×3 normal-eqs system.
+    let S22=0, S23=0, S24=0, S33=0, S34=0, S44=0, R2=0, R3=0, R4=0;
+    for (const s of samples) {
+      const t2 = s.T*s.T, t3 = t2*s.T, t4 = t3*s.T;
+      S22 += t2*t2;  S23 += t2*t3;  S24 += t2*t4;
+      S33 += t3*t3;  S34 += t3*t4;
+      S44 += t4*t4;
+      R2 += t2*s.delta;  R3 += t3*s.delta;  R4 += t4*s.delta;
+    }
+    const _det3 = (m) =>
+        m[0][0]*(m[1][1]*m[2][2] - m[1][2]*m[2][1])
+      - m[0][1]*(m[1][0]*m[2][2] - m[1][2]*m[2][0])
+      + m[0][2]*(m[1][0]*m[2][1] - m[1][1]*m[2][0]);
+    const M0 = [[S22, S23, S24], [S23, S33, S34], [S24, S34, S44]];
+    const D  = _det3(M0);
+    const Ma = [[R2, S23, S24], [R3, S33, S34], [R4, S34, S44]];
+    const Mb = [[S22, R2, S24], [S23, R3, S34], [S24, R4, S44]];
+    const Mc = [[S22, S23, R2], [S23, S33, R3], [S24, S34, R4]];
+    const aP = D !== 0 ? _det3(Ma) / D : 0;
+    const bP = D !== 0 ? _det3(Mb) / D : 0;
+    const cP = D !== 0 ? _det3(Mc) / D : 0;
+    let sqP = 0;
+    for (const s of samples) {
+      const T = s.T, t2 = T*T, t3 = t2*T, t4 = t3*T;
+      const fit = aP*t2 + bP*t3 + cP*t4;
+      sqP += (s.delta - fit) * (s.delta - fit);
+    }
+    const rmsPoly = Math.sqrt(sqP / samples.length);
+    console.log('');
+    console.log('  Higher-order polynomial fit Δ = a·T² + b·T³ + c·T⁴  (3-param least-squares):');
+    console.log(`    a  (T² coef)  = ${aP.toExponential(4)}  °/Jcy²`);
+    console.log(`    b  (T³ coef)  = ${bP.toExponential(4)}  °/Jcy³   ← asymmetry (0 = symmetric quadratic)`);
+    console.log(`    c  (T⁴ coef)  = ${cP.toExponential(4)}  °/Jcy⁴   ← quartic contribution`);
+    console.log(`    RMS residual  = ${rmsPoly.toFixed(4)}°   (T²-only baseline: ${rmsT2.toFixed(4)}°)`);
+    // Compare to Meeus's own T² coefficient
+    const meeusT2 = -0.0003032;
+    const extraA = aP - meeusT2;
+    console.log(`    Meeus baseline T² (would be Δ from framework-linear-vs-Meeus): ${meeusT2.toExponential(4)}`);
+    console.log(`    Extra T² beyond Meeus baseline: a − Meeus_T² = ${extraA.toExponential(4)}  ← framework-side extra decel`);
+
+    // ── Ranking ─────────────────────────────────────────────────────────
+    fits.sort((a, b) => a.rms - b.rms);
+    console.log('');
+    console.log('  Ranking (best fit = lowest RMS residual):');
+    fits.slice(0, 5).forEach((f, i) => {
+      console.log(`   ${i + 1}. ${f.name.padEnd(24)}  amp=${f.amp.toFixed(4)}°  phase=${f.phase.toFixed(1)}°  RMS=${f.rms.toFixed(4)}°`);
+    });
+    console.log('');
+    console.log(`  T² baseline for comparison:     k=${kT2.toExponential(4)}  RMS=${rmsT2.toFixed(4)}°`);
+    console.log(`  T²+T³+T⁴ polynomial fit:        a=${aP.toExponential(4)}  b=${bP.toExponential(4)}  c=${cP.toExponential(4)}  RMS=${rmsPoly.toFixed(4)}°`);
+    console.log('');
+    console.log('  Interpretation:');
+    console.log('   • A candidate whose RMS ≪ T² baseline is a better fit → likely the missing harmonic.');
+    console.log('   • Amplitude gives the H-lattice term needed to close scene-vs-Meeus drift.');
+    console.log('   • Phase is measured relative to J2000 (T=0), positive = cos-leading.');
+    console.log('   • If T²+T³+T⁴ polynomial RMS ≪ T² baseline: drift has quartic / cubic content.');
+    console.log('   • If b (T³) is significant: drift has cubic asymmetry — past ≠ future magnitude.');
+    console.log('══════════════════════════════════════════════════════════════════════════════════════');
+
+    // Machine-readable dump (paste back for offline fitting / alternate periods)
+    console.log('');
+    console.log('  JSON dump (samples + fits + polynomial):');
+    console.log(JSON.stringify({ samples, fits, kT2, rmsT2, poly: { a: aP, b: bP, c: cP, rms: rmsPoly } }));
+    console.log('══════════════════════════════════════════════════════════════════════════════════════');
+  }, 'Samples framework scene Sun ecliptic longitude at 41 epochs (-50000 to +50000, 2500-yr steps, ' +
+     'Jun-15 12 UT). Compares each sample to Meeus Ch. 25 and fits the (scene−Meeus) drift to candidate ' +
+     'H-lattice periods (H/16, H/8, H/5, H/13, H/3, H/2, H, 2H, 8H, plus 405 kyr and Bond 1470 yr). ' +
+     'Range chosen so Meeus\' T² does not wrap mod 360°. If any harmonic RMS ≪ T² baseline, that\'s a ' +
+     'candidate for extending sunLongitudeCorrection\'s fit range (Stage 3).');
 
   // ────────────────────────────────────────────────────────────────────────
   // -135 Babylonian case study — unified three-section diagnostic
@@ -54157,44 +54476,6 @@ function updatePositions() {
                + (_vc.cosEl_d2_dec || 0) * _cosEl * _invDv2
                + (_vc.cosVwE_cosEl_d2_dec || 0) * _cosVwE * _cosEl * _invDv2
                + (_vc.sinVwE_cosEl_d2_dec || 0) * _sinVwE * _cosEl * _invDv2) * _d2r;
-    }
-
-    // Meeus Ch. 25 post-hoc correction for Sun: routes scene Sun's RA/Dec/position
-    // through Meeus Ch. 25 to eliminate pipeline extrapolation drift at deep past.
-    // 2026-07 diagnostic toggle. When enabled, overrides sun.ra, sun.dec, and
-    // sun.pivotObj.position with Meeus-corrected values. Sun's ecliptic latitude
-    // is 0 by definition, so only longitude needs correction. Scene distance is
-    // preserved (SPHERICAL.radius from the setFromVector3 above).
-    if (SUN_MEEUS_OVERLAY_ENABLED && obj === sun) {
-      // Use framework's authoritative obliquity (o.obliquityEarth), kept fresh
-      // at top of updatePositions so it's valid in both 'light' and 'full' modes.
-      // Was: Meeus linear (23.4393 - 0.01300*T); framework has H/3+H/8 obliquity
-      // harmonics that diverge from linear by ~11″ at present epoch and ~4′ at year -135.
-      const _sunEps = o.obliquityEarth * (Math.PI / 180);
-      const _sunLamR = _eclSunLon(o.julianDay) * (Math.PI / 180);
-      const _sunSinL = Math.sin(_sunLamR), _sunCosL = Math.cos(_sunLamR);
-      const _sunCosE = Math.cos(_sunEps),  _sunSinE = Math.sin(_sunEps);
-
-      // Ecliptic (β=0) → equatorial (Meeus eq. 13.3, 13.4)
-      let _sunNewRA = Math.atan2(_sunSinL * _sunCosE, _sunCosL);
-      if (_sunNewRA < 0) _sunNewRA += 2 * Math.PI;
-      const _sunNewDec = Math.asin(_sunSinE * _sunSinL);
-
-      obj.ra  = _sunNewRA;                     // override RA
-      obj.dec = Math.PI / 2 - _sunNewDec;      // override Dec (phi convention)
-
-      // Correct 3D visual position: keep scene distance (SPHERICAL.radius unchanged
-      // from setFromVector3 above), only override direction.
-      // NOTE: pivotObj and rotationAxis are SIBLINGS under orbitObj, NOT parent/child.
-      // The mesh (planetObj) is a child of rotationAxis, so BOTH must be updated.
-      SPHERICAL.theta = obj.ra;
-      SPHERICAL.phi = obj.dec;
-      _moonVisualCorrection.setFromSpherical(SPHERICAL);
-      _moonVisualCorrection.applyMatrix4(earth.rotationAxis.matrixWorld);
-      _moonVisualMatrix.copy(obj.pivotObj.parent.matrixWorld).invert();
-      _moonVisualCorrection.applyMatrix4(_moonVisualMatrix);
-      obj.pivotObj.position.copy(_moonVisualCorrection);
-      obj.rotationAxis.position.copy(_moonVisualCorrection);
     }
 
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.
