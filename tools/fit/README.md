@@ -483,11 +483,17 @@ Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
          divisors only:
            - Year-multiple: divisor ≥ round(H) AND divisor % round(H) === 0
              (covers 1 yr, 0.5 yr, 0.333 yr, ... up to 1/20 yr)
-           - Small precession: divisor ∈ {3, 5, 8, 13, 16} (Earth Fibonacci)
+           - Small precession: divisor 1..20 (Earth's Fibonacci named cycles
+             — H/3, H/5, H/8, H/13, H/16, etc. — structurally on-lattice
+             by fiat even though gcd(d, H) = 1)
            - Lunar precession: divisor ∈ {18015, 37900} (nodal/apsidal ICRF)
-         Any other divisor (e.g. legacy [168]) is silently skipped at
-         runtime — design-rule violation safeguard. See `lessons-learned-
-         lunar-framework-native.md` Addendum 5 for the full Z investigation.
+           - Mid-range structural: gcd(divisor, H) > 1 (H = 23·61·239, so
+             multiples of 23, 61, or 239 qualify). Codifies the gcd rule
+             stated in commit 9383161. Newly-allowed candidates in the
+             sample range 21..200: 23, 46, 61, 69, 92, 115, 122, 138
+             (~2430 yr ≈ Hallstatt), 161, 183, 184.
+         Any other divisor (gcd=1 mid-range; e.g. legacy [168]) is silently
+         skipped at runtime — design-rule violation safeguard.
 
          Architecture choice (Sun-only vs barycenter): the correction is
          Earth-Sun-geometry-specific (the eccentricity-difference signature

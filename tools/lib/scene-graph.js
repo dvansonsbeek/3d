@@ -26,6 +26,10 @@ const MEEUS_LUNAR = JSON.parse(require('fs').readFileSync(
 // In snapshot mode (DEEP_TIME_ENABLED=false): (year - anchor) × N / H_J2000
 // In integrated mode: DT.cyclesBetweenYears (integrates ∫N/H(t)dt properly)
 // Both agree at J2000; diverge at deep time per framework's H(t) drift.
+
+// Euclidean gcd — used by the H-lattice filter in sunLongitudeCorrection.
+function _gcdInt(a, b) { a = Math.abs(a); b = Math.abs(b); while (b !== 0) { const t = b; b = a % b; a = t; } return a; }
+
 function _phaseCycles(year, divisor_N) {
   if (DEEP_TIME_ENABLED) {
     return DT.cyclesBetweenYears(C.balancedYear, year, divisor_N);
@@ -864,9 +868,15 @@ function moveModel(graph, pos) {
     // planet inverse corrections, or accept the visual artifact in deep
     // zoom views). Mirror to script.js is deferred until that's resolved.
     //
-    // Filter: only H-lattice-compliant terms (year-multiples, small
-    // precession divisors, lunar precession). The legacy [168] term is
-    // skipped here (gcd(168, H) = 1, design-rule violating).
+    // Filter: only H-lattice-compliant terms.
+    //   (a) year-multiples (integer year period),
+    //   (b) small precession divisors 1..20 (Earth's Fibonacci named cycles
+    //       H/3, H/5, H/8, H/13, H/16, etc.),
+    //   (c) lunar precession special divisors (18015, 37900),
+    //   (d) mid-range divisors that share a non-trivial prime factor with H
+    //       (H = 23·61·239, so multiples of 23, 61, or 239 qualify).
+    // Everything else (gcd(d,H)=1 mid-range) is design-rule violating and
+    // silently skipped. The legacy [168] term falls in this skip bucket.
     const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
     if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
       // Recover JD via epoch-consistent mSY so pos→jd round-trip is exact.
@@ -879,10 +889,11 @@ function moveModel(graph, pos) {
       const H_round = Math.round(C.H);
       for (const h of C.SUN_LONGITUDE_HARMONICS) {
         const divisor = h[0];
-        const isYearMultiple = divisor >= H_round && divisor % H_round === 0;
+        const isYearMultiple      = divisor >= H_round && divisor % H_round === 0;
         const isPrecessionDivisor = divisor > 0 && divisor <= 20;
-        const isLunarPrecession = divisor === 18015 || divisor === 37900;
-        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession) continue;
+        const isLunarPrecession   = divisor === 18015 || divisor === 37900;
+        const sharesFactorWithH   = _gcdInt(divisor, H_round) > 1;
+        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession && !sharesFactorWithH) continue;
         const phase = 2 * Math.PI * t / (C.H / divisor);
         corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
       }
@@ -1497,10 +1508,11 @@ function computeSunPositionFast(jd) {
       const H_round = Math.round(C.H);
       for (const h of C.SUN_LONGITUDE_HARMONICS) {
         const divisor = h[0];
-        const isYearMultiple = divisor >= H_round && divisor % H_round === 0;
+        const isYearMultiple      = divisor >= H_round && divisor % H_round === 0;
         const isPrecessionDivisor = divisor > 0 && divisor <= 20;
-        const isLunarPrecession = divisor === 18015 || divisor === 37900;
-        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession) continue;
+        const isLunarPrecession   = divisor === 18015 || divisor === 37900;
+        const sharesFactorWithH   = _gcdInt(divisor, H_round) > 1;
+        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession && !sharesFactorWithH) continue;
         const phase = 2 * Math.PI * t / (C.H / divisor);
         corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
       }

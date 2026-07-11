@@ -287,21 +287,28 @@ function solveCholesky(A, b, n) {
 // The Sun-correction runtime application in src/script.js AND
 // tools/lib/scene-graph.js only applies harmonics whose divisor is:
 //   (a) a whole-year multiple of H (335317, 670634, 1005951, ...),
-//   (b) a small precession divisor (1..20),
-//   (c) or one of the two lunar precession divisors (18015, 37900).
-// Divisors outside this set are silently skipped at runtime — see commit
-// 9383161 ("sun: Phase Z-B harmonics integration"), which added the filter
-// with the rationale that "gcd(d, H) = 1" mid-range divisors are H-lattice
-// design-rule violating. If we fit terms outside the whitelist here, they
-// land in fitted-coefficients.json but are never applied — a plumbing trap.
-// This helper matches the runtime filter EXACTLY so the fit script never
-// picks a coefficient the runtime would ignore.
+//   (b) a small precession divisor (1..20 — Earth's Fibonacci named
+//       cycles H/3, H/5, H/8, H/13, H/16 etc. are structurally on-lattice
+//       by fiat even though their gcd with H is 1),
+//   (c) one of the two lunar precession divisors (18015, 37900),
+//   (d) a mid-range divisor that shares a non-trivial prime factor with H
+//       — H = 23·61·239, so multiples of 23, 61, or 239 qualify. This
+//       codifies the "gcd(d, H) > 1" principle stated in commit 9383161
+//       ("sun: Phase Z-B harmonics integration"). Newly-allowed mid-range
+//       candidates in the 21..200 sample range: 23, 46, 61, 69, 92, 115,
+//       122, 138 (~2430 yr ≈ Hallstatt), 161, 183, 184.
+// Divisors outside this set (gcd=1 mid-range) are silently skipped at
+// runtime — design-rule violating. If we fit terms outside the whitelist
+// here, they land in fitted-coefficients.json but are never applied —
+// a plumbing trap this helper prevents.
 const H_ROUND = Math.round(C.H);
+function _gcdInt(a, b) { a = Math.abs(a); b = Math.abs(b); while (b !== 0) { const t = b; b = a % b; a = t; } return a; }
 function _isRuntimeWhitelisted(divisor) {
   const isYearMultiple      = divisor >= H_ROUND && divisor % H_ROUND === 0;
   const isPrecessionDivisor = divisor > 0 && divisor <= 20;
   const isLunarPrecession   = divisor === 18015 || divisor === 37900;
-  return isYearMultiple || isPrecessionDivisor || isLunarPrecession;
+  const sharesFactorWithH   = _gcdInt(divisor, H_ROUND) > 1;
+  return isYearMultiple || isPrecessionDivisor || isLunarPrecession || sharesFactorWithH;
 }
 
 // ─── Greedy harmonic selection ──────────────────────────────────────────────
@@ -443,11 +450,14 @@ function main() {
   //   (A) Higher year-multiples (k×year periods): 4..20 harmonics of 1 yr
   //   (B) Planetary synodic periods (Jup-Sat, Mars-Earth, Venus-Earth, Mer-Earth):
   //       rounded to nearest H-lattice divisor.
-  //   (C) Precession-scale divisors 2..20 (matches runtime whitelist upper bound).
-  //   (D) Lunar precession divisors (18015, 37900) — runtime-whitelisted.
-  // Filter: only keep candidates whose period fits ≥3 full cycles in the sample
-  // range. Precession-scale divisors require sample ranges of thousands of years
-  // to fit safely; with --range 100 they cause rank-deficient design matrices.
+  //   (C) Precession-scale divisors 2..20 (Earth Fibonacci named cycles).
+  //   (D) Lunar precession divisors (18015, 37900).
+  //   (E) Mid-range divisors 21..200 that share a prime factor with H
+  //       (H = 23·61·239): multiples of 23, 61, or 239 in that range.
+  //       Newly-added in the gcd-rule fix — these were blocked by the
+  //       previous coarse "d ≤ 20" bucket even though structurally on-lattice.
+  // Nyquist filter: only keep candidates whose period fits ≥3 full cycles
+  // in the sample range (high-freq) or ≤10× the sample range (low-freq).
   // FINAL filter: apply the runtime whitelist so we never emit a coefficient
   // the runtime would silently skip (see _isRuntimeWhitelisted rationale).
   const sampleSpanYears = yearEnd - yearStart;
@@ -462,8 +472,11 @@ function main() {
   for (const p of Object.values(synodicPeriodsYr)) {
     allCandidates.add(Math.max(1, Math.round(C.H / p)));                     // (B) synodic
   }
-  for (let k = 2; k <= 20; k++) allCandidates.add(k);                        // (C) precession scale (runtime cap)
+  for (let k = 2; k <= 20; k++) allCandidates.add(k);                        // (C) precession scale (small)
   allCandidates.add(18015); allCandidates.add(37900);                        // (D) lunar precession
+  for (let k = 21; k <= 200; k++) {                                          // (E) mid-range with gcd>1
+    if (_gcdInt(k, H_ROUND) > 1) allCandidates.add(k);
+  }
   // Two-tier filter:
   //   HIGH-frequency candidates (period ≤ sampleSpan) must fit ≥3 cycles (Nyquist).
   //   LOW-frequency candidates (period > sampleSpan) capture slow drift: kept up

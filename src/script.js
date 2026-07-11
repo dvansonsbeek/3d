@@ -3022,6 +3022,9 @@ const SUN_LONGITUDE_HARMONICS = [
 // Design-rule filter: applies ONLY H-lattice-compliant terms (year-multiples,
 // small precession divisors, lunar precession). The legacy [168] term is
 // skipped (gcd(168, H) = 1, design-rule violating — see lessons-learned doc).
+// Euclidean gcd — used by sunLongitudeCorrection's H-lattice filter.
+function _gcdInt(a, b) { a = Math.abs(a); b = Math.abs(b); while (b !== 0) { const t = b; b = a % b; a = t; } return a; }
+
 function sunLongitudeCorrection(jd) {
   const year = 2000 + (jd - j2000JD) / 365.25;
   const t = year - balancedYear;
@@ -3029,10 +3032,20 @@ function sunLongitudeCorrection(jd) {
   const H_round = Math.round(holisticyearLength);
   for (const h of SUN_LONGITUDE_HARMONICS) {
     const divisor = h[0];
-    const isYearMultiple = divisor >= H_round && divisor % H_round === 0;
+    // H-lattice filter: a divisor is structurally on-lattice if EITHER
+    //   (a) it is a year-multiple of H (integer year period), OR
+    //   (b) it is a small precession divisor (1..20 — Earth's Fibonacci
+    //       named cycles H/3, H/5, H/8, H/13, H/16, etc.), OR
+    //   (c) it is one of the two lunar precession special divisors, OR
+    //   (d) it shares a non-trivial prime factor with H (gcd(d,H) > 1) —
+    //       H = 23·61·239, so multiples of 23, 61, or 239 qualify.
+    // Divisors that fail all four (gcd=1 mid-range) are H-lattice
+    // design-rule violating and silently skipped.
+    const isYearMultiple      = divisor >= H_round && divisor % H_round === 0;
     const isPrecessionDivisor = divisor > 0 && divisor <= 20;
-    const isLunarPrecession = divisor === 18015 || divisor === 37900;
-    if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession) continue;
+    const isLunarPrecession   = divisor === 18015 || divisor === 37900;
+    const sharesFactorWithH   = _gcdInt(divisor, H_round) > 1;
+    if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession && !sharesFactorWithH) continue;
     const phase = 2 * Math.PI * t / (holisticyearLength / divisor);
     corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
   }
