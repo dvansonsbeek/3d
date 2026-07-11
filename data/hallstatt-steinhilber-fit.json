@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "description": "Hallstatt cycle amplitude test using Steinhilber 2012 solar modulation \u03a6 as an independent proxy. Compares framework 8H/1104 (= H/138 = 2430 yr, gcd-compliant on H-lattice) vs canonical 8H/1166 (= 2300 yr, closer to literature but not H-lattice compliant on gcd rule). Also tests Bond (8H/1851) as a comparison anchor.",
+    "source_script": "scripts/hallstatt_steinhilber_amplitude.py",
+    "source_data": "/home/dennis/code/3d/data/steinhilber-2012-solar.txt",
+    "H_yr": 335317,
+    "eight_H_yr": 2682536
+  },
+  "series_summary": {
+    "n_points": 429,
+    "year_range": [
+      -7439.0,
+      1977.0
+    ],
+    "phi_mean_MV": 280.94638694638695,
+    "phi_std_MV": 142.44023624616838
+  },
+  "fit_a_framework_1104_alone": {
+    "r2": 0.11233800828695695,
+    "amplitude_MV": 48.460753998336465,
+    "phase_deg": 29.440650191955967
+  },
+  "fit_b_canonical_1166_alone": {
+    "r2": 0.13035144389401843,
+    "amplitude_MV": 56.68444884486368,
+    "phase_deg": 7.585387438068461
+  },
+  "fit_c_joint_1104_1166": {
+    "r2": 0.13163518000546304,
+    "framework_amp_MV": 18.90796567464352,
+    "framework_phase_deg": -155.09842705601434,
+    "canonical_amp_MV": 74.40375608204032,
+    "canonical_phase_deg": 6.38908407363985
+  },
+  "fit_d_hallstatt_plus_bond_in_phi": {
+    "r2": 0.11523568975881315,
+    "hallstatt_amp_MV": 49.14731407487963,
+    "hallstatt_phase_deg": 27.65744011897648,
+    "bond_amp_MV": 11.12562390344766,
+    "bond_phase_deg": -125.16079042986686
+  },
+  "hallstatt_dt_estimate": {
+    "hallstatt_amp_via_bond_ratio_s": 1669.8105995249002,
+    "bond_dt_amp_reference_s": 378.0,
+    "method": "Hallstatt in \u0394T \u2248 Bond_DT \u00d7 (Hallstatt_\u03a6 / Bond_\u03a6) assuming same proportionality; rough \u2014 \u03a6\u2192\u0394T link is complex."
+  }
+}

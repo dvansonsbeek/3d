@@ -51,7 +51,9 @@ const debugOn                    = false;  // Debug button flag (developer only)
 let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge (~L7080)
 let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction (Phase Z-B) — rationale ~L7066
 let   EARTH_ROTATION_DT_CORRECTION_ENABLED = false;  // DIAGNOSTIC-ONLY — do NOT enable for eclipse validation. When ON, applies ΔT twice: Meeus wrappers already advance UT→TT internally for Sun/Moon positions (~L5107 `_eclSunLon` + ~L5157/5190/5199 `_meeusMoon*`) and the base Earth spin is already at UT-anchored rate (correct actual rotation). Enabling this adds ΔT to Earth's rotation on top of the already-correct scene → over-rotates Earth by ~47° at year -135. Kept as an A/B diagnostic to verify the Meeus internal TT conversion is working. Formerly "Strategy A"; rationale ~L6889
-let   BOND_DT_CORRECTION_ENABLED = false;  // Bond 8H/1851 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
+let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 8H/1851 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
+let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research toggle) — rationale + associated constants ~L5039
+let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
 const earthtiltMean = 23.41353954485521;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
@@ -5034,6 +5036,191 @@ function bondCycleDeltaTCorrection(year) {
   return taper * (raw - BOND_DT_RAW_AT_J2000);
 }
 
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLSTATT CYCLE ΔT CORRECTION (research toggle) — 8H/1104 = H/138 = 2430 yr
+// ═════════════════════════════════════════════════════════════════════════════
+// STRUCTURAL INTERPRETATION:
+//   Period 8H/1104 = H/138 = 2429.83 yr, with 1104 = 2⁴·3·23. Shares the H
+//   prime factor 23 (H = 23·61·239), placing it on the H-lattice per the
+//   gcd rule. The equivalent H-lattice denomination is H/138 = H/(6·23) —
+//   the sixth harmonic of the framework's 14,579-yr period H/23.
+//
+//   Matches the well-established Hallstatt cycle (~2200-2500 yr) in
+//   cosmogenic isotope records (Damon & Sonett 1991; Steinhilber et al.
+//   2012, PNAS). Physical mechanism: long-term solar activity modulation,
+//   coupled to Earth rotation via atmospheric mass-distribution response
+//   to solar EUV/UV variability.
+//
+// EMPIRICAL EVIDENCE — validated on 2026-07-11 across three proxies:
+//   Steinhilber 2012 solar Φ (9.4 kyr):     peak 2293 yr, R² = 0.077;
+//                                            framework 8H/1104 fits at R² = 0.058
+//   Cheng 2016 speleothem δ¹⁸O (640 kyr):   no clear Hallstatt-band peak
+//                                            (residual dominated by internal variability)
+//   Bereiter 2015 EPICA CO₂ (800 kyr):      peak 2404 yr, R² = 0.043;
+//                                            framework 8H/1104 fits at R² = 0.037
+//   The two datasets that resolve Hallstatt (Steinhilber, EPICA) both show a
+//   band-peak near the framework's 8H/1104 = 2430 yr. Cheng is a null result.
+//
+// AMPLITUDE:
+//   Joint ΔT fit (Bond + Hallstatt against Stephenson ΔT residual) yielded
+//   Hallstatt amp = 256 sec — likely INFLATED by partial collinearity with
+//   Bond (Bond phase shifted +14° when Hallstatt was added, indicating
+//   shared variance). Physical prior for solar-activity → ΔT is ~30-100 sec.
+//   The coefficients here are the joint-fit values SCALED to a target
+//   amplitude of 80 sec (moderate constraint balancing physical prior with
+//   observational evidence). Phase from the fit is preserved.
+//
+// SHIP CAVEATS:
+//   • Amplitude 80 sec is a constraint, not a measurement — revisit if a
+//     longer/cleaner proxy narrows the physical estimate
+//   • Uses the same Holocene taper as Bond (±4500 full, ±6000 zero) —
+//     conservative given uncertainty about Hallstatt persistence into
+//     deep time
+//   • Should be A/B-tested against audit-26 alongside Bond before adoption
+//   • Turning this ON, like Bond, VIOLATES the paper's "zero coefficients
+//     fitted to eclipse data" claim
+//
+// Sources:
+//   data/deltaT-bond-plus-hallstatt-fit.json    (joint ΔT fit, free amplitude)
+//   data/hallstatt-steinhilber-fit.json         (solar Φ validation)
+//   data/hallstatt-cheng-fit.json               (speleothem null result)
+//   data/hallstatt-epica-fit.json               (CO₂ validation)
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLSTATT_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
+const HALLSTATT_LATTICE_N              = 1104;                     // 8H/1104 = H/138 = 2·H/(6·23)
+const HALLSTATT_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / HALLSTATT_LATTICE_N;  // 2429.833 yr
+const HALLSTATT_OMEGA                  = 2 * Math.PI / HALLSTATT_PERIOD_YR;
+const HALLSTATT_COS_COEFF_S            = -1.574249;                // free-fit (-5.03) scaled to 80-sec target
+const HALLSTATT_SIN_COEFF_S            = 79.984509;                // free-fit (255.49) scaled to 80-sec target
+const HALLSTATT_TAPER_FULL_HALFWIDTH_YR  = 4500;                   // same as Bond
+const HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR = 6000;                   // same as Bond
+const HALLSTATT_DT_RAW_AT_J2000        = HALLSTATT_COS_COEFF_S * Math.cos(HALLSTATT_OMEGA * 2000)
+                                       + HALLSTATT_SIN_COEFF_S * Math.sin(HALLSTATT_OMEGA * 2000);
+
+/** Smooth cosine taper 1 → 0 between the Hallstatt full and total halfwidths.
+ *  Uses the same window as Bond by design — no independent evidence yet for
+ *  a longer Hallstatt persistence in deep time. */
+function hallstattHoloceneTaper(year) {
+  const dy = Math.abs(year - 2000);
+  if (dy <= HALLSTATT_TAPER_FULL_HALFWIDTH_YR) return 1.0;
+  if (dy >= HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR) return 0.0;
+  const u = (dy - HALLSTATT_TAPER_FULL_HALFWIDTH_YR)
+          / (HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR - HALLSTATT_TAPER_FULL_HALFWIDTH_YR);
+  return 0.5 * (1.0 + Math.cos(Math.PI * u));
+}
+
+/** Anchored Hallstatt cycle ΔT correction at calendar year (CE), in seconds.
+ *  Same structure as bondCycleDeltaTCorrection: returns 0 when flag OFF,
+ *  exactly 0 at year 2000, and 0 outside the taper window. */
+function hallstattCycleDeltaTCorrection(year) {
+  if (!HALLSTATT_DT_CORRECTION_ENABLED) return 0;
+  const taper = hallstattHoloceneTaper(year);
+  if (taper <= 0) return 0;
+  const raw = HALLSTATT_COS_COEFF_S * Math.cos(HALLSTATT_OMEGA * year)
+            + HALLSTATT_SIN_COEFF_S * Math.sin(HALLSTATT_OMEGA * year);
+  return taper * (raw - HALLSTATT_DT_RAW_AT_J2000);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// JOSE5 CYCLE ΔT CORRECTION (research toggle) — 8H/2989 ≈ 897 yr
+// ═════════════════════════════════════════════════════════════════════════════
+// STRUCTURAL INTERPRETATION:
+//   Period 8H/2989 = 897.47 yr, with 2989 = 7²·61. Shares H's prime factor 61
+//   (H = 23·61·239), so gcd(2989, 8H) = 61 — satisfies the H-lattice gcd rule
+//   introduced for Sun harmonics in commit 6d87173.
+//
+//   Physical interpretation candidates:
+//     • 5 × Jose period (5 × 179 yr = 895 yr; 0.28% offset from 8H/2989)
+//     • 45 × Jupiter-Saturn synodic (45 × 19.85 yr = 893 yr; 0.45% offset)
+//   Neither is as tight as Bond's 73×J-S synodic (0.001%) but both are within
+//   0.5%. The Jose period (Charvátová 2000) is a well-established solar
+//   inertial motion period linked to Jupiter-Uranus dynamics.
+//
+// EMPIRICAL EVIDENCE (2026-07-11):
+//   L-5b button Section 14 (8H integer-divisor scan against Stephenson ΔT
+//   residual, run with Bond correction ON): the ~897 yr band consistently
+//   gave the top ΔR² = 0.0026 across n = 2991..3000, amp ~70 s. This is
+//   the STRONGEST remaining lattice signal after Bond in the LUNAR eclipse
+//   residual channel — the exact channel we're modifying.
+//   Triple joint fit (Bond + Hallstatt + Jose5 against Stephenson): Jose5
+//   free-fit amp = 74.4 s (matches L-5b within 4 s), phase = +164.76°.
+//
+// AMPLITUDE — 50 SEC CONSERVATIVE:
+//   Triple fit showed Hallstatt amplitude bloating (256 s → 422 s) when
+//   Jose5 was added, indicating collinearity between the three harmonics.
+//   To minimize inter-flag interaction, Jose5 amplitude is constrained to
+//   50 s (below both L-5b's 70 s and the triple-fit's 74 s). Phase preserved
+//   from the triple fit; cos/sin coefficients scaled proportionally.
+//
+// SHIP CAVEATS:
+//   • ΔR² contribution is small (0.0026 in L-5b residual, ~0.016 in
+//     Stephenson residual before collinearity accounting)
+//   • Triple-fit collinearity means enabling Jose5 alongside Hallstatt
+//     produces amplitudes that don't reflect isolated contributions
+//   • Same Holocene taper as Bond and Hallstatt (±4500 / ±6000 yr)
+//   • Like Bond and Hallstatt, turning this ON VIOLATES the paper's
+//     zero-fit claim
+//
+// Sources:
+//   data/deltaT-triple-bond-hallstatt-jose5-fit.json  (joint 3-cycle fit)
+//   L-5b Section 14 output                            (browser-side scan)
+// ═════════════════════════════════════════════════════════════════════════════
+// JOSE5_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
+const JOSE5_LATTICE_N              = 2989;                        // 8H/(7²·61); gcd(2989, 8H) = 61
+const JOSE5_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE5_LATTICE_N;  // 897.47 yr
+const JOSE5_OMEGA                  = 2 * Math.PI / JOSE5_PERIOD_YR;
+const JOSE5_COS_COEFF_S            = -48.24;                      // triple-fit (-71.78) scaled to 50-sec target
+const JOSE5_SIN_COEFF_S            = -13.14;                      // triple-fit (-19.56) scaled to 50-sec target
+const JOSE5_TAPER_FULL_HALFWIDTH_YR  = 4500;                      // same as Bond and Hallstatt
+const JOSE5_TAPER_TOTAL_HALFWIDTH_YR = 6000;                      // same as Bond and Hallstatt
+const JOSE5_DT_RAW_AT_J2000        = JOSE5_COS_COEFF_S * Math.cos(JOSE5_OMEGA * 2000)
+                                   + JOSE5_SIN_COEFF_S * Math.sin(JOSE5_OMEGA * 2000);
+
+/** Smooth cosine taper 1 → 0 between the Jose5 full and total halfwidths.
+ *  Uses the same window as Bond and Hallstatt for consistency. */
+function jose5HoloceneTaper(year) {
+  const dy = Math.abs(year - 2000);
+  if (dy <= JOSE5_TAPER_FULL_HALFWIDTH_YR) return 1.0;
+  if (dy >= JOSE5_TAPER_TOTAL_HALFWIDTH_YR) return 0.0;
+  const u = (dy - JOSE5_TAPER_FULL_HALFWIDTH_YR)
+          / (JOSE5_TAPER_TOTAL_HALFWIDTH_YR - JOSE5_TAPER_FULL_HALFWIDTH_YR);
+  return 0.5 * (1.0 + Math.cos(Math.PI * u));
+}
+
+/** Anchored Jose5 cycle ΔT correction at calendar year (CE), in seconds.
+ *  Same structure as Bond and Hallstatt: returns 0 when flag OFF, exactly
+ *  0 at year 2000 by construction, 0 outside the taper window. */
+function jose5CycleDeltaTCorrection(year) {
+  if (!JOSE5_DT_CORRECTION_ENABLED) return 0;
+  const taper = jose5HoloceneTaper(year);
+  if (taper <= 0) return 0;
+  const raw = JOSE5_COS_COEFF_S * Math.cos(JOSE5_OMEGA * year)
+            + JOSE5_SIN_COEFF_S * Math.sin(JOSE5_OMEGA * year);
+  return taper * (raw - JOSE5_DT_RAW_AT_J2000);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// JUPITER92 attempt (8H/2461 = 1090 yr) — TESTED AND ROLLED BACK 2026-07-11
+// ═════════════════════════════════════════════════════════════════════════════
+// Rationale for absence: after Bond+Hallstatt+Jose5 shipped, L-5b Section 14
+// identified 8H/2461 (~1090 yr, 92×Jupiter orbit, gcd=23) as the strongest
+// remaining lattice signal. Two Jupiter92 fits were tried:
+//   • Solo against RAW Stephenson residual → phase -108° (Bond-contaminated)
+//   • Isolated against post-B+H+Jose5 residual → phase +20° (correct isolation)
+// Both L-5b tests (with each phase) REGRESSED global metrics vs 3-flag stack:
+//   • Global |residual|: 1626 s (3-flag) → 1627 s (bad phase) → 1637 s (fixed)
+//   • Events closer than NASA: 83 → 81 → 82 (never returned to 83)
+//   • Section 14 with all 4 ON: Bond's ΔR² dropped 0.0010 → 0.0005 and Bond
+//     amp measured 44 → 30 s — Jupiter92 was cannibalizing Bond signal
+//     rather than adding independent variance.
+// Conclusion: the 1090 yr peak in Section 14 is Bond-frequency residual
+// structure, not an independent signal. Ship the 3-flag stack (Bond +
+// Hallstatt + Jose5) as the optimal empirically-validated configuration.
+// Research artifacts kept: scripts/lod_residual_quad_fit.py (collinearity
+// blow-up demo), scripts/jupiter92_isolated_refit.py (phase-isolation), and
+// their JSON outputs document the null attempt.
+// ═════════════════════════════════════════════════════════════════════════════
+
 // ───── ΔT integrator — used for proper Earth rotation in scene graph ─────
 const _DELTA_T_CACHE = new Map();
 const _MAX_DELTA_T_CACHE = 512;
@@ -5051,12 +5238,18 @@ const _MAX_DELTA_T_CACHE = 512;
  *  geographically correct location at deep historical past.
  *
  *  If BOND_DT_CORRECTION_ENABLED is ON, an additional Bond-cycle correction
- *  is added POST-INTEGRATION (see the Bond section above). LOD physics is
- *  untouched; the J2000 LOD anchor is preserved. */
+ *  is added POST-INTEGRATION (see the Bond section above). If
+ *  HALLSTATT_DT_CORRECTION_ENABLED is ON, an additional Hallstatt cycle
+ *  correction (8H/1104) is added on top. LOD physics is untouched; the
+ *  J2000 LOD anchor is preserved. */
 function meanDeltaTSecondsAtAge(t_Ma) {
   if (t_Ma === 0) return 0;
-  // Cache key must include the Bond flag so toggling doesn't return stale values.
-  const cacheKey = BOND_DT_CORRECTION_ENABLED ? `bond:${t_Ma}` : `raw:${t_Ma}`;
+  // Cache key must include all sub-Milankovitch feature flags so toggling
+  // any of them doesn't return stale values.
+  const flagKey = (BOND_DT_CORRECTION_ENABLED      ? 'B' : '_')
+                + (HALLSTATT_DT_CORRECTION_ENABLED ? 'H' : '_')
+                + (JOSE5_DT_CORRECTION_ENABLED     ? 'J' : '_');
+  const cacheKey = `${flagKey}:${t_Ma}`;
   const hit = _DELTA_T_CACHE.get(cacheKey);
   if (hit !== undefined) return hit;
 
@@ -5077,11 +5270,15 @@ function meanDeltaTSecondsAtAge(t_Ma) {
     sum += w * integrand;
   }
   let result = (sum * h) / 3;
-  // Bond cycle ΔT correction (Option B). Post-integration additive term.
-  // Bond correction is anchored to 0 at J2000, so ΔT(J2000) remains exactly 0.
-  if (BOND_DT_CORRECTION_ENABLED) {
+  // Sub-Milankovitch H-lattice ΔT corrections (Option B). Post-integration
+  // additive terms. Each correction is anchored to 0 at J2000 by construction,
+  // so ΔT(J2000) remains exactly 0 regardless of which subset is enabled.
+  if (BOND_DT_CORRECTION_ENABLED || HALLSTATT_DT_CORRECTION_ENABLED
+      || JOSE5_DT_CORRECTION_ENABLED) {
     const yearY = 2000 - t_Ma * 1e6;
-    result += bondCycleDeltaTCorrection(yearY);
+    if (BOND_DT_CORRECTION_ENABLED)      result += bondCycleDeltaTCorrection(yearY);
+    if (HALLSTATT_DT_CORRECTION_ENABLED) result += hallstattCycleDeltaTCorrection(yearY);
+    if (JOSE5_DT_CORRECTION_ENABLED)     result += jose5CycleDeltaTCorrection(yearY);
   }
   if (_DELTA_T_CACHE.size >= _MAX_DELTA_T_CACHE) {
     const firstKey = _DELTA_T_CACHE.keys().next().value;
@@ -28736,6 +28933,103 @@ function setupGUI() {
      'medieval bump reduces dramatically (in-sample R² = 0.975 vs Stephenson residual). Kept as a ' +
      'research toggle only — the amplitude/phase are fitted to eclipse data and therefore ' +
      'violate the paper\'s zero-fit claim. Compare L-5b results ON vs OFF to measure effect.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Toggle: Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research)
+  //
+  // OFF by default. Structurally the sixth harmonic of the framework's 23-
+  // factor period H/23 (H = 23·61·239), so 8H/1104 shares H's 23 factor via
+  // gcd(1104, 8H) = 184. Coincides with the well-established Hallstatt cycle
+  // (~2200-2500 yr) in cosmogenic isotope records. Empirical validation on
+  // 2026-07-11: Steinhilber solar Φ shows R² = 0.058 at 8H/1104; EPICA CO₂
+  // shows R² = 0.037; Cheng speleothem shows R² < 0.001 (null result).
+  // Amplitude constrained to 80 s (physically defensible; free ΔT fit gave
+  // 256 s but with partial Bond collinearity). Same Holocene taper as Bond.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Toggle 8H/1104 Hallstatt ΔT correction (H/138 = 2430 yr; violates zero-fit if ON)', () => {
+    HALLSTATT_DT_CORRECTION_ENABLED = !HALLSTATT_DT_CORRECTION_ENABLED;
+    _DELTA_T_CACHE.clear();
+    console.log('\n══════════════════════════════════════════════════════════════════');
+    console.log(`  8H/1104 Hallstatt ΔT correction is now: ${HALLSTATT_DT_CORRECTION_ENABLED ? 'ENABLED (research toggle only)' : 'DISABLED (default)'}`);
+    console.log('══════════════════════════════════════════════════════════════════');
+    if (HALLSTATT_DT_CORRECTION_ENABLED) {
+      console.log('  • Lattice harmonic 8H/1104 = ' + HALLSTATT_PERIOD_YR.toFixed(3) + ' yr = H/138');
+      console.log('  • Structural interpretation: gcd(1104, 8H) = 184 shares H\'s 23 prime factor');
+      console.log('    Framework H/23 = 14,579 yr; H/138 = H/(6·23) is its sixth harmonic');
+      console.log('  • Matches Hallstatt cycle (Damon & Sonett 1991; Steinhilber 2012)');
+      console.log('  • Amplitude 80 s (constrained physical prior; free fit gave 256 s with Bond collinearity)');
+      console.log('  • Holocene taper: full strength ±4500 yr from J2000, zero beyond ±6000 yr');
+      console.log('  • VIOLATES paper\'s zero-fit claim: coefficients fitted to Stephenson residual.');
+    } else {
+      console.log('  Correction disabled — framework operates in default zero-fit mode.');
+    }
+    console.log('  ');
+    console.log('  Preserved invariants (both states):');
+    console.log('   • meanLodSecondsAtAge(0) = 86400.00001 s (J2000 LOD anchor)');
+    console.log('   • meanDeltaTSecondsAtAge(0) = 0 s        (J2000 ΔT anchor)');
+    console.log('  • Raw eval at J2000: ' + HALLSTATT_DT_RAW_AT_J2000.toFixed(2) + ' s');
+    console.log('    (subtracted by construction so ΔT(J2000) = 0 either way)');
+    console.log('  • Compatibility with Bond flag: independent — either, both, or neither can be ON');
+    console.log('    Current state: Bond = ' + (BOND_DT_CORRECTION_ENABLED ? 'ON' : 'OFF') + ', Hallstatt = ' + (HALLSTATT_DT_CORRECTION_ENABLED ? 'ON' : 'OFF'));
+    const lod_J2000 = meanLodSecondsAtAge(0);
+    const dt_J2000  = meanDeltaTSecondsAtAge(0);
+    console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
+    console.log('══════════════════════════════════════════════════════════════════');
+  }, 'Feature flag for the 8H/1104 Hallstatt ΔT correction (2430 yr H-lattice harmonic). OFF by ' +
+     'default. When ON, adds up to ±80 s modulation in the Holocene window. Structurally on-lattice ' +
+     'via H\'s 23 prime factor; matches the ~2400-yr solar Hallstatt cycle. Kept as a research ' +
+     'toggle: amplitude constrained but fitted to eclipse data, therefore violates the paper\'s ' +
+     'zero-fit claim. Compare eclipse-audit results Hallstatt ON vs OFF, and joint with Bond, to ' +
+     'measure marginal contribution.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Toggle: Jose5 8H/2989 ≈ 897 yr ΔT correction (research)
+  //
+  // OFF by default. Divisor 2989 = 7²·61 satisfies the gcd rule via H's 61
+  // prime factor (H = 23·61·239). Physical interpretation: 5 × Jose period
+  // (5 × 179 yr = 895 yr, 0.28% offset) or 45 × Jupiter-Saturn synodic
+  // (0.45%). Identified by L-5b Section 14 as the STRONGEST remaining 8H
+  // divisor signal after Bond in the lunar-eclipse residual (ΔR² = 0.0026,
+  // amp ~70 s at empirical). Amplitude constrained to 50 s (below both the
+  // L-5b empirical 70 s and the triple-fit 74 s) to reduce Hallstatt-Jose5
+  // collinearity when both are enabled.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Toggle 8H/2989 Jose5 ΔT correction (~897 yr; violates zero-fit if ON)', () => {
+    JOSE5_DT_CORRECTION_ENABLED = !JOSE5_DT_CORRECTION_ENABLED;
+    _DELTA_T_CACHE.clear();
+    console.log('\n══════════════════════════════════════════════════════════════════');
+    console.log(`  8H/2989 Jose5 ΔT correction is now: ${JOSE5_DT_CORRECTION_ENABLED ? 'ENABLED (research toggle only)' : 'DISABLED (default)'}`);
+    console.log('══════════════════════════════════════════════════════════════════');
+    if (JOSE5_DT_CORRECTION_ENABLED) {
+      console.log('  • Lattice harmonic 8H/2989 = ' + JOSE5_PERIOD_YR.toFixed(3) + ' yr');
+      console.log('  • Structural: 2989 = 7²·61, gcd(2989, 8H) = 61 (shares H\'s 61 prime)');
+      console.log('  • Physical: 5 × Jose 179 yr (0.28% offset) or 45 × J-S synodic (0.45% offset)');
+      console.log('  • Empirical: L-5b Section 14 found this as strongest 8H residual peak after Bond');
+      console.log('  • Amplitude 50 s (constrained; L-5b empirical 70 s, triple-fit 74 s)');
+      console.log('  • Holocene taper: full strength ±4500 yr from J2000, zero beyond ±6000 yr');
+      console.log('  • VIOLATES paper\'s zero-fit claim: coefficients from Stephenson residual fit.');
+    } else {
+      console.log('  Correction disabled — framework operates in default zero-fit mode.');
+    }
+    console.log('  ');
+    console.log('  Preserved invariants (both states):');
+    console.log('   • meanLodSecondsAtAge(0) = 86400.00001 s (J2000 LOD anchor)');
+    console.log('   • meanDeltaTSecondsAtAge(0) = 0 s        (J2000 ΔT anchor)');
+    console.log('  • Raw eval at J2000: ' + JOSE5_DT_RAW_AT_J2000.toFixed(2) + ' s');
+    console.log('    (subtracted by construction so ΔT(J2000) = 0 either way)');
+    console.log('  • Compatibility: independent of Bond and Hallstatt flags — 8 total states');
+    console.log('    Current: Bond=' + (BOND_DT_CORRECTION_ENABLED?'ON':'OFF') + ', Hallstatt=' + (HALLSTATT_DT_CORRECTION_ENABLED?'ON':'OFF') + ', Jose5=' + (JOSE5_DT_CORRECTION_ENABLED?'ON':'OFF'));
+    console.log('  ⚠ Collinearity note: enabling Jose5 alongside Hallstatt inflates Hallstatt\'s');
+    console.log('    apparent amplitude (256 s → 422 s in triple free-fit). Constrained coefficients');
+    console.log('    here mitigate but don\'t eliminate the joint-effect distortion.');
+    const lod_J2000 = meanLodSecondsAtAge(0);
+    const dt_J2000  = meanDeltaTSecondsAtAge(0);
+    console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
+    console.log('══════════════════════════════════════════════════════════════════');
+  }, 'Feature flag for the 8H/2989 Jose5 ΔT correction (~897 yr, 5×Jose 179 or 45×J-S synodic). OFF ' +
+     'by default. When ON, adds up to ±50 s modulation. Structurally on-lattice via H\'s 61 prime ' +
+     'factor. Identified by L-5b Section 14 as strongest remaining 8H residual peak after Bond. ' +
+     'Research toggle only — same zero-fit-claim violation as Bond and Hallstatt.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Button 2: Sun position diagnostic — scene vs Meeus

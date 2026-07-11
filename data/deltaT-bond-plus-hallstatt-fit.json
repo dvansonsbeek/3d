@@ -1,0 +1,51 @@
+{
+  "_meta": {
+    "description": "Joint fit of Stephenson \u0394T residual to Bond (8H/1851 = 1449 yr) and Hallstatt (8H/1104 = H/138 = 2430 yr) H-lattice cycles. Bond is the 73\u00d7J-S synodic top-ranked \u0394T harmonic. Hallstatt is the well-established ~2400-yr solar cycle (Damon & Sonett 1991) that emerges naturally on the H-lattice via 8H/1104 = H/138 (1104 = 2\u2074\u00b73\u00b723, gcd with 8H shares H's 23 factor). This joint fit tests whether the two cycles independently explain distinct variance components of the \u0394T residual.",
+    "source_script": "scripts/lod_residual_bond_plus_hallstatt.py",
+    "H_yr": 335317,
+    "eight_H_yr": 2682536,
+    "bond_period_yr": 1449.2360886007564,
+    "hallstatt_period_yr": 2429.8333333333335
+  },
+  "fit_a_bond_only": {
+    "r2": 0.9751078775548133,
+    "rms_pre": 355.6388251955625,
+    "rms_post": 56.109982242137974,
+    "bond_amplitude_s": 377.72735671429416,
+    "bond_phase_deg": -65.52609884724494
+  },
+  "fit_b_bond_plus_hallstatt": {
+    "r2": 0.9812301402444873,
+    "rms_pre": 355.6388251955625,
+    "rms_post": 48.72363496032876,
+    "bond_amplitude_s": 386.1601852551293,
+    "bond_phase_deg": -51.09737666983711,
+    "hallstatt_amplitude_s": 255.53960057589447,
+    "hallstatt_phase_deg": -91.12754528598585
+  },
+  "delta_r2": 0.006122262689673974,
+  "delta_rms_post": 7.386347281809215,
+  "verdict": {
+    "meaningful_r2": true,
+    "bond_stable": true,
+    "physical_amp": false,
+    "ship_integration": false
+  },
+  "coefficients_if_ship": {
+    "BOND_LATTICE_N": 1851,
+    "BOND_COS_COEFF_S": 242.50809025271866,
+    "BOND_SIN_COEFF_S": 300.5154153088574,
+    "BOND_DT_RAW_AT_J2000": 28.84568442653847,
+    "HALLSTATT_LATTICE_N": 1104,
+    "HALLSTATT_COS_COEFF_S": -5.028535730389706,
+    "HALLSTATT_SIN_COEFF_S": 255.49011975200898,
+    "HALLSTATT_DT_RAW_AT_J2000": -231.2398866481466
+  },
+  "fit_metrics_in_sample": {
+    "n_points": 274,
+    "year_range": [
+      -720.0,
+      2010.0
+    ]
+  }
+}

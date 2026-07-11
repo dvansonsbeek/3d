@@ -1,0 +1,64 @@
+{
+  "_meta": {
+    "description": "Triple joint fit of Stephenson \u0394T residual to Bond (8H/1851), Hallstatt (8H/1104 = H/138), and Jose5 (8H/2989 = 7\u00b2\u00b761 harmonic ~897 yr). Jose5 divisor identified by L-5b button Section 14 as the strongest remaining lattice signal after Bond (\u0394R\u00b2 = 0.0026). H-lattice compliant via H's 61 prime.",
+    "source_script": "scripts/lod_residual_triple_bond_hallstatt_jose5.py",
+    "H_yr": 335317,
+    "eight_H_yr": 2682536
+  },
+  "periods_yr": {
+    "bond": 1449.2360886007564,
+    "hallstatt": 2429.8333333333335,
+    "jose5": 897.469387755102
+  },
+  "fit_a_bond_alone": {
+    "r2": 0.9751078775548133,
+    "rms_post": 56.109982242137974,
+    "bond_amp": 377.72735671429416,
+    "bond_phase_deg": -65.52609884724494
+  },
+  "fit_b_bond_hallstatt": {
+    "r2": 0.9812301402444873,
+    "rms_post": 48.72363496032876,
+    "bond_amp": 386.1601852551293,
+    "bond_phase_deg": -51.09737666983711,
+    "hallstatt_amp": 255.53960057589447,
+    "hallstatt_phase_deg": -91.12754528598585
+  },
+  "fit_c_triple": {
+    "r2": 0.9969729553277273,
+    "rms_post": 19.56674485856767,
+    "bond_amp": 387.29872281243405,
+    "bond_phase_deg": -41.94857590697733,
+    "hallstatt_amp": 422.1774473799395,
+    "hallstatt_phase_deg": -86.60828823627934,
+    "jose5_amp": 74.3951099800077,
+    "jose5_phase_deg": 164.75614858524813
+  },
+  "marginal_contributions": {
+    "delta_r2_bond_to_bond_hall": 0.006122262689673974,
+    "delta_r2_bond_hall_to_triple": 0.015742815083240047,
+    "delta_r2_bond_to_triple": 0.02186507777291402,
+    "delta_rms_bond_to_triple": 36.5432373835703
+  },
+  "coefficients_for_script_js": {
+    "BOND_LATTICE_N": 1851,
+    "BOND_COS_COEFF_S": 288.0515211336633,
+    "BOND_SIN_COEFF_S": 258.8950016217489,
+    "BOND_DT_RAW_AT_J2000_FROM_FIT": -32.8453764962255,
+    "HALLSTATT_LATTICE_N": 1104,
+    "HALLSTATT_COS_COEFF_S": 24.97684971506883,
+    "HALLSTATT_SIN_COEFF_S": 421.43795991171993,
+    "HALLSTATT_DT_RAW_AT_J2000_FROM_FIT": -366.6862153207744,
+    "JOSE5_LATTICE_N": 2989,
+    "JOSE5_COS_COEFF_S": -71.77755857750881,
+    "JOSE5_SIN_COEFF_S": -19.560533571192114,
+    "JOSE5_DT_RAW_AT_J2000_FROM_FIT": -29.05423229083693
+  },
+  "fit_metrics": {
+    "n_points": 274,
+    "year_range": [
+      -720.0,
+      2010.0
+    ]
+  }
+}

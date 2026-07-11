@@ -1,0 +1,117 @@
+{
+  "_meta": {
+    "description": "Third Hallstatt proxy test using EPICA 800 kyr CO\u2082 (Bereiter 2015). Median 420-yr resolution: Hallstatt (~2400 yr) is 5.7\u00d7 above Nyquist. Following weak Steinhilber solar \u03a6 signal and null Cheng speleothem, this test provides a third independent look at whether a Hallstatt-band cycle is a persistent long-term feature or a Holocene-solar artifact.",
+    "source_script": "scripts/hallstatt_epica_co2.py",
+    "source_data": "/home/dennis/code/3d/data/epica-co2-bereiter2015.txt",
+    "H_yr": 335317,
+    "eight_H_yr": 2682536
+  },
+  "series_summary": {
+    "n_points": 1901,
+    "year_range_ad": [
+      -803718.87,
+      2001.03
+    ],
+    "span_kyr": 805.7199,
+    "median_spacing_yr": 275.3400000000438
+  },
+  "milankovitch_fit": {
+    "r2": 0.5834094180614451,
+    "residual_rms_ppm": 23.166885395653516,
+    "amplitudes": {
+      "eccentricity_405k": 5.9413184667635175,
+      "eccentricity_100k": 27.889363746162438,
+      "obliquity_41k": 18.87818906912263,
+      "precession_23k": 4.162082928367448,
+      "precession_19k": 3.4816844201299673
+    }
+  },
+  "hallstatt_candidates": {
+    "8H/1104": {
+      "n": 1104,
+      "period_yr": 2429.8333333333335,
+      "r2": 0.0365645030387981,
+      "amplitude": 6.1182158617744875
+    },
+    "8H/1150": {
+      "n": 1150,
+      "period_yr": 2332.64,
+      "r2": 0.03056791257973357,
+      "amplitude": 5.491405034033374
+    },
+    "8H/1166": {
+      "n": 1166,
+      "period_yr": 2300.631217838765,
+      "r2": 0.02131539955877093,
+      "amplitude": 4.569508418830893
+    }
+  },
+  "empirical_peak_in_hallstatt_band": {
+    "n": 1116,
+    "period_yr": 2403.706093189964,
+    "r2": 0.04317312448562771,
+    "amplitude": 6.584182831300755
+  },
+  "top_10_wider_sub_orbital": [
+    {
+      "n": 510,
+      "period_yr": 5259.874509803922,
+      "r2": 0.044668820856221036,
+      "amplitude": 6.71002953953933
+    },
+    {
+      "n": 500,
+      "period_yr": 5365.072,
+      "r2": 0.04338078184190153,
+      "amplitude": 6.701536656682741
+    },
+    {
+      "n": 1120,
+      "period_yr": 2395.1214285714286,
+      "r2": 0.0429233776111011,
+      "amplitude": 6.600280459098507
+    },
+    {
+      "n": 520,
+      "period_yr": 5158.723076923077,
+      "r2": 0.04171074655457652,
+      "amplitude": 6.457930190914307
+    },
+    {
+      "n": 660,
+      "period_yr": 4064.448484848485,
+      "r2": 0.03751198269400968,
+      "amplitude": 6.069884383752093
+    },
+    {
+      "n": 1130,
+      "period_yr": 2373.925663716814,
+      "r2": 0.03676255935499517,
+      "amplitude": 6.072277297344027
+    },
+    {
+      "n": 530,
+      "period_yr": 5061.388679245283,
+      "r2": 0.036580121249220054,
+      "amplitude": 6.050016608711824
+    },
+    {
+      "n": 650,
+      "period_yr": 4126.9784615384615,
+      "r2": 0.03652969442655729,
+      "amplitude": 5.9806611390365365
+    },
+    {
+      "n": 2510,
+      "period_yr": 1068.7394422310756,
+      "r2": 0.03573972893011412,
+      "amplitude": 6.055076447932805
+    },
+    {
+      "n": 670,
+      "period_yr": 4003.7850746268655,
+      "r2": 0.035161823703663275,
+      "amplitude": 5.848271668572767
+    }
+  ]
+}

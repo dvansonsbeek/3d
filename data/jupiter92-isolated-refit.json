@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "description": "Jupiter92 (8H/2461) isolated re-fit against Stephenson \u0394T residual AFTER Bond + Hallstatt + Jose5 corrections have been applied (using shipped coefficients). Fixes the phase-contamination issue from the earlier solo fit which was against raw Stephenson residual and inherited Bond's phase.",
+    "source_script": "scripts/jupiter92_isolated_refit.py",
+    "H_yr": 335317,
+    "eight_H_yr": 2682536
+  },
+  "inputs": {
+    "BOND_N": 1851,
+    "BOND_COS": 156.48439921860614,
+    "BOND_SIN": 343.78858156076024,
+    "HALL_N": 1104,
+    "HALL_COS": -1.574249,
+    "HALL_SIN": 79.984509,
+    "JOSE5_N": 2989,
+    "JOSE5_COS": -48.24,
+    "JOSE5_SIN": -13.14,
+    "JUP92_N": 2461,
+    "target_amplitude_s": 35.0
+  },
+  "free_fit_isolated": {
+    "r2_local": 0.9904350288865907,
+    "amplitude_s": 53.10685386546963,
+    "phase_deg": -19.730840821021854,
+    "cos_free": 49.98889518340867,
+    "sin_free": 17.928978939987843,
+    "raw_j2000_free": 9.958780531407424
+  },
+  "scaled_to_35s_ship_values": {
+    "cos": 32.94511356013334,
+    "sin": 11.816069249539703,
+    "amplitude": 34.99999999999999,
+    "raw_j2000": 6.56332080002754
+  },
+  "previous_solo_fit_reference": {
+    "cos_free": -56.44,
+    "sin_free": 171.64,
+    "amp_free": 181,
+    "phase_deg": -108.2,
+    "cos_scaled_shipped": -10.9337,
+    "sin_scaled_shipped": 33.2484
+  }
+}

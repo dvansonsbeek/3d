@@ -1,0 +1,57 @@
+{
+  "_meta": {
+    "description": "4-way joint fit: Bond + Hallstatt + Jose5 + Jupiter92 (8H/2461 = 1090 yr) against Stephenson \u0394T residual. Jupiter92 identified by L-5b Section 14 with all three prior corrections enabled. Structural: 2461 = 23\u00b7107; physical: 92 \u00d7 Jupiter orbit (0.02% error).",
+    "source_script": "scripts/lod_residual_quad_fit.py",
+    "H_yr": 335317,
+    "eight_H_yr": 2682536
+  },
+  "periods_yr": {
+    "bond": 1449.2360886007564,
+    "hallstatt": 2429.8333333333335,
+    "jose5": 897.469387755102,
+    "jupiter92": 1090.018691588785
+  },
+  "quad_fit_r2": 0.9986744923310134,
+  "quad_fit_rms_post": 12.947928405140672,
+  "amplitudes_free_fit": {
+    "bond": 760.1084918712465,
+    "hallstatt": 958.2326443119053,
+    "jose5": 219.0552354866318,
+    "jupiter92": 471.05128204820716
+  },
+  "coefficients_free_fit": {
+    "bond": {
+      "cos": -420.0962225836385,
+      "sin": 633.4698755155914,
+      "raw_j2000": 739.8359827095308,
+      "amplitude": 760.1084918712465,
+      "period_yr": 1449.2360886007564
+    },
+    "hallstatt": {
+      "cos": 47.82988946579342,
+      "sin": -957.0381927063708,
+      "raw_j2000": 879.0531998882087,
+      "amplitude": 958.2326443119053,
+      "period_yr": 2429.8333333333335
+    },
+    "jose5": {
+      "cos": -145.05074169582335,
+      "sin": -164.15077985679886,
+      "raw_j2000": -182.19937906863484,
+      "amplitude": 219.0552354866318,
+      "period_yr": 897.469387755102
+    },
+    "jupiter92": {
+      "cos": 438.4661665831051,
+      "sin": 172.15321978161288,
+      "raw_j2000": 74.52384839471901,
+      "amplitude": 471.05128204820716,
+      "period_yr": 1090.018691588785
+    }
+  },
+  "jupiter92_scaled_to_35s": {
+    "cos": 32.578864372644134,
+    "sin": 12.791309400872873,
+    "raw_j2000": 5.537262699877823
+  }
+}
