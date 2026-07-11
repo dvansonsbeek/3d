@@ -1,0 +1,35 @@
+{
+  "_meta": {
+    "description": "Single-component 8H/n = 8H/1830 fit to Stephenson \u0394T residual. n=1830 = 2\u00b73\u00b75\u00b761 satisfies the gcd rule via H's 61 prime factor (gcd(1830, 8H) = 122 shares H's 61). Closest gcd-compliant match to the canonical Bond period 1470 yr (only 4 yr off). Structural: 74 \u00d7 Jupiter-Saturn synodic (0.22% error).",
+    "framework_n": 1830,
+    "framework_period_yr": 1465.8666666666666,
+    "gcd_n_H": 61,
+    "gcd_n_8H": 122,
+    "H_yr": 335317,
+    "eight_H_yr": 2682536
+  },
+  "coefficients_for_script_js": {
+    "BOND_LATTICE_N": 1830,
+    "BOND_COS_COEFF_S": 165.9257461933014,
+    "BOND_SIN_COEFF_S": 336.8133395385491,
+    "BOND_DT_RAW_AT_J2000": 144.26896672977952,
+    "BOND_AMPLITUDE_S": 375.46581594189615,
+    "BOND_PHASE_DEG": -63.77356923761882
+  },
+  "fit_metrics": {
+    "n_points": 274,
+    "year_range": [
+      -720.0,
+      2010.0
+    ],
+    "r2": 0.9745035656179933,
+    "rms_pre": 355.6388251955625,
+    "rms_post": 56.78699552670326
+  },
+  "comparison_to_1851": {
+    "n_1851_r2": 0.9751,
+    "n_1830_r2": 0.9745035656179933,
+    "delta_r2": -0.0005964343820066276,
+    "period_shift_yr": 16.630578065910186
+  }
+}

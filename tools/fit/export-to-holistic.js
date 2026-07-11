@@ -562,6 +562,35 @@ if (fs.existsSync(PLANETS_PATH)) {
 // We just flag when the snapshot is stale so the exporter's output makes
 // the "you'll need to rebuild/regen the website" step obvious.
 
+// ── ΔT correction coefficients (deepTime.ts) ──────────────────
+// Source of truth: data/deltaT-3flag-fit.json (fitted by tools/fit/dt-corrections-fit.js).
+// Delegates to tools/fit/export-dt-corrections.js so the transform lives in one place.
+// deepTime.ts is independent of constants.ts so its changes are NOT folded into the
+// model-values staleness check below — DT corrections don't feed the LOD pipeline.
+{
+  console.log('');
+  console.log('  ── deepTime.ts (ΔT correction coefficients) ──');
+  const dt = require('./export-dt-corrections');
+  const fit = dt.loadFitJson();
+  const targetPath = dt.TARGETS.websiteDeepTime.path;
+  if (!fit) {
+    console.log('    (data/deltaT-3flag-fit.json not found — run dt-corrections-fit.js --write to generate)');
+  } else if (!fs.existsSync(targetPath)) {
+    console.log(`    (${dt.TARGETS.websiteDeepTime.label} not found, skipping)`);
+  } else {
+    const before = fs.readFileSync(targetPath, 'utf8');
+    const { source: after, changes } = dt.applyToSource(before, fit);
+    if (changes === 0) {
+      console.log('    ✓ 3-flag ΔT constants already in sync');
+    } else if (!WRITE) {
+      console.log(`    ${changes} ΔT constants pending. Run with --write to apply.`);
+    } else {
+      fs.writeFileSync(targetPath, after);
+      console.log(`    ✓ Written ${changes} ΔT constants to deepTime.ts`);
+    }
+  }
+}
+
 const MV_COMPUTE = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.compute.ts');
 const MV_JSON    = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.generated.json');
 const MV_TS      = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');

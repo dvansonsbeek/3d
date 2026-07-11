@@ -176,18 +176,94 @@ function meanYearInDaysAtAge(t_Ma) {
   return meanTropicalYearSecondsAtAge(t_Ma) / LOD_s;
 }
 
-// ─── Pure-tidal ΔT integrator (mirrors src/script.js meanDeltaTSecondsAtAge) ─
-// ΔT = TT − UT1 accumulated from LOD deviation via Simpson's rule.
-// Positive on both sides of J2000 (ΔT(0) = 0 exactly).
-// This is FRAMEWORK'S OWN ΔT (LOD-based), NOT the Espenak/Meeus polynomial.
-// At year 9000 gives potentially very different values from Espenak/Meeus tail.
-// NOTE: does NOT include Bond correction (browser-only research toggle).
+// ═════════════════════════════════════════════════════════════════════════════
+// Sub-Milankovitch 8H-lattice ΔT corrections (3-flag stack, mirrors src/script.js)
+// ═════════════════════════════════════════════════════════════════════════════
+// Three framework-native harmonic corrections applied post-integration on top
+// of the pure-tidal ΔT below. Each has a zero-fit structural period (drops
+// out of the 8H lattice arithmetic) and a fitted amplitude/phase (constrained
+// physical prior). Each anchored to 0 at year 2000; Holocene taper (±4500
+// full, ±6000 zero) prevents unbounded extrapolation. Details in
+// docs/102-gia-alpha-lunar-validation.md.
+//
+//   Bond      8H/1830 = 1466 yr — 74 × Jupiter-Saturn synodic; gcd=61
+//   Hallstatt 8H/1104 = H/138 = 2430 yr — H's 23-factor
+//   Jose5     8H/2989 ≈ 897 yr — H's 61-factor, 5×Jose 179
+
+const EIGHT_H = 8 * HOLISTIC_YEAR_J2000;
+
+const BOND_LATTICE_N = 1830;
+const BOND_PERIOD_YR = EIGHT_H / BOND_LATTICE_N;
+const BOND_OMEGA = 2 * Math.PI / BOND_PERIOD_YR;
+const BOND_COS_COEFF_S = 165.92681616414058;
+const BOND_SIN_COEFF_S = 336.8127054187615;
+
+const HALLSTATT_LATTICE_N = 1104;
+const HALLSTATT_PERIOD_YR = EIGHT_H / HALLSTATT_LATTICE_N;
+const HALLSTATT_OMEGA = 2 * Math.PI / HALLSTATT_PERIOD_YR;
+const HALLSTATT_COS_COEFF_S = -9.173518918513707;
+const HALLSTATT_SIN_COEFF_S = 79.47230052446999;
+
+const JOSE5_LATTICE_N = 2989;
+const JOSE5_PERIOD_YR = EIGHT_H / JOSE5_LATTICE_N;
+const JOSE5_OMEGA = 2 * Math.PI / JOSE5_PERIOD_YR;
+const JOSE5_COS_COEFF_S = -48.48068102537258;
+const JOSE5_SIN_COEFF_S = -12.23207126025995;
+
+const HOLOCENE_TAPER_FULL_HALFWIDTH_YR = 4500;
+const HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR = 6000;
+
+function holoceneTaper(year) {
+  const dy = Math.abs(year - 2000);
+  if (dy <= HOLOCENE_TAPER_FULL_HALFWIDTH_YR) return 1.0;
+  if (dy >= HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR) return 0.0;
+  const u = (dy - HOLOCENE_TAPER_FULL_HALFWIDTH_YR)
+          / (HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR - HOLOCENE_TAPER_FULL_HALFWIDTH_YR);
+  return 0.5 * (1.0 + Math.cos(Math.PI * u));
+}
+
+const BOND_DT_RAW_AT_J2000      = BOND_COS_COEFF_S      * Math.cos(BOND_OMEGA      * 2000) + BOND_SIN_COEFF_S      * Math.sin(BOND_OMEGA      * 2000);
+const HALLSTATT_DT_RAW_AT_J2000 = HALLSTATT_COS_COEFF_S * Math.cos(HALLSTATT_OMEGA * 2000) + HALLSTATT_SIN_COEFF_S * Math.sin(HALLSTATT_OMEGA * 2000);
+const JOSE5_DT_RAW_AT_J2000     = JOSE5_COS_COEFF_S     * Math.cos(JOSE5_OMEGA     * 2000) + JOSE5_SIN_COEFF_S     * Math.sin(JOSE5_OMEGA     * 2000);
+
+function bondCycleDeltaTCorrection(year) {
+  const taper = holoceneTaper(year);
+  if (taper <= 0) return 0;
+  const raw = BOND_COS_COEFF_S * Math.cos(BOND_OMEGA * year)
+            + BOND_SIN_COEFF_S * Math.sin(BOND_OMEGA * year);
+  return taper * (raw - BOND_DT_RAW_AT_J2000);
+}
+function hallstattCycleDeltaTCorrection(year) {
+  const taper = holoceneTaper(year);
+  if (taper <= 0) return 0;
+  const raw = HALLSTATT_COS_COEFF_S * Math.cos(HALLSTATT_OMEGA * year)
+            + HALLSTATT_SIN_COEFF_S * Math.sin(HALLSTATT_OMEGA * year);
+  return taper * (raw - HALLSTATT_DT_RAW_AT_J2000);
+}
+function jose5CycleDeltaTCorrection(year) {
+  const taper = holoceneTaper(year);
+  if (taper <= 0) return 0;
+  const raw = JOSE5_COS_COEFF_S * Math.cos(JOSE5_OMEGA * year)
+            + JOSE5_SIN_COEFF_S * Math.sin(JOSE5_OMEGA * year);
+  return taper * (raw - JOSE5_DT_RAW_AT_J2000);
+}
+
+// ─── ΔT integrator (mirrors src/script.js meanDeltaTSecondsAtAge) ───────────
+// Pure-tidal Simpson integration + post-integration 3-cycle H-lattice
+// corrections (Bond + Hallstatt + Jose5) matching the shipped 3-flag stack.
+// Positive on both sides of J2000; ΔT(0) = 0 exactly by anchor construction.
+// This is FRAMEWORK'S OWN ΔT (LOD-based + lattice), NOT Espenak/Meeus.
 const _DELTA_T_CACHE = new Map();
 const _MAX_DELTA_T_CACHE = 512;
 
+// DT_CORRECTIONS_DISABLED=1 in env: bypasses the 3-flag stack (pure-tidal only).
+// Used by tools/fit/dt-corrections-fit.js to compute the raw framework residual
+// before applying corrections. Mirrors SUN_HARMONICS_DISABLED=1 pattern.
+const DT_CORRECTIONS_ENABLED = process.env.DT_CORRECTIONS_DISABLED !== '1';
+
 function meanDeltaTSecondsAtAge(t_Ma) {
   if (t_Ma === 0) return 0;
-  const cacheKey = `raw:${t_Ma}`;
+  const cacheKey = (DT_CORRECTIONS_ENABLED ? 'BHJ:' : 'raw:') + t_Ma;
   const hit = _DELTA_T_CACHE.get(cacheKey);
   if (hit !== undefined) return hit;
 
@@ -207,7 +283,17 @@ function meanDeltaTSecondsAtAge(t_Ma) {
     const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
     sum += w * integrand;
   }
-  const result = (sum * h) / 3;
+  let result = (sum * h) / 3;
+
+  // Post-integration 3-cycle H-lattice corrections; anchored to 0 at J2000.
+  // Skipped when DT_CORRECTIONS_DISABLED=1 (raw pure-tidal for fitting).
+  if (DT_CORRECTIONS_ENABLED) {
+    const yearY = 2000 - t_Ma * 1e6;
+    result += bondCycleDeltaTCorrection(yearY);
+    result += hallstattCycleDeltaTCorrection(yearY);
+    result += jose5CycleDeltaTCorrection(yearY);
+  }
+
   if (_DELTA_T_CACHE.size >= _MAX_DELTA_T_CACHE) {
     const firstKey = _DELTA_T_CACHE.keys().next().value;
     _DELTA_T_CACHE.delete(firstKey);

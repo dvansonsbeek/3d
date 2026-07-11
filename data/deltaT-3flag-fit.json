@@ -1,0 +1,94 @@
+{
+  "_meta": {
+    "description": "Sub-Milankovitch H-lattice ΔT correction stack fit against Stephenson 2016 residual. Bond uses solo-fit phase (unconstrained amplitude, physical anchor). Hallstatt and Jose5 use scaled amplitudes below their free-fit values to mitigate inter-cycle collinearity. See docs/102-gia-alpha-lunar-validation.md §\"Companion 8H lattice harmonics\".",
+    "generator": "tools/fit/dt-corrections-fit.js",
+    "dt_corrections_disabled": true,
+    "H_yr": 335317,
+    "eight_H_yr": 2682536
+  },
+  "config": {
+    "cycles": [
+      {
+        "name": "bond",
+        "lattice_n": 1830,
+        "structural": "74 × J-S synodic; gcd(1830, H) = 61",
+        "fit_stage": "solo",
+        "target_amp_s": null
+      },
+      {
+        "name": "hallstatt",
+        "lattice_n": 1104,
+        "structural": "H/138 = H/(6·23); gcd(1104, H) = 23",
+        "fit_stage": "with_bond",
+        "target_amp_s": 80
+      },
+      {
+        "name": "jose5",
+        "lattice_n": 2989,
+        "structural": "5×Jose 179 yr; gcd(2989, H) = 61",
+        "fit_stage": "with_bond_hallstatt",
+        "target_amp_s": 50
+      }
+    ],
+    "holocene_taper": {
+      "full_halfwidth_yr": 4500,
+      "total_halfwidth_yr": 6000
+    },
+    "fit_window": {
+      "year_start": -720,
+      "year_end": 2017,
+      "step_yr": 10
+    },
+    "stephenson_source": "public/input/stephenson-2016-deltaT-polynomial.json"
+  },
+  "fit_metrics": {
+    "stage_a_bond_solo": {
+      "r2": 0.9752335836110751,
+      "rms_post": 56.78535196606009
+    },
+    "stage_b_bond_hallstatt_joint": {
+      "r2": 0.9809770724390021,
+      "rms_post": 49.76722368746449,
+      "bond_phase_shift_deg": -14.860565466191545,
+      "hallstatt_free_amp_s": 271.93829574581963
+    },
+    "stage_c_bond_hallstatt_jose5": {
+      "r2": 0.9971027517286252,
+      "rms_post": 19.422162929515956,
+      "bond_phase_shift_deg": -23.941749874079825,
+      "jose5_free_amp_s": 75.94323903093856
+    }
+  },
+  "collinearity_warnings": [],
+  "shipped_coefficients": {
+    "bond": {
+      "lattice_n": 1830,
+      "period_yr": 1465.8666666666666,
+      "cos_coeff_s": 165.92681616414058,
+      "sin_coeff_s": 336.8127054187615,
+      "raw_at_j2000_s": 144.26778498564244,
+      "amplitude_s": 375.4657199450756,
+      "phase_deg": 63.77338000659273
+    },
+    "hallstatt": {
+      "lattice_n": 1104,
+      "period_yr": 2429.8333333333335,
+      "cos_coeff_s": -9.173518918513707,
+      "sin_coeff_s": 79.47230052446999,
+      "raw_at_j2000_s": -75.30252939531123,
+      "amplitude_s": 80,
+      "phase_deg": 96.58453307072189,
+      "target_amp_source": "constrained from pair-fit free amp 271.94 → 80 s"
+    },
+    "jose5": {
+      "lattice_n": 2989,
+      "period_yr": 897.469387755102,
+      "cos_coeff_s": -48.48068102537258,
+      "sin_coeff_s": -12.23207126025995,
+      "raw_at_j2000_s": -18.653330787565643,
+      "amplitude_s": 50,
+      "phase_deg": -165.83935592986222,
+      "target_amp_source": "constrained from triple-fit free amp 75.94 → 50 s"
+    }
+  }
+}

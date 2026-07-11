@@ -51,7 +51,7 @@ const debugOn                    = false;  // Debug button flag (developer only)
 let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge (~L7080)
 let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction (Phase Z-B) — rationale ~L7066
 let   EARTH_ROTATION_DT_CORRECTION_ENABLED = false;  // DIAGNOSTIC-ONLY — do NOT enable for eclipse validation. When ON, applies ΔT twice: Meeus wrappers already advance UT→TT internally for Sun/Moon positions (~L5107 `_eclSunLon` + ~L5157/5190/5199 `_meeusMoon*`) and the base Earth spin is already at UT-anchored rate (correct actual rotation). Enabling this adds ΔT to Earth's rotation on top of the already-correct scene → over-rotates Earth by ~47° at year -135. Kept as an A/B diagnostic to verify the Meeus internal TT conversion is working. Formerly "Strategy A"; rationale ~L6889
-let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 8H/1851 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
+let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 8H/1830 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
 let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research toggle) — rationale + associated constants ~L5039
 let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
 
@@ -4950,33 +4950,39 @@ function meanTropicalYearSecondsAtAge(t_Ma) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// Bond-scale ΔT correction — 8H/1851 = 73 × Jupiter-Saturn synodic
-// (Option B research toggle, OFF by default)
+// Bond-scale ΔT correction — 8H/1830 = 74 × Jupiter-Saturn synodic (gcd=61)
+// (Option B research toggle, default ON as part of 3-flag stack)
 //
 // The Stephenson 2016 ΔT residual (Stephenson − our framework) over −720 to
 // +2016 CE has a dominant Bond-scale lattice component in the 500-5000 yr
 // band. A full 8H integer-divisor scan (scripts/lod_residual_divisor_scan_jse.py)
-// ranks divisors by ΔR² and identifies n=1851 as the top single component.
+// identified a broad peak in the ~1450 yr range; the fit quality is essentially
+// identical across n=1817..1863 (all R² ≈ 0.974-0.975, within Fourier resolution
+// of ~370 yr). We select n=1830 as the H-lattice-compliant representative that
+// closest matches the paleoclimate canonical Bond period.
 //
-// STRUCTURAL INTERPRETATION at n=1851:
-//   Period 8H/1851 = 1449.236 yr
-//   = 73 × Jupiter-Saturn synodic (73 × 19.853 yr = 1449.26 yr, 0.001% error)
-//   = 168 ÷ Earth ecliptic perihelion (8H/11 = 243867 yr) (0.05% error)
-//   = 122 × Jupiter orbit (122 × 11.860 yr) (0.05% error)
+// STRUCTURAL INTERPRETATION at n=1830:
+//   Period 8H/1830 = 1465.867 yr
+//   gcd(1830, H) = 61 shares H's 61 prime factor (via 1830 = 2·3·5·61) —
+//     satisfies the H-lattice gcd rule (`gcd(n, H) > 1`), uniform with
+//     Hallstatt (gcd(1104, H) = 23) and Jose5 (gcd(2989, H) = 61); gives
+//     a unified "each cycle on H's own primes" story
+//   = 74 × Jupiter-Saturn synodic (74 × 19.853 = 1469.11 yr, 0.22% error)
+//   = 124 × Jupiter orbit (124 × 11.860 = 1470.64 yr, 0.32% error)
+//   = 50 × Saturn orbit  (50 × 29.457 = 1472.85 yr, 0.47% error)
+//   All three interpretations converge on the Bond-scale period; anchored by
+//   Charvátová's solar inertial motion mechanism at 74 × J-S synodic.
 //
-//   All three interpretations converge on the same period within Fourier
-//   resolution. The J-S synodic count of 73 is exact within the framework's
-//   quantized Jupiter/Saturn periods — a framework-native derivation of the
-//   observed Bond-scale climate cycle from Jupiter-Saturn dynamics
-//   (matches Charvátová Solar Inertial Motion theory).
-//
-// HISTORICAL NOTE: paper's original single-term fit selected n=1825 (matching
-// documented Bond cycle from paleoclimate at 1470 yr, 74×J-S synodic to 0.05%
-// error). The 8H scan shows n=1825 ranks #50 in the sub-Milankovitch band;
-// n=1851 (73×J-S synodic to 0.001%) is optimal by ΔR² AND cleaner structurally.
-// R² difference is small (0.9751 vs 0.9742) but the interpretation is
-// dramatically stronger — Bond emerges from the framework's own Jupiter-Saturn
-// arithmetic rather than being imported from paleoclimate.
+// HISTORICAL NOTES:
+//   Paper's original selection: n=1825 (matching Bond 1997 paleoclimate cycle
+//     at 1470 yr; 74×J-S synodic to 0.05%). gcd(1825, H) = 1 — not H-lattice
+//     compliant per the gcd rule (commit 6d87173).
+//   Interim selection: n=1851 (73×J-S synodic to 0.001%). gcd(1851, H) = 1 —
+//     also not gcd-compliant; tighter planetary match but inconsistent with
+//     Hallstatt and Jose5's structural criterion.
+//   Current selection: n=1830 (74×J-S synodic to 0.22%; gcd=61). Empirical
+//     R² difference from n=1851 is 0.06 pp (0.9745 vs 0.9751) — within
+//     Fourier resolution and structurally uniform with Hallstatt+Jose5.
 //
 // IMPLEMENTATION HISTORY (Option A → Option B):
 //   commit 67624c2 (2026-06-22): integrated Bond directly into meanLodSecondsAtAge
@@ -4998,15 +5004,16 @@ function meanTropicalYearSecondsAtAge(t_Ma) {
 // is to calibrate amplitude/phase against Bond 1997 IRD or equivalent
 // independent proxy. See doc 102 "Bond cycle" section.
 //
-// Source: data/deltaT-1851-residual-fit.json (n=1851 refit, current)
-//         data/deltaT-bond-cycle-residual-fit.json (n=1825 original, archived)
+// Source: data/deltaT-1830-residual-fit.json (n=1830, current)
+//         data/deltaT-1851-residual-fit.json (n=1851, archived interim)
+//         data/deltaT-bond-cycle-residual-fit.json (n=1825 paper original, archived)
 // ═════════════════════════════════════════════════════════════════════════════
 // BOND_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const BOND_LATTICE_N              = 1851;                       // integer n in 8H/n — 73 × J-S synodic
-const BOND_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / BOND_LATTICE_N;  // 1449.236 yr
+const BOND_LATTICE_N              = 1830;                       // integer n in 8H/n — 74 × J-S synodic; gcd(1830, H) = 61 shares H's 61 prime
+const BOND_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / BOND_LATTICE_N;  // 1465.867 yr
 const BOND_OMEGA                  = 2 * Math.PI / BOND_PERIOD_YR;
-const BOND_COS_COEFF_S            = 156.48439921860614;         // from data/deltaT-1851-residual-fit.json
-const BOND_SIN_COEFF_S            = 343.78858156076024;         // from data/deltaT-1851-residual-fit.json
+const BOND_COS_COEFF_S            = 165.92681616414058;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
+const BOND_SIN_COEFF_S            = 336.8127054187615;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
 const BOND_TAPER_FULL_HALFWIDTH_YR  = 4500;                     // ±yr from J2000 = full strength
 const BOND_TAPER_TOTAL_HALFWIDTH_YR = 6000;                     // ±yr from J2000 = zero beyond
 // Anchor calibration constant: Bond cyclic value at exactly year 2000.
@@ -5090,8 +5097,8 @@ function bondCycleDeltaTCorrection(year) {
 const HALLSTATT_LATTICE_N              = 1104;                     // 8H/1104 = H/138 = 2·H/(6·23)
 const HALLSTATT_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / HALLSTATT_LATTICE_N;  // 2429.833 yr
 const HALLSTATT_OMEGA                  = 2 * Math.PI / HALLSTATT_PERIOD_YR;
-const HALLSTATT_COS_COEFF_S            = -1.574249;                // free-fit (-5.03) scaled to 80-sec target
-const HALLSTATT_SIN_COEFF_S            = 79.984509;                // free-fit (255.49) scaled to 80-sec target
+const HALLSTATT_COS_COEFF_S            = -9.173518918513707;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
+const HALLSTATT_SIN_COEFF_S            = 79.47230052446999;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
 const HALLSTATT_TAPER_FULL_HALFWIDTH_YR  = 4500;                   // same as Bond
 const HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR = 6000;                   // same as Bond
 const HALLSTATT_DT_RAW_AT_J2000        = HALLSTATT_COS_COEFF_S * Math.cos(HALLSTATT_OMEGA * 2000)
@@ -5126,7 +5133,7 @@ function hallstattCycleDeltaTCorrection(year) {
 // ═════════════════════════════════════════════════════════════════════════════
 // STRUCTURAL INTERPRETATION:
 //   Period 8H/2989 = 897.47 yr, with 2989 = 7²·61. Shares H's prime factor 61
-//   (H = 23·61·239), so gcd(2989, 8H) = 61 — satisfies the H-lattice gcd rule
+//   (H = 23·61·239), so gcd(2989, H) = 61 — satisfies the H-lattice gcd rule
 //   introduced for Sun harmonics in commit 6d87173.
 //
 //   Physical interpretation candidates:
@@ -5166,11 +5173,11 @@ function hallstattCycleDeltaTCorrection(year) {
 //   L-5b Section 14 output                            (browser-side scan)
 // ═════════════════════════════════════════════════════════════════════════════
 // JOSE5_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const JOSE5_LATTICE_N              = 2989;                        // 8H/(7²·61); gcd(2989, 8H) = 61
+const JOSE5_LATTICE_N              = 2989;                        // 8H/(7²·61); gcd(2989, H) = 61
 const JOSE5_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE5_LATTICE_N;  // 897.47 yr
 const JOSE5_OMEGA                  = 2 * Math.PI / JOSE5_PERIOD_YR;
-const JOSE5_COS_COEFF_S            = -48.24;                      // triple-fit (-71.78) scaled to 50-sec target
-const JOSE5_SIN_COEFF_S            = -13.14;                      // triple-fit (-19.56) scaled to 50-sec target
+const JOSE5_COS_COEFF_S            = -48.48068102537258;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
+const JOSE5_SIN_COEFF_S            = -12.23207126025995;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
 const JOSE5_TAPER_FULL_HALFWIDTH_YR  = 4500;                      // same as Bond and Hallstatt
 const JOSE5_TAPER_TOTAL_HALFWIDTH_YR = 6000;                      // same as Bond and Hallstatt
 const JOSE5_DT_RAW_AT_J2000        = JOSE5_COS_COEFF_S * Math.cos(JOSE5_OMEGA * 2000)
@@ -28882,27 +28889,29 @@ function setupGUI() {
   // ────────────────────────────────────────────────────────────────────────
   // Toggle: Bond-scale ΔT correction (Option B research toggle)
   //
-  // OFF by default. When ON, adds the top-ranked 8H integer-divisor harmonic
-  // at n=1851 (= 73 × Jupiter-Saturn synodic = 1449.24 yr) as a post-
-  // integration ΔT correction, anchored to 0 at J2000 so the framework's
-  // LOD physics is untouched. Amplitude/phase from the eclipse-residual fit
-  // (data/deltaT-1851-residual-fit.json) — TURNING THIS ON VIOLATES THE
+  // Default ON as part of the 3-flag stack. Adds the gcd-compliant 8H
+  // integer-divisor harmonic at n=1830 (= 74 × Jupiter-Saturn synodic =
+  // 1465.87 yr, gcd(1830,H)=61 shares H's 61 prime) as a post-integration
+  // ΔT correction, anchored to 0 at J2000 so the framework's LOD physics
+  // is untouched. Amplitude/phase from the eclipse-residual fit
+  // (data/deltaT-1830-residual-fit.json) — enabling this VIOLATES THE
   // PAPER'S "zero coefficients fitted to eclipse data" claim. Kept as a
-  // research toggle to measure effect.
+  // research toggle to A/B measure the correction's effect.
   // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Toggle 8H/1851 ΔT correction (73×J-S synodic; violates zero-fit if ON)', () => {
+  addTestButton('Toggle 8H/1830 ΔT correction (74×J-S synodic; violates zero-fit if ON)', () => {
     BOND_DT_CORRECTION_ENABLED = !BOND_DT_CORRECTION_ENABLED;
     // Clear the ΔT cache so all callers see the new state
     _DELTA_T_CACHE.clear();
     console.log('\n══════════════════════════════════════════════════════════════════');
-    console.log(`  8H/1851 ΔT correction is now: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (research toggle only; not for paper claims)' : 'DISABLED (default)'}`);
+    console.log(`  8H/1830 ΔT correction is now: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (research toggle only; not for paper claims)' : 'DISABLED'}`);
     console.log('══════════════════════════════════════════════════════════════════');
     if (BOND_DT_CORRECTION_ENABLED) {
-      console.log('  • Lattice harmonic 8H/1851 = ' + BOND_PERIOD_YR.toFixed(3) + ' yr');
-      console.log('  • Structural interpretation: 73 × Jupiter-Saturn synodic (0.001% error)');
-      console.log('    Also: 168 ÷ Earth ecliptic perihelion (8H/11), 122 × Jupiter orbit');
-      console.log('    (all three interpretations converge within Fourier resolution)');
-      console.log('  • Amplitude ~378 s peak; anchored to 0 at J2000 (LOD untouched)');
+      console.log('  • Lattice harmonic 8H/1830 = ' + BOND_PERIOD_YR.toFixed(3) + ' yr');
+      console.log('  • gcd(1830, H) = 61 shares H\'s 61 prime factor (1830 = 2·3·5·61)');
+      console.log('  • Structural interpretation: 74 × Jupiter-Saturn synodic (0.22% error)');
+      console.log('    Also: 124 × Jupiter orbit (0.32%), 50 × Saturn orbit (0.47%)');
+      console.log('    Canonical Bond 1997 paleoclimate period 1470 yr is 4 yr off.');
+      console.log('  • Amplitude ~375 s peak; anchored to 0 at J2000 (LOD untouched)');
       console.log('  • Holocene taper: full strength ±4500 yr from J2000, zero beyond ±6000 yr');
       console.log('  • VIOLATES paper\'s zero-fit claim: coefficients fitted to Stephenson residual.');
       console.log('  • Kept as a research toggle only — do not commit to paper claim without');
@@ -28928,8 +28937,8 @@ function setupGUI() {
     const dt_J2000  = meanDeltaTSecondsAtAge(0);
     console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
     console.log('══════════════════════════════════════════════════════════════════');
-  }, 'Feature flag for the 8H/1851 ΔT correction (73 × J-S synodic = 1449.24 yr lattice harmonic). ' +
-     'OFF by default. When ON, adds ~±378 s correction to ΔT in the Holocene window; the ' +
+  }, 'Feature flag for the 8H/1830 ΔT correction (74 × J-S synodic = 1465.87 yr lattice harmonic; gcd=61). ' +
+     'Default ON. When ON, adds ~±375 s correction to ΔT in the Holocene window; the ' +
      'medieval bump reduces dramatically (in-sample R² = 0.975 vs Stephenson residual). Kept as a ' +
      'research toggle only — the amplitude/phase are fitted to eclipse data and therefore ' +
      'violate the paper\'s zero-fit claim. Compare L-5b results ON vs OFF to measure effect.');
@@ -28939,7 +28948,7 @@ function setupGUI() {
   //
   // OFF by default. Structurally the sixth harmonic of the framework's 23-
   // factor period H/23 (H = 23·61·239), so 8H/1104 shares H's 23 factor via
-  // gcd(1104, 8H) = 184. Coincides with the well-established Hallstatt cycle
+  // gcd(1104, H) = 23. Coincides with the well-established Hallstatt cycle
   // (~2200-2500 yr) in cosmogenic isotope records. Empirical validation on
   // 2026-07-11: Steinhilber solar Φ shows R² = 0.058 at 8H/1104; EPICA CO₂
   // shows R² = 0.037; Cheng speleothem shows R² < 0.001 (null result).
@@ -28954,7 +28963,7 @@ function setupGUI() {
     console.log('══════════════════════════════════════════════════════════════════');
     if (HALLSTATT_DT_CORRECTION_ENABLED) {
       console.log('  • Lattice harmonic 8H/1104 = ' + HALLSTATT_PERIOD_YR.toFixed(3) + ' yr = H/138');
-      console.log('  • Structural interpretation: gcd(1104, 8H) = 184 shares H\'s 23 prime factor');
+      console.log('  • Structural interpretation: gcd(1104, H) = 23 shares H\'s 23 prime factor');
       console.log('    Framework H/23 = 14,579 yr; H/138 = H/(6·23) is its sixth harmonic');
       console.log('  • Matches Hallstatt cycle (Damon & Sonett 1991; Steinhilber 2012)');
       console.log('  • Amplitude 80 s (constrained physical prior; free fit gave 256 s with Bond collinearity)');
@@ -29002,7 +29011,7 @@ function setupGUI() {
     console.log('══════════════════════════════════════════════════════════════════');
     if (JOSE5_DT_CORRECTION_ENABLED) {
       console.log('  • Lattice harmonic 8H/2989 = ' + JOSE5_PERIOD_YR.toFixed(3) + ' yr');
-      console.log('  • Structural: 2989 = 7²·61, gcd(2989, 8H) = 61 (shares H\'s 61 prime)');
+      console.log('  • Structural: 2989 = 7²·61, gcd(2989, H) = 61 (shares H\'s 61 prime)');
       console.log('  • Physical: 5 × Jose 179 yr (0.28% offset) or 45 × J-S synodic (0.45% offset)');
       console.log('  • Empirical: L-5b Section 14 found this as strongest 8H residual peak after Bond');
       console.log('  • Amplitude 50 s (constrained; L-5b empirical 70 s, triple-fit 74 s)');
@@ -36231,7 +36240,7 @@ function setupGUI() {
       console.log('  Stephenson − model residual, ranking by ΔR² gain over polynomial-only baseline.');
       console.log('  ');
       console.log('  The scanned residual REFLECTS the current toggle state:');
-      console.log('    • Toggle ON  → residual after 8H/1851 correction (this is what\'s LEFT to explain)');
+      console.log('    • Toggle ON  → residual after 8H/1830 correction (this is what\'s LEFT to explain)');
       console.log('    • Toggle OFF → raw residual (bare framework vs Stephenson)');
       console.log('  ');
 
@@ -36403,6 +36412,7 @@ function setupGUI() {
       const padR = (s, n) => (String(s ?? '') + ' '.repeat(n)).slice(0, n);
       const padL = (s, n) => (' '.repeat(n) + String(s ?? '')).slice(-n);
       const top10 = scanResults.slice(0, 10);
+      const rank1830 = scanResults.findIndex(r => r.n === 1830) + 1;
       const rank1851 = scanResults.findIndex(r => r.n === 1851) + 1;
       const rank1825 = scanResults.findIndex(r => r.n === 1825) + 1;
       const tableLines = [
@@ -36424,8 +36434,9 @@ function setupGUI() {
         );
       }
       tableLines.push('');
-      tableLines.push(`  n=1851 (73×J-S synodic, currently in toggle):  rank #${rank1851}, ΔR² = ${scanResults[rank1851-1].dR2.toFixed(4)}, amp = ${scanResults[rank1851-1].amp.toFixed(1)} s`);
-      tableLines.push(`  n=1825 (paper's original Bond):                 rank #${rank1825}, ΔR² = ${scanResults[rank1825-1].dR2.toFixed(4)}, amp = ${scanResults[rank1825-1].amp.toFixed(1)} s`);
+      tableLines.push(`  n=1830 (74×J-S synodic, currently in toggle):  rank #${rank1830}, ΔR² = ${scanResults[rank1830-1].dR2.toFixed(4)}, amp = ${scanResults[rank1830-1].amp.toFixed(1)} s`);
+      tableLines.push(`  n=1851 (73×J-S synodic, archived interim):     rank #${rank1851}, ΔR² = ${scanResults[rank1851-1].dR2.toFixed(4)}, amp = ${scanResults[rank1851-1].amp.toFixed(1)} s`);
+      tableLines.push(`  n=1825 (paper's original Bond):                rank #${rank1825}, ΔR² = ${scanResults[rank1825-1].dR2.toFixed(4)}, amp = ${scanResults[rank1825-1].amp.toFixed(1)} s`);
 
       // Add verdict lines to the batched output
       const top = scanResults[0];
@@ -36453,7 +36464,7 @@ function setupGUI() {
       tableLines.push('══════════════════════════════════════════════════════════════════════════════════');
       console.log(tableLines.join('\n'));
 
-      window._L5b_lattice_scan = { results: scanResults, r2_baseline: r2_base, rank1851, rank1825 };
+      window._L5b_lattice_scan = { results: scanResults, r2_baseline: r2_base, rank1830, rank1851, rank1825 };
       console.log('\nFull scan exposed at window._L5b_lattice_scan');
     } catch (e) {
       console.error(`\n■■■ SECTION 14 FAILED ■■■`);
@@ -36479,7 +36490,7 @@ function setupGUI() {
 
       console.log('  Analyzes the DRIFT that remains after lattice correction (Bond toggle whatever state).');
       console.log('  Answers: how much of the residual drift is J2000-anchor-attributable vs structural?');
-      console.log(`  Bond correction is currently: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (n=1851)' : 'DISABLED'}`);
+      console.log(`  Bond correction is currently: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (n=1830)' : 'DISABLED'}`);
       console.log('  ');
 
       // ── Fit linear + quadratic to current residual ──
@@ -36693,7 +36704,7 @@ function setupGUI() {
 
       console.log('  Companion to §15. §15 tested UNIFORM anchor shift (linear residual effect).');
       console.log('  §16 tests SECULAR RATE mismatch (quadratic residual effect).');
-      console.log(`  Bond correction is currently: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (n=1851)' : 'DISABLED'}`);
+      console.log(`  Bond correction is currently: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (n=1830)' : 'DISABLED'}`);
       console.log('  ');
       console.log('  Physics: a rate mismatch δ_rate (ms/century difference between model\'s Cox-Chao');
       console.log('  and reality\'s actual secular LOD rate) makes model LOD(Y) = reality LOD(Y) − δ_rate·(2000−Y).');
@@ -36934,13 +36945,13 @@ function setupGUI() {
 
       console.log('  Companion to §15/§16. Investigates whether the LINEAR "anchor-like" component');
       console.log('  in §16 is a GENUINE non-tidal signal or a POLYNOMIAL-ORDER artifact of the fit.');
-      console.log(`  Bond correction is currently: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (n=1851)' : 'DISABLED'}`);
+      console.log(`  Bond correction is currently: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (n=1830)' : 'DISABLED'}`);
       console.log('  ');
       console.log('  Part A: fits polynomial orders 1 through 5. If cubic/quartic terms are');
       console.log('  significant, §16\'s -1.5 s/yr linear coefficient may be a polynomial artifact.');
-      console.log('  Part B: fits dual harmonic (n=1851 + n=1920) alongside polynomial. Tests whether');
-      console.log('  the two lattice candidates (73×J-S synodic AND 15÷Earth ICRF perihelion) are');
-      console.log('  independent lattice features or Fourier-degenerate.');
+      console.log('  Part B: fits dual harmonic (n=1830 + n=1851) alongside polynomial. Tests whether');
+      console.log('  the current gcd-compliant divisor (74×J-S synodic) and the archived interim');
+      console.log('  n=1851 (73×J-S synodic) are independent lattice features or Fourier-degenerate.');
       console.log('  ');
 
       // General OLS solver for arbitrary-size symmetric normal equations
@@ -37067,9 +37078,9 @@ function setupGUI() {
       // ── Part B: Dual harmonic test ──
       const H_YR = 335317;
       const EIGHT_H = 8 * H_YR;
-      const n_A = 1851, n_B = 1920;
-      const P_A = EIGHT_H / n_A;   // 1449.24 yr
-      const P_B = EIGHT_H / n_B;   // 1397.15 yr
+      const n_A = 1830, n_B = 1851;
+      const P_A = EIGHT_H / n_A;   // 1465.87 yr (current n=1830, gcd=61)
+      const P_B = EIGHT_H / n_B;   // 1449.24 yr (archived n=1851, gcd=1)
       const omega_A = 2 * Math.PI / P_A;
       const omega_B = 2 * Math.PI / P_B;
 
@@ -37109,21 +37120,21 @@ function setupGUI() {
 
       const partBLines = [
         '',
-        '  ── Part B: Dual-harmonic test (n=1851 vs n=1920 vs both) ──',
+        '  ── Part B: Dual-harmonic test (n=1830 vs n=1851 vs both) ──',
         '',
-        '    Testing whether the two candidate lattice divisors (73×J-S synodic and',
-        '    15÷Earth ICRF perihelion) are independent or Fourier-degenerate.',
+        '    Testing whether the current gcd-compliant n=1830 (74×J-S synodic, gcd=61) and',
+        '    the archived interim n=1851 (73×J-S synodic, gcd=1) are Fourier-degenerate.',
         '',
-        `    Period n=1851 (73×J-S synodic):        ${P_A.toFixed(2)} yr`,
-        `    Period n=1920 (15÷Earth ICRF perihelion): ${P_B.toFixed(2)} yr`,
+        `    Period n=1830 (74×J-S synodic, gcd=61):  ${P_A.toFixed(2)} yr`,
+        `    Period n=1851 (73×J-S synodic, gcd=1):   ${P_B.toFixed(2)} yr`,
         `    Period difference: ${(P_A - P_B).toFixed(2)} yr (${((P_A-P_B)/P_A*100).toFixed(2)}%)`,
         `    Fourier resolution at ${(ys[nPts-1] - ys[0]).toFixed(0)}-yr window: ~${((P_A + P_B)/2 * ((P_A+P_B)/2) / (2*(ys[nPts-1] - ys[0]))).toFixed(0)} yr`,
         '',
-        `    Single n=1851 alone: R² = ${r2_A.toFixed(4)}, amp = ${amp_A.toFixed(1)} s, phase = ${phase_A.toFixed(1)}°`,
-        `    Single n=1920 alone: R² = ${r2_B.toFixed(4)}, amp = ${amp_B.toFixed(1)} s, phase = ${phase_B.toFixed(1)}°`,
-        `    Dual n=1851 + n=1920: R² = ${r2_dual.toFixed(4)}`,
-        `      → amp at n=1851 in dual fit: ${amp_A_dual.toFixed(1)} s (was ${amp_A.toFixed(1)} s single)`,
-        `      → amp at n=1920 in dual fit: ${amp_B_dual.toFixed(1)} s (was ${amp_B.toFixed(1)} s single)`,
+        `    Single n=1830 alone: R² = ${r2_A.toFixed(4)}, amp = ${amp_A.toFixed(1)} s, phase = ${phase_A.toFixed(1)}°`,
+        `    Single n=1851 alone: R² = ${r2_B.toFixed(4)}, amp = ${amp_B.toFixed(1)} s, phase = ${phase_B.toFixed(1)}°`,
+        `    Dual n=1830 + n=1851: R² = ${r2_dual.toFixed(4)}`,
+        `      → amp at n=1830 in dual fit: ${amp_A_dual.toFixed(1)} s (was ${amp_A.toFixed(1)} s single)`,
+        `      → amp at n=1851 in dual fit: ${amp_B_dual.toFixed(1)} s (was ${amp_B.toFixed(1)} s single)`,
         '',
       ];
 

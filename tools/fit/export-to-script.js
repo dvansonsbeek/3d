@@ -419,6 +419,29 @@ if (fs.existsSync(climatePath)) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// F. ΔT CORRECTION COEFFICIENTS (Bond + Hallstatt + Jose5)
+// Source of truth: data/deltaT-3flag-fit.json  (fitted by tools/fit/dt-corrections-fit.js)
+// Delegates to tools/fit/export-dt-corrections.js so the transform lives in one place.
+// ═══════════════════════════════════════════════════════════════════════════
+
+console.log('\n=== F. ΔT Correction Coefficients ===');
+{
+  const dt = require('./export-dt-corrections');
+  const fit = dt.loadFitJson();
+  if (!fit) {
+    console.log('  (data/deltaT-3flag-fit.json not found, skipping — run dt-corrections-fit.js --write to generate)');
+  } else {
+    const result = dt.applyToSource(src, fit);
+    if (result.changes === 0) {
+      console.log('  ✓ 3-flag ΔT constants already in sync');
+    } else {
+      src = result.source;
+      changes += result.changes;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Summary
 // ═══════════════════════════════════════════════════════════════════════════
 
