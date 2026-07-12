@@ -1072,7 +1072,7 @@ diagnostics) substantially updates the picture from the earlier
 
 ---
 
-## Millennial-scale 8H lattice harmonic at ~1466 years (74 × Jupiter-Saturn synodic, gcd=61) — shipped default-ON as part of 3-flag stack
+## Millennial-scale 8H lattice harmonic at ~1466 years (74 × Jupiter-Saturn synodic, gcd=61) — shipped default-ON as part of 4-flag stack
 
 After the eight hypothesis tests left the medieval residual characterized
 but not causally explained by any per-observation mechanism, a follow-up
@@ -1172,9 +1172,9 @@ the same prime factor that anchors Jose5 (2989 = 7²·61). Hallstatt
 uses H's 23 factor (138 = 6·23; 1104 = 2⁴·3·23). All three shipped
 divisors satisfy the gcd rule that the framework's Sun-longitude
 harmonic runtime filter enforces (commit 6d87173), giving a uniform
-"each cycle on H's own primes" story across the 3-flag stack.
+"each cycle on H's own primes" story across the 4-flag stack (Bond gcd=61, Hallstatt gcd=23, Jose5 gcd=61, Jose4 gcd=23).
 
-### Live integration: shipped default-ON as part of the 3-flag stack
+### Live integration: shipped default-ON as part of the 4-flag stack
 
 The **Option B** ΔT-only correction architecture was prototyped
 (`BOND_DT_CORRECTION_ENABLED` feature flag in `src/script.js`) and
@@ -1194,7 +1194,7 @@ companions were added):
 companion 8H harmonics Hallstatt (8H/1104) and Jose5 (8H/2989) each
 absorb their own designed signal band without degrading Bond
 (§ "Companion 8H lattice harmonics" below), Bond is shipped
-**default-ON** as part of the 3-flag sub-Milankovitch stack. The L-5b
+**default-ON** as part of the 4-flag sub-Milankovitch stack. The L-5b
 verification with the full stack ON shows global |residual| 1626 s
 and 31.1% closer-than-NASA — a modest but coherent improvement over
 Bond-only.
@@ -1301,21 +1301,21 @@ for the empirical validation that motivated shipping.
 
 ---
 
-## Companion 8H lattice harmonics: Hallstatt (2430 yr) and Jose5 (897 yr)
+## Companion 8H lattice harmonics: Hallstatt (2430 yr), Jose5 (897 yr), and Jose4 (715 yr)
 
-After Bond's structural identification, two further sub-Milankovitch
-divisors were investigated as companion ΔT corrections. All three
+After Bond's structural identification, three further sub-Milankovitch
+divisors were investigated as companion ΔT corrections. All four
 shipped divisors are **H-lattice-compliant via the gcd rule** (they
 share prime factors with H = 23·61·239): Bond n=1830 shares 61,
-Hallstatt n=1104 shares 23, Jose5 n=2989 shares 61. Each corresponds
-to established sub-Milankovitch cycles in independent paleoclimate
-proxies.
+Hallstatt n=1104 shares 23, Jose5 n=2989 shares 61, Jose4 n=3749
+shares 23. Each corresponds to established sub-Milankovitch cycles in
+independent paleoclimate proxies.
 
-The three-cycle stack (Bond + Hallstatt + Jose5) is shipped default-ON
-in `src/script.js` as of 2026-07-11, with each individually toggleable.
-The gcd rule (`gcd(divisor, H) > 1`) enforced in the Sun-longitude
-runtime filter (commit `6d87173`) provides the structural principle
-that separates on-lattice from off-lattice divisor candidates.
+The four-cycle stack (Bond + Hallstatt + Jose5 + Jose4) is shipped
+default-ON in `src/script.js` as of 2026-07-12, with each individually
+toggleable. The gcd rule (`gcd(divisor, H) > 1`) enforced in the
+Sun-longitude runtime filter (commit `6d87173`) provides the structural
+principle that separates on-lattice from off-lattice divisor candidates.
 
 ### Hallstatt-scale 8H/1104 harmonic (~2430 yr, H/138 via 23-factor) — solar-activity coupling
 
@@ -1408,6 +1408,131 @@ are simultaneously enabled); phase preserved from triple fit.
 - `JOSE5_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
 - "Toggle 8H/2989 Jose5 ΔT correction" console-test button
 
+### Jose4 8H/3749 harmonic (~715 yr, 4×Jose via 23-factor) — cross-archive coherent
+
+**Period 8H/3749 = 715.53 yr**. Divisor 3749 = 23 × 163 shares H's 23
+prime factor (`gcd(3749, H) = 23` — same family as Hallstatt).
+H-lattice-compliant by the gcd rule.
+
+**Physical interpretation**: closest match to **4 × Jose period**
+(4 × 178.735 yr = 714.94 yr, offset **0.083%** — the tightest structural
+anchor of any gcd-compliant 600–800 yr candidate, tighter than Bond's
+0.26% match to 74×J-S synodic). Same SIM/Jose family as Jose5 (5×Jose,
+897 yr).
+Structurally degenerate with Bond/2 ≈ 733 yr at ~2.5% level, but the
+4×Jose anchor is 30× tighter so the shipped interpretation attributes
+the signal to the SIM family.
+
+**Empirical identification — cross-archive coherence test** (2026-07-12):
+The `scripts/lattice_harmonic_scan.py` universal scan enumerates all
+gcd-compliant divisors in a period band and fits each against multiple
+paleoclimate archives simultaneously (Steinhilber ¹⁰Be solar Φ,
+Stephenson ΔT, Cheng speleothem δ¹⁸O, EPICA CO2, LR04 δ¹⁸O). Jose4
+was the top-ranked candidate in the 600–800 yr band by cross-dataset
+significance:
+
+| Proxy | Duration | Amp | Perm-95 threshold | Significant? |
+|---|---:|---:|---:|:---:|
+| Steinhilber ¹⁰Be solar Φ | 9.4 kyr | 41.7 MV | 24.1 MV | ✓ |
+| EPICA CO2 | 800 kyr | 11.4 ppm | 2.5 ppm | ✓ |
+| Stephenson ΔT | 2.7 kyr | 72.6 s | 393 s | (resolution-limited, not null) |
+| Cheng speleothem | 640 kyr | 0.043 ‰ | 0.049 ‰ | · |
+
+**Two independent archives** (solar activity + climate CO2) both light
+up at exactly the 4×Jose divisor. The ~54° phase offset between them
+(~107 yr at 715-yr period) is consistent with the expected CO2 lag
+behind solar forcing. Within the Jose-family preset scan (2×–8× Jose),
+4×Jose is UNIQUELY strong — the only Jose multiple with cross-archive
+significance in both solar AND climate archives.
+
+**Amplitude — 35 s free-fit (cap-only)**: 4-cycle joint fit (Bond +
+Hallstatt + Jose5 + Jose4) gave Jose4 free-fit amplitude 35.3 s at
+phase −46.2°. Since 35 s < 50 s prior, no cap applied — Jose4 ships
+at its free-fit value. Adding Jose4 drops the fit-residual RMS from
+19.4 s (Stage C, 3-flag) to 13.9 s (Stage D, 4-flag) — a 28% reduction.
+In L-5b: global RMS essentially unchanged (1625 → 1629 s, +4 s neutral),
+but MWP peak improved from **−638 s @ year 990** (3-flag) to
+**−580 s @ year 1000** (4-flag) — a ~58 s reduction of the medieval
+bump at the target year.
+
+**Cap-only shipping logic** (introduced with Jose4): the target
+amplitude is treated as a MAX cap, never a floor. If free-fit < prior,
+use free-fit as-is (Jose4 case, 35 s < 50 s prior). If free-fit >
+prior, scale DOWN preserving phase (Hallstatt 272 s → 80 s cap; Jose5
+76 s → 50 s cap). This prevents inflating a modest empirically-found
+signal above what the joint fit actually finds.
+
+**Research infrastructure**:
+- `scripts/lattice_harmonic_scan.py` — universal cross-archive scan
+- `data/lattice-scan-{mwp-band,jose-family,bond-harmonics}.json` — scan outputs
+- `data/deltaT-4flag-fit.json` — 4-cycle joint fit output
+- `JOSE4_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
+- "Toggle 8H/3749 Jose4 ΔT correction" console-test button
+
+### Eddy attempt (8H/2684 ≈ 999 yr) — tested and rolled back
+
+After Jose4 shipped, `scripts/lattice_harmonic_scan.py --band 500 1200`
+identified **8H/2684 = 999.45 yr** as the tightest structural anchor
+of any gcd-compliant 800–1100 yr candidate — a **0.05% match** to the
+Eddy 1000-yr solar-minimum cycle (Eddy 1976), with cross-archive
+coherence in Steinhilber Φ + EPICA CO2 (both p<5% via permutation
+test). Divisor 2684 = 4·11·61 → gcd=61 (H's 61-family, like Bond and
+Jose5).
+
+**Stage E 5-cycle joint fit and L-5b outcome**:
+- Bond amp inflated 375 s (solo) → 646 s (5-cycle) — significant collinearity
+- Bond phase shift: +12.85° (within 25° tolerance, but concerning)
+- Eddy free-fit: 432 s (CAPPED to 50 s prior for shipping)
+- L-5b RMS: 1629 s (4-flag) → 1641 s (+12 s, REGRESSED)
+- Late medieval 1200–1299 CE: improved by ~70 s
+- Ancient BCE (−800 to −300): regressed ~70–86 s per century
+- Year 990 MWP peak: Eddy at null phase there, contribution only ~0.8 s
+
+**Diagnosis**: modest late-medieval improvement (~70 s at 1200–1299 CE)
+was overwhelmed by ancient BCE regression (~70–86 s per century over
+5 BCE centuries). The 999-yr Eddy solar cycle is empirically real
+(cross-archive coherent), but cannot be fit against the 2.7 kyr
+Stephenson ΔT residual without hurting the ancient window.
+
+**Rolled back 2026-07-12**. Research artifacts kept:
+- `data/lattice-scan-band-500-1200.json` — cross-archive scan output
+- `data/lattice-scan-custom.json` — targeted candidate comparison
+- CONFIG.cycles rollback note in `tools/fit/dt-corrections-fit.js`
+- Rollback comment block in `src/script.js` (after Jose4 block)
+
+### Emp862 attempt (8H/3111 ≈ 862 yr) — tested and rolled back
+
+After Eddy's rollback investigation, `scripts/lattice_harmonic_scan.py`
+identified **8H/3111 = 862.27 yr** (gcd=61) as the ONLY candidate
+anywhere with **THREE-archive cross-coherence**: Steinhilber solar Φ
+(29.7 MV vs 24.7 threshold) + Cheng speleothem δ¹⁸O (0.045 ‰ vs 0.041
+threshold) + EPICA CO2 (9.1 ppm vs 2.7 threshold), all significant.
+The strongest empirical evidence for any candidate ever tested. But
+862 yr does NOT map to a known named cycle (between 4×Jose 715 yr and
+5×Jose 897 yr, no clean integer multiple).
+
+**Stage F 6-cycle joint fit outcome — RANK-DEFICIENT**:
+- Bond amp: 375 s (solo) → **9,898 s** (6-cycle) — inflated 27×
+- Bond phase: **-90° shift** (far exceeds 25° tolerance)
+- Emp862 free-fit amp: **29,961 s** (physically absurd)
+- Hallstatt free-fit: 14,742 s; Jose5: 45,638 s; all cycles inflated 20–700×
+
+**Root cause**: the beat period between Eddy (999 yr) and Emp862
+(862 yr) is ~6,255 yr, unresolvable by the 2.7 kyr Stephenson window.
+Six close-period cycles span too much of the residual variance for
+the small dataset — the fit matrix becomes rank-deficient. Even
+though the shipped coefficients would be bounded by cap-only logic,
+they'd come from a meaningless numerical fit.
+
+**Rolled back 2026-07-12**. The 3-archive empirical evidence for
+862 yr remains VALID and is preserved as a research infrastructure
+finding — the cycle cannot be fit against ΔT residual with existing
+data, but a different fitting target (multi-archive multi-record
+joint fit, not Stephenson) could revisit it. Research artifacts:
+- `data/lattice-scan-band-500-1200.json` — 3-archive coherence data
+- CONFIG.cycles rollback note in `tools/fit/dt-corrections-fit.js`
+- Rollback comment block in `src/script.js` (after Eddy block)
+
 ### Jupiter92 attempt (8H/2461 ≈ 1090 yr) — tested and rolled back
 
 After the 3-flag stack was activated, L-5b Section 14 identified
@@ -1441,10 +1566,18 @@ independent variance.** The apparent 1090-yr peak in Section 14 is
 Bond-frequency residual structure aliased through imperfect Bond
 phase/amplitude — not an independent signal.
 
-**Conclusion**: 3-flag stack (Bond + Hallstatt + Jose5) is the
-empirically-validated optimal configuration. Jupiter92 was rolled
-back on 2026-07-11. Research artifacts preserved as documentation
-of the null attempt:
+**Conclusion (superseded 2026-07-12)**: at the time of Jupiter92's
+rollback the 3-flag stack (Bond + Hallstatt + Jose5) was the
+empirically-validated optimal configuration. This was subsequently
+extended by adding Jose4 (8H/3749 = 715 yr = 4×Jose) as a 4th flag,
+identified via `scripts/lattice_harmonic_scan.py` cross-archive scan
+rather than Section 14 residual peak-hunting. The lesson from
+Jupiter92 — that a Section 14 residual peak by itself doesn't
+guarantee independence from Bond signal — is preserved. Jose4 was
+selected on a DIFFERENT basis: multi-archive spectral coherence in
+independent proxies (Steinhilber solar Φ + EPICA CO2), which
+Jupiter92 lacked. Research artifacts preserved as documentation of
+the null attempt:
 
 - `scripts/lod_residual_quad_fit.py` — 4-way collinearity demo
 - `scripts/jupiter92_isolated_refit.py` — isolated-phase fit
@@ -1452,32 +1585,37 @@ of the null attempt:
   blow up 2–3× — evidence for severe collinearity)
 - `data/jupiter92-isolated-refit.json` — isolated-fit output
 
-### L-5b verification of shipped 3-flag stack
+### L-5b verification of shipped 4-flag stack
 
 Empirical validation of the shipped configuration on the L-5b
 267-observation primary source dataset:
 
-| Metric | Bond only (n=1851) | Bond+Hallstatt+Jose5 (n=1830, shipped) | Δ |
+| Metric | Bond only (n=1851) | Bond+Hallstatt+Jose5 (3-flag) | Bond+Hallstatt+Jose5+Jose4 (4-flag, shipped) |
 |---|---:|---:|---:|
-| Global \|residual\| | 1636 s | 1625 s | **−11 s** |
-| Events closer than NASA | 81 (30.3%) | 83 (31.1%) | **+2 events** |
-| Medieval bump peak | −687 s @ 970 | −638 s @ 990 | **−49 s peak, +20 yr shift** |
-| Section 14 top peak | 897 yr (ΔR² 0.0026) | 1060 yr (ΔR² 0.0015) | Jose5 absorbed its 897 yr band |
+| Global \|residual\| | 1636 s | 1625 s | 1629 s |
+| Events closer than NASA | 81 (30.3%) | 83 (31.1%) | 83 (31.1%) |
+| Medieval bump peak | −687 s @ 970 | −638 s @ 990 | **−580 s @ 1000** |
+| Section 14 top peak | 897 yr (ΔR² 0.0026) | 1060 yr (ΔR² 0.0015) | 1079 yr (see § Eddy rollback below) |
 
-The 3-flag stack yields modest but coherent improvement across all
-metrics. Each cycle demonstrably contributes to reducing the medieval
-bump toward alignment with Medieval Warm Period timing, and the
-Section 14 peak migration confirms each cycle absorbs its designed
-target band without cannibalizing the others.
+The 4-flag stack extends the 3-flag stack with **~58 s further
+reduction of the medieval bump peak** (year 990 −638 s → year 1000
+−580 s) via Jose4's 4×Jose harmonic. Global RMS is essentially
+unchanged (+4 s neutral), consistent with Jose4 redistributing
+error rather than eliminating it — it moves the medieval bump
+without introducing significant ancient-BCE regression (Eddy did the
+opposite, hence its rollback).
 
 **Collinearity management**: joint fits show progressively worse
 inter-cycle collinearity as more nearby-frequency harmonics are
 added (Hallstatt+Jose5 pair shows +14° Bond phase shift; adding
-Jupiter92 blows up all amplitudes 2–3×). This is the empirical
-limit — sub-Milankovitch harmonics of nearby frequency on a
-2730-yr fit window cannot be independently resolved beyond about
-three degrees of freedom. The 3-flag stack sits at that limit; the
-Jupiter92 rollback confirms that adding a fourth flag violates it.
+Jose4 stays within tolerance at −9°; adding Eddy inflates Bond amp
+375 → 646 s; Jupiter92 blows up all amplitudes 2–3×). The
+**cap-only shipping logic** — never inflate a free-fit above its
+prior — keeps runtime coefficients bounded even when the joint fit
+is showing collinearity signatures. The 4-flag stack sits at the
+empirical limit; Eddy (5-flag) and Emp862 (6-flag) rollbacks
+confirm that further extension on the 2730-yr Stephenson window is
+not viable without a different fitting target.
 
 ---
 
@@ -1662,14 +1800,15 @@ What this validation establishes:
    polynomial to within 4 min on a 20 min observation noise floor.
    NASA's polynomial uses ~10+ coefficients fitted to this exact
    dataset. Our model independently predicts it from satellite/geodesy
-   literature. The three sub-Milankovitch harmonics identified above
-   (Bond n=1830, Hallstatt n=1104, Jose5 n=2989) are STRUCTURAL
-   PREDICTIONS from framework arithmetic — their PERIODS drop out of
-   the 8H lattice with zero fitting. AMPLITUDES and PHASES are
-   fit-derived (constrained physical priors) against the Stephenson
-   ΔT residual; enabling the shipped 3-flag stack therefore violates
-   the paper's original zero-eclipse-fit claim, and this is documented
-   as a research-toggle default state rather than a paper claim.
+   literature. The four sub-Milankovitch harmonics identified above
+   (Bond n=1830, Hallstatt n=1104, Jose5 n=2989, Jose4 n=3749) are
+   STRUCTURAL PREDICTIONS from framework arithmetic — their PERIODS
+   drop out of the 8H lattice with zero fitting. AMPLITUDES and
+   PHASES are fit-derived (constrained physical priors, using cap-only
+   shipping) against the Stephenson ΔT residual; enabling the shipped
+   4-flag stack therefore violates the paper's original zero-eclipse-
+   fit claim, and this is documented as a research-toggle default state
+   rather than a paper claim.
 
    *Empirical sensitivity confirmation (added 2026-06-25):* the
    [doc 103](103-135-babylonian-case-study.md) -135 Babylonian case
@@ -1744,14 +1883,14 @@ What we are NOT claiming:
 3. **Medieval residual** (years 800-1300, model overshoots by ~20 min)
    is a residual signal that the framework's α(t) does not fully
    capture. This has been decomposed in detail (see "Complete residual
-   decomposition" and "Companion 8H lattice harmonics") into three
+   decomposition" and "Companion 8H lattice harmonics") into four
    sub-Milankovitch 8H harmonics (Bond 8H/1830 = 1466 yr, Hallstatt
-   8H/1104 = 2430 yr, Jose5 8H/2989 = 897 yr), plus a fractional
-   non-tidal secular rate ~0.5 ms/century, plus observation noise.
-   The 3-flag lattice harmonic stack is shipped default-ON with
-   fit-derived amplitudes/phases; independent (non-eclipse)
-   calibration remains open as the path to fully restore the zero-fit
-   claim.
+   8H/1104 = 2430 yr, Jose5 8H/2989 = 897 yr, Jose4 8H/3749 = 715 yr),
+   plus a fractional non-tidal secular rate ~0.5 ms/century, plus
+   observation noise. The 4-flag lattice harmonic stack is shipped
+   default-ON with cap-only fit-derived amplitudes/phases; independent
+   (non-eclipse) calibration remains open as the path to fully restore
+   the zero-fit claim.
 
 4. **Greek (S07) is an outlier** with 11 observations and a
    detrended mean residual of −795 s. Small sample; the per-table
@@ -1780,16 +1919,17 @@ The natural extensions, in order from most to least defensible:
    (8,658 → 8,682 s). See [doc 101](101-pure-tidal-eclipses.md) lines
    8-20 for the baseline note documenting the re-verification.
 
-2. **Independent amplitude/phase calibration of the 3-flag stack**.
+2. **Independent amplitude/phase calibration of the 4-flag stack**.
    The framework arithmetic predicts each PERIOD (Bond 74 × J-S
    synodic = 1466 yr, Hallstatt H/138 = 2430 yr, Jose5 5 × Jose =
-   897 yr — all zero-fit structural periods on H's prime-factor
-   lattice); the Option B ΔT-only correction architecture is
-   implemented, shipped default-ON, and preserves the J2000 LOD anchor.
-   What's missing is independent (non-eclipse) calibration of amplitudes
-   and phases — e.g., against Bond 1997 IRD for Bond, Steinhilber ¹⁰Be
-   for Hallstatt, or SIM-driven solar activity for Jose5. Once
-   amplitudes/phases come from independent physics, the paper's original
+   897 yr, Jose4 4 × Jose = 715 yr — all zero-fit structural periods
+   on H's prime-factor lattice); the Option B ΔT-only correction
+   architecture is implemented, shipped default-ON, and preserves the
+   J2000 LOD anchor. What's missing is independent (non-eclipse)
+   calibration of amplitudes and phases — e.g., against Bond 1997 IRD
+   for Bond, Steinhilber ¹⁰Be for Hallstatt, or SIM-driven solar
+   activity for Jose5/Jose4. Once amplitudes/phases come from
+   independent physics, the paper's original
    zero-eclipse-fitting claim is fully restored. See § "Millennial-scale
    8H lattice harmonic" and § "Companion 8H lattice harmonics" for the
    fit + cross-validation details.

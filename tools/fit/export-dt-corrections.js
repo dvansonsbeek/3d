@@ -32,7 +32,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const FIT_JSON_PATH = path.join(__dirname, '..', '..', 'data', 'deltaT-3flag-fit.json');
+// Prefer the 4-flag artifact if present; fall back to the 3-flag artifact
+// for consumers that haven't re-run the fit tool yet. Both share the same
+// shape for the shared cycles (bond / hallstatt / jose5); the 4-flag file
+// adds a jose4 section.
+const FIT_JSON_PATHS = [
+  path.join(__dirname, '..', '..', 'data', 'deltaT-4flag-fit.json'),
+  path.join(__dirname, '..', '..', 'data', 'deltaT-3flag-fit.json'),
+];
+const FIT_JSON_PATH = FIT_JSON_PATHS[0];  // preferred write target
 
 const TARGETS = {
   script: {
@@ -49,10 +57,12 @@ const TARGETS = {
   },
 };
 
-// ─── Load fit JSON (returns null if not present) ───
+// ─── Load fit JSON (returns null if none present; prefers 4-flag) ───
 function loadFitJson() {
-  if (!fs.existsSync(FIT_JSON_PATH)) return null;
-  return JSON.parse(fs.readFileSync(FIT_JSON_PATH, 'utf8'));
+  for (const p of FIT_JSON_PATHS) {
+    if (fs.existsSync(p)) return JSON.parse(fs.readFileSync(p, 'utf8'));
+  }
+  return null;
 }
 
 // ─── In-memory transformation: takes source string, returns {source, changes} ───
@@ -69,6 +79,14 @@ function applyToSource(src, fit) {
     ['JOSE5_COS_COEFF_S',     c.jose5.cos_coeff_s],
     ['JOSE5_SIN_COEFF_S',     c.jose5.sin_coeff_s],
   ];
+  // Jose4 appears from the 4-flag artifact onward; skip silently if absent from JSON.
+  if (c.jose4) {
+    replacements.push(
+      ['JOSE4_LATTICE_N',    c.jose4.lattice_n],
+      ['JOSE4_COS_COEFF_S',  c.jose4.cos_coeff_s],
+      ['JOSE4_SIN_COEFF_S',  c.jose4.sin_coeff_s],
+    );
+  }
   let changes = 0;
   for (const [name, val] of replacements) {
     const re = new RegExp(
@@ -130,7 +148,7 @@ function syncAllTargets(fit, { dryRun = false } = {}) {
 // ─── CLI ───
 function main() {
   console.log('═══════════════════════════════════════════════════════════════════════');
-  console.log('  SYNC 3-FLAG ΔT COEFFICIENTS TO CODE FILES');
+  console.log('  SYNC ΔT COEFFICIENTS TO CODE FILES');
   console.log('═══════════════════════════════════════════════════════════════════════\n');
   const WRITE = process.argv.includes('--write');
   const fit = loadFitJson();
@@ -138,11 +156,14 @@ function main() {
     console.log(`✗ ${FIT_JSON_PATH} not found. Run dt-corrections-fit.js --write first.`);
     process.exit(1);
   }
-  console.log('  Source: data/deltaT-3flag-fit.json');
+  const activePath = FIT_JSON_PATHS.find(p => fs.existsSync(p));
+  console.log(`  Source: ${path.relative(path.join(__dirname, '..', '..'), activePath)}`);
   const c = fit.shipped_coefficients;
   console.log(`  Bond      n=${c.bond.lattice_n}`);
   console.log(`  Hallstatt n=${c.hallstatt.lattice_n}`);
-  console.log(`  Jose5     n=${c.jose5.lattice_n}\n`);
+  console.log(`  Jose5     n=${c.jose5.lattice_n}`);
+  if (c.jose4) console.log(`  Jose4    n=${c.jose4.lattice_n}`);
+  console.log('');
   console.log(WRITE ? '  Applying updates:' : '  Dry run (add --write to modify files, each backed up as .bak):');
   const total = syncAllTargets(fit, { dryRun: !WRITE });
   console.log(`\n  ${WRITE ? '✓' : '·'} ${total} total constants ${WRITE ? 'updated' : 'would be updated'}.`);

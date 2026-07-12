@@ -210,8 +210,22 @@ const JOSE5_OMEGA = 2 * Math.PI / JOSE5_PERIOD_YR;
 const JOSE5_COS_COEFF_S = -48.48068102537258;
 const JOSE5_SIN_COEFF_S = -12.23207126025995;
 
-const HOLOCENE_TAPER_FULL_HALFWIDTH_YR = 4500;
-const HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR = 6000;
+const JOSE4_LATTICE_N = 3749;
+const JOSE4_PERIOD_YR = EIGHT_H / JOSE4_LATTICE_N;
+const JOSE4_OMEGA = 2 * Math.PI / JOSE4_PERIOD_YR;
+const JOSE4_COS_COEFF_S = 24.407831414482406;
+const JOSE4_SIN_COEFF_S = -25.48517683106091;
+
+// Cyclic-correction taper widened 2026-07-12 from ±4.5/6 kyr Holocene window to
+// ±300/400 kyr — cross-archive validation across Steinhilber ¹⁰Be (9.4 kyr),
+// EPICA CO2 (800 kyr), and Cheng speleothem (640 kyr) supports cycle coherence
+// well beyond the original 2.7-kyr Stephenson fit window. Fade to zero at
+// ±400 kyr preserves the "not extrapolating to Myr-scale H(t) drift" honest
+// claim; H differs from H_J2000 by <1.5% at this range, so the fixed-period
+// assumption is valid. Constant name kept for historical continuity though the
+// window is no longer literally "Holocene".
+const HOLOCENE_TAPER_FULL_HALFWIDTH_YR = 300000;
+const HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR = 400000;
 
 function holoceneTaper(year) {
   const dy = Math.abs(year - 2000);
@@ -225,6 +239,7 @@ function holoceneTaper(year) {
 const BOND_DT_RAW_AT_J2000      = BOND_COS_COEFF_S      * Math.cos(BOND_OMEGA      * 2000) + BOND_SIN_COEFF_S      * Math.sin(BOND_OMEGA      * 2000);
 const HALLSTATT_DT_RAW_AT_J2000 = HALLSTATT_COS_COEFF_S * Math.cos(HALLSTATT_OMEGA * 2000) + HALLSTATT_SIN_COEFF_S * Math.sin(HALLSTATT_OMEGA * 2000);
 const JOSE5_DT_RAW_AT_J2000     = JOSE5_COS_COEFF_S     * Math.cos(JOSE5_OMEGA     * 2000) + JOSE5_SIN_COEFF_S     * Math.sin(JOSE5_OMEGA     * 2000);
+const JOSE4_DT_RAW_AT_J2000    = JOSE4_COS_COEFF_S    * Math.cos(JOSE4_OMEGA    * 2000) + JOSE4_SIN_COEFF_S    * Math.sin(JOSE4_OMEGA    * 2000);
 
 function bondCycleDeltaTCorrection(year) {
   const taper = holoceneTaper(year);
@@ -246,6 +261,13 @@ function jose5CycleDeltaTCorrection(year) {
   const raw = JOSE5_COS_COEFF_S * Math.cos(JOSE5_OMEGA * year)
             + JOSE5_SIN_COEFF_S * Math.sin(JOSE5_OMEGA * year);
   return taper * (raw - JOSE5_DT_RAW_AT_J2000);
+}
+function jose4CycleDeltaTCorrection(year) {
+  const taper = holoceneTaper(year);
+  if (taper <= 0) return 0;
+  const raw = JOSE4_COS_COEFF_S * Math.cos(JOSE4_OMEGA * year)
+            + JOSE4_SIN_COEFF_S * Math.sin(JOSE4_OMEGA * year);
+  return taper * (raw - JOSE4_DT_RAW_AT_J2000);
 }
 
 // ─── Implied LOD corrections from the 3-flag stack (Phase-8 physical consistency) ───
@@ -307,6 +329,9 @@ function hallstattCycleLodCorrection(year) {
 function jose5CycleLodCorrection(year) {
   return _cycleLodCorrection(year, JOSE5_COS_COEFF_S, JOSE5_SIN_COEFF_S, JOSE5_OMEGA, JOSE5_DT_RAW_AT_J2000);
 }
+function jose4CycleLodCorrection(year) {
+  return _cycleLodCorrection(year, JOSE4_COS_COEFF_S, JOSE4_SIN_COEFF_S, JOSE4_OMEGA, JOSE4_DT_RAW_AT_J2000);
+}
 
 /**
  * LOD in seconds at t_Ma, WITH 3-flag correction stack applied (physical
@@ -323,7 +348,8 @@ function meanLodSecondsWithCorrectionsAtAge(t_Ma) {
   return tidal
        + bondCycleLodCorrection(year)
        + hallstattCycleLodCorrection(year)
-       + jose5CycleLodCorrection(year);
+       + jose5CycleLodCorrection(year)
+       + jose4CycleLodCorrection(year);
 }
 
 // ─── ΔT integrator (mirrors src/script.js meanDeltaTSecondsAtAge) ───────────
@@ -341,7 +367,7 @@ const DT_CORRECTIONS_ENABLED = process.env.DT_CORRECTIONS_DISABLED !== '1';
 
 function meanDeltaTSecondsAtAge(t_Ma) {
   if (t_Ma === 0) return 0;
-  const cacheKey = (DT_CORRECTIONS_ENABLED ? 'BHJ:' : 'raw:') + t_Ma;
+  const cacheKey = (DT_CORRECTIONS_ENABLED ? 'BHJW:' : 'raw:') + t_Ma;
   const hit = _DELTA_T_CACHE.get(cacheKey);
   if (hit !== undefined) return hit;
 
@@ -363,13 +389,14 @@ function meanDeltaTSecondsAtAge(t_Ma) {
   }
   let result = (sum * h) / 3;
 
-  // Post-integration 3-cycle H-lattice corrections; anchored to 0 at J2000.
+  // Post-integration 4-cycle H-lattice corrections; anchored to 0 at J2000.
   // Skipped when DT_CORRECTIONS_DISABLED=1 (raw pure-tidal for fitting).
   if (DT_CORRECTIONS_ENABLED) {
     const yearY = 2000 - t_Ma * 1e6;
     result += bondCycleDeltaTCorrection(yearY);
     result += hallstattCycleDeltaTCorrection(yearY);
     result += jose5CycleDeltaTCorrection(yearY);
+    result += jose4CycleDeltaTCorrection(yearY);
   }
 
   if (_DELTA_T_CACHE.size >= _MAX_DELTA_T_CACHE) {
@@ -657,9 +684,9 @@ module.exports = {
   meanTropicalYearDaysAtAge, meanYearInDaysAtAge,
   // ΔT
   meanDeltaTSecondsAtAge, frameworkDeltaT,
-  bondCycleDeltaTCorrection, hallstattCycleDeltaTCorrection, jose5CycleDeltaTCorrection,
-  // Implied LOD corrections from the 3-flag ΔT stack (physical-consistency helper)
-  bondCycleLodCorrection, hallstattCycleLodCorrection, jose5CycleLodCorrection,
+  bondCycleDeltaTCorrection, hallstattCycleDeltaTCorrection, jose5CycleDeltaTCorrection, jose4CycleDeltaTCorrection,
+  // Implied LOD corrections from the 4-flag ΔT stack (physical-consistency helper)
+  bondCycleLodCorrection, hallstattCycleLodCorrection, jose5CycleLodCorrection, jose4CycleLodCorrection,
   meanLodSecondsWithCorrectionsAtAge,
   // Moon chain
   meanSolarDeltaAAtAge, meanMoonDistanceCorrectedAtAge,
