@@ -101,17 +101,26 @@ function exportEarth(years) {
     precessionPeriod.push(+el.precession.toFixed(2));
     erd.push(+el.erd.toFixed(8));
 
-    // Day lengths (from computeEarthOrbitalElements)
-    solarDaySeconds.push(+el.lengthOfDay.toFixed(6));
-    siderealDaySeconds.push(+el.siderealDay.toFixed(6));
-    stellarDaySeconds.push(+el.stellarDay.toFixed(6));
+    // Day lengths (physically consistent with the shipped 3-flag ΔT correction stack):
+    //   corrected LOD = tidal LOD + Σ δLOD_i(year), where δLOD_i is derived from
+    //   d/dy[correction_i(y)] / T_year(y) (see tools/lib/deep-time.js § "Implied
+    //   LOD corrections"). Sidereal, stellar, solar-year-sec, and anom-year-sec
+    //   scale linearly with LOD so we propagate the ratio (corrected / tidal).
+    //   Holocene-tapered: unchanged for |year − 2000| > 6000 yr. Peak ~5-10 ms.
+    const t_Ma = (2000 - year) / 1e6;
+    const lodCorrected = DT.meanLodSecondsWithCorrectionsAtAge(t_Ma);
+    const lodRatio = (lodCorrected !== null && el.lengthOfDay > 0) ? lodCorrected / el.lengthOfDay : 1;
+    solarDaySeconds.push(+lodCorrected.toFixed(6));
+    siderealDaySeconds.push(+(el.siderealDay * lodRatio).toFixed(6));
+    stellarDaySeconds.push(+(el.stellarDay * lodRatio).toFixed(6));
 
     // Anomalistic year
     anomalisticYearDays.push(+OE.computeLengthOfAnomalisticYearDays(year).toFixed(10));
 
-    // Precession variants (derived from axial precession)
-    const solarYearSec = el.solarYearDays * el.lengthOfDay;
-    const anomYearSec = OE.computeLengthOfAnomalisticYearDays(year) * el.lengthOfDay;
+    // Precession variants (derived from axial precession).
+    // Year-in-seconds scales with LOD (a longer day → longer year in seconds).
+    const solarYearSec = el.solarYearDays * el.lengthOfDay * lodRatio;
+    const anomYearSec = OE.computeLengthOfAnomalisticYearDays(year) * el.lengthOfDay * lodRatio;
     perihelionPrecession.push(+OE.computePerihelionPrecession(anomYearSec, solarYearSec).toFixed(2));
     inclinationPrecession.push(+(el.precession * 13 / 3).toFixed(2));
     eclipticPrecession.push(+(el.precession * 13 / 5).toFixed(2));
@@ -149,7 +158,7 @@ function exportEarth(years) {
     argPerihelion.push(+omega.toFixed(4));
 
     // Deep-time chain values (ESSRT): per-year H, AU, Moon distance evolution
-    const t_Ma = (2000 - year) / 1e6;
+    // (t_Ma already declared above in the LOD-corrections block)
     holisticYearAtYear.push(+DT.meanHAtAge(t_Ma).toFixed(4));
     auKmAtYear.push(+DT.meanAuAtAge(t_Ma).toFixed(2));
     moonDistanceKmAtYear.push(+DT.meanMoonDistanceAtAge(t_Ma).toFixed(2));

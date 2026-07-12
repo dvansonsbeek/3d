@@ -248,6 +248,84 @@ function jose5CycleDeltaTCorrection(year) {
   return taper * (raw - JOSE5_DT_RAW_AT_J2000);
 }
 
+// ─── Implied LOD corrections from the 3-flag stack (Phase-8 physical consistency) ───
+// The ΔT corrections are additive post-integration terms on the pure-tidal ΔT
+// curve. Physically they imply corresponding sub-Milankovitch LOD variations
+// via the LOD ↔ ΔT relationship (see docs/102 § "Companion 8H lattice harmonics"
+// and tools/fit/README.md § Phase 8):
+//
+//   d/dy ΔT(y)  =  (LOD(y) − 86400) / 86400 · yearS(y)
+//   ⇒ δLOD_i(y) = 86400 · d/dy[correction_i(y)] / yearS(y)
+//
+// These functions expose that implied δLOD so callers (dashboard export,
+// browser tweakpane display) can render an LOD curve that is physically
+// consistent with the corrected ΔT curve. They are NOT used by the ΔT
+// integrator (which already handles the corrections via post-integration
+// addition — using them there would double-count).
+//
+// Interior of the Holocene taper (|y−2000| ≤ 4500 yr) taper=1, taper'=0:
+//   d/dy[correction_i] = ω_i · (B_i · cos(ω_i · y) − A_i · sin(ω_i · y))
+// In the taper transition (4500 < |y−2000| < 6000):
+//   product rule — taper'(y) · (raw(y) − raw(2000)) + taper(y) · raw'(y)
+// Beyond ±6000: taper=0, δLOD=0.
+//
+// Peak magnitude (at Holocene coherence): Bond ≈ 4.4 ms, Hallstatt ≈ 0.6 ms,
+// Jose5 ≈ 1.0 ms; combined ~5-10 ms peak-to-peak on top of the ~86400 s baseline.
+
+function holoceneTaperDerivative(year) {
+  const dy = Math.abs(year - 2000);
+  if (dy <= HOLOCENE_TAPER_FULL_HALFWIDTH_YR) return 0;
+  if (dy >= HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR) return 0;
+  const width = HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR - HOLOCENE_TAPER_FULL_HALFWIDTH_YR;
+  const u = (dy - HOLOCENE_TAPER_FULL_HALFWIDTH_YR) / width;
+  // taper(y) = 0.5·(1 + cos(π·u)); d/dy = −0.5·π·sin(π·u) · (du/dy)
+  // du/dy = (1/width) · sign(y − 2000)
+  const sign = year >= 2000 ? 1 : -1;
+  return -0.5 * Math.PI * Math.sin(Math.PI * u) / width * sign;
+}
+
+function _cycleLodCorrection(year, cos_coeff, sin_coeff, omega, raw_at_j2000) {
+  const taper = holoceneTaper(year);
+  if (taper <= 0) return 0;
+  const raw       = cos_coeff * Math.cos(omega * year) + sin_coeff * Math.sin(omega * year);
+  const raw_prime = omega * (sin_coeff * Math.cos(omega * year) - cos_coeff * Math.sin(omega * year));
+  const taper_prime = holoceneTaperDerivative(year);
+  // d/dy[correction(y)] = taper'(y)·(raw − raw@J2000) + taper(y)·raw'(y)
+  const dCdy = taper_prime * (raw - raw_at_j2000) + taper * raw_prime;
+  // Use J2000 tropical year length as denominator — variation within ±6000 yr
+  // is ≤10^-8 relative, negligible at millisecond LOD scale.
+  const yearS = MEAN_TROPICAL_YEAR_J2000_S;
+  return 86400 * dCdy / yearS;
+}
+
+function bondCycleLodCorrection(year) {
+  return _cycleLodCorrection(year, BOND_COS_COEFF_S, BOND_SIN_COEFF_S, BOND_OMEGA, BOND_DT_RAW_AT_J2000);
+}
+function hallstattCycleLodCorrection(year) {
+  return _cycleLodCorrection(year, HALLSTATT_COS_COEFF_S, HALLSTATT_SIN_COEFF_S, HALLSTATT_OMEGA, HALLSTATT_DT_RAW_AT_J2000);
+}
+function jose5CycleLodCorrection(year) {
+  return _cycleLodCorrection(year, JOSE5_COS_COEFF_S, JOSE5_SIN_COEFF_S, JOSE5_OMEGA, JOSE5_DT_RAW_AT_J2000);
+}
+
+/**
+ * LOD in seconds at t_Ma, WITH 3-flag correction stack applied (physical
+ * consistency: this LOD's integral matches the corrected ΔT curve).
+ * Use for display in dashboards / tweakpane. The pure-tidal
+ * `meanLodSecondsAtAge` remains the physics-baseline function used by the
+ * ΔT integrator and by year-length / precession derivations.
+ */
+function meanLodSecondsWithCorrectionsAtAge(t_Ma) {
+  const tidal = meanLodSecondsAtAge(t_Ma);
+  if (tidal === null) return null;
+  if (!DT_CORRECTIONS_ENABLED) return tidal;
+  const year = 2000 - t_Ma * 1e6;
+  return tidal
+       + bondCycleLodCorrection(year)
+       + hallstattCycleLodCorrection(year)
+       + jose5CycleLodCorrection(year);
+}
+
 // ─── ΔT integrator (mirrors src/script.js meanDeltaTSecondsAtAge) ───────────
 // Pure-tidal Simpson integration + post-integration 3-cycle H-lattice
 // corrections (Bond + Hallstatt + Jose5) matching the shipped 3-flag stack.
@@ -579,6 +657,10 @@ module.exports = {
   meanTropicalYearDaysAtAge, meanYearInDaysAtAge,
   // ΔT
   meanDeltaTSecondsAtAge, frameworkDeltaT,
+  bondCycleDeltaTCorrection, hallstattCycleDeltaTCorrection, jose5CycleDeltaTCorrection,
+  // Implied LOD corrections from the 3-flag ΔT stack (physical-consistency helper)
+  bondCycleLodCorrection, hallstattCycleLodCorrection, jose5CycleLodCorrection,
+  meanLodSecondsWithCorrectionsAtAge,
   // Moon chain
   meanSolarDeltaAAtAge, meanMoonDistanceCorrectedAtAge,
   meanMoonSiderealMonthAtAge, meanSynodicMonthAtAge, meanTropicalMonthAtAge,
