@@ -50,7 +50,6 @@ const useVariableSpeed           = true;   // Equation of Center on planet orbit
 const debugOn                    = false;  // Debug button flag (developer only)
 let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge (~L7080)
 let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction (Phase Z-B) — rationale ~L7066
-let   EARTH_ROTATION_DT_CORRECTION_ENABLED = false;  // DIAGNOSTIC-ONLY — do NOT enable for eclipse validation. When ON, applies ΔT twice: Meeus wrappers already advance UT→TT internally for Sun/Moon positions (~L5107 `_eclSunLon` + ~L5157/5190/5199 `_meeusMoon*`) and the base Earth spin is already at UT-anchored rate (correct actual rotation). Enabling this adds ΔT to Earth's rotation on top of the already-correct scene → over-rotates Earth by ~47° at year -135. Kept as an A/B diagnostic to verify the Meeus internal TT conversion is working. Formerly "Strategy A"; rationale ~L6889
 let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 8H/1830 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
 let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research toggle) — rationale + associated constants ~L5039
 let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
@@ -88,8 +87,7 @@ const tropicalCenturyDays = 100 * meansolaryearlengthinDays;  // 100 model tropi
 // N = tropical days per year — this is the standard relationship between mean
 // solar and mean sidereal day (Earth completes N sidereal rotations per year
 // in solar-day units, or N+1 rotations relative to inertial space).
-// Used by (a) earth.rotationSpeed (sidereal-frame base spin, ~L6663) and
-// (b) earthRotationCorrectionRadians (ΔT→radians in sidereal frame, ~L6923).
+// Used by earth.rotationSpeed (sidereal-frame base spin, ~L6663).
 const _siderealDaySec_J2000 = 86400 * inputmeanlengthsolaryearindays / (inputmeanlengthsolaryearindays + 1);
 // Triple synodic period (Jupiter-Saturn conjunction cycle incl. perihelion precession H/5, -H/8)
 // Computed after planets are defined — see section E2
@@ -5350,9 +5348,10 @@ const _MAX_DELTA_T_CACHE = 512;
  *  Earth orientation needs +ΔT/86400 rotations of CORRECTION on top of the
  *  constant-rate model to match physical reality.
  *
- *  Used by Strategy A in updateEarthForEpoch: add (ΔT/86400) × 2π radians
- *  to the constant-rate scene rotation so the eclipse appears at the
- *  geographically correct location at deep historical past.
+ *  Used by the Meeus ephemeris wrappers (`_eclSunLon`, `_eclMoonLon`,
+ *  `_eclMoonBeta`, `_meeusMoon*`) to convert JD_UT → JD_TT before evaluating
+ *  the Sun and Moon polynomials, so the inertial positions are at their
+ *  correct TT-time evaluation.
  *
  *  If BOND_DT_CORRECTION_ENABLED is ON, an additional Bond-cycle correction
  *  is added POST-INTEGRATION (see the Bond section above). If
@@ -7361,74 +7360,6 @@ function updateAllObjectsForEpoch() {
 // disableDeepTimeMode() or flip this flag directly.
 
 const J2000_CALENDAR_YEAR = startmodelYear;   // 2000.5
-
-/** Earth rotation correction (radians) — DIAGNOSTIC-ONLY, canonical default = OFF.
- *
- *  EARTH_ROTATION_DT_CORRECTION_ENABLED (formerly "Strategy A") — OFF by default.
- *
- *  ═══ IMPORTANT: this is a 2×-ΔT diagnostic, NOT a physically correct rendering ═══
- *
- *  When enabled, this function adds `ΔT × 2π / _siderealDaySec_J2000` radians to
- *  Earth's day-night spin. This applies ΔT to Earth's rotation ON TOP OF a scene
- *  that already correctly accounts for ΔT — because:
- *
- *    1. The Meeus polynomial wrappers `_eclSunLon` / `_eclMoonLon` / `_eclMoonBeta`
- *       (~L5107, 5121, 5154, 5163) ALREADY convert JD_UT → JD_TT internally via
- *       `jd + _eclDeltaT(jd) / 86400`. Sun and Moon inertial positions are given
- *       at the correct TT-time evaluation of the polynomial.
- *    2. Earth's base spin `pos × rotationSpeed` uses `pos ∝ jd_UT` (elapsed UT
- *       years) times the sidereal-rate constant (2π × 366.256 per UT-year). By
- *       the UT1 convention this gives Earth's ACTUAL rotation angle at that UT
- *       moment — LOD history is automatically incorporated in the definition of
- *       UT (see UT1 IAU definition).
- *
- *  With correction OFF, all three coordinates are correctly at the same absolute
- *  moment: Sun+Moon at their inertial TT-positions, Earth at its UT-rotation. The
- *  umbra geometry is astronomically correct.
- *
- *  With correction ON, ΔT is effectively applied a second time — the Earth is
- *  over-rotated by ~47° at year -135, ~71° at Thales -584, etc. The scene falls
- *  into a non-physical state where the umbra shifts west in Earth-fixed frame.
- *
- *  The 19/19 documented eclipse validation (doc 101) confirmed OFF is correct.
- *
- *  ═══ Why keep the toggle at all? ═══
- *
- *  Kept as a diagnostic A/B test for verifying that the Meeus internal TT
- *  conversion is working correctly. If Sun/Moon positions ever drifted (e.g.
- *  from a bug in `_eclDeltaT` or the `+ ΔT/86400` step), toggling this on and
- *  off would produce an asymmetric umbra shift instead of the expected 2×-ΔT
- *  double-apply. Also provides a "Stephenson-plotted-path visualization mode"
- *  for cross-referencing Stephenson's own catalog plots (which appear to use
- *  the same double-apply convention in some versions).
- *
- *  DO NOT enable for eclipse validation, published results, or production use.
- *
- *  See docs/hidden/old-documents/IP-strategy-z-earth-rotation-integration.md
- *  for the historical Phase 9.5b context. The Phase 9.5b rate-lock change is
- *  correct and still active; only the ΔT-add overlay (this function) turned
- *  out to be misconceived. */
-// EARTH_ROTATION_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-
-function earthRotationCorrectionRadians(jd) {
-  if (!EARTH_ROTATION_DT_CORRECTION_ENABLED) return 0;   // diagnostic A/B toggle (formerly "Strategy A")
-  if (!DEEP_TIME_MODE_ENABLED) return 0;
-  // Convert JD to t_Ma (positive = past). julianDateToDecimalYear gives a
-  // calendar-year-equivalent for the JD, which we then convert to t_Ma.
-  const decYear = julianDateToDecimalYear(jd);
-  const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
-  if (Math.abs(t_Ma) < 1e-9) return 0;
-  const deltaT_sec = meanDeltaTSecondsAtAge(t_Ma);
-  if (!Number.isFinite(deltaT_sec)) return 0;
-  // Convert ΔT (SI seconds) → radians in the SIDEREAL frame. The base spin
-  // `earth.rotationSpeed × pos` is 2π radians per sidereal day (see rotationSpeed
-  // derivation ~L6670), so the correction must use the same frame — dividing by
-  // the sidereal day (~86164 s) not the mean solar day (86400 s). Using 86400
-  // here would leave a 0.274% frame-mismatch (~14 km on Earth's surface at
-  // year -135); the sidereal-frame denominator makes the base + correction
-  // internally consistent.
-  return (deltaT_sec / _siderealDaySec_J2000) * 2 * Math.PI;
-}
 
 // ───── Phase 9.15: SI-tropical-year conversion (fixes Step 4 + Moon unit bug) ─────
 // The scene-graph integrators (cyclesBetweenYears, _moonChainCycles) expect
@@ -28946,58 +28877,6 @@ function setupGUI() {
      'and NASA Five Millennium Canon values. Identifies whether our LOD model ' +
      'over- or under-predicts ΔT.');
 
-  // ════════════════════════════════════════════════════════════════════════
-  //  Strategy A investigation — diagnostic buttons (2026-06-24)
-  //
-  //  Strategy A is the framework's ΔT × 2π/86400 Earth-rotation correction
-  //  added in moveModel via `earthRotationCorrectionRadians(jd)`. It adds
-  //  rotation that makes scene-visualized eclipse paths match Stephenson's
-  //  conventional eclipse-catalog locations.
-  //
-  //  Empirical finding (2026-06-24): disabling Strategy A reduces deep-time
-  //  umbra-centerline offset by ~75% and brings -584 Thales (the contested
-  //  case) to ★ TOTAL at the conventional documented date (80 km from
-  //  Anatolia). Doc 101's 19/19 penumbra validation is independent of
-  //  Strategy A (uses Meeus subSolar in the test buttons, not scene state).
-  //
-  //  These 3 buttons provide the diagnostic infrastructure to confirm
-  //  the finding empirically before deciding on next direction.
-  // ════════════════════════════════════════════════════════════════════════
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Button 1: Toggle Strategy A (the A/B switch)
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Toggle Strategy A (ΔT Earth-rotation correction)', () => {
-    EARTH_ROTATION_DT_CORRECTION_ENABLED = !EARTH_ROTATION_DT_CORRECTION_ENABLED;
-    console.log('\n══════════════════════════════════════════════════════════════════');
-    console.log(`  ΔT Earth-rotation correction (formerly "Strategy A") is now: ${EARTH_ROTATION_DT_CORRECTION_ENABLED ? 'ENABLED (legacy Stephenson-matching mode)' : 'DISABLED (default since 2026-06-24)'}`);
-    console.log('══════════════════════════════════════════════════════════════════');
-    if (!EARTH_ROTATION_DT_CORRECTION_ENABLED) {
-      console.log('  Earth\'s scene rotation = constant-J2000-rate × JD-days');
-      console.log('  Equivalent to standard GMST(UT1). This is the framework\'s default.');
-      console.log('  Empirically matches the documented historical eclipse record at');
-      console.log('  the umbra-centerline level (★ TOTAL at -584 Thales, -762 Bur-Sagale).');
-    } else {
-      console.log('  Earth\'s scene rotation = constant-rate × JD-days + ΔT × 2π/86400');
-      console.log('  Legacy mode (Phase 9.5b Strategy A overlay). Makes scene umbra appear');
-      console.log('  at Stephenson\'s documented conventional eclipse locations. At deep');
-      console.log('  historical past, this shifts the framework\'s prediction ~ΔT × 360/86400');
-      console.log('  degrees relative to standard GMST(UT1), which is why disabling improves');
-      console.log('  the tight umbra-centerline match.');
-    }
-    console.log('  ');
-    console.log('  Suggested follow-up:');
-    console.log('   • "Sun position diagnostic" → see the ΔT-scaled gap (or its absence)');
-    console.log('   • "Strategy A impact summary" → automated A/B sweep across 11 events');
-    console.log('   • "Divergence trend by epoch" → eclipse-prediction accuracy');
-    console.log('   • "Visibility window: ΔT range" → confirms doc 101 (19/19) holds either way');
-    forceSceneUpdate('light');
-    console.log('  (Scene refreshed.)');
-    console.log('══════════════════════════════════════════════════════════════════');
-  }, 'A/B toggle for Strategy A. Now DISABLED by default (2026-06-24 finding). ' +
-     'Toggle to legacy Stephenson-matching mode if needed. Critical for understanding ' +
-     'which mode matches the documented historical eclipse record at the umbra-centerline level.');
-
   // ────────────────────────────────────────────────────────────────────────
   // Toggle: Bond-scale ΔT correction (Option B research toggle)
   //
@@ -29211,28 +29090,24 @@ function setupGUI() {
      'Bond/2 ≈ 733 yr at present record length.');
 
   // ────────────────────────────────────────────────────────────────────────
-  // Button 2: Sun position diagnostic — scene vs Meeus
+  // Sun position diagnostic — scene vs Meeus
   //
   // Decomposes the framework's eclipse-prediction error into orthogonal
   // components:
   //   • Δ(lat) — Sun ecliptic-position error (independent of Earth rotation/ΔT)
   //   • Δ(lon) — Sun position + Earth rotation/ΔT combined error
-  //   • ΔT × 360/86400 — expected contribution from Strategy A
-  //   • Residual — Δ(lon) − Strategy-A-expected
+  //   • ΔT × 360/86400 — the rotation angle ΔT represents (reference column)
   //
-  // Run with Strategy A both ON and OFF and compare the two columns.
-  // Expected (verified 2026-06-24): with A ON, residual ≈ constant ~-0.55°
-  // everywhere (Strategy A explains 99%+ of deep-time gap). With A OFF,
-  // Δ(lon) ≈ -0.55° everywhere (constant frame offset only, no ΔT-scaled).
+  // Expected (verified 2026-06-24 with the ΔT-rotation overlay removed):
+  // Δ(lon) ≈ constant ~-0.55° everywhere = the framework's baseline frame offset,
+  // with no ΔT-scaled component.
   // ────────────────────────────────────────────────────────────────────────
   addTestButton('Sun position diagnostic (scene vs Meeus Ch. 25)', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════════');
     console.log('  Sun position diagnostic — framework scene vs Meeus Ch. 25');
-    console.log(`  ΔT Earth-rotation correction (formerly "Strategy A") is currently: ${EARTH_ROTATION_DT_CORRECTION_ENABLED ? 'ENABLED' : 'DISABLED (default)'}`);
     console.log('    Δ(lat)            = Sun ecliptic-position error (Earth-rotation independent)');
     console.log('    Δ(lon)            = Sun position + Earth rotation/ΔT combined error');
-    console.log('    ΔT × 360/86400    = expected contribution from Strategy A if ENABLED');
-    console.log('    Residual          = Δ(lon) + ΔT×360/86400 (error after subtracting Strategy A)');
+    console.log('    ΔT × 360/86400    = rotation angle represented by ΔT (reference)');
     console.log('══════════════════════════════════════════════════════════════════════════════════════');
 
     const _d2r = Math.PI / 180;
@@ -29285,8 +29160,8 @@ function setupGUI() {
       { Y: -762, M:  6, D: 15, label: '-762 Bur-Sagale' },
     ];
 
-    console.log('  Year   Label                Meeus(lat,lon)   Scene(lat,lon)   Δ(lat)   Δ(lon)   ΔT(s)    -ΔT×360/86400   Residual');
-    console.log('  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────');
+    console.log('  Year   Label                Meeus(lat,lon)   Scene(lat,lon)   Δ(lat)   Δ(lon)   ΔT(s)    -ΔT×360/86400');
+    console.log('  ─────────────────────────────────────────────────────────────────────────────────────────────────────');
     const _saveJD = o.julianDay;
     try {
       for (const e of epochs) {
@@ -29297,8 +29172,7 @@ function setupGUI() {
         let dLon = scene.lon - meeus.lon;
         while (dLon > 180)  dLon -= 360;
         while (dLon < -180) dLon += 360;
-        const strategyA_deg = -meeus.dT * 360 / 86400;
-        const residual = dLon - strategyA_deg;
+        const dT_rot_deg = -meeus.dT * 360 / 86400;
         const yearStr = String(e.Y).padStart(5);
         const labStr  = e.label.padEnd(20);
         const mStr    = `(${meeus.lat.toFixed(2).padStart(6)},${meeus.lon.toFixed(2).padStart(7)})`;
@@ -29306,40 +29180,27 @@ function setupGUI() {
         const dLatStr = (dLat >= 0 ? '+' : '') + dLat.toFixed(3) + '°';
         const dLonStr = (dLon >= 0 ? '+' : '') + dLon.toFixed(2) + '°';
         const dTStr   = Math.round(meeus.dT).toString();
-        const strAStr = (strategyA_deg >= 0 ? '+' : '') + strategyA_deg.toFixed(2) + '°';
-        const resStr  = (residual >= 0 ? '+' : '') + residual.toFixed(2) + '°';
-        console.log(`  ${yearStr}  ${labStr} ${mStr}  ${sStr}  ${dLatStr.padStart(8)}  ${dLonStr.padStart(8)}  ${dTStr.padStart(7)}     ${strAStr.padStart(8)}   ${resStr.padStart(8)}`);
+        const dTRotStr = (dT_rot_deg >= 0 ? '+' : '') + dT_rot_deg.toFixed(2) + '°';
+        console.log(`  ${yearStr}  ${labStr} ${mStr}  ${sStr}  ${dLatStr.padStart(8)}  ${dLonStr.padStart(8)}  ${dTStr.padStart(7)}     ${dTRotStr.padStart(8)}`);
       }
     } finally {
       jumpToJulianDay(_saveJD);
       forceSceneUpdate('light');
     }
-    console.log('  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────');
+    console.log('  ─────────────────────────────────────────────────────────────────────────────────────────────────────');
     console.log('');
     console.log('  How to interpret:');
     console.log('   • Δ(lat) ≈ 0 everywhere → framework\'s Sun ecliptic position is correct.');
-    console.log('   • If Strategy A is ENABLED: Δ(lon) tracks -ΔT×360/86400 (= Strategy A\'s contribution).');
-    console.log('     Residual ≈ constant ~-0.55° = the framework\'s baseline frame offset.');
-    console.log('   • If Strategy A is DISABLED: Δ(lon) ≈ constant ~-0.55° (no ΔT-scaled component).');
-    console.log('     Residual = Δ(lon) − (would-be Strategy A); both should be opposite of ΔT term.');
-    console.log('');
-    console.log('  Run this with Strategy A toggled both ways to verify the decomposition.');
+    console.log('   • Δ(lon) ≈ constant ~-0.55° everywhere → constant baseline frame offset,');
+    console.log('     no ΔT-scaled component (Meeus wrappers apply the UT→TT conversion internally,');
+    console.log('     so Sun/Moon positions are already at the correct TT-time evaluation).');
+    console.log('   • ΔT × 360/86400 shows the rotation angle that ΔT would represent if applied to');
+    console.log('     Earth\'s spin — reference-only column; Δ(lon) should NOT track it.');
     console.log('══════════════════════════════════════════════════════════════════════════════════════');
   }, 'Compares framework scene Sun position to Meeus Ch. 25 at 10 epochs from ' +
      'J2000 to -762 BCE. Decomposes the error into Sun-ecliptic-position component ' +
-     '(Δ(lat)) and Earth-rotation/ΔT component (Δ(lon)). Run with Strategy A ON ' +
-     'and OFF to see the empirical effect of the toggle.');
-
-  // ────────────────────────────────────────────────────────────────────────
-  // REMOVED 2026-06-25: "Strategy A impact summary (auto A/B sweep)" button.
-  // The empirical Strategy A ON-vs-OFF table it produced is documented in
-  // docs/hidden/old-documents/IP-strategy-z-earth-rotation-integration.md
-  // and the doc 101 2026-06-24 update box. Strategy A is now disabled by
-  // default; for ad-hoc A/B verification use "Toggle Strategy A" +
-  // "Sun position diagnostic" together.
-  // ────────────────────────────────────────────────────────────────────────
-  // (Original 130-line button removed; for ad-hoc A/B verification see
-  // "Toggle Strategy A" + "Sun position diagnostic".)
+     '(Δ(lat)) and Earth-rotation/ΔT component (Δ(lon)); the ΔT-rotation reference ' +
+     'column shows what ΔT would contribute if double-applied to Earth\'s spin.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Sun ecl_lon harmonic scan — samples scene Sun ecliptic longitude at
@@ -29607,7 +29468,6 @@ function setupGUI() {
     console.log('  -135 Babylonian case study — three-section unified diagnostic');
     console.log('  Documented: 15 April 136 BCE (JD 1671853.76 UT), totality at Babylon (32.5°N, 44.4°E)');
     console.log('  Attribution: BM 45745 + LBAT 1285, 4-planet fingerprint, double-dated Arsacid/Seleucid.');
-    console.log(`  ΔT Earth-rotation correction (formerly "Strategy A") is currently: ${EARTH_ROTATION_DT_CORRECTION_ENABLED ? 'ENABLED' : 'DISABLED'}`);
     console.log('══════════════════════════════════════════════════════════════════════════════════');
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -55399,12 +55259,12 @@ function moveModel(pos) {
       // Phase 9.16 ΔT (UT→TT) fix: Meeus Ch. 47 defines T in Julian centuries
       // from JD 2451545.0 TT, but o.julianDay is JD_UT. The two are the same
       // at J2000 (by convention) but diverge by ΔT/86400 days going back in
-      // time. Earth's rotation in moveModel already accounts for ΔT (via
-      // earthRotationCorrectionRadians, Strategy A), but the Moon polynomial
-      // wasn't doing the matching JD_UT → JD_TT conversion. At year -584 the
-      // missing 0.187-day ΔT shift caused Moon Lp to be ~2.46° west of
-      // physical reality. Using the SAME meanDeltaTSecondsAtAge that Strategy
-      // A uses keeps the two systems on the same ΔT model.
+      // time. The Moon polynomial needs to see JD_TT for correct polynomial
+      // evaluation; at year -584 the missing 0.187-day ΔT shift caused Moon
+      // Lp to be ~2.46° west of physical reality. Applying the same
+      // meanDeltaTSecondsAtAge conversion here keeps the Moon evaluation
+      // consistent with the same ΔT model used by the Sun wrapper and the
+      // eclipse geometry code.
       let d = o.julianDay - j2000JD;
       if (DEEP_TIME_MODE_ENABLED) {
         const decYear_d = julianDateToDecimalYear(o.julianDay);
@@ -55533,21 +55393,21 @@ function moveModel(pos) {
         const _dtCycles = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, _rotYearSI, obj._dtRotN);
         obj.planetObj.rotation.y = (_dtCycles !== null ? _dtCycles : 0) * 2 * Math.PI * obj._dtRotSign;
       } else {
-        let spinAngle = obj.rotationSpeed * pos;
-        // Earth day-night spin: add ΔT correction so Earth orientation in
-        // the scene matches its physical orientation at the given JD. The
-        // constant-J2000-rate (obj.rotationSpeed × pos) gives the rotation
-        // count as if Earth had always spun at 86,400 s/day; the correction
-        // ΔT/86400 × 2π adds the cumulative extra rotation that Earth has
-        // actually completed because LOD was shorter in the past (Farhat
-        // 2022 polynomial integrated to ΔT via meanDeltaTSecondsAtAge).
-        // ~0 at modern era (ΔT < 1s); ~71° at year -584 (Thales era).
-        // Only applied when deep-time mode is ON, and only to Earth (the
-        // helper returns 0 when deep-time is off).
-        if (obj.name === 'Earth') {
-          spinAngle += earthRotationCorrectionRadians(o.julianDay);
-        }
-        obj.planetObj.rotation.y = spinAngle;
+        // Earth day-night spin uses the constant-J2000-rate model
+        // (obj.rotationSpeed × pos), i.e. as if Earth had always spun at
+        // 86,400 s/day. This is equivalent to standard GMST(UT1): the base
+        // spin is already at UT-anchored rate and gives Earth's actual
+        // rotation angle at that UT moment (LOD history is automatically
+        // incorporated in the definition of UT1). Sun and Moon inertial
+        // positions are separately advanced to their correct TT-time
+        // evaluation by the Meeus wrappers (`_eclSunLon`, `_eclMoonLon`,
+        // `_eclMoonBeta`, `_meeusMoon*`), which apply JD_UT → JD_TT
+        // internally. The doc 101 19/19 penumbra validation confirmed this
+        // arrangement is astronomically correct at the umbra-centerline
+        // level (empirical finding 2026-06-24; the earlier ΔT-rotation
+        // overlay double-applied ΔT and over-rotated Earth by ~47° at
+        // year -135 / ~71° at Thales -584).
+        obj.planetObj.rotation.y = obj.rotationSpeed * pos;
       }
     }
 
