@@ -177,17 +177,17 @@ where `N_apsidal` and `N_nodal` are the number of full lunar apsidal / nodal cyc
 **J2000 anchors and derived invariant value:**
 ```
 Framework structural:    H₀ = 335,317 yr    (= 23 × 61 × 239)
-Observed (Meeus/IERS):   T_apsidal,J2000 ≈ 8.847 yr,  T_nodal,J2000 ≈ 18.613 yr
-Integer cycle counts:    N_apsidal = 37,900,  N_nodal = 18,015
+Observed (Meeus/IERS):   T_apsidal,J2000 ≈ 8.848 yr,  T_nodal,J2000 ≈ 18.613 yr
+Integer cycle counts:    N_apsidal = 37,899,  N_nodal = 18,015
                          (= round(H₀ / T_observed); anchored in src/script.js,
                           verified in tools/explore/audit-moon-months.js)
 
 J2000-anchored invariant value (held exact at every epoch by construction):
-    T_apsidal × H = H₀² / N_apsidal = 335,317² / 37,900 = 2,966,688 yr²
+    T_apsidal × H = H₀² / N_apsidal = 335,317² / 37,899 = 2,966,767 yr²
     T_nodal   × H = H₀² / N_nodal   = 335,317² / 18,015 = 6,241,326 yr²
 ```
 
-The VALUE 2,966,688 yr² is **empirically anchored** (one structural H, one observed T_apsidal); it is *not* a structurally-derived integer like `8H = 2,682,536 yr`. What is structural is the **claim** that this value is preserved at every epoch — the framework's `N(t) = N₀ × (H/H₀)²` scaling.
+The VALUE 2,966,767 yr² is **empirically anchored** (one structural H, one observed T_apsidal); it is *not* a structurally-derived integer like `8H = 2,682,536 yr`. What is structural is the **claim** that this value is preserved at every epoch — the framework's `N(t) = N₀ × (H/H₀)²` scaling.
 
 ### Where it comes from
 
@@ -210,16 +210,16 @@ Unlike the day-count near-invariant (`H × days/yr`), which drifts at deep time 
 
 | Age (Ma) | H (yr) | N_apsidal (cyc/H) | T_apsidal (yr) | T_apsidal × H (yr²) | Drift vs J2000 |
 |---:|---:|---:|---:|---:|---:|
-| **+200** | 350,665 | 41,448.820 | 8.460185 | 2,966,688 | 0 ppm |
-| **+100** | 342,819 | 39,614.935 | 8.653793 | 2,966,688 | 0 ppm |
-| **0** (anchor) | **335,317** | **37,900.000** | **8.847414** | **2,966,688** | **0 ppm** |
-| −100 | 328,105 | 36,287.212 | 9.041889 | 2,966,688 | 0 ppm |
-| −380 (Devonian) | 309,084 | 32,201.770 | 9.598339 | 2,966,688 | 0 ppm |
-| −500 | 301,318 | 30,604.084 | 9.845693 | 2,966,688 | 0 ppm |
-| −1000 | 270,297 | 24,627.013 | 10.975646 | 2,966,688 | 0 ppm |
-| −2500 | 180,573 | 10,990.962 | 16.429264 | 2,966,688 | 0 ppm |
+| **+200** | 350,665 | 41,447.797 | 8.460401 | 2,966,767 | 0 ppm |
+| **+100** | 342,819 | 39,613.788 | 8.654032 | 2,966,767 | 0 ppm |
+| **0** (anchor) | **335,317** | **37,899.000** | **8.847648** | **2,966,767** | **0 ppm** |
+| −100 | 328,105 | 36,286.268 | 9.042126 | 2,966,767 | 0 ppm |
+| −380 (Devonian) | 309,084 | 32,201.022 | 9.598577 | 2,966,767 | 0 ppm |
+| −500 | 301,318 | 30,603.194 | 9.845966 | 2,966,767 | 0 ppm |
+| −1000 | 270,297 | 24,626.294 | 10.975951 | 2,966,767 | 0 ppm |
+| −2500 | 180,573 | 10,990.621 | 16.429736 | 2,966,767 | 0 ppm |
 
-The `T_apsidal × H` column is the **J2000-anchored value 2,966,688 yr²** (exact: H₀² / N_apsidal,J2000 = 2,966,688.40 yr²), held constant by the framework's `(H/H₀)²` scaling. N is real-valued (not rounded to integer except at the J2000 anchor). Both H (integer) and T_apsidal (6 decimals) are display-rounded, so the hand-reproduction `T × H ≈ 2,966,688` is accurate to within ±10 yr² (well below the displayed precision). Same pattern for nodal: `T_nodal × H = H₀² / N_nodal,J2000 = 6,241,326 yr²` at every age.
+The `T_apsidal × H` column is the **J2000-anchored value 2,966,767 yr²** (exact: H₀² / N_apsidal,J2000 = 2,966,766.68 yr²), held constant by the framework's `(H/H₀)²` scaling. N is real-valued (not rounded to integer except at the J2000 anchor). Both H (integer) and T_apsidal (6 decimals) are display-rounded, so the hand-reproduction `T × H ≈ 2,966,767` is accurate to within ±10 yr² (well below the displayed precision). Same pattern for nodal: `T_nodal × H = H₀² / N_nodal,J2000 = 6,241,326 yr²` at every age.
 
 ### Physical interpretation
 
@@ -240,6 +240,121 @@ This is the third member of the framework's family of **deep-time invariants** �
 | **Lunar Precession Invariant** | **`T_apsidal × H = const`, `T_nodal × H = const`** | **Driver 1 + Brown m²** | **0 ppm (structural)** |
 
 Cross-references: deep-time implementation in `src/script.js` (`meanApsidalCyclesICRFAtAge`, `meanNodalCyclesICRFAtAge`) and `tools/lib/deep-time.js`; anchor verification in `tools/explore/audit-moon-months.js`; Earth-frame Brouwer-Clemence scaling in [Moon-Kepler Derivation](24-moon-kepler-derivation.md).
+
+## The H/5 LOD correction — REAL_LOD from ecliptic precession
+
+Two structural relations sit between the framework's kinematic mean LOD and the observed physical LOD (USNO Earth Orientation Center measurement):
+
+1. **Raw H/5 kinematic correction** — captures the "missing motion" from the ecliptic reference frame's precession over the H/5 cycle. First-principles, no free parameters. Contribution at J2000: **+3.527 ms**.
+2. **Calibrated cyclic ΔT stack** (Bond/Hallstatt/Jose5/Jose4) — the framework's cyclic ΔT harmonic stack, jointly fit against Espenak history under the USNO-anchor soft constraint. Net LOD contribution at J2000: **−1.74 ms**.
+
+Their sum closes the Layer 3 composite `LOD_real` onto the USNO anchor **86400.0018 s** exactly at J2000 by construction of the fit.
+
+### The identity
+
+```
+LOD_real(t) = LOD_mean(t)                         ← H/13 kinematic baseline
+            + LOD_mean(t) / ((H(t)/5) × mSY(t))   ← raw H/5 kinematic correction
+            + Σ δ_LOD,i(t)                        ← calibrated Bond/Hallstatt/Jose5/Jose4 stack
+```
+
+At J2000:
+
+```
+LOD_mean               = 86399.999676 s   (framework H/13 identity: T_sid_s / (mSY × H/(H−13)))
+raw H/5 correction     = LOD_mean / ((H/5) × mSY)
+                       = 86399.999676 / (67,063.400 × 365.242204)
+                       = 3.527 × 10⁻³ s   (+3.527 ms)
+raw H/5 kinematic sum  = LOD_mean + raw H/5 correction
+                       = 86400.003203 s   (intermediate; NOT the physical LOD readout)
+
+Σ ΔT-cycle δ_LOD       = −1.737 × 10⁻³ s  (net at J2000, from calibrated stack;
+                                            see `data/deltaT-4flag-fit.json` →
+                                            `usno_anchor.shipped_sum_lod_at_j2000_s`)
+
+LOD_real (Layer 3)     = 86400.001800 s   (physical LOD readout — matches USNO anchor exactly)
+USNO anchor            = 86400.0018 s     (Earth Orientation Center J2000, joint-optimum
+                                            vs Espenak history, 2026-07-18)
+```
+
+The raw H/5 correction is a first-order additive expansion of the multiplicative form `LOD_mean × (1 + 1/((H/5)·mSY))`; higher-order terms are ~10⁻¹⁶ s and are ignored.
+
+### Physical derivation of the raw H/5 term
+
+The correction represents Earth's need to rotate slightly MORE per solar day to compensate for the ecliptic's precession in ICRF over the ecliptic-precession period H/5. The mean solar day is measured against the Sun, whose apparent motion follows the ecliptic — so it is the ecliptic frame, not the invariable-plane frame, that sets the meridian passage.
+
+Over one full ecliptic-precession cycle (H/5 = 67,063 yr at J2000), the ecliptic completes one full revolution of its orientation in ICRF. Over one solar day (= 1/mSY of one year), the ecliptic direction therefore precesses by:
+
+```
+δ_rev = 1 / ((H/5) × mSY) revolutions per day
+      = 1 / (67,063.400 × 365.242) = 4.083 × 10⁻⁸ rev/day
+```
+
+Earth must spin this additional fraction to catch the Sun on the meridian, adding:
+
+```
+δ_LOD_H5 = LOD_mean × δ_rev = 86,400 × 4.083 × 10⁻⁸ s = 3.527 ms per solar day
+```
+
+### Why other H/N precessions don't appear as raw kinematic corrections
+
+**The H/13 axial precession is already implicit** in the framework's baseline. The H/13 identity is `sidereal_year_days_kinematic = mSY × H / (H − 13)` — the −13 in the denominator IS the axial precession contribution (over H tropical years, the sidereal frame counts H−13 years because Earth's spin axis has completed 13 full precession cycles). Adding an explicit H/13 correction to LOD_mean would double-count.
+
+**H/3 inclination precession is an invariable-plane-frame effect** — it rotates Earth's orbital *plane* relative to ICRF, but the Sun's apparent longitude is measured in the ecliptic-of-date, so the inclination cycle does not enter the day-length count directly.
+
+**H/8 obliquity is an oscillation**, not a monotonic precession — time-averaged contribution to LOD is zero.
+
+**H/16 perihelion motion** enters the anomalistic year (Sun-perihelion return), not the tropical solar-day count that defines LOD.
+
+Only H/5 provides the correct reference-frame kinematic correction for the Sun's apparent motion.
+
+### The calibrated ΔT stack's role
+
+The raw H/5 kinematic prediction (86400.0032 s) overshoots the USNO J2000 anchor (86400.0018 s) by ~1.74 ms. The framework does not treat this as a defect of the raw physics — the raw H/5 term is a clean, parameter-free geometric statement about the ecliptic frame. Instead, the residual is absorbed by the framework's calibrated cyclic ΔT stack:
+
+- **CONFIG.usno_target_lod_s = 86400.0018 s** — the fit's soft-constraint J2000 LOD target, itself the joint-optimum over Espenak history (RMS ≈ 11.5 s across 20 reference years 1650–2017) rather than the raw ~86400.0016 s instantaneous IERS value.
+- **deltaTStart = 57.53 s** — the ΔT trend anchor at J2000. This is the long-term trend value the calibrated stack rides through the epoch, distinct from the IERS instantaneous observation of ΔT_J2000 ≈ 63.63 s (the trend line does not pass through the middle of an intra-decadal noise band).
+
+Both are propagated from `data/astro-reference.json` via Step 9 `export-to-script.js`. The fit itself is run by `tools/fit/dt-corrections-fit.js` (Step 6c of the pipeline) with automatic joint-optimum sweep (`--sweep-usno`). The calibrated stack's four cycles (Bond, Hallstatt, Jose5, Jose4) collectively contribute **−1.737 ms at J2000** (per current shipped fit — see `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s`) plus a ~11.5 s RMS envelope over 1650–2017 against Espenak; the sign of the net J2000 contribution comes out of the fit, not from a hand-chosen constraint.
+
+### Two internal LOD conventions
+
+| Concept | Definition | Where used |
+|:---|:---|:---|
+| **LOD_mean** (framework kinematic baseline) | `LOD_mean = T_sid_sec / (mSY × H/(H−13))` — H/13 identity, no H/5 correction, no ΔT-cycle contribution | `meanDeltaTSecondsAtAge` integrand + Bond/Hallstatt/Jose5/Jose4 cyclic stack → calibrated ΔT for Meeus geometry, eclipse code, live accumulator, tweakpane "ΔT correction" |
+| **raw H/5 kinematic** | `LOD_mean + LOD_mean/((H/5)·mSY)` — H/5 correction only, no ΔT cycles | Intermediate scalar shown as the calibrated stack's raw-physics baseline (the "V curve" near J2000 in `pureH5DeltaTAtAge`); reported alongside LOD_real for transparency |
+| **LOD_real** (Layer 3 composite, physical) | `LOD_mean + LOD_mean/((H/5)·mSY) + Σ δ_LOD,i` — H/5 correction PLUS calibrated ΔT cycle contributions | Physical LOD readout — tweakpane "Solar Day (L3 physical)", J2000 tables, USNO comparison. Matches USNO anchor exactly at J2000 by construction of the joint-optimum fit. |
+
+### Deep-time behaviour
+
+The raw H/5 kinematic correction `δ_LOD_H5 = LOD_mean/((H/5)·mSY)` **scales with LOD_mean** across deep time. Since mSY(t) ≈ TOTAL_DAYS_IN_H / H(t) (from the day-count near-invariant), the denominator `(H/5)·mSY(t) ≈ TOTAL_DAYS_IN_H / 5` is nearly constant, so the correction magnitude grows and shrinks with LOD_mean:
+
+```
+δ_LOD_H5(t) ≈ 5 × LOD_mean(t) / TOTAL_DAYS_IN_H
+```
+
+What IS constant is the **fractional correction** `δ_LOD_H5 / LOD_mean ≈ 5 / TOTAL_DAYS_IN_H ≈ 4.08 × 10⁻⁸` — a purely H-lattice-geometric ratio, independent of epoch. The absolute correction moves with LOD:
+
+| Age (Ma) | H (yr) | H/5 (yr) | LOD_mean (s) | δ_LOD_H5 (ms) | raw H/5 kinematic (s) |
+|---:|---:|---:|---:|---:|---:|
+| +200 | 350,665 | 70,133 | 90,354.6 | ~3.69 | ~90,354.604 |
+| 0 (anchor) | **335,317** | **67,063** | **86,400.000** | **3.527** | **86,400.003** |
+| −380 (Devonian) | 309,084 | 61,817 | 79,640.5 | ~3.25 | ~79,640.503 |
+| −1000 | 270,297 | 54,059 | 69,646.6 | ~2.84 | ~69,646.603 |
+
+(Non-J2000 rows are approximate; exact values require running the sim's deep-time state — the numbers are shown to first order to convey the LOD-linear scaling. The calibrated ΔT-stack contribution at deep-time epochs is not tabulated here; it is a small, slowly-varying quantity determined by the fit at each epoch and is negligible compared to LOD_mean(t) growth.)
+
+### Position in the framework taxonomy
+
+| Invariant / Relation | Form | Governed by | Status |
+|:---|:---|:---|:---|
+| Day-count near-invariant | `H × days/yr ≈ TOTAL_DAYS_IN_H` | Driver 1 + Driver 2 | Structural (Driver 2 residual) |
+| Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | Structural (definitional) |
+| Lunar Precession Invariant | `T_apsidal × H = const`, `T_nodal × H = const` | Driver 1 + Brown m² | Structural (0 ppm across epochs) |
+| **Raw H/5 LOD kinematic correction** | **`δ_LOD_H5 = LOD_mean/((H/5)·mSY)`** | **Driver 1 + ecliptic precession** | **Structural (parameter-free geometry); fractional correction 4.08 × 10⁻⁸, absolute 3.527 ms at J2000** |
+| **LOD_real (Layer 3 composite)** | **`LOD_real = LOD_mean + raw H/5 + Σ calibrated ΔT δ_LOD`** | **raw H/5 + calibrated Bond/Hallstatt/Jose5/Jose4 stack** | **Matches USNO 86400.0018 s exactly at J2000 by construction of the joint-optimum fit** |
+
+Cross-references: `pureH5DeltaTAtAge` in `src/script.js` (browser, raw H/5 baseline) and `meanDeltaTSecondsAtAge` in `tools/lib/deep-time.js` (Node lib mirror, calibrated stack); tweakpane bindings under Orbital → "ΔT (TT − UT1)" (raw H/5 curve), "ΔT correction (rel. J2000)" (calibrated stack) and "Solar Day (L3 physical)" (Layer 3 composite); chart config for `id: 'delta-t'`; component-breakdown diagnostic in Tools > Console Tests "ΔT Breakdown (H/5 physics vs Bond stack)".
 
 ## H value and LOD through geological time
 
@@ -1097,7 +1212,7 @@ These three equations together **derive the Moon's drift as a necessary conseque
 
 The PGR section above explains why PGR is **negligible for deep-time work** (>10⁵ yr) — it averages out over multiple ice-age cycles. But for the **historical eclipse window** (last 2-3 millennia, well within the Quaternary), PGR is the dominant *non*-tidal contributor to Earth's rotation evolution. Eclipse-timing data from this window can resolve effects of order 1-2 milliseconds in LOD that a pure-tidal model alone misses. The L-5b and L-7 validation work (lunar 270 events + solar 89 events from Stephenson, Morrison & Hohenkerk 2016) is anchored in this window and required a non-tidal correction to reach competitive accuracy.
 
-The correction is implemented as a **time-varying** Earth polar moment coefficient α(t), where α was previously treated as a constant (0.3306947, IERS Conventions 2010). It's no longer constant — it evolves under multi-mode Peltier viscoelastic relaxation. **Literature-cited constants from independent satellite/rheology measurements (Cox & Chao 2002, Peltier ICE-5G(VM2) 2004); zero parameters fitted to eclipse data.** (Note: PGR and GIA refer to the same physical process — post-glacial mantle reflow — viewed from the rotation-rate community vs the satellite-gravimetry community; both terms appear in this document and in the literature.)
+The correction is implemented as a **time-varying** Earth polar moment coefficient α(t), where α was previously treated as a constant (0.3306947, IERS Conventions 2010). It's no longer constant — it evolves through an **L1-orbital-coupled α(t)** correction: α is tied directly to the L1 orbital layer of the canonical Climate Formula, so the same orbital forcing that drives ice-mass cycles also drives Earth's polar moment on the same timescale. **Anchored on the Cox & Chao 2002 satellite measurement of dα/dt at J2000; zero parameters fitted to eclipse data.** (Note: PGR and GIA refer to the same physical process — post-glacial mantle reflow — viewed from the rotation-rate community vs the satellite-gravimetry community; both terms appear in this document and in the literature.)
 
 #### What α is and why it varies
 
@@ -1165,6 +1280,8 @@ Literature uncertainty: ±10% range across published estimates of dJ₂/dt (vari
 | Cox & Chao 2002 (LAGEOS, pre-ice-loss) | −2.7 × 10⁻¹¹ | **−1.8 × 10⁻¹¹** (our value) |
 | Cheng, Tapley & Ries 2013 (GRACE confirm) | −2.6 to −2.8 × 10⁻¹¹ | −1.7 to −1.9 × 10⁻¹¹ |
 | Roy & Peltier 2011 (alternative GIA models) | −3.0 × 10⁻¹¹ | −2.0 × 10⁻¹¹ |
+
+> **Historical framing note.** The following subsections (Constant 3, Multi-mode refinement, and The function form) describe the **initial multi-mode Peltier viscoelastic implementation** of α(t) — retained here for physical context, since it derives the mantle-relaxation timescales from first principles. The **current shipped implementation** is the L1-orbital-coupled form documented in **§Refinement: climate-driven α(t)** further below, which preserves the same Cox-Chao J2000 anchor and dα/dt calibration but replaces the mantle-mode relaxation with a direct coupling to the L1 orbital layer of the Climate Formula. That refinement (a) removes a derivative discontinuity at J2000 present in the earlier form, and (b) makes the Milankovitch α oscillation an emergent prediction rather than an assumed rheology.
 
 #### Constant 3 — GIA viscoelastic timescale: `GIA_DECAY_TIMESCALE_YR = 5000`
 
@@ -1255,7 +1372,7 @@ The 9000 s ΔT contribution at Babylonian era (year -720) is the central effect 
 
 #### Validation result
 
-With α(t) added to the framework, the model achieves a mean ΔT residual of **26.7 minutes against 267 valid primary-source lunar observations** (-720 BCE to 1280 CE, Stephenson, Morrison & Hohenkerk 2016 tables S01/S02/S04/S05/S07/S09), versus NASA Espenak/Meeus's polynomial 20.0 minutes against the same observations — a **6.7-minute gap on top of the ~20-min per-observation noise floor**. An independent solar cross-validation on 89 primary-source events (S03/S06/S08) gives model 16.6 min vs NASA 11.2 min. NASA's polynomial uses ~10+ empirical coefficients fitted to this exact dataset; our model uses literature-cited constants from independent satellite/rheology measurements (Cox & Chao 2002, Peltier ICE-5G(VM2) 2004) plus the L1 orbital layer of the canonical Climate Formula for the deep-time refinement. **Zero parameters fitted to eclipse data.**
+With α(t) added to the framework (initial multi-mode implementation; later refined to L1-orbital coupling), the model achieved a mean ΔT residual of **26.7 minutes against 267 valid primary-source lunar observations** (-720 BCE to 1280 CE, Stephenson, Morrison & Hohenkerk 2016 tables S01/S02/S04/S05/S07/S09) under that earlier configuration, versus NASA Espenak/Meeus's polynomial 20.0 minutes. **The current shipped state** — L1-orbital-coupled α(t) plus a jointly-calibrated trend anchor and 4-flag lattice stack against the Espenak 2006 ΔT polynomial 1650–2017 — reports **48.6 minutes mean \|residual\|** on the same 267 events. Both NASA Espenak/Meeus and Stephenson 2016 are polynomials fit to essentially this lunar dataset, so per-event residuals against either index fit quality against a smoothed representation of the observations rather than physical validity. The framework's independent validation is the **26-event eclipse alignment audit** on documented solar eclipses (see [doc 102](102-gia-alpha-lunar-validation.md) headline for both configurations and the current framing). Our model uses literature-cited constants from independent satellite gravimetry (Cox & Chao 2002 dα/dt anchor) plus the L1 orbital layer of the canonical Climate Formula for the deep-time coupling; the trend anchor and lattice-stack amplitudes/phases are calibrated against the Espenak 2006 ΔT polynomial as a documented design choice, not against eclipse data.
 
 #### Where the change lives
 

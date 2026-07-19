@@ -290,25 +290,29 @@ function solveCholesky(A, b, n) {
 //   (b) a small precession divisor (1..20 — Earth's Fibonacci named
 //       cycles H/3, H/5, H/8, H/13, H/16 etc. are structurally on-lattice
 //       by fiat even though their gcd with H is 1),
-//   (c) one of the two lunar precession divisors (18015, 37900),
-//   (d) a mid-range divisor that shares a non-trivial prime factor with H
-//       — H = 23·61·239, so multiples of 23, 61, or 239 qualify. This
-//       codifies the "gcd(d, H) > 1" principle stated in commit 9383161
-//       ("sun: Phase Z-B harmonics integration"). Newly-allowed mid-range
-//       candidates in the 21..200 sample range: 23, 46, 61, 69, 92, 115,
-//       122, 138 (~2430 yr ≈ Hallstatt), 161, 183, 184.
+//   (c) one of the two lunar precession divisors (auto-tracked from Meeus
+//       anchors via C.N_apsidalI, C.N_nodalI).
 // Divisors outside this set (gcd=1 mid-range) are silently skipped at
 // runtime — design-rule violating. If we fit terms outside the whitelist
 // here, they land in fitted-coefficients.json but are never applied —
 // a plumbing trap this helper prevents.
+//
+// 2026-07-15: Removed clause (d) "sharesFactorWithH". Under H values with
+// rich small-prime factorization (like H=335,320 = 2³·5·83·101), clause (d)
+// admitted mid-range divisors (84, 92, 115, 122) with amplitudes 400-600"
+// at ~3000-4000 yr periods. These are NOT physical (don't correspond to
+// any known perturbation cycle) — they're fit artifacts compensating for
+// Meeus-vs-framework long-period residual. The greedy algorithm picked
+// them up, shifting Sun position and cascading into Phase 1 optimizer
+// output (e.g. earthInvPlaneInclinationAmplitude shifted by ~90 arcsec).
+// Limiting to (a)+(b)+(c) keeps only physically-motivated harmonics.
 const H_ROUND = Math.round(C.H);
 function _gcdInt(a, b) { a = Math.abs(a); b = Math.abs(b); while (b !== 0) { const t = b; b = a % b; a = t; } return a; }
 function _isRuntimeWhitelisted(divisor) {
   const isYearMultiple      = divisor >= H_ROUND && divisor % H_ROUND === 0;
   const isPrecessionDivisor = divisor > 0 && divisor <= 20;
-  const isLunarPrecession   = divisor === 18015 || divisor === 37900;
-  const sharesFactorWithH   = _gcdInt(divisor, H_ROUND) > 1;
-  return isYearMultiple || isPrecessionDivisor || isLunarPrecession || sharesFactorWithH;
+  const isLunarPrecession   = divisor === C.N_nodalI || divisor === C.N_apsidalI;
+  return isYearMultiple || isPrecessionDivisor || isLunarPrecession;
 }
 
 // ─── Greedy harmonic selection ──────────────────────────────────────────────
@@ -451,11 +455,10 @@ function main() {
   //   (B) Planetary synodic periods (Jup-Sat, Mars-Earth, Venus-Earth, Mer-Earth):
   //       rounded to nearest H-lattice divisor.
   //   (C) Precession-scale divisors 2..20 (Earth Fibonacci named cycles).
-  //   (D) Lunar precession divisors (18015, 37900).
+  //   (D) Lunar precession divisors (auto-tracked from Meeus anchors
+  //       via C.N_apsidalI, C.N_nodalI).
   //   (E) Mid-range divisors 21..200 that share a prime factor with H
-  //       (H = 23·61·239): multiples of 23, 61, or 239 in that range.
-  //       Newly-added in the gcd-rule fix — these were blocked by the
-  //       previous coarse "d ≤ 20" bucket even though structurally on-lattice.
+  //       (H = 3²·5·7451): multiples of 3, 5, or 7451 in that range.
   // Nyquist filter: only keep candidates whose period fits ≥3 full cycles
   // in the sample range (high-freq) or ≤10× the sample range (low-freq).
   // FINAL filter: apply the runtime whitelist so we never emit a coefficient
@@ -473,10 +476,14 @@ function main() {
     allCandidates.add(Math.max(1, Math.round(C.H / p)));                     // (B) synodic
   }
   for (let k = 2; k <= 20; k++) allCandidates.add(k);                        // (C) precession scale (small)
-  allCandidates.add(18015); allCandidates.add(37900);                        // (D) lunar precession
-  for (let k = 21; k <= 200; k++) {                                          // (E) mid-range with gcd>1
-    if (_gcdInt(k, H_ROUND) > 1) allCandidates.add(k);
-  }
+  allCandidates.add(C.N_nodalI); allCandidates.add(C.N_apsidalI);            // (D) lunar precession (auto-tracked)
+  // Removed 2026-07-15: category (E) "mid-range gcd>1" candidates (21..200).
+  // These divisors admit mid-range fit artifacts (like 84, 92, 115, 122)
+  // whose amplitudes reach 400-600" but don't correspond to any physical
+  // perturbation cycle. Under H values with rich small-prime factorization
+  // (e.g. H=335,320 = 2³·5·83·101), category E would admit ~50 divisors —
+  // greedy would pick a few, shifting Phase 1 optimizer output cascadingly.
+  // Restricting to (A)+(B)+(C)+(D) keeps only physically-motivated harmonics.
   // Two-tier filter:
   //   HIGH-frequency candidates (period ≤ sampleSpan) must fit ≥3 cycles (Nyquist).
   //   LOW-frequency candidates (period > sampleSpan) capture slow drift: kept up

@@ -222,26 +222,31 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 #### 1.5.3 Dynamic Time Variables (Length of Day dependent)
 
+Naming taxonomy: `_Kinematic` = framework kinematic day units; `_Real` = physical LOD (with H/5 ecliptic missing-motion + DT cyclic corrections).
+
 | Variable | Description |
 |----------|-------------|
-| `o.lengthofDay` | Current solar day length (SI seconds) |
-| `o.lengthofsiderealDayRealLOD` | Current sidereal day length (SI seconds) |
-| `o.lengthofstellarDayRealLOD` | Current stellar day length (SI seconds) |
-| `o.lengthofsolarYear` | Current solar year length (days) |
-| `o.lengthofsolarYearSecRealLOD` | Current solar year length (SI seconds) |
-| `o.lengthofsiderealYear` | Current sidereal year length (SI seconds) |
-| `o.lengthofanomalisticYearRealLOD` | Current anomalistic year length (SI seconds) |
+| `o.lodKinematic` | Current epoch-specific kinematic day (SI seconds), = IAU_sid_sec / Fourier sid_days ≈ 86400.00030 s at J2000 |
+| `predictions.lodReal` | Physical LOD (Layer 3): `o.lodKinematic + h5Correction + dtCycleLodCorrectionSum`. Displayed as "Solar Day = REAL" in the Predictions panel. |
+| `o.siderealDayReal` | Current sidereal day length (SI seconds) |
+| `o.stellarDayReal` | Current stellar day length (SI seconds) |
+| `o.solarYearDays` | Current solar year length (days) |
+| `o.solarYearSeconds` | Current solar year length (SI seconds), = solarYearDays × lodKinematic |
+| `o.siderealYearDays` | Current sidereal year length (days) |
+| `o.siderealYearSeconds` | Current sidereal year length (SI seconds) — round-trip identity gives IAU value exactly |
+| `o.anomalisticYearDays` | Current anomalistic year length (days) |
+| `o.anomalisticYearSeconds` | Current anomalistic year length (SI seconds) |
 | `o.lengthofAU` | Current length of AU (km) - dynamic |
 
 #### 1.5.4 Dynamic Precession Cycles
 
 | Variable | Description |
 |----------|-------------|
-| `o.axialPrecessionRealLOD` | Current axial precession cycle (years) |
-| `o.inclinationPrecessionRealLOD` | Current inclination precession cycle (years) |
-| `o.perihelionPrecessionRealLOD` | Current perihelion precession cycle (years) |
-| `o.obliquityPrecessionRealLOD` | Current obliquity precession cycle (years) |
-| `o.eclipticPrecessionRealLOD` | Current ecliptic precession cycle (years) |
+| `o.axialPrecession` | Current axial precession cycle (years) — framework identity: H/13 |
+| `o.inclinationPrecession` | Current inclination precession cycle (years) — framework identity: H/3 |
+| `o.perihelionPrecession` | Current perihelion precession cycle (years) — framework identity: H/16 |
+| `o.obliquityPrecession` | Current obliquity precession cycle (years) — framework identity: H/8 |
+| `o.eclipticPrecession` | Current ecliptic precession cycle (years) — framework identity: H/5 |
 
 #### 1.5.5 Perihelion/Aphelion Dates
 

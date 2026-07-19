@@ -65,12 +65,19 @@ The panel closes on "×" click, Escape, or overlay click.
 
 ## Export for paper
 
-Two buttons in the header produce publication-grade SVG exports:
+Three buttons in the header produce publication-grade SVG exports:
 
 - **Export for Paper** — renders the current category to a clean SVG with the default `[−12 000, +12 000]` year range and the model + references, without the UI chrome. Uses the category's `paperRange`, `paperTitle`, `paperYRange`, and `paperYTicks` if defined.
 - **Export Cycles** — only visible for categories that have a `paperAlt` block (eccentricity and obliquity). Renders a much longer-baseline plot (e.g. eccentricity: −248 000 BC to +102 000 AD) to show the model's long-term oscillation cycles against La2004. Excludes the polynomial references (Meeus, Chapront) that diverge badly outside the century-scale window, and overlays a mean-value reference line.
+- **Export Recent** — only visible for categories that have a `paperRecent` block (currently: ΔT). Renders a zoomed 1650-2050 SVG so short-scale features (e.g. the 1900 ΔT dip) are readable. Same curves as the main chart, plus a dashed reference baseline (ΔT = 0) for visual grounding.
 
-Exports are triggered by `exportVFPPaper()` and `exportVFPPaperAlt()`. They open in a new tab as an SVG data URL; the reader can right-click to save or screenshot.
+Exports are triggered by `exportVFPPaper()`, `exportVFPPaperAlt()`, and `exportVFPPaperRecent()`. All three call the same `renderVFPPaperChartAlt(category, altConfig)` renderer with different config blocks — the "Recent" and "Cycles" variants pass `paperRecent` / `paperAlt` respectively. They open in a new tab as an SVG data URL; the reader can right-click to save or screenshot.
+
+### Charts consistency (2026-07-18)
+
+- **Tropical year modal** now shows SI 86400-s days (was accidentally displaying epoch-local LOD-days under deep-time, causing the model curve to overshoot Laskar going into the future). The model function was refactored to `evalYearFourier(year, MEAN_SOLAR_YEAR_J2000_DAYS, TROPICAL_YEAR_HARMONICS)` with a frozen J2000 baseline.
+- **Axial precession modal** made cross-consistent with the tropical-year modal: both now source the tropical year length from the same `TROPICAL_YEAR_HARMONICS` fit (previously the axial chart used a Step-6c cardinal-derivative fit that differed by ~1 s at J2000). The sidereal component uses `evalYearFourier(year, IAU_sidereal_J2000, SIDEREAL_YEAR_HARMONICS)`. Neither chart depends on the sim's current epoch.
+- **ΔT modal** — the model curve is the calibrated *trend* (H/5 physics + Bond/Hallstatt/Jose5/Jose4 stack), fit against Espenak history ~12 s RMS across 1650-2017 (2026-07-18 joint optimum). Reads ~57.5 s at J2000 (trend value passing through J2000), distinct from the IERS instantaneous observation of ~63.6 s.
 
 ## Reference formula catalogue
 

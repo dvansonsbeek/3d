@@ -74,9 +74,12 @@ Year-length variations are modelled as Fourier series around the derived means. 
 
 The tropical year is measured at the actual solstices and equinoxes (declination extrema and zero-crossings), NOT at RA crossings. The mean tropical year is the average of 4 cardinal point intervals: SS-to-SS, WS-to-WS, VE-to-VE, AE-to-AE.
 
-In the browser, `computeLengthofsolarYear(year)` computes the derivative of the cardinal point harmonic formula (CARDINAL_POINT_HARMONICS, 24 harmonics per type) and averages all 4 types.
+Two paths compute the tropical year:
 
-The simpler `TROPICAL_YEAR_HARMONICS` (12 terms) is fitted from the same data and used by the pipeline tools. It is not used at runtime in the browser — only the cardinal point derivative approach is authoritative.
+- `computeSolarYearDaysDirect(year)` — Step 6d direct year-length Fourier fit (TROPICAL_YEAR_HARMONICS, 12 terms). J2000-anchored to the CSV year-2000 measurement (365.24219037 at J2000). **This is the primary display path — used by the Predictions panel Solar Year (days) row and the modal tropical-year chart.**
+- `computeSolarYearDaysFromCardinals(year)` — analytical derivative of the cardinal-point harmonic formula (CARDINAL_POINT_HARMONICS, 24 harmonics per type, averaged over all 4 CPs). Kept for chart consistency in `charts/report` code paths that already display cardinal-point data.
+
+Both paths converge at year 2000 within ~2 μd (Step 6c fit residual vs Step 6d anchor).
 
 ### Sidereal Year (5 harmonics)
 
@@ -110,27 +113,47 @@ Given the three year lengths from above, all other time quantities are derived. 
 ```
 siderealYearSeconds = siderealYearJ2000 × 86400
         │
-        ▼  ÷ siderealYear(days) from Fourier
-  ┌─────────────────────────────────────────────────────┐
-  │ dayLength = siderealYearSeconds / siderealYear(days)│
-  └─────────────────────────────────────────────────────┘
+        ▼  ÷ siderealYear(days_kinematic) via H/13 identity
+  ┌──────────────────────────────────────────────────────────────┐
+  │ LOD_mean = siderealYearSeconds / siderealYear(days_kinematic)│
+  │          = 86399.999676 s at J2000                           │
+  │  ← the KINEMATIC baseline used throughout the sidereal↔      │
+  │    tropical conversion chain and the calibrated ΔT stack     │
+  └──────────────────────────────────────────────────────────────┘
         │
         ▼  × year lengths in days
   ┌─────────────────────────────────────────────────────┐
-  │ solarYearSec = solarYear(days) × dayLength          │
-  │ anomYearSec  = anomYear(days) × dayLength           │
+  │ solarYearSec = solarYear(days) × LOD_mean           │
+  │ anomYearSec  = anomYear(days) × LOD_mean            │
   └─────────────────────────────────────────────────────┘
         │
         ▼  Derived day types
   ┌─────────────────────────────────────────────────────┐
-  │ siderealDay = solarYearSec / (solarYearSec/86400+1)│
+  │ siderealDay = solarYearSec / (solarYearSec/86400+1) │
   │ stellarDay  = siderealDay + precession correction   │
   └─────────────────────────────────────────────────────┘
+
+Separately (physical/USNO branch — does NOT feed the derivation chain above):
+  ┌──────────────────────────────────────────────────────────┐
+  │ LOD_real = LOD_mean × (1 + 1/((H/5)·mSY)) + Σ DT cycles  │
+  │          = 86400.0018 s at J2000                         │
+  │  ← anchored at USNO 86400.0018 (joint-optimum vs Espenak,│
+  │    2026-07-18; see tools/fit/dt-corrections-fit.js       │
+  │    --sweep-usno for the {USNO × deltaTStart} sweep)      │
+  │    (used in Predictions panel LOD readout, pure-H/5 ΔT   │
+  │     V-curve, physical display — see § "The H/5 LOD       │
+  │     Correction")                                         │
+  └──────────────────────────────────────────────────────────┘
 ```
 
 ### Day Types
 
-**Solar day** — the time for the Sun to return to the same local meridian (noon to noon). The solar day varies throughout the year due to orbital eccentricity and obliquity (equation of time). The model computes the **length of day** (LOD) as `siderealYearSeconds / siderealYear(days)`, which gives the mean solar day for a given epoch (≈ 86,400 seconds at J2000). The LOD fluctuates over millennia as the sidereal year in days changes.
+**Solar day** — the time for the Sun to return to the same local meridian (noon to noon). The solar day varies throughout the year due to orbital eccentricity and obliquity (equation of time). The framework maintains **two mean-LOD values**:
+
+- **LOD_mean** = `siderealYearSeconds / siderealYear(days_kinematic)` ≈ 86399.999676 s at J2000 — the kinematic baseline used inside all sidereal↔tropical conversions and the calibrated ΔT correction stack.
+- **LOD_real** = LOD_mean + LOD_mean/((H/5) × mSY) + DT cycle sum = 86400.0018 s at J2000 — Layer 3: adds the H/5 ecliptic missing-motion correction (~3.5 ms) + Bond/Hallstatt/Jose5/Jose4 cyclic δLOD. USNO-anchored via joint optimum. Used in the user-facing physical LOD display.
+
+Both fluctuate over millennia as the sidereal year in days changes. See § "The H/5 LOD Correction" below.
 
 **Sidereal day** — the time for Earth to rotate 360° relative to the vernal equinox. Shorter than the solar day because Earth's orbital motion means the Sun drifts ~1°/day eastward, requiring extra rotation to reach the next noon. Formula:
 
@@ -142,11 +165,52 @@ siderealDay = solarYearSec / (solarYearSec / 86400 + 1)
 
 ### J2000 Day-Length Values
 
-| Quantity | Model value | IAU reference |
-|----------|-------------|---------------|
-| Mean solar day | 86400.000 s | 86400.000 s |
-| Sidereal day | 86164.091 s | 86164.091 s |
-| Stellar day | 86164.099 s | 86164.099 s |
+| Quantity | Model value | Reference |
+|----------|-------------|-----------|
+| Mean solar day — **LOD_mean** (H/13 identity) | 86399.999676 s | — (kinematic) |
+| Mean solar day — **LOD_real** (Layer 3: +H/5 + DT cycles, physical) | 86400.0018 s | 86400.0018 s (USNO joint-optimum anchor, 2026-07-18) |
+| Sidereal day | 86164.091 s | 86164.091 s (IAU) |
+| Stellar day | 86164.099 s | 86164.099 s (IAU) |
+
+See § "The H/5 LOD Correction" below for the distinction between the two mean solar day values.
+
+### The H/5 LOD Correction (Kinematic vs Physical)
+
+The framework maintains two distinct LOD values that differ by a small H/5-derived correction:
+
+**LOD_mean** — the kinematic baseline from the H/13 identity:
+```
+LOD_mean = siderealYearSeconds / (mSY × H/(H−13))
+         = 86399.999676 s at J2000
+```
+
+**LOD_real** (Layer 3) — the physical LOD, three-part construction:
+```
+LOD_real = o.lodKinematic + h5Correction(year) + dtCycleLodCorrectionSum(year)
+
+where:
+  o.lodKinematic     = IAU_sid_sec / Fourier_sid_days ≈ 86400.00030 s at J2000
+  h5Correction(year) = LOD_mean / ((H/5) × mSY)       ≈ 3.527 ms
+  dtCycleLodCorrectionSum = sum of Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (~−2.6 ms at J2000)
+```
+
+The H/5 correction represents Earth's need to rotate slightly MORE per solar day to catch the Sun on the meridian, because the Sun's apparent motion follows the ecliptic — which precesses at H/5 (the ecliptic precession cycle, ~67,063 yr). Over one solar day (= 1/mSY of one year), the ecliptic advances by 1/((H/5)·mSY) revolutions — requiring that many extra revolutions of Earth rotation:
+
+```
+δ_rev = 1 / ((H/5) × mSY)                                ≈ 4.083 × 10⁻⁸ rev/day
+δ_LOD = LOD_mean × δ_rev = LOD_mean / ((H/5) × mSY)      ≈ 3.527 ms per solar day
+```
+
+**Why H/5 (not H/3):** the correction's reference frame must be the Sun's apparent motion (which follows the ecliptic, precesses at H/5). The H/3 inclination precession applies to the invariable-plane frame, which is not the reference used for the solar-day counting.
+
+**Where each is used:**
+
+| LOD used | Purpose | Code path |
+|----------|---------|-----------|
+| **LOD_mean** | sidereal↔tropical conversions (day-count identity), calibrated ΔT correction integrand (Bond/Hallstatt/Jose4/5 stack expects this baseline), Meeus JD_UT → JD_TT, eclipse code, live accumulator | `meanDeltaTSecondsAtAge`, `updateDeltaT` |
+| **LOD_real** (Layer 3) | User-facing "physical" LOD display, pure-H/5 physics ΔT V-curve | `pureH5DeltaTAtAge`, Predictions panel LOD binding |
+
+**Why other H/N cycles don't appear as explicit corrections:** the H/13 axial precession is ALREADY implicit in LOD_mean via the `H/(H−13)` denominator (over H tropical years the sidereal frame counts H−13 years — the missing 13 IS the axial precession). Adding an explicit H/13 correction would double-count. H/8 obliquity is oscillatory (mean zero). H/16 perihelion motion contributes to the anomalistic year, not to the tropical-day counting relative to the Sun. Only H/5 (ecliptic precession) gives the correct reference for the Sun's apparent motion.
 
 
 ## Precession Periods (Coin Rotation Paradox)
@@ -175,14 +239,15 @@ The coin rotation paradox manifests at every timescale:
 
 ## J2000 Reference Values
 
-| Quantity | Model value | IAU reference |
-|----------|-------------|---------------|
-| Tropical year | 365.242190 days | 365.242190 days |
-| Sidereal year | 365.256363 days | 365.256363 days |
-| Anomalistic year | 365.259633 days | 365.259636 days |
-| Mean solar day | 86400.000 s | 86400.000 s |
-| Sidereal day | 86164.091 s | 86164.091 s |
-| Stellar day | 86164.099 s | 86164.099 s |
+| Quantity | Model value | Reference |
+|----------|-------------|-----------|
+| Tropical year | 365.242190 days | 365.242190 days (IAU) |
+| Sidereal year | 365.256363 days | 365.256363 days (IAU) |
+| Anomalistic year | 365.259633 days | 365.259636 days (IAU) |
+| LOD_mean (kinematic, H/13 identity) | 86399.999676 s | — |
+| LOD_real (Layer 3: physical, +H/5 correction + DT cycles) | 86400.0018 s | 86400.0018 s (USNO joint-optimum anchor, 2026-07-18) |
+| Sidereal day | 86164.091 s | 86164.091 s (IAU) |
+| Stellar day | 86164.099 s | 86164.099 s (IAU) |
 | Axial precession | 25,771 yr | 25,771 yr (instantaneous J2000 rate) |
 
 
@@ -236,10 +301,18 @@ The stellar day (rotation relative to fixed stars) exceeds the sidereal day (rot
 
 ### JavaScript (`script.js`)
 
-The tropical year uses the derivative of the cardinal point harmonics (24 harmonics per type, averaged over 4 types):
+The tropical year primary display path uses the direct year-length Fourier fit (Step 6d, TROPICAL_YEAR_HARMONICS, 12 terms):
 
 ```javascript
-function computeLengthofsolarYear(currentYear) {
+function computeSolarYearDaysDirect(currentYear) {
+  return evalYearFourier(currentYear, meansolaryearlengthinDays, TROPICAL_YEAR_HARMONICS);
+}
+```
+
+A secondary derivation via cardinal-point harmonics is kept for chart consistency:
+
+```javascript
+function computeSolarYearDaysFromCardinals(currentYear) {
   return (computeSolsticeYearLength(currentYear, 'SS') +
           computeSolsticeYearLength(currentYear, 'WS') +
           computeSolsticeYearLength(currentYear, 'VE') +

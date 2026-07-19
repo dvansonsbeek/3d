@@ -383,7 +383,7 @@ The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier t
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Initial Delta-T | `deltaTStart` | 63.63 s | Starting Delta-T value at model epoch |
+| Initial Delta-T | `deltaTStart` | 57.53 s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s = 86400.0018` at the joint optimum against Espenak, 2026-07-18). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
 
 ## Perihelion Longitude Formula Parameters
 

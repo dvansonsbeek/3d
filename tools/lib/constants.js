@@ -71,10 +71,12 @@ const systemResetN = modelParams.foundational.systemResetN || 0;  // 0..7: eccen
 // ═══════════════════════════════════════════════════════════════════════════
 
 const currentAUDistance = astroRef.physicalConstants.currentAUDistance;
-// Method B LOD anchor: multiplier is 86400.00001 (framework J2000 LOD), not 86400 SI.
-// Matches src/script.js:3355 so meanLengthOfDay derives to 86400.00001 exactly at J2000.
-// See memory `project_sim_website_alignment` for the invariant this preserves.
-const meanSiderealYearSeconds = astroRef.yearLengthRef.siderealYear * 86400.00001;
+// Pure IAU × 86400 (SI-second definition) = 31,558,149.7635 s. Physical sidereal
+// year in SI seconds. Divided by MEAN_SIDEREAL_YEAR_DAYS_KINEMATIC (framework's
+// own H/13-derived days count) gives the framework's MEAN LOD at J2000
+// (86399.99968 s under H=335,317) via the T_axial=H/13 identity.
+// Supersedes Method B (× 86400.00001), which was a hand-tuned shim.
+const meanSiderealYearSeconds = astroRef.yearLengthRef.siderealYear * 86400;
 const G_CONSTANT = astroRef.physicalConstants.G_CONSTANT;
 const MASS_RATIO_EARTH_MOON = astroRef.physicalConstants.MASS_RATIO_EARTH_MOON;
 const massRatioDE440 = astroRef.physicalConstants.massRatioDE440;
@@ -211,12 +213,16 @@ const balancedYear = perihelionalignmentYear - (temperatureGraphMostLikely * (H 
 const perihelionalignmentJD = Math.round(startmodelJD - (meanSolarYearDays * (startModelYearWithCorrection - perihelionalignmentYear)));
 const balancedJD = startmodelJD - (meanSolarYearDays * (startModelYearWithCorrection - balancedYear));
 const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meanSolarYearDays;
-// IAU sidereal-year J2000 anchor (365.256363004 d) instead of the kinematic
-// Fibonacci derivation. Matches src/script.js:3345 so meanLengthOfDay collapses
-// to the Method B LOD anchor 86400.00001 s exactly at J2000. The kinematic form
-// gave a ~150 ms/yr sidereal-year offset that leaked ~4 μs into meanLengthOfDay.
+// IAU sidereal-year J2000 anchor (365.256363004 d) — used as the Fourier
+// baseline for SIDEREAL_YEAR_HARMONICS. Do not change.
 const meanSiderealYearDays = astroRef.yearLengthRef.siderealYear;
-const meanLengthOfDay = meanSiderealYearSeconds / meanSiderealYearDays;
+// Framework's H-lattice sidereal year in days, derived from the T_axial = H/13
+// identity: T_sid = T_trop × H / (H − 13). This is the framework's own MEAN
+// prediction, independent of the IAU reference — used to anchor meanLengthOfDay.
+const meanSiderealYearDaysKinematic = meanSolarYearDays * H / (H - 13);
+// MEAN LOD at J2000: 86399.99968 s under H=335,317 (from H/13 identity).
+// Supersedes Method B (which anchored to 86400.00001 via a hand-tuned shim).
+const meanLengthOfDay = meanSiderealYearSeconds / meanSiderealYearDaysKinematic;
 const meanSiderealDay = (meanSolarYearDays / (meanSolarYearDays + 1)) * meanLengthOfDay;
 const meanStellarDay = (meanSiderealDay / (H / 13)) / (meanSolarYearDays + 1) + meanSiderealDay;
 const meanAnomalisticYearDays = (meanSolarYearDays / (perihelionCycleLength - 1)) + meanSolarYearDays;
@@ -224,18 +230,45 @@ const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + 
 const totalDaysInH = H * meanSolarYearDays;
 
 // ── Step size and grid year (derived from H and startmodelYear) ──────────
-const stepYears = modelParams.foundational.stepYears || 21;
+//
+// pickStepYears: auto-select a step that divides H exactly (required for phase
+// closure across one full cycle). Prefers divisors close to targetSamples,
+// within [3, 100] year range. Enables recalibration to any H without manual retuning.
+function pickStepYears(HL, targetSamples = 22000) {
+  const divs = [];
+  for (let d = 3; d * d <= HL; d++) {
+    if (HL % d === 0) { divs.push(d); if (HL / d !== d) divs.push(HL / d); }
+  }
+  const candidates = divs.filter(d => d >= 3 && d <= 100).sort((a, b) => a - b);
+  if (candidates.length === 0) return null;
+  const targetStep = HL / targetSamples;
+  return candidates.reduce((best, d) =>
+    Math.abs(d - targetStep) < Math.abs(best - targetStep) ? d : best
+  );
+}
+
+const _autoStep = pickStepYears(H);
+const stepYears = modelParams.foundational.stepYears || _autoStep || 21;
+if (H % stepYears !== 0) {
+  console.warn(`[constants] stepYears=${stepYears} does not divide H=${H}. Auto-suggestion: ${_autoStep}.`);
+}
 const gridYear = balancedYear + Math.round((2000 - balancedYear) / stepYears) * stepYears;
 const gridYearDeltaFromJ2000 = gridYear - 2000;
 
 // Cardinal point year fractions for initial search (derived from startmodelYear offset)
-// Maps calendar event to approximate year fraction from the model epoch
+// Maps calendar event to approximate year fraction from the model epoch.
+// The `VE` seed intentionally stays NEGATIVE (was previously wrapped positive
+// with `% 1`) so it lands on the CURRENT calendar year's VE (March, ≈92 days
+// before the June-solstice epoch) rather than the following year's. This makes
+// the CSV row where `seedModelYear === year` line up on the same calendar year
+// for all four cardinal points — see export-solar-measurements.js and the
+// `seedModelYear = Math.floor(...)` choice there.
 const _epochOffset = startmodelYear % 1;  // 0.5 for mid-year epoch
 const cardinalPointYearFractions = {
-  SS: 0.47 - _epochOffset,                   // June solstice
-  WS: 0.97 - _epochOffset,                   // December solstice
-  VE: ((0.22 - _epochOffset) % 1 + 1) % 1,  // March equinox (wrap if negative)
-  AE: 0.73 - _epochOffset,                   // September equinox
+  SS: 0.47 - _epochOffset,   // June solstice (≈+0.5, next-summer or before-epoch)
+  WS: 0.97 - _epochOffset,   // December solstice (≈+0.47, later-same-year)
+  VE: 0.22 - _epochOffset,   // March equinox (≈-0.28, earlier-same-year — do not wrap positive)
+  AE: 0.73 - _epochOffset,   // September equinox (≈+0.23, later-same-year)
 };
 
 // Shifted IAU values at grid year (for harmonic fitting when grid ≠ J2000)
@@ -632,6 +665,7 @@ module.exports = {
   balancedYear,
   balancedJD,
   stepYears,
+  pickStepYears,
   gridYear,
   gridYearDeltaFromJ2000,
   cardinalPointYearFractions,
@@ -641,6 +675,7 @@ module.exports = {
   systemResetN,
   eccentricityAnchor,
   meanSiderealYearDays,
+  meanSiderealYearDaysKinematic,
   meanLengthOfDay,
   meanSiderealDay,
   meanStellarDay,

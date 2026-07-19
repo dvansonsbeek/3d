@@ -52,11 +52,11 @@ function readSSData() {
     }
   }
 
-  // Downsample: every stepYears-th point (same RMSE, much faster fitting)
+  // Downsample: J2000-anchored (filter (year - 2000) % step === 0 so year 2000
+  // lands on the sampling line — matches year-length + cardinal-point fits).
   const step = C.stepYears || 20;
-  const data = [];
-  for (let i = 0; i < allSS.length; i += step) data.push(allSS[i]);
-  console.log(`Downsampled: ${allSS.length} → ${data.length} points (step=${step})`);
+  const data = allSS.filter(r => ((r.year - 2000) % step + step) % step === 0);
+  console.log(`Downsampled (J2000-anchored): ${allSS.length} → ${data.length} points (step=${step})`);
   return data;
 }
 

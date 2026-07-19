@@ -40,7 +40,11 @@ BALANCED_YEAR = 1246.03125
 # Mainstream tidal-LOD constants
 MODERN_LOD_S = 86400.0
 TIDAL_LOD_RATE_MS_PER_CENTURY = 2.3   # IERS / lunar laser ranging
-EARTH_PRECESSION_PERIOD_YR = 25771.5  # modern, Hipparchus → modern measurements
+# IAU-derived precession: sid_days / (sid_days − trop_days) — auto-updates with IAU reference values
+_IAU_SIDEREAL_YEAR_DAYS = 365.256363004
+_IAU_TROPICAL_YEAR_DAYS = 365.2421897
+EARTH_PRECESSION_PERIOD_YR = _IAU_SIDEREAL_YEAR_DAYS / (_IAU_SIDEREAL_YEAR_DAYS - _IAU_TROPICAL_YEAR_DAYS)
+# ≈ 25,770.7280535361 yr
 
 
 def load_la2004():

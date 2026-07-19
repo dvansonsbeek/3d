@@ -41,6 +41,20 @@ skipped, only the 3 year-multiple terms (1 yr, ½ yr, ⅓ yr) and any future
 lunar-precession or small-precession-divisor terms are applied. Sun-only
 application (NOT barycenter) keeps planet baselines pristine. See Step 0.
 
+**Status 2026-07-15:** Sun harmonic whitelist further tightened. Previously
+clause (d) `sharesFactorWithH` (gcd(d, H) > 1) admitted mid-range divisors
+like 84, 92, 115, 122 with 400-600" amplitudes at ~3000-4000 yr periods —
+these are **fit artifacts** (empirical residual compensation), not
+physically-motivated cycles. Under H values with rich small-prime
+factorization (e.g. H=335,320 = 2³·5·83·101), clause (d) admitted many such
+divisors, silently shifting Phase 1 optimizer outputs (earthInvPlaneInclinationAmplitude
+drifted by 90 arcsec, correctionSun by ~0.6 arcsec). Clause (d) has been
+**removed** from all three whitelist sites: `tools/fit/sun-longitude-harmonics.js`,
+`src/script.js#sunLongitudeCorrection`, and `tools/lib/scene-graph.js`.
+Sun harmonics are now strictly limited to (a) year-multiples of H, (b) small
+precession divisors 1..20, and (c) lunar-precession divisors. Any future
+Sun fit will produce a clean 3-term physical fit regardless of H.
+
 **Allowed exception:** standalone consumer-side calls (e.g. `_eclSunLon`
 for one-off eclipse longitude reads) MAY keep Meeus polynomial terms —
 they are short-window calculations consumed at a single epoch, not part
@@ -195,7 +209,7 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `../../scripts/lattice_harmonic_scan.py` | `data/lattice-scan-<tag>.json` — universal 8H-lattice harmonic scan across multiple paleoclimate archives (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem δ18O, EPICA CO2, LR04 δ18O). Enumerates gcd-compliant divisors in a period band, fits each candidate against each dataset, ranks by cross-dataset consistency. Used to identify Jose4 (4×Jose 715 yr) as the 4th flag with cross-archive coherence. | Multiple paleoclimate proxies in `data/` and `public/input/` |
 | `export-dt-corrections.js` | Patches `BOND_/HALLSTATT_/JOSE5_ COS_/SIN_COEFF_S` (and `_LATTICE_N`) in `src/script.js`, `tools/lib/deep-time.js`, and website `deepTime.ts`. Also exposes an in-memory API (`loadFitJson`/`applyToSource`) used by `export-to-script.js` and `export-to-holistic.js` as a delegated tail step. | `data/deltaT-4flag-fit.json` |
 | `export-to-script.js` | Syncs all JSON values → `src/script.js` (includes DT correction constants via `export-dt-corrections.js` delegate) | 4 JSON files in `public/input/` + `data/deltaT-4flag-fit.json` if present |
-| `export-to-holistic.js` | Syncs all values → Holistic website repo (manual, not in pipeline). Includes `deepTime.ts` DT constants via delegate. | `fitted-coefficients.json` + `model-parameters.json` + `data/balance-presets.json` + `data/significance-results.json` + `data/deltaT-4flag-fit.json` if present |
+| `export-to-holistic.js` | Syncs all values → Holistic website repo (manual, not in pipeline). Covers `constants.ts` (harmonics + fitted scalars), `cardinalPointHarmonics.ts`, `coefficients.ts` (7×2421 terms + `planets.ts buildFeatures`), `deepTime.ts` DT constants (via `export-dt-corrections.js` delegate), and — as of 2026-07-18 — astro-reference scalar anchors (`DELTA_T_START_SECONDS`, `PERIHELION_ALIGNMENT_YEAR`) sourced from `public/input/astro-reference.json`. See **"Syncing to Holistic"** section below for the full command sequence. | `fitted-coefficients.json` + `model-parameters.json` + `data/balance-presets.json` + `data/significance-results.json` + `data/deltaT-4flag-fit.json` if present + `public/input/astro-reference.json` |
 | `reclassify-tiers.js` | Tier reclassification + JPL enrichment of Tier 1 data | `data/reference-data.json` |
 | `verify-pipeline.js` | Pass/fail verification of all 9 targets + correction stack | Scene-graph simulation |
 
@@ -203,6 +217,66 @@ Note: `eocEccentricity` and `perihelionPhaseOffset` are derived analytically in
 `constants.js` and require no pipeline step. The historical numerical-verification
 scripts (`eoc-constants.js`, `perihelion-offset.js`) now live in
 [`tools/explore/`](../explore/).
+
+## Syncing to Holistic
+
+The Holistic website (`/home/dennis/code/Holistic/holisticuniverse`) mirrors the
+simulator's fitted coefficients and scalar anchors so that the orbital calculator,
+MDX pages, and paper macros display values that agree with the 3D simulator. The
+sync is **not part of the automated pipeline** — run it manually after Step 9.
+Failing to run it results in silent drift: the website continues to ship the
+previous fit's numbers.
+
+### Command sequence
+
+```bash
+# 3D repo — sync all values to Holistic (dry-run first)
+cd /home/dennis/code/3d
+node tools/fit/export-to-holistic.js            # dry-run, preview changes
+node tools/fit/export-to-holistic.js --write    # apply
+
+# Holistic repo — regenerate the derived model-values JSON and paper macros
+cd /home/dennis/code/Holistic/holisticuniverse
+pnpm run values:generate                        # refreshes src/data/model-values.generated.json
+npx tsx docs/paper/generate-tex-values.ts       # refreshes docs/paper/model-values.tex
+```
+
+The `values:generate` step is idempotent — it content-compares against the
+existing JSON and no-ops when nothing changed. `predev` and `prebuild` also
+call it automatically, so if you're about to start `pnpm run dev` you can
+skip the explicit call. The paper `.tex` regeneration has no auto-trigger
+and must be run by hand when compute.ts changes.
+
+### What each step does
+
+- **`export-to-holistic.js --write`** — writes Holistic's `src/lib/orbital/{constants,coefficients,cardinalPointHarmonics,deepTime}.ts` from the current fit JSONs + `public/input/astro-reference.json`. Delegates the 12 DT correction constants to `export-dt-corrections.js` (same helper the 3D script uses). Content-compares each field and only rewrites what actually changed.
+- **`pnpm run values:generate`** — runs `scripts/generate-model-values.mjs` on the Holistic side, which evaluates `src/data/model-values.compute.ts` and writes `src/data/model-values.generated.json`. This is the JSON that MDX pages read via `<V k="..."/>` tags. Downstream of `constants.ts` / `deepTime.ts` / `dayLength.ts`, so must run *after* export-to-holistic completes.
+- **`npx tsx docs/paper/generate-tex-values.ts`** — regenerates `docs/paper/model-values.tex` (the `\Mv…` macro file) from the same `MODEL_VALUES` registry. Not auto-triggered; must run by hand when compute.ts or its upstream inputs change.
+
+### What gets synced
+
+| Target file (in Holistic) | Content | Written by |
+|---|---|---|
+| `src/lib/orbital/constants.ts` | Harmonics, planetary orbital elements, ΔT trend anchor (`DELTA_T_START_SECONDS`), perihelion-alignment year, other scalars | `export-to-holistic.js` |
+| `src/lib/orbital/cardinalPointHarmonics.ts` | Cardinal-point Fourier terms (4×24) | `export-to-holistic.js` |
+| `src/lib/orbital/coefficients.ts` | Prediction coefficients (7×2421) + `planets.ts` buildFeatures | `export-to-holistic.js` |
+| `src/lib/orbital/deepTime.ts` | Bond/Hallstatt/Jose5/Jose4 correction constants (12 total: LATTICE_N + COS_COEFF_S + SIN_COEFF_S per cycle) | delegated to `export-dt-corrections.js` |
+| `src/data/model-values.generated.json` | 757 derived display keys (day/year lengths, precession rates, orbital elements at J2000, etc.) | `pnpm run values:generate` |
+| `docs/paper/model-values.tex` | ~500 `\Mv…` LaTeX macros used in the paper | `npx tsx docs/paper/generate-tex-values.ts` |
+
+### When drift happens (and how to catch it)
+
+`export-to-holistic.js` reports "unchanged" for every field it checks — so
+a first run after a refit shows exactly which values shifted. Running it
+regularly (or wiring it into a post-fit hook) prevents the drift-then-audit
+cycle. Specific stale-value classes we've hit before:
+
+- **Fourier harmonics** (`TROPICAL_YEAR_HARMONICS`, `SIDEREAL_YEAR_HARMONICS`, `OBLIQUITY_HARMONICS`, `PERI_HARMONICS`, cardinal-point terms) — if the fit re-runs but the sync doesn't, downstream J2000 day-length values drift by ~10s of seconds.
+- **ΔT stack** (`BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S`) — silent, because deepTime.ts imports directly and the calculator page uses `calcDeltaT` → `meanDeltaTSecondsAtAge`. A stale DT stack shifts ΔT at year 1000 by hundreds of seconds.
+- **`DELTA_T_START_SECONDS`** — the ΔT trend anchor. Auto-updated by `dt-corrections-fit.js --sweep-usno`; if not synced, Holistic's absolute-ΔT displays disagree with the simulator's tweakpane by the Δ between the old and new joint-optimum values.
+- **Prediction coefficients** (`COEFFICIENTS`) — 2421-term arrays per planet. Stale coefficients silently mis-predict planetary positions in the calculator by up to arcminutes.
+
+The `pnpm run values:generate` step catches drift *indirectly* — it re-derives every J2000 value from the (already-synced) primitives, so out-of-sync sources cascade through. This is why running it as the last step is essential.
 
 ## Dependency chain
 
@@ -263,9 +337,23 @@ Step 0:  SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --wr
 
          Why this is "Step 0" rather than a regular fitting step:
          - Coefficients are stable across normal refits — re-run only
-           when H, the eccentricity definition, or the underlying physics
-           reference (Meeus Ch.25) changes. (Same "stable across normal
-           refits" pattern as fibonacci_significance.py / Step 7d.)
+           when one of these foundational inputs changes:
+             · `holisticyearLength` (H) — the H-lattice whitelist and
+               the year-multiple seed harmonics all shift with H.
+             · `perihelionalignmentYear` or `balancedYear` — the phase
+               anchor for every harmonic term moves.
+             · `eccentricityBase` / `eccentricityAmplitude` — the
+               framework-vs-Meeus eccentricity gap that produces the
+               dominant ~280" annual harmonic shifts.
+             · `moonApsidalPrecessionDaysInputICRF` /
+               `moonNodalPrecessionDaysInputICRF` — the auto-derived
+               `N_apsidal` / `N_nodal` divisors on the whitelist shift.
+             · Meeus Ch.25 (`_eclSunLon`) or Ch.47 (`_meeusMoonLon`)
+               reference reformulation.
+             · `SUN_HARMONICS_ENABLED` toggle between framework-native
+               and Meeus-parity modes.
+           (Same "stable across normal refits" pattern as
+           fibonacci_significance.py / Step 7d.)
          - Running it FIRST means Step 1 calibrates correctionSun with
            harmonics already applied → single-pass convergence. If 6f
            ran after Step 1 (legacy order), Step 1 would need to re-run
@@ -330,8 +418,8 @@ Step 3:  Export from browser GUI              → data/01-holistic-year-objects-
               is below ML training noise).
            5. Set the range fields in the test panel:
                 Test mode:    Range
-                Range Start:  -108814024         (JD; model year -302635, date -302629-06-10)
-                Range End:     13657896          (JD; model year  +32682, date  32681-12-12)
+                Range Start:  -108814024         (JD; model year -302635 = balancedYear)
+                Range End:     13657896          (JD; model year  +32682 = balancedYear + H)
                 Range Pieces:  335318            (= H + 1; first and last JD are the
                                                  SAME phase position in the H cycle —
                                                  H-period closure point, so 335,317
@@ -339,7 +427,7 @@ Step 3:  Export from browser GUI              → data/01-holistic-year-objects-
            6. Click Analysis → Export Objects Report. Long-running (minutes
               to hours depending on machine). Output is a TSV trio
               `Holistic_objects_*.tsv` (large dataset path), since the
-              335,318-row export exceeds the 5000-row Excel threshold.
+              335,387-row export exceeds the 5000-row Excel threshold.
            7. Rename / save the perihelion data as
               `data/01-holistic-year-objects-data.xlsx` (overwriting the
               existing file). The Python training scripts auto-downsample
@@ -594,7 +682,20 @@ Step 7b: balance-search.js                    → balance-presets.json
          Writes data/balance-presets.json (synced to script.js by Step 9).
          Count changes when eccentricity values change (affects w = √(m·a(1-e²))/d).
 
-Step 7c: verify-laws.js                       → pass/fail
+Step 7c: dt-corrections-fit.js                → data/deltaT-4flag-fit.json
+         Fits the 4-flag sub-Milankovitch ΔT correction stack (Bond +
+         Hallstatt + Jose5 + Jose4) against the Stephenson 2016 residual.
+         Requires DT_CORRECTIONS_DISABLED=1 env so the residual reflects the
+         raw pure-tidal framework, not framework + previously-shipped
+         corrections. Bond uses solo-fit phase; Hallstatt/Jose5/Jose4 use
+         cap-only shipping (free-fit if below prior amplitude, scaled down
+         to prior only if free > prior). See docs/102 § "Companion 8H
+         lattice harmonics" and dt-corrections-fit.js header comment.
+         Only re-run when H or the tidal LOD anchor changes (H change
+         shifts the framework model ΔT curve, altering the residual to fit).
+         Automated in the pipeline as of 2026-07-15.
+
+Step 7d: verify-laws.js                       → pass/fail
          Verifies Laws 2 (inclination amplitude), 3 (inclination balance),
          and 5 (eccentricity balance). All must pass.
          Key targets:
@@ -607,7 +708,7 @@ Step 7c: verify-laws.js                       → pass/fail
          For per-planet sensitivity decomposition of the residual balance
          gaps, see tools/verify/dual-balance-optimizer.js and doc 19.
 
-Step 7d: fibonacci_significance.py            → data/significance-results.json
+Step 7e: fibonacci_significance.py            → data/significance-results.json
          Monte Carlo + permutation significance test for the Fibonacci structure.
          11 tests across 3 null distributions (permutation, log-uniform MC,
          uniform MC); 100,000 trials per MC null. Of the 11 tests, 7 are
@@ -755,7 +856,7 @@ The cardinal-point-derived tropical year (Step 6c) is the authoritative runtime 
 | `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a→6d |
 | `earthInvPlaneInclinationMean` | 3, 6a→6d |
 | `correctionSun` | 1, 6a→6d |
-| `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | **Step 0 is the source.** Re-run Step 0 only when H, the eccentricity definition, or Meeus reference changes — then re-run the full pipeline (1 → 2 → … → 9) so all downstream steps re-calibrate against the new Sun frame. The harmonics are NOT re-fit as part of ordinary refits. Runtime H-lattice filter automatically skips design-rule-violating divisors. |
+| `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | **Step 0 is the source.** Re-run Step 0 (`SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write`) when any of these change: (a) `holisticyearLength` — the H-lattice divisor whitelist and the year-multiple seed harmonics all shift; (b) `perihelionalignmentYear` or `balancedYear` — the phase anchor moves; (c) `eccentricityBase` / `eccentricityAmplitude` — the ~8% Meeus vs framework eccentricity gap shifts, changing the ~280" annual harmonic amplitude; (d) `moonApsidalPrecessionDaysInputICRF` / `moonNodalPrecessionDaysInputICRF` — the auto-derived N_apsidal / N_nodal divisors on the whitelist shift; (e) `_eclSunLon` (Meeus Ch.25) or `_meeusMoonLon` change; (f) `SUN_HARMONICS_ENABLED` toggles between framework-native and Meeus-parity mode. After Step 0 --write, re-run the full pipeline (1 → 2 → … → 9) so all downstream steps re-calibrate against the new Sun frame. The harmonics are NOT re-fit as part of ordinary refits. Runtime H-lattice filter automatically skips design-rule-violating divisors. |
 | ~~Sun T² polynomial (inline in `moveModel`)~~ | **REMOVED 2026-06** — violates design rule (polynomial-in-T not cyclic). Do not re-introduce. |
 | `eccentricityBase` / `eccentricityAmplitude` | **0, 1, 3→4a, 6a→6d** (re-fit Step 0 because eccentricity gap definition changed; then re-run pipeline) |
 | `correctionDays` | 3, 6a→6d |
@@ -776,7 +877,11 @@ Also update `stepYears` to a value that divides H evenly (factorize H to find op
 All derived values (balancedYear, meanSolarYearDays, cycle periods, etc.) are
 computed automatically in `constants.js` — no per-script updates needed.
 
-Current: H=335,317 (= 23 × 61 × 239), stepYears=23.
+Current: H=335,317 (= 23 × 61 × 239), stepYears=23. H is prime-poor (only three
+distinct prime factors), so the small-integer divisors used by the framework
+(H/3 = 111,772.3̄, H/5 = 67,063.4, H/8 = 41,914.625, H/13 = 25,793.6̄,
+H/16 = 20,957.3125) are non-integer — the H/8-snapped `mean_solar_year`
+matches IAU 365.2422 d to 10 decimals.
 
 ## How to run
 
@@ -784,12 +889,42 @@ All scripts default to **dry run** (print only). Add `--write` to update JSON fi
 Run `export-to-script.js --write` to sync JSON values to `src/script.js`.
 This can be done after each `--write` step, or once at the end — it patches all diffs in one pass.
 
+### Pre-requisite — JSON → script.js sync after foundational-constant edits
+
+If you have just edited one of the source-of-truth JSON files
+(`public/input/model-parameters.json`, `public/input/astro-reference.json`)
+— e.g. changing `holisticyearLength`, `inputmeanlengthsolaryearindays`,
+`correctionDays`, `perihelionalignmentYear`, or any Meeus/IAU anchor —
+**run `export-to-script.js --write` FIRST** so `src/script.js` mirrors the
+new JSON state before any pipeline step touches it:
+
+```bash
+node tools/fit/export-to-script.js --write   # Sync JSON → script.js (pre-Phase 0)
+```
+
+Why this matters:
+- The Node pipeline (`tools/lib/constants.js`) reads JSON directly, so it
+  always sees the new values.
+- The browser (`src/script.js`) has its own top-level `const` declarations
+  that mirror the JSON — but they don't auto-update. If you skip this sync,
+  Phase 2 (browser export) runs against a stale H / mean-solar-year and the
+  resulting `data/01-holistic-year-objects-data.xlsx` mismatches every
+  downstream fit.
+- Running this pre-sync is idempotent: if script.js is already in sync,
+  the tool reports "no changes" and exits.
+- The tool is auto-invoked again in Step 2-sync after Phase 1 optimizers
+  update per-planet `startpos` — that later invocation will also carry
+  any leftover JSON diffs.
+
+This step is a no-op on routine refits (JSON unchanged) but essential when
+foundational constants have been re-derived (e.g. an H recalibration).
+
 ### Automated pipeline runner
 
 Instead of running each step manually, use `run-pipeline.js`:
 
 ```bash
-node tools/fit/run-pipeline.js --phase1        # Steps 1-2 only (~15 sec)
+node tools/fit/run-pipeline.js --phase1        # Steps 1-2 only (~2 min)
 node tools/fit/run-pipeline.js --phase2        # Steps 4a-10 (~2.5 hrs, requires Step 3 data)
 node tools/fit/run-pipeline.js --all           # Steps 1-2, then 4a-10
 node tools/fit/run-pipeline.js --from 5a       # Resume from Step 5a onwards
@@ -800,6 +935,17 @@ node tools/fit/run-pipeline.js --converge      # Repeat Steps 5a-5b until improv
 Output is logged to `tools/results/pipeline.log`. Stops on any step failure.
 Step 3 (browser export) is always manual — the runner checks the data file exists.
 
+**Observed timings (2026-07-15 H=335,317 recalibration):**
+- Phase 1 (Steps 1-2): **~2 min** (8 optimizers, first run needs `baseline sun` JPL cache refresh)
+- Step 4a (Perihelion harmonics): **~7 min**
+- Steps 4b-d (ML training): **~10 min combined**
+- Steps 5a-c (Planet corrections): **~1 min combined**
+- **Step 6a (CSV export): ~2 hours** — this is the pipeline bottleneck. Default step timeout raised to 3 h.
+- Step 6b (Obliquity): ~90 sec
+- **Step 6c (Cardinal-point): ~40 min** — greedy fit × 4 CPs × 24 harmonics per CP. Default step timeout was 10 min (too short); raised to 60 min. Observed to complete in ~30 min.
+- Steps 6d-10 (year-length, balance, verify, export, dashboard): ~5-10 min combined
+- **TOTAL Phase 2: ~2.5-3 hours** dominated by Step 6a.
+
 The `--iterate` / `--converge` flags repeat the planet correction fitting steps (5a parallax →
 5b gravitation + elongation) iteratively. Each pass, the parallax sees cleaner residuals
 and reallocates its terms, allowing the elongation correction to capture more signal.
@@ -809,6 +955,11 @@ The Moon step (5c) runs once after the iteration completes.
 ### Manual step-by-step
 
 ```bash
+# Pre-requisite: sync JSON → script.js after any foundational-constant edit
+# (H, mean_solar_year, correctionDays, perihelionalignmentYear, Meeus/IAU anchors).
+# No-op if src/script.js is already in sync with JSON.
+node tools/fit/export-to-script.js --write                                   # Pre-Phase 0
+
 # Phase 0: Pre-fit Sun harmonic structure (prerequisite, run once)
 # Skip on routine refits — coefficients are stable. Re-run only when H,
 # eccentricity definition, or Meeus reference changes. Disable existing

@@ -30,7 +30,11 @@ import numpy as np
 H_NOW = 335317
 EIGHT_H_NOW = 8 * H_NOW
 LOD_NOW_S = 86400.0
-PRECESSION_NOW_YR = 25771.5
+# IAU-derived: sid_days / (sid_days − trop_days) — auto-updates with IAU reference values
+_IAU_SIDEREAL_YEAR_DAYS = 365.256363004
+_IAU_TROPICAL_YEAR_DAYS = 365.2421897
+PRECESSION_NOW_YR = _IAU_SIDEREAL_YEAR_DAYS / (_IAU_SIDEREAL_YEAR_DAYS - _IAU_TROPICAL_YEAR_DAYS)
+# ≈ 25,770.7280535361 yr
 
 # Paleo-LOD data points compiled in doc 97 Test C-PaleoLOD
 # (geological_age_Ma, lod_hours, uncertainty, source)

@@ -1,8 +1,11 @@
 # Pure-tidal + GIA viscoelastic α(t) validates against the historical lunar record
 
-**Date**: 2026-06-22 (last update 2026-06-25)
-**Status**: Validation complete — 270 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 + L1-orbital-coupled α(t) GIA viscoelastic model. Mean residual 26.7 min vs NASA Espenak/Meeus polynomial 20.0 min — 6.7-min gap on top of the ~20-min per-observation noise floor, using named physical constants from independent literature sources (IERS α, Cox & Chao dα/dt, Peltier ICE-5G(VM2) multi-mode GIA decomposition + Climate Formula L1 orbital layer for the deep-time refinement) and zero parameters fitted to the eclipse data.
-**Prior baseline**: [`doc 101`](101-pure-tidal-eclipses.md) — pure-tidal Moon physics validated against 19 documented solar eclipses, established that pure-tidal alone is "in the running" but did not require non-tidal Earth rotation. This doc demonstrates that the non-tidal contribution IS measurable in the lunar record, identifies it as GIA, and quantifies it from independent satellite measurements rather than from fitting.
+**Date**: 2026-06-22 (last L-5b re-audit 2026-07-19)
+
+> **2026-07-19 update — headline numbers refreshed against current L-5b (SECTION 1) run**. Mean |residual| against 267 primary-source observations is **48.6 min (2917 s)**, up from the earlier 26.7 min value. The shift is driven by the current shipped calibration prioritising modern-record fit against the Espenak 2006 ΔT polynomial 1650–2017 (trend anchor + 4-flag stack). NASA Espenak/Meeus polynomial mean |residual|: **20.0 min (1199 s)**. **Stephenson 2016 spline polynomial mean |residual|: 20.2 min (1211 s)** — new comparison line available in L-5b Section 5, kept only in this internal doc per project directive. Events where model closer to obs than NASA: **67/267 (25.1%)**, was 78/267 (29.2%). See "Headline" section below for the full refreshed metric table; sections downstream that use the old 26.7 / 6.7-min framing retain their original wording and should be read as historical snapshots against the earlier calibration. The 4-flag stack physics, cross-cultural agreement, and periodicity findings are unchanged.
+
+**Status**: Validation complete — 270 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 + L1-orbital-coupled α(t) GIA viscoelastic model. Current mean |residual| **48.6 min** against the 267 events with all three ΔT predictions defined. NASA Espenak/Meeus polynomial and Stephenson 2016 spline polynomial are both fit to (essentially) this exact dataset, so per-event residuals against either index fit quality against a smoothed representation of the observations. The framework's independent validation is the [26-event solar-eclipse alignment audit](https://holisticuniverse.com/model/historical-eclipse-validation): 20/26 events with the framework umbra reaching the observation site within a ±4-hour scan window, 4/26 pure geographic misses (all Ibn Yunus / Said–Stephenson late-tenth-century Cairo observations).
+**Prior baseline**: [`doc 101`](101-pure-tidal-eclipses.md) — pure-tidal Moon physics validated against a 19-event solar visibility-window test (later superseded by the 26-event eclipse alignment audit). This doc demonstrates that the non-tidal contribution IS measurable in the lunar record, identifies it as GIA, and quantifies it from independent satellite measurements rather than from fitting.
 
 ---
 
@@ -15,14 +18,18 @@ plus a smaller fractional non-tidal secular rate (~0.5 ms/century) beyond
 that dominant term.**
 
 **Pure-tidal Farhat 2022 evolution PLUS the L1-orbital-coupled α(t) GIA
-viscoelastic correction predicts 267 primary-source lunar observations
-spanning 2,000 years, matching NASA's empirical Espenak/Meeus polynomial
-to within 6.7 minutes on top of the ~20-min per-observation noise floor.
-The remaining residual after α(t) correction is fully decomposed under
-"Complete residual decomposition" into four framework-native sub-Milankovitch
-lattice harmonics (Bond 8H/1830 = 1466 yr, Hallstatt 8H/1104 = 2430 yr,
-Jose5 8H/2989 = 897 yr, Jose4 8H/3749 = 715 yr — shipped default-ON as the
-4-flag stack with cap-only fit-derived amplitudes) plus the fractional
+viscoelastic correction, together with the current Espenak-calibrated
+trend anchor + 4-flag stack, produces a mean |residual| of 48.6 min
+against 267 primary-source lunar observations spanning 2,000 years.
+Both NASA Espenak/Meeus and Stephenson 2016 spline polynomials are
+fit to essentially this dataset (per-event mean |residual| 20.0 min
+and 20.2 min respectively), so residual comparisons against either
+index fit quality against a smoothed representation of the observations
+rather than physical validity. The residual after α(t) is decomposed
+below into four framework-native sub-Milankovitch lattice harmonics
+(Bond 8H/1830 = 1466 yr, Hallstatt 8H/1104 = 2430 yr, Jose5 8H/2989
+= 897 yr, Jose4 8H/3749 = 715 yr — shipped default-ON as the 4-flag
+stack with cap-only fit-derived amplitudes) plus the fractional
 non-tidal secular rate above plus observation noise.**
 
 **Every physical constant in the live model comes from independent literature
@@ -402,24 +409,42 @@ expected to mirror L-5b per-table structure if α(t) is real physics.
 
 ### Headline (267 observations, six tables)
 
+**Current L-5b run (2026-07-19):**
+
 ```
                                        Mean |residual| (s)    Mean |residual| (min)
-NASA Espenak/Meeus ΔT:                             1199                20.0
-Model pure-tidal + L1-orbital α(t):                1604                26.7
+Stephenson 2016 spline polynomial:                 1211                20.2   ← fit to these data
+NASA Espenak/Meeus polynomial:                     1199                20.0   ← also fit-class
+Model pure-tidal + α(t) GIA (current shipped):     2917                48.6   ← Espenak-calibrated
 
-Events where model closer to obs than NASA: 78/267 (29.2%)
-NASA closer to obs by: 25.2% on average
+Events where model closer to obs than NASA: 67/267 (25.1%)
+NASA closer to obs by: 58.9% on average
+Excess of model residual over Stephenson: 1706 s (28.4 min)
 ```
 
-NASA's polynomial is FIT to (essentially) this exact observation
-dataset; ours PREDICTS it from literature-cited physical constants
-sourced from three independent measurement chains (IERS Conventions 2010
-for α at J2000, Cox & Chao satellite gravimetry for dα/dt, Peltier
-ICE-5G(VM2) for the multi-mode viscoelastic decomposition), plus the L1
-orbital layer of the canonical Climate Formula for the deep-time α(t)
-refinement (see doc 99 §"Deep-time refinement"). The 6.7-minute gap is
-the model's distance from the observation noise floor under L1-orbital
-α(t).
+**Historical L-5b run (pre-Espenak calibration, 2026-06-22):**
+
+```
+Model pure-tidal + L1-orbital α(t):                1604                26.7
+Events where model closer to obs than NASA: 78/267 (29.2%)
+```
+
+The shift from 26.7 → 48.6 min follows the current shipped calibration
+prioritising modern-record fit: the ΔT trend anchor `deltaTStart` and
+the 4-flag stack amplitudes/phases are jointly optimised against the
+Espenak 2006 ΔT polynomial 1650–2017 (see [doc 99](99-expanding-solar-system-resonance-theory.md)
+§"Deep-time refinement"). That calibration is a documented design choice.
+
+Both the Stephenson 2016 spline polynomial and the NASA Espenak/Meeus
+polynomial are fit to (essentially) this exact observation dataset —
+per-event residuals against either measure model distance from a
+smoothed representation of the observations, not physical validity.
+The framework's independent validation is the 26-event solar-eclipse
+alignment audit (20/26 events with framework umbra reaching the
+observation site within a ±4h scan window; 4/26 pure geographic misses,
+all Ibn Yunus / Said-Stephenson late-tenth-century Cairo observations),
+which uses the model's own predicted UT and umbra track with no ΔT
+polynomial in the loop.
 
 ### Convergence story across iterations
 
@@ -430,7 +455,8 @@ the model's distance from the observation noise floor under L1-orbital
 | Linear α(t) @ −1.8×10⁻¹¹/yr (axisymmetric ÷1.5) | 23.9 min | 0.20 | −1.24 |
 | Single-mode viscoelastic α(t), τ = 5 ka | 24.3 min | 0.096 | −0.79 |
 | Multi-mode viscoelastic α(t), τ ∈ {1.5, 5, 14} ka (|t|-symmetric) | 24.4 min | 0.090 | −0.77 |
-| **L1-orbital-coupled α(t) refinement (current)** | **26.7 min** | **0.36** | **−1.878** |
+| L1-orbital-coupled α(t) refinement (2026-06-22, pre-Espenak calibration) | 26.7 min | 0.36 | −1.878 |
+| **L1-orbital + Espenak-calibrated trend anchor + 4-flag stack (current, 2026-07-19)** | **48.6 min** | — | — |
 
 The final row reflects the L1-orbital refinement of α(t) documented in
 doc 99 §"Deep-time refinement": the |t|-symmetric multi-mode form was

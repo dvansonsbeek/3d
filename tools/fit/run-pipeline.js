@@ -97,12 +97,16 @@ const STEPS = [
     cmd: 'node tools/fit/moon-eclipse-optimizer.js --write' },
 
   // Phase 5: Solar measurements & harmonic fits
-  { id: '6a', phase: 2, name: 'Export solar measurements (~50 min)',
-    cmd: 'node tools/fit/export-solar-measurements.js', timeout: 2 * 60 * 60 * 1000 },
+  // 6a observed: ~2h 3min at H=335,317 (14,579 samples × 6 event types × cardinal-point
+  // bisection with ±2-day narrow window). 3h timeout gives generous margin.
+  { id: '6a', phase: 2, name: 'Export solar measurements (~2 hr)',
+    cmd: 'node tools/fit/export-solar-measurements.js', timeout: 3 * 60 * 60 * 1000 },
   { id: '6b', phase: 2, name: 'Obliquity harmonics',
     cmd: 'node tools/fit/obliquity-harmonics.js --write' },
-  { id: '6c', phase: 2, name: 'Cardinal point harmonics',
-    cmd: 'node tools/fit/cardinal-point-harmonics.js --write' },
+  // 6c observed: SS+WS+VE+AE greedy fit, ~10 min per CP × 4 = ~40 min total.
+  // Default 10-min per-step timeout would abort mid-VE. Use 60 min.
+  { id: '6c', phase: 2, name: 'Cardinal point harmonics (~40 min)',
+    cmd: 'node tools/fit/cardinal-point-harmonics.js --write', timeout: 60 * 60 * 1000 },
   { id: '6d', phase: 2, name: 'Sidereal year harmonics',
     cmd: 'node tools/fit/year-length-harmonics.js --write --type sidereal' },
   { id: '6e', phase: 2, name: 'Anomalistic year harmonics',
@@ -117,13 +121,21 @@ const STEPS = [
   { id: '7b', phase: 2, name: 'Balance search (presets)',
     cmd: 'node tools/verify/balance-search.js' },
 
-  // Phase 6: Verify & sync
+  // Phase 6: ΔT correction stack (Bond + Hallstatt + Jose5 + Jose4)
+  // Fits the 4-flag sub-Milankovitch cascade against Stephenson 2016 ΔT
+  // residual. Requires DT_CORRECTIONS_DISABLED=1 env so the residual reflects
+  // pure-tidal framework, not framework + previously-shipped corrections.
+  // See tools/fit/dt-corrections-fit.js docstring + docs/102.
+  { id: '7c', phase: 2, name: 'ΔT correction stack (Bond+Hallstatt+Jose5+Jose4)',
+    cmd: 'DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --write' },
+
+  // Phase 7: Verify & sync
   { id: '8',  phase: 2, name: 'Verify pipeline',
     cmd: 'node tools/fit/verify-pipeline.js --write' },
   { id: '9',  phase: 2, name: 'Export to script.js',
     cmd: 'node tools/fit/export-to-script.js --write' },
 
-  // Phase 7: Dashboard data
+  // Phase 8: Dashboard data
   { id: '10', phase: 2, name: 'Export dashboard data',
     cmd: 'node tools/export-dashboard-data.js' },
 ];

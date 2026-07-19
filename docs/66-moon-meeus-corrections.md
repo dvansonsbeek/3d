@@ -367,12 +367,21 @@ table would suggest.
 **Forward path:** [`docs/hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md)
 proposes optionally adding the full ELP-2000/82 series as an alternative
 polynomial path. With ELP-2000/82, framework's -135 β residual would drop
-from 0.07° to the Layer 1 floor (~10-30 arcsec), and -135's BestGap to
-Babylon would close from 1159 km to ~270 km (with ΔT residual remaining)
-or ~50-150 km (with both ELP-2000/82 + α(t) tuning). Not currently
-prioritized; doc 103's Interpretation 1 (Babylon saw deep partial; framework's
-Meeus-residual-driven path through Saudi Arabia is correct *given its
-polynomial*) is the project's official position.
+from 0.07° to the Layer 1 floor (~10-30 arcsec) — a general precision
+improvement rather than a fix for a specific problem event. Under the
+current **26-event eclipse alignment audit** (see
+[Historical Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)
+and [doc 103](103-135-babylonian-case-study.md)), -135 already reports
+BestGap 15 km within the ±4h scan window — the tightest per-event
+geographic match in the entire audit. The framework's own greatest-eclipse
+UT differs from the documented UT by ~48 minutes (the ΔT-signal + off-peak
+verdict category); this ΔT-signal is decomposable into Sun ecliptic-longitude
+drift at antiquity, framework ΔT vs Stephenson gap, and framework GMST vs
+IAU convention gap — the Meeus Ch. 47 Moon polynomial is exonerated for
+this event (all modern lunar theories converge within 0.001° at year -135).
+The ELP-2000/82 upgrade remains a general polynomial-precision improvement
+path at deep time; it is not blocking under the current scan-window
+methodology.
 
 **Layer 2: Delta-T (Earth rotation) uncertainty**
 

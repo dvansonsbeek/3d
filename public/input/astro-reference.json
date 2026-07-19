@@ -27,7 +27,7 @@
     "earthInclinationCycleAnchor": 21.77,
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
-    "deltaTStart": 63.63,
+    "deltaTStart": 57.526262670934045,
     "sunTilt": 7.155
   },
   "cardinalPointAnchors": {
@@ -39,7 +39,7 @@
   "moonReference": {
     "_comment": "Option C+ (2026-06): sidereal month + apsidal/nodal precession periods (ICRF) are the J2000 anchors. Anomalistic and nodal months are derived kinematically. Deep-time evolution: N_apsidal,N_nodal scale as H(t)^2 (T_apsidal*H = const law).",
     "moonSiderealMonthInput": 27.32166156,
-    "moonApsidalPrecessionDaysInputICRF": 3231.449,
+    "moonApsidalPrecessionDaysInputICRF": 3231.493,
     "moonNodalPrecessionDaysInputICRF": 6798.38,
     "moonDistance": 384399.07,
     "moonEclipticInclinationJ2000": 5.1453964,
@@ -238,7 +238,7 @@
     "tropicalYearMean": 365.2421897,
     "anomalisticYear": 365.259636,
     "siderealYear": 365.256363004,
-    "iauPrecessionJ2000": 25771.57634,
+    "iauPrecessionJ2000": 25770.7280535361,
     "tropicalYearRateSecPerCentury": -0.53,
     "solarDay": 86400,
     "siderealDay": 86164.09053083288,

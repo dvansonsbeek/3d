@@ -240,7 +240,7 @@ function extractTrends(yrArr, yArr, oscPeriodYr) {
 
 async function main() {
   const { start, end, stepMonths } = args();
-  const H = 335317;
+  const H = require('../lib/constants').H;
 
   console.log('═══════════════════════════════════════════════════════════════');
   console.log('  WebGeoCalc: Observed Perihelion Precession (trustworthy baseline)');

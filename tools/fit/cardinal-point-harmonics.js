@@ -44,13 +44,14 @@ function readData() {
     }
   }
 
-  // Downsample by stepYears for fitting efficiency
+  // Downsample by stepYears, J2000-anchored (filter (year - 2000) % step === 0
+  // so year 2000 lands on the sampling line — matching year-length-harmonics.js).
   const step = C.stepYears || 20;
   const byType = { SS: [], WS: [], VE: [], AE: [] };
   for (const type of ['SS', 'WS', 'VE', 'AE']) {
-    for (let i = 0; i < allByType[type].length; i += step) byType[type].push(allByType[type][i]);
+    byType[type] = allByType[type].filter(r => ((r.year - 2000) % step + step) % step === 0);
   }
-  console.log(`Downsampled: ${allByType.SS.length} → ${byType.SS.length} per type (step=${step})`);
+  console.log(`Downsampled (J2000-anchored): ${allByType.SS.length} → ${byType.SS.length} per type (step=${step})`);
   return { byType, allByType };
 }
 

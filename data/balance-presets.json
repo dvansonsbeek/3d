@@ -1,17 +1,17 @@
 {
-  "generated": "2026-06-30T17:10:20.311Z",
+  "generated": "2026-07-18T08:25:20.944Z",
   "threshold": 99.994,
   "searchSpace": 7558272,
   "count": 767,
   "allPassCount": 0,
   "currentConfig": {
     "rank": 4,
-    "inclBalance": 99.99744631883176,
-    "eccBalance": 99.86362193596369,
-    "eccBalanceJ2000": 99.87534316161774,
-    "saturnPredicted": 0.05371910238679246,
-    "saturnActual": 0.05386582462744935,
-    "saturnPredErrPct": -0.27238465515317545,
+    "inclBalance": 99.99744631884852,
+    "eccBalance": 99.86362193511928,
+    "eccBalanceJ2000": 99.87534316161802,
+    "saturnPredicted": 0.05371910238619187,
+    "saturnActual": 0.05386582462775682,
+    "saturnPredErrPct": -0.2723846568373989,
     "llPassCount": 7,
     "dirPassCount": 2,
     "allPass": false,
@@ -642,9 +642,9 @@
     "configs": [
       {
         "scenario": "A",
-        "inclBalance": 99.99724023076656,
-        "eccBalance": 99.99924456574998,
-        "eccBalanceAtSystemReset": 99.99626024612648,
+        "inclBalance": 99.99724023075424,
+        "eccBalance": 99.99924456608018,
+        "eccBalanceAtSystemReset": 99.99626024539458,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -669,12 +669,12 @@
           "n": 6,
           "balancedYear": -2314537,
           "dirCount": 7,
-          "totalErrArcsec": 6.967026302836649,
+          "totalErrArcsec": 6.967229922757373,
           "perPlanet": {
             "mercury": {
               "phase": 189.52,
               "mean": 6.11274,
-              "amp": 0.624317,
+              "amp": 0.62432,
               "N": 57,
               "ascNodePeriod": -47062,
               "errArcsec": 0.45,
@@ -682,8 +682,8 @@
             },
             "venus": {
               "phase": 308.64,
-              "mean": 2.57671,
-              "amp": 0.422724,
+              "mean": 2.57672,
+              "amp": 0.422726,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.32,
@@ -692,7 +692,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.60147,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 21,
               "ascNodePeriod": -127740,
               "errArcsec": 0.3,
@@ -740,12 +740,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 36.50984574661715,
+          "totalErrArcsec": 36.509911888616436,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -754,7 +754,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.13292,
-              "amp": 0.422724,
+              "amp": 0.422726,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 34.4,
@@ -763,7 +763,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -810,9 +810,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99878046036325,
-        "eccBalance": 99.99355924884861,
-        "eccBalanceAtSystemReset": 99.98906389706744,
+        "inclBalance": 99.99878046035153,
+        "eccBalance": 99.99355924851284,
+        "eccBalanceAtSystemReset": 99.98906389634537,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -837,12 +837,12 @@
           "n": 6,
           "balancedYear": -2314537,
           "dirCount": 7,
-          "totalErrArcsec": 6.905883146706573,
+          "totalErrArcsec": 6.90576159980463,
           "perPlanet": {
             "mercury": {
               "phase": 189.52,
               "mean": 6.20209,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 43,
               "ascNodePeriod": -62385,
               "errArcsec": 0.4,
@@ -850,8 +850,8 @@
             },
             "venus": {
               "phase": 308.64,
-              "mean": 2.57671,
-              "amp": 0.422724,
+              "mean": 2.57672,
+              "amp": 0.422726,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.32,
@@ -908,12 +908,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 36.420015027676214,
+          "totalErrArcsec": 36.42023247211127,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -922,7 +922,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.13292,
-              "amp": 0.422724,
+              "amp": 0.422726,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 34.4,
@@ -978,9 +978,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99512387510671,
-        "eccBalance": 99.99014210794101,
-        "eccBalanceAtSystemReset": 99.99463849783962,
+        "inclBalance": 99.99512387509346,
+        "eccBalance": 99.99014210826577,
+        "eccBalanceAtSystemReset": 99.9946384985774,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -1005,12 +1005,12 @@
           "n": 6,
           "balancedYear": -2314537,
           "dirCount": 7,
-          "totalErrArcsec": 6.768904141366486,
+          "totalErrArcsec": 6.76854727711014,
           "perPlanet": {
             "mercury": {
               "phase": 189.52,
               "mean": 5.96615,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 82,
               "ascNodePeriod": -32714,
               "errArcsec": 0.49,
@@ -1018,8 +1018,8 @@
             },
             "venus": {
               "phase": 308.64,
-              "mean": 2.57671,
-              "amp": 0.422724,
+              "mean": 2.57672,
+              "amp": 0.422726,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.32,
@@ -1028,7 +1028,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.58308,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 18,
               "ascNodePeriod": -149030,
               "errArcsec": 0.06,
@@ -1076,12 +1076,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 45.77189948863519,
+          "totalErrArcsec": 45.77217765289742,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 7.28161,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 10,
@@ -1090,7 +1090,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.13292,
-              "amp": 0.422724,
+              "amp": 0.422726,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 34.4,
@@ -1099,7 +1099,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.67929,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 35,
               "ascNodePeriod": -76644,
               "errArcsec": 0.12,
@@ -1146,9 +1146,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99646187705756,
-        "eccBalance": 99.9412601605118,
-        "eccBalanceAtSystemReset": 99.93677111628385,
+        "inclBalance": 99.99646187706735,
+        "eccBalance": 99.94126016020572,
+        "eccBalanceAtSystemReset": 99.93677111560379,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -1173,12 +1173,12 @@
           "n": 6,
           "balancedYear": -2314537,
           "dirCount": 7,
-          "totalErrArcsec": 6.905883146706573,
+          "totalErrArcsec": 6.90576159980463,
           "perPlanet": {
             "mercury": {
               "phase": 9.52,
               "mean": 6.20209,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 43,
               "ascNodePeriod": -62385,
               "errArcsec": 0.4,
@@ -1186,8 +1186,8 @@
             },
             "venus": {
               "phase": 308.64,
-              "mean": 2.57671,
-              "amp": 0.422724,
+              "mean": 2.57672,
+              "amp": 0.422726,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.32,
@@ -1244,12 +1244,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 36.420015027676214,
+          "totalErrArcsec": 36.42023247211127,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -1258,7 +1258,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.13292,
-              "amp": 0.422724,
+              "amp": 0.422726,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 34.4,
@@ -1314,9 +1314,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9949225919158,
-        "eccBalance": 99.93407261473591,
-        "eccBalanceAtSystemReset": 99.92958459765076,
+        "inclBalance": 99.994922591925,
+        "eccBalance": 99.93407261442319,
+        "eccBalanceAtSystemReset": 99.92958459695235,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -1341,12 +1341,12 @@
           "n": 6,
           "balancedYear": -2314537,
           "dirCount": 7,
-          "totalErrArcsec": 6.967026302836649,
+          "totalErrArcsec": 6.967229922757373,
           "perPlanet": {
             "mercury": {
               "phase": 9.52,
               "mean": 6.11274,
-              "amp": 0.624317,
+              "amp": 0.62432,
               "N": 57,
               "ascNodePeriod": -47062,
               "errArcsec": 0.45,
@@ -1354,8 +1354,8 @@
             },
             "venus": {
               "phase": 308.64,
-              "mean": 2.57671,
-              "amp": 0.422724,
+              "mean": 2.57672,
+              "amp": 0.422726,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.32,
@@ -1364,7 +1364,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.60147,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 21,
               "ascNodePeriod": -127740,
               "errArcsec": 0.3,
@@ -1412,12 +1412,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 36.50984574661715,
+          "totalErrArcsec": 36.509911888616436,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -1426,7 +1426,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.13292,
-              "amp": 0.422724,
+              "amp": 0.422726,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 34.4,
@@ -1435,7 +1435,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -1482,9 +1482,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99695574772925,
-        "eccBalance": 99.91919895134858,
-        "eccBalanceAtSystemReset": 99.92364835840189,
+        "inclBalance": 99.99695574774306,
+        "eccBalance": 99.91919895188181,
+        "eccBalanceAtSystemReset": 99.92364835914029,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -1509,12 +1509,12 @@
           "n": 6,
           "balancedYear": -2314537,
           "dirCount": 7,
-          "totalErrArcsec": 6.969966705480493,
+          "totalErrArcsec": 6.969744240668921,
           "perPlanet": {
             "mercury": {
               "phase": 9.52,
               "mean": 6.20209,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 43,
               "ascNodePeriod": -62385,
               "errArcsec": 0.4,
@@ -1523,7 +1523,7 @@
             "venus": {
               "phase": 308.64,
               "mean": 2.4184,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 3,
               "ascNodePeriod": -894179,
               "errArcsec": 0.26,
@@ -1532,7 +1532,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.5049,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 4,
               "ascNodePeriod": -670634,
               "errArcsec": 0.41,
@@ -1580,12 +1580,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 22.816160319888475,
+          "totalErrArcsec": 22.816215953420457,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -1594,7 +1594,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.14103,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 20.67,
@@ -1603,7 +1603,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.75747,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 49,
               "ascNodePeriod": -54746,
               "errArcsec": 0.46,
@@ -1650,9 +1650,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99611095957374,
-        "eccBalance": 99.88886300855104,
-        "eccBalanceAtSystemReset": 99.8949286675157,
+        "inclBalance": 99.99611095959501,
+        "eccBalance": 99.88886300826756,
+        "eccBalanceAtSystemReset": 99.89492866832335,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -1677,12 +1677,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 7.417846358056726,
+          "totalErrArcsec": 7.418480247541029,
           "perPlanet": {
             "mercury": {
               "phase": 144.52,
               "mean": 6.74261,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 81,
               "ascNodePeriod": -33118,
               "errArcsec": 0.2,
@@ -1700,7 +1700,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -1748,12 +1748,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 18.25230731408358,
+          "totalErrArcsec": 18.252803405360243,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 7.28161,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 10,
@@ -1771,7 +1771,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -1818,9 +1818,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99472334830075,
-        "eccBalance": 99.88513704538036,
-        "eccBalanceAtSystemReset": 99.88513704538036,
+        "inclBalance": 99.99472334832113,
+        "eccBalance": 99.88513704617421,
+        "eccBalanceAtSystemReset": 99.88513704617421,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -1845,12 +1845,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 5.469294140489879,
+          "totalErrArcsec": 5.469599793641268,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.56713,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.55,
@@ -1859,7 +1859,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -1868,7 +1868,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -1916,12 +1916,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 5.469294140489879,
+          "totalErrArcsec": 5.469599793641268,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.56713,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.55,
@@ -1930,7 +1930,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -1939,7 +1939,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -1986,9 +1986,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99776121670223,
-        "eccBalance": 99.88298746302402,
-        "eccBalanceAtSystemReset": 99.88298746302402,
+        "inclBalance": 99.99776121668195,
+        "eccBalance": 99.88298746381888,
+        "eccBalanceAtSystemReset": 99.88298746381888,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2013,12 +2013,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 5.083307709511731,
+          "totalErrArcsec": 5.0836672595308885,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.48319,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 15,
               "ascNodePeriod": -178836,
               "errArcsec": 0.17,
@@ -2027,7 +2027,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -2036,7 +2036,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -2084,12 +2084,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 5.083307709511731,
+          "totalErrArcsec": 5.0836672595308885,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.48319,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 15,
               "ascNodePeriod": -178836,
               "errArcsec": 0.17,
@@ -2098,7 +2098,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -2107,7 +2107,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -2154,9 +2154,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99422840592945,
-        "eccBalance": 99.86688155343853,
-        "eccBalanceAtSystemReset": 99.86688155343853,
+        "inclBalance": 99.9942284059514,
+        "eccBalance": 99.86688155254303,
+        "eccBalanceAtSystemReset": 99.86688155254303,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2181,12 +2181,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 3.466743670359875,
+          "totalErrArcsec": 3.466989576037695,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -2195,7 +2195,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -2204,7 +2204,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -2252,12 +2252,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 3.466743670359875,
+          "totalErrArcsec": 3.466989576037695,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -2266,7 +2266,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -2275,7 +2275,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -2322,9 +2322,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99744631883176,
-        "eccBalance": 99.86362210906645,
-        "eccBalanceAtSystemReset": 99.86362210906645,
+        "inclBalance": 99.99744631884852,
+        "eccBalance": 99.86362210822205,
+        "eccBalanceAtSystemReset": 99.86362210822205,
         "mirror": true,
         "isConfig7": true,
         "dValues": {
@@ -2349,12 +2349,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 5.13780385956951,
+          "totalErrArcsec": 5.1377128109892345,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -2363,7 +2363,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -2372,7 +2372,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -2420,12 +2420,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 5.13780385956951,
+          "totalErrArcsec": 5.1377128109892345,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -2434,7 +2434,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -2443,7 +2443,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -2490,9 +2490,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9940325780989,
-        "eccBalance": 99.86300620849565,
-        "eccBalanceAtSystemReset": 99.86300620849565,
+        "inclBalance": 99.99403257807924,
+        "eccBalance": 99.8630062092877,
+        "eccBalanceAtSystemReset": 99.8630062092877,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2517,12 +2517,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 3.2861230593196114,
+          "totalErrArcsec": 3.286506337116112,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -2531,7 +2531,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -2540,7 +2540,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -2588,12 +2588,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 3.2861230593196114,
+          "totalErrArcsec": 3.286506337116112,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -2602,7 +2602,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -2611,7 +2611,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -2658,9 +2658,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99917189818302,
-        "eccBalance": 99.84279739830548,
-        "eccBalanceAtSystemReset": 99.83611020264725,
+        "inclBalance": 99.99917189820073,
+        "eccBalance": 99.84279739839494,
+        "eccBalanceAtSystemReset": 99.8361102018028,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2685,12 +2685,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 7.582357672186899,
+          "totalErrArcsec": 7.582045616909281,
           "perPlanet": {
             "mercury": {
               "phase": 144.52,
-              "mean": 6.49788,
-              "amp": 0.386482,
+              "mean": 6.49789,
+              "amp": 0.386484,
               "N": 43,
               "ascNodePeriod": -62385,
               "errArcsec": 0.57,
@@ -2708,7 +2708,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -2756,12 +2756,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 8.469455647417043,
+          "totalErrArcsec": 8.469380175161797,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -2779,7 +2779,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -2826,9 +2826,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99741610747141,
-        "eccBalance": 99.82908980413214,
-        "eccBalanceAtSystemReset": 99.8224312329697,
+        "inclBalance": 99.99741610745218,
+        "eccBalance": 99.829089804061,
+        "eccBalanceAtSystemReset": 99.8224312321006,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2853,12 +2853,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 7.4608531694480265,
+          "totalErrArcsec": 7.4602398130455585,
           "perPlanet": {
             "mercury": {
               "phase": 144.52,
               "mean": 6.9798,
-              "amp": 1.623224,
+              "amp": 1.623232,
               "N": 119,
               "ascNodePeriod": -22542,
               "errArcsec": 0.38,
@@ -2867,7 +2867,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.16286,
-              "amp": 0.162586,
+              "amp": 0.162587,
               "N": 26,
               "ascNodePeriod": -103174,
               "errArcsec": 0.14,
@@ -2876,7 +2876,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -2924,12 +2924,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 5,
-          "totalErrArcsec": 41.577515473491815,
+          "totalErrArcsec": 41.57763763372214,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 7.8422,
-              "amp": 1.623224,
+              "mean": 7.84221,
+              "amp": 1.623232,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 28.17,
@@ -2938,7 +2938,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.14623,
-              "amp": 0.162586,
+              "amp": 0.162587,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 11.88,
@@ -2947,7 +2947,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -2994,9 +2994,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99811504372761,
-        "eccBalance": 99.77124173207412,
-        "eccBalanceAtSystemReset": 99.76626256933434,
+        "inclBalance": 99.99811504373895,
+        "eccBalance": 99.77124173169678,
+        "eccBalanceAtSystemReset": 99.76626256852981,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3021,12 +3021,12 @@
           "n": 6,
           "balancedYear": -2314537,
           "dirCount": 7,
-          "totalErrArcsec": 6.954702632784884,
+          "totalErrArcsec": 6.954581463667744,
           "perPlanet": {
             "mercury": {
               "phase": 9.52,
               "mean": 6.20209,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 43,
               "ascNodePeriod": -62385,
               "errArcsec": 0.4,
@@ -3035,7 +3035,7 @@
             "venus": {
               "phase": 308.64,
               "mean": 2.4184,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 3,
               "ascNodePeriod": -894179,
               "errArcsec": 0.26,
@@ -3092,12 +3092,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 22.802445982516936,
+          "totalErrArcsec": 22.80260292814023,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -3106,7 +3106,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.14103,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 20.67,
@@ -3162,9 +3162,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9996648507109,
-        "eccBalance": 99.76835154567031,
-        "eccBalanceAtSystemReset": 99.7727118629412,
+        "inclBalance": 99.99966485072287,
+        "eccBalance": 99.76835154471969,
+        "eccBalanceAtSystemReset": 99.77271186213504,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3189,12 +3189,12 @@
           "n": 2,
           "balancedYear": -973269,
           "dirCount": 7,
-          "totalErrArcsec": 3.509180405835794,
+          "totalErrArcsec": 3.5092195951655754,
           "perPlanet": {
             "mercury": {
               "phase": 189.52,
               "mean": 6.40272,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 10,
               "ascNodePeriod": -268254,
               "errArcsec": 0.51,
@@ -3203,7 +3203,7 @@
             "venus": {
               "phase": 308.64,
               "mean": 2.4184,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 3,
               "ascNodePeriod": -894179,
               "errArcsec": 0.26,
@@ -3212,7 +3212,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.60147,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 21,
               "ascNodePeriod": -127740,
               "errArcsec": 0.3,
@@ -3260,12 +3260,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 22.560183326647895,
+          "totalErrArcsec": 22.560296670467824,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.48319,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 15,
               "ascNodePeriod": -178836,
               "errArcsec": 0.17,
@@ -3274,7 +3274,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.14103,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 20.67,
@@ -3283,7 +3283,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -3330,9 +3330,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99772821273879,
-        "eccBalance": 99.76350603695978,
-        "eccBalanceAtSystemReset": 99.76785786422782,
+        "inclBalance": 99.99772821272582,
+        "eccBalance": 99.76350603604565,
+        "eccBalanceAtSystemReset": 99.76785786342097,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3357,12 +3357,12 @@
           "n": 2,
           "balancedYear": -973269,
           "dirCount": 7,
-          "totalErrArcsec": 2.86286363655835,
+          "totalErrArcsec": 2.8629164295331417,
           "perPlanet": {
             "mercury": {
               "phase": 9.52,
               "mean": 6.43696,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 4,
               "ascNodePeriod": -670634,
               "errArcsec": 0.1,
@@ -3371,7 +3371,7 @@
             "venus": {
               "phase": 308.64,
               "mean": 2.4184,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 3,
               "ascNodePeriod": -894179,
               "errArcsec": 0.26,
@@ -3380,7 +3380,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.58308,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 18,
               "ascNodePeriod": -149030,
               "errArcsec": 0.06,
@@ -3428,12 +3428,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 22.70296905772975,
+          "totalErrArcsec": 22.703011861379974,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.56713,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.55,
@@ -3442,7 +3442,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.14103,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 20.67,
@@ -3451,7 +3451,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.67929,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 35,
               "ascNodePeriod": -76644,
               "errArcsec": 0.12,
@@ -3498,9 +3498,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99759784217636,
-        "eccBalance": 99.6157929026625,
-        "eccBalanceAtSystemReset": 99.61092373875047,
+        "inclBalance": 99.99759784218338,
+        "eccBalance": 99.61579290205316,
+        "eccBalanceAtSystemReset": 99.61092373794955,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3525,12 +3525,12 @@
           "n": 6,
           "balancedYear": -2314537,
           "dirCount": 7,
-          "totalErrArcsec": 7.133646636154325,
+          "totalErrArcsec": 7.13343112206655,
           "perPlanet": {
             "mercury": {
               "phase": 9.52,
               "mean": 6.20209,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 43,
               "ascNodePeriod": -62385,
               "errArcsec": 0.4,
@@ -3538,8 +3538,8 @@
             },
             "venus": {
               "phase": 308.64,
-              "mean": 2.57671,
-              "amp": 0.422724,
+              "mean": 2.57672,
+              "amp": 0.422726,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.32,
@@ -3548,7 +3548,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.5049,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 4,
               "ascNodePeriod": -670634,
               "errArcsec": 0.41,
@@ -3596,12 +3596,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 36.6462287817999,
+          "totalErrArcsec": 36.64635224265224,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -3610,7 +3610,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.13292,
-              "amp": 0.422724,
+              "amp": 0.422726,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 34.4,
@@ -3619,7 +3619,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.75747,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 49,
               "ascNodePeriod": -54746,
               "errArcsec": 0.46,
@@ -3666,9 +3666,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99474316492287,
-        "eccBalance": 99.60800007287523,
-        "eccBalanceAtSystemReset": 99.60310601254942,
+        "inclBalance": 99.99474316491315,
+        "eccBalance": 99.60800007240562,
+        "eccBalanceAtSystemReset": 99.60310601175235,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3693,12 +3693,12 @@
           "n": 6,
           "balancedYear": -2314537,
           "dirCount": 7,
-          "totalErrArcsec": 6.914099126993393,
+          "totalErrArcsec": 6.914403603674461,
           "perPlanet": {
             "mercury": {
               "phase": 189.52,
               "mean": 6.11274,
-              "amp": 0.624317,
+              "amp": 0.62432,
               "N": 57,
               "ascNodePeriod": -47062,
               "errArcsec": 0.45,
@@ -3706,8 +3706,8 @@
             },
             "venus": {
               "phase": 308.64,
-              "mean": 2.57671,
-              "amp": 0.422724,
+              "mean": 2.57672,
+              "amp": 0.422726,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.32,
@@ -3716,7 +3716,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.55347,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 13,
               "ascNodePeriod": -206349,
               "errArcsec": 0.14,
@@ -3764,12 +3764,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 36.344378024395134,
+          "totalErrArcsec": 36.34454503203286,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -3778,7 +3778,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.13292,
-              "amp": 0.422724,
+              "amp": 0.422726,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 34.4,
@@ -3787,7 +3787,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.7089,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 40,
               "ascNodePeriod": -67063,
               "errArcsec": 0.09,
@@ -3834,9 +3834,9 @@
       },
       {
         "scenario": "D",
-        "inclBalance": 99.99907780374862,
-        "eccBalance": 99.60689324062943,
-        "eccBalanceAtSystemReset": 99.5962525724133,
+        "inclBalance": 99.99907780374244,
+        "eccBalance": 99.60689324046687,
+        "eccBalanceAtSystemReset": 99.59625257110088,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3861,12 +3861,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 17.978188262385984,
+          "totalErrArcsec": 17.97790778399187,
           "perPlanet": {
             "mercury": {
               "phase": 324.52,
               "mean": 6.9798,
-              "amp": 1.623224,
+              "amp": 1.623232,
               "N": 119,
               "ascNodePeriod": -22542,
               "errArcsec": 0.38,
@@ -3875,7 +3875,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.20861,
-              "amp": 1.05681,
+              "amp": 1.056815,
               "N": 120,
               "ascNodePeriod": -22354,
               "errArcsec": 16.87,
@@ -3884,7 +3884,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -3932,12 +3932,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 5,
-          "totalErrArcsec": 119.13533574536922,
+          "totalErrArcsec": 119.13580499423458,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
-              "mean": 7.8422,
-              "amp": 1.623224,
+              "mean": 7.84221,
+              "amp": 1.623232,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 28.17,
@@ -3946,7 +3946,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.10048,
-              "amp": 1.05681,
+              "amp": 1.056815,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 89.29,
@@ -3955,7 +3955,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -4002,9 +4002,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99823184344072,
-        "eccBalance": 99.52367710497583,
-        "eccBalanceAtSystemReset": 99.53216755536086,
+        "inclBalance": 99.9982318434613,
+        "eccBalance": 99.52367710554554,
+        "eccBalanceAtSystemReset": 99.53216755634922,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4029,12 +4029,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 4.543099022443875,
+          "totalErrArcsec": 4.5422726984118755,
           "perPlanet": {
             "mercury": {
               "phase": 144.52,
               "mean": 6.9798,
-              "amp": 1.623224,
+              "amp": 1.623232,
               "N": 119,
               "ascNodePeriod": -22542,
               "errArcsec": 0.38,
@@ -4043,7 +4043,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.19059,
-              "amp": 0.70454,
+              "amp": 0.704543,
               "N": 99,
               "ascNodePeriod": -27096,
               "errArcsec": 0.07,
@@ -4052,7 +4052,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -4061,7 +4061,7 @@
             "jupiter": {
               "phase": 17.06,
               "mean": 0.3086,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 42,
               "ascNodePeriod": -63870,
               "errArcsec": 0.09,
@@ -4100,12 +4100,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 5,
-          "totalErrArcsec": 87.89555073682513,
+          "totalErrArcsec": 87.8960462612714,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 7.8422,
-              "amp": 1.623224,
+              "mean": 7.84221,
+              "amp": 1.623232,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 28.17,
@@ -4114,7 +4114,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.1185,
-              "amp": 0.70454,
+              "amp": 0.704543,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 58.8,
@@ -4123,7 +4123,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -4132,7 +4132,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -4170,9 +4170,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99941744683424,
-        "eccBalance": 99.51610356681762,
-        "eccBalanceAtSystemReset": 99.50937404598683,
+        "inclBalance": 99.99941744683218,
+        "eccBalance": 99.51610356714849,
+        "eccBalanceAtSystemReset": 99.50937404510972,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4197,12 +4197,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 7.497373117694154,
+          "totalErrArcsec": 7.497637563944651,
           "perPlanet": {
             "mercury": {
               "phase": 144.52,
               "mean": 6.59056,
-              "amp": 0.624317,
+              "amp": 0.62432,
               "N": 57,
               "ascNodePeriod": -47062,
               "errArcsec": 0.17,
@@ -4211,7 +4211,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.19059,
-              "amp": 0.70454,
+              "amp": 0.704543,
               "N": 99,
               "ascNodePeriod": -27096,
               "errArcsec": 0.07,
@@ -4220,7 +4220,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -4268,12 +4268,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 61.13446979104515,
+          "totalErrArcsec": 61.13498531061499,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -4282,7 +4282,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.1185,
-              "amp": 0.70454,
+              "amp": 0.704543,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 58.8,
@@ -4291,7 +4291,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -4338,9 +4338,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99564889018417,
-        "eccBalance": 99.46293532927712,
-        "eccBalanceAtSystemReset": 99.45543587552187,
+        "inclBalance": 99.99564889020259,
+        "eccBalance": 99.46293532895652,
+        "eccBalanceAtSystemReset": 99.45543587459885,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4365,12 +4365,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 3.8665103128943654,
+          "totalErrArcsec": 3.8670101436131796,
           "perPlanet": {
             "mercury": {
               "phase": 324.52,
               "mean": 6.74261,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 81,
               "ascNodePeriod": -33118,
               "errArcsec": 0.2,
@@ -4379,7 +4379,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.16286,
-              "amp": 0.162586,
+              "amp": 0.162587,
               "N": 26,
               "ascNodePeriod": -103174,
               "errArcsec": 0.14,
@@ -4388,7 +4388,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.7089,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 40,
               "ascNodePeriod": -67063,
               "errArcsec": 0.09,
@@ -4397,7 +4397,7 @@
             "jupiter": {
               "phase": 17.06,
               "mean": 0.3086,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 42,
               "ascNodePeriod": -63870,
               "errArcsec": 0.09,
@@ -4415,7 +4415,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -4436,12 +4436,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 22.242761320626073,
+          "totalErrArcsec": 22.24305787097515,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 7.28161,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 10,
@@ -4450,7 +4450,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.14623,
-              "amp": 0.162586,
+              "amp": 0.162587,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 11.88,
@@ -4459,7 +4459,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.7089,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 40,
               "ascNodePeriod": -67063,
               "errArcsec": 0.09,
@@ -4468,7 +4468,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -4486,7 +4486,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -4506,9 +4506,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99922487642606,
-        "eccBalance": 99.41316577011234,
-        "eccBalanceAtSystemReset": 99.4056545445323,
+        "inclBalance": 99.99922487640382,
+        "eccBalance": 99.41316576980121,
+        "eccBalanceAtSystemReset": 99.40565454360905,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4533,12 +4533,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 3.897521952379239,
+          "totalErrArcsec": 3.89793081204816,
           "perPlanet": {
             "mercury": {
               "phase": 144.52,
               "mean": 6.74261,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 81,
               "ascNodePeriod": -33118,
               "errArcsec": 0.2,
@@ -4547,7 +4547,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15772,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 13,
               "ascNodePeriod": -206349,
               "errArcsec": 0.17,
@@ -4556,7 +4556,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.7089,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 40,
               "ascNodePeriod": -67063,
               "errArcsec": 0.09,
@@ -4565,7 +4565,7 @@
             "jupiter": {
               "phase": 17.06,
               "mean": 0.3086,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 42,
               "ascNodePeriod": -63870,
               "errArcsec": 0.09,
@@ -4583,7 +4583,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -4604,12 +4604,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 13.548925558692218,
+          "totalErrArcsec": 13.54918146269101,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 7.28161,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 10,
@@ -4618,7 +4618,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -4627,7 +4627,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.7089,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 40,
               "ascNodePeriod": -67063,
               "errArcsec": 0.09,
@@ -4636,7 +4636,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -4654,7 +4654,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -4674,9 +4674,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99857536228997,
-        "eccBalance": 99.41314674467868,
-        "eccBalanceAtSystemReset": 99.41793101308222,
+        "inclBalance": 99.99857536231075,
+        "eccBalance": 99.41314674367764,
+        "eccBalanceAtSystemReset": 99.4179310121763,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4701,12 +4701,12 @@
           "n": 2,
           "balancedYear": -973269,
           "dirCount": 7,
-          "totalErrArcsec": 1.3684364410961902,
+          "totalErrArcsec": 1.368604828297173,
           "perPlanet": {
             "mercury": {
               "phase": 9.52,
               "mean": 6.43696,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 4,
               "ascNodePeriod": -670634,
               "errArcsec": 0.1,
@@ -4724,7 +4724,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.55347,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 13,
               "ascNodePeriod": -206349,
               "errArcsec": 0.14,
@@ -4733,7 +4733,7 @@
             "jupiter": {
               "phase": 62.06,
               "mean": 0.3129,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 45,
               "ascNodePeriod": -59612,
               "errArcsec": 0.04,
@@ -4751,7 +4751,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -4772,12 +4772,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 7.429215960793587,
+          "totalErrArcsec": 7.429312579317169,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.56713,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.55,
@@ -4795,7 +4795,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.7089,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 40,
               "ascNodePeriod": -67063,
               "errArcsec": 0.09,
@@ -4804,7 +4804,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -4822,7 +4822,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -4842,9 +4842,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.9953383606448,
-        "eccBalance": 99.39418362864139,
-        "eccBalanceAtSystemReset": 99.39382337401561,
+        "inclBalance": 99.9953383606646,
+        "eccBalance": 99.39418362792333,
+        "eccBalanceAtSystemReset": 99.39382337311844,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4869,12 +4869,12 @@
           "n": 0,
           "balancedYear": -302635,
           "dirCount": 7,
-          "totalErrArcsec": 3.649247298694817,
+          "totalErrArcsec": 3.6492821676441447,
           "perPlanet": {
             "mercury": {
               "phase": 279.52,
               "mean": 5.98911,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.01,
@@ -4883,7 +4883,7 @@
             "venus": {
               "phase": 308.64,
               "mean": 2.09246,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 5,
               "ascNodePeriod": -536507,
               "errArcsec": 0.11,
@@ -4892,7 +4892,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.58308,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 18,
               "ascNodePeriod": -149030,
               "errArcsec": 0.06,
@@ -4901,7 +4901,7 @@
             "jupiter": {
               "phase": 332.06,
               "mean": 0.31212,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.13,
@@ -4919,7 +4919,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -4940,12 +4940,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 3.997816944815494,
+          "totalErrArcsec": 3.9978713749363046,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -4954,7 +4954,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -4963,7 +4963,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.67929,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 35,
               "ascNodePeriod": -76644,
               "errArcsec": 0.12,
@@ -4972,7 +4972,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -4990,7 +4990,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5010,9 +5010,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.9950724638277,
-        "eccBalance": 99.37746475383634,
-        "eccBalanceAtSystemReset": 99.37746475383634,
+        "inclBalance": 99.99507246380868,
+        "eccBalance": 99.37746475294111,
+        "eccBalanceAtSystemReset": 99.37746475294111,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5037,12 +5037,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 2.1861105223738773,
+          "totalErrArcsec": 2.1861719878333994,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -5051,7 +5051,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -5060,7 +5060,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -5069,7 +5069,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -5087,7 +5087,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5108,12 +5108,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 2.1861105223738773,
+          "totalErrArcsec": 2.1861719878333994,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -5122,7 +5122,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -5131,7 +5131,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -5140,7 +5140,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -5158,7 +5158,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5178,9 +5178,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99930128832258,
-        "eccBalance": 99.37318554352416,
-        "eccBalanceAtSystemReset": 99.37347940843588,
+        "inclBalance": 99.99930128833712,
+        "eccBalance": 99.37318554417888,
+        "eccBalanceAtSystemReset": 99.37347940931517,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5205,12 +5205,12 @@
           "n": 0,
           "balancedYear": -302635,
           "dirCount": 7,
-          "totalErrArcsec": 3.555998021177011,
+          "totalErrArcsec": 3.5559120870699807,
           "perPlanet": {
             "mercury": {
               "phase": 99.52,
               "mean": 5.7687,
-              "amp": 0.624317,
+              "amp": 0.62432,
               "N": 3,
               "ascNodePeriod": -894179,
               "errArcsec": 0.02,
@@ -5218,8 +5218,8 @@
             },
             "venus": {
               "phase": 308.64,
-              "mean": 1.45093,
-              "amp": 0.70454,
+              "mean": 1.45092,
+              "amp": 0.704543,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.16,
@@ -5228,7 +5228,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.58308,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 18,
               "ascNodePeriod": -149030,
               "errArcsec": 0.06,
@@ -5237,7 +5237,7 @@
             "jupiter": {
               "phase": 332.06,
               "mean": 0.31212,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.13,
@@ -5255,7 +5255,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5276,12 +5276,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 59.82143092439553,
+          "totalErrArcsec": 59.82160124323616,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -5290,7 +5290,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.1185,
-              "amp": 0.70454,
+              "amp": 0.704543,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 58.8,
@@ -5299,7 +5299,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.67929,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 35,
               "ascNodePeriod": -76644,
               "errArcsec": 0.12,
@@ -5308,7 +5308,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -5326,7 +5326,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5346,9 +5346,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99738879903887,
-        "eccBalance": 99.3652650531592,
-        "eccBalanceAtSystemReset": 99.3700551680933,
+        "inclBalance": 99.9973887990208,
+        "eccBalance": 99.36526505205107,
+        "eccBalanceAtSystemReset": 99.37005516719299,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5373,12 +5373,12 @@
           "n": 2,
           "balancedYear": -973269,
           "dirCount": 7,
-          "totalErrArcsec": 1.822141082459737,
+          "totalErrArcsec": 1.822189411017293,
           "perPlanet": {
             "mercury": {
               "phase": 9.52,
               "mean": 6.40272,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 10,
               "ascNodePeriod": -268254,
               "errArcsec": 0.51,
@@ -5387,7 +5387,7 @@
             "venus": {
               "phase": 128.64,
               "mean": 2.19292,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 4,
               "ascNodePeriod": -670634,
               "errArcsec": 0.09,
@@ -5405,7 +5405,7 @@
             "jupiter": {
               "phase": 62.06,
               "mean": 0.3129,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 45,
               "ascNodePeriod": -59612,
               "errArcsec": 0.04,
@@ -5423,7 +5423,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5444,12 +5444,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 1.912928233951331,
+          "totalErrArcsec": 1.912966629733085,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.48319,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 15,
               "ascNodePeriod": -178836,
               "errArcsec": 0.17,
@@ -5458,7 +5458,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -5476,7 +5476,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -5494,7 +5494,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5514,9 +5514,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99670634051897,
-        "eccBalance": 99.36362020507735,
-        "eccBalanceAtSystemReset": 99.3638983255496,
+        "inclBalance": 99.99670634050287,
+        "eccBalance": 99.3636202057995,
+        "eccBalanceAtSystemReset": 99.36389832640648,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5541,12 +5541,12 @@
           "n": 0,
           "balancedYear": -302635,
           "dirCount": 7,
-          "totalErrArcsec": 4.117141696221824,
+          "totalErrArcsec": 4.117188498894362,
           "perPlanet": {
             "mercury": {
               "phase": 99.52,
               "mean": 6.12606,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 13,
               "ascNodePeriod": -206349,
               "errArcsec": 0.34,
@@ -5554,8 +5554,8 @@
             },
             "venus": {
               "phase": 308.64,
-              "mean": 1.45093,
-              "amp": 0.70454,
+              "mean": 1.45092,
+              "amp": 0.704543,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.16,
@@ -5564,7 +5564,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.60147,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 21,
               "ascNodePeriod": -127740,
               "errArcsec": 0.3,
@@ -5573,7 +5573,7 @@
             "jupiter": {
               "phase": 332.06,
               "mean": 0.31212,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.13,
@@ -5591,7 +5591,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5612,12 +5612,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 60.11852468045999,
+          "totalErrArcsec": 60.1187654463672,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.56713,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.55,
@@ -5626,7 +5626,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.1185,
-              "amp": 0.70454,
+              "amp": 0.704543,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 58.8,
@@ -5635,7 +5635,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -5644,7 +5644,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -5662,7 +5662,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5682,9 +5682,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99487305503123,
-        "eccBalance": 99.30237786605981,
-        "eccBalanceAtSystemReset": 99.30237786605981,
+        "inclBalance": 99.99487305504623,
+        "eccBalance": 99.30237786520422,
+        "eccBalanceAtSystemReset": 99.30237786520422,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5709,12 +5709,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 2.245021608761317,
+          "totalErrArcsec": 2.2449523039106585,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -5723,7 +5723,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -5741,7 +5741,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -5759,7 +5759,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5780,12 +5780,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 2.245021608761317,
+          "totalErrArcsec": 2.2449523039106585,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -5794,7 +5794,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -5812,7 +5812,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -5830,7 +5830,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5850,9 +5850,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99489710639254,
-        "eccBalance": 99.25442754294794,
-        "eccBalanceAtSystemReset": 99.25442754294794,
+        "inclBalance": 99.99489710637573,
+        "eccBalance": 99.25442754208323,
+        "eccBalanceAtSystemReset": 99.25442754208323,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5877,12 +5877,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 2.2604814250380696,
+          "totalErrArcsec": 2.2604018541246114,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -5891,7 +5891,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -5900,7 +5900,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -5909,7 +5909,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -5927,7 +5927,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -5948,12 +5948,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 2.2604814250380696,
+          "totalErrArcsec": 2.2604018541246114,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -5962,7 +5962,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -5971,7 +5971,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -5980,7 +5980,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -5998,7 +5998,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -6018,9 +6018,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99530411490886,
-        "eccBalance": 99.25256179441682,
-        "eccBalanceAtSystemReset": 99.25256179441682,
+        "inclBalance": 99.99530411492165,
+        "eccBalance": 99.2525617935433,
+        "eccBalanceAtSystemReset": 99.2525617935433,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6045,12 +6045,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 1.9143930917757837,
+          "totalErrArcsec": 1.9145517586194474,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -6059,7 +6059,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -6068,7 +6068,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.7089,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 40,
               "ascNodePeriod": -67063,
               "errArcsec": 0.09,
@@ -6077,7 +6077,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -6095,7 +6095,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -6116,12 +6116,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 1.9143930917757837,
+          "totalErrArcsec": 1.9145517586194474,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -6130,7 +6130,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -6139,7 +6139,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.7089,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 40,
               "ascNodePeriod": -67063,
               "errArcsec": 0.09,
@@ -6148,7 +6148,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -6166,7 +6166,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -6186,9 +6186,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99775730788552,
-        "eccBalance": 99.24328446068584,
-        "eccBalanceAtSystemReset": 99.23584960444221,
+        "inclBalance": 99.99775730789497,
+        "eccBalance": 99.24328446046935,
+        "eccBalanceAtSystemReset": 99.23584960353074,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6213,12 +6213,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 4.273743612448191,
+          "totalErrArcsec": 4.2739678889587545,
           "perPlanet": {
             "mercury": {
               "phase": 324.52,
               "mean": 6.74261,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 81,
               "ascNodePeriod": -33118,
               "errArcsec": 0.2,
@@ -6227,7 +6227,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15772,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 13,
               "ascNodePeriod": -206349,
               "errArcsec": 0.17,
@@ -6236,7 +6236,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.75747,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 49,
               "ascNodePeriod": -54746,
               "errArcsec": 0.46,
@@ -6245,7 +6245,7 @@
             "jupiter": {
               "phase": 17.06,
               "mean": 0.3086,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 42,
               "ascNodePeriod": -63870,
               "errArcsec": 0.09,
@@ -6263,7 +6263,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -6284,12 +6284,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 13.92514721876117,
+          "totalErrArcsec": 13.925218539601603,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 7.28161,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 10,
@@ -6298,7 +6298,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -6307,7 +6307,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.75747,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 49,
               "ascNodePeriod": -54746,
               "errArcsec": 0.46,
@@ -6316,7 +6316,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -6334,7 +6334,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -6354,9 +6354,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99888452578979,
-        "eccBalance": 99.24028650899186,
-        "eccBalanceAtSystemReset": 99.24520159968544,
+        "inclBalance": 99.99888452577451,
+        "eccBalance": 99.24028650797722,
+        "eccBalanceAtSystemReset": 99.24520159882245,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6381,12 +6381,12 @@
           "n": 2,
           "balancedYear": -973269,
           "dirCount": 7,
-          "totalErrArcsec": 1.1913382019087635,
+          "totalErrArcsec": 1.1913898707735502,
           "perPlanet": {
             "mercury": {
               "phase": 9.52,
               "mean": 6.43696,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 4,
               "ascNodePeriod": -670634,
               "errArcsec": 0.1,
@@ -6395,7 +6395,7 @@
             "venus": {
               "phase": 308.64,
               "mean": 2.19292,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 4,
               "ascNodePeriod": -670634,
               "errArcsec": 0.09,
@@ -6404,7 +6404,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.58308,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 18,
               "ascNodePeriod": -149030,
               "errArcsec": 0.06,
@@ -6413,7 +6413,7 @@
             "jupiter": {
               "phase": 62.06,
               "mean": 0.3129,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 45,
               "ascNodePeriod": -59612,
               "errArcsec": 0.04,
@@ -6431,7 +6431,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -6452,12 +6452,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 2.071173781309938,
+          "totalErrArcsec": 2.0711313708591867,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.56713,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.55,
@@ -6466,7 +6466,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -6475,7 +6475,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.67929,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 35,
               "ascNodePeriod": -76644,
               "errArcsec": 0.12,
@@ -6484,7 +6484,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -6502,7 +6502,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -6522,9 +6522,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99995393655118,
-        "eccBalance": 99.2185427509011,
-        "eccBalanceAtSystemReset": 99.22341079739734,
+        "inclBalance": 99.99995393656206,
+        "eccBalance": 99.2185427500008,
+        "eccBalanceAtSystemReset": 99.22341079650339,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6549,12 +6549,12 @@
           "n": 2,
           "balancedYear": -973269,
           "dirCount": 7,
-          "totalErrArcsec": 1.6336132176607268,
+          "totalErrArcsec": 1.6335970442533134,
           "perPlanet": {
             "mercury": {
               "phase": 189.52,
               "mean": 6.43696,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 4,
               "ascNodePeriod": -670634,
               "errArcsec": 0.1,
@@ -6572,7 +6572,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.5049,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 4,
               "ascNodePeriod": -670634,
               "errArcsec": 0.41,
@@ -6581,7 +6581,7 @@
             "jupiter": {
               "phase": 62.06,
               "mean": 0.3129,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 45,
               "ascNodePeriod": -59612,
               "errArcsec": 0.04,
@@ -6599,7 +6599,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -6620,12 +6620,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 7.80543762086254,
+          "totalErrArcsec": 7.805349656227763,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.56713,
-              "amp": 0.238709,
+              "amp": 0.238711,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.55,
@@ -6643,7 +6643,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.75747,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 49,
               "ascNodePeriod": -54746,
               "errArcsec": 0.46,
@@ -6652,7 +6652,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -6670,7 +6670,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -6690,9 +6690,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.9975993948477,
-        "eccBalance": 99.21664342746243,
-        "eccBalanceAtSystemReset": 99.22531418889851,
+        "inclBalance": 99.99759939487484,
+        "eccBalance": 99.21664342733571,
+        "eccBalanceAtSystemReset": 99.22531418995207,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6717,12 +6717,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 21.34739827288199,
+          "totalErrArcsec": 21.347536769031738,
           "perPlanet": {
             "mercury": {
               "phase": 324.52,
-              "mean": 6.49788,
-              "amp": 0.386482,
+              "mean": 6.49789,
+              "amp": 0.386484,
               "N": 43,
               "ascNodePeriod": -62385,
               "errArcsec": 0.57,
@@ -6731,7 +6731,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.20861,
-              "amp": 1.05681,
+              "amp": 1.056815,
               "N": 120,
               "ascNodePeriod": -22354,
               "errArcsec": 16.87,
@@ -6740,7 +6740,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -6749,7 +6749,7 @@
             "jupiter": {
               "phase": 17.06,
               "mean": 0.3086,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 42,
               "ascNodePeriod": -63870,
               "errArcsec": 0.09,
@@ -6788,12 +6788,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 90.45786045645826,
+          "totalErrArcsec": 90.45817004764176,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -6802,7 +6802,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.10048,
-              "amp": 1.05681,
+              "amp": 1.056815,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 89.29,
@@ -6811,7 +6811,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -6820,7 +6820,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -6858,9 +6858,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99711984870072,
-        "eccBalance": 99.19356615474882,
-        "eccBalanceAtSystemReset": 99.18612007314826,
+        "inclBalance": 99.99711984868756,
+        "eccBalance": 99.19356615454245,
+        "eccBalanceAtSystemReset": 99.18612007223692,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6885,12 +6885,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 4.242731972963318,
+          "totalErrArcsec": 4.243047220523774,
           "perPlanet": {
             "mercury": {
               "phase": 144.52,
               "mean": 6.74261,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 81,
               "ascNodePeriod": -33118,
               "errArcsec": 0.2,
@@ -6899,7 +6899,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.16286,
-              "amp": 0.162586,
+              "amp": 0.162587,
               "N": 26,
               "ascNodePeriod": -103174,
               "errArcsec": 0.14,
@@ -6908,7 +6908,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.75747,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 49,
               "ascNodePeriod": -54746,
               "errArcsec": 0.46,
@@ -6917,7 +6917,7 @@
             "jupiter": {
               "phase": 17.06,
               "mean": 0.3086,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 42,
               "ascNodePeriod": -63870,
               "errArcsec": 0.09,
@@ -6935,7 +6935,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -6956,12 +6956,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 22.618982980695026,
+          "totalErrArcsec": 22.619094947885745,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 7.28161,
-              "amp": 1.014515,
+              "amp": 1.01452,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 10,
@@ -6970,7 +6970,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.14623,
-              "amp": 0.162586,
+              "amp": 0.162587,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 11.88,
@@ -6979,7 +6979,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.75747,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 49,
               "ascNodePeriod": -54746,
               "errArcsec": 0.46,
@@ -6988,7 +6988,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -7006,7 +7006,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -7026,9 +7026,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99915718538192,
-        "eccBalance": 99.17358453875539,
-        "eccBalanceAtSystemReset": 99.16603800135371,
+        "inclBalance": 99.99915718538097,
+        "eccBalance": 99.17358453896065,
+        "eccBalanceAtSystemReset": 99.16603800036135,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7053,12 +7053,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 4.40195816721607,
+          "totalErrArcsec": 4.401649837280487,
           "perPlanet": {
             "mercury": {
               "phase": 324.52,
               "mean": 6.9798,
-              "amp": 1.623224,
+              "amp": 1.623232,
               "N": 119,
               "ascNodePeriod": -22542,
               "errArcsec": 0.38,
@@ -7067,7 +7067,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.16806,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 40,
               "ascNodePeriod": -67063,
               "errArcsec": 0.11,
@@ -7076,7 +7076,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -7085,7 +7085,7 @@
             "jupiter": {
               "phase": 17.06,
               "mean": 0.3086,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 42,
               "ascNodePeriod": -63870,
               "errArcsec": 0.09,
@@ -7103,7 +7103,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -7124,12 +7124,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 5,
-          "totalErrArcsec": 49.59859701848035,
+          "totalErrArcsec": 49.59925407788882,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
-              "mean": 7.8422,
-              "amp": 1.623224,
+              "mean": 7.84221,
+              "amp": 1.623232,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 28.17,
@@ -7138,7 +7138,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.14103,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 20.67,
@@ -7147,7 +7147,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -7156,7 +7156,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -7174,7 +7174,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -7194,9 +7194,9 @@
       },
       {
         "scenario": "C",
-        "inclBalance": 99.99641018569615,
-        "eccBalance": 99.1463498893953,
-        "eccBalanceAtSystemReset": 99.15239627592311,
+        "inclBalance": 99.99641018572625,
+        "eccBalance": 99.14634988803982,
+        "eccBalanceAtSystemReset": 99.15239627479166,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7221,12 +7221,12 @@
           "n": 2,
           "balancedYear": -973269,
           "dirCount": 7,
-          "totalErrArcsec": 1.445615046658813,
+          "totalErrArcsec": 1.4456178922329892,
           "perPlanet": {
             "mercury": {
               "phase": 9.52,
               "mean": 6.40272,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 10,
               "ascNodePeriod": -268254,
               "errArcsec": 0.51,
@@ -7235,7 +7235,7 @@
             "venus": {
               "phase": 128.64,
               "mean": 2.4184,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 3,
               "ascNodePeriod": -894179,
               "errArcsec": 0.26,
@@ -7244,7 +7244,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.58308,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 18,
               "ascNodePeriod": -149030,
               "errArcsec": 0.06,
@@ -7292,12 +7292,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 21.926438324874017,
+          "totalErrArcsec": 21.92651059448791,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.48319,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 15,
               "ascNodePeriod": -178836,
               "errArcsec": 0.17,
@@ -7306,7 +7306,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.14103,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 20.67,
@@ -7315,7 +7315,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.67929,
-              "amp": 0.277197,
+              "amp": 0.277199,
               "N": 35,
               "ascNodePeriod": -76644,
               "errArcsec": 0.12,
@@ -7362,9 +7362,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99871604456858,
-        "eccBalance": 99.12681027101438,
-        "eccBalanceAtSystemReset": 99.13300735649389,
+        "inclBalance": 99.99871604456642,
+        "eccBalance": 99.12681027064225,
+        "eccBalanceAtSystemReset": 99.1330073572804,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7389,12 +7389,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 7.5930873075788075,
+          "totalErrArcsec": 7.593334893560724,
           "perPlanet": {
             "mercury": {
               "phase": 144.52,
               "mean": 6.40479,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 28,
               "ascNodePeriod": -95805,
               "errArcsec": 0.24,
@@ -7412,7 +7412,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -7460,12 +7460,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 8.551383575927744,
+          "totalErrArcsec": 8.551755621435944,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.48319,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 15,
               "ascNodePeriod": -178836,
               "errArcsec": 0.17,
@@ -7483,7 +7483,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -7530,9 +7530,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.998475731253,
-        "eccBalance": 99.10977289279103,
-        "eccBalanceAtSystemReset": 99.10222595693115,
+        "inclBalance": 99.99847573124802,
+        "eccBalance": 99.10977289301256,
+        "eccBalanceAtSystemReset": 99.10222595593908,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7557,12 +7557,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 4.358904638958668,
+          "totalErrArcsec": 4.358874349627225,
           "perPlanet": {
             "mercury": {
               "phase": 144.52,
               "mean": 6.9798,
-              "amp": 1.623224,
+              "amp": 1.623232,
               "N": 119,
               "ascNodePeriod": -22542,
               "errArcsec": 0.38,
@@ -7571,7 +7571,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.17617,
-              "amp": 0.422724,
+              "amp": 0.422726,
               "N": 61,
               "ascNodePeriod": -43976,
               "errArcsec": 0.06,
@@ -7580,7 +7580,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -7589,7 +7589,7 @@
             "jupiter": {
               "phase": 17.06,
               "mean": 0.3086,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 42,
               "ascNodePeriod": -63870,
               "errArcsec": 0.09,
@@ -7607,7 +7607,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -7628,12 +7628,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 5,
-          "totalErrArcsec": 63.32241577201569,
+          "totalErrArcsec": 63.323136994490234,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 7.8422,
-              "amp": 1.623224,
+              "mean": 7.84221,
+              "amp": 1.623232,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 28.17,
@@ -7642,7 +7642,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.13292,
-              "amp": 0.422724,
+              "amp": 0.422726,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 34.4,
@@ -7651,7 +7651,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -7660,7 +7660,7 @@
             "jupiter": {
               "phase": 287.06,
               "mean": 0.32141,
-              "amp": 0.013377,
+              "amp": 0.013378,
               "N": 39,
               "ascNodePeriod": -68783,
               "errArcsec": 0.07,
@@ -7678,7 +7678,7 @@
             "uranus": {
               "phase": 21.33,
               "mean": 1.02781,
-              "amp": 0.038496,
+              "amp": 0.038497,
               "N": 12,
               "ascNodePeriod": -223545,
               "errArcsec": 0.16,
@@ -7698,9 +7698,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99955827193354,
-        "eccBalance": 99.10956279351046,
-        "eccBalanceAtSystemReset": 99.10956279351046,
+        "inclBalance": 99.9995582719348,
+        "eccBalance": 99.10956279430542,
+        "eccBalanceAtSystemReset": 99.10956279430542,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7725,12 +7725,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 5.551825162890193,
+          "totalErrArcsec": 5.552073931440952,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -7739,7 +7739,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -7748,7 +7748,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -7796,12 +7796,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 5.551825162890193,
+          "totalErrArcsec": 5.552073931440952,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -7810,7 +7810,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -7819,7 +7819,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.96795,
-              "amp": 1.940382,
+              "amp": 1.940391,
               "N": 85,
               "ascNodePeriod": -31559,
               "errArcsec": 0.48,
@@ -7866,9 +7866,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9964821631651,
-        "eccBalance": 99.10625952587081,
-        "eccBalanceAtSystemReset": 99.10625952587081,
+        "inclBalance": 99.99648216317135,
+        "eccBalance": 99.1062595266164,
+        "eccBalanceAtSystemReset": 99.1062595266164,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7893,12 +7893,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 3.1130711074240045,
+          "totalErrArcsec": 3.112963705790218,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -7907,7 +7907,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -7916,7 +7916,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -7964,12 +7964,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 3.1130711074240045,
+          "totalErrArcsec": 3.112963705790218,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -7978,7 +7978,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15258,
-              "amp": 0.038429,
+              "amp": 0.03843,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 1.13,
@@ -7987,7 +7987,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -8034,9 +8034,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99545228620313,
-        "eccBalance": 99.08684689166193,
-        "eccBalanceAtSystemReset": 99.09295979739504,
+        "inclBalance": 99.99545228621298,
+        "eccBalance": 99.08684689188007,
+        "eccBalanceAtSystemReset": 99.09295979814154,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -8061,12 +8061,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 7.815480632550242,
+          "totalErrArcsec": 7.814838129838209,
           "perPlanet": {
             "mercury": {
               "phase": 144.52,
               "mean": 6.9798,
-              "amp": 1.623224,
+              "amp": 1.623232,
               "N": 119,
               "ascNodePeriod": -22542,
               "errArcsec": 0.38,
@@ -8075,7 +8075,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.15772,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 13,
               "ascNodePeriod": -206349,
               "errArcsec": 0.17,
@@ -8084,7 +8084,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.75747,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 49,
               "ascNodePeriod": -54746,
               "errArcsec": 0.46,
@@ -8132,12 +8132,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 33.2072955351753,
+          "totalErrArcsec": 33.20743887379567,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 7.8422,
-              "amp": 1.623224,
+              "mean": 7.84221,
+              "amp": 1.623232,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 28.17,
@@ -8146,7 +8146,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -8155,7 +8155,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.75747,
-              "amp": 0.727643,
+              "amp": 0.727646,
               "N": 49,
               "ascNodePeriod": -54746,
               "errArcsec": 0.46,
@@ -8202,9 +8202,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99973520840636,
-        "eccBalance": 99.08601185165338,
-        "eccBalanceAtSystemReset": 99.08601185165338,
+        "inclBalance": 99.99973520840074,
+        "eccBalance": 99.0860118524017,
+        "eccBalanceAtSystemReset": 99.0860118524017,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -8229,12 +8229,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 4.910255757616122,
+          "totalErrArcsec": 4.910124628204993,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.48319,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 15,
               "ascNodePeriod": -178836,
               "errArcsec": 0.17,
@@ -8243,7 +8243,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -8252,7 +8252,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -8300,12 +8300,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 7,
-          "totalErrArcsec": 4.910255757616122,
+          "totalErrArcsec": 4.910124628204993,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.48319,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 15,
               "ascNodePeriod": -178836,
               "errArcsec": 0.17,
@@ -8314,7 +8314,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.15136,
-              "amp": 0.062165,
+              "amp": 0.062166,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 3.18,
@@ -8323,7 +8323,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.83324,
-              "amp": 1.164229,
+              "amp": 1.164234,
               "N": 62,
               "ascNodePeriod": -43267,
               "errArcsec": 0.17,
@@ -8370,9 +8370,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99787652980126,
-        "eccBalance": 99.05771212763804,
-        "eccBalanceAtSystemReset": 99.06229682917832,
+        "inclBalance": 99.9978765298113,
+        "eccBalance": 99.0577121280501,
+        "eccBalanceAtSystemReset": 99.06229682989853,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -8397,12 +8397,12 @@
           "n": 6,
           "balancedYear": -2314537,
           "dirCount": 7,
-          "totalErrArcsec": 6.516916823146877,
+          "totalErrArcsec": 6.517204772749239,
           "perPlanet": {
             "mercury": {
               "phase": 189.52,
               "mean": 6.11274,
-              "amp": 0.624317,
+              "amp": 0.62432,
               "N": 57,
               "ascNodePeriod": -47062,
               "errArcsec": 0.45,
@@ -8411,7 +8411,7 @@
             "venus": {
               "phase": 128.64,
               "mean": 2.31692,
-              "amp": 0.162586,
+              "amp": 0.162587,
               "N": 3,
               "ascNodePeriod": -894179,
               "errArcsec": 0.19,
@@ -8420,7 +8420,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.55347,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 13,
               "ascNodePeriod": -206349,
               "errArcsec": 0.14,
@@ -8468,12 +8468,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 13.85340468771595,
+          "totalErrArcsec": 13.853459657011664,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 6.92225,
-              "amp": 0.624317,
+              "mean": 6.92226,
+              "amp": 0.62432,
               "N": 2,
               "ascNodePeriod": -1341268,
               "errArcsec": 0.5,
@@ -8482,7 +8482,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.14623,
-              "amp": 0.162586,
+              "amp": 0.162587,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 11.88,
@@ -8491,7 +8491,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.7089,
-              "amp": 0.44778,
+              "amp": 0.447782,
               "N": 40,
               "ascNodePeriod": -67063,
               "errArcsec": 0.09,
@@ -8538,9 +8538,9 @@
       },
       {
         "scenario": "C",
-        "inclBalance": 99.99870924851894,
-        "eccBalance": 99.03604253011777,
-        "eccBalanceAtSystemReset": 99.02664158876789,
+        "inclBalance": 99.99870924853839,
+        "eccBalance": 99.03604252944704,
+        "eccBalanceAtSystemReset": 99.02664158766505,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -8565,12 +8565,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 2.4998869475844074,
+          "totalErrArcsec": 2.4992291395767428,
           "perPlanet": {
             "mercury": {
               "phase": 324.52,
               "mean": 6.9798,
-              "amp": 1.623224,
+              "amp": 1.623232,
               "N": 119,
               "ascNodePeriod": -22542,
               "errArcsec": 0.38,
@@ -8579,7 +8579,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.16806,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 40,
               "ascNodePeriod": -67063,
               "errArcsec": 0.11,
@@ -8588,7 +8588,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -8636,12 +8636,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 5,
-          "totalErrArcsec": 50.17323734890456,
+          "totalErrArcsec": 50.173532160021274,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
-              "mean": 7.8422,
-              "amp": 1.623224,
+              "mean": 7.84221,
+              "amp": 1.623232,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 28.17,
@@ -8650,7 +8650,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.14103,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 20.67,
@@ -8659,7 +8659,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -8706,9 +8706,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99489023999885,
-        "eccBalance": 99.03503551520531,
-        "eccBalanceAtSystemReset": 99.04109783110967,
+        "inclBalance": 99.9948902399863,
+        "eccBalance": 99.03503551560597,
+        "eccBalanceAtSystemReset": 99.04109783182244,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -8733,12 +8733,12 @@
           "n": 1,
           "balancedYear": -637952,
           "dirCount": 7,
-          "totalErrArcsec": 7.67996476359451,
+          "totalErrArcsec": 7.679500613706586,
           "perPlanet": {
             "mercury": {
               "phase": 144.52,
               "mean": 6.9798,
-              "amp": 1.623224,
+              "amp": 1.623232,
               "N": 119,
               "ascNodePeriod": -22542,
               "errArcsec": 0.38,
@@ -8747,7 +8747,7 @@
             "venus": {
               "phase": 218.64,
               "mean": 2.16286,
-              "amp": 0.162586,
+              "amp": 0.162587,
               "N": 26,
               "ascNodePeriod": -103174,
               "errArcsec": 0.14,
@@ -8756,7 +8756,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -8804,12 +8804,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 5,
-          "totalErrArcsec": 41.7966270676383,
+          "totalErrArcsec": 41.796898434383166,
           "perPlanet": {
             "mercury": {
               "phase": 54.52,
-              "mean": 7.8422,
-              "amp": 1.623224,
+              "mean": 7.84221,
+              "amp": 1.623232,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 28.17,
@@ -8818,7 +8818,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.14623,
-              "amp": 0.162586,
+              "amp": 0.162587,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 11.88,
@@ -8827,7 +8827,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -8874,9 +8874,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99962877787335,
-        "eccBalance": 99.00097384224698,
-        "eccBalanceAtSystemReset": 98.99700149808987,
+        "inclBalance": 99.99962877788414,
+        "eccBalance": 99.00097384307338,
+        "eccBalanceAtSystemReset": 98.99700149877526,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -8901,12 +8901,12 @@
           "n": 2,
           "balancedYear": -973269,
           "dirCount": 7,
-          "totalErrArcsec": 3.2319321249131567,
+          "totalErrArcsec": 3.2319771863951026,
           "perPlanet": {
             "mercury": {
               "phase": 189.52,
               "mean": 6.40272,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 10,
               "ascNodePeriod": -268254,
               "errArcsec": 0.51,
@@ -8915,7 +8915,7 @@
             "venus": {
               "phase": 128.64,
               "mean": 2.4184,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 3,
               "ascNodePeriod": -894179,
               "errArcsec": 0.26,
@@ -8972,12 +8972,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 22.574897880563547,
+          "totalErrArcsec": 22.575014745355993,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.48319,
-              "amp": 0.147566,
+              "amp": 0.147567,
               "N": 15,
               "ascNodePeriod": -178836,
               "errArcsec": 0.17,
@@ -8986,7 +8986,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.14103,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 20.67,
@@ -9042,9 +9042,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99815551663687,
-        "eccBalance": 98.99839573400808,
-        "eccBalanceAtSystemReset": 99.0029957057723,
+        "inclBalance": 99.99815551664707,
+        "eccBalance": 98.99839573433601,
+        "eccBalanceAtSystemReset": 99.00299570646234,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9069,12 +9069,12 @@
           "n": 6,
           "balancedYear": -2314537,
           "dirCount": 7,
-          "totalErrArcsec": 6.708482129315188,
+          "totalErrArcsec": 6.708346305674653,
           "perPlanet": {
             "mercury": {
               "phase": 9.52,
               "mean": 6.20209,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 43,
               "ascNodePeriod": -62385,
               "errArcsec": 0.4,
@@ -9083,7 +9083,7 @@
             "venus": {
               "phase": 128.64,
               "mean": 2.4184,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 3,
               "ascNodePeriod": -894179,
               "errArcsec": 0.26,
@@ -9092,7 +9092,7 @@
             "mars": {
               "phase": 236.07,
               "mean": 1.60147,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 21,
               "ascNodePeriod": -127740,
               "errArcsec": 0.3,
@@ -9140,12 +9140,12 @@
           "n": 7,
           "balancedYear": -2649854,
           "dirCount": 6,
-          "totalErrArcsec": 22.848080168986094,
+          "totalErrArcsec": 22.84822010345631,
           "perPlanet": {
             "mercury": {
               "phase": 234.52,
               "mean": 6.70322,
-              "amp": 0.386482,
+              "amp": 0.386484,
               "N": 9,
               "ascNodePeriod": -298060,
               "errArcsec": 0.42,
@@ -9154,7 +9154,7 @@
             "venus": {
               "phase": 38.64,
               "mean": 2.14103,
-              "amp": 0.264203,
+              "amp": 0.264204,
               "N": 1,
               "ascNodePeriod": -2682536,
               "errArcsec": 20.67,
@@ -9163,7 +9163,7 @@
             "mars": {
               "phase": 56.07,
               "mean": 1.6609,
-              "amp": 0.17121,
+              "amp": 0.171211,
               "N": 32,
               "ascNodePeriod": -83829,
               "errArcsec": 0.36,
@@ -9210,9 +9210,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99605189898658,
-        "eccBalance": 99.93037573697833,
-        "eccBalanceAtSystemReset": 99.93037573697833,
+        "inclBalance": 99.99605189901226,
+        "eccBalance": 99.93037573589534,
+        "eccBalanceAtSystemReset": 99.93037573589534,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9238,9 +9238,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99963093784648,
-        "eccBalance": 99.8741032747811,
-        "eccBalanceAtSystemReset": 99.8741032747811,
+        "inclBalance": 99.99963093782107,
+        "eccBalance": 99.87410327641932,
+        "eccBalanceAtSystemReset": 99.87410327641932,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9266,9 +9266,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99815488426623,
-        "eccBalance": 99.84290252707763,
-        "eccBalanceAtSystemReset": 99.84290252707763,
+        "inclBalance": 99.99815488429013,
+        "eccBalance": 99.84290252871482,
+        "eccBalanceAtSystemReset": 99.84290252871482,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9294,9 +9294,9 @@
       },
       {
         "scenario": "C",
-        "inclBalance": 99.99419251327765,
-        "eccBalance": 99.6778943850449,
-        "eccBalanceAtSystemReset": 99.6778943850449,
+        "inclBalance": 99.9941925132582,
+        "eccBalance": 99.67789438350752,
+        "eccBalanceAtSystemReset": 99.67789438350752,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9322,9 +9322,9 @@
       },
       {
         "scenario": "C",
-        "inclBalance": 99.99639997834302,
-        "eccBalance": 99.60397445118629,
-        "eccBalanceAtSystemReset": 99.60397445118629,
+        "inclBalance": 99.99639997835878,
+        "eccBalance": 99.60397444984348,
+        "eccBalanceAtSystemReset": 99.60397444984348,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9350,9 +9350,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99980379666515,
-        "eccBalance": 99.98086628645096,
-        "eccBalanceAtSystemReset": 99.98086628645096,
+        "inclBalance": 99.99980379664942,
+        "eccBalance": 99.980866287001,
+        "eccBalanceAtSystemReset": 99.980866287001,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9378,9 +9378,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99586924422495,
-        "eccBalance": 99.97071071541019,
-        "eccBalanceAtSystemReset": 99.97071071541019,
+        "inclBalance": 99.9958692442077,
+        "eccBalance": 99.97071071599575,
+        "eccBalanceAtSystemReset": 99.97071071599575,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9406,9 +9406,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99412841346637,
-        "eccBalance": 99.96196555713382,
-        "eccBalanceAtSystemReset": 99.96196555713382,
+        "inclBalance": 99.99412841346904,
+        "eccBalance": 99.96196555675505,
+        "eccBalanceAtSystemReset": 99.96196555675505,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9434,9 +9434,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99963916574015,
-        "eccBalance": 99.95942426079668,
-        "eccBalanceAtSystemReset": 99.95942426079668,
+        "inclBalance": 99.9996391657397,
+        "eccBalance": 99.95942425967141,
+        "eccBalanceAtSystemReset": 99.95942425967141,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9462,9 +9462,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9971027857492,
-        "eccBalance": 99.92423703472525,
-        "eccBalanceAtSystemReset": 99.92423703472525,
+        "inclBalance": 99.99710278576522,
+        "eccBalance": 99.9242370337237,
+        "eccBalanceAtSystemReset": 99.9242370337237,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9490,9 +9490,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99781093840527,
-        "eccBalance": 99.90415001413527,
-        "eccBalanceAtSystemReset": 99.90415001413527,
+        "inclBalance": 99.99781093837143,
+        "eccBalance": 99.90415001569085,
+        "eccBalanceAtSystemReset": 99.90415001569085,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9518,9 +9518,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99793621963407,
-        "eccBalance": 99.83804440606193,
-        "eccBalanceAtSystemReset": 99.83804440606193,
+        "inclBalance": 99.99793621964731,
+        "eccBalance": 99.83804440502288,
+        "eccBalanceAtSystemReset": 99.83804440502288,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9546,9 +9546,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99719985533073,
-        "eccBalance": 99.82701215243057,
-        "eccBalanceAtSystemReset": 99.82701215243057,
+        "inclBalance": 99.99719985535215,
+        "eccBalance": 99.82701215407437,
+        "eccBalanceAtSystemReset": 99.82701215407437,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9574,9 +9574,9 @@
       },
       {
         "scenario": "D",
-        "inclBalance": 99.99462624942362,
-        "eccBalance": 99.81231074950901,
-        "eccBalanceAtSystemReset": 99.81231074950901,
+        "inclBalance": 99.99462624947178,
+        "eccBalance": 99.81231074774595,
+        "eccBalanceAtSystemReset": 99.81231074774595,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9602,9 +9602,9 @@
       },
       {
         "scenario": "D",
-        "inclBalance": 99.99679955242313,
-        "eccBalance": 99.80809920044342,
-        "eccBalanceAtSystemReset": 99.80809920044342,
+        "inclBalance": 99.99679955236395,
+        "eccBalance": 99.80809920270234,
+        "eccBalanceAtSystemReset": 99.80809920270234,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9630,9 +9630,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99800410155892,
-        "eccBalance": 99.77646989704105,
-        "eccBalanceAtSystemReset": 99.77646989704105,
+        "inclBalance": 99.99800410158836,
+        "eccBalance": 99.77646989696713,
+        "eccBalanceAtSystemReset": 99.77646989696713,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9658,9 +9658,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99998882207656,
-        "eccBalance": 99.76981365148536,
-        "eccBalanceAtSystemReset": 99.76981365148536,
+        "inclBalance": 99.999988822114,
+        "eccBalance": 99.76981365331352,
+        "eccBalanceAtSystemReset": 99.76981365331352,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9686,9 +9686,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99534657095154,
-        "eccBalance": 99.76445982129206,
-        "eccBalanceAtSystemReset": 99.76445982129206,
+        "inclBalance": 99.99534657099927,
+        "eccBalance": 99.7644598224267,
+        "eccBalanceAtSystemReset": 99.7644598224267,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9714,9 +9714,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99547402436349,
-        "eccBalance": 99.75594472604313,
-        "eccBalanceAtSystemReset": 99.75594472604313,
+        "inclBalance": 99.99547402436043,
+        "eccBalance": 99.75594472632405,
+        "eccBalanceAtSystemReset": 99.75594472632405,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9742,9 +9742,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99961982550842,
-        "eccBalance": 99.75386406699627,
-        "eccBalanceAtSystemReset": 99.75386406699627,
+        "inclBalance": 99.99961982554193,
+        "eccBalance": 99.75386406693212,
+        "eccBalanceAtSystemReset": 99.75386406693212,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9770,9 +9770,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99999926693688,
-        "eccBalance": 99.7341643654283,
-        "eccBalanceAtSystemReset": 99.7341643654283,
+        "inclBalance": 99.9999992669382,
+        "eccBalance": 99.73416436462412,
+        "eccBalanceAtSystemReset": 99.73416436462412,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9798,9 +9798,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99892402395871,
-        "eccBalance": 99.73392038825962,
-        "eccBalanceAtSystemReset": 99.73392038825962,
+        "inclBalance": 99.99892402391491,
+        "eccBalance": 99.7339203883022,
+        "eccBalanceAtSystemReset": 99.7339203883022,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9826,9 +9826,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99859349027156,
-        "eccBalance": 99.71053493528638,
-        "eccBalanceAtSystemReset": 99.71053493528638,
+        "inclBalance": 99.99859349029778,
+        "eccBalance": 99.71053493534757,
+        "eccBalanceAtSystemReset": 99.71053493534757,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9854,9 +9854,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9975701928858,
-        "eccBalance": 99.6964043637378,
-        "eccBalanceAtSystemReset": 99.6964043637378,
+        "inclBalance": 99.99757019288552,
+        "eccBalance": 99.6964043632114,
+        "eccBalanceAtSystemReset": 99.6964043632114,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9882,9 +9882,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99524188877119,
-        "eccBalance": 99.68712101300152,
-        "eccBalanceAtSystemReset": 99.68712101300152,
+        "inclBalance": 99.99524188876643,
+        "eccBalance": 99.68712101254609,
+        "eccBalanceAtSystemReset": 99.68712101254609,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9910,9 +9910,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99984597382873,
-        "eccBalance": 99.63455175495652,
-        "eccBalanceAtSystemReset": 99.63455175495652,
+        "inclBalance": 99.99984597388986,
+        "eccBalance": 99.63455175281956,
+        "eccBalanceAtSystemReset": 99.63455175281956,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9938,9 +9938,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.9961696786097,
-        "eccBalance": 99.5883104330308,
-        "eccBalanceAtSystemReset": 99.5883104330308,
+        "inclBalance": 99.99616967859161,
+        "eccBalance": 99.58831043398708,
+        "eccBalanceAtSystemReset": 99.58831043398708,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9966,9 +9966,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99463235621602,
-        "eccBalance": 99.58471944842427,
-        "eccBalanceAtSystemReset": 99.58471944842427,
+        "inclBalance": 99.99463235621195,
+        "eccBalance": 99.58471944936822,
+        "eccBalanceAtSystemReset": 99.58471944936822,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -9994,9 +9994,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99852569359479,
-        "eccBalance": 99.48251496893141,
-        "eccBalanceAtSystemReset": 99.48251496893141,
+        "inclBalance": 99.99852569355853,
+        "eccBalance": 99.48251496712062,
+        "eccBalanceAtSystemReset": 99.48251496712062,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10022,9 +10022,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99822068663259,
-        "eccBalance": 99.45099764752099,
-        "eccBalanceAtSystemReset": 99.45099764752099,
+        "inclBalance": 99.99822068663123,
+        "eccBalance": 99.45099764737814,
+        "eccBalanceAtSystemReset": 99.45099764737814,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10050,9 +10050,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99894095489621,
-        "eccBalance": 99.41553159235835,
-        "eccBalanceAtSystemReset": 99.41553159235835,
+        "inclBalance": 99.99894095492117,
+        "eccBalance": 99.41553159331565,
+        "eccBalanceAtSystemReset": 99.41553159331565,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10078,9 +10078,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.9974409717926,
-        "eccBalance": 99.36901141202702,
-        "eccBalanceAtSystemReset": 99.36901141202702,
+        "inclBalance": 99.99744097182291,
+        "eccBalance": 99.36901141308488,
+        "eccBalanceAtSystemReset": 99.36901141308488,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10106,9 +10106,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99807253704535,
-        "eccBalance": 99.33857000936925,
-        "eccBalanceAtSystemReset": 99.33857000936925,
+        "inclBalance": 99.99807253702222,
+        "eccBalance": 99.33857000846024,
+        "eccBalanceAtSystemReset": 99.33857000846024,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10134,9 +10134,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99484288860529,
-        "eccBalance": 99.21446195549241,
-        "eccBalanceAtSystemReset": 99.21446195549241,
+        "inclBalance": 99.99484288860823,
+        "eccBalance": 99.21446195444439,
+        "eccBalanceAtSystemReset": 99.21446195444439,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10162,9 +10162,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99439682081803,
-        "eccBalance": 99.18860170086695,
-        "eccBalanceAtSystemReset": 99.18860170086695,
+        "inclBalance": 99.99439682086508,
+        "eccBalance": 99.18860170268792,
+        "eccBalanceAtSystemReset": 99.18860170268792,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10190,9 +10190,9 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99410923552746,
-        "eccBalance": 99.18714943786209,
-        "eccBalanceAtSystemReset": 99.18714943786209,
+        "inclBalance": 99.99410923549809,
+        "eccBalance": 99.18714943669528,
+        "eccBalanceAtSystemReset": 99.18714943669528,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10218,9 +10218,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99691760835351,
-        "eccBalance": 99.15368820062545,
-        "eccBalanceAtSystemReset": 99.15368820062545,
+        "inclBalance": 99.99691760835051,
+        "eccBalance": 99.15368820142837,
+        "eccBalanceAtSystemReset": 99.15368820142837,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10246,9 +10246,9 @@
       },
       {
         "scenario": "C",
-        "inclBalance": 99.99703213784255,
-        "eccBalance": 99.14233420612673,
-        "eccBalanceAtSystemReset": 99.14233420612673,
+        "inclBalance": 99.9970321377843,
+        "eccBalance": 99.14233420440905,
+        "eccBalanceAtSystemReset": 99.14233420440905,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10274,9 +10274,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99403372718912,
-        "eccBalance": 99.10745596761876,
-        "eccBalanceAtSystemReset": 99.10745596761876,
+        "inclBalance": 99.99403372717639,
+        "eccBalance": 99.10745596864444,
+        "eccBalanceAtSystemReset": 99.10745596864444,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10302,9 +10302,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99966793886026,
-        "eccBalance": 99.10286846705266,
-        "eccBalanceAtSystemReset": 99.10286846705266,
+        "inclBalance": 99.99966793886146,
+        "eccBalance": 99.10286846799421,
+        "eccBalanceAtSystemReset": 99.10286846799421,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10330,9 +10330,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99680017715671,
-        "eccBalance": 99.08506731612704,
-        "eccBalanceAtSystemReset": 99.08506731612704,
+        "inclBalance": 99.99680017716922,
+        "eccBalance": 99.08506731724634,
+        "eccBalanceAtSystemReset": 99.08506731724634,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10358,9 +10358,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99652581252553,
-        "eccBalance": 99.081939647008,
-        "eccBalanceAtSystemReset": 99.081939647008,
+        "inclBalance": 99.99652581250828,
+        "eccBalance": 99.08193964696244,
+        "eccBalanceAtSystemReset": 99.08193964696244,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10386,9 +10386,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99589504448866,
-        "eccBalance": 99.05147078910309,
-        "eccBalanceAtSystemReset": 99.05147078910309,
+        "inclBalance": 99.99589504450445,
+        "eccBalance": 99.0514707902956,
+        "eccBalanceAtSystemReset": 99.0514707902956,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10414,9 +10414,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99822963385677,
-        "eccBalance": 99.02851320393255,
-        "eccBalanceAtSystemReset": 99.02851320393255,
+        "inclBalance": 99.99822963385914,
+        "eccBalance": 99.02851320418145,
+        "eccBalanceAtSystemReset": 99.02851320418145,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -10442,9 +10442,9 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99925951067286,
-        "eccBalance": 99.02241228598221,
-        "eccBalanceAtSystemReset": 99.02241228598221,
+        "inclBalance": 99.99925951066575,
+        "eccBalance": 99.02241228631216,
+        "eccBalanceAtSystemReset": 99.02241228631216,
         "mirror": false,
         "isConfig7": false,
         "dValues": {

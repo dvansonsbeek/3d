@@ -278,8 +278,15 @@ for (const type of allTypes) {
 const allRows = [];
 const t0 = Date.now();
 
-// We'll store the seed year's model year (startmodelYear rounded)
-const seedModelYear = Math.round(C.startmodelYear);
+// Seed model year = calendar year of the J2000 model epoch (mid-year 2000).
+// Using `Math.floor(2000.5) = 2000` (was `Math.round(...) = 2001`) so that the
+// CSV row labeled `year = seedModelYear` lines up on the same calendar year for
+// ALL six event types (VE 2000-03, SS 2000-06, AE 2000-09, WS 2000-12, PERI
+// 2000-01, APH 2000-07 all share label 2000). Requires the paired change in
+// tools/lib/constants.js cardinalPointYearFractions.VE (kept negative, not
+// wrapped positive) so the VE seed lands on that year's March equinox rather
+// than the following year's.
+const seedModelYear = Math.floor(C.startmodelYear);
 
 // ─── Forward pass: seedModelYear → endYear ──────────────────────────────────
 console.error('\nForward pass...');

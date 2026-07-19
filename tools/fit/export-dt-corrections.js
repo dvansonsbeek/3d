@@ -57,6 +57,8 @@ const TARGETS = {
   },
 };
 
+const ASTRO_REFERENCE_PATH = path.join(__dirname, '..', '..', 'public', 'input', 'astro-reference.json');
+
 // ─── Load fit JSON (returns null if none present; prefers 4-flag) ───
 function loadFitJson() {
   for (const p of FIT_JSON_PATHS) {
@@ -87,6 +89,11 @@ function applyToSource(src, fit) {
       ['JOSE4_SIN_COEFF_S',  c.jose4.sin_coeff_s],
     );
   }
+  // NOTE: deltaTStart (auto-selected joint optimum) is NOT synced here — it's
+  // written to public/input/astro-reference.json by syncAstroReference() below,
+  // and Step 9 of the pipeline (export-to-script.js) propagates it from JSON to
+  // src/script.js in the normal sync sweep. Keeping a single source of truth in
+  // astro-reference.json avoids two places writing the same const value.
   let changes = 0;
   for (const [name, val] of replacements) {
     const re = new RegExp(
@@ -136,12 +143,64 @@ function syncTargetToDisk(targetKey, fit, { dryRun }) {
   return changes;
 }
 
-// ─── Sync all three targets (bulk mode, called by dt-corrections-fit.js) ───
+// ─── Sync auto-optimum deltaTStart to public/input/astro-reference.json ─────
+// The JSON is the source of truth for that constant; Step 9 of the pipeline
+// (export-to-script.js) then propagates it from astro-reference.json into
+// src/script.js. This keeps a single writer per const across the pipeline.
+// No-op when fit.optimum.deltaTStart is null (--fixed-anchors or DT flag
+// unset — the sweep was skipped and the previous JSON value stays).
+function syncAstroReference(fit, { dryRun = false } = {}) {
+  if (!fit.optimum || typeof fit.optimum.deltaTStart !== 'number') {
+    console.log('  → public/input/astro-reference.json  (auto-optimum not available, skipping)');
+    return 0;
+  }
+  if (!fs.existsSync(ASTRO_REFERENCE_PATH)) {
+    console.log('  → public/input/astro-reference.json  (not found, skipping)');
+    return 0;
+  }
+  console.log('  → public/input/astro-reference.json');
+  const raw = fs.readFileSync(ASTRO_REFERENCE_PATH, 'utf8');
+  const json = JSON.parse(raw);
+  const oldVal = json.earthOrbital && json.earthOrbital.deltaTStart;
+  const newVal = fit.optimum.deltaTStart;
+  if (typeof oldVal !== 'number') {
+    console.log('    (earthOrbital.deltaTStart not present or non-numeric — skipping)');
+    return 0;
+  }
+  if (Math.abs(oldVal - newVal) < 1e-9) {
+    console.log('    (already in sync: ' + oldVal + ')');
+    return 0;
+  }
+  console.log(`    deltaTStart: ${oldVal} → ${newVal}`);
+  if (dryRun) {
+    console.log(`    1 change pending (dry run)`);
+    return 1;
+  }
+  // Regex-patch the specific line so surrounding formatting is preserved.
+  const re = /("deltaTStart"\s*:\s*)(-?[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)/;
+  const m = raw.match(re);
+  if (!m) {
+    console.log('    (deltaTStart line pattern not found — skipping)');
+    return 0;
+  }
+  fs.copyFileSync(ASTRO_REFERENCE_PATH, `${ASTRO_REFERENCE_PATH}.bak`);
+  console.log(`    (backup) → ${ASTRO_REFERENCE_PATH}.bak`);
+  const patched = raw.replace(re, `$1${newVal}`);
+  fs.writeFileSync(ASTRO_REFERENCE_PATH, patched);
+  console.log('    ✓ deltaTStart updated (propagates to script.js at pipeline Step 9)');
+  return 1;
+}
+
+// ─── Sync all targets (bulk mode, called by dt-corrections-fit.js) ─────────
+// Order: coefficient consts in the 3 code files, then deltaTStart in
+// astro-reference.json. The astro-reference.json update flows into script.js
+// separately via export-to-script.js at pipeline Step 9.
 function syncAllTargets(fit, { dryRun = false } = {}) {
   let total = 0;
   for (const key of Object.keys(TARGETS)) {
     total += syncTargetToDisk(key, fit, { dryRun });
   }
+  total += syncAstroReference(fit, { dryRun });
   return total;
 }
 
@@ -174,8 +233,10 @@ module.exports = {
   loadFitJson,
   applyToSource,
   syncTargetToDisk,
+  syncAstroReference,
   syncAllTargets,
   TARGETS,
+  ASTRO_REFERENCE_PATH,
 };
 
 if (require.main === module) main();

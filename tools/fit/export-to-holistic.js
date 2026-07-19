@@ -451,6 +451,35 @@ console.log('  ── Ascending node integers ──');
   }
 }
 
+// ── 3d. Astro-reference anchors (from public/input/astro-reference.json) ──
+// Values sourced from astro-reference.json (the pipeline's single source of
+// truth for IAU/Meeus/fit-derived scalar anchors). deltaTStart in particular
+// is auto-updated by tools/fit/dt-corrections-fit.js --sweep-usno, so it must
+// propagate to Holistic to keep the calculator's ΔT anchor in step with the
+// simulator.
+console.log('');
+console.log('  ── Astro-reference anchors ──');
+{
+  const arFull = require('../../public/input/astro-reference.json');
+  const eo = arFull.earthOrbital || {};
+  const mr = arFull.moonReference || {};
+  const anchors = [
+    ['DELTA_T_START_SECONDS',                     eo.deltaTStart],
+    ['PERIHELION_ALIGNMENT_YEAR',                 eo.perihelionalignmentYear],
+    // Lunar Precession Invariant inputs — needed for the deep-time apsidal/nodal
+    // scaling and the V-tags shown on the website + paper.
+    ['MOON_APSIDAL_PRECESSION_DAYS_ICRF_INPUT',   mr.moonApsidalPrecessionDaysInputICRF],
+    ['MOON_NODAL_PRECESSION_DAYS_ICRF_INPUT',     mr.moonNodalPrecessionDaysInputICRF],
+  ];
+  for (const [name, val] of anchors) {
+    if (typeof val !== 'number') {
+      console.log(`  ⚠ ${name}: astro-reference missing corresponding key`);
+      continue;
+    }
+    constantsTs = replaceScalar(constantsTs, name, val);
+  }
+}
+
 // ── 4. Write constants.ts ─────────────────────────────────────
 
 console.log('');

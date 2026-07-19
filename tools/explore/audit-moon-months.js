@@ -15,7 +15,7 @@
  *       rationalizes each input independently, but the *consequences* —
  *       N_apsidal_per_H = N_sid − N_ano and N_nodal_per_H = N_nod − N_sid —
  *       fall out as integers too. Are those integers H-meaningful
- *       (divisors of H = 23·61·239, or simple lattice multiples), or
+ *       (divisors of H, or simple lattice multiples), or
  *       arbitrary integers determined purely by observation?
  *
  *   Q3. Deep-time correctness. The current code treats all three input
@@ -68,7 +68,18 @@ const N_trop_derived = N_sid_input_round - 1 + 13;
 
 // ─── Q2. H-meaningfulness of the cycle-count integers ────────────────────
 
-const H_factors = [23, 61, 239];   // H = 23 × 61 × 239
+// Auto-derived prime factorization of H (H = 23 × 61 × 239 under H=335,317)
+function factorize(n) {
+  const f = [], seen = new Set();
+  let d = 2;
+  while (d * d <= n) {
+    while (n % d === 0) { if (!seen.has(d)) { f.push(d); seen.add(d); } n = n / d; }
+    d++;
+  }
+  if (n > 1 && !seen.has(n)) f.push(n);
+  return f;
+}
+const H_factors = factorize(H);
 
 function smallFactors(n) {
   const out = [];
@@ -84,7 +95,7 @@ function smallFactors(n) {
 function gcd(a, b) { return b ? gcd(b, a % b) : a; }
 
 function hOverlap(n) {
-  // How many of H's prime factors {23, 61, 239} divide n?
+  // How many of H's prime factors (auto-derived) divide n?
   return H_factors.filter(p => n % p === 0);
 }
 
@@ -157,7 +168,7 @@ console.log(R_RULE);
 console.log(' Q2. H-MEANINGFULNESS OF CYCLE-COUNT INTEGERS');
 console.log(R_RULE);
 console.log(' For each integer, list small prime factorization and which of');
-console.log(' H\'s prime factors {23, 61, 239} divide it.');
+console.log(` H's prime factors {${H_factors.join(', ')}} divide it.`);
 console.log('');
 for (const [name, n] of Object.entries(integers)) {
   const factors = smallFactors(n);

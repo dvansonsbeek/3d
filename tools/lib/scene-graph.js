@@ -872,11 +872,12 @@ function moveModel(graph, pos) {
     //   (a) year-multiples (integer year period),
     //   (b) small precession divisors 1..20 (Earth's Fibonacci named cycles
     //       H/3, H/5, H/8, H/13, H/16, etc.),
-    //   (c) lunar precession special divisors (18015, 37900),
+    //   (c) lunar precession divisors (auto-tracked from Meeus anchors via
+    //       C.N_apsidalI, C.N_nodalI),
     //   (d) mid-range divisors that share a non-trivial prime factor with H
-    //       (H = 23·61·239, so multiples of 23, 61, or 239 qualify).
+    //       (H = 3²·5·7451, so multiples of 3, 5, or 7451 qualify).
     // Everything else (gcd(d,H)=1 mid-range) is design-rule violating and
-    // silently skipped. The legacy [168] term falls in this skip bucket.
+    // silently skipped.
     const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
     if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
       // Recover JD via epoch-consistent mSY so pos→jd round-trip is exact.
@@ -891,9 +892,11 @@ function moveModel(graph, pos) {
         const divisor = h[0];
         const isYearMultiple      = divisor >= H_round && divisor % H_round === 0;
         const isPrecessionDivisor = divisor > 0 && divisor <= 20;
-        const isLunarPrecession   = divisor === 18015 || divisor === 37900;
-        const sharesFactorWithH   = _gcdInt(divisor, H_round) > 1;
-        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession && !sharesFactorWithH) continue;
+        const isLunarPrecession   = divisor === C.N_nodalI || divisor === C.N_apsidalI;
+        // Clause (d) "sharesFactorWithH" removed 2026-07-15 — admitted
+        // mid-range fit artifacts (divisors 84, 92, 115, 122) not physically
+        // motivated. See tools/fit/sun-longitude-harmonics.js for rationale.
+        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession) continue;
         const phase = 2 * Math.PI * t / (C.H / divisor);
         corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
       }
@@ -1510,9 +1513,11 @@ function computeSunPositionFast(jd) {
         const divisor = h[0];
         const isYearMultiple      = divisor >= H_round && divisor % H_round === 0;
         const isPrecessionDivisor = divisor > 0 && divisor <= 20;
-        const isLunarPrecession   = divisor === 18015 || divisor === 37900;
-        const sharesFactorWithH   = _gcdInt(divisor, H_round) > 1;
-        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession && !sharesFactorWithH) continue;
+        const isLunarPrecession   = divisor === C.N_nodalI || divisor === C.N_apsidalI;
+        // Clause (d) "sharesFactorWithH" removed 2026-07-15 — admitted
+        // mid-range fit artifacts (divisors 84, 92, 115, 122) not physically
+        // motivated. See tools/fit/sun-longitude-harmonics.js for rationale.
+        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession) continue;
         const phase = 2 * Math.PI * t / (C.H / divisor);
         corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
       }

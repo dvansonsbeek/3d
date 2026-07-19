@@ -23,9 +23,14 @@ let src = fs.readFileSync(SCRIPT_PATH, 'utf8');
 const doWrite = process.argv.includes('--write');
 let changes = 0;
 
-// ─── Helper: replace a top-level const value ────────────────────────────
+// ─── Helper: replace a top-level const/let value ────────────────────────
+// Matches both `const NAME = value` and `let NAME = value`. Some mutable
+// deep-time constants (holisticyearLength, meansiderealyearlengthinDays)
+// are declared with `let` because they get recomputed by
+// recomputeEpochAnchors — but their J2000 anchor value still needs to
+// sync from JSON on foundational-constant changes.
 function replaceConst(name, newVal) {
-  const re = new RegExp('(const\\s+' + name + '\\s*=\\s*)([\\d.eE+\\-]+)');
+  const re = new RegExp('((?:const|let)\\s+' + name + '\\s*=\\s*)([\\d.eE+\\-]+)');
   const m = src.match(re);
   if (!m) return;
   const oldVal = parseFloat(m[2]);

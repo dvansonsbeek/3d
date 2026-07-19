@@ -351,7 +351,7 @@ divisor type, applying ONLY:
 |---|---|
 | Year-multiple: divisor ≥ round(H) AND divisor % round(H) == 0 | 335317 (1 yr), 670634 (½ yr), 1005951 (⅓ yr), … |
 | Small precession: divisor ∈ [1, 20] | 3, 5, 8, 13, 16 (Earth Fibonacci hierarchy) |
-| Lunar precession ICRF | 18015 (nodal, 18.6 yr), 37900 (apsidal, 8.85 yr) |
+| Lunar precession ICRF | 18015 (nodal, 18.6 yr), 37899 (apsidal, 8.85 yr) |
 
 Any other divisor is **silently skipped** at runtime — this is a design-rule
 safeguard. The legacy `[168, 0.0048, -0.0050]` term (period 1996 yr,

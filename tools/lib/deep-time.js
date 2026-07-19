@@ -18,6 +18,8 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('./constants');
+const fs = require('fs');
+const path = require('path');
 
 // ─── Physical constants (literature-anchored, not framework-derived) ──────
 
@@ -25,14 +27,17 @@ const EARTH_DIAMETER_KM = 12756.27;                                  // IERS WGS
 const R_EARTH_M = (EARTH_DIAMETER_KM / 2) * 1000;
 const EARTH_MOI_FACTOR = 0.3306947;                                  // IERS Conventions 2010 (α at J2000)
 
-// Glacial Isostatic Adjustment — Cox & Chao 2002 + Peltier ICE-5G(VM2) modes
-const EARTH_MOI_FACTOR_RATE_YR = -1.8e-11;                           // dα/dt today, per year (sum of all modes)
-const GIA_MODES = [
-  { tau:  1500, frac: 0.15 },   // M₁ — upper mantle
-  { tau:  5000, frac: 0.55 },   // M₂ — transition zone (dominant for continental ice loads)
-  { tau: 14000, frac: 0.30 },   // M₃ — lower mantle (slow, deep-time tail)
-];
-const GIA_MODE_AMPLITUDES = GIA_MODES.map(m => -EARTH_MOI_FACTOR_RATE_YR * m.frac * m.tau);
+// ─── Climate-driven α(t) — Option 4-climate refinement (2026-07) ─────────
+// Replaces the earlier |t|-symmetric Peltier 3-mode viscoelastic form (which
+// had a slope discontinuity at J2000) with a direct coupling to the L1
+// orbital layer of the canonical Climate Formula (LR04 post-MPT regime).
+// Kept in lock-step with src/script.js earthMoiFactorAtAge and with the
+// Holistic mirror src/lib/orbital/deepTime.ts. Loads coefficients from the
+// shared JSON source to eliminate manual dual-copy sync.
+const ALPHA_CLIMATE_REGIME_KEY = 'lr04-post-mpt';
+const ALPHA_CLIMATE_SCALE      = -5.24e-7;   // per ‰; calibrated so dα/dt at J2000 = -1.8e-11/yr
+const _CLIMATE_JSON_PATH       = path.join(__dirname, '..', '..', 'public', 'input', 'climate-formula-coefficients.json');
+const CLIMATE_FORMULA_COEFFS   = JSON.parse(fs.readFileSync(_CLIMATE_JSON_PATH, 'utf8'));
 
 // Solar physics — Driver 2 mass loss
 const L_SUN_W              = 3.828e26;                                // IAU 2015 nominal solar luminosity (W)
@@ -50,7 +55,10 @@ const ALPHA_4 = +1.3619800519e-16;   // /Ma⁴  (LSQ fit to Farhat 2022 deep-tim
 
 const HOLISTIC_YEAR_J2000        = C.H;
 const MEAN_SIDEREAL_YEAR_J2000_S = C.meanSiderealYearSeconds;
-const LOD_NOW_H13_S              = C.meanSiderealYearSeconds / C.meanSiderealYearDays;
+// LOD anchor via H/13 identity: T_sid_sec / T_sid_days_framework where
+// T_sid_days_framework = T_trop × H/(H−13). Under H=335,317 this gives
+// 86399.99968 s at J2000 — matches simulator src/script.js:LOD_NOW_H13_S.
+const LOD_NOW_H13_S              = C.meanSiderealYearSeconds / C.meanSiderealYearDaysKinematic;
 const MEAN_TROPICAL_YEAR_J2000_S = C.meanSolarYearDays * C.meanLengthOfDay;
 const SI_TROPICAL_YEAR_DAYS      = MEAN_TROPICAL_YEAR_J2000_S / 86400;
 
@@ -98,17 +106,35 @@ for (const k of ['mercury','venus','earth','mars','jupiter','saturn','uranus','n
   _planetA_J2000[k] = _planetAuRatio(k) * C.currentAUDistance;
 }
 
-// ─── α(t): viscoelastic GIA — earthMoiFactorAtAge ────────────────────────
-// Symmetric: GIA modes saturate in both past AND future. Linear extrapolation
-// would be unphysical at deep time (modern dα/dt is GIA-driven, not secular).
-// Kept in lock-step with src/script.js per the dual-source invariant.
-function earthMoiFactorAtAge(t_Ma) {
-  const t_abs_yr = Math.abs(t_Ma) * 1e6;
-  let alpha_excess = 0;
-  for (let i = 0; i < GIA_MODES.length; i++) {
-    alpha_excess += GIA_MODE_AMPLITUDES[i] * (1 - Math.exp(-t_abs_yr / GIA_MODES[i].tau));
+// ─── α(t): climate-driven — earthMoiFactorAtAge ──────────────────────────
+// Binds α to the L1 orbital layer of the canonical Climate Formula (LR04
+// post-MPT regime). One physical mechanism, two observables: the same L1
+// signal that fits δ¹⁸O also drives α — via Milankovitch orbital forcing
+// → ice sheet dynamics → GIA J₂/α → LOD. Preserves α_J2000 = EARTH_MOI_
+// FACTOR exactly and Cox & Chao's dα/dt at J2000 = -1.8e-11/yr exactly.
+// Kept in lock-step with src/script.js earthMoiFactorAtAge and Holistic
+// mirror src/lib/orbital/deepTime.ts. See doc 99 §prediction-7.
+let _alphaClimateL1_J2000 = null;
+
+function _evalClimateL1Orbital(year) {
+  const t_kyr_BP = (2000 - year) / 1000;
+  const r        = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
+  const EIGHT_H  = CLIMATE_FORMULA_COEFFS.config.eight_H_kyr;
+  let L1_sum = 0;
+  for (const c of r.L1) {
+    const omega = 2 * Math.PI * c.n / EIGHT_H;
+    L1_sum += c.a * Math.cos(omega * t_kyr_BP) + c.b * Math.sin(omega * t_kyr_BP);
   }
-  return EARTH_MOI_FACTOR + alpha_excess;
+  return L1_sum * r.denormalization.y_std;
+}
+
+function earthMoiFactorAtAge(t_Ma) {
+  if (_alphaClimateL1_J2000 === null) {
+    _alphaClimateL1_J2000 = _evalClimateL1Orbital(2000);
+  }
+  const year  = 2000 - t_Ma * 1e6;
+  const L1_at = _evalClimateL1Orbital(year);
+  return EARTH_MOI_FACTOR - ALPHA_CLIMATE_SCALE * (L1_at - _alphaClimateL1_J2000);
 }
 
 function iEarthAtAge(t_Ma) {
@@ -136,6 +162,34 @@ function meanLodSecondsAtAge(t_Ma) {
 function meanLodHoursAtAge(t_Ma) {
   const s = meanLodSecondsAtAge(t_Ma);
   return (s === null) ? null : s / 3600;
+}
+
+// ─── Fourier evaluator for the sidereal-year length (IAU base) ────────────
+// Mirrors src/script.js `evalYearFourier` in DEEP_TIME_MODE_ENABLED=false form.
+// Uses the IAU baseline (C.meanSiderealYearDays = 365.256363004) so the derived
+// "Actual" LOD matches the simulator tweakpane readout exactly at J2000.
+function _evalSiderealYearFourierIAU(year) {
+  const t = year - C.balancedYear;
+  let result = C.meanSiderealYearDays;
+  for (const [div, sinC, cosC] of C.SIDEREAL_YEAR_HARMONICS) {
+    const phase = 2 * Math.PI * t / (C.H / div);
+    result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  return result;
+}
+
+/** ACTUAL LOD in seconds at given age, including Fourier fluctuations.
+ *
+ *  `actual(t) = mean(t) × Y_days_kinematic / Y_days_fourier(year_at_t)`
+ *
+ *  At J2000: matches simulator tweakpane readout exactly (via the IAU-based
+ *  Fourier evaluator). For deep time: tidal LOD growth × Fourier ripple. */
+function meanLodSecondsAtAgeActual(t_Ma) {
+  const mean_t = meanLodSecondsAtAge(t_Ma);
+  if (mean_t === null) return null;
+  const year_at_t = 2000 - t_Ma * 1e6;
+  const Y_days_fourier = _evalSiderealYearFourierIAU(year_at_t);
+  return mean_t * C.meanSiderealYearDaysKinematic / Y_days_fourier;
 }
 
 // ─── STEP 2 — H(t) ────────────────────────────────────────────────────────
@@ -195,26 +249,26 @@ const EIGHT_H = 8 * HOLISTIC_YEAR_J2000;
 const BOND_LATTICE_N = 1830;
 const BOND_PERIOD_YR = EIGHT_H / BOND_LATTICE_N;
 const BOND_OMEGA = 2 * Math.PI / BOND_PERIOD_YR;
-const BOND_COS_COEFF_S = 165.92681616414058;
-const BOND_SIN_COEFF_S = 336.8127054187615;
+const BOND_COS_COEFF_S = 167.64023832420898;
+const BOND_SIN_COEFF_S = 258.4981100083818;
 
 const HALLSTATT_LATTICE_N = 1104;
 const HALLSTATT_PERIOD_YR = EIGHT_H / HALLSTATT_LATTICE_N;
 const HALLSTATT_OMEGA = 2 * Math.PI / HALLSTATT_PERIOD_YR;
-const HALLSTATT_COS_COEFF_S = -9.173518918513707;
-const HALLSTATT_SIN_COEFF_S = 79.47230052446999;
+const HALLSTATT_COS_COEFF_S = 13.096307224194323;
+const HALLSTATT_SIN_COEFF_S = 78.92076239551615;
 
 const JOSE5_LATTICE_N = 2989;
 const JOSE5_PERIOD_YR = EIGHT_H / JOSE5_LATTICE_N;
 const JOSE5_OMEGA = 2 * Math.PI / JOSE5_PERIOD_YR;
-const JOSE5_COS_COEFF_S = -48.48068102537258;
-const JOSE5_SIN_COEFF_S = -12.23207126025995;
+const JOSE5_COS_COEFF_S = -47.87063341413967;
+const JOSE5_SIN_COEFF_S = 14.436151028894592;
 
 const JOSE4_LATTICE_N = 3749;
 const JOSE4_PERIOD_YR = EIGHT_H / JOSE4_LATTICE_N;
 const JOSE4_OMEGA = 2 * Math.PI / JOSE4_PERIOD_YR;
-const JOSE4_COS_COEFF_S = 24.407831414482406;
-const JOSE4_SIN_COEFF_S = -25.48517683106091;
+const JOSE4_COS_COEFF_S = 27.044284247103754;
+const JOSE4_SIN_COEFF_S = -23.80250191160088;
 
 // Cyclic-correction taper widened 2026-07-12 from ±4.5/6 kyr Holocene window to
 // ±300/400 kyr — cross-archive validation across Steinhilber ¹⁰Be (9.4 kyr),
@@ -366,6 +420,10 @@ const _MAX_DELTA_T_CACHE = 512;
 const DT_CORRECTIONS_ENABLED = process.env.DT_CORRECTIONS_DISABLED !== '1';
 
 function meanDeltaTSecondsAtAge(t_Ma) {
+  // ΔT(J2000) = 0 by convention (integration reference = J2000). Framework's
+  // ΔT curve is offset from Stephenson-2016's absolute values by ~62 s (their
+  // observed ΔT(J2000)), which is the constant offset expected between two
+  // integration conventions. All differential (curvature) behavior matches.
   if (t_Ma === 0) return 0;
   const cacheKey = (DT_CORRECTIONS_ENABLED ? 'BHJW:' : 'raw:') + t_Ma;
   const hit = _DELTA_T_CACHE.get(cacheKey);
@@ -380,10 +438,18 @@ function meanDeltaTSecondsAtAge(t_Ma) {
   let sum = 0;
   for (let i = 0; i <= n; i++) {
     const tau = i * h;
-    const lod = meanLodSecondsAtAge(tau);
-    if (lod === null) return NaN;
+    const lodMean = meanLodSecondsAtAge(tau);
+    if (lodMean === null) return NaN;
     const yearS = meanTropicalYearSecondsAtAge(tau);
-    const integrand = (86400 - lod) * yearS * 1e6 / 86400;
+    // H/5 ecliptic "missing motion" — adds ~3.5 ms at J2000. Solar day is
+    // measured against the Sun on the ecliptic (precesses at H/5); NOT against
+    // the inclination frame (H/3). Formula corrected 2026-07-16; the H/3 form
+    // was the wrong reference frame. See docs/hidden/IP-tweakpane-days-years-precession-restructure.md.
+    // Mirrors src/script.js#meanDeltaTSecondsAtAge.
+    const H_local  = meanHAtAge(tau);
+    const mSY_days = meanTropicalYearDaysAtAge(tau);
+    const lodReal  = lodMean + lodMean / ((H_local / 5) * mSY_days);
+    const integrand = (86400 - lodReal) * yearS * 1e6 / 86400;
     const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
     sum += w * integrand;
   }
@@ -676,7 +742,7 @@ module.exports = {
   earthMoiFactorAtAge, iEarthAtAge,
   // Layer 2 + Layer 1
   meanMoonDistanceMetresAtAge, meanMoonDistanceAtAge,
-  meanLodSecondsAtAge, meanLodHoursAtAge,
+  meanLodSecondsAtAge, meanLodSecondsAtAgeActual, meanLodHoursAtAge,
   // Step 2
   meanHAtAge,
   // Driver 2

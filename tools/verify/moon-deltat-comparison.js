@@ -49,10 +49,12 @@ const GM_SUN_KM3_S2 = 132712440041.93938;
 // J2000 snapshot values. Under ESSRT (docs/99) these drift at deep time via
 // Drivers 1 (LOD growth) and 2 (Kepler); this verify script compares against
 // modern-era ΔT data so the J2000 anchor is appropriate here.
-const SIDEREAL_YEAR_SECONDS = 31558149.764;       // J2000
-const MEAN_SIDEREAL_YEAR_DAYS = 365.25636301;     // J2000
-const MEAN_DAY_LENGTH = SIDEREAL_YEAR_SECONDS / MEAN_SIDEREAL_YEAR_DAYS;
-const MEAN_SOLAR_YEAR_DAYS = 365.2422;            // J2000
+// Auto-derived from the shared constants module (auto-updates with H).
+const C_LOCAL = require('../lib/constants');
+const SIDEREAL_YEAR_SECONDS = C_LOCAL.meanSiderealYearSeconds;      // J2000
+const MEAN_SIDEREAL_YEAR_DAYS = C_LOCAL.meanSiderealYearDays;        // J2000 (IAU)
+const MEAN_DAY_LENGTH = C_LOCAL.meanLengthOfDay;                     // H/13-derived
+const MEAN_SOLAR_YEAR_DAYS = C_LOCAL.meanSolarYearDays;              // H/8 snapped
 const MEAN_TROPICAL_YEAR_J2000_S = MEAN_SOLAR_YEAR_DAYS * MEAN_DAY_LENGTH;
 
 // Farhat 2022 polynomial coefficients
