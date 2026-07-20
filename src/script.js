@@ -24203,30 +24203,414 @@ function closeEssrtPanel() {
 let lcrPanel = null;
 let lcrProxyData = null;   // { sources: [{name, unit, range, data:[[year,°C],…]}] }
 
-// Which layers to show in the chart (default: net L2 + net L3 + stack rate + proxy).
+// Which layers to show in the chart. Kept minimal: Net L2 secular baseline,
+// Net L3 observable (which contains the stack signal as its offset from L2),
+// climate bands, framework zero-crossings, and the GISP2 temperature proxy.
+// Stack rate and GIA rate are decomposition-only diagnostics — reachable via
+// the tweakpane dLOD/dt decomposition sub-folder, not needed in this modal.
 const lcrLayerVisibility = {
-  netL2: true,   // tidal + GIA (secular baseline)
-  netL3: true,   // + 4-flag stack (observable)
-  stack: true,   // sub-Milankovitch stack rate alone
-  gia:   false,  // GIA rate alone (opt-in)
-  bands: true,   // named climate period bands (background shading)
-  crossings: true, // framework zero-crossings as triangle markers
-  proxy: true,   // GISP2/Moberg temperature anomaly overlay (secondary Y-axis)
+  netL2: true,        // tidal + GIA (secular baseline)
+  netL3: true,        // + 4-flag stack (observable)
+  bondCurve: true,    // Bond harmonic isolated (thin dashed) — expected to align with Bond markers
+  bands: true,        // named climate period bands (background shading)
+  crossings: true,    // framework zero-crossings as triangle markers
+  proxy: true,        // temperature anomaly overlay (secondary Y-axis) — GISP2 only
+  bonds: true,        // Bond 0-8 vertical marker lines (independent literature dates)
+  detrended: false,   // if true, GISP2 proxy is rendered as anomaly-vs-rolling-mean
 };
 
-/** Async loader for climate proxy data. Caches on first call. */
+// Bond events — North Atlantic ice-rafted-debris cold events on ~1470 yr
+// cycle (Bond et al. 1997 Science; Bond et al. 2001 Science). Dates converted
+// from age-kyr-BP (1950 CE base) to calendar year CE.
+//   Bond 0: 500  yr BP → 1450 CE (Little Ice Age)
+//   Bond 1: 1400 yr BP →  550 CE (Migration Period / Late Antique LIA)
+//   Bond 2: 2800 yr BP → -850 CE (Iron Age cold epoch)
+//   Bond 3: 4200 yr BP → -2250 CE (4.2 ka event / Late Bronze Age)
+//   Bond 4: 5900 yr BP → -3950 CE
+//   Bond 5: 8200 yr BP → -6250 CE (8.2 ka event)
+//   Bond 6: 9400 yr BP → -7450 CE
+//   Bond 7: 10300 yr BP → -8350 CE
+//   Bond 8: 11100 yr BP → -9150 CE
+const LCR_BOND_EVENTS = [
+  { year: 1450,  n: 0, name: 'Bond 0', desc: 'Little Ice Age' },
+  { year:  550,  n: 1, name: 'Bond 1', desc: 'Migration Period / Late Antique' },
+  { year: -850,  n: 2, name: 'Bond 2', desc: 'Iron Age cold epoch' },
+  { year: -2250, n: 3, name: 'Bond 3', desc: '4.2 ka event' },
+  { year: -3950, n: 4, name: 'Bond 4' },
+  { year: -6250, n: 5, name: 'Bond 5', desc: '8.2 ka event' },
+  { year: -7450, n: 6, name: 'Bond 6' },
+  { year: -8350, n: 7, name: 'Bond 7' },
+  { year: -9150, n: 8, name: 'Bond 8', desc: 'Younger Dryas onset era' },
+];
+
+// Which proxy source to render (selectable via UI). Only one at a time
+// because they use different baselines / units and can't share a single
+// secondary Y-axis meaningfully. Default is Bond 2001 IRD — Bond's own
+// signal that identifies the Bond events, most direct comparison target
+// for the framework's Bond harmonic.
+let lcrSelectedProxy = 'Bond 2001 IRD';
+const LCR_PROXY_OPTIONS = [
+  { name: 'Bond 2001 IRD',       label: 'Bond 2001 IRD (Holocene)',   axisLabel: 'IRD anomaly (inv, positive = warm)' },
+  { name: 'GISP2 (Alley 2000)',  label: 'GISP2 Greenland (Holocene)', axisLabel: 'Temperature anomaly (°C)' },
+  { name: 'Moberg 2005',         label: 'Moberg NH (0–2000 AD)',      axisLabel: 'Temperature anomaly (°C)' },
+];
+
+/** Compute framework-vs-temperature Pearson correlations over the Holocene
+ *  overlap window. Two series are compared to the detrended GISP2 proxy:
+ *    (1) Σ_stack — cumulative 4-flag ΔT stack contribution (Bond + Hallstatt +
+ *        Jose5 + Jose4). Same physical dimension as an LOD anomaly.
+ *    (2) Bond harmonic isolated — just the 8H/1830 (1466-yr) term.
+ *  Sign convention: Σ > 0 = higher LOD than Layer 2 baseline = Earth slower
+ *  = mass equatorward = WARM anomaly. Same sign as positive T anomaly.
+ *  Positive r → framework tracks temperature (co-varies). Negative r → anti-
+ *  phase / driven by other signals. Near zero → no linear relationship.
+ *
+ *  Also computes the best-lag cross-correlation for the Bond harmonic
+ *  (search ±500 yr) — if the framework's Bond phase is offset from the true
+ *  Bond phase, the best lag reveals it. */
+function lcrComputeCorrelations(windowLo, windowHi) {
+  if (!lcrProxyData || !lcrProxyData.sources) return null;
+  const proxy = lcrProxyData.sources.find(s => s.name === lcrSelectedProxy);
+  if (!proxy || !proxy.dataDetrended || proxy.dataDetrended.length < 3) return null;
+
+  const proxyMin = proxy.dataDetrended[0][0];
+  const proxyMax = proxy.dataDetrended[proxy.dataDetrended.length - 1][0];
+  // Sample framework at proxy's native step (~100 yr for GISP2). Optional
+  // caller-supplied [windowLo, windowHi] clamps the scan (e.g., to restrict
+  // to the framework's Espenak-fit-validated window).
+  const STEP = 100;
+  const yrLo = Math.max(windowLo != null ? windowLo : -Infinity,
+                        Math.ceil(proxyMin / STEP) * STEP);
+  const yrHi = Math.min(windowHi != null ? windowHi :  Infinity,
+                        Math.floor(proxyMax / STEP) * STEP);
+
+  // Linear interpolation of proxy detrended values.
+  const dd = proxy.dataDetrended;
+  const interpT = (year) => {
+    if (year < dd[0][0] || year > dd[dd.length - 1][0]) return null;
+    let lo = 0, hi = dd.length - 1;
+    while (hi - lo > 1) {
+      const mid = (lo + hi) >> 1;
+      if (dd[mid][0] < year) lo = mid; else hi = mid;
+    }
+    const [y1, v1] = dd[lo], [y2, v2] = dd[hi];
+    if (y1 === y2) return v1;
+    return v1 + ((year - y1) / (y2 - y1)) * (v2 - v1);
+  };
+
+  const stackVals = [];
+  const bondVals  = [];
+  const tempVals  = [];
+  const years     = [];
+  for (let year = yrLo; year <= yrHi; year += STEP) {
+    const t = interpT(year);
+    if (t == null) continue;
+    stackVals.push(dtCycleLodCorrectionSum(year));
+    bondVals.push(bondCycleLodCorrection(year));
+    tempVals.push(t);
+    years.push(year);
+  }
+  if (tempVals.length < 30) return null;
+
+  function pearson(x, y) {
+    const n = x.length;
+    if (n !== y.length || n < 3) return null;
+    let sx = 0, sy = 0;
+    for (let i = 0; i < n; i++) { sx += x[i]; sy += y[i]; }
+    const mx = sx / n, my = sy / n;
+    let sxy = 0, sxx = 0, syy = 0;
+    for (let i = 0; i < n; i++) {
+      const dx = x[i] - mx, dy = y[i] - my;
+      sxy += dx * dy; sxx += dx * dx; syy += dy * dy;
+    }
+    const den = Math.sqrt(sxx * syy);
+    return den > 0 ? sxy / den : null;
+  }
+
+  // Best-lag cross-correlation for Bond harmonic (±500 yr in 25-yr steps).
+  // Positive lag = framework LEADS temperature by that many years.
+  let bestLag = 0, bestR = pearson(bondVals, tempVals) ?? 0;
+  const lagStep = 25;
+  const lagMax  = 500;
+  for (let lag = -lagMax; lag <= lagMax; lag += lagStep) {
+    if (lag === 0) continue;
+    // Recompute bond at (year + lag) so we test "if the framework Bond were
+    // shifted by `lag` years, would it correlate better?".
+    const bondLagged = [];
+    const tempSame   = [];
+    for (let i = 0; i < years.length; i++) {
+      const b = bondCycleLodCorrection(years[i] + lag);
+      const t = tempVals[i];
+      if (b == null || t == null) continue;
+      bondLagged.push(b);
+      tempSame.push(t);
+    }
+    const r = pearson(bondLagged, tempSame);
+    if (r != null && Math.abs(r) > Math.abs(bestR)) { bestR = r; bestLag = lag; }
+  }
+
+  return {
+    n: tempVals.length,
+    windowLo: yrLo,
+    windowHi: yrHi,
+    proxyName: proxy.name,
+    r_stack: pearson(stackVals, tempVals),
+    r_bond:  pearson(bondVals,  tempVals),
+    bestLag: bestLag,
+    r_bond_bestlag: bestR,
+  };
+}
+
+/** Sign-convention diagnostic — at each named cold or warm event, print
+ *  the framework's Σ_stack value. Under the derived convention (Σ > 0 =
+ *  higher LOD than baseline = mass equatorward = WARM anomaly), we
+ *  expect Σ < 0 at cold events and Σ > 0 at warm events.
+ *
+ *  If most events match expectation: sign convention is right; framework
+ *  really does anti-correlate weakly with GISP2 temperature (some other
+ *  signal dominates, e.g., mantle-core coupling).
+ *
+ *  If most events reversed: sign flipped somewhere in physics chain →
+ *  fix it, re-run correlations, and everything may look better.
+ *
+ *  If mixed: framework doesn't cleanly track climate at these named events. */
+const LCR_SIGN_CHECK_EVENTS = [
+  { year: -10500, type: 'cold', name: 'Younger Dryas cold' },
+  { year:  -6250, type: 'cold', name: '8.2 ka event' },
+  { year:  -5000, type: 'warm', name: 'Holocene Optimum peak' },
+  { year:  -3950, type: 'cold', name: 'Bond 4 event' },
+  { year:  -2250, type: 'cold', name: '4.2 ka event' },
+  { year:    100, type: 'warm', name: 'Roman Warm Period peak' },
+  { year:   1050, type: 'warm', name: 'MWP peak' },
+  { year:   1670, type: 'cold', name: 'Maunder Minimum' },
+  { year:   1810, type: 'cold', name: 'Dalton Minimum' },
+  { year:   2000, type: 'warm', name: 'Modern warm (nominal)' },
+];
+
+function lcrRenderSignCheckPanel() {
+  const rows = LCR_SIGN_CHECK_EVENTS.map(evt => {
+    const sigma = dtCycleLodCorrectionSum(evt.year);   // seconds
+    const sigma_ms = sigma * 1000;                     // for display
+    // Predicted sign per convention: cold → Σ < 0, warm → Σ > 0.
+    const expectedSign = evt.type === 'cold' ? -1 : +1;
+    const actualSign   = sigma > 0 ? +1 : sigma < 0 ? -1 : 0;
+    const match = actualSign === expectedSign;
+    return { evt, sigma_ms, expectedSign, actualSign, match };
+  });
+  const matches   = rows.filter(r => r.match).length;
+  const nOnSide   = rows.filter(r => r.actualSign !== 0).length;
+  const matchPct  = Math.round((matches / rows.length) * 100);
+
+  const verdict = (() => {
+    if (matches >= rows.length - 2) return { text: '✓ Sign convention CONFIRMED', color: 'lcr-r-strong', note: 'Framework Σ_stack aligns with climate direction at named events. The weak anti-correlation with detrended GISP2 is likely real physics (framework captures a signal other than Greenland-specific temperature).' };
+    if (matches <= 2)                  return { text: '✗ Sign convention APPEARS FLIPPED', color: 'lcr-r-mod',    note: 'Most named events give the OPPOSITE Σ sign from what climate direction predicts. There may be a sign flip in the physics interpretation — the framework code may be correct, but our "Σ > 0 = warm" derivation may be inverted.' };
+    return { text: '△ Sign convention MIXED', color: 'lcr-r-weak', note: 'Framework Σ agrees with some named events, opposes others. No clean sign-flip, but no clean confirmation either. Framework may capture mixed signals (partly climate, partly mantle-core, partly PGR).' };
+  })();
+
+  const fmtYr = (y) => (y > 0 ? y + ' AD' : y < 0 ? (-y) + ' BC' : '1 BC');
+  const fmtSigma = (v) => (v >= 0 ? '+' : '') + v.toFixed(3) + ' ms';
+  const trRows = rows.map(({ evt, sigma_ms, match }) => `
+    <tr>
+      <td class="lcr-match-td-name">${evt.name}</td>
+      <td class="lcr-match-td-year">${fmtYr(evt.year)}</td>
+      <td>${evt.type === 'cold' ? '🩵 cold' : '🟥 warm'}</td>
+      <td class="lcr-match-td-off">${fmtSigma(sigma_ms)}</td>
+      <td class="${match ? 'lcr-r-strong' : 'lcr-r-mod'}">${match ? '✓' : '✗'}</td>
+    </tr>
+  `).join('');
+
+  return `
+    <div class="lcr-match-title">Sign convention check — Σ_stack at named events</div>
+    <table class="lcr-match-table">
+      <thead>
+        <tr><th>Event</th><th>Year</th><th>Expected</th><th>Σ_stack</th><th>Match</th></tr>
+      </thead>
+      <tbody>${trRows}</tbody>
+    </table>
+    <div class="lcr-match-summary">
+      <b class="${verdict.color}">${verdict.text}</b> — ${matches}/${rows.length} events match (${matchPct}%)
+      <span class="lcr-match-note">${verdict.note}</span>
+    </div>
+  `;
+}
+
+/** Render the framework-vs-temperature correlation panel. Reports Pearson r
+ *  for two comparisons + best-lag Bond harmonic; color-codes strength. */
+function lcrRenderCorrelationPanel() {
+  // Two windows: full overlap (framework range ∩ proxy range) + the
+  // "framework-validated" window (-4000 BC to 1800 AD). The validated
+  // window brackets the 6/10 named events that matched sign expectation
+  // in the sign-check panel. Everything outside is too many millennia
+  // before Espenak's 1650-2017 fit window; harmonic extrapolation drifts.
+  const cFull = lcrComputeCorrelations();
+  const cRec  = lcrComputeCorrelations(-4000, 1800);
+  if (!cFull) {
+    return '<div class="lcr-match-note">(temperature proxy not loaded — correlation cannot be computed)</div>';
+  }
+  const strengthClass = (r) => {
+    if (r == null) return '';
+    const a = Math.abs(r);
+    if (a >= 0.5)  return 'lcr-r-strong';
+    if (a >= 0.25) return 'lcr-r-mod';
+    if (a >= 0.10) return 'lcr-r-weak';
+    return 'lcr-r-none';
+  };
+  const strengthLabel = (r) => {
+    if (r == null) return '—';
+    const a = Math.abs(r);
+    if (a >= 0.5)  return 'strong';
+    if (a >= 0.25) return 'moderate';
+    if (a >= 0.10) return 'weak';
+    return 'negligible';
+  };
+  const fmtR  = (r) => (r == null ? '—' : (r >= 0 ? '+' : '') + r.toFixed(3));
+  const fmtYr = (y) => (y > 0 ? y + ' AD' : y < 0 ? (-y) + ' BC' : '1 BC');
+  const row = (c, label, small) => c ? `
+        <tr class="${small ? 'lcr-match-td-empty' : ''}">
+          <td>${label} <span class="lcr-match-td-empty">(${fmtYr(c.windowLo)}–${fmtYr(c.windowHi)}, n=${c.n})</span></td>
+          <td class="lcr-match-td-off ${strengthClass(c.r_stack)}">${fmtR(c.r_stack)}</td>
+          <td class="lcr-match-td-off ${strengthClass(c.r_bond)}">${fmtR(c.r_bond)}</td>
+          <td class="lcr-match-td-off ${strengthClass(c.r_bond_bestlag)}">${fmtR(c.r_bond_bestlag)} <span class="lcr-match-td-empty">@ lag ${c.bestLag >= 0 ? '+' : ''}${c.bestLag}</span></td>
+        </tr>` : '';
+
+  return `
+    <div class="lcr-match-title">Framework ↔ ${cFull.proxyName} correlation (detrended)</div>
+    <table class="lcr-match-table">
+      <thead>
+        <tr><th>Window</th><th>Σ_stack r</th><th>Bond only r</th><th>Bond best-lag r</th></tr>
+      </thead>
+      <tbody>
+        ${row(cRec,  '<b>Validated window</b>', false)}
+        ${row(cFull, 'Full overlap', true)}
+      </tbody>
+    </table>
+    <div class="lcr-match-summary">
+      Positive <b>r</b> ⇒ framework Σ &amp; temperature co-vary (warm-with-warm).
+      Σ &gt; 0 = LOD higher than baseline = mass equatorward = warm anomaly.
+      <span class="lcr-match-note">
+        Validated window (−4000 BC → 1800 AD) covers where the framework's harmonic
+        extrapolation from its Espenak 1650-2017 fit target is still trustworthy
+        (~2× the fit-window duration in each direction). Deep-past (older than
+        ~5000 BC) accumulates phase drift on the 1466-yr Bond harmonic. Modern
+        post-1850 excludes anthropogenic warming which the framework doesn't model.
+        Strength: |r| ≥ 0.5 strong, ≥ 0.25 moderate, ≥ 0.10 weak.
+      </span>
+    </div>
+  `;
+}
+
+/** Bond-event ↔ framework-TROUGH match table. Uses a wide scan window
+ *  (-12000 to +2050 CE) via lcrComputeSeries('full') so B8 is reachable;
+ *  filters framework crossings to TROUGH only and picks the nearest one
+ *  for each Bond event. Returns an HTML string for the panel. */
+function lcrRenderBondMatchTable() {
+  // Ensure we have the widest scan available (Full range) — it includes all Bond events.
+  const S = lcrComputeSeries('full');
+  const troughs = S.crossings.filter(c => c.type === 'TROUGH');
+  if (troughs.length === 0) {
+    return '<div class="lcr-match-note">(no framework TROUGH crossings in scan window)</div>';
+  }
+  const rows = [];
+  const offsets = [];
+  for (const b of LCR_BOND_EVENTS) {
+    let best = null;
+    for (const t of troughs) {
+      const dt = t.year - b.year;
+      if (best === null || Math.abs(dt) < Math.abs(best.dt)) best = { year: t.year, dt };
+    }
+    // Guard: if the nearest is absurdly far (>1500 yr, half a Bond cycle),
+    // mark as "out of range" — no meaningful match.
+    if (best && Math.abs(best.dt) <= 1500) {
+      offsets.push(Math.abs(best.dt));
+      rows.push({ bond: b, matched: best });
+    } else {
+      rows.push({ bond: b, matched: null });
+    }
+  }
+  const median = offsets.length > 0
+    ? offsets.slice().sort((a, b) => a - b)[Math.floor(offsets.length / 2)]
+    : null;
+  const mean = offsets.length > 0
+    ? Math.round(offsets.reduce((a, b) => a + b, 0) / offsets.length)
+    : null;
+
+  const fmtYear = y => (y > 0 ? y + ' AD' : y < 0 ? (-y) + ' BC' : '1 BC');
+  const fmtOff  = d => (d > 0 ? '+' + d : String(d)) + ' yr';
+  const trRows = rows.map(({ bond, matched }) => {
+    const bondCell    = `<td class="lcr-match-td-name">${bond.name}</td><td class="lcr-match-td-year">${fmtYear(bond.year)}</td>`;
+    const arrowCell   = `<td class="lcr-match-td-arrow">↔</td>`;
+    const fwCell      = matched
+      ? `<td class="lcr-match-td-year">${fmtYear(matched.year)}</td>`
+      : `<td class="lcr-match-td-year lcr-match-td-empty">(out of range)</td>`;
+    const offCell     = matched
+      ? `<td class="lcr-match-td-off ${Math.abs(matched.dt) <= 200 ? 'lcr-match-td-off-good' : Math.abs(matched.dt) <= 500 ? 'lcr-match-td-off-fair' : 'lcr-match-td-off-poor'}">${fmtOff(matched.dt)}</td>`
+      : `<td class="lcr-match-td-off"></td>`;
+    return `<tr>${bondCell}${arrowCell}${fwCell}${offCell}</tr>`;
+  }).join('');
+  return `
+    <div class="lcr-match-title">Bond event ↔ nearest framework ▼ TROUGH crossing</div>
+    <table class="lcr-match-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Mainstream</th><th></th><th>Framework</th><th>Offset</th>
+        </tr>
+      </thead>
+      <tbody>${trRows}</tbody>
+    </table>
+    <div class="lcr-match-summary">
+      ${offsets.length}/${LCR_BOND_EVENTS.length} matched within ±1500 yr &middot;
+      median |offset| <b>${median != null ? median + ' yr' : '—'}</b> &middot;
+      mean |offset| <b>${mean != null ? mean + ' yr' : '—'}</b>
+      <span class="lcr-match-note">Bond dating uncertainty in the literature is ~100-300 yr per event.</span>
+    </div>
+  `;
+}
+
+/** Detrend a proxy series by subtracting a symmetric rolling-mean baseline.
+ *  Purpose: highlight sub-Milankovitch (Bond-scale) oscillations by removing
+ *  the slow Milankovitch-scale trend (e.g. Younger Dryas → Holocene warming
+ *  or Holocene → present cooling). Uses a full-window mean at each point,
+ *  clamped at edges (partial windows shorter than requested near boundaries).
+ *  Input:  data = [[year, value], …] sorted ascending
+ *          windowYr = detrend baseline window (default 5000 yr)
+ *  Output: [[year, detrended_value], …] same length. */
+function lcrDetrendSeries(data, windowYr = 5000) {
+  const halfWin = windowYr / 2;
+  const out = [];
+  for (let i = 0; i < data.length; i++) {
+    const [yi, vi] = data[i];
+    let sum = 0, count = 0;
+    for (let j = 0; j < data.length; j++) {
+      const [yj, vj] = data[j];
+      if (yj < yi - halfWin) continue;
+      if (yj > yi + halfWin) break;
+      sum += vj;
+      count += 1;
+    }
+    out.push([yi, vi - (sum / count)]);
+  }
+  return out;
+}
+
+/** Async loader for climate proxy data. Caches on first call. Uses the same
+ *  local→GitHub-raw fallback as loadCfmLR04Data (via `_cfmFetchJson`). */
 async function lcrLoadProxyData() {
   if (lcrProxyData) return lcrProxyData;
-  try {
-    const resp = await fetch('input/climate-proxy.json');
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    lcrProxyData = await resp.json();
-    return lcrProxyData;
-  } catch (e) {
-    console.warn('[LCR] proxy data load failed:', e);
+  lcrProxyData = await _cfmFetchJson('input/climate-proxy.json', 'public/input/climate-proxy.json');
+  if (!lcrProxyData) {
+    console.error('[LCR] Failed to load climate-proxy.json (both local and GitHub fallback). Proxy overlay disabled.');
     lcrProxyData = { sources: [] };
-    return lcrProxyData;
+  } else {
+    console.log(`[LCR] Loaded climate proxy: ${lcrProxyData.sources.length} sources (${lcrProxyData.sources.map(s => s.name).join(', ')})`);
+    // Precompute a detrended version (5-kyr rolling mean baseline) for each
+    // source, cached under `dataDetrended`. Used by the "Detrended" toggle to
+    // reveal sub-Milankovitch (Bond-scale) oscillations by removing the
+    // slow Milankovitch-scale trend.
+    for (const src of lcrProxyData.sources) {
+      src.dataDetrended = lcrDetrendSeries(src.data, 5000);
+    }
   }
+  return lcrProxyData;
 }
 
 // Epoch tabs — different time windows for different narrative focuses.
@@ -24235,10 +24619,9 @@ async function lcrLoadProxyData() {
 // yMin/yMax are auto-computed at render time from visible data (see
 // lcrRenderChart); the label + xStep + window are fixed per tab.
 const LCR_RANGE_TABS = [
-  { key: 'historical', xLo:   800, xHi: 2050, label: '800 – 2050 CE',         xStep: 100  },
-  { key: 'holocene',   xLo:-12000, xHi: 2050, label: '−12000 BCE – 2050 CE',  xStep: 1000 },
-  { key: 'future',     xLo:  2000, xHi: 5000, label: '2000 CE forward',       xStep: 250  },
-  { key: 'full',       xLo:-10000, xHi: 5000, label: 'Full (−10000 – +5000)', xStep: 1000 },
+  { key: 'historical', xLo:   800, xHi:  2050, label: '800 – 2050 AD',            xStep: 100  },
+  { key: 'future',     xLo:  2000, xHi:  5000, label: '2000 AD forward',          xStep: 250  },
+  { key: 'full',       xLo:-13000, xHi: 13000, label: 'Full (13,000 BC – 13,000 AD)', xStep: 2000 },
 ];
 let lcrSelectedRange = 'historical';
 
@@ -24256,9 +24639,7 @@ const LCR_CLIMATE_PERIODS = [
   { start:   -250, end:    400, type: 'warm', name: 'Roman Warm Period',          src: 'Lamb 1965' },
   { start:    536, end:    660, type: 'cold', name: 'Late Antique Little Ice Age',src: 'Büntgen 2016' },
   { start:    950, end:   1250, type: 'warm', name: 'Medieval Warm Period',       src: 'Lamb 1965; Mann 2009' },
-  { start:   1300, end:   1850, type: 'cold', name: 'Little Ice Age',             src: 'Matthes 1939; Grove 2004' },
-  { start:   1645, end:   1715, type: 'cold', name: 'Maunder Minimum',            src: 'Eddy 1976' },
-  { start:   1790, end:   1830, type: 'cold', name: 'Dalton Minimum',             src: 'Wagner & Zorita 2005' },
+  { start:   1300, end:   1850, type: 'cold', name: 'Little Ice Age',             src: 'Matthes 1939; Grove 2004 (includes Maunder ~1645-1715 and Dalton ~1790-1830 solar minima)' },
   { start:   1850, end:   2050, type: 'warm', name: 'Modern warm period',         src: 'Instrumental (part-anthropogenic)' },
 ];
 
@@ -24279,7 +24660,9 @@ function lcrComputeSeries(rangeKey) {
   const netL3 = [];
   const stack = [];
   const gia   = [];
+  const bond  = [];   // Bond harmonic isolated rate — d/dt of bondCycleLodCorrection
 
+  const DYR_BOND = 50;
   for (let year = xLo; year <= xHi; year += step) {
     const t_Ma = (2000 - year) / 1e6;
     const d = dLodDtDecompositionAtAge(t_Ma);
@@ -24288,6 +24671,11 @@ function lcrComputeSeries(rangeKey) {
     netL3.push(d.net_L3);
     stack.push(d.stack);
     gia.push(d.gia);
+    // Bond harmonic rate (ms/century): numerical derivative of
+    // bondCycleLodCorrection at ±50 yr, converted from s/yr to ms/century.
+    const bondPlus  = bondCycleLodCorrection(year + DYR_BOND);
+    const bondMinus = bondCycleLodCorrection(year - DYR_BOND);
+    bond.push(((bondPlus - bondMinus) / (2 * DYR_BOND)) * 100 * 1000);
   }
 
   const crossings = [];
@@ -24304,7 +24692,7 @@ function lcrComputeSeries(rangeKey) {
     }
   }
 
-  _lcrSeriesCache[rangeKey] = { xs, netL2, netL3, stack, gia, crossings, xLo, xHi, step };
+  _lcrSeriesCache[rangeKey] = { xs, netL2, netL3, stack, gia, bond, crossings, xLo, xHi, step };
   return _lcrSeriesCache[rangeKey];
 }
 
@@ -24330,8 +24718,18 @@ function lcrRenderChart(rangeKey) {
   };
   if (lcrLayerVisibility.netL2) scan(S.netL2);
   if (lcrLayerVisibility.netL3) scan(S.netL3);
-  if (lcrLayerVisibility.stack) scan(S.stack);
-  if (lcrLayerVisibility.gia)   scan(S.gia);
+  // Bond isolated curve is rendered OFFSET by Net L2 so it visually
+  // oscillates on the Framework baseline (the reference height of the
+  // TROUGH triangles). Scan its shifted values for auto-Y-range so the
+  // axis fits the visible curve.
+  if (lcrLayerVisibility.bondCurve) {
+    for (let i = 0; i < S.bond.length; i++) {
+      const v = (S.bond[i] != null && S.netL2[i] != null) ? S.bond[i] + S.netL2[i] : null;
+      if (v == null) continue;
+      if (v < dataMin) dataMin = v;
+      if (v > dataMax) dataMax = v;
+    }
+  }
   // Always include IERS reference and zero line in the axis so they're never clipped.
   if (dataMin > 0)    dataMin = 0;
   if (dataMax < 1.75) dataMax = 1.75;
@@ -24356,7 +24754,10 @@ function lcrRenderChart(rangeKey) {
   const xStart = Math.ceil(S.xLo / range.xStep) * range.xStep;
   for (let year = xStart; year <= S.xHi + 1e-9; year += range.xStep) {
     const x = xPos(year);
-    const label = year === 0 ? 'J2000' : (year < 0 ? `${-year} BCE` : `${year} CE`);
+    // Year 0 in the astronomical calendar = 1 BC (there's no "year 0 AD").
+    // J2000 is calendar year 2000 AD, handled by the vertical J2000 line +
+    // label elsewhere — not by an x-axis tick.
+    const label = year === 0 ? '1 BC' : (year < 0 ? `${-year} BC` : `${year} AD`);
     xticks.push(`<line x1="${x}" y1="${margin.top + plotH}" x2="${x}" y2="${margin.top + plotH + 5}" stroke="#888" stroke-width="0.7"/>
       <text x="${x}" y="${margin.top + plotH + 20}" text-anchor="middle" font-size="10" fill="#d4d4d4">${label}</text>`);
   }
@@ -24374,18 +24775,41 @@ function lcrRenderChart(rangeKey) {
   const zeroY = yPos(0);
   const zeroLine = `<line x1="${margin.left}" y1="${zeroY}" x2="${margin.left + plotW}" y2="${zeroY}" stroke="#666" stroke-width="1" stroke-dasharray="4,3"/>`;
 
-  // IERS reference line (+1.75 ms/cy)
-  const iersY = yPos(1.75);
-  const iersLine = `<line x1="${margin.left}" y1="${iersY}" x2="${margin.left + plotW}" y2="${iersY}" stroke="#7ec98a" stroke-width="0.9" stroke-dasharray="6,4" opacity="0.55"/>
-    <text x="${margin.left + plotW - 6}" y="${iersY - 4}" text-anchor="end" font-size="9" fill="#7ec98a" opacity="0.7">IERS +1.75 ms/cy</text>`;
+  // (IERS +1.75 reference line removed — Framework baseline (teal) already
+  // sits at ≈ 1.77 ms/cy on the historical view, so an extra dashed reference
+  // would be visually redundant. IERS anchor remains documented in the "How
+  // to read" panel + Framework baseline tooltip.)
+  const iersLine = '';
 
   // J2000 vertical (only if year 2000 is inside the range).
   let j2000Line = '';
   if (S.xLo <= 2000 && 2000 <= S.xHi) {
     const j2000X = xPos(2000);
-    j2000Line = `<line x1="${j2000X}" y1="${margin.top}" x2="${j2000X}" y2="${margin.top + plotH}" stroke="#ffce4b" stroke-width="1.1" opacity="0.65"/>
-      <text x="${j2000X}" y="${margin.top - 6}" text-anchor="middle" font-size="10" fill="#ffce4b">J2000</text>`;
+    j2000Line = `<line x1="${j2000X}" y1="${margin.top}" x2="${j2000X}" y2="${margin.top + plotH}" stroke="#e8e8e8" stroke-width="1.1" opacity="0.55"/>
+      <text x="${j2000X}" y="${margin.top - 6}" text-anchor="middle" font-size="10" fill="#e8e8e8" opacity="0.85">J2000</text>`;
   }
+
+  // Bond events — independent-literature North Atlantic ice-rafted-debris
+  // cold events on ~1470 yr cycle (Bond 1997, 2001). Rendered as vertical
+  // dotted lines with a small marker + label ON the Framework baseline
+  // (Net L2) — same reference height as the framework's ▼ TROUGH triangles,
+  // making the mainstream ↔ framework offset immediately readable.
+  const bondLines = lcrLayerVisibility.bonds
+    ? LCR_BOND_EVENTS.filter(b => b.year >= S.xLo && b.year <= S.xHi).map(b => {
+        const bx = xPos(b.year);
+        // Interpolate Net L2 at Bond year for marker & label placement.
+        const bidx = Math.max(0, Math.min(S.xs.length - 1, Math.round((b.year - S.xLo) / S.step)));
+        const bl2  = S.netL2[bidx];
+        const by   = (bl2 != null) ? yPosClipped(bl2) : (margin.top + plotH / 2);
+        const line = `<line x1="${bx}" y1="${margin.top}" x2="${bx}" y2="${margin.top + plotH}" stroke="#9ccfff" stroke-width="0.7" stroke-dasharray="2,3" opacity="0.5"/>`;
+        // Small filled dot ON the baseline (mainstream Bond date anchor).
+        const dot   = `<circle cx="${bx}" cy="${by}" r="3.5" fill="#9ccfff" opacity="0.95" stroke="#0a0d11" stroke-width="0.8"/>`;
+        // Label above the dot; hover tooltip includes description + full year.
+        const bLabelYr = b.year > 0 ? b.year + ' AD' : b.year < 0 ? (-b.year) + ' BC' : '1 BC';
+        const label = `<text x="${bx}" y="${by - 8}" text-anchor="middle" font-size="10" font-weight="700" fill="#9ccfff" opacity="0.95"><title>${b.name}${b.desc ? ' — ' + b.desc : ''} (${bLabelYr})</title>B${b.n}</text>`;
+        return line + dot + label;
+      }).join('')
+    : '';
 
   // Climate period bands (background shading). Cold = blue, warm = red.
   // Label style adapts to plot pixel-width available per band; anti-collision
@@ -24418,7 +24842,7 @@ function lcrRenderChart(rangeKey) {
       const y = margin.top + 12 + row * 14;
       const maxChars = Math.max(6, Math.floor(w / 6));
       const displayName = p.name.length > maxChars ? p.name.slice(0, maxChars - 1) + '…' : p.name;
-      labels.push(`<text x="${midX}" y="${y}" text-anchor="middle" font-size="10" fill="${color}" opacity="0.95" font-weight="600">${displayName}</text>`);
+      labels.push(`<text x="${midX}" y="${y}" text-anchor="middle" font-size="11" fill="${color}" opacity="0.95" font-weight="600">${displayName}</text>`);
     });
     return rects.join('') + labels.join('');
   })();
@@ -24438,30 +24862,41 @@ function lcrRenderChart(rangeKey) {
   }
 
   const paths = [];
-  if (lcrLayerVisibility.gia) {
-    paths.push(`<path d="${pathFor(S.gia)}" fill="none" stroke="#66e0a0" stroke-width="1.4" stroke-dasharray="4,3" opacity="0.8" data-lcr-curve="gia"/>`);
-  }
-  if (lcrLayerVisibility.stack) {
-    paths.push(`<path d="${pathFor(S.stack)}" fill="none" stroke="#c4c8d0" stroke-width="1.2" opacity="0.85" data-lcr-curve="stack"/>`);
-  }
   if (lcrLayerVisibility.netL2) {
-    paths.push(`<path d="${pathFor(S.netL2)}" fill="none" stroke="#6ee5ff" stroke-width="2" opacity="0.95" data-lcr-curve="netL2"/>`);
+    paths.push(`<path d="${pathFor(S.netL2)}" fill="none" stroke="#4dd0c8" stroke-width="2" opacity="0.95" data-lcr-curve="netL2"/>`);
+  }
+  if (lcrLayerVisibility.bondCurve) {
+    // Bond isolated (1466-yr harmonic only). Thin lavender dashed —
+    // expected to be a clean 1466-yr sinusoid. Rendered SHIFTED by Net L2
+    // so the sinusoid oscillates ON THE FRAMEWORK BASELINE (the reference
+    // height for TROUGH triangles + Bond mainstream dots). Sub-baseline
+    // portions = COLD anomalies, above-baseline = WARM anomalies.
+    const bondShifted = S.bond.map((b, i) =>
+      (b == null || S.netL2[i] == null) ? null : b + S.netL2[i]
+    );
+    paths.push(`<path d="${pathFor(bondShifted)}" fill="none" stroke="#c084fc" stroke-width="1.2" stroke-dasharray="5,3" opacity="0.85" data-lcr-curve="bond"/>`);
   }
   if (lcrLayerVisibility.netL3) {
     paths.push(`<path d="${pathFor(S.netL3)}" fill="none" stroke="#ffce4b" stroke-width="2" opacity="1" data-lcr-curve="netL3"/>`);
   }
 
-  // Framework crossings as small triangle markers on the zero line.
+  // Framework crossings as small triangle markers ON the Framework baseline
+  // (Net L2 line) — that's where the stack contribution is zero, i.e., where
+  // Net L3 crosses Net L2. Placing them there makes the visual meaning
+  // immediate: "at this year, prediction touches baseline; before/after it
+  // swings warm or cold". Falls back to zero line if netL2 is null.
   const crossingMarks = lcrLayerVisibility.crossings ? S.crossings.map(c => {
     if (c.year < S.xLo || c.year > S.xHi) return '';
     const x = xPos(c.year);
-    const y = zeroY;
+    // Interpolate Net L2 at c.year for the marker's Y position.
+    const idx = Math.max(0, Math.min(S.xs.length - 1, Math.round((c.year - S.xLo) / S.step)));
+    const l2 = S.netL2[idx];
+    const y = (l2 != null) ? yPosClipped(l2) : zeroY;
     const isPeak = c.type === 'PEAK';
-    // PEAK = up-triangle at zero line pointing up; TROUGH = down-triangle pointing down.
-    const color = isPeak ? '#ff9b66' : '#66c0ff';
+    const color = isPeak ? '#ff4757' : '#4dabff';
     const tri = isPeak
-      ? `<polygon points="${x-5},${y+2} ${x+5},${y+2} ${x},${y-8}" fill="${color}" opacity="0.9" data-lcr-crossing="${c.year}" data-lcr-crossing-type="${c.type}"/>`
-      : `<polygon points="${x-5},${y-2} ${x+5},${y-2} ${x},${y+8}" fill="${color}" opacity="0.9" data-lcr-crossing="${c.year}" data-lcr-crossing-type="${c.type}"/>`;
+      ? `<polygon points="${x-5},${y+2} ${x+5},${y+2} ${x},${y-8}" fill="${color}" opacity="0.95" data-lcr-crossing="${c.year}" data-lcr-crossing-type="${c.type}"/>`
+      : `<polygon points="${x-5},${y-2} ${x+5},${y-2} ${x},${y+8}" fill="${color}" opacity="0.95" data-lcr-crossing="${c.year}" data-lcr-crossing-type="${c.type}"/>`;
     return tri;
   }).join('') : '';
 
@@ -24470,12 +24905,14 @@ function lcrRenderChart(rangeKey) {
   // when the window is CE-dominant; GISP2 (coarser, Holocene through LGM) fills
   // the deep past. Both plotted on the SAME right-hand °C-anomaly axis.
   let proxyGroup = '';
-  let proxyLegend = '';
   if (lcrLayerVisibility.proxy && lcrProxyData && lcrProxyData.sources) {
+    const useDetrended = !!lcrLayerVisibility.detrended;
     const activeSources = lcrProxyData.sources
+      .filter(src => src.name === lcrSelectedProxy)
       .map(src => {
-        const filtered = src.data.filter(([y, _]) => y >= S.xLo && y <= S.xHi);
-        return { src, filtered };
+        const seriesData = useDetrended && src.dataDetrended ? src.dataDetrended : src.data;
+        const filtered = seriesData.filter(([y, _]) => y >= S.xLo && y <= S.xHi);
+        return { src, filtered, detrended: useDetrended };
       })
       .filter(({ filtered }) => filtered.length >= 2);
 
@@ -24495,13 +24932,37 @@ function lcrRenderChart(rangeKey) {
 
       const proxyColors = {
         'Moberg 2005':          '#ff66c0',
-        'GISP2 (Alley 2000)':   '#ffa040',
+        'GISP2 (Alley 2000)':   '#ff5978',
       };
       const proxyPaths = activeSources.map(({ src, filtered }) => {
+        // Smooth path via Catmull-Rom → cubic Bezier conversion. Sparse
+        // series (GISP2 at 100-yr binning gives only ~10 points on the
+        // historical view) look unrealistically jagged with straight L
+        // segments; cubic Bezier through the same anchors preserves data
+        // fidelity while producing a fluent curve.
+        //   c1 = P[i]   + (P[i+1] - P[i-1]) / 6
+        //   c2 = P[i+1] - (P[i+2] - P[i])   / 6
+        // Endpoints degenerate to the anchor itself.
+        const pts = filtered.map(([y, t]) => [xPos(y), yPosProxy(t)]);
         let d = '';
-        filtered.forEach(([y, t], i) => {
-          d += (i === 0 ? 'M' : 'L') + xPos(y).toFixed(1) + ' ' + yPosProxy(t).toFixed(1) + ' ';
-        });
+        if (pts.length === 1) {
+          d = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+        } else if (pts.length === 2) {
+          d = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)} L${pts[1][0].toFixed(1)} ${pts[1][1].toFixed(1)}`;
+        } else {
+          d = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+          for (let i = 0; i < pts.length - 1; i++) {
+            const p0 = pts[Math.max(i - 1, 0)];
+            const p1 = pts[i];
+            const p2 = pts[i + 1];
+            const p3 = pts[Math.min(i + 2, pts.length - 1)];
+            const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+            const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+            const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+            const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+            d += ` C${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+          }
+        }
         const col = proxyColors[src.name] || '#ffb0d0';
         return `<path d="${d}" fill="none" stroke="${col}" stroke-width="1.6" opacity="0.75" data-lcr-proxy="${src.name}"><title>${src.name} — ${src.reference}
 ${src.region} • ${src.unit}</title></path>`;
@@ -24520,27 +24981,23 @@ ${src.region} • ${src.unit}</title></path>`;
       const pStart = Math.ceil(proxyMin / pStep) * pStep;
       for (let t = pStart; t <= proxyMax + 1e-9; t += pStep) {
         const y = yPosProxy(t);
-        proxyTicks.push(`<line x1="${margin.left + plotW}" y1="${y}" x2="${margin.left + plotW + 5}" y2="${y}" stroke="#ff9bd0" stroke-width="0.7"/>
-          <text x="${margin.left + plotW + 8}" y="${y + 4}" text-anchor="start" font-size="10" fill="#ff9bd0" opacity="0.85">${t > 0 ? '+' : ''}${t.toFixed(pStep < 1 ? 1 : 0)}</text>`);
+        proxyTicks.push(`<line x1="${margin.left + plotW}" y1="${y}" x2="${margin.left + plotW + 5}" y2="${y}" stroke="#ff5978" stroke-width="0.7"/>
+          <text x="${margin.left + plotW + 8}" y="${y + 4}" text-anchor="start" font-size="10" fill="#ff5978" opacity="0.85">${t > 0 ? '+' : ''}${t.toFixed(pStep < 1 ? 1 : 0)}</text>`);
       }
-      const proxyAxisLabel = `<text x="${margin.left + plotW + 42}" y="${margin.top + plotH / 2}" text-anchor="middle" transform="rotate(90 ${margin.left + plotW + 42} ${margin.top + plotH / 2})" font-size="11" fill="#ff9bd0" font-weight="600">Temperature anomaly (°C)</text>`;
+      const proxyOpt = LCR_PROXY_OPTIONS.find(o => o.name === lcrSelectedProxy);
+      const baseAxisLabel = proxyOpt ? proxyOpt.axisLabel : 'Anomaly';
+      const axisLabelText = lcrLayerVisibility.detrended
+        ? baseAxisLabel + ' (detrended, 5-kyr baseline)'
+        : baseAxisLabel;
+      const proxyAxisLabel = `<text x="${margin.left + plotW + 42}" y="${margin.top + plotH / 2}" text-anchor="middle" transform="rotate(90 ${margin.left + plotW + 42} ${margin.top + plotH / 2})" font-size="11" fill="#ff5978" font-weight="600">${axisLabelText}</text>`;
 
       proxyGroup = proxyTicks.join('') + proxyPaths + proxyAxisLabel;
-
-      // Legend text under the chart (small).
-      proxyLegend = activeSources.map(({ src }) => {
-        const col = proxyColors[src.name] || '#ffb0d0';
-        return `<tspan fill="${col}" font-weight="700">■</tspan> ${src.name} (${src.range[0]}–${src.range[1]})`;
-      }).join('   ');
     }
   }
 
   // Axis labels
   const yLabel = `<text x="${margin.left - 55}" y="${margin.top + plotH / 2}" text-anchor="middle" transform="rotate(-90 ${margin.left - 55} ${margin.top + plotH / 2})" font-size="11" fill="#d4d4d4" font-weight="600">dLOD/dt (ms/century)</text>`;
   const xLabel = `<text x="${margin.left + plotW / 2}" y="${margin.top + plotH + 46}" text-anchor="middle" font-size="11" fill="#d4d4d4" font-weight="600">Calendar year</text>`;
-  const proxyFootLegend = proxyLegend
-    ? `<text x="${margin.left + plotW / 2}" y="${margin.top + plotH + 66}" text-anchor="middle" font-size="10" fill="#d4d4d4" opacity="0.85">${proxyLegend}</text>`
-    : '';
 
   // Hover overlay — invisible rect that catches mouse; JS reads x → year.
   const hoverRect = `<rect class="lcr-hover-capture" x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="transparent" pointer-events="all"/>`;
@@ -24550,11 +25007,10 @@ ${src.region} • ${src.unit}</title></path>`;
   const hoverDot  = `<circle class="lcr-hover-dot" cx="0" cy="0" r="4" fill="#ffce4b" opacity="0" pointer-events="none"/>`;
   const hoverBg   = `<rect class="lcr-hover-bg" x="0" y="0" width="180" height="70" rx="4" fill="rgba(20,22,28,.94)" stroke="rgba(255,255,255,.15)" opacity="0" pointer-events="none"/>`;
   const hoverTxt  = `<text class="lcr-hover-year" x="0" y="0" font-size="11" fill="#fff" font-weight="700" opacity="0" pointer-events="none"></text>
-    <text class="lcr-hover-l2" x="0" y="0" font-size="10" fill="#6ee5ff" opacity="0" pointer-events="none"></text>
-    <text class="lcr-hover-l3" x="0" y="0" font-size="10" fill="#ffce4b" opacity="0" pointer-events="none"></text>
-    <text class="lcr-hover-stack" x="0" y="0" font-size="10" fill="#c4c8d0" opacity="0" pointer-events="none"></text>`;
+    <text class="lcr-hover-l2" x="0" y="0" font-size="10" fill="#4dd0c8" opacity="0" pointer-events="none"></text>
+    <text class="lcr-hover-l3" x="0" y="0" font-size="10" fill="#ffce4b" opacity="0" pointer-events="none"></text>`;
 
-  return `<svg class="lcr-svg" viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet">
+  return `<svg class="lcr-svg" viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
     <rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#0e1116" stroke="rgba(255,255,255,.08)"/>
     ${bands}
     ${yticks.join('')}
@@ -24562,12 +25018,12 @@ ${src.region} • ${src.unit}</title></path>`;
     ${zeroLine}
     ${iersLine}
     ${j2000Line}
+    ${bondLines}
     ${paths.join('')}
     ${crossingMarks}
     ${proxyGroup}
     ${yLabel}
     ${xLabel}
-    ${proxyFootLegend}
     ${hoverBg}
     ${hoverLine}
     ${hoverDot}
@@ -24587,15 +25043,15 @@ async function createLcrPanel() {
 
   const layerToggles = `
     <div class="cfm-layer-toggles">
-      <span class="cfm-layer-toggles-label">Curves:</span>
-      <label class="cfm-layer-check" title="Layer 2 net rate = tidal + GIA (Milankovitch physics only). At J2000: +1.77 ms/cy, matches IERS +1.75."><input type="checkbox" data-lcr-layer="netL2" ${lcrLayerVisibility.netL2 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL2"></span>Net L2 (secular)</label>
-      <label class="cfm-layer-check" title="Layer 3 net rate = tidal + GIA + 4-flag ΔT stack. Full observable dLOD/dt including sub-Milankovitch modulation. At J2000: +0.764 ms/cy."><input type="checkbox" data-lcr-layer="netL3" ${lcrLayerVisibility.netL3 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL3"></span>Net L3 (observable)</label>
-      <label class="cfm-layer-check" title="Sub-Milankovitch stack rate alone (Bond + Hallstatt + Jose5 + Jose4 harmonic derivatives). Zero-crossings mark climate transitions."><input type="checkbox" data-lcr-layer="stack" ${lcrLayerVisibility.stack ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-stack"></span>Stack rate</label>
-      <label class="cfm-layer-check" title="L1-orbital-coupled GIA rate alone (Milankovitch glacial-cycle contribution to dLOD/dt)."><input type="checkbox" data-lcr-layer="gia" ${lcrLayerVisibility.gia ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-gia"></span>GIA rate</label>
-      <span class="cfm-layer-toggles-label" style="margin-left:18px">Overlays:</span>
-      <label class="cfm-layer-check" title="Named climate period bands from mainstream literature. Cold = blue; Warm = red."><input type="checkbox" data-lcr-layer="bands" ${lcrLayerVisibility.bands ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bands"></span>Climate bands</label>
-      <label class="cfm-layer-check" title="Framework zero-crossings of the stack rate. Up-triangle = PEAK; Down-triangle = TROUGH."><input type="checkbox" data-lcr-layer="crossings" ${lcrLayerVisibility.crossings ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-cross"></span>Framework crossings</label>
-      <label class="cfm-layer-check" title="Independent paleoclimate temperature reconstructions on the secondary right-hand °C-anomaly axis. Moberg 2005 = Northern Hemisphere (5-1975 CE, decadal). GISP2 Alley 2000 = Greenland ice core (Holocene through LGM). Both anomalies but against different baselines (see per-source tooltip)."><input type="checkbox" data-lcr-layer="proxy" ${lcrLayerVisibility.proxy ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxy"></span>Temperature proxy</label>
+      <label class="cfm-layer-check" title="Framework's secular baseline = Layer 2 net rate = tidal + GIA (Milankovitch physics only). At J2000: +1.77 ms/cy, matches IERS +1.75."><input type="checkbox" data-lcr-layer="netL2" ${lcrLayerVisibility.netL2 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL2"></span>Framework baseline</label>
+      <label class="cfm-layer-check" title="Framework's full prediction = Layer 3 net rate = tidal + GIA + 4-flag ΔT stack. The observable dLOD/dt including sub-Milankovitch modulation. At J2000: +0.764 ms/cy."><input type="checkbox" data-lcr-layer="netL3" ${lcrLayerVisibility.netL3 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL3"></span>Framework prediction</label>
+      <label class="cfm-layer-check" title="Bond 8H/1830 harmonic ISOLATED from the 4-flag stack. A clean 1466-yr sinusoid — its zero-crossings should align with B0…B8 markers if the framework captures the Bond cycle. Full-stack prediction has additional Hallstatt / Jose5 / Jose4 crossings on top of this."><input type="checkbox" data-lcr-layer="bondCurve" ${lcrLayerVisibility.bondCurve ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bondcurve"></span>Bond harmonic only</label>
+      <label class="cfm-layer-check" title="Named climate period bands from mainstream literature. Cold = blue; Warm = red."><input type="checkbox" data-lcr-layer="bands" ${lcrLayerVisibility.bands ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bands"></span>Named climate periods</label>
+      <label class="cfm-layer-check" title="Framework's predicted climate transitions — zero-crossings of the stack rate, drawn on the Framework baseline line (where prediction and baseline coincide). Up-triangle = warm-anomaly peak (cooling starts after); Down-triangle = cold-anomaly trough (warming starts after)."><input type="checkbox" data-lcr-layer="crossings" ${lcrLayerVisibility.crossings ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-cross"></span>Predicted transitions</label>
+      <label class="cfm-layer-check" title="Bond events (0-8) from Bond et al. 1997/2001 Science. North Atlantic ice-rafted-debris cold events on ~1470 yr cycle. Independent literature dates — labeled B0 through B8. Purpose: visually check whether framework transition markers (▼) cluster near Bond dates."><input type="checkbox" data-lcr-layer="bonds" ${lcrLayerVisibility.bonds ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bonds"></span>Bond events</label>
+      <label class="cfm-layer-check" title="Independent paleoclimate proxy on the secondary right-hand axis. Use the dropdown to switch between three sources — Bond 2001 IRD (drift-ice, positive = warm; the exact signal Bond used to identify his events), GISP2 Alley 2000 (Greenland temperature), or Moberg 2005 (Northern Hemisphere temperature, 0-2000 AD only). All expressed with 'positive = warm anomaly' convention. Not part of the framework fit."><input type="checkbox" data-lcr-layer="proxy" ${lcrLayerVisibility.proxy ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxy"></span>Proxy overlay:</label>
+      <select class="lcr-proxy-select" data-lcr-proxy-select>${LCR_PROXY_OPTIONS.map(o => `<option value="${o.name}" ${o.name === lcrSelectedProxy ? 'selected' : ''}>${o.label}</option>`).join('')}</select>
+      <label class="cfm-layer-check" title="Toggle: show the ice-core proxy detrended by a 5000-yr rolling-mean baseline. Removes the slow Milankovitch-scale trend (LGM → Holocene warming), so sub-Milankovitch Bond-scale oscillations (~1-2°C wiggles) become clearly visible. When ON, right-axis switches to detrended anomaly."><input type="checkbox" data-lcr-layer="detrended" ${lcrLayerVisibility.detrended ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-detrend"></span>Detrended proxy</label>
     </div>
   `;
 
@@ -24615,14 +25071,25 @@ async function createLcrPanel() {
         </div>
         <div class="lcr-legend-panel">
           <div class="lcr-legend-note">
-            <b>How to read:</b> <b>Net L2</b> (cyan) is the framework's secular tidal + GIA baseline (≈ IERS at J2000).
-            <b>Net L3</b> (yellow) adds the sub-Milankovitch 4-flag stack. Where they diverge, the stack is pushing
-            Earth's rotation above or below the Milankovitch baseline — that pressure historically maps to warm/cool episodes.
-            The <b>stack rate</b> curve (grey, thin) zero-crossings are the framework's predicted climate transitions;
-            <b>PEAK</b> markers (▲ orange) = warming starts after; <b>TROUGH</b> markers (▼ blue) = cooling starts after.
-            Empirical match: <b>10/10 named climate events fall within ±500 yr, 5/10 within ±100 yr</b>
-            (framework fit used Espenak ΔT 1650-2017 only — no climate proxies in the loop).
+            Where <b>prediction</b> (gold) swings above / below <b>baseline</b> (teal), the framework is pushing Earth's
+            rotation above/below the Milankovitch trend — historically mapping to warm/cool episodes visible in the
+            <b>selected proxy</b> (coral, right axis; switch source via the dropdown above). All proxies use
+            positive-anomaly = warm convention: <b>Bond 2001 IRD</b> is inverted (raw IRD is high when cold, so we
+            negate for consistency); <b>GISP2</b> and <b>Moberg</b> are already temperature anomalies.
+            ▲ = warm-anomaly peak; ▼ = cold-anomaly trough. The <b>Bond harmonic only</b> curve (lavender dashed)
+            isolates the framework's 8H/1830 (1466-yr) component — its zero-crossings should align with the
+            <b>B0…B8</b> markers if the framework captures the Bond cycle correctly. On Full view, enable
+            <b>Detrended proxy</b> to remove the slow trend.
           </div>
+        </div>
+        <div class="lcr-match-panel">
+          ${lcrRenderBondMatchTable()}
+        </div>
+        <div class="lcr-match-panel">
+          ${lcrRenderSignCheckPanel()}
+        </div>
+        <div class="lcr-match-panel">
+          ${lcrRenderCorrelationPanel()}
         </div>
       </div>
     </div>
@@ -24654,6 +25121,14 @@ async function createLcrPanel() {
     });
   });
 
+  // Proxy source selector (dropdown next to the "Proxy overlay:" checkbox).
+  panel.querySelectorAll('[data-lcr-proxy-select]').forEach(sel => {
+    sel.addEventListener('change', () => {
+      lcrSelectedProxy = sel.value;
+      rerender();
+    });
+  });
+
   // Hover tooltip binding — delegates to the .lcr-hover-capture rect.
   function bindLcrHover() {
     const svg = contentEl.querySelector('svg.lcr-svg');
@@ -24662,7 +25137,10 @@ async function createLcrPanel() {
     if (!capture) return;
     const S = lcrComputeSeries(lcrSelectedRange);
     const W = 1100;
-    const margin = { top: 40, right: 30, bottom: 90, left: 78 };
+    // Must match margins used in lcrRenderChart above — otherwise plotW is
+    // wrong and the hover-year lookup drifts (~60 yr shift observed when
+    // right went 30 → 78 for the secondary axis but this constant lagged).
+    const margin = { top: 40, right: 78, bottom: 90, left: 78 };
     const plotW = W - margin.left - margin.right;
     const plotH = 470 - margin.top - 90;
     const xLo = S.xLo, xHi = S.xHi;
@@ -24672,8 +25150,6 @@ async function createLcrPanel() {
     const scanH = (arr) => { for (const v of arr) if (v != null) { if (v < dataMin) dataMin = v; if (v > dataMax) dataMax = v; } };
     if (lcrLayerVisibility.netL2) scanH(S.netL2);
     if (lcrLayerVisibility.netL3) scanH(S.netL3);
-    if (lcrLayerVisibility.stack) scanH(S.stack);
-    if (lcrLayerVisibility.gia)   scanH(S.gia);
     if (dataMin > 0)    dataMin = 0;
     if (dataMax < 1.75) dataMax = 1.75;
     if (!Number.isFinite(dataMin) || !Number.isFinite(dataMax)) { dataMin = -0.5; dataMax = 3.5; }
@@ -24687,7 +25163,6 @@ async function createLcrPanel() {
     const yearTxt    = svg.querySelector('.lcr-hover-year');
     const l2Txt      = svg.querySelector('.lcr-hover-l2');
     const l3Txt      = svg.querySelector('.lcr-hover-l3');
-    const stackTxt   = svg.querySelector('.lcr-hover-stack');
 
     function showTooltip(event) {
       const rect = svg.getBoundingClientRect();
@@ -24702,7 +25177,6 @@ async function createLcrPanel() {
 
       const l2 = S.netL2[idx];
       const l3 = S.netL3[idx];
-      const st = S.stack[idx];
       const y  = S.xs[idx];
 
       const xPos = margin.left + ((y - xLo) / (xHi - xLo)) * plotW;
@@ -24715,13 +25189,12 @@ async function createLcrPanel() {
       hoverDot.setAttribute('cy', yPos);
       hoverDot.setAttribute('opacity', '1');
 
-      const label = y === 0 ? 'J2000' : (y < 0 ? `${-y} BCE` : `${y} CE`);
+      const label = y === 2000 ? 'J2000' : y === 0 ? '1 BC' : y < 0 ? `${-y} BC` : `${y} AD`;
       yearTxt.textContent = label;
-      l2Txt.textContent    = `Net L2: ${l2.toFixed(3)} ms/cy`;
-      l3Txt.textContent    = `Net L3: ${l3.toFixed(3)} ms/cy`;
-      stackTxt.textContent = `Stack:  ${st.toFixed(3)} ms/cy`;
+      l2Txt.textContent    = `Baseline:   ${l2.toFixed(3)} ms/cy`;
+      l3Txt.textContent    = `Prediction: ${l3.toFixed(3)} ms/cy`;
 
-      const tipW = 170, tipH = 70;
+      const tipW = 170, tipH = 56;
       let tipX = xPos + 12;
       if (tipX + tipW > margin.left + plotW) tipX = xPos - 12 - tipW;
       const tipY = Math.max(margin.top + 6, Math.min(yPos - tipH/2, margin.top + plotW - tipH));
@@ -24733,7 +25206,6 @@ async function createLcrPanel() {
       yearTxt.setAttribute('x', tipX + 10); yearTxt.setAttribute('y', tipY + 16); yearTxt.setAttribute('opacity', '1');
       l2Txt.setAttribute('x', tipX + 10);   l2Txt.setAttribute('y', tipY + 32);   l2Txt.setAttribute('opacity', '1');
       l3Txt.setAttribute('x', tipX + 10);   l3Txt.setAttribute('y', tipY + 46);   l3Txt.setAttribute('opacity', '1');
-      stackTxt.setAttribute('x', tipX + 10); stackTxt.setAttribute('y', tipY + 60); stackTxt.setAttribute('opacity', '1');
     }
     function hideTooltip() {
       hoverLine.setAttribute('opacity', '0');
@@ -24742,7 +25214,6 @@ async function createLcrPanel() {
       yearTxt.setAttribute('opacity', '0');
       l2Txt.setAttribute('opacity', '0');
       l3Txt.setAttribute('opacity', '0');
-      stackTxt.setAttribute('opacity', '0');
     }
     capture.addEventListener('mousemove', showTooltip);
     capture.addEventListener('mouseleave', hideTooltip);
@@ -24756,6 +25227,10 @@ async function createLcrPanel() {
 
 async function openLcrPanel() {
   if (lcrPanel) { lcrPanel.remove(); lcrPanel = null; }
+  // Wipe series cache — range specs (LCR_RANGE_TABS) can change between
+  // sessions during development, and cached samples over stale windows
+  // would render at the wrong X-scale.
+  for (const k of Object.keys(_lcrSeriesCache)) delete _lcrSeriesCache[k];
   await lcrLoadProxyData();
   lcrPanel = await createLcrPanel();
 }
@@ -29589,7 +30064,7 @@ function setupGUI() {
   addTooltip(toolsFolder.addButton({ title: 'WebGeoCalc Explorer' }).on('click', () => openWGCPanel()),
     'Observed perihelion precession rates for all 8 planets (1900\u20132026) from JPL WebGeoCalc. Three charts per planet: ascending node, argument of periapsis, longitude of perihelion.');
   addTooltip(toolsFolder.addButton({ title: 'LOD-Climate Rhythm' }).on('click', () => openLcrPanel()),
-    'Sub-Milankovitch driver decomposition (tidal + GIA + 4-flag stack) mapped against named historical climate transitions. Framework crossings vs mainstream MWP / LIA / Bond events / 8.2 ka / 4.2 ka / LBA / Iron Age cold / modern warming.');
+    'Sub-Milankovitch driver decomposition (tidal + GIA + 4-flag stack) mapped against named historical climate transitions. Framework predictions vs mainstream MWP / LIA / Bond events / 8.2 ka / 4.2 ka / LBA / Iron Age cold / modern warming.');
 
   addTooltip(toolsFolder.addButton({ title: 'Climate Formula Explorer' }).on('click', () => openClimateFormulaPanel()),
     'Modular climate formula: L1 8H orbital lattice + L2 silicate-weathering carbon thermostat (405/202/135 kyr) + L3 boundary-condition steps (PETM, EOT, Mi-1, MMCT, iNHG, MPT). Per-regime fits vs LR04 \u03b4\u00b9\u2078O (Lisiecki & Raymo 2005) and CENOGRID \u03b4\u00b9\u2078O / \u03b4\u00b9\u00b3C (Westerhold 2020). Independent layer toggles + per-layer R\u00b2 breakdown. Forward-projection tab; cross-regime prediction fails honestly (doc 92 \u00a78.4).');

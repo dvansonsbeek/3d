@@ -127,16 +127,66 @@ function loadMoberg() {
   };
 }
 
+// ── Bond et al. 2001 IRD (North Atlantic drift-ice) stack ─────────────────
+// Format: 10-column table, columns 9-10 = "all 4 stacked" age vs % HSG
+// (Hematite-Stained Grains), the exact signal Bond used to identify his
+// Bond 0-8 cold events. Age in years BP (1950 CE = 0).
+//
+// Physical meaning: HIGH IRD = more drift-ice = COLD anomaly.
+// To match the "warm anomaly = positive" convention of temperature proxies,
+// we store the values NEGATED (so positive = warm anomaly). This lets the
+// correlation panel compare all proxies with the same sign convention as
+// the framework's Σ_stack.
+
+function loadBond2001() {
+  const raw = fs.readFileSync(
+    path.join(__dirname, '..', 'public', 'input', 'proxy', 'bond2001-raw.txt'),
+    'utf8'
+  );
+  const lines = raw.split('\n');
+  const points = [];
+  for (const line of lines) {
+    // Data rows have 10 whitespace-separated numeric columns. Pick columns
+    // 9 (age BP) + 10 (stacked HSG %). Skip header, non-data lines.
+    const parts = line.trim().split(/\s+/);
+    if (parts.length < 10) continue;
+    const age  = parseFloat(parts[8]);   // col 9 (0-indexed 8)
+    const hsg  = parseFloat(parts[9]);   // col 10 (0-indexed 9)
+    if (!Number.isFinite(age) || !Number.isFinite(hsg)) continue;
+    if (age < 0 || age > 12000) continue;
+    const year_CE = Math.round(1950 - age);
+    points.push({ year: year_CE, hsg });
+  }
+  points.sort((a, b) => a.year - b.year);
+  // Compute the mean HSG across the record to convert to anomaly.
+  const mean = points.reduce((s, p) => s + p.hsg, 0) / points.length;
+  // Store as anomaly-vs-mean, NEGATED so positive = warm anomaly.
+  const data = points.map(p => [p.year, +((-1) * (p.hsg - mean)).toFixed(3)]);
+  return {
+    name: 'Bond 2001 IRD',
+    region: 'North Atlantic (MC52, VM29-191, MC21, GGC22 stacked)',
+    reference: 'Bond G.C. et al. 2001. Science 294:2130-2136.',
+    unit: 'inverse-IRD anomaly (positive = warm), vs record mean',
+    baseline: `mean HSG = ${mean.toFixed(2)} % of grains`,
+    note: 'HIGH IRD = MORE ice-rafted debris = COLD event. Values are NEGATED (×−1) so positive = warm anomaly, matching GISP2/temperature convention for direct correlation comparison. Original signal available in bond2001-raw.txt.',
+    climateProxy: 'ird',
+    range: [data[0][0], data[data.length - 1][0]],
+    n: data.length,
+    data,
+  };
+}
+
 const output = {
   _meta: {
     generator: 'scripts/process_climate_proxy.js',
     source_files: [
       'public/input/proxy/gisp2-alley2000-raw.txt',
       'public/input/proxy/moberg2005-raw.txt',
+      'public/input/proxy/bond2001-raw.txt',
     ],
-    note: 'Compact proxy JSON for LOD-Climate Rhythm modal. Both series expressed as °C anomalies but against different baselines (see per-source unit field).',
+    note: 'Compact proxy JSON for LOD-Climate Rhythm modal. All series expressed with "positive = warm anomaly" convention (GISP2 and Moberg are already temperature anomalies; Bond 2001 IRD is NEGATED because raw IRD is inversely related to warmth).',
   },
-  sources: [loadMoberg(), loadGisp2()],
+  sources: [loadMoberg(), loadGisp2(), loadBond2001()],
 };
 
 const outPath = path.join(__dirname, '..', 'public', 'input', 'climate-proxy.json');
