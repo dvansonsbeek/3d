@@ -35,7 +35,12 @@ const EARTH_MOI_FACTOR = 0.3306947;                                  // IERS Con
 // Holistic mirror src/lib/orbital/deepTime.ts. Loads coefficients from the
 // shared JSON source to eliminate manual dual-copy sync.
 const ALPHA_CLIMATE_REGIME_KEY = 'lr04-post-mpt';
-const ALPHA_CLIMATE_SCALE      = -5.24e-7;   // per ‰; calibrated so dα/dt at J2000 = -1.8e-11/yr
+const ALPHA_CLIMATE_SCALE      = -3.93e-7;   // per ‰; calibrated so dα/dt at J2000 = -1.35e-11/yr.
+                                             //  Cox & Chao 2002 dJ₂/dt = -2.7e-11/yr / conversion factor 2.0
+                                             //  (Peltier ICE-6G LOD-coupling range; was 1.5 per Cheng-Tapley-Ries 2013).
+                                             //  Empirical L-5b|R| optimum with LLR α₁ landed at this GIA coupling —
+                                             //  physically defensible via the model-dependent J₂→α conversion uncertainty.
+                                             //  Prior value: -5.24e-7 (dα/dt = -1.8e-11/yr, factor 1.5).
 const _CLIMATE_JSON_PATH       = path.join(__dirname, '..', '..', 'public', 'input', 'climate-formula-coefficients.json');
 const CLIMATE_FORMULA_COEFFS   = JSON.parse(fs.readFileSync(_CLIMATE_JSON_PATH, 'utf8'));
 
@@ -257,26 +262,26 @@ const EIGHT_H = 8 * HOLISTIC_YEAR_J2000;
 const BOND_LATTICE_N = 1830;
 const BOND_PERIOD_YR = EIGHT_H / BOND_LATTICE_N;
 const BOND_OMEGA = 2 * Math.PI / BOND_PERIOD_YR;
-const BOND_COS_COEFF_S = 141.51919080027318;
-const BOND_SIN_COEFF_S = 252.46321828911084;
+const BOND_COS_COEFF_S = 135.99799341108618;
+const BOND_SIN_COEFF_S = 246.2916701068097;
 
 const HALLSTATT_LATTICE_N = 1104;
 const HALLSTATT_PERIOD_YR = EIGHT_H / HALLSTATT_LATTICE_N;
 const HALLSTATT_OMEGA = 2 * Math.PI / HALLSTATT_PERIOD_YR;
-const HALLSTATT_COS_COEFF_S = -7.744043068664131;
-const HALLSTATT_SIN_COEFF_S = 79.62430405944326;
+const HALLSTATT_COS_COEFF_S = 3.4311229577689573;
+const HALLSTATT_SIN_COEFF_S = 79.92638735266766;
 
 const JOSE5_LATTICE_N = 2989;
 const JOSE5_PERIOD_YR = EIGHT_H / JOSE5_LATTICE_N;
 const JOSE5_OMEGA = 2 * Math.PI / JOSE5_PERIOD_YR;
-const JOSE5_COS_COEFF_S = -46.92891772805531;
-const JOSE5_SIN_COEFF_S = 17.25330927310511;
+const JOSE5_COS_COEFF_S = -46.90713628513566;
+const JOSE5_SIN_COEFF_S = 17.3124396180235;
 
 const JOSE4_LATTICE_N = 3749;
 const JOSE4_PERIOD_YR = EIGHT_H / JOSE4_LATTICE_N;
 const JOSE4_OMEGA = 2 * Math.PI / JOSE4_PERIOD_YR;
-const JOSE4_COS_COEFF_S = 44.149299740511985;
-const JOSE4_SIN_COEFF_S = -13.619833153315945;
+const JOSE4_COS_COEFF_S = 45.29158371637972;
+const JOSE4_SIN_COEFF_S = -12.79094364535659;
 
 // Cyclic-correction taper widened 2026-07-12 from ±4.5/6 kyr Holocene window to
 // ±300/400 kyr — cross-archive validation across Steinhilber ¹⁰Be (9.4 kyr),
