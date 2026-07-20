@@ -117,7 +117,7 @@ The deep-time extension framework — canonical 9-step chain from `t_Ma` through
 
 ### Eclipse Data Pipeline (Docs 100–103)
 
-Scripts that fetch and parse the historical eclipse datasets used by the ΔT validation work in [doc 101](../docs/101-pure-tidal-eclipses.md), [doc 102](../docs/102-gia-alpha-lunar-validation.md), and [doc 103](../docs/103-135-babylonian-case-study.md):
+Scripts that fetch and parse the historical eclipse datasets used by the ΔT validation work in [doc 102](../docs/102-gia-alpha-lunar-validation.md) and [doc 103](../docs/103-135-babylonian-case-study.md):
 
 | Script | Description |
 |--------|-------------|

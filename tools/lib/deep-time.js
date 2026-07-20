@@ -124,7 +124,8 @@ for (const k of ['mercury','venus','earth','mars','jupiter','saturn','uranus','n
 // post-MPT regime). One physical mechanism, two observables: the same L1
 // signal that fits δ¹⁸O also drives α — via Milankovitch orbital forcing
 // → ice sheet dynamics → GIA J₂/α → LOD. Preserves α_J2000 = EARTH_MOI_
-// FACTOR exactly and Cox & Chao's dα/dt at J2000 = -1.8e-11/yr exactly.
+// FACTOR exactly. Modern anchor: dα/dt at J2000 = -1.35e-11/yr from Cox & Chao
+// 2002 dJ₂/dt = -2.7e-11/yr via J₂→α conversion factor 2.0 (Peltier ICE-6G range).
 // Kept in lock-step with src/script.js earthMoiFactorAtAge and Holistic
 // mirror src/lib/orbital/deepTime.ts. See doc 99 §prediction-7.
 let _alphaClimateL1_J2000 = null;

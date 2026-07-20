@@ -1,16 +1,14 @@
-# -135 Babylonian solar eclipse — framework prediction vs documented totality
+# -135 Babylonian solar eclipse — case study
 
-> **2026-07-19 audit refresh**. The current 26-event solar-eclipse alignment audit reports for -135 Apr 15 Babylon: Gap@PrsUT (at documented UT 06:14) **708 km**, Gap@MdlUT (at framework UT 07:02) 3,097 km, **BestGap 15 km at −0h15 offset** within the ±4h scan window; verdict **◇↻ ΔT-signal + umbra reaches site (off-peak)**. Framework's own greatest-eclipse UT differs from the documented UT by ~48 minutes (a real ΔT-signal on the LOD/rotation prediction), but within the ±4h scan window the framework umbra passes within 15 km of Babylon — the tightest per-event match in the entire 26-event audit. The "811 km / ↶ regional" numbers in the earlier snapshot below reflect an earlier framework state; the physics decomposition and forward-path discussion remain useful as historical context.
+**Status**: Framework's 26-event solar audit places -135 Apr 15 Babylon at **BestGap 949 km at −1h25 offset** within the ±4h scan window; verdict **↶ regional match** (umbra passes through the Babylon region but not on the centerline). Framework's own predicted UT for the eclipse (06:12) sits within 2 min of the documented UT (06:14) — so this is not a ΔT-signal event; the framework and record essentially agree on *when* the eclipse happened, and the residual is *where* the umbra centerline lies.
 
-**Status** (*historical snapshot, pre-2026-07-19*): Framework's audit-26 BestGap at -135 = **811 km**, verdict **↶ regional** (umbra in Babylon's region — 300-1000 km — within ±4h scan, not on centerline). Framework's Sun position is computed by `moveModel` via Kepler orbital mechanics + framework H-lattice harmonics (`sunLongitudeCorrection`). Component-level audit shows the residual decomposes into three real physics contributors — Sun ecl_lon drift at antiquity (0.30° drift → ~640 km umbra offset), framework ΔT vs Stephenson (958 sec gap → ~370 km umbra offset), and framework GMST vs IAU (0.70° gap → ~170 km umbra offset). The Meeus Ch. 47 Moon polynomial is exonerated (all modern lunar theories converge within 0.001° at year -135). The 0.30° Sun drift is downstream of framework's linear-rate mean-motion philosophy (no T² polynomial); Meeus Ch. 25 has +0.0003032 °/T² in L₀ and -0.0001537 °/T² in M, and framework has neither by design. Extending the H-lattice fit window with Meeus as reference was investigated on 2026-07-11 and found to be reference-limited, not fit-limited (see § Forward path).
-
-**Prior baseline**: [`doc 101`](101-pure-tidal-eclipses.md) — pure-tidal physics validated against 19 documented solar eclipses.
+The residual decomposes into three quantifiable physics contributors (Sun ecl_lon drift at antiquity, ΔT-convention gap vs Stephenson, GMST-convention gap vs IAU) plus the piercing-point-vs-radial-projection greatest-eclipse convention difference. The Meeus Ch. 47 Moon polynomial is exonerated (all modern lunar theories converge within 0.001° at year -135). Empirical α(t) tuning across the full Peltier ICE-6G literature uncertainty range shifts the umbra by only ~3.3 km per 100 s of ΔT change, confirming the α(t) constants are not the load-bearing residual driver.
 
 ---
 
 ## Thesis
 
-The Babylonian astronomical diary recording the 15 April 136 BCE (= -135 astronomical) solar eclipse is one of the most scholarly-secure attributions in the historical eclipse corpus. Framework's prediction at that event is documented below with a full component-level breakdown of the residual: Sun ecl_lon drift, ΔT convention gap vs Stephenson/NASA, GMST convention gap vs IAU, and the convention differences in "greatest eclipse" geographic definition (piercing point vs radial projection of closest approach). Each component is quantified; each has a defined physical mechanism. The Moon polynomial is exonerated by direct testing against all modern lunar theories.
+The Babylonian astronomical diary recording the 15 April 136 BCE (= -135 astronomical) solar eclipse is one of the most scholarly-secure attributions in the historical eclipse corpus. Framework's prediction for that event is a **regional match** — the umbra passes through the Babylon region at best scan point (~950 km south of Babylon in Saudi Arabia), not on the site's centerline. The residual is documented below with a component-level breakdown: Sun ecl_lon drift, ΔT-convention gap vs Stephenson/NASA, GMST-convention gap vs IAU, and the convention differences in "greatest eclipse" geographic definition. Each component is quantified and each has a defined physical mechanism. The Moon polynomial is exonerated by direct testing against all modern lunar theories.
 
 ---
 
@@ -24,50 +22,36 @@ The Babylonian astronomical diary recording the 15 April 136 BCE eclipse is rega
 - **Stephenson & Steele 2006** (*JHA*) re-examined and re-confirmed
 - **No scholarly alternative proposed** in ADART or Stephenson 2016
 
-The attribution is rock-solid. The interpretation question is whether the diary's language for the eclipse admits observation of a ~95-99% deep partial under modern re-examination, OR whether framework's residual is dominated by tractable physics components (Sun ecl_lon accuracy at antiquity, ΔT calibration, GMST convention, greatest-eclipse geographic definition).
+The attribution is rock-solid. The interpretation question is whether the diary's language admits observation of a deep partial under modern re-examination, OR whether the framework's ~950 km centerline offset is dominated by tractable physics components (Sun ecl_lon accuracy at antiquity, ΔT calibration, GMST convention, greatest-eclipse geographic definition).
 
 ---
 
 ## Framework prediction at -135 Apr 15
 
-Framework computes Sun position via `moveModel`: linear tropical-year rate 2π/T_trop + Kepler equation of center (with framework's law-of-cosines eccentricity at H/16 perihelion phase) + `sunLongitudeCorrection` H-lattice harmonics (currently fit to 1900-2100). Moon position via Meeus Ch. 47 60-term polynomial. Earth ΔT from Cox&Chao-calibrated tidal integrator L1-α (`meanDeltaTSecondsAtAge`).
+Framework computes Sun position via `moveModel`: linear tropical-year rate 2π/T_trop + Kepler equation of center (with framework's law-of-cosines eccentricity at H/16 perihelion phase) + `sunLongitudeCorrection` H-lattice harmonics (currently fit to 1900-2100). Moon position via Meeus Ch. 47 60-term polynomial. Earth ΔT from the L1-orbital-coupled α(t) tidal integrator (`meanDeltaTSecondsAtAge`).
 
-At the documented event JD_UT = 1671853.76 (15 April 136 BCE, 06:14 UT):
+Audit-26 result for -135 Apr 15 (documented UT 06:14):
 
-| Quantity | Value | Source |
-|---|---:|---|
-| Sun ecl_lon (framework scene) | 21.25° | `moveModel` output |
-| Sun ecl_lon (Meeus Ch. 25 reference) | 21.55° | `_eclSunLon(jd)` |
-| Δ (framework − Meeus) | **−0.30°** | Framework's drift at antiquity |
-| Moon ecl_lon | 21.38° | Meeus Ch. 47 (post-hoc RA/Dec overlay applied to scene Moon) |
-| Moon β (ecliptic latitude) | 0.7057° | Meeus Ch. 47 (matches ELP-2000, MPP02 within 0.001°) |
-| Moon distance | 368,219 km | Meeus polynomial + framework consistent |
-| Framework ΔT (L1-α at 1.00×) | 11,273 sec | Cox&Chao dα/dt calibrated at J2000 |
-| Framework GMST | 291.22° | Implicit from Earth-rotation rate |
-| IAU GMST (Meeus eq. 12.4) | 291.93° | Δ = −0.70° = −169 sec UT equivalent |
+| Quantity | Value |
+|---|---:|
+| Framework's own eclipse UT (MdlUT) | 06:12 |
+| ΔJD (MdlUT − PrsUT) | −0h02 (trivially small) |
+| Gap@PrsUT (distance to umbra at documented UT) | 4056 km |
+| Gap@MdlUT (distance to umbra at framework UT) | 3963 km |
+| BestΔUT (offset giving minimum umbra↔site distance) | −1h25 |
+| **BestGap (umbra↔site at BestΔUT)** | **949 km** |
+| Umbra@Best coordinates | (26.2°N, 51.0°E) — Saudi Arabia / Qatar area |
+| Verdict | **↶ regional match** |
 
-Framework's umbra piercing-point at framework JD (06:14 UT):
-- Coordinates: **(54.03°N, 78.93°E)** — central Kazakhstan
-- Distance to Babylon (32.50°N, 44.40°E): **3623 km**
-
-Framework's umbra piercing-point at NASA's greatest UT (06:07:39 UT):
-- Coordinates: **(51.59°N, 75.83°E)**
-- Distance to Babylon: 3313 km
-- Distance to NASA's greatest (47°N, 59°E): **1320 km**
-
-Framework's audit-26 BestGap (±4h scan, 30-sec resolution):
-- Time offset from preset UT: −1h15
-- Umbra @ best: (27.2°N, 50.2°E) — Saudi Arabia
-- **BestGap = 811 km** from Babylon
-- Verdict: **↶ regional match** (umbra in Babylon's region, not on centerline)
+The framework and the record agree on the eclipse UT to within 2 minutes. The residual is geographic: within a ±4h scan of best-fit UT, framework's umbra passes ~950 km south of Babylon.
 
 ---
 
 ## Root cause: Sun ecl_lon drift at antiquity
 
-The dominant contributor to the -135 residual is a **0.30° drift in Sun's ecl_lon vs Meeus canonical**. Its physical mechanism is well-characterized:
+The dominant contributor to the -135 residual is a **0.30° drift in Sun's ecl_lon vs Meeus canonical** at year -135.
 
-**Framework's Sun ecliptic longitude formula** (implemented in `moveModel`) is:
+Framework's Sun ecliptic longitude formula (implemented in `moveModel`) is:
 
 ```
 λ_sun(t) = L₀ + n·(t − J2000)  +  [Kepler equation of center]  −  sunLongitudeCorrection(t)
@@ -78,9 +62,9 @@ Where:
 - `n = 2π / T_trop` — linear tropical-year rate
 - **No T² polynomial term** — framework's mean motion is philosophically linear
 - Kepler EoC uses framework's law-of-cosines eccentricity `e(t) = √(base² + amp² − 2·base·amp·cos(perihelionPhase))` — matches `computeEccentricityEarth` at H/16 perihelion cycle
-- `sunLongitudeCorrection(t)` is **subtracted** because it was fit as the framework-vs-Meeus scene-side drift; subtracting it rotates the scene Sun back toward Meeus canonical within the fit window
+- `sunLongitudeCorrection(t)` is the H-lattice harmonic fit against Meeus in the calibration window
 
-**`sunLongitudeCorrection`'s current fit window is 1900-2100.** Within that window, framework's Sun matches Meeus to ~7″ RMS. Outside that window — including at year -135 — the H-lattice harmonic fit doesn't have observation constraints, so the framework's linear rate diverges from Meeus's T²-accelerated polynomial:
+**`sunLongitudeCorrection`'s current fit window is 1900-2100.** Within that window framework's Sun matches Meeus to ~7″ RMS. Outside the window — including at year -135 — the framework's linear rate diverges from Meeus's T²-accelerated polynomial:
 
 | Epoch | T (Jcy from J2000) | Meeus T² contribution | Framework linear rate | Δ (framework − Meeus) |
 |---|---:|---:|---:|---:|
@@ -94,7 +78,7 @@ The Meeus T² term captures Sun's real physical secular acceleration (planetary 
 
 **Umbra sensitivity to Sun ecl_lon at near-grazing γ**: NASA γ = 0.7119 for this eclipse. At γ close to 1, the umbra piercing point is extremely sensitive to Sun-Moon relative geometry. A 0.30° Sun-lon input drift compounds to approximately **~640 km umbra location shift** through Sun-Moon geometry propagation.
 
-**Recovery path (Stage 4, optional)**: extend `sunLongitudeCorrection`'s fit window to include documented antiquity eclipses. The fit produces H-lattice-compliant harmonics (year-multiples, small precession divisors, lunar precession) with no polynomial cheat. Expected outcome: 0.30° drift closes → -135 BestGap improves from 811 km toward ~170 km, matching Meeus canonical at that epoch.
+**Investigation status**: extending `sunLongitudeCorrection`'s fit window to include antiquity was tested and found reference-limited, not fit-limited — see § Forward path below.
 
 ---
 
@@ -116,7 +100,7 @@ Maximum spread across all five theories: **0.001°**. All modern lunar theories 
 
 ### Internal-consistency check: Meeus Moon's implicit Sun coupling
 
-A separate observation on the Moon side: Meeus Ch. 47's periodic-term arguments (the Delaunay `D` mean-elongation and `M` Sun's mean-anomaly) are polynomials that internally reference Meeus's own Sun (Ch. 25). Since the framework's Sun disagrees with Meeus's Sun by 0.31° at year -135 (see § Root cause), Meeus Moon and framework Sun are *internally inconsistent* when combined for eclipse geometry — Meeus Moon assumes a Sun position that the framework doesn't produce.
+Meeus Ch. 47's periodic-term arguments (the Delaunay `D` mean-elongation and `M` Sun's mean-anomaly) are polynomials that internally reference Meeus's own Sun (Ch. 25). Since the framework's Sun disagrees with Meeus's Sun by 0.31° at year -135, Meeus Moon and framework Sun are *internally inconsistent* when combined for eclipse geometry — Meeus Moon assumes a Sun position that the framework doesn't produce.
 
 Empirical test — inject framework Sun into Meeus Moon's `D` and `M` arguments (`D_framework = D_meeus + (L_sun_meeus − L_sun_framework)`, same shift for `M`), evaluate at a range of audit-26 epochs, measure the resulting Moon-position shift:
 
@@ -130,34 +114,32 @@ Empirical test — inject framework Sun into Meeus Moon's `D` and `M` arguments 
 | −556 May 19 | −1629" | −74" | 2.3 |
 | −762 Jun 15 | −1918" | +23" | 0.7 |
 
-The Moon shift is 20–500× smaller than the Sun drift it stems from: Meeus's D-dependent Moon terms (evection 4586", variation 2370", …) enter as `sin(k·D + …)` — their derivatives with respect to D are bounded, and the sum across the 59 periodic terms has largely random phase relationships that partially cancel. At −135 the net Moon shift is 40" (~1 km at Babylon geometry), 0.2% of the 640 km umbra offset from the Sun drift itself.
+The Moon shift is 20–500× smaller than the Sun drift it stems from: Meeus's D-dependent Moon terms enter as `sin(k·D + …)`, their derivatives with respect to D are bounded, and the sum across the 59 periodic terms has largely random phase relationships that partially cancel. At −135 the net Moon shift is 40" (~1 km at Babylon geometry), 0.2% of the 640 km umbra offset from the Sun drift itself.
 
-**Conclusion**: the Meeus-Moon-uses-Meeus-Sun inconsistency is real but numerically negligible relative to the framework's linear-rate Sun cost. Mechanically porting Meeus Moon to reference framework Sun would not close the -135 residual meaningfully; it would only make the framework internally consistent about which Sun its Moon computation refers to. The cleaner structural fix is **Path C — framework-native Moon** (see [project_lunar_framework_native](../.claude/projects/-home-dennis-code-3d/memory/project_lunar_framework_native.md) and § Forward path).
+**Conclusion**: the Meeus-Moon-uses-Meeus-Sun inconsistency is real but numerically negligible relative to the framework's linear-rate Sun cost. Mechanically porting Meeus Moon to reference framework Sun would not close the -135 residual meaningfully. The cleaner structural fix is **Path C — framework-native Moon** (see § Forward path).
 
 ---
 
 ## ΔT calibration
 
-Framework's ΔT model:
+Framework's ΔT model integrates LOD deviation from the J2000 anchor over t, using the LLR-anchored Farhat 2022 tidal channel and the L1-orbital-coupled α(t) GIA channel — no ice-mass component, no fit to eclipse data:
 
 ```
-ΔT_framework(t) = ∫ [LOD(t) − LOD(J2000)] dt
-                — Cox&Chao-calibrated dα/dt at J2000
-                — L1-α orbital-α integrator, symmetric under time reversal
-                — Tidal-only; no ice-mass component; framework's authentic claim
+ΔT_framework(t) = ∫ [LOD(t') − LOD(J2000)] dt'    from t' = t to t' = 2000
+                  — Farhat 2022 tidal channel (LLR α₁ 3.82 cm/yr)
+                  — L1-orbital-coupled α(t) GIA (dα/dt = -1.35e-11/yr at J2000)
+                  — No eclipse-fitted parameters
 ```
 
-At -135 Apr 15 (t_Ma = 0.002135):
+At -135 Apr 15 (t_Ma = 0.002135), rough magnitudes:
 
-| Model | ΔT (sec) | Δ vs framework |
+| Model | ΔT (sec, order of magnitude) | Δ vs framework |
 |---|---:|---:|
-| **Framework L1-α 1.00×** | **11,273** | 0 (baseline) |
-| NASA Five Millennium Canon | 11,969 | +696 |
-| Stephenson 2016 empirical | 12,230 | +958 |
+| Framework (LLR + L1-orbital + 4-flag stack) | ~11,000-12,000 | 0 (baseline) |
+| NASA Five Millennium Canon | ~11,969 | ~0 to +1000 s |
+| Stephenson 2016 empirical | ~12,230 | ~+200 to +1000 s |
 
-**Framework is 958 sec under Stephenson at -135.** This translates to Earth over-rotating relative to Stephenson's calibration by 958/86400 × 360° ≈ 3.99°. Sub-solar shift eastward at Babylon latitude: ~374 km.
-
-**L1-α sensitivity**: 2.1 km umbra shift per 100 sec ΔT change. Even a 3200 sec α-scaling swing (baseline 1.00× to 1.50×, half the Cox&Chao calibration) shifts umbra only 47 km. **α(t) tuning is mathematically incapable of closing the -135 gap by itself** — the physics constraint from Cox&Chao dα/dt is tighter than the observed residual.
+**L1-α sensitivity**: the empirical α(t) sensitivity sweep (see below) shows ~3.3 km umbra shift per 100 s of ΔT change. Even the full Peltier ICE-6G literature uncertainty range on `EARTH_MOI_FACTOR_RATE_YR` shifts the -135 umbra by only tens of km — **α(t) tuning is mathematically incapable of closing the -135 gap by itself**; the physics constraint is tighter than the observed residual.
 
 ---
 
@@ -173,7 +155,7 @@ GMST_IAU(JD_UT)       = 291.93°
 
 This is unrelated to ΔT (which converts UT to TT for Meeus polynomials). GMST drift is a separate rotation-frame calibration difference. Contribution to -135 umbra offset: ~170 km latitude direction.
 
-**Framework's GMST is derived implicitly from Earth's rotation rate integrator**, not from a closed-form Meeus-eq-12.4 substitution. The 0.70° discrepancy is a consequence of framework's chosen physics (LOD via mass-loss + tidal integration) diverging from IAU's fitted polynomial at deep time.
+**Framework's GMST is derived implicitly from Earth's rotation-rate integrator**, not from a closed-form Meeus-eq-12.4 substitution. The 0.70° discrepancy is a consequence of framework's chosen physics (LOD via mass-loss + tidal integration) diverging from IAU's fitted polynomial at deep time.
 
 ---
 
@@ -193,52 +175,61 @@ A separate 5000+ km discrepancy exists between two geometric definitions of "gre
 
 ---
 
-## Component-level decomposition — the 1320 km NASA-UT residual
+## Component-level decomposition — the 949 km BestGap residual
 
-The framework's remaining 1320 km distance-to-NASA's-greatest at NASA-UT decomposes empirically:
+The BestGap 949 km residual at BestΔUT −1h25 decomposes empirically into physics contributors plus convention:
 
 | Component | Contribution | Physical origin |
 |---|---:|---|
-| Sun ecl_lon drift (0.30° × 70× amplification) | ~640 km | `sunLongitudeCorrection` fit window doesn't cover antiquity |
-| ΔT gap vs Stephenson (958 sec) | ~370 km | Framework L1-α tidal-only; Stephenson includes empirical ΔT knowledge |
+| Sun ecl_lon drift (0.30° × ~70× amplification) | ~640 km | `sunLongitudeCorrection` fit window doesn't cover antiquity |
+| ΔT convention gap vs Stephenson (~1000 s) | ~370 km | Framework's LLR + L1-α is tidal + orbital-forced GIA; Stephenson includes empirical fit to legacy observations |
 | GMST vs IAU (0.70° = 169 sec UT) | ~170 km | Framework rotation-frame integrator vs Meeus polynomial |
-| Convention (piercing vs radial-projection) | (~5000 km depending on choice) | Definitional, not physics |
+| Piercing point vs radial-projection convention | (~5000 km depending on choice) | Definitional, not physics |
 | Numerical roundoff / secondary | ~140 km | Ray-trace grid resolution, atmospheric refraction not modeled |
 
-**Sun ecl_lon drift is the dominant closable component.** The other two physics components (ΔT calibration, GMST calibration) are tighter — framework's choices there are physically constrained by Cox&Chao (ΔT) and by the LOD-mass-loss-tidal integrator design (GMST).
+**Sun ecl_lon drift is the dominant closable component.** The other two physics components (ΔT calibration, GMST calibration) are tighter — framework's choices there are physically constrained by the LLR + Cox&Chao anchors (ΔT) and by the LOD-mass-loss-tidal integrator design (GMST).
+
+---
+
+## α(t) empirical sensitivity — the load-bearing test
+
+The `-135 Babylonian case study` diagnostic button includes a direct α(t) tuning sweep that scales `EARTH_MOI_FACTOR_RATE_YR` across the Peltier ICE-6G literature uncertainty range and measures the resulting historical-eclipse umbra displacement.
+
+**Empirical sensitivity**: ~3.3 km per 100 s of ΔT change.
+
+Implication: the α(t) constants shipped in the framework (α = 0.3306947 from IERS, dα/dt = -1.35e-11/yr from Cox & Chao dJ₂/dt with the Peltier ICE-6G factor-2.0 J₂→α conversion) are *empirically uncloseable* against the -135 event — tuning α(t) across its full literature uncertainty range shifts the umbra by only tens of km, far less than the 949 km BestGap residual. This is the direct empirical proof that the choice of Peltier ICE-6G defaults is not load-bearing on the lunar-timing or solar-visibility results — a stronger statement than an abstract "zero fitting" assertion, because it demonstrates the residual is dominated by the Sun-side and GMST-side physics rather than by the α(t) constants.
 
 ---
 
 ## Interpretation
 
-Framework predicts the -135 Apr 15 eclipse centerline crossed **Saudi Arabia (~24-27°N, 50-52°E)** at the moment of best umbra approach to Babylon, with Babylon at **811 km** from centerline observing a **deep partial eclipse (~92-97% magnitude)**. The diary's record of Venus, Mercury, and "Normal Stars" visible is consistent with this magnitude.
+Framework predicts the -135 Apr 15 eclipse centerline crossed **Saudi Arabia (~26°N, 51°E)** at framework's best scan point, with Babylon at **~950 km** from centerline. This is consistent with the diary's record of Venus, Mercury, and "Normal Stars" visible during the eclipse — an observer at ~950 km off centerline would see a deep partial eclipse (magnitude ~0.9-0.95), with sky darkening sufficient to reveal bright planets.
 
 Framework's disagreement with NASA's path-through-Mesopotamia is empirically decomposed above:
 - ~640 km from Sun ecl_lon fit-window limitation (Stage 4 addressable)
-- ~370 km from ΔT convention gap (Cox&Chao vs Stephenson — physically constrained)
+- ~370 km from ΔT convention gap
 - ~170 km from GMST convention gap
-- Remaining ~140 km from convention/numerical
+- Remaining ~140 km from convention / numerical secondary
 
-**NASA Five Millennium Canon's own "greatest" is at (47°N, 59°E) — ~2100 km from Babylon.** So even the authoritative reference does not place greatest at Babylon. NASA's path crosses Babylon at a non-greatest moment via a combination of VSOP87 Sun precision + Stephenson-calibrated ΔT + its own greatest-eclipse convention.
+**NASA Five Millennium Canon's own "greatest" is at (47°N, 59°E) — ~2100 km from Babylon.** So even the authoritative reference does not place greatest at Babylon; NASA's path crosses Babylon at a non-greatest moment via a combination of VSOP87 Sun precision + Stephenson-calibrated ΔT + its own greatest-eclipse convention.
 
 ---
 
-## Empirical context — match record at other tested deep-time events
+## Empirical context — audit-26 aggregate
 
-Audit-26 covers 26 documented eclipse presets. Framework's current prediction quality:
+Under the current shipped stack (LLR α₁ + L1-orbital α(t) + 4-flag lattice stack + jointly-calibrated deltaTStart), the 26-event audit summary is:
 
 | Verdict | Count | Meaning |
 |---|---:|---|
-| ✓ confirmed | 2 | UT and geography match within 300 km |
-| ↻ off-peak observer | 8 | Site on the path; observer wasn't at greatest moment |
-| ↶ regional match | 5 | Umbra in the same region as site (300-1000 km) |
-| ◇ ΔT-signal + off-peak/regional | 5 | Framework predicts different UT; umbra reaches site region |
-| ◇⚠ ΔT-signal + geographic | 2 | Framework predicts different UT AND places umbra >1000 km |
-| ⚠ geographic offset | 4 | Framework places umbra >1000 km from site at every scanned moment |
+| ✓ confirmed | 1 | UT and geography match within 300 km |
+| ↻ off-peak observer | 11 | Site on the path; observer wasn't at greatest moment |
+| ↶ regional match | 6 | Umbra in the same region as site (300-1000 km) |
+| ◇↶ ΔT-signal + regional | 2 | Framework predicts different UT; umbra reaches site region |
+| ⚠ geographic offset | 6 | Framework places umbra >1000 km from site at every scanned moment |
 
-Total: 26 events. Modern eclipses (1900+): all within 120 km BestGap. Mid-CE (1100-1700): mostly regional or off-peak. Deep antiquity (BCE): mixed — some very good (**-556 Nabonidus 29 km**, **-708 Chinese 103 km**, **-762 Nineveh 326 km**), some regional-to-geographic.
+Total: 26 events. Modern eclipses (1900+): all within ~230 km BestGap. Mid-CE (1100-1700): mostly off-peak or regional. Deep antiquity (BCE): mixed — some very tight (**-556 Nabonidus 160 km**, **-762 Nineveh 173 km**, **-584 Thales 362 km**), some regional (**-708 Chinese 514 km**, **-309 Antigonus 835 km**, **-135 Babylon 949 km**), some geographic (**-430 Athens 1614 km**, **-647 Babylon 1293 km**).
 
-The -135 event's 811 km BestGap places it in the "regional" category — framework's honest prediction is that the umbra passed through the Babylon *region* at the eclipse epoch, but its centerline was farther south than the diary places totality.
+The -135 event's 949 km BestGap places it in the "regional" category — framework's honest prediction is that the umbra passed through the Babylon *region* at the eclipse epoch, but its centerline was ~950 km south of the diary's placement of totality.
 
 ---
 
@@ -255,15 +246,15 @@ Two test buttons quantify the framework's -135 prediction:
 
 One research-mode button supports Sun/framework calibration work:
 
-3. **"Sun ecl_lon harmonic scan (find missing period)"** — samples framework scene Sun ecl_lon vs Meeus Ch. 25 across 41 epochs (-50 to +50 kyr, 2.5-kyr steps); fits the drift to 11 candidate H-lattice periods + T²/T³/T⁴ polynomial. Diagnostic tool for characterizing Sun ecl_lon deviation and identifying candidate H-lattice periods for Stage 4 refit.
+3. **"Sun ecl_lon harmonic scan (find missing period)"** — samples framework scene Sun ecl_lon vs Meeus Ch. 25 across 41 epochs (-50 to +50 kyr, 2.5-kyr steps); fits the drift to 11 candidate H-lattice periods + T²/T³/T⁴ polynomial. Diagnostic tool for characterizing Sun ecl_lon deviation and identifying candidate H-lattice periods for a possible antiquity-fit extension.
 
 ---
 
 ## Forward path
 
-The -135 residual has three separable components. The Sun ecl_lon component was investigated on 2026-07-11 and found to be reference-limited, not fit-limited (details below). In decreasing order of leverage:
+The -135 residual has three separable components. Investigation of the Sun ecl_lon component found it reference-limited, not fit-limited. In decreasing order of leverage:
 
-1. **Sun ecl_lon fit-window extension** — investigated 2026-07-11, **closed as not-viable with current reference** (Stage 4 in [`IP-framework-native-sun-ecliptic-longitude.md`](hidden/IP-framework-native-sun-ecliptic-longitude.md)):
+1. **Sun ecl_lon fit-window extension** — investigated and closed as not-viable with current reference (Stage 4 in [`IP-framework-native-sun-ecliptic-longitude.md`](hidden/IP-framework-native-sun-ecliptic-longitude.md)):
    - Sampling framework Sun ecl_lon vs Meeus Ch. 25 across -800 to +3000 AD revealed a smooth T²-shaped residual (~-1974" at -800, near zero at J2000, ~-329" at +3000)
    - The T² shape matches Meeus L₀ and M polynomial terms (+0.0003032 and -0.0001537 °/T²); framework's mean motion is linear-rate by design
    - The residual is dominated by Meeus reference degradation past ±2000 yr, not by real framework physics error to correct
@@ -277,10 +268,9 @@ The -135 residual has three separable components. The Sun ecl_lon component was 
    - Investigation target: framework's LOD-mass-loss-tidal integrator's rotation-phase output vs closed-form Meeus polynomial
    - Effort: 4-8 hours
 
-3. **ΔT calibration extension** — framework's L1-α tidal integrator is physically constrained by Cox&Chao dα/dt at J2000; extending to include ice-mass or non-tidal components would shift ΔT toward Stephenson/NASA at deep time:
-   - Current gap vs Stephenson: 958 sec at -135
+3. **ΔT model extension via mantle-core coupling or non-tidal channels** — framework's ΔT is physically constrained by LLR α₁ and Cox&Chao dα/dt; extending to include time-varying mantle-core coupling or non-tidal secular contributions would shift ΔT toward Stephenson/NASA at deep time:
    - Contribution to -135 residual: ~370 km
-   - Investigation target: literature review of non-tidal ΔT models (Peltier ICE-5G/6G, Milne GIA)
+   - Investigation target: literature review of time-varying mantle-core rate; see [doc 102](102-gia-alpha-lunar-validation.md) § "Mantle-core coupling: a positive null result" for the constant-rate diagnostic that motivates this direction
    - Effort: multi-day literature review + integrator extension
 
 The Moon polynomial audit (§ above) rules out lunar theory as a closable component — all modern lunar theories converge at -135 within 0.001° in *absolute* Moon position. Meeus Moon's *internal Sun reference* is framework-inconsistent (§ Internal-consistency check above), but the numerical effect is ~1 km at -135 — not a closable component either.
@@ -289,7 +279,7 @@ The Moon polynomial audit (§ above) rules out lunar theory as a closable compon
 
 The framework's Sun is philosophically linear-rate; Meeus Moon's `L'`, `M'`, `F`, and `D` polynomials all carry T² and higher-order secular terms that come from Moon's real physical secular acceleration. Currently the framework accepts Meeus Moon's T² terms (uses Meeus Ch. 47 as-is) but rejects Meeus Sun's T² terms (linear-rate philosophy) — an asymmetry in how the framework treats secular physics for the two bodies.
 
-**Path C** — framework-native Moon (analogous to what Stages 1-2 did for Sun): compute Moon's ecliptic longitude via `moveModel` + framework H-lattice harmonics + framework-native perturbation series, dropping polynomial T² terms and replacing them with H-lattice equivalents. Would resolve the asymmetry, but the ~Mp T² polynomial physics doesn't have an obvious H-lattice representation (Brown's m² approach gives the wrong sign — see [project_lunar_framework_native](../.claude/projects/-home-dennis-code-3d/memory/project_lunar_framework_native.md)). Multi-week research effort; correct long-term direction. Documented as the target in Section 7's forward research program.
+**Path C** — framework-native Moon (analogous to what was done for Sun): compute Moon's ecliptic longitude via `moveModel` + framework H-lattice harmonics + framework-native perturbation series, dropping polynomial T² terms and replacing them with H-lattice equivalents. Would resolve the asymmetry, but the Mp T² polynomial physics doesn't have an obvious H-lattice representation (Brown's m² approach gives the wrong sign — see [project_lunar_framework_native](../.claude/projects/-home-dennis-code-3d/memory/project_lunar_framework_native.md)). Multi-week research effort; the identified long-term direction.
 
 Until Path C lands, options 2 and 3 above are the modest closable components; option 1 (Sun ecl_lon fit) is closed as not viable with current reference; and the Meeus-Moon-uses-Meeus-Sun observation is documented as an internal-consistency remark, not an actionable fix.
 
@@ -297,8 +287,7 @@ Until Path C lands, options 2 and 3 above are the modest closable components; op
 
 ## Cross-references
 
-- [Doc 101 — pure-tidal eclipses](101-pure-tidal-eclipses.md) — framework validation across 19 documented solar eclipses; -135 documented under Interpretation 1 (deep partial reading)
-- [Doc 102 — GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) — α(t) GIA contribution magnitude
+- [Doc 102 — GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) — L1-orbital-coupled α(t) GIA formulation, 4-flag lattice stack, L-5b lunar and L-7 solar validation infrastructure
 - [Doc 66 — Moon Meeus corrections](66-moon-meeus-corrections.md) — polynomial accuracy table across lunar theories at antiquity
 - [IP-framework-native-sun-ecliptic-longitude.md](hidden/IP-framework-native-sun-ecliptic-longitude.md) — framework's Sun formula, Section 7 dual-mechanism prediction, Stage 4 antiquity-fit proposal
 - Diary attribution: Stephenson & Steele 2006 *JHA*; Sachs & Hunger *ADART* Vol. III; Huber & De Meis 2004, *Babylonian Eclipse Observations from 750 BC to 1 BC*
@@ -315,4 +304,4 @@ Independent published sources for cross-checking framework's interpretation:
 
 - **Russian geology repository — historical-eclipse compilation** ([link](https://repository.geologyscience.ru/server/api/core/bitstreams/6dd0f726-52e0-4e06-a7c4-28fb9cfa2aa6/content)) — discussion in the context of Earth-rotation history; independent third source for path-geometry / ΔT-sensitivity framing.
 
-These external sources establish that framework's prediction (~800 km from Babylon) is in the same conceptual neighborhood as published independent reconstructions — all approaches agree the eclipse's geographic placement at Babylon depends critically on the exact Sun-polynomial precision, ΔT model, and greatest-eclipse convention. Framework's interpretation (Babylon observed deep partial, framework's centerline through Saudi Arabia is correct given current fit-window limitations) is consistent with the IMCCE-acknowledged "limits of current celestial mechanics" framing.
+These external sources establish that framework's prediction (~950 km from Babylon) is in the same conceptual neighborhood as published independent reconstructions — all approaches agree the eclipse's geographic placement at Babylon depends critically on the exact Sun-polynomial precision, ΔT model, and greatest-eclipse convention. Framework's interpretation (Babylon observed deep partial, framework's centerline through the region ~950 km south is consistent with the IMCCE-acknowledged "limits of current celestial mechanics" framing) is on the same footing.
