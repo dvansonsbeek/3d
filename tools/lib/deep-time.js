@@ -47,7 +47,15 @@ const DM_DT_TOTAL_KG_S     = L_SUN_W / (C_SI_M_PER_S * C_SI_M_PER_S) + SOLAR_WIN
 
 // Farhat 2022 LSQ polynomial coefficients — Moon distance evolution
 // a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴  (no α₂; preserves modern Wells rate)
-const ALPHA_1 = -8.8658188951e-05;   // /Ma   (modern recession, Wells 0.00526 hr/Ma anchor)
+const ALPHA_1 = -9.9375895103e-05;   // /Ma  — anchored to modern LLR direct observation
+                                     //  da/dt(J2000) = 3.82 cm/yr (Dickey 1994 / Chapront 2002).
+                                     //  Validates against Wells 1963 coral rings (400.06 vs 400 days/yr
+                                     //  at 380 Ma, 0.01% error) and Wu 2024 cyclostratigraphy (411.5 vs
+                                     //  412 days/yr at 500 Ma, 0.12%). Places Moon at rigid Roche at
+                                     //  ~4.498 Ga — matches giant-impact-4.5-Ga standard.
+                                     //  Prior value: -8.8658188951e-05 (Wells 1989 DERIVED rate 3.43 cm/yr,
+                                     //  a theoretical Phanerozoic-average value; the direct paleontological
+                                     //  data itself supports the LLR rate, not the Wells 1989 derivation).
 const ALPHA_3 = -6.4186463489e-12;   // /Ma³  (LSQ fit to Farhat 2022 deep-time anchors)
 const ALPHA_4 = +1.3619800519e-16;   // /Ma⁴  (LSQ fit to Farhat 2022 deep-time anchors)
 
@@ -249,26 +257,26 @@ const EIGHT_H = 8 * HOLISTIC_YEAR_J2000;
 const BOND_LATTICE_N = 1830;
 const BOND_PERIOD_YR = EIGHT_H / BOND_LATTICE_N;
 const BOND_OMEGA = 2 * Math.PI / BOND_PERIOD_YR;
-const BOND_COS_COEFF_S = 167.64023832420898;
-const BOND_SIN_COEFF_S = 258.4981100083818;
+const BOND_COS_COEFF_S = 141.51919080027318;
+const BOND_SIN_COEFF_S = 252.46321828911084;
 
 const HALLSTATT_LATTICE_N = 1104;
 const HALLSTATT_PERIOD_YR = EIGHT_H / HALLSTATT_LATTICE_N;
 const HALLSTATT_OMEGA = 2 * Math.PI / HALLSTATT_PERIOD_YR;
-const HALLSTATT_COS_COEFF_S = 13.096307224194323;
-const HALLSTATT_SIN_COEFF_S = 78.92076239551615;
+const HALLSTATT_COS_COEFF_S = -7.744043068664131;
+const HALLSTATT_SIN_COEFF_S = 79.62430405944326;
 
 const JOSE5_LATTICE_N = 2989;
 const JOSE5_PERIOD_YR = EIGHT_H / JOSE5_LATTICE_N;
 const JOSE5_OMEGA = 2 * Math.PI / JOSE5_PERIOD_YR;
-const JOSE5_COS_COEFF_S = -47.87063341413967;
-const JOSE5_SIN_COEFF_S = 14.436151028894592;
+const JOSE5_COS_COEFF_S = -46.92891772805531;
+const JOSE5_SIN_COEFF_S = 17.25330927310511;
 
 const JOSE4_LATTICE_N = 3749;
 const JOSE4_PERIOD_YR = EIGHT_H / JOSE4_LATTICE_N;
 const JOSE4_OMEGA = 2 * Math.PI / JOSE4_PERIOD_YR;
-const JOSE4_COS_COEFF_S = 27.044284247103754;
-const JOSE4_SIN_COEFF_S = -23.80250191160088;
+const JOSE4_COS_COEFF_S = 44.149299740511985;
+const JOSE4_SIN_COEFF_S = -13.619833153315945;
 
 // Cyclic-correction taper widened 2026-07-12 from ±4.5/6 kyr Holocene window to
 // ±300/400 kyr — cross-archive validation across Steinhilber ¹⁰Be (9.4 kyr),

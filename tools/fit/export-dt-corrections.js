@@ -112,11 +112,9 @@ function applyToSource(src, fit) {
 }
 
 // ─── Backup helper (standalone CLI only) ───
-function backup(p) {
-  if (!fs.existsSync(p)) return;
-  fs.copyFileSync(p, `${p}.bak`);
-  console.log(`    (backup) → ${p}.bak`);
-}
+// Backup helper — retained as no-op. Git tracks the changes; .bak files just
+// clutter the working tree. Historical calls left in place; behaviour disabled.
+function backup(p) { /* no-op — git is the backup */ }
 
 // ─── Sync one file end-to-end (read → transform → write) ───
 function syncTargetToDisk(targetKey, fit, { dryRun }) {
@@ -183,8 +181,6 @@ function syncAstroReference(fit, { dryRun = false } = {}) {
     console.log('    (deltaTStart line pattern not found — skipping)');
     return 0;
   }
-  fs.copyFileSync(ASTRO_REFERENCE_PATH, `${ASTRO_REFERENCE_PATH}.bak`);
-  console.log(`    (backup) → ${ASTRO_REFERENCE_PATH}.bak`);
   const patched = raw.replace(re, `$1${newVal}`);
   fs.writeFileSync(ASTRO_REFERENCE_PATH, patched);
   console.log('    ✓ deltaTStart updated (propagates to script.js at pipeline Step 9)');
@@ -223,7 +219,7 @@ function main() {
   console.log(`  Jose5     n=${c.jose5.lattice_n}`);
   if (c.jose4) console.log(`  Jose4    n=${c.jose4.lattice_n}`);
   console.log('');
-  console.log(WRITE ? '  Applying updates:' : '  Dry run (add --write to modify files, each backed up as .bak):');
+  console.log(WRITE ? '  Applying updates:' : '  Dry run (add --write to modify files):');
   const total = syncAllTargets(fit, { dryRun: !WRITE });
   console.log(`\n  ${WRITE ? '✓' : '·'} ${total} total constants ${WRITE ? 'updated' : 'would be updated'}.`);
   if (WRITE) console.log('  Next: verify with `git diff` and run L-5b to confirm no regression.');

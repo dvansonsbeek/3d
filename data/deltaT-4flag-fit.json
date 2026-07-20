@@ -60,102 +60,102 @@
   },
   "fit_metrics": {
     "stage_a_bond_solo": {
-      "r2": 0.997083268357462,
-      "rms_post": 56.7853517453034,
-      "rms_post_modern": 91.40160075495056
+      "r2": 0.9931591633674604,
+      "rms_post": 63.22224121083548,
+      "rms_post_modern": 64.89101384191598
     },
     "stage_b_bond_hallstatt_joint": {
-      "r2": 0.9977596768906966,
-      "rms_post": 49.76722359259767,
-      "rms_post_modern": 55.27817163442722,
-      "bond_phase_shift_deg": -14.860565341983808,
-      "hallstatt_free_amp_s": 271.9382930229329
+      "r2": 0.9959781166862217,
+      "rms_post": 48.476361005719234,
+      "rms_post_modern": 53.626075882726035,
+      "bond_phase_shift_deg": -13.299754433903217,
+      "hallstatt_free_amp_s": 278.83757793415293
     },
     "stage_c_bond_hallstatt_jose5": {
-      "r2": 0.9996587921467016,
-      "rms_post": 19.422162923594552,
-      "rms_post_modern": 36.74769389332677,
-      "bond_phase_shift_deg": -23.941749734053523,
-      "jose5_free_amp_s": 75.94323885434713
+      "r2": 0.9993288843646521,
+      "rms_post": 19.802223427430008,
+      "rms_post_modern": 37.94137174972718,
+      "bond_phase_shift_deg": -21.99449164894024,
+      "jose5_free_amp_s": 73.5313589078699
     },
     "stage_d_bond_hallstatt_jose5_jose4": {
-      "r2": 0.9998215544675862,
-      "rms_post": 14.045620286156678,
-      "rms_post_modern": 22.714712452366534,
-      "bond_phase_shift_deg": -9.227806665360845,
-      "jose4_free_amp_s": 36.02710656838692
+      "r2": 0.9992673288313778,
+      "rms_post": 20.690444879267343,
+      "rms_post_modern": 36.693117026521605,
+      "bond_phase_shift_deg": -5.789483315359014,
+      "jose4_free_amp_s": 46.20238654768534
     }
   },
   "collinearity_warnings": [],
   "optimum": {
-    "usno_target_lod_s": 86400.0018,
-    "deltaTStart": 57.526262670934045,
-    "espenak_rms_s": 11.528972398422495,
+    "usno_target_lod_s": 86400.0024,
+    "deltaTStart": 63.925513607584755,
+    "espenak_rms_s": 19.21023319222273,
     "selected_by": "auto (--sweep default; disable with --fixed-anchors)"
   },
   "usno_anchor": {
     "enabled": true,
-    "usno_target_lod_s": 86400.0018,
-    "derived_target_offset_s": -0.001736569941175829,
+    "usno_target_lod_s": 86400.0024,
+    "derived_target_offset_s": -0.0011365699417811887,
     "derivation": {
       "lod_kinematic_at_j2000_s": 86400.00000923077,
       "fitted_sidereal_days_at_2000": 365.25636296497686,
       "h5_correction_s": 0.003527339164765279
     },
-    "shipped_sum_lod_at_j2000_s": -0.0017365699411758286,
-    "drift_from_target_s": 4.336808689942018e-19,
+    "shipped_sum_lod_at_j2000_s": -0.0011365699417811893,
+    "drift_from_target_s": -6.505213034913027e-19,
     "fit_stage": "D",
     "soft_constraint_weight": 1000000,
-    "fit_residual_s": -0.000004847424225402734,
+    "fit_residual_s": -0.00003795968947269547,
     "post_cap_bond_adjustment": {
-      "pre_adj_sum_lod_s": -0.0024160582084515876,
-      "delta_lod_s": 0.0006794882672757586,
-      "cos_shift_s": -43.58002059250226,
-      "sin_shift_s": -38.120541077528365,
-      "amp_shift_s": -56.03995577454168,
-      "phase_shift_deg": 2.490360425967104
+      "pre_adj_sum_lod_s": -0.0018806763155138123,
+      "delta_lod_s": 0.0007441063737326236,
+      "cos_shift_s": -47.72440180651347,
+      "sin_shift_s": -41.74573565434855,
+      "amp_shift_s": -60.39470484841604,
+      "phase_shift_deg": 3.477308723454861
     }
   },
   "shipped_coefficients": {
     "bond": {
       "lattice_n": 1830,
       "period_yr": 1465.8666666666666,
-      "cos_coeff_s": 167.64023832420898,
-      "sin_coeff_s": 258.4981100083818,
-      "raw_at_j2000_s": 84.19392245859514,
-      "amplitude_s": 308.0982349564876,
-      "phase_deg": 57.03593370028875,
+      "cos_coeff_s": 141.51919080027318,
+      "sin_coeff_s": 252.46321828911084,
+      "raw_at_j2000_s": 96.84935467020188,
+      "amplitude_s": 289.42245585589825,
+      "phase_deg": 60.72702848180098,
       "source": "Stage D anchored fit (USNO LOD constraint active)"
     },
     "hallstatt": {
       "lattice_n": 1104,
       "period_yr": 2429.8333333333335,
-      "cos_coeff_s": 13.096307224194323,
-      "sin_coeff_s": 78.92076239551615,
-      "raw_at_j2000_s": -64.93524474528314,
+      "cos_coeff_s": -7.744043068664131,
+      "sin_coeff_s": 79.62430405944326,
+      "raw_at_j2000_s": -74.80504769334249,
       "amplitude_s": 80,
-      "phase_deg": 80.57805380498658,
-      "target_amp_source": "CAPPED from anchored quad-fit free amp 160.49 s → 80 s prior"
+      "phase_deg": 95.55496076223478,
+      "target_amp_source": "CAPPED from anchored quad-fit free amp 101.76 s → 80 s prior"
     },
     "jose5": {
       "lattice_n": 2989,
       "period_yr": 897.469387755102,
-      "cos_coeff_s": -47.87063341413967,
-      "sin_coeff_s": 14.436151028894592,
-      "raw_at_j2000_s": 7.853868169404401,
+      "cos_coeff_s": -46.92891772805531,
+      "sin_coeff_s": 17.25330927310511,
+      "raw_at_j2000_s": 10.7722296538269,
       "amplitude_s": 50,
-      "phase_deg": 163.21847943308302,
-      "target_amp_source": "CAPPED from anchored quad-fit free amp 68.06 s → 50 s prior"
+      "phase_deg": 159.81416397535054,
+      "target_amp_source": "CAPPED from anchored quad-fit free amp 84.81 s → 50 s prior"
     },
     "jose4": {
       "lattice_n": 3749,
       "period_yr": 715.5337423312883,
-      "cos_coeff_s": 27.044284247103754,
-      "sin_coeff_s": -23.80250191160088,
-      "raw_at_j2000_s": 30.416619398795664,
-      "amplitude_s": 36.02710656838692,
-      "phase_deg": -41.3519938003071,
-      "target_amp_source": "unconstrained: quad-fit free amp 36.03 s (below 50 s prior — no cap applied)"
+      "cos_coeff_s": 44.149299740511985,
+      "sin_coeff_s": -13.619833153315945,
+      "raw_at_j2000_s": 25.424489798417106,
+      "amplitude_s": 46.20238654768534,
+      "phase_deg": -17.14472676818975,
+      "target_amp_source": "unconstrained: quad-fit free amp 46.20 s (below 50 s prior — no cap applied)"
     }
   }
 }

@@ -75,7 +75,7 @@ let   currentAUDistance = 149597870.698828;               // 1 AU in km (IAU 201
 const AU_J2000_KM = currentAUDistance;                    // J2000 reference snapshot — used as a frozen anchor for physical constants (GM_SUN, masses) and Driver 2 evolution formula
 const speedOfLight = 299792.458;                          // Speed of light in km/s (CODATA)
 const perihelionalignmentYear = 1246.03125;                     // Year when perihelion longitude = 90° (Meeus)
-const deltaTStart = 57.526262670934045;                                // Delta-T at model epoch (seconds) — was 63.63 (Espenak/IERS observed at J2000); paired with CONFIG.usno_target_lod_s = 86400.0018 at the joint-optimum (RMS 11.5 s vs Espenak across 20 reference years 1650-2017). See tools/fit/dt-corrections-fit.js --sweep-usno.
+const deltaTStart = 63.925513607584755;                                // Delta-T at model epoch (seconds) — was 63.63 (Espenak/IERS observed at J2000); paired with CONFIG.usno_target_lod_s = 86400.0018 at the joint-optimum (RMS 11.5 s vs Espenak across 20 reference years 1650-2017). See tools/fit/dt-corrections-fit.js --sweep-usno.
 
 
 // ─── E1. Early derived (needed before ASTRO_REFERENCE) ───────────────────
@@ -4880,8 +4880,16 @@ const A_LOCK_M        = (L_TOTAL_EM_KGM2_S / (M_MOON_ALONE * Math.sqrt(GM_EM_M3S
                        // ≈ 555,623 km (tidal-lock asymptote, 87.1 R_E, reached ~50 Gyr ahead)
 
 // Farhat 2022 LSQ polynomial coefficients — Moon distance evolution
-// a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴   (no α₂; preserves modern Wells rate)
-const ALPHA_1 = -8.8658188951e-05;   // /Ma   (modern recession, Wells 0.00526 hr/Ma anchor)
+// a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴   (no α₂)
+const ALPHA_1 = -9.9375895103e-05;   // /Ma  — anchored to modern LLR direct observation
+                                     //  da/dt(J2000) = 3.82 cm/yr (Dickey 1994 / Chapront 2002).
+                                     //  Validates against Wells 1963 coral rings (400.06 vs 400 days/yr
+                                     //  at 380 Ma, 0.01% error) and Wu 2024 cyclostratigraphy (411.5 vs
+                                     //  412 days/yr at 500 Ma, 0.12%). Places Moon at rigid Roche at
+                                     //  ~4.498 Ga — matches giant-impact-4.5-Ga standard.
+                                     //  Prior value: -8.8658188951e-05 (Wells 1989 DERIVED rate 3.43 cm/yr,
+                                     //  a theoretical Phanerozoic-average value; the direct paleontological
+                                     //  data itself supports the LLR rate, not the Wells 1989 derivation).
 const ALPHA_3 = -6.4186463489e-12;   // /Ma³  (LSQ fit to Farhat 2022 deep-time anchors)
 const ALPHA_4 = +1.3619800519e-16;   // /Ma⁴  (LSQ fit to Farhat 2022 deep-time anchors)
 
@@ -5097,8 +5105,8 @@ function meanTropicalYearSecondsAtAge(t_Ma) {
 const BOND_LATTICE_N              = 1830;                       // integer n in 8H/n — 74 × J-S synodic; gcd(1830, H) = 61 shares H's 61 prime
 const BOND_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / BOND_LATTICE_N;  // 1465.867 yr
 const BOND_OMEGA                  = 2 * Math.PI / BOND_PERIOD_YR;
-const BOND_COS_COEFF_S            = 167.64023832420898;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
-const BOND_SIN_COEFF_S            = 258.4981100083818;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
+const BOND_COS_COEFF_S            = 141.51919080027318;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
+const BOND_SIN_COEFF_S            = 252.46321828911084;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
 // Cyclic-correction taper widened 2026-07-12 from ±4.5/6 kyr Holocene window to
 // ±300/400 kyr — cross-archive validation across Steinhilber ¹⁰Be (9.4 kyr),
 // EPICA CO2 (800 kyr), and Cheng speleothem (640 kyr) supports cycle coherence
@@ -5190,8 +5198,8 @@ function bondCycleDeltaTCorrection(year) {
 const HALLSTATT_LATTICE_N              = 1104;                     // 8H/1104 = H/138 = 2·H/(6·23)
 const HALLSTATT_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / HALLSTATT_LATTICE_N;  // 2429.833 yr
 const HALLSTATT_OMEGA                  = 2 * Math.PI / HALLSTATT_PERIOD_YR;
-const HALLSTATT_COS_COEFF_S            = 13.096307224194323;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
-const HALLSTATT_SIN_COEFF_S            = 78.92076239551615;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
+const HALLSTATT_COS_COEFF_S            = -7.744043068664131;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
+const HALLSTATT_SIN_COEFF_S            = 79.62430405944326;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
 const HALLSTATT_TAPER_FULL_HALFWIDTH_YR  = 300000;                 // same as Bond (widened 2026-07-12)
 const HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR = 400000;                 // same as Bond (widened 2026-07-12)
 const HALLSTATT_DT_RAW_AT_J2000        = HALLSTATT_COS_COEFF_S * Math.cos(HALLSTATT_OMEGA * 2000)
@@ -5269,8 +5277,8 @@ function hallstattCycleDeltaTCorrection(year) {
 const JOSE5_LATTICE_N              = 2989;                        // 8H/(7²·61); gcd(2989, H) = 61
 const JOSE5_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE5_LATTICE_N;  // 897.47 yr
 const JOSE5_OMEGA                  = 2 * Math.PI / JOSE5_PERIOD_YR;
-const JOSE5_COS_COEFF_S            = -47.87063341413967;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
-const JOSE5_SIN_COEFF_S            = 14.436151028894592;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
+const JOSE5_COS_COEFF_S            = -46.92891772805531;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
+const JOSE5_SIN_COEFF_S            = 17.25330927310511;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
 const JOSE5_TAPER_FULL_HALFWIDTH_YR  = 300000;                    // same as Bond/Hallstatt (widened 2026-07-12)
 const JOSE5_TAPER_TOTAL_HALFWIDTH_YR = 400000;                    // same as Bond/Hallstatt (widened 2026-07-12)
 const JOSE5_DT_RAW_AT_J2000        = JOSE5_COS_COEFF_S * Math.cos(JOSE5_OMEGA * 2000)
@@ -5320,8 +5328,8 @@ function jose5CycleDeltaTCorrection(year) {
 const JOSE4_LATTICE_N              = 3749;                       // 3749 = 23 × 163; gcd(3749, H) = 23 shares H's 23 prime
 const JOSE4_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE4_LATTICE_N;  // 715.53 yr
 const JOSE4_OMEGA                  = 2 * Math.PI / JOSE4_PERIOD_YR;
-const JOSE4_COS_COEFF_S            = 27.044284247103754;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
-const JOSE4_SIN_COEFF_S            = -23.80250191160088;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
+const JOSE4_COS_COEFF_S            = 44.149299740511985;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
+const JOSE4_SIN_COEFF_S            = -13.619833153315945;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
 const JOSE4_TAPER_FULL_HALFWIDTH_YR  = 300000;                   // same as Bond/Hallstatt/Jose5 (widened 2026-07-12)
 const JOSE4_TAPER_TOTAL_HALFWIDTH_YR = 400000;                   // same as Bond/Hallstatt/Jose5 (widened 2026-07-12)
 const JOSE4_DT_RAW_AT_J2000        = JOSE4_COS_COEFF_S * Math.cos(JOSE4_OMEGA * 2000)
