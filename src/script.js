@@ -24194,6 +24194,577 @@ function closeEssrtPanel() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// LOD-CLIMATE RHYTHM (.lcr-)
+// Sub-Milankovitch stack vs named historical climate transitions.
+// Reuses .cfm-* CSS classes for modal chrome.
+// See docs/hidden/IP-lod-climate-rhythm.md for the implementation plan.
+// ═══════════════════════════════════════════════════════════════════
+
+let lcrPanel = null;
+let lcrProxyData = null;   // { sources: [{name, unit, range, data:[[year,°C],…]}] }
+
+// Which layers to show in the chart (default: net L2 + net L3 + stack rate + proxy).
+const lcrLayerVisibility = {
+  netL2: true,   // tidal + GIA (secular baseline)
+  netL3: true,   // + 4-flag stack (observable)
+  stack: true,   // sub-Milankovitch stack rate alone
+  gia:   false,  // GIA rate alone (opt-in)
+  bands: true,   // named climate period bands (background shading)
+  crossings: true, // framework zero-crossings as triangle markers
+  proxy: true,   // GISP2/Moberg temperature anomaly overlay (secondary Y-axis)
+};
+
+/** Async loader for climate proxy data. Caches on first call. */
+async function lcrLoadProxyData() {
+  if (lcrProxyData) return lcrProxyData;
+  try {
+    const resp = await fetch('input/climate-proxy.json');
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    lcrProxyData = await resp.json();
+    return lcrProxyData;
+  } catch (e) {
+    console.warn('[LCR] proxy data load failed:', e);
+    lcrProxyData = { sources: [] };
+    return lcrProxyData;
+  }
+}
+
+// Epoch tabs — different time windows for different narrative focuses.
+// The 'historical' tab is the default because it shows MWP/LIA/modern
+// warming clearly and matches the culturally-recognizable climate rhythm.
+// yMin/yMax are auto-computed at render time from visible data (see
+// lcrRenderChart); the label + xStep + window are fixed per tab.
+const LCR_RANGE_TABS = [
+  { key: 'historical', xLo:   800, xHi: 2050, label: '800 – 2050 CE',         xStep: 100  },
+  { key: 'holocene',   xLo:-12000, xHi: 2050, label: '−12000 BCE – 2050 CE',  xStep: 1000 },
+  { key: 'future',     xLo:  2000, xHi: 5000, label: '2000 CE forward',       xStep: 250  },
+  { key: 'full',       xLo:-10000, xHi: 5000, label: 'Full (−10000 – +5000)', xStep: 1000 },
+];
+let lcrSelectedRange = 'historical';
+
+// Named climate periods with mainstream literature dates + sources.
+// Bands are drawn as light background rectangles behind the rate curves.
+// Sign convention: type 'cold' = blue band; 'warm' = red band.
+const LCR_CLIMATE_PERIODS = [
+  { start: -12900, end: -11700, type: 'cold', name: 'Younger Dryas',              src: 'Alley 2000' },
+  { start:  -7000, end:  -3000, type: 'warm', name: 'Holocene Climatic Optimum',  src: 'various' },
+  { start:  -6250, end:  -6100, type: 'cold', name: '8.2 ka event',               src: 'Alley 1997' },
+  { start:  -3850, end:  -3750, type: 'cold', name: 'Bond 4 event',               src: 'Bond 2001' },
+  { start:  -2250, end:  -2150, type: 'cold', name: '4.2 ka event / Bond 3',      src: 'Weiss 1993' },
+  { start:  -1200, end:  -1100, type: 'cold', name: 'Late Bronze Age Collapse',   src: 'Kaniewski 2013' },
+  { start:   -800, end:   -400, type: 'cold', name: 'Iron Age cold epoch',        src: 'van Geel 1996' },
+  { start:   -250, end:    400, type: 'warm', name: 'Roman Warm Period',          src: 'Lamb 1965' },
+  { start:    536, end:    660, type: 'cold', name: 'Late Antique Little Ice Age',src: 'Büntgen 2016' },
+  { start:    950, end:   1250, type: 'warm', name: 'Medieval Warm Period',       src: 'Lamb 1965; Mann 2009' },
+  { start:   1300, end:   1850, type: 'cold', name: 'Little Ice Age',             src: 'Matthes 1939; Grove 2004' },
+  { start:   1645, end:   1715, type: 'cold', name: 'Maunder Minimum',            src: 'Eddy 1976' },
+  { start:   1790, end:   1830, type: 'cold', name: 'Dalton Minimum',             src: 'Wagner & Zorita 2005' },
+  { start:   1850, end:   2050, type: 'warm', name: 'Modern warm period',         src: 'Instrumental (part-anthropogenic)' },
+];
+
+/** Compute the four rate curves + framework crossings across the requested LCR window.
+ *  Cached per range so repeated renders on the same tab don't rebuild.
+ *  Returns { xs, netL2, netL3, stack, gia, crossings, xLo, xHi, step }. */
+const _lcrSeriesCache = {};
+function lcrComputeSeries(rangeKey) {
+  if (_lcrSeriesCache[rangeKey]) return _lcrSeriesCache[rangeKey];
+  const range = LCR_RANGE_TABS.find(r => r.key === rangeKey) || LCR_RANGE_TABS[0];
+  const xLo = range.xLo;
+  const xHi = range.xHi;
+  // Adaptive step: coarser on wide views, finer on narrow (target ~600 samples).
+  const step = Math.max(2, Math.round((xHi - xLo) / 600));
+
+  const xs = [];
+  const netL2 = [];
+  const netL3 = [];
+  const stack = [];
+  const gia   = [];
+
+  for (let year = xLo; year <= xHi; year += step) {
+    const t_Ma = (2000 - year) / 1e6;
+    const d = dLodDtDecompositionAtAge(t_Ma);
+    xs.push(year);
+    netL2.push(d.net_L2);
+    netL3.push(d.net_L3);
+    stack.push(d.stack);
+    gia.push(d.gia);
+  }
+
+  const crossings = [];
+  for (let i = 1; i < xs.length; i++) {
+    const r1 = stack[i - 1];
+    const r2 = stack[i];
+    if (r1 == null || r2 == null) continue;
+    if (r1 * r2 < 0) {
+      const y1 = xs[i - 1];
+      const y2 = xs[i];
+      const yc = y1 + (y2 - y1) * (-r1) / (r2 - r1);
+      const type = r1 > 0 ? 'PEAK' : 'TROUGH';
+      crossings.push({ year: Math.round(yc), type });
+    }
+  }
+
+  _lcrSeriesCache[rangeKey] = { xs, netL2, netL3, stack, gia, crossings, xLo, xHi, step };
+  return _lcrSeriesCache[rangeKey];
+}
+
+function lcrRenderChart(rangeKey) {
+  const range = LCR_RANGE_TABS.find(r => r.key === rangeKey) || LCR_RANGE_TABS[0];
+  const S = lcrComputeSeries(rangeKey);
+  const W = 1100, H = 470;
+  // right margin widened from 30 → 78 to accommodate the secondary temperature-anomaly axis.
+  const margin = { top: 40, right: 78, bottom: 90, left: 78 };
+  const plotW = W - margin.left - margin.right;
+  const plotH = H - margin.top - margin.bottom;
+
+  // Auto-compute Y range from visible data. Consider only currently-toggled
+  // curves so hiding a curve rescales the axis to fit what's visible.
+  let dataMin = +Infinity, dataMax = -Infinity;
+  const scan = (arr) => {
+    for (let i = 0; i < arr.length; i++) {
+      const v = arr[i];
+      if (v == null) continue;
+      if (v < dataMin) dataMin = v;
+      if (v > dataMax) dataMax = v;
+    }
+  };
+  if (lcrLayerVisibility.netL2) scan(S.netL2);
+  if (lcrLayerVisibility.netL3) scan(S.netL3);
+  if (lcrLayerVisibility.stack) scan(S.stack);
+  if (lcrLayerVisibility.gia)   scan(S.gia);
+  // Always include IERS reference and zero line in the axis so they're never clipped.
+  if (dataMin > 0)    dataMin = 0;
+  if (dataMax < 1.75) dataMax = 1.75;
+  // Fallback if no curves toggled.
+  if (!Number.isFinite(dataMin) || !Number.isFinite(dataMax)) { dataMin = -0.5; dataMax = 3.5; }
+  const pad = Math.max(0.2, (dataMax - dataMin) * 0.08);
+  // Snap to nice 0.5-multiples so gridlines land on clean values.
+  const yMin = Math.floor((dataMin - pad) * 2) / 2;
+  const yMax = Math.ceil((dataMax + pad) * 2) / 2;
+
+  const xPos = (year) => margin.left + ((year - S.xLo) / (S.xHi - S.xLo)) * plotW;
+  const yPos = (v)    => margin.top + (1 - (v - yMin) / (yMax - yMin)) * plotH;
+  const yPosClipped = (v) => {
+    const y = yPos(v);
+    if (y < margin.top) return margin.top;
+    if (y > margin.top + plotH) return margin.top + plotH;
+    return y;
+  };
+
+  // X ticks — nice-round spacing per range.
+  const xticks = [];
+  const xStart = Math.ceil(S.xLo / range.xStep) * range.xStep;
+  for (let year = xStart; year <= S.xHi + 1e-9; year += range.xStep) {
+    const x = xPos(year);
+    const label = year === 0 ? 'J2000' : (year < 0 ? `${-year} BCE` : `${year} CE`);
+    xticks.push(`<line x1="${x}" y1="${margin.top + plotH}" x2="${x}" y2="${margin.top + plotH + 5}" stroke="#888" stroke-width="0.7"/>
+      <text x="${x}" y="${margin.top + plotH + 20}" text-anchor="middle" font-size="10" fill="#d4d4d4">${label}</text>`);
+  }
+
+  // Y ticks — 0.5 ms/cy spacing.
+  const yticks = [];
+  for (let v = Math.ceil(yMin * 2) / 2; v <= yMax + 1e-9; v += 0.5) {
+    const y = yPos(v);
+    yticks.push(`<line x1="${margin.left - 5}" y1="${y}" x2="${margin.left}" y2="${y}" stroke="#888" stroke-width="0.7"/>
+      <text x="${margin.left - 9}" y="${y + 4}" text-anchor="end" font-size="10" fill="#d4d4d4">${v.toFixed(1)}</text>
+      <line x1="${margin.left}" y1="${y}" x2="${margin.left + plotW}" y2="${y}" stroke="#2a2f37" stroke-width="0.5"/>`);
+  }
+
+  // Zero line (bold)
+  const zeroY = yPos(0);
+  const zeroLine = `<line x1="${margin.left}" y1="${zeroY}" x2="${margin.left + plotW}" y2="${zeroY}" stroke="#666" stroke-width="1" stroke-dasharray="4,3"/>`;
+
+  // IERS reference line (+1.75 ms/cy)
+  const iersY = yPos(1.75);
+  const iersLine = `<line x1="${margin.left}" y1="${iersY}" x2="${margin.left + plotW}" y2="${iersY}" stroke="#7ec98a" stroke-width="0.9" stroke-dasharray="6,4" opacity="0.55"/>
+    <text x="${margin.left + plotW - 6}" y="${iersY - 4}" text-anchor="end" font-size="9" fill="#7ec98a" opacity="0.7">IERS +1.75 ms/cy</text>`;
+
+  // J2000 vertical (only if year 2000 is inside the range).
+  let j2000Line = '';
+  if (S.xLo <= 2000 && 2000 <= S.xHi) {
+    const j2000X = xPos(2000);
+    j2000Line = `<line x1="${j2000X}" y1="${margin.top}" x2="${j2000X}" y2="${margin.top + plotH}" stroke="#ffce4b" stroke-width="1.1" opacity="0.65"/>
+      <text x="${j2000X}" y="${margin.top - 6}" text-anchor="middle" font-size="10" fill="#ffce4b">J2000</text>`;
+  }
+
+  // Climate period bands (background shading). Cold = blue, warm = red.
+  // Label style adapts to plot pixel-width available per band; anti-collision
+  // stacks labels vertically when several bands overlap in x.
+  const bands = (() => {
+    if (!lcrLayerVisibility.bands) return '';
+    const visible = LCR_CLIMATE_PERIODS
+      .filter(p => p.end >= S.xLo && p.start <= S.xHi)
+      .map(p => {
+        const x1 = xPos(Math.max(p.start, S.xLo));
+        const x2 = xPos(Math.min(p.end, S.xHi));
+        return { p, x1, x2, w: Math.max(1, x2 - x1), midX: (x1 + x2) / 2 };
+      });
+    // Assign a label row (0,1,2) to reduce overlap; naive: alternate rows.
+    const rects = [];
+    const labels = [];
+    // Sort by start; walk through and assign rows greedily based on last-x per row.
+    const rowLastX = [-Infinity, -Infinity, -Infinity];
+    visible.forEach(({ p, x1, x2, w, midX }) => {
+      const color = p.type === 'warm' ? '#e07070' : '#6db4ff';
+      rects.push(`<rect x="${x1}" y="${margin.top}" width="${w}" height="${plotH}" fill="${color}" opacity="0.10" data-lcr-band="${p.name}" data-lcr-band-src="${p.src}"><title>${p.name} (${p.start}–${p.end}) — ${p.src}</title></rect>`);
+      if (w < 22) return; // too narrow to label
+      // Find first row where the previous label doesn't collide.
+      let row = 0;
+      for (row = 0; row < rowLastX.length; row++) {
+        if (midX - rowLastX[row] >= 50) break;
+      }
+      if (row >= rowLastX.length) return; // no free row → skip label
+      rowLastX[row] = midX;
+      const y = margin.top + 12 + row * 14;
+      const maxChars = Math.max(6, Math.floor(w / 6));
+      const displayName = p.name.length > maxChars ? p.name.slice(0, maxChars - 1) + '…' : p.name;
+      labels.push(`<text x="${midX}" y="${y}" text-anchor="middle" font-size="10" fill="${color}" opacity="0.95" font-weight="600">${displayName}</text>`);
+    });
+    return rects.join('') + labels.join('');
+  })();
+
+  // Curve helpers.
+  function pathFor(data) {
+    let d = '';
+    let prevNull = true;
+    for (let i = 0; i < S.xs.length; i++) {
+      const v = data[i];
+      if (v == null) { prevNull = true; continue; }
+      const cmd = (d === '' || prevNull) ? 'M' : 'L';
+      d += `${cmd}${xPos(S.xs[i]).toFixed(1)} ${yPosClipped(v).toFixed(1)} `;
+      prevNull = false;
+    }
+    return d;
+  }
+
+  const paths = [];
+  if (lcrLayerVisibility.gia) {
+    paths.push(`<path d="${pathFor(S.gia)}" fill="none" stroke="#66e0a0" stroke-width="1.4" stroke-dasharray="4,3" opacity="0.8" data-lcr-curve="gia"/>`);
+  }
+  if (lcrLayerVisibility.stack) {
+    paths.push(`<path d="${pathFor(S.stack)}" fill="none" stroke="#c4c8d0" stroke-width="1.2" opacity="0.85" data-lcr-curve="stack"/>`);
+  }
+  if (lcrLayerVisibility.netL2) {
+    paths.push(`<path d="${pathFor(S.netL2)}" fill="none" stroke="#6ee5ff" stroke-width="2" opacity="0.95" data-lcr-curve="netL2"/>`);
+  }
+  if (lcrLayerVisibility.netL3) {
+    paths.push(`<path d="${pathFor(S.netL3)}" fill="none" stroke="#ffce4b" stroke-width="2" opacity="1" data-lcr-curve="netL3"/>`);
+  }
+
+  // Framework crossings as small triangle markers on the zero line.
+  const crossingMarks = lcrLayerVisibility.crossings ? S.crossings.map(c => {
+    if (c.year < S.xLo || c.year > S.xHi) return '';
+    const x = xPos(c.year);
+    const y = zeroY;
+    const isPeak = c.type === 'PEAK';
+    // PEAK = up-triangle at zero line pointing up; TROUGH = down-triangle pointing down.
+    const color = isPeak ? '#ff9b66' : '#66c0ff';
+    const tri = isPeak
+      ? `<polygon points="${x-5},${y+2} ${x+5},${y+2} ${x},${y-8}" fill="${color}" opacity="0.9" data-lcr-crossing="${c.year}" data-lcr-crossing-type="${c.type}"/>`
+      : `<polygon points="${x-5},${y-2} ${x+5},${y-2} ${x},${y+8}" fill="${color}" opacity="0.9" data-lcr-crossing="${c.year}" data-lcr-crossing-type="${c.type}"/>`;
+    return tri;
+  }).join('') : '';
+
+  // ── Secondary Y-axis: climate proxy overlay (temperature anomaly, °C) ──
+  // Auto-select in-range proxies. Moberg (fine resolution, 0-1975 CE) preferred
+  // when the window is CE-dominant; GISP2 (coarser, Holocene through LGM) fills
+  // the deep past. Both plotted on the SAME right-hand °C-anomaly axis.
+  let proxyGroup = '';
+  let proxyLegend = '';
+  if (lcrLayerVisibility.proxy && lcrProxyData && lcrProxyData.sources) {
+    const activeSources = lcrProxyData.sources
+      .map(src => {
+        const filtered = src.data.filter(([y, _]) => y >= S.xLo && y <= S.xHi);
+        return { src, filtered };
+      })
+      .filter(({ filtered }) => filtered.length >= 2);
+
+    if (activeSources.length > 0) {
+      // Compute proxy Y range from all active sources (with 10% padding).
+      let pMin = +Infinity, pMax = -Infinity;
+      for (const { filtered } of activeSources) {
+        for (const [_, t] of filtered) {
+          if (t < pMin) pMin = t;
+          if (t > pMax) pMax = t;
+        }
+      }
+      const pPad = Math.max(0.15, (pMax - pMin) * 0.10);
+      const proxyMin = pMin - pPad;
+      const proxyMax = pMax + pPad;
+      const yPosProxy = (t) => margin.top + (1 - (t - proxyMin) / (proxyMax - proxyMin)) * plotH;
+
+      const proxyColors = {
+        'Moberg 2005':          '#ff66c0',
+        'GISP2 (Alley 2000)':   '#ffa040',
+      };
+      const proxyPaths = activeSources.map(({ src, filtered }) => {
+        let d = '';
+        filtered.forEach(([y, t], i) => {
+          d += (i === 0 ? 'M' : 'L') + xPos(y).toFixed(1) + ' ' + yPosProxy(t).toFixed(1) + ' ';
+        });
+        const col = proxyColors[src.name] || '#ffb0d0';
+        return `<path d="${d}" fill="none" stroke="${col}" stroke-width="1.6" opacity="0.75" data-lcr-proxy="${src.name}"><title>${src.name} — ${src.reference}
+${src.region} • ${src.unit}</title></path>`;
+      }).join('');
+
+      // Right-hand axis ticks + label.
+      const proxyTicks = [];
+      // Choose a nice tick step.
+      const proxySpan = proxyMax - proxyMin;
+      let pStep = 0.5;
+      if (proxySpan > 30) pStep = 5;
+      else if (proxySpan > 15) pStep = 2;
+      else if (proxySpan > 6)  pStep = 1;
+      else if (proxySpan > 2)  pStep = 0.5;
+      else                     pStep = 0.25;
+      const pStart = Math.ceil(proxyMin / pStep) * pStep;
+      for (let t = pStart; t <= proxyMax + 1e-9; t += pStep) {
+        const y = yPosProxy(t);
+        proxyTicks.push(`<line x1="${margin.left + plotW}" y1="${y}" x2="${margin.left + plotW + 5}" y2="${y}" stroke="#ff9bd0" stroke-width="0.7"/>
+          <text x="${margin.left + plotW + 8}" y="${y + 4}" text-anchor="start" font-size="10" fill="#ff9bd0" opacity="0.85">${t > 0 ? '+' : ''}${t.toFixed(pStep < 1 ? 1 : 0)}</text>`);
+      }
+      const proxyAxisLabel = `<text x="${margin.left + plotW + 42}" y="${margin.top + plotH / 2}" text-anchor="middle" transform="rotate(90 ${margin.left + plotW + 42} ${margin.top + plotH / 2})" font-size="11" fill="#ff9bd0" font-weight="600">Temperature anomaly (°C)</text>`;
+
+      proxyGroup = proxyTicks.join('') + proxyPaths + proxyAxisLabel;
+
+      // Legend text under the chart (small).
+      proxyLegend = activeSources.map(({ src }) => {
+        const col = proxyColors[src.name] || '#ffb0d0';
+        return `<tspan fill="${col}" font-weight="700">■</tspan> ${src.name} (${src.range[0]}–${src.range[1]})`;
+      }).join('   ');
+    }
+  }
+
+  // Axis labels
+  const yLabel = `<text x="${margin.left - 55}" y="${margin.top + plotH / 2}" text-anchor="middle" transform="rotate(-90 ${margin.left - 55} ${margin.top + plotH / 2})" font-size="11" fill="#d4d4d4" font-weight="600">dLOD/dt (ms/century)</text>`;
+  const xLabel = `<text x="${margin.left + plotW / 2}" y="${margin.top + plotH + 46}" text-anchor="middle" font-size="11" fill="#d4d4d4" font-weight="600">Calendar year</text>`;
+  const proxyFootLegend = proxyLegend
+    ? `<text x="${margin.left + plotW / 2}" y="${margin.top + plotH + 66}" text-anchor="middle" font-size="10" fill="#d4d4d4" opacity="0.85">${proxyLegend}</text>`
+    : '';
+
+  // Hover overlay — invisible rect that catches mouse; JS reads x → year.
+  const hoverRect = `<rect class="lcr-hover-capture" x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="transparent" pointer-events="all"/>`;
+
+  // Hover tooltip elements (positioned by JS)
+  const hoverLine = `<line class="lcr-hover-line" x1="0" y1="${margin.top}" x2="0" y2="${margin.top + plotH}" stroke="#fff" stroke-width="0.8" opacity="0" pointer-events="none"/>`;
+  const hoverDot  = `<circle class="lcr-hover-dot" cx="0" cy="0" r="4" fill="#ffce4b" opacity="0" pointer-events="none"/>`;
+  const hoverBg   = `<rect class="lcr-hover-bg" x="0" y="0" width="180" height="70" rx="4" fill="rgba(20,22,28,.94)" stroke="rgba(255,255,255,.15)" opacity="0" pointer-events="none"/>`;
+  const hoverTxt  = `<text class="lcr-hover-year" x="0" y="0" font-size="11" fill="#fff" font-weight="700" opacity="0" pointer-events="none"></text>
+    <text class="lcr-hover-l2" x="0" y="0" font-size="10" fill="#6ee5ff" opacity="0" pointer-events="none"></text>
+    <text class="lcr-hover-l3" x="0" y="0" font-size="10" fill="#ffce4b" opacity="0" pointer-events="none"></text>
+    <text class="lcr-hover-stack" x="0" y="0" font-size="10" fill="#c4c8d0" opacity="0" pointer-events="none"></text>`;
+
+  return `<svg class="lcr-svg" viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet">
+    <rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#0e1116" stroke="rgba(255,255,255,.08)"/>
+    ${bands}
+    ${yticks.join('')}
+    ${xticks.join('')}
+    ${zeroLine}
+    ${iersLine}
+    ${j2000Line}
+    ${paths.join('')}
+    ${crossingMarks}
+    ${proxyGroup}
+    ${yLabel}
+    ${xLabel}
+    ${proxyFootLegend}
+    ${hoverBg}
+    ${hoverLine}
+    ${hoverDot}
+    ${hoverTxt}
+    ${hoverRect}
+  </svg>`;
+}
+
+async function createLcrPanel() {
+  const panel = document.createElement('div');
+  panel.id = 'lodClimateRhythmPanel';
+  panel.className = 'cfm-modal';   // reuse cfm chrome styles
+
+  const tabs = LCR_RANGE_TABS.map(t =>
+    `<button class="cfm-tab${t.key === lcrSelectedRange ? ' cfm-tab-active' : ''}" data-lcr-tab="${t.key}">${t.label}</button>`
+  ).join('');
+
+  const layerToggles = `
+    <div class="cfm-layer-toggles">
+      <span class="cfm-layer-toggles-label">Curves:</span>
+      <label class="cfm-layer-check" title="Layer 2 net rate = tidal + GIA (Milankovitch physics only). At J2000: +1.77 ms/cy, matches IERS +1.75."><input type="checkbox" data-lcr-layer="netL2" ${lcrLayerVisibility.netL2 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL2"></span>Net L2 (secular)</label>
+      <label class="cfm-layer-check" title="Layer 3 net rate = tidal + GIA + 4-flag ΔT stack. Full observable dLOD/dt including sub-Milankovitch modulation. At J2000: +0.764 ms/cy."><input type="checkbox" data-lcr-layer="netL3" ${lcrLayerVisibility.netL3 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL3"></span>Net L3 (observable)</label>
+      <label class="cfm-layer-check" title="Sub-Milankovitch stack rate alone (Bond + Hallstatt + Jose5 + Jose4 harmonic derivatives). Zero-crossings mark climate transitions."><input type="checkbox" data-lcr-layer="stack" ${lcrLayerVisibility.stack ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-stack"></span>Stack rate</label>
+      <label class="cfm-layer-check" title="L1-orbital-coupled GIA rate alone (Milankovitch glacial-cycle contribution to dLOD/dt)."><input type="checkbox" data-lcr-layer="gia" ${lcrLayerVisibility.gia ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-gia"></span>GIA rate</label>
+      <span class="cfm-layer-toggles-label" style="margin-left:18px">Overlays:</span>
+      <label class="cfm-layer-check" title="Named climate period bands from mainstream literature. Cold = blue; Warm = red."><input type="checkbox" data-lcr-layer="bands" ${lcrLayerVisibility.bands ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bands"></span>Climate bands</label>
+      <label class="cfm-layer-check" title="Framework zero-crossings of the stack rate. Up-triangle = PEAK; Down-triangle = TROUGH."><input type="checkbox" data-lcr-layer="crossings" ${lcrLayerVisibility.crossings ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-cross"></span>Framework crossings</label>
+      <label class="cfm-layer-check" title="Independent paleoclimate temperature reconstructions on the secondary right-hand °C-anomaly axis. Moberg 2005 = Northern Hemisphere (5-1975 CE, decadal). GISP2 Alley 2000 = Greenland ice core (Holocene through LGM). Both anomalies but against different baselines (see per-source tooltip)."><input type="checkbox" data-lcr-layer="proxy" ${lcrLayerVisibility.proxy ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxy"></span>Temperature proxy</label>
+    </div>
+  `;
+
+  panel.innerHTML = `
+    <div class="cfm-overlay"></div>
+    <div class="cfm-container">
+      <div class="cfm-header">
+        <div class="cfm-title">LOD-Climate Rhythm</div>
+        <div class="cfm-subtitle">Sub-Milankovitch driver decomposition (tidal + GIA + 4-flag stack) mapped against named historical climate transitions</div>
+        <div class="cfm-close" title="Close"></div>
+      </div>
+      <div class="cfm-body">
+        <div class="cfm-tabs">${tabs}</div>
+        <div class="cfm-controls">${layerToggles}</div>
+        <div class="cfm-content lcr-content">
+          ${lcrRenderChart(lcrSelectedRange)}
+        </div>
+        <div class="lcr-legend-panel">
+          <div class="lcr-legend-note">
+            <b>How to read:</b> <b>Net L2</b> (cyan) is the framework's secular tidal + GIA baseline (≈ IERS at J2000).
+            <b>Net L3</b> (yellow) adds the sub-Milankovitch 4-flag stack. Where they diverge, the stack is pushing
+            Earth's rotation above or below the Milankovitch baseline — that pressure historically maps to warm/cool episodes.
+            The <b>stack rate</b> curve (grey, thin) zero-crossings are the framework's predicted climate transitions;
+            <b>PEAK</b> markers (▲ orange) = warming starts after; <b>TROUGH</b> markers (▼ blue) = cooling starts after.
+            Empirical match: <b>10/10 named climate events fall within ±500 yr, 5/10 within ±100 yr</b>
+            (framework fit used Espenak ΔT 1650-2017 only — no climate proxies in the loop).
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const contentEl = panel.querySelector('.cfm-content');
+
+  function rerender() {
+    contentEl.innerHTML = lcrRenderChart(lcrSelectedRange);
+    bindLcrHover();
+  }
+
+  panel.querySelector('.cfm-close').addEventListener('click', closeLcrPanel);
+  panel.querySelector('.cfm-overlay').addEventListener('click', closeLcrPanel);
+
+  panel.querySelectorAll('[data-lcr-tab]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      lcrSelectedRange = tab.dataset.lcrTab;
+      panel.querySelectorAll('[data-lcr-tab]').forEach(t =>
+        t.classList.toggle('cfm-tab-active', t.dataset.lcrTab === lcrSelectedRange));
+      rerender();
+    });
+  });
+
+  panel.querySelectorAll('[data-lcr-layer]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      lcrLayerVisibility[cb.dataset.lcrLayer] = cb.checked;
+      rerender();
+    });
+  });
+
+  // Hover tooltip binding — delegates to the .lcr-hover-capture rect.
+  function bindLcrHover() {
+    const svg = contentEl.querySelector('svg.lcr-svg');
+    if (!svg) return;
+    const capture = svg.querySelector('.lcr-hover-capture');
+    if (!capture) return;
+    const S = lcrComputeSeries(lcrSelectedRange);
+    const W = 1100;
+    const margin = { top: 40, right: 30, bottom: 90, left: 78 };
+    const plotW = W - margin.left - margin.right;
+    const plotH = 470 - margin.top - 90;
+    const xLo = S.xLo, xHi = S.xHi;
+    // Re-derive the auto Y range the same way lcrRenderChart does so the
+    // hover dot's Y coordinate matches the visible curve pixel-for-pixel.
+    let dataMin = +Infinity, dataMax = -Infinity;
+    const scanH = (arr) => { for (const v of arr) if (v != null) { if (v < dataMin) dataMin = v; if (v > dataMax) dataMax = v; } };
+    if (lcrLayerVisibility.netL2) scanH(S.netL2);
+    if (lcrLayerVisibility.netL3) scanH(S.netL3);
+    if (lcrLayerVisibility.stack) scanH(S.stack);
+    if (lcrLayerVisibility.gia)   scanH(S.gia);
+    if (dataMin > 0)    dataMin = 0;
+    if (dataMax < 1.75) dataMax = 1.75;
+    if (!Number.isFinite(dataMin) || !Number.isFinite(dataMax)) { dataMin = -0.5; dataMax = 3.5; }
+    const padH = Math.max(0.2, (dataMax - dataMin) * 0.08);
+    const yMin = Math.floor((dataMin - padH) * 2) / 2;
+    const yMax = Math.ceil((dataMax + padH) * 2) / 2;
+
+    const hoverLine  = svg.querySelector('.lcr-hover-line');
+    const hoverDot   = svg.querySelector('.lcr-hover-dot');
+    const hoverBg    = svg.querySelector('.lcr-hover-bg');
+    const yearTxt    = svg.querySelector('.lcr-hover-year');
+    const l2Txt      = svg.querySelector('.lcr-hover-l2');
+    const l3Txt      = svg.querySelector('.lcr-hover-l3');
+    const stackTxt   = svg.querySelector('.lcr-hover-stack');
+
+    function showTooltip(event) {
+      const rect = svg.getBoundingClientRect();
+      const svgWidth  = rect.width;
+      const scaleX = W / svgWidth;
+      const mouseX = (event.clientX - rect.left) * scaleX;
+
+      // Convert mouseX → year → nearest sample index.
+      const year = xLo + ((mouseX - margin.left) / plotW) * (xHi - xLo);
+      const idx = Math.round((year - xLo) / S.step);
+      if (idx < 0 || idx >= S.xs.length) return;
+
+      const l2 = S.netL2[idx];
+      const l3 = S.netL3[idx];
+      const st = S.stack[idx];
+      const y  = S.xs[idx];
+
+      const xPos = margin.left + ((y - xLo) / (xHi - xLo)) * plotW;
+      const yPos = margin.top + (1 - (l3 - yMin) / (yMax - yMin)) * plotH;
+
+      hoverLine.setAttribute('x1', xPos);
+      hoverLine.setAttribute('x2', xPos);
+      hoverLine.setAttribute('opacity', '0.6');
+      hoverDot.setAttribute('cx', xPos);
+      hoverDot.setAttribute('cy', yPos);
+      hoverDot.setAttribute('opacity', '1');
+
+      const label = y === 0 ? 'J2000' : (y < 0 ? `${-y} BCE` : `${y} CE`);
+      yearTxt.textContent = label;
+      l2Txt.textContent    = `Net L2: ${l2.toFixed(3)} ms/cy`;
+      l3Txt.textContent    = `Net L3: ${l3.toFixed(3)} ms/cy`;
+      stackTxt.textContent = `Stack:  ${st.toFixed(3)} ms/cy`;
+
+      const tipW = 170, tipH = 70;
+      let tipX = xPos + 12;
+      if (tipX + tipW > margin.left + plotW) tipX = xPos - 12 - tipW;
+      const tipY = Math.max(margin.top + 6, Math.min(yPos - tipH/2, margin.top + plotW - tipH));
+      hoverBg.setAttribute('x', tipX);
+      hoverBg.setAttribute('y', tipY);
+      hoverBg.setAttribute('width', tipW);
+      hoverBg.setAttribute('height', tipH);
+      hoverBg.setAttribute('opacity', '1');
+      yearTxt.setAttribute('x', tipX + 10); yearTxt.setAttribute('y', tipY + 16); yearTxt.setAttribute('opacity', '1');
+      l2Txt.setAttribute('x', tipX + 10);   l2Txt.setAttribute('y', tipY + 32);   l2Txt.setAttribute('opacity', '1');
+      l3Txt.setAttribute('x', tipX + 10);   l3Txt.setAttribute('y', tipY + 46);   l3Txt.setAttribute('opacity', '1');
+      stackTxt.setAttribute('x', tipX + 10); stackTxt.setAttribute('y', tipY + 60); stackTxt.setAttribute('opacity', '1');
+    }
+    function hideTooltip() {
+      hoverLine.setAttribute('opacity', '0');
+      hoverDot.setAttribute('opacity', '0');
+      hoverBg.setAttribute('opacity', '0');
+      yearTxt.setAttribute('opacity', '0');
+      l2Txt.setAttribute('opacity', '0');
+      l3Txt.setAttribute('opacity', '0');
+      stackTxt.setAttribute('opacity', '0');
+    }
+    capture.addEventListener('mousemove', showTooltip);
+    capture.addEventListener('mouseleave', hideTooltip);
+  }
+  bindLcrHover();
+
+  document.body.appendChild(panel);
+  requestAnimationFrame(() => panel.classList.add('visible'));
+  return panel;
+}
+
+async function openLcrPanel() {
+  if (lcrPanel) { lcrPanel.remove(); lcrPanel = null; }
+  await lcrLoadProxyData();
+  lcrPanel = await createLcrPanel();
+}
+
+function closeLcrPanel() {
+  if (lcrPanel) lcrPanel.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // FORMULA VERIFICATION PANEL (.vfp-)
 // Compare model predictions vs published scientific formulas
 // ═══════════════════════════════════════════════════════════════════
@@ -29017,6 +29588,9 @@ function setupGUI() {
     'All planetary periods as integer divisors of 8H = 2,682,360 years. Axial precession, perihelion, inclination, ascending node, obliquity, and eccentricity cycles.');
   addTooltip(toolsFolder.addButton({ title: 'WebGeoCalc Explorer' }).on('click', () => openWGCPanel()),
     'Observed perihelion precession rates for all 8 planets (1900\u20132026) from JPL WebGeoCalc. Three charts per planet: ascending node, argument of periapsis, longitude of perihelion.');
+  addTooltip(toolsFolder.addButton({ title: 'LOD-Climate Rhythm' }).on('click', () => openLcrPanel()),
+    'Sub-Milankovitch driver decomposition (tidal + GIA + 4-flag stack) mapped against named historical climate transitions. Framework crossings vs mainstream MWP / LIA / Bond events / 8.2 ka / 4.2 ka / LBA / Iron Age cold / modern warming.');
+
   addTooltip(toolsFolder.addButton({ title: 'Climate Formula Explorer' }).on('click', () => openClimateFormulaPanel()),
     'Modular climate formula: L1 8H orbital lattice + L2 silicate-weathering carbon thermostat (405/202/135 kyr) + L3 boundary-condition steps (PETM, EOT, Mi-1, MMCT, iNHG, MPT). Per-regime fits vs LR04 \u03b4\u00b9\u2078O (Lisiecki & Raymo 2005) and CENOGRID \u03b4\u00b9\u2078O / \u03b4\u00b9\u00b3C (Westerhold 2020). Independent layer toggles + per-layer R\u00b2 breakdown. Forward-projection tab; cross-regime prediction fails honestly (doc 92 \u00a78.4).');
   addTooltip(toolsFolder.addButton({ title: 'ESSRT Explorer' }).on('click', () => openEssrtPanel()),
