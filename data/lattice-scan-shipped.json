@@ -1,0 +1,120 @@
+{
+  "_meta": {
+    "generator": "scripts/lattice_harmonic_scan.py",
+    "H": 335317,
+    "eight_H": 2682536,
+    "H_primes": [
+      23,
+      61,
+      239
+    ],
+    "candidates_source": "custom",
+    "detrend_kind": "quadratic",
+    "n_perm_iterations": null
+  },
+  "candidates": [
+    1104,
+    1830,
+    2989
+  ],
+  "datasets": {
+    "stephenson": {
+      "meta": {
+        "name": "stephenson",
+        "label": "Stephenson 2016 \u0394T (raw values, s)",
+        "kind": "deltaT",
+        "unit": "s",
+        "span_yr": 2736.0,
+        "median_dt": 1.0,
+        "note": "Cubic detrend applied at fit time to expose millennial residual"
+      },
+      "detrend_applied": "quadratic"
+    }
+  },
+  "ranked": [
+    {
+      "n": 1830,
+      "period_yr": 1465.8666666666666,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": {
+        "name": "Bond",
+        "anchor_yr": 1466.0,
+        "delta_pct": 0.009095043201462445
+      },
+      "resolvable_datasets": 1,
+      "significant_datasets": 0,
+      "mean_r2_harmonic": 0.0015296458699116382,
+      "per_dataset": {
+        "stephenson": {
+          "n": 1830,
+          "period_yr": 1465.8666666666666,
+          "cos_coeff": 161.78368019015016,
+          "sin_coeff": 322.6595543959138,
+          "amplitude": 360.9475685176982,
+          "phase_deg": 63.37050420657588,
+          "r2_total": 0.9999121191753243,
+          "r2_harmonic_only": 0.0015296458699116382,
+          "resolvable": true,
+          "perm_95_threshold": NaN
+        }
+      }
+    },
+    {
+      "n": 1104,
+      "period_yr": 2429.8333333333335,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": {
+        "name": "Hallstatt",
+        "anchor_yr": 2430.0,
+        "delta_pct": 0.006858710562408029
+      },
+      "resolvable_datasets": 1,
+      "significant_datasets": 0,
+      "mean_r2_harmonic": 0.0007707127076553226,
+      "per_dataset": {
+        "stephenson": {
+          "n": 1104,
+          "period_yr": 2429.8333333333335,
+          "cos_coeff": 319.8591445259088,
+          "sin_coeff": -14.525501048030378,
+          "amplitude": 320.1887919923846,
+          "phase_deg": -2.6001398413616705,
+          "r2_total": 0.9991531860130679,
+          "r2_harmonic_only": 0.0007707127076553226,
+          "resolvable": true,
+          "perm_95_threshold": NaN
+        }
+      }
+    },
+    {
+      "n": 2989,
+      "period_yr": 897.469387755102,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": {
+        "name": "5\u00d7Jose (Jose5)",
+        "anchor_yr": 893.6750000000001,
+        "delta_pct": 0.4245825109913536
+      },
+      "resolvable_datasets": 1,
+      "significant_datasets": 0,
+      "mean_r2_harmonic": 2.2587939988892607e-05,
+      "per_dataset": {
+        "stephenson": {
+          "n": 2989,
+          "period_yr": 897.469387755102,
+          "cos_coeff": -39.820203513561005,
+          "sin_coeff": 16.566144002307468,
+          "amplitude": 43.12871126021045,
+          "phase_deg": 157.41153728977307,
+          "r2_total": 0.9984050612454015,
+          "r2_harmonic_only": 2.2587939988892607e-05,
+          "resolvable": true,
+          "perm_95_threshold": NaN
+        }
+      }
+    }
+  ]
+}
