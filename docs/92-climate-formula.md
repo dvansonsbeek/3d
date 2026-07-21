@@ -190,7 +190,7 @@ Fit strategy: add a single explicit `cos(2π·t/404.5) + sin(2π·t/404.5)` pair
 Position: **13H = 4,359,121 yr** — an integer *multiple* of H, not an integer divisor of 8H (8H / 13H = 0.615 — non-integer). 13H is therefore outside the 8H/N divisor lattice; it lives as a long-period extension at the secular-resonance libration period identified by Boulila et al. 2020 at ~4.5 Myr.
 
 Empirical signature:
-- **Match to Boulila 2020**: 4.36 Myr (framework) vs 4.5 Myr (Boulila) = 3.1% difference
+- **Match to Boulila 2018**: 4.36 Myr (framework) vs 4.5 Myr (Boulila) = 3.1% difference
 - **δ¹³C/δ¹⁸O = 2.76** (strongest carbon-cycle signature in the suite; only δ¹³C statistically significant, F = 5.40 vs F δ¹⁸O = 0.34)
 - LR04 contains only **1.25 cycles** → marginal direct detection
 - CENOGRID contains **~15.4 cycles** → strong direct detection
@@ -791,7 +791,7 @@ Neither is currently in the framework. The framework remains *descriptive within
 - **(b) 13H is a fit artifact**: in each window, the OLS fit absorbs some long-period variance into the 13H component regardless of whether 13H is the true source; the amp ≈ 0.26 is approximately what one expects from the residual variance budget
 - **(c) The 13H window is too narrow**: 15-Myr windows give ~3.4 cycles of 13H — adequate to fit but not adequate to *distinguish 13H from neighboring frequencies*
 
-The Boulila 2020 match (4.36 Myr vs 4.5 Myr ≈ 3% difference) and the strong δ¹³C/δ¹⁸O amplitude ratio (2.76, doc 91 §13) remain valid as *amplitude* signatures. But R3-4 shows the **13H line is NOT a stable coherent single eigenmode at the variance-decomposition level**. The earlier docs' framing of 13H as a confirmed L2 component should be qualified: it's a real spectral signature, but interpretation as a single Laskar-mode-driven oscillator with stable phase is not supported by sliding-window analysis.
+The Boulila 2018 match (4.36 Myr vs 4.5 Myr ≈ 3% difference) and the strong δ¹³C/δ¹⁸O amplitude ratio (2.76, doc 91 §13) remain valid as *amplitude* signatures. But R3-4 shows the **13H line is NOT a stable coherent single eigenmode at the variance-decomposition level**. The earlier docs' framing of 13H as a confirmed L2 component should be qualified: it's a real spectral signature, but interpretation as a single Laskar-mode-driven oscillator with stable phase is not supported by sliding-window analysis.
 
 ### 8.5 Summary of where the framework stands after three Tier B rounds
 

@@ -15,7 +15,7 @@
 - Website: `Holistic/holisticuniverse/src/content/en/model/supporting-evidence.mdx` §1 (100-kyr problem) and §12 (eigenfrequency convergence)
 - Source: `src/script.js` `perihelionCycleLength` (line 63) and `eclipticPrecessionPeriod` family
 
-> **Scope note (ESSRT).** The Fibonacci-closure algebra (13−5=8, 13+3=16, 8−5=3, 13−8=5) and the integer-divisor structure of H/N and 8H/N are scale-invariant — they hold at any epoch. The literal year counts (H = 335,317; 8H = 2,682,536; the five Milankovitch periods 111,772 / 67,063 / 41,915 / 25,794 / 20,957; deep-time multiples 3H = 1,005,951 and 13H = 4,359,121) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — so the periods shown in §§ 2 and 4 are present-epoch values, and the comparison with the geological record across the past 1.2 Myr (LR04, CENOGRID, EPICA) assumes drift over that window is sub-percent (verified ~0.05% over 1 Myr). For Boulila 2020's ~4.5 Myr resonance comparison (line 128) the cumulative drift starts to matter — see doc 99 for the per-driver Δ-H formulas.
+> **Scope note (ESSRT).** The Fibonacci-closure algebra (13−5=8, 13+3=16, 8−5=3, 13−8=5) and the integer-divisor structure of H/N and 8H/N are scale-invariant — they hold at any epoch. The literal year counts (H = 335,317; 8H = 2,682,536; the five Milankovitch periods 111,772 / 67,063 / 41,915 / 25,794 / 20,957; deep-time multiples 3H = 1,005,951 and 13H = 4,359,121) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — so the periods shown in §§ 2 and 4 are present-epoch values, and the comparison with the geological record across the past 1.2 Myr (LR04, CENOGRID, EPICA) assumes drift over that window is sub-percent (verified ~0.05% over 1 Myr). For Boulila 2018's ~4.5 Myr resonance comparison (line 128) the cumulative drift starts to matter — see doc 99 for the per-driver Δ-H formulas.
 
 ---
 
@@ -128,9 +128,9 @@ The ~111-kyr region is "crowded": three distinct physical mechanisms all land wi
 | Multiple | Years | Matched geological cycle | Standard | Deviation |
 |---|---:|---|---:|---:|
 | **3H** | 1,005,951 | g₁ − g₅ Mercury–Jupiter eccentricity envelope | ~980,000 yr | **2.6 %** |
-| **13H** | 4,359,121 | Earth–Mars secular resonance libration (Boulila 2020) | ~4,500,000 yr | **3.1 %** |
+| **13H** | 4,359,121 | Earth–Mars secular resonance libration (Boulila 2018) | ~4,500,000 yr | **3.1 %** |
 
-The Boulila et al. 2020 *Palaeogeography* result identifies a ~4.5 Myr cycle in Mesozoic-Cenozoic sediments from the resonant argument θ = 2(g₄ − g₃) − (s₄ − s₃). The model's 13H falls within range.
+The Boulila et al. 2018 *EPSL* result identifies a ~4.5 Myr cycle in Mesozoic-Cenozoic sediments from the resonant argument θ = 2(g₄ − g₃) − (s₄ − s₃). The model's 13H falls within range.
 
 **5H and 8H do not match known cycles** — the Fibonacci-multiple pattern is selective, not universal.
 
@@ -235,7 +235,7 @@ The framework laid out in §§ 1–5 of this document (five H-divisor periods, F
 11. Lisiecki, L. E. (2023). Precession pacing of Late Pleistocene ice-sheet changes. *Nature Geoscience*.
 
 **Deep-time cycles**
-12. Boulila, S. et al. (2020). A robust and consistent middle Eocene astronomical timescale. *Palaeogeography* 549, 109702.
+12. Boulila, S., Vahlenkamp, M., De Vleeschouwer, D., Laskar, J., Yamamoto, Y., Pälike, H., et al. (2018). Towards a robust and consistent middle Eocene astronomical timescale. *Earth and Planetary Science Letters* 486, 94–107. https://doi.org/10.1016/j.epsl.2018.01.003
 
 **Holistic model**
 13. eigenfrequencies.mdx — full eigenfrequency / divisor / Berger comparison

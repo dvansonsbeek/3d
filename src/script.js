@@ -25221,7 +25221,7 @@ function lcrExport() {
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${outerW} ${outerH}" width="${outerW}" height="${outerH}" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
   <rect width="${outerW}" height="${outerH}" fill="#ffffff"/>
   <text x="${outerW / 2}" y="38" text-anchor="middle" font-size="20" font-weight="600" fill="#111">LOD–Climate Rhythm — ${xmlEsc(range.label)}</text>
-  <text x="${outerW / 2}" y="64" text-anchor="middle" font-size="12" fill="#555">Framework's cyclic LOD prediction (Tidal + GIA + all cycles) versus Bond 2001 IRD — r = ${rTxt} in the validated window (4,000 BC – 1,800 AD).</text>
+  <text x="${outerW / 2}" y="64" text-anchor="middle" font-size="12" fill="#555">Framework's cyclic LOD-rate modulation (Tidal + GIA + all cycles) versus Bond 2001 IRD — r = ${rTxt} in the validated window (4,000 BC – 1,800 AD).</text>
   ${legendSvg}
   <g transform="translate(${chartX}, ${chartY})">
     ${inner}
@@ -25262,7 +25262,7 @@ async function createLcrPanel() {
     <div class="cfm-container">
       <div class="cfm-header">
         <div class="cfm-title">LOD-Climate Rhythm</div>
-        <div class="cfm-subtitle">Framework's cyclic LOD prediction, compared against paleoclimate proxy data</div>
+        <div class="cfm-subtitle">Framework's cyclic LOD-rate modulation, compared against paleoclimate proxy data</div>
         <button class="cfm-export-btn" data-lcr-export title="Export the current chart (with the layers currently toggled) as a paper-style SVG in a new tab — white background, dark text.">Export LOD-Climate graph</button>
         <div class="cfm-close" title="Close"></div>
       </div>

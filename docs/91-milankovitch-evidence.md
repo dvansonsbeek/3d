@@ -713,19 +713,19 @@ Data: [data/milankovitch-8h-cenogrid-windowed.json](../data/milankovitch-8h-ceno
 
 Because the super-cycle result is null, it raises an honest question: how much of the broader 8H framework is actually empirically supported, versus how much survived only because no one had tested it sharply? The fourteen tests in this section (A–N) are each a *separate* falsifiable prediction of the framework, run after the super-cycle null result to assess the framework's overall empirical standing.
 
-### 12.1 Test A — 13H matches Boulila 2020 long-period libration ✅ POSITIVE
+### 12.1 Test A — 13H matches Boulila 2018 long-period libration ✅ POSITIVE
 
-The 8H framework predicts that the next long-period climate eigenmode after 8H is **13H = 4.359 Myr**. Boulila et al. (2020) independently identified a Cenozoic libration of the secular resonance argument $\theta = 2(g_4 − g_3) − (s_4 − s_3)$ with characteristic period ~4.5 Myr (range 3.7–4.8 Myr).
+The 8H framework predicts that the next long-period climate eigenmode after 8H is **13H = 4.359 Myr**. Boulila et al. (2018, *EPSL*) independently identified a Cenozoic libration of the secular resonance argument $\theta = 2(g_4 − g_3) − (s_4 − s_3)$ with characteristic period ~4.5 Myr (range 3.7–4.8 Myr).
 
 | Quantity | Value | Source |
 |---|---:|---|
 | 13H | 4.359 Myr | this framework |
-| Boulila 2020 central estimate | 4.5 Myr | empirical libration |
-| Boulila 2020 range | 3.7 – 4.8 Myr | empirical libration |
+| Boulila 2018 central estimate | 4.5 Myr | empirical libration |
+| Boulila 2018 range | 3.7 – 4.8 Myr | empirical libration |
 | Relative difference | 3.1 % | model vs central |
 | Within published range? | **yes** | |
 
-**Verdict: POSITIVE.** The 13H eigenmode falls inside the Boulila 2020 empirical libration range with a 3.1 % central-estimate match. This is a quantitative cross-check against a completely independent paleoclimate result.
+**Verdict: POSITIVE.** The 13H eigenmode falls inside the Boulila 2018 empirical libration range with a 3.1 % central-estimate match. This is a quantitative cross-check against a completely independent paleoclimate result.
 
 Data: [data/milankovitch-13H-boulila-test.json](../data/milankovitch-13H-boulila-test.json).
 
@@ -1053,7 +1053,7 @@ Data: [data/milankovitch-8h-405k-head-to-head.json](../data/milankovitch-8h-405k
 
 | Test | Verdict | Strength |
 |---|---|---|
-| A: 13H ↔ Boulila 2020 | ✅ POSITIVE | 3.1 % match, inside published range |
+| A: 13H ↔ Boulila 2018 | ✅ POSITIVE | 3.1 % match, inside published range |
 | B0: Cheng strict closure | NULL (blocked) | T < 8H, Rayleigh resolution insufficient |
 | **B1: Cheng band-centroid agreement** | ✅ **POSITIVE** | 3/3 bands LR04 vs Cheng within Rayleigh |
 | B2: Cheng permutation on formula amplitudes | NULL trending | p = 0.11, underpowered |
@@ -1221,7 +1221,7 @@ Data: [data/milankovitch-8h-g4g3-carbon-cycle.json](../data/milankovitch-8h-g4g3
 
 ### 13.8 13H = 4.36 Myr is on the lattice AND carbon-amplified
 
-A surprising additional finding from the same g₄−g₃ test: the **4.5-Myr Boulila 2020 secular-resonance libration period** (which matches the framework's **13H = 4.36 Myr** within 3.1%; see Test A §12.1) shows the **strongest δ¹³C/δ¹⁸O amplification of any cycle tested**:
+A surprising additional finding from the same g₄−g₃ test: the **4.5-Myr Boulila 2018 secular-resonance libration period** (which matches the framework's **13H = 4.36 Myr** within 3.1%; see Test A §12.1) shows the **strongest δ¹³C/δ¹⁸O amplification of any cycle tested**:
 
 | Period | δ¹³C/δ¹⁸O ratio | F δ¹³C | F δ¹⁸O |
 |---|---:|---:|---:|
@@ -1231,7 +1231,7 @@ A surprising additional finding from the same g₄−g₃ test: the **4.5-Myr Bo
 The 4.5-Myr cycle is statistically significant in δ¹³C (F = 5.40) but not in δ¹⁸O (F = 0.34) — i.e. it lives almost entirely in the carbon record, with very little ice-volume imprint. This is the **purest carbon-cycle signature** in any cycle we tested.
 
 Two independent observations now converge on the framework's 13H prediction:
-1. **Test A**: 13H = 4.36 Myr matches Boulila 2020's published libration period within 3.1% (cross-check against external scientific literature)
+1. **Test A**: 13H = 4.36 Myr matches Boulila 2018's published libration period within 3.1% (cross-check against external scientific literature)
 2. **§13.8**: 4.5-Myr cycle is empirically strongly carbon-amplified in CENOGRID δ¹³C (F = 5.40, ratio 2.76 — highest in the entire test suite)
 
 The 4.5-Myr / 13H cycle is **on the 8H lattice** (n=13 is a clean framework integer corresponding to 8H/N where N = 8 × H_year / 13H_year structure) AND **strongly expressed in climate records via carbon-cycle response**. This is an additional positive empirical result for the 13H framework prediction.
@@ -1573,7 +1573,7 @@ python3 scripts/milankovitch_climate_formula.py
 
 - Bereiter, B., Eggleston, S., Schmitt, J., Nehrbass-Ahles, C., Stocker, T. F., Fischer, H., Kipfstuhl, S. & Chappellaz, J. (2015). Revision of the EPICA Dome C CO₂ record from 800 to 600 kyr before present. *Geophysical Research Letters* 42, 542–549.
 - Berger, A. & Loutre, M. F. (2002). An exceptionally long interglacial ahead? *Science* 297, 1287–1288.
-- Boulila, S. et al. (2020). Coupled astrochronological and lithologically forced models of a Cretaceous astronomically-tuned floating chronology. *Earth-Science Reviews* 200, 102954.
+- Boulila, S., Vahlenkamp, M., De Vleeschouwer, D., Laskar, J., Yamamoto, Y., Pälike, H., et al. (2018). Towards a robust and consistent middle Eocene astronomical timescale. *Earth and Planetary Science Letters* 486, 94–107. https://doi.org/10.1016/j.epsl.2018.01.003
 - Gradstein, F. M., Ogg, J. G., Schmitz, M. D. & Ogg, G. M. (eds) (2020). *Geologic Time Scale 2020*. Elsevier.
 - Hinich, M. J. (1982). Testing for Gaussianity and linearity of a stationary time series. *Journal of Time Series Analysis* 3, 169–176.
 - International Commission on Stratigraphy (2023). Chronostratigraphic chart. https://stratigraphy.org/chart
