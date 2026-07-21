@@ -624,6 +624,109 @@ const MV_COMPUTE = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.compute
 const MV_JSON    = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.generated.json');
 const MV_TS      = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
 
+// ── 7. Fit-anchored measurement scalars → model-values.compute.ts + deepTime.ts ──
+//
+// Auto-syncs the hand-written "shipped measurement constants" in the website
+// from their machine sources in this repo, so a re-fit propagates into website
+// V-tags and paper \Mv macros without manual edits:
+//
+//   data/deltaT-4flag-fit.json  → usnoLodJ2000, deltaTEspenakRmsSeconds
+//   tools/lib/deep-time.js      → ALPHA_CLIMATE_SCALE_NUM + the dLOD/dt
+//     channel rates (DLOD_TIDAL / DLOD_GIA / DLOD_ALLCYCLES), evaluated at
+//     the sim's model epoch 2000.5 (t_Ma = −5e-7) so they match the
+//     tweakpane's dLOD/dt decomposition rows digit-for-digit; plus
+//     ALPHA_CLIMATE_SCALE / ALPHA_1 into website deepTime.ts (the α(t)
+//     constants export-dt-corrections.js does not cover).
+//
+// Eclipse-audit / Bond-IRD / Babylon-135 numbers remain hand-maintained —
+// they come from docs 102/103 analyses with no machine-readable artifact.
+{
+  console.log('');
+  console.log('  ── Fit-anchored scalars (compute.ts + deepTime.ts) ──');
+  let mvChangeCount = 0;
+
+  // Replace a quoted V-key value:  key: '…',
+  function replaceMvString(content, key, newVal) {
+    const re = new RegExp("(" + key + ":\\s*')[^']*(')");
+    const m = content.match(re);
+    if (!m) { console.log(`    ⚠ ${key}: not found`); return content; }
+    const oldVal = m[0].slice(m[1].length, m[0].length - 1);
+    if (oldVal === newVal) { console.log(`    ✓ ${key}: unchanged (${newVal})`); return content; }
+    console.log(`    ↻ ${key}: '${oldVal}' → '${newVal}'`);
+    mvChangeCount++;
+    return content.replace(m[0], m[1] + newVal + "'");
+  }
+
+  // Replace a numeric const:  const NAME = <number>   (no export prefix).
+  // Comparison is NUMERIC so equal values in different notations (e.g.
+  // -9.9375895103e-5 vs -0.000099375895103) don't churn the file.
+  function replaceMvConst(content, name, newVal, label) {
+    const re = new RegExp('(const ' + name + '\\s*=\\s*)[\\-\\d.e+]+');
+    const m = content.match(re);
+    if (!m) { console.log(`    ⚠ const ${name}: not found${label ? ' in ' + label : ''}`); return content; }
+    const oldVal = m[0].replace(m[1], '');
+    if (Number(oldVal) === Number(newVal)) { console.log(`    ✓ ${name}: unchanged (${oldVal})`); return content; }
+    console.log(`    ↻ ${name}: ${oldVal} → ${newVal}${label ? '  [' + label + ']' : ''}`);
+    mvChangeCount++;
+    return content.replace(m[0], m[1] + newVal);
+  }
+
+  const DT = require('../lib/deep-time');
+
+  if (fs.existsSync(MV_COMPUTE)) {
+    let mv = fs.readFileSync(MV_COMPUTE, 'utf8');
+    const mvBefore = mv;
+
+    const FIT4_PATH = path.resolve(__dirname, '..', '..', 'data', 'deltaT-4flag-fit.json');
+    if (fs.existsSync(FIT4_PATH)) {
+      const fit4 = JSON.parse(fs.readFileSync(FIT4_PATH, 'utf8'));
+      const usno = fit4.optimum.usno_target_lod_s;                 // e.g. 86400.0026
+      const usnoStr = String(usno).replace(/^\d+/, i => i.replace(/\B(?=(\d{3})+$)/g, ','));
+      mv = replaceMvString(mv, 'usnoLodJ2000', usnoStr);
+      mv = replaceMvString(mv, 'deltaTEspenakRmsSeconds', fit4.optimum.espenak_rms_s.toFixed(1));
+    } else {
+      console.log('    (data/deltaT-4flag-fit.json not found — skipping USNO/RMS sync)');
+    }
+
+    mv = replaceMvConst(mv, 'ALPHA_CLIMATE_SCALE_NUM', DT.ALPHA_CLIMATE_SCALE);
+    const dLod = DT.dLodDtDecompositionAtAge(-5e-7);               // model epoch 2000.5
+    if (dLod.tidal !== null) {
+      mv = replaceMvConst(mv, 'DLOD_TIDAL',     dLod.tidal.toFixed(2));
+      mv = replaceMvConst(mv, 'DLOD_GIA',       dLod.gia.toFixed(2));
+      mv = replaceMvConst(mv, 'DLOD_ALLCYCLES', dLod.stack.toFixed(2));
+    }
+
+    if (mv !== mvBefore && WRITE) {
+      fs.writeFileSync(MV_COMPUTE, mv);
+      console.log('    ✓ Written to model-values.compute.ts');
+    }
+  } else {
+    console.log('    (model-values.compute.ts not found, skipping)');
+  }
+
+  // α(t) constants → website deepTime.ts (cycle coefficients are handled by
+  // export-dt-corrections.js above; these two are the remaining hand-edits).
+  const WEB_DEEPTIME = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'deepTime.ts');
+  if (fs.existsSync(WEB_DEEPTIME)) {
+    let wdt = fs.readFileSync(WEB_DEEPTIME, 'utf8');
+    const wdtBefore = wdt;
+    wdt = replaceMvConst(wdt, 'ALPHA_CLIMATE_SCALE', DT.ALPHA_CLIMATE_SCALE, 'deepTime.ts');
+    wdt = replaceMvConst(wdt, 'ALPHA_1', DT.ALPHA_1, 'deepTime.ts');
+    if (wdt !== wdtBefore && WRITE) {
+      fs.writeFileSync(WEB_DEEPTIME, wdt);
+      console.log('    ✓ Written to deepTime.ts');
+    }
+  }
+
+  if (mvChangeCount === 0) {
+    console.log('    ✓ all fit-anchored scalars in sync');
+  } else if (!WRITE) {
+    console.log(`    ${mvChangeCount} scalar(s) pending. Run with --write to apply.`);
+  } else {
+    console.log('      Regen after write: `pnpm run values:generate` + `npx tsx docs/paper/generate-tex-values.ts`');
+  }
+}
+
 if (fs.existsSync(MV_COMPUTE) && fs.existsSync(MV_JSON)) {
   console.log('');
   console.log('  ── model-values (compute + JSON snapshot) ──');

@@ -4977,10 +4977,11 @@ function meanLodHoursAtAge(t_Ma) {
  *              dLOD/dt = LOD × (dα/dt)/α. Sign is negative in the Holocene
  *              (α is decreasing → I shrinks → Earth spins faster → LOD shrinks).
  *              Sign flips over glacial cycles as L1 orbital forcing swings.
- *    stack   — Sub-Milankovitch 4-flag ΔT stack rate (Layer 3 addition):
+ *    stack   — All-cycles 4-flag ΔT stack rate (Layer 3 addition):
  *              d/dt of Bond/Hallstatt/Jose5/Jose4 δLOD sum. Captures millennial
  *              structure (Bond 1466 yr, Hallstatt 2430 yr, Jose5 897 yr,
- *              Jose4 715 yr) that maps to sub-Milankovitch climate rhythm.
+ *              Jose4 716 yr) that maps to the LOD-Climate Rhythm
+ *              (sub-Milankovitch modulation).
  *    net_L2  — Layer 2 net (tidal + gia). Matches IERS +1.75 ms/century at J2000
  *              within ~1% (framework value: +1.77).
  *    net_L3  — Layer 3 net (tidal + gia + stack). Includes millennial modulation.
@@ -5026,9 +5027,9 @@ function dLodDtDecompositionAtAge(t_Ma) {
   const dLod_dt_gia_s_per_yr = lod_s * dalpha_dyr / alpha;
   const dLod_dt_gia_ms_per_cy = dLod_dt_gia_s_per_yr * 100 * 1000;
 
-  // Sub-Milankovitch stack rate: d(Σ ΔT δLOD)/dt at current epoch.
+  // All-cycles stack rate: d(Σ ΔT δLOD)/dt at current epoch.
   // Numerical derivative on dtCycleLodCorrectionSum with a 50-yr window (well
-  // below the shortest harmonic period Jose4 = 715 yr, so aliasing-safe).
+  // below the shortest harmonic period Jose4 = 716 yr, so aliasing-safe).
   const DYR = 50;   // yr half-window
   const stack_plus  = dtCycleLodCorrectionSum(year + DYR);
   const stack_minus = dtCycleLodCorrectionSum(year - DYR);
@@ -24195,7 +24196,7 @@ function closeEssrtPanel() {
 
 // ═══════════════════════════════════════════════════════════════════
 // LOD-CLIMATE RHYTHM (.lcr-)
-// Sub-Milankovitch stack vs named historical climate transitions.
+// All-cycles stack vs named historical climate transitions.
 // Reuses .cfm-* CSS classes for modal chrome.
 // See docs/hidden/IP-lod-climate-rhythm.md for the implementation plan.
 // ═══════════════════════════════════════════════════════════════════
@@ -24923,7 +24924,7 @@ function lcrRenderChart(rangeKey) {
   // immediate: "at this year, prediction touches baseline; before/after it
   // swings warm or cold". Falls back to zero line if netL2 is null.
   // Transition markers piggy-back on Framework prediction (netL3) visibility —
-  // they mark zero-crossings of the sub-Milankovitch stack, which is the very
+  // they mark zero-crossings of the all-cycles stack, which is the very
   // signal Net L3 adds. Separate toggle previously; now one control.
   const crossingMarks = lcrLayerVisibility.netL3 ? S.crossings.map(c => {
     if (c.year < S.xLo || c.year > S.xHi) return '';
@@ -29738,7 +29739,7 @@ function setupGUI() {
     label: 'Tidal + GIA + all cycles', readonly: true, format: fmt6
   }), 'Framework\'s full solar-day prediction: Tidal + GIA + sum of Bond/Hallstatt/Jose5/Jose4 cyclic \u03b4LOD corrections. Physical length of one solar day. At J2000 \u2248 86400.002593 s (matches USNO 86400.0026 s anchor by construction). Same value shown as the top-level "Solar Day (s)" row.');
 
-  // dLOD/dt driver decomposition sub-folder \u2014 tidal + GIA + sub-Milankovitch stack producing observed LOD growth.
+  // dLOD/dt driver decomposition sub-folder \u2014 tidal + GIA + all-cycles stack producing observed LOD growth.
   // Collapsed by default \u2014 the numbers are diagnostic rather than everyday.
   const dLodDtFolder = daysFolder.addFolder({ title: 'dLOD/dt decomposition', expanded: false });
   const fmt3msCy = v => v.toFixed(3) + ' ms/cy';
@@ -29750,7 +29751,7 @@ function setupGUI() {
   }), 'Glacial Isostatic Adjustment channel (\u03b1(t) coupling). L1-orbital-coupled \u03b1(t): dLOD/dt = LOD \u00d7 (d\u03b1/dt) / \u03b1. At J2000: \u22120.35 ms/century (from Cox & Chao dJ\u2082/dt \u00d7 factor-2.0 J\u2082\u2192\u03b1 conversion, Peltier ICE-6G LOD-coupling range). Sign is negative in the Holocene \u2014 mass migrating from oceans back onto polar continents shrinks Earth\'s polar moment \u03b1, spinning Earth up. Sign flips over glacial cycles: reaches ~+0.6 ms/cy near year 13,000 AD (returning glacial max), passes through 0 near 5,000 AD and 23,000 BCE, reaches ~\u22121.2 ms/cy near 11,000 BCE (glacial minimum \u2192 interglacial ramp).');
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtStack_msCy', {
     label: 'All cycles', readonly: true, format: fmt3msCy
-  }), 'Sum of the 4 sub-Milankovitch lattice cycles: Bond (1466 yr) + Hallstatt (2430 yr) + Jose5 (897 yr) + Jose4 (715 yr). d/dt of their combined \u03b4LOD contribution. Captures millennial-scale rhythm on top of the Tidal + GIA secular baseline; maps to sub-Milankovitch climate oscillations (Bond events, Hallstatt cycle solar-activity modulation, etc.). Zero-mean over long periods; sign flips on each half-period of each harmonic.');
+  }), 'Sum of the 4 sub-Milankovitch lattice cycles: Bond (1466 yr) + Hallstatt (2430 yr) + Jose5 (897 yr) + Jose4 (716 yr). d/dt of their combined \u03b4LOD contribution. Captures millennial-scale rhythm on top of the Tidal + GIA secular baseline; maps to sub-Milankovitch climate oscillations (Bond events, Hallstatt cycle solar-activity modulation, etc.). Zero-mean over long periods; sign flips on each half-period of each harmonic.');
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtNetL2_msCy', {
     label: 'Tidal + GIA', readonly: true, format: fmt3msCy
   }), 'Secular baseline = Tidal + GIA. At J2000: +1.77 ms/century, matching IERS observation of +1.75 ms/century within 1%. No parameters fitted to the observed rate \u2014 both channels come from independent literature anchors (LLR + Cox & Chao). The ~17% cancellation between Tidal and GIA at J2000 is what makes the observed Earth-rotation slowdown smaller than the pure-tidal rate.');
@@ -30846,7 +30847,7 @@ function setupGUI() {
   //
   // ON by default. Divisor 3749 = 23 × 163 satisfies the gcd rule via H's 23
   // prime factor (H = 23·61·239). Physical interpretation: 4 × Jose period
-  // (4 × 179 yr = 715 yr, 0.08% match — the tightest structural anchor of
+  // (4 × 179 yr = 716 yr, 0.08% match — the tightest structural anchor of
   // any 600-800 yr candidate). Empirically supported by cross-archive
   // coherence: scripts/lattice_harmonic_scan.py identifies 8H/3749 as
   // significant in BOTH Steinhilber solar Φ (~41 MV, permutation p<5%) AND
@@ -30859,7 +30860,7 @@ function setupGUI() {
   // a 28% reduction targeted at the MWP-band gap around year 990. Amplitude
   // kept at free-fit 35.3 s (below the 50-s prior — no cap applied).
   // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Toggle 8H/3749 Jose4 ΔT correction (~715 yr, 4×Jose; violates zero-fit if ON)', () => {
+  addTestButton('Toggle 8H/3749 Jose4 ΔT correction (~716 yr, 4×Jose; violates zero-fit if ON)', () => {
     JOSE4_DT_CORRECTION_ENABLED = !JOSE4_DT_CORRECTION_ENABLED;
     _DELTA_T_CACHE.clear();
     console.log('\n══════════════════════════════════════════════════════════════════');
@@ -30892,7 +30893,7 @@ function setupGUI() {
     const dt_J2000  = meanDeltaTSecondsAtAge(0);
     console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
     console.log('══════════════════════════════════════════════════════════════════');
-  }, 'Feature flag for the 8H/3749 Jose4 ΔT correction (~715 yr, 4×Jose SIM sub-harmonic). ' +
+  }, 'Feature flag for the 8H/3749 Jose4 ΔT correction (~716 yr, 4×Jose SIM sub-harmonic). ' +
      'ON by default as the 4th flag of the ΔT stack. When ON, adds up to ±35 s modulation ' +
      'targeted at the MWP-band residual around year 990. Structurally on-lattice via H\'s 23 ' +
      'prime factor. Cross-archive coherent in Steinhilber Φ + EPICA CO2 (independent evidence ' +
@@ -33297,7 +33298,7 @@ function setupGUI() {
      'GREEN-marker exactly. Lists every framework eclipse near the documented site.');
 
   // ────────────────────────────────────────────────────────────────────────
-  // Sub-Milankovitch stack ↔ climate transitions
+  // All cycles (4-flag stack) ↔ climate transitions
   //   Scan d(stack)/dt over -5000 to +5000 CE, find zero-crossings.
   //   PEAK crossing (derivative + → −): stack LOD-contribution at MAX; going forward
   //     the stack removes LOD, Earth spins up relative to secular baseline → WARMING starts.
@@ -33305,13 +33306,13 @@ function setupGUI() {
   //     Earth slows more than secular → COOLING starts.
   //   Match each crossing to nearest named climate transition of matching sign.
   //   Empirical validation that the 4-flag stack's H-lattice periods (Bond 1466,
-  //   Hallstatt 2430, Jose5 897, Jose4 715 yr) time the historical climate rhythm
+  //   Hallstatt 2430, Jose5 897, Jose4 716 yr) time the historical climate rhythm
   //   despite the fit targeting Espenak ΔT, not climate proxies.
   // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Sub-Milankovitch stack ↔ climate transitions', () => {
+  addTestButton('All cycles (4-flag stack) ↔ climate transitions', () => {
     console.log('\n════════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Sub-Milankovitch 4-flag stack — zero-crossing timings vs named climate transitions');
-    console.log('  Bond 8H/1830 (1466 yr) + Hallstatt 8H/1104 (2430 yr) + Jose5 8H/2989 (897 yr) + Jose4 8H/3749 (715 yr)');
+    console.log('  All-cycles 4-flag stack — zero-crossing timings vs named climate transitions');
+    console.log('  Bond 8H/1830 (1466 yr) + Hallstatt 8H/1104 (2430 yr) + Jose5 8H/2989 (897 yr) + Jose4 8H/3749 (716 yr)');
     console.log('════════════════════════════════════════════════════════════════════════════════════');
     console.log('  PEAK  = stack LOD at MAX, derivative + → −. After this year, stack rate < 0, Earth');
     console.log('          spins up vs secular baseline → warm episode STARTS.');

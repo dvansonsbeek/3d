@@ -249,7 +249,7 @@ and must be run by hand when compute.ts changes.
 
 ### What each step does
 
-- **`export-to-holistic.js --write`** — writes Holistic's `src/lib/orbital/{constants,coefficients,cardinalPointHarmonics,deepTime}.ts` from the current fit JSONs + `public/input/astro-reference.json`. Delegates the 12 DT correction constants to `export-dt-corrections.js` (same helper the 3D script uses). Content-compares each field and only rewrites what actually changed.
+- **`export-to-holistic.js --write`** — writes Holistic's `src/lib/orbital/{constants,coefficients,cardinalPointHarmonics,deepTime}.ts` from the current fit JSONs + `public/input/astro-reference.json`. Delegates the 12 DT correction constants to `export-dt-corrections.js` (same helper the 3D script uses). Content-compares each field and only rewrites what actually changed. **Section 7 (fit-anchored scalars)** additionally patches the website's shipped measurement constants: `usnoLodJ2000` + `deltaTEspenakRmsSeconds` in `src/data/model-values.compute.ts` (from `data/deltaT-4flag-fit.json → optimum`), `ALPHA_CLIMATE_SCALE_NUM` + `DLOD_TIDAL/GIA/ALLCYCLES` in the same file (from `tools/lib/deep-time.js` — the dLOD channels via `dLodDtDecompositionAtAge(-5e-7)`, i.e. model epoch 2000.5), and `ALPHA_CLIMATE_SCALE`/`ALPHA_1` in `deepTime.ts`. Never hand-edit these on the website — they carry "AUTO-SYNCED" comments.
 - **`pnpm run values:generate`** — runs `scripts/generate-model-values.mjs` on the Holistic side, which evaluates `src/data/model-values.compute.ts` and writes `src/data/model-values.generated.json`. This is the JSON that MDX pages read via `<V k="..."/>` tags. Downstream of `constants.ts` / `deepTime.ts` / `dayLength.ts`, so must run *after* export-to-holistic completes.
 - **`npx tsx docs/paper/generate-tex-values.ts`** — regenerates `docs/paper/model-values.tex` (the `\Mv…` macro file) from the same `MODEL_VALUES` registry. Not auto-triggered; must run by hand when compute.ts or its upstream inputs change.
 
@@ -260,7 +260,8 @@ and must be run by hand when compute.ts changes.
 | `src/lib/orbital/constants.ts` | Harmonics, planetary orbital elements, ΔT trend anchor (`DELTA_T_START_SECONDS`), perihelion-alignment year, other scalars | `export-to-holistic.js` |
 | `src/lib/orbital/cardinalPointHarmonics.ts` | Cardinal-point Fourier terms (4×24) | `export-to-holistic.js` |
 | `src/lib/orbital/coefficients.ts` | Prediction coefficients (7×2421) + `planets.ts` buildFeatures | `export-to-holistic.js` |
-| `src/lib/orbital/deepTime.ts` | Bond/Hallstatt/Jose5/Jose4 correction constants (12 total: LATTICE_N + COS_COEFF_S + SIN_COEFF_S per cycle) | delegated to `export-dt-corrections.js` |
+| `src/lib/orbital/deepTime.ts` | Bond/Hallstatt/Jose5/Jose4 correction constants (12 total: LATTICE_N + COS_COEFF_S + SIN_COEFF_S per cycle); α(t) anchors `ALPHA_CLIMATE_SCALE` + `ALPHA_1` | delegated to `export-dt-corrections.js`; α anchors by Section 7 |
+| `src/data/model-values.compute.ts` | Fit-anchored measurement scalars: `usnoLodJ2000`, `deltaTEspenakRmsSeconds` (from `data/deltaT-4flag-fit.json`), `ALPHA_CLIMATE_SCALE_NUM`, `DLOD_TIDAL/GIA/ALLCYCLES` (from `tools/lib/deep-time.js`) | `export-to-holistic.js` Section 7 |
 | `src/data/model-values.generated.json` | 757 derived display keys (day/year lengths, precession rates, orbital elements at J2000, etc.) | `pnpm run values:generate` |
 | `docs/paper/model-values.tex` | ~500 `\Mv…` LaTeX macros used in the paper | `npx tsx docs/paper/generate-tex-values.ts` |
 

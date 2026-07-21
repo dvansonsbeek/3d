@@ -418,7 +418,7 @@ The IERS observed rate is the physical Earth-rotation slowdown, integrating tida
 
 #### Cyclic rate on top of the secular baseline
 
-The Tidal + GIA rate (+1.77 ms/cy at J2000) captures the Milankovitch-scale physics. The four sub-Milankovitch lattice cycles — Bond (1466 yr), Hallstatt (2430 yr), Jose5 (897 yr), Jose4 (715 yr) — add cyclic modulation on top. The individual cycles are anchored so that the cumulative δLOD **value** sums to ≈ 0 at J2000 (the USNO 86400.0026 s anchor is honoured by construction); the cumulative **derivative** at J2000 is not zero, and at present sits at −1.01 ms/cy — the mid-descending part of the Bond cycle. The full observable rate at J2000 is therefore Tidal + GIA + all cycles = +1.77 − 1.01 = **+0.76 ms/century**.
+The Tidal + GIA rate (+1.77 ms/cy at J2000) captures the Milankovitch-scale physics. The four sub-Milankovitch lattice cycles — Bond (1466 yr), Hallstatt (2430 yr), Jose5 (897 yr), Jose4 (716 yr) — add cyclic modulation on top. The individual cycles are anchored so that the cumulative δLOD **value** sums to ≈ 0 at J2000 (the USNO 86400.0026 s anchor is honoured by construction); the cumulative **derivative** at J2000 is not zero, and at present sits at −1.01 ms/cy — the mid-descending part of the Bond cycle. The full observable rate at J2000 is therefore Tidal + GIA + all cycles = +1.77 − 1.01 = **+0.76 ms/century**.
 
 ```
 full rate = Tidal + GIA + Σ d(cycles)/dt

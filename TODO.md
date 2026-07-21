@@ -24,3 +24,15 @@
   - Paper `Fibonacci_Laws_of_Planetary_Motion.tex` (external repo) needs the same physics-anchor updates
 
 - **Build the LOD-Climate Rhythm modal** — implementation plan at [docs/hidden/IP-lod-climate-rhythm.md](docs/hidden/IP-lod-climate-rhythm.md)
+
+- **Identify the physical channel for the fractional non-tidal secular rate (~0.5 ms/century)** — tracked as doc 102 §"What's next" item 3. §16 rate-sensitivity diagnostic finds a ~0.5 ms/cy contribution in the ΔT residual after α(t) + 4-flag stack subtraction (≈ 2× Cox-Chao satellite value, ~10% of full Munk-MacDonald). Currently detected but **not modelled** — website + docs honestly disclose this. Candidate mechanisms:
+  - Time-varying core-mantle EM coupling (constant Holme 1998 rate was rejected — over-corrects Babylonian ΔT by ~2,700 s; time-average could still hit ~0.5 ms/cy if variability is derived from independent geomagnetic-secular-variation data)
+  - Continental hydrology / groundwater / sea-level redistribution on centennial timescale (not currently in α(t))
+  - Regional GIA structure beyond the global-average L1-orbital α(t) (a higher-resolution ICE-6G_C-type model with continental-resolution rebound profiles)
+  - Fifth 8H-lattice harmonic (Eddy 999 yr / Emp862 862 yr / Jupiter92 1090 yr all tested and rolled back for various reasons — see doc 102 § "Rolled-back candidates")
+
+  Whichever path pays off first, calibration must come from independent (non-eclipse) physics — otherwise the "zero eclipse-fitting" claim reduces to "zero fitting except for this channel". Preserving that claim is the design constraint.
+
+- **Stage 2 (LOD-Climate Rhythm modal): GIA moving-mean analysis** — plan at [docs/hidden/IP-lod-climate-rhythm.md](docs/hidden/IP-lod-climate-rhythm.md) §Stage 2. Rolling-mean deviation over 100/300/1000/3000 yr windows, plus a proposed Framework Climate Index (FCI). Open question: does moving-mean deviation carry signal beyond the raw rate breakdown, or is it a phase-shifted version of the same information?
+
+- **Stage 3 (LOD-Climate Rhythm modal): DT stack tuning sliders** — plan at [docs/hidden/IP-lod-climate-rhythm.md](docs/hidden/IP-lod-climate-rhythm.md) §Stage 3. Per-flag amplitude/phase live-preview sliders (±20% amp, ±50 yr phase) for hypothesis-testing without overwriting the shipped defaults. Less urgent now that Bond IRD r = +0.49 validates the current 4-flag calibration.

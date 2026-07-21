@@ -420,6 +420,63 @@ function meanLodSecondsWithCorrectionsAtAge(t_Ma) {
        + jose4CycleLodCorrection(year);
 }
 
+/** Sum of the 4-flag stack's implied δLOD contributions at calendar year (s).
+ *  Mirrors src/script.js dtCycleLodCorrectionSum. */
+function dtCycleLodCorrectionSum(year) {
+  return bondCycleLodCorrection(year)
+       + hallstattCycleLodCorrection(year)
+       + jose5CycleLodCorrection(year)
+       + jose4CycleLodCorrection(year);
+}
+
+/** dLOD/dt driver decomposition at t_Ma, in ms/century per channel.
+ *  Mirrors src/script.js dLodDtDecompositionAtAge (tweakpane dLOD/dt
+ *  decomposition sub-folder: Tidal baseline / GIA / All cycles /
+ *  Tidal + GIA / Tidal + GIA + all cycles). Consumed by
+ *  tools/fit/export-to-holistic.js to sync the website's shipped
+ *  measurement constants (model-values.compute.ts dLodDt* V-keys). */
+function dLodDtDecompositionAtAge(t_Ma) {
+  const nullResult = { tidal: null, gia: null, stack: null, net_L2: null, net_L3: null };
+  const a = meanMoonDistanceMetresAtAge(t_Ma);
+  if (a === null || a <= 0 || a >= A_LOCK_M) return nullResult;
+  const lod_s = meanLodSecondsAtAge(t_Ma);
+  if (lod_s === null) return nullResult;
+  const alpha = earthMoiFactorAtAge(t_Ma);
+  const I_E   = alpha * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
+  const year  = 2000 - t_Ma * 1e6;
+
+  // Tidal channel: dL_M/dt = m_M × (1/2) × √(GM/a) × (da/dt) × √(1−e²)
+  const da_dt_yr = -A_MOON_NOW_M * (ALPHA_1 + 3*ALPHA_3*t_Ma*t_Ma + 4*ALPHA_4*t_Ma*t_Ma*t_Ma) / 1e6;
+  const SEC_PER_YR = 365.25 * 86400;
+  const da_dt_s = da_dt_yr / SEC_PER_YR;
+  const dLm_dt = M_MOON_ALONE * 0.5 * Math.sqrt(GM_EM_M3S2 / a) * da_dt_s * E_FACTOR_MOON;
+  const domega_dt_tidal = -dLm_dt / I_E;   // dL_E = -dL_M, dω = dL_E/I
+  const dLod_dt_tidal_ms_per_cy = -(lod_s * lod_s) / (2 * Math.PI) * domega_dt_tidal * SEC_PER_YR * 100 * 1000;
+
+  // GIA channel: dLOD/dt = LOD × (dα/dt)/α, dα/dt via central difference.
+  const EPS_MA = 1e-4;   // 100 yr — well below any L1 harmonic period
+  const alpha_plus  = earthMoiFactorAtAge(t_Ma - EPS_MA);   // future
+  const alpha_minus = earthMoiFactorAtAge(t_Ma + EPS_MA);   // past
+  const dalpha_dyr = (alpha_plus - alpha_minus) / (2 * EPS_MA * 1e6);
+  const dLod_dt_gia_ms_per_cy = lod_s * dalpha_dyr / alpha * 100 * 1000;
+
+  // All-cycles stack rate: d(Σ ΔT δLOD)/dt, 50-yr central difference (well
+  // below the shortest harmonic period Jose4 = 716 yr, so aliasing-safe).
+  const DYR = 50;
+  const dStack_dyr = (dtCycleLodCorrectionSum(year + DYR) - dtCycleLodCorrectionSum(year - DYR)) / (2 * DYR);
+  const dLod_dt_stack_ms_per_cy = dStack_dyr * 100 * 1000;
+
+  const net_L2 = dLod_dt_tidal_ms_per_cy + dLod_dt_gia_ms_per_cy;
+  const net_L3 = net_L2 + dLod_dt_stack_ms_per_cy;
+  return {
+    tidal:  dLod_dt_tidal_ms_per_cy,
+    gia:    dLod_dt_gia_ms_per_cy,
+    stack:  dLod_dt_stack_ms_per_cy,
+    net_L2: net_L2,
+    net_L3: net_L3,
+  };
+}
+
 // ─── ΔT integrator (mirrors src/script.js meanDeltaTSecondsAtAge) ───────────
 // Pure-tidal Simpson integration + post-integration 3-cycle H-lattice
 // corrections (Bond + Hallstatt + Jose5) matching the shipped 3-flag stack.
@@ -767,7 +824,12 @@ module.exports = {
   bondCycleDeltaTCorrection, hallstattCycleDeltaTCorrection, jose5CycleDeltaTCorrection, jose4CycleDeltaTCorrection,
   // Implied LOD corrections from the 4-flag ΔT stack (physical-consistency helper)
   bondCycleLodCorrection, hallstattCycleLodCorrection, jose5CycleLodCorrection, jose4CycleLodCorrection,
+  dtCycleLodCorrectionSum,
   meanLodSecondsWithCorrectionsAtAge,
+  // dLOD/dt driver decomposition (tidal / GIA / all-cycles channels, ms/cy)
+  dLodDtDecompositionAtAge,
+  ALPHA_CLIMATE_SCALE,
+  ALPHA_1,
   // Moon chain
   meanSolarDeltaAAtAge, meanMoonDistanceCorrectedAtAge,
   meanMoonSiderealMonthAtAge, meanSynodicMonthAtAge, meanTropicalMonthAtAge,

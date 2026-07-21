@@ -20,6 +20,7 @@ The simulation includes several interactive panels for inspecting planetary data
 | **WebGeoCalc Explorer** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet — see [doc 56](56-webgeocalc-explorer.md) |
 | **Climate Formula Explorer** | L1+L2+L3 climate formula visualized across LR04 / CENOGRID / EPICA / CenCO2PIP, multiple time windows — see [doc 58](58-climate-formula-explorer.md) |
 | **ESSRT Explorer** | Deep-time evolution of H, LOD, year length, Moon distance under Expanding Solar System Resonance Theory — see [doc 59](59-essrt-explorer.md) |
+| **LOD-Climate Rhythm** | dLOD/dt driver layers (Tidal baseline / GIA / all cycles) vs named climate periods + GISP2 temperature; Σ_stack ↔ Bond 2001 IRD cross-validation — physics in [doc 102](102-gia-alpha-lunar-validation.md) |
 | **Formula Verification** | Model vs published celestial-mechanics formulas (±12,000 yr, 9 quantities) — see [doc 57](57-formula-verification.md) |
 
 > **Scope note (ESSRT).** Each panel is intrinsically a present-epoch UI that reads from the live simulation state — what users see at any time reflects whatever date is currently active. When users scrub the simulation date by millions of years, the panels reflect ESSRT-evolved values automatically (per `DEEP_TIME_MODE_ENABLED` in `src/script.js`). The Solar System Resonance Cycle panel displays integer divisors (scale-invariant); the ESSRT Explorer is the dedicated visualization for how those divisors' literal year-counts evolve at deep time. See [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the formalism.
@@ -565,6 +566,58 @@ Modal that visualizes the **Expanding Solar System Resonance Theory (ESSRT)** �
 ### Full Reference
 
 See [doc 59 — ESSRT Explorer](59-essrt-explorer.md) for the complete panel reference (7 quantity tabs, 2 range tabs, era markers, Wu 2024 anchor overlay, hover tooltip, paper-export buttons, code locations). The underlying theory — Driver 1 (Farhat polynomial + angular-momentum conservation), Driver 2 (Kepler scaling under solar mass loss), the H(t) / LOD(t) / year(t) parameterizations, validation against the published cyclostratigraphy record (sub-percent agreement Hadean → present), and the per-frame integrator architecture (`_dtCycleN`, `_dtMoonIntegrator`, `_dtPlanetIntegrator`) — lives in [doc 99 — Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md).
+
+---
+
+## LOD-Climate Rhythm
+
+### Purpose
+
+Modal that plots the framework's **dLOD/dt driver decomposition** (the rate curves behind the tweakpane's *dLOD/dt decomposition* sub-folder) against named historical climate periods and an independent paleoclimate temperature proxy. Where the ESSRT Explorer shows the *secular* deep-time LOD evolution, this modal shows the *millennial-scale cyclic modulation* on top of it — the 4-flag sub-Milankovitch stack (Bond + Hallstatt + Jose5 + Jose4) — and asks: do the framework's predicted warm/cool transitions line up with the climate record?
+
+It is the interactive home of the **Σ_stack ↔ Bond 2001 IRD cross-validation** ([doc 102](102-gia-alpha-lunar-validation.md) § "Defensible scientific position" item 7): Pearson **r = +0.49** on the validated window −4000 BC to +1800 AD (r = +0.38 full overlap), out-of-sample since the stack was fit against the Stephenson 2016 ΔT residual, not any climate proxy. Sign convention "Σ > 0 = LOD above baseline = mass equatorward = warm" holds on **6 of 6** named events in-window.
+
+### Accessing the Panel
+
+1. Open the Tweakpane Tools folder
+2. Click "LOD-Climate Rhythm"
+3. Pick an **epoch tab** (six windows; default **750–2050 AD**, the culturally-recognizable MWP → LIA → Modern window)
+4. Toggle layers with the legend checkboxes; open the three collapsible evidence panels below the chart
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Layer toggles (6)** | **Tidal baseline** (flat rust dashed, +2.12 ms/cy — pure Moon-recession reference) · **Tidal + GIA** (secular baseline, +1.77 ms/cy at J2000, matches IERS +1.75) · **Tidal + GIA + all cycles** (full observable prediction, +0.76 ms/cy at J2000; also gates the ▲/▼ transition markers) · **Bond cycle** (the 8H/1830 = 1466-yr harmonic isolated, thin dashed) · **Periods** (climate-band shading) · **Temperature (GISP2)** (opt-in proxy overlay, secondary °C axis) |
+| **Epoch tabs (6)** | 27,500 BC–2050 AD · 13,000 BC–2050 AD · 4,000 BC–2050 AD · 750–2050 AD (default) · 1,200–2,500 AD (near future) · 13,000 BC–15,000 AD (full). Y-range auto-computed per tab from the currently-visible curves |
+| **Climate-period bands** | 15 named periods from mainstream literature (LGM, Older/Younger Dryas, Holocene Optimum, 8.2 ka, Bond 4, 4.2 ka, Late Bronze Age Collapse, Iron Age cold, Roman Warm, Late Antique LIA, MWP, LIA incl. Maunder + Dalton, Modern warm) — cold = blue band, warm = red band; wide bands get inline labels, narrow bands get 45° leader labels in the top margin |
+| **Transition markers ▲/▼** | Zero-crossings of the stack rate on the Tidal + GIA + all cycles curve: ▲ PEAK (stack at max, rate turns negative → Earth spins up vs baseline → warm episode starts), ▼ TROUGH (stack at min → cooling starts). The matching console test *All cycles (4-flag stack) ↔ climate transitions* scans −5000 to +5000 CE and matches each crossing to the nearest named transition of the correct sign |
+| **Temperature overlay** | GISP2 (Alley 2000) Greenland ice-core reconstruction on a secondary right-hand °C-anomaly axis, 27,950 BC–1850 AD at 100-yr resolution — independent reconstruction, not part of any framework fit. A 5-kyr rolling-mean detrend (`lcrDetrendSeries`) removes the Milankovitch-scale trend so Bond-scale oscillations are visible |
+| **Evidence panels (3, collapsible)** | *Framework ↔ Bond 2001 IRD correlation (detrended)* — Pearson r for Σ_stack and for the isolated Bond harmonic, plus best-lag cross-correlation (±500 yr scan) · *Sign convention check* — Σ_stack sign vs warm/cold at 10 named events (6/6 within the validated window) · *Bond event ↔ nearest framework ▼ TROUGH crossing* — offsets from Bond 0–8 (1450 CE back to 9150 BC) |
+| **Export button** | "Export LOD-Climate graph" — paper-style SVG (white background, ESSRT-export typography) of the current tab with the currently-toggled layers |
+
+### Proxy roles (fixed, no user selector)
+
+- **Chart overlay** = GISP2 (Alley 2000) — smoothest signal across the widest window
+- **Correlation target** = Bond 2001 IRD stack — Bond's *own* dataset, the most direct out-of-sample validation of the framework's Bond harmonic (the IRD drift-ice signal is the same physical mass-redistribution signal the 8H/1830 harmonic models, which is why it correlates at +0.49 where GISP2 gives only +0.20)
+
+Both live in `public/input/climate-proxy.json` (loaded by `lcrLoadProxyData()` with GitHub raw-URL fallback).
+
+### Code Locations
+
+| Item | Location |
+|------|----------|
+| Modal block (comment header → close) | `src/script.js` ~lines 24198–25445, CSS prefix `.lcr-` (reuses `.cfm-*` modal chrome) |
+| `LCR_RANGE_TABS` / `LCR_CLIMATE_PERIODS` / `LCR_BOND_EVENTS` / `LCR_SIGN_CHECK_EVENTS` | ~24627 / ~24640 / ~24233 / ~24374 |
+| `lcrComputeSeries` (rate curves + crossings, cached per tab) | ~24661 |
+| `lcrRenderChart` / `lcrExport` | ~24712 / ~25078 |
+| `lcrComputeCorrelations` / `lcrRenderCorrelationPanel` / `lcrRenderSignCheckPanel` / `lcrRenderBondMatchTable` | ~24268 / ~24438 / ~24387 / ~24499 |
+| `createLcrPanel` / `openLcrPanel` / `closeLcrPanel` | ~25240 / ~25431 / ~25441 |
+| Tools folder button | ~30279 |
+
+### Full Reference
+
+The physics and validation methodology live in [doc 102 — GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) (4-flag stack derivation, Bond IRD cross-validation, sign-convention analysis) and [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) § "dLOD/dt decomposition at J2000" (the five-row taxonomy — Tidal baseline / GIA / All cycles / Tidal + GIA / Tidal + GIA + all cycles — shared by the tweakpane sub-folder, the dashboard export, and this modal).
 
 ---
 
