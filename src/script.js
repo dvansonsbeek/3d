@@ -24209,11 +24209,11 @@ let lcrProxyData = null;   // { sources: [{name, unit, range, data:[[year,°C],�
 // Stack rate and GIA rate are decomposition-only diagnostics — reachable via
 // the tweakpane dLOD/dt decomposition sub-folder, not needed in this modal.
 const lcrLayerVisibility = {
-  netL2: true,        // tidal + GIA (secular baseline)
-  netL3: true,        // + 4-flag stack (observable)
+  tidal: true,        // Tidal-only reference (+2.12 ms/cy, ~flat) — pure Moon-recession
+  netL2: true,        // Tidal + GIA (secular baseline)
+  netL3: true,        // Tidal + GIA + all cycles (observable); also gates the ▲/▼ transition markers
   bondCurve: true,    // Bond harmonic isolated (thin dashed) — expected 1466-yr sinusoid
   bands: true,        // named climate period bands (background shading)
-  crossings: true,    // framework zero-crossings as triangle markers
   proxy: false,       // temperature anomaly overlay (secondary Y-axis) — opt-in
 };
 
@@ -24557,7 +24557,7 @@ function lcrRenderBondMatchTable(hideTitle) {
     <table class="lcr-match-table">
       <thead>
         <tr>
-          <th>#</th><th>Mainstream</th><th></th><th>Framework</th><th>Offset</th>
+          <th>#</th><th>Literature</th><th></th><th>Framework</th><th>Offset</th>
         </tr>
       </thead>
       <tbody>${trRows}</tbody>
@@ -24620,15 +24620,16 @@ async function lcrLoadProxyData() {
   return lcrProxyData;
 }
 
-// Epoch tabs — different time windows for different narrative focuses.
-// The 'historical' tab is the default because it shows MWP/LIA/modern
-// warming clearly and matches the culturally-recognizable climate rhythm.
-// yMin/yMax are auto-computed at render time from visible data (see
-// lcrRenderChart); the label + xStep + window are fixed per tab.
+// Epoch tabs — six windows spanning deep past to deep future. Default is
+// 'historical' (750-2050 AD) — the culturally-recognizable window (MWP,
+// LIA, Modern). yMin/yMax auto-computed per tab from visible data.
 const LCR_RANGE_TABS = [
-  { key: 'historical', xLo:   800, xHi:  2050, label: '800 – 2050 AD',            xStep: 100  },
-  { key: 'future',     xLo:  2000, xHi:  5000, label: '2000 AD forward',          xStep: 250  },
-  { key: 'full',       xLo:-13000, xHi: 13000, label: 'Full (13,000 BC – 13,000 AD)', xStep: 2000 },
+  { key: 'deep',       xLo:-27500, xHi:  2050, label: '27,500 BC – 2050 AD',   xStep: 4000 },
+  { key: 'lgm',        xLo:-13000, xHi:  2050, label: '13,000 BC – 2050 AD',   xStep: 2000 },
+  { key: 'holocene',   xLo: -4000, xHi:  2050, label: '4,000 BC – 2050 AD',    xStep: 1000 },
+  { key: 'historical', xLo:   750, xHi:  2050, label: '750 – 2050 AD',         xStep: 100  },
+  { key: 'nearFuture', xLo:  1200, xHi:  2500, label: '1,200 – 2,500 AD',      xStep: 100  },
+  { key: 'full',       xLo:-13000, xHi: 15000, label: '13,000 BC – 15,000 AD', xStep: 2000 },
 ];
 let lcrSelectedRange = 'historical';
 
@@ -24636,7 +24637,9 @@ let lcrSelectedRange = 'historical';
 // Bands are drawn as light background rectangles behind the rate curves.
 // Sign convention: type 'cold' = blue band; 'warm' = red band.
 const LCR_CLIMATE_PERIODS = [
-  { start: -12900, end: -11700, type: 'cold', name: 'Younger Dryas',              src: 'Alley 2000' },
+  { start: -22000, end: -18000, type: 'cold', name: 'Last Glacial Maximum',       src: 'LGM sea-level minimum window ~24,000–20,000 BP' },
+  { start: -12050, end: -11750, type: 'cold', name: 'Older Dryas',                src: '14,000–13,700 BP cold reversal within Bølling-Allerød' },
+  { start: -10950, end:  -9750, type: 'cold', name: 'Younger Dryas',              src: 'Alley 2000 (12,900–11,700 BP → calendar 10,950–9,750 BC)' },
   { start:  -7000, end:  -3000, type: 'warm', name: 'Holocene Climatic Optimum',  src: 'various' },
   { start:  -6250, end:  -6100, type: 'cold', name: '8.2 ka event',               src: 'Alley 1997' },
   { start:  -3850, end:  -3750, type: 'cold', name: 'Bond 4 event',               src: 'Bond 2001' },
@@ -24663,6 +24666,7 @@ function lcrComputeSeries(rangeKey) {
   const step = Math.max(2, Math.round((xHi - xLo) / 600));
 
   const xs = [];
+  const tidal = [];
   const netL2 = [];
   const netL3 = [];
   const stack = [];
@@ -24674,6 +24678,7 @@ function lcrComputeSeries(rangeKey) {
     const t_Ma = (2000 - year) / 1e6;
     const d = dLodDtDecompositionAtAge(t_Ma);
     xs.push(year);
+    tidal.push(d.tidal);
     netL2.push(d.net_L2);
     netL3.push(d.net_L3);
     stack.push(d.stack);
@@ -24699,16 +24704,18 @@ function lcrComputeSeries(rangeKey) {
     }
   }
 
-  _lcrSeriesCache[rangeKey] = { xs, netL2, netL3, stack, gia, bond, crossings, xLo, xHi, step };
+  _lcrSeriesCache[rangeKey] = { xs, tidal, netL2, netL3, stack, gia, bond, crossings, xLo, xHi, step };
   return _lcrSeriesCache[rangeKey];
 }
 
 function lcrRenderChart(rangeKey) {
   const range = LCR_RANGE_TABS.find(r => r.key === rangeKey) || LCR_RANGE_TABS[0];
   const S = lcrComputeSeries(rangeKey);
-  const W = 1100, H = 470;
+  const W = 1100, H = 420;
   // right margin widened from 30 → 78 to accommodate the secondary temperature-anomaly axis.
-  const margin = { top: 40, right: 78, bottom: 90, left: 78 };
+  // top margin 50 leaves room for J2000 label + 2-3 rows of 45° leader labels
+  // pointing to narrow climate-period bands (Older Dryas, 8.2 ka event, etc.).
+  const margin = { top: 50, right: 78, bottom: 70, left: 78 };
   const plotW = W - margin.left - margin.right;
   const plotH = H - margin.top - margin.bottom;
 
@@ -24723,6 +24730,7 @@ function lcrRenderChart(rangeKey) {
       if (v > dataMax) dataMax = v;
     }
   };
+  if (lcrLayerVisibility.tidal) scan(S.tidal);
   if (lcrLayerVisibility.netL2) scan(S.netL2);
   if (lcrLayerVisibility.netL3) scan(S.netL3);
   // Bond isolated curve is rendered OFFSET by Net L2 so it visually
@@ -24788,20 +24796,24 @@ function lcrRenderChart(rangeKey) {
   // to read" panel + Framework baseline tooltip.)
   const iersLine = '';
 
-  // J2000 vertical (only if year 2000 is inside the range).
+  // J2000 vertical (only if year 2000 is inside the range). No text label —
+  // the tab range already communicates the epoch; the vertical line is only
+  // kept as a subtle visual anchor.
   let j2000Line = '';
   if (S.xLo <= 2000 && 2000 <= S.xHi) {
     const j2000X = xPos(2000);
-    j2000Line = `<line x1="${j2000X}" y1="${margin.top}" x2="${j2000X}" y2="${margin.top + plotH}" stroke="#e8e8e8" stroke-width="1.1" opacity="0.55"/>
-      <text x="${j2000X}" y="${margin.top - 6}" text-anchor="middle" font-size="10" fill="#e8e8e8" opacity="0.85">J2000</text>`;
+    j2000Line = `<line x1="${j2000X}" y1="${margin.top}" x2="${j2000X}" y2="${margin.top + plotH}" stroke="#e8e8e8" stroke-width="1.1" opacity="0.55"/>`;
   }
 
   // (Bond event markers removed from the chart — the Bond-match table below
   // provides the numeric mainstream-vs-framework comparison instead.)
 
   // Climate period bands (background shading). Cold = blue, warm = red.
-  // Label style adapts to plot pixel-width available per band; anti-collision
-  // stacks labels vertically when several bands overlap in x.
+  // Wide bands (≥60 px) get an inline horizontal label; narrower bands get
+  // their name in the top margin above the plot, connected by a thin
+  // 45°-angled leader line pointing down to the band top. Multiple narrow
+  // labels are staggered across 3 vertical rows to avoid overlapping each
+  // other.
   const bands = (() => {
     if (!lcrLayerVisibility.bands) return '';
     const visible = LCR_CLIMATE_PERIODS
@@ -24811,28 +24823,59 @@ function lcrRenderChart(rangeKey) {
         const x2 = xPos(Math.min(p.end, S.xHi));
         return { p, x1, x2, w: Math.max(1, x2 - x1), midX: (x1 + x2) / 2 };
       });
-    // Assign a label row (0,1,2) to reduce overlap; naive: alternate rows.
     const rects = [];
-    const labels = [];
-    // Sort by start; walk through and assign rows greedily based on last-x per row.
-    const rowLastX = [-Infinity, -Infinity, -Infinity];
+    const inlineLabels = [];
+    const leaderLabels = [];
+
+    // Inline-label anti-collision (wide bands): 2 rows inside plot area.
+    const inlineRowLastX = [-Infinity, -Infinity];
+    // Leader-label anti-collision (narrow bands): 3 rows staggered at
+    // different leader lengths so labels don't overlap in the top margin.
+    // Larger L pushes the label higher and further to the right of the band.
+    const LEADER_LENGTHS  = [12, 24, 36];
+    const leaderRowLastX  = [-Infinity, -Infinity, -Infinity];
+
     visible.forEach(({ p, x1, x2, w, midX }) => {
       const color = p.type === 'warm' ? '#e07070' : '#6db4ff';
       rects.push(`<rect x="${x1}" y="${margin.top}" width="${w}" height="${plotH}" fill="${color}" opacity="0.10" data-lcr-band="${p.name}" data-lcr-band-src="${p.src}"><title>${p.name} (${p.start}–${p.end}) — ${p.src}</title></rect>`);
-      if (w < 22) return; // too narrow to label
-      // Find first row where the previous label doesn't collide.
-      let row = 0;
-      for (row = 0; row < rowLastX.length; row++) {
-        if (midX - rowLastX[row] >= 50) break;
+
+      if (w >= 60) {
+        // Wide band — horizontal inline label at the top of the band.
+        let row = 0;
+        for (row = 0; row < inlineRowLastX.length; row++) {
+          if (midX - inlineRowLastX[row] >= 50) break;
+        }
+        if (row >= inlineRowLastX.length) return;
+        inlineRowLastX[row] = midX;
+        const y = margin.top + 12 + row * 14;
+        const maxChars = Math.max(6, Math.floor(w / 6));
+        const displayName = p.name.length > maxChars ? p.name.slice(0, maxChars - 1) + '…' : p.name;
+        inlineLabels.push(`<text x="${midX}" y="${y}" text-anchor="middle" font-size="11" fill="${color}" opacity="0.95" font-weight="600">${displayName}</text>`);
+      } else {
+        // Narrow band — leader label in the top margin, connected by a
+        // thin 45° line pointing down to the band top. Try each row until
+        // the label fits without colliding with the previous label in that
+        // row (~6 px per character estimate).
+        const labelWEst = p.name.length * 6 + 6;
+        let row = 0;
+        for (row = 0; row < LEADER_LENGTHS.length; row++) {
+          const L = LEADER_LENGTHS[row];
+          const labelStartX = midX + L;
+          if (labelStartX - leaderRowLastX[row] >= labelWEst + 10) break;
+        }
+        if (row >= LEADER_LENGTHS.length) return; // no free row
+        const L = LEADER_LENGTHS[row];
+        const labelStartX = midX + L;
+        leaderRowLastX[row] = labelStartX + labelWEst;
+        const labelX = labelStartX + 3;
+        const labelY = margin.top - L + 3; // slight baseline padding
+        leaderLabels.push(
+          `<line x1="${midX.toFixed(1)}" y1="${margin.top}" x2="${(midX + L).toFixed(1)}" y2="${(margin.top - L).toFixed(1)}" stroke="${color}" stroke-width="0.6" opacity="0.7"/>` +
+          `<text x="${labelX.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="start" font-size="10" fill="${color}" opacity="0.95" font-weight="600">${p.name}</text>`
+        );
       }
-      if (row >= rowLastX.length) return; // no free row → skip label
-      rowLastX[row] = midX;
-      const y = margin.top + 12 + row * 14;
-      const maxChars = Math.max(6, Math.floor(w / 6));
-      const displayName = p.name.length > maxChars ? p.name.slice(0, maxChars - 1) + '…' : p.name;
-      labels.push(`<text x="${midX}" y="${y}" text-anchor="middle" font-size="11" fill="${color}" opacity="0.95" font-weight="600">${displayName}</text>`);
     });
-    return rects.join('') + labels.join('');
+    return rects.join('') + inlineLabels.join('') + leaderLabels.join('');
   })();
 
   // Curve helpers.
@@ -24850,6 +24893,12 @@ function lcrRenderChart(rangeKey) {
   }
 
   const paths = [];
+  // Tidal-only reference (~flat at +2.12 ms/cy). Drawn first so the other
+  // physical layers stack visibly above it. Dashed rust color reads as a
+  // bedrock reference rather than a derived prediction.
+  if (lcrLayerVisibility.tidal) {
+    paths.push(`<path d="${pathFor(S.tidal)}" fill="none" stroke="#c46a4d" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.9" data-lcr-curve="tidal"/>`);
+  }
   if (lcrLayerVisibility.netL2) {
     paths.push(`<path d="${pathFor(S.netL2)}" fill="none" stroke="#4dd0c8" stroke-width="2" opacity="0.95" data-lcr-curve="netL2"/>`);
   }
@@ -24873,7 +24922,10 @@ function lcrRenderChart(rangeKey) {
   // Net L3 crosses Net L2. Placing them there makes the visual meaning
   // immediate: "at this year, prediction touches baseline; before/after it
   // swings warm or cold". Falls back to zero line if netL2 is null.
-  const crossingMarks = lcrLayerVisibility.crossings ? S.crossings.map(c => {
+  // Transition markers piggy-back on Framework prediction (netL3) visibility —
+  // they mark zero-crossings of the sub-Milankovitch stack, which is the very
+  // signal Net L3 adds. Separate toggle previously; now one control.
+  const crossingMarks = lcrLayerVisibility.netL3 ? S.crossings.map(c => {
     if (c.year < S.xLo || c.year > S.xHi) return '';
     const x = xPos(c.year);
     // Interpolate Net L2 at c.year for the marker's Y position.
@@ -24889,9 +24941,9 @@ function lcrRenderChart(rangeKey) {
   }).join('') : '';
 
   // ── Secondary Y-axis: climate proxy overlay (temperature anomaly, °C) ──
-  // Auto-select in-range proxies. Moberg (fine resolution, 0-1975 CE) preferred
-  // when the window is CE-dominant; GISP2 (coarser, Holocene through LGM) fills
-  // the deep past. Both plotted on the SAME right-hand °C-anomaly axis.
+  // Renders LCR_CHART_PROXY (GISP2 Alley 2000, 27,950 BC – 1850 AD at 100-yr
+  // resolution, extended by two chart-only anchor points to 2000 AD) on the
+  // right-hand °C-anomaly axis.
   let proxyGroup = '';
   if (lcrLayerVisibility.proxy && lcrProxyData && lcrProxyData.sources) {
     const activeSources = lcrProxyData.sources
@@ -24922,7 +24974,6 @@ function lcrRenderChart(rangeKey) {
       const yPosProxy = (t) => margin.top + (1 - (t - proxyMin) / (proxyMax - proxyMin)) * plotH;
 
       const proxyColors = {
-        'Moberg 2005':          '#ff66c0',
         'GISP2 (Alley 2000)':   '#ff5978',
       };
       const proxyPaths = activeSources.map(({ src, filtered }) => {
@@ -25018,6 +25069,173 @@ ${src.region} • ${src.unit}</title></path>`;
   </svg>`;
 }
 
+/** Export the currently-visible LOD-Climate Rhythm chart as a paper-style
+ *  SVG (white background, dark text) in a new tab. Reuses lcrRenderChart's
+ *  output — strips hover overlays, remaps dark-theme colors to light-theme
+ *  equivalents, and wraps in an outer SVG with title, subtitle, and footer.
+ *  Curve/band colors are kept as-is — they read fine on white too. */
+function lcrExport() {
+  const rangeKey = lcrSelectedRange;
+  const range = LCR_RANGE_TABS.find(r => r.key === rangeKey) || LCR_RANGE_TABS[0];
+
+  // 1. Get the interactive chart SVG, then strip the outer <svg> wrapper so
+  //    the inner elements can be placed inside our paper outer SVG at an
+  //    offset via <g transform="translate(...)">.
+  let inner = lcrRenderChart(rangeKey);
+  inner = inner.replace(/^\s*<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+
+  // 2. Strip the hover overlays (invisible in-app, pollute the export).
+  inner = inner.replace(/<[^>]*class="lcr-hover-[a-z]+"[^>]*(?:\/>|>[^<]*<\/[a-z]+>)/g, '');
+
+  // 3. Recolor dark-theme surfaces + text + curves for a white background.
+  //    Dark-theme pastels (bright teal, pale gold, light lavender) wash out
+  //    on white — remap each to a darker/deeper equivalent that keeps its
+  //    hue identity but reads with enough contrast on paper.
+  const PRINT = {
+    teal:     '#0f8e83',   // Tidal + GIA         (was #4dd0c8)
+    gold:     '#c68a13',   // Tidal + GIA + all cycles (was #ffce4b)
+    lavender: '#6d3ee0',   // Bond cycle          (was #c084fc)
+    rust:     '#a4553d',   // Tidal baseline      (was #c46a4d — nudge darker)
+    pink:     '#e63959',   // Temperature (GISP2) (was #ff5978)
+    peak:     '#c62838',   // PEAK triangles      (was #ff4757)
+    trough:   '#1a72c9',   // TROUGH triangles    (was #4dabff)
+    warmBand: '#c94040',   // warm period band + leader labels (was #e07070)
+    coldBand: '#3d84e0',   // cold period band + leader labels (was #6db4ff)
+  };
+  const colorMap = [
+    // Backgrounds / grid / text
+    [/fill="#0e1116"/g,                     'fill="#ffffff"'],
+    // Plot-area frame: match ESSRT — dark, thin border.
+    [/stroke="rgba\(255,255,255,\.08\)"/g,  'stroke="#222"'],
+    [/fill="#d4d4d4"/g,                     'fill="#222222"'],
+    [/stroke="#2a2f37"/g,                   'stroke="#ececec"'],
+    [/stroke="#e8e8e8"/g,                   'stroke="#999999"'],
+    [/stroke="#888"/g,                      'stroke="#666666"'],
+    // Curves
+    [/stroke="#4dd0c8"/g,                   `stroke="${PRINT.teal}"`],
+    [/stroke="#ffce4b"/g,                   `stroke="${PRINT.gold}"`],
+    [/stroke="#c084fc"/g,                   `stroke="${PRINT.lavender}"`],
+    [/stroke="#c46a4d"/g,                   `stroke="${PRINT.rust}"`],
+    [/stroke="#ff5978"/g,                   `stroke="${PRINT.pink}"`],
+    [/fill="#ff5978"/g,                     `fill="${PRINT.pink}"`],
+    // Peak / trough triangles
+    [/fill="#ff4757"/g,                     `fill="${PRINT.peak}"`],
+    [/fill="#4dabff"/g,                     `fill="${PRINT.trough}"`],
+    // Band shading + narrow-band leader labels
+    [/fill="#e07070"/g,                     `fill="${PRINT.warmBand}"`],
+    [/fill="#6db4ff"/g,                     `fill="${PRINT.coldBand}"`],
+    [/stroke="#e07070"/g,                   `stroke="${PRINT.warmBand}"`],
+    [/stroke="#6db4ff"/g,                   `stroke="${PRINT.coldBand}"`],
+    // Boost band-rect opacity from 0.10 → 0.16 so shading reads on white.
+    [/(<rect[^>]*data-lcr-band[^>]*)opacity="0\.10"/g, '$1opacity="0.16"'],
+  ];
+  for (const [pat, repl] of colorMap) inner = inner.replace(pat, repl);
+
+  // Bump the three axis labels (Y "dLOD/dt", X "Calendar year", right-hand
+  // "Temperature anomaly") from screen-scale 11 pt to paper-scale 13 pt so
+  // they read at print size (matches ESSRT). Targeted by their text content
+  // so the many other 11 pt labels (bands, ticks) stay put.
+  inner = inner.replace(/(<text[^>]+)font-size="11"([^>]*>dLOD\/dt)/,        '$1font-size="13"$2');
+  inner = inner.replace(/(<text[^>]+)font-size="11"([^>]*>Calendar year)/,   '$1font-size="13"$2');
+  inner = inner.replace(/(<text[^>]+)font-size="11"([^>]*>Temperature anom)/,'$1font-size="13"$2');
+
+  // 4. Pull the validated-window Bond 2001 IRD correlation for the subtitle.
+  const corr = lcrComputeCorrelations(-4000, 1800);
+  const rTxt = (corr && corr.r_stack != null)
+    ? `${corr.r_stack >= 0 ? '+' : ''}${corr.r_stack.toFixed(2)}`
+    : 'n/a';
+
+  // 5. Compose the outer paper SVG. Chart is 1100x420; add margin for
+  //    title, subtitle, a horizontal legend row above the chart, and a
+  //    one-line footer below. Typography matches the ESSRT paper export:
+  //    centered title (20pt, weight 600, #111), centered subtitle (12pt,
+  //    #555), centered legend (12pt, #333), and a right-aligned credit
+  //    line at 9pt #888.
+  const chartW = 1100, chartH = 420;
+  const chartX = 50;
+  const legendY = 94;                      // baseline of legend row
+  const chartY  = legendY + 22;            // chart starts below the legend
+  const outerW  = chartW + 100;
+  const outerH  = chartY + chartH + 44;    // footer sits at bottom
+  const xmlEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // Legend row — one entry per currently-visible layer. Swatches use the
+  // PRINT palette so they match the darkened curves in the recolored chart.
+  // Widths are approximate (~6.4 px per character at font-size 12) so the
+  // row can be pre-measured and centered without touching the DOM.
+  const legendEntries = [];
+  const swatchW = 26;
+  const swatchLabelGap = 7;
+  const entryGap = 26;
+  if (lcrLayerVisibility.tidal) {
+    legendEntries.push({
+      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.rust}" stroke-width="1.6" stroke-dasharray="4,3"/>`,
+      label: 'Tidal baseline',
+    });
+  }
+  if (lcrLayerVisibility.netL2) {
+    legendEntries.push({
+      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.teal}" stroke-width="2.2"/>`,
+      label: 'Tidal + GIA',
+    });
+  }
+  if (lcrLayerVisibility.netL3) {
+    legendEntries.push({
+      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.gold}" stroke-width="2.2"/>`,
+      label: 'Tidal + GIA + all cycles',
+    });
+  }
+  if (lcrLayerVisibility.bondCurve) {
+    legendEntries.push({
+      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.lavender}" stroke-width="1.4" stroke-dasharray="5,3"/>`,
+      label: 'Bond cycle',
+    });
+  }
+  if (lcrLayerVisibility.bands) {
+    legendEntries.push({
+      swatch: `<rect x="0" y="-5" width="${swatchW / 2}" height="10" fill="${PRINT.warmBand}" opacity="0.35"/><rect x="${swatchW / 2}" y="-5" width="${swatchW / 2}" height="10" fill="${PRINT.coldBand}" opacity="0.35"/>`,
+      label: 'Periods (warm / cold)',
+    });
+  }
+  if (lcrLayerVisibility.proxy) {
+    legendEntries.push({
+      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.pink}" stroke-width="1.8"/>`,
+      label: 'Temperature (GISP2)',
+    });
+  }
+
+  const itemWidths = legendEntries.map(e => swatchW + swatchLabelGap + e.label.length * 6.4);
+  const totalLegendW = itemWidths.reduce((a, b) => a + b, 0) + entryGap * Math.max(0, legendEntries.length - 1);
+  let legendX = Math.max(24, (outerW - totalLegendW) / 2);
+  const legendSvg = legendEntries.map((e, i) => {
+    const item = `<g transform="translate(${legendX}, ${legendY})">
+      ${e.swatch}
+      <text x="${swatchW + swatchLabelGap}" y="4" font-size="12" fill="#333333">${xmlEsc(e.label)}</text>
+    </g>`;
+    legendX += itemWidths[i] + entryGap;
+    return item;
+  }).join('');
+
+  const paperSvg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${outerW} ${outerH}" width="${outerW}" height="${outerH}" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <rect width="${outerW}" height="${outerH}" fill="#ffffff"/>
+  <text x="${outerW / 2}" y="38" text-anchor="middle" font-size="20" font-weight="600" fill="#111">LOD–Climate Rhythm — ${xmlEsc(range.label)}</text>
+  <text x="${outerW / 2}" y="64" text-anchor="middle" font-size="12" fill="#555">Framework's cyclic LOD prediction (Tidal + GIA + all cycles) versus Bond 2001 IRD — r = ${rTxt} in the validated window (4,000 BC – 1,800 AD).</text>
+  ${legendSvg}
+  <g transform="translate(${chartX}, ${chartY})">
+    ${inner}
+  </g>
+  <text x="${outerW - 16}" y="${outerH - 10}" text-anchor="end" font-size="9" fill="#888">LOD-Climate Rhythm · Holistic Universe Model · H = 335,317 yr · Out-of-sample retrodiction (fit: Espenak ΔT 1650–2017, no climate proxies)</text>
+</svg>`;
+
+  const blob = new Blob([paperSvg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) {
+    win.addEventListener('load', () => { win.document.title = `LOD–Climate Rhythm — ${range.label}`; });
+  }
+}
+
 async function createLcrPanel() {
   const panel = document.createElement('div');
   panel.id = 'lodClimateRhythmPanel';
@@ -25029,11 +25247,11 @@ async function createLcrPanel() {
 
   const layerToggles = `
     <div class="cfm-layer-toggles">
-      <label class="cfm-layer-check" title="Framework's secular baseline = Layer 2 net rate = tidal + GIA (Milankovitch physics only). At J2000: +1.77 ms/cy, matches IERS +1.75."><input type="checkbox" data-lcr-layer="netL2" ${lcrLayerVisibility.netL2 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL2"></span>Framework baseline</label>
-      <label class="cfm-layer-check" title="Framework's full prediction = Layer 3 net rate = tidal + GIA + 4-flag ΔT stack. The observable dLOD/dt including sub-Milankovitch modulation. At J2000: +0.764 ms/cy."><input type="checkbox" data-lcr-layer="netL3" ${lcrLayerVisibility.netL3 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL3"></span>Framework prediction</label>
-      <label class="cfm-layer-check" title="Bond 8H/1830 harmonic ISOLATED from the 4-flag stack. A clean 1466-yr sinusoid — its zero-crossings should align with Bond cycle timing if the framework captures the Bond cycle. Full-stack prediction has additional Hallstatt / Jose5 / Jose4 crossings on top of this."><input type="checkbox" data-lcr-layer="bondCurve" ${lcrLayerVisibility.bondCurve ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bondcurve"></span>Bond cycle</label>
+      <label class="cfm-layer-check" title="Pure tidal channel = Moon-recession torque only, no GIA compensation, no cycles. At J2000: +2.12 ms/cy. Essentially flat across the Holocene. Provides a physical reference height above which GIA subtracts and the ΔT cycles oscillate."><input type="checkbox" data-lcr-layer="tidal" ${lcrLayerVisibility.tidal ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-tidal"></span>Tidal baseline</label>
+      <label class="cfm-layer-check" title="Tidal + GIA secular rate = Layer 2 net rate = Moon recession minus the Milankovitch mass-response drag. At J2000: +1.77 ms/cy, matches IERS +1.75."><input type="checkbox" data-lcr-layer="netL2" ${lcrLayerVisibility.netL2 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL2"></span>Tidal + GIA</label>
+      <label class="cfm-layer-check" title="Framework's full prediction = Layer 3 net rate = tidal + GIA + all 4 lattice cycles (Bond + Hallstatt + Jose5 + Jose4). The observable dLOD/dt including cyclic modulation. At J2000: +0.764 ms/cy."><input type="checkbox" data-lcr-layer="netL3" ${lcrLayerVisibility.netL3 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL3"></span>Tidal + GIA + all cycles</label>
+      <label class="cfm-layer-check" title="Bond 8H/1830 harmonic ISOLATED from the 4-cycle stack. A clean 1466-yr sinusoid — its zero-crossings should align with Bond cycle timing if the framework captures the Bond cycle. Full-stack prediction has additional Hallstatt / Jose5 / Jose4 crossings on top of this."><input type="checkbox" data-lcr-layer="bondCurve" ${lcrLayerVisibility.bondCurve ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bondcurve"></span>Bond cycle</label>
       <label class="cfm-layer-check" title="Named climate period bands from mainstream literature. Cold = blue; Warm = red."><input type="checkbox" data-lcr-layer="bands" ${lcrLayerVisibility.bands ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bands"></span>Periods</label>
-      <label class="cfm-layer-check" title="Framework's predicted climate transitions — zero-crossings of the stack rate, drawn on the Framework baseline line (where prediction and baseline coincide). Up-triangle = warm-anomaly peak (cooling starts after); Down-triangle = cold-anomaly trough (warming starts after)."><input type="checkbox" data-lcr-layer="crossings" ${lcrLayerVisibility.crossings ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-cross"></span>Predicted transitions</label>
       <label class="cfm-layer-check" title="GISP2 Alley 2000 Greenland ice-core temperature reconstruction on the secondary right-hand °C-anomaly axis. Independent paleoclimate reconstruction — not part of the framework fit. Covers 27,950 BC to 1850 AD at 100-yr resolution, with two anchor points appended at 1950 and 2000 AD for visual continuity to the modern era."><input type="checkbox" data-lcr-layer="proxy" ${lcrLayerVisibility.proxy ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxy"></span>Temperature (GISP2)</label>
     </div>
   `;
@@ -25043,7 +25261,8 @@ async function createLcrPanel() {
     <div class="cfm-container">
       <div class="cfm-header">
         <div class="cfm-title">LOD-Climate Rhythm</div>
-        <div class="cfm-subtitle">Sub-Milankovitch driver decomposition (tidal + GIA + 4-flag stack) mapped against named historical climate transitions</div>
+        <div class="cfm-subtitle">Framework's cyclic LOD prediction, compared against paleoclimate proxy data</div>
+        <button class="cfm-export-btn" data-lcr-export title="Export the current chart (with the layers currently toggled) as a paper-style SVG in a new tab — white background, dark text.">Export LOD-Climate graph</button>
         <div class="cfm-close" title="Close"></div>
       </div>
       <div class="cfm-body">
@@ -25054,11 +25273,12 @@ async function createLcrPanel() {
         </div>
         <div class="lcr-legend-panel">
           <div class="lcr-legend-note">
-            <b>How to read:</b> <b>Framework baseline</b> (teal) is the tidal + GIA secular rate (≈ IERS +1.75 ms/cy at J2000).
-            <b>Framework prediction</b> (gold) adds cyclic modulation from the 4-flag stack — where it swings
-            above / below the baseline, the framework's cyclic contribution pushes Earth's rotation above/below the trend.
-            <b>Bond harmonic only</b> (lavender dashed) isolates the 8H/1830 (1466-yr) component — a clean sinusoid
-            around the baseline.
+            <b>How to read:</b> Each line adds one physical mechanism on top of the previous.
+            <b>Tidal baseline</b> (dashed rust) is the pure Moon-recession rate (+2.12 ms/cy, ~flat).
+            <b>Tidal + GIA</b> (teal) subtracts the Milankovitch mass-response drag (≈ IERS +1.77 ms/cy at J2000).
+            <b>Tidal + GIA + all cycles</b> (gold) adds cyclic modulation from the 4 lattice cycles (Bond + Hallstatt + Jose5 + Jose4)
+            — where it swings above / below the teal line, the cyclic contribution is pushing Earth's rotation above/below the secular trend.
+            <b>Bond cycle</b> (lavender dashed) isolates the 8H/1830 (1466-yr) component alone — a clean sinusoid around the teal baseline.
             The correlation panel below quantifies the alignment — framework's Σ_stack correlates positively at
             <b>r = +0.49</b> with the Bond 2001 IRD dataset in the validated window (out-of-sample; framework fit used
             only Espenak ΔT 1650-2017, no climate proxies).
@@ -25106,6 +25326,9 @@ async function createLcrPanel() {
     });
   });
 
+  const exportBtn = panel.querySelector('[data-lcr-export]');
+  if (exportBtn) exportBtn.addEventListener('click', lcrExport);
+
 
   // Hover tooltip binding — delegates to the .lcr-hover-capture rect.
   function bindLcrHover() {
@@ -25118,14 +25341,15 @@ async function createLcrPanel() {
     // Must match margins used in lcrRenderChart above — otherwise plotW is
     // wrong and the hover-year lookup drifts (~60 yr shift observed when
     // right went 30 → 78 for the secondary axis but this constant lagged).
-    const margin = { top: 40, right: 78, bottom: 90, left: 78 };
+    const margin = { top: 50, right: 78, bottom: 70, left: 78 };
     const plotW = W - margin.left - margin.right;
-    const plotH = 470 - margin.top - 90;
+    const plotH = 420 - margin.top - 70;
     const xLo = S.xLo, xHi = S.xHi;
     // Re-derive the auto Y range the same way lcrRenderChart does so the
     // hover dot's Y coordinate matches the visible curve pixel-for-pixel.
     let dataMin = +Infinity, dataMax = -Infinity;
     const scanH = (arr) => { for (const v of arr) if (v != null) { if (v < dataMin) dataMin = v; if (v > dataMax) dataMax = v; } };
+    if (lcrLayerVisibility.tidal) scanH(S.tidal);
     if (lcrLayerVisibility.netL2) scanH(S.netL2);
     if (lcrLayerVisibility.netL3) scanH(S.netL3);
     if (dataMin > 0)    dataMin = 0;
@@ -29474,21 +29698,15 @@ function setupGUI() {
   ]);
 
   const daysFolder = astroFolder.addFolder({ title: 'Day Lengths' });
-
-  // Solar Day sub-folder \u2014 3 LOD layer rows
-  const astroSolarDayFolder = daysFolder.addFolder({ title: 'Solar Day' });
   const fmt6 = v => v.toFixed(6);
-  addTooltip(astroSolarDayFolder.addBinding(predictions, 'solarDayLayer1', {
-    label: 'Layer 1 (Tidal Mean)', readonly: true, format: fmt6
-  }), 'Layer 1: pure-tidal chain with \u03b1 at long-term climate mean + H/5 ecliptic missing-motion correction. Sits ~0.107 s above Layer 2 at J2000 because J2000 is near an L1 minimum (\u03b1 at climate-mean > \u03b1 at J2000).');
-  addTooltip(astroSolarDayFolder.addBinding(predictions, 'solarDayLayer2', {
-    label: 'Layer 2 (+ GIA)', readonly: true, format: fmt6
-  }), 'Layer 2: Layer 1 with \u03b1(t) applied at current epoch (at J2000 \u03b1 = EARTH_MOI_FACTOR exactly). Physics baseline used by year-length derivations. At J2000 = 86400.003203 s.');
-  addTooltip(astroSolarDayFolder.addBinding(predictions, 'lodReal', {
-    label: 'Solar Day = REAL', readonly: true, format: fmt6
-  }), 'Layer 3 = REAL LOD: Layer 2 + sum of Bond/Hallstatt/Jose5/Jose4 cyclic \u03b4LOD corrections. Physical length of one solar day. At J2000 \u2248 86400.002593 s (matches USNO 86400.0026 s anchor by construction).');
 
-  // Sidereal + Stellar Day at folder level
+  // Top-level day-length rows: Solar / Sidereal / Stellar. Solar Day (s)
+  // is the framework's full prediction (Tidal + GIA + all cycles) \u2014 a
+  // single-line summary; the Solar Day decomposition sub-folder below
+  // breaks it into its physical layers.
+  addTooltip(daysFolder.addBinding(predictions, 'lodReal', {
+    label: 'Solar Day (s)', readonly: true, format: fmt6
+  }), 'Physical (observable) length of one solar day = framework\'s full prediction (Tidal + GIA + all cycles). At J2000 \u2248 86400.002593 s. Broken down in the Solar Day decomposition sub-folder below.');
   addTooltip(daysFolder.addBinding(predictions, 'siderealDayReal', {
     label: 'Sidereal Day (s)', readonly: true, format: fmt6
   }), 'One rotation relative to the vernal equinox. Shorter than a solar day by ~235.9 s.');
@@ -29505,24 +29723,40 @@ function setupGUI() {
     label: 'Rate (s/yr)', readonly: true, format: v => v.toFixed(4)
   }), 'Current d(\u0394T)/dt = (LOD_real \u2212 86400) \u00d7 solarYearDays. LOD_real is Layer 3 = o.lodKinematic + h5Correction + dtCycleLodCorrectionSum(year), i.e. the same value shown as Solar Day = REAL. Positive = clocks running slower than TT (Earth day > 86400 SI s).');
 
+  // Solar Day decomposition sub-folder \u2014 3 rows breaking down the physical
+  // solar day by the same layer stacking used in the dLOD/dt decomposition
+  // (Tidal baseline \u2192 Tidal + GIA \u2192 Tidal + GIA + all cycles). Collapsed by
+  // default \u2014 the top-level Solar Day (s) row already carries the summary.
+  const astroSolarDayFolder = daysFolder.addFolder({ title: 'Solar Day decomposition', expanded: false });
+  addTooltip(astroSolarDayFolder.addBinding(predictions, 'solarDayLayer1', {
+    label: 'Tidal baseline', readonly: true, format: fmt6
+  }), 'Pure-tidal chain with \u03b1 held at its long-term climate mean + H/5 ecliptic missing-motion correction \u2014 Moon-recession contribution only, no GIA response, no cycles. Sits ~0.107 s above Tidal + GIA at J2000 because J2000 is near a minimum (\u03b1 at climate-mean > \u03b1 at J2000).');
+  addTooltip(astroSolarDayFolder.addBinding(predictions, 'solarDayLayer2', {
+    label: 'Tidal + GIA', readonly: true, format: fmt6
+  }), 'Tidal baseline with \u03b1(t) applied at the current epoch (at J2000 \u03b1 = EARTH_MOI_FACTOR exactly). Secular baseline used by year-length derivations. At J2000 = 86400.003203 s.');
+  addTooltip(astroSolarDayFolder.addBinding(predictions, 'lodReal', {
+    label: 'Tidal + GIA + all cycles', readonly: true, format: fmt6
+  }), 'Framework\'s full solar-day prediction: Tidal + GIA + sum of Bond/Hallstatt/Jose5/Jose4 cyclic \u03b4LOD corrections. Physical length of one solar day. At J2000 \u2248 86400.002593 s (matches USNO 86400.0026 s anchor by construction). Same value shown as the top-level "Solar Day (s)" row.');
+
   // dLOD/dt driver decomposition sub-folder \u2014 tidal + GIA + sub-Milankovitch stack producing observed LOD growth.
-  const dLodDtFolder = daysFolder.addFolder({ title: 'dLOD/dt decomposition' });
+  // Collapsed by default \u2014 the numbers are diagnostic rather than everyday.
+  const dLodDtFolder = daysFolder.addFolder({ title: 'dLOD/dt decomposition', expanded: false });
   const fmt3msCy = v => v.toFixed(3) + ' ms/cy';
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtTidal_msCy', {
-    label: 'Tidal (LLR \u03b1\u2081)', readonly: true, format: fmt3msCy
-  }), 'Tidal channel contribution to dLOD/dt at current epoch (Layer 2 physics). Moon recession via angular-momentum conservation using Farhat 2022 polynomial (LLR-anchored at 3.82 cm/yr at J2000, Dickey 1994 / Chapront 2002). At J2000: +2.12 ms/century. Sign is positive \u2014 Earth loses angular momentum to the Moon, spins slower, LOD grows.');
+    label: 'Tidal baseline', readonly: true, format: fmt3msCy
+  }), 'Pure tidal channel \u2014 Moon-recession torque only, no GIA compensation, no cycles. Angular-momentum conservation using Farhat 2022 polynomial (LLR-anchored at 3.82 cm/yr at J2000, Dickey 1994 / Chapront 2002). At J2000: +2.12 ms/century, essentially flat across the Holocene. Sign is positive \u2014 Earth loses angular momentum to the Moon, spins slower, LOD grows. Bedrock reference above which GIA subtracts and cycles oscillate.');
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtGia_msCy', {
-    label: 'GIA (\u03b1(t) coupling)', readonly: true, format: fmt3msCy
-  }), 'GIA channel contribution to dLOD/dt at current epoch (Layer 2 physics). L1-orbital-coupled \u03b1(t): dLOD/dt = LOD \u00d7 (d\u03b1/dt) / \u03b1. At J2000: \u22120.35 ms/century (from Cox & Chao dJ\u2082/dt \u00d7 factor-2.0 J\u2082\u2192\u03b1 conversion, Peltier ICE-6G LOD-coupling range). Sign is negative in the Holocene \u2014 mass migrating from oceans back onto polar continents shrinks Earth\'s polar moment \u03b1, spinning Earth up. Sign flips over glacial cycles: reaches ~+0.6 ms/cy near year 13,000 AD (returning glacial max), passes through 0 near 5,000 AD and 23,000 BCE, reaches ~\u22121.2 ms/cy near 11,000 BCE (glacial minimum \u2192 interglacial ramp).');
+    label: 'GIA', readonly: true, format: fmt3msCy
+  }), 'Glacial Isostatic Adjustment channel (\u03b1(t) coupling). L1-orbital-coupled \u03b1(t): dLOD/dt = LOD \u00d7 (d\u03b1/dt) / \u03b1. At J2000: \u22120.35 ms/century (from Cox & Chao dJ\u2082/dt \u00d7 factor-2.0 J\u2082\u2192\u03b1 conversion, Peltier ICE-6G LOD-coupling range). Sign is negative in the Holocene \u2014 mass migrating from oceans back onto polar continents shrinks Earth\'s polar moment \u03b1, spinning Earth up. Sign flips over glacial cycles: reaches ~+0.6 ms/cy near year 13,000 AD (returning glacial max), passes through 0 near 5,000 AD and 23,000 BCE, reaches ~\u22121.2 ms/cy near 11,000 BCE (glacial minimum \u2192 interglacial ramp).');
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtStack_msCy', {
-    label: 'Sub-Milankovitch stack', readonly: true, format: fmt3msCy
-  }), 'Sub-Milankovitch 4-flag \u0394T stack rate at current epoch (Layer 3 addition). d/dt of the Bond (1466 yr) + Hallstatt (2430 yr) + Jose5 (897 yr) + Jose4 (715 yr) cyclic \u03b4LOD sum. Captures millennial-scale rhythm on top of the Milankovitch-scale GIA channel; maps to sub-Milankovitch climate oscillations (Bond events, Hallstatt cycle solar-activity modulation, etc.). Zero-mean over long periods; sign flips on each half-period of each harmonic.');
+    label: 'All cycles', readonly: true, format: fmt3msCy
+  }), 'Sum of the 4 sub-Milankovitch lattice cycles: Bond (1466 yr) + Hallstatt (2430 yr) + Jose5 (897 yr) + Jose4 (715 yr). d/dt of their combined \u03b4LOD contribution. Captures millennial-scale rhythm on top of the Tidal + GIA secular baseline; maps to sub-Milankovitch climate oscillations (Bond events, Hallstatt cycle solar-activity modulation, etc.). Zero-mean over long periods; sign flips on each half-period of each harmonic.');
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtNetL2_msCy', {
-    label: 'Net Layer 2', readonly: true, format: fmt3msCy
-  }), 'Layer 2 net = tidal + GIA. At J2000: +1.77 ms/century, matching IERS observation of +1.75 ms/century within 1%. No parameters fitted to the observed rate \u2014 both channels come from independent literature anchors (LLR + Cox & Chao). The ~17% cancellation between tidal and GIA at J2000 is what makes the observed Earth-rotation slowdown smaller than the pure-tidal rate.');
+    label: 'Tidal + GIA', readonly: true, format: fmt3msCy
+  }), 'Secular baseline = Tidal + GIA. At J2000: +1.77 ms/century, matching IERS observation of +1.75 ms/century within 1%. No parameters fitted to the observed rate \u2014 both channels come from independent literature anchors (LLR + Cox & Chao). The ~17% cancellation between Tidal and GIA at J2000 is what makes the observed Earth-rotation slowdown smaller than the pure-tidal rate.');
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtNetL3_msCy', {
-    label: 'Net Layer 3', readonly: true, format: fmt3msCy
-  }), 'Layer 3 net = tidal + GIA + sub-Milankovitch stack. The full observable dLOD/dt including millennial modulation. Layer 3 diverges from Layer 2 by the stack rate on ~1-2 kyr timescales. Above the long-term Layer 2 trend at some epochs (contributing to cooling excursions like the Little Ice Age); below at others (contributing to warm anomalies like the Medieval Warm Period).');
+    label: 'Tidal + GIA + all cycles', readonly: true, format: fmt3msCy
+  }), 'Framework\'s full prediction = Tidal + GIA + All cycles. The full observable dLOD/dt including millennial modulation. Diverges from the Tidal + GIA baseline by the All cycles rate on ~1-2 kyr timescales. Above the baseline at some epochs (contributing to cooling excursions like the Little Ice Age); below at others (contributing to warm anomalies like the Medieval Warm Period).');
 
   const yearsFolder = astroFolder.addFolder({ title: 'Solar Year' });
   const fmt8 = v => v.toFixed(8);

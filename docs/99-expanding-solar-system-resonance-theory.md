@@ -382,15 +382,21 @@ This gap is not fixed — it oscillates with the glacial cycle. Over the ~100 ky
 
 Cross-references: `meanLodSecondsAtAgeMeanAlpha` in `src/script.js` (Layer 1 tidal chain with climate-mean α), `meanLodSecondsAtAge` (Layer 2 tidal + GIA at α(t)), `dtCycleLodCorrectionSum` (Layer 3 stack addition), predictions bindings `solarDayLayer1` / `solarDayLayer2` / `lodReal`.
 
+**Sidereal / stellar day source.** `siderealDayReal` and `stellarDayReal` are derived from `o.lodKinematic` (the IAU-anchored baseline), *not* from `lodReal` (which additionally carries the H/5 and cyclic corrections). This preserves the round-trip identity `siderealYearDays × o.lodKinematic = meansiderealyearlengthinSeconds = 31,558,149.7635 s` at every epoch. J2000 values: 86164.090540 s (sidereal) and 86164.099661 s (stellar).
+
 ### dLOD/dt decomposition at J2000
 
-The framework's total dLOD/dt at J2000 = **+1.77 ms/century**, matching IERS observation of +1.75 ms/century within 1%. This total is the net of two physically distinct drivers with opposite signs:
+The framework's Tidal + GIA secular rate at J2000 = **+1.77 ms/century**, matching IERS observation of +1.75 ms/century within 1%. Adding the four sub-Milankovitch lattice cycles brings the full observable rate to **+0.76 ms/century** at J2000. Five rows, matching the tweakpane's *dLOD/dt decomposition* sub-folder:
 
-| Driver | Contribution | Physical mechanism | Sign explanation |
+| Layer | Rate (J2000) | Physical mechanism | Sign explanation |
 |:---|---:|:---|:---|
-| **Tidal channel** (Farhat 2022 / LLR α₁ 3.82 cm/yr) | **+2.12 ms/century** | Moon recession; Earth loses angular momentum to the Moon via ocean tidal dissipation | Earth spins slower → LOD grows |
-| **GIA channel** (L1-orbital α(t), dα/dt = −1.35×10⁻¹¹/yr at J2000) | **−0.35 ms/century** | Continental rebound after LGM; mass migrating from oceans back onto polar continents; Earth's polar moment α decreases | Earth's I = αMR² shrinks, ω = L_E/I grows → LOD shrinks |
-| **Net framework** | **+1.77 ms/century** | Sum of above | ≈ IERS observation +1.75 ms/century |
+| **Tidal baseline** (Farhat 2022 / LLR α₁ 3.82 cm/yr) | **+2.12 ms/cy** | Moon recession; Earth loses angular momentum to the Moon via ocean tidal dissipation | Earth spins slower → LOD grows |
+| **GIA** (L1-orbital α(t), dα/dt = −1.35×10⁻¹¹/yr at J2000) | **−0.35 ms/cy** | Continental rebound after LGM; mass migrating from oceans back onto polar continents; Earth's polar moment α decreases | Earth's I = αMR² shrinks, ω = L_E/I grows → LOD shrinks |
+| **All cycles** (Σ d/dt of Bond + Hallstatt + Jose5 + Jose4) | **−1.01 ms/cy** | Sub-Milankovitch cyclic modulation; zero-mean over long periods, sign flips on each half-period of each harmonic | Cyclic — sign depends on epoch; negative at J2000 (mid-descent of the Bond cycle) |
+| **Tidal + GIA** (secular baseline) | **+1.77 ms/cy** | Sum of the two secular drivers | ≈ IERS observation +1.75 ms/century (secular tidal + Milankovitch-scale GIA only, no sub-Milankovitch cycles) |
+| **Tidal + GIA + all cycles** (full framework) | **+0.76 ms/cy** | Full observable dLOD/dt including cyclic modulation | Above/below the secular baseline at other epochs (Little Ice Age vs Medieval Warm Period, etc.) |
+
+Row-label history: previously *Tidal (LLR α₁) / GIA (α(t) coupling) / Sub-Milankovitch stack / Net Layer 2 / Net Layer 3*. Renamed for consistency across the tweakpane, dashboard export, and the *LOD-Climate Rhythm* modal; the underlying `predictions.dLodDtTidal_msCy / dLodDtGia_msCy / dLodDtStack_msCy / dLodDtNetL2_msCy / dLodDtNetL3_msCy` bindings are unchanged.
 
 **Derivations at J2000**:
 ```
@@ -410,21 +416,21 @@ The IERS observed rate is the physical Earth-rotation slowdown, integrating tida
 
 **Physical picture**: the ~1.77 ms/century LOD growth we experience today is what remains of the tidal channel after GIA cancels ~17% of the tidal effect. Without GIA, Earth would be slowing 20% faster than observed; without the tidal channel, Earth would be spinning UP at −0.35 ms/century instead of slowing down.
 
-#### Layer 3 addition — sub-Milankovitch stack rate
+#### Cyclic rate on top of the secular baseline
 
-The Layer 2 net rate (+1.77 ms/century at J2000) captures the Milankovitch-scale physics (tidal + GIA). Layer 3 adds the sub-Milankovitch 4-flag ΔT stack derivative — Bond (1466 yr), Hallstatt (2430 yr), Jose5 (897 yr), Jose4 (715 yr) — which introduces millennial modulation on top of the Layer 2 baseline. At J2000 the stack derivative is small (the fit balances the LOD value at anchor), but at other epochs it can add or subtract several tenths of a ms/century.
+The Tidal + GIA rate (+1.77 ms/cy at J2000) captures the Milankovitch-scale physics. The four sub-Milankovitch lattice cycles — Bond (1466 yr), Hallstatt (2430 yr), Jose5 (897 yr), Jose4 (715 yr) — add cyclic modulation on top. The individual cycles are anchored so that the cumulative δLOD **value** sums to ≈ 0 at J2000 (the USNO 86400.0026 s anchor is honoured by construction); the cumulative **derivative** at J2000 is not zero, and at present sits at −1.01 ms/cy — the mid-descending part of the Bond cycle. The full observable rate at J2000 is therefore Tidal + GIA + all cycles = +1.77 − 1.01 = **+0.76 ms/century**.
 
 ```
-Layer 3 net = tidal + GIA + Σ d(stack)/dt
+full rate = Tidal + GIA + Σ d(cycles)/dt
 ```
 
-The tweakpane exposes both `Net Layer 2` (tidal + GIA, the Milankovitch physics) and `Net Layer 3` (adds the sub-Milankovitch stack) under the **dLOD/dt decomposition** sub-folder.
+The tweakpane exposes all five rows — Tidal baseline, GIA, All cycles, Tidal + GIA, Tidal + GIA + all cycles — under the **dLOD/dt decomposition** sub-folder.
 
 #### Rate excursions map to named climate periods (deep-time projection)
 
 Under the L1-orbital-coupled α(t) form, the GIA channel oscillates over the ~100-kyr glacial cycle with sign matching Milankovitch orbital forcing. Cross-checks at several epochs produce a specific mapping between the net LOD-growth rate and named Quaternary climate periods:
 
-| Epoch | GIA rate | Net (Layer 2) rate | Climate interpretation |
+| Epoch | GIA rate | Tidal + GIA rate | Climate interpretation |
 |---|---:|---:|:---|
 | −36,000 (LGM ramp) | +0.38 | +2.50 ms/cy | Ice building on continents (α ↑, Earth slowing extra) |
 | −23,000 | 0 (crossover) | +2.12 ms/cy | GIA sign flip — glaciation stops accelerating |
@@ -432,7 +438,9 @@ Under the L1-orbital-coupled α(t) form, the GIA channel oscillates over the ~10
 | +5,000 (projected future) | 0 (crossover) | +2.12 ms/cy | Interglacial peak — mass redistribution flipping direction |
 | +13,000 (projected next-glacial-max) | **+0.61** | **+2.73 ms/cy** | Ice returning to continents (α ↑ again, Earth slowing extra) |
 
-Between −11,000 and +5,000 (the current Holocene warm interval), sub-Milankovitch modulations from the Layer 3 stack are candidates for named climate excursions (mini-ice-age / Little Ice Age; Medieval Warm Period; Holocene Climatic Optimum) via faster-and-slower LOD-growth epochs on top of the smooth Milankovitch trajectory. This is a testable mechanism claim: the framework predicts specific rate deviations at millennial-scale timing without any fitting to Holocene climate proxies. Empirical mapping against Greenland/Vostok ice-core δ¹⁸O, LR04 benthic, or dendrochronology curves is a natural follow-up validation.
+Between −11,000 and +5,000 (the current Holocene warm interval), sub-Milankovitch modulations (the "all cycles" term) superposed on the Tidal + GIA baseline are candidates for named climate excursions (mini-ice-age / Little Ice Age; Medieval Warm Period; Holocene Climatic Optimum) via faster-and-slower LOD-growth epochs on top of the smooth Milankovitch trajectory. This is a testable mechanism claim: the framework predicts specific rate deviations at millennial-scale timing without any fitting to Holocene climate proxies.
+
+The predicted rhythm has now been validated against an independent paleoclimate record. Σ_stack correlates with Bond 2001 IRD (North Atlantic drift-ice, the same signal Bond used to identify his cold events) at **r = +0.49 Pearson** on the framework's validated window −4000 BC to +1800 AD — out-of-sample, since the stack was fit against the Stephenson 2016 ΔT residual (an eclipse-timing dataset, not a climate record). Sign-convention holds event-by-event on 6 of 6 named events inside the window (Bond 4, 4.2 ka, Roman Warm Period, MWP, Maunder, Dalton) under "Σ > 0 = LOD above baseline = mass equatorward = warm; Σ < 0 = cold". Events pre-window (Younger Dryas, 8.2 ka, Holocene Optimum) drift with fit-window extrapolation; the Modern warm epoch is post-window and anthropogenic — the framework, a pure orbital/tidal model, correctly does not predict it. See [doc 102](102-gia-alpha-lunar-validation.md) § "Defensible scientific position" item 7 for the full derivation. The *LOD-Climate Rhythm* modal exposes this comparison interactively.
 
 ### Comparison to published dLOD/dt decompositions
 

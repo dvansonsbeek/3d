@@ -4014,6 +4014,10 @@ details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
   display: inline-block; width: 14px; height: 3px; border-radius: 1px;
   background: #888;
 }
+.lcr-swatch-tidal {
+  background: linear-gradient(90deg, #c46a4d 0 4px, transparent 4px 7px, #c46a4d 7px 11px, transparent 11px 14px);
+  height: 2px;
+}
 .lcr-swatch-netL2 { background: #4dd0c8; height: 3px; }
 .lcr-swatch-netL3 { background: #ffce4b; height: 3px; }
 .lcr-swatch-bondcurve {

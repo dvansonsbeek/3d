@@ -101,18 +101,43 @@ function exportEarth(years) {
     precessionPeriod.push(+el.precession.toFixed(2));
     erd.push(+el.erd.toFixed(8));
 
-    // Day lengths (physically consistent with the shipped 3-flag ΔT correction stack):
-    //   corrected LOD = tidal LOD + Σ δLOD_i(year), where δLOD_i is derived from
-    //   d/dy[correction_i(y)] / T_year(y) (see tools/lib/deep-time.js § "Implied
-    //   LOD corrections"). Sidereal, stellar, solar-year-sec, and anom-year-sec
-    //   scale linearly with LOD so we propagate the ratio (corrected / tidal).
-    //   Holocene-tapered: unchanged for |year − 2000| > 6000 yr. Peak ~5-10 ms.
+    // Day lengths — mirror the tweakpane's Layer 3 formulas exactly.
+    // See src/script.js:5085 (h5Correction), 59860 (lodReal), 59885-59886
+    // (siderealDayReal / stellarDayReal).
+    //
+    //   lodKinematic     = meansiderealyearlengthinSeconds / o.siderealYearDays(year)
+    //   h5Correction     = meanLodSecondsAtAge(t_Ma) / ((meanHAtAge(t_Ma) / 5) × meanTropicalYearDaysAtAge(t_Ma))
+    //   dtCycleLodSum    = Bond + Hallstatt + Jose5 + Jose4        (cyclic, 0 at J2000)
+    //   lodReal          = lodKinematic + h5Correction + dtCycleLodSum
+    //   siderealDayReal  = (solarYearDays × lodKinematic) / (solarYearDays + 1)
+    //   stellarDayReal   = (siderealDayReal / (H/13)) / (solarYearDays + 1) + siderealDayReal
+    //
+    // At J2000: 86400.002593 / 86164.090540 / 86164.099661 s — matches tweakpane.
+    // Note: uses lodKinematic (not the physics-tidal mean) as baseline, per the
+    // framework's IAU-round-trip identity. Deep-time tidal recession growth is
+    // shown in the ESSRT chart, not here.
     const t_Ma = (2000 - year) / 1e6;
-    const lodCorrected = DT.meanLodSecondsWithCorrectionsAtAge(t_Ma);
-    const lodRatio = (lodCorrected !== null && el.lengthOfDay > 0) ? lodCorrected / el.lengthOfDay : 1;
-    solarDaySeconds.push(+lodCorrected.toFixed(6));
-    siderealDaySeconds.push(+(el.siderealDay * lodRatio).toFixed(6));
-    stellarDaySeconds.push(+(el.stellarDay * lodRatio).toFixed(6));
+    const lodMean_tMa   = DT.meanLodSecondsAtAge(t_Ma);
+    const H_tMa         = DT.meanHAtAge(t_Ma);
+    const mSY_days_tMa  = DT.meanTropicalYearDaysAtAge(t_Ma);
+    const lodKinematic  = C.meanSiderealYearSeconds / el.siderealYearDays;
+    const h5            = (lodMean_tMa !== null && H_tMa !== null && mSY_days_tMa !== null)
+                          ? lodMean_tMa / ((H_tMa / 5) * mSY_days_tMa)
+                          : 0;
+    const dtCycleLodSum = DT.bondCycleLodCorrection(year)
+                        + DT.hallstattCycleLodCorrection(year)
+                        + DT.jose5CycleLodCorrection(year)
+                        + DT.jose4CycleLodCorrection(year);
+    const lodReal         = lodKinematic + h5 + dtCycleLodSum;
+    const siderealDayReal = (el.solarYearDays * lodKinematic) / (el.solarYearDays + 1);
+    const stellarDayReal  = (siderealDayReal / (C.H / 13)) / (el.solarYearDays + 1) + siderealDayReal;
+    solarDaySeconds.push(+lodReal.toFixed(6));
+    siderealDaySeconds.push(+siderealDayReal.toFixed(6));
+    stellarDaySeconds.push(+stellarDayReal.toFixed(6));
+
+    // lodRatio kept for the downstream year-in-seconds calculations, which
+    // still need to scale by the ratio of corrected LOD to raw tidal LOD.
+    const lodRatio = (lodReal !== null && el.lengthOfDay > 0) ? lodReal / el.lengthOfDay : 1;
 
     // Anomalistic year
     anomalisticYearDays.push(+OE.computeLengthOfAnomalisticYearDays(year).toFixed(10));
