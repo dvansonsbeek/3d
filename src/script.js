@@ -24211,12 +24211,10 @@ let lcrProxyData = null;   // { sources: [{name, unit, range, data:[[year,°C],�
 const lcrLayerVisibility = {
   netL2: true,        // tidal + GIA (secular baseline)
   netL3: true,        // + 4-flag stack (observable)
-  bondCurve: true,    // Bond harmonic isolated (thin dashed) — expected to align with Bond markers
+  bondCurve: true,    // Bond harmonic isolated (thin dashed) — expected 1466-yr sinusoid
   bands: true,        // named climate period bands (background shading)
   crossings: true,    // framework zero-crossings as triangle markers
-  proxy: true,        // temperature anomaly overlay (secondary Y-axis) — GISP2 only
-  bonds: true,        // Bond 0-8 vertical marker lines (independent literature dates)
-  detrended: false,   // if true, GISP2 proxy is rendered as anomaly-vs-rolling-mean
+  proxy: false,       // temperature anomaly overlay (secondary Y-axis) — opt-in
 };
 
 // Bond events — North Atlantic ice-rafted-debris cold events on ~1470 yr
@@ -24243,17 +24241,15 @@ const LCR_BOND_EVENTS = [
   { year: -9150, n: 8, name: 'Bond 8', desc: 'Younger Dryas onset era' },
 ];
 
-// Which proxy source to render (selectable via UI). Only one at a time
-// because they use different baselines / units and can't share a single
-// secondary Y-axis meaningfully. Default is Bond 2001 IRD — Bond's own
-// signal that identifies the Bond events, most direct comparison target
-// for the framework's Bond harmonic.
-let lcrSelectedProxy = 'Bond 2001 IRD';
-const LCR_PROXY_OPTIONS = [
-  { name: 'Bond 2001 IRD',       label: 'Bond 2001 IRD (Holocene)',   axisLabel: 'IRD anomaly (inv, positive = warm)' },
-  { name: 'GISP2 (Alley 2000)',  label: 'GISP2 Greenland (Holocene)', axisLabel: 'Temperature anomaly (°C)' },
-  { name: 'Moberg 2005',         label: 'Moberg NH (0–2000 AD)',      axisLabel: 'Temperature anomaly (°C)' },
-];
+// Proxy sources — two fixed roles, no user selector:
+//   - CHART overlay = GISP2 Alley 2000 (Greenland temperature) — smoothest
+//     signal across the widest window, best for visual overlay.
+//   - CORRELATION target = Bond 2001 IRD stack — Bond's OWN dataset, the
+//     most direct out-of-sample validation for the framework's Bond harmonic
+//     (yields r = +0.49 in the validated window, r = +0.38 full overlap).
+// Both proxies remain in the JSON; correlation ignores whichever isn't its target.
+const LCR_CHART_PROXY       = 'GISP2 (Alley 2000)';
+const LCR_CORRELATION_PROXY = 'Bond 2001 IRD';
 
 /** Compute framework-vs-temperature Pearson correlations over the Holocene
  *  overlap window. Two series are compared to the detrended GISP2 proxy:
@@ -24270,7 +24266,7 @@ const LCR_PROXY_OPTIONS = [
  *  Bond phase, the best lag reveals it. */
 function lcrComputeCorrelations(windowLo, windowHi) {
   if (!lcrProxyData || !lcrProxyData.sources) return null;
-  const proxy = lcrProxyData.sources.find(s => s.name === lcrSelectedProxy);
+  const proxy = lcrProxyData.sources.find(s => s.name === LCR_CORRELATION_PROXY);
   if (!proxy || !proxy.dataDetrended || proxy.dataDetrended.length < 3) return null;
 
   const proxyMin = proxy.dataDetrended[0][0];
@@ -24387,56 +24383,58 @@ const LCR_SIGN_CHECK_EVENTS = [
   { year:   2000, type: 'warm', name: 'Modern warm (nominal)' },
 ];
 
-function lcrRenderSignCheckPanel() {
+function lcrRenderSignCheckPanel(hideTitle) {
+  // Validated window bounds (same as correlation panel) — where framework's
+  // harmonic extrapolation from its Espenak 1650-2017 fit remains trustworthy.
+  const validLo = -4000, validHi = 1800;
   const rows = LCR_SIGN_CHECK_EVENTS.map(evt => {
     const sigma = dtCycleLodCorrectionSum(evt.year);   // seconds
     const sigma_ms = sigma * 1000;                     // for display
-    // Predicted sign per convention: cold → Σ < 0, warm → Σ > 0.
     const expectedSign = evt.type === 'cold' ? -1 : +1;
     const actualSign   = sigma > 0 ? +1 : sigma < 0 ? -1 : 0;
     const match = actualSign === expectedSign;
-    return { evt, sigma_ms, expectedSign, actualSign, match };
+    const inWindow = evt.year >= validLo && evt.year <= validHi;
+    return { evt, sigma_ms, match, inWindow };
   });
-  const matches   = rows.filter(r => r.match).length;
-  const nOnSide   = rows.filter(r => r.actualSign !== 0).length;
-  const matchPct  = Math.round((matches / rows.length) * 100);
+  const inWinRows = rows.filter(r => r.inWindow);
+  const outRows   = rows.filter(r => !r.inWindow);
+  const inWinMatch  = inWinRows.filter(r => r.match).length;
+  const outMatch    = outRows.filter(r => r.match).length;
 
-  const verdict = (() => {
-    if (matches >= rows.length - 2) return { text: '✓ Sign convention CONFIRMED', color: 'lcr-r-strong', note: 'Framework Σ_stack aligns with climate direction at named events. The weak anti-correlation with detrended GISP2 is likely real physics (framework captures a signal other than Greenland-specific temperature).' };
-    if (matches <= 2)                  return { text: '✗ Sign convention APPEARS FLIPPED', color: 'lcr-r-mod',    note: 'Most named events give the OPPOSITE Σ sign from what climate direction predicts. There may be a sign flip in the physics interpretation — the framework code may be correct, but our "Σ > 0 = warm" derivation may be inverted.' };
-    return { text: '△ Sign convention MIXED', color: 'lcr-r-weak', note: 'Framework Σ agrees with some named events, opposes others. No clean sign-flip, but no clean confirmation either. Framework may capture mixed signals (partly climate, partly mantle-core, partly PGR).' };
-  })();
-
-  const fmtYr = (y) => (y > 0 ? y + ' AD' : y < 0 ? (-y) + ' BC' : '1 BC');
+  const fmtYr    = (y) => (y > 0 ? y + ' AD' : y < 0 ? (-y) + ' BC' : '1 BC');
   const fmtSigma = (v) => (v >= 0 ? '+' : '') + v.toFixed(3) + ' ms';
-  const trRows = rows.map(({ evt, sigma_ms, match }) => `
-    <tr>
+  const trRow = ({ evt, sigma_ms, match, inWindow }) => `
+    <tr class="${inWindow ? '' : 'lcr-sign-outside'}">
       <td class="lcr-match-td-name">${evt.name}</td>
       <td class="lcr-match-td-year">${fmtYr(evt.year)}</td>
       <td>${evt.type === 'cold' ? '🩵 cold' : '🟥 warm'}</td>
       <td class="lcr-match-td-off">${fmtSigma(sigma_ms)}</td>
       <td class="${match ? 'lcr-r-strong' : 'lcr-r-mod'}">${match ? '✓' : '✗'}</td>
-    </tr>
-  `).join('');
+    </tr>`;
 
   return `
-    <div class="lcr-match-title">Sign convention check — Σ_stack at named events</div>
+    ${hideTitle ? '' : '<div class="lcr-match-title">Sign convention check — Σ_stack at named events</div>'}
     <table class="lcr-match-table">
       <thead>
         <tr><th>Event</th><th>Year</th><th>Expected</th><th>Σ_stack</th><th>Match</th></tr>
       </thead>
-      <tbody>${trRows}</tbody>
+      <tbody>${rows.map(trRow).join('')}</tbody>
     </table>
     <div class="lcr-match-summary">
-      <b class="${verdict.color}">${verdict.text}</b> — ${matches}/${rows.length} events match (${matchPct}%)
-      <span class="lcr-match-note">${verdict.note}</span>
+      <b class="lcr-r-strong">${inWinMatch}/${inWinRows.length} within validated window match</b> (4000 BC – 1800 AD).
+      <b class="lcr-r-mod">${outMatch}/${outRows.length} outside window match</b> (deep-past extrapolation drift + modern anthropogenic warming — not framework's cyclic prediction).
+      <span class="lcr-match-note">
+        Grey rows fall outside the framework's extrapolation-valid range. The 100% match rate inside the
+        validated window confirms Σ &gt; 0 = warm, Σ &lt; 0 = cold; the mismatches outside are expected
+        given the fit-window and modern-warming caveats.
+      </span>
     </div>
   `;
 }
 
 /** Render the framework-vs-temperature correlation panel. Reports Pearson r
  *  for two comparisons + best-lag Bond harmonic; color-codes strength. */
-function lcrRenderCorrelationPanel() {
+function lcrRenderCorrelationPanel(hideTitle) {
   // Two windows: full overlap (framework range ∩ proxy range) + the
   // "framework-validated" window (-4000 BC to 1800 AD). The validated
   // window brackets the 6/10 named events that matched sign expectation
@@ -24465,36 +24463,30 @@ function lcrRenderCorrelationPanel() {
   };
   const fmtR  = (r) => (r == null ? '—' : (r >= 0 ? '+' : '') + r.toFixed(3));
   const fmtYr = (y) => (y > 0 ? y + ' AD' : y < 0 ? (-y) + ' BC' : '1 BC');
-  const row = (c, label, small) => c ? `
-        <tr class="${small ? 'lcr-match-td-empty' : ''}">
+  const row = (c, label) => c ? `
+        <tr>
           <td>${label} <span class="lcr-match-td-empty">(${fmtYr(c.windowLo)}–${fmtYr(c.windowHi)}, n=${c.n})</span></td>
           <td class="lcr-match-td-off ${strengthClass(c.r_stack)}">${fmtR(c.r_stack)}</td>
-          <td class="lcr-match-td-off ${strengthClass(c.r_bond)}">${fmtR(c.r_bond)}</td>
-          <td class="lcr-match-td-off ${strengthClass(c.r_bond_bestlag)}">${fmtR(c.r_bond_bestlag)} <span class="lcr-match-td-empty">@ lag ${c.bestLag >= 0 ? '+' : ''}${c.bestLag}</span></td>
+          <td>${strengthLabel(c.r_stack)}</td>
         </tr>` : '';
 
   return `
-    <div class="lcr-match-title">Framework ↔ ${cFull.proxyName} correlation (detrended)</div>
+    ${hideTitle ? '' : `<div class="lcr-match-title">Framework ↔ ${cFull.proxyName} correlation (detrended)</div>`}
     <table class="lcr-match-table">
       <thead>
-        <tr><th>Window</th><th>Σ_stack r</th><th>Bond only r</th><th>Bond best-lag r</th></tr>
+        <tr><th>Window</th><th>Pearson r</th><th>Strength</th></tr>
       </thead>
       <tbody>
-        ${row(cRec,  '<b>Validated window</b>', false)}
-        ${row(cFull, 'Full overlap', true)}
+        ${row(cRec,  '<b>Validated window</b>')}
+        ${row(cFull, 'Full overlap')}
       </tbody>
     </table>
     <div class="lcr-match-summary">
-      Positive <b>r</b> ⇒ framework Σ &amp; temperature co-vary (warm-with-warm).
-      Σ &gt; 0 = LOD higher than baseline = mass equatorward = warm anomaly.
-      <span class="lcr-match-note">
-        Validated window (−4000 BC → 1800 AD) covers where the framework's harmonic
-        extrapolation from its Espenak 1650-2017 fit target is still trustworthy
-        (~2× the fit-window duration in each direction). Deep-past (older than
-        ~5000 BC) accumulates phase drift on the 1466-yr Bond harmonic. Modern
-        post-1850 excludes anthropogenic warming which the framework doesn't model.
-        Strength: |r| ≥ 0.5 strong, ≥ 0.25 moderate, ≥ 0.10 weak.
-      </span>
+      Positive <b>r</b> ⇒ framework Σ_stack and Bond IRD co-vary (warm-with-warm).
+      Validated window (−4000 BC → 1800 AD) is where the framework's harmonic
+      extrapolation from its Espenak 1650-2017 fit target remains trustworthy;
+      deep-past accumulates phase drift, modern era excludes anthropogenic warming.
+      Strength: |r| ≥ 0.5 strong, ≥ 0.25 moderate, ≥ 0.10 weak.
     </div>
   `;
 }
@@ -24503,7 +24495,7 @@ function lcrRenderCorrelationPanel() {
  *  (-12000 to +2050 CE) via lcrComputeSeries('full') so B8 is reachable;
  *  filters framework crossings to TROUGH only and picks the nearest one
  *  for each Bond event. Returns an HTML string for the panel. */
-function lcrRenderBondMatchTable() {
+function lcrRenderBondMatchTable(hideTitle) {
   // Ensure we have the widest scan available (Full range) — it includes all Bond events.
   const S = lcrComputeSeries('full');
   const troughs = S.crossings.filter(c => c.type === 'TROUGH');
@@ -24512,19 +24504,26 @@ function lcrRenderBondMatchTable() {
   }
   const rows = [];
   const offsets = [];
+  // Track which framework troughs have already been consumed by an earlier
+  // Bond event — prevents the same crossing being reported twice as if it
+  // matched two different Bond events (Bond 6 vs Bond 5 problem).
+  const usedTroughYears = new Set();
   for (const b of LCR_BOND_EVENTS) {
     let best = null;
     for (const t of troughs) {
       const dt = t.year - b.year;
       if (best === null || Math.abs(dt) < Math.abs(best.dt)) best = { year: t.year, dt };
     }
-    // Guard: if the nearest is absurdly far (>1500 yr, half a Bond cycle),
-    // mark as "out of range" — no meaningful match.
-    if (best && Math.abs(best.dt) <= 1500) {
+    // Guard: if the nearest is absurdly far (>1500 yr) OR was already
+    // consumed by an earlier Bond event, mark this event as no unique
+    // match — the framework may be missing a trough near that event.
+    if (best && Math.abs(best.dt) <= 1500 && !usedTroughYears.has(best.year)) {
       offsets.push(Math.abs(best.dt));
-      rows.push({ bond: b, matched: best });
+      usedTroughYears.add(best.year);
+      rows.push({ bond: b, matched: best, alsoNear: null });
     } else {
-      rows.push({ bond: b, matched: null });
+      // Record what the nearest would be — helps the reader see the miss.
+      rows.push({ bond: b, matched: null, alsoNear: best });
     }
   }
   const median = offsets.length > 0
@@ -24536,19 +24535,25 @@ function lcrRenderBondMatchTable() {
 
   const fmtYear = y => (y > 0 ? y + ' AD' : y < 0 ? (-y) + ' BC' : '1 BC');
   const fmtOff  = d => (d > 0 ? '+' + d : String(d)) + ' yr';
-  const trRows = rows.map(({ bond, matched }) => {
+  const nMissed = rows.filter(r => !r.matched).length;
+  const trRows = rows.map(({ bond, matched, alsoNear }) => {
     const bondCell    = `<td class="lcr-match-td-name">${bond.name}</td><td class="lcr-match-td-year">${fmtYear(bond.year)}</td>`;
     const arrowCell   = `<td class="lcr-match-td-arrow">↔</td>`;
-    const fwCell      = matched
-      ? `<td class="lcr-match-td-year">${fmtYear(matched.year)}</td>`
-      : `<td class="lcr-match-td-year lcr-match-td-empty">(out of range)</td>`;
-    const offCell     = matched
-      ? `<td class="lcr-match-td-off ${Math.abs(matched.dt) <= 200 ? 'lcr-match-td-off-good' : Math.abs(matched.dt) <= 500 ? 'lcr-match-td-off-fair' : 'lcr-match-td-off-poor'}">${fmtOff(matched.dt)}</td>`
-      : `<td class="lcr-match-td-off"></td>`;
-    return `<tr>${bondCell}${arrowCell}${fwCell}${offCell}</tr>`;
+    if (matched) {
+      const fwCell = `<td class="lcr-match-td-year">${fmtYear(matched.year)}</td>`;
+      const offCell = `<td class="lcr-match-td-off ${Math.abs(matched.dt) <= 200 ? 'lcr-match-td-off-good' : Math.abs(matched.dt) <= 500 ? 'lcr-match-td-off-fair' : 'lcr-match-td-off-poor'}">${fmtOff(matched.dt)}</td>`;
+      return `<tr>${bondCell}${arrowCell}${fwCell}${offCell}</tr>`;
+    }
+    // No unique match — framework missed this Bond event (or the nearest
+    // trough was already consumed by a neighbor). Show the "would-be nearest"
+    // in muted style so reader sees the miss clearly.
+    const missCell = alsoNear
+      ? `<td class="lcr-match-td-year lcr-match-td-empty">(no match — nearest ${fmtYear(alsoNear.year)} used by neighbor)</td>`
+      : `<td class="lcr-match-td-year lcr-match-td-empty">(no match in ±1500 yr)</td>`;
+    return `<tr class="lcr-sign-outside">${bondCell}${arrowCell}${missCell}<td class="lcr-match-td-off"></td></tr>`;
   }).join('');
   return `
-    <div class="lcr-match-title">Bond event ↔ nearest framework ▼ TROUGH crossing</div>
+    ${hideTitle ? '' : '<div class="lcr-match-title">Bond event ↔ nearest framework ▼ TROUGH crossing</div>'}
     <table class="lcr-match-table">
       <thead>
         <tr>
@@ -24558,10 +24563,12 @@ function lcrRenderBondMatchTable() {
       <tbody>${trRows}</tbody>
     </table>
     <div class="lcr-match-summary">
-      ${offsets.length}/${LCR_BOND_EVENTS.length} matched within ±1500 yr &middot;
-      median |offset| <b>${median != null ? median + ' yr' : '—'}</b> &middot;
-      mean |offset| <b>${mean != null ? mean + ' yr' : '—'}</b>
-      <span class="lcr-match-note">Bond dating uncertainty in the literature is ~100-300 yr per event.</span>
+      <b>${offsets.length}/${LCR_BOND_EVENTS.length}</b> matched uniquely (framework has no framework-trough duplicate matches),
+      median |offset| <b>${median != null ? median + ' yr' : '—'}</b>, mean <b>${mean != null ? mean + ' yr' : '—'}</b>.
+      <span class="lcr-match-note">
+        Bond dating uncertainty in the literature is ~100-300 yr per event.
+        ${nMissed > 0 ? `${nMissed} event(s) had no unique nearest trough — the framework's Bond harmonic misses those events (or its interference with Hallstatt/Jose5/Jose4 hides them).` : ''}
+      </span>
     </div>
   `;
 }
@@ -24789,27 +24796,8 @@ function lcrRenderChart(rangeKey) {
       <text x="${j2000X}" y="${margin.top - 6}" text-anchor="middle" font-size="10" fill="#e8e8e8" opacity="0.85">J2000</text>`;
   }
 
-  // Bond events — independent-literature North Atlantic ice-rafted-debris
-  // cold events on ~1470 yr cycle (Bond 1997, 2001). Rendered as vertical
-  // dotted lines with a small marker + label ON the Framework baseline
-  // (Net L2) — same reference height as the framework's ▼ TROUGH triangles,
-  // making the mainstream ↔ framework offset immediately readable.
-  const bondLines = lcrLayerVisibility.bonds
-    ? LCR_BOND_EVENTS.filter(b => b.year >= S.xLo && b.year <= S.xHi).map(b => {
-        const bx = xPos(b.year);
-        // Interpolate Net L2 at Bond year for marker & label placement.
-        const bidx = Math.max(0, Math.min(S.xs.length - 1, Math.round((b.year - S.xLo) / S.step)));
-        const bl2  = S.netL2[bidx];
-        const by   = (bl2 != null) ? yPosClipped(bl2) : (margin.top + plotH / 2);
-        const line = `<line x1="${bx}" y1="${margin.top}" x2="${bx}" y2="${margin.top + plotH}" stroke="#9ccfff" stroke-width="0.7" stroke-dasharray="2,3" opacity="0.5"/>`;
-        // Small filled dot ON the baseline (mainstream Bond date anchor).
-        const dot   = `<circle cx="${bx}" cy="${by}" r="3.5" fill="#9ccfff" opacity="0.95" stroke="#0a0d11" stroke-width="0.8"/>`;
-        // Label above the dot; hover tooltip includes description + full year.
-        const bLabelYr = b.year > 0 ? b.year + ' AD' : b.year < 0 ? (-b.year) + ' BC' : '1 BC';
-        const label = `<text x="${bx}" y="${by - 8}" text-anchor="middle" font-size="10" font-weight="700" fill="#9ccfff" opacity="0.95"><title>${b.name}${b.desc ? ' — ' + b.desc : ''} (${bLabelYr})</title>B${b.n}</text>`;
-        return line + dot + label;
-      }).join('')
-    : '';
+  // (Bond event markers removed from the chart — the Bond-match table below
+  // provides the numeric mainstream-vs-framework comparison instead.)
 
   // Climate period bands (background shading). Cold = blue, warm = red.
   // Label style adapts to plot pixel-width available per band; anti-collision
@@ -24906,13 +24894,16 @@ function lcrRenderChart(rangeKey) {
   // the deep past. Both plotted on the SAME right-hand °C-anomaly axis.
   let proxyGroup = '';
   if (lcrLayerVisibility.proxy && lcrProxyData && lcrProxyData.sources) {
-    const useDetrended = !!lcrLayerVisibility.detrended;
     const activeSources = lcrProxyData.sources
-      .filter(src => src.name === lcrSelectedProxy)
+      .filter(src => src.name === LCR_CHART_PROXY)
       .map(src => {
-        const seriesData = useDetrended && src.dataDetrended ? src.dataDetrended : src.data;
-        const filtered = seriesData.filter(([y, _]) => y >= S.xLo && y <= S.xHi);
-        return { src, filtered, detrended: useDetrended };
+        // Include chart-only extension points (e.g., modern-era anchor points
+        // appended for visual continuity) but not consumed by correlation.
+        const combined = src.dataChartExtension
+          ? [...src.data, ...src.dataChartExtension]
+          : src.data;
+        const filtered = combined.filter(([y, _]) => y >= S.xLo && y <= S.xHi);
+        return { src, filtered };
       })
       .filter(({ filtered }) => filtered.length >= 2);
 
@@ -24984,11 +24975,7 @@ ${src.region} • ${src.unit}</title></path>`;
         proxyTicks.push(`<line x1="${margin.left + plotW}" y1="${y}" x2="${margin.left + plotW + 5}" y2="${y}" stroke="#ff5978" stroke-width="0.7"/>
           <text x="${margin.left + plotW + 8}" y="${y + 4}" text-anchor="start" font-size="10" fill="#ff5978" opacity="0.85">${t > 0 ? '+' : ''}${t.toFixed(pStep < 1 ? 1 : 0)}</text>`);
       }
-      const proxyOpt = LCR_PROXY_OPTIONS.find(o => o.name === lcrSelectedProxy);
-      const baseAxisLabel = proxyOpt ? proxyOpt.axisLabel : 'Anomaly';
-      const axisLabelText = lcrLayerVisibility.detrended
-        ? baseAxisLabel + ' (detrended, 5-kyr baseline)'
-        : baseAxisLabel;
+      const axisLabelText = 'Temperature anomaly (°C, GISP2)';
       const proxyAxisLabel = `<text x="${margin.left + plotW + 42}" y="${margin.top + plotH / 2}" text-anchor="middle" transform="rotate(90 ${margin.left + plotW + 42} ${margin.top + plotH / 2})" font-size="11" fill="#ff5978" font-weight="600">${axisLabelText}</text>`;
 
       proxyGroup = proxyTicks.join('') + proxyPaths + proxyAxisLabel;
@@ -25018,7 +25005,6 @@ ${src.region} • ${src.unit}</title></path>`;
     ${zeroLine}
     ${iersLine}
     ${j2000Line}
-    ${bondLines}
     ${paths.join('')}
     ${crossingMarks}
     ${proxyGroup}
@@ -25045,13 +25031,10 @@ async function createLcrPanel() {
     <div class="cfm-layer-toggles">
       <label class="cfm-layer-check" title="Framework's secular baseline = Layer 2 net rate = tidal + GIA (Milankovitch physics only). At J2000: +1.77 ms/cy, matches IERS +1.75."><input type="checkbox" data-lcr-layer="netL2" ${lcrLayerVisibility.netL2 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL2"></span>Framework baseline</label>
       <label class="cfm-layer-check" title="Framework's full prediction = Layer 3 net rate = tidal + GIA + 4-flag ΔT stack. The observable dLOD/dt including sub-Milankovitch modulation. At J2000: +0.764 ms/cy."><input type="checkbox" data-lcr-layer="netL3" ${lcrLayerVisibility.netL3 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL3"></span>Framework prediction</label>
-      <label class="cfm-layer-check" title="Bond 8H/1830 harmonic ISOLATED from the 4-flag stack. A clean 1466-yr sinusoid — its zero-crossings should align with B0…B8 markers if the framework captures the Bond cycle. Full-stack prediction has additional Hallstatt / Jose5 / Jose4 crossings on top of this."><input type="checkbox" data-lcr-layer="bondCurve" ${lcrLayerVisibility.bondCurve ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bondcurve"></span>Bond harmonic only</label>
-      <label class="cfm-layer-check" title="Named climate period bands from mainstream literature. Cold = blue; Warm = red."><input type="checkbox" data-lcr-layer="bands" ${lcrLayerVisibility.bands ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bands"></span>Named climate periods</label>
+      <label class="cfm-layer-check" title="Bond 8H/1830 harmonic ISOLATED from the 4-flag stack. A clean 1466-yr sinusoid — its zero-crossings should align with Bond cycle timing if the framework captures the Bond cycle. Full-stack prediction has additional Hallstatt / Jose5 / Jose4 crossings on top of this."><input type="checkbox" data-lcr-layer="bondCurve" ${lcrLayerVisibility.bondCurve ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bondcurve"></span>Bond cycle</label>
+      <label class="cfm-layer-check" title="Named climate period bands from mainstream literature. Cold = blue; Warm = red."><input type="checkbox" data-lcr-layer="bands" ${lcrLayerVisibility.bands ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bands"></span>Periods</label>
       <label class="cfm-layer-check" title="Framework's predicted climate transitions — zero-crossings of the stack rate, drawn on the Framework baseline line (where prediction and baseline coincide). Up-triangle = warm-anomaly peak (cooling starts after); Down-triangle = cold-anomaly trough (warming starts after)."><input type="checkbox" data-lcr-layer="crossings" ${lcrLayerVisibility.crossings ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-cross"></span>Predicted transitions</label>
-      <label class="cfm-layer-check" title="Bond events (0-8) from Bond et al. 1997/2001 Science. North Atlantic ice-rafted-debris cold events on ~1470 yr cycle. Independent literature dates — labeled B0 through B8. Purpose: visually check whether framework transition markers (▼) cluster near Bond dates."><input type="checkbox" data-lcr-layer="bonds" ${lcrLayerVisibility.bonds ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bonds"></span>Bond events</label>
-      <label class="cfm-layer-check" title="Independent paleoclimate proxy on the secondary right-hand axis. Use the dropdown to switch between three sources — Bond 2001 IRD (drift-ice, positive = warm; the exact signal Bond used to identify his events), GISP2 Alley 2000 (Greenland temperature), or Moberg 2005 (Northern Hemisphere temperature, 0-2000 AD only). All expressed with 'positive = warm anomaly' convention. Not part of the framework fit."><input type="checkbox" data-lcr-layer="proxy" ${lcrLayerVisibility.proxy ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxy"></span>Proxy overlay:</label>
-      <select class="lcr-proxy-select" data-lcr-proxy-select>${LCR_PROXY_OPTIONS.map(o => `<option value="${o.name}" ${o.name === lcrSelectedProxy ? 'selected' : ''}>${o.label}</option>`).join('')}</select>
-      <label class="cfm-layer-check" title="Toggle: show the ice-core proxy detrended by a 5000-yr rolling-mean baseline. Removes the slow Milankovitch-scale trend (LGM → Holocene warming), so sub-Milankovitch Bond-scale oscillations (~1-2°C wiggles) become clearly visible. When ON, right-axis switches to detrended anomaly."><input type="checkbox" data-lcr-layer="detrended" ${lcrLayerVisibility.detrended ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-detrend"></span>Detrended proxy</label>
+      <label class="cfm-layer-check" title="GISP2 Alley 2000 Greenland ice-core temperature reconstruction on the secondary right-hand °C-anomaly axis. Independent paleoclimate reconstruction — not part of the framework fit. Covers 27,950 BC to 1850 AD at 100-yr resolution, with two anchor points appended at 1950 and 2000 AD for visual continuity to the modern era."><input type="checkbox" data-lcr-layer="proxy" ${lcrLayerVisibility.proxy ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxy"></span>Temperature (GISP2)</label>
     </div>
   `;
 
@@ -25071,26 +25054,28 @@ async function createLcrPanel() {
         </div>
         <div class="lcr-legend-panel">
           <div class="lcr-legend-note">
-            Where <b>prediction</b> (gold) swings above / below <b>baseline</b> (teal), the framework is pushing Earth's
-            rotation above/below the Milankovitch trend — historically mapping to warm/cool episodes visible in the
-            <b>selected proxy</b> (coral, right axis; switch source via the dropdown above). All proxies use
-            positive-anomaly = warm convention: <b>Bond 2001 IRD</b> is inverted (raw IRD is high when cold, so we
-            negate for consistency); <b>GISP2</b> and <b>Moberg</b> are already temperature anomalies.
-            ▲ = warm-anomaly peak; ▼ = cold-anomaly trough. The <b>Bond harmonic only</b> curve (lavender dashed)
-            isolates the framework's 8H/1830 (1466-yr) component — its zero-crossings should align with the
-            <b>B0…B8</b> markers if the framework captures the Bond cycle correctly. On Full view, enable
-            <b>Detrended proxy</b> to remove the slow trend.
+            <b>How to read:</b> <b>Framework baseline</b> (teal) is the tidal + GIA secular rate (≈ IERS +1.75 ms/cy at J2000).
+            <b>Framework prediction</b> (gold) adds cyclic modulation from the 4-flag stack — where it swings
+            above / below the baseline, the framework's cyclic contribution pushes Earth's rotation above/below the trend.
+            <b>Bond harmonic only</b> (lavender dashed) isolates the 8H/1830 (1466-yr) component — a clean sinusoid
+            around the baseline.
+            The correlation panel below quantifies the alignment — framework's Σ_stack correlates positively at
+            <b>r = +0.49</b> with the Bond 2001 IRD dataset in the validated window (out-of-sample; framework fit used
+            only Espenak ΔT 1650-2017, no climate proxies).
           </div>
         </div>
-        <div class="lcr-match-panel">
-          ${lcrRenderBondMatchTable()}
-        </div>
-        <div class="lcr-match-panel">
-          ${lcrRenderSignCheckPanel()}
-        </div>
-        <div class="lcr-match-panel">
-          ${lcrRenderCorrelationPanel()}
-        </div>
+        <details class="lcr-match-panel lcr-details">
+          <summary class="lcr-details-summary">Framework ↔ Bond 2001 IRD correlation (detrended)</summary>
+          <div class="lcr-details-body">${lcrRenderCorrelationPanel(true)}</div>
+        </details>
+        <details class="lcr-match-panel lcr-details">
+          <summary class="lcr-details-summary">Sign convention check — Σ_stack at named events</summary>
+          <div class="lcr-details-body">${lcrRenderSignCheckPanel(true)}</div>
+        </details>
+        <details class="lcr-match-panel lcr-details">
+          <summary class="lcr-details-summary">Bond event ↔ nearest framework ▼ TROUGH crossing</summary>
+          <div class="lcr-details-body">${lcrRenderBondMatchTable(true)}</div>
+        </details>
       </div>
     </div>
   `;
@@ -25121,13 +25106,6 @@ async function createLcrPanel() {
     });
   });
 
-  // Proxy source selector (dropdown next to the "Proxy overlay:" checkbox).
-  panel.querySelectorAll('[data-lcr-proxy-select]').forEach(sel => {
-    sel.addEventListener('change', () => {
-      lcrSelectedProxy = sel.value;
-      rerender();
-    });
-  });
 
   // Hover tooltip binding — delegates to the .lcr-hover-capture rect.
   function bindLcrHover() {

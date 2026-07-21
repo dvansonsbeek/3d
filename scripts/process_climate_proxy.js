@@ -69,15 +69,31 @@ function loadGisp2() {
   const data = Array.from(bins.entries())
     .map(([year, { sum, n }]) => [year + binWidth / 2, +(sum / n).toFixed(3)])
     .sort((a, b) => a[0] - b[0]);
+  // Two chart-only anchor points appended for visual continuity to the
+  // modern era (GISP2 core itself ends ~1855 AD). These are approximate
+  // estimates of Greenland Summit temperature anomaly vs the 1050 BC–1950 AD
+  // Holocene mean, based on GISP2 borehole extension + GEOSummit instrumental
+  // (Vinther 2006-style stitching):
+  //   1950 AD: near baseline (essentially the reference epoch)
+  //   2000 AD: modern warming, roughly +1.5 °C above Holocene mean
+  // Stored under `dataChartExtension` so the chart draws them but the
+  // correlation panel ignores them (the framework doesn't model the
+  // anthropogenic warming these points reflect).
+  const dataChartExtension = [
+    [1950, +0.3],
+    [2000, +1.5],
+  ];
   return {
     name: 'GISP2 (Alley 2000)',
     region: 'Greenland (Summit)',
     reference: 'Alley R.B. 2000. Quaternary Science Reviews 19:213-226.',
-    unit: '°C anomaly vs 1050 BCE–1950 CE mean',
+    unit: '°C anomaly vs 1050 BC–1950 AD mean',
     baseline: `${meanLate.toFixed(2)} °C absolute`,
     range: [data[0][0], data[data.length - 1][0]],
     n: data.length,
     data,
+    dataChartExtension,
+    extensionNote: 'The two anchor points [1950, +0.3] and [2000, +1.5] are appended for chart continuity only (GISP2 core ends ~1855 AD). Approximate anomaly estimates based on instrumental Greenland Summit temperature vs 1050 BC–1950 AD Holocene mean. Excluded from correlation analysis.',
   };
 }
 

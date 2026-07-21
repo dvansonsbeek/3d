@@ -4038,34 +4038,6 @@ details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
   background: #ff5978;
   height: 3px;
 }
-.lcr-swatch-bonds {
-  background: linear-gradient(90deg, #9ccfff 0 3px, transparent 3px 6px, #9ccfff 6px 9px, transparent 9px 12px, #9ccfff 12px 14px);
-  height: 6px;
-}
-.lcr-swatch-detrend {
-  background: #ff5978;
-  height: 3px;
-  opacity: 0.5;
-  border: 1px dashed #ff5978;
-  background: transparent;
-  box-sizing: border-box;
-}
-.lcr-proxy-select {
-  font: 500 11px/1.2 Inter, system-ui, sans-serif;
-  color: rgba(255, 255, 255, .85);
-  background: rgba(255, 255, 255, .06);
-  border: 1px solid rgba(255, 255, 255, .15);
-  border-radius: 4px;
-  padding: 3px 6px;
-  cursor: pointer;
-  margin-left: 4px;
-  margin-right: 12px;
-}
-.lcr-proxy-select:hover {
-  background: rgba(255, 255, 255, .10);
-  border-color: rgba(255, 255, 255, .25);
-}
-.lcr-proxy-select option { background: #12151a; color: #fff; }
 
 .lcr-content { padding: 4px 0 8px; }
 
@@ -4087,6 +4059,30 @@ details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
   border: 1px solid rgba(255, 255, 255, .06);
   border-radius: 5px;
 }
+/* Collapsible variant using <details><summary>. Closed by default so the
+   modal isn't overwhelming; user clicks to expand. */
+.lcr-details { padding: 0; }
+.lcr-details[open] { padding-bottom: 12px; }
+.lcr-details-summary {
+  cursor: pointer; list-style: none;
+  padding: 10px 16px;
+  font: 700 11px/1.3 Inter, system-ui, sans-serif;
+  color: #fff; letter-spacing: .04em; text-transform: uppercase;
+  user-select: none;
+  display: flex; align-items: center; gap: 8px;
+}
+.lcr-details-summary::-webkit-details-marker { display: none; }
+.lcr-details-summary::before {
+  content: '▸';
+  display: inline-block;
+  transition: transform .15s ease;
+  color: rgba(255, 255, 255, .5);
+  font-size: 10px;
+}
+.lcr-details[open] > .lcr-details-summary::before { transform: rotate(90deg); }
+.lcr-details-summary:hover { background: rgba(255, 255, 255, .03); }
+.lcr-details-body { padding: 0 16px; }
+.lcr-details-body .lcr-match-title { margin-top: 0; }
 .lcr-match-title {
   font: 700 11px/1.3 Inter, system-ui, sans-serif;
   color: #fff; letter-spacing: .04em; text-transform: uppercase;
@@ -4118,6 +4114,7 @@ details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
 .lcr-r-mod    { color: #ffce4b; }
 .lcr-r-weak   { color: #ffa040; }
 .lcr-r-none   { color: rgba(255, 255, 255, .5); }
+.lcr-sign-outside td { opacity: 0.5; }
 .lcr-match-summary {
   margin-top: 10px;
   font: 400 11.5px/1.55 Inter, system-ui, sans-serif;
