@@ -1,0 +1,105 @@
+{
+  "_meta": {
+    "description": "H/46 (8H/368 = 7,289.5 yr) millennial-cycle fit against the post-4-flag Stephenson residual \u2014 tests whether the \u22120.75 ms/day ancient missing motion is one arc of a lattice cycle (2nd harmonic of the H/23 fundamental; Hallstatt = 6th harmonic). Archive support: 3-of-3 significant band 5.8\u20138.3 kyr (lattice-scan-band-3500-15000.json).",
+    "candidate_n": 368,
+    "period_yr": 7289.5
+  },
+  "models": {
+    "A_rms": 310.55064027279116,
+    "B_drift_rms": 68.98670241371572,
+    "C_cycle_rms": 66.38279701785184,
+    "C2_rms": 49.230241183673996
+  },
+  "cycle": {
+    "cos_s": -1322.7195676281603,
+    "sin_s": -901.4171424243403,
+    "amplitude_s": 1600.668585074028,
+    "phase_deg": -145.72605038039342,
+    "node_year": 1000,
+    "dlod_ancient_us_day": -2477.1297918473974,
+    "dlod_modern_us_day": 3112.813792896042,
+    "espenak_shape_cost_s": 3.374238542419252
+  },
+  "band_scan": [
+    {
+      "n": 322,
+      "period_yr": 8330.857142857143,
+      "rms_s": 66.92165087446082,
+      "amp_s": 2041.2144112657318,
+      "node_year": 693,
+      "dlod_ancient_us": -2492.831392367925,
+      "dlod_modern_us": 3167.227628179813
+    },
+    {
+      "n": 345,
+      "period_yr": 7775.466666666666,
+      "rms_s": 66.65507160841989,
+      "amp_s": 1798.8084150297766,
+      "node_year": 693,
+      "dlod_ancient_us": -2485.324888670346,
+      "dlod_modern_us": 3140.9833867626526
+    },
+    {
+      "n": 366,
+      "period_yr": 7329.333333333333,
+      "rms_s": 66.4066202089402,
+      "amp_s": 1616.4177939504204,
+      "node_year": 694,
+      "dlod_ancient_us": -2477.8707054127185,
+      "dlod_modern_us": 3115.3402832896827
+    },
+    {
+      "n": 368,
+      "period_yr": 7289.5,
+      "rms_s": 66.38279701785184,
+      "amp_s": 1600.668585074028,
+      "node_year": 694,
+      "dlod_ancient_us": -2477.1297918473974,
+      "dlod_modern_us": 3112.813792896042
+    },
+    {
+      "n": 427,
+      "period_yr": 6282.285714285715,
+      "rms_s": 65.6821039514696,
+      "amp_s": 1231.796258178009,
+      "node_year": 696,
+      "dlod_ancient_us": -2452.675394864544,
+      "dlod_modern_us": 3031.5997871227314
+    },
+    {
+      "n": 437,
+      "period_yr": 6138.526315789473,
+      "rms_s": 65.56652541878732,
+      "amp_s": 1183.7833573588282,
+      "node_year": 696,
+      "dlod_ancient_us": -2448.000891755995,
+      "dlod_modern_us": 3016.5385476689344
+    },
+    {
+      "n": 460,
+      "period_yr": 5831.6,
+      "rms_s": 65.30872022380609,
+      "amp_s": 1085.19349130059,
+      "node_year": 697,
+      "dlod_ancient_us": -2436.616880155731,
+      "dlod_modern_us": 2980.4500793165507
+    },
+    {
+      "n": 488,
+      "period_yr": 5497.0,
+      "rms_s": 65.01661522885912,
+      "amp_s": 983.8450353900907,
+      "node_year": 699,
+      "dlod_ancient_us": -2421.4970945967366,
+      "dlod_modern_us": 2933.764789128776
+    }
+  ],
+  "checks": {
+    "cycle_matches_drift_model_at_equal_dof": true,
+    "ancient_dlod_in_range": false,
+    "modern_dlod_near_zero": false,
+    "espenak_shape_cost_small": true,
+    "amplitude_sane": false
+  },
+  "verdict": "NO-GO"
+}

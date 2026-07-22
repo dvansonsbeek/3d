@@ -102,6 +102,10 @@ const CONFIG = {
       structural: '4×Jose 179 yr = 715.5 yr; gcd(3749, H) = 23. Cross-archive coherent in Steinhilber solar Φ + EPICA CO2 (see scripts/lattice_harmonic_scan.py --preset jose-family). Also degenerate with Bond/2 at ~733 yr; 4×Jose is the tighter anchor (0.083% vs 2.5%).',
       fit_stage:  'with_bond_hallstatt_jose5',
       target_amp_s: 50 },
+    { name: 'h253',     lattice_n: 2024,
+      structural: 'H/253 = H/(11·23) = 1,325.4 yr; gcd(2024, H) = 23; 184th harmonic of 8H/11 (Earth ecliptic-perihelion family). Identified 2026-07-22 by L-5b §14 post-4-flag residual scan (flat ΔR²=0.031 peak n=2015-2024, gcd-compliant flank chosen) — see scripts/lod_residual_h253_fifth_cycle.py (GO verdict: medieval 990-bump window 98→17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, lattice_harmonic_scan); Steinhilber marginal (~95% threshold); cap-only ship keeps the amplitude below the free fit.',
+      fit_stage:  'frozen_residual_after_D',
+      target_amp_s: 75 },
     // Eddy (8H/2684 = 999.45 yr) TESTED AND ROLLED BACK 2026-07-12: the 5-cycle
     // joint fit showed Bond amp inflating 375 s → 646 s (collinearity) and L-5b
     // metrics regressed by +12 s RMS. Eddy modestly improved 1200-1300 CE
@@ -422,6 +426,19 @@ const ESPENAK_REFERENCE = {
   2000: 63.83, 2010: 66.06, 2017: 68.97,
 };
 
+// ─── Closure-design experiments (2026-07-22) — implementations removed ────
+// Two alternative anchor closures were implemented and tested this day:
+//   1. distributeAnchorClosure — min-norm over ALL uncapped cycles' coeffs
+//      (Espenak RMS 23.57 s: dumps distortion into Jose4, damages modern window)
+//   2. anchoredCapRefit — active-set refit with the USNO anchor as an in-fit
+//      constraint (Espenak RMS 23.16 s: converges to the SAME ~74 s Bond haircut)
+// vs the retained Bond-only min-norm closure (21.66 s). Conclusion: the ~74 s
+// Bond amplitude cost is the USNO anchor's SHADOW PRICE — the constrained
+// optimum pays it in every formulation — and its deficit is what the
+// post-closure phantom check quantifies as the apparent ~1,326-yr line.
+// Implementations preserved in git history (commit with this note); evidence:
+// scripts/lod_residual_h253_fifth_cycle.py + data/deltaT-h253-fifth-cycle-scan.json.
+
 // ─── Quiet fit: run all 4 stages + shipping + Bond adjustment for a given
 // USNO anchor value. Returns the shipped coefficients + fit metrics WITHOUT
 // any console output or JSON writes. Used by the --sweep-usno sweep to explore
@@ -474,9 +491,26 @@ function runFitQuiet(usnoTargetLodS, years, residual) {
   const joseForShip = ship(joseCycle, joseD);
   const jose4ForShip = ship(jose4Cycle, jose4Free);
 
-  // Post-cap Bond adjustment (min-norm shift to close anchor)
+  // Stage E (mirrors main): h253 frozen-residual fit after the four Stage-D
+  // shipped cycles, then included in the anchor re-close sum.
+  const h253Cycle = CONFIG.cycles.find(c => c.name === 'h253');
+  const frozenFour = [bondForShipRaw, hallForShip, joseForShip, jose4ForShip];
+  const residualE = years.map((y, i) => {
+    let s = residual[i];
+    for (const c of frozenFour) {
+      const om = 2 * Math.PI * c.n / EIGHT_H;
+      s -= c.cos * Math.cos(om * y) + c.sin * Math.sin(om * y);
+    }
+    return s;
+  });
+  const fitE = fitCycles(years, residualE, [h253Cycle.lattice_n], null, sampleWeights);
+  const h253Fit = ship(h253Cycle, fitE.cycles[0]);
+
+  // Bond-only min-norm closure (retained — see main() closure notes), with
+  // h253 included in the pre-adjust sum.
   const preSum = cycleLodAtJ2000(bondForShipRaw) + cycleLodAtJ2000(hallForShip)
-               + cycleLodAtJ2000(joseForShip) + cycleLodAtJ2000(jose4ForShip);
+               + cycleLodAtJ2000(joseForShip) + cycleLodAtJ2000(jose4ForShip)
+               + cycleLodAtJ2000(h253Fit);
   const deltaLod = derivation.targetOffset - preSum;
   const omB = 2 * Math.PI * bondCycle.lattice_n / EIGHT_H;
   const wCos = -86400 * omB * Math.sin(omB * 2000) / MEAN_TROPICAL_YEAR_J2000_S;
@@ -488,7 +522,8 @@ function runFitQuiet(usnoTargetLodS, years, residual) {
     sin: bondForShipRaw.sin + wSin * deltaLod / denom,
   };
 
-  return { bond: bondForShip, hall: hallForShip, jose5: joseForShip, jose4: jose4ForShip,
+  return { bond: bondForShip, hall: hallForShip, jose5: joseForShip,
+           jose4: jose4ForShip, h253: h253Fit,
            stage_d_rms: fitD.rms_post, stage_d_rms_modern: fitD.rms_post_modern };
 }
 
@@ -513,7 +548,7 @@ function findJointOptimum(years, residual, { sweepMin = 86400.0014, sweepMax = 8
   let best = null;
   for (const usno of sweep) {
     const shipped = runFitQuiet(usno, years, residual);
-    const div = { bond: 1830, hall: 1104, jose5: 2989, jose4: 3749 };
+    const div = { bond: 1830, hall: 1104, jose5: 2989, jose4: 3749, h253: 2024 };
     function cyclesAt(year) {
       let s = 0;
       for (const [name, d] of Object.entries(div)) {
@@ -540,6 +575,116 @@ function findJointOptimum(years, residual, { sweepMin = 86400.0014, sweepMax = 8
 }
 
 // ─── Diagnostic sweep — prints the full table. Does not write or sync. ──────
+// ─── 2D EPOCH SWEEP (2026-07-22): Layer-2 LOD trajectory offset δ × USNO ───
+// Tests the "one-century epoch offset" hypothesis: the ~730 μs/day linear
+// drift in the Stephenson residual (L-5b §15) numerically equals the
+// framework's observable dLOD/dt (0.764 ms/cy) × ~0.96 century, suggesting
+// the H/13-structural LOD anchor (86399.9997 ≈ the ~1870–1900 mean solar
+// day, the SI second's calibration epoch) is pinned one century late at
+// J2000. A constant trajectory offset δ (s/day) enters the ΔT integral
+// analytically: ΔT_δ(y) = ΔT₀(y) − δ·365.2422·(2000−y).
+//
+// Metrics per (δ, USNO) grid point, after the full quiet 5-stage fit:
+//   driftSlope  — linear slope of the final shipped-stack residual (target 0)
+//   phantomAmp  — 8H/2024 line in the final residual (anchor shadow price)
+//   espenakRMS  — modern shape fit (deltaTStart free = trend-offset allowed;
+//                 ΔT(2000)_trend reported as a SOFT indicator vs observed
+//                 63.8 s — today may legitimately sit above/below trend)
+function deltaTWithLodOffset(baseDeltaT, year, deltaLodS) {
+  return baseDeltaT - deltaLodS * 365.2422 * (2000 - year);
+}
+
+function runSweepEpoch() {
+  console.log('═══════════════════════════════════════════════════════════════════════');
+  console.log('  2D EPOCH SWEEP — Layer-2 LOD trajectory offset δ × USNO anchor');
+  console.log('  Hypothesis: drift ⇔ ~1-century epoch offset of the LOD anchor');
+  console.log('═══════════════════════════════════════════════════════════════════════\n');
+  if (process.env.DT_CORRECTIONS_DISABLED !== '1') {
+    console.log('  ✗ REFUSING: DT_CORRECTIONS_DISABLED=1 not set.');
+    return;
+  }
+  const segments = loadStephenson();
+  const { year_start, year_end, step_yr } = CONFIG.fit_window;
+  const years = [], baseModel = [], steph = [];
+  for (let y = year_start; y <= year_end; y += step_yr) {
+    const s = stephensonDeltaT(y, segments);
+    const m = frameworkModelDeltaT(y);
+    if (!Number.isFinite(s) || !Number.isFinite(m)) continue;
+    years.push(y); steph.push(s); baseModel.push(m);
+  }
+  const espenakYears = Object.keys(ESPENAK_REFERENCE).map(Number).sort((a, b) => a - b);
+  const basePhysEsp = espenakYears.map(y => DT.meanDeltaTSecondsAtAge((2000 - y) / 1e6));
+
+  const DELTAS = [];   // seconds/day
+  for (let d = -1500e-6; d <= 1500e-6 + 1e-12; d += 250e-6) DELTAS.push(Math.round(d * 1e6) / 1e6);
+  const USNOS = [];
+  for (let u = 86400.0016; u <= 86400.0030 + 1e-9; u += 0.0002) USNOS.push(Math.round(u * 1e7) / 1e7);
+
+  function linSlope(ys2, vals) {
+    const n2 = ys2.length;
+    const mx = ys2.reduce((a, b) => a + b, 0) / n2;
+    const my = vals.reduce((a, b) => a + b, 0) / n2;
+    let sxy = 0, sxx = 0;
+    for (let i = 0; i < n2; i++) { sxy += (ys2[i] - mx) * (vals[i] - my); sxx += (ys2[i] - mx) ** 2; }
+    return sxy / sxx;
+  }
+
+  console.log('  δ(μs/day)  bestUSNO      drift(s/yr)  phantom(s)  EspRMS(s)  ΔT2000trend(s)  Bond(s)');
+  console.log('  ' + '─'.repeat(90));
+  const results = [];
+  for (const delta of DELTAS) {
+    const residual = years.map((y, i) => steph[i] - deltaTWithLodOffset(baseModel[i], y, delta));
+    let best = null;
+    for (const usno of USNOS) {
+      const shipped = runFitQuiet(usno, years, residual);
+      const five = [shipped.bond, shipped.hall, shipped.jose5, shipped.jose4, shipped.h253];
+      const residFinal = years.map((y, i) => {
+        let s = residual[i];
+        for (const c of five) {
+          const om = 2 * Math.PI * c.n / EIGHT_H;
+          s -= c.cos * Math.cos(om * y) + c.sin * Math.sin(om * y);
+        }
+        return s;
+      });
+      const drift = linSlope(years, residFinal);
+      const phantom = fitCycles(years, residFinal, [2024], null, null).cycles[0].amplitude;
+      // Espenak shape scoring with free deltaTStart (trend offset allowed)
+      function cyclesAt(y2) {
+        let s = 0;
+        for (const c of five) {
+          const om = 2 * Math.PI * c.n / EIGHT_H;
+          s += c.cos * Math.cos(om * y2) + c.sin * Math.sin(om * y2)
+             - (c.cos * Math.cos(om * 2000) + c.sin * Math.sin(om * 2000));
+        }
+        return s;
+      }
+      const modelEsp = espenakYears.map((y2, i) =>
+        deltaTWithLodOffset(basePhysEsp[i], y2, delta) + cyclesAt(y2));
+      const diffs = espenakYears.map((y2, i) => ESPENAK_REFERENCE[y2] - modelEsp[i]);
+      const dts = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+      const rms = Math.sqrt(diffs.reduce((s2, d2) => s2 + (d2 - dts) ** 2, 0) / diffs.length);
+      const row = { delta, usno, drift, phantom, rms, deltaTStart: dts,
+                    bondAmp: Math.hypot(shipped.bond.cos, shipped.bond.sin) };
+      if (!best || Math.abs(row.drift) < Math.abs(best.drift)) best = row;
+      results.push(row);
+    }
+    console.log(`  ${(delta * 1e6).toFixed(0).padStart(7)}   ${best.usno.toFixed(4)}   ${best.drift.toFixed(4).padStart(10)}   ${best.phantom.toFixed(1).padStart(8)}   ${best.rms.toFixed(2).padStart(8)}   ${best.deltaTStart.toFixed(1).padStart(10)}     ${best.bondAmp.toFixed(0).padStart(5)}`);
+  }
+
+  // Global verdict: candidates with |drift| < 0.02 s/yr, ranked by Espenak RMS
+  const flat = results.filter(r => Math.abs(r.drift) < 0.02).sort((a, b) => a.rms - b.rms);
+  console.log('\n  ── Drift-flat candidates (|slope| < 0.02 s/yr), best 8 by Espenak RMS ──');
+  console.log('  δ(μs/day)   USNO        drift(s/yr)  phantom(s)  EspRMS(s)  ΔT2000trend(s)');
+  for (const r of flat.slice(0, 8)) {
+    console.log(`  ${(r.delta * 1e6).toFixed(0).padStart(7)}   ${r.usno.toFixed(4)}   ${r.drift.toFixed(4).padStart(10)}   ${r.phantom.toFixed(1).padStart(8)}   ${r.rms.toFixed(2).padStart(8)}   ${r.deltaTStart.toFixed(1).padStart(10)}`);
+  }
+  if (flat.length === 0) console.log('  (none — no grid point flattens the drift)');
+  console.log('\n  Reading: hypothesis CONFIRMED if drift-flat candidates cluster near');
+  console.log('  δ ≈ ±700–800 μs/day with Espenak RMS ≲ 25 s and |ΔT2000trend − 63.8| ≲ 10 s.');
+  console.log('  δ ≈ 0 flat candidates would mean the drift is already stack-absorbable.');
+  console.log('  Diagnostic only — nothing written.');
+}
+
 function runSweepUsno() {
   console.log('═══════════════════════════════════════════════════════════════════════');
   console.log('  JOINT SWEEP — USNO anchor × best deltaTStart, scored vs Espenak');
@@ -748,6 +893,7 @@ function main() {
   if (hallFree.amplitude > 400)      warnings.push(`Hallstatt free-fit amp ${hallFree.amplitude.toFixed(0)} s exceeds 400 s guardrail`);
   if (joseFree.amplitude > 200)      warnings.push(`Jose5 free-fit amp ${joseFree.amplitude.toFixed(0)} s exceeds 200 s guardrail`);
   if (jose4Free.amplitude > 200)      warnings.push(`Jose4 free-fit amp ${jose4Free.amplitude.toFixed(0)} s exceeds 200 s guardrail (Bond/2 degeneracy may inflate)`);
+  // (h253 guardrail is checked inside Stage E below — it runs after this block.)
   if (warnings.length === 0) {
     console.log('  ✓ No collinearity concerns detected.');
   } else {
@@ -781,9 +927,39 @@ function main() {
   // cascade shipping: Bond=solo, Hallstatt=Stage B, Jose5=Stage C, Jose4=Stage D.
   const anchorActive = CONFIG.usno_anchor.enabled && fitD.anchorAchieved !== null;
   const bondForShipRaw = anchorActive ? bondD : bondSolo;
-  const hallForShip = anchorActive ? shipCycle(hallCycle, hallD) : hallShipped;
-  const joseForShip = anchorActive ? shipCycle(joseCycle, joseD) : joseShipped;
-  const jose4ForShip = jose4Shipped;   // always from Stage D (unchanged)
+  let hallForShip = anchorActive ? shipCycle(hallCycle, hallD) : hallShipped;
+  let joseForShip = anchorActive ? shipCycle(joseCycle, joseD) : joseShipped;
+  let jose4ForShip = jose4Shipped;   // always from Stage D (unchanged)
+
+  // ─── Stage E: h253 frozen-residual fit (2026-07-22) ────────────────────
+  // The four Stage-D cycles are FROZEN (post-cap shipped values) and their
+  // contribution subtracted from the residual; h253 fits alone on what's
+  // left. This is structurally immune to the Bond-collinearity blowup that
+  // rolled back Eddy-999 (1,326 yr vs Bond 1,466 yr beat ≈ 14 kyr — a joint
+  // fit would be near-degenerate over the 2.7-kyr window; the frozen fit
+  // sidesteps it). GO evidence: scripts/lod_residual_h253_fifth_cycle.py.
+  const h253Cycle = CONFIG.cycles.find(c => c.name === 'h253');
+  const frozenFour = [bondForShipRaw, hallForShip, joseForShip, jose4ForShip];
+  const residualE = years.map((y, i) => {
+    let s = residual[i];
+    for (const c of frozenFour) {
+      const om = 2 * Math.PI * c.n / EIGHT_H;
+      s -= c.cos * Math.cos(om * y) + c.sin * Math.sin(om * y);
+    }
+    return s;
+  });
+  const fitE = fitCycles(years, residualE, [h253Cycle.lattice_n], null, sampleWeights);
+  const h253Free = fitE.cycles[0];
+  let h253ForShip = shipCycle(h253Cycle, h253Free);
+  console.log('── Stage E: h253 (frozen-residual fit after the four Stage-D cycles) ──');
+  console.log(`  R² = ${fitE.r2.toFixed(4)}, RMS post = ${fitE.rms_post.toFixed(1)} s (all)  ${fitE.rms_post_modern ? fitE.rms_post_modern.toFixed(1) + ' s (≥1600)' : ''}`);
+  console.log(`  h253 free amp = ${h253Free.amplitude.toFixed(2)} s  phase = ${h253Free.phase_deg.toFixed(2)}°`);
+  console.log(`  h253 ${h253ForShip.constrained ? 'CAPPED at ' + h253Cycle.target_amp_s : 'kept at free-fit ' + h253ForShip.amplitude.toFixed(2)} s: cos = ${h253ForShip.cos.toFixed(6)}  sin = ${h253ForShip.sin.toFixed(6)}`);
+  if (h253Free.amplitude > 200) {
+    warnings.push(`h253 free-fit amp ${h253Free.amplitude.toFixed(0)} s exceeds 200 s guardrail`);
+    console.log(`  ⚠ h253 free-fit amp ${h253Free.amplitude.toFixed(0)} s exceeds 200 s guardrail`);
+  }
+  console.log('');
 
   // cycleLOD-at-J2000 helper (identity with runtime _cycleLodCorrection at
   // year=2000 with taper=1, taper_prime=0).
@@ -792,20 +968,31 @@ function main() {
     return 86400 * omega * (c.sin * Math.cos(omega * 2000) - c.cos * Math.sin(omega * 2000)) / MEAN_TROPICAL_YEAR_J2000_S;
   }
 
-  // Post-cap Bond adjustment to recover the USNO anchor exactly.
+  // Post-cap anchor closure. h253's J2000 LOD contribution is included in
+  // the pre-adjust sum so the full stack closes onto the USNO anchor exactly.
   let bondForShip = bondForShipRaw;
   let bondAdjustment = null;
   const anchorTarget = usnoDerivation ? usnoDerivation.targetOffset : null;
   if (anchorActive) {
+    // Bond-only min-norm closure — RETAINED after the 2026-07-22 closure-design
+    // experiments. Alternatives tested the same day and rejected on Espenak
+    // scoring: distributed min-norm over uncapped cycles (23.57 s — dumps the
+    // distortion into Jose4 and damages the modern window) and an anchored
+    // cap-refit with the in-fit USNO constraint (23.16 s — converges to the
+    // SAME ~74 s Bond haircut). Bond-only scores 21.66 s. Conclusion: the
+    // ~74 s Bond amplitude cost is the SHADOW PRICE of the USNO anchor itself
+    // (the constrained optimum pays it in every formulation), and its deficit
+    // is what the post-closure phantom check below quantifies as the apparent
+    // ~1,326-yr residual line. See scripts/lod_residual_h253_fifth_cycle.py;
+    // rejected closure implementations preserved in git history (see the
+    // closure-design experiment note above the quiet-fit section).
     const preAdjSum = cycleLodAtJ2000(bondForShipRaw)
                     + cycleLodAtJ2000(hallForShip)
                     + cycleLodAtJ2000(joseForShip)
-                    + cycleLodAtJ2000(jose4ForShip);
+                    + cycleLodAtJ2000(jose4ForShip)
+                    + cycleLodAtJ2000(h253ForShip);
     const deltaLod = anchorTarget - preAdjSum;
 
-    // Bond's LOD gradient at J2000 (partial derivatives of cycleLodAtJ2000 w.r.t. cos, sin):
-    //   d(cycleLOD)/d(cos) = -86400 × ω × sin(ω·2000) / T_yr
-    //   d(cycleLOD)/d(sin) = +86400 × ω × cos(ω·2000) / T_yr
     const omB = 2 * Math.PI * bondCycle.lattice_n / EIGHT_H;
     const wCos = -86400 * omB * Math.sin(omB * 2000) / MEAN_TROPICAL_YEAR_J2000_S;
     const wSin = +86400 * omB * Math.cos(omB * 2000) / MEAN_TROPICAL_YEAR_J2000_S;
@@ -822,6 +1009,7 @@ function main() {
       phase_deg: Math.atan2(sinAdj, cosAdj) * 180 / Math.PI,
     };
     bondAdjustment = {
+      closure_mode: 'bond-only min-norm (retained; see 2026-07-22 closure-design experiment notes above)',
       pre_adj_sum_lod_s: preAdjSum,
       delta_lod_s: deltaLod,
       cos_shift_s: dCos,
@@ -831,16 +1019,42 @@ function main() {
     };
   }
 
+  // ─── Post-closure phantom check ────────────────────────────────────────
+  // Re-fit the 8H/2024 line against the FINAL shipped-stack residual. Under
+  // the old Bond-only closure this phantom measured ~73–85 s (the Bond
+  // haircut leaking into the ~1,326-yr band); target after the distributed
+  // closure is ≲ the Stage-E irreducible level (~12 s).
+  {
+    const finalFive = [bondForShip, hallForShip, joseForShip, jose4ForShip, h253ForShip];
+    const residualFinal = years.map((y, i) => {
+      let s = residual[i];
+      for (const c of finalFive) {
+        const om = 2 * Math.PI * c.n / EIGHT_H;
+        s -= c.cos * Math.cos(om * y) + c.sin * Math.sin(om * y);
+      }
+      return s;
+    });
+    const fitPhantom = fitCycles(years, residualFinal, [2024], null, sampleWeights);
+    const ph = fitPhantom.cycles[0];
+    const polyOnly = fitCycles(years, residualFinal, [], null, sampleWeights);
+    console.log('── Post-closure phantom check (8H/2024 line vs final shipped residual) ──');
+    console.log(`  phantom amp = ${ph.amplitude.toFixed(2)} s  (Bond-only closure historically ~73–85 s; target ≲ 12 s)`);
+    console.log(`  final shipped-stack residual RMS (poly-detrended) = ${polyOnly.rms_post.toFixed(1)} s (all)  ${polyOnly.rms_post_modern ? polyOnly.rms_post_modern.toFixed(1) + ' s (≥1600)' : ''}`);
+    console.log('');
+  }
+
   const bondJ2000 = rawAtJ2000(bondForShip);
   const hallJ2000 = rawAtJ2000(hallForShip);
   const joseJ2000 = rawAtJ2000(joseForShip);
   const jose4J2000 = rawAtJ2000(jose4ForShip);
+  const h253J2000 = rawAtJ2000(h253ForShip);
 
   const sumLodAtJ2000 =
       cycleLodAtJ2000(bondForShip)
     + cycleLodAtJ2000(hallForShip)
     + cycleLodAtJ2000(joseForShip)
-    + cycleLodAtJ2000(jose4ForShip);
+    + cycleLodAtJ2000(jose4ForShip)
+    + cycleLodAtJ2000(h253ForShip);
 
   // ─── Print shipped coefficients ───
   console.log('── Shipped coefficients ' +
@@ -858,6 +1072,9 @@ function main() {
   console.log(`  JOSE4    cos = ${jose4ForShip.cos}`);
   console.log(`  JOSE4    sin = ${jose4ForShip.sin}`);
   console.log(`  JOSE4    raw@J2000 = ${jose4J2000.toFixed(6)}`);
+  console.log(`  H253     cos = ${h253ForShip.cos}`);
+  console.log(`  H253     sin = ${h253ForShip.sin}`);
+  console.log(`  H253     raw@J2000 = ${h253J2000.toFixed(6)}`);
   if (anchorActive) {
     const driftMs = (sumLodAtJ2000 - anchorTarget) * 1000;
     console.log(`  ── USNO LOD anchor achievement (post-cap + Bond adjustment) ──`);
@@ -887,6 +1104,7 @@ function main() {
       stage_b_bond_hallstatt_joint:          { r2: fitB.r2, rms_post: fitB.rms_post, rms_post_modern: fitB.rms_post_modern, bond_phase_shift_deg: bondPhaseShiftB, hallstatt_free_amp_s: hallFree.amplitude },
       stage_c_bond_hallstatt_jose5:          { r2: fitC.r2, rms_post: fitC.rms_post, rms_post_modern: fitC.rms_post_modern, bond_phase_shift_deg: bondPhaseShiftC, jose5_free_amp_s: joseFree.amplitude },
       stage_d_bond_hallstatt_jose5_jose4:   { r2: fitD.r2, rms_post: fitD.rms_post, rms_post_modern: fitD.rms_post_modern, bond_phase_shift_deg: bondPhaseShiftD, jose4_free_amp_s: jose4Free.amplitude },
+      stage_e_h253_frozen_residual:          { r2: fitE.r2, rms_post: fitE.rms_post, rms_post_modern: fitE.rms_post_modern, h253_free_amp_s: h253Free.amplitude, h253_free_phase_deg: h253Free.phase_deg },
     },
     collinearity_warnings: warnings,
     optimum: (effectiveDeltaTStart !== null) ? {
@@ -966,6 +1184,19 @@ function main() {
           ? `CAPPED from quad-fit free amp ${jose4Free.amplitude.toFixed(2)} s → ${jose4Cycle.target_amp_s} s prior`
           : `unconstrained: quad-fit free amp ${jose4Free.amplitude.toFixed(2)} s (below ${jose4Cycle.target_amp_s} s prior — no cap applied)`,
       },
+      h253: {
+        lattice_n: h253Cycle.lattice_n,
+        period_yr: EIGHT_H / h253Cycle.lattice_n,
+        cos_coeff_s: h253ForShip.cos,
+        sin_coeff_s: h253ForShip.sin,
+        raw_at_j2000_s: h253J2000,
+        amplitude_s: h253ForShip.amplitude,
+        phase_deg: h253ForShip.phase_deg,
+        target_amp_source: h253ForShip.constrained
+          ? `CAPPED from Stage-E frozen-residual free amp ${h253Free.amplitude.toFixed(2)} s → ${h253Cycle.target_amp_s} s prior`
+          : `unconstrained: Stage-E frozen-residual free amp ${h253Free.amplitude.toFixed(2)} s (below ${h253Cycle.target_amp_s} s prior — no cap applied)`,
+        source: 'Stage E frozen-residual fit (four Stage-D cycles subtracted; immune to Bond collinearity)',
+      },
     },
   };
 
@@ -990,6 +1221,8 @@ function main() {
 // of (usno, best deltaTStart, RMS vs Espenak) so the user can pick a value.
 if (process.argv.includes('--sweep-usno')) {
   runSweepUsno();
+} else if (process.argv.includes('--sweep-epoch')) {
+  runSweepEpoch();
 } else {
   main();
 }

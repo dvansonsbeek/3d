@@ -1,0 +1,1965 @@
+{
+  "_meta": {
+    "generator": "scripts/lattice_harmonic_scan.py",
+    "H": 335317,
+    "eight_H": 2682536,
+    "H_primes": [
+      23,
+      61,
+      239
+    ],
+    "candidates_source": "band",
+    "detrend_kind": "quadratic",
+    "n_perm_iterations": 200
+  },
+  "candidates": [
+    183,
+    184,
+    207,
+    230,
+    239,
+    244,
+    253,
+    276,
+    299,
+    305,
+    322,
+    345,
+    366,
+    368,
+    391,
+    414,
+    427,
+    437,
+    460,
+    478,
+    483,
+    488,
+    506,
+    529,
+    549,
+    552,
+    575,
+    598,
+    610,
+    621,
+    644,
+    667,
+    671,
+    690,
+    713,
+    717,
+    732,
+    736,
+    759
+  ],
+  "datasets": {
+    "steinhilber": {
+      "meta": {
+        "name": "steinhilber",
+        "label": "Steinhilber 2012 solar \u03a6 (MV)",
+        "kind": "solar",
+        "unit": "MV",
+        "span_yr": 9416.0,
+        "median_dt": 22.0
+      },
+      "detrend_applied": "quadratic"
+    },
+    "epica": {
+      "meta": {
+        "name": "epica",
+        "label": "EPICA Dome C CO2 (ppm)",
+        "kind": "climate",
+        "unit": "ppm",
+        "span_yr": 805719.9,
+        "median_dt": 275.3400000000438
+      },
+      "detrend_applied": "milankovitch"
+    },
+    "cheng": {
+      "meta": {
+        "name": "cheng",
+        "label": "Cheng 2016 speleothem \u03b418O (\u2030)",
+        "kind": "climate",
+        "unit": "\u2030",
+        "span_yr": 641300.0,
+        "median_dt": 50.0
+      },
+      "detrend_applied": "milankovitch"
+    }
+  },
+  "ranked": [
+    {
+      "n": 368,
+      "period_yr": 7289.5,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.042466990906767484,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 368,
+          "period_yr": 7289.5,
+          "cos_coeff": -4.509866296414207,
+          "sin_coeff": -90.68041593798424,
+          "amplitude": 90.79249268908393,
+          "phase_deg": -92.84718123338297,
+          "r2_total": 0.16508131456885955,
+          "r2_harmonic_only": 0.1099426879600857,
+          "resolvable": true,
+          "perm_95_threshold": 35.89720123594607
+        },
+        "epica": {
+          "n": 368,
+          "period_yr": 7289.5,
+          "cos_coeff": -1.0495531105028193,
+          "sin_coeff": 6.298464993568175,
+          "amplitude": 6.385313070395992,
+          "phase_deg": 99.46063118530799,
+          "r2_total": 0.553315908094183,
+          "r2_harmonic_only": 0.01539371623245525,
+          "resolvable": true,
+          "perm_95_threshold": 3.112703910018191
+        },
+        "cheng": {
+          "n": 368,
+          "period_yr": 7289.5,
+          "cos_coeff": 0.06405039277846794,
+          "sin_coeff": -0.043818063466155834,
+          "amplitude": 0.07760461004991957,
+          "phase_deg": -34.376756097139975,
+          "r2_total": 0.3811366119695223,
+          "r2_harmonic_only": 0.0020645685277615147,
+          "resolvable": true,
+          "perm_95_threshold": 0.045714409073189875
+        }
+      }
+    },
+    {
+      "n": 366,
+      "period_yr": 7329.333333333333,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.04203073646203551,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 366,
+          "period_yr": 7329.333333333333,
+          "cos_coeff": -3.730388468752737,
+          "sin_coeff": -91.57254034412402,
+          "amplitude": 91.64849122164546,
+          "phase_deg": -92.33276701214287,
+          "r2_total": 0.16504860154426726,
+          "r2_harmonic_only": 0.10990997493549344,
+          "resolvable": true,
+          "perm_95_threshold": 36.309660788436936
+        },
+        "epica": {
+          "n": 366,
+          "period_yr": 7329.333333333333,
+          "cos_coeff": -1.8307527727561397,
+          "sin_coeff": 5.663987076709962,
+          "amplitude": 5.952512521624104,
+          "phase_deg": 107.91222611195954,
+          "r2_total": 0.551176998936709,
+          "r2_harmonic_only": 0.013254807074981287,
+          "resolvable": true,
+          "perm_95_threshold": 2.988994546329273
+        },
+        "cheng": {
+          "n": 366,
+          "period_yr": 7329.333333333333,
+          "cos_coeff": 0.08594553247388823,
+          "sin_coeff": -0.033947365334352005,
+          "amplitude": 0.09240702443734534,
+          "phase_deg": -21.553374044285004,
+          "r2_total": 0.3819994708173926,
+          "r2_harmonic_only": 0.002927427375631805,
+          "resolvable": true,
+          "perm_95_threshold": 0.04608955291589756
+        }
+      }
+    },
+    {
+      "n": 427,
+      "period_yr": 6282.285714285715,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.040775036980338845,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 427,
+          "period_yr": 6282.285714285715,
+          "cos_coeff": -23.711616371436083,
+          "sin_coeff": -70.10042640439674,
+          "amplitude": 74.00209816636553,
+          "phase_deg": -108.68821550440734,
+          "r2_total": 0.16344714213416078,
+          "r2_harmonic_only": 0.10830851552538699,
+          "resolvable": true,
+          "perm_95_threshold": 28.054716491192423
+        },
+        "epica": {
+          "n": 427,
+          "period_yr": 6282.285714285715,
+          "cos_coeff": -1.6460413091455974,
+          "sin_coeff": 5.496142610465207,
+          "amplitude": 5.737336976854772,
+          "phase_deg": 106.6724472673252,
+          "r2_total": 0.5500070450871869,
+          "r2_harmonic_only": 0.012084853225459194,
+          "resolvable": true,
+          "perm_95_threshold": 2.9802495957154895
+        },
+        "cheng": {
+          "n": 427,
+          "period_yr": 6282.285714285715,
+          "cos_coeff": -0.05853242895419313,
+          "sin_coeff": -0.0449563191179684,
+          "amplitude": 0.07380457890886091,
+          "phase_deg": -142.47363560312812,
+          "r2_total": 0.38100378563193105,
+          "r2_harmonic_only": 0.0019317421901703454,
+          "resolvable": true,
+          "perm_95_threshold": 0.04533257010035896
+        }
+      }
+    },
+    {
+      "n": 345,
+      "period_yr": 7775.466666666666,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.04021835433206955,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 345,
+          "period_yr": 7775.466666666666,
+          "cos_coeff": 5.381671360031221,
+          "sin_coeff": -102.17004156167049,
+          "amplitude": 102.31167958420414,
+          "phase_deg": -86.98480735180408,
+          "r2_total": 0.1645047624937951,
+          "r2_harmonic_only": 0.10936613588502123,
+          "resolvable": true,
+          "perm_95_threshold": 41.3316242993883
+        },
+        "epica": {
+          "n": 345,
+          "period_yr": 7775.466666666666,
+          "cos_coeff": -1.7220821948372618,
+          "sin_coeff": 4.732007242502303,
+          "amplitude": 5.0356190909231575,
+          "phase_deg": 109.99756662912162,
+          "r2_total": 0.5474171426866317,
+          "r2_harmonic_only": 0.009494950824903934,
+          "resolvable": true,
+          "perm_95_threshold": 2.9932021503307715
+        },
+        "cheng": {
+          "n": 345,
+          "period_yr": 7775.466666666666,
+          "cos_coeff": 0.04487062289025125,
+          "sin_coeff": 0.05581937423451968,
+          "amplitude": 0.07161826120824562,
+          "phase_deg": 51.205802290416614,
+          "r2_total": 0.38086601972804424,
+          "r2_harmonic_only": 0.001793976286283489,
+          "resolvable": true,
+          "perm_95_threshold": 0.04551334891687645
+        }
+      }
+    },
+    {
+      "n": 437,
+      "period_yr": 6138.526315789473,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.03985840143262131,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 437,
+          "period_yr": 6138.526315789473,
+          "cos_coeff": -26.564670640575176,
+          "sin_coeff": -67.22385291360926,
+          "amplitude": 72.28228086324344,
+          "phase_deg": -111.56231290853202,
+          "r2_total": 0.16242431720295136,
+          "r2_harmonic_only": 0.10728569059417749,
+          "resolvable": true,
+          "perm_95_threshold": 26.94584672701507
+        },
+        "epica": {
+          "n": 437,
+          "period_yr": 6138.526315789473,
+          "cos_coeff": -1.6839898798763135,
+          "sin_coeff": 5.214581634795747,
+          "amplitude": 5.479752142339554,
+          "phase_deg": 107.89727280004614,
+          "r2_total": 0.5491279300402274,
+          "r2_harmonic_only": 0.011205738178499696,
+          "resolvable": true,
+          "perm_95_threshold": 3.057381536332771
+        },
+        "cheng": {
+          "n": 437,
+          "period_yr": 6138.526315789473,
+          "cos_coeff": -0.023298799894261205,
+          "sin_coeff": -0.050674653406873854,
+          "amplitude": 0.05577413893929352,
+          "phase_deg": -114.69165959396766,
+          "r2_total": 0.3801558189669475,
+          "r2_harmonic_only": 0.0010837755251867343,
+          "resolvable": true,
+          "perm_95_threshold": 0.04327592256240998
+        }
+      }
+    },
+    {
+      "n": 322,
+      "period_yr": 8330.857142857143,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.03832850953993288,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 322,
+          "period_yr": 8330.857142857143,
+          "cos_coeff": 18.103670441998702,
+          "sin_coeff": -117.07872315204156,
+          "amplitude": 118.47012407516458,
+          "phase_deg": -81.21007181728405,
+          "r2_total": 0.16360700972119013,
+          "r2_harmonic_only": 0.10846838311241627,
+          "resolvable": true,
+          "perm_95_threshold": 48.74196748432709
+        },
+        "epica": {
+          "n": 322,
+          "period_yr": 8330.857142857143,
+          "cos_coeff": 0.22839133899547587,
+          "sin_coeff": 3.9488545742972727,
+          "amplitude": 3.9554538364992506,
+          "phase_deg": 86.68985085725866,
+          "r2_total": 0.5435158645504248,
+          "r2_harmonic_only": 0.005593672688697098,
+          "resolvable": true,
+          "perm_95_threshold": 3.008254769073575
+        },
+        "cheng": {
+          "n": 322,
+          "period_yr": 8330.857142857143,
+          "cos_coeff": 0.02328395463913665,
+          "sin_coeff": -0.04498889366436589,
+          "amplitude": 0.05065711299295484,
+          "phase_deg": -62.636223072543046,
+          "r2_total": 0.37999551626044603,
+          "r2_harmonic_only": 0.000923472818685266,
+          "resolvable": true,
+          "perm_95_threshold": 0.045459495280462496
+        }
+      }
+    },
+    {
+      "n": 460,
+      "period_yr": 5831.6,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.03796965325427297,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 460,
+          "period_yr": 5831.6,
+          "cos_coeff": -32.916249212966,
+          "sin_coeff": -60.611971118218094,
+          "amplitude": 68.97311436411864,
+          "phase_deg": -118.50484304609455,
+          "r2_total": 0.1588039036770188,
+          "r2_harmonic_only": 0.10366527706824491,
+          "resolvable": true,
+          "perm_95_threshold": 25.643015676422095
+        },
+        "epica": {
+          "n": 460,
+          "period_yr": 5831.6,
+          "cos_coeff": -1.5721142891904851,
+          "sin_coeff": 4.016829873274158,
+          "amplitude": 4.313521249409187,
+          "phase_deg": 111.37447284954861,
+          "r2_total": 0.5450897529560763,
+          "r2_harmonic_only": 0.007167561094348566,
+          "resolvable": true,
+          "perm_95_threshold": 2.9003720318482977
+        },
+        "cheng": {
+          "n": 460,
+          "period_yr": 5831.6,
+          "cos_coeff": 0.002148772321615556,
+          "sin_coeff": -0.09413897893853888,
+          "amplitude": 0.094163499181375,
+          "phase_deg": -88.69242037722663,
+          "r2_total": 0.38214816504198623,
+          "r2_harmonic_only": 0.0030761216002254395,
+          "resolvable": true,
+          "perm_95_threshold": 0.04203439367150353
+        }
+      }
+    },
+    {
+      "n": 488,
+      "period_yr": 5497.0,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.03621976587643095,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 488,
+          "period_yr": 5497.0,
+          "cos_coeff": -40.13826745147913,
+          "sin_coeff": -51.699573028463575,
+          "amplitude": 65.45171017881738,
+          "phase_deg": -127.82487879319775,
+          "r2_total": 0.15137598920051976,
+          "r2_harmonic_only": 0.09623736259174595,
+          "resolvable": true,
+          "perm_95_threshold": 24.982375713195918
+        },
+        "epica": {
+          "n": 488,
+          "period_yr": 5497.0,
+          "cos_coeff": -4.070932516322086,
+          "sin_coeff": 2.965453994664222,
+          "amplitude": 5.036507614103097,
+          "phase_deg": 143.92868801429339,
+          "r2_total": 0.5470833420062683,
+          "r2_harmonic_only": 0.00916115014454064,
+          "resolvable": true,
+          "perm_95_threshold": 2.6609783447863316
+        },
+        "cheng": {
+          "n": 488,
+          "period_yr": 5497.0,
+          "cos_coeff": -0.09523343456726191,
+          "sin_coeff": 0.003860655247548764,
+          "amplitude": 0.09531165573222082,
+          "phase_deg": 177.67856531403294,
+          "r2_total": 0.382332828334767,
+          "r2_harmonic_only": 0.003260784893006257,
+          "resolvable": true,
+          "perm_95_threshold": 0.044626794580373205
+        }
+      }
+    },
+    {
+      "n": 549,
+      "period_yr": 4886.222222222223,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.026948919400078777,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 549,
+          "period_yr": 4886.222222222223,
+          "cos_coeff": -49.341211933733945,
+          "sin_coeff": -23.712039877657368,
+          "amplitude": 54.7431825001914,
+          "phase_deg": -154.3323309208771,
+          "r2_total": 0.12173206012703452,
+          "r2_harmonic_only": 0.06659343351826072,
+          "resolvable": true,
+          "perm_95_threshold": 23.798585529206452
+        },
+        "epica": {
+          "n": 549,
+          "period_yr": 4886.222222222223,
+          "cos_coeff": -3.35957113966275,
+          "sin_coeff": 4.7087358853835575,
+          "amplitude": 5.784367889471913,
+          "phase_deg": 125.5069550267144,
+          "r2_total": 0.5505115752191685,
+          "r2_harmonic_only": 0.012589383357440871,
+          "resolvable": true,
+          "perm_95_threshold": 2.9093381746198084
+        },
+        "cheng": {
+          "n": 549,
+          "period_yr": 4886.222222222223,
+          "cos_coeff": 0.029000073616117485,
+          "sin_coeff": -0.06256771523017982,
+          "amplitude": 0.06896175214468603,
+          "phase_deg": -65.13232417386374,
+          "r2_total": 0.38073598476629555,
+          "r2_harmonic_only": 0.0016639413245347523,
+          "resolvable": true,
+          "perm_95_threshold": 0.04200173205596454
+        }
+      }
+    },
+    {
+      "n": 575,
+      "period_yr": 4665.28,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.020304775342049095,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 575,
+          "period_yr": 4665.28,
+          "cos_coeff": -47.13406748983908,
+          "sin_coeff": -8.013784553050145,
+          "amplitude": 47.810470202659694,
+          "phase_deg": -170.35078141604657,
+          "r2_total": 0.10580891108452561,
+          "r2_harmonic_only": 0.0506702844757518,
+          "resolvable": true,
+          "perm_95_threshold": 23.28250551993341
+        },
+        "epica": {
+          "n": 575,
+          "period_yr": 4665.28,
+          "cos_coeff": -2.84101833200606,
+          "sin_coeff": 2.5981108810459523,
+          "amplitude": 3.8498786101647244,
+          "phase_deg": 137.55708765785457,
+          "r2_total": 0.5435333301405305,
+          "r2_harmonic_only": 0.005611138278802828,
+          "resolvable": true,
+          "perm_95_threshold": 3.144188004505784
+        },
+        "cheng": {
+          "n": 575,
+          "period_yr": 4665.28,
+          "cos_coeff": 0.016597252035145352,
+          "sin_coeff": -0.11352278613109847,
+          "amplitude": 0.1147296463259835,
+          "phase_deg": -81.68217608646223,
+          "r2_total": 0.3837049467133534,
+          "r2_harmonic_only": 0.004632903271592652,
+          "resolvable": true,
+          "perm_95_threshold": 0.04762806029771999
+        }
+      }
+    },
+    {
+      "n": 598,
+      "period_yr": 4485.846153846154,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.015297670331389138,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 598,
+          "period_yr": 4485.846153846154,
+          "cos_coeff": -40.883159494903566,
+          "sin_coeff": 5.949584894902482,
+          "amplitude": 41.313802665784415,
+          "phase_deg": 171.72006749001187,
+          "r2_total": 0.09297556330781076,
+          "r2_harmonic_only": 0.03783693669903694,
+          "resolvable": true,
+          "perm_95_threshold": 24.189172786403702
+        },
+        "epica": {
+          "n": 598,
+          "period_yr": 4485.846153846154,
+          "cos_coeff": -2.602879023547486,
+          "sin_coeff": 1.4677366570464934,
+          "amplitude": 2.9881817390616536,
+          "phase_deg": 150.58179677577877,
+          "r2_total": 0.5411692797860754,
+          "r2_harmonic_only": 0.0032470879243477967,
+          "resolvable": true,
+          "perm_95_threshold": 2.7756680482055556
+        },
+        "cheng": {
+          "n": 598,
+          "period_yr": 4485.846153846154,
+          "cos_coeff": 0.017968402591726128,
+          "sin_coeff": -0.11645149494645443,
+          "amplitude": 0.11782959800899964,
+          "phase_deg": -81.22846755254128,
+          "r2_total": 0.38388102981254346,
+          "r2_harmonic_only": 0.00480898637078268,
+          "resolvable": true,
+          "perm_95_threshold": 0.048527729117774754
+        }
+      }
+    },
+    {
+      "n": 610,
+      "period_yr": 4397.6,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.01423095856814884,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 610,
+          "period_yr": 4397.6,
+          "cos_coeff": -36.093661548685674,
+          "sin_coeff": 12.589692193915315,
+          "amplitude": 38.22633586323182,
+          "phase_deg": 160.7709126345738,
+          "r2_total": 0.08739021766697264,
+          "r2_harmonic_only": 0.032251591058198824,
+          "resolvable": true,
+          "perm_95_threshold": 25.315265937976704
+        },
+        "epica": {
+          "n": 610,
+          "period_yr": 4397.6,
+          "cos_coeff": -4.1369136937057895,
+          "sin_coeff": 0.36452148384282756,
+          "amplitude": 4.152942429332901,
+          "phase_deg": 174.96442474562426,
+          "r2_total": 0.5443113460674329,
+          "r2_harmonic_only": 0.006389154205705217,
+          "resolvable": true,
+          "perm_95_threshold": 3.1571850822236227
+        },
+        "cheng": {
+          "n": 610,
+          "period_yr": 4397.6,
+          "cos_coeff": 0.029553514947020486,
+          "sin_coeff": -0.10380004932739764,
+          "amplitude": 0.1079252541627489,
+          "phase_deg": -74.1075089530101,
+          "r2_total": 0.38312417388230324,
+          "r2_harmonic_only": 0.00405213044054248,
+          "resolvable": true,
+          "perm_95_threshold": 0.04528353707654166
+        }
+      }
+    },
+    {
+      "n": 759,
+      "period_yr": 3534.3030303030305,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.013018297021857693,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 759,
+          "period_yr": 3534.3030303030305,
+          "cos_coeff": 33.55097661846335,
+          "sin_coeff": 7.130090164619369,
+          "amplitude": 34.30023641038464,
+          "phase_deg": 11.997728747822217,
+          "r2_total": 0.08419660163639275,
+          "r2_harmonic_only": 0.02905797502761892,
+          "resolvable": true,
+          "perm_95_threshold": 26.238896309854
+        },
+        "epica": {
+          "n": 759,
+          "period_yr": 3534.3030303030305,
+          "cos_coeff": -4.0308090626414215,
+          "sin_coeff": -1.685322837491126,
+          "amplitude": 4.368951220377879,
+          "phase_deg": -157.3096922895069,
+          "r2_total": 0.5451884696018028,
+          "r2_harmonic_only": 0.007266277740075175,
+          "resolvable": true,
+          "perm_95_threshold": 2.834882805500583
+        },
+        "cheng": {
+          "n": 759,
+          "period_yr": 3534.3030303030305,
+          "cos_coeff": 0.06174334482914108,
+          "sin_coeff": -0.06304765357070294,
+          "amplitude": 0.08824538090722706,
+          "phase_deg": -45.598830572014585,
+          "r2_total": 0.3818026817396397,
+          "r2_harmonic_only": 0.0027306382978789776,
+          "resolvable": true,
+          "perm_95_threshold": 0.04588454851535055
+        }
+      }
+    },
+    {
+      "n": 621,
+      "period_yr": 4319.7037037037035,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.012263710774094876,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 621,
+          "period_yr": 4319.7037037037035,
+          "cos_coeff": -30.929170937341848,
+          "sin_coeff": 17.982017552011435,
+          "amplitude": 35.776620440060555,
+          "phase_deg": 149.82656106635045,
+          "r2_total": 0.08312815097615467,
+          "r2_harmonic_only": 0.027989524367380874,
+          "resolvable": true,
+          "perm_95_threshold": 26.37185231377443
+        },
+        "epica": {
+          "n": 621,
+          "period_yr": 4319.7037037037035,
+          "cos_coeff": -4.239187585755217,
+          "sin_coeff": -0.4272135888802101,
+          "amplitude": 4.2606599063695585,
+          "phase_deg": -174.24531908860035,
+          "r2_total": 0.544761425998751,
+          "r2_harmonic_only": 0.00683923413702336,
+          "resolvable": true,
+          "perm_95_threshold": 2.8960189255130064
+        },
+        "cheng": {
+          "n": 621,
+          "period_yr": 4319.7037037037035,
+          "cos_coeff": -0.0387987385662353,
+          "sin_coeff": -0.06295659904280229,
+          "amplitude": 0.07395184566572527,
+          "phase_deg": -121.6445958973709,
+          "r2_total": 0.38103441725964116,
+          "r2_harmonic_only": 0.001962373817880393,
+          "resolvable": true,
+          "perm_95_threshold": 0.0439987620799629
+        }
+      }
+    },
+    {
+      "n": 671,
+      "period_yr": 3997.818181818182,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 3,
+      "mean_r2_harmonic": 0.011426236471164744,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 671,
+          "period_yr": 3997.818181818182,
+          "cos_coeff": -2.5693420374783402,
+          "sin_coeff": 30.317418583972795,
+          "amplitude": 30.426097155260848,
+          "phase_deg": 94.84413036390801,
+          "r2_total": 0.07433898651164539,
+          "r2_harmonic_only": 0.019200359902871576,
+          "resolvable": true,
+          "perm_95_threshold": 27.927920136160402
+        },
+        "epica": {
+          "n": 671,
+          "period_yr": 3997.818181818182,
+          "cos_coeff": -6.035710538272294,
+          "sin_coeff": 0.5291200501439489,
+          "amplitude": 6.058858781096945,
+          "phase_deg": 174.9899784079674,
+          "r2_total": 0.5520097810072249,
+          "r2_harmonic_only": 0.01408758914549725,
+          "resolvable": true,
+          "perm_95_threshold": 2.964887619322018
+        },
+        "cheng": {
+          "n": 671,
+          "period_yr": 3997.818181818182,
+          "cos_coeff": -0.04420632645101865,
+          "sin_coeff": -0.029351931088631013,
+          "amplitude": 0.053063501174779024,
+          "phase_deg": -146.41680171741316,
+          "r2_total": 0.3800628038068862,
+          "r2_harmonic_only": 0.0009907603651254013,
+          "resolvable": true,
+          "perm_95_threshold": 0.04445489962417954
+        }
+      }
+    },
+    {
+      "n": 414,
+      "period_yr": 6479.555555555556,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.04242365130110507,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 414,
+          "period_yr": 6479.555555555556,
+          "cos_coeff": -19.896210720410558,
+          "sin_coeff": -73.97356938376554,
+          "amplitude": 76.60253369442654,
+          "phase_deg": -105.05422365041315,
+          "r2_total": 0.16437412338475565,
+          "r2_harmonic_only": 0.10923549677598185,
+          "resolvable": true,
+          "perm_95_threshold": 29.20741145223305
+        },
+        "epica": {
+          "n": 414,
+          "period_yr": 6479.555555555556,
+          "cos_coeff": -1.2503277079685136,
+          "sin_coeff": 6.836330972700268,
+          "amplitude": 6.949729530392877,
+          "phase_deg": 100.3645332627312,
+          "r2_total": 0.5553458779869933,
+          "r2_harmonic_only": 0.017423686125265604,
+          "resolvable": true,
+          "perm_95_threshold": 2.9049704197328015
+        },
+        "cheng": {
+          "n": 414,
+          "period_yr": 6479.555555555556,
+          "cos_coeff": 0.01563866685926807,
+          "sin_coeff": -0.03862682898991782,
+          "amplitude": 0.041672530748102225,
+          "phase_deg": -67.95867777521045,
+          "r2_total": 0.3796838144438285,
+          "r2_harmonic_only": 0.000611771002067776,
+          "resolvable": true,
+          "perm_95_threshold": 0.047086852344306526
+        }
+      }
+    },
+    {
+      "n": 391,
+      "period_yr": 6860.705882352941,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.04089852593212887,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 391,
+          "period_yr": 6860.705882352941,
+          "cos_coeff": -12.694535349612298,
+          "sin_coeff": -81.55493257056287,
+          "amplitude": 82.53701142112921,
+          "phase_deg": -98.84744779292706,
+          "r2_total": 0.16513257542445892,
+          "r2_harmonic_only": 0.10999394881568508,
+          "resolvable": true,
+          "perm_95_threshold": 31.940856858535124
+        },
+        "epica": {
+          "n": 391,
+          "period_yr": 6860.705882352941,
+          "cos_coeff": -1.5115668217779799,
+          "sin_coeff": 5.633043907827997,
+          "amplitude": 5.832325258781277,
+          "phase_deg": 105.02084996321972,
+          "r2_total": 0.55022949319705,
+          "r2_harmonic_only": 0.0123073013353223,
+          "resolvable": true,
+          "perm_95_threshold": 2.595633232429936
+        },
+        "cheng": {
+          "n": 391,
+          "period_yr": 6860.705882352941,
+          "cos_coeff": 0.027169929036124824,
+          "sin_coeff": 0.01967929659102487,
+          "amplitude": 0.03354817071235899,
+          "phase_deg": 35.915976014194676,
+          "r2_total": 0.37946637108714,
+          "r2_harmonic_only": 0.00039432764537922004,
+          "resolvable": true,
+          "perm_95_threshold": 0.0399409335602793
+        }
+      }
+    },
+    {
+      "n": 483,
+      "period_yr": 5553.9047619047615,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.03646730474499074,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 483,
+          "period_yr": 5553.9047619047615,
+          "cos_coeff": -38.91071780439861,
+          "sin_coeff": -53.41436502463867,
+          "amplitude": 66.08432757499229,
+          "phase_deg": -126.07218376439492,
+          "r2_total": 0.15298131583110686,
+          "r2_harmonic_only": 0.09784268922233302,
+          "resolvable": true,
+          "perm_95_threshold": 24.735481504297773
+        },
+        "epica": {
+          "n": 483,
+          "period_yr": 5553.9047619047615,
+          "cos_coeff": -4.658815211729257,
+          "sin_coeff": 3.2218959700278167,
+          "amplitude": 5.664377531443451,
+          "phase_deg": 145.3334357976103,
+          "r2_total": 0.549433449008516,
+          "r2_harmonic_only": 0.011511257146788228,
+          "resolvable": true,
+          "perm_95_threshold": 2.7564064197381817
+        },
+        "cheng": {
+          "n": 483,
+          "period_yr": 5553.9047619047615,
+          "cos_coeff": -0.006482392838225164,
+          "sin_coeff": 0.009510891778068653,
+          "amplitude": 0.011509929596796272,
+          "phase_deg": 124.2773921827547,
+          "r2_total": 0.37912001130761175,
+          "r2_harmonic_only": 4.796786585097409e-05,
+          "resolvable": true,
+          "perm_95_threshold": 0.04400217820258444
+        }
+      }
+    },
+    {
+      "n": 506,
+      "period_yr": 5301.454545454545,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.03626167218347992,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 506,
+          "period_yr": 5301.454545454545,
+          "cos_coeff": -44.186245066607626,
+          "sin_coeff": -44.89979886118372,
+          "amplitude": 62.99536642373835,
+          "phase_deg": -134.54108696702147,
+          "r2_total": 0.14450925172004236,
+          "r2_harmonic_only": 0.08937062511126852,
+          "resolvable": true,
+          "perm_95_threshold": 24.103074032026626
+        },
+        "epica": {
+          "n": 506,
+          "period_yr": 5301.454545454545,
+          "cos_coeff": -5.0600149632211515,
+          "sin_coeff": 5.203081197886599,
+          "amplitude": 7.257809957543873,
+          "phase_deg": 134.20135596339983,
+          "r2_total": 0.557287605188828,
+          "r2_harmonic_only": 0.01936541332710032,
+          "resolvable": true,
+          "perm_95_threshold": 2.8333285067615837
+        },
+        "cheng": {
+          "n": 506,
+          "period_yr": 5301.454545454545,
+          "cos_coeff": 0.0110069011697051,
+          "sin_coeff": -0.004387518125989415,
+          "amplitude": 0.011849142950675427,
+          "phase_deg": -21.732977601689264,
+          "r2_total": 0.37912102155383165,
+          "r2_harmonic_only": 4.897811207092187e-05,
+          "resolvable": true,
+          "perm_95_threshold": 0.04645009561886188
+        }
+      }
+    },
+    {
+      "n": 478,
+      "period_yr": 5612.0,
+      "gcd_H": 239,
+      "shared_H_factors": "239",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.03546419510659864,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 478,
+          "period_yr": 5612.0,
+          "cos_coeff": -37.650653403664386,
+          "sin_coeff": -55.066487894863286,
+          "amplitude": 66.70749426262381,
+          "phase_deg": -124.36161844570043,
+          "r2_total": 0.15446017722106142,
+          "r2_harmonic_only": 0.09932155061228763,
+          "resolvable": true,
+          "perm_95_threshold": 24.82455993860676
+        },
+        "epica": {
+          "n": 478,
+          "period_yr": 5612.0,
+          "cos_coeff": -3.4527085970316143,
+          "sin_coeff": 2.751288322428317,
+          "amplitude": 4.414836813422037,
+          "phase_deg": 141.45043640040694,
+          "r2_total": 0.5449420758504409,
+          "r2_harmonic_only": 0.007019883988713101,
+          "resolvable": true,
+          "perm_95_threshold": 2.696355582489425
+        },
+        "cheng": {
+          "n": 478,
+          "period_yr": 5612.0,
+          "cos_coeff": 0.0051367539486859475,
+          "sin_coeff": 0.010989739614031494,
+          "amplitude": 0.012130977615738715,
+          "phase_deg": 64.9479729527694,
+          "r2_total": 0.37912319416055595,
+          "r2_harmonic_only": 5.11507187951791e-05,
+          "resolvable": true,
+          "perm_95_threshold": 0.04572396051546886
+        }
+      }
+    },
+    {
+      "n": 529,
+      "period_yr": 5070.95652173913,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.033421496612606245,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 529,
+          "period_yr": 5070.95652173913,
+          "cos_coeff": -48.00691336399221,
+          "sin_coeff": -34.47447173851461,
+          "amplitude": 59.102901218023945,
+          "phase_deg": -144.31731564180268,
+          "r2_total": 0.13328880057411518,
+          "r2_harmonic_only": 0.07815017396534138,
+          "resolvable": true,
+          "perm_95_threshold": 23.97463084168989
+        },
+        "epica": {
+          "n": 529,
+          "period_yr": 5070.95652173913,
+          "cos_coeff": -4.2069208840125665,
+          "sin_coeff": 6.336966848299703,
+          "amplitude": 7.606269266913349,
+          "phase_deg": 123.57898270360435,
+          "r2_total": 0.559425145202002,
+          "r2_harmonic_only": 0.021502953340274404,
+          "resolvable": true,
+          "perm_95_threshold": 3.0014971364376564
+        },
+        "cheng": {
+          "n": 529,
+          "period_yr": 5070.95652173913,
+          "cos_coeff": 0.04116876828768546,
+          "sin_coeff": -0.009282178322600261,
+          "amplitude": 0.04220220748654845,
+          "phase_deg": -12.705821803163703,
+          "r2_total": 0.37968340597396366,
+          "r2_harmonic_only": 0.0006113625322029429,
+          "resolvable": true,
+          "perm_95_threshold": 0.04762841316885056
+        }
+      }
+    },
+    {
+      "n": 552,
+      "period_yr": 4859.666666666667,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.025421298266056682,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 552,
+          "period_yr": 4859.666666666667,
+          "cos_coeff": -49.33352063170748,
+          "sin_coeff": -21.976747136833467,
+          "amplitude": 54.00716316041258,
+          "phase_deg": -155.98832281461216,
+          "r2_total": 0.11990713064061187,
+          "r2_harmonic_only": 0.06476850403183802,
+          "resolvable": true,
+          "perm_95_threshold": 23.50619582382713
+        },
+        "epica": {
+          "n": 552,
+          "period_yr": 4859.666666666667,
+          "cos_coeff": -3.4299430947642526,
+          "sin_coeff": 4.354711483239197,
+          "amplitude": 5.543286185610148,
+          "phase_deg": 128.22536764174075,
+          "r2_total": 0.5493313049070019,
+          "r2_harmonic_only": 0.011409113045274217,
+          "resolvable": true,
+          "perm_95_threshold": 2.881175280190667
+        },
+        "cheng": {
+          "n": 552,
+          "period_yr": 4859.666666666667,
+          "cos_coeff": 0.015406827230602027,
+          "sin_coeff": -0.0033287945711852505,
+          "amplitude": 0.015762334808357946,
+          "phase_deg": -12.19190160570786,
+          "r2_total": 0.37915832116281856,
+          "r2_harmonic_only": 8.627772105780556e-05,
+          "resolvable": true,
+          "perm_95_threshold": 0.04577473400523755
+        }
+      }
+    },
+    {
+      "n": 183,
+      "period_yr": 14658.666666666666,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": null,
+      "resolvable_datasets": 2,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.022637385902547096,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 183,
+          "period_yr": 14658.666666666666,
+          "cos_coeff": 439.591781633805,
+          "sin_coeff": -465.6851164088582,
+          "amplitude": 640.3932870703086,
+          "phase_deg": -46.65101323126906,
+          "r2_total": 0.15699349957897135,
+          "r2_harmonic_only": 0.10185487297019752,
+          "resolvable": false,
+          "perm_95_threshold": 307.14925987755606
+        },
+        "epica": {
+          "n": 183,
+          "period_yr": 14658.666666666666,
+          "cos_coeff": 1.1644527412312586,
+          "sin_coeff": 8.540791480238012,
+          "amplitude": 8.619806801516331,
+          "phase_deg": 82.23615542056521,
+          "r2_total": 0.5632282327852713,
+          "r2_harmonic_only": 0.025306040923543677,
+          "resolvable": true,
+          "perm_95_threshold": 3.06661670525555
+        },
+        "cheng": {
+          "n": 183,
+          "period_yr": 14658.666666666666,
+          "cos_coeff": 0.08030072477229287,
+          "sin_coeff": 0.22663332949723775,
+          "amplitude": 0.24043891623021232,
+          "phase_deg": 70.48974490089682,
+          "r2_total": 0.3990407743233113,
+          "r2_harmonic_only": 0.01996873088155051,
+          "resolvable": true,
+          "perm_95_threshold": 0.045905658226315676
+        }
+      }
+    },
+    {
+      "n": 184,
+      "period_yr": 14579.0,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 2,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.020543760798422506,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 184,
+          "period_yr": 14579.0,
+          "cos_coeff": 429.3505023833288,
+          "sin_coeff": -458.8419913214656,
+          "amplitude": 628.3930512797423,
+          "phase_deg": -46.901746851743596,
+          "r2_total": 0.15703390192754418,
+          "r2_harmonic_only": 0.10189527531877032,
+          "resolvable": false,
+          "perm_95_threshold": 301.1226643326414
+        },
+        "epica": {
+          "n": 184,
+          "period_yr": 14579.0,
+          "cos_coeff": 1.7105478079327432,
+          "sin_coeff": 8.457010034817868,
+          "amplitude": 8.628267064262303,
+          "phase_deg": 78.56539916027207,
+          "r2_total": 0.5635406908274294,
+          "r2_harmonic_only": 0.025618498965701682,
+          "resolvable": true,
+          "perm_95_threshold": 3.096457581575282
+        },
+        "cheng": {
+          "n": 184,
+          "period_yr": 14579.0,
+          "cos_coeff": 0.154026615472031,
+          "sin_coeff": 0.14542528277270508,
+          "amplitude": 0.21183179917871192,
+          "phase_deg": 43.354712062339516,
+          "r2_total": 0.39454106607290407,
+          "r2_harmonic_only": 0.01546902263114333,
+          "resolvable": true,
+          "perm_95_threshold": 0.04737103589331458
+        }
+      }
+    },
+    {
+      "n": 207,
+      "period_yr": 12959.111111111111,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 2,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.017429715356091283,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 207,
+          "period_yr": 12959.111111111111,
+          "cos_coeff": 255.50185096444463,
+          "sin_coeff": -334.8374091748765,
+          "amplitude": 421.18557243713957,
+          "phase_deg": -52.654107276474846,
+          "r2_total": 0.15801338393057196,
+          "r2_harmonic_only": 0.10287475732179807,
+          "resolvable": false,
+          "perm_95_threshold": 197.35376257650483
+        },
+        "epica": {
+          "n": 207,
+          "period_yr": 12959.111111111111,
+          "cos_coeff": 1.7422373668393452,
+          "sin_coeff": 8.797414516051782,
+          "amplitude": 8.968271472789498,
+          "phase_deg": 78.79810494001201,
+          "r2_total": 0.5664394480397922,
+          "r2_harmonic_only": 0.02851725617806452,
+          "resolvable": true,
+          "perm_95_threshold": 2.888628708907948
+        },
+        "cheng": {
+          "n": 207,
+          "period_yr": 12959.111111111111,
+          "cos_coeff": 0.09310668761938007,
+          "sin_coeff": 0.09669773609879273,
+          "amplitude": 0.1342360139682514,
+          "phase_deg": 46.08389137134172,
+          "r2_total": 0.3854142179758788,
+          "r2_harmonic_only": 0.006342174534118047,
+          "resolvable": true,
+          "perm_95_threshold": 0.04439454171546965
+        }
+      }
+    },
+    {
+      "n": 230,
+      "period_yr": 11663.2,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 2,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.017392939022502732,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 230,
+          "period_yr": 11663.2,
+          "cos_coeff": 156.99487939698622,
+          "sin_coeff": -255.00229297793555,
+          "amplitude": 299.45544172861366,
+          "phase_deg": -58.381027435029864,
+          "r2_total": 0.15907906027774465,
+          "r2_harmonic_only": 0.10394043366897081,
+          "resolvable": false,
+          "perm_95_threshold": 136.72337869065805
+        },
+        "epica": {
+          "n": 230,
+          "period_yr": 11663.2,
+          "cos_coeff": 4.576680982752371,
+          "sin_coeff": 7.364073093496429,
+          "amplitude": 8.670385305408594,
+          "phase_deg": 58.139556418666345,
+          "r2_total": 0.5657974239112544,
+          "r2_harmonic_only": 0.027875232049526806,
+          "resolvable": true,
+          "perm_95_threshold": 2.714397836748587
+        },
+        "cheng": {
+          "n": 230,
+          "period_yr": 11663.2,
+          "cos_coeff": 0.13915745244958774,
+          "sin_coeff": -0.008796596138754047,
+          "amplitude": 0.13943520601299952,
+          "phase_deg": -3.617040299147281,
+          "r2_total": 0.38598268943723946,
+          "r2_harmonic_only": 0.0069106459954786596,
+          "resolvable": true,
+          "perm_95_threshold": 0.046560599441038915
+        }
+      }
+    },
+    {
+      "n": 239,
+      "period_yr": 11224.0,
+      "gcd_H": 239,
+      "shared_H_factors": "239",
+      "nearest_known": null,
+      "resolvable_datasets": 2,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.01498028384133047,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 239,
+          "period_yr": 11224.0,
+          "cos_coeff": 130.37807296052617,
+          "sin_coeff": -231.53698239973494,
+          "amplitude": 265.7213128969437,
+          "phase_deg": -60.61621401555509,
+          "r2_total": 0.15951536777130604,
+          "r2_harmonic_only": 0.10437674116253216,
+          "resolvable": false,
+          "perm_95_threshold": 119.97550831146192
+        },
+        "epica": {
+          "n": 239,
+          "period_yr": 11224.0,
+          "cos_coeff": 5.777089651717044,
+          "sin_coeff": 6.0780877945699086,
+          "amplitude": 8.385577862167631,
+          "phase_deg": 46.4544041185779,
+          "r2_total": 0.5642087810449591,
+          "r2_harmonic_only": 0.026286589183231387,
+          "resolvable": true,
+          "perm_95_threshold": 2.9559289101328865
+        },
+        "cheng": {
+          "n": 239,
+          "period_yr": 11224.0,
+          "cos_coeff": -0.10102325694487406,
+          "sin_coeff": 0.0017340878271890961,
+          "amplitude": 0.10103813886024648,
+          "phase_deg": 179.01660112450642,
+          "r2_total": 0.38274602194119034,
+          "r2_harmonic_only": 0.00367397849942955,
+          "resolvable": true,
+          "perm_95_threshold": 0.040315013953903626
+        }
+      }
+    },
+    {
+      "n": 713,
+      "period_yr": 3762.3225806451615,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.013269753632818302,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 713,
+          "period_yr": 3762.3225806451615,
+          "cos_coeff": 19.329832782689916,
+          "sin_coeff": 24.284176471532025,
+          "amplitude": 31.03810017232471,
+          "phase_deg": 51.48074730255345,
+          "r2_total": 0.07694069289205363,
+          "r2_harmonic_only": 0.021802066283279742,
+          "resolvable": true,
+          "perm_95_threshold": 26.92423275190668
+        },
+        "epica": {
+          "n": 713,
+          "period_yr": 3762.3225806451615,
+          "cos_coeff": -6.820396173083628,
+          "sin_coeff": 1.017877870329466,
+          "amplitude": 6.895932084694588,
+          "phase_deg": 171.51180973779307,
+          "r2_total": 0.555593758917976,
+          "r2_harmonic_only": 0.017671567056248408,
+          "resolvable": true,
+          "perm_95_threshold": 2.974518147318959
+        },
+        "cheng": {
+          "n": 713,
+          "period_yr": 3762.3225806451615,
+          "cos_coeff": 0.027592227348113355,
+          "sin_coeff": -0.013611727528141543,
+          "amplitude": 0.030767030021279933,
+          "phase_deg": -26.25792812354631,
+          "r2_total": 0.3794076710006875,
+          "r2_harmonic_only": 0.00033562755892675684,
+          "resolvable": true,
+          "perm_95_threshold": 0.041314783459218005
+        }
+      }
+    },
+    {
+      "n": 644,
+      "period_yr": 4165.428571428572,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.01308806321983507,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 644,
+          "period_yr": 4165.428571428572,
+          "cos_coeff": -18.42305504285235,
+          "sin_coeff": 26.372286741887077,
+          "amplitude": 32.169962155841596,
+          "phase_deg": 124.93723806430734,
+          "r2_total": 0.07703516775777441,
+          "r2_harmonic_only": 0.02189654114900057,
+          "resolvable": true,
+          "perm_95_threshold": 27.02085072778828
+        },
+        "epica": {
+          "n": 644,
+          "period_yr": 4165.428571428572,
+          "cos_coeff": -6.609308390850121,
+          "sin_coeff": -0.2940111746662075,
+          "amplitude": 6.6158446154811115,
+          "phase_deg": -177.4529103639726,
+          "r2_total": 0.5548703493407932,
+          "r2_harmonic_only": 0.016948157479065435,
+          "resolvable": true,
+          "perm_95_threshold": 2.9555474480891575
+        },
+        "cheng": {
+          "n": 644,
+          "period_yr": 4165.428571428572,
+          "cos_coeff": -0.006837852222942216,
+          "sin_coeff": -0.033797927219346435,
+          "amplitude": 0.03448269286681414,
+          "phase_deg": -101.43745373805187,
+          "r2_total": 0.37949153447319994,
+          "r2_harmonic_only": 0.00041949103143920825,
+          "resolvable": true,
+          "perm_95_threshold": 0.04530667998607691
+        }
+      }
+    },
+    {
+      "n": 717,
+      "period_yr": 3741.3333333333335,
+      "gcd_H": 239,
+      "shared_H_factors": "239",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.012850836007376243,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 717,
+          "period_yr": 3741.3333333333335,
+          "cos_coeff": 21.03408206440544,
+          "sin_coeff": 23.094887923365565,
+          "amplitude": 31.237900961571654,
+          "phase_deg": 47.6737482240098,
+          "r2_total": 0.07747418921716687,
+          "r2_harmonic_only": 0.022335562608393016,
+          "resolvable": true,
+          "perm_95_threshold": 26.855511230288577
+        },
+        "epica": {
+          "n": 717,
+          "period_yr": 3741.3333333333335,
+          "cos_coeff": -6.433083766260319,
+          "sin_coeff": 1.0116855944074998,
+          "amplitude": 6.512148223562921,
+          "phase_deg": 171.06269621307146,
+          "r2_total": 0.5538943677420172,
+          "r2_harmonic_only": 0.01597217588028947,
+          "resolvable": true,
+          "perm_95_threshold": 3.1758604015883742
+        },
+        "cheng": {
+          "n": 717,
+          "period_yr": 3741.3333333333335,
+          "cos_coeff": -0.0048596993874695515,
+          "sin_coeff": -0.02598004007579874,
+          "amplitude": 0.026430648128199213,
+          "phase_deg": -100.59502896678705,
+          "r2_total": 0.37931681297520703,
+          "r2_harmonic_only": 0.0002447695334462372,
+          "resolvable": true,
+          "perm_95_threshold": 0.0445092577051698
+        }
+      }
+    },
+    {
+      "n": 244,
+      "period_yr": 10994.0,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": null,
+      "resolvable_datasets": 2,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.01262942503597945,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 244,
+          "period_yr": 10994.0,
+          "cos_coeff": 117.64870706354877,
+          "sin_coeff": -219.9375617759338,
+          "amplitude": 249.42684168642998,
+          "phase_deg": -61.85684200476204,
+          "r2_total": 0.15976156906910144,
+          "r2_harmonic_only": 0.10462294246032758,
+          "resolvable": false,
+          "perm_95_threshold": 111.89426292448539
+        },
+        "epica": {
+          "n": 244,
+          "period_yr": 10994.0,
+          "cos_coeff": 4.302002673993059,
+          "sin_coeff": 6.271440878424464,
+          "amplitude": 7.605142845378832,
+          "phase_deg": 55.55115585867932,
+          "r2_total": 0.5596410819814983,
+          "r2_harmonic_only": 0.021718890119770583,
+          "resolvable": true,
+          "perm_95_threshold": 2.9811031875980123
+        },
+        "cheng": {
+          "n": 244,
+          "period_yr": 10994.0,
+          "cos_coeff": 0.08420931257376733,
+          "sin_coeff": 0.056309440459558456,
+          "amplitude": 0.10130133962102875,
+          "phase_deg": 33.77002283956777,
+          "r2_total": 0.3826120033939491,
+          "r2_harmonic_only": 0.003539959952188318,
+          "resolvable": true,
+          "perm_95_threshold": 0.04491076630536088
+        }
+      }
+    },
+    {
+      "n": 253,
+      "period_yr": 10602.90909090909,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 2,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.012536380382699261,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 253,
+          "period_yr": 10602.90909090909,
+          "cos_coeff": 97.78252393822333,
+          "sin_coeff": -201.27041766766757,
+          "amplitude": 223.7659558910751,
+          "phase_deg": -64.08828518080566,
+          "r2_total": 0.1602103796461838,
+          "r2_harmonic_only": 0.1050717530374099,
+          "resolvable": false,
+          "perm_95_threshold": 99.17748634616287
+        },
+        "epica": {
+          "n": 253,
+          "period_yr": 10602.90909090909,
+          "cos_coeff": 5.309884643128117,
+          "sin_coeff": 6.112742505027424,
+          "amplitude": 8.09694361201168,
+          "phase_deg": 49.020514694926646,
+          "r2_total": 0.5620929728319377,
+          "r2_harmonic_only": 0.024170780970210057,
+          "resolvable": true,
+          "perm_95_threshold": 3.2807867233548715
+        },
+        "cheng": {
+          "n": 253,
+          "period_yr": 10602.90909090909,
+          "cos_coeff": 0.04564560555938276,
+          "sin_coeff": -0.02184594550059036,
+          "amplitude": 0.05060401803906009,
+          "phase_deg": -25.575734519377693,
+          "r2_total": 0.3799740232369492,
+          "r2_harmonic_only": 0.0009019797951884645,
+          "resolvable": true,
+          "perm_95_threshold": 0.04449902678002111
+        }
+      }
+    },
+    {
+      "n": 667,
+      "period_yr": 4021.793103448276,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.012347575637022276,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 667,
+          "period_yr": 4021.793103448276,
+          "cos_coeff": -4.907135651879865,
+          "sin_coeff": 30.15034282192802,
+          "amplitude": 30.54706454940862,
+          "phase_deg": 99.24415095410454,
+          "r2_total": 0.07447525521157217,
+          "r2_harmonic_only": 0.019336628602798358,
+          "resolvable": true,
+          "perm_95_threshold": 27.991288107248394
+        },
+        "epica": {
+          "n": 667,
+          "period_yr": 4021.793103448276,
+          "cos_coeff": -6.671409114132319,
+          "sin_coeff": 0.05823380279370205,
+          "amplitude": 6.671663266676129,
+          "phase_deg": 179.49988580654528,
+          "r2_total": 0.554946620244033,
+          "r2_harmonic_only": 0.017024428382305255,
+          "resolvable": true,
+          "perm_95_threshold": 2.860900820443425
+        },
+        "cheng": {
+          "n": 667,
+          "period_yr": 4021.793103448276,
+          "cos_coeff": -0.04221287786086578,
+          "sin_coeff": 0.013181100338243362,
+          "amplitude": 0.04422294046559106,
+          "phase_deg": 162.6588660478225,
+          "r2_total": 0.379753713367724,
+          "r2_harmonic_only": 0.000681669925963217,
+          "resolvable": true,
+          "perm_95_threshold": 0.04781445639107519
+        }
+      }
+    },
+    {
+      "n": 736,
+      "period_yr": 3644.75,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.01218727837514736,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 736,
+          "period_yr": 3644.75,
+          "cos_coeff": 27.953223476359433,
+          "sin_coeff": 16.47619583931341,
+          "amplitude": 32.44761519826535,
+          "phase_deg": 30.51595836654085,
+          "r2_total": 0.08038323381092027,
+          "r2_harmonic_only": 0.025244607202146437,
+          "resolvable": true,
+          "perm_95_threshold": 26.484234183742
+        },
+        "epica": {
+          "n": 736,
+          "period_yr": 3644.75,
+          "cos_coeff": -5.285261064151914,
+          "sin_coeff": -0.309557207120597,
+          "amplitude": 5.2943186701142695,
+          "phase_deg": -176.64802138918031,
+          "r2_total": 0.5487730446590051,
+          "r2_harmonic_only": 0.010850852797277469,
+          "resolvable": true,
+          "perm_95_threshold": 2.974129585553024
+        },
+        "cheng": {
+          "n": 736,
+          "period_yr": 3644.75,
+          "cos_coeff": -0.03284491048320832,
+          "sin_coeff": -0.015959233955966802,
+          "amplitude": 0.03651691790268247,
+          "phase_deg": -154.08503560613437,
+          "r2_total": 0.3795384185677789,
+          "r2_harmonic_only": 0.00046637512601817424,
+          "resolvable": true,
+          "perm_95_threshold": 0.044161682362479034
+        }
+      }
+    },
+    {
+      "n": 690,
+      "period_yr": 3887.733333333333,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.012135846425948714,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 690,
+          "period_yr": 3887.733333333333,
+          "cos_coeff": 8.094592290883558,
+          "sin_coeff": 29.23006577505238,
+          "amplitude": 30.33016929675006,
+          "phase_deg": 74.52115695363284,
+          "r2_total": 0.0747133775829828,
+          "r2_harmonic_only": 0.01957475097420898,
+          "resolvable": true,
+          "perm_95_threshold": 27.478671165088294
+        },
+        "epica": {
+          "n": 690,
+          "period_yr": 3887.733333333333,
+          "cos_coeff": -6.598308144450352,
+          "sin_coeff": -0.3840439320381279,
+          "amplitude": 6.609475025359817,
+          "phase_deg": -176.66894921075945,
+          "r2_total": 0.5542200216877164,
+          "r2_harmonic_only": 0.016297829825988853,
+          "resolvable": true,
+          "perm_95_threshold": 3.006533976102999
+        },
+        "cheng": {
+          "n": 690,
+          "period_yr": 3887.733333333333,
+          "cos_coeff": 0.01258448586453492,
+          "sin_coeff": 0.036816523629216835,
+          "amplitude": 0.03890791303340955,
+          "phase_deg": 71.1287384553719,
+          "r2_total": 0.3796070019194091,
+          "r2_harmonic_only": 0.0005349584776483089,
+          "resolvable": true,
+          "perm_95_threshold": 0.04617649500709928
+        }
+      }
+    },
+    {
+      "n": 732,
+      "period_yr": 3664.6666666666665,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": null,
+      "resolvable_datasets": 3,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.01191557316360642,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 732,
+          "period_yr": 3664.6666666666665,
+          "cos_coeff": 26.664303627630126,
+          "sin_coeff": 17.981591301296998,
+          "amplitude": 32.160887949080774,
+          "phase_deg": 33.994522558089,
+          "r2_total": 0.07973235704416604,
+          "r2_harmonic_only": 0.024593730435392147,
+          "resolvable": true,
+          "perm_95_threshold": 26.546881537331373
+        },
+        "epica": {
+          "n": 732,
+          "period_yr": 3664.6666666666665,
+          "cos_coeff": -5.377170601250222,
+          "sin_coeff": 0.4668572252328624,
+          "amplitude": 5.397399312974889,
+          "phase_deg": 175.0379035541056,
+          "r2_total": 0.5489479192808476,
+          "r2_harmonic_only": 0.011025727419119976,
+          "resolvable": true,
+          "perm_95_threshold": 2.8966550669221816
+        },
+        "cheng": {
+          "n": 732,
+          "period_yr": 3664.6666666666665,
+          "cos_coeff": 0.01884495469851335,
+          "sin_coeff": -0.0010916805126860343,
+          "amplitude": 0.018876548517427618,
+          "phase_deg": -3.315415704362036,
+          "r2_total": 0.37919930507806787,
+          "r2_harmonic_only": 0.00012726163630714167,
+          "resolvable": true,
+          "perm_95_threshold": 0.04880338935307864
+        }
+      }
+    },
+    {
+      "n": 276,
+      "period_yr": 9719.333333333334,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 2,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.0065826206747125,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 276,
+          "period_yr": 9719.333333333334,
+          "cos_coeff": 60.31271777274353,
+          "sin_coeff": -163.7952879962324,
+          "amplitude": 174.54661353032125,
+          "phase_deg": -69.78527879745833,
+          "r2_total": 0.16137642987659206,
+          "r2_harmonic_only": 0.10623780326781827,
+          "resolvable": false,
+          "perm_95_threshold": 74.80029689234037
+        },
+        "epica": {
+          "n": 276,
+          "period_yr": 9719.333333333334,
+          "cos_coeff": 3.78061749035911,
+          "sin_coeff": 3.2189901471989373,
+          "amplitude": 4.965376740608214,
+          "phase_deg": 40.412587670499,
+          "r2_total": 0.5465475416759618,
+          "r2_harmonic_only": 0.008625349814234047,
+          "resolvable": true,
+          "perm_95_threshold": 2.985594725229898
+        },
+        "cheng": {
+          "n": 276,
+          "period_yr": 9719.333333333334,
+          "cos_coeff": -0.071920295073542,
+          "sin_coeff": -0.08882100544276487,
+          "amplitude": 0.11428779397349928,
+          "phase_deg": -128.99784277377415,
+          "r2_total": 0.3836119349769517,
+          "r2_harmonic_only": 0.004539891535190953,
+          "resolvable": true,
+          "perm_95_threshold": 0.04526924111785465
+        }
+      }
+    },
+    {
+      "n": 299,
+      "period_yr": 8971.692307692309,
+      "gcd_H": 23,
+      "shared_H_factors": "23",
+      "nearest_known": null,
+      "resolvable_datasets": 2,
+      "significant_datasets": 2,
+      "mean_r2_harmonic": 0.0041338709882776025,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 299,
+          "period_yr": 8971.692307692309,
+          "cos_coeff": 35.436671455194904,
+          "sin_coeff": -136.8850721376014,
+          "amplitude": 141.39759777994735,
+          "phase_deg": -75.48596151115207,
+          "r2_total": 0.16253122961991395,
+          "r2_harmonic_only": 0.10739260301114015,
+          "resolvable": false,
+          "perm_95_threshold": 59.134396984611655
+        },
+        "epica": {
+          "n": 299,
+          "period_yr": 8971.692307692309,
+          "cos_coeff": 1.7806357991859771,
+          "sin_coeff": 3.244260021387919,
+          "amplitude": 3.7007954463491526,
+          "phase_deg": 61.23949678916199,
+          "r2_total": 0.5427908606781287,
+          "r2_harmonic_only": 0.004868668816400943,
+          "resolvable": true,
+          "perm_95_threshold": 2.924740185192977
+        },
+        "cheng": {
+          "n": 299,
+          "period_yr": 8971.692307692309,
+          "cos_coeff": 0.012920119279308697,
+          "sin_coeff": -0.09731019202031314,
+          "amplitude": 0.0981641632838674,
+          "phase_deg": -82.43693000239904,
+          "r2_total": 0.382471116601915,
+          "r2_harmonic_only": 0.003399073160154262,
+          "resolvable": true,
+          "perm_95_threshold": 0.04384757501770197
+        }
+      }
+    },
+    {
+      "n": 305,
+      "period_yr": 8795.2,
+      "gcd_H": 61,
+      "shared_H_factors": "61",
+      "nearest_known": null,
+      "resolvable_datasets": 2,
+      "significant_datasets": 1,
+      "mean_r2_harmonic": 0.004072707686671287,
+      "per_dataset": {
+        "steinhilber": {
+          "n": 305,
+          "period_yr": 8795.2,
+          "cos_coeff": 30.33382049076804,
+          "sin_coeff": -131.13951015770317,
+          "amplitude": 134.60204972424629,
+          "phase_deg": -76.97599421620806,
+          "r2_total": 0.16282285827580745,
+          "r2_harmonic_only": 0.10768423166703363,
+          "resolvable": false,
+          "perm_95_threshold": 56.05050498309277
+        },
+        "epica": {
+          "n": 305,
+          "period_yr": 8795.2,
+          "cos_coeff": 0.6482990039741432,
+          "sin_coeff": 2.825923407154723,
+          "amplitude": 2.899333492659791,
+          "phase_deg": 77.07927030818814,
+          "r2_total": 0.5409999380157688,
+          "r2_harmonic_only": 0.003077746154041173,
+          "resolvable": true,
+          "perm_95_threshold": 2.9093045546924783
+        },
+        "cheng": {
+          "n": 305,
+          "period_yr": 8795.2,
+          "cos_coeff": -0.11682205938741123,
+          "sin_coeff": 0.023002535726980713,
+          "amplitude": 0.11906515111226652,
+          "phase_deg": 168.86082585645084,
+          "r2_total": 0.38413971266106217,
+          "r2_harmonic_only": 0.0050676692193014,
+          "resolvable": true,
+          "perm_95_threshold": 0.046000163004312644
+        }
+      }
+    }
+  ]
+}
