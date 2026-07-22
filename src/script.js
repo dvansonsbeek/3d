@@ -32854,37 +32854,62 @@ function setupGUI() {
         }
 
         const isCentral = (evt.type === 'Total' || evt.type === 'Annular' || evt.type === 'Hybrid');
-        let minDist = Infinity, minPoint = null, minKind = '', minOffsetMin = 0;
         // Signed east-west drift capture: at the scan instant where the umbra
         // track crosses the site's latitude, record Δlon = lon_obs − lon_umbra
         // (positive = site EAST of framework path → framework ΔT too SMALL).
         // Unsigned min-distance folds east/west misses together and cannot see
         // a secular drift; this signed observable can.
-        let minLatDiff = Infinity, dlonAtLat = null;
+        //
+        // v2 conditioning: shallow crossing angle θ amplifies cross-track
+        // error into Δlon as 1/sin θ — record sin θ for the weighted fit.
+        //
+        // v3 branch fix: an umbra track arcs, crossing a given latitude TWICE
+        // (rising + falling branch). A global min-|Δlat| pick can land on the
+        // far branch (1842 Vienna: the other 48°N crossing sits ~72° west
+        // over the Atlantic), injecting ~15 ks phantoms. Two-pass scan: find
+        // the closest approach first, then search the latitude crossing only
+        // within ±60 min of it — the branch the observer actually sat under.
+        const samples = [];
         for (let dt = -halfWindow; dt <= halfWindow + 1e-9; dt += stepDays) {
           const jd = evt.jd + dt;
           let point = null, kind = '';
           if (isCentral) { point = umbraFromSceneAtJd(jd); kind = 'umbra'; }
           if (point === null) { point = subSolarFromSceneAtJd(jd); kind = 'sub-solar'; }
-          const dist = gcKmFromLatLon(lat_obs, lon_obs, point.lat, point.lon);
-          if (dist < minDist) {
-            minDist = dist;
-            minPoint = point;
-            minKind = kind;
-            minOffsetMin = Math.round(dt * 24 * 60);
+          samples.push({ dt, point, kind,
+                         dist: gcKmFromLatLon(lat_obs, lon_obs, point.lat, point.lon) });
+        }
+        let minDist = Infinity, minPoint = null, minKind = '', minOffsetMin = 0, dtMin = 0;
+        for (const s of samples) {
+          if (s.dist < minDist) {
+            minDist = s.dist;
+            minPoint = s.point;
+            minKind = s.kind;
+            minOffsetMin = Math.round(s.dt * 24 * 60);
+            dtMin = s.dt;
           }
-          if (kind === 'umbra') {
-            const latDiff = Math.abs(point.lat - lat_obs);
-            if (latDiff < minLatDiff) {
-              minLatDiff = latDiff;
-              dlonAtLat = ((lon_obs - point.lon + 540) % 360) - 180;
-            }
+        }
+        let minLatDiff = Infinity, dlonAtLat = null, sinThetaAtLat = null;
+        const BRANCH_WINDOW_D = 60 / 1440;   // ±60 min around closest approach
+        for (let i = 1; i < samples.length; i++) {
+          const s = samples[i], p = samples[i - 1];
+          if (s.kind !== 'umbra' || p.kind !== 'umbra') continue;
+          if (Math.abs(s.dt - dtMin) > BRANCH_WINDOW_D) continue;
+          const latDiff = Math.abs(s.point.lat - lat_obs);
+          if (latDiff < minLatDiff) {
+            minLatDiff = latDiff;
+            dlonAtLat = ((lon_obs - s.point.lon + 540) % 360) - 180;
+            const dLat = s.point.lat - p.point.lat;
+            const dLonScale = (((s.point.lon - p.point.lon + 540) % 360) - 180)
+                            * Math.cos(s.point.lat * Math.PI / 180);
+            const norm = Math.hypot(dLat, dLonScale);
+            sinThetaAtLat = norm > 1e-9 ? Math.abs(dLat) / norm : 0;
           }
         }
         results.push({
           year: Y, type, dist: minDist, kind: minKind, name,
           point: minPoint, offsetMin: minOffsetMin, jd: evt.jd,
           dlon: dlonAtLat, latDiff: minLatDiff,
+          sinTheta: sinThetaAtLat, latObs: lat_obs,
         });
       }
     } finally {
@@ -32965,47 +32990,71 @@ function setupGUI() {
     // ~0.5 ms/cy fractional non-tidal rate detected in the lunar timing test.
     const driftEvents = results.filter(r => r.dlon !== null && r.latDiff < 5);
     if (driftEvents.length >= 4) {
+      // Per-event conditioning: cross-track path uncertainty (band half-width
+      // ~100 km) maps to a longitude error of 100/(111.32·cosφ·sinθ) degrees
+      // at the latitude crossing → ×240 s of ΔT. Shallow crossings (small
+      // sin θ, e.g. 1842 Vienna) get honest, large error bars instead of
+      // poisoning the fit.
+      const HALF_WIDTH_KM = 100;
+      for (const r of driftEvents) {
+        const sinT = Math.max(r.sinTheta || 0, 1e-3);
+        const cosPhi = Math.max(Math.cos(r.latObs * Math.PI / 180), 0.2);
+        r.sigmaDt = (HALF_WIDTH_KM / (111.32 * cosPhi * sinT)) * 240;
+      }
       console.log('');
       console.log('  Signed east-west drift (umbra at site-latitude crossing):');
-      console.log('  Year    Δlon(°E of path)   δΔT_needed(s)   T²(cy²)   Event');
+      console.log('  Year    Δlon(°E of path)   δΔT_needed(s)   σ(s)   sinθ    T²(cy²)   Event');
       console.log('  ─────────────────────────────────────────────────────────────────────────────────');
-      const dxs = [], dys = [];
+      const dxs = [], dys = [], dss = [];
       for (const r of driftEvents) {
         const dT_need = r.dlon * 240;
         const Tcy2 = ((2000 - r.year) / 100) ** 2;
-        dxs.push(Tcy2); dys.push(dT_need);
-        console.log(`  ${`${r.year}`.padStart(5)}   ${r.dlon >= 0 ? '+' : ''}${r.dlon.toFixed(2).padStart(7)}          ${(dT_need >= 0 ? '+' : '') + Math.round(dT_need).toString().padStart(6)}     ${Tcy2.toFixed(1).padStart(6)}   ${r.name.slice(0, 48)}`);
+        dxs.push(Tcy2); dys.push(dT_need); dss.push(r.sigmaDt);
+        console.log(`  ${`${r.year}`.padStart(5)}   ${r.dlon >= 0 ? '+' : ''}${r.dlon.toFixed(2).padStart(7)}          ${(dT_need >= 0 ? '+' : '') + Math.round(dT_need).toString().padStart(6)}   ${Math.round(r.sigmaDt).toString().padStart(5)}   ${(r.sinTheta ?? 0).toFixed(2)}   ${Tcy2.toFixed(1).padStart(6)}   ${r.name.slice(0, 44)}`);
       }
-      // Quadratic drift-law fit: δΔT = a + c·T² (with intercept a = modern frame offset)
-      function fitLine(xs2, ys2) {
+      // Quadratic drift-law fit: δΔT = a + c·T² (intercept a = modern frame offset).
+      // Weighted (1/σ²) and unweighted variants; weighted SE inflated by
+      // sqrt(χ²_red) when the scatter exceeds the assigned errors.
+      function fitLine(xs2, ys2, ss2) {
         const m = xs2.length;
-        const mx = xs2.reduce((s, v) => s + v, 0) / m;
-        const my = ys2.reduce((s, v) => s + v, 0) / m;
+        const w = ss2 ? ss2.map(s => 1 / (s * s)) : xs2.map(() => 1);
+        const W = w.reduce((s, v) => s + v, 0);
+        const mx = xs2.reduce((s, v, i) => s + w[i] * v, 0) / W;
+        const my = ys2.reduce((s, v, i) => s + w[i] * v, 0) / W;
         let sxy = 0, sxx = 0;
-        for (let i = 0; i < m; i++) { sxy += (xs2[i] - mx) * (ys2[i] - my); sxx += (xs2[i] - mx) ** 2; }
+        for (let i = 0; i < m; i++) { sxy += w[i] * (xs2[i] - mx) * (ys2[i] - my); sxx += w[i] * (xs2[i] - mx) ** 2; }
         const c = sxy / sxx;
         const a = my - c * mx;
-        const res = ys2.reduce((s, v, i) => s + (v - (a + c * xs2[i])) ** 2, 0);
-        const tot = ys2.reduce((s, v) => s + (v - my) ** 2, 0);
-        const seC = Math.sqrt(res / Math.max(1, m - 2) / sxx);
-        return { a, c, r2: tot > 0 ? 1 - res / tot : 0, seC, n: m };
+        let chi2 = 0, tot = 0;
+        for (let i = 0; i < m; i++) { chi2 += w[i] * (ys2[i] - (a + c * xs2[i])) ** 2; tot += w[i] * (ys2[i] - my) ** 2; }
+        const dof = Math.max(1, m - 2);
+        const seC = ss2
+          ? Math.sqrt(1 / sxx) * Math.max(1, Math.sqrt(chi2 / dof))
+          : Math.sqrt(chi2 / dof / sxx);
+        return { a, c, r2: tot > 0 ? 1 - chi2 / tot : 0, seC, chi2red: chi2 / dof, n: m };
       }
-      const fAll = fitLine(dxs, dys);
       console.log('  ─────────────────────────────────────────────────────────────────────────────────');
-      console.log(`  Drift-law fit (all ${fAll.n}):  δΔT = ${fAll.a.toFixed(0)} + ${fAll.c.toFixed(1)}·T²   R² = ${fAll.r2.toFixed(3)}`);
+      const fAll = fitLine(dxs, dys, null);
+      console.log(`  Unweighted fit (all ${fAll.n}):      δΔT = ${fAll.a.toFixed(0)} + ${fAll.c.toFixed(1)}·T²   R² = ${fAll.r2.toFixed(3)}`);
       console.log(`    → implied secular rate r = ${(fAll.c / 18.26).toFixed(2)} ± ${(fAll.seC / 18.26).toFixed(2)} ms/cy`);
+      const fAllW = fitLine(dxs, dys, dss);
+      console.log(`  WEIGHTED fit (all ${fAllW.n}, 1/σ²):  δΔT = ${fAllW.a.toFixed(0)} + ${fAllW.c.toFixed(1)}·T²   χ²_red = ${fAllW.chi2red.toFixed(1)}`);
+      console.log(`    → implied secular rate r = ${(fAllW.c / 18.26).toFixed(2)} ± ${(fAllW.seC / 18.26).toFixed(2)} ms/cy`);
       const clean = driftEvents.filter(r => !/CONTESTED/i.test(r.name));
       if (clean.length >= 4 && clean.length < driftEvents.length) {
         const cx = clean.map(r => ((2000 - r.year) / 100) ** 2);
         const cy = clean.map(r => r.dlon * 240);
-        const fCl = fitLine(cx, cy);
-        console.log(`  Excluding CONTESTED (${fCl.n}):  δΔT = ${fCl.a.toFixed(0)} + ${fCl.c.toFixed(1)}·T²   R² = ${fCl.r2.toFixed(3)}`);
-        console.log(`    → implied secular rate r = ${(fCl.c / 18.26).toFixed(2)} ± ${(fCl.seC / 18.26).toFixed(2)} ms/cy`);
+        const cs = clean.map(r => r.sigmaDt);
+        const fClW = fitLine(cx, cy, cs);
+        console.log(`  WEIGHTED, excl. CONTESTED (${fClW.n}): δΔT = ${fClW.a.toFixed(0)} + ${fClW.c.toFixed(1)}·T²   χ²_red = ${fClW.chi2red.toFixed(1)}`);
+        console.log(`    → implied secular rate r = ${(fClW.c / 18.26).toFixed(2)} ± ${(fClW.seC / 18.26).toFixed(2)} ms/cy`);
       }
       console.log('  Reading: r > 0 → Earth rotation slower than framework (framework misses a');
       console.log('  braking channel); r < 0 → a speedup channel. Compare against the lunar-detected');
       console.log('  fractional non-tidal rate ~0.5 ms/cy (three-component residual decomposition).');
       console.log('  |r| within ~2σ of 0 → solar corpus cannot resolve the channel (power-limited).');
+      console.log('  The WEIGHTED fit is the conditioned answer: steep-crossing events (19th-c.');
+      console.log('  photographic anchors) dominate; shallow crossings carry ~10-20 ks error bars.');
       console.log('  ─────────────────────────────────────────────────────────────────────────────────');
     } else {
       console.log('  Signed drift analysis skipped: fewer than 4 events with umbra latitude-crossing.');
