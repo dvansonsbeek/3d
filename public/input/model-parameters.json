@@ -246,5 +246,14 @@
     "saturn": 2452875.9,
     "uranus": 2439699.8,
     "neptune": 2409432.4
+  },
+  "deepTime": {
+    "_description": "Deep-time (ESSRT) fitted/calibrated anchors — single source of truth. alpha1PerMa is LLR-anchored (da/dt = 3.82 cm/yr, Dickey 1994 / Chapront 2002); alpha3/alpha4 are the Farhat 2022 LSQ deep-time fit; alphaClimateScalePerMille is calibrated so dalpha/dt at J2000 = -1.35e-11/yr (Cox & Chao 2002 dJ2/dt / 2.0 Peltier factor); the taper halfwidths bound the 4-flag DT stack. Synced into src/script.js by tools/fit/export-to-script.js and into the website deepTime.ts by tools/fit/export-to-holistic.js; tools/lib/deep-time.js reads via tools/lib/constants.js.",
+    "alpha1PerMa": -9.9375895103e-5,
+    "alpha3PerMa3": -6.4186463489e-12,
+    "alpha4PerMa4": 1.3619800519e-16,
+    "alphaClimateScalePerMille": -3.93e-7,
+    "dtStackTaperFullHalfwidthYr": 300000,
+    "dtStackTaperTotalHalfwidthYr": 400000
   }
 }

@@ -5,6 +5,9 @@
     "G_CONSTANT": 6.6743e-20,
     "MASS_RATIO_EARTH_MOON": 81.30056816,
     "speedOfLight": 299792.458,
+    "earthMoiFactorJ2000": 0.3306947,
+    "solarLuminosityW": 3.828e26,
+    "solarWindMassLossKgPerS": 1.6e9,
     "massRatioDE440": {
       "mercury": 6023657.94,
       "venus": 408523.72,

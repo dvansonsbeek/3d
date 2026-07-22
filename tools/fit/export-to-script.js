@@ -447,6 +447,40 @@ console.log('\n=== F. ΔT Correction Coefficients ===');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Deep-time physics anchors (script.js section C3)
+// Source: astro-reference.json physicalConstants + model-parameters.json deepTime
+// ═══════════════════════════════════════════════════════════════════════════
+
+{
+  console.log('\n── Deep-time physics anchors (section C3) ──');
+  // Relative-tolerance const replace: replaceConst()'s absolute 1e-14 cutoff
+  // would swallow real changes to tiny values (ALPHA_4 ≈ 1.4e-16).
+  const replaceConstRel = (name, newVal) => {
+    const re = new RegExp('((?:const|let)\\s+' + name + '\\s*=\\s*)([+\\-]?[\\d.eE+\\-]+)');
+    const m = src.match(re);
+    if (!m) { console.log('  ⚠ ' + name + ' not found in script.js'); return; }
+    const oldVal = parseFloat(m[2]);
+    const scale = Math.max(Math.abs(oldVal), Math.abs(newVal), 1e-300);
+    if (Math.abs(oldVal - newVal) / scale < 1e-12) return;
+    console.log('  ' + name + ': ' + oldVal + ' → ' + newVal);
+    src = src.replace(re, '$1' + newVal);
+    changes++;
+  };
+  const pc  = ar.physicalConstants;
+  const dtp = mp.deepTime;
+  replaceConstRel('G_CONSTANT',                    pc.G_CONSTANT);
+  replaceConstRel('EARTH_MOI_FACTOR',              pc.earthMoiFactorJ2000);
+  replaceConstRel('L_SUN_W',                       pc.solarLuminosityW);
+  replaceConstRel('SOLAR_WIND_KG_PER_S',           pc.solarWindMassLossKgPerS);
+  replaceConstRel('ALPHA_1',                       dtp.alpha1PerMa);
+  replaceConstRel('ALPHA_3',                       dtp.alpha3PerMa3);
+  replaceConstRel('ALPHA_4',                       dtp.alpha4PerMa4);
+  replaceConstRel('ALPHA_CLIMATE_SCALE',           dtp.alphaClimateScalePerMille);
+  replaceConstRel('BOND_TAPER_FULL_HALFWIDTH_YR',  dtp.dtStackTaperFullHalfwidthYr);
+  replaceConstRel('BOND_TAPER_TOTAL_HALFWIDTH_YR', dtp.dtStackTaperTotalHalfwidthYr);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Summary
 // ═══════════════════════════════════════════════════════════════════════════
 

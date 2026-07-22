@@ -33,17 +33,20 @@ const d2r = Math.PI / 180;
 const PARALLAX = 0.95;  // Moon parallax in degrees
 
 // ─────────────────────────────────────────────────────────────────
-// Earth-Moon physics constants (from src/script.js Architecture α)
+// Earth-Moon physics constants — sourced from the shared constants
+// module (single truth: public/input/*.json) so this verify tool can
+// never drift from production physics.
 // ─────────────────────────────────────────────────────────────────
 
-const G_CONSTANT = 6.6743e-20;                 // km³/(kg·s²)
-const MASS_RATIO_EARTH_MOON = 81.30056816;
-const MOON_SIDEREAL_MONTH_INPUT_DAYS = 27.32166156;
+const C_SHARED = require('../lib/constants');
+const G_CONSTANT = C_SHARED.G_CONSTANT;        // km³/(kg·s²)
+const MASS_RATIO_EARTH_MOON = C_SHARED.MASS_RATIO_EARTH_MOON;
+const MOON_SIDEREAL_MONTH_INPUT_DAYS = C_SHARED.moonSiderealMonthInput;
 const MOON_ORBITAL_ECCENTRICITY_BASE = 0.054900489;
-const AU_J2000_KM = 149597870.698828;
-const MOON_DISTANCE_J2000_KM = 384399.07;
+const AU_J2000_KM = C_SHARED.currentAUDistance;
+const MOON_DISTANCE_J2000_KM = C_SHARED.moonDistance;
 const EARTH_DIAMETER_KM = 12756.27;
-const EARTH_MOI_FACTOR = 0.3306947;
+const EARTH_MOI_FACTOR = C_SHARED.EARTH_MOI_FACTOR;
 const R_EARTH_M = (EARTH_DIAMETER_KM / 2) * 1000;
 const GM_SUN_KM3_S2 = 132712440041.93938;
 // J2000 snapshot values. Under ESSRT (docs/99) these drift at deep time via
@@ -57,10 +60,11 @@ const MEAN_DAY_LENGTH = C_LOCAL.meanLengthOfDay;                     // H/13-der
 const MEAN_SOLAR_YEAR_DAYS = C_LOCAL.meanSolarYearDays;              // H/8 snapped
 const MEAN_TROPICAL_YEAR_J2000_S = MEAN_SOLAR_YEAR_DAYS * MEAN_DAY_LENGTH;
 
-// Farhat 2022 polynomial coefficients
-const ALPHA_1 = -8.8658188951e-5;
-const ALPHA_3 = -6.4186463489e-12;
-const ALPHA_4 = +1.3619800519e-16;
+// Farhat 2022 polynomial coefficients (single truth: model-parameters.json
+// deepTime — was stale here at the pre-refit ALPHA_1 = -8.8658188951e-5)
+const ALPHA_1 = C_SHARED.ALPHA_1;
+const ALPHA_3 = C_SHARED.ALPHA_3;
+const ALPHA_4 = C_SHARED.ALPHA_4;
 
 const M_SUN_KG = GM_SUN_KM3_S2 / G_CONSTANT;
 

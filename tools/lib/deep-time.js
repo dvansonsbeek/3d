@@ -25,7 +25,8 @@ const path = require('path');
 
 const EARTH_DIAMETER_KM = 12756.27;                                  // IERS WGS84
 const R_EARTH_M = (EARTH_DIAMETER_KM / 2) * 1000;
-const EARTH_MOI_FACTOR = 0.3306947;                                  // IERS Conventions 2010 (α at J2000)
+// α at J2000 (IERS Conventions 2010) — single source: astro-reference.json physicalConstants
+const EARTH_MOI_FACTOR = C.EARTH_MOI_FACTOR;
 
 // ─── Climate-driven α(t) — Option 4-climate refinement (2026-07) ─────────
 // Replaces the earlier |t|-symmetric Peltier 3-mode viscoelastic form (which
@@ -35,34 +36,28 @@ const EARTH_MOI_FACTOR = 0.3306947;                                  // IERS Con
 // Holistic mirror src/lib/orbital/deepTime.ts. Loads coefficients from the
 // shared JSON source to eliminate manual dual-copy sync.
 const ALPHA_CLIMATE_REGIME_KEY = 'lr04-post-mpt';
-const ALPHA_CLIMATE_SCALE      = -3.93e-7;   // per ‰; calibrated so dα/dt at J2000 = -1.35e-11/yr.
-                                             //  Cox & Chao 2002 dJ₂/dt = -2.7e-11/yr / conversion factor 2.0
-                                             //  (Peltier ICE-6G LOD-coupling range; was 1.5 per Cheng-Tapley-Ries 2013).
-                                             //  Empirical L-5b|R| optimum with LLR α₁ landed at this GIA coupling —
-                                             //  physically defensible via the model-dependent J₂→α conversion uncertainty.
-                                             //  Prior value: -5.24e-7 (dα/dt = -1.8e-11/yr, factor 1.5).
+// per ‰; calibrated so dα/dt at J2000 = -1.35e-11/yr (Cox & Chao 2002 dJ₂/dt
+// = -2.7e-11/yr ÷ conversion factor 2.0, Peltier ICE-6G LOD-coupling range).
+// Single source: model-parameters.json deepTime.alphaClimateScalePerMille.
+const ALPHA_CLIMATE_SCALE      = C.ALPHA_CLIMATE_SCALE;
 const _CLIMATE_JSON_PATH       = path.join(__dirname, '..', '..', 'public', 'input', 'climate-formula-coefficients.json');
 const CLIMATE_FORMULA_COEFFS   = JSON.parse(fs.readFileSync(_CLIMATE_JSON_PATH, 'utf8'));
 
-// Solar physics — Driver 2 mass loss
-const L_SUN_W              = 3.828e26;                                // IAU 2015 nominal solar luminosity (W)
-const SOLAR_WIND_KG_PER_S  = 1.6e9;                                   // Ulysses/ACE/Wind measurements
+// Solar physics — Driver 2 mass loss (single source: astro-reference.json physicalConstants)
+const L_SUN_W              = C.SOLAR_LUMINOSITY_W;                    // IAU 2015 nominal solar luminosity (W)
+const SOLAR_WIND_KG_PER_S  = C.SOLAR_WIND_KG_PER_S;                   // Ulysses/ACE/Wind measurements
 const C_SI_M_PER_S         = C.speedOfLight ? C.speedOfLight * 1000 : 299792458;  // m/s
 const DM_DT_TOTAL_KG_S     = L_SUN_W / (C_SI_M_PER_S * C_SI_M_PER_S) + SOLAR_WIND_KG_PER_S;
 
 // Farhat 2022 LSQ polynomial coefficients — Moon distance evolution
 // a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴  (no α₂; preserves modern Wells rate)
-const ALPHA_1 = -9.9375895103e-05;   // /Ma  — anchored to modern LLR direct observation
-                                     //  da/dt(J2000) = 3.82 cm/yr (Dickey 1994 / Chapront 2002).
-                                     //  Validates against Wells 1963 coral rings (400.06 vs 400 days/yr
-                                     //  at 380 Ma, 0.01% error) and Wu 2024 cyclostratigraphy (411.5 vs
-                                     //  412 days/yr at 500 Ma, 0.12%). Places Moon at rigid Roche at
-                                     //  ~4.498 Ga — matches giant-impact-4.5-Ga standard.
-                                     //  Prior value: -8.8658188951e-05 (Wells 1989 DERIVED rate 3.43 cm/yr,
-                                     //  a theoretical Phanerozoic-average value; the direct paleontological
-                                     //  data itself supports the LLR rate, not the Wells 1989 derivation).
-const ALPHA_3 = -6.4186463489e-12;   // /Ma³  (LSQ fit to Farhat 2022 deep-time anchors)
-const ALPHA_4 = +1.3619800519e-16;   // /Ma⁴  (LSQ fit to Farhat 2022 deep-time anchors)
+// Single source: model-parameters.json deepTime.alpha1PerMa/alpha3PerMa3/alpha4PerMa4.
+// α₁ is LLR-anchored (da/dt(J2000) = 3.82 cm/yr, Dickey 1994 / Chapront 2002);
+// α₃/α₄ are the LSQ fit to the Farhat 2022 deep-time anchors. Provenance and
+// validation history documented in the JSON _description and src/script.js.
+const ALPHA_1 = C.ALPHA_1;           // /Ma
+const ALPHA_3 = C.ALPHA_3;           // /Ma³
+const ALPHA_4 = C.ALPHA_4;           // /Ma⁴
 
 // ─── J2000 anchors derived from framework constants ───────────────────────
 
@@ -292,8 +287,10 @@ const JOSE4_SIN_COEFF_S = -12.79094364535659;
 // claim; H differs from H_J2000 by <1.5% at this range, so the fixed-period
 // assumption is valid. Constant name kept for historical continuity though the
 // window is no longer literally "Holocene".
-const HOLOCENE_TAPER_FULL_HALFWIDTH_YR = 300000;
-const HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR = 400000;
+// Single source: model-parameters.json deepTime.dtStackTaper*HalfwidthYr
+// (mirrors src/script.js BOND_TAPER_* — same values, per-file legacy names).
+const HOLOCENE_TAPER_FULL_HALFWIDTH_YR = C.DT_STACK_TAPER_FULL_HALFWIDTH_YR;
+const HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR = C.DT_STACK_TAPER_TOTAL_HALFWIDTH_YR;
 
 function holoceneTaper(year) {
   const dy = Math.abs(year - 2000);

@@ -624,6 +624,18 @@ module.exports = {
   MASS_RATIO_EARTH_MOON,
   massRatioDE440,
 
+  // Deep-time physics anchors (single source of truth:
+  // astro-reference.json physicalConstants + model-parameters.json deepTime)
+  EARTH_MOI_FACTOR: astroRef.physicalConstants.earthMoiFactorJ2000,
+  SOLAR_LUMINOSITY_W: astroRef.physicalConstants.solarLuminosityW,
+  SOLAR_WIND_KG_PER_S: astroRef.physicalConstants.solarWindMassLossKgPerS,
+  ALPHA_1: modelParams.deepTime.alpha1PerMa,
+  ALPHA_3: modelParams.deepTime.alpha3PerMa3,
+  ALPHA_4: modelParams.deepTime.alpha4PerMa4,
+  ALPHA_CLIMATE_SCALE: modelParams.deepTime.alphaClimateScalePerMille,
+  DT_STACK_TAPER_FULL_HALFWIDTH_YR: modelParams.deepTime.dtStackTaperFullHalfwidthYr,
+  DT_STACK_TAPER_TOTAL_HALFWIDTH_YR: modelParams.deepTime.dtStackTaperTotalHalfwidthYr,
+
   // Earth parameters
   earthRAAngle,
   earthtiltMean,

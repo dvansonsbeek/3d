@@ -127,6 +127,24 @@ const moonEclipticInclinationJ2000 = 5.1453964;           // Moon orbital inclin
 const moonOrbitalEccentricityBase = 0.054900489;          // Moon orbital eccentricity
 const moonTilt = 6.687;                                   // Moon axial tilt
 
+// ─── C3. Deep-time physics anchors (SYNCED — do not hand-edit) ────────────
+// Single source of truth: public/input/astro-reference.json (physicalConstants)
+// + public/input/model-parameters.json (deepTime). Synced into this file by
+// tools/fit/export-to-script.js; tools/lib/deep-time.js reads the JSONs via
+// tools/lib/constants.js; the website deepTime.ts is synced by
+// tools/fit/export-to-holistic.js. Derivation notes live in the JSON
+// _description fields and at the usage sites below.
+const G_CONSTANT = 6.6743e-20;       // km³/(kg·s²) — CODATA G in km units
+const EARTH_MOI_FACTOR = 0.3306947;  // IERS Conventions 2010 — α at J2000
+const L_SUN_W = 3.828e26;            // IAU 2015 nominal solar luminosity (W)
+const SOLAR_WIND_KG_PER_S = 1.6e9;   // Ulysses/ACE/Wind measurements
+const ALPHA_1 = -9.9375895103e-05;   // /Ma  — Moon recession, LLR-anchored (3.82 cm/yr)
+const ALPHA_3 = -6.4186463489e-12;   // /Ma³ — Farhat 2022 LSQ deep-time fit
+const ALPHA_4 = +1.3619800519e-16;   // /Ma⁴ — Farhat 2022 LSQ deep-time fit
+const ALPHA_CLIMATE_SCALE = -3.93e-7;             // per ‰ — dα/dt(J2000) = Cox-Chao/2.0
+const BOND_TAPER_FULL_HALFWIDTH_YR  = 300000;     // 4-flag ΔT stack taper: full strength
+const BOND_TAPER_TOTAL_HALFWIDTH_YR = 400000;     // 4-flag ΔT stack taper: zero beyond
+
 // ─── A4. Planet input constants ──────────────────────────────────────────
 // Per-planet J2000 orbital elements, tuned parameters (startpos, angleCorrection,
 // eocFraction, perihelionRef_JD), and perihelion precession periods.
@@ -3605,7 +3623,7 @@ let   moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meanso
 // mass-from-moon formula and per-planet verification.
 
 // Gravitational constant (km³/(kg·s²))
-const G_CONSTANT = 6.6743e-20;  // 6.6743 × 10⁻¹¹ m³/(kg·s²) converted to km³/(kg·s²)
+// G_CONSTANT (6.6743e-20 km³/(kg·s²)) lives in section C3 "Deep-time physics anchors" near the top.
 
 // Earth-Moon mass ratio (DE440 SPICE kernel: GM_E/GM_M = 81.30056816).
 const MASS_RATIO_EARTH_MOON = 81.30056816;
@@ -4604,7 +4622,7 @@ const halleysRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/
 // into the animation loop.
 //
 // Verified against scripts/devonian_cross_check.py at modern + Devonian
-// (t_Ma = 380): LOD = 22.12 hr, H = 309,083 yr, Moon a = 371,314 km.
+// (t_Ma = 380): LOD = 21.92 hr, H = 306,189 yr, Moon a = 369,749 km.
 // ═════════════════════════════════════════════════════════════════
 
 // ───── Tidal evolution rates ─────
@@ -4612,7 +4630,7 @@ const CANONICAL_TIDAL_RATE_HR_PER_MA = 0.00526;     // Wells 1963 Phanerozoic / 
 const MODERN_TIDAL_RATE_HR_PER_MA    = 0.006;       // LLR-measured lunar-only (≈ 2.16 ms/century)
 
 // ───── Earth physical constants ─────
-const EARTH_MOI_FACTOR = 0.3306947;                 // IERS Conventions 2010, dimensionless — α at J2000
+// EARTH_MOI_FACTOR (α at J2000) lives in section C3 "Deep-time physics anchors" near the top.
 const R_EARTH_M        = (diameters.earthDiameter / 2) * 1000;        // km → m
 const I_EARTH          = EARTH_MOI_FACTOR * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
                        // ≈ 8.034 × 10³⁷ kg·m² — anchor value of Earth's polar moment at J2000.
@@ -4699,12 +4717,12 @@ const I_EARTH          = EARTH_MOI_FACTOR * M_EARTH_ALONE * R_EARTH_M * R_EARTH_
  *  Beyond ±1 Myr the extrapolation is a smooth continuation of the fitted
  *  periodic pattern, not a physics prediction. */
 const ALPHA_CLIMATE_REGIME_KEY = 'lr04-post-mpt';
-const ALPHA_CLIMATE_SCALE = -3.93e-7;  // per ‰; calibrated so dα/dt at J2000 = -1.35e-11/yr.
-                                       // Cox & Chao 2002 dJ₂/dt = -2.7e-11/yr / conversion factor 2.0
-                                       // (Peltier ICE-6G LOD-coupling range; was 1.5 per Cheng-Tapley-Ries 2013).
-                                       // Empirical L-5b|R| optimum with LLR α₁ landed at this GIA coupling —
-                                       // physically defensible via the model-dependent J₂→α conversion uncertainty.
-                                       // Prior value: -5.24e-7 (dα/dt = -1.8e-11/yr, factor 1.5).
+// ALPHA_CLIMATE_SCALE lives in section C3 "Deep-time physics anchors" near the top.
+// Calibration: dα/dt at J2000 = -1.35e-11/yr — Cox & Chao 2002 dJ₂/dt = -2.7e-11/yr
+// ÷ conversion factor 2.0 (Peltier ICE-6G LOD-coupling range; was 1.5 per
+// Cheng-Tapley-Ries 2013). Empirical L-5b|R| optimum with LLR α₁ landed at this
+// GIA coupling — physically defensible via the model-dependent J₂→α conversion
+// uncertainty. Prior value: -5.24e-7 (dα/dt = -1.8e-11/yr, factor 1.5).
 let _alphaClimateL1_J2000 = null;
 
 function _evalClimateL1Orbital(year) {
@@ -4765,8 +4783,7 @@ function iEarthAtAge(t_Ma) {
 }
 
 // ───── Solar physics constants (Driver 2 — mass loss) ─────
-const L_SUN_W              = 3.828e26;              // IAU 2015 nominal solar luminosity (W)
-const SOLAR_WIND_KG_PER_S  = 1.6e9;                 // Ulysses/ACE/Wind measurements
+// L_SUN_W and SOLAR_WIND_KG_PER_S live in section C3 "Deep-time physics anchors" near the top.
 const C_SI_M_PER_S         = speedOfLight * 1000;   // km/s → m/s (exact IAU c)
 const dM_dt_radiation_kg_s = L_SUN_W / (C_SI_M_PER_S * C_SI_M_PER_S);  // ≈ 4.26 × 10⁹
 const dM_dt_total_kg_s     = dM_dt_radiation_kg_s + SOLAR_WIND_KG_PER_S;  // ≈ 5.86 × 10⁹
@@ -4890,17 +4907,15 @@ const A_LOCK_M        = (L_TOTAL_EM_KGM2_S / (M_MOON_ALONE * Math.sqrt(GM_EM_M3S
 
 // Farhat 2022 LSQ polynomial coefficients — Moon distance evolution
 // a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴   (no α₂)
-const ALPHA_1 = -9.9375895103e-05;   // /Ma  — anchored to modern LLR direct observation
-                                     //  da/dt(J2000) = 3.82 cm/yr (Dickey 1994 / Chapront 2002).
-                                     //  Validates against Wells 1963 coral rings (400.06 vs 400 days/yr
-                                     //  at 380 Ma, 0.01% error) and Wu 2024 cyclostratigraphy (411.5 vs
-                                     //  412 days/yr at 500 Ma, 0.12%). Places Moon at rigid Roche at
-                                     //  ~4.498 Ga — matches giant-impact-4.5-Ga standard.
-                                     //  Prior value: -8.8658188951e-05 (Wells 1989 DERIVED rate 3.43 cm/yr,
-                                     //  a theoretical Phanerozoic-average value; the direct paleontological
-                                     //  data itself supports the LLR rate, not the Wells 1989 derivation).
-const ALPHA_3 = -6.4186463489e-12;   // /Ma³  (LSQ fit to Farhat 2022 deep-time anchors)
-const ALPHA_4 = +1.3619800519e-16;   // /Ma⁴  (LSQ fit to Farhat 2022 deep-time anchors)
+// ALPHA_1 / ALPHA_3 / ALPHA_4 live in section C3 "Deep-time physics anchors" near the top.
+// α₁ is anchored to modern LLR direct observation: da/dt(J2000) = 3.82 cm/yr
+// (Dickey 1994 / Chapront 2002). Validates against Wells 1963 coral rings
+// (400.06 vs 400 days/yr at 380 Ma, 0.01% error) and Wu 2024 cyclostratigraphy
+// (411.5 vs 412 days/yr at 500 Ma, 0.12%). Places Moon at rigid Roche at
+// ~4.498 Ga — matches giant-impact-4.5-Ga standard. Prior value:
+// -8.8658188951e-05 (Wells 1989 DERIVED rate 3.43 cm/yr, a theoretical
+// Phanerozoic-average value; the direct paleontological data itself supports
+// the LLR rate, not the Wells 1989 derivation).
 
 // ───── Structural diagnostic (J2000 anchor — drifts at deep time) ─────
 // Earth solar-day rotations per H cycle at J2000 = 122,463,880 (Wells 1963
@@ -5206,8 +5221,7 @@ const BOND_SIN_COEFF_S            = 246.2916701068097;          // from data/del
 // claim; H differs from H_J2000 by <1.5% at this range, so the fixed-period
 // assumption is valid. Constant name kept for historical continuity though the
 // window is no longer literally "Holocene".
-const BOND_TAPER_FULL_HALFWIDTH_YR  = 300000;                   // ±yr from J2000 = full strength
-const BOND_TAPER_TOTAL_HALFWIDTH_YR = 400000;                   // ±yr from J2000 = zero beyond
+// BOND_TAPER_FULL/TOTAL_HALFWIDTH_YR live in section C3 "Deep-time physics anchors" near the top.
 // Anchor calibration constant: Bond cyclic value at exactly year 2000.
 // Subtracted from the raw cyclic evaluation so bondCycleDeltaTCorrection(2000) === 0.
 const BOND_DT_RAW_AT_J2000        = BOND_COS_COEFF_S * Math.cos(BOND_OMEGA * 2000)
@@ -5607,7 +5621,7 @@ function meanLodSecondsWithCorrectionsAtAge(t_Ma) {
   return tidal + dtCycleLodCorrectionSum(year);
 }
 
-// ───── ΔT integrator — used for proper Earth rotation in scene graph ─────
+// ───── ΔT integrator — ephemeris time (JD_UT → JD_TT) for the eclipse chain ─────
 const _DELTA_T_CACHE = new Map();
 const _MAX_DELTA_T_CACHE = 512;
 
@@ -32741,6 +32755,13 @@ function setupGUI() {
   //        small std-dev + monotonic increase → bulk ΔT signal, supports
   //          "framework's pure-tidal ΔT is right, conventional ΔT is wrong"
   //
+  //   3. SIGNED east-west drift (added 2026-07 for the ~0.5 ms/cy hunt):
+  //        unsigned distance is sign-blind and cannot see a secular drift.
+  //        Per event, Δlon at the umbra's site-latitude crossing → needed-ΔT
+  //        offset (240 s/°) → quadratic drift-law fit δΔT = a + c·T² whose
+  //        curvature converts to a dLOD/dt rate (r = c/18.26 ms/cy), directly
+  //        comparable to the lunar-detected fractional non-tidal ~0.5 ms/cy.
+  //
   // Designed to discriminate between "framework is wrong" vs "conventional
   // eclipse attributions are wrong" — see the discussion that motivated
   // this button (post-audit interpretation, June 2026).
@@ -32834,6 +32855,12 @@ function setupGUI() {
 
         const isCentral = (evt.type === 'Total' || evt.type === 'Annular' || evt.type === 'Hybrid');
         let minDist = Infinity, minPoint = null, minKind = '', minOffsetMin = 0;
+        // Signed east-west drift capture: at the scan instant where the umbra
+        // track crosses the site's latitude, record Δlon = lon_obs − lon_umbra
+        // (positive = site EAST of framework path → framework ΔT too SMALL).
+        // Unsigned min-distance folds east/west misses together and cannot see
+        // a secular drift; this signed observable can.
+        let minLatDiff = Infinity, dlonAtLat = null;
         for (let dt = -halfWindow; dt <= halfWindow + 1e-9; dt += stepDays) {
           const jd = evt.jd + dt;
           let point = null, kind = '';
@@ -32846,10 +32873,18 @@ function setupGUI() {
             minKind = kind;
             minOffsetMin = Math.round(dt * 24 * 60);
           }
+          if (kind === 'umbra') {
+            const latDiff = Math.abs(point.lat - lat_obs);
+            if (latDiff < minLatDiff) {
+              minLatDiff = latDiff;
+              dlonAtLat = ((lon_obs - point.lon + 540) % 360) - 180;
+            }
+          }
         }
         results.push({
           year: Y, type, dist: minDist, kind: minKind, name,
           point: minPoint, offsetMin: minOffsetMin, jd: evt.jd,
+          dlon: dlonAtLat, latDiff: minLatDiff,
         });
       }
     } finally {
@@ -32917,6 +32952,65 @@ function setupGUI() {
     console.log(`              slope = ${slope.toFixed(2)} km/yr   intercept = ${Math.round(intercept)} km   R² = ${r2.toFixed(3)}`);
     console.log('  ─────────────────────────────────────────────────────────────────────────────────');
 
+    // ─── Signed east-west drift analysis (secular-rate detector) ───
+    // Per-event: Δlon = lon_obs − lon_umbra at the site-latitude crossing.
+    // Positive Δlon = site EAST of framework path = framework ΔT too SMALL
+    // (larger ΔT shifts the umbra east: conjunction at earlier UT → Earth
+    // rotated less → shadow at greater east longitude).
+    // Conversion: δΔT_needed ≈ Δlon° × 240 s (Stephenson path-shift rule).
+    // A constant-rate LOD error r [ms/cy] accumulates quadratically:
+    //   δΔT(T) = a + 18.26·r·T²  seconds  (T = centuries before 2000;
+    //   18.26 = ½ × 36,525 days/cy × 1e-3 — cf. Stephenson 32·T² ↔ 1.78 ms/cy).
+    // Fitting the curvature c gives r = c / 18.26 directly comparable to the
+    // ~0.5 ms/cy fractional non-tidal rate detected in the lunar timing test.
+    const driftEvents = results.filter(r => r.dlon !== null && r.latDiff < 5);
+    if (driftEvents.length >= 4) {
+      console.log('');
+      console.log('  Signed east-west drift (umbra at site-latitude crossing):');
+      console.log('  Year    Δlon(°E of path)   δΔT_needed(s)   T²(cy²)   Event');
+      console.log('  ─────────────────────────────────────────────────────────────────────────────────');
+      const dxs = [], dys = [];
+      for (const r of driftEvents) {
+        const dT_need = r.dlon * 240;
+        const Tcy2 = ((2000 - r.year) / 100) ** 2;
+        dxs.push(Tcy2); dys.push(dT_need);
+        console.log(`  ${`${r.year}`.padStart(5)}   ${r.dlon >= 0 ? '+' : ''}${r.dlon.toFixed(2).padStart(7)}          ${(dT_need >= 0 ? '+' : '') + Math.round(dT_need).toString().padStart(6)}     ${Tcy2.toFixed(1).padStart(6)}   ${r.name.slice(0, 48)}`);
+      }
+      // Quadratic drift-law fit: δΔT = a + c·T² (with intercept a = modern frame offset)
+      function fitLine(xs2, ys2) {
+        const m = xs2.length;
+        const mx = xs2.reduce((s, v) => s + v, 0) / m;
+        const my = ys2.reduce((s, v) => s + v, 0) / m;
+        let sxy = 0, sxx = 0;
+        for (let i = 0; i < m; i++) { sxy += (xs2[i] - mx) * (ys2[i] - my); sxx += (xs2[i] - mx) ** 2; }
+        const c = sxy / sxx;
+        const a = my - c * mx;
+        const res = ys2.reduce((s, v, i) => s + (v - (a + c * xs2[i])) ** 2, 0);
+        const tot = ys2.reduce((s, v) => s + (v - my) ** 2, 0);
+        const seC = Math.sqrt(res / Math.max(1, m - 2) / sxx);
+        return { a, c, r2: tot > 0 ? 1 - res / tot : 0, seC, n: m };
+      }
+      const fAll = fitLine(dxs, dys);
+      console.log('  ─────────────────────────────────────────────────────────────────────────────────');
+      console.log(`  Drift-law fit (all ${fAll.n}):  δΔT = ${fAll.a.toFixed(0)} + ${fAll.c.toFixed(1)}·T²   R² = ${fAll.r2.toFixed(3)}`);
+      console.log(`    → implied secular rate r = ${(fAll.c / 18.26).toFixed(2)} ± ${(fAll.seC / 18.26).toFixed(2)} ms/cy`);
+      const clean = driftEvents.filter(r => !/CONTESTED/i.test(r.name));
+      if (clean.length >= 4 && clean.length < driftEvents.length) {
+        const cx = clean.map(r => ((2000 - r.year) / 100) ** 2);
+        const cy = clean.map(r => r.dlon * 240);
+        const fCl = fitLine(cx, cy);
+        console.log(`  Excluding CONTESTED (${fCl.n}):  δΔT = ${fCl.a.toFixed(0)} + ${fCl.c.toFixed(1)}·T²   R² = ${fCl.r2.toFixed(3)}`);
+        console.log(`    → implied secular rate r = ${(fCl.c / 18.26).toFixed(2)} ± ${(fCl.seC / 18.26).toFixed(2)} ms/cy`);
+      }
+      console.log('  Reading: r > 0 → Earth rotation slower than framework (framework misses a');
+      console.log('  braking channel); r < 0 → a speedup channel. Compare against the lunar-detected');
+      console.log('  fractional non-tidal rate ~0.5 ms/cy (three-component residual decomposition).');
+      console.log('  |r| within ~2σ of 0 → solar corpus cannot resolve the channel (power-limited).');
+      console.log('  ─────────────────────────────────────────────────────────────────────────────────');
+    } else {
+      console.log('  Signed drift analysis skipped: fewer than 4 events with umbra latitude-crossing.');
+    }
+
     // ─── Within-bucket outlier scan (>2σ from same-bucket mean) ───
     const outliers = [];
     for (const b of buckets) {
@@ -32969,11 +33063,13 @@ function setupGUI() {
   }, 'Trend analysis: framework vs documented distance across ' +
      '~18 well-dated eclipses spanning -762 to 1860, anchored by 19th-century ' +
      'photographic-era events that cannot be mis-attributed. Reports per-event ' +
-     'distance, per-millennium bucket statistics, linear fit + R², and outlier ' +
-     'flags. Discriminates between "framework\'s ΔT is wrong" (monotonic ' +
-     'divergence with age, high R²) and "conventional eclipse attributions are ' +
-     'wrong" (scattered, event-specific, low R²). Designed to answer the post-' +
-     'audit interpretation question: is the model wrong, or is the history wrong?');
+     'distance, per-millennium bucket statistics, linear fit + R², outlier ' +
+     'flags, and a SIGNED east-west drift analysis: per-event Δlon at the ' +
+     'site-latitude crossing → needed-ΔT offsets → quadratic drift-law fit ' +
+     'whose curvature is a dLOD/dt rate in ms/cy, directly comparable to the ' +
+     'lunar-detected fractional non-tidal ~0.5 ms/cy. Discriminates "framework ' +
+     'ΔT wrong" (monotonic, high R²) vs "chronology wrong" (scattered, low R²), ' +
+     'and bounds the secular-rate channel from the solar side.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Chronology candidates — framework-best alternative dates for the

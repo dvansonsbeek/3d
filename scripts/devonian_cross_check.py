@@ -12,13 +12,22 @@ Comparing against Wells 1963 (400 d/yr Devonian) and Williams 2000
 """
 
 import math
+import sys
+from pathlib import Path
+
+# Single source of truth: public/input/astro-reference.json + model-parameters.json,
+# read via tools/lib/constants.js through the Python bridge. The derivation CHAIN
+# below stays an independent re-implementation (that's what this script verifies);
+# only the input CONSTANTS come from the shared source so they can never go stale.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'tools' / 'fit' / 'python'))
+from load_constants import C as _C
 
 
 # ============================================================
-# Framework constants (mirror script.js)
+# Framework constants (single truth via load_constants bridge)
 # ============================================================
 
-H_now = 335_317                                # holisticyearLength (yr)
+H_now = _C['H']                                # holisticyearLength (335,317 yr)
 LOD_now_s = 86_400                             # mean solar day (IAU convention, used for
                                                # time conversions and J2000 anchors)
 
@@ -34,7 +43,7 @@ LOD_now_s = 86_400                             # mean solar day (IAU convention,
 # meansolaryearlengthinDays — quantized tropical year (line 64 of script.js):
 #   round(input × H/8) / (H/8)  with input = 365.2422
 H_over_8 = H_now / 8                           # 41914.625
-input_solar_yr = 365.2422
+input_solar_yr = _C['inputMeanSolarYear']      # 365.2422 (exact IAU tropical year)
 mean_solar_year_d = round(input_solar_yr * H_over_8) / H_over_8
 year_seconds_now = mean_solar_year_d * LOD_now_s
 days_per_year_now = mean_solar_year_d
@@ -45,20 +54,21 @@ days_per_year_now = mean_solar_year_d
 TOTAL_DAYS_IN_H_at_J2000 = H_now * mean_solar_year_d    # ≈ 122,471,920 modernly
 TOTAL_DAYS_IN_H = TOTAL_DAYS_IN_H_at_J2000     # kept for backwards compat in script
 
-moon_distance_now_km = 384_399.07
-moon_sidereal_month_input_d = 27.32166156
-moon_e = 0.054900489                           # moonOrbitalEccentricityBase
+moon_distance_now_km = _C['moonDistance']                    # 384,399.07 km
+moon_sidereal_month_input_d = _C['moonSiderealMonthInput']   # 27.32166156 d
+moon_e = _C['moonOrbitalEccentricity']                       # 0.054900489
 
 # ---- Follow script.js derivation chain EXACTLY ----
 # (script.js lines 3406-3429)
-G_CONSTANT = 6.6743e-20                        # km³/(kg·s²) — line 3406
-MASS_RATIO_EARTH_MOON = 81.30056816            # line 3409
+G_CONSTANT = _C['G_CONSTANT']                  # km³/(kg·s²)
+MASS_RATIO_EARTH_MOON = _C['MASS_RATIO_EARTH_MOON']
 
 # Sidereal year — script.js uses ASTRO_REFERENCE.siderealYearJ2000 directly
 # (line 3281), NOT the H/13-derived meansiderealyearlengthinDays.
 # Source: IERS Conventions / IAU definitions.
-sidereal_year_J2000_d = 365.25636301             # ASTRO_REFERENCE.siderealYearJ2000
-mean_sidereal_year_s = sidereal_year_J2000_d * LOD_now_s
+# (was stale here at 365.25636301; production anchor is 365.256363004)
+mean_sidereal_year_s = _C['meanSiderealYearSeconds']         # 31,558,149.7635456 s
+sidereal_year_J2000_d = mean_sidereal_year_s / LOD_now_s     # 365.256363004 d
 mean_sidereal_year_d = sidereal_year_J2000_d
 # Note: the H/13-derived variant (line 3280) gives 365.2563643738 d
 # (= 31,558,149.88 s) — used elsewhere in script.js for day counts but
@@ -99,7 +109,7 @@ M_moon = GM_moon_kms / G_CONSTANT              # kg (line 3428)
 # Earth radius (equatorial) and moment of inertia
 earth_diameter_km = 12_756.27
 R_earth_m = (earth_diameter_km / 2) * 1000
-alpha = 0.3306947                              # EARTH_MOI_FACTOR (IERS Conventions 2010)
+alpha = _C['EARTH_MOI_FACTOR']                 # IERS Conventions 2010 (α at J2000)
 I_earth = alpha * M_earth * R_earth_m**2       # kg·m²
 
 CANONICAL_TIDAL_RATE = 0.00526                 # hr/Ma  (diagnostic only — proper formula below)
@@ -113,13 +123,15 @@ CANONICAL_TIDAL_RATE = 0.00526                 # hr/Ma  (diagnostic only — pro
 #
 # Properties:
 #   - Modern LOD = LOD_now_H13 exactly (anchored)
-#   - Modern rate = canonical Wells 0.00526 hr/Ma (via α₁)
-#   - Past matches Farhat 2022 to ≤7.5 % over 4.5 Gyr
+#   - Modern recession rate = LLR direct observation, da/dt = 3.82 cm/yr
+#     (Dickey 1994 / Chapront 2002) via α₁
+#   - Past matches Farhat 2022 deep-time anchors (LSQ fit via α₃/α₄)
 #   - Future PHYSICALLY BOUNDED — naturally asymptotes to tidal lock
-#   - Hadean Moon distance lands at Roche limit (~3.0 R_E)
-ALPHA_1 = -8.8658188951e-05    # /Ma   (modern recession, Wells canonical anchor)
-ALPHA_3 = -6.4186463489e-12    # /Ma³  (LSQ fit to Farhat 2022 deep-time)
-ALPHA_4 = +1.3619800519e-16    # /Ma⁴  (LSQ fit to Farhat 2022 deep-time)
+#   - Run backwards, Moon crosses the RIGID Roche limit (~9,500 km ≈ 1.49 R_E)
+#     at ~4.498 Ga — the canonical giant-impact Moon-formation age
+ALPHA_1 = _C['ALPHA_1']        # /Ma   (LLR-anchored modern recession)
+ALPHA_3 = _C['ALPHA_3']        # /Ma³  (LSQ fit to Farhat 2022 deep-time)
+ALPHA_4 = _C['ALPHA_4']        # /Ma⁴  (LSQ fit to Farhat 2022 deep-time)
 # (α values are physics-consistent with full GM_EM and Moon eccentricity factor.)
 
 # --- Solar mass loss → AU drift → year_s drift ---
@@ -457,8 +469,12 @@ print(f"  H(t) — year_s with AU drift = {H_dev_AUdrift:.4f} yr   "
 print(f"  tropical year_s(t) drift  = {year_seconds_now - year_s_dev_AUdrift_tropical:+.2f} s shorter "
       f"({(year_seconds_now - year_s_dev_AUdrift_tropical)/60:.2f} min)")
 print(f"  days/yr (solar/tropical) = {days_per_year_dev_solar:.6f} d")
-print(f"    Wells 1963 (~380 Ma)   = 399.4 d   "
-      f"match: {100 * days_per_year_dev_solar / 399.4:.3f}%")
+# Canonical docs/paper reference: Wells 1963 coral growth bands ≈ 400 d/yr at
+# Devonian (~380 Ma) — same value quoted in the paper's paleo-day-count table,
+# the website, and the ESSRT modal. (Was a nonstandard 399.4 reading here.)
+WELLS_1963_DEVONIAN_DAYS = 400.0
+print(f"    Wells 1963 (~380 Ma)   = {WELLS_1963_DEVONIAN_DAYS:.0f} d   "
+      f"deviation: {100 * (days_per_year_dev_solar / WELLS_1963_DEVONIAN_DAYS - 1):+.3f}%")
 print(f"  days/yr (sidereal)       = {days_per_year_dev_sidereal:.7f} d")
 print()
 print(f"  L_E_spin(t)              = {L_E_spin_dev:.6e} kg·m²/s")

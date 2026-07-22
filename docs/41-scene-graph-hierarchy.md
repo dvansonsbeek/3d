@@ -134,7 +134,7 @@ The Earth object itself represents **Axial Precession**:
 |----------|-------|---------|
 | orbitRadius | -`eccentricityAmplitude` × 100 | Derived from constants |
 | speed | -2π / (H/13) | Clockwise axial precession |
-| rotationSpeed | 2π × (mean solar year + 1 day) | Daily rotation |
+| rotationSpeed | 2π × sidereal rotations per SI year — **locked to the J2000 sidereal day** in both modes (see §14.4) | Daily spin |
 | tilt | -`earthtiltMean` | Mean axial tilt (obliquity) |
 
 ### 4.2 Inclination Precession
@@ -436,7 +436,19 @@ The scene-graph hierarchy from Parts 3, 7, and 8 is identical in both modes. The
 
 Integrator mode preserves bit-equivalence to snapshot mode at the J2000 anchor (`anchor === STARTMODEL_YEAR_SI` → integrator returns 0 cycles → composition reduces to the snapshot path). At deep time, integrator mode produces physically-correct positions while snapshot mode would silently apply the J2000 rate retroactively to the full simulated interval.
 
-### 14.4 References
+### 14.4 Earth's daily spin and the ΔT / LOD layering — three consumers
+
+The three dLOD/dt layers (L1 tidal baseline · L2 + GIA α(t) · L3 + 4-flag ΔT stack) are consumed at three distinct places in `src/script.js`, each deliberately using a different depth:
+
+| Consumer | Layers applied | Where / why |
+|---|---|---|
+| **Ephemeris & eclipse chain** | **Full Layer 3** | `meanDeltaTSecondsAtAge()` integrates the Layer-2 LOD (tidal + GIA) with the H/5 kinematic term, then adds the 4-flag stack post-integration (each harmonic zero-anchored at J2000). Feeds `_eclDeltaT()` → JD_UT → JD_TT inside every Meeus wrapper (`_eclSunLon`, `_eclMoonLon`, …) and the TT-anchored planet integrators (`_currentYearSI_TT`). All validated rotation claims (26-event solar audit, 267-event lunar test, ΔT charts) run through this path. |
+| **Deep-time epoch anchors** | **Layer 2 only** | `recomputeEpochAnchors()` sets `meanlengthofday` from `meanLodSecondsAtAge()` (tidal + GIA). The stack is a zero-mean ±ms *modulation* around the epoch mean, so folding it into the mean-LOD anchor would inject a phase-dependent offset into every derived day count. Layer 3 (`meanLodSecondsWithCorrectionsAtAge()`) exists for consistency with the corrected ΔT curve and is consumed only by the ESSRT modal display. |
+| **Visible scene-graph spin** | **None over time (J2000-locked)** | `earth.rotationSpeed` is a constant J2000 sidereal rate (`updateEarthForEpoch()`). The scene graph applies spin as `pos × rate` (a multiplier, not `∫dt/LOD(t)`), so an epoch-mutated rate would be retroactively applied to the whole elapsed span (~163° spurious drift — "eclipse over America renders over Turkey at −584"). The lock gives a stable JD ↔ orientation convention; it is explicitly **not** a ΔT claim — physically-correct orientation lives in the ephemeris chain above. |
+
+In short: **Layer 3 governs all validated rotation physics, Layer 2 governs epoch means, and the rendered globe uses a fixed J2000 convention.** Deep-time LOD/H evolution remains visible in the calculator displays and the ESSRT modal, which read `meanLodSecondsAtAge()` / `meanHAtAge()` directly.
+
+### 14.5 References
 
 - [`hidden/old-documents/IP-planet-deep-time-scene-graph.md`](hidden/old-documents/IP-planet-deep-time-scene-graph.md) — full implementation history (Phases P-A through P-F) including the math problem, frame-composition risk, per-phase rollout, naming convention summary, and the "Future Phase Z" discussion of Moon-chain TT correctness
 - [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — canonical 9-step chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, planet orbital + synodic periods

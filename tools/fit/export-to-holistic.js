@@ -749,14 +749,23 @@ const MV_TS      = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
     console.log('    (model-values.compute.ts not found, skipping)');
   }
 
-  // α(t) constants → website deepTime.ts (cycle coefficients are handled by
-  // export-dt-corrections.js above; these two are the remaining hand-edits).
+  // Deep-time physics anchors → website deepTime.ts (cycle coefficients are
+  // handled by export-dt-corrections.js above). Source of truth:
+  // astro-reference.json physicalConstants + model-parameters.json deepTime,
+  // read via tools/lib/constants.js (same chain deep-time.js uses).
   const WEB_DEEPTIME = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'deepTime.ts');
   if (fs.existsSync(WEB_DEEPTIME)) {
     let wdt = fs.readFileSync(WEB_DEEPTIME, 'utf8');
     const wdtBefore = wdt;
-    wdt = replaceMvConst(wdt, 'ALPHA_CLIMATE_SCALE', DT.ALPHA_CLIMATE_SCALE, 'deepTime.ts');
-    wdt = replaceMvConst(wdt, 'ALPHA_1', DT.ALPHA_1, 'deepTime.ts');
+    wdt = replaceMvConst(wdt, 'ALPHA_CLIMATE_SCALE', C.ALPHA_CLIMATE_SCALE, 'deepTime.ts');
+    wdt = replaceMvConst(wdt, 'ALPHA_1', C.ALPHA_1, 'deepTime.ts');
+    wdt = replaceMvConst(wdt, 'ALPHA_3', C.ALPHA_3, 'deepTime.ts');
+    wdt = replaceMvConst(wdt, 'ALPHA_4', C.ALPHA_4, 'deepTime.ts');
+    wdt = replaceMvConst(wdt, 'EARTH_MOI_FACTOR', C.EARTH_MOI_FACTOR, 'deepTime.ts');
+    wdt = replaceMvConst(wdt, 'L_SUN_W', C.SOLAR_LUMINOSITY_W, 'deepTime.ts');
+    wdt = replaceMvConst(wdt, 'SOLAR_WIND_KG_PER_S', C.SOLAR_WIND_KG_PER_S, 'deepTime.ts');
+    wdt = replaceMvConst(wdt, 'HOLOCENE_TAPER_FULL_HALFWIDTH_YR', C.DT_STACK_TAPER_FULL_HALFWIDTH_YR, 'deepTime.ts');
+    wdt = replaceMvConst(wdt, 'HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR', C.DT_STACK_TAPER_TOTAL_HALFWIDTH_YR, 'deepTime.ts');
     if (wdt !== wdtBefore && WRITE) {
       fs.writeFileSync(WEB_DEEPTIME, wdt);
       console.log('    ✓ Written to deepTime.ts');

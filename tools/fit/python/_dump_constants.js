@@ -64,9 +64,22 @@ const output = {
   MASS_RATIO_EARTH_MOON: C.MASS_RATIO_EARTH_MOON,
   massRatioDE440: C.massRatioDE440,
 
+  // Deep-time physics anchors (single truth: astro-reference.json
+  // physicalConstants + model-parameters.json deepTime)
+  EARTH_MOI_FACTOR: C.EARTH_MOI_FACTOR,
+  SOLAR_LUMINOSITY_W: C.SOLAR_LUMINOSITY_W,
+  SOLAR_WIND_KG_PER_S: C.SOLAR_WIND_KG_PER_S,
+  ALPHA_1: C.ALPHA_1,
+  ALPHA_3: C.ALPHA_3,
+  ALPHA_4: C.ALPHA_4,
+  ALPHA_CLIMATE_SCALE: C.ALPHA_CLIMATE_SCALE,
+  DT_STACK_TAPER_FULL_HALFWIDTH_YR: C.DT_STACK_TAPER_FULL_HALFWIDTH_YR,
+  DT_STACK_TAPER_TOTAL_HALFWIDTH_YR: C.DT_STACK_TAPER_TOTAL_HALFWIDTH_YR,
+
   // Moon inputs
   moonSiderealMonthInput: C.moonSiderealMonthInput,
   moonDistance: C.moonDistance,
+  moonOrbitalEccentricity: C.moonOrbitalEccentricity,
 
   // Planet data (full objects)
   planets: C.planets,
