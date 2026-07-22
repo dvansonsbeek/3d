@@ -23324,7 +23324,7 @@ const ESSRT_QTY_TABS = [
 
 // Time ranges (x in calendar Ma; negative = past). Convention: t_Ma_geo = -x.
 const ESSRT_RANGE_TABS = [
-  { key: 'full',    t_lo: -4540, t_hi: 1000, label: 'Full (−4.54 to +1 Gyr)' },
+  { key: 'full',    t_lo: -4498, t_hi: 1000, label: 'Full (−4.5 to +1 Gyr)' },
   { key: 'phanero', t_lo:  -650, t_hi:    0, label: 'Phanerozoic (650 Ma)' },
 ];
 
@@ -23344,7 +23344,7 @@ const WU_ANCHORS = [
 const ESSRT_QTY_SPECS = {
   lod: {
     title:    'Length of Day (LOD)',
-    subtitle: 'Earth\'s mean solar day length under Driver 1 (Earth-Moon tidal recession). Tidal slowing increases the day; LOD grew from ~5 hr at Hadean to ~24 hr at J2000.',
+    subtitle: 'Earth\'s mean solar day length under Driver 1 (Earth-Moon tidal recession). Tidal slowing increases the day; LOD grew from ~4.6 hr at Earth-Moon genesis to ~24 hr at J2000.',
     yLabel:   'LOD (hours)',
     compute:  (t_Ma) => { const s = meanLodSecondsAtAge(t_Ma); return s === null ? null : s / 3600; },
     yFmt:     (v) => v.toFixed(2) + ' hr',
@@ -23426,7 +23426,7 @@ const ESSRT_QTY_SPECS = {
   },
   moon: {
     title:    'Earth-Moon Distance',
-    subtitle: 'Tidal recession under Driver 1 (Farhat 2022 polynomial fit). Moon at Roche limit at Earth-Moon genesis.',
+    subtitle: 'Tidal recession under Driver 1 (Farhat 2022 polynomial fit). Moon at the rigid Roche limit (~9,500 km) at Earth-Moon genesis — the giant-impact epoch, ~4.5 Ga.',
     yLabel:   'Moon distance (km)',
     // Returns kilometres directly so tick labels render as natural numbers.
     compute:  (t_Ma) => { const m = meanMoonDistanceMetresAtAge(t_Ma); return m === null ? null : m / 1000; },
@@ -23442,7 +23442,7 @@ const ESSRT_QTY_SPECS = {
 
 // Geological-era markers (calendar Ma, negative = past)
 const ESSRT_ERA_MARKERS = [
-  { t_cal: -4540, label: 'Earth-Moon genesis', color: '#a66' },
+  { t_cal: -4498, label: 'Earth-Moon genesis', color: '#a66' },
   { t_cal: -541,  label: 'Cambrian',           color: '#699' },
   { t_cal: -380,  label: 'Devonian',           color: '#6a9' },
   { t_cal: -250,  label: 'Pangea (mid)',       color: '#c95' },
@@ -24215,7 +24215,8 @@ const lcrLayerVisibility = {
   netL3: true,        // Tidal + GIA + all cycles (observable); also gates the ▲/▼ transition markers
   bondCurve: true,    // Bond harmonic isolated (thin dashed) — expected 1466-yr sinusoid
   bands: true,        // named climate period bands (background shading)
-  proxy: false,       // temperature anomaly overlay (secondary Y-axis) — opt-in
+  proxy: false,       // temperature anomaly overlay GISP2 (secondary Y-axis) — opt-in
+  proxyLR04: false,   // LR04 inverted-δ¹⁸O overlay (secondary Y-axis) — opt-in, covers the 200-kyr tab
 };
 
 // Bond events — North Atlantic ice-rafted-debris cold events on ~1470 yr
@@ -24242,14 +24243,19 @@ const LCR_BOND_EVENTS = [
   { year: -9150, n: 8, name: 'Bond 8', desc: 'Younger Dryas onset era' },
 ];
 
-// Proxy sources — two fixed roles, no user selector:
+// Proxy sources — fixed roles, no user selector:
 //   - CHART overlay = GISP2 Alley 2000 (Greenland temperature) — smoothest
-//     signal across the widest window, best for visual overlay.
+//     signal across the Holocene window, best for visual overlay.
+//   - CHART overlay (deep) = LR04 benthic stack (Lisiecki & Raymo 2005),
+//     derived at load from the Climate Formula Explorer's lr04-data.json as
+//     inverted δ¹⁸O anomaly — covers the full 200-kyr glacial tab where
+//     GISP2 runs out (~27,950 BC).
 //   - CORRELATION target = Bond 2001 IRD stack — Bond's OWN dataset, the
 //     most direct out-of-sample validation for the framework's Bond harmonic
 //     (yields r = +0.49 in the validated window, r = +0.38 full overlap).
-// Both proxies remain in the JSON; correlation ignores whichever isn't its target.
+// All proxies live in lcrProxyData.sources; correlation ignores non-targets.
 const LCR_CHART_PROXY       = 'GISP2 (Alley 2000)';
+const LCR_CHART_PROXY_LR04  = 'LR04 (Lisiecki & Raymo 2005)';
 const LCR_CORRELATION_PROXY = 'Bond 2001 IRD';
 
 /** Compute framework-vs-temperature Pearson correlations over the Holocene
@@ -24618,19 +24624,43 @@ async function lcrLoadProxyData() {
       src.dataDetrended = lcrDetrendSeries(src.data, 5000);
     }
   }
+  // Derive the LR04 overlay source from the Climate Formula Explorer's data
+  // file: inverted benthic δ¹⁸O anomaly vs core-top (positive = warm), same
+  // sign convention as the Bond IRD source. 1-kyr native resolution; clipped
+  // to the widest LCR tab (200,000 BC) to keep the series small.
+  const lr04 = await _cfmFetchJson('input/lr04-data.json', 'public/input/lr04-data.json');
+  if (lr04 && lr04.age_kyr_BP && lr04.d18o_per_mille) {
+    const ref = lr04.d18o_per_mille[0]; // core-top (0 ka BP)
+    const data = [];
+    for (let i = lr04.age_kyr_BP.length - 1; i >= 0; i--) {
+      const year = 1950 - lr04.age_kyr_BP[i] * 1000;
+      if (year < -202000) continue;
+      data.push([year, ref - lr04.d18o_per_mille[i]]);
+    }
+    lcrProxyData.sources.push({
+      name: LCR_CHART_PROXY_LR04,
+      reference: lr04.source || 'Lisiecki & Raymo (2005)',
+      region: 'global benthic stack (57 sites)',
+      unit: 'inverted δ¹⁸O anomaly (‰, positive = warm) vs core-top',
+      data,
+    });
+  } else {
+    console.error('[LCR] Failed to load lr04-data.json — LR04 overlay disabled.');
+  }
   return lcrProxyData;
 }
 
-// Epoch tabs — six windows spanning deep past to deep future. Default is
+// Epoch tabs — seven windows spanning deep past to deep future. Default is
 // 'historical' (750-2050 AD) — the culturally-recognizable window (MWP,
 // LIA, Modern). yMin/yMax auto-computed per tab from visible data.
 const LCR_RANGE_TABS = [
-  { key: 'deep',       xLo:-27500, xHi:  2050, label: '27,500 BC – 2050 AD',   xStep: 4000 },
-  { key: 'lgm',        xLo:-13000, xHi:  2050, label: '13,000 BC – 2050 AD',   xStep: 2000 },
-  { key: 'holocene',   xLo: -4000, xHi:  2050, label: '4,000 BC – 2050 AD',    xStep: 1000 },
-  { key: 'historical', xLo:   750, xHi:  2050, label: '750 – 2050 AD',         xStep: 100  },
-  { key: 'nearFuture', xLo:  1200, xHi:  2500, label: '1,200 – 2,500 AD',      xStep: 100  },
-  { key: 'full',       xLo:-13000, xHi: 15000, label: '13,000 BC – 15,000 AD', xStep: 2000 },
+  { key: 'glacial',    xLo:-200000, xHi: 2050, label: '200,000 BC–2050',     xStep: 25000, samples: 3000 },
+  { key: 'deep',       xLo:-27500, xHi:  2050, label: '27,500 BC–2050',      xStep: 4000 },
+  { key: 'lgm',        xLo:-13000, xHi:  2050, label: '13,000 BC–2050',      xStep: 2000 },
+  { key: 'holocene',   xLo: -4000, xHi:  2050, label: '4,000 BC–2050',       xStep: 1000 },
+  { key: 'historical', xLo:   750, xHi:  2050, label: '750–2050 AD',         xStep: 100  },
+  { key: 'nearFuture', xLo:  1200, xHi:  2500, label: '1,200–2,500 AD',      xStep: 100  },
+  { key: 'full',       xLo:-13000, xHi: 15000, label: '13,000 BC–15,000',    xStep: 2000 },
 ];
 let lcrSelectedRange = 'historical';
 
@@ -24638,6 +24668,10 @@ let lcrSelectedRange = 'historical';
 // Bands are drawn as light background rectangles behind the rate curves.
 // Sign convention: type 'cold' = blue band; 'warm' = red band.
 const LCR_CLIMATE_PERIODS = [
+  { start: -200000, end: -189000, type: 'warm', name: 'MIS 7 interglacial',            src: 'MIS 7a–7c interglacial complex, ends ~191 ka BP' },
+  { start: -189000, end: -128000, type: 'cold', name: 'Penultimate Glaciation (MIS 6)', src: 'Saalian / Illinoian glacial, ~191–130 ka BP' },
+  { start: -128000, end: -113000, type: 'warm', name: 'Eemian (MIS 5e)',               src: 'Last Interglacial, ~130–115 ka BP' },
+  { start: -113000, end:   -9700, type: 'cold', name: 'Last Glacial Period',           src: 'MIS 5d–2, ~115–11.7 ka BP' },
   { start: -22000, end: -18000, type: 'cold', name: 'Last Glacial Maximum',       src: 'LGM sea-level minimum window ~24,000–20,000 BP' },
   { start: -12050, end: -11750, type: 'cold', name: 'Older Dryas',                src: '14,000–13,700 BP cold reversal within Bølling-Allerød' },
   { start: -10950, end:  -9750, type: 'cold', name: 'Younger Dryas',              src: 'Alley 2000 (12,900–11,700 BP → calendar 10,950–9,750 BC)' },
@@ -24664,7 +24698,9 @@ function lcrComputeSeries(rangeKey) {
   const xLo = range.xLo;
   const xHi = range.xHi;
   // Adaptive step: coarser on wide views, finer on narrow (target ~600 samples).
-  const step = Math.max(2, Math.round((xHi - xLo) / 600));
+  // Very wide tabs can override via range.samples — the 200-kyr view needs a
+  // finer grid to keep the ~716-yr Jose4 harmonic above Nyquist (no moiré).
+  const step = Math.max(2, Math.round((xHi - xLo) / (range.samples || 600)));
 
   const xs = [];
   const tidal = [];
@@ -24926,7 +24962,9 @@ function lcrRenderChart(rangeKey) {
   // Transition markers piggy-back on Framework prediction (netL3) visibility —
   // they mark zero-crossings of the all-cycles stack, which is the very
   // signal Net L3 adds. Separate toggle previously; now one control.
-  const crossingMarks = lcrLayerVisibility.netL3 ? S.crossings.map(c => {
+  // Suppress crossing triangles when the view is so wide they'd overlap into
+  // a solid stripe (the 200-kyr tab has ~450 crossings across ~950 px).
+  const crossingMarks = (lcrLayerVisibility.netL3 && S.crossings.length <= 120) ? S.crossings.map(c => {
     if (c.year < S.xLo || c.year > S.xHi) return '';
     const x = xPos(c.year);
     // Interpolate Net L2 at c.year for the marker's Y position.
@@ -24946,9 +24984,12 @@ function lcrRenderChart(rangeKey) {
   // resolution, extended by two chart-only anchor points to 2000 AD) on the
   // right-hand °C-anomaly axis.
   let proxyGroup = '';
-  if (lcrLayerVisibility.proxy && lcrProxyData && lcrProxyData.sources) {
+  const enabledProxyNames = [];
+  if (lcrLayerVisibility.proxy)     enabledProxyNames.push(LCR_CHART_PROXY);
+  if (lcrLayerVisibility.proxyLR04) enabledProxyNames.push(LCR_CHART_PROXY_LR04);
+  if (enabledProxyNames.length > 0 && lcrProxyData && lcrProxyData.sources) {
     const activeSources = lcrProxyData.sources
-      .filter(src => src.name === LCR_CHART_PROXY)
+      .filter(src => enabledProxyNames.includes(src.name))
       .map(src => {
         // Include chart-only extension points (e.g., modern-era anchor points
         // appended for visual continuity) but not consumed by correlation.
@@ -24975,7 +25016,8 @@ function lcrRenderChart(rangeKey) {
       const yPosProxy = (t) => margin.top + (1 - (t - proxyMin) / (proxyMax - proxyMin)) * plotH;
 
       const proxyColors = {
-        'GISP2 (Alley 2000)':   '#ff5978',
+        'GISP2 (Alley 2000)':          '#ff5978',
+        'LR04 (Lisiecki & Raymo 2005)': '#4ade80',
       };
       const proxyPaths = activeSources.map(({ src, filtered }) => {
         // Smooth path via Catmull-Rom → cubic Bezier conversion. Sparse
@@ -25007,11 +25049,19 @@ function lcrRenderChart(rangeKey) {
           }
         }
         const col = proxyColors[src.name] || '#ffb0d0';
-        return `<path d="${d}" fill="none" stroke="${col}" stroke-width="1.6" opacity="0.75" data-lcr-proxy="${src.name}"><title>${src.name} — ${src.reference}
-${src.region} • ${src.unit}</title></path>`;
+        // xmlEsc: source names/references may contain '&' (e.g. "Lisiecki &
+        // Raymo") which breaks strict-XML parsing of the exported SVG.
+        const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `<path d="${d}" fill="none" stroke="${col}" stroke-width="1.6" opacity="0.75" data-lcr-proxy="${esc(src.name)}"><title>${esc(src.name)} — ${esc(src.reference)}
+${esc(src.region)} • ${esc(src.unit)}</title></path>`;
       }).join('');
 
-      // Right-hand axis ticks + label.
+      // Right-hand axis ticks + label. Ticks take the color of the sole
+      // active proxy; pink when both are shown (mixed-unit axis).
+      const onlyLR04 = enabledProxyNames.length === 1 && enabledProxyNames[0] === LCR_CHART_PROXY_LR04;
+      const axisCol = (activeSources.length === 1)
+        ? (proxyColors[activeSources[0].src.name] || '#ff5978')
+        : '#ff5978';
       const proxyTicks = [];
       // Choose a nice tick step.
       const proxySpan = proxyMax - proxyMin;
@@ -25024,11 +25074,14 @@ ${src.region} • ${src.unit}</title></path>`;
       const pStart = Math.ceil(proxyMin / pStep) * pStep;
       for (let t = pStart; t <= proxyMax + 1e-9; t += pStep) {
         const y = yPosProxy(t);
-        proxyTicks.push(`<line x1="${margin.left + plotW}" y1="${y}" x2="${margin.left + plotW + 5}" y2="${y}" stroke="#ff5978" stroke-width="0.7"/>
-          <text x="${margin.left + plotW + 8}" y="${y + 4}" text-anchor="start" font-size="10" fill="#ff5978" opacity="0.85">${t > 0 ? '+' : ''}${t.toFixed(pStep < 1 ? 1 : 0)}</text>`);
+        proxyTicks.push(`<line x1="${margin.left + plotW}" y1="${y}" x2="${margin.left + plotW + 5}" y2="${y}" stroke="${axisCol}" stroke-width="0.7"/>
+          <text x="${margin.left + plotW + 8}" y="${y + 4}" text-anchor="start" font-size="10" fill="${axisCol}" opacity="0.85">${t > 0 ? '+' : ''}${t.toFixed(pStep < 1 ? 1 : 0)}</text>`);
       }
-      const axisLabelText = 'Temperature anomaly (°C, GISP2)';
-      const proxyAxisLabel = `<text x="${margin.left + plotW + 42}" y="${margin.top + plotH / 2}" text-anchor="middle" transform="rotate(90 ${margin.left + plotW + 42} ${margin.top + plotH / 2})" font-size="11" fill="#ff5978" font-weight="600">${axisLabelText}</text>`;
+      const axisLabelText = activeSources.length > 1
+        ? 'Temperature anomaly (GISP2 °C / LR04 −δ¹⁸O ‰)'
+        : onlyLR04 ? 'Temperature proxy (−δ¹⁸O ‰, LR04)'
+                   : 'Temperature anomaly (°C, GISP2)';
+      const proxyAxisLabel = `<text x="${margin.left + plotW + 42}" y="${margin.top + plotH / 2}" text-anchor="middle" transform="rotate(90 ${margin.left + plotW + 42} ${margin.top + plotH / 2})" font-size="11" fill="${axisCol}" font-weight="600">${axisLabelText}</text>`;
 
       proxyGroup = proxyTicks.join('') + proxyPaths + proxyAxisLabel;
     }
@@ -25098,6 +25151,7 @@ function lcrExport() {
     lavender: '#6d3ee0',   // Bond cycle          (was #c084fc)
     rust:     '#a4553d',   // Tidal baseline      (was #c46a4d — nudge darker)
     pink:     '#e63959',   // Temperature (GISP2) (was #ff5978)
+    green:    '#15803d',   // Temperature (LR04)  (was #4ade80)
     peak:     '#c62838',   // PEAK triangles      (was #ff4757)
     trough:   '#1a72c9',   // TROUGH triangles    (was #4dabff)
     warmBand: '#c94040',   // warm period band + leader labels (was #e07070)
@@ -25119,6 +25173,8 @@ function lcrExport() {
     [/stroke="#c46a4d"/g,                   `stroke="${PRINT.rust}"`],
     [/stroke="#ff5978"/g,                   `stroke="${PRINT.pink}"`],
     [/fill="#ff5978"/g,                     `fill="${PRINT.pink}"`],
+    [/stroke="#4ade80"/g,                   `stroke="${PRINT.green}"`],
+    [/fill="#4ade80"/g,                     `fill="${PRINT.green}"`],
     // Peak / trough triangles
     [/fill="#ff4757"/g,                     `fill="${PRINT.peak}"`],
     [/fill="#4dabff"/g,                     `fill="${PRINT.trough}"`],
@@ -25204,6 +25260,12 @@ function lcrExport() {
       label: 'Temperature (GISP2)',
     });
   }
+  if (lcrLayerVisibility.proxyLR04) {
+    legendEntries.push({
+      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.green}" stroke-width="1.8"/>`,
+      label: 'Temperature (LR04, −δ¹⁸O)',
+    });
+  }
 
   const itemWidths = legendEntries.map(e => swatchW + swatchLabelGap + e.label.length * 6.4);
   const totalLegendW = itemWidths.reduce((a, b) => a + b, 0) + entryGap * Math.max(0, legendEntries.length - 1);
@@ -25254,6 +25316,7 @@ async function createLcrPanel() {
       <label class="cfm-layer-check" title="Bond 8H/1830 harmonic ISOLATED from the 4-cycle stack. A clean 1466-yr sinusoid — its zero-crossings should align with Bond cycle timing if the framework captures the Bond cycle. Full-stack prediction has additional Hallstatt / Jose5 / Jose4 crossings on top of this."><input type="checkbox" data-lcr-layer="bondCurve" ${lcrLayerVisibility.bondCurve ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bondcurve"></span>Bond cycle</label>
       <label class="cfm-layer-check" title="Named climate period bands from mainstream literature. Cold = blue; Warm = red."><input type="checkbox" data-lcr-layer="bands" ${lcrLayerVisibility.bands ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bands"></span>Periods</label>
       <label class="cfm-layer-check" title="GISP2 Alley 2000 Greenland ice-core temperature reconstruction on the secondary right-hand °C-anomaly axis. Independent paleoclimate reconstruction — not part of the framework fit. Covers 27,950 BC to 1850 AD at 100-yr resolution, with two anchor points appended at 1950 and 2000 AD for visual continuity to the modern era."><input type="checkbox" data-lcr-layer="proxy" ${lcrLayerVisibility.proxy ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxy"></span>Temperature (GISP2)</label>
+      <label class="cfm-layer-check" title="LR04 global benthic δ¹⁸O stack (Lisiecki & Raymo 2005, 57 sites) shown as inverted anomaly vs core-top on the secondary axis — positive = warm, same sign convention as the Bond IRD panel. Independent paleoclimate reconstruction — not part of the framework fit; the same dataset the Climate Formula Explorer fits against. 1-kyr resolution; covers the full 200,000 BC tab where GISP2 ends (~27,950 BC)."><input type="checkbox" data-lcr-layer="proxyLR04" ${lcrLayerVisibility.proxyLR04 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxylr04"></span>Temperature (LR04)</label>
     </div>
   `;
 
@@ -30282,7 +30345,7 @@ function setupGUI() {
   addTooltip(toolsFolder.addButton({ title: 'Climate Formula Explorer' }).on('click', () => openClimateFormulaPanel()),
     'Modular climate formula: L1 8H orbital lattice + L2 silicate-weathering carbon thermostat (405/202/135 kyr) + L3 boundary-condition steps (PETM, EOT, Mi-1, MMCT, iNHG, MPT). Per-regime fits vs LR04 \u03b4\u00b9\u2078O (Lisiecki & Raymo 2005) and CENOGRID \u03b4\u00b9\u2078O / \u03b4\u00b9\u00b3C (Westerhold 2020). Independent layer toggles + per-layer R\u00b2 breakdown. Forward-projection tab; cross-regime prediction fails honestly (doc 92 \u00a78.4).');
   addTooltip(toolsFolder.addButton({ title: 'ESSRT Explorer' }).on('click', () => openEssrtPanel()),
-    'Expanding Solar System Resonance Theory \u2014 deep-time evolution of LOD, H, axial precession, obliquity cycle, AU, Moon distance, and per-planet orbital parameters from Earth-Moon genesis (\u22124.54 Gyr) to +5 Gyr future. Wu et al. 2024 cyclostratigraphy overlay on the Phanerozoic 650 Ma window.');
+    'Expanding Solar System Resonance Theory \u2014 deep-time evolution of LOD, H, axial precession, obliquity cycle, AU, Moon distance, and per-planet orbital parameters from Earth-Moon genesis (\u22124.5 Gyr, giant-impact epoch) to +5 Gyr future. Wu et al. 2024 cyclostratigraphy overlay on the Phanerozoic 650 Ma window.');
   addTooltip(toolsFolder.addButton({ title: 'Formula Verification' }).on('click', () => openVerificationPanel()),
     'Compare the model against published formulas (Laskar, Meeus, Capitaine, etc.) for eccentricity, obliquity, year lengths, and precession over \u00B112,000 years.');
   addTooltip(toolsFolder.addButton({ title: 'Data Explorer' }).on('click', () => window.open('https://data.holisticuniverse.com', '_blank')),

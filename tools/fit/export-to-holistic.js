@@ -696,6 +696,51 @@ const MV_TS      = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
       mv = replaceMvConst(mv, 'DLOD_ALLCYCLES', dLod.stack.toFixed(2));
     }
 
+    // Deep-time scalar anchors (Devonian / Earth-Moon genesis / +200 Myr) —
+    // computed from the shipped ESSRT chain so a Moon-polynomial refit
+    // propagates into website V-tags and paper \Mv macros automatically.
+    // Genesis epoch = the rigid-Roche crossing (~9,500 km) of the recession
+    // polynomial; the "Hadean" key names are kept for macro compatibility.
+    {
+      const R_E_KM = 6371, ROCHE_RIGID_KM = 9500;
+      const fmtInt = x => Math.round(x).toLocaleString('en-US');
+      const uMinus = s => String(s).replace('-', '−');
+      const TOTAL_DAYS = DT.meanHAtAge(0) * DT.meanYearInDaysAtAge(0);
+      const driftPpm = t => uMinus(Math.round(
+        (DT.meanHAtAge(t) * DT.meanYearInDaysAtAge(t) / TOTAL_DAYS - 1) * 1e6));
+      let lo = 4400, hi = 4550;
+      for (let i = 0; i < 60; i++) {
+        const mid = (lo + hi) / 2;
+        if (DT.meanMoonDistanceMetresAtAge(mid) / 1000 > ROCHE_RIGID_KM) lo = mid; else hi = mid;
+      }
+      const tGen = Math.round((lo + hi) / 2);
+      const key = (name, val) => { mv = replaceMvString(mv, name, val); };
+      // Devonian (380 Ma)
+      key('hAtDevonian',            fmtInt(DT.meanHAtAge(380)));
+      key('lodAtDevonianHr',        (DT.meanLodSecondsAtAge(380) / 3600).toFixed(2));
+      key('eightHAtDevonian',       (8 * DT.meanHAtAge(380) / 1e6).toFixed(3));
+      key('moonDistanceAtDevonian', fmtInt(DT.meanMoonDistanceMetresAtAge(380) / 1000));
+      key('daysPerYearAtDevonian',  DT.meanYearInDaysAtAge(380).toFixed(2));
+      key('driftAtDevonianPpm',     driftPpm(380));
+      key('axialPrecAtDevonian',    fmtInt(DT.meanHAtAge(380) / 13));
+      // Earth-Moon genesis (rigid-Roche crossing)
+      key('moonGenesisAgeGa',       (tGen / 1000).toFixed(3));
+      key('hAtHadean',              fmtInt(DT.meanHAtAge(tGen)));
+      key('lodAtHadeanHr',          (DT.meanLodSecondsAtAge(tGen) / 3600).toFixed(2));
+      key('eightHAtHadean',         (8 * DT.meanHAtAge(tGen) / 1e6).toFixed(3));
+      key('moonDistanceAtHadean',   fmtInt(DT.meanMoonDistanceMetresAtAge(tGen) / 1000));
+      key('moonDistanceAtHadeanRE', (DT.meanMoonDistanceMetresAtAge(tGen) / 1000 / R_E_KM).toFixed(2));
+      key('axialPrecAtHadean',      fmtInt(DT.meanHAtAge(tGen) / 13));
+      key('driftAtHadeanPpm',       driftPpm(tGen));
+      key('hOneGyrAgoPct',          '~' + Math.round(DT.meanHAtAge(1000) / DT.meanHAtAge(0) * 100));
+      // +200 Myr future
+      key('hAt200MyrFuture',            fmtInt(DT.meanHAtAge(-200)));
+      key('eightHAt200MyrFuture',       (8 * DT.meanHAtAge(-200) / 1e6).toFixed(3));
+      key('moonDistanceAt200MyrFuture', fmtInt(DT.meanMoonDistanceMetresAtAge(-200) / 1000));
+      key('lodAt200MyrFutureHr',        (DT.meanLodSecondsAtAge(-200) / 3600).toFixed(2));
+      key('axialPrecAt200MyrFuture',    fmtInt(DT.meanHAtAge(-200) / 13));
+    }
+
     if (mv !== mvBefore && WRITE) {
       fs.writeFileSync(MV_COMPUTE, mv);
       console.log('    ✓ Written to model-values.compute.ts');

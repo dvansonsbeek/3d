@@ -38,7 +38,7 @@ Earth's H is the model's master cycle, but it isn't the largest. **Eight Earth F
 The unifying theory is the **Expanding Solar System Resonance Theory (ESSRT)** ([Doc 99](docs/99-expanding-solar-system-resonance-theory.md)):
 
 - The **L1 integer labels** (n = 9, 12, …, 65, 66, 68, …, 185 — 32 components in total) are **scale-invariant** structural constants of the solar system. Same integers at every epoch.
-- The **literal periods** scale with the current value of H(t): in the Devonian H ≈ 309,083 yr, today H = 335,317 yr, in 200 Myr H ≈ 350,665 yr — but `8H/65` is still the obliquity beat, `8H/104` is still axial precession, etc.
+- The **literal periods** scale with the current value of H(t): in the Devonian H ≈ 306,189 yr, today H = 335,317 yr, in 200 Myr H ≈ 352,600 yr — but `8H/65` is still the obliquity beat, `8H/104` is still axial precession, etc.
 - Two physically independent drivers expand H(t): **Driver 1** is Earth-Moon tidal evolution (Moon recedes ~3.4 cm/yr, Earth's length-of-day grows); **Driver 2** is solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). Both act simultaneously; the structural invariant `H × days/year ≈ 122,471,920` couples them at the per-planet observational level.
 
 ESSRT therefore unifies the **modern-era 8H climate lattice** (docs 90–92), the **deep-time predictions** (see deep-time section below), and the **future projections** (tidal-lock asymptote at ~87 R_⊕) into a single coherent framework with the **same 6 free parameters** throughout. The Solar System Resonance Cycle Period Table is in [Doc 55](docs/55-solar-system-resonance-cycle-periods.md).
@@ -144,7 +144,7 @@ The simulation is not limited to the modern era. The model's 6 free parameters a
 
 The framework is documented in [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](docs/99-expanding-solar-system-resonance-theory.md): a canonical 9-step chain from `t_Ma` through length-of-day (LOD), the Earth Fundamental Cycle H(t), AU, solar mass loss, Kepler year, Moon distance, Moon synodic month, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods. The chain is anchored to modern Lunar Laser Ranging and the [Farhat 2022](https://www.aanda.org/articles/aa/full_html/2022/09/aa44329-22/aa44329-22.html) lunar-distance evolution polynomial; deep-time outputs are then independently validated against three external anchors that the model was **not** fit against:
 
-- **Wells 1963** (Devonian coral growth bands at 380 Ma): predicted Earth Fundamental Cycle H ≈ 309,083 yr matches Wells's paleontological day-count to ~1.4 %
+- **Wells 1963** (Devonian coral growth bands at 380 Ma): predicted Earth Fundamental Cycle H ≈ 306,189 yr matches Wells's paleontological day-count essentially exactly (−0.01 %)
 - **Wu et al. 2024** (650-Myr cyclostratigraphy from sedimentary records): predicted H(t) matches Wu's reconstruction across the entire Phanerozoic to within ~1 %
 - **Patterson 1956 Pb-Pb Earth age** (4.55 Gyr): the model places the Moon at the Roche limit at that epoch — **no Hadean constraint was used in the fit**; the result emerges from the same proper-physics chain that produces the modern Moon distance
 

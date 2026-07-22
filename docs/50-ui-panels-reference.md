@@ -588,9 +588,9 @@ It is the interactive home of the **Σ_stack ↔ Bond 2001 IRD cross-validation*
 
 | Feature | Description |
 |---------|-------------|
-| **Layer toggles (6)** | **Tidal baseline** (flat rust dashed, +2.12 ms/cy — pure Moon-recession reference) · **Tidal + GIA** (secular baseline, +1.77 ms/cy at J2000, matches IERS +1.75) · **Tidal + GIA + all cycles** (full observable prediction, +0.76 ms/cy at J2000; also gates the ▲/▼ transition markers) · **Bond cycle** (the 8H/1830 = 1466-yr harmonic isolated, thin dashed) · **Periods** (climate-band shading) · **Temperature (GISP2)** (opt-in proxy overlay, secondary °C axis) |
-| **Epoch tabs (6)** | 27,500 BC–2050 AD · 13,000 BC–2050 AD · 4,000 BC–2050 AD · 750–2050 AD (default) · 1,200–2,500 AD (near future) · 13,000 BC–15,000 AD (full). Y-range auto-computed per tab from the currently-visible curves |
-| **Climate-period bands** | 15 named periods from mainstream literature (LGM, Older/Younger Dryas, Holocene Optimum, 8.2 ka, Bond 4, 4.2 ka, Late Bronze Age Collapse, Iron Age cold, Roman Warm, Late Antique LIA, MWP, LIA incl. Maunder + Dalton, Modern warm) — cold = blue band, warm = red band; wide bands get inline labels, narrow bands get 45° leader labels in the top margin |
+| **Layer toggles (7)** | **Tidal baseline** (flat rust dashed, +2.12 ms/cy — pure Moon-recession reference) · **Tidal + GIA** (secular baseline, +1.77 ms/cy at J2000, matches IERS +1.75) · **Tidal + GIA + all cycles** (full observable prediction, +0.76 ms/cy at J2000; also gates the ▲/▼ transition markers) · **Bond cycle** (the 8H/1830 = 1466-yr harmonic isolated, thin dashed) · **Periods** (climate-band shading) · **Temperature (GISP2)** (opt-in proxy overlay, secondary °C axis) · **Temperature (LR04)** (opt-in inverted-δ¹⁸O overlay, green, covers the 200-kyr tab) |
+| **Epoch tabs (7)** | 200,000 BC–2050 AD (glacial; fine 3,000-sample grid, crossing triangles suppressed above 120 crossings) · 27,500 BC–2050 AD · 13,000 BC–2050 AD · 4,000 BC–2050 AD · 750–2050 AD (default) · 1,200–2,500 AD (near future) · 13,000 BC–15,000 AD (full). Y-range auto-computed per tab from the currently-visible curves |
+| **Climate-period bands** | 19 named periods from mainstream literature (MIS 7 interglacial, Penultimate Glaciation MIS 6, Eemian MIS 5e, Last Glacial Period, LGM, Older/Younger Dryas, Holocene Optimum, 8.2 ka, Bond 4, 4.2 ka, Late Bronze Age Collapse, Iron Age cold, Roman Warm, Late Antique LIA, MWP, LIA incl. Maunder + Dalton, Modern warm) — cold = blue band, warm = red band; wide bands get inline labels, narrow bands get 45° leader labels in the top margin |
 | **Transition markers ▲/▼** | Zero-crossings of the stack rate on the Tidal + GIA + all cycles curve: ▲ PEAK (stack at max, rate turns negative → Earth spins up vs baseline → warm episode starts), ▼ TROUGH (stack at min → cooling starts). The matching console test *All cycles (4-flag stack) ↔ climate transitions* scans −5000 to +5000 CE and matches each crossing to the nearest named transition of the correct sign |
 | **Temperature overlay** | GISP2 (Alley 2000) Greenland ice-core reconstruction on a secondary right-hand °C-anomaly axis, 27,950 BC–1850 AD at 100-yr resolution — independent reconstruction, not part of any framework fit. A 5-kyr rolling-mean detrend (`lcrDetrendSeries`) removes the Milankovitch-scale trend so Bond-scale oscillations are visible |
 | **Evidence panels (3, collapsible)** | *Framework ↔ Bond 2001 IRD correlation (detrended)* — Pearson r for Σ_stack and for the isolated Bond harmonic, plus best-lag cross-correlation (±500 yr scan) · *Sign convention check* — Σ_stack sign vs warm/cold at 10 named events (6/6 within the validated window) · *Bond event ↔ nearest framework ▼ TROUGH crossing* — offsets from Bond 0–8 (1450 CE back to 9150 BC) |
@@ -598,10 +598,11 @@ It is the interactive home of the **Σ_stack ↔ Bond 2001 IRD cross-validation*
 
 ### Proxy roles (fixed, no user selector)
 
-- **Chart overlay** = GISP2 (Alley 2000) — smoothest signal across the widest window
+- **Chart overlay** = GISP2 (Alley 2000) — smoothest signal across the Holocene window
+- **Chart overlay (deep)** = LR04 benthic stack (Lisiecki & Raymo 2005) — derived at load from `public/input/lr04-data.json` (the Climate Formula Explorer's dataset) as inverted δ¹⁸O anomaly vs core-top (positive = warm, same sign convention as Bond IRD); 1-kyr resolution, covers the full 200,000 BC tab where GISP2 ends (~27,950 BC)
 - **Correlation target** = Bond 2001 IRD stack — Bond's *own* dataset, the most direct out-of-sample validation of the framework's Bond harmonic (the IRD drift-ice signal is the same physical mass-redistribution signal the 8H/1830 harmonic models, which is why it correlates at +0.49 where GISP2 gives only +0.20)
 
-Both live in `public/input/climate-proxy.json` (loaded by `lcrLoadProxyData()` with GitHub raw-URL fallback).
+GISP2 + Bond live in `public/input/climate-proxy.json`; all are loaded/derived by `lcrLoadProxyData()` with GitHub raw-URL fallback.
 
 ### Code Locations
 
