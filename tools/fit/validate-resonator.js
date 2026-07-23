@@ -1,7 +1,9 @@
-// Stage 3.3 — runtime validation sweep for the Core-mantle swing (Resonator
-// driver), toggle OFF vs ON, against the PRODUCTION chain (current shipped
-// stack, production deltaTStart — NOT the resonator-aware closure refit,
-// which is a default-ON-time decision).
+// validate-resonator.js — runtime validation sweep for the Core-mantle swing
+// (Resonator driver), toggle OFF vs ON, against the CURRENT production chain.
+// Pipeline role (tools/fit/README.md Step 7c): run after every
+// `dt-corrections-fit.js --joint --write` + constant sync to confirm the
+// shipped world end-to-end. Formerly scripts/core_mantle_resonator_stage3_
+// validation.js (Stage 3.3 of the resonator integration).
 //
 // Checks:
 //   1. J2000 invariants (ΔT(0) = 0; pure-physics LOD untouched; Layer-3
@@ -13,14 +15,14 @@
 //      ±200 Myr (episode + taper must vanish)
 //
 // Output: data/core-mantle-resonator-stage3-validation.json
-// Run:    node scripts/core_mantle_resonator_stage3_validation.js
+// Run:    node tools/fit/validate-resonator.js
 
 const fs = require('fs');
 const path = require('path');
-const REPO = path.join(__dirname, '..');
+const REPO = path.join(__dirname, '..', '..');
 // Single source of truth (joint-world value 58.48 since the flip)
 const DELTA_T_START = JSON.parse(fs.readFileSync(
-  path.join(__dirname, '..', 'public', 'input', 'astro-reference.json'),
+  path.join(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'),
   'utf8')).earthOrbital.deltaTStart;
 
 function freshDT(resonatorOn) {
