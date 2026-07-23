@@ -26432,9 +26432,10 @@ const VFP_CATEGORIES = [
     },
     fmtValue: v => Number.isFinite(v) ? v.toLocaleString('en-US', { maximumFractionDigits: 0 }) : 'N/A',
     // Model curve shows the calibrated long-term ΔT trend (H/5 LOD physics +
-    // Bond/Hallstatt/Jose5/Jose4 cyclic stack, jointly fit against Espenak &
-    // Meeus). Reads ~57.5 s at J2000 — the trend value, not the industrial-era-
-    // inflated instantaneous IERS observation of 63.6 s. Reference curve is
+    // 4-flag stack + Core-mantle swing, jointly fit against Espenak & Meeus
+    // under the hard USNO closure). Reads ~56.0 s at J2000 — the trend value,
+    // not the industrial-era-inflated instantaneous IERS observation of
+    // 63.6 s. Reference curve is
     // NASA's Five Millennium Canon piecewise polynomial fit to observed eclipse
     // timings (~5-millennia validity).
     model: { name: 'This model (ΔT trend)', color: '#f0b040',
@@ -26443,7 +26444,7 @@ const VFP_CATEGORIES = [
       { name: 'Espenak & Meeus (NASA Canon)', color: '#4fc3f7', fn: deltaTEspenakMeeusRaw,
         sourceUrl: 'https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html' },
     ],
-    modelNote: `Both curves show <strong>absolute ΔT (TT − UT1)</strong> in seconds. Our model is the calibrated long-term trend: <code>deltaTStart</code> (~57.5&nbsp;s J2000 anchor) + Simpson integral of Layer 2 + H/5 LOD + Bond/Hallstatt/Jose5/Jose4 cyclic stack (jointly fit against Espenak history 1650-2017, RMS ≈ 12&nbsp;s). The J2000 anchor sits below the IERS instantaneous observation (63.6&nbsp;s) by design — the ~6&nbsp;s gap is the industrial-era Earth-rotation acceleration (mass redistribution, ice loss, groundwater pumping) that no cyclic model can capture. <strong>Espenak &amp; Meeus</strong> is the NASA Five Millennium Canon piecewise polynomial fit to observed eclipse timings; divergence from our model (~15&nbsp;s at the 1900 dip, near-zero at 1870 and 2010) shows what our 4 cycles cannot resolve — short-scale (~50-year) wiggles need shorter-period corrections than our H-lattice cycle stack (all ≥ 700&nbsp;yr) allows. Both curves match to ~1&nbsp;s at J2000+50&nbsp;yr and again near 2050.`,
+    modelNote: `Both curves show <strong>absolute ΔT (TT − UT1)</strong> in seconds. Our model is the calibrated long-term trend: <code>deltaTStart</code> (~56.0&nbsp;s J2000 anchor, joint world) + Simpson integral of Layer 2 + H/5 LOD + Bond/Hallstatt/Jose5/Jose4 + Core-mantle swing stack (jointly fit against Espenak history 1650-2017, RMS ≈ 12.6&nbsp;s). The J2000 anchor sits below the IERS instantaneous observation (63.6&nbsp;s) by design — the ~7.6&nbsp;s gap is the industrial-era Earth-rotation acceleration (mass redistribution, ice loss, groundwater pumping) that no cyclic model can capture. <strong>Espenak &amp; Meeus</strong> is the NASA Five Millennium Canon piecewise polynomial fit to observed eclipse timings; divergence from our model (~15&nbsp;s at the 1900 dip, near-zero at 1870 and 2010) shows what our cyclic stack cannot resolve — short-scale (~50-year) wiggles need shorter-period corrections than our H-lattice cycle stack (all ≥ 700&nbsp;yr) allows. Both curves match to ~1&nbsp;s at J2000+50&nbsp;yr and again near 2050.`,
   },
 ];
 
@@ -30072,7 +30073,7 @@ function setupGUI() {
   const dtFolder = daysFolder.addFolder({ title: '\u0394T (TT \u2212 UT1)' });
   addTooltip(dtFolder.addBinding(predictions, 'deltaTCorrectionSeconds', {
     label: '\u0394T trend (s)', readonly: true, format: v => v.toFixed(2)
-  }), 'Model-calibrated long-term TREND of \u0394T (TT \u2212 UT1) in seconds. Reads \u2248 65.9 s at J2000 \u2014 the smooth trend value passing through 2000, distinct from the IERS instantaneous observation of ~63.6 s (which includes industrial-era Earth-rotation acceleration our cyclic model does not attempt to capture). Formula: deltaTStart + Simpson integral of Layer 2 + H/5 LOD + Bond/Hallstatt/Jose5/Jose4 cyclic corrections (jointly fit against Espenak history 1650-2017, RMS \u2248 22.5 s). Used by Meeus geometry, eclipse timing, and the live accumulator. The pure-physics-only (no cycles) variant is available on the Formula Verification chart at Reports \u2192 Days & Years \u2192 \u0394T.');
+  }), 'Model-calibrated long-term TREND of \u0394T (TT \u2212 UT1) in seconds. Reads \u2248 56.0 s at J2000 \u2014 the smooth trend value passing through 2000, distinct from the IERS instantaneous observation of ~63.6 s (the ~8-s gap is industrial-era Earth-rotation acceleration our cyclic model does not attempt to capture). Formula: deltaTStart + Simpson integral of Layer 2 + H/5 LOD + 4-flag stack + Core-mantle swing (jointly fit under the hard USNO closure; Espenak history 1650-2017 RMS \u2248 12.6 s). Used by Meeus geometry, eclipse timing, and the live accumulator. The pure-physics-only (no cycles) variant is available on the Formula Verification chart at Reports \u2192 Days & Years \u2192 \u0394T.');
   addTooltip(dtFolder.addBinding(predictions, 'predictedDeltatPerYear', {
     label: 'Rate (s/yr)', readonly: true, format: v => v.toFixed(4)
   }), 'Current d(\u0394T)/dt = (LOD_real \u2212 86400) \u00d7 solarYearDays. LOD_real is Layer 3 = o.lodKinematic + h5Correction + dtCycleLodCorrectionSum(year), i.e. the same value shown as Solar Day = REAL. Positive = clocks running slower than TT (Earth day > 86400 SI s).');
@@ -37369,11 +37370,11 @@ function setupGUI() {
       // H2 = mass-balance instantaneous (paper: r=0.00, p=0.93)
       // H3 = mass-balance integrated Y→2000 lunar + solar replication
       //      (paper: lunar r=−0.14 marginal; solar r=+0.24 sign-flipped)
-      // H4 = mass-balance lagged Δ∈[0,1000] yr scan (paper: best r=0.07, p=0.25)
-      // H5 = mass-balance signed sign-duration (paper: r=0.02)
+      // H4 = mass-balance lagged Δ∈[0,1000] yr scan (paper: lunar best-lag null r=−0.108 at Δ=0; solar sign mismatch)
+      // H5 = mass-balance signed sign-duration (paper: lunar null r=−0.054; only solar significant)
       // H6 = 9 literature periodic forcings via Lomb-Scargle (paper: 0/9 detected)
-      // H7 = 14.2-yr marginal peak robustness (paper: window artifact — failed)
-      // H8 = lunar nodal 18.6-yr cycle medieval-only (paper: FAP 93%)
+      // H7 = 14.2-yr peak robustness (paper: sampling-window artifact — eclipse-cadence comb)
+      // H8 = lunar nodal 18.6-yr cycle medieval-only (paper: FAP 70.6%)
       const rows = [];
 
       // H1 — mantle-core coupling: tested via ΔT extrapolation in doc 103,
@@ -49610,7 +49611,7 @@ function resetDeltaTForJump() {
       // Raw H/5 kinematic LOD = LOD + H/5 ecliptic-precession "missing motion"
       // (~3.5 ms at J2000). This is the raw-physics integrand for the ΔT accumulator;
       // it is NOT the Layer 3 physical LOD_real (which further adds the calibrated
-      // Bond/Hallstatt/Jose5/Jose4 stack to hit the USNO 86400.0026 s anchor).
+      // 4-flag stack + Core-mantle swing to hit the USNO 86400.0014 s anchor, joint world).
       const lodH5Raw = lod + lod / ((holisticyearLength / 5) * solarYear);
       const dTchangePerYr = (lodH5Raw - 86_400) * solarYear;   // seconds/yr
       deltaTsum += dTchangePerYr / SUBSTEPS_PER_YEAR;         // fraction
@@ -49635,7 +49636,7 @@ function resetDeltaTForJump() {
       // Raw H/5 kinematic LOD = LOD + H/5 ecliptic-precession "missing motion"
       // (~3.5 ms at J2000). This is the raw-physics integrand for the ΔT accumulator;
       // it is NOT the Layer 3 physical LOD_real (which further adds the calibrated
-      // Bond/Hallstatt/Jose5/Jose4 stack to hit the USNO 86400.0026 s anchor).
+      // 4-flag stack + Core-mantle swing to hit the USNO 86400.0014 s anchor, joint world).
       const lodH5Raw = lod + lod / ((holisticyearLength / 5) * solarYear);
       const dTchangePerYr = (lodH5Raw - 86_400) * solarYear;
       deltaTsum += dTchangePerYr / SUBSTEPS_PER_YEAR;
@@ -59457,8 +59458,9 @@ function updatePredictions() {
   // Sidereal year in seconds = MEASURED days × o.lodKinematic (round-trip identity → = IAU_sid_sec = 31,558,149.7635 s).
   predictions.siderealYearSeconds = o.siderealYearSeconds = o.siderealYearDays * o.lodKinematic;
   // Tweakpane display: LOD_real = o.lodKinematic + H/5 ecliptic missing-motion + DT cyclic sum (Layer 3).
-  // At J2000: raw H/5 kinematic = 86400.003 s → Layer 3 = 86400.003 + (~−1.74 ms from calibrated DT stack)
-  //         = 86400.0026 s → matches USNO joint-optimum anchor exactly, by construction of the fit.
+  // At J2000: raw H/5 kinematic = 86400.003527 s → Layer 3 = 86400.003527 + (~−2.14 ms from
+  // calibrated 4-flag stack + Core-mantle swing) = 86400.0014 s → matches the USNO joint-world
+  // anchor exactly, by construction of the fit.
   //
   // Layer 3's baseline is `o.lodKinematic` (IAU-anchored kinematic) NOT `_gia`
   // (physics tidal+GIA). The two differ by ~0.34 ms at J2000 — that offset IS the
@@ -59546,7 +59548,7 @@ function updatePredictions() {
 
   // ΔT (TT − UT1) and Earth polar-moment α at the current epoch. ΔT integrates
   // the (86400 − LOD_real(τ)) contribution from J2000 to the current year, then
-  // adds deltaTStart (65.92 s trend anchor) so the displayed value is ABSOLUTE ΔT — matching
+  // adds deltaTStart (56.05 s trend anchor, joint world) so the displayed value is ABSOLUTE ΔT — matching
   // Espenak/Meeus at J2000. α is the climate-driven refinement (doc 99
   // §prediction-7), anchored at IERS 2010 at J2000.
   {
@@ -59554,12 +59556,13 @@ function updatePredictions() {
     // deep-time convention — otherwise a ~7 yr/H offset leaks into ΔT and α at balanced clicks.
     const t_Ma_now = (J2000_CALENDAR_YEAR - yearForFormula) / 1e6;
     // ΔT (TT − UT1), the single model-calibrated value shown to the user.
-    //   = deltaTStart (65.92 s J2000 trend anchor — joint optimum vs Espenak,
-    //     were aligned around 1900 CE) + meanDeltaTSecondsAtAge(t_Ma_now)
-    // meanDeltaTSecondsAtAge = Simpson integral of H/5-corrected LOD + Bond/Hallstatt/
-    // Jose5/Jose4 cyclic stack fit against Stephenson-2016 residual. Framework-native
-    // 0 at J2000; the deltaTStart anchor lifts it onto the Espenak/IERS observational
-    // scale so the displayed value reads ~57.5 s at J2000 and follows Espenak history trend.
+    //   = deltaTStart (56.05 s J2000 trend anchor — joint-world optimum vs Espenak)
+    //     + meanDeltaTSecondsAtAge(t_Ma_now)
+    // meanDeltaTSecondsAtAge = Simpson integral of H/5-corrected LOD + 4-flag stack
+    // + Core-mantle swing, fitted jointly against the Stephenson-2016 residual under
+    // the hard USNO closure. Framework-native 0 at J2000; the deltaTStart anchor lifts
+    // it onto the Espenak/IERS observational scale so the displayed value reads
+    // ~56.0 s at J2000 and follows the Espenak history trend.
     // The pure-physics-only variant `deltaTStart + pureH5DeltaTAtAge(t_Ma_now)` is still
     // available on the Formula Verification chart at Reports → Days & Years → ΔT.
     predictions.deltaTCorrectionSeconds = o.deltaTCorrectionSeconds = deltaTStart + meanDeltaTSecondsAtAge(t_Ma_now);
@@ -59663,7 +59666,7 @@ function computeSiderealYearDaysDirect(currentYear) {
   // just shifts the reported value by the base difference. Downstream LOD
   // derivation (sec / sid_days) then lands at ~86399.999676 at J2000
   // (matching the CSV-measured mean over full H). The physical LOD_real
-  // (matching USNO 86400.0026 joint-optimum anchor) adds the H/5 ecliptic-precession
+  // (matching the USNO 86400.0014 joint-world anchor) adds the H/5 ecliptic-precession
   // correction separately in the display layer — see doc 11 § "The H/5 LOD Correction".
   //
   // Uses `meansiderealyearlengthinDays_kinematic` (immutable, computed from
