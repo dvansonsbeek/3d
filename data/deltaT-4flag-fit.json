@@ -88,21 +88,21 @@
   },
   "collinearity_warnings": [],
   "optimum": {
-    "usno_target_lod_s": 86400.0026,
-    "deltaTStart": 65.92372934570098,
-    "espenak_rms_s": 22.52792297620699,
-    "selected_by": "auto (--sweep default; disable with --fixed-anchors)"
+    "usno_target_lod_s": 86400.0015,
+    "deltaTStart": 58.479922749628315,
+    "espenak_rms_s": 12.542997544192646,
+    "selected_by": "joint mode (--joint --write; flags + resonator, hard closure, caps)"
   },
   "usno_anchor": {
     "enabled": true,
-    "usno_target_lod_s": 86400.0026,
-    "derived_target_offset_s": -0.0009365699322816984,
+    "usno_target_lod_s": 86400.0015,
+    "derived_target_offset_s": -0.002036569940873149,
     "derivation": {
       "lod_kinematic_at_j2000_s": 86400.00000923077,
       "fitted_sidereal_days_at_2000": 365.25636296497686,
       "h5_correction_s": 0.003527339164765279
     },
-    "shipped_sum_lod_at_j2000_s": -0.000936569932281699,
+    "shipped_sum_lod_at_j2000_s": -0.0020365699398618604,
     "drift_from_target_s": -6.505213034913027e-19,
     "fit_stage": "D",
     "soft_constraint_weight": 1000000,
@@ -114,48 +114,53 @@
       "sin_shift_s": -44.452577327436536,
       "amp_shift_s": -64.24541144521612,
       "phase_shift_deg": 3.8159396099260334
-    }
+    },
+    "joint_mode_note": "JOINT world (2026-07-23): closure sum includes the Core-mantle swing (Resonator) episode; stage_a..e fit_metrics below predate the joint fit and are kept as historical cascade diagnostics."
   },
   "shipped_coefficients": {
     "bond": {
       "lattice_n": 1830,
       "period_yr": 1465.8666666666666,
-      "cos_coeff_s": 135.99799341108618,
-      "sin_coeff_s": 246.2916701068097,
-      "raw_at_j2000_s": 95.83924575997014,
-      "amplitude_s": 281.34505678231386,
-      "phase_deg": 61.09328085575851,
-      "source": "Stage D anchored fit (USNO LOD constraint active)"
+      "cos_coeff_s": 166.47057950204547,
+      "sin_coeff_s": 318.7280035757656,
+      "raw_at_j2000_s": 130.29779914656734,
+      "amplitude_s": 359.583083727725,
+      "phase_deg": 62.422083965201814,
+      "source": "Stage D anchored fit (USNO LOD constraint active)",
+      "joint_mode": true
     },
     "hallstatt": {
       "lattice_n": 1104,
       "period_yr": 2429.8333333333335,
-      "cos_coeff_s": 3.4311229577689573,
-      "sin_coeff_s": 79.92638735266766,
-      "raw_at_j2000_s": -70.12152248586756,
+      "cos_coeff_s": -36.6985946101689,
+      "sin_coeff_s": 71.08595609287732,
+      "raw_at_j2000_s": -79.98808883628658,
       "amplitude_s": 80,
-      "phase_deg": 87.5418851964481,
-      "target_amp_source": "CAPPED from anchored quad-fit free amp 100.73 s → 80 s prior"
+      "phase_deg": 117.30534390053242,
+      "target_amp_source": "CAPPED from anchored quad-fit free amp 100.73 s → 80 s prior",
+      "joint_mode": true
     },
     "jose5": {
       "lattice_n": 2989,
       "period_yr": 897.469387755102,
-      "cos_coeff_s": -46.90713628513566,
-      "sin_coeff_s": 17.3124396180235,
-      "raw_at_j2000_s": 10.833755771767375,
+      "cos_coeff_s": -40.11722776347204,
+      "sin_coeff_s": 29.843056756533972,
+      "raw_at_j2000_s": 24.165034496840125,
       "amplitude_s": 50,
-      "phase_deg": 159.74195465682845,
-      "target_amp_source": "CAPPED from anchored quad-fit free amp 86.44 s → 50 s prior"
+      "phase_deg": 143.35457776906085,
+      "target_amp_source": "CAPPED from anchored quad-fit free amp 86.44 s → 50 s prior",
+      "joint_mode": true
     },
     "jose4": {
       "lattice_n": 3749,
       "period_yr": 715.5337423312883,
-      "cos_coeff_s": 45.29158371637972,
-      "sin_coeff_s": -12.79094364535659,
-      "raw_at_j2000_s": 24.94816987464833,
-      "amplitude_s": 47.063104390557584,
-      "phase_deg": -15.770383134928233,
-      "target_amp_source": "unconstrained: quad-fit free amp 47.06 s (below 50 s prior — no cap applied)"
+      "cos_coeff_s": 21.58624686862962,
+      "sin_coeff_s": -32.33131542846586,
+      "raw_at_j2000_s": 37.078472499936424,
+      "amplitude_s": 38.87518503117865,
+      "phase_deg": -56.27064573661426,
+      "target_amp_source": "unconstrained: quad-fit free amp 47.06 s (below 50 s prior — no cap applied)",
+      "joint_mode": true
     }
   }
 }

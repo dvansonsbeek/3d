@@ -45,10 +45,10 @@
     "V1_eigen_only": {
       "rms_s": 120.83997730127254,
       "kicks": [
-        -1500.0
+        -1500
       ],
-      "t_exc": -1500.0,
-      "T0_yr": 2600.0,
+      "t_exc": -1500,
+      "T0_yr": 2600,
       "Q": 1.05,
       "coefs": [
         -837.0268850664487,
@@ -66,10 +66,10 @@
     "V2_eigen_plus_top_tone": {
       "rms_s": 68.1220188712411,
       "kicks": [
-        -2000.0
+        -2000
       ],
-      "t_exc": -2000.0,
-      "T0_yr": 3000.0,
+      "t_exc": -2000,
+      "T0_yr": 3000,
       "Q": 7.8,
       "coefs": [
         194.42972611181702,
@@ -88,10 +88,10 @@
     "V3_eigen_plus_all_tones": {
       "rms_s": 29.228825203680508,
       "kicks": [
-        -900.0
+        -900
       ],
-      "t_exc": -900.0,
-      "T0_yr": 2600.0,
+      "t_exc": -900,
+      "T0_yr": 2600,
       "Q": 7.3,
       "coefs": [
         1037.6267501328543,
@@ -117,10 +117,10 @@
     "V4_twokick_pinnedT0": {
       "rms_s": 137.89820383571072,
       "kicks": [
-        -700.0,
-        1600.0
+        -700,
+        1600
       ],
-      "t_exc": -700.0,
+      "t_exc": -700,
       "T0_yr": 3997.818181818182,
       "Q": 0.55,
       "coefs": [
@@ -141,10 +141,10 @@
     "V5_twokick_tone_pinnedT0": {
       "rms_s": 53.40268740604114,
       "kicks": [
-        -800.0,
-        1600.0
+        -800,
+        1600
       ],
-      "t_exc": -800.0,
+      "t_exc": -800,
       "T0_yr": 3916.1109489051096,
       "Q": 1.8,
       "coefs": [
@@ -166,22 +166,22 @@
   },
   "selected_variant": "V5_twokick_tone_pinnedT0",
   "deep_time_checks": {
-    "-100000": 0.0,
-    "-5000": 0.0,
-    "-801": 0.0,
     "900": -245.8439379884609,
     "2000": -82.32559425279462,
     "5000": 5.334235000224568,
-    "100000": -1.545960510634632e-17
+    "100000": -1.545960510634632e-17,
+    "-100000": 0,
+    "-5000": 0,
+    "-801": 0
   },
   "proposed_shipped_coefficients": {
     "resonator": {
       "display_name": "Core-mantle swing",
       "driver": "Resonator",
-      "functional_class": "episode (2-kick windowed damped oscillation \u2014 zero before first kick)",
+      "functional_class": "episode (2-kick windowed damped oscillation — zero before first kick)",
       "kick_epochs_year": [
-        -800.0,
-        1600.0
+        -800,
+        1600
       ],
       "kick_coefficients_s": [
         {
@@ -189,8 +189,8 @@
           "sin": 123.33378225236893
         },
         {
-          "cos": 98.63268885254392,
-          "sin": -149.74939357006627
+          "cos": 1.9240430673737383,
+          "sin": -2.921184506818565
         }
       ],
       "T0_lattice_n": 685,
@@ -202,31 +202,31 @@
           "dn": 726,
           "period_yr": 3694.9531680440773,
           "phi_locked_rad": -0.4616152283022974,
-          "amp_s": -186.1396099707357,
-          "phase_convention": "cos(2\u03c0\u00b7dn/8H\u00b7y \u2212 \u03c6_locked), kick-1-envelope-shared"
+          "amp_s": -122.1328514244366,
+          "phase_convention": "cos(2π·dn/8H·y − φ_locked), kick-1-envelope-shared"
         }
       ],
-      "rms_s": 53.40268740604114,
-      "raw_at_j2000_s": -82.32559425279462,
-      "lod_raw_at_j2000_s_per_day": 9.880327745013574e-05,
+      "rms_s": 32.37468741532057,
+      "raw_at_j2000_s": -91.11587807549724,
+      "lod_raw_at_j2000_s_per_day": 0.0007864328401519675,
       "deep_time_checks_s": {
-        "-100000": 0.0,
-        "-5000": 0.0,
-        "-801": 0.0,
         "900": -245.8439379884609,
         "2000": -82.32559425279462,
         "5000": 5.334235000224568,
-        "100000": -1.545960510634632e-17
+        "100000": -1.545960510634632e-17,
+        "-100000": 0,
+        "-5000": 0,
+        "-801": 0
       },
-      "regeneration_rule": "drive-tone menu = \u0394n difference tones of the ACTIVE flag set (any count); refit this script after any stack change (3rd/5th cycle)",
-      "status": "STAGE 1 SELECTED (user-confirmed V5, physical-consistency rule) \u2014 episode = excitation + termination counter-kick of the physical eigenmode. Caveats: counter-kick epoch at scan-grid edge (+1600); RMS slightly below the ~70-s structure floor; kick-epoch stability across refits to be verified in Stage 3. Not integrated yet; default-off toggle planned"
+      "regeneration_rule": "drive-tone menu = Δn difference tones of the ACTIVE flag set (any count); refit this script after any stack change (3rd/5th cycle)",
+      "status": "JOINT WORLD SHIPPED (--joint --write): amplitudes from the joint equality-constrained fit (kick2 ~0 — the termination is carried by flag interference in the joint world); phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON."
     },
     "resonator_free_reference": {
       "display_name": "Core-mantle swing",
       "driver": "Resonator",
-      "functional_class": "episode (1-kick windowed damped oscillation \u2014 zero before first kick)",
+      "functional_class": "episode (1-kick windowed damped oscillation — zero before first kick)",
       "kick_epochs_year": [
-        -900.0
+        -900
       ],
       "kick_coefficients_s": [
         {
@@ -235,7 +235,7 @@
         }
       ],
       "T0_lattice_n": null,
-      "T0_yr": 2600.0,
+      "T0_yr": 2600,
       "Q": 7.3,
       "drive_tones": [
         {
@@ -244,7 +244,7 @@
           "period_yr": 3694.9531680440773,
           "phi_locked_rad": -0.4616152283022974,
           "amp_s": 529.7263768903591,
-          "phase_convention": "cos(2\u03c0\u00b7dn/8H\u00b7y \u2212 \u03c6_locked), kick-1-envelope-shared"
+          "phase_convention": "cos(2π·dn/8H·y − φ_locked), kick-1-envelope-shared"
         },
         {
           "pair": "jose5-bond",
@@ -252,7 +252,7 @@
           "period_yr": 2314.5263157894738,
           "phi_locked_rad": 1.7217441605545398,
           "amp_s": 692.4781957412899,
-          "phase_convention": "cos(2\u03c0\u00b7dn/8H\u00b7y \u2212 \u03c6_locked), kick-1-envelope-shared"
+          "phase_convention": "cos(2π·dn/8H·y − φ_locked), kick-1-envelope-shared"
         },
         {
           "pair": "jose4-bond",
@@ -260,7 +260,7 @@
           "period_yr": 1397.882230328296,
           "phi_locked_rad": -1.3415240117840876,
           "amp_s": 108.75088147528625,
-          "phase_convention": "cos(2\u03c0\u00b7dn/8H\u00b7y \u2212 \u03c6_locked), kick-1-envelope-shared"
+          "phase_convention": "cos(2π·dn/8H·y − φ_locked), kick-1-envelope-shared"
         },
         {
           "pair": "jose5-hallstatt",
@@ -268,7 +268,7 @@
           "period_yr": 1423.0960212201592,
           "phi_locked_rad": 1.2601289322522424,
           "amp_s": 226.1671548197893,
-          "phase_convention": "cos(2\u03c0\u00b7dn/8H\u00b7y \u2212 \u03c6_locked), kick-1-envelope-shared"
+          "phase_convention": "cos(2π·dn/8H·y − φ_locked), kick-1-envelope-shared"
         },
         {
           "pair": "jose4-hallstatt",
@@ -276,7 +276,7 @@
           "period_yr": 1014.1913043478261,
           "phi_locked_rad": -1.8031392400863853,
           "amp_s": -17.004095029036364,
-          "phase_convention": "cos(2\u03c0\u00b7dn/8H\u00b7y \u2212 \u03c6_locked), kick-1-envelope-shared"
+          "phase_convention": "cos(2π·dn/8H·y − φ_locked), kick-1-envelope-shared"
         },
         {
           "pair": "jose4-jose5",
@@ -284,23 +284,23 @@
           "period_yr": 3529.6526315789474,
           "phi_locked_rad": -3.0632681723386277,
           "amp_s": -133.55540329618555,
-          "phase_convention": "cos(2\u03c0\u00b7dn/8H\u00b7y \u2212 \u03c6_locked), kick-1-envelope-shared"
+          "phase_convention": "cos(2π·dn/8H·y − φ_locked), kick-1-envelope-shared"
         }
       ],
       "rms_s": 29.228825203680508,
       "raw_at_j2000_s": -113.30945570913079,
-      "lod_raw_at_j2000_s_per_day": 1.680286997406751e-05,
+      "lod_raw_at_j2000_s_per_day": 0.00001680286997406751,
       "deep_time_checks_s": {
-        "-100000": 0.0,
-        "-5000": 0.0,
-        "-901": 0.0,
         "900": -307.55312435661597,
         "2000": -113.30945570913079,
         "5000": -0.355220358043816,
-        "100000": 3.8125516548017845e-05
+        "100000": 0.000038125516548017845,
+        "-100000": 0,
+        "-5000": 0,
+        "-901": 0
       },
-      "regeneration_rule": "drive-tone menu = \u0394n difference tones of the ACTIVE flag set (any count); refit this script after any stack change (3rd/5th cycle)",
-      "status": "FREE-T\u2080 STATISTICAL REFERENCE ONLY (not for shipping): best unpinned fit; T\u2080 is a shape parameter here, not the physical eigenperiod"
+      "regeneration_rule": "drive-tone menu = Δn difference tones of the ACTIVE flag set (any count); refit this script after any stack change (3rd/5th cycle)",
+      "status": "FREE-T₀ STATISTICAL REFERENCE ONLY (not for shipping): best unpinned fit; T₀ is a shape parameter here, not the physical eigenperiod"
     }
   }
 }

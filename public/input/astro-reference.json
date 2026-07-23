@@ -6,8 +6,8 @@
     "MASS_RATIO_EARTH_MOON": 81.30056816,
     "speedOfLight": 299792.458,
     "earthMoiFactorJ2000": 0.3306947,
-    "solarLuminosityW": 3.828e26,
-    "solarWindMassLossKgPerS": 1.6e9,
+    "solarLuminosityW": 3.828e+26,
+    "solarWindMassLossKgPerS": 1600000000,
     "massRatioDE440": {
       "mercury": 6023657.94,
       "venus": 408523.72,
@@ -30,7 +30,7 @@
     "earthInclinationCycleAnchor": 21.77,
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
-    "deltaTStart": 65.92372934570098,
+    "deltaTStart": 58.479922749628315,
     "sunTilt": 7.155
   },
   "cardinalPointAnchors": {

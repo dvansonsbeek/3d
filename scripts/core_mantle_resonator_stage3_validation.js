@@ -18,12 +18,16 @@
 const fs = require('fs');
 const path = require('path');
 const REPO = path.join(__dirname, '..');
-const DELTA_T_START = 65.92372934570098;
+// Single source of truth (joint-world value 58.48 since the flip)
+const DELTA_T_START = JSON.parse(fs.readFileSync(
+  path.join(__dirname, '..', 'public', 'input', 'astro-reference.json'),
+  'utf8')).earthOrbital.deltaTStart;
 
 function freshDT(resonatorOn) {
   for (const k of Object.keys(require.cache)) delete require.cache[k];
-  if (resonatorOn) process.env.DT_RESONATOR_ENABLED = '1';
-  else delete process.env.DT_RESONATOR_ENABLED;
+  // JOINT world: resonator is default-ON, opt-out via DT_RESONATOR_DISABLED=1.
+  if (resonatorOn) delete process.env.DT_RESONATOR_DISABLED;
+  else process.env.DT_RESONATOR_DISABLED = '1';
   return require(path.join(REPO, 'tools', 'lib', 'deep-time.js'));
 }
 
@@ -93,8 +97,8 @@ console.log('══ Stage 3.3 validation sweep (production chain, shipped consta
 console.log(`1. ΔT(J2000):          OFF ${off.dt_j2000}  ON ${on.dt_j2000}   (both must be 0)`);
 console.log(`   LOD pure (J2000):   OFF ${off.lod_pure_j2000.toFixed(9)}  ON ${on.lod_pure_j2000.toFixed(9)}  (must match)`);
 console.log(`   LOD Layer-3 (J2000): OFF ${off.lod_layer3_j2000.toFixed(9)}  ON ${on.lod_layer3_j2000.toFixed(9)}`);
-console.log(`   → Layer-3 shift: ${((on.lod_layer3_j2000 - off.lod_layer3_j2000) * 1000).toFixed(4)} ms  (expected +0.0988 — closure item, integrated Stage 3.2)`);
-console.log(`2. Stephenson RMS (−720..2016): OFF ${off.steph_rms_demeaned.toFixed(1)} s  →  ON ${on.steph_rms_demeaned.toFixed(1)} s  (target 268.8 → 53.4)`);
+console.log(`   → Layer-3 shift: ${((on.lod_layer3_j2000 - off.lod_layer3_j2000) * 1000).toFixed(4)} ms  (joint world: resonator-alone δLOD(2000) ≈ +0.786 ms/day; the TOTAL closes the USNO anchor exactly — verified separately)`);
+console.log(`2. Stephenson RMS (−720..2016): OFF ${off.steph_rms_demeaned.toFixed(1)} s  →  ON ${on.steph_rms_demeaned.toFixed(1)} s  (joint world target: OFF = raw+flags-off state, ON ≈ 32.4)`);
 console.log('   landmarks (yr: OFF → ON):');
 for (const y of Object.keys(off.landmarks)) {
   console.log(`     ${String(y).padStart(5)}: ${off.landmarks[y].toFixed(0).padStart(5)} → ${on.landmarks[y].toFixed(0).padStart(5)} s`);
@@ -110,7 +114,7 @@ for (const tMa of Object.keys(off.deep)) {
 }
 const pass = off.dt_j2000 === 0 && on.dt_j2000 === 0
   && Math.abs(off.lod_pure_j2000 - on.lod_pure_j2000) < 1e-12
-  && on.steph_rms_demeaned < 60 && deepOk;
+  && on.steph_rms_demeaned < 40 && deepOk;
 console.log(`\nVERDICT: ${pass ? 'ALL CHECKS PASS' : 'CHECK FAILURES — see above'}`);
 
 fs.writeFileSync(path.join(REPO, 'data', 'core-mantle-resonator-stage3-validation.json'),

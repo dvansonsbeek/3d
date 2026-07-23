@@ -182,13 +182,13 @@ const CONFIG = {
 const MEAN_TROPICAL_YEAR_J2000_S = C.meanSolarYearDays * 86400;
 
 // ── Core-mantle swing (Resonator driver) closure hook — Stage 3.2 ──────────
-// When the resonator episode is enabled (DT_RESONATOR_ENABLED=1, matching the
-// runtime opt-in), its δLOD(2000) must join the USNO pre-adjust closure sums
-// below exactly like h253's — otherwise the shipped stack would close onto
-// the anchor WITHOUT the resonator's +0.0988 ms/day and the composite Layer-3
-// LOD at J2000 would miss the USNO target (the h253 lesson). Default runs
-// (env unset) are bit-identical to the pre-resonator behavior.
-const RESONATOR_IN_CLOSURE = process.env.DT_RESONATOR_ENABLED === '1';
+// JOINT world (2026-07-23): the resonator is default-ON (opt-out via
+// DT_RESONATOR_DISABLED=1, mirroring the runtime). Its δLOD(2000) joins the
+// legacy cascade's USNO pre-adjust sums below like h253's. NOTE: since the
+// joint-world flip, --joint is the AUTHORITATIVE fit (it carries the
+// resonator inside its design matrix and closure row directly); the legacy
+// single-shot cascade below remains as a stage-wise diagnostic only.
+const RESONATOR_IN_CLOSURE = process.env.DT_RESONATOR_DISABLED !== '1';
 function resonatorLodAtJ2000() {
   if (!RESONATOR_IN_CLOSURE) return 0;
   const p = path.join(__dirname, '..', '..', 'data', 'core-mantle-resonator-stage1.json');
@@ -1451,10 +1451,88 @@ function runJointMode() {
               + (cap ? `  (cap ${cap.toFixed(2)}${Math.abs(amp - cap) < 1e-6 ? ' — AT CAP' : ''})` : '  (free)'));
   }
   console.log(`    intercept  ${x[INTERCEPT].toFixed(2).padStart(8)} s  (folds into deltaTStart; not shipped)`);
-  console.log('\n  Report-only: the --write path for joint mode ships with the atomic');
-  console.log('  default-ON package (anchors + coefficients must move together).');
-  console.log('  Prototype cross-check: scripts/core_mantle_joint_fit_stage4.py');
-  console.log('  (12.53 s @ 86400.0016, dts 60.54 on a 2-yr unweighted grid).');
+  if (!WRITE) {
+    console.log('\n  Dry run — add --write to ship the joint world (updates');
+    console.log('  data/deltaT-4flag-fit.json, data/core-mantle-resonator-stage1.json,');
+    console.log('  public/input/astro-reference.json). Prototype cross-check:');
+    console.log('  scripts/core_mantle_joint_fit_stage4.py (12.53 s @ 86400.0016, 2-yr grid).');
+    return;
+  }
+
+  // ── --write: ship the joint world (atomic default-ON package, part 1) ──
+  // Anchors + coefficients move TOGETHER: 4-flag JSON, resonator JSON,
+  // astro-reference deltaTStart. Runtime constants then sync via
+  // export-dt-corrections (part 2); defaults flip in the same commit.
+  const flagNames = ['bond', 'hallstatt', 'jose5', 'jose4'];
+  const fitPath = path.join(__dirname, '..', '..', 'data', 'deltaT-4flag-fit.json');
+  const fitJson = JSON.parse(fs.readFileSync(fitPath, 'utf8'));
+  flagNames.forEach((nm, k) => {
+    const cos = x[2 * k], sin = x[2 * k + 1];
+    const d = FLAG_DIVS[nm];
+    const om = 2 * Math.PI * d / EIGHT_H;
+    const c = fitJson.shipped_coefficients[nm];
+    c.cos_coeff_s = cos;
+    c.sin_coeff_s = sin;
+    c.raw_at_j2000_s = cos * Math.cos(om * 2000) + sin * Math.sin(om * 2000);
+    c.amplitude_s = Math.hypot(cos, sin);
+    c.phase_deg = Math.atan2(sin, cos) * 180 / Math.PI;
+    c.joint_mode = true;
+  });
+  fitJson.optimum = {
+    usno_target_lod_s: best.usno,
+    deltaTStart: best.dts,
+    espenak_rms_s: best.rmsEsp,
+    selected_by: 'joint mode (--joint --write; flags + resonator, hard closure, caps)',
+  };
+  fitJson.usno_anchor.usno_target_lod_s = best.usno;
+  fitJson.usno_anchor.derived_target_offset_s = computeUsnoTargetOffset(best.usno).targetOffset;
+  fitJson.usno_anchor.shipped_sum_lod_at_j2000_s = closure;
+  fitJson.usno_anchor.joint_mode_note =
+    'JOINT world (2026-07-23): closure sum includes the Core-mantle swing '
+    + '(Resonator) episode; stage_a..e fit_metrics below predate the joint fit '
+    + 'and are kept as historical cascade diagnostics.';
+  fs.writeFileSync(fitPath, JSON.stringify(fitJson, null, 2) + '\n');
+  console.log(`\n  ✓ wrote ${fitPath}`);
+
+  // Resonator JSON: scaled amplitudes (phases/epochs/T0/Q = convention).
+  const resJsonPath = resPath;
+  const resJson = JSON.parse(fs.readFileSync(resJsonPath, 'utf8'));
+  const rb = resJson.proposed_shipped_coefficients.resonator;
+  const s1 = x[8] / Math.hypot(kc[0].cos, kc[0].sin);
+  const s2 = x[9] / Math.hypot(kc[1].cos, kc[1].sin);
+  rb.kick_coefficients_s = [
+    { cos: kc[0].cos * s1, sin: kc[0].sin * s1 },
+    { cos: kc[1].cos * s2, sin: kc[1].sin * s2 },
+  ];
+  rb.drive_tones[0].amp_s = x[10];
+  // Raw (unanchored) resonator value + implied δLOD at J2000 — the closure
+  // bookkeeping fields consumed by resonatorLodAtJ2000() and the runtime.
+  rb.raw_at_j2000_s =
+    x[8] * kickUnit(0, 2000) + x[9] * kickUnit(1, 2000) + x[10] * toneUnit(2000);
+  // dC/dy from a 1-yr central difference (2000.5 − 1999.5 spans exactly 1 yr),
+  // then δLOD (s/day) = 86400 · dC/dy / T_trop_s.
+  const resDCdy =
+    x[8] * (kickUnit(0, 2000.5) - kickUnit(0, 1999.5))
+    + x[9] * (kickUnit(1, 2000.5) - kickUnit(1, 1999.5))
+    + x[10] * (toneUnit(2000.5) - toneUnit(1999.5));
+  rb.lod_raw_at_j2000_s_per_day = 86400 * resDCdy / MEAN_TROPICAL_YEAR_J2000_S;
+  rb.rms_s = best.rmsFull;
+  rb.status = ('JOINT WORLD SHIPPED (--joint --write): amplitudes from the joint '
+    + 'equality-constrained fit (kick2 ~0 — the termination is carried by flag '
+    + 'interference in the joint world); phases/epochs/T0/Q remain the Stage-1/3 '
+    + 'convention. Default-ON.');
+  fs.writeFileSync(resJsonPath, JSON.stringify(resJson, null, 2) + '\n');
+  console.log(`  ✓ wrote ${resJsonPath}`);
+
+  // astro-reference deltaTStart (single source; export-to-script propagates).
+  const arPath = path.join(__dirname, '..', '..', 'public', 'input', 'astro-reference.json');
+  const ar = JSON.parse(fs.readFileSync(arPath, 'utf8'));
+  ar.earthOrbital.deltaTStart = best.dts;
+  fs.writeFileSync(arPath, JSON.stringify(ar, null, 2) + '\n');
+  console.log(`  ✓ wrote ${arPath} (deltaTStart = ${best.dts.toFixed(4)})`);
+  console.log('\n  Next (atomic package part 2): sync runtime constants via');
+  console.log('  export-dt-corrections (script + nodeDeepTime + astro targets),');
+  console.log('  flip both runtime defaults ON, re-run validation.');
 }
 
 // normal single-shot fit. The sweep does NOT write or sync — it prints a table

@@ -258,26 +258,26 @@ const EIGHT_H = 8 * HOLISTIC_YEAR_J2000;
 const BOND_LATTICE_N = 1830;
 const BOND_PERIOD_YR = EIGHT_H / BOND_LATTICE_N;
 const BOND_OMEGA = 2 * Math.PI / BOND_PERIOD_YR;
-const BOND_COS_COEFF_S = 135.99799341108618;
-const BOND_SIN_COEFF_S = 246.2916701068097;
+const BOND_COS_COEFF_S = 166.47057950204547;
+const BOND_SIN_COEFF_S = 318.7280035757656;
 
 const HALLSTATT_LATTICE_N = 1104;
 const HALLSTATT_PERIOD_YR = EIGHT_H / HALLSTATT_LATTICE_N;
 const HALLSTATT_OMEGA = 2 * Math.PI / HALLSTATT_PERIOD_YR;
-const HALLSTATT_COS_COEFF_S = 3.4311229577689573;
-const HALLSTATT_SIN_COEFF_S = 79.92638735266766;
+const HALLSTATT_COS_COEFF_S = -36.6985946101689;
+const HALLSTATT_SIN_COEFF_S = 71.08595609287732;
 
 const JOSE5_LATTICE_N = 2989;
 const JOSE5_PERIOD_YR = EIGHT_H / JOSE5_LATTICE_N;
 const JOSE5_OMEGA = 2 * Math.PI / JOSE5_PERIOD_YR;
-const JOSE5_COS_COEFF_S = -46.90713628513566;
-const JOSE5_SIN_COEFF_S = 17.3124396180235;
+const JOSE5_COS_COEFF_S = -40.11722776347204;
+const JOSE5_SIN_COEFF_S = 29.843056756533972;
 
 const JOSE4_LATTICE_N = 3749;
 const JOSE4_PERIOD_YR = EIGHT_H / JOSE4_LATTICE_N;
 const JOSE4_OMEGA = 2 * Math.PI / JOSE4_PERIOD_YR;
-const JOSE4_COS_COEFF_S = 45.29158371637972;
-const JOSE4_SIN_COEFF_S = -12.79094364535659;
+const JOSE4_COS_COEFF_S = 21.58624686862962;
+const JOSE4_SIN_COEFF_S = -32.33131542846586;
 
 // Cyclic-correction taper widened 2026-07-12 from ±4.5/6 kyr Holocene window to
 // ±300/400 kyr — cross-archive validation across Steinhilber ¹⁰Be (9.4 kyr),
@@ -398,7 +398,7 @@ function jose4CycleLodCorrection(year) {
   return _cycleLodCorrection(year, JOSE4_COS_COEFF_S, JOSE4_SIN_COEFF_S, JOSE4_OMEGA, JOSE4_DT_RAW_AT_J2000);
 }
 
-// ─── Core-mantle swing (Resonator driver) — DEFAULT OFF ─────────────────────
+// ─── Core-mantle swing (Resonator driver) — DEFAULT ON (joint world) ────────
 // Fifth ΔT component in a NEW functional class: a 2-kick EPISODE — windowed
 // damped oscillation of the core's eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q = 1.80, in the
 // published axiMC range) plus one drive tone at the bond−hallstatt difference
@@ -413,11 +413,15 @@ function jose4CycleLodCorrection(year) {
 // consistency selection rule); constants synced from
 // data/core-mantle-resonator-stage1.json. Narrative: docs/104 §6/§8.
 //
-// Opt-IN via DT_RESONATOR_ENABLED=1 (the 4-flag stack is opt-OUT) — research
-// toggle, not yet part of the shipped default chain. When enabled, its
-// δLOD(2000) = +0.099 ms/day MUST join the USNO anchor-closure pre-adjust sum
-// in tools/fit/dt-corrections-fit.js (h253 lesson).
-const DT_RESONATOR_ENABLED = process.env.DT_RESONATOR_ENABLED === '1';
+// DEFAULT ON since the JOINT-world flip (2026-07-23): the resonator ships as
+// the 4th driver, fitted JOINTLY with the flags (--joint mode in
+// dt-corrections-fit.js; anchors USNO 86400.0015 / deltaTStart 58.48 moved
+// with the coefficients — its δLOD(2000) is inside the USNO closure by
+// construction). Opt-OUT via DT_RESONATOR_DISABLED=1 (mirrors the stack's
+// DT_CORRECTIONS_DISABLED). The ΔT integrator additionally gates this
+// component on DT_CORRECTIONS_ENABLED, so DT_CORRECTIONS_DISABLED=1 alone
+// still yields the fully-raw pure-tidal residual for fitting.
+const DT_RESONATOR_ENABLED = process.env.DT_RESONATOR_DISABLED !== '1';
 
 // Scalar constants (syncable by tools/fit/export-dt-corrections.js from
 // data/core-mantle-resonator-stage1.json — same regex machinery as the flags).
@@ -433,11 +437,11 @@ const RES_KICK1_T_YR  = -800;
 const RES_KICK1_COS_S = 763.426519638273;
 const RES_KICK1_SIN_S = 123.33378225236893;
 const RES_KICK2_T_YR  = 1600;
-const RES_KICK2_COS_S = 98.63268885254392;
-const RES_KICK2_SIN_S = -149.74939357006627;
+const RES_KICK2_COS_S = 1.9240430673737383;
+const RES_KICK2_SIN_S = -2.921184506818565;
 const RES_TONE1_DN    = 726;
 const RES_TONE1_PHI_RAD = -0.4616152283022974;
-const RES_TONE1_AMP_S = -186.1396099707357;
+const RES_TONE1_AMP_S = -122.1328514244366;
 
 const RES_T0_YR  = EIGHT_H / RES_T0_LATTICE_N;   // 3,916.11 yr
 const RES_W0     = 2 * Math.PI / RES_T0_YR;
@@ -659,8 +663,10 @@ function meanDeltaTSecondsAtAge(t_Ma) {
     result += jose5CycleDeltaTCorrection(yearY);
     result += jose4CycleDeltaTCorrection(yearY);
   }
-  // Core-mantle swing episode (Resonator driver) — opt-in, default OFF.
-  if (DT_RESONATOR_ENABLED) {
+  // Core-mantle swing episode (Resonator driver) — default ON (joint world).
+  // Master-gated on DT_CORRECTIONS_ENABLED: fitting mode (DT_CORRECTIONS_
+  // DISABLED=1) must see the fully-raw pure-tidal ΔT.
+  if (DT_CORRECTIONS_ENABLED && DT_RESONATOR_ENABLED) {
     result += resonatorSwingDeltaTCorrection(2000 - t_Ma * 1e6);
   }
 
