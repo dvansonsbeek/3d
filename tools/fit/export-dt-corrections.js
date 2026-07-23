@@ -67,6 +67,16 @@ function loadFitJson() {
   return null;
 }
 
+// Core-mantle swing (Resonator driver) Stage-1 artifact — proposed shipped
+// block for the 2-kick episode. Absent file → resonator sync skipped.
+const RESONATOR_JSON_PATH = path.join(__dirname, '..', '..', 'data',
+                                      'core-mantle-resonator-stage1.json');
+function loadResonatorJson() {
+  if (!fs.existsSync(RESONATOR_JSON_PATH)) return null;
+  const j = JSON.parse(fs.readFileSync(RESONATOR_JSON_PATH, 'utf8'));
+  return (j.proposed_shipped_coefficients || {}).resonator || null;
+}
+
 // ─── In-memory transformation: takes source string, returns {source, changes} ───
 function applyToSource(src, fit) {
   const c = fit.shipped_coefficients;
@@ -94,6 +104,29 @@ function applyToSource(src, fit) {
   // and Step 9 of the pipeline (export-to-script.js) propagates it from JSON to
   // src/script.js in the normal sync sweep. Keeping a single source of truth in
   // astro-reference.json avoids two places writing the same const value.
+
+  // ── Core-mantle swing (Resonator driver) — 2-kick episode constants ──
+  // Source of truth: data/core-mantle-resonator-stage1.json (fitted by
+  // scripts/core_mantle_resonator_stage1.py, variant V5, physical-consistency
+  // rule). Skipped silently if the JSON or the RES_* constants are absent
+  // from the target (e.g. website deepTime.ts until its display integration).
+  const res = loadResonatorJson();
+  if (res) {
+    const k = res.kick_epochs_year, kc = res.kick_coefficients_s, t1 = res.drive_tones[0];
+    replacements.push(
+      ['RES_T0_LATTICE_N', res.T0_lattice_n],   // T₀ = 8H/n (lattice-labeled eigenperiod)
+      ['RES_Q',            res.Q],
+      ['RES_KICK1_T_YR',   k[0]],
+      ['RES_KICK1_COS_S',  kc[0].cos],
+      ['RES_KICK1_SIN_S',  kc[0].sin],
+      ['RES_KICK2_T_YR',   k[1]],
+      ['RES_KICK2_COS_S',  kc[1].cos],
+      ['RES_KICK2_SIN_S',  kc[1].sin],
+      ['RES_TONE1_DN',     t1.dn],
+      ['RES_TONE1_PHI_RAD', t1.phi_locked_rad],
+      ['RES_TONE1_AMP_S',  t1.amp_s],
+    );
+  }
   let changes = 0;
   for (const [name, val] of replacements) {
     const re = new RegExp(
@@ -227,12 +260,14 @@ function main() {
 
 module.exports = {
   loadFitJson,
+  loadResonatorJson,
   applyToSource,
   syncTargetToDisk,
   syncAstroReference,
   syncAllTargets,
   TARGETS,
   ASTRO_REFERENCE_PATH,
+  RESONATOR_JSON_PATH,
 };
 
 if (require.main === module) main();

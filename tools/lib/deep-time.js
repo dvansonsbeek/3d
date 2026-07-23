@@ -398,6 +398,120 @@ function jose4CycleLodCorrection(year) {
   return _cycleLodCorrection(year, JOSE4_COS_COEFF_S, JOSE4_SIN_COEFF_S, JOSE4_OMEGA, JOSE4_DT_RAW_AT_J2000);
 }
 
+// ─── Core-mantle swing (Resonator driver) — DEFAULT OFF ─────────────────────
+// Fifth ΔT component in a NEW functional class: a 2-kick EPISODE — windowed
+// damped oscillation of the core's eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q = 1.80, in the
+// published axiMC range) plus one drive tone at the bond−hallstatt difference
+// frequency (8H/726) with phase LOCKED to the quadratic-mixing prediction
+// φ_bond − φ_hallstatt. Exactly zero before the excitation kick (−800);
+// actively terminated by the counter-kick (+1600, the push-pull recovered by
+// the excitation inversion); decayed thereafter. Anchored to 0 at J2000 via
+// raw_at_j2000 subtraction and wrapped in the same ±300/400-kyr taper as the
+// flags (fades the small pre-episode constant at deep time).
+//
+// Fitted by scripts/core_mantle_resonator_stage1.py (variant V5, physical-
+// consistency selection rule); constants synced from
+// data/core-mantle-resonator-stage1.json. Narrative: docs/104 §6/§8.
+//
+// Opt-IN via DT_RESONATOR_ENABLED=1 (the 4-flag stack is opt-OUT) — research
+// toggle, not yet part of the shipped default chain. When enabled, its
+// δLOD(2000) = +0.099 ms/day MUST join the USNO anchor-closure pre-adjust sum
+// in tools/fit/dt-corrections-fit.js (h253 lesson).
+const DT_RESONATOR_ENABLED = process.env.DT_RESONATOR_ENABLED === '1';
+
+// Scalar constants (syncable by tools/fit/export-dt-corrections.js from
+// data/core-mantle-resonator-stage1.json — same regex machinery as the flags).
+// The eigenperiod is LATTICE-LABELED (T₀ = 8H/685 ≈ 3,916 yr): the shipped
+// resonator is the combined effect of the lattice cycles, so under H(t)
+// evolution the episode scales WITH its drivers (clock coherence). Physical
+// caveat, recorded once: the bare axiMC eigenmode is core-material physics;
+// the lattice label is the framework's clock-coherence convention for the
+// shipped component (numeric difference ~1e-6 over the episode's life).
+const RES_T0_LATTICE_N = 685;
+const RES_Q           = 1.8;
+const RES_KICK1_T_YR  = -800;
+const RES_KICK1_COS_S = 763.426519638273;
+const RES_KICK1_SIN_S = 123.33378225236893;
+const RES_KICK2_T_YR  = 1600;
+const RES_KICK2_COS_S = 98.63268885254392;
+const RES_KICK2_SIN_S = -149.74939357006627;
+const RES_TONE1_DN    = 726;
+const RES_TONE1_PHI_RAD = -0.4616152283022974;
+const RES_TONE1_AMP_S = -186.1396099707357;
+
+const RES_T0_YR  = EIGHT_H / RES_T0_LATTICE_N;   // 3,916.11 yr
+const RES_W0     = 2 * Math.PI / RES_T0_YR;
+const RES_LAMBDA = RES_W0 / (2 * RES_Q);
+const RES_WD     = RES_W0 * Math.sqrt(1 - 1 / (4 * RES_Q * RES_Q));
+const RES_KICKS = [
+  { t: RES_KICK1_T_YR, cos_s: RES_KICK1_COS_S, sin_s: RES_KICK1_SIN_S },
+  { t: RES_KICK2_T_YR, cos_s: RES_KICK2_COS_S, sin_s: RES_KICK2_SIN_S },
+];
+// Drive tones: Δn difference tones of the active flag set, kick-1-envelope-
+// shared. Regenerate via core_mantle_resonator_stage1.py after ANY stack
+// change (3rd/5th cycle) — the tone menu derives from the flags, so the
+// design extends to a different flag count without structural change.
+const RES_TONES = [
+  { dn: RES_TONE1_DN, omega: 2 * Math.PI * RES_TONE1_DN / EIGHT_H,
+    phi_locked: RES_TONE1_PHI_RAD, amp_s: RES_TONE1_AMP_S },
+];
+
+function _resonatorRaw(year) {
+  let v = 0;
+  for (const k of RES_KICKS) {
+    const dt = year - k.t;
+    if (dt < 0) continue;
+    const e = Math.exp(-RES_LAMBDA * dt);
+    v += e * (k.cos_s * Math.cos(RES_WD * dt) + k.sin_s * Math.sin(RES_WD * dt));
+  }
+  const dt1 = year - RES_KICKS[0].t;
+  if (dt1 >= 0) {
+    const e1 = Math.exp(-RES_LAMBDA * dt1);
+    for (const t of RES_TONES) {
+      v += e1 * t.amp_s * Math.cos(t.omega * year - t.phi_locked);
+    }
+  }
+  return v;
+}
+
+function _resonatorRawPrime(year) {
+  let v = 0;
+  for (const k of RES_KICKS) {
+    const dt = year - k.t;
+    if (dt < 0) continue;
+    const e = Math.exp(-RES_LAMBDA * dt);
+    v += e * ((-RES_LAMBDA * k.cos_s + RES_WD * k.sin_s) * Math.cos(RES_WD * dt)
+            + (-RES_LAMBDA * k.sin_s - RES_WD * k.cos_s) * Math.sin(RES_WD * dt));
+  }
+  const dt1 = year - RES_KICKS[0].t;
+  if (dt1 >= 0) {
+    const e1 = Math.exp(-RES_LAMBDA * dt1);
+    for (const t of RES_TONES) {
+      v += e1 * t.amp_s * (-RES_LAMBDA * Math.cos(t.omega * year - t.phi_locked)
+                           - t.omega * Math.sin(t.omega * year - t.phi_locked));
+    }
+  }
+  return v;
+}
+
+const RES_DT_RAW_AT_J2000 = _resonatorRaw(2000);
+
+function resonatorSwingDeltaTCorrection(year) {
+  if (!DT_RESONATOR_ENABLED) return 0;
+  const taper = holoceneTaper(year);
+  if (taper <= 0) return 0;
+  return taper * (_resonatorRaw(year) - RES_DT_RAW_AT_J2000);
+}
+
+function resonatorSwingLodCorrection(year) {
+  if (!DT_RESONATOR_ENABLED) return 0;
+  const taper = holoceneTaper(year);
+  if (taper <= 0) return 0;
+  const dCdy = holoceneTaperDerivative(year) * (_resonatorRaw(year) - RES_DT_RAW_AT_J2000)
+             + taper * _resonatorRawPrime(year);
+  return 86400 * dCdy / MEAN_TROPICAL_YEAR_J2000_S;
+}
+
 /**
  * LOD in seconds at t_Ma, WITH 3-flag correction stack applied (physical
  * consistency: this LOD's integral matches the corrected ΔT curve).
@@ -410,20 +524,18 @@ function meanLodSecondsWithCorrectionsAtAge(t_Ma) {
   if (tidal === null) return null;
   if (!DT_CORRECTIONS_ENABLED) return tidal;
   const year = 2000 - t_Ma * 1e6;
-  return tidal
-       + bondCycleLodCorrection(year)
-       + hallstattCycleLodCorrection(year)
-       + jose5CycleLodCorrection(year)
-       + jose4CycleLodCorrection(year);
+  return tidal + dtCycleLodCorrectionSum(year);
 }
 
-/** Sum of the 4-flag stack's implied δLOD contributions at calendar year (s).
- *  Mirrors src/script.js dtCycleLodCorrectionSum. */
+/** Sum of the cyclic δLOD contributions at calendar year (s): the 4-flag
+ *  stack plus, when DT_RESONATOR_ENABLED=1, the Core-mantle swing episode.
+ *  Mirrors src/script.js dtCycleLodCorrectionSum (Layer-3 composite). */
 function dtCycleLodCorrectionSum(year) {
   return bondCycleLodCorrection(year)
        + hallstattCycleLodCorrection(year)
        + jose5CycleLodCorrection(year)
-       + jose4CycleLodCorrection(year);
+       + jose4CycleLodCorrection(year)
+       + resonatorSwingLodCorrection(year);   // 0 unless DT_RESONATOR_ENABLED=1
 }
 
 /** dLOD/dt driver decomposition at t_Ma, in ms/century per channel.
@@ -433,7 +545,8 @@ function dtCycleLodCorrectionSum(year) {
  *  tools/fit/export-to-holistic.js to sync the website's shipped
  *  measurement constants (model-values.compute.ts dLodDt* V-keys). */
 function dLodDtDecompositionAtAge(t_Ma) {
-  const nullResult = { tidal: null, gia: null, stack: null, net_L2: null, net_L3: null };
+  const nullResult = { tidal: null, gia: null, stack: null, resonator: null,
+                       net_L2: null, net_L3: null, net_L4: null };
   const a = meanMoonDistanceMetresAtAge(t_Ma);
   if (a === null || a <= 0 || a >= A_LOCK_M) return nullResult;
   const lod_s = meanLodSecondsAtAge(t_Ma);
@@ -463,14 +576,27 @@ function dLodDtDecompositionAtAge(t_Ma) {
   const dStack_dyr = (dtCycleLodCorrectionSum(year + DYR) - dtCycleLodCorrectionSum(year - DYR)) / (2 * DYR);
   const dLod_dt_stack_ms_per_cy = dStack_dyr * 100 * 1000;
 
+  // Resonator channel (Core-mantle swing episode): d(δLOD_resonator)/dt.
+  // 0 unless DT_RESONATOR_ENABLED=1 — net_L4 then equals net_L3. Note
+  // dtCycleLodCorrectionSum above already includes the resonator term when
+  // enabled, so the 'stack' display channel subtracts it to stay pure 4-flag
+  // (mirrors src/script.js).
+  const dRes_dyr = (resonatorSwingLodCorrection(year + DYR)
+                  - resonatorSwingLodCorrection(year - DYR)) / (2 * DYR);
+  const dLod_dt_resonator_ms_per_cy = dRes_dyr * 100 * 1000;
+  const dLod_dt_stack_only_ms_per_cy = dLod_dt_stack_ms_per_cy - dLod_dt_resonator_ms_per_cy;
+
   const net_L2 = dLod_dt_tidal_ms_per_cy + dLod_dt_gia_ms_per_cy;
-  const net_L3 = net_L2 + dLod_dt_stack_ms_per_cy;
+  const net_L3 = net_L2 + dLod_dt_stack_only_ms_per_cy;
+  const net_L4 = net_L3 + dLod_dt_resonator_ms_per_cy;
   return {
     tidal:  dLod_dt_tidal_ms_per_cy,
     gia:    dLod_dt_gia_ms_per_cy,
-    stack:  dLod_dt_stack_ms_per_cy,
+    stack:  dLod_dt_stack_only_ms_per_cy,
+    resonator: dLod_dt_resonator_ms_per_cy,
     net_L2: net_L2,
     net_L3: net_L3,
+    net_L4: net_L4,
   };
 }
 
@@ -493,7 +619,8 @@ function meanDeltaTSecondsAtAge(t_Ma) {
   // observed ΔT(J2000)), which is the constant offset expected between two
   // integration conventions. All differential (curvature) behavior matches.
   if (t_Ma === 0) return 0;
-  const cacheKey = (DT_CORRECTIONS_ENABLED ? 'BHJW:' : 'raw:') + t_Ma;
+  const cacheKey = (DT_CORRECTIONS_ENABLED ? 'BHJW' : 'raw')
+                 + (DT_RESONATOR_ENABLED ? '+R:' : ':') + t_Ma;
   const hit = _DELTA_T_CACHE.get(cacheKey);
   if (hit !== undefined) return hit;
 
@@ -531,6 +658,10 @@ function meanDeltaTSecondsAtAge(t_Ma) {
     result += hallstattCycleDeltaTCorrection(yearY);
     result += jose5CycleDeltaTCorrection(yearY);
     result += jose4CycleDeltaTCorrection(yearY);
+  }
+  // Core-mantle swing episode (Resonator driver) — opt-in, default OFF.
+  if (DT_RESONATOR_ENABLED) {
+    result += resonatorSwingDeltaTCorrection(2000 - t_Ma * 1e6);
   }
 
   if (_DELTA_T_CACHE.size >= _MAX_DELTA_T_CACHE) {
@@ -822,6 +953,8 @@ module.exports = {
   // Implied LOD corrections from the 4-flag ΔT stack (physical-consistency helper)
   bondCycleLodCorrection, hallstattCycleLodCorrection, jose5CycleLodCorrection, jose4CycleLodCorrection,
   dtCycleLodCorrectionSum,
+  // Core-mantle swing (Resonator driver) — episode component, default OFF
+  resonatorSwingDeltaTCorrection, resonatorSwingLodCorrection, DT_RESONATOR_ENABLED,
   meanLodSecondsWithCorrectionsAtAge,
   // dLOD/dt driver decomposition (tidal / GIA / all-cycles channels, ms/cy)
   dLodDtDecompositionAtAge,

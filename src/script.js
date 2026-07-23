@@ -54,6 +54,7 @@ let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 8H/1830 ΔT correction (Option
 let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research toggle) — rationale + associated constants ~L5039
 let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
 let   JOSE4_DT_CORRECTION_ENABLED = true;  // Jose4 8H/3749 ≈ 715.5 yr ΔT correction (4×Jose period, structural gcd=23) — cross-archive coherent in Steinhilber Φ + EPICA CO2; rationale + associated constants ~L5209
+let   RESONATOR_DT_CORRECTION_ENABLED = false;  // Core-mantle swing (Resonator driver) — 2-kick episode of the core eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q=1.8) + locked bond−hallstatt drive tone. DEFAULT OFF (research toggle, Stage 2); fitted by scripts/core_mantle_resonator_stage1.py (V5); doc 104 §6/§8; constants + rationale near the Jose4 block
 let   REPORT_TIMING_ENABLED       = false;  // Per-phase timing lines during Days/Years/Precession report — flip to false to silence — see runYearAnalysisExport (~L40133)
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
@@ -5008,7 +5009,8 @@ function meanLodHoursAtAge(t_Ma) {
  *  dJ₂/dt via factor-2.0 J₂→α conversion). The stack is fit against Espenak
  *  history 1650-2017 as a documented design choice. */
 function dLodDtDecompositionAtAge(t_Ma) {
-  const nullResult = { tidal: null, gia: null, stack: null, net_L2: null, net_L3: null };
+  const nullResult = { tidal: null, gia: null, stack: null, resonator: null,
+                       net_L2: null, net_L3: null, net_L4: null };
   const a = meanMoonDistanceMetresAtAge(t_Ma);
   if (a === null || a <= 0 || a >= A_LOCK_M) return nullResult;
   const lod_s = meanLodSecondsAtAge(t_Ma);
@@ -5051,15 +5053,28 @@ function dLodDtDecompositionAtAge(t_Ma) {
   const dStack_dyr = (stack_plus - stack_minus) / (2 * DYR);
   const dLod_dt_stack_ms_per_cy = dStack_dyr * 100 * 1000;   // s/yr → ms/century
 
+  // NOTE: dtCycleLodCorrectionSum already INCLUDES the resonator term when its
+  // toggle is ON, so 'stack' above is the full all-cycles+resonator rate. The
+  // separate 'resonator' channel below isolates the Core-mantle swing share
+  // for the 4-driver display (Tidal / GIA / All cycles / Resonator); the
+  // 'stack' display subtracts it to stay a pure 4-flag channel.
+  const dRes_dyr = (resonatorSwingLodCorrection(year + DYR)
+                  - resonatorSwingLodCorrection(year - DYR)) / (2 * DYR);
+  const dLod_dt_resonator_ms_per_cy = dRes_dyr * 100 * 1000;
+  const dLod_dt_stack_only_ms_per_cy = dLod_dt_stack_ms_per_cy - dLod_dt_resonator_ms_per_cy;
+
   const net_L2 = dLod_dt_tidal_ms_per_cy + dLod_dt_gia_ms_per_cy;
-  const net_L3 = net_L2 + dLod_dt_stack_ms_per_cy;
+  const net_L3 = net_L2 + dLod_dt_stack_only_ms_per_cy;
+  const net_L4 = net_L3 + dLod_dt_resonator_ms_per_cy;
 
   return {
     tidal:  dLod_dt_tidal_ms_per_cy,
     gia:    dLod_dt_gia_ms_per_cy,
-    stack:  dLod_dt_stack_ms_per_cy,
+    stack:  dLod_dt_stack_only_ms_per_cy,
+    resonator: dLod_dt_resonator_ms_per_cy,
     net_L2: net_L2,
     net_L3: net_L3,
+    net_L4: net_L4,
   };
 }
 
@@ -5464,6 +5479,125 @@ function jose4CycleDeltaTCorrection(year) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
+// CORE-MANTLE SWING (Resonator driver) — 5th ΔT component, DEFAULT OFF
+// ═════════════════════════════════════════════════════════════════════════════
+// NEW functional class: a 2-kick EPISODE — windowed damped oscillation of the
+// core's eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q = 1.80, inside the published axiMC
+// eigenmode range, Dumberry, Gerick & Gillet 2025) plus one drive tone at the
+// bond−hallstatt difference frequency (8H/726 = 3,695 yr) with phase LOCKED
+// to the quadratic-mixing prediction φ_bond − φ_hallstatt. Exactly zero
+// before the excitation kick (−800); actively terminated by the counter-kick
+// (+1600 — the push-pull independently recovered by the excitation
+// inversion); decayed thereafter. Anchored to 0 at J2000 (raw_at_j2000
+// subtraction) and wrapped in the same ±300/400-kyr taper as the flags.
+//
+// Fitted by scripts/core_mantle_resonator_stage1.py (variant V5, physical-
+// consistency selection rule — shipped T₀ must be the physically determined
+// eigenperiod). Constants synced from data/core-mantle-resonator-stage1.json.
+// Mirrors tools/lib/deep-time.js. Narrative: docs/104 §6/§8.
+//
+// When enabled its δLOD(2000) = +0.099 ms/day must join the USNO anchor-
+// closure pre-adjust sum in tools/fit/dt-corrections-fit.js (h253 lesson).
+// RESONATOR_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
+// Scalar constants (syncable by tools/fit/export-dt-corrections.js from
+// data/core-mantle-resonator-stage1.json — same regex machinery as the flags).
+// The eigenperiod is LATTICE-LABELED (T₀ = 8H/685 ≈ 3,916 yr): the shipped
+// resonator is the combined effect of the lattice cycles, so under H(t)
+// evolution the episode scales WITH its drivers (clock coherence). Physical
+// caveat, recorded once: the bare axiMC eigenmode is core-material physics;
+// the lattice label is the framework's clock-coherence convention for the
+// shipped component (numeric difference ~1e-6 over the episode's life).
+const RES_T0_LATTICE_N = 685;
+const RES_Q           = 1.8;
+const RES_KICK1_T_YR  = -800;
+const RES_KICK1_COS_S = 763.426519638273;
+const RES_KICK1_SIN_S = 123.33378225236893;
+const RES_KICK2_T_YR  = 1600;
+const RES_KICK2_COS_S = 98.63268885254392;
+const RES_KICK2_SIN_S = -149.74939357006627;
+const RES_TONE1_DN    = 726;
+const RES_TONE1_PHI_RAD = -0.4616152283022974;
+const RES_TONE1_AMP_S = -186.1396099707357;
+
+const RES_T0_YR  = (8 * HOLISTIC_YEAR_J2000) / RES_T0_LATTICE_N;   // 3,916.11 yr
+const RES_W0     = 2 * Math.PI / RES_T0_YR;
+const RES_LAMBDA = RES_W0 / (2 * RES_Q);
+const RES_WD     = RES_W0 * Math.sqrt(1 - 1 / (4 * RES_Q * RES_Q));
+const RES_KICKS = [
+  { t: RES_KICK1_T_YR, cos_s: RES_KICK1_COS_S, sin_s: RES_KICK1_SIN_S },
+  { t: RES_KICK2_T_YR, cos_s: RES_KICK2_COS_S, sin_s: RES_KICK2_SIN_S },
+];
+// Drive tones: Δn difference tones of the ACTIVE flag set, kick-1-envelope-
+// shared. Regenerate via core_mantle_resonator_stage1.py after ANY stack
+// change (3rd/5th cycle) — the tone menu derives from the flags.
+const RES_TONES = [
+  { dn: RES_TONE1_DN, omega: 2 * Math.PI * RES_TONE1_DN / (8 * HOLISTIC_YEAR_J2000),
+    phi_locked: RES_TONE1_PHI_RAD, amp_s: RES_TONE1_AMP_S },
+];
+
+function _resonatorRaw(year) {
+  let v = 0;
+  for (const k of RES_KICKS) {
+    const dt = year - k.t;
+    if (dt < 0) continue;
+    const e = Math.exp(-RES_LAMBDA * dt);
+    v += e * (k.cos_s * Math.cos(RES_WD * dt) + k.sin_s * Math.sin(RES_WD * dt));
+  }
+  const dt1 = year - RES_KICKS[0].t;
+  if (dt1 >= 0) {
+    const e1 = Math.exp(-RES_LAMBDA * dt1);
+    for (const t of RES_TONES) {
+      v += e1 * t.amp_s * Math.cos(t.omega * year - t.phi_locked);
+    }
+  }
+  return v;
+}
+
+function _resonatorRawPrime(year) {
+  let v = 0;
+  for (const k of RES_KICKS) {
+    const dt = year - k.t;
+    if (dt < 0) continue;
+    const e = Math.exp(-RES_LAMBDA * dt);
+    v += e * ((-RES_LAMBDA * k.cos_s + RES_WD * k.sin_s) * Math.cos(RES_WD * dt)
+            + (-RES_LAMBDA * k.sin_s - RES_WD * k.cos_s) * Math.sin(RES_WD * dt));
+  }
+  const dt1 = year - RES_KICKS[0].t;
+  if (dt1 >= 0) {
+    const e1 = Math.exp(-RES_LAMBDA * dt1);
+    for (const t of RES_TONES) {
+      v += e1 * t.amp_s * (-RES_LAMBDA * Math.cos(t.omega * year - t.phi_locked)
+                           - t.omega * Math.sin(t.omega * year - t.phi_locked));
+    }
+  }
+  return v;
+}
+
+const RES_DT_RAW_AT_J2000 = _resonatorRaw(2000);
+
+/** Anchored Core-mantle swing ΔT correction at calendar year (CE), seconds.
+ *  Same anchoring conventions as the four flags: 0 when flag OFF, exactly 0
+ *  at year 2000, tapered at deep time. Display name: "Core-mantle swing";
+ *  driver taxonomy: Resonator. */
+function resonatorSwingDeltaTCorrection(year) {
+  if (!RESONATOR_DT_CORRECTION_ENABLED) return 0;
+  const taper = bondHoloceneTaper(year);   // shared taper widths
+  if (taper <= 0) return 0;
+  return taper * (_resonatorRaw(year) - RES_DT_RAW_AT_J2000);
+}
+
+/** Instantaneous δLOD implied by the Core-mantle swing episode (seconds to
+ *  add to LOD_mean). Product rule over taper × (raw − raw@J2000). */
+function resonatorSwingLodCorrection(year) {
+  if (!RESONATOR_DT_CORRECTION_ENABLED) return 0;
+  const taper = bondHoloceneTaper(year);
+  if (taper <= 0) return 0;
+  const dCdy = _dtCycleTaperDerivative(year) * (_resonatorRaw(year) - RES_DT_RAW_AT_J2000)
+             + taper * _resonatorRawPrime(year);
+  return 86400 * dCdy / MEAN_TROPICAL_YEAR_J2000_S;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
 // EDDY attempt (8H/2684 = 999.45 yr) — TESTED AND ROLLED BACK 2026-07-12
 // ═════════════════════════════════════════════════════════════════════════════
 // Rationale for absence: after Jose4 shipped, scripts/lattice_harmonic_scan.py
@@ -5608,7 +5742,8 @@ function dtCycleLodCorrectionSum(year) {
   return bondCycleLodCorrection(year)
        + hallstattCycleLodCorrection(year)
        + jose5CycleLodCorrection(year)
-       + jose4CycleLodCorrection(year);
+       + jose4CycleLodCorrection(year)
+       + resonatorSwingLodCorrection(year);   // Core-mantle swing — 0 unless research toggle ON
 }
 
 /** Layer 3 LOD in seconds at t_Ma: pure-tidal + GIA + 4 DT cycles.
@@ -5662,7 +5797,8 @@ function meanDeltaTSecondsAtAge(t_Ma) {
   const flagKey = (BOND_DT_CORRECTION_ENABLED      ? 'B' : '_')
                 + (HALLSTATT_DT_CORRECTION_ENABLED ? 'H' : '_')
                 + (JOSE5_DT_CORRECTION_ENABLED     ? 'J' : '_')
-                + (JOSE4_DT_CORRECTION_ENABLED    ? 'W' : '_');
+                + (JOSE4_DT_CORRECTION_ENABLED    ? 'W' : '_')
+                + (RESONATOR_DT_CORRECTION_ENABLED ? 'R' : '_');
   const cacheKey = `${flagKey}:${t_Ma}`;
   const hit = _DELTA_T_CACHE.get(cacheKey);
   if (hit !== undefined) return hit;
@@ -5696,12 +5832,15 @@ function meanDeltaTSecondsAtAge(t_Ma) {
   // additive terms. Each correction is anchored to 0 at J2000 by construction,
   // so ΔT(J2000) remains exactly 0 regardless of which subset is enabled.
   if (BOND_DT_CORRECTION_ENABLED || HALLSTATT_DT_CORRECTION_ENABLED
-      || JOSE5_DT_CORRECTION_ENABLED  || JOSE4_DT_CORRECTION_ENABLED) {
+      || JOSE5_DT_CORRECTION_ENABLED  || JOSE4_DT_CORRECTION_ENABLED
+      || RESONATOR_DT_CORRECTION_ENABLED) {
     const yearY = 2000 - t_Ma * 1e6;
     if (BOND_DT_CORRECTION_ENABLED)      result += bondCycleDeltaTCorrection(yearY);
     if (HALLSTATT_DT_CORRECTION_ENABLED) result += hallstattCycleDeltaTCorrection(yearY);
     if (JOSE5_DT_CORRECTION_ENABLED)     result += jose5CycleDeltaTCorrection(yearY);
     if (JOSE4_DT_CORRECTION_ENABLED)    result += jose4CycleDeltaTCorrection(yearY);
+    // Core-mantle swing episode (Resonator driver) — research toggle, default OFF
+    if (RESONATOR_DT_CORRECTION_ENABLED) result += resonatorSwingDeltaTCorrection(yearY);
   }
   if (_DELTA_T_CACHE.size >= _MAX_DELTA_T_CACHE) {
     const firstKey = _DELTA_T_CACHE.keys().next().value;
@@ -11502,8 +11641,10 @@ let predictions = {
   dLodDtTidal_msCy: 0,     // dLOD/dt tidal contribution (ms/century) at current epoch
   dLodDtGia_msCy: 0,       // dLOD/dt GIA contribution (ms/century) at current epoch
   dLodDtStack_msCy: 0,     // dLOD/dt sub-Milankovitch 4-flag stack rate (Layer 3 addition)
+  dLodDtResonator_msCy: 0, // dLOD/dt Core-mantle swing episode rate (Resonator driver; 0 unless research toggle ON)
   dLodDtNetL2_msCy: 0,     // Layer 2 net = tidal + gia (matches IERS at J2000)
   dLodDtNetL3_msCy: 0,     // Layer 3 net = tidal + gia + stack (observable dLOD/dt)
+  dLodDtNetL4_msCy: 0,     // Layer 4 net = tidal + gia + stack + resonator (= L3 when resonator OFF)
   siderealDayReal: 0,
   stellarDayReal: 0,
   predictedDeltat: 0,
@@ -29832,9 +29973,15 @@ function setupGUI() {
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtNetL2_msCy', {
     label: 'Tidal + GIA', readonly: true, format: fmt3msCy
   }), 'Secular baseline = Tidal + GIA. At J2000: +1.77 ms/century, matching IERS observation of +1.75 ms/century within 1%. No parameters fitted to the observed rate \u2014 both channels come from independent literature anchors (LLR + Cox & Chao). The ~17% cancellation between Tidal and GIA at J2000 is what makes the observed Earth-rotation slowdown smaller than the pure-tidal rate.');
+  addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtResonator_msCy', {
+    label: 'Core-mantle swing', readonly: true, format: fmt3msCy
+  }), 'Resonator driver (4th physical channel): the Core-mantle swing episode — a 2-kick damped oscillation of the core\'s eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q = 1.8, axiMC range) driven through quadratic coupling by the lattice cycles\' beat structure (locked bond−hallstatt difference tone). Excitation −800, termination counter-kick +1600, decayed today. 0.000 unless the research toggle (Eclipse buttons → Core-mantle swing) is ON — default OFF pending Stage 3 validation. See docs/104.');
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtNetL3_msCy', {
     label: 'Tidal + GIA + all cycles', readonly: true, format: fmt3msCy
   }), 'Framework\'s full prediction = Tidal + GIA + All cycles. The full observable dLOD/dt including millennial modulation. Diverges from the Tidal + GIA baseline by the All cycles rate on ~1-2 kyr timescales. Above the baseline at some epochs (contributing to cooling excursions like the Little Ice Age); below at others (contributing to warm anomalies like the Medieval Warm Period).');
+  addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtNetL4_msCy', {
+    label: '+ Core-mantle swing', readonly: true, format: fmt3msCy
+  }), 'Layer 4 net = Tidal + GIA + All cycles + Core-mantle swing (Resonator). Equals the Layer 3 value while the resonator research toggle is OFF (default). The complete 4-driver decomposition: Tidal / GIA / All cycles / Resonator.');
 
   const yearsFolder = astroFolder.addFolder({ title: 'Solar Year' });
   const fmt8 = v => v.toFixed(8);
@@ -30976,6 +31123,44 @@ function setupGUI() {
      'prime factor. Cross-archive coherent in Steinhilber Φ + EPICA CO2 (independent evidence ' +
      'from two proxies). Same zero-fit-claim violation as Bond/Hallstatt/Jose5. Degenerate with ' +
      'Bond/2 ≈ 733 yr at present record length.');
+
+  // ────────────────────────────────────────────────────────────────────────
+  // CORE-MANTLE SWING (Resonator driver) toggle — 5th ΔT component, NEW
+  // functional class: 2-kick EPISODE (windowed damped oscillation), not a
+  // constant-amplitude harmonic. DEFAULT OFF pending Stage 3 validation.
+  // Fitted by scripts/core_mantle_resonator_stage1.py (V5, physical-
+  // consistency rule); constants near the Jose4 block; docs/104 §6/§8.
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Toggle Core-mantle swing ΔT episode (Resonator driver; default OFF)', () => {
+    RESONATOR_DT_CORRECTION_ENABLED = !RESONATOR_DT_CORRECTION_ENABLED;
+    _DELTA_T_CACHE.clear();
+    console.log('\n══════════════════════════════════════════════════════════════════');
+    console.log(`  Core-mantle swing (Resonator) episode is now: ${RESONATOR_DT_CORRECTION_ENABLED ? 'ENABLED (research toggle only)' : 'DISABLED (default)'}`);
+    console.log('══════════════════════════════════════════════════════════════════');
+    if (RESONATOR_DT_CORRECTION_ENABLED) {
+      console.log('  • NEW functional class: 2-kick EPISODE (windowed damped oscillation)');
+      console.log('  • Eigenmode: T₀ = 8H/' + RES_T0_LATTICE_N + ' = ' + RES_T0_YR.toFixed(1) + ' yr, Q = ' + RES_Q + ' (published axiMC range; lattice-labeled for H(t) clock coherence with the driving cycles)');
+      console.log('  • Kicks: excitation ' + RES_KICKS[0].t + ' CE, termination counter-kick +' + RES_KICKS[1].t + ' CE');
+      console.log('  • Drive tone: bond−hallstatt 8H/726 = 3,695 yr, phase LOCKED (φ_b − φ_h)');
+      console.log('  • Exactly 0 before ' + RES_KICKS[0].t + '; decayed today (δLOD(2000) = +0.099 ms/day)');
+      console.log('  • Absorbs ~96% of the post-stack ancient ΔT residual (RMS 268.8 → 53.4 s)');
+      console.log('  • Guards: modern window 0.046 ms/day, Espenak shape < 1 s — all pass');
+      console.log('  ⚠ When ON, the USNO anchor closure does NOT yet include its δLOD(2000);');
+      console.log('    Layer-3 LOD at J2000 shifts by +0.096 ms/day — Stage 3 will close this.');
+      console.log('  • VIOLATES paper\'s zero-fit claim: amplitudes from Stephenson residual fit.');
+    } else {
+      console.log('  Episode disabled — 4-flag stack unchanged (default configuration).');
+    }
+    const lod_J2000 = meanLodSecondsAtAge(0);
+    const dt_J2000  = meanDeltaTSecondsAtAge(0);
+    console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
+    console.log('══════════════════════════════════════════════════════════════════');
+  }, 'Feature flag for the Core-mantle swing episode (Resonator driver — the 4th physical ' +
+     'dLOD/dt channel: Tidal / GIA / All cycles / Resonator). A 2-kick windowed damped ' +
+     'oscillation of the core\'s eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q = 1.8) + locked bond−hallstatt ' +
+     'drive tone, modeling the millennial rotation swing (turnaround ~900 CE, doc 104). ' +
+     'DEFAULT OFF: Stage 3 validation + USNO closure integration pending. Exactly zero ' +
+     'before −1300 and at deep time; ΔT(J2000) = 0 preserved by construction.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Sun position diagnostic — scene vs Meeus
@@ -60074,8 +60259,10 @@ function updatePredictions() {
     predictions.dLodDtTidal_msCy  = _dLod.tidal  !== null ? _dLod.tidal  : 0;
     predictions.dLodDtGia_msCy    = _dLod.gia    !== null ? _dLod.gia    : 0;
     predictions.dLodDtStack_msCy  = _dLod.stack  !== null ? _dLod.stack  : 0;
+    predictions.dLodDtResonator_msCy = _dLod.resonator !== null ? _dLod.resonator : 0;
     predictions.dLodDtNetL2_msCy  = _dLod.net_L2 !== null ? _dLod.net_L2 : 0;
     predictions.dLodDtNetL3_msCy  = _dLod.net_L3 !== null ? _dLod.net_L3 : 0;
+    predictions.dLodDtNetL4_msCy  = _dLod.net_L4 !== null ? _dLod.net_L4 : 0;
   }
 
   // Compute these early - they are dependencies for calculations below.

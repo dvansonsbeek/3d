@@ -970,6 +970,15 @@ function main() {
 
   // Post-cap anchor closure. h253's J2000 LOD contribution is included in
   // the pre-adjust sum so the full stack closes onto the USNO anchor exactly.
+  //
+  // ⚠ CORE-MANTLE SWING (Resonator driver) — STAGE 3 PENDING: the 2-kick
+  // episode component (data/core-mantle-resonator-stage1.json; runtime toggle
+  // RESONATOR_DT_CORRECTION_ENABLED / DT_RESONATOR_ENABLED, default OFF)
+  // carries δLOD(2000) = +0.0961 ms/day (lod_raw_at_j2000_s_per_day). While
+  // the toggle is OFF the closure below is complete as-is. Before the
+  // resonator can ship default-ON, its δLOD(2000) must join this pre-adjust
+  // sum exactly like h253's (the h253 lesson: an unclosed J2000 contribution
+  // silently breaks the USNO anchor). See docs/104 §8.
   let bondForShip = bondForShipRaw;
   let bondAdjustment = null;
   const anchorTarget = usnoDerivation ? usnoDerivation.targetOffset : null;
