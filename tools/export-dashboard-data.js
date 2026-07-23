@@ -107,12 +107,13 @@ function exportEarth(years) {
     //
     //   lodKinematic     = meansiderealyearlengthinSeconds / o.siderealYearDays(year)
     //   h5Correction     = meanLodSecondsAtAge(t_Ma) / ((meanHAtAge(t_Ma) / 5) × meanTropicalYearDaysAtAge(t_Ma))
-    //   dtCycleLodSum    = Bond + Hallstatt + Jose5 + Jose4        (cyclic, 0 at J2000)
-    //   lodReal          = lodKinematic + h5Correction + dtCycleLodSum
+    //   dtCycleLodSum    = Bond + Hallstatt + Jose5 + Jose4 + Core-mantle swing
+    //                      (cyclic + episode; each term 0 at J2000 by anchoring)
+    //   lodReal          = lodKinematic + h5Correction + dtCycleLodSum  (Layer 4)
     //   siderealDayReal  = (solarYearDays × lodKinematic) / (solarYearDays + 1)
     //   stellarDayReal   = (siderealDayReal / (H/13)) / (solarYearDays + 1) + siderealDayReal
     //
-    // At J2000: 86400.002593 / 86164.090540 / 86164.099661 s — matches tweakpane.
+    // At J2000: 86400.001400 (USNO joint-world anchor) / 86164.090540 / 86164.099661 s — matches tweakpane.
     // Note: uses lodKinematic (not the physics-tidal mean) as baseline, per the
     // framework's IAU-round-trip identity. Deep-time tidal recession growth is
     // shown in the ESSRT chart, not here.
@@ -127,7 +128,8 @@ function exportEarth(years) {
     const dtCycleLodSum = DT.bondCycleLodCorrection(year)
                         + DT.hallstattCycleLodCorrection(year)
                         + DT.jose5CycleLodCorrection(year)
-                        + DT.jose4CycleLodCorrection(year);
+                        + DT.jose4CycleLodCorrection(year)
+                        + DT.resonatorSwingLodCorrection(year);   // Core-mantle swing (joint world)
     const lodReal         = lodKinematic + h5 + dtCycleLodSum;
     const siderealDayReal = (el.solarYearDays * lodKinematic) / (el.solarYearDays + 1);
     const stellarDayReal  = (siderealDayReal / (C.H / 13)) / (el.solarYearDays + 1) + siderealDayReal;

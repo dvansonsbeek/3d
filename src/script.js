@@ -11658,6 +11658,7 @@ let predictions = {
   lodReal: 0,
   solarDayLayer1: 0,   // Tidal Mean + H/5 (live per-frame value)
   solarDayLayer2: 0,   // + GIA + H/5 (live per-frame value)
+  solarDayLayer3: 0,   // + 4-flag cycles only (kinematic base; EXCLUDES the Core-mantle swing — lodReal is Layer 4)
   dLodDtTidal_msCy: 0,     // dLOD/dt tidal contribution (ms/century) at current epoch
   dLodDtGia_msCy: 0,       // dLOD/dt GIA contribution (ms/century) at current epoch
   dLodDtStack_msCy: 0,     // dLOD/dt sub-Milankovitch 4-flag stack rate (Layer 3 addition)
@@ -24387,8 +24388,10 @@ let lcrProxyData = null;   // { sources: [{name, unit, range, data:[[year,°C],�
 const lcrLayerVisibility = {
   tidal: true,        // Tidal-only reference (+2.12 ms/cy, ~flat) — pure Moon-recession
   netL2: true,        // Tidal + GIA (secular baseline)
-  netL3: true,        // Tidal + GIA + all cycles (observable); also gates the ▲/▼ transition markers
+  netL3: true,        // Tidal + GIA + 4-flag cycles (flags only since the joint world); gates the ▲/▼ transition markers
+  netL4: true,        // + Core-mantle swing (Resonator) = the shipped observable (Layer 4, joint world)
   bondCurve: true,    // Bond harmonic isolated (thin dashed) — expected 1466-yr sinusoid
+  resonator: true,    // Core-mantle swing episode isolated (rendered on the Net L2 baseline like Bond)
   bands: true,        // named climate period bands (background shading)
   proxy: false,       // temperature anomaly overlay GISP2 (secondary Y-axis) — opt-in
   proxyLR04: false,   // LR04 inverted-δ¹⁸O overlay (secondary Y-axis) — opt-in, covers the 200-kyr tab
@@ -24881,9 +24884,11 @@ function lcrComputeSeries(rangeKey) {
   const tidal = [];
   const netL2 = [];
   const netL3 = [];
+  const netL4 = [];
   const stack = [];
   const gia   = [];
   const bond  = [];   // Bond harmonic isolated rate — d/dt of bondCycleLodCorrection
+  const resonator = [];   // Core-mantle swing isolated rate (Resonator driver channel)
 
   const DYR_BOND = 50;
   for (let year = xLo; year <= xHi; year += step) {
@@ -24893,6 +24898,8 @@ function lcrComputeSeries(rangeKey) {
     tidal.push(d.tidal);
     netL2.push(d.net_L2);
     netL3.push(d.net_L3);
+    netL4.push(d.net_L4);
+    resonator.push(d.resonator);
     stack.push(d.stack);
     gia.push(d.gia);
     // Bond harmonic rate (ms/century): numerical derivative of
@@ -24916,7 +24923,7 @@ function lcrComputeSeries(rangeKey) {
     }
   }
 
-  _lcrSeriesCache[rangeKey] = { xs, tidal, netL2, netL3, stack, gia, bond, crossings, xLo, xHi, step };
+  _lcrSeriesCache[rangeKey] = { xs, tidal, netL2, netL3, netL4, resonator, stack, gia, bond, crossings, xLo, xHi, step };
   return _lcrSeriesCache[rangeKey];
 }
 
@@ -24945,6 +24952,16 @@ function lcrRenderChart(rangeKey) {
   if (lcrLayerVisibility.tidal) scan(S.tidal);
   if (lcrLayerVisibility.netL2) scan(S.netL2);
   if (lcrLayerVisibility.netL3) scan(S.netL3);
+  if (lcrLayerVisibility.netL4) scan(S.netL4);
+  // Resonator isolated curve is rendered OFFSET by Net L2 (like Bond below).
+  if (lcrLayerVisibility.resonator) {
+    for (let i = 0; i < S.resonator.length; i++) {
+      const v = (S.resonator[i] != null && S.netL2[i] != null) ? S.resonator[i] + S.netL2[i] : null;
+      if (v == null) continue;
+      if (v < dataMin) dataMin = v;
+      if (v > dataMax) dataMax = v;
+    }
+  }
   // Bond isolated curve is rendered OFFSET by Net L2 so it visually
   // oscillates on the Framework baseline (the reference height of the
   // TROUGH triangles). Scan its shifted values for auto-Y-range so the
@@ -25125,8 +25142,23 @@ function lcrRenderChart(rangeKey) {
     );
     paths.push(`<path d="${pathFor(bondShifted)}" fill="none" stroke="#c084fc" stroke-width="1.2" stroke-dasharray="5,3" opacity="0.85" data-lcr-curve="bond"/>`);
   }
+  if (lcrLayerVisibility.resonator) {
+    // Core-mantle swing isolated (Resonator driver), SHIFTED by Net L2 so the
+    // episode rides the framework baseline: zero before −1600, the swing
+    // through antiquity, terminated by +1600, zero today — the 4th driver
+    // made visible. Solid thin green.
+    const resShifted = S.resonator.map((r, i) =>
+      (r == null || S.netL2[i] == null) ? null : r + S.netL2[i]
+    );
+    paths.push(`<path d="${pathFor(resShifted)}" fill="none" stroke="#7bd88f" stroke-width="1.4" opacity="0.9" data-lcr-curve="resonator"/>`);
+  }
   if (lcrLayerVisibility.netL3) {
-    paths.push(`<path d="${pathFor(S.netL3)}" fill="none" stroke="#ffce4b" stroke-width="2" opacity="1" data-lcr-curve="netL3"/>`);
+    paths.push(`<path d="${pathFor(S.netL3)}" fill="none" stroke="#ffce4b" stroke-width="1.4" stroke-dasharray="6,3" opacity="0.85" data-lcr-curve="netL3"/>`);
+  }
+  if (lcrLayerVisibility.netL4) {
+    // The shipped observable (joint world): Layer 4 = Tidal + GIA + cycles +
+    // Core-mantle swing. Drawn last/boldest — this is THE prediction curve.
+    paths.push(`<path d="${pathFor(S.netL4)}" fill="none" stroke="#ff8c42" stroke-width="2.2" opacity="1" data-lcr-curve="netL4"/>`);
   }
 
   // Framework crossings as small triangle markers ON the Framework baseline
@@ -25275,7 +25307,8 @@ ${esc(src.region)} • ${esc(src.unit)}</title></path>`;
   const hoverBg   = `<rect class="lcr-hover-bg" x="0" y="0" width="180" height="70" rx="4" fill="rgba(20,22,28,.94)" stroke="rgba(255,255,255,.15)" opacity="0" pointer-events="none"/>`;
   const hoverTxt  = `<text class="lcr-hover-year" x="0" y="0" font-size="11" fill="#fff" font-weight="700" opacity="0" pointer-events="none"></text>
     <text class="lcr-hover-l2" x="0" y="0" font-size="10" fill="#4dd0c8" opacity="0" pointer-events="none"></text>
-    <text class="lcr-hover-l3" x="0" y="0" font-size="10" fill="#ffce4b" opacity="0" pointer-events="none"></text>`;
+    <text class="lcr-hover-l3" x="0" y="0" font-size="10" fill="#ffce4b" opacity="0" pointer-events="none"></text>
+    <text class="lcr-hover-l4" x="0" y="0" font-size="10" fill="#ff8c42" opacity="0" pointer-events="none"></text>`;
 
   return `<svg class="lcr-svg" viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
     <rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#0e1116" stroke="rgba(255,255,255,.08)"/>
@@ -25324,6 +25357,8 @@ function lcrExport() {
     teal:     '#0f8e83',   // Tidal + GIA         (was #4dd0c8)
     gold:     '#c68a13',   // Tidal + GIA + all cycles (was #ffce4b)
     lavender: '#6d3ee0',   // Bond cycle          (was #c084fc)
+    orange:   '#c75b12',   // + Core-mantle swing (L4) (was #ff8c42)
+    resGreen: '#2e8b57',   // Core-mantle swing isolated (was #7bd88f)
     rust:     '#a4553d',   // Tidal baseline      (was #c46a4d — nudge darker)
     pink:     '#e63959',   // Temperature (GISP2) (was #ff5978)
     green:    '#15803d',   // Temperature (LR04)  (was #4ade80)
@@ -25345,6 +25380,8 @@ function lcrExport() {
     [/stroke="#4dd0c8"/g,                   `stroke="${PRINT.teal}"`],
     [/stroke="#ffce4b"/g,                   `stroke="${PRINT.gold}"`],
     [/stroke="#c084fc"/g,                   `stroke="${PRINT.lavender}"`],
+    [/stroke="#ff8c42"/g,                   `stroke="${PRINT.orange}"`],
+    [/stroke="#7bd88f"/g,                   `stroke="${PRINT.resGreen}"`],
     [/stroke="#c46a4d"/g,                   `stroke="${PRINT.rust}"`],
     [/stroke="#ff5978"/g,                   `stroke="${PRINT.pink}"`],
     [/fill="#ff5978"/g,                     `fill="${PRINT.pink}"`],
@@ -25413,8 +25450,20 @@ function lcrExport() {
   }
   if (lcrLayerVisibility.netL3) {
     legendEntries.push({
-      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.gold}" stroke-width="2.2"/>`,
-      label: 'Tidal + GIA + all cycles',
+      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.gold}" stroke-width="1.6" stroke-dasharray="6,3"/>`,
+      label: '+ 4-flag cycles (L3)',
+    });
+  }
+  if (lcrLayerVisibility.netL4) {
+    legendEntries.push({
+      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.orange}" stroke-width="2.4"/>`,
+      label: '+ Core-mantle swing (L4)',
+    });
+  }
+  if (lcrLayerVisibility.resonator) {
+    legendEntries.push({
+      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.resGreen}" stroke-width="1.6"/>`,
+      label: 'Core-mantle swing (isolated)',
     });
   }
   if (lcrLayerVisibility.bondCurve) {
@@ -25487,8 +25536,10 @@ async function createLcrPanel() {
     <div class="cfm-layer-toggles">
       <label class="cfm-layer-check" title="Pure tidal channel = Moon-recession torque only, no GIA compensation, no cycles. At J2000: +2.12 ms/cy. Essentially flat across the Holocene. Provides a physical reference height above which GIA subtracts and the ΔT cycles oscillate."><input type="checkbox" data-lcr-layer="tidal" ${lcrLayerVisibility.tidal ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-tidal"></span>Tidal baseline</label>
       <label class="cfm-layer-check" title="Tidal + GIA secular rate = Layer 2 net rate = Moon recession minus the Milankovitch mass-response drag. At J2000: +1.77 ms/cy, matches IERS +1.75."><input type="checkbox" data-lcr-layer="netL2" ${lcrLayerVisibility.netL2 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL2"></span>Tidal + GIA</label>
-      <label class="cfm-layer-check" title="Framework's full prediction = Layer 3 net rate = tidal + GIA + all 4 lattice cycles (Bond + Hallstatt + Jose5 + Jose4). The observable dLOD/dt including cyclic modulation. At J2000: +0.764 ms/cy."><input type="checkbox" data-lcr-layer="netL3" ${lcrLayerVisibility.netL3 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL3"></span>Tidal + GIA + all cycles</label>
+      <label class="cfm-layer-check" title="Framework's full prediction = Layer 3 net rate = tidal + GIA + all 4 lattice cycles (Bond + Hallstatt + Jose5 + Jose4). The observable dLOD/dt including cyclic modulation. At J2000: +0.764 ms/cy."><input type="checkbox" data-lcr-layer="netL3" ${lcrLayerVisibility.netL3 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL3"></span>+ 4-flag cycles (L3)</label>
+      <label class="cfm-layer-check" title="The SHIPPED observable (joint world) = Layer 4 = Tidal + GIA + 4-flag cycles + Core-mantle swing (Resonator driver, fitted jointly). At J2000: +0.81 ms/cy; Layer-3 solar day matches USNO 86400.0014 by construction."><input type="checkbox" data-lcr-layer="netL4" ${lcrLayerVisibility.netL4 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL4"></span>+ Core-mantle swing (L4)</label>
       <label class="cfm-layer-check" title="Bond 8H/1830 harmonic ISOLATED from the 4-cycle stack. A clean 1466-yr sinusoid — its zero-crossings should align with Bond cycle timing if the framework captures the Bond cycle. Full-stack prediction has additional Hallstatt / Jose5 / Jose4 crossings on top of this."><input type="checkbox" data-lcr-layer="bondCurve" ${lcrLayerVisibility.bondCurve ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bondcurve"></span>Bond cycle</label>
+      <label class="cfm-layer-check" title="Core-mantle swing episode ISOLATED (Resonator driver — the 4th dLOD/dt channel): impulse-consistent damped oscillation of the core eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q = 1.8), excitation −1600, termination +1600, zero before and after. Rendered on the Net L2 baseline like the Bond curve. See docs/104."><input type="checkbox" data-lcr-layer="resonator" ${lcrLayerVisibility.resonator ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-resonator"></span>Core-mantle swing</label>
       <label class="cfm-layer-check" title="Named climate period bands from mainstream literature. Cold = blue; Warm = red."><input type="checkbox" data-lcr-layer="bands" ${lcrLayerVisibility.bands ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bands"></span>Periods</label>
       <label class="cfm-layer-check" title="GISP2 Alley 2000 Greenland ice-core temperature reconstruction on the secondary right-hand °C-anomaly axis. Independent paleoclimate reconstruction — not part of the framework fit. Covers 27,950 BC to 1850 AD at 100-yr resolution, with two anchor points appended at 1950 and 2000 AD for visual continuity to the modern era."><input type="checkbox" data-lcr-layer="proxy" ${lcrLayerVisibility.proxy ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxy"></span>Temperature (GISP2)</label>
       <label class="cfm-layer-check" title="LR04 global benthic δ¹⁸O stack (Lisiecki & Raymo 2005, 57 sites) shown as inverted anomaly vs core-top on the secondary axis — positive = warm, same sign convention as the Bond IRD panel. Independent paleoclimate reconstruction — not part of the framework fit; the same dataset the Climate Formula Explorer fits against. 1-kyr resolution; covers the full 200,000 BC tab where GISP2 ends (~27,950 BC)."><input type="checkbox" data-lcr-layer="proxyLR04" ${lcrLayerVisibility.proxyLR04 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxylr04"></span>Temperature (LR04)</label>
@@ -25591,6 +25642,7 @@ async function createLcrPanel() {
     if (lcrLayerVisibility.tidal) scanH(S.tidal);
     if (lcrLayerVisibility.netL2) scanH(S.netL2);
     if (lcrLayerVisibility.netL3) scanH(S.netL3);
+    if (lcrLayerVisibility.netL4) scanH(S.netL4);
     if (dataMin > 0)    dataMin = 0;
     if (dataMax < 1.75) dataMax = 1.75;
     if (!Number.isFinite(dataMin) || !Number.isFinite(dataMax)) { dataMin = -0.5; dataMax = 3.5; }
@@ -25604,6 +25656,7 @@ async function createLcrPanel() {
     const yearTxt    = svg.querySelector('.lcr-hover-year');
     const l2Txt      = svg.querySelector('.lcr-hover-l2');
     const l3Txt      = svg.querySelector('.lcr-hover-l3');
+    const l4Txt      = svg.querySelector('.lcr-hover-l4');
 
     function showTooltip(event) {
       const rect = svg.getBoundingClientRect();
@@ -25618,10 +25671,11 @@ async function createLcrPanel() {
 
       const l2 = S.netL2[idx];
       const l3 = S.netL3[idx];
+      const l4 = S.netL4[idx];
       const y  = S.xs[idx];
 
       const xPos = margin.left + ((y - xLo) / (xHi - xLo)) * plotW;
-      const yPos = margin.top + (1 - (l3 - yMin) / (yMax - yMin)) * plotH;
+      const yPos = margin.top + (1 - ((l4 != null ? l4 : l3) - yMin) / (yMax - yMin)) * plotH;
 
       hoverLine.setAttribute('x1', xPos);
       hoverLine.setAttribute('x2', xPos);
@@ -25632,10 +25686,11 @@ async function createLcrPanel() {
 
       const label = y === 2000 ? 'J2000' : y === 0 ? '1 BC' : y < 0 ? `${-y} BC` : `${y} AD`;
       yearTxt.textContent = label;
-      l2Txt.textContent    = `Baseline:   ${l2.toFixed(3)} ms/cy`;
-      l3Txt.textContent    = `Prediction: ${l3.toFixed(3)} ms/cy`;
+      l2Txt.textContent    = `Baseline:    ${l2.toFixed(3)} ms/cy`;
+      l3Txt.textContent    = `+ cycles:    ${l3.toFixed(3)} ms/cy`;
+      l4Txt.textContent    = `Full (L4):   ${l4 != null ? l4.toFixed(3) : '—'} ms/cy`;
 
-      const tipW = 170, tipH = 56;
+      const tipW = 178, tipH = 70;
       let tipX = xPos + 12;
       if (tipX + tipW > margin.left + plotW) tipX = xPos - 12 - tipW;
       const tipY = Math.max(margin.top + 6, Math.min(yPos - tipH/2, margin.top + plotW - tipH));
@@ -25647,6 +25702,7 @@ async function createLcrPanel() {
       yearTxt.setAttribute('x', tipX + 10); yearTxt.setAttribute('y', tipY + 16); yearTxt.setAttribute('opacity', '1');
       l2Txt.setAttribute('x', tipX + 10);   l2Txt.setAttribute('y', tipY + 32);   l2Txt.setAttribute('opacity', '1');
       l3Txt.setAttribute('x', tipX + 10);   l3Txt.setAttribute('y', tipY + 46);   l3Txt.setAttribute('opacity', '1');
+      l4Txt.setAttribute('x', tipX + 10);   l4Txt.setAttribute('y', tipY + 60);   l4Txt.setAttribute('opacity', '1');
     }
     function hideTooltip() {
       hoverLine.setAttribute('opacity', '0');
@@ -25655,6 +25711,7 @@ async function createLcrPanel() {
       yearTxt.setAttribute('opacity', '0');
       l2Txt.setAttribute('opacity', '0');
       l3Txt.setAttribute('opacity', '0');
+      l4Txt.setAttribute('opacity', '0');
     }
     capture.addEventListener('mousemove', showTooltip);
     capture.addEventListener('mouseleave', hideTooltip);
@@ -29973,9 +30030,12 @@ function setupGUI() {
   addTooltip(astroSolarDayFolder.addBinding(predictions, 'solarDayLayer2', {
     label: 'Tidal + GIA', readonly: true, format: fmt6
   }), 'Tidal baseline with \u03b1(t) applied at the current epoch (at J2000 \u03b1 = EARTH_MOI_FACTOR exactly). Secular baseline used by year-length derivations. At J2000 = 86400.003203 s.');
+  addTooltip(astroSolarDayFolder.addBinding(predictions, 'solarDayLayer3', {
+    label: '+ all cycles (Layer 3)', readonly: true, format: fmt6
+  }), 'Kinematic base + H/5 + the 4-flag lattice stack ONLY (Bond/Hallstatt/Jose5/Jose4 cyclic \u03b4LOD corrections) \u2014 the Core-mantle swing is EXCLUDED here and added in the next row, so each layer is honest. Baseline is o.lodKinematic (IAU-anchored), not the physics Layer 2.');
   addTooltip(astroSolarDayFolder.addBinding(predictions, 'lodReal', {
-    label: 'Tidal + GIA + all cycles', readonly: true, format: fmt6
-  }), 'Framework\'s full solar-day prediction: Tidal + GIA + sum of Bond/Hallstatt/Jose5/Jose4 cyclic \u03b4LOD corrections. Physical length of one solar day. At J2000 = 86400.0014 s (matches the USNO Earth-orientation anchor by construction — joint world incl. the Core-mantle swing). Same value shown as the top-level "Solar Day (s)" row.');
+    label: '+ Core-mantle swing (REAL)', readonly: true, format: fmt6
+  }), 'Layer 4 \u2014 the framework\'s full shipped solar day: Layer 3 + the Core-mantle swing episode (Resonator driver, fitted jointly with the flags). Physical length of one solar day. At J2000 = 86400.0014 s (matches the USNO Earth-orientation anchor by construction \u2014 the joint closure constrains this TOTAL). Same value as the top-level "Solar Day (s)" row. Equals Layer 3 only when the resonator is toggled off (research state).');
 
   // dLOD/dt driver decomposition sub-folder \u2014 tidal + GIA + all-cycles stack producing observed LOD growth.
   // Collapsed by default \u2014 the numbers are diagnostic rather than everyday.
@@ -31128,7 +31188,7 @@ function setupGUI() {
     console.log('   • meanDeltaTSecondsAtAge(0) = 0 s        (J2000 ΔT anchor)');
     console.log('  • Raw eval at J2000: ' + JOSE4_DT_RAW_AT_J2000.toFixed(2) + ' s');
     console.log('    (subtracted by construction so ΔT(J2000) = 0 either way)');
-    console.log('  • Compatibility: independent of Bond/Hallstatt/Jose5 flags — 16 total states');
+    console.log('  • Compatibility: independent of the other flags — 32 total states incl. the Core-mantle swing toggle');
     console.log('    Current: Bond=' + (BOND_DT_CORRECTION_ENABLED?'ON':'OFF') + ', Hallstatt=' + (HALLSTATT_DT_CORRECTION_ENABLED?'ON':'OFF') + ', Jose5=' + (JOSE5_DT_CORRECTION_ENABLED?'ON':'OFF') + ', Jose4=' + (JOSE4_DT_CORRECTION_ENABLED?'ON':'OFF'));
     console.log('  ⚠ Degeneracy note: Jose4 is empirically indistinguishable from Bond/2 ≈ 733 yr');
     console.log('    at the current record length. The 4×Jose anchor is tighter (0.08% vs 2.5%),');
@@ -60274,7 +60334,14 @@ function updatePredictions() {
     const _gia = meanLodSecondsAtAge(_tMa);
     predictions.solarDayLayer1 = (_tidal !== null ? _tidal : o.lodKinematic) + _h5;
     predictions.solarDayLayer2 = (_gia !== null ? _gia : o.lodKinematic) + _h5;
-    predictions.lodReal = o.lodKinematic + _h5 + dtCycleLodCorrectionSum(yearForFormula);
+    // Layer 3 = kinematic + H/5 + 4-flag cycles ONLY; Layer 4 (= lodReal, the
+    // shipped Solar Day) adds the Core-mantle swing. dtCycleLodCorrectionSum
+    // includes the resonator when its toggle is ON, so Layer 3 subtracts it
+    // back out for an honest per-layer display.
+    const _cycleSum = dtCycleLodCorrectionSum(yearForFormula);
+    const _resLod = resonatorSwingLodCorrection(yearForFormula);
+    predictions.solarDayLayer3 = o.lodKinematic + _h5 + (_cycleSum - _resLod);
+    predictions.lodReal = o.lodKinematic + _h5 + _cycleSum;
 
     // dLOD/dt decomposition (tidal + GIA + stack), in ms/century, live per-frame.
     // At J2000: tidal +2.12, GIA −0.35, stack ≈ 0, net L2 +1.77 ≈ IERS +1.75.
