@@ -1,0 +1,87 @@
+{
+  "_meta": {
+    "description": "Default-ON convergence dry run (sandboxed, production restored): iterate [resonator-aware 4-flag fit --write -> constant sync -> Stage-1 resonator refit] x4. RESULT: NO clean convergence \u2014 the coupled system oscillates between two regimes: A (deltaTStart ~58-59, Espenak ~17.1-17.3 s, Bond amp ~284-287, resonator tone amp balloons to -1250..-1343 s cancellation-heavy) and B (deltaTStart ~65.2-66.0, Espenak ~20.7-20.8 s, Bond amp ~246-250, tone ~-870..-949). Diagnosis: Bond (1,466 yr) and the resonator drive tone (3,695 yr) plus the deltaTStart constant are strongly collinear in the 2.7-kyr window \u2014 sequential iterate-and-close trades amplitude between them instead of converging. CONCLUSION: default-ON requires a JOINT fit (stack + resonator in one design matrix, shared USNO closure) with resonator amplitude CAPS at the convention values (tone -186 s, the flag-cap philosophy) \u2014 not sequential iteration. Espenak upside is real in both regimes (17.1-20.8 vs 22.5 production). Production files verified restored.",
+    "iterations": [
+      {
+        "deltaTStart": 65.92372934570098,
+        "usno": 86400.0026,
+        "espenak_rms": 22.52792297620699,
+        "bond_amp": 281.34505678231386,
+        "bond_phase": 61.09328085575851,
+        "res_rms": 53.40268740604114,
+        "res_dlod2000_ms": 0.09880327745013574,
+        "res_T0_n": 685,
+        "res_Q": 1.8,
+        "res_kicks": [
+          -800.0,
+          1600.0
+        ],
+        "res_tone_amp": -186.1396099707357
+      },
+      {
+        "deltaTStart": 59.15554476542716,
+        "usno": 86400.0021,
+        "espenak_rms": 17.315951665267168,
+        "bond_amp": 284.19613767913125,
+        "bond_phase": 52.893906011217,
+        "res_rms": 62.07755993583741,
+        "res_dlod2000_ms": 0.058340182514142046,
+        "res_T0_n": 671,
+        "res_Q": 1.8,
+        "res_kicks": [
+          -1800.0,
+          1600.0
+        ],
+        "res_tone_amp": -1253.017260766667
+      },
+      {
+        "deltaTStart": 57.66070145874922,
+        "usno": 86400.002,
+        "espenak_rms": 17.087703709266265,
+        "bond_amp": 287.1956275536096,
+        "bond_phase": 52.72015126841035,
+        "res_rms": 61.17497555693272,
+        "res_dlod2000_ms": 0.05705565654564253,
+        "res_T0_n": 671,
+        "res_Q": 1.8,
+        "res_kicks": [
+          -1700.0,
+          1600.0
+        ],
+        "res_tone_amp": -1343.0684626451296
+      },
+      {
+        "deltaTStart": 65.15867311020921,
+        "usno": 86400.0025,
+        "espenak_rms": 20.749374511720283,
+        "bond_amp": 250.02871017344216,
+        "bond_phase": 49.12180967658835,
+        "res_rms": 79.80276587250522,
+        "res_dlod2000_ms": 0.0236619148614252,
+        "res_T0_n": 671,
+        "res_Q": 2.05,
+        "res_kicks": [
+          -1700.0,
+          1600.0
+        ],
+        "res_tone_amp": -949.0730926491523
+      },
+      {
+        "deltaTStart": 65.95382508990116,
+        "usno": 86400.0025,
+        "espenak_rms": 20.836163589244247,
+        "bond_amp": 246.437864258968,
+        "bond_phase": 48.90463899321933,
+        "res_rms": 81.54329780245934,
+        "res_dlod2000_ms": 0.023190103636874102,
+        "res_T0_n": 671,
+        "res_Q": 2.05,
+        "res_kicks": [
+          -1700.0,
+          1600.0
+        ],
+        "res_tone_amp": -868.8486709857498
+      }
+    ]
+  }
+}

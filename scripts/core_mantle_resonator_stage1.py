@@ -63,7 +63,10 @@ import numpy as np
 REPO = Path('/home/dennis/code/3d')
 OUT_PATH = REPO / 'data' / 'core-mantle-resonator-stage1.json'
 EIGHT_H = 8 * 335317
-DELTA_T_START = 65.92372934570098
+# deltaTStart from the single source of truth (updated by dt-corrections-fit
+# --write joint-optimum sweep) — required for the coupled default-ON refit
+# loop, where deltaTStart moves with the resonator-aware closure.
+DELTA_T_START = json.load(open(REPO / 'public/input/astro-reference.json'))['earthOrbital']['deltaTStart']
 
 NODE_DUMP = r"""
 const fs = require('fs');

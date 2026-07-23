@@ -181,6 +181,23 @@ const CONFIG = {
 // error in the weights — well below the μs-scale anchor residual.
 const MEAN_TROPICAL_YEAR_J2000_S = C.meanSolarYearDays * 86400;
 
+// ── Core-mantle swing (Resonator driver) closure hook — Stage 3.2 ──────────
+// When the resonator episode is enabled (DT_RESONATOR_ENABLED=1, matching the
+// runtime opt-in), its δLOD(2000) must join the USNO pre-adjust closure sums
+// below exactly like h253's — otherwise the shipped stack would close onto
+// the anchor WITHOUT the resonator's +0.0988 ms/day and the composite Layer-3
+// LOD at J2000 would miss the USNO target (the h253 lesson). Default runs
+// (env unset) are bit-identical to the pre-resonator behavior.
+const RESONATOR_IN_CLOSURE = process.env.DT_RESONATOR_ENABLED === '1';
+function resonatorLodAtJ2000() {
+  if (!RESONATOR_IN_CLOSURE) return 0;
+  const p = path.join(__dirname, '..', '..', 'data', 'core-mantle-resonator-stage1.json');
+  if (!fs.existsSync(p)) return 0;
+  const j = JSON.parse(fs.readFileSync(p, 'utf8'));
+  const res = (j.proposed_shipped_coefficients || {}).resonator;
+  return res ? res.lod_raw_at_j2000_s_per_day : 0;
+}
+
 // Derive the required `Σ cycleLodCorrection(2000) = target` from the USNO knob.
 // Mirrors the runtime formula:
 //   predictions.lodReal = o.lodKinematic + h5Correction(2000) + dtCycleLodCorrectionSum(2000)
@@ -510,7 +527,8 @@ function runFitQuiet(usnoTargetLodS, years, residual) {
   // h253 included in the pre-adjust sum.
   const preSum = cycleLodAtJ2000(bondForShipRaw) + cycleLodAtJ2000(hallForShip)
                + cycleLodAtJ2000(joseForShip) + cycleLodAtJ2000(jose4ForShip)
-               + cycleLodAtJ2000(h253Fit);
+               + cycleLodAtJ2000(h253Fit)
+               + resonatorLodAtJ2000();   // 0 unless DT_RESONATOR_ENABLED=1
   const deltaLod = derivation.targetOffset - preSum;
   const omB = 2 * Math.PI * bondCycle.lattice_n / EIGHT_H;
   const wCos = -86400 * omB * Math.sin(omB * 2000) / MEAN_TROPICAL_YEAR_J2000_S;
@@ -971,14 +989,15 @@ function main() {
   // Post-cap anchor closure. h253's J2000 LOD contribution is included in
   // the pre-adjust sum so the full stack closes onto the USNO anchor exactly.
   //
-  // ⚠ CORE-MANTLE SWING (Resonator driver) — STAGE 3 PENDING: the 2-kick
-  // episode component (data/core-mantle-resonator-stage1.json; runtime toggle
-  // RESONATOR_DT_CORRECTION_ENABLED / DT_RESONATOR_ENABLED, default OFF)
-  // carries δLOD(2000) = +0.0961 ms/day (lod_raw_at_j2000_s_per_day). While
-  // the toggle is OFF the closure below is complete as-is. Before the
-  // resonator can ship default-ON, its δLOD(2000) must join this pre-adjust
-  // sum exactly like h253's (the h253 lesson: an unclosed J2000 contribution
-  // silently breaks the USNO anchor). See docs/104 §8.
+  // CORE-MANTLE SWING (Resonator driver) — closure INTEGRATED (Stage 3.2):
+  // when DT_RESONATOR_ENABLED=1 the episode's δLOD(2000) = +0.0988 ms/day
+  // (from data/core-mantle-resonator-stage1.json) joins the pre-adjust sums
+  // via resonatorLodAtJ2000(), so a resonator-aware fit closes the composite
+  // Layer-3 LOD onto the USNO anchor exactly (the h253 lesson). Default runs
+  // (env unset) are bit-identical to the pre-resonator closure. Note the
+  // coupling loop: a resonator-aware closure shifts Bond, which shifts the
+  // residual the resonator was fitted on — quantified in Stage 3.3; one
+  // refit iteration converges (the shift is ~10% of the closure budget).
   let bondForShip = bondForShipRaw;
   let bondAdjustment = null;
   const anchorTarget = usnoDerivation ? usnoDerivation.targetOffset : null;
@@ -999,7 +1018,8 @@ function main() {
                     + cycleLodAtJ2000(hallForShip)
                     + cycleLodAtJ2000(joseForShip)
                     + cycleLodAtJ2000(jose4ForShip)
-                    + cycleLodAtJ2000(h253ForShip);
+                    + cycleLodAtJ2000(h253ForShip)
+                    + resonatorLodAtJ2000();   // 0 unless DT_RESONATOR_ENABLED=1
     const deltaLod = anchorTarget - preAdjSum;
 
     const omB = 2 * Math.PI * bondCycle.lattice_n / EIGHT_H;
