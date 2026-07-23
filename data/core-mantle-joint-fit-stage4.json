@@ -1,0 +1,60 @@
+{
+  "_meta": {
+    "description": "Stage 4 prototype: joint equality-constrained fit of the 4-flag stack + frozen-convention resonator episode with USNO closure as hard constraint and amplitude caps (cascade). Scored on the instrumental window (Stephenson 1650-2015 proxy \u2014 winner must be re-scored with the fit tool before integration).",
+    "caps": {
+      "hallstatt": 80.0,
+      "jose5": 50.0,
+      "jose4": 50.0,
+      "res_kick1": 773.335,
+      "res_kick2": 179.324,
+      "res_tone": 186.14
+    },
+    "resonator_frozen": {
+      "n": 685,
+      "Q": 1.8,
+      "kicks": [
+        -800.0,
+        1600.0
+      ]
+    }
+  },
+  "optimum": {
+    "usno": 86400.0016,
+    "deltaTStart": 60.54345219450319,
+    "capped": [
+      2,
+      3,
+      4,
+      5,
+      8
+    ],
+    "rms_espenak": 12.529642072734914,
+    "rms_instr": 34.2731548305324,
+    "rms_full": 31.785567548048796
+  },
+  "coefficients": {
+    "bond_cos": 166.1710946662956,
+    "bond_sin": 316.2978034759154,
+    "hallstatt_cos": -32.95295707623662,
+    "hallstatt_sin": 72.89789173859357,
+    "jose5_cos": -40.71024794607835,
+    "jose5_sin": 29.02887721164605,
+    "jose4_cos": 22.879388214331073,
+    "jose4_sin": -30.797570646282633,
+    "res_kick1": 773.335,
+    "res_kick2": 1.6659904813664974,
+    "res_tone": -127.9076023282936,
+    "intercept": 95.19047660452244
+  },
+  "amplitudes": {
+    "bond": 357.29138414784614,
+    "hallstatt": 80.00000000000001,
+    "jose5": 50.0,
+    "jose4": 38.36608870832211,
+    "res_kick1": 773.335,
+    "res_kick2": 1.6659904813664974,
+    "res_tone": 127.9076023282936
+  },
+  "closure_sum_lod_s": -0.0019365699361234038,
+  "verdict": "Joint fit is a SINGLE closed-form solve \u2014 no iteration, no ping-pong by construction. Optimum (USNO 86400.0016, deltaTStart 60.54): TRUE Espenak RMS 12.53 s, full-window RMS 31.79 s, Bond 357.3 s, closure exact. NO-GO at prototype level \u2014 amplitudes or window RMS out of range; revisit cap values or the constraint formulation before integration."
+}
