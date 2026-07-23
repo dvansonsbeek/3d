@@ -55,7 +55,6 @@ let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 24
 let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
 let   JOSE4_DT_CORRECTION_ENABLED = true;  // Jose4 8H/3749 ≈ 715.5 yr ΔT correction (4×Jose period, structural gcd=23) — cross-archive coherent in Steinhilber Φ + EPICA CO2; rationale + associated constants ~L5209
 let   RESONATOR_DT_CORRECTION_ENABLED = true;  // Core-mantle swing (Resonator driver) — episode of the core eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q=1.8) + locked bond−hallstatt drive tone. DEFAULT ON since the JOINT-world flip (2026-07-23): fitted JOINTLY with the 4 flags (dt-corrections-fit.js --joint; anchors USNO 86400.0014 / deltaTStart 56.05 moved with the coefficients, Espenak RMS 12.60 s). doc 104 §6/§8; constants + rationale near the Jose4 block
-let   REPORT_TIMING_ENABLED       = false;  // Per-phase timing lines during Days/Years/Precession report — flip to false to silence — see runYearAnalysisExport (~L40133)
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
 const earthtiltMean = 23.41353942374053;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
@@ -28507,12 +28506,19 @@ o.perihelionDate = `${pInit.date} ${pInit.time}`;
 // the setupGUI() call so the const isn't in temporal dead zone when the folder's
 // _solarEclRefresh() runs at GUI construction time.
 // JD values are time of greatest eclipse in UT. The 8 modern/landmark entries
-// are computed from NASA SE-Canon UT times via calToJD. The 17 ancient entries
+// are computed from NASA SE-Canon UT times via calToJD. The pre-1600 entries
 // (added 2026-06) come from our Moon polynomial's predicted conjunction JD —
 // same physics used in the Historical Eclipses & ΔT analysis buttons.
-// γ is the Moon path-centerline offset (β-derived for new entries). The
+// Stale-registration audit 2026-07-23 (headless conjunction sweep vs the
+// joint-world production model): 16/18 pre-1600 entries agreed within 0.2–7
+// min; TWO were mis-registered and re-registered to the current conjunction
+// JD + β-derived γ (the convention the other 16 follow, γ = β at conjunction):
+//   1133 Aug 2 was +98.5 min late (user-spotted: England crossing ~11:40 UT,
+//   conjunction 12:03 UT), −584 Thales was −56 min early. Their old γ values
+//   (−0.243 / 0.353) matched neither JD's β — mixed-provenance registration.
+// γ is the Moon path-centerline offset (β-derived for pre-1600 entries). The
 // simulation interprets JD as TT; for visual eclipse verification, the small
-// ΔT shift (~70 sec modern, ~1500 sec at 1133 AD, ~17000 sec at 584 BC)
+// ΔT shift (~70 sec modern, ~900 sec at 1133 AD, ~17000 sec at 584 BC)
 // appears as a fraction-of-a-degree Moon offset and remains within the Meeus
 // polynomial error budget documented in doc 66.
 const ECLIPSE_PRESETS = [
@@ -28529,7 +28535,7 @@ const ECLIPSE_PRESETS = [
   // Medieval
   { jd: 2173756.000111, label: '1239 Jun 3 Total',         loc: 'Tuscany — Cerchiari chronicle',           gamma: 0.325,  era: 'Medieval' },
   { jd: 2154000.058445, label: '1185 May 1 Annular',       loc: "Russia — Igor's Tale Primary Chronicle",  gamma: 0.541,  era: 'Medieval' },
-  { jd: 2135100.070833, label: '1133 Aug 2 Total',         loc: 'England — King Henry I',                  gamma: -0.243, era: 'Medieval' },
+  { jd: 2135100.002430, label: '1133 Aug 2 Total',         loc: 'England — King Henry I',                  gamma: 0.554,  era: 'Medieval' },
   { jd: 2087792.051441, label: '1004 Jan 24 Annular',      loc: 'Cairo — Ibn Yunus famous observation',    gamma: 0.226,  era: 'Medieval' },
   { jd: 2083982.839931, label: '993 Aug 20 Annular',       loc: 'Cairo — Ibn Yunus Hakemite Tables',       gamma: 0.242,  era: 'Medieval' },
   { jd: 2081030.093891, label: '985 Jul 20 Annular',       loc: 'Cairo — Said-Stephenson catalog',         gamma: 0.284,  era: 'Medieval' },
@@ -28543,7 +28549,7 @@ const ECLIPSE_PRESETS = [
   { jd: 1608421.835171, label: '-309 Aug 15 Total',        loc: 'Babylon — Antigonus death era',           gamma: 0.348,  era: 'Ancient' },
   { jd: 1564215.113895, label: '-430 Aug 3 Annular',       loc: 'Athens — Thucydides 2.28',                gamma: 0.798,  era: 'Ancient' },
   { jd: 1518118.032841, label: '-556 May 19 Partial',      loc: 'Babylon — Nabonidus reign',               gamma: 0.307,  era: 'Ancient' },
-  { jd: 1507900.065279, label: '-584 May 28 Total',        loc: 'Anatolia — Thales predicted',             gamma: 0.353,  era: 'Ancient' },
+  { jd: 1507900.104145, label: '-584 May 28 Total',        loc: 'Anatolia — Thales predicted',             gamma: 0.331,  era: 'Ancient' },
   { jd: 1484836.848499, label: '-647 Apr 6 Partial',       loc: 'Babylon — early astronomical diary',      gamma: 0.705,  era: 'Ancient' },
   { jd: 1462658.779682, label: '-708 Jul 17 Total',        loc: 'Lu State — Chinese Spring/Autumn Annals', gamma: 0.484,  era: 'Ancient' },
   { jd: 1442902.839207, label: '-762 Jun 15 Total',        loc: 'Nineveh — Bur-Sagale Assyrian Eponym',    gamma: 0.275,  era: 'Ancient' },
@@ -42331,19 +42337,6 @@ async function runYearAnalysisExport(years) {
   let prevYear_VE = null, prevYear_SS = null, prevYear_AE = null, prevYear_WS = null;
   let prevYear_Peri = null, prevYear_Aph = null;
 
-  // ─── Report-timing instrumentation ───────────────────────────────────
-  // Toggle is `REPORT_TIMING_ENABLED` in the top-of-file A1 toggle block.
-  // When true, prints per-year phase timings + grand-total breakdown at
-  // end of collection. To remove entirely: delete the top-of-file toggle,
-  // this block, the `_perfNow` calls interleaved below, and the summary
-  // block after "Data collection complete.".
-  const _perfNow = () => REPORT_TIMING_ENABLED ? performance.now() : 0;
-  const _timingTotals = {
-    setEpoch: 0, ss: 0, ws: 0, ve: 0, ae: 0, peri: 0, aph: 0, orbital: 0
-  };
-  const _reportStart = _perfNow();
-  // ─────────────────────────────────────────────────────────────────────
-
   for (let idx = 0; idx < sortedCollectYears.length; idx++) {
     const year = sortedCollectYears[idx];
     const progress = ((idx + 1) / totalToCollect * 100).toFixed(0);
@@ -42352,25 +42345,18 @@ async function runYearAnalysisExport(years) {
       await new Promise(r => setTimeout(r, 10));
     }
 
-    // Per-year timing bucket (reset each year so lines are readable).
-    const _yr = { setEpoch: 0, ss: 0, ws: 0, ve: 0, ae: 0, peri: 0, aph: 0, orbital: 0 };
-    let _t0;
-
     // Sync deep-time globals to this iteration year so the scene calibration
     // (meansolaryearlengthinDays, meanlengthofday, planet speeds, etc.) reflects
     // this year's actual epoch. Without this, all measurements collapse onto
     // whatever sim epoch was active when the report started — making results
     // depend on starting state rather than on the iteration year.
-    _t0 = _perfNow();
     if (typeof DEEP_TIME_MODE_ENABLED !== 'undefined' && DEEP_TIME_MODE_ENABLED &&
         typeof setEpoch === 'function') {
       setEpoch(year);
     }
-    _yr.setEpoch = _perfNow() - _t0;
 
     // 1. Collect all 4 cardinal points by declination (solstice=max/min, equinox=zero-crossing)
     // After each function returns, scene is at the found JD — capture world angle for sidereal year
-    _t0 = _perfNow();
     const useSSPrev = (prevYear_SS !== null && year - prevYear_SS === 1) ? prevJD_SS : null;
     const ssResult = solsticeForYear(year, useSSPrev);
     if (ssResult) {
@@ -42379,9 +42365,7 @@ async function runYearAnalysisExport(years) {
       prevJD_SS = ssResult.jd;
       prevYear_SS = year;
     }
-    _yr.ss = _perfNow() - _t0;
 
-    _t0 = _perfNow();
     const useWSPrev = (prevYear_WS !== null && year - prevYear_WS === 1) ? prevJD_WS : null;
     const wsResult = winterSolsticeForYear(year, useWSPrev);
     if (wsResult) {
@@ -42390,9 +42374,7 @@ async function runYearAnalysisExport(years) {
       prevJD_WS = wsResult.jd;
       prevYear_WS = year;
     }
-    _yr.ws = _perfNow() - _t0;
 
-    _t0 = _perfNow();
     const useVEPrev = (prevYear_VE !== null && year - prevYear_VE === 1) ? prevJD_VE : null;
     const veResult = equinoxForYearByDec(year, 'VE', useVEPrev);
     if (veResult) {
@@ -42401,9 +42383,7 @@ async function runYearAnalysisExport(years) {
       prevJD_VE = veResult.jd;
       prevYear_VE = year;
     }
-    _yr.ve = _perfNow() - _t0;
 
-    _t0 = _perfNow();
     const useAEPrev = (prevYear_AE !== null && year - prevYear_AE === 1) ? prevJD_AE : null;
     const aeResult = equinoxForYearByDec(year, 'AE', useAEPrev);
     if (aeResult) {
@@ -42412,10 +42392,8 @@ async function runYearAnalysisExport(years) {
       prevJD_AE = aeResult.jd;
       prevYear_AE = year;
     }
-    _yr.ae = _perfNow() - _t0;
 
     // 2. Collect perihelion for this year
-    _t0 = _perfNow();
     const usePeriPrev = (prevYear_Peri !== null && year - prevYear_Peri === 1) ? prevPeriJD : null;
     const periResult = perihelionForYearMethodB(year, false, usePeriPrev);
     if (periResult) {
@@ -42423,10 +42401,8 @@ async function runYearAnalysisExport(years) {
       prevPeriJD = periResult.jd;
       prevYear_Peri = year;
     }
-    _yr.peri = _perfNow() - _t0;
 
     // 3. Collect aphelion for this year
-    _t0 = _perfNow();
     const useAphPrev = (prevYear_Aph !== null && year - prevYear_Aph === 1) ? prevAphelionJD : null;
     const aphResult = aphelionForYearMethodB(year, false, useAphPrev);
     if (aphResult) {
@@ -42434,12 +42410,10 @@ async function runYearAnalysisExport(years) {
       prevAphelionJD = aphResult.jd;
       prevYear_Aph = year;
     }
-    _yr.aph = _perfNow() - _t0;
 
     // 4. Collect orbital parameters (obliquity from SS, eccentricity at mid-year)
     // Obliquity is already captured as obliqDeg at the SS event above
     // Phase 9.2: SI tropical year for consistency with SI-anchored sDay.
-    _t0 = _perfNow();
     jumpToJulianDay(startmodelJD + (year + 0.5 - startmodelYear) * _phase9YearToJDDays());
     forceSceneUpdate();
     yearlyOrbitalParams.push({
@@ -42447,38 +42421,9 @@ async function runYearAnalysisExport(years) {
       obliquity: ssResult ? ssResult.obliqDeg : (o.obliquityEarth || 0),
       eccentricity: o.eccentricityEarth || 0
     });
-    _yr.orbital = _perfNow() - _t0;
-
-    // Roll per-year timings into totals + emit per-year line.
-    if (REPORT_TIMING_ENABLED) {
-      for (const k of Object.keys(_yr)) _timingTotals[k] += _yr[k];
-      const fmt = (v) => v.toFixed(0).padStart(5);
-      console.log(
-        `  [timing] year ${year}: setEpoch=${fmt(_yr.setEpoch)}ms  ` +
-        `SS=${fmt(_yr.ss)}ms  WS=${fmt(_yr.ws)}ms  ` +
-        `VE=${fmt(_yr.ve)}ms  AE=${fmt(_yr.ae)}ms  ` +
-        `peri=${fmt(_yr.peri)}ms  aph=${fmt(_yr.aph)}ms  ` +
-        `orbital=${fmt(_yr.orbital)}ms`
-      );
-    }
   }
 
   console.log('Data collection complete.');
-
-  // Grand-total timing breakdown (only prints when REPORT_TIMING_ENABLED).
-  if (REPORT_TIMING_ENABLED) {
-    const _reportElapsed = _perfNow() - _reportStart;
-    const _sumPhases = Object.values(_timingTotals).reduce((a, b) => a + b, 0);
-    const _overhead = _reportElapsed - _sumPhases;
-    console.log('─── Report timing grand totals ──────────────────────');
-    console.log(`  Total wall clock:  ${(_reportElapsed / 1000).toFixed(2)}s`);
-    for (const [k, v] of Object.entries(_timingTotals)) {
-      const pct = (100 * v / _reportElapsed).toFixed(1);
-      console.log(`  ${k.padEnd(10)}: ${(v / 1000).toFixed(2)}s (${pct.padStart(4)}%)`);
-    }
-    console.log(`  ${'overhead'.padEnd(10)}: ${(_overhead / 1000).toFixed(2)}s (yields, interval calc, etc.)`);
-    console.log('─────────────────────────────────────────────────────');
-  }
 
   /* D · Calculate intervals - keyed by year for correct lookup in List mode */
   // For each data type, create a Map: year -> interval (from previous year to this year)
