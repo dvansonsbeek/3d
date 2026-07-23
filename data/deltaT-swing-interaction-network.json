@@ -1,0 +1,123 @@
+{
+  "_meta": {
+    "description": "Full quadratic interaction network of the shipped 4-flag stack vs the millennial swing: per-pair forcing/gain/response table (eigenmode T0=3,900, Q=8), direct correlation of recovered excitation f(t) (inversion T0=3,850, Q=2) with total F\u00b2 and each single-pair product, and F\u00b2 extrema timing.",
+    "delta_n_locking": "726/760 and 1885/1919 pairs split by \u0394n=34 = 78,898-yr phase lock"
+  },
+  "network_table": [
+    {
+      "pair": "bond-hallstatt",
+      "dn": 726,
+      "period_yr": 3694.9531680440773,
+      "forcing_s2": 11253.802271292556,
+      "gain": 5.733640091428828,
+      "response_s2": 64525.251883695804,
+      "gain_phase_deg": -130.8453470911633
+    },
+    {
+      "pair": "bond-jose5",
+      "dn": 1159,
+      "period_yr": 2314.5263157894738,
+      "forcing_s2": 7033.626419557847,
+      "gain": 0.5401669286020164,
+      "response_s2": 3799.3323799865598,
+      "gain_phase_deg": -173.46712205066095
+    },
+    {
+      "pair": "bond-jose4",
+      "dn": 1919,
+      "period_yr": 1397.882230328296,
+      "forcing_s2": 6620.485888556694,
+      "gain": 0.14721701027172965,
+      "response_s2": 974.648139059492,
+      "gain_phase_deg": -177.0570991038136
+    },
+    {
+      "pair": "hallstatt-jose5",
+      "dn": 1885,
+      "period_yr": 1423.0960212201592,
+      "forcing_s2": 2000.0000000000005,
+      "gain": 0.15338912149822675,
+      "response_s2": 306.77824299645357,
+      "gain_phase_deg": -176.98798132486127
+    },
+    {
+      "pair": "hallstatt-jose4",
+      "dn": 2645,
+      "period_yr": 1014.1913043478261,
+      "forcing_s2": 1882.5241756223036,
+      "gain": 0.07248637630550618,
+      "response_s2": 136.4573557983711,
+      "gain_phase_deg": -178.0032592957337
+    },
+    {
+      "pair": "jose5-jose4",
+      "dn": 760,
+      "period_yr": 3529.6526315789474,
+      "forcing_s2": 1176.5776097639396,
+      "gain": 3.8389391586125168,
+      "response_s2": 4516.809859269504,
+      "gain_phase_deg": -147.97986283904746
+    }
+  ],
+  "driving_correlations": {
+    "TOTAL F\u00b2 (all interactions)": {
+      "r": 0.2175710904099055,
+      "lag_yr": 300
+    },
+    "bond\u00d7hallstatt only": {
+      "r": -0.6822349265454947,
+      "lag_yr": -130
+    },
+    "bond\u00d7jose5 only": {
+      "r": 0.497705356813806,
+      "lag_yr": 30
+    },
+    "bond\u00d7jose4 only": {
+      "r": -0.5570240014142496,
+      "lag_yr": 240
+    },
+    "hallstatt\u00d7jose5 only": {
+      "r": 0.5276522035940202,
+      "lag_yr": 300
+    },
+    "hallstatt\u00d7jose4 only": {
+      "r": 0.5453947737593507,
+      "lag_yr": -80
+    },
+    "jose5\u00d7jose4 only": {
+      "r": -0.1294387384383215,
+      "lag_yr": 300
+    }
+  },
+  "f2_extrema_in_window": [
+    [
+      -450.0,
+      54586.459794992006
+    ],
+    [
+      -90.0,
+      -27344.579330575245
+    ],
+    [
+      300.0,
+      48674.53948396979
+    ],
+    [
+      690.0,
+      -27258.486745453007
+    ],
+    [
+      990.0,
+      28265.881154584804
+    ],
+    [
+      1350.0,
+      -34853.58239186784
+    ],
+    [
+      1560.0,
+      -27159.320679088287
+    ]
+  ],
+  "verdict": "ALL FOUR cycles do participate \u2014 but cooperatively, not democratically. The dominant structure is the ~3.6-kyr BAND: bond\u2212hallstatt (3,695 yr) phase-locked with jose4\u2212jose5 (3,530 yr) via the \u0394n = 34 splitting (8H/34 = 78,898-yr lock) \u2014 together 93% of the eigenmode-weighted response, and it takes all four flags to build it. The remaining pairs are suppressed by the resonator gain (hallstatt\u00d7jose4: 0.2% of response \u2014 its earlier \"driver\" role was in-window envelope-extremum TIMING, not power). Driving-side: uniform total F\u00b2 correlates with the recovered excitation only at r = +0.22, while bond\u00d7hallstatt only reaches r = -0.68 \u2014 the coupling is selective (pair-dependent efficiency/sign), though with ~2.7 kyr of smoothed record the effective dof are few (~6) and no single-pair attribution is statistically decisive. Note the recovered FORCING correlates with products that contain sum tones (e.g. bond\u00d7hall 914 yr) while the RESPONSE contains none \u2014 exactly the resonator low-pass signature (|H| at 914 yr \u2248 0.06)."
+}

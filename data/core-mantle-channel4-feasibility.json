@@ -1,0 +1,41 @@
+{
+  "_meta": {
+    "description": "Feasibility of modeling the millennial swing as a hallstatt\u00d7jose4-driven component: route 5C (5th constant-amplitude stack cycle, phase-locked, modern-window amplitude ceiling) vs route 4F (4th force: guard-constrained transient resonator + capped drive tone).",
+    "n_diff": 2645,
+    "period_yr": 1014.1913043478261,
+    "predicted_phase_deg": 103.31226833137634,
+    "residual_rms_s": 268.78138045222954
+  },
+  "results": {
+    "route_5C_stack_cycle": {
+      "amp_ceiling_s": 18.521273161043478,
+      "amp_free_would_be_s": 58.63946203039544,
+      "amp_used_s": 18.521273161043478,
+      "rms_s": 267.0437397488285,
+      "delta_rms_s": 1.7376407034010413,
+      "guards": {
+        "modern_dlod_ms_day": 0.15586597342201708,
+        "espenak_shape_s": 3.2590582681746967,
+        "dlod_at_2000_ms_day": 0.28816492930755855,
+        "pass": false
+      }
+    },
+    "route_4F_a_persistent_tone": null,
+    "route_4F_b_fully_decaying": {
+      "rms_s": 118.84963112752921,
+      "T0_yr": 4000.0,
+      "Q": 0.55,
+      "decay_time_yr": 700.2817496043396,
+      "guards": {
+        "modern_dlod_ms_day": 0.1510265230681524,
+        "espenak_shape_s": 0.786625123297494,
+        "dlod_at_2000_ms_day": 0.0980311861046191,
+        "pass": true
+      },
+      "ringdown_amp_at_start_s": 2132.1363780393963,
+      "drive_tone_amp_at_start_s": -130.44390580881327,
+      "variant": "fully-decaying(episodic coupling)"
+    }
+  },
+  "verdict": "Route 5C is architecturally dead: the modern window caps a constant 1,014-yr tone at 19 s (free fit wants 59 s), absorbing only 2 s of RMS \u2014 a 5th stack cycle cannot carry the swing. Route 4F is FEASIBLE: a guard-passing transient resonator (T\u2080 = 4000 yr, Q = 0.55) + capped drive reaches RMS 119 s (vs 52.7 unconstrained, 269 raw) while staying quiet in the modern window and at J2000. The 4th-force architecture (transient, decaying) is the only viable implementation \u2014 as physics predicted. Shipping would require: an envelope/ring-down formalism in the runtime (new architecture), an agreed excitation epoch, and the anchor-closure design. Driving attribution to hallstatt\u00d7jose4 remains marginal (n = 2) \u2014 hold as-if status."
+}

@@ -1,0 +1,112 @@
+{
+  "_meta": {
+    "description": "Phase-locked test of the H/26 = 12,896.8-yr line: free amplitude+phase fit vs extrema pinned at the J/S-perihelion symmetric-alignment epochs (\u221231200/\u221218300/\u22125500/+7400 CE), per archive, quadratic detrend, label-permutation p95.",
+    "n": 208,
+    "period_yr": 12896.807692307691,
+    "epochs_ce": [
+      -31200,
+      -18300,
+      -5500,
+      7400
+    ],
+    "n_permutations": 500
+  },
+  "datasets": {
+    "cheng": {
+      "label": "Cheng 2016 speleothem \u03b418O (\u2030)",
+      "span_yr": 641300.0,
+      "cycles_of_P": 49.73,
+      "resolvable": true,
+      "free": {
+        "amplitude": 0.1319300852207803,
+        "phase_deg": 26.664903521205282,
+        "perm_p95": 0.04384145620642167,
+        "significant": true
+      },
+      "locked": {
+        "signed_amplitude": -0.13192774021135695,
+        "perm_p95": 0.03645109288441906,
+        "significant": true
+      },
+      "free_extremum_offset_from_epochs_yr": 3.659770728630974,
+      "retention_locked_over_free": 0.9999822253626272
+    },
+    "epica": {
+      "label": "EPICA Dome C CO2 (ppm)",
+      "span_yr": 805719.9,
+      "cycles_of_P": 62.47,
+      "resolvable": true,
+      "free": {
+        "amplitude": 15.121462518782433,
+        "phase_deg": 67.01414250776426,
+        "perm_p95": 2.8933945767907208,
+        "significant": true
+      },
+      "locked": {
+        "signed_amplitude": -12.222684987533034,
+        "perm_p95": 2.0859774131178606,
+        "significant": true
+      },
+      "free_extremum_offset_from_epochs_yr": 1449.1497033414507,
+      "retention_locked_over_free": 0.8083004519140384
+    },
+    "gisp2": {
+      "label": "GISP2 temperature (Alley 2000)",
+      "span_yr": 49885.8591,
+      "cycles_of_P": 3.87,
+      "resolvable": true,
+      "free": {
+        "amplitude": 2.29192871237273,
+        "phase_deg": -162.20736284586494,
+        "perm_p95": 0.34634395543413327,
+        "significant": true
+      },
+      "locked": {
+        "signed_amplitude": 2.2837625003931534,
+        "perm_p95": 0.2680110043801428,
+        "significant": true
+      },
+      "free_extremum_offset_from_epochs_yr": 314.1844324131307,
+      "retention_locked_over_free": 0.9964369694679017
+    },
+    "bond_stack": {
+      "label": "Bond 2001 stacked %HSG",
+      "span_yr": 11550.0,
+      "cycles_of_P": 0.9,
+      "resolvable": false,
+      "free": {
+        "amplitude": 0.3369252510797342,
+        "phase_deg": -87.92303243748606,
+        "perm_p95": 0.8394636660496976,
+        "significant": false
+      },
+      "locked": {
+        "signed_amplitude": 0.10831860936995323,
+        "perm_p95": 0.6341448527495089,
+        "significant": false
+      },
+      "free_extremum_offset_from_epochs_yr": 2347.0120226666113,
+      "retention_locked_over_free": 0.3214915148770472
+    },
+    "steinhilber": {
+      "label": "Steinhilber 2012 solar \u03a6 (MV)",
+      "span_yr": 9416.0,
+      "cycles_of_P": 0.73,
+      "resolvable": false,
+      "free": {
+        "amplitude": 14.679928785306045,
+        "phase_deg": -4.866133651420741,
+        "perm_p95": 21.827504497099802,
+        "significant": false
+      },
+      "locked": {
+        "signed_amplitude": -13.12410283211705,
+        "perm_p95": 15.810697412806377,
+        "significant": false
+      },
+      "free_extremum_offset_from_epochs_yr": 1125.9227924779334,
+      "retention_locked_over_free": 0.8940167915019923
+    }
+  },
+  "verdict": "Among resolvable archives (cheng, epica, gisp2): free fit significant in 3/3, phase-LOCKED fit significant in 3/3. The 12.9-kyr line survives with its extrema pinned at the J/S-perihelion alignment epochs \u2014 the alignment phase is consistent with the archive phase within the retention factors shown. Period alone still cannot separate this clock from semi-precession; the phase agreement is the new information. CAVEATS (see docstring addendum): distributed pattern only \u2014 no event-like anomalies at the epochs; EPICA partially termination-aliased; extremum comb degenerate with the perihelion-solstice (semi-precession) comb to ~295 yr."
+}

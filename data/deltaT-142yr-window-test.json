@@ -1,0 +1,75 @@
+{
+  "_meta": {
+    "description": "Identity test of the ~14.2-yr peak from L-5b \u00a77: weighted amplitude scan of the 270-observation eclipse residual (production chain) vs the spectral window of the observation epochs, P = 5..30 yr.",
+    "n_observations": 267,
+    "weighted_rms_s": 1315.9644658959598,
+    "physical_ceiling_s": 0.12381711631376593
+  },
+  "amplitude_peaks": [
+    {
+      "period_yr": 5.45,
+      "value": 575.335
+    },
+    {
+      "period_yr": 8.15,
+      "value": 521.569
+    },
+    {
+      "period_yr": 14.15,
+      "value": 591.703
+    },
+    {
+      "period_yr": 17.4,
+      "value": 612.675
+    },
+    {
+      "period_yr": 24.75,
+      "value": 395.211
+    },
+    {
+      "period_yr": 28.75,
+      "value": 305.094
+    }
+  ],
+  "window_peaks": [
+    {
+      "period_yr": 7.9,
+      "value": 0.283
+    },
+    {
+      "period_yr": 14.3,
+      "value": 0.242
+    },
+    {
+      "period_yr": 18.3,
+      "value": 0.159
+    },
+    {
+      "period_yr": 21.3,
+      "value": 0.195
+    },
+    {
+      "period_yr": 25.15,
+      "value": 0.195
+    },
+    {
+      "period_yr": 28.75,
+      "value": 0.172
+    }
+  ],
+  "markers": {
+    "14.2": {
+      "amp_s": 539.1,
+      "window": 0.166
+    },
+    "13.6": {
+      "amp_s": 387.1,
+      "window": 0.158
+    },
+    "18.6": {
+      "amp_s": 186.9,
+      "window": 0.034
+    }
+  },
+  "verdict": "SAMPLING-WINDOW ARTIFACT. The fitted 14.2-yr amplitude (~540-590 s) exceeds the physical ceiling of any real decadal LOD line (~0.12 s) by four orders of magnitude, and the observation epochs' own spectral window peaks at 14.30 yr (2nd-strongest window structure, part of a ~7.15-yr harmonic comb \u2248 the 88-lunation eclipse cycle). The peak is a property of WHEN eclipses were recorded, not of Earth rotation \u2014 which is also why it passed subset robustness checks (all subsets share the catalog cadence). The literature 13.5-13.6-yr core mode (Hsu 2021; Ding & Jiang 2024) is real physics but undetectable at ancient timing noise; no framework component is warranted."
+}

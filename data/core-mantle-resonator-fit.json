@@ -1,0 +1,52 @@
+{
+  "_meta": {
+    "description": "Core-mantle formula candidates fitted to the millennial swing: B0 rectifier (k, tau), A1 rectifier->resonator steady state (k, T0, Q), A2 free ring-down (T0, Q, a, b). Guards: modern-window dLOD <= 0.2 ms/day, Espenak shape <= 5 s, |dLOD(2000)| <= 0.1 ms/day. External validation: axiMC eigenmode range (Dumberry, Gerick & Gillet 2025).",
+    "residual_rms_s": 268.78138045222954,
+    "rectifier_amp_ratio_predicted": 5.9780386446152285,
+    "two_tone_amp_ratio_observed": 5.12987012987013
+  },
+  "results": {
+    "B0_rectifier": {
+      "rms_s": 258.31814478409143,
+      "tau_yr": 100.0,
+      "k_per_s": 0.0024794482483669607,
+      "guards": {
+        "modern_dlod_ms_day": 0.8095133389330205,
+        "espenak_shape_s": 10.700350735200377,
+        "dlod_at_2000_ms_day": 0.9547615138211385,
+        "pass": false
+      }
+    },
+    "A1_rectifier_resonator": {
+      "rms_s": 66.16130421178804,
+      "T0_yr": 3900.0,
+      "Q": 8.0,
+      "k_per_s": -0.0067709559992385395,
+      "guards": {
+        "modern_dlod_ms_day": 1.753932299626989,
+        "espenak_shape_s": 1.564331064238213,
+        "dlod_at_2000_ms_day": 1.9678296755120008,
+        "pass": false
+      },
+      "aximc_range": true
+    },
+    "A2_ring_down": {
+      "rms_s": 52.693366161284715,
+      "T0_yr": 3800.0,
+      "Q": 1.75,
+      "amplitude_at_minus720_s": 605.3309257331001,
+      "cos_sin": [
+        201.7573140514661,
+        -570.7184208308245
+      ],
+      "guards": {
+        "modern_dlod_ms_day": 0.7593090615777588,
+        "espenak_shape_s": 0.22453119123688822,
+        "dlod_at_2000_ms_day": 0.7579144859813499,
+        "pass": false
+      },
+      "aximc_range": true
+    }
+  },
+  "verdict": "Best in-window fits: A1 66 s (T0=3900, Q=8.0), A2 53 s (T0=3800, Q=1.8), B0 258 s. Guard-passing: NONE. No variant passes the modern-window guards \u2014 steady-state responses inherit the constant-amplitude veto, and the ring-down alone cannot both fit the ancient window and stay quiet today. The formula needs episodic re-excitation (time-varying forcing efficiency), which is beyond a 3-parameter law. The swing stays a documented research finding (doc 104 \u00a78)."
+}

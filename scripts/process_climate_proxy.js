@@ -4,8 +4,8 @@
 // a compact JSON file for the LOD-Climate Rhythm modal.
 //
 // Inputs:
-//   public/input/proxy/gisp2-alley2000-raw.txt   — Greenland ice-core temperature
-//   public/input/proxy/bond2001-raw.txt          — North Atlantic drift-ice stack
+//   data/gisp2-alley2000-raw.txt   — Greenland ice-core temperature
+//   data/bond2001-raw.txt          — North Atlantic drift-ice stack
 //
 // Output:
 //   public/input/climate-proxy.json — { sources: [{name, unit, range, data:[[year,T],…]}] }
@@ -24,7 +24,7 @@ const path = require('path');
 
 function loadGisp2() {
   const raw = fs.readFileSync(
-    path.join(__dirname, '..', 'public', 'input', 'proxy', 'gisp2-alley2000-raw.txt'),
+    path.join(__dirname, '..', 'data', 'gisp2-alley2000-raw.txt'),
     'utf8'
   );
   const lines = raw.split('\n');
@@ -110,7 +110,7 @@ function loadGisp2() {
 
 function loadBond2001() {
   const raw = fs.readFileSync(
-    path.join(__dirname, '..', 'public', 'input', 'proxy', 'bond2001-raw.txt'),
+    path.join(__dirname, '..', 'data', 'bond2001-raw.txt'),
     'utf8'
   );
   const lines = raw.split('\n');
@@ -150,8 +150,8 @@ const output = {
   _meta: {
     generator: 'scripts/process_climate_proxy.js',
     source_files: [
-      'public/input/proxy/gisp2-alley2000-raw.txt',
-      'public/input/proxy/bond2001-raw.txt',
+      'data/gisp2-alley2000-raw.txt',
+      'data/bond2001-raw.txt',
     ],
     note: 'Compact proxy JSON for LOD-Climate Rhythm modal. All series expressed with "positive = warm anomaly" convention (GISP2 is already a temperature anomaly; Bond 2001 IRD is NEGATED because raw IRD is inversely related to warmth).',
   },

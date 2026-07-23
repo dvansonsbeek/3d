@@ -1,0 +1,158 @@
+{
+  "_meta": {
+    "description": "Holocene phase-lock test: Bond 2001 IRD events vs CFF core-flow \u0394LOD episodes vs the 8H/1830 clock. Formulated as a falsifiable prediction 2026-07-22; tested (and failed) the same week, before publication.",
+    "period_tested_yr": 1465.8666666666666
+  },
+  "bond": {
+    "stack_events_bp": {
+      "0": 420.0,
+      "2": 2870.0,
+      "3": 4060.0,
+      "4": 6230.0,
+      "5": 8470.0,
+      "6": 9380.0,
+      "7": 10290.0,
+      "8": 11340.0
+    },
+    "canonical_events_bp": {
+      "0": 400,
+      "1": 1400,
+      "2": 2800,
+      "3": 4200,
+      "4": 5900,
+      "5": 8100,
+      "6": 9400,
+      "7": 10300,
+      "8": 11100
+    },
+    "rayleigh_stack_events": {
+      "R": 0.15748124974346597,
+      "n": 8,
+      "p_approx": 0.8200395139293486
+    },
+    "rayleigh_canonical": {
+      "R": 0.17711007292916106,
+      "n": 9,
+      "p_approx": 0.7540385376061913
+    },
+    "spectrum_top": [
+      {
+        "period_yr": 1000,
+        "r2": 0.1814
+      },
+      {
+        "period_yr": 2460,
+        "r2": 0.1276
+      },
+      {
+        "period_yr": 2210,
+        "r2": 0.1067
+      },
+      {
+        "period_yr": 2710,
+        "r2": 0.0941
+      },
+      {
+        "period_yr": 890,
+        "r2": 0.0711
+      }
+    ],
+    "power_at_1466": 0.0455686410116799
+  },
+  "core_and_cross": {
+    "cff_mp": {
+      "episodes_ce": [
+        -6790.0,
+        -6360.0,
+        -6040.0,
+        -5440.0,
+        -5050.0,
+        -4440.0,
+        -3970.0,
+        -2930.0,
+        -2320.0,
+        -1810.0,
+        -1470.0,
+        -650.0,
+        890.0,
+        1410.0
+      ],
+      "rayleigh_episodes": {
+        "R": 0.08493423232869393,
+        "n": 14,
+        "p_approx": 0.9039388781897961
+      },
+      "spectrum_top": [
+        {
+          "period_yr": 3020,
+          "r2": 0.2665
+        },
+        {
+          "period_yr": 3330,
+          "r2": 0.2167
+        },
+        {
+          "period_yr": 4000,
+          "r2": 0.183
+        },
+        {
+          "period_yr": 2710,
+          "r2": 0.1825
+        },
+        {
+          "period_yr": 1040,
+          "r2": 0.1315
+        }
+      ],
+      "power_at_1466": 0.0038820981374466657,
+      "cross_r_lag0": -0.09168341697799083,
+      "cross_r_max": 0.3416140332333016,
+      "cross_lag_at_max": -1000,
+      "null_p95": 0.48497059370003753,
+      "null_p99": 0.537245204392104,
+      "significant": false
+    },
+    "cff_nt": {
+      "episodes_ce": [
+        -6570.0,
+        -2260.0,
+        -370.0
+      ],
+      "rayleigh_episodes": {
+        "R": 0.7170331240425095,
+        "n": 3,
+        "p_approx": 0.21386517135368577
+      },
+      "spectrum_top": [
+        {
+          "period_yr": 3100,
+          "r2": 0.1385
+        },
+        {
+          "period_yr": 4000,
+          "r2": 0.1102
+        },
+        {
+          "period_yr": 3420,
+          "r2": 0.1095
+        },
+        {
+          "period_yr": 2780,
+          "r2": 0.0799
+        },
+        {
+          "period_yr": 2050,
+          "r2": 0.0193
+        }
+      ],
+      "power_at_1466": 0.006770985705378041,
+      "cross_r_lag0": 0.1320987499689455,
+      "cross_r_max": 0.13241964010312862,
+      "cross_lag_at_max": 10,
+      "null_p95": 0.383705698308587,
+      "null_p99": 0.4787541897472222,
+      "significant": false
+    }
+  },
+  "verdict": "NO PHASE-LOCK \u2014 the prediction fails at every level and the mainstream expectation holds. (a) Bond events are quasi-periodic, not 1,466-yr-clocked (Rayleigh p ~ 0.6-0.8; stack spectrum peaks at ~1,000 and ~2,450 yr, reproducing Obrochta 2012). (b) Core-flow \u0394LOD episodes show no 1,466-yr Rayleigh lock and the CFF spectrum has essentially no power at 1,466 yr. (c) No significant millennial-band cross-coherence between core-flow \u0394LOD and Bond IRD within \u00b11,000-yr lags. The 8H/1830 flag remains what the eclipse window shows it to be \u2014 the periodic part of the millennial LOD fluctuation over the last 2.7 kyr \u2014 not a Holocene-wide shared clock. Caveat: CFF posterior \u03c3 (~2 ms) limits power before ~2000 BCE; a future higher-resolution flow model could reopen the test."
+}

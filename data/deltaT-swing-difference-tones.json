@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "description": "Difference-tone (intermodulation) analysis of the millennial rotation swing: lattice closure under beats, blind two-tone scan, forced (726,2645) fit, zero-parameter phase test, sum-tone suppression.",
+    "residual_rms_s": 268.78138045222954
+  },
+  "difference_tones_dn": {
+    "bond-hallstatt": 726,
+    "bond-jose5": 1159,
+    "bond-jose4": 1919,
+    "hallstatt-jose5": 1885,
+    "hallstatt-jose4": 2645,
+    "jose5-jose4": 760
+  },
+  "blind_scan_best": {
+    "n1": 700,
+    "n2": 2575,
+    "rms_s": 34.51041474273128
+  },
+  "forced_pair": {
+    "ns": [
+      726,
+      2645
+    ],
+    "rms_s": 38.28599699725066,
+    "amps_s": [
+      394.93751430708863,
+      77.3253184298295
+    ],
+    "modern_dlod_ms_day": 1.4741421738395257,
+    "espenak_shape_s": 14.853146828377577
+  },
+  "phase_tests": {
+    "726": {
+      "fitted_deg": -75.99731341160792,
+      "predicted_deg": -26.4486043406896,
+      "mismatch_deg": -49.548709070918335,
+      "mismatch_yr": 508.55599876134454
+    },
+    "2645": {
+      "fitted_deg": 125.41626108340084,
+      "predicted_deg": 103.31226833137634,
+      "mismatch_deg": 22.10399275202451,
+      "mismatch_yr": 62.27132566797397
+    }
+  },
+  "sum_tones": {
+    "2934": {
+      "label": "bond+hallstatt (914 yr)",
+      "amp_s": 8.559264874289614
+    },
+    "4853": {
+      "label": "hallstatt+jose4 (553 yr)",
+      "amp_s": 9.392036681202251
+    },
+    "4819": {
+      "label": "bond+jose5 (557 yr)",
+      "amp_s": 10.189939320021683
+    },
+    "5579": {
+      "label": "bond+jose4 (481 yr)",
+      "amp_s": 24.79311225486407
+    }
+  },
+  "sum_tone_noise_floor_s": 14.62662813700379,
+  "verdict": "The swing is representable, in-window, as the shipped stack's own two dominant difference tones (8H/726 = 3,695 yr and 8H/2645 = 1,014 yr; ~98% of variance; the blind pair scan selects the same tones; the 1,014-yr phase matches the zero-parameter quadratic-mixing prediction within 22\u00b0 = 62 yr, the window-degenerate 3,695-yr tone within 50\u00b0). Sum tones are absent \u2192 low-pass rectification. Constant amplitudes are vetoed by the modern window \u2192 the tones must decay, matching the low-Q (1-10) axisymmetric Magneto-Coriolis eigenmodes of Dumberry, Gerick & Gillet 2025 (gravest period ~3,000 yr) \u2014 the core as a damped resonator, episodically re-excited, whose clock information comes from the lattice beat structure. Research finding only: shipping requires a decay-envelope formalism the harmonic-only architecture lacks."
+}

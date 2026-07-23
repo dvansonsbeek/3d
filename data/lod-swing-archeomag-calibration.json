@@ -1,0 +1,109 @@
+{
+  "_meta": {
+    "description": "Archeomagnetic calibration test of the millennial rotation swing. A: same-lineage consistency vs Kiani Shahvandi 2024 observed LOD residual (Zenodo 13885017). B: independent test vs Rivera 2026 SHAWQ-flow \u0394LOD predictions (data/rivera2026-fig9a-digitized.json), raw + band-filtered (~0.5-2.5 kyr) lead-time scans.",
+    "swing_sigma_yr": 300,
+    "band_sigmas_yr": [
+      120,
+      500
+    ],
+    "delta_t_start": 65.92372934570098
+  },
+  "A_observed_vs_decomposition": {
+    "stack_only": 0.8389210087127742,
+    "swing_only": 0.370473531133559,
+    "stack_plus_swing": 0.9065634447705909
+  },
+  "B_rivera_leadscans": {
+    "PT": {
+      "raw": {
+        "vs_observed_control": {
+          "r_at_lead0": -0.08881612718901112,
+          "r_max": 0.39123813048139505,
+          "lead_yr_at_max": 270
+        },
+        "vs_stack_plus_swing": {
+          "r_at_lead0": 0.01721945959745034,
+          "r_max": 0.2914675331346196,
+          "lead_yr_at_max": 260
+        },
+        "vs_stack_only": {
+          "r_at_lead0": 0.03309548214072725,
+          "r_max": 0.25893423734018167,
+          "lead_yr_at_max": 270
+        },
+        "vs_swing_only": {
+          "r_at_lead0": -0.04321667501278192,
+          "r_max": 0.15152697175191923,
+          "lead_yr_at_max": 250
+        }
+      },
+      "band_filtered": {
+        "vs_observed_control": {
+          "r_at_lead0": -0.02537467779977075,
+          "r_max": 0.6205143893897185,
+          "lead_yr_at_max": 280
+        },
+        "vs_stack_plus_swing": {
+          "r_at_lead0": 0.12774705748195894,
+          "r_max": 0.4752573948955717,
+          "lead_yr_at_max": 210
+        },
+        "vs_stack_only": {
+          "r_at_lead0": 0.09377996549389388,
+          "r_max": 0.38613768952502014,
+          "lead_yr_at_max": 170
+        }
+      }
+    },
+    "TG": {
+      "raw": {
+        "vs_observed_control": {
+          "r_at_lead0": -0.1517423954858699,
+          "r_max": 0.41013171746210375,
+          "lead_yr_at_max": 350
+        },
+        "vs_stack_plus_swing": {
+          "r_at_lead0": -0.03373468539269463,
+          "r_max": 0.3572061494019381,
+          "lead_yr_at_max": 500
+        },
+        "vs_stack_only": {
+          "r_at_lead0": -0.019379258564703815,
+          "r_max": 0.324234086836596,
+          "lead_yr_at_max": 500
+        },
+        "vs_swing_only": {
+          "r_at_lead0": -0.04845313501599082,
+          "r_max": 0.2489271304667579,
+          "lead_yr_at_max": 330
+        }
+      },
+      "band_filtered": {
+        "vs_observed_control": {
+          "r_at_lead0": -0.08856143232440442,
+          "r_max": 0.633197020141084,
+          "lead_yr_at_max": 340
+        },
+        "vs_stack_plus_swing": {
+          "r_at_lead0": 0.07876888999902817,
+          "r_max": 0.5207953116982289,
+          "lead_yr_at_max": 380
+        },
+        "vs_stack_only": {
+          "r_at_lead0": 0.052399067207870714,
+          "r_max": 0.44444875952535096,
+          "lead_yr_at_max": 500
+        }
+      }
+    }
+  },
+  "band_control_r_max": [
+    0.6205143893897185,
+    0.633197020141084
+  ],
+  "band_ours_r_max": [
+    0.4752573948955717,
+    0.5207953116982289
+  ],
+  "verdict": "CONFIRMATION, NOT CALIBRATION: the independent archeomagnetic predictions correlate with our stack+swing almost as strongly as with the observed record itself, and adding the swing improves every comparison \u2014 the swing is independently CONFIRMED as core-mantle physics. But raw-curve agreement is only ~0.4 and requires a fitted ~300-yr phase lead (a known archeomagnetic systematic), so deriving stack amplitudes/phases from these flows would degrade the eclipse fit. Zero-eclipse-fit via archeomagnetic calibration is not achievable at current field-model quality."
+}
