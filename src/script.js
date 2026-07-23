@@ -6235,10 +6235,15 @@ function findLunarEclipsesInRange(jdStart, jdEnd) {
 
   // Compute classification thresholds (in degrees) for a given Moon distance D.
   // Returns {moonR, umbraR, penumbraR, totalMax, partialMax, penumMax}.
+  // Shadow radii carry the standard ~2% atmospheric enlargement (Danjon rule /
+  // Chauvenet's 1/50, as used by the NASA Lunar Canon and Meeus Ch. 54) — the
+  // pure geometric shadow under-classifies borderline events (e.g. 2021-05-26:
+  // geometric umbral magnitude 0.961 "Partial" vs NASA 1.009 Total).
+  const SHADOW_ENLARGEMENT = 1.02;
   const _shadowGeometry = (D_MOON_KM) => {
     const moonR   = Math.atan(R_MOON_KM / D_MOON_KM) * _rad2deg;
-    const umbraR  = Math.atan((R_EARTH_KM - D_MOON_KM * Math.tan(umbraApex_rad))    / D_MOON_KM) * _rad2deg;
-    const penumR  = Math.atan((R_EARTH_KM + D_MOON_KM * Math.tan(penumbraApex_rad)) / D_MOON_KM) * _rad2deg;
+    const umbraR  = Math.atan((R_EARTH_KM - D_MOON_KM * Math.tan(umbraApex_rad))    / D_MOON_KM) * _rad2deg * SHADOW_ENLARGEMENT;
+    const penumR  = Math.atan((R_EARTH_KM + D_MOON_KM * Math.tan(penumbraApex_rad)) / D_MOON_KM) * _rad2deg * SHADOW_ENLARGEMENT;
     return {
       moonR, umbraR, penumR,
       totalMax:   umbraR - moonR,
@@ -30726,7 +30731,9 @@ function setupGUI() {
   // eclipse. In TT-space, the astronomical event is ΔT-independent — so
   // any time difference here is purely a Moon polynomial residual.
   //
-  // Also reports our ΔT vs NASA's ΔT (which uses Stephenson) for context.
+  // Also reports our ΔT vs NASA's canon ΔT (Morrison-Stephenson 2004 — the
+  // older reference, NOT Stephenson 2016; the two disagree by ~100-300 s at
+  // these epochs) for context.
   // ────────────────────────────────────────────────────────────────────────
   const firstEclipseBtn = addTestButton('NASA catalog cross-check (Moon polynomial validation)', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
@@ -30881,23 +30888,31 @@ function setupGUI() {
       const maxTT = Math.max(...TT_diffs.map(Math.abs));
       console.log(`TT-space agreement (our Moon polynomial vs NASA catalog):`);
       console.log(`  mean |TT diff| = ${meanAbs(TT_diffs).toFixed(1)} min,  min ${minTT.toFixed(1)} min,  max ${maxTT.toFixed(1)} min`);
-      console.log(`  → If max < ~10 min, our Moon polynomial agrees with NASA's reference within Meeus accuracy.`);
+      console.log(`  → If max < ~15 min (Meeus accuracy + the up-to-~10-min conjunction-vs-greatest`);
+      console.log(`    offset at high |γ|), our Moon polynomial agrees with NASA's reference — the published claim.`);
       console.log(`  → If max > 30 min, the polynomial drifts; if max > hours, there's a real bug.`);
     }
     if (dT_diffs.length > 0) {
       const meanDt = mean(dT_diffs);
       console.log('');
-      console.log(`ΔT difference (our pure-tidal − NASA Stephenson):`);
+      console.log(`ΔT difference (our production ΔT − NASA canon ΔT, Morrison-Stephenson 2004):`);
       console.log(`  mean = ${Math.round(meanDt)} s,   typical sign: ${meanDt > 0 ? 'OURS HIGHER (over-predicts)' : 'OURS LOWER (under-predicts)'}`);
       console.log(`  Note: this gap is the difference between the two ΔT models — orthogonal to Moon physics.`);
+      console.log(`  NASA's canon ΔT is the OLDER Morrison-Stephenson 2004 polynomial, NOT Stephenson 2016 —`);
+      console.log(`  the two references themselves disagree by ~100-300 s at these epochs (cf. L-5b §13),`);
+      console.log(`  so this column overstates our gap vs Stephenson 2016 (L-5b §2 landmarks: ~40-60 s).`);
     }
     console.log('');
     console.log('Interpretation:');
     console.log(' • Column "TT diff" is THE clean Moon-polynomial test. NASA computed greatest');
     console.log('   eclipse TD using JPL ephemeris (essentially exact for this purpose).');
     console.log('   Our model uses Meeus Ch. 47 polynomial → expected accuracy ~few minutes.');
-    console.log(' • Column "ΔT diff" measures how much our pure-tidal ΔT differs from Stephenson.');
-    console.log('   This is the entire substance of the "pure-tidal vs empirical" question.');
+    console.log(' • Definitional offset included in "TT diff": we compute the ECLIPTIC CONJUNCTION');
+    console.log('   instant, NASA publishes GREATEST ECLIPSE — these differ by up to ~10 min at');
+    console.log('   high |γ| (largest for partials, e.g. the "Partial only" row). The true');
+    console.log('   polynomial residual is therefore SMALLER than the raw column suggests.');
+    console.log(' • Column "ΔT diff" measures how much our production ΔT differs from NASA MS-2004.');
+    console.log('   This is the entire substance of the "framework vs empirical" question.');
     console.log(' • If TT diff is small (✓) and ΔT diff is small (✓): both models agree.');
     console.log(' • If TT diff is small (✓) and ΔT diff is large (≠): Moon physics is right,');
     console.log('   models genuinely disagree on Earth rotation history — substantive question.');
@@ -30909,38 +30924,42 @@ function setupGUI() {
      'residual is purely a Moon polynomial discrepancy. Definitively validates whether our ' +
      'Moon physics agrees with the standard astronomical reference.');
 
-  addTestButton('Verify ΔT at historical epochs', () => {
-    // Dumps our Architecture α ΔT value at multiple epochs alongside
-    // published reference values. Helps identify whether our LOD-evolution
-    // model is over- or under-predicting ΔT.
-    console.log('\n══════════════════════════════════════════════════════════');
-    console.log('  ΔT comparison: our Architecture α vs published references');
-    console.log('══════════════════════════════════════════════════════════');
-    console.log('Year         Ours(s)    Stephenson(s)   NASA-FMC(s)   Holistic(s)');
-    const epochs = [
-      { year: 2000, t_Ma: 0,        stephenson: 0,      nasa: 64,    holistic: null },
-      { year: 1900, t_Ma: 0.0001,   stephenson: 0,      nasa: -3,    holistic: null },
-      { year: 1500, t_Ma: 0.0005,   stephenson: 130,    nasa: 180,   holistic: null },
-      { year: 1000, t_Ma: 0.001,    stephenson: 1570,   nasa: 1571,  holistic: null },
-      { year: 0,    t_Ma: 0.002,    stephenson: 10583,  nasa: 10583, holistic: null },
-      { year: -500, t_Ma: 0.0025,   stephenson: 16800,  nasa: 16800, holistic: null },
-      { year: -584, t_Ma: 0.002584, stephenson: null,   nasa: 16128, holistic: 23412 },
-      { year: -1000,t_Ma: 0.003,    stephenson: 25400,  nasa: 25400, holistic: null },
-    ];
-    const fmt = (v) => v === null ? '       -' : String(Math.round(v)).padStart(9);
-    for (const e of epochs) {
-      const ours = meanDeltaTSecondsAtAge(e.t_Ma);
-      const oursStr = Number.isFinite(ours) ? Math.round(ours).toString().padStart(9) : '    NaN';
-      console.log(String(e.year).padEnd(8) + oursStr + fmt(e.stephenson) + fmt(e.nasa) + fmt(e.holistic));
+  addTestButton('Verify ΔT at historical epochs', async () => {
+    // Compares our production ΔT (J2000-relative trend convention) to the two
+    // LIVE reference polynomials — no hardcoded reference values:
+    //   • Stephenson 2016 spline (stephenson-2016-deltaT-polynomial.json, −720..2016)
+    //   • NASA Espenak/Meeus polynomial (Morrison-Stephenson 2004 lineage)
+    // References are ABSOLUTE (TT−UT); ours is J2000-relative — the Ours(abs)
+    // column adds deltaTStart (trend anchor) for the like-for-like comparison.
+    const poly = await loadStephensonDtPolynomial();
+    console.log('\n══════════════════════════════════════════════════════════════════════════════');
+    console.log('  ΔT comparison: production model vs LIVE references (Stephenson 2016 + Espenak/MS2004)');
+    console.log('══════════════════════════════════════════════════════════════════════════════');
+    console.log('Year       Ours(rel)  Ours(abs)  Steph2016  Espenak/MS04  abs−Steph  abs−Esp');
+    const years = [2000, 1900, 1700, 1500, 1000, 500, 0, -500, -584, -720, -1000];
+    const fmt = (v) => (v === null || !Number.isFinite(v)) ? '        -' : String(Math.round(v)).padStart(9);
+    for (const year of years) {
+      const t_Ma = (2000 - year) / 1e6;
+      const rel  = meanDeltaTSecondsAtAge(t_Ma);
+      const abs  = Number.isFinite(rel) ? rel + deltaTStart : null;
+      const st   = poly ? stephensonDeltaT(year, poly) : null;
+      const esp  = deltaTEspenakMeeusRaw(year);
+      const dSt  = (abs !== null && st !== null) ? abs - st : null;
+      const dEsp = (abs !== null && Number.isFinite(esp)) ? abs - esp : null;
+      console.log(String(year).padEnd(9) + fmt(rel) + fmt(abs) + '  ' + fmt(st) + '     ' + fmt(esp) + fmt(dSt) + fmt(dEsp));
     }
-    console.log();
-    // Stephenson empirical: ΔT(t) ≈ 32 × ((year-1820)/100)² seconds for ancient
-    console.log('Stephenson empirical fit: ΔT ≈ 32 × ((year-1820)/100)² seconds');
-    console.log('Note: at year -584, Stephenson formula gives 32 × 24.04² = 18,493 s');
-    console.log('══════════════════════════════════════════════════════════');
-  }, 'Compare our Architecture α ΔT at historical epochs to Stephenson 1997 ' +
-     'and NASA Five Millennium Canon values. Identifies whether our LOD model ' +
-     'over- or under-predicts ΔT.');
+    console.log('');
+    console.log('Conventions: Ours(rel) = meanDeltaTSecondsAtAge (0 at J2000 by construction);');
+    console.log(`  Ours(abs) = rel + deltaTStart (${deltaTStart.toFixed(2)} s trend anchor) — compare THIS to the references.`);
+    console.log('Stephenson 2016 spline is defined −720..2016 ("-" outside its range). Espenak/MS2004');
+    console.log('  is the NASA-canon lineage. The two references disagree with EACH OTHER by');
+    console.log('  ~100-300 s at deep epochs (L-5b §13) — read our residual against that spread.');
+    console.log('Context parabola: ΔT ≈ 32 × ((year−1820)/100)² s (Stephenson long-term fit).');
+    console.log('══════════════════════════════════════════════════════════════════════════════');
+  }, 'Compare our production ΔT (converted to absolute via deltaTStart) against the LIVE ' +
+     'Stephenson 2016 spline and NASA Espenak/Meeus (MS-2004) polynomial at 11 epochs — ' +
+     'no hardcoded reference values. Identifies over/under-prediction per era; read the ' +
+     'residual columns against the ~100-300 s inter-reference disagreement.');
 
   addTestButton('ΔT Breakdown (H/5 physics vs Bond stack)', () => {
     console.log('\n══════════════════════════════════════════════════════════');
@@ -30995,7 +31014,8 @@ function setupGUI() {
       const j4   = JOSE4_DT_CORRECTION_ENABLED     ? jose4CycleDeltaTCorrection(yr)     : 0;
       const swing = RESONATOR_DT_CORRECTION_ENABLED ? resonatorSwingDeltaTCorrection(yr) : 0;
       const total = deltaTStart + integ + bond + hall + j5 + j4 + swing;
-      const espenak = deltaTEspenakMeeusRaw(yr);
+      const espenakRaw = deltaTEspenakMeeusRaw(yr);
+      const espenak = Number.isFinite(espenakRaw) ? espenakRaw : '—';
       rows.push([yr, deltaTStart, integ, bond, hall, j5, j4, swing, total, espenak]);
     }
     // Pretty-print
@@ -31016,298 +31036,39 @@ function setupGUI() {
     console.log('  LOD + ΔT DIAGNOSTIC — breakdown by year');
     console.log('══════════════════════════════════════════════════════════');
     console.log('LOD display = L1+L2 (meanLodSecondsAtAge): physics via mass-loss + year-specific α from L1 orbital.');
-    console.log('L3 cyclic derivatives shown for reference (NOT in LOD; they are ΔT-residual corrections added');
-    console.log('POST-integration to meanDeltaTSecondsAtAge). Framework anchors ΔT(J2000) = 0.');
-    console.log('Observed (Espenak/Meeus): ΔT(1815)=13.4s, ΔT(1902)=0s, ΔT(2000)=63.87s.');
-    console.log('  → Framework-convention observed: shift by −63.87 (relative to 2000):');
-    console.log('    ΔT_obs_framework(1815) ≈ −50.5 s,  ΔT_obs_framework(1902) ≈ −63.87 s,  ΔT_obs_framework(2000) = 0');
+    console.log('Cyclic δLOD contributions shown for reference (NOT in the L1+L2 LOD; they are ΔT-residual');
+    console.log('corrections added POST-integration to meanDeltaTSecondsAtAge). Framework anchors ΔT(J2000) = 0.');
+    console.log('Observed reference = LIVE Espenak/Meeus polynomial (absolute TT−UT); framework absolute');
+    console.log(`ΔT = rel + deltaTStart (${deltaTStart.toFixed(2)} s) — the same convention as "Verify ΔT at historical epochs".`);
     console.log();
     const years = [1815, 1902, 2000];
     const rows = years.map(y => diagnoseLodLayers(y));
     console.log('\n──────────────────────────────────────────────────────────');
     console.log('  SUMMARY');
     console.log('──────────────────────────────────────────────────────────');
-    console.log(' Year | LOD (s)          | ΔT_int_only (s) | ΔT_cyc (s) | ΔT_framework (s) | ΔT_observed_fw (s) | Δ (fw − obs)');
-    const obsFw = { 1815: -50.5, 1902: -63.87, 2000: 0 };
+    console.log(' Year | LOD (s)          | ΔT_int_only (s) | ΔT_cyc (s) | ΔT_fw_abs (s) | Espenak (s) | Δ (fw − Esp)');
     for (const r of rows) {
       const lod  = r.L12.toFixed(9).padStart(15);
       const iOnly = (r.dtIntegrationOnly !== null ? r.dtIntegrationOnly.toFixed(3) : 'null').padStart(10);
       const cyc  = r.cyclicAcc.toFixed(3).padStart(9);
-      const fwT  = (r.dtFrameworkTotal !== null ? r.dtFrameworkTotal.toFixed(3) : 'null').padStart(10);
-      const obs  = obsFw[r.year].toFixed(2).padStart(10);
-      const diff = (r.dtFrameworkTotal !== null ? (r.dtFrameworkTotal - obsFw[r.year]).toFixed(3) : 'null').padStart(10);
-      console.log(` ${String(r.year).padStart(5)} | ${lod} | ${iOnly}      | ${cyc}   | ${fwT}       | ${obs}         | ${diff}`);
+      const abs  = (r.dtFrameworkTotal !== null ? r.dtFrameworkTotal + deltaTStart : null);
+      const esp  = deltaTEspenakMeeusRaw(r.year);
+      const fwT  = (abs !== null ? abs.toFixed(3) : 'null').padStart(10);
+      const obs  = (Number.isFinite(esp) ? esp.toFixed(2) : '—').padStart(10);
+      const diff = (abs !== null && Number.isFinite(esp) ? (abs - esp).toFixed(3) : '—').padStart(10);
+      console.log(` ${String(r.year).padStart(5)} | ${lod} | ${iOnly}      | ${cyc}   | ${fwT}    | ${obs}  | ${diff}`);
     }
     console.log('\nSLOPE ANALYSIS: 1815 → 2000');
     const r1815 = rows[0], r2000 = rows[2];
+    const espSlope = deltaTEspenakMeeusRaw(2000) - deltaTEspenakMeeusRaw(1815);
     console.log(`  ΔLOD (L1+L2):                      ${((r2000.L12 - r1815.L12) * 1000).toFixed(4)} ms`);
-    console.log(`  Δ(framework ΔT):                   ${(r2000.dtFrameworkTotal - r1815.dtFrameworkTotal).toFixed(3)} s (should match observed +50.5 s)`);
-    console.log(`  Δ(observed ΔT):                    50.5 s`);
+    console.log(`  Δ(framework ΔT):                   ${(r2000.dtFrameworkTotal - r1815.dtFrameworkTotal).toFixed(3)} s`);
+    console.log(`  Δ(observed Espenak ΔT):            ${espSlope.toFixed(3)} s  (framework slope should match)`);
     console.log('══════════════════════════════════════════════════════════');
-  }, 'Print full LOD + ΔT breakdown at 1815, 1902, 2000 vs observed values. LOD = L1+L2 physics ' +
-     '(meanLodSecondsAtAge). Framework ΔT = LOD integration + 4-cycle accumulated post-corrections. ' +
-     'Compare to Espenak/Meeus observed ΔT curve (shifted to framework J2000-anchor convention).');
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Toggle: Bond-scale ΔT correction (Option B research toggle)
-  //
-  // Default ON as part of the 4-flag stack + Core-mantle swing (joint world). Adds the gcd-compliant 8H
-  // integer-divisor harmonic at n=1830 (= 74 × Jupiter-Saturn synodic =
-  // 1465.87 yr, gcd(1830,H)=61 shares H's 61 prime) as a post-integration
-  // ΔT correction, anchored to 0 at J2000 so the framework's LOD physics
-  // is untouched. Amplitude/phase from the eclipse-residual fit
-  // (data/deltaT-1830-residual-fit.json) — enabling this VIOLATES THE
-  // PAPER'S "zero coefficients fitted to eclipse data" claim. Kept as a
-  // research toggle to A/B measure the correction's effect.
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Toggle 8H/1830 ΔT correction (74×J-S synodic; violates zero-fit if ON)', () => {
-    BOND_DT_CORRECTION_ENABLED = !BOND_DT_CORRECTION_ENABLED;
-    // Clear the ΔT cache so all callers see the new state
-    _DELTA_T_CACHE.clear();
-    console.log('\n══════════════════════════════════════════════════════════════════');
-    console.log(`  8H/1830 ΔT correction is now: ${BOND_DT_CORRECTION_ENABLED ? 'ENABLED (research toggle only; not for paper claims)' : 'DISABLED'}`);
-    console.log('══════════════════════════════════════════════════════════════════');
-    if (BOND_DT_CORRECTION_ENABLED) {
-      console.log('  • Lattice harmonic 8H/1830 = ' + BOND_PERIOD_YR.toFixed(3) + ' yr');
-      console.log('  • gcd(1830, H) = 61 shares H\'s 61 prime factor (1830 = 2·3·5·61)');
-      console.log('  • Structural interpretation: 74 × Jupiter-Saturn synodic (0.22% error)');
-      console.log('    Also: 124 × Jupiter orbit (0.32%), 50 × Saturn orbit (0.47%)');
-      console.log('    Canonical Bond 1997 paleoclimate period 1470 yr is 4 yr off.');
-      console.log('  • Amplitude ~375 s peak; anchored to 0 at J2000 (LOD untouched)');
-      console.log('  • Cyclic-correction taper: full strength ±300 kyr from J2000, zero beyond ±400 kyr');
-      console.log('  • VIOLATES paper\'s zero-fit claim: coefficients fitted to Stephenson residual.');
-      console.log('  • Kept as a research toggle only — do not commit to paper claim without');
-      console.log('    independent amplitude/phase calibration from paleoclimate proxy.');
-    } else {
-      console.log('  Correction disabled — remaining flags + Core-mantle swing still active.');
-      console.log('  ⚠ Joint world: all five components are fitted in ONE solve — with any one');
-      console.log('    OFF the USNO J2000 closure breaks (only the TOTAL is anchor-clean).');
-    }
-    console.log('  ');
-    console.log('  Preserved invariants (both states):');
-    console.log('   • meanLodSecondsAtAge(0) = ' + meanlengthofday.toFixed(6) + ' s (H/13 anchor)');
-    console.log('   • meanDeltaTSecondsAtAge(0) = 0 s        (J2000 ΔT anchor)');
-    console.log('  ');
-    console.log('  Suggested follow-up:');
-    console.log('   • Re-run "L-5b LUNAR: primary observations + full residual investigation"');
-    console.log('     with ON, then OFF, compare medieval residual and Path A/Test 5 verdicts');
-    console.log('   • Sanity check: window._L5b.records[i].res_model should shrink dramatically');
-    console.log('     in the medieval window when ON');
-    console.log('   • Raw eval at J2000: ' + BOND_DT_RAW_AT_J2000.toFixed(2) + ' s');
-    console.log('     (subtracted by construction so ΔT(J2000) = 0 either way)');
-    // Sanity: confirm the LOD anchor still holds under toggle.
-    const lod_J2000 = meanLodSecondsAtAge(0);
-    const dt_J2000  = meanDeltaTSecondsAtAge(0);
-    console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
-    console.log('══════════════════════════════════════════════════════════════════');
-  }, 'Feature flag for the 8H/1830 ΔT correction (74 × J-S synodic = 1465.87 yr lattice harmonic; gcd=61). ' +
-     'Default ON. When ON, adds ~±375 s correction to ΔT in the Holocene window; the ' +
-     'medieval bump reduces dramatically (in-sample R² = 0.975 vs Stephenson residual). Kept as a ' +
-     'research toggle only — the amplitude/phase are fitted to eclipse data and therefore ' +
-     'violate the paper\'s zero-fit claim. Compare L-5b results ON vs OFF to measure effect.');
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Toggle: Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research)
-  //
-  // ON by default (4-flag stack). Structurally the sixth harmonic of the framework's 23-
-  // factor period H/23 (H = 23·61·239), so 8H/1104 shares H's 23 factor via
-  // gcd(1104, H) = 23. Coincides with the well-established Hallstatt cycle
-  // (~2200-2500 yr) in cosmogenic isotope records. Empirical validation on
-  // 2026-07-11: Steinhilber solar Φ shows R² = 0.058 at 8H/1104; EPICA CO₂
-  // shows R² = 0.037; Cheng speleothem shows R² < 0.001 (null result).
-  // Amplitude constrained to 80 s (physically defensible; free ΔT fit gave
-  // 256 s but with partial Bond collinearity). Same cyclic-correction taper as Bond.
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Toggle 8H/1104 Hallstatt ΔT correction (H/138 = 2430 yr; violates zero-fit if ON)', () => {
-    HALLSTATT_DT_CORRECTION_ENABLED = !HALLSTATT_DT_CORRECTION_ENABLED;
-    _DELTA_T_CACHE.clear();
-    console.log('\n══════════════════════════════════════════════════════════════════');
-    console.log(`  8H/1104 Hallstatt ΔT correction is now: ${HALLSTATT_DT_CORRECTION_ENABLED ? 'ENABLED (research toggle only)' : 'DISABLED (default)'}`);
-    console.log('══════════════════════════════════════════════════════════════════');
-    if (HALLSTATT_DT_CORRECTION_ENABLED) {
-      console.log('  • Lattice harmonic 8H/1104 = ' + HALLSTATT_PERIOD_YR.toFixed(3) + ' yr = H/138');
-      console.log('  • Structural interpretation: gcd(1104, H) = 23 shares H\'s 23 prime factor');
-      console.log('    Framework H/23 = 14,579 yr; H/138 = H/(6·23) is its sixth harmonic');
-      console.log('  • Matches Hallstatt cycle (Damon & Sonett 1991; Steinhilber 2012)');
-      console.log('  • Amplitude 80 s (constrained physical prior; free fit gave 256 s with Bond collinearity)');
-      console.log('  • Cyclic-correction taper: full strength ±300 kyr from J2000, zero beyond ±400 kyr');
-      console.log('  • VIOLATES paper\'s zero-fit claim: coefficients fitted to Stephenson residual.');
-    } else {
-      console.log('  Correction disabled — remaining flags + Core-mantle swing still active.');
-      console.log('  ⚠ Joint world: all five components are fitted in ONE solve — with any one');
-      console.log('    OFF the USNO J2000 closure breaks (only the TOTAL is anchor-clean).');
-    }
-    console.log('  ');
-    console.log('  Preserved invariants (both states):');
-    console.log('   • meanLodSecondsAtAge(0) = ' + meanlengthofday.toFixed(6) + ' s (H/13 anchor)');
-    console.log('   • meanDeltaTSecondsAtAge(0) = 0 s        (J2000 ΔT anchor)');
-    console.log('  • Raw eval at J2000: ' + HALLSTATT_DT_RAW_AT_J2000.toFixed(2) + ' s');
-    console.log('    (subtracted by construction so ΔT(J2000) = 0 either way)');
-    console.log('  • Compatibility with Bond flag: independent — either, both, or neither can be ON');
-    console.log('    Current state: Bond = ' + (BOND_DT_CORRECTION_ENABLED ? 'ON' : 'OFF') + ', Hallstatt = ' + (HALLSTATT_DT_CORRECTION_ENABLED ? 'ON' : 'OFF'));
-    const lod_J2000 = meanLodSecondsAtAge(0);
-    const dt_J2000  = meanDeltaTSecondsAtAge(0);
-    console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
-    console.log('══════════════════════════════════════════════════════════════════');
-  }, 'Feature flag for the 8H/1104 Hallstatt ΔT correction (2430 yr H-lattice harmonic). ON by ' +
-     'default (4-flag stack, joint world). Adds up to ±80 s modulation in the Holocene window; toggling OFF breaks the USNO closure. Structurally on-lattice ' +
-     'via H\'s 23 prime factor; matches the ~2400-yr solar Hallstatt cycle. Kept as a research ' +
-     'toggle: amplitude constrained but fitted to eclipse data, therefore violates the paper\'s ' +
-     'zero-fit claim. Compare eclipse-audit results Hallstatt ON vs OFF, and joint with Bond, to ' +
-     'measure marginal contribution.');
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Toggle: Jose5 8H/2989 ≈ 897 yr ΔT correction (research)
-  //
-  // ON by default (4-flag stack). Divisor 2989 = 7²·61 satisfies the gcd rule via H's 61
-  // prime factor (H = 23·61·239). Physical interpretation: 5 × Jose period
-  // (5 × 179 yr = 895 yr, 0.28% offset) or 45 × Jupiter-Saturn synodic
-  // (0.45%). Identified by L-5b Section 14 as the STRONGEST remaining 8H
-  // divisor signal after Bond in the lunar-eclipse residual (ΔR² = 0.0026,
-  // amp ~70 s at empirical). Amplitude constrained to 50 s (below both the
-  // L-5b empirical 70 s and the triple-fit 74 s) to reduce Hallstatt-Jose5
-  // collinearity when both are enabled.
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Toggle 8H/2989 Jose5 ΔT correction (~897 yr; violates zero-fit if ON)', () => {
-    JOSE5_DT_CORRECTION_ENABLED = !JOSE5_DT_CORRECTION_ENABLED;
-    _DELTA_T_CACHE.clear();
-    console.log('\n══════════════════════════════════════════════════════════════════');
-    console.log(`  8H/2989 Jose5 ΔT correction is now: ${JOSE5_DT_CORRECTION_ENABLED ? 'ENABLED (research toggle only)' : 'DISABLED (default)'}`);
-    console.log('══════════════════════════════════════════════════════════════════');
-    if (JOSE5_DT_CORRECTION_ENABLED) {
-      console.log('  • Lattice harmonic 8H/2989 = ' + JOSE5_PERIOD_YR.toFixed(3) + ' yr');
-      console.log('  • Structural: 2989 = 7²·61, gcd(2989, H) = 61 (shares H\'s 61 prime)');
-      console.log('  • Physical: 5 × Jose 179 yr (0.28% offset) or 45 × J-S synodic (0.45% offset)');
-      console.log('  • Empirical: L-5b Section 14 found this as strongest 8H residual peak after Bond');
-      console.log('  • Amplitude 50 s (constrained; L-5b empirical 70 s, triple-fit 74 s)');
-      console.log('  • Cyclic-correction taper: full strength ±300 kyr from J2000, zero beyond ±400 kyr');
-      console.log('  • VIOLATES paper\'s zero-fit claim: coefficients from Stephenson residual fit.');
-    } else {
-      console.log('  Correction disabled — remaining flags + Core-mantle swing still active.');
-      console.log('  ⚠ Joint world: all five components are fitted in ONE solve — with any one');
-      console.log('    OFF the USNO J2000 closure breaks (only the TOTAL is anchor-clean).');
-    }
-    console.log('  ');
-    console.log('  Preserved invariants (both states):');
-    console.log('   • meanLodSecondsAtAge(0) = ' + meanlengthofday.toFixed(6) + ' s (H/13 anchor)');
-    console.log('   • meanDeltaTSecondsAtAge(0) = 0 s        (J2000 ΔT anchor)');
-    console.log('  • Raw eval at J2000: ' + JOSE5_DT_RAW_AT_J2000.toFixed(2) + ' s');
-    console.log('    (subtracted by construction so ΔT(J2000) = 0 either way)');
-    console.log('  • Compatibility: independent of Bond and Hallstatt flags — 8 total states');
-    console.log('    Current: Bond=' + (BOND_DT_CORRECTION_ENABLED?'ON':'OFF') + ', Hallstatt=' + (HALLSTATT_DT_CORRECTION_ENABLED?'ON':'OFF') + ', Jose5=' + (JOSE5_DT_CORRECTION_ENABLED?'ON':'OFF'));
-    console.log('  ⚠ Collinearity note: enabling Jose5 alongside Hallstatt inflates Hallstatt\'s');
-    console.log('    apparent amplitude (256 s → 422 s in triple free-fit). Constrained coefficients');
-    console.log('    here mitigate but don\'t eliminate the joint-effect distortion.');
-    const lod_J2000 = meanLodSecondsAtAge(0);
-    const dt_J2000  = meanDeltaTSecondsAtAge(0);
-    console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
-    console.log('══════════════════════════════════════════════════════════════════');
-  }, 'Feature flag for the 8H/2989 Jose5 ΔT correction (~897 yr, 5×Jose 179 or 45×J-S synodic). ON ' +
-     'by default (4-flag stack, joint world). Adds up to ±50 s modulation; toggling OFF breaks the USNO closure. Structurally on-lattice via H\'s 61 prime ' +
-     'factor. Identified by L-5b Section 14 as strongest remaining 8H residual peak after Bond. ' +
-     'Research toggle only — same zero-fit-claim violation as Bond and Hallstatt.');
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Toggle: Jose4 8H/3749 ≈ 715.5 yr ΔT correction (research)
-  //
-  // ON by default. Divisor 3749 = 23 × 163 satisfies the gcd rule via H's 23
-  // prime factor (H = 23·61·239). Physical interpretation: 4 × Jose period
-  // (4 × 179 yr = 716 yr, 0.08% match — the tightest structural anchor of
-  // any 600-800 yr candidate). Empirically supported by cross-archive
-  // coherence: scripts/lattice_harmonic_scan.py identifies 8H/3749 as
-  // significant in BOTH Steinhilber solar Φ (~41 MV, permutation p<5%) AND
-  // EPICA CO2 (~11 ppm, permutation p<5%). The ONLY Jose-multiple with this
-  // two-archive coherence. Also degenerate with Bond/2 ≈ 733 yr at ~2.5%
-  // level; the 4×Jose anchor is tighter so we ship on the SIM interpretation.
-  //
-  // L-5b impact: adding Jose4 to the 3-flag stack drops the ΔT-residual RMS
-  // from 19.4 s (Stage C: Bond+Hallstatt+Jose5) to 13.9 s (Stage D: 4-flag),
-  // a 28% reduction targeted at the MWP-band gap around year 990. Amplitude
-  // kept at free-fit 35.3 s (below the 50-s prior — no cap applied).
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Toggle 8H/3749 Jose4 ΔT correction (~716 yr, 4×Jose; violates zero-fit if ON)', () => {
-    JOSE4_DT_CORRECTION_ENABLED = !JOSE4_DT_CORRECTION_ENABLED;
-    _DELTA_T_CACHE.clear();
-    console.log('\n══════════════════════════════════════════════════════════════════');
-    console.log(`  8H/3749 Jose4 ΔT correction is now: ${JOSE4_DT_CORRECTION_ENABLED ? 'ENABLED (research toggle only)' : 'DISABLED (default)'}`);
-    console.log('══════════════════════════════════════════════════════════════════');
-    if (JOSE4_DT_CORRECTION_ENABLED) {
-      console.log('  • Lattice harmonic 8H/3749 = ' + JOSE4_PERIOD_YR.toFixed(3) + ' yr');
-      console.log('  • Structural: 3749 = 23 × 163, gcd(3749, H) = 23 (shares H\'s 23 prime)');
-      console.log('  • Physical: 4 × Jose 179 yr (0.08% match — tightest 600-800 yr anchor)');
-      console.log('  • Empirical: cross-archive coherence in Steinhilber Φ + EPICA CO2 (p<5%)');
-      console.log('    (scripts/lattice_harmonic_scan.py --preset jose-family)');
-      console.log('  • Amplitude 35.3 s (free-fit; below 50-s prior so no cap applied)');
-      console.log('  • Cyclic-correction taper: full strength ±300 kyr from J2000, zero beyond ±400 kyr');
-      console.log('  • VIOLATES paper\'s zero-fit claim: coefficients from Stephenson residual fit.');
-    } else {
-      console.log('  Correction disabled — Bond + Hallstatt + Jose5 + Core-mantle swing still active.');
-      console.log('  ⚠ Joint world: all five components are fitted in ONE solve — with any one');
-      console.log('    OFF the USNO J2000 closure breaks (only the TOTAL is anchor-clean).');
-    }
-    console.log('  ');
-    console.log('  Preserved invariants (both states):');
-    console.log('   • meanLodSecondsAtAge(0) = ' + meanlengthofday.toFixed(6) + ' s (H/13 anchor)');
-    console.log('   • meanDeltaTSecondsAtAge(0) = 0 s        (J2000 ΔT anchor)');
-    console.log('  • Raw eval at J2000: ' + JOSE4_DT_RAW_AT_J2000.toFixed(2) + ' s');
-    console.log('    (subtracted by construction so ΔT(J2000) = 0 either way)');
-    console.log('  • Compatibility: independent of the other flags — 32 total states incl. the Core-mantle swing toggle');
-    console.log('    Current: Bond=' + (BOND_DT_CORRECTION_ENABLED?'ON':'OFF') + ', Hallstatt=' + (HALLSTATT_DT_CORRECTION_ENABLED?'ON':'OFF') + ', Jose5=' + (JOSE5_DT_CORRECTION_ENABLED?'ON':'OFF') + ', Jose4=' + (JOSE4_DT_CORRECTION_ENABLED?'ON':'OFF'));
-    console.log('  ⚠ Degeneracy note: Jose4 is empirically indistinguishable from Bond/2 ≈ 733 yr');
-    console.log('    at the current record length. The 4×Jose anchor is tighter (0.08% vs 2.5%),');
-    console.log('    but Bond/2 is a competing interpretation that would produce a similar signal.');
-    const lod_J2000 = meanLodSecondsAtAge(0);
-    const dt_J2000  = meanDeltaTSecondsAtAge(0);
-    console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
-    console.log('══════════════════════════════════════════════════════════════════');
-  }, 'Feature flag for the 8H/3749 Jose4 ΔT correction (~716 yr, 4×Jose SIM sub-harmonic). ' +
-     'ON by default as the 4th flag of the ΔT stack. When ON, adds up to ±35 s modulation ' +
-     'targeted at the MWP-band residual around year 990. Structurally on-lattice via H\'s 23 ' +
-     'prime factor. Cross-archive coherent in Steinhilber Φ + EPICA CO2 (independent evidence ' +
-     'from two proxies). Same zero-fit-claim violation as Bond/Hallstatt/Jose5. Degenerate with ' +
-     'Bond/2 ≈ 733 yr at present record length.');
-
-  // ────────────────────────────────────────────────────────────────────────
-  // CORE-MANTLE SWING (Resonator driver) toggle — 5th ΔT component, NEW
-  // functional class: 2-kick EPISODE (windowed damped oscillation), not a
-  // constant-amplitude harmonic. DEFAULT OFF pending Stage 3 validation.
-  // Fitted by scripts/core_mantle_resonator_stage1.py (V5, physical-
-  // consistency rule); constants near the Jose4 block; docs/104 §6/§8.
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Toggle Core-mantle swing ΔT episode (Resonator driver; default ON — joint world)', () => {
-    RESONATOR_DT_CORRECTION_ENABLED = !RESONATOR_DT_CORRECTION_ENABLED;
-    _DELTA_T_CACHE.clear();
-    console.log('\n══════════════════════════════════════════════════════════════════');
-    console.log(`  Core-mantle swing (Resonator) episode is now: ${RESONATOR_DT_CORRECTION_ENABLED ? 'ENABLED (default — joint world)' : 'DISABLED (research state: breaks the USNO closure — the joint-world anchors assume this component)'}`);
-    console.log('══════════════════════════════════════════════════════════════════');
-    if (RESONATOR_DT_CORRECTION_ENABLED) {
-      console.log('  • NEW functional class: 2-kick EPISODE (windowed damped oscillation)');
-      console.log('  • Eigenmode: T₀ = 8H/' + RES_T0_LATTICE_N + ' = ' + RES_T0_YR.toFixed(1) + ' yr, Q = ' + RES_Q + ' (published axiMC range; lattice-labeled for H(t) clock coherence with the driving cycles)');
-      console.log('  • Kicks: excitation ' + RES_KICKS[0].t + ' CE, termination counter-kick +' + RES_KICKS[1].t + ' CE');
-      console.log('  • Drive tone: bond−hallstatt 8H/726 = 3,695 yr, phase LOCKED (φ_b − φ_h)');
-      console.log('  • Exactly 0 before ' + RES_KICKS[0].t + '; component δLOD(2000) ≈ +0.63 ms/day');
-      console.log('  • JOINT world: fitted with the 4 flags in one solve (dt-corrections-fit.js --joint);');
-      console.log('    Espenak RMS 12.60 s, full-window 31.3 s, USNO closure exact on the TOTAL.');
-      console.log('  • Impulse-consistent: sin-only kicks (displacement-continuous); termination');
-      console.log('    counter-kick small (−75 s vs 760-s excitation) — medieval shutdown mostly');
-      console.log('    carried by damping + flag interference (doc 104 §6 "The shipped form").');
-      console.log('  • VIOLATES paper\'s zero-fit claim: amplitudes from Stephenson residual fit.');
-    } else {
-      console.log('  ⚠ RESEARCH STATE: the joint-world flag coefficients + anchors (USNO');
-      console.log('    86400.0014, deltaTStart 56.05) assume this component — with it OFF the');
-      console.log('    Layer-4 LOD misses the USNO anchor by its δLOD(2000) ≈ 0.63 ms/day.');
-    }
-    const lod_J2000 = meanLodSecondsAtAge(0);
-    const dt_J2000  = meanDeltaTSecondsAtAge(0);
-    console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
-    console.log('══════════════════════════════════════════════════════════════════');
-  }, 'Feature flag for the Core-mantle swing episode (Resonator driver — the 4th physical ' +
-     'dLOD/dt channel: Tidal / GIA / All cycles / Resonator). A windowed damped ' +
-     'oscillation of the core\'s eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q = 1.8) + locked bond−hallstatt ' +
-     'drive tone, modeling the millennial rotation swing (turnaround ~900 CE, doc 104). ' +
-     'DEFAULT ON since the joint-world flip: fitted jointly with the flags, USNO closure ' +
-     'exact on the total. Turning it OFF is a research state that breaks the anchors. ' +
-     'Exactly zero before −800 and at deep time; ΔT(J2000) = 0 preserved by construction.');
+  }, 'Print full LOD + ΔT breakdown at 1815, 1902, 2000 vs the LIVE Espenak/Meeus polynomial. ' +
+     'LOD = L1+L2 physics (meanLodSecondsAtAge). Framework ΔT = LOD integration + 4-flag + ' +
+     'Core-mantle-swing accumulated post-corrections; compared in ABSOLUTE convention ' +
+     '(rel + deltaTStart), same as "Verify ΔT at historical epochs".');
 
   // ────────────────────────────────────────────────────────────────────────
   // Sun position diagnostic — scene vs Meeus
@@ -31421,238 +31182,6 @@ function setupGUI() {
      'J2000 to -762 BCE. Decomposes the error into Sun-ecliptic-position component ' +
      '(Δ(lat)) and Earth-rotation/ΔT component (Δ(lon)); the ΔT-rotation reference ' +
      'column shows what ΔT would contribute if double-applied to Earth\'s spin.');
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Sun ecl_lon harmonic scan — samples scene Sun ecliptic longitude at
-  // many epochs (past + future), compares to Meeus Ch. 25, fits the drift
-  // pattern to candidate H-lattice periods to identify the missing harmonic
-  // that explains the observed deep-time Sun/planet-orbit-center offset.
-  // The scene's Sun is framework-native via moveModel (no overlay); scan reads it directly.
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Sun ecl_lon harmonic scan (find missing period)', () => {
-    console.log('\n══════════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Sun ecliptic longitude — framework scene vs Meeus Ch. 25');
-    console.log('  Purpose: characterize framework Sun\'s deviation from Meeus across deep time.');
-    console.log('  Sampling: Jun-15 12:00 UT at each epoch.');
-    console.log('══════════════════════════════════════════════════════════════════════════════════════');
-
-    const _d2r = Math.PI / 180;
-    const _r2d = 180 / Math.PI;
-    // Range chosen so Meeus's cumulative T² term keeps |Δ| < 180° everywhere —
-    // otherwise `delta -= 360` aliasing scrambles the signal. Empirically
-    // k ≈ -5.5e-4 °/Jcy² → safe zone is |T| < √(180/5.5e-4) ≈ 572 Jcy → ±57 kyr.
-    // ±50 kyr with 2.5-kyr steps (41 samples) gives fine resolution to distinguish:
-    //   H/3 = 112 kyr  — 45% cycle at ±50 kyr, clearest signature
-    //   405 kyr Laskar — 12% cycle, curvature diverges from T² noticeably
-    //   H = 335 kyr    — 15% cycle
-    // 8H = 2.68 Myr is NOT distinguishable at this range (2% cycle) but is
-    // testable by comparing k in this scan vs the prior ±20 kyr scan — if k
-    // is the same, drift is more polynomial-like; if k shrinks, drift is
-    // saturating (indicative of a long period).
-    const YEARS_START = -50000, YEARS_END = 50000, STEP = 2500;   // 41 samples
-    const MONTH = 6, DAY = 15, HOUR = 12;
-
-    function _jdFromYMD(Y, M, D, hour) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D - 1524.5 + hour / 24;
-    }
-
-    const _saveJD = o.julianDay;
-    const samples = [];
-
-    try {
-      for (let Y = YEARS_START; Y <= YEARS_END; Y += STEP) {
-        const jd = _jdFromYMD(Y, MONTH, DAY, HOUR);
-        jumpToJulianDay(jd);
-        forceSceneUpdate('light');
-
-        // Scene Sun ecl_lon: (sun.ra, sun.dec) → λ using framework ε.
-        // sun.dec is phi-from-+Z-pole convention → δ_true = π/2 − sun.dec.
-        const _alpha = sun.ra;
-        const _delta = Math.PI / 2 - sun.dec;
-        const _eps = o.obliquityEarth * _d2r;
-        let sceneLam = Math.atan2(
-          Math.sin(_alpha) * Math.cos(_eps) + Math.tan(_delta) * Math.sin(_eps),
-          Math.cos(_alpha)
-        ) * _r2d;
-        sceneLam = ((sceneLam % 360) + 360) % 360;
-
-        const meeusLam = _eclSunLon(jd);
-        let delta = sceneLam - meeusLam;
-        while (delta >  180) delta -= 360;
-        while (delta < -180) delta += 360;
-
-        const T = (jd - j2000JD) / 36525;   // Julian centuries from J2000
-        samples.push({ Y, jd, T, sceneLam, meeusLam, delta });
-      }
-    } finally {
-      jumpToJulianDay(_saveJD);
-      forceSceneUpdate('light');
-    }
-
-    // ── Aliasing check: if Δ jumps by >150° between adjacent samples, we
-    //    are in mod-360° wrap-around territory and the fits are meaningless.
-    let aliasingDetected = false;
-    for (let i = 1; i < samples.length; i++) {
-      if (Math.abs(samples[i].delta - samples[i - 1].delta) > 150) {
-        aliasingDetected = true;
-        break;
-      }
-    }
-    if (aliasingDetected) {
-      console.warn('  ⚠ WARNING: Δ jumps > 150° between adjacent samples — the sampling range');
-      console.warn('    is too wide, Meeus\'s T² term wraps mod 360° between steps, and the fits');
-      console.warn('    below are meaningless. Reduce the range constants at the top of this button.');
-      console.log('');
-    }
-
-    // ── Table of raw samples ────────────────────────────────────────────
-    console.log('  Year         T(Jcy)   Scene λ      Meeus λ      Δ(scene−Meeus)');
-    console.log('  ─────────────────────────────────────────────────────────────────');
-    for (const s of samples) {
-      const yr   = String(s.Y).padStart(8);
-      const T    = s.T.toFixed(3).padStart(8);
-      const sc   = s.sceneLam.toFixed(4).padStart(9);
-      const me   = s.meeusLam.toFixed(4).padStart(9);
-      const dSgn = s.delta >= 0 ? '+' : '';
-      const dStr = (dSgn + s.delta.toFixed(4)).padStart(9);
-      console.log(`  ${yr}   ${T}   ${sc}°   ${me}°   ${dStr}°`);
-    }
-    console.log('  ─────────────────────────────────────────────────────────────────');
-
-    // ── Candidate-period fits ───────────────────────────────────────────
-    // Each period: least-squares fit Δ_i ≈ A cos(2π yr_i / P) + B sin(2π yr_i / P)
-    // where yr_i = T_i × 100. Reports amplitude √(A²+B²) and RMS residual.
-    const H = holisticyearLength;
-    const candidates = [
-      { name: 'H/16 (peri.-cycle)',   P: H / 16 },
-      { name: 'H/13 (gen. prec.)',    P: H / 13 },
-      { name: 'H/8  (obliquity)',     P: H / 8  },
-      { name: 'H/5  (ecl. prec.)',    P: H / 5  },
-      { name: 'H/3  (inclination)',   P: H / 3  },
-      { name: 'H/2',                  P: H / 2  },
-      { name: 'H    (Fundamental)',   P: H      },
-      { name: '2H',                   P: 2 * H  },
-      { name: '8H   (Resonance)',     P: 8 * H  },
-      { name: '405 kyr (Laskar)',     P: 405000 },
-      { name: '8H/1825 (Bond ~1470)', P: 8 * H / 1825 },
-    ];
-
-    console.log('');
-    console.log('  Candidate periods — least-squares 2-parameter (A cos + B sin) fit:');
-    console.log('  ─────────────────────────────────────────────────────────────────');
-    console.log('  Period                    P (yr)        Amp (°)   Phase (°)   RMS residual (°)');
-    console.log('  ─────────────────────────────────────────────────────────────────');
-    const fits = [];
-    for (const c of candidates) {
-      let sumCC = 0, sumSS = 0, sumCS = 0, sumDC = 0, sumDS = 0;
-      for (const s of samples) {
-        const w = 2 * Math.PI * (s.T * 100) / c.P;
-        const cw = Math.cos(w), sw = Math.sin(w);
-        sumCC += cw * cw; sumSS += sw * sw; sumCS += cw * sw;
-        sumDC += s.delta * cw; sumDS += s.delta * sw;
-      }
-      const det = sumCC * sumSS - sumCS * sumCS;
-      const A = det !== 0 ? (sumSS * sumDC - sumCS * sumDS) / det : 0;
-      const B = det !== 0 ? (sumCC * sumDS - sumCS * sumDC) / det : 0;
-      const amp   = Math.sqrt(A * A + B * B);
-      const phase = Math.atan2(B, A) * _r2d;
-      let sq = 0;
-      for (const s of samples) {
-        const w = 2 * Math.PI * (s.T * 100) / c.P;
-        const fit = A * Math.cos(w) + B * Math.sin(w);
-        sq += (s.delta - fit) * (s.delta - fit);
-      }
-      const rms = Math.sqrt(sq / samples.length);
-      fits.push({ name: c.name, P: c.P, A, B, amp, phase, rms });
-      console.log(`  ${c.name.padEnd(24)}  ${c.P.toFixed(0).padStart(8)}   ${amp.toFixed(4).padStart(7)}   ${phase.toFixed(1).padStart(7)}     ${rms.toFixed(4).padStart(8)}`);
-    }
-
-    // Baseline reference: T² polynomial (Meeus's own model)
-    let sumT4 = 0, sumT2D = 0;
-    for (const s of samples) { sumT4 += Math.pow(s.T, 4); sumT2D += s.T * s.T * s.delta; }
-    const kT2 = sumT4 > 0 ? sumT2D / sumT4 : 0;
-    let sqT2 = 0;
-    for (const s of samples) { const f = kT2 * s.T * s.T; sqT2 += (s.delta - f) * (s.delta - f); }
-    const rmsT2 = Math.sqrt(sqT2 / samples.length);
-    console.log(`  T² polynomial (Δ=k·T²)     —          k=${kT2.toExponential(3)}     —         ${rmsT2.toFixed(4).padStart(8)}`);
-    console.log('  ─────────────────────────────────────────────────────────────────');
-
-    // ── Higher-order polynomial fit: Δ = a·T² + b·T³ + c·T⁴ ───────────
-    // The T² coefficient drifted from ±20 kyr to ±50 kyr scans (-5.51e-4 → -6.42e-4),
-    // meaning pure T² doesn't fit the whole shape. Adding T³ (asymmetry) and T⁴
-    // (quartic acceleration) via a 3-parameter least-squares fit exposes those
-    // higher-order contributions. Cramer's rule solves the 3×3 normal-eqs system.
-    let S22=0, S23=0, S24=0, S33=0, S34=0, S44=0, R2=0, R3=0, R4=0;
-    for (const s of samples) {
-      const t2 = s.T*s.T, t3 = t2*s.T, t4 = t3*s.T;
-      S22 += t2*t2;  S23 += t2*t3;  S24 += t2*t4;
-      S33 += t3*t3;  S34 += t3*t4;
-      S44 += t4*t4;
-      R2 += t2*s.delta;  R3 += t3*s.delta;  R4 += t4*s.delta;
-    }
-    const _det3 = (m) =>
-        m[0][0]*(m[1][1]*m[2][2] - m[1][2]*m[2][1])
-      - m[0][1]*(m[1][0]*m[2][2] - m[1][2]*m[2][0])
-      + m[0][2]*(m[1][0]*m[2][1] - m[1][1]*m[2][0]);
-    const M0 = [[S22, S23, S24], [S23, S33, S34], [S24, S34, S44]];
-    const D  = _det3(M0);
-    const Ma = [[R2, S23, S24], [R3, S33, S34], [R4, S34, S44]];
-    const Mb = [[S22, R2, S24], [S23, R3, S34], [S24, R4, S44]];
-    const Mc = [[S22, S23, R2], [S23, S33, R3], [S24, S34, R4]];
-    const aP = D !== 0 ? _det3(Ma) / D : 0;
-    const bP = D !== 0 ? _det3(Mb) / D : 0;
-    const cP = D !== 0 ? _det3(Mc) / D : 0;
-    let sqP = 0;
-    for (const s of samples) {
-      const T = s.T, t2 = T*T, t3 = t2*T, t4 = t3*T;
-      const fit = aP*t2 + bP*t3 + cP*t4;
-      sqP += (s.delta - fit) * (s.delta - fit);
-    }
-    const rmsPoly = Math.sqrt(sqP / samples.length);
-    console.log('');
-    console.log('  Higher-order polynomial fit Δ = a·T² + b·T³ + c·T⁴  (3-param least-squares):');
-    console.log(`    a  (T² coef)  = ${aP.toExponential(4)}  °/Jcy²`);
-    console.log(`    b  (T³ coef)  = ${bP.toExponential(4)}  °/Jcy³   ← asymmetry (0 = symmetric quadratic)`);
-    console.log(`    c  (T⁴ coef)  = ${cP.toExponential(4)}  °/Jcy⁴   ← quartic contribution`);
-    console.log(`    RMS residual  = ${rmsPoly.toFixed(4)}°   (T²-only baseline: ${rmsT2.toFixed(4)}°)`);
-    // Compare to Meeus's own T² coefficient
-    const meeusT2 = -0.0003032;
-    const extraA = aP - meeusT2;
-    console.log(`    Meeus baseline T² (would be Δ from framework-linear-vs-Meeus): ${meeusT2.toExponential(4)}`);
-    console.log(`    Extra T² beyond Meeus baseline: a − Meeus_T² = ${extraA.toExponential(4)}  ← framework-side extra decel`);
-
-    // ── Ranking ─────────────────────────────────────────────────────────
-    fits.sort((a, b) => a.rms - b.rms);
-    console.log('');
-    console.log('  Ranking (best fit = lowest RMS residual):');
-    fits.slice(0, 5).forEach((f, i) => {
-      console.log(`   ${i + 1}. ${f.name.padEnd(24)}  amp=${f.amp.toFixed(4)}°  phase=${f.phase.toFixed(1)}°  RMS=${f.rms.toFixed(4)}°`);
-    });
-    console.log('');
-    console.log(`  T² baseline for comparison:     k=${kT2.toExponential(4)}  RMS=${rmsT2.toFixed(4)}°`);
-    console.log(`  T²+T³+T⁴ polynomial fit:        a=${aP.toExponential(4)}  b=${bP.toExponential(4)}  c=${cP.toExponential(4)}  RMS=${rmsPoly.toFixed(4)}°`);
-    console.log('');
-    console.log('  Interpretation:');
-    console.log('   • A candidate whose RMS ≪ T² baseline is a better fit → likely the missing harmonic.');
-    console.log('   • Amplitude gives the H-lattice term needed to close scene-vs-Meeus drift.');
-    console.log('   • Phase is measured relative to J2000 (T=0), positive = cos-leading.');
-    console.log('   • If T²+T³+T⁴ polynomial RMS ≪ T² baseline: drift has quartic / cubic content.');
-    console.log('   • If b (T³) is significant: drift has cubic asymmetry — past ≠ future magnitude.');
-    console.log('══════════════════════════════════════════════════════════════════════════════════════');
-
-    // Machine-readable dump (paste back for offline fitting / alternate periods)
-    console.log('');
-    console.log('  JSON dump (samples + fits + polynomial):');
-    console.log(JSON.stringify({ samples, fits, kT2, rmsT2, poly: { a: aP, b: bP, c: cP, rms: rmsPoly } }));
-    console.log('══════════════════════════════════════════════════════════════════════════════════════');
-  }, 'Samples framework scene Sun ecliptic longitude at 41 epochs (-50000 to +50000, 2500-yr steps, ' +
-     'Jun-15 12 UT). Compares each sample to Meeus Ch. 25 and fits the (scene−Meeus) drift to candidate ' +
-     'H-lattice periods (H/16, H/8, H/5, H/13, H/3, H/2, H, 2H, 8H, plus 405 kyr and Bond 1470 yr). ' +
-     'Range chosen so Meeus\' T² does not wrap mod 360°. If any harmonic RMS ≪ T² baseline, that\'s a ' +
-     'candidate for extending sunLongitudeCorrection\'s fit range (Stage 3).');
 
   // ────────────────────────────────────────────────────────────────────────
   // -135 Babylonian case study — unified three-section diagnostic
@@ -32010,11 +31539,26 @@ function setupGUI() {
         const lod = _lodScaledL1(tau, scale);
         if (lod === null) return NaN;
         const yearS = _tropYearScaledL1(tau, scale);
-        const integrand = (86400 - lod) * yearS * 1e6 / 86400;
+        // Mirror the PRODUCTION integrand: raw H/5 kinematic form, not bare
+        // L1+L2 LOD — omitting the H/5 term inflates ΔT by ~2.5 ks at -135
+        // (the same integrand bug class fixed on the Holistic calculator).
+        const Ht = HOLISTIC_YEAR_J2000 * lod / LOD_NOW_H13_S;
+        const mSY_days = yearS / lod;
+        const lodH5Raw = lod + lod / ((Ht / 5) * mSY_days);
+        const integrand = (86400 - lodH5Raw) * yearS * 1e6 / 86400;
         const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
         sum += w * integrand;
       }
-      return (sum * h) / 3;
+      let result = (sum * h) / 3;
+      // Post-integration calibrated corrections (flags + Core-mantle swing) are
+      // α-independent — added identically to every scale row, so the sweep's
+      // sensitivity slope is unaffected while the 1.00× baseline now matches
+      // the production ΔT of Section 1.
+      const yearY = 2000 - t_Ma_arg * 1e6;
+      result += bondCycleDeltaTCorrection(yearY) + hallstattCycleDeltaTCorrection(yearY)
+              + jose5CycleDeltaTCorrection(yearY) + jose4CycleDeltaTCorrection(yearY)
+              + resonatorSwingDeltaTCorrection(yearY);
+      return result;
     }
 
     function _predictUmbraAtDT(jd_UT, deltaT_sec) {
@@ -32090,8 +31634,8 @@ function setupGUI() {
     console.log('   • Baseline (1.00×) matches Cox&Chao dα/dt at J2000 — physically-constrained.');
     console.log('   • Off-calibration scales are sensitivity probes, not physically-justified refits.');
     console.log('   • Residual gap at any scale = Moon polynomial residual (β/Lp) — needs ELP-2000/82.');
-    console.log('   • Simplified umbra (sub-solar + β leverage). Real ray-trace at 1.00× via audit-26 gives');
-    console.log('     BestGap ≈ 965 km with ±4h sweep; qualitative scaling correct.');
+    console.log('   • Simplified umbra (sub-solar + β leverage) — for the real ±4h ray-trace BestGap,');
+    console.log('     run "Audit all 26 solar eclipse presets" (its -135 row is the authoritative number).');
 
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
   }, 'Three-section unified -135 Babylonian diagnostic: (1) root-cause decomposition — framework ' +
@@ -32099,7 +31643,7 @@ function setupGUI() {
      '8 events (-762 to -135); (3) L1-α scale sensitivity — how much of the gap is closable by ' +
      'ALPHA_CLIMATE_SCALE tuning (with dα/dt de-calibration caveat). Feeds doc 103 case-study updates.');
 
-  addTestButton('Meeus vs Integrator (Option A verify)', () => {
+  addTestButton('Meeus vs Integrator (lunar argument drift — Path C baseline)', () => {
     // Phase 9.14 Option A step 1: compare Meeus Ch. 47 perturbation arguments
     // (Lp, D, M, M', F) to our integrator-derived equivalents (Steps 1-3)
     // across modern + deep-time epochs. Decision input for whether to switch
@@ -32141,15 +31685,20 @@ function setupGUI() {
       console.log(pad(s.label, 38) + pad(s.year, 9) + fmt(s.Lp) + fmt(s.D) + fmt(s.M) + fmt(s.Mp) + fmt(s.F));
     }
     console.log('══════════════════════════════════════════════════════════════════════');
-    console.log('Interpretation:');
-    console.log(' • If modern epochs (J2000, 2024) show diffs ≪ 0.01°: anchor calibration good.');
-    console.log(' • If -584 diffs are 0.5°-2° and consistent direction: polynomial drift, replacement should help.');
-    console.log(' • If -584 diffs are inconsistent/large: replacement risky (Step C trap).');
+    console.log('Interpretation (Path C baseline — the framework-native-Moon target metric):');
+    console.log(' • Lp/D/M small everywhere (≪0.01° modern, <1° at Thales) → anchor + mean-motion rates good.');
+    console.log(' • M\' (anomaly) and F (node) drift at ≈ +1.4°/century (linear, anchored 2000.5, both');
+    console.log('   directions) with a T² tail at deep epochs — this is the integrator\'s apsidal/nodal');
+    console.log('   precession-rate gap vs Brown/Meeus, i.e. the Mp T²-physics gap Path C must close.');
+    console.log('   Track these two columns as the Moon-campaign progress meter.');
+    console.log(' • Decision history: Phase 9.14 chose Option A (keep Meeus arguments; replacement');
+    console.log('   rejected — the large/inconsistent deep-epoch drift confirmed the Step C trap).');
     console.log('══════════════════════════════════════════════════════════════════════');
-  }, 'Phase 9.14 Option A verification: compare Meeus polynomial arguments to ' +
-     'our integrator-derived equivalents across 7 epochs from J2000 to year -584. ' +
-     'Decides whether to replace Meeus arguments with integrator values in the ' +
-     'perturbation series (potential fix for Thales eclipse residual).');
+  }, 'Path C baseline meter: compares Meeus Ch. 47 lunar arguments to our integrator-derived ' +
+     'equivalents at 10 epochs (J2000 to -584). Lp/D/M agree sub-degree everywhere; M\'/F drift ' +
+     '~1.4°/century — the framework\'s apsidal/nodal rate gap vs Brown/Meeus, the target the ' +
+     'framework-native Moon work must close. (Historically: Phase 9.14 Option A verification; ' +
+     'the replace-Meeus-arguments route was rejected.)');
 
 
   // ────────────────────────────────────────────────────────────────────────
@@ -32390,16 +31939,19 @@ function setupGUI() {
     console.log('');
     console.log('Interpretation:');
     console.log(' • If MOST events are "same day" (Δλ small, conj-doc small):');
-    console.log('     → Our Moon polynomial is correct at these epochs.');
-    console.log('     → All visibility failures are ΔT geographic-placement errors.');
-    console.log('     → Fixing eclipses requires adjusting ΔT (or accepting Earth rotation history is non-tidal).');
+    console.log('     → Our Moon polynomial TIMING is correct at these epochs; any remaining visibility');
+    console.log('       question is geographic placement (measure it with the event-time tools:');
+    console.log('       "Visibility window", the scene-state validations, and the audits — the SS-dist');
+    console.log('       column here is anchored at noon UT and overstates for large conj-doc offsets).');
     console.log(' • If MANY events are "Moon timing off" (Δλ > 30°, conj-doc days away):');
-    console.log('     → Our Moon polynomial drifts at these epochs.');
-    console.log('     → Fixing eclipses requires Moon polynomial correction OR replacing arguments.');
-    console.log(' • Mixed pattern → both Moon timing AND ΔT contribute.');
+    console.log('     → Our Moon polynomial drifts at these epochs — a Path C (framework-native Moon) lead.');
+    console.log(' • Mixed pattern → both Moon timing AND geographic placement contribute.');
+    console.log(' • Joint world: the calibrated ΔT (4 flags + Core-mantle swing) has shipped, so');
+    console.log('   placement residuals here are what remains AFTER that calibration.');
     console.log('');
     console.log('Note: documented JDs use noon UT as anchor. A true eclipse occurs within ±12h of noon UT');
-    console.log('on its calendar day. Use the conj-doc column (hours offset) as the primary timing signal.');
+    console.log('on its calendar day. Use the conj-doc column (hours offset) as the primary timing signal;');
+    console.log('treat SS-dist as a rough same-day screen only.');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
   }, 'For each documented historic eclipse, compute Moon-Sun ecliptic separation in ' +
      'our model AT THE EXACT documented JD. Separates Moon-polynomial timing errors ' +
@@ -32419,7 +31971,7 @@ function setupGUI() {
   addTestButton('Visibility window: ΔT range that fits each eclipse', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Visibility window — RANGE of ΔTs that put the eclipse path near each obs site.');
-    console.log('  Asks: does our pure-tidal ΔT fall in this window? Does Stephenson empirical?');
+    console.log('  Asks: does our production ΔT (4 flags + Core-mantle swing) fall in this window? Does Stephenson?');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
 
     const _d2r = Math.PI / 180;
@@ -32680,11 +32232,11 @@ function setupGUI() {
     console.log('');
     console.log('Summary — does the model ΔT fall inside the visibility window?');
     console.log(`  Penumbra window (eclipse visible, dist < ${PENUMBRA_KM} km):`);
-    console.log(`    OUR pure-tidal ΔT in window:   ${ourInPen}/${totalEvts}`);
+    console.log(`    OUR production ΔT in window:   ${ourInPen}/${totalEvts}`);
     console.log(`    Stephenson empirical ΔT:        ${stephInPen}/${totalEvts}`);
     if (totalTotal > 0) {
       console.log(`  Umbra window (totality/annular at site, dist < ${UMBRA_KM} km):`);
-      console.log(`    OUR pure-tidal ΔT in window:   ${ourInUmb}/${totalTotal}`);
+      console.log(`    OUR production ΔT in window:   ${ourInUmb}/${totalTotal}`);
       console.log(`    Stephenson empirical ΔT:        ${stephInUmb}/${totalTotal}`);
     }
 
@@ -32700,24 +32252,33 @@ function setupGUI() {
     console.log('   That just means both produce "some" eclipse near the site — weak test.');
     console.log(' • Umbra window is tighter (~±10-15k s); fewer pass. This discriminates totality.');
     console.log(' • The Mean residuals show which model is closer to "best" per-event, on average.');
-    console.log(' • If pure-tidal wins on means AND on umbra counts: your model is the truer fit.');
-    console.log(' • If Stephenson wins both: non-tidal speedup is needed to match these eclipses.');
+    console.log(' • Joint world: our production ΔT tracks Stephenson within ~±50 s across the record,');
+    console.log('   so the two columns give near-identical verdicts BY CONSTRUCTION — the old');
+    console.log('   "pure-tidal vs empirical" contest is settled. Read this button as per-event QA:');
+    console.log('   events where BOTH models fail (e.g. the Cairo 979/1004 partial-only cases,');
+    console.log('   just over the penumbra threshold) are geometry/attribution-limited, not ΔT.');
+    console.log('   A future event where OUR ΔT exits a window Stephenson stays inside would be');
+    console.log('   a real regression — that is the check this button now performs.');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
   }, 'For each documented historic eclipse, scans ΔT to find the RANGE that puts the eclipse ' +
      'path within penumbra/umbra reach of the obs site. Tests whether our pure-tidal ΔT and ' +
      'Stephenson empirical ΔT fall inside this visibility window. Unlike the inverse-ΔT test, ' +
      'this respects real eclipse geometry (wide visibility band, not point sub-solar).');
 
-  addTestButton('Historic Eclipse Validation (15 events)', () => {
-    // Test our model's pure-tidal Architecture α physics against well-documented
-    // historic solar eclipses. For each documented eclipse:
-    //   1. Find the actual Moon-Sun conjunction in our model near the documented date
-    //   2. Compute where our model places the sub-solar point at that conjunction
-    //   3. Compare to where the observation took place
-    // The geographic offset measures how well our pure-tidal ΔT explains observations,
-    // WITHOUT empirically fitting to eclipses (the Stephenson approach).
+  addTestButton('Historic Eclipse Validation (14 events, Meeus umbra)', () => {
+    // Test the model against well-documented historic solar eclipses.
+    // For each documented eclipse:
+    //   1. Find the Moon-Sun conjunction in our model near the documented date
+    //   2. Construct the MEEUS-METHOD UMBRA position at that conjunction
+    //      (sub-solar point + Moon-β leverage — the same construction as the
+    //      -135 case study's "Meeus method"; simplified, no Besselian elements)
+    //   3. Report great-circle distance to the documented observation site
+    // This is the Meeus-Moon half of the A/B pair with the SCENE-STATE variant
+    // below (which ray-traces the umbra from the scene-graph): the per-event
+    // difference between the two = Meeus-Moon vs scene-Moon rendering gap —
+    // the Path C (framework-native Moon) per-event meter.
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Historic Eclipse Validation — our pure-tidal model vs documented observations');
+    console.log('  Historic Eclipse Validation — Meeus-method umbra vs documented observations');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
 
     const _d2r = Math.PI / 180;
@@ -32827,10 +32388,11 @@ function setupGUI() {
       return bestJD;
     }
 
-    console.log('Date (Julian)     Obs Loc       Type      Our conj JD     Sub-solar     Δlon       Δlon (km)  Note');
+    console.log('Date (Julian)     Obs Loc       Type      Our conj JD     Meeus umbra        Gap→site  Note');
     console.log('──────────────────────────────────────────────────────────────────────────────────────────────────');
 
     const offsets = [];  // for stats
+    const R_E_km = diameters.earthDiameter / 2;
 
     for (const [Y, M, D, lat, lon_obs, type, name] of HISTORIC) {
       const jd_nominal = julianDateToJD(Y, M, D);
@@ -32842,70 +32404,81 @@ function setupGUI() {
         continue;
       }
 
+      // Meeus-method umbra: sub-solar point + Moon-β leverage (same construction
+      // as the -135 case study's "Meeus method"; simplified, no Besselian elements).
       const lon_pred = subSolarLon(jd_conj);
-      let dlon = lon_pred - lon_obs;
-      while (dlon > 180) dlon -= 360;
-      while (dlon < -180) dlon += 360;
-      const km_per_deg = 111.32 * Math.cos(lat * _d2r);  // approx km per ° lon at latitude
-      const dlon_km = dlon * km_per_deg;
+      const T_ec  = (jd_conj + ourΔT(jd_conj) / 86400 - j2000JD) / 36525;
+      const eps_r = (23.4392911 - 0.0130042 * T_ec) * _d2r;
+      const sunDec = Math.asin(Math.sin(eps_r) * Math.sin(sunLon(jd_conj) * _d2r)) / _d2r;
+      const beta   = _eclMoonBeta(jd_conj);
+      const mDist  = _eclMoonDistance(jd_conj);
+      const umbraLat = sunDec + beta * (mDist / R_E_km);
+      const gap_km = gcKmFromLatLon(lat, lon_obs, umbraLat, lon_pred);
 
-      offsets.push({ year: Y, dlon, dlon_km, name });
+      offsets.push({ year: Y, gap_km, name });
 
       const dateStr = `${Y >= 0 ? Y : '-' + (-Y)}-${String(M).padStart(2,'0')}-${String(D).padStart(2,'0')}`;
       const locStr = `${lat.toFixed(1)},${lon_obs.toFixed(1).padStart(6)}`;
-      const lonPredStr = lon_pred >= 0 ? `${lon_pred.toFixed(1)}°E` : `${(-lon_pred).toFixed(1)}°W`;
-      const dlonStr = (dlon >= 0 ? '+' : '') + dlon.toFixed(1) + '°';
-      const kmStr = (dlon_km >= 0 ? '+' : '') + Math.round(dlon_km) + ' km';
+      const umbraStr = `(${umbraLat.toFixed(1).padStart(5)},${lon_pred.toFixed(1).padStart(7)})`;
       console.log(
         dateStr.padEnd(15) + ' ' +
         locStr.padEnd(13) + ' ' +
         type.padEnd(8) + '  ' +
         jd_conj.toFixed(2).padStart(12) + '  ' +
-        lonPredStr.padStart(10) + '  ' +
-        dlonStr.padStart(7) + '  ' +
-        kmStr.padStart(10) + '  ' +
+        umbraStr.padStart(16) + '  ' +
+        (Math.round(gap_km) + ' km').padStart(8) + '  ' +
         name
       );
     }
 
-    // Statistics: systematic offset trend by epoch
+    // Statistics: umbra-gap distribution by epoch
     console.log('──────────────────────────────────────────────────────────────────────────────────────────────────');
     if (offsets.length > 0) {
-      const dlons = offsets.map(o => o.dlon);
-      const meanDlon = dlons.reduce((a,b) => a+b, 0) / dlons.length;
-      const variance = dlons.reduce((a,b) => a + (b-meanDlon)**2, 0) / dlons.length;
-      const rmsDlon = Math.sqrt(variance + meanDlon*meanDlon);
+      const gaps = offsets.map(o => o.gap_km);
+      const meanGap = gaps.reduce((a,b) => a+b, 0) / gaps.length;
+      const sorted = gaps.slice().sort((a,b) => a-b);
+      const medianGap = sorted[Math.floor(sorted.length / 2)];
       console.log();
-      console.log(`Mean systematic offset:   ${meanDlon.toFixed(1)}°  (negative = our model puts shadow WEST of observation)`);
-      console.log(`RMS offset:               ${rmsDlon.toFixed(1)}°`);
+      console.log(`Mean umbra gap→site:    ${Math.round(meanGap)} km    Median: ${Math.round(medianGap)} km    Max: ${Math.round(sorted[sorted.length-1])} km`);
       console.log();
-      console.log('Per-epoch trend (offset grouped by century):');
+      console.log('Per-epoch trend (mean gap grouped by century):');
       const byCentury = {};
       for (const o of offsets) {
         const cent = Math.floor(o.year / 100) * 100;
         if (!byCentury[cent]) byCentury[cent] = [];
-        byCentury[cent].push(o.dlon);
+        byCentury[cent].push(o.gap_km);
       }
       const cents = Object.keys(byCentury).map(Number).sort((a,b) => a - b);
       for (const c of cents) {
         const mean = byCentury[c].reduce((a,b) => a+b, 0) / byCentury[c].length;
         const yearLbl = c >= 0 ? `${c} CE` : `${-c} BC`;
-        console.log(`  ${yearLbl.padStart(8)} (n=${byCentury[c].length}):  mean offset ${mean.toFixed(1)}°`);
+        console.log(`  ${yearLbl.padStart(8)} (n=${byCentury[c].length}):  mean gap ${Math.round(mean)} km`);
       }
     }
     console.log();
     console.log('Interpretation:');
-    console.log(' • Δlon = our predicted sub-solar lon − observed lon.');
-    console.log(' • If pure-tidal Architecture α is sufficient, Δlon should be small (<5°) and');
-    console.log('   randomly scattered around zero (no systematic trend by epoch).');
-    console.log(' • A monotonic trend Δlon ∝ (year - reference) reveals a systematic ΔT bias.');
-    console.log(' • Sources: Stephenson 1997 "Historical Eclipses and Earth’s Rotation",');
+    console.log(' • Gap = great-circle distance from the Meeus-method umbra (sub-solar + β leverage,');
+    console.log('   at conjunction instant) to the documented site. Simplified umbra — no Besselian');
+    console.log('   elements, no ±hours path sweep; the audits are the authoritative geographic test.');
+    console.log(' • MAIN USE: lightweight per-event approximation, A/B partner of the SCENE-STATE variant');
+    console.log('   below (same event list, umbra ray-traced from the scene-graph — the authoritative');
+    console.log('   current-model geography, matching the umbra disc).');
+    console.log(' • Construction limit: the Meeus-method umbra LON is tied to the sub-solar point');
+    console.log('   (β leverage corrects lat only) — off-noon events (Thales, Cairo) carry a large');
+    console.log('   hour-geometry artifact here that the scene ray-trace does not have.');
+    console.log(' • NOTE (today): the scene MOON is itself Meeus-driven (case-study §B: agree to 0.01°),');
+    console.log('   so pair differences = umbra construction + Sun-frame/GMST conventions, NOT Moon');
+    console.log('   physics. Once Path C ships a framework-native Moon, this pair becomes the');
+    console.log('   before/after meter; until then the Path C baseline is Meeus-vs-Integrator (M\'/F).');
+    console.log(' • Sources: Stephenson 1997 "Historical Eclipses and Earth\'s Rotation",');
     console.log('   Steele 2000, primary ancient texts (Herodotus, Thucydides, Babylonian diaries).');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
-  }, 'Test our pure-tidal Architecture α model against 15 well-documented historic ' +
-     'solar eclipses (Babylonian, Greek, Chinese, Islamic, medieval European). ' +
-     'Reports the geographic offset between our predicted sub-solar location and ' +
-     'the documented observation location. Reveals whether our ΔT has systematic bias.');
+  }, 'Lightweight Meeus-method umbra check (sub-solar + β leverage) for 14 well-documented ' +
+     'historic solar eclipses; reports the great-circle gap to the documented site. Umbra LON ' +
+     'is sub-solar-tied (hour-geometry artifact at off-noon events) — the scene-state variant ' +
+     'ray-traces the true piercing point and is authoritative. Since the scene Moon is currently ' +
+     'Meeus-driven, pair differences are construction/frame, not Moon physics; the pair becomes ' +
+     'the Path C before/after meter once a framework-native Moon ships.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Historic Eclipse Validation — SCENE STATE variant
@@ -33049,11 +32622,16 @@ function setupGUI() {
     console.log(' • Distance = great-circle from documented observation site to the framework\'s');
     console.log('   scene-graph umbra (central) or sub-solar (partial) at the conjunction JD.');
     console.log(' • Matches the always-on umbra disc / GREEN-marker exactly — same data path.');
-    console.log(' • Compare to the Meeus-based "Historic Eclipse Validation (15 events)" button:');
-    console.log('     – Modern epochs (1654, 1185): both should agree (cross-validates Moon polynomial).');
-    console.log('     – Deep time (Bur-Sagale, Thales): divergence is the framework\'s deep-time signal.');
-    console.log(' • Distances are reported as DISTANCES, not Δlon — the framework\'s scene position can');
-    console.log('   differ from documented in BOTH lat and lon (Meeus Δlon was lon-only by construction).');
+    console.log(' • Compare per-event to "Historic Eclipse Validation (14 events, Meeus umbra)":');
+    console.log('     – Both report umbra→site great-circle gaps, but the constructions differ: this');
+    console.log('       button ray-traces the true piercing point; the Meeus-method button pins the');
+    console.log('       umbra LON to the sub-solar (hour-geometry artifact at off-noon events).');
+    console.log('     – Near-local-noon events (1239) agree; elsewhere THIS button is authoritative');
+    console.log('       (e.g. 1133: at conjunction 12:03 UT the path had moved past England onto the');
+    console.log('       continent — the scene shows that correctly).');
+    console.log('     – The scene Moon is currently Meeus-driven, so pair differences are construction');
+    console.log('       + Sun-frame/GMST conventions, NOT Moon physics. After Path C ships a framework-');
+    console.log('       native Moon, this pair becomes the before/after meter.');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
   }, 'Same 14-event curated historic-eclipse list as the Meeus-based Historic Eclipse ' +
      'Validation button, but each conjunction\'s geographic position is read from the ' +
@@ -33381,12 +32959,17 @@ function setupGUI() {
         console.log(`  WEIGHTED, excl. CONTESTED (${fClW.n}): δΔT = ${fClW.a.toFixed(0)} + ${fClW.c.toFixed(1)}·T²   χ²_red = ${fClW.chi2red.toFixed(1)}`);
         console.log(`    → implied secular rate r = ${(fClW.c / 18.26).toFixed(2)} ± ${(fClW.seC / 18.26).toFixed(2)} ms/cy`);
       }
-      console.log('  Reading: r > 0 → Earth rotation slower than framework (framework misses a');
-      console.log('  braking channel); r < 0 → a speedup channel. Compare against the lunar-detected');
-      console.log('  fractional non-tidal rate ~0.5 ms/cy (three-component residual decomposition).');
-      console.log('  |r| within ~2σ of 0 → solar corpus cannot resolve the channel (power-limited).');
+      console.log('  Reading: r > 0 → Earth rotation slower than framework (a missing braking');
+      console.log('  channel); r < 0 → a missing speedup channel.');
+      console.log('  JOINT WORLD: the Core-mantle swing (the former ~0.5 ms/cy fractional channel)');
+      console.log('  is IN production, so the expected residual r is ≈ 0. Measured r consistent');
+      console.log('  with 0 within ~2σ = the independent SOLAR-corpus confirmation of the closure');
+      console.log('  (pre-joint, this same instrument disfavored a uniform secular −0.5 at ~4σ —');
+      console.log('  the era-localized/swing interpretation that then shipped; doc 104).');
+      console.log('  A future |r| > 2σ here would be a real regression of the joint calibration.');
       console.log('  The WEIGHTED fit is the conditioned answer: steep-crossing events (19th-c.');
-      console.log('  photographic anchors) dominate; shallow crossings carry ~10-20 ks error bars.');
+      console.log('  photographic anchors) dominate; shallow crossings carry ~10-20 ks error bars');
+      console.log('  (χ²_red ≫ 1 reflects mis-attribution scatter beyond the geometric σ model).');
       console.log('  ─────────────────────────────────────────────────────────────────────────────────');
     } else {
       console.log('  Signed drift analysis skipped: fewer than 4 events with umbra latitude-crossing.');
@@ -33615,8 +33198,41 @@ function setupGUI() {
           }
         }
 
+        // ─── Documented event reference (always shown, filters bypassed) ───
+        // The documented conjunction can be excluded from the candidate list by
+        // the |β| grazing filter (e.g. -135: β = 0.705 > 0.7°) or the cheap
+        // first pass — print its own scan result so its absence is never
+        // misread as "documented date > NEAR_KM off".
+        let docRefLine = null;
+        {
+          const jdDoc = julianDateToJD(out.docY, out.M, out.D);
+          let docEvt = null, docGap = Infinity;
+          for (const evt of events) {
+            const g = Math.abs(evt.jd - jdDoc);
+            if (g < docGap) { docGap = g; docEvt = evt; }
+          }
+          if (docEvt !== null && docGap < 20) {
+            let dMin = Infinity, dOff = 0;
+            for (let dt = -halfWindow; dt <= halfWindow + 1e-9; dt += stepDays) {
+              const pt = umbraFromSceneAtJd(docEvt.jd + dt);
+              if (pt === null) continue;
+              const d = gcKmFromLatLon(out.lat, out.lon, pt.lat, pt.lon);
+              if (d < dMin) { dMin = d; dOff = Math.round(dt * 24 * 60); }
+            }
+            const isCen = (docEvt.type === 'Total' || docEvt.type === 'Annular' || docEvt.type === 'Hybrid');
+            const why = !isCen ? 'type=Partial → filtered from list'
+                      : Math.abs(docEvt.beta) > MAX_BETA_DEG ? `|β| > ${MAX_BETA_DEG}° grazing filter → not in list`
+                      : (Number.isFinite(dMin) && dMin > NEAR_KM) ? `dist > ${NEAR_KM} km → not in list`
+                      : 'appears in candidate list above';
+            docRefLine = `  Documented event reference: ${docEvt.type}, |β| ${Math.abs(docEvt.beta).toFixed(3)}°, min umbra→site ` +
+                         (Number.isFinite(dMin) ? `${Math.round(dMin)} km (Δt ${dOff >= 0 ? '+' : ''}${dOff} min)` : 'umbra never on Earth in ±3h') +
+                         ` — ${why}`;
+          }
+        }
+
         if (candidates.length === 0) {
           console.log(`  No framework candidates within ${NEAR_KM} km of the documented site in this window.`);
+          if (docRefLine) console.log(docRefLine);
           continue;
         }
 
@@ -33639,6 +33255,7 @@ function setupGUI() {
         }
         const best = candidates[0];
         console.log('');
+        if (docRefLine) console.log(docRefLine);
         console.log(`  ★ Framework's best candidate: ${best.cal.year}-${String(best.cal.month).padStart(2,'0')}-${String(best.cal.day).padStart(2,'0')} (${best.yrOffset >= 0 ? '+' : ''}${best.yrOffset} yr from documented), ${Math.round(best.minDist)} km from site`);
       }
     } finally {
@@ -33828,6 +33445,12 @@ function setupGUI() {
     console.log(' • If NO candidates match, the framework places no eclipse near the site in');
     console.log('   that window → potential ΔT signal or wrong attribution.');
     console.log(' • Geometry: penumbra ≤ 7500 km, umbra ≤ 4500 km from observer.');
+    console.log(' • ⚠ Dist is CONJUNCTION-INSTANT — no time sweep. A path can pass MUCH closer');
+    console.log('   hours away (e.g. documented -762 reads 3,482 km here but 142 km min-dist');
+    console.log('   under the ±3h sweep). Before reading any row as a better match than the');
+    console.log('   documented date, check it with "Chronology candidates" (±3h min-dist scan,');
+    console.log('   grazing filter) or the preset audit (±4h). This census is for VISIBILITY');
+    console.log('   ambiguity, not for ranking candidates.');
     console.log(' • Scene points come from the framework\'s scene-graph (matches the always-on');
     console.log('   umbra disc / GREEN-marker). At ancient times this includes our deep-time');
     console.log('   ΔT/Moon-perturbation predictions, which can disagree with conventional ΔT.');
@@ -33976,6 +33599,13 @@ function setupGUI() {
     console.log('  The fit targeted Espenak ΔT 1650-2017 only — climate proxies were NOT in the loop.');
     console.log('  A tight match (mean |offset| < 200 yr) is out-of-sample evidence that the H-lattice');
     console.log('  periods (Bond, Hallstatt, Jose5, Jose4) are physically real, not curve-fitting artifacts.');
+    console.log('  ⚠ Joint-world reading: the flags and the Core-mantle swing were REFIT TOGETHER, so');
+    console.log('  part of the medieval/late-Holocene structure the pre-joint 4-flag stack carried alone');
+    console.log('  now lives in the swing (excluded here as core-supplied, not climate). Expect the');
+    console.log('  early/mid-Holocene transitions to match tightly (Bond 4, 4.2 ka, Iron Age) while');
+    console.log('  post-500-CE transitions (LIA, Modern) match loosely in this flags-only view — the');
+    console.log('  calibrated late-Holocene comparisons are the Bond IRD correlation (r = +0.36) and');
+    console.log('  the LOD-Climate Rhythm modal, not this crossing table.');
     console.log('════════════════════════════════════════════════════════════════════════════════════');
 
     window._stackClimateMatch = { crossings, matches, offsets, meanAbs };
@@ -34221,7 +33851,7 @@ function setupGUI() {
       [2325394.925106, { name: 'London (European total)', lat: 51.50, lon:  -0.10 }],
       [2173756.000111, { name: 'Tuscany (Cerchiari)',     lat: 43.70, lon:  10.40 }],
       [2154000.058445, { name: 'Russia (Igor’s Tale)',    lat: 50.00, lon:  38.00 }],
-      [2135100.070833, { name: 'England (Henry I)',       lat: 52.00, lon:  -2.00 }],
+      [2135100.002430, { name: 'England (Henry I)',       lat: 52.00, lon:  -2.00 }],
       [2087792.051441, { name: 'Cairo (Ibn Yunus)',       lat: 30.05, lon:  31.24 }],
       [2083982.839931, { name: 'Cairo (Ibn Yunus)',       lat: 30.05, lon:  31.24 }],
       [2081030.093891, { name: 'Cairo (Said-Stephenson)', lat: 30.05, lon:  31.24 }],
@@ -34233,7 +33863,7 @@ function setupGUI() {
       [1608421.835171, { name: 'Babylon (Antigonus)',     lat: 32.50, lon:  44.40 }],
       [1564215.113895, { name: 'Athens (Thucydides)',     lat: 37.97, lon:  23.72 }],
       [1518118.032841, { name: 'Babylon (Nabonidus)',     lat: 32.50, lon:  44.40 }],
-      [1507900.065279, { name: 'Anatolia (Thales/Halys)', lat: 39.00, lon:  35.00 }],
+      [1507900.104145, { name: 'Anatolia (Thales/Halys)', lat: 39.00, lon:  35.00 }],
       [1484836.848499, { name: 'Babylon (early diary)',   lat: 32.50, lon:  44.40 }],
       [1462658.779682, { name: 'Lu State (Chinese)',      lat: 35.60, lon: 117.00 }],
       [1442902.839207, { name: 'Nineveh (Bur-Sagale)',    lat: 36.36, lon:  43.16 }],
@@ -34289,7 +33919,15 @@ function setupGUI() {
 
     try {
     for (const preset of ECLIPSE_PRESETS) {
-      const site = SITES.get(preset.jd);
+      // Tolerant site lookup: exact JD first, else nearest key within 0.5 day —
+      // so preset JD re-registrations (e.g. the 2026-07 stale-registration fixes
+      // for 1133 and -584) can never orphan their site coordinates.
+      let site = SITES.get(preset.jd);
+      if (!site) {
+        for (const [k, v] of SITES) {
+          if (Math.abs(k - preset.jd) < 0.5) { site = v; break; }
+        }
+      }
       const labelPad = preset.label.padEnd(28).slice(0, 28);
       if (!site) {
         console.log(`  ${labelPad}  <no site coords>`);
@@ -34451,126 +34089,6 @@ function setupGUI() {
      'time offset that minimises the gap. Saves + restores the user\'s scene state. Runtime ~30 s ' +
      'on modern hardware. Verdict per preset: ★/↻/◇/◇⚠/⚠ — read interpretation block in the output.');
 
-  // ────────────────────────────────────────────────────────────────────────
-  // Toggle expected-umbra + sub-Sun markers in scene
-  //
-  // Places two small spheres as children of earth.planetObj so they rotate
-  // with Earth's mesh and stay anchored to specific texture pixels:
-  //   • YELLOW = sub-Sun  (from scene-state subSolarFromSceneAtJd)
-  //   • GREEN  = umbra    (from scene-state umbraFromSceneAtJd)
-  //
-  // Both are derived from the framework's actual scene-graph world positions
-  // (same data path as the always-on umbra disc). If the GREEN marker lands
-  // at the rendered shadow's centre and the YELLOW marker sits at the
-  // brightest-illuminated point, the visual model matches the data.
-  //
-  // Click the button a second time to remove the markers.
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Toggle expected umbra + sub-Sun markers in scene', () => {
-    const _d2r = Math.PI / 180;
-
-    // Toggle: remove existing markers if any
-    const existing = earth.planetObj.getObjectByName('EclipseMarkers');
-    if (existing) {
-      earth.planetObj.remove(existing);
-      existing.traverse(obj => {
-        if (obj.geometry) obj.geometry.dispose();
-        if (obj.material) obj.material.dispose();
-      });
-      console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-      console.log('  Eclipse markers REMOVED.  Click again to place at current scene time.');
-      console.log('══════════════════════════════════════════════════════════════════════════════════');
-      return;
-    }
-
-    const jd = o.julianDay;
-
-    // Both points come from the shared scene-state helpers (same data path
-    // as the always-on umbra disc). umbraFromSceneAtJd returns null when
-    // the umbra misses Earth at this instant; subSolarFromSceneAtJd always
-    // returns a value.
-    const ss   = subSolarFromSceneAtJd(jd);
-    const umbra = umbraFromSceneAtJd(jd);
-
-    // ───── Convert (lat, lon) → local mesh coords ─────
-    // public/Earth.jpg is Pacific-centered (Greenwich at the u=0/u=1 seam,
-    // date line at u=0.5). The Three.js SphereGeometry vertex layout gives:
-    //   -X local = Greenwich (lon  0°)    +X local = ±180° (date line)
-    //   +Z local = 90°E                  -Z local = 90°W
-    //   +Y local = north pole
-    function latLonToLocal(lat, lon, radius) {
-      const phi   = (90 - lat) * _d2r;
-      const theta = lon         * _d2r;
-      return new THREE.Vector3(
-        -radius * Math.cos(theta) * Math.sin(phi),
-         radius * Math.cos(phi),
-         radius * Math.sin(theta) * Math.sin(phi)
-      );
-    }
-
-    const R = earth.size;
-    const surfaceR = R * 1.005;     // just above the day/night shader sphere
-    const markerR  = R * 0.04;       // ~510 km in physical scene units
-
-    // ───── Build marker group (children of earth.planetObj) ─────
-    const group = new THREE.Group();
-    group.name = 'EclipseMarkers';
-
-    const markerGeom = new THREE.SphereGeometry(markerR, 16, 16);
-
-    // YELLOW = sub-Sun (from scene state)
-    const ssMarker = new THREE.Mesh(
-      markerGeom,
-      new THREE.MeshBasicMaterial({ color: 0xffff00 })
-    );
-    ssMarker.position.copy(latLonToLocal(ss.lat, ss.lon, surfaceR));
-    ssMarker.castShadow    = false;
-    ssMarker.receiveShadow = false;
-    ssMarker.name          = 'SubSunMarker';
-    group.add(ssMarker);
-
-    // GREEN = umbra centerline (from scene state)
-    if (umbra !== null) {
-      const sceneUmMarker = new THREE.Mesh(
-        markerGeom,
-        new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-      );
-      sceneUmMarker.position.copy(latLonToLocal(umbra.lat, umbra.lon, surfaceR));
-      sceneUmMarker.castShadow    = false;
-      sceneUmMarker.receiveShadow = false;
-      sceneUmMarker.name          = 'SceneUmbraMarker';
-      group.add(sceneUmMarker);
-    }
-
-    earth.planetObj.add(group);
-
-    // ───── Console summary ─────
-    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Eclipse markers placed in scene  (click button again to remove)');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-    console.log(`  Scene JD: ${jd.toFixed(6)}`);
-    console.log('');
-    console.log(`  YELLOW marker — framework sub-Sun (Sun overhead at this scene instant):`);
-    console.log(`    lat = ${ss.lat.toFixed(3)}°N, lon = ${ss.lon.toFixed(3)}°E`);
-    if (umbra !== null) {
-      console.log(`  GREEN marker — framework umbra centerline (ray-traced through scene Sun→Moon→Earth):`);
-      console.log(`    lat = ${umbra.lat.toFixed(3)}°N, lon = ${umbra.lon.toFixed(3)}°E`);
-    } else {
-      console.log(`  GREEN marker NOT placed — scene umbra misses Earth at this instant (no central eclipse).`);
-    }
-    console.log('');
-    console.log('  Both markers use the framework\'s scene-graph world positions — same data');
-    console.log('  path as the always-on umbra disc. They should coincide with the rendered');
-    console.log('  shadow / brightest-illumination point. Divergence is a rendering-pipeline');
-    console.log('  issue (DirectionalLight target, shadow camera, etc.), not a data issue.');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-  },
-  'Places two visible markers on the Earth mesh: YELLOW = framework sub-Sun, ' +
-  'GREEN = framework umbra centerline. Both derived from the scene-graph world ' +
-  'positions (same data path as the always-on umbra disc). Markers are children ' +
-  'of Earth\'s mesh so they rotate with the spin/tilt/precession and stay ' +
-  'anchored to specific texture pixels. Click again to remove. Useful for ' +
-  'verifying the rendered shadow lands where the framework\'s data says it should.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Lunar Eclipses & Validation
@@ -34719,13 +34237,23 @@ function setupGUI() {
         note(`Nearest model opposition: JD ${nearest.jd.toFixed(4)} (${diffDays >= 0 ? '+' : ''}${diffDays.toFixed(2)} d), type=${nearest.type}, β=${nearest.beta.toFixed(3)}°, mag=${nearest.magnitudeUmbral.toFixed(3)}`,
              closeEnough, closeEnough ? '' : 'JD is more than 2 days off');
         const typeMatches = (e.type === nearest.type);
-        note(`Type: catalog "${e.type}" vs model "${nearest.type}"`, typeMatches, typeMatches ? '' : 'mismatch (boundary case or wrong type)');
+        // Total↔Partial disagreement with umbral magnitude within ~0.02 of 1.0 is a
+        // model-side boundary case (classification precision), NOT a catalog error —
+        // e.g. 2021-05-26 (model 0.988 vs NASA 1.009, total by only 0.9%).
+        const isBoundary = !typeMatches
+          && ((e.type === 'Total' && nearest.type === 'Partial') || (e.type === 'Partial' && nearest.type === 'Total'))
+          && Math.abs(nearest.magnitudeUmbral - 1.0) <= 0.02;
+        note(`Type: catalog "${e.type}" vs model "${nearest.type}"`, typeMatches,
+             typeMatches ? '' : (isBoundary
+               ? `known boundary case (mag ${nearest.magnitudeUmbral.toFixed(3)} vs 1.0 threshold) — catalog label is correct, no action needed`
+               : 'mismatch — check catalog entry (wrong type or stale registration)'));
       }
     }
 
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log(`  SUMMARY: ${passCount} passed, ${failCount} failed across ${LUNAR_ECLIPSE_PRESETS.length} entries`);
-    console.log('  Entries with ✗ marks need correction in LUNAR_ECLIPSE_PRESETS + the source JSON.');
+    console.log('  ✗ marked "known boundary case" = model classification precision, catalog is correct.');
+    console.log('  Other ✗ marks need correction in LUNAR_ECLIPSE_PRESETS + the source JSON.');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
   }, 'Validates each LUNAR_ECLIPSE_PRESETS entry: (1) JD ↔ label date consistency, ' +
      '(2) the JD is within ±2 days of an actual model-predicted lunar eclipse, ' +
@@ -35761,19 +35289,25 @@ function setupGUI() {
       const bucket = buckets.get(cent);
       const signedMin = bucket.map(o => o.offsetMin);
       const absMin    = signedMin.map(Math.abs);
-      const meanNasaDT  = bucket.reduce((s, o) => s + o.nasaDeltaT_sec,  0) / bucket.length;
-      const meanModelDT = bucket.reduce((s, o) => s + o.modelDeltaT_sec, 0) / bucket.length;
+      // A model-only event (no NASA counterpart) still pairs to its NEAREST NASA
+      // opposition — up to a full lunation (~43,000 min) away. One such mis-pair
+      // shifts a century's mean by ~180 min, so mean-based columns use only
+      // physically-matched pairs (|Δ| ≤ 3h); medians are robust and use all.
+      const paired = bucket.filter(o => Math.abs(o.offsetMin) <= 180);
+      const meanNasaDT  = paired.length ? paired.reduce((s, o) => s + o.nasaDeltaT_sec,  0) / paired.length : NaN;
+      const meanModelDT = paired.length ? paired.reduce((s, o) => s + o.modelDeltaT_sec, 0) / paired.length : NaN;
       return {
         century:           fmtCent(cent),
         n:                 bucket.length,
-        signed_mean_min:   (signedMin.reduce((a,b)=>a+b,0) / signedMin.length).toFixed(2),
+        mispaired:         bucket.length - paired.length,
+        signed_mean_min:   paired.length ? (paired.reduce((s,o)=>s+o.offsetMin,0) / paired.length).toFixed(2) : '—',
         signed_median_min: median(signedMin).toFixed(2),
         abs_median_min:    median(absMin).toFixed(2),
         abs_p95_min:       pct(absMin, 0.95).toFixed(2),
         within_15min_pct:  (absMin.filter(x => x <= 15).length / absMin.length * 100).toFixed(0) + '%',
-        nasa_ΔT_hr:        (meanNasaDT  / 3600).toFixed(2),
-        model_ΔT_hr:       (meanModelDT / 3600).toFixed(2),
-        ΔT_excess_hr:      ((meanModelDT - meanNasaDT) / 3600).toFixed(2),
+        nasa_ΔT_hr:        Number.isFinite(meanNasaDT)  ? (meanNasaDT  / 3600).toFixed(2) : '—',
+        model_ΔT_hr:       Number.isFinite(meanModelDT) ? (meanModelDT / 3600).toFixed(2) : '—',
+        ΔT_excess_hr:      Number.isFinite(meanModelDT) ? ((meanModelDT - meanNasaDT) / 3600).toFixed(2) : '—',
       };
     });
 
@@ -35782,12 +35316,14 @@ function setupGUI() {
     // Global summary
     const allAbs    = offsets.map(o => Math.abs(o.offsetMin)).sort((a,b)=>a-b);
     const allSigned = offsets.map(o => o.offsetMin);
-    console.log(`\nGlobal stats over ${offsets.length.toLocaleString('en-US')} model events:`);
-    console.log(`  Signed mean Δ:      ${(allSigned.reduce((a,b)=>a+b,0) / allSigned.length).toFixed(2)} min`);
+    const pairedAll = offsets.filter(o => Math.abs(o.offsetMin) <= 180);
+    console.log(`\nGlobal stats over ${offsets.length.toLocaleString('en-US')} model events` +
+                ` (${offsets.length - pairedAll.length} mis-pairs > 3h excluded from the mean):`);
+    console.log(`  Signed mean Δ:      ${(pairedAll.reduce((s,o)=>s+o.offsetMin,0) / pairedAll.length).toFixed(2)} min  (pairs ≤ 3h)`);
     console.log(`  Signed median Δ:    ${median(allSigned).toFixed(2)} min  ← positive = model ΔT > NASA ΔT (more tidal recession)`);
     console.log(`  |Δ| median:         ${allAbs[Math.floor(allAbs.length/2)].toFixed(2)} min`);
     console.log(`  |Δ| p95:            ${allAbs[Math.floor(allAbs.length * 0.95)].toFixed(2)} min`);
-    console.log(`  |Δ| max:            ${allAbs[allAbs.length - 1].toFixed(2)} min`);
+    console.log(`  |Δ| max:            ${allAbs[allAbs.length - 1].toFixed(2)} min  (mis-pairs included — a model-only event pairs to an opposition up to a lunation away)`);
     const within = t => (offsets.filter(o => Math.abs(o.offsetMin) <= t).length / offsets.length * 100).toFixed(1) + '%';
     console.log(`\n  Cumulative recall at looser thresholds:`);
     console.log(`    ≤ 15 min:    ${within(15)}`);
@@ -35801,9 +35337,10 @@ function setupGUI() {
     console.log('exposed at window._L4_offsets for further inspection / plotting.');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
   }, 'Post-L-4 diagnostic. For each model event, computes the signed UT-offset to its ' +
-     'nearest NASA event (no threshold) and bins by century. Reports per-century mean/median ' +
-     'offset and the implied model-effective ΔT vs NASA-published ΔT — directly tests whether ' +
-     'the L-4 recall gap is driven by our pure-tidal ΔT diverging from NASA\'s empirical fit. ' +
+     'nearest NASA event and bins by century. Medians use all pairs; mean-based columns ' +
+     '(and the implied model-effective ΔT vs NASA-published ΔT) use physically-matched ' +
+     'pairs (≤3h) only, with mis-pairs counted per century — directly tests whether ' +
+     'the L-4 recall gap is driven by our production ΔT diverging from NASA\'s empirical fit. ' +
      'Requires L-4 to have been run (uses window._L4). Output exposed on window._L4_offsets.', 1);
 
   const firstPrimaryBtn = addTestButton('L-5: Model vs NASA vs documented historical observations', async () => {
@@ -35877,16 +35414,19 @@ function setupGUI() {
 
     console.log(`\n── L-5a (model vs NASA across 28 documented events) ──`);
     console.log(`  Within ±${TIGHT_MIN} min:                ${modelTightMatch}/${documented.entries.length}`);
-    console.log(`  Expected pattern: tight matches cluster in modern era (~1700+);`);
-    console.log(`  ancient events show 1-3h offset matching the ΔT divergence found in L-4 diagnostic.`);
+    console.log(`  Expected pattern: minutes-level agreement across the FULL list — production ΔT`);
+    console.log(`  tracks the Stephenson-class curve throughout this span. Meaningful divergence vs`);
+    console.log(`  NASA's MS-2004 ΔT only opens before ~-1500 (see L-4 per-century medians), older`);
+    console.log(`  than any entry here.`);
 
     console.log(`\n── L-5b (model vs observed time, vs NASA vs observed time) ──`);
     if (withObs === 0) {
       console.log(`  0 of ${documented.entries.length} events have a transcribed observed_time_ut.`);
-      console.log(`  L-5b is the next deliverable: transcribe observed contact times from primary sources`);
-      console.log(`  (Stephenson 1997, Said & Stephenson 1996, Sachs & Hunger) into the L-5b placeholders`);
-      console.log(`  in public/input/lunar-eclipses-documented.json. Then this button shows whether our`);
-      console.log(`  model is CLOSER or FURTHER than NASA from the actual primary-source observations.`);
+      console.log(`  Observed-time validation is delivered by the L-5b button (Stephenson/Morrison`);
+      console.log(`  timed contacts, n=1212 — the doc-102 numbers). The per-event observed_time_ut`);
+      console.log(`  placeholders in public/input/lunar-eclipses-documented.json remain empty and`);
+      console.log(`  optional; if ever filled, this button additionally shows per-event`);
+      console.log(`  model-vs-observed and NASA-vs-observed columns.`);
     } else {
       const filledRows = rows.filter(r => r.ΔMO_min !== '—');
       const closerModel = filledRows.filter(r => Math.abs(+r.ΔMO_min) < Math.abs(+r.ΔNO_min)).length;
@@ -36177,172 +35717,12 @@ function setupGUI() {
       console.error('  Continuing to next section...\n');
     }
 
-    await new Promise(r => setTimeout(r, 200));  // let console flush
-    console.log('\n▶ Starting SECTION 3: 4th GIA mode search...');
-    console.log('\n══════════════════════════════════════════════════════════════════════════════');
-    console.log('  SECTION 3: 4th GIA mode search');
-    console.log('══════════════════════════════════════════════════════════════════════════════');
-    try {
-      const poly = await loadStephensonDtPolynomial();
-      if (!poly) return;
-
-      // Reference: current model's missing signal characterization
-      const RATE_TODAY_YR = 1.8e-11;  // |dα/dt|_today, absolute value
-      const ALPHA_J2000 = 0.3306947;
-
-      // Compute α(t_age) for a given mode set
-      // modes = [{tau, frac}, ...] with fractions summing to 1.0
-      const alphaAtAge = (t_age_yr, modes) => {
-        if (t_age_yr < 0) return ALPHA_J2000 + RATE_TODAY_YR * t_age_yr;  // future: linear
-        let alpha_excess = 0;
-        for (const m of modes) {
-          const amp = RATE_TODAY_YR * m.frac * m.tau;
-          alpha_excess += amp * (1 - Math.exp(-t_age_yr / m.tau));
-        }
-        return ALPHA_J2000 + alpha_excess;
-      };
-
-      // Compute ΔT(year) using a given mode set.
-      // KEY INSIGHT: LOD ∝ I_Earth ∝ α (with same L_Earth from conservation), so
-      //   custom_LOD(tau) = baseline_LOD(tau) × (alpha_custom(tau) / alpha_baseline(tau))
-      // This avoids re-implementing the angular-momentum machinery and re-using whatever
-      // constants the existing meanLodSecondsAtAge already uses (correctly anchored).
-      const computeDeltaT_modes = (year, modes) => {
-        const t_Ma = (2000 - year) / 1e6;
-        if (t_Ma === 0) return 0;
-        const n = Math.max(32, Math.ceil(Math.abs(t_Ma) * 10));
-        const nEven = n % 2 === 0 ? n : n + 1;
-        const h = t_Ma / nEven;
-        let sum = 0;
-        for (let i = 0; i <= nEven; i++) {
-          const tau = i * h;
-          const lodBaseline = meanLodSecondsAtAge(tau);
-          if (lodBaseline === null) return NaN;
-          const alphaBaseline = earthMoiFactorAtAge(tau);
-          const alphaCustom   = alphaAtAge(tau * 1e6, modes);
-          const lodCustom = lodBaseline * (alphaCustom / alphaBaseline);
-          const yearS = meanTropicalYearSecondsAtAge(tau);
-          const integrand = (86400 - lodCustom) * yearS * 1e6 / 86400;
-          const w = (i === 0 || i === nEven) ? 1 : (i % 2 === 1 ? 4 : 2);
-          sum += w * integrand;
-        }
-        return (sum * h) / 3;
-      };
-
-      // Helper: evaluate one mode configuration at all key years, compute Δ vs Stephenson
-      const evalConfig = (modes, label) => {
-        const sampleYears = [-700, -300, 0, 300, 500, 700, 900, 960, 1100, 1300, 1500, 1700, 1900];
-        let sumSqDiff = 0, peakDiff = 0, peakYear = 0;
-        const deltas = [];
-        for (const y of sampleYears) {
-          const ourDt = computeDeltaT_modes(y, modes);
-          const stephDt = stephensonDeltaT(y, poly);
-          const d = stephDt - ourDt;
-          deltas.push({ y, d });
-          sumSqDiff += d * d;
-          if (Math.abs(d) > Math.abs(peakDiff)) { peakDiff = d; peakYear = y; }
-        }
-        // Also check ancient + modern preservation
-        const ancientDelta = deltas.find(d => d.y === -700).d;
-        const modernDelta = deltas.find(d => d.y === 1900).d;
-        const medievalDelta = deltas.find(d => d.y === 960).d;
-        return {
-          label,
-          modes:           modes.map(m => `τ=${m.tau} f=${m.frac.toFixed(3)}`).join(' + '),
-          ancient_diff_s:  Math.round(ancientDelta),
-          medieval_diff_s: Math.round(medievalDelta),
-          modern_diff_s:   Math.round(modernDelta),
-          peak_abs_diff_s: Math.round(Math.abs(peakDiff)),
-          peak_year:       peakYear,
-          rms_diff_s:      Math.round(Math.sqrt(sumSqDiff / sampleYears.length)),
-        };
-      };
-
-      // ── Test configurations ──
-      // Baseline: current 3-mode
-      const BASELINE = [
-        { tau:  1500, frac: 0.15 },
-        { tau:  5000, frac: 0.55 },
-        { tau: 14000, frac: 0.30 },
-      ];
-
-      // Helper to make a 4-mode config: M4 at given tau with given fraction,
-      // re-scaling existing modes proportionally to preserve Σ frac = 1
-      const make4Mode = (m4_tau, m4_frac) => {
-        const scaleFactor = 1 - m4_frac;
-        return [
-          { tau: m4_tau, frac: m4_frac },
-          { tau:  1500, frac: 0.15 * scaleFactor },
-          { tau:  5000, frac: 0.55 * scaleFactor },
-          { tau: 14000, frac: 0.30 * scaleFactor },
-        ];
-      };
-
-      console.log('── Baseline (current 3-mode model) ──');
-      const baselineResult = evalConfig(BASELINE, '3-mode baseline');
-      console.table([baselineResult]);
-
-      console.log('\n── 4th-mode parameter scan ──');
-      console.log('  (M4 mode added at given τ with given fraction; existing modes re-scaled to preserve modern rate)\n');
-      const results = [baselineResult];
-      const m4_taus = [200, 300, 500, 700, 1000];
-      const m4_fracs = [0.05, 0.10, 0.20, 0.30, 0.50];
-      for (const tau of m4_taus) {
-        for (const frac of m4_fracs) {
-          results.push(evalConfig(make4Mode(tau, frac), `M4 τ=${tau} f=${frac.toFixed(2)}`));
-        }
-      }
-      console.table(results);
-
-      // ── Find best configurations ──
-      console.log('── Best configurations (smallest peak |Δ|, then smallest rms |Δ|) ──');
-      const ranked = results.slice().sort((a, b) => {
-        if (a.peak_abs_diff_s !== b.peak_abs_diff_s) return a.peak_abs_diff_s - b.peak_abs_diff_s;
-        return a.rms_diff_s - b.rms_diff_s;
-      });
-      console.table(ranked.slice(0, 6));
-
-      // Constraint check: did we BREAK the ancient or modern match?
-      console.log('\n── Configurations that REDUCE medieval AND preserve ancient (|ancient diff| < 200 s) ──');
-      const preserving = results.filter(r => Math.abs(r.ancient_diff_s) < 200 && Math.abs(r.medieval_diff_s) < 700);
-      if (preserving.length === 0) {
-        console.log(`  (none — no 4-mode config tested both reduces medieval bump AND preserves ancient match)`);
-        console.log(`  This suggests the medieval bump is NOT a GIA-mode issue — it\'s a different mechanism.`);
-      } else {
-        console.table(preserving.sort((a, b) => Math.abs(a.medieval_diff_s) - Math.abs(b.medieval_diff_s)));
-        console.log(`  Best candidate: ${preserving[0].label}`);
-        console.log(`    → Could indicate a real shallow-mantle GIA mode missing from our 3-mode model`);
-      }
-
-      // Verdict
-      console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-      const bestPreserving = preserving.length > 0 ? preserving.sort((a, b) => Math.abs(a.medieval_diff_s) - Math.abs(b.medieval_diff_s))[0] : null;
-      if (bestPreserving && Math.abs(bestPreserving.medieval_diff_s) < 200) {
-        console.log(`  VERDICT: A 4th GIA mode at τ ≈ ${bestPreserving.label.match(/τ=(\d+)/)[1]} yr CAN absorb the medieval bump`);
-        console.log(`           while preserving ancient/modern match. The medieval residual reduces from`);
-        console.log(`           1322 s → ${Math.abs(bestPreserving.medieval_diff_s)} s with this mode.`);
-        console.log(`           → Worth investigating if this τ matches a known shallow-mantle relaxation`);
-        console.log(`             timescale in the GIA literature.`);
-      } else if (preserving.length === 0) {
-        console.log(`  VERDICT: NO 4-mode GIA configuration can absorb the medieval bump while preserving`);
-        console.log(`           the ancient/modern match. The medieval signal is NOT a missing GIA mode.`);
-        console.log(`           This means the bump comes from a DIFFERENT physical mechanism — likely`);
-        console.log(`           climate-mediated (Medieval Warm Period mass redistribution) or unknown.`);
-      } else {
-        console.log(`  VERDICT: Partial reduction possible (best: ${bestPreserving.label}) but medieval residual`);
-        console.log(`           still ${Math.abs(bestPreserving.medieval_diff_s)} s after correction. GIA modes can help but`);
-        console.log(`           don't fully absorb the bump — likely a combination of mechanisms needed.`);
-      }
-      console.log('══════════════════════════════════════════════════════════════════════════════════');
-
-      window._L5b_4mode_search = { baseline: baselineResult, all: results, preserving };
-      console.log('\nFull data exposed at window._L5b_4mode_search');
-    } catch (e) {
-      console.error(`\n■■■ SECTION 3 FAILED ■■■`);
-      console.error('  Error:', e && e.message);
-      console.error('  Stack:', e && e.stack);
-      console.error('  Continuing to next section...\n');
-    }
+    // SECTION 3 (4th GIA mode search) retired: it reconstructed the superseded
+    // 3-mode Peltier viscoelastic α(t) as its baseline — replaced in production
+    // by the climate-driven α(t) — so the test was no longer self-consistent.
+    // Finding preserved in doc 102: the medieval signal is NOT a missing GIA
+    // mode. Section numbering kept stable (docs cite §12–§17 by number).
+    console.log('\n(SECTION 3 retired — 4th-GIA-mode search tested a superseded α(t) formulation; see doc 102.)');
 
     await new Promise(r => setTimeout(r, 200));  // let console flush
     console.log('\n▶ Starting SECTION 4: Regression (linear / quadratic / cubic)...');
@@ -36941,11 +36321,13 @@ function setupGUI() {
       const passes = [test1Pass, test2Pass, test3Pass].filter(p => p).length;
       const failures = 3 - passes;
       if (passes === 3) {
-        console.log(`  VERDICT: ✓ All 3 tests passed — the ${TARGET_PERIOD} yr peak is ROBUSTLY DETECTED.`);
-        console.log('  Real spectral feature. Possible interpretations:');
-        console.log('    • Subharmonic of Hale cycle (22 yr × 0.65)');
-        console.log('    • Half of Wilson 2025 28 yr cycle (Jupiter+Saturn+Uranus)');
-        console.log('    • Unidentified Earth-rotation forcing in this band');
+        console.log(`  VERDICT: ✓ All 3 tests passed — the ${TARGET_PERIOD} yr peak is ROBUSTLY DETECTED in-catalog.`);
+        console.log('  ⚠ RESOLVED interpretation: the peak is a SAMPLING-WINDOW ARTIFACT — the observation');
+        console.log('    epochs\' own spectral window peaks at 14.30 yr (part of a ~7.15-yr comb ≈ the');
+        console.log('    88-lunation eclipse cycle), which is why every subset shares it (same catalog');
+        console.log('    cadence). Physical ceiling: a real 0.15-ms decadal LOD line integrates to ~0.12 s');
+        console.log('    of ΔT — four orders below the fitted peak amplitude. No framework component');
+        console.log('    warranted. (Archived kill: scripts/archive/lod_residual_142yr_window_test.py.)');
       } else if (failures === 3) {
         console.log(`  VERDICT: ✗ All 3 tests failed — the ${TARGET_PERIOD} yr peak is a WINDOW/NOISE ARTIFACT.`);
         console.log('  The single "significant" peak from the original OLD-α periodogram was the kind of');
@@ -38715,8 +38097,13 @@ function setupGUI() {
       tableLines.push('');
       tableLines.push('══════════════════════════════════════════════════════════════════════════════════');
       if (top.dR2 > 0.10) {
-        tableLines.push('  VERDICT: STRONG lattice signal in residual — a new 8H/n harmonic would help substantially.');
+        tableLines.push('  VERDICT: STRONG lattice signal in residual (by pre-joint thresholds — see scale check).');
         tableLines.push(`           Best next divisor: n=${top.n}, P=${top.P.toFixed(1)} yr, ΔR²=+${top.dR2.toFixed(3)}, amp=${top.amp.toFixed(0)} s`);
+        tableLines.push('  ⚠ Scale check (joint world): ΔR² is measured against the smooth Stephenson SPLINE,');
+        tableLines.push('    not observations (per-event noise ~1,200 s). With the residual at the ~30-s noise');
+        tableLines.push('    floor, a "STRONG" verdict can be spline structure + a degenerate divisor ridge');
+        tableLines.push('    (the 2.7-kyr window cannot resolve n at these periods — note the flat top-10).');
+        tableLines.push('    Research note, not a shipping candidate — see TODO (8H/2024 item) + doc 104 §8.');
         if (interpTop) tableLines.push(`           Structural interpretation: ${interpTop.mult}${interpTop.op}${interpTop.label} (${interpTop.err.toFixed(2)}% error)`);
         if (distinctSecondary) {
           const interp2 = interpretPeriod(distinctSecondary.P);
@@ -39432,7 +38819,10 @@ function setupGUI() {
       if (Math.abs(totalDualAmp - totalSingleAmp) / totalSingleAmp < 0.15) {
         partBLines.push(`      → Amplitude is roughly PRESERVED under dual fit (Fourier-degenerate behavior).`);
       } else {
-        partBLines.push(`      → Amplitude differs substantially between single and dual — genuine independent content.`);
+        partBLines.push(`      → Amplitude differs substantially between single and dual — CHECK for collinear`);
+        partBLines.push(`        blow-up before reading this as independent content: at ~1% period spacing vs`);
+        partBLines.push(`        the window's ~390-yr Fourier resolution, a near-degenerate pair inflates both`);
+        partBLines.push(`        amplitudes without genuine new information (the joint-fit caps exist for this).`);
       }
 
       console.log(partBLines.join('\n'));
@@ -39455,14 +38845,17 @@ function setupGUI() {
         verdictLines.push('      → Keep n=1851 for the J-S synodic narrative; adding n=1920 wouldn\'t help.');
         verdictLines.push('');
         verdictLines.push('    Full picture of the residual:');
-        verdictLines.push('      • Bond-scale oscillation at ~1450 yr (captured by n=1851 8H-lattice harmonic)');
+        verdictLines.push('      • Bond-scale oscillation at ~1466 yr (captured by the shipped n=1830 8H-lattice harmonic)');
         verdictLines.push('      • Higher-order polynomial (cubic+) shape — not physical, likely fit artifact of');
         verdictLines.push('        the Bond fit being imperfect in ancient BCE tail');
-        verdictLines.push('      • Fractional Munk-MacDonald ~0.5 ms/century secular rate (§16)');
+        verdictLines.push('      • Fractional non-tidal channel ~0.5 ms/century window-average (§16) — carried by the Core-mantle swing');
         verdictLines.push('      • ~62 s RMS observation noise + small unexplained structure');
       } else if (isPolyArtifact) {
         verdictLines.push('    ✓ Linear coefficient is POLYNOMIAL ARTIFACT.');
-        verdictLines.push('    ⚠ Dual harmonic test shows some independent content (dR² = ' + (dualGain*100).toFixed(2) + ' pp).');
+        verdictLines.push('    ⚠ Dual harmonic test shows APPARENT independent content — with 1.1% period spacing');
+        verdictLines.push('      vs ~390-yr window resolution this is the textbook collinear blow-up (amplitudes');
+        verdictLines.push('      balloon under the near-degenerate pair); not evidence of a second physical line.');
+        verdictLines.push('      (dR² = ' + (dualGain*100).toFixed(2) + ' pp).');
       } else if (isFourierDegenerate) {
         verdictLines.push('    ⚠ Linear coefficient is STABLE across orders — genuine physical linear component.');
         verdictLines.push('    ✓ n=1851 and n=1920 are FOURIER-DEGENERATE.');
@@ -60398,38 +59791,43 @@ function diagnoseLodLayers(year) {
   const hall = _lodContribFromDeltaTFn(typeof hallstattCycleDeltaTCorrection === 'function' ? hallstattCycleDeltaTCorrection : null, year);
   const jose5 = _lodContribFromDeltaTFn(typeof jose5CycleDeltaTCorrection === 'function' ? jose5CycleDeltaTCorrection : null, year);
   const jose4 = _lodContribFromDeltaTFn(typeof jose4CycleDeltaTCorrection === 'function' ? jose4CycleDeltaTCorrection : null, year);
-  const cyclic = bond + hall + jose5 + jose4;
+  const swing = (typeof resonatorSwingLodCorrection === 'function') ? resonatorSwingLodCorrection(year) : 0;
+  const cyclic = bond + hall + jose5 + jose4 + swing;
   const total = epochSpecificMeanLodSec(year);
   // ΔT: accumulated (framework, integrated from J2000) — uses meanDeltaTSecondsAtAge which
-  // already includes the 4-cycle post-integration additions. Framework anchors ΔT(J2000)=0.
+  // already includes the 4-flag + Core-mantle-swing post-integration additions.
+  // Framework anchors ΔT(J2000)=0.
   const dtFrameworkTotal = (typeof meanDeltaTSecondsAtAge === 'function') ? meanDeltaTSecondsAtAge(t_Ma) : null;
   const bondAcc = (typeof bondCycleDeltaTCorrection === 'function') ? bondCycleDeltaTCorrection(year) : 0;
   const hallAcc = (typeof hallstattCycleDeltaTCorrection === 'function') ? hallstattCycleDeltaTCorrection(year) : 0;
   const jose5Acc = (typeof jose5CycleDeltaTCorrection === 'function') ? jose5CycleDeltaTCorrection(year) : 0;
   const jose4Acc = (typeof jose4CycleDeltaTCorrection === 'function') ? jose4CycleDeltaTCorrection(year) : 0;
-  const cyclicAcc = bondAcc + hallAcc + jose5Acc + jose4Acc;
+  const swingAcc = (typeof resonatorSwingDeltaTCorrection === 'function') ? resonatorSwingDeltaTCorrection(year) : 0;
+  const cyclicAcc = bondAcc + hallAcc + jose5Acc + jose4Acc + swingAcc;
   const dtIntegrationOnly = (dtFrameworkTotal !== null) ? dtFrameworkTotal - cyclicAcc : null;
   console.log(`--- Year ${year} (t_Ma=${t_Ma.toExponential(3)}) ---`);
   console.log(`  LOD:`);
   console.log(`    L1 (mass-loss meanAlpha):       ${L1 !== null ? L1.toFixed(9) : 'null'} s`);
   console.log(`    L1+L2 (meanLodAtAge, LOD used): ${L12 !== null ? L12.toFixed(9) : 'null'} s  ← DISPLAY value`);
   console.log(`    L2 delta (GIA orbital):         ${L2 !== null ? (L2 * 1000).toFixed(6) : 'null'} ms`);
-  console.log(`  L3 cyclic derivatives (informational, NOT in LOD):`);
-  console.log(`    Bond deriv:                     ${(bond * 1000).toFixed(6)} ms`);
-  console.log(`    Hallstatt deriv:                ${(hall * 1000).toFixed(6)} ms`);
-  console.log(`    Jose5 deriv:                    ${(jose5 * 1000).toFixed(6)} ms`);
-  console.log(`    Jose4 deriv:                    ${(jose4 * 1000).toFixed(6)} ms`);
-  console.log(`    Total:                          ${(cyclic * 1000).toFixed(6)} ms`);
+  console.log(`  Cyclic δLOD contributions (informational, NOT in the L1+L2 LOD; they live in Layer 3/4):`);
+  console.log(`    Bond δLOD:                      ${(bond * 1000).toFixed(6)} ms`);
+  console.log(`    Hallstatt δLOD:                 ${(hall * 1000).toFixed(6)} ms`);
+  console.log(`    Jose5 δLOD:                     ${(jose5 * 1000).toFixed(6)} ms`);
+  console.log(`    Jose4 δLOD:                     ${(jose4 * 1000).toFixed(6)} ms`);
+  console.log(`    Core-mantle swing δLOD:         ${(swing * 1000).toFixed(6)} ms`);
+  console.log(`    Total (flags + swing):          ${(cyclic * 1000).toFixed(6)} ms`);
   console.log(`  ΔT (TT − UT1, framework anchors J2000 = 0):`);
   console.log(`    LOD-integration only:           ${dtIntegrationOnly !== null ? dtIntegrationOnly.toFixed(3) : 'null'} s`);
   console.log(`    Bond accumulated:               ${bondAcc.toFixed(3)} s`);
   console.log(`    Hallstatt accumulated:          ${hallAcc.toFixed(3)} s`);
   console.log(`    Jose5 accumulated:              ${jose5Acc.toFixed(3)} s`);
   console.log(`    Jose4 accumulated:              ${jose4Acc.toFixed(3)} s`);
+  console.log(`    Core-mantle swing accumulated:  ${swingAcc.toFixed(3)} s`);
   console.log(`    Cyclic accumulated total:       ${cyclicAcc.toFixed(3)} s`);
   console.log(`    TOTAL framework ΔT:             ${dtFrameworkTotal !== null ? dtFrameworkTotal.toFixed(3) : 'null'} s`);
-  return { year, t_Ma, L1, L12, L2, bond, hall, jose5, jose4, cyclic, total,
-           dtIntegrationOnly, bondAcc, hallAcc, jose5Acc, jose4Acc, cyclicAcc, dtFrameworkTotal };
+  return { year, t_Ma, L1, L12, L2, bond, hall, jose5, jose4, swing, cyclic, total,
+           dtIntegrationOnly, bondAcc, hallAcc, jose5Acc, jose4Acc, swingAcc, cyclicAcc, dtFrameworkTotal };
 }
 
 
@@ -62618,7 +62016,10 @@ function dayToDate(jd) {
 
   // zero-pad helpers
   const pad2 = n => n.toString().padStart(2, '0');
-  const pad4 = n => n.toString().padStart(4, '0');
+  // BCE years: pad the absolute value and keep the sign in front — plain
+  // padStart on "-99" yields "0-99", which downstream year-parsers read as
+  // year 0 (garbled every date in years -1…-99).
+  const pad4 = n => n < 0 ? '-' + Math.abs(n).toString().padStart(4, '0') : n.toString().padStart(4, '0');
 
   return {
     calendar: isGregorian ? 'Gregorian' : 'Julian',

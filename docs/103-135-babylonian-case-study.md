@@ -244,9 +244,7 @@ Two test buttons quantify the framework's -135 prediction:
 
 2. **"Audit all 26 solar eclipse presets"** — full audit with ±4h scan per event; verdict summary + per-event best gap.
 
-One research-mode button supports Sun/framework calibration work:
-
-3. **"Sun ecl_lon harmonic scan (find missing period)"** — samples framework scene Sun ecl_lon vs Meeus Ch. 25 across 41 epochs (-50 to +50 kyr, 2.5-kyr steps); fits the drift to 11 candidate H-lattice periods + T²/T³/T⁴ polynomial. Diagnostic tool for characterizing Sun ecl_lon deviation and identifying candidate H-lattice periods for a possible antiquity-fit extension.
+(A third button, "Sun ecl_lon harmonic scan (find missing period)", was removed during the 2026-07 test-button audit: at its ±50-kyr range Meeus's T² term wraps mod 360° — the button's own validity warning fired — and Meeus is out of its validity window at those ranges anyway, so the scan measured the reference's extrapolation blow-up rather than framework error. Its harmonic-fitting role lives in the Step-0 pipeline tool `tools/fit/sun-longitude-harmonics.js`; the near-J2000 scene-vs-Meeus regression check is the "Sun position diagnostic" button.)
 
 ---
 

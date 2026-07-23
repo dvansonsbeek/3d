@@ -1,6 +1,5 @@
 # Moon Meeus Corrections -- Implementation Reference
 
-**Date**: 2026-03-07 (last update 2026-06-25 — added Layer 1b for Meeus empirical accuracy at -135 per doc 103)
 **Status**: Complete (full Meeus Ch. 47: 60L+60B terms, RA+Dec override, JPL-verified)
 
 ---
@@ -228,7 +227,10 @@ Tested against solar eclipses from 584 BCE to 2024 CE using
 | Ancient (584 BCE-484 CE) | ~8+ | ~8+ | 1/8 |
 
 Accuracy degrades significantly before ~1900. This is expected given the
-combined uncertainties described below.
+combined uncertainties described below. (These are raw geocentric
+separations at catalog JDs from the exploration tool, without the
+production ΔT machinery; the current authoritative deep-time accuracy
+statement is the 26-event eclipse alignment audit — doc 103.)
 
 ### Consistency with Architecture α deep-time Moon model
 
@@ -242,40 +244,51 @@ a_Moon(t_Ma) = a_now × (1 + α₁·t_Ma + α₃·t_Ma³ + α₄·t_Ma⁴)
 This polynomial is calibrated to deep-time anchors (Wells 1963 Devonian corals,
 Wu et al. 2024 cyclostratigraphy 0–650 Ma, modern lunar laser ranging) and is
 independent of the Meeus formulas. **The two are nevertheless physically
-consistent at J2000** — the Meeus T² coefficient on Moon mean longitude
-implicitly encodes the same lunar tidal acceleration that the Farhat polynomial
-expresses analytically.
+consistent at J2000** — the tidal component of the Meeus T² coefficient on
+Moon mean longitude encodes the same lunar tidal acceleration that the Farhat
+polynomial expresses analytically.
 
-**Derivation from Farhat at J2000:**
+**Derivation from Farhat at J2000** (shipped LLR-anchored α₁):
 
 ```
 da/dt|_J2000  = a_now × α₁ / 1e6
-             = 384,399 km × (−8.866e−5 /Ma) / 1e6
-             = +3.41 cm/yr                              (matches Wells/LLR rate)
+             = 384,399 km × (−9.9376e−5 /Ma) / 1e6
+             = +3.82 cm/yr                    (LLR direct anchor, Dickey 1994 / Chapront 2002)
 
 dn/dt|_J2000 = −1.5 × n × (1/a) × da/dt
-             = −1.5 × 4,812 deg/yr × (1/384,399 km) × 3.41e-5 km/yr
-             = −6.40e−7 deg/yr per year
+             = −1.5 × 4,812.7 deg/yr × (3.82e-5 km/yr / 384,399 km)
+             = −7.17e−7 deg/yr per year
 
-n̈ over 1 century² ≈ −23.0 arcsec/cy²
+n̈ (tidal) over 1 century² ≈ −25.8 arcsec/cy²
 ```
 
-**Comparison with Meeus T² coefficient:**
+**Comparison with the LLR-observed tidal acceleration:**
+
+| Source | n̈ (tidal) |
+|--------|-----------|
+| Framework chain (α₁ → Kepler) | ≈ −25.8 arcsec/cy² |
+| LLR observation (Chapront 2002) | −25.86 arcsec/cy² |
+
+The match to LLR is by construction — α₁ is anchored to the LLR recession —
+but the Kepler chain closing to ~0.2% confirms the α₁ → da/dt → n̈ conversion
+is implemented consistently.
+
+**Comparison with Meeus's T² coefficient** — a different quantity:
 
 ```
 Meeus L' = 218.3164 + 481267.88123·T − 0.0015786·T² + …
-
-c (T² coefficient) = −0.0015786 deg/cy²
-n̈ (lunar acceleration) = 2c = −0.00316 deg/cy² = −22.8 arcsec/cy²
+c (T² coefficient) = −0.0015786 deg/cy² = −5.68 arcsec/cy²
 ```
 
-The two agree to **<1%** at J2000:
-
-| Source | n̈ value |
-|--------|---------|
-| Farhat 2022 polynomial (deep-time chain) | −23.0 arcsec/cy² |
-| Meeus Ch. 47 T² coefficient | −22.8 arcsec/cy² |
-| Chapront-Touzé/Chapront LLR observation | −22.97 arcsec/cy² |
+Meeus's c is NOT the tidal acceleration directly. ELP's mean-longitude T²
+term is the sum of the tidal secular term (n̈/2 ≈ −12.9 arcsec/cy²) and the
+planetary (non-tidal) secular term (≈ +7.2 arcsec/cy²), netting ≈ −5.7
+arcsec/cy² — which is Meeus's coefficient. The Farhat chain and the Meeus
+polynomial therefore agree through the *tidal component* of Meeus's T², with
+the planetary term on top. The entanglement of the two in a single T²
+coefficient is exactly the polynomial-physics gap the framework-native Moon
+(Path C) would resolve by carrying tidal and planetary parts in separate
+framework channels.
 
 **Implication.** No refit of Meeus rates is needed for modern-era Moon position;
 the two formulations are equivalent in their overlap domain (~modern era ±10
@@ -338,50 +351,34 @@ present epoch, not for millennia-scale extrapolation.
 The framework uses Meeus Ch. 47 (a truncated ~60-term form of ELP-2000/82)
 via the `_eclMoonLon`, `_eclMoonBeta`, `_eclMoonDistance` helpers. Because
 this is a truncation of the full ~37,000-term ELP-2000/82, its residual at
-deep time is *larger* than the Layer 1 floor — sometimes substantially so,
-because the truncated perturbation series can sum constructively at specific
-JDs even when the full series cancels.
+deep time can in principle exceed the Layer 1 floor at specific JDs.
 
-The empirical -135 Babylonian case study (doc 103) measured Meeus' β
-(ecliptic latitude) residual:
-
-| Source | β at -135-04-15 |
-|---|---|
-| Meeus Ch. 47 (framework's polynomial) | 0.728° |
-| ELP-2000/82 effective (back-calculated from NASA Five Millennium Canon) | ≈ 0.66° |
-| **Residual** | **~0.07° = ~250 arcsec** |
-
-**This is roughly 10× the Layer 1 floor for the same era** (Layer 1's
-"~10-30 arcsec at 0 CE" was for *full* ELP-2000/82; Meeus at the same
-era is event-dependent and can reach hundreds of arcsec when
-truncation-residuals constructively interfere).
-
-Adjacent Hellenistic events the framework was tested against (-584 Thales,
--309 Sicily, -762 Bur-Sagale) have much smaller residual (≤0.12°
-β_diff per the Babylonian-era Meeus residual sweep), confirming the -135
-case is *event-specific* truncation behavior — not a systematic
-degradation across the era. Most deep-time eclipses match cleanly;
-specific JDs can have substantially larger residuals than the Layer 1
-table would suggest.
-
-**Forward path:** [`docs/hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md)
-proposes optionally adding the full ELP-2000/82 series as an alternative
-polynomial path. With ELP-2000/82, framework's -135 β residual would drop
-from 0.07° to the Layer 1 floor (~10-30 arcsec) — a general precision
-improvement rather than a fix for a specific problem event. Under the
-current **26-event eclipse alignment audit** (see
+Empirically, the -135 Babylonian case study (doc 103) tested this directly:
+Meeus Ch. 47, ELP-2000/82 (both a 3,402-term truncation and the full
+37,863-term series), and ELP/MPP02 (both DE-fit and LLR-fit variants) all
+converge to β ≈ 0.706° at the -135 conjunction — within 0.001° of each
+other, and consistent with NASA's γ = 0.7119. **The Moon polynomial is not
+the source of the -135 residual.** Under the current 26-event eclipse
+alignment audit (see
 [Historical Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)
-and [doc 103](103-135-babylonian-case-study.md)), -135 already reports
-BestGap 15 km within the ±4h scan window — the tightest per-event
-geographic match in the entire audit. The framework's own greatest-eclipse
-UT differs from the documented UT by ~48 minutes (the ΔT-signal + off-peak
-verdict category); this ΔT-signal is decomposable into Sun ecliptic-longitude
-drift at antiquity, framework ΔT vs Stephenson gap, and framework GMST vs
-IAU convention gap — the Meeus Ch. 47 Moon polynomial is exonerated for
-this event (all modern lunar theories converge within 0.001° at year -135).
-The ELP-2000/82 upgrade remains a general polynomial-precision improvement
-path at deep time; it is not blocking under the current scan-window
-methodology.
+and [doc 103](103-135-babylonian-case-study.md)), -135 reports BestGap
+949 km (regional verdict) with the framework's predicted UT within 2
+minutes of the documented UT — a *where* residual carried by Sun-side
+longitude, GMST convention, and umbra geometry, not a *when* residual and
+not a Moon-series error. The Babylonian-era Meeus residual sweep of
+adjacent events (-584 Thales, -309 Sicily, -762 Bur-Sagale) shows β
+differences ≤ 0.12° against the same references.
+
+**Forward path:** the full ELP-2000/82 series
+([`docs/hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md))
+remains available as a general deep-time precision option, but the -135
+test shows all modern lunar theories agree at the audited epochs, so it is
+not blocking and fixes no audited event. The identified forward direction
+for Moon physics is the framework-native Moon (**Path C**): the Meeus
+fundamental-argument polynomials (M′, F) carry T² terms whose physics the
+framework would express through its own tidal-evolution channels; the
+"Meeus vs Integrator (lunar argument drift — Path C baseline)" test button
+measures the current gap (≈ +1.4°/century in M′/F argument drift).
 
 **Layer 2: Delta-T (Earth rotation) uncertainty**
 

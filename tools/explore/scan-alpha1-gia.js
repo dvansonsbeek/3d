@@ -1,17 +1,26 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // ALPHA_1 × GIA SCANNER — physically-motivated parameter scan
 //
+// HISTORICAL exploration tool: this is the study that motivated the 2026-07
+// LLR-α₁ refit. At the time it was written, production used the Wells 1989
+// anchor (α₁ = -8.87e-5 /Ma → 3.41 cm/yr) and this scan's finding — optimum
+// near α₁-scale ≈ 1.12, i.e. the LLR value — drove the shipped change.
+// Production NOW uses the LLR direct anchor (α₁ = -9.9376e-5 /Ma →
+// 3.82 cm/yr, Dickey 1994 / Chapront 2002), so scale 1.0 in a fresh run of
+// this scanner corresponds to the LLR anchor, and the comments below
+// describe the PRE-REFIT world.
+//
 // Traces the α(t) tidal-slowdown source to two specific literature constants:
-//   ALPHA_1 = -8.87e-5 /Ma       (Farhat 2022; Wells 1989 anchor: 3.82 cm/yr)
+//   ALPHA_1 = -8.87e-5 /Ma       (Farhat 2022; Wells 1989 anchor — pre-refit)
 //   ALPHA_CLIMATE_SCALE = -5.24e-7 (Cox & Chao 2002: dα/dt = -1.8e-11/yr)
 //
-// The framework is currently 23% too shallow in dLOD/dt at J2000 (1.42 vs
-// observed 1.75 ms/century). The h5/lodMean/α scans all point at this same
-// under-slope but only via empirical multipliers. THIS scan tests the specific
-// physical parameters that could be off:
+// The pre-refit framework was 23% too shallow in dLOD/dt at J2000 (1.42 vs
+// observed 1.75 ms/century). The h5/lodMean/α scans all pointed at this same
+// under-slope but only via empirical multipliers. THIS scan tested the
+// specific physical parameters that could be off:
 //
-//   ALPHA_1_SCALE:      1.0 → prod Wells 1989 anchor (framework 3.41 cm/yr)
-//                       ~1.12 → matches modern lunar laser ranging (3.82 cm/yr)
+//   ALPHA_1_SCALE:      1.0 → pre-refit Wells 1989 anchor (3.41 cm/yr)
+//                       ~1.12 → matches modern lunar laser ranging (3.82 cm/yr) — SHIPPED
 //                       ~1.20 → some recent satellite LR estimates (4.09 cm/yr)
 //
 //   ALPHA_CLIMATE_SCALE: 1.0 → prod Cox & Chao (-0.47 ms/century GIA drag)
@@ -387,7 +396,7 @@ if (prodL5b !== null) {
 }
 console.log('');
 console.log('Interpretation:');
-console.log('  * α₁-scale = 1.12 → matches Wells 3.82 cm/yr (from framework\'s current 3.41 cm/yr)');
+console.log('  * α₁-scale = 1.12 → matches LLR 3.82 cm/yr (from the pre-refit Wells 3.41 cm/yr; this is the SHIPPED anchor since the 2026-07 LLR-α₁ refit)');
 console.log('  * α₁-scale = 1.30 → gives ~4.4 cm/yr (extreme end)');
 console.log('  * GIA-scale = 0 → removes Cox & Chao contribution entirely (pure tidal)');
 console.log('  * GIA-scale = 0.5 → weaker GIA drag (~-0.24 ms/century)');
