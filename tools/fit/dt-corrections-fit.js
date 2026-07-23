@@ -1246,12 +1246,225 @@ function main() {
 }
 
 // Dispatch: --sweep-usno runs the joint-optimum diagnostic sweep instead of the
+// ═══════════════════════════════════════════════════════════════════════════
+// JOINT MODE (--joint, Stage 4 2026-07-23) — 4 flags + Core-mantle swing in
+// ONE equality-constrained solve.
+// ═══════════════════════════════════════════════════════════════════════════
+// Motivation: sequential iterate-and-close oscillates (Bond, the 3,695-yr
+// drive tone and deltaTStart are collinear in the 2.7-kyr window — see
+// data/core-mantle-resonator-default-on-convergence.json). The joint design
+// (prototyped in scripts/core_mantle_joint_fit_stage4.py):
+//   minimize ||A·x − residual||²  s.t.  Σ δLOD_j(2000)·x_j = targetOffset
+//   columns: 4 flag cos/sin pairs (8) + 3 resonator UNIT SHAPES with phases
+//   LOCKED to the Stage-1/3 convention (free phases let the cap cascade lock
+//   in ballooned phases) + free intercept (absorbs the deltaTStart trend
+//   anchor; zero δLOD; NOT shipped). Deliberately NO linear/quadratic
+//   detrend columns — the resonator episode IS the trend structure.
+//   Caps (cascade, scale-to-cap): Hallstatt 80, Jose5 50, Jose4 50, resonator
+//   kick1/kick2/tone at convention amplitudes; Bond free (anchor-bearing).
+// Scoring: TRUE Espenak table, free deltaTStart per USNO (findJointOptimum
+// convention). Report-only for now — the --write path lands with the atomic
+// default-ON package (new anchors + coefficients must move together).
+
+function runJointMode() {
+  const resPath = path.join(__dirname, '..', '..', 'data', 'core-mantle-resonator-stage1.json');
+  const res = JSON.parse(fs.readFileSync(resPath, 'utf8')).proposed_shipped_coefficients.resonator;
+  const T0 = EIGHT_H / res.T0_lattice_n;
+  const w0 = 2 * Math.PI / T0;
+  const lam = w0 / (2 * res.Q);
+  const wd = w0 * Math.sqrt(1 - 1 / (4 * res.Q * res.Q));
+  const kicks = res.kick_epochs_year;
+  const kc = res.kick_coefficients_s;
+  const tone = res.drive_tones[0];
+  const wTone = 2 * Math.PI * tone.dn / EIGHT_H;
+
+  function kickUnit(i, y) {
+    const dt = y - kicks[i];
+    if (dt < 0) return 0;
+    const norm = Math.hypot(kc[i].cos, kc[i].sin);
+    return Math.exp(-lam * dt)
+         * (kc[i].cos * Math.cos(wd * dt) + kc[i].sin * Math.sin(wd * dt)) / norm;
+  }
+  function toneUnit(y) {
+    const dt = y - kicks[0];
+    if (dt < 0) return 0;
+    return Math.exp(-lam * dt) * Math.cos(wTone * y - tone.phi_locked_rad);
+  }
+
+  const FLAG_DIVS = { bond: 1830, hallstatt: 1104, jose5: 2989, jose4: 3749 };
+  const colFns = [];
+  const names = [];
+  for (const [nm, d] of Object.entries(FLAG_DIVS)) {
+    const om = 2 * Math.PI * d / EIGHT_H;
+    colFns.push(y => Math.cos(om * y)); names.push(nm + '_cos');
+    colFns.push(y => Math.sin(om * y)); names.push(nm + '_sin');
+  }
+  colFns.push(y => kickUnit(0, y)); names.push('res_kick1');
+  colFns.push(y => kickUnit(1, y)); names.push('res_kick2');
+  colFns.push(y => toneUnit(y));    names.push('res_tone');
+  const N = colFns.length + 1;                       // + intercept
+  const INTERCEPT = N - 1;
+  const COMP = { bond: [0, 1], hallstatt: [2, 3], jose5: [4, 5], jose4: [6, 7],
+                 res_kick1: [8], res_kick2: [9], res_tone: [10] };
+  const CAPS = { hallstatt: 80.0, jose5: 50.0, jose4: 50.0,
+                 res_kick1: Math.hypot(kc[0].cos, kc[0].sin),
+                 res_kick2: Math.hypot(kc[1].cos, kc[1].sin),
+                 res_tone: Math.abs(tone.amp_s) };
+
+  function corrAt(y, x, excludeIntercept) {
+    let s = 0;
+    for (let j = 0; j < colFns.length; j++) s += x[j] * (colFns[j](y) - colFns[j](2000));
+    if (!excludeIntercept) s += x[INTERCEPT];
+    return s;
+  }
+
+  // δLOD(2000) row (central difference — exact enough at 0.5-yr step; matches
+  // the runtime _cycleLodCorrection convention 86400·dC/dy / T_trop_s)
+  const lodRow = new Array(N).fill(0);
+  for (let j = 0; j < colFns.length; j++) {
+    const d = (colFns[j](2000.5) - colFns[j](1999.5));
+    lodRow[j] = 86400 * d / MEAN_TROPICAL_YEAR_J2000_S;
+  }
+
+  function gaussSolve(M, v) {
+    const n = v.length;
+    const a = M.map((row, i) => [...row, v[i]]);
+    for (let c = 0; c < n; c++) {
+      let p = c;
+      for (let r = c + 1; r < n; r++) if (Math.abs(a[r][c]) > Math.abs(a[p][c])) p = r;
+      [a[c], a[p]] = [a[p], a[c]];
+      for (let r = 0; r < n; r++) {
+        if (r === c || a[c][c] === 0) continue;
+        const f = a[r][c] / a[c][c];
+        for (let k = c; k <= n; k++) a[r][k] -= f * a[c][k];
+      }
+    }
+    return a.map((row, i) => row[n] / a[i][i]);
+  }
+
+  function jointSolveOnce(years, residual, target) {
+    const n = years.length;
+    const X = years.map(y => {
+      const row = new Array(N);
+      for (let j = 0; j < colFns.length; j++) row[j] = colFns[j](y) - colFns[j](2000);
+      row[INTERCEPT] = 1;
+      return row;
+    });
+    // Effectively-hard anchor row: δLOD row entries are ~1e-5-scale, so the
+    // weight must be large enough that (W·row)² dominates the A'A entries
+    // (~n/2 ≈ 137). W = 1e10 → weighted entries ~1e5, squared ~1e10 ≫ A'A;
+    // closure then holds to ~1e-6 ms (verified in the report line below).
+    const W = 1e10;
+    const fixed = new Map();
+    let x = null;
+    for (let pass = 0; pass < 10; pass++) {
+      const free = [];
+      for (let j = 0; j < N; j++) if (!fixed.has(j)) free.push(j);
+      const M = free.map(() => new Array(free.length).fill(0));
+      const v = new Array(free.length).fill(0);
+      for (let i = 0; i < n; i++) {
+        let bi = residual[i];
+        for (const [j, val] of fixed) bi -= val * X[i][j];
+        for (let a2 = 0; a2 < free.length; a2++) {
+          v[a2] += X[i][free[a2]] * bi;
+          for (let b2 = 0; b2 <= a2; b2++) M[a2][b2] += X[i][free[a2]] * X[i][free[b2]];
+        }
+      }
+      let tEff = target;
+      for (const [j, val] of fixed) tEff -= val * lodRow[j];
+      for (let a2 = 0; a2 < free.length; a2++) {
+        v[a2] += W * W * lodRow[free[a2]] * tEff;
+        for (let b2 = 0; b2 <= a2; b2++) M[a2][b2] += W * W * lodRow[free[a2]] * lodRow[free[b2]];
+      }
+      for (let a2 = 0; a2 < free.length; a2++)
+        for (let b2 = a2 + 1; b2 < free.length; b2++) M[a2][b2] = M[b2][a2];
+      const xf = gaussSolve(M, v);
+      x = new Array(N).fill(0);
+      free.forEach((j, k2) => { x[j] = xf[k2]; });
+      for (const [j, val] of fixed) x[j] = val;
+      let violated = false;
+      for (const [comp, idx] of Object.entries(COMP)) {
+        if (comp === 'bond' || idx.every(j => fixed.has(j))) continue;
+        const amp = idx.length === 2 ? Math.hypot(x[idx[0]], x[idx[1]]) : Math.abs(x[idx[0]]);
+        const cap = CAPS[comp];
+        if (cap && amp > cap * (1 + 1e-9)) {
+          const s = cap / amp;
+          idx.forEach(j => fixed.set(j, x[j] * s));
+          violated = true;
+          break;
+        }
+      }
+      if (!violated) break;
+    }
+    return x;
+  }
+
+  // ── residual (tool conventions: fit_window, pure-tidal model, NO deltaTStart) ──
+  if (process.env.DT_CORRECTIONS_DISABLED !== '1') {
+    console.log('  ✗ Run with DT_CORRECTIONS_DISABLED=1 (raw pure-tidal residual required).');
+    process.exit(1);
+  }
+  const segments = loadStephenson();
+  const { years, residual } = sampleResidual(segments);
+  console.log('══ JOINT MODE — 4 flags + Core-mantle swing, hard USNO closure, caps ══');
+  console.log(`  fit window −720..2017 step ${CONFIG.fit_window.step_yr}; `
+            + `resonator convention: T₀ = 8H/${res.T0_lattice_n}, Q = ${res.Q}, `
+            + `kicks ${kicks[0]}/${kicks[1]}`);
+
+  const espenakYears = Object.keys(ESPENAK_REFERENCE).map(Number).sort((a, b) => a - b);
+  const physicsByYear = new Map();
+  for (const y of espenakYears) physicsByYear.set(y, DT.meanDeltaTSecondsAtAge((2000 - y) / 1e6));
+
+  let best = null;
+  const rows = [];
+  console.log('\n   USNO          deltaTStart  EspenakRMS  fullRMS   Bond    kick2   tone');
+  for (let u = 86400.0014; u <= 86400.0030 + 1e-9; u += 0.0001) {
+    const usno = Math.round(u * 1e7) / 1e7;
+    const target = computeUsnoTargetOffset(usno).targetOffset;
+    const x = jointSolveOnce(years, residual, target);
+    const diffs = espenakYears.map(y => ESPENAK_REFERENCE[y] - (physicsByYear.get(y) + corrAt(y, x, true)));
+    const dts = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+    const rmsEsp = Math.sqrt(diffs.reduce((a, d) => a + (d - dts) ** 2, 0) / diffs.length);
+    const resid = years.map((y, i) => residual[i] - corrAt(y, x, false));
+    const rmsFull = Math.sqrt(resid.reduce((a, r) => a + r * r, 0) / resid.length);
+    const bondAmp = Math.hypot(x[0], x[1]);
+    const row = { usno, dts, rmsEsp, rmsFull, bondAmp, x };
+    rows.push(row);
+    console.log(`   ${usno.toFixed(4)}   ${dts.toFixed(2).padStart(8)}   `
+              + `${rmsEsp.toFixed(2).padStart(8)}  ${rmsFull.toFixed(2).padStart(7)}  `
+              + `${bondAmp.toFixed(1).padStart(6)}  ${Math.abs(x[9]).toFixed(1).padStart(6)} `
+              + `${Math.abs(x[10]).toFixed(1).padStart(6)}`);
+    if (!best || rmsEsp < best.rmsEsp) best = row;
+  }
+
+  const x = best.x;
+  const closure = lodRow.reduce((a, w, j) => a + w * x[j], 0);
+  console.log(`\n  BEST: USNO ${best.usno.toFixed(4)}  deltaTStart ${best.dts.toFixed(2)} s  `
+            + `Espenak RMS ${best.rmsEsp.toFixed(2)} s  full ${best.rmsFull.toFixed(2)} s`);
+  console.log(`  closure Σ δLOD(2000) = ${(closure * 1000).toFixed(4)} ms `
+            + `(target ${(computeUsnoTargetOffset(best.usno).targetOffset * 1000).toFixed(4)} — hard row, weight 1e10)`);
+  console.log('  amplitudes:');
+  for (const [comp, idx] of Object.entries(COMP)) {
+    const amp = idx.length === 2 ? Math.hypot(x[idx[0]], x[idx[1]]) : Math.abs(x[idx[0]]);
+    const cap = CAPS[comp];
+    console.log(`    ${comp.padEnd(10)} ${amp.toFixed(2).padStart(8)} s`
+              + (cap ? `  (cap ${cap.toFixed(2)}${Math.abs(amp - cap) < 1e-6 ? ' — AT CAP' : ''})` : '  (free)'));
+  }
+  console.log(`    intercept  ${x[INTERCEPT].toFixed(2).padStart(8)} s  (folds into deltaTStart; not shipped)`);
+  console.log('\n  Report-only: the --write path for joint mode ships with the atomic');
+  console.log('  default-ON package (anchors + coefficients must move together).');
+  console.log('  Prototype cross-check: scripts/core_mantle_joint_fit_stage4.py');
+  console.log('  (12.53 s @ 86400.0016, dts 60.54 on a 2-yr unweighted grid).');
+}
+
 // normal single-shot fit. The sweep does NOT write or sync — it prints a table
 // of (usno, best deltaTStart, RMS vs Espenak) so the user can pick a value.
 if (process.argv.includes('--sweep-usno')) {
   runSweepUsno();
 } else if (process.argv.includes('--sweep-epoch')) {
   runSweepEpoch();
+} else if (process.argv.includes('--joint')) {
+  runJointMode();
 } else {
   main();
 }
