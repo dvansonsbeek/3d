@@ -2,9 +2,9 @@
 
 ## Status
 
-Research synthesis — closes the former TODO item "identify the physical channel for the ~0.5 ms/century fractional non-tidal secular rate." The residual is fully decomposed; its millennial component is identified with the documented core–mantle LOD fluctuation, independently confirmed against archeomagnetic core-flow reconstructions, and found to be representable in-window as the shipped ΔT stack's own lattice difference tones with a physically motivated damping interpretation — quantified in §6 as a driven-damped-resonator formula (T₀ ≈ 3.8–4.0 kyr, low Q, in the published axiMC eigenmode range) with a first guard-passing "channel-4" implementation form. Builds on docs 93 (L1 attribution), 99 (ESSRT), 102 (GIA α), 103 (Babylonian case study). Companion scripts: `scripts/lod_swing_archeomag_calibration.py`, `scripts/bond_coreflow_phase_lock_test.py`, `scripts/lod_residual_142yr_window_test.py`, `scripts/lod_swing_difference_tones.py`, `scripts/core_mantle_resonator_fit.py`, `scripts/core_mantle_excitation_inversion.py`, `scripts/core_mantle_channel4_feasibility.py`, `scripts/lod_swing_interaction_network.py`, `scripts/h26_phase_locked_test.py`, `scripts/lod_residual_h46_millennial_cycle.py`, `scripts/lod_residual_transient_plus_periods.py`, and the Stage-E / phantom-check instrumentation in `tools/fit/dt-corrections-fit.js`.
+Research synthesis — closes the former TODO item "identify the physical channel for the ~0.5 ms/century fractional non-tidal secular rate." The residual is fully decomposed; its millennial component is identified with the documented core–mantle LOD fluctuation, independently confirmed against archeomagnetic core-flow reconstructions, and found to be representable in-window as the shipped ΔT stack's own lattice difference tones with a physically motivated damping interpretation — quantified in §6 as a driven-damped-resonator formula (T₀ ≈ 3.8–4.0 kyr, low Q, in the published axiMC eigenmode range) with a first guard-passing "channel-4" implementation form. Builds on docs 93 (L1 attribution), 99 (ESSRT), 102 (GIA α), 103 (Babylonian case study). Companion scripts: `scripts/archive/lod_swing_archeomag_calibration.py`, `scripts/archive/bond_coreflow_phase_lock_test.py`, `scripts/archive/lod_residual_142yr_window_test.py`, `scripts/archive/lod_swing_difference_tones.py`, `scripts/archive/core_mantle_resonator_fit.py`, `scripts/archive/core_mantle_excitation_inversion.py`, `scripts/archive/core_mantle_channel4_feasibility.py`, `scripts/archive/lod_swing_interaction_network.py`, `scripts/archive/h26_phase_locked_test.py`, `scripts/archive/lod_residual_h46_millennial_cycle.py`, `scripts/archive/lod_residual_transient_plus_periods.py`, and the Stage-E / phantom-check instrumentation in `tools/fit/dt-corrections-fit.js`.
 
-**Nothing in this document ships.** The swing remains outside the runtime model; the constraints that keep it out (and what would change that) are stated in §8.
+**Update — the swing NOW SHIPS.** After this document was written, the campaign continued (joint fit, impulse-consistent episode) and the Core-mantle swing was integrated as the model's 4th dLOD/dt driver (Resonator), default-ON, fitted jointly with the flags by `tools/fit/dt-corrections-fit.js --joint` (anchors moved with it: USNO 86400.0014, deltaTStart 56.05, Espenak RMS 12.60 s). §8's shipping constraints are therefore HISTORICAL — each was resolved as described in TODO.md ("JOINT-WORLD FLIP") and the fit tool's documentation; a full rewrite of §6/§8 to the joint-world narrative is pending (integration backlog). The research scripts referenced below now live in `scripts/archive/` (see `scripts/archive/README-resonator-2026-07.md`).
 
 ---
 
@@ -72,7 +72,7 @@ Decadal context (relevant to §6): ~6-yr torsional/Alfvén waves (Gillet, Jault,
 
 ## 4. Independent confirmation: archeomagnetic cross-checks
 
-Script: `scripts/lod_swing_archeomag_calibration.py` → `data/lod-swing-archeomag-calibration.json`.
+Script: `scripts/archive/lod_swing_archeomag_calibration.py` → `data/lod-swing-archeomag-calibration.json`.
 
 **Same-lineage consistency (observational).** Against the state-of-the-art observational LOD residual (Kiani Shahvandi et al. 2024, *GRL* 51:e2024GL111148 companion data, Zenodo 13885017, CC-BY 4.0 — Morrison et al. 2021 Addendum lineage; local copy `data/kiani-shahvandi2024-lod-residual.txt`):
 
@@ -93,7 +93,7 @@ Script: `scripts/lod_swing_archeomag_calibration.py` → `data/lod-swing-archeom
 
 ## 5. The Holocene phase-lock test (negative result, recorded deliberately)
 
-Script: `scripts/bond_coreflow_phase_lock_test.py` → `data/bond-coreflow-phase-lock-test.json`.
+Script: `scripts/archive/bond_coreflow_phase_lock_test.py` → `data/bond-coreflow-phase-lock-test.json`.
 
 Hypothesis (formulated as a falsifiable prediction, tested before publication): if the climatic Bond cycle and the core swing both ride the 8H/1830 = 1,465.9-yr clock, Bond IRD events and archeomagnetic core-flow episodes must be phase-locked across the Holocene. Data: Bond et al. 2001 stacked %HSG (*Science* 294:2130, NOAA archive; local `data/bond2001-raw.txt`) and CAM ΔLOD derived from the CFF joint field+flow models (Nilsson, Suttie, Troyano, Gillet, Aubert & Irbäck, *jSEDI*, doi:10.46298/jsedi.17320; EarthRef ERDA 2776; derived series `data/cff-coreflow-lod-derived.json`, LOD = 1.138(t₁⁰ + 12⁄7 t₃⁰) per Jault et al. 1988 / Jackson et al. 1993).
 
@@ -110,7 +110,7 @@ The 8H/1830 flag is what the eclipse window shows it to be — the periodic part
 
 ## 6. The difference-tone structure
 
-Script: `scripts/lod_swing_difference_tones.py` → `data/deltaT-swing-difference-tones.json`.
+Script: `scripts/archive/lod_swing_difference_tones.py` → `data/deltaT-swing-difference-tones.json`.
 
 ### Lattice closure under beats
 
@@ -147,7 +147,7 @@ If multiple slow systems (core, and the solar/heliospheric modulation recorded i
 
 ### The resonator formula, quantified
 
-Script: `scripts/core_mantle_resonator_fit.py` → `data/core-mantle-resonator-fit.json`.
+Script: `scripts/archive/core_mantle_resonator_fit.py` → `data/core-mantle-resonator-fit.json`.
 
 Three formula candidates were fitted to the post-stack residual with the H/46-guard discipline (modern-window mean |δLOD| ≤ 0.2 ms/day, Espenak shape ≤ 5 s, |δLOD(2000)| ≤ 0.1 ms/day):
 
@@ -161,7 +161,7 @@ Two structurally different models independently select **T₀ ≈ 3.8–3.9 kyr*
 
 ### The interaction network: Δn = 34 phase-locking
 
-Script: `scripts/lod_swing_interaction_network.py` → `data/deltaT-swing-interaction-network.json`.
+Script: `scripts/archive/lod_swing_interaction_network.py` → `data/deltaT-swing-interaction-network.json`.
 
 All four flags interact — cooperatively, not democratically. Weighting each pair's forcing (AᵢAⱼ/2) by the eigenmode gain |H| at its beat frequency (T₀ = 3,900 yr, Q = 8):
 
@@ -178,13 +178,13 @@ The key structural fact: the difference-tone spectrum self-organizes into **lock
 
 ### Excitation: the recovered driving history
 
-Script: `scripts/core_mantle_excitation_inversion.py` → `data/core-mantle-excitation-inversion.json`.
+Script: `scripts/archive/core_mantle_excitation_inversion.py` → `data/core-mantle-excitation-inversion.json`.
 
 Because the oscillator equation is known, the forcing is recoverable by deconvolution: f(t) = ÿ + (ω₀/Q)ẏ + ω₀²y. Applied to the observed LOD residual and the CFF core-flow ΔLOD: (a) the driving is **smooth, not impulsive** (kurtosis within phase-randomized surrogates — continuous envelope-modulated forcing, not discrete kicks); (b) in the well-measured window the forcing reverses sign across the ~900 CE turnaround — a push centered at 730 CE and a pull at 1220 CE — landing **7–10 yr from consecutive extrema of the hallstatt×jose4 envelope** (deterministic max 723 / min 1230, zero free parameters); (c) a third appearance of the low-pass signature: the recovered *forcing* correlates with pair products containing sum tones (bond×hall's 914-yr component) while the *response* contains none (|H| at 914 yr ≈ 0.06). Statistical weight of the timing link: p = 0.02 uncorrected, ~0.06 after multiplicity, n = 2 events, partial circularity (stack phases fitted to the same eclipse record) — **suggestive, not established; "as-if" status**.
 
 ### Channel-4 feasibility: the first guard-passing model
 
-Script: `scripts/core_mantle_channel4_feasibility.py` → `data/core-mantle-channel4-feasibility.json`.
+Script: `scripts/archive/core_mantle_channel4_feasibility.py` → `data/core-mantle-channel4-feasibility.json`.
 
 Two implementation routes tested:
 
@@ -200,13 +200,13 @@ Two implementation routes tested:
 Two astronomically flavored driver hypotheses were tested and rejected for the swing (both preserved as scripts/artifacts):
 
 1. **Earth-planet perihelion alignments** (invariable-plane-explorer epochs): alignment epochs vs CFF core-flow episodes give p = 0.58 (Monte-Carlo nearest-distance null) and no alignment marks the ~900 CE turnaround; independently, the configuration clocks (≥ ~11–70 kyr per Earth-relative perihelion synodic) are 5–20× too slow to pace the 1–3.5-kyr episodes. At most a slow modulating layer; not the driver.
-2. **H/26 = 12,896.8-yr J/S-symmetric alignment comb** (`scripts/h26_phase_locked_test.py` → `data/h26-phase-locked-test.json`): a ~12.9-kyr line IS archive-significant (free and epoch-locked fits both clear permutation p95 in Cheng ~50 cycles, EPICA ~62, GISP2 ~3.9) — but the superposed-epoch fold shows a **distributed pattern, not peaks** (no event-like anomaly at any alignment epoch), part of EPICA's significance is ~100-kyr termination aliasing, and the alignment comb is degenerate to ~295 yr with the framework's perihelion-solstice (semi-precession) comb — mechanism attribution open, and irrelevant to the swing on timescale grounds. Retained as a genuine archive result of the broader lattice program.
+2. **H/26 = 12,896.8-yr J/S-symmetric alignment comb** (`scripts/archive/h26_phase_locked_test.py` → `data/h26-phase-locked-test.json`): a ~12.9-kyr line IS archive-significant (free and epoch-locked fits both clear permutation p95 in Cheng ~50 cycles, EPICA ~62, GISP2 ~3.9) — but the superposed-epoch fold shows a **distributed pattern, not peaks** (no event-like anomaly at any alignment epoch), part of EPICA's significance is ~100-kyr termination aliasing, and the alignment comb is degenerate to ~295 yr with the framework's perihelion-solstice (semi-precession) comb — mechanism attribution open, and irrelevant to the swing on timescale grounds. Retained as a genuine archive result of the broader lattice program.
 
 ---
 
 ## 7. The 14.2-yr peak (closed alongside)
 
-Script: `scripts/lod_residual_142yr_window_test.py` → `data/deltaT-142yr-window-test.json`.
+Script: `scripts/archive/lod_residual_142yr_window_test.py` → `data/deltaT-142yr-window-test.json`.
 
 The ~14.2-yr line in the 270-observation eclipse residual is a **sampling-window artifact**: (a) physical ceiling — the observations span −720…+1280 with ~10³-s timing noise, and a real 0.15-ms decadal LOD line integrates to only ~0.12 s of ΔT (SMH 2016: decadal fluctuations resolved only after +1600); (b) the observation epochs' own spectral window peaks at **14.30 yr** (2nd-strongest structure, part of a ~7.15-yr harmonic comb ≈ the 88-lunation eclipse cycle) — a property of *when* eclipses were recorded, which also explains why it passed subset-robustness checks. The genuine 13.5–13.6-yr core mode (Hsu 2021; Ding & Jiang 2024) is undetectable at ancient noise; no framework component is warranted.
 

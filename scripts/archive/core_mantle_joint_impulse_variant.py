@@ -1,4 +1,13 @@
 """
+[ARCHIVED 2026-07-23 — pre-joint-world research script. Conclusions are
+recorded in docs/104, TODO.md and the data/ JSON artifacts. Since the
+joint-world flip (USNO 86400.0014, deltaTStart 56.05, resonator default-ON,
+impulse-consistent episode −1600→+1600), reruns against current production
+give DIFFERENT numbers: the shipped 4-flag coefficients changed and the
+runtime includes the resonator (set DT_RESONATOR_DISABLED=1 for pre-flip
+runtime semantics; exact reproduction needs the commit noted in git log).
+See scripts/archive/README-resonator-2026-07.md]
+
 Impulse-consistent joint-fit variant: displacement-continuous episode.
 
 The shipped joint world (--joint) allows kick columns with both cos and sin
@@ -36,7 +45,8 @@ import numpy as np
 
 REPO = Path('/home/dennis/code/3d')
 OUT_PATH = REPO / 'data' / 'core-mantle-joint-impulse-variant.json'
-sys.path.insert(0, str(REPO / 'scripts'))
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # archive-local imports
+sys.path.insert(1, str(REPO / 'scripts'))
 from core_mantle_joint_fit_stage4 import (          # noqa: E402
     EIGHT_H, MEAN_TROP_S, ESPENAK_REFERENCE, FLAGS, TONE_DN,
     load_raw, tone_phase_locked, constrained_lsq)

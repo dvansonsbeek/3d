@@ -207,8 +207,8 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `../../scripts/fibonacci_significance.py` | `data/significance-results.json` (combined p + sigma via Stouffer's Z with correlation correction; Fisher's reported for transparency; 11 tests × 3 null distributions) | `tools/lib/python/constants_scripts.py` |
 | `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond 8H/1830, Hallstatt 8H/1104, Jose5 8H/2989, Jose4 8H/3749) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (USNO 86400.0015, deltaTStart 58.48, Espenak RMS 12.54 s, full-window 32.4 s). The legacy single-shot cascade remains as a stage-wise diagnostic; the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
 | `../../scripts/lattice_harmonic_scan.py` | `data/lattice-scan-<tag>.json` — universal 8H-lattice harmonic scan across multiple paleoclimate archives (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem δ18O, EPICA CO2, LR04 δ18O). Enumerates gcd-compliant divisors in a period band, fits each candidate against each dataset, ranks by cross-dataset consistency. Used to identify Jose4 (4×Jose 715 yr) as the 4th flag with cross-archive coherence. | Multiple paleoclimate proxies in `data/` and `public/input/` |
-| `../../scripts/core_mantle_resonator_stage1.py` | `data/core-mantle-resonator-stage1.json` — the **Core-mantle swing (Resonator driver)** shipped block: a 2-kick EPISODE (windowed damped oscillation, T₀ = 8H/`RES_T0_LATTICE_N` lattice-labeled, Q, kick epochs/coefficients, phase-locked drive tone). Selection rule: pinned-lattice-T₀ guard-passers first (guard-aware solver — modern-window δLOD penalty rows). **Regeneration rule: refit after ANY stack change (3rd/5th cycle) — the drive-tone menu derives from the active flags (Δn arithmetic), so the design is generic over flag count.** Kick epochs are a documented CONVENTION (−800/+1600), not data-pinned — see the stage-3 stability artifact before moving them. | Stephenson residual after the shipped stack (node bridge to `tools/lib/deep-time.js`) + `data/deltaT-4flag-fit.json` (parents' phases for the locked tones) |
-| `../../scripts/core_mantle_resonator_stage3_stability.py` | `data/core-mantle-resonator-stage3-stability.json` — kick-epoch stability: coordinate refinement, ridge map + 2% stability box, era jackknife. Verdict 2026-07: epochs NOT data-pinnable (broad t_exc/T₀ ridge, era-dependent jackknife) → shipped epochs stand as convention. | same residual |
+| `../../scripts/archive/core_mantle_resonator_stage1.py` | `data/core-mantle-resonator-stage1.json` — the **Core-mantle swing (Resonator driver)** shipped block: a 2-kick EPISODE (windowed damped oscillation, T₀ = 8H/`RES_T0_LATTICE_N` lattice-labeled, Q, kick epochs/coefficients, phase-locked drive tone). Selection rule: pinned-lattice-T₀ guard-passers first (guard-aware solver — modern-window δLOD penalty rows). **Regeneration in the joint world: amplitudes refit automatically via `--joint --write` (tone menu derives from the active flags — generic over flag count). The episode CONVENTION (T₀ = 8H/685, Q = 1.8, epochs −1600/+1600, impulse-consistent shapes) is re-derived only if ever needed via the archived stage-1/stage-3/impulse scripts.** Kick epochs are a documented CONVENTION, not data-pinned — see the stage-3 stability artifact before moving them. | Stephenson residual after the shipped stack (node bridge to `tools/lib/deep-time.js`) + `data/deltaT-4flag-fit.json` (parents' phases for the locked tones) |
+| `../../scripts/archive/core_mantle_resonator_stage3_stability.py` | `data/core-mantle-resonator-stage3-stability.json` — kick-epoch stability: coordinate refinement, ridge map + 2% stability box, era jackknife. Verdict 2026-07: epochs NOT data-pinnable (broad t_exc/T₀ ridge, era-dependent jackknife) → shipped epochs stand as convention. | same residual |
 | `../../scripts/core_mantle_resonator_stage3_validation.js` | `data/core-mantle-resonator-stage3-validation.json` — runtime OFF/ON sweep: J2000 invariants, Stephenson RMS 268.8 → 53.4 s, Espenak window +0.4 s, deep-time bit-identical ±200 Myr. | production chain (`tools/lib/deep-time.js`) |
 | `export-dt-corrections.js` | Patches `BOND_/HALLSTATT_/JOSE5_ COS_/SIN_COEFF_S` (and `_LATTICE_N`) **and the resonator `RES_*` constants** in `src/script.js`, `tools/lib/deep-time.js`, and website `deepTime.ts` (targets lacking the constants skip silently). Also exposes an in-memory API (`loadFitJson`/`loadResonatorJson`/`applyToSource`) used by `export-to-script.js` and `export-to-holistic.js` as a delegated tail step. | `data/deltaT-4flag-fit.json` + `data/core-mantle-resonator-stage1.json` |
 | `export-to-script.js` | Syncs all JSON values → `src/script.js` (includes DT correction constants via `export-dt-corrections.js` delegate) | 4 JSON files in `public/input/` + `data/deltaT-4flag-fit.json` if present |
@@ -277,7 +277,7 @@ cycle. Specific stale-value classes we've hit before:
 
 - **Fourier harmonics** (`TROPICAL_YEAR_HARMONICS`, `SIDEREAL_YEAR_HARMONICS`, `OBLIQUITY_HARMONICS`, `PERI_HARMONICS`, cardinal-point terms) — if the fit re-runs but the sync doesn't, downstream J2000 day-length values drift by ~10s of seconds.
 - **ΔT stack** (`BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S`) — silent, because deepTime.ts imports directly and the calculator page uses `calcDeltaT` → `meanDeltaTSecondsAtAge`. A stale DT stack shifts ΔT at year 1000 by hundreds of seconds.
-- **`DELTA_T_START_SECONDS`** — the ΔT trend anchor. Auto-updated by `dt-corrections-fit.js --sweep-usno`; if not synced, Holistic's absolute-ΔT displays disagree with the simulator's tweakpane by the Δ between the old and new joint-optimum values.
+- **`DELTA_T_START_SECONDS`** — the ΔT trend anchor. Auto-updated by `dt-corrections-fit.js --joint --write` (joint-optimum deltaTStart; legacy: --sweep-usno); if not synced, Holistic's absolute-ΔT displays disagree with the simulator's tweakpane by the Δ between the old and new joint-optimum values.
 - **Prediction coefficients** (`COEFFICIENTS`) — 2421-term arrays per planet. Stale coefficients silently mis-predict planetary positions in the calculator by up to arcminutes.
 
 The `pnpm run values:generate` step catches drift *indirectly* — it re-derives every J2000 value from the (already-synced) primitives, so out-of-sync sources cascade through. This is why running it as the last step is essential.
@@ -686,15 +686,20 @@ Step 7b: balance-search.js                    → balance-presets.json
          Writes data/balance-presets.json (synced to script.js by Step 9).
          Count changes when eccentricity values change (affects w = √(m·a(1-e²))/d).
 
-Step 7c: dt-corrections-fit.js                → data/deltaT-4flag-fit.json
-         Fits the 4-flag sub-Milankovitch ΔT correction stack (Bond +
-         Hallstatt + Jose5 + Jose4) against the Stephenson 2016 residual.
-         Requires DT_CORRECTIONS_DISABLED=1 env so the residual reflects the
-         raw pure-tidal framework, not framework + previously-shipped
-         corrections. Bond uses solo-fit phase; Hallstatt/Jose5/Jose4 use
-         cap-only shipping (free-fit if below prior amplitude, scaled down
-         to prior only if free > prior). See docs/102 § "Companion 8H
-         lattice harmonics" and dt-corrections-fit.js header comment.
+Step 7c: DT_CORRECTIONS_DISABLED=1 dt-corrections-fit.js --joint --write
+         → data/deltaT-4flag-fit.json + data/core-mantle-resonator-stage1.json
+           + astro-reference.json deltaTStart          (JOINT WORLD, 2026-07-23)
+         AUTHORITATIVE fit: 4 flags + the Core-mantle swing (Resonator)
+         episode in ONE equality-constrained solve — hard USNO closure row
+         (anchor met exactly, resonator included), amplitude caps at FIXED
+         convention values (cap-creep warning in the code), impulse-
+         consistent resonator shapes (sin-only kicks, compensated tone,
+         phases locked), composite selection (best Espenak s.t. full-window
+         RMS ≤ 40 s). Then sync constants (export-dt-corrections) and run
+         scripts/core_mantle_resonator_stage3_validation.js. The legacy
+         single-shot cascade (plain --write) remains a stage-wise DIAGNOSTIC
+         (collinearity warnings, Stage-E phantom check) — do not ship from
+         it. See dt-corrections-fit.js header + docs/104.
          Only re-run when H or the tidal LOD anchor changes (H change
          shifts the framework model ΔT curve, altering the residual to fit).
          Automated in the pipeline as of 2026-07-15.
@@ -783,8 +788,10 @@ Step 10: node tools/export-dashboard-data.js  → dashboard/data/*.json
 
 ── Phase 8: ΔT correction stack (Bond + Hallstatt + Jose5 + Jose4) ─
 
-Step 11: DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --write
-         → data/deltaT-4flag-fit.json
+Step 11: DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write
+         → data/deltaT-4flag-fit.json + resonator JSON + deltaTStart
+         (JOINT WORLD — authoritative; the cascade description below is the
+         legacy diagnostic path, retained for its stage-wise instrumentation)
          Cascaded LSQ fit of the sub-Milankovitch 8H-lattice ΔT correction stack
          against the Stephenson 2016 residual over years -720 → 2016:
            Stage A: Bond 8H/1830 solo (unconstrained; the primary anchor)

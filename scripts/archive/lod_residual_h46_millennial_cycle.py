@@ -1,4 +1,13 @@
 """
+[ARCHIVED 2026-07-23 — pre-joint-world research script. Conclusions are
+recorded in docs/104, TODO.md and the data/ JSON artifacts. Since the
+joint-world flip (USNO 86400.0014, deltaTStart 56.05, resonator default-ON,
+impulse-consistent episode −1600→+1600), reruns against current production
+give DIFFERENT numbers: the shipped 4-flag coefficients changed and the
+runtime includes the resonator (set DT_RESONATOR_DISABLED=1 for pre-flip
+runtime semantics; exact reproduction needs the commit noted in git log).
+See scripts/archive/README-resonator-2026-07.md]
+
 H/46 millennial-cycle test: is the "missing 0.75 ms/day motion" one arc of a
 ~7,290-yr lattice cycle?
 

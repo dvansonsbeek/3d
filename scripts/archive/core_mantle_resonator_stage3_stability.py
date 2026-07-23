@@ -1,4 +1,13 @@
 """
+[ARCHIVED 2026-07-23 — pre-joint-world research script. Conclusions are
+recorded in docs/104, TODO.md and the data/ JSON artifacts. Since the
+joint-world flip (USNO 86400.0014, deltaTStart 56.05, resonator default-ON,
+impulse-consistent episode −1600→+1600), reruns against current production
+give DIFFERENT numbers: the shipped 4-flag coefficients changed and the
+runtime includes the resonator (set DT_RESONATOR_DISABLED=1 for pre-flip
+runtime semantics; exact reproduction needs the commit noted in git log).
+See scripts/archive/README-resonator-2026-07.md]
+
 Stage 3.1 — kick-epoch stability for the Core-mantle swing (Resonator driver).
 
 The Stage-1 fits exposed a t_exc/T₀ ridge: the excitation epoch moved
@@ -33,7 +42,8 @@ import numpy as np
 
 REPO = Path('/home/dennis/code/3d')
 OUT_PATH = REPO / 'data' / 'core-mantle-resonator-stage3-stability.json'
-sys.path.insert(0, str(REPO / 'scripts'))
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # archive-local imports
+sys.path.insert(1, str(REPO / 'scripts'))
 from core_mantle_resonator_stage1 import (          # noqa: E402
     EIGHT_H, load_residual, load_flags, difference_tones,
     episode_columns, guards)

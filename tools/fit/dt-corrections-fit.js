@@ -1,8 +1,44 @@
 #!/usr/bin/env node
 /**
- * Fit the 3-flag sub-Milankovitch ΔT correction stack (Bond + Hallstatt + Jose5).
+ * ΔT correction fitting — 4-flag lattice stack + Core-mantle swing (Resonator).
  *
- * Design (mirrors sun-longitude-harmonics.js pattern):
+ * ═══ JOINT WORLD (authoritative since 2026-07-23) ═══
+ * The production fit is the JOINT mode: 4 flags + the Core-mantle swing
+ * episode in ONE equality-constrained solve —
+ *
+ *   DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint          # report
+ *   DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write  # SHIP
+ *
+ * Design (see runJointMode below; prototypes in scripts/archive/core_mantle_
+ * joint_fit_stage4.py + core_mantle_joint_impulse_variant.py):
+ *   • columns: 4 flag cos/sin pairs + 3 resonator IMPULSE-CONSISTENT unit
+ *     shapes (sin-only kicks — displacement-continuous; switch-on-compensated
+ *     drive tone; phases locked to the convention) + free intercept (= the
+ *     deltaTStart trend anchor; not shipped)
+ *   • hard USNO closure row (weight 1e10): Σ δLOD_j(2000)·x_j = targetOffset
+ *     — the anchor is met EXACTLY by construction, resonator included
+ *   • amplitude caps (cascade): Hallstatt 80 / Jose5 50 / Jose4 50 /
+ *     resonator kick1 773.335 / kick2 179.324 / tone 186.140 — FIXED
+ *     convention constants (never derived from the mutable JSON: cap creep)
+ *   • sweep over USNO; TRUE Espenak scoring with free per-USNO deltaTStart;
+ *     COMPOSITE selection (best Espenak subject to full-window RMS ≤ 40 s —
+ *     Espenak-only selection degenerates)
+ *   • --write ships atomically: data/deltaT-4flag-fit.json (flag coefficients
+ *     + optimum + usno_anchor), data/core-mantle-resonator-stage1.json
+ *     (resonator amplitudes; T₀/Q/epochs stay the convention), and
+ *     public/input/astro-reference.json (deltaTStart). Then sync runtime
+ *     constants via export-dt-corrections and re-run
+ *     scripts/core_mantle_resonator_stage3_validation.js.
+ *   Shipped state: USNO 86400.0014, deltaTStart 56.05, Espenak 12.60 s,
+ *   full-window 31.3 s; episode −1600 → +1600; resonator default-ON runtime-
+ *   wide (opt-out DT_RESONATOR_DISABLED=1). Narrative: docs/104 + TODO.md.
+ *
+ * ═══ LEGACY single-shot cascade (diagnostic only since the joint flip) ═══
+ * The original stage-wise fit below (Bond solo → +Hallstatt → +Jose5 →
+ * +Jose4 anchored → Stage E h253 → Bond-only closure) is retained for its
+ * stage-wise diagnostics (collinearity warnings, Stage-E phantom check, the
+ * anchor-shadow-price meter) — do NOT use its --write for shipping anymore.
+ *
  *   1. Set DT_CORRECTIONS_DISABLED=1 in env so framework model ΔT is pure-tidal.
  *   2. Load Stephenson 2016 ΔT polynomial from JSON.
  *   3. Sample residual R(y) = Stephenson(y) − framework_model(y) on a year grid.
@@ -19,19 +55,18 @@
  * SOLO-fit phases (least contaminated) with constrained amplitudes below the
  * free-fit values — see docs/102 § "Companion 8H lattice harmonics".
  *
- * Usage:
- *   node tools/fit/dt-corrections-fit.js                                # dry run
- *   node tools/fit/dt-corrections-fit.js --write                        # write JSON artifact
- *   node tools/fit/dt-corrections-fit.js --write --sync-code            # also sync to code files
+ * Other diagnostic modes:
  *   DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --sweep-usno
- *     → joint-optimum sweep over CONFIG.usno_anchor.usno_target_lod_s;
- *       for each anchor value in the sweep range, finds the deltaTStart that
- *       minimises RMS vs Espenak & Meeus at ~20 historical reference years.
- *       Diagnostic only — does NOT write or sync (nothing persisted).
+ *     → legacy-cascade joint-optimum sweep (USNO × deltaTStart vs Espenak).
+ *   DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --sweep-epoch
+ *     → 2D epoch sweep (trajectory offset δ × USNO) — the experiment that
+ *       established the time-varying nature of the millennial swing.
  *
- * The --write flag requires DT_CORRECTIONS_DISABLED=1 be set: this ensures
+ * All fitting/write modes require DT_CORRECTIONS_DISABLED=1: this ensures
  * the residual samples reflect the raw framework model, not framework +
- * previously-shipped corrections (which would produce a delta, not an absolute fit).
+ * previously-shipped corrections (which would produce a delta, not an
+ * absolute fit). Note the integrator master-gate: DT_CORRECTIONS_DISABLED=1
+ * also removes the resonator from the model ΔT, so no extra env is needed.
  *
  * The --sync-code flag also updates the three code sites that hold the shipped
  * coefficients: src/script.js, tools/lib/deep-time.js, and the website
@@ -53,14 +88,16 @@
  * shipped-stack Stephenson-residual RMS therefore inherits a deep-past
  * mismatch that is a known limitation of the harmonic-only ship.
  *
- * USNO ANCHOR (Stage D, from 2026-07-18): the final Stage D fit adds a soft
- * constraint `Σ cycleLodCorrection_i(2000) = TARGET_LOD_OFFSET` where
- *   TARGET_LOD_OFFSET = 86400.0016 (USNO) − o.lodKinematic − h5Correction(2000)
- *                    ≈ −1.937 ms
- * so that at J2000 the sum of the four DT-cycle δLOD contributions lands
- * exactly on the USNO Earth Orientation Center's LOD value. Implemented as
- * an extra weighted row in the design matrix (weight ≈ 1e6 relative to a
- * per-year sample). See `usno_anchor` in CONFIG for enable/disable + target.
+ * USNO ANCHOR (legacy cascade; Stage D, from 2026-07-18): the final Stage D
+ * fit adds a soft constraint `Σ cycleLodCorrection_i(2000) = TARGET_LOD_OFFSET`
+ * where TARGET_LOD_OFFSET = USNO_target − o.lodKinematic − h5Correction(2000),
+ * so that at J2000 the sum of the DT-cycle δLOD contributions lands exactly
+ * on the USNO Earth Orientation Center's LOD value. In the JOINT world the
+ * shipped USNO target is 86400.0014 (target offset ≈ −2.137 ms, resonator
+ * included in the sum — see the joint-mode section above); the value in
+ * CONFIG/`usno_anchor` follows the shipped optimum in data/deltaT-4flag-
+ * fit.json. Implemented in the legacy cascade as an extra weighted row in
+ * the design matrix; in joint mode as the hard closure row (weight 1e10).
  */
 
 const fs = require('fs');
@@ -103,7 +140,7 @@ const CONFIG = {
       fit_stage:  'with_bond_hallstatt_jose5',
       target_amp_s: 50 },
     { name: 'h253',     lattice_n: 2024,
-      structural: 'H/253 = H/(11·23) = 1,325.4 yr; gcd(2024, H) = 23; 184th harmonic of 8H/11 (Earth ecliptic-perihelion family). Identified 2026-07-22 by L-5b §14 post-4-flag residual scan (flat ΔR²=0.031 peak n=2015-2024, gcd-compliant flank chosen) — see scripts/lod_residual_h253_fifth_cycle.py (GO verdict: medieval 990-bump window 98→17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, lattice_harmonic_scan); Steinhilber marginal (~95% threshold); cap-only ship keeps the amplitude below the free fit.',
+      structural: 'H/253 = H/(11·23) = 1,325.4 yr; gcd(2024, H) = 23; 184th harmonic of 8H/11 (Earth ecliptic-perihelion family). Identified 2026-07-22 by L-5b §14 post-4-flag residual scan (flat ΔR²=0.031 peak n=2015-2024, gcd-compliant flank chosen) — see scripts/archive/lod_residual_h253_fifth_cycle.py (GO verdict: medieval 990-bump window 98→17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, lattice_harmonic_scan); Steinhilber marginal (~95% threshold); cap-only ship keeps the amplitude below the free fit.',
       fit_stage:  'frozen_residual_after_D',
       target_amp_s: 75 },
     // Eddy (8H/2684 = 999.45 yr) TESTED AND ROLLED BACK 2026-07-12: the 5-cycle
@@ -454,7 +491,7 @@ const ESPENAK_REFERENCE = {
 // optimum pays it in every formulation — and its deficit is what the
 // post-closure phantom check quantifies as the apparent ~1,326-yr line.
 // Implementations preserved in git history (commit with this note); evidence:
-// scripts/lod_residual_h253_fifth_cycle.py + data/deltaT-h253-fifth-cycle-scan.json.
+// scripts/archive/lod_residual_h253_fifth_cycle.py + data/deltaT-h253-fifth-cycle-scan.json.
 
 // ─── Quiet fit: run all 4 stages + shipping + Bond adjustment for a given
 // USNO anchor value. Returns the shipped coefficients + fit metrics WITHOUT
@@ -955,7 +992,7 @@ function main() {
   // left. This is structurally immune to the Bond-collinearity blowup that
   // rolled back Eddy-999 (1,326 yr vs Bond 1,466 yr beat ≈ 14 kyr — a joint
   // fit would be near-degenerate over the 2.7-kyr window; the frozen fit
-  // sidesteps it). GO evidence: scripts/lod_residual_h253_fifth_cycle.py.
+  // sidesteps it). GO evidence: scripts/archive/lod_residual_h253_fifth_cycle.py.
   const h253Cycle = CONFIG.cycles.find(c => c.name === 'h253');
   const frozenFour = [bondForShipRaw, hallForShip, joseForShip, jose4ForShip];
   const residualE = years.map((y, i) => {
@@ -1011,7 +1048,7 @@ function main() {
     // ~74 s Bond amplitude cost is the SHADOW PRICE of the USNO anchor itself
     // (the constrained optimum pays it in every formulation), and its deficit
     // is what the post-closure phantom check below quantifies as the apparent
-    // ~1,326-yr residual line. See scripts/lod_residual_h253_fifth_cycle.py;
+    // ~1,326-yr residual line. See scripts/archive/lod_residual_h253_fifth_cycle.py;
     // rejected closure implementations preserved in git history (see the
     // closure-design experiment note above the quiet-fit section).
     const preAdjSum = cycleLodAtJ2000(bondForShipRaw)
@@ -1253,7 +1290,7 @@ function main() {
 // Motivation: sequential iterate-and-close oscillates (Bond, the 3,695-yr
 // drive tone and deltaTStart are collinear in the 2.7-kyr window — see
 // data/core-mantle-resonator-default-on-convergence.json). The joint design
-// (prototyped in scripts/core_mantle_joint_fit_stage4.py):
+// (prototyped in scripts/archive/core_mantle_joint_fit_stage4.py):
 //   minimize ||A·x − residual||²  s.t.  Σ δLOD_j(2000)·x_j = targetOffset
 //   columns: 4 flag cos/sin pairs (8) + 3 resonator UNIT SHAPES with phases
 //   LOCKED to the Stage-1/3 convention (free phases let the cap cascade lock
@@ -1466,7 +1503,7 @@ function runJointMode() {
     console.log('\n  Dry run — add --write to ship the joint world (updates');
     console.log('  data/deltaT-4flag-fit.json, data/core-mantle-resonator-stage1.json,');
     console.log('  public/input/astro-reference.json). Prototype cross-check:');
-    console.log('  scripts/core_mantle_joint_fit_stage4.py (12.53 s @ 86400.0016, 2-yr grid).');
+    console.log('  scripts/archive/core_mantle_joint_fit_stage4.py (12.53 s @ 86400.0016, 2-yr grid).');
     return;
   }
 

@@ -107,7 +107,7 @@ function applyToSource(src, fit) {
 
   // ── Core-mantle swing (Resonator driver) — 2-kick episode constants ──
   // Source of truth: data/core-mantle-resonator-stage1.json (fitted by
-  // scripts/core_mantle_resonator_stage1.py, variant V5, physical-consistency
+  // scripts/archive/core_mantle_resonator_stage1.py, variant V5, physical-consistency
   // rule). Skipped silently if the JSON or the RES_* constants are absent
   // from the target (e.g. website deepTime.ts until its display integration).
   const res = loadResonatorJson();

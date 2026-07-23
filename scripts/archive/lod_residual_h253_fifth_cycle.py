@@ -1,4 +1,13 @@
 """
+[ARCHIVED 2026-07-23 — pre-joint-world research script. Conclusions are
+recorded in docs/104, TODO.md and the data/ JSON artifacts. Since the
+joint-world flip (USNO 86400.0014, deltaTStart 56.05, resonator default-ON,
+impulse-consistent episode −1600→+1600), reruns against current production
+give DIFFERENT numbers: the shipped 4-flag coefficients changed and the
+runtime includes the resonator (set DT_RESONATOR_DISABLED=1 for pre-flip
+runtime semantics; exact reproduction needs the commit noted in git log).
+See scripts/archive/README-resonator-2026-07.md]
+
 5th ΔT-stack cycle experiment: h253 (~1,326 yr) against the POST-4-flag residual.
 
 Motivated by L-5b §14 (2026-07-22): after subtracting the shipped 4-flag stack
