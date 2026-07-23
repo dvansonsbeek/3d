@@ -75,7 +75,7 @@ let   currentAUDistance = 149597870.698828;               // 1 AU in km (IAU 201
 const AU_J2000_KM = currentAUDistance;                    // J2000 reference snapshot — used as a frozen anchor for physical constants (GM_SUN, masses) and Driver 2 evolution formula
 const speedOfLight = 299792.458;                          // Speed of light in km/s (CODATA)
 const perihelionalignmentYear = 1246.03125;                     // Year when perihelion longitude = 90° (Meeus)
-const deltaTStart = 56.04899719615156;                                // Delta-T at model epoch (seconds) — auto-optimum joint solve with USNO 86400.0026 s (RMS 22.53 s vs Espenak across 20 reference years 1650-2017). Approaches IAU J2000 ΔT = 64.184 s within 2.7%. Prior values: 57.526 s (Wells 1989 α₁ + Cox&Chao factor 1.5); 63.925 s (LLR α₁ + factor 1.5). See tools/fit/dt-corrections-fit.js --sweep-usno.
+const deltaTStart = 56.04899719615156;                                // Delta-T at model epoch (seconds) — joint-world optimum (dt-corrections-fit.js --joint --write) with hard USNO closure 86400.0014 s; Espenak RMS 12.60 s across 20 reference years 1650-2017, Stephenson full-window 31.3 s. Distinct from IERS instantaneous ~63.63 s (~8-s trend/instantaneous offset). Moves atomically with the fit coefficients.
 
 
 // ─── E1. Early derived (needed before ASTRO_REFERENCE) ───────────────────
@@ -30946,21 +30946,22 @@ function setupGUI() {
     console.log('\n══════════════════════════════════════════════════════════');
     console.log('  ΔT COMPONENT BREAKDOWN — how the tweakpane value builds up');
     console.log('══════════════════════════════════════════════════════════');
-    console.log('  displayed ΔT = deltaTStart + integrated(raw H/5 LOD) + Bond + Hallstatt + Jose5 + Jose4');
-    console.log('  Anchor: deltaTStart = 65.92 s (J2000 long-term trend anchor, joint optimum vs Espenak)');
+    console.log('  displayed ΔT = deltaTStart + integrated(raw H/5 LOD) + Bond + Hallstatt + Jose5 + Jose4 + Core-mantle swing');
+    console.log(`  Anchor: deltaTStart = ${deltaTStart.toFixed(2)} s (J2000 long-term trend anchor, joint-world optimum vs Espenak)`);
     console.log('  Integrand: (86400 − raw H/5 LOD) × T_year × 1e6 / 86400, Simpson from τ=0 to τ=t_Ma');
     console.log('  raw H/5 LOD = MEAN_LOD + MEAN_LOD/((H/5)·mSY)  (H/5 ecliptic-precession missing motion, +3.5 ms J2000)');
-    console.log('  Layer 3 LOD_real = raw H/5 + Σ cyclic δ_LOD  →  86400.0026 s at J2000 (matches USNO anchor exactly)');
-    console.log('  Corrections: Bond/Hallstatt/Jose*: post-integration ΔT residual harmonics');
-    console.log('               (research toggles at script.js L53–56; fit against Stephenson-2016).');
+    console.log('  Layer 4 LOD_real = raw H/5 + Σ cyclic δ_LOD + swing δ_LOD  →  86400.0014 s at J2000 (matches USNO anchor exactly)');
+    console.log('  Corrections: Bond/Hallstatt/Jose* flags + Core-mantle swing episode: post-integration ΔT terms');
+    console.log('               (research toggles in the script.js A1 block; fitted jointly, dt-corrections-fit.js --joint).');
     console.log('');
     console.log('  Flag state:  BOND=' + (BOND_DT_CORRECTION_ENABLED?'on':'off')
               + '  HALLSTATT=' + (HALLSTATT_DT_CORRECTION_ENABLED?'on':'off')
               + '  JOSE5=' + (JOSE5_DT_CORRECTION_ENABLED?'on':'off')
-              + '  JOSE4=' + (JOSE4_DT_CORRECTION_ENABLED?'on':'off'));
+              + '  JOSE4=' + (JOSE4_DT_CORRECTION_ENABLED?'on':'off')
+              + '  SWING=' + (RESONATOR_DT_CORRECTION_ENABLED?'on':'off'));
     console.log('');
     const rows = [
-      ['Year','deltaTStart','integrated','Bond','Hallst.','Jose5','Jose4','TOTAL','Espenak'],
+      ['Year','deltaTStart','integrated','Bond','Hallst.','Jose5','Jose4','Swing','TOTAL','Espenak'],
     ];
     for (const yr of [2000, 1950, 1900, 1850, 1830, 1815, 1800, 1750, 1700, 1600, 1500, 1000, 0, -1000, -3000]) {
       const t_Ma = (2000 - yr) / 1e6;
@@ -30992,9 +30993,10 @@ function setupGUI() {
       const hall = HALLSTATT_DT_CORRECTION_ENABLED ? hallstattCycleDeltaTCorrection(yr) : 0;
       const j5   = JOSE5_DT_CORRECTION_ENABLED     ? jose5CycleDeltaTCorrection(yr)     : 0;
       const j4   = JOSE4_DT_CORRECTION_ENABLED     ? jose4CycleDeltaTCorrection(yr)     : 0;
-      const total = deltaTStart + integ + bond + hall + j5 + j4;
+      const swing = RESONATOR_DT_CORRECTION_ENABLED ? resonatorSwingDeltaTCorrection(yr) : 0;
+      const total = deltaTStart + integ + bond + hall + j5 + j4 + swing;
       const espenak = deltaTEspenakMeeusRaw(yr);
-      rows.push([yr, deltaTStart, integ, bond, hall, j5, j4, total, espenak]);
+      rows.push([yr, deltaTStart, integ, bond, hall, j5, j4, swing, total, espenak]);
     }
     // Pretty-print
     const widths = rows[0].map((_, i) => Math.max(...rows.map(r => String(typeof r[i]==='number'?r[i].toFixed(2):r[i]).length)));
@@ -31003,10 +31005,11 @@ function setupGUI() {
     }
     console.log('');
     console.log('  ► "integrated" is the raw-H/5-kinematic pure-physics contribution (want DOWN then UP).');
-    console.log('  ► "Bond+Hallst+Jose5+Jose4" is the post-integration research stack (currently DOMINATES near J2000).');
-    console.log('  ► To see pure H/5 physics: toggle all 4 flags OFF at script.js L53–56 and reload.');
+    console.log('  ► "Bond+Hallst+Jose5+Jose4+Swing" is the post-integration calibrated stack (currently DOMINATES near J2000).');
+    console.log('  ► To see pure H/5 physics: toggle the 4 flags + swing OFF in the script.js A1 block and reload.');
+    console.log('  ► Joint world: only the TOTAL is anchor-clean — with any component OFF the USNO closure breaks.');
     console.log('══════════════════════════════════════════════════════════');
-  }, 'Break down the tweakpane ΔT value into its components: anchor + H/5-corrected integrated + 4-flag research stack. Shows why near-J2000 shape is currently dominated by the Bond correction (jointly fit against Espenak history 1650-2017 to ~12 s RMS). To see pure H/5 physics, toggle BOND/HALLSTATT/JOSE5/JOSE4 flags OFF at the top of script.js.');
+  }, 'Break down the tweakpane ΔT value into its components: anchor + H/5-corrected integrated + 4-flag stack + Core-mantle swing. All five calibrated components are fitted jointly against Espenak history 1650-2017 (12.6 s RMS) under the hard USNO closure. To see pure H/5 physics, toggle the flags + swing OFF at the top of script.js.');
 
   addTestButton('LOD + ΔT Diagnostic (1815 / 1902 / 2000)', () => {
     console.log('\n══════════════════════════════════════════════════════════');
@@ -31048,7 +31051,7 @@ function setupGUI() {
   // ────────────────────────────────────────────────────────────────────────
   // Toggle: Bond-scale ΔT correction (Option B research toggle)
   //
-  // Default ON as part of the 3-flag stack. Adds the gcd-compliant 8H
+  // Default ON as part of the 4-flag stack + Core-mantle swing (joint world). Adds the gcd-compliant 8H
   // integer-divisor harmonic at n=1830 (= 74 × Jupiter-Saturn synodic =
   // 1465.87 yr, gcd(1830,H)=61 shares H's 61 prime) as a post-integration
   // ΔT correction, anchored to 0 at J2000 so the framework's LOD physics
@@ -31076,8 +31079,9 @@ function setupGUI() {
       console.log('  • Kept as a research toggle only — do not commit to paper claim without');
       console.log('    independent amplitude/phase calibration from paleoclimate proxy.');
     } else {
-      console.log('  Correction disabled — framework operates in default zero-fit mode.');
-      console.log('  ΔT computation reverts to pure Simpson integration of (86400 − LOD(τ)).');
+      console.log('  Correction disabled — remaining flags + Core-mantle swing still active.');
+      console.log('  ⚠ Joint world: all five components are fitted in ONE solve — with any one');
+      console.log('    OFF the USNO J2000 closure breaks (only the TOTAL is anchor-clean).');
     }
     console.log('  ');
     console.log('  Preserved invariants (both states):');
@@ -31105,7 +31109,7 @@ function setupGUI() {
   // ────────────────────────────────────────────────────────────────────────
   // Toggle: Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research)
   //
-  // OFF by default. Structurally the sixth harmonic of the framework's 23-
+  // ON by default (4-flag stack). Structurally the sixth harmonic of the framework's 23-
   // factor period H/23 (H = 23·61·239), so 8H/1104 shares H's 23 factor via
   // gcd(1104, H) = 23. Coincides with the well-established Hallstatt cycle
   // (~2200-2500 yr) in cosmogenic isotope records. Empirical validation on
@@ -31129,7 +31133,9 @@ function setupGUI() {
       console.log('  • Cyclic-correction taper: full strength ±300 kyr from J2000, zero beyond ±400 kyr');
       console.log('  • VIOLATES paper\'s zero-fit claim: coefficients fitted to Stephenson residual.');
     } else {
-      console.log('  Correction disabled — framework operates in default zero-fit mode.');
+      console.log('  Correction disabled — remaining flags + Core-mantle swing still active.');
+      console.log('  ⚠ Joint world: all five components are fitted in ONE solve — with any one');
+      console.log('    OFF the USNO J2000 closure breaks (only the TOTAL is anchor-clean).');
     }
     console.log('  ');
     console.log('  Preserved invariants (both states):');
@@ -31143,8 +31149,8 @@ function setupGUI() {
     const dt_J2000  = meanDeltaTSecondsAtAge(0);
     console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
     console.log('══════════════════════════════════════════════════════════════════');
-  }, 'Feature flag for the 8H/1104 Hallstatt ΔT correction (2430 yr H-lattice harmonic). OFF by ' +
-     'default. When ON, adds up to ±80 s modulation in the Holocene window. Structurally on-lattice ' +
+  }, 'Feature flag for the 8H/1104 Hallstatt ΔT correction (2430 yr H-lattice harmonic). ON by ' +
+     'default (4-flag stack, joint world). Adds up to ±80 s modulation in the Holocene window; toggling OFF breaks the USNO closure. Structurally on-lattice ' +
      'via H\'s 23 prime factor; matches the ~2400-yr solar Hallstatt cycle. Kept as a research ' +
      'toggle: amplitude constrained but fitted to eclipse data, therefore violates the paper\'s ' +
      'zero-fit claim. Compare eclipse-audit results Hallstatt ON vs OFF, and joint with Bond, to ' +
@@ -31153,7 +31159,7 @@ function setupGUI() {
   // ────────────────────────────────────────────────────────────────────────
   // Toggle: Jose5 8H/2989 ≈ 897 yr ΔT correction (research)
   //
-  // OFF by default. Divisor 2989 = 7²·61 satisfies the gcd rule via H's 61
+  // ON by default (4-flag stack). Divisor 2989 = 7²·61 satisfies the gcd rule via H's 61
   // prime factor (H = 23·61·239). Physical interpretation: 5 × Jose period
   // (5 × 179 yr = 895 yr, 0.28% offset) or 45 × Jupiter-Saturn synodic
   // (0.45%). Identified by L-5b Section 14 as the STRONGEST remaining 8H
@@ -31177,7 +31183,9 @@ function setupGUI() {
       console.log('  • Cyclic-correction taper: full strength ±300 kyr from J2000, zero beyond ±400 kyr');
       console.log('  • VIOLATES paper\'s zero-fit claim: coefficients from Stephenson residual fit.');
     } else {
-      console.log('  Correction disabled — framework operates in default zero-fit mode.');
+      console.log('  Correction disabled — remaining flags + Core-mantle swing still active.');
+      console.log('  ⚠ Joint world: all five components are fitted in ONE solve — with any one');
+      console.log('    OFF the USNO J2000 closure breaks (only the TOTAL is anchor-clean).');
     }
     console.log('  ');
     console.log('  Preserved invariants (both states):');
@@ -31194,8 +31202,8 @@ function setupGUI() {
     const dt_J2000  = meanDeltaTSecondsAtAge(0);
     console.log('   • Verified now: LOD(J2000) = ' + lod_J2000.toFixed(6) + ' s, ΔT(J2000) = ' + dt_J2000.toFixed(6) + ' s');
     console.log('══════════════════════════════════════════════════════════════════');
-  }, 'Feature flag for the 8H/2989 Jose5 ΔT correction (~897 yr, 5×Jose 179 or 45×J-S synodic). OFF ' +
-     'by default. When ON, adds up to ±50 s modulation. Structurally on-lattice via H\'s 61 prime ' +
+  }, 'Feature flag for the 8H/2989 Jose5 ΔT correction (~897 yr, 5×Jose 179 or 45×J-S synodic). ON ' +
+     'by default (4-flag stack, joint world). Adds up to ±50 s modulation; toggling OFF breaks the USNO closure. Structurally on-lattice via H\'s 61 prime ' +
      'factor. Identified by L-5b Section 14 as strongest remaining 8H residual peak after Bond. ' +
      'Research toggle only — same zero-fit-claim violation as Bond and Hallstatt.');
 
@@ -31233,7 +31241,9 @@ function setupGUI() {
       console.log('  • Cyclic-correction taper: full strength ±300 kyr from J2000, zero beyond ±400 kyr');
       console.log('  • VIOLATES paper\'s zero-fit claim: coefficients from Stephenson residual fit.');
     } else {
-      console.log('  Correction disabled — 3-flag stack (Bond + Hallstatt + Jose5) still active.');
+      console.log('  Correction disabled — Bond + Hallstatt + Jose5 + Core-mantle swing still active.');
+      console.log('  ⚠ Joint world: all five components are fitted in ONE solve — with any one');
+      console.log('    OFF the USNO J2000 closure breaks (only the TOTAL is anchor-clean).');
     }
     console.log('  ');
     console.log('  Preserved invariants (both states):');
@@ -31275,16 +31285,17 @@ function setupGUI() {
       console.log('  • Eigenmode: T₀ = 8H/' + RES_T0_LATTICE_N + ' = ' + RES_T0_YR.toFixed(1) + ' yr, Q = ' + RES_Q + ' (published axiMC range; lattice-labeled for H(t) clock coherence with the driving cycles)');
       console.log('  • Kicks: excitation ' + RES_KICKS[0].t + ' CE, termination counter-kick +' + RES_KICKS[1].t + ' CE');
       console.log('  • Drive tone: bond−hallstatt 8H/726 = 3,695 yr, phase LOCKED (φ_b − φ_h)');
-      console.log('  • Exactly 0 before ' + RES_KICKS[0].t + '; component δLOD(2000) ≈ +0.786 ms/day');
+      console.log('  • Exactly 0 before ' + RES_KICKS[0].t + '; component δLOD(2000) ≈ +0.63 ms/day');
       console.log('  • JOINT world: fitted with the 4 flags in one solve (dt-corrections-fit.js --joint);');
-      console.log('    Espenak RMS 12.54 s, full-window 32.4 s, USNO closure exact on the TOTAL.');
-      console.log('  • kick2 ≈ 0 in the joint world — no termination kick; medieval shutdown is');
-      console.log('    carried by flag interference (doc 104 narrative update).');
+      console.log('    Espenak RMS 12.60 s, full-window 31.3 s, USNO closure exact on the TOTAL.');
+      console.log('  • Impulse-consistent: sin-only kicks (displacement-continuous); termination');
+      console.log('    counter-kick small (−75 s vs 760-s excitation) — medieval shutdown mostly');
+      console.log('    carried by damping + flag interference (doc 104 §6 "The shipped form").');
       console.log('  • VIOLATES paper\'s zero-fit claim: amplitudes from Stephenson residual fit.');
     } else {
       console.log('  ⚠ RESEARCH STATE: the joint-world flag coefficients + anchors (USNO');
-      console.log('    86400.0015, deltaTStart 58.48) assume this component — with it OFF the');
-      console.log('    Layer-3 LOD misses the USNO anchor by its δLOD(2000) ≈ 0.786 ms/day.');
+      console.log('    86400.0014, deltaTStart 56.05) assume this component — with it OFF the');
+      console.log('    Layer-4 LOD misses the USNO anchor by its δLOD(2000) ≈ 0.63 ms/day.');
     }
     const lod_J2000 = meanLodSecondsAtAge(0);
     const dt_J2000  = meanDeltaTSecondsAtAge(0);
@@ -33840,8 +33851,10 @@ function setupGUI() {
   // ────────────────────────────────────────────────────────────────────────
   addTestButton('All cycles (4-flag stack) ↔ climate transitions', () => {
     console.log('\n════════════════════════════════════════════════════════════════════════════════════');
-    console.log('  All-cycles 4-flag stack — zero-crossing timings vs named climate transitions');
+    console.log('  All-cycles 4-flag stack (flags only, swing excluded) — zero-crossing timings vs named climate transitions');
     console.log('  Bond 8H/1830 (1466 yr) + Hallstatt 8H/1104 (2430 yr) + Jose5 8H/2989 (897 yr) + Jose4 8H/3749 (716 yr)');
+    console.log('  (The Core-mantle swing is core-supplied, not climate — excluded here so crossings match');
+    console.log('   the LOD-Climate Rhythm modal\'s ▲/▼ markers, which gate on the flags-only L3 curve.)');
     console.log('════════════════════════════════════════════════════════════════════════════════════');
     console.log('  PEAK  = stack LOD at MAX, derivative + → −. After this year, stack rate < 0, Earth');
     console.log('          spins up vs secular baseline → warm episode STARTS.');
@@ -33858,9 +33871,13 @@ function setupGUI() {
     const STEP       = 5;
     const DYR        = 50;
     const rates = [];
+    // Flags-only stack (subtract the Core-mantle swing): the swing is core-supplied
+    // angular momentum, not climate — and the modal's ▲/▼ markers gate on the
+    // flags-only L3 curve, so this scan must match that convention.
+    const flagsOnly = (y) => dtCycleLodCorrectionSum(y) - resonatorSwingLodCorrection(y);
     for (let y = YEAR_START; y <= YEAR_END; y += STEP) {
-      const stackPlus  = dtCycleLodCorrectionSum(y + DYR);
-      const stackMinus = dtCycleLodCorrectionSum(y - DYR);
+      const stackPlus  = flagsOnly(y + DYR);
+      const stackMinus = flagsOnly(y - DYR);
       const rate_msCy  = ((stackPlus - stackMinus) / (2 * DYR)) * 100 * 1000;
       rates.push({ year: y, rate: rate_msCy });
     }
@@ -33970,270 +33987,6 @@ function setupGUI() {
      'modern warming). Reports mean |offset| between framework crossings and mainstream dates. ' +
      'Out-of-sample validation of the H-lattice periods — the stack was fit against Espenak ΔT only, ' +
      'no climate proxies in the loop.');
-
-  addTestButton('Search candidate Thales eclipses (595-575 BC)', () => {
-    // Scan 20 years around the traditional Thales date (585 BC). Find all
-    // Moon-Sun conjunctions (via findSolarEclipsesInRange — Meeus-based
-    // timing is fine for IDENTIFYING events). For each, navigate the
-    // framework's SCENE-GRAPH to the conjunction JD and read where our
-    // framework places the umbra (matches the always-on disc / GREEN-marker).
-    // The user can then see which conjunction the framework places over
-    // Anatolia → that's the framework's candidate for Thales' eclipse.
-    //
-    // Anatolia (Halys river region) ≈ (39°N, 35°E). We flag any conjunction
-    // whose framework umbra lands within 1000 km of this point.
-    console.log('\n══════════════════════════════════════════════════════════════════════════════');
-    console.log('  Candidate Thales eclipses (595–575 BC) — framework SCENE STATE');
-    console.log('  Anatolia reference: (39°N, 35°E) Halys river region (Herodotus 1.74)');
-    console.log('══════════════════════════════════════════════════════════════════════════════');
-
-    function jdToJulianDate(jd) {
-      const J = jd + 0.5;
-      const Z = Math.floor(J);
-      const F = J - Z;
-      const A = Z;  // proleptic Julian (no Gregorian alpha shift)
-      const B = A + 1524;
-      const C = Math.floor((B - 122.1) / 365.25);
-      const D = Math.floor(365.25 * C);
-      const E = Math.floor((B - D) / 30.6001);
-      const day_full = B - D - Math.floor(30.6001 * E) + F;
-      const month = (E < 14) ? E - 1 : E - 13;
-      const year  = (month > 2) ? C - 4716 : C - 4715;
-      const day = Math.floor(day_full);
-      const dayFrac = day_full - day;
-      const h = Math.floor(dayFrac * 24);
-      const m = Math.floor((dayFrac * 24 - h) * 60);
-      return { year, month, day, h, m };
-    }
-
-    const ANATOLIA = { lat: 39.0, lon: 35.0 };
-    const NEAR_KM  = 1000;   // umbra within 1000 km of Halys → flag as candidate
-
-    const startJD = 1505000;   // ≈ 600 BC
-    const endJD   = 1512000;   // ≈ 570 BC
-
-    // Step 1: Meeus timing → list of all eclipse-class conjunctions
-    const events = findSolarEclipsesInRange(startJD, endJD);
-    console.log(`Found ${events.length} eclipse-class conjunctions (Meeus timing); now scanning each via scene state.`);
-    console.log();
-
-    // Step 2: scene-state lookup for each. Save/restore scene state.
-    const _saveJD = o.julianDay;
-    const candidates = [];
-    try {
-      for (const evt of events) {
-        const um = umbraFromSceneAtJd(evt.jd);
-        const d  = jdToJulianDate(evt.jd);
-        let dist = null;
-        if (um !== null) {
-          dist = gcKmFromLatLon(ANATOLIA.lat, ANATOLIA.lon, um.lat, um.lon);
-        }
-        candidates.push({ jd: evt.jd, evt, d, um, dist });
-      }
-    } finally {
-      jumpToJulianDay(_saveJD);
-      forceSceneUpdate();
-    }
-
-    // Print table
-    console.log('  Date (Julian)        JD          UT     Type        |β|      Umbra@scene             Dist→Anatolia');
-    console.log('  ──────────────────────────────────────────────────────────────────────────────────────────────────────');
-    let nearAnatolia = 0;
-    for (const c of candidates) {
-      const dateStr = `${c.d.year >= 0 ? c.d.year : '-' + (-c.d.year)}-${String(c.d.month).padStart(2,'0')}-${String(c.d.day).padStart(2,'0')}`;
-      const UTstr = `${String(c.d.h).padStart(2,'0')}:${String(c.d.m).padStart(2,'0')}`;
-      const absBeta = Math.abs(c.evt.beta);
-      const typeStr = c.evt.type || '—';
-      const umStr   = (c.um === null) ? '   off Earth   ' : `(${c.um.lat.toFixed(1).padStart(5)},${c.um.lon.toFixed(1).padStart(7)})`;
-      const distStr = (c.dist === null) ? '       —' : `${c.dist.toFixed(0).padStart(6)} km`;
-      const isNear  = (c.dist !== null && c.dist <= NEAR_KM);
-      const marker  = isNear ? ' ⭐ CANDIDATE — framework places umbra near Anatolia' : '';
-      if (isNear) nearAnatolia++;
-      console.log(
-        `  ${dateStr.padEnd(13)}` +
-        ` JD${c.jd.toFixed(2).padStart(11)}` +
-        ` ${UTstr}` +
-        ` ${typeStr.padEnd(10)}` +
-        ` ${absBeta.toFixed(3).padStart(6)}°` +
-        ` ${umStr}` +
-        `  ${distStr}` +
-        marker
-      );
-    }
-    console.log('  ──────────────────────────────────────────────────────────────────────────────────────────────────────');
-    console.log(`  Summary:  ${candidates.length} conjunctions · ${nearAnatolia} candidates whose framework umbra lands within ${NEAR_KM} km of Anatolia (39°N, 35°E)`);
-    console.log();
-    console.log('  Notes:');
-    console.log('   • Umbra coordinates are from the framework\'s scene-graph (matches what you see in the simulator).');
-    console.log('   • A ⭐ CANDIDATE is an eclipse the framework places over Thales\' region. Cross-check the date');
-    console.log('     against historical sources to see if it fits Herodotus\' description (battle between Lydians');
-    console.log('     and Medes interrupted by sudden daytime darkness, 28 May -584 traditionally).');
-    console.log('   • Type Total/Annular = central eclipse with umbra reaching Earth. Partial = umbra misses,');
-    console.log('     but partial obscuration still visible from a wide area (penumbra extends thousands of km).');
-    console.log('   • Wikipedia mentions 21 Sep 582 BC and 16 Mar 581 BC as alternative Thales candidates.');
-    console.log('══════════════════════════════════════════════════════════════════════════════');
-  }, 'Search all Moon-Sun conjunctions in 595-575 BC. For each, navigates the ' +
-     'framework\'s scene-graph to that JD and reports where the framework places ' +
-     'the umbra. Flags conjunctions whose umbra lands within 1000 km of Anatolia ' +
-     '(39°N, 35°E) as candidate dates for the historical Thales eclipse. ' +
-     'Matches the always-on umbra disc / GREEN-marker positions exactly.');
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Investigation: enumerate ALL solar eclipses our model produces near
-  // Babylon (-525 to -518) and Cairo (975 to 986). For each, list date,
-  // type, sub-solar distance, and visibility class. Cross-references our
-  // model against:
-  //  • Said & Stephenson 1991 Cairo list (8 Jun 978, 14-15 May 979,
-  //    28 May 979 [annulars], 2-3 May 980, 1-2 Mar 983 [totals])
-  //  • Stephenson 1997: Babylonian solar observations only span 369 BC
-  //    to 136 BC — no Cambyses-era solar eclipse exists in the literature.
-  //  • The "Cambyses eclipse" in our HISTORIC list is a misidentification:
-  //    it refers to the LUNAR eclipses of 16 Jul 523 BC and 10 Jan 522 BC,
-  //    NOT a solar event.
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Enumerate alternatives: Babylon -525..-518 + Cairo 975-986', () => {
-    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Enumerate alternative eclipse candidates for the two anomalous entries.');
-    console.log('  Each conjunction is checked by navigating the framework\'s SCENE-GRAPH (same');
-    console.log('  data path as the always-on umbra disc / GREEN-marker). Reports framework');
-    console.log('  umbra position; for partials, reports sub-solar (where penumbra is centred).');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-
-    const PENUMBRA_KM = 7500, UMBRA_NEAR_KM = 4500;
-
-    function julianDateToJD(Y, M, D, hour = 12) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      let B = 0;
-      if ((Y > 1582) || (Y === 1582 && (M > 10 || (M === 10 && D >= 15)))) {
-        const A = Math.floor(y / 100);
-        B = 2 - A + Math.floor(A / 4);
-      }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D + B - 1524.5 + hour / 24;
-    }
-    function jdToCal(jd) {
-      const J = jd + 0.5;
-      const Z = Math.floor(J);
-      const F = J - Z;
-      let A = Z;
-      if (Z >= 2299161) {
-        const alpha = Math.floor((Z - 1867216.25) / 36524.25);
-        A = Z + 1 + alpha - Math.floor(alpha / 4);
-      }
-      const B = A + 1524;
-      const C = Math.floor((B - 122.1) / 365.25);
-      const D = Math.floor(365.25 * C);
-      const E = Math.floor((B - D) / 30.6001);
-      const dayF = B - D - Math.floor(30.6001 * E) + F;
-      const month = (E < 14) ? E - 1 : E - 13;
-      const year  = (month > 2) ? C - 4716 : C - 4715;
-      return { year, month, day: Math.floor(dayF) };
-    }
-
-    function enumerate(label, lat_obs, lon_obs, jdStart, jdEnd) {
-      console.log('');
-      console.log(`────────────────────────────────────────────────────────────────────────────────`);
-      console.log(`${label}`);
-      console.log(`Observation site: (${lat_obs.toFixed(2)}°N, ${lon_obs.toFixed(2)}°E).`);
-      console.log(`Listing every eclipse-class conjunction in this window. Umbra/sub-solar from scene.`);
-      console.log(`────────────────────────────────────────────────────────────────────────────────`);
-      console.log(`  Date              JD            β(M)    Scene point             Dist(km)  Class`);
-
-      // Use findSolarEclipsesInRange for timing — Meeus is fine for identifying
-      // candidate conjunctions. Then for each one, navigate the SCENE to get
-      // the framework's actual umbra or sub-solar geographic position.
-      const events = findSolarEclipsesInRange(jdStart, jdEnd);
-      const _saveJD = o.julianDay;
-      try {
-        for (const evt of events) {
-          const jd = evt.jd;
-          const beta = evt.beta;
-          // For central eclipses (T/A), use the umbra hit point.
-          // For partials / non-central, use the sub-solar point as a proxy
-          // (penumbra is centred there).
-          const isCentral = (evt.type === 'Total' || evt.type === 'Annular' || evt.type === 'Hybrid');
-          let point = null;
-          let pointKind = '';
-          if (isCentral) {
-            point = umbraFromSceneAtJd(jd);
-            pointKind = 'umbra';
-          }
-          if (point === null) {
-            point = subSolarFromSceneAtJd(jd);
-            pointKind = 'sub-solar';
-          }
-          const dist = gcKmFromLatLon(lat_obs, lon_obs, point.lat, point.lon);
-          let cls = '—';
-          if (isCentral && dist < UMBRA_NEAR_KM)          cls = '★ TOTAL/ANN near site';
-          else if (Math.abs(beta) < 0.5 && dist < PENUMBRA_KM) cls = '◐ partial near';
-          else if (dist < PENUMBRA_KM)                    cls = '○ partial';
-          else                                            cls = '✗ not visible at site';
-          const cal = jdToCal(jd);
-          const ds = `${cal.year}-${String(cal.month).padStart(2,'0')}-${String(cal.day).padStart(2,'0')}`;
-          const pointStr = `(${point.lat.toFixed(1).padStart(5)},${point.lon.toFixed(1).padStart(7)}) ${pointKind.padEnd(8)}`;
-          console.log(
-            `  ${ds.padEnd(16)}  ${jd.toFixed(2).padStart(11)}   ` +
-            `${beta.toFixed(2).padStart(6)}  ` +
-            `${pointStr}  ` +
-            `${Math.round(dist).toString().padStart(7)}   ` +
-            cls
-          );
-        }
-      } finally {
-        jumpToJulianDay(_saveJD);
-        forceSceneUpdate();
-      }
-    }
-
-    // --- Cambyses: Babylon (32.5°N, 44.4°E), -525 to -518 ---
-    console.log('');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  CAMBYSES CASE — but per Stephenson 1997, Babylonian SOLAR records only');
-    console.log('  span 369 BC to 136 BC. NO documented solar eclipse exists for Cambyses (530-522 BC).');
-    console.log('  The "Cambyses eclipses" in Babylonian diaries / Ptolemy Almagest V.14 are');
-    console.log('  LUNAR: 16 July 523 BC and 10 January 522 BC. Our HISTORIC entry is mislabeled.');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-    enumerate('Solar conjunctions visible from Babylon, -525 to -518',
-              32.5, 44.4, julianDateToJD(-525, 1, 1), julianDateToJD(-518, 12, 31));
-
-    // --- Ibn Yunus: Cairo (30.05°N, 31.24°E), 975-986 ---
-    console.log('');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  IBN YUNUS CASE — Per NASA Five Millennium Catalog, the solar eclipses');
-    console.log('  in this window with significant Cairo visibility are:');
-    console.log('    • 977 Dec 13 (Julian)  Total at (3°N, 55°E)   — Cairo sees ~partial');
-    console.log('    • 978 Jun 8  (Julian)  Annular near Cairo');
-    console.log('    • 979 May 28 (Julian)  Annular ~ Cairo partial');
-    console.log('  NASA confirms NO total/annular in May 980 or March 983 — the earlier');
-    console.log('  "Said-Stephenson lists 2-3 May 980 TOTAL" claim was an LLM hallucination.');
-    console.log('  Ibn Yunus\'s OWN Hakemite Tables only contain 4 eclipses he compiled:');
-    console.log('    993 (solar), 1001 (lunar), 1002 (lunar), 1004 (solar).');
-    console.log('  Pre-993 entries (977, 978, 979, 985) come from earlier observers / records');
-    console.log('  he cited; ours had the right date for 977-12-13 but the path stays south');
-    console.log('  of Cairo (greatest at 3°N), so Cairo can only see partial, not annular.');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-    enumerate('Solar conjunctions visible from Cairo, 975 to 986',
-              30.05, 31.24, julianDateToJD(975, 1, 1), julianDateToJD(986, 12, 31));
-
-    console.log('');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  CONCLUSIONS (revised after NASA cross-check):');
-    console.log('  • Cambyses: REMOVE from solar-eclipse test list. No solar eclipse exists');
-    console.log('    in our model OR in NASA catalog at -522-07-16. The Cambyses-era eclipses');
-    console.log('    in Babylonian diaries are LUNAR. Confirmed category error.');
-    console.log('  • Ibn Yunus 977-12-13: KEEP. NASA confirms a Total at (3°N, 55°E) on this');
-    console.log('    date. The greatest-eclipse path was 3,000 km south of Cairo, so Cairo');
-    console.log('    can only see a low-amplitude partial. The "negative needed-ΔT" was the');
-    console.log('    model correctly saying no ΔT can move the umbra path 3,000 km north.');
-    console.log('  • No 15-day Moon polynomial drift. NASA\'s -522 Jul 31 total at (17°S,117°E)');
-    console.log('    matches our model\'s -522-07-31 conjunction exactly. Same for 977 Dec 13.');
-    console.log('  • The pure-tidal Moon polynomial is sound at every epoch we have tested.');
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-  }, 'Enumerates every solar conjunction our model produces near the two anomalous events ' +
-     '(Cambyses Babylon -525..-518, Ibn Yunus Cairo 975-986). Cross-references with Said & ' +
-     'Stephenson 1991 published Cairo list and Stephenson 1997 finding that Babylonian solar ' +
-     'records only span 369 BC – 136 BC. Confirms both anomalies were mis-attributed entries.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Umbra path trace — geographic centerline of an eclipse over time
