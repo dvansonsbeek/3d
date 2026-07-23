@@ -246,9 +246,9 @@ Cross-references: deep-time implementation in `src/script.js` (`meanApsidalCycle
 Two structural relations sit between the framework's kinematic mean LOD and the observed physical LOD (USNO Earth Orientation Center measurement):
 
 1. **Raw H/5 kinematic correction** — captures the "missing motion" from the ecliptic reference frame's precession over the H/5 cycle. First-principles, no free parameters. Contribution at J2000: **+3.527 ms**.
-2. **Calibrated cyclic ΔT stack** (Bond/Hallstatt/Jose5/Jose4) — the framework's cyclic ΔT harmonic stack, jointly fit against Espenak history under the USNO-anchor soft constraint. Net LOD contribution at J2000: **−0.937 ms**.
+2. **Calibrated cyclic ΔT stack + Core-mantle swing** (Bond/Hallstatt/Jose5/Jose4 + the Resonator episode; the Core-mantle swing is the framework's model of the documented millennial core–mantle LOD oscillation — a damped core-eigenmode episode, full derivation in doc 104). Jointly fitted — see "The calibrated ΔT stack's role" below. Net LOD contribution at J2000: **−2.137 ms**.
 
-Their sum closes the Layer 3 composite `LOD_real` onto the USNO anchor **86400.0026 s** exactly at J2000 by construction of the fit.
+Their sum closes the Layer 4 composite `LOD_real` onto the USNO anchor **86400.0014 s** exactly at J2000 by construction of the fit.
 
 ### The identity
 
@@ -256,6 +256,7 @@ Their sum closes the Layer 3 composite `LOD_real` onto the USNO anchor **86400.0
 LOD_real(t) = lod_kinematic(t)                    ← IAU-anchored kinematic baseline
             + lod_kinematic(t) / ((H(t)/5) × mSY(t))   ← raw H/5 kinematic correction
             + Σ δ_LOD,i(t)                        ← calibrated Bond/Hallstatt/Jose5/Jose4 stack
+            + δ_LOD,swing(t)                      ← Core-mantle swing (Resonator episode)
 ```
 
 At J2000 (values from `data/deltaT-4flag-fit.json` → `usno_anchor.derivation`):
@@ -269,13 +270,14 @@ raw H/5 correction     = lod_kinematic / ((H/5) × mSY)
 raw H/5 kinematic sum  = lod_kinematic + raw H/5 correction
                        = 86400.003537 s    (intermediate; NOT the physical LOD readout)
 
-Σ ΔT-cycle δ_LOD       = −0.937 × 10⁻³ s   (net at J2000, from calibrated stack;
-                                              see `data/deltaT-4flag-fit.json` →
+Σ ΔT-cycle δ_LOD       = −2.137 × 10⁻³ s   (net at J2000, calibrated stack + Core-mantle
+                                              swing; see `data/deltaT-4flag-fit.json` →
                                               `usno_anchor.shipped_sum_lod_at_j2000_s`)
 
-LOD_real (Layer 3)     = 86400.002600 s    (physical LOD readout — matches USNO anchor exactly)
-USNO anchor            = 86400.0026 s      (Earth Orientation Center J2000 joint-optimum
-                                              vs Espenak history, auto-swept)
+LOD_real (Layer 4)     = 86400.001400 s    (physical LOD readout — matches USNO anchor exactly)
+USNO anchor            = 86400.0014 s      (Earth Orientation Center J2000 joint-fit optimum
+                                              vs Espenak history, auto-swept; within 0.2 ms of
+                                              the observed EO value 86400.0016)
 ```
 
 The raw H/5 correction is a first-order additive expansion of the multiplicative form `LOD_mean × (1 + 1/((H/5)·mSY))`; higher-order terms are ~10⁻¹⁶ s and are ignored.
@@ -311,12 +313,12 @@ Only H/5 provides the correct reference-frame kinematic correction for the Sun's
 
 ### The calibrated ΔT stack's role
 
-The raw H/5 kinematic prediction (86400.003537 s) overshoots the USNO J2000 anchor (86400.0026 s) by ~0.94 ms. The framework does not treat this as a defect of the raw physics — the raw H/5 term is a clean, parameter-free geometric statement about the ecliptic frame. Instead, the residual is absorbed by the framework's calibrated cyclic ΔT stack:
+The raw H/5 kinematic prediction (86400.003537 s) overshoots the USNO J2000 anchor (86400.0014 s) by ~2.14 ms. The framework does not treat this as a defect of the raw physics — the raw H/5 term is a clean, parameter-free geometric statement about the ecliptic frame. Instead, the residual is absorbed by the framework's calibrated cyclic ΔT stack + Core-mantle swing:
 
-- **CONFIG.usno_target_lod_s = 86400.0026 s** — the fit's soft-constraint J2000 LOD target, itself the joint-optimum over Espenak history (RMS ≈ 22.5 s across 20 reference years 1650–2017) rather than the raw ~86400.0016 s instantaneous IERS value.
-- **deltaTStart = 65.924 s** — the ΔT trend anchor at J2000. This is the long-term trend value the calibrated stack rides through the epoch, distinct from the IERS instantaneous observation of ΔT_J2000 ≈ 63.63 s (the trend line does not pass through the middle of an intra-decadal noise band).
+- **CONFIG.usno_target_lod_s = 86400.0014 s** — the joint fit's hard-equality J2000 LOD closure target, itself the composite optimum over Espenak history (Espenak RMS ≈ 12.6 s across 20 reference years 1650–2017, subject to full-window Stephenson RMS ≤ 40 s), within 0.2 ms of the observed EO value ~86400.0016 s.
+- **deltaTStart = 56.049 s** — the ΔT trend anchor at J2000. This is the long-term trend value the calibrated stack rides through the epoch, distinct from the IERS instantaneous observation of ΔT_J2000 ≈ 63.63 s (the trend line does not pass through the middle of an intra-decadal noise band).
 
-Both are propagated from `data/astro-reference.json` via Step 9 `export-to-script.js`. The fit itself is run by `tools/fit/dt-corrections-fit.js` (Step 6c of the pipeline) with automatic joint-optimum sweep (`--sweep-usno`). The calibrated stack's four cycles (Bond, Hallstatt, Jose5, Jose4) collectively contribute **−0.937 ms at J2000** (per current shipped fit — see `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s`) plus a ~22.5 s RMS envelope over 1650–2017 against Espenak; the sign of the net J2000 contribution comes out of the fit, not from a hand-chosen constraint.
+Both are propagated from `data/astro-reference.json` via Step 9 `export-to-script.js`. The fit itself is run by `tools/fit/dt-corrections-fit.js --joint --write` (Step 6c of the pipeline): 4 flags + the Core-mantle swing in one equality-constrained solve with the USNO closure as a hard anchor row. The calibrated components collectively contribute **−2.137 ms at J2000** (per current shipped fit — see `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s`) plus a ~12.6 s Espenak RMS envelope over 1650–2017 (full-window Stephenson RMS 31.3 s); the anchor triplet (USNO, deltaTStart, coefficients) moves atomically with each fit configuration.
 
 ### Two internal LOD conventions
 
@@ -324,7 +326,7 @@ Both are propagated from `data/astro-reference.json` via Step 9 `export-to-scrip
 |:---|:---|:---|
 | **LOD_mean** (framework kinematic baseline) | `LOD_mean = T_sid_sec / (mSY × H/(H−13))` — H/13 identity, no H/5 correction, no ΔT-cycle contribution | `meanDeltaTSecondsAtAge` integrand + Bond/Hallstatt/Jose5/Jose4 cyclic stack → calibrated ΔT for Meeus geometry, eclipse code, live accumulator, tweakpane "ΔT correction" |
 | **raw H/5 kinematic** | `lod_kinematic + lod_kinematic/((H/5)·mSY)` — H/5 correction only, no ΔT cycles | Intermediate scalar shown as the calibrated stack's raw-physics baseline (`pureH5DeltaTAtAge`); reported alongside LOD_real for transparency |
-| **LOD_real** (Layer 3 composite, physical) | `lod_kinematic + lod_kinematic/((H/5)·mSY) + Σ δ_LOD,i` — H/5 correction PLUS calibrated ΔT cycle contributions | Physical LOD readout — tweakpane "Solar Day (L3 physical)", J2000 tables, USNO comparison. Matches USNO anchor exactly at J2000 by construction of the joint-optimum fit. |
+| **LOD_real** (Layer 4 composite, physical) | `lod_kinematic + lod_kinematic/((H/5)·mSY) + Σ δ_LOD,i + δ_LOD,swing` — H/5 correction PLUS calibrated ΔT cycles PLUS Core-mantle swing | Physical LOD readout — tweakpane Solar Day decomposition, J2000 tables, USNO comparison. Matches USNO anchor exactly at J2000 by construction of the joint fit. |
 
 ### Deep-time behaviour
 
@@ -353,19 +355,20 @@ What IS constant is the **fractional correction** `δ_LOD_H5 / LOD_mean ≈ 5 / 
 | Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | Structural (definitional) |
 | Lunar Precession Invariant | `T_apsidal × H = const`, `T_nodal × H = const` | Driver 1 + Brown m² | Structural (0 ppm across epochs) |
 | **Raw H/5 LOD kinematic correction** | **`δ_LOD_H5 = LOD_mean/((H/5)·mSY)`** | **Driver 1 + ecliptic precession** | **Structural (parameter-free geometry); fractional correction 4.08 × 10⁻⁸, absolute 3.527 ms at J2000** |
-| **LOD_real (Layer 3 composite)** | **`LOD_real = lod_kinematic + raw H/5 + Σ calibrated ΔT δ_LOD`** | **raw H/5 + calibrated Bond/Hallstatt/Jose5/Jose4 stack** | **Matches USNO 86400.0026 s exactly at J2000 by construction of the joint-optimum fit** |
+| **LOD_real (Layer 4 composite)** | **`LOD_real = lod_kinematic + raw H/5 + Σ calibrated ΔT δ_LOD + δ_LOD,swing`** | **raw H/5 + calibrated Bond/Hallstatt/Jose5/Jose4 stack + Core-mantle swing** | **Matches USNO 86400.0014 s exactly at J2000 by construction of the joint fit** |
 
-Cross-references: `pureH5DeltaTAtAge` in `src/script.js` (browser, raw H/5 baseline) and `meanDeltaTSecondsAtAge` in `tools/lib/deep-time.js` (Node lib mirror, calibrated stack); tweakpane bindings under Orbital → "ΔT (TT − UT1)" (raw H/5 curve), "ΔT correction (rel. J2000)" (calibrated stack) and "Solar Day (L3 physical)" (Layer 3 composite); chart config for `id: 'delta-t'`; component-breakdown diagnostic in Tools > Console Tests "ΔT Breakdown (H/5 physics vs Bond stack)".
+Cross-references: `pureH5DeltaTAtAge` in `src/script.js` (browser, raw H/5 baseline) and `meanDeltaTSecondsAtAge` in `tools/lib/deep-time.js` (Node lib mirror, calibrated stack); tweakpane bindings under Orbital → "ΔT (TT − UT1)" (raw H/5 curve), "ΔT correction (rel. J2000)" (calibrated stack) and the Solar Day decomposition sub-folder (Layer 1–4); chart config for `id: 'delta-t'`; component-breakdown diagnostic in Tools > Console Tests "ΔT Breakdown (H/5 physics vs Bond stack)".
 
-### Layer 1 / Layer 2 / Layer 3 — solar-day taxonomy
+### Layer 1 / Layer 2 / Layer 3 / Layer 4 — solar-day taxonomy
 
-The framework exposes three LOD values in the tweakpane **Day Lengths → Solar Day** sub-folder, each isolating a specific physics contribution:
+The framework exposes four LOD values in the tweakpane **Day Lengths → Solar Day** sub-folder, each isolating a specific physics contribution:
 
 | Layer | Definition | Physics content | J2000 value |
 |:---|:---|:---|---:|
 | **Layer 1 (Tidal Mean)** | pure-tidal chain (Farhat 2022, LLR α₁) + H/5 kinematic, with α held at long-term L1-climate MEAN value | Isolates Moon-recession tidal drift from the glacial-cycle α oscillation. Sits ABOVE Layer 2 at J2000 because J2000 is near a Holocene interglacial (L1 minimum → α at J2000 < α at climate mean) | **86400.110143 s** |
 | **Layer 2 (+ GIA)** | Layer 1 with α(t) applied at the current epoch (at J2000 this is EARTH_MOI_FACTOR exactly) | Adds the GIA channel via the L1-orbital-coupled α(t) curve — the physics baseline used by year-length derivations | **86400.003203 s** |
-| **Layer 3 (REAL LOD)** | Layer 2 + Σ Bond/Hallstatt/Jose5/Jose4 cyclic δLOD stack | Physical length of one solar day. Matches USNO 86400.0026 s anchor at J2000 by construction of the joint-optimum fit | **86400.002593 s** (≈ USNO 86400.0026) |
+| **Layer 3 (+ Cycles)** | Layer 2 + Σ Bond/Hallstatt/Jose5/Jose4 cyclic δLOD stack (flags only) | Cyclic sub-Milankovitch modulation WITHOUT the Core-mantle swing | **86400.000774 s** |
+| **Layer 4 (REAL LOD)** | Layer 3 + Core-mantle swing (Resonator episode) | Physical length of one solar day — the shipped observable. Matches USNO 86400.0014 s anchor at J2000 by construction of the joint fit | **86400.001398 s** (≈ USNO 86400.0014) |
 
 **Layer 1 − Layer 2 gap (~107 ms at J2000)** — the effect of using α at climate-mean vs α at J2000:
 
@@ -378,25 +381,27 @@ Layer 1 − Layer 2 = LOD × Δα / α
 
 This gap is not fixed — it oscillates with the glacial cycle. Over the ~100 kyr Milankovitch period, Layer 1 and Layer 2 cross whenever the epoch's L1(year) equals the L1 climate mean; the gap is largest at interglacial/glacial extrema.
 
-**Layer 2 − Layer 3 gap (~0.61 ms at J2000)** — the 4-flag ΔT stack contribution, absorbing the small residual between the Layer 2 physics baseline and the USNO 86400.0026 s anchor. The full ΔT-stack contribution at J2000 recorded in `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s` is **−0.937 ms**; the ~0.33 ms difference between −0.937 ms (fit) and −0.610 ms (Layer 3 − Layer 2 in the display) is the numerical spread between `LOD_mean` (H/13 identity, 86399.999676 s — the value the Solar Day display uses as the Layer 2 physics baseline) and `lod_kinematic` (IAU sidereal seconds / fitted sidereal days at J2000, 86400.00000923 — the value the ΔT fit uses as its anchor). Both paths agree at Layer 3 within numerical precision.
+**Layer 2 − Layer 4 gap (~1.81 ms at J2000)** — the contribution of the 4-flag ΔT stack + Core-mantle swing, absorbing the residual between the Layer 2 physics baseline and the USNO 86400.0014 s anchor. The full contribution at J2000 recorded in `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s` is **−2.137 ms**; the ~0.33 ms difference between −2.137 ms (fit) and −1.805 ms (Layer 4 − Layer 2 in the display) is the numerical spread between `LOD_mean` (H/13 identity, 86399.999676 s — the value the Solar Day display uses as the Layer 2 physics baseline) and `lod_kinematic` (IAU sidereal seconds / fitted sidereal days at J2000, 86400.00000923 — the value the ΔT fit uses as its anchor). Both paths agree at Layer 4 within numerical precision.
 
-Cross-references: `meanLodSecondsAtAgeMeanAlpha` in `src/script.js` (Layer 1 tidal chain with climate-mean α), `meanLodSecondsAtAge` (Layer 2 tidal + GIA at α(t)), `dtCycleLodCorrectionSum` (Layer 3 stack addition), predictions bindings `solarDayLayer1` / `solarDayLayer2` / `lodReal`.
+Cross-references: `meanLodSecondsAtAgeMeanAlpha` in `src/script.js` (Layer 1 tidal chain with climate-mean α), `meanLodSecondsAtAge` (Layer 2 tidal + GIA at α(t)), `dtCycleLodCorrectionSum` (cycles + swing sum), `resonatorSwingLodCorrection` (the Layer-4 addition), predictions bindings `solarDayLayer1` / `solarDayLayer2` / `solarDayLayer3` / `lodReal`.
 
 **Sidereal / stellar day source.** `siderealDayReal` and `stellarDayReal` are derived from `o.lodKinematic` (the IAU-anchored baseline), *not* from `lodReal` (which additionally carries the H/5 and cyclic corrections). This preserves the round-trip identity `siderealYearDays × o.lodKinematic = meansiderealyearlengthinSeconds = 31,558,149.7635 s` at every epoch. J2000 values: 86164.090540 s (sidereal) and 86164.099661 s (stellar).
 
 ### dLOD/dt decomposition at J2000
 
-The framework's Tidal + GIA secular rate at J2000 = **+1.77 ms/century**, matching IERS observation of +1.75 ms/century within 1%. Adding the four sub-Milankovitch lattice cycles brings the full observable rate to **+0.76 ms/century** at J2000. Five rows, matching the tweakpane's *dLOD/dt decomposition* sub-folder:
+The framework's Tidal + GIA secular rate at J2000 = **+1.77 ms/century**, matching IERS observation of +1.75 ms/century within 1%. Adding the four sub-Milankovitch lattice cycles and the Core-mantle swing brings the full observable rate to **−0.08 ms/century** at J2000. Rows match the tweakpane's *dLOD/dt decomposition* sub-folder:
 
 | Layer | Rate (J2000) | Physical mechanism | Sign explanation |
 |:---|---:|:---|:---|
 | **Tidal baseline** (Farhat 2022 / LLR α₁ 3.82 cm/yr) | **+2.12 ms/cy** | Moon recession; Earth loses angular momentum to the Moon via ocean tidal dissipation | Earth spins slower → LOD grows |
 | **GIA** (L1-orbital α(t), dα/dt = −1.35×10⁻¹¹/yr at J2000) | **−0.35 ms/cy** | Continental rebound after LGM; mass migrating from oceans back onto polar continents; Earth's polar moment α decreases | Earth's I = αMR² shrinks, ω = L_E/I grows → LOD shrinks |
-| **All cycles** (Σ d/dt of Bond + Hallstatt + Jose5 + Jose4) | **−1.01 ms/cy** | Sub-Milankovitch cyclic modulation; zero-mean over long periods, sign flips on each half-period of each harmonic | Cyclic — sign depends on epoch; negative at J2000 (mid-descent of the Bond cycle) |
-| **Tidal + GIA** (secular baseline) | **+1.77 ms/cy** | Sum of the two secular drivers | ≈ IERS observation +1.75 ms/century (secular tidal + Milankovitch-scale GIA only, no sub-Milankovitch cycles) |
-| **Tidal + GIA + all cycles** (full framework) | **+0.76 ms/cy** | Full observable dLOD/dt including cyclic modulation | Above/below the secular baseline at other epochs (Little Ice Age vs Medieval Warm Period, etc.) |
+| **All cycles** (Σ d/dt of Bond + Hallstatt + Jose5 + Jose4) | **−1.90 ms/cy** | Sub-Milankovitch cyclic modulation; zero-mean over long periods, sign flips on each half-period of each harmonic | Cyclic — sign depends on epoch; negative at J2000 (descending phase) |
+| **Core-mantle swing** (Resonator episode) | **+0.05 ms/cy** | Damped core-eigenmode episode (T₀ = 8H/685, Q = 1.8); core–mantle angular-momentum exchange | Aperiodic — decaying tail of the terminated episode at J2000 |
+| **Tidal + GIA** (secular baseline, L2) | **+1.77 ms/cy** | Sum of the two secular drivers | ≈ IERS observation +1.75 ms/century (secular tidal + Milankovitch-scale GIA only, no sub-Milankovitch cycles) |
+| **+ Cycles (L3)** | **−0.13 ms/cy** | Secular baseline + flags-only modulation | Flags-only net; excludes the swing |
+| **+ Core-mantle swing (L4, full framework)** | **−0.08 ms/cy** | Full observable dLOD/dt — the shipped Layer-4 observable | Marginally negative at J2000 (descending phase since ~1980, consistent in sign with the observed post-2020 spin-up); above/below the secular baseline at other epochs (Little Ice Age vs Medieval Warm Period, etc.) |
 
-Row-label history: previously *Tidal (LLR α₁) / GIA (α(t) coupling) / Sub-Milankovitch stack / Net Layer 2 / Net Layer 3*. Renamed for consistency across the tweakpane, dashboard export, and the *LOD-Climate Rhythm* modal; the underlying `predictions.dLodDtTidal_msCy / dLodDtGia_msCy / dLodDtStack_msCy / dLodDtNetL2_msCy / dLodDtNetL3_msCy` bindings are unchanged.
+Row-label history: previously *Tidal (LLR α₁) / GIA (α(t) coupling) / Sub-Milankovitch stack / Net Layer 2 / Net Layer 3*. Renamed for consistency across the tweakpane, dashboard export, and the *LOD-Climate Rhythm* modal; the underlying `predictions.dLodDtTidal_msCy / dLodDtGia_msCy / dLodDtStack_msCy / dLodDtNetL2_msCy / dLodDtNetL3_msCy` bindings are unchanged, with `dLodDtResonator_msCy` / `dLodDtNetL4_msCy` added in the joint world.
 
 **Derivations at J2000**:
 ```
@@ -418,10 +423,10 @@ The IERS observed rate is the physical Earth-rotation slowdown, integrating tida
 
 #### Cyclic rate on top of the secular baseline
 
-The Tidal + GIA rate (+1.77 ms/cy at J2000) captures the Milankovitch-scale physics. The four sub-Milankovitch lattice cycles — Bond (1466 yr), Hallstatt (2430 yr), Jose5 (897 yr), Jose4 (716 yr) — add cyclic modulation on top. The individual cycles are anchored so that the cumulative δLOD **value** sums to ≈ 0 at J2000 (the USNO 86400.0026 s anchor is honoured by construction); the cumulative **derivative** at J2000 is not zero, and at present sits at −1.01 ms/cy — the mid-descending part of the Bond cycle. The full observable rate at J2000 is therefore Tidal + GIA + all cycles = +1.77 − 1.01 = **+0.76 ms/century**.
+The Tidal + GIA rate (+1.77 ms/cy at J2000) captures the Milankovitch-scale physics. The four sub-Milankovitch lattice cycles — Bond (1466 yr), Hallstatt (2430 yr), Jose5 (897 yr), Jose4 (716 yr) — add cyclic modulation on top, and the Core-mantle swing (Resonator episode) is the fourth dLOD/dt driver. The components are jointly anchored so that the cumulative δLOD **value** at J2000 closes the raw H/5 kinematic onto the USNO 86400.0014 s anchor (net −2.137 ms, by construction); the cumulative **derivative** at J2000 is not zero: cycles contribute −1.90 ms/cy (descending phase) and the swing +0.05 ms/cy. The full observable rate at J2000 is therefore Tidal + GIA + cycles + swing = +1.77 − 1.90 + 0.05 = **−0.08 ms/century** — marginally negative, a descending-phase episode since ~1980, consistent in sign with the observed post-2020 spin-up.
 
 ```
-full rate = Tidal + GIA + Σ d(cycles)/dt
+full rate = Tidal + GIA + Σ d(cycles)/dt + d(swing)/dt
 ```
 
 The tweakpane exposes all five rows — Tidal baseline, GIA, All cycles, Tidal + GIA, Tidal + GIA + all cycles — under the **dLOD/dt decomposition** sub-folder.
@@ -456,7 +461,7 @@ The framework's three-channel breakdown sits firmly inside the published literat
 
 - **Net-rate quantitative match**: framework +1.77 ms/cy vs IERS ~+1.75 ms/cy — essentially at observation precision, achieved with zero fitting to the observed rate.
 - **Sign structure**: tidal positive (Moon takes L → Earth slows) and GIA negative (mass poleward → α drops → Earth spins up) — matches mainstream physics completely.
-- **Munk-MacDonald rejection**: mainstream also rejects the full ~5-6 ms/century non-tidal magnitude that Munk & MacDonald 1960 postulated. Framework agrees; both settle at ~0.5 ms/century secular non-tidal magnitude.
+- **Munk-MacDonald rejection**: mainstream also rejects the full ~5-6 ms/century non-tidal magnitude that Munk & MacDonald 1960 postulated. Framework agrees; the remaining fractional non-tidal content (~0.5 ms/century window-average) is era-localized — the millennial core–mantle rotation swing, modelled as the Core-mantle swing episode — not a uniform secular rate (disfavored ~4σ by the signed solar-drift bound).
 
 #### One subtle disagreement — modern-era GIA sign flip
 
@@ -475,7 +480,7 @@ The framework rolls the "secular GIA" and "modern ice-loss acceleration" togethe
 
 #### Where the framework differs stylistically
 
-1. **Attribution**: framework treats all non-tidal secular contribution as GIA-via-α(t) coupled to L1 orbital forcing. Mainstream typically splits into GIA + mantle-core + hydrology + modern ice-mass, with the split being **contested and model-dependent** — different authors partition the same total ~−0.5 ms/cy differently.
+1. **Attribution**: framework carries the non-tidal contribution in two channels — the secular part as GIA-via-α(t) coupled to L1 orbital forcing, and the millennial part as the Core-mantle swing (time-varying mantle-core coupling). Mainstream typically splits into GIA + mantle-core + hydrology + modern ice-mass, with the split being **contested and model-dependent** — different authors partition the same total differently.
 2. **Factor 2.0 vs 1.5**: The J₂→α conversion factor of 2.0 sits at the mid-range of Peltier ICE-6G LOD-coupling estimates (1.5-2.5). Authors using factor 1.5 from the idealized axisymmetric derivation (Mitrovica & Peltier 1993) get a proportionally larger GIA magnitude (~−0.55 ms/cy), which would swing the framework's net to ~+1.57 ms/cy — still within observational uncertainty but no longer the tight IERS match.
 3. **Zero fitting**: mainstream ΔT models (Stephenson-Morrison, NASA Espenak/Meeus) fit their non-tidal rate polynomial to the eclipse dataset. The framework anchors both channels independently to satellite geodesy (Cox & Chao dJ₂/dt with Peltier ICE-6G conversion) and Lunar Laser Ranging (LLR α₁), and finds the observational IERS match emergently. This is the load-bearing scientific claim of the decomposition.
 
@@ -1424,7 +1429,7 @@ This gives the *timescale*. The shipped α(t) implementation goes further and pr
 
 #### Validation result
 
-The framework's ΔT curve — LLR-anchored α₁ + L1-orbital-coupled α(t) with J₂→α factor 2.0 + jointly-calibrated trend anchor + 4-flag lattice stack against the Espenak 2006 ΔT polynomial 1650–2017 — reports **21.3 minutes mean \|residual\|** against 267 valid primary-source lunar observations (-720 BCE to 1280 CE, Stephenson, Morrison & Hohenkerk 2016 tables S01/S02/S04/S05/S07/S09), versus NASA Espenak/Meeus's polynomial 20.0 minutes. **108/267 events (40.4%) fall closer to observation than the NASA polynomial does.**
+The framework's ΔT curve — LLR-anchored α₁ + L1-orbital-coupled α(t) with J₂→α factor 2.0 + jointly-calibrated trend anchor + 4-flag lattice stack + Core-mantle swing against the Espenak 2006 ΔT polynomial 1650–2017 — reports **20.2 minutes mean \|residual\|** against 267 valid primary-source lunar observations (-720 BCE to 1280 CE, Stephenson, Morrison & Hohenkerk 2016 tables S01/S02/S04/S05/S07/S09), versus NASA Espenak/Meeus's polynomial 20.0 minutes — a 13-s gap, with the excess over Stephenson's own fitted spline just 2 s. **117/267 events (43.8%) fall closer to observation than the NASA polynomial does.**
 
 Both NASA Espenak/Meeus and Stephenson 2016 are polynomials fit to essentially this lunar dataset, so per-event residuals against either index measure fit quality against a smoothed representation of the observations rather than physical validity. The framework's independent validation is the **26-event eclipse alignment audit** on documented solar eclipses (see [doc 102](102-gia-alpha-lunar-validation.md)). The model uses literature-cited constants from independent satellite gravimetry (Cox & Chao 2002 dJ₂/dt with factor-2.0 J₂→α conversion) plus the L1 orbital layer of the canonical Climate Formula for the deep-time coupling; the trend anchor and lattice-stack amplitudes/phases are calibrated against the Espenak 2006 ΔT polynomial as a documented design choice, not against eclipse data.
 
@@ -1442,7 +1447,7 @@ Downstream quantities auto-update through the calculation chain: LOD, sidereal d
 See `docs/102-gia-alpha-lunar-validation.md` for:
 - The complete L-1 through L-7 validation pipeline (10 console-test buttons)
 - Per-table cross-source consistency analysis (Babylonian / Greek / Chinese / Arab)
-- Comprehensive hypothesis-testing section: eight alternative statistical hypotheses tested rigorously under the L1-orbital α(t) refinement, plus two follow-up predictive tests of proposed physical mechanisms (Path A: solar-activity → ionospheric coupling; Test 5: Jupiter-Saturn-Earth perihelion configuration) and a four-diagnostic drift-decomposition sequence. All correlation-based hypotheses (H3 mass-balance, Path A, Test 5) reduce to drift-tracking artifacts under per-era analysis: aggregate correlations appear strong (H3-lunar r = −0.38 "at ~4σ", Path A r = −0.54, Test 5 J-S r = −0.55) but per-era breakdowns reveal sign flips or near-zero medieval-window r values — the aggregates are drift-tracking, not causal per-observation links. The mechanisms that survive are all structural: **(a)** three of nine literature periodic forcings are detected via Lomb-Scargle — Gleissberg 88 yr, Jose 179 yr, and Neptune de Vries 182 yr — all three in the same **solar-activity** forcing family (coherent spectral signature, not scattered noise-level hits); **(b)** the 14.2-yr peak shows partial support (focused-window noise floor and jackknife pass cleanly, half-split narrowly misses); **(c)** the residual decomposes cleanly into three physical components — a framework-native millennial-scale 8H lattice harmonic at **n=1830 = 74 × Jupiter-Saturn synodic = 1466 yr** (gcd(1830, H) = 61) capturing the "bump", shipped default-ON as the Bond component of the 4-flag sub-Milankovitch stack (Bond + Hallstatt + Jose5 + Jose4); a fractional non-tidal secular rate of ~0.5 ms/century (approximately 2× Cox-Chao satellite value, ~10% of the full Munk-MacDonald postulate — full MM still rejected, fractional acknowledged); and observation noise. See doc 102 §"Eight hypotheses tested" and §"Complete residual decomposition" for the full analysis.
+- Comprehensive hypothesis-testing section: eight alternative statistical hypotheses tested rigorously under the L1-orbital α(t) refinement, plus two follow-up predictive tests of proposed physical mechanisms (Path A: solar-activity → ionospheric coupling; Test 5: Jupiter-Saturn-Earth perihelion configuration) and a four-diagnostic drift-decomposition sequence. All correlation-based hypotheses (H3 mass-balance, Path A, Test 5) reduce to drift-tracking artifacts under per-era analysis: aggregate correlations appear strong (H3-lunar r = −0.38 "at ~4σ", Path A r = −0.54, Test 5 J-S r = −0.55) but per-era breakdowns reveal sign flips or near-zero medieval-window r values — the aggregates are drift-tracking, not causal per-observation links. The mechanisms that survive are all structural: **(a)** three of nine literature periodic forcings are detected via Lomb-Scargle — Gleissberg 88 yr, Jose 179 yr, and Neptune de Vries 182 yr — all three in the same **solar-activity** forcing family (coherent spectral signature, not scattered noise-level hits); **(b)** the 14.2-yr peak shows partial support (focused-window noise floor and jackknife pass cleanly, half-split narrowly misses); **(c)** the residual decomposes cleanly into three physical components — a framework-native millennial-scale 8H lattice harmonic at **n=1830 = 74 × Jupiter-Saturn synodic = 1466 yr** (gcd(1830, H) = 61) capturing the "bump", shipped default-ON as the Bond component of the 4-flag sub-Milankovitch stack (Bond + Hallstatt + Jose5 + Jose4); a fractional non-tidal channel of ~0.5 ms/century window-average (approximately 2× Cox-Chao satellite value, ~10% of the full Munk-MacDonald postulate — full MM still rejected), carried by the Core-mantle swing episode (time-varying mantle-core coupling; see doc 104); and observation noise. See doc 102 §"Eight hypotheses tested" and §"Complete residual decomposition" for the full analysis.
 
 #### Climate-driven α(t) — the L1-orbital coupling
 

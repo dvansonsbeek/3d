@@ -4,7 +4,7 @@
 
 Research synthesis — closes the former TODO item "identify the physical channel for the ~0.5 ms/century fractional non-tidal secular rate." The residual is fully decomposed; its millennial component is identified with the documented core–mantle LOD fluctuation, independently confirmed against archeomagnetic core-flow reconstructions, and found to be representable in-window as the shipped ΔT stack's own lattice difference tones with a physically motivated damping interpretation — quantified in §6 as a driven-damped-resonator formula (T₀ ≈ 3.8–4.0 kyr, low Q, in the published axiMC eigenmode range) with a first guard-passing "channel-4" implementation form. Builds on docs 93 (L1 attribution), 99 (ESSRT), 102 (GIA α), 103 (Babylonian case study). Companion scripts: `scripts/archive/lod_swing_archeomag_calibration.py`, `scripts/archive/bond_coreflow_phase_lock_test.py`, `scripts/archive/lod_residual_142yr_window_test.py`, `scripts/archive/lod_swing_difference_tones.py`, `scripts/archive/core_mantle_resonator_fit.py`, `scripts/archive/core_mantle_excitation_inversion.py`, `scripts/archive/core_mantle_channel4_feasibility.py`, `scripts/archive/lod_swing_interaction_network.py`, `scripts/archive/h26_phase_locked_test.py`, `scripts/archive/lod_residual_h46_millennial_cycle.py`, `scripts/archive/lod_residual_transient_plus_periods.py`, and the Stage-E / phantom-check instrumentation in `tools/fit/dt-corrections-fit.js`.
 
-**Update — the swing NOW SHIPS.** After this document was written, the campaign continued (joint fit, impulse-consistent episode) and the Core-mantle swing was integrated as the model's 4th dLOD/dt driver (Resonator), default-ON, fitted jointly with the flags by `tools/fit/dt-corrections-fit.js --joint` (anchors moved with it: USNO 86400.0014, deltaTStart 56.05, Espenak RMS 12.60 s). §8's shipping constraints are therefore HISTORICAL — each was resolved as described in TODO.md ("JOINT-WORLD FLIP") and the fit tool's documentation; a full rewrite of §6/§8 to the joint-world narrative is pending (integration backlog). The research scripts referenced below now live in `scripts/archive/` (see `scripts/archive/README-resonator-2026-07.md`).
+**Update — the swing NOW SHIPS.** After this document was written, the campaign continued (joint fit, impulse-consistent episode) and the Core-mantle swing was integrated as the model's 4th dLOD/dt driver (Resonator), default-ON. §6 closes with the shipped joint-world form ("The shipped form" below — episode constants, joint-fit design, and the anchors that moved with it); §8 records how each of the original shipping constraints was resolved. The research scripts referenced below now live in `scripts/archive/` (see `scripts/archive/README-resonator-2026-07.md`).
 
 ---
 
@@ -195,6 +195,18 @@ Two implementation routes tested:
 
 > **channel 4 = env(t; T₀, Q, t_launch) × [eigenmode ringing + locked drive-tone response], driven by the Δn = 34-locked four-cycle beat band through quadratic (low-pass) coupling** — T₀ ≈ 3.8–4.0 kyr and low Q externally corroborated (axiMC); drive-phase attribution as-if (n = 2).
 
+### The shipped form (joint world)
+
+The production episode, as shipped by `tools/fit/dt-corrections-fit.js --joint --write` (constants in `data/core-mantle-resonator-stage1.json`, synced to `tools/lib/deep-time.js`, `src/script.js`, and the website's `deepTime.ts` by `tools/fit/export-dt-corrections.js`):
+
+- **Eigenperiod** T₀ = 8H/685 = 3,916.1 yr (lattice-labeled by convention: the shipped resonator is the combined effect of the lattice cycles, so under H(t) evolution the episode scales with its drivers; the bare axiMC eigenmode is core-material physics — recorded caveat), **Q = 1.8**.
+- **Impulse-consistent 2-kick episode**: kicks are sin-only (displacement-continuous — ΔT is accumulated angle and must not step; the impulses live in the slope). Excitation at **−1600** (sin 760.35 s, just below the 773.3-s cap), termination at **+1600** (sin −75.19 s). The kick epochs are CONVENTION, not data-dated: the record starts at −720 with the swing already at full amplitude (so excitation genuinely predates −720), and the stability box t₁ ∈ [−2350, −750] is flat. The excitation kick steps δLOD by +3.878 ms/day — inside the SMH ±3–4 ms envelope — and Dumberry & Finlay-class core-flow reorganizations of that size within <100 yr are documented physics.
+- **Drive tone** at the bond−hallstatt difference frequency 8H/726 = 3,695 yr, phase LOCKED to the quadratic-mixing prediction φ_bond − φ_hallstatt, amplitude +186.14 s (at cap), **switch-on compensated** (its displacement at the excitation epoch is cancelled by an eigenmode transient).
+- **Joint fit design**: 4 flags + resonator in ONE equality-constrained solve; the USNO J2000 solar-day closure is a hard anchor row; amplitude caps are FIXED convention constants (never derived from the mutable fit JSON — the cap-creep lesson); resonator phases enter as locked unit shapes (free phases balloon under the cap cascade); composite selection = best Espenak RMS subject to full-window Stephenson RMS ≤ 40 s.
+- **Shipped anchors** (move atomically with the coefficients): USNO 86,400.0014 s (interior optimum, within 0.2 ms of the observed EO value 86,400.0016 that no H-recalibration could reach — the resonator was the missing piece), deltaTStart 56.049 s, Espenak RMS 12.60 s, full-window Stephenson RMS 31.3 s (best ever).
+- **Termination-kick interpretation**: in the joint world the explicit counter-kick is small (−75 s vs the 760-s excitation) — the medieval shutdown is largely carried by damping plus flag interference, with the counter-kick as a residual trim. The excitation inversion's push–pull structure survives as the physical reading; the counter-kick's smallness is the joint-fit's restatement of it.
+- **Post-ship validation**: `tools/fit/validate-resonator.js` ALL PASS (ΔT(J2000) = 0, pure LOD untouched, deep time bit-identical ±200 Myr); the L-5b §12–§17 diagnostics in the joint world confirm closure on every axis — anchor drift 6.7 μs/day (was ~730–750), rate-equivalent 0.010 ms/cy (was the ~0.5 ms/cy channel), bump-symmetry structure gone, residual at the Stephenson-fit noise floor (2 s excess).
+
 ### Tested and rejected external drivers
 
 Two astronomically flavored driver hypotheses were tested and rejected for the swing (both preserved as scripts/artifacts):
@@ -212,18 +224,18 @@ The ~14.2-yr line in the 270-observation eclipse residual is a **sampling-window
 
 ---
 
-## 8. Shipping constraints and forward path
+## 8. Shipping constraints and their resolution
 
-The swing does **not** enter the runtime model because:
+Four constraints originally kept the swing out of the runtime model. Each is now resolved — the swing ships as the 4th dLOD/dt driver (see §6 "The shipped form"):
 
-1. **Envelope formalism missing** — the harmonic-only correction architecture has no damped-amplitude machinery, and constant-amplitude difference tones violate the modern instrumental window (~1.5 ms/day). The guard-passing channel-4 form (§6) specifies exactly what the extension would need: an episodic decay envelope env(t; T₀, Q, t_launch).
-2. **Excitation-epoch convention missing** — the feasibility fit launches at −720 (record start) only because that is where the data begins; a physical convention (e.g., envelope-extremum-locked) is undecided, and the drive attribution rests on n = 2 forcing extrema.
-3. **Eclipse-fit purity** — the tone amplitudes/phases are eclipse-fitted; archeomagnetic calibration cannot yet replace them (§4).
-4. **Anchor discipline** — any millennial component must close the J2000 LOD anchor (precedent: the earlier Bond-integration attempt was reverted for breaking it).
+1. ~~Envelope formalism missing~~ — **Resolved**: the impulse-consistent episode class (damped eigenmode + switch-on-compensated drive tone, analytic first and second derivatives) is implemented in `tools/lib/deep-time.js`, `src/script.js`, and the website's `deepTime.ts`, with exporter sync for all 11 scalar constants.
+2. ~~Excitation-epoch convention missing~~ — **Resolved as convention**: Stage-3 stability analysis showed the epochs are not data-pinnable (flat box t₁ ∈ [−2350, −750]); shipped (−1600, +1600) stand as convention, with the data-supported statement limited to "excitation predates the −720 record start."
+3. **Eclipse-fit purity — still the honest caveat**: the amplitudes are capped and jointly eclipse-fitted; archeomagnetic calibration cannot yet replace them (§4's ~300-yr lead systematic). The zero-eclipse-fitting claim applies to the pure-tidal + α(t) chain, not to the stack + swing.
+4. ~~Anchor discipline~~ — **Resolved by design**: the joint fit carries the USNO J2000 closure as a hard equality constraint — the anchor is exact by construction (the earlier Bond-integration revert is the precedent this design answers).
 
-What would change this: (i) an archeomagnetic flow model without the ~300-yr lead systematic, enabling external calibration (an ArchKalmag14k-based flow/LOD series is the watch item); (ii) adopting the envelope architecture and an excitation-epoch convention so the guard-passing channel-4 form can be integrated with anchor closure; (iii) confirmation of the difference-tone phases in independent climate archives; (iv) more forcing extrema than two — only a longer clean record can firm up the drive attribution.
+Forward path (unchanged in kind, updated in role — these now refine rather than gate): (i) an archeomagnetic flow model without the ~300-yr lead systematic would enable external amplitude/phase calibration (ArchKalmag14k-based flow/LOD series is the watch item); (ii) confirmation of the difference-tone phases in independent climate archives; (iii) more forcing extrema than two — only a longer clean record can firm up the drive attribution beyond "as-if."
 
-Remaining open questions: the ~12-s irreducible 8H/2024 content (Stage-E floor of `tools/fit/dt-corrections-fit.js`); the 3,695-yr tone's phase (window-degenerate — only a longer record or external data can pin it); paper component-(ii) wording update.
+Remaining open questions: the ~12-s irreducible 8H/2024 content (Stage-E floor of `tools/fit/dt-corrections-fit.js`; the joint-world L-5b §14 scan's degenerate ~990-yr ridge in the hallstatt−jose4 difference-tone band is the same family, fitted against the Stephenson spline rather than observations — research note, not a shipping candidate); the 3,695-yr tone's phase (window-degenerate — only a longer record or external data can pin it).
 
 ---
 

@@ -1,6 +1,6 @@
 # Pure-tidal + L1-orbital-coupled α(t) validates against the historical lunar record
 
-**Status**: Validation complete — 267 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 (LLR-anchored α₁ giving da/dt = 3.82 cm/yr at J2000) + L1-orbital-coupled α(t) GIA model. Framework mean |residual| **21.3 min (1281 s)**, with **108/267 events (40.4%)** falling closer to observation than NASA Espenak/Meeus's polynomial. NASA polynomial mean |residual|: 20.0 min (1199 s); Stephenson 2016 spline polynomial: 20.2 min (1211 s) — both are fit to essentially this exact dataset, so per-event residuals against either index fit quality against a smoothed representation of the observations rather than physical validity. The framework's independent validation is the [26-event solar-eclipse alignment audit](https://holisticuniverse.com/model/historical-eclipse-validation): 12/26 confirmed+off-peak, 6 regional, 2 with residual ΔT-signal, 6 pure geographic misses (historical attribution debates, unrelated to physics).
+**Status**: Validation complete — 267 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 (LLR-anchored α₁ giving da/dt = 3.82 cm/yr at J2000) + L1-orbital-coupled α(t) GIA model. Under the joint world (4-flag stack + Core-mantle swing, doc 104), framework mean |residual| **20.2 min (1212 s)**, with **117/267 events (43.8%)** falling closer to observation than NASA Espenak/Meeus's polynomial. NASA polynomial mean |residual|: 20.0 min (1199 s); Stephenson 2016 spline polynomial: 20.2 min (1211 s) — both are fit to essentially this exact dataset, so per-event residuals against either index fit quality against a smoothed representation of the observations rather than physical validity; the framework's excess over Stephenson's own fit is **2 s** — the dataset noise floor. The framework's independent validation is the [26-event solar-eclipse alignment audit](https://holisticuniverse.com/model/historical-eclipse-validation): 12/26 confirmed+off-peak, 6 regional, 2 with residual ΔT-signal, 6 pure geographic misses (historical attribution debates, unrelated to physics).
 
 ---
 
@@ -15,9 +15,9 @@ at J2000, Dickey 1994 / Chapront 2002) PLUS the L1-orbital-coupled α(t) GIA
 viscoelastic correction (Cox & Chao 2002 dJ₂/dt = -2.7e-11/yr with J₂→α
 conversion factor 2.0 in the Peltier ICE-6G LOD-coupling range, giving
 dα/dt = -1.35e-11/yr at J2000), together with a jointly-calibrated trend
-anchor + 4-flag lattice stack against the Espenak 2006 ΔT polynomial
-1650-2017, produces a mean |residual| of 21.3 min against 267 primary-source
-lunar observations spanning 2,000 years. The residual after α(t) is
+anchor + 4-flag lattice stack + Core-mantle swing against the Espenak 2006
+ΔT polynomial 1650-2017, produces a mean |residual| of 20.2 min against 267
+primary-source lunar observations spanning 2,000 years. The residual after α(t) is
 decomposed below into four framework-native sub-Milankovitch lattice
 harmonics (Bond 8H/1830 = 1466 yr, Hallstatt 8H/1104 = 2430 yr, Jose5
 8H/2989 = 897 yr, Jose4 8H/3749 = 716 yr — shipped default-ON as the
@@ -341,11 +341,11 @@ expected to mirror L-5b per-table structure if α(t) is real physics.
                                        Mean |residual| (s)    Mean |residual| (min)
 Stephenson 2016 spline polynomial:                 1211                20.2   ← fit to these data
 NASA Espenak/Meeus polynomial:                     1199                20.0   ← also fit-class
-Model pure-tidal + L1-orbital α(t) GIA:            1281                21.3   ← framework, no ΔT fitting
+Model (joint world: tidal + α(t) + stack + swing): 1212                20.2   ← framework, no ΔT polynomial fitting
 
-Events where framework closer to obs than NASA: 108/267 (40.4%)
-Framework excess over NASA on remaining events: 82 s on average
-Framework excess over Stephenson: 70 s (1.2 min)
+Events where framework closer to obs than NASA: 117/267 (43.8%)
+Framework excess over NASA on remaining events: 13 s on average
+Framework excess over Stephenson: 2 s (0.0 min — the dataset noise floor)
 ```
 
 Both the Stephenson 2016 spline polynomial and the NASA Espenak/Meeus
@@ -370,7 +370,8 @@ audit uses the framework's own predicted UT and umbra track with no
 | Linear α(t) @ −1.35×10⁻¹¹/yr (factor-2.0 J₂→α, Peltier ICE-6G) | 23.6 min | — | — |
 | Single-mode viscoelastic α(t), τ = 5 ka | 24.3 min | 0.096 | −0.79 |
 | Multi-mode viscoelastic α(t), τ ∈ {1.5, 5, 14} ka (\|t\|-symmetric) | 24.4 min | 0.090 | −0.77 |
-| **L1-orbital-coupled α(t) + 4-flag lattice stack (shipped)** | **21.3 min** | — | — |
+| L1-orbital-coupled α(t) + 4-flag lattice stack (pre-joint) | 21.3 min | — | — |
+| **L1-orbital-coupled α(t) + 4-flag stack + Core-mantle swing (shipped, joint world)** | **20.2 min** | — | — |
 
 Each row is a single physically-motivated literature value swapped
 into the model. The R²(linear) collapse from 0.53 → 0.090 under the
@@ -445,11 +446,12 @@ three parts:
   framework arithmetic that captures the dominant "bump" shape of the
   medieval feature; shipped default-ON as the Bond component of the
   4-flag stack (Bond + Hallstatt + Jose5 + Jose4).
-- **A fractional non-tidal secular rate** ~0.5 ms/century (about 2×
-  Cox-Chao satellite value, and ~10% of the full Munk-MacDonald
-  postulate) — a real but small unmodelled physical channel;
-  candidate mechanisms include time-varying mantle-core coupling
-  (see next section) and continental hydrology.
+- **A fractional non-tidal channel** ~0.5 ms/century window-average
+  (about 2× Cox-Chao satellite value, and ~10% of the full
+  Munk-MacDonald postulate) — time-varying mantle-core coupling: the
+  era-localized signature of the millennial core–mantle rotation
+  swing, now modelled as the Core-mantle swing episode (Resonator
+  driver, the 4th dLOD/dt channel — doc 104).
 - **Observation noise + Bond-fit imperfection artifacts** at the
   ~60 s RMS level — the irreducible floor from Stephenson's dataset
   precision averaged into the sampled Δ curve.
@@ -500,7 +502,8 @@ Per-table:
 | S08 | Arab timed | 22 | 829…1004 | 390 | 419 | 27% |
 
 The absolute residuals are smaller than L-5b lunar (NASA 672 vs 1199 s,
-framework 671 vs 1281 s) because solar observations have tighter
+framework 666 vs 1212 s in the joint world — the solar framework
+residual is now BELOW NASA's) because solar observations have tighter
 intrinsic precision — narrow totality paths give sharper timing.
 The framework's ancient Babylonian S03 table has the framework
 *closer than NASA* on 60% of events, with lower mean residual (837 s
@@ -628,7 +631,8 @@ value if the coupling was smaller in earlier eras, or a fraction if
 the coupling was intermittent). The constant-Holme extrapolation
 tested above assumed the modern rate was representative for all past
 eras — the diagnostic shows it wasn't, and constrains the
-time-average to ~0.5 ms/century.
+time-average to ~0.5 ms/century. This time-varying channel is
+carried by the Core-mantle swing (doc 104).
 
 ---
 
@@ -636,10 +640,10 @@ time-average to ~0.5 ms/century.
 
 The L1-orbital-coupled α(t) GIA correction (see §"α(t) implementation" in
 [doc 99](99-expanding-solar-system-resonance-theory.md) for the
-formulation) brings the residual to 21.3 min mean |residual| against 267
-primary-source observations (NASA Espenak/Meeus's empirical polynomial
-gives 20.0 min against the same events — a 1.3-min gap on top of the
-~20-min per-observation noise floor). Structural characterisation of
+formulation) brings the residual to 20.2 min mean |residual| against 267
+primary-source observations in the joint world (NASA Espenak/Meeus's
+empirical polynomial gives 20.0 min against the same events — a 13-s gap
+on top of the ~20-min per-observation noise floor). Structural characterisation of
 the residual (see "Residual shape decomposition" below) shows it
 decomposes into a linear secular drift plus one symmetric bump centred
 in the medieval window — one mechanism each for drift and bump, not
@@ -657,8 +661,9 @@ analysis all correlation-based hypotheses collapse to drift-tracking artifacts
 rather than causal per-observation links.** The mechanisms that survive are all
 STRUCTURAL — spectral (H6 coherent solar-activity family), lattice-native
 (single 8H integer divisor at n=1830 = 74×J-S synodic, gcd=61, captures the
-~1466 yr bump), and residual-rate-based (§16 finds a fractional non-tidal secular
-rate ~0.5 ms/century, roughly 10% of the full Munk-MacDonald postulate). The
+~1466 yr bump), and residual-rate-based (§16's fractional non-tidal channel ~0.5 ms/century
+window-average, roughly 10% of the full Munk-MacDonald postulate — carried
+by the Core-mantle swing, doc 104). The
 section documents the analysis rigorously — the mix of null and structural
 results constrains the space of plausible explanations and produces a clean
 three-component decomposition of the residual (see "Complete residual
@@ -668,7 +673,7 @@ decomposition" below).
 
 | # | Hypothesis | Method | n | Result |
 |---|---|---|---:|---|
-| 1 | Constant mantle-core coupling (Holme 1998 secular rate) vs FRACTIONAL non-tidal rate | Linear extrapolation in `meanLodSecondsAtAge`; §16 rate-sensitivity diagnostic | 270 | ⚠ **Constant Holme rate REJECTED (over-corrects Babylonian ΔT by ~2,700 s). But §16 rate-sensitivity finds a FRACTIONAL non-tidal secular contribution of ~0.5 ms/century (≈ 2× Cox-Chao satellite value; ~10% of full Munk-MacDonald postulate) present in the ΔT residual. Time-varying core-mantle coupling, or unmodelled slow hydrology/GIA, remains a live candidate.** |
+| 1 | Constant mantle-core coupling (Holme 1998 secular rate) vs FRACTIONAL non-tidal rate | Linear extrapolation in `meanLodSecondsAtAge`; §16 rate-sensitivity diagnostic | 270 | ⚠ **Constant Holme rate REJECTED (over-corrects Babylonian ΔT by ~2,700 s). But §16 rate-sensitivity finds a FRACTIONAL non-tidal contribution of ~0.5 ms/century window-average (≈ 2× Cox-Chao satellite value; ~10% of full Munk-MacDonald postulate) present in the ΔT residual. Time-varying core-mantle coupling is the channel — carried by the Core-mantle swing episode (doc 104).** |
 | 2 | Mass balance ↔ residual (instantaneous) | Pearson + permutation p-value | 267 | ✗ r = −0.108, p = 0.065 (borderline null) |
 | 3 | **Mass balance integrated Y → 2000, with per-era analysis + solar replication** | Pearson + Bonferroni + solar replication + per-era stability check | 267 + 89 | ✗ **Aggregate r = −0.381 (p < 10⁻⁴, "~4σ") appears strong, but per-era analysis reveals sign-flip: Ancient (−720 to 0) r = −0.13, Transition (0 to 800) r = +0.18, Medieval (800 to 1280) r = +0.10. The aggregate is a drift-tracking artifact of two smooth monotonic signals over the ancient BCE window, not a causal per-observation link. Cannot claim to explain the medieval bump specifically. Solar replication superseded by the per-era finding.** |
 | 4 | Mass balance lagged (Δ ∈ {0,100,...,1000} yr scan) | Pearson + best-of-scan + Bonferroni | 267 | ✗ Lunar best lag Δ=0: r = −0.108 (p = 0.065); solar best lag Δ=200: r = +0.246 (p = 0.020). Opposite signs at different best lags — no coherent lagged coupling |
@@ -957,15 +962,14 @@ tests (Path A, Test 5) and the drift-origin diagnostic sequence
    Steinhilber ¹⁰Be for Hallstatt) to fully restore the zero-eclipse-fit
    claim. See "Millennial-scale 8H lattice harmonic" and "Companion 8H
    lattice harmonics" sections above.
-3. **Identify the physical channel for the fractional non-tidal
-   secular rate** (~0.5 ms/century detected by §16). Candidate
-   mechanisms include time-varying core-mantle EM coupling (not the
-   constant-Holme H1 rate), continental hydrology on centennial
-   scale, and regional GIA structure beyond global 3-mode α(t).
-4. **Regional GIA structure** remains a candidate explanation both for
-   the fractional non-tidal rate above AND for residual features at
-   the noise floor — not tested and would require ICE-6G_C or
-   equivalent continental-resolution rebound modelling.
+3. ~~Identify the physical channel for the fractional non-tidal
+   rate~~ **Identified: the Core-mantle swing** (see the
+   three-component decomposition above; full identification chain,
+   difference-tone structure, and joint-fit design in doc 104).
+4. **Regional GIA structure** remains a candidate explanation for
+   residual features at the noise floor — not tested and would
+   require ICE-6G_C or equivalent continental-resolution rebound
+   modelling.
 
 ### Why the rigorous testing section matters
 
@@ -982,10 +986,12 @@ diagnostics) substantially updates the picture from the earlier
    at 4σ" narrative is DOWNGRADED — the aggregate correlation is real
    as a statistical fact but not a mechanism claim.
 2. **The residual shape is one drift + one symmetric MWP bump plus
-   fractional non-tidal rate** — structural diagnostics (symmetry test,
-   reference robustness) confirm the drift+bump superposition;
-   §14–§17 further show the drift itself has a fractional non-tidal
-   secular rate component ~0.5 ms/century (§16).
+   fractional non-tidal channel** — structural diagnostics (symmetry
+   test, reference robustness) confirm the drift+bump superposition;
+   §14–§17 further show the drift carries a fractional non-tidal
+   channel ~0.5 ms/century window-average (§16) — the Core-mantle
+   swing (doc 104). In the joint world both structures are absorbed
+   (numbers in "The complete picture" below).
 3. **H6 detects coherent solar-activity signal** — Gleissberg and Jose/de Vries
    spectral peaks resolve to two spectral features, both solar-activity cycles.
    Spectral detection is unaffected by the per-era finding (H6 is a spectral
@@ -1134,8 +1140,9 @@ ancient trough near year −480 adds to the already-positive ancient BCE
 residuals, cancelling the medieval win at the aggregate level. This
 motivated the companion 8H harmonics (Hallstatt 8H/1104 and Jose5
 8H/2989) that absorb signal bands where Bond is off-cycle. With the
-full 4-flag stack shipped default-ON, the L-5b headline reaches 21.3
-min mean |residual| with 108/267 events (40.4%) beating NASA's
+full stack shipped default-ON (4 flags + Core-mantle swing, joint
+world), the L-5b headline reaches 20.2 min mean |residual| with
+117/267 events (43.8%) beating NASA's
 Espenak/Meeus polynomial — the numbers reported in the L-5b Result
 section above.
 
@@ -1627,11 +1634,15 @@ Combining §14–§17 findings, the residual decomposes cleanly:
 |---|---:|---|
 | **Bond-scale oscillation at ~1466 yr** | ~7 pp R², ~175 s RMS | **Real, framework-native** (n=1830 = 74 × J-S synodic, gcd=61) |
 | **Higher-order polynomial shape (order 3+)** | ~4.5 pp R², ~100 s RMS | **Not physical** — Bond fit imperfection at ancient BCE tail; artifact |
-| **Fractional non-tidal secular rate** | ~0.5 ms/century | **Real, NOT in framework** — 2× Cox-Chao, ~10% of full Munk-MacDonald |
+| **Fractional non-tidal channel** | ~0.5 ms/century window-average | **Real — carried by the Core-mantle swing** (time-varying mantle-core coupling, Resonator driver; doc 104). 2× Cox-Chao, ~10% of full Munk-MacDonald |
 | **Observation noise + unexplained** | ~62 s RMS post-fit | Irreducible floor (Stephenson dataset noise averaged into sampled Δ) |
 
 Three physical components + one artifact + noise floor. Nothing else is
-required to explain the residual's structure.
+required to explain the residual's structure. In the joint world (stack +
+swing in one equality-constrained solve) the §15/§16 diagnostics confirm
+closure: anchor drift 6.7 μs/day, rate-equivalent 0.010 ms/cy — the
+residual sits at the dataset noise floor (2 s excess over Stephenson's
+own fit).
 
 ---
 
@@ -1649,15 +1660,12 @@ What this validation establishes:
    Munk-MacDonald non-tidal assumption would over-correct Babylonian ΔT
    by ~2,700 s (H1 constant-Holme test). But the §16 rate sensitivity
    diagnostic (see "Complete residual decomposition" above) finds a
-   **fractional non-tidal secular rate of ~+0.5 ms/century** present in
+   **fractional non-tidal channel of ~0.5 ms/century (window-average)** present in
    the ΔT residual after Bond correction — approximately 2× the Cox &
    Chao 2002 satellite-measured GIA value, and ~10% of the full
    Munk-MacDonald postulate. This fractional contribution is real and
-   NOT currently in the framework's α(t). Candidate mechanisms:
-   time-varying core-mantle EM coupling (not the constant-Holme rate),
-   continental hydrology / groundwater on centennial timescale, regional
-   GIA structure beyond the global L1-orbital α(t) average. The residual
-   supports ~2× Cox-Chao, not 25× Cox-Chao.
+   is carried by the **Core-mantle swing** (doc 104). The
+   residual supports ~2× Cox-Chao, not 25× Cox-Chao.
 
 3. **α(t) uses zero eclipse-fitting parameters; the 4-flag stack
    PERIODS are zero-fit while its amplitudes/phases are fit-derived.**
@@ -1774,20 +1782,20 @@ What this validation establishes:
 What we are NOT claiming:
 
 - **That NASA's polynomial is comprehensively "beaten."** The framework
-  matches NASA within 82 s on average across L-5b lunar (1281 s vs
-  1199 s), beats NASA on 108/267 lunar events (40.4%), and essentially
-  ties NASA on L-7 solar (671 s vs 672 s, 44/89 events beating).
+  matches NASA within 13 s on average across L-5b lunar (1212 s vs
+  1199 s), beats NASA on 117/267 lunar events (43.8%), and edges past
+  NASA on L-7 solar (666 s vs 672 s, 42/89 events beating).
   NASA's polynomial is FIT to this dataset; ours PREDICTS it. The
   comparison is asymmetric and we acknowledge it openly. The
   achievement is not "beating NASA" but "predicting historical eclipse
   timing to essentially the same accuracy as NASA's ~10-coefficient
   fit, using only first-principles physical constants."
 
-- **That the 21.3 min framework residual is purely physical.** The
+- **That the 20.2 min framework residual is purely physical.** The
   Stephenson 2016 dataset has a ~20 min irreducible per-observation
-  scatter; the remaining 1.3-min gap to NASA includes both observation
-  noise and small contributions from non-tidal channels we don't model
-  (mantle-core mean, sea-level secular).
+  scatter; the remaining 13-s gap to NASA is at the level of
+  observation noise and small unmodelled contributions (sea-level
+  secular, regional GIA structure).
 
 - **That GIA is the only secular non-tidal contributor.** Other channels
   exist but are smaller. We model GIA explicitly because it is the
@@ -1820,11 +1828,13 @@ What we are NOT claiming:
    (see "Complete residual decomposition" and "Companion 8H lattice
    harmonics") into four sub-Milankovitch 8H harmonics (Bond 8H/1830
    = 1466 yr, Hallstatt 8H/1104 = 2430 yr, Jose5 8H/2989 = 897 yr,
-   Jose4 8H/3749 = 716 yr), plus a fractional non-tidal secular rate
-   ~0.5 ms/century, plus observation noise. The 4-flag lattice
-   harmonic stack is shipped default-ON with cap-only fit-derived
-   amplitudes/phases; independent (non-eclipse) calibration remains
-   open as the path to fully restore the zero-fit claim.
+   Jose4 8H/3749 = 716 yr), plus the Core-mantle swing (the fractional
+   non-tidal channel, ~0.5 ms/century window-average — doc 104), plus
+   observation noise. The stack + swing are shipped default-ON,
+   calibrated in one joint equality-constrained solve with capped
+   fit-derived amplitudes/phases; independent (non-eclipse)
+   calibration remains open as the path to fully restore the zero-fit
+   claim.
 
 4. **Greek (S07) is an outlier** with 11 observations and a
    detrended mean residual of −795 s. Small sample; the per-table

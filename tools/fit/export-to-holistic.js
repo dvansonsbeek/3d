@@ -632,7 +632,8 @@ const MV_TS      = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
 //
 //   data/deltaT-4flag-fit.json  → usnoLodJ2000, deltaTEspenakRmsSeconds
 //   tools/lib/deep-time.js      → ALPHA_CLIMATE_SCALE_NUM + the dLOD/dt
-//     channel rates (DLOD_TIDAL / DLOD_GIA / DLOD_ALLCYCLES), evaluated at
+//     channel rates (DLOD_TIDAL / DLOD_GIA / DLOD_ALLCYCLES /
+//     DLOD_RESONATOR), evaluated at
 //     the sim's model epoch 2000.5 (t_Ma = −5e-7) so they match the
 //     tweakpane's dLOD/dt decomposition rows digit-for-digit; plus
 //     ALPHA_CLIMATE_SCALE / ALPHA_1 into website deepTime.ts (the α(t)
@@ -694,6 +695,7 @@ const MV_TS      = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
       mv = replaceMvConst(mv, 'DLOD_TIDAL',     dLod.tidal.toFixed(2));
       mv = replaceMvConst(mv, 'DLOD_GIA',       dLod.gia.toFixed(2));
       mv = replaceMvConst(mv, 'DLOD_ALLCYCLES', dLod.stack.toFixed(2));
+      mv = replaceMvConst(mv, 'DLOD_RESONATOR', dLod.resonator.toFixed(2));
     }
 
     // Deep-time scalar anchors (Devonian / Earth-Moon genesis / +200 Myr) —
