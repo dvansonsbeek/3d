@@ -5044,24 +5044,19 @@ function dLodDtDecompositionAtAge(t_Ma) {
   const dLod_dt_gia_s_per_yr = lod_s * dalpha_dyr / alpha;
   const dLod_dt_gia_ms_per_cy = dLod_dt_gia_s_per_yr * 100 * 1000;
 
-  // All-cycles stack rate: d(Σ ΔT δLOD)/dt at current epoch.
-  // Numerical derivative on dtCycleLodCorrectionSum with a 50-yr window (well
-  // below the shortest harmonic period Jose4 = 716 yr, so aliasing-safe).
+  // All-cycles (flags-only) stack rate: 50-yr central difference on the
+  // FLAGS-ONLY sum (sum minus the resonator term). The flags are smooth, so
+  // the 50-yr window is aliasing-safe (shortest harmonic Jose4 = 716 yr) and
+  // smear-free. The resonator channel uses the ANALYTIC rate instead: the
+  // episode's δLOD has genuine steps at the kicks (impulses), which a
+  // central difference would smear into 100-yr rectangles (the 1550–1650
+  // notch first seen in the LOD-Climate modal). Mirrors deep-time.js.
   const DYR = 50;   // yr half-window
-  const stack_plus  = dtCycleLodCorrectionSum(year + DYR);
-  const stack_minus = dtCycleLodCorrectionSum(year - DYR);
-  const dStack_dyr = (stack_plus - stack_minus) / (2 * DYR);
-  const dLod_dt_stack_ms_per_cy = dStack_dyr * 100 * 1000;   // s/yr → ms/century
-
-  // NOTE: dtCycleLodCorrectionSum already INCLUDES the resonator term when its
-  // toggle is ON, so 'stack' above is the full all-cycles+resonator rate. The
-  // separate 'resonator' channel below isolates the Core-mantle swing share
-  // for the 4-driver display (Tidal / GIA / All cycles / Resonator); the
-  // 'stack' display subtracts it to stay a pure 4-flag channel.
-  const dRes_dyr = (resonatorSwingLodCorrection(year + DYR)
-                  - resonatorSwingLodCorrection(year - DYR)) / (2 * DYR);
-  const dLod_dt_resonator_ms_per_cy = dRes_dyr * 100 * 1000;
-  const dLod_dt_stack_only_ms_per_cy = dLod_dt_stack_ms_per_cy - dLod_dt_resonator_ms_per_cy;
+  const dFlags_dyr = ((dtCycleLodCorrectionSum(year + DYR) - resonatorSwingLodCorrection(year + DYR))
+                    - (dtCycleLodCorrectionSum(year - DYR) - resonatorSwingLodCorrection(year - DYR)))
+                    / (2 * DYR);
+  const dLod_dt_stack_only_ms_per_cy = dFlags_dyr * 100 * 1000;   // s/yr → ms/century
+  const dLod_dt_resonator_ms_per_cy = resonatorSwingLodRate(year) * 100 * 1000;
 
   const net_L2 = dLod_dt_tidal_ms_per_cy + dLod_dt_gia_ms_per_cy;
   const net_L3 = net_L2 + dLod_dt_stack_only_ms_per_cy;
@@ -5592,6 +5587,41 @@ function _resonatorRawPrime(year) {
   return v;
 }
 
+// Analytic SECOND derivative of the raw episode (d²C/dy²) — mirrors
+// tools/lib/deep-time.js _resonatorRawSecond. Used by the dLOD/dt
+// decomposition so the kick impulses render as clean steps instead of the
+// 50-yr-window rectangles a finite difference produces (the 1550–1650 notch
+// first seen in the LOD-Climate modal). Kick terms: the derivative maps
+// (a,b) → (−λa + w_d·b, −λb − w_d·a); apply twice. Compensated tone
+// amp·e·A: d²/dy² = amp·e·(λ²A − 2λA′ + A″).
+function _resonatorRawSecond(year) {
+  let v = 0;
+  for (const k of RES_KICKS) {
+    const dt = year - k.t;
+    if (dt < 0) continue;
+    const e = Math.exp(-RES_LAMBDA * dt);
+    const a1 = -RES_LAMBDA * k.cos_s + RES_WD * k.sin_s;
+    const b1 = -RES_LAMBDA * k.sin_s - RES_WD * k.cos_s;
+    const a2 = -RES_LAMBDA * a1 + RES_WD * b1;
+    const b2 = -RES_LAMBDA * b1 - RES_WD * a1;
+    v += e * (a2 * Math.cos(RES_WD * dt) + b2 * Math.sin(RES_WD * dt));
+  }
+  const dt1 = year - RES_KICKS[0].t;
+  if (dt1 >= 0) {
+    const e1 = Math.exp(-RES_LAMBDA * dt1);
+    for (const t of RES_TONES) {
+      const c0 = _resonatorToneC0(t);
+      const A  = Math.cos(t.omega * year - t.phi_locked) - c0 * Math.cos(RES_WD * dt1);
+      const A1 = -t.omega * Math.sin(t.omega * year - t.phi_locked)
+               + c0 * RES_WD * Math.sin(RES_WD * dt1);
+      const A2 = -t.omega * t.omega * Math.cos(t.omega * year - t.phi_locked)
+               + c0 * RES_WD * RES_WD * Math.cos(RES_WD * dt1);
+      v += t.amp_s * e1 * (RES_LAMBDA * RES_LAMBDA * A - 2 * RES_LAMBDA * A1 + A2);
+    }
+  }
+  return v;
+}
+
 const RES_DT_RAW_AT_J2000 = _resonatorRaw(2000);
 
 /** Anchored Core-mantle swing ΔT correction at calendar year (CE), seconds.
@@ -5614,6 +5644,21 @@ function resonatorSwingLodCorrection(year) {
   const dCdy = _dtCycleTaperDerivative(year) * (_resonatorRaw(year) - RES_DT_RAW_AT_J2000)
              + taper * _resonatorRawPrime(year);
   return 86400 * dCdy / MEAN_TROPICAL_YEAR_J2000_S;
+}
+
+/** Analytic RATE of the resonator's δLOD contribution, d(δLOD)/dy in
+ *  (s/day) per year — mirrors tools/lib/deep-time.js resonatorSwingLodRate.
+ *  Exact inside the flat-taper region (|y−2000| ≤ 300 kyr — every display
+ *  tab); numeric fallback in the taper transition. Renders the kick impulses
+ *  as clean steps instead of finite-difference rectangles. */
+function resonatorSwingLodRate(year) {
+  if (!RESONATOR_DT_CORRECTION_ENABLED) return 0;
+  const taper = bondHoloceneTaper(year);
+  if (taper <= 0) return 0;
+  if (taper >= 1) {
+    return 86400 * _resonatorRawSecond(year) / MEAN_TROPICAL_YEAR_J2000_S;
+  }
+  return (resonatorSwingLodCorrection(year + 1) - resonatorSwingLodCorrection(year - 1)) / 2;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════

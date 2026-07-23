@@ -512,6 +512,44 @@ function _resonatorRawPrime(year) {
   return v;
 }
 
+// Analytic SECOND derivative of the raw episode (d²C/dy²). Needed by the
+// dLOD/dt decomposition: the resonator's δLOD has a genuine STEP at each
+// kick (the impulse), so a finite-difference rate smears it into a
+// window-wide rectangle (seen in the LOD-Climate modal as a 100-yr notch at
+// 1550–1650). The analytic form renders a clean step exactly at the kick.
+// Derivation: for kick terms e·(a·cos + b·sin), one derivative maps the
+// coefficients (a,b) → (−λa + w_d·b, −λb − w_d·a); apply the map twice.
+// For the compensated tone amp·e·A with A = cos(ωy−φ) − c0·cos(w_d·dt):
+// d²/dy² = amp·e·(λ²A − 2λA′ + A″), A′ = −ω·sin(ωy−φ) + c0·w_d·sin(w_d·dt),
+// A″ = −ω²·cos(ωy−φ) + c0·w_d²·cos(w_d·dt).
+function _resonatorRawSecond(year) {
+  let v = 0;
+  for (const k of RES_KICKS) {
+    const dt = year - k.t;
+    if (dt < 0) continue;
+    const e = Math.exp(-RES_LAMBDA * dt);
+    const a1 = -RES_LAMBDA * k.cos_s + RES_WD * k.sin_s;
+    const b1 = -RES_LAMBDA * k.sin_s - RES_WD * k.cos_s;
+    const a2 = -RES_LAMBDA * a1 + RES_WD * b1;
+    const b2 = -RES_LAMBDA * b1 - RES_WD * a1;
+    v += e * (a2 * Math.cos(RES_WD * dt) + b2 * Math.sin(RES_WD * dt));
+  }
+  const dt1 = year - RES_KICKS[0].t;
+  if (dt1 >= 0) {
+    const e1 = Math.exp(-RES_LAMBDA * dt1);
+    for (const t of RES_TONES) {
+      const c0 = _resonatorToneC0(t);
+      const A  = Math.cos(t.omega * year - t.phi_locked) - c0 * Math.cos(RES_WD * dt1);
+      const A1 = -t.omega * Math.sin(t.omega * year - t.phi_locked)
+               + c0 * RES_WD * Math.sin(RES_WD * dt1);
+      const A2 = -t.omega * t.omega * Math.cos(t.omega * year - t.phi_locked)
+               + c0 * RES_WD * RES_WD * Math.cos(RES_WD * dt1);
+      v += t.amp_s * e1 * (RES_LAMBDA * RES_LAMBDA * A - 2 * RES_LAMBDA * A1 + A2);
+    }
+  }
+  return v;
+}
+
 const RES_DT_RAW_AT_J2000 = _resonatorRaw(2000);
 
 function resonatorSwingDeltaTCorrection(year) {
@@ -528,6 +566,23 @@ function resonatorSwingLodCorrection(year) {
   const dCdy = holoceneTaperDerivative(year) * (_resonatorRaw(year) - RES_DT_RAW_AT_J2000)
              + taper * _resonatorRawPrime(year);
   return 86400 * dCdy / MEAN_TROPICAL_YEAR_J2000_S;
+}
+
+/** Analytic RATE of the resonator's δLOD contribution, d(δLOD)/dy in
+ *  (s/day) per year. Exact inside the flat-taper region (|y−2000| ≤ 300 kyr
+ *  — every display tab); falls back to a central difference in the taper
+ *  transition. Renders the kick impulses as clean steps instead of the
+ *  100-yr rectangles a finite difference produces. */
+function resonatorSwingLodRate(year) {
+  if (!DT_RESONATOR_ENABLED) return 0;
+  const taper = holoceneTaper(year);
+  if (taper <= 0) return 0;
+  if (taper >= 1) {
+    return 86400 * _resonatorRawSecond(year) / MEAN_TROPICAL_YEAR_J2000_S;
+  }
+  // taper transition zone (300–400 kyr from J2000): product-rule terms are
+  // messy and the values are microscopic — numeric fallback is fine here.
+  return (resonatorSwingLodCorrection(year + 1) - resonatorSwingLodCorrection(year - 1)) / 2;
 }
 
 /**
@@ -588,21 +643,25 @@ function dLodDtDecompositionAtAge(t_Ma) {
   const dalpha_dyr = (alpha_plus - alpha_minus) / (2 * EPS_MA * 1e6);
   const dLod_dt_gia_ms_per_cy = lod_s * dalpha_dyr / alpha * 100 * 1000;
 
-  // All-cycles stack rate: d(Σ ΔT δLOD)/dt, 50-yr central difference (well
-  // below the shortest harmonic period Jose4 = 716 yr, so aliasing-safe).
+  // All-cycles (flags-only) stack rate: 50-yr central difference — well
+  // below the shortest harmonic period (Jose4 = 716 yr), aliasing-safe, and
+  // the flags are smooth so no smear issues. Computed below together with
+  // the analytic resonator channel.
   const DYR = 50;
-  const dStack_dyr = (dtCycleLodCorrectionSum(year + DYR) - dtCycleLodCorrectionSum(year - DYR)) / (2 * DYR);
-  const dLod_dt_stack_ms_per_cy = dStack_dyr * 100 * 1000;
 
-  // Resonator channel (Core-mantle swing episode): d(δLOD_resonator)/dt.
-  // 0 unless DT_RESONATOR_ENABLED=1 — net_L4 then equals net_L3. Note
-  // dtCycleLodCorrectionSum above already includes the resonator term when
-  // enabled, so the 'stack' display channel subtracts it to stay pure 4-flag
-  // (mirrors src/script.js).
-  const dRes_dyr = (resonatorSwingLodCorrection(year + DYR)
-                  - resonatorSwingLodCorrection(year - DYR)) / (2 * DYR);
-  const dLod_dt_resonator_ms_per_cy = dRes_dyr * 100 * 1000;
-  const dLod_dt_stack_only_ms_per_cy = dLod_dt_stack_ms_per_cy - dLod_dt_resonator_ms_per_cy;
+  // Resonator channel (Core-mantle swing episode): ANALYTIC rate — the
+  // episode's δLOD has genuine steps at the kicks (impulses), which a
+  // central difference smears into DYR-wide rectangles (the 1550–1650 notch
+  // seen in the LOD-Climate modal). 0 unless DT_RESONATOR_ENABLED=1 —
+  // net_L4 then equals net_L3. The 'stack' channel is differenced on the
+  // FLAGS-ONLY sum (smooth, so the 50-yr window is harmless there); it must
+  // NOT be derived from the full sum minus the analytic resonator, or the
+  // smear would leak between channels (mirrors src/script.js).
+  const dFlags_dyr = ((dtCycleLodCorrectionSum(year + DYR) - resonatorSwingLodCorrection(year + DYR))
+                    - (dtCycleLodCorrectionSum(year - DYR) - resonatorSwingLodCorrection(year - DYR)))
+                    / (2 * DYR);
+  const dLod_dt_stack_only_ms_per_cy = dFlags_dyr * 100 * 1000;
+  const dLod_dt_resonator_ms_per_cy = resonatorSwingLodRate(year) * 100 * 1000;
 
   const net_L2 = dLod_dt_tidal_ms_per_cy + dLod_dt_gia_ms_per_cy;
   const net_L3 = net_L2 + dLod_dt_stack_only_ms_per_cy;
@@ -973,8 +1032,9 @@ module.exports = {
   // Implied LOD corrections from the 4-flag ΔT stack (physical-consistency helper)
   bondCycleLodCorrection, hallstattCycleLodCorrection, jose5CycleLodCorrection, jose4CycleLodCorrection,
   dtCycleLodCorrectionSum,
-  // Core-mantle swing (Resonator driver) — episode component, default OFF
-  resonatorSwingDeltaTCorrection, resonatorSwingLodCorrection, DT_RESONATOR_ENABLED,
+  // Core-mantle swing (Resonator driver) — episode component, default ON (joint world)
+  resonatorSwingDeltaTCorrection, resonatorSwingLodCorrection, resonatorSwingLodRate,
+  DT_RESONATOR_ENABLED,
   meanLodSecondsWithCorrectionsAtAge,
   // dLOD/dt driver decomposition (tidal / GIA / all-cycles channels, ms/cy)
   dLodDtDecompositionAtAge,
