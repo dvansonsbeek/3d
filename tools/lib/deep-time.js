@@ -258,26 +258,26 @@ const EIGHT_H = 8 * HOLISTIC_YEAR_J2000;
 const BOND_LATTICE_N = 1830;
 const BOND_PERIOD_YR = EIGHT_H / BOND_LATTICE_N;
 const BOND_OMEGA = 2 * Math.PI / BOND_PERIOD_YR;
-const BOND_COS_COEFF_S = 166.47057950204547;
-const BOND_SIN_COEFF_S = 318.7280035757656;
+const BOND_COS_COEFF_S = 145.59456999025969;
+const BOND_SIN_COEFF_S = 329.22555981262514;
 
 const HALLSTATT_LATTICE_N = 1104;
 const HALLSTATT_PERIOD_YR = EIGHT_H / HALLSTATT_LATTICE_N;
 const HALLSTATT_OMEGA = 2 * Math.PI / HALLSTATT_PERIOD_YR;
-const HALLSTATT_COS_COEFF_S = -36.6985946101689;
-const HALLSTATT_SIN_COEFF_S = 71.08595609287732;
+const HALLSTATT_COS_COEFF_S = -72.94533763545279;
+const HALLSTATT_SIN_COEFF_S = 32.84779623125113;
 
 const JOSE5_LATTICE_N = 2989;
 const JOSE5_PERIOD_YR = EIGHT_H / JOSE5_LATTICE_N;
 const JOSE5_OMEGA = 2 * Math.PI / JOSE5_PERIOD_YR;
-const JOSE5_COS_COEFF_S = -40.11722776347204;
-const JOSE5_SIN_COEFF_S = 29.843056756533972;
+const JOSE5_COS_COEFF_S = -34.55484512708396;
+const JOSE5_SIN_COEFF_S = 36.13810562610113;
 
 const JOSE4_LATTICE_N = 3749;
 const JOSE4_PERIOD_YR = EIGHT_H / JOSE4_LATTICE_N;
 const JOSE4_OMEGA = 2 * Math.PI / JOSE4_PERIOD_YR;
-const JOSE4_COS_COEFF_S = 21.58624686862962;
-const JOSE4_SIN_COEFF_S = -32.33131542846586;
+const JOSE4_COS_COEFF_S = 38.592083031774166;
+const JOSE4_SIN_COEFF_S = -31.7907396464544;
 
 // Cyclic-correction taper widened 2026-07-12 from ±4.5/6 kyr Holocene window to
 // ±300/400 kyr — cross-archive validation across Steinhilber ¹⁰Be (9.4 kyr),
@@ -433,15 +433,15 @@ const DT_RESONATOR_ENABLED = process.env.DT_RESONATOR_DISABLED !== '1';
 // shipped component (numeric difference ~1e-6 over the episode's life).
 const RES_T0_LATTICE_N = 685;
 const RES_Q           = 1.8;
-const RES_KICK1_T_YR  = -800;
-const RES_KICK1_COS_S = 763.426519638273;
-const RES_KICK1_SIN_S = 123.33378225236893;
+const RES_KICK1_T_YR  = -1600;
+const RES_KICK1_COS_S = 0;
+const RES_KICK1_SIN_S = 760.3459514001411;
 const RES_KICK2_T_YR  = 1600;
-const RES_KICK2_COS_S = 1.9240430673737383;
-const RES_KICK2_SIN_S = -2.921184506818565;
+const RES_KICK2_COS_S = 0;
+const RES_KICK2_SIN_S = -75.18554900744495;
 const RES_TONE1_DN    = 726;
 const RES_TONE1_PHI_RAD = -0.4616152283022974;
-const RES_TONE1_AMP_S = -122.1328514244366;
+const RES_TONE1_AMP_S = 186.14;
 
 const RES_T0_YR  = EIGHT_H / RES_T0_LATTICE_N;   // 3,916.11 yr
 const RES_W0     = 2 * Math.PI / RES_T0_YR;
@@ -460,6 +460,15 @@ const RES_TONES = [
     phi_locked: RES_TONE1_PHI_RAD, amp_s: RES_TONE1_AMP_S },
 ];
 
+// IMPULSE-CONSISTENT episode (2026-07-23): kicks are sin-only (cos_s ≡ 0 —
+// displacement-continuous, the true impulse response of the damped
+// oscillator; ΔT is accumulated angle and must not step). The drive tone is
+// SWITCH-ON COMPENSATED: its displacement at the excitation epoch is
+// cancelled by an eigenmode transient (physical switched-on drive; slope
+// discontinuities at the kicks are allowed — they are the impulses).
+function _resonatorToneC0(t) {
+  return Math.cos(t.omega * RES_KICKS[0].t - t.phi_locked);
+}
 function _resonatorRaw(year) {
   let v = 0;
   for (const k of RES_KICKS) {
@@ -472,7 +481,8 @@ function _resonatorRaw(year) {
   if (dt1 >= 0) {
     const e1 = Math.exp(-RES_LAMBDA * dt1);
     for (const t of RES_TONES) {
-      v += e1 * t.amp_s * Math.cos(t.omega * year - t.phi_locked);
+      v += e1 * t.amp_s * (Math.cos(t.omega * year - t.phi_locked)
+                           - _resonatorToneC0(t) * Math.cos(RES_WD * dt1));
     }
   }
   return v;
@@ -491,8 +501,12 @@ function _resonatorRawPrime(year) {
   if (dt1 >= 0) {
     const e1 = Math.exp(-RES_LAMBDA * dt1);
     for (const t of RES_TONES) {
-      v += e1 * t.amp_s * (-RES_LAMBDA * Math.cos(t.omega * year - t.phi_locked)
-                           - t.omega * Math.sin(t.omega * year - t.phi_locked));
+      const c0 = _resonatorToneC0(t);
+      // d/dy of e1·[cos(ωy−φ) − c0·cos(w_d·dt1)] — product rule
+      v += e1 * t.amp_s * (-RES_LAMBDA * (Math.cos(t.omega * year - t.phi_locked)
+                                          - c0 * Math.cos(RES_WD * dt1))
+                           - t.omega * Math.sin(t.omega * year - t.phi_locked)
+                           + c0 * RES_WD * Math.sin(RES_WD * dt1));
     }
   }
   return v;

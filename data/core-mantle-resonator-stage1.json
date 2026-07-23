@@ -178,19 +178,19 @@
     "resonator": {
       "display_name": "Core-mantle swing",
       "driver": "Resonator",
-      "functional_class": "episode (2-kick windowed damped oscillation — zero before first kick)",
+      "functional_class": "episode (2-kick IMPULSE-CONSISTENT windowed damped oscillation — sin-only kicks, displacement-continuous; zero before first kick)",
       "kick_epochs_year": [
-        -800,
+        -1600,
         1600
       ],
       "kick_coefficients_s": [
         {
-          "cos": 763.426519638273,
-          "sin": 123.33378225236893
+          "cos": 0,
+          "sin": 760.3459514001411
         },
         {
-          "cos": 1.9240430673737383,
-          "sin": -2.921184506818565
+          "cos": 0,
+          "sin": -75.18554900744495
         }
       ],
       "T0_lattice_n": 685,
@@ -202,13 +202,13 @@
           "dn": 726,
           "period_yr": 3694.9531680440773,
           "phi_locked_rad": -0.4616152283022974,
-          "amp_s": -122.1328514244366,
+          "amp_s": 186.14,
           "phase_convention": "cos(2π·dn/8H·y − φ_locked), kick-1-envelope-shared"
         }
       ],
-      "rms_s": 32.37468741532057,
-      "raw_at_j2000_s": -91.11587807549724,
-      "lod_raw_at_j2000_s_per_day": 0.0007864328401519675,
+      "rms_s": 31.31305470423878,
+      "raw_at_j2000_s": -149.26700354452785,
+      "lod_raw_at_j2000_s_per_day": 0.0006264038106577331,
       "deep_time_checks_s": {
         "900": -245.8439379884609,
         "2000": -82.32559425279462,
@@ -219,7 +219,8 @@
         "-801": 0
       },
       "regeneration_rule": "drive-tone menu = Δn difference tones of the ACTIVE flag set (any count); refit this script after any stack change (3rd/5th cycle)",
-      "status": "JOINT WORLD SHIPPED (--joint --write): amplitudes from the joint equality-constrained fit (kick2 ~0 — the termination is carried by flag interference in the joint world); phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON."
+      "status": "JOINT WORLD SHIPPED (--joint --write): amplitudes from the joint equality-constrained fit (kick2 ~0 — the termination is carried by flag interference in the joint world); phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON.",
+      "impulse_consistent": true
     },
     "resonator_free_reference": {
       "display_name": "Core-mantle swing",

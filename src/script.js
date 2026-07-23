@@ -54,7 +54,7 @@ let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 8H/1830 ΔT correction (Option
 let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research toggle) — rationale + associated constants ~L5039
 let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
 let   JOSE4_DT_CORRECTION_ENABLED = true;  // Jose4 8H/3749 ≈ 715.5 yr ΔT correction (4×Jose period, structural gcd=23) — cross-archive coherent in Steinhilber Φ + EPICA CO2; rationale + associated constants ~L5209
-let   RESONATOR_DT_CORRECTION_ENABLED = true;  // Core-mantle swing (Resonator driver) — episode of the core eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q=1.8) + locked bond−hallstatt drive tone. DEFAULT ON since the JOINT-world flip (2026-07-23): fitted JOINTLY with the 4 flags (dt-corrections-fit.js --joint; anchors USNO 86400.0015 / deltaTStart 58.48 moved with the coefficients, Espenak RMS 12.54 s). doc 104 §6/§8; constants + rationale near the Jose4 block
+let   RESONATOR_DT_CORRECTION_ENABLED = true;  // Core-mantle swing (Resonator driver) — episode of the core eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q=1.8) + locked bond−hallstatt drive tone. DEFAULT ON since the JOINT-world flip (2026-07-23): fitted JOINTLY with the 4 flags (dt-corrections-fit.js --joint; anchors USNO 86400.0014 / deltaTStart 56.05 moved with the coefficients, Espenak RMS 12.60 s). doc 104 §6/§8; constants + rationale near the Jose4 block
 let   REPORT_TIMING_ENABLED       = false;  // Per-phase timing lines during Days/Years/Precession report — flip to false to silence — see runYearAnalysisExport (~L40133)
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
@@ -76,7 +76,7 @@ let   currentAUDistance = 149597870.698828;               // 1 AU in km (IAU 201
 const AU_J2000_KM = currentAUDistance;                    // J2000 reference snapshot — used as a frozen anchor for physical constants (GM_SUN, masses) and Driver 2 evolution formula
 const speedOfLight = 299792.458;                          // Speed of light in km/s (CODATA)
 const perihelionalignmentYear = 1246.03125;                     // Year when perihelion longitude = 90° (Meeus)
-const deltaTStart = 58.479922749628315;                                // Delta-T at model epoch (seconds) — auto-optimum joint solve with USNO 86400.0026 s (RMS 22.53 s vs Espenak across 20 reference years 1650-2017). Approaches IAU J2000 ΔT = 64.184 s within 2.7%. Prior values: 57.526 s (Wells 1989 α₁ + Cox&Chao factor 1.5); 63.925 s (LLR α₁ + factor 1.5). See tools/fit/dt-corrections-fit.js --sweep-usno.
+const deltaTStart = 56.04899719615156;                                // Delta-T at model epoch (seconds) — auto-optimum joint solve with USNO 86400.0026 s (RMS 22.53 s vs Espenak across 20 reference years 1650-2017). Approaches IAU J2000 ΔT = 64.184 s within 2.7%. Prior values: 57.526 s (Wells 1989 α₁ + Cox&Chao factor 1.5); 63.925 s (LLR α₁ + factor 1.5). See tools/fit/dt-corrections-fit.js --sweep-usno.
 
 
 // ─── E1. Early derived (needed before ASTRO_REFERENCE) ───────────────────
@@ -5226,8 +5226,8 @@ function meanTropicalYearSecondsAtAge(t_Ma) {
 const BOND_LATTICE_N              = 1830;                       // integer n in 8H/n — 74 × J-S synodic; gcd(1830, H) = 61 shares H's 61 prime
 const BOND_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / BOND_LATTICE_N;  // 1465.867 yr
 const BOND_OMEGA                  = 2 * Math.PI / BOND_PERIOD_YR;
-const BOND_COS_COEFF_S            = 166.47057950204547;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
-const BOND_SIN_COEFF_S            = 318.7280035757656;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
+const BOND_COS_COEFF_S            = 145.59456999025969;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
+const BOND_SIN_COEFF_S            = 329.22555981262514;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
 // Cyclic-correction taper widened 2026-07-12 from ±4.5/6 kyr Holocene window to
 // ±300/400 kyr — cross-archive validation across Steinhilber ¹⁰Be (9.4 kyr),
 // EPICA CO2 (800 kyr), and Cheng speleothem (640 kyr) supports cycle coherence
@@ -5318,8 +5318,8 @@ function bondCycleDeltaTCorrection(year) {
 const HALLSTATT_LATTICE_N              = 1104;                     // 8H/1104 = H/138 = 2·H/(6·23)
 const HALLSTATT_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / HALLSTATT_LATTICE_N;  // 2429.833 yr
 const HALLSTATT_OMEGA                  = 2 * Math.PI / HALLSTATT_PERIOD_YR;
-const HALLSTATT_COS_COEFF_S            = -36.6985946101689;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
-const HALLSTATT_SIN_COEFF_S            = 71.08595609287732;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
+const HALLSTATT_COS_COEFF_S            = -72.94533763545279;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
+const HALLSTATT_SIN_COEFF_S            = 32.84779623125113;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
 const HALLSTATT_TAPER_FULL_HALFWIDTH_YR  = 300000;                 // same as Bond (widened 2026-07-12)
 const HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR = 400000;                 // same as Bond (widened 2026-07-12)
 const HALLSTATT_DT_RAW_AT_J2000        = HALLSTATT_COS_COEFF_S * Math.cos(HALLSTATT_OMEGA * 2000)
@@ -5397,8 +5397,8 @@ function hallstattCycleDeltaTCorrection(year) {
 const JOSE5_LATTICE_N              = 2989;                        // 8H/(7²·61); gcd(2989, H) = 61
 const JOSE5_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE5_LATTICE_N;  // 897.47 yr
 const JOSE5_OMEGA                  = 2 * Math.PI / JOSE5_PERIOD_YR;
-const JOSE5_COS_COEFF_S            = -40.11722776347204;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
-const JOSE5_SIN_COEFF_S            = 29.843056756533972;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
+const JOSE5_COS_COEFF_S            = -34.55484512708396;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
+const JOSE5_SIN_COEFF_S            = 36.13810562610113;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
 const JOSE5_TAPER_FULL_HALFWIDTH_YR  = 300000;                    // same as Bond/Hallstatt (widened 2026-07-12)
 const JOSE5_TAPER_TOTAL_HALFWIDTH_YR = 400000;                    // same as Bond/Hallstatt (widened 2026-07-12)
 const JOSE5_DT_RAW_AT_J2000        = JOSE5_COS_COEFF_S * Math.cos(JOSE5_OMEGA * 2000)
@@ -5448,8 +5448,8 @@ function jose5CycleDeltaTCorrection(year) {
 const JOSE4_LATTICE_N              = 3749;                       // 3749 = 23 × 163; gcd(3749, H) = 23 shares H's 23 prime
 const JOSE4_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE4_LATTICE_N;  // 715.53 yr
 const JOSE4_OMEGA                  = 2 * Math.PI / JOSE4_PERIOD_YR;
-const JOSE4_COS_COEFF_S            = 21.58624686862962;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
-const JOSE4_SIN_COEFF_S            = -32.33131542846586;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
+const JOSE4_COS_COEFF_S            = 38.592083031774166;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
+const JOSE4_SIN_COEFF_S            = -31.7907396464544;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
 const JOSE4_TAPER_FULL_HALFWIDTH_YR  = 300000;                   // same as Bond/Hallstatt/Jose5 (widened 2026-07-12)
 const JOSE4_TAPER_TOTAL_HALFWIDTH_YR = 400000;                   // same as Bond/Hallstatt/Jose5 (widened 2026-07-12)
 const JOSE4_DT_RAW_AT_J2000        = JOSE4_COS_COEFF_S * Math.cos(JOSE4_OMEGA * 2000)
@@ -5514,15 +5514,15 @@ function jose4CycleDeltaTCorrection(year) {
 // shipped component (numeric difference ~1e-6 over the episode's life).
 const RES_T0_LATTICE_N = 685;
 const RES_Q           = 1.8;
-const RES_KICK1_T_YR  = -800;
-const RES_KICK1_COS_S = 763.426519638273;
-const RES_KICK1_SIN_S = 123.33378225236893;
+const RES_KICK1_T_YR  = -1600;
+const RES_KICK1_COS_S = 0;
+const RES_KICK1_SIN_S = 760.3459514001411;
 const RES_KICK2_T_YR  = 1600;
-const RES_KICK2_COS_S = 1.9240430673737383;
-const RES_KICK2_SIN_S = -2.921184506818565;
+const RES_KICK2_COS_S = 0;
+const RES_KICK2_SIN_S = -75.18554900744495;
 const RES_TONE1_DN    = 726;
 const RES_TONE1_PHI_RAD = -0.4616152283022974;
-const RES_TONE1_AMP_S = -122.1328514244366;
+const RES_TONE1_AMP_S = 186.14;
 
 const RES_T0_YR  = (8 * HOLISTIC_YEAR_J2000) / RES_T0_LATTICE_N;   // 3,916.11 yr
 const RES_W0     = 2 * Math.PI / RES_T0_YR;
@@ -5540,6 +5540,15 @@ const RES_TONES = [
     phi_locked: RES_TONE1_PHI_RAD, amp_s: RES_TONE1_AMP_S },
 ];
 
+// IMPULSE-CONSISTENT episode (2026-07-23): kicks are sin-only (cos_s ≡ 0 —
+// displacement-continuous, the true impulse response of the damped
+// oscillator; ΔT is accumulated angle and must not step). The drive tone is
+// SWITCH-ON COMPENSATED: its displacement at the excitation epoch is
+// cancelled by an eigenmode transient (physical switched-on drive; slope
+// discontinuities at the kicks are allowed — they are the impulses).
+function _resonatorToneC0(t) {
+  return Math.cos(t.omega * RES_KICKS[0].t - t.phi_locked);
+}
 function _resonatorRaw(year) {
   let v = 0;
   for (const k of RES_KICKS) {
@@ -5552,7 +5561,8 @@ function _resonatorRaw(year) {
   if (dt1 >= 0) {
     const e1 = Math.exp(-RES_LAMBDA * dt1);
     for (const t of RES_TONES) {
-      v += e1 * t.amp_s * Math.cos(t.omega * year - t.phi_locked);
+      v += e1 * t.amp_s * (Math.cos(t.omega * year - t.phi_locked)
+                           - _resonatorToneC0(t) * Math.cos(RES_WD * dt1));
     }
   }
   return v;
@@ -5571,8 +5581,12 @@ function _resonatorRawPrime(year) {
   if (dt1 >= 0) {
     const e1 = Math.exp(-RES_LAMBDA * dt1);
     for (const t of RES_TONES) {
-      v += e1 * t.amp_s * (-RES_LAMBDA * Math.cos(t.omega * year - t.phi_locked)
-                           - t.omega * Math.sin(t.omega * year - t.phi_locked));
+      const c0 = _resonatorToneC0(t);
+      // d/dy of e1·[cos(ωy−φ) − c0·cos(w_d·dt1)] — product rule
+      v += e1 * t.amp_s * (-RES_LAMBDA * (Math.cos(t.omega * year - t.phi_locked)
+                                          - c0 * Math.cos(RES_WD * dt1))
+                           - t.omega * Math.sin(t.omega * year - t.phi_locked)
+                           + c0 * RES_WD * Math.sin(RES_WD * dt1));
     }
   }
   return v;
@@ -5686,7 +5700,7 @@ function resonatorSwingLodCorrection(year) {
 //
 // Current shipped fit: Bond dominates (in decreasing-LOD phase); joint-optimum
 // sweep against Espenak lands the 4-cycle net at −0.937 ms at J2000 (matches
-// USNO 86400.0015 − raw-H/5 86400.003527 = −0.002037 s, joint world). See
+// USNO 86400.0014 − raw-H/5 86400.003527 = −0.002137 s, joint world). See
 // `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s` and
 // per-cycle amplitudes/phases under `shipped_coefficients`. Individual per-cycle
 // contributions are best inspected via the "ΔT Breakdown (H/5 physics vs Bond
@@ -5740,7 +5754,7 @@ function jose4CycleLodCorrection(year) {
 
 /** Sum of DT cyclic LOD contributions at year. At J2000 the shipped 4-cycle sum
  *  ≈ −0.937 ms — the target for the joint-optimum fit that closes Layer 3 LOD_real
- *  onto USNO 86400.0015 s exactly (raw H/5 kinematic 86400.003527 − 2.037 ms = anchor;
+ *  onto USNO 86400.0014 s exactly (raw H/5 kinematic 86400.003527 − 2.137 ms = anchor;
  *  joint world: the sum includes the Core-mantle swing episode).
  *  See data/deltaT-4flag-fit.json → usno_anchor.shipped_sum_lod_at_j2000_s.
  *  Used by the Solar Day display (Layer 3) and by future modal chart. */
@@ -5777,7 +5791,7 @@ const _MAX_DELTA_T_CACHE = 512;
  *  Integrand uses raw H/5 kinematic LOD = MEAN_LOD × (1 + 1/((H/5)·mSY_days))
  *  — the H/5 ecliptic-precession "missing motion" adds ~3.5 ms at J2000, so
  *  raw kinematic ≈ 86400.003 s. This overshoots the USNO Earth Orientation
- *  Center J2000 anchor (86400.0015 s) by ~2.04 ms; the Bond/Hallstatt/Jose5/
+ *  Center J2000 anchor (86400.0014 s) by ~2.14 ms; the Bond/Hallstatt/Jose5/
  *  Jose4 post-integration stack closes the composite (Layer 3 LOD_real) onto
  *  the USNO anchor exactly by construction of the joint-optimum fit. This
  *  integrand correctly reproduces the positive dΔT/dt slope near J2000.
@@ -5786,7 +5800,7 @@ const _MAX_DELTA_T_CACHE = 512;
  *  `_eclMoonBeta`, `_meeusMoon*`) to convert JD_UT → JD_TT before evaluating
  *  the Sun and Moon polynomials, so the inertial positions are at their
  *  correct TT-time evaluation. For ABSOLUTE ΔT (Espenak convention with
- *  ΔT(J2000) ≈ 58.48 s trend anchor, joint world), add `deltaTStart` to the return value — see the
+ *  ΔT(J2000) ≈ 56.05 s trend anchor, joint world), add `deltaTStart` to the return value — see the
  *  'delta-t' chart configuration for the display-layer convention.
  *
  *  If BOND_DT_CORRECTION_ENABLED is ON, an additional Bond-cycle correction
@@ -5796,7 +5810,7 @@ const _MAX_DELTA_T_CACHE = 512;
  *  J2000 LOD anchor is preserved. */
 function meanDeltaTSecondsAtAge(t_Ma) {
   // ΔT(J2000) = 0 by convention for this function (integration reference).
-  // The DISPLAY value adds deltaTStart (58.48 s trend anchor, joint world) — done at the chart layer.
+  // The DISPLAY value adds deltaTStart (56.05 s trend anchor, joint world) — done at the chart layer.
   if (t_Ma === 0) return 0;
   // Cache key must include all sub-Milankovitch feature flags so toggling
   // any of them doesn't return stale values.
@@ -5823,7 +5837,7 @@ function meanDeltaTSecondsAtAge(t_Ma) {
     const yearS = meanTropicalYearSecondsAtAge(tau);
     // H/5 ecliptic-precession "missing motion" — adds ~3.5 ms at J2000 to
     // give the raw H/5 kinematic LOD (86400.003 s at J2000). Overshoots the
-    // USNO anchor (86400.0015 s) by ~2.04 ms; the calibrated Bond/Hallstatt/
+    // USNO anchor (86400.0014 s) by ~2.14 ms; the calibrated Bond/Hallstatt/
     // Jose5/Jose4 post-integration stack closes Layer 3 LOD_real onto the
     // USNO anchor. Correctly reproduces the positive dΔT/dt slope near J2000.
     const H_local  = meanHAtAge(tau);
@@ -5866,7 +5880,7 @@ function meanDeltaTSecondsAtAge(t_Ma) {
  *  This is the "pure H/5 physics" baseline curve, separate from the calibrated
  *  Layer 3 composite (meanDeltaTSecondsAtAge) which adds the cyclic Bond/
  *  Hallstatt/Jose5/Jose4 stack to match Espenak/Stephenson history and hit the
- *  USNO 86400.0015 s J2000 anchor exactly (joint world: incl. resonator). */
+ *  USNO 86400.0014 s J2000 anchor exactly (joint world: incl. resonator). */
 function pureH5DeltaTAtAge(t_Ma) {
   if (t_Ma === 0) return 0;
   const absSpan = Math.abs(t_Ma);
@@ -28520,7 +28534,7 @@ function setupGUI() {
       'v10 highlights (2026-07-18):\n' +
       '• ΔT & Layer-3 LOD auto-fit to Espenak history (~12 s RMS across 1650-2017).\n' +
       '• dt-corrections-fit pipeline fully automated: joint-optimum sweep over USNO anchor + deltaTStart runs by default; astro-reference.json + script.js sync end-to-end.\n' +
-      '• Layer-3 solar day at J2000 = 86400.0015 s (USNO Earth Orientation Center-aligned, joint world).\n' +
+      '• Layer-3 solar day at J2000 = 86400.0014 s (USNO Earth Orientation Center-aligned, joint world).\n' +
       '• Days & Years report ~3× faster (±2-day search window in cardinal-point scans).\n' +
       '• CSV labelling (Step 6a): calendar-year alignment for all 6 event types — matches XLSX report row-by-row.\n' +
       '• Formula Verification chart: new "Export Recent" (1650-2050) view + ΔT chart re-anchored to the model trend rather than IERS instantaneous.\n' +
@@ -29961,7 +29975,7 @@ function setupGUI() {
   }), 'Tidal baseline with \u03b1(t) applied at the current epoch (at J2000 \u03b1 = EARTH_MOI_FACTOR exactly). Secular baseline used by year-length derivations. At J2000 = 86400.003203 s.');
   addTooltip(astroSolarDayFolder.addBinding(predictions, 'lodReal', {
     label: 'Tidal + GIA + all cycles', readonly: true, format: fmt6
-  }), 'Framework\'s full solar-day prediction: Tidal + GIA + sum of Bond/Hallstatt/Jose5/Jose4 cyclic \u03b4LOD corrections. Physical length of one solar day. At J2000 = 86400.0015 s (matches the USNO Earth-orientation anchor by construction — joint world incl. the Core-mantle swing). Same value shown as the top-level "Solar Day (s)" row.');
+  }), 'Framework\'s full solar-day prediction: Tidal + GIA + sum of Bond/Hallstatt/Jose5/Jose4 cyclic \u03b4LOD corrections. Physical length of one solar day. At J2000 = 86400.0014 s (matches the USNO Earth-orientation anchor by construction — joint world incl. the Core-mantle swing). Same value shown as the top-level "Solar Day (s)" row.');
 
   // dLOD/dt driver decomposition sub-folder \u2014 tidal + GIA + all-cycles stack producing observed LOD growth.
   // Collapsed by default \u2014 the numbers are diagnostic rather than everyday.

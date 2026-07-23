@@ -1,0 +1,34 @@
+{
+  "_meta": {
+    "description": "Impulse-consistent joint-fit variant: sin-only kicks (displacement-continuous) + switch-on-compensated drive tone, excitation epoch scanned \u22122600..\u2212800. Same closure/caps/scoring as the shipped joint world.",
+    "T0_lattice_n": 685,
+    "Q": 1.8,
+    "t2": 1600.0
+  },
+  "best": {
+    "t1": -1600.0,
+    "usno": 86400.0015,
+    "dts": 58.07033384052123,
+    "rms_esp": 12.635246291051356,
+    "rms_full": 29.223509662562748,
+    "x": [
+      145.14019556242684,
+      328.45074392386925,
+      -72.74555690079576,
+      33.287894964883044,
+      -36.34301990729053,
+      34.33926184440027,
+      39.89068156725345,
+      -30.145207315591414,
+      744.3521426656587,
+      -61.34016046024627,
+      186.14000000000001,
+      63.22375131216683
+    ]
+  },
+  "continuity_steps_s": {
+    "t1": 0.059678271864896715,
+    "t2": 0.004504706276755144
+  },
+  "verdict": "Impulse-consistent optimum: t1 = -1600, USNO 86400.0015, deltaTStart 58.07, Espenak 12.64 s, full 29.22 s; displacement-continuous everywhere (steps 6.0e-02/4.5e-03 s). GO \u2014 quality within tolerance of the shipped world; re-ship the continuous episode forms (runtime evaluators change: sin-only kicks + compensated tone)."
+}

@@ -1278,17 +1278,22 @@ function runJointMode() {
   const tone = res.drive_tones[0];
   const wTone = 2 * Math.PI * tone.dn / EIGHT_H;
 
+  // IMPULSE-CONSISTENT forms (2026-07-23): kicks are SIN-ONLY unit shapes
+  // (displacement-continuous — the true impulse response; the earlier cos
+  // freedom produced an unphysical ~700-s ΔT step at the excitation epoch).
+  // The drive tone is SWITCH-ON COMPENSATED: its initial displacement at t1
+  // is cancelled by the eigenmode transient (physical switched-on drive).
   function kickUnit(i, y) {
     const dt = y - kicks[i];
     if (dt < 0) return 0;
-    const norm = Math.hypot(kc[i].cos, kc[i].sin);
-    return Math.exp(-lam * dt)
-         * (kc[i].cos * Math.cos(wd * dt) + kc[i].sin * Math.sin(wd * dt)) / norm;
+    return Math.exp(-lam * dt) * Math.sin(wd * dt);
   }
+  const toneC0 = Math.cos(wTone * kicks[0] - tone.phi_locked_rad);
   function toneUnit(y) {
     const dt = y - kicks[0];
     if (dt < 0) return 0;
-    return Math.exp(-lam * dt) * Math.cos(wTone * y - tone.phi_locked_rad);
+    return Math.exp(-lam * dt)
+         * (Math.cos(wTone * y - tone.phi_locked_rad) - toneC0 * Math.cos(wd * dt));
   }
 
   const FLAG_DIVS = { bond: 1830, hallstatt: 1104, jose5: 2989, jose4: 3749 };
@@ -1306,10 +1311,12 @@ function runJointMode() {
   const INTERCEPT = N - 1;
   const COMP = { bond: [0, 1], hallstatt: [2, 3], jose5: [4, 5], jose4: [6, 7],
                  res_kick1: [8], res_kick2: [9], res_tone: [10] };
+  // Caps are the FIXED Stage-1 convention amplitudes. NEVER derive them from
+  // the mutable resonator JSON — a previous --write stores fitted amplitudes
+  // there, and deriving caps from those collapses the cap to the last fit
+  // ("cap creep": each write shrinks the allowed range). Bug caught 2026-07-23.
   const CAPS = { hallstatt: 80.0, jose5: 50.0, jose4: 50.0,
-                 res_kick1: Math.hypot(kc[0].cos, kc[0].sin),
-                 res_kick2: Math.hypot(kc[1].cos, kc[1].sin),
-                 res_tone: Math.abs(tone.amp_s) };
+                 res_kick1: 773.335, res_kick2: 179.324, res_tone: 186.140 };
 
   function corrAt(y, x, excludeIntercept) {
     let s = 0;
@@ -1418,7 +1425,7 @@ function runJointMode() {
   let best = null;
   const rows = [];
   console.log('\n   USNO          deltaTStart  EspenakRMS  fullRMS   Bond    kick2   tone');
-  for (let u = 86400.0014; u <= 86400.0030 + 1e-9; u += 0.0001) {
+  for (let u = 86400.0008; u <= 86400.0030 + 1e-9; u += 0.0001) {
     const usno = Math.round(u * 1e7) / 1e7;
     const target = computeUsnoTargetOffset(usno).targetOffset;
     const x = jointSolveOnce(years, residual, target);
@@ -1434,8 +1441,12 @@ function runJointMode() {
               + `${rmsEsp.toFixed(2).padStart(8)}  ${rmsFull.toFixed(2).padStart(7)}  `
               + `${bondAmp.toFixed(1).padStart(6)}  ${Math.abs(x[9]).toFixed(1).padStart(6)} `
               + `${Math.abs(x[10]).toFixed(1).padStart(6)}`);
-    if (!best || rmsEsp < best.rmsEsp) best = row;
+    // Composite selection: best Espenak SUBJECT TO ancient-window quality.
+    // Espenak-only selection degenerates (prototype lesson: it accepts
+    // solutions whose ancient window collapses to ~400 s).
+    if (rmsFull <= 40.0 && (!best || rmsEsp < best.rmsEsp)) best = row;
   }
+  if (!best) best = rows.reduce((a, r) => (!a || r.rmsFull < a.rmsFull ? r : a), null);
 
   const x = best.x;
   const closure = lodRow.reduce((a, w, j) => a + w * x[j], 0);
@@ -1498,12 +1509,12 @@ function runJointMode() {
   const resJsonPath = resPath;
   const resJson = JSON.parse(fs.readFileSync(resJsonPath, 'utf8'));
   const rb = resJson.proposed_shipped_coefficients.resonator;
-  const s1 = x[8] / Math.hypot(kc[0].cos, kc[0].sin);
-  const s2 = x[9] / Math.hypot(kc[1].cos, kc[1].sin);
+  // Impulse-consistent: sin-only kicks (cos ≡ 0 — displacement continuity).
   rb.kick_coefficients_s = [
-    { cos: kc[0].cos * s1, sin: kc[0].sin * s1 },
-    { cos: kc[1].cos * s2, sin: kc[1].sin * s2 },
+    { cos: 0, sin: x[8] },
+    { cos: 0, sin: x[9] },
   ];
+  rb.impulse_consistent = true;
   rb.drive_tones[0].amp_s = x[10];
   // Raw (unanchored) resonator value + implied δLOD at J2000 — the closure
   // bookkeeping fields consumed by resonatorLodAtJ2000() and the runtime.
