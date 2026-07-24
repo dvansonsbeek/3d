@@ -6107,9 +6107,11 @@ function _frameworkSunLon(jd_ut) {
 //    planetary secular remainder (+7.25″/cy², labeled empirical).
 //  • D and M are retained as full Meeus polynomials (Sun-side arguments —
 //    the framework-native Sun campaign owns that territory).
-//  • Meeus element T³/T⁴ tails are intentionally omitted (≤0.25° at −584,
-//    ≪ the 0.05°/cy Stage-2 gate); L′ keeps its tiny T³/T⁴ for in-window
-//    carrier fidelity.
+//  • Element T³ terms are DERIVED (not copied): same (s, κ) chain at third
+//    order with ë₀ from the eccentricity composite — reproduces Meeus's
+//    empirical element T³ at 4% (ϖ) / 20% (Ω). Only the tiny element T⁴
+//    tails remain omitted (~0.2° at the −1999 canon edge); L′ keeps its
+//    Meeus T³/T⁴ for in-window carrier fidelity.
 // ═════════════════════════════════════════════════════════════════════════════
 
 let MOON_ARGS_FRAMEWORK_NATIVE = false;  // Stage-3 dispatcher switch (Meeus default until gates pass)
@@ -6129,11 +6131,20 @@ const _FW_MOON = (() => {
   const S_W = 2.407, S_N = 1.0;
   const T2_W = S_W * WDOT * KAPPA / 2;   // −0.010318 deg/cy²  (Meeus ϖ:  −0.010320)
   const T2_N = S_N * NDOT * KAPPA / 2;   // +0.0020385 deg/cy² (Meeus Ω:  +0.0020753)
+  // Third order (T²-nativity gate, 2026-07-24): ë₀ from the lattice+g2−g5
+  // eccentricity composite (tools/explore/path-c-ecc-composite.js), stable to
+  // 0.2% across ridge variants. Same (s, κ) chain as T²: derived T³ reproduces
+  // Meeus's empirical element T³ at 4% (ϖ) / 20% (Ω) with no new sensitivity.
+  const EDDOT0 = -2.651e-7;                                  // per cy², composite curvature at J2000
+  const KAPPA_DOT = 3 * (EDOT0 * EDOT0 + E0 * EDDOT0) / (1 - E0 * E0)
+                  + 6 * E0 * E0 * EDOT0 * EDOT0 / Math.pow(1 - E0 * E0, 2);
+  const T3_W = WDOT * (S_W * S_W * KAPPA * KAPPA + S_W * KAPPA_DOT) / 6;  // ≈ −1.30e-5 °/cy³ (Meeus ϖ: −1.25e-5)
+  const T3_N = NDOT * (S_N * S_N * KAPPA * KAPPA + S_N * KAPPA_DOT) / 6;  // ≈ +2.57e-6 °/cy³ (Meeus Ω: +2.14e-6)
   // L′ carrier T²: framework tidal n̈/2 + explicit planetary secular remainder
   const T2_LP_TIDAL     = (-25.86 / 3600) / 2;           // α₁-chain n̈ (= LLR), doc 66 §5
   const T2_LP_PLANETARY = -0.0015786 - T2_LP_TIDAL;      // +7.25″/cy², labeled empirical
   const T2_LP = T2_LP_TIDAL + T2_LP_PLANETARY;
-  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T2_LP };
+  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP };
 })();
 
 /** Framework-native lunar fundamental arguments {Lp, D, M, Mp, F} in degrees
@@ -6144,8 +6155,8 @@ function _fwMoonArgs(jd_tt) {
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
   const wrap = (x) => ((x % 360) + 360) % 360;
   const Lp = A.LP0 + A.LPR * T + A.T2_LP * T2 + T3 / 538841 - T4 / 65194000;
-  const w  = (A.LP0 - A.MP0) + A.WDOT * T + A.T2_W * T2;   // perigee ϖ (of-date)
-  const om = (A.LP0 - A.F0)  + A.NDOT * T + A.T2_N * T2;   // node Ω (of-date)
+  const w  = (A.LP0 - A.MP0) + A.WDOT * T + A.T2_W * T2 + A.T3_W * T3;   // perigee ϖ (of-date)
+  const om = (A.LP0 - A.F0)  + A.NDOT * T + A.T2_N * T2 + A.T3_N * T3;   // node Ω (of-date)
   return {
     Lp: wrap(Lp),
     D:  wrap(A.D0 + A.DR * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000),
@@ -31801,19 +31812,20 @@ function setupGUI() {
         + fmt(_d180(fw.Mp, me.Mp)) + fmt(_d180(fw.F, me.F)));
     }
     console.log('Recipe: of-date anchors frame-decomposed (ICRF + framework p = 360·13/H); element');
-    console.log('T² from the e_E channel (s_Ω = 1 derived, s_ϖ = 2.407 anchored). Residuals are the');
-    console.log('omitted element T³/T⁴ tails (≤0.25° at −584) — see IP-framework-native-moon.md.');
+    console.log('T² AND T³ from the e_E channel (s_Ω = 1 derived, s_ϖ = 2.407 anchored; ë₀ from the');
+    console.log('lattice+g2−g5 eccentricity composite). Residual = omitted element T⁴ tails');
+    console.log('(~0.1° at the −1999 canon edge) — see IP-framework-native-moon.md.');
     console.log('══════════════════════════════════════════════════════════════════════');
     console.log('Interpretation (Path C progress meter):');
     console.log(' • Table 1 (legacy integrator chain — kept as the historical baseline): Lp/D/M small');
     console.log('   everywhere; M\'/F drift ≈ 1.4°/cy + T² tail. Stage 0 identified this as the');
     console.log('   ICRF↔of-date frame gap (missing general precession p = 360·13/H) plus the');
     console.log('   e_E-channel secular T² — measured, not mysterious.');
-    console.log(' • Table 2 (Stage 1, _fwMoonArgs): frame + T² closed natively — M\' ≤ 0.24°,');
-    console.log('   F ≤ 0.02° at −584 (0.009 / 0.0008 °/cy vs the 0.05°/cy gate). Residual =');
-    console.log('   the omitted element T³/T⁴ tails, documented.');
-    console.log(' • Next: Stage 3 wires MOON_ARGS_FRAMEWORK_NATIVE into the _eclMoon* dispatchers');
-    console.log('   and re-runs L-4 + audit-26 A/B (docs/hidden/IP-framework-native-moon.md).');
+    console.log(' • Table 2 (Stages 1 + T²-nativity, _fwMoonArgs): frame + T² + derived T³ —');
+    console.log('   M\' ≤ 0.015°, F ≤ 0.025° at −584 (0.0006 / 0.001 °/cy vs the 0.05°/cy gate).');
+    console.log('   Residual = omitted element T⁴ tails + the Ω T³ 20% overshoot, documented.');
+    console.log(' • Stage 3 is wired: the A/B toggle button flips MOON_ARGS_FRAMEWORK_NATIVE into');
+    console.log('   the _eclMoon* dispatchers; all gates passed (IP-framework-native-moon.md).');
     console.log(' • Decision history: Phase 9.14 Option A kept Meeus arguments (drift then');
     console.log('   unexplained); Stage 0 explained it; Stage 1 closed it.');
     console.log('══════════════════════════════════════════════════════════════════════');
