@@ -6155,13 +6155,35 @@ function _fwMoonArgs(jd_tt) {
   };
 }
 
+/** Lunar fundamental arguments {Lp, D, M, Mp, F} (degrees, of-date) at JD_TT,
+ *  source-switched (Path C Stage 3): Meeus Ch. 47 polynomials by default,
+ *  _fwMoonArgs (framework-native secular skeleton) when
+ *  MOON_ARGS_FRAMEWORK_NATIVE is ON. The Meeus periodic perturbation series
+ *  consumes these arguments unchanged in either mode. */
+function _moonArgsAt(jd_tt) {
+  if (MOON_ARGS_FRAMEWORK_NATIVE) return _fwMoonArgs(jd_tt);
+  const T = (jd_tt - j2000JD) / 36525;
+  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+  const wrap = (x) => ((x % 360) + 360) % 360;
+  return {
+    Lp: wrap(218.3164477 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841 - T4 / 65194000),
+    D:  wrap(297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000),
+    M:  wrap(357.5291092 +  35999.0502909 * T - 0.0001536 * T2 + T3 / 24490000),
+    Mp: wrap(134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000),
+    F:  wrap( 93.2720950 + 483202.0175233 * T - 0.0036539 * T2 - T3 / 3526000 + T4 / 863310000),
+  };
+}
+
 // ═════════════════════════════════════════════════════════════════════════════
 // Moon polynomial dispatchers — Meeus Ch. 47.
 //
 // The dispatcher pattern preserves a hook for future work: swapping in a
 // different Moon polynomial (e.g. VSOP87 Sun ↔ Meeus, or a higher-precision
 // lunar theory) would only require changing `_eclMoonLon/Beta/Distance` to
-// route to the alternative implementation.
+// route to the alternative implementation. As of Path C Stage 3, the
+// FUNDAMENTAL ARGUMENTS feeding the series are source-switched via
+// _moonArgsAt (Meeus default; framework-native when
+// MOON_ARGS_FRAMEWORK_NATIVE is ON — A/B toggle test button).
 //
 // EMPIRICAL FINDING (2026-07): tested ELP-2000/82B (both 3,402-term truncated
 // and 37,863-term full) and ELP/MPP02 (both DE-fit and LLR-fit variants) at
@@ -6194,13 +6216,12 @@ function _eclMoonBeta(jd)     { return _meeusMoonBeta(jd); }
  *  JD_TT via _eclDeltaT. */
 function _meeusMoonLon(jd) {
   const _d2r = Math.PI / 180;
-  const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
-  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
-  const Lp_mean = 218.3164477 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841 - T4 / 65194000;
-  const Dr  = ((297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000) % 360) * _d2r;
-  const Mr  = ((357.5291092 +  35999.0502909 * T - 0.0001536 * T2 + T3 / 24490000) % 360) * _d2r;
-  const Mpr = ((134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000) % 360) * _d2r;
-  const Fr  = (( 93.2720950 + 483202.0175233 * T - 0.0036539 * T2 - T3 / 3526000 + T4 / 863310000) % 360) * _d2r;
+  const jd_tt = jd + _eclDeltaT(jd) / 86400;
+  const T = (jd_tt - j2000JD) / 36525;
+  const T2 = T * T;
+  const A = _moonArgsAt(jd_tt);
+  const Lp_mean = A.Lp;
+  const Dr = A.D * _d2r, Mr = A.M * _d2r, Mpr = A.Mp * _d2r, Fr = A.F * _d2r;
   const E = 1 - 0.002516 * T - 0.0000074 * T2;
   const E2 = E * E;
   let Sl = 0;
@@ -6227,21 +6248,19 @@ function _meeusMoonLon(jd) {
  *  Refinement (future): full Meeus Ch. 47 distance series for ~10-km accuracy. */
 function _meeusMoonDistance(jd) {
   const _d2r = Math.PI / 180;
-  const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
-  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
-  const Mpr = ((134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000) % 360) * _d2r;
+  const jd_tt = jd + _eclDeltaT(jd) / 86400;
+  const Mpr = _moonArgsAt(jd_tt).Mp * _d2r;
   return moonDistance * (1 - moonOrbitalEccentricityBase * Math.cos(Mpr));
 }
 
 /** Moon's geocentric ecliptic latitude in degrees. Meeus Ch. 47 (MOON_B). */
 function _meeusMoonBeta(jd) {
   const _d2r = Math.PI / 180;
-  const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
-  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
-  const Dr  = ((297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000) % 360) * _d2r;
-  const Mr  = ((357.5291092 +  35999.0502909 * T - 0.0001536 * T2 + T3 / 24490000) % 360) * _d2r;
-  const Mpr = ((134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000) % 360) * _d2r;
-  const Fr  = (( 93.2720950 + 483202.0175233 * T - 0.0036539 * T2 - T3 / 3526000 + T4 / 863310000) % 360) * _d2r;
+  const jd_tt = jd + _eclDeltaT(jd) / 86400;
+  const T = (jd_tt - j2000JD) / 36525;
+  const T2 = T * T;
+  const A = _moonArgsAt(jd_tt);
+  const Dr = A.D * _d2r, Mr = A.M * _d2r, Mpr = A.Mp * _d2r, Fr = A.F * _d2r;
   const E = 1 - 0.002516 * T - 0.0000074 * T2;
   const E2 = E * E;
   let Sb = 0;
@@ -31803,6 +31822,24 @@ function setupGUI() {
      'e_E-channel T², per Stage 0). Table 2 shows the Stage-1 framework-native _fwMoonArgs vs ' +
      'Meeus: M\' ≤ 0.24° / F ≤ 0.02° back to -584 — drift gate passed. Stage 3 wires the ' +
      'dispatcher flag. See docs/hidden/IP-framework-native-moon.md.');
+
+  addTestButton('Path C Stage 3: toggle framework-native Moon arguments (A/B)', () => {
+    MOON_ARGS_FRAMEWORK_NATIVE = !MOON_ARGS_FRAMEWORK_NATIVE;
+    console.log('\n══════════════════════════════════════════════════════════════════════');
+    console.log(`  MOON_ARGS_FRAMEWORK_NATIVE = ${MOON_ARGS_FRAMEWORK_NATIVE
+      ? 'ON  — _eclMoon* dispatchers use _fwMoonArgs (framework-native secular skeleton)'
+      : 'OFF — _eclMoon* dispatchers use Meeus Ch. 47 argument polynomials (default)'}`);
+    console.log('  Affects: eclipse finders (L-1/L-2/L-4), canon comparisons, audits — everything');
+    console.log('  routed through _eclMoonLon/Beta/Distance. The Meeus periodic perturbation');
+    console.log('  series is identical in both modes; only the argument skeleton switches.');
+    console.log('  Scene Moon (moveModel Meeus block) is unaffected until Stage 4.');
+    console.log('  A/B protocol (IP-framework-native-moon.md §Stage 2/3): run L-1 + L-3 with');
+    console.log('  flag ON (expect modern results unchanged), then L-4 + audit-26 ON vs OFF.');
+    console.log('══════════════════════════════════════════════════════════════════════');
+  }, 'Path C Stage 3 A/B switch: flips MOON_ARGS_FRAMEWORK_NATIVE at runtime (default OFF). ' +
+     'ON routes the _eclMoon* dispatchers through the framework-native argument skeleton ' +
+     '(_fwMoonArgs) under the unchanged Meeus periodic series; OFF = pure Meeus. Scene Moon ' +
+     'unaffected (Stage 4). See docs/hidden/IP-framework-native-moon.md.');
 
 
   // ────────────────────────────────────────────────────────────────────────
