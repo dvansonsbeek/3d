@@ -3580,8 +3580,8 @@ let   moonSiderealMonth = (holisticyearLength*meansolaryearlengthinDays)/N_sid_J
 let   moonAnomalisticMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000 - N_apsidalE_J2000);  // Phase 2: mutable
 let   moonNodalMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000 + N_nodalE_J2000);  // Phase 2: mutable
 
-let   moonSynodicMonth = (holisticyearLength*meansolaryearlengthinDays)/(Math.round(((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)-1)+13-holisticyearLength);  // Phase 2: mutable
-let   moonTropicalMonth = (holisticyearLength*meansolaryearlengthinDays)/(Math.round(((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)-1)+13);  // Phase 2: mutable
+let   moonSynodicMonth = (holisticyearLength*meansolaryearlengthinDays)/(Math.round((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)+13-holisticyearLength);  // Phase 2: mutable — N_syn = N_trop − H = N_sid − (H−13); legacy −1 removed 2026-07-24 (0.70→0.08 s vs IAU)
+let   moonTropicalMonth = (holisticyearLength*meansolaryearlengthinDays)/(Math.round((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)+13);  // Phase 2: mutable — N_trop = N_sid + 13 (13 axial-precession cycles per H); legacy −1 removed 2026-07-24
 let   moonFullMoonCycleEarth = (moonSynodicMonth/(moonSynodicMonth-moonAnomalisticMonth))*moonAnomalisticMonth;  // Phase 6.5: mutable
 let   moonFullMoonCycleICRF = (holisticyearLength*meansolaryearlengthinDays)/(((holisticyearLength*meansolaryearlengthinDays)/moonFullMoonCycleEarth)+13);  // Phase 6.5: mutable
 let   moonNodalPrecessionindaysEarth = (holisticyearLength*meansolaryearlengthinDays)/N_nodalE_J2000;  // Phase 2: mutable

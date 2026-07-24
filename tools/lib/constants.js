@@ -329,8 +329,8 @@ const moonSiderealMonth = totalDaysInH / N_sid;
 const moonAnomalisticMonth = totalDaysInH / (N_sid - N_apsidalE);
 const moonNodalMonth = totalDaysInH / (N_sid + N_nodalE);
 
-const moonSynodicMonth = totalDaysInH / (Math.round(totalDaysInH / moonSiderealMonthInput - 1) + 13 - H);
-const moonTropicalMonth = totalDaysInH / (Math.round(totalDaysInH / moonSiderealMonthInput - 1) + 13);
+const moonSynodicMonth = totalDaysInH / (Math.round(totalDaysInH / moonSiderealMonthInput) + 13 - H);  // N_syn = N_trop − H; legacy −1 removed 2026-07-24 (matches src/script.js)
+const moonTropicalMonth = totalDaysInH / (Math.round(totalDaysInH / moonSiderealMonthInput) + 13);  // N_trop = N_sid + 13; legacy −1 removed 2026-07-24 (matches src/script.js)
 
 const moonFullMoonCycleEarth = (moonSynodicMonth / (moonSynodicMonth - moonAnomalisticMonth)) * moonAnomalisticMonth;
 const moonFullMoonCycleICRF = totalDaysInH / ((totalDaysInH / moonFullMoonCycleEarth) + 13);
