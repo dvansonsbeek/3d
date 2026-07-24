@@ -55,7 +55,7 @@ let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 24
 let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
 let   JOSE4_DT_CORRECTION_ENABLED = true;  // Jose4 8H/3749 ≈ 715.5 yr ΔT correction (4×Jose period, structural gcd=23) — cross-archive coherent in Steinhilber Φ + EPICA CO2; rationale + associated constants ~L5209
 let   RESONATOR_DT_CORRECTION_ENABLED = true;  // Core-mantle swing (Resonator driver) — episode of the core eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q=1.8) + locked bond−hallstatt drive tone. DEFAULT ON since the JOINT-world flip (2026-07-23): fitted JOINTLY with the 4 flags (dt-corrections-fit.js --joint; anchors USNO 86400.0014 / deltaTStart 56.05 moved with the coefficients, Espenak RMS 12.60 s). doc 104 §6/§8; constants + rationale near the Jose4 block
-let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argument skeleton (_fwMoonArgs via _moonArgsAt) feeding the _eclMoon* dispatchers: frame-decomposed rates + solar-eccentricity-channel T²/T³ (derivation record: docs/66 §1). OFF = pure Meeus Ch. 47 argument polynomials (A/B reference; runtime toggle test button available)
+let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argument skeleton (_fwMoonArgs via _moonArgsAt) feeding the _eclMoon* dispatchers: frame-decomposed rates + solar-eccentricity-channel T²/T³ (derivation record: docs/66 §1). OFF = pure Meeus Ch. 47 argument polynomials (A/B reference; flip via console for comparison runs)
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
 const earthtiltMean = 23.41353942374053;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
@@ -6097,9 +6097,9 @@ function _fwSunMeanElements(jd_ut) {
 //
 // Implements the measured argument-decomposition recipe (derivation record:
 // docs/66 §1). Consumed by the _eclMoon* dispatchers via _moonArgsAt, SHIPPED
-// DEFAULT (MOON_ARGS_FRAMEWORK_NATIVE, declared
-// in the toggle block at the top of the file; runtime A/B toggle button flips
-// back to pure Meeus). A/B meter: the "Meeus vs Integrator" button prints both.
+// DEFAULT (MOON_ARGS_FRAMEWORK_NATIVE, declared in the toggle block at the
+// top of the file; flip via console for pure-Meeus A/B runs). A/B meter: the
+// "Meeus vs Integrator" button prints both.
 //
 // Construction (per the measured argument decomposition):
 //  • Linear rates are observational J2000 anchors, frame-decomposed as
@@ -6208,8 +6208,8 @@ function _moonArgsAt(jd_tt) {
 // lunar theory) would only require changing `_eclMoonLon/Beta/Distance` to
 // route to the alternative implementation. As shipped, the FUNDAMENTAL
 // ARGUMENTS feeding the series are source-switched via _moonArgsAt
-// (framework-native _fwMoonArgs is the SHIPPED DEFAULT since the item-6
-// re-baseline; pure-Meeus reference via the A/B toggle test button).
+// (framework-native _fwMoonArgs is the SHIPPED DEFAULT; pure-Meeus
+// reference via a console flag flip).
 //
 // EMPIRICAL FINDING (2026-07): tested ELP-2000/82B (both 3,402-term truncated
 // and 37,863-term full) and ELP/MPP02 (both DE-fit and LLR-fit variants) at
@@ -31895,8 +31895,8 @@ function setupGUI() {
     console.log(' • Table 2 (framework-native _fwMoonArgs): frame + T² + derived T³ —');
     console.log('   M\' ≤ 0.015°, F ≤ 0.025° at −584 (0.0006 / 0.001 °/cy vs the 0.05°/cy gate).');
     console.log('   Residual = omitted element T⁴ tails + the Ω T³ 20% overshoot, documented.');
-    console.log(' • The A/B toggle button flips MOON_ARGS_FRAMEWORK_NATIVE into the _eclMoon*');
-    console.log('   dispatchers; all certification gates passed (doc 66 §1).');
+    console.log(' • Flip MOON_ARGS_FRAMEWORK_NATIVE via the console for pure-Meeus A/B runs;');
+    console.log('   all certification gates passed (doc 66 §1).');
     console.log(' • Decision history: Phase 9.14 Option A kept Meeus arguments (drift then');
     console.log('   unexplained); the frame decomposition explained it; the framework-native rates closed it.');
     console.log('══════════════════════════════════════════════════════════════════════');
@@ -31905,23 +31905,6 @@ function setupGUI() {
      'e_E-channel T²). Table 2 shows the framework-native _fwMoonArgs vs ' +
      'Meeus: M\' ≤ 0.015° / F ≤ 0.025° at -584 — drift gate passed. The A/B button flips the ' +
      'dispatcher flag. Derivation record: docs/66 §1.');
-
-  addTestButton('Framework Moon: toggle framework-native arguments (A/B)', () => {
-    MOON_ARGS_FRAMEWORK_NATIVE = !MOON_ARGS_FRAMEWORK_NATIVE;
-    console.log('\n══════════════════════════════════════════════════════════════════════');
-    console.log(`  MOON_ARGS_FRAMEWORK_NATIVE = ${MOON_ARGS_FRAMEWORK_NATIVE
-      ? 'ON  — _eclMoon* dispatchers use _fwMoonArgs (framework-native skeleton; SHIPPED DEFAULT)'
-      : 'OFF — _eclMoon* dispatchers use Meeus Ch. 47 argument polynomials (A/B reference mode)'}`);
-    console.log('  Affects: eclipse finders (L-1/L-2/L-4), canon comparisons, audits — everything');
-    console.log('  routed through _eclMoonLon/Beta/Distance. The Meeus periodic perturbation');
-    console.log('  series is identical in both modes; only the argument skeleton switches.');
-    console.log('  Use OFF for A/B reference runs against pure Meeus');
-    console.log('  (certified baselines are flag-ON; doc 66 §1 has the derivation record).');
-    console.log('══════════════════════════════════════════════════════════════════════');
-  }, 'A/B switch: flips MOON_ARGS_FRAMEWORK_NATIVE at runtime. ON = framework-native ' +
-     'argument skeleton (_fwMoonArgs) under the unchanged Meeus periodic series — the ' +
-     'shipped default; OFF = pure Meeus reference for A/B comparison runs. ' +
-     'Derivation record: docs/66 §1.');
 
   addTestButton('Framework Moon: J2000 element anchoring meter', () => {
     // Navigates the scene to J2000, reads the hierarchy's geometric lunar elements
