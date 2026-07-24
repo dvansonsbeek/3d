@@ -103,7 +103,7 @@ const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3
 // ─── A3. Moon model parameters ───────────────────────────────────────────
 const moonStartposApsidal = 347.5544;                     // Path C Stage 4b: J2000-element anchored (ϖ = 83.3532° Meeus; mapping ∂ϖ/∂a = −1, measured)
 const moonStartposNodal = 64.0436;                        // Path C Stage 4b: J2000-element anchored (Ω = 125.0446° Meeus; ∂Ω/∂n = −1; was the legacy compromise −83.630)
-const moonStartposMoon = 131.930;                         // Eclipse-optimizer tuned (Step 5b)
+const moonStartposMoon = 67.8443;                         // Path C item 3: in-plane anchor via unmask meter (∂Δlon/∂m = −1; mean Δlon closed; was legacy 131.930)
 const moonMeeusLpCorrection = 0.010525;                   // Meeus Lp longitude correction (DE200→DE440 offset)
 
 // ─── C2. Sun & Moon astro references ─────────────────────────────────────
@@ -31901,6 +31901,56 @@ function setupGUI() {
      'geometric node/perigee/mean-longitude vs the Meeus element targets (Ω 125.0446 / ϖ 83.3532 / ' +
      'L 218.3164), then restores the date. Run after the composition fix; the printed Δs drive ' +
      'the startPos re-anchoring. See docs/hidden/IP-framework-native-moon.md §Stage 4b.');
+
+  addTestButton('Path C: raw hierarchy Moon vs Meeus override (unmask meter)', () => {
+    // Raw = hierarchy + moveModel perturbations, PRE-override: the Meeus
+    // override rewrites only moon.pivotObj.position, never moon.orbitObj's
+    // rotation — so the raw Moon is recovered by transforming the pivot's
+    // built local offset (moon.a, 0, 0) through moon.orbitObj.matrixWorld.
+    // Two outputs (IP-framework-native-moon.md §Remaining work items 3+4):
+    //  • mean Δlon at J2000 → the moonStartposMoon in-plane anchor error
+    //  • post-mean RMS over a month → what the override genuinely contributes
+    //    (the periodic-terms floor — the "unmask the Moon" assessment number)
+    const savedJD = o.julianDay;
+    const wrap180 = (d) => { let x = ((d % 360) + 360) % 360; return x > 180 ? x - 360 : x; };
+    const rawV = new THREE.Vector3(), ovrV = new THREE.Vector3(), eV = new THREE.Vector3();
+    const rows = [];
+    for (let i = 0; i <= 30; i++) {
+      jumpToJulianDay(j2000JD + i);
+      forceSceneUpdate('light');
+      earth.pivotObj.getWorldPosition(eV);
+      moon.pivotObj.getWorldPosition(ovrV);                    // overridden (Meeus truth)
+      moon.orbitObj.updateWorldMatrix(true, false);
+      rawV.set(moon.a ?? moon.orbitRadius, 0, 0);
+      moon.orbitObj.localToWorld(rawV);                        // raw hierarchy position
+      const lon = (p) => Math.atan2(-(p.z - eV.z), p.x - eV.x) * 180 / Math.PI;
+      const lat = (p) => Math.atan2(p.y - eV.y, Math.hypot(p.x - eV.x, p.z - eV.z)) * 180 / Math.PI;
+      rows.push({ d: i, dLon: wrap180(lon(rawV) - lon(ovrV)), dLat: lat(rawV) - lat(ovrV) });
+    }
+    const mean = (k) => rows.reduce((s, r) => s + r[k], 0) / rows.length;
+    const mLon = mean('dLon'), mLat = mean('dLat');
+    const rms  = (k, m) => Math.sqrt(rows.reduce((s, r) => s + (r[k] - m) ** 2, 0) / rows.length);
+    console.log('\n══════════════════════════════════════════════════════════════════════');
+    console.log('  Path C unmask meter — raw hierarchy Moon vs Meeus override');
+    console.log('  (J2000 + 30 daily samples; Δ = raw − overridden, degrees)');
+    console.log('══════════════════════════════════════════════════════════════════════');
+    for (const r of rows.filter((_, i) => i % 5 === 0)) {
+      console.log(`  day ${String(r.d).padStart(2)}   Δlon ${r.dLon.toFixed(4).padStart(9)}   Δlat ${r.dLat.toFixed(4).padStart(9)}`);
+    }
+    console.log('  ────────────────────────────────────────────');
+    console.log(`  mean Δlon: ${mLon.toFixed(4)}°   ← moonStartposMoon in-plane anchor error (item 3)`);
+    console.log(`  mean Δlat: ${mLat.toFixed(4)}°`);
+    console.log(`  RMS after mean removal:  Δlon ${rms('dLon', mLon).toFixed(4)}°   Δlat ${rms('dLat', mLat).toFixed(4)}°`);
+    console.log('  ← the periodic-terms floor: what the Meeus override genuinely');
+    console.log('    contributes beyond the anchored secular geometry (item 4 verdict)');
+    console.log('══════════════════════════════════════════════════════════════════════');
+    jumpToJulianDay(savedJD);
+    forceSceneUpdate();
+  }, 'Path C "unmask the Moon" meter: recovers the RAW hierarchy Moon (pre-override, via ' +
+     'moon.orbitObj matrices — the override only rewrites pivot positions) and compares it to ' +
+     'the Meeus-overridden Moon over J2000+30 days. Mean Δlon anchors moonStartposMoon (item 3); ' +
+     'post-mean RMS is the periodic-terms floor for the override-narrowing assessment (item 4). ' +
+     'See docs/hidden/IP-framework-native-moon.md §Remaining work.');
 
 
   // ────────────────────────────────────────────────────────────────────────

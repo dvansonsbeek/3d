@@ -164,15 +164,15 @@ This is a clean structural near-identity equivalent to "TOTAL_DAYS_IN_H = 13 × 
 A second invariant falls out of the framework, this time governing the Moon's apsidal and nodal precession: **the count of apsidal (and nodal) cycles per H scales as H², so the precession period (in years) times H is structurally constant across all epochs.**
 
 ```
-T_apsidal × H = const   (apsidal — perigee advance, ICRF frame, in years)
-T_nodal   × H = const   (nodal   — node regression, ICRF frame, in years)
+T_apsidal × H = const   (apsidal — perigee advance, of-date frame, in years)
+T_nodal   × H = const   (nodal   — node regression, of-date frame, in years)
 
 Equivalently:
 N_apsidal(t) = N_apsidal,J2000 × (H(t)/H₀)²
 N_nodal(t)   = N_nodal,J2000   × (H(t)/H₀)²
 ```
 
-where `N_apsidal` and `N_nodal` are the number of full lunar apsidal / nodal cycles per H cycle in the ICRF frame, and `H₀` is the J2000 anchor value of H.
+where `N_apsidal` and `N_nodal` are the number of full lunar apsidal / nodal cycles per H cycle in the of-date (equinox-of-date) frame, and `H₀` is the J2000 anchor value of H.
 
 **J2000 anchors and derived invariant value:**
 ```
@@ -188,6 +188,17 @@ J2000-anchored invariant value (held exact at every epoch by construction):
 ```
 
 The VALUE 2,966,767 yr² is **empirically anchored** (one structural H, one observed T_apsidal); it is *not* a structurally-derived integer like `8H = 2,682,536 yr`. What is structural is the **claim** that this value is preserved at every epoch — the framework's `N(t) = N₀ × (H/H₀)²` scaling.
+
+**Frame convention (Path C Stage 4b bookkeeping).** The J2000 anchor values
+above (8.848 yr / 18.613 yr) are the OF-DATE (equinox-of-date) periods — the
+Meeus/IERS observables. The star-referenced periods differ by the general
+precession p = 360°/(H/13): apsidal 8.8507 yr, nodal 18.5994 yr (counts per H
+differ by exactly ∓13: `N_apsidalE = N_apsidalI − 13`,
+`N_nodalE = N_nodalI + 13` in src/script.js). Because p itself scales as
+1/(H/13), BOTH frames' products T × H are preserved under the framework's
+(H/H₀)² count scaling — the invariant holds in either frame with
+frame-specific constants; the constants quoted above are the of-date pair.
+(Earlier revisions labeled these anchors "ICRF"; corrected here.)
 
 ### Where it comes from
 
