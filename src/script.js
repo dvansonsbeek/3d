@@ -6146,7 +6146,7 @@ const _FW_MOON = (() => {
   const T2_LP_TIDAL     = (-25.86 / 3600) / 2;           // α₁-chain n̈ (= LLR), doc 66 §5
   const T2_LP_PLANETARY = -0.0015786 - T2_LP_TIDAL;      // +7.25″/cy², labeled empirical
   const T2_LP = T2_LP_TIDAL + T2_LP_PLANETARY;
-  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP };
+  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, S_W, S_N };
 })();
 
 /** Framework-native lunar fundamental arguments {Lp, D, M, Mp, F} in degrees
@@ -6817,7 +6817,52 @@ function meanMoonNodalOfDateCyclesBetween(yearA, yearB) {
   return (drac === null || trop === null) ? null : drac - trop;
 }
 
-/** Lunar perigee precession period in seconds (Brouwer-Clemence scaling). */
+// ═════════════════════════════════════════════════════════════════════════════
+// Path C item 5 — framework Earth-eccentricity composite (deep-time e_E)
+//
+// The multi-planet secular e_E the Moon feels through the Sun's perturbation:
+// 8H-lattice lines + the labeled OFF-lattice 405-kyr g2−g5 term (L2 taxonomy).
+// Equality-constrained fit on e(0) = 0.0167024 and ė(0) = −4.204e-5/cy
+// (tools/explore/path-c-ecc-composite.js; LA2010 −500..0 kyr, ridge λ=3e-4).
+// Anchored magnitudes + structural periods — NOT zero-fit (4-flag taxonomy).
+// Beyond the fit window the claim is BOUNDEDNESS + band structure; phases
+// indicative only (same class as the L1 lattice phase-drift note).
+//
+// Use: modulates the lunar apsidal/nodal chain rates as the FACTORED deep-time
+// law — rate(t) = [invariant mean from H(t)] × [g(t)/g₀]^s, g = (1−e²)^(−3/2).
+// J2000 factor ≡ 1 (all anchors bit-preserved); local derivatives reproduce
+// the shipped κ/κ̇ Taylor chain to 0.03%. Envelope over ±2 Myr: perigee ±2%,
+// node ±0.8% — bounded, zero-mean (vs Meeus's unbounded T² parabola ~10%).
+// The N-form functions (meanApsidalPrecessionSecondsICRFAtAge etc.) stay the
+// pure invariant MEAN law; these two anchored chains carry the full factored law.
+// ═════════════════════════════════════════════════════════════════════════════
+const _ECOMP = {
+  c0: 0.02814222258,
+  T:  [405000, 95804.8571, 99353.1852, 107301.44, 121933.4545, 127739.8095, 134126.8, 86533.4194, 223544.6667, 298059.5556],
+  A:  [-0.01713360824, 0.003885798879, 0.003162499557, -0.002439315342, 0.0009946933865, -0.002804779985, 0.0007349600656, 0.002378093225, -0.0007624261717, 0.0005442620468],
+  B:  [-0.0009600398502, -0.009349595921, 0.001151405217, -0.004809468603, 0.005451777722, 0.00162872882, -0.001835102032, 0.003606461969, -0.001298883291, -0.003982540754],
+};
+
+/** Framework Earth-eccentricity composite at t years relative to J2000 (negative = past). */
+function _fwEarthEccComposite(t_yr) {
+  let e = _ECOMP.c0;
+  for (let i = 0; i < _ECOMP.T.length; i++) {
+    const w = 2 * Math.PI * t_yr / _ECOMP.T[i];
+    e += _ECOMP.A[i] * Math.cos(w) + _ECOMP.B[i] * Math.sin(w);
+  }
+  return e;
+}
+const _ECOMP_G0 = Math.pow(1 - 0.0167024 * 0.0167024, -1.5);   // g at J2000 (composite anchor)
+
+/** e_E-channel rate modulation [g(t)/g₀]^s at age t_Ma (positive = past). ≡ 1 at J2000. */
+function _eCompModulation(t_Ma, s) {
+  if (t_Ma === 0) return 1;
+  const e = _fwEarthEccComposite(-t_Ma * 1e6);
+  return Math.pow(Math.pow(1 - e * e, -1.5) / _ECOMP_G0, s);
+}
+
+/** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
+ *  e_E-composite modulation — the factored deep-time law, Path C item 5). */
 function meanLunarPerigeePrecessionAtAge(t_Ma) {
   if (t_Ma === 0) return MOON_APSIDAL_J2000_S;
   const T_sm_t = meanMoonSiderealMonthAtAge(t_Ma);
@@ -6825,10 +6870,12 @@ function meanLunarPerigeePrecessionAtAge(t_Ma) {
   if (T_sm_t === null) return null;
   return MOON_APSIDAL_J2000_S
     * Math.pow(T_yr_t / MEAN_SIDEREAL_YEAR_J2000_S, 2)
-    * (MOON_SIDEREAL_MONTH_J2000_S / T_sm_t);
+    * (MOON_SIDEREAL_MONTH_J2000_S / T_sm_t)
+    / _eCompModulation(t_Ma, _FW_MOON.S_W);   // Path C item 5: period = invariant mean / rate modulation
 }
 
-/** Lunar nodal precession period in seconds (Brouwer-Clemence scaling). */
+/** Lunar nodal precession period in seconds (Brouwer-Clemence scaling ×
+ *  e_E-composite modulation — the factored deep-time law, Path C item 5). */
 function meanLunarNodePrecessionAtAge(t_Ma) {
   if (t_Ma === 0) return MOON_NODAL_J2000_S;
   const T_sm_t = meanMoonSiderealMonthAtAge(t_Ma);
@@ -6836,7 +6883,8 @@ function meanLunarNodePrecessionAtAge(t_Ma) {
   if (T_sm_t === null) return null;
   return MOON_NODAL_J2000_S
     * Math.pow(T_yr_t / MEAN_SIDEREAL_YEAR_J2000_S, 2)
-    * (MOON_SIDEREAL_MONTH_J2000_S / T_sm_t);
+    * (MOON_SIDEREAL_MONTH_J2000_S / T_sm_t)
+    / _eCompModulation(t_Ma, _FW_MOON.S_N);   // Path C item 5: period = invariant mean / rate modulation
 }
 
 /** Moon anomalistic month in seconds (perigee-to-perigee). */
