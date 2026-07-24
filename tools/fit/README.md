@@ -197,7 +197,7 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |
 | `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
 | `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
-| `moon-eclipse-optimizer.js` | `moonMeeusLpCorrection`, `MOON_CORRECTION` | 66 solar eclipses (2000–2025) + JPL baseline — run separately, not part of standard pipeline. `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
+| `moon-eclipse-optimizer.js` | `moonMeeusLpCorrection`, `MOON_CORRECTION` | 58 solar eclipses (2000–2025) + JPL baseline — run separately, not part of standard pipeline. `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
 | `python/fit_perihelion_harmonics.py` | `PERI_HARMONICS_RAW`, `PERI_OFFSET` | `data/01-holistic-year-objects-data.xlsx` |
 | `python/verify_perihelion_erd.py` | pass/fail verification (exits 0=pass, 1=fail) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/train_precession_physical.py` | `PREDICT_COEFFS_PHYSICAL` (~2421 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
@@ -524,7 +524,7 @@ Step 5b: gravitation-correction.js            → GRAVITATION_CORRECTION + ELONG
 Step 5c: moon-eclipse-optimizer.js            → moonMeeusLpCorrection + MOON_CORRECTION
          Fits the Lp bias and 3-term RA/Dec correction vs JPL at the
          J2000-anchored startpos; verifies Moon-Sun angular separation
-         at 66 solar eclipses (2000–2025) — should be ~0°.
+         at 58 solar eclipses (2000–2025) — should be ~0°.
          moonStartpos* values are J2000-element anchored via the in-sim
          meters (docs/66 §4) — NO LONGER fitted; the startPos scan in
          the tool is a flat-gradient diagnostic only, never written.
