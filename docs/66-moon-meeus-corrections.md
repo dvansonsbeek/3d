@@ -68,14 +68,29 @@ shows the hierarchy path, while the Moon mesh shows the correct Meeus position.
 
 ## 2. Ecliptic Latitude Correction (Meeus Ch. 47)
 
-### The Problem
+### The Problem (historical) and the Stage-4b geometric fix
 
-The 5-layer hierarchy's node positions have phase errors. The hierarchy produces
-a draconitic month of ~30.9 days instead of the correct 27.2 days, causing the
-Moon's ecliptic latitude to be wrong by up to ~5 degrees at any given time.
-This made solar eclipses invisible in the 3D scene.
+Historically the 5-layer hierarchy carried the 5.14° inclination tilt on the
+nodal layer itself. In the scene's transform structure a layer's own Y-spin
+cannot rotate its own tilt (tilts are static on `containerObj`; the animated
+spin runs inside it), so the orbit PLANE followed only the parent rotations —
+the node phase drifted against reality, the Moon's ecliptic latitude was wrong
+by up to ~5°, and solar eclipses were invisible in the 3D scene. (An earlier
+version of this doc attributed this to "a draconitic month of ~30.9 days"; the
+measured effective value was the sidereal month, 27.32 d — same root cause,
+different number.)
 
-### The Solution
+As of Path C Stage 4b the geometry is correct natively: the tilt lives on the
+moon container (below the nodal layer's spin), the nodal layer regresses the
+plane at the of-date 18.6132-yr period, the moon layer runs on the draconitic
+(nodal-month) clock 27.2122209 d, and the layer sum equals the tropical month
+by the exact integer identity N_drac = N_trop + N_nodI. The startPos values
+are J2000-element anchored (Ω = 125.0446°, ϖ = 83.3532°, Δ = 0.0000° via the
+in-sim anchoring meter). The Meeus latitude series below remains in place as
+the source of the PERIODIC perturbation terms and continues to drive the
+displayed position; the secular geometry no longer depends on it.
+
+### The Solution (periodic terms via Meeus)
 
 The Moon's ecliptic latitude beta is computed analytically using Meeus Ch. 47's
 13-term Fourier series, using the argument of latitude F:
@@ -178,14 +193,18 @@ used for the latitude correction (computed from `T = d/36525`).
 
 ## 4. StartPos Values
 
-Optimized against JPL Horizons (7-day sampling, 2000-2025) with Meeus
-corrections active, then validated against 58 NASA GSFC solar eclipses:
+Provenance (Path C Stage 4b): **J2000-element anchored** — the scene's node
+and perigee longitudes are set to the Meeus J2000 elements (Ω = 125.0446°,
+ϖ = 83.3532°) to Δ = 0.0000° via the in-sim anchoring meter, replacing the
+earlier eclipse-optimizer compromise values (which were tuned under the
+pre-Stage-4b geometry). Verified against the Step-5c eclipse RMS (0.8086°,
+unchanged — that metric is Meeus-override-framed).
 
-| Parameter | Old Value | New Value |
-|-----------|-----------|-----------|
-| moonStartposApsidal | 330 | 347.622 |
-| moonStartposNodal | 64 | -83.630 |
-| moonStartposMoon | 132 | 131.930 |
+| Parameter | Legacy (optimizer-tuned) | Current (J2000-anchored) |
+|-----------|--------------------------|--------------------------|
+| moonStartposApsidal | 347.622 | 347.5544 |
+| moonStartposNodal | -83.630 | 64.0436 |
+| moonStartposMoon | 131.930 | 131.93 (deferred — the anchoring meter's L row reads the Meeus-overridden Moon, so this phase affects only the pre-override in-plane geometry) |
 
 ---
 

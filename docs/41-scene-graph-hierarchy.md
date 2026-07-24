@@ -237,25 +237,25 @@ The Moon has its own set of precession cycles nested within Earth's frame:
 
 ```
 earth.pivotObj
-└── moonApsidalPrecession.containerObj              ← ~8.85 year apsidal cycle
-    └── moonApsidalNodalPrecession1.containerObj    ← ~206 day beat
-        └── moonApsidalNodalPrecession2.containerObj    ← ~206 day (reverse)
-            └── moonLunarLevelingCyclePrecession.containerObj    ← Lunar Leveling cycle
-                └── moonNodalPrecession.containerObj    ← ~18.6 year nodal cycle
-                    └── moon.containerObj
-                        └── moon.orbitObj    ← ~27.3 day lunar month
+└── moonApsidalPrecession.containerObj              ← ~8.85 year apsidal advance (carries perigee offset)
+    └── moonApsidalNodalPrecession1.containerObj    ← ~5.997 yr beat (pair, geometrically inert)
+        └── moonApsidalNodalPrecession2.containerObj    ← ~5.997 yr (reverse of pair)
+            └── moonLunarLevelingCyclePrecession.containerObj    ← apsidal canceller (−8.85 yr; Stage 4b role)
+                └── moonNodalPrecession.containerObj    ← ~18.613 yr nodal regression (of-date) — rotates the tilted plane below
+                    └── moon.containerObj    ← carries the 5.14° inclination tilt (Stage 4b)
+                        └── moon.orbitObj    ← draconitic (nodal-month) clock, 27.2122 d
 ```
 
-### 7.1 Moon Precession Cycles
+### 7.1 Moon Precession Cycles (Path C Stage 4b composition)
 
 | Layer | Period | Physical Meaning |
 |-------|--------|------------------|
-| **Apsidal Precession** | ~3,233 days (~8.85 years) | Lunar perigee precession |
-| **Apsidal-Nodal 1** | ~2,190 days (~6 years) | Apsidal-nodal beat frequency |
-| **Apsidal-Nodal 2** | ~2,190 days (~6 years, reverse) | Counter-rotation for beat |
-| **Lunar Leveling Cycle** | ~6,167 days (~16.9 years) | Long-term lunar cycle |
-| **Nodal Precession** | ~6,794 days (~18.6 years) | Lunar node regression |
-| **Moon** | ~27.32 days | Sidereal lunar month |
+| **Apsidal Precession** | +3,232.64 days (~8.8507 years) | Lunar perigee advance |
+| **Apsidal-Nodal 1** | −2,190 days (~5.997 years) | Apsidal-nodal beat (pair, inert) |
+| **Apsidal-Nodal 2** | +2,190 days (reverse) | Counter-rotation of the pair |
+| **Lunar Leveling Cycle** | −3,232.64 days (apsidal canceller) | Cancels the apsidal rotation for the plane; the 16.886-yr leveling beat remains a derived display quantity |
+| **Nodal Precession** | −6,798.33 days (18.6132 years, of-date) | Lunar node regression — drives the orbit plane (tilt sits below its spin) |
+| **Moon** | +27.2122 days (draconitic / nodal month) | In-plane clock; layer sum = tropical month by the exact integer identity N_drac = N_trop + N_nodI |
 
 ---
 

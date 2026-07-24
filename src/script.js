@@ -101,8 +101,8 @@ const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3
 // debugOn moved to A5 Research toggles (near top)
 
 // ─── A3. Moon model parameters ───────────────────────────────────────────
-const moonStartposApsidal = 347.622;                      // Eclipse-optimizer tuned (Step 5b)
-const moonStartposNodal = -83.630;                        // Eclipse-optimizer tuned (Step 5b)
+const moonStartposApsidal = 347.5544;                     // Path C Stage 4b: J2000-element anchored (ϖ = 83.3532° Meeus; mapping ∂ϖ/∂a = −1, measured)
+const moonStartposNodal = 64.0436;                        // Path C Stage 4b: J2000-element anchored (Ω = 125.0446° Meeus; ∂Ω/∂n = −1; was the legacy compromise −83.630)
 const moonStartposMoon = 131.930;                         // Eclipse-optimizer tuned (Step 5b)
 const moonMeeusLpCorrection = 0.010525;                   // Meeus Lp longitude correction (DE200→DE440 offset)
 
@@ -4892,6 +4892,8 @@ const OBLIQUITY_CYCLE_J2000 = {
 // their observational anchors (Earth frame = ICRF ∓ H/13 offset).
 const MOON_APSIDAL_J2000_S = moonApsidalPrecessionindaysEarth * LOD_NOW_H13_S;  // ≈ 8.85 yr
 const MOON_NODAL_J2000_S   = moonNodalPrecessionindaysEarth   * LOD_NOW_H13_S;  // ≈ 18.60 yr
+const MOON_NODAL_OFDATE_J2000_S = moonNodalPrecessionindaysICRF * LOD_NOW_H13_S;  // 6798.3303 d — of-date node regression (Path C Stage 4b scene rate)
+const MOON_NODAL_MONTH_J2000_S  = moonNodalMonth * LOD_NOW_H13_S;                 // 27.2122209 d — draconitic clock for the moon layer
 const MOON_SIDEREAL_MONTH_J2000_S = moonSiderealMonthInput * LOD_NOW_H13_S;
                                                                              // ≈ 2,360,591 s
 
@@ -6805,6 +6807,15 @@ function meanMoonApsidalCyclesBetween(yearA, yearB)        { return _moonChainCy
 function meanMoonNodalCyclesBetween(yearA, yearB)          { return _moonChainCycles(meanLunarNodePrecessionAtAge, yearA, yearB); }
 function meanMoonApsidalMeetsNodalCyclesBetween(yearA, yearB) { return _moonChainCycles(meanApsidalMeetsNodalAtAge, yearA, yearB); }
 function meanMoonLunarLevelingCyclesBetween(yearA, yearB)  { return _moonChainCycles(meanLunarLevelingCycleAtAge, yearA, yearB); }
+// Path C Stage 4b: draconitic composition wrappers.
+function meanMoonDraconicOrbitsBetween(yearA, yearB)       { return _moonChainCycles(meanNodalMonthAtAge, yearA, yearB); }
+/** Of-date node cycles between years = draconic orbits − tropical orbits
+ *  (count identity N_nodI = N_drac − N_trop, exact at every epoch). */
+function meanMoonNodalOfDateCyclesBetween(yearA, yearB) {
+  const drac = _moonChainCycles(meanNodalMonthAtAge, yearA, yearB);
+  const trop = _moonChainCycles(meanTropicalMonthAtAge, yearA, yearB);
+  return (drac === null || trop === null) ? null : drac - trop;
+}
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling). */
 function meanLunarPerigeePrecessionAtAge(t_Ma) {
@@ -7796,7 +7807,7 @@ function updateMoonForEpoch() {
   // elapsed scene interval since startmodel (snapshot path) or shadowed by
   // the integrator (deep-time path). Locking it eliminates the first risk
   // while remaining bit-equivalent to the integrator at modern epochs.
-  moon.speed       = (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_TROPICAL_MONTH_J2000_S;
+  moon.speed       = (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_NODAL_MONTH_J2000_S;  // Path C Stage 4b: draconitic clock
   moon.orbitRadius = (moonDistance / currentAUDistance) * 100;
   moon.size        = (diameters.moonDiameter / 2 / currentAUDistance) * 100;
 }
@@ -7806,21 +7817,20 @@ function updateMoonForEpoch() {
  *  (`_dtMoonIntegrator`, see line ~6975 + moveModel branch at ~42995); the
  *  locked speeds remain authoritative for snapshot mode (deep-time OFF) and
  *  are bit-equivalent to the integrator at modern epochs by construction.
- *  Anchors used:
- *    apsidal           — MOON_APSIDAL_J2000_S            (≈ 8.85 yr)
- *    apsidal-meets-nodal — meanApsidalMeetsNodalAtAge(0) (≈ 5.997 yr)
- *    lunar leveling    — meanLunarLevelingCycleAtAge(0)  (≈ 6.0 yr)
- *    nodal             — MOON_NODAL_J2000_S              (≈ 18.60 yr)
- *  Signs mirror the previous mutation (apsidal +, apsidal-meets-nodal ±,
- *  leveling −, nodal −). */
+ *  Anchors used (Path C Stage 4b composition):
+ *    apsidal           — MOON_APSIDAL_J2000_S            (≈ 8.85 yr, advance)
+ *    apsidal-meets-nodal — meanApsidalMeetsNodalAtAge(0) (≈ 5.997 yr, inert pair)
+ *    lunar leveling    — MOON_APSIDAL_J2000_S            (apsidal canceller, −)
+ *    nodal             — MOON_NODAL_OFDATE_J2000_S       (6798.33 d of-date, −)
+ *  Signs (apsidal +, apsidal-meets-nodal ±, leveling −, nodal −); layer sum
+ *  = tropical month by the exact integer identity N_drac = N_trop + N_nodI. */
 function updateMoonHarmonicsForEpoch() {
   const apsiMeetsNodalJ2000_S = meanApsidalMeetsNodalAtAge(0);
-  const levelingJ2000_S       = meanLunarLevelingCycleAtAge(0);
   moonApsidalPrecession.speed            =  (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_J2000_S;
   moonApsidalNodalPrecession1.speed      = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / apsiMeetsNodalJ2000_S;
   moonApsidalNodalPrecession2.speed      =  (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / apsiMeetsNodalJ2000_S;
-  moonLunarLevelingCyclePrecession.speed = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / levelingJ2000_S;
-  moonNodalPrecession.speed              = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_NODAL_J2000_S;
+  moonLunarLevelingCyclePrecession.speed = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_J2000_S;   // Path C Stage 4b: apsidal canceller
+  moonNodalPrecession.speed              = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_NODAL_OFDATE_J2000_S;  // Path C Stage 4b: of-date regression
 }
 
 /** Mutate the 5 Earth-precession control objects (lines 5238–5346). */
@@ -9152,8 +9162,8 @@ const moonApsidalNodalPrecession2 = {
 
 const moonLunarLevelingCyclePrecession = {
   name: "Moon Lunar Leveling Cycle",
-  startPos: 360-moonStartposApsidal-moonStartposNodal,
-  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonLunarLevelingCycleindays,  // Phase 9.5b: cycles per SI year
+  startPos: -moonStartposApsidal,  // Path C Stage 4b: canceller pairs with the apsidal layer in phase AND rate
+  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonApsidalPrecessionindaysEarth,  // Path C Stage 4b: exact apsidal canceller (−0.709910 rad/yr) — with the inclination tilt on the MOON's container, the nodal layer's own spin regresses the plane
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -9175,14 +9185,14 @@ const moonLunarLevelingCyclePrecession = {
 const moonNodalPrecession = {
   name: "Moon Nodal Precession",
   startPos: moonStartposNodal,
-  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonNodalPrecessionindaysEarth,  // Phase 9.5b: cycles per SI year
+  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonNodalPrecessionindaysICRF,  // Path C Stage 4b: node regresses at the of-date period 6798.3303 d = −18.6132112 yr (−0.337566 rad/yr) — rotates the Moon's tilted plane, which now sits on the moon container below
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90+180)*Math.PI)/180)*-moonEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90+180)*Math.PI)/180)*-moonEclipticInclinationJ2000,
+  orbitTilta: 0,  // Path C Stage 4b: inclination tilt moved to the moon container so this layer's spin can rotate the plane
+  orbitTiltb: 0,
   
   size: 0.001,
   color: 0x8b8b8b,
@@ -9197,15 +9207,15 @@ const moonNodalPrecession = {
 const moon = {
   name: "Moon",
   startPos: moonStartposMoon,
-  speed: (Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonTropicalMonth,  // Phase 9.5b: orbits per SI year
+  speed: (Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonNodalMonth,  // Path C Stage 4b: draconitic (nodal-month) clock 27.2122209 d (+84.332861 rad/yr) — layer sum = tropical month by exact integer identity
   rotationSpeed: 0,
   tilt: -moonTilt,
   orbitRadius: (moonDistance/currentAUDistance)*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90+180)*Math.PI)/180)*-moonEclipticInclinationJ2000,  // Path C Stage 4b: 5.14° inclination tilt lives HERE (below the nodal spin) so the nodal layer regresses the plane
+  orbitTiltb: Math.sin(((-90+180)*Math.PI)/180)*-moonEclipticInclinationJ2000,
   eccentricity: moonOrbitalEccentricityBase,
   lunarPerturbations: true,
 
@@ -9229,7 +9239,7 @@ const moon = {
 // Moon position under Farhat-evolving sidereal-month period. Anchor matches
 // Earth's `_dtCycleAnchor = STARTMODEL_YEAR_SI` so the integrator returns
 // 0 at startmodel (preserves modern J2000 Moon position).
-moon._dtMoonIntegrator = meanMoonOrbitsBetweenYears;
+moon._dtMoonIntegrator = meanMoonDraconicOrbitsBetween;  // Path C Stage 4b: draconitic clock (was tropical)
 moon._dtMoonSign       = +1;  // Moon orbits prograde (eastward)
 moon._dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
@@ -9248,11 +9258,11 @@ moonApsidalNodalPrecession2.      _dtMoonIntegrator = meanMoonApsidalMeetsNodalC
 moonApsidalNodalPrecession2.      _dtMoonSign       = +1;
 moonApsidalNodalPrecession2.      _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
-moonLunarLevelingCyclePrecession. _dtMoonIntegrator = meanMoonLunarLevelingCyclesBetween;
+moonLunarLevelingCyclePrecession. _dtMoonIntegrator = meanMoonApsidalCyclesBetween;  // Path C Stage 4b: apsidal canceller (sign −)
 moonLunarLevelingCyclePrecession. _dtMoonSign       = -1;
 moonLunarLevelingCyclePrecession. _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
-moonNodalPrecession.              _dtMoonIntegrator = meanMoonNodalCyclesBetween;
+moonNodalPrecession.              _dtMoonIntegrator = meanMoonNodalOfDateCyclesBetween;  // Path C Stage 4b: of-date regression (was star-frame chain)
 moonNodalPrecession.              _dtMoonSign       = -1;
 moonNodalPrecession.              _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
@@ -31852,6 +31862,45 @@ function setupGUI() {
      'ON routes the _eclMoon* dispatchers through the framework-native argument skeleton ' +
      '(_fwMoonArgs) under the unchanged Meeus periodic series; OFF = pure Meeus. Scene Moon ' +
      'unaffected (Stage 4). See docs/hidden/IP-framework-native-moon.md.');
+
+  addTestButton('Path C Stage 4b: J2000 lunar element anchoring meter', () => {
+    // Navigates the scene to J2000, reads the hierarchy's geometric lunar elements
+    // (updateMoonOrbitalElements — the raw scene geometry, NOT the Meeus override),
+    // compares to the Meeus J2000 element targets, and restores the scene. Drives
+    // the startPos re-anchoring after the Stage-4b composition fix — the Step-5c
+    // eclipse optimizer cannot do this (its metric is override-framed; startPos
+    // gradient is flat there). See IP-framework-native-moon.md §Stage 4b.
+    const savedJD = o.julianDay;
+    jumpToJulianDay(j2000JD);   // 2000 Jan 1.5 (element epoch; the ~64 s UT/TT offset moves the node <0.0001° — negligible)
+    forceSceneUpdate();
+    const node  = o.moonAscendingNode;
+    const peri  = o.moonLongitudeOfPerigee;
+    const Lmean = ((peri + o.moonMeanAnomaly) % 360 + 360) % 360;   // mean longitude = ϖ + M
+    const wrap180 = (d) => { let x = ((d % 360) + 360) % 360; return x > 180 ? x - 360 : x; };
+    console.log('\n══════════════════════════════════════════════════════════════════════');
+    console.log('  Path C Stage 4b — scene lunar elements at J2000 vs Meeus targets');
+    console.log('══════════════════════════════════════════════════════════════════════');
+    console.log(`  Ascending node Ω:       scene ${node.toFixed(4)}°   target 125.0446°   Δ ${wrap180(node - 125.0446).toFixed(4)}°`);
+    console.log(`  Longitude of perigee ϖ: scene ${peri.toFixed(4)}°   target  83.3532°   Δ ${wrap180(peri - 83.3532).toFixed(4)}°`);
+    console.log(`  Mean longitude L:       scene ${Lmean.toFixed(4)}°   target 218.3164°   Δ ${wrap180(Lmean - 218.3164).toFixed(4)}°`);
+    console.log(`  (current startPos: apsidal ${moonStartposApsidal}, nodal ${moonStartposNodal}, moon ${moonStartposMoon})`);
+    // Dynamic gate: measured node regression rate over J2000 → J2000+2 yr —
+    // proves the plane genuinely regresses (not just sits anchored). Baseline
+    // kept short so the ~−19.34°/yr accumulation stays inside wrap180's ±180°.
+    jumpToJulianDay(j2000JD + 730.48);
+    forceSceneUpdate();
+    const node10 = o.moonAscendingNode;
+    const rate = wrap180(node10 - node) / 2;    // deg/yr
+    console.log(`  Node regression rate:   measured ${rate.toFixed(4)}°/yr   target −19.3411°/yr (of-date 18.6132-yr cycle)`);
+    console.log('  Anchors + rate at target ⇒ Stage 4b geometry verified. L row reads the');
+    console.log('  Meeus-OVERRIDDEN Moon (documented limitation; moonStartposMoon deferred).');
+    console.log('══════════════════════════════════════════════════════════════════════');
+    jumpToJulianDay(savedJD);
+    forceSceneUpdate();
+  }, 'Path C Stage 4b re-anchoring meter: jumps the scene to J2000, prints the hierarchy\'s ' +
+     'geometric node/perigee/mean-longitude vs the Meeus element targets (Ω 125.0446 / ϖ 83.3532 / ' +
+     'L 218.3164), then restores the date. Run after the composition fix; the printed Δs drive ' +
+     'the startPos re-anchoring. See docs/hidden/IP-framework-native-moon.md §Stage 4b.');
 
 
   // ────────────────────────────────────────────────────────────────────────
@@ -58456,11 +58505,12 @@ function updateMoonOrbitalElements() {
   // Eccentric Anomaly from Kepler's equation (Newton-Raphson)
   o.moonEccentricAnomaly = OrbitalFormulas.eccentricAnomaly(o.moonMeanAnomaly, moonOrbitalEccentricityBase);
 
-  // Ascending Node (Ω) — geometric extraction from orbit plane normal
-  // moonNodalPrecession.containerObj.matrixWorld includes all parent transforms:
-  // earth Y-rot, apsidal precession (through tilted frame), coupling layers, nodal precession.
-  // The apsidal Y-rotations through the tilted apsidal frame correctly precess the ascending node.
-  const m = moonNodalPrecession.containerObj.matrixWorld.elements;
+  // Ascending Node (Ω) — geometric extraction from orbit plane normal.
+  // Path C Stage 4b: the 5.14° inclination tilt lives on the MOON's containerObj
+  // (below the nodal layer's spin), so moon.containerObj.matrixWorld carries the
+  // actual orbit-plane orientation: earth Y-rot + apsidal + canceller + nodal
+  // regression + the static tilt.
+  const m = moon.containerObj.matrixWorld.elements;
   // Extract local Y direction (orbit normal) in world space: column 1 of 4×4 matrix
   const nx = m[4], ny = m[5], nz = m[6];
 
