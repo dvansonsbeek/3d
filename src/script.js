@@ -6083,6 +6083,79 @@ function _frameworkSunLon(jd_ut) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
+// Framework-native lunar fundamental arguments — Path C Stage 1
+//
+// docs/hidden/IP-framework-native-moon.md — implements the Stage-0 measured
+// recipe. Parallel to the Meeus Ch. 47 argument polynomials; NOT yet consumed
+// by the eclipse dispatchers (Stage 3 wires MOON_ARGS_FRAMEWORK_NATIVE).
+// A/B meter: the "Meeus vs Integrator" test button prints both sources.
+//
+// Construction (per Stage 0):
+//  • Linear rates are observational J2000 anchors, frame-decomposed as
+//    of-date = ICRF magnitude + framework general precession p = 360·13/H
+//    (50.24″/yr; the +1.4°/cy M′/F drift of the old integrator chain was
+//    exactly this missing p). In the historical window the sum is used in
+//    closed form; at deep time the two parts evolve under different laws
+//    (invariant/tidal chain vs H(t)) — documented follow-up.
+//  • Element T² terms come from the e_E solar-perturbation channel
+//    (strength ∝ (1−e²)^(−3/2)): Ẍ/Ẋ = s·3e·ė/(1−e²), with s_Ω = 1
+//    (derived — reproduces Meeus's F/Ω T² to 1.8%) and s_ϖ = 2.407
+//    (anchored Clairaut-type apsidal amplification; classical rate
+//    amplification ≈ 2.0). e₀/ė₀ are observed anchors; routing the L1
+//    eccentricity composite through this channel is the deep-time follow-up.
+//  • L′ T² = framework tidal n̈/2 (α₁ chain, −12.93″/cy² = LLR) + explicit
+//    planetary secular remainder (+7.25″/cy², labeled empirical).
+//  • D and M are retained as full Meeus polynomials (Sun-side arguments —
+//    the framework-native Sun campaign owns that territory).
+//  • Meeus element T³/T⁴ tails are intentionally omitted (≤0.25° at −584,
+//    ≪ the 0.05°/cy Stage-2 gate); L′ keeps its tiny T³/T⁴ for in-window
+//    carrier fidelity.
+// ═════════════════════════════════════════════════════════════════════════════
+
+let MOON_ARGS_FRAMEWORK_NATIVE = false;  // Stage-3 dispatcher switch (Meeus default until gates pass)
+
+const _FW_MOON = (() => {
+  // Meeus Ch. 47 J2000 anchors (phases + of-date rates: observational anchors)
+  const LP0 = 218.3164477, D0 = 297.8501921, M0 = 357.5291092,
+        MP0 = 134.9633964, F0 = 93.2720950;
+  const LPR = 481267.88123421, DR = 445267.1114034, MR = 35999.0502909,
+        MPR = 477198.8675055,  FR = 483202.0175233;
+  const P_DEGCY = 360 * 13 / holisticyearLength * 100;   // framework general precession, deg/Julian cy
+  const WDOT = LPR - MPR;   // perigee ϖ̇ of-date (+4069.0137) = ϖ̇_ICRF + p
+  const NDOT = LPR - FR;    // node   Ω̇ of-date (−1934.1363) = Ω̇_ICRF + p
+  // e_E channel (Stage 0b): d ln(perturbation strength)/dt = 3e·ė/(1−e²)
+  const E0 = 0.016708634, EDOT0 = -0.000042037;          // observed anchors (per Julian cy)
+  const KAPPA = 3 * E0 * EDOT0 / (1 - E0 * E0);
+  const S_W = 2.407, S_N = 1.0;
+  const T2_W = S_W * WDOT * KAPPA / 2;   // −0.010318 deg/cy²  (Meeus ϖ:  −0.010320)
+  const T2_N = S_N * NDOT * KAPPA / 2;   // +0.0020385 deg/cy² (Meeus Ω:  +0.0020753)
+  // L′ carrier T²: framework tidal n̈/2 + explicit planetary secular remainder
+  const T2_LP_TIDAL     = (-25.86 / 3600) / 2;           // α₁-chain n̈ (= LLR), doc 66 §5
+  const T2_LP_PLANETARY = -0.0015786 - T2_LP_TIDAL;      // +7.25″/cy², labeled empirical
+  const T2_LP = T2_LP_TIDAL + T2_LP_PLANETARY;
+  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T2_LP };
+})();
+
+/** Framework-native lunar fundamental arguments {Lp, D, M, Mp, F} in degrees
+ *  (of-date, same convention as the Meeus Ch. 47 block). Takes JD_TT. */
+function _fwMoonArgs(jd_tt) {
+  const A = _FW_MOON;
+  const T = (jd_tt - j2000JD) / 36525;
+  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+  const wrap = (x) => ((x % 360) + 360) % 360;
+  const Lp = A.LP0 + A.LPR * T + A.T2_LP * T2 + T3 / 538841 - T4 / 65194000;
+  const w  = (A.LP0 - A.MP0) + A.WDOT * T + A.T2_W * T2;   // perigee ϖ (of-date)
+  const om = (A.LP0 - A.F0)  + A.NDOT * T + A.T2_N * T2;   // node Ω (of-date)
+  return {
+    Lp: wrap(Lp),
+    D:  wrap(A.D0 + A.DR * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000),
+    M:  wrap(A.M0 + A.MR * T - 0.0001536 * T2 + T3 / 24490000),
+    Mp: wrap(Lp - w),
+    F:  wrap(Lp - om),
+  };
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
 // Moon polynomial dispatchers — Meeus Ch. 47.
 //
 // The dispatcher pattern preserves a hook for future work: swapping in a
@@ -31686,20 +31759,50 @@ function setupGUI() {
       console.log(pad(s.label, 38) + pad(s.year, 9) + fmt(s.Lp) + fmt(s.D) + fmt(s.M) + fmt(s.Mp) + fmt(s.F));
     }
     console.log('══════════════════════════════════════════════════════════════════════');
-    console.log('Interpretation (Path C baseline — the framework-native-Moon target metric):');
-    console.log(' • Lp/D/M small everywhere (≪0.01° modern, <1° at Thales) → anchor + mean-motion rates good.');
-    console.log(' • M\' (anomaly) and F (node) drift at ≈ +1.4°/century (linear, anchored 2000.5, both');
-    console.log('   directions) with a T² tail at deep epochs — this is the integrator\'s apsidal/nodal');
-    console.log('   precession-rate gap vs Brown/Meeus, i.e. the Mp T²-physics gap Path C must close.');
-    console.log('   Track these two columns as the Moon-campaign progress meter.');
-    console.log(' • Decision history: Phase 9.14 chose Option A (keep Meeus arguments; replacement');
-    console.log('   rejected — the large/inconsistent deep-epoch drift confirmed the Step C trap).');
+
+    // ── Path C Stage 1: framework-native arguments (_fwMoonArgs) vs Meeus ──
+    console.log('\n══════ Stage 1 meter: _fwMoonArgs − Meeus (degrees; target |M\'/F| < 0.05°/cy) ══════');
+    console.log('Epoch                              year      Lp       D       M       M\'      F');
+    const _d180 = (a, b) => { let d = a - b; while (d > 180) d -= 360; while (d < -180) d += 360; return d; };
+    for (const { jd, label } of epochs) {
+      const T = (jd - j2000JD) / 36525, T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const wrapM = (x) => ((x % 360) + 360) % 360;
+      const me = {
+        Lp: wrapM(218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000),
+        D:  wrapM(297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000),
+        M:  wrapM(357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000),
+        Mp: wrapM(134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000),
+        F:  wrapM( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000),
+      };
+      const fw = _fwMoonArgs(jd);
+      const pad = (str, n) => String(str).padEnd(n);
+      const fmt = (x) => String(x.toFixed(3)).padStart(8);
+      console.log(pad(label, 38) + pad(julianDateToDecimalYear(jd).toFixed(1), 9)
+        + fmt(_d180(fw.Lp, me.Lp)) + fmt(_d180(fw.D, me.D)) + fmt(_d180(fw.M, me.M))
+        + fmt(_d180(fw.Mp, me.Mp)) + fmt(_d180(fw.F, me.F)));
+    }
+    console.log('Recipe: of-date anchors frame-decomposed (ICRF + framework p = 360·13/H); element');
+    console.log('T² from the e_E channel (s_Ω = 1 derived, s_ϖ = 2.407 anchored). Residuals are the');
+    console.log('omitted element T³/T⁴ tails (≤0.25° at −584) — see IP-framework-native-moon.md.');
     console.log('══════════════════════════════════════════════════════════════════════');
-  }, 'Path C baseline meter: compares Meeus Ch. 47 lunar arguments to our integrator-derived ' +
-     'equivalents at 10 epochs (J2000 to -584). Lp/D/M agree sub-degree everywhere; M\'/F drift ' +
-     '~1.4°/century — the framework\'s apsidal/nodal rate gap vs Brown/Meeus, the target the ' +
-     'framework-native Moon work must close. (Historically: Phase 9.14 Option A verification; ' +
-     'the replace-Meeus-arguments route was rejected.)');
+    console.log('Interpretation (Path C progress meter):');
+    console.log(' • Table 1 (legacy integrator chain — kept as the historical baseline): Lp/D/M small');
+    console.log('   everywhere; M\'/F drift ≈ 1.4°/cy + T² tail. Stage 0 identified this as the');
+    console.log('   ICRF↔of-date frame gap (missing general precession p = 360·13/H) plus the');
+    console.log('   e_E-channel secular T² — measured, not mysterious.');
+    console.log(' • Table 2 (Stage 1, _fwMoonArgs): frame + T² closed natively — M\' ≤ 0.24°,');
+    console.log('   F ≤ 0.02° at −584 (0.009 / 0.0008 °/cy vs the 0.05°/cy gate). Residual =');
+    console.log('   the omitted element T³/T⁴ tails, documented.');
+    console.log(' • Next: Stage 3 wires MOON_ARGS_FRAMEWORK_NATIVE into the _eclMoon* dispatchers');
+    console.log('   and re-runs L-4 + audit-26 A/B (docs/hidden/IP-framework-native-moon.md).');
+    console.log(' • Decision history: Phase 9.14 Option A kept Meeus arguments (drift then');
+    console.log('   unexplained); Stage 0 explained it; Stage 1 closed it.');
+    console.log('══════════════════════════════════════════════════════════════════════');
+  }, 'Path C progress meter: Table 1 compares Meeus Ch. 47 lunar arguments to the legacy ' +
+     'integrator chain (historical baseline: M\'/F drift ~1.4°/cy = ICRF↔of-date frame gap + ' +
+     'e_E-channel T², per Stage 0). Table 2 shows the Stage-1 framework-native _fwMoonArgs vs ' +
+     'Meeus: M\' ≤ 0.24° / F ≤ 0.02° back to -584 — drift gate passed. Stage 3 wires the ' +
+     'dispatcher flag. See docs/hidden/IP-framework-native-moon.md.');
 
 
   // ────────────────────────────────────────────────────────────────────────
