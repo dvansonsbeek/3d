@@ -11,8 +11,8 @@
 //
 // The point: separate "does H/5 have room" from "does the flag fit compensate?".
 // If the optimum h5 leaves L-5b residual roughly unchanged from production,
-// H/5 tuning alone is not the lever we need — path forward is Path C
-// (framework-native Moon) or refit-the-α(t)-tidal-model.
+// H/5 tuning alone is not the lever we need — path forward is the
+// framework-native Moon (since shipped) or refit-the-α(t)-tidal-model.
 //
 // Runs entirely offline (Node). No browser, no console. Standalone — does
 // NOT modify dt-corrections-fit.js or deep-time.js. Duplicates the fit
@@ -359,7 +359,7 @@ console.log('  * res@Y   = Stephenson(Y) − total framework ΔT(Y)  (POSITIVE =
 console.log('  * LOD_J2K = reconstructed lodReal at J2000 (should stay ~86400.0018 = USNO target)');
 console.log('');
 console.log('  If L-5b|R| minimum is deep (< 2000 s) → H/5 tuning IS the lever; ship the optimum.');
-console.log('  If minimum is ~production (2500-3000 s) → H/5 alone cannot close the gap; escalate to Path C.');
+console.log('  If minimum is ~production (2500-3000 s) → H/5 alone cannot close the gap; escalate beyond H/5 (the framework-native Moon arguments, since shipped, were that escalation).');
 
 if (process.argv.includes('--json')) {
   const outPath = path.join(__dirname, '..', '..', 'data', 'h5-scan-results.json');

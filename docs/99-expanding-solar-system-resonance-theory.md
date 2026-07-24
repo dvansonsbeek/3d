@@ -189,7 +189,7 @@ J2000-anchored invariant value (held exact at every epoch by construction):
 
 The VALUE 2,966,767 yr² is **empirically anchored** (one structural H, one observed T_apsidal); it is *not* a structurally-derived integer like `8H = 2,682,536 yr`. What is structural is the **claim** that this value is preserved at every epoch — the framework's `N(t) = N₀ × (H/H₀)²` scaling.
 
-**Frame convention (Path C Stage 4b bookkeeping).** The J2000 anchor values
+**Frame convention (of-date vs star-referenced bookkeeping).** The J2000 anchor values
 above (8.848 yr / 18.613 yr) are the OF-DATE (equinox-of-date) periods — the
 Meeus/IERS observables. The star-referenced periods differ by the general
 precession p = 360°/(H/13): apsidal 8.8507 yr, nodal 18.5994 yr (counts per H
@@ -200,7 +200,7 @@ differ by exactly ∓13: `N_apsidalE = N_apsidalI − 13`,
 frame-specific constants; the constants quoted above are the of-date pair.
 (Earlier revisions labeled these anchors "ICRF"; corrected here.)
 
-**The factored deep-time law (Path C).** The invariant governs the MEAN
+**The factored deep-time law.** The invariant governs the MEAN
 rate; the solar-perturbation strength modulates around it with Earth's
 eccentricity:
 

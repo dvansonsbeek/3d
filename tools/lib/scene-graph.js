@@ -598,29 +598,29 @@ function buildSceneGraph() {
   const moonLunarLevel = makePrecessionNode('moonLunarLevelingCycle', {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: 0, tilt: 0,
-    startPos: -C.moonStartposApsidal,  // Path C Stage 4b: apsidal canceller (phase + rate)
-    speed: -(Math.PI * 2) / (C.moonApsidalPrecessionDaysEarth / C.meanSolarYearDays),  // Path C Stage 4b: apsidal canceller
+    startPos: -C.moonStartposApsidal,  // apsidal canceller (phase + rate)
+    speed: -(Math.PI * 2) / (C.moonApsidalPrecessionDaysEarth / C.meanSolarYearDays),  // apsidal canceller
   });
   moonApsNodalPrec2.pivot.addChild(moonLunarLevel.container);
 
   const moonNodalPrec = makePrecessionNode('moonNodalPrecession', {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-    orbitTilta: 0,  // Path C Stage 4b: inclination tilt moved to the moon def (below this layer's spin) so the nodal spin regresses the plane
+    orbitTilta: 0,  // inclination tilt lives on the moon def (below this layer's spin) so the nodal spin regresses the plane
     orbitTiltb: 0,
     tilt: 0,
     startPos: C.moonStartposNodal,
-    speed: -(Math.PI * 2) / (C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays),  // Path C Stage 4b: of-date regression (6798.3303 d)
+    speed: -(Math.PI * 2) / (C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays),  // of-date regression (6798.3303 d)
   });
   moonLunarLevel.pivot.addChild(moonNodalPrec.container);
 
   const moonDef = {
     orbitRadius: (C.moonDistance / C.currentAUDistance) * 100,
     orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-    orbitTilta: Math.cos((-90 + 180) * d2r) * -C.moonEclipticInclinationJ2000,  // Path C Stage 4b: 5.14° tilt lives here (below the nodal spin)
+    orbitTilta: Math.cos((-90 + 180) * d2r) * -C.moonEclipticInclinationJ2000,  // 5.14° tilt lives here (below the nodal spin)
     orbitTiltb: Math.sin((-90 + 180) * d2r) * -C.moonEclipticInclinationJ2000,
     tilt: -C.moonTilt,
     startPos: C.moonStartposMoon,
-    speed: (Math.PI * 2) / (1 / (C.meanSolarYearDays / C.moonNodalMonth)),  // Path C Stage 4b: draconitic (nodal-month) clock
+    speed: (Math.PI * 2) / (1 / (C.meanSolarYearDays / C.moonNodalMonth)),  // draconitic (nodal-month) clock
     eccentricity: C.moonOrbitalEccentricity,
     lunarPerturbations: true,
   };

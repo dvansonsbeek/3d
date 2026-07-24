@@ -826,10 +826,10 @@ function meanNodalPrecessionSecondsICRFAtAge(t_Ma) {
   return H_t * T_yr_s / N;
 }
 
-// ─── Path C item 5: framework Earth-eccentricity composite (deep-time e_E) ──
+// ─── Framework Earth-eccentricity composite (deep-time e_E) ──
 // Mirror of src/script.js _ECOMP/_fwEarthEccComposite/_eCompModulation — the
 // factored deep-time law: rate(t) = [invariant mean] × [g(t)/g₀]^s with
-// g = (1−e²)^(−3/2). Fit: tools/explore/path-c-ecc-composite.js. J2000
+// g = (1−e²)^(−3/2). Fit: tools/explore/framework-moon-ecc-composite.js. J2000
 // factor ≡ 1 (anchors preserved); bounded ±2 Myr (perigee ±2%, node ±0.8%).
 const _ECOMP = {
   c0: 0.02814222258,
@@ -854,7 +854,7 @@ function _eCompModulation(t_Ma, s) {
 }
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
- *  e_E-composite modulation — the factored deep-time law, Path C item 5). */
+ *  e_E-composite modulation — the factored deep-time law). */
 function meanLunarPerigeePrecessionAtAge(t_Ma) {
   if (t_Ma === 0) return MOON_APSIDAL_J2000_S;
   const T_sm_t = meanMoonSiderealMonthAtAge(t_Ma);
@@ -867,7 +867,7 @@ function meanLunarPerigeePrecessionAtAge(t_Ma) {
 }
 
 /** Lunar nodal precession period in seconds (Brouwer-Clemence scaling ×
- *  e_E-composite modulation — the factored deep-time law, Path C item 5). */
+ *  e_E-composite modulation — the factored deep-time law). */
 function meanLunarNodePrecessionAtAge(t_Ma) {
   if (t_Ma === 0) return MOON_NODAL_J2000_S;
   const T_sm_t = meanMoonSiderealMonthAtAge(t_Ma);

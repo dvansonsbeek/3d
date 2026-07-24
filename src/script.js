@@ -55,7 +55,7 @@ let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 24
 let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
 let   JOSE4_DT_CORRECTION_ENABLED = true;  // Jose4 8H/3749 ≈ 715.5 yr ΔT correction (4×Jose period, structural gcd=23) — cross-archive coherent in Steinhilber Φ + EPICA CO2; rationale + associated constants ~L5209
 let   RESONATOR_DT_CORRECTION_ENABLED = true;  // Core-mantle swing (Resonator driver) — episode of the core eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q=1.8) + locked bond−hallstatt drive tone. DEFAULT ON since the JOINT-world flip (2026-07-23): fitted JOINTLY with the 4 flags (dt-corrections-fit.js --joint; anchors USNO 86400.0014 / deltaTStart 56.05 moved with the coefficients, Espenak RMS 12.60 s). doc 104 §6/§8; constants + rationale near the Jose4 block
-let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Path C framework-native lunar argument skeleton (_fwMoonArgs via _moonArgsAt) feeding the _eclMoon* dispatchers. DEFAULT ON since the item-6 re-baseline release (2026-07-24): frame-decomposed rates + e_E-channel T²/T³, all A/B gates passed (Stages 0-5, docs/hidden/IP-framework-native-moon.md). OFF = pure Meeus Ch. 47 argument polynomials (A/B reference; runtime toggle test button available)
+let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argument skeleton (_fwMoonArgs via _moonArgsAt) feeding the _eclMoon* dispatchers: frame-decomposed rates + solar-eccentricity-channel T²/T³ (derivation record: docs/66 §1). OFF = pure Meeus Ch. 47 argument polynomials (A/B reference; runtime toggle test button available)
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
 const earthtiltMean = 23.41353942374053;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
@@ -102,9 +102,9 @@ const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3
 // debugOn moved to A5 Research toggles (near top)
 
 // ─── A3. Moon model parameters ───────────────────────────────────────────
-const moonStartposApsidal = 347.5544;                     // Path C Stage 4b: J2000-element anchored (ϖ = 83.3532° Meeus; mapping ∂ϖ/∂a = −1, measured)
-const moonStartposNodal = 64.0436;                        // Path C Stage 4b: J2000-element anchored (Ω = 125.0446° Meeus; ∂Ω/∂n = −1; was the legacy compromise −83.630)
-const moonStartposMoon = 67.8443;                         // Path C item 3: in-plane anchor via unmask meter (∂Δlon/∂m = −1; mean Δlon closed; was legacy 131.930)
+const moonStartposApsidal = 347.5544;                     // J2000-element anchored (ϖ = 83.3532° Meeus; mapping ∂ϖ/∂a = −1, measured)
+const moonStartposNodal = 64.0436;                        // J2000-element anchored (Ω = 125.0446° Meeus; ∂Ω/∂n = −1; was the legacy compromise −83.630)
+const moonStartposMoon = 67.8443;                         // in-plane anchor via unmask meter (∂Δlon/∂m = −1; mean Δlon closed; was legacy 131.930)
 const moonMeeusLpCorrection = 0.010525;                   // Meeus Lp longitude correction (DE200→DE440 offset)
 
 // ─── C2. Sun & Moon astro references ─────────────────────────────────────
@@ -4893,7 +4893,7 @@ const OBLIQUITY_CYCLE_J2000 = {
 // their observational anchors (Earth frame = ICRF ∓ H/13 offset).
 const MOON_APSIDAL_J2000_S = moonApsidalPrecessionindaysEarth * LOD_NOW_H13_S;  // ≈ 8.85 yr
 const MOON_NODAL_J2000_S   = moonNodalPrecessionindaysEarth   * LOD_NOW_H13_S;  // ≈ 18.60 yr
-const MOON_NODAL_OFDATE_J2000_S = moonNodalPrecessionindaysICRF * LOD_NOW_H13_S;  // 6798.3303 d — of-date node regression (Path C Stage 4b scene rate)
+const MOON_NODAL_OFDATE_J2000_S = moonNodalPrecessionindaysICRF * LOD_NOW_H13_S;  // 6798.3303 d — of-date node regression (scene rate)
 const MOON_NODAL_MONTH_J2000_S  = moonNodalMonth * LOD_NOW_H13_S;                 // 27.2122209 d — draconitic clock for the moon layer
 const MOON_SIDEREAL_MONTH_J2000_S = moonSiderealMonthInput * LOD_NOW_H13_S;
                                                                              // ≈ 2,360,591 s
@@ -6035,29 +6035,11 @@ function _frameworkSunLon(jd_ut) {
   // _eclSunLon still applies ΔT internally (canonical for eclipse detection).
   const year = julianDateToDecimalYear(jd_ut);
 
-  // ── Mean longitude (linear rate; framework's tropical year) ────────────
-  const days_from_j2000 = jd_ut - j2000JD;
-  let T_tropical_days;
-  if (DEEP_TIME_MODE_ENABLED) {
-    const t_Ma = (2000 - year) / 1e6;
-    const T_now = meanTropicalYearDaysAtAge(t_Ma);
-    T_tropical_days = 0.5 * (meansolaryearlengthinDays + (T_now || meansolaryearlengthinDays));
-  } else {
-    T_tropical_days = meansolaryearlengthinDays;
-  }
-  const L0_j2000_deg = 280.46646;   // Sun mean lon at J2000 (matches Meeus anchor)
-  const L_deg = L0_j2000_deg + 360 * days_from_j2000 / T_tropical_days;
-
-  // ── Perihelion longitude (H/16 cycle; framework's precession) ──────────
-  const perihelion_j2000_deg =
-    (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + 180) % 360;
-  const cyclesNow_16   = _phaseCycles(year, 16);
-  const cyclesJ2000_16 = _phaseCycles(2000, 16);
-  const perihelion_deg = perihelion_j2000_deg
-                       + 360 * (cyclesNow_16 - cyclesJ2000_16);
+  // ── Mean elements (shared recipe — also feeds the D/M probe button) ────
+  const { L_deg, M_deg } = _fwSunMeanElements(jd_ut);
 
   // ── Mean anomaly ───────────────────────────────────────────────────────
-  const M_rad = (L_deg - perihelion_deg) * _d2r;
+  const M_rad = M_deg * _d2r;
 
   // ── Eccentricity (framework's law of cosines, matches computeEccentricityEarth) ──
   // e(t) = √(base² + amp² − 2·base·amp·cos(θ)) where θ = (year - balancedYear)/H_16 × 2π
@@ -6085,16 +6067,41 @@ function _frameworkSunLon(jd_ut) {
   return ((lambda % 360) + 360) % 360;
 }
 
+/** Framework Sun MEAN elements (no equation of center): mean longitude,
+ *  perihelion longitude, and mean anomaly, degrees (unwrapped). Extracted
+ *  from _frameworkSunLon so the Meeus-Moon D/M substitution probe can
+ *  rebuild the Moon's Sun-dependent arguments (D = Lp − L_sun, M = Sun
+ *  mean anomaly) from the framework Sun. */
+function _fwSunMeanElements(jd_ut) {
+  const year = julianDateToDecimalYear(jd_ut);
+  const days_from_j2000 = jd_ut - j2000JD;
+  let T_tropical_days;
+  if (DEEP_TIME_MODE_ENABLED) {
+    const t_Ma = (2000 - year) / 1e6;
+    const T_now = meanTropicalYearDaysAtAge(t_Ma);
+    T_tropical_days = 0.5 * (meansolaryearlengthinDays + (T_now || meansolaryearlengthinDays));
+  } else {
+    T_tropical_days = meansolaryearlengthinDays;
+  }
+  const L0_j2000_deg = 280.46646;   // Sun mean lon at J2000 (matches Meeus anchor)
+  const L_deg = L0_j2000_deg + 360 * days_from_j2000 / T_tropical_days;
+  const perihelion_j2000_deg =
+    (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + 180) % 360;
+  const perihelion_deg = perihelion_j2000_deg
+    + 360 * (_phaseCycles(year, 16) - _phaseCycles(2000, 16));
+  return { L_deg, perihelion_deg, M_deg: L_deg - perihelion_deg };
+}
+
 // ═════════════════════════════════════════════════════════════════════════════
-// Framework-native lunar fundamental arguments — Path C Stage 1
+// Framework-native lunar fundamental arguments
 //
-// docs/hidden/IP-framework-native-moon.md — implements the Stage-0 measured
-// recipe. Consumed by the _eclMoon* dispatchers via _moonArgsAt, SHIPPED
-// DEFAULT since the item-6 re-baseline (MOON_ARGS_FRAMEWORK_NATIVE, declared
+// Implements the measured argument-decomposition recipe (derivation record:
+// docs/66 §1). Consumed by the _eclMoon* dispatchers via _moonArgsAt, SHIPPED
+// DEFAULT (MOON_ARGS_FRAMEWORK_NATIVE, declared
 // in the toggle block at the top of the file; runtime A/B toggle button flips
 // back to pure Meeus). A/B meter: the "Meeus vs Integrator" button prints both.
 //
-// Construction (per Stage 0):
+// Construction (per the measured argument decomposition):
 //  • Linear rates are observational J2000 anchors, frame-decomposed as
 //    of-date = ICRF magnitude + framework general precession p = 360·13/H
 //    (50.24″/yr; the +1.4°/cy M′/F drift of the old integrator chain was
@@ -6119,7 +6126,7 @@ function _frameworkSunLon(jd_ut) {
 // ═════════════════════════════════════════════════════════════════════════════
 
 // MOON_ARGS_FRAMEWORK_NATIVE is declared in the toggle block at the top of the
-// file (next to RESONATOR_DT_CORRECTION_ENABLED) — default ON since item 6.
+// file (next to RESONATOR_DT_CORRECTION_ENABLED) — default ON.
 
 const _FW_MOON = (() => {
   // Meeus Ch. 47 J2000 anchors (phases + of-date rates: observational anchors)
@@ -6130,7 +6137,7 @@ const _FW_MOON = (() => {
   const P_DEGCY = 360 * 13 / holisticyearLength * 100;   // framework general precession, deg/Julian cy
   const WDOT = LPR - MPR;   // perigee ϖ̇ of-date (+4069.0137) = ϖ̇_ICRF + p
   const NDOT = LPR - FR;    // node   Ω̇ of-date (−1934.1363) = Ω̇_ICRF + p
-  // e_E channel (Stage 0b): d ln(perturbation strength)/dt = 3e·ė/(1−e²)
+  // e_E channel: d ln(perturbation strength)/dt = 3e·ė/(1−e²)
   const E0 = 0.016708634, EDOT0 = -0.000042037;          // observed anchors (per Julian cy)
   const KAPPA = 3 * E0 * EDOT0 / (1 - E0 * E0);
   const S_W = 2.407, S_N = 1.0;
@@ -6172,11 +6179,14 @@ function _fwMoonArgs(jd_tt) {
 }
 
 /** Lunar fundamental arguments {Lp, D, M, Mp, F} (degrees, of-date) at JD_TT,
- *  source-switched (Path C Stage 3): Meeus Ch. 47 polynomials by default,
- *  _fwMoonArgs (framework-native secular skeleton) when
- *  MOON_ARGS_FRAMEWORK_NATIVE is ON. The Meeus periodic perturbation series
- *  consumes these arguments unchanged in either mode. */
+ *  source-switched: _fwMoonArgs (framework-native secular skeleton) by
+ *  default, pure Meeus Ch. 47 polynomials when MOON_ARGS_FRAMEWORK_NATIVE
+ *  is OFF (A/B reference). The Meeus periodic perturbation series consumes
+ *  these arguments unchanged in either mode. */
+let _moonArgsProbeOverride = null; // D/M-probe button hook: (jd_tt) => args; ALWAYS null in production
+
 function _moonArgsAt(jd_tt) {
+  if (_moonArgsProbeOverride) return _moonArgsProbeOverride(jd_tt);
   if (MOON_ARGS_FRAMEWORK_NATIVE) return _fwMoonArgs(jd_tt);
   const T = (jd_tt - j2000JD) / 36525;
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
@@ -6196,7 +6206,7 @@ function _moonArgsAt(jd_tt) {
 // The dispatcher pattern preserves a hook for future work: swapping in a
 // different Moon polynomial (e.g. VSOP87 Sun ↔ Meeus, or a higher-precision
 // lunar theory) would only require changing `_eclMoonLon/Beta/Distance` to
-// route to the alternative implementation. As of Path C, the FUNDAMENTAL
+// route to the alternative implementation. As shipped, the FUNDAMENTAL
 // ARGUMENTS feeding the series are source-switched via _moonArgsAt
 // (framework-native _fwMoonArgs is the SHIPPED DEFAULT since the item-6
 // re-baseline; pure-Meeus reference via the A/B toggle test button).
@@ -6810,7 +6820,7 @@ function meanMoonApsidalCyclesBetween(yearA, yearB)        { return _moonChainCy
 function meanMoonNodalCyclesBetween(yearA, yearB)          { return _moonChainCycles(meanLunarNodePrecessionAtAge, yearA, yearB); }
 function meanMoonApsidalMeetsNodalCyclesBetween(yearA, yearB) { return _moonChainCycles(meanApsidalMeetsNodalAtAge, yearA, yearB); }
 function meanMoonLunarLevelingCyclesBetween(yearA, yearB)  { return _moonChainCycles(meanLunarLevelingCycleAtAge, yearA, yearB); }
-// Path C Stage 4b: draconitic composition wrappers.
+// Draconitic composition wrappers.
 function meanMoonDraconicOrbitsBetween(yearA, yearB)       { return _moonChainCycles(meanNodalMonthAtAge, yearA, yearB); }
 /** Of-date node cycles between years = draconic orbits − tropical orbits
  *  (count identity N_nodI = N_drac − N_trop, exact at every epoch). */
@@ -6821,7 +6831,7 @@ function meanMoonNodalOfDateCyclesBetween(yearA, yearB) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// Path C item 5 — framework Earth-eccentricity composite (deep-time e_E)
+// Framework Earth-eccentricity composite (deep-time e_E)
 //
 // The multi-planet secular e_E the Moon feels through the Sun's perturbation:
 // 8H-lattice lines + the labeled OFF-lattice 405-kyr g2−g5 term (L2 taxonomy).
@@ -6865,7 +6875,7 @@ function _eCompModulation(t_Ma, s) {
 }
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
- *  e_E-composite modulation — the factored deep-time law, Path C item 5). */
+ *  e_E-composite modulation — the factored deep-time law). */
 function meanLunarPerigeePrecessionAtAge(t_Ma) {
   if (t_Ma === 0) return MOON_APSIDAL_J2000_S;
   const T_sm_t = meanMoonSiderealMonthAtAge(t_Ma);
@@ -6874,11 +6884,11 @@ function meanLunarPerigeePrecessionAtAge(t_Ma) {
   return MOON_APSIDAL_J2000_S
     * Math.pow(T_yr_t / MEAN_SIDEREAL_YEAR_J2000_S, 2)
     * (MOON_SIDEREAL_MONTH_J2000_S / T_sm_t)
-    / _eCompModulation(t_Ma, _FW_MOON.S_W);   // Path C item 5: period = invariant mean / rate modulation
+    / _eCompModulation(t_Ma, _FW_MOON.S_W);   // factored law: period = invariant mean / rate modulation
 }
 
 /** Lunar nodal precession period in seconds (Brouwer-Clemence scaling ×
- *  e_E-composite modulation — the factored deep-time law, Path C item 5). */
+ *  e_E-composite modulation — the factored deep-time law). */
 function meanLunarNodePrecessionAtAge(t_Ma) {
   if (t_Ma === 0) return MOON_NODAL_J2000_S;
   const T_sm_t = meanMoonSiderealMonthAtAge(t_Ma);
@@ -6887,7 +6897,7 @@ function meanLunarNodePrecessionAtAge(t_Ma) {
   return MOON_NODAL_J2000_S
     * Math.pow(T_yr_t / MEAN_SIDEREAL_YEAR_J2000_S, 2)
     * (MOON_SIDEREAL_MONTH_J2000_S / T_sm_t)
-    / _eCompModulation(t_Ma, _FW_MOON.S_N);   // Path C item 5: period = invariant mean / rate modulation
+    / _eCompModulation(t_Ma, _FW_MOON.S_N);   // factored law: period = invariant mean / rate modulation
 }
 
 /** Moon anomalistic month in seconds (perigee-to-perigee). */
@@ -7858,7 +7868,7 @@ function updateMoonForEpoch() {
   // elapsed scene interval since startmodel (snapshot path) or shadowed by
   // the integrator (deep-time path). Locking it eliminates the first risk
   // while remaining bit-equivalent to the integrator at modern epochs.
-  moon.speed       = (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_NODAL_MONTH_J2000_S;  // Path C Stage 4b: draconitic clock
+  moon.speed       = (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_NODAL_MONTH_J2000_S;  // draconitic clock
   moon.orbitRadius = (moonDistance / currentAUDistance) * 100;
   moon.size        = (diameters.moonDiameter / 2 / currentAUDistance) * 100;
 }
@@ -7868,7 +7878,7 @@ function updateMoonForEpoch() {
  *  (`_dtMoonIntegrator`, see line ~6975 + moveModel branch at ~42995); the
  *  locked speeds remain authoritative for snapshot mode (deep-time OFF) and
  *  are bit-equivalent to the integrator at modern epochs by construction.
- *  Anchors used (Path C Stage 4b composition):
+ *  Anchors used (framework-native composition):
  *    apsidal           — MOON_APSIDAL_J2000_S            (≈ 8.85 yr, advance)
  *    apsidal-meets-nodal — meanApsidalMeetsNodalAtAge(0) (≈ 5.997 yr, inert pair)
  *    lunar leveling    — MOON_APSIDAL_J2000_S            (apsidal canceller, −)
@@ -7880,8 +7890,8 @@ function updateMoonHarmonicsForEpoch() {
   moonApsidalPrecession.speed            =  (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_J2000_S;
   moonApsidalNodalPrecession1.speed      = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / apsiMeetsNodalJ2000_S;
   moonApsidalNodalPrecession2.speed      =  (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / apsiMeetsNodalJ2000_S;
-  moonLunarLevelingCyclePrecession.speed = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_J2000_S;   // Path C Stage 4b: apsidal canceller
-  moonNodalPrecession.speed              = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_NODAL_OFDATE_J2000_S;  // Path C Stage 4b: of-date regression
+  moonLunarLevelingCyclePrecession.speed = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_J2000_S;   // apsidal canceller
+  moonNodalPrecession.speed              = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_NODAL_OFDATE_J2000_S;  // of-date regression
 }
 
 /** Mutate the 5 Earth-precession control objects (lines 5238–5346). */
@@ -9213,8 +9223,8 @@ const moonApsidalNodalPrecession2 = {
 
 const moonLunarLevelingCyclePrecession = {
   name: "Moon Lunar Leveling Cycle",
-  startPos: -moonStartposApsidal,  // Path C Stage 4b: canceller pairs with the apsidal layer in phase AND rate
-  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonApsidalPrecessionindaysEarth,  // Path C Stage 4b: exact apsidal canceller (−0.709910 rad/yr) — with the inclination tilt on the MOON's container, the nodal layer's own spin regresses the plane
+  startPos: -moonStartposApsidal,  // canceller pairs with the apsidal layer in phase AND rate
+  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonApsidalPrecessionindaysEarth,  // exact apsidal canceller (−0.709910 rad/yr) — with the inclination tilt on the MOON's container, the nodal layer's own spin regresses the plane
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -9236,13 +9246,13 @@ const moonLunarLevelingCyclePrecession = {
 const moonNodalPrecession = {
   name: "Moon Nodal Precession",
   startPos: moonStartposNodal,
-  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonNodalPrecessionindaysICRF,  // Path C Stage 4b: node regresses at the of-date period 6798.3303 d = −18.6132112 yr (−0.337566 rad/yr) — rotates the Moon's tilted plane, which now sits on the moon container below
+  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonNodalPrecessionindaysICRF,  // node regresses at the of-date period 6798.3303 d = −18.6132112 yr (−0.337566 rad/yr) — rotates the Moon's tilted plane, which sits on the moon container below
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,  // Path C Stage 4b: inclination tilt moved to the moon container so this layer's spin can rotate the plane
+  orbitTilta: 0,  // inclination tilt lives on the moon container so this layer's spin can rotate the plane
   orbitTiltb: 0,
   
   size: 0.001,
@@ -9258,14 +9268,14 @@ const moonNodalPrecession = {
 const moon = {
   name: "Moon",
   startPos: moonStartposMoon,
-  speed: (Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonNodalMonth,  // Path C Stage 4b: draconitic (nodal-month) clock 27.2122209 d (+84.332861 rad/yr) — layer sum = tropical month by exact integer identity
+  speed: (Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonNodalMonth,  // draconitic (nodal-month) clock 27.2122209 d (+84.332861 rad/yr) — layer sum = tropical month by exact integer identity
   rotationSpeed: 0,
   tilt: -moonTilt,
   orbitRadius: (moonDistance/currentAUDistance)*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90+180)*Math.PI)/180)*-moonEclipticInclinationJ2000,  // Path C Stage 4b: 5.14° inclination tilt lives HERE (below the nodal spin) so the nodal layer regresses the plane
+  orbitTilta: Math.cos(((-90+180)*Math.PI)/180)*-moonEclipticInclinationJ2000,  // 5.14° inclination tilt lives HERE (below the nodal spin) so the nodal layer regresses the plane
   orbitTiltb: Math.sin(((-90+180)*Math.PI)/180)*-moonEclipticInclinationJ2000,
   eccentricity: moonOrbitalEccentricityBase,
   lunarPerturbations: true,
@@ -9290,7 +9300,7 @@ const moon = {
 // Moon position under Farhat-evolving sidereal-month period. Anchor matches
 // Earth's `_dtCycleAnchor = STARTMODEL_YEAR_SI` so the integrator returns
 // 0 at startmodel (preserves modern J2000 Moon position).
-moon._dtMoonIntegrator = meanMoonDraconicOrbitsBetween;  // Path C Stage 4b: draconitic clock (was tropical)
+moon._dtMoonIntegrator = meanMoonDraconicOrbitsBetween;  // draconitic clock (was tropical)
 moon._dtMoonSign       = +1;  // Moon orbits prograde (eastward)
 moon._dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
@@ -9309,11 +9319,11 @@ moonApsidalNodalPrecession2.      _dtMoonIntegrator = meanMoonApsidalMeetsNodalC
 moonApsidalNodalPrecession2.      _dtMoonSign       = +1;
 moonApsidalNodalPrecession2.      _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
-moonLunarLevelingCyclePrecession. _dtMoonIntegrator = meanMoonApsidalCyclesBetween;  // Path C Stage 4b: apsidal canceller (sign −)
+moonLunarLevelingCyclePrecession. _dtMoonIntegrator = meanMoonApsidalCyclesBetween;  // apsidal canceller (sign −)
 moonLunarLevelingCyclePrecession. _dtMoonSign       = -1;
 moonLunarLevelingCyclePrecession. _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
-moonNodalPrecession.              _dtMoonIntegrator = meanMoonNodalOfDateCyclesBetween;  // Path C Stage 4b: of-date regression (was star-frame chain)
+moonNodalPrecession.              _dtMoonIntegrator = meanMoonNodalOfDateCyclesBetween;  // of-date regression (was star-frame chain)
 moonNodalPrecession.              _dtMoonSign       = -1;
 moonNodalPrecession.              _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
@@ -31808,7 +31818,7 @@ function setupGUI() {
      '8 events (-762 to -135); (3) L1-α scale sensitivity — how much of the gap is closable by ' +
      'ALPHA_CLIMATE_SCALE tuning (with dα/dt de-calibration caveat). Feeds doc 103 case-study updates.');
 
-  addTestButton('Meeus vs Integrator (lunar argument drift — Path C baseline)', () => {
+  addTestButton('Meeus vs Integrator (lunar argument drift)', () => {
     // Phase 9.14 Option A step 1: compare Meeus Ch. 47 perturbation arguments
     // (Lp, D, M, M', F) to our integrator-derived equivalents (Steps 1-3)
     // across modern + deep-time epochs. Decision input for whether to switch
@@ -31851,8 +31861,8 @@ function setupGUI() {
     }
     console.log('══════════════════════════════════════════════════════════════════════');
 
-    // ── Path C Stage 1: framework-native arguments (_fwMoonArgs) vs Meeus ──
-    console.log('\n══════ Stage 1 meter: _fwMoonArgs − Meeus (degrees; target |M\'/F| < 0.05°/cy) ══════');
+    // ── Framework-native arguments (_fwMoonArgs) vs Meeus ──
+    console.log('\n══════ Framework meter: _fwMoonArgs − Meeus (degrees; target |M\'/F| < 0.05°/cy) ══════');
     console.log('Epoch                              year      Lp       D       M       M\'      F');
     const _d180 = (a, b) => { let d = a - b; while (d > 180) d -= 360; while (d < -180) d += 360; return d; };
     for (const { jd, label } of epochs) {
@@ -31875,51 +31885,51 @@ function setupGUI() {
     console.log('Recipe: of-date anchors frame-decomposed (ICRF + framework p = 360·13/H); element');
     console.log('T² AND T³ from the e_E channel (s_Ω = 1 derived, s_ϖ = 2.407 anchored; ë₀ from the');
     console.log('lattice+g2−g5 eccentricity composite). Residual = omitted element T⁴ tails');
-    console.log('(~0.1° at the −1999 canon edge) — see IP-framework-native-moon.md.');
+    console.log('(~0.1° at the −1999 canon edge) — see docs/66 §1.');
     console.log('══════════════════════════════════════════════════════════════════════');
-    console.log('Interpretation (Path C progress meter):');
+    console.log('Interpretation (framework-native argument meter):');
     console.log(' • Table 1 (legacy integrator chain — kept as the historical baseline): Lp/D/M small');
-    console.log('   everywhere; M\'/F drift ≈ 1.4°/cy + T² tail. Stage 0 identified this as the');
-    console.log('   ICRF↔of-date frame gap (missing general precession p = 360·13/H) plus the');
-    console.log('   e_E-channel secular T² — measured, not mysterious.');
-    console.log(' • Table 2 (Stages 1 + T²-nativity, _fwMoonArgs): frame + T² + derived T³ —');
+    console.log('   everywhere; M\'/F drift ≈ 1.4°/cy + T² tail. The argument decomposition identified');
+    console.log('   this as the ICRF↔of-date frame gap (missing general precession p = 360·13/H) plus');
+    console.log('   the e_E-channel secular T² — measured, not mysterious.');
+    console.log(' • Table 2 (framework-native _fwMoonArgs): frame + T² + derived T³ —');
     console.log('   M\' ≤ 0.015°, F ≤ 0.025° at −584 (0.0006 / 0.001 °/cy vs the 0.05°/cy gate).');
     console.log('   Residual = omitted element T⁴ tails + the Ω T³ 20% overshoot, documented.');
-    console.log(' • Stage 3 is wired: the A/B toggle button flips MOON_ARGS_FRAMEWORK_NATIVE into');
-    console.log('   the _eclMoon* dispatchers; all gates passed (IP-framework-native-moon.md).');
+    console.log(' • The A/B toggle button flips MOON_ARGS_FRAMEWORK_NATIVE into the _eclMoon*');
+    console.log('   dispatchers; all certification gates passed (doc 66 §1).');
     console.log(' • Decision history: Phase 9.14 Option A kept Meeus arguments (drift then');
-    console.log('   unexplained); Stage 0 explained it; Stage 1 closed it.');
+    console.log('   unexplained); the frame decomposition explained it; the framework-native rates closed it.');
     console.log('══════════════════════════════════════════════════════════════════════');
-  }, 'Path C progress meter: Table 1 compares Meeus Ch. 47 lunar arguments to the legacy ' +
+  }, 'Framework-native argument meter: Table 1 compares Meeus Ch. 47 lunar arguments to the legacy ' +
      'integrator chain (historical baseline: M\'/F drift ~1.4°/cy = ICRF↔of-date frame gap + ' +
-     'e_E-channel T², per Stage 0). Table 2 shows the Stage-1 framework-native _fwMoonArgs vs ' +
-     'Meeus: M\' ≤ 0.24° / F ≤ 0.02° back to -584 — drift gate passed. Stage 3 wires the ' +
-     'dispatcher flag. See docs/hidden/IP-framework-native-moon.md.');
+     'e_E-channel T²). Table 2 shows the framework-native _fwMoonArgs vs ' +
+     'Meeus: M\' ≤ 0.015° / F ≤ 0.025° at -584 — drift gate passed. The A/B button flips the ' +
+     'dispatcher flag. Derivation record: docs/66 §1.');
 
-  addTestButton('Path C Stage 3: toggle framework-native Moon arguments (A/B)', () => {
+  addTestButton('Framework Moon: toggle framework-native arguments (A/B)', () => {
     MOON_ARGS_FRAMEWORK_NATIVE = !MOON_ARGS_FRAMEWORK_NATIVE;
     console.log('\n══════════════════════════════════════════════════════════════════════');
     console.log(`  MOON_ARGS_FRAMEWORK_NATIVE = ${MOON_ARGS_FRAMEWORK_NATIVE
-      ? 'ON  — _eclMoon* dispatchers use _fwMoonArgs (framework-native skeleton; SHIPPED DEFAULT since item 6)'
+      ? 'ON  — _eclMoon* dispatchers use _fwMoonArgs (framework-native skeleton; SHIPPED DEFAULT)'
       : 'OFF — _eclMoon* dispatchers use Meeus Ch. 47 argument polynomials (A/B reference mode)'}`);
     console.log('  Affects: eclipse finders (L-1/L-2/L-4), canon comparisons, audits — everything');
     console.log('  routed through _eclMoonLon/Beta/Distance. The Meeus periodic perturbation');
     console.log('  series is identical in both modes; only the argument skeleton switches.');
     console.log('  Use OFF for A/B reference runs against pure Meeus');
-    console.log('  (IP-framework-native-moon.md; certified baselines are flag-ON since item 6).');
+    console.log('  (certified baselines are flag-ON; doc 66 §1 has the derivation record).');
     console.log('══════════════════════════════════════════════════════════════════════');
-  }, 'Path C A/B switch: flips MOON_ARGS_FRAMEWORK_NATIVE at runtime (default ON since the ' +
-     'item-6 re-baseline release). ON = framework-native argument skeleton (_fwMoonArgs) under ' +
-     'the unchanged Meeus periodic series — the shipped default; OFF = pure Meeus reference ' +
-     'for A/B comparison runs. See docs/hidden/IP-framework-native-moon.md.');
+  }, 'A/B switch: flips MOON_ARGS_FRAMEWORK_NATIVE at runtime. ON = framework-native ' +
+     'argument skeleton (_fwMoonArgs) under the unchanged Meeus periodic series — the ' +
+     'shipped default; OFF = pure Meeus reference for A/B comparison runs. ' +
+     'Derivation record: docs/66 §1.');
 
-  addTestButton('Path C Stage 4b: J2000 lunar element anchoring meter', () => {
+  addTestButton('Framework Moon: J2000 element anchoring meter', () => {
     // Navigates the scene to J2000, reads the hierarchy's geometric lunar elements
     // (updateMoonOrbitalElements — the raw scene geometry, NOT the Meeus override),
     // compares to the Meeus J2000 element targets, and restores the scene. Drives
-    // the startPos re-anchoring after the Stage-4b composition fix — the Step-5c
+    // the startPos re-anchoring after the composition fix — the Step-5c
     // eclipse optimizer cannot do this (its metric is override-framed; startPos
-    // gradient is flat there). See IP-framework-native-moon.md §Stage 4b.
+    // gradient is flat there). See docs/66 §4 (startPos provenance).
     const savedJD = o.julianDay;
     jumpToJulianDay(j2000JD);   // 2000 Jan 1.5 (element epoch; the ~64 s UT/TT offset moves the node <0.0001° — negligible)
     forceSceneUpdate();
@@ -31928,7 +31938,7 @@ function setupGUI() {
     const Lmean = ((peri + o.moonMeanAnomaly) % 360 + 360) % 360;   // mean longitude = ϖ + M
     const wrap180 = (d) => { let x = ((d % 360) + 360) % 360; return x > 180 ? x - 360 : x; };
     console.log('\n══════════════════════════════════════════════════════════════════════');
-    console.log('  Path C Stage 4b — scene lunar elements at J2000 vs Meeus targets');
+    console.log('  Framework Moon — scene lunar elements at J2000 vs Meeus targets');
     console.log('══════════════════════════════════════════════════════════════════════');
     console.log(`  Ascending node Ω:       scene ${node.toFixed(4)}°   target 125.0446°   Δ ${wrap180(node - 125.0446).toFixed(4)}°`);
     console.log(`  Longitude of perigee ϖ: scene ${peri.toFixed(4)}°   target  83.3532°   Δ ${wrap180(peri - 83.3532).toFixed(4)}°`);
@@ -31942,22 +31952,22 @@ function setupGUI() {
     const node10 = o.moonAscendingNode;
     const rate = wrap180(node10 - node) / 2;    // deg/yr
     console.log(`  Node regression rate:   measured ${rate.toFixed(4)}°/yr   target −19.3411°/yr (of-date 18.6132-yr cycle)`);
-    console.log('  Anchors + rate at target ⇒ Stage 4b geometry verified. L row reads the');
+    console.log('  Anchors + rate at target ⇒ scene geometry verified. L row reads the');
     console.log('  Meeus-OVERRIDDEN Moon (documented limitation; moonStartposMoon deferred).');
     console.log('══════════════════════════════════════════════════════════════════════');
     jumpToJulianDay(savedJD);
     forceSceneUpdate();
-  }, 'Path C Stage 4b re-anchoring meter: jumps the scene to J2000, prints the hierarchy\'s ' +
+  }, 'J2000 re-anchoring meter: jumps the scene to J2000, prints the hierarchy\'s ' +
      'geometric node/perigee/mean-longitude vs the Meeus element targets (Ω 125.0446 / ϖ 83.3532 / ' +
      'L 218.3164), then restores the date. Run after the composition fix; the printed Δs drive ' +
-     'the startPos re-anchoring. See docs/hidden/IP-framework-native-moon.md §Stage 4b.');
+     'the startPos re-anchoring. See docs/66 §4 (startPos provenance).');
 
-  addTestButton('Path C: raw hierarchy Moon vs Meeus override (unmask meter)', () => {
+  addTestButton('Framework Moon: raw hierarchy vs Meeus override (unmask meter)', () => {
     // Raw = hierarchy + moveModel perturbations, PRE-override: the Meeus
     // override rewrites only moon.pivotObj.position, never moon.orbitObj's
     // rotation — so the raw Moon is recovered by transforming the pivot's
     // built local offset (moon.a, 0, 0) through moon.orbitObj.matrixWorld.
-    // Two outputs (IP-framework-native-moon.md §Remaining work items 3+4):
+    // Two outputs:
     //  • mean Δlon at J2000 → the moonStartposMoon in-plane anchor error
     //  • post-mean RMS over a month → what the override genuinely contributes
     //    (the periodic-terms floor — the "unmask the Moon" assessment number)
@@ -31981,7 +31991,7 @@ function setupGUI() {
     const mLon = mean('dLon'), mLat = mean('dLat');
     const rms  = (k, m) => Math.sqrt(rows.reduce((s, r) => s + (r[k] - m) ** 2, 0) / rows.length);
     console.log('\n══════════════════════════════════════════════════════════════════════');
-    console.log('  Path C unmask meter — raw hierarchy Moon vs Meeus override');
+    console.log('  Framework Moon unmask meter — raw hierarchy vs Meeus override');
     console.log('  (J2000 + 30 daily samples; Δ = raw − overridden, degrees)');
     console.log('══════════════════════════════════════════════════════════════════════');
     for (const r of rows.filter((_, i) => i % 5 === 0)) {
@@ -31996,11 +32006,11 @@ function setupGUI() {
     console.log('══════════════════════════════════════════════════════════════════════');
     jumpToJulianDay(savedJD);
     forceSceneUpdate();
-  }, 'Path C "unmask the Moon" meter: recovers the RAW hierarchy Moon (pre-override, via ' +
+  }, '"Unmask the Moon" meter: recovers the RAW hierarchy Moon (pre-override, via ' +
      'moon.orbitObj matrices — the override only rewrites pivot positions) and compares it to ' +
      'the Meeus-overridden Moon over J2000+30 days. Mean Δlon anchors moonStartposMoon (item 3); ' +
      'post-mean RMS is the periodic-terms floor for the override-narrowing assessment (item 4). ' +
-     'See docs/hidden/IP-framework-native-moon.md §Remaining work.');
+     'See docs/66 §1 (framework-native form) and TODO (override-narrowing).');
 
 
   // ────────────────────────────────────────────────────────────────────────
@@ -32015,6 +32025,64 @@ function setupGUI() {
   // documented JD = our model has the conjunction near that date (any
   // miss is ΔT). Large Δλ = Moon timing is off.
   // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Framework Moon: D/M substitution probe (framework Sun)', () => {
+    // Re-tests the earlier "~1 km" dead-end finding under the shipped skeleton:
+    // rebuild the Moon's Sun-dependent arguments D = Lp − L_sun and M = Sun
+    // mean anomaly from the FRAMEWORK Sun, feed them through the production
+    // Ch. 47 series via the probe hook, and measure the Moon position shift.
+    const wrap180 = (x) => ((x % 360) + 540) % 360 - 180;
+    const wrap360 = (x) => ((x % 360) + 360) % 360;
+    const epochs = [
+      { jd: 2451545.0,      label: 'J2000.0 (anchor check — expect ~0)' },
+      { jd: 1671853.759762, label: '-135 Apr 15 Babylonian' },
+      { jd: 1608421.835171, label: '-309 Aug 15 Agathocles' },
+      { jd: 1518118.032841, label: '-556 May 19 Nabonidus' },
+    ];
+    console.log('══════════════════════════════════════════════════════════════════════');
+    console.log('  D/M substitution probe — Meeus-Moon with framework-Sun arguments');
+    console.log('  Variants: TT-eval (series convention) and UT-eval (scene-Sun convention)');
+    console.log('══════════════════════════════════════════════════════════════════════');
+    try {
+      for (const e of epochs) {
+        const jd_ut = e.jd;
+        const jd_tt = jd_ut + _eclDeltaT(jd_ut) / 86400;
+        const base = {
+          lon: _eclMoonLon(jd_ut), beta: _eclMoonBeta(jd_ut), dist: _eclMoonDistance(jd_ut),
+        };
+        const stock = _moonArgsAt(jd_tt);
+        console.log(`\n  ${e.label}   (JD_UT ${jd_ut.toFixed(4)}, ΔT ${(_eclDeltaT(jd_ut)).toFixed(0)} s)`);
+        console.log(`    Stock args:  D ${stock.D.toFixed(4)}°  M ${stock.M.toFixed(4)}°`);
+        console.log(`    Stock Moon:  lon ${base.lon.toFixed(4)}°  β ${base.beta.toFixed(4)}°  d ${base.dist.toFixed(0)} km`);
+        for (const v of [{ tag: 'TT-eval', jdSun: jd_tt }, { tag: 'UT-eval', jdSun: jd_ut }]) {
+          const s = _fwSunMeanElements(v.jdSun);
+          const probeArgs = { ...stock, D: wrap360(stock.Lp - s.L_deg), M: wrap360(s.M_deg) };
+          _moonArgsProbeOverride = () => probeArgs;
+          const lon = _eclMoonLon(jd_ut), beta = _eclMoonBeta(jd_ut), dist = _eclMoonDistance(jd_ut);
+          _moonArgsProbeOverride = null;
+          const dLon = wrap180(lon - base.lon), dBeta = beta - base.beta;
+          const kmLon  = base.dist * Math.sin(Math.abs(dLon)  * Math.PI / 180);
+          const kmBeta = base.dist * Math.sin(Math.abs(dBeta) * Math.PI / 180);
+          console.log(`    ${v.tag.padEnd(8)} ΔD ${wrap180(probeArgs.D - stock.D).toFixed(4).padStart(8)}°` +
+                      `  ΔM ${wrap180(probeArgs.M - stock.M).toFixed(4).padStart(8)}°` +
+                      `  → Δlon ${dLon.toFixed(4)}° (${kmLon.toFixed(0)} km)` +
+                      `  Δβ ${dBeta.toFixed(4)}° (${kmBeta.toFixed(0)} km)  Δd ${(dist - base.dist).toFixed(1)} km`);
+        }
+      }
+    } finally {
+      _moonArgsProbeOverride = null;
+    }
+    console.log('\n  Interpretation:');
+    console.log('   • J2000 row ≈ 0 by construction (framework mean elements are Meeus-anchored).');
+    console.log('   • Ancient Δlon/Δβ ≲ 0.01° (≲ 60 km) → confirms the earlier ~1 km dead end:');
+    console.log('     argument-level substitution cannot move the umbra materially.');
+    console.log('   • Ancient Δlon ≫ 0.01° → argument-level channel is real; reopen TODO item');
+    console.log('     at level (b), perturbation-series consistency.');
+    console.log('══════════════════════════════════════════════════════════════════════');
+  }, 'Rebuilds Meeus-Moon Sun-dependent arguments (D = Lp − L_sun, M = Sun mean anomaly) from the ' +
+     'framework Sun and feeds them through the production Ch. 47 series via a probe hook. ' +
+     'TT/UT variants; J2000 anchor row; km-equivalents. Re-tests the earlier ~1 km finding ' +
+     'under the shipped framework-native skeleton (TODO: Meeus-Moon internal Sun assumptions).');
+
   const firstPerEventEclipseBtn = addTestButton('Moon timing vs ΔT bias (historical eclipses)', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Moon-Sun separation at documented historical eclipse dates');
@@ -32246,7 +32314,7 @@ function setupGUI() {
     console.log('       "Visibility window", the scene-state validations, and the audits — the SS-dist');
     console.log('       column here is anchored at noon UT and overstates for large conj-doc offsets).');
     console.log(' • If MANY events are "Moon timing off" (Δλ > 30°, conj-doc days away):');
-    console.log('     → Our Moon polynomial drifts at these epochs — a Path C (framework-native Moon) lead.');
+    console.log('     → Moon argument drift at these epochs (bounded by the framework-native arguments — re-run the drift meter).');
     console.log(' • Mixed pattern → both Moon timing AND geographic placement contribute.');
     console.log(' • Joint world: the calibrated ΔT (4 flags + Core-mantle swing) has shipped, so');
     console.log('   placement residuals here are what remains AFTER that calibration.');
@@ -32578,7 +32646,7 @@ function setupGUI() {
     // This is the Meeus-Moon half of the A/B pair with the SCENE-STATE variant
     // below (which ray-traces the umbra from the scene-graph): the per-event
     // difference between the two = Meeus-Moon vs scene-Moon rendering gap —
-    // the Path C (framework-native Moon) per-event meter.
+    // the framework-native-Moon per-event meter.
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  Historic Eclipse Validation — Meeus-method umbra vs documented observations');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
@@ -32770,8 +32838,8 @@ function setupGUI() {
     console.log('   hour-geometry artifact here that the scene ray-trace does not have.');
     console.log(' • NOTE (today): the scene MOON is itself Meeus-driven (case-study §B: agree to 0.01°),');
     console.log('   so pair differences = umbra construction + Sun-frame/GMST conventions, NOT Moon');
-    console.log('   physics. Once Path C ships a framework-native Moon, this pair becomes the');
-    console.log('   before/after meter; until then the Path C baseline is Meeus-vs-Integrator (M\'/F).');
+    console.log('   physics. The framework-native argument skeleton now feeds both (certified within');
+    console.log('   ±2 events of pure Meeus); the full before/after meter arrives with override-narrowing.');
     console.log(' • Sources: Stephenson 1997 "Historical Eclipses and Earth\'s Rotation",');
     console.log('   Steele 2000, primary ancient texts (Herodotus, Thucydides, Babylonian diaries).');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
@@ -32779,8 +32847,8 @@ function setupGUI() {
      'historic solar eclipses; reports the great-circle gap to the documented site. Umbra LON ' +
      'is sub-solar-tied (hour-geometry artifact at off-noon events) — the scene-state variant ' +
      'ray-traces the true piercing point and is authoritative. Since the scene Moon is currently ' +
-     'Meeus-driven, pair differences are construction/frame, not Moon physics; the pair becomes ' +
-     'the Path C before/after meter once a framework-native Moon ships.');
+     'Meeus-driven, pair differences are construction/frame, not Moon physics; the full ' +
+     'before/after meter arrives once the Meeus override is narrowed to a differential correction.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Historic Eclipse Validation — SCENE STATE variant
@@ -32932,8 +33000,8 @@ function setupGUI() {
     console.log('       (e.g. 1133: at conjunction 12:03 UT the path had moved past England onto the');
     console.log('       continent — the scene shows that correctly).');
     console.log('     – The scene Moon is currently Meeus-driven, so pair differences are construction');
-    console.log('       + Sun-frame/GMST conventions, NOT Moon physics. After Path C ships a framework-');
-    console.log('       native Moon, this pair becomes the before/after meter.');
+    console.log('       + Sun-frame/GMST conventions, NOT Moon physics. The full before/after meter');
+    console.log('       arrives once the Meeus override is narrowed to a differential correction.');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
   }, 'Same 14-event curated historic-eclipse list as the Meeus-based Historic Eclipse ' +
      'Validation button, but each conjunction\'s geographic position is read from the ' +
@@ -58606,7 +58674,7 @@ function updateMoonOrbitalElements() {
   o.moonEccentricAnomaly = OrbitalFormulas.eccentricAnomaly(o.moonMeanAnomaly, moonOrbitalEccentricityBase);
 
   // Ascending Node (Ω) — geometric extraction from orbit plane normal.
-  // Path C Stage 4b: the 5.14° inclination tilt lives on the MOON's containerObj
+  // The 5.14° inclination tilt lives on the MOON's containerObj
   // (below the nodal layer's spin), so moon.containerObj.matrixWorld carries the
   // actual orbit-plane orientation: earth Y-rot + apsidal + canceller + nodal
   // regression + the static tilt.

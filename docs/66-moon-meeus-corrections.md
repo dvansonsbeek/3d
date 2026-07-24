@@ -27,7 +27,7 @@ gravitational perturbation effects directly visible.
 
 Applied in `moveModel()` when `useVariableSpeed && obj.lunarPerturbations`.
 
-### Fundamental Arguments (polynomial in T = centuries from J2000)
+### Fundamental Arguments — Meeus reference form (polynomial in T = centuries from J2000)
 
 ```
 d  = (startmodelJD - 2451545.0) + pos * meanSolarYearDays
@@ -39,6 +39,69 @@ M' = 134.9634 + 477198.8675*T + ...  (Moon mean anomaly)
 F  = 93.2721  + 483202.0175*T + ...  (argument of latitude)
 E  = 1 - 0.002516*T                  (Earth eccentricity correction)
 ```
+
+### Fundamental Arguments — framework-native form (shipped default)
+
+The polynomials above are the A/B reference. The shipped default
+(`MOON_ARGS_FRAMEWORK_NATIVE = true`, declared in the toggle block at the top
+of script.js) computes the same five arguments framework-natively in
+`_fwMoonArgs()`, dispatched through `_moonArgsAt()`. Every Meeus quantity it
+replaces is either derived from framework primitives or anchored to a single
+classical constant:
+
+- **Linear rates — the frame convention.** Meeus's argument rates differ from
+  the framework's ICRF chain rates by exactly ± general precession. The
+  framework's own p = 360·13/H = 50.24″/yr closes the ±1.4°/century M′/F
+  drift with zero new constants — the drift was frame bookkeeping, not
+  missing physics. Meter: "Meeus vs Integrator (lunar argument drift)".
+- **Element T² — derived from the solar-eccentricity channel.** The Sun's
+  mean perturbation on the lunar node and perigee scales as (1 − e_E²)^(−3/2).
+  With e₀ = 0.016708634 and ė₀ = −4.2037e-5/cy (framework-anchored), the
+  channel predicts the node's Meeus T² coefficient at sensitivity
+  s_Ω = 1.018 ≈ 1 — a DERIVED match (Meeus +7.47″/cy² vs predicted +7.34).
+  The perigee needs one anchored Clairaut-type sensitivity s_ϖ = 2.407 (the
+  classical ≈ 2 rate amplification of apsidal motion), constant across orders.
+- **Element T³ — derived, zero new constants.** The eccentricity composite's
+  curvature ë₀ = −2.651e-7/cy² propagated through the same channel reproduces
+  Meeus's T³ terms (gate vs Meeus: ϖ 1.044, Ω 1.205).
+- **The sign paradox dissolved.** Brown's m²-scaling predicts apsidal
+  precession ACCELERATING while Meeus's M′ T² says decelerating — the old
+  "wrong sign" mystery. Resolution: the Lunar Precession Invariant governs
+  the MEAN rate (tidal, slowly accelerating) while the eccentricity channel
+  is a bounded zero-mean oscillation around it (currently in its decelerating
+  phase because ė < 0). Both are true at once; the Meeus polynomial entangles
+  them in single coefficients.
+- **Still Meeus:** the D and M polynomials (they enter only periodic terms;
+  measured impact of substituting framework-Sun-derived values: ≤ 0.013° /
+  83 km at −556). Adopting framework-native D/M is the tracked follow-up
+  (TODO) — it completes the bounded skeleton and restores the
+  D ≡ L′ − L_sun identity at deep time.
+
+Certification of the framework-native default: argument drift M′ ≤ 0.015° at
+−584 (legacy comparison: +1.4°/century); NASA-canon recall 99.69% /
+tight-window 75.42% / type 98.97% — every counter within ±2 events of the
+pure-Meeus reference; 26-event historical audit verdicts identical. At deep
+time the same channel modulates the anchored precession chains as
+rate(t) = invariant mean × [g(t)/g₀]^s (the factored law, doc 99) — bounded
+±2% over ±2 Myr where the Meeus parabola is unbounded.
+
+**How ė is pinned (the (ė, s) degeneracy).** Only the product s·ė enters each
+element's T², but node and perigee share one ė, and fast-converging node
+theory pins s_Ω ≈ 1 — so the node MEASURES ė (observed −4.204e-5/cy →
+s_Ω = 1.018 ✓), and the perigee ratio then yields s_ϖ with no freedom. The
+alternative — the H/16-law ė at its current phase (−0.84e-5/cy) — would force
+s_Ω = 5.1, excluded by theory. Falsification path: s_ϖ = 2.407 should be
+derivable from the Hill–Brown e′² series; a first-principles derivation
+matching 2.407 would close the last anchored constant.
+
+**Eccentricity-composite taxonomy note.** The deep-time e_E composite behind
+ë₀ and the factored law is equality-constrained: e(0) and ė(0) are
+hard-anchored exactly and the shape is ridge-fitted (R² 0.985; the constant
+matches the Laskar mean; the 405-kyr g₂−g₅ line is labeled OFF-lattice per
+the climate taxonomy). It is an anchored-magnitude + structural-period
+construction — NOT a zero-fit claim; 21 coefficients. Free least-squares
+blows up on the unresolvable ~100-kyr multiplet and un-anchored ridge gets
+the local ė wrong — both rejected forms.
 
 ### 1.1 Longitude Series (Table 47.A, 60 terms + 3 additional)
 
@@ -80,7 +143,7 @@ version of this doc attributed this to "a draconitic month of ~30.9 days"; the
 measured effective value was the sidereal month, 27.32 d — same root cause,
 different number.)
 
-As of Path C Stage 4b the geometry is correct natively: the tilt lives on the
+In the current scene composition the geometry is correct natively: the tilt lives on the
 moon container (below the nodal layer's spin), the nodal layer regresses the
 plane at the of-date 18.6132-yr period, the moon layer runs on the draconitic
 (nodal-month) clock 27.2122209 d, and the layer sum equals the tropical month
@@ -193,7 +256,7 @@ used for the latitude correction (computed from `T = d/36525`).
 
 ## 4. StartPos Values
 
-Provenance (Path C Stage 4b): **J2000-element anchored** — the scene's node
+Provenance: **J2000-element anchored** — the scene's node
 and perigee longitudes are set to the Meeus J2000 elements (Ω = 125.0446°,
 ϖ = 83.3532°) to Δ = 0.0000° via the in-sim anchoring meter, replacing the
 earlier eclipse-optimizer compromise values (which were tuned under the
@@ -305,9 +368,10 @@ planetary (non-tidal) secular term (≈ +7.2 arcsec/cy²), netting ≈ −5.7
 arcsec/cy² — which is Meeus's coefficient. The Farhat chain and the Meeus
 polynomial therefore agree through the *tidal component* of Meeus's T², with
 the planetary term on top. The entanglement of the two in a single T²
-coefficient is exactly the polynomial-physics gap the framework-native Moon
-(Path C) would resolve by carrying tidal and planetary parts in separate
-framework channels.
+coefficient is exactly what the framework-native fundamental arguments
+resolve: the Lunar Precession Invariant carries the tidal MEAN rate, and the
+bounded solar-eccentricity channel carries the oscillatory part (see §1,
+framework-native form).
 
 **Implication.** No refit of Meeus rates is needed for modern-era Moon position;
 the two formulations are equivalent in their overlap domain (~modern era ±10
@@ -392,12 +456,12 @@ differences ≤ 0.12° against the same references.
 ([`docs/hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md))
 remains available as a general deep-time precision option, but the -135
 test shows all modern lunar theories agree at the audited epochs, so it is
-not blocking and fixes no audited event. The identified forward direction
-for Moon physics is the framework-native Moon (**Path C**): the Meeus
-fundamental-argument polynomials (M′, F) carry T² terms whose physics the
-framework would express through its own tidal-evolution channels; the
-"Meeus vs Integrator (lunar argument drift — Path C baseline)" test button
-measures the current gap (≈ +1.4°/century in M′/F argument drift).
+not blocking and fixes no audited event. The framework-native fundamental
+arguments are the shipped default (§1): the Meeus M′/F T²⁺ polynomial physics
+is expressed through the framework's own channels, and the "Meeus vs
+Integrator (lunar argument drift)" test button confirms closure (M′ ≤ 0.015°
+at −584, versus the ≈ +1.4°/century drift of the raw ICRF-rate comparison).
+The remaining argument-level item is framework-native D/M (tracked in TODO).
 
 **Layer 2: Delta-T (Earth rotation) uncertainty**
 

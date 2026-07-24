@@ -240,13 +240,22 @@ earth.pivotObj
 └── moonApsidalPrecession.containerObj              ← ~8.85 year apsidal advance (carries perigee offset)
     └── moonApsidalNodalPrecession1.containerObj    ← ~5.997 yr beat (pair, geometrically inert)
         └── moonApsidalNodalPrecession2.containerObj    ← ~5.997 yr (reverse of pair)
-            └── moonLunarLevelingCyclePrecession.containerObj    ← apsidal canceller (−8.85 yr; Stage 4b role)
+            └── moonLunarLevelingCyclePrecession.containerObj    ← apsidal canceller (−8.85 yr; mirrors the apsidal layer)
                 └── moonNodalPrecession.containerObj    ← ~18.613 yr nodal regression (of-date) — rotates the tilted plane below
-                    └── moon.containerObj    ← carries the 5.14° inclination tilt (Stage 4b)
+                    └── moon.containerObj    ← carries the 5.14° inclination tilt (below the nodal spin)
                         └── moon.orbitObj    ← draconitic (nodal-month) clock, 27.2122 d
 ```
 
-### 7.1 Moon Precession Cycles (Path C Stage 4b composition)
+**Tilt/spin composition rule.** `createPlanet` applies orbit tilts STATICALLY
+on `containerObj`; the animated Y-spin runs inside it. A layer's own spin can
+therefore never rotate its own tilt — an orbit PLANE follows only its PARENT
+rotations. Any layer that must visibly rotate a tilted plane needs the tilt
+placed on a CHILD container (this is why the Moon's 5.14° inclination lives
+on the moon container below the nodal spin; with the tilt on the nodal layer
+itself, the plane silently followed the parent sum — prograde — masked by the
+RA/Dec override).
+
+### 7.1 Moon Precession Cycles (framework-native composition)
 
 | Layer | Period | Physical Meaning |
 |-------|--------|------------------|

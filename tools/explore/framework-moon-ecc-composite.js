@@ -30,7 +30,7 @@
 // Result: ϖ ratio 1.041 (4%), Ω ratio 1.202 (20%) — PASS. Consumed by
 // _FW_MOON.EDDOT0 in src/script.js.
 //
-// Run: node tools/explore/path-c-ecc-composite.js
+// Run: node tools/explore/framework-moon-ecc-composite.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 const fs = require('fs');

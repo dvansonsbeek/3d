@@ -294,8 +294,8 @@ umbral magnitude within ~0.02 of 1.0, or Penumbral↔Partial within
 ~0.03 of 0). Tight (15 min) UT recall 75.42% — structured by the
 model ↔ NASA ΔT divergence, captured quantitatively by the per-century
 diagnostic. Certified under the framework-native lunar argument
-skeleton (`MOON_ARGS_FRAMEWORK_NATIVE` default ON — the Path C
-re-baseline): statistically indistinguishable from the pure-Meeus
+skeleton (`MOON_ARGS_FRAMEWORK_NATIVE` default ON — the
+framework-native re-baseline): statistically indistinguishable from the pure-Meeus
 skeleton (every counter within ±2 events) while bounded at deep time.
 
 ### L-5 — NASA "Historical Interest" cross-check (28 famous events)

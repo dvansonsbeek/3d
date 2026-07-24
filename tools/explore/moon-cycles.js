@@ -122,7 +122,7 @@ const precComparisons = [
     knownDays: null,
   },
   {
-    name: 'Lunar leveling cycle',
+    name: 'Lunar leveling cycle (derived beat — not a scene layer)',
     modelDays: C.moonLunarLevelingCycleDays,
     knownYears: null,
     knownDays: null,

@@ -103,7 +103,7 @@ for (const d of baseline.details) {
 }
 
 // --- OPTIMIZE ---
-console.log('\n═══ OPTIMIZING startPos against eclipses ═══\n');
+console.log('\n═══ startPos scan (DIAGNOSTIC ONLY — values not adopted) ═══\n');
 
 const origNodal = C.moonStartposNodal;
 const origApsidal = C.moonStartposApsidal;
@@ -152,9 +152,12 @@ for (let iter = 0; iter < 4; iter++) {
 setParams(bestNodal, bestApsidal, bestMoon);
 const final = computeEclipseRMS(ECLIPSES);
 console.log(`\n═══ OPTIMIZED RESULTS ═══\n`);
-console.log(`moonStartposNodal  = ${bestNodal.toFixed(3)}  (was ${origNodal})`);
-console.log(`moonStartposApsidal = ${bestApsidal.toFixed(3)}  (was ${origApsidal})`);
-console.log(`moonStartposMoon   = ${bestMoon.toFixed(3)}  (was ${origMoon})`);
+console.log(`moonStartposNodal  = ${bestNodal.toFixed(3)}  (anchored production value: ${origNodal})`);
+console.log(`moonStartposApsidal = ${bestApsidal.toFixed(3)}  (anchored production value: ${origApsidal})`);
+console.log(`moonStartposMoon   = ${bestMoon.toFixed(3)}  (anchored production value: ${origMoon})`);
+console.log('\nNOTE: startPos is J2000-element anchored (docs/66 §4); this metric is');
+console.log('override-framed with a flat startPos gradient, so scan optima are noise —');
+console.log('NOT adopted, NOT written.');
 console.log(`RMS separation: ${final.rms.toFixed(4)}° (was ${baseline.rms.toFixed(4)}°)`);
 
 console.log(`\n${'Eclipse'.padEnd(25)} Sep°    dRA°    dDec°`);
@@ -169,8 +172,9 @@ const fs = require('fs');
 const path = require('path');
 const { baseline: computeJPLBaseline } = require('../lib/optimizer');
 
-// Apply the optimized startpos for the Lp measurement
-setParams(bestNodal, bestApsidal, bestMoon);
+// Lp/MOON_CORRECTION are measured at the J2000-anchored startpos (the
+// production geometry), not the scan output.
+setParams(origNodal, origApsidal, origMoon);
 
 // Save current Lp correction, then zero it out to measure raw bias
 const origLpCorr = C.moonMeeusLpCorrection;
@@ -267,9 +271,6 @@ console.log(`\nMoon RMS after 3-term correction: ${finalBaseline.rmsTotal.toFixe
 if (process.argv.includes('--write')) {
   const mpPath = path.resolve(__dirname, '..', '..', 'public', 'input', 'model-parameters.json');
   const mp = JSON.parse(fs.readFileSync(mpPath, 'utf8'));
-  mp.moon.moonStartposNodal = bestNodal;
-  mp.moon.moonStartposApsidal = bestApsidal;
-  mp.moon.moonStartposMoon = bestMoon;
   mp.moon.moonMeeusLpCorrection = Math.round(bestLpCorrection * 1000000) / 1000000;
   fs.writeFileSync(mpPath, JSON.stringify(mp, null, 2) + '\n');
 
@@ -278,7 +279,7 @@ if (process.argv.includes('--write')) {
   fc.MOON_CORRECTION = bestMoonCorrection;
   fs.writeFileSync(fcPath, JSON.stringify(fc, null, 2) + '\n');
 
-  console.log('\n✓ Written to model-parameters.json (startpos + Lp) and fitted-coefficients.json (MOON_CORRECTION)');
+  console.log('\n✓ Written to model-parameters.json (Lp) and fitted-coefficients.json (MOON_CORRECTION) — startpos untouched (J2000-anchored)');
 } else {
   console.log('\n  (dry run — add --write to update JSON files)');
 }

@@ -12,7 +12,7 @@
 // 0b. Compare framework-generated T² coefficients (finite differences
 //     of the deep-time chain) against Meeus's empirical T² terms.
 //
-// Run: node tools/explore/path-c-stage0-arguments.js
+// Run: node tools/explore/framework-moon-argument-decomposition.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 const DT = require('../lib/deep-time');
