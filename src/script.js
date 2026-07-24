@@ -55,6 +55,7 @@ let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 24
 let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
 let   JOSE4_DT_CORRECTION_ENABLED = true;  // Jose4 8H/3749 ≈ 715.5 yr ΔT correction (4×Jose period, structural gcd=23) — cross-archive coherent in Steinhilber Φ + EPICA CO2; rationale + associated constants ~L5209
 let   RESONATOR_DT_CORRECTION_ENABLED = true;  // Core-mantle swing (Resonator driver) — episode of the core eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q=1.8) + locked bond−hallstatt drive tone. DEFAULT ON since the JOINT-world flip (2026-07-23): fitted JOINTLY with the 4 flags (dt-corrections-fit.js --joint; anchors USNO 86400.0014 / deltaTStart 56.05 moved with the coefficients, Espenak RMS 12.60 s). doc 104 §6/§8; constants + rationale near the Jose4 block
+let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Path C framework-native lunar argument skeleton (_fwMoonArgs via _moonArgsAt) feeding the _eclMoon* dispatchers. DEFAULT ON since the item-6 re-baseline release (2026-07-24): frame-decomposed rates + e_E-channel T²/T³, all A/B gates passed (Stages 0-5, docs/hidden/IP-framework-native-moon.md). OFF = pure Meeus Ch. 47 argument polynomials (A/B reference; runtime toggle test button available)
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
 const earthtiltMean = 23.41353942374053;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
@@ -6088,9 +6089,10 @@ function _frameworkSunLon(jd_ut) {
 // Framework-native lunar fundamental arguments — Path C Stage 1
 //
 // docs/hidden/IP-framework-native-moon.md — implements the Stage-0 measured
-// recipe. Parallel to the Meeus Ch. 47 argument polynomials; NOT yet consumed
-// by the eclipse dispatchers (Stage 3 wires MOON_ARGS_FRAMEWORK_NATIVE).
-// A/B meter: the "Meeus vs Integrator" test button prints both sources.
+// recipe. Consumed by the _eclMoon* dispatchers via _moonArgsAt, SHIPPED
+// DEFAULT since the item-6 re-baseline (MOON_ARGS_FRAMEWORK_NATIVE, declared
+// in the toggle block at the top of the file; runtime A/B toggle button flips
+// back to pure Meeus). A/B meter: the "Meeus vs Integrator" button prints both.
 //
 // Construction (per Stage 0):
 //  • Linear rates are observational J2000 anchors, frame-decomposed as
@@ -6116,7 +6118,8 @@ function _frameworkSunLon(jd_ut) {
 //    Meeus T³/T⁴ for in-window carrier fidelity.
 // ═════════════════════════════════════════════════════════════════════════════
 
-let MOON_ARGS_FRAMEWORK_NATIVE = false;  // Stage-3 dispatcher switch (Meeus default until gates pass)
+// MOON_ARGS_FRAMEWORK_NATIVE is declared in the toggle block at the top of the
+// file (next to RESONATOR_DT_CORRECTION_ENABLED) — default ON since item 6.
 
 const _FW_MOON = (() => {
   // Meeus Ch. 47 J2000 anchors (phases + of-date rates: observational anchors)
@@ -6193,10 +6196,10 @@ function _moonArgsAt(jd_tt) {
 // The dispatcher pattern preserves a hook for future work: swapping in a
 // different Moon polynomial (e.g. VSOP87 Sun ↔ Meeus, or a higher-precision
 // lunar theory) would only require changing `_eclMoonLon/Beta/Distance` to
-// route to the alternative implementation. As of Path C Stage 3, the
-// FUNDAMENTAL ARGUMENTS feeding the series are source-switched via
-// _moonArgsAt (Meeus default; framework-native when
-// MOON_ARGS_FRAMEWORK_NATIVE is ON — A/B toggle test button).
+// route to the alternative implementation. As of Path C, the FUNDAMENTAL
+// ARGUMENTS feeding the series are source-switched via _moonArgsAt
+// (framework-native _fwMoonArgs is the SHIPPED DEFAULT since the item-6
+// re-baseline; pure-Meeus reference via the A/B toggle test button).
 //
 // EMPIRICAL FINDING (2026-07): tested ELP-2000/82B (both 3,402-term truncated
 // and 37,863-term full) and ELP/MPP02 (both DE-fit and LLR-fit variants) at
@@ -31897,19 +31900,18 @@ function setupGUI() {
     MOON_ARGS_FRAMEWORK_NATIVE = !MOON_ARGS_FRAMEWORK_NATIVE;
     console.log('\n══════════════════════════════════════════════════════════════════════');
     console.log(`  MOON_ARGS_FRAMEWORK_NATIVE = ${MOON_ARGS_FRAMEWORK_NATIVE
-      ? 'ON  — _eclMoon* dispatchers use _fwMoonArgs (framework-native secular skeleton)'
-      : 'OFF — _eclMoon* dispatchers use Meeus Ch. 47 argument polynomials (default)'}`);
+      ? 'ON  — _eclMoon* dispatchers use _fwMoonArgs (framework-native skeleton; SHIPPED DEFAULT since item 6)'
+      : 'OFF — _eclMoon* dispatchers use Meeus Ch. 47 argument polynomials (A/B reference mode)'}`);
     console.log('  Affects: eclipse finders (L-1/L-2/L-4), canon comparisons, audits — everything');
     console.log('  routed through _eclMoonLon/Beta/Distance. The Meeus periodic perturbation');
     console.log('  series is identical in both modes; only the argument skeleton switches.');
-    console.log('  Scene Moon (moveModel Meeus block) is unaffected until Stage 4.');
-    console.log('  A/B protocol (IP-framework-native-moon.md §Stage 2/3): run L-1 + L-3 with');
-    console.log('  flag ON (expect modern results unchanged), then L-4 + audit-26 ON vs OFF.');
+    console.log('  Use OFF for A/B reference runs against pure Meeus');
+    console.log('  (IP-framework-native-moon.md; certified baselines are flag-ON since item 6).');
     console.log('══════════════════════════════════════════════════════════════════════');
-  }, 'Path C Stage 3 A/B switch: flips MOON_ARGS_FRAMEWORK_NATIVE at runtime (default OFF). ' +
-     'ON routes the _eclMoon* dispatchers through the framework-native argument skeleton ' +
-     '(_fwMoonArgs) under the unchanged Meeus periodic series; OFF = pure Meeus. Scene Moon ' +
-     'unaffected (Stage 4). See docs/hidden/IP-framework-native-moon.md.');
+  }, 'Path C A/B switch: flips MOON_ARGS_FRAMEWORK_NATIVE at runtime (default ON since the ' +
+     'item-6 re-baseline release). ON = framework-native argument skeleton (_fwMoonArgs) under ' +
+     'the unchanged Meeus periodic series — the shipped default; OFF = pure Meeus reference ' +
+     'for A/B comparison runs. See docs/hidden/IP-framework-native-moon.md.');
 
   addTestButton('Path C Stage 4b: J2000 lunar element anchoring meter', () => {
     // Navigates the scene to J2000, reads the hierarchy's geometric lunar elements

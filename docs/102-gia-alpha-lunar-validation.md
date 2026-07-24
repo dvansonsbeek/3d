@@ -284,16 +284,19 @@ matched / type-mismatch / model-only / NASA-only. Two thresholds:
   the same opposition NASA found?
 - **Tight UT match (±15 min)**: do the two clocks agree on UT timing?
 
-**Result**: 12,065 model events vs 12,064 NASA events over 5,000
+**Result**: 12,062 model events vs 12,064 NASA events over 5,000
 years. Physical-event recall 99.69%; the unmatched edges are symmetric
-(38 model-only / 37 NASA-only) and consist entirely of grazing
+(36 model-only / 38 NASA-only) and consist entirely of grazing
 penumbrals at the outer eclipse threshold — threshold-convention
 scatter with no directional bias. Type accuracy on matched events
-98.99%; all 122 mismatches are boundary-straddlers (Total↔Partial with
+98.97%; all 124 mismatches are boundary-straddlers (Total↔Partial with
 umbral magnitude within ~0.02 of 1.0, or Penumbral↔Partial within
-~0.03 of 0). Tight (15 min) UT recall 75.4% — structured by the
+~0.03 of 0). Tight (15 min) UT recall 75.42% — structured by the
 model ↔ NASA ΔT divergence, captured quantitatively by the per-century
-diagnostic.
+diagnostic. Certified under the framework-native lunar argument
+skeleton (`MOON_ARGS_FRAMEWORK_NATIVE` default ON — the Path C
+re-baseline): statistically indistinguishable from the pure-Meeus
+skeleton (every counter within ±2 events) while bounded at deep time.
 
 ### L-5 — NASA "Historical Interest" cross-check (28 famous events)
 

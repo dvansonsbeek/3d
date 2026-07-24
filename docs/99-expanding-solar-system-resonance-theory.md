@@ -200,6 +200,31 @@ differ by exactly ∓13: `N_apsidalE = N_apsidalI − 13`,
 frame-specific constants; the constants quoted above are the of-date pair.
 (Earlier revisions labeled these anchors "ICRF"; corrected here.)
 
+**The factored deep-time law (Path C).** The invariant governs the MEAN
+rate; the solar-perturbation strength modulates around it with Earth's
+eccentricity:
+
+```
+rate(t) = [invariant mean from H(t)] × [g(t)/g₀]^s,   g = (1 − e_E²)^(−3/2)
+```
+
+with s_Ω = 1 (derived — reproduces Meeus's empirical node T² to 1.8% and
+T³ to 20% with no fitting) and s_ϖ = 2.407 (anchored, the Clairaut-amplified
+apsidal sensitivity; constant across the T²/T³ orders — an independent
+check). e_E(t) is the framework eccentricity composite: 8H-lattice lines
+plus the acknowledged off-lattice 405-kyr g₂−g₅ term (the climate work's
+L2 taxonomy), equality-constrained on the observed e and ė at J2000. The
+oscillation is bounded and zero-mean (perigee ±2%, node ±0.8% over
+±2 Myr), so the T × H product is preserved exactly as the law of the
+mean — while Meeus's empirical T² polynomial, correct locally, diverges
+without bound at deep time. Implemented in the deep-time chain
+(`meanLunarPerigeePrecessionAtAge` / `meanLunarNodePrecessionAtAge` carry
+the full factored law; the N-form functions carry the pure invariant
+mean). This dissolves the historical "Brown m² wrong sign" tension: the
+invariant answers the mean-trend question while the observed present-day
+perigee deceleration (Meeus's +T² on M′) is the oscillation phase of the
+e_E channel — two channels, both real, different clocks.
+
 ### Where it comes from
 
 Brown's leading m² lunar perturbation theory gives the apsidal (and analogously nodal) rate as proportional to m² × n_Moon, where m = n_Sun / n_Moon ≈ 1/13.37 is the ratio of solar to lunar mean motion:
