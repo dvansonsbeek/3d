@@ -57476,14 +57476,20 @@ function moveModel(pos) {
       }
       const _d2r = Math.PI / 180;
       const T = d / 36525;
-      const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+      const T2 = T * T;
 
-      // Fundamental arguments (Meeus Ch. 47, degrees → radians)
-      const Lp = (218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000) * _d2r;
-      const Dr = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
-      const Mr = ((357.5291092 + 35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
-      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
-      const Fr = ((93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+      // Fundamental arguments via the shared dispatcher (_moonArgsAt):
+      // framework-native skeleton by default, pure Meeus when
+      // MOON_ARGS_FRAMEWORK_NATIVE is OFF. The scene Moon and the eclipse
+      // machinery share ONE argument source (this block previously carried
+      // its own duplicate pure-Meeus polynomial copy, which extrapolated
+      // meaninglessly at deep time — args wrapped 50-140× at ±220 kyr).
+      const _args = _moonArgsAt(j2000JD + d);
+      const Lp  = _args.Lp * _d2r;
+      const Dr  = _args.D  * _d2r;
+      const Mr  = _args.M  * _d2r;
+      const Mpr = _args.Mp * _d2r;
+      const Fr  = _args.F  * _d2r;
 
       // E correction for Sun's eccentricity
       const E = 1 - 0.002516*T - 0.0000074*T2;
