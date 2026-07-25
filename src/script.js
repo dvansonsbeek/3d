@@ -102,7 +102,7 @@ const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3
 // debugOn moved to A5 Research toggles (near top)
 
 // ─── A3. Moon model parameters ───────────────────────────────────────────
-const moonStartposApsidal = 347.5544;                     // J2000-element anchored (ϖ = 83.3532° Meeus; mapping ∂ϖ/∂a = −1, measured)
+const moonStartposApsidal = 347.5479;                     // J2000-element anchored (ϖ = 83.3532° Meeus; ∂ϖ/∂a = −1; re-anchored after the of-date pair switch)
 const moonStartposNodal = 64.0436;                        // J2000-element anchored (Ω = 125.0446° Meeus; ∂Ω/∂n = −1; was the legacy compromise −83.630)
 const moonStartposMoon = 67.8443;                         // in-plane anchor via unmask meter (∂Δlon/∂m = −1; mean Δlon closed; was legacy 131.930)
 const moonMeeusLpCorrection = 0.010525;                   // Meeus Lp longitude correction (DE200→DE440 offset)
@@ -4894,6 +4894,7 @@ const OBLIQUITY_CYCLE_J2000 = {
 const MOON_APSIDAL_J2000_S = moonApsidalPrecessionindaysEarth * LOD_NOW_H13_S;  // ≈ 8.85 yr
 const MOON_NODAL_J2000_S   = moonNodalPrecessionindaysEarth   * LOD_NOW_H13_S;  // ≈ 18.60 yr
 const MOON_NODAL_OFDATE_J2000_S = moonNodalPrecessionindaysICRF * LOD_NOW_H13_S;  // 6798.3303 d — of-date node regression (scene rate)
+const MOON_APSIDAL_OFDATE_J2000_S = moonApsidalPrecessionindaysICRF * LOD_NOW_H13_S;  // ≈ 8.8475 yr — of-date perigee advance (scene rate; the deep-time invariant chain keeps the star-referenced MOON_APSIDAL_J2000_S)
 const MOON_NODAL_MONTH_J2000_S  = moonNodalMonth * LOD_NOW_H13_S;                 // 27.2122209 d — draconitic clock for the moon layer
 const MOON_SIDEREAL_MONTH_J2000_S = moonSiderealMonthInput * LOD_NOW_H13_S;
                                                                              // ≈ 2,360,591 s
@@ -6878,6 +6879,16 @@ function meanMoonNodalOfDateCyclesBetween(yearA, yearB) {
   return (drac === null || trop === null) ? null : drac - trop;
 }
 
+/** Of-date apsidal cycles between epochs — count identity
+ *  N_apsidal_of-date = N_tropical − N_anomalistic (the apsidal analogue of the
+ *  nodal composition above). Drives the scene apsidal/canceller pair, which
+ *  runs at the of-date rate so the ring's perigee tracks the Meeus perigee. */
+function meanMoonApsidalOfDateCyclesBetween(yearA, yearB) {
+  const trop = _moonChainCycles(meanTropicalMonthAtAge, yearA, yearB);
+  const anom = _moonChainCycles(meanAnomalisticMonthAtAge, yearA, yearB);
+  return (trop === null || anom === null) ? null : trop - anom;
+}
+
 // ═════════════════════════════════════════════════════════════════════════════
 // Framework Earth-eccentricity composite (deep-time e_E)
 //
@@ -7927,18 +7938,18 @@ function updateMoonForEpoch() {
  *  locked speeds remain authoritative for snapshot mode (deep-time OFF) and
  *  are bit-equivalent to the integrator at modern epochs by construction.
  *  Anchors used (framework-native composition):
- *    apsidal           — MOON_APSIDAL_J2000_S            (≈ 8.85 yr, advance)
+ *    apsidal           — MOON_APSIDAL_OFDATE_J2000_S     (≈ 8.8475 yr of-date, advance)
  *    apsidal-meets-nodal — meanApsidalMeetsNodalAtAge(0) (≈ 5.997 yr, inert pair)
- *    lunar leveling    — MOON_APSIDAL_J2000_S            (apsidal canceller, −)
+ *    lunar leveling    — MOON_APSIDAL_OFDATE_J2000_S     (apsidal canceller, −, of-date pair)
  *    nodal             — MOON_NODAL_OFDATE_J2000_S       (6798.33 d of-date, −)
  *  Signs (apsidal +, apsidal-meets-nodal ±, leveling −, nodal −); layer sum
  *  = tropical month by the exact integer identity N_drac = N_trop + N_nodI. */
 function updateMoonHarmonicsForEpoch() {
   const apsiMeetsNodalJ2000_S = meanApsidalMeetsNodalAtAge(0);
-  moonApsidalPrecession.speed            =  (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_J2000_S;
+  moonApsidalPrecession.speed            =  (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_OFDATE_J2000_S;
   moonApsidalNodalPrecession1.speed      = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / apsiMeetsNodalJ2000_S;
   moonApsidalNodalPrecession2.speed      =  (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / apsiMeetsNodalJ2000_S;
-  moonLunarLevelingCyclePrecession.speed = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_J2000_S;   // apsidal canceller
+  moonLunarLevelingCyclePrecession.speed = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_OFDATE_J2000_S;   // apsidal canceller (of-date pair)
   moonNodalPrecession.speed              = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_NODAL_OFDATE_J2000_S;  // of-date regression
 }
 
@@ -9206,7 +9217,7 @@ sun._dtPerihelionAnchor  = STARTMODEL_YEAR_SI;
 const moonApsidalPrecession = {
   name: "Moon Apsidal Precession",
   startPos: moonStartposApsidal,
-  speed: (Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonApsidalPrecessionindaysEarth,  // Phase 9.5b: cycles per SI year
+  speed: (Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonApsidalPrecessionindaysICRF,  // of-date perigee advance (+8.8475 yr) — the ring's perigee tracks the Meeus of-date perigee; pairs with the canceller (sum unchanged)
   tilt: 0,
   orbitRadius: -(moonDistance/currentAUDistance)*(moonOrbitalEccentricityBase*100),
   orbitCentera: 0,
@@ -9272,7 +9283,7 @@ const moonApsidalNodalPrecession2 = {
 const moonLunarLevelingCyclePrecession = {
   name: "Moon Lunar Leveling Cycle",
   startPos: -moonStartposApsidal,  // canceller pairs with the apsidal layer in phase AND rate
-  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonApsidalPrecessionindaysEarth,  // exact apsidal canceller (−0.709910 rad/yr) — with the inclination tilt on the MOON's container, the nodal layer's own spin regresses the plane
+  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonApsidalPrecessionindaysICRF,  // exact apsidal canceller (of-date pair, −0.71017 rad/yr) — with the inclination tilt on the MOON's container, the nodal layer's own spin regresses the plane
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -9355,7 +9366,7 @@ moon._dtMoonAnchor     = STARTMODEL_YEAR_SI;
 // Phase 9.13 (step 2): Moon precession-chain integrator tags. Signs mirror
 // the per-epoch speed mutations at updateMoonHarmonicsForEpoch (~line 5712):
 // apsidal +, apsidal-meets-nodal ±, lunar leveling −, nodal −.
-moonApsidalPrecession.            _dtMoonIntegrator = meanMoonApsidalCyclesBetween;
+moonApsidalPrecession.            _dtMoonIntegrator = meanMoonApsidalOfDateCyclesBetween;  // of-date (N_trop − N_anom)
 moonApsidalPrecession.            _dtMoonSign       = +1;
 moonApsidalPrecession.            _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
@@ -9367,7 +9378,7 @@ moonApsidalNodalPrecession2.      _dtMoonIntegrator = meanMoonApsidalMeetsNodalC
 moonApsidalNodalPrecession2.      _dtMoonSign       = +1;
 moonApsidalNodalPrecession2.      _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
-moonLunarLevelingCyclePrecession. _dtMoonIntegrator = meanMoonApsidalCyclesBetween;  // apsidal canceller (sign −)
+moonLunarLevelingCyclePrecession. _dtMoonIntegrator = meanMoonApsidalOfDateCyclesBetween;  // apsidal canceller (sign −, of-date pair)
 moonLunarLevelingCyclePrecession. _dtMoonSign       = -1;
 moonLunarLevelingCyclePrecession. _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
@@ -32047,6 +32058,103 @@ function setupGUI() {
      'the Meeus-overridden Moon over J2000+30 days. Mean Δlon anchors moonStartposMoon (item 3); ' +
      'post-mean RMS is the periodic-terms floor for the override-narrowing assessment (item 4). ' +
      'See docs/66 §1 (framework-native form) and TODO (override-narrowing).');
+
+  addTestButton('Framework Moon: scene orbit vs Meeus divergence (epochs)', () => {
+    // Where does the visible scene orbit depart from the Meeus Moon, and why?
+    // Raw hierarchy Moon (pre-override, via moon.orbitObj — the override only
+    // rewrites pivot positions) vs Meeus, sampled one anomalistic month per
+    // epoch. Perigee-phase and node-phase drifts localize period mismatches;
+    // mean/RMS Δdist localize eccentricity-term and missing-perturbation
+    // (evection/variation) content.
+    const savedJD = o.julianDay;
+    const wrap180 = (d) => { let x = ((d % 360) + 360) % 360; return x > 180 ? x - 360 : x; };
+    const ANOM_MONTH = 27.55455; // days, phase-conversion reference
+    const rawV = new THREE.Vector3(), ovrV = new THREE.Vector3(), eV = new THREE.Vector3();
+    const kmPerUnit = moonDistance / (moon.a ?? moon.orbitRadius);
+    const epochs = [2000, 1950, 1800, 1500, 1000, 500, 1, -584];
+    console.log('\n══════════════════════════════════════════════════════════════════════════════');
+    console.log('  Scene orbit vs Meeus divergence — per-epoch attribution');
+    console.log(`  Deep-time mode: ${typeof DEEP_TIME_MODE_ENABLED !== 'undefined' && DEEP_TIME_MODE_ENABLED ? 'ON (scene a(t) evolves; Meeus stays J2000!)' : 'OFF'}`);
+    console.log('  Epoch   meanΔlon°   perigeeΔ°   nodeΔ°   meanΔdist(km)   RMSΔdist(km)');
+    console.log('  ────────────────────────────────────────────────────────────────────');
+    const summary = [], summary2 = [], rows2 = [];
+    for (const yr of epochs) {
+      const jd0 = j2000JD + (yr - 2000) * 365.2422;
+      const S = [];
+      for (let i = 0; i <= 112; i++) {                      // 28 d at 0.25-d step
+        const jd = jd0 + i * 0.25;
+        jumpToJulianDay(jd); forceSceneUpdate('light');
+        earth.pivotObj.getWorldPosition(eV);
+        moon.orbitObj.updateWorldMatrix(true, false);
+        rawV.set(moon.a ?? moon.orbitRadius, 0, 0);
+        moon.orbitObj.localToWorld(rawV);
+        moon.pivotObj.getWorldPosition(ovrV);                // overridden Moon (what you SEE)
+        const dx = rawV.x - eV.x, dy = rawV.y - eV.y, dz = rawV.z - eV.z;
+        const ox = ovrV.x - eV.x, oy = ovrV.y - eV.y, oz = ovrV.z - eV.z;
+        S.push({ jd,
+          rl: Math.atan2(-dz, dx) * 180 / Math.PI,
+          rb: Math.atan2(dy, Math.hypot(dx, dz)) * 180 / Math.PI,
+          rd: Math.hypot(dx, dy, dz) * kmPerUnit,
+          ol: Math.atan2(-oz, ox) * 180 / Math.PI,
+          ob: Math.atan2(oy, Math.hypot(ox, oz)) * 180 / Math.PI,
+          od: Math.hypot(ox, oy, oz) * kmPerUnit,
+          ml: _eclMoonLon(jd), mb: _eclMoonBeta(jd), md: _eclMoonDistance(jd) });
+      }
+      const minAt = (key) => { let k = 1;                    // parabolic min refine
+        for (let i = 2; i < S.length - 1; i++) if (S[i][key] < S[k][key]) k = i;
+        const a = S[k-1][key], b = S[k][key], c = S[k+1][key];
+        return S[k].jd + 0.25 * 0.5 * (a - c) / (a - 2*b + c); };
+      const zeroUpAt = (key) => { for (let i = 1; i < S.length; i++)
+          if (S[i-1][key] < 0 && S[i][key] >= 0)
+            return S[i-1].jd + 0.25 * (-S[i-1][key]) / (S[i][key] - S[i-1][key]);
+        return null; };
+      const stats = (lk, bk, dk) => {
+        const mLon = S.reduce((s, r) => s + wrap180(r.rl - r[lk]), 0) / S.length;
+        const dD = S.map(r => r.rd - r[dk]);
+        const mD = dD.reduce((s, v) => s + v, 0) / dD.length;
+        const rmsD = Math.sqrt(dD.reduce((s, v) => s + (v - mD) ** 2, 0) / dD.length);
+        const perig = wrap180((minAt('rd') - minAt(dk)) / ANOM_MONTH * 360);
+        const zr = zeroUpAt('rb'), zo = zeroUpAt(bk);
+        const node = (zr !== null && zo !== null) ? wrap180((zr - zo) / 27.21222 * 360) : NaN;
+        return { mLon, mD, rmsD, perig, node };
+      };
+      const t1 = stats('ml', 'mb', 'md');    // raw vs Meeus of-date values (frame gap included)
+      const t2 = stats('ol', 'ob', 'od');    // raw vs OVERRIDDEN pivot — the VISIBLE divergence
+      summary.push({ yr, perig: t1.perig, node: t1.node });
+      summary2.push({ yr, perig: t2.perig, node: t2.node });
+      const fmt = (t) => `${t.mLon.toFixed(3).padStart(8)}   ${t.perig.toFixed(2).padStart(8)}   ${t.node.toFixed(2).padStart(7)}   ${t.mD.toFixed(0).padStart(11)}   ${t.rmsD.toFixed(0).padStart(11)}`;
+      console.log(`  ${String(yr).padStart(5)}   ${fmt(t1)}`);
+      rows2.push(`  ${String(yr).padStart(5)}   ${fmt(t2)}`);
+    }
+    console.log('\n  Table 2 — raw hierarchy vs OVERRIDDEN pivot (same scene frame = what you SEE):');
+    console.log('  Epoch   meanΔlon°   perigeeΔ°   nodeΔ°   meanΔdist(km)   RMSΔdist(km)');
+    console.log('  ────────────────────────────────────────────────────────────────────');
+    for (const line of rows2) console.log(line);
+    const slope = (key) => { const n = summary.length,
+        sx = summary.reduce((s, r) => s + r.yr, 0), sy = summary.reduce((s, r) => s + r[key], 0),
+        sxx = summary.reduce((s, r) => s + r.yr * r.yr, 0), sxy = summary.reduce((s, r) => s + r.yr * r[key], 0);
+      return (n * sxy - sx * sy) / (n * sxx - sx * sx); };
+    const slope2 = (key) => { const n = summary2.length,
+        sx = summary2.reduce((s, r) => s + r.yr, 0), sy = summary2.reduce((s, r) => s + r[key], 0),
+        sxx = summary2.reduce((s, r) => s + r.yr * r.yr, 0), sxy = summary2.reduce((s, r) => s + r.yr * r[key], 0);
+      return (n * sxy - sx * sy) / (n * sxx - sx * sx); };
+    console.log('  ────────────────────────────────────────────────────────────────────');
+    console.log(`  Table 1 (vs of-date Meeus, frame gap incl.): perigee ${(slope('perig') * 100).toFixed(3)} °/cy, node ${(slope('node') * 100).toFixed(3)} °/cy`);
+    console.log(`  Table 2 (VISIBLE, same scene frame):         perigee ${(slope2('perig') * 100).toFixed(3)} °/cy, node ${(slope2('node') * 100).toFixed(3)} °/cy`);
+    console.log('  Interpretation:');
+    console.log('  • The apsidal+canceller pair runs at the OF-DATE rate (8.8476 yr) — the frame');
+    console.log('    fix. Table 2 residual perigee drift ≈ −0.2°/cy = Meeus\'s perigee T² (the');
+    console.log('    derived e_E-channel deceleration, −0.01032 °/cy² → 6.9° at −584), which the');
+    console.log('    constant-rate layers deliberately do not carry (bounded, derived, accepted).');
+    console.log('  • RMSΔdist ≈ 700 km floor = perturbation-pattern residual (present at J2000).');
+    console.log('  • Table 1 vs Table 2 meanΔlon difference = the of-date↔scene frame conversion');
+    console.log('    absorbed by the override (expected).');
+    console.log('══════════════════════════════════════════════════════════════════════════════');
+    jumpToJulianDay(savedJD); forceSceneUpdate();
+  }, 'Samples the RAW hierarchy Moon (pre-override) vs Meeus over one anomalistic month at ' +
+     '8 epochs (2000 → -584): mean Δlon, perigee-phase and node-phase offsets, mean/RMS ' +
+     'distance deltas (km). Phase-drift slopes localize period mismatches between the scene ' +
+     'composition and Meeus — answers "where and why does the visible orbit diverge?"');
 
 
   // ────────────────────────────────────────────────────────────────────────

@@ -161,7 +161,11 @@ In the current scene composition the geometry is correct natively: the tilt live
 moon container (below the nodal layer's spin), the nodal layer regresses the
 plane at the of-date 18.6132-yr period, the moon layer runs on the draconitic
 (nodal-month) clock 27.2122209 d, and the layer sum equals the tropical month
-by the exact integer identity N_drac = N_trop + N_nodI. The startPos values
+by the exact integer identity N_drac = N_trop + N_nodI. The apsidal layer and
+its canceller run at the of-date perigee rate (8.8476 yr — the same frame
+choice as the nodal layer; count identity N_apsI = N_trop − N_anom), so the
+visible ring's perigee tracks the Meeus perigee across epochs; the pair
+cancels exactly, leaving the tropical-month sum untouched. The startPos values
 are J2000-element anchored (Ω = 125.0446°, ϖ = 83.3532°, Δ = 0.0000° via the
 in-sim anchoring meter). The Meeus latitude series below remains in place as
 the source of the PERIODIC perturbation terms and continues to drive the

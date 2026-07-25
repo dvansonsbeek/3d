@@ -575,7 +575,7 @@ function buildSceneGraph() {
     orbitTilta: 0, orbitTiltb: 0, // apsidal precession rotates perigee within the orbital plane — no plane tilt
     tilt: 0,
     startPos: C.moonStartposApsidal,
-    speed: (Math.PI * 2) / (C.moonApsidalPrecessionDaysEarth / C.meanSolarYearDays),
+    speed: (Math.PI * 2) / (C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays),  // of-date perigee advance (pairs with the canceller; sum unchanged)
   });
   earthNodes.pivot.addChild(moonApsidalPrec.container);
 
@@ -599,7 +599,7 @@ function buildSceneGraph() {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: 0, tilt: 0,
     startPos: -C.moonStartposApsidal,  // apsidal canceller (phase + rate)
-    speed: -(Math.PI * 2) / (C.moonApsidalPrecessionDaysEarth / C.meanSolarYearDays),  // apsidal canceller
+    speed: -(Math.PI * 2) / (C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays),  // apsidal canceller (of-date pair)
   });
   moonApsNodalPrec2.pivot.addChild(moonLunarLevel.container);
 

@@ -237,10 +237,10 @@ The Moon has its own set of precession cycles nested within Earth's frame:
 
 ```
 earth.pivotObj
-└── moonApsidalPrecession.containerObj              ← ~8.85 year apsidal advance (carries perigee offset)
+└── moonApsidalPrecession.containerObj              ← of-date ~8.8476 yr apsidal advance (carries perigee offset)
     └── moonApsidalNodalPrecession1.containerObj    ← ~5.997 yr beat (pair, geometrically inert)
         └── moonApsidalNodalPrecession2.containerObj    ← ~5.997 yr (reverse of pair)
-            └── moonLunarLevelingCyclePrecession.containerObj    ← apsidal canceller (−8.85 yr; mirrors the apsidal layer)
+            └── moonLunarLevelingCyclePrecession.containerObj    ← apsidal canceller (−8.8476 yr of-date; mirrors the apsidal layer)
                 └── moonNodalPrecession.containerObj    ← ~18.613 yr nodal regression (of-date) — rotates the tilted plane below
                     └── moon.containerObj    ← carries the 5.14° inclination tilt (below the nodal spin)
                         └── moon.orbitObj    ← draconitic (nodal-month) clock, 27.2122 d
@@ -259,10 +259,10 @@ RA/Dec override).
 
 | Layer | Period | Physical Meaning |
 |-------|--------|------------------|
-| **Apsidal Precession** | +3,232.64 days (~8.8507 years) | Lunar perigee advance |
+| **Apsidal Precession** | +3,231.53 days (~8.8476 years, of-date) | Lunar perigee advance — of-date rate, so the ring's perigee tracks the Meeus perigee |
 | **Apsidal-Nodal 1** | −2,190 days (~5.997 years) | Apsidal-nodal beat (pair, inert) |
 | **Apsidal-Nodal 2** | +2,190 days (reverse) | Counter-rotation of the pair |
-| **Lunar Leveling Cycle** | −3,232.64 days (apsidal canceller) | Cancels the apsidal rotation for the plane; the 16.886-yr leveling beat remains a derived display quantity |
+| **Lunar Leveling Cycle** | −3,231.53 days (apsidal canceller, of-date pair) | Cancels the apsidal rotation for the plane; the 16.886-yr leveling beat remains a derived display quantity |
 | **Nodal Precession** | −6,798.33 days (18.6132 years, of-date) | Lunar node regression — drives the orbit plane (tilt sits below its spin) |
 | **Moon** | +27.2122 days (draconitic / nodal month) | In-plane clock; layer sum = tropical month by the exact integer identity N_drac = N_trop + N_nodI |
 

@@ -23,7 +23,7 @@
     "eccentricityAmplitudeK": 0.0000034149201282126695
   },
   "moon": {
-    "moonStartposApsidal": 347.5544,
+    "moonStartposApsidal": 347.5479,
     "moonStartposNodal": 64.0436,
     "moonStartposMoon": 67.8443,
     "moonMeeusLpCorrection": 0.010524
