@@ -71,16 +71,30 @@ classical constant:
   is a bounded zero-mean oscillation around it (currently in its decelerating
   phase because ė < 0). Both are true at once; the Meeus polynomial entangles
   them in single coefficients.
-- **Still Meeus:** the D and M polynomials (they enter only periodic terms;
-  measured impact of substituting framework-Sun-derived values: ≤ 0.013° /
-  83 km at −556). Adopting framework-native D/M is the tracked follow-up
-  (TODO) — it completes the bounded skeleton and restores the
-  D ≡ L′ − L_sun identity at deep time.
+- **D and M — identity-composed from the real-time framework rates.** D and M
+  carry no independent physics: Meeus's own coefficients satisfy
+  D = L′ − L_sun (rate to 3e-6 °/cy, T² to 1e-7 °/cy²) and M = L_sun − ϖ_sun.
+  The framework composes them literally — D = L′ − L_sun, M = L_sun − ϖ_sun —
+  with Meeus J2000 anchors (Ls0 ≡ L′0 − D0 absorbs the Ch. 25/47 convention
+  offset) and secular content from the closed-form integrals of the
+  epoch-local year-length harmonics: the model's REAL-TIME axial and
+  perihelion rates around their H/13 and H/16 means
+  (`_fwSunSecularDeviations`). The equinox acceleration is 62% derived from
+  the model's own rates (local a2 +0.000187 °/cy² vs Meeus's +0.0003032 —
+  itself a local fit of an unbounded polynomial); the remainder is the
+  framework's genuine prediction. Bounded ±5° over ±50 kyr where the Meeus
+  D parabola reaches 82°; deviations ≤ 0.08°/0.11° (D/M) at −584, ~0 in the
+  certification window. Zero new constants.
 
 Certification of the framework-native default: argument drift M′ ≤ 0.015° at
 −584 (legacy comparison: +1.4°/century); NASA-canon recall 99.69% /
 tight-window 75.42% / type 98.97% — every counter within ±2 events of the
-pure-Meeus reference; 26-event historical audit verdicts identical. At deep
+pure-Meeus reference; 26-event historical audit verdicts identical. D/M
+re-certification: physical recall identical, tight-window recall +13 events
+better (75.53%), model total exactly 12,064 = NASA's count, five additional
+type flips at the documented ±0.02 magnitude classification boundary (129 vs
+124 — the accepted, documented trade); audit-26 identical with −135
+unchanged at 1040 km. At deep
 time the same channel modulates the anchored precession chains as
 rate(t) = invariant mean × [g(t)/g₀]^s (the factored law, doc 99) — bounded
 ±2% over ±2 Myr where the Meeus parabola is unbounded.

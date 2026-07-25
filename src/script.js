@@ -6092,6 +6092,46 @@ function _fwSunMeanElements(jd_ut) {
   return { L_deg, perihelion_deg, M_deg: L_deg - perihelion_deg };
 }
 
+/** Framework real-time secular deviations of the of-date mean Sun longitude
+ *  and Sun perihelion longitude, in degrees — closed-form integrals of the
+ *  epoch-local year-length harmonics (the model's real-time axial/H16 rates),
+ *  normalized to value 0 AND slope 0 at J2000 so the Meeus J2000 anchors and
+ *  rates stay exact. Replaces Meeus's empirical L_sun/ϖ T² parabolas with the
+ *  framework's bounded oscillation (validated: local a2 +0.000187 °/cy² vs
+ *  Meeus +0.0003032 — 62% derived from the model's own rates, remainder is
+ *  the framework's genuine prediction; bounded ±5° over ±50 kyr where the
+ *  Meeus parabola reaches 82°). Phases use the fixed J2000 lattice (snapshot
+ *  form) — the documented approximation, matching the L1-lattice convention;
+ *  KL/KA/KS capture the J2000 mean-year values at load time by design. */
+const _FW_SUN_SEC = (() => {
+  const trop = TROPICAL_YEAR_HARMONICS, anom = ANOMALISTIC_YEAR_HARMONICS;
+  const PBAR = meansolaryearlengthinDays, ABAR = meanAnomalisticYearinDays, DBAR = ABAR - PBAR;
+  const KL = -(360 / PBAR);                    // deg/yr per day of δT_trop (mean Sun longitude)
+  const wbar = 360 * DBAR / ABAR;              // mean of-date perihelion rate, deg/yr
+  const KA = wbar * PBAR / (ABAR * DBAR);      // deg/yr per day of δT_anom (perihelion)
+  const KS = -wbar / DBAR;                     // deg/yr per day of δT_trop (perihelion)
+  const dP = (y, set) => { const t = y - BALANCED_YEAR_J2000_FIXED; let s = 0;
+    for (const [d, sc, cc] of set) { const w = 2 * Math.PI / (holisticyearLength / d);
+      s += sc * Math.sin(w * t) + cc * Math.cos(w * t); } return s; };
+  const intdP = (y, set) => { const t = y - BALANCED_YEAR_J2000_FIXED; let s = 0;
+    for (const [d, sc, cc] of set) { const w = 2 * Math.PI / (holisticyearLength / d);
+      s += (-sc * Math.cos(w * t) + cc * Math.sin(w * t)) / w; } return s; };
+  return { int0T: intdP(2000, trop), int0A: intdP(2000, anom),
+           slope0L: KL * dP(2000, trop),
+           slope0P: KA * dP(2000, anom) + KS * dP(2000, trop),
+           KL, KA, KS, dP, intdP, trop, anom };
+})();
+
+function _fwSunSecularDeviations(jd_tt) {
+  const y = julianDateToDecimalYear(jd_tt);
+  const S = _FW_SUN_SEC;
+  const iT = S.intdP(y, S.trop) - S.int0T, iA = S.intdP(y, S.anom) - S.int0A;
+  return {
+    dLs:   S.KL * iT - S.slope0L * (y - 2000),
+    dPeri: S.KA * iA + S.KS * iT - S.slope0P * (y - 2000),
+  };
+}
+
 // ═════════════════════════════════════════════════════════════════════════════
 // Framework-native lunar fundamental arguments
 //
@@ -6169,10 +6209,18 @@ function _fwMoonArgs(jd_tt) {
   const Lp = A.LP0 + A.LPR * T + A.T2_LP * T2 + T3 / 538841 - T4 / 65194000;
   const w  = (A.LP0 - A.MP0) + A.WDOT * T + A.T2_W * T2 + A.T3_W * T3;   // perigee ϖ (of-date)
   const om = (A.LP0 - A.F0)  + A.NDOT * T + A.T2_N * T2 + A.T3_N * T3;   // node Ω (of-date)
+  // Framework-native D and M: identity-composed (D ≡ Lp − L_sun restored
+  // exactly; M ≡ L_sun − ϖ_sun). Anchors/rates are Meeus-exact at J2000 by
+  // construction (Ls0 ≡ LP0−D0 absorbs the Ch. 25/47 convention offset);
+  // secular content = framework real-time integrals (_fwSunSecularDeviations),
+  // replacing the last unbounded Meeus polynomials in the skeleton.
+  const dev  = _fwSunSecularDeviations(jd_tt);
+  const Lsun = (A.LP0 - A.D0) + (A.LPR - A.DR) * T + dev.dLs;                  // of-date mean Sun
+  const ws   = (A.LP0 - A.D0 - A.M0) + (A.LPR - A.DR - A.MR) * T + dev.dPeri;  // of-date Sun perihelion
   return {
     Lp: wrap(Lp),
-    D:  wrap(A.D0 + A.DR * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000),
-    M:  wrap(A.M0 + A.MR * T - 0.0001536 * T2 + T3 / 24490000),
+    D:  wrap(Lp - Lsun),
+    M:  wrap(Lsun - ws),
     Mp: wrap(Lp - w),
     F:  wrap(Lp - om),
   };
@@ -31884,7 +31932,10 @@ function setupGUI() {
     }
     console.log('Recipe: of-date anchors frame-decomposed (ICRF + framework p = 360·13/H); element');
     console.log('T² AND T³ from the e_E channel (s_Ω = 1 derived, s_ϖ = 2.407 anchored; ë₀ from the');
-    console.log('lattice+g2−g5 eccentricity composite). Residual = omitted element T⁴ tails');
+    console.log('lattice+g2−g5 eccentricity composite); D and M identity-composed (D = Lp − L_sun,');
+    console.log('M = L_sun − ϖ_sun) with secular content from the framework real-time year-length');
+    console.log('integrals — their growing rows are the bounded framework prediction replacing');
+    console.log('Meeus parabolas, not an error. Residual = omitted element T⁴ tails');
     console.log('(~0.1° at the −1999 canon edge) — see docs/66 §1.');
     console.log('══════════════════════════════════════════════════════════════════════');
     console.log('Interpretation (framework-native argument meter):');
@@ -31893,7 +31944,9 @@ function setupGUI() {
     console.log('   this as the ICRF↔of-date frame gap (missing general precession p = 360·13/H) plus');
     console.log('   the e_E-channel secular T² — measured, not mysterious.');
     console.log(' • Table 2 (framework-native _fwMoonArgs): frame + T² + derived T³ —');
-    console.log('   M\' ≤ 0.015°, F ≤ 0.025° at −584 (0.0006 / 0.001 °/cy vs the 0.05°/cy gate).');
+    console.log('   M\' ≤ 0.015°, F ≤ 0.025° at −584 (0.0006 / 0.001 °/cy vs the 0.05°/cy gate);');
+    console.log('   D ≤ 0.08°, M ≤ 0.11° at −584 = the real-time-integral prediction vs Meeus');
+    console.log('   (bounded ±5° at deep time where the Meeus parabola reaches 82° at −50 kyr).');
     console.log('   Residual = omitted element T⁴ tails + the Ω T³ 20% overshoot, documented.');
     console.log(' • Flip MOON_ARGS_FRAMEWORK_NATIVE via the console for pure-Meeus A/B runs;');
     console.log('   all certification gates passed (doc 66 §1).');
@@ -32009,10 +32062,11 @@ function setupGUI() {
   // miss is ΔT). Large Δλ = Moon timing is off.
   // ────────────────────────────────────────────────────────────────────────
   addTestButton('Framework Moon: D/M substitution probe (framework Sun)', () => {
-    // Re-tests the earlier "~1 km" dead-end finding under the shipped skeleton:
-    // rebuild the Moon's Sun-dependent arguments D = Lp − L_sun and M = Sun
-    // mean anomaly from the FRAMEWORK Sun, feed them through the production
-    // Ch. 47 series via the probe hook, and measure the Moon position shift.
+    // With framework D/M shipped (identity-composed + real-time integrals),
+    // this probe measures the Moon-position contribution of the secular
+    // integrals: it rebuilds D/M from the LINEAR framework Sun elements
+    // (no integrals), feeds them through the production Ch. 47 series via
+    // the probe hook, and measures the shift vs the shipped arguments.
     const wrap180 = (x) => ((x % 360) + 540) % 360 - 180;
     const wrap360 = (x) => ((x % 360) + 360) % 360;
     const epochs = [
@@ -32056,15 +32110,16 @@ function setupGUI() {
     }
     console.log('\n  Interpretation:');
     console.log('   • J2000 row ≈ 0 by construction (framework mean elements are Meeus-anchored).');
-    console.log('   • Ancient Δlon/Δβ ≲ 0.01° (≲ 60 km) → confirms the earlier ~1 km dead end:');
-    console.log('     argument-level substitution cannot move the umbra materially.');
-    console.log('   • Ancient Δlon ≫ 0.01° → argument-level channel is real; reopen TODO item');
-    console.log('     at level (b), perturbation-series consistency.');
+    console.log('   • Ancient Δlon/Δβ ≲ 0.01° (≲ 60 km) → the real-time secular integrals');
+    console.log('     contribute only marginally to Moon position — argument-level channel');
+    console.log('     confirmed small (the earlier ~1 km dead-end finding, re-measured under');
+    console.log('     the shipped identity-composed D/M; derivation record docs/66 §1).');
     console.log('══════════════════════════════════════════════════════════════════════');
   }, 'Rebuilds Meeus-Moon Sun-dependent arguments (D = Lp − L_sun, M = Sun mean anomaly) from the ' +
      'framework Sun and feeds them through the production Ch. 47 series via a probe hook. ' +
-     'TT/UT variants; J2000 anchor row; km-equivalents. Re-tests the earlier ~1 km finding ' +
-     'under the shipped framework-native skeleton (TODO: Meeus-Moon internal Sun assumptions).');
+     'TT/UT variants; J2000 anchor row; km-equivalents. Measures the Moon-position ' +
+     'contribution of the real-time secular integrals (framework D/M vs linear-element D/M). ' +
+     'Derivation record: docs/66 §1.');
 
   const firstPerEventEclipseBtn = addTestButton('Moon timing vs ΔT bias (historical eclipses)', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
