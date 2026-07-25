@@ -6297,7 +6297,7 @@ function _meeusMoonLon(jd) {
   const A = _moonArgsAt(jd_tt);
   const Lp_mean = A.Lp;
   const Dr = A.D * _d2r, Mr = A.M * _d2r, Mpr = A.Mp * _d2r, Fr = A.F * _d2r;
-  const E = 1 - 0.002516 * T - 0.0000074 * T2;
+  const E = _fwEFactor(jd_tt, T, T2);
   const E2 = E * E;
   let Sl = 0;
   for (let i = 0; i < MOON_L.length; i++) {
@@ -6336,7 +6336,7 @@ function _meeusMoonBeta(jd) {
   const T2 = T * T;
   const A = _moonArgsAt(jd_tt);
   const Dr = A.D * _d2r, Mr = A.M * _d2r, Mpr = A.Mp * _d2r, Fr = A.F * _d2r;
-  const E = 1 - 0.002516 * T - 0.0000074 * T2;
+  const E = _fwEFactor(jd_tt, T, T2);
   const E2 = E * E;
   let Sb = 0;
   for (let i = 0; i < MOON_B.length; i++) {
@@ -6931,6 +6931,20 @@ function _eCompModulation(t_Ma, s) {
   if (t_Ma === 0) return 1;
   const e = _fwEarthEccComposite(-t_Ma * 1e6);
   return Math.pow(Math.pow(1 - e * e, -1.5) / _ECOMP_G0, s);
+}
+
+/** Meeus E-factor (Earth-eccentricity scaling of the M-bearing series terms),
+ *  bounded: E ≡ e_E(t)/e_E(J2000). Meeus's polynomial
+ *  1 − 0.002516·T − 0.0000074·T² IS exactly e(T)/e₀ for his e(T) parabola —
+ *  the framework composite supplies the bounded closed form (value 1 and
+ *  slope −0.002517/cy at J2000 via the composite's own anchoring; bounded at
+ *  every epoch, where the polynomial reaches E = −40, E² = +1,626 at
+ *  +220 kyr and explodes the series amplitudes). Flag-consistent: pure-Meeus
+ *  A/B mode keeps the polynomial. */
+const _FW_ECOMP_E0 = () => _fwEarthEccComposite(0);
+function _fwEFactor(jd_tt, T, T2) {
+  if (!MOON_ARGS_FRAMEWORK_NATIVE) return 1 - 0.002516 * T - 0.0000074 * T2;
+  return _fwEarthEccComposite((jd_tt - j2000JD) / 365.2422) / _FW_ECOMP_E0();
 }
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
@@ -57491,8 +57505,8 @@ function moveModel(pos) {
       const Mpr = _args.Mp * _d2r;
       const Fr  = _args.F  * _d2r;
 
-      // E correction for Sun's eccentricity
-      const E = 1 - 0.002516*T - 0.0000074*T2;
+      // E correction for Sun's eccentricity — bounded framework form
+      const E = _fwEFactor(j2000JD + d, T, T2);
       const E2 = E * E;
 
       // Additional arguments

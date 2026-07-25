@@ -111,6 +111,110 @@ function _frameworkSunLon(jd_ut) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Framework-native lunar fundamental arguments — mirror of src/script.js
+// (_FW_MOON / _fwMoonArgs / _fwSunSecularDeviations / _moonArgsAt). One
+// argument source everywhere: the fitting/verification world now runs the
+// same skeleton as production (docs/66 §1). Pure-Meeus A/B reference via
+// env MOON_ARGS_PURE_MEEUS=1 (matches the browser console flag flip).
+// ═══════════════════════════════════════════════════════════════════════════
+const MOON_ARGS_FRAMEWORK_NATIVE = !process.env.MOON_ARGS_PURE_MEEUS;
+
+const _FW_MOON = (() => {
+  const LP0 = 218.3164477, D0 = 297.8501921, M0 = 357.5291092,
+        MP0 = 134.9633964, F0 = 93.2720950;
+  const LPR = 481267.88123421, DR = 445267.1114034, MR = 35999.0502909,
+        MPR = 477198.8675055,  FR = 483202.0175233;
+  const WDOT = LPR - MPR;
+  const NDOT = LPR - FR;
+  const E0 = 0.016708634, EDOT0 = -0.000042037;
+  const KAPPA = 3 * E0 * EDOT0 / (1 - E0 * E0);
+  const S_W = 2.407, S_N = 1.0;
+  const T2_W = S_W * WDOT * KAPPA / 2;
+  const T2_N = S_N * NDOT * KAPPA / 2;
+  const EDDOT0 = -2.651e-7;
+  const KAPPA_DOT = 3 * (EDOT0 * EDOT0 + E0 * EDDOT0) / (1 - E0 * E0)
+                  + 6 * E0 * E0 * EDOT0 * EDOT0 / Math.pow(1 - E0 * E0, 2);
+  const T3_W = WDOT * (S_W * S_W * KAPPA * KAPPA + S_W * KAPPA_DOT) / 6;
+  const T3_N = NDOT * (S_N * S_N * KAPPA * KAPPA + S_N * KAPPA_DOT) / 6;
+  const T2_LP_TIDAL     = (-25.86 / 3600) / 2;
+  const T2_LP = T2_LP_TIDAL + (-0.0015786 - T2_LP_TIDAL);
+  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP };
+})();
+
+const _FW_SUN_SEC = (() => {
+  const trop = C.TROPICAL_YEAR_HARMONICS, anom = C.ANOMALISTIC_YEAR_HARMONICS;
+  const PBAR = C.meanSolarYearDays, ABAR = C.meanAnomalisticYearDays, DBAR = ABAR - PBAR;
+  const KL = -(360 / PBAR);
+  const wbar = 360 * DBAR / ABAR;
+  const KA = wbar * PBAR / (ABAR * DBAR);
+  const KS = -wbar / DBAR;
+  const dP = (y, set) => { const t = y - C.balancedYear; let s = 0;
+    for (const [dv, sc, cc] of set) { const w = 2 * Math.PI / (C.H / dv);
+      s += sc * Math.sin(w * t) + cc * Math.cos(w * t); } return s; };
+  const intdP = (y, set) => { const t = y - C.balancedYear; let s = 0;
+    for (const [dv, sc, cc] of set) { const w = 2 * Math.PI / (C.H / dv);
+      s += (-sc * Math.cos(w * t) + cc * Math.sin(w * t)) / w; } return s; };
+  return { int0T: intdP(2000, trop), int0A: intdP(2000, anom),
+           slope0L: KL * dP(2000, trop),
+           slope0P: KA * dP(2000, anom) + KS * dP(2000, trop),
+           KL, KA, KS, dP, intdP, trop, anom };
+})();
+
+function _fwSunSecularDeviations(jd_tt) {
+  const y = 2000 + (jd_tt - C.j2000JD) / 365.2422;
+  const S = _FW_SUN_SEC;
+  const iT = S.intdP(y, S.trop) - S.int0T, iA = S.intdP(y, S.anom) - S.int0A;
+  return {
+    dLs:   S.KL * iT - S.slope0L * (y - 2000),
+    dPeri: S.KA * iA + S.KS * iT - S.slope0P * (y - 2000),
+  };
+}
+
+function _fwMoonArgs(jd_tt) {
+  const A = _FW_MOON;
+  const T = (jd_tt - C.j2000JD) / 36525;
+  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+  const wrap = (x) => ((x % 360) + 360) % 360;
+  const Lp = A.LP0 + A.LPR * T + A.T2_LP * T2 + T3 / 538841 - T4 / 65194000;
+  const w  = (A.LP0 - A.MP0) + A.WDOT * T + A.T2_W * T2 + A.T3_W * T3;
+  const om = (A.LP0 - A.F0)  + A.NDOT * T + A.T2_N * T2 + A.T3_N * T3;
+  const dev  = _fwSunSecularDeviations(jd_tt);
+  const Lsun = (A.LP0 - A.D0) + (A.LPR - A.DR) * T + dev.dLs;
+  const ws   = (A.LP0 - A.D0 - A.M0) + (A.LPR - A.DR - A.MR) * T + dev.dPeri;
+  return {
+    Lp: wrap(Lp),
+    D:  wrap(Lp - Lsun),
+    M:  wrap(Lsun - ws),
+    Mp: wrap(Lp - w),
+    F:  wrap(Lp - om),
+  };
+}
+
+/** Argument dispatcher mirror: framework-native by default, pure Meeus
+ *  polynomials (from the centralized tables) when MOON_ARGS_PURE_MEEUS=1. */
+function _moonArgsAtTools(jd_tt) {
+  if (MOON_ARGS_FRAMEWORK_NATIVE) return _fwMoonArgs(jd_tt);
+  const T = (jd_tt - C.j2000JD) / 36525;
+  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+  const FA = MEEUS_LUNAR.fundamentalArguments;
+  const pe = (c) => c[0] + c[1] * T + c[2] * T2 + c[3] * T3 + (c[4] || 0) * T4;
+  const wrap = (x) => ((x % 360) + 360) % 360;
+  return { Lp: wrap(pe(FA.Lp)), D: wrap(pe(FA.D)), M: wrap(pe(FA.M)),
+           Mp: wrap(pe(FA.Mp)), F: wrap(pe(FA.F)) };
+}
+
+/** Bounded Meeus E-factor mirror: e_E(t)/e_E(J2000) from the deep-time
+ *  composite (kills the polynomial blow-up at deep time). */
+function _fwEFactorTools(d_days, T, T2) {
+  if (!MOON_ARGS_FRAMEWORK_NATIVE) {
+    const EC = MEEUS_LUNAR.eccentricityCorrection;
+    return 1 + EC.e1 * T + EC.e2 * T2;
+  }
+  const DTmod = require('./deep-time');
+  return DTmod._fwEarthEccComposite(d_days / 365.2422) / DTmod._fwEarthEccComposite(0);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // DEEP-TIME MODE (Option B, mirrors browser DEEP_TIME_MODE_ENABLED)
 // ═══════════════════════════════════════════════════════════════════════════
 // When SG_DEEP_TIME=1, each computePlanetPosition / computeSunPositionFast
@@ -911,17 +1015,17 @@ function moveModel(graph, pos) {
       const T = d / C.julianCenturyDays;
       const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
 
-      // Fundamental arguments from centralized Meeus tables
-      const FA = MEEUS_LUNAR.fundamentalArguments;
-      const polyEval = (c, T, T2, T3, T4) => c[0] + c[1]*T + c[2]*T2 + c[3]*T3 + (c[4] || 0)*T4;
-      const Lp = polyEval(FA.Lp, T, T2, T3, T4) * d2r;
-      const Dr = (polyEval(FA.D, T, T2, T3, T4) % 360) * d2r;
-      const Mr = (polyEval(FA.M, T, T2, T3, T4) % 360) * d2r;
-      const Mpr = (polyEval(FA.Mp, T, T2, T3, T4) % 360) * d2r;
-      const Fr = (polyEval(FA.F, T, T2, T3, T4) % 360) * d2r;
+      // Fundamental arguments via the shared dispatcher mirror (one argument
+      // source with production; pure-Meeus A/B via MOON_ARGS_PURE_MEEUS=1)
+      const _args = _moonArgsAtTools(C.j2000JD + d);
+      const Lp = _args.Lp * d2r;
+      const Dr = _args.D * d2r;
+      const Mr = _args.M * d2r;
+      const Mpr = _args.Mp * d2r;
+      const Fr = _args.F * d2r;
 
-      const EC = MEEUS_LUNAR.eccentricityCorrection;
-      const E = 1 + EC.e1*T + EC.e2*T2;
+      // Bounded E-factor (framework e_E ratio; pure-Meeus polynomial in A/B mode)
+      const E = _fwEFactorTools(d, T, T2);
       const E2 = E * E;
       const AA = MEEUS_LUNAR.additionalArguments;
       const A1 = (AA.A1[0] + AA.A1[1]*T) * d2r;

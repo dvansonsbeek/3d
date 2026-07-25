@@ -1036,6 +1036,9 @@ function cyclesBetweenYears(yearA, yearB, divisor_N) {
 
 // ─── Exports ──────────────────────────────────────────────────────────────
 module.exports = {
+  // Framework Earth-eccentricity composite (bounded e_E; also feeds the
+  // Meeus E-factor mirror in scene-graph.js)
+  _fwEarthEccComposite,
   // Anchor constants (for callers that need them)
   HOLISTIC_YEAR_J2000,
   MEAN_SIDEREAL_YEAR_J2000_S,
