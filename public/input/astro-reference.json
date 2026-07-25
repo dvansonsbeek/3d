@@ -25,6 +25,8 @@
     "obliquityJ2000_deg": 23.439291111,
     "obliquityRate_arcsecPerCentury": -46.836769,
     "earthEccentricityJ2000": 0.01671022,
+    "earthEccentricityDotJ2000": -0.000042037,
+    "earthEccentricityDotDotJ2000": -0.0000002534,
     "earthPerihelionLongitudeJ2000": 102.94719,
     "earthAscendingNodeInvPlane": 284.51,
     "earthInclinationCycleAnchor": 21.77,

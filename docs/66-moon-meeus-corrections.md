@@ -61,9 +61,10 @@ classical constant:
   s_Ω = 1.018 ≈ 1 — a DERIVED match (Meeus +7.47″/cy² vs predicted +7.34).
   The perigee needs one anchored Clairaut-type sensitivity s_ϖ = 2.407 (the
   classical ≈ 2 rate amplification of apsidal motion), constant across orders.
-- **Element T³ — derived, zero new constants.** The eccentricity composite's
-  curvature ë₀ = −2.651e-7/cy² propagated through the same channel reproduces
-  Meeus's T³ terms (gate vs Meeus: ϖ 1.044, Ω 1.205).
+- **Element T³ — derived, zero new constants.** The eccentricity curvature
+  anchor ë₀ = −2.534e-7/cy² (astro-reference `earthEccentricityDotDotJ2000`,
+  2× the Meeus Eq. 25.4 T² coefficient) propagated through the same channel
+  reproduces Meeus's T³ terms.
 - **The sign paradox dissolved.** Brown's m²-scaling predicts apsidal
   precession ACCELERATING while Meeus's M′ T² says decelerating — the old
   "wrong sign" mystery. Resolution: the Lunar Precession Invariant governs
@@ -86,8 +87,9 @@ classical constant:
   D parabola reaches 82°; deviations ≤ 0.08°/0.11° (D/M) at −584, ~0 in the
   certification window. Zero new constants.
 
-Certification of the framework-native default: argument drift M′ ≤ 0.015° at
-−584 (legacy comparison: +1.4°/century); NASA-canon recall 99.69% /
+Certification of the framework-native default: argument drift M′ ≤ 0.033° /
+F ≤ 0.021° at −584 under the astro-reference ë anchor (legacy comparison:
++1.4°/century); NASA-canon recall 99.69% /
 tight-window 75.42% / type 98.97% — every counter within ±2 events of the
 pure-Meeus reference; 26-event historical audit verdicts identical. D/M
 re-certification: physical recall identical, tight-window recall +13 events
@@ -95,10 +97,12 @@ better (75.53%), model total exactly 12,064 = NASA's count, five additional
 type flips at the documented ±0.02 magnitude classification boundary (129 vs
 124 — the accepted, documented trade); audit-26 identical with −135
 at 1040 km (1029 km once the scene Moon was routed through the shared
-argument dispatcher — nearly every ancient BestGap moved closer). At deep
+argument dispatcher — nearly every ancient BestGap moved closer; 1032 km
+under the astro-reference ë anchor). At deep
 time the same channel modulates the anchored precession chains as
-rate(t) = invariant mean × [g(t)/g₀]^s (the factored law, doc 99) — bounded
-±2% over ±2 Myr where the Meeus parabola is unbounded.
+rate(t) = invariant mean × [g(t)/g₀]^s (the factored law, doc 99) —
+modulation bounded 0.9987…1.0007 over ±2 Myr under the H/3 line, where the
+Meeus parabola is unbounded.
 
 **How ė is pinned (the (ė, s) degeneracy).** Only the product s·ė enters each
 element's T², but node and perigee share one ė, and fast-converging node
@@ -109,14 +113,22 @@ s_Ω = 5.1, excluded by theory. Falsification path: s_ϖ = 2.407 should be
 derivable from the Hill–Brown e′² series; a first-principles derivation
 matching 2.407 would close the last anchored constant.
 
-**Eccentricity-composite taxonomy note.** The deep-time e_E composite behind
-ë₀ and the factored law is equality-constrained: e(0) and ė(0) are
-hard-anchored exactly and the shape is ridge-fitted (R² 0.985; the constant
-matches the Laskar mean; the 405-kyr g₂−g₅ line is labeled OFF-lattice per
-the climate taxonomy). It is an anchored-magnitude + structural-period
-construction — NOT a zero-fit claim; 21 coefficients. Free least-squares
-blows up on the unresolvable ~100-kyr multiplet and un-anchored ridge gets
-the local ė wrong — both rejected forms.
+**Framework-native e_E: the H/3 line.** The deep-time e_E behind the factored
+law and the E-factor is a SINGLE H/3 cosine (H/3 = Earth's inclination/ICRF-
+apsidal cycle; Config #7 eccentricity divisor Ea = 3), solved at load from
+the three astro-reference anchors (e₀ = 0.01671022, ė₀ = −4.2037e-5/cy,
+ë₀ = −2.534e-7/cy²) — fully determined, zero free parameters. Solution:
+A ≈ 0.0110, base ≈ 0.0087, φ(J2000) ≈ 43° (the phase's physical
+interpretation is an open question). Rationale: the framework's own L1
+climate fit carries NO Earth.Ecc line (the "eccentricity" 100-kyr band is
+attributed to compound planet beats; the 405-kyr is absent in LR04), so
+geology does not pin e_E — the lunar perigee channel is the e_E instrument,
+and in the observational window all candidate e_E histories sharing the
+three anchors are empirically equivalent. Divergent framework prediction:
+deep-time e_max ≈ 0.020 (conventional secular theory: ≈ 0.067) —
+falsifiable. The earlier Laskar-band composite (equality-constrained
+ridge fit, 21 coefficients, 405-kyr g₂−g₅ labeled OFF-lattice) is
+SUPERSEDED and retained in code for A/B research only.
 
 ### 1.1 Longitude Series (Table 47.A, 60 terms + 3 additional)
 

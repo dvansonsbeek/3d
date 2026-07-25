@@ -126,7 +126,7 @@ const _FW_MOON = (() => {
         MPR = 477198.8675055,  FR = 483202.0175233;
   const WDOT = LPR - MPR;
   const NDOT = LPR - FR;
-  const E0 = 0.016708634, EDOT0 = -0.000042037;
+  const E0 = C.ASTRO_REFERENCE.earthEccentricityJ2000, EDOT0 = C.ASTRO_REFERENCE.earthEccentricityDotJ2000;
   const KAPPA = 3 * E0 * EDOT0 / (1 - E0 * E0);
   const S_W = 2.407, S_N = 1.0;
   const T2_W = S_W * WDOT * KAPPA / 2;
@@ -211,7 +211,7 @@ function _fwEFactorTools(d_days, T, T2) {
     return 1 + EC.e1 * T + EC.e2 * T2;
   }
   const DTmod = require('./deep-time');
-  return DTmod._fwEarthEccComposite(d_days / 365.2422) / DTmod._fwEarthEccComposite(0);
+  return DTmod._fwEarthEccH3(d_days / 365.2422) / DTmod._fwEarthEccH3(0);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

@@ -838,7 +838,7 @@ const _ECOMP = {
   B:  [-0.0009600398502, -0.009349595921, 0.001151405217, -0.004809468603, 0.005451777722, 0.00162872882, -0.001835102032, 0.003606461969, -0.001298883291, -0.003982540754],
 };
 const _ECOMP_S_W = 2.407, _ECOMP_S_N = 1.0;   // Stage-0b sensitivities (single source: src/script.js _FW_MOON)
-const _ECOMP_G0 = Math.pow(1 - 0.0167024 * 0.0167024, -1.5);
+const _ECOMP_G0 = Math.pow(1 - _fwEarthEccComposite(0) ** 2, -1.5);   // g at the composite's OWN J2000 anchor (KKT-constrained e(0) from the La2010 fit; A/B research only — production uses _FW_ECC_G0)
 function _fwEarthEccComposite(t_yr) {
   let e = _ECOMP.c0;
   for (let i = 0; i < _ECOMP.T.length; i++) {
@@ -847,10 +847,28 @@ function _fwEarthEccComposite(t_yr) {
   }
   return e;
 }
+
+// ─── Framework-native H/3 e_E line (mirror of src/script.js _FW_ECC) ──
+// e(t) = c + A·cos(ω₃t + φ), solved at load from the three astro-reference
+// anchors (e₀, ė₀, ë₀) — zero free parameters. Supersedes the Laskar-band
+// composite above for the lunar machinery (composite retained for A/B).
+const _FW_ECC = (() => {
+  const AR = C.ASTRO_REFERENCE;
+  const w = 2 * Math.PI / (C.H / 3) * 100;   // rad per Julian cy
+  const e0 = AR.earthEccentricityJ2000;
+  const Asin = -AR.earthEccentricityDotJ2000 / w;
+  const Acos = -AR.earthEccentricityDotDotJ2000 / (w * w);
+  return { w, A: Math.hypot(Asin, Acos), phi: Math.atan2(Asin, Acos), c: e0 - Acos, e0 };
+})();
+function _fwEarthEccH3(t_yr) {
+  return _FW_ECC.c + _FW_ECC.A * Math.cos(_FW_ECC.w * (t_yr / 100) + _FW_ECC.phi);
+}
+const _FW_ECC_G0 = Math.pow(1 - _FW_ECC.e0 * _FW_ECC.e0, -1.5);
+
 function _eCompModulation(t_Ma, s) {
   if (t_Ma === 0) return 1;
-  const e = _fwEarthEccComposite(-t_Ma * 1e6);
-  return Math.pow(Math.pow(1 - e * e, -1.5) / _ECOMP_G0, s);
+  const e = _fwEarthEccH3(-t_Ma * 1e6);
+  return Math.pow(Math.pow(1 - e * e, -1.5) / _FW_ECC_G0, s);
 }
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
@@ -1036,8 +1054,8 @@ function cyclesBetweenYears(yearA, yearB, divisor_N) {
 
 // ─── Exports ──────────────────────────────────────────────────────────────
 module.exports = {
-  // Framework Earth-eccentricity composite (bounded e_E; also feeds the
-  // Meeus E-factor mirror in scene-graph.js)
+  // Framework e_E: H/3 line (production) + Laskar-band composite (A/B research)
+  _fwEarthEccH3,
   _fwEarthEccComposite,
   // Anchor constants (for callers that need them)
   HOLISTIC_YEAR_J2000,

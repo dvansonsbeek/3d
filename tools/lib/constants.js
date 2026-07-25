@@ -30,6 +30,8 @@ const ASTRO_REFERENCE = {
   obliquityJ2000_deg: astroRef.earthOrbital.obliquityJ2000_deg,
   obliquityRate_arcsecPerCentury: astroRef.earthOrbital.obliquityRate_arcsecPerCentury,
   earthEccentricityJ2000: astroRef.earthOrbital.earthEccentricityJ2000,
+  earthEccentricityDotJ2000: astroRef.earthOrbital.earthEccentricityDotJ2000,
+  earthEccentricityDotDotJ2000: astroRef.earthOrbital.earthEccentricityDotDotJ2000,
   earthPerihelionLongitudeJ2000: astroRef.earthOrbital.earthPerihelionLongitudeJ2000,
   earthAscendingNodeInvPlane: astroRef.earthOrbital.earthAscendingNodeInvPlane,
   earthInclinationCycleAnchor: astroRef.earthOrbital.earthInclinationCycleAnchor,
