@@ -94,7 +94,8 @@ re-certification: physical recall identical, tight-window recall +13 events
 better (75.53%), model total exactly 12,064 = NASA's count, five additional
 type flips at the documented ±0.02 magnitude classification boundary (129 vs
 124 — the accepted, documented trade); audit-26 identical with −135
-unchanged at 1040 km. At deep
+at 1040 km (1029 km once the scene Moon was routed through the shared
+argument dispatcher — nearly every ancient BestGap moved closer). At deep
 time the same channel modulates the anchored precession chains as
 rate(t) = invariant mean × [g(t)/g₀]^s (the factored law, doc 99) — bounded
 ±2% over ±2 Myr where the Meeus parabola is unbounded.
