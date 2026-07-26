@@ -87,8 +87,8 @@ const A_LOCK_M        = (L_TOTAL_EM_KGM2_S / (M_MOON_ALONE * Math.sqrt(GM_EM_M3S
 
 // J2000 Moon precession anchors (Option C+ — observational anchors, Earth frame = ICRF ∓ H/13)
 const TOTAL_DAYS_IN_H_J2000 = C.H * C.meanSolarYearDays;
-const N_apsidalI_J2000 = Math.round(TOTAL_DAYS_IN_H_J2000 / C.moonApsidalPrecessionDaysInputICRF);
-const N_nodalI_J2000   = Math.round(TOTAL_DAYS_IN_H_J2000 / C.moonNodalPrecessionDaysInputICRF);
+const N_apsidalI_J2000 = Math.round(8 * TOTAL_DAYS_IN_H_J2000 / C.moonApsidalPrecessionDaysInputICRF) / 8;   // integer per 8H (mirrors src/script.js)
+const N_nodalI_J2000   = Math.round(8 * TOTAL_DAYS_IN_H_J2000 / C.moonNodalPrecessionDaysInputICRF) / 8;     // integer per 8H
 const N_apsidalE_J2000 = N_apsidalI_J2000 - 13;
 const N_nodalE_J2000   = N_nodalI_J2000 + 13;
 
@@ -96,7 +96,7 @@ const _moonApsidalEarthDays = TOTAL_DAYS_IN_H_J2000 / N_apsidalE_J2000;
 const _moonNodalEarthDays   = TOTAL_DAYS_IN_H_J2000 / N_nodalE_J2000;
 const MOON_APSIDAL_J2000_S = _moonApsidalEarthDays * LOD_NOW_H13_S;  // ≈ 8.85 yr
 const MOON_NODAL_J2000_S   = _moonNodalEarthDays   * LOD_NOW_H13_S;  // ≈ 18.60 yr
-const MOON_SIDEREAL_MONTH_J2000_S = C.moonSiderealMonthInput * LOD_NOW_H13_S;
+const MOON_SIDEREAL_MONTH_J2000_S = C.moonSiderealMonth * LOD_NOW_H13_S;   // 8H-quantized month (chain-anchor consistency, mirrors src/script.js)
 
 // Per-planet semi-major axes at J2000 (km). AU-ratio via Kepler 3rd law:
 // a = (T²)^(1/3) where T = H / round(H × meanSolarYear / solarYearInput).
@@ -966,7 +966,12 @@ const meanNeptuneSemiMajorAxisAtAge = t => meanPlanetSemiMajorAxisAtAge('neptune
 // ═══════════════════════════════════════════════════════════════════════════
 
 const _CUMUL_INTEGRAL_YEAR_MIN = -500e6;   // -500 Myr
-const _CUMUL_INTEGRAL_YEAR_MAX =  1.0e6;   // +1 Myr
+const _CUMUL_INTEGRAL_YEAR_MAX =  500e6;   // +500 Myr (symmetric with past; was +1 Myr —
+                                           // the asymmetry made cyclesBetweenYears null past
+                                           // +1 Myr, dropping the Moon args to the Meeus
+                                           // polynomial whose T⁴ tail reverses lunar motion
+                                           // at year ~1.99e6; physics functions are already
+                                           // exercised to ±1 Gyr by the paper figures)
 const _CUMUL_INTEGRAL_STEP     = 10000;    // 10 kyr per cell (matches browser)
 
 let _cumulIntegralTable    = null;
@@ -1035,15 +1040,14 @@ function integralInverseHFromYears(yearA, yearB) {
 // the two forms agree at startModelYearWithCorrection, restoring
 // snapshot-fitted harmonic calibration at J2000 without changing the
 // integrated form's shape at deep time.
-const _J2000_DRIFT_CACHE = new Map();
+// (Cache removed — mirrors src/script.js: keyed by year, it grew one entry
+// per unique moving endpoint and hit V8's Map cap during canon scans; the
+// computation is two table lookups, cheaper than the cache.)
 function _getJ2000Drift(yearA) {
-  if (_J2000_DRIFT_CACHE.has(yearA)) return _J2000_DRIFT_CACHE.get(yearA);
   const integral = integralInverseHFromYears(yearA, C.startModelYearWithCorrection);
-  if (integral === null) { _J2000_DRIFT_CACHE.set(yearA, 0); return 0; }
+  if (integral === null) return 0;
   const snapshot = (C.startModelYearWithCorrection - yearA) / HOLISTIC_YEAR_J2000;
-  const drift = integral - snapshot;
-  _J2000_DRIFT_CACHE.set(yearA, drift);
-  return drift;
+  return integral - snapshot;
 }
 
 /** Total cycles between two years for a cycle of period H/divisor_N.

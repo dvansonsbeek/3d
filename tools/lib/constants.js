@@ -318,10 +318,13 @@ const perihelionPhaseOffset = (((startModelYearWithCorrection - balancedYear) / 
 //   N_nodalI    — nodal precession cycles per H (ICRF)
 //   N_nodalE    — nodal precession cycles per H (Earth frame) = N_nodalI + 13
 // The ±13 is the Earth-axial-precession offset (H/13 cycles per H).
-const N_sid      = Math.round(totalDaysInH / moonSiderealMonthInput);
-const N_apsidalI = Math.round(totalDaysInH / moonApsidalPrecessionDaysInputICRF);
+// Lunar counts are INTEGER PER 8H (Solar System Resonance Cycle) → eighth-
+// integers per H. Mirrors src/script.js (measured basis + derivation record:
+// docs/66 §1).
+const N_sid      = Math.round(8 * totalDaysInH / moonSiderealMonthInput) / 8;             // 35,860,753 per 8H
+const N_apsidalI = Math.round(8 * totalDaysInH / moonApsidalPrecessionDaysInputICRF) / 8;  // 303,196 per 8H
 const N_apsidalE = N_apsidalI - 13;
-const N_nodalI   = Math.round(totalDaysInH / moonNodalPrecessionDaysInputICRF);
+const N_nodalI   = Math.round(8 * totalDaysInH / moonNodalPrecessionDaysInputICRF) / 8;    // 144,119 per 8H
 const N_nodalE   = N_nodalI + 13;
 
 const moonSiderealMonth = totalDaysInH / N_sid;
@@ -331,8 +334,8 @@ const moonSiderealMonth = totalDaysInH / N_sid;
 const moonAnomalisticMonth = totalDaysInH / (N_sid - N_apsidalE);
 const moonNodalMonth = totalDaysInH / (N_sid + N_nodalE);
 
-const moonSynodicMonth = totalDaysInH / (Math.round(totalDaysInH / moonSiderealMonthInput) + 13 - H);  // N_syn = N_trop − H; legacy −1 removed 2026-07-24 (matches src/script.js)
-const moonTropicalMonth = totalDaysInH / (Math.round(totalDaysInH / moonSiderealMonthInput) + 13);  // N_trop = N_sid + 13; legacy −1 removed 2026-07-24 (matches src/script.js)
+const moonSynodicMonth = totalDaysInH / (N_sid + 13 - H);  // N_syn = N_trop − H; legacy −1 removed 2026-07-24 (matches src/script.js)
+const moonTropicalMonth = totalDaysInH / (N_sid + 13);  // N_trop = N_sid + 13; legacy −1 removed 2026-07-24 (matches src/script.js)
 
 const moonFullMoonCycleEarth = (moonSynodicMonth / (moonSynodicMonth - moonAnomalisticMonth)) * moonAnomalisticMonth;
 const moonFullMoonCycleICRF = totalDaysInH / ((totalDaysInH / moonFullMoonCycleEarth) + 13);

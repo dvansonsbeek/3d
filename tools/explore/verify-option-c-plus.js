@@ -29,18 +29,21 @@ console.log(' Test 1 — J2000 values preserved');
 console.log(RULE);
 
 const expected = {
-  N_sid:      4482594,
-  N_apsidalI: 37900,
-  N_apsidalE: 37887,
-  N_nodalI:   18015,
-  N_nodalE:   18028,
+  // 8H-integer counts (Solar System Resonance Cycle): eighth-integers per H.
+  // (Pre-8H this block also carried a stale N_apsidalI = 37,900 vs the
+  // computed 37,899 — corrected here.)
+  N_sid:      4482594.125,    // 35,860,753 per 8H
+  N_apsidalI: 37899.5,        // 303,196 per 8H
+  N_apsidalE: 37886.5,
+  N_nodalI:   18014.875,      // 144,119 per 8H
+  N_nodalE:   18027.875,
   // Months (within ~1 second tolerance for kinematic derivations)
-  moonSiderealMonth:    27.3216624124,
-  moonAnomalisticMonth: 27.55455421,    // kinematic, was 27.5545498 IAU input — diff 0.4s OK
-  moonNodalMonth:       27.21222089,    // kinematic, ~bit-matches old 27.21222082
+  moonSiderealMonth:    27.3216616506,  // IAU input +0.008 s (8H lattice point)
+  moonAnomalisticMonth: 27.55455034,    // kinematic; Meeus-implied 27.5545499 +0.04 s
+  moonNodalMonth:       27.21222089,    // kinematic, ~bit-matches IAU 27.21222082
   // Precession periods (Earth + ICRF, in days)
-  moonApsidalPrecessionDaysEarth: 3232.55785,
-  moonApsidalPrecessionDaysICRF:  3231.44908,
+  moonApsidalPrecessionDaysEarth: 3232.60053,   // 8H count: 112 s from input (was 3,572 s under the H count)
+  moonApsidalPrecessionDaysICRF:  3231.49171,   // vs input 3231.493 — 0.0013 d
   moonNodalPrecessionDaysEarth:   6793.42795,
   moonNodalPrecessionDaysICRF:    6798.33028,
 };

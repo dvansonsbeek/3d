@@ -138,7 +138,7 @@ const _FW_MOON = (() => {
   const T3_N = NDOT * (S_N * S_N * KAPPA * KAPPA + S_N * KAPPA_DOT) / 6;
   const T2_LP_TIDAL     = (-25.86 / 3600) / 2;
   const T2_LP = T2_LP_TIDAL + (-0.0015786 - T2_LP_TIDAL);
-  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, S_W, S_N };
+  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
 })();
 
 /** Phase-aware channel-rate integral (mirror of src/script.js
@@ -178,7 +178,7 @@ const _FW_SUN_SEC = (() => {
 })();
 
 function _fwSunSecularDeviations(jd_tt) {
-  const y = 2000 + (jd_tt - C.j2000JD) / 365.2422;
+  const y = 2000 + (jd_tt - C.j2000JD) / C.inputMeanSolarYear;
   const S = _FW_SUN_SEC;
   const iT = S.intdP(y, S.trop) - S.int0T, iA = S.intdP(y, S.anom) - S.int0A;
   return {
@@ -187,12 +187,160 @@ function _fwSunSecularDeviations(jd_tt) {
   };
 }
 
+// ── Stage B deep-time branch (mirror of src/script.js _fwMoonArgsDeep) ─────
+// Always-chains: secular phases from the factored-law month/precession chains
+// under SG_DEEP_TIME=1 (the same functions that phase the deep-time layers).
+// Snapshot mode (default) keeps the certified polynomial skeleton.
+// SI-year coordinate: MUST mirror the browser's _jdToSIyear exactly, which
+// divides by SI_TROPICAL_YEAR_DAYS = MEAN_TROPICAL_YEAR_J2000_S/86400
+// (≈ 365.24189 — NOT the 365.2422 input constant).
+const _SI_TROP_DAYS = DT.MEAN_TROPICAL_YEAR_J2000_S / 86400;
+const _jdToSIyearTools = (jd) => C.startModelYearWithCorrection + (jd - C.startmodelJD) / _SI_TROP_DAYS;
+// Cumulative month-cycle tables (mirror of src/script.js _moonCycleTable):
+// fixed 10-yr grid over ±250 kyr, per-cell 3-point Simpson at build, linear
+// interpolation on read; deterministic, call-order independent. The adaptive
+// Simpson below stays as the out-of-range fallback.
+const _MOON_CYCLE_TABLES_T = new Map();
+const _MCT_MIN_T  = 2000 - 250000;
+const _MCT_MAX_T  = 2000 + 250000;
+const _MCT_STEP_T = 10;
+function _moonCycleTableTools(periodFn) {
+  let tab = _MOON_CYCLE_TABLES_T.get(periodFn);
+  if (tab !== undefined) return tab;
+  const N = Math.round((_MCT_MAX_T - _MCT_MIN_T) / _MCT_STEP_T);
+  const cum = new Float64Array(N + 1);
+  const j2000Idx = Math.round((2000 - _MCT_MIN_T) / _MCT_STEP_T);
+  const f = (y) => {
+    const t_Ma = (2000 - y) / 1e6;
+    const T_p = periodFn(t_Ma);
+    if (T_p === null) return null;
+    const T_yr = DT.meanTropicalYearSecondsAtAge(t_Ma);
+    return T_yr === null ? null : T_yr / T_p;
+  };
+  let ok = true;
+  let fPrev = f(_MCT_MIN_T);
+  for (let i = 1; i <= N; i++) {
+    const fMid = f(_MCT_MIN_T + (i - 0.5) * _MCT_STEP_T);
+    const fCur = f(_MCT_MIN_T + i * _MCT_STEP_T);
+    if (fPrev === null || fMid === null || fCur === null) { ok = false; break; }
+    cum[i] = cum[i - 1] + (fPrev + 4 * fMid + fCur) * (_MCT_STEP_T / 6);
+    fPrev = fCur;
+  }
+  if (ok) {
+    const c0 = cum[j2000Idx];
+    for (let i = 0; i <= N; i++) cum[i] -= c0;
+    tab = cum;
+  } else {
+    tab = null;
+  }
+  _MOON_CYCLE_TABLES_T.set(periodFn, tab);
+  return tab;
+}
+function _moonCycleTableAtTools(tab, y) {
+  const idx_f = (y - _MCT_MIN_T) / _MCT_STEP_T;
+  const i = Math.floor(idx_f);
+  return tab[i] + (idx_f - i) * (tab[i + 1] - tab[i]);
+}
+
+function _moonChainCyclesTools(periodFn, yearA, yearB) {
+  const dy = yearB - yearA;
+  if (dy === 0) return 0;
+  if (yearA > _MCT_MIN_T && yearA < _MCT_MAX_T && yearB > _MCT_MIN_T && yearB < _MCT_MAX_T) {
+    const tab = _moonCycleTableTools(periodFn);
+    if (tab !== null) return _moonCycleTableAtTools(tab, yearB) - _moonCycleTableAtTools(tab, yearA);
+  }
+  let n = Math.max(32, Math.ceil(Math.abs(dy) / 1000));
+  if (n > 1024) n = 1024;
+  if (n % 2 === 1) n++;
+  const h = dy / n;
+  let sum = 0;
+  for (let i = 0; i <= n; i++) {
+    const t_Ma = (2000 - (yearA + i * h)) / 1e6;
+    const T_p = periodFn(t_Ma);
+    const T_yr = DT.meanTropicalYearSecondsAtAge(t_Ma);
+    if (T_p === null || T_yr === null) return null;
+    sum += ((i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2)) * (T_yr / T_p);
+  }
+  return (sum * h) / 3;
+}
+// Named moon-chain wrappers (mirror of src/script.js meanMoon*Between family;
+// used by both the deep-time argument branch and the layer integrator branch)
+const _mcDraconic      = (a, b) => _moonChainCyclesTools(DT.meanNodalMonthAtAge, a, b);
+const _mcTropical      = (a, b) => _moonChainCyclesTools(DT.meanTropicalMonthAtAge, a, b);
+const _mcAnomalistic   = (a, b) => _moonChainCyclesTools(DT.meanAnomalisticMonthAtAge, a, b);
+const _mcApsidalOfDate = (a, b) => {
+  const t = _mcTropical(a, b), n = _mcAnomalistic(a, b);
+  return (t === null || n === null) ? null : t - n;
+};
+const _mcNodalOfDate   = (a, b) => {
+  const dr = _mcDraconic(a, b), t = _mcTropical(a, b);
+  return (dr === null || t === null) ? null : dr - t;
+};
+// apsidal-meets-nodal pair: the two members carry equal-and-opposite signs
+// with nothing between them, so ANY common integrator cancels exactly (the
+// browser uses meanApsidalMeetsNodalAtAge; net-neutral here by construction)
+const _mcApsidalMeetsNodal = _mcApsidalOfDate;
+
+// Bounded planetary Lp carrier mirror (src/script.js _fwLpPlanetaryCarrier):
+// K_PL·∫₀ᵀ(e_E²−e_E²(J2000))dt′, record-normalized — K_PL derived lazily from
+// the record remainder and the channel slope; no new constants.
+let _fwLpKplTools = null;
+function _fwLpPlanetaryCarrierTools(T) {
+  if (T === 0) return 0;
+  const DTmod = require('./deep-time');
+  if (_fwLpKplTools === null) {
+    const de2dT = Math.pow(DTmod._fwEarthEcc(50), 2) - Math.pow(DTmod._fwEarthEcc(-50), 2);
+    _fwLpKplTools = 2 * (_FW_MOON.T2_LP - _FW_MOON.T2_LP_TIDAL) / de2dT;
+  }
+  const e0 = DTmod._fwEarthEcc(0), e0sq = e0 * e0;
+  const f = (t) => { const e = DTmod._fwEarthEcc(t * 100); return e * e - e0sq; };
+  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
+  const h = T / N;
+  let sum = f(0) + f(T);
+  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
+  return _fwLpKplTools * sum * h / 3;
+}
+
+let _fwArgsY0Tools = null;
+function _fwMoonArgsDeepTools(jd) {
+  const A = _FW_MOON;
+  if (_fwArgsY0Tools === null) _fwArgsY0Tools = _jdToSIyearTools(C.j2000JD);
+  const y = _jdToSIyearTools(jd);
+  const Ntrop = _moonChainCyclesTools(DT.meanTropicalMonthAtAge, _fwArgsY0Tools, y);
+  const Nanom = _moonChainCyclesTools(DT.meanAnomalisticMonthAtAge, _fwArgsY0Tools, y);
+  const Ndrac = _moonChainCyclesTools(DT.meanNodalMonthAtAge, _fwArgsY0Tools, y);
+  const Nperi = DT.cyclesBetweenYears(_fwArgsY0Tools, y, 16);
+  if (Ntrop === null || Nanom === null || Ndrac === null || Nperi === null) return null;
+  const wrap = (x) => ((x % 360) + 360) % 360;
+  const dev = _fwSunSecularDeviations(jd);
+  // Planetary Lp remainder — bounded e_E² carrier (see src comment)
+  const Tj = (jd - C.j2000JD) / 36525;
+  const Lp   = A.LP0 + 360 * Ntrop + _fwLpPlanetaryCarrierTools(Tj);
+  const w    = (A.LP0 - A.MP0) + 360 * (Ntrop - Nanom);            // of-date perigee, advance
+  const om   = (A.LP0 - A.F0)  - 360 * (Ndrac - Ntrop);            // of-date node, regression
+  const Lsun = (A.LP0 - A.D0) + 360 * (y - _fwArgsY0Tools) + dev.dLs;
+  const ws   = (A.LP0 - A.D0 - A.M0) + 360 * Nperi + dev.dPeri;
+  return { Lp: wrap(Lp), D: wrap(Lp - Lsun), M: wrap(Lsun - ws),
+           Mp: wrap(Lp - w), F: wrap(Lp - om) };
+}
+
 function _fwMoonArgs(jd_tt) {
+  // Always-chains in deep-time mode (Stage B; mirrors src — no toggle,
+  // this is simply how deep-time mode works). Snapshot mode keeps the
+  // certified polynomial skeleton.
+  if (DEEP_TIME_ENABLED) {
+    const dt = _fwMoonArgsDeepTools(jd_tt);
+    if (dt !== null) return dt;
+  }
   const A = _FW_MOON;
   const T = (jd_tt - C.j2000JD) / 36525;
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
   const wrap = (x) => ((x % 360) + 360) % 360;
-  const Lp = A.LP0 + A.LPR * T + A.T2_LP * T2 + T3 / 538841 - T4 / 65194000;
+  // Polynomial tails clamped at |T| ≤ 100 cy (mirrors src/script.js — the
+  // unclamped T⁴ tail reverses lunar motion at year ~1.99e6)
+  const Tc = Math.max(-100, Math.min(100, T));
+  const Tc2 = Tc * Tc, Tc3 = Tc2 * Tc, Tc4 = Tc3 * Tc;
+  const Lp = A.LP0 + A.LPR * T + A.T2_LP * Tc2 + Tc3 / 538841 - Tc4 / 65194000;
   // Phase-aware channel rate (mirror): rate = WDOT·(g/g₀)^s integrated exactly
   const w  = (A.LP0 - A.MP0) + A.WDOT * (T + _fwChannelIntegralTools(T, A.S_W));
   const om = (A.LP0 - A.F0)  + A.NDOT * (T + _fwChannelIntegralTools(T, A.S_N));
@@ -229,7 +377,7 @@ function _fwEFactorTools(d_days, T, T2) {
     return 1 + EC.e1 * T + EC.e2 * T2;
   }
   const DTmod = require('./deep-time');
-  return DTmod._fwEarthEcc(d_days / 365.2422) / DTmod._fwEarthEcc(0);
+  return DTmod._fwEarthEcc(d_days / C.inputMeanSolarYear) / DTmod._fwEarthEcc(0);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -698,6 +846,7 @@ function buildSceneGraph() {
     tilt: 0,
     startPos: C.moonStartposApsidal,
     speed: (Math.PI * 2) / (C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays),  // of-date perigee advance (pairs with the canceller; sum unchanged)
+    _dtMoonIntegrator: _mcApsidalOfDate, _dtMoonSign: +1,   // Phase 9.13 mirror
   });
   earthNodes.pivot.addChild(moonApsidalPrec.container);
 
@@ -706,6 +855,7 @@ function buildSceneGraph() {
     orbitTilta: 0, orbitTiltb: 0, tilt: 0,
     startPos: C.moonStartposApsidal - C.moonStartposNodal,
     speed: -(Math.PI * 2) / (C.moonApsidalMeetsNodalDays / C.meanSolarYearDays),
+    _dtMoonIntegrator: _mcApsidalMeetsNodal, _dtMoonSign: -1,   // Phase 9.13 mirror (pair cancels)
   });
   moonApsidalPrec.pivot.addChild(moonApsNodalPrec1.container);
 
@@ -714,6 +864,7 @@ function buildSceneGraph() {
     orbitTilta: 0, orbitTiltb: 0, tilt: 0,
     startPos: -(C.moonStartposApsidal - C.moonStartposNodal),
     speed: (Math.PI * 2) / (C.moonApsidalMeetsNodalDays / C.meanSolarYearDays),
+    _dtMoonIntegrator: _mcApsidalMeetsNodal, _dtMoonSign: +1,   // Phase 9.13 mirror (pair cancels)
   });
   moonApsNodalPrec1.pivot.addChild(moonApsNodalPrec2.container);
 
@@ -722,6 +873,7 @@ function buildSceneGraph() {
     orbitTilta: 0, orbitTiltb: 0, tilt: 0,
     startPos: -C.moonStartposApsidal,  // apsidal canceller (phase + rate)
     speed: -(Math.PI * 2) / (C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays),  // apsidal canceller (of-date pair)
+    _dtMoonIntegrator: _mcApsidalOfDate, _dtMoonSign: -1,   // Phase 9.13 mirror (canceller)
   });
   moonApsNodalPrec2.pivot.addChild(moonLunarLevel.container);
 
@@ -732,6 +884,7 @@ function buildSceneGraph() {
     tilt: 0,
     startPos: C.moonStartposNodal,
     speed: -(Math.PI * 2) / (C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays),  // of-date regression (6798.3303 d)
+    _dtMoonIntegrator: _mcNodalOfDate, _dtMoonSign: -1,   // Phase 9.13 mirror
   });
   moonLunarLevel.pivot.addChild(moonNodalPrec.container);
 
@@ -745,6 +898,7 @@ function buildSceneGraph() {
     speed: (Math.PI * 2) / (1 / (C.meanSolarYearDays / C.moonNodalMonth)),  // draconitic (nodal-month) clock
     eccentricity: C.moonOrbitalEccentricity,
     lunarPerturbations: true,
+    _dtMoonIntegrator: _mcDraconic, _dtMoonSign: +1,   // Phase 9.13 mirror (draconitic clock)
   };
   const moonNodes = makeObjectNodes('moon', moonDef);
   moonNodalPrec.pivot.addChild(moonNodes.container);
@@ -954,6 +1108,15 @@ function moveModel(graph, pos) {
     if (DEEP_TIME_ENABLED && Number.isFinite(def._dtCycleN)) {
       const cycles = DT.cyclesBetweenYears(C.balancedYear, currentYear, def._dtCycleN);
       θ = (cycles !== null ? cycles : 0) * 2 * Math.PI * def._dtCycleSign;
+    } else if (DEEP_TIME_ENABLED && def._dtMoonIntegrator) {
+      // Phase 9.13 mirror (previously MISSING in tools — the moon layers ran
+      // frozen J2000 speeds in deep-time mode while the browser ran the
+      // chains; measured as a spurious ~9.6° Moon-vs-ring plane divergence
+      // at +52 kyr in the moon-on-ring meter). Anchor + SI-year coordinate
+      // mirror src/script.js moveModel (_mAnchor = STARTMODEL_YEAR_SI, UT).
+      const _jdHere = C.startmodelJD + pos * _epochCache.mSY;
+      const _cyc = def._dtMoonIntegrator(C.startModelYearWithCorrection, _jdToSIyearTools(_jdHere));
+      θ = (_cyc !== null ? _cyc : 0) * 2 * Math.PI * def._dtMoonSign - def.startPos * d2r;
     } else {
       θ = def.speed * pos - def.startPos * d2r;
     }
@@ -1036,6 +1199,7 @@ function moveModel(graph, pos) {
       // Fundamental arguments via the shared dispatcher mirror (one argument
       // source with production; pure-Meeus A/B via MOON_ARGS_PURE_MEEUS=1)
       const _args = _moonArgsAtTools(C.j2000JD + d);
+      nodes._fwArgs = _args;   // cached for the ring lock (same call, same jd)
       const Lp = _args.Lp * d2r;
       const Dr = _args.D * d2r;
       const Mr = _args.M * d2r;
@@ -1210,6 +1374,64 @@ function _invalidateGraph() {
  * @returns {{ ra: number, dec: number, distAU: number, sunDistAU: number }}
  *   ra/dec in radians (Three.js spherical convention: theta/phi)
  */
+// ═══ Moon ring lock (Stage C fix, mirrors src/script.js): at deep time the
+// ring's ellipse-phase and node-line azimuths are re-based onto the SAME
+// argument chains + of-date conversion that place the override Moon — the
+// ring rides the Moon's clock instead of the H/13 scene frame (the measured
+// frame divergence reached ~145° at +52 kyr → ring anti-phased → 38,000 km
+// radial gap). Self-calibrating: the J2000 offsets are captured lazily from
+// the certified state (zero new constants); in-window behavior preserved.
+// The leveling layer keeps the exact apsidal-pair cancellation, so the
+// correction never leaks into the plane below.
+let _ringLockCal = null;   // { cA, cN } captured near J2000
+function _applyMoonRingLockTools(graph, jd) {
+  // Cached by the series this call when the override is active; the raw pass
+  // (useVariableSpeed=false) skips the series, so compute args directly there.
+  const args = (C.useVariableSpeed && graph.moonNodes._fwArgs) || _moonArgsAtTools(jd);
+  if (!args) return;
+  const currentYear = C.balancedYear + (jd - C.balancedJD) / _epochCache.mSY;
+  const eps = OE.computeObliquityEarth(currentYear) * d2r;
+  const cosE = Math.cos(eps), sinE = Math.sin(eps);
+  const rm = graph.earthNodes.rotAxis.worldMatrix.e;
+  const azWorld = (lamDeg) => {              // of-date ecliptic longitude (β=0) → world azimuth
+    const lam = lamDeg * d2r;
+    const sinLam = Math.sin(lam), cosLam = Math.cos(lam);
+    const RA = Math.atan2(sinLam * cosE, cosLam);
+    const phi = Math.PI / 2 - Math.asin(sinE * sinLam);
+    const vL = [Math.sin(phi) * Math.sin(RA), Math.cos(phi), Math.sin(phi) * Math.cos(RA)];
+    const vx = rm[0]*vL[0] + rm[4]*vL[1] + rm[8]*vL[2];
+    const vz = rm[2]*vL[0] + rm[6]*vL[1] + rm[10]*vL[2];
+    return Math.atan2(-vz, vx);
+  };
+  const grab = (nm) => { let p = graph.moonNodes.pivot; while (p && p.name !== nm) p = p.parent; return p; };
+  const orbitNode = grab('moon.orbit');
+  const eE = graph.earthNodes.pivot.worldMatrix.e;
+  const oM = orbitNode.worldMatrix.e;
+  const azO = Math.atan2(-(oM[14] - eE[14]), oM[12] - eE[12]);   // offset (ellipse-phase) azimuth
+  let nY = [oM[4], oM[5], oM[6]];                                // ring plane normal (orbit local +Y)
+  if (nY[1] < 0) nY = [-nY[0], -nY[1], -nY[2]];
+  const azNode = Math.atan2(-nY[2], nY[0]) + Math.PI / 2;
+  const wrapPi = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+  const rawA = wrapPi(azWorld(args.Lp - args.Mp) - (azO + Math.PI));   // perigee misalignment
+  const rawN = wrapPi(azWorld(args.Lp - args.F) - azNode);             // node misalignment
+  if (_ringLockCal === null) {
+    if (Math.abs(2000 + (jd - C.j2000JD) / 365.25 - 2000) > 500) return;  // calibrate only in-window
+    _ringLockCal = { cA: rawA, cN: rawN };
+  }
+  const dA = wrapPi(rawA - _ringLockCal.cA);
+  const dN = wrapPi(rawN - _ringLockCal.cN);
+  if (process.env.SG_RINGLOCK_DEBUG === '1') {
+    console.log(`[ringlock] jd ${jd.toFixed(0)} rawA ${(rawA/d2r).toFixed(2)}° rawN ${(rawN/d2r).toFixed(2)}° dA ${(dA/d2r).toFixed(2)}° dN ${(dN/d2r).toFixed(2)}°`);
+  }
+  // No-op guard (numerical; mirrors src/script.js): skip writes + matrix
+  // rebuild below 2e-5 rad — invisible at every epoch.
+  if (Math.abs(dA) < 2e-5 && Math.abs(dN) < 2e-5) return;
+  grab('moonApsidalPrecession.orbit').ry += dA;
+  grab('moonLunarLevelingCycle.orbit').ry -= dA;   // preserve exact pair cancellation
+  grab('moonNodalPrecession.orbit').ry += dN;
+  graph.root.updateWorldMatrix();
+}
+
 function computePlanetPosition(target, jd) {
   const graph = getGraph();
 
@@ -1222,6 +1444,9 @@ function computePlanetPosition(target, jd) {
 
   // Animate all objects
   moveModel(graph, pos);
+
+  // Stage C ring lock (deep-time only): ring phases follow the args clock
+  if (DEEP_TIME_ENABLED && target === 'moon') _applyMoonRingLockTools(graph, jd);
 
   // Get Earth reference frame (rotationAxis world matrix)
   const earthRotAxisWP = graph.earthNodes.rotAxis.getWorldPosition();
@@ -1485,6 +1710,12 @@ function computePlanetPosition(target, jd) {
     // Was: Meeus linear (obliquityJ2000_deg - 0.01300*T); framework harmonics
     // diverge by 11" at modern → sub-km Moon position effect at eclipse epochs.
     // Consistent with src/script.js Moon Meeus overlay fix (commit 5443a55).
+    // NOTE (Stage C investigation): an empirical scene-basis conversion was
+    // tested here (sun-plane and moon-base-plane variants) against the
+    // moon-on-ring meter and FALSIFIED — the deep-time Moon-vs-ring plane
+    // divergence (~9-10° peak near +52 kyr) is NOT a conversion-frame issue;
+    // it lives in the relative deep-time phasing of the moon's secondary
+    // tilt layers vs the series latitude terms (see TODO).
     const currentYear = C.balancedYear + (jd - C.balancedJD) / _epochCache.mSY;
     const eps = OE.computeObliquityEarth(currentYear) * d2r;
     const cosE = Math.cos(eps), sinE = Math.sin(eps);
@@ -1512,6 +1743,8 @@ function computePlanetPosition(target, jd) {
                + mc.decSinMs * Math.sin(Msc) + mc.decCosMs * Math.cos(Msc)) * d2r;
     }
 
+    // (Stage C note: a rigid ring-frame placement mirror was implemented and
+    // measured to be an exact identity — frames are rigid; reverted.)
     sph.theta = newRA;
     sph.phi = Math.PI / 2 - newDec;
   }
@@ -1700,4 +1933,5 @@ module.exports = {
   Mat4,
   Node,
   cartesianToSpherical,
+  _getGraphForProbe: () => getGraph(),   // research probes: the internal graph AFTER a computePlanetPosition call
 };

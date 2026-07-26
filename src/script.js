@@ -102,8 +102,8 @@ const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3
 // debugOn moved to A5 Research toggles (near top)
 
 // ─── A3. Moon model parameters ───────────────────────────────────────────
-const moonStartposApsidal = 347.5479;                     // J2000-element anchored (ϖ = 83.3532° Meeus; ∂ϖ/∂a = −1; re-anchored after the of-date pair switch)
-const moonStartposNodal = 64.0436;                        // J2000-element anchored (Ω = 125.0446° Meeus; ∂Ω/∂n = −1; was the legacy compromise −83.630)
+const moonStartposApsidal = 347.5476;                     // J2000-element anchored (ϖ = 83.3532° Meeus; ∂ϖ/∂a = −1; re-anchored after the of-date pair switch, micro-recalibrated for the 8H-count layer rates)
+const moonStartposNodal = 64.0435;                        // J2000-element anchored (Ω = 125.0446° Meeus; ∂Ω/∂n = −1; was the legacy compromise −83.630; micro-recalibrated for the 8H-count layer rates)
 const moonStartposMoon = 67.8443;                         // in-plane anchor via unmask meter (∂Δlon/∂m = −1; mean Δlon closed; was legacy 131.930)
 const moonMeeusLpCorrection = 0.010525;                   // Meeus Lp longitude correction (DE200→DE440 offset)
 
@@ -3570,10 +3570,19 @@ const milkywayOrbitPeriod = (lightYear*greatattractorDistance*Math.PI*2)/(milkyw
 //   N_apsidalI_J2000 — apsidal cycles per H (ICRF / inertial frame)
 //   N_nodalI_J2000   — nodal cycles per H (ICRF)
 // Earth-frame counts = ICRF ± 13 (Earth axial precession at H/13).
-const N_sid_J2000      = Math.round((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput);
-const N_apsidalI_J2000 = Math.round((holisticyearLength*meansolaryearlengthinDays)/moonApsidalPrecessionDaysInputICRF);
+// Lunar counts are INTEGER PER 8H (the Solar System Resonance Cycle), so per H
+// they are eighth-integers. Measured
+// basis: the H-grid's 0.527-s month spacing puts the quantized sidereal month
+// +0.0737 s from the IAU input (−42 min of BCE opposition timing — resolved
+// and rejected by the timed-Babylonian corpus); the 8H grid lands +0.0078 s
+// (−4.5 min — inside every record band). The apsidal H-count fraction is
+// 0.485 (worst case); on 8H its period is honored to 112 s instead of
+// 3,572 s. All count identities (±13, −H, …) add integers and survive
+// unchanged. Derivation record: docs/66 §1.
+const N_sid_J2000      = Math.round(8*(holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)/8;           // 35,860,753 per 8H
+const N_apsidalI_J2000 = Math.round(8*(holisticyearLength*meansolaryearlengthinDays)/moonApsidalPrecessionDaysInputICRF)/8; // 303,196 per 8H
 const N_apsidalE_J2000 = N_apsidalI_J2000 - 13;
-const N_nodalI_J2000   = Math.round((holisticyearLength*meansolaryearlengthinDays)/moonNodalPrecessionDaysInputICRF);
+const N_nodalI_J2000   = Math.round(8*(holisticyearLength*meansolaryearlengthinDays)/moonNodalPrecessionDaysInputICRF)/8;   // 144,119 per 8H
 const N_nodalE_J2000   = N_nodalI_J2000 + 13;
 
 let   moonSiderealMonth = (holisticyearLength*meansolaryearlengthinDays)/N_sid_J2000;  // Phase 2: mutable
@@ -3583,8 +3592,8 @@ let   moonSiderealMonth = (holisticyearLength*meansolaryearlengthinDays)/N_sid_J
 let   moonAnomalisticMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000 - N_apsidalE_J2000);  // Phase 2: mutable
 let   moonNodalMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000 + N_nodalE_J2000);  // Phase 2: mutable
 
-let   moonSynodicMonth = (holisticyearLength*meansolaryearlengthinDays)/(Math.round((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)+13-holisticyearLength);  // Phase 2: mutable — N_syn = N_trop − H = N_sid − (H−13); legacy −1 removed 2026-07-24 (0.70→0.08 s vs IAU)
-let   moonTropicalMonth = (holisticyearLength*meansolaryearlengthinDays)/(Math.round((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)+13);  // Phase 2: mutable — N_trop = N_sid + 13 (13 axial-precession cycles per H); legacy −1 removed 2026-07-24
+let   moonSynodicMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000+13-holisticyearLength);  // Phase 2: mutable — N_syn = N_trop − H = N_sid − (H−13); legacy −1 removed 2026-07-24 (0.70→0.08 s vs IAU)
+let   moonTropicalMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000+13);  // Phase 2: mutable — N_trop = N_sid + 13 (13 axial-precession cycles per H); legacy −1 removed 2026-07-24
 let   moonFullMoonCycleEarth = (moonSynodicMonth/(moonSynodicMonth-moonAnomalisticMonth))*moonAnomalisticMonth;  // Phase 6.5: mutable
 let   moonFullMoonCycleICRF = (holisticyearLength*meansolaryearlengthinDays)/(((holisticyearLength*meansolaryearlengthinDays)/moonFullMoonCycleEarth)+13);  // Phase 6.5: mutable
 let   moonNodalPrecessionindaysEarth = (holisticyearLength*meansolaryearlengthinDays)/N_nodalE_J2000;  // Phase 2: mutable
@@ -4898,7 +4907,7 @@ const MOON_NODAL_J2000_S   = moonNodalPrecessionindaysEarth   * LOD_NOW_H13_S;  
 const MOON_NODAL_OFDATE_J2000_S = moonNodalPrecessionindaysICRF * LOD_NOW_H13_S;  // 6798.3303 d — of-date node regression (scene rate)
 const MOON_APSIDAL_OFDATE_J2000_S = moonApsidalPrecessionindaysICRF * LOD_NOW_H13_S;  // ≈ 8.8475 yr — of-date perigee advance (scene rate; the deep-time invariant chain keeps the star-referenced MOON_APSIDAL_J2000_S)
 const MOON_NODAL_MONTH_J2000_S  = moonNodalMonth * LOD_NOW_H13_S;                 // 27.2122209 d — draconitic clock for the moon layer
-const MOON_SIDEREAL_MONTH_J2000_S = moonSiderealMonthInput * LOD_NOW_H13_S;
+const MOON_SIDEREAL_MONTH_J2000_S = moonSiderealMonth * LOD_NOW_H13_S;   // 8H-quantized month (chain-anchor consistency; input retained as the count selector)
                                                                              // ≈ 2,360,591 s
 
 // ───── Layer-1 / Layer-2 constants (Architecture α proper physics) ─────
@@ -4932,7 +4941,7 @@ const TOTAL_DAYS_IN_H = holisticyearLength * meansolaryearlengthinDays;
 
 const ORBITS_PER_H = {
   earth_rotations: TOTAL_DAYS_IN_H,
-  moon_months:     Math.round(TOTAL_DAYS_IN_H / moonSiderealMonthInput),
+  moon_months:     N_sid_J2000,   // eighth-integer per H (integer 35,860,753 per 8H)
   mercury:         mercurySolarYearCount,
   venus:           venusSolarYearCount,
   mars:            marsSolarYearCount,
@@ -6201,17 +6210,87 @@ const _FW_MOON = (() => {
   const T2_LP_TIDAL     = (-25.86 / 3600) / 2;           // α₁-chain n̈ (= LLR), doc 66 §5
   const T2_LP_PLANETARY = -0.0015786 - T2_LP_TIDAL;      // +7.25″/cy², labeled empirical
   const T2_LP = T2_LP_TIDAL + T2_LP_PLANETARY;
-  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, S_W, S_N };
+  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
 })();
+
+/** Deep-time secular phases for the five arguments — ALWAYS-CHAINS (Stage B):
+ *  the same factored-law integrator chains that phase the scene layers
+ *  (_dtMoonIntegrator wiring, ~L9440) supply the argument skeleton, so the
+ *  override Moon rides the visible ring at every epoch BY CONSTRUCTION.
+ *  Conventions mirrored from the layer branch (moveModel ~L57423): SI-year
+ *  coordinate _jdToSIyear (UT basis), of-date chains, signs apsidal +/nodal −.
+ *  Anchored at J2000 (chains = 0 there → Meeus anchors exact). The Meeus Lp
+ *  T³/T⁴ tails and the empirical planetary Lp T² remainder (+7.25″/cy²,
+ *  worth 0.0014° at −584) are OMITTED here — the chains carry the physical
+ *  (tidal + e_E-channel) content; snapshot mode keeps the certified
+ *  polynomial skeleton, bit-equivalent at J2000 by construction. The Sun
+ *  carriers: L_sun advances 360°/tropical year on the model timeline;
+ *  ϖ_sun advances on the H/16 chain (framework rate 1.7179°/cy replaces
+ *  Meeus's fitted 1.7195); both keep the bounded year-length-harmonic
+ *  deviations (_fwSunSecularDeviations). Known accepted in-window deltas of
+ *  the chain anchors vs Meeus rates (docs/66 §1): M′ ≈ −0.9° at −584,
+ *  dominated by the framework's kinematically-derived anomalistic month
+ *  being 0.171 s shorter than Meeus's MPR-implied value. */
+let _fwArgsY0 = null;   // SI-year label of J2000 (lazy: _jdToSIyear is declared later in the file)
+function _fwMoonArgsDeep(jd) {
+  const A = _FW_MOON;
+  if (_fwArgsY0 === null) _fwArgsY0 = _jdToSIyear(j2000JD);
+  const y = _jdToSIyear(jd);
+  const Ntrop = meanMoonOrbitsBetweenYears(_fwArgsY0, y);
+  const Naps  = meanMoonApsidalOfDateCyclesBetween(_fwArgsY0, y);
+  const Nnod  = meanMoonNodalOfDateCyclesBetween(_fwArgsY0, y);
+  const Nperi = cyclesBetweenYears(_fwArgsY0, y, 16);
+  if (Ntrop === null || Naps === null || Nnod === null || Nperi === null) return null;   // tidal-lock guard
+  const wrap = (x) => ((x % 360) + 360) % 360;
+  const dev  = _fwSunSecularDeviations(jd);
+  // Planetary Lp remainder (+7.25″/cy² at J2000): REQUIRED by the record
+  // (dropping it shifts BCE oppositions by hours — measured on the
+  // timed-Babylonian corpus). The chains carry the tidal content; the
+  // planetary content rides the bounded e_E²-channel carrier (its J2000
+  // Taylor truncation is the old (T2_LP − T2_LP_TIDAL)·T² polynomial).
+  const Tj   = (jd - j2000JD) / 36525;
+  const Lp   = A.LP0 + 360 * Ntrop + _fwLpPlanetaryCarrier(Tj);
+  const w    = (A.LP0 - A.MP0) + 360 * Naps;                      // perigee ϖ (of-date, advance)
+  const om   = (A.LP0 - A.F0)  - 360 * Nnod;                      // node Ω (of-date, regression)
+  const Lsun = (A.LP0 - A.D0) + 360 * (y - _fwArgsY0) + dev.dLs;  // mean Sun (model timeline)
+  const ws   = (A.LP0 - A.D0 - A.M0) + 360 * Nperi + dev.dPeri;   // Sun perihelion (H/16 chain)
+  return {
+    Lp: wrap(Lp),
+    D:  wrap(Lp - Lsun),
+    M:  wrap(Lsun - ws),
+    Mp: wrap(Lp - w),
+    F:  wrap(Lp - om),
+  };
+}
 
 /** Framework-native lunar fundamental arguments {Lp, D, M, Mp, F} in degrees
  *  (of-date, same convention as the Meeus Ch. 47 block). Takes JD_TT. */
 function _fwMoonArgs(jd_tt) {
+  // Always-chains in deep-time mode (Stage B). The 8H-count adoption
+  // resolved the month-anchor question that originally blocked this branch
+  // (the H-grid's 0.527-s month spacing forced +0.0737 s on the quantized
+  // month = −44 min of BCE opposition timing; the 8H lattice point sits
+  // +0.0078 s from the measured month and the timed-Babylonian corpus
+  // certifies the chains at parity with the certified skeleton: −6/37/4-of-6
+  // vs +3/36/3). Snapshot mode keeps the certified polynomial skeleton —
+  // the same mode split the scene layers use (locked J2000 speeds vs
+  // integrators), bit-equivalent at J2000 by construction.
+  if (DEEP_TIME_MODE_ENABLED) {
+    const dt = _fwMoonArgsDeep(jd_tt);
+    if (dt !== null) return dt;
+  }
   const A = _FW_MOON;
   const T = (jd_tt - j2000JD) / 36525;
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
   const wrap = (x) => ((x % 360) + 360) % 360;
-  const Lp = A.LP0 + A.LPR * T + A.T2_LP * T2 + T3 / 538841 - T4 / 65194000;
+  // Polynomial tails clamped at |T| ≤ 100 cy (±10 kyr): the T²/T³/T⁴ terms
+  // are fitted truncations valid ±few kyr — unclamped, the T⁴ tail cancels
+  // the lunar mean motion at T ≈ 19,870 cy (year ~1.99e6) and reverses it
+  // beyond. With deep-time mode ON this path only serves epochs beyond the
+  // ±500 Myr chain table, where frozen tails keep clean prograde mean motion.
+  const Tc = Math.max(-100, Math.min(100, T));
+  const Tc2 = Tc * Tc, Tc3 = Tc2 * Tc, Tc4 = Tc3 * Tc;
+  const Lp = A.LP0 + A.LPR * T + A.T2_LP * Tc2 + Tc3 / 538841 - Tc4 / 65194000;
   // Perigee/node from the PHASE-AWARE channel rate: ϖ̇(t) = WDOT·(g(e_E(t))/g₀)^s
   // integrated exactly along the framework H/3 fluctuation line — fully
   // derived, e = base·(1 + cosθ_i/2), phase from the inclination anchor
@@ -6820,6 +6899,56 @@ const _MAX_MOON_CYCLE_CACHE = 512;
  *
  *  Per-periodFn LRU cache (~512 entries each) — the scene graph calls this
  *  6× per frame (one per Moon-chain node). */
+// ═══ Cumulative month-cycle tables ═══ Fixed 10-yr grid over ±250 kyr
+// around J2000, cumulative cycles per chain (per-cell 3-point Simpson at
+// build; linear interpolation on read). Deterministic and call-order
+// independent — replaces the per-call Simpson for all in-range spans, so a
+// full-canon scan pays two table lookups per chain instead of ~33 deep-chain
+// integrand evaluations (the L-4 92 s/century regression). The adaptive
+// Simpson below remains the out-of-range fallback (±Myr navigations).
+// Build is lazy, a fraction of a second per chain, once per session.
+const _MOON_CYCLE_TABLES = new Map();
+const _MCT_MIN  = 2000 - 250000;
+const _MCT_MAX  = 2000 + 250000;
+const _MCT_STEP = 10;
+function _moonCycleTable(periodFnSeconds) {
+  let tab = _MOON_CYCLE_TABLES.get(periodFnSeconds);
+  if (tab !== undefined) return tab;
+  const N = Math.round((_MCT_MAX - _MCT_MIN) / _MCT_STEP);
+  const cum = new Float64Array(N + 1);
+  const j2000Idx = Math.round((2000 - _MCT_MIN) / _MCT_STEP);
+  const f = (y) => {
+    const t_Ma = (J2000_CALENDAR_YEAR - y) / 1e6;
+    const T_period_s = periodFnSeconds(t_Ma);
+    if (T_period_s === null) return null;
+    const T_yr_s = meanTropicalYearSecondsAtAge(t_Ma);
+    return T_yr_s === null ? null : T_yr_s / T_period_s;
+  };
+  let ok = true;
+  let fPrev = f(_MCT_MIN);
+  for (let i = 1; i <= N; i++) {
+    const fMid = f(_MCT_MIN + (i - 0.5) * _MCT_STEP);
+    const fCur = f(_MCT_MIN + i * _MCT_STEP);
+    if (fPrev === null || fMid === null || fCur === null) { ok = false; break; }
+    cum[i] = cum[i - 1] + (fPrev + 4 * fMid + fCur) * (_MCT_STEP / 6);
+    fPrev = fCur;
+  }
+  if (ok) {
+    const c0 = cum[j2000Idx];
+    for (let i = 0; i <= N; i++) cum[i] -= c0;   // anchor C(2000) = 0
+    tab = cum;
+  } else {
+    tab = null;   // chain unavailable somewhere in range — Simpson fallback
+  }
+  _MOON_CYCLE_TABLES.set(periodFnSeconds, tab);
+  return tab;
+}
+function _moonCycleTableAt(tab, y) {
+  const idx_f = (y - _MCT_MIN) / _MCT_STEP;
+  const i = Math.floor(idx_f);
+  return tab[i] + (idx_f - i) * (tab[i + 1] - tab[i]);
+}
+
 function _moonChainCycles(periodFnSeconds, yearA, yearB) {
   const dy = yearB - yearA;
   if (dy === 0) return 0;
@@ -6833,6 +6962,12 @@ function _moonChainCycles(periodFnSeconds, yearA, yearB) {
 
   if (!DEEP_TIME_MODE_ENABLED) {
     return dy * MEAN_TROPICAL_YEAR_J2000_S / T_J2000;
+  }
+
+  // Cumulative-table fast path (deterministic; see _moonCycleTable above)
+  if (yearA > _MCT_MIN && yearA < _MCT_MAX && yearB > _MCT_MIN && yearB < _MCT_MAX) {
+    const tab = _moonCycleTable(periodFnSeconds);
+    if (tab !== null) return _moonCycleTableAt(tab, yearB) - _moonCycleTableAt(tab, yearA);
   }
 
   let cache = _MOON_CYCLE_CACHES.get(periodFnSeconds);
@@ -6990,6 +7125,32 @@ function _fwChannelIntegral(T, s) {
   return sum * h / 3;
 }
 
+/** Bounded planetary Lp carrier: the record's planetary T² remainder
+ *  (T2_LP − T2_LP_TIDAL, +7.25″/cy²) is the J2000 Taylor truncation of
+ *      K_PL · ∫₀ᵀ (e_E²(t′) − e_E²(J2000)) dt′
+ *  — the Moon's mean motion responds to the SOLAR eccentricity channel
+ *  (the Laplace/Adams planetary acceleration; ∂n/∂e_S² measured from the
+ *  3-body laboratory at 95% of K_PL — tools/explore/es-sensitivity-scan.js).
+ *  Record-normalized: K_PL is derived lazily from the existing record
+ *  remainder and the channel slope — no new constants. Bounded at every
+ *  epoch (the T² parabola reaches 7,892° of spurious longitude at +200 kyr;
+ *  this carrier stays ≤ ~220°). Same Simpson scheme as _fwChannelIntegral. */
+let _FW_LP_KPL = null;
+function _fwLpPlanetaryCarrier(T) {
+  if (T === 0) return 0;
+  if (_FW_LP_KPL === null) {
+    const de2dT = Math.pow(_fwEarthEcc(50), 2) - Math.pow(_fwEarthEcc(-50), 2);  // Δ(e²) per cy at J2000
+    _FW_LP_KPL = 2 * (_FW_MOON.T2_LP - _FW_MOON.T2_LP_TIDAL) / de2dT;
+  }
+  const e0sq = _FW_ECC_E0 * _FW_ECC_E0;
+  const f = (t) => { const e = _fwEarthEcc(t * 100); return e * e - e0sq; };
+  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
+  const h = T / N;
+  let sum = f(0) + f(T);
+  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
+  return _FW_LP_KPL * sum * h / 3;
+}
+
 /** e_E-channel rate modulation [g(t)/g₀]^s at age t_Ma (positive = past). ≡ 1 at J2000.
  *  Uses the framework H/3 fluctuation line (was: the Laskar-band composite). */
 function _eCompModulation(t_Ma, s) {
@@ -7008,7 +7169,7 @@ function _eCompModulation(t_Ma, s) {
  *  amplitudes). Flag-consistent: pure-Meeus A/B mode keeps the polynomial. */
 function _fwEFactor(jd_tt, T, T2) {
   if (!MOON_ARGS_FRAMEWORK_NATIVE) return 1 - 0.002516 * T - 0.0000074 * T2;
-  return _fwEarthEcc((jd_tt - j2000JD) / 365.2422) / _FW_ECC_E0;
+  return _fwEarthEcc((jd_tt - j2000JD) / inputmeanlengthsolaryearindays) / _FW_ECC_E0;
 }
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
@@ -7272,9 +7433,16 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
 // error rises from ~10⁻²⁰ to ~10⁻¹⁵ per step — cumulative phase error at
 // modern epochs ~10⁻¹² rad ≈ 10⁻¹² arcsec, FAR below the 0.1″ IAU
 // obliquity calibration threshold. Verified by `runObliquityCalibrationTest`.
-// Future range still bounded by Moon tidal-lock asymptote (~+700 kyr).
+// Future range ±500 Myr symmetric (was +1 Myr with a stale "+700 kyr
+// tidal-lock asymptote" note — measured: the H/LOD/month chains are smooth
+// and physical to +500 Myr, LOD 24→27.4 hr, month 27.32→29.42 d; the true
+// lock asymptote is ~Gyr-scale). The old +1 Myr cutoff made
+// cyclesBetweenYears return null past +1 Myr, silently dropping the Moon
+// arguments to the Meeus polynomial skeleton whose fitted T⁴ tail cancels
+// the lunar mean motion at year ~1,989,000 and REVERSES it beyond
+// (user-visible: Moon stationary at +2.0 Myr, retrograde at +2.1 Myr).
 const _CUMUL_INTEGRAL_YEAR_MIN = -500e6;
-const _CUMUL_INTEGRAL_YEAR_MAX = 1.0e6;
+const _CUMUL_INTEGRAL_YEAR_MAX = 500e6;
 const _CUMUL_INTEGRAL_STEP     = 10000;
 let   _cumulIntegralTable      = null;
 let   _cumulIntegralJ2000Idx   = -1;
@@ -7525,15 +7693,17 @@ function yearToJD(year) {
 // correction is a constant shift relative to integral form — slightly less
 // physically accurate than raw integral, but the harmonics weren't fit for deep
 // time anyway, and this makes DEEP_TIME=true and DEEP_TIME=false agree at J2000.
-const _J2000_DRIFT_CACHE = new Map();
+// (Cache removed: it was keyed by year, and cyclesBetweenYears feeds it the
+// MOVING endpoint whenever that endpoint is farther from J2000 — during a
+// canon scan that is a unique year per evaluation, so the Map grew without
+// bound and hit V8's ~16.7M-entry cap ("Map maximum size exceeded") ~44
+// chunks into L-4. The computation is two cumulative-table lookups — cheaper
+// than the cache ever was.)
 function _getJ2000Drift(yearA) {
-  if (_J2000_DRIFT_CACHE.has(yearA)) return _J2000_DRIFT_CACHE.get(yearA);
   const integral = integralInverseHFromYears(yearA, startmodelyearwithCorrection);
-  if (integral === null) { _J2000_DRIFT_CACHE.set(yearA, 0); return 0; }
+  if (integral === null) return 0;
   const snapshot = (startmodelyearwithCorrection - yearA) / HOLISTIC_YEAR_J2000;
-  const drift = integral - snapshot;
-  _J2000_DRIFT_CACHE.set(yearA, drift);
-  return drift;
+  return integral - snapshot;
 }
 
 /** Total cycles between two years for a cycle of period H/divisor_N (in years).
@@ -32152,7 +32322,8 @@ function setupGUI() {
     const ANOM_MONTH = 27.55455; // days, phase-conversion reference
     const rawV = new THREE.Vector3(), ovrV = new THREE.Vector3(), eV = new THREE.Vector3();
     const kmPerUnit = moonDistance / (moon.a ?? moon.orbitRadius);
-    const epochs = [2000, 1950, 1800, 1500, 1000, 500, 1, -584];
+    const epochs = [2000, 1950, 1800, 1500, 1000, 500, 1, -584,
+                    12000, 52000, 122000, 200000, 222000];   // Stage C deep-time rows (Moon-on-ring)
     console.log('\n══════════════════════════════════════════════════════════════════════════════');
     console.log('  Scene orbit vs Meeus divergence — per-epoch attribution');
     console.log(`  Deep-time mode: ${typeof DEEP_TIME_MODE_ENABLED !== 'undefined' && DEEP_TIME_MODE_ENABLED ? 'ON (scene a(t) evolves; Meeus stays J2000!)' : 'OFF'}`);
@@ -32180,6 +32351,77 @@ function setupGUI() {
           ob: Math.atan2(oy, Math.hypot(ox, oz)) * 180 / Math.PI,
           od: Math.hypot(ox, oy, oz) * kmPerUnit,
           ml: _eclMoonLon(jd), mb: _eclMoonBeta(jd), md: _eclMoonDistance(jd) });
+      }
+      // Stage C deep-epoch diagnostic: instantaneous Moon-vs-ring plane offset
+      // in the BROWSER frame + does the nodal layer phase track the args' Ω?
+      if (Math.abs(yr - 2000) > 3000) {
+        let mB = 0, mG = 0;
+        for (const s of S) {
+          if (Math.abs(s.ob - s.rb) > mB) mB = Math.abs(s.ob - s.rb);
+          if (Math.abs(s.od - s.rd) > mG) mG = Math.abs(s.od - s.rd);
+        }
+        const _a0 = _moonArgsAt(jd0);
+        const _argsOm = (((_a0.Lp - _a0.F) % 360) + 360) % 360;
+        const _nodTh = (typeof moonNodalPrecession !== 'undefined' && moonNodalPrecession.orbitObj)
+          ? ((-moonNodalPrecession.orbitObj.rotation.y * 180 / Math.PI) % 360 + 360) % 360 : NaN;
+        // three-way attribution: what SHOULD the nodal layer angle be under
+        // (a) the chain branch, (b) the snapshot path — vs (c) the actual?
+        const _ySI = _jdToSIyear(o.julianDay);
+        const _cyc = meanMoonNodalOfDateCyclesBetween(STARTMODEL_YEAR_SI, _ySI);
+        const _thChain = _cyc !== null
+          ? ((-(_cyc * 360 * -1) + moonNodalPrecession.startPos) % 360 + 360) % 360 : NaN;
+        const _thChainRaw = _cyc !== null ? _cyc : NaN;
+        const _thSnap = ((-( (moonNodalPrecession.speed * o.pos * 180 / Math.PI) - moonNodalPrecession.startPos)) % 360 + 360) % 360;
+        console.log(`    [deep ${yr}] instant β raw/ovr ${S[0].rb.toFixed(3)}/${S[0].ob.toFixed(3)}°` +
+          `  max|Δβ| ${mB.toFixed(3)}°  max|Δdist| ${mG.toFixed(0)} km` +
+          `  nodalLayer θ ${_nodTh.toFixed(2)}°  args Ω ${_argsOm.toFixed(2)}°  ` +
+          `deepMode ${typeof DEEP_TIME_MODE_ENABLED !== 'undefined' && DEEP_TIME_MODE_ENABLED ? 'ON' : 'OFF'}`);
+        console.log(`    [deep ${yr}] nodal three-way: actual ${_nodTh.toFixed(2)}°` +
+          `  chain-pred cycles ${Number.isFinite(_thChainRaw) ? _thChainRaw.toFixed(4) : 'NULL'}` +
+          ` (θ ${Number.isFinite(_thChain) ? _thChain.toFixed(2) : 'NULL'}°)` +
+          `  snapshot-pred θ ${_thSnap.toFixed(2)}°` +
+          `  integrator tagged: ${typeof moonNodalPrecession._dtMoonIntegrator === 'function'}`);
+        // Apsidal three-way + absolute perigee azimuths (raw vs override vs args)
+        {
+          const _cycA = meanMoonApsidalOfDateCyclesBetween(STARTMODEL_YEAR_SI, _ySI);
+          const _apsTh = (typeof moonApsidalPrecession !== 'undefined' && moonApsidalPrecession.orbitObj)
+            ? ((moonApsidalPrecession.orbitObj.rotation.y * 180 / Math.PI) % 360 + 360) % 360 : NaN;
+          const _argsW = (((_a0.Lp - _a0.Mp) % 360) + 360) % 360;
+          let iR = 0, iO = 0;
+          for (let i = 1; i < S.length; i++) {
+            if (S[i].rd < S[iR].rd) iR = i;
+            if (S[i].od < S[iO].od) iO = i;
+          }
+          const _rawPeri = ((S[iR].rl % 360) + 360) % 360;
+          const _ovrPeri = ((S[iO].ol % 360) + 360) % 360;
+          console.log(`    [deep ${yr}] apsidal three-way: layer actual ${_apsTh.toFixed(2)}°` +
+            `  chain-pred cycles ${_cycA !== null ? _cycA.toFixed(4) : 'NULL'}` +
+            `  args ϖ ${_argsW.toFixed(2)}°  raw-perigee az ${_rawPeri.toFixed(2)}°  ovr-perigee az ${_ovrPeri.toFixed(2)}°`);
+        }
+        // Moon-on-ring CURVE distance (what the eye sees): the raw samples
+        // trace the full ellipse over the window, so the min distance from
+        // each override sample to the raw set ≈ distance to the ring curve.
+        {
+          const P = S.map(s => {
+            const bR = s.ob * Math.PI / 180, lR = s.ol * Math.PI / 180;
+            return [s.od * Math.cos(bR) * Math.cos(lR), s.od * Math.cos(bR) * Math.sin(lR), s.od * Math.sin(bR)];
+          });
+          const R = S.map(s => {
+            const bR = s.rb * Math.PI / 180, lR = s.rl * Math.PI / 180;
+            return [s.rd * Math.cos(bR) * Math.cos(lR), s.rd * Math.cos(bR) * Math.sin(lR), s.rd * Math.sin(bR)];
+          });
+          let cgMax = 0, cgSum = 0;
+          for (const p of P) {
+            let best = Infinity;
+            for (const r of R) {
+              const d = Math.hypot(p[0]-r[0], p[1]-r[1], p[2]-r[2]);
+              if (d < best) best = d;
+            }
+            cgSum += best; if (best > cgMax) cgMax = best;
+          }
+          console.log(`    [deep ${yr}] Moon-on-ring CURVE gap: mean ${(cgSum/P.length).toFixed(0)} km  max ${cgMax.toFixed(0)} km` +
+            `  (ring lock active: expect ≤ ~5,000 km periodic floor; pre-lock browser showed 24–73k km from the earth-chain frame divergence)`);
+        }
       }
       const minAt = (key) => { let k = 1;                    // parabolic min refine
         for (let i = 2; i < S.length - 1; i++) if (S[i][key] < S[k][key]) k = i;
@@ -51214,24 +51456,24 @@ const planetStats = {
 
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per Earth Fundamental Cycle`,
-       value : [ { v: () => (meansolaryearlengthinDays*holisticyearLength)/moonSiderealMonth, dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`The Moon orbits Earth ${fmtNum((meansolaryearlengthinDays*holisticyearLength)/moonSiderealMonth,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years (at J2000)`]},
+       value : [ { v: () => N_sid_J2000, dec:3, sep:',' },{ small: 'orbits' }],
+       hover : [`The Moon orbits Earth ${fmtNum(N_sid_J2000,3,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years — exactly ${fmtNum(8*N_sid_J2000,0,',')} orbits in one Solar System Resonance Cycle (8H = ${fmtNum(8*holisticyearLength,0,',')} yr): the Moon's orbit count is an integer on the 8H lattice (at J2000)`]},
       {label : () => `Sidereal month`,
        value : [ { v: () => moonSiderealMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon to complete one full orbit relative to the distant stars — the Moon's true orbital period. This is the fundamental reference from which all other lunar months are derived. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength,0,',')} yr = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} = ${fmtNum(moonSiderealMonth,10,',')} d (at J2000)`],
+       hover : [`Time for the Moon to complete one full orbit relative to the distant stars — the Moon's true orbital period. This is the fundamental reference from which all other lunar months are derived. In one Solar System Resonance Cycle (8H = ${fmtNum(8*holisticyearLength,0,',')} yr), the Moon completes exactly ${fmtNum(8*N_sid_J2000,0,',')} sidereal orbits (per Earth Fundamental Cycle: ${fmtNum(N_sid_J2000,3,',')}). Period = ${fmtNum(8*holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(8*N_sid_J2000,0,',')} = ${fmtNum(moonSiderealMonth,10,',')} d (at J2000)`],
        info  : 'https://en.wikipedia.org/wiki/Orbit_of_the_Moon'},
       {label : () => `Synodic month`,
        value : [ { v: () => moonSynodicMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month: in one Earth Fundamental Cycle the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Synodic orbits = sidereal − 1 + 13 − H = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} − 1 + 13 − ${fmtNum(holisticyearLength,0,',')} = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13-holisticyearLength,0,',')}. The −H subtracts Earth's solar orbits (one fewer Moon-Sun alignment per Earth year); +13 adds general precession (H/13 period). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13-holisticyearLength,0,',')} = ${fmtNum(moonSynodicMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`]},
+       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month: per Earth Fundamental Cycle the Moon completes ${fmtNum(N_sid_J2000,3,',')} sidereal orbits (exactly ${fmtNum(8*N_sid_J2000,0,',')} per 8H). Synodic orbits = sidereal + 13 − H = ${fmtNum(N_sid_J2000,3,',')} + 13 − ${fmtNum(holisticyearLength,0,',')} = ${fmtNum(N_sid_J2000+13-holisticyearLength,3,',')}. The −H subtracts Earth's solar orbits (one fewer Moon-Sun alignment per Earth year); +13 adds general precession (H/13 period). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000+13-holisticyearLength,3,',')} = ${fmtNum(moonSynodicMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`]},
       {label : () => `Anomalistic month`,
        value : [ { v: () => moonAnomalisticMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(N_sid_J2000 - N_apsidalE_J2000,0,',')} anomalistic orbits (= N_sidereal − N_apsidal_Earth, kinematic identity). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000 - N_apsidalE_J2000,0,',')} = ${fmtNum(moonAnomalisticMonth,10,',')} d (at J2000)`]},
+       hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(N_sid_J2000 - N_apsidalE_J2000,3,',')} anomalistic orbits (= N_sidereal − N_apsidal_Earth, kinematic identity; exactly ${fmtNum(8*(N_sid_J2000 - N_apsidalE_J2000),0,',')} per 8H). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000 - N_apsidalE_J2000,3,',')} = ${fmtNum(moonAnomalisticMonth,10,',')} d (at J2000)`]},
       {label : () => `Draconic month (a.k.a. nodal period)`,
        value : [ { v: () => moonNodalMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(N_sid_J2000 + N_nodalE_J2000,0,',')} draconic orbits (= N_sidereal + N_nodal_Earth, kinematic identity). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000 + N_nodalE_J2000,0,',')} = ${fmtNum(moonNodalMonth,10,',')} d (at J2000)`]},
+       hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(N_sid_J2000 + N_nodalE_J2000,3,',')} draconic orbits (= N_sidereal + N_nodal_Earth, kinematic identity; exactly ${fmtNum(8*(N_sid_J2000 + N_nodalE_J2000),0,',')} per 8H). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000 + N_nodalE_J2000,3,',')} = ${fmtNum(moonNodalMonth,10,',')} d (at J2000)`]},
       {label : () => `Tropical month`,
        value : [ { v: () => moonTropicalMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: in one Earth Fundamental Cycle the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Tropical orbits = sidereal − 1 + 13 = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} − 1 + 13 = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13,0,',')}. The +13 accounts for general precession (H/13 period): the westward drift of the equinox adds 13 extra returns to the same ecliptic longitude per Earth Fundamental Cycle. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13,0,',')} = ${fmtNum(moonTropicalMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`],
+       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: per Earth Fundamental Cycle the Moon completes ${fmtNum(N_sid_J2000,3,',')} sidereal orbits (exactly ${fmtNum(8*N_sid_J2000,0,',')} per 8H). Tropical orbits = sidereal + 13 = ${fmtNum(N_sid_J2000,3,',')} + 13 = ${fmtNum(N_sid_J2000+13,3,',')}. The +13 accounts for general precession (H/13 period): the westward drift of the equinox adds 13 extra returns to the same ecliptic longitude per Earth Fundamental Cycle. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000+13,3,',')} = ${fmtNum(moonTropicalMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`],
        info  : 'https://eclipse.gsfc.nasa.gov/LEcat5/LEcatalog.html'},
 
     {header : '—  Orbital Shape & Geometry —' },
@@ -56817,6 +57059,57 @@ function calculateRAFromEarthPerihelion(obj) {
 }
 
 const _moonVisualCorrection = new THREE.Vector3();
+
+// ═══ Stage C ring lock: at deep time, the ring's ellipse-phase and node-line
+// azimuths are re-based onto the SAME argument chains + of-date conversion
+// that place the override Moon — the ring rides the Moon's clock instead of
+// the scene's H/13 frame composition (measured misalignment reached ~155° at
+// +200 kyr → ring anti-phased → the visible Moon-off-ring detachment).
+// Self-calibrating: the J2000 offsets are captured lazily from the certified
+// state (zero new constants); in-window behavior is preserved exactly. The
+// leveling layer keeps the exact apsidal-pair cancellation so the correction
+// never leaks into the ring plane. Measurement uses the layers' own rotation
+// values (set absolutely by moveModel each frame — no accumulation) plus the
+// verified linear mapping az = θ_layer + θ_earthframe + const, with the
+// const absorbed by calibration. Mirrored in tools/lib/scene-graph.js.
+let _ringLockCal = null;   // { cA, cN } captured near J2000
+function _applyMoonRingLock(obj, o) {
+  const A = obj._fwArgs;                       // args cached by the series this frame (no recompute)
+  if (!A) return;
+  const eps = o.obliquityEarth * (Math.PI / 180);         // same obliquity as the override conversion
+  const cosE = Math.cos(eps), sinE = Math.sin(eps);
+  const rm = earth.rotationAxis.matrixWorld.elements;
+  const azWorld = (lamDeg) => {                           // of-date ecliptic longitude (β=0) → world azimuth
+    const lam = lamDeg * Math.PI / 180;
+    const sinLam = Math.sin(lam), cosLam = Math.cos(lam);
+    const RA = Math.atan2(sinLam * cosE, cosLam);
+    const phi = Math.PI / 2 - Math.asin(sinE * sinLam);
+    const vx0 = Math.sin(phi) * Math.sin(RA), vy0 = Math.cos(phi), vz0 = Math.sin(phi) * Math.cos(RA);
+    const vx = rm[0] * vx0 + rm[4] * vy0 + rm[8] * vz0;
+    const vz = rm[2] * vx0 + rm[6] * vy0 + rm[10] * vz0;
+    return Math.atan2(-vz, vx);
+  };
+  const wrapPi = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+  const thEo = earth.orbitObj.rotation.y;
+  const rawA = wrapPi(azWorld(A.Lp - A.Mp) - (moonApsidalPrecession.orbitObj.rotation.y + thEo));
+  const rawN = wrapPi(azWorld(A.Lp - A.F) - (moonNodalPrecession.orbitObj.rotation.y + thEo));
+  if (_ringLockCal === null) {
+    if (Math.abs(o.julianDay - j2000JD) > 500 * 365.25) return;   // calibrate only from the certified window
+    _ringLockCal = { cA: rawA, cN: rawN };
+  }
+  const dA = wrapPi(rawA - _ringLockCal.cA);
+  const dN = wrapPi(rawN - _ringLockCal.cN);
+  // No-op guard (numerical, not an epoch gate): skip the rotation writes and
+  // the forced subtree matrix rebuild when the correction is below 2e-5 rad
+  // (0.0011° ≈ 1 km at lunar distance — invisible at every epoch). In-window
+  // the correction sits under this floor, so the scan-heavy report buttons
+  // pay zero lock cost; at deep time the full correction applies.
+  if (Math.abs(dA) < 2e-5 && Math.abs(dN) < 2e-5) return;
+  moonApsidalPrecession.orbitObj.rotation.y += dA;
+  moonLunarLevelingCyclePrecession.orbitObj.rotation.y -= dA;   // preserve exact pair cancellation
+  moonNodalPrecession.orbitObj.rotation.y += dN;
+  moonApsidalPrecession.containerObj.updateMatrixWorld(true);
+}
 const _moonVisualMatrix = new THREE.Matrix4();
 
 function updatePositions() {
@@ -57105,6 +57398,9 @@ function updatePositions() {
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.
     // The hierarchy provides the orbit ring visual; this puts the Moon mesh at the correct position.
     if (obj._meeusLonDeg !== undefined && obj._meeusLatRad !== undefined) {
+      // Stage C ring lock: re-base the ring phases BEFORE the Moon placement
+      // below reads the (now-updated) orbit frame matrices.
+      if (DEEP_TIME_MODE_ENABLED) _applyMoonRingLock(obj, o);
       // Use framework's authoritative obliquity (o.obliquityEarth), kept fresh
       // at top of updatePositions so it's valid in both 'light' and 'full' modes.
       // Was: Meeus linear (23.4393 - 0.01300*T); framework has H/3+H/8 obliquity
@@ -57147,6 +57443,12 @@ function updatePositions() {
         SPHERICAL.radius = obj._meeusDistKm * 100 / currentAUDistance;
       }
       _moonVisualCorrection.setFromSpherical(SPHERICAL);
+      // (Stage C note: a rigid ring-frame placement variant was implemented
+      // and MEASURED to be an exact identity — the rotAxis frame is rigid to
+      // the base chain, so the frame-drift hypothesis is falsified; reverted.
+      // The remaining deep-time Moon-vs-ring gap decomposes into the
+      // planetary-Lp-T² radial breathing + a browser-vs-tools scene-state
+      // delta at ≥120 kyr — see TODO Stage C.)
       _moonVisualCorrection.applyMatrix4(earth.rotationAxis.matrixWorld);          // local → world
       _moonVisualMatrix.copy(obj.pivotObj.parent.matrixWorld).invert();
       _moonVisualCorrection.applyMatrix4(_moonVisualMatrix);                      // world → orbitObj local
@@ -57566,6 +57868,7 @@ function moveModel(pos) {
       // its own duplicate pure-Meeus polynomial copy, which extrapolated
       // meaninglessly at deep time — args wrapped 50-140× at ±220 kyr).
       const _args = _moonArgsAt(j2000JD + d);
+      obj._fwArgs = _args;   // cached for the ring lock (same frame, same jd — no recompute)
       const Lp  = _args.Lp * _d2r;
       const Dr  = _args.D  * _d2r;
       const Mr  = _args.M  * _d2r;
