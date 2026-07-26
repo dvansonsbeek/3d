@@ -138,8 +138,25 @@ const _FW_MOON = (() => {
   const T3_N = NDOT * (S_N * S_N * KAPPA * KAPPA + S_N * KAPPA_DOT) / 6;
   const T2_LP_TIDAL     = (-25.86 / 3600) / 2;
   const T2_LP = T2_LP_TIDAL + (-0.0015786 - T2_LP_TIDAL);
-  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP };
+  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, S_W, S_N };
 })();
+
+/** Phase-aware channel-rate integral (mirror of src/script.js
+ *  _fwChannelIntegral): ∫₀ᵀ [(g(e_E(t))/g₀)^s − 1] dt′ in Julian cy. */
+function _fwChannelIntegralTools(T, s) {
+  if (T === 0) return 0;
+  const DTmod = require('./deep-time');
+  const g0 = Math.pow(1 - Math.pow(DTmod._fwEarthEcc(0), 2), -1.5);
+  const f = (t) => {
+    const e = DTmod._fwEarthEcc(t * 100);
+    return Math.pow(Math.pow(1 - e * e, -1.5) / g0, s) - 1;
+  };
+  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
+  const h = T / N;
+  let sum = f(0) + f(T);
+  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
+  return sum * h / 3;
+}
 
 const _FW_SUN_SEC = (() => {
   const trop = C.TROPICAL_YEAR_HARMONICS, anom = C.ANOMALISTIC_YEAR_HARMONICS;
@@ -176,8 +193,9 @@ function _fwMoonArgs(jd_tt) {
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
   const wrap = (x) => ((x % 360) + 360) % 360;
   const Lp = A.LP0 + A.LPR * T + A.T2_LP * T2 + T3 / 538841 - T4 / 65194000;
-  const w  = (A.LP0 - A.MP0) + A.WDOT * T + A.T2_W * T2 + A.T3_W * T3;
-  const om = (A.LP0 - A.F0)  + A.NDOT * T + A.T2_N * T2 + A.T3_N * T3;
+  // Phase-aware channel rate (mirror): rate = WDOT·(g/g₀)^s integrated exactly
+  const w  = (A.LP0 - A.MP0) + A.WDOT * (T + _fwChannelIntegralTools(T, A.S_W));
+  const om = (A.LP0 - A.F0)  + A.NDOT * (T + _fwChannelIntegralTools(T, A.S_N));
   const dev  = _fwSunSecularDeviations(jd_tt);
   const Lsun = (A.LP0 - A.D0) + (A.LPR - A.DR) * T + dev.dLs;
   const ws   = (A.LP0 - A.D0 - A.M0) + (A.LPR - A.DR - A.MR) * T + dev.dPeri;
@@ -203,15 +221,15 @@ function _moonArgsAtTools(jd_tt) {
            Mp: wrap(pe(FA.Mp)), F: wrap(pe(FA.F)) };
 }
 
-/** Bounded Meeus E-factor mirror: e_E(t)/e_E(J2000) from the deep-time
- *  composite (kills the polynomial blow-up at deep time). */
+/** Bounded Meeus E-factor mirror: e_E(t)/e_E(J2000) from the framework H/16
+ *  eccentricity law (kills the polynomial blow-up at deep time). */
 function _fwEFactorTools(d_days, T, T2) {
   if (!MOON_ARGS_FRAMEWORK_NATIVE) {
     const EC = MEEUS_LUNAR.eccentricityCorrection;
     return 1 + EC.e1 * T + EC.e2 * T2;
   }
   const DTmod = require('./deep-time');
-  return DTmod._fwEarthEccH3(d_days / 365.2422) / DTmod._fwEarthEccH3(0);
+  return DTmod._fwEarthEcc(d_days / 365.2422) / DTmod._fwEarthEcc(0);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

@@ -3292,7 +3292,7 @@ const ASTRO_REFERENCE = {
   earthInclinationRate_arcsecPerCentury: -18,
   // Source: JPL Horizons / Astronomical Almanac
   eccentricityJ2000: 0.01671022,                     // Earth eccentricity at J2000.0
-  eccentricityDotJ2000: -0.000042037,                // Earth eccentricity rate at J2000 (per Julian cy; observed anchor)
+  eccentricityDotJ2000: -0.000042037,                // Earth eccentricity rate at J2000 (per Julian cy) — the e_E-cycle slope at the CURRENT phase (near quadrature; NOT a constant: the rate speeds up and slows down along the cycle — see _fwChannelIntegral). Secular-theory coefficient corroborated by modern ephemeris fits, the LLR node channel (s_Ω ≈ 1, doc 66 §1), and the ancient timing record — not a raw observation. A/B demo with the H/16 geometric-phase value −8.389e-6: falsified (audit ΔJD +21…65 min BCE, L-4 tight recall 75.5→46.1%)
   eccentricityDotDotJ2000: -0.0000002534,            // Earth eccentricity curvature at J2000 (per Julian cy²; 2× Meeus Eq. 25.4 T² coefficient)
   perihelionLongitudeJ2000_deg: 102.947,             // Longitude of perihelion at J2000.0
   perihelionPassageJ2000_JD: 2451547.042,            // Earth perihelion 2000 Jan 3 13:00 UTC (USNO)
@@ -6155,8 +6155,9 @@ function _fwSunSecularDeviations(jd_tt) {
 //    (strength ∝ (1−e²)^(−3/2)): Ẍ/Ẋ = s·3e·ė/(1−e²), with s_Ω = 1
 //    (derived — reproduces Meeus's F/Ω T² to 1.8%) and s_ϖ = 2.407
 //    (anchored Clairaut-type apsidal amplification; classical rate
-//    amplification ≈ 2.0). e₀/ė₀ are observed anchors; routing the L1
-//    eccentricity composite through this channel is the deep-time follow-up.
+//    amplification ≈ 2.0). The channel is integrated phase-aware along the
+//    framework H/3 fluctuation line — fully derived, e = base·(1 + cosθ_i/2),
+//    phase from the inclination anchor 21.77° — see _FW_ECC.
 //  • L′ T² = framework tidal n̈/2 (α₁ chain, −12.93″/cy² = LLR) + explicit
 //    planetary secular remainder (+7.25″/cy², labeled empirical).
 //  • D and M are retained as full Meeus polynomials (Sun-side arguments —
@@ -6210,8 +6211,14 @@ function _fwMoonArgs(jd_tt) {
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
   const wrap = (x) => ((x % 360) + 360) % 360;
   const Lp = A.LP0 + A.LPR * T + A.T2_LP * T2 + T3 / 538841 - T4 / 65194000;
-  const w  = (A.LP0 - A.MP0) + A.WDOT * T + A.T2_W * T2 + A.T3_W * T3;   // perigee ϖ (of-date)
-  const om = (A.LP0 - A.F0)  + A.NDOT * T + A.T2_N * T2 + A.T3_N * T3;   // node Ω (of-date)
+  // Perigee/node from the PHASE-AWARE channel rate: ϖ̇(t) = WDOT·(g(e_E(t))/g₀)^s
+  // integrated exactly along the framework H/3 fluctuation line — fully
+  // derived, e = base·(1 + cosθ_i/2), phase from the inclination anchor
+  // 21.77° — the rate speeds up and slows down with the H/3 wobble phase
+  // (NOT one value). Replaces the frozen-κ T²/T³ Taylor truncation (T2_W/
+  // T3_W etc. remain in _FW_MOON as the documented J2000 Taylor checks).
+  const w  = (A.LP0 - A.MP0) + A.WDOT * (T + _fwChannelIntegral(T, A.S_W));   // perigee ϖ (of-date)
+  const om = (A.LP0 - A.F0)  + A.NDOT * (T + _fwChannelIntegral(T, A.S_N));   // node Ω (of-date)
   // Framework-native D and M: identity-composed (D ≡ Lp − L_sun restored
   // exactly; M ≡ L_sun − ϖ_sun). Anchors/rates are Meeus-exact at J2000 by
   // construction (Ls0 ≡ LP0−D0 absorbs the Ch. 25/47 convention offset);
@@ -6928,48 +6935,79 @@ function _fwEarthEccComposite(t_yr) {
 }
 const _ECOMP_G0 = Math.pow(1 - _fwEarthEccComposite(0) ** 2, -1.5);   // g at the composite's OWN J2000 anchor (its KKT-constrained e(0), from the La2010 fit — deliberately NOT astro-reference, so the composite's modulation ≡ 1 at J2000; A/B research only, production uses _FW_ECC_G0)
 
-/** Framework-native Earth-eccentricity line (H/3): e(t) = c + A·cos(ω₃t + φ),
- *  solved at load from the three astro-reference anchors (e₀, ė₀, ë₀) — zero
- *  free parameters. H/3 = Earth's inclination/ICRF-apsidal cycle (Config #7
- *  eccentricity divisor Ea = 3). Replaces the Laskar-band _ECOMP composite in
- *  the lunar machinery (framework-native; no imported spectra — the L1 climate
- *  fit carries no Earth.Ecc line, so geology does not pin e_E; the lunar
- *  perigee channel is the e_E instrument). Solved φ ≈ 43°; the physical
- *  interpretation of the phase is an open question. Range ≈ [−0.002, 0.020]
- *  (plain-cosine form; grazes zero at minimum). */
+/** Framework-native Earth-eccentricity fluctuation for the LUNAR machinery —
+ *  ONE movement, FULLY DERIVED, zero solved values:
+ *
+ *      e(t) = eccentricityBase · (1 + cos θ_i(t) / 2)
+ *
+ *  The H/3 wobble cycle that drives Earth's inclination (anchor 21.77°) also
+ *  carries the eccentricity fluctuation the lunar rate channel senses: mean
+ *  c = eccentricityBase (Law 5), amplitude A = base/2 (the half-base factor
+ *  the framework already carries — cf. eocEccentricity = mean − base/2),
+ *  phase θ₀ = ϖ_ICRF(J2000) − 21.77° = 81.18° past max. NOTHING is fitted;
+ *  the observed J2000 values become PREDICTIONS: e = 0.016566 (−0.86% vs
+ *  astro-reference 0.0167102), ė = −4.273×10⁻⁵/cy (+1.7% vs secular theory's
+ *  −4.204×10⁻⁵), ë = −3.7×10⁻⁸ (same sign as Meeus's −2.5×10⁻⁷), E-factor at
+ *  −135/−584 within ~0.5% of Meeus. Cross-checks: solving (A, θ) freely from
+ *  the observed (e, ė) with c = base returns θ = 79.96° (framework: 81.18°)
+ *  and A = 0.4936·base — the data hands back this structure on its own.
+ *  Earth's own orbital eccentricity for the Sun machinery keeps the H/16
+ *  perihelion law (e-max 1246, _eclSunLon) — this line is the Moon channel's
+ *  view of the H/3 movement. Bounded [base/2, 3·base/2]; e-mean crossing
+ *  ≈ 4739, locked to the inclination's; turning points ≈ −23,200 / +32,700.
+ *  Deep-time aware via cyclesBetweenYears (integrated ∫3/H(t)dt when on). */
 const _FW_ECC = (() => {
-  const w = 2 * Math.PI / (holisticyearLength / 3) * 100;   // rad per Julian cy
-  const e0 = ASTRO_REFERENCE.eccentricityJ2000;
-  const Asin = -ASTRO_REFERENCE.eccentricityDotJ2000 / w;
-  const Acos = -ASTRO_REFERENCE.eccentricityDotDotJ2000 / (w * w);
-  return { w, A: Math.hypot(Asin, Acos), phi: Math.atan2(Asin, Acos), c: e0 - Acos, e0 };
+  const th0 = (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg
+             - earthInclinationCycleAnchor) * Math.PI / 180;   // 81.18° past max
+  const A = eccentricityBase / 2;
+  return { th0, A, c: eccentricityBase, e0: eccentricityBase + A * Math.cos(th0) };
 })();
-
-/** Framework e_E at t years relative to J2000 (negative = past). */
-function _fwEarthEccH3(t_yr) {
-  return _FW_ECC.c + _FW_ECC.A * Math.cos(_FW_ECC.w * (t_yr / 100) + _FW_ECC.phi);
+function _fwEarthEcc(t_yr) {
+  const cycles = cyclesBetweenYears(2000, 2000 + t_yr, 3);
+  if (cycles === null) return _FW_ECC.c;   // past tidal-lock asymptote — mean
+  return _FW_ECC.c + _FW_ECC.A * Math.cos(_FW_ECC.th0 + 2 * Math.PI * cycles);
 }
-const _FW_ECC_G0 = Math.pow(1 - _FW_ECC.e0 * _FW_ECC.e0, -1.5);   // g at J2000 (exact anchor)
+const _FW_ECC_E0 = _FW_ECC.e0;                                  // J2000 value anchor (exact by construction)
+const _FW_ECC_G0 = Math.pow(1 - _FW_ECC_E0 * _FW_ECC_E0, -1.5); // g at J2000 (exact anchor)
+
+/** Integral of the PHASE-AWARE channel rate: ∫₀ᵀ [(g(e(t))/g₀)^s − 1] dt′ in
+ *  Julian centuries. The perigee/node rates are NOT constants — they speed up
+ *  and slow down with the e_E phase (user directive); the old frozen-κ T²/T³
+ *  polynomial was this integral's Taylor truncation at J2000. Composite
+ *  Simpson: 3 evaluations in-window (the integrand barely bends over
+ *  centuries), step ≤ ~4,000 yr at deep time. Bounded at every epoch. */
+function _fwChannelIntegral(T, s) {
+  if (T === 0) return 0;
+  const f = (t) => {
+    const e = _fwEarthEcc(t * 100);   // t in cy → years
+    return Math.pow(Math.pow(1 - e * e, -1.5) / _FW_ECC_G0, s) - 1;
+  };
+  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
+  const h = T / N;
+  let sum = f(0) + f(T);
+  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
+  return sum * h / 3;
+}
 
 /** e_E-channel rate modulation [g(t)/g₀]^s at age t_Ma (positive = past). ≡ 1 at J2000.
- *  Uses the framework-native H/3 e_E line (was: the Laskar-band composite). */
+ *  Uses the framework H/3 fluctuation line (was: the Laskar-band composite). */
 function _eCompModulation(t_Ma, s) {
   if (t_Ma === 0) return 1;
-  const e = _fwEarthEccH3(-t_Ma * 1e6);
+  const e = _fwEarthEcc(-t_Ma * 1e6);
   return Math.pow(Math.pow(1 - e * e, -1.5) / _FW_ECC_G0, s);
 }
 
 /** Meeus E-factor (Earth-eccentricity scaling of the M-bearing series terms),
  *  bounded: E ≡ e_E(t)/e_E(J2000). Meeus's polynomial
  *  1 − 0.002516·T − 0.0000074·T² IS exactly e(T)/e₀ for his e(T) parabola —
- *  the framework H/3 line supplies the bounded closed form (value 1, slope
- *  and curvature anchored to astro-reference at J2000; bounded at every
- *  epoch, where the polynomial reaches E = −40, E² = +1,626 at +220 kyr and
- *  explodes the series amplitudes). Flag-consistent: pure-Meeus A/B mode
- *  keeps the polynomial. */
+ *  the framework H/3 fluctuation line supplies the bounded closed form
+ *  (value 1 at J2000 by construction; predicts Meeus's BCE values to 0.3–0.4%
+ *  — 1.0531 vs 1.0503 at −135; bounded at every epoch, where the polynomial
+ *  reaches E = −40, E² = +1,626 at +220 kyr and explodes the series
+ *  amplitudes). Flag-consistent: pure-Meeus A/B mode keeps the polynomial. */
 function _fwEFactor(jd_tt, T, T2) {
   if (!MOON_ARGS_FRAMEWORK_NATIVE) return 1 - 0.002516 * T - 0.0000074 * T2;
-  return _fwEarthEccH3((jd_tt - j2000JD) / 365.2422) / _FW_ECC.e0;
+  return _fwEarthEcc((jd_tt - j2000JD) / 365.2422) / _FW_ECC_E0;
 }
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
@@ -31980,9 +32018,10 @@ function setupGUI() {
         + fmt(_d180(fw.Lp, me.Lp)) + fmt(_d180(fw.D, me.D)) + fmt(_d180(fw.M, me.M))
         + fmt(_d180(fw.Mp, me.Mp)) + fmt(_d180(fw.F, me.F)));
     }
-    console.log('Recipe: of-date anchors frame-decomposed (ICRF + framework p = 360·13/H); element');
-    console.log('T² AND T³ from the e_E channel (s_Ω = 1 derived, s_ϖ = 2.407 anchored; e/ė/ë');
-    console.log('anchors from astro-reference; e_E = the framework H/3 line); D and M identity-composed (D = Lp − L_sun,');
+    console.log('Recipe: of-date anchors frame-decomposed (ICRF + framework p = 360·13/H); perigee/');
+    console.log('node from the phase-aware e_E channel (s_Ω = 1 derived, s_ϖ = 2.407 anchored;');
+    console.log('e_E = the framework H/3 fluctuation, FULLY DERIVED: e = base·(1 + cosθ_i/2),');
+    console.log('phase from the inclination anchor 21.77°); D and M identity-composed (D = Lp − L_sun,');
     console.log('M = L_sun − ϖ_sun) with secular content from the framework real-time year-length');
     console.log('integrals — their growing rows are the bounded framework prediction replacing');
     console.log('Meeus parabolas, not an error. Residual = omitted element T⁴ tails');
@@ -31993,11 +32032,13 @@ function setupGUI() {
     console.log('   everywhere; M\'/F drift ≈ 1.4°/cy + T² tail. The argument decomposition identified');
     console.log('   this as the ICRF↔of-date frame gap (missing general precession p = 360·13/H) plus');
     console.log('   the e_E-channel secular T² — measured, not mysterious.');
-    console.log(' • Table 2 (framework-native _fwMoonArgs): frame + T² + derived T³ —');
-    console.log('   M\' ≤ 0.033°, F ≤ 0.021° at −584 (0.0013 / 0.0008 °/cy vs the 0.05°/cy gate);');
+    console.log(' • Table 2 (framework-native _fwMoonArgs, fully-derived e_E line): frame +');
+    console.log('   phase-aware channel — M\' +0.22° at −135 / +0.38° at −584, F −0.03°/−0.05°');
+    console.log('   = the line\'s PREDICTED ë (−3.7e-8) vs secular theory\'s soft −2.5e-7;');
+    console.log('   minutes-class in eclipse timing, in-window rows ~0 (0.05°/cy gate holds);');
     console.log('   D ≤ 0.08°, M ≤ 0.11° at −584 = the real-time-integral prediction vs Meeus');
     console.log('   (bounded ±5° at deep time where the Meeus parabola reaches 82° at −50 kyr).');
-    console.log('   Residual = omitted element T⁴ tails + the Ω T³ 20% overshoot, documented.');
+    console.log('   Residual provenance: docs/66 §1 (derivation + experiment log).');
     console.log(' • Flip MOON_ARGS_FRAMEWORK_NATIVE via the console for pure-Meeus A/B runs;');
     console.log('   all certification gates passed (doc 66 §1).');
     console.log(' • Decision history: Phase 9.14 Option A kept Meeus arguments (drift then');

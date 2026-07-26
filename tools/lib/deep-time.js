@@ -848,26 +848,31 @@ function _fwEarthEccComposite(t_yr) {
   return e;
 }
 
-// ─── Framework-native H/3 e_E line (mirror of src/script.js _FW_ECC) ──
-// e(t) = c + A·cos(ω₃t + φ), solved at load from the three astro-reference
-// anchors (e₀, ė₀, ë₀) — zero free parameters. Supersedes the Laskar-band
-// composite above for the lunar machinery (composite retained for A/B).
+// ─── Framework H/3 fluctuation line (mirror of src/script.js _fwEarthEcc) ──
+// ONE movement, FULLY DERIVED, zero solved values:
+//   e(t) = eccentricityBase · (1 + cos θ_i(t) / 2)
+// The H/3 wobble cycle that drives Earth's inclination (anchor 21.77°) also
+// carries the Moon-channel eccentricity fluctuation: mean = base (Law 5),
+// amplitude = base/2, phase = ϖ_ICRF(J2000) − 21.77° = 81.18° past max.
+// Observed J2000 e (−0.86%) and ė (+1.7%) are PREDICTIONS, not inputs.
+// Supersedes the Laskar-band composite (retained for A/B) and the
+// fitted-phase line (solved φ = 78.6° hereby derived). Snapshot phase
+// (tools libs are pure snapshot kinematics; src adds deep-time integration).
 const _FW_ECC = (() => {
   const AR = C.ASTRO_REFERENCE;
-  const w = 2 * Math.PI / (C.H / 3) * 100;   // rad per Julian cy
-  const e0 = AR.earthEccentricityJ2000;
-  const Asin = -AR.earthEccentricityDotJ2000 / w;
-  const Acos = -AR.earthEccentricityDotDotJ2000 / (w * w);
-  return { w, A: Math.hypot(Asin, Acos), phi: Math.atan2(Asin, Acos), c: e0 - Acos, e0 };
+  const th0 = (AR.earthPerihelionLongitudeJ2000 - AR.earthInclinationCycleAnchor) * Math.PI / 180;
+  const A = C.eccentricityBase / 2;
+  return { th0, A, c: C.eccentricityBase, e0: C.eccentricityBase + A * Math.cos(th0), wYr: 2 * Math.PI / (C.H / 3) };
 })();
-function _fwEarthEccH3(t_yr) {
-  return _FW_ECC.c + _FW_ECC.A * Math.cos(_FW_ECC.w * (t_yr / 100) + _FW_ECC.phi);
+function _fwEarthEcc(t_yr) {
+  return _FW_ECC.c + _FW_ECC.A * Math.cos(_FW_ECC.th0 + _FW_ECC.wYr * t_yr);
 }
-const _FW_ECC_G0 = Math.pow(1 - _FW_ECC.e0 * _FW_ECC.e0, -1.5);
+const _FW_ECC_E0 = _FW_ECC.e0;                                     // J2000 value anchor (exact by construction)
+const _FW_ECC_G0 = Math.pow(1 - _FW_ECC_E0 * _FW_ECC_E0, -1.5);
 
 function _eCompModulation(t_Ma, s) {
   if (t_Ma === 0) return 1;
-  const e = _fwEarthEccH3(-t_Ma * 1e6);
+  const e = _fwEarthEcc(-t_Ma * 1e6);
   return Math.pow(Math.pow(1 - e * e, -1.5) / _FW_ECC_G0, s);
 }
 
@@ -1054,8 +1059,8 @@ function cyclesBetweenYears(yearA, yearB, divisor_N) {
 
 // ─── Exports ──────────────────────────────────────────────────────────────
 module.exports = {
-  // Framework e_E: H/3 line (production) + Laskar-band composite (A/B research)
-  _fwEarthEccH3,
+  // Framework e_E: H/3 fluctuation line (production) + Laskar-band composite (A/B research)
+  _fwEarthEcc,
   _fwEarthEccComposite,
   // Anchor constants (for callers that need them)
   HOLISTIC_YEAR_J2000,

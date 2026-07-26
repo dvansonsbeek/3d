@@ -54,17 +54,22 @@ classical constant:
   framework's own p = 360·13/H = 50.24″/yr closes the ±1.4°/century M′/F
   drift with zero new constants — the drift was frame bookkeeping, not
   missing physics. Meter: "Meeus vs Integrator (lunar argument drift)".
-- **Element T² — derived from the solar-eccentricity channel.** The Sun's
-  mean perturbation on the lunar node and perigee scales as (1 − e_E²)^(−3/2).
-  With e₀ = 0.016708634 and ė₀ = −4.2037e-5/cy (framework-anchored), the
-  channel predicts the node's Meeus T² coefficient at sensitivity
-  s_Ω = 1.018 ≈ 1 — a DERIVED match (Meeus +7.47″/cy² vs predicted +7.34).
-  The perigee needs one anchored Clairaut-type sensitivity s_ϖ = 2.407 (the
-  classical ≈ 2 rate amplification of apsidal motion), constant across orders.
-- **Element T³ — derived, zero new constants.** The eccentricity curvature
-  anchor ë₀ = −2.534e-7/cy² (astro-reference `earthEccentricityDotDotJ2000`,
-  2× the Meeus Eq. 25.4 T² coefficient) propagated through the same channel
-  reproduces Meeus's T³ terms.
+- **Element secular content — the phase-aware solar-eccentricity channel.**
+  The Sun's mean perturbation on the lunar node and perigee scales as
+  (1 − e_E²)^(−3/2). The perigee/node longitudes are computed as
+  ϖ(T) = ϖ₀ + ϖ̇₀·(T + ∫₀ᵀ[(g(e_E(t))/g₀)^s − 1]dt) — the rate speeds up and
+  slows down with the e_E phase; the older frozen-κ T²/T³ Taylor coefficients
+  remain in the code as documented J2000 checks against Meeus. Sensitivities:
+  s_Ω = 1 (derived — with the observed ė₀ = −4.2037e-5/cy the node measures
+  s_Ω = 1.018, matching Meeus's +7.47″/cy² at 1.8%) and one anchored
+  Clairaut-type s_ϖ = 2.407 (classical ≈ 2 apsidal rate amplification),
+  constant across orders.
+- **e_E itself — fully derived (see "Framework-native e_E" below).** The
+  channel's eccentricity history is the framework's own H/3 fluctuation;
+  the observed J2000 eccentricity, its rate, and its curvature are
+  PREDICTIONS of that line (−0.9%, +1.7%, and sign-correct respectively),
+  not inputs. The astro-reference (e₀, ė₀, ë₀) values are retained as the
+  documented Taylor-check anchors.
 - **The sign paradox dissolved.** Brown's m²-scaling predicts apsidal
   precession ACCELERATING while Meeus's M′ T² says decelerating — the old
   "wrong sign" mystery. Resolution: the Lunar Precession Invariant governs
@@ -87,48 +92,106 @@ classical constant:
   D parabola reaches 82°; deviations ≤ 0.08°/0.11° (D/M) at −584, ~0 in the
   certification window. Zero new constants.
 
-Certification of the framework-native default: argument drift M′ ≤ 0.033° /
-F ≤ 0.021° at −584 under the astro-reference ë anchor (legacy comparison:
-+1.4°/century); NASA-canon recall 99.69% /
-tight-window 75.42% / type 98.97% — every counter within ±2 events of the
-pure-Meeus reference; 26-event historical audit verdicts identical. D/M
-re-certification: physical recall identical, tight-window recall +13 events
-better (75.53%), model total exactly 12,064 = NASA's count, five additional
-type flips at the documented ±0.02 magnitude classification boundary (129 vs
-124 — the accepted, documented trade); audit-26 identical with −135
-at 1040 km (1029 km once the scene Moon was routed through the shared
-argument dispatcher — nearly every ancient BestGap moved closer; 1032 km
-under the astro-reference ë anchor). At deep
-time the same channel modulates the anchored precession chains as
-rate(t) = invariant mean × [g(t)/g₀]^s (the factored law, doc 99) —
-modulation bounded 0.9987…1.0007 over ±2 Myr under the H/3 line, where the
-Meeus parabola is unbounded.
+Certification of the framework-native default (fully-derived e_E line):
+argument drift vs Meeus M′ +0.221° at −135 / +0.381° at −584 and
+F −0.025° / −0.047° — this is the predicted-ë-vs-secular-ë difference
+(minutes-class in eclipse timing), with in-window rows at zero (legacy
+comparison: +1.4°/century); NASA-canon recall 99.71% / tight-window 74.88% /
+type 98.84% (140 type mismatches, all at the documented ±0.02 magnitude
+classification boundary; certified reference 99.69 / 75.42 / 98.97);
+26-event historical audit split identical (1 confirmed · 12 off-peak ·
+6 regional · 0 ΔT-signal · 7 geographic) with minutes-class ΔJD throughout
+and −135 at 1088 km (the standing geographic tension, assigned to the
+T²-attribution question); timed Babylonian lunar corpus (Almagest records,
+reduced via local astronomy only — no external ΔT, no eclipse canon):
+mean +3 min / RMS 36 min, statistically identical to conventional secular
+theory's +2/34 (tools/explore/timed-babylonian-lunar-eclipses.js; corpus
+encodings to be verified against Stephenson 1997 Ch. 6 before publication).
+Earlier D/M re-certification details: physical recall identical, tight
++13 events, model total exactly 12,064 = NASA's count, five type flips at
+the boundary (129 vs 124 — accepted trade). At deep time the same channel
+modulates the anchored precession chains as rate(t) = invariant mean ×
+[g(t)/g₀]^s (the factored law, doc 99) — bounded at every epoch under the
+derived line (e ∈ [0.0077, 0.0231]), where the Meeus parabola is unbounded.
 
 **How ė is pinned (the (ė, s) degeneracy).** Only the product s·ė enters each
 element's T², but node and perigee share one ė, and fast-converging node
 theory pins s_Ω ≈ 1 — so the node MEASURES ė (observed −4.204e-5/cy →
 s_Ω = 1.018 ✓), and the perigee ratio then yields s_ϖ with no freedom. The
-alternative — the H/16-law ė at its current phase (−0.84e-5/cy) — would force
-s_Ω = 5.1, excluded by theory. Falsification path: s_ϖ = 2.407 should be
-derivable from the Hill–Brown e′² series; a first-principles derivation
-matching 2.407 would close the last anchored constant.
+alternative — the H/16 perihelion law's ė at its current phase
+(−0.84e-5/cy) — would force s_Ω = 5.1, excluded by theory (and was falsified
+directly by the record; see the experiment log below). The shipped derived
+line PREDICTS ė = −4.273e-5 (+1.7% of the measured value) with no anchor.
+Falsification path: s_ϖ = 2.407 should be derivable from the Hill–Brown e′²
+series; a first-principles derivation matching 2.407 would close the last
+anchored constant.
 
-**Framework-native e_E: the H/3 line.** The deep-time e_E behind the factored
-law and the E-factor is a SINGLE H/3 cosine (H/3 = Earth's inclination/ICRF-
-apsidal cycle; Config #7 eccentricity divisor Ea = 3), solved at load from
-the three astro-reference anchors (e₀ = 0.01671022, ė₀ = −4.2037e-5/cy,
-ë₀ = −2.534e-7/cy²) — fully determined, zero free parameters. Solution:
-A ≈ 0.0110, base ≈ 0.0087, φ(J2000) ≈ 43° (the phase's physical
-interpretation is an open question). Rationale: the framework's own L1
-climate fit carries NO Earth.Ecc line (the "eccentricity" 100-kyr band is
-attributed to compound planet beats; the 405-kyr is absent in LR04), so
-geology does not pin e_E — the lunar perigee channel is the e_E instrument,
-and in the observational window all candidate e_E histories sharing the
-three anchors are empirically equivalent. Divergent framework prediction:
-deep-time e_max ≈ 0.020 (conventional secular theory: ≈ 0.067) —
-falsifiable. The earlier Laskar-band composite (equality-constrained
-ridge fit, 21 coefficients, 405-kyr g₂−g₅ labeled OFF-lattice) is
-SUPERSEDED and retained in code for A/B research only.
+**Framework-native e_E: the fully-derived H/3 fluctuation.** The e_E behind
+the rate channel, the E-factor, and the factored deep-time law is ONE
+movement — the H/3 wobble cycle that also drives Earth's inclination —
+expressed in eccentricity form with nothing solved and nothing fitted:
+
+    e(t) = eccentricityBase · (1 + cos θ(t) / 2)
+    θ(t) = 3 · (t − balancedYear) / H · 360° − 180°
+
+Mean = Law 5's base, amplitude = base/2, and the phase is pure lattice
+arithmetic: the inclination minimum falls exactly on the balanced year (the
+System Reset convention), which fixes θ(J2000) = 81.178°. In anchor form
+this is θ = ϖ_ICRF − 21.77°, and 21.77° is itself derived
+(ϖ_ICRF(J2000) − 3·(2000 − balancedYear)/H·360° + 180° = 21.769°) — the
+perihelion longitude cancels out of the channel phase entirely. Inputs:
+base, balancedYear, H. Everything observational becomes a prediction:
+
+- e(J2000) = 0.016566 (observed 0.0167102; −0.86%)
+- ė(J2000) = −4.273e-5/cy (secular theory −4.204e-5; +1.7%)
+- ë(J2000) = −3.7e-8/cy² (secular −2.5e-7; correct sign — the standing
+  divergence, worth 0.2–0.4° of BCE argument drift, minutes of timing)
+- E-factor at −135/−584: 1.0544/1.0657 (Meeus 1.0503/1.0601; 0.4–0.5%)
+- bounded e ∈ [0.0077, 0.0231]; rate turning points at ≈ −23,200 and
+  +32,700 (the ~±25-kyr boundedness emerges from the geometry); e-mean
+  crossing ≈ 4739, locked to the inclination's own mean crossing.
+
+Cross-checks: freely solving the line from the observed (e, ė) with the mean
+held at base returns θ = 79.96° and A = 0.4936·base — the data reproduce the
+derived structure unprompted. The certified predecessor line (same H/3
+period, phase fitted at 78.6°, all three anchors consumed) is hereby derived
+to ~1–2°. Frame interlock: read on the equinox clock instead of ICRF
+(16 = 13 + 3), the same anchor construction gives an H/16-period line whose
+rate-solved amplitude is eccentricityAmplitude × 1.046 and whose predicted ë
+is best-in-class (−1.96e-7); it is retained as a research note — exact frame
+equivalence would require base/amp = 32/3 (actual 11.35, a 6.4% gap).
+
+Experiment log (what the record rejected before this form was found):
+(a) the H/16 perihelion law itself in the channel (e-max 1246; today's slope
+−0.84e-5, 5× under observed) — canon fell to 96.77/44.07/88.98, the
+26-event audit acquired systematic BCE timing offsets (+26…+76 min), and
+the timed Babylonian corpus rejected it (mean −26 / RMS 59 min) while,
+notably, its BCE paths landed closest-ever to Babylon (303 km) and the
+Halys region (122 km) — recorded as the T²-attribution clue; (b) a fixed
+κ/5 rate — same failure class; (c) a value-exact amplitude 0.561·base —
++14% on ė, tablet RMS 42 min, and rejected structurally: the channel
+quantity is not the osculating eccentricity (the H/16 orbit law owns the
+observed J2000 value; the two curves crossed near year 1605 and meet again
+only after tens of millennia), so anchoring the channel to today's value
+would privilege our epoch.
+
+Rationale for the single-line form: the framework's own L1 climate fit
+carries NO Earth.Ecc line (the "eccentricity" 100-kyr band is attributed to
+compound planet beats; the 405-kyr is absent in LR04), so geology does not
+pin e_E — the lunar perigee channel is the e_E instrument. Divergent
+framework prediction: deep-time e_max ≈ 0.023 (conventional secular theory:
+≈ 0.067) — falsifiable. The earlier Laskar-band composite (equality-
+constrained ridge fit, 21 coefficients, 405-kyr g₂−g₅ labeled OFF-lattice)
+is SUPERSEDED and retained in code for A/B research only.
+
+Open research item — the 1.2° azimuthal family: three independent ~1.2°
+tensions live in the node/phase sector while all magnitudes are stiff:
+(1) reconciling the RAW Souami & Souchay planetary nodes with JPL ecliptic
+inclinations moves Earth's invariable-plane node by −1.23° (i_E moves only
++3″); (2) the channel's value-exact phase sits at 80.09° vs the derived
+81.18°; (3) equivalently, the inclination minimum displaced +339 yr from
+the balanced year. Same size, same sector — possibly one cause. If it
+resolves structurally, the channel's e(J2000) prediction snaps exact.
 
 ### 1.1 Longitude Series (Table 47.A, 60 terms + 3 additional)
 
