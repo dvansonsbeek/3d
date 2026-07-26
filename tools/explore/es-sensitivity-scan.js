@@ -4,9 +4,12 @@
  * using the D1 first-principles 3-body laboratory, then convert the response
  * into the framework's deep-time law via the fully-derived e_E channel.
  *
- * Goal: derive the planetary Lp T² remainder (+0.0020131°/cy², currently the
- * last labeled-empirical polynomial) as  k · [e_E²(t) − e_E²(J2000)]  — a
- * BOUNDED carrier, because the derived e_E channel is bounded.
+ * Goal: derive the planetary Lp T² remainder (+0.0020131°/cy²) as
+ * k · [e_E²(t) − e_E²(J2000)]  — a BOUNDED carrier, because the derived e_E
+ * channel is bounded. RESULT: achieved at 95.1% (k = −2704 vs record-implied
+ * −2844); the record-normalized carrier is SHIPPED as _fwLpPlanetaryCarrier
+ * (src/script.js + tools mirror) — the former "last labeled-empirical
+ * polynomial" now has a derived origin and bounded deep-time form.
  *
  * Method: calibrate ICs once at e_S(J2000); then vary ONLY e_S across the
  * channel's bounded range with all lunar ICs fixed (partial derivative in

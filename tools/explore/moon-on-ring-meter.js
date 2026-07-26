@@ -102,5 +102,9 @@ for (const yr of EPOCHS) {
   const ring = sampleMoon(SG2, jd0, 240, 27.3);
   analyze(String(yr), overrideSamples[yr], ring);
 }
-console.log('\nInterpretation: out-of-plane = Moon above/below the visible ring plane;');
-console.log('radial = inside/outside the ring ellipse; nearest-gap = what the eye sees.');
+console.log('\nInterpretation: out-of-plane = Moon above/below the visible ring plane.');
+console.log('CAVEAT (known artifact): in tools the override modifies only the returned');
+console.log('RA/Dec while p.distAU stays the RAW pivot distance, so the radial and');
+console.log('nearest-gap columns pair series azimuths with raw anomaly — an artifact of');
+console.log('2·e·a·sin(Δlon/2), NOT what the eye sees in the browser. Fix pending (TODO):');
+console.log('pair the override curve with the series distance (_meeusDistKm equivalent).');

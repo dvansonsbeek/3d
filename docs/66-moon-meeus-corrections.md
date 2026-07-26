@@ -92,21 +92,50 @@ classical constant:
   D parabola reaches 82°; deviations ≤ 0.08°/0.11° (D/M) at −584, ~0 in the
   certification window. Zero new constants.
 
+- **L′ planetary remainder — the bounded e_E² carrier (derived).** Meeus's
+  planetary T² content (T2_LP − T2_LP_TIDAL = +0.0020131 °/cy² = +7.25″/cy²)
+  is the J2000 Taylor truncation of `K_PL · ∫₀ᵀ (e_E²(t′) − e_E²(J2000)) dt′`
+  — the Moon's mean motion responding to the Sun's eccentricity as it moves
+  along the derived H/3 channel (the Laplace/Adams planetary acceleration,
+  reproduced in-framework). K_PL is derived lazily from the existing record
+  remainder and the channel slope (record-normalized; zero new constants);
+  the first-principles Sun–Earth–Moon 3-body laboratory
+  (`tools/explore/derive-meeus-amplitudes.js` + `es-sensitivity-scan.js`,
+  fixed-action Adams–Laplace scan) reproduces the coefficient independently
+  at 95.1% (k = ∂n/∂e_S² = −2704 vs record-implied −2844 °/cy per unit e²)
+  and numerically confirms the channel exponents (s_ϖ 2.486 vs the Clairaut
+  2.407; s_Ω 0.880 vs 1.018) and the E-factor law (annual equation
+  ∝ e_S^1.0007). In-window the carrier is Taylor-identical to the old T²
+  (−584: +0.017° difference ≈ 2 min); at deep time it stays bounded
+  (≤ ~230°) where the T² parabola reached 7,892° at +200 kyr. The same
+  laboratory derives the top-20 longitude amplitudes at 100.0 ± 0.1% and the
+  apsidal/nodal precession periods at 0.036%/0.064% from the sidereal month
+  plus solar parameters alone — the three Moon inputs are not independent.
+
+- **Deep-future validity.** The cumulative-H table spans ±500 Myr symmetric
+  (the chains are smooth and physical throughout: LOD 24→27.4 hr, month
+  27.32→29.42 d at +500 Myr), and the Meeus-polynomial fallback clamps its
+  T²/T³/T⁴ tails at |T| ≤ 100 cy — unclamped, the fitted T⁴ tail cancels
+  the lunar mean motion at year ≈ 1,989,000 and reverses it beyond. The
+  scene Moon is prograde at every epoch out to ±1 Gyr by construction.
+
 Certification of the framework-native default (fully-derived e_E line):
 argument drift vs Meeus M′ +0.221° at −135 / +0.381° at −584 and
 F −0.025° / −0.047° — this is the predicted-ë-vs-secular-ë difference
 (minutes-class in eclipse timing), with in-window rows at zero (legacy
 comparison: +1.4°/century); NASA-canon recall 99.71% / tight-window 74.88% /
 type 98.84% (140 type mismatches, all at the documented ±0.02 magnitude
-classification boundary; certified reference 99.69 / 75.42 / 98.97);
-26-event historical audit split identical (1 confirmed · 12 off-peak ·
-6 regional · 0 ΔT-signal · 7 geographic) with minutes-class ΔJD throughout
-and −135 at 1088 km (the standing geographic tension, assigned to the
-T²-attribution question); timed Babylonian lunar corpus (Almagest records,
-reduced via local astronomy only — no external ΔT, no eclipse canon):
-mean +3 min / RMS 36 min, statistically identical to conventional secular
-theory's +2/34 (tools/explore/timed-babylonian-lunar-eclipses.js; corpus
-encodings to be verified against Stephenson 1997 Ch. 6 before publication).
+classification boundary). Current certified reference after the 8H-lattice +
+always-chains + bounded-carrier + ring-lock package (commit 8e131aa):
+full-canon recall 99.61 / tight 74.37 / type 98.75 (all mismatch samples
+knife-edge at the γ ≈ 1.0/1.5 boundaries); 26-event historical audit split
+1 confirmed · 11 off-peak · 7 regional · 0 ΔT-signal · 7 geographic;
+timed Babylonian lunar corpus (Almagest records, reduced via local
+astronomy only — no external ΔT, no eclipse canon): non-deep skeleton
+mean +3 min / RMS 36 min (statistically identical to conventional secular
+theory's +2/34), deep-chains branch −8 min / 38 min / 4-of-6
+(tools/explore/timed-babylonian-lunar-eclipses.js; corpus encodings to be
+verified against Stephenson 1997 Ch. 6 before publication).
 Earlier D/M re-certification details: physical recall identical, tight
 +13 events, model total exactly 12,064 = NASA's count, five type flips at
 the boundary (129 vs 124 — accepted trade). At deep time the same channel

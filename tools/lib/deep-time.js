@@ -1025,7 +1025,7 @@ function _cumulIntegralAtYear(year) {
 }
 
 /** ∫_{yearA}^{yearB} 1/H(t') dt'. Returns null if either endpoint is outside
- *  [-500 Myr, +1 Myr] or past the tidal-lock asymptote. */
+ *  the precomputed range (±500 Myr symmetric). */
 function integralInverseHFromYears(yearA, yearB) {
   if (yearA === yearB) return 0;
   const cA = _cumulIntegralAtYear(yearA);

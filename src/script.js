@@ -6167,8 +6167,9 @@ function _fwSunSecularDeviations(jd_tt) {
 //    amplification ≈ 2.0). The channel is integrated phase-aware along the
 //    framework H/3 fluctuation line — fully derived, e = base·(1 + cosθ_i/2),
 //    phase from the inclination anchor 21.77° — see _FW_ECC.
-//  • L′ T² = framework tidal n̈/2 (α₁ chain, −12.93″/cy² = LLR) + explicit
-//    planetary secular remainder (+7.25″/cy², labeled empirical).
+//  • L′ T² = framework tidal n̈/2 (α₁ chain, −12.93″/cy² = LLR) + planetary
+//    secular remainder (+7.25″/cy² — derived: the bounded e_E²-channel
+//    carrier _fwLpPlanetaryCarrier; 3-body laboratory reproduces it at 95%).
 //  • D and M are retained as full Meeus polynomials (Sun-side arguments —
 //    the framework-native Sun campaign owns that territory).
 //  • Element T³-and-above content comes from the phase-aware channel
@@ -6208,7 +6209,7 @@ const _FW_MOON = (() => {
   const T3_N = NDOT * (S_N * S_N * KAPPA * KAPPA + S_N * KAPPA_DOT) / 6;  // ≈ +2.57e-6 °/cy³ (Meeus Ω: +2.14e-6)
   // L′ carrier T²: framework tidal n̈/2 + explicit planetary secular remainder
   const T2_LP_TIDAL     = (-25.86 / 3600) / 2;           // α₁-chain n̈ (= LLR), doc 66 §5
-  const T2_LP_PLANETARY = -0.0015786 - T2_LP_TIDAL;      // +7.25″/cy², labeled empirical
+  const T2_LP_PLANETARY = -0.0015786 - T2_LP_TIDAL;      // +7.25″/cy² — K_PL normalization anchor for the derived bounded carrier
   const T2_LP = T2_LP_TIDAL + T2_LP_PLANETARY;
   return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
 })();
@@ -6220,9 +6221,10 @@ const _FW_MOON = (() => {
  *  Conventions mirrored from the layer branch (moveModel ~L57423): SI-year
  *  coordinate _jdToSIyear (UT basis), of-date chains, signs apsidal +/nodal −.
  *  Anchored at J2000 (chains = 0 there → Meeus anchors exact). The Meeus Lp
- *  T³/T⁴ tails and the empirical planetary Lp T² remainder (+7.25″/cy²,
- *  worth 0.0014° at −584) are OMITTED here — the chains carry the physical
- *  (tidal + e_E-channel) content; snapshot mode keeps the certified
+ *  T³/T⁴ tails are OMITTED here (the chains carry the tidal content); the
+ *  planetary Lp remainder rides the bounded e_E²-channel carrier
+ *  _fwLpPlanetaryCarrier (its J2000 Taylor truncation is the old
+ *  (T2_LP−T2_LP_TIDAL)·T² polynomial); snapshot mode keeps the certified
  *  polynomial skeleton, bit-equivalent at J2000 by construction. The Sun
  *  carriers: L_sun advances 360°/tropical year on the model timeline;
  *  ϖ_sun advances on the H/16 chain (framework rate 1.7179°/cy replaces
@@ -6271,8 +6273,8 @@ function _fwMoonArgs(jd_tt) {
   // (the H-grid's 0.527-s month spacing forced +0.0737 s on the quantized
   // month = −44 min of BCE opposition timing; the 8H lattice point sits
   // +0.0078 s from the measured month and the timed-Babylonian corpus
-  // certifies the chains at parity with the certified skeleton: −6/37/4-of-6
-  // vs +3/36/3). Snapshot mode keeps the certified polynomial skeleton —
+  // certifies the chains at parity with the certified skeleton: −8/38/4-of-6
+  // vs +3/36/3, incl. the ~2-min bounded-carrier shape shift). Snapshot mode keeps the certified polynomial skeleton —
   // the same mode split the scene layers use (locked J2000 speeds vs
   // integrators), bit-equivalent at J2000 by construction.
   if (DEEP_TIME_MODE_ENABLED) {
@@ -6890,15 +6892,18 @@ const _MAX_MOON_CYCLE_CACHE = 512;
  *  to (locked) `obj.speed × Δyear / 2π`, so the integrator path is
  *  bit-equivalent to the snapshot path at recent epochs.
  *
- *  Deep-time mode: Simpson integration of (T_yr_SI / T_period_SI)(y) over
- *  [yearA, yearB], capturing Farhat-derived period evolution for any Moon
- *  scene-graph cycle (tropical month, apsidal precession, nodal precession,
- *  apsidal-meets-nodal beat, lunar leveling cycle). Anchored at
- *  startmodelYear in the scene graph so currentYear==startmodelYear gives
- *  zero cycles (preserves the J2000 phase used by modern eclipses).
+ *  Deep-time mode: cumulative-table lookup (see _moonCycleTable below) for
+ *  any span inside ±250 kyr — the hot path; per-call Simpson integration of
+ *  (T_yr_SI / T_period_SI)(y) remains as the out-of-range fallback,
+ *  capturing Farhat-derived period evolution for any Moon scene-graph cycle
+ *  (tropical month, apsidal precession, nodal precession, apsidal-meets-
+ *  nodal beat, lunar leveling cycle). Anchored at startmodelYear in the
+ *  scene graph so currentYear==startmodelYear gives zero cycles (preserves
+ *  the J2000 phase used by modern eclipses).
  *
- *  Per-periodFn LRU cache (~512 entries each) — the scene graph calls this
- *  6× per frame (one per Moon-chain node). */
+ *  Per-periodFn bounded FIFO cache (~512 entries each) serves only the
+ *  Simpson fallback; in-range calls return from the table and never touch
+ *  it. */
 // ═══ Cumulative month-cycle tables ═══ Fixed 10-yr grid over ±250 kyr
 // around J2000, cumulative cycles per chain (per-cell 3-point Simpson at
 // build; linear interpolation on read). Deterministic and call-order
@@ -7284,11 +7289,12 @@ function meanPlanetRotationPeriodAtAge(planetName, t_Ma, T_rot_J2000_s = null) {
 //
 // Each planet's orbital cycle count between two SI-year inputs, integrated under
 // Driver 2 (Kepler + solar mass loss). Reuses the generic `_moonChainCycles`
-// adaptive Simpson + LRU-cache infrastructure (the "Moon" name is historical;
-// the function is period-function-agnostic).
+// infrastructure — cumulative table in-range, adaptive Simpson + bounded FIFO
+// cache out-of-range (the "Moon" name is historical; the function is
+// period-function-agnostic).
 //
 // Cache identity invariant: each period function MUST be captured ONCE as a stable
-// const so `_moonChainCycles` LRU cache (keyed by function identity) works. Inline
+// const so the caches AND `_MOON_CYCLE_TABLES` (all keyed by function identity) work. Inline
 // `t_Ma => meanPlanetOrbitalPeriodAtAge(t_Ma, K)` inside the wrappers would create
 // a new function object per call, defeating the cache.
 //
@@ -7496,7 +7502,7 @@ function _cumulIntegralAtYear(year) {
 
 /** ∫_{yearA}^{yearB} 1/H(t') dt' via cumulative-table lookup. Years are calendar
  *  years (J2000 = 2000.5). Returns null if either endpoint is outside the
- *  precomputed range [-3M, +1M] or past the tidal-lock asymptote.
+ *  precomputed range (±500 Myr symmetric).
  *  The `_N_unused` arg is kept for backward-compat with old callers. */
 function integralInverseHFromYears(yearA, yearB, _N_unused = 1000) {
   if (yearA === yearB) return 0;
@@ -30440,7 +30446,7 @@ function setupGUI() {
 
   addTooltip(balancedJdFolder.addBinding(predictions, 'lastBalancedJD_H', {
     label: 'Last H JD', readonly: true, format: fmtJdOrDash
-  }), 'Julian Date of the most recent Earth-balanced event. Copy and paste into Julian Day input to navigate. Shows "—" if outside the deep-time table range (~3 Myr past, ~700 kyr future before tidal-lock asymptote).');
+  }), 'Julian Date of the most recent Earth-balanced event. Copy and paste into Julian Day input to navigate. Shows "—" if outside the deep-time table range (±500 Myr).');
 
   const bHnext = addTooltip(balancedJdFolder.addBinding(predictions, 'nextBalancedJD_H', {
     label: 'Next H JD', readonly: true, format: fmtJdOrDash
@@ -32466,9 +32472,8 @@ function setupGUI() {
     console.log(`  Table 2 (VISIBLE, same scene frame):         perigee ${(slope2('perig') * 100).toFixed(3)} °/cy, node ${(slope2('node') * 100).toFixed(3)} °/cy`);
     console.log('  Interpretation:');
     console.log('  • The apsidal+canceller pair runs at the OF-DATE rate (8.8476 yr) — the frame');
-    console.log('    fix. Table 2 residual perigee drift ≈ −0.2°/cy = Meeus\'s perigee T² (the');
-    console.log('    derived e_E-channel deceleration, −0.01032 °/cy² → 6.9° at −584), which the');
-    console.log('    constant-rate layers deliberately do not carry (bounded, derived, accepted).');
+    console.log('    fix. Table 2 residual perigee drift ≈ −0.010°/cy (chain-integrated layers +');
+    console.log('    deep-time ring lock; the old −0.2°/cy constant-rate-layer gap is closed).');
     console.log('  • RMSΔdist ≈ 700 km floor = perturbation-pattern residual (present at J2000).');
     console.log('  • Table 1 vs Table 2 meanΔlon difference = the of-date↔scene frame conversion');
     console.log('    absorbed by the override (expected).');
@@ -57446,9 +57451,10 @@ function updatePositions() {
       // (Stage C note: a rigid ring-frame placement variant was implemented
       // and MEASURED to be an exact identity — the rotAxis frame is rigid to
       // the base chain, so the frame-drift hypothesis is falsified; reverted.
-      // The remaining deep-time Moon-vs-ring gap decomposes into the
-      // planetary-Lp-T² radial breathing + a browser-vs-tools scene-state
-      // delta at ≥120 kyr — see TODO Stage C.)
+      // The deep-time Moon-vs-ring misalignment was resolved by the ring
+      // lock (_applyMoonRingLock): the ring's ellipse/node phases follow the
+      // argument clock, compensating the still-open browser earth-chain
+      // frame divergence — see TODO Stage C.)
       _moonVisualCorrection.applyMatrix4(earth.rotationAxis.matrixWorld);          // local → world
       _moonVisualMatrix.copy(obj.pivotObj.parent.matrixWorld).invert();
       _moonVisualCorrection.applyMatrix4(_moonVisualMatrix);                      // world → orbitObj local

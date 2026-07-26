@@ -1712,10 +1712,11 @@ function computePlanetPosition(target, jd) {
     // Consistent with src/script.js Moon Meeus overlay fix (commit 5443a55).
     // NOTE (Stage C investigation): an empirical scene-basis conversion was
     // tested here (sun-plane and moon-base-plane variants) against the
-    // moon-on-ring meter and FALSIFIED — the deep-time Moon-vs-ring plane
-    // divergence (~9-10° peak near +52 kyr) is NOT a conversion-frame issue;
-    // it lives in the relative deep-time phasing of the moon's secondary
-    // tilt layers vs the series latitude terms (see TODO).
+    // moon-on-ring meter and FALSIFIED — the conversion frame is correct.
+    // The ~9-10° plane divergence measured at the time was the then-missing
+    // Phase 9.13 _dtMoonIntegrator mirror branch (added; planes now ≤1.0°),
+    // and the residual phase misalignment is handled by the deep-time ring
+    // lock (_applyMoonRingLockTools).
     const currentYear = C.balancedYear + (jd - C.balancedJD) / _epochCache.mSY;
     const eps = OE.computeObliquityEarth(currentYear) * d2r;
     const cosE = Math.cos(eps), sinE = Math.sin(eps);
