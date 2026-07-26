@@ -284,19 +284,21 @@ matched / type-mismatch / model-only / NASA-only. Two thresholds:
   the same opposition NASA found?
 - **Tight UT match (±15 min)**: do the two clocks agree on UT timing?
 
-**Result**: 12,062 model events vs 12,064 NASA events over 5,000
-years. Physical-event recall 99.69%; the unmatched edges are symmetric
-(36 model-only / 38 NASA-only) and consist entirely of grazing
-penumbrals at the outer eclipse threshold — threshold-convention
-scatter with no directional bias. Type accuracy on matched events
-98.97%; all 124 mismatches are boundary-straddlers (Total↔Partial with
-umbral magnitude within ~0.02 of 1.0, or Penumbral↔Partial within
-~0.03 of 0). Tight (15 min) UT recall 75.42% — structured by the
-model ↔ NASA ΔT divergence, captured quantitatively by the per-century
-diagnostic. Certified under the framework-native lunar argument
-skeleton (`MOON_ARGS_FRAMEWORK_NATIVE` default ON — the
-framework-native re-baseline): statistically indistinguishable from the pure-Meeus
-skeleton (every counter within ±2 events) while bounded at deep time.
+**Result** (fully-derived e_E channel, the shipped state): 12,082 model
+events vs 12,064 NASA events over 5,000 years. Physical-event recall
+99.71%; the unmatched edges (53 model-only / 35 NASA-only) consist
+entirely of grazing penumbrals at the outer eclipse threshold —
+threshold-convention scatter with no directional bias. Type accuracy on
+matched events 98.84%; all 140 mismatches are boundary-straddlers
+(Total↔Partial with umbral magnitude within ~0.02 of 1.0, or
+Penumbral↔Partial within ~0.03 of 0). Tight (15 min) UT recall 74.88% —
+structured by the model ↔ NASA ΔT divergence, captured quantitatively by
+the per-century diagnostic. Certified under the framework-native lunar
+argument skeleton (`MOON_ARGS_FRAMEWORK_NATIVE` default ON) with the
+fully-derived e_E fluctuation (doc 66 §1): statistically
+indistinguishable from the pure-Meeus skeleton (recall/type within
+0.1–0.15 pp of the earlier astro-reference-anchored certification
+99.69/75.42/98.97) while bounded at deep time with zero fitted values.
 
 ### L-5 — NASA "Historical Interest" cross-check (28 famous events)
 

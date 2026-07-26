@@ -3292,8 +3292,8 @@ const ASTRO_REFERENCE = {
   earthInclinationRate_arcsecPerCentury: -18,
   // Source: JPL Horizons / Astronomical Almanac
   eccentricityJ2000: 0.01671022,                     // Earth eccentricity at J2000.0
-  eccentricityDotJ2000: -0.000042037,                // Earth eccentricity rate at J2000 (per Julian cy) — the e_E-cycle slope at the CURRENT phase (near quadrature; NOT a constant: the rate speeds up and slows down along the cycle — see _fwChannelIntegral). Secular-theory coefficient corroborated by modern ephemeris fits, the LLR node channel (s_Ω ≈ 1, doc 66 §1), and the ancient timing record — not a raw observation. A/B demo with the H/16 geometric-phase value −8.389e-6: falsified (audit ΔJD +21…65 min BCE, L-4 tight recall 75.5→46.1%)
-  eccentricityDotDotJ2000: -0.0000002534,            // Earth eccentricity curvature at J2000 (per Julian cy²; 2× Meeus Eq. 25.4 T² coefficient)
+  eccentricityDotJ2000: -0.000042037,                // Earth eccentricity rate at J2000 (per Julian cy) — secular-theory coefficient corroborated by modern ephemeris fits, the LLR node channel (s_Ω ≈ 1, doc 66 §1), and the ancient timing record; not a raw observation. REFERENCE/Taylor-check anchor only: the shipped lunar channel does NOT consume it — the fully-derived H/3 fluctuation line PREDICTS −4.273e-5 (+1.7%; see _FW_ECC and docs/66 §1, incl. the falsified H/16-phase alternative −8.389e-6)
+  eccentricityDotDotJ2000: -0.0000002534,            // Earth eccentricity curvature at J2000 (per Julian cy²; 2× Meeus Eq. 25.4 T² coefficient). REFERENCE/Taylor-check anchor only — the derived H/3 line predicts −3.7e-8 (same sign; the documented divergence behind the drift meter's BCE M′/F rows)
   perihelionLongitudeJ2000_deg: 102.947,             // Longitude of perihelion at J2000.0
   perihelionPassageJ2000_JD: 2451547.042,            // Earth perihelion 2000 Jan 3 13:00 UTC (USNO)
   // Source: USNO / timeanddate.com
@@ -6162,11 +6162,11 @@ function _fwSunSecularDeviations(jd_tt) {
 //    planetary secular remainder (+7.25″/cy², labeled empirical).
 //  • D and M are retained as full Meeus polynomials (Sun-side arguments —
 //    the framework-native Sun campaign owns that territory).
-//  • Element T³ terms are DERIVED (not copied): same (s, κ) chain at third
-//    order with ë₀ from the eccentricity composite — reproduces Meeus's
-//    empirical element T³ at 4% (ϖ) / 20% (Ω). Only the tiny element T⁴
-//    tails remain omitted (~0.2° at the −1999 canon edge); L′ keeps its
-//    Meeus T³/T⁴ for in-window carrier fidelity.
+//  • Element T³-and-above content comes from the phase-aware channel
+//    integral itself (no Taylor truncation); the T3_W/T3_N constants below
+//    are retained as documented J2000 Taylor checks (with astro-reference
+//    ë₀, they reproduce Meeus's empirical element T³ at 4% (ϖ) / 20% (Ω)).
+//    L′ keeps its Meeus T³/T⁴ for in-window carrier fidelity.
 // ═════════════════════════════════════════════════════════════════════════════
 
 // MOON_ARGS_FRAMEWORK_NATIVE is declared in the toggle block at the top of the
@@ -6181,17 +6181,18 @@ const _FW_MOON = (() => {
   const P_DEGCY = 360 * 13 / holisticyearLength * 100;   // framework general precession, deg/Julian cy
   const WDOT = LPR - MPR;   // perigee ϖ̇ of-date (+4069.0137) = ϖ̇_ICRF + p
   const NDOT = LPR - FR;    // node   Ω̇ of-date (−1934.1363) = Ω̇_ICRF + p
-  // e_E channel: d ln(perturbation strength)/dt = 3e·ė/(1−e²)
-  const E0 = ASTRO_REFERENCE.eccentricityJ2000, EDOT0 = ASTRO_REFERENCE.eccentricityDotJ2000;  // observed anchors, sourced from astro-reference (per Julian cy)
+  // e_E channel Taylor CHECKS (documented J2000 reference values — the live
+  // path is the phase-aware _fwChannelIntegral along the derived H/3 line,
+  // which consumes only S_W/S_N + the anchors/rates; the T2_*/T3_* constants
+  // below are NOT consumed by _fwMoonArgs):
+  // d ln(perturbation strength)/dt = 3e·ė/(1−e²) with the astro-reference
+  // secular-theory anchors (the derived line PREDICTS ė at +1.7% of this).
+  const E0 = ASTRO_REFERENCE.eccentricityJ2000, EDOT0 = ASTRO_REFERENCE.eccentricityDotJ2000;
   const KAPPA = 3 * E0 * EDOT0 / (1 - E0 * E0);
   const S_W = 2.407, S_N = 1.0;
   const T2_W = S_W * WDOT * KAPPA / 2;   // −0.010318 deg/cy²  (Meeus ϖ:  −0.010320)
   const T2_N = S_N * NDOT * KAPPA / 2;   // +0.0020385 deg/cy² (Meeus Ω:  +0.0020753)
-  // Third order (T²-nativity gate, 2026-07-24): ë₀ from the lattice+g2−g5
-  // eccentricity composite (tools/explore/path-c-ecc-composite.js), stable to
-  // 0.2% across ridge variants. Same (s, κ) chain as T²: derived T³ reproduces
-  // Meeus's empirical element T³ at 4% (ϖ) / 20% (Ω) with no new sensitivity.
-  const EDDOT0 = ASTRO_REFERENCE.eccentricityDotDotJ2000;    // per cy², sourced from astro-reference (2× Meeus 25.4 T²)
+  const EDDOT0 = ASTRO_REFERENCE.eccentricityDotDotJ2000;    // per cy², astro-reference (2× Meeus 25.4 T²)
   const KAPPA_DOT = 3 * (EDOT0 * EDOT0 + E0 * EDDOT0) / (1 - E0 * E0)
                   + 6 * E0 * E0 * EDOT0 * EDOT0 / Math.pow(1 - E0 * E0, 2);
   const T3_W = WDOT * (S_W * S_W * KAPPA * KAPPA + S_W * KAPPA_DOT) / 6;  // ≈ −1.30e-5 °/cy³ (Meeus ϖ: −1.25e-5)
@@ -6909,13 +6910,13 @@ function meanMoonApsidalOfDateCyclesBetween(yearA, yearB) {
 // Beyond the fit window the claim is BOUNDEDNESS + band structure; phases
 // indicative only (same class as the L1 lattice phase-drift note).
 //
-// Use: modulates the lunar apsidal/nodal chain rates as the FACTORED deep-time
-// law — rate(t) = [invariant mean from H(t)] × [g(t)/g₀]^s, g = (1−e²)^(−3/2).
-// J2000 factor ≡ 1 (all anchors bit-preserved); local derivatives reproduce
-// the shipped κ/κ̇ Taylor chain to 0.03%. Envelope over ±2 Myr: perigee ±2%,
-// node ±0.8% — bounded, zero-mean (vs Meeus's unbounded T² parabola ~10%).
-// The N-form functions (meanApsidalPrecessionSecondsICRFAtAge etc.) stay the
-// pure invariant MEAN law; these two anchored chains carry the full factored law.
+// Status: A/B RESEARCH ONLY — SUPERSEDED as the production e_E by the
+// fully-derived H/3 fluctuation line (_FW_ECC/_fwEarthEcc below), which now
+// carries the factored deep-time law — rate(t) = [invariant mean from H(t)]
+// × [g(t)/g₀]^s, g = (1−e²)^(−3/2) — and the E-factor. The composite is
+// retained for comparison experiments only. The N-form functions
+// (meanApsidalPrecessionSecondsICRFAtAge etc.) stay the pure invariant MEAN
+// law; the anchored chains carry the full factored law on the derived line.
 // ═════════════════════════════════════════════════════════════════════════════
 const _ECOMP = {
   c0: 0.02814222258,

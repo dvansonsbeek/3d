@@ -211,13 +211,18 @@ rate(t) = [invariant mean from H(t)] × [g(t)/g₀]^s,   g = (1 − e_E²)^(−3
 with s_Ω = 1 (derived — reproduces Meeus's empirical node T² to 1.8% and
 T³ to 20% with no fitting) and s_ϖ = 2.407 (anchored, the Clairaut-amplified
 apsidal sensitivity; constant across the T²/T³ orders — an independent
-check). e_E(t) is the framework eccentricity composite: 8H-lattice lines
-plus the acknowledged off-lattice 405-kyr g₂−g₅ term (the climate work's
-L2 taxonomy), equality-constrained on the observed e and ė at J2000. The
-oscillation is bounded and zero-mean (perigee ±2%, node ±0.8% over
-±2 Myr), so the T × H product is preserved exactly as the law of the
-mean — while Meeus's empirical T² polynomial, correct locally, diverges
-without bound at deep time. Implemented in the deep-time chain
+check). e_E(t) is the FULLY-DERIVED framework H/3 fluctuation —
+e(t) = eccentricityBase·(1 + cos θ(t)/2) with
+θ(t) = 3·(t − balancedYear)/H·360° − 180° — one movement (the same H/3
+wobble that drives Earth's inclination, whose minimum falls on the balanced
+year), inputs base/balancedYear/H only; the observed J2000 eccentricity
+(−0.9%) and its rate (+1.7%) are predictions (derivation record and
+experiment log: doc 66 §1). The modulation is bounded at every epoch
+(e ∈ [0.0077, 0.0231]: perigee within ±0.1%, node within ±0.04%), so the
+T × H product is preserved exactly as the law of the mean — while Meeus's
+empirical T² polynomial, correct locally, diverges without bound at deep
+time. (The earlier Laskar-band composite formulation is superseded and
+retained in code for A/B research only.) Implemented in the deep-time chain
 (`meanLunarPerigeePrecessionAtAge` / `meanLunarNodePrecessionAtAge` carry
 the full factored law; the N-form functions carry the pure invariant
 mean). This dissolves the historical "Brown m² wrong sign" tension: the

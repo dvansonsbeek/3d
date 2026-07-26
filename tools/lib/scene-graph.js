@@ -131,7 +131,7 @@ const _FW_MOON = (() => {
   const S_W = 2.407, S_N = 1.0;
   const T2_W = S_W * WDOT * KAPPA / 2;
   const T2_N = S_N * NDOT * KAPPA / 2;
-  const EDDOT0 = -2.651e-7;
+  const EDDOT0 = C.ASTRO_REFERENCE.earthEccentricityDotDotJ2000;   // Taylor-check anchor (mirrors src/script.js _FW_MOON)
   const KAPPA_DOT = 3 * (EDOT0 * EDOT0 + E0 * EDDOT0) / (1 - E0 * E0)
                   + 6 * E0 * E0 * EDOT0 * EDOT0 / Math.pow(1 - E0 * E0, 2);
   const T3_W = WDOT * (S_W * S_W * KAPPA * KAPPA + S_W * KAPPA_DOT) / 6;
@@ -221,8 +221,8 @@ function _moonArgsAtTools(jd_tt) {
            Mp: wrap(pe(FA.Mp)), F: wrap(pe(FA.F)) };
 }
 
-/** Bounded Meeus E-factor mirror: e_E(t)/e_E(J2000) from the framework H/16
- *  eccentricity law (kills the polynomial blow-up at deep time). */
+/** Bounded Meeus E-factor mirror: e_E(t)/e_E(J2000) from the fully-derived
+ *  framework H/3 fluctuation line (kills the polynomial blow-up at deep time). */
 function _fwEFactorTools(d_days, T, T2) {
   if (!MOON_ARGS_FRAMEWORK_NATIVE) {
     const EC = MEEUS_LUNAR.eccentricityCorrection;
