@@ -61,7 +61,7 @@ classical constant:
   framework's own p = 360·13/H = 50.24″/yr closes the ±1.4°/century M′/F
   drift with zero new constants — the drift was frame bookkeeping, not
   missing physics. Meter: "Meeus vs Integrator (lunar argument drift)".
-  Two composite rates reduce to exact lattice identities (D2): A3 ≡ the
+  Two composite rates reduce to exact lattice identities: A3 ≡ the
   Moon's SIDEREAL mean longitude rate = L′_tropical − p_H13 (0.003 ppm vs
   Meeus 481266.484 °/cy) and the A2 argument rate ≡ 2·L′_trop − M′rate −
   2·n_Jupiter (0.19 ppm vs 479264.290). Both are CHAIN-INTEGRATED at deep
@@ -78,20 +78,15 @@ classical constant:
   (1 − e_E²)^(−3/2). The perigee/node longitudes are computed as
   ϖ(T) = ϖ₀ + ϖ̇₀·(T + ∫₀ᵀ[(g(e_E(t))/g₀)^s − 1]dt) — the rate speeds up and
   slows down with the e_E phase; the older frozen-κ T²/T³ Taylor coefficients
-  remain in the code as documented J2000 checks against Meeus. Sensitivities:
-  s_Ω = 1.018 and a Clairaut-type s_ϖ = 2.407, constant across orders —
-  both Meeus-effective and exact (the earlier s_Ω = 1 shipped under a
-  "theory pins 1" rationale, with the 1.8% node gap read as the channel
-  measuring ė; the v4 frame attribution superseded that reading — the 1.8%
-  was the frame term hiding — so both exponents now carry the same
-  convention). FRAME ATTRIBUTION (v4 campaign):
-  these are frame-EFFECTIVE exponents — every of-date Meeus T² contains the
-  IAU precession acceleration ṗ_A T² (+1.1054″/cy², IAU2006); removing that
-  frame term gives physical exponents s_ϖ 2.479 / s_Ω 0.867, which the
-  3-body laboratory reproduces from pure gravity at 100.3% / 101.5%
-  (`tools/explore/v4-frame-audit.js`). The effective form is kept in the
+  remain in the code as documented J2000 checks against Meeus. The
+  sensitivities s_ϖ = 2.407 and s_Ω = 1.018, constant across orders, are
+  the Meeus-EFFECTIVE pair: every of-date Meeus T² contains the IAU
+  precession acceleration ṗ_A T² (+1.1054″/cy², IAU2006), and removing that
+  frame term gives the PHYSICAL exponents s_ϖ 2.479 / s_Ω 0.867 — which
+  the 3-body laboratory reproduces from pure gravity at 100.3% / 101.5%
+  (`tools/explore/v4-frame-audit.js`). The effective form runs in the
   runtime (exact vs Meeus by construction); an explicit bounded frame
-  carrier is the D4-companion follow-up.
+  carrier for the argument rates is registered future work.
 - **e_E itself — fully derived (see "Framework-native e_E" below).** The
   channel's eccentricity history is the framework's own H/3 fluctuation;
   the observed J2000 eccentricity, its rate, and its curvature are
@@ -113,79 +108,71 @@ classical constant:
   offset) and secular content from the closed-form integrals of the
   epoch-local year-length harmonics: the model's REAL-TIME axial and
   perihelion rates around their H/13 and H/16 means
-  (`_fwSunSecularDeviations`). The equinox acceleration is 62% derived from
-  the model's own rates (local a2 +0.000187 °/cy² vs Meeus's +0.0003032 —
-  itself a local fit of an unbounded polynomial); the remainder is the
-  framework's genuine prediction. Bounded ±5° over ±50 kyr where the Meeus
+  (`_fwSunSecularDeviations`). The equinox acceleration is ~62% derived
+  from the model's own rates (local a2 +0.000187 °/cy² vs Meeus's
+  +0.0003032 — itself a local fit of an unbounded polynomial); the
+  remaining ~38% is the planetary χ-channel — the ecliptic-of-date motion
+  absent from the equator-only composition — and is derived at 104% by the
+  ṗ_A composition (see the L′ bullet). Bounded ±5° over ±50 kyr where the Meeus
   D parabola reaches 82°; deviations ≤ 0.08°/0.11° (D/M) at −584, ~0 in the
   certification window. Zero new constants.
 
-- **L′ planetary remainder — the bounded e_E² carrier (derived).** Meeus's
-  planetary T² content (T2_LP − T2_LP_TIDAL = +0.0020131 °/cy² = +7.25″/cy²)
-  is the J2000 Taylor truncation of `K_PL · ∫₀ᵀ (e_E²(t′) − e_E²(J2000)) dt′`
-  — the Moon's mean motion responding to the Sun's eccentricity as it moves
-  along the derived H/3 channel (the Laplace/Adams planetary acceleration,
-  reproduced in-framework). K_PL is derived lazily from the existing record
-  remainder and the channel slope (record-normalized; zero new constants);
-  the first-principles Sun–Earth–Moon 3-body laboratory
-  (`tools/explore/derive-meeus-amplitudes.js` + `es-sensitivity-scan.js`,
-  fixed-action Adams–Laplace scan) reproduces the coefficient independently
-  at 95.1% (k = ∂n/∂e_S² = −2704 vs record-implied −2844 °/cy per unit e²)
-  and numerically confirms the channel exponents (s_ϖ 2.486, s_Ω 0.880 —
-  which the v4 frame audit identified as the PHYSICAL exponents, matching
-  the frame-corrected record at 100.3%/101.5%) and the E-factor law (annual
-  equation ∝ e_S^1.0007). v4 BUDGET CLOSURE: the record-implied −2844 is
-  not a pure channel value — the remainder +7.247″/cy² decomposes with zero
-  free parameters as true planetary +5.8665 (Chapront et al. 2002, the
-  channel part) + Earth-figure J2 +0.1925 + frame ṗ_A +1.11113 (Lieske) +
-  0.077 Meeus-era tidal-convention gap (Γ embedded −25.706 vs LLR −25.858);
-  see `tools/explore/v4-kpl-budget.js` and astro-reference.json
-  `elpW1T2Decomposition_arcsecPerCy2`. E5 RESOLVED: the lab-vs-ELP k gap
-  (−2704 vs −2320) was a held-quantity protocol artifact — the
-  convention-free adiabatic-ramp measurement (e_S slowly ramped inside one
-  integration, the dynamics conserving the true invariant;
-  `tools/explore/v4-e5-adiabatic-ramp.js`) gives k = −2370 ± 40 °/cy per e²,
-  confirming the ELP planetary value at ~2%; holding mean osculating a
-  instead of the action biases k by 15% (an m²-order difference — the same
-  order as k itself). Direct planetary + J2 terms measured small
-  (+0.47″/cy²; `v4-e5-direct-planetary.js`). The Adams–Laplace planetary
-  acceleration is thereby derived in-framework at the percent level.
-  D3 CLOSED (the Lp T³/T⁴ "tails"): the T³ = 1/538841 °/cy³ is DERIVED at
-  98.8% with zero free parameters — Adams–Laplace channel curvature
-  k·(e_S²)″/6 with the secular ë (+104.2%) + obliquity-carrier second order
-  (−6.5%) + frame p_A T³ (+1.2%); the channel-only k in the observed-ė
-  convention (−2350.3) sits dead-center of the adiabatic −2370 ± 40. The T⁴
-  is 41% channel (quadratic secular e), remainder = higher-order secular
-  content (0.004° at −584, clamped at deep time). Convention note: with the
-  derived H/3 line's own ë (−3.7e-8) the channel T³ flips sign — the Meeus
-  literal embodies the SECULAR-theory ë, the same documented divergence as
-  the BCE drift-meter rows, now localized at the T³ level
-  (`tools/explore/v4-d3-tails.js`). In-window the carrier is Taylor-identical to the old T²
-  (−584: +0.017° difference ≈ 2 min); at deep time it stays bounded
-  (≤ ~230°) where the T² parabola reached 7,892° at +200 kyr. The same
-  laboratory derives the top-20 longitude amplitudes at 100.0 ± 0.1% and the
-  apsidal/nodal precession periods from the sidereal month plus solar
-  parameters alone — the three Moon inputs are not independent. (The early
-  "0.036%/0.064% residuals" on those periods were later RESOLVED as a frame
-  convention: the lab reproduces the true star-referenced periods, 3232.60 d
-  apsidal / 6793.48 d nodal, at ±1‱ — full-system ±0.5‱/±0.3‱ — while the
-  catalog inputs 3231.493/6798.38 are the equinox-of-date partners.)
-  CARRIER SPLIT (shipped): the single record-normalized carrier is now TWO
-  bounded per-law carriers — `_fwLpPlanetaryCarrier` carries the channel
-  part only (planetary +5.8665″ + the 0.077″ Meeus-tidal gap; k = −2332,
-  inside the adiabatic −2370 ± 40) and `_fwLpObliquityCarrier` (+ tools
-  mirror) carries the figure+frame part (+1.30363″/cy²) along the framework
-  obliquity cycle, Lp_obl = C·∫(ε(t)−ε₀)dt with C = 2·T2_OBL/ε̇₀ — bounded,
-  zero new fitted values. This split IMPROVED the Babylonian corpus
-  (−8/38/4-of-6 → −7/37/5-of-6). The frame part itself is now DERIVED: the
-  ṗ_A composition experiment chain (`tools/explore/v4-pdot-composer{,2,3}.js`)
-  composes the general-precession acceleration from the lab's gravity-derived
-  ecliptic-of-date pole track (π̇ 47.49″/cy vs IAU 46.998) + the framework
-  ε(T) + a luni-solar cone about the moving pole with the cos ε torque law +
-  one rate anchor (which independently lands ψ̇₀ = 5039.15, 0.013% from
-  IAU's 5038.48): composed T² = +1.1496″/cy² = 104% of IAU2006 — and the
-  scene-only composition's missing 39% identified D4's "remaining 38%" as
-  the planetary χ-channel (the ecliptic tilting UNDER the equator).
+- **L′ planetary remainder — the closed budget, carried by two bounded
+  carriers (derived).** Meeus's non-tidal T² content
+  (T2_LP − T2_LP_TIDAL = +7.247″/cy²) decomposes against primary sources
+  with zero free parameters (astro-reference
+  `elpW1T2Decomposition_arcsecPerCy2`; runnable:
+  `tools/explore/v4-kpl-budget.js`): true planetary +5.8665″ (Chapront et
+  al. 2002 — the Laplace/Adams solar-eccentricity channel) + Earth-figure
+  J2 +0.1925″ + frame ṗ_A +1.11113″ (Lieske) + 0.077″ tidal-convention gap
+  (the Γ embedded in Meeus's polynomial is −25.706″/cy² vs LLR −25.858).
+  The runtime replaces the T² polynomial with two bounded carriers:
+  `_fwLpPlanetaryCarrier` carries the channel part —
+  `K_PL · ∫₀ᵀ (e_E²(t′) − e_E²(J2000)) dt′` along the derived H/3 line,
+  with K_PL = −2332 °/cy per e² derived lazily from the budget (zero new
+  constants) — and `_fwLpObliquityCarrier` carries the figure+frame part
+  (+1.30363″/cy²) along the framework obliquity cycle,
+  `C · ∫₀ᵀ (ε(t′) − ε₀) dt′` with C = 2·T2_OBL/ε̇₀ (tools mirrors of both
+  in scene-graph.js). In-window the carriers are Taylor-identical to the
+  polynomial (−584: +0.017° ≈ 2 min); at deep time they stay bounded
+  (≤ ~230°) where the T² parabola reaches 7,892° at +200 kyr.
+  The channel sensitivity is verified convention-free by an adiabatic-ramp
+  measurement (e_S ramped slowly inside one integration so the dynamics
+  conserves the true invariant; `tools/explore/v4-e5-adiabatic-ramp.js`):
+  k = −2370 ± 40 °/cy per e², containing the budget value; a fixed-mean-a
+  scan protocol biases k by 15% (a held-quantity convention at the same m²
+  order as k itself), and direct planetary + J2 secular terms measure small
+  (+0.47″/cy²; `v4-e5-direct-planetary.js`). The 3-body laboratory also
+  confirms the channel exponents (physical s_ϖ 2.486 / s_Ω 0.880, matching
+  the frame-corrected record at 100.3%/101.5%) and the E-factor law
+  (annual equation ∝ e_S^1.0007).
+  The Lp T³ (1/538841 °/cy³) is likewise derived, at 98.8% with zero free
+  parameters — Adams–Laplace channel curvature k·(e_S²)″/6 with the secular
+  ë (+104.2%) + obliquity-carrier second order (−6.5%) + frame ṗ_A T³
+  (+1.2%) (`tools/explore/v4-d3-tails.js`); the T⁴ is 41% channel with the
+  remainder documented (0.004° at −584, clamped at deep time). Convention
+  note: with the derived H/3 line's own ë (−3.7e-8) the channel T³ flips
+  sign — the Meeus literal embodies the SECULAR-theory ë, the same
+  documented divergence as the BCE drift-meter rows.
+  The same laboratory derives the top-20 longitude amplitudes at
+  100.0 ± 0.1% and the apsidal/nodal precession periods from the sidereal
+  month plus solar parameters alone — the three Moon inputs are not
+  independent. The emergent periods are the true star-referenced ones
+  (3232.60 d apsidal / 6793.48 d nodal, reproduced at ±0.5‱/±0.3‱ in the
+  full system); the catalog inputs 3231.493/6798.38 are their
+  equinox-of-date partners (∓13 counts per H).
+  The frame term ṗ_A is itself derived: the composition
+  (`tools/explore/v4-pdot-composer{,2,3}.js`) builds the general-precession
+  acceleration from the lab's gravity-derived ecliptic-of-date pole track
+  (π̇ 47.49″/cy vs IAU 46.998) + the framework ε(T) + a luni-solar cone
+  about the moving pole with the classical cos ε torque law + one rate
+  anchor — which independently lands ψ̇₀ = 5039.15″/cy, 0.013% from the
+  IAU luni-solar 5038.48 that was never an input — giving composed
+  T² = +1.1496″/cy² = 104% of IAU2006. The equator-only composition yields
+  61%; the balance is the planetary χ-channel (the ecliptic tilting under
+  the equator) — the framework's former "remaining 38% of the equinox
+  acceleration", now identified. Chronology and the full experiment log:
+  the TODO ledger and git history.
 
 - **Deep-future validity.** The cumulative-H table spans ±500 Myr symmetric
   (the chains are smooth and physical throughout: LOD 24→27.4 hr, month
@@ -194,52 +181,40 @@ classical constant:
   the lunar mean motion at year ≈ 1,989,000 and reverses it beyond. The
   scene Moon is prograde at every epoch out to ±1 Gyr by construction.
 
-Certification of the framework-native default (fully-derived e_E line):
-argument drift vs Meeus M′ +0.37° at −135 / +0.58° at −584 and F ≈ 0
-(current meter values after the 8H-lattice/always-chains refit; the
-pre-refit line read +0.221/+0.381 with F −0.025/−0.047) — this is the
-predicted-ë-vs-secular-ë difference (minutes-class in eclipse timing), with
-in-window rows at zero (legacy comparison: +1.4°/century); NASA-canon
-recall 99.71% / tight-window 74.88% / type 98.84% at that stage (140 type
-mismatches, all at the documented ±0.02 magnitude classification boundary).
-Current certified reference after the 8H-lattice + always-chains +
-bounded-carrier package (commit 8e131aa) and the D5/carrier-split batches:
-full-canon recall 99.61 / tight 74.37 / type 98.75 (all mismatch samples
-knife-edge at the γ ≈ 1.0/1.5 boundaries); 26-event historical audit split
-1 confirmed · 11 off-peak · 7 regional · 0 ΔT-signal · 7 geographic;
-timed Babylonian lunar corpus (Almagest records, reduced via local
-astronomy only — no external ΔT, no eclipse canon): non-deep skeleton
-mean +3 min / RMS 36 min (statistically identical to conventional secular
-theory's +2/34), deep-chains branch **−7 min / 37 min / 5-of-6** (current
-certified after the carrier split; the pre-split reference was −8/38/4-of-6
-— the physically-attributed T³ shape moved −719 Mar into its ±30 band)
-(tools/explore/timed-babylonian-lunar-eclipses.js; corpus encodings to be
-verified against Stephenson 1997 Ch. 6 before publication).
-Earlier D/M re-certification details: physical recall identical, tight
-+13 events, model total exactly 12,064 = NASA's count, five type flips at
-the boundary (129 vs 124 — accepted trade). At deep time the same channel
+Certified references of the framework-native default (fully-derived e_E
+line): argument drift vs Meeus M′ +0.37° at −135 / +0.58° at −584 with
+F ≈ 0 — the predicted-ë-vs-secular-ë difference (minutes-class in eclipse
+timing), with in-window rows at zero (the legacy pure-ICRF comparison
+drifts +1.4°/century). NASA full-canon recall 99.58 / tight-window 74.62 /
+type 98.66 (model event total 12,070 vs NASA's 12,064; all mismatch
+samples knife-edge at the γ ≈ 1.0/1.5 boundaries); 26-event historical
+audit split 1 confirmed · 11 off-peak · 6 regional · 0 ΔT-signal ·
+8 geographic (an umbra-centerline distance class, not visibility — the
+penumbra can still cover these sites; −708 Lu State sits at 1002 km, on
+the 1000-km class boundary); timed Babylonian lunar corpus (Almagest records, reduced via
+local astronomy only — no external ΔT, no eclipse canon): non-deep
+skeleton mean +3 min / RMS 36 min (statistically identical to conventional
+secular theory's +2/34), deep-chains branch **−7 min / 37 min / 5-of-6 in
+band** (tools/explore/timed-babylonian-lunar-eclipses.js; corpus encodings
+to be verified against Stephenson 1997 Ch. 6 before publication).
+Superseded baseline values live in git history. At deep time the same channel
 modulates the anchored precession chains as rate(t) = invariant mean ×
 [g(t)/g₀]^s (the factored law, doc 99) — bounded at every epoch under the
 derived line (e ∈ [0.0077, 0.0231]), where the Meeus parabola is unbounded.
 
-**How ė is pinned (the (ė, s) degeneracy).** Only the product s·ė enters each
-element's T², but node and perigee share one ė. (Historical rationale: node
-theory was read as pinning s_Ω ≈ 1, so the node "measured" ė at 1.8%; the v4
-frame attribution superseded this — the 1.8% was the ṗ_A frame term hiding,
-the physical exponents are 0.867/2.479 from the lab at 101.5%/100.3%, and
-both shipped values are now the Meeus-effective pair 1.018/2.407.) The
-node-vs-perigee ratio structure still holds: one shared ė, and the
+**How ė is pinned (the (ė, s) degeneracy).** Only the product s·ė enters
+each element's T², but node and perigee share one ė: with the observed
+ė₀ = −4.204e-5/cy the node requires s_Ω = 1.018 and the perigee ratio then
+yields s_ϖ = 2.407 with no freedom — the Meeus-effective pair. The
 alternative — the H/16 perihelion law's ė at its current phase
-(−0.84e-5/cy) — would force s_Ω = 5.1, excluded by theory (and was falsified
-directly by the record; see the experiment log below). The shipped derived
+(−0.84e-5/cy) — would force s_Ω = 5.1, excluded by theory and falsified
+directly by the record (see the experiment log below). The derived H/3
 line PREDICTS ė = −4.273e-5 (+1.7% of the measured value) with no anchor.
-Falsification path — RESOLVED (v4 campaign): the first-principles derivation
-exists, but for the PHYSICAL exponent, not the effective one. The 3-body
-laboratory gives s_ϖ = 2.486 from pure gravity; the of-date record minus the
-IAU frame acceleration ṗ_A requires 2.479 — agreement 100.3%. The shipped
-2.407 is the frame-effective value (physical channel + ṗ_A absorbed), exact
-vs Meeus by construction. The last anchored sensitivity is thereby
-attributed, not fitted.
+First-principles status: the laboratory derives the PHYSICAL exponents
+from pure gravity (2.486/0.880) and the of-date record minus the IAU frame
+acceleration requires 2.479/0.867 — agreement 100.3%/101.5%. The runtime's
+effective pair absorbs the frame term and is exact vs Meeus by
+construction: the sensitivities are attributed, not fitted.
 
 **Framework-native e_E: the fully-derived H/3 fluctuation.** The e_E behind
 the rate channel, the E-factor, and the factored deep-time law is ONE
@@ -269,7 +244,7 @@ base, balancedYear, H. Everything observational becomes a prediction:
 Cross-checks: freely solving the line from the observed (e, ė) with the mean
 held at base returns θ = 79.96° and A = 0.4936·base — the data reproduce the
 derived structure unprompted. The certified predecessor line (same H/3
-period, phase fitted at 78.6°, all three anchors consumed) is hereby derived
+period, phase fitted at 78.6°, all three anchors consumed) is thereby derived
 to ~1–2°. Frame interlock: read on the equinox clock instead of ICRF
 (16 = 13 + 3), the same anchor construction gives an H/16-period line whose
 rate-solved amplitude is eccentricityAmplitude × 1.046 and whose predicted ë
@@ -297,7 +272,7 @@ pin e_E — the lunar perigee channel is the e_E instrument. Divergent
 framework prediction: deep-time e_max ≈ 0.023 (conventional secular theory:
 ≈ 0.067) — falsifiable. The earlier Laskar-band composite (equality-
 constrained ridge fit, 21 coefficients, 405-kyr g₂−g₅ labeled OFF-lattice)
-is SUPERSEDED and retained in code for A/B research only.
+is retained in code for A/B research only (superseded as the production e_E).
 
 Open research item — the 1.2° azimuthal family: three independent ~1.2°
 tensions live in the node/phase sector while all magnitudes are stiff:
@@ -415,7 +390,7 @@ This gives accurate RA/Dec numbers (current baseline: RMS 0.0009° RA /
 0.0008° Dec over 6,088 JPL reference points, 2000–2050).
 The RA override eliminates the ~1.2-degree errors from the 5-layer hierarchy.
 
-**Derived optics (D5).** The post-Meeus fitted correction `MOON_CORRECTION`
+**Derived optics — the aberration decomposition.** The post-Meeus fitted correction `MOON_CORRECTION`
 was decomposed (`tools/explore/derive-moon-correction-content.js`): 98–102%
 of it is ANNUAL ABERRATION — the model frames carry apparent-Sun content
 while the JPL reference is astrometric (Horizons QUANTITIES='1'). The
@@ -430,7 +405,7 @@ left; everything aberration-shaped ≤ 0.13″). A weighted refit against the
 full 6,088-point baseline reproduces the shipped residual to 0.12″ —
 already optimal. J2000 witness reference: RA 222.45959 / Dec −10.90333.
 
-**Inclination convention (E3c).** The input `moonEclipticInclinationJ2000`
+**The inclination convention.** The input `moonEclipticInclinationJ2000`
 is the Moon's DYNAMICAL mean osculating inclination **5.1573°** (measured
 from the theory itself: h-vector over 2 node cycles; oscillation range
 [4.98°, 5.30°]); the Brown/ELP THEORY CONSTANT 5.1453964° (the latitude
@@ -439,7 +414,7 @@ partner `moonInclinationConstantBrownELP`. Pure gravity maps between the two
 at 0.01% (compression 0.9944). With the D1 lab calibrated on the dynamical
 value, the latitude family closes: sinF 100.02% of Meeus (base3), full
 system 99.96%. Caution note: the compact formula "1 − m²" reproduces the
-compression to 1″ at the real Moon and was REFUTED as a theorem by m-scaling
+compression to 1″ at the real Moon and is disproved as a theorem by m-scaling
 (`tools/explore/v4-i-theorem.js`) — a parameter coincidence
 ((3/2)e_M² + sin²i/8 ≈ m² at our Moon); the analytic theorem needs a
 leakage-clean estimator (open research).
@@ -504,9 +479,17 @@ unchanged — that metric is Meeus-override-framed).
 
 | Parameter | Legacy (optimizer-tuned) | Current (J2000-anchored) |
 |-----------|--------------------------|--------------------------|
-| moonStartposApsidal | 347.622 | 347.5544 |
-| moonStartposNodal | -83.630 | 64.0436 |
-| moonStartposMoon | 131.930 | 131.93 (deferred — the anchoring meter's L row reads the Meeus-overridden Moon, so this phase affects only the pre-override in-plane geometry) |
+| moonStartposApsidal | 347.622 | 347.5476 |
+| moonStartposNodal | -83.630 | 64.0435 |
+| moonStartposMoon | 131.930 | 67.8443 (in-plane anchor via the unmask meter, mean Δlon ≈ 0; the anchoring meter's L row reads the Meeus-overridden *true* Moon, so its ~3° Δ against the mean-longitude target is the equation-of-center reading, not an anchor error) |
+
+The apsidal/nodal values carry a micro-recalibration for the 8H-count layer
+rates (hence the last-digit drift from the first anchoring pass). The
+anchoring meter's node-rate row reads the **world frame**: the nodal layer
+spins at the of-date period (6798.33 d, −19.3411°/yr) in its local frame, and
+Earth's axial-precession parent adds the equinox precession (~0.0140°/yr, both
+retrograde), so the measured world-frame regression is the star-referenced
+−19.3551°/yr.
 
 ---
 
@@ -694,7 +677,7 @@ not a Moon-series error. The Babylonian-era Meeus residual sweep of
 adjacent events (-584 Thales, -309 Sicily, -762 Bur-Sagale) shows β
 differences ≤ 0.12° against the same references.
 
-**DE441 A/B result (historical, infrastructure since removed):** a full A/B
+**DE441 cross-check (one-time A/B; the test infrastructure is no longer in the codebase):** a full A/B
 of the 26-event audit with JPL DE441 lunar positions injected in place of
 the framework Meeus series (session notes archived at
 `docs/hidden/old-documents/session-2026-07-19-jup1740-de441-h-tuning.md`)
@@ -718,7 +701,10 @@ arguments are the shipped default (§1): the Meeus M′/F T²⁺ polynomial phys
 is expressed through the framework's own channels, and the "Meeus vs
 Integrator (lunar argument drift)" test button confirms closure (M′ ≤ 0.015°
 at −584, versus the ≈ +1.4°/century drift of the raw ICRF-rate comparison).
-The remaining argument-level item is framework-native D/M (tracked in TODO).
+Framework-native D/M is likewise shipped (identity-composed with real-time
+secular integrals; all five fundamental arguments bounded, zero new
+constants) — the D/M substitution probe measures the secular-integral
+contribution at ≲ 0.007° TT-eval (≲ 0.017° UT-eval) at the ancient epochs.
 
 **Layer 2: Delta-T (Earth rotation) uncertainty**
 

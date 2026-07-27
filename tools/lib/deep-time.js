@@ -838,7 +838,7 @@ const _ECOMP = {
   A:  [-0.01713360824, 0.003885798879, 0.003162499557, -0.002439315342, 0.0009946933865, -0.002804779985, 0.0007349600656, 0.002378093225, -0.0007624261717, 0.0005442620468],
   B:  [-0.0009600398502, -0.009349595921, 0.001151405217, -0.004809468603, 0.005451777722, 0.00162872882, -0.001835102032, 0.003606461969, -0.001298883291, -0.003982540754],
 };
-const _ECOMP_S_W = 2.407, _ECOMP_S_N = 1.0;   // Stage-0b sensitivities (single source: src/script.js _FW_MOON)
+const _ECOMP_S_W = 2.407, _ECOMP_S_N = 1.018;   // channel sensitivities (single source: src/script.js _FW_MOON; both Meeus-effective — S_N 1.0→1.018 with the v4 frame-attribution batch)
 const _ECOMP_G0 = Math.pow(1 - _fwEarthEccComposite(0) ** 2, -1.5);   // g at the composite's OWN J2000 anchor (KKT-constrained e(0) from the La2010 fit; A/B research only — production uses _FW_ECC_G0)
 function _fwEarthEccComposite(t_yr) {
   let e = _ECOMP.c0;

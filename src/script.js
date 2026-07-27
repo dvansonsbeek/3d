@@ -29171,9 +29171,11 @@ const _eclipseState = { idx: 0 };
 // Curated historical lunar eclipses — canonical source is
 // public/input/lunar-eclipses-historical.json; embedded here for synchronous
 // access at setupGUI() time (same TDZ avoidance pattern as ECLIPSE_PRESETS).
-// 13 events spanning −721 BCE to 2025 CE. Sourced from NASA Lunar Canon
-// (modern), Said & Stephenson 1996 (Ibn Yunus), and Stephenson 1997 (ancient).
-// Expansion via NASA Lunar Canon subset is Commit 3 (Phase L-3).
+// 14 NASA-Lunar-Canon-verified events in the 2020-2025 window (matching the
+// JSON's seed set; the ancient timed records — Said & Stephenson 1996,
+// Stephenson 1997 — live in the doc-102 lunar timing corpus, not here).
+// The systematic canon coverage is the shipped L-3/L-4 pair (12,064-event
+// load + bidirectional scan); this preset list stays curated for the GUI.
 // Schema: { jd, label, type, magnitude_umbral, visibility, era, source }
 //   - jd:               Julian Date (UT) of greatest eclipse
 //   - type:             'Total' / 'Partial' / 'Penumbral' (NASA classification)
@@ -29194,7 +29196,7 @@ const _eclipseState = { idx: 0 };
 //      Canon, Stephenson 1997, Said & Stephenson 1996) to confirm the event was documented.
 //   3. Add the verified entry below.
 //   4. Run "Validate LUNAR_ECLIPSE_PRESETS catalog entries" to confirm JD↔label↔model match.
-// Phase L-3 (NASA Lunar Canon JSON import) will systematize this for the -2000…+3000 range.
+// The shipped L-3 button (NASA Lunar Canon load) systematizes this for the -1999…+3000 range.
 const LUNAR_ECLIPSE_PRESETS = [
   { jd: 2460926.2582, label: '2025 Sep 7 Total',    type: 'Total',     magnitude_umbral: 1.367, visibility: 'Europe, Africa, Asia, Australia',                era: 'Modern', source: 'NASA Lunar Canon' },
   { jd: 2460748.7908, label: '2025 Mar 14 Total',   type: 'Total',     magnitude_umbral: 1.183, visibility: 'Americas, Western Europe, West Africa',          era: 'Modern', source: 'NASA Lunar Canon' },
@@ -31338,14 +31340,15 @@ function setupGUI() {
   // any time difference here is purely a Moon polynomial residual.
   //
   // Also reports our ΔT vs NASA's canon ΔT (Morrison-Stephenson 2004 — the
-  // older reference, NOT Stephenson 2016; the two disagree by ~100-300 s at
+  // older reference, NOT Stephenson 2016; the two disagree by ~100-400 s at
   // these epochs) for context.
   // ────────────────────────────────────────────────────────────────────────
   const firstEclipseBtn = addTestButton('NASA catalog cross-check (Moon polynomial validation)', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
     console.log('  NASA Five Millennium Catalog cross-check.');
     console.log('  TT-space comparison: our jd_conj+ourΔT vs NASA published TD (greatest eclipse).');
-    console.log('  Any difference here = pure Moon polynomial residual (ΔT-independent).');
+    console.log('  Differences here = Moon-polynomial residual (ΔT-independent) PLUS the');
+    console.log('  conjunction-vs-greatest-eclipse definitional offset (up to ~10 min at high |γ| — see Interpretation).');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
 
     const _d2r = Math.PI / 180;
@@ -31505,7 +31508,7 @@ function setupGUI() {
       console.log(`  mean = ${Math.round(meanDt)} s,   typical sign: ${meanDt > 0 ? 'OURS HIGHER (over-predicts)' : 'OURS LOWER (under-predicts)'}`);
       console.log(`  Note: this gap is the difference between the two ΔT models — orthogonal to Moon physics.`);
       console.log(`  NASA's canon ΔT is the OLDER Morrison-Stephenson 2004 polynomial, NOT Stephenson 2016 —`);
-      console.log(`  the two references themselves disagree by ~100-300 s at these epochs (cf. L-5b §13),`);
+      console.log(`  the two references themselves disagree by ~100-400 s at these epochs (cf. L-5b §13),`);
       console.log(`  so this column overstates our gap vs Stephenson 2016 (L-5b §2 landmarks: ~40-60 s).`);
     }
     console.log('');
@@ -31559,7 +31562,7 @@ function setupGUI() {
     console.log(`  Ours(abs) = rel + deltaTStart (${deltaTStart.toFixed(2)} s trend anchor) — compare THIS to the references.`);
     console.log('Stephenson 2016 spline is defined −720..2016 ("-" outside its range). Espenak/MS2004');
     console.log('  is the NASA-canon lineage. The two references disagree with EACH OTHER by');
-    console.log('  ~100-300 s at deep epochs (L-5b §13) — read our residual against that spread.');
+    console.log('  ~100-400 s at deep epochs (L-5b §13) — read our residual against that spread.');
     console.log('Context parabola: ΔT ≈ 32 × ((year−1820)/100)² s (Stephenson long-term fit).');
     console.log('══════════════════════════════════════════════════════════════════════════════');
   }, 'Compare our production ΔT (converted to absolute via deltaTStart) against the LIVE ' +
@@ -31631,7 +31634,7 @@ function setupGUI() {
     }
     console.log('');
     console.log('  ► "integrated" is the raw-H/5-kinematic pure-physics contribution (want DOWN then UP).');
-    console.log('  ► "Bond+Hallst+Jose5+Jose4+Swing" is the post-integration calibrated stack (currently DOMINATES near J2000).');
+    console.log('  ► "Bond+Hallst+Jose5+Jose4+Swing" is the post-integration calibrated stack (zero at J2000 by construction; comparable to the physics term across ~1700–1950).');
     console.log('  ► To see pure H/5 physics: toggle the 4 flags + swing OFF in the script.js A1 block and reload.');
     console.log('  ► Joint world: only the TOTAL is anchor-clean — with any component OFF the USNO closure breaks.');
     console.log('══════════════════════════════════════════════════════════');
@@ -31646,6 +31649,9 @@ function setupGUI() {
     console.log('corrections added POST-integration to meanDeltaTSecondsAtAge). Framework anchors ΔT(J2000) = 0.');
     console.log('Observed reference = LIVE Espenak/Meeus polynomial (absolute TT−UT); framework absolute');
     console.log(`ΔT = rel + deltaTStart (${deltaTStart.toFixed(2)} s) — the same convention as "Verify ΔT at historical epochs".`);
+    console.log('Epochs are CALENDAR years; the J2000 anchor sits at year 2000.5 (2000 Jan 1.5), so the');
+    console.log('"Year 2000" row evaluates 0.5 yr before the anchor — its small nonzero integrated term');
+    console.log('is the half-year offset, not a discrepancy vs the ΔT tables (whose year-2000 rows sit on the anchor).');
     console.log();
     const years = [1815, 1902, 2000];
     const rows = years.map(y => diagnoseLodLayers(y));
@@ -31777,7 +31783,10 @@ function setupGUI() {
     console.log('  ─────────────────────────────────────────────────────────────────────────────────────────────────────');
     console.log('');
     console.log('  How to interpret:');
-    console.log('   • Δ(lat) ≈ 0 everywhere → framework\'s Sun ecliptic position is correct.');
+    console.log('   • Δ(lat) ≈ 0 in the CE era → framework\'s Sun ecliptic position is correct;');
+    console.log('     the small BCE growth (≤ ~0.1° at −135/−584) is the documented Sun-side residual');
+    console.log('     behind the audit\'s ~1000-km-class umbra offsets at those events (doc 103) — a');
+    console.log('     WHERE residual, not a ΔT/rotation error (see the flat Δ(lon) column).');
     console.log('   • Δ(lon) ≈ constant ~-0.55° everywhere → constant baseline frame offset,');
     console.log('     no ΔT-scaled component (Meeus wrappers apply the UT→TT conversion internally,');
     console.log('     so Sun/Moon positions are already at the correct TT-time evaluation).');
@@ -32026,7 +32035,9 @@ function setupGUI() {
     console.log('');
     console.log('    Interpretation:');
     console.log('      • (A) large (>0.1°) → Sun pipeline drift is a factor; consider VSOP87 for scene Sun');
-    console.log('      • (B) large (>0.01°) → Meeus overlay diverges from dispatcher (bug in override path)');
+    console.log('      • (B): with MOON_ARGS_FRAMEWORK_NATIVE (default) a ~0.01° divergence at BCE epochs is');
+    console.log('        EXPECTED — the documented predicted-ë args difference (M′ +0.37° at −135, doc 66 §1);');
+    console.log('        only in pure-Meeus A/B mode does (B) > 0.01° indicate an override-path bug');
     console.log('      • (C) large (>0.05°) → Earth-rotation model diverges from IAU (would shift longitude)');
     console.log('      • (D) large (>500 km) → framework and NASA use different geometric conventions');
     console.log('      • All small + NASA convention gap ≈ 0 → residual explained by convention alone');
@@ -32239,7 +32250,9 @@ function setupGUI() {
     console.log('  Interpretation:');
     console.log('   • Baseline (1.00×) matches Cox&Chao dα/dt at J2000 — physically-constrained.');
     console.log('   • Off-calibration scales are sensitivity probes, not physically-justified refits.');
-    console.log('   • Residual gap at any scale = Moon polynomial residual (β/Lp) — needs ELP-2000/82.');
+    console.log('   • Residual gap at any scale is carried by the Sun-side longitude + GMST convention +');
+    console.log('     umbra geometry (docs 103/66) — NOT the Moon series: all modern lunar theories');
+    console.log('     (Meeus, full ELP-2000/82, ELP/MPP02) agree at −135 to ~0.001° in β.');
     console.log('   • Simplified umbra (sub-solar + β leverage) — for the real ±4h ray-trace BestGap,');
     console.log('     run "Audit all 26 solar eclipse presets" (its -135 row is the authoritative number).');
 
@@ -32373,9 +32386,12 @@ function setupGUI() {
     forceSceneUpdate();
     const node10 = o.moonAscendingNode;
     const rate = wrap180(node10 - node) / 2;    // deg/yr
-    console.log(`  Node regression rate:   measured ${rate.toFixed(4)}°/yr   target −19.3411°/yr (of-date 18.6132-yr cycle)`);
+    console.log(`  Node regression rate:   measured ${rate.toFixed(4)}°/yr   target −19.3551°/yr (star-referenced world-frame reading:`);
+    console.log('    of-date −19.3411°/yr [18.6132-yr cycle] + scene equinox precession 0.0140°/yr — both retrograde)');
     console.log('  Anchors + rate at target ⇒ scene geometry verified. L row reads the');
-    console.log('  Meeus-OVERRIDDEN Moon (documented limitation; moonStartposMoon deferred).');
+    console.log('  Meeus-OVERRIDDEN (true) Moon against the MEAN-longitude target, so its ~3° Δ');
+    console.log('  is the equation-of-center reading, not an anchor error — moonStartposMoon');
+    console.log('  is anchored via the unmask meter (mean Δlon ≈ 0).');
     console.log('══════════════════════════════════════════════════════════════════════');
     jumpToJulianDay(savedJD);
     forceSceneUpdate();
@@ -32571,7 +32587,7 @@ function setupGUI() {
             cgSum += best; if (best > cgMax) cgMax = best;
           }
           console.log(`    [deep ${yr}] Moon-on-ring CURVE gap: mean ${(cgSum/P.length).toFixed(0)} km  max ${cgMax.toFixed(0)} km` +
-            `  (TT-aligned clocks: expect the ~5,000–12,000 km periodic floor; the UT-clock era showed 24–73k km)`);
+            `  (TT-aligned clocks: periodic floor — mean ~4,500–9,500 km, max ~11,000–15,000 km; the UT-clock era showed 24–73k km)`);
         }
       }
       const minAt = (key) => { let k = 1;                    // parabolic min refine
@@ -32625,15 +32641,19 @@ function setupGUI() {
     console.log('══════════════════════════════════════════════════════════════════════════════');
     jumpToJulianDay(savedJD); forceSceneUpdate();
   }, 'Samples the RAW hierarchy Moon (pre-override) vs Meeus over one anomalistic month at ' +
-     '8 epochs (2000 → -584): mean Δlon, perigee-phase and node-phase offsets, mean/RMS ' +
-     'distance deltas (km). Phase-drift slopes localize period mismatches between the scene ' +
-     'composition and Meeus — answers "where and why does the visible orbit diverge?"');
+     '13 epochs (2000 → -584 plus five deep-time rows to 222,000): mean Δlon, perigee-phase and ' +
+     'node-phase offsets, mean/RMS distance deltas (km). Phase-drift slopes localize period ' +
+     'mismatches between the scene composition and Meeus; the [deep] rows attribute the ' +
+     'ring-curve gap and chain-vs-args phases (open scene-ring completions: TODO item on ' +
+     'ecliptic-of-date re-base + a(t)/a₀ distance scaling) — answers "where and why does the ' +
+     'visible orbit diverge?"');
 
 
   // ────────────────────────────────────────────────────────────────────────
   // Historical-eclipse diagnostics. The buttons that follow progressively
   // test our model against documented solar eclipses (Bur-Sagale -762 to
-  // Halley 1654) and against NASA's Five Millennium Catalog reference.
+  // the 1654 European total and Halley's 1715) and against NASA's Five
+  // Millennium Catalog reference.
   //
   // This first one cleanly separates Moon-polynomial TIMING error from ΔT
   // GEOGRAPHIC error: a "not visible at site" failure can mean (a) our Moon
@@ -32691,10 +32711,11 @@ function setupGUI() {
     }
     console.log('\n  Interpretation:');
     console.log('   • J2000 row ≈ 0 by construction (framework mean elements are Meeus-anchored).');
-    console.log('   • Ancient Δlon/Δβ ≲ 0.01° (≲ 60 km) → the real-time secular integrals');
-    console.log('     contribute only marginally to Moon position — argument-level channel');
-    console.log('     confirmed small (the earlier ~1 km dead-end finding, re-measured under');
-    console.log('     the shipped identity-composed D/M; derivation record docs/66 §1).');
+    console.log('   • Ancient Δlon/Δβ: TT-eval ≲ 0.007° (≲ 40 km); UT-eval ≲ 0.017° (≲ 105 km)');
+    console.log('     → the real-time secular integrals contribute only marginally to Moon');
+    console.log('     position — argument-level channel confirmed small (the earlier ~1 km');
+    console.log('     dead-end finding, re-measured under the shipped identity-composed D/M;');
+    console.log('     derivation record docs/66 §1).');
     console.log('══════════════════════════════════════════════════════════════════════');
   }, 'Rebuilds Meeus-Moon Sun-dependent arguments (D = Lp − L_sun, M = Sun mean anomaly) from the ' +
      'framework Sun and feeds them through the production Ch. 47 series via a probe hook. ' +
@@ -33241,8 +33262,9 @@ function setupGUI() {
     console.log('   That just means both produce "some" eclipse near the site — weak test.');
     console.log(' • Umbra window is tighter (~±10-15k s); fewer pass. This discriminates totality.');
     console.log(' • The Mean residuals show which model is closer to "best" per-event, on average.');
-    console.log(' • Joint world: our production ΔT tracks Stephenson within ~±50 s across the record,');
-    console.log('   so the two columns give near-identical verdicts BY CONSTRUCTION — the old');
+    console.log(' • Joint world: our production ΔT tracks Stephenson within ~0.4 ks across the record');
+    console.log('   (worst ~420 s near −556; ≲150 s medieval; ≲50 s after ~1100 CE) — tiny against');
+    console.log('   the ~20–38 ks windows, so the two columns give near-identical verdicts BY CONSTRUCTION — the old');
     console.log('   "pure-tidal vs empirical" contest is settled. Read this button as per-event QA:');
     console.log('   events where BOTH models fail (e.g. the Cairo 979/1004 partial-only cases,');
     console.log('   just over the penumbra threshold) are geometry/attribution-limited, not ΔT.');
@@ -33291,7 +33313,7 @@ function setupGUI() {
       [1133,  8,  2, 52.0,  -2.0,  'Total',   'Henry I death (English chronicles)'],
       [1185,  5,  1, 50.0,  38.0,  'Annular', 'Igor’s Tale (Russian Primary Chronicle)'],
       [1239,  6,  3, 43.7,  10.4,  'Total',   'Cerchiari Tuscany (Italian chronicle)'],
-      [1654,  8, 12, 51.5,  -0.1,  'Total',   'Halley’s map basis (London)'],
+      [1654,  8, 12, 51.5,  -0.1,  'Total',   'European total (London)'],
     ];
 
     // Julian Day Number at noon UT for proleptic Julian calendar date
@@ -33509,7 +33531,7 @@ function setupGUI() {
       [1133,  8,  2, 52.0,  -2.0,  'Total',   'Henry I death (English chronicles)'],
       [1185,  5,  1, 50.0,  38.0,  'Annular', "Igor's Tale (Russian Primary Chronicle)"],
       [1239,  6,  3, 43.7,  10.4,  'Total',   'Cerchiari Tuscany (Italian chronicle)'],
-      [1654,  8, 12, 51.5,  -0.1,  'Total',   "Halley's map basis (London)"],
+      [1654,  8, 12, 51.5,  -0.1,  'Total',   "European total (London)"],
     ];
 
     function julianDateToJD(Y, M, D, hour = 12) {
@@ -33948,14 +33970,19 @@ function setupGUI() {
         console.log(`  WEIGHTED, excl. CONTESTED (${fClW.n}): δΔT = ${fClW.a.toFixed(0)} + ${fClW.c.toFixed(1)}·T²   χ²_red = ${fClW.chi2red.toFixed(1)}`);
         console.log(`    → implied secular rate r = ${(fClW.c / 18.26).toFixed(2)} ± ${(fClW.seC / 18.26).toFixed(2)} ms/cy`);
       }
+      const zRaw = Math.abs(fAllW.c / fAllW.seC);
+      const zScaled = zRaw / Math.sqrt(Math.max(fAllW.chi2red, 1));
       console.log('  Reading: r > 0 → Earth rotation slower than framework (a missing braking');
       console.log('  channel); r < 0 → a missing speedup channel.');
       console.log('  JOINT WORLD: the Core-mantle swing (the former ~0.5 ms/cy fractional channel)');
-      console.log('  is IN production, so the expected residual r is ≈ 0. Measured r consistent');
-      console.log('  with 0 within ~2σ = the independent SOLAR-corpus confirmation of the closure');
-      console.log('  (pre-joint, this same instrument disfavored a uniform secular −0.5 at ~4σ —');
-      console.log('  the era-localized/swing interpretation that then shipped; doc 104).');
-      console.log('  A future |r| > 2σ here would be a real regression of the joint calibration.');
+      console.log('  is IN production, so the expected residual r is ≈ 0. This run: weighted r sits');
+      console.log(`  ${zRaw.toFixed(1)}σ from 0 on the raw geometric σ; χ²_red ≫ 1 says that σ understates the`);
+      console.log(`  true (mis-attribution) scatter — scaled by √χ²_red the residual is ${zScaled.toFixed(1)}σ,`);
+      console.log('  the conditioned read. (Pre-joint, this same instrument disfavored a uniform');
+      console.log('  secular −0.5 at ~4σ — the era-localized/swing interpretation that then');
+      console.log('  shipped; doc 104.)');
+      console.log('  A persistent scaled residual > 2σ here would be a real regression of the');
+      console.log('  joint calibration.');
       console.log('  The WEIGHTED fit is the conditioned answer: steep-crossing events (19th-c.');
       console.log('  photographic anchors) dominate; shallow crossings carry ~10-20 ks error bars');
       console.log('  (χ²_red ≫ 1 reflects mis-attribution scatter beyond the geometric σ model).');
@@ -34263,6 +34290,10 @@ function setupGUI() {
     console.log('     a chronological re-attribution: the historical record refers to a real');
     console.log('     eclipse at a slightly different year (calendar conversion / regnal-year /');
     console.log('     eponym list ambiguity).');
+    console.log('   • EXCEPTION — date-certain events: the −135 diary is astronomically dated by');
+    console.log('     its own positional observations, so its rows are umbra-geometry QA, NOT a');
+    console.log('     re-dating proposal; the −135 residual is the documented Sun-side/geographic');
+    console.log('     channel (docs 103/66).');
     console.log('   • No candidate found → either window is too small, the framework genuinely');
     console.log('     has no nearby eclipse, OR the event isn\'t a single solar eclipse at all');
     console.log('     (literary trope, lunar eclipse, comet, etc.).');
@@ -34272,10 +34303,11 @@ function setupGUI() {
   }, 'For each deep-time outlier from the Divergence trend (-135, -584, -708, -762), ' +
      'scan ±15 years around the documented date and find every eclipse where the ' +
      'framework\'s umbra comes within 1500 km of the documented site (using ±3h ' +
-     'min-distance scan). Reports the framework\'s best alternative dates — these are ' +
-     'the chronology proposals the framework\'s pure-tidal physics points to. ' +
-     'A clean candidate ~10 years off the documented date strongly suggests calendar/' +
-     'regnal-year mis-attribution in the historical record.');
+     'min-distance scan). Reports the framework\'s best alternative dates — the ' +
+     'chronology proposals the production model (joint-world ΔT) points to. ' +
+     'A clean candidate ~10 years off the documented date suggests calendar/' +
+     'regnal-year mis-attribution — except for date-certain events like the −135 ' +
+     'diary, where the rows are umbra-geometry QA only.');
 
   const firstInvestigationEclipseBtn = addTestButton('Historic Eclipse Candidates (multi-match search)', () => {
     // For each documented historic eclipse event, search a WIDE time window
@@ -35064,9 +35096,14 @@ function setupGUI() {
     console.log('                                        within the scan window. Both signals are mild.');
     console.log('    ◇⚠ ΔT-signal + geographic offset   → framework predicts different UT AND umbra is > 1000 km from');
     console.log('                                        site even at framework UT. Two separate findings co-occur.');
-    console.log('    ⚠ geographic (no timing offset)    → framework agrees with record on UT, but places umbra > 1000 km');
-    console.log('                                        from site at every scanned moment. Possible causes:');
-    console.log('                                        (a) observer was in partial zone, not totality;');
+    console.log('    ⚠ geographic (no timing offset)    → framework agrees with record on UT, but the UMBRA CENTERLINE stays');
+    console.log('                                        > 1000 km from the site at every scanned moment. NOTE: the gate is an');
+    console.log('                                        umbra-centerline distance, NOT eclipse visibility — at high γ the');
+    console.log('                                        shadow strikes the tilted Earth obliquely and the penumbral footprint');
+    console.log('                                        spans thousands of km, so the site can still sit deep in the penumbra.');
+    console.log('                                        Possible readings:');
+    console.log('                                        (a) observer saw a deep partial from inside the penumbra (e.g. -135');
+    console.log('                                            Babylon at γ = 0.719 — penumbra covers Mesopotamia, diary-consistent);');
     console.log('                                        (b) preset attribution refers to a different eclipse — the');
     console.log('                                            documented event may need re-identification (e.g. Thales);');
     console.log('                                        (c) genuine framework deep-time drift places umbra elsewhere.');
@@ -35167,7 +35204,9 @@ function setupGUI() {
     console.log(`         ${events.length - matched} model-predicted events NOT in this NASA subset`);
     console.log(`         ${unmatched.length} NASA events MISSED by model`);
     console.log('\nNote: this 14-event subset is for sanity-check only. The full NASA Lunar Canon');
-    console.log('comparison (model⇄NASA bidirectional) is the next commit (Phase L-3/L-4).');
+    console.log('comparison is SHIPPED: the L-3 button loads + cross-checks the 12,064-event');
+    console.log('canon and the L-4 button runs the bidirectional scan (−1999 to +3000; full-canon');
+    console.log('recall 99.61 / tight-window 74.37 / type 98.75).');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
   }, 'Predictive lunar eclipse finder (Commit 1 of the lunar eclipse track). ' +
      'Runs findLunarEclipsesInRange on the 2020-2026 window, classifies events ' +
@@ -35424,7 +35463,7 @@ function setupGUI() {
       console.log(`     mean Δlon = ${meanLon >= 0 ? '+' : ''}${meanLon.toFixed(2)}°  (${meanLon > 0 ? 'EAST'  : 'WEST'} of NASA path)  std ${stdLon.toFixed(2)}°`);
       console.log(`     mean great-circle distance to centerline = ${meanGC.toFixed(0)} km`);
       console.log(`   Approx conversion: 1° lat ≈ 111 km;  1° lon ≈ ${Math.round(111 * Math.cos(45 * Math.PI / 180))} km at mid-lat 45°.`);
-      console.log(`   Visual check: screenshot showed model band running NORTH of Spain → expected meanΔlat > 0.`);
+      console.log(`   Sign convention: meanΔlat > 0 = model band NORTH of the NASA path (matches the in-scene umbra band).`);
     }
     console.log(`   Window A0 runtime: ${((performance.now() - _t2026) / 1000).toFixed(1)} s`);
     console.log('');
@@ -35539,8 +35578,9 @@ function setupGUI() {
       console.log(`     mean Δlat = ${meanLat24 >= 0 ? '+' : ''}${meanLat24.toFixed(2)}°  (${meanLat24 > 0 ? 'NORTH' : 'SOUTH'} of NASA path)  std ${stdLat24.toFixed(2)}°`);
       console.log(`     mean Δlon = ${meanLon24 >= 0 ? '+' : ''}${meanLon24.toFixed(2)}°  (${meanLon24 > 0 ? 'EAST'  : 'WEST'} of NASA path)  std ${stdLon24.toFixed(2)}°`);
       console.log(`     mean great-circle distance to centerline = ${meanGC24.toFixed(0)} km`);
-      console.log(`   Diagnostic: if mean Δlat ≈ 0 here but +1.4° for 2026 → 2026-specific β-trajectory issue.`);
-      console.log(`               if mean Δlat ≈ 2026 → general secular-pole / β-implementation issue.`);
+      console.log(`   Diagnostic: mean Δlat ≈ 0 here with a larger 2026 value → high-γ leverage on the`);
+      console.log(`   2026 grazing path (γ = 0.898 vs 0.343), not a general β-implementation issue;`);
+      console.log(`   similar means on both → check secular-pole / β implementation.`);
     }
     console.log(`   Window A1 runtime: ${((performance.now() - _t2024) / 1000).toFixed(1)} s`);
     console.log('');
@@ -36404,15 +36444,16 @@ function setupGUI() {
     console.log(`\n── L-5a (model vs NASA across 28 documented events) ──`);
     console.log(`  Within ±${TIGHT_MIN} min:                ${modelTightMatch}/${documented.entries.length}`);
     console.log(`  Expected pattern: minutes-level agreement across the FULL list — production ΔT`);
-    console.log(`  tracks the Stephenson-class curve throughout this span. Meaningful divergence vs`);
-    console.log(`  NASA's MS-2004 ΔT only opens before ~-1500 (see L-4 per-century medians), older`);
-    console.log(`  than any entry here.`);
+    console.log(`  tracks the Stephenson-class curve throughout this span. The larger divergence vs`);
+    console.log(`  NASA's MS-2004 ΔT — the ~+14-min median bulge at −1300…−900 and the ~−10-min tail`);
+    console.log(`  before −1800 (see L-4 per-century medians) — is older than any entry here.`);
 
     console.log(`\n── L-5b (model vs observed time, vs NASA vs observed time) ──`);
     if (withObs === 0) {
       console.log(`  0 of ${documented.entries.length} events have a transcribed observed_time_ut.`);
       console.log(`  Observed-time validation is delivered by the L-5b button (Stephenson/Morrison`);
-      console.log(`  timed contacts, n=1212 — the doc-102 numbers). The per-event observed_time_ut`);
+      console.log(`  timed observations, ~270 events; mean |residual| 20.2 min — the doc-102`);
+      console.log(`  numbers). The per-event observed_time_ut`);
       console.log(`  placeholders in public/input/lunar-eclipses-documented.json remain empty and`);
       console.log(`  optional; if ever filled, this button additionally shows per-event`);
       console.log(`  model-vs-observed and NASA-vs-observed columns.`);

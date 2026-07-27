@@ -1,6 +1,6 @@
 # Pure-tidal + L1-orbital-coupled α(t) validates against the historical lunar record
 
-**Status**: Validation complete — 267 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 (LLR-anchored α₁ giving da/dt = 3.82 cm/yr at J2000) + L1-orbital-coupled α(t) GIA model. Under the joint world (4-flag stack + Core-mantle swing, doc 104), framework mean |residual| **20.2 min (1212 s)**, with **117/267 events (43.8%)** falling closer to observation than NASA Espenak/Meeus's polynomial. NASA polynomial mean |residual|: 20.0 min (1199 s); Stephenson 2016 spline polynomial: 20.2 min (1211 s) — both are fit to essentially this exact dataset, so per-event residuals against either index fit quality against a smoothed representation of the observations rather than physical validity; the framework's excess over Stephenson's own fit is **2 s** — the dataset noise floor. The framework's independent validation is the [26-event solar-eclipse alignment audit](https://holisticuniverse.com/model/historical-eclipse-validation): 13/26 confirmed+off-peak, 6 regional, 0 with residual ΔT-signal (framework agrees with the documented UT on every event), 7 pure geographic misses (partial-only sites and attribution debates, unrelated to physics).
+**Status**: Validation complete — 267 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 (LLR-anchored α₁ giving da/dt = 3.82 cm/yr at J2000) + L1-orbital-coupled α(t) GIA model. Under the joint world (4-flag stack + Core-mantle swing, doc 104), framework mean |residual| **20.2 min (1212 s)**, with **117/267 events (43.8%)** falling closer to observation than NASA Espenak/Meeus's polynomial. NASA polynomial mean |residual|: 20.0 min (1199 s); Stephenson 2016 spline polynomial: 20.2 min (1211 s) — both are fit to essentially this exact dataset, so per-event residuals against either index fit quality against a smoothed representation of the observations rather than physical validity; the framework's excess over Stephenson's own fit is **2 s** — the dataset noise floor. The framework's independent validation is the [26-event solar-eclipse alignment audit](https://holisticuniverse.com/model/historical-eclipse-validation): 12/26 confirmed+off-peak, 6 regional, 0 with residual ΔT-signal (framework agrees with the documented UT on every event), 8 geographic-class events (umbra-*centerline* >1,000 km from the site — a centerline-distance gate, not visibility: at high γ the shadow strikes the tilted Earth obliquely and the penumbra can still cover the site with a deep partial, as at −135 Babylon; the class collects penumbra-only sites, attribution debates, and one 1000-km boundary case — all unrelated to physics).
 
 ---
 
@@ -68,8 +68,9 @@ resolution cannot.
    at the sub-Moon point vs Sun apparent radius. Validates against NASA
    Five Millennium Canon (which ends at year 3000 CE) and produces
    honest first-principles predictions beyond NASA's published
-   endpoint — 114 solar eclipses found for the 3001-3050 CE window that
-   are not on any NASA tabulation.
+   endpoint — 116 solar eclipses found for the 3001-3050 CE window
+   (35 Total, 42 Annular, 39 Partial) that are not on any NASA
+   tabulation.
 
 3. **NASA 5-Millennium Canon of Lunar Eclipses import** (12,064 events,
    -1999 BCE to +3000 CE; Espenak & Meeus 2009). Scraped per-century from
@@ -284,14 +285,15 @@ matched / type-mismatch / model-only / NASA-only. Two thresholds:
   the same opposition NASA found?
 - **Tight UT match (±15 min)**: do the two clocks agree on UT timing?
 
-**Result** (fully-derived e_E channel, the shipped state): 12,082 model
+**Result** (fully-derived e_E channel + carrier split + dynamical
+inclination, the shipped state): 12,070 model
 events vs 12,064 NASA events over 5,000 years. Physical-event recall
-99.71%; the unmatched edges (53 model-only / 35 NASA-only) consist
+99.58%; the unmatched edges (57 model-only / 51 NASA-only) consist
 entirely of grazing penumbrals at the outer eclipse threshold —
 threshold-convention scatter with no directional bias. Type accuracy on
-matched events 98.84%; all 140 mismatches are boundary-straddlers
+matched events 98.66%; all 161 mismatches are boundary-straddlers
 (Total↔Partial with umbral magnitude within ~0.02 of 1.0, or
-Penumbral↔Partial within ~0.03 of 0). Tight (15 min) UT recall 74.88% —
+Penumbral↔Partial within ~0.03 of 0). Tight (15 min) UT recall 74.62% —
 structured by the model ↔ NASA ΔT divergence, captured quantitatively by
 the per-century diagnostic. Certified under the framework-native lunar
 argument skeleton (`MOON_ARGS_FRAMEWORK_NATIVE` default ON) with the
@@ -372,12 +374,17 @@ per-event residuals against either measure model distance from a
 smoothed representation of the observations, not physical validity.
 The framework's independent validation is the 26-event solar-eclipse
 alignment audit (joint world, after the 1133 + −584 preset
-re-registrations): 13/26 confirmed umbra reaching the observation
-site (1 confirmed at greatest moment + 12 off-peak alignments), 6/26
+re-registrations): 12/26 confirmed umbra reaching the observation
+site (1 confirmed at greatest moment + 11 off-peak alignments), 6/26
 regional (framework umbra in same continental band but off site),
 0/26 with residual ΔT-signal — the framework agrees with the
-documented UT on every event (max ΔJD 14 min) — and 7/26 pure
-geographic misses (partial-only sites and attribution debates,
+documented UT on every event (max ΔJD 18 min) — and 8/26
+geographic-class events (umbra-*centerline* >1,000 km from the site;
+the gate measures centerline distance, not visibility — at high γ the
+penumbral footprint on the tilted Earth spans thousands of km, so
+these sites can still see a deep partial, as at −135 Babylon; the
+class collects penumbra-only sites, attribution debates, and the
+−708 boundary case at 1002 km vs the 1000-km threshold —
 unrelated to physics). That audit uses the framework's own predicted
 UT and umbra track with no ΔT polynomial in the loop.
 
@@ -1696,7 +1703,8 @@ What this validation establishes:
    Peltier ICE-6G factor-2.0 J₂→α conversion, and direct coupling to
    the L1 orbital layer of the canonical Climate Formula (see [doc 92](92-climate-formula.md))
    — and produces a framework that agrees with NASA's empirical
-   polynomial to within 1.3 min on a 20 min observation noise floor.
+   polynomial to within 13 s (0.2 min) on a 20 min observation noise
+   floor.
    NASA's polynomial uses ~10+ coefficients fitted to this exact
    dataset; our α(t) independently predicts it from satellite/geodesy
    literature. The four sub-Milankovitch harmonics (Bond n=1830,
@@ -1771,8 +1779,11 @@ What this validation establishes:
    GGC22 — the same hematite-stained-grain drift-ice series Bond
    used to identify his Bond 0-8 cold events). Detrended, on the
    framework's validated window −4000 BC to +1800 AD (the range where
-   the ΔT fit is not extrapolating): **r = +0.49 at lag 0**. The
-   correlation is a true retrodiction — the stack was fit against
+   the ΔT fit is not extrapolating): **r = +0.49 at lag 0** with the
+   pre-joint flags-only stack (re-measured under the shipped joint
+   world — where part of the late-Holocene structure moved into the
+   Core-mantle swing — the flags-only correlation is **r = +0.36**).
+   The correlation is a true retrodiction — the stack was fit against
    the Stephenson 2016 ΔT residual (an eclipse-timing dataset, not a
    climate record — see item 6), never against IRD, GISP2, or any
    climate proxy. Framework-vs-IRD is stronger than
@@ -1888,7 +1899,8 @@ The natural extensions, in order from most to least defensible:
    architecture is implemented, shipped default-ON, and preserves the
    J2000 LOD anchor. The Bond channel has now been *cross-validated*
    against Bond's own drift-ice record (r = +0.49 Pearson correlation
-   of Σ_stack vs Bond 2001 IRD, out-of-sample in the −4000 BC to
+   of Σ_stack vs Bond 2001 IRD pre-joint, +0.36 under the shipped
+   joint world, out-of-sample in the −4000 BC to
    +1800 AD window — see item 7 of "What this validation establishes"
    above). Note: cross-validation confirms the fitted amplitude and
    phase are consistent with an independent proxy; it does *not*
@@ -1933,9 +1945,9 @@ What NOT to do:
 
 - **Do not introduce a fourth empirical constant** to fit the medieval
   residual unless a physical mechanism (specific non-tidal channel,
-  modeled from independent data) requires it. The 21.3-min residual
-  is essentially at the observation noise floor; further reduction
-  would be over-fitting.
+  modeled from independent data) requires it. The 20.2-min residual
+  is essentially at the observation noise floor (2 s excess over
+  Stephenson's own fit); further reduction would be over-fitting.
 
 - **Do not modify Farhat 2022 tidal rate** to absorb residual structure.
   The tidal rate is anchored to modern LLR; refitting against deep-time
@@ -1956,7 +1968,7 @@ first.
 
 | Button | Purpose |
 |---|---|
-| **L-1: Verify lunar eclipse finder (vs 14 known NASA events)** | Scans 2020-2026, cross-checks 14 NASA Canon events. Expects 14/14 match with 13/14 type classifications correct (1 known boundary case at 2021-05-26: mag 0.988 vs NASA 1.009, an event total by only 0.9%). |
+| **L-1: Verify lunar eclipse finder (vs 14 known NASA events)** | Scans 2020-2026, cross-checks 14 NASA Canon events. Expects 14/14 match with 13/14 type classifications correct (1 known boundary case at 2021-05-26: model mag 0.989 vs NASA 1.009, an event total by only 0.9%). |
 | **L-1: Validate LUNAR_ECLIPSE_PRESETS catalog entries** | Sanity test for the 14-event tweakpane catalog: JD ↔ label date ↔ model-predicted opposition ↔ catalog-asserted type. |
 
 ### Predictive finders
@@ -1965,7 +1977,7 @@ first.
 |---|---|
 | **L-2 lunar: Discover lunar eclipses in a year range** | Expansion helper. Default window 1000-1010 CE (Ibn Yunus era); edit `START_YEAR`/`END_YEAR` in `script.js` to scan other eras. |
 | **L-2 solar: Predict solar eclipses (validate 2026-2036 + beyond NASA Canon)** | Validates against NASA Five Millennium Canon for 2026-2036, then produces honest first-principles predictions for 3001-3050 (116 events beyond NASA's tabulation endpoint at year 3000). |
-| **L-2b: Modern eclipse multi-signal validation (Ω signal + γ amplification, 37 events)** | 37 modern totals (1900-2030): tests for a missing nodal (Ω) term in the Moon β-trajectory (none — R² ≈ 0.17) and for grazing amplification (dominant — \|Δlon\| scales with 1/√(1−γ²), r = 0.87, 9.9× at γ > 0.85). Absorbs the retired L-2c…L-2h diagnostic chain. |
+| **L-2b: Modern eclipse multi-signal validation (Ω signal + γ amplification, 37 events)** | 37 modern totals (1900-2030): tests for a missing nodal (Ω) term in the Moon β-trajectory (none — R² ≈ 0.15) and for grazing amplification (dominant — \|Δlon\| scales with 1/√(1−γ²), r = 0.86, 9.5× at γ > 0.85). Absorbs the retired L-2c…L-2h diagnostic chain. |
 
 ### NASA Canon cross-check
 

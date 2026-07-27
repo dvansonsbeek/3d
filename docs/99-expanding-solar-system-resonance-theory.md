@@ -208,10 +208,12 @@ eccentricity:
 rate(t) = [invariant mean from H(t)] × [g(t)/g₀]^s,   g = (1 − e_E²)^(−3/2)
 ```
 
-with s_Ω = 1 (derived — reproduces Meeus's empirical node T² to 1.8% and
-T³ to 20% with no fitting) and s_ϖ = 2.407 (anchored, the Clairaut-amplified
-apsidal sensitivity; constant across the T²/T³ orders — an independent
-check). e_E(t) is the FULLY-DERIVED framework H/3 fluctuation —
+with s_Ω = 1.018 (derived — the leading-order value 1 already reproduces
+Meeus's empirical node T² to 1.8% with no fitting; the shipped 1.018 makes
+the node channel Meeus-exact) and s_ϖ = 2.407 (anchored, the
+Clairaut-amplified apsidal sensitivity; constant across the T²/T³ orders —
+an independent check; the lab-derived physical exponents are 0.867/2.479,
+the 2.407/1.018 pair being their frame-effective Meeus-convention form). e_E(t) is the FULLY-DERIVED framework H/3 fluctuation —
 e(t) = eccentricityBase·(1 + cos θ(t)/2) with
 θ(t) = 3·(t − balancedYear)/H·360° − 180° — one movement (the same H/3
 wobble that drives Earth's inclination, whose minimum falls on the balanced
@@ -486,7 +488,7 @@ Under the L1-orbital-coupled α(t) form, the GIA channel oscillates over the ~10
 
 Between −11,000 and +5,000 (the current Holocene warm interval), sub-Milankovitch modulations (the "all cycles" term) superposed on the Tidal + GIA baseline are candidates for named climate excursions (mini-ice-age / Little Ice Age; Medieval Warm Period; Holocene Climatic Optimum) via faster-and-slower LOD-growth epochs on top of the smooth Milankovitch trajectory. This is a testable mechanism claim: the framework predicts specific rate deviations at millennial-scale timing without any fitting to Holocene climate proxies.
 
-The predicted rhythm has now been validated against an independent paleoclimate record. Σ_stack correlates with Bond 2001 IRD (North Atlantic drift-ice, the same signal Bond used to identify his cold events) at **r = +0.49 Pearson** on the framework's validated window −4000 BC to +1800 AD — out-of-sample, since the stack was fit against the Stephenson 2016 ΔT residual (an eclipse-timing dataset, not a climate record). Sign-convention holds event-by-event on 6 of 6 named events inside the window (Bond 4, 4.2 ka, Roman Warm Period, MWP, Maunder, Dalton) under "Σ > 0 = LOD above baseline = mass equatorward = warm; Σ < 0 = cold". Events pre-window (Younger Dryas, 8.2 ka, Holocene Optimum) drift with fit-window extrapolation; the Modern warm epoch is post-window and anthropogenic — the framework, a pure orbital/tidal model, correctly does not predict it. See [doc 102](102-gia-alpha-lunar-validation.md) § "Defensible scientific position" item 7 for the full derivation. The *LOD-Climate Rhythm* modal exposes this comparison interactively.
+The predicted rhythm has now been validated against an independent paleoclimate record. Σ_stack correlates with Bond 2001 IRD (North Atlantic drift-ice, the same signal Bond used to identify his cold events) at **r = +0.36 Pearson under the shipped joint world** (+0.49 with the pre-joint flags-only stack — part of the late-Holocene structure now lives in the Core-mantle swing) on the framework's validated window −4000 BC to +1800 AD — out-of-sample, since the stack was fit against the Stephenson 2016 ΔT residual (an eclipse-timing dataset, not a climate record). Sign-convention holds event-by-event on 6 of 6 named events inside the window (Bond 4, 4.2 ka, Roman Warm Period, MWP, Maunder, Dalton) under "Σ > 0 = LOD above baseline = mass equatorward = warm; Σ < 0 = cold". Events pre-window (Younger Dryas, 8.2 ka, Holocene Optimum) drift with fit-window extrapolation; the Modern warm epoch is post-window and anthropogenic — the framework, a pure orbital/tidal model, correctly does not predict it. See [doc 102](102-gia-alpha-lunar-validation.md) § "Defensible scientific position" item 7 for the full derivation. The *LOD-Climate Rhythm* modal exposes this comparison interactively.
 
 ### Comparison to published dLOD/dt decompositions
 
@@ -1223,7 +1225,7 @@ This formula is not a standard published equation — it's a **conservation-base
 
 The framework's claim about the formula is:
 1. **It's algebraically equivalent to standard angular momentum conservation** ✓
-2. **It correctly predicts Moon drift rate (within 1.5%) using observed lunar despin rate as input** ✓
+2. **It correctly predicts Moon drift rate (within 1.8%) using observed lunar despin rate as input** ✓
 3. **It does NOT predict either rate from first principles** — it relates the two observables via conservation. For a first-principles prediction of either, the textbook tidal Q formulation is needed.
 
 The framework's contribution is showing that **lunar recession is structurally necessary** (the 8H invariant requires angular momentum redistribution, which the Moon must absorb). The exact rate comes from tidal Q physics; the *fact* of recession comes from the structural invariant.
