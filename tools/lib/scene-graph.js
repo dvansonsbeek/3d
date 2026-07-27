@@ -119,6 +119,13 @@ function _frameworkSunLon(jd_ut) {
 // ═══════════════════════════════════════════════════════════════════════════
 const MOON_ARGS_FRAMEWORK_NATIVE = !process.env.MOON_ARGS_PURE_MEEUS;
 
+// D2 derived additional-argument rates (deg/cy, J2000 8H-lattice months —
+// mirrors src/script.js FW_A2_RATE/FW_A3_RATE; record: tools/explore/derive-a1a2a3.js)
+const _FW_A2_RATE = 2 * (360 * 36525 / C.moonTropicalMonth)
+                  - (360 * 36525 / C.moonAnomalisticMonth)
+                  - 2 * (360 * 36525 / C.planets.jupiter.solarYearInput);
+const _FW_A3_RATE = 360 * 36525 / C.moonSiderealMonth;
+
 const _FW_MOON = (() => {
   const LP0 = 218.3164477, D0 = 297.8501921, M0 = 357.5291092,
         MP0 = 134.9633964, F0 = 93.2720950;
@@ -1226,9 +1233,12 @@ function moveModel(graph, pos) {
       const E = _fwEFactorTools(d, T, T2);
       const E2 = E * E;
       const AA = MEEUS_LUNAR.additionalArguments;
+      // D2 derived rates (mirrors src/script.js FW_A2_RATE/FW_A3_RATE):
+      // A3 = sidereal Lp rate (0.003 ppm); A2 = 2·Lp − M′ − 2·L_J (0.19 ppm);
+      // A1 stays Meeus-observed (no credible lattice identity).
       const A1 = (AA.A1[0] + AA.A1[1]*T) * d2r;
-      const A2 = (AA.A2[0] + AA.A2[1]*T) * d2r;
-      const A3 = (AA.A3[0] + AA.A3[1]*T) * d2r;
+      const A2 = (AA.A2[0] + (MOON_ARGS_FRAMEWORK_NATIVE ? _FW_A2_RATE : AA.A2[1])*T) * d2r;
+      const A3 = (AA.A3[0] + (MOON_ARGS_FRAMEWORK_NATIVE ? _FW_A3_RATE : AA.A3[1])*T) * d2r;
 
       // Table 47.A longitude terms from centralized tables
       const ML = MEEUS_LUNAR.longitudeTerms.terms;
@@ -1272,6 +1282,11 @@ function moveModel(graph, pos) {
                        + (1.25 * eocHalf * eocHalf / d2r * 1e6) * Math.sin(2*Mpr);
       nodes._meeusLonDeg = Lp / d2r + fullSl * 1e-6 + C.moonMeeusLpCorrection;
       nodes._meeusT = T;
+      // Series distance (mirrors src/script.js obj._meeusDistKm — the
+      // two-term ellipse the browser places the Moon at). Exposed on the
+      // computePlanetPosition result so meters can pair override angles
+      // with the OVERRIDE distance instead of the raw pivot distance.
+      nodes._meeusDistKm = C.moonDistance * (1 - C.moonOrbitalEccentricity * Math.cos(Mpr));
     }
     if (nodes.isEllipse) {
       const x = Math.cos(θ) * nodes.a;
@@ -1727,6 +1742,10 @@ function computePlanetPosition(target, jd) {
     distAU,
     sunDistAU,
     meanAnomaly,     // radians (from EoC computation, heliocentric orbital phase)
+    // Moon override only: the SERIES distance the browser places the Moon at
+    // (km). distAU above stays the raw pivot distance — pair angles with
+    // THIS for any override-vs-ring comparison (meter distance-pairing fix).
+    meeusDistKm: (target === 'moon' && C.useVariableSpeed) ? graph.moonNodes._meeusDistKm : undefined,
   };
 }
 

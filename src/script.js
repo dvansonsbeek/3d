@@ -6214,6 +6214,22 @@ const _FW_MOON = (() => {
   return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
 })();
 
+// D2: derived additional-argument rates (deg/cy), captured at load from the
+// J2000 8H-lattice months (the month globals are epoch-mutable; these rates
+// are J2000-frozen exactly like the Meeus polynomial rates they replace).
+//   A3 ≡ the Moon's SIDEREAL mean longitude rate (= Lp_tropical − p_H13, a
+//        structural lattice identity) — matches Meeus 481266.484 at 0.003 ppm.
+//   A2 ≡ 2·Lp_trop − M′rate − 2·n_Jupiter (the Jupiter–perigee argument
+//        Lp + ϖ_moon − 2λ_J) — matches Meeus 479264.290 at 0.19 ppm.
+//   A1 has NO credible lattice identity (all small-integer candidates are
+//   high-complexity chance matches ≥ 1000 ppm; the textbook 18V−16E−l
+//   misses by 3.7%) — its rate stays Meeus-observed by design.
+// Identification record: tools/explore/derive-a1a2a3.js.
+const FW_A2_RATE = 2 * (360 * 36525 / moonTropicalMonth)
+                 - (360 * 36525 / moonAnomalisticMonth)
+                 - 2 * (360 * 36525 / planets.jupiter.solarYearInput);
+const FW_A3_RATE = 360 * 36525 / moonSiderealMonth;
+
 /** Deep-time secular phases for the five arguments — ALWAYS-CHAINS (Stage B):
  *  the same factored-law integrator chains that phase the scene layers
  *  (_dtMoonIntegrator wiring, ~L9440) supply the argument skeleton, so the
@@ -6401,7 +6417,7 @@ function _meeusMoonLon(jd) {
     Sl += term;
   }
   const A1 = (119.75 +    131.849 * T) * _d2r;
-  const A2 = ( 53.09 + 479264.290 * T) * _d2r;
+  const A2 = ( 53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290) * T) * _d2r;
   Sl += 3958 * Math.sin(A1) + 1962 * Math.sin(Lp_mean * _d2r - Fr) + 318 * Math.sin(A2);
   return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
 }
@@ -31284,7 +31300,7 @@ function setupGUI() {
         Sl += term;
       }
       const A1 = (119.75 + 131.849*T) * _d2r;
-      const A2 = (53.09 + 479264.290*T) * _d2r;
+      const A2 = (53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T) * _d2r;
       Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
       return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
     }
@@ -32663,7 +32679,7 @@ function setupGUI() {
         Sl += term;
       }
       const A1 = (119.75 + 131.849*T) * _d2r;
-      const A2 = (53.09 + 479264.290*T) * _d2r;
+      const A2 = (53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T) * _d2r;
       Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
       return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
     }
@@ -32910,7 +32926,7 @@ function setupGUI() {
         Sl += term;
       }
       const A1 = (119.75 + 131.849*T) * _d2r;
-      const A2 = (53.09 + 479264.290*T) * _d2r;
+      const A2 = (53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T) * _d2r;
       Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
       return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
     }
@@ -33214,7 +33230,7 @@ function setupGUI() {
         Sl += term;
       }
       const A1 = (119.75 + 131.849*T) * _d2r;
-      const A2 = (53.09 + 479264.290*T) * _d2r;
+      const A2 = (53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T) * _d2r;
       Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
       return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
     }
@@ -57864,8 +57880,8 @@ function moveModel(pos) {
 
       // Additional arguments
       const A1 = (119.75 + 131.849*T) * _d2r;
-      const A2 = (53.09 + 479264.290*T) * _d2r;
-      const A3 = (313.45 + 481266.484*T) * _d2r;
+      const A2 = (53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T) * _d2r;
+      const A3 = (313.45 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A3_RATE : 481266.484)*T) * _d2r;
 
       // ── Sigma_l: longitude series (Table 47.A, 60 terms) ──
       let Sl = 0;

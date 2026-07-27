@@ -28,7 +28,12 @@ function sampleMoon(SG, jd0, n, spanDays) {
     const p = SG.computePlanetPosition('moon', jd);
     const ra = SG.thetaToRaDeg(p.ra) * Math.PI / 180;
     const dec = SG.phiToDecDeg(p.dec) * Math.PI / 180;
-    const r = p.distAU * AU_KM;
+    // Override pass: use the SERIES distance (meeusDistKm) — the distance the
+    // browser actually places the Moon at. Raw pass: pivot distance. This is
+    // the distance-pairing fix — previously the override curve paired series
+    // angles with the RAW distance, manufacturing a 2·e·a·sin(Δlon/2)
+    // artifact gap (38.3k km at 52000).
+    const r = (p.meeusDistKm !== undefined) ? p.meeusDistKm : p.distAU * AU_KM;
     pts.push([r * Math.cos(dec) * Math.cos(ra), r * Math.cos(dec) * Math.sin(ra), r * Math.sin(dec)]);
   }
   return pts;
@@ -102,9 +107,7 @@ for (const yr of EPOCHS) {
   const ring = sampleMoon(SG2, jd0, 240, 27.3);
   analyze(String(yr), overrideSamples[yr], ring);
 }
-console.log('\nInterpretation: out-of-plane = Moon above/below the visible ring plane.');
-console.log('CAVEAT (known artifact): in tools the override modifies only the returned');
-console.log('RA/Dec while p.distAU stays the RAW pivot distance, so the radial and');
-console.log('nearest-gap columns pair series azimuths with raw anomaly — an artifact of');
-console.log('2·e·a·sin(Δlon/2), NOT what the eye sees in the browser. Fix pending (TODO):');
-console.log('pair the override curve with the series distance (_meeusDistKm equivalent).');
+console.log('\nInterpretation: out-of-plane = Moon above/below the visible ring plane;');
+console.log('radial = inside/outside the ring ellipse; nearest-gap = what the eye sees.');
+console.log('(Distance pairing fixed: the override curve uses the SERIES distance');
+console.log('meeusDistKm — the meter is now a faithful mirror of the browser meter.)');
