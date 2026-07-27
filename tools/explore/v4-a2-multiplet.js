@@ -70,6 +70,52 @@ const fMa = LAB.linFit(T, full.lamMa), fSa = LAB.linFit(T, full.lamSa);
   console.log(`\njoint LSQ at ${YEARS} yr:  ` + planets.map(([k], p) => `${k} ${(Math.hypot(x[2 * p], x[2 * p + 1]) * 1e6).toFixed(0)}e-6`).join('   ') + '   (A2=J; Meeus 318)');
 }
 
+// ── (1b) drift-leak-corrected joint LSQ ────────────────────────────────────
+// The window-growing content is the secular-rate mismatch between full and
+// base3 (J2+planets shift ϖ̇/Ω̇/ṅ slightly) leaking through the main-problem
+// terms: λ_full − λ_base3 ⊃ (∂term/∂arg)·Δarg(t), with Δarg(t) growing
+// linearly. Model it: fixed sin/cos at the A2 family PLUS fixed AND
+// t-modulated sin/cos at the main-problem arguments. The t-terms absorb the
+// leak; the A2 coefficients come out unbiased.
+{
+  const fS = LAB.linFit(T, full.lamS);
+  const planets = [['V', fV], ['Ma', fMa], ['J', fJ], ['Sa', fSa]];
+  // main-problem argument linfits (from the full run's own elements)
+  const mains = [
+    ['Mp', { a: fLam.a - fW.a, b: fLam.b - fW.b }],                                  // M′ = λ − ϖ
+    ['2D-Mp', { a: fLam.a - 2 * fS.a + fW.a, b: fLam.b - 2 * fS.b + fW.b }],         // λ − 2λ_S + ϖ
+    ['2D', { a: 2 * (fLam.a - fS.a), b: 2 * (fLam.b - fS.b) }],
+    ['2Mp', { a: 2 * (fLam.a - fW.a), b: 2 * (fLam.b - fW.b) }],
+  ];
+  const K = planets.length * 2 + mains.length * 4;
+  const G = Array.from({ length: K }, () => new Float64Array(K)), b = new Float64Array(K);
+  const rowBuf = new Float64Array(K);
+  for (let i = 0; i < N; i++) {
+    const tc = T[i] / 36525;
+    const base = (fLam.a + fLam.b * T[i]) + (fW.a + fW.b * T[i]);
+    let c = 0;
+    for (const [, f] of planets) { const th = base - 2 * (f.a + f.b * T[i]); rowBuf[c++] = Math.sin(th); rowBuf[c++] = Math.cos(th); }
+    for (const [, f] of mains) {
+      const th = f.a + f.b * T[i], s = Math.sin(th), co = Math.cos(th);
+      rowBuf[c++] = s; rowBuf[c++] = co; rowBuf[c++] = tc * s; rowBuf[c++] = tc * co;
+    }
+    for (let k = 0; k < K; k++) { b[k] += dl[i] * rowBuf[k]; for (let j = k; j < K; j++) G[k][j] += rowBuf[k] * rowBuf[j]; }
+  }
+  for (let k = 0; k < K; k++) for (let j = 0; j < k; j++) G[k][j] = G[j][k];
+  const M = G.map((r, i) => [...r, b[i]]);
+  for (let col = 0; col < K; col++) {
+    let piv = col; for (let r = col + 1; r < K; r++) if (Math.abs(M[r][col]) > Math.abs(M[piv][col])) piv = r;
+    [M[col], M[piv]] = [M[piv], M[col]];
+    for (let r = col + 1; r < K; r++) { const f = M[r][col] / M[col][col]; for (let cc = col; cc <= K; cc++) M[r][cc] -= f * M[col][cc]; }
+  }
+  const x = new Float64Array(K);
+  for (let col = K - 1; col >= 0; col--) { let s = M[col][K]; for (let cc = col + 1; cc < K; cc++) s -= M[col][cc] * x[cc]; x[col] = s / M[col][col]; }
+  console.log(`leak-corrected LSQ:  ` + planets.map(([k], p) => `${k} ${(Math.hypot(x[2 * p], x[2 * p + 1]) * 1e6).toFixed(0)}e-6`).join('   ') + '   (A2=J; Meeus 318)');
+  const off = planets.length * 2;
+  console.log('  leak terms (t-modulated, e-6°/cy): ' + mains.map(([k], m) =>
+    `${k} ${(Math.hypot(x[off + 4 * m + 2], x[off + 4 * m + 3]) * 1e6).toFixed(0)}`).join('   '));
+}
+
 // ── (2) complex demodulation at θ_A2 ───────────────────────────────────────
 const LP_YR = 50;                                   // low-pass window
 const zr = new Float64Array(N), zi = new Float64Array(N);
