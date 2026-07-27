@@ -32499,8 +32499,8 @@ function setupGUI() {
     console.log(`  Table 2 (VISIBLE, same scene frame):         perigee ${(slope2('perig') * 100).toFixed(3)} °/cy, node ${(slope2('node') * 100).toFixed(3)} °/cy`);
     console.log('  Interpretation:');
     console.log('  • The apsidal+canceller pair runs at the OF-DATE rate (8.8476 yr) — the frame');
-    console.log('    fix. Table 2 residual perigee drift ≈ −0.010°/cy (chain-integrated layers +');
-    console.log('    deep-time ring lock; the old −0.2°/cy constant-rate-layer gap is closed).');
+    console.log('    fix. Table 2 residual perigee drift ≈ ±0.05°/cy (TT-aligned chain-integrated');
+    console.log('    layers; the old −0.2°/cy constant-rate-layer gap is closed).');
     console.log('  • RMSΔdist ≈ 700 km floor = perturbation-pattern residual (present at J2000).');
     console.log('  • Table 1 vs Table 2 meanΔlon difference = the of-date↔scene frame conversion');
     console.log('    absorbed by the override (expected).');
