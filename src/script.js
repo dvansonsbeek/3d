@@ -6221,10 +6221,15 @@ const _FW_MOON = (() => {
 //        structural lattice identity) — matches Meeus 481266.484 at 0.003 ppm.
 //   A2 ≡ 2·Lp_trop − M′rate − 2·n_Jupiter (the Jupiter–perigee argument
 //        Lp + ϖ_moon − 2λ_J) — matches Meeus 479264.290 at 0.19 ppm.
-//   A1 has NO credible lattice identity (all small-integer candidates are
-//   high-complexity chance matches ≥ 1000 ppm; the textbook 18V−16E−l
-//   misses by 3.7%) — its rate stays Meeus-observed by design.
-// Identification record: tools/explore/derive-a1a2a3.js.
+//   A1 CANNOT be lattice-identified, and the 5-body laboratory found why:
+//   it is the 18V−16E−M′ NEAR-RESONANCE — a beat of 18n_V−16n_E ≈ 477,336
+//   against n_M′ = 477,199 °/cy, where 26 ppm in the Venus year moves the
+//   beat ~27 °/cy (21%). The rate is hypersensitive to ppm-level planetary
+//   rates, so Meeus's 131.849 is an observed effective rate by nature —
+//   retained as such by design (bounded 0.004° sine; no deep-time hazard).
+// Identification record: tools/explore/derive-a1a2a3.js;
+// mechanism + A2-amplitude confirmation (79%) + J2 negative control:
+// tools/explore/derive-planetary-lunar-terms.js.
 const FW_A2_RATE = 2 * (360 * 36525 / moonTropicalMonth)
                  - (360 * 36525 / moonAnomalisticMonth)
                  - 2 * (360 * 36525 / planets.jupiter.solarYearInput);
