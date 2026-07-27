@@ -184,6 +184,8 @@ function runSystem(opts, moonIC, years, dt) {
   const jV = opts.planets ? 3 + PLANET_KEYS.indexOf('venus') : -1;
   const jMa = opts.planets ? 3 + PLANET_KEYS.indexOf('mars') : -1;
   const jSa = opts.planets ? 3 + PLANET_KEYS.indexOf('saturn') : -1;
+  if (opts.recordEclipticNormal) S.eclN = [];
+  const fE = GM_E / GM_EM, fM = GM_M / GM_EM;
   for (let s = 0; s <= nSteps; s++) {
     if (s % sampleEvery === 0) {
       const rx = Y[6] - Y[3], ry = Y[7] - Y[4], rz = Y[8] - Y[5];
@@ -191,6 +193,14 @@ function runSystem(opts, moonIC, years, dt) {
       S.t.push(s * dt);
       S.lam.push(Math.atan2(ry, rx));
       S.beta.push(Math.atan2(rz, Math.hypot(rx, ry)));
+      if (opts.recordEclipticNormal) {
+        // EMB orbital plane around the Sun — the lab's true "ecliptic of date"
+        const ex = fE * Y[3] + fM * Y[6] - Y[0], ey = fE * Y[4] + fM * Y[7] - Y[1], ez = fE * Y[5] + fM * Y[8] - Y[2];
+        const evx = fE * Y[3 * n + 3] + fM * Y[3 * n + 6] - Y[3 * n], evy = fE * Y[3 * n + 4] + fM * Y[3 * n + 7] - Y[3 * n + 1], evz = fE * Y[3 * n + 5] + fM * Y[3 * n + 8] - Y[3 * n + 2];
+        let hx = ey * evz - ez * evy, hy = ez * evx - ex * evz, hz = ex * evy - ey * evx;
+        const hn = Math.hypot(hx, hy, hz);
+        S.eclN.push([hx / hn, hy / hn, hz / hn]);
+      }
       S.lamS.push(Math.atan2(Y[1] - Y[4], Y[0] - Y[3]));
       if (jJ > 0) S.lamJ.push(Math.atan2(Y[3 * jJ + 1] - Y[1], Y[3 * jJ] - Y[0]));
       if (jV > 0) S.lamV.push(Math.atan2(Y[3 * jV + 1] - Y[1], Y[3 * jV] - Y[0]));
