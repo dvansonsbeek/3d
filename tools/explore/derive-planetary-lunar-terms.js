@@ -175,9 +175,11 @@ function runSystem(opts, moonIC, years, dt) {
   const k1 = new Float64Array(6 * n), k2 = new Float64Array(6 * n), k3 = new Float64Array(6 * n), k4 = new Float64Array(6 * n), Yt = new Float64Array(6 * n);
   const sampleEvery = Math.max(1, Math.round(0.25 / dt));
   const nSteps = Math.round(years * 365.25 / dt);
-  const S = { t: [], lam: [], beta: [], lamS: [], lamJ: [], lamV: [], w: [], Om: [] };
+  const S = { t: [], lam: [], beta: [], lamS: [], lamJ: [], lamV: [], lamMa: [], lamSa: [], w: [], Om: [] };
   const jJ = opts.planets ? 3 + PLANET_KEYS.indexOf('jupiter') : -1;
   const jV = opts.planets ? 3 + PLANET_KEYS.indexOf('venus') : -1;
+  const jMa = opts.planets ? 3 + PLANET_KEYS.indexOf('mars') : -1;
+  const jSa = opts.planets ? 3 + PLANET_KEYS.indexOf('saturn') : -1;
   for (let s = 0; s <= nSteps; s++) {
     if (s % sampleEvery === 0) {
       const rx = Y[6] - Y[3], ry = Y[7] - Y[4], rz = Y[8] - Y[5];
@@ -188,6 +190,8 @@ function runSystem(opts, moonIC, years, dt) {
       S.lamS.push(Math.atan2(Y[1] - Y[4], Y[0] - Y[3]));
       if (jJ > 0) S.lamJ.push(Math.atan2(Y[3 * jJ + 1] - Y[1], Y[3 * jJ] - Y[0]));
       if (jV > 0) S.lamV.push(Math.atan2(Y[3 * jV + 1] - Y[1], Y[3 * jV] - Y[0]));
+      if (jMa > 0) S.lamMa.push(Math.atan2(Y[3 * jMa + 1] - Y[1], Y[3 * jMa] - Y[0]));
+      if (jSa > 0) S.lamSa.push(Math.atan2(Y[3 * jSa + 1] - Y[1], Y[3 * jSa] - Y[0]));
       const hx = ry * vz - rz * vy, hy = rz * vx - rx * vz, hz = rx * vy - ry * vx;
       const rn = Math.hypot(rx, ry, rz);
       S.w.push(Math.atan2((vz * hx - vx * hz) / GM_EM - ry / rn, (vy * hz - vz * hy) / GM_EM - rx / rn));
@@ -202,7 +206,7 @@ function runSystem(opts, moonIC, years, dt) {
     deriv(Yt, k4);
     for (let i = 0; i < 6 * n; i++) Y[i] += h_s / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]);
   }
-  for (const k of ['lam', 'lamS', 'lamJ', 'lamV', 'w', 'Om']) if (S[k].length) S[k] = unwrap(S[k]);
+  for (const k of ['lam', 'lamS', 'lamJ', 'lamV', 'lamMa', 'lamSa', 'w', 'Om']) if (S[k].length) S[k] = unwrap(S[k]);
   return S;
 }
 
@@ -304,3 +308,89 @@ console.log('\n── PART B2: full planetary differential (full − base3) ─�
     console.log(`    rate ${p.rate.toFixed(1).padStart(6)} °/cy (period ${(36000 / p.rate).toFixed(0).padStart(5)} yr)  amp ${(p.amp * 1e6).toFixed(0).padStart(6)}e-6°${Math.abs(p.rate - 131.849) < 8 ? '  ← A1 band' : ''}`);
   }
 }
+
+// ═══ PART C (v3): JOINT multi-argument LSQ of the fast planetary band ══════
+// The single-argument A2 extraction was contaminated by unresolved planetary
+// neighbors; fit the whole Lp+ϖ−2λ_P family simultaneously.
+{
+  const dl = detrended(full, base3);
+  const T = base3.t;
+  const fLam = linFit(full.t, full.lam), fW = linFit(full.t, full.w);
+  const planets = [
+    { key: 'V', f: linFit(full.t, full.lamV) },
+    { key: 'Ma', f: linFit(full.t, full.lamMa) },
+    { key: 'J', f: linFit(full.t, full.lamJ) },
+    { key: 'Sa', f: linFit(full.t, full.lamSa) },
+  ];
+  const K = planets.length * 2;
+  const basisAt = (i) => {
+    const base = (fLam.a + fLam.b * T[i]) + (fW.a + fW.b * T[i]);
+    const row = [];
+    for (const p of planets) {
+      const th = base - 2 * (p.f.a + p.f.b * T[i]);
+      row.push(Math.sin(th), Math.cos(th));
+    }
+    return row;
+  };
+  const G = Array.from({ length: K }, () => new Float64Array(K)), b = new Float64Array(K);
+  for (let i = 0; i < T.length; i++) {
+    const row = basisAt(i);
+    for (let k = 0; k < K; k++) {
+      b[k] += dl[i] * row[k];
+      for (let j = k; j < K; j++) G[k][j] += row[k] * row[j];
+    }
+  }
+  for (let k = 0; k < K; k++) for (let j = 0; j < k; j++) G[k][j] = G[j][k];
+  const M = G.map((r, i) => [...r, b[i]]);
+  for (let col = 0; col < K; col++) {
+    let piv = col; for (let r = col + 1; r < K; r++) if (Math.abs(M[r][col]) > Math.abs(M[piv][col])) piv = r;
+    [M[col], M[piv]] = [M[piv], M[col]];
+    for (let r = col + 1; r < K; r++) { const f = M[r][col] / M[col][col]; for (let cc = col; cc <= K; cc++) M[r][cc] -= f * M[col][cc]; }
+  }
+  const x = new Float64Array(K);
+  for (let col = K - 1; col >= 0; col--) {
+    let s = M[col][K]; for (let cc = col + 1; cc < K; cc++) s -= M[col][cc] * x[cc];
+    x[col] = s / M[col][col];
+  }
+  console.log('\n── PART C (v3): joint LSQ — the Lp + ϖ − 2λ_P family ──');
+  for (let p = 0; p < planets.length; p++) {
+    const amp = Math.hypot(x[2 * p], x[2 * p + 1]) * 1e6;
+    const tag = planets[p].key === 'J' ? '   (A2 — Meeus 318)' : '';
+    console.log(`  Lp + ϖ − 2λ_${planets[p].key.padEnd(2)}: ${amp.toFixed(0).padStart(6)}e-6°${tag}`);
+  }
+}
+
+// ═══ PART D (v3): nodal-definition demodulation (the −7.8‱ puzzle) ═════════
+// Two node-rate estimators on the SAME dynamics: (1) osculating h-vector
+// linfit (the current extraction), (2) the LATITUDE node — per-window LSQ of
+// β ≈ i·sin(λ − Ω_w) using the true λ series, then a linfit of Ω_w over
+// window centers. If (2) lands near the observed 6798.38 while (1) stays at
+// ~6793, the framework input is the latitude-node convention and the "gap"
+// was definitional.
+function latitudeNodePeriod(S, label) {
+  const WIN_YR = 2, stepD = S.t[1] - S.t[0];
+  const perWin = Math.round(WIN_YR * 365.25 / stepD);
+  const centers = [], oms = [];
+  for (let s0 = 0; s0 + perWin <= S.t.length; s0 += perWin) {
+    let ss = 0, sc = 0, scs = 0, bs = 0, bc = 0;
+    for (let i = s0; i < s0 + perWin; i++) {
+      const sl = Math.sin(S.lam[i]), cl = Math.cos(S.lam[i]);
+      ss += sl * sl; sc += cl * cl; scs += sl * cl;
+      bs += S.beta[i] * sl; bc += S.beta[i] * cl;
+    }
+    const det = ss * sc - scs * scs;
+    const A = (bs * sc - bc * scs) / det;            // i·cosΩ
+    const B = (bc * ss - bs * scs) / det;            // −i·sinΩ
+    centers.push(S.t[s0 + Math.floor(perWin / 2)]);
+    oms.push(Math.atan2(-B, A));
+  }
+  const omU = unwrap(oms);
+  const f = linFit(centers, omU);
+  const periodD = -2 * Math.PI / f.b;
+  const fOm = linFit(S.t, S.Om);
+  const periodH = -2 * Math.PI / fOm.b;
+  console.log(`  ${label.padEnd(14)} h-vector node ${periodH.toFixed(2)} d   latitude node ${periodD.toFixed(2)} d   (observed input 6798.38)`);
+}
+console.log('\n── PART D (v3): node-rate estimator comparison ──');
+latitudeNodePeriod(base3, 'base3');
+latitudeNodePeriod(full, '8-body + J2');
