@@ -3304,7 +3304,7 @@ const ASTRO_REFERENCE = {
   earthInclinationRate_arcsecPerCentury: -18,
   // Source: JPL Horizons / Astronomical Almanac
   eccentricityJ2000: 0.01671022,                     // Earth eccentricity at J2000.0
-  eccentricityDotJ2000: -0.000042037,                // Earth eccentricity rate at J2000 (per Julian cy) — secular-theory coefficient corroborated by modern ephemeris fits, the LLR node channel (s_Ω ≈ 1, doc 66 §1), and the ancient timing record; not a raw observation. REFERENCE/Taylor-check anchor only: the shipped lunar channel does NOT consume it — the fully-derived H/3 fluctuation line PREDICTS −4.273e-5 (+1.7%; see _FW_ECC and docs/66 §1, incl. the falsified H/16-phase alternative −8.389e-6)
+  eccentricityDotJ2000: -0.000042037,                // Earth eccentricity rate at J2000 (per Julian cy) — secular-theory coefficient corroborated by modern ephemeris fits, the lunar node channel (doc 66 §1; v4 note: the old "s_Ω ≈ 1 measures ė" reading was superseded by the frame attribution — physical s_Ω = 0.867, effective 1.018), and the ancient timing record; not a raw observation. REFERENCE/Taylor-check anchor only: the shipped lunar channel does NOT consume it — the fully-derived H/3 fluctuation line PREDICTS −4.273e-5 (+1.7%; see _FW_ECC and docs/66 §1, incl. the falsified H/16-phase alternative −8.389e-6)
   eccentricityDotDotJ2000: -0.0000002534,            // Earth eccentricity curvature at J2000 (per Julian cy²; 2× Meeus Eq. 25.4 T² coefficient). REFERENCE/Taylor-check anchor only — the derived H/3 line predicts −3.7e-8 (same sign; the documented divergence behind the drift meter's BCE M′/F rows)
   perihelionLongitudeJ2000_deg: 102.947,             // Longitude of perihelion at J2000.0
   sunMeanLongitudeJ2000_deg: 280.46646,              // Sun mean longitude at J2000.0 (D5 aberration anchor; source of truth astro-reference.json, synced by export-to-script.js)
@@ -6332,8 +6332,9 @@ function _fwMoonArgs(jd_tt) {
   // (the H-grid's 0.527-s month spacing forced +0.0737 s on the quantized
   // month = −44 min of BCE opposition timing; the 8H lattice point sits
   // +0.0078 s from the measured month and the timed-Babylonian corpus
-  // certifies the chains at parity with the certified skeleton: −8/38/4-of-6
-  // vs +3/36/3, incl. the ~2-min bounded-carrier shape shift). Snapshot mode keeps the certified polynomial skeleton —
+  // certifies the chains at parity with the certified skeleton: −7/37/5-of-6
+  // current (post carrier-split; −8/38/4-of-6 pre-split) vs +3/36/3 non-deep,
+  // incl. the ~2-min bounded-carrier shape shift). Snapshot mode keeps the certified polynomial skeleton —
   // the same mode split the scene layers use (locked J2000 speeds vs
   // integrators), bit-equivalent at J2000 by construction.
   if (DEEP_TIME_MODE_ENABLED) {
@@ -7199,19 +7200,21 @@ function _fwChannelIntegral(T, s) {
  *  (T2_LP − T2_LP_TIDAL, +7.247″/cy²) is the J2000 Taylor truncation of
  *      K_PL · ∫₀ᵀ (e_E²(t′) − e_E²(J2000)) dt′
  *  — the Moon's mean motion responds to the SOLAR eccentricity channel
- *  (the Laplace/Adams planetary acceleration). Record-normalized: K_PL is
- *  derived lazily from the existing record remainder and the channel slope —
- *  no new constants. Bounded at every epoch (the T² parabola reaches 7,892°
- *  of spurious longitude at +200 kyr; this carrier stays ≤ ~220°). Same
+ *  (the Laplace/Adams planetary acceleration). CHANNEL-ONLY normalization
+ *  (v4 carrier split): K_PL is derived lazily from the channel part of the
+ *  record remainder (planetary +5.8665″ + the 0.077″ Meeus-tidal gap;
+ *  k = −2332 °/cy per e², inside the adiabatic −2370 ± 40) — the
+ *  figure+frame part (+1.30363″) lives in _fwLpObliquityCarrier below. No
+ *  new constants. Bounded at every epoch (the T² parabola reaches 7,892°
+ *  of spurious longitude at +200 kyr; this carrier stays bounded). Same
  *  Simpson scheme as _fwChannelIntegral.
  *  v4 BUDGET ATTRIBUTION (closed to 0.1″ with primary sources —
  *  astro-reference.json elpW1T2Decomposition_arcsecPerCy2, runnable at
  *  tools/explore/v4-kpl-budget.js): the remainder = true planetary +5.8665″
  *  (the e_E²-channel part; Chapront et al. 2002) + Earth-figure J2 +0.1925″
- *  + frame ṗ_A T² +1.11113″ + 0.077″ Meeus-era tidal-convention gap.
- *  Documented approximation: the non-channel ~19% rides this bounded e_E²
- *  carrier; per-law split (J2/rotation law, obliquity-cycle ṗ) = the
- *  D4-companion follow-up. E5 RESOLVED (adiabatic-ramp lab,
+ *  + frame ṗ_A T² +1.11113″ + 0.077″ Meeus-era tidal-convention gap —
+ *  the frame part now DERIVED at 104% by the ṗ composition chain
+ *  (tools/explore/v4-pdot-composer3.js). E5 RESOLVED (adiabatic-ramp lab,
  *  tools/explore/v4-e5-adiabatic-ramp.js): the convention-free k measured
  *  by slowly ramping e_S inside one integration is −2370 ± 40 °/cy per e²,
  *  confirming the ELP-implied −2320 at ~2% and exposing the fixed-mean-a

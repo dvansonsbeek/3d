@@ -190,7 +190,7 @@ earth.pivotObj
 | `moonNodalMonthInput` | 27.21222082 d | Nodal month (ascending node to ascending node) |
 | `moonDistance` | 384,399.07 km | Mean Earth-Moon distance |
 | `moonOrbitalEccentricity` | 0.054900489 | Orbital eccentricity |
-| `moonEclipticInclinationJ2000` | 5.1453964° | Inclination to ecliptic |
+| `moonEclipticInclinationJ2000` | 5.1573° | Inclination to ecliptic (dynamical mean osculating; Brown/ELP constant 5.1453964 = `moonInclinationConstantBrownELP`) |
 | `moonTilt` | 6.687° | Moon's axial tilt |
 | `moonStartposApsidal/Nodal/Moon` | 330° / 64° / 132.105° | Start positions (aligned to Stellarium) |
 

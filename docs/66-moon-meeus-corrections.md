@@ -61,6 +61,18 @@ classical constant:
   framework's own p = 360·13/H = 50.24″/yr closes the ±1.4°/century M′/F
   drift with zero new constants — the drift was frame bookkeeping, not
   missing physics. Meter: "Meeus vs Integrator (lunar argument drift)".
+  Two composite rates reduce to exact lattice identities (D2): A3 ≡ the
+  Moon's SIDEREAL mean longitude rate = L′_tropical − p_H13 (0.003 ppm vs
+  Meeus 481266.484 °/cy) and the A2 argument rate ≡ 2·L′_trop − M′rate −
+  2·n_Jupiter (0.19 ppm vs 479264.290). Both are CHAIN-INTEGRATED at deep
+  time through their identified content (A3 = A3₀ + 360·(N_trop − N_p13);
+  A2 = A2₀ + 360·(N_trop + N_apsOfDate − 2·N_Jupiter), Jupiter via the
+  Driver-2 chain) so they evolve with the tidal months, H(t) precession,
+  and solar mass loss. The A1 rate (131.849 °/cy) is observationally
+  defined by nature: it sits on the 18V−16E−M′ near-resonance where ppm in
+  planetary years moves the beat by °/cy (hypersensitivity, experimentally
+  demonstrated); its amplitude is gravity-sized (18-kyr lab: single line,
+  124% of Meeus at the lab's own beat rate).
 - **Element secular content — the phase-aware solar-eccentricity channel.**
   The Sun's mean perturbation on the lunar node and perigee scales as
   (1 − e_E²)^(−3/2). The perigee/node longitudes are computed as
@@ -152,8 +164,28 @@ classical constant:
   (−584: +0.017° difference ≈ 2 min); at deep time it stays bounded
   (≤ ~230°) where the T² parabola reached 7,892° at +200 kyr. The same
   laboratory derives the top-20 longitude amplitudes at 100.0 ± 0.1% and the
-  apsidal/nodal precession periods at 0.036%/0.064% from the sidereal month
-  plus solar parameters alone — the three Moon inputs are not independent.
+  apsidal/nodal precession periods from the sidereal month plus solar
+  parameters alone — the three Moon inputs are not independent. (The early
+  "0.036%/0.064% residuals" on those periods were later RESOLVED as a frame
+  convention: the lab reproduces the true star-referenced periods, 3232.60 d
+  apsidal / 6793.48 d nodal, at ±1‱ — full-system ±0.5‱/±0.3‱ — while the
+  catalog inputs 3231.493/6798.38 are the equinox-of-date partners.)
+  CARRIER SPLIT (shipped): the single record-normalized carrier is now TWO
+  bounded per-law carriers — `_fwLpPlanetaryCarrier` carries the channel
+  part only (planetary +5.8665″ + the 0.077″ Meeus-tidal gap; k = −2332,
+  inside the adiabatic −2370 ± 40) and `_fwLpObliquityCarrier` (+ tools
+  mirror) carries the figure+frame part (+1.30363″/cy²) along the framework
+  obliquity cycle, Lp_obl = C·∫(ε(t)−ε₀)dt with C = 2·T2_OBL/ε̇₀ — bounded,
+  zero new fitted values. This split IMPROVED the Babylonian corpus
+  (−8/38/4-of-6 → −7/37/5-of-6). The frame part itself is now DERIVED: the
+  ṗ_A composition experiment chain (`tools/explore/v4-pdot-composer{,2,3}.js`)
+  composes the general-precession acceleration from the lab's gravity-derived
+  ecliptic-of-date pole track (π̇ 47.49″/cy vs IAU 46.998) + the framework
+  ε(T) + a luni-solar cone about the moving pole with the cos ε torque law +
+  one rate anchor (which independently lands ψ̇₀ = 5039.15, 0.013% from
+  IAU's 5038.48): composed T² = +1.1496″/cy² = 104% of IAU2006 — and the
+  scene-only composition's missing 39% identified D4's "remaining 38%" as
+  the planetary χ-channel (the ecliptic tilting UNDER the equator).
 
 - **Deep-future validity.** The cumulative-H table spans ±500 Myr symmetric
   (the chains are smooth and physical throughout: LOD 24→27.4 hr, month
@@ -163,20 +195,24 @@ classical constant:
   scene Moon is prograde at every epoch out to ±1 Gyr by construction.
 
 Certification of the framework-native default (fully-derived e_E line):
-argument drift vs Meeus M′ +0.221° at −135 / +0.381° at −584 and
-F −0.025° / −0.047° — this is the predicted-ë-vs-secular-ë difference
-(minutes-class in eclipse timing), with in-window rows at zero (legacy
-comparison: +1.4°/century); NASA-canon recall 99.71% / tight-window 74.88% /
-type 98.84% (140 type mismatches, all at the documented ±0.02 magnitude
-classification boundary). Current certified reference after the 8H-lattice +
-always-chains + bounded-carrier + ring-lock package (commit 8e131aa):
+argument drift vs Meeus M′ +0.37° at −135 / +0.58° at −584 and F ≈ 0
+(current meter values after the 8H-lattice/always-chains refit; the
+pre-refit line read +0.221/+0.381 with F −0.025/−0.047) — this is the
+predicted-ë-vs-secular-ë difference (minutes-class in eclipse timing), with
+in-window rows at zero (legacy comparison: +1.4°/century); NASA-canon
+recall 99.71% / tight-window 74.88% / type 98.84% at that stage (140 type
+mismatches, all at the documented ±0.02 magnitude classification boundary).
+Current certified reference after the 8H-lattice + always-chains +
+bounded-carrier package (commit 8e131aa) and the D5/carrier-split batches:
 full-canon recall 99.61 / tight 74.37 / type 98.75 (all mismatch samples
 knife-edge at the γ ≈ 1.0/1.5 boundaries); 26-event historical audit split
 1 confirmed · 11 off-peak · 7 regional · 0 ΔT-signal · 7 geographic;
 timed Babylonian lunar corpus (Almagest records, reduced via local
 astronomy only — no external ΔT, no eclipse canon): non-deep skeleton
 mean +3 min / RMS 36 min (statistically identical to conventional secular
-theory's +2/34), deep-chains branch −8 min / 38 min / 4-of-6
+theory's +2/34), deep-chains branch **−7 min / 37 min / 5-of-6** (current
+certified after the carrier split; the pre-split reference was −8/38/4-of-6
+— the physically-attributed T³ shape moved −719 Mar into its ±30 band)
 (tools/explore/timed-babylonian-lunar-eclipses.js; corpus encodings to be
 verified against Stephenson 1997 Ch. 6 before publication).
 Earlier D/M re-certification details: physical recall identical, tight
@@ -187,9 +223,12 @@ modulates the anchored precession chains as rate(t) = invariant mean ×
 derived line (e ∈ [0.0077, 0.0231]), where the Meeus parabola is unbounded.
 
 **How ė is pinned (the (ė, s) degeneracy).** Only the product s·ė enters each
-element's T², but node and perigee share one ė, and fast-converging node
-theory pins s_Ω ≈ 1 — so the node MEASURES ė (observed −4.204e-5/cy →
-s_Ω = 1.018 ✓), and the perigee ratio then yields s_ϖ with no freedom. The
+element's T², but node and perigee share one ė. (Historical rationale: node
+theory was read as pinning s_Ω ≈ 1, so the node "measured" ė at 1.8%; the v4
+frame attribution superseded this — the 1.8% was the ṗ_A frame term hiding,
+the physical exponents are 0.867/2.479 from the lab at 101.5%/100.3%, and
+both shipped values are now the Meeus-effective pair 1.018/2.407.) The
+node-vs-perigee ratio structure still holds: one shared ė, and the
 alternative — the H/16 perihelion law's ė at its current phase
 (−0.84e-5/cy) — would force s_Ω = 5.1, excluded by theory (and was falsified
 directly by the record; see the experiment log below). The shipped derived
@@ -372,8 +411,38 @@ are replaced with the full Meeus values:
 4. Override both obj.ra and obj.dec
 ```
 
-This gives accurate RA/Dec numbers (verified against JPL to 0.02 degrees in Dec).
+This gives accurate RA/Dec numbers (current baseline: RMS 0.0009° RA /
+0.0008° Dec over 6,088 JPL reference points, 2000–2050).
 The RA override eliminates the ~1.2-degree errors from the 5-layer hierarchy.
+
+**Derived optics (D5).** The post-Meeus fitted correction `MOON_CORRECTION`
+was decomposed (`tools/explore/derive-moon-correction-content.js`): 98–102%
+of it is ANNUAL ABERRATION — the model frames carry apparent-Sun content
+while the JPL reference is astrometric (Horizons QUANTITIES='1'). The
+framework-native default now subtracts the aberration ANALYTICALLY
+(`_moonAberrationRaDec` + tools mirror: u′ = normalize(u − v_E/c), with the
+Sun vector itself framework-native — rates from the framework year + H/16
+perihelion, equation-of-center from the Kepler identity) plus the small
+residual `MOON_CORRECTION_RESIDUAL` (source of truth
+fitted-coefficients.json; dominated by raCosMp −0.001421° = 5.1″, the
+Meeus-vs-DE440 series-truncation class — the ONE genuinely fitted value
+left; everything aberration-shaped ≤ 0.13″). A weighted refit against the
+full 6,088-point baseline reproduces the shipped residual to 0.12″ —
+already optimal. J2000 witness reference: RA 222.45959 / Dec −10.90333.
+
+**Inclination convention (E3c).** The input `moonEclipticInclinationJ2000`
+is the Moon's DYNAMICAL mean osculating inclination **5.1573°** (measured
+from the theory itself: h-vector over 2 node cycles; oscillation range
+[4.98°, 5.30°]); the Brown/ELP THEORY CONSTANT 5.1453964° (the latitude
+sinF-coefficient normalization, 5.128122/0.99665) is kept as the documented
+partner `moonInclinationConstantBrownELP`. Pure gravity maps between the two
+at 0.01% (compression 0.9944). With the D1 lab calibrated on the dynamical
+value, the latitude family closes: sinF 100.02% of Meeus (base3), full
+system 99.96%. Caution note: the compact formula "1 − m²" reproduces the
+compression to 1″ at the real Moon and was REFUTED as a theorem by m-scaling
+(`tools/explore/v4-i-theorem.js`) — a parameter coincidence
+((3/2)e_M² + sin²i/8 ≈ m² at our Moon); the analytic theorem needs a
+leakage-clean estimator (open research).
 
 **Stage 2 -- Visual 3D position correction**:
 
@@ -460,8 +529,9 @@ unchanged — that metric is Meeus-override-framed).
   (accounting for the observer's location on Earth).
 
 ### JPL Horizons comparison (with IAU precession correction)
-- RMS Total: 0.012 degrees
-- Entries: 6088 (7-day sampling, 2000-2200)
+- RMS Total: **0.0012 degrees** (RA 0.0009 / Dec 0.0008) — current certified
+  baseline after the D5 derived-optics implementation
+- Entries: 6088 weighted reference points, 2000–2050
 
 ### Historical eclipse accuracy by era
 
@@ -546,8 +616,8 @@ framework-native form).
 **Implication.** No refit of Meeus rates is needed for modern-era Moon position;
 the two formulations are equivalent in their overlap domain (~modern era ±10
 millennia). The Meeus polynomial is the better representation within this
-window (it includes the full perturbation series, T³ and T⁴ refinements, and
-matches JPL Horizons to 0.012°). The Farhat polynomial extends the same physics
+window (it includes the full perturbation series, T³ and T⁴ refinements —
+themselves now derived, see §1 — and matches JPL Horizons to 0.0012°). The Farhat polynomial extends the same physics
 to deep time (Phanerozoic and beyond), where the Meeus polynomial loses physical
 meaning. For deep-time Moon orbital position (Devonian, Hadean), replacing the
 Meeus L' polynomial with `meanMoonMeanLongitudeAtAge(t_Ma)` from integrated
@@ -615,12 +685,29 @@ the source of the -135 residual.** Under the current 26-event eclipse
 alignment audit (see
 [Historical Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)
 and [doc 103](103-135-babylonian-case-study.md)), -135 reports BestGap
-949 km (regional verdict) with the framework's predicted UT within 2
-minutes of the documented UT — a *where* residual carried by Sun-side
-longitude, GMST convention, and umbra geometry, not a *when* residual and
+BestGap 1221 km (geographic verdict, at the regional boundary; audit
+history: 949 km legacy arguments → 1032 → 1088 → 1221 across the
+certified batches) with the framework's predicted UT within 16 minutes of
+the documented UT — a *where* residual carried by Sun-side longitude, GMST
+convention, and umbra geometry, primarily not a *when* residual and
 not a Moon-series error. The Babylonian-era Meeus residual sweep of
 adjacent events (-584 Thales, -309 Sicily, -762 Bur-Sagale) shows β
 differences ≤ 0.12° against the same references.
+
+**DE441 A/B result (historical, infrastructure since removed):** a full A/B
+of the 26-event audit with JPL DE441 lunar positions injected in place of
+the framework Meeus series (session notes archived at
+`docs/hidden/old-documents/session-2026-07-19-jup1740-de441-h-tuning.md`)
+found mean Δ = −7 km ("unchanged") with a clean epoch pattern: modern era
+slightly worse under DE441 (the framework Meeus is tightly calibrated at
+present), late-ancient (+71…−430) worse by +206…+1133 km (framework ΔT
+convention closer to observation), deep-ancient (−556…−762) better by
+−253…−1139 km (e.g. −762 Nineveh 386 → 92 km; −584 Thales 1402 → 306 km) —
+quantifying the Meeus-truncation degradation past its calibration horizon
+at the few-hundred-km class. The Cairo 977–985 cluster moved < 120 km
+under DE441 — NOT a Moon problem (misidentification/partial-zone/Sun-side).
+(Numbers are from the pre-D5 audit references; the qualitative pattern is
+the durable finding.)
 
 **Forward path:** the full ELP-2000/82 series
 ([`docs/hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md))

@@ -12,7 +12,7 @@
 | Target   | RMS Total | Notes |
 |----------|-----------|-------|
 | Sun      | 0.0032°   | Earth geometry only |
-| Moon     | 0.0015°   | Meeus correction layer |
+| Moon     | 0.0012°   | Meeus correction layer + D5 derived optics (analytic aberration + residual; was 0.0015° pre-D5) |
 | Mercury  | 0.0793°   | 78p parallax + mean anomaly terms |
 | Venus    | 0.0406°   | 78p parallax |
 | Mars     | 0.0904°   | 78p parallax, circular orbit limit |

@@ -457,7 +457,7 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 | Nodal Month | `moonNodalMonthInput` | 27.21222082 days | Node to node |
 | Mean Distance | `moonDistance` | 384,399.07 km | Mean Earth-Moon distance |
 | Orbital Eccentricity | `moonOrbitalEccentricity` | 0.054900489 | |
-| Ecliptic Inclination | `moonEclipticInclinationJ2000` | 5.1453964 deg | |
+| Ecliptic Inclination | `moonEclipticInclinationJ2000` | 5.1573 deg | Dynamical mean osculating inclination (v4 E3c); the Brown/ELP theory constant 5.1453964 (latitude sinF normalization) is kept as `moonInclinationConstantBrownELP` |
 | Moon Tilt | `moonTilt` | 6.687 deg | |
 
 ### Lunar Mean Longitude Coefficients (Meeus Ch. 47)
@@ -503,7 +503,7 @@ The per-day rates are used for EoC phase computation; the per-century rates are 
 | Uranus | 0.77263783 | 74.00919023 | JPL/SPICE |
 | Neptune | 1.77004347 | 131.7853754 | JPL/SPICE |
 | Pluto | 17.14001 | 110.30393 | JPL Horizons |
-| Moon | 5.1453964 | — | — |
+| Moon | 5.1573 (dynamical mean osc; theory constant 5.1453964) | — | — |
 
 ### Ecliptic Inclination Trend Rates
 

@@ -11,6 +11,16 @@
  * (src/script.js + tools mirror) — the former "last labeled-empirical
  * polynomial" now has a derived origin and bounded deep-time form.
  *
+ * SUPERSEDED NOTES (v4 campaign): (1) the "95.1%" compared a protocol-biased
+ * k against a 4-part total — the K_PL budget decomposes the remainder with
+ * primary sources (v4-kpl-budget.js) and the convention-free adiabatic ramp
+ * (v4-e5-adiabatic-ramp.js) measures k = −2370 ± 40, exposing this scan's
+ * fixed-mean-a protocol as an m²-order held-quantity artifact (E5);
+ * (2) the shipped carrier is now SPLIT (channel-only k = −2332 +
+ * _fwLpObliquityCarrier for figure+frame). This scan's s_ϖ/s_Ω exponent
+ * measurements are ratio-based and protocol-robust — they stand (the v4
+ * frame audit identified them as the PHYSICAL exponents, 100.3%/101.5%).
+ *
  * Method: calibrate ICs once at e_S(J2000); then vary ONLY e_S across the
  * channel's bounded range with all lunar ICs fixed (partial derivative in
  * the Adams–Laplace sense: ∂n/∂e'² at fixed lunar orbit). Fit responses

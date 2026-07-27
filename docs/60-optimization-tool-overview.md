@@ -641,7 +641,7 @@ Additionally, there are less well-known cycles that may need modeling:
 | `holisticyearLength` | Core model constant (335,317) -- the entire model is built on this |
 | `perihelionalignmentYear` | Historical reference (1246.03125 AD) |
 | `AscendingNodeInvPlaneVerified` | Optimized from Souami & Souchay to match J2000 ecliptic inclinations |
-| `moonEclipticInclinationJ2000` | 5.1453964 deg -- observational data |
+| `moonEclipticInclinationJ2000` | 5.1573 deg -- dynamical mean osculating inclination (measured from the Meeus series, v4 E3c; the Brown/ELP theory constant 5.1453964 is the documented partner) |
 | `moonOrbitalEccentricity` | 0.054900489 -- observational data |
 | `moonDistance` | 384399.07 km -- measured (Lunar Laser Ranging) |
 | Laplace-Lagrange bounds | Scientific reference data from Farside Table 10.4 |

@@ -348,16 +348,18 @@ function _jdTTToolsFromUT(jd) {
 }
 
 // Bounded planetary Lp carrier mirror (src/script.js _fwLpPlanetaryCarrier):
-// K_PL·∫₀ᵀ(e_E²−e_E²(J2000))dt′, record-normalized — K_PL derived lazily from
-// the record remainder and the channel slope; no new constants.
+// K_PL·∫₀ᵀ(e_E²−e_E²(J2000))dt′ — CHANNEL-ONLY normalization (v4 carrier
+// split): K_PL derived lazily from the channel part of the record remainder
+// (planetary +5.8665″ + the 0.077″ Meeus-tidal gap; k = −2332, inside the
+// adiabatic −2370 ± 40); the figure+frame part (+1.30363″) lives in
+// _fwLpObliquityCarrierTools below. No new constants.
 // ATTRIBUTION (v4 K_PL budget, closed with zero free parameters — primary
 // sources in astro-reference.json elpW1T2Decomposition_arcsecPerCy2, runnable
 // at tools/explore/v4-kpl-budget.js): the remainder +7.247″/cy² = true
 // planetary +5.8665 (e_E²-channel physics) + Earth-figure J2 +0.1925 +
-// frame ṗ_A T² +1.11113 (equinox-of-date bridge) + 0.077 Meeus-era
-// tidal-convention gap (Γ embedded −25.706 vs LLR −25.858). Documented
-// approximation: the non-channel parts (~19%) ride the bounded e_E² carrier;
-// per-law split (J2/rotation, obliquity-cycle ṗ) is the D4-companion item.
+// frame ṗ_A T² +1.11113 (equinox-of-date bridge; now DERIVED at 104% by the
+// ṗ composition chain, v4-pdot-composer3.js) + 0.077 Meeus-era
+// tidal-convention gap (Γ embedded −25.706 vs LLR −25.858).
 let _fwLpKplTools = null;
 function _fwLpPlanetaryCarrierTools(T) {
   if (T === 0) return 0;
