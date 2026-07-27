@@ -41,7 +41,7 @@ const expected = {
   moonSiderealMonth:    27.3216616506,  // IAU input +0.008 s (8H lattice point)
   moonAnomalisticMonth: 27.55455034,    // kinematic; Meeus-implied 27.5545499 +0.04 s
   moonNodalMonth:       27.21222089,    // kinematic, ~bit-matches IAU 27.21222082
-  // Precession periods (Earth + ICRF, in days)
+  // Precession periods in days ('ICRF'-named = of-date values; 'Earth'-named = star-referenced — legacy naming)
   moonApsidalPrecessionDaysEarth: 3232.60053,   // 8H count: 112 s from input (was 3,572 s under the H count)
   moonApsidalPrecessionDaysICRF:  3231.49171,   // vs input 3231.493 — 0.0013 d
   moonNodalPrecessionDaysEarth:   6793.42795,

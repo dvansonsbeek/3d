@@ -79,8 +79,8 @@ const i_M = (i_M_deg * Math.PI) / 180;                    // rad
 
 // ─── FRAMEWORK J2000 targets (full precision, inertial frame) ────────────
 
-const T_apse = C.moonApsidalPrecessionDaysICRF;  // days, ICRF
-const T_node = C.moonNodalPrecessionDaysICRF;    // days, ICRF
+const T_apse = C.moonApsidalPrecessionDaysICRF;  // days, of-date (legacy-'ICRF' name)
+const T_node = C.moonNodalPrecessionDaysICRF;    // days, of-date (legacy-'ICRF' name)
 
 // Dimensionless rates per Moon orbit (the primary comparison)
 const apseDimensionless_obs = T_M / T_apse;       // prograde, positive

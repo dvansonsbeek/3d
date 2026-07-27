@@ -44,7 +44,7 @@
     "AE": 2451810.304796
   },
   "moonReference": {
-    "_comment": "Option C+ (2026-06): sidereal month + apsidal/nodal precession periods (ICRF) are the J2000 anchors. Anomalistic and nodal months are derived kinematically. Deep-time evolution: N_apsidal,N_nodal scale as H(t)^2 (T_apsidal*H = const law).",
+    "_comment": "Option C+ (2026-06): sidereal month + apsidal/nodal precession periods are the J2000 anchors. FRAME NOTE: the *ICRF key names are legacy — the VALUES are the EQUINOX-OF-DATE periods (Meeus/IERS observables); the star-referenced periods are the N-/+13 partners (apsidal 3232.60 d, nodal 6793.48 d). Anomalistic and nodal months are derived kinematically. Deep-time evolution: N_apsidal,N_nodal scale as H(t)^2 (T_apsidal*H = const law).",
     "moonSiderealMonthInput": 27.32166156,
     "moonApsidalPrecessionDaysInputICRF": 3231.493,
     "moonNodalPrecessionDaysInputICRF": 6798.38,

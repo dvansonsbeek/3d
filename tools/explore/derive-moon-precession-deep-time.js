@@ -54,10 +54,10 @@ const EPOCHS = [
 
 // ─── Framework fixed-N lattice constants (the user's proposal) ───────────
 // User claims Moon precessions are H-lattice integers, FIXED across epochs:
-//   N_apsidalI = 37900 (apsidal cycles per H, ICRF frame)
-//   N_apsidalE = 37887 (apsidal cycles per H, Earth frame)  = 37900 − 13
-//   N_nodalI   = 18015 (nodal cycles per H, ICRF frame)
-//   N_nodalE   = 18028 (nodal cycles per H, Earth frame)    = 18015 + 13
+//   N_apsidalI = 37900 (apsidal cycles per H, of-date convention; legacy-'ICRF' name)
+//   N_apsidalE = 37887 (apsidal cycles per H, star-referenced)  = 37900 − 13
+//   N_nodalI   = 18015 (nodal cycles per H, of-date convention)
+//   N_nodalE   = 18028 (nodal cycles per H, star-referenced)    = 18015 + 13
 // ⇒ T_apsidal(t) = H(t) / 37900 yr (linear scaling with H)
 // ⇒ T_nodal(t)   = H(t) / 18015 yr (linear scaling with H)
 const N_APSIDAL_I_FIXED = 37900;

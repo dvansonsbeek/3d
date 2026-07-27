@@ -647,7 +647,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 - Saros cycle: 223 synodic = 6585.32 days, matching known value to 0.06 hours
 - 242 draconic months differ from 223 synodic months by only 0.83 hours (confirms Saros eclipse repetition)
 - Apsidal precession: 8.851 years (model) vs ~8.849 years (known) — 12 hours difference
-- Nodal precession: Earth frame = 18.600 yr, **ICRF frame = 18.613 yr** (exact match to known 18.613 yr — the ICRF value is the correct physical comparison)
+- Nodal precession: star-referenced = 18.5994 yr (the `…Earth`-named variable), **equinox-of-date = 18.613 yr** (the `…ICRF`-named variable — legacy naming; exact match to the known observed 18.613-yr cycle, which is the equinox-of-date figure)
 - Draconic year: 346.620 days — matches known ~346.62 days to 0.004 hours
 - Full Moon Cycle: 411.783 days — matches known ~411.78 days to 0.003 days
 - Metonic cycle: 235 synodic = 19 solar years to within 2.1 hours

@@ -85,7 +85,8 @@ const L_TOTAL_EM_KGM2_S = (I_EARTH_J2000 * 2 * Math.PI / LOD_NOW_H13_S)
                         + (M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * A_MOON_NOW_M) * E_FACTOR_MOON);
 const A_LOCK_M        = (L_TOTAL_EM_KGM2_S / (M_MOON_ALONE * Math.sqrt(GM_EM_M3S2) * E_FACTOR_MOON)) ** 2;
 
-// J2000 Moon precession anchors (Option C+ — observational anchors, Earth frame = ICRF ∓ H/13)
+// J2000 Moon precession anchors (Option C+ — of-date observational anchors in
+// the legacy-'ICRF'-named inputs; the *Earth/E values are star-referenced = ∓ H/13)
 const TOTAL_DAYS_IN_H_J2000 = C.H * C.meanSolarYearDays;
 const N_apsidalI_J2000 = Math.round(8 * TOTAL_DAYS_IN_H_J2000 / C.moonApsidalPrecessionDaysInputICRF) / 8;   // integer per 8H (mirrors src/script.js)
 const N_nodalI_J2000   = Math.round(8 * TOTAL_DAYS_IN_H_J2000 / C.moonNodalPrecessionDaysInputICRF) / 8;     // integer per 8H

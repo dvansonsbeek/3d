@@ -35,11 +35,11 @@ console.log(`  Sidereal month:    input = ${C.moonSiderealMonthInput} d`);
 console.log(`    Cycles in H:  ${C.fmtInt(siderealCycles)}`);
 console.log(`    Model month:  ${C.moonSiderealMonth.toFixed(10)} d`);
 console.log();
-console.log(`  Apsidal period:    input (ICRF) = ${C.moonApsidalPrecessionDaysInputICRF} d`);
-console.log(`    Cycles in H:  ${C.fmtInt(apsidalCyclesI)} (ICRF), ${C.fmtInt(C.N_apsidalE)} (Earth = ICRF − 13)`);
+console.log(`  Apsidal period:    input (of-date; legacy-'ICRF' name) = ${C.moonApsidalPrecessionDaysInputICRF} d`);
+console.log(`    Cycles in H:  ${C.fmtInt(apsidalCyclesI)} (of-date), ${C.fmtInt(C.N_apsidalE)} (star-referenced = of-date − 13)`);
 console.log();
-console.log(`  Nodal period:      input (ICRF) = ${C.moonNodalPrecessionDaysInputICRF} d`);
-console.log(`    Cycles in H:  ${C.fmtInt(nodalCyclesI)} (ICRF), ${C.fmtInt(C.N_nodalE)} (Earth = ICRF + 13)`);
+console.log(`  Nodal period:      input (of-date; legacy-'ICRF' name) = ${C.moonNodalPrecessionDaysInputICRF} d`);
+console.log(`    Cycles in H:  ${C.fmtInt(nodalCyclesI)} (of-date), ${C.fmtInt(C.N_nodalE)} (star-referenced = of-date + 13)`);
 console.log();
 console.log(`  Anomalistic month (KINEMATIC):  N_sid − N_apsidalE = ${C.fmtInt(anomalisticCycles)}`);
 console.log(`    Model month:  ${C.moonAnomalisticMonth.toFixed(10)} d`);
@@ -92,28 +92,33 @@ console.log();
 
 const precComparisons = [
   {
-    name: 'Apsidal precession (Earth frame)',
+    // Frame fix: the known observed values (8.849 yr / 18.613 yr) are the
+    // EQUINOX-OF-DATE observables — compare them against the of-date model
+    // values (legacy-'ICRF'-named vars); the star-referenced ('Earth'-named)
+    // rows have no direct textbook figure to compare (they are the lab-
+    // verified inertial periods 3232.60 / 6793.48 d).
+    name: 'Apsidal precession (star-referenced)',
     modelDays: C.moonApsidalPrecessionDaysEarth,
+    knownYears: null,
+    knownDays: null,
+  },
+  {
+    name: 'Apsidal precession (of date)',
+    modelDays: C.moonApsidalPrecessionDaysICRF,
     knownYears: kv.moonApsidalPrecessionYears,
     knownDays: kv.moonApsidalPrecessionYears * C.meanSolarYearDays,
   },
   {
-    name: 'Apsidal precession (ICRF)',
-    modelDays: C.moonApsidalPrecessionDaysICRF,
+    name: 'Nodal precession (star-referenced)',
+    modelDays: C.moonNodalPrecessionDaysEarth,
     knownYears: null,
     knownDays: null,
   },
   {
-    name: 'Nodal precession (Earth frame)',
-    modelDays: C.moonNodalPrecessionDaysEarth,
+    name: 'Nodal precession (of date)',
+    modelDays: C.moonNodalPrecessionDaysICRF,
     knownYears: kv.moonNodalPrecessionYears,
     knownDays: kv.moonNodalPrecessionYears * C.meanSolarYearDays,
-  },
-  {
-    name: 'Nodal precession (ICRF)',
-    modelDays: C.moonNodalPrecessionDaysICRF,
-    knownYears: null,
-    knownDays: null,
   },
   {
     name: 'Apsidal-nodal beat',
@@ -298,10 +303,10 @@ console.log(`    Model:    ${C.moonNodalPrecessionDaysEarth.toFixed(4)} days`);
 console.log(`    Match:    ${Math.abs(computedNodal - C.moonNodalPrecessionDaysEarth) < 0.001 ? 'YES' : 'NO'} (diff: ${(computedNodal - C.moonNodalPrecessionDaysEarth).toFixed(4)} days)`);
 console.log();
 
-// Important note: Nodal precession Earth frame vs ICRF frame
+// Important note: nodal precession frame conventions (legacy variable naming)
 console.log('  Note on nodal precession frames:');
-console.log(`    Earth frame: ${(C.moonNodalPrecessionDaysEarth / C.meanSolarYearDays).toFixed(6)} yr (shorter due to Earth axial precession)`);
-console.log(`    ICRF frame:  ${(C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays).toFixed(6)} yr (matches known ~18.613 yr)`);
+console.log(`    Star-referenced ('Earth'-named var): ${(C.moonNodalPrecessionDaysEarth / C.meanSolarYearDays).toFixed(6)} yr (the TRUE inertial regression — lab-verified)`);
+console.log(`    Equinox-of-date ('ICRF'-named var):  ${(C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays).toFixed(6)} yr (the observed ~18.613-yr cycle — equinox chases the retrograde node)`);
 
 console.log();
 console.log('═══════════════════════════════════════════════════════════════');

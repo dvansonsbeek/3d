@@ -243,7 +243,7 @@ This sets the **scaling form**; it does not by itself fix the magnitude. Brown m
 
 **Aligning, not replacing.** The Lunar Precession Invariant does not compete with Brown's lunar theory but sharpens it: the m²-leading-order scaling is adopted as a structural law, with the J2000 magnitude anchored from observation and propagated to deep time without polynomial corrections. Where Brown's expansion derives the absolute period from the underlying m-series, ESSRT treats the period as one anchored input and the (H/H₀)² evolution as the structural claim — the two views agree on the scaling form by construction.
 
-Under Driver 1, the Moon recedes; angular-momentum conservation simultaneously slows Earth's spin (LOD grows), which propagates into a proportional growth of H via the H/13 axial-precession coupling. T_sm and H thus co-evolve, and in the ICRF cycles-per-H formulation `N_apsidal(t) = N₀ × (H/H₀)²` the product T_apsidal × H is held exact by construction.
+Under Driver 1, the Moon recedes; angular-momentum conservation simultaneously slows Earth's spin (LOD grows), which propagates into a proportional growth of H via the H/13 axial-precession coupling. T_sm and H thus co-evolve, and in the cycles-per-H formulation `N_apsidal(t) = N₀ × (H/H₀)²` (of-date-anchored; see the frame-convention note above) the product T_apsidal × H is held exact by construction.
 
 ### Why it is structurally **exact** under Driver 1 (in year-units)
 
@@ -268,7 +268,7 @@ The Moon's apsidal and nodal periods are not static anchors — they depend on E
 
 A modern observer sees the Moon's perigee advance once every ~8.85 yr; a Devonian observer would have seen it advance once every ~9.60 yr (slower because H was smaller and the Moon was closer). But measured in the framework's natural time unit, both observers count `N₀ × (H/H₀)²` lunar precession cycles per H — the same structural ratio at every epoch.
 
-> 📊 **Relation to Earth-frame perigee/node precession (in seconds).** The table above gives the ICRF-frame, year-units anchors. The Earth-frame precession periods (in seconds) used by the lunar engine — `meanLunarPerigeePrecessionAtAge(t)` and `meanLunarNodePrecessionAtAge(t)` — are computed via the equivalent Brouwer-Clemence form `T_per ∝ T_yr² / T_sm`, which folds in the year-length drift from Driver 2 (since T_yr is in seconds). The two formulations agree to <100 ppm across the Phanerozoic; the year-units ICRF form is the structurally exact statement, the seconds form is the working formula used by the lunar engine.
+> 📊 **Relation to the seconds-frame perigee/node precession.** The table above gives the of-date-anchored, year-units invariant (see the frame-convention note above — the anchors are equinox-of-date observables). The star-referenced precession periods (in seconds) used by the lunar engine — `meanLunarPerigeePrecessionAtAge(t)` and `meanLunarNodePrecessionAtAge(t)` — are computed via the equivalent Brouwer-Clemence form `T_per ∝ T_yr² / T_sm`, which folds in the year-length drift from Driver 2 (since T_yr is in seconds). The two formulations agree to <100 ppm across the Phanerozoic; the year-units form is the structurally exact statement, the seconds form is the working formula used by the lunar engine.
 
 ### Position in the framework taxonomy
 
@@ -280,7 +280,7 @@ This is the third member of the framework's family of **deep-time invariants** �
 | Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | 0 ppm (definitional) |
 | **Lunar Precession Invariant** | **`T_apsidal × H = const`, `T_nodal × H = const`** | **Driver 1 + Brown m²** | **0 ppm (structural)** |
 
-Cross-references: deep-time implementation in `src/script.js` (`meanApsidalCyclesICRFAtAge`, `meanNodalCyclesICRFAtAge`) and `tools/lib/deep-time.js`; anchor verification in `tools/explore/audit-moon-months.js`; Earth-frame Brouwer-Clemence scaling in [Moon-Kepler Derivation](24-moon-kepler-derivation.md).
+Cross-references: deep-time implementation in `src/script.js` (`meanApsidalCyclesICRFAtAge`, `meanNodalCyclesICRFAtAge` — legacy names; of-date convention) and `tools/lib/deep-time.js`; anchor verification in `tools/explore/audit-moon-months.js`; seconds-frame Brouwer-Clemence scaling in [Moon-Kepler Derivation](24-moon-kepler-derivation.md).
 
 ## The H/5 LOD correction — REAL_LOD from ecliptic precession
 

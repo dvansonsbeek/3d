@@ -114,10 +114,15 @@ const sunSpeed = 828000;                                  // Sun orbital speed (
 const greatattractorDistance = 200000000;                 // Distance to Great Attractor (light-years)
 const milkywaySpeed = 2160000;                            // Milky Way speed toward GA (km/h)
 const moonSiderealMonthInput = 27.32166156;               // IAU sidereal month (days)
-// Option C+ (2026-06): apsidal & nodal precession periods (ICRF) replace
-// the old anomalistic/nodal month anchors. Anomalistic and nodal MONTHS
-// are derived kinematically below. Deep-time evolution: N scales as H(t)²
-// — see meanApsidal/NodalCyclesICRFAtAge() near line ~5300.
+// Option C+ (2026-06): apsidal & nodal precession periods replace the old
+// anomalistic/nodal month anchors. FRAME NOTE: the *ICRF identifier names
+// are legacy — the VALUES are the EQUINOX-OF-DATE periods (the Meeus/IERS
+// observables: apsidal 8.8475 yr / 3231.49 d, nodal 18.613 yr / 6798.38 d).
+// The star-referenced (inertial) periods are the N∓13 "Earth-frame"
+// partners: apsidal 3232.60 d, nodal 6793.48 d — reproduced from first
+// principles by the planetary laboratory at ±1e-4 (v3). Anomalistic and
+// nodal MONTHS are derived kinematically below. Deep-time evolution: N
+// scales as H(t)² — see meanApsidal/NodalCyclesICRFAtAge() (legacy names).
 // KEEP IN SYNC with public/input/astro-reference.json moonReference block.
 // Browser can't load JSON at runtime (Vite doesn't auto-inject), so these are
 // manually mirrored. tools/lib/constants.js reads the JSON directly.
@@ -3567,9 +3572,11 @@ const milkywayOrbitPeriod = (lightYear*greatattractorDistance*Math.PI*2)/(milkyw
 // --- 9e. Moon derived cycles (Option C+ derivation, 2026-06) ---
 // J2000 cycle counts per H from the three observational anchors:
 //   N_sid_J2000      — sidereal months per H
-//   N_apsidalI_J2000 — apsidal cycles per H (ICRF / inertial frame)
-//   N_nodalI_J2000   — nodal cycles per H (ICRF)
-// Earth-frame counts = ICRF ± 13 (Earth axial precession at H/13).
+//   N_apsidalI_J2000 — apsidal cycles per H ("I" = of-date input convention;
+//                      legacy-'ICRF' naming — the input periods are equinox-of-date)
+//   N_nodalI_J2000   — nodal cycles per H (of-date input convention)
+// "E"-counts = I ∓ 13 (Earth axial precession at H/13) — these produce the
+// STAR-REFERENCED (inertial) periods (3232.60 d / 6793.48 d).
 // Lunar counts are INTEGER PER 8H (the Solar System Resonance Cycle), so per H
 // they are eighth-integers. Measured
 // basis: the H-grid's 0.527-s month spacing puts the quantized sidereal month
@@ -4901,7 +4908,8 @@ const OBLIQUITY_CYCLE_J2000 = {
 // Lunar precession period anchors at J2000 — pre-computed once so the
 // per-call functions don't re-evaluate them every frame.
 // Under Option C+ (2026-06), apsidal/nodal periods come directly from
-// their observational anchors (Earth frame = ICRF ∓ H/13 offset).
+// their observational anchors (of-date values in the legacy-'ICRF'-named
+// inputs; the *Earth variables hold the star-referenced periods = ∓ H/13).
 const MOON_APSIDAL_J2000_S = moonApsidalPrecessionindaysEarth * LOD_NOW_H13_S;  // ≈ 8.85 yr
 const MOON_NODAL_J2000_S   = moonNodalPrecessionindaysEarth   * LOD_NOW_H13_S;  // ≈ 18.60 yr
 const MOON_NODAL_OFDATE_J2000_S = moonNodalPrecessionindaysICRF * LOD_NOW_H13_S;  // 6798.3303 d — of-date node regression (scene rate)
@@ -6829,13 +6837,13 @@ function meanTropicalMonthAtAge(t_Ma) {
 // trail in tools/explore/ (audit-moon-months, derive-moon-precession-rates,
 // derive-moon-precession-deep-time, explore-scaling-N-proposal).
 
-/** Apsidal cycles per H at age t_Ma (ICRF frame). Returns N×(H/H₀)² (real-valued, not rounded). */
+/** Apsidal cycles per H at age t_Ma (of-date convention; legacy-'ICRF' name). Returns N×(H/H₀)² (real-valued, not rounded). */
 function meanApsidalCyclesICRFAtAge(t_Ma) {
   const H_t = meanHAtAge(t_Ma);
   if (H_t === null) return null;
   return N_apsidalI_J2000 * Math.pow(H_t / HOLISTIC_YEAR_J2000, 2);
 }
-/** Nodal cycles per H at age t_Ma (ICRF frame). */
+/** Nodal cycles per H at age t_Ma (of-date convention; legacy-'ICRF' name). */
 function meanNodalCyclesICRFAtAge(t_Ma) {
   const H_t = meanHAtAge(t_Ma);
   if (H_t === null) return null;
@@ -6851,7 +6859,7 @@ function meanNodalCyclesICRFAtAge(t_Ma) {
 // (meanLunarPerigeePrecessionAtAge, meanLunarNodePrecessionAtAge) use
 // Brouwer-Clemence m² scaling and are the production model.
 
-/** Apsidal precession period in seconds (ICRF) at age t_Ma. */
+/** Apsidal precession period in seconds (of-date convention; legacy-'ICRF' name) at age t_Ma. */
 function meanApsidalPrecessionSecondsICRFAtAge(t_Ma) {
   const N = meanApsidalCyclesICRFAtAge(t_Ma);
   const H_t = meanHAtAge(t_Ma);
@@ -6859,7 +6867,7 @@ function meanApsidalPrecessionSecondsICRFAtAge(t_Ma) {
   if (N === null || H_t === null) return null;
   return H_t * T_yr_s / N;     // H in years × seconds/year / N
 }
-/** Nodal precession period in seconds (ICRF) at age t_Ma. */
+/** Nodal precession period in seconds (of-date convention; legacy-'ICRF' name) at age t_Ma. */
 function meanNodalPrecessionSecondsICRFAtAge(t_Ma) {
   const N = meanNodalCyclesICRFAtAge(t_Ma);
   const H_t = meanHAtAge(t_Ma);
@@ -51619,25 +51627,25 @@ const planetStats = {
        value : [ { v: () => moonDraconicYearEarth, dec:10, sep:',' },{ small: 'days' }],
        hover : [`Time for the Sun to return to the Moon's ascending node as experienced from Earth — the eclipse year. Eclipses can only occur when the Sun is near a lunar node. Converted from ICRF to Earth frame by subtracting 13 cycles (general precession) per Earth Fundamental Cycle. All derived from the 3 lunar month inputs`]},
     null,
-      {label : () => `Apsidal precession (fixed stars)`,
+      {label : () => `Apsidal precession (of date)`,
        value : [ { v: () => moonApsidalPrecessionindaysICRF, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon's line of apsides (the perigee–apogee axis) to complete one full prograde rotation against the fixed star background. Converted from Earth frame to ICRF: cycles_ICRF = cycles_Earth + 13 (general precession). ≈ ${fmtNum(moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`]},
+       hover : [`Time for the Moon's line of apsides (the perigee–apogee axis) to complete one full prograde rotation relative to the EQUINOX OF DATE — the observed ≈${fmtNum(moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')}-year cycle (the Meeus/IERS observable). The star-referenced period is the row below; the two differ by the general precession (±13 cycles per Earth Fundamental Cycle). Note: internal *ICRF variable names are legacy — the values are of-date. All derived from the 3 lunar month inputs (at J2000)`]},
       {label : () => ``,
        value : [ { v: () => moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }]},
-      {label : () => `Apsidal precession (from Earth)`,
+      {label : () => `Apsidal precession (fixed stars)`,
        value : [ { v: () => moonApsidalPrecessionindaysEarth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon's perigee to complete one full rotation as experienced from Earth. This is the beat frequency between the sidereal and anomalistic months — the anomalistic month is slightly longer because perigee advances, and this difference accumulates to one full rotation over this period: P = P_sid × P_anom / (P_anom − P_sid). ≈ ${fmtNum(moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`]},
+       hover : [`Time for the Moon's perigee to complete one full rotation against the fixed star background (star-referenced / inertial). This is the beat frequency between the sidereal and anomalistic months: P = P_sid × P_anom / (P_anom − P_sid). ≈ ${fmtNum(moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays,2,',')} years — reproduced from first principles by the planetary laboratory (3-body gravity) to 1 part in 10,000. Note: internal *Earth variable names are legacy — the values are star-referenced. All derived from the 3 lunar month inputs (at J2000)`]},
       {label : () => ``,
        value : [ { v: () => moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }]},
      null,
-      {label : () => `Nodal precession (fixed stars)`,
+      {label : () => `Nodal precession (of date)`,
        value : [ { v: () => moonNodalPrecessionindaysICRF, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon's ascending node to complete one full westward regression against the fixed star background. Converted from Earth frame to ICRF: cycles_ICRF = cycles_Earth − 13 (minus because nodal precession is retrograde, opposing general precession). ≈ ${fmtNum(moonNodalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`]},
+       hover : [`Time for the Moon's ascending node to complete one full westward regression relative to the EQUINOX OF DATE — the observed ≈${fmtNum(moonNodalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')}-year cycle (the Meeus/IERS 18.61-yr observable; the retrograde node is chased by the precessing equinox, so the apparent cycle is slower than the true regression). The star-referenced period is the row below. Note: internal *ICRF variable names are legacy — the values are of-date. All derived from the 3 lunar month inputs (at J2000)`]},
       {label : () => ``,
        value : [ { v: () => moonNodalPrecessionindaysICRF/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }]},
-      {label : () => `Nodal precession (from Earth)`,
+      {label : () => `Nodal precession (fixed stars)`,
        value : [ { v: () => moonNodalPrecessionindaysEarth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon's ascending node to complete one full westward regression as experienced from Earth. This is the beat frequency between the sidereal and draconic months — the draconic month is slightly shorter because the node regresses toward the Moon, and this difference accumulates to one full regression over this period: P = P_sid × P_drac / (P_sid − P_drac). ≈ ${fmtNum(moonNodalPrecessionindaysEarth/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`]},
+       hover : [`Time for the Moon's ascending node to complete one full westward regression against the fixed star background (star-referenced / inertial — the true regression). This is the beat frequency between the sidereal and draconic months: P = P_sid × P_drac / (P_sid − P_drac). ≈ ${fmtNum(moonNodalPrecessionindaysEarth/meansolaryearlengthinDays,2,',')} years — reproduced from first principles by the planetary laboratory (3-body gravity) to 1 part in 10,000. Note: internal *Earth variable names are legacy — the values are star-referenced. All derived from the 3 lunar month inputs (at J2000)`]},
       {label : () => ``,
        value : [ { v: () => moonNodalPrecessionindaysEarth/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }]},
     null,

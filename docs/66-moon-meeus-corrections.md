@@ -50,7 +50,7 @@ replaces is either derived from framework primitives or anchored to a single
 classical constant:
 
 - **Linear rates — the frame convention.** Meeus's argument rates differ from
-  the framework's ICRF chain rates by exactly ± general precession. The
+  the framework's star-referenced chain rates by exactly ± general precession. The
   framework's own p = 360·13/H = 50.24″/yr closes the ±1.4°/century M′/F
   drift with zero new constants — the drift was frame bookkeeping, not
   missing physics. Meter: "Meeus vs Integrator (lunar argument drift)".

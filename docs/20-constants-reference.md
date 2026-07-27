@@ -343,10 +343,12 @@ All Moon cycles are derived from the 3 input months (sidereal, anomalistic, noda
 
 | Cycle | Variable | Value (days) | Value (years) |
 |-------|----------|-------------|--------------|
-| Apsidal Precession (Earth frame) | `moonApsidalPrecessionDaysEarth` | ~3,232 | ~8.851 |
-| Apsidal Precession (ICRF) | `moonApsidalPrecessionDaysICRF` | ~3,233 | ~8.852 |
-| Nodal Precession (Earth frame) | `moonNodalPrecessionDaysEarth` | ~6,793 | ~18.600 |
-| Nodal Precession (ICRF) | `moonNodalPrecessionDaysICRF` | ~6,798 | ~18.613 |
+| Apsidal Precession (star-referenced) | `moonApsidalPrecessionDaysEarth` | ~3,232.60 | ~8.8506 |
+| Apsidal Precession (equinox-of-date) | `moonApsidalPrecessionDaysICRF` | ~3,231.49 | ~8.8475 |
+| Nodal Precession (star-referenced) | `moonNodalPrecessionDaysEarth` | ~6,793.43 | ~18.5994 |
+| Nodal Precession (equinox-of-date) | `moonNodalPrecessionDaysICRF` | ~6,798.33 | ~18.6132 |
+
+> **Frame note (legacy naming):** the `…ICRF`-named variables hold the EQUINOX-OF-DATE periods (the Meeus/IERS observables) and the `…Earth`-named variables hold the STAR-REFERENCED (inertial) periods — the labels predate the frame audit. The star-referenced periods are reproduced from first principles by the planetary laboratory at ±1×10⁻⁴.
 | Apsidal-Nodal Beat | `moonApsidalMeetsNodalDays` | ~206 | — |
 | Lunar Leveling Cycle | `moonLunarLevelingCycleDays` | ~61,250 | ~167.7 |
 | Draconic Year (ICRF) | `moonDraconicYearICRF` | ~346.620 | — |

@@ -313,11 +313,14 @@ const perihelionPhaseOffset = (((startModelYearWithCorrection - balancedYear) / 
 // ───── Option C+ derivation chain (2026-06) ─────
 // J2000 cycle counts per H (from the three observational anchors):
 //   N_sid       — sidereal months per H
-//   N_apsidalI  — apsidal precession cycles per H (ICRF / inertial frame)
-//   N_apsidalE  — apsidal precession cycles per H (Earth frame) = N_apsidalI − 13
-//   N_nodalI    — nodal precession cycles per H (ICRF)
-//   N_nodalE    — nodal precession cycles per H (Earth frame) = N_nodalI + 13
-// The ±13 is the Earth-axial-precession offset (H/13 cycles per H).
+//   N_apsidalI  — apsidal cycles per H ("I" = of-date input convention;
+//                 legacy-'ICRF' naming — the input periods are equinox-of-date)
+//   N_apsidalE  — apsidal cycles per H = N_apsidalI − 13 → the STAR-REFERENCED
+//                 (inertial) period 3232.60 d
+//   N_nodalI    — nodal cycles per H (of-date input convention)
+//   N_nodalE    — nodal cycles per H = N_nodalI + 13 → star-referenced 6793.48 d
+// The ∓13 is the Earth-axial-precession offset (H/13 cycles per H); the
+// star-referenced periods are reproduced by the planetary laboratory at ±1e-4.
 // Lunar counts are INTEGER PER 8H (Solar System Resonance Cycle) → eighth-
 // integers per H. Mirrors src/script.js (measured basis + derivation record:
 // docs/66 §1).
