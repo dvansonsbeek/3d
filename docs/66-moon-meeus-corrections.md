@@ -2,6 +2,13 @@
 
 **Status**: Complete (full Meeus Ch. 47: 60L+60B terms, RA+Dec override, JPL-verified)
 
+**Public capstone**: the derivation program documented here is presented as the
+website document **"The Derived Moon" (DLT-1)** — a framework-native lunar
+theory in Meeus Ch. 47's form with every constant derived, attributed,
+observationally-defined, or anchored by design
+(`src/content/en/reference/the-derived-moon.mdx` in the website repo). This
+file remains the complete technical record behind it.
+
 ---
 
 ## Overview
