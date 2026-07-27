@@ -3602,15 +3602,15 @@ let   moonNodalMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J20
 let   moonSynodicMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000+13-holisticyearLength);  // Phase 2: mutable — N_syn = N_trop − H = N_sid − (H−13); legacy −1 removed 2026-07-24 (0.70→0.08 s vs IAU)
 let   moonTropicalMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000+13);  // Phase 2: mutable — N_trop = N_sid + 13 (13 axial-precession cycles per H); legacy −1 removed 2026-07-24
 let   moonFullMoonCycleEarth = (moonSynodicMonth/(moonSynodicMonth-moonAnomalisticMonth))*moonAnomalisticMonth;  // Phase 6.5: mutable
-let   moonFullMoonCycleICRF = (holisticyearLength*meansolaryearlengthinDays)/(((holisticyearLength*meansolaryearlengthinDays)/moonFullMoonCycleEarth)+13);  // Phase 6.5: mutable
+let   moonFullMoonCycleICRF = (holisticyearLength*meansolaryearlengthinDays)/(((holisticyearLength*meansolaryearlengthinDays)/moonFullMoonCycleEarth)+13);  // Phase 6.5: mutable — H/13-frame lattice partner (411.767 d; the OBSERVED supermoon cycle is the Earth-named 411.784 d)
 let   moonNodalPrecessionindaysEarth = (holisticyearLength*meansolaryearlengthinDays)/N_nodalE_J2000;  // Phase 2: mutable
 let   moonNodalPrecessionindaysICRF = (holisticyearLength*meansolaryearlengthinDays)/N_nodalI_J2000;  // Phase 6.5: mutable
 let   moonApsidalPrecessionindaysEarth = (holisticyearLength*meansolaryearlengthinDays)/N_apsidalE_J2000;  // Phase 2: mutable
 let   moonApsidalPrecessionindaysICRF = (holisticyearLength*meansolaryearlengthinDays)/N_apsidalI_J2000;  // Phase 6.5: mutable
 let   moonApsidalMeetsNodalindays = ((moonNodalMonth/(moonAnomalisticMonth-moonNodalMonth))*moonAnomalisticMonth);  // Phase 6.5: mutable
 let   moonLunarLevelingCycleindays = (moonNodalPrecessionindaysEarth/(moonNodalPrecessionindaysEarth-moonApsidalPrecessionindaysEarth)*(moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays))*meansolaryearlengthinDays;  // Phase 6.5: mutable
-let   moonDraconicYearICRF = 1/((1/meansolaryearlengthinDays)+(1/moonNodalPrecessionindaysEarth));  // Phase 6.5: mutable
-let   moonDraconicYearEarth = (holisticyearLength*meansolaryearlengthinDays)/(((holisticyearLength*meansolaryearlengthinDays)/moonDraconicYearICRF)-13);  // Phase 6.5: mutable
+let   moonDraconicYearICRF = 1/((1/meansolaryearlengthinDays)+(1/moonNodalPrecessionindaysEarth));  // Phase 6.5: mutable — H/13-frame lattice partner (346.607 d; NOT the observable)
+let   moonDraconicYearEarth = (holisticyearLength*meansolaryearlengthinDays)/(((holisticyearLength*meansolaryearlengthinDays)/moonDraconicYearICRF)-13);  // Phase 6.5: mutable — THE OBSERVED ECLIPSE YEAR (346.620 d; the −13 exactly compensates the mixed-frame intermediate above: ≡ tropical⊕of-date ≡ sidereal⊕star-referenced)
 let   moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meansolaryearlengthinDays/moonSiderealMonth)))/24;  // Phase 6.5: mutable
 
 // ─── E2. Mass calculations ──────────────────────────────────────────────
@@ -51613,19 +51613,19 @@ const planetStats = {
     // rather than leaving it on the Moon (where the eclipse is invisible).
 
     {header : '—  Moon Cycles & Precession —' },
-      {label : () => `Full Moon cycle (fixed stars)`,
-       value : [ { v: () => moonFullMoonCycleICRF, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive perigee full moons ("supermoon" alignments), measured against the fixed star background. Derived by converting the Earth-frame value to ICRF: cycles_ICRF = cycles_Earth + 13 (general precession adds 13 cycles per Earth Fundamental Cycle). All derived from the 3 lunar month inputs`]},
-      {label : () => `Full Moon cycle (from Earth)`,
+      {label : () => `Full Moon cycle (observed)`,
        value : [ { v: () => moonFullMoonCycleEarth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive perigee full moons as experienced from Earth — when both a full moon and perigee coincide. This is the beat frequency between the synodic month (phase cycle) and the anomalistic month (perigee cycle): P = P_syn × P_anom / (P_syn − P_anom) = ${fmtNum(moonSynodicMonth,4,',')} × ${fmtNum(moonAnomalisticMonth,4,',')} / ${fmtNum(moonSynodicMonth - moonAnomalisticMonth,4,',')} = ${fmtNum(moonFullMoonCycleEarth,4,',')} d. All derived from the 3 lunar month inputs (at J2000)`]},
+       hover : [`Time between successive perigee full moons ("supermoon" alignments) — a physical conjunction cycle, frame-independent: there is only one observed value. This is the beat frequency between the synodic month (phase cycle) and the anomalistic month (perigee cycle): P = P_syn × P_anom / (P_syn − P_anom) = ${fmtNum(moonSynodicMonth,4,',')} × ${fmtNum(moonAnomalisticMonth,4,',')} / ${fmtNum(moonSynodicMonth - moonAnomalisticMonth,4,',')} = ${fmtNum(moonFullMoonCycleEarth,4,',')} d. All derived from the 3 lunar month inputs (at J2000)`]},
+      {label : () => `Full Moon cycle (H/13-frame partner)`,
+       value : [ { v: () => moonFullMoonCycleICRF, dec:10, sep:',' },{ small: 'days' }],
+       hover : [`Lattice bookkeeping partner of the observed cycle: the count per Earth Fundamental Cycle differs by +13 in the H/13 co-rotating frame (cycles_partner = cycles_observed + 13). Not a directly-observed period — conjunction cycles are frame-independent; this value carries the H-lattice frame arithmetic. All derived from the 3 lunar month inputs`]},
      null,
-      {label : () => `Draconic year (fixed stars)`,
-       value : [ { v: () => moonDraconicYearICRF, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Sun to return to the Moon's ascending node, measured against the fixed star background. Since the node regresses westward while the Sun advances eastward, they meet sooner than a solar year. Harmonic sum: 1/P = 1/P_year + 1/P_nodal = 1/${fmtNum(meansolaryearlengthinDays,4,',')} + 1/${fmtNum(moonNodalPrecessionindaysEarth,4,',')} → P = ${fmtNum(moonDraconicYearICRF,4,',')} d. All derived from the 3 lunar month inputs (at J2000)`]},
-      {label : () => `Draconic year (from Earth)`,
+      {label : () => `Draconic year (observed — eclipse year)`,
        value : [ { v: () => moonDraconicYearEarth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Sun to return to the Moon's ascending node as experienced from Earth — the eclipse year. Eclipses can only occur when the Sun is near a lunar node. Converted from ICRF to Earth frame by subtracting 13 cycles (general precession) per Earth Fundamental Cycle. All derived from the 3 lunar month inputs`]},
+       hover : [`Time for the Sun to return to the Moon's ascending node — the ECLIPSE YEAR (eclipses can only occur when the Sun is near a lunar node). A physical conjunction cycle, frame-independent: tropical year ⊕ of-date node and sidereal year ⊕ star-referenced node give the same value (the general precession cancels). Matches the observed 346.620 d. All derived from the 3 lunar month inputs (at J2000)`]},
+      {label : () => `Draconic year (H/13-frame partner)`,
+       value : [ { v: () => moonDraconicYearICRF, dec:10, sep:',' },{ small: 'days' }],
+       hover : [`Lattice bookkeeping partner of the eclipse year: the count per Earth Fundamental Cycle differs by 13 in the H/13 co-rotating frame (equivalently: the harmonic sum with frames mixed, 1/P = 1/${fmtNum(meansolaryearlengthinDays,4,',')} + 1/${fmtNum(moonNodalPrecessionindaysEarth,4,',')}). Not a directly-observed period; carries the H-lattice frame arithmetic. All derived from the 3 lunar month inputs (at J2000)`]},
     null,
       {label : () => `Apsidal precession (of date)`,
        value : [ { v: () => moonApsidalPrecessionindaysICRF, dec:10, sep:',' },{ small: 'days' }],
