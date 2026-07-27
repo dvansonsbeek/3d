@@ -6594,6 +6594,21 @@
     "decSinMs": -0.001093,
     "decCosMs": -0.000257
   },
+  "MOON_CORRECTION_RESIDUAL": {
+    "_comment": "D5 derived optics: the framework-native runtime subtracts the ANALYTIC annual aberration (from speedOfLight + Sun velocity); this residual = MOON_CORRECTION minus the aberration projection (tools/explore/derive-moon-correction-content.js). Dominated by the one genuinely non-optical term raCosMp (5.1 arcsec, Meeus-vs-DE440 truncation class); everything aberration-shaped cancels. Legacy MOON_CORRECTION above stays for the pure-Meeus A/B mode.",
+    "raSinD": 0.000002,
+    "raCosD": 0.000003,
+    "raSinMp": -0.000027,
+    "raCosMp": -0.001421,
+    "raSinMs": -0.000036,
+    "raCosMs": 0.000028,
+    "decSinD": 0.000015,
+    "decCosD": -0.000009,
+    "decSinMp": 0.000015,
+    "decCosMp": -0.000026,
+    "decSinMs": 0.000024,
+    "decCosMs": -0.000006
+  },
   "ELONGATION_CORRECTION": {
     "venus": {
       "cosVwE_sinEl_ra": 0.000063,

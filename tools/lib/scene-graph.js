@@ -296,6 +296,47 @@ const _mcNodalOfDate   = (a, b) => {
 // browser uses meanApsidalMeetsNodalAtAge; net-neutral here by construction)
 const _mcApsidalMeetsNodal = _mcApsidalOfDate;
 
+// D5 derived optics (mirrors src/script.js _sunGeoVecEqD5/_moonAberrationRaDec):
+// annual aberration of the Moon direction from the framework speedOfLight +
+// the Sun's velocity. FRAMEWORK-NATIVE Sun vector: e(T) from the anchored
+// observed eccentricity + drift (ASTRO_REFERENCE), equation-of-center
+// coefficients DERIVED from e via the Kepler series (2e − e³/4, (5/4)e²,
+// (13/12)e³ — the same identity the D1 laboratory proved at 2 ppm), mean
+// longitude rate = framework tropical year, mean anomaly rate = that minus
+// the H/16 perihelion rate, R from currentAUDistance, ε from the framework
+// obliquity (bounded at deep time). One J2000 anchor: the Sun's mean
+// longitude (sunMeanLongitudeJ2000_deg, astro-reference.json).
+function _sunGeoVecEqD5Tools(jd) {
+  const T = (jd - C.j2000JD) / 36525;
+  const d = jd - C.j2000JD;
+  const rateL = 360 / C.meanSolarYearDays;                             // deg/day, framework tropical
+  const ratePeri = 360 / ((C.H / 16) * C.meanSolarYearDays);           // deg/day, H/16 perihelion advance
+  const L0 = C.ASTRO_REFERENCE.sunMeanLongitudeJ2000_deg + rateL * d;
+  const M = ((L0 - (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 + ratePeri * d)) + 180) * d2r;  // geocentric-perigee convention (Sun perigee = Earth perihelion + 180°)
+  const e = C.ASTRO_REFERENCE.earthEccentricityJ2000 + C.ASTRO_REFERENCE.earthEccentricityDotJ2000 * T;
+  const Ceq = ((2 * e - Math.pow(e, 3) / 4) * Math.sin(M)
+            + 1.25 * e * e * Math.sin(2 * M)
+            + (13 / 12) * Math.pow(e, 3) * Math.sin(3 * M)) / d2r;     // deg (Kepler EoC series)
+  const lam = (L0 + Ceq) * d2r;
+  const v = M + Ceq * d2r;
+  const R = (1 - e * e) / (1 + e * Math.cos(v)) * C.currentAUDistance;
+  const eps = OE.computeObliquityEarth(2000 + d / 365.2425) * d2r;
+  return [R * Math.cos(lam), R * Math.sin(lam) * Math.cos(eps), R * Math.sin(lam) * Math.sin(eps)];
+}
+function _moonAberrationRaDecTools(jd, ra, dec) {
+  const h = 0.02;
+  const a = _sunGeoVecEqD5Tools(jd - h), b = _sunGeoVecEqD5Tools(jd + h);
+  const s = 1 / (2 * h * 86400 * C.speedOfLight);
+  const kx = -(b[0] - a[0]) * s, ky = -(b[1] - a[1]) * s, kz = -(b[2] - a[2]) * s;
+  const cd = Math.cos(dec);
+  const ux = cd * Math.cos(ra), uy = cd * Math.sin(ra), uz = Math.sin(dec);
+  const wx = ux - kx, wy = uy - ky, wz = uz - kz;
+  const wr = Math.sqrt(wx * wx + wy * wy + wz * wz);
+  let dRA = Math.atan2(wy, wx) - ra;
+  dRA = Math.atan2(Math.sin(dRA), Math.cos(dRA));
+  return { dRA, dDec: Math.asin(Math.max(-1, Math.min(1, wz / wr))) - dec };
+}
+
 // UT→TT (mirror of src/script.js Phase 9.16): TT = UT + ΔT from the
 // framework chain. Both the Meeus/args side AND the Moon-chain layers run on
 // TT — one clock for the ring and the Moon at every epoch.
@@ -1732,7 +1773,16 @@ function computePlanetPosition(target, jd) {
     let newDec = Math.asin(sinBet * cosE + cosBet * sinE * sinLam);
 
     // Post-Meeus RA/Dec correction (fitted to JPL DE440 residuals)
-    const mc = C.MOON_CORRECTION;
+    // D5 derived optics (mirrors src/script.js): framework-native subtracts
+    // the ANALYTIC annual aberration + the small fitted residual; pure-Meeus
+    // A/B mode keeps the legacy fitted MOON_CORRECTION.
+    if (MOON_ARGS_FRAMEWORK_NATIVE) {
+      // delta TO the aberration-removed direction (u − v/c) — apply directly
+      const _ab = _moonAberrationRaDecTools(C.j2000JD + (graph.moonNodes._meeusT || 0) * 36525, newRA, newDec);
+      newRA  += _ab.dRA;
+      newDec += _ab.dDec;
+    }
+    const mc = MOON_ARGS_FRAMEWORK_NATIVE ? C.MOON_CORRECTION_RESIDUAL : C.MOON_CORRECTION;
     if (mc) {
       const dJD = (graph.moonNodes._meeusT || 0) * 36525;  // days from J2000
       const Dc  = (297.850 + 12.19074912 * dJD) * d2r;

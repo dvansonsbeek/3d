@@ -30,6 +30,7 @@
     "earthEccentricityDotJ2000": -0.000042037,
     "earthEccentricityDotDotJ2000": -0.0000002534,
     "earthPerihelionLongitudeJ2000": 102.94719,
+    "sunMeanLongitudeJ2000_deg": 280.46646,
     "earthAscendingNodeInvPlane": 284.51,
     "earthInclinationCycleAnchor": 21.77,
     "perihelionPassageJ2000_JD": 2451547.042,

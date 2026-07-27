@@ -155,3 +155,20 @@ const rms = (pred, fit) => {
 console.log(`\nresidual/​fitted RMS: RA ${(rms(predRA, fitRA) * 100).toFixed(1)}%   Dec ${(rms(predDec, fitDec) * 100).toFixed(1)}%`);
 console.log('Small residual ⇒ the patches ARE optics (aberration + light-time), derivable');
 console.log('from the framework speed of light — D5 reclassification: optical, not gravity.');
+
+// ── D5 implementation output: MOON_CORRECTION_RESIDUAL ─────────────────────
+// The derived runtime subtracts the analytic aberration directly; the
+// remaining fitted content is residual = fitted − proj₃(ΔRA_ab) = fitted +
+// predicted_ab (the "predicted" columns are −projections). Dominated by the
+// genuine non-optical raCosMp term; everything aberration-shaped ≈ cancels.
+{
+  const res = {};
+  const raKeys = ['raSinD', 'raCosD', 'raSinMp', 'raCosMp', 'raSinMs', 'raCosMs'];
+  const decKeys = ['decSinD', 'decCosD', 'decSinMp', 'decCosMp', 'decSinMs', 'decCosMs'];
+  for (let k = 0; k < 6; k++) {
+    res[raKeys[k]] = +(fitRA[names[k]] + predRA_ab[k]).toFixed(6);
+    res[decKeys[k]] = +(fitDec[names[k]] + predDec_ab[k]).toFixed(6);
+  }
+  console.log('\nMOON_CORRECTION_RESIDUAL (fitted + aberration-projection; paste into fitted-coefficients.json):');
+  console.log(JSON.stringify(res));
+}

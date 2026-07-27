@@ -2970,6 +2970,13 @@ const PARALLAX_RA_CORRECTION = {
 // Source: public/input/fitted-coefficients.json
 // @AUTO:MOON_CORRECTION
 const MOON_CORRECTION = { raSinD: 0.000002, raCosD: -0.005654, raSinMp: -0.000027, raCosMp: -0.001423, raSinMs: -0.000027, raCosMs: 0.000005, decSinD: 0.000005, decCosD: -0.000009, decSinMp: 0.000017, decCosMp: -0.000026, decSinMs: -0.001093, decCosMs: -0.000257 };
+// D5 derived optics: the framework-native runtime subtracts the ANALYTIC
+// annual aberration (speedOfLight + Sun velocity — the fitted patch above was
+// 98–102% aberration-shaped); this residual is what genuinely remains
+// (dominated by the 5.1″ raCosMp Meeus-vs-DE440 truncation term). KEEP IN
+// SYNC with fitted-coefficients.json MOON_CORRECTION_RESIDUAL (derivation:
+// tools/explore/derive-moon-correction-content.js).
+const MOON_CORRECTION_RESIDUAL = { raSinD: 0.000002, raCosD: 0.000003, raSinMp: -0.000027, raCosMp: -0.001421, raSinMs: -0.000036, raCosMs: 0.000028, decSinD: 0.000015, decCosD: -0.000009, decSinMp: 0.000015, decCosMp: -0.000026, decSinMs: 0.000024, decCosMs: -0.000006 };
 
 // ─── B3c. Gravitation correction (planet-planet perturbations, per-planet synodic periods) ─
 // Each planet has 1-2 terms at its dominant perturber's synodic period.
@@ -3300,6 +3307,7 @@ const ASTRO_REFERENCE = {
   eccentricityDotJ2000: -0.000042037,                // Earth eccentricity rate at J2000 (per Julian cy) — secular-theory coefficient corroborated by modern ephemeris fits, the LLR node channel (s_Ω ≈ 1, doc 66 §1), and the ancient timing record; not a raw observation. REFERENCE/Taylor-check anchor only: the shipped lunar channel does NOT consume it — the fully-derived H/3 fluctuation line PREDICTS −4.273e-5 (+1.7%; see _FW_ECC and docs/66 §1, incl. the falsified H/16-phase alternative −8.389e-6)
   eccentricityDotDotJ2000: -0.0000002534,            // Earth eccentricity curvature at J2000 (per Julian cy²; 2× Meeus Eq. 25.4 T² coefficient). REFERENCE/Taylor-check anchor only — the derived H/3 line predicts −3.7e-8 (same sign; the documented divergence behind the drift meter's BCE M′/F rows)
   perihelionLongitudeJ2000_deg: 102.947,             // Longitude of perihelion at J2000.0
+  sunMeanLongitudeJ2000_deg: 280.46646,              // Sun mean longitude at J2000.0 (D5 aberration anchor; KEEP IN SYNC with astro-reference.json)
   perihelionPassageJ2000_JD: 2451547.042,            // Earth perihelion 2000 Jan 3 13:00 UTC (USNO)
   // Source: USNO / timeanddate.com
   juneSolstice2000_JD: 2451716.575,                  // June 21, 2000 01:48 UTC
@@ -32239,10 +32247,10 @@ function setupGUI() {
     console.log('   this as the ICRF↔of-date frame gap (missing general precession p = 360·13/H) plus');
     console.log('   the e_E-channel secular T² — measured, not mysterious.');
     console.log(' • Table 2 (framework-native _fwMoonArgs, fully-derived e_E line): frame +');
-    console.log('   phase-aware channel — M\' +0.22° at −135 / +0.38° at −584, F −0.03°/−0.05°');
+    console.log('   phase-aware channel — M\' +0.37° at −135 / +0.58° at −584, F ~0.00°');
     console.log('   = the line\'s PREDICTED ë (−3.7e-8) vs secular theory\'s soft −2.5e-7;');
     console.log('   minutes-class in eclipse timing, in-window rows ~0 (0.05°/cy gate holds);');
-    console.log('   D ≤ 0.08°, M ≤ 0.11° at −584 = the real-time-integral prediction vs Meeus');
+    console.log('   D ≤ 0.14°, M ≤ 0.10° at −584 = the real-time-integral prediction vs Meeus');
     console.log('   (bounded ±5° at deep time where the Meeus parabola reaches 82° at −50 kyr).');
     console.log('   Residual provenance: docs/66 §1 (derivation + experiment log).');
     console.log(' • Flip MOON_ARGS_FRAMEWORK_NATIVE via the console for pure-Meeus A/B runs;');
@@ -57121,6 +57129,56 @@ function calculateRAFromEarthPerihelion(obj) {
 
 const _moonVisualCorrection = new THREE.Vector3();
 
+// ═══ D5 derived optics: annual aberration of the Moon direction ═══
+// The model's frames carry apparent-Sun (aberration) content — the Phase D5
+// analysis showed the fitted MOON_CORRECTION was 98–102% the aberration
+// projection (raCosD −0.005654° ≈ κ = 20.4955″), against an ASTROMETRIC
+// (aberration-free) JPL reference. The framework-native runtime therefore
+// subtracts the aberration ANALYTICALLY — exact (all harmonics, not just the
+// 3-argument projection), epoch-aware (velocity from the Sun geometry), and
+// derived from the framework speedOfLight — leaving only the small fitted
+// residual (MOON_CORRECTION_RESIDUAL). Earth velocity = −d/dt of the
+// geocentric Sun vector (compact Meeus Ch. 25 form; framework obliquity for
+// the frame so it stays bounded at deep time).
+// FRAMEWORK-NATIVE Sun vector: e(T) from the anchored observed eccentricity
+// + drift (ASTRO_REFERENCE), equation-of-center coefficients DERIVED from e
+// via the Kepler series (2e − e³/4, (5/4)e², (13/12)e³ — the identity the D1
+// laboratory proved at 2 ppm), mean longitude rate = framework tropical
+// year, mean anomaly rate = that minus the H/16 perihelion rate, R from
+// currentAUDistance, ε from the framework obliquity. One J2000 anchor:
+// sunMeanLongitudeJ2000_deg. Rates frozen at load (J2000 values — the year
+// globals are deep-time-mutable; same pattern as FW_A2_RATE).
+const _D5_RATE_L    = 360 / meansolaryearlengthinDays;                          // deg/day, tropical
+const _D5_RATE_PERI = 360 / ((holisticyearLength / 16) * meansolaryearlengthinDays);  // deg/day, H/16
+function _sunGeoVecEqD5(jd) {
+  const T = (jd - j2000JD) / 36525;
+  const d = jd - j2000JD;
+  const L0 = ASTRO_REFERENCE.sunMeanLongitudeJ2000_deg + _D5_RATE_L * d;
+  const M = ((L0 - (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + _D5_RATE_PERI * d)) + 180) * Math.PI / 180;  // geocentric-perigee convention (Sun perigee = Earth perihelion + 180°)
+  const e = ASTRO_REFERENCE.eccentricityJ2000 + ASTRO_REFERENCE.eccentricityDotJ2000 * T;
+  const Ceq = ((2 * e - Math.pow(e, 3) / 4) * Math.sin(M)
+            + 1.25 * e * e * Math.sin(2 * M)
+            + (13 / 12) * Math.pow(e, 3) * Math.sin(3 * M)) * 180 / Math.PI;    // deg (Kepler EoC series)
+  const lam = (L0 + Ceq) * Math.PI / 180;
+  const v = M + Ceq * Math.PI / 180;
+  const R = (1 - e * e) / (1 + e * Math.cos(v)) * currentAUDistance;
+  const eps = computeObliquityEarth(2000 + d / 365.2425) * Math.PI / 180;
+  return [R * Math.cos(lam), R * Math.sin(lam) * Math.cos(eps), R * Math.sin(lam) * Math.sin(eps)];
+}
+function _moonAberrationRaDec(jd, ra, dec) {
+  const h = 0.02;                                        // days (central difference)
+  const a = _sunGeoVecEqD5(jd - h), b = _sunGeoVecEqD5(jd + h);
+  const s = 1 / (2 * h * 86400 * speedOfLight);
+  const kx = -(b[0] - a[0]) * s, ky = -(b[1] - a[1]) * s, kz = -(b[2] - a[2]) * s;   // v_E/c
+  const cd = Math.cos(dec);
+  const ux = cd * Math.cos(ra), uy = cd * Math.sin(ra), uz = Math.sin(dec);
+  const wx = ux - kx, wy = uy - ky, wz = uz - kz;        // SUBTRACT the aberration content
+  const wr = Math.sqrt(wx * wx + wy * wy + wz * wz);
+  let dRA = Math.atan2(wy, wx) - ra;
+  dRA = Math.atan2(Math.sin(dRA), Math.cos(dRA));
+  return { dRA, dDec: Math.asin(Math.max(-1, Math.min(1, wz / wr))) - dec };
+}
+
 // (Stage C ring lock REVERTED: the deep-time ring-vs-Moon misalignment
 // (~155° at +200 kyr) was root-caused to the Moon-chain layers running on
 // the UT clock while the override arguments ran on TT — ring lag =
@@ -57432,19 +57490,31 @@ function updatePositions() {
       if (newRA < 0) newRA += 2 * Math.PI;
       let newDec = Math.asin(sinBet * cosE + cosBet * sinE * sinLam);
 
-      // Post-Meeus RA/Dec correction (fitted to JPL DE440 residuals, 3 terms: D, M', M_sun)
-      if (MOON_CORRECTION) {
+      // Post-Meeus RA/Dec correction. Framework-native (D5 derived optics):
+      // subtract the ANALYTIC annual aberration + the small fitted residual
+      // (MOON_CORRECTION_RESIDUAL). Pure-Meeus A/B mode keeps the legacy
+      // 3-argument fitted MOON_CORRECTION. See the D5 block near
+      // _moonAberrationRaDec for the derivation record.
+      if (MOON_ARGS_FRAMEWORK_NATIVE) {
+        // _moonAberrationRaDec returns the delta TO the aberration-removed
+        // direction (u − v/c) — apply it directly.
+        const _ab = _moonAberrationRaDec(j2000JD + (obj._meeusT || 0) * 36525, newRA, newDec);
+        newRA  += _ab.dRA;
+        newDec += _ab.dDec;
+      }
+      const _mcPatch = MOON_ARGS_FRAMEWORK_NATIVE ? MOON_CORRECTION_RESIDUAL : MOON_CORRECTION;
+      if (_mcPatch) {
         const _d2r = Math.PI / 180;
         const _dJD = (obj._meeusT || 0) * 36525;
         const _Dc  = (297.850 + 12.19074912 * _dJD) * _d2r;
         const _Mpc = (134.963 + 13.06499295 * _dJD) * _d2r;
         const _Msc = (357.529 + 0.98560028 * _dJD) * _d2r;
-        newRA  -= (MOON_CORRECTION.raSinD  * Math.sin(_Dc) + MOON_CORRECTION.raCosD  * Math.cos(_Dc)
-                 + MOON_CORRECTION.raSinMp * Math.sin(_Mpc) + MOON_CORRECTION.raCosMp * Math.cos(_Mpc)
-                 + MOON_CORRECTION.raSinMs * Math.sin(_Msc) + MOON_CORRECTION.raCosMs * Math.cos(_Msc)) * _d2r;
-        newDec -= (MOON_CORRECTION.decSinD  * Math.sin(_Dc) + MOON_CORRECTION.decCosD  * Math.cos(_Dc)
-                 + MOON_CORRECTION.decSinMp * Math.sin(_Mpc) + MOON_CORRECTION.decCosMp * Math.cos(_Mpc)
-                 + MOON_CORRECTION.decSinMs * Math.sin(_Msc) + MOON_CORRECTION.decCosMs * Math.cos(_Msc)) * _d2r;
+        newRA  -= (_mcPatch.raSinD  * Math.sin(_Dc) + _mcPatch.raCosD  * Math.cos(_Dc)
+                 + _mcPatch.raSinMp * Math.sin(_Mpc) + _mcPatch.raCosMp * Math.cos(_Mpc)
+                 + _mcPatch.raSinMs * Math.sin(_Msc) + _mcPatch.raCosMs * Math.cos(_Msc)) * _d2r;
+        newDec -= (_mcPatch.decSinD  * Math.sin(_Dc) + _mcPatch.decCosD  * Math.cos(_Dc)
+                 + _mcPatch.decSinMp * Math.sin(_Mpc) + _mcPatch.decCosMp * Math.cos(_Mpc)
+                 + _mcPatch.decSinMs * Math.sin(_Msc) + _mcPatch.decCosMs * Math.cos(_Msc)) * _d2r;
       }
 
       obj.ra  = newRA;                     // override RA

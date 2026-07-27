@@ -33,6 +33,7 @@ const ASTRO_REFERENCE = {
   earthEccentricityDotJ2000: astroRef.earthOrbital.earthEccentricityDotJ2000,
   earthEccentricityDotDotJ2000: astroRef.earthOrbital.earthEccentricityDotDotJ2000,
   earthPerihelionLongitudeJ2000: astroRef.earthOrbital.earthPerihelionLongitudeJ2000,
+  sunMeanLongitudeJ2000_deg: astroRef.earthOrbital.sunMeanLongitudeJ2000_deg,   // D5 aberration anchor
   earthAscendingNodeInvPlane: astroRef.earthOrbital.earthAscendingNodeInvPlane,
   earthInclinationCycleAnchor: astroRef.earthOrbital.earthInclinationCycleAnchor,
   perihelionPassageJ2000_JD: astroRef.earthOrbital.perihelionPassageJ2000_JD,
@@ -368,6 +369,7 @@ ASTRO_REFERENCE.raCorrection = fitted.PARALLAX_RA_CORRECTION;
 
 // Moon post-Meeus RA/Dec correction (fitted to JPL DE440 residuals)
 const MOON_CORRECTION = fitted.MOON_CORRECTION || null;
+const MOON_CORRECTION_RESIDUAL = fitted.MOON_CORRECTION_RESIDUAL || null;   // D5: residual after analytic-aberration subtraction
 
 // Gravitation correction (per-planet synodic periods, planet-planet perturbations)
 const GRAVITATION_CORRECTION = fitted.GRAVITATION_CORRECTION || null;
@@ -665,6 +667,7 @@ module.exports = {
   moonEclipticInclinationJ2000,
   moonMeeusLpCorrection,
   MOON_CORRECTION,
+  MOON_CORRECTION_RESIDUAL,
   GRAVITATION_CORRECTION,
   ELONGATION_CORRECTION,
   moonOrbitalEccentricity,
