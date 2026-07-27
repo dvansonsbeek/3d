@@ -440,6 +440,7 @@ function _fwMoonArgs(jd_tt) {
   // unclamped T⁴ tail reverses lunar motion at year ~1.99e6)
   const Tc = Math.max(-100, Math.min(100, T));
   const Tc2 = Tc * Tc, Tc3 = Tc2 * Tc, Tc4 = Tc3 * Tc;
+  // D3 (v4): T³/T⁴ tails derived — see src/script.js note + tools/explore/v4-d3-tails.js
   const Lp = A.LP0 + A.LPR * T + A.T2_LP * Tc2 + Tc3 / 538841 - Tc4 / 65194000;
   // Phase-aware channel rate (mirror): rate = WDOT·(g/g₀)^s integrated exactly
   const w  = (A.LP0 - A.MP0) + A.WDOT * (T + _fwChannelIntegralTools(T, A.S_W));

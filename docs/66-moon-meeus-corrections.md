@@ -130,7 +130,18 @@ classical constant:
   instead of the action biases k by 15% (an m²-order difference — the same
   order as k itself). Direct planetary + J2 terms measured small
   (+0.47″/cy²; `v4-e5-direct-planetary.js`). The Adams–Laplace planetary
-  acceleration is thereby derived in-framework at the percent level. In-window the carrier is Taylor-identical to the old T²
+  acceleration is thereby derived in-framework at the percent level.
+  D3 CLOSED (the Lp T³/T⁴ "tails"): the T³ = 1/538841 °/cy³ is DERIVED at
+  98.8% with zero free parameters — Adams–Laplace channel curvature
+  k·(e_S²)″/6 with the secular ë (+104.2%) + obliquity-carrier second order
+  (−6.5%) + frame p_A T³ (+1.2%); the channel-only k in the observed-ė
+  convention (−2350.3) sits dead-center of the adiabatic −2370 ± 40. The T⁴
+  is 41% channel (quadratic secular e), remainder = higher-order secular
+  content (0.004° at −584, clamped at deep time). Convention note: with the
+  derived H/3 line's own ë (−3.7e-8) the channel T³ flips sign — the Meeus
+  literal embodies the SECULAR-theory ë, the same documented divergence as
+  the BCE drift-meter rows, now localized at the T³ level
+  (`tools/explore/v4-d3-tails.js`). In-window the carrier is Taylor-identical to the old T²
   (−584: +0.017° difference ≈ 2 min); at deep time it stays bounded
   (≤ ~230°) where the T² parabola reached 7,892° at +200 kyr. The same
   laboratory derives the top-20 longitude amplitudes at 100.0 ± 0.1% and the

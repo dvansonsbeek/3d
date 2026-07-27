@@ -6199,7 +6199,10 @@ function _fwSunSecularDeviations(jd_tt) {
 //    integral itself (no Taylor truncation); the T3_W/T3_N constants below
 //    are retained as documented J2000 Taylor checks (with astro-reference
 //    ë₀, they reproduce Meeus's empirical element T³ at 4% (ϖ) / 20% (Ω)).
-//    L′ keeps its Meeus T³/T⁴ for in-window carrier fidelity.
+//    L′ keeps its Meeus T³/T⁴ literals — now DERIVED (D3, v4): T³ = the
+//    Adams–Laplace channel's curvature + obl/frame bits at 98.8% of
+//    1/538841 (secular-ë convention); T⁴ 41% channel, remainder documented
+//    (tools/explore/v4-d3-tails.js).
 // ═════════════════════════════════════════════════════════════════════════════
 
 // MOON_ARGS_FRAMEWORK_NATIVE is declared in the toggle block at the top of the
@@ -6348,6 +6351,12 @@ function _fwMoonArgs(jd_tt) {
   // ±500 Myr chain table, where frozen tails keep clean prograde mean motion.
   const Tc = Math.max(-100, Math.min(100, T));
   const Tc2 = Tc * Tc, Tc3 = Tc2 * Tc, Tc4 = Tc3 * Tc;
+  // D3 (v4): the T³/T⁴ "tails" are DERIVED — T³ = Adams–Laplace channel
+  // curvature k·(e_S²)″/6 with the secular ë (+104.2%) + obliquity-carrier
+  // 2nd order (−6.5%) + frame p_A T³ (+1.2%) = 98.8% of 1/538841; T⁴ 41%
+  // channel (quadratic-e), remainder documented (tools/explore/v4-d3-tails.js).
+  // Literals kept: they embody the SECULAR-ë convention (the H/3 line's own
+  // ë would flip the T³ sign — the known BCE-divergence, localized here).
   const Lp = A.LP0 + A.LPR * T + A.T2_LP * Tc2 + Tc3 / 538841 - Tc4 / 65194000;
   // Perigee/node from the PHASE-AWARE channel rate: ϖ̇(t) = WDOT·(g(e_E(t))/g₀)^s
   // integrated exactly along the framework H/3 fluctuation line — fully
