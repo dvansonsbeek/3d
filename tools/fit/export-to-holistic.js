@@ -480,6 +480,41 @@ console.log('  ── Astro-reference anchors ──');
   }
 }
 
+// ── 3b. Observed dynamics constants (source of truth: astro-reference.json
+//        physicalConstants) — website's MASS_RATIO_DE440_SYSTEM record +
+//        _MASS_RATIO_EARTH_MOON sync from there ─────────────────
+{
+  console.log('  ── Observed dynamics (physicalConstants) ──');
+  const pc = require('../../public/input/astro-reference.json').physicalConstants;
+  for (const [planet, ratio] of Object.entries(pc.massRatioDE440)) {
+    const cap = planet[0].toUpperCase() + planet.slice(1);
+    // scoped to the SYSTEM record block (the ALONE record differs for Mars by design)
+    const blockRe = new RegExp('(MASS_RATIO_DE440_SYSTEM[\\s\\S]{0,220}?' + cap + ':\\s*)([\\d.]+)');
+    const m = constantsTs.match(blockRe);
+    if (!m) { console.log(`  ⚠ MASS_RATIO_DE440_SYSTEM.${cap}: not found`); continue; }
+    if (parseFloat(m[2]) !== ratio) {
+      console.log(`  ↻ MASS_RATIO_DE440_SYSTEM.${cap}: ${m[2]} → ${ratio}`);
+      constantsTs = constantsTs.replace(blockRe, '$1' + ratio);
+      changeCount++;
+    } else {
+      console.log(`  ✓ MASS_RATIO_DE440_SYSTEM.${cap}: unchanged (${ratio})`);
+    }
+  }
+  const emRe = /(const _MASS_RATIO_EARTH_MOON\s*=\s*)([\d.]+)/;
+  const em = constantsTs.match(emRe);
+  if (em) {
+    if (parseFloat(em[2]) !== pc.MASS_RATIO_EARTH_MOON) {
+      console.log(`  ↻ _MASS_RATIO_EARTH_MOON: ${em[2]} → ${pc.MASS_RATIO_EARTH_MOON}`);
+      constantsTs = constantsTs.replace(emRe, '$1' + pc.MASS_RATIO_EARTH_MOON);
+      changeCount++;
+    } else {
+      console.log(`  ✓ _MASS_RATIO_EARTH_MOON: unchanged (${pc.MASS_RATIO_EARTH_MOON})`);
+    }
+  } else {
+    console.log('  ⚠ _MASS_RATIO_EARTH_MOON: not found');
+  }
+}
+
 // ── 4. Write constants.ts ─────────────────────────────────────
 
 console.log('');
