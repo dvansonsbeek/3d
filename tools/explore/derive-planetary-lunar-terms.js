@@ -210,6 +210,7 @@ function runSystem(opts, moonIC, years, dt) {
       const rn = Math.hypot(rx, ry, rz);
       S.w.push(Math.atan2((vz * hx - vx * hz) / GM_EM - ry / rn, (vy * hz - vz * hy) / GM_EM - rx / rn));
       S.Om.push(Math.atan2(hx, -hy));
+      if (opts.recordInc) (S.inc || (S.inc = [])).push(Math.atan2(Math.hypot(hx, hy), hz));   // v4 E3c: osculating inclination
     }
     deriv(Y, k1);
     for (let i = 0; i < 6 * n; i++) Yt[i] = Y[i] + 0.5 * h_s * k1[i];
