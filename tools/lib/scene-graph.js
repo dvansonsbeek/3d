@@ -143,7 +143,7 @@ const _FW_MOON = (() => {
   const NDOT = LPR - FR;
   const E0 = C.ASTRO_REFERENCE.earthEccentricityJ2000, EDOT0 = C.ASTRO_REFERENCE.earthEccentricityDotJ2000;
   const KAPPA = 3 * E0 * EDOT0 / (1 - E0 * E0);
-  const S_W = 2.407, S_N = 1.0;
+  const S_W = 2.407, S_N = 1.018;   // both Meeus-effective (v4 frame attribution; physical 2.479/0.867)
   const T2_W = S_W * WDOT * KAPPA / 2;
   const T2_N = S_N * NDOT * KAPPA / 2;
   const EDDOT0 = C.ASTRO_REFERENCE.earthEccentricityDotDotJ2000;   // Taylor-check anchor (mirrors src/script.js _FW_MOON)
@@ -364,7 +364,12 @@ function _fwLpPlanetaryCarrierTools(T) {
   const DTmod = require('./deep-time');
   if (_fwLpKplTools === null) {
     const de2dT = Math.pow(DTmod._fwEarthEcc(50), 2) - Math.pow(DTmod._fwEarthEcc(-50), 2);
-    _fwLpKplTools = 2 * (_FW_MOON.T2_LP - _FW_MOON.T2_LP_TIDAL) / de2dT;
+    // v4 carrier split: channel part only (planetary + Meeus-era tidal gap);
+    // the figure+frame part moved to _fwLpObliquityCarrierTools. k = −2332,
+    // inside the adiabatic −2370 ± 40 (E5).
+    const _elp = C.ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2;
+    const _t2Obl = (_elp.earthFigureJ2 + _elp.generalPrecessionPA_T2_Lieske1976) / 3600;
+    _fwLpKplTools = 2 * (_FW_MOON.T2_LP - _FW_MOON.T2_LP_TIDAL - _t2Obl) / de2dT;
   }
   const e0 = DTmod._fwEarthEcc(0), e0sq = e0 * e0;
   const f = (t) => { const e = DTmod._fwEarthEcc(t * 100); return e * e - e0sq; };
@@ -373,6 +378,27 @@ function _fwLpPlanetaryCarrierTools(T) {
   let sum = f(0) + f(T);
   for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
   return _fwLpKplTools * sum * h / 3;
+}
+
+// v4 carrier split — bounded obliquity-line carrier mirror (src/script.js
+// _fwLpObliquityCarrier): the figure+frame remainder (+1.30363″/cy²) rides
+// the framework obliquity cycle; C_OBL = 2·T2_OBL/ε̇₀; zero new fitted values.
+let _fwLpOblTools = null;
+function _fwLpObliquityCarrierTools(T) {
+  if (T === 0) return 0;
+  if (_fwLpOblTools === null) {
+    const _elp = C.ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2;
+    const T2_OBL = (_elp.earthFigureJ2 + _elp.generalPrecessionPA_T2_Lieske1976) / 3600;
+    const eps0 = OE.computeObliquityEarth(2000);
+    const epsDot = OE.computeObliquityEarth(2050) - OE.computeObliquityEarth(1950);
+    _fwLpOblTools = { eps0, C: 2 * T2_OBL / epsDot };
+  }
+  const f = (t) => OE.computeObliquityEarth(2000 + t * 100) - _fwLpOblTools.eps0;
+  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 2000));
+  const h = T / N;
+  let sum = f(0) + f(T);
+  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
+  return _fwLpOblTools.C * sum * h / 3;
 }
 
 let _fwArgsY0Tools = null;
@@ -389,7 +415,7 @@ function _fwMoonArgsDeepTools(jd) {
   const dev = _fwSunSecularDeviations(jd);
   // Planetary Lp remainder — bounded e_E² carrier (see src comment)
   const Tj = (jd - C.j2000JD) / 36525;
-  const Lp   = A.LP0 + 360 * Ntrop + _fwLpPlanetaryCarrierTools(Tj);
+  const Lp   = A.LP0 + 360 * Ntrop + _fwLpPlanetaryCarrierTools(Tj) + _fwLpObliquityCarrierTools(Tj);
   const w    = (A.LP0 - A.MP0) + 360 * (Ntrop - Nanom);            // of-date perigee, advance
   const om   = (A.LP0 - A.F0)  - 360 * (Ndrac - Ntrop);            // of-date node, regression
   const Lsun = (A.LP0 - A.D0) + 360 * (y - _fwArgsY0Tools) + dev.dLs;

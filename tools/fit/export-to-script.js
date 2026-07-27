@@ -313,6 +313,27 @@ replaceConst('moonOrbitalEccentricityBase', ar.moonReference.moonOrbitalEccentri
 replaceConst('moonEclipticInclinationJ2000', ar.moonReference.moonEclipticInclinationJ2000);
 replaceConst('moonTilt', ar.moonReference.moonTilt);
 
+// ─── Browser ASTRO_REFERENCE object-literal keys (source of truth: astro-reference.json) ───
+// replaceConst only handles `const X = value`; these live INSIDE the browser's
+// hand-written ASTRO_REFERENCE object. blockAnchor scopes generic key names.
+function replaceAstroRefKey(key, newVal, blockAnchor) {
+  const re = blockAnchor
+    ? new RegExp('(' + blockAnchor + ':\\s*\\{[\\s\\S]{0,600}?\\b' + key + ':\\s*)([\\d.eE+\\-]+)')
+    : new RegExp('(\\n\\s+' + key + ':\\s*)([\\d.eE+\\-]+)');
+  const m = src.match(re);
+  if (!m) { console.log('  ⚠ ASTRO_REFERENCE.' + key + ': NOT FOUND in script.js — sync skipped (renamed?)'); return; }
+  const oldVal = parseFloat(m[2]);
+  if (Math.abs(oldVal - newVal) < 1e-14) return;
+  console.log('  ASTRO_REFERENCE.' + key + ': ' + oldVal + ' → ' + newVal);
+  src = src.replace(re, '$1' + newVal);
+  changes++;
+}
+replaceAstroRefKey('sunMeanLongitudeJ2000_deg', ar.earthOrbital.sunMeanLongitudeJ2000_deg);
+const elpDecomp = ar.moonMeeus.elpW1T2Decomposition_arcsecPerCy2;
+replaceAstroRefKey('planetary', elpDecomp.planetary, 'elpW1T2Decomposition_arcsecPerCy2');
+replaceAstroRefKey('earthFigureJ2', elpDecomp.earthFigureJ2, 'elpW1T2Decomposition_arcsecPerCy2');
+replaceAstroRefKey('generalPrecessionPA_T2_Lieske1976', elpDecomp.generalPrecessionPA_T2_Lieske1976, 'elpW1T2Decomposition_arcsecPerCy2');
+
 // Planet astro references
 console.log('\n=== C. Planet Astro References ===');
 for (const [key, a] of Object.entries(ar.planetOrbitalElements)) {

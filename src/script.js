@@ -129,7 +129,7 @@ const moonSiderealMonthInput = 27.32166156;               // IAU sidereal month 
 const moonApsidalPrecessionDaysInputICRF = 3231.493;      // Meeus apsidal period; N_apsidalI derived at line ~3498
 const moonNodalPrecessionDaysInputICRF   = 6798.38;       // Meeus nodal period;   N_nodalI   derived at line ~3500
 let   moonDistance = 384399.07;                           // Mean Earth-Moon distance (km; Phase 2: mutable for deep-time mode)
-const moonEclipticInclinationJ2000 = 5.1453964;           // Moon orbital inclination at J2000
+const moonEclipticInclinationJ2000 = 5.1573;              // Moon DYNAMICAL mean osculating inclination at J2000 (v4 E3c; the Brown/ELP theory constant 5.1453964 = sinF normalization is the documented partner in astro-reference.json)
 const moonOrbitalEccentricityBase = 0.054900489;          // Moon orbital eccentricity
 const moonTilt = 6.687;                                   // Moon axial tilt
 
@@ -3307,7 +3307,12 @@ const ASTRO_REFERENCE = {
   eccentricityDotJ2000: -0.000042037,                // Earth eccentricity rate at J2000 (per Julian cy) — secular-theory coefficient corroborated by modern ephemeris fits, the LLR node channel (s_Ω ≈ 1, doc 66 §1), and the ancient timing record; not a raw observation. REFERENCE/Taylor-check anchor only: the shipped lunar channel does NOT consume it — the fully-derived H/3 fluctuation line PREDICTS −4.273e-5 (+1.7%; see _FW_ECC and docs/66 §1, incl. the falsified H/16-phase alternative −8.389e-6)
   eccentricityDotDotJ2000: -0.0000002534,            // Earth eccentricity curvature at J2000 (per Julian cy²; 2× Meeus Eq. 25.4 T² coefficient). REFERENCE/Taylor-check anchor only — the derived H/3 line predicts −3.7e-8 (same sign; the documented divergence behind the drift meter's BCE M′/F rows)
   perihelionLongitudeJ2000_deg: 102.947,             // Longitude of perihelion at J2000.0
-  sunMeanLongitudeJ2000_deg: 280.46646,              // Sun mean longitude at J2000.0 (D5 aberration anchor; KEEP IN SYNC with astro-reference.json)
+  sunMeanLongitudeJ2000_deg: 280.46646,              // Sun mean longitude at J2000.0 (D5 aberration anchor; source of truth astro-reference.json, synced by export-to-script.js)
+  elpW1T2Decomposition_arcsecPerCy2: {               // v4 K_PL budget primary sources (Chapront et al. 2002 + Lieske 1976; source of truth astro-reference.json, synced by export-to-script.js) — consumed by the split Lp carriers
+    planetary: 5.8665,
+    earthFigureJ2: 0.1925,
+    generalPrecessionPA_T2_Lieske1976: 1.11113,
+  },
   perihelionPassageJ2000_JD: 2451547.042,            // Earth perihelion 2000 Jan 3 13:00 UTC (USNO)
   // Source: USNO / timeanddate.com
   juneSolstice2000_JD: 2451716.575,                  // June 21, 2000 01:48 UTC
@@ -6177,7 +6182,7 @@ function _fwSunSecularDeviations(jd_tt) {
 //    closed form; at deep time the two parts evolve under different laws
 //    (invariant/tidal chain vs H(t)) — documented follow-up.
 //  • Element T² terms come from the e_E solar-perturbation channel
-//    (strength ∝ (1−e²)^(−3/2)): Ẍ/Ẋ = s·3e·ė/(1−e²), with s_Ω = 1 and
+//    (strength ∝ (1−e²)^(−3/2)): Ẍ/Ẋ = s·3e·ė/(1−e²), with s_Ω = 1.018 and
 //    s_ϖ = 2.407 — FRAME-EFFECTIVE exponents (v4 campaign): each of-date
 //    Meeus T² contains the IAU precession acceleration ṗ_A (+1.1054″/cy²);
 //    the physical exponents after frame removal are s_ϖ 2.479 / s_Ω 0.867,
@@ -6224,9 +6229,9 @@ const _FW_MOON = (() => {
   // laboratory reproduces from pure gravity at 100.3% / 101.5% (E1 +
   // tools/explore/v4-frame-audit.js). Effective form kept: exact vs Meeus by
   // construction; explicit bounded frame carrier = D4-companion follow-up.
-  const S_W = 2.407, S_N = 1.0;
+  const S_W = 2.407, S_N = 1.018;
   const T2_W = S_W * WDOT * KAPPA / 2;   // −0.010318 deg/cy²  (Meeus ϖ:  −0.010320)
-  const T2_N = S_N * NDOT * KAPPA / 2;   // +0.0020385 deg/cy² (Meeus Ω:  +0.0020753)
+  const T2_N = S_N * NDOT * KAPPA / 2;   // +0.0020752 deg/cy² (Meeus Ω:  +0.0020753 — exact; S_N was 1.0/98.2% before the v4 frame attribution superseded the "theory pins 1" rationale)
   const EDDOT0 = ASTRO_REFERENCE.eccentricityDotDotJ2000;    // per cy², astro-reference (2× Meeus 25.4 T²)
   const KAPPA_DOT = 3 * (EDOT0 * EDOT0 + E0 * EDDOT0) / (1 - E0 * E0)
                   + 6 * E0 * E0 * EDOT0 * EDOT0 / Math.pow(1 - E0 * E0, 2);
@@ -6302,7 +6307,7 @@ function _fwMoonArgsDeep(jd) {
   // planetary content rides the bounded e_E²-channel carrier (its J2000
   // Taylor truncation is the old (T2_LP − T2_LP_TIDAL)·T² polynomial).
   const Tj   = (jd - j2000JD) / 36525;
-  const Lp   = A.LP0 + 360 * Ntrop + _fwLpPlanetaryCarrier(Tj);
+  const Lp   = A.LP0 + 360 * Ntrop + _fwLpPlanetaryCarrier(Tj) + _fwLpObliquityCarrier(Tj);
   const w    = (A.LP0 - A.MP0) + 360 * Naps;                      // perigee ϖ (of-date, advance)
   const om   = (A.LP0 - A.F0)  - 360 * Nnod;                      // node Ω (of-date, regression)
   const Lsun = (A.LP0 - A.D0) + 360 * (y - _fwArgsY0) + dev.dLs;  // mean Sun (model timeline)
@@ -7210,7 +7215,13 @@ function _fwLpPlanetaryCarrier(T) {
   if (T === 0) return 0;
   if (_FW_LP_KPL === null) {
     const de2dT = Math.pow(_fwEarthEcc(50), 2) - Math.pow(_fwEarthEcc(-50), 2);  // Δ(e²) per cy at J2000
-    _FW_LP_KPL = 2 * (_FW_MOON.T2_LP - _FW_MOON.T2_LP_TIDAL) / de2dT;
+    // v4 carrier split: normalize to the CHANNEL part only (planetary
+    // +5.8665″ + the 0.077″ Meeus-era tidal gap); the figure+frame part
+    // (+1.30363″) moved to _fwLpObliquityCarrier. Resulting k = −2332 °/cy
+    // per e² — inside the convention-free adiabatic measurement −2370 ± 40.
+    const _elp = ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2;
+    const _t2Obl = (_elp.earthFigureJ2 + _elp.generalPrecessionPA_T2_Lieske1976) / 3600;
+    _FW_LP_KPL = 2 * (_FW_MOON.T2_LP - _FW_MOON.T2_LP_TIDAL - _t2Obl) / de2dT;
   }
   const e0sq = _FW_ECC_E0 * _FW_ECC_E0;
   const f = (t) => { const e = _fwEarthEcc(t * 100); return e * e - e0sq; };
@@ -7219,6 +7230,36 @@ function _fwLpPlanetaryCarrier(T) {
   let sum = f(0) + f(T);
   for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
   return _FW_LP_KPL * sum * h / 3;
+}
+
+/** v4 carrier split — bounded OBLIQUITY-LINE carrier for the non-channel Lp
+ *  remainder (Earth-figure J2 +0.1925″ + frame ṗ_A +1.11113″ = +1.30363″/cy²,
+ *  the ~18% of the T² remainder that is NOT solar-eccentricity physics; K_PL
+ *  budget, astro-reference elpW1T2Decomposition_arcsecPerCy2). Both parts
+ *  respond to the obliquity/ecliptic motion, so the rate perturbation rides
+ *  the framework obliquity cycle (H/3 + H/8 harmonics — bounded):
+ *      Lp_obl(T) = C_OBL · ∫₀ᵀ (ε(t′) − ε₀) dt′,   C_OBL = 2·T2_OBL/ε̇₀
+ *  J2000 Taylor = T2_OBL·T² exactly (ε̇₀ measured from the framework curve,
+ *  ≈ −46.8″/cy); bounded at every epoch because ε is. Zero new fitted
+ *  values — amplitude from documented constants, shape from the framework's
+ *  own obliquity line. Same Simpson scheme as the channel carrier (finer
+ *  step: the H/8 term needs ~2 kyr resolution). */
+let _FW_LP_OBL = null;
+function _fwLpObliquityCarrier(T) {
+  if (T === 0) return 0;
+  if (_FW_LP_OBL === null) {
+    const _elp = ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2;
+    const T2_OBL = (_elp.earthFigureJ2 + _elp.generalPrecessionPA_T2_Lieske1976) / 3600;   // °/cy²
+    const eps0 = computeObliquityEarth(2000);
+    const epsDot = computeObliquityEarth(2050) - computeObliquityEarth(1950);              // °/cy at J2000
+    _FW_LP_OBL = { eps0, C: 2 * T2_OBL / epsDot };
+  }
+  const f = (t) => computeObliquityEarth(2000 + t * 100) - _FW_LP_OBL.eps0;
+  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 2000));
+  const h = T / N;
+  let sum = f(0) + f(T);
+  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
+  return _FW_LP_OBL.C * sum * h / 3;
 }
 
 /** e_E-channel rate modulation [g(t)/g₀]^s at age t_Ma (positive = past). ≡ 1 at J2000.
@@ -32261,7 +32302,7 @@ function setupGUI() {
         + fmt(_d180(fw.Mp, me.Mp)) + fmt(_d180(fw.F, me.F)));
     }
     console.log('Recipe: of-date anchors frame-decomposed (ICRF + framework p = 360·13/H); perigee/');
-    console.log('node from the phase-aware e_E channel (s_Ω = 1, s_ϖ = 2.407 — frame-effective; physical 0.867/2.479, lab-derived 100.3%/101.5%;');
+    console.log('node from the phase-aware e_E channel (s_Ω = 1.018, s_ϖ = 2.407 — frame-effective, Meeus-exact; physical 0.867/2.479, lab-derived 100.3%/101.5%;');
     console.log('e_E = the framework H/3 fluctuation, FULLY DERIVED: e = base·(1 + cosθ_i/2),');
     console.log('phase from the inclination anchor 21.77°); D and M identity-composed (D = Lp − L_sun,');
     console.log('M = L_sun − ϖ_sun) with secular content from the framework real-time year-length');

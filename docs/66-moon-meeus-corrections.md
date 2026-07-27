@@ -60,9 +60,12 @@ classical constant:
   ϖ(T) = ϖ₀ + ϖ̇₀·(T + ∫₀ᵀ[(g(e_E(t))/g₀)^s − 1]dt) — the rate speeds up and
   slows down with the e_E phase; the older frozen-κ T²/T³ Taylor coefficients
   remain in the code as documented J2000 checks against Meeus. Sensitivities:
-  s_Ω = 1 (with the observed ė₀ = −4.2037e-5/cy the node measures
-  s_Ω = 1.018, matching Meeus's +7.47″/cy² at 1.8%) and a Clairaut-type
-  s_ϖ = 2.407, constant across orders. FRAME ATTRIBUTION (v4 campaign):
+  s_Ω = 1.018 and a Clairaut-type s_ϖ = 2.407, constant across orders —
+  both Meeus-effective and exact (the earlier s_Ω = 1 shipped under a
+  "theory pins 1" rationale, with the 1.8% node gap read as the channel
+  measuring ė; the v4 frame attribution superseded that reading — the 1.8%
+  was the frame term hiding — so both exponents now carry the same
+  convention). FRAME ATTRIBUTION (v4 campaign):
   these are frame-EFFECTIVE exponents — every of-date Meeus T² contains the
   IAU precession acceleration ṗ_A T² (+1.1054″/cy², IAU2006); removing that
   frame term gives physical exponents s_ϖ 2.479 / s_Ω 0.867, which the
