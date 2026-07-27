@@ -32,7 +32,7 @@ let changes = 0;
 function replaceConst(name, newVal) {
   const re = new RegExp('((?:const|let)\\s+' + name + '\\s*=\\s*)([\\d.eE+\\-]+)');
   const m = src.match(re);
-  if (!m) return;
+  if (!m) { console.log('  ⚠ ' + name + ': NOT FOUND in script.js — sync skipped (renamed?)'); return; }
   const oldVal = parseFloat(m[2]);
   if (Math.abs(oldVal - newVal) < 1e-14) return;
   console.log('  ' + name + ': ' + oldVal + ' → ' + newVal);
