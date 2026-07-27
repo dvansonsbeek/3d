@@ -301,6 +301,11 @@ console.log('\n=== C. Astro References ===');
 replaceConst('currentAUDistance', ar.physicalConstants.currentAUDistance);
 // meansiderealyearlengthinSeconds is now derived: ASTRO_REFERENCE.siderealYearJ2000 * 86400
 replaceConst('speedOfLight', ar.physicalConstants.speedOfLight);
+// Sun/planet mass ratios: source of truth is physicalConstants.massRatioDE440
+// (script.js MASS_RATIO_SUN_<P>_SYSTEM consts sync from here)
+for (const [planet, ratio] of Object.entries(ar.physicalConstants.massRatioDE440)) {
+  replaceConst(`MASS_RATIO_SUN_${planet.toUpperCase()}_SYSTEM`, ratio);
+}
 replaceConst('perihelionalignmentYear', ar.earthOrbital.perihelionalignmentYear);
 replaceConst('deltaTStart', ar.earthOrbital.deltaTStart);
 replaceConst('moonDistance', ar.moonReference.moonDistance);

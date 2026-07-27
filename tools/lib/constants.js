@@ -742,6 +742,11 @@ module.exports = {
 
   // Physical constants (needed by deep-time chain)
   speedOfLight: astroRef.physicalConstants.speedOfLight,
+  // Observed dynamics constants (source of truth: astro-reference.json
+  // physicalConstants — used by the derivation laboratories; massRatioDE440
+  // is exported above)
+  earthJ2: astroRef.physicalConstants.earthJ2,
+  earthEquatorialRadiusKm: astroRef.physicalConstants.earthEquatorialRadiusKm,
 
   // Planet derived
   derived,

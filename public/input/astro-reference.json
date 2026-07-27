@@ -16,7 +16,9 @@
       "saturn": 3497.9018,
       "uranus": 22902.944,
       "neptune": 19412.237
-    }
+    },
+    "earthJ2": 1.08262668e-3,
+    "earthEquatorialRadiusKm": 6378.1366
   },
   "earthOrbital": {
     "j2000EpochYear": 2000,

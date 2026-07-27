@@ -50,11 +50,12 @@ const GM_M = GM_EM / (MR + 1);
 const eS = C.ASTRO_REFERENCE.earthEccentricityJ2000;
 const EPS_J2000 = OE.computeObliquityEarth(2000) * d2r;    // framework J2000 obliquity
 
-// IAU observed constants (not in the framework — documented, same status as
-// MASS_RATIO_EARTH_MOON): Sun/planet mass ratios; Earth J2 + equatorial radius.
-const MASS_RATIO_SUN = { mercury: 6023600, venus: 408523.719, mars: 3098703.59, jupiter: 1047.3486, saturn: 3497.902 };
-const J2_E = 1.08262668e-3;
-const R_E_KM = 6378.1366;
+// Observed dynamics constants — source of truth: astro-reference.json
+// physicalConstants (massRatioDE440 / earthJ2 / earthEquatorialRadiusKm),
+// imported via tools/lib/constants.js like every other constant.
+const MASS_RATIO_SUN = C.massRatioDE440;
+const J2_E = C.earthJ2;
+const R_E_KM = C.earthEquatorialRadiusKm;
 
 // planets from the framework (period, ecc, inclination, node, perihelion)
 const PLANET_KEYS = ['mercury', 'venus', 'mars', 'jupiter', 'saturn'];
