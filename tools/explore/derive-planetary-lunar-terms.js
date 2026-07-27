@@ -71,9 +71,11 @@ const PLANETS = PLANET_KEYS.map(k => {
     w: (((p.longitudePerihelion || 0) - (p.ascendingNode || 0)) * d2r),
   };
 });
-console.log(`planetary laboratory v2: ${YEARS} yr at dt=${DTD} d — 8 bodies + Earth J2`);
-console.log(`AU ${AU_KM} km (framework)  eps_J2000 ${(EPS_J2000/d2r).toFixed(5)}°  J2 ${J2_E}  R_E ${R_E_KM} km`);
-for (const p of PLANETS) console.log(`  ${p.key.padEnd(8)} T ${String(p.T_days).padStart(9)} d  e ${p.e}  i ${(p.inc/d2r).toFixed(3)}°  Ω ${(p.Om/d2r).toFixed(2)}°`);
+function printHeader() {
+  console.log(`planetary laboratory v2: ${YEARS} yr at dt=${DTD} d — 8 bodies + Earth J2`);
+  console.log(`AU ${AU_KM} km (framework)  eps_J2000 ${(EPS_J2000/d2r).toFixed(5)}°  J2 ${J2_E}  R_E ${R_E_KM} km`);
+  for (const p of PLANETS) console.log(`  ${p.key.padEnd(8)} T ${String(p.T_days).padStart(9)} d  e ${p.e}  i ${(p.inc/d2r).toFixed(3)}°  Ω ${(p.Om/d2r).toFixed(2)}°`);
+}
 
 // Earth spin axis (ecliptic frame, z = pole): tilted by eps toward −y
 // (equinox line = x-axis; direction fixed over the window — precession is
@@ -99,7 +101,8 @@ function keplerPosVel(gm, a, e, inc, Om, w, nu) {
 function makeSystem(opts, moonIC) {
   const gms = [GM_S, GM_E, GM_M];
   const a_EMB = Math.cbrt(GM_HELIO * Math.pow(T_SID_YR_S / (2 * Math.PI), 2));
-  const emb = keplerPosVel(GM_HELIO, a_EMB, eS, 0, 0, 0, 0);
+  // v4: opts.eS overrides the J2000 solar eccentricity (sensitivity scans)
+  const emb = keplerPosVel(GM_HELIO, a_EMB, opts.eS !== undefined ? opts.eS : eS, 0, 0, 0, 0);
   const rel = keplerPosVel(GM_EM, moonIC.a, moonIC.e, moonIC.i, 0, 0, 0);
   const states = [
     { r: [0, 0, 0], v: [0, 0, 0] },
@@ -171,9 +174,10 @@ function linFit(t, y) {
 function runSystem(opts, moonIC, years, dt) {
   const { Y, gms, n } = makeSystem(opts, moonIC);
   const deriv = makeDeriv(gms, n, opts.j2);
+  const E0 = energyOf(Y, gms, n);   // v4 step-ladder drift metric
   const h_s = dt * DAY;
   const k1 = new Float64Array(6 * n), k2 = new Float64Array(6 * n), k3 = new Float64Array(6 * n), k4 = new Float64Array(6 * n), Yt = new Float64Array(6 * n);
-  const sampleEvery = Math.max(1, Math.round(0.25 / dt));
+  const sampleEvery = Math.max(1, Math.round((opts.sampleDays || 0.25) / dt));   // v4: coarser sampling for multi-kyr windows (all extracted bands ≫ 2 d)
   const nSteps = Math.round(years * 365.25 / dt);
   const S = { t: [], lam: [], beta: [], lamS: [], lamJ: [], lamV: [], lamMa: [], lamSa: [], w: [], Om: [] };
   const jJ = opts.planets ? 3 + PLANET_KEYS.indexOf('jupiter') : -1;
@@ -207,10 +211,60 @@ function runSystem(opts, moonIC, years, dt) {
     for (let i = 0; i < 6 * n; i++) Y[i] += h_s / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]);
   }
   for (const k of ['lam', 'lamS', 'lamJ', 'lamV', 'lamMa', 'lamSa', 'w', 'Om']) if (S[k].length) S[k] = unwrap(S[k]);
+  S.energyDrift = Math.abs((energyOf(Y, gms, n) - E0) / E0) / (years / 100);   // relative drift per century
   return S;
 }
 
+// ── total system energy (per GM convention) — step-ladder drift metric ─────
+function energyOf(Y, gms, n) {
+  let E = 0;
+  for (let i = 0; i < n; i++) {
+    const v2 = Y[3 * n + 3 * i] ** 2 + Y[3 * n + 3 * i + 1] ** 2 + Y[3 * n + 3 * i + 2] ** 2;
+    E += 0.5 * gms[i] * v2;
+    for (let j = i + 1; j < n; j++) {
+      const dx = Y[3 * j] - Y[3 * i], dy = Y[3 * j + 1] - Y[3 * i + 1], dz = Y[3 * j + 2] - Y[3 * i + 2];
+      E -= gms[i] * gms[j] / Math.hypot(dx, dy, dz);
+    }
+  }
+  return E;
+}
+
+// ── differential detrend + single-argument amplitude (PART B machinery) ────
+function detrended(SA, SB) {
+  const N = SA.t.length;
+  const dl = new Float64Array(N);
+  for (let i = 0; i < N; i++) dl[i] = (SA.lam[i] - SB.lam[i]) / d2r;
+  let s0 = N, s1 = 0, s2 = 0, s3 = 0, s4 = 0, b0 = 0, b1 = 0, b2 = 0;
+  for (let i = 0; i < N; i++) { const x = SA.t[i] / 36525, x2 = x * x;
+    s1 += x; s2 += x2; s3 += x2 * x; s4 += x2 * x2; b0 += dl[i]; b1 += dl[i] * x; b2 += dl[i] * x2; }
+  const M = [[s0, s1, s2, b0], [s1, s2, s3, b1], [s2, s3, s4, b2]];
+  for (let c = 0; c < 3; c++) {
+    let piv = c; for (let r = c + 1; r < 3; r++) if (Math.abs(M[r][c]) > Math.abs(M[piv][c])) piv = r;
+    [M[c], M[piv]] = [M[piv], M[c]];
+    for (let r = c + 1; r < 3; r++) { const f = M[r][c] / M[c][c]; for (let cc = c; cc < 4; cc++) M[r][cc] -= f * M[c][cc]; }
+  }
+  const c2 = M[2][3] / M[2][2], c1 = (M[1][3] - M[1][2] * c2) / M[1][1], c0 = (M[0][3] - M[0][1] * c1 - M[0][2] * c2) / M[0][0];
+  for (let i = 0; i < N; i++) { const x = SA.t[i] / 36525; dl[i] -= c0 + c1 * x + c2 * x * x; }
+  return dl;
+}
+function ampAt(dl, T, thetaFn) {
+  let ss = 0, sc = 0, scs = 0, bs = 0, bc = 0; const N = T.length;
+  for (let i = 0; i < N; i++) {
+    const th = thetaFn(i), s = Math.sin(th), c = Math.cos(th);
+    ss += s * s; sc += c * c; scs += s * c; bs += dl[i] * s; bc += dl[i] * c;
+  }
+  const det = ss * sc - scs * scs;
+  return Math.hypot((bs * sc - bc * scs) / det, (bc * ss - bs * scs) / det);
+}
+
+// ═══ v4: importable machinery (IP-v4-lab.md) — the campaign report below
+// only runs when this file is the entry point ═══════════════════════════════
+module.exports = { runSystem, makeSystem, makeDeriv, energyOf, detrended, ampAt, PLANETS, PLANET_KEYS, linFit, unwrap, GM_EM, DAY, d2r, eS, EPS_J2000 };
+
+if (require.main === module) {
+
 // ── Moon ICs from the D1 calibration (3-body definitional match) ───────────
+printHeader();
 console.log('\ncalibrating lunar ICs via the D1 laboratory...');
 const cal = D1.calibrate(undefined, true);
 const moonIC = { a: cal.aIC, e: cal.eIC, i: cal.iIC };
@@ -245,33 +299,8 @@ const Aj2 = secular(j2_3, 'base3 + J2');
 const Afl = secular(full, '8-body + J2');
 console.log(`  gap vs inputs:  base3 ${((A3b.aps / 3231.493 - 1) * 1e4).toFixed(1)}‱ / ${((A3b.nod / 6798.38 - 1) * 1e4).toFixed(1)}‱   full ${((Afl.aps / 3231.493 - 1) * 1e4).toFixed(1)}‱ / ${((Afl.nod / 6798.38 - 1) * 1e4).toFixed(1)}‱`);
 
-// ═══ PART B: differential term extraction ══════════════════════════════════
-function detrended(SA, SB) {
-  const N = SA.t.length;
-  const dl = new Float64Array(N);
-  for (let i = 0; i < N; i++) dl[i] = (SA.lam[i] - SB.lam[i]) / d2r;
-  let s0 = N, s1 = 0, s2 = 0, s3 = 0, s4 = 0, b0 = 0, b1 = 0, b2 = 0;
-  for (let i = 0; i < N; i++) { const x = SA.t[i] / 36525, x2 = x * x;
-    s1 += x; s2 += x2; s3 += x2 * x; s4 += x2 * x2; b0 += dl[i]; b1 += dl[i] * x; b2 += dl[i] * x2; }
-  const M = [[s0, s1, s2, b0], [s1, s2, s3, b1], [s2, s3, s4, b2]];
-  for (let c = 0; c < 3; c++) {
-    let piv = c; for (let r = c + 1; r < 3; r++) if (Math.abs(M[r][c]) > Math.abs(M[piv][c])) piv = r;
-    [M[c], M[piv]] = [M[piv], M[c]];
-    for (let r = c + 1; r < 3; r++) { const f = M[r][c] / M[c][c]; for (let cc = c; cc < 4; cc++) M[r][cc] -= f * M[c][cc]; }
-  }
-  const c2 = M[2][3] / M[2][2], c1 = (M[1][3] - M[1][2] * c2) / M[1][1], c0 = (M[0][3] - M[0][1] * c1 - M[0][2] * c2) / M[0][0];
-  for (let i = 0; i < N; i++) { const x = SA.t[i] / 36525; dl[i] -= c0 + c1 * x + c2 * x * x; }
-  return dl;
-}
-function ampAt(dl, T, thetaFn) {
-  let ss = 0, sc = 0, scs = 0, bs = 0, bc = 0; const N = T.length;
-  for (let i = 0; i < N; i++) {
-    const th = thetaFn(i), s = Math.sin(th), c = Math.cos(th);
-    ss += s * s; sc += c * c; scs += s * c; bs += dl[i] * s; bc += dl[i] * c;
-  }
-  const det = ss * sc - scs * scs;
-  return Math.hypot((bs * sc - bc * scs) / det, (bc * ss - bs * scs) / det);
-}
+// ═══ PART B: differential term extraction (detrended/ampAt defined above,
+// exported for the v4 campaign scripts) ═════════════════════════════════════
 
 console.log('\n── PART B1: pure-J2 differential (j2_3 − base3) ──');
 {
@@ -394,3 +423,5 @@ function latitudeNodePeriod(S, label) {
 console.log('\n── PART D (v3): node-rate estimator comparison ──');
 latitudeNodePeriod(base3, 'base3');
 latitudeNodePeriod(full, '8-body + J2');
+
+}  // end require.main guard (v4 importable-machinery wrap)
