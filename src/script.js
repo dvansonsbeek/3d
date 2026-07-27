@@ -6177,10 +6177,12 @@ function _fwSunSecularDeviations(jd_tt) {
 //    closed form; at deep time the two parts evolve under different laws
 //    (invariant/tidal chain vs H(t)) — documented follow-up.
 //  • Element T² terms come from the e_E solar-perturbation channel
-//    (strength ∝ (1−e²)^(−3/2)): Ẍ/Ẋ = s·3e·ė/(1−e²), with s_Ω = 1
-//    (derived — reproduces Meeus's F/Ω T² to 1.8%) and s_ϖ = 2.407
-//    (anchored Clairaut-type apsidal amplification; classical rate
-//    amplification ≈ 2.0). The channel is integrated phase-aware along the
+//    (strength ∝ (1−e²)^(−3/2)): Ẍ/Ẋ = s·3e·ė/(1−e²), with s_Ω = 1 and
+//    s_ϖ = 2.407 — FRAME-EFFECTIVE exponents (v4 campaign): each of-date
+//    Meeus T² contains the IAU precession acceleration ṗ_A (+1.1054″/cy²);
+//    the physical exponents after frame removal are s_ϖ 2.479 / s_Ω 0.867,
+//    reproduced by the 3-body laboratory from pure gravity at 100.3%/101.5%
+//    (tools/explore/v4-frame-audit.js). The channel is integrated phase-aware along the
 //    framework H/3 fluctuation line — fully derived, e = base·(1 + cosθ_i/2),
 //    phase from the inclination anchor 21.77° — see _FW_ECC.
 //  • L′ T² = framework tidal n̈/2 (α₁ chain, −12.93″/cy² = LLR) + planetary
@@ -6215,6 +6217,13 @@ const _FW_MOON = (() => {
   // secular-theory anchors (the derived line PREDICTS ė at +1.7% of this).
   const E0 = ASTRO_REFERENCE.eccentricityJ2000, EDOT0 = ASTRO_REFERENCE.eccentricityDotJ2000;
   const KAPPA = 3 * E0 * EDOT0 / (1 - E0 * E0);
+  // v4 FRAME ATTRIBUTION: these are FRAME-EFFECTIVE exponents (of-date rates,
+  // Meeus T² absorbed whole). Physically, every of-date Meeus T² contains the
+  // IAU precession acceleration ṗ_A T² (+1.1054″/cy², IAU2006); removing it
+  // gives physical exponents s_ϖ 2.479 / s_Ω 0.867 — which the 3-body
+  // laboratory reproduces from pure gravity at 100.3% / 101.5% (E1 +
+  // tools/explore/v4-frame-audit.js). Effective form kept: exact vs Meeus by
+  // construction; explicit bounded frame carrier = D4-companion follow-up.
   const S_W = 2.407, S_N = 1.0;
   const T2_W = S_W * WDOT * KAPPA / 2;   // −0.010318 deg/cy²  (Meeus ϖ:  −0.010320)
   const T2_N = S_N * NDOT * KAPPA / 2;   // +0.0020385 deg/cy² (Meeus Ω:  +0.0020753)
@@ -6225,7 +6234,12 @@ const _FW_MOON = (() => {
   const T3_N = NDOT * (S_N * S_N * KAPPA * KAPPA + S_N * KAPPA_DOT) / 6;  // ≈ +2.57e-6 °/cy³ (Meeus Ω: +2.14e-6)
   // L′ carrier T²: framework tidal n̈/2 + explicit planetary secular remainder
   const T2_LP_TIDAL     = (-25.86 / 3600) / 2;           // α₁-chain n̈ (= LLR), doc 66 §5
-  const T2_LP_PLANETARY = -0.0015786 - T2_LP_TIDAL;      // +7.25″/cy² — K_PL normalization anchor for the derived bounded carrier
+  const T2_LP_PLANETARY = -0.0015786 - T2_LP_TIDAL;      // +7.247″/cy² — K_PL normalization for the derived bounded carrier.
+  // v4 BUDGET (closed, zero free parameters — astro-reference.json
+  // elpW1T2Decomposition_arcsecPerCy2 + tools/explore/v4-kpl-budget.js):
+  // +7.247 = planetary +5.8665 (Chapront et al. 2002; the e_E²-channel part)
+  //        + Earth-figure J2 +0.1925 + frame ṗ_A T² +1.11113 (of-date bridge)
+  //        + 0.077 Meeus-era tidal gap (Γ embedded −25.706 vs LLR −25.858).
   const T2_LP = T2_LP_TIDAL + T2_LP_PLANETARY;
   return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
 })();
@@ -7168,15 +7182,25 @@ function _fwChannelIntegral(T, s) {
 }
 
 /** Bounded planetary Lp carrier: the record's planetary T² remainder
- *  (T2_LP − T2_LP_TIDAL, +7.25″/cy²) is the J2000 Taylor truncation of
+ *  (T2_LP − T2_LP_TIDAL, +7.247″/cy²) is the J2000 Taylor truncation of
  *      K_PL · ∫₀ᵀ (e_E²(t′) − e_E²(J2000)) dt′
  *  — the Moon's mean motion responds to the SOLAR eccentricity channel
- *  (the Laplace/Adams planetary acceleration; ∂n/∂e_S² measured from the
- *  3-body laboratory at 95% of K_PL — tools/explore/es-sensitivity-scan.js).
- *  Record-normalized: K_PL is derived lazily from the existing record
- *  remainder and the channel slope — no new constants. Bounded at every
- *  epoch (the T² parabola reaches 7,892° of spurious longitude at +200 kyr;
- *  this carrier stays ≤ ~220°). Same Simpson scheme as _fwChannelIntegral. */
+ *  (the Laplace/Adams planetary acceleration). Record-normalized: K_PL is
+ *  derived lazily from the existing record remainder and the channel slope —
+ *  no new constants. Bounded at every epoch (the T² parabola reaches 7,892°
+ *  of spurious longitude at +200 kyr; this carrier stays ≤ ~220°). Same
+ *  Simpson scheme as _fwChannelIntegral.
+ *  v4 BUDGET ATTRIBUTION (closed to 0.1″ with primary sources —
+ *  astro-reference.json elpW1T2Decomposition_arcsecPerCy2, runnable at
+ *  tools/explore/v4-kpl-budget.js): the remainder = true planetary +5.8665″
+ *  (the e_E²-channel part; Chapront et al. 2002) + Earth-figure J2 +0.1925″
+ *  + frame ṗ_A T² +1.11113″ + 0.077″ Meeus-era tidal-convention gap.
+ *  Documented approximation: the non-channel ~19% rides this bounded e_E²
+ *  carrier; per-law split (J2/rotation law, obliquity-cycle ṗ) = the
+ *  D4-companion follow-up. Lab cross-check now protocol-limited (E5):
+ *  ∂n/∂e_S² at fixed mean-osculating a = −2704 vs ELP-planetary-implied
+ *  −2320 — the held-quantity convention (action vs mean a) is the next
+ *  candidate, not missing physics. */
 let _FW_LP_KPL = null;
 function _fwLpPlanetaryCarrier(T) {
   if (T === 0) return 0;
@@ -32233,7 +32257,7 @@ function setupGUI() {
         + fmt(_d180(fw.Mp, me.Mp)) + fmt(_d180(fw.F, me.F)));
     }
     console.log('Recipe: of-date anchors frame-decomposed (ICRF + framework p = 360·13/H); perigee/');
-    console.log('node from the phase-aware e_E channel (s_Ω = 1 derived, s_ϖ = 2.407 anchored;');
+    console.log('node from the phase-aware e_E channel (s_Ω = 1, s_ϖ = 2.407 — frame-effective; physical 0.867/2.479, lab-derived 100.3%/101.5%;');
     console.log('e_E = the framework H/3 fluctuation, FULLY DERIVED: e = base·(1 + cosθ_i/2),');
     console.log('phase from the inclination anchor 21.77°); D and M identity-composed (D = Lp − L_sun,');
     console.log('M = L_sun − ϖ_sun) with secular content from the framework real-time year-length');

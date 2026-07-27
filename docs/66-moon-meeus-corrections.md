@@ -60,10 +60,16 @@ classical constant:
   ϖ(T) = ϖ₀ + ϖ̇₀·(T + ∫₀ᵀ[(g(e_E(t))/g₀)^s − 1]dt) — the rate speeds up and
   slows down with the e_E phase; the older frozen-κ T²/T³ Taylor coefficients
   remain in the code as documented J2000 checks against Meeus. Sensitivities:
-  s_Ω = 1 (derived — with the observed ė₀ = −4.2037e-5/cy the node measures
-  s_Ω = 1.018, matching Meeus's +7.47″/cy² at 1.8%) and one anchored
-  Clairaut-type s_ϖ = 2.407 (classical ≈ 2 apsidal rate amplification),
-  constant across orders.
+  s_Ω = 1 (with the observed ė₀ = −4.2037e-5/cy the node measures
+  s_Ω = 1.018, matching Meeus's +7.47″/cy² at 1.8%) and a Clairaut-type
+  s_ϖ = 2.407, constant across orders. FRAME ATTRIBUTION (v4 campaign):
+  these are frame-EFFECTIVE exponents — every of-date Meeus T² contains the
+  IAU precession acceleration ṗ_A T² (+1.1054″/cy², IAU2006); removing that
+  frame term gives physical exponents s_ϖ 2.479 / s_Ω 0.867, which the
+  3-body laboratory reproduces from pure gravity at 100.3% / 101.5%
+  (`tools/explore/v4-frame-audit.js`). The effective form is kept in the
+  runtime (exact vs Meeus by construction); an explicit bounded frame
+  carrier is the D4-companion follow-up.
 - **e_E itself — fully derived (see "Framework-native e_E" below).** The
   channel's eccentricity history is the framework's own H/3 fluctuation;
   the observed J2000 eccentricity, its rate, and its curvature are
@@ -103,9 +109,18 @@ classical constant:
   (`tools/explore/derive-meeus-amplitudes.js` + `es-sensitivity-scan.js`,
   fixed-action Adams–Laplace scan) reproduces the coefficient independently
   at 95.1% (k = ∂n/∂e_S² = −2704 vs record-implied −2844 °/cy per unit e²)
-  and numerically confirms the channel exponents (s_ϖ 2.486 vs the Clairaut
-  2.407; s_Ω 0.880 vs 1.018) and the E-factor law (annual equation
-  ∝ e_S^1.0007). In-window the carrier is Taylor-identical to the old T²
+  and numerically confirms the channel exponents (s_ϖ 2.486, s_Ω 0.880 —
+  which the v4 frame audit identified as the PHYSICAL exponents, matching
+  the frame-corrected record at 100.3%/101.5%) and the E-factor law (annual
+  equation ∝ e_S^1.0007). v4 BUDGET CLOSURE: the record-implied −2844 is
+  not a pure channel value — the remainder +7.247″/cy² decomposes with zero
+  free parameters as true planetary +5.8665 (Chapront et al. 2002, the
+  channel part) + Earth-figure J2 +0.1925 + frame ṗ_A +1.11113 (Lieske) +
+  0.077 Meeus-era tidal-convention gap (Γ embedded −25.706 vs LLR −25.858);
+  see `tools/explore/v4-kpl-budget.js` and astro-reference.json
+  `elpW1T2Decomposition_arcsecPerCy2`. The lab-vs-ELP-planetary comparison
+  (−2704 vs −2320, 117%) is a held-quantity protocol question (mean
+  osculating a vs Delaunay action — open item E5), not missing physics. In-window the carrier is Taylor-identical to the old T²
   (−584: +0.017° difference ≈ 2 min); at deep time it stays bounded
   (≤ ~230°) where the T² parabola reached 7,892° at +200 kyr. The same
   laboratory derives the top-20 longitude amplitudes at 100.0 ± 0.1% and the
@@ -151,9 +166,13 @@ alternative — the H/16 perihelion law's ė at its current phase
 (−0.84e-5/cy) — would force s_Ω = 5.1, excluded by theory (and was falsified
 directly by the record; see the experiment log below). The shipped derived
 line PREDICTS ė = −4.273e-5 (+1.7% of the measured value) with no anchor.
-Falsification path: s_ϖ = 2.407 should be derivable from the Hill–Brown e′²
-series; a first-principles derivation matching 2.407 would close the last
-anchored constant.
+Falsification path — RESOLVED (v4 campaign): the first-principles derivation
+exists, but for the PHYSICAL exponent, not the effective one. The 3-body
+laboratory gives s_ϖ = 2.486 from pure gravity; the of-date record minus the
+IAU frame acceleration ṗ_A requires 2.479 — agreement 100.3%. The shipped
+2.407 is the frame-effective value (physical channel + ṗ_A absorbed), exact
+vs Meeus by construction. The last anchored sensitivity is thereby
+attributed, not fitted.
 
 **Framework-native e_E: the fully-derived H/3 fluctuation.** The e_E behind
 the rate channel, the E-factor, and the factored deep-time law is ONE

@@ -56,6 +56,15 @@
   },
   "moonMeeus": {
     "_description": "Lunar mean longitude coefficients (Meeus Ch. 47). Full perturbation tables in tools/lib/constants/meeus-lunar-tables.json.",
+    "elpW1T2Decomposition_arcsecPerCy2": {
+      "_comment": "Chapront, Chapront-Touze & Francou (2002, A&A 387, 700): W1 T^2 parts on the inertial ecliptic J2000. Frame bridge to Meeus's of-date L': add p_A T^2 (Lieske 1976 for the Meeus-era polynomial; IAU2006 modern). Attributes the framework's Lp planetary T^2 remainder with zero free parameters: remainder +7.247 = planetary + earthFigureJ2 + p_A(Lieske) + 0.077 Meeus-era tidal-convention gap (Gamma embedded -25.706 vs LLR -25.858). See tools/explore/v4-kpl-budget.js.",
+      "planetary": 5.8665,
+      "earthFigureJ2": 0.1925,
+      "tidesAdopted": -12.8125,
+      "tidesFittedLLR": -12.9257,
+      "generalPrecessionPA_T2_Lieske1976": 1.11113,
+      "generalPrecessionPA_T2_IAU2006": 1.1054348
+    },
     "moonMeanAnomalyJ2000_deg": 134.9634,
     "moonMeanAnomalyRate_degPerDay": 13.06499295,
     "moonMeanElongationJ2000_deg": 297.8502,
