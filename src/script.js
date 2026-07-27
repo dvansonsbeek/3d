@@ -7197,10 +7197,14 @@ function _fwChannelIntegral(T, s) {
  *  + frame ṗ_A T² +1.11113″ + 0.077″ Meeus-era tidal-convention gap.
  *  Documented approximation: the non-channel ~19% rides this bounded e_E²
  *  carrier; per-law split (J2/rotation law, obliquity-cycle ṗ) = the
- *  D4-companion follow-up. Lab cross-check now protocol-limited (E5):
- *  ∂n/∂e_S² at fixed mean-osculating a = −2704 vs ELP-planetary-implied
- *  −2320 — the held-quantity convention (action vs mean a) is the next
- *  candidate, not missing physics. */
+ *  D4-companion follow-up. E5 RESOLVED (adiabatic-ramp lab,
+ *  tools/explore/v4-e5-adiabatic-ramp.js): the convention-free k measured
+ *  by slowly ramping e_S inside one integration is −2370 ± 40 °/cy per e²,
+ *  confirming the ELP-implied −2320 at ~2% and exposing the fixed-mean-a
+ *  scan value (−2704) as a held-quantity protocol artifact (mean osculating
+ *  a vs the conserved action — an m²-order bookkeeping difference, the same
+ *  order as k itself). Direct planetary+J2 terms measured small (+0.47″/cy²,
+ *  tools/explore/v4-e5-direct-planetary.js). */
 let _FW_LP_KPL = null;
 function _fwLpPlanetaryCarrier(T) {
   if (T === 0) return 0;

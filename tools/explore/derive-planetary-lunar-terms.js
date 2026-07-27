@@ -201,6 +201,16 @@ function runSystem(opts, moonIC, years, dt) {
         const hn = Math.hypot(hx, hy, hz);
         S.eclN.push([hx / hn, hy / hn, hz / hn]);
       }
+      if (opts.recordES) {
+        // EMB heliocentric osculating eccentricity (v4 E5: the lab's own e_S(t))
+        const ex = fE * Y[3] + fM * Y[6] - Y[0], ey = fE * Y[4] + fM * Y[7] - Y[1], ez = fE * Y[5] + fM * Y[8] - Y[2];
+        const evx = fE * Y[3 * n + 3] + fM * Y[3 * n + 6] - Y[3 * n], evy = fE * Y[3 * n + 4] + fM * Y[3 * n + 7] - Y[3 * n + 1], evz = fE * Y[3 * n + 5] + fM * Y[3 * n + 8] - Y[3 * n + 2];
+        const mu = GM_S + GM_EM;
+        const rr = Math.hypot(ex, ey, ez), v2 = evx * evx + evy * evy + evz * evz, rv = ex * evx + ey * evy + ez * evz;
+        const c1 = v2 - mu / rr;
+        const evecx = (c1 * ex - rv * evx) / mu, evecy = (c1 * ey - rv * evy) / mu, evecz = (c1 * ez - rv * evz) / mu;
+        (S.eS || (S.eS = [])).push(Math.hypot(evecx, evecy, evecz));
+      }
       S.lamS.push(Math.atan2(Y[1] - Y[4], Y[0] - Y[3]));
       if (jJ > 0) S.lamJ.push(Math.atan2(Y[3 * jJ + 1] - Y[1], Y[3 * jJ] - Y[0]));
       if (jV > 0) S.lamV.push(Math.atan2(Y[3 * jV + 1] - Y[1], Y[3 * jV] - Y[0]));

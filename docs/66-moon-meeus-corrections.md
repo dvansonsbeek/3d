@@ -118,9 +118,16 @@ classical constant:
   channel part) + Earth-figure J2 +0.1925 + frame ṗ_A +1.11113 (Lieske) +
   0.077 Meeus-era tidal-convention gap (Γ embedded −25.706 vs LLR −25.858);
   see `tools/explore/v4-kpl-budget.js` and astro-reference.json
-  `elpW1T2Decomposition_arcsecPerCy2`. The lab-vs-ELP-planetary comparison
-  (−2704 vs −2320, 117%) is a held-quantity protocol question (mean
-  osculating a vs Delaunay action — open item E5), not missing physics. In-window the carrier is Taylor-identical to the old T²
+  `elpW1T2Decomposition_arcsecPerCy2`. E5 RESOLVED: the lab-vs-ELP k gap
+  (−2704 vs −2320) was a held-quantity protocol artifact — the
+  convention-free adiabatic-ramp measurement (e_S slowly ramped inside one
+  integration, the dynamics conserving the true invariant;
+  `tools/explore/v4-e5-adiabatic-ramp.js`) gives k = −2370 ± 40 °/cy per e²,
+  confirming the ELP planetary value at ~2%; holding mean osculating a
+  instead of the action biases k by 15% (an m²-order difference — the same
+  order as k itself). Direct planetary + J2 terms measured small
+  (+0.47″/cy²; `v4-e5-direct-planetary.js`). The Adams–Laplace planetary
+  acceleration is thereby derived in-framework at the percent level. In-window the carrier is Taylor-identical to the old T²
   (−584: +0.017° difference ≈ 2 min); at deep time it stays bounded
   (≤ ~230°) where the T² parabola reached 7,892° at +200 kyr. The same
   laboratory derives the top-20 longitude amplitudes at 100.0 ± 0.1% and the
