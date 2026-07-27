@@ -38,17 +38,18 @@ const DT = parseFloat(process.argv[3] || '0.01');          // days
 
 // ── framework constants ────────────────────────────────────────────────────
 const DAY = 86400;
-const AU_KM = 149597870.7;
-const T_SID_YR_S = 365.256363004 * DAY;                    // framework sidereal year anchor
+const DT_LIB = require('../lib/deep-time');
+const AU_KM = C.currentAUDistance;                         // framework AU (149,597,870.698828 km)
+const T_SID_YR_S = DT_LIB.MEAN_SIDEREAL_YEAR_J2000_S;      // framework sidereal year anchor (s)
 const GM_EM = C.GM_EARTH_MOON_SYSTEM;                      // km³/s²
 const GM_HELIO = 4 * Math.PI * Math.PI * Math.pow(AU_KM, 3) / (T_SID_YR_S * T_SID_YR_S);
 const GM_S = GM_HELIO - GM_EM;
 const MR = C.MASS_RATIO_EARTH_MOON;
 const GM_E = GM_EM * MR / (MR + 1);
 const GM_M = GM_EM / (MR + 1);
-const eM = 0.054900489;                                    // moonOrbitalEccentricityBase (mean/free)
-const eS = 0.0167102;                                      // H/16 law at J2000
-const INC = (C.moonEclipticInclinationJ2000 ?? 5.145) * Math.PI / 180;
+const eM = C.moonOrbitalEccentricity;                      // framework mean/free lunar eccentricity
+const eS = C.ASTRO_REFERENCE.earthEccentricityJ2000;       // anchored observed J2000 solar eccentricity
+const INC = C.moonEclipticInclinationJ2000 * Math.PI / 180;
 const aM = (C.moonDistanceCorrected ?? C.moonDistance);    // km
 
 console.log('framework inputs: GM_EM', GM_EM.toFixed(3), ' GM_S', GM_S.toExponential(6), ' M_E/M_M', MR);
