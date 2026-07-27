@@ -281,6 +281,16 @@ const _mcNodalOfDate   = (a, b) => {
 // browser uses meanApsidalMeetsNodalAtAge; net-neutral here by construction)
 const _mcApsidalMeetsNodal = _mcApsidalOfDate;
 
+// UT→TT (mirror of src/script.js Phase 9.16): TT = UT + ΔT from the
+// framework chain. Both the Meeus/args side AND the Moon-chain layers run on
+// TT — one clock for the ring and the Moon at every epoch.
+function _jdTTToolsFromUT(jd) {
+  if (!DEEP_TIME_ENABLED) return jd;
+  const t_Ma = -(jd - C.j2000JD) / 365.2425 / 1e6;
+  const dT = DT.meanDeltaTSecondsAtAge(t_Ma);
+  return Number.isFinite(dT) ? jd + dT / 86400 : jd;
+}
+
 // Bounded planetary Lp carrier mirror (src/script.js _fwLpPlanetaryCarrier):
 // K_PL·∫₀ᵀ(e_E²−e_E²(J2000))dt′, record-normalized — K_PL derived lazily from
 // the record remainder and the channel slope; no new constants.
@@ -1115,7 +1125,10 @@ function moveModel(graph, pos) {
       // at +52 kyr in the moon-on-ring meter). Anchor + SI-year coordinate
       // mirror src/script.js moveModel (_mAnchor = STARTMODEL_YEAR_SI, UT).
       const _jdHere = C.startmodelJD + pos * _epochCache.mSY;
-      const _cyc = def._dtMoonIntegrator(C.startModelYearWithCorrection, _jdToSIyearTools(_jdHere));
+      // TT clock (mirrors src/script.js): the Moon-chain layers run on the
+      // SAME clock as the override arguments — the earlier UT convention made
+      // the ring lag the Moon by precession-rate × ΔT at deep time.
+      const _cyc = def._dtMoonIntegrator(C.startModelYearWithCorrection, _jdToSIyearTools(_jdTTToolsFromUT(_jdHere)));
       θ = (_cyc !== null ? _cyc : 0) * 2 * Math.PI * def._dtMoonSign - def.startPos * d2r;
     } else {
       θ = def.speed * pos - def.startPos * d2r;
@@ -1191,15 +1204,18 @@ function moveModel(graph, pos) {
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
     // Meeus formulas require T from standard J2000.0 (JD 2451545.0) in Julian centuries (36525 days)
     if (C.useVariableSpeed && def.lunarPerturbations) {
-      // Recover JD via epoch-consistent mSY for pos→jd round-trip.
-      const d = (C.startmodelJD - C.j2000JD) + pos * _epochCache.mSY;
+      // Recover JD via epoch-consistent mSY for pos→jd round-trip, then
+      // UT→TT (mirrors src/script.js Phase 9.16): Meeus arguments are defined
+      // in dynamical time — this shift was MISSING in the tools mirror (the
+      // browser had it), which was the whole browser-vs-tools deep-time delta
+      // (~4 yr of ΔT at +200 kyr → args differing by ~150° in ϖ).
+      const d = _jdTTToolsFromUT(C.startmodelJD + pos * _epochCache.mSY) - C.j2000JD;
       const T = d / C.julianCenturyDays;
       const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
 
       // Fundamental arguments via the shared dispatcher mirror (one argument
       // source with production; pure-Meeus A/B via MOON_ARGS_PURE_MEEUS=1)
       const _args = _moonArgsAtTools(C.j2000JD + d);
-      nodes._fwArgs = _args;   // cached for the ring lock (same call, same jd)
       const Lp = _args.Lp * d2r;
       const Dr = _args.D * d2r;
       const Mr = _args.M * d2r;
@@ -1374,63 +1390,12 @@ function _invalidateGraph() {
  * @returns {{ ra: number, dec: number, distAU: number, sunDistAU: number }}
  *   ra/dec in radians (Three.js spherical convention: theta/phi)
  */
-// ═══ Moon ring lock (Stage C fix, mirrors src/script.js): at deep time the
-// ring's ellipse-phase and node-line azimuths are re-based onto the SAME
-// argument chains + of-date conversion that place the override Moon — the
-// ring rides the Moon's clock instead of the H/13 scene frame (the measured
-// frame divergence reached ~145° at +52 kyr → ring anti-phased → 38,000 km
-// radial gap). Self-calibrating: the J2000 offsets are captured lazily from
-// the certified state (zero new constants); in-window behavior preserved.
-// The leveling layer keeps the exact apsidal-pair cancellation, so the
-// correction never leaks into the plane below.
-let _ringLockCal = null;   // { cA, cN } captured near J2000
-function _applyMoonRingLockTools(graph, jd) {
-  // Cached by the series this call when the override is active; the raw pass
-  // (useVariableSpeed=false) skips the series, so compute args directly there.
-  const args = (C.useVariableSpeed && graph.moonNodes._fwArgs) || _moonArgsAtTools(jd);
-  if (!args) return;
-  const currentYear = C.balancedYear + (jd - C.balancedJD) / _epochCache.mSY;
-  const eps = OE.computeObliquityEarth(currentYear) * d2r;
-  const cosE = Math.cos(eps), sinE = Math.sin(eps);
-  const rm = graph.earthNodes.rotAxis.worldMatrix.e;
-  const azWorld = (lamDeg) => {              // of-date ecliptic longitude (β=0) → world azimuth
-    const lam = lamDeg * d2r;
-    const sinLam = Math.sin(lam), cosLam = Math.cos(lam);
-    const RA = Math.atan2(sinLam * cosE, cosLam);
-    const phi = Math.PI / 2 - Math.asin(sinE * sinLam);
-    const vL = [Math.sin(phi) * Math.sin(RA), Math.cos(phi), Math.sin(phi) * Math.cos(RA)];
-    const vx = rm[0]*vL[0] + rm[4]*vL[1] + rm[8]*vL[2];
-    const vz = rm[2]*vL[0] + rm[6]*vL[1] + rm[10]*vL[2];
-    return Math.atan2(-vz, vx);
-  };
-  const grab = (nm) => { let p = graph.moonNodes.pivot; while (p && p.name !== nm) p = p.parent; return p; };
-  const orbitNode = grab('moon.orbit');
-  const eE = graph.earthNodes.pivot.worldMatrix.e;
-  const oM = orbitNode.worldMatrix.e;
-  const azO = Math.atan2(-(oM[14] - eE[14]), oM[12] - eE[12]);   // offset (ellipse-phase) azimuth
-  let nY = [oM[4], oM[5], oM[6]];                                // ring plane normal (orbit local +Y)
-  if (nY[1] < 0) nY = [-nY[0], -nY[1], -nY[2]];
-  const azNode = Math.atan2(-nY[2], nY[0]) + Math.PI / 2;
-  const wrapPi = (a) => Math.atan2(Math.sin(a), Math.cos(a));
-  const rawA = wrapPi(azWorld(args.Lp - args.Mp) - (azO + Math.PI));   // perigee misalignment
-  const rawN = wrapPi(azWorld(args.Lp - args.F) - azNode);             // node misalignment
-  if (_ringLockCal === null) {
-    if (Math.abs(2000 + (jd - C.j2000JD) / 365.25 - 2000) > 500) return;  // calibrate only in-window
-    _ringLockCal = { cA: rawA, cN: rawN };
-  }
-  const dA = wrapPi(rawA - _ringLockCal.cA);
-  const dN = wrapPi(rawN - _ringLockCal.cN);
-  if (process.env.SG_RINGLOCK_DEBUG === '1') {
-    console.log(`[ringlock] jd ${jd.toFixed(0)} rawA ${(rawA/d2r).toFixed(2)}° rawN ${(rawN/d2r).toFixed(2)}° dA ${(dA/d2r).toFixed(2)}° dN ${(dN/d2r).toFixed(2)}°`);
-  }
-  // No-op guard (numerical; mirrors src/script.js): skip writes + matrix
-  // rebuild below 2e-5 rad — invisible at every epoch.
-  if (Math.abs(dA) < 2e-5 && Math.abs(dN) < 2e-5) return;
-  grab('moonApsidalPrecession.orbit').ry += dA;
-  grab('moonLunarLevelingCycle.orbit').ry -= dA;   // preserve exact pair cancellation
-  grab('moonNodalPrecession.orbit').ry += dN;
-  graph.root.updateWorldMatrix();
-}
+// (Stage C ring lock REVERTED — mirrors src/script.js: the deep-time
+// ring-vs-Moon misalignment was root-caused to the UT-vs-TT clock split
+// between the Moon-chain layers and the override arguments; fixed at the
+// source via the TT clock in the _dtMoonIntegrator branch and the series'
+// UT→TT shift, after which the lock measured dA/dN ≈ 0 at every epoch and
+// was removed.)
 
 function computePlanetPosition(target, jd) {
   const graph = getGraph();
@@ -1444,9 +1409,6 @@ function computePlanetPosition(target, jd) {
 
   // Animate all objects
   moveModel(graph, pos);
-
-  // Stage C ring lock (deep-time only): ring phases follow the args clock
-  if (DEEP_TIME_ENABLED && target === 'moon') _applyMoonRingLockTools(graph, jd);
 
   // Get Earth reference frame (rotationAxis world matrix)
   const earthRotAxisWP = graph.earthNodes.rotAxis.getWorldPosition();
@@ -1715,8 +1677,8 @@ function computePlanetPosition(target, jd) {
     // moon-on-ring meter and FALSIFIED — the conversion frame is correct.
     // The ~9-10° plane divergence measured at the time was the then-missing
     // Phase 9.13 _dtMoonIntegrator mirror branch (added; planes now ≤1.0°),
-    // and the residual phase misalignment is handled by the deep-time ring
-    // lock (_applyMoonRingLockTools).
+    // and the residual phase misalignment was resolved by the TT clock
+    // alignment (Moon-chain layers + args on one clock).
     const currentYear = C.balancedYear + (jd - C.balancedJD) / _epochCache.mSY;
     const eps = OE.computeObliquityEarth(currentYear) * d2r;
     const cosE = Math.cos(eps), sinE = Math.sin(eps);

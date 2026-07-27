@@ -32403,6 +32403,33 @@ function setupGUI() {
           console.log(`    [deep ${yr}] apsidal three-way: layer actual ${_apsTh.toFixed(2)}°` +
             `  chain-pred cycles ${_cycA !== null ? _cycA.toFixed(4) : 'NULL'}` +
             `  args ϖ ${_argsW.toFixed(2)}°  raw-perigee az ${_rawPeri.toFixed(2)}°  ovr-perigee az ${_ovrPeri.toFixed(2)}°`);
+          // Earth-chain frame dump (root-cause hunt): every chain angle plus
+          // the conversion frame, in one consistent convention, for a
+          // layer-by-layer diff against the tools twin
+          // (tools/explore/earth-chain-dump.js).
+          {
+            const _wd = (r) => ((r * 180 / Math.PI) % 360 + 360) % 360;
+            const _eps = o.obliquityEarth * Math.PI / 180;
+            const _rm = earth.rotationAxis.matrixWorld.elements;
+            const _azW = (lamDeg) => {
+              const lam = lamDeg * Math.PI / 180;
+              const RA = Math.atan2(Math.sin(lam) * Math.cos(_eps), Math.cos(lam));
+              const phi = Math.PI / 2 - Math.asin(Math.sin(_eps) * Math.sin(lam));
+              const vx0 = Math.sin(phi) * Math.sin(RA), vy0 = Math.cos(phi), vz0 = Math.sin(phi) * Math.cos(RA);
+              const vx = _rm[0]*vx0 + _rm[4]*vy0 + _rm[8]*vz0;
+              const vz = _rm[2]*vx0 + _rm[6]*vy0 + _rm[10]*vz0;
+              return ((Math.atan2(-vz, vx) * 180 / Math.PI) % 360 + 360) % 360;
+            };
+            const _axX = ((Math.atan2(-_rm[2], _rm[0]) * 180 / Math.PI) % 360 + 360) % 360;
+            console.log(`    [deep ${yr}] earth-chain: eo ${_wd(earth.orbitObj.rotation.y).toFixed(2)}` +
+              `  incl ${_wd(earthInclinationPrecession.orbitObj.rotation.y).toFixed(2)}` +
+              `  ecl ${_wd(earthEclipticPrecession.orbitObj.rotation.y).toFixed(2)}` +
+              `  obl ${_wd(earthObliquityPrecession.orbitObj.rotation.y).toFixed(2)}` +
+              `  peri1 ${_wd(earthPerihelionPrecession1.orbitObj.rotation.y).toFixed(2)}` +
+              `  peri2 ${_wd(earthPerihelionPrecession2.orbitObj.rotation.y).toFixed(2)}` +
+              `  eps ${o.obliquityEarth.toFixed(4)}  axX ${_axX.toFixed(2)}` +
+              `  azW0 ${_azW(0).toFixed(2)}  azW90 ${_azW(90).toFixed(2)}`);
+          }
         }
         // Moon-on-ring CURVE distance (what the eye sees): the raw samples
         // trace the full ellipse over the window, so the min distance from
@@ -32426,7 +32453,7 @@ function setupGUI() {
             cgSum += best; if (best > cgMax) cgMax = best;
           }
           console.log(`    [deep ${yr}] Moon-on-ring CURVE gap: mean ${(cgSum/P.length).toFixed(0)} km  max ${cgMax.toFixed(0)} km` +
-            `  (ring lock active: expect ≤ ~5,000 km periodic floor; pre-lock browser showed 24–73k km from the earth-chain frame divergence)`);
+            `  (TT-aligned clocks: expect the ~5,000–12,000 km periodic floor; the UT-clock era showed 24–73k km)`);
         }
       }
       const minAt = (key) => { let k = 1;                    // parabolic min refine
@@ -57065,56 +57092,13 @@ function calculateRAFromEarthPerihelion(obj) {
 
 const _moonVisualCorrection = new THREE.Vector3();
 
-// ═══ Stage C ring lock: at deep time, the ring's ellipse-phase and node-line
-// azimuths are re-based onto the SAME argument chains + of-date conversion
-// that place the override Moon — the ring rides the Moon's clock instead of
-// the scene's H/13 frame composition (measured misalignment reached ~155° at
-// +200 kyr → ring anti-phased → the visible Moon-off-ring detachment).
-// Self-calibrating: the J2000 offsets are captured lazily from the certified
-// state (zero new constants); in-window behavior is preserved exactly. The
-// leveling layer keeps the exact apsidal-pair cancellation so the correction
-// never leaks into the ring plane. Measurement uses the layers' own rotation
-// values (set absolutely by moveModel each frame — no accumulation) plus the
-// verified linear mapping az = θ_layer + θ_earthframe + const, with the
-// const absorbed by calibration. Mirrored in tools/lib/scene-graph.js.
-let _ringLockCal = null;   // { cA, cN } captured near J2000
-function _applyMoonRingLock(obj, o) {
-  const A = obj._fwArgs;                       // args cached by the series this frame (no recompute)
-  if (!A) return;
-  const eps = o.obliquityEarth * (Math.PI / 180);         // same obliquity as the override conversion
-  const cosE = Math.cos(eps), sinE = Math.sin(eps);
-  const rm = earth.rotationAxis.matrixWorld.elements;
-  const azWorld = (lamDeg) => {                           // of-date ecliptic longitude (β=0) → world azimuth
-    const lam = lamDeg * Math.PI / 180;
-    const sinLam = Math.sin(lam), cosLam = Math.cos(lam);
-    const RA = Math.atan2(sinLam * cosE, cosLam);
-    const phi = Math.PI / 2 - Math.asin(sinE * sinLam);
-    const vx0 = Math.sin(phi) * Math.sin(RA), vy0 = Math.cos(phi), vz0 = Math.sin(phi) * Math.cos(RA);
-    const vx = rm[0] * vx0 + rm[4] * vy0 + rm[8] * vz0;
-    const vz = rm[2] * vx0 + rm[6] * vy0 + rm[10] * vz0;
-    return Math.atan2(-vz, vx);
-  };
-  const wrapPi = (a) => Math.atan2(Math.sin(a), Math.cos(a));
-  const thEo = earth.orbitObj.rotation.y;
-  const rawA = wrapPi(azWorld(A.Lp - A.Mp) - (moonApsidalPrecession.orbitObj.rotation.y + thEo));
-  const rawN = wrapPi(azWorld(A.Lp - A.F) - (moonNodalPrecession.orbitObj.rotation.y + thEo));
-  if (_ringLockCal === null) {
-    if (Math.abs(o.julianDay - j2000JD) > 500 * 365.25) return;   // calibrate only from the certified window
-    _ringLockCal = { cA: rawA, cN: rawN };
-  }
-  const dA = wrapPi(rawA - _ringLockCal.cA);
-  const dN = wrapPi(rawN - _ringLockCal.cN);
-  // No-op guard (numerical, not an epoch gate): skip the rotation writes and
-  // the forced subtree matrix rebuild when the correction is below 2e-5 rad
-  // (0.0011° ≈ 1 km at lunar distance — invisible at every epoch). In-window
-  // the correction sits under this floor, so the scan-heavy report buttons
-  // pay zero lock cost; at deep time the full correction applies.
-  if (Math.abs(dA) < 2e-5 && Math.abs(dN) < 2e-5) return;
-  moonApsidalPrecession.orbitObj.rotation.y += dA;
-  moonLunarLevelingCyclePrecession.orbitObj.rotation.y -= dA;   // preserve exact pair cancellation
-  moonNodalPrecession.orbitObj.rotation.y += dN;
-  moonApsidalPrecession.containerObj.updateMatrixWorld(true);
-}
+// (Stage C ring lock REVERTED: the deep-time ring-vs-Moon misalignment
+// (~155° at +200 kyr) was root-caused to the Moon-chain layers running on
+// the UT clock while the override arguments ran on TT — ring lag =
+// precession-rate × ΔT. Fixed at the source: the _dtMoonIntegrator branch
+// now consumes _currentYearSI_TT, after which the lock measured dA/dN ≈ 0
+// at every epoch (acceptance criterion) and was removed. One clock, no
+// compensator.)
 const _moonVisualMatrix = new THREE.Matrix4();
 
 function updatePositions() {
@@ -57403,9 +57387,6 @@ function updatePositions() {
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.
     // The hierarchy provides the orbit ring visual; this puts the Moon mesh at the correct position.
     if (obj._meeusLonDeg !== undefined && obj._meeusLatRad !== undefined) {
-      // Stage C ring lock: re-base the ring phases BEFORE the Moon placement
-      // below reads the (now-updated) orbit frame matrices.
-      if (DEEP_TIME_MODE_ENABLED) _applyMoonRingLock(obj, o);
       // Use framework's authoritative obliquity (o.obliquityEarth), kept fresh
       // at top of updatePositions so it's valid in both 'light' and 'full' modes.
       // Was: Meeus linear (23.4393 - 0.01300*T); framework has H/3+H/8 obliquity
@@ -57702,15 +57683,18 @@ function moveModel(pos) {
     // _jdToSIyear consistently for both anchor (via STARTMODEL_YEAR_SI) and
     // current restores correct units.
     const _currentYearSI = DEEP_TIME_MODE_ENABLED ? _jdToSIyear(o.julianDay) : o.currentYear;
-    // Phase P-A.1 (narrowed): TT-shifted SI year for the planet _dtIntegrator
-    // branch (introduced in P-B0+). The existing _dtCycleN + _dtMoonIntegrator
-    // dispatch sites below CONTINUE to use _currentYearSI (UT) — applying TT
-    // shift to them would regress 6/19 historical eclipses in the archived
-    // 19-event visibility-window test (doc 101's 19/19 result, superseded by
-    // the current 26-event eclipse alignment audit at 20/26 but the Moon-chain
-    // UT convention rationale remains unchanged).
-    // See docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md "Future
-    // Phase Z" for the asymmetry rationale. The model's convention
+    // Phase P-A.1: TT-shifted SI year for the planet _dtIntegrator branch AND
+    // (since the earth-chain frame divergence root-cause fix) the Moon-chain
+    // _dtMoonIntegrator branch. The Moon layers previously stayed on UT (the
+    // archived doc-101 19/19 constraint, long superseded) while the override
+    // arguments ran on TT (Phase 9.16) — two clocks whose divergence grows as
+    // precession-rate × ΔT: at +200 kyr ΔT ≈ 4 yr → the ring's perigee lagged
+    // the Moon's by ~163° (the visible Moon-off-ring detachment). One clock
+    // (TT — physical dynamics) for both sides aligns ring and Moon at every
+    // epoch; in-window the shift is arcsecond-scale (ΔT ~ minutes).
+    // Only _dtCycleN (Sun/planet H-lattice layers) remains on UT — those
+    // drive frames the UT-based cardinal-point machinery is calibrated
+    // against. The model's convention
     // meanDeltaTSecondsAtAge(0)=0 means anchor identity holds at J2000 with
     // no separate TT anchor — _currentYearSI_TT === STARTMODEL_YEAR_SI at
     // startmodelJD, so cyclesBetween(STARTMODEL_YEAR_SI, _currentYearSI_TT, N)
@@ -57738,7 +57722,7 @@ function moveModel(pos) {
       // eclipses (within ±100 yr of J2000) are unchanged at sub-arcsecond
       // level; deep-time corrections grow with |Δyear|.
       const _mAnchor = Number.isFinite(obj._dtMoonAnchor) ? obj._dtMoonAnchor : STARTMODEL_YEAR_SI;
-      const _mCycles = obj._dtMoonIntegrator(_mAnchor, _currentYearSI);
+      const _mCycles = obj._dtMoonIntegrator(_mAnchor, _currentYearSI_TT);   // TT — same clock as the override args
       θ = (_mCycles !== null ? _mCycles : 0) * 2 * Math.PI * obj._dtMoonSign
           - obj.startPos * (Math.PI / 180);
     } else if (DEEP_TIME_MODE_ENABLED && obj._dtPlanetIntegrator) {
@@ -57746,14 +57730,8 @@ function moveModel(pos) {
       // Consumes _currentYearSI_TT (TT-shifted) — NOT _currentYearSI (UT) —
       // because planet period functions (meanPlanetOrbitalPeriodAtAge and
       // the 7 meanXOrbitalCyclesBetween wrappers) are TT-uniform.
-      //
-      // The Moon-chain branch above stays on UT to preserve doc 101's
-      // archived 19/19 historical eclipse validation (now superseded by
-      // the 26-event eclipse alignment audit at 20/26; the Moon-chain UT
-      // convention constraint remains). The convention depends on the
-      // co-evolved (Moon integrator + pure-tidal ΔT formula + visibility
-      // test methodology) UT calibration. See "Future Phase Z" in
-      // docs/hidden/old-documents/IP-planet-deep-time-scene-graph.md.
+      // (The Moon-chain branch above is ALSO on TT since the earth-chain
+      // frame divergence root-cause fix — see the Phase P-A.1 comment.)
       //
       // No object has _dtPlanetIntegrator tagged yet — this branch is
       // dead code until Phase P-B1 starts wiring per-planet tags.
@@ -57874,7 +57852,6 @@ function moveModel(pos) {
       // its own duplicate pure-Meeus polynomial copy, which extrapolated
       // meaninglessly at deep time — args wrapped 50-140× at ±220 kyr).
       const _args = _moonArgsAt(j2000JD + d);
-      obj._fwArgs = _args;   // cached for the ring lock (same frame, same jd — no recompute)
       const Lp  = _args.Lp * _d2r;
       const Dr  = _args.D  * _d2r;
       const Mr  = _args.M  * _d2r;

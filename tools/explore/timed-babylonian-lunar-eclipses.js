@@ -65,7 +65,12 @@ function sunState(jd_tt) {
 
 // ─── Moon geocentric state from scene graph (mode-switched arguments) ──────
 function moonState(jd_tt) {
-  const pos = computePlanetPosition('moon', jd_tt);
+  // The scene graph's jd axis is UT (it applies the framework's UT→TT shift
+  // internally — the Phase 9.16 convention, mirrored into tools during the
+  // earth-chain TT-alignment fix). This tool works on a TT axis, so convert
+  // TT→UT before querying; the model re-applies ΔT internally, netting the
+  // certified TT semantics (round-trip error ~microseconds).
+  const pos = computePlanetPosition('moon', ttToUt(jd_tt));
   const ra = thetaToRaDeg(pos.ra) * d2r;
   const dec = phiToDecDeg(pos.dec) * d2r;
   const T = (jd_tt - J2000_JD) / 36525;
