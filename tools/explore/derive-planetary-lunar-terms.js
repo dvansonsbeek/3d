@@ -100,7 +100,9 @@ function keplerPosVel(gm, a, e, inc, Om, w, nu) {
 // ── system builder ─────────────────────────────────────────────────────────
 function makeSystem(opts, moonIC) {
   const gms = [GM_S, GM_E, GM_M];
-  const a_EMB = Math.cbrt(GM_HELIO * Math.pow(T_SID_YR_S / (2 * Math.PI), 2));
+  // v4 i-theorem: opts.yearSeconds scales the solar year (m = n′/n scan)
+  const Tyr = opts.yearSeconds || T_SID_YR_S;
+  const a_EMB = Math.cbrt(GM_HELIO * Math.pow(Tyr / (2 * Math.PI), 2));
   // v4: opts.eS overrides the J2000 solar eccentricity (sensitivity scans)
   const emb = keplerPosVel(GM_HELIO, a_EMB, opts.eS !== undefined ? opts.eS : eS, 0, 0, 0, 0);
   const rel = keplerPosVel(GM_EM, moonIC.a, moonIC.e, moonIC.i, 0, 0, 0);
