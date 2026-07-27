@@ -126,6 +126,14 @@ const _FW_A2_RATE = 2 * (360 * 36525 / C.moonTropicalMonth)
                   - 2 * (360 * 36525 / C.planets.jupiter.solarYearInput);
 const _FW_A3_RATE = 360 * 36525 / C.moonSiderealMonth;
 
+// Jupiter orbital chain (mirrors src/script.js meanJupiterOrbitalCyclesBetween:
+// Driver 2 — T_p(t) = T_p0·(1 − massloss·t)²) for the deep-time A2 argument.
+const _JUP_PERIOD_J2000_S = C.planets.jupiter.solarYearInput * 86400;
+const _meanJupiterOrbitalPeriodSecondsTools = (t_Ma) =>
+  t_Ma === 0 ? _JUP_PERIOD_J2000_S
+             : _JUP_PERIOD_J2000_S * Math.pow(1 - DT.SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6, 2);
+const _mcJupiter = (a, b) => _moonChainCyclesTools(_meanJupiterOrbitalPeriodSecondsTools, a, b);
+
 const _FW_MOON = (() => {
   const LP0 = 218.3164477, D0 = 297.8501921, M0 = 357.5291092,
         MP0 = 134.9633964, F0 = 93.2720950;
@@ -1235,10 +1243,27 @@ function moveModel(graph, pos) {
       const AA = MEEUS_LUNAR.additionalArguments;
       // D2 derived rates (mirrors src/script.js FW_A2_RATE/FW_A3_RATE):
       // A3 = sidereal Lp rate (0.003 ppm); A2 = 2·Lp − M′ − 2·L_J (0.19 ppm);
-      // A1 stays Meeus-observed (no credible lattice identity).
+      // A1 stays Meeus-observed (no credible lattice identity). In deep-time
+      // mode A2/A3 are CHAIN-INTEGRATED through their identified content
+      // (mirrors src/script.js): A3 = A3₀ + 360·(N_trop − N_p13),
+      // A2 = A2₀ + 360·(N_trop + N_apsOfDate − 2·N_J); counts 0 at J2000.
       const A1 = (AA.A1[0] + AA.A1[1]*T) * d2r;
-      const A2 = (AA.A2[0] + (MOON_ARGS_FRAMEWORK_NATIVE ? _FW_A2_RATE : AA.A2[1])*T) * d2r;
-      const A3 = (AA.A3[0] + (MOON_ARGS_FRAMEWORK_NATIVE ? _FW_A3_RATE : AA.A3[1])*T) * d2r;
+      let _a2Deg = AA.A2[0] + (MOON_ARGS_FRAMEWORK_NATIVE ? _FW_A2_RATE : AA.A2[1])*T;
+      let _a3Deg = AA.A3[0] + (MOON_ARGS_FRAMEWORK_NATIVE ? _FW_A3_RATE : AA.A3[1])*T;
+      if (DEEP_TIME_ENABLED && MOON_ARGS_FRAMEWORK_NATIVE) {
+        const _yA0 = _jdToSIyearTools(C.j2000JD);
+        const _yA  = _jdToSIyearTools(C.j2000JD + d);
+        const _Nt   = _mcTropical(_yA0, _yA);
+        const _Naps = _mcApsidalOfDate(_yA0, _yA);
+        const _Np13 = DT.cyclesBetweenYears(_yA0, _yA, 13);
+        const _Nj   = _mcJupiter(_yA0, _yA);
+        if (_Nt !== null && _Naps !== null && _Np13 !== null && _Nj !== null) {
+          _a3Deg = AA.A3[0] + 360 * (_Nt - _Np13);
+          _a2Deg = AA.A2[0] + 360 * (_Nt + _Naps - 2 * _Nj);
+        }
+      }
+      const A2 = _a2Deg * d2r;
+      const A3 = _a3Deg * d2r;
 
       // Table 47.A longitude terms from centralized tables
       const ML = MEEUS_LUNAR.longitudeTerms.terms;

@@ -57878,10 +57878,31 @@ function moveModel(pos) {
       const E = _fwEFactor(j2000JD + d, T, T2);
       const E2 = E * E;
 
-      // Additional arguments
+      // Additional arguments. A1 rate is Meeus-observed (no lattice identity).
+      // A2/A3 rates are D2-derived; in deep-time mode they are CHAIN-INTEGRATED
+      // through their identified physical content so they evolve with the
+      // framework (tidal months, H(t) precession, Jupiter's Driver-2 year)
+      // instead of riding a frozen J2000 tangent:
+      //   A3 = sidereal Lp:      A3₀ + 360·(N_trop − N_p13)
+      //   A2 = Lp + ϖ − 2λ_J:    A2₀ + 360·(N_trop + N_apsOfDate − 2·N_J)
+      // All cycle counts are 0 at J2000 → anchors exact by construction.
       const A1 = (119.75 + 131.849*T) * _d2r;
-      const A2 = (53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T) * _d2r;
-      const A3 = (313.45 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A3_RATE : 481266.484)*T) * _d2r;
+      let _a2Deg = 53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T;
+      let _a3Deg = 313.45 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A3_RATE : 481266.484)*T;
+      if (DEEP_TIME_MODE_ENABLED && MOON_ARGS_FRAMEWORK_NATIVE) {
+        const _yA0 = _jdToSIyear(j2000JD);
+        const _yA  = _jdToSIyear(j2000JD + d);
+        const _Nt   = meanMoonOrbitsBetweenYears(_yA0, _yA);
+        const _Naps = meanMoonApsidalOfDateCyclesBetween(_yA0, _yA);
+        const _Np13 = cyclesBetweenYears(_yA0, _yA, 13);
+        const _Nj   = meanJupiterOrbitalCyclesBetween(_yA0, _yA);
+        if (_Nt !== null && _Naps !== null && _Np13 !== null && _Nj !== null) {
+          _a3Deg = 313.45 + 360 * (_Nt - _Np13);
+          _a2Deg = 53.09 + 360 * (_Nt + _Naps - 2 * _Nj);
+        }
+      }
+      const A2 = _a2Deg * _d2r;
+      const A3 = _a3Deg * _d2r;
 
       // ── Sigma_l: longitude series (Table 47.A, 60 terms) ──
       let Sl = 0;
