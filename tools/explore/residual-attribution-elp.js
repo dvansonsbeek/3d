@@ -28,6 +28,9 @@
 // date that Meeus uses (the two mean-longitude rates differ by exactly
 // 5029.0966″/cy — the check is printed).
 //
+// Data: data/lunar-series/elp2000-82b/ (provenance + licences in that folder's
+// README; the JSON is verified against the IMCCE primary files ELP1..ELP36).
+//
 // Usage: node tools/explore/residual-attribution-elp.js [path-to-elp-full.json]
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -38,8 +41,13 @@ const DEG = Math.PI / 180;
 const J2000 = 2451545.0;
 
 // ── Data ────────────────────────────────────────────────────────────────────
-const elpPath = process.argv[2] ||
-  '/tmp/claude-1000/-home-dennis-code-3d/91db24ca-b27d-4b3a-9c22-11307c2d6b6f/scratchpad/moon-elp2000-82b-full.json';
+const elpPath = process.argv[2] || path.resolve(
+  __dirname, '..', '..', 'data', 'lunar-series', 'elp2000-82b', 'moon-elp2000-82b-full.json');
+if (!fs.existsSync(elpPath)) {
+  console.error(`ELP series not found at ${elpPath}\n` +
+    'See data/lunar-series/README.md for the source (IMCCE ftp / vsr83 transcription).');
+  process.exit(1);
+}
 const ELP = JSON.parse(fs.readFileSync(elpPath, 'utf8'));
 const MEEUS = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '..', '..', 'public', 'input', 'meeus-lunar-tables.json'), 'utf8'));
@@ -218,7 +226,8 @@ console.log('  Residual attribution: (full ELP-2000/82B − Meeus-60) on the pat
 console.log('═'.repeat(78));
 const termCount = FAM.reduce((s, f) => s + f.files.reduce(
   (q, i) => q + ((ELP['ELP' + String(i).padStart(2, '0')] || []).length || 0), 0), 0);
-console.log(`  ELP series: ${termCount} terms (git-archived data, commit 3200493; vsr83/ELP2000-82B, MIT)`);
+console.log(`  ELP series: ${termCount} terms — data/lunar-series/elp2000-82b/` +
+            ' (verified against the IMCCE primary files ELP1..ELP36)');
 
 // frame sanity: rate difference between Meeus Lp and ELP W1 must equal p
 console.log(`  Frame check: Meeus L′ rate − ELP W1 rate = ${((MA.Lp[1] - W1[1]) * 3600).toFixed(4)}″/cy` +
