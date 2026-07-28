@@ -25227,6 +25227,31 @@ const LCR_SIGN_CHECK_EVENTS = [
   { year:   2000, type: 'warm', name: 'Modern warm (nominal)' },
 ];
 
+/** Band-level counterpart to the event check below. The event check samples ONE
+ *  hand-picked year per named period, which flatters the result; this scores
+ *  EVERY year inside each named period against its warm/cold label. Restricted
+ *  to the validated window and to sub-Milankovitch periods (≤1000 yr span),
+ *  i.e. the named events the stack is claimed to time — not the multi-millennial
+ *  glacial envelopes. Returns pooled % correct plus the Little Ice Age alone. */
+function lcrBandSignScore() {
+  const LO = -4000, HI = 1800, STEP = 5;
+  let tot = 0, ok = 0, liaTot = 0, liaOk = 0;
+  for (const p of LCR_CLIMATE_PERIODS) {
+    if (p.end - p.start > 1000) continue;
+    const a = Math.max(p.start, LO), b = Math.min(p.end, HI);
+    if (b <= a) continue;
+    const want = p.type === 'warm' ? 1 : -1;
+    for (let y = a; y <= b; y += STEP) {
+      const sgn = Math.sign(dtCycleLodCorrectionSum(y));
+      tot++; if (sgn === want) ok++;
+      if (p.name === 'Little Ice Age') { liaTot++; if (sgn === want) liaOk++; }
+    }
+  }
+  return { pct: tot ? Math.round(100 * ok / tot) : null,
+           liaPct: liaTot ? Math.round(100 * liaOk / liaTot) : null,
+           nPeriods: tot };
+}
+
 function lcrRenderSignCheckPanel(hideTitle) {
   // Validated window bounds (same as correlation panel) — where framework's
   // harmonic extrapolation from its Espenak 1650-2017 fit remains trustworthy.
@@ -25268,9 +25293,16 @@ function lcrRenderSignCheckPanel(hideTitle) {
       <b class="lcr-r-strong">${inWinMatch}/${inWinRows.length} within validated window match</b> (4000 BC – 1800 AD).
       <b class="lcr-r-mod">${outMatch}/${outRows.length} outside window match</b> (deep-past extrapolation drift + modern anthropogenic warming — not framework's cyclic prediction).
       <span class="lcr-match-note">
-        Grey rows fall outside the framework's extrapolation-valid range. The ${inWinMatch}/${inWinRows.length} match rate inside the
-        validated window supports Σ &gt; 0 = warm, Σ &lt; 0 = cold; the mismatches outside are expected
+        Grey rows fall outside the framework's extrapolation-valid range; those mismatches are expected
         given the fit-window and modern-warming caveats.
+        <br/><b>Read the ${inWinMatch}/${inWinRows.length} with care — each row samples one hand-picked year.</b>
+        Scored instead across the <i>full</i> named periods, every year against its warm/cold label,
+        the rule holds for <b>${(() => { const b = lcrBandSignScore(); return b.pct == null ? '—' : b.pct + '%'; })()}</b>
+        of years against a 50% coin-flip baseline — and for
+        <b>${(() => { const b = lcrBandSignScore(); return b.liaPct == null ? '—' : b.liaPct + '%'; })()}</b>
+        of the Little Ice Age, where Σ_stack stays positive ("warm") across all five centuries.
+        The event test books that as a single narrow miss at Maunder; it is a five-century systematic one.
+        This comparison is an open correspondence, not a validation of the lattice periods.
       </span>
     </div>
   `;
@@ -26194,7 +26226,7 @@ async function createLcrPanel() {
   const layerToggles = `
     <div class="cfm-layer-toggles">
       <label class="cfm-layer-check" title="Pure tidal channel = Moon-recession torque only, no GIA compensation, no cycles. At J2000: +2.12 ms/cy. Essentially flat across the Holocene. Provides a physical reference height above which GIA subtracts and the ΔT cycles oscillate."><input type="checkbox" data-lcr-layer="tidal" ${lcrLayerVisibility.tidal ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-tidal"></span>Tidal (L1)</label>
-      <label class="cfm-layer-check" title="Tidal + GIA secular rate = Layer 2 net rate = Moon recession minus the Milankovitch mass-response drag. At J2000: +1.77 ms/cy, matches IERS +1.75."><input type="checkbox" data-lcr-layer="netL2" ${lcrLayerVisibility.netL2 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL2"></span>+ GIA (L2)</label>
+      <label class="cfm-layer-check" title="Tidal + GIA secular rate = Layer 2 net rate = Moon recession plus the Milankovitch mass response. The GIA term is TWO-SIGNED, not a one-way drag: negative (spin-up) while the mantle rebounds poleward after a deglaciation, positive while ice sheets grow and mantle is displaced equatorward. So this curve dips below the tidal line through a deglaciation and rides above it during ice growth (visible on the 200,000 BC and 27,500 BC tabs; GIA = +0.08 ms/cy at 25,000 BC). At J2000: GIA −0.35, net +1.77 ms/cy, matches IERS +1.75."><input type="checkbox" data-lcr-layer="netL2" ${lcrLayerVisibility.netL2 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL2"></span>+ GIA (L2)</label>
       <label class="cfm-layer-check" title="Layer 3 net rate = Tidal + GIA + the 4 lattice cycles (Bond + Hallstatt + Jose5 + Jose4), flags only — cyclic modulation WITHOUT the Core-mantle swing. At J2000: −0.13 ms/cy."><input type="checkbox" data-lcr-layer="netL3" ${lcrLayerVisibility.netL3 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL3"></span>+ Cycles (L3)</label>
       <label class="cfm-layer-check" title="The SHIPPED observable (joint world) = Layer 4 = Tidal + GIA + 4-flag cycles + Core-mantle swing (Resonator driver, fitted jointly). At J2000: −0.08 ms/cy; the Layer-4 solar day closes the USNO anchor 86400.0014 by construction."><input type="checkbox" data-lcr-layer="netL4" ${lcrLayerVisibility.netL4 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL4"></span>+ Core-mantle (L4)</label>
       <label class="cfm-layer-check" title="Named climate period bands from mainstream literature. Cold = blue; Warm = red."><input type="checkbox" data-lcr-layer="bands" ${lcrLayerVisibility.bands ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bands"></span>Periods</label>
@@ -26204,6 +26236,13 @@ async function createLcrPanel() {
       <label class="cfm-layer-check" title="LR04 global benthic δ¹⁸O stack (Lisiecki & Raymo 2005, 57 sites) shown as inverted anomaly vs core-top on the secondary axis — positive = warm, same sign convention as the Bond IRD panel. Independent paleoclimate reconstruction — not part of the framework fit; the same dataset the Climate Formula Explorer fits against. 1-kyr resolution; covers the full 200,000 BC tab where GISP2 ends (~27,950 BC)."><input type="checkbox" data-lcr-layer="proxyLR04" ${lcrLayerVisibility.proxyLR04 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxylr04"></span>LR04</label>
     </div>
   `;
+
+  // Legend quotes the same validated-window correlation the panel below computes,
+  // read live rather than hardcoded so the two can never silently diverge.
+  const _lcrLegendC = lcrComputeCorrelations(-4000, 1800);
+  const lcrLegendR = (_lcrLegendC && _lcrLegendC.r_stack != null)
+    ? (_lcrLegendC.r_stack >= 0 ? '+' : '') + _lcrLegendC.r_stack.toFixed(2)
+    : '—';
 
   panel.innerHTML = `
     <div class="cfm-overlay"></div>
@@ -26222,15 +26261,17 @@ async function createLcrPanel() {
         </div>
         <div class="lcr-legend-panel">
           <div class="lcr-legend-note">
-            <b>How to read:</b> Each line adds one mechanism.
-            <b>Tidal (L1)</b> (dashed rust) is the pure Moon-recession rate (+2.12 ms/cy, ~flat).
-            <b>+ GIA (L2)</b> (teal) subtracts the Milankovitch mass-response drag (IERS ≈ +1.77 ms/cy at J2000).
-            <b>+ Cycles (L3)</b> (gold dashed) adds the 4 lattice cycles (Bond + Hallstatt + Jose5 + Jose4).
-            <b>+ Core-mantle (L4)</b> (orange) adds the damped core-eigenmode swing (T₀ = 8H/685, Q = 1.8, excited
-            ~1600 BC) — the shipped observable: above / below the teal line = decelerating faster / slower than the secular trend.
-            <b>Bond</b> and <b>Core</b> isolate single components around the teal baseline.
-            The full stack correlates at <b>r = +0.36</b> with Bond 2001 IRD in the validated window
-            (out-of-sample; fit used only Espenak ΔT 1650-2017, no climate proxies).
+            <b>How to read</b> — each line adds one mechanism (hover a toggle for detail).
+            <b>Tidal (L1)</b>: pure Moon-recession, +2.12 ms/cy, ~flat.
+            <b>+ GIA (L2)</b>: two-signed mass response (−0.35 ms/cy at J2000; positive during ice growth).
+            <b>+ Cycles (L3)</b>: Bond + Hallstatt + Jose5 + Jose4.
+            <b>+ Core-mantle (L4)</b>: core swing — the shipped observable.
+            <b>Bond</b> / <b>Core</b> isolate single components. Full stack ↔ Bond 2001 IRD
+            <b>r = ${lcrLegendR}</b> (out-of-sample).
+            <br/><b>Opposite signs, different quantities.</b> <b>GIA</b> — the teal line <i>dipping</i>
+            marks rebound, melting under way; peak warmth follows ~4–6 kyr later (<b>shorter</b> day).
+            <b>Cycles</b> — warm ⇔ Σ_stack &gt; 0 (<b>longer</b> day), where Σ_stack is the running total
+            of the orange-minus-teal gap (L4 − L2), not either line's height; the panel below computes it.
           </div>
         </div>
         <details class="lcr-match-panel lcr-details">

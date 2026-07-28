@@ -1807,11 +1807,10 @@ What this validation establishes:
    warm, Σ = +1.01 ✓), MWP peak (+1050 AD, warm, Σ = +1.97 ✓),
    Maunder Minimum (+1670 AD, cold, Σ = +0.45 — a MISS: the
    convention predicts warm). Dalton Minimum (+1810 AD) falls just
-   outside the +1800 AD window edge and is no longer counted. The
-   pre-joint flags-only stack scored 6 of 6 on the wider event set,
-   which is the figure earlier revisions quoted; folding in the
-   Core-mantle swing (core-supplied angular momentum, not climate)
-   moved Maunder across zero.
+   outside the +1800 AD window edge and is no longer counted.
+   Maunder misses under either stack definition: flags-only it is
+   Σ = +0.118 ms, still positive, so the Core-mantle swing is not
+   what carries it across zero.
 
    Four events lie outside the validated window and are expected to
    miss. Three are pre-window (Younger Dryas at −10500 BC, 8.2 ka
@@ -1823,6 +1822,39 @@ What this validation establishes:
    framework does *not* predict recent industrial warming is a
    feature, not a bug: it isolates the natural orbital rhythm from
    the anthropogenic signal.
+
+   **How far this event test can be trusted.** The 4-of-5 figure is
+   correctly computed, but it is the most favourable slice of a weak
+   relationship. Four null tests against the shipped stack:
+
+   | Test | Result | Null / baseline |
+   |---|---|---|
+   | Sign rule across **full** named-period bands (every year, not the sampled peak year) | **65 %** correct | 50 % (coin flip) |
+   | — of which the Little Ice Age (1300–1800 AD) | **0 %** — Σ_stack is positive, i.e. "warm", across the entire 500-yr period | — |
+   | Crossing timing vs 10 named transitions (Monte-Carlo over typed crossings) | median 262 yr, **p ≈ 0.19** | null median 353 yr |
+   | Band-limited phase, 4 harmonics × 2 proxies × 2 windows | no band survives correction for the 16 tests (single nominal hit Jose4↔GISP2 p = 0.046); Bond band ≈ **anti-phase** vs IRD (175°) | phase-randomised surrogates |
+   | Windowed phase-tracking (drifting phase permitted) | no band significant; Bond↔IRD PLV p = 0.49 | phase-randomised surrogates |
+
+   Both regenerate from `tools/explore/climate-band-phase.js`; the sign score
+   and crossing test above from `tools/explore/climate-crossing-null.js`.
+
+   The correlation is real as a number (r = +0.36 ⇒ ~13 % of variance),
+   but it is **not carried by the 1466-yr band**, and the event-level
+   sign agreement does not survive being tested across the full named
+   periods instead of at hand-picked peak years. The Little Ice Age
+   result is the most serious: the event test books it as a single
+   narrow miss (Maunder), when the framework in fact has the wrong sign
+   for all five centuries of it.
+
+   **What this means for the claim.** The correspondence between the
+   4-flag stack and the Holocene climate rhythm is an **open
+   correspondence, not a validation**, and must not be cited as
+   confirmation that the 8H-lattice periods are the climate periods.
+   The flags remain well-motivated as **ΔT corrections** — that is what
+   they were fitted to, and what they demonstrably close — but the
+   further step to "these are the climate cycles" is not supported by
+   any test currently available to us. Re-upgrading the claim requires
+   new evidence, not re-description of the existing correlation.
 
 What we are NOT claiming:
 
@@ -1903,20 +1935,22 @@ What we are NOT claiming:
 The natural extensions, in order from most to least defensible:
 
 1. **Independent amplitude/phase calibration of the 4-flag stack —
-   Bond cross-validated, all four still open for calibration.**
+   all four channels still open.**
    The framework arithmetic predicts each PERIOD (Bond 74 × J-S
    synodic = 1466 yr, Hallstatt H/138 = 2430 yr, Jose5 5 × Jose =
    897 yr, Jose4 4 × Jose = 716 yr — all zero-fit structural periods
    on H's prime-factor lattice); the Option B ΔT-only correction
    architecture is implemented, shipped default-ON, and preserves the
-   J2000 LOD anchor. The Bond channel has now been *cross-validated*
-   against Bond's own drift-ice record (r = +0.49 Pearson correlation
-   of Σ_stack vs Bond 2001 IRD pre-joint, +0.36 under the shipped
-   joint world, out-of-sample in the −4000 BC to
-   +1800 AD window — see item 7 of "What this validation establishes"
-   above). Note: cross-validation confirms the fitted amplitude and
-   phase are consistent with an independent proxy; it does *not*
-   refit them from that proxy. Independent *calibration* of the Bond
+   J2000 LOD anchor. The Bond channel's comparison against Bond's own
+   drift-ice record (r = +0.36 under the shipped joint world,
+   out-of-sample in the −4000 BC to +1800 AD window) does **not**
+   constitute cross-validation of that channel: band-limited and
+   windowed-phase testing show the correlation is not carried by the
+   1466-yr band, and at the Bond period the stack and the IRD record
+   are close to anti-phase. It therefore cannot anchor the Bond
+   channel's amplitude or phase. See item 7 of "What this validation
+   establishes" above for the four null tests. Independent
+   *calibration* of the Bond
    amplitude/phase against IRD (and the analogous work for Hallstatt
    against Steinhilber ¹⁰Be, Jose5/Jose4 against SIM-driven solar
    activity) is still open. Once every amplitude/phase is anchored to
