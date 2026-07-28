@@ -1792,14 +1792,26 @@ What this validation establishes:
    same physical drift-ice-driven mass-redistribution signal the
    framework's Bond harmonic is modelling.
 
-   The sign convention holds event-by-event within the window.
-   Under "Σ > 0 = higher LOD than baseline = mass equatorward = warm
-   anomaly; Σ < 0 = cold," six of six named events in the validated
-   window match: Bond 4 (-3950 BC, cold, Σ = −3.5 ms), 4.2 ka event
-   (-2250 BC, cold, Σ = −2.3), Roman Warm Period peak (+100 AD, warm,
-   Σ = +2.3), MWP peak (+1050 AD, warm, Σ = +1.5), Maunder Minimum
-   (+1670 AD, cold, Σ = −0.8), Dalton Minimum (+1810 AD, cold,
-   Σ = −0.4).
+   The sign convention is the STACK channel's rule — "Σ > 0 = higher
+   LOD than baseline = surface mass equatorward = warm anomaly;
+   Σ < 0 = cold." It is NOT the rule for the α(t)/GIA channel, which
+   responds to the same climate signal with the opposite sign and a
+   multi-millennial lag (solid-Earth rebound; see doc 99 § "Two
+   channels, opposite signs"). Conflating the two is the easiest way
+   to get this subject backwards.
+
+   Under that rule, **4 of the 5 named events inside the validated
+   window match** (shipped joint-world Σ = 4 flags + Core-mantle
+   swing): Bond 4 (-3950 BC, cold, Σ = −3.03 ms ✓), 4.2 ka event
+   (-2250 BC, cold, Σ = −4.11 ✓), Roman Warm Period peak (+100 AD,
+   warm, Σ = +1.01 ✓), MWP peak (+1050 AD, warm, Σ = +1.97 ✓),
+   Maunder Minimum (+1670 AD, cold, Σ = +0.45 — a MISS: the
+   convention predicts warm). Dalton Minimum (+1810 AD) falls just
+   outside the +1800 AD window edge and is no longer counted. The
+   pre-joint flags-only stack scored 6 of 6 on the wider event set,
+   which is the figure earlier revisions quoted; folding in the
+   Core-mantle swing (core-supplied angular momentum, not climate)
+   moved Maunder across zero.
 
    Four events lie outside the validated window and are expected to
    miss. Three are pre-window (Younger Dryas at −10500 BC, 8.2 ka

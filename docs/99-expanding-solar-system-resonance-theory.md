@@ -488,7 +488,7 @@ Under the L1-orbital-coupled α(t) form, the GIA channel oscillates over the ~10
 
 Between −11,000 and +5,000 (the current Holocene warm interval), sub-Milankovitch modulations (the "all cycles" term) superposed on the Tidal + GIA baseline are candidates for named climate excursions (mini-ice-age / Little Ice Age; Medieval Warm Period; Holocene Climatic Optimum) via faster-and-slower LOD-growth epochs on top of the smooth Milankovitch trajectory. This is a testable mechanism claim: the framework predicts specific rate deviations at millennial-scale timing without any fitting to Holocene climate proxies.
 
-The predicted rhythm has now been validated against an independent paleoclimate record. Σ_stack correlates with Bond 2001 IRD (North Atlantic drift-ice, the same signal Bond used to identify his cold events) at **r = +0.36 Pearson under the shipped joint world** (+0.49 with the pre-joint flags-only stack — part of the late-Holocene structure now lives in the Core-mantle swing) on the framework's validated window −4000 BC to +1800 AD — out-of-sample, since the stack was fit against the Stephenson 2016 ΔT residual (an eclipse-timing dataset, not a climate record). Sign-convention holds event-by-event on 6 of 6 named events inside the window (Bond 4, 4.2 ka, Roman Warm Period, MWP, Maunder, Dalton) under "Σ > 0 = LOD above baseline = mass equatorward = warm; Σ < 0 = cold". Events pre-window (Younger Dryas, 8.2 ka, Holocene Optimum) drift with fit-window extrapolation; the Modern warm epoch is post-window and anthropogenic — the framework, a pure orbital/tidal model, correctly does not predict it. See [doc 102](102-gia-alpha-lunar-validation.md) § "Defensible scientific position" item 7 for the full derivation. The *LOD-Climate Rhythm* modal exposes this comparison interactively.
+The predicted rhythm has now been validated against an independent paleoclimate record. Σ_stack correlates with Bond 2001 IRD (North Atlantic drift-ice, the same signal Bond used to identify his cold events) at **r = +0.36 Pearson under the shipped joint world** (+0.49 with the pre-joint flags-only stack — part of the late-Holocene structure now lives in the Core-mantle swing) on the framework's validated window −4000 BC to +1800 AD — out-of-sample, since the stack was fit against the Stephenson 2016 ΔT residual (an eclipse-timing dataset, not a climate record). Sign-convention (this is the STACK channel's rule — "Σ > 0 = LOD above baseline = surface mass equatorward = warm; Σ < 0 = cold"; the α(t)/GIA channel runs the other way, see "Two channels, opposite signs" above) holds on **4 of the 5 named events inside the window**: Bond 4 (Σ = −3.03 ms, cold ✓), 4.2 ka (−4.11, cold ✓), Roman Warm Period (+1.01, warm ✓), MWP (+1.97, warm ✓), Maunder Minimum (+0.45 — a MISS, the convention predicts warm). Dalton (1810) falls outside the +1800 window edge. Values are the shipped joint-world Σ (4 flags + Core-mantle swing); the pre-joint flags-only stack scored 6 of 6 on a slightly different event set, which is the figure earlier revisions of this document quoted. Events pre-window (Younger Dryas, 8.2 ka, Holocene Optimum) drift with fit-window extrapolation; the Modern warm epoch is post-window and anthropogenic — the framework, a pure orbital/tidal model, correctly does not predict it. See [doc 102](102-gia-alpha-lunar-validation.md) § "Defensible scientific position" item 7 for the full derivation. The *LOD-Climate Rhythm* modal exposes this comparison interactively.
 
 ### Comparison to published dLOD/dt decompositions
 
@@ -1559,11 +1559,50 @@ dα/dt |_{year=2000} = −ALPHA_CLIMATE_SCALE × d(L1)/dyear |_{year=2000}  =  �
 From the LR04-post-MPT coefficients this gives `d(L1)/dyear|_2000 =
 −3.435×10⁻⁵ ‰/yr`, hence `ALPHA_CLIMATE_SCALE = −3.93×10⁻⁷` per ‰.
 
-**Sign convention** (Peltier & Wu 1984): warmer (lower δ¹⁸O = interglacial)
-↔ less continental ice ↔ ocean water shifts equatorward on the geoid ↔ mass
-distribution more equatorial ↔ smaller α. So a positive Δ(L1) (colder,
-glacial) drives Δα > 0. The negative sign of `ALPHA_CLIMATE_SCALE` combined
-with the `-` in the α formula gives the physically correct direction.
+**Sign convention** (Peltier & Wu 1984). The α(t) channel is the **solid-Earth
+(GIA) response** — the mantle flowing under a changing ice load — *not* the
+surface water/ice swap. The two have opposite signs, so the mechanism must be
+named precisely:
+
+- **Glacial**: ice loads the high-latitude crust, mantle material flows
+  equatorward, Earth becomes more oblate → **larger α** → longer day.
+- **Interglacial / deglaciation**: the mantle rebounds poleward, Earth becomes
+  less oblate → **smaller α** → shorter day.
+
+So a positive Δ(L1) (colder, glacial) drives Δα > 0, and warming drives
+Δα < 0; the negative `ALPHA_CLIMATE_SCALE` combined with the `−` in the α
+formula produces exactly this. It is also what the shipped code does: α at the
+LGM (−18 kyr) and at the MIS-6 glacial (−138 kyr) sits **~630 ppb above** its
+J2000 value, while the Eemian and Holocene-optimum interglacials sit only
+~125–165 ppb above — the glacial maxima are the α maxima.
+
+**Do not derive this sign from the surface water redistribution.** "Warm →
+meltwater into the ocean → mass equatorward" is a real effect, but it gives
+the OPPOSITE sign (more equatorial mass ⇒ *larger* moment ⇒ *longer* day), and
+it is carried by the 4-flag stack, not by α(t). See "Two channels, opposite
+signs" immediately below — conflating them is the single easiest way to get
+this subject backwards.
+
+### Two channels, opposite signs
+
+The framework's rotation–climate link runs through **two distinct channels that
+respond to the same climate signal with opposite sign and different lag**. Any
+statement of the form "warm means the day gets longer/shorter" is incomplete
+until it says which channel it means.
+
+| | Physical process | Response to warming | Timescale |
+|---|---|---|---|
+| **Stack channel** (Bond/Hallstatt/Jose5/Jose4) | surface mass: ice → meltwater spread through the global ocean, mass moves equatorward | moment of inertia **up** → day **lengthens** → Σ_stack > 0 | fast, effectively concurrent |
+| **α(t) / GIA channel** | solid Earth: mantle rebounds poleward once the ice load is removed | moment of inertia **down** → day **shortens** | lagged by the mantle relaxation time (τ ≈ 4–6 kyr) |
+
+Both are physically real, and their opposition is not a contradiction — it is
+the reason the deglacial signature *leads* peak warmth (the rebound spin-up
+runs while melting is fastest, and the warm peak arrives thousands of years
+later, once melting completes). The observable rotation is the **sum**, so the
+two channels can currently disagree about what the rotation "means": at J2000
+the GIA term is −0.35 ms/cy (interglacial, rebound continuing) while the stack
+term is −1.90 ms/cy and descending toward its trough at ~2206 AD. Reading one
+channel's rule onto the other's number is a category error.
 
 **Domain.** Uses the `lr04-post-mpt` regime L1 coefficients throughout. Since
 the L1 formula is a periodic sum of cosines on H-lattice divisors, it stays
