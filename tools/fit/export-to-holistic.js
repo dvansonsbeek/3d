@@ -716,7 +716,7 @@ const MV_TS      = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
     const FIT4_PATH = path.resolve(__dirname, '..', '..', 'data', 'deltaT-4flag-fit.json');
     if (fs.existsSync(FIT4_PATH)) {
       const fit4 = JSON.parse(fs.readFileSync(FIT4_PATH, 'utf8'));
-      const usno = fit4.optimum.usno_target_lod_s;                 // e.g. 86400.0026
+      const usno = fit4.optimum.usno_target_lod_s;                 // e.g. 86400.0014
       const usnoStr = String(usno).replace(/^\d+/, i => i.replace(/\B(?=(\d{3})+$)/g, ','));
       mv = replaceMvString(mv, 'usnoLodJ2000', usnoStr);
       mv = replaceMvString(mv, 'deltaTEspenakRmsSeconds', fit4.optimum.espenak_rms_s.toFixed(1));

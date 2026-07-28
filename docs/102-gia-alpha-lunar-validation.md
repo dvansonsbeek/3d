@@ -1763,17 +1763,20 @@ What this validation establishes:
    | LIA onset (~1450 CE) | Cold | −65 |
    | Modern warming (2100) | Warm | +1740 |
 
-   The Bond 1466-yr half-period (~733 yr) predicts the MWP→LIA transition
-   at year ~1000 + 733 = ~1733 — matching the historical Maunder Minimum
-   coldest window (1650–1715 CE). The framework further extrapolates the
-   next Bond warm peak to year ~1000 + 1466 = ~2466. The stack was fitted
-   to eclipse residuals, not climate records; that it independently
-   reproduces the correct LOD-climate rhythm is a cross-validation the
-   fit did not target.
+   The Bond 1466-yr half-period (~733 yr) places a MWP→LIA turn at
+   year ~1000 + 733 = ~1733, near the historical Maunder Minimum coldest
+   window (1650–1715 CE); the next Bond warm peak extrapolates to
+   ~1000 + 1466 = ~2466. Treat this as period arithmetic, not as a
+   result: tested across the full Little Ice Age, Σ_stack carries the
+   **wrong sign for all five centuries** (item 7), so the harmonic does
+   not in fact track that transition. The stack was fitted to eclipse
+   residuals rather than climate records, which makes the comparison
+   out-of-sample — but out-of-sample is not the same as validated.
 
 7. **The 4-flag stack correlates with Bond's own drift-ice record at
-   r = +0.49 out-of-sample.** A quantitative version of the previous
-   point. The Σ_stack value (cumulative δLOD from the four flag cycles:
+   r = +0.36 out-of-sample (shipped joint world; +0.49 with the
+   pre-joint flags-only stack) — an open correspondence, not a
+   validation.** A quantitative version of the previous point. The Σ_stack value (cumulative δLOD from the four flag cycles:
    Bond + Hallstatt + Jose5 + Jose4) was Pearson-correlated against
    the Bond 2001 IRD stack (North Atlantic MC52 + VM29-191 + MC21 +
    GGC22 — the same hematite-stained-grain drift-ice series Bond
@@ -1792,13 +1795,17 @@ What this validation establishes:
    same physical drift-ice-driven mass-redistribution signal the
    framework's Bond harmonic is modelling.
 
-   The sign convention is the STACK channel's rule — "Σ > 0 = higher
-   LOD than baseline = surface mass equatorward = warm anomaly;
-   Σ < 0 = cold." It is NOT the rule for the α(t)/GIA channel, which
-   responds to the same climate signal with the opposite sign and a
-   multi-millennial lag (solid-Earth rebound; see doc 99 § "Two
-   channels, opposite signs"). Conflating the two is the easiest way
-   to get this subject backwards.
+   The sign convention tested here is the one proposed for the STACK —
+   "Σ > 0 = higher LOD than baseline = surface mass equatorward = warm
+   anomaly; Σ < 0 = cold." Two things must be said about it. It is NOT
+   the rule for the α(t)/GIA channel, which responds to the same
+   climate signal with the opposite sign and a multi-millennial lag
+   (solid-Earth rebound; see doc 99 § "Two channels, opposite signs") —
+   conflating the two is the easiest way to get this subject backwards.
+   And the rule itself is **a hypothesis under test in what follows,
+   not an established property of the stack**: the surface-mass
+   mechanism is real geophysics, but the identification of these four
+   flags with it is exactly what the null tests below fail to support.
 
    Under that rule, **4 of the 5 named events inside the validated
    window match** (shipped joint-world Σ = 4 flags + Core-mantle

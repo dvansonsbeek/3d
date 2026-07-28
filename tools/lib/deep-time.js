@@ -280,13 +280,31 @@ const JOSE4_OMEGA = 2 * Math.PI / JOSE4_PERIOD_YR;
 const JOSE4_COS_COEFF_S = 38.592083031774166;
 const JOSE4_SIN_COEFF_S = -31.7907396464544;
 
-// Cyclic-correction taper widened 2026-07-12 from ±4.5/6 kyr Holocene window to
-// ±300/400 kyr — cross-archive validation across Steinhilber ¹⁰Be (9.4 kyr),
-// EPICA CO2 (800 kyr), and Cheng speleothem (640 kyr) supports cycle coherence
-// well beyond the original 2.7-kyr Stephenson fit window. Fade to zero at
-// ±400 kyr preserves the "not extrapolating to Myr-scale H(t) drift" honest
-// claim; H differs from H_J2000 by <1.5% at this range, so the fixed-period
-// assumption is valid. Constant name kept for historical continuity though the
+// Cyclic-correction taper: full to ±300 kyr, fading to zero at ±400 kyr.
+//
+// The width is a SAFETY CHOICE, not a value derived from data. It is also not
+// observationally consequential: the stack's ΔT contribution is a sum of
+// bounded sinusoids (≤ ~±420 s at any age) while ΔT itself grows quadratically,
+// so beyond ~10 kyr the stack is under 0.1% of ΔT and by −300 kyr under 1e-6 of
+// it. Narrowing the taper would change nothing measurable.
+//
+// Archive support for cycle coherence beyond the 2.7-kyr Stephenson fit window
+// is real but marginal (measured by scripts/lattice_harmonic_scan.py, against
+// a 95th-percentile permutation threshold):
+//   • EPICA CO2 (803 kyr) — all four flags clear the threshold, but every
+//     R²ₕ is ~0.01, i.e. coherence at the noise margin.
+//   • Steinhilber ¹⁰Be (9.4 kyr) — Hallstatt and Jose4 only. Jose4 was
+//     *identified by* a Steinhilber+EPICA scan, so that hit is post-selection
+//     and cannot count as independent confirmation.
+//   • Cheng speleothem (640 kyr) — nothing, for any flag. LR04 unresolvable.
+//   • Bond has the WEAKEST deep-time archive support of the four (it fails
+//     Steinhilber outright); its evidence is in the ΔT record, not the archives.
+// No flag is individually significant in the Stephenson ΔT record either — the
+// four work collectively (see docs/hidden/IP-dt-stack-flag-audit.md Stage 3).
+//
+// Fade to zero at ±400 kyr preserves the "not extrapolating to Myr-scale H(t)
+// drift" honest claim; H differs from H_J2000 by <1.5% at this range, so the
+// fixed-period assumption is valid. Constant name kept for historical continuity though the
 // window is no longer literally "Holocene".
 // Single source: model-parameters.json deepTime.dtStackTaper*HalfwidthYr
 // (mirrors src/script.js BOND_TAPER_* — same values, per-file legacy names).
@@ -416,7 +434,7 @@ function jose4CycleLodCorrection(year) {
 //
 // DEFAULT ON since the JOINT-world flip (2026-07-23): the resonator ships as
 // the 4th driver, fitted JOINTLY with the flags (--joint mode in
-// dt-corrections-fit.js; anchors USNO 86400.0015 / deltaTStart 58.48 moved
+// dt-corrections-fit.js; anchors USNO 86400.0014 / deltaTStart 56.05 moved
 // with the coefficients — its δLOD(2000) is inside the USNO closure by
 // construction). Opt-OUT via DT_RESONATOR_DISABLED=1 (mirrors the stack's
 // DT_CORRECTIONS_DISABLED). The ΔT integrator additionally gates this

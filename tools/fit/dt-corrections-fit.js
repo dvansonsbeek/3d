@@ -212,6 +212,70 @@ const CONFIG = {
   },
 };
 
+// ── Fit-window override (cross-validation hook) ────────────────────────────
+// DT_FIT_WINDOW="start:end" or "start:end:step" trains the fit on a SUB-WINDOW
+// of the Stephenson residual so the held-out remainder can score it. Purely a
+// diagnostic hook for docs/hidden/IP-dt-stack-flag-audit.md Stage 2 — when the
+// variable is unset nothing is touched and output is byte-identical.
+//
+// Refuses to combine with --write: a stack fitted on a sub-window must never be
+// shipped, since its coefficients are deliberately not fitted to the full record.
+//
+//   DT_FIT_WINDOW="-720:900" node tools/fit/dt-corrections-fit.js --joint
+if (process.env.DT_FIT_WINDOW) {
+  const parts = process.env.DT_FIT_WINDOW.split(':').map(s => Number(s.trim()));
+  if (parts.length < 2 || parts.length > 3 || !parts.every(Number.isFinite)) {
+    console.error(`DT_FIT_WINDOW must be "start:end" or "start:end:step" — got "${process.env.DT_FIT_WINDOW}"`);
+    process.exit(1);
+  }
+  const [start, end, step] = parts;
+  if (end <= start) {
+    console.error(`DT_FIT_WINDOW end (${end}) must exceed start (${start}).`);
+    process.exit(1);
+  }
+  if (process.argv.includes('--write') || process.argv.includes('--sync-code')) {
+    console.error('DT_FIT_WINDOW cannot be combined with --write/--sync-code: a stack');
+    console.error('fitted on a sub-window is a cross-validation artifact, not a shippable fit.');
+    process.exit(1);
+  }
+  CONFIG.fit_window.year_start = start;
+  CONFIG.fit_window.year_end   = end;
+  if (step !== undefined) CONFIG.fit_window.step_yr = step;
+  console.log(`  [DT_FIT_WINDOW] training window overridden → ${start}..${end} `
+            + `step ${CONFIG.fit_window.step_yr} (diagnostic; --write disabled)\n`);
+}
+
+// ── Flag-subset override (configuration sweep hook) ────────────────────────
+// DT_FLAGS="bond,hallstatt" runs the joint fit with only those flags in the
+// design matrix — Stage 3 of docs/hidden/IP-dt-stack-flag-audit.md, answering
+// "what is each flag actually buying?". Unset = all four, unchanged.
+//
+// Refuses --write: the ship path writes resonator coefficients by fixed index
+// and assumes all four flags are present, so a reduced fit must never reach it.
+const _ALL_FLAGS = ['bond', 'hallstatt', 'jose5', 'jose4'];
+let ACTIVE_FLAGS = _ALL_FLAGS;
+if (process.env.DT_FLAGS) {
+  const want = process.env.DT_FLAGS.split(',').map(s => s.trim()).filter(Boolean);
+  const bad = want.filter(f => !_ALL_FLAGS.includes(f));
+  if (bad.length) {
+    console.error(`DT_FLAGS: unknown flag(s) ${bad.join(', ')}. Valid: ${_ALL_FLAGS.join(', ')}`);
+    process.exit(1);
+  }
+  // Canonical cascade order preserved regardless of the order given.
+  ACTIVE_FLAGS = _ALL_FLAGS.filter(f => want.includes(f));
+  if (!ACTIVE_FLAGS.length) {
+    console.error('DT_FLAGS: at least one flag required.');
+    process.exit(1);
+  }
+  if (process.argv.includes('--write') || process.argv.includes('--sync-code')) {
+    console.error('DT_FLAGS cannot be combined with --write/--sync-code: the ship path');
+    console.error('assumes the full four-flag design matrix. Reduced fits are diagnostic.');
+    process.exit(1);
+  }
+  console.log(`  [DT_FLAGS] joint fit restricted to: ${ACTIVE_FLAGS.join(', ')}`
+            + ` (diagnostic; --write disabled)\n`);
+}
+
 // Runtime constant needed for the cycleLodCorrection weight formula.
 // Matches script.js: `const MEAN_TROPICAL_YEAR_J2000_S = meansolaryearlengthinDays * meanlengthofday;`
 // Approximation using 86400 s (vs runtime's 86399.99968 s) introduces ~1e-11 relative
@@ -1166,6 +1230,15 @@ function main() {
     },
     config: CONFIG,
     fit_metrics: {
+      _WARNING_NOT_THE_SHIPPED_FIT:
+        'These stage_* metrics come from the LEGACY single-shot cascade, which is a '
+        + 'stage-wise diagnostic only. They are NOT the shipped fit and must NOT be used '
+        + 'to judge whether a flag earns its place: --joint is the authoritative fit and '
+        + 're-optimises the USNO/deltaTStart anchors together with the coefficients, which '
+        + 'reverses the ranking. Worked example: these metrics show stage_d (adding Jose4) '
+        + 'RAISING rms_post 19.75 -> 21.21 s, while under --joint Jose4 is the single '
+        + 'largest contributor (Espenak RMS 34.89 -> 12.60 s). To compare configurations '
+        + 'use DT_FLAGS with --joint. See docs/105-dt-stack-flag-audit.md.',
       stage_a_bond_solo:                     { r2: fitA.r2, rms_post: fitA.rms_post, rms_post_modern: fitA.rms_post_modern },
       stage_b_bond_hallstatt_joint:          { r2: fitB.r2, rms_post: fitB.rms_post, rms_post_modern: fitB.rms_post_modern, bond_phase_shift_deg: bondPhaseShiftB, hallstatt_free_amp_s: hallFree.amplitude },
       stage_c_bond_hallstatt_jose5:          { r2: fitC.r2, rms_post: fitC.rms_post, rms_post_modern: fitC.rms_post_modern, bond_phase_shift_deg: bondPhaseShiftC, jose5_free_amp_s: joseFree.amplitude },
@@ -1333,27 +1406,38 @@ function runJointMode() {
          * (Math.cos(wTone * y - tone.phi_locked_rad) - toneC0 * Math.cos(wd * dt));
   }
 
-  const FLAG_DIVS = { bond: 1830, hallstatt: 1104, jose5: 2989, jose4: 3749 };
+  // DT_FLAGS="bond,hallstatt" restricts the joint fit to a subset of the four
+  // flags — the configuration sweep of docs/hidden/IP-dt-stack-flag-audit.md
+  // Stage 3. Unset = all four, and the design matrix is then byte-for-byte the
+  // shipped one. Column indices are derived, never hardcoded, so a reduced set
+  // stays consistent; --write is refused whenever this is set (see the guard
+  // near the top of the file), because the ship path assumes all four.
+  const ALL_FLAG_DIVS = { bond: 1830, hallstatt: 1104, jose5: 2989, jose4: 3749 };
+  const FLAG_DIVS = Object.fromEntries(
+    Object.entries(ALL_FLAG_DIVS).filter(([nm]) => ACTIVE_FLAGS.includes(nm)));
+
   const colFns = [];
   const names = [];
+  const COMP = {};
   for (const [nm, d] of Object.entries(FLAG_DIVS)) {
     const om = 2 * Math.PI * d / EIGHT_H;
+    COMP[nm] = [colFns.length, colFns.length + 1];
     colFns.push(y => Math.cos(om * y)); names.push(nm + '_cos');
     colFns.push(y => Math.sin(om * y)); names.push(nm + '_sin');
   }
-  colFns.push(y => kickUnit(0, y)); names.push('res_kick1');
-  colFns.push(y => kickUnit(1, y)); names.push('res_kick2');
-  colFns.push(y => toneUnit(y));    names.push('res_tone');
+  COMP.res_kick1 = [colFns.length]; colFns.push(y => kickUnit(0, y)); names.push('res_kick1');
+  COMP.res_kick2 = [colFns.length]; colFns.push(y => kickUnit(1, y)); names.push('res_kick2');
+  COMP.res_tone  = [colFns.length]; colFns.push(y => toneUnit(y));    names.push('res_tone');
   const N = colFns.length + 1;                       // + intercept
   const INTERCEPT = N - 1;
-  const COMP = { bond: [0, 1], hallstatt: [2, 3], jose5: [4, 5], jose4: [6, 7],
-                 res_kick1: [8], res_kick2: [9], res_tone: [10] };
   // Caps are the FIXED Stage-1 convention amplitudes. NEVER derive them from
   // the mutable resonator JSON — a previous --write stores fitted amplitudes
   // there, and deriving caps from those collapses the cap to the last fit
   // ("cap creep": each write shrinks the allowed range). Bug caught 2026-07-23.
-  const CAPS = { hallstatt: 80.0, jose5: 50.0, jose4: 50.0,
-                 res_kick1: 773.335, res_kick2: 179.324, res_tone: 186.140 };
+  const ALL_CAPS = { hallstatt: 80.0, jose5: 50.0, jose4: 50.0,
+                     res_kick1: 773.335, res_kick2: 179.324, res_tone: 186.140 };
+  // Only cap components actually present in this run's design matrix.
+  const CAPS = Object.fromEntries(Object.entries(ALL_CAPS).filter(([k]) => k in COMP));
 
   function corrAt(y, x, excludeIntercept) {
     let s = 0;
@@ -1451,7 +1535,10 @@ function runJointMode() {
   const segments = loadStephenson();
   const { years, residual } = sampleResidual(segments);
   console.log('══ JOINT MODE — 4 flags + Core-mantle swing, hard USNO closure, caps ══');
-  console.log(`  fit window −720..2017 step ${CONFIG.fit_window.step_yr}; `
+  // Window read from CONFIG so DT_FIT_WINDOW overrides are reported honestly.
+  // U+2212 minus preserved so the unset-override output stays byte-identical.
+  const _fw = (y) => String(y).replace('-', '−');
+  console.log(`  fit window ${_fw(CONFIG.fit_window.year_start)}..${_fw(CONFIG.fit_window.year_end)} step ${CONFIG.fit_window.step_yr}; `
             + `resonator convention: T₀ = 8H/${res.T0_lattice_n}, Q = ${res.Q}, `
             + `kicks ${kicks[0]}/${kicks[1]}`);
 
@@ -1471,13 +1558,14 @@ function runJointMode() {
     const rmsEsp = Math.sqrt(diffs.reduce((a, d) => a + (d - dts) ** 2, 0) / diffs.length);
     const resid = years.map((y, i) => residual[i] - corrAt(y, x, false));
     const rmsFull = Math.sqrt(resid.reduce((a, r) => a + r * r, 0) / resid.length);
-    const bondAmp = Math.hypot(x[0], x[1]);
+    // Indices derived from COMP so a reduced DT_FLAGS set still reports correctly.
+    const bondAmp = COMP.bond ? Math.hypot(x[COMP.bond[0]], x[COMP.bond[1]]) : 0;
     const row = { usno, dts, rmsEsp, rmsFull, bondAmp, x };
     rows.push(row);
     console.log(`   ${usno.toFixed(4)}   ${dts.toFixed(2).padStart(8)}   `
               + `${rmsEsp.toFixed(2).padStart(8)}  ${rmsFull.toFixed(2).padStart(7)}  `
-              + `${bondAmp.toFixed(1).padStart(6)}  ${Math.abs(x[9]).toFixed(1).padStart(6)} `
-              + `${Math.abs(x[10]).toFixed(1).padStart(6)}`);
+              + `${bondAmp.toFixed(1).padStart(6)}  ${Math.abs(x[COMP.res_kick2[0]]).toFixed(1).padStart(6)} `
+              + `${Math.abs(x[COMP.res_tone[0]]).toFixed(1).padStart(6)}`);
     // Composite selection: best Espenak SUBJECT TO ancient-window quality.
     // Espenak-only selection degenerates (prototype lesson: it accepts
     // solutions whose ancient window collapses to ~400 s).
@@ -1499,6 +1587,78 @@ function runJointMode() {
               + (cap ? `  (cap ${cap.toFixed(2)}${Math.abs(amp - cap) < 1e-6 ? ' — AT CAP' : ''})` : '  (free)'));
   }
   console.log(`    intercept  ${x[INTERCEPT].toFixed(2).padStart(8)} s  (folds into deltaTStart; not shipped)`);
+
+  // ── Held-out scoring (cross-validation hook) ──────────────────────────────
+  // Fires automatically whenever DT_FIT_WINDOW narrowed the training set, so a
+  // sub-window run can never silently report only its in-sample numbers. Scores
+  // THIS solution on the complement of the training window inside the full
+  // −720..2017 record — years the fit never saw.
+  // Criteria live in docs/hidden/IP-dt-stack-flag-audit.md Stage 2.
+  if (process.env.DT_FIT_WINDOW) {
+    const FULL_LO = -720, FULL_HI = 2017, FULL_STEP = 10;
+    const segsHo = loadStephenson();
+    const te = [];
+    for (let y = FULL_LO; y <= FULL_HI; y += FULL_STEP) {
+      if (y >= CONFIG.fit_window.year_start && y <= CONFIG.fit_window.year_end) continue;
+      const ds = stephensonDeltaT(y, segsHo);
+      const dm = DT.meanDeltaTSecondsAtAge((2000 - y) / 1e6);
+      if (Number.isFinite(ds) && Number.isFinite(dm)) te.push({ y, r: ds - dm });
+    }
+    console.log('\n  ── HELD-OUT (years the fit never saw) ──────────────────────────');
+    if (te.length < 10) {
+      console.log(`  only ${te.length} held-out samples — too few to score.`);
+    } else {
+      const rms = (a) => Math.sqrt(a.reduce((s, v) => s + v * v, 0) / a.length);
+      const rMod = te.map(t => t.r - corrAt(t.y, x, false));   // fitted stack
+      const rInt = te.map(t => t.r - x[INTERCEPT]);            // intercept only
+      const rNil = te.map(t => t.r);                           // no correction
+      const mean = te.reduce((a, t) => a + t.r, 0) / te.length;
+      const ssTot = te.reduce((a, t) => a + (t.r - mean) ** 2, 0);
+      const r2 = 1 - rMod.reduce((a, v) => a + v * v, 0) / Math.max(ssTot, 1e-12);
+      const lo = te[0].y, hi = te[te.length - 1].y;
+      console.log(`  test years ${lo}..${hi}  (n = ${te.length}, discontiguous if the`
+                + ` training window is interior)`);
+      console.log(`    fitted stack        RMS ${rms(rMod).toFixed(1).padStart(8)} s   R² ${r2 >= 0 ? '+' : ''}${r2.toFixed(4)}`);
+      console.log(`    intercept only      RMS ${rms(rInt).toFixed(1).padStart(8)} s   <- the baseline that matters`);
+      console.log(`    no correction       RMS ${rms(rNil).toFixed(1).padStart(8)} s`);
+      const beat = rms(rMod) < rms(rInt);
+      console.log(`  VERDICT: the fitted stack ${beat ? 'BEATS' : 'does NOT beat'} the intercept-only`
+                + ` baseline out-of-sample.`);
+      if (!beat) {
+        console.log('  Per Stage 2 criteria a configuration FAILS if held-out RMS exceeds');
+        console.log('  the predict-nothing baseline — extrapolating it is worse than omitting it.');
+      }
+    }
+  }
+
+  // ── Diagnostic solution dump (cross-validation hook) ──────────────────────
+  // DT_FIT_DUMP=<path> writes the joint solution to an arbitrary path so a
+  // held-out scorer can evaluate THIS fit on years it never saw. Writes only
+  // where told; never touches a shipped artifact. See
+  // docs/hidden/IP-dt-stack-flag-audit.md Stage 2.
+  if (process.env.DT_FIT_DUMP) {
+    const dump = {
+      _meta: {
+        description: 'Diagnostic joint-fit solution. NOT a shipped artifact — written '
+                   + 'only via DT_FIT_DUMP for cross-validation scoring.',
+        generator: 'tools/fit/dt-corrections-fit.js --joint',
+        train_window: { ...CONFIG.fit_window },
+        dt_fit_window_override: process.env.DT_FIT_WINDOW || null,
+      },
+      usno: best.usno,
+      deltaTStart: best.dts,
+      rms_espenak_train: best.rmsEsp,
+      rms_full_train: best.rmsFull,
+      x: Array.from(x),
+      comp_index: COMP,
+      intercept_index: INTERCEPT,
+      amplitudes: Object.fromEntries(Object.entries(COMP).map(([comp, idx]) =>
+        [comp, idx.length === 2 ? Math.hypot(x[idx[0]], x[idx[1]]) : Math.abs(x[idx[0]])])),
+    };
+    fs.writeFileSync(process.env.DT_FIT_DUMP, JSON.stringify(dump, null, 2));
+    console.log(`\n  [DT_FIT_DUMP] joint solution written → ${process.env.DT_FIT_DUMP}`);
+  }
+
   if (!WRITE) {
     console.log('\n  Dry run — add --write to ship the joint world (updates');
     console.log('  data/deltaT-4flag-fit.json, data/core-mantle-resonator-stage1.json,');

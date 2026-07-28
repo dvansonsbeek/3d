@@ -5261,14 +5261,31 @@ const BOND_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / BOND_LATTICE_N; 
 const BOND_OMEGA                  = 2 * Math.PI / BOND_PERIOD_YR;
 const BOND_COS_COEFF_S            = 145.59456999025969;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
 const BOND_SIN_COEFF_S            = 329.22555981262514;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
-// Cyclic-correction taper widened 2026-07-12 from ±4.5/6 kyr Holocene window to
-// ±300/400 kyr — cross-archive validation across Steinhilber ¹⁰Be (9.4 kyr),
-// EPICA CO2 (800 kyr), and Cheng speleothem (640 kyr) supports cycle coherence
-// well beyond the original 2.7-kyr Stephenson fit window. Fade to zero at
-// ±400 kyr preserves the "not extrapolating to Myr-scale H(t) drift" honest
-// claim; H differs from H_J2000 by <1.5% at this range, so the fixed-period
-// assumption is valid. Constant name kept for historical continuity though the
-// window is no longer literally "Holocene".
+// Cyclic-correction taper: full to ±300 kyr, fading to zero at ±400 kyr.
+//
+// The width is a SAFETY CHOICE, not a value derived from data, and it is not
+// observationally consequential: the stack's ΔT contribution is a sum of
+// bounded sinusoids (≤ ~±420 s at any age) while ΔT itself grows quadratically,
+// so beyond ~10 kyr the stack is under 0.1% of ΔT and by −300 kyr under 1e-6 of
+// it. Narrowing the taper would change nothing measurable.
+//
+// Archive support for cycle coherence beyond the 2.7-kyr Stephenson fit window
+// is real but marginal (scripts/lattice_harmonic_scan.py, 95th-percentile
+// permutation threshold):
+//   • EPICA CO2 (803 kyr) — all four flags clear it, but every R²ₕ is ~0.01,
+//     i.e. coherence at the noise margin.
+//   • Steinhilber ¹⁰Be (9.4 kyr) — Hallstatt and Jose4 only, and Jose4 was
+//     *identified by* a Steinhilber+EPICA scan, so that hit is post-selection.
+//   • Cheng speleothem (640 kyr) — nothing, for any flag. LR04 unresolvable.
+//   • Bond has the WEAKEST deep-time archive support of the four (fails
+//     Steinhilber); its evidence is in the ΔT record, not the archives.
+// No flag is individually significant in the Stephenson ΔT record either — the
+// four work collectively. Full audit: docs/105-dt-stack-flag-audit.md.
+//
+// Fade to zero at ±400 kyr preserves the "not extrapolating to Myr-scale H(t)
+// drift" honest claim; H differs from H_J2000 by <1.5% at this range, so the
+// fixed-period assumption is valid. Constant name kept for historical
+// continuity though the window is no longer literally "Holocene".
 // BOND_TAPER_FULL/TOTAL_HALFWIDTH_YR live in section C3 "Deep-time physics anchors" near the top.
 // Anchor calibration constant: Bond cyclic value at exactly year 2000.
 // Subtracted from the raw cyclic evaluation so bondCycleDeltaTCorrection(2000) === 0.
@@ -25031,7 +25048,9 @@ function closeEssrtPanel() {
 // LOD-CLIMATE RHYTHM (.lcr-)
 // All-cycles stack vs named historical climate transitions.
 // Reuses .cfm-* CSS classes for modal chrome.
-// See docs/hidden/IP-lod-climate-rhythm.md for the implementation plan.
+// Plan archived (Stages 2 + 3 closed, not built): see
+// docs/hidden/old-documents/IP-lod-climate-rhythm.md. Findings live in
+// docs/102 § "Defensible scientific position" item 7 and docs/105.
 // ═══════════════════════════════════════════════════════════════════
 
 let lcrPanel = null;
@@ -25086,10 +25105,13 @@ const LCR_BOND_EVENTS = [
 //     inverted δ¹⁸O anomaly — covers the full 200-kyr glacial tab where
 //     GISP2 runs out (~27,950 BC).
 //   - CORRELATION target = Bond 2001 IRD stack — Bond's OWN dataset, the
-//     most direct out-of-sample validation for the framework's Bond harmonic
+//     most direct out-of-sample COMPARISON for the framework's Bond harmonic
 //     (joint world, stack incl. Core-mantle swing: r = +0.36 in the
 //     validated window, r = +0.27 full overlap; pre-joint 4-flag stack
-//     gave +0.49 / +0.38).
+//     gave +0.49 / +0.38). NOT a validation: the correspondence fails its
+//     null tests and is not carried by the 1466-yr band — at that period the
+//     stack and IRD are ~175° apart. See docs/102 § "Defensible scientific
+//     position" item 7; regenerate via tools/explore/climate-band-phase.js.
 // All proxies live in lcrProxyData.sources; correlation ignores non-targets.
 const LCR_CHART_PROXY       = 'GISP2 (Alley 2000)';
 const LCR_CHART_PROXY_LR04  = 'LR04 (Lisiecki & Raymo 2005)';
@@ -26230,7 +26252,7 @@ async function createLcrPanel() {
       <label class="cfm-layer-check" title="Layer 3 net rate = Tidal + GIA + the 4 lattice cycles (Bond + Hallstatt + Jose5 + Jose4), flags only — cyclic modulation WITHOUT the Core-mantle swing. At J2000: −0.13 ms/cy."><input type="checkbox" data-lcr-layer="netL3" ${lcrLayerVisibility.netL3 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL3"></span>+ Cycles (L3)</label>
       <label class="cfm-layer-check" title="The SHIPPED observable (joint world) = Layer 4 = Tidal + GIA + 4-flag cycles + Core-mantle swing (Resonator driver, fitted jointly). At J2000: −0.08 ms/cy; the Layer-4 solar day closes the USNO anchor 86400.0014 by construction."><input type="checkbox" data-lcr-layer="netL4" ${lcrLayerVisibility.netL4 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-netL4"></span>+ Core-mantle (L4)</label>
       <label class="cfm-layer-check" title="Named climate period bands from mainstream literature. Cold = blue; Warm = red."><input type="checkbox" data-lcr-layer="bands" ${lcrLayerVisibility.bands ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bands"></span>Periods</label>
-      <label class="cfm-layer-check" title="Bond 8H/1830 harmonic ISOLATED from the 4-cycle stack. A clean 1466-yr sinusoid — its zero-crossings should align with Bond cycle timing if the framework captures the Bond cycle. Full-stack prediction has additional Hallstatt / Jose5 / Jose4 crossings on top of this."><input type="checkbox" data-lcr-layer="bondCurve" ${lcrLayerVisibility.bondCurve ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bondcurve"></span>Bond</label>
+      <label class="cfm-layer-check" title="Bond 8H/1830 harmonic ISOLATED from the 4-cycle stack. A clean 1466-yr sinusoid. TESTED: its phase does NOT align with Bond's own IRD record — band-limited projection puts the two ~175° apart, essentially anti-phase, and allowing a drifting phase does not recover alignment (PLV p = 0.49). The harmonic earns its place as a ΔT correction, not as a reproduction of the Bond climate cycle. Full-stack prediction has additional Hallstatt / Jose5 / Jose4 crossings on top of this."><input type="checkbox" data-lcr-layer="bondCurve" ${lcrLayerVisibility.bondCurve ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bondcurve"></span>Bond</label>
       <label class="cfm-layer-check" title="Core-mantle swing episode ISOLATED (Resonator driver — the 4th dLOD/dt channel): impulse-consistent damped oscillation of the core eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q = 1.8), excitation −1600, termination +1600, zero before and after. Rendered on the Net L2 baseline like the Bond curve. See docs/104."><input type="checkbox" data-lcr-layer="resonator" ${lcrLayerVisibility.resonator ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-resonator"></span>Core</label>
       <label class="cfm-layer-check" title="GISP2 Alley 2000 Greenland ice-core temperature reconstruction on the secondary right-hand °C-anomaly axis. Independent paleoclimate reconstruction — not part of the framework fit. Covers 27,950 BC to 1850 AD at 100-yr resolution, with two anchor points appended at 1950 and 2000 AD for visual continuity to the modern era."><input type="checkbox" data-lcr-layer="proxy" ${lcrLayerVisibility.proxy ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxy"></span>GISP2</label>
       <label class="cfm-layer-check" title="LR04 global benthic δ¹⁸O stack (Lisiecki & Raymo 2005, 57 sites) shown as inverted anomaly vs core-top on the secondary axis — positive = warm, same sign convention as the Bond IRD panel. Independent paleoclimate reconstruction — not part of the framework fit; the same dataset the Climate Formula Explorer fits against. 1-kyr resolution; covers the full 200,000 BC tab where GISP2 ends (~27,950 BC)."><input type="checkbox" data-lcr-layer="proxyLR04" ${lcrLayerVisibility.proxyLR04 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxylr04"></span>LR04</label>
@@ -26261,17 +26283,15 @@ async function createLcrPanel() {
         </div>
         <div class="lcr-legend-panel">
           <div class="lcr-legend-note">
-            <b>How to read</b> — each line adds one mechanism (hover a toggle for detail).
-            <b>Tidal (L1)</b>: pure Moon-recession, +2.12 ms/cy, ~flat.
-            <b>+ GIA (L2)</b>: two-signed mass response (−0.35 ms/cy at J2000; positive during ice growth).
-            <b>+ Cycles (L3)</b>: Bond + Hallstatt + Jose5 + Jose4.
-            <b>+ Core-mantle (L4)</b>: core swing — the shipped observable.
-            <b>Bond</b> / <b>Core</b> isolate single components. Full stack ↔ Bond 2001 IRD
-            <b>r = ${lcrLegendR}</b> (out-of-sample).
-            <br/><b>Opposite signs, different quantities.</b> <b>GIA</b> — the teal line <i>dipping</i>
-            marks rebound, melting under way; peak warmth follows ~4–6 kyr later (<b>shorter</b> day).
-            <b>Cycles</b> — warm ⇔ Σ_stack &gt; 0 (<b>longer</b> day), where Σ_stack is the running total
-            of the orange-minus-teal gap (L4 − L2), not either line's height; the panel below computes it.
+            <b>How to read</b> — each line adds one mechanism; hover a toggle for detail.
+            <b>Tidal (L1)</b> +2.12 ms/cy, flat · <b>+ GIA (L2)</b> two-signed, −0.35 at J2000 ·
+            <b>+ Cycles (L3)</b> the 4 flags · <b>+ Core-mantle (L4)</b> the shipped observable.
+            <b>Bond</b>/<b>Core</b> isolate single components; full stack ↔ Bond IRD <b>r = ${lcrLegendR}</b>.
+            <br/><b>Don't swap these two readings.</b> <b>GIA</b> — teal below rust = mantle still
+            rebounding from past ice loss, which outlasts the melting, so only its <i>deepest</i> excursion
+            marks peak melt. <b>Cycles</b> — the orange-minus-teal gap accumulates into Σ_stack
+            (&gt; 0 = longer day); surface mass and solid Earth move rotation <i>opposite</i> ways, and
+            Σ_stack's sign is <b>not</b> a validated warm/cold rule.
           </div>
         </div>
         <details class="lcr-match-panel lcr-details">
@@ -34533,9 +34553,11 @@ function setupGUI() {
   //   TROUGH crossing (derivative − → +): stack at MIN; going forward stack adds LOD,
   //     Earth slows more than secular → COOLING starts.
   //   Match each crossing to nearest named climate transition of matching sign.
-  //   Empirical validation that the 4-flag stack's H-lattice periods (Bond 1466,
-  //   Hallstatt 2430, Jose5 897, Jose4 716 yr) time the historical climate rhythm
-  //   despite the fit targeting Espenak ΔT, not climate proxies.
+  //   Exploratory comparison of the 4-flag stack's H-lattice periods (Bond 1466,
+  //   Hallstatt 2430, Jose5 897, Jose4 716 yr) against the historical climate
+  //   rhythm, the fit having targeted Espenak ΔT rather than climate proxies.
+  //   NOT a validation: the match does not beat a Monte-Carlo null (p ≈ 0.19),
+  //   and the band-limited phase tests are negative. See docs/102 item 7.
   // ────────────────────────────────────────────────────────────────────────
   addTestButton('All cycles (4-flag stack) ↔ climate transitions', () => {
     console.log('\n════════════════════════════════════════════════════════════════════════════════════');
@@ -34662,8 +34684,13 @@ function setupGUI() {
     console.log('  its zero-crossings should coincide with the mainstream climate-transition dates within');
     console.log('  the uncertainty of the literature dates themselves (~50-200 yr for pre-instrumental).');
     console.log('  The fit targeted Espenak ΔT 1650-2017 only — climate proxies were NOT in the loop.');
-    console.log('  A tight match (mean |offset| < 200 yr) is out-of-sample evidence that the H-lattice');
-    console.log('  periods (Bond, Hallstatt, Jose5, Jose4) are physically real, not curve-fitting artifacts.');
+    console.log('  ⚠ Do NOT read a tight match as evidence that the H-lattice periods are physically');
+    console.log('  real. Against a Monte-Carlo null that scatters the same 7 TROUGH + 3 PEAK events at');
+    console.log('  random over the same typed crossings, the null median is 353 yr — the observed');
+    console.log('  median 262 yr gives p ≈ 0.19, not significant. And "10/10 within ±500 yr" is near-');
+    console.log('  guaranteed by construction: typed crossing spacing is ~1,170 yr, so almost nothing');
+    console.log('  in the window CAN sit more than ~580 yr from a matching crossing.');
+    console.log('  Regenerate: node tools/explore/climate-crossing-null.js — see docs/102 item 7.');
     console.log('  ⚠ Joint-world reading: the flags and the Core-mantle swing were REFIT TOGETHER, so');
     console.log('  part of the medieval/late-Holocene structure the pre-joint 4-flag stack carried alone');
     console.log('  now lives in the swing (excluded here as core-supplied, not climate). Expect the');

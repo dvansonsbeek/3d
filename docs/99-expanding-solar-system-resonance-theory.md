@@ -1587,14 +1587,23 @@ this subject backwards.
 
 ### Two channels, opposite signs
 
-The framework's rotation–climate link runs through **two distinct channels that
+Climate reaches Earth's rotation through **two distinct physical mechanisms that
 respond to the same climate signal with opposite sign and different lag**. Any
 statement of the form "warm means the day gets longer/shorter" is incomplete
-until it says which channel it means.
+until it says which mechanism it means. This is standard geophysics and holds
+independently of anything in this framework.
+
+**One caveat before the table.** The α(t) channel *implements* the solid-Earth
+mechanism by construction — it is anchored on Cox & Chao satellite gravimetry
+and its sign follows from the mantle flow. The 4-flag stack is *hypothesised* to
+carry the surface-mass mechanism, but that identification is **not established**:
+the stack's climate correspondence fails its null tests (§ above, and doc 102
+item 7). Read the stack row as the mechanism it is proposed to represent, not as
+a demonstrated property of the flags.
 
 | | Physical process | Response to warming | Timescale |
 |---|---|---|---|
-| **Stack channel** (Bond/Hallstatt/Jose5/Jose4) | surface mass: ice → meltwater spread through the global ocean, mass moves equatorward | moment of inertia **up** → day **lengthens** → Σ_stack > 0 | fast, effectively concurrent |
+| **Surface-mass mechanism** (proposed home of the Bond/Hallstatt/Jose5/Jose4 stack) | ice → meltwater spread through the global ocean, mass moves equatorward | moment of inertia **up** → day **lengthens** → Σ_stack > 0 | fast, effectively concurrent |
 | **α(t) / GIA channel** | solid Earth: mantle rebounds poleward once the ice load is removed | moment of inertia **down** → day **shortens** | lagged by the mantle relaxation time (τ ≈ 4–6 kyr) |
 
 Both are physically real, and their opposition is not a contradiction — it is

@@ -20,7 +20,8 @@
 const fs = require('fs');
 const path = require('path');
 const REPO = path.join(__dirname, '..', '..');
-// Single source of truth (joint-world value 58.48 since the flip)
+// Single source of truth — read from astro-reference.json, never hardcoded
+// (joint-world value is 56.05 s; the JSON is authoritative if they disagree)
 const DELTA_T_START = JSON.parse(fs.readFileSync(
   path.join(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'),
   'utf8')).earthOrbital.deltaTStart;

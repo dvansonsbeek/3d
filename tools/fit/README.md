@@ -205,7 +205,7 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `python/greedy_features_physical.py` | Candidate features for ML (physical-beat basis) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
 | `../../scripts/fibonacci_significance.py` | `data/significance-results.json` (combined p + sigma via Stouffer's Z with correlation correction; Fisher's reported for transparency; 11 tests × 3 null distributions) | `tools/lib/python/constants_scripts.py` |
-| `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond 8H/1830, Hallstatt 8H/1104, Jose5 8H/2989, Jose4 8H/3749) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (USNO 86400.0015, deltaTStart 58.48, Espenak RMS 12.54 s, full-window 32.4 s). The legacy single-shot cascade remains as a stage-wise diagnostic; the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
+| `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond 8H/1830, Hallstatt 8H/1104, Jose5 8H/2989, Jose4 8H/3749) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (USNO 86400.0014, deltaTStart 56.05, Espenak RMS 12.60 s, full-window 31.31 s). The legacy single-shot cascade remains as a stage-wise diagnostic — **its `fit_metrics.stage_*` entries in `deltaT-4flag-fit.json` rank the flags differently from the shipped fit and must not be used to judge whether a flag earns its place** (worked example and the correct method in [doc 105](../../docs/105-dt-stack-flag-audit.md)); the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
 | `../../scripts/lattice_harmonic_scan.py` | `data/lattice-scan-<tag>.json` — universal 8H-lattice harmonic scan across multiple paleoclimate archives (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem δ18O, EPICA CO2, LR04 δ18O). Enumerates gcd-compliant divisors in a period band, fits each candidate against each dataset, ranks by cross-dataset consistency. Used to identify Jose4 (4×Jose 715 yr) as the 4th flag with cross-archive coherence. | Multiple paleoclimate proxies in `data/` and `public/input/` |
 | `../../scripts/archive/core_mantle_resonator_stage1.py` | `data/core-mantle-resonator-stage1.json` — the **Core-mantle swing (Resonator driver)** shipped block: a 2-kick EPISODE (windowed damped oscillation, T₀ = 8H/`RES_T0_LATTICE_N` lattice-labeled, Q, kick epochs/coefficients, phase-locked drive tone). Selection rule: pinned-lattice-T₀ guard-passers first (guard-aware solver — modern-window δLOD penalty rows). **Regeneration in the joint world: amplitudes refit automatically via `--joint --write` (tone menu derives from the active flags — generic over flag count). The episode CONVENTION (T₀ = 8H/685, Q = 1.8, epochs −1600/+1600, impulse-consistent shapes) is re-derived only if ever needed via the archived stage-1/stage-3/impulse scripts.** Kick epochs are a documented CONVENTION, not data-pinned — see the stage-3 stability artifact before moving them. | Stephenson residual after the shipped stack (node bridge to `tools/lib/deep-time.js`) + `data/deltaT-4flag-fit.json` (parents' phases for the locked tones) |
 | `../../scripts/archive/core_mantle_resonator_stage3_stability.py` | `data/core-mantle-resonator-stage3-stability.json` — kick-epoch stability: coordinate refinement, ridge map + 2% stability box, era jackknife. Verdict 2026-07: epochs NOT data-pinnable (broad t_exc/T₀ ridge, era-dependent jackknife) → shipped epochs stand as convention. | same residual |
@@ -1142,6 +1142,37 @@ Steps 5a and 5b use `prepareForFitting()` which disables the target layer(s) so 
 fitter sees residuals without its own layer's contribution.
 
 For full details see [docs/71 — Correction Stack Architecture](../../docs/71-correction-stack-architecture.md).
+
+## ΔT stack diagnostic hooks (dt-corrections-fit.js)
+
+Three environment variables turn the fitter into a cross-validation instrument.
+All are diagnostic-only and **refuse `--write`/`--sync-code`**; with every one
+unset, output is byte-identical to the shipped run.
+
+| variable | effect |
+|---|---|
+| `DT_FIT_WINDOW="start:end[:step]"` | train on a sub-window; the held-out complement of −720…2017 is scored automatically, against an intercept-only baseline |
+| `DT_FLAGS="bond,hallstatt,jose5,jose4"` | restrict the joint design matrix to a subset of flags |
+| `DT_FIT_DUMP=<path>` | write the joint solution (coefficients, anchors, amplitudes) to an arbitrary path |
+
+```bash
+# in-sample: what does a configuration buy?
+DT_FLAGS="bond,hallstatt" DT_CORRECTIONS_DISABLED=1 \
+  node tools/fit/dt-corrections-fit.js --joint
+
+# out-of-sample: can it predict the pre-CE era it never saw?
+DT_FLAGS="bond,hallstatt" DT_FIT_WINDOW="0:2017" DT_CORRECTIONS_DISABLED=1 \
+  node tools/fit/dt-corrections-fit.js --joint
+```
+
+Two traps, both documented with worked examples in
+[doc 105](../../docs/105-dt-stack-flag-audit.md):
+
+- **Never judge a flag from `fit_metrics.stage_*`** — those are legacy cascade
+  diagnostics and rank the flags differently from `--joint`.
+- **Never judge Jose5 or Jose4 singly.** They are a coupled pair (897 yr and
+  715.5 yr); each looks poor without the other while the pair is optimal. Use
+  leave-one-out, not a cumulative cascade.
 
 ## Python-Node.js bridge
 
