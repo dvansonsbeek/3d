@@ -399,11 +399,30 @@ framework-native default now subtracts the aberration ANALYTICALLY
 Sun vector itself framework-native — rates from the framework year + H/16
 perihelion, equation-of-center from the Kepler identity) plus the small
 residual `MOON_CORRECTION_RESIDUAL` (source of truth
-fitted-coefficients.json; dominated by raCosMp −0.001421° = 5.1″, the
-Meeus-vs-DE440 series-truncation class — the ONE genuinely fitted value
-left; everything aberration-shaped ≤ 0.13″). A weighted refit against the
-full 6,088-point baseline reproduces the shipped residual to 0.12″ —
-already optimal. J2000 witness reference: RA 222.45959 / Dec −10.90333.
+fitted-coefficients.json; dominated by raCosMp −0.001421° = 5.1″ — the ONE
+genuinely fitted value left; everything aberration-shaped ≤ 0.13″). A
+weighted refit against the full 6,088-point baseline reproduces the shipped
+residual to 0.12″ — already optimal. J2000 witness reference:
+RA 222.45959 / Dec −10.90333.
+
+**The 5.1″ term — attributed by decomposition (truncation reading
+refuted).** The full ELP-2000/82B series (37,863 terms; data git-archived
+at commit 3200493) was evaluated against the production Meeus-60 tables
+over the 2000–2050 fit window and LSQ-projected onto the exact 12-term
+patch basis (`tools/explore/residual-attribution-elp.js`; evaluator parity:
+ELP−Meeus RMS 3.13″ lon / 0.99″ lat, inside Meeus's stated ~10″/4″ class).
+Result: series truncation predicts raCosMp = **+1.15″** — wrong sign and
+~4.5× too small — so "series-truncation artifact" is REFUTED as the story
+of the shipped −5.12″. Measured decomposition: **+1.15″ named truncation
+content** (almost entirely the planetary family — Meeus compresses ELP's
+~14,000-term planetary series into 3 additive terms; the main-problem
+60-term cut itself contributes only −0.04″, i.e. Meeus's truncation is
+excellent) **− 6.27″ Meeus/ELP82-lineage → DE440 ephemeris-generation
+gap** (the modern-ephemeris correction class that MPP02 embodies; naming
+its terms would require the MPP02 series, not in-repo). Classification:
+attributed in class — documented model lineage, not free physics. All
+other basis coefficients are dust (≤ 0.13″) in both the prediction and
+the shipped patch.
 
 **The inclination convention.** The input `moonEclipticInclinationJ2000`
 is the Moon's DYNAMICAL mean osculating inclination **5.1573°** (measured
@@ -418,6 +437,37 @@ compression to 1″ at the real Moon and is disproved as a theorem by m-scaling
 (`tools/explore/v4-i-theorem.js`) — a parameter coincidence
 ((3/2)e_M² + sin²i/8 ≈ m² at our Moon); the analytic theorem needs a
 leakage-clean estimator (open research).
+
+**The Cassini axial tilt — ε_ecl derived.** The Moon's obliquity to the
+ecliptic (measured ε_ecl = 1.5424° — the only independently measured member
+of the catalog composition moonTilt 6.687° = i + ε) is derived as the
+equilibrium of Cassini state 2 (`tools/explore/cassini-moontilt.js`):
+numerical gravity-gradient torque averaging over the locked triaxial figure
+(elliptical orbit, uniform synchronous rotation, perigee-azimuth averaged;
+solar term 2-D-averaged) balanced against the framework's of-date node
+regression. Inputs: three documented observed constants of the lunar gravity
+field (J₂ = 203.305e-6, C₂₂ = 22.4261e-6, C/MR² = 0.392728 — GRAIL+LLR,
+Williams et al. 2014) plus framework rates (sidereal month, of-date nodal
+period 6798.3303 d, sidereal year, mass ratio; the Earth-only torque mass
+fraction M_E/(M_E+M_M) is a 1.2% term first-order treatments miss). Result:
+**ε = 1.5528° at the Brown-convention i (100.7% of measured; 1.5563° at the
+dynamical i — ∂ε/∂i ≈ 0.295 makes the convention worth 13″)**. The
+rigid-figure remainder of **37″** is attributed to the Sun-coherent orbit
+oscillations the unperturbed-ellipse average omits (node libration ±1.4°,
+i-oscillation ±0.15° — synchronized with the torque phase, so they do not
+average out); the fluid core is quantitatively EXCLUDED as the owner — the
+direct CMB pressure-torque capacity bracket (C_f/C = 7.0e-4,
+f_cmb = 2.2e-4) is ~170× too small (0.004% of the balance), consistent
+with the arcsecond-level core/dissipation pole signatures in LLR.
+Classification: rigid-figure **derived**, solar-coupling channel
+**attributed** (the coupled perturbed-orbit average is the upgrade path). Scene fix (shipped): the mesh tilt
+composes `moonEclipticInclinationJ2000 + moonObliquityEclipticJ2000`
+(6.6997° in the scene's own convention) so the rendered spin-to-ecliptic
+obliquity equals the measured 1.5424° (previously the catalog 6.687°
+composition rendered 1.530°); `moonObliquityEclipticJ2000` lives in
+astro-reference.json with export-to-script sync and tools mirrors, and the
+refuted "moonTilt − I_E ≈ i" display composition is replaced by the
+dynamical inclination constant.
 
 **Stage 2 -- Visual 3D position correction**:
 

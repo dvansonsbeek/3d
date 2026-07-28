@@ -116,6 +116,7 @@ const moonNodalPrecessionDaysInputICRF = astroRef.moonReference.moonNodalPrecess
 const moonDistance = astroRef.moonReference.moonDistance;
 const moonEclipticInclinationJ2000 = astroRef.moonReference.moonEclipticInclinationJ2000;
 const moonOrbitalEccentricity = astroRef.moonReference.moonOrbitalEccentricityBase;
+const moonObliquityEclipticJ2000 = astroRef.moonReference.moonObliquityEclipticJ2000;
 const moonTilt = astroRef.moonReference.moonTilt;
 const moonMeeusLpCorrection = modelParams.moon.moonMeeusLpCorrection || 0;
 const moonStartposApsidal = modelParams.moon.moonStartposApsidal;
@@ -671,6 +672,7 @@ module.exports = {
   GRAVITATION_CORRECTION,
   ELONGATION_CORRECTION,
   moonOrbitalEccentricity,
+  moonObliquityEclipticJ2000,
   moonTilt,
   moonStartposApsidal,
   moonStartposNodal,

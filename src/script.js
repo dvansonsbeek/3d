@@ -131,7 +131,8 @@ const moonNodalPrecessionDaysInputICRF   = 6798.38;       // Meeus nodal period;
 let   moonDistance = 384399.07;                           // Mean Earth-Moon distance (km; Phase 2: mutable for deep-time mode)
 const moonEclipticInclinationJ2000 = 5.1573;              // Moon DYNAMICAL mean osculating inclination at J2000 (v4 E3c; the Brown/ELP theory constant 5.1453964 = sinF normalization is the documented partner in astro-reference.json)
 const moonOrbitalEccentricityBase = 0.054900489;          // Moon orbital eccentricity
-const moonTilt = 6.687;                                   // Moon axial tilt
+const moonObliquityEclipticJ2000 = 1.5424;                // MEASURED lunar spin-to-ecliptic obliquity; Cassini-state DERIVED at 100.7% rigid-figure (tools/explore/cassini-moontilt.js; 37″ remainder = Sun-coherent orbit-oscillation couplings, core excluded ~170×, docs/66 §1)
+const moonTilt = 6.687;                                   // Moon axial tilt — catalog CONVENTION-COMPOSED value (Brown 5.1454 + measured 1.5424); display/reference only, the mesh composes i + ε in the scene's own convention
 
 // ─── C3. Deep-time physics anchors (SYNCED — do not hand-edit) ────────────
 // Single source of truth: public/input/astro-reference.json (physicalConstants)
@@ -2973,7 +2974,9 @@ const MOON_CORRECTION = { raSinD: 0.000002, raCosD: -0.005654, raSinMp: -0.00002
 // D5 derived optics: the framework-native runtime subtracts the ANALYTIC
 // annual aberration (speedOfLight + Sun velocity — the fitted patch above was
 // 98–102% aberration-shaped); this residual is what genuinely remains
-// (dominated by the 5.1″ raCosMp Meeus-vs-DE440 truncation term). KEEP IN
+// (dominated by the 5.1″ raCosMp term — measured decomposition: +1.15″ named
+// planetary-series truncation − 6.27″ Meeus-lineage→DE440 ephemeris-generation
+// gap; tools/explore/residual-attribution-elp.js, docs/66 §1). KEEP IN
 // SYNC with fitted-coefficients.json MOON_CORRECTION_RESIDUAL (derivation:
 // tools/explore/derive-moon-correction-content.js).
 const MOON_CORRECTION_RESIDUAL = { raSinD: 0.000002, raCosD: 0.000003, raSinMp: -0.000027, raCosMp: -0.001421, raSinMs: -0.000036, raCosMs: 0.000028, decSinD: 0.000015, decCosD: -0.000009, decSinMp: 0.000015, decCosMp: -0.000026, decSinMs: 0.000024, decCosMs: -0.000006 };
@@ -9701,7 +9704,7 @@ const moon = {
   startPos: moonStartposMoon,
   speed: (Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonNodalMonth,  // draconitic (nodal-month) clock 27.2122209 d (+84.332861 rad/yr) — layer sum = tropical month by exact integer identity
   rotationSpeed: 0,
-  tilt: -moonTilt,
+  tilt: -(moonEclipticInclinationJ2000 + moonObliquityEclipticJ2000),  // Cassini composition in the scene's own convention (5.1573 + 1.5424 = 6.6997): rendered spin-to-ecliptic = measured 1.5424° (catalog 6.687 is the Brown-convention composition)
   orbitRadius: (moonDistance/currentAUDistance)*100,
   orbitCentera: 0,
   orbitCenterb: 0,
@@ -51600,15 +51603,15 @@ const planetStats = {
      null,
       {label : () => `Axial tilt`,
        value : [ { v: () => moonTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Tilt of Moon's equator to the ecliptic. Moon's axis precesses with an 18.6-year period`],
+       hover : [`Catalog CONVENTION-COMPOSED tilt: Brown/ELP inclination constant 5.1454° + measured spin-to-ecliptic obliquity ε_ecl = 1.5424°. The mesh applies the same composition in the scene's own convention (dynamical i 5.1573° + ε 1.5424° = 6.6997°) so the rendered obliquity to the ecliptic equals the measured 1.5424°. ε_ecl is Cassini-state DERIVED at 100.7% from GRAIL/LLR J₂/C₂₂/C-MR² + the framework's node rate (tools/explore/cassini-moontilt.js); the 37″ remainder is attributed to the Sun-coherent orbit-oscillation couplings (core excluded ~170× by the capacity bracket). The axis co-precesses with the node (18.6-yr period, Cassini's third law)`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => moonOrbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],
        hover : [`Eccentricity of Moon's orbit around Earth. Varies 0.026–0.077 due to solar perturbations`],
        constant: true},
       {label : () => `Ecliptic Inclination (i)`,
-       value : [ { v: () => moonTilt - o.earthInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`moonTilt (${moonTilt}°) − Earth's Inv. plane inclination (I): oscillates ~5.00°–5.30°, mean 5.145° at J2000`]},
+       value : [ { v: () => moonEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`DYNAMICAL mean osculating inclination of the lunar orbit to the ecliptic (h-vector mean; osculating range ~4.98°–5.30°). The Brown/ELP theory constant 5.1453964° (sinF normalization) is the documented partner. Note: the old display composition moonTilt − Earth's inv-plane inclination ≈ 5.145° is a refuted near-identity (ε_ecl is a Cassini-state equilibrium, NOT Earth's invariable-plane inclination — misses by 2.2′)`]},
       'null_row',
 
     {header : '—  Gravitational Influence Zones —' },

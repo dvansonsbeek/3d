@@ -996,7 +996,7 @@ function buildSceneGraph() {
     orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: Math.cos((-90 + 180) * d2r) * -C.moonEclipticInclinationJ2000,  // 5.14° tilt lives here (below the nodal spin)
     orbitTiltb: Math.sin((-90 + 180) * d2r) * -C.moonEclipticInclinationJ2000,
-    tilt: -C.moonTilt,
+    tilt: -(C.moonEclipticInclinationJ2000 + C.moonObliquityEclipticJ2000),  // Cassini composition in the scene's own convention (mirrors src/script.js moon.tilt)
     startPos: C.moonStartposMoon,
     speed: (Math.PI * 2) / (1 / (C.meanSolarYearDays / C.moonNodalMonth)),  // draconitic (nodal-month) clock
     eccentricity: C.moonOrbitalEccentricity,

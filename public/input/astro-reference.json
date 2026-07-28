@@ -53,7 +53,10 @@
     "moonEclipticInclinationJ2000": 5.1573,
     "moonInclinationConstantBrownELP": 5.1453964,
     "moonOrbitalEccentricityBase": 0.054900489,
-    "moonTilt": 6.687
+    "moonObliquityEclipticJ2000": 1.5424,
+    "_comment_moonObliquity": "Measured obliquity of the lunar spin axis to the ecliptic (the only independently MEASURED member of the moonTilt composition). Cassini-state DERIVED at 100.7% rigid-figure (1.5528 deg from GRAIL/LLR J2/C22/C-MR2 + framework rates; 37 arcsec remainder attributed to the Sun-coherent orbit-oscillation couplings, fluid core excluded ~170x by the capacity bracket) - tools/explore/cassini-moontilt.js, docs/66 par 1. The scene mesh tilt composes moonEclipticInclinationJ2000 + this value so the rendered spin-to-ecliptic obliquity equals the measured 1.5424.",
+    "moonTilt": 6.687,
+    "_comment_moonTilt": "Catalog CONVENTION-COMPOSED axial tilt: Brown/ELP constant 5.1453964 + measured obliquity 1.5424 = 6.6878. Kept for display/reference; the scene geometry uses the composition in its own (dynamical-inclination) convention."
   },
   "moonMeeus": {
     "_description": "Lunar mean longitude coefficients (Meeus Ch. 47). Full perturbation tables in tools/lib/constants/meeus-lunar-tables.json.",

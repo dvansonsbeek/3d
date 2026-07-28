@@ -311,6 +311,7 @@ replaceConst('deltaTStart', ar.earthOrbital.deltaTStart);
 replaceConst('moonDistance', ar.moonReference.moonDistance);
 replaceConst('moonOrbitalEccentricityBase', ar.moonReference.moonOrbitalEccentricityBase);
 replaceConst('moonEclipticInclinationJ2000', ar.moonReference.moonEclipticInclinationJ2000);
+replaceConst('moonObliquityEclipticJ2000', ar.moonReference.moonObliquityEclipticJ2000);
 replaceConst('moonTilt', ar.moonReference.moonTilt);
 
 // ─── Browser ASTRO_REFERENCE object-literal keys (source of truth: astro-reference.json) ───
