@@ -465,11 +465,15 @@ than adopting the least-bad story:
 | **The fixed-axis averaging assumption itself** | **−29.3″** | **The answer: 64% of the discrepancy** (`tools/explore/moon-euler-rotation.js`) |
 
 **The formulation, not a correction.** That every named channel fell short by
-5–10× was the clue: the missing physics was not a term but an assumption. The
+5–10× was the clue, and it pointed at the method rather than at the Moon. The
 averaged balance solves for a body spinning *uniformly about a fixed axis*;
 the real Moon obeys the coupled Euler equations, in which the pole orientation
 and the physical librations evolve together. A fixed-axis average cannot
-contain that coupling at all. Integrating the full rigid-body rotation —
+contain that coupling at all. This is not a discovery about lunar dynamics —
+it is standard practice in the field, and the reason modern lunar rotation
+theory integrates the Euler equations numerically instead of using averaged
+forms at sub-percent precision. What follows is the framework catching up to
+that standard with its own constants. Integrating the full rigid-body rotation —
 3-DOF Euler equations, torque from Earth and the Sun over the real
 ELP-2000/82B orbit, RK4, no averaging anywhere — gives
 
@@ -488,26 +492,36 @@ independent of the starting obliquity to **0.6″** (runs from 1.5551° and
 size; the free modes (libration ~1057 d, free precession ~81 yr) are
 oscillatory about the forced state and average out over the 250-yr span.
 
+**Status: closed.** ε_ecl is classified **derived to 0.30%**. The residual
+16.5″ is the size of the known channels this rigid treatment omits — elastic
+(k₂) modification of the effective moments, degree-3 gravity, and a two-layer
+mantle+core solution — and is left **named rather than absorbed**; chasing it
+further is lunar interior physics, not framework physics, and the
+investigation is closed by decision. What is claimed: the framework's own
+month, node rate and mass ratio, plus three published gravity coefficients
+and Newtonian gravity, reproduce a lunar constant the model previously
+adopted, with nothing fitted.
+
 The coupled average (`--` the whole-orbit torque integral over the real
 ELP-2000/82B orbit, 18.6 yr, in the frame co-rotating with the mean node)
 therefore gives **ε = 1.5551° (100.83%)** against the rigid pass's 1.5528°
-(100.7%). Both bracket the measurement at the ~1% level, which is the
-derivation claim; the ~0.8% channel that would close it is an explicit open
-question. No input can absorb it: closing the gap would require C/MR² wrong
-by 0.8% (known to 3×10⁻⁵), J₂ wrong by 0.8% (known to 10⁻⁹), or the node
-period wrong by 56 days. Classification: rigid-figure **derived**, remainder
-**open**.
+(100.7%). Neither averaged pass reaches the measurement, and no input can
+absorb the difference: that would require C/MR² wrong by 0.8% (known to
+3×10⁻⁵), J₂ wrong by 0.8% (known to 10⁻⁹), or the node period wrong by 56
+days. The resolution is in the next paragraph — the averaging itself.
 
 **The lab is verified, so the gap is physics, not arithmetic.** The circular
 locked-orbit average is analytically closed:
 `⟨(r̂ × I·r̂)_y⟩ = sinψ · [ −A/2 + (C/2)cosψ + (1−cosψ)((3/8)A + (1/8)B) ]`
 with ψ = i + ε. The lab's numerical average reproduces it to **1.00000** (a
-permanent self-test in the script). Worth knowing: this is *not* the textbook
-first-order form `(C−A)/2·sinψ` — the bracket is a near-total cancellation of
-large terms, so the O(ψ²) pieces survive and the naive form overstates the
-torque by **0.62%**, which is the same size as the discrepancy under
-investigation. Any sub-percent claim about a Cassini state has to pass this
-test before its residual means anything.
+permanent self-test in the script). Worth knowing when reading this section:
+the bracket is *not* the textbook first-order form `(C−A)/2·sinψ`. It is a
+near-total cancellation of large terms, so the O(ψ²) pieces survive and the
+naive form overstates the torque by **0.62%** — the same size as the
+discrepancy under investigation. Specialists know this (it is part of why the
+field integrates rather than averages); it is recorded here so that anyone
+re-deriving this section from the first-order relation understands why their
+number will differ.
 
 A framework cross-connection worth recording: the ⟨r⁻³⟩ enhancement of
 0.276% over the Keplerian ellipse is the torque-problem face of the same
