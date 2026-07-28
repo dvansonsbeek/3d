@@ -462,6 +462,31 @@ than adopting the least-bad story:
 | Node-rate frame (equinox-of-date → inertial) | −5.2″ | Real and correct — Cassini's laws are stated in the inertial ecliptic, so the shipped figure adopts it |
 | Sun-coherent orbit orientation (node libration ±1.4°, i-oscillation ±0.15°) | −6.5″ | Right sign, ~5× too small — **refutes the earlier attribution** |
 | Real-orbit radial content ⟨r⁻³⟩ (1.00276 × Keplerian) | +20.0″ | Wrong sign — the coupled average lands *further* from the measurement than the rigid one |
+| **The fixed-axis averaging assumption itself** | **−29.3″** | **The answer: 64% of the discrepancy** (`tools/explore/moon-euler-rotation.js`) |
+
+**The formulation, not a correction.** That every named channel fell short by
+5–10× was the clue: the missing physics was not a term but an assumption. The
+averaged balance solves for a body spinning *uniformly about a fixed axis*;
+the real Moon obeys the coupled Euler equations, in which the pole orientation
+and the physical librations evolve together. A fixed-axis average cannot
+contain that coupling at all. Integrating the full rigid-body rotation —
+3-DOF Euler equations, torque from Earth and the Sun over the real
+ELP-2000/82B orbit, RK4, no averaging anywhere — gives
+
+| | ε | vs measured |
+|---|---:|---:|
+| averaged balance, fixed axis | 1.5551° | +45.7″ |
+| **full Euler rotation** | **1.5470°** | **+16.5″** |
+| measured | 1.5424° | — |
+
+The libration–pole coupling is worth **−29.3″, i.e. 64% of the gap**, and the
+residual falls to **16.5″ (0.30%)** — for the first time the same size as the
+named ~0.1% channels (elasticity k₂, degree-3 gravity, the core) rather than
+5–10× larger than all of them combined. Verification: the integrated mean is
+independent of the starting obliquity to **0.6″** (runs from 1.5551° and
+1.5424° converge to the same forced state) and unchanged at half the step
+size; the free modes (libration ~1057 d, free precession ~81 yr) are
+oscillatory about the forced state and average out over the 250-yr span.
 
 The coupled average (`--` the whole-orbit torque integral over the real
 ELP-2000/82B orbit, 18.6 yr, in the frame co-rotating with the mean node)

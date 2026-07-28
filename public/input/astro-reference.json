@@ -54,7 +54,7 @@
     "moonInclinationConstantBrownELP": 5.1453964,
     "moonOrbitalEccentricityBase": 0.054900489,
     "moonObliquityEclipticJ2000": 1.5424,
-    "_comment_moonObliquity": "Measured obliquity of the lunar spin axis to the ecliptic (the only independently MEASURED member of the moonTilt composition). Cassini-state DERIVED at ~1 percent (rigid ellipse 1.5528 deg = 100.7%, coupled real-orbit average 1.5551 deg = 100.83%, from GRAIL/LLR J2/C22/C-MR2 + framework rates); the ~0.8 percent remainder is an OPEN dynamical channel - fluid core excluded ~176x, Sun-coherent orbit oscillations worth only -6.5 arcsec - tools/explore/cassini-moontilt.js, docs/66 par 1. The scene mesh tilt composes moonEclipticInclinationJ2000 + this value so the rendered spin-to-ecliptic obliquity equals the measured 1.5424.",
+    "_comment_moonObliquity": "Measured obliquity of the lunar spin axis to the ecliptic (the only independently MEASURED member of the moonTilt composition). Cassini-state DERIVED to 0.30 percent by direct Euler integration of the full rigid-body rotation (1.5470 deg, tools/explore/moon-euler-rotation.js) from GRAIL/LLR J2/C22/C-MR2 + framework rates; the fixed-axis averaged balance gives 1.5551 deg and the libration-pole coupling it cannot contain accounts for 64 percent of that gap - tools/explore/cassini-moontilt.js, docs/66 par 1. The scene mesh tilt composes moonEclipticInclinationJ2000 + this value so the rendered spin-to-ecliptic obliquity equals the measured 1.5424.",
     "moonTilt": 6.687,
     "_comment_moonTilt": "Catalog CONVENTION-COMPOSED axial tilt: Brown/ELP constant 5.1453964 + measured obliquity 1.5424 = 6.6878. Kept for display/reference; the scene geometry uses the composition in its own (dynamical-inclination) convention."
   },
