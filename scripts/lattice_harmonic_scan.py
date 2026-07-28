@@ -375,12 +375,93 @@ def load_lr04():
         'median_dt': float(np.median(np.diff(ys_ad[idx]))),
     }
 
+def load_bond_ird():
+    """Bond et al. 2001 North Atlantic drift-ice (ice-rafted debris) stack.
+
+    The file carries 10 columns (5 age/value pairs); columns 9-10 are the
+    all-4-cores "ocean stacked" %HSG record — the series Bond used to identify
+    his 0-8 cold events, and the one the framework's Bond harmonic is named
+    after. ~70-yr sampling over ~11.5 kyr, so all four shipped flag periods
+    (716-2430 yr) are comfortably resolved.
+    """
+    path = DATA_DIR / 'bond2001-raw.txt'
+    ys_bp, hsg = [], []
+    # latin-1: the header carries degree symbols that are not valid UTF-8
+    for ln in open(path, encoding='latin-1'):
+        parts = ln.strip().split()
+        if len(parts) < 10:
+            continue
+        try:
+            vals = [float(p) for p in parts]
+        except ValueError:
+            continue
+        if not (0 <= vals[8] < 20000):
+            continue
+        ys_bp.append(vals[8])
+        hsg.append(vals[9])
+    ys_ad = 1950.0 - np.array(ys_bp)
+    vals = np.array(hsg)
+    idx = np.argsort(ys_ad)
+    return ys_ad[idx], vals[idx], {
+        'name': 'bond_ird',
+        'label': 'Bond 2001 N-Atlantic IRD stack (% HSG)',
+        'kind': 'climate',
+        'unit': '% HSG',
+        'span_yr': float(ys_ad.max() - ys_ad.min()),
+        'median_dt': float(np.median(np.diff(ys_ad[idx]))),
+    }
+
+def load_gisp2():
+    """GISP2 central-Greenland temperature reconstruction (Alley 2000).
+
+    The file holds TWO tables — temperature, then accumulation rate. Only the
+    temperature table is taken; it ends where the accumulation header begins.
+    Column layout: age (kyr BP)  temperature (degC).
+    """
+    path = DATA_DIR / 'gisp2-alley2000-raw.txt'
+    txt = open(path, encoding='latin-1').read()
+    cut = txt.find('2.  Accumulation rate')
+    if cut > 0:
+        txt = txt[:cut]
+    ys_bp, temp = [], []
+    for ln in txt.split('\n'):
+        parts = ln.strip().split()
+        if len(parts) != 2:
+            continue
+        try:
+            a, t = float(parts[0]), float(parts[1])
+        except ValueError:
+            continue
+        ys_bp.append(a * 1000.0)
+        temp.append(t)
+    ys_ad = 1950.0 - np.array(ys_bp)
+    vals = np.array(temp)
+    idx = np.argsort(ys_ad)
+    return ys_ad[idx], vals[idx], {
+        'name': 'gisp2',
+        'label': 'GISP2 central-Greenland temperature (degC)',
+        'kind': 'climate',
+        'unit': 'degC',
+        'span_yr': float(ys_ad.max() - ys_ad.min()),
+        'median_dt': float(np.median(np.diff(ys_ad[idx]))),
+    }
+
+# Archives deliberately NOT wired in — their sampling cannot resolve the
+# sub-kyr flag periods (716-2430 yr), so adding them would only manufacture
+# unresolvable rows:
+#   • CenCO2PIP (data/cenco2pip-100kyr-bayesian.csv) — 100-kyr resolution.
+#   • Snyder 2016 (xlsx) — a multi-record SST compilation, ~470-yr sampling on
+#     its densest record and no single stacked series to fit.
+#   • Chalk 2017 boron CO2 — 1.2-Myr record, far too coarse.
+
 DATASETS = {
     'steinhilber': load_steinhilber,
     'stephenson':  load_stephenson,
     'cheng':       load_cheng,
     'epica':       load_epica,
     'lr04':        load_lr04,
+    'bond_ird':    load_bond_ird,
+    'gisp2':       load_gisp2,
 }
 
 # ═════════════════════════════════════════════════════════════════════════════
