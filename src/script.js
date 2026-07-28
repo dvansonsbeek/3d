@@ -131,7 +131,7 @@ const moonNodalPrecessionDaysInputICRF   = 6798.38;       // Meeus nodal period;
 let   moonDistance = 384399.07;                           // Mean Earth-Moon distance (km; Phase 2: mutable for deep-time mode)
 const moonEclipticInclinationJ2000 = 5.1573;              // Moon DYNAMICAL mean osculating inclination at J2000 (v4 E3c; the Brown/ELP theory constant 5.1453964 = sinF normalization is the documented partner in astro-reference.json)
 const moonOrbitalEccentricityBase = 0.054900489;          // Moon orbital eccentricity
-const moonObliquityEclipticJ2000 = 1.5424;                // MEASURED lunar spin-to-ecliptic obliquity; Cassini-state DERIVED at 100.7% rigid-figure (tools/explore/cassini-moontilt.js; 37″ remainder = Sun-coherent orbit-oscillation couplings, core excluded ~170×, docs/66 §1)
+const moonObliquityEclipticJ2000 = 1.5424;                // MEASURED lunar spin-to-ecliptic obliquity; Cassini-state DERIVED at ~1% (rigid 100.7%, coupled-orbit 100.83% — tools/explore/cassini-moontilt.js); the ~0.8% remainder is an OPEN channel (core excluded ~176×, orbit oscillations only −6.5″, docs/66 §1)
 const moonTilt = 6.687;                                   // Moon axial tilt — catalog CONVENTION-COMPOSED value (Brown 5.1454 + measured 1.5424); display/reference only, the mesh composes i + ε in the scene's own convention
 
 // ─── C3. Deep-time physics anchors (SYNCED — do not hand-edit) ────────────
@@ -51603,7 +51603,7 @@ const planetStats = {
      null,
       {label : () => `Axial tilt`,
        value : [ { v: () => moonTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Catalog CONVENTION-COMPOSED tilt: Brown/ELP inclination constant 5.1454° + measured spin-to-ecliptic obliquity ε_ecl = 1.5424°. The mesh applies the same composition in the scene's own convention (dynamical i 5.1573° + ε 1.5424° = 6.6997°) so the rendered obliquity to the ecliptic equals the measured 1.5424°. ε_ecl is Cassini-state DERIVED at 100.7% from GRAIL/LLR J₂/C₂₂/C-MR² + the framework's node rate (tools/explore/cassini-moontilt.js); the 37″ remainder is attributed to the Sun-coherent orbit-oscillation couplings (core excluded ~170× by the capacity bracket). The axis co-precesses with the node (18.6-yr period, Cassini's third law)`],
+       hover : [`Catalog CONVENTION-COMPOSED tilt: Brown/ELP inclination constant 5.1454° + measured spin-to-ecliptic obliquity ε_ecl = 1.5424°. The mesh applies the same composition in the scene's own convention (dynamical i 5.1573° + ε 1.5424° = 6.6997°) so the rendered obliquity to the ecliptic equals the measured 1.5424°. ε_ecl is Cassini-state DERIVED at ~1% from GRAIL/LLR J₂/C₂₂/C-MR² + the framework's node rate (tools/explore/cassini-moontilt.js: rigid ellipse 100.7%, coupled real-orbit average 100.83%); the ~0.8% remainder is an OPEN dynamical channel — the fluid core is excluded ~176× and the Sun-coherent orbit oscillations move ε by only −6.5″. The axis co-precesses with the node (18.6-yr period, Cassini's third law)`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => moonOrbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],

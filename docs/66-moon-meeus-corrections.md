@@ -452,15 +452,33 @@ period 6798.3303 d, sidereal year, mass ratio; the Earth-only torque mass
 fraction M_E/(M_E+M_M) is a 1.2% term first-order treatments miss). Result:
 **ε = 1.5528° at the Brown-convention i (100.7% of measured; 1.5563° at the
 dynamical i — ∂ε/∂i ≈ 0.295 makes the convention worth 13″)**. The
-rigid-figure remainder of **37″** is attributed to the Sun-coherent orbit
-oscillations the unperturbed-ellipse average omits (node libration ±1.4°,
-i-oscillation ±0.15° — synchronized with the torque phase, so they do not
-average out); the fluid core is quantitatively EXCLUDED as the owner — the
-direct CMB pressure-torque capacity bracket (C_f/C = 7.0e-4,
-f_cmb = 2.2e-4) is ~170× too small (0.004% of the balance), consistent
-with the arcsecond-level core/dissipation pole signatures in LLR.
-Classification: rigid-figure **derived**, solar-coupling channel
-**attributed** (the coupled perturbed-orbit average is the upgrade path). Scene fix (shipped): the mesh tilt
+rigid-figure remainder of **37″** is **not attributed** — every candidate
+named so far has been measured and rejected, and the record says so rather
+than adopting the least-bad story:
+
+| Channel | Measured effect on ε | Verdict |
+|---|---:|---|
+| Fluid-core CMB pressure torque | 0.004% of the balance (capacity bracket C_f/C = 7.0e-4, f_cmb = 2.2e-4) | ~176× too small; consistent with the arcsecond-level core/dissipation pole signatures in LLR |
+| Node-rate frame (equinox-of-date → inertial) | −5.2″ | Real and correct — Cassini's laws are stated in the inertial ecliptic, so the shipped figure adopts it |
+| Sun-coherent orbit orientation (node libration ±1.4°, i-oscillation ±0.15°) | −6.5″ | Right sign, ~5× too small — **refutes the earlier attribution** |
+| Real-orbit radial content ⟨r⁻³⟩ (1.00276 × Keplerian) | +20.0″ | Wrong sign — the coupled average lands *further* from the measurement than the rigid one |
+
+The coupled average (`--` the whole-orbit torque integral over the real
+ELP-2000/82B orbit, 18.6 yr, in the frame co-rotating with the mean node)
+therefore gives **ε = 1.5551° (100.83%)** against the rigid pass's 1.5528°
+(100.7%). Both bracket the measurement at the ~1% level, which is the
+derivation claim; the ~0.8% channel that would close it is an explicit open
+question. No input can absorb it: closing the gap would require C/MR² wrong
+by 0.8% (known to 3×10⁻⁵), J₂ wrong by 0.8% (known to 10⁻⁹), or the node
+period wrong by 56 days. Classification: rigid-figure **derived**, remainder
+**open**.
+
+A framework cross-connection worth recording: the ⟨r⁻³⟩ enhancement of
+0.276% over the Keplerian ellipse is the torque-problem face of the same
+m²-class solar modification that DLT-1 §3 identifies for the semi-major axis
+(the "which a" question — two-body Kepler 384,748 km vs three-body 386,321 km).
+The torque needs the properly averaged ⟨r⁻³⟩, which the lab now computes
+directly rather than choosing an `a`. Scene fix (shipped): the mesh tilt
 composes `moonEclipticInclinationJ2000 + moonObliquityEclipticJ2000`
 (6.6997° in the scene's own convention) so the rendered spin-to-ecliptic
 obliquity equals the measured 1.5424° (previously the catalog 6.687°

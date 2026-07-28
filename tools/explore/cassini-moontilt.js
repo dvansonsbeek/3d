@@ -161,28 +161,29 @@ function averagedTorque(epsDeg, iDeg, NM = 1440, NS = 96) {
 
 // Equilibrium condition: dĉ/dt (torque) = Ω̇ · (ẑ × ĉ).
 // By the coplanar symmetry both sides point along ±ŷ; balance the y-components.
-function residual(epsDeg, iDeg) {
+function residual(epsDeg, iDeg, omdot = OmDot) {
   const eps = epsDeg * DEG;
   const { total } = averagedTorque(epsDeg, iDeg);
   const lhs = total[1];                            // torque-driven dĉ/dt · ŷ
-  const rhs = OmDot * (-Math.sin(eps)) * -1;       // (ẑ×ĉ)_y = -(-sin eps)?  ẑ×ĉ = (0*cosε-1*0, 1*(-sinε)... compute:
-  // ẑ×ĉ = ẑ × (−sinε, 0, cosε) = ( -0? ) do explicitly:
-  // ẑ = (0,0,1); ẑ×ĉ = ( z_y*c_z - z_z*c_y, z_z*c_x - z_x*c_z, z_x*c_y - z_y*c_x )
-  //              = ( 0*cosε - 1*0, 1*(-sinε) - 0*cosε, 0 ) = (0, -sinε, 0)
-  const rhsY = OmDot * (-Math.sin(eps));
+  // ẑ = (0,0,1); ĉ = (−sinε, 0, cosε)  →  ẑ×ĉ = (0, −sinε, 0)
+  const rhsY = omdot * (-Math.sin(eps));
   return lhs - rhsY;
 }
 
-function solveEps(iDeg) {
-  let lo = 0.5, hi = 3.0;
-  let flo = residual(lo, iDeg);
+// generic bisection on any residual(ε) → ε
+function bisect(f, lo = 0.5, hi = 3.0) {
+  let flo = f(lo);
   for (let k = 0; k < 60; k++) {
     const mid = (lo + hi) / 2;
-    const fm = residual(mid, iDeg);
+    const fm = f(mid);
     if ((fm > 0) === (flo > 0)) { lo = mid; flo = fm; } else hi = mid;
     if (hi - lo < 1e-7) break;
   }
   return (lo + hi) / 2;
+}
+
+function solveEps(iDeg, omdot = OmDot) {
+  return bisect((e) => residual(e, iDeg, omdot));
 }
 
 // Closed-form first-order reference:  |Ω̇|·sinε = κ_E·sin(i+ε)cos(i+ε) + κ_S·sinε·cosε
@@ -198,6 +199,73 @@ function closedForm(iDeg) {
     eps = Math.asin((kE * Math.sin(th) * Math.cos(th)) / (W - kS * Math.cos(eps)));
   }
   return eps / DEG;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COUPLED AVERAGE — the torque over the REAL (solar-perturbed) orbit.
+//
+// The average above rides an unperturbed Keplerian ellipse in a fixed plane.
+// The real orbit is not that: the Sun drives the variation (±3,300 km in r),
+// the evection, a ±1.4° libration of the node and a ±0.15° oscillation of the
+// inclination — all phase-locked to the solar direction, so they do NOT average
+// out of a torque that is itself Sun-synchronised. Rather than model those
+// parametrically, this section averages the torque over the orbit as the
+// classical series actually produces it (ELP-2000/82B, data/lunar-series/).
+//
+// Frame: co-rotating with the MEAN node W3, so the node sits on +ŷ and the
+// spin axis is fixed at ĉ = (−sinε, 0, cosε). The node rate is then ELP's own
+// dW3/dt — the INERTIAL (star-referenced) rate, which is the frame in which
+// the ecliptic pole is fixed and Cassini's laws are stated. Note this differs
+// from the equinox-of-date rate the rigid pass used; that difference is
+// isolated as its own row in the budget below.
+//
+// The orbit sample is independent of ε, so it is built once and reused.
+// ═══════════════════════════════════════════════════════════════════════════
+const ELP = require('../lib/elp2000-82b');
+
+// GM of the Earth alone, framework-native: GM(E+M) from the deep-time chain
+// divided through the DLT-1 mass ratio. (The torque about the Moon's centre of
+// mass is exerted by Earth's field alone; Kepler's n² carries the system mass —
+// that distinction is the 1.2% term.)
+const GM_EM_M3_S2 = 4.03505e14;
+const GM_E_KM3_D2 = (GM_EM_M3_S2 / 1e9) * (MASS_RATIO_EM / (1 + MASS_RATIO_EM)) * 86400 * 86400;
+const OMDOT_INERTIAL = ELP.W3poly[1] * DEG / 36525;      // rad/day (retrograde)
+
+function sampleRealOrbit({ years = 18.6, dt = 0.5, variant = 'truncated' } = {}) {
+  const N = Math.round(years * 365.25 / dt);
+  const S = new Array(N);
+  for (let k = 0; k < N; k++) {
+    const t = ((k + 0.5) * dt) / 36525;
+    const m = ELP.evalMoon(t, { variant, inertial: true });
+    const phi = (m.W3 - 90) * DEG;                       // put the mean node on +ŷ
+    const lam = m.lon * DEG - phi, bet = m.lat * DEG;
+    const cb = Math.cos(bet);
+    S[k] = { x: cb * Math.cos(lam), y: cb * Math.sin(lam), z: Math.sin(bet),
+             invr3: 1 / (m.dist * m.dist * m.dist),
+             u: (m.W1 - m.W3) * DEG };                   // long-axis argument from the node
+  }
+  return S;
+}
+
+function perturbedResidual(epsDeg, S, omdot = OMDOT_INERTIAL) {
+  const eps = epsDeg * DEG;
+  const cHat = [-Math.sin(eps), 0, Math.cos(eps)];
+  const xb = [0, 1, 0];
+  const yb = norm(cross(cHat, xb));
+  let Ny = 0;
+  for (const s of S) {
+    const ca = Math.cos(s.u), sa = Math.sin(s.u);
+    const aHat = [xb[0] * ca + yb[0] * sa, xb[1] * ca + yb[1] * sa, xb[2] * ca + yb[2] * sa];
+    const bHat = cross(cHat, aHat);
+    const rHat = [s.x, s.y, s.z];
+    const da = dot(aHat, rHat), db = dot(bHat, rHat), dc = dot(cHat, rHat);
+    const Ir = [aN * da * aHat[0] + bN * db * bHat[0] + cN * dc * cHat[0],
+                aN * da * aHat[1] + bN * db * bHat[1] + cN * dc * cHat[1],
+                aN * da * aHat[2] + bN * db * bHat[2] + cN * dc * cHat[2]];
+    Ny += (rHat[2] * Ir[0] - rHat[0] * Ir[2]) * s.invr3;   // (r̂ × I·r̂)_y
+  }
+  Ny *= 3 * GM_E_KM3_D2 / (cN * n_moon) / S.length;
+  return Ny - omdot * (-Math.sin(eps));
 }
 
 // ── Run ─────────────────────────────────────────────────────────────────────
@@ -233,12 +301,10 @@ console.log('  Reading:');
 console.log('  • The rigid-figure Cassini equilibrium reproduces the measured obliquity');
 console.log('    at the 100.7% level from three GRAIL/LLR gravity constants + the');
 console.log('    framework\'s own rates. ε_ecl is NOT a free constant.');
-console.log('  • The ~37″ remainder sits in the physics this rigid two-body average');
-console.log('    omits: the SUN-COHERENT orbit oscillations (node libration ±1.4°,');
-console.log('    i-oscillation ±0.15° — synchronized with the torque phase, so they');
-console.log('    do not average out). Core and dissipation are arcsecond-level (see');
-console.log('    the capacity bracket below). Rigid-figure derived + solar-coupling');
-console.log('    channel attributed.');
+console.log('  • The ~37″ remainder is NOT yet attributed. Every candidate named so far');
+console.log('    has been measured and found too small or of the wrong sign — the fluid');
+console.log('    core by the capacity bracket below, the Sun-coherent orbit oscillations');
+console.log('    by the coupled average at the end of this report. It is an open channel.');
 console.log('  • Composition: the catalog moonTilt 6.687° = i + ε in ONE convention');
 console.log('    (Brown 5.1454 + measured 1.5424). The derivation confirms the');
 console.log('    MEASURED member of the pair; the composition remains convention-bound.');
@@ -258,10 +324,9 @@ console.log('  Fluid-core capacity bracket (C_f/C = 7.0e-4, f_cmb = 2.2e-4):');
 console.log(`    (C_f/C)·f_cmb·n/|Ω̇| = ${(100 * coreCapacity).toFixed(4)}% of the balance — ~${(((base - EPS_MEASURED) / EPS_MEASURED) / coreCapacity).toFixed(0)}× TOO`);
 console.log(`    SMALL for the ${((base - EPS_MEASURED) / EPS_MEASURED * 100).toFixed(2)}% rigid-figure gap. VERDICT: the direct core pressure`);
 console.log('    torque CANNOT own the 37″ remainder (consistent with LLR, where the');
-console.log('    core/dissipation pole signature is arcsecond-level). The remainder is');
-console.log('    attributed to the Sun-coherent orbit-oscillation couplings (node');
-console.log('    libration ±1.4°, i ±0.15°) that the unperturbed-ellipse average omits —');
-console.log('    the full coupled solution is the upgrade path.');
+console.log('    core/dissipation pole signature is arcsecond-level). The next candidate —');
+console.log('    the Sun-coherent orbit oscillations — is measured in the coupled average');
+console.log('    below, and is likewise too small. The remainder stays OPEN.');
 console.log('═'.repeat(76));
 
 // debug probe (run with --probe)
@@ -271,4 +336,47 @@ if (process.argv.includes('--probe')) {
     const rhsY = OmDot * (-Math.sin(e * DEG));
     console.log(`eps=${e}: torqueY=${total[1].toExponential(3)} (E ${NE[1].toExponential(3)}, S ${NS[1].toExponential(3)})  rhsY=${rhsY.toExponential(3)}  resid=${(total[1]-rhsY).toExponential(3)}`);
   }
+}
+
+// ── Coupled (perturbed-orbit) result ────────────────────────────────────────
+{
+  console.log('─'.repeat(76));
+  const t0 = Date.now();
+  const S = sampleRealOrbit();
+
+  // Decompose the perturbation content: how much is RADIAL (⟨r⁻³⟩ over the real
+  // orbit vs the Keplerian ellipse) and how much is ORIENTATION (the node
+  // libration / inclination oscillation the attribution named)?
+  const meanInvR3 = S.reduce((q, s) => q + s.invr3, 0) / S.length;
+  const aKep = Math.cbrt(GM_EM_M3_S2 / ((n_moon / 86400) ** 2)) / 1000;   // km
+  const kepInvR3 = Math.pow(1 - E_MOON * E_MOON, -1.5) / (aKep ** 3);
+  const radialRatio = meanInvR3 / kepInvR3;
+  // orientation-only: same real geometry, radial content renormalised to Kepler
+  const Sorient = S.map((s) => ({ ...s, invr3: s.invr3 / radialRatio }));
+
+  const epsPert   = bisect((e) => perturbedResidual(e, S));
+  const epsOrient = bisect((e) => perturbedResidual(e, Sorient));
+  const epsKepInertial = solveEps(I_BROWN, OMDOT_INERTIAL);
+  const secs = ((Date.now() - t0) / 1000).toFixed(1);
+  const as = (x) => ((x - EPS_MEASURED) * 3600).toFixed(1).padStart(6) + '\u2033';
+
+  console.log(`  COUPLED AVERAGE over the real ELP orbit (${S.length} samples / 18.6 yr, ${secs}s)`);
+  console.log('  Budget — each row changes ONE thing from the row above:');
+  console.log(`    rigid ellipse, equinox-of-date node rate   ε = ${base.toFixed(4)}°  ${as(base)}`);
+  console.log(`    rigid ellipse, INERTIAL node rate          ε = ${epsKepInertial.toFixed(4)}°  ${as(epsKepInertial)}   (frame: ${((epsKepInertial - base) * 3600).toFixed(1)}″)`);
+  console.log(`    real orbit ORIENTATION only               ε = ${epsOrient.toFixed(4)}°  ${as(epsOrient)}   (node libration + i-oscillation: ${((epsOrient - epsKepInertial) * 3600).toFixed(1)}″)`);
+  console.log(`    real orbit, full (orientation + radial)    ε = ${epsPert.toFixed(4)}°  ${as(epsPert)}   (⟨r⁻³⟩ content: ${((epsPert - epsOrient) * 3600).toFixed(1)}″)`);
+  console.log(`    MEASURED                                  ε = ${EPS_MEASURED}°`);
+  console.log(`    ⟨r⁻³⟩ real / Kepler = ${radialRatio.toFixed(6)}  (Kepler a = ${aKep.toFixed(0)} km)`);
+  console.log('─'.repeat(76));
+  console.log('  READING — the orbit-oscillation attribution is REFUTED by measurement:');
+  console.log('    • the named cause (node libration ±1.4°, i ±0.15°) moves ε by only');
+  console.log(`      ${Math.abs((epsOrient - epsKepInertial) * 3600).toFixed(1)}″ — it cannot own a ${Math.abs((epsKepInertial - EPS_MEASURED) * 3600).toFixed(0)}″ gap;`);
+  console.log('    • the real orbit\'s radial content pushes ε the WRONG way, so the full');
+  console.log('      coupled average sits FURTHER from the measurement than the rigid one;');
+  console.log('    • no input can absorb the remainder: closing it would need C/MR² wrong');
+  console.log('      by 0.8% (known to 3e-5), J₂ by 0.8% (known to 1e-9), or the node');
+  console.log('      period wrong by 56 d. The residual is a real dynamical channel, and');
+  console.log('      identifying it is now an explicit open item — not an attribution.');
+  console.log('═'.repeat(76));
 }
