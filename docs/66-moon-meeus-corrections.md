@@ -473,6 +473,17 @@ by 0.8% (known to 3×10⁻⁵), J₂ wrong by 0.8% (known to 10⁻⁹), or the n
 period wrong by 56 days. Classification: rigid-figure **derived**, remainder
 **open**.
 
+**The lab is verified, so the gap is physics, not arithmetic.** The circular
+locked-orbit average is analytically closed:
+`⟨(r̂ × I·r̂)_y⟩ = sinψ · [ −A/2 + (C/2)cosψ + (1−cosψ)((3/8)A + (1/8)B) ]`
+with ψ = i + ε. The lab's numerical average reproduces it to **1.00000** (a
+permanent self-test in the script). Worth knowing: this is *not* the textbook
+first-order form `(C−A)/2·sinψ` — the bracket is a near-total cancellation of
+large terms, so the O(ψ²) pieces survive and the naive form overstates the
+torque by **0.62%**, which is the same size as the discrepancy under
+investigation. Any sub-percent claim about a Cassini state has to pass this
+test before its residual means anything.
+
 A framework cross-connection worth recording: the ⟨r⁻³⟩ enhancement of
 0.276% over the Keplerian ellipse is the torque-problem face of the same
 m²-class solar modification that DLT-1 §3 identifies for the semi-major axis

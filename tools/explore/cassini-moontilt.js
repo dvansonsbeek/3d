@@ -268,6 +268,38 @@ function perturbedResidual(epsDeg, S, omdot = OMDOT_INERTIAL) {
   return Ny - omdot * (-Math.sin(eps));
 }
 
+// ── Self-test: numerical average vs the EXACT analytic circular-orbit integral
+// Averaging the torque over a circular locked orbit is analytically closed:
+//   ⟨(r̂ × I·r̂)_y⟩ = sinψ · [ −A/2 + (C/2)cosψ + (1−cosψ)((3/8)A + (1/8)B) ],  ψ = i+ε
+// Note this is NOT the textbook first-order form (C−A)/2·sinψ: the bracket is a
+// near-total cancellation of large terms, so the O(ψ²) pieces survive and the
+// naive form overstates the torque by ~0.7% — the same size as the gap under
+// investigation. Any lab claiming a sub-percent result here must pass this test.
+function analyticCircularNy(epsDeg, iDeg) {
+  const psi = (iDeg + epsDeg) * DEG, cw = Math.cos(psi);
+  return Math.sin(psi) * (-aN / 2 + (cN / 2) * cw + (1 - cw) * ((3 / 8) * aN + (1 / 8) * bN));
+}
+function numericCircularNy(epsDeg, iDeg, N = 20000) {
+  const i = iDeg * DEG, eps = epsDeg * DEG;
+  const nHat = [Math.sin(i), 0, Math.cos(i)], cHat = [-Math.sin(eps), 0, Math.cos(eps)];
+  const xo = [0, 1, 0], yo = norm(cross(nHat, xo));
+  const xb = [0, 1, 0], yb = norm(cross(cHat, xb));
+  let Ny = 0;
+  for (let k = 0; k < N; k++) {
+    const th = 2 * Math.PI * (k + 0.5) / N;        // circular ⇒ true = mean anomaly
+    const ct = Math.cos(th), st = Math.sin(th);
+    const rHat = [xo[0] * ct + yo[0] * st, xo[1] * ct + yo[1] * st, xo[2] * ct + yo[2] * st];
+    const aHat = [xb[0] * ct + yb[0] * st, xb[1] * ct + yb[1] * st, xb[2] * ct + yb[2] * st];
+    const bHat = cross(cHat, aHat);
+    const da = dot(aHat, rHat), db = dot(bHat, rHat), dc = dot(cHat, rHat);
+    const Ir = [aN * da * aHat[0] + bN * db * bHat[0] + cN * dc * cHat[0],
+                aN * da * aHat[1] + bN * db * bHat[1] + cN * dc * cHat[1],
+                aN * da * aHat[2] + bN * db * bHat[2] + cN * dc * cHat[2]];
+    Ny += rHat[2] * Ir[0] - rHat[0] * Ir[2];
+  }
+  return Ny / N;
+}
+
 // ── Run ─────────────────────────────────────────────────────────────────────
 console.log('═'.repeat(76));
 console.log('  Cassini-state derivation of the Moon\'s axial tilt (ε_ecl)');
@@ -291,6 +323,16 @@ for (const [label, iDeg] of [['Brown/ELP i = 5.1453964° (catalog convention)', 
 }
 
 // Sensitivity panel: which knob moves ε how much
+console.log('─'.repeat(76));
+{
+  const nNum = numericCircularNy(EPS_MEASURED, I_BROWN);
+  const nAna = analyticCircularNy(EPS_MEASURED, I_BROWN);
+  const naive = 0.5 * (J2_MOON + 2 * C22_MOON) * Math.sin((I_BROWN + EPS_MEASURED) * DEG);
+  console.log('  Self-test — numerical average vs the exact analytic circular integral:');
+  console.log(`    numerical ${nNum.toExponential(6)}   analytic ${nAna.toExponential(6)}   ratio ${(nNum / nAna).toFixed(5)}`);
+  console.log(`    (textbook first-order (C−A)/2·sinψ would give ${naive.toExponential(6)},`);
+  console.log(`     i.e. ${((naive / nAna - 1) * 100).toFixed(2)}% high — the same size as the gap under study)`);
+}
 console.log('─'.repeat(76));
 console.log('  Sensitivities (numerical, at Brown i):');
 const base = solveEps(I_BROWN);
