@@ -39,10 +39,27 @@ series: 35,901 terms across 14 files.
 |---|---|
 | `elp_main.{long,lat,dist}`, `elp_pert.{long,lat,dist}T*` | Chapront, J. & Francou, G. (2003) *A&A* 404, 735, "The lunar theory ELP revisited. Introduction of new planetary perturbations". Author data originally distributed at `ftp://cyrano-se.obspm.fr/pub/2_lunar_solutions/2_elpmpp02/` (now defunct); obtained via the reformatted copy in `ytliu0/ElpMpp02` (GPL-3.0, compatible with this repository's licence). |
 
+| `driver/ElpMpp02.{cpp,h}` | Reference implementation by Y.-T. Liu (`ytliu0/ElpMpp02`, GPL-3.0), written from the authors' ftp material. **Required to evaluate the series** — see below. |
+
 Format: whitespace-separated rows. Main-problem files carry the four Delaunay
 multipliers followed by the amplitude and its partial derivatives; perturbation
 files carry the amplitude, phase, and the full multiplier set. `T0…T3` denote the
 power of time multiplying each block.
+
+### The series alone are not evaluable — `driver/` supplies the rest
+
+Two things live in the driver rather than in the series files, and both are
+needed before a single MPP02 position can be computed:
+
+1. **The fundamental arguments.** MPP02 re-fitted them, which is a large part of
+   what separates it from ELP-2000/82B — e.g. `W2` rate `14643420.3171″/cy`
+   against ELP82B's `14643420.2632`. Evaluating MPP02 amplitudes on ELP82B
+   arguments would mix the two theories and is not a valid substitute.
+2. **The two Δ-parameter sets.** `setup_parameters(corr, …)` carries
+   `corr=0` (fitted to LLR) and `corr=1` (fitted to JPL DE405/DE406). The
+   main-problem partial derivatives exist precisely so amplitudes can be
+   corrected by these Δ values; using the nominal amplitudes uncorrected is a
+   third variant belonging to neither published solution.
 
 ## Why both are here
 
@@ -51,12 +68,17 @@ The two theories bracket a real distinction the framework needs:
 - **ELP-2000/82B** is the lineage Meeus Ch. 47 was abridged *from* — so
   `full ELP82B − Meeus-60` isolates pure **series truncation**.
 - **ELP/MPP02** is the lineage modern numerical ephemerides (DE-class) were
-  fitted *to* — so `MPP02 − ELP82B` isolates the **ephemeris-generation gap**.
+  fitted *to* — so `MPP02 − ELP82B` was expected to isolate an
+  **ephemeris-generation gap**.
 
-That separation is what allowed the shipped 5.1″ RA correction to be decomposed
-rather than merely fitted: **+1.15″ named planetary-series truncation** vs
-**−6.27″ generation gap** (see docs/66 §1). Naming the second half term-by-term
-is the remaining open item in the TODO.
+The first separation worked: it names **−1.13″** of the shipped 5.1″ RA
+correction as planetary-series truncation. **The second did not.** Measured
+(`tools/explore/residual-attribution-mpp02.js`), MPP02 and ELP82B agree to
+**0.03″** on that term and to 0.30″ RMS in longitude over 2000–2050 — the two
+analytic theories sit together, and JPL DE441 sits **~4″ from both**. So the
+remaining −4.05″ is an analytic-vs-numerical offset, not a step between
+analytic lineages, and it has no series-term decomposition in any analytic
+theory. See docs/66 §1.
 
 ## Consumers
 

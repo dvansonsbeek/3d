@@ -270,9 +270,12 @@ console.log(`    • +${(proj.raCosMp * 3600).toFixed(2)}″  named series trunc
 console.log('             family (Meeus compresses ELP\'s ~14,000-term planetary series');
 console.log('             into 3 additive terms); the main-problem 60-term cut itself');
 console.log('             contributes ≈ −0.04″ (Meeus\'s truncation is excellent);');
-console.log(`    • ${((SHIPPED.raCosMp - proj.raCosMp) * 3600).toFixed(2)}″  the Meeus/ELP82-lineage → DE440 ephemeris-generation gap`);
-console.log('             (the modern-ephemeris correction class that MPP02 embodies —');
-console.log('             not resolvable inside ELP82; naming its terms needs the MPP02');
-console.log('             series). Attributed in class: documented model lineage, not');
-console.log('             free physics.');
+console.log(`    • ${((SHIPPED.raCosMp + proj.raCosMp) * 3600).toFixed(2)}″  analytic theory vs the JPL DE441 numerical ephemeris`);
+console.log('             NOTE the sign: the patch is Meeus − JPL, so the truncation');
+console.log('             above enters it NEGATIVE. Subtracting it as +1.13 (an earlier');
+console.log('             revision did) inflates this remainder to a spurious −6.27″.');
+console.log('             This half is NOT an ELP82B→MPP02 step: those two agree to');
+console.log('             0.03″ on this term (tools/explore/residual-attribution-mpp02.js),');
+console.log('             so it has no series-term decomposition in any analytic theory.');
+console.log('             Attributed by cause, not by term — and not free physics.');
 console.log('═'.repeat(78));

@@ -411,16 +411,44 @@ at commit 3200493) was evaluated against the production Meeus-60 tables
 over the 2000–2050 fit window and LSQ-projected onto the exact 12-term
 patch basis (`tools/explore/residual-attribution-elp.js`; evaluator parity:
 ELP−Meeus RMS 3.13″ lon / 0.99″ lat, inside Meeus's stated ~10″/4″ class).
-Result: series truncation predicts raCosMp = **+1.15″** — wrong sign and
-~4.5× too small — so "series-truncation artifact" is REFUTED as the story
-of the shipped −5.12″. Measured decomposition: **+1.15″ named truncation
-content** (almost entirely the planetary family — Meeus compresses ELP's
-~14,000-term planetary series into 3 additive terms; the main-problem
-60-term cut itself contributes only −0.04″, i.e. Meeus's truncation is
-excellent) **− 6.27″ Meeus/ELP82-lineage → DE440 ephemeris-generation
-gap** (the modern-ephemeris correction class that MPP02 embodies; naming
-its terms would require the MPP02 series, not in-repo). Classification:
-attributed in class — documented model lineage, not free physics. All
+Result: series truncation predicts raCosMp = **+1.13″** — far too small to
+be the story of the shipped −5.12″, so "series-truncation artifact" is
+REFUTED. The full decomposition, every term measured in ONE convention
+(X − Meeus at raCosMp, same 6,088 reference points, same basis, J2000
+frame) rather than inferred by subtraction:
+
+| quantity | raCosMp |
+|---|---:|
+| JPL (DE441) − Meeus-60 | **+5.15″** |
+| ELP-2000/82B − Meeus-60 (named truncation) | +1.13″ |
+| ELP/MPP02 − Meeus-60 | +1.10″ |
+| **JPL − MPP02 (the real gap)** | **+4.05″** |
+
+The shipped patch is `Meeus − JPL`, so it reproduces the measured −5.15″ to
+0.03″. Its content is **−1.13″ named truncation** (almost entirely the
+planetary family — Meeus compresses ELP's ~14,000-term planetary series into
+3 additive terms; the main-problem 60-term cut itself contributes only
+−0.04″, i.e. Meeus's truncation is excellent) **− 4.05″ analytic-theory
+vs JPL numerical ephemeris**.
+
+**The "MPP02 embodies the gap" reading is refuted** (`tools/explore/
+residual-attribution-mpp02.js`, on the MPP02 series + driver now in
+`data/lunar-series/elp-mpp02/`). MPP02 and ELP82B agree to **0.03″** on this
+term and to 0.30″ RMS in longitude over 2000–2050 — both analytic theories
+sit together, and JPL sits ~4″ from both. The gap is analytic-vs-numerical,
+not one analytic lineage vs another, so it has no series-term decomposition
+in any analytic theory: naming it term-by-term is impossible in principle,
+not merely unblocked-by-data.
+
+Time-sliced, the gap is **flat** (3.81 / 4.07 / 4.21 / 4.09″ across
+2000–2013 / 2013–2025 / 2025–2038 / 2038–2051) while MPP02 − Meeus decays
+1.60 → 0.69″. A stable offset, not extrapolation decay — a fixed
+representational difference between the analytic theories and DE441.
+
+Classification: attributed by CAUSE (both halves measured), not by term.
+Not free physics. Scope note: this is exact for the raCosMp coefficient;
+38.5″ RMS of (JPL − Meeus) lies outside the 6-term basis altogether,
+largely aberration geometry the framework models separately. All
 other basis coefficients are dust (≤ 0.13″) in both the prediction and
 the shipped patch.
 

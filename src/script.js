@@ -2974,9 +2974,16 @@ const MOON_CORRECTION = { raSinD: 0.000002, raCosD: -0.005654, raSinMp: -0.00002
 // D5 derived optics: the framework-native runtime subtracts the ANALYTIC
 // annual aberration (speedOfLight + Sun velocity — the fitted patch above was
 // 98–102% aberration-shaped); this residual is what genuinely remains
-// (dominated by the 5.1″ raCosMp term — measured decomposition: +1.15″ named
-// planetary-series truncation − 6.27″ Meeus-lineage→DE440 ephemeris-generation
-// gap; tools/explore/residual-attribution-elp.js, docs/66 §1). KEEP IN
+// (dominated by the 5.1″ raCosMp term. Measured decomposition, every part in
+// one convention: the patch = Meeus − JPL = −5.15″ (shipped −5.12″, agrees to
+// 0.03″) = −1.13″ named planetary-series truncation − 4.05″ analytic-theory
+// vs JPL DE441 numerical ephemeris. The second half is NOT an ELP82B→MPP02
+// step — those two agree to 0.03″ here — so it has no series-term
+// decomposition in any analytic theory; it is a flat ~4″ offset across
+// 2000–2050. tools/explore/residual-attribution-{elp,mpp02}.js, docs/66 §1.
+// Do NOT "improve" this by swapping the Meeus override for MPP02: that would
+// remove only the 1.13″ truncation for ~154× the evaluation cost and would
+// leave the 4.05″ still fitted.) KEEP IN
 // SYNC with fitted-coefficients.json MOON_CORRECTION_RESIDUAL (derivation:
 // tools/explore/derive-moon-correction-content.js).
 const MOON_CORRECTION_RESIDUAL = { raSinD: 0.000002, raCosD: 0.000003, raSinMp: -0.000027, raCosMp: -0.001421, raSinMs: -0.000036, raCosMs: 0.000028, decSinD: 0.000015, decCosD: -0.000009, decSinMp: 0.000015, decCosMp: -0.000026, decSinMs: 0.000024, decCosMs: -0.000006 };
