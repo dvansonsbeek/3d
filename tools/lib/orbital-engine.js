@@ -869,8 +869,13 @@ function computeSiderealDay(t_Ma) {
 /**
  * Stellar day length in seconds. Production (src/script.js:3335,
  * constants.js:214) defines:
- *   meanStellarday = (meanSiderealday / (H / 13)) / (meanSolarYearDays + 1) + meanSiderealday
- * The H/13 factor is the axial precession period in years.
+ *   meanStellarday = (meanSiderealday / (H / 13)) / (meanSolarYearDays + 1)
+ *                    × STELLAR_DAY_RA_PROJECTION + meanSiderealday
+ * The H/13 factor is the axial precession period in years — precession in
+ * LONGITUDE, along the ecliptic. The sidereal→stellar offset depends on
+ * precession in RIGHT ASCENSION, along the equator, so the term carries
+ * cos(ε) (m = p·cos ε). Without it the offset reads ~9.12 ms instead of
+ * ~8.37 ms; see docs/11 § "Stellar−Sidereal Offset".
  *
  * Earlier version used `(siderealYearSec - solarYearSec) / (1/eccentricityAmplitude/13*16)`
  * which gave a divisor of ~907 instead of H/13 ≈ 25,794 — completely wrong

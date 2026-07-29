@@ -945,11 +945,23 @@ function meanAnomalisticYearSecondsAtAge(t_Ma) {
   return T_trop_s * H_t / (H_t - 16);
 }
 
+// Stellar day = sidereal day + the precession offset, PROJECTED onto the equator.
+// NOTE the parametrisation here differs from src/script.js: there the sidereal day
+// is the base and the stellar day adds the offset; here the unprojected stellar day
+// falls out of T_sid/(T_sid/LOD + 1) while the sidereal day carries the +13/H
+// precession term. Same answer before projection — but cos(ε) must be applied to
+// the DIFFERENCE, not pattern-matched onto either formula.
+//
+// H/13 is precession in LONGITUDE (along the ecliptic); the sidereal→stellar offset
+// depends on precession in RIGHT ASCENSION (along the equator), m = p·cos(ε).
+// MEAN family, so OBLIQUITY_MEAN. Mirrors STELLAR_DAY_RA_PROJECTION in src/script.js.
 function meanStellarDayAtAge(t_Ma) {
   const T_sid_s = meanSiderealYearSecondsAtAge(t_Ma);
   const LOD_s   = meanLodSecondsAtAge(t_Ma);
   if (LOD_s === null) return null;
-  return T_sid_s / (T_sid_s / LOD_s + 1);
+  const sid       = meanSiderealDayAtAge(t_Ma);
+  const unproj    = T_sid_s / (T_sid_s / LOD_s + 1);
+  return sid + (unproj - sid) * C.STELLAR_DAY_RA_PROJECTION;
 }
 
 function meanSiderealDayAtAge(t_Ma) {

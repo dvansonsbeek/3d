@@ -130,15 +130,17 @@ siderealYearSeconds = siderealYearJ2000 × 86400
         ▼  Derived day types
   ┌─────────────────────────────────────────────────────┐
   │ siderealDay = solarYearSec / (solarYearSec/86400+1) │
-  │ stellarDay  = siderealDay + precession correction   │
+  │ stellarDay  = siderealDay + precession·cos(ε)       │
+  │   (cos ε projects the H/13 ecliptic rate onto the   │
+  │    equator — see § "Stellar−Sidereal Offset")       │
   └─────────────────────────────────────────────────────┘
 
 Separately (physical/USNO branch — does NOT feed the derivation chain above):
   ┌──────────────────────────────────────────────────────────┐
   │ LOD_real = LOD_mean × (1 + 1/((H/5)·mSY)) + Σ DT cycles  │
-  │          = 86400.0018 s at J2000                         │
-  │  ← anchored at USNO 86400.0018 (joint-optimum vs Espenak,│
-  │    2026-07-18; see tools/fit/dt-corrections-fit.js       │
+  │          = 86400.0014 s at J2000                         │
+  │  ← anchored at USNO 86400.0014 (joint optimum vs Espenak;│
+  │    see tools/fit/dt-corrections-fit.js                   │
   │    --sweep-usno for the {USNO × deltaTStart} sweep)      │
   │    (used in Predictions panel LOD readout, pure-H/5 ΔT   │
   │     V-curve, physical display — see § "The H/5 LOD       │
@@ -151,7 +153,7 @@ Separately (physical/USNO branch — does NOT feed the derivation chain above):
 **Solar day** — the time for the Sun to return to the same local meridian (noon to noon). The solar day varies throughout the year due to orbital eccentricity and obliquity (equation of time). The framework maintains **two mean-LOD values**:
 
 - **LOD_mean** = `siderealYearSeconds / siderealYear(days_kinematic)` ≈ 86399.999676 s at J2000 — the kinematic baseline used inside all sidereal↔tropical conversions and the calibrated ΔT correction stack.
-- **LOD_real** = LOD_mean + LOD_mean/((H/5) × mSY) + DT cycle sum = 86400.0018 s at J2000 — Layer 3: adds the H/5 ecliptic missing-motion correction (~3.5 ms) + Bond/Hallstatt/Jose5/Jose4 cyclic δLOD. USNO-anchored via joint optimum. Used in the user-facing physical LOD display.
+- **LOD_real** = LOD_mean + LOD_mean/((H/5) × mSY) + DT cycle sum = 86400.0014 s at J2000 — Layer 3: adds the H/5 ecliptic missing-motion correction (~3.5 ms) + Bond/Hallstatt/Jose5/Jose4 cyclic δLOD. USNO-anchored via joint optimum. Used in the user-facing physical LOD display.
 
 Both fluctuate over millennia as the sidereal year in days changes. See § "The H/5 LOD Correction" below.
 
@@ -161,14 +163,16 @@ Both fluctuate over millennia as the sidereal year in days changes. See § "The 
 siderealDay = solarYearSec / (solarYearSec / 86400 + 1)
 ```
 
-**Stellar day** — the time for Earth to rotate 360° relative to fixed stars (ICRF). Slightly *longer* than the sidereal day because the vernal equinox precesses westward ~50″/year, so Earth needs less rotation to "catch" the moving equinox than to return to the same fixed star. The precession correction adds ~9.1 ms to the sidereal day.
+**Stellar day** — the time for Earth to rotate 360° relative to fixed stars (ICRF). Slightly *longer* than the sidereal day because the vernal equinox precesses westward, so Earth needs less rotation to "catch" the moving equinox than to return to the same fixed star. The precession correction adds ~8.37 ms to the sidereal day.
+
+The rate that matters here is precession in **right ascension** (along the equator, m ≈ 4612″/cy), not precession in **longitude** (along the ecliptic, p ≈ 5029″/cy, which is what H/13 represents). The two are related by m = p·cos ε, so the H/13 rate carries `STELLAR_DAY_RA_PROJECTION = cos ε`. Without it the offset comes out ~9.12 ms, overshooting the IAU value of 8.373 ms by 1/cos ε. See § "Stellar−Sidereal Offset" below.
 
 ### J2000 Day-Length Values
 
 | Quantity | Model value | Reference |
 |----------|-------------|-----------|
 | Mean solar day — **LOD_mean** (H/13 identity) | 86399.999676 s | — (kinematic) |
-| Mean solar day — **LOD_real** (Layer 3: +H/5 + DT cycles, physical) | 86400.0018 s | 86400.0018 s (USNO joint-optimum anchor, 2026-07-18) |
+| Mean solar day — **LOD_real** (Layer 3: +H/5 + DT cycles, physical) | 86400.0014 s | 86400.0014 s (USNO joint-optimum anchor) |
 | Sidereal day | 86164.091 s | 86164.091 s (IAU) |
 | Stellar day | 86164.099 s | 86164.099 s (IAU) |
 
@@ -189,7 +193,7 @@ LOD_mean = siderealYearSeconds / (mSY × H/(H−13))
 LOD_real = o.lodKinematic + h5Correction(year) + dtCycleLodCorrectionSum(year)
 
 where:
-  o.lodKinematic     = IAU_sid_sec / Fourier_sid_days ≈ 86400.00030 s at J2000
+  o.lodKinematic     = IAU_sid_sec / Fourier_sid_days ≈ 86400.000009 s at J2000
   h5Correction(year) = LOD_mean / ((H/5) × mSY)       ≈ 3.527 ms
   dtCycleLodCorrectionSum = sum of Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (~−2.6 ms at J2000)
 ```
@@ -245,7 +249,7 @@ The coin rotation paradox manifests at every timescale:
 | Sidereal year | 365.256363 days | 365.256363 days (IAU) |
 | Anomalistic year | 365.259633 days | 365.259636 days (IAU) |
 | LOD_mean (kinematic, H/13 identity) | 86399.999676 s | — |
-| LOD_real (Layer 3: physical, +H/5 correction + DT cycles) | 86400.0018 s | 86400.0018 s (USNO joint-optimum anchor, 2026-07-18) |
+| LOD_real (Layer 3: physical, +H/5 correction + DT cycles) | 86400.0014 s | 86400.0014 s (USNO joint-optimum anchor) |
 | Sidereal day | 86164.091 s | 86164.091 s (IAU) |
 | Stellar day | 86164.099 s | 86164.099 s (IAU) |
 | Axial precession | 25,771 yr | 25,771 yr (instantaneous J2000 rate) |
@@ -288,13 +292,28 @@ holds at every epoch — it is algebraically tautological. **Within the modern e
 
 **At deep time**, both terms on the right-hand side scale: Driver 1 (Earth-Moon tidal evolution) changes `dayLength`; Driver 2 (solar mass loss) changes the sidereal year in seconds via Kepler's 3rd law (`dT/T = −2 dM/M`). The identity is preserved at every epoch, but neither factor is constant. See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the two-driver derivation and [Doc 20 §"ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the epoch-dependent helpers (`meanSiderealYearSecondsAtAge`, `meanLodSecondsAtAge`).
 
-### The 9.1ms Stellar-Sidereal Day Offset (Axial Precession)
+### Stellar−Sidereal Offset, and the 9.12 ms Axial Coin Rotation
 
-The stellar day (rotation relative to fixed stars) exceeds the sidereal day (rotation relative to the precessing vernal equinox) by ~9.1 ms. This accumulates to exactly **one extra sidereal day per axial precession cycle**:
+These are **two different quantities** that happen to share a formula. Before the equator projection was applied they read the same number, which is why earlier revisions of this document treated them as one.
+
+**Axial coin rotation — 9.12 ms, on the ecliptic.** Axial precession (H/13) accumulates exactly one extra sidereal day per precession cycle:
 
 ```
-9.12 ms/day × 366.24 sidereal days/year × H/13 years ≈ 1.00 sidereal days
+9.12 ms/day × 366.24 sidereal days/year × H/13 years = 1.0000 sidereal days
 ```
+
+This is a structural count on the H-lattice and is deliberately **not** projected. `axialCoinRotationMs` uses the unprojected rate. Substituting 8.37 ms into the identity gives 0.917 days, not 1.000.
+
+**Stellar−sidereal day offset — 8.37 ms, on the equator.** The physical difference between the two day lengths depends on how fast the equinox moves *along the equator* (precession in right ascension, m), not along the ecliptic (precession in longitude, p, which is what H/13 represents). Since m = p·cos ε, the stellar day carries `STELLAR_DAY_RA_PROJECTION = cos ε`:
+
+```
+stellarDay = siderealDay × (1 + cos(ε) / (H/13 × rotationsPerYear))
+           → 8.37 ms above the sidereal day, vs the IAU value of 8.373 ms
+```
+
+**This was confirmed by measurement, not asserted.** The "Analyze Stellar Day" tool's Method D tracks Earth's rotation about its own spin axis against ICRF — using no precession period at all, since the spin axis precesses on the H/13 cone and the projection plane tilts with it — and reproduces the IAU stellar day to ~0.02 ms. Methods A and B, which reference the ecliptic normal instead of the spin axis, overshoot by ~0.79 and ~0.47 ms respectively; that ~23.44° of axis difference *is* the cos ε.
+
+The obliquity used follows the family of the sidereal day it is applied to: `OBLIQUITY_MEAN` for the H-cycle mean values, `computeObliquityEarth(year)` for epoch-specific ones. At J2000 the choice is worth 0.0008 ms, but across the deep-time obliquity range (~22.0°–24.5°) the offset runs 8.46 → 8.30 ms.
 
 
 ## Implementation

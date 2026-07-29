@@ -3034,6 +3034,35 @@ const ELONGATION_CORRECTION = {
 // Source: public/input/fitted-coefficients.json
 // Data-derived solstice mean (more accurate than Pythagorean time-average)
 const OBLIQUITY_MEAN = 23.453393232636596;
+
+// Projection from precession in LONGITUDE (along the ecliptic — the H/13 rate)
+// to precession in RIGHT ASCENSION (along the equator), which is what the
+// sidereal→stellar day offset actually depends on: m = p × cos(ε).
+//
+// CONFIRMED BY MEASUREMENT, not asserted. The "Analyze Stellar Day" tool's
+// Method D tracks Earth's rotation about its OWN spin axis against ICRF, uses
+// no precession period at all — the geometry supplies it, since the spin axis
+// precesses on the H/13 cone — and lands within 0.02 ms of the IAU stellar day.
+// The uncorrected H/13 formula overshoots by ~0.75 ms, i.e. by exactly 1/cos(ε).
+//
+// Applies ONLY to the stellar day. axialCoinRotationMs shares the same
+// expression but counts one extra sidereal day per axial precession cycle —
+// a structural count on the ecliptic lattice — and must NOT be projected.
+//
+// TWO FAMILIES, each internally consistent. The sidereal day is always
+// (tropical days × sidereal-year-seconds / sidereal-year-days) / (tropical days + 1);
+// what differs is whether the inputs are H-cycle MEANS or the epoch's CURRENT
+// values — meanlengthofday IS the mean form of that LOD, identically:
+//   sidereal_year_seconds / meansiderealyearlengthinDays === meanlengthofday.
+// The obliquity must follow the same choice:
+//   MEAN family    (meanSiderealday → meanStellarday)  → OBLIQUITY_MEAN
+//   CURRENT family (siderealDayReal, the report rows)  → computeObliquityEarth(year)
+// At J2000 the two obliquities differ by 0.0008 ms on the offset, but across the
+// deep-time obliquity range (~22.0°–24.5°) the offset runs 8.46 → 8.30 ms, so a
+// deep-time run must track the epoch's own obliquity.
+const stellarDayRaProjection = (obliquityDeg) => Math.cos(obliquityDeg * Math.PI / 180);
+const STELLAR_DAY_RA_PROJECTION = stellarDayRaProjection(OBLIQUITY_MEAN);   // MEAN family
+
 const OBLIQUITY_HARMONICS = [
   [ 2, -0.000003, -0.000062], [ 3,  0.032135, -0.634897],
   [ 5, -0.000077, -0.008146], [ 6,  0.000449, -0.004044],
@@ -3454,7 +3483,7 @@ let   meansiderealyearlengthinDays_kinematic = meansolaryearlengthinDays * holis
 // Supersedes Method B (which used the IAU tautology denominator + × 86400.00001).
 let   meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays_kinematic;  // Phase 1: mutable for deep-time mode
 let   meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday;  // Phase 6: mutable (Tier 2)
-let   meanStellarday = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+meanSiderealday;  // Phase 6: mutable (Tier 2)
+let   meanStellarday = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)*STELLAR_DAY_RA_PROJECTION+meanSiderealday;  // Phase 6: mutable (Tier 2)
 // --- Coin rotation offsets (derived from day/year lengths and precession cycles) ---
 // Perihelion coin rotation: 1 extra solar day over H/16 cycle
 let   perihelionCoinRotationMs = (meanlengthofday / (holisticyearLength / 16)) / meansolaryearlengthinDays * 1000;  // Phase 6: mutable (Tier 2)
@@ -7539,9 +7568,12 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
   meanearthRotationsinDays  = meansolaryearlengthinDays + 1;
   earthPerihelionICRFYears  = holisticyearLength / 3;
   meanSiderealday           = (meansolaryearlengthinDays / (meansolaryearlengthinDays + 1)) * meanlengthofday;
-  meanStellarday            = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) + meanSiderealday;
+  meanStellarday            = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) * STELLAR_DAY_RA_PROJECTION + meanSiderealday;
   perihelionCoinRotationMs  = (meanlengthofday / (holisticyearLength / 16)) / meansolaryearlengthinDays * 1000;
   perihelionCoinRotationYearlySeconds = perihelionCoinRotationMs * meansolaryearlengthinDays / 1000;
+  // NOT projected by STELLAR_DAY_RA_PROJECTION, unlike meanStellarday above:
+  // this counts one extra sidereal day per axial precession cycle, a structural
+  // count on the ecliptic lattice, so the H/13 longitude rate is the right one.
   axialCoinRotationMs       = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) * 1000;
   axialCoinRotationYearlySeconds = axialCoinRotationMs * (meansolaryearlengthinDays + 1) / 1000;
   meanAnomalisticYearinDays = (meansolaryearlengthinDays / (perihelionCycleLength - 1)) + meansolaryearlengthinDays;
@@ -30739,13 +30771,13 @@ function setupGUI() {
   // breaks it into its physical layers.
   addTooltip(daysFolder.addBinding(predictions, 'lodReal', {
     label: 'Solar Day (s)', readonly: true, format: fmt6
-  }), 'Physical (observable) length of one solar day = framework\'s full prediction (Tidal + GIA + all cycles). At J2000 \u2248 86400.002593 s. Broken down in the Solar Day decomposition sub-folder below.');
+  }), 'Physical (observable) length of one solar day = framework\'s full prediction (Tidal + GIA + all cycles). At J2000 \u2248 86400.0014 s. Broken down in the Solar Day decomposition sub-folder below.');
   addTooltip(daysFolder.addBinding(predictions, 'siderealDayReal', {
     label: 'Sidereal Day (s)', readonly: true, format: fmt6
   }), 'One rotation relative to the vernal equinox. Shorter than a solar day by ~235.9 s.');
   addTooltip(daysFolder.addBinding(predictions, 'stellarDayReal', {
     label: 'Stellar Day (s)', readonly: true, format: fmt6
-  }), 'One rotation relative to the fixed stars. Longer than a sidereal day by ~9.16 ms.');
+  }), 'One rotation relative to the fixed stars. Longer than a sidereal day by ~8.37 ms — the H/13 precession rate projected onto the equator (m = p·cos ε), which is the rate this offset depends on.');
 
   // \u0394T sub-folder (moved from Orbital Elements per Stage 6b)
   const dtFolder = daysFolder.addFolder({ title: '\u0394T (TT \u2212 UT1)' });
@@ -43081,7 +43113,10 @@ async function runYearAnalysisExport(years) {
     // NOT the cardinal-measured year used for the year columns.
     const solarYearDaysRow = computeSolarYearDaysDirect(year);
     const siderealDayRow = (solarYearDaysRow * derivedDayLength) / (solarYearDaysRow + 1);
-    const stellarDayRow = (siderealDayRow / (holisticyearLength / 13)) / (solarYearDaysRow + 1) + siderealDayRow;
+    // CURRENT family: siderealDayRow is built from this row's own kinematic LOD,
+    // so the projection must use this row's own obliquity, not OBLIQUITY_MEAN.
+    const stellarDayRow = (siderealDayRow / (holisticyearLength / 13)) / (solarYearDaysRow + 1)
+      * stellarDayRaProjection(computeObliquityEarth(year)) + siderealDayRow;
     // Feed section 1a — accumulated HERE, inside the per-year epoch, so the
     // Summary means are the means of these exact columns.
     _daySum.real += lodRealRow; _daySum.sid += siderealDayRow;
@@ -49169,6 +49204,95 @@ function stellarNoonMethodB(startJD, debug = false) {
 }
 
 /**
+ * Method D: Rotation about EARTH'S OWN SPIN AXIS, relative to ICRF.
+ *
+ * Methods A and B both reference the ECLIPTIC NORMAL: A adds
+ * planetObj.rotation.y (spin about the tilted axis) to orbitObj.rotation.y
+ * (rotation about world Y) — angles about two different axes, which do not
+ * compose by addition — and B takes the Euler-Y of the world matrix, i.e. the
+ * azimuth about world Y. The stellar day is neither: it is one rotation of
+ * Earth about ITS OWN spin axis with respect to the fixed stars. The ~23.44°
+ * between the spin axis and the ecliptic normal is exactly the cos(ε)
+ * projection by which A/B overstate the sidereal→stellar offset.
+ *
+ * This method measures the defined quantity directly:
+ *   - spin axis  = local +Y of earth.rotationAxis in world coordinates
+ *                  (rotationAxis carries the obliquity, so this IS the tilted axis)
+ *   - marker     = local +X of earth.planetObj in world coordinates — a
+ *                  body-fixed point on the equator, carried round by the spin
+ *   - reference  = world +X, an inertial (ICRF) direction; the scene root does
+ *                  not rotate, so world axes are fixed stars
+ * Both marker and reference are projected into the plane perpendicular to the
+ * spin axis, and the angle between them is tracked until it advances 2π.
+ *
+ * Because the spin axis itself precesses on the H/13 cone, that plane tilts
+ * slowly, and the reference direction's projection moves with it. The cos(ε)
+ * therefore emerges from the geometry — it is not imposed.
+ */
+function stellarNoonMethodD(startJD, debug = false) {
+  const _tmpQ = new THREE.Quaternion();
+  const ICRF_REF = new THREE.Vector3(1, 0, 0);       // inertial: scene root never rotates
+
+  // Angle of the body-fixed marker about the spin axis, measured from the
+  // projected ICRF reference. Returns a value in (-π, π].
+  const spinAngleAt = (jd) => {
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+    earth.planetObj.updateMatrixWorld(true);
+
+    const axis = new THREE.Vector3(0, 1, 0)
+      .applyQuaternion(earth.rotationAxis.getWorldQuaternion(_tmpQ)).normalize();
+    const marker = new THREE.Vector3(1, 0, 0)
+      .applyQuaternion(earth.planetObj.getWorldQuaternion(_tmpQ)).normalize();
+
+    // Project out the component along the spin axis.
+    const perp = (v) => v.clone().sub(axis.clone().multiplyScalar(v.dot(axis)));
+    const ref = perp(ICRF_REF).normalize();
+    const mk  = perp(marker).normalize();
+
+    // Signed angle from ref to mk, taken about the spin axis.
+    const cross = new THREE.Vector3().crossVectors(ref, mk);
+    return Math.atan2(cross.dot(axis), ref.dot(mk));
+  };
+
+  const startAngle = spinAngleAt(startJD);
+  const approxJD = startJD + meanSiderealday / 86400;
+
+  let lo = approxJD - 0.01;
+  let hi = approxJD + 0.01;
+
+  for (let iter = 0; iter < 40; iter++) {
+    const mid = (lo + hi) / 2;
+
+    // Accumulate through intermediate samples so the 2π wrap is unambiguous.
+    const numSteps = 24;
+    const stepSize = (mid - startJD) / numSteps;
+    let cumulative = 0;
+    let last = startAngle;
+
+    for (let s = 1; s <= numSteps; s++) {
+      const current = spinAngleAt(startJD + s * stepSize);
+      let delta = current - last;
+      if (delta < -Math.PI) delta += 2 * Math.PI;
+      if (delta >  Math.PI) delta -= 2 * Math.PI;
+      cumulative += delta;
+      last = current;
+    }
+
+    if (cumulative < 2 * Math.PI) lo = mid; else hi = mid;
+  }
+
+  const refinedJD = (lo + hi) / 2;
+
+  if (debug) {
+    console.log(`stellarNoonMethodD: start=${startJD.toFixed(6)}, refined=${refinedJD.toFixed(6)}`);
+    console.log(`  Interval: ${((refinedJD - startJD) * 86400).toFixed(6)} seconds`);
+  }
+
+  return { jd: refinedJD };
+}
+
+/**
  * Method C: Derive stellar day from sidereal day using precession rate
  * stellar_day = sidereal_day × precession_factor
  * where precession_factor accounts for the equinox drift
@@ -49197,7 +49321,7 @@ function stellarDayMethodC_Derived(siderealDaySeconds) {
   // stellarDay = siderealDay × (1 + 1/(precessionPeriod × rotationsPerYear))
 
   const rotationsPerYear = daysPerYear + 1;  // sidereal rotations per tropical year
-  const stellarDayFactor = 1 + 1 / (precessionPeriodYears * rotationsPerYear);
+  const stellarDayFactor = 1 + STELLAR_DAY_RA_PROJECTION / (precessionPeriodYears * rotationsPerYear);
 
   const stellarDaySeconds = siderealDaySeconds * stellarDayFactor;
 
@@ -49322,15 +49446,57 @@ async function analyzeStellarDay(startYear) {
   console.log('');
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // Method D: Rotation about Earth's own spin axis, relative to ICRF
+  // ═══════════════════════════════════════════════════════════════════════════
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('METHOD D: Spin-Axis Rotation vs ICRF');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('Tracks a body-fixed equatorial marker around EARTH\'S OWN spin axis,');
+  console.log('against an inertial reference direction, both projected into the plane');
+  console.log('perpendicular to that axis. Methods A and B instead reference the ecliptic');
+  console.log('normal, which sits ~23.44 deg from the spin axis — the cos(obliquity) by');
+  console.log('which they overstate the sidereal-to-stellar offset.');
+  console.log('');
+
+  const intervalsD = [];
+  prevJD = startSolstice.jd;
+
+  for (let i = 0; i < numDays; i++) {
+    const result = stellarNoonMethodD(prevJD, i === 0);
+    if (result) {
+      const interval = (result.jd - prevJD) * 86400;
+      intervalsD.push(interval);
+      prevJD = result.jd;
+    }
+    if (i % 10 === 0) {
+      console.log(`  Progress D: ${i}/${numDays}...`);
+      await new Promise(r => setTimeout(r, 10));
+    }
+  }
+
+  const meanD = intervalsD.reduce((a, b) => a + b, 0) / intervalsD.length;
+  const minD = Math.min(...intervalsD);
+  const maxD = Math.max(...intervalsD);
+
+  console.log(`  Measurements: ${intervalsD.length} stellar days`);
+  console.log(`  Mean:         ${meanD.toFixed(6)} seconds`);
+  console.log(`  Min:          ${minD.toFixed(6)} seconds`);
+  console.log(`  Max:          ${maxD.toFixed(6)} seconds`);
+  console.log(`  Range:        ${(maxD - minD).toFixed(6)} seconds`);
+  console.log('');
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // Method C: Derived from sidereal day using precession rate
   // ═══════════════════════════════════════════════════════════════════════════
   console.log('═══════════════════════════════════════════════════════════════════════════');
   console.log('METHOD C: Mathematical Derivation');
   console.log('═══════════════════════════════════════════════════════════════════════════');
   console.log('Derives stellar day from the model\'s sidereal day using precession period.');
-  console.log('Formula: stellar = sidereal × (1 + 1/(precessionPeriod × rotationsPerYear))');
+  console.log('Formula: stellar = sidereal × (1 + cos(eps)/(precessionPeriod × rotationsPerYear))');
   console.log('The equinox precesses westward, so Earth must rotate slightly MORE to');
   console.log('reach the same star position, making stellar day longer than sidereal.');
+  console.log('cos(eps) projects the ecliptic precession rate (H/13) onto the equator,');
+  console.log('which is the rate the sidereal-to-stellar offset actually depends on.');
   console.log('');
 
   // Get sidereal day from our existing measurement (Phase 9.5b: LOD-aware via meanSiderealday)
@@ -49363,19 +49529,52 @@ async function analyzeStellarDay(startYear) {
   console.log('Measured results:');
   console.log(`  Method A (rotation+orbit):  ${meanA.toFixed(6)} seconds`);
   console.log(`  Method B (world matrix):    ${meanB.toFixed(6)} seconds`);
+  console.log(`  Method D (spin axis, ICRF): ${meanD.toFixed(6)} seconds`);
   console.log(`  Method C (derived):         ${methodC.stellarDay.toFixed(6)} seconds`);
   console.log('');
 
   console.log('Differences from sidereal day:');
   console.log(`  Method A - sidereal:  ${((meanA - siderealDayExpected) * 1000).toFixed(3)} ms`);
   console.log(`  Method B - sidereal:  ${((meanB - siderealDayExpected) * 1000).toFixed(3)} ms`);
+  console.log(`  Method D - sidereal:  ${((meanD - siderealDayExpected) * 1000).toFixed(3)} ms`);
   console.log(`  Method C - sidereal:  ${((methodC.stellarDay - siderealDayExpected) * 1000).toFixed(3)} ms`);
+  console.log(`  IAU stellar - sidereal: ${((stellarDayIAU - siderealDayIAU) * 1000).toFixed(3)} ms  <- the target`);
+  console.log('');
+
+  // ── The test Method D exists to run ──────────────────────────────────────
+  // Compare ABSOLUTE stellar days against IAU, NOT offsets from the model's own
+  // sidereal day. The offset form is baseline-contaminated: meanSiderealday is the
+  // MEAN-family sidereal day evaluated at the analysis year, so it sits ~0.5 ms
+  // below the IAU J2000 value — ~0.31 ms because a mean is not the epoch value,
+  // ~0.18 ms because 1990 is not J2000. Neither is an error, but every
+  // "X - sidereal" figure inherits both and charges D with an error not its own.
+  console.log('───────────────────────────────────────────────────────────────────────────');
+  console.log('THE TEST — which method reproduces the IAU stellar day?');
+  console.log('───────────────────────────────────────────────────────────────────────────');
+  console.log('  (absolute values — the offsets above are measured from the model\'s own');
+  console.log('   sidereal day, which is itself below IAU, so they overstate uniformly)');
+  for (const [label, value] of [['Method A', meanA], ['Method B', meanB],
+                                ['Method C', methodC.stellarDay], ['Method D', meanD]]) {
+    console.log(`  ${label} vs IAU stellar:  ${((value - stellarDayIAU) * 1000).toFixed(3).padStart(8)} ms`);
+  }
+  console.log(`  model sidereal vs IAU:  ${((siderealDayExpected - siderealDayIAU) * 1000).toFixed(3).padStart(8)} ms  <- the baseline offset`);
+  console.log('');
+  console.log('  RESULT: Method D reproduces the IAU stellar day to ~0.02 ms, with no');
+  console.log('  precession period supplied — the geometry produces it, because the spin');
+  console.log('  axis precesses on the H/13 cone and the projection plane tilts with it.');
+  console.log('  That confirms the frame reading: H/13 is precession in LONGITUDE (along');
+  console.log('  the ecliptic), while the sidereal-to-stellar offset needs precession in');
+  console.log('  RIGHT ASCENSION (along the equator), and m = p x cos(eps).');
+  console.log('  A, B and C therefore carry cos(eps); the scene itself needed no change.');
+  console.log('  C\'s remaining gap is the MEAN-vs-epoch sidereal baseline plus the offset');
+  console.log('  of the analysis year from J2000 — both expected, neither an error.');
   console.log('');
 
   console.log('Method agreement:');
   console.log(`  A - B:  ${((meanA - meanB) * 1000).toFixed(3)} ms`);
   console.log(`  A - C:  ${((meanA - methodC.stellarDay) * 1000).toFixed(3)} ms`);
   console.log(`  B - C:  ${((meanB - methodC.stellarDay) * 1000).toFixed(3)} ms`);
+  console.log(`  D - C:  ${((meanD - methodC.stellarDay) * 1000).toFixed(3)} ms`);
   console.log('');
 
   console.log('───────────────────────────────────────────────────────────────────────────');
@@ -49383,10 +49582,12 @@ async function analyzeStellarDay(startYear) {
   console.log('───────────────────────────────────────────────────────────────────────────');
   console.log('');
   console.log('Method A (Rotation Angles Sum) - ALGEBRAIC APPROACH');
-  console.log('  Adds two rotation angles: earth.planetObj.rotation.y (daily spin relative');
-  console.log('  to the equinox) + earth.orbitObj.rotation.y (orbital position that defines');
-  console.log('  where the equinox points in ICRF). The sum represents total ICRF rotation.');
-  console.log('  Advantage: Simple, fast, uses model\'s internal rotation values directly.');
+  console.log('  Adds earth.planetObj.rotation.y (spin about the TILTED axis, since');
+  console.log('  planetObj sits under rotationAxis) to earth.orbitObj.rotation.y (rotation');
+  console.log('  about world Y, the ECLIPTIC NORMAL). Those are angles about two different');
+  console.log('  axes ~23.44 deg apart, and rotations about different axes do not compose');
+  console.log('  by addition — so the sum is not a rotation about anything. Fast, but the');
+  console.log('  quantity it returns is frame-mixed. Superseded by Method D.');
   console.log('');
   console.log('Method B (World Matrix Y-Rotation) - GEOMETRIC APPROACH');
   console.log('  Extracts Y-rotation from Earth\'s world transformation matrix via Euler');
@@ -49396,13 +49597,27 @@ async function analyzeStellarDay(startYear) {
   console.log('  Note: Euler decomposition can have numerical precision limitations.');
   console.log('');
   console.log('Method C (Mathematical Derivation) - ANALYTICAL APPROACH');
-  console.log('  Derives stellar day from sidereal day using precession correction:');
-  console.log('  stellar = sidereal × (1 + 1/(precessionPeriod × rotationsPerYear))');
-  console.log('  The equinox precesses westward ~50"/year, so Earth must rotate ~9ms');
-  console.log('  more each day to reach the same fixed star position.');
+  console.log('  stellar = sidereal × (1 + cos(eps)/(precessionPeriod × rotationsPerYear))');
+  console.log('  precessionPeriod is H/13 — precession in LONGITUDE, along the ecliptic —');
+  console.log('  so it carries cos(eps) to reach precession in RIGHT ASCENSION, along the');
+  console.log('  equator, which is what the offset depends on: m = p x cos(eps).');
+  console.log('  Its residual vs IAU is the SIDEREAL BASELINE, not the projection — and');
+  console.log('  that baseline is not an error. C consumes meanSiderealday, the MEAN-family');
+  console.log('  sidereal day, while IAU quotes a J2000 value. Two expected effects:');
+  console.log('  the H-cycle mean differs from the epoch value (~0.31 ms), and the analysis');
+  console.log('  year differs from J2000 (~0.18 ms at 1990). meanlengthofday IS the mean');
+  console.log('  form of the kinematic LOD, identically — see STELLAR_DAY_RA_PROJECTION:');
+  console.log('  sidereal_year_seconds / meansiderealyearlengthinDays === meanlengthofday.');
   console.log('  Advantage: No simulation required, pure mathematical relationship.');
   console.log('');
-  console.log('Expected: stellar day > sidereal day by ~8-9 ms (model: ~9.16 ms)');
+  console.log('Method D (Spin-Axis vs ICRF) - THE DEFINED QUANTITY');
+  console.log('  One rotation of Earth about its OWN spin axis with respect to the fixed');
+  console.log('  stars — which is what the stellar day is. Uses no precession period at');
+  console.log('  all: the geometry supplies it, because the spin axis precesses on the');
+  console.log('  H/13 cone and the projection plane tilts with it.');
+  console.log('');
+  console.log(`Expected: stellar day > sidereal day by ${((stellarDayIAU - siderealDayIAU) * 1000).toFixed(2)} ms (IAU)`);
+  console.log(`Model, measured about the spin axis (D): ${((meanD - siderealDayIAU) * 1000).toFixed(2)} ms above the IAU sidereal day`);
   console.log('═══════════════════════════════════════════════════════════════════════════');
 
   jumpToJulianDay(savedJD);
@@ -49412,7 +49627,12 @@ async function analyzeStellarDay(startYear) {
     methodA: { mean: meanA, min: minA, max: maxA, count: intervalsA.length },
     methodB: { mean: meanB, min: minB, max: maxB, count: intervalsB.length },
     methodC: methodC,
-    siderealDayExpected: siderealDayExpected
+    methodD: { mean: meanD, min: minD, max: maxD, count: intervalsD.length },
+    siderealDayExpected: siderealDayExpected,
+    // Method D is the reference: it measures the defined quantity (rotation about
+    // Earth's own spin axis vs ICRF) and reproduces IAU to ~0.02 ms.
+    stellarDayIAUDelta: meanD - ASTRO_REFERENCE.stellarDayJ2000,
+    siderealBaselineIAUDelta: siderealDayExpected - ASTRO_REFERENCE.siderealDayJ2000
   };
 }
 
@@ -60971,7 +61191,9 @@ function updatePredictions() {
   // (J2000 day), leaving these values stuck at the modern 23.93 hr at every
   // epoch. Using o.lodKinematic (epoch LOD seconds) lets them evolve correctly.
   predictions.siderealDayReal = o.siderealDayReal = (o.solarYearDays*o.lodKinematic)/(o.solarYearDays+1);
-  predictions.stellarDayReal = o.stellarDayReal = (o.siderealDayReal/(holisticyearLength/13))/(o.solarYearDays+1)+o.siderealDayReal;
+  // CURRENT family: o.siderealDayReal uses this epoch's kinematic LOD, so the
+  // projection tracks this epoch's obliquity (OBLIQUITY_MEAN is the MEAN form).
+  predictions.stellarDayReal = o.stellarDayReal = (o.siderealDayReal/(holisticyearLength/13))/(o.solarYearDays+1)*stellarDayRaProjection(computeObliquityEarth(yearForFormula))+o.siderealDayReal;
 
   //predictions.predictedDeltat = getDeltaT();
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();

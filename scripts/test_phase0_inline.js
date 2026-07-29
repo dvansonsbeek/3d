@@ -143,7 +143,15 @@ let   perihelionPhaseOffset  = (((startmodelyearwithCorrection - balancedYear) /
 let   meanearthRotationsinDays  = meansolaryearlengthinDays + 1;
 let   earthPerihelionICRFYears  = holisticyearLength / 3;
 let   meanSiderealday           = (meansolaryearlengthinDays / (meansolaryearlengthinDays + 1)) * meanlengthofday;
-let   meanStellarday            = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) + meanSiderealday;
+// cos(ε): H/13 is precession in LONGITUDE; the sidereal→stellar offset needs
+// precession in RIGHT ASCENSION (m = p·cos ε). Mirrors STELLAR_DAY_RA_PROJECTION
+// in src/script.js and tools/lib/constants.js — MEAN family, mean obliquity.
+// Literal inlined per this harness's convention (it mirrors script.js globals in
+// isolation, cf. holisticyearLength / eccentricityBase above). SOURCE OF TRUTH:
+// public/input/fitted-coefficients.json → SOLSTICE_OBLIQUITY_MEAN_FITTED, which
+// script.js exposes as OBLIQUITY_MEAN. Re-sync this literal if that value moves.
+const STELLAR_DAY_RA_PROJECTION = Math.cos(23.453393232636596 * Math.PI / 180);
+let   meanStellarday            = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) * STELLAR_DAY_RA_PROJECTION + meanSiderealday;
 let   perihelionCoinRotationMs  = (meanlengthofday / (holisticyearLength / 16)) / meansolaryearlengthinDays * 1000;
 let   perihelionCoinRotationYearlySeconds = perihelionCoinRotationMs * meansolaryearlengthinDays / 1000;
 let   axialCoinRotationMs       = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) * 1000;
@@ -171,7 +179,7 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
   meanearthRotationsinDays  = meansolaryearlengthinDays + 1;
   earthPerihelionICRFYears  = holisticyearLength / 3;
   meanSiderealday           = (meansolaryearlengthinDays / (meansolaryearlengthinDays + 1)) * meanlengthofday;
-  meanStellarday            = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) + meanSiderealday;
+  meanStellarday            = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) * STELLAR_DAY_RA_PROJECTION + meanSiderealday;
   perihelionCoinRotationMs  = (meanlengthofday / (holisticyearLength / 16)) / meansolaryearlengthinDays * 1000;
   perihelionCoinRotationYearlySeconds = perihelionCoinRotationMs * meansolaryearlengthinDays / 1000;
   axialCoinRotationMs       = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) * 1000;
@@ -351,7 +359,11 @@ function meanStellarDayAtAge(t_Ma) {
   const T_sid_s = meanSiderealYearSecondsAtAge(t_Ma);
   const LOD_s   = meanLodSecondsAtAge(t_Ma);
   if (LOD_s === null) return null;
-  return T_sid_s / (T_sid_s / LOD_s + 1);
+  // Projection applied to the DIFFERENCE — this parametrisation makes the
+  // unprojected stellar day the base and puts +13/H on the sidereal day.
+  const sid    = meanSiderealDayAtAge(t_Ma);
+  const unproj = T_sid_s / (T_sid_s / LOD_s + 1);
+  return sid + (unproj - sid) * STELLAR_DAY_RA_PROJECTION;
 }
 function meanSiderealDayAtAge(t_Ma) {
   const T_sid_s = meanSiderealYearSecondsAtAge(t_Ma);
@@ -497,7 +509,7 @@ check('Moon T_sidereal d at 0',
 check('Anomalistic year d at 0',
       meanAnomalisticYearSecondsAtAge(0) / meanlengthofday,
       365.259633, 5e-5);
-check('Stellar day s at 0', meanStellarDayAtAge(0), 86164.0997, null, 1.0);
+check('Stellar day s at 0', meanStellarDayAtAge(0), 86164.0986, null, 1.0);
 check('Sidereal day s at 0', meanSiderealDayAtAge(0), 86164.0905, null, 1.0);
 
 console.log(`  LOD_NOW_H13_S          = ${LOD_NOW_H13_S.toFixed(6)} s   (target ≈ 86399.999677)`);
@@ -1109,7 +1121,7 @@ check('Phase 6 Devonian: meanAnomalisticYearinDays uses new days + perihelionCyc
       (meansolaryearlengthinDays / (perihelionCycleLength - 1)) + meansolaryearlengthinDays, 1e-9);
 check('Phase 6 Devonian: meanStellarday',
       meanStellarday,
-      (meanSiderealday / (H_dev / 13)) / (meansolaryearlengthinDays + 1) + meanSiderealday, 1e-9);
+      (meanSiderealday / (H_dev / 13)) / (meansolaryearlengthinDays + 1) * STELLAR_DAY_RA_PROJECTION + meanSiderealday, 1e-9);
 
 // Round-trip
 resetEpochToJ2000();

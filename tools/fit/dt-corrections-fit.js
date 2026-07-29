@@ -204,9 +204,13 @@ const CONFIG = {
     // when --fixed-anchors is passed (auto-optimum skipped) or when
     // DT_CORRECTIONS_DISABLED=1 is not set (unsafe to sweep).
     //
-    // The 86400.0018 value is the historical joint-optimum from the 2026-07-18
-    // Espenak reference set (RMS 11.5 s paired with deltaTStart = 57.53).
-    usno_target_lod_s: 86400.0018,
+    // This is the SHIPPED joint optimum: 86400.0014 paired with
+    // deltaTStart = 56.049 (Espenak RMS 12.60). It must match
+    // data/deltaT-4flag-fit.json `usno_anchor` and `deltaTStart` in
+    // src/script.js — the USNO target and deltaTStart are a PAIR, so never
+    // change one without the other.
+    // (Superseded: 86400.0018 with deltaTStart = 57.53, the pre-joint optimum.)
+    usno_target_lod_s: 86400.0014,
     weight: 1e6,                     // multiplier on the anchor row before least-squares
     apply_at_stage: 'D',             // only the final 4-cycle fit is anchored
   },

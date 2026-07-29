@@ -4,7 +4,7 @@
 // For each candidate H/5 correction value, this scanner:
 //   1. Recomputes the pure-H/5-baseline ΔT curve with that value substituted
 //   2. Re-fits the Bond/Hallstatt/Jose5/Jose4 4-flag stack (with USNO anchor)
-//      so the modern LOD still closes on USNO 86400.0018 at J2000
+//      so the modern LOD still closes on USNO 86400.0014 at J2000
 //   3. Computes total ΔT (baseline + refitted flags) at each L-5b Stephenson
 //      observation year
 //   4. Reports mean |residual|, per-century breakdown, and residual at key years
@@ -265,7 +265,12 @@ for (let y = -720; y <= 2017; y += 10) {
   stephDT.push(stephenson(y, stephSegs));
 }
 
-const USNO_TARGET = 86400.0018;
+// Read the SHIPPED joint-optimum anchor rather than hardcoding it — a stale
+// literal here silently re-targets every scan (this file carried 86400.0018,
+// the pre-joint value, long after production moved to 86400.0014).
+const USNO_TARGET = JSON.parse(fs.readFileSync(
+  path.resolve(__dirname, '..', '..', 'data', 'deltaT-4flag-fit.json'), 'utf8'))
+  .usno_anchor.usno_target_lod_s;
 
 // Key years for the per-year residual column
 const KEY_YEARS = [-720, -430, -135, 0, 500, 1000, 1600, 2000];
@@ -356,7 +361,7 @@ console.log('Interpretation:');
 console.log('  * fitRMS  = post-fit residual over the 1650-2050 Stephenson window (LOWER is better)');
 console.log('  * L-5b|R| = mean |obs_dt_observed - framework_dt| across 267 primary lunar observations');
 console.log('  * res@Y   = Stephenson(Y) − total framework ΔT(Y)  (POSITIVE = framework too low at Y)');
-console.log('  * LOD_J2K = reconstructed lodReal at J2000 (should stay ~86400.0018 = USNO target)');
+console.log('  * LOD_J2K = reconstructed lodReal at J2000 (should stay ~86400.0014 = USNO target)');
 console.log('');
 console.log('  If L-5b|R| minimum is deep (< 2000 s) → H/5 tuning IS the lever; ship the optimum.');
 console.log('  If minimum is ~production (2500-3000 s) → H/5 alone cannot close the gap; escalate beyond H/5 (the framework-native Moon arguments, since shipped, were that escalation).');

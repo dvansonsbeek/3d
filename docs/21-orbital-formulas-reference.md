@@ -226,7 +226,7 @@ Naming taxonomy: `_Kinematic` = framework kinematic day units; `_Real` = physica
 
 | Variable | Description |
 |----------|-------------|
-| `o.lodKinematic` | Current epoch-specific kinematic day (SI seconds), = IAU_sid_sec / Fourier sid_days ≈ 86400.00030 s at J2000 |
+| `o.lodKinematic` | Current epoch-specific kinematic day (SI seconds), = IAU_sid_sec / Fourier sid_days ≈ 86400.000009 s at J2000 |
 | `predictions.lodReal` | Physical LOD (Layer 3): `o.lodKinematic + h5Correction + dtCycleLodCorrectionSum`. Displayed as "Solar Day = REAL" in the Predictions panel. |
 | `o.siderealDayReal` | Current sidereal day length (SI seconds) |
 | `o.stellarDayReal` | Current stellar day length (SI seconds) |

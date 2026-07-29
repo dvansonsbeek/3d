@@ -264,7 +264,11 @@ for (let y = -720; y <= 2017; y += 10) {
   stephDT.push(stephenson(y, stephSegs));
 }
 
-const USNO_TARGET = 86400.0018;
+// Shipped joint-optimum anchor, read not hardcoded — a stale literal here
+// silently re-targets the scan (this file carried the pre-joint 86400.0018).
+const USNO_TARGET = JSON.parse(fs.readFileSync(
+  path.resolve(__dirname, '..', '..', 'data', 'deltaT-4flag-fit.json'), 'utf8'))
+  .usno_anchor.usno_target_lod_s;
 const KEY_YEARS = [-720, -430, -135, 0, 500, 1000, 1600, 2000];
 
 const results = [];

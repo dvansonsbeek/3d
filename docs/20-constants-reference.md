@@ -385,7 +385,7 @@ The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier t
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Initial Delta-T | `deltaTStart` | 57.53 s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s = 86400.0018` at the joint optimum against Espenak, 2026-07-18). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
+| Initial Delta-T | `deltaTStart` | 56.049 s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s = 86400.0014` at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
 
 ## Perihelion Longitude Formula Parameters
 
@@ -446,7 +446,7 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 
 **Perihelion Coin Rotation**: Theoretical value derived from 1 extra solar day per H/16 cycle.
 
-**Axial Coin Rotation**: Axial precession (H/13) causes the stellar day to exceed the sidereal day by ~9.1 ms. This accumulates to 1 extra sidereal day over one axial precession cycle. See [Year and Day Length Formulas](11-length-day-year-formulas.md) for details.
+**Axial Coin Rotation**: Axial precession (H/13) accumulates exactly 1 extra sidereal day over one axial precession cycle — 9.12 ms per sidereal day. This is a count on the **ecliptic** lattice and is deliberately *not* projected. It is **not** the physical stellar−sidereal day offset, which is the same rate projected onto the **equator** (precession in right ascension, m = p·cos ε) and is therefore ~8.37 ms. See [Year and Day Length Formulas](11-length-day-year-formulas.md) for details.
 
 ## Moon Constants (External)
 

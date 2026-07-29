@@ -88,6 +88,10 @@ function buildFittedCoefficients(params) {
 
 
 module.exports = {
+  // Fitted solstice-obliquity mean, exported raw so early constants (the stellar
+  // day's cos(ε) equator projection) can reach it before buildFittedCoefficients
+  // runs. Same value that comes back as SOLSTICE_OBLIQUITY_MEAN.
+  SOLSTICE_OBLIQUITY_MEAN_FITTED: data.SOLSTICE_OBLIQUITY_MEAN_FITTED,
   // Parallax corrections (attached to ASTRO_REFERENCE by constants.js)
   PARALLAX_DEC_CORRECTION,
   PARALLAX_RA_CORRECTION,

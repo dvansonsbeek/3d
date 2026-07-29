@@ -111,9 +111,9 @@ function exportEarth(years) {
     //                      (cyclic + episode; each term 0 at J2000 by anchoring)
     //   lodReal          = lodKinematic + h5Correction + dtCycleLodSum  (Layer 4)
     //   siderealDayReal  = (solarYearDays × lodKinematic) / (solarYearDays + 1)
-    //   stellarDayReal   = (siderealDayReal / (H/13)) / (solarYearDays + 1) + siderealDayReal
+    //   stellarDayReal   = (siderealDayReal / (H/13)) / (solarYearDays + 1) × cos(ε) + siderealDayReal
     //
-    // At J2000: 86400.001400 (USNO joint-world anchor) / 86164.090540 / 86164.099661 s — matches tweakpane.
+    // At J2000: 86400.001400 (USNO joint-world anchor) / 86164.090540 / 86164.098908 s — matches tweakpane.
     // Note: uses lodKinematic (not the physics-tidal mean) as baseline, per the
     // framework's IAU-round-trip identity. Deep-time tidal recession growth is
     // shown in the ESSRT chart, not here.
@@ -132,7 +132,12 @@ function exportEarth(years) {
                         + DT.resonatorSwingLodCorrection(year);   // Core-mantle swing (joint world)
     const lodReal         = lodKinematic + h5 + dtCycleLodSum;
     const siderealDayReal = (el.solarYearDays * lodKinematic) / (el.solarYearDays + 1);
-    const stellarDayReal  = (siderealDayReal / (C.H / 13)) / (el.solarYearDays + 1) + siderealDayReal;
+    // cos(ε) projects the H/13 rate — precession in LONGITUDE, along the ecliptic —
+    // onto the equator, giving precession in RIGHT ASCENSION (m = p·cos ε), which is
+    // the rate the sidereal→stellar offset depends on. CURRENT family, so this row's
+    // own obliquity (el.obliquity), matching the tweakpane's stellarDayReal.
+    const stellarDayReal  = (siderealDayReal / (C.H / 13)) / (el.solarYearDays + 1)
+                            * Math.cos(el.obliquity * Math.PI / 180) + siderealDayReal;
     solarDaySeconds.push(+lodReal.toFixed(6));
     siderealDaySeconds.push(+siderealDayReal.toFixed(6));
     stellarDaySeconds.push(+stellarDayReal.toFixed(6));

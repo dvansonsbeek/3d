@@ -228,7 +228,14 @@ const meanSiderealYearDaysKinematic = meanSolarYearDays * H / (H - 13);
 // Supersedes Method B (which anchored to 86400.00001 via a hand-tuned shim).
 const meanLengthOfDay = meanSiderealYearSeconds / meanSiderealYearDaysKinematic;
 const meanSiderealDay = (meanSolarYearDays / (meanSolarYearDays + 1)) * meanLengthOfDay;
-const meanStellarDay = (meanSiderealDay / (H / 13)) / (meanSolarYearDays + 1) + meanSiderealDay;
+// Stellar day: the H/13 precession rate is precession in LONGITUDE (along the
+// ecliptic); the sidereal→stellar offset depends on precession in RIGHT
+// ASCENSION (along the equator), and m = p·cos(ε). MEAN family, so the mean
+// obliquity. Mirrors STELLAR_DAY_RA_PROJECTION in src/script.js — keep in sync.
+const STELLAR_DAY_RA_PROJECTION =
+  Math.cos(fitted.SOLSTICE_OBLIQUITY_MEAN_FITTED * Math.PI / 180);
+const meanStellarDay = (meanSiderealDay / (H / 13)) / (meanSolarYearDays + 1)
+  * STELLAR_DAY_RA_PROJECTION + meanSiderealDay;
 const meanAnomalisticYearDays = (meanSolarYearDays / (perihelionCycleLength - 1)) + meanSolarYearDays;
 const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
 const totalDaysInH = H * meanSolarYearDays;
@@ -704,6 +711,7 @@ module.exports = {
   meanLengthOfDay,
   meanSiderealDay,
   meanStellarDay,
+  STELLAR_DAY_RA_PROJECTION,
   meanAnomalisticYearDays,
   eccentricityDerivedMean,
   totalDaysInH,
