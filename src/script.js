@@ -5889,11 +5889,11 @@ function jose4CycleLodCorrection(year) {
 }
 
 /** Sum of DT cyclic LOD contributions at year. At J2000 the shipped 4-cycle sum
- *  ≈ −0.937 ms — the target for the joint-optimum fit that closes Layer 3 LOD_real
+ *  ≈ −0.937 ms — the target for the joint-optimum fit that closes Layer 4 LOD_real
  *  onto USNO 86400.0014 s exactly (raw H/5 kinematic 86400.003527 − 2.137 ms = anchor;
  *  joint world: the sum includes the Core-mantle swing episode).
  *  See data/deltaT-4flag-fit.json → usno_anchor.shipped_sum_lod_at_j2000_s.
- *  Used by the Solar Day display (Layer 3) and by future modal chart. */
+ *  Used by the Solar Day display (Layer 4) and by future modal chart. */
 function dtCycleLodCorrectionSum(year) {
   return bondCycleLodCorrection(year)
        + hallstattCycleLodCorrection(year)
@@ -5902,7 +5902,9 @@ function dtCycleLodCorrectionSum(year) {
        + resonatorSwingLodCorrection(year);   // Core-mantle swing — 0 unless research toggle ON
 }
 
-/** Layer 3 LOD in seconds at t_Ma: pure-tidal + GIA + 4 DT cycles.
+/** Layer 4 LOD in seconds at t_Ma: pure-tidal + GIA + 4 DT cycles + Core-mantle
+ *  swing (dtCycleLodCorrectionSum carries the swing — that is what makes this
+ *  Layer 4; Layer 3 is the same stack with flags only).
  *  Physical consistency: this LOD's integral matches the corrected ΔT curve.
  *  Ported from tools/lib/deep-time.js:374 (2026-07-17, Stage 2c). */
 function meanLodSecondsWithCorrectionsAtAge(t_Ma) {
@@ -5928,7 +5930,7 @@ const _MAX_DELTA_T_CACHE = 512;
  *  — the H/5 ecliptic-precession "missing motion" adds ~3.5 ms at J2000, so
  *  raw kinematic ≈ 86400.003 s. This overshoots the USNO Earth Orientation
  *  Center J2000 anchor (86400.0014 s) by ~2.14 ms; the Bond/Hallstatt/Jose5/
- *  Jose4 post-integration stack closes the composite (Layer 3 LOD_real) onto
+ *  Jose4 post-integration stack closes the composite (Layer 4 LOD_real) onto
  *  the USNO anchor exactly by construction of the joint-optimum fit. This
  *  integrand correctly reproduces the positive dΔT/dt slope near J2000.
  *
@@ -5974,7 +5976,7 @@ function meanDeltaTSecondsAtAge(t_Ma) {
     // H/5 ecliptic-precession "missing motion" — adds ~3.5 ms at J2000 to
     // give the raw H/5 kinematic LOD (86400.003 s at J2000). Overshoots the
     // USNO anchor (86400.0014 s) by ~2.14 ms; the calibrated Bond/Hallstatt/
-    // Jose5/Jose4 post-integration stack closes Layer 3 LOD_real onto the
+    // Jose5/Jose4 post-integration stack closes Layer 4 LOD_real onto the
     // USNO anchor. Correctly reproduces the positive dΔT/dt slope near J2000.
     const H_local  = meanHAtAge(tau);
     const mSY_days = meanTropicalYearDaysAtAge(tau);
@@ -26995,7 +26997,7 @@ const VFP_CATEGORIES = [
         { year:   60500, label: 'Next glacial (proj.)',  color: '#b45309' },
       ],
     },
-    // Blue "This model" = REAL LOD (Layer 3): tidal + GIA + 4-flag DT cycles + H/5
+    // Blue "This model" = REAL LOD (Layer 4): tidal + GIA + 4-flag DT cycles + swing + H/5
     // ecliptic missing motion. Physics-derived SHAPE (tidal secular drift + DT
     // oscillations), IAU-anchored at J2000 to match tweakpane's Solar Day = REAL
     // display (86400.000934 s at J2000).
@@ -29358,9 +29360,9 @@ function setupGUI() {
     versionEl.textContent = 'Holistic Universe Model v10';
     versionEl.title =
       'v10 highlights (2026-07-18):\n' +
-      '• ΔT & Layer-3 LOD auto-fit to Espenak history (~12 s RMS across 1650-2017).\n' +
+      '• ΔT & Layer-4 LOD auto-fit to Espenak history (~12 s RMS across 1650-2017).\n' +
       '• dt-corrections-fit pipeline fully automated: joint-optimum sweep over USNO anchor + deltaTStart runs by default; astro-reference.json + script.js sync end-to-end.\n' +
-      '• Layer-3 solar day at J2000 = 86400.0014 s (USNO Earth Orientation Center-aligned, joint world).\n' +
+      '• Layer-4 solar day at J2000 = 86400.0014 s (USNO Earth Orientation Center-aligned, joint world).\n' +
       '• Days & Years report ~3× faster (±2-day search window in cardinal-point scans).\n' +
       '• CSV labelling (Step 6a): calendar-year alignment for all 6 event types — matches XLSX report row-by-row.\n' +
       '• Formula Verification chart: new "Export Recent" (1650-2050) view + ΔT chart re-anchored to the model trend rather than IERS instantaneous.\n' +
@@ -30786,7 +30788,7 @@ function setupGUI() {
   }), 'Model-calibrated long-term TREND of \u0394T (TT \u2212 UT1) in seconds. Reads \u2248 56.0 s at J2000 \u2014 the smooth trend value passing through 2000, distinct from the IERS instantaneous observation of ~63.6 s (the ~8-s gap is industrial-era Earth-rotation acceleration our cyclic model does not attempt to capture). Formula: deltaTStart + Simpson integral of Layer 2 + H/5 LOD + 4-flag stack + Core-mantle swing (jointly fit under the hard USNO closure; Espenak history 1650-2017 RMS \u2248 12.6 s). Used by Meeus geometry, eclipse timing, and the live accumulator. The pure-physics-only (no cycles) variant is available on the Formula Verification chart at Reports \u2192 Days & Years \u2192 \u0394T.');
   addTooltip(dtFolder.addBinding(predictions, 'predictedDeltatPerYear', {
     label: 'Rate (s/yr)', readonly: true, format: v => v.toFixed(4)
-  }), 'Current d(\u0394T)/dt = (LOD_real \u2212 86400) \u00d7 solarYearDays. LOD_real is Layer 3 = o.lodKinematic + h5Correction + dtCycleLodCorrectionSum(year), i.e. the same value shown as Solar Day = REAL. Positive = clocks running slower than TT (Earth day > 86400 SI s).');
+  }), 'Current d(\u0394T)/dt = (LOD_real \u2212 86400) \u00d7 solarYearDays. LOD_real is Layer 4 = o.lodKinematic + h5Correction + dtCycleLodCorrectionSum(year), i.e. the same value shown as Solar Day = REAL. Positive = clocks running slower than TT (Earth day > 86400 SI s).');
 
   // Solar Day decomposition sub-folder \u2014 3 rows breaking down the physical
   // solar day by the same layer stacking used in the dLOD/dt decomposition
@@ -42893,14 +42895,22 @@ async function runYearAnalysisExport(years) {
     ['  solar day    = siderealYearSeconds / measured sidereal year (in days)'],
     ['  sidereal day = tropicalYearSec / (tropicalYearSec / 86400 + 1)'],
     ['                 i.e. one rotation less per year than the solar day'],
-    ['  stellar day  = sidereal day × (1 + 1 / (axialPrecession × rotationsPerYear))'],
-    ['                 i.e. the equinox precessing on top of the sidereal day'],
+    ['  stellar day  = sidereal day × (1 + cos(ε) / (axialPrecession × rotationsPerYear))'],
+    ['                 i.e. the equinox precessing on top of the sidereal day.'],
+    ['                 cos(ε) projects the precession rate from the ECLIPTIC (where'],
+    ['                 axialPrecession is defined) onto the EQUATOR, where this'],
+    ['                 offset lives: m = p·cos ε. Without it the offset reads'],
+    ['                 ~9.13 ms instead of ~8.37 ms (IAU: 8.373 ms).'],
     ['CIRCULAR by construction: siderealYearSeconds is an ASSERTED constant, so'],
     ['dividing it by a measured day count cannot test that constant — see the note'],
     ['in section 5. Kept because the RATIOS between the three are a genuine scene check.'],
     ['Mean Solar Day = siderealYearSeconds / measuredSiderealYear', (meansiderealyearlengthinSeconds / meanSiderealYear).toFixed(6)],
     ['Mean Sidereal Day = tropicalYearSec / (tropicalYearSec / 86400 + 1)', (() => { const tropSec = meanTropicalYear * (meansiderealyearlengthinSeconds / meanSiderealYear); return (tropSec / (tropSec / 86400 + 1)).toFixed(6); })()],
-    ['Mean Stellar Day = siderealDay × (1 + 1 / (axialPrecession × rotationsPerYear))', (() => { const measuredLOD = meansiderealyearlengthinSeconds / meanSiderealYear; const tropSec = meanTropicalYear * measuredLOD; const sidDay = tropSec / (tropSec / 86400 + 1); const axialPrec = meanSiderealYear / (meanSiderealYear - meanTropicalYear); const rotPerYear = meanTropicalYear + 1; return (sidDay * (1 + 1 / (axialPrec * rotPerYear))).toFixed(6); })()],
+    // cos(ε) projects the axial precession rate onto the equator — see the note
+    // below section 5's values. axialPrec here is the MEASURED beat, and the
+    // inputs are analysis-period means, so the obliquity is taken at the period
+    // midpoint rather than OBLIQUITY_MEAN.
+    ['Mean Stellar Day = siderealDay × (1 + cos(ε) / (axialPrecession × rotationsPerYear))', (() => { const measuredLOD = meansiderealyearlengthinSeconds / meanSiderealYear; const tropSec = meanTropicalYear * measuredLOD; const sidDay = tropSec / (tropSec / 86400 + 1); const axialPrec = meanSiderealYear / (meanSiderealYear - meanTropicalYear); const rotPerYear = meanTropicalYear + 1; const raProj = stellarDayRaProjection(computeObliquityEarth((startYear + endYear) / 2)); return (sidDay * (1 + raProj / (axialPrec * rotPerYear))).toFixed(6); })()],
     ['The solar-day row above is ANCHORED AT 86400 by construction:'],
     ['siderealYearSeconds is the IAU sidereal year × 86400 SI seconds, so the row'],
     ['reads exactly 86400 whenever the scene reproduces the IAU sidereal year.'],
@@ -42914,7 +42924,7 @@ async function runYearAnalysisExport(years) {
     ['ΔT stack. Each value is the mean of its sheet-2 column.'],
     ['  solar day    = LOD real (the production value; tweakpane Solar Day = REAL)'],
     ['  sidereal day = solarYearDays × LOD_kinematic / (solarYearDays + 1)'],
-    ['  stellar day  = sidereal day / (H/13) / (solarYearDays + 1) + sidereal day'],
+    ['  stellar day  = sidereal day / (H/13) / (solarYearDays + 1) × cos(ε) + sidereal day'],
     ['Sidereal and stellar use the KINEMATIC LOD, not LOD real — the kinematic'],
     ['base is the one that reproduces the IAU sidereal day at J2000.'],
     ['Mean Solar Day (LOD real, s)', ''],     // filled after the sheet-2 loop
@@ -42963,6 +42973,10 @@ async function runYearAnalysisExport(years) {
     ['  Both are correct; they are different quantities, so the two need not agree.'],
     ['  Daily offset', axialCoinRotationMs.toFixed(2), 'ms/sidereal day'],
     ['  Yearly accumulation', axialCoinRotationYearlySeconds.toFixed(2), 's/year'],
+    [`  ^ ${axialCoinRotationMs.toFixed(2)} ms is the ECLIPTIC-lattice count, NOT the stellar−sidereal day`],
+    [`    offset. That offset is measured along the EQUATOR and is smaller by cos(ε)`],
+    [`    (${(axialCoinRotationMs * STELLAR_DAY_RA_PROJECTION).toFixed(2)} ms — see sections 4 and 5). Substituting it here would give`],
+    [`    ${(1 * STELLAR_DAY_RA_PROJECTION).toFixed(3)} sidereal days per precession cycle instead of exactly 1.`],
   ];
 
   // Helper to get interval by year from a Map
@@ -43104,7 +43118,7 @@ async function runYearAnalysisExport(years) {
     // (predictions.siderealDayReal / stellarDayReal, script.js ~60850), evaluated
     // at this row's year instead of the live epoch:
     //   sidereal = solY × LOD_kinematic / (solY + 1)
-    //   stellar  = sidereal / (H/13) / (solY + 1) + sidereal
+    //   stellar  = sidereal / (H/13) / (solY + 1) × cos(ε) + sidereal
     // The base is the KINEMATIC LOD, not LOD real. That is not an oversight:
     // the sidereal day is a rotation quantity tied to the kinematic construction,
     // and the kinematic base reproduces ASTRO_REFERENCE.siderealDayJ2000
@@ -49307,19 +49321,19 @@ function stellarDayMethodC_Derived(siderealDaySeconds) {
   // So per year, equinox shifts by 360/precessionPeriod degrees
   // Per sidereal day, equinox shifts by 360/(precessionPeriod × daysPerYear) degrees
 
-  // The relationship:
-  // stellarDay = siderealDay × (1 - 1/(precessionPeriod × daysPerYear))
-  // Because in each sidereal day, the equinox has moved slightly,
-  // so we need slightly less rotation to reach the same star
+  // The stellar day is LONGER than the sidereal day, because the equinox
+  // precesses WESTWARD (retrograde), so Earth must rotate MORE to catch up to
+  // the stars:  stellarDay = siderealDay × (1 + cos(ε)/(P × rotationsPerYear))
+  //
+  // cos(ε) projects P — precession in LONGITUDE, along the ecliptic — onto the
+  // equator, where the offset is defined (precession in right ascension,
+  // m = p·cos ε). Confirmed by Method D below, which measures the rotation
+  // about Earth's own spin axis and needs no precession period at all.
+  //
+  // (A `precessionFactor = 1 − 1/(P × daysPerYear)` once sat here, unused —
+  //  the author's discarded first sign attempt. Removed.)
 
   const daysPerYear = meansolaryearlengthinDays;
-  const precessionFactor = 1 - 1 / (precessionPeriodYears * daysPerYear);
-
-  // Actually, the stellar day is LONGER than sidereal day
-  // because the equinox precesses WESTWARD (retrograde)
-  // So Earth has to rotate MORE to catch up to the stars
-  // stellarDay = siderealDay × (1 + 1/(precessionPeriod × rotationsPerYear))
-
   const rotationsPerYear = daysPerYear + 1;  // sidereal rotations per tropical year
   const stellarDayFactor = 1 + STELLAR_DAY_RA_PROJECTION / (precessionPeriodYears * rotationsPerYear);
 
@@ -51124,11 +51138,12 @@ async function generateAndDisplayReport(planetKey) {
 //  Negative  => Earth day is shorter            ➜ ΔT decreases
 // ---------------------------------------------------------------------------
 function secondsExcessPerDay () {
-  // Matches the tweakpane's Layer 3 Solar Day = REAL:
+  // Matches the tweakpane's Layer 4 Solar Day = REAL (dtCycleLodCorrectionSum
+  // includes the Core-mantle swing, which is what makes this Layer 4, not 3):
   //   LOD_real = o.lodKinematic + h5Correction + dtCycleLodCorrectionSum(year)
   // (kinematic-anchored, USNO-tuned at J2000 by the DT-corrections fit).
-  // Previously omitted `dtCycleLodCorrectionSum`, which made the Rate cell
-  // inconsistent with the displayed Layer 3 — corrected 2026-07-18.
+  // `dtCycleLodCorrectionSum` MUST stay in this sum: omitting it desyncs the
+  // Rate cell from the displayed Solar Day = REAL.
   const h5 = o.lodKinematic / ((holisticyearLength / 5) * meansolaryearlengthinDays);
   const dt = dtCycleLodCorrectionSum(o.currentYear);
   const lodReal = o.lodKinematic + h5 + dt;
@@ -51142,7 +51157,7 @@ function secondsExcessPerDay () {
 function updateDeltaT() {
   const currentJD = o.julianDay;                       // use your existing value
   const daysElapsed = currentJD - state.prevJD;
-  // Layer 3 LOD (kinematic + H/5 + DT cyclic sum) — same value as tweakpane
+  // Layer 4 LOD (kinematic + H/5 + DT cyclic sum incl. swing) — same value as tweakpane
   // Solar Day = REAL. USNO-anchored at J2000 after the DT-corrections fit.
   const h5 = o.lodKinematic / ((holisticyearLength / 5) * meansolaryearlengthinDays);
   const dt = dtCycleLodCorrectionSum(o.currentYear);
@@ -51185,7 +51200,7 @@ function resetDeltaTForJump() {
 
       // Raw H/5 kinematic LOD = LOD + H/5 ecliptic-precession "missing motion"
       // (~3.5 ms at J2000). This is the raw-physics integrand for the ΔT accumulator;
-      // it is NOT the Layer 3 physical LOD_real (which further adds the calibrated
+      // it is NOT the Layer 4 physical LOD_real (which further adds the calibrated
       // 4-flag stack + Core-mantle swing to hit the USNO 86400.0014 s anchor, joint world).
       const lodH5Raw = lod + lod / ((holisticyearLength / 5) * solarYear);
       const dTchangePerYr = (lodH5Raw - 86_400) * solarYear;   // seconds/yr
@@ -51210,7 +51225,7 @@ function resetDeltaTForJump() {
 
       // Raw H/5 kinematic LOD = LOD + H/5 ecliptic-precession "missing motion"
       // (~3.5 ms at J2000). This is the raw-physics integrand for the ΔT accumulator;
-      // it is NOT the Layer 3 physical LOD_real (which further adds the calibrated
+      // it is NOT the Layer 4 physical LOD_real (which further adds the calibrated
       // 4-flag stack + Core-mantle swing to hit the USNO 86400.0014 s anchor, joint world).
       const lodH5Raw = lod + lod / ((holisticyearLength / 5) * solarYear);
       const dTchangePerYr = (lodH5Raw - 86_400) * solarYear;
@@ -61137,18 +61152,19 @@ function updatePredictions() {
   o.lodKinematic = meansiderealyearlengthinSeconds / o.siderealYearDays;
   // Sidereal year in seconds = MEASURED days × o.lodKinematic (round-trip identity → = IAU_sid_sec = 31,558,149.7635 s).
   predictions.siderealYearSeconds = o.siderealYearSeconds = o.siderealYearDays * o.lodKinematic;
-  // Tweakpane display: LOD_real = o.lodKinematic + H/5 ecliptic missing-motion + DT cyclic sum (Layer 3).
-  // At J2000: raw H/5 kinematic = 86400.003527 s → Layer 3 = 86400.003527 + (~−2.14 ms from
+  // Tweakpane display: LOD_real = o.lodKinematic + H/5 ecliptic missing-motion + DT cyclic sum incl. swing (Layer 4).
+  // At J2000: raw H/5 kinematic = 86400.003527 s → Layer 4 = 86400.003527 + (~−2.14 ms from
   // calibrated 4-flag stack + Core-mantle swing) = 86400.0014 s → matches the USNO joint-world
-  // anchor exactly, by construction of the fit.
+  // anchor exactly, by construction of the fit. Layer 3 is the same sum with the
+  // swing left out — see `solarDayLayer3` below, which subtracts it back off.
   //
-  // Layer 3's baseline is `o.lodKinematic` (IAU-anchored kinematic) NOT `_gia`
+  // The Layer 3/4 baseline is `o.lodKinematic` (IAU-anchored kinematic) NOT `_gia`
   // (physics tidal+GIA). The two differ by ~0.34 ms at J2000 — that offset IS the
   // real reconciliation between the framework's tidal integrator and the IAU
   // definition, and dropping it would break the round-trip identity used by other
   // cells (sidereal year seconds = sid_days × lodKinematic = 31,558,149.7635 s).
   // Layer 1 and Layer 2 keep their physics baselines because they represent the
-  // physics stack; Layer 3 is IAU-anchored on top.
+  // physics stack; Layers 3 and 4 are IAU-anchored on top.
   {
     const _tMa = (J2000_CALENDAR_YEAR - yearForFormula) / 1e6;
     const _h5 = h5Correction(yearForFormula);

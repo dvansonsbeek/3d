@@ -153,7 +153,7 @@ Separately (physical/USNO branch — does NOT feed the derivation chain above):
 **Solar day** — the time for the Sun to return to the same local meridian (noon to noon). The solar day varies throughout the year due to orbital eccentricity and obliquity (equation of time). The framework maintains **two mean-LOD values**:
 
 - **LOD_mean** = `siderealYearSeconds / siderealYear(days_kinematic)` ≈ 86399.999676 s at J2000 — the kinematic baseline used inside all sidereal↔tropical conversions and the calibrated ΔT correction stack.
-- **LOD_real** = LOD_mean + LOD_mean/((H/5) × mSY) + DT cycle sum = 86400.0014 s at J2000 — Layer 3: adds the H/5 ecliptic missing-motion correction (~3.5 ms) + Bond/Hallstatt/Jose5/Jose4 cyclic δLOD. USNO-anchored via joint optimum. Used in the user-facing physical LOD display.
+- **LOD_real** = LOD_mean + LOD_mean/((H/5) × mSY) + DT cycle sum = 86400.0014 s at J2000 — Layer 4: adds the H/5 ecliptic missing-motion correction (~3.5 ms) + the Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (Layer 3) + the Core-mantle swing. USNO-anchored via joint optimum. Used in the user-facing physical LOD display.
 
 Both fluctuate over millennia as the sidereal year in days changes. See § "The H/5 LOD Correction" below.
 
@@ -172,7 +172,7 @@ The rate that matters here is precession in **right ascension** (along the equat
 | Quantity | Model value | Reference |
 |----------|-------------|-----------|
 | Mean solar day — **LOD_mean** (H/13 identity) | 86399.999676 s | — (kinematic) |
-| Mean solar day — **LOD_real** (Layer 3: +H/5 + DT cycles, physical) | 86400.0014 s | 86400.0014 s (USNO joint-optimum anchor) |
+| Mean solar day — **LOD_real** (Layer 4: +H/5 + DT cycles + swing, physical) | 86400.0014 s | 86400.0014 s (USNO joint-optimum anchor) |
 | Sidereal day | 86164.091 s | 86164.091 s (IAU) |
 | Stellar day | 86164.099 s | 86164.099 s (IAU) |
 
@@ -188,7 +188,7 @@ LOD_mean = siderealYearSeconds / (mSY × H/(H−13))
          = 86399.999676 s at J2000
 ```
 
-**LOD_real** (Layer 3) — the physical LOD, three-part construction:
+**LOD_real** (Layer 4) — the physical LOD, three-part construction:
 ```
 LOD_real = o.lodKinematic + h5Correction(year) + dtCycleLodCorrectionSum(year)
 
@@ -212,7 +212,7 @@ The H/5 correction represents Earth's need to rotate slightly MORE per solar day
 | LOD used | Purpose | Code path |
 |----------|---------|-----------|
 | **LOD_mean** | sidereal↔tropical conversions (day-count identity), calibrated ΔT correction integrand (Bond/Hallstatt/Jose4/5 stack expects this baseline), Meeus JD_UT → JD_TT, eclipse code, live accumulator | `meanDeltaTSecondsAtAge`, `updateDeltaT` |
-| **LOD_real** (Layer 3) | User-facing "physical" LOD display, pure-H/5 physics ΔT V-curve | `pureH5DeltaTAtAge`, Predictions panel LOD binding |
+| **LOD_real** (Layer 4) | User-facing "physical" LOD display, pure-H/5 physics ΔT V-curve | `pureH5DeltaTAtAge`, Predictions panel LOD binding |
 
 **Why other H/N cycles don't appear as explicit corrections:** the H/13 axial precession is ALREADY implicit in LOD_mean via the `H/(H−13)` denominator (over H tropical years the sidereal frame counts H−13 years — the missing 13 IS the axial precession). Adding an explicit H/13 correction would double-count. H/8 obliquity is oscillatory (mean zero). H/16 perihelion motion contributes to the anomalistic year, not to the tropical-day counting relative to the Sun. Only H/5 (ecliptic precession) gives the correct reference for the Sun's apparent motion.
 
@@ -249,7 +249,7 @@ The coin rotation paradox manifests at every timescale:
 | Sidereal year | 365.256363 days | 365.256363 days (IAU) |
 | Anomalistic year | 365.259633 days | 365.259636 days (IAU) |
 | LOD_mean (kinematic, H/13 identity) | 86399.999676 s | — |
-| LOD_real (Layer 3: physical, +H/5 correction + DT cycles) | 86400.0014 s | 86400.0014 s (USNO joint-optimum anchor) |
+| LOD_real (Layer 4: physical, +H/5 correction + DT cycles + swing) | 86400.0014 s | 86400.0014 s (USNO joint-optimum anchor) |
 | Sidereal day | 86164.091 s | 86164.091 s (IAU) |
 | Stellar day | 86164.099 s | 86164.099 s (IAU) |
 | Axial precession | 25,771 yr | 25,771 yr (instantaneous J2000 rate) |
