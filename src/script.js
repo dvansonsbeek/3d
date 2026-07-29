@@ -42772,7 +42772,36 @@ async function runYearAnalysisExport(years) {
 
   // Pre-compute Fourier formula day lengths at mid-year (for Section 5 of summary)
 
+  // Period-mean day lengths for section 1a. These CANNOT be computed here:
+  // computeSiderealYearDaysDirect / computeSolarYearDaysDirect read deep-time
+  // globals that setEpoch(year) mutates inside the sheet-2 loop below, and at
+  // this point those globals sit at whatever epoch the cardinal scan finished
+  // at — so every year would evaluate to the END year's values.
+  // Instead the sheet-2 loop accumulates its own Block 9 values into _daySum,
+  // and the three cells are filled in after the loop. Section 1a is then the
+  // mean of its sheet-2 column by construction, not by a parallel calculation.
+  const _daySum = { real: 0, sid: 0, stel: 0, n: 0 };
 
+  // Section 0 is pinned to J2000: the model's mean year lengths for the
+  // production H. They must NOT move with the analysis period — a 1000-1010 run
+  // still reports the J2000 means. The live globals (meansolaryearlengthinDays,
+  // meanlengthofday, meansiderealyearlengthinSeconds, …) CANNOT be used here:
+  // recomputeEpochAnchors() rewrites all of them — H included — during the
+  // cardinal scan, so by this point they hold the scan's END year. That is why
+  // two runs over different periods reported different "model" year lengths.
+  const _j2kLod   = meanLodSecondsAtAge(0);
+  const _j2kTropS = meanTropicalYearSecondsAtAge(0);
+  const _j2kSidS  = meanSiderealYearSecondsAtAge(0);
+  const _j2kH     = meanHAtAge(0);
+  const _j2kTropD = _j2kTropS / _j2kLod;
+  const _j2kSidD  = _j2kSidS  / _j2kLod;
+  // Same construction as recomputeEpochAnchors(): perihelionCycleLength = H/16.
+  const _j2kAnomD = (_j2kTropD / (_j2kH / 16 - 1)) + _j2kTropD;
+  const _j2kAnomS = _j2kAnomD * _j2kLod;
+  // Section 5 does the same for the Block 10 precession columns. Separate count:
+  // a row with incomplete cardinal/apsidal events yields null precessions while
+  // still yielding day lengths, so the two blocks can span different row counts.
+  const _precSum = { ax: 0, inc: 0, peri: 0, n: 0 };
 
   // Sheet 1: Summary
   const summaryRows = [
@@ -42780,19 +42809,23 @@ async function runYearAnalysisExport(years) {
     ['GENERATED', new Date().toISOString()],
     ['ANALYSIS PERIOD', `${startYear} to ${endYear} (${endYear - startYear} years)`],
     [],
-    ['0. MODEL CONSTANTS (configured & derived)'],
-    ['1a) Days'],
-    ['Mean Solar Day in Seconds', meanlengthofday.toFixed(9)],
-    ['Mean Sidereal Day in Seconds', meanSiderealday.toFixed(9)],
-    ['Mean Stellar Day in Seconds', meanStellarday.toFixed(9)],
-    [],
-    ['1b) Years'],
-    ['Mean Tropical Year in Days', meansolaryearlengthinDays.toFixed(9)],
-    ['Mean Tropical Year in Seconds', (meansolaryearlengthinDays * meanlengthofday).toFixed(9)],
-    ['Mean Sidereal Year in Days', meansiderealyearlengthinDays.toFixed(9)],
-    ['Mean Sidereal Year in Seconds', meansiderealyearlengthinSeconds.toFixed(9)],
-    ['Mean Anomalistic Year in Days', meanAnomalisticYearinDays.toFixed(9)],
-    ['Mean Anomalistic Year in Seconds', (meanAnomalisticYearinDays * meanlengthofday).toFixed(9)],
+    // These are H-cycle MEAN year lengths, so they pair with the model's MEAN day
+    // (meanlengthofday) — all three rows share that one converter to within 2e-7 s,
+    // and the sidereal row then reproduces siderealYearJ2000 × 86400 to 3 µs.
+    // Do NOT switch this to o.lodKinematic: that is the tweakpane's converter for
+    // its EPOCH-specific year days (o.solarYearDays), not for these means. Mixing
+    // the two pushes the sidereal row 0.12 s off IAU.
+    ['0. MEAN YEAR LENGTHS — the model at J2000', 'Value'],
+    [`The model's mean year lengths at J2000, for H = ${_j2kH.toFixed(0)}. These are FIXED:`],
+    ['they do not move with the analysis period, so a run over any epoch reports the'],
+    ['same J2000 means here. The MEASURED values for the period requested are in'],
+    ['sections 1-3 and will differ slightly — the two are not the same quantity.'],
+    ['Mean Tropical Year in Days', _j2kTropD.toFixed(9)],
+    ['Mean Tropical Year in Seconds', _j2kTropS.toFixed(9)],
+    ['Mean Sidereal Year in Days', _j2kSidD.toFixed(9)],
+    ['Mean Sidereal Year in Seconds', _j2kSidS.toFixed(9)],
+    ['Mean Anomalistic Year in Days', _j2kAnomD.toFixed(9)],
+    ['Mean Anomalistic Year in Seconds', _j2kAnomS.toFixed(9)],
     [],
     ['1. TROPICAL YEAR (measured at solstices & equinoxes)', 'Measured (days)'],
     ['IAU Tropical Year J2000', ASTRO_REFERENCE.tropicalYearMeanJ2000.toFixed(9)],
@@ -42822,12 +42855,67 @@ async function runYearAnalysisExport(years) {
     ['Perihelion to Perihelion', meanPerihelion.toFixed(9)],
     ['Aphelion to Aphelion', meanAphelion.toFixed(9)],
     [],
-    ['4. DERIVED DAY LENGTHS (from measured year lengths)', 'Value (seconds)'],
+    ['4. DERIVED DAY LENGTHS (measured year days × asserted seconds constant)', 'Value (seconds)'],
+    ['Each day length is derived from the MEASURED year lengths of sections 1-3,'],
+    ['by the standard rotation identities:'],
+    ['  solar day    = siderealYearSeconds / measured sidereal year (in days)'],
+    ['  sidereal day = tropicalYearSec / (tropicalYearSec / 86400 + 1)'],
+    ['                 i.e. one rotation less per year than the solar day'],
+    ['  stellar day  = sidereal day × (1 + 1 / (axialPrecession × rotationsPerYear))'],
+    ['                 i.e. the equinox precessing on top of the sidereal day'],
+    ['CIRCULAR by construction: siderealYearSeconds is an ASSERTED constant, so'],
+    ['dividing it by a measured day count cannot test that constant — see the note'],
+    ['in section 5. Kept because the RATIOS between the three are a genuine scene check.'],
     ['Mean Solar Day = siderealYearSeconds / measuredSiderealYear', (meansiderealyearlengthinSeconds / meanSiderealYear).toFixed(6)],
     ['Mean Sidereal Day = tropicalYearSec / (tropicalYearSec / 86400 + 1)', (() => { const tropSec = meanTropicalYear * (meansiderealyearlengthinSeconds / meanSiderealYear); return (tropSec / (tropSec / 86400 + 1)).toFixed(6); })()],
     ['Mean Stellar Day = siderealDay × (1 + 1 / (axialPrecession × rotationsPerYear))', (() => { const measuredLOD = meansiderealyearlengthinSeconds / meanSiderealYear; const tropSec = meanTropicalYear * measuredLOD; const sidDay = tropSec / (tropSec / 86400 + 1); const axialPrec = meanSiderealYear / (meanSiderealYear - meanTropicalYear); const rotPerYear = meanTropicalYear + 1; return (sidDay * (1 + 1 / (axialPrec * rotPerYear))).toFixed(6); })()],
+    ['The solar-day row above is ANCHORED AT 86400 by construction:'],
+    ['siderealYearSeconds is the IAU sidereal year × 86400 SI seconds, so the row'],
+    ['reads exactly 86400 whenever the scene reproduces the IAU sidereal year.'],
+    ['Its departure from 86400 is therefore the scene\'s sidereal-year residual'],
+    ['re-expressed in seconds — not a measurement of how long a day is.'],
+    ['The sidereal and stellar rows are built on that same anchored value.'],
     [],
-    ['COIN ROTATION EFFECTS'],
+    [`5. DERIVED DAY LENGTHS (from LOD real) — mean over ${startYear}-${endYear}`, 'Value (seconds)'],
+    ['The same three day lengths as section 4, derived the OTHER way: not from the'],
+    ['measured year lengths, but from the model\'s LOD chain — kinematic + H/5 +'],
+    ['ΔT stack. Each value is the mean of its sheet-2 column.'],
+    ['  solar day    = LOD real (the production value; tweakpane Solar Day = REAL)'],
+    ['  sidereal day = solarYearDays × LOD_kinematic / (solarYearDays + 1)'],
+    ['  stellar day  = sidereal day / (H/13) / (solarYearDays + 1) + sidereal day'],
+    ['Sidereal and stellar use the KINEMATIC LOD, not LOD real — the kinematic'],
+    ['base is the one that reproduces the IAU sidereal day at J2000.'],
+    ['Mean Solar Day (LOD real, s)', ''],     // filled after the sheet-2 loop
+    ['Mean Sidereal Day in Seconds', ''],     // ditto
+    ['Mean Stellar Day in Seconds', ''],      // ditto
+    ['These are the PHYSICAL day lengths: how long a day actually is at this'],
+    ['epoch, from the model\'s LOD chain. Sections 4 and 5 are NOT competing'],
+    ['estimates of one quantity — section 4 is pinned to 86400 by its own'],
+    ['definition, while section 5 measures how far the real day sits from 86400.'],
+    ['The difference between the two sections is that offset.'],
+    [''],
+    ['NOTE: no day length in this report is scene-measured. The scene rotates at'],
+    ['exactly one solar day per JD and carries no ΔT, so a scene-derived day only'],
+    ['returns whatever seconds-per-day constant is fed in. Sections 1-3 — the year'],
+    ['lengths, in days — ARE genuine scene measurements.'],
+    [],
+    ['6. DERIVED PRECESSION PERIODS', 'Value (years)'],
+    ['Each is a BEAT period between two of the measured year lengths above:'],
+    ['a period P = A / (A − B) is how long until the two clocks realign.'],
+    ['The inputs are this year\'s own 4-cardinal / apsidal means — the'],
+    ['"(Measured, SI)" columns on sheet 2 — so the values below are the mean'],
+    ['of their sheet-2 column, not a recomputation from the period means.'],
+    [''],
+    ['Axial = sidereal / (sidereal − tropical)', ''],          // filled after the loop
+    ['  the equinox regressing against the stars'],
+    ['Inclination = anomalistic / (anomalistic − sidereal)', ''],
+    ['  perihelion lapping the stars'],
+    ['Perihelion = anomalistic / (anomalistic − tropical)', ''],
+    ['  perihelion lapping the equinox'],
+    [],
+    ['7. COIN ROTATION EFFECTS', 'Value'],
+    ['The extra rotation an orbiting, precessing body accumulates — the "coin'],
+    ['rotation" of a coin rolled around another: one turn more than the contacts.'],
     [''],
     ['Orbital Coin Rotation (1 year)'],
     ['  1 fewer solar day than sidereal days per year'],
@@ -42838,6 +42926,9 @@ async function runYearAnalysisExport(years) {
     ['Axial Coin Rotation (H/13)'],
     ['  1 extra sidereal day over axial precession cycle'],
     ['  Formula: (meanSiderealDay / axialCycle) / siderealDaysPerYear'],
+    ['  Uses the H/13 LATTICE divisor — a model constant:', (holisticyearLength / 13).toFixed(3), 'yr'],
+    ['  Section 6 axial, for contrast — a MEASURED beat:', ''],   // filled after the loop
+    ['  Both are correct; they are different quantities, so the two need not agree.'],
     ['  Daily offset', axialCoinRotationMs.toFixed(2), 'ms/sidereal day'],
     ['  Yearly accumulation', axialCoinRotationYearlySeconds.toFixed(2), 's/year'],
   ];
@@ -42865,12 +42956,11 @@ async function runYearAnalysisExport(years) {
   //                                tweakpane and meaningful for deep-time observation
   //   - (Physics, epoch-local):   pure formula prediction from computeLengthof*Year(year)
   //                                — matches tweakpane to sub-microsecond precision
-  // Day quantities follow the same Measured/Physics distinction:
-  //   - (Measured, s): scene-derived via live globals + Fourier modulation
-  //   - (Physics, s):  pure Driver 1 secular formula (meanLodSecondsAtAge etc.)
-  // The Measured-vs-Physics gap is a permanent diagnostic of scene-vs-formula
-  // divergence (residual Phase 8 integrated-math correction + first-iteration
-  // scan sensitivity).
+  // Day quantities do NOT follow that distinction — there is no measured day.
+  // The scene rotates at exactly one solar day per JD and carries no ΔT, so a
+  // scene-derived day only returns the seconds-per-day constant fed into it.
+  // Block 9 therefore carries the three formula values the tweakpane's Days
+  // folder shows, evaluated per row. See Block 9's own comment for the bases.
   const detailedRows = [
     [
       // Block 1 — Reference info
@@ -42897,15 +42987,25 @@ async function runYearAnalysisExport(years) {
       'Mean Sidereal (Measured, SI)',
       'Mean Sidereal (Measured, epoch-local)',
       'Mean Sidereal (Physics, epoch-local)',
-      // Block 9 — Day quantities.
-      //   LOD: just one view (LOD IS in SI seconds — no SI/local distinction)
-      //   Sidereal/Stellar Day: three views in parallel with year structure:
-      //     (Measured, SI)          — uses 86400 in formula, matches tweakpane (~flat at all epochs)
-      //     (Measured, epoch-local) — uses actual LOD, varies with epoch (deep-time observer view)
-      //     (Physics, s)            — Driver 1 formula truth
-      'LOD (Measured, s)', 'LOD (Physics, s)',
-      'Sidereal Day (Measured, SI, s)', 'Sidereal Day (Measured, epoch-local, s)', 'Sidereal Day (Physics, s)',
-      'Stellar Day (Measured, SI, s)',  'Stellar Day (Measured, epoch-local, s)',  'Stellar Day (Physics, s)'
+      // Block 9 — Day quantities, formula-only. NOTHING here is scene-measured:
+      // the scene's JD-days are 86400-s by construction and carry no ΔT, so any
+      // scene-derived day only returns the conversion constant (the same result
+      // the Solar Day report's "IS THIS CIRCULAR?" block reports).
+      // These are the three values the tweakpane's Days folder shows, evaluated
+      // per row: LOD real (kinematic + H/5 + ΔT stack), and the sidereal/stellar
+      // day, which are built on the KINEMATIC LOD — see the note at their
+      // computation for why the bases differ.
+      'LOD real (s)', 'Sidereal Day (s)', 'Stellar Day (s)',
+      // Block 10 — Precession periods, in years, from THIS row's measured-SI
+      // year means (the same three values shown in the "(Measured, SI)" columns
+      // above). Each is a beat period between two year lengths:
+      //   axial       = sid  / (sid  − trop)   — equinox regression   (≈ 25,772 yr)
+      //   inclination = anom / (anom − sid)    — inclination cycle    (≈ H/3)
+      //   perihelion  = anom / (anom − trop)   — apsidal vs equinox   (≈ 20,940 yr)
+      // Same construction as the Summary's axialPrec and the tweakpane's
+      // o.perihelionPrecession (script.js ~60862), which use seconds instead of
+      // days — the ratio is identical either way.
+      'Axial Precession (yr)', 'Inclination Precession (yr)', 'Perihelion Precession (yr)'
     ]
   ];
 
@@ -42956,24 +43056,49 @@ async function runYearAnalysisExport(years) {
     const meanSid = (siVE !== undefined && siSS !== undefined && siAE !== undefined && siWS !== undefined)
       ? (siVE + siSS + siAE + siWS) / 4 : null;
 
-    // Derived day lengths (formula-only, no scene needed)
-    const derivedDayLength = meansiderealyearlengthinSeconds / computeSiderealYearDaysDirect(year);
-    const solarYearDaysRow = computeSolarYearDaysFromCardinals(year);
-    // Phase 9.4 (Path 1): use epoch's actual LOD (meanlengthofday) instead of the
-    // SI constant 86400. The previous formula `(solY * 86400) / (solY + 1)` gives
-    // ~86164.09 SI s at every epoch because the ratio is dominated by solY, hiding
-    // the real epoch-local sidereal-day shrinkage from LOD evolution. Physically:
-    // sidereal_day_SI = T_trop_s × LOD / (T_trop_s + LOD) = solY × LOD / (solY + 1).
-    // Epoch-local versions: use actual epoch LOD — physically correct sidereal/stellar
-    // day in SI seconds, varies with epoch. Phase 9 toggle reverts to 86400.
-    const _phase94LOD = _phase9SiderealDayLODFactor();
-    const siderealDayRow = (solarYearDaysRow * _phase94LOD) / (solarYearDaysRow + 1);
-    const stellarDayRow = (meanSiderealday / (holisticyearLength / 13)) / (solarYearDaysRow + 1) + siderealDayRow;
-    // SI versions: use 86400 in the formula — matches tweakpane's
-    // siderealDayReal / stellarDayReal. Essentially flat at all
-    // epochs because the 86400 doesn't track LOD evolution.
-    const siderealDayRow_SI = (solarYearDaysRow * 86400) / (solarYearDaysRow + 1);
-    const stellarDayRow_SI = (meanSiderealday / (holisticyearLength / 13)) / (solarYearDaysRow + 1) + siderealDayRow_SI;
+    // Day lengths — formula-only, no scene needed. The LOD ledger at this row's
+    // year, in the same three steps the tweakpane uses:
+    //   kinematic  = IAU sidereal-year seconds / epoch sidereal-year days
+    //                (identical to o.lodKinematic, but evaluated per row)
+    //   + H/5      = the kinematic H/5 term
+    //   real       = + the 4-flag ΔT stack and core-mantle swing
+    //                (dtCycleLodCorrectionSum) — the production value, i.e.
+    //                what the tweakpane shows as Solar Day = REAL.
+    const derivedDayLength  = meansiderealyearlengthinSeconds / computeSiderealYearDaysDirect(year);
+    const lodRealRow        = derivedDayLength +
+      derivedDayLength / ((holisticyearLength / 5) * meansolaryearlengthinDays) +
+      dtCycleLodCorrectionSum(year);
+    // Sidereal and stellar day use the SAME formulas as the tweakpane
+    // (predictions.siderealDayReal / stellarDayReal, script.js ~60850), evaluated
+    // at this row's year instead of the live epoch:
+    //   sidereal = solY × LOD_kinematic / (solY + 1)
+    //   stellar  = sidereal / (H/13) / (solY + 1) + sidereal
+    // The base is the KINEMATIC LOD, not LOD real. That is not an oversight:
+    // the sidereal day is a rotation quantity tied to the kinematic construction,
+    // and the kinematic base reproduces ASTRO_REFERENCE.siderealDayJ2000
+    // (86164.090531) to 1 µs, whereas LOD real misses it by 1.39 ms.
+    // solY is computeSolarYearDaysDirect — the same source as o.solarYearDays —
+    // NOT the cardinal-measured year used for the year columns.
+    const solarYearDaysRow = computeSolarYearDaysDirect(year);
+    const siderealDayRow = (solarYearDaysRow * derivedDayLength) / (solarYearDaysRow + 1);
+    const stellarDayRow = (siderealDayRow / (holisticyearLength / 13)) / (solarYearDaysRow + 1) + siderealDayRow;
+    // Feed section 1a — accumulated HERE, inside the per-year epoch, so the
+    // Summary means are the means of these exact columns.
+    _daySum.real += lodRealRow; _daySum.sid += siderealDayRow;
+    _daySum.stel += stellarDayRow; _daySum.n++;
+
+    // Precession periods from this row's measured-SI year means. Guarded: any
+    // year whose cardinal/apsidal events are incomplete leaves meanTrop/meanSid/
+    // meanAnom null, and a vanishing denominator would blow up to ±Infinity.
+    const _precession = (a, b) => (a !== null && b !== null && Math.abs(a - b) > 1e-9)
+      ? (a / (a - b)) : null;
+    const axialPrecRow       = _precession(meanSid,  meanTrop);
+    const inclinationPrecRow = _precession(meanAnom, meanSid);
+    const perihelionPrecRow  = _precession(meanAnom, meanTrop);
+    if (axialPrecRow !== null && inclinationPrecRow !== null && perihelionPrecRow !== null) {
+      _precSum.ax += axialPrecRow; _precSum.inc += inclinationPrecRow;
+      _precSum.peri += perihelionPrecRow; _precSum.n++;
+    }
 
     // Phase 9.7c: Measured columns converted back to EPOCH-LOCAL days.
     // The Measured columns are intrinsically in SI 86400-s days (from JD
@@ -42997,15 +43122,8 @@ async function runYearAnalysisExport(years) {
     // for "what an observer at THIS epoch would experience" — at -380 Ma the
     // tropical year shows as ~398 epoch-local days, not 365.24 SI days.
     // External cross-reference (Chapront, IAU) values can be reconstructed
-    // from epoch-local × meanlengthofday / 86400 (= the (SI 86400) columns).
+    // from epoch-local × meanlengthofday / 86400.
     //
-    // Day-length Physics columns: stay on Driver 1 secular (mean*Day helpers)
-    // because the model doesn't separately Fourier-modulate LOD — Driver 1
-    // IS the model's full LOD prediction.
-    const _t_Ma_row = (startmodelYear - year) / 1e6;
-    const _LOD_s    = meanLodSecondsAtAge(_t_Ma_row);
-    const _sidDay_s = meanSiderealDayAtAge(_t_Ma_row);
-    const _stelDay_s = meanStellarDayAtAge(_t_Ma_row);
     const tropPhys  = computeSolarYearDaysFromCardinals(year);
     const sidPhys   = computeSiderealYearDaysDirect(year);
     // computeAnomalisticYearSecFromDaysFourier returns seconds (= days × LOD);
@@ -43032,7 +43150,11 @@ async function runYearAnalysisExport(years) {
       getInterval(cardinalData.AE.intervalsByYear, year),
       getInterval(cardinalData.WS.intervalsByYear, year),
       // Block 4 — Mean Tropical Year aggregates
-      meanTrop      !== null ? meanTrop.toFixed(9)      : '',
+      // 12 decimals, not 9: this cell is an input to the Block 10 precession
+      // columns, and at 9 dp the inclination column cannot be reproduced from
+      // the sheet (its denominator is only 0.0033 d, so one unit in the last
+      // printed digit moves it by 0.034 yr).
+      meanTrop      !== null ? meanTrop.toFixed(12)     : '',
       meanTropLocal !== null ? meanTropLocal.toFixed(9) : '',
       tropPhys      !== null ? tropPhys.toFixed(9)      : '',
       // Block 5 — Perihelion / Aphelion
@@ -43043,7 +43165,7 @@ async function runYearAnalysisExport(years) {
       aph?.distance?.toFixed(8) || '',
       getInterval(aphelionIntervalsByYear, year),
       // Block 6 — Mean Anomalistic Year aggregates
-      meanAnom      !== null ? meanAnom.toFixed(9)      : '',
+      meanAnom      !== null ? meanAnom.toFixed(12)     : '',   // 12 dp — Block 10 input
       meanAnomLocal !== null ? meanAnomLocal.toFixed(9) : '',
       anomPhys      !== null ? anomPhys.toFixed(9)      : '',
       // Block 7 — Per-cardinal sidereal year
@@ -43052,19 +43174,40 @@ async function runYearAnalysisExport(years) {
       getInterval(siderealData.AE.intervalsByYear, year),
       getInterval(siderealData.WS.intervalsByYear, year),
       // Block 8 — Mean Sidereal Year aggregates
-      meanSid      !== null ? meanSid.toFixed(9)      : '',
+      meanSid      !== null ? meanSid.toFixed(12)     : '',   // 12 dp — Block 10 input
       meanSidLocal !== null ? meanSidLocal.toFixed(9) : '',
       sidPhys      !== null ? sidPhys.toFixed(9)      : '',
-      // Block 9 — Day quantities. LOD single view + Sidereal/Stellar three views each.
-      derivedDayLength.toFixed(6),
-      _LOD_s     !== null ? _LOD_s.toFixed(6)     : '',
-      siderealDayRow_SI.toFixed(6),
+      // Block 9 — Day quantities.
+      lodRealRow.toFixed(6),
       siderealDayRow.toFixed(6),
-      _sidDay_s  !== null ? _sidDay_s.toFixed(6)  : '',
-      stellarDayRow_SI.toFixed(6),
       stellarDayRow.toFixed(6),
-      _stelDay_s !== null ? _stelDay_s.toFixed(6) : ''
+      // Block 10 — Precession periods (years)
+      axialPrecRow       !== null ? axialPrecRow.toFixed(3)       : '',
+      inclinationPrecRow !== null ? inclinationPrecRow.toFixed(3) : '',
+      perihelionPrecRow  !== null ? perihelionPrecRow.toFixed(3)  : ''
     ]);
+  }
+
+  /* Fill section 1a from the sheet-2 columns just produced (see _daySum above). */
+  if (_daySum.n > 0) {
+    const _fill = (label, value) => {
+      const row = summaryRows.find(r => r[0] === label);
+      if (row) row[1] = (value / _daySum.n).toFixed(9);
+    };
+    _fill('Mean Solar Day (LOD real, s)', _daySum.real);
+    _fill('Mean Sidereal Day in Seconds', _daySum.sid);
+    _fill('Mean Stellar Day in Seconds', _daySum.stel);
+  }
+  /* Section 5 — same treatment for the Block 10 precession columns. */
+  if (_precSum.n > 0) {
+    const _fillPrec = (label, value) => {
+      const row = summaryRows.find(r => r[0] === label);
+      if (row) row[1] = (value / _precSum.n).toFixed(3);
+    };
+    _fillPrec('Axial = sidereal / (sidereal − tropical)', _precSum.ax);
+    _fillPrec('  Section 6 axial, for contrast — a MEASURED beat:', _precSum.ax);
+    _fillPrec('Inclination = anomalistic / (anomalistic − sidereal)', _precSum.inc);
+    _fillPrec('Perihelion = anomalistic / (anomalistic − tropical)', _precSum.peri);
   }
 
   /* E · Create workbook and download */
@@ -47925,6 +48068,26 @@ async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
  * @returns {{ intervals: number[], declinations: number[], noonJDs: number[], firstNoonJD: number }}
  */
 async function measureSolarDayIntervals(startJD, numDays = 365) {
+  // ── JD → seconds conversion constant ──────────────────────────────────────
+  // The scene JD is a UT-like coordinate: one solar day = 1.000000000 JD by
+  // construction (earth.rotationSpeed is built from SI_TROPICAL_YEAR_DAYS,
+  // 86400 and _siderealDaySec_J2000, giving 86400.000007 SI s/day and NO ΔT —
+  // see the comment on updateEarthForEpoch). Verified to 1e-10 against the
+  // year-2000 and year-−399 reports.
+  //
+  // Converting that interval to SI seconds therefore needs the ACTUAL length
+  // of the day — the shipped Layer-4 LOD_real — not `meanlengthofday`, which
+  // is the KINEMATIC day and a different quantity. Using the kinematic
+  // constant silently under-reported the mean by ~1.7 ms.
+  //
+  // Composition mirrors secondsExcessPerDay() / the tweakpane Layer 4 exactly,
+  // evaluated once at the report epoch:
+  //   LOD_real = o.lodKinematic + h5Correction + dtCycleLodCorrectionSum(year)
+  jumpToJulianDay(startJD);
+  forceSceneUpdate();
+  const _reportH5 = o.lodKinematic / ((holisticyearLength / 5) * meansolaryearlengthinDays);
+  const _reportLodReal = o.lodKinematic + _reportH5 + dtCycleLodCorrectionSum(o.currentYear);
+
   // Find nearest solar noon to startJD (adapted from analyzeSolarDay)
   const findNearestNoon = (jd) => {
     jumpToJulianDay(jd);
@@ -47957,10 +48120,16 @@ async function measureSolarDayIntervals(startJD, numDays = 365) {
   let prevJD = firstNoonJD;
   let cumulativeState = null;
 
-  for (let i = 0; i < numDays; i++) {
+  // numDays + 1: the extra interval is NOT part of the daily table. It exists
+  // only to complete the tropical-year integral in the weighted mean (the year
+  // is not an integer number of days, so numDays intervals leave a fractional
+  // residual unmeasured, biasing the arithmetic mean by up to ±20 ms depending
+  // on starting phase). numDays itself is epoch-adaptive — floor(solar days per
+  // year) — so this stays correct at deep time where the year had ~400 days.
+  for (let i = 0; i < numDays + 1; i++) {
     const result = solarNoonForJD(prevJD, false, cumulativeState);
     if (result) {
-      intervals.push((result.jd - prevJD) * meanlengthofday);
+      intervals.push((result.jd - prevJD) * _reportLodReal);
       prevJD = result.jd;
       cumulativeState = result.cumulativeState;
       // Capture declination at this noon
@@ -47973,7 +48142,7 @@ async function measureSolarDayIntervals(startJD, numDays = 365) {
     if (i % 50 === 49) await new Promise(r => setTimeout(r, 0));
   }
 
-  return { intervals, declinations, noonJDs, firstNoonJD };
+  return { intervals, declinations, noonJDs, firstNoonJD, lodReal: _reportLodReal };
 }
 
 /**
@@ -47990,7 +48159,12 @@ async function runSolarDayReport(year, onProgress) {
   const savedRun = o.Run;
   o.Run = false;
 
-  const numDays = Math.floor(meansolaryearlengthinDays); // 365
+  const numDays = Math.floor(meansolaryearlengthinDays); // epoch-adaptive (~365 now, ~400 at deep time)
+  // Hoisted above the measurement loop: the per-start weighted mean needs
+  // `residual` (the epoch's fractional day) while sampling, not just in the
+  // summary text below.
+  const tropicalYearAtEpoch = computeSolarYearDaysFromCardinals(year);
+  const residual = tropicalYearAtEpoch - numDays;
 
   // Build starting points: 4 RA crossings + perihelion + aphelion
   const startPoints = [
@@ -48025,9 +48199,24 @@ async function runSolarDayReport(year, onProgress) {
 
     const data = await measureSolarDayIntervals(startJD, numDays);
 
-    const intervals = data.intervals;
+    const allIntervals = data.intervals;
+    const intervals = allIntervals.slice(0, numDays);
     const sorted = [...intervals].sort((a, b) => a - b);
     const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+
+    // Mean over EXACTLY one tropical year: numDays whole intervals plus the
+    // fractional part of the next one. Removes the truncation bias (validated
+    // on the year-2000 report: 4-cardinal −0.669 ms → −0.002 ms, and the
+    // starting-point spread 34.0 ms → 0.86 ms — the bias is removed, not
+    // averaged away). `residual` is the epoch's fractional day.
+    const _extra = allIntervals[numDays];
+    const meanYear = (_extra !== undefined && residual > 0 && residual < 1)
+      ? (intervals.reduce((a, b) => a + b, 0) + residual * _extra) / (numDays + residual)
+      : null;
+    // The ACTUAL measured quantity: scene days per solar day. The seconds
+    // figures above are this number times the JD→s constant, so THEY CANNOT
+    // VALIDATE THAT CONSTANT — only this ratio is a measurement.
+    const meanYearJD = (meanYear !== null) ? meanYear / data.lodReal : null;
     const min = sorted[0];
     const max = sorted[sorted.length - 1];
 
@@ -48046,14 +48235,14 @@ async function runSolarDayReport(year, onProgress) {
         max,
         range: max - min,
         diffFrom86400: mean - 86400,
+        meanYear,
+        meanYearJD,
       }
     });
     console.log(`  ${sp.label}: mean = ${mean.toFixed(6)}s, diff = ${((mean - 86400) * 1000).toFixed(3)} ms`);
   }
 
   // ── Sheet 1: Summary ──────────────────────────────────────────────────
-  const tropicalYearAtEpoch = computeSolarYearDaysFromCardinals(year);
-  const residual = tropicalYearAtEpoch - numDays;
 
   if (onProgress) onProgress('Building report...');
 
@@ -48064,16 +48253,18 @@ async function runSolarDayReport(year, onProgress) {
     [`YEAR: ${year}`],
     [`Tropical year length at year ${year}:`, tropicalYearAtEpoch.toFixed(9), 'days'],
     [`Mean tropical year (H-cycle average):`, meansolaryearlengthinDays.toFixed(9), 'days'],
-    [`Measured intervals per starting point:`, numDays],
+    [`Intervals measured per starting point:`, numDays + 1,
+      `(${numDays} whole + the ${residual.toFixed(6)} fraction that completes the year)`],
     [],
     ['WHY STARTING ANGLE MATTERS'],
     [`The solar day is measured as the interval between successive solar noons.`],
     [`In year ${year} the tropical year is ${tropicalYearAtEpoch.toFixed(6)} days — not an integer.`],
-    [`We measure exactly ${numDays} noon-to-noon intervals, leaving a ${residual.toFixed(6)}-day`],
-    ['residual that is not measured. Which part of the annual equation-of-time cycle'],
-    ['falls in that unmeasured residual depends on the starting point, biasing the'],
-    ['measured mean solar day by several milliseconds.'],
-    ['This report measures from 6 starting points to expose this bias.'],
+    [`Averaging a whole number of intervals therefore covers ${residual.toFixed(6)} of a day less`],
+    ['than a full year. Which part of the annual equation-of-time cycle is left out'],
+    ['depends on the starting point, biasing that mean by several milliseconds.'],
+    ['This report measures from 6 starting points to expose that bias, and the'],
+    ['UNBIASED block removes it by measuring one interval more and weighting it'],
+    [`by ${residual.toFixed(6)}, so the average covers exactly one tropical year.`],
     ['Results are specific to year ' + year + ' and will differ for other years.'],
     [],
     ['MEASUREMENT METHOD'],
@@ -48118,9 +48309,66 @@ async function runSolarDayReport(year, onProgress) {
     if (cardinalResults.length === 4) {
       summaryRows.push(['Mean of 4 cardinal points (RA 0/90/180/270)', '', cardinalMean.toFixed(6), 's',
         '', ((cardinalMean - 86400) * 1000).toFixed(4), 'ms from 86400']);
+      summaryRows.push(['  ^ the 4 cardinal points ARE the estimator. Perihelion and aphelion sit']);
+      summaryRows.push(['    near the same part of the annual cycle, so including them UNBALANCES the']);
+      summaryRows.push([`    phase sampling — ${Math.abs((allMean - 86400) * 1000).toFixed(1)} ms of truncation bias vs ` +
+        `${Math.abs((cardinalMean - 86400) * 1000).toFixed(1)} ms — so they are averaged in nowhere below.`]);
+    } else {
+      // Fallback only: without the full cardinal set there is no balanced subset.
+      summaryRows.push([`Mean of all ${results.length} starting points`, '', allMean.toFixed(6), 's',
+        '', ((allMean - 86400) * 1000).toFixed(4), 'ms from 86400']);
     }
-    summaryRows.push([`Mean of all ${results.length} starting points`, '', allMean.toFixed(6), 's',
-      '', ((allMean - 86400) * 1000).toFixed(4), 'ms from 86400']);
+    const yv  = results.map(r => r.stats.meanYear).filter(v => v != null);
+    const yjd = results.map(r => r.stats.meanYearJD).filter(v => v != null);
+    const cy  = cardinalResults.map(r => r.stats.meanYear).filter(v => v != null);
+    if (yv.length) {
+      summaryRows.push([]);
+      summaryRows.push([`UNBIASED — mean over exactly ONE tropical year (${numDays} + ${residual.toFixed(6)} intervals)`]);
+      if (cy.length === 4) {
+        const cm = cy.reduce((a, b) => a + b, 0) / 4;
+        summaryRows.push(['  4 cardinal points', '', cm.toFixed(6), 's',
+          '', ((cm - 86400) * 1000).toFixed(4), 'ms from 86400']);
+      } else {
+        const am = yv.reduce((a, b) => a + b, 0) / yv.length;
+        summaryRows.push([`  all ${yv.length} starting points`, '', am.toFixed(6), 's',
+          '', ((am - 86400) * 1000).toFixed(4), 'ms from 86400']);
+      }
+      // Dispersion, not a central estimate — all points belong here: it is the
+      // spread across starting points that shows the bias is removed, not hidden.
+      summaryRows.push(['  spread between starting points', '',
+        ((Math.max(...yv) - Math.min(...yv)) * 1000).toFixed(3) + ' ms',
+        `(vs ${(spread * 1000).toFixed(2)} ms for the plain means — bias removed, not averaged away)`]);
+      summaryRows.push([]);
+      summaryRows.push(['IS THIS CIRCULAR? — read before quoting the seconds figure']);
+      summaryRows.push(['Partly, and deliberately exposed. Every interval above is']);
+      summaryRows.push(['  (ΔJD measured in the scene) × (JD→s constant = Layer-4 LOD_real).']);
+      summaryRows.push(['So the SECONDS cannot validate that constant — feed in a different LOD']);
+      summaryRows.push(['and the seconds move with it. The genuinely MEASURED quantity is the']);
+      summaryRows.push(['ratio below, which tests the scene construction, not the LOD value:']);
+      // Same estimator as the seconds above: the 4 cardinal points sample the
+      // annual cycle evenly, so the phase imbalance does not leak into the ratio.
+      const cjd = cardinalResults.map(r => r.stats.meanYearJD).filter(v => v != null);
+      const jdSet = (cjd.length === 4) ? cjd : yjd;
+      const amJD = jdSet.reduce((a, b) => a + b, 0) / jdSet.length;
+      summaryRows.push([`  scene days per solar day (${cjd.length === 4 ? '4 cardinals' : `all ${yjd.length} points`})`,
+        '', amJD.toFixed(12), 'JD']);
+      summaryRows.push(['  expected by construction', '', (1).toFixed(12), 'JD',
+        '', ((amJD - 1) * 1e9).toFixed(2), 'ppb deviation']);
+      summaryRows.push(['A ratio of 1.000000000 confirms the scene rotates at exactly one solar']);
+      summaryRows.push(['day per JD over a full year. It does NOT confirm the length of that day.']);
+      summaryRows.push(['The scene carries no ΔT (see updateEarthForEpoch); the LOD value comes']);
+      summaryRows.push(['from the ΔT/H-5 chain and is asserted here, not measured.']);
+    }
+    summaryRows.push([]);
+    summaryRows.push(['WHAT IS MEASURED HERE — AND WHAT IS NOT']);
+    summaryRows.push(['MEASURED: the equation-of-time structure. The ~50 s daily swing and the']);
+    summaryRows.push(['  ~34 ms spread between starting points are genuine scene physics.']);
+    summaryRows.push(['NOT MEASURED: the mean itself. The scene rotates at exactly one solar day']);
+    summaryRows.push(['  per JD by construction (86400.000007 SI s/day, ΔT-free by design — see the']);
+    summaryRows.push(['  comment on updateEarthForEpoch), so the mean returned here follows the']);
+    summaryRows.push(['  JD→seconds conversion constant (Layer-4 LOD_real at this epoch), not an']);
+    summaryRows.push(['  independent determination of the length of day. The starting-point spread']);
+    summaryRows.push([`  and the annual structure are this report's real content.`]);
   }
 
   // ── Sheet 2: Daily Data ───────────────────────────────────────────────
@@ -60661,7 +60909,10 @@ function updatePredictions() {
   predictions.solarYearDays = o.solarYearDays = computeSolarYearDaysDirect(yearForFormula);
   o.siderealYearDays = computeSiderealYearDaysDirect(yearForFormula);
   // o.lodKinematic MUST be assigned BEFORE any downstream calc that uses it.
-  // o.lodKinematic = epoch-specific kinematic = IAU_sid_sec / Fourier_sid_days ≈ 86400.000312 at J2000
+  // o.lodKinematic = epoch-specific kinematic = IAU_sid_sec / Fourier_sid_days ≈ 86400.000000 at J2000
+  // (86400.000312 is the SCENE-MEASURED route — IAU_sid_sec / the cardinal-point
+  //  measured sidereal year — which the Days & Years report shows in section 4.
+  //  It is a different quantity; do not use it to sanity-check this line.)
   // (includes SIDEREAL_YEAR_HARMONICS Fourier ripple).
   o.lodKinematic = meansiderealyearlengthinSeconds / o.siderealYearDays;
   // Sidereal year in seconds = MEASURED days × o.lodKinematic (round-trip identity → = IAU_sid_sec = 31,558,149.7635 s).
