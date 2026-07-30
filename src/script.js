@@ -30776,7 +30776,7 @@ function setupGUI() {
   }), 'Physical (observable) length of one solar day = framework\'s full prediction (Tidal + GIA + all cycles). At J2000 \u2248 86400.0014 s. Broken down in the Solar Day decomposition sub-folder below.');
   addTooltip(daysFolder.addBinding(predictions, 'siderealDayReal', {
     label: 'Sidereal Day (s)', readonly: true, format: fmt6
-  }), 'One rotation relative to the vernal equinox. Shorter than a solar day by ~235.9 s.');
+  }), 'One rotation relative to the MOVING vernal equinox — shorter than the solar day by ~235.9 s. Its day-length basis is the IAU sidereal year in SI seconds divided by the model\'s sidereal year in days: anchored on the 86400 SI-second day at J2000. That basis — not the LOD_real shown as Solar Day above — is why this reproduces the IAU sidereal day (86164.090531 s) to ~9 µs.');
   addTooltip(daysFolder.addBinding(predictions, 'stellarDayReal', {
     label: 'Stellar Day (s)', readonly: true, format: fmt6
   }), 'One rotation relative to the fixed stars. Longer than a sidereal day by ~8.37 ms — the H/13 precession rate projected onto the equator (m = p·cos ε), which is the rate this offset depends on.');
@@ -31411,6 +31411,8 @@ function setupGUI() {
     'Measure solar day offset at 65 epochs (H/64 steps) across one full Earth Fundamental Cycle.');
   addTestButton('Analyze Stellar Day', analyzeStellarDay,
     'Measure Earth\'s rotation period relative to distant stars.');
+  addTestButton('Scene vs Step-6a Engine Diff', compareSceneVsSceneGraph,
+    'Read the Sun at fixed JDs in this scene and compare against tools/lib/scene-graph.js (the Node engine Step 6a uses). Isolates whether the ~115 ms year-length disagreement is a position difference or a search difference.');
 
   // Calibration
   const firstCalibBtn = addTestButton('Verify Obliquity Calibration', runObliquityCalibrationTest,
@@ -49350,6 +49352,330 @@ function stellarDayMethodC_Derived(siderealDaySeconds) {
 /**
  * Main stellar day analysis function - runs all three methods
  */
+/**
+ * Compare THIS scene's Sun position against tools/lib/scene-graph.js — the
+ * standalone Node engine that Step 6a (export-solar-measurements.js) runs on.
+ *
+ * WHY: the Days & Years report measures the tropical year ~115 ms SHORTER than
+ * the Step 6a CSV, systematically, in every year 1990-2010. Already ruled out
+ * by measurement: CSV rounding (was the ±63 ms scatter, fixed by toFixed(9)),
+ * sample-grid phase (±0.01 ms), missing Sun harmonics (identical code and
+ * whitelist in both), obliquity (matches to 0.0000"), and deep-time epoch
+ * granularity (0.03 ms). What remains is a systematic offset with a ~33 ms
+ * cardinal-point dependence (VE −131, SS −113, AE −98, WS −118 ms).
+ *
+ * This is the direct test the inference could not reach. Both sides read the
+ * same quantity — 90 − sun.dec×180/π — so any difference here is a genuine
+ * POSITION difference between the two engines. If the columns agree to the
+ * last digit instead, the engines are identical and the 115 ms lives in the
+ * SEARCH (e.g. forceSceneUpdate('light') skipping a step the exporter gets),
+ * which is a different fix entirely.
+ *
+ * The reference column is scene-graph.js evaluated at these exact JDs.
+ */
+function compareSceneVsSceneGraph() {
+  // tools/lib/scene-graph.js → computeSunPositionFast(jd), plus the internals it
+  // derives on the way: ecliptic longitude, the currentYear it feeds to
+  // computeEccentricity, that eccentricity, and sunLongitudeCorrection(jd).
+  const REF = [
+    { label: '~VE',   jd: 2451623.8, dec:  90.006902632, ra: 359.998395282, dist: 0.996416458,
+      lon: 359.995780589, cy: 2000.243926547, ecc: 0.016710201897, corr:  0.077211527 },
+    { label: '~SS',   jd: 2451716.6, dec:  66.560710946, ra:  90.039679608, dist: 1.014990307,
+      lon:  90.036405330, cy: 2000.498004524, ecc: 0.016710180572, corr: -0.000723310 },
+    { label: '~AE',   jd: 2451810.2, dec:  89.990270670, ra: 179.991868644, dist: 1.003322212,
+      lon: 179.988668121, cy: 2000.754272828, ecc: 0.016710159055, corr: -0.078143491 },
+    { label: '~WS',   jd: 2451900.1, dec: 113.439221361, ra: 270.051481119, dist: 0.984997727,
+      lon: 270.047233029, cy: 2001.000410867, ecc: 0.016710138382, corr: -0.001694621 },
+    { label: '~PERI', jd: 2451547.5, dec: 112.812246548, ra: 284.048728188, dist: 0.984613992,
+      lon: 282.929938326, cy: 2000.035024073, ecc: 0.016710219426, corr:  0.016152182 },
+    { label: '~APH',  jd: 2451730.1, dec:  67.185947071, ra: 104.027772743, dist: 1.015386009,
+      lon: 102.910537973, cy: 2000.534966298, ecc: 0.016710177469, corr: -0.017489757 },
+  ];
+
+  const savedJD = o.julianDay, savedRun = o.Run;
+  o.Run = false;
+
+  console.log('═'.repeat(96));
+  console.log('  SCENE vs STEP-6a ENGINE — Sun position at identical JDs');
+  console.log('═'.repeat(96));
+
+  /* MEAN MOTION — the one thing position-at-fixed-JD tests cannot see.
+   * jumpToJulianDay does o.pos = sDay * (jd - startmodelJD), and moveModel turns
+   * pos into the Sun's angle. So `sDay` IS the mean motion. It is a module-level
+   * mutable set once from meansolaryearlengthinDays, while that global is itself
+   * rewritten by recomputeEpochAnchors (script.js ~7522). If the two ever drift
+   * apart, every year length is wrong by the relative gap — and positions at a
+   * fixed JD still look fine, because the error is a RATE, not an offset.
+   * Step 6a uses 1 / C.meanSolarYearDays = 1 / 365.242203646102. */
+  const _sdayImplied = 1 / sDay;
+  const _sixA = 365.242203646102;
+  console.log(`  mean motion check:  1/sDay = ${_sdayImplied.toFixed(12)}`);
+  console.log(`                      meansolaryearlengthinDays = ${meansolaryearlengthinDays.toFixed(12)}`);
+  console.log(`                      Step 6a uses              = ${_sixA.toFixed(12)}`);
+  const _relSix = (_sdayImplied - _sixA) / _sixA;
+  console.log(`  1/sDay vs meansolaryearlengthinDays: ${((_sdayImplied - meansolaryearlengthinDays) * 86400 * 1000).toFixed(2)} ms/yr`);
+  console.log(`  1/sDay vs Step 6a:                   ${(_relSix * 365.2422 * 86400 * 1000).toFixed(2)} ms/yr` +
+              `   <-- compare to the measured -115 ms/yr`);
+  console.log('');
+  console.log('  Both read 90 − sun.dec×180/π. A nonzero Δdec is a POSITION difference');
+  console.log('  between this Three.js scene and tools/lib/scene-graph.js.');
+  console.log('');
+  console.log('  label      JD           scene dec       6a dec        Δdec (")   Δdec→ms   ΔRA (")');
+  console.log('  ' + '─'.repeat(92));
+
+  const out = [];
+  for (const r of REF) {
+    jumpToJulianDay(r.jd);
+    forceSceneUpdate();
+    if (!Number.isFinite(sun?.dec)) { console.log(`  ${r.label}  — sun.dec not finite, skipped`); continue; }
+
+    const decDeg = sun.dec * 180 / Math.PI;
+    const raDeg  = ((sun.ra * 180 / Math.PI) % 360 + 360) % 360;
+    const dDec   = (decDeg - r.dec) * 3600;                       // arcsec
+    const dRa    = (((raDeg - r.ra + 540) % 360) - 180) * 3600;    // arcsec, wrapped
+
+    // Convert a declination difference to an equivalent timing shift using the
+    // LOCAL slope d(dec)/dt — near a solstice that slope → 0, so the same Δdec
+    // implies a much larger time shift there. Slope measured from the scene.
+    const h = 0.01;                                                // days
+    jumpToJulianDay(r.jd + h); forceSceneUpdate();
+    const decPlus = sun.dec * 180 / Math.PI;
+    jumpToJulianDay(r.jd - h); forceSceneUpdate();
+    const decMinus = sun.dec * 180 / Math.PI;
+    const slope = (decPlus - decMinus) / (2 * h);                  // deg/day
+    const dtMs = Math.abs(slope) > 1e-9 ? ((decDeg - r.dec) / slope) * 86400 * 1000 : NaN;
+
+    out.push({ ...r, decDeg, dDec, dRa, slope, dtMs });
+    console.log(`  ${r.label.padEnd(6)} ${r.jd.toFixed(1)}  ${decDeg.toFixed(9).padStart(14)}  ` +
+                `${r.dec.toFixed(9).padStart(13)}  ${dDec.toFixed(4).padStart(10)}  ` +
+                `${(Number.isFinite(dtMs) ? dtMs.toFixed(1) : 'n/a').padStart(9)}  ${dRa.toFixed(4).padStart(9)}`);
+  }
+
+  /* ── Longitude-space comparison ──────────────────────────────────────────
+   * Declination is blind to a longitude error at the solstices, which is why
+   * SS/WS matched exactly above. Ecliptic longitude has no such blind spot, so
+   * this table shows the discrepancy at ALL six JDs and isolates WHICH input
+   * differs: the eccentricity (equation of centre), the Sun harmonics, or the
+   * currentYear each engine derives from the JD.                            */
+  console.log('');
+  console.log('  ' + '─'.repeat(92));
+  console.log('  LONGITUDE SPACE — where the difference actually lives');
+  console.log('  ' + '─'.repeat(92));
+  console.log('  label   Δlon (")   Δ currentYear    Δ ecc          Δ sunCorr (")');
+  const eps = OBLIQUITY_MEAN * Math.PI / 180;
+  for (const r of REF) {
+    jumpToJulianDay(r.jd);
+    forceSceneUpdate();
+    if (!Number.isFinite(sun?.dec)) continue;
+
+    // Ecliptic longitude from the scene's own RA/Dec — same transform both sides.
+    const decTrue = (90 - sun.dec * 180 / Math.PI) * Math.PI / 180;
+    const a = sun.ra;
+    const lam = Math.atan2(Math.sin(a) * Math.cos(eps) + Math.tan(decTrue) * Math.sin(eps),
+                           Math.cos(a));
+    const lonDeg = ((lam * 180 / Math.PI) % 360 + 360) % 360;
+    const dLon = (((lonDeg - r.lon + 540) % 360) - 180) * 3600;
+
+    // The three inputs that can move longitude without touching obliquity.
+    const cyScene   = (typeof o.currentYear === 'number') ? o.currentYear : NaN;
+    const eccScene  = (typeof o.eccentricityEarth === 'number') ? o.eccentricityEarth : NaN;
+    const corrScene = (typeof sunLongitudeCorrection === 'function')
+                        ? sunLongitudeCorrection(r.jd) : NaN;
+
+    console.log(`  ${r.label.padEnd(6)} ${dLon.toFixed(4).padStart(9)}  ` +
+      `${(Number.isFinite(cyScene) ? (cyScene - r.cy).toExponential(2) : 'n/a').padStart(14)}  ` +
+      `${(Number.isFinite(eccScene) ? (eccScene - r.ecc).toExponential(2) : 'n/a').padStart(12)}  ` +
+      `${(Number.isFinite(corrScene) ? ((corrScene - r.corr) * 3600).toFixed(4) : 'n/a').padStart(14)}`);
+  }
+  console.log('');
+  console.log('  READ IT LIKE THIS:');
+  console.log('   • Δ sunCorr nonzero      -> the Sun-harmonic term differs (phase or coefficients).');
+  console.log('   • Δ ecc nonzero          -> equation-of-centre differs; check the currentYear each');
+  console.log('                               engine derives, since ecc is a function of it.');
+  console.log('   • Δ currentYear nonzero  -> the JD→year mapping differs; that alone shifts both');
+  console.log('                               ecc and the harmonic phase.');
+  console.log('   • all three ~0 but Δlon nonzero -> the difference is in the orbit geometry');
+  console.log('                               (startPos / perihelion phase), not in these inputs.');
+
+  /* ── Accumulation test ───────────────────────────────────────────────────
+   * The six JDs above span < 1 year, so they show the WITHIN-year difference
+   * only. The year-length gap (-115 ms/yr) is an ACCUMULATING longitude lag of
+   * ~1.3e-6 deg/yr, which a single-epoch snapshot cannot see. This samples the
+   * same orbital phase (~VE) five years apart: if Δlon grows linearly, that
+   * slope IS the year-length discrepancy, and its size names the cause.      */
+  const ACC = [
+    { jd: 2449797.6, lon:   0.007443317 },
+    { jd: 2451623.8, lon: 359.995780589 },
+    { jd: 2453450.0, lon: 359.984112258 },
+    { jd: 2455276.2, lon: 359.972438327 },
+    { jd: 2457102.4, lon: 359.960758799 },
+  ];
+  console.log('');
+  console.log('  ' + '─'.repeat(92));
+  console.log('  ACCUMULATION — same phase, 5-year spacing (this is what a snapshot cannot show)');
+  console.log('  ' + '─'.repeat(92));
+  console.log('       JD        approx yr     Δlon (")     cumulative drift');
+  const acc = [];
+  for (const p of ACC) {
+    jumpToJulianDay(p.jd);
+    forceSceneUpdate();
+    if (!Number.isFinite(sun?.dec)) continue;
+    const decTrue = (90 - sun.dec * 180 / Math.PI) * Math.PI / 180;
+    const lam = Math.atan2(Math.sin(sun.ra) * Math.cos(eps) + Math.tan(decTrue) * Math.sin(eps),
+                           Math.cos(sun.ra));
+    const lonDeg = ((lam * 180 / Math.PI) % 360 + 360) % 360;
+    const dLon = (((lonDeg - p.lon + 540) % 360) - 180) * 3600;
+    const yr = 2000 + (p.jd - 2451545) / 365.25;
+    acc.push({ yr, dLon });
+    console.log(`  ${p.jd.toFixed(1)}  ${yr.toFixed(1).padStart(9)}  ${dLon.toFixed(4).padStart(11)}` +
+                `      ${acc.length > 1 ? (dLon - acc[0].dLon).toFixed(4) : '(baseline)'}`);
+  }
+  if (acc.length >= 2) {
+    // least-squares slope of Δlon against year
+    const n = acc.length, sx = acc.reduce((s, p) => s + p.yr, 0), sy = acc.reduce((s, p) => s + p.dLon, 0);
+    const sxx = acc.reduce((s, p) => s + p.yr * p.yr, 0), sxy = acc.reduce((s, p) => s + p.yr * p.dLon, 0);
+    const slopeArcsecPerYr = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+    // Sun moves ~0.9856 deg/day; convert the drift rate to a year-length difference
+    const msPerYr = (slopeArcsecPerYr / 3600) / 0.98561 * 86400 * 1000;
+    console.log('');
+    console.log(`  drift rate = ${slopeArcsecPerYr.toFixed(6)} "/yr  ->  year-length difference ${msPerYr.toFixed(1)} ms/yr`);
+    console.log('  Compare against the measured report-vs-Step-6a gap of -114.9 ms/yr.');
+    console.log('  A match confirms an accumulating mean-motion difference; near-zero drift means');
+    console.log('  the 115 ms comes from the event SEARCH, not from the Sun position at all.');
+    console.log('  NOTE: the FIRST row jumps backwards two decades and can read high while the');
+    console.log('  scene settles — judge the slope from the later rows, which should be linear.');
+  }
+
+  /* ── light vs full update ────────────────────────────────────────────────
+   * solsticeForYear() samples with forceSceneUpdate('light'), which stops after
+   * updatePositions(). The full path continues into updatePredictions(), which
+   * writes o.eccentricityEarth / o.solarYearDays / o.lodKinematic. If moveModel
+   * reads any of those, every sample in the report's search runs on values one
+   * step stale — a systematic bias the Step 6a evaluator never has, because it
+   * recomputes everything per JD.
+   *
+   * This is the only path difference the position comparison above could NOT
+   * see: that comparison used the FULL update, so it never exercised what the
+   * search actually does.                                                    */
+  console.log('');
+  console.log('  ' + '─'.repeat(92));
+  console.log('  LIGHT vs FULL UPDATE — what the report\'s search actually sees');
+  console.log('  ' + '─'.repeat(92));
+  console.log('  label   dec after light    dec after full      Δ (")      Δ→ms');
+  let maxLF = 0;
+  for (const r of REF) {
+    // Approach each JD the way the search does: step in from the previous sample.
+    jumpToJulianDay(r.jd - 0.5 / 24); forceSceneUpdate('light');
+    jumpToJulianDay(r.jd);            forceSceneUpdate('light');
+    const decLight = Number.isFinite(sun?.dec) ? sun.dec * 180 / Math.PI : NaN;
+    forceSceneUpdate();               // same JD, full update
+    const decFull = Number.isFinite(sun?.dec) ? sun.dec * 180 / Math.PI : NaN;
+    if (!Number.isFinite(decLight) || !Number.isFinite(decFull)) continue;
+    const d = (decLight - decFull) * 3600;
+    maxLF = Math.max(maxLF, Math.abs(d));
+    // slope for the ms conversion (skip at solstices, where it is ~0)
+    const hh = 0.01;
+    jumpToJulianDay(r.jd + hh); forceSceneUpdate();
+    const dp = sun.dec * 180 / Math.PI;
+    jumpToJulianDay(r.jd - hh); forceSceneUpdate();
+    const dm = sun.dec * 180 / Math.PI;
+    const sl = (dp - dm) / (2 * hh);
+    const dms = Math.abs(sl) > 1e-4 ? ((decLight - decFull) / sl) * 86400 * 1000 : NaN;
+    console.log(`  ${r.label.padEnd(6)} ${decLight.toFixed(9).padStart(15)}  ${decFull.toFixed(9).padStart(15)}  ` +
+                `${d.toFixed(4).padStart(9)}  ${(Number.isFinite(dms) ? dms.toFixed(1) : 'flat').padStart(8)}`);
+  }
+  console.log('');
+  if (maxLF < 1e-6) {
+    console.log('  light and full agree -> the update tier is NOT the cause; the 115 ms is');
+    console.log('  elsewhere in the search (seed, chaining, or the interval convention).');
+
+    /* ── idempotency / hysteresis ────────────────────────────────────────
+     * The tests above exposed this by accident: ~VE at JD 2451623.8 read
+     * 90.006903337 when it was the first JD of the button, and 90.006958920
+     * when reached after the accumulation loop jumped back from year 2015 —
+     * same JD, same full update, 0.20" apart, which at the equinox slope is
+     * ~12 s of event time. Every other label matched to 9 digits.
+     *
+     * If arriving at a JD by a LARGE jump differs from arriving by small
+     * steps, the report's search is biased at every event (it jumps ~365 d
+     * between years, ~90 d between cardinal points) while Step 6a is not —
+     * computeSunPositionFast(jd) is stateless and recomputes from the JD.
+     *
+     * Two probes: (a) does a second update at the same JD change anything,
+     * (b) does a far approach differ from a near approach.               */
+    console.log('');
+    console.log('  ' + '─'.repeat(92));
+    console.log('  IDEMPOTENCY — does the scene settle in one update?');
+    console.log('  ' + '─'.repeat(92));
+    console.log('  label   1st update       2nd update        Δ (")     far-approach Δ (")');
+    let maxIdem = 0, maxPath = 0;
+    for (const r of REF) {
+      // (a) same JD, two consecutive updates
+      jumpToJulianDay(r.jd); forceSceneUpdate();
+      const d1 = Number.isFinite(sun?.dec) ? sun.dec * 180 / Math.PI : NaN;
+      forceSceneUpdate();
+      const d2 = Number.isFinite(sun?.dec) ? sun.dec * 180 / Math.PI : NaN;
+      if (!Number.isFinite(d1) || !Number.isFinite(d2)) continue;
+      const dIdem = (d2 - d1) * 3600;
+
+      // (b) NEAR approach (step in from -0.5 h) vs FAR approach (jump from +20 yr)
+      jumpToJulianDay(r.jd - 0.5 / 24); forceSceneUpdate();
+      jumpToJulianDay(r.jd);            forceSceneUpdate();
+      const dNear = sun.dec * 180 / Math.PI;
+      jumpToJulianDay(r.jd + 7305);     forceSceneUpdate();   // ~+20 yr away
+      jumpToJulianDay(r.jd);            forceSceneUpdate();
+      const dFar = sun.dec * 180 / Math.PI;
+      const dPath = (dFar - dNear) * 3600;
+
+      maxIdem = Math.max(maxIdem, Math.abs(dIdem));
+      maxPath = Math.max(maxPath, Math.abs(dPath));
+      console.log(`  ${r.label.padEnd(6)} ${d1.toFixed(9).padStart(14)}  ${d2.toFixed(9).padStart(14)}  ` +
+                  `${dIdem.toFixed(4).padStart(8)}  ${dPath.toFixed(4).padStart(16)}`);
+    }
+    console.log('');
+    if (maxIdem > 1e-6) {
+      console.log(`  NOT IDEMPOTENT (max ${maxIdem.toFixed(4)}"): one forceSceneUpdate is not enough.`);
+      console.log('  Fix: update twice after any large jump in solsticeForYear / the report scan.');
+    } else if (maxPath > 1e-6) {
+      console.log(`  Idempotent, but PATH-DEPENDENT (max ${maxPath.toFixed(4)}"): a far approach gives`);
+      console.log('  a different answer than a near one. The report jumps ~365 d between events and');
+      console.log('  ~90 d between cardinal points, so each is biased differently — which matches the');
+      console.log('  per-CP structure (VE -131, SS -113, AE -98, WS -118 ms). Step 6a is immune:');
+      console.log('  computeSunPositionFast(jd) is stateless.');
+    } else {
+      console.log('  Idempotent AND path-independent — the expected state since moveModel started');
+      console.log('  computing eccentricity inline. Before that fix these read 0.0039" and 0.2722"');
+      console.log('  at VE/AE (~16 s of event time), because moveModel read o[_eccentricityKey],');
+      console.log('  which updatePredictions writes only AFTER moveModel has run. If either column');
+      console.log('  goes nonzero again, something new is feeding a stale value into the motion path.');
+    }
+  } else {
+    console.log(`  light and full DIFFER (max ${maxLF.toFixed(4)}"). The report samples with 'light',`);
+    console.log('  so its search runs on values updatePredictions() has not refreshed. That is a');
+    console.log('  systematic bias Step 6a does not share — the leading candidate for the 115 ms.');
+  }
+
+  console.log('');
+  const maxAbs = out.reduce((m, r) => Math.max(m, Math.abs(r.dDec)), 0);
+  if (maxAbs < 1e-6) {
+    console.log('  RESULT: the two engines agree to <1e-6". Positions are IDENTICAL, so the');
+    console.log('  ~115 ms year-length gap is NOT a physics difference — it lives in the search.');
+    console.log('  Next suspect: forceSceneUpdate(\'light\') in solsticeForYear vs the full');
+    console.log('  update the Step 6a path performs.');
+  } else {
+    console.log(`  RESULT: positions DIFFER (max |Δdec| = ${maxAbs.toFixed(4)}").`);
+    console.log('  The Δdec→ms column is each difference converted through the local slope.');
+    console.log('  Compare its sign at ~VE vs ~AE: opposite signs there mean an annual-period');
+    console.log('  term (eccentricity / equation-of-centre / perihelion phase) differs between');
+    console.log('  the engines. Same sign throughout means a constant frame offset instead.');
+  }
+  console.log('═'.repeat(96));
+
+  jumpToJulianDay(savedJD);
+  o.Run = savedRun;
+  return out;
+}
+
 async function analyzeStellarDay(startYear) {
   startYear = startYear || o.calibrationYearStart;
 
@@ -52048,10 +52374,10 @@ const planetStats = {
        hover : [`EPOCH-SPECIFIC MEAN LOD (1b): physics-derived rotation period at current year (tidal + GIA + ΔT residual). ABSOLUTE MEAN LOD (1a, mass-loss trend only, no GIA/ΔT): ${fmtNum(absoluteMeanLodSec(o.currentYear || 2000), 6, ',')} SI sec at current year.`]},
       {label : () => `Sidereal day (SI seconds)`,
        value : [ { small: () => meanSiderealday },{ v: () => o.siderealDayReal, dec:10, sep:',' }],
-       hover : [`Left = mean sidereal day at current epoch. Right = live current. One rotation relative to stars, ~3m 56s shorter than solar day.`]},
+       hover : [`One rotation relative to the MOVING vernal equinox — ~3m 56s shorter than the solar day. Left = MEAN family: H-cycle mean year lengths × the secular LOD (meanlengthofday). Right = CURRENT family: this epoch's year length × the kinematic LOD. They differ by ~0.3 ms at J2000 — mean vs epoch, not an error. Both are built on the epoch's actual LOD, so both shrink into the deep past (78,698 s at −380 Ma). NOT the 86400-anchored form used in the Days & Years report section 4, which stays pinned near 86,164.09 at every epoch by construction.`]},
       {label : () => `Stellar day (SI seconds)`,
        value : [ { small: () => meanStellarday },{ v: () => o.stellarDayReal, dec:10, sep:',' }],
-       hover : [`Left = mean stellar day at current epoch. Right = live current. Differs from sidereal day by ~8 ms due to precession of the equinoxes.`]},
+       hover : [`One rotation relative to the FIXED STARS (ICRF). Longer than the sidereal day by ~8.37 ms, because the equinox precesses westward. That offset carries cos(ε): H/13 is precession in LONGITUDE (along the ecliptic) while the offset is defined along the EQUATOR, m = p·cos ε. Left/Right are the same MEAN vs CURRENT families as the sidereal day above. At J2000 the live value matches the IAU 2000A stellar day (86,164.098904 s) to ~0.01 ms.`]},
      null,
       {label : () => `Solar year (SI seconds)`,
        value : [ { small: () => meanlengthofday*meansolaryearlengthinDays },{ v: () => o.solarYearSeconds, dec:6, sep:',' }],
@@ -58547,10 +58873,36 @@ function moveModel(pos) {
     // Apply equation of center (Kepler's 2nd Law: faster at perihelion, slower at aphelion)
     if (useVariableSpeed && obj.eccentricity && obj.perihelionPhaseJ2000 !== undefined) {
       let e;
-      if (obj._eccentricityKey && o[obj._eccentricityKey] !== undefined) {
+      // Eccentricity is computed INLINE from the year, not read back from
+      // o[_eccentricityKey]. Those o.* fields are written by updatePredictions(),
+      // which runs AFTER moveModel() inside forceSceneUpdate — so reading them
+      // here fed moveModel the PREVIOUS call's value. Consequences, all measured
+      // via the "Scene vs Step-6a Engine Diff" tool:
+      //   • not idempotent — a second update at the same JD moved dec by 0.0039"
+      //   • path-dependent — reaching a JD from 20 yr away vs 0.5 h away differed
+      //     by 0.272", i.e. ~16 s of event time
+      //   • worst of all, forceSceneUpdate('light') never calls updatePredictions,
+      //     so the report's cardinal-point SEARCH ran every one of its samples on
+      //     an eccentricity frozen from before the search began — a different
+      //     stale epoch per cardinal point.
+      // Only the equinoxes revealed it: eccentricity enters through the equation
+      // of centre, a pure LONGITUDE term, and declination is stationary (blind to
+      // longitude) at the solstices.
+      // computeEccentricityEarth is a pure function of the year with J2000-FIXED
+      // anchors, so computing it here is exactly equivalent — minus the staleness.
+      // This is what tools/lib/scene-graph.js has always done (computeSunPositionFast
+      // derives earthEcc inline), which is why Step 6a was immune.
+      // Year derived from o.julianDay exactly as updatePredictions' `yearForFormula`
+      // does — NOT from _currentYearSI, whose non-deep-time branch is o.currentYear,
+      // which forceSceneUpdate also sets after moveModel and so is stale as well.
+      const _eccYear = DEEP_TIME_MODE_ENABLED
+        ? _jdToSIyear(o.julianDay)
+        : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
+      const _eccNow = obj._eccentricityKey ? _eccentricityInline(obj._eccentricityKey, _eccYear) : undefined;
+      if (_eccNow !== undefined) {
         e = obj._eocDerived
-          ? o[obj._eccentricityKey] - eccentricityBase / 2       // Sun: eoc = e_dynamic - e_base/2
-          : o[obj._eccentricityKey] * obj._eocFraction;          // Planets: eoc = e_dynamic × fraction
+          ? _eccNow - eccentricityBase / 2       // Sun: eoc = e_dynamic - e_base/2
+          : _eccNow * obj._eocFraction;          // Planets: eoc = e_dynamic × fraction
       } else {
         e = typeof obj.eccentricity === 'number' ? obj.eccentricity : (o.eccentricityEarth || ASTRO_REFERENCE.eccentricityJ2000);
       }
@@ -61574,6 +61926,33 @@ function computeAxialPrecessionRealLOD(
  * @param {number} eccentricityAmplitude
  * @returns {number}
  */
+/** Eccentricity for an `_eccentricityKey` ('eccentricityEarth', 'eccentricityMars', …)
+ *  computed DIRECTLY from the year — the same call updatePredictions() makes, with
+ *  the same J2000-FIXED anchors.
+ *
+ *  Exists so moveModel() does not have to read back o.eccentricityEarth etc.
+ *  Those are written after moveModel runs, so reading them made the scene
+ *  non-idempotent and path-dependent, and left the report's event search running
+ *  on a frozen value (forceSceneUpdate('light') never reaches updatePredictions).
+ *  See the note at the equation-of-centre block in moveModel.
+ *
+ *  Returns undefined for an unknown key so the caller can fall back. */
+function _eccentricityInline(key, year) {
+  if (key === 'eccentricityEarth') {
+    return computeEccentricityEarth(year, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED,
+                                    eccentricityBase, eccentricityAmplitude);
+  }
+  // Planets: same formula, per-body J2000-fixed anchor / wobble period / base / amplitude.
+  const p = key.startsWith('eccentricity') ? key.slice('eccentricity'.length).toLowerCase() : null;
+  if (!p || !planets[p]) return undefined;
+  const anchor = _planetEccAnchors_J2000[p];
+  const period = _planetWobblePeriodJ2000[p];
+  if (!Number.isFinite(anchor) || !Number.isFinite(period)) return undefined;
+  return computeEccentricityEarth(year, anchor, period,
+                                  planets[p].orbitalEccentricityBase,
+                                  planets[p].orbitalEccentricityAmplitude);
+}
+
 function computeEccentricityEarth(
   currentYear,
   anchorYearJ2000,        // J2000-FIXED anchor year for this body's eccentricity oscillation

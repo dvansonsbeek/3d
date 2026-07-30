@@ -385,10 +385,24 @@ for (const r of allRows) {
   csvLines.push([
     r.type,
     r.year,
-    r.jd.toFixed(6),
+    // jd and worldAngle carry 9 decimals, not 6: they are the two columns the
+    // year lengths are DIFFERENCED from, so their quantization lands directly
+    // on the result.
+    //   jd  at 6 dp -> interval error up to 1e-6 d = 86.4 ms on the solar year
+    //   WA  at 6 dp -> dWA error up to 1e-6 deg    = 87.7 ms on the sidereal year
+    //                  (sidereal = dJD x 360/(360 - dWA), dWA ~ 0.014 deg)
+    // Both were the same order as the residual disagreement with the in-browser
+    // Days & Years report (~129 ms on the mean tropical year), so they masked
+    // how much of that gap is the real scene-graph-vs-Three.js engine difference.
+    // 9 dp is full double precision here: the ULP of a JD near 2.45e6 is
+    // 4.66e-10 d, so nothing is gained past it.
+    // raDeg / obliqDeg / distAU stay at 6 dp — they are read as levels, not
+    // differenced, and their consumers are far coarser (the obliquity fit's
+    // RMSE is 1.45 arcsec vs a 0.0036 arcsec quantization).
+    r.jd.toFixed(9),
     r.raDeg !== null ? r.raDeg.toFixed(6) : '',
     r.obliqDeg !== null ? r.obliqDeg.toFixed(6) : '',
-    r.worldAngle.toFixed(6),
+    r.worldAngle.toFixed(9),
     r.distAU.toFixed(6),
   ].join(','));
 }
