@@ -81,6 +81,33 @@ returns a clean result from a broken model.
 Fastest way to classify a discrepancy: evaluate where each candidate cause has
 maximum leverage, not where the data is densest.
 
+### Sample at the defined points, not at a convenient grid
+
+The sidereal year was measured at world angles **0/90/180/270** — an arbitrary
+geometric grid. Per-angle results scattered across 8 seconds:
+
+| world angle | vs IAU |
+|---|---|
+| 0° | +4.92 s |
+| 90° | +8.17 s |
+| 180° | +2.96 s |
+| 270° | **−0.30 s** |
+
+The 270° figure looked excellent and was the one being quoted. It was luck: the
+parent-chain tilts contribute a −4.24 s projection bias at that angle, which
+happened to cancel a real +3.94 s offset.
+
+The fix was not a better average over the same grid. **Measure at the four
+cardinal points — SS, AE, WS, VE — because that is where the quantity is
+physically defined.** They are found by declination (solstice = extremum,
+equinox = zero crossing), not by world angle:
+`src/script.js:42633`.
+
+Generalise: if a sampling grid is chosen for convenience rather than because the
+phenomenon is defined there, per-sample scatter is an artefact of the grid, and
+any single sample that looks good is unearned. Ask what defines the point before
+asking what the value is.
+
 ## 7. Estimate before you implement
 
 A trapezoid-vs-Simpson hypothesis was implemented, then refuted by a
