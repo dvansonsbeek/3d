@@ -37,7 +37,7 @@ series: 35,901 terms across 14 files.
 
 | Item | Provenance |
 |---|---|
-| `elp_main.{long,lat,dist}`, `elp_pert.{long,lat,dist}T*` | Chapront, J. & Francou, G. (2003) *A&A* 404, 735, "The lunar theory ELP revisited. Introduction of new planetary perturbations". Author data originally distributed at `ftp://cyrano-se.obspm.fr/pub/2_lunar_solutions/2_elpmpp02/` (now defunct); obtained via the reformatted copy in `ytliu0/ElpMpp02` (GPL-3.0, compatible with this repository's licence). |
+| `elp_main.{long,lat,dist}`, `elp_pert.{long,lat,dist}T*` | Chapront, J. & Francou, G. (2003) *A&A* 404, 735, "The lunar theory ELP revisited. Introduction of new planetary perturbations". Author data originally distributed at `ftp://cyrano-se.obspm.fr/pub/2_lunar_solutions/2_elpmpp02/` (now defunct); obtained via the reformatted copy in `ytliu0/ElpMpp02` (GPL-3.0; combinable with this repository's AGPL-3.0 licence under GPLv3 §13 — see `NOTICE`). |
 
 | `driver/ElpMpp02.{cpp,h}` | Reference implementation by Y.-T. Liu (`ytliu0/ElpMpp02`, GPL-3.0), written from the authors' ftp material. **Required to evaluate the series** — see below. |
 

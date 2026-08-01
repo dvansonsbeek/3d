@@ -230,14 +230,26 @@ The pipeline runs across 6 phases: Sun geometry → planet alignment → perihel
 
 ## Credits
 
-- [Three.js](https://threejs.org/) — 3D rendering library
+Built on the work of others. Full attribution, licences and data provenance are
+in [NOTICE](NOTICE) — that is the authoritative list; this is the short version.
+
+**Incorporated under copyleft**
+
 - [Tychosium](https://codepen.io/pholmq/pen/XGPrPd) — © 2018 Simon Shack, Patrik
-  Holmqvist, released under the GNU General Public License. This simulator began
-  from the Tychosium source; the rendering scaffold and scene-graph pattern derive
-  from it, and the orbital model, fitting pipeline and analysis are original work
-  added since. See [NOTICE](NOTICE).
-- [Solar System Scope](https://www.solarsystemscope.com/textures/) — Planet textures
-- [Yale Bright Star Catalog](https://github.com/brettonw/YaleBrightStarCatalog) — Star data
+  Holmqvist (GPL). The simulator began from this source.
+- [ytliu0/ElpMpp02](https://github.com/ytliu0/ElpMpp02) — © Y.-T. Liu (GPL-3.0).
+  `tools/lib/elp-mpp02.js` is a port of its reference implementation, and the
+  ELP/MPP02 series data came through it.
+
+**Libraries** — [Three.js](https://threejs.org/) (rendering) ·
+[Tweakpane](https://tweakpane.github.io/docs/) (UI) ·
+[Plotly.js](https://plotly.com/javascript/) (dashboard charts) ·
+[SheetJS](https://sheetjs.com/) (spreadsheets)
+
+**Data** — [Yale Bright Star Catalog](https://github.com/brettonw/YaleBrightStarCatalog)
+(stars) · [Solar System Scope](https://www.solarsystemscope.com/textures/)
+(textures) · IMCCE and Chapront & Francou (ELP lunar series) · third-party
+paleoclimate and historical eclipse records, cited where used
 
 ## License
 

@@ -3,8 +3,14 @@ NOTICE
 
 This project is a derivative work.
 
-Upstream work
--------------
+Upstream works under copyleft
+-----------------------------
+
+Two GPL-licensed works are incorporated. Both are compatible with this project's
+AGPL-3.0 licence: GNU GPL version 3 section 13 permits combining a GPLv3 work
+with an AGPLv3 work, with the AGPL network clause applying to the combination.
+
+**1. The TYCHOSIUM** — the simulator's starting point.
 
     /*Copyright 2018 Simon Shack, Patrik Holmqvist
     The TYCHOSIUM is free software; you can redistribute it and/or modify it
@@ -14,6 +20,20 @@ Upstream work
 
     The TYCHOSIUM — https://codepen.io/pholmq/pen/XGPrPd
     Source repository — https://github.com/pholmq/The_TYCHOSIUM (GPL-3.0)
+
+**2. ElpMpp02** — the ELP/MPP02 lunar theory evaluator.
+
+    Copyright Y.-T. Liu — https://github.com/ytliu0/ElpMpp02 (GPL-3.0)
+
+`tools/lib/elp-mpp02.js` is a JavaScript port of that project's reference C++
+implementation (`ElpMpp02.cpp/h`), which itself implements the ftp distribution
+of Chapront, J. & Francou, G. (2003), A&A 404, 735. The ELP/MPP02 series data
+under `data/lunar-series/elp-mpp02/` was obtained through the same project. The
+series cannot be evaluated without the driver's re-fitted fundamental arguments
+and Δ-parameter sets, so both the data and the implementation derive from it.
+
+This is reference material used to cross-check the framework's own lunar theory
+(docs/66 §1); it is not part of the model.
 
 Statement of modification
 -------------------------
@@ -44,14 +64,42 @@ simulation scaffolding, not in the astronomy.
 Licensing
 ---------
 
-The upstream work is under the GNU General Public License. This combined work is
-distributed under the GNU Affero General Public License v3.0 — see LICENSE. GPL
-version 3 section 13 permits combining a GPLv3 work with an AGPLv3 work, with the
-AGPL network clause applying to the combination.
+This combined work is distributed under the GNU Affero General Public License
+v3.0 — see LICENSE. The basis for combining it with the GPL works above is given
+under "Upstream works under copyleft".
 
-Other credited components
--------------------------
+Bundled and runtime libraries
+-----------------------------
 
-    Three.js                  https://threejs.org/                    (MIT)
-    Solar System Scope        planet textures, https://www.solarsystemscope.com/textures/
-    Yale Bright Star Catalog  https://github.com/brettonw/YaleBrightStarCatalog
+    three                 MIT          https://threejs.org/
+    tweakpane             MIT          https://tweakpane.github.io/docs/
+    Plotly.js             MIT          https://plotly.com/javascript/
+                                       (dashboard, loaded from cdn.plot.ly)
+    SheetJS (xlsx)        Apache-2.0   https://sheetjs.com/
+    Parcel, Babel         MIT          build toolchain, not shipped
+
+Python analysis depends on NumPy, SciPy, Astropy and pandas (all BSD-3-Clause).
+These are declared dependencies, not vendored copies.
+
+Data sources
+------------
+
+    Yale Bright Star Catalog   https://github.com/brettonw/YaleBrightStarCatalog
+    Solar System Scope         planet textures
+                               https://www.solarsystemscope.com/textures/
+    ELP-2000/82B series        IMCCE public archive, ELP1..ELP36.
+                               Chapront-Touzé, M. & Chapront, J. (1983) A&A 124,
+                               50; revised (1988) A&A 190, 342.
+                               https://ftp.imcce.fr/pub/ephem/moon/elp82b/
+    ELP/MPP02 series           Chapront, J. & Francou, G. (2003) A&A 404, 735,
+                               via ytliu0/ElpMpp02 (see above).
+
+Per-file provenance for the lunar series, including transcription verification
+against the IMCCE primary files, is in `data/lunar-series/README.md`.
+
+The paleoclimate and historical-record corpus under `data/` (Laskar LA2004,
+Snyder 2016, Bereiter/EPICA, Cheng 2016, Steinhilber 2012, LR04, Westerhold 2020
+Cenogrid, Spratt & Lisiecki 2016, Stephenson 2016) is third-party research data,
+cited where used. A per-dataset redistribution audit is outstanding; any dataset
+without a clear redistribution right will be removed from the repository and
+replaced by a documented download step.
