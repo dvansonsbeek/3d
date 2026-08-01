@@ -29462,6 +29462,37 @@ function setupGUI() {
   const aboutFolder = gui.addFolder({ title: 'About', expanded: false });
   addFolderTooltip(aboutFolder, 'Six Fibonacci Laws, 6 free parameters, and all calibration and model parameters that define the solar system.');
 
+  // --- Licence & Credits (AGPL-3.0 s13: offer source to network users) ---
+  {
+    const licFolder = aboutFolder.addFolder({ title: 'Licence & Credits', expanded: false });
+    const c = licFolder.element.querySelector('.tp-fldv_c');
+    const line = (html, dim) => {
+      const d = document.createElement('div');
+      d.style.cssText = 'padding: 3px 8px; font-size: ' + (dim ? '10px' : '11px')
+        + '; line-height: 1.45; color: hsla(210,' + (dim ? '10%,55%' : '15%,75%') + ',1);';
+      d.innerHTML = html;
+      c.appendChild(d);
+    };
+    const a = (href, text) => '<a href="' + href + '" target="_blank" rel="noopener" '
+      + 'style="color: hsla(210,60%,65%,1); text-decoration: none;">' + text + '</a>';
+
+    line('Holistic Universe Model — Fibonacci Laws of Planetary Motion');
+    line('Copyright © 2025–2026 D. van Sonsbeek');
+    line('Licensed under ' + a('https://www.gnu.org/licenses/agpl-3.0.html', 'AGPL-3.0')
+       + ' · ' + a('https://github.com/dvansonsbeek/3d', 'Source code'));
+    line('This program comes with ABSOLUTELY NO WARRANTY, to the extent permitted '
+       + 'by law. You may redistribute it under the terms of the AGPL.', true);
+    line('Built from ' + a('https://codepen.io/pholmq/pen/XGPrPd', 'The TYCHOSIUM')
+       + ' © 2018 Simon Shack, Patrik Holmqvist (GPL) — scene-graph construction', true);
+    line('Lunar reference: ' + a('https://github.com/ytliu0/ElpMpp02', 'ytliu0/ElpMpp02')
+       + ' (GPL-3.0) · ' + a('https://ftp.imcce.fr/pub/ephem/moon/elp82b/', 'IMCCE ELP-2000/82B'), true);
+    line(a('https://threejs.org/', 'Three.js') + ' · '
+       + a('https://tweakpane.github.io/docs/', 'Tweakpane') + ' · '
+       + a('https://www.solarsystemscope.com/textures/', 'Solar System Scope textures') + ' · '
+       + a('https://github.com/brettonw/YaleBrightStarCatalog', 'Yale BSC'), true);
+    line('Full attribution: ' + a('https://github.com/dvansonsbeek/3d/blob/master/NOTICE', 'NOTICE'), true);
+  }
+
   // --- The Six Laws (custom DOM for full-width readability) ---
   {
     const lawsFolder = aboutFolder.addFolder({ title: 'The Six Laws', expanded: false });
