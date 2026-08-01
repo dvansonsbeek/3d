@@ -15,6 +15,10 @@ import { Pane } from 'tweakpane';
   Holmqvist, released under the GNU General Public License. Substantially
   modified. See NOTICE.
 
+  Commercial scope: the model — formulas, H lattice, deep-time engine,
+  coefficients — may be licensed separately. THIS FILE may not: its scene-graph
+  construction uses the inherited TYCHOSIUM idiom and stays AGPL-3.0.
+
   <https://www.gnu.org/licenses/>
 
   Interactive 3D simulation of the solar system modelled from a geo-heliocentric

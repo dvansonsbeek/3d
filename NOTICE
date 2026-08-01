@@ -68,6 +68,33 @@ This combined work is distributed under the GNU Affero General Public License
 v3.0 — see LICENSE. The basis for combining it with the GPL works above is given
 under "Upstream works under copyleft".
 
+What this means for commercial enquiries
+----------------------------------------
+
+Everyone receives this software under AGPL-3.0. Nothing below narrows that.
+
+Separate commercial terms can only be offered for parts whose copyright is held
+solely by the author, which the GPL components above are not. The line falls
+where the code does:
+
+  Available under separate terms
+      The model itself — the ESSRT formulas, the Earth Fundamental Cycle
+      lattice, the deep-time engine, the fitted coefficients — together with
+      services built over it. This is original work throughout.
+
+  NOT available under separate terms
+      The 3D simulator's scene-graph construction, which uses the settings-object
+      idiom inherited from The TYCHOSIUM. It stays AGPL-3.0.
+
+      The ELP lunar evaluators, which derive from ytliu0/ElpMpp02 (GPL-3.0) and
+      are reference material for cross-checking, not part of the model.
+
+The distinction is between the model and one particular way of rendering it. The
+scene hierarchy this project computes — its precession chain — is original; the
+inherited part is the plumbing that instantiates it in Three.js. The accompanying
+website computes the same model with none of that plumbing present, which
+demonstrates the separation is real rather than asserted.
+
 Bundled and runtime libraries
 -----------------------------
 

@@ -274,6 +274,14 @@ wish to build on this model without the reciprocal source obligations —
 enquiries are welcome. Contact
 [dennis@holisticuniverse.com](mailto:dennis@holisticuniverse.com).
 
+Scope, so it is clear up front: separate terms can cover **the model** — the
+ESSRT formulas, the H lattice, the deep-time engine, the fitted coefficients —
+and services built over it, all of which is original work. They cannot cover the
+**3D simulator's scene-graph construction**, which uses an idiom inherited from
+The TYCHOSIUM under GPL, or the **ELP lunar evaluators**, which derive from
+`ytliu0/ElpMpp02` under GPL-3.0. Those stay AGPL-3.0 for everyone. See
+[NOTICE](NOTICE) for the reasoning.
+
 **Why AGPL.** The model is intended to be openly studied and independently
 reproducible — the accompanying [preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4)
 depends on that. Copyleft keeps derivative versions open and attributed rather
