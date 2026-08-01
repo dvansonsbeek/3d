@@ -2,7 +2,7 @@
 
 Geocentric solar-system model and 3D simulator implementing the Expanding Solar
 System Resonance Theory (ESSRT). The model is analytic and parametric, valid
-across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v3) ·
+across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
 **Scale:** `src/script.js` 64,673 lines · `tools/` 203 JS scripts across 7

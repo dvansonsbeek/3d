@@ -39,6 +39,8 @@ retains its original NOAA header giving the full citation.
 | file | source | licence |
 |---|---|---|
 | `westerhold2020-cenogrid.tab` | Westerhold et al. (2020), CENOGRID, PANGAEA | **CC-BY-4.0**, stated in the file header |
+| `cenco2pip-100kyr-bayesian.csv` | CenCO2PIP Consortium (2023), *Science* 382:eadi5177. Data product `SPATIAL-Lab/CenoCO2` v1.2, Bowen, Zenodo record 10471529 | **CC-BY-4.0** |
+| `delavega-2020-boron-co2.xlsx` | de la Vega et al. (2020), *Scientific Reports* 10, doi:10.1038/s41598-020-67154-8 | **CC-BY-4.0** — *Scientific Reports* is fully open access |
 | `lr04-stack.txt` | Lisiecki & Raymo (2005) | freely distributed, citation requested (stated in file) |
 | `kiani-shahvandi2024-lod-residual.txt` | Kiani Shahvandi et al. (2024) — LOD residual | citation requested |
 
@@ -67,19 +69,20 @@ recorded in the repository `NOTICE`.
 
 ---
 
-## Tracked — attribution recorded, rights to be confirmed
+## Tracked — no explicit licence, retained on a documented basis
 
-Retained because the basis for redistribution is good but not documented in
-writing by the source. To be confirmed; any that cannot be will move to the
-section below.
+Neither source attaches terms to the data. Retained because the practical basis
+is strong and both are factual scientific records redistributed as a matter of
+routine across the field — but the absence of a written grant is recorded here
+rather than glossed over.
 
-| file(s) | source | basis |
+| file(s) | source | basis for retention |
 |---|---|---|
-| `la2004-earth-51myr-back.asc` | Laskar et al. (2004), IMCCE | IMCCE distributes the LA2004 solutions publicly for scientific use |
-| `rspa20160404supp2/` (15 tables) | Extract of the IOTA Lunar Occultation Archive VI/132B (Herald & Gault, 2010–2012), held by CDS Strasbourg; published as supplementary material to Stephenson, Morrison & Hohenkerk (2016), *Proc. R. Soc. A* — see `ReadMe-extract.txt` | CDS/VizieR catalogues are openly available for scientific use; the extract is a derived subset |
-| `cenco2pip-100kyr-bayesian.csv` | CenCO2PIP consortium | community consortium data product |
-| `delavega-2020-boron-co2.xlsx` | de la Vega et al. (2020) | supplementary data |
-| `rahmstorf-2015-amoc-index.txt` | Rahmstorf et al. (2015) | AMOC index |
+| `la2004-earth-51myr-back.asc` | Laskar et al. (2004), IMCCE. Nominal solution, −51 Myr to 0; columns match `INSOLN.LA2004.BTL.ASC` (time in kyr from J2000, eccentricity, obliquity in rad, longitude of perihelion in rad) | The IMCCE README for the LA2004 files states **no terms of use, licence or citation requirement** of any kind. IMCCE publishes them for open download and they are universally redistributed in the paleoclimate literature. Astronomical solution data is factual output rather than creative expression. |
+| `rspa20160404supp2/` (15 tables) | Extract of the IOTA Lunar Occultation Archive VI/132B (Herald & Gault, 2010–2012), held by CDS Strasbourg; published as supplementary material to Stephenson, Morrison & Hohenkerk (2016), *Proc. R. Soc. A* — see `ReadMe-extract.txt` | The underlying material is a CDS/VizieR catalogue, openly available for scientific use; what is here is a derived subset, not the Royal Society's own material. |
+
+If either needs to become unambiguous — a journal requirement, or a commercial
+use — a short written confirmation from IMCCE and CDS would settle it.
 
 ---
 
@@ -128,6 +131,13 @@ Used by `scripts/climate_ecs_boron.py`, `climate_ecs_cross_proxy.py`,
 `climate_ecs_per_regime.py`, `climate_ecs_snyder.py`, `climate_ecs_tight.py`.
 
 ---
+
+## Removed as unused
+
+`rahmstorf-2015-amoc-index.txt` (AMOC index, Rahmstorf et al. 2015) was
+downloaded but never referenced by any script or document. Removed from the
+repository rather than resolved: there is no reason to hold rights to a file
+nothing uses. It remains on local disk.
 
 ## Maintenance
 

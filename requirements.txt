@@ -1,4 +1,12 @@
+# Core — used across scripts/ and tools/
 numpy
 pandas
 openpyxl
 scipy
+astropy
+
+# Optional — each used by exactly one script. Uncomment if you run it.
+#   rebound     — scripts/nbody_50myr_backward.py  (GPL-3.0; compiled N-body integrator)
+#   astroquery  — tools/fit/python/planet_eccentricity_jpl.py
+# rebound
+# astroquery

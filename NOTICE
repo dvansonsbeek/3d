@@ -78,8 +78,11 @@ Bundled and runtime libraries
     SheetJS (xlsx)        Apache-2.0   https://sheetjs.com/
     Parcel, Babel         MIT          build toolchain, not shipped
 
-Python analysis depends on NumPy, SciPy, Astropy and pandas (all BSD-3-Clause).
-These are declared dependencies, not vendored copies.
+Python analysis depends on NumPy, SciPy, pandas, Astropy and astroquery
+(BSD-3-Clause) and openpyxl (MIT) — declared dependencies, not vendored copies.
+One script, scripts/nbody_50myr_backward.py, optionally uses REBOUND (GPL-3.0)
+as its N-body integrator; it is imported at runtime, not redistributed here, and
+GPLv3 combines with AGPL-3.0 under section 13 as above.
 
 Data sources
 ------------

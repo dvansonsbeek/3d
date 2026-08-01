@@ -8,7 +8,7 @@
 
 > **[Live Demo](https://3d.holisticuniverse.com)** — Experience the simulation in your browser
 >
-> **[Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v3)** — Read the accompanying research paper
+> **[Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4)** — Read the accompanying research paper
 
 What if the orbits of all eight planets, the wobble of Earth's axis, and the rhythm of ice ages are all governed by the same mathematical structure?
 
@@ -110,7 +110,7 @@ Features: multi-planet overlay, synchronized zoom/pan, light/dark mode, CSV expo
 The `scripts/` directory contains statistical analysis and verification scripts (Fibonacci significance tests, exoplanet tests, eccentricity analysis, Milankovitch spectral analysis on LR04 + Cheng2016 paleoclimate records producing the **8H Orbital Forcing Formula**, Planet Nine falsification). To use them:
 
 ```bash
-pip install -r requirements.txt   # numpy, pandas, openpyxl, scipy
+pip install -r requirements.txt   # numpy, pandas, openpyxl, scipy, astropy
 python3 scripts/fibonacci_significance.py
 ```
 
@@ -228,12 +228,6 @@ The pipeline runs across 6 phases: Sun geometry → planet alignment → perihel
 
 ---
 
-## Roadmap
-
-- [ ] Add more celestial objects
-
----
-
 ## Credits
 
 Built on the work of others. Full attribution, licences and data provenance are
@@ -281,7 +275,7 @@ enquiries are welcome. Contact
 [dennis@holisticuniverse.com](mailto:dennis@holisticuniverse.com).
 
 **Why AGPL.** The model is intended to be openly studied and independently
-reproducible — the accompanying [preprint](https://doi.org/10.21203/rs.3.rs-8758810/v3)
+reproducible — the accompanying [preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4)
 depends on that. Copyleft keeps derivative versions open and attributed rather
 than diverging into closed forks, and the network clause ensures the same holds
 for hosted services.

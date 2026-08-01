@@ -35,3 +35,6 @@ tools/tuning/01-holistic-year-planets-data.xlsx
 data/silso-monthly-sunspot.csv
 data/Snyder 2016-Paleoceanography-Full Data Set.xlsx
 data/Snyder_Data_Figures/
+
+# Downloaded but never used by any script or doc — no reason to hold rights to it.
+data/rahmstorf-2015-amoc-index.txt
