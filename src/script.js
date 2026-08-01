@@ -4,6 +4,15 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Pane } from 'tweakpane';
 
+// Generated from public/input/{model-parameters,astro-reference}.json by
+// `npm run constants:generate` (§2g). Never hand-edited; `npm run test:constants`
+// fails if it is stale. This replaces the text-patching `export-to-script.js`:
+// values are IMPORTED, so browser and Node cannot drift apart by construction.
+//
+// Generated at build time, not fetched at runtime — `holisticyearLength` is read
+// at module scope below, and Phase 15 requires offline === hosted.
+import { DEFAULT_CONSTANTS as K } from '@hum/physics';
+
 /*
   Fibonacci Laws of Planetary Motion — Holistic Universe Model v10
 
@@ -41,15 +50,21 @@ import { Pane } from 'tweakpane';
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ─── A1. Foundational ────────────────────────────────────────────────────
-let   holisticyearLength = 335317;                        // H — full precession cycle length in years (Phase 1: mutable for deep-time mode; see recomputeEpochAnchors)
-const inputmeanlengthsolaryearindays = 365.2422;          // Mean tropical year input
-const startmodelJD = 2451716.5;                           // June 21, 2000 00:00 UTC (Julian Day)
-const startmodelYear = 2000.5;                            // Fractional year of model start
-const correctionDays = -0.828832119703292;                // Fine timing correction (optimizer-derived)
-const correctionSun = 0.4967673207590977;                 // Sun position correction angle (optimizer Step 1)
-const temperatureGraphMostLikely = 14.5;                  // Position in obliquity cycle (0–16)
-const startAngleModel = 89.91949879;                      // Start angle at 2000-06-21 00:00 UTC
-const systemResetN = 7;                                    // Eccentricity anchor offset (H-units): 0=balancedYear, 7=System Reset
+// SEEDED, not imported: recomputeEpochAnchors reassigns this, and an ESM import
+// is a read-only binding — assigning to one throws (§5e). Stays `let` until
+// Phase 6 removes the writer; then it can become a plain injected value.
+let   holisticyearLength = K.foundational.holisticyearLength;  // H — full precession cycle length in years (Phase 1: mutable for deep-time mode; see recomputeEpochAnchors)
+// Imported, not literals: these are never reassigned, so the read-only binding
+// an ESM import gives is exactly right. The values cannot drift from
+// model-parameters.json because there is no second copy to drift.
+const inputmeanlengthsolaryearindays = K.foundational.inputmeanlengthsolaryearindays;  // Mean tropical year input
+const startmodelJD = K.foundational.startmodelJD;         // June 21, 2000 00:00 UTC (Julian Day)
+const startmodelYear = K.foundational.startmodelYear;     // Fractional year of model start
+const correctionDays = K.foundational.correctionDays;     // Fine timing correction (optimizer-derived)
+const correctionSun = K.foundational.correctionSun;       // Sun position correction angle (optimizer Step 1)
+const temperatureGraphMostLikely = K.foundational.temperatureGraphMostLikely;  // Position in obliquity cycle (0–16)
+const startAngleModel = K.foundational.startAngleModel;   // Start angle at 2000-06-21 00:00 UTC
+const systemResetN = K.foundational.systemResetN;         // Eccentricity anchor offset (H-units): 0=balancedYear, 7=System Reset
 
 // ─── A5. Research toggles ────────────────────────────────────────────────
 // Six user-facing feature flags, canonical defaults. Full rationale for each
@@ -69,10 +84,11 @@ let   RESONATOR_DT_CORRECTION_ENABLED = true;  // Core-mantle swing (Resonator d
 let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argument skeleton (_fwMoonArgs via _moonArgsAt) feeding the _eclMoon* dispatchers: frame-decomposed rates + solar-eccentricity-channel T²/T³ (derivation record: docs/66 §1). OFF = pure Meeus Ch. 47 argument polynomials (A/B reference; flip via console for comparison runs)
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
-const earthtiltMean = 23.41353942374053;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
-const earthInvPlaneInclinationAmplitude = 0.6360412216221447; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
-const eccentricityBase = 0.015386008387504473;                      // Law 5 balance-locked
-const eccentricityAmplitude = 0.0013559453578636752;      // Solved: e(J2000) = 0.01671022
+const earthtiltMean = K.earth.earthtiltMean;              // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
+const earthInvPlaneInclinationAmplitude = K.earth.earthInvPlaneInclinationAmplitude; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
+// The optimizer must NEVER touch this — it is set by the Law 5 balance constraint.
+const eccentricityBase = K.earth.eccentricityBase;        // Law 5 balance-locked
+const eccentricityAmplitude = K.earth.eccentricityAmplitude;  // Solved: e(J2000) = 0.01671022
 // PSI is derived from Earth's inclination amplitude — see section E2c below
 // K is derived from Earth's eccentricity amplitude + mean obliquity — see section E2d below
 const earthAscendingNodeInvPlaneVerified = 284.51;        // Verified ascending node (Souami & Souchay 2012)
@@ -113,10 +129,15 @@ const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3
 // debugOn moved to A5 Research toggles (near top)
 
 // ─── A3. Moon model parameters ───────────────────────────────────────────
-const moonStartposApsidal = 347.5476;                     // J2000-element anchored (ϖ = 83.3532° Meeus; ∂ϖ/∂a = −1; re-anchored after the of-date pair switch, micro-recalibrated for the 8H-count layer rates)
-const moonStartposNodal = 64.0435;                        // J2000-element anchored (Ω = 125.0446° Meeus; ∂Ω/∂n = −1; was the legacy compromise −83.630; micro-recalibrated for the 8H-count layer rates)
-const moonStartposMoon = 67.8443;                         // in-plane anchor via unmask meter (∂Δlon/∂m = −1; mean Δlon closed; was legacy 131.930)
-const moonMeeusLpCorrection = 0.010525;                   // Meeus Lp longitude correction (DE200→DE440 offset)
+const moonStartposApsidal = K.moon.moonStartposApsidal;   // J2000-element anchored (ϖ = 83.3532° Meeus; ∂ϖ/∂a = −1; re-anchored after the of-date pair switch, micro-recalibrated for the 8H-count layer rates)
+const moonStartposNodal = K.moon.moonStartposNodal;       // J2000-element anchored (Ω = 125.0446° Meeus; ∂Ω/∂n = −1; was the legacy compromise −83.630; micro-recalibrated for the 8H-count layer rates)
+const moonStartposMoon = K.moon.moonStartposMoon;         // in-plane anchor via unmask meter (∂Δlon/∂m = −1; mean Δlon closed; was legacy 131.930)
+// Was the literal 0.010525 here — a drifted copy. The optimizer-derived value is
+// 0.010524 (archive: lessons-learned-lunar-framework-native "0.010524 | 0.010524
+// | none"; IP-bounded-moon-derivation "bit-identical (0.8086/0.010524/0.0015),
+// FULL GATES PASSED"), which is what tools/lib has always used. Importing it
+// makes browser and Node agree on lunar longitude to 1e-6 deg.
+const moonMeeusLpCorrection = K.moon.moonMeeusLpCorrection;  // Meeus Lp longitude correction (DE200→DE440 offset)
 
 // ─── C2. Sun & Moon astro references ─────────────────────────────────────
 const sunTilt = 7.155;                                    // Solar obliquity to ecliptic

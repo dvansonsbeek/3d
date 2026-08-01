@@ -59,6 +59,34 @@ jobs:
       - name: Regression (tools/lib golden masters)
         run: npm run test:fixtures
 
+      # §2g — the generated constants module must match the JSON source of
+      # truth. Also refuses to emit if a JSON block is unclassified, so a new
+      # block cannot silently enter (or bypass) the injectable surface.
+      - name: Constants generated from JSON (not stale)
+        run: npm run test:constants
+
+      # §2d — THE PHASE 5 GATE. A counterfactual must return a changed,
+      # reproducible result carrying a different hash. Asserts a VALUE changes,
+      # not just the hash: a hash-only check passes even when createModel
+      # ignores its argument entirely (verified by planting exactly that).
+      - name: Counterfactual (injected constants)
+        run: npm run test:counterfactual
+
+      # §2g interim gate — src/script.js mirrors ~42 numeric literals from
+      # public/input/*.json, and until Phase 5 replaces that with a generated
+      # module, nothing but memory kept them in step. Drift lands in the shipped
+      # bundle silently. Retires when export-to-script.js is deleted.
+      - name: Constants sync (script.js vs JSON source of truth)
+        run: npm run test:sync
+
+      # Covers the 35 duplicated values export-to-script.js does NOT patch —
+      # MASS_RATIO_EARTH_MOON, earthEccentricityJ2000, moonSiderealMonthInput
+      # among them. Checks rather than mirrors, and shrinks to nothing as values
+      # migrate to the generated module. Name-matching here is what surfaced the
+      # IAU 2006 vs IAU 1980 obliquity divergence between browser and Node.
+      - name: Constants literals (the values the exporter never covered)
+        run: npm run test:literals
+
       # §5d — the model gates. Only 2 of the 17 tools/verify scripts have a
       # failing exit path; the runner encodes that classification and excludes
       # balance-search.js, which writes tracked data. verify-laws is checked on
@@ -66,6 +94,13 @@ jobs:
       # code, so both a regression and an unexplained improvement are caught.
       - name: Model gates (tools/verify)
         run: npm run test:verify
+
+      # 1540 checks asserting the JSON files agree with the computation engine.
+      # It was assertive all along but wired into nothing — it caught an obliquity
+      # regression instantly during Phase 5, and only because someone ran it by
+      # hand. ~6 s, no dependency on the gitignored 166 MB CSV.
+      - name: Pipeline verification (JSON vs engine, 1540 checks)
+        run: npm run test:pipeline
 
       # The simulator must keep building while the packages are empty shells.
       - name: Build simulator

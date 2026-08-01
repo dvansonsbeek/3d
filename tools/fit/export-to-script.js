@@ -519,4 +519,14 @@ if (changes === 0) {
   console.log('✓ Written ' + changes + ' changes to script.js');
 } else {
   console.log('(dry run — add --write to apply changes)');
+  // The dry run is a GATE, not just a report (plan §2g). Until Phase 5 replaces
+  // this script with a generated module, script.js holds ~42 numeric literals
+  // mirrored from public/input/*.json, and nothing but memory kept them in step.
+  // Drift here is silent and lands in the shipped bundle, so exit non-zero and
+  // let CI say so.
+  //
+  // --write exits 0 because it just fixed them; only the dry run can fail.
+  console.log('FAIL — script.js has drifted from the JSON source of truth.');
+  console.log('Run: node tools/fit/export-to-script.js --write');
+  process.exitCode = 1;
 }

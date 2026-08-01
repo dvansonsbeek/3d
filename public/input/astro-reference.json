@@ -24,6 +24,7 @@
     "j2000EpochYear": 2000,
     "perihelionalignmentYear": 1246.03125,
     "juneSolstice2000_JD": 2451716.575,
+    "_obliquityJ2000Note": "HOLDS IAU 1976/1980 (23.439291111 = 84381.448 arcsec) DELIBERATELY, pending a refit. src/script.js is already on IAU 2006 (84381.406/3600 = 23.439279444444445, Capitaine et al. 2003), so browser and Node disagree by 0.042 arcsec — about 6.5x the 0.00641 arcsec out-of-sample RMS the obliquity fit targets. IAU 2006 is the intended value; it is not adopted yet because this constant is a FIT TARGET (tools/lib/optimizer.js, tools/fit/obliquity-harmonics.js), so changing it requires regenerating Step 6a and then Step 6b. Swapping the value alone was measured: verify-pipeline goes from 0.0000 to 0.0420 arcsec and fails, because the shipped harmonics remain anchored to the old value. Guarded by KNOWN_DIVERGENCE in tools/constants/check-literals.mjs.",
     "obliquityJ2000_deg": 23.439291111,
     "obliquityRate_arcsecPerCentury": -46.836769,
     "earthEccentricityJ2000": 0.01671022,
