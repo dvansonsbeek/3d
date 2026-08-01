@@ -29480,8 +29480,7 @@ function setupGUI() {
     line('Copyright © 2025–2026 D. van Sonsbeek');
     line('Licensed under ' + a('https://www.gnu.org/licenses/agpl-3.0.html', 'AGPL-3.0')
        + ' · ' + a('https://github.com/dvansonsbeek/3d', 'Source code'));
-    line('This program comes with ABSOLUTELY NO WARRANTY, to the extent permitted '
-       + 'by law. You may redistribute it under the terms of the AGPL.', true);
+    line('Provided as-is, without warranty. Redistributable under the terms of the AGPL.', true);
     line('Built from ' + a('https://codepen.io/pholmq/pen/XGPrPd', 'The TYCHOSIUM')
        + ' © 2018 Simon Shack, Patrik Holmqvist (GPL) — scene-graph construction', true);
     line('Lunar reference: ' + a('https://github.com/ytliu0/ElpMpp02', 'ytliu0/ElpMpp02')
