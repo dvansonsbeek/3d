@@ -42539,6 +42539,7 @@ async function runSolsticeExport(years) {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb,
         XLSX.utils.aoa_to_sheet(rows), sheetName);
+    appendAboutSheet(wb, 'Solstices & Equinoxes', `${sheetName} · ${rows.length - 1} rows`);
     const url = URL.createObjectURL(workbookToBlob(wb));
     Object.assign(document.createElement('a'), {
       href: url,
@@ -43306,6 +43307,7 @@ async function runYearAnalysisExport(years) {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryRows), 'Summary');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(detailedRows), 'Year Length & Precession');
+  appendAboutSheet(wb, 'Days & Years', `${years.length} model years`);
 
   const url = URL.createObjectURL(workbookToBlob(wb));
   // Filename: use range format for consecutive years, or list first/last for sparse lists
@@ -48498,6 +48500,7 @@ async function runSolarDayReport(year, onProgress) {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryRows), 'Summary');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dailyRows), 'Daily Data');
+  appendAboutSheet(wb, 'Solar Day', `model year ${year} · ${dailyRows.length - 1} daily rows`);
 
   const xlsxBlobUrl = URL.createObjectURL(workbookToBlob(wb));
   const xlsxFilename = `Holistic_solar_day_${year}.xlsx`;
@@ -50253,6 +50256,49 @@ function workbookToBlob (wb) {
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 }
 
+/*  ── Provenance for exported reports ───────────────────────────────────────
+ *
+ *  A bare export is an anonymous file a few months later: no source, no date,
+ *  no way to tell which run produced a number that ended up in a doc or the
+ *  paper. Every paleoclimate dataset this model consumes (EPICA, Cheng,
+ *  Steinhilber) carries a header saying exactly this — the output should meet
+ *  the standard the inputs do.
+ *
+ *  The wording GRANTS rather than restricts: computed model output is fact, and
+ *  facts are not copyrightable. The AGPL line refers to the software.
+ *
+ *  No modelVersion / coefficientsHash yet — neither identifier exists in this
+ *  repo. They belong here once real; a placeholder would look like provenance
+ *  while carrying none.
+ */
+function buildProvenance (what, detail) {
+  return [
+    'Holistic Universe Model — geocentric solar-system model',
+    `Report:    ${what}`,
+    `Detail:    ${detail}`,
+    `Generated: ${new Date().toISOString()}`,
+    'Source:    https://3d.holisticuniverse.com  ·  https://github.com/dvansonsbeek/3d',
+    'Cite:      van Sonsbeek, D. — https://doi.org/10.21203/rs.3.rs-8758810/v4',
+    'These values are computed model output and are free to use.',
+    'The software producing them is AGPL-3.0; see the repository NOTICE.',
+  ];
+}
+
+/*  Prepend the provenance block to TSV/CSV rows as comment lines.  */
+function provenanceComments (what, detail) {
+  return buildProvenance(what, detail).map(l => `# ${l}`);
+}
+
+/*  Add an "About" sheet to a workbook and move it to the front.
+ *  Comment lines cannot live in a spreadsheet grid, so a dedicated sheet is the
+ *  equivalent — visible, survives re-saving, and leaves the data sheets clean.
+ *  Call AFTER the data sheets; the unshift moves it first.  */
+function appendAboutSheet (wb, what, detail) {
+  const rows = buildProvenance(what, detail).map(l => [l]);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'About');
+  wb.SheetNames.unshift(wb.SheetNames.pop());
+}
+
 async function runRATest() {
 
   const jds = buildJdArray();
@@ -50576,6 +50622,9 @@ async function runRATest() {
 
   const CSV_THRESHOLD = 5000;
 
+  // Shared by both export branches below (TSV comments / xlsx About sheet).
+  const provDetail = `${jds.length} points · JD ${jds[0]} to ${jds[jds.length - 1]}`;
+
   if (jds.length > CSV_THRESHOLD) {
     /* --- Large dataset: export as TSV files (tab-separated, works in all Excel locales) --- */
 
@@ -50598,7 +50647,8 @@ async function runRATest() {
 
     // Create and download each TSV file
     const downloadTSV = (rows, filename) => {
-      const tsv = arrayToTSV(rows);
+      const tsv = provenanceComments('Planet Positions, Perihelion & Inclination', provDetail)
+        .join('\n') + '\n' + arrayToTSV(rows);
       const blob = new Blob([tsv], { type: 'text/tab-separated-values;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       Object.assign(document.createElement('a'),
@@ -50643,6 +50693,7 @@ async function runRATest() {
 
     XLSX.utils.book_append_sheet(wb,
         XLSX.utils.aoa_to_sheet(processRowsForExcel(planetRows)), 'Sun & Planets');
+    appendAboutSheet(wb, 'Planet Positions, Perihelion & Inclination', provDetail);
     await new Promise(requestAnimationFrame);
 
     try {
@@ -51364,6 +51415,12 @@ async function exportPlanetReportToExcel(planetKey, excelData) {
     ['Planet:', planetLabel],
     ['Generated:', new Date().toISOString()],
     ['Model Start Date:', 'JD 2451716.5 (June 21, 2000 00:00 UTC)'],
+    [''],
+    // This sheet already documented the report; only the provenance the other
+    // exports carry was missing. Added here rather than as a second About sheet.
+    ['Source:', 'https://3d.holisticuniverse.com  ·  https://github.com/dvansonsbeek/3d'],
+    ['Cite:', 'van Sonsbeek, D. — https://doi.org/10.21203/rs.3.rs-8758810/v4'],
+    ['Usage:', 'Computed model output, free to use. Software is AGPL-3.0; see the repository NOTICE.'],
     [''],
     ['DATA SOURCES'],
     ['─'.repeat(60)],
