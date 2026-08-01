@@ -1,0 +1,9 @@
+{
+  "name": "@hum/analysis",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Python analysis. Reads fitted-coefficients.json; never defines physics.",
+  "type": "module",
+  "main": "src/index.js",
+  "license": "AGPL-3.0-or-later"
+}

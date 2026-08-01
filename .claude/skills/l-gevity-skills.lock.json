@@ -1,0 +1,31 @@
+{
+    "version": 1,
+    "source": {
+        "repository": "https://github.com/l-gevity/l-gevity-skills.git",
+        "ref": "main",
+        "commit": "2d34153d5612ca5ee22c2e2d9a5062a49d849bca",
+        "path": ".claude/skills"
+    },
+    "syncedAt": "2026-08-01T16:13:33Z",
+    "skills": [
+        "alchemy",
+        "architecture-as-code",
+        "architecture-as-code-javascript",
+        "architecture-as-code-python",
+        "architecture-guidelines",
+        "bring-down",
+        "ci-cd-reliability-architecture",
+        "continuous-improvement",
+        "defect-shift-left",
+        "functionality-complexity-tradeoff",
+        "implementation-readiness",
+        "morphogenetic-architecture",
+        "push-out",
+        "requirements-grounding",
+        "requirements-topology",
+        "requirements-traceability",
+        "structural-simplification",
+        "system-optimization",
+        "test-strategy"
+    ]
+}

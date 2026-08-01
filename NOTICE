@@ -98,6 +98,14 @@ demonstrates the separation is real rather than asserted.
 Bundled and runtime libraries
 -----------------------------
 
+    l-gevity-skills       MIT          https://github.com/l-gevity/l-gevity-skills
+                                       Copyright (c) 2026 L-GEVITY. 19 agent
+                                       skills vendored into .claude/skills/;
+                                       the pinned commit is recorded in
+                                       .claude/skills/l-gevity-skills.lock.json.
+                                       Not shipped to browsers — these guide
+                                       development, they are not runtime code.
+
     three                 MIT          https://threejs.org/
     tweakpane             MIT          https://tweakpane.github.io/docs/
     Plotly.js             MIT          https://plotly.com/javascript/

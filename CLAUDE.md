@@ -83,12 +83,35 @@ would silently churn a structural claim for a rounding-level gain.
 
 ## Verification
 
-`/gates` runs the standalone checks. Full suite: `tools/verify/` (17 scripts).
-They are **not** a test suite — 17 manual scripts encoding real gates, with no
-shared harness and not in CI.
+`npm run check` is the enforced chain — lint (§4 boundaries), typecheck (JSDoc +
+`checkJs`), `check:boundaries` (the §2h licensing invariant), purity. Every gate
+has been shown to **fail on a planted violation**, not merely to pass on clean
+code. It covers `packages/` only; `src/script.js` and `tools/` are pre-migration
+and join as Phase 8 extracts.
+
+`/gates` runs the standalone model checks. Full suite: `tools/verify/`
+(17 scripts) — **not** a test suite, 17 manual scripts encoding real gates.
 
 Reference values: Law 4 K = 3.4143e-6 · Law 5 balance = 99.8636% (use **base**
 eccentricity, not J2000) · Saturn Law 5 = 0.05371910.
+
+## Skills
+
+`.claude/skills/` holds two sets, both loaded automatically:
+
+- **7 project skills** — the domain rules L-GEVITY excludes, each built from
+  measured bugs here: `numerical-methods`, `units-and-frames`,
+  `scientific-validation`, `fitting-pipeline`, `provenance-reproducibility`,
+  `improvement-evidence`, plus `/gates`.
+- **19 from `l-gevity-skills`** (MIT, pinned in `l-gevity-skills.lock.json`) —
+  generic architecture judgement, the A.L.C.H.E.M.Y. gates M→A→L→C→E→H→Y.
+  Invoke a full pass with `/alchemy`; the `alchemy` skill owns the dispatch
+  protocol, so it is not restated here.
+
+Skills activate on description match — you never name them. Where the two sets
+overlap, the generic one owns the method and the project one carries the
+evidence: `continuous-improvement` is the protocol, `improvement-evidence` is
+what actually made corrections stick here.
 
 ## Key paths
 

@@ -1,0 +1,47 @@
+{
+  "//": [
+    "Phase 0 decision 2 (IP-unified-architecture.md §13.2): the stack stays JS +",
+    "Python, NOT TypeScript. The rationale for TS was real — it would have caught",
+    "the [div,sin,cos] vs {order,sin,cos} confusion at compile time — so the",
+    "safety is replaced rather than dropped: JSDoc annotations plus checkJs give",
+    "genuine type checking and editor support with no build step.",
+    "",
+    "This also supplies the type information @typescript-eslint/no-floating-promises",
+    "needs (§4), which cannot work on plain JS without it.",
+    "",
+    "Scope is packages/ only. src/script.js is 64,714 lines of pre-migration code",
+    "and would drown the signal; it joins as Phase 8 extracts from it.",
+    "",
+    "maxNodeModuleJsDepth is 0 because `exclude` does not cover files reached",
+    "through imports — without it TypeScript walks into node_modules/punycode.",
+    "",
+    "types:[node] lets the test harness use console/process/URL. It also makes",
+    "Node globals type-legal inside physics/src, which is intentional: the actual",
+    "purity rule is enforced by no-restricted-globals and the purity test, both of",
+    "which have been shown to reject violations. Types are not the gate here."
+  ],
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": false,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "maxNodeModuleJsDepth": 0,
+    "paths": {
+      "@hum/*": ["./packages/*/src"]
+    }
+  },
+  "include": ["packages/*/src/**/*.js", "packages/*/test/**/*.mjs"],
+  "exclude": ["node_modules", "dist", "packages/research", "packages/analysis"]
+}

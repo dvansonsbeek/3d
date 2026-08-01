@@ -1,0 +1,9 @@
+{
+  "name": "@hum/fixtures",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Golden masters. Imported by any package; imports only physics. The one shared leaf.",
+  "type": "module",
+  "main": "src/index.js",
+  "license": "AGPL-3.0-or-later"
+}

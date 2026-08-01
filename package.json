@@ -1,12 +1,20 @@
 {
   "name": "threejs-r183-app",
   "version": "1.0.0",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "start": "parcel src/index.html",
     "dev": "parcel src/index.html",
     "dashboard": "npx serve dashboard -l 5050",
     "dashboard:export": "node tools/export-dashboard-data.js",
-    "build": "parcel build src/index.html --dist-dir dist"
+    "build": "parcel build src/index.html --dist-dir dist",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p jsconfig.json",
+    "check:boundaries": "node tools/check-boundaries.mjs",
+    "test:purity": "node packages/physics/test/purity.test.mjs",
+    "check": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:purity"
   },
   "dependencies": {
     "three": "^0.183.0",
@@ -15,7 +23,15 @@
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^26.1.2",
+    "eslint": "^9.39.5",
+    "eslint-plugin-boundaries": "^7.1.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsdoc": "^63.3.2",
     "parcel": "^2.16.4",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.65.0",
     "xlsx": "^0.18.5"
   }
 }

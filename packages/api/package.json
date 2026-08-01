@@ -1,0 +1,9 @@
+{
+  "name": "@hum/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "HTTP + OpenAPI. Thin adapter over physics; contains zero physics.",
+  "type": "module",
+  "main": "src/index.js",
+  "license": "AGPL-3.0-or-later"
+}

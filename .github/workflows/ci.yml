@@ -1,0 +1,59 @@
+name: check
+
+# Architecture enforced BEFORE code moves (IP-unified-architecture.md, Phase 2).
+#
+# Every gate here has been shown to FAIL on a planted violation, not merely to
+# pass on clean code. A check that has never been seen to fail is not known to
+# work — which is the same reason Phase 4's referential-transparency test must be
+# present and failing before the fix lands.
+#
+# Scope is packages/ only. src/script.js, tools/, scripts/ and dashboard/ are
+# pre-migration and join as Phase 8 extracts from them.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # §2b — physics imports nothing external; no cycles; no platform globals.
+      - name: Lint (architecture-as-code, §4)
+        run: npm run lint
+
+      # §13.2 — JSDoc + checkJs replaces the type safety TypeScript would have
+      # given. Catches the [div,sin,cos] vs {order,sin,cos} class of confusion.
+      - name: Typecheck (JSDoc + checkJs)
+        run: npm run typecheck
+
+      # §2h — no Tychosium scene-graph schema and nothing GPL-derived may be
+      # reachable from packages/physics. This is what keeps the commercial
+      # surface clean (§14.6); ESLint cannot express it.
+      - name: Boundaries (§2h licensing invariant)
+        run: npm run check:boundaries
+
+      # §8 — purity is an NFR. Catches dynamic global access that the linter
+      # cannot see, e.g. globalThis['doc' + 'ument'].
+      - name: Purity (physics with no platform)
+        run: npm run test:purity
+
+      # The simulator must keep building while the packages are empty shells.
+      - name: Build simulator
+        run: npm run build

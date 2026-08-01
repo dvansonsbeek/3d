@@ -1,0 +1,9 @@
+{
+  "name": "@hum/fitting",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The production fitting pipeline (fit + verify + pipeline). Node only.",
+  "type": "module",
+  "main": "src/index.js",
+  "license": "AGPL-3.0-or-later"
+}
