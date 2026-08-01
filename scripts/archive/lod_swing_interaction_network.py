@@ -44,7 +44,7 @@ from itertools import combinations
 from pathlib import Path
 import numpy as np
 
-REPO = Path('/home/dennis/code/3d')
+REPO = Path(__file__).resolve().parents[2]
 OUT_PATH = REPO / 'data' / 'deltaT-swing-interaction-network.json'
 EIGHT_H = 8 * 335317
 T0_RESP, Q_RESP = 3900.0, 8.0        # response-shaping eigenmode (A1 fit)

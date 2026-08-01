@@ -662,7 +662,7 @@ def main():
     out["b2_eigenmode_enum"] = stage_b2_eigenmode_enumeration(ages_cgd, d13c_cgd, d18o_cgd)
 
     out["meta"] = {
-        "script": str(SCRIPT_DIR / "milankovitch_8h_variance_budget_tier_b.py"),
+        "script": "milankovitch_8h_variance_budget_tier_b.py",
         "doc": "docs/92-climate-formula.md",
         "runtime_sec": time.time() - t0,
     }

@@ -58,7 +58,9 @@ from milankovitch_climate_formula import (
     load_cenogrid, load_lr04, preprocess,
 )
 
-OUTPUT = Path("/home/dennis/code/3d/data/cenogrid-mtm-ftest.json")
+REPO = Path(__file__).resolve().parents[1]
+
+OUTPUT = REPO / "data/cenogrid-mtm-ftest.json"
 
 NW = 3                # Time-bandwidth product (standard choice)
 K = 5                 # Number of tapers (= 2*NW - 1)

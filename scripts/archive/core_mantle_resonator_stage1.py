@@ -69,7 +69,7 @@ from itertools import combinations
 from pathlib import Path
 import numpy as np
 
-REPO = Path('/home/dennis/code/3d')
+REPO = Path(__file__).resolve().parents[2]
 OUT_PATH = REPO / 'data' / 'core-mantle-resonator-stage1.json'
 EIGHT_H = 8 * 335317
 # deltaTStart from the single source of truth (updated by dt-corrections-fit

@@ -2,7 +2,7 @@
 Parse the 3 timed-solar-eclipse tables from the Stephenson, Morrison & Hohenkerk
 (2016) supplementary material into a single JSON catalog.
 
-Input  : /home/dennis/code/3d/data/rspa20160404supp2/Table-S{03,06,08}.txt
+Input  : data/rspa20160404supp2/Table-S{03,06,08}.txt
 Output : public/input/solar-eclipses-stephenson-2016.json
 
 Each row in the source tables encodes a SINGLE OBSERVATION'S derived ΔT value
@@ -33,7 +33,9 @@ like S01 (Babylonian lunar); S06 and S08 use the simpler 4-column format.
 import re, json, sys
 from pathlib import Path
 
-SRC = Path('/home/dennis/code/3d/data/rspa20160404supp2')
+REPO = Path(__file__).resolve().parents[1]
+
+SRC = REPO / 'data/rspa20160404supp2'
 OUT = Path(__file__).parent.parent / 'public' / 'input' / 'solar-eclipses-stephenson-2016.json'
 
 TABLE_NAMES = {

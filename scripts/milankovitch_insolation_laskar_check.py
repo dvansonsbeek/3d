@@ -278,7 +278,7 @@ def main():
     # Persist
     out = {
         "metadata": {
-            "script": str(SCRIPT_DIR / "milankovitch_insolation_laskar_check.py"),
+            "script": "milankovitch_insolation_laskar_check.py",
             "data_source": laskar["source"],
             "window_kyr": list(WINDOW_KYR),
             "runtime_sec": time.time() - t0,

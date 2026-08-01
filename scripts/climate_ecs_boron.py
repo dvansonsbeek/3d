@@ -48,6 +48,8 @@ from milankovitch_climate_formula import (
     load_lr04, preprocess,
 )
 
+REPO = Path(__file__).resolve().parents[1]
+
 # ── Constants ────────────────────────────────────────────────────────────────
 ALPHA = 5.35
 F_2X = ALPHA * math.log(2)
@@ -61,9 +63,9 @@ N_BOOT = 200
 BLOCK_KYR = 30
 RNG_SEED = 20260606
 
-SNYDER_FILE = Path("/home/dennis/code/3d/data/Snyder_Data_Figures/Source Data - Figure 1.xlsx")
-SPRATT_FILE = Path("/home/dennis/code/3d/data/spratt-lisiecki-2016-sea-level.txt")
-OUTPUT = Path("/home/dennis/code/3d/data/climate-ecs-boron.json")
+SNYDER_FILE = REPO / "data/Snyder_Data_Figures/Source Data - Figure 1.xlsx"
+SPRATT_FILE = REPO / "data/spratt-lisiecki-2016-sea-level.txt"
+OUTPUT = REPO / "data/climate-ecs-boron.json"
 
 BANDS = {
     "obliquity (35-50)":     [(35, 50)],

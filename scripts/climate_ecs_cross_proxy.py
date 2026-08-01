@@ -55,9 +55,11 @@ from milankovitch_climate_formula import (   # noqa
     REGIME_WINDOWS, load_lr04, load_epica_co2, preprocess,
 )
 
-CHENG_FILE = Path("/home/dennis/code/3d/data/cheng2016-speleothem.txt")
-SNYDER_FILE = Path("/home/dennis/code/3d/data/snyder2016-gast.xlsx")
-OUTPUT = Path("/home/dennis/code/3d/data/climate-ecs-cross-proxy.json")
+REPO = Path(__file__).resolve().parents[1]
+
+CHENG_FILE = REPO / "data/cheng2016-speleothem.txt"
+SNYDER_FILE = REPO / "data/snyder2016-gast.xlsx"
+OUTPUT = REPO / "data/climate-ecs-cross-proxy.json"
 
 
 def load_cheng2016():

@@ -56,8 +56,10 @@ sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import EIGHT_H, L1_LATTICE_INTEGERS
 from l1_vs_laskar_eigenmodes import enumerate_eigenmode_beats
 
-LA2004_FILE = Path("/home/dennis/code/3d/data/la2004-earth-51myr-back.asc")
-OUTPUT = Path("/home/dennis/code/3d/data/stability-sublattice.json")
+REPO = Path(__file__).resolve().parents[1]
+
+LA2004_FILE = REPO / "data/la2004-earth-51myr-back.asc"
+OUTPUT = REPO / "data/stability-sublattice.json"
 
 N_RANGE = (5, 200)            # 13.4 to 537 kyr periods
 WINDOW_MYR = 5.0

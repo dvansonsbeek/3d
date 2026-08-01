@@ -39,6 +39,8 @@ import json
 from pathlib import Path
 import numpy as np
 
+REPO = Path(__file__).resolve().parents[1]
+
 H_NOW = 335317
 EIGHT_H_NOW = 8 * H_NOW
 LOD_NOW_S = 86400.0
@@ -232,7 +234,7 @@ def main():
     (3, 5, 8, 13, 21, 34) are structural; the periods are not."
     """)
 
-    Path("/home/dennis/code/3d/data/paleo-l1-renumbering.json").write_text(
+    (REPO / "data/paleo-l1-renumbering.json").write_text(
         json.dumps({
             "method": (
                 "Computed paleo L1 integers for major Laskar beats at "

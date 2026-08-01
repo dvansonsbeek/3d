@@ -18,7 +18,9 @@ import re, json
 from pathlib import Path
 from collections import defaultdict
 
-DATA_DIR = Path('/home/dennis/code/3d/data/rspa20160404supp2')
+REPO = Path(__file__).resolve().parents[1]
+
+DATA_DIR = REPO / 'data/rspa20160404supp2'
 
 # Table title -> source category
 TABLE_INFO = {
@@ -166,7 +168,7 @@ def main():
     print('=' * 70)
     print('Stephenson spline knot positions (Table S15) vs observation density')
     print('=' * 70)
-    spline = json.loads(Path('/home/dennis/code/3d/public/input/stephenson-2016-deltaT-polynomial.json').read_text())
+    spline = json.loads((REPO / 'public/input/stephenson-2016-deltaT-polynomial.json').read_text())
     print(f'{"Segment":>4} {"Knot Y0":>10} {"Knot Y1":>10} {"Width":>8} {"Obs in seg":>12}')
     print('-' * 60)
     for seg in spline['segments']:

@@ -58,14 +58,16 @@ import sys
 from pathlib import Path
 import numpy as np
 
-sys.path.insert(0, str(Path('/home/dennis/code/3d/scripts')))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lod_residual_lattice_fit import (
     H, EIGHT_H, load_stephenson, stephenson_delta_t_vector,
     model_delta_t_vector,
 )
 
-SHIPPED_FIT = Path('/home/dennis/code/3d/data/deltaT-4flag-fit.json')
-OUT_PATH    = Path('/home/dennis/code/3d/data/deltaT-h46-millennial-cycle-fit.json')
+REPO = Path(__file__).resolve().parents[2]
+
+SHIPPED_FIT = REPO / 'data/deltaT-4flag-fit.json'
+OUT_PATH    = REPO / 'data/deltaT-h46-millennial-cycle-fit.json'
 
 CAND_N   = 368                      # H/46 = 7,289.5 yr (2nd harmonic of H/23)
 BAND_NS  = [322, 345, 366, 368, 427, 437, 460, 488]   # archive-significant band

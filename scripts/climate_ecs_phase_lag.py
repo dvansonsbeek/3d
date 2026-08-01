@@ -56,6 +56,8 @@ from milankovitch_climate_formula import (   # noqa: E402
     preprocess,
 )
 
+REPO = Path(__file__).resolve().parents[1]
+
 # ── Physics & calibration constants ──────────────────────────────────────────
 ALPHA = 5.35
 F_2X = ALPHA * math.log(2)
@@ -90,7 +92,7 @@ PAIRS = [
      BLOCK_KYR_CENOZOIC),
 ]
 
-OUTPUT_PATH = Path("/home/dennis/code/3d/data/climate-ecs-phase-lag.json")
+OUTPUT_PATH = REPO / "data/climate-ecs-phase-lag.json"
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────

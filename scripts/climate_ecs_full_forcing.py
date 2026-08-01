@@ -63,6 +63,8 @@ from milankovitch_climate_formula import (   # noqa
     REGIME_WINDOWS, load_lr04, load_epica_co2, preprocess,
 )
 
+REPO = Path(__file__).resolve().parents[1]
+
 # ── Physics ──────────────────────────────────────────────────────────────────
 ALPHA = 5.35
 F_2X = ALPHA * math.log(2)
@@ -80,8 +82,8 @@ N_BOOT = 200
 BLOCK_KYR = 30
 RNG_SEED = 20260605
 
-SNYDER_FILE = Path("/home/dennis/code/3d/data/Snyder_Data_Figures/Source Data - Figure 1.xlsx")
-OUTPUT = Path("/home/dennis/code/3d/data/climate-ecs-full-forcing.json")
+SNYDER_FILE = REPO / "data/Snyder_Data_Figures/Source Data - Figure 1.xlsx"
+OUTPUT = REPO / "data/climate-ecs-full-forcing.json"
 
 BANDS = {
     "obliquity (35-50)":   [(35, 50)],

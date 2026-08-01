@@ -24,7 +24,7 @@ import sys
 from pathlib import Path
 import numpy as np
 
-sys.path.insert(0, str(Path('/home/dennis/code/3d/scripts')))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lod_residual_lattice_fit import (
     EIGHT_H, load_stephenson, stephenson_delta_t_vector,
     model_delta_t_vector, fit_harmonics, harmonic_amp_phase,

@@ -43,7 +43,7 @@ import sys
 from pathlib import Path
 import numpy as np
 
-REPO = Path('/home/dennis/code/3d')
+REPO = Path(__file__).resolve().parents[2]
 OUT_PATH = REPO / 'data' / 'core-mantle-joint-impulse-variant.json'
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # archive-local imports
 sys.path.insert(1, str(REPO / 'scripts'))

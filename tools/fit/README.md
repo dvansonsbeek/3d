@@ -108,7 +108,7 @@ Days-per-year at epoch is computed as `T_tropical_s(t_Ma) / LOD_s(t_Ma)`
 period. Both sides use this: simulator `meanYearInDaysAtAge`
 ([src/script.js:5339](../../src/script.js#L5339)), website
 `meanTropicalYearInDaysAtAge`
-([Holistic .../deepTime.ts:387](../../../../Holistic/holisticuniverse/src/lib/orbital/deepTime.ts#L387)).
+(website `src/lib/orbital/deepTime.ts:387`).
 At J2000 both equal the IAU anchor exactly; at deep time they diverge from
 the SI-anchored `/86400` form by a few percent at ±100 Myr.
 
@@ -223,7 +223,8 @@ scripts (`eoc-constants.js`, `perihelion-offset.js`) now live in
 
 ## Syncing to Holistic
 
-The Holistic website (`/home/dennis/code/Holistic/holisticuniverse`) mirrors the
+The Holistic website (a separate repo — set `HOLISTIC_ROOT`, default
+`../Holistic/holisticuniverse` alongside this one) mirrors the
 simulator's fitted coefficients and scalar anchors so that the orbital calculator,
 MDX pages, and paper macros display values that agree with the 3D simulator. The
 sync is **not part of the automated pipeline** — run it manually after Step 9.
@@ -234,12 +235,12 @@ previous fit's numbers.
 
 ```bash
 # 3D repo — sync all values to Holistic (dry-run first)
-cd /home/dennis/code/3d
+cd "$(git rev-parse --show-toplevel)"
 node tools/fit/export-to-holistic.js            # dry-run, preview changes
 node tools/fit/export-to-holistic.js --write    # apply
 
 # Holistic repo — regenerate the derived model-values JSON and paper macros
-cd /home/dennis/code/Holistic/holisticuniverse
+cd "${HOLISTIC_ROOT:-../Holistic/holisticuniverse}"
 pnpm run values:generate                        # refreshes src/data/model-values.generated.json
 npx tsx docs/paper/generate-tex-values.ts       # refreshes docs/paper/model-values.tex
 ```

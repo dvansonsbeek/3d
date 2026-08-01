@@ -315,7 +315,7 @@ The Holistic model also proposes a candidate **dust-free climate-coupling mechan
 
 > Inclination-related orbital-plane oscillations (model: H/3 second obliquity component; data: Mercury-Mars nodal beat at ~107 kyr) → modulated obliquity → standard Milankovitch insolation forcing → ice sheets
 
-Every step after "modulated obliquity" is standard Milankovitch physics; the mechanism needs no new forcing. The model's specific proposal that Earth's intrinsic H/3 inclination precession produces a second obliquity component at the same period is one theoretical pathway *within* this broader inclination-side family; the empirical signal is consistent with this family but does not single out H/3 specifically. See [supporting-evidence.mdx §6](../../Holistic/holisticuniverse/src/content/en/model/supporting-evidence.mdx) for the model's full mechanism statement.
+Every step after "modulated obliquity" is standard Milankovitch physics; the mechanism needs no new forcing. The model's specific proposal that Earth's intrinsic H/3 inclination precession produces a second obliquity component at the same period is one theoretical pathway *within* this broader inclination-side family; the empirical signal is consistent with this family but does not single out H/3 specifically. See [supporting-evidence §6](https://www.holisticuniverse.com/en/model/supporting-evidence) for the model's full mechanism statement.
 
 Reproducer: `scripts/milankovitch_spectral_tests.py` and `scripts/milankovitch_candidate_amplitudes.py`; results in `data/milankovitch-spectral-results.json` and `data/milankovitch-candidate-amplitudes.json`.
 

@@ -2,7 +2,7 @@
 Parse the 6 timed-lunar-eclipse tables from the Stephenson, Morrison & Hohenkerk
 (2016) supplementary material into a single JSON catalog.
 
-Input  : /home/dennis/code/3d/data/rspa20160404supp2/Table-S{01,02,04,05,07,09}.txt
+Input  : data/rspa20160404supp2/Table-S{01,02,04,05,07,09}.txt
 Output : public/input/lunar-eclipses-stephenson-2016.json
 
 Each row in the source tables encodes a SINGLE OBSERVATION'S derived ΔT value
@@ -27,7 +27,9 @@ https://royalsocietypublishing.org/doi/10.1098/rspa.2016.0404
 import re, json, sys
 from pathlib import Path
 
-SRC = Path('/home/dennis/code/3d/data/rspa20160404supp2')
+REPO = Path(__file__).resolve().parents[1]
+
+SRC = REPO / 'data/rspa20160404supp2'
 OUT = Path(__file__).parent.parent / 'public' / 'input' / 'lunar-eclipses-stephenson-2016.json'
 
 TABLE_NAMES = {

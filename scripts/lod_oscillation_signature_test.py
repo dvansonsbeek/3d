@@ -38,8 +38,10 @@ SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import EIGHT_H, L1_LATTICE_INTEGERS
 
+REPO = Path(__file__).resolve().parents[1]
+
 H = 335317
-LA2004_FILE = Path("/home/dennis/code/3d/data/la2004-earth-51myr-back.asc")
+LA2004_FILE = REPO / "data/la2004-earth-51myr-back.asc"
 
 # Framework's predicted LOD oscillation periods (H/n)
 LOD_HARMONICS = {

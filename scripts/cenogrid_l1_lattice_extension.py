@@ -43,7 +43,9 @@ from milankovitch_climate_formula import (
     load_cenogrid, preprocess,
 )
 
-OUTPUT = Path("/home/dennis/code/3d/data/cenogrid-l1-lattice-extension.json")
+REPO = Path(__file__).resolve().parents[1]
+
+OUTPUT = REPO / "data/cenogrid-l1-lattice-extension.json"
 
 WINDOW_KYR = 2000     # 2 Myr sliding window
 STEP_KYR   = 500      # 0.5 Myr step

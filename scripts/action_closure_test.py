@@ -51,10 +51,12 @@ SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import EIGHT_H
 
+REPO = Path(__file__).resolve().parents[1]
+
 H = 335317
 EIGHT_H_YR = 8 * H              # 2,682,536 yr
-LA2004_FILE = Path("/home/dennis/code/3d/data/la2004-earth-51myr-back.asc")
-OUTPUT = Path("/home/dennis/code/3d/data/action-closure.json")
+LA2004_FILE = REPO / "data/la2004-earth-51myr-back.asc"
+OUTPUT = REPO / "data/action-closure.json"
 
 
 def load_la2004():

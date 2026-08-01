@@ -33,8 +33,10 @@ import sys
 from pathlib import Path
 import numpy as np
 
-CHENG_PATH = Path('/home/dennis/code/3d/data/cheng2016-speleothem.txt')
-OUT_PATH   = Path('/home/dennis/code/3d/data/hallstatt-cheng-fit.json')
+REPO = Path(__file__).resolve().parents[1]
+
+CHENG_PATH = REPO / 'data/cheng2016-speleothem.txt'
+OUT_PATH   = REPO / 'data/hallstatt-cheng-fit.json'
 
 H = 335317
 EIGHT_H = 8 * H

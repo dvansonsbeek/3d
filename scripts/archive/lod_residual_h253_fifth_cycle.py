@@ -44,14 +44,16 @@ import sys
 from pathlib import Path
 import numpy as np
 
-sys.path.insert(0, str(Path('/home/dennis/code/3d/scripts')))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lod_residual_lattice_fit import (
     H, EIGHT_H, load_stephenson, stephenson_delta_t_vector,
     model_delta_t_vector, fit_harmonics, harmonic_amp_phase,
 )
 
-SHIPPED_FIT = Path('/home/dennis/code/3d/data/deltaT-4flag-fit.json')
-OUT_PATH    = Path('/home/dennis/code/3d/data/deltaT-h253-fifth-cycle-scan.json')
+REPO = Path(__file__).resolve().parents[2]
+
+SHIPPED_FIT = REPO / 'data/deltaT-4flag-fit.json'
+OUT_PATH    = REPO / 'data/deltaT-h253-fifth-cycle-scan.json'
 
 CANDIDATE_N = 2024          # gcd-compliant preferred candidate (H/253)
 SCAN_NS     = [2013, 2015, 2016, 2017, 2018, 2019, 2020, 2021,

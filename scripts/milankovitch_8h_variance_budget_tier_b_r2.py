@@ -642,7 +642,7 @@ def main():
     out["d1_proxy_aware"] = stage_d1_proxy_aware(ages_cgd, d13c, d18o)
 
     out["meta"] = {
-        "script": str(SCRIPT_DIR / "milankovitch_8h_variance_budget_tier_b_r2.py"),
+        "script": "milankovitch_8h_variance_budget_tier_b_r2.py",
         "doc": "docs/92-climate-formula.md",
         "runtime_sec": time.time() - t0,
     }

@@ -49,8 +49,10 @@ SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import EIGHT_H, L1_LATTICE_INTEGERS
 
-LA2004_FILE = Path("/home/dennis/code/3d/data/la2004-earth-51myr-back.asc")
-OUTPUT = Path("/home/dennis/code/3d/data/chirikov-resonance.json")
+REPO = Path(__file__).resolve().parents[1]
+
+LA2004_FILE = REPO / "data/la2004-earth-51myr-back.asc"
+OUTPUT = REPO / "data/chirikov-resonance.json"
 
 PERIOD_RANGE_KYR = (14.0, 500.0)  # extended to cover ecc 405-kyr
 N_TOP_PEAKS = 200                 # how many resonances to include

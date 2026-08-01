@@ -42,6 +42,8 @@ from milankovitch_climate_formula import (
     load_lr04, load_epica_co2, load_cenco2pip, preprocess,
 )
 
+REPO = Path(__file__).resolve().parents[1]
+
 ALPHA = 5.35
 F_2X = ALPHA * math.log(2)
 
@@ -51,8 +53,8 @@ SL_PER_PERMIL = 120.0
 F_PER_M_SL = 0.04
 GHG_MULT = 0.5
 
-SNYDER_FILE = Path("/home/dennis/code/3d/data/Snyder_Data_Figures/Source Data - Figure 1.xlsx")
-OUTPUT = Path("/home/dennis/code/3d/data/climate-ecs-per-regime.json")
+SNYDER_FILE = REPO / "data/Snyder_Data_Figures/Source Data - Figure 1.xlsx"
+OUTPUT = REPO / "data/climate-ecs-per-regime.json"
 
 BANDS = {
     "obliquity (35-50)":     [(35, 50)],

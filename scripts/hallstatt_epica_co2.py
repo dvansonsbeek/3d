@@ -26,8 +26,10 @@ import math
 from pathlib import Path
 import numpy as np
 
-EPICA_PATH = Path('/home/dennis/code/3d/data/epica-co2-bereiter2015.txt')
-OUT_PATH   = Path('/home/dennis/code/3d/data/hallstatt-epica-fit.json')
+REPO = Path(__file__).resolve().parents[1]
+
+EPICA_PATH = REPO / 'data/epica-co2-bereiter2015.txt'
+OUT_PATH   = REPO / 'data/hallstatt-epica-fit.json'
 
 H = 335317
 EIGHT_H = 8 * H

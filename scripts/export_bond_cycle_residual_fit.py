@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 import numpy as np
 
-sys.path.insert(0, str(Path('/home/dennis/code/3d/scripts')))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lod_residual_lattice_fit import (
     EIGHT_H, H, load_stephenson, stephenson_delta_t_vector,
     model_delta_t_vector, fit_harmonics,
@@ -37,7 +37,9 @@ from lod_residual_lattice_fit import (
 )
 from lod_residual_lattice_cv import fit_and_predict, SELECTED_1
 
-OUT_PATH = Path('/home/dennis/code/3d/data/deltaT-bond-cycle-residual-fit.json')
+REPO = Path(__file__).resolve().parents[1]
+
+OUT_PATH = REPO / 'data/deltaT-bond-cycle-residual-fit.json'
 
 
 def main():

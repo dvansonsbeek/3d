@@ -30,8 +30,10 @@ import math
 from pathlib import Path
 import numpy as np
 
-STEIN_PATH = Path('/home/dennis/code/3d/data/steinhilber-2012-solar.txt')
-OUT_PATH   = Path('/home/dennis/code/3d/data/hallstatt-steinhilber-fit.json')
+REPO = Path(__file__).resolve().parents[1]
+
+STEIN_PATH = REPO / 'data/steinhilber-2012-solar.txt'
+OUT_PATH   = REPO / 'data/hallstatt-steinhilber-fit.json'
 
 H = 335317
 EIGHT_H = 8 * H  # = 2,682,536

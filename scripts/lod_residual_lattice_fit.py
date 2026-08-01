@@ -28,6 +28,8 @@ import math
 from pathlib import Path
 import numpy as np
 
+REPO = Path(__file__).resolve().parents[1]
+
 # ============================================================================
 # FRAMEWORK CONSTANTS (verbatim from src/script.js)
 # ============================================================================
@@ -191,7 +193,7 @@ def model_delta_t_vector(years, year_anchor=1820.0):
 # STEPHENSON POLYNOMIAL EVALUATION
 # ============================================================================
 
-STEPHENSON_JSON = Path('/home/dennis/code/3d/public/input/stephenson-2016-deltaT-polynomial.json')
+STEPHENSON_JSON = REPO / 'public/input/stephenson-2016-deltaT-polynomial.json'
 
 def load_stephenson():
     return json.loads(STEPHENSON_JSON.read_text())['segments']

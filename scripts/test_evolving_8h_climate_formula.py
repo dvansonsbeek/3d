@@ -36,6 +36,8 @@ from milankovitch_climate_formula import (
     L3_TRANSITIONS_MA, ClimateFormula, REGIME_WINDOWS,
 )
 
+REPO = Path(__file__).resolve().parents[1]
+
 MilankovitchClimateFormula = ClimateFormula  # alias for clarity
 
 H_NOW = 335317
@@ -108,7 +110,7 @@ def time_warp(t_kyr):
 
 def load_lr04():
     """Load LR04 benthic δ¹⁸O stack."""
-    p = Path("/home/dennis/code/3d/data/lr04-stack.txt")
+    p = REPO / "data/lr04-stack.txt"
     if not p.exists():
         return None
     ages, d18o = [], []
@@ -129,7 +131,7 @@ def load_lr04():
 
 def load_cenogrid():
     """Load CENOGRID δ¹⁸O (Westerhold 2020 PANGAEA tab format)."""
-    p = Path("/home/dennis/code/3d/data/westerhold2020-cenogrid.tab")
+    p = REPO / "data/westerhold2020-cenogrid.tab"
     if not p.exists():
         return None
     ages_ma, d18o_vals = [], []
@@ -291,7 +293,7 @@ def main():
             print(f"    in any tested regime. Improvements all < 0.001.")
             print(f"    Implication: keep constant 8H_now for current fits.")
 
-    Path("/home/dennis/code/3d/data/evolving-8h-test.json").write_text(
+    (REPO / "data/evolving-8h-test.json").write_text(
         json.dumps({
             "method": "Compare R² between constant 8H_now and time-warped 8H(t)",
             "results": results,

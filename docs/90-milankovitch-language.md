@@ -11,8 +11,8 @@
 - [32 — Inclination Calculations](32-inclination-calculations.md)
 - [38 — Eccentricity Scale](38-eccentricity-scale.md)
 - [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); how Milankovitch periods evolve under Drivers 1 and 2
-- Website: `Holistic/holisticuniverse/src/content/en/model/eigenfrequencies.mdx` — full eigenfrequency / divisor / Berger comparison
-- Website: `Holistic/holisticuniverse/src/content/en/model/supporting-evidence.mdx` §1 (100-kyr problem) and §12 (eigenfrequency convergence)
+- Website: [model/eigenfrequencies](https://www.holisticuniverse.com/en/model/eigenfrequencies) — full eigenfrequency / divisor / Berger comparison
+- Website: [model/supporting-evidence](https://www.holisticuniverse.com/en/model/supporting-evidence) §1 (100-kyr problem) and §12 (eigenfrequency convergence)
 - Source: `src/script.js` `perihelionCycleLength` (line 63) and `eclipticPrecessionPeriod` family
 
 > **Scope note (ESSRT).** The Fibonacci-closure algebra (13−5=8, 13+3=16, 8−5=3, 13−8=5) and the integer-divisor structure of H/N and 8H/N are scale-invariant — they hold at any epoch. The literal year counts (H = 335,317; 8H = 2,682,536; the five Milankovitch periods 111,772 / 67,063 / 41,915 / 25,794 / 20,957; deep-time multiples 3H = 1,005,951 and 13H = 4,359,121) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — so the periods shown in §§ 2 and 4 are present-epoch values, and the comparison with the geological record across the past 1.2 Myr (LR04, CENOGRID, EPICA) assumes drift over that window is sub-percent (verified ~0.05% over 1 Myr). For Boulila 2018's ~4.5 Myr resonance comparison (line 128) the cumulative drift starts to matter — see doc 99 for the per-driver Δ-H formulas.
@@ -38,7 +38,7 @@ The "100-kyr problem" is that standard eccentricity has *split* peaks at 95 & 12
 
 ## 2. The Model's Five Natural Milankovitch Periods
 
-**H = 335,317 years (at J2000)** is the **Earth Fundamental Cycle** — the model's master timescale, anchored observationally to the verified 1246 AD perihelion-solstice alignment. See [doc 10 — Fibonacci Laws](10-fibonacci-laws.md) and [website fundamental-cycles.mdx](../../Holistic/holisticuniverse/src/content/en/model/fundamental-cycles.mdx) for derivation.
+**H = 335,317 years (at J2000)** is the **Earth Fundamental Cycle** — the model's master timescale, anchored observationally to the verified 1246 AD perihelion-solstice alignment. See [doc 10 — Fibonacci Laws](10-fibonacci-laws.md) and [website fundamental-cycles](https://www.holisticuniverse.com/en/model/fundamental-cycles) for derivation.
 
 | Cycle | Model formula | Years | Source |
 |---|---|---:|---|
@@ -87,7 +87,7 @@ All five model periods are integer divisors of H with **zero free parameters** �
 
 ### 4.2 Berger 1978 climatic-precession spectrum
 
-The **Solar System Resonance Cycle** is 8H = **2,682,536 yr (at J2000)** — the smallest period in which every planet's principal precession cycles return to alignment simultaneously (each cycle's period divides 8H by some integer). See [website fundamental-cycles.mdx](../../Holistic/holisticuniverse/src/content/en/model/fundamental-cycles.mdx).
+The **Solar System Resonance Cycle** is 8H = **2,682,536 yr (at J2000)** — the smallest period in which every planet's principal precession cycles return to alignment simultaneously (each cycle's period divides 8H by some integer). See [website fundamental-cycles](https://www.holisticuniverse.com/en/model/fundamental-cycles).
 
 The Berger climatic-precession spectrum is a **set of six** peaks from `g_j + k` beats (apsidal eigenfrequencies plus axial precession k). Every Berger peak matches integer divisors of 8H to within 0.4 %:
 
@@ -138,7 +138,7 @@ The Boulila et al. 2018 *EPSL* result identifies a ~4.5 Myr cycle in Mesozoic-Ce
 
 ## 5. The 100-kyr Problem — How the Model Speaks to It
 
-(For the full position statement see [website supporting-evidence.mdx §1](../../Holistic/holisticuniverse/src/content/en/model/supporting-evidence.mdx).)
+(For the full position statement see [website supporting-evidence §1](https://www.holisticuniverse.com/en/model/supporting-evidence).)
 
 ### 5.1 The standard attribution and its problems
 
@@ -172,7 +172,7 @@ Earth's actual obliquity would then have **two** components — one at H/8 ≈ 4
 
 Important distinction: H/3 = 111.77 kyr and the empirically dominant Mercury-Mars nodal beat at 107.3 kyr lie within one Rayleigh element of each other at T = 1.2 Myr (ΔP ≈ 10 kyr at P = 110 kyr — doc 91 §4.3), so the data cannot single out H/3 specifically. The empirical signal is consistent with the inclination-side family but does not confirm the model's specific H/3-second-obliquity proposal. That proposal remains **theoretical** within the broader empirically-supported framework.
 
-Full mechanism statement: [website supporting-evidence.mdx §6](../../Holistic/holisticuniverse/src/content/en/model/supporting-evidence.mdx).
+Full mechanism statement: [website supporting-evidence §6](https://www.holisticuniverse.com/en/model/supporting-evidence).
 
 **Why the 100-kyr cycle only emerged at the MPT (visibility-mechanism candidates):**
 

@@ -365,7 +365,7 @@ def main():
 
     # Add tier-A label & metadata
     out["meta"] = {
-        "script": str(SCRIPT_DIR / "milankovitch_8h_variance_budget.py"),
+        "script": "milankovitch_8h_variance_budget.py",
         "doc": "docs/92-climate-formula.md",
         "runtime_sec": time.time() - t0,
     }

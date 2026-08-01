@@ -62,7 +62,7 @@ import sys
 from pathlib import Path
 import numpy as np
 
-REPO = Path('/home/dennis/code/3d')
+REPO = Path(__file__).resolve().parents[2]
 OUT_PATH = REPO / 'data' / 'h26-phase-locked-test.json'
 sys.path.insert(0, str(REPO / 'scripts'))
 from lattice_harmonic_scan import load_cheng, load_epica, load_steinhilber  # noqa: E402

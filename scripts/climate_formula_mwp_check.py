@@ -25,7 +25,7 @@ import sys, json
 from pathlib import Path
 import numpy as np
 
-sys.path.insert(0, str(Path('/home/dennis/code/3d/scripts')))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from milankovitch_climate_formula import (
     ClimateFormula, REGIME_WINDOWS, EIGHT_H, L1_LATTICE_INTEGERS,
     L2_THERMOSTAT_FAMILY, load_lr04, preprocess, L1_LABELS,

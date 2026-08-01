@@ -27,6 +27,8 @@ import json
 from pathlib import Path
 import numpy as np
 
+REPO = Path(__file__).resolve().parents[1]
+
 H_NOW = 335317
 EIGHT_H_NOW = 8 * H_NOW
 LOD_NOW_S = 86400.0
@@ -215,7 +217,7 @@ def main():
       regime changes.
     """)
 
-    Path("/home/dennis/code/3d/data/eight-h-history.json").write_text(
+    (REPO / "data/eight-h-history.json").write_text(
         json.dumps({
             "method": (
                 "Computed paleo-H(t) = 13 × paleo-precession-period(t) "

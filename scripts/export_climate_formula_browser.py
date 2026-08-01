@@ -249,7 +249,7 @@ def main():
             "cenco2pip":     block_cenco2pip,
         },
         "meta": {
-            "script": str(SCRIPT_DIR / "export_climate_formula_browser.py"),
+            "script": "export_climate_formula_browser.py",
             "consumer": "src/script.js — Climate Formula Explorer modal",
         },
     }

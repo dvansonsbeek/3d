@@ -30,6 +30,8 @@ SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import EIGHT_H, L1_LATTICE_INTEGERS
 
+REPO = Path(__file__).resolve().parents[1]
+
 # Framework constants (from src/script.js)
 H = 335317
 PERIHELION_CYCLE = H / 16          # 20,957.3 yr
@@ -48,7 +50,7 @@ EARTH_PRECESSION_PERIOD_YR = _IAU_SIDEREAL_YEAR_DAYS / (_IAU_SIDEREAL_YEAR_DAYS 
 
 
 def load_la2004():
-    LA2004_FILE = Path("/home/dennis/code/3d/data/la2004-earth-51myr-back.asc")
+    LA2004_FILE = REPO / "data/la2004-earth-51myr-back.asc"
     ages, ecc = [], []
     with open(LA2004_FILE) as f:
         for line in f:

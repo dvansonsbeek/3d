@@ -46,8 +46,10 @@ from l1_vs_laskar_eigenmodes import (
     enumerate_eigenmode_beats, mtm_spectrum, find_peaks,
 )
 
-LA2004_FILE = Path("/home/dennis/code/3d/data/la2004-earth-51myr-back.asc")
-OUTPUT = Path("/home/dennis/code/3d/data/l1-vs-laskar-50myr-published.json")
+REPO = Path(__file__).resolve().parents[1]
+
+LA2004_FILE = REPO / "data/la2004-earth-51myr-back.asc"
+OUTPUT = REPO / "data/l1-vs-laskar-50myr-published.json"
 
 WINDOW_MYR = 5.0   # 5-Myr window — same as our forward 10-Myr test halved
 STEP_MYR = 5.0     # non-overlapping

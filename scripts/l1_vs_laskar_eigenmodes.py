@@ -45,8 +45,10 @@ SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import EIGHT_H, L1_LATTICE_INTEGERS
 
-NBODY_CACHE = Path("/home/dennis/code/3d/scripts/archive/nbody_cache_10myr.npz")
-OUTPUT = Path("/home/dennis/code/3d/data/l1-vs-laskar-eigenmodes.json")
+REPO = Path(__file__).resolve().parents[1]
+
+NBODY_CACHE = REPO / "scripts/archive/nbody_cache_10myr.npz"
+OUTPUT = REPO / "data/l1-vs-laskar-eigenmodes.json"
 
 # Laskar 2004 secular eigenfrequencies (arcsec/yr), from Laskar et al. 2004 A&A 428, 261.
 # These are the standard values quoted in paleoclimate literature.

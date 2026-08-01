@@ -49,9 +49,11 @@ SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import EIGHT_H
 
+REPO = Path(__file__).resolve().parents[1]
+
 H = 335317
 EIGHT_H_YR = 8 * H
-OUTPUT = Path("/home/dennis/code/3d/data/laplace-lagrange.json")
+OUTPUT = REPO / "data/laplace-lagrange.json"
 ARCSEC_PER_RAD = 180 / np.pi * 3600
 ARCSEC_PER_CYCLE = 360 * 3600   # 1,296,000
 

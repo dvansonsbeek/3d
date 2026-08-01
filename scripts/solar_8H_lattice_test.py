@@ -53,15 +53,17 @@ import numpy as np
 
 # Suppress scipy deprecation warnings
 import warnings
+
+REPO = Path(__file__).resolve().parents[1]
 warnings.filterwarnings("ignore")
 
 # 8H Solar System Resonance Cycle (years)
 H = 335_317
 EIGHT_H = 8 * H   # 2,682,536 yr
 
-SILSO_FILE = Path("/home/dennis/code/3d/data/silso-monthly-sunspot.csv")
-STEINHILBER_FILE = Path("/home/dennis/code/3d/data/steinhilber-2012-solar.txt")
-OUTPUT = Path("/home/dennis/code/3d/data/solar-8H-lattice-test.json")
+SILSO_FILE = REPO / "data/silso-monthly-sunspot.csv"
+STEINHILBER_FILE = REPO / "data/steinhilber-2012-solar.txt"
+OUTPUT = REPO / "data/solar-8H-lattice-test.json"
 
 # Known solar cycle periods (from heliophysics literature)
 KNOWN_CYCLES = {

@@ -59,8 +59,10 @@ SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import EIGHT_H, L1_LATTICE_INTEGERS
 
-LA2004_FILE = Path("/home/dennis/code/3d/data/la2004-earth-51myr-back.asc")
-OUTPUT = Path("/home/dennis/code/3d/data/l1-libration-test.json")
+REPO = Path(__file__).resolve().parents[1]
+
+LA2004_FILE = REPO / "data/la2004-earth-51myr-back.asc"
+OUTPUT = REPO / "data/l1-libration-test.json"
 
 WINDOW_MYR = 4.0
 STEP_MYR = 1.0

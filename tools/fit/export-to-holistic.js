@@ -18,12 +18,18 @@ const fs = require('fs');
 const path = require('path');
 
 const WRITE = process.argv.includes('--write');
-const HOLISTIC_ROOT = path.resolve(__dirname, '..', '..', '..', '..', 'code', 'Holistic', 'holisticuniverse');
+// The website is a separate, optional downstream consumer of this repo's fitted
+// values — it is not required to run the pipeline. Point HOLISTIC_ROOT at its
+// checkout; the default assumes a sibling directory next to this repo.
+const HOLISTIC_ROOT = process.env.HOLISTIC_ROOT
+  || path.resolve(__dirname, '..', '..', '..', 'Holistic', 'holisticuniverse');
 const CONSTANTS_PATH = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'constants.ts');
 const COEFFICIENTS_PATH = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'coefficients.ts');
 
 if (!fs.existsSync(HOLISTIC_ROOT)) {
-  console.error(`Holistic repo not found at ${HOLISTIC_ROOT}`);
+  console.error(`Website repo not found at ${HOLISTIC_ROOT}`);
+  console.error('Set HOLISTIC_ROOT=/path/to/website-repo, or skip this step —');
+  console.error('it is manual and not part of the fitting pipeline.');
   process.exit(1);
 }
 

@@ -26,18 +26,20 @@ import sys
 from pathlib import Path
 import numpy as np
 
-sys.path.insert(0, str(Path('/home/dennis/code/3d/scripts')))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lod_residual_lattice_fit import (
     H, EIGHT_H, load_stephenson, stephenson_delta_t_vector,
     model_delta_t_vector, fit_harmonics, harmonic_amp_phase,
 )
+
+REPO = Path(__file__).resolve().parents[1]
 
 # Constants (framework-consistent, matching lod_residual_lattice_fit.py)
 JUPITER_PERIOD_YR = 11.8598
 SATURN_PERIOD_YR  = 29.4570
 J_S_SYNODIC_YR    = 1.0 / (1.0/JUPITER_PERIOD_YR - 1.0/SATURN_PERIOD_YR)  # ≈ 19.85260
 
-OUT_PATH = Path('/home/dennis/code/3d/data/deltaT-1851-residual-fit.json')
+OUT_PATH = REPO / 'data/deltaT-1851-residual-fit.json'
 
 def main():
     print('=' * 85)

@@ -128,7 +128,7 @@ WebGL Render (60 FPS target)
 ## Project Structure
 
 ```
-/home/dennis/code/3d/
+3d/
 ├── src/
 │   ├── index.html              # Entry point (minimal HTML wrapper)
 │   ├── script.js               # Main application (~43,000 lines)

@@ -51,9 +51,15 @@ const TARGETS = {
     label: 'tools/lib/deep-time.js',
     path:  path.join(__dirname, '..', '..', 'tools', 'lib', 'deep-time.js'),
   },
+  // Optional downstream consumer — absent checkouts are skipped, not an error.
+  // Override the location with HOLISTIC_ROOT; default is a sibling directory.
   websiteDeepTime: {
     label: 'website src/lib/orbital/deepTime.ts',
-    path:  path.join(__dirname, '..', '..', '..', 'Holistic', 'holisticuniverse', 'src', 'lib', 'orbital', 'deepTime.ts'),
+    path:  path.join(
+      process.env.HOLISTIC_ROOT
+        || path.join(__dirname, '..', '..', '..', 'Holistic', 'holisticuniverse'),
+      'src', 'lib', 'orbital', 'deepTime.ts',
+    ),
   },
 };
 

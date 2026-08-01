@@ -33,6 +33,8 @@ from milankovitch_climate_formula import (
     load_lr04, load_epica_co2, preprocess,
 )
 
+REPO = Path(__file__).resolve().parents[1]
+
 ALPHA = 5.35
 F_2X = ALPHA * math.log(2)
 
@@ -45,8 +47,8 @@ RANGES = {
 }
 
 N_MC = 5000
-SNYDER_FILE = Path("/home/dennis/code/3d/data/Snyder_Data_Figures/Source Data - Figure 1.xlsx")
-OUTPUT = Path("/home/dennis/code/3d/data/climate-ecs-monte-carlo.json")
+SNYDER_FILE = REPO / "data/Snyder_Data_Figures/Source Data - Figure 1.xlsx"
+OUTPUT = REPO / "data/climate-ecs-monte-carlo.json"
 
 BANDS = {
     "obliquity (35-50)":     [(35, 50)],

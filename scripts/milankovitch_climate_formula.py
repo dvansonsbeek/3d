@@ -880,7 +880,7 @@ def main():
     }
 
     out["meta"] = {
-        "script": str(SCRIPT_DIR / "milankovitch_climate_formula.py"),
+        "script": "milankovitch_climate_formula.py",
         "doc": "docs/92-climate-formula.md",
         "runtime_sec": time.time() - t0,
     }

@@ -538,7 +538,7 @@ def main():
     out["r3_4_13h_stability"] = stage_r34_13h_stability(ages_cgd, d18o, d13c)
 
     out["meta"] = {
-        "script": str(SCRIPT_DIR / "milankovitch_8h_variance_budget_tier_b_r3.py"),
+        "script": "milankovitch_8h_variance_budget_tier_b_r3.py",
         "doc": "docs/92-climate-formula.md",
         "runtime_sec": time.time() - t0,
     }

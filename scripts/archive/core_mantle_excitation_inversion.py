@@ -46,7 +46,7 @@ import math
 from pathlib import Path
 import numpy as np
 
-REPO = Path('/home/dennis/code/3d')
+REPO = Path(__file__).resolve().parents[2]
 OUT_PATH = REPO / 'data' / 'core-mantle-excitation-inversion.json'
 EIGHT_H = 8 * 335317
 T0, Q = 3850.0, 2.0            # resonator from core_mantle_resonator_fit (A2-leaning)

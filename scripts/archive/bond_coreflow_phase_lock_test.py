@@ -42,7 +42,7 @@ import math
 from pathlib import Path
 import numpy as np
 
-REPO = Path('/home/dennis/code/3d')
+REPO = Path(__file__).resolve().parents[2]
 OUT_PATH = REPO / 'data' / 'bond-coreflow-phase-lock-test.json'
 P_1830 = 8 * 335317 / 1830.0
 CANONICAL_BP = {0: 400, 1: 1400, 2: 2800, 3: 4200, 4: 5900,

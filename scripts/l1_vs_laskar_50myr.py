@@ -50,9 +50,11 @@ from l1_vs_laskar_eigenmodes import (
     enumerate_eigenmode_beats, mtm_spectrum, find_peaks,
 )
 
-FWD_CACHE = Path("/home/dennis/code/3d/scripts/archive/nbody_cache_10myr.npz")
-BWD_CACHE = Path("/home/dennis/code/3d/data/nbody_cache_50myr_backward.npz")
-OUTPUT = Path("/home/dennis/code/3d/data/l1-vs-laskar-50myr.json")
+REPO = Path(__file__).resolve().parents[1]
+
+FWD_CACHE = REPO / "scripts/archive/nbody_cache_10myr.npz"
+BWD_CACHE = REPO / "data/nbody_cache_50myr_backward.npz"
+OUTPUT = REPO / "data/l1-vs-laskar-50myr.json"
 
 WINDOW_MYR = 5.0
 STEP_MYR = 5.0  # non-overlapping

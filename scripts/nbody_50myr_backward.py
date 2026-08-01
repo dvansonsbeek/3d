@@ -37,6 +37,8 @@ import time
 from pathlib import Path
 import numpy as np
 
+REPO = Path(__file__).resolve().parents[1]
+
 try:
     import rebound
 except ImportError:
@@ -50,7 +52,7 @@ T_TOTAL = -50.0e6     # 50 Myr backward
 DT_OUTPUT = -1000.0    # output every 1 kyr (negative because backward)
 N_OUTPUT = int(abs(T_TOTAL / DT_OUTPUT)) + 1   # 50,001 snapshots
 
-CACHE_FILE = Path("/home/dennis/code/3d/data/nbody_cache_50myr_backward.npz")
+CACHE_FILE = REPO / "data/nbody_cache_50myr_backward.npz"
 
 
 def main():

@@ -345,7 +345,7 @@ def main():
         "test_c_significant_count": len(sig_c),
     }
 
-    out["meta"] = {"runtime_sec": time.time() - t0, "script": __file__}
+    out["meta"] = {"runtime_sec": time.time() - t0, "script": Path(__file__).name}
     OUT_PATH.write_text(json.dumps(out, indent=2))
     print(f"\nOutput: {OUT_PATH}")
     print(f"Runtime: {time.time() - t0:.1f}s")

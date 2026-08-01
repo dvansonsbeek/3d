@@ -27,7 +27,9 @@ Usage:
 import re, json, sys
 from pathlib import Path
 
-SRC = Path('/home/dennis/code/3d/data/rspa20160404supp2/Table-S15.txt')
+REPO = Path(__file__).resolve().parents[1]
+
+SRC = REPO / 'data/rspa20160404supp2/Table-S15.txt'
 OUT = Path(__file__).parent.parent / 'public' / 'input' / 'stephenson-2016-deltaT-polynomial.json'
 
 # Match data rows like:
