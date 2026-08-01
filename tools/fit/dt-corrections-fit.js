@@ -31,7 +31,7 @@
  *     tools/fit/validate-resonator.js.
  *   Shipped state: USNO 86400.0014, deltaTStart 56.05, Espenak 12.60 s,
  *   full-window 31.3 s; episode −1600 → +1600; resonator default-ON runtime-
- *   wide (opt-out DT_RESONATOR_DISABLED=1). Narrative: docs/104 + TODO.md.
+ *   wide (opt-out DT_RESONATOR_DISABLED=1). Narrative: docs/104.
  *
  * ═══ LEGACY single-shot cascade (diagnostic only since the joint flip) ═══
  * The original stage-wise fit below (Bond solo → +Hallstatt → +Jose5 →

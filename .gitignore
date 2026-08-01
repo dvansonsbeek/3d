@@ -9,9 +9,13 @@ dist/
 __pycache__/
 
 # excluded folders
-.bmad-core/
-.claude/
-docs/hidden/
+# .claude — the process discipline (skills, /gates) IS shared; these are not:
+#   settings.local.json  machine-local permission grants
+#   *-reference.md       model-internal reference material, not published yet
+.claude/settings.local.json
+.claude/commands/holistic-model-reference.md
+.claude/commands/simulation-dev-reference.md
+docs/archive/
 docs/scripts/archive/
 tools/explore/archive/
 scripts/archive/
