@@ -5,10 +5,11 @@
  * document is advice; a boundary in CI is a boundary. This file is the §4 table
  * of IP-unified-architecture.md, executable.
  *
- * SCOPE. Only `packages/` is linted. `src/script.js` (64,714 lines), `tools/`,
- * `scripts/` and `dashboard/` are pre-migration code — linting them now would
- * produce thousands of findings that say nothing about the architecture and
- * would train everyone to ignore the output. They join as Phase 8 extracts.
+ * SCOPE. `packages/` and `test/` are linted. `src/script.js` (64,714 lines),
+ * `tools/`, `scripts/` and `dashboard/` are pre-migration code — linting them
+ * now would produce thousands of findings that say nothing about the
+ * architecture and would train everyone to ignore the output. They join as
+ * Phase 8 extracts.
  *
  * `packages/research` and `packages/analysis` are exempt by policy (§2e, §2f):
  * frozen one-offs and Python respectively.
@@ -162,6 +163,37 @@ export default [
       'jsdoc/require-jsdoc': 'off',
       'jsdoc/require-param': 'off',
       'jsdoc/require-returns': 'off',
+    },
+  },
+
+  {
+    /* `@hum/fixtures` reads its JSON from disk at call time rather than importing
+     * it, so a stale fixture cannot be baked into a bundle and consumers need no
+     * import-attributes support. That makes it Node-side test infrastructure that
+     * legitimately uses `node:` builtins — nothing shipped to a browser imports
+     * it. `core` is not banned for fixtures by §2b (only `external` is, and only
+     * physics is barred from both), so this grants globals, not an exemption. */
+    files: ['packages/fixtures/src/**/*.js'],
+    languageOptions: {
+      globals: { URL: 'readonly', console: 'readonly', process: 'readonly' },
+    },
+  },
+
+  {
+    /* The §5c golden-master harness. It runs in Node and drives headless
+     * Chromium, and the callbacks handed to `page.evaluate()` execute IN the
+     * browser — so this is the one place that legitimately sees both global
+     * sets in a single file. Retires at Phase 8 with the harness. */
+    files: ['test/**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        console: 'readonly', process: 'readonly', globalThis: 'readonly',
+        URL: 'readonly', Buffer: 'readonly',
+        setTimeout: 'readonly', clearTimeout: 'readonly',
+        window: 'readonly', document: 'readonly',
+      },
     },
   },
 ];

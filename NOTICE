@@ -116,6 +116,11 @@ Bundled and runtime libraries
                                        (dashboard, loaded from cdn.plot.ly)
     SheetJS (xlsx)        Apache-2.0   https://sheetjs.com/
     Parcel, Babel         MIT          build toolchain, not shipped
+    playwright            Apache-2.0   https://playwright.dev/
+                                       Headless-browser test harness. Dev
+                                       tooling, never shipped. Downloads a
+                                       Chromium build at install time; that
+                                       browser is not redistributed here.
 
 Python analysis depends on NumPy, SciPy, pandas, Astropy and astroquery
 (BSD-3-Clause) and openpyxl (MIT) — declared dependencies, not vendored copies.

@@ -8797,6 +8797,28 @@ function disableDeepTimeMode() {
 function isDeepTimeMode()  { return DEEP_TIME_MODE_ENABLED; }
 function currentEpochTMa() { return currentEpoch_t_Ma; }
 
+// ── Phase 4 test surface — NOT an API ───────────────────────────────────────
+// ESM module scope is unreachable from `window`, so the golden-master harness
+// (plan §5c) cannot otherwise call in. The transparency gate must evaluate
+// f(Y), mutate the epoch, and evaluate f(Y) again — impossible from outside.
+// Follows the existing guarded pattern at :8733. Retires at Phase 8, when
+// these live in packages/physics and are importable with no browser.
+if (typeof window !== 'undefined') {
+  window.__test__ = {
+    setEpochByAge, setEpoch, resetEpochToJ2000, currentEpochTMa, isDeepTimeMode,
+    // f(Y) — the plan §5a "year lengths" row
+    computeSolarYearDaysFromCardinals,
+    computeSiderealYearDaysDirect,
+    computeSolsticeYearLength,
+    // The seven globals recomputeEpochAnchors mutates, read live.
+    anchors: () => ({
+      holisticyearLength, H, meanlengthofday,
+      meansiderealyearlengthinSeconds, meansiderealyearlengthinDays,
+      meansolaryearlengthinDays, meansiderealyearlengthinDays_kinematic,
+    }),
+  };
+}
+
 /**
  * Phase 4 UI invalidation — unfreeze panel displays after epoch mutation.
  *

@@ -126,6 +126,29 @@ for each, and the source, citation and licence for every dataset in `data/`.
 npm run build
 ```
 
+### Verification
+
+```bash
+npm run check             # lint, typecheck, boundaries, purity, fixtures, model gates
+npm run test:browser      # golden masters in headless Chromium (builds first)
+npm run test:verify:list  # how the 17 tools/verify scripts classify
+```
+
+`npm run check` is the gate that must stay green. Every check in it has been
+shown to fail on a deliberately planted violation, not merely to pass on clean
+code — the golden masters detect a change of one floating-point ULP.
+
+Two things worth knowing before you read a red result as breakage:
+
+- `npm run test:transparency` is an **acceptance gate for work still in progress**
+  and is expected to fail. It asserts that a year's computed values do not depend
+  on which epoch the scene happens to be set to; that holds for three of its four
+  probes today. Red there is the tracked state.
+- Of the 17 scripts in `tools/verify/`, only two can actually fail — the rest
+  print analysis without asserting anything. `test:verify` runs the real gates and
+  deliberately skips `balance-search.js`, which regenerates a tracked data file
+  rather than checking it.
+
 ---
 
 ## Features

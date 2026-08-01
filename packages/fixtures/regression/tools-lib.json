@@ -1,0 +1,29 @@
+{
+  "_comment": "REGRESSION fixture — what tools/lib does today. Must never change unintentionally. Regenerate: node tools/fixtures/record-tools-lib.mjs --write",
+  "_source": "tools/lib/{constants,deep-time}.js",
+  "values": {
+    "anchor.H": 335317,
+    "anchor.perihelionAlignmentYear": 1246.03125,
+    "anchor.correctionDays": -0.828832119703292,
+    "anchor.meanSiderealYearSeconds": 31558149.7635456,
+    "lod.meanKinematicSeconds": 86399.99967597384,
+    "lod.meanAtAge0": 86399.99967597387,
+    "lod.realAtAge0": 86400.00033163711,
+    "deeptime.H@-5Ma": 335729.89970224234,
+    "deeptime.lodSeconds@-5Ma": 86506.39014869055,
+    "deeptime.H@-1Ma": 335399.63338940515,
+    "deeptime.lodSeconds@-1Ma": 86421.29154252946,
+    "deeptime.H@0Ma": 335317.0000000001,
+    "deeptime.lodSeconds@0Ma": 86399.99967597387,
+    "deeptime.H@1Ma": 335235.0887540183,
+    "deeptime.lodSeconds@1Ma": 86378.89388167688,
+    "deeptime.H@5Ma": 334905.60361844575,
+    "deeptime.lodSeconds@5Ma": 86293.99655882503,
+    "dtstack.bondCycleLodCorrection@0": 0.003863651899241966,
+    "dtstack.hallstattCycleLodCorrection@0": 0.00023255659923505426,
+    "dtstack.jose5CycleLodCorrection@0": 0.0006926991498190643,
+    "dtstack.jose4CycleLodCorrection@0": -0.0007643098022400997,
+    "dtstack.dtCycleLodCorrectionSum@0": 0.002126383403784588,
+    "dtstack.resonatorSwingLodCorrection@0": -0.0018982144422713973
+  }
+}

@@ -14,7 +14,14 @@
     "typecheck": "tsc --noEmit -p jsconfig.json",
     "check:boundaries": "node tools/check-boundaries.mjs",
     "test:purity": "node packages/physics/test/purity.test.mjs",
-    "check": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:purity"
+    "test:fixtures": "node tools/fixtures/record-tools-lib.mjs",
+    "test:verify": "node tools/verify/run-suite.mjs",
+    "test:verify:list": "node tools/verify/run-suite.mjs --list",
+    "test:snapshot": "node test/browser/snapshot.test.mjs",
+    "test:transparency": "node test/browser/transparency.test.mjs",
+    "test:browser": "npm run build && npm run test:snapshot",
+    "targets": "node tools/fixtures/report-targets.mjs",
+    "check": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:purity && npm run test:fixtures && npm run test:verify"
   },
   "dependencies": {
     "three": "^0.183.0",
@@ -30,6 +37,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^63.3.2",
     "parcel": "^2.16.4",
+    "playwright": "^1.62.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.65.0",
     "xlsx": "^0.18.5"

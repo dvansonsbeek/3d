@@ -7,8 +7,9 @@ across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 
 **Scale:** `src/script.js` 64,673 lines · `tools/` 203 JS scripts across 7
 directories · 237 Python files · 71 docs · two web UIs (simulator, `dashboard/`).
-**No automated tests, no CI, no lint config.** There are 17 manual verification
-scripts in `tools/verify/` — real gates, just not automated.
+**`npm run check` enforces six gates; CI runs them plus a headless-browser job.**
+Golden masters live in `packages/fixtures/`. Of the 17 scripts in `tools/verify/`,
+only 2 can actually fail — see the Verification section.
 
 ---
 
@@ -84,13 +85,26 @@ would silently churn a structural claim for a rounding-level gain.
 ## Verification
 
 `npm run check` is the enforced chain — lint (§4 boundaries), typecheck (JSDoc +
-`checkJs`), `check:boundaries` (the §2h licensing invariant), purity. Every gate
-has been shown to **fail on a planted violation**, not merely to pass on clean
-code. It covers `packages/` only; `src/script.js` and `tools/` are pre-migration
-and join as Phase 8 extracts.
+`checkJs`), `check:boundaries` (the §2h licensing invariant), purity,
+`test:fixtures` (the `tools/lib` golden masters), `test:verify` (the model gates).
+Every gate has been shown to **fail on a planted violation**, not merely to pass
+on clean code — the two fixture gates on a 1-ULP change, ~1.6e-16 relative. Lint
+and typecheck cover `packages/` and `test/`; `src/script.js` and `tools/` are
+pre-migration and join as Phase 8 extracts.
 
-`/gates` runs the standalone model checks. Full suite: `tools/verify/`
-(17 scripts) — **not** a test suite, 17 manual scripts encoding real gates.
+`npm run test:browser` runs the `src/script.js` golden masters in headless
+Chromium — the only tier that guards Phase 8, which dissolves that file.
+`npm run test:transparency` is the Phase 6 acceptance gate and is **expected to
+fail** (21/84, all of it `computeSiderealYearDaysDirect`); red there is the
+tracked state, not a broken checkout.
+
+`/gates` runs the standalone model checks. `tools/verify/` holds 17 scripts, and
+**15 of them cannot fail** — no exit path, no assertion, so running them proves
+nothing. `npm run test:verify:list` gives the classification: 2 gate · 4 liftable
+· 10 narrative · 1 generator. **Never run `balance-search.js` as a test** — it
+rewrites the tracked `data/balance-presets.json`. `verify-laws` is gated on its
+check count (44/45, Saturn's Laplace–Lagrange bound the documented failure), not
+its exit code, so an unexplained *improvement* fails too.
 
 Reference values: Law 4 K = 3.4143e-6 · Law 5 balance = 99.8636% (use **base**
 eccentricity, not J2000) · Saturn Law 5 = 0.05371910.

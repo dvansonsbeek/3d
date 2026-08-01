@@ -1,0 +1,79 @@
+{
+  "_comment": "TARGETS — what attempt 1 achieved, on a tree that no longer exists. These are EXPECTED RED. They are the 'Phases 6-7 are not finished' list, NOT a regression alarm. Never move a value here into regression/ to make a suite go green.",
+  "_sources": "plan IP-unified-architecture.md §5a; archive ~/holistic-archive/2026-08-01-attempt1/",
+  "_archiveCaveat": "The three archive harnesses are specifications, not runnable seeds: runtime-check.js throws on a missing attempt-1 key, integral-truth.js returns NaN for its comparison column (DT._cumulIntegralAtYear is gone), and only yearlen-check.js still runs.",
+  "targets": [
+    {
+      "id": "cardinal-point-jds",
+      "description": "Cardinal-point Julian Day accuracy (SS / AE / WS / VE)",
+      "target": { "SS": 5.62, "WS": 5.53, "AE": 5.06, "VE": 5.35, "unit": "minutes" },
+      "current": null,
+      "measurable": false,
+      "blockedBy": "needs CARDINAL_POINT_ECC_TERMS and CARDINAL_POINT_DERIVED — attempt-1 keys, absent from src/script.js",
+      "unblockedByPhase": 7
+    },
+    {
+      "id": "year-lengths",
+      "description": "Mean year-length error vs reference",
+      "target": { "tropical": 0.0073, "sidereal": 0.0016, "anomalistic": 0.0178, "unit": "seconds" },
+      "current": { "tropical": 0.117, "sidereal": 0.117, "anomalistic": 0.120, "unit": "seconds" },
+      "measurable": true,
+      "note": "16-70x off. Found by the one archive harness that still runs (yearlen-check.js).",
+      "unblockedByPhase": 6
+    },
+    {
+      "id": "obliquity-out-of-sample",
+      "description": "Step 6b obliquity, out-of-sample RMS decomposed as RMS^2 = bias^2 + scatter^2",
+      "target": { "rms": 0.00641, "bias": 0.00476, "scatter": 0.00429, "unit": "arcseconds" },
+      "current": null,
+      "measurable": false,
+      "blockedBy": "needs a 6b fit run; not reproducible without one",
+      "unblockedByPhase": 9
+    },
+    {
+      "id": "h16-spiral-coherence",
+      "description": "H/16 spiral coherence",
+      "target": { "quadratureDegrees": 0.05, "spreadPercent": 0.15, "comparison": "<=" },
+      "current": null,
+      "measurable": false,
+      "blockedBy": "browser-scene measurement; no Node path yet",
+      "unblockedByPhase": 8
+    },
+    {
+      "id": "days-and-years-1990-2010",
+      "description": "Mean tropical year offset over 1990-2010",
+      "target": { "value": 0.020, "unit": "milliseconds" },
+      "current": null,
+      "measurable": false,
+      "blockedBy": "source is an XLSX exported from the simulator UI — author's copy, not in the repo",
+      "unblockedByPhase": null
+    },
+    {
+      "id": "j2000-anchor-reproduction",
+      "description": "Reproduction of the J2000 anchor",
+      "target": { "value": 80, "unit": "microseconds", "comparison": "<=" },
+      "current": null,
+      "measurable": false,
+      "note": "Beware: agreement AT the anchor is a tautology on its own. Only meaningful paired with out-of-sample rows.",
+      "unblockedByPhase": 6
+    },
+    {
+      "id": "referential-transparency",
+      "description": "f(Y) identical before and after setEpoch",
+      "target": { "violations": 0 },
+      "current": { "violations": 21, "outOf": 84, "probe": "computeSiderealYearDaysDirect", "maxDeltaSeconds": 7769.2 },
+      "measurable": true,
+      "note": "THE acceptance criterion. Measured by test/browser/transparency.test.mjs. solar and solstice probes are already invariant; the violation is isolated to the sidereal probe, which reads the mutated meansiderealyearlengthinSeconds.",
+      "unblockedByPhase": 6
+    },
+    {
+      "id": "offline-equals-hosted",
+      "description": "Offline bundle bit-identical to hosted",
+      "target": { "identical": true },
+      "current": null,
+      "measurable": false,
+      "blockedBy": "nothing to compare until the offline bundle exists",
+      "unblockedByPhase": 15
+    }
+  ]
+}

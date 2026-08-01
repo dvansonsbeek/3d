@@ -54,6 +54,62 @@ jobs:
       - name: Purity (physics with no platform)
         run: npm run test:purity
 
+      # §5b — the tools/lib regression tier. Exact comparison, no tolerance:
+      # proven to fail on a 1-ULP change (1.7e-16 relative).
+      - name: Regression (tools/lib golden masters)
+        run: npm run test:fixtures
+
+      # §5d — the model gates. Only 2 of the 17 tools/verify scripts have a
+      # failing exit path; the runner encodes that classification and excludes
+      # balance-search.js, which writes tracked data. verify-laws is checked on
+      # its CHECK COUNT (44/45, Saturn LL the documented failure), not its exit
+      # code, so both a regression and an unexplained improvement are caught.
+      - name: Model gates (tools/verify)
+        run: npm run test:verify
+
       # The simulator must keep building while the packages are empty shells.
       - name: Build simulator
         run: npm run build
+
+  # Separate job so a browser failure is never mistaken for a lint failure, and
+  # so the Chromium download is cached independently of the fast checks above.
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Cache Chromium
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      # SwiftShader supplies the GL context. `new THREE.WebGLRenderer(...)` sits
+      # at module scope (src/script.js:12486), so the page cannot load without
+      # one — jsdom is not an option.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build simulator
+        run: npm run build
+
+      # §5c — the tier that guards Phase 8, which dissolves src/script.js.
+      # Proven to fail on a 1-ULP change.
+      - name: Regression (script.js golden masters, headless)
+        run: npm run test:snapshot
+
+      # THE acceptance gate. Expected RED until Phase 6 removes the seven mutable
+      # epoch globals; `continue-on-error` keeps that honest without painting the
+      # whole run red. When this turns green, drop the flag — do not delete the
+      # step, and check the probes still resolve before celebrating.
+      - name: Referential transparency (EXPECTED RED until Phase 6)
+        run: npm run test:transparency
+        continue-on-error: true
