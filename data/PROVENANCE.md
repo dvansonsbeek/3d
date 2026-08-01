@@ -43,6 +43,7 @@ retains its original NOAA header giving the full citation.
 | `delavega-2020-boron-co2.xlsx` | de la Vega et al. (2020), *Scientific Reports* 10, doi:10.1038/s41598-020-67154-8 | **CC-BY-4.0** — *Scientific Reports* is fully open access |
 | `lr04-stack.txt` | Lisiecki & Raymo (2005) | freely distributed, citation requested (stated in file) |
 | `kiani-shahvandi2024-lod-residual.txt` | Kiani Shahvandi et al. (2024) — LOD residual | citation requested |
+| `rspa20160404supp2/` (15 tables + ReadMe) | Supplementary material to Stephenson, Morrison & Hohenkerk (2016), *Proc. R. Soc. A* **472**:20160404, doi:10.1098/rspa.2016.0404. The tables are an extract of the IOTA Lunar Occultation Archive VI/132B (Herald & Gault, 2010–2012) held by CDS Strasbourg — see `ReadMe-extract.txt`. | **CC BY 4.0** — the article is open access, so the supplementary material is redistributable with attribution. The underlying CDS/VizieR catalogue is separately open for scientific use. |
 
 ### Public domain
 
@@ -60,29 +61,42 @@ Listed so their absence from the sections above is not read as an omission.
 | `02-solar-measurements.csv` | `tools/fit/export-solar-measurements.js` — gitignored, ~2 h 24 m to rebuild |
 | `*.json` results under `data/` | the analysis scripts that name them; each records its generating script in a `meta` block |
 
-### Lunar series
+### Lunar series — `data/lunar-series/` (55 files, 11 MB)
 
-See `data/lunar-series/README.md` for per-file provenance and the verification
-against the IMCCE primary files. Summary: ELP-2000/82B from the IMCCE public
-archive; ELP/MPP02 series and driver via `ytliu0/ElpMpp02` (GPL-3.0). Both are
-recorded in the repository `NOTICE`.
+| part | source | redistribution |
+|---|---|---|
+| `elp2000-82b/ELP1..ELP36` | IMCCE public archive. Chapront-Touzé, M. & Chapront, J. (1983) *A&A* **124**, 50; revised (1988) *A&A* **190**, 342. | No stated terms, same position as LA2004 below. Transcription verified against the primary files — see the folder README. |
+| `elp-mpp02/` series + `driver/ElpMpp02.{cpp,h}` | Chapront, J. & Francou, G. (2003) *A&A* **404**, 735, obtained via `ytliu0/ElpMpp02` | **GPL-3.0 — redistribution is explicitly granted.** |
+
+The GPL half is worth stating plainly, because "third-party licensed" reads as a
+risk and here it is the opposite: **the GPL exists to grant redistribution.** The
+conditions are that notices are preserved and the combined work is compatibly
+licensed — both hold (`NOTICE`; AGPL-3.0 combines under GPLv3 §13). This is the
+inverse of SILSO, whose non-commercial term *withholds* a right we would need to
+pass on.
+
+Per-file provenance and the verification method are in
+`data/lunar-series/README.md`.
 
 ---
 
 ## Tracked — no explicit licence, retained on a documented basis
 
-Neither source attaches terms to the data. Retained because the practical basis
-is strong and both are factual scientific records redistributed as a matter of
-routine across the field — but the absence of a written grant is recorded here
+One dataset, and the source attaches no terms to it at all. Retained because the
+practical basis is strong — but the absence of a written grant is recorded here
 rather than glossed over.
 
-| file(s) | source | basis for retention |
+| file | source | basis for retention |
 |---|---|---|
 | `la2004-earth-51myr-back.asc` | Laskar et al. (2004), IMCCE. Nominal solution, −51 Myr to 0; columns match `INSOLN.LA2004.BTL.ASC` (time in kyr from J2000, eccentricity, obliquity in rad, longitude of perihelion in rad) | The IMCCE README for the LA2004 files states **no terms of use, licence or citation requirement** of any kind. IMCCE publishes them for open download and they are universally redistributed in the paleoclimate literature. Astronomical solution data is factual output rather than creative expression. |
-| `rspa20160404supp2/` (15 tables) | Extract of the IOTA Lunar Occultation Archive VI/132B (Herald & Gault, 2010–2012), held by CDS Strasbourg; published as supplementary material to Stephenson, Morrison & Hohenkerk (2016), *Proc. R. Soc. A* — see `ReadMe-extract.txt` | The underlying material is a CDS/VizieR catalogue, openly available for scientific use; what is here is a derived subset, not the Royal Society's own material. |
 
-If either needs to become unambiguous — a journal requirement, or a commercial
-use — a short written confirmation from IMCCE and CDS would settle it.
+**"No stated licence" is not the same as "public domain",** and writing down which
+one is being relied on is the point of this section. If it ever needs to be
+unambiguous — a journal requirement, or commercial use — a short written
+confirmation from IMCCE would settle it.
+
+The ELP-2000/82B files under `lunar-series/` sit in the same position and are
+noted there rather than duplicated here.
 
 ---
 
