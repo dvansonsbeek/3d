@@ -100,11 +100,15 @@ Bundled and runtime libraries
 
     l-gevity-skills       MIT          https://github.com/l-gevity/l-gevity-skills
                                        Copyright (c) 2026 L-GEVITY. 19 agent
-                                       skills vendored into .claude/skills/;
-                                       the pinned commit is recorded in
+                                       skills VENDORED into .claude/skills/ —
+                                       redistributed, not merely depended on, so
+                                       the licence text sits with the files at
+                                       .claude/skills/LICENSE.l-gevity-skills and
+                                       the commit is pinned in
                                        .claude/skills/l-gevity-skills.lock.json.
-                                       Not shipped to browsers — these guide
-                                       development, they are not runtime code.
+                                       Development tooling; never shipped to a
+                                       browser. The six project skills alongside
+                                       them are ours, AGPL-3.0 with the repo.
 
     three                 MIT          https://threejs.org/
     tweakpane             MIT          https://tweakpane.github.io/docs/
