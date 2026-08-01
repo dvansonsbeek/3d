@@ -99,10 +99,10 @@ eccentricity, not J2000) · Saturn Law 5 = 0.05371910.
 
 `.claude/skills/` holds two sets, both loaded automatically:
 
-- **7 project skills** — the domain rules L-GEVITY excludes, each built from
+- **6 project skills** — the domain rules L-GEVITY excludes, each built from
   measured bugs here: `numerical-methods`, `units-and-frames`,
   `scientific-validation`, `fitting-pipeline`, `provenance-reproducibility`,
-  `improvement-evidence`, plus `/gates`.
+  `improvement-evidence`. (`/gates` is a command, not a skill.)
 - **19 from `l-gevity-skills`** (MIT, pinned in `l-gevity-skills.lock.json`) —
   generic architecture judgement, the A.L.C.H.E.M.Y. gates M→A→L→C→E→H→Y.
   Invoke a full pass with `/alchemy`; the `alchemy` skill owns the dispatch
