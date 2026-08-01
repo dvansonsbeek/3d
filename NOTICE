@@ -97,9 +97,14 @@ Data sources
 Per-file provenance for the lunar series, including transcription verification
 against the IMCCE primary files, is in `data/lunar-series/README.md`.
 
-The paleoclimate and historical-record corpus under `data/` (Laskar LA2004,
-Snyder 2016, Bereiter/EPICA, Cheng 2016, Steinhilber 2012, LR04, Westerhold 2020
-Cenogrid, Spratt & Lisiecki 2016, Stephenson 2016) is third-party research data,
-cited where used. A per-dataset redistribution audit is outstanding; any dataset
-without a clear redistribution right will be removed from the repository and
-replaced by a documented download step.
+The paleoclimate and historical-record corpus under `data/` is third-party
+research data, cited where used. It has been audited per dataset for
+redistribution rights; the results, with source, citation and licence for each,
+are in `data/PROVENANCE.md`.
+
+Two datasets are used but NOT redistributed, and are absent from this
+repository — SILSO sunspot numbers (CC BY-NC 4.0, whose non-commercial term
+cannot be reconciled with the commercial rights AGPL-3.0 grants downstream) and
+the Snyder (2016) Nature source data (© Springer Nature, subscription article).
+`data/PROVENANCE.md` gives the download step for both. No model physics depends
+on either.

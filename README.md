@@ -114,6 +114,12 @@ pip install -r requirements.txt   # numpy, pandas, openpyxl, scipy
 python3 scripts/fibonacci_significance.py
 ```
 
+Most datasets these scripts need are committed under `data/`. Two are not ours to
+redistribute and must be fetched separately — SILSO sunspot numbers and the
+Snyder (2016) source data — so the scripts using them will report a missing file
+until you do. [data/PROVENANCE.md](data/PROVENANCE.md) gives the download step
+for each, and the source, citation and licence for every dataset in `data/`.
+
 ### Build for Production
 
 ```bash
@@ -248,8 +254,9 @@ in [NOTICE](NOTICE) — that is the authoritative list; this is the short versio
 
 **Data** — [Yale Bright Star Catalog](https://github.com/brettonw/YaleBrightStarCatalog)
 (stars) · [Solar System Scope](https://www.solarsystemscope.com/textures/)
-(textures) · IMCCE and Chapront & Francou (ELP lunar series) · third-party
-paleoclimate and historical eclipse records, cited where used
+(textures) · IMCCE and Chapront & Francou (ELP lunar series) · paleoclimate and
+historical eclipse records — per-dataset sources, citations and licences in
+[data/PROVENANCE.md](data/PROVENANCE.md)
 
 ## License
 

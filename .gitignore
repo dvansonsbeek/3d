@@ -25,3 +25,13 @@ data/01-holistic-year-objects-data.xlsx
 data/02-solar-measurements.csv
 data/.cache/
 tools/tuning/01-holistic-year-planets-data.xlsx
+
+# Third-party data we may USE but may not REDISTRIBUTE. Fetch locally; see
+# data/PROVENANCE.md for the source and download step for each.
+#   SILSO  — CC BY-NC 4.0; the NC term is incompatible with this repo's AGPL-3.0,
+#            which grants downstream users commercial rights we cannot pass on.
+#   Snyder — Nature 538 (2016) supplementary source data, © Springer Nature;
+#            the article is not open access.
+data/silso-monthly-sunspot.csv
+data/Snyder 2016-Paleoceanography-Full Data Set.xlsx
+data/Snyder_Data_Figures/
