@@ -1,7 +1,7 @@
 # Fibonacci Laws of Planetary Motion — Interactive 3D Solar System Simulation
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-9-green.svg)](https://github.com/dvansonsbeek/3d)
+[![Version](https://img.shields.io/badge/version-10-green.svg)](https://github.com/dvansonsbeek/3d/releases/tag/v10)
 [![Three.js](https://img.shields.io/badge/Three.js-0.183-orange.svg)](https://threejs.org/)
 
 ![Solar System Simulation](https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/readme.png)
@@ -265,9 +265,11 @@ This software is licensed under the **GNU Affero General Public License v3.0
   must make your modified source available to its users. This is the difference
   between AGPL and plain GPL, and it is deliberate.
 
-Releases up to and including v9 were published under GPL-3.0. Those releases
-remain available to anyone who received them under that licence; AGPL-3.0
-applies from this point forward.
+The licence boundary is tagged. [`v9`](https://github.com/dvansonsbeek/3d/releases/tag/v9)
+is the final release under GPL-3.0; [`v10`](https://github.com/dvansonsbeek/3d/releases/tag/v10)
+is the first under AGPL-3.0. Anyone who received the project at or before `v9`
+holds an irrevocable GPL-3.0 grant over it, which carries no network clause;
+AGPL-3.0 applies from `v10` onward.
 
 **Commercial licensing.** If AGPL-3.0 does not suit your use — for example you
 wish to build on this model without the reciprocal source obligations —
