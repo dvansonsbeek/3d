@@ -7,8 +7,15 @@ import { Pane } from 'tweakpane';
 /*
   Fibonacci Laws of Planetary Motion — Holistic Universe Model v10
 
-  This software is licensed under the GNU General Public License (GPL-3.0).
-  For more information, visit <https://www.gnu.org/licenses/>.
+  Copyright (C) 2025-2026 D. van Sonsbeek
+  Licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
+  See LICENSE for the full text.
+
+  Derived in part from The TYCHOSIUM, Copyright 2018 Simon Shack, Patrik
+  Holmqvist, released under the GNU General Public License. Substantially
+  modified. See NOTICE.
+
+  <https://www.gnu.org/licenses/>
 
   Interactive 3D simulation of the solar system modelled from a geo-heliocentric
   frame of reference. Six Fibonacci Laws and only 6 free parameters describe the

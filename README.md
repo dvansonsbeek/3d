@@ -1,6 +1,6 @@
 # Fibonacci Laws of Planetary Motion — Interactive 3D Solar System Simulation
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-9-green.svg)](https://github.com/dvansonsbeek/3d)
 [![Three.js](https://img.shields.io/badge/Three.js-0.183-orange.svg)](https://threejs.org/)
 
@@ -231,14 +231,41 @@ The pipeline runs across 6 phases: Sun geometry → planet alignment → perihel
 ## Credits
 
 - [Three.js](https://threejs.org/) — 3D rendering library
-- [Tychosium](https://codepen.io/pholmq/pen/XGPrPd) — Inspiration
+- [Tychosium](https://codepen.io/pholmq/pen/XGPrPd) — © 2018 Simon Shack, Patrik
+  Holmqvist, released under the GNU General Public License. This simulator began
+  from the Tychosium source; the rendering scaffold and scene-graph pattern derive
+  from it, and the orbital model, fitting pipeline and analysis are original work
+  added since. See [NOTICE](NOTICE).
 - [Solar System Scope](https://www.solarsystemscope.com/textures/) — Planet textures
 - [Yale Bright Star Catalog](https://github.com/brettonw/YaleBrightStarCatalog) — Star data
 
 ## License
 
-This software is licensed under the **GNU General Public License (GPL-3.0)**.
-See the [LICENSE](https://www.gnu.org/licenses/gpl-3.0) for details.
+This software is licensed under the **GNU Affero General Public License v3.0
+(AGPL-3.0)**. The full text is in [LICENSE](LICENSE).
+
+**What this means for you**
+
+- You may **use, study, modify and redistribute** this software freely.
+- Any derivative work must also be released under AGPL-3.0, with attribution.
+- **Network clause:** if you run a modified version as a network service, you
+  must make your modified source available to its users. This is the difference
+  between AGPL and plain GPL, and it is deliberate.
+
+Releases up to and including v9 were published under GPL-3.0. Those releases
+remain available to anyone who received them under that licence; AGPL-3.0
+applies from this point forward.
+
+**Commercial licensing.** If AGPL-3.0 does not suit your use — for example you
+wish to build on this model without the reciprocal source obligations —
+enquiries are welcome. Contact
+[dennis@holisticuniverse.com](mailto:dennis@holisticuniverse.com).
+
+**Why AGPL.** The model is intended to be openly studied and independently
+reproducible — the accompanying [preprint](https://doi.org/10.21203/rs.3.rs-8758810/v3)
+depends on that. Copyleft keeps derivative versions open and attributed rather
+than diverging into closed forks, and the network clause ensures the same holds
+for hosted services.
 
 ## Contact
 

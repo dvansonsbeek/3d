@@ -1,0 +1,57 @@
+NOTICE
+======
+
+This project is a derivative work.
+
+Upstream work
+-------------
+
+    /*Copyright 2018 Simon Shack, Patrik Holmqvist
+    The TYCHOSIUM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation. The above copyright notice and this permission notice
+    shall be included in all copies or substantial portions of the Software.*/
+
+    The TYCHOSIUM — https://codepen.io/pholmq/pen/XGPrPd
+    Source repository — https://github.com/pholmq/The_TYCHOSIUM (GPL-3.0)
+
+Statement of modification
+-------------------------
+
+The Holistic Universe Model simulator began from the Tychosium source as a
+starting point and has been substantially modified since.
+
+What derives from the upstream work is the settings-object schema (field names
+such as containerObj, orbitCentera/b/c, orbitTilta/b, pivotObj, planetObj,
+startPos) together with the generic routine that walks that array to compose
+nested Three.js Object3D containers, plus assorted rendering and utility
+helpers. That is an engine interface, not a model.
+
+The scene graph itself is original. The Tychosium builds 31 nodes on an
+epicycle/deferent geometry; this project builds 73 nodes on a precession
+hierarchy.
+
+Also original: the Expanding Solar System Resonance Theory, the six Fibonacci
+Laws, the L1 climate formula, the planet inspector, the LOD-climate tool, the
+Earth Fundamental Cycle (H) lattice, the deep-time engine, the derived moon, the
+fitting pipeline, the verification suite and the documentation. The upstream
+work is 3,432 lines; this one is 64,673.
+
+The Tychosium implements the TYCHOS model of Simon Shack. This project implements
+a different model and reaches different conclusions; the shared lineage is in the
+simulation scaffolding, not in the astronomy.
+
+Licensing
+---------
+
+The upstream work is under the GNU General Public License. This combined work is
+distributed under the GNU Affero General Public License v3.0 — see LICENSE. GPL
+version 3 section 13 permits combining a GPLv3 work with an AGPLv3 work, with the
+AGPL network clause applying to the combination.
+
+Other credited components
+-------------------------
+
+    Three.js                  https://threejs.org/                    (MIT)
+    Solar System Scope        planet textures, https://www.solarsystemscope.com/textures/
+    Yale Bright Star Catalog  https://github.com/brettonw/YaleBrightStarCatalog
