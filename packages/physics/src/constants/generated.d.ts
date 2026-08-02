@@ -2,15 +2,18 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "f60956ce5df05db0";
+export declare const CONSTANTS_HASH: "2addbd3960fcef0f";
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "f60956ce5df05db0";
+  readonly hash: "2addbd3960fcef0f";
   readonly additionalBodies: {
     "pluto": {
       "name": string;
       "orbitalEccentricityBase": number;
       "type": string;
+      "angleCorrection": number;
+      "startpos": number;
+      "perihelionEclipticFraction": number[];
       "ascendingNodeInvPlane": number;
       "inclinationCycleAnchor": number;
       "invPlaneInclinationMean": number;
@@ -20,6 +23,9 @@ export declare const DEFAULT_CONSTANTS: {
       "name": string;
       "orbitalEccentricityBase": number;
       "type": string;
+      "angleCorrection": number;
+      "startpos": number;
+      "perihelionEclipticFraction": number[];
       "ascendingNodeInvPlane": number;
       "inclinationCycleAnchor": number;
       "invPlaneInclinationMean": number;
@@ -29,6 +35,9 @@ export declare const DEFAULT_CONSTANTS: {
       "name": string;
       "orbitalEccentricityBase": number;
       "type": string;
+      "angleCorrection": number;
+      "startpos": number;
+      "perihelionEclipticFraction": number[];
       "ascendingNodeInvPlane": number;
       "inclinationCycleAnchor": number;
       "invPlaneInclinationMean": number;
@@ -38,6 +47,9 @@ export declare const DEFAULT_CONSTANTS: {
       "name": string;
       "orbitalEccentricityBase": number;
       "orbitDistanceOverride": number;
+      "angleCorrection": number;
+      "startpos": number;
+      "perihelionEclipticFraction": number[];
       "ascendingNodeInvPlane": number;
       "inclinationCycleAnchor": number;
       "invPlaneInclinationMean": number;
@@ -48,21 +60,62 @@ export declare const DEFAULT_CONSTANTS: {
     "pluto": {
       "solarYearInput": number;
       "orbitalEccentricityJ2000": number;
+      "eclipticInclinationJ2000": number;
       "invPlaneInclinationJ2000": number;
+      "axialTiltJ2000": number;
+      "longitudePerihelion": number;
+      "ascendingNode": number;
+      "meanAnomaly": number;
+      "trueAnomaly": number;
     };
     "halleys": {
       "solarYearInput": number;
       "orbitalEccentricityJ2000": number;
+      "eclipticInclinationJ2000": number;
+      "invPlaneInclinationJ2000": number;
+      "axialTiltJ2000": number;
+      "longitudePerihelion": number;
+      "ascendingNode": number;
+      "meanAnomaly": number;
+      "trueAnomaly": number;
     };
     "eros": {
       "solarYearInput": number;
       "orbitalEccentricityJ2000": number;
+      "eclipticInclinationJ2000": number;
+      "invPlaneInclinationJ2000": number;
+      "axialTiltJ2000": number;
+      "longitudePerihelion": number;
+      "ascendingNode": number;
+      "meanAnomaly": number;
+      "trueAnomaly": number;
     };
     "ceres": {
       "solarYearInput": number;
       "orbitalEccentricityJ2000": number;
+      "eclipticInclinationJ2000": number;
       "invPlaneInclinationJ2000": number;
+      "axialTiltJ2000": number;
+      "longitudePerihelion": number;
+      "ascendingNode": number;
+      "meanAnomaly": number;
+      "trueAnomaly": number;
     };
+  };
+  readonly bodyDiametersKm: {
+    "sun": number;
+    "moon": number;
+    "earth": number;
+    "mercury": number;
+    "venus": number;
+    "mars": number;
+    "jupiter": number;
+    "saturn": number;
+    "uranus": number;
+    "neptune": number;
+    "pluto": number;
+    "halleys": number;
+    "eros": number;
   };
   readonly cardinalPointAnchors: {
     "SS": number;
@@ -178,6 +231,20 @@ export declare const DEFAULT_CONSTANTS: {
       "saturn": number;
       "uranus": number;
       "neptune": number;
+      "pluto": number;
+    };
+    "massRatioDE440Alone": {
+      "mars": number;
+      "jupiter": number;
+      "saturn": number;
+      "uranus": number;
+      "neptune": number;
+      "pluto": number;
+    };
+    "smallBodyMasses": {
+      "ceresGmKm3PerS2": number;
+      "erosMassKg": number;
+      "halleysMassKg": number;
     };
     "earthJ2": number;
     "earthEquatorialRadiusKm": number;
@@ -388,5 +455,73 @@ export declare const DEFAULT_CONSTANTS: {
     "solarDay": number;
     "siderealDay": number;
     "stellarDay": number;
+  };
+};
+
+// Validation targets and presentation data. Single-sourced, NOT injectable —
+// createModel does not accept these (§2d).
+export declare const REFERENCE_DATA: {
+  readonly ascendingNodesSouamiSouchay: {
+    "earth": number;
+    "mercury": number;
+    "venus": number;
+    "mars": number;
+    "jupiter": number;
+    "saturn": number;
+    "uranus": number;
+    "neptune": number;
+    "pluto": number;
+    "halleys": number;
+    "eros": number;
+    "ceres": number;
+  };
+  readonly eigenmodePhasesLaplaceLagrange: {
+    "gamma1": number;
+    "gamma2": number;
+    "gamma3": number;
+    "gamma4": number;
+    "gamma6": number;
+    "gamma7": number;
+    "gamma8": number;
+  };
+  readonly externalCurveAnchors: {
+    "deltaTEspenakJ2000Seconds": number;
+  };
+  readonly galaxyMotion: {
+    "milkywayDistance": number;
+    "sunSpeed": number;
+    "greatattractorDistance": number;
+    "milkywaySpeed": number;
+  };
+  readonly jplEclipticInclinationTrends: {
+    "mercury": number;
+    "venus": number;
+    "mars": number;
+    "jupiter": number;
+    "saturn": number;
+    "uranus": number;
+    "neptune": number;
+    "pluto": number;
+  };
+  readonly knownValues: {
+    "jupiterSaturnConjunctionPeriod": number;
+    "moonSynodicMonth": number;
+    "moonTropicalMonth": number;
+    "moonNodalPrecessionYears": number;
+    "moonApsidalPrecessionYears": number;
+    "moonDraconicYear": number;
+    "fullMoonCycleDays": number;
+    "sarosDays": number;
+    "exeligmosDays": number;
+  };
+  readonly laplaceLagrangeBounds: {
+    "mercury": number[];
+    "venus": number[];
+    "earth": number[];
+    "mars": number[];
+    "jupiter": number[];
+    "saturn": number[];
+    "uranus": number[];
+    "neptune": number[];
   };
 };

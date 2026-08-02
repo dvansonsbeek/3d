@@ -56,6 +56,11 @@ const CLASSIFICATION = {
   'astro-reference.json': {
     physicalConstants: 'anchor',
     earthOrbital: 'anchor',
+    // Anchor, not presentation: earthDiameter yields R_EARTH_M for the physics
+    // and sun/moon diameters give the radii the eclipse geometry uses. They are
+    // measured reality, so a counterfactual over them is legitimate — "what if
+    // the Moon were larger" is a real question this model can answer.
+    bodyDiametersKm: 'anchor',
     cardinalPointAnchors: 'anchor',
     moonReference: 'anchor',
     moonMeeus: 'anchor',
@@ -66,6 +71,9 @@ const CLASSIFICATION = {
     // ── never injectable ────────────────────────────────────────────────────
     // Self-described: "Validation reference values for comparison".
     knownValues: 'target',
+    // Re-anchors a published external curve (Espenak/Meeus ΔT) onto the model's
+    // axis so the two can be plotted together. A comparison aid, never an input.
+    externalCurveAnchors: 'target',
     // Consumed only by tools/verify/{inclination-optimization,inclination-verification}.
     laplaceLagrangeBounds: 'target',
     // Consumed only by tools/verify/ascending-node-*.
@@ -106,6 +114,7 @@ const canonical = (v) => {
 
 function build() {
   const included = {};
+  const reference = {};
   const excluded = {};
   const problems = [];
 
@@ -117,29 +126,61 @@ function build() {
       const cls = classes[b];
       if (!cls) { problems.push(`${file}: block "${b}" is UNCLASSIFIED — add it to CLASSIFICATION`); continue; }
       if (cls === 'parameter' || cls === 'anchor') included[b] = strip(json[b]);
-      else excluded[b] = cls;
+      else {
+        excluded[b] = cls;
+        // Excluded from the INJECTABLE context, but still emitted — as a
+        // separate export. Not injectable and single-sourced are different
+        // properties, and conflating them left 36 values duplicated as
+        // literals in script.js with nothing keeping them in step.
+        reference[b] = strip(json[b]);
+      }
     }
     for (const b of Object.keys(classes)) {
       if (!blocks.includes(b)) problems.push(`${file}: classified block "${b}" no longer exists — remove it`);
     }
   }
 
+  // Hashed over the INJECTABLE set only. Reference data is not part of the
+  // model's identity: changing a validation bound does not make it a different
+  // model, and a counterfactual cannot alter it.
   const hash = createHash('sha256')
     .update(JSON.stringify(canonical(included)))
     .digest('hex')
     .slice(0, 16);
 
-  return { included, excluded, problems, hash };
+  return { included, reference, excluded, problems, hash };
 }
 
 const countLeaves = (o) =>
   Object.values(o).reduce((n, v) => n + (v && typeof v === 'object' ? countLeaves(v) : 1), 0);
 
-function emitJs({ included, excluded, hash }) {
+function emitJs({ included, reference, excluded, hash }) {
   const blocks = Object.keys(included).sort();
+  const refBlocks = Object.keys(reference).sort();
   const exNote = Object.entries(excluded)
     .map(([b, c]) => ` *   ${b.padEnd(32)} ${c}`)
     .join('\n');
+
+  const refSection = `
+/**
+ * Validation targets and presentation data — SINGLE-SOURCED BUT NOT INJECTABLE.
+ *
+ * These are deliberately absent from DEFAULT_CONSTANTS. \`createModel\` never
+ * accepts them, so a counterfactual cannot move the goalposts it is judged by:
+ * laplaceLagrangeBounds is the bound Saturn fails in verify-laws (44/45), and
+ * making it injectable would let that documented failure be configured away.
+ *
+ * They are still emitted, because "must not be injectable" and "may be
+ * duplicated as literals" are different claims. Before this export existed,
+ * script.js carried its own copies of all of them with nothing keeping the two
+ * in step — they happened to agree, by nobody's design.
+ *
+ * @type {Readonly<Record<string, unknown>>}
+ */
+export const REFERENCE_DATA = Object.freeze({
+${refBlocks.map((b) => `  ${b}: ${JSON.stringify(reference[b], null, 2).split('\n').join('\n  ')},`).join('\n')}
+});
+`;
 
   return `/**
  * GENERATED — do not edit. Regenerate:
@@ -148,8 +189,12 @@ function emitJs({ included, excluded, hash }) {
  * Source of truth: public/input/{model-parameters,astro-reference}.json
  * Classification and rationale: tools/constants/generate.mjs
  *
- * Deliberately EXCLUDED (§2d) — validation targets must never be injectable, or
- * a counterfactual could move the goalposts it is judged by:
+ * Two exports, deliberately separate (§2d):
+ *
+ *   DEFAULT_CONSTANTS  free parameters + measured anchors. INJECTABLE — this is
+ *                      the counterfactual surface, and what the hash covers.
+ *   REFERENCE_DATA     validation targets + presentation. Single-sourced so
+ *                      nothing duplicates them, but NOT injectable:
 ${exNote}
  *
  * @typedef {typeof DEFAULT_CONSTANTS} GeneratedConstants
@@ -167,10 +212,10 @@ export const DEFAULT_CONSTANTS = Object.freeze({
   hash: ${JSON.stringify(hash)},
 ${blocks.map((b) => `  ${b}: ${JSON.stringify(included[b], null, 2).split('\n').join('\n  ')},`).join('\n')}
 });
-`;
+${refSection}`;
 }
 
-function emitDts({ included, hash }) {
+function emitDts({ included, reference, hash }) {
   const t = (v, ind = '  ') => {
     if (Array.isArray(v)) return v.length && typeof v[0] === 'number' ? 'number[]' : 'unknown[]';
     if (v === null) return 'null';
@@ -195,6 +240,12 @@ export declare const CONSTANTS_HASH: ${JSON.stringify(hash)};
 export declare const DEFAULT_CONSTANTS: {
   readonly hash: ${JSON.stringify(hash)};
 ${body}
+};
+
+// Validation targets and presentation data. Single-sourced, NOT injectable —
+// createModel does not accept these (§2d).
+export declare const REFERENCE_DATA: {
+${Object.keys(reference).sort().map((b) => `  readonly ${b}: ${t(reference[b])};`).join('\n')}
 };
 `;
 }

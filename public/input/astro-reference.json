@@ -8,6 +8,7 @@
     "earthMoiFactorJ2000": 0.3306947,
     "solarLuminosityW": 3.828e+26,
     "solarWindMassLossKgPerS": 1600000000,
+    "_massRatioNote": "SYSTEM = planet + its moons; ALONE = planet only. They differ materially where a massive satellite exists — Pluto/Charon by 10.85%. Mercury and Venus have no moons, so ALONE = SYSTEM and src/script.js derives it rather than storing a second copy; Earth-alone is likewise derived via MASS_RATIO_EARTH_MOON.",
     "massRatioDE440": {
       "mercury": 6023657.94,
       "venus": 408523.72,
@@ -15,7 +16,22 @@
       "jupiter": 1047.348625,
       "saturn": 3497.9018,
       "uranus": 22902.944,
-      "neptune": 19412.237
+      "neptune": 19412.237,
+      "pluto": 136045556
+    },
+    "massRatioDE440Alone": {
+      "mars": 3098703.71,
+      "jupiter": 1047.5655,
+      "saturn": 3498.7667,
+      "uranus": 22905.343,
+      "neptune": 19416.299,
+      "pluto": 152610777
+    },
+    "smallBodyMasses": {
+      "_description": "Ceres from Dawn radiometric tracking (2015-2018). Eros measured by NEAR Shoemaker (2000-2001). Halley's is an ESTIMATE from size (~11x8x8 km) and density (~0.6 g/cm3) — no spacecraft has orbited it.",
+      "ceresGmKm3PerS2": 62.6274,
+      "erosMassKg": 6.687e15,
+      "halleysMassKg": 2.2e14
     },
     "earthJ2": 1.08262668e-3,
     "earthEquatorialRadiusKm": 6378.1366
@@ -38,6 +54,22 @@
     "earthInclinationJ2000_deg": 1.57869,
     "deltaTStart": 56.04899719615156,
     "sunTilt": 7.155
+  },
+  "bodyDiametersKm": {
+    "_description": "Mean body diameters in km. NOT presentation-only: earthDiameter yields R_EARTH_M for the physics, and sunDiameter/moonDiameter give the radii the eclipse geometry uses. Halley's and Eros are irregular; the figure is a mean.",
+    "sun": 1392684.0,
+    "moon": 3474.8,
+    "earth": 12756.27,
+    "mercury": 4879.4,
+    "venus": 12103.6,
+    "mars": 6779,
+    "jupiter": 139822,
+    "saturn": 116464,
+    "uranus": 50724,
+    "neptune": 49244,
+    "pluto": 2376.6,
+    "halleys": 11,
+    "eros": 16.84
   },
   "cardinalPointAnchors": {
     "SS": 2451716.5748,
@@ -162,23 +194,50 @@
     }
   },
   "additionalBodiesReference": {
+    "_description": "J2000 orbital elements for the four additional bodies, mirroring planetOrbitalElements. Previously only 2-3 fields per body lived here and the rest were literals in src/script.js with no source of truth.",
     "pluto": {
       "solarYearInput": 90465,
       "orbitalEccentricityJ2000": 0.2488273,
-      "invPlaneInclinationJ2000": 15.5639473
+      "eclipticInclinationJ2000": 17.14001,
+      "invPlaneInclinationJ2000": 15.5639473,
+      "axialTiltJ2000": 57.47,
+      "longitudePerihelion": 224.06891,
+      "ascendingNode": 110.30393,
+      "meanAnomaly": 15.55009,
+      "trueAnomaly": 26.31965048
     },
     "halleys": {
       "solarYearInput": 27503,
-      "orbitalEccentricityJ2000": 0.96714291
+      "orbitalEccentricityJ2000": 0.96714291,
+      "eclipticInclinationJ2000": 162.26269,
+      "invPlaneInclinationJ2000": 150,
+      "axialTiltJ2000": 0,
+      "longitudePerihelion": 111.33249,
+      "ascendingNode": 58.42008,
+      "meanAnomaly": 38.77481,
+      "trueAnomaly": 166.26774708
     },
     "eros": {
       "solarYearInput": 642.93,
-      "orbitalEccentricityJ2000": 0.2229512
+      "orbitalEccentricityJ2000": 0.2229512,
+      "eclipticInclinationJ2000": 10.8276,
+      "invPlaneInclinationJ2000": 9.25,
+      "axialTiltJ2000": 0,
+      "longitudePerihelion": 178.81322,
+      "ascendingNode": 304.30993,
+      "meanAnomaly": 320.21552,
+      "trueAnomaly": 299.9171374
     },
     "ceres": {
       "solarYearInput": 1680.5,
       "orbitalEccentricityJ2000": 0.0755347,
-      "invPlaneInclinationJ2000": 0.4331698
+      "eclipticInclinationJ2000": 10.59407,
+      "invPlaneInclinationJ2000": 0.4331698,
+      "axialTiltJ2000": 4,
+      "longitudePerihelion": 73.59769,
+      "ascendingNode": 80.30533,
+      "meanAnomaly": 95.98772,
+      "trueAnomaly": 104.48097667
     }
   },
   "ascendingNodesSouamiSouchay": {
@@ -265,6 +324,10 @@
     "solarDay": 86400,
     "siderealDay": 86164.09053083288,
     "stellarDay": 86164.0989036905
+  },
+  "externalCurveAnchors": {
+    "_description": "Offsets used ONLY to re-anchor a published external curve onto the model's axis for comparison. Never inputs — nothing downstream of the model reads them.",
+    "deltaTEspenakJ2000Seconds": 62.92
   },
   "knownValues": {
     "_description": "Validation reference values for comparison (used by moon-cycles.js). Moon month inputs are in moonReference — not duplicated here.",

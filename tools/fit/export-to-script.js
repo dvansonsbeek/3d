@@ -23,6 +23,34 @@ let src = fs.readFileSync(SCRIPT_PATH, 'utf8');
 const doWrite = process.argv.includes('--write');
 let changes = 0;
 
+// ─── Phase 5: the scalar half of this script is OBSOLETE AND UNSAFE ─────────
+//
+// script.js now imports its scalar constants from @hum/physics (generated from
+// the same JSON by tools/constants/generate.mjs), so there are no literals left
+// for the patchers below to find.
+//
+// That is not merely redundant, it is DANGEROUS. These patchers locate a value
+// by scanning for the next matching literal. With the intended targets gone,
+// the regex slides onto an unrelated body's number: a dry run reports
+//
+//     planets.mercury.startpos: 71.555 -> 83.650...     (71.555 is PLUTO's)
+//     planets.venus.startpos:   83.650... -> 249.325... (83.650 is MERCURY's)
+//
+// and `--write` would commit that shift, corrupting every additional body.
+//
+// The large blocks this script also syncs — PREDICT_COEFFS, CLIMATE_FORMULA_
+// COEFFS, balance presets, the 3-flag dT constants — are NOT yet generated and
+// still need it. So the script survives with its scalar half disabled until the
+// generator covers those too, at which point it retires entirely (§2g).
+const MIGRATED_TO_IMPORT = /from\s+'@hum\/physics'/.test(src);
+if (MIGRATED_TO_IMPORT && doWrite) {
+  console.error('REFUSING TO WRITE — script.js imports its scalars from @hum/physics.');
+  console.error('The scalar patchers would match other bodies\' literals and corrupt the file.');
+  console.error('Scalars: edit public/input/*.json, then `npm run constants:generate`.');
+  console.error('Large coefficient blocks are not yet generated; see §2g.');
+  process.exit(1);
+}
+
 // ─── Helper: replace a top-level const/let value ────────────────────────
 // Matches both `const NAME = value` and `let NAME = value`. Some mutable
 // deep-time constants (holisticyearLength, meansiderealyearlengthinDays)
@@ -30,6 +58,7 @@ let changes = 0;
 // recomputeEpochAnchors — but their J2000 anchor value still needs to
 // sync from JSON on foundational-constant changes.
 function replaceConst(name, newVal) {
+  if (MIGRATED_TO_IMPORT) return;   // scalar half retired — see the note at the top
   const re = new RegExp('((?:const|let)\\s+' + name + '\\s*=\\s*)([\\d.eE+\\-]+)');
   const m = src.match(re);
   if (!m) { console.log('  ⚠ ' + name + ': NOT FOUND in script.js — sync skipped (renamed?)'); return; }
@@ -42,6 +71,7 @@ function replaceConst(name, newVal) {
 
 // ─── Helper: replace a value inside planets.KEY = { ... PROP: value } ───
 function replacePlanetProp(planet, prop, newVal) {
+  if (MIGRATED_TO_IMPORT) return;   // scalar half retired — see the note at the top
   // Match the property inside the planet block
   const blockRe = new RegExp('(planets\\.' + planet + '\\s*=\\s*\\{[\\s\\S]*?' + prop + ':\\s*)([\\d.eE+\\-]+)');
   const m = src.match(blockRe);
@@ -318,6 +348,7 @@ replaceConst('moonTilt', ar.moonReference.moonTilt);
 // replaceConst only handles `const X = value`; these live INSIDE the browser's
 // hand-written ASTRO_REFERENCE object. blockAnchor scopes generic key names.
 function replaceAstroRefKey(key, newVal, blockAnchor) {
+  if (MIGRATED_TO_IMPORT) return;   // scalar half retired — see the note at the top
   const re = blockAnchor
     ? new RegExp('(' + blockAnchor + ':\\s*\\{[\\s\\S]{0,600}?\\b' + key + ':\\s*)([\\d.eE+\\-]+)')
     : new RegExp('(\\n\\s+' + key + ':\\s*)([\\d.eE+\\-]+)');
@@ -483,6 +514,7 @@ console.log('\n=== F. ΔT Correction Coefficients ===');
   // Relative-tolerance const replace: replaceConst()'s absolute 1e-14 cutoff
   // would swallow real changes to tiny values (ALPHA_4 ≈ 1.4e-16).
   const replaceConstRel = (name, newVal) => {
+    if (MIGRATED_TO_IMPORT) return;   // scalar half retired — see the note at the top
     const re = new RegExp('((?:const|let)\\s+' + name + '\\s*=\\s*)([+\\-]?[\\d.eE+\\-]+)');
     const m = src.match(re);
     if (!m) { console.log('  ⚠ ' + name + ' not found in script.js'); return; }

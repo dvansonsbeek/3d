@@ -21,7 +21,15 @@
  * All three are enforced: `npm run lint` and `npm run check:boundaries`.
  */
 
-import { DEFAULT_CONSTANTS as GENERATED, CONSTANTS_HASH } from './constants/index.js';
+import { DEFAULT_CONSTANTS as GENERATED, CONSTANTS_HASH, REFERENCE_DATA } from './constants/index.js';
+
+/**
+ * Keys `createModel` refuses. Derived from REFERENCE_DATA rather than listed by
+ * hand, so classifying a new block in the generator automatically protects it —
+ * a hand-written list would drift the moment someone added a bound.
+ * @type {string[]}
+ */
+const NEVER_INJECTABLE = Object.keys(REFERENCE_DATA);
 
 /**
  * @typedef {Record<string, unknown> & { hash?: string }} Constants
@@ -47,6 +55,13 @@ import { DEFAULT_CONSTANTS as GENERATED, CONSTANTS_HASH } from './constants/inde
 export { GENERATED as DEFAULT_CONSTANTS, CONSTANTS_HASH };
 
 /**
+ * Validation targets and presentation data. Single-sourced so nothing keeps a
+ * duplicate copy, but NOT part of the model context — `createModel` refuses
+ * these keys (§2d).
+ */
+export { REFERENCE_DATA };
+
+/**
  * Build a model bound to a set of constants.
  *
  * Dependency injection rather than import is the key decision (§2d): it is what
@@ -58,6 +73,21 @@ export { GENERATED as DEFAULT_CONSTANTS, CONSTANTS_HASH };
  * @returns {Model}
  */
 export const createModel = (constants = GENERATED) => {
+  // Validation targets are not merely absent from DEFAULT_CONSTANTS — they are
+  // REFUSED here. Absence alone only stops the spread form
+  // `{...DEFAULT_CONSTANTS, x}`; nothing stopped a caller passing a bound
+  // explicitly. Saturn fails its Laplace-Lagrange bound in verify-laws (44/45),
+  // and a counterfactual that could widen that bound would be measuring itself.
+  for (const key of NEVER_INJECTABLE) {
+    if (constants && Object.prototype.hasOwnProperty.call(constants, key)) {
+      throw new Error(
+        `physics: "${key}" is a validation target and cannot be injected (§2d). `
+        + 'It is exported as REFERENCE_DATA, which createModel does not accept — '
+        + 'a counterfactual must not be able to move the goalposts it is judged by.',
+      );
+    }
+  }
+
   const ctx = Object.freeze({ ...constants });
 
   // The hash identifies THIS context, not the default one. A counterfactual

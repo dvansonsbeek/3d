@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R } from '@hum/physics';
 
 /*
   Fibonacci Laws of Planetary Motion — Holistic Universe Model v10
@@ -91,19 +91,26 @@ const eccentricityBase = K.earth.eccentricityBase;        // Law 5 balance-locke
 const eccentricityAmplitude = K.earth.eccentricityAmplitude;  // Solved: e(J2000) = 0.01671022
 // PSI is derived from Earth's inclination amplitude — see section E2c below
 // K is derived from Earth's eccentricity amplitude + mean obliquity — see section E2d below
-const earthAscendingNodeInvPlaneVerified = 284.51;        // Verified ascending node (Souami & Souchay 2012)
-const earthInclinationCycleAnchor = 21.77;                  // Cycle anchor: ω̃_ICRF at max inclination (from balanced year)
+// Same NUMBER as ascendingNodesSouamiSouchay.earth, different ROLE — which is
+// why it comes from the anchor block and not from REFERENCE_DATA. This is the
+// node the model ADOPTS (it feeds earthOmega and EclipticInclinationDynamic);
+// the S&S entry is the catalog value used for the parallel
+// EclipticInclinationSouamiSouchayDynamic comparison. Class 2 vs class 3 turns
+// on function, not on value, and here the two functions share a figure.
+const earthAscendingNodeInvPlaneVerified = K.earthOrbital.earthAscendingNodeInvPlane;  // Verified ascending node (Souami & Souchay 2012)
+const earthInclinationCycleAnchor = K.earthOrbital.earthInclinationCycleAnchor;  // Cycle anchor: ω̃_ICRF at max inclination (from balanced year)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // C. ASTRO REFERENCES (source: public/input/astro-reference.json)
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ─── C1. Physical constants ──────────────────────────────────────────────
-let   currentAUDistance = 149597870.698828;               // 1 AU in km (IAU 2012; Phase 2: mutable for deep-time mode)
+// SEEDED, not imported — recomputeMoonAndAuForEpoch reassigns this (§5e).
+let   currentAUDistance = K.physicalConstants.currentAUDistance;  // 1 AU in km (IAU 2012; Phase 2: mutable for deep-time mode)
 const AU_J2000_KM = currentAUDistance;                    // J2000 reference snapshot — used as a frozen anchor for physical constants (GM_SUN, masses) and Driver 2 evolution formula
-const speedOfLight = 299792.458;                          // Speed of light in km/s (CODATA)
-const perihelionalignmentYear = 1246.03125;                     // Year when perihelion longitude = 90° (Meeus)
-const deltaTStart = 56.04899719615156;                                // Delta-T at model epoch (seconds) — joint-world optimum (dt-corrections-fit.js --joint --write) with hard USNO closure 86400.0014 s; Espenak RMS 12.60 s across 20 reference years 1650-2017, Stephenson full-window 31.3 s. Distinct from IERS instantaneous ~63.63 s (~8-s trend/instantaneous offset). Moves atomically with the fit coefficients.
+const speedOfLight = K.physicalConstants.speedOfLight;    // Speed of light in km/s (CODATA)
+const perihelionalignmentYear = K.earthOrbital.perihelionalignmentYear;  // Year when perihelion longitude = 90° (Meeus)
+const deltaTStart = K.earthOrbital.deltaTStart;                       // Delta-T at model epoch (seconds) — joint-world optimum (dt-corrections-fit.js --joint --write) with hard USNO closure 86400.0014 s; Espenak RMS 12.60 s across 20 reference years 1650-2017, Stephenson full-window 31.3 s. Distinct from IERS instantaneous ~63.63 s (~8-s trend/instantaneous offset). Moves atomically with the fit coefficients.
 
 
 // ─── E1. Early derived (needed before ASTRO_REFERENCE) ───────────────────
@@ -140,12 +147,14 @@ const moonStartposMoon = K.moon.moonStartposMoon;         // in-plane anchor via
 const moonMeeusLpCorrection = K.moon.moonMeeusLpCorrection;  // Meeus Lp longitude correction (DE200→DE440 offset)
 
 // ─── C2. Sun & Moon astro references ─────────────────────────────────────
-const sunTilt = 7.155;                                    // Solar obliquity to ecliptic
-const milkywayDistance = 27500;                           // Distance to galactic center (light-years)
-const sunSpeed = 828000;                                  // Sun orbital speed (km/h)
-const greatattractorDistance = 200000000;                 // Distance to Great Attractor (light-years)
-const milkywaySpeed = 2160000;                            // Milky Way speed toward GA (km/h)
-const moonSiderealMonthInput = 27.32166156;               // IAU sidereal month (days)
+const sunTilt = K.earthOrbital.sunTilt;                   // Solar obliquity to ecliptic
+// Visualisation only — not physics, so REFERENCE_DATA rather than the model
+// context. The JSON block says as much in its own description.
+const milkywayDistance = R.galaxyMotion.milkywayDistance;         // Distance to galactic center (light-years)
+const sunSpeed = R.galaxyMotion.sunSpeed;                         // Sun orbital speed (km/h)
+const greatattractorDistance = R.galaxyMotion.greatattractorDistance;  // Distance to Great Attractor (light-years)
+const milkywaySpeed = R.galaxyMotion.milkywaySpeed;               // Milky Way speed toward GA (km/h)
+const moonSiderealMonthInput = K.moonReference.moonSiderealMonthInput;  // IAU sidereal month (days)
 // Option C+ (2026-06): apsidal & nodal precession periods replace the old
 // anomalistic/nodal month anchors. FRAME NOTE: the *ICRF identifier names
 // are legacy — the VALUES are the EQUINOX-OF-DATE periods (the Meeus/IERS
@@ -158,13 +167,14 @@ const moonSiderealMonthInput = 27.32166156;               // IAU sidereal month 
 // KEEP IN SYNC with public/input/astro-reference.json moonReference block.
 // Browser can't load JSON at runtime (Vite doesn't auto-inject), so these are
 // manually mirrored. tools/lib/constants.js reads the JSON directly.
-const moonApsidalPrecessionDaysInputICRF = 3231.493;      // Meeus apsidal period; N_apsidalI derived at line ~3498
-const moonNodalPrecessionDaysInputICRF   = 6798.38;       // Meeus nodal period;   N_nodalI   derived at line ~3500
-let   moonDistance = 384399.07;                           // Mean Earth-Moon distance (km; Phase 2: mutable for deep-time mode)
-const moonEclipticInclinationJ2000 = 5.1573;              // Moon DYNAMICAL mean osculating inclination at J2000 (v4 E3c; the Brown/ELP theory constant 5.1453964 = sinF normalization is the documented partner in astro-reference.json)
-const moonOrbitalEccentricityBase = 0.054900489;          // Moon orbital eccentricity
-const moonObliquityEclipticJ2000 = 1.5424;                // MEASURED lunar spin-to-ecliptic obliquity; Cassini-state DERIVED to 0.30% by direct Euler integration (1.5470° — tools/explore/moon-euler-rotation.js); the fixed-axis averaged balance gives 1.5551° and the libration–pole coupling accounts for 64% of that gap (docs/66 §1)
-const moonTilt = 6.687;                                   // Moon axial tilt — catalog CONVENTION-COMPOSED value (Brown 5.1454 + measured 1.5424); display/reference only, the mesh composes i + ε in the scene's own convention
+const moonApsidalPrecessionDaysInputICRF = K.moonReference.moonApsidalPrecessionDaysInputICRF;  // Meeus apsidal period; N_apsidalI derived at line ~3498
+const moonNodalPrecessionDaysInputICRF   = K.moonReference.moonNodalPrecessionDaysInputICRF;    // Meeus nodal period;   N_nodalI   derived at line ~3500
+// SEEDED, not imported — recomputeMoonAndAuForEpoch reassigns this (§5e).
+let   moonDistance = K.moonReference.moonDistance;        // Mean Earth-Moon distance (km; Phase 2: mutable for deep-time mode)
+const moonEclipticInclinationJ2000 = K.moonReference.moonEclipticInclinationJ2000;  // Moon DYNAMICAL mean osculating inclination at J2000 (v4 E3c; the Brown/ELP theory constant 5.1453964 = sinF normalization is the documented partner in astro-reference.json)
+const moonOrbitalEccentricityBase = K.moonReference.moonOrbitalEccentricityBase;    // Moon orbital eccentricity
+const moonObliquityEclipticJ2000 = K.moonReference.moonObliquityEclipticJ2000;      // MEASURED lunar spin-to-ecliptic obliquity; Cassini-state DERIVED to 0.30% by direct Euler integration (1.5470° — tools/explore/moon-euler-rotation.js); the fixed-axis averaged balance gives 1.5551° and the libration–pole coupling accounts for 64% of that gap (docs/66 §1)
+const moonTilt = K.moonReference.moonTilt;                // Moon axial tilt — catalog CONVENTION-COMPOSED value (Brown 5.1454 + measured 1.5424); display/reference only, the mesh composes i + ε in the scene's own convention
 
 // ─── C3. Deep-time physics anchors (SYNCED — do not hand-edit) ────────────
 // Single source of truth: public/input/astro-reference.json (physicalConstants)
@@ -173,16 +183,19 @@ const moonTilt = 6.687;                                   // Moon axial tilt —
 // tools/lib/constants.js; the website deepTime.ts is synced by
 // tools/fit/export-to-holistic.js. Derivation notes live in the JSON
 // _description fields and at the usage sites below.
-const G_CONSTANT = 6.6743e-20;       // km³/(kg·s²) — CODATA G in km units
-const EARTH_MOI_FACTOR = 0.3306947;  // IERS Conventions 2010 — α at J2000
-const L_SUN_W = 3.828e26;            // IAU 2015 nominal solar luminosity (W)
-const SOLAR_WIND_KG_PER_S = 1.6e9;   // Ulysses/ACE/Wind measurements
-const ALPHA_1 = -9.9375895103e-05;   // /Ma  — Moon recession, LLR-anchored (3.82 cm/yr)
-const ALPHA_3 = -6.4186463489e-12;   // /Ma³ — Farhat 2022 LSQ deep-time fit
-const ALPHA_4 = +1.3619800519e-16;   // /Ma⁴ — Farhat 2022 LSQ deep-time fit
-const ALPHA_CLIMATE_SCALE = -3.93e-7;             // per ‰ — dα/dt(J2000) = Cox-Chao/2.0
-const BOND_TAPER_FULL_HALFWIDTH_YR  = 300000;     // 4-flag ΔT stack taper: full strength
-const BOND_TAPER_TOTAL_HALFWIDTH_YR = 400000;     // 4-flag ΔT stack taper: zero beyond
+// These four carry SHORT local names that differ from their JSON keys — the
+// mapping was previously known only to export-to-script.js. Naming it here in
+// the import makes the correspondence visible at the declaration.
+const G_CONSTANT = K.physicalConstants.G_CONSTANT;               // km³/(kg·s²) — CODATA G in km units
+const EARTH_MOI_FACTOR = K.physicalConstants.earthMoiFactorJ2000; // IERS Conventions 2010 — α at J2000
+const L_SUN_W = K.physicalConstants.solarLuminosityW;            // IAU 2015 nominal solar luminosity (W)
+const SOLAR_WIND_KG_PER_S = K.physicalConstants.solarWindMassLossKgPerS;  // Ulysses/ACE/Wind measurements
+const ALPHA_1 = K.deepTime.alpha1PerMa;           // /Ma  — Moon recession, LLR-anchored (3.82 cm/yr)
+const ALPHA_3 = K.deepTime.alpha3PerMa3;          // /Ma³ — Farhat 2022 LSQ deep-time fit
+const ALPHA_4 = K.deepTime.alpha4PerMa4;          // /Ma⁴ — Farhat 2022 LSQ deep-time fit
+const ALPHA_CLIMATE_SCALE = K.deepTime.alphaClimateScalePerMille;  // per ‰ — dα/dt(J2000) = Cox-Chao/2.0
+const BOND_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;   // 4-flag ΔT stack taper: full strength
+const BOND_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;  // 4-flag ΔT stack taper: zero beyond
 
 // ─── A4. Planet input constants ──────────────────────────────────────────
 // Per-planet J2000 orbital elements, tuned parameters (startpos, angleCorrection,
@@ -196,186 +209,212 @@ const BOND_TAPER_TOTAL_HALFWIDTH_YR = 400000;     // 4-flag ΔT stack taper: zer
 
 const planets = {};
 
+/**
+ * H-lattice period in years from the JSON integer pair [numerator, denominator]:
+ * [8, 11] -> 8H/11, [-4, 3] -> -4H/3, [610, 1] -> 610H.
+ *
+ * These were hand-written arithmetic (`-holisticyearLength*8/65`) while the
+ * fractions they encode already lived in model-parameters.json. Verified
+ * bit-identical to every expression it replaces — all 21 pairs, 7 planets x
+ * {perihelion, axial precession, obliquity} — so the lattice values do not move.
+ *
+ * Evaluated once at module load, like the literals it replaces. The epoch path
+ * (recomputePlanetCyclesForEpoch) rescales the J2000 snapshots taken from these.
+ *
+ * @param {number[]|null|undefined} frac
+ * @returns {number|undefined} undefined when the JSON pair is null (Venus and
+ *   Neptune obliquity, which is derived from |ICRF| further down instead)
+ */
+const latticeYears = (frac) => (frac ? holisticyearLength * frac[0] / frac[1] : undefined);
+
 // Mercury
+// The derived members (perihelionEclipticYears, axialPrecessionYears,
+// obliquityCycle) deliberately stay as arithmetic. They encode the H-lattice
+// fractions the JSON stores as integer pairs — [8,11] is written here as
+// H/(1+3/8) = 8H/11 — so importing them would change the expression's form,
+// not merely its source. Phase 6 owns that.
 planets.mercury = {
-  // Astro references (from astro-reference.json)
-  solarYearInput: 87.9683,
-  eclipticInclinationJ2000: 7.00497902,
-  orbitalEccentricityJ2000: 0.20563593,
-  invPlaneInclinationJ2000: 6.3472858,
-  axialTiltJ2000: 0.03,
-  longitudePerihelion: 77.4569131,
-  ascendingNode: 48.33033155,
-  meanAnomaly: 156.6364301,
-  trueAnomaly: 164.1669319,
-  // Model parameters (from model-parameters.json)
-  angleCorrection: 0.9715969391605945,
-  perihelionEclipticYears: holisticyearLength/(1+(3/8)),
-  axialPrecessionYears: -(8 * holisticyearLength / 9),
-  obliquityCycle: holisticyearLength * 8 / 3,
-  startpos: 83.65049392346397,
-  eocFraction: -0.527,
-  perihelionRef_JD: 2460335.9,
-  ascendingNodeInvPlane: 32.83,
-  inclinationCycleAnchor: 234.52,
-  antiPhase: false,
-  ascendingNodeCyclesIn8H: 9,
+  // Astro references (astro-reference.json -> planetOrbitalElements.mercury)
+  solarYearInput: K.planetOrbitalElements.mercury.solarYearInput,
+  eclipticInclinationJ2000: K.planetOrbitalElements.mercury.eclipticInclinationJ2000,
+  orbitalEccentricityJ2000: K.planetOrbitalElements.mercury.orbitalEccentricityJ2000,
+  invPlaneInclinationJ2000: K.planetOrbitalElements.mercury.invPlaneInclinationJ2000,
+  axialTiltJ2000: K.planetOrbitalElements.mercury.axialTiltJ2000,
+  longitudePerihelion: K.planetOrbitalElements.mercury.longitudePerihelion,
+  ascendingNode: K.planetOrbitalElements.mercury.ascendingNode,
+  meanAnomaly: K.planetOrbitalElements.mercury.meanAnomaly,
+  trueAnomaly: K.planetOrbitalElements.mercury.trueAnomaly,
+  // Model parameters (model-parameters.json -> planets.mercury)
+  angleCorrection: K.planets.mercury.angleCorrection,
+  perihelionEclipticYears: latticeYears(K.planets.mercury.perihelionEclipticFraction),
+  axialPrecessionYears: latticeYears(K.planets.mercury.axialPrecessionFraction),
+  obliquityCycle: latticeYears(K.planets.mercury.obliquityCycleFraction),
+  startpos: K.planets.mercury.startpos,
+  eocFraction: K.planets.mercury.eocFraction,
+  perihelionRef_JD: K.perihelionPassageRef.mercury,
+  ascendingNodeInvPlane: K.planets.mercury.ascendingNodeInvPlane,
+  inclinationCycleAnchor: K.planets.mercury.inclinationCycleAnchor,
+  antiPhase: K.planets.mercury.antiPhase,
+  ascendingNodeCyclesIn8H: K.planets.mercury.ascendingNodeCyclesIn8H,
 };
 
 // Venus
 planets.venus = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 224.695,
-  eclipticInclinationJ2000: 3.39467605,
-  orbitalEccentricityJ2000: 0.00677672,
-  invPlaneInclinationJ2000: 2.1545441,
-  axialTiltJ2000: 2.6392,
-  longitudePerihelion: 131.5765919,
-  ascendingNode: 76.67877109,
-  meanAnomaly: 324.9668371,
-  trueAnomaly: 324.5198504,
-  // Model parameters (from model-parameters.json)
-  angleCorrection: -2.750623585711864,
-  perihelionEclipticYears: -holisticyearLength*8/6,
-  axialPrecessionYears: 8 * holisticyearLength / 91,
-  // obliquityCycle derived below from |ICRF| (tidally damped)
-  startpos: 249.32539285801533,
-  eocFraction: 0.436,
-  perihelionRef_JD: 2455464.42,
-  ascendingNodeInvPlane: 54.70,
-  inclinationCycleAnchor: 218.64,
-  antiPhase: false,
-  ascendingNodeCyclesIn8H: 1,
+  solarYearInput: K.planetOrbitalElements.venus.solarYearInput,
+  eclipticInclinationJ2000: K.planetOrbitalElements.venus.eclipticInclinationJ2000,
+  orbitalEccentricityJ2000: K.planetOrbitalElements.venus.orbitalEccentricityJ2000,
+  invPlaneInclinationJ2000: K.planetOrbitalElements.venus.invPlaneInclinationJ2000,
+  axialTiltJ2000: K.planetOrbitalElements.venus.axialTiltJ2000,
+  longitudePerihelion: K.planetOrbitalElements.venus.longitudePerihelion,
+  ascendingNode: K.planetOrbitalElements.venus.ascendingNode,
+  meanAnomaly: K.planetOrbitalElements.venus.meanAnomaly,
+  trueAnomaly: K.planetOrbitalElements.venus.trueAnomaly,
+  // Model parameters (model-parameters.json -> planets.venus)
+  angleCorrection: K.planets.venus.angleCorrection,
+  perihelionEclipticYears: latticeYears(K.planets.venus.perihelionEclipticFraction),
+  axialPrecessionYears: latticeYears(K.planets.venus.axialPrecessionFraction),
+  // obliquityCycle derived below from |ICRF| (tidally damped) — the JSON pair is
+  // null and the key stays ABSENT here, not undefined; downstream code tests for
+  // its presence.
+  startpos: K.planets.venus.startpos,
+  eocFraction: K.planets.venus.eocFraction,
+  perihelionRef_JD: K.perihelionPassageRef.venus,
+  ascendingNodeInvPlane: K.planets.venus.ascendingNodeInvPlane,
+  inclinationCycleAnchor: K.planets.venus.inclinationCycleAnchor,
+  antiPhase: K.planets.venus.antiPhase,
+  ascendingNodeCyclesIn8H: K.planets.venus.ascendingNodeCyclesIn8H,
 };
 
 // Mars
 planets.mars = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 686.93,
-  eclipticInclinationJ2000: 1.84969142,
-  orbitalEccentricityJ2000: 0.09339410,
-  invPlaneInclinationJ2000: 1.6311858,
-  axialTiltJ2000: 25.19,
-  longitudePerihelion: 336.0650681,
-  ascendingNode: 49.55737662,
-  meanAnomaly: 109.2630844,
-  trueAnomaly: 118.9501056,
-  // Model parameters (from model-parameters.json)
-  angleCorrection: -2.1102648138849744,
-  perihelionEclipticYears: holisticyearLength*8/36,
-  axialPrecessionYears: -holisticyearLength/2,
-  obliquityCycle: 8 * holisticyearLength / 21,
-  startpos: 121.4634461571797,
-  eocFraction: -0.066224,
-  perihelionRef_JD: 2456499.441,
-  ascendingNodeInvPlane: 354.87,
-  inclinationCycleAnchor: 236.07,
-  antiPhase: false,
-  ascendingNodeCyclesIn8H: 64,
+  solarYearInput: K.planetOrbitalElements.mars.solarYearInput,
+  eclipticInclinationJ2000: K.planetOrbitalElements.mars.eclipticInclinationJ2000,
+  orbitalEccentricityJ2000: K.planetOrbitalElements.mars.orbitalEccentricityJ2000,
+  invPlaneInclinationJ2000: K.planetOrbitalElements.mars.invPlaneInclinationJ2000,
+  axialTiltJ2000: K.planetOrbitalElements.mars.axialTiltJ2000,
+  longitudePerihelion: K.planetOrbitalElements.mars.longitudePerihelion,
+  ascendingNode: K.planetOrbitalElements.mars.ascendingNode,
+  meanAnomaly: K.planetOrbitalElements.mars.meanAnomaly,
+  trueAnomaly: K.planetOrbitalElements.mars.trueAnomaly,
+  // Model parameters (model-parameters.json -> planets.mars)
+  angleCorrection: K.planets.mars.angleCorrection,
+  perihelionEclipticYears: latticeYears(K.planets.mars.perihelionEclipticFraction),
+  axialPrecessionYears: latticeYears(K.planets.mars.axialPrecessionFraction),
+  obliquityCycle: latticeYears(K.planets.mars.obliquityCycleFraction),
+  startpos: K.planets.mars.startpos,
+  eocFraction: K.planets.mars.eocFraction,
+  perihelionRef_JD: K.perihelionPassageRef.mars,
+  ascendingNodeInvPlane: K.planets.mars.ascendingNodeInvPlane,
+  inclinationCycleAnchor: K.planets.mars.inclinationCycleAnchor,
+  antiPhase: K.planets.mars.antiPhase,
+  ascendingNodeCyclesIn8H: K.planets.mars.ascendingNodeCyclesIn8H,
 };
 
 // Jupiter
 planets.jupiter = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 4330.53,
-  eclipticInclinationJ2000: 1.30439695,
-  orbitalEccentricityJ2000: 0.04838624,
-  invPlaneInclinationJ2000: 0.3219652,
-  axialTiltJ2000: 3.13,
-  longitudePerihelion: 14.70659401,
-  ascendingNode: 100.4877868,
-  meanAnomaly: 32.47179744,
-  trueAnomaly: 35.69428061,
-  // Model parameters (from model-parameters.json)
-  angleCorrection: 0.9306123041099745,
-  perihelionEclipticYears: holisticyearLength*8/39,
-  axialPrecessionYears: -(8 * holisticyearLength / 21),
-  obliquityCycle: holisticyearLength / 2,
-  startpos: 13.887251714696855,
-  eocFraction: 0.495,
-  perihelionRef_JD: 2464224.5,
-  ascendingNodeInvPlane: 312.89,
-  inclinationCycleAnchor: 287.06,
-  antiPhase: false,
-  ascendingNodeCyclesIn8H: 36,
+  solarYearInput: K.planetOrbitalElements.jupiter.solarYearInput,
+  eclipticInclinationJ2000: K.planetOrbitalElements.jupiter.eclipticInclinationJ2000,
+  orbitalEccentricityJ2000: K.planetOrbitalElements.jupiter.orbitalEccentricityJ2000,
+  invPlaneInclinationJ2000: K.planetOrbitalElements.jupiter.invPlaneInclinationJ2000,
+  axialTiltJ2000: K.planetOrbitalElements.jupiter.axialTiltJ2000,
+  longitudePerihelion: K.planetOrbitalElements.jupiter.longitudePerihelion,
+  ascendingNode: K.planetOrbitalElements.jupiter.ascendingNode,
+  meanAnomaly: K.planetOrbitalElements.jupiter.meanAnomaly,
+  trueAnomaly: K.planetOrbitalElements.jupiter.trueAnomaly,
+  // Model parameters (model-parameters.json -> planets.jupiter)
+  angleCorrection: K.planets.jupiter.angleCorrection,
+  perihelionEclipticYears: latticeYears(K.planets.jupiter.perihelionEclipticFraction),
+  axialPrecessionYears: latticeYears(K.planets.jupiter.axialPrecessionFraction),
+  obliquityCycle: latticeYears(K.planets.jupiter.obliquityCycleFraction),
+  startpos: K.planets.jupiter.startpos,
+  eocFraction: K.planets.jupiter.eocFraction,
+  perihelionRef_JD: K.perihelionPassageRef.jupiter,
+  ascendingNodeInvPlane: K.planets.jupiter.ascendingNodeInvPlane,
+  inclinationCycleAnchor: K.planets.jupiter.inclinationCycleAnchor,
+  antiPhase: K.planets.jupiter.antiPhase,
+  ascendingNodeCyclesIn8H: K.planets.jupiter.ascendingNodeCyclesIn8H,
 };
 
 // Saturn
 planets.saturn = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 10747.0,
-  eclipticInclinationJ2000: 2.48599187,
-  orbitalEccentricityJ2000: 0.05386179,
-  invPlaneInclinationJ2000: 0.9254704,
-  axialTiltJ2000: 26.73,
-  longitudePerihelion: 92.12794343,
-  ascendingNode: 113.6452856,
-  meanAnomaly: 325.663876,
-  trueAnomaly: 321.7910116,
-  // Model parameters (from model-parameters.json)
-  angleCorrection: -0.1788736536157458,
-  perihelionEclipticYears: -holisticyearLength*8/65,
-  axialPrecessionYears: -holisticyearLength*4/3,
-  obliquityCycle: holisticyearLength / 3,
-  startpos: 11.280368711684483,
-  eocFraction: 0.54,
-  perihelionRef_JD: 2452875.9,
-  ascendingNodeInvPlane: 118.81,
-  inclinationCycleAnchor: 116.26,
-  antiPhase: true,
-  ascendingNodeCyclesIn8H: 36,
+  solarYearInput: K.planetOrbitalElements.saturn.solarYearInput,
+  eclipticInclinationJ2000: K.planetOrbitalElements.saturn.eclipticInclinationJ2000,
+  orbitalEccentricityJ2000: K.planetOrbitalElements.saturn.orbitalEccentricityJ2000,
+  invPlaneInclinationJ2000: K.planetOrbitalElements.saturn.invPlaneInclinationJ2000,
+  axialTiltJ2000: K.planetOrbitalElements.saturn.axialTiltJ2000,
+  longitudePerihelion: K.planetOrbitalElements.saturn.longitudePerihelion,
+  ascendingNode: K.planetOrbitalElements.saturn.ascendingNode,
+  meanAnomaly: K.planetOrbitalElements.saturn.meanAnomaly,
+  trueAnomaly: K.planetOrbitalElements.saturn.trueAnomaly,
+  // Model parameters (model-parameters.json -> planets.saturn)
+  angleCorrection: K.planets.saturn.angleCorrection,
+  perihelionEclipticYears: latticeYears(K.planets.saturn.perihelionEclipticFraction),
+  axialPrecessionYears: latticeYears(K.planets.saturn.axialPrecessionFraction),
+  obliquityCycle: latticeYears(K.planets.saturn.obliquityCycleFraction),
+  startpos: K.planets.saturn.startpos,
+  eocFraction: K.planets.saturn.eocFraction,
+  perihelionRef_JD: K.perihelionPassageRef.saturn,
+  ascendingNodeInvPlane: K.planets.saturn.ascendingNodeInvPlane,
+  inclinationCycleAnchor: K.planets.saturn.inclinationCycleAnchor,
+  antiPhase: K.planets.saturn.antiPhase,
+  ascendingNodeCyclesIn8H: K.planets.saturn.ascendingNodeCyclesIn8H,
 };
 
 // Uranus
 planets.uranus = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 30586,
-  eclipticInclinationJ2000: 0.77263783,
-  orbitalEccentricityJ2000: 0.04725744,
-  invPlaneInclinationJ2000: 0.9946692,
-  axialTiltJ2000: 82.23,
-  longitudePerihelion: 170.7308251,
-  ascendingNode: 74.00919023,
-  meanAnomaly: 145.7292678,
-  trueAnomaly: 148.5142459,
-  // Model parameters (from model-parameters.json)
-  angleCorrection: -0.7329076961290184,
-  perihelionEclipticYears: holisticyearLength/3,
-  axialPrecessionYears: holisticyearLength*610,
-  obliquityCycle: holisticyearLength / 2,
-  startpos: 44.900388945775106,
-  eocFraction: 0.53,
-  perihelionRef_JD: 2439699.8,
-  ascendingNodeInvPlane: 307.80,
-  inclinationCycleAnchor: 21.33,
-  antiPhase: false,
-  ascendingNodeCyclesIn8H: 11,
+  solarYearInput: K.planetOrbitalElements.uranus.solarYearInput,
+  eclipticInclinationJ2000: K.planetOrbitalElements.uranus.eclipticInclinationJ2000,
+  orbitalEccentricityJ2000: K.planetOrbitalElements.uranus.orbitalEccentricityJ2000,
+  invPlaneInclinationJ2000: K.planetOrbitalElements.uranus.invPlaneInclinationJ2000,
+  axialTiltJ2000: K.planetOrbitalElements.uranus.axialTiltJ2000,
+  longitudePerihelion: K.planetOrbitalElements.uranus.longitudePerihelion,
+  ascendingNode: K.planetOrbitalElements.uranus.ascendingNode,
+  meanAnomaly: K.planetOrbitalElements.uranus.meanAnomaly,
+  trueAnomaly: K.planetOrbitalElements.uranus.trueAnomaly,
+  // Model parameters (model-parameters.json -> planets.uranus)
+  angleCorrection: K.planets.uranus.angleCorrection,
+  perihelionEclipticYears: latticeYears(K.planets.uranus.perihelionEclipticFraction),
+  axialPrecessionYears: latticeYears(K.planets.uranus.axialPrecessionFraction),
+  obliquityCycle: latticeYears(K.planets.uranus.obliquityCycleFraction),
+  startpos: K.planets.uranus.startpos,
+  eocFraction: K.planets.uranus.eocFraction,
+  perihelionRef_JD: K.perihelionPassageRef.uranus,
+  ascendingNodeInvPlane: K.planets.uranus.ascendingNodeInvPlane,
+  inclinationCycleAnchor: K.planets.uranus.inclinationCycleAnchor,
+  antiPhase: K.planets.uranus.antiPhase,
+  ascendingNodeCyclesIn8H: K.planets.uranus.ascendingNodeCyclesIn8H,
 };
 
 // Neptune
 planets.neptune = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 59800,
-  eclipticInclinationJ2000: 1.77004347,
-  orbitalEccentricityJ2000: 0.00859048,
-  invPlaneInclinationJ2000: 0.7354155,
-  axialTiltJ2000: 28.32,
-  longitudePerihelion: 45.80124471,
-  ascendingNode: 131.7853754,
-  meanAnomaly: 262.5003424,
-  trueAnomaly: 261.2242728,
-  // Model parameters (from model-parameters.json)
-  angleCorrection: 2.332350100136672,
-  perihelionEclipticYears: holisticyearLength*2,
-  axialPrecessionYears: -holisticyearLength*68,
-  // obliquityCycle derived below from |ICRF| (tidally damped)
-  startpos: 47.9552024382285,
-  eocFraction: 0.585,
-  perihelionRef_JD: 2409432.4,
-  ascendingNodeInvPlane: 192.04,
-  inclinationCycleAnchor: 174.04,
-  antiPhase: false,
-  ascendingNodeCyclesIn8H: 3,
+  solarYearInput: K.planetOrbitalElements.neptune.solarYearInput,
+  eclipticInclinationJ2000: K.planetOrbitalElements.neptune.eclipticInclinationJ2000,
+  orbitalEccentricityJ2000: K.planetOrbitalElements.neptune.orbitalEccentricityJ2000,
+  invPlaneInclinationJ2000: K.planetOrbitalElements.neptune.invPlaneInclinationJ2000,
+  axialTiltJ2000: K.planetOrbitalElements.neptune.axialTiltJ2000,
+  longitudePerihelion: K.planetOrbitalElements.neptune.longitudePerihelion,
+  ascendingNode: K.planetOrbitalElements.neptune.ascendingNode,
+  meanAnomaly: K.planetOrbitalElements.neptune.meanAnomaly,
+  trueAnomaly: K.planetOrbitalElements.neptune.trueAnomaly,
+  // Model parameters (model-parameters.json -> planets.neptune)
+  angleCorrection: K.planets.neptune.angleCorrection,
+  perihelionEclipticYears: latticeYears(K.planets.neptune.perihelionEclipticFraction),
+  axialPrecessionYears: latticeYears(K.planets.neptune.axialPrecessionFraction),
+  // obliquityCycle derived below from |ICRF| (tidally damped) — JSON pair is
+  // null; key stays ABSENT, as for Venus.
+  startpos: K.planets.neptune.startpos,
+  eocFraction: K.planets.neptune.eocFraction,
+  perihelionRef_JD: K.perihelionPassageRef.neptune,
+  ascendingNodeInvPlane: K.planets.neptune.ascendingNodeInvPlane,
+  inclinationCycleAnchor: K.planets.neptune.inclinationCycleAnchor,
+  antiPhase: K.planets.neptune.antiPhase,
+  ascendingNodeCyclesIn8H: K.planets.neptune.ascendingNodeCyclesIn8H,
 };
 
 // --- A4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
@@ -383,83 +422,95 @@ planets.neptune = {
 // Pluto
 planets.pluto = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 90465, 
-  eclipticInclinationJ2000: 17.14001,
-  invPlaneInclinationJ2000: 15.5639473, 
-  axialTiltJ2000: 57.47, 
-  longitudePerihelion: 224.06891,
-  ascendingNode: 110.30393, 
-  meanAnomaly: 15.55009, 
-  trueAnomaly: 26.31965048,
-  // Model parameters (from model-parameters.json)
-  orbitalEccentricityBase: 0.2488273,
-  angleCorrection: 2.469281, 
-  perihelionEclipticYears: holisticyearLength, 
-  startpos: 71.555,
-  ascendingNodeInvPlane: 101.06,
-  inclinationCycleAnchor: 203.32,
-  invPlaneInclinationMean: 15.716200, invPlaneInclinationAmplitude: 0.717024,
+  solarYearInput: K.additionalBodiesReference.pluto.solarYearInput,
+  eclipticInclinationJ2000: K.additionalBodiesReference.pluto.eclipticInclinationJ2000,
+  invPlaneInclinationJ2000: K.additionalBodiesReference.pluto.invPlaneInclinationJ2000,
+  axialTiltJ2000: K.additionalBodiesReference.pluto.axialTiltJ2000,
+  longitudePerihelion: K.additionalBodiesReference.pluto.longitudePerihelion,
+  ascendingNode: K.additionalBodiesReference.pluto.ascendingNode,
+  meanAnomaly: K.additionalBodiesReference.pluto.meanAnomaly,
+  trueAnomaly: K.additionalBodiesReference.pluto.trueAnomaly,
+  // Model parameters (model-parameters.json -> additionalBodies.pluto).
+  // The fraction is [1,1] — one full H, unlike the planets' 8H/N divisors — so
+  // latticeYears returns H*1/1, which is H exactly.
+  orbitalEccentricityBase: K.additionalBodies.pluto.orbitalEccentricityBase,
+  angleCorrection: K.additionalBodies.pluto.angleCorrection,
+  perihelionEclipticYears: latticeYears(K.additionalBodies.pluto.perihelionEclipticFraction),
+  startpos: K.additionalBodies.pluto.startpos,
+  ascendingNodeInvPlane: K.additionalBodies.pluto.ascendingNodeInvPlane,
+  inclinationCycleAnchor: K.additionalBodies.pluto.inclinationCycleAnchor,
+  invPlaneInclinationMean: K.additionalBodies.pluto.invPlaneInclinationMean, invPlaneInclinationAmplitude: K.additionalBodies.pluto.invPlaneInclinationAmplitude,
 };
 
 // Halley's
 planets.halleys = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 27503, 
-  eclipticInclinationJ2000: 162.26269,
-  invPlaneInclinationJ2000: 150, 
-  axialTiltJ2000: 0, 
-  longitudePerihelion: 111.33249,
-  ascendingNode: 58.42008, 
-  meanAnomaly: 38.77481, 
-  trueAnomaly: 166.26774708,
+  solarYearInput: K.additionalBodiesReference.halleys.solarYearInput,
+  eclipticInclinationJ2000: K.additionalBodiesReference.halleys.eclipticInclinationJ2000,
+  invPlaneInclinationJ2000: K.additionalBodiesReference.halleys.invPlaneInclinationJ2000,
+  axialTiltJ2000: K.additionalBodiesReference.halleys.axialTiltJ2000,
+  longitudePerihelion: K.additionalBodiesReference.halleys.longitudePerihelion,
+  ascendingNode: K.additionalBodiesReference.halleys.ascendingNode,
+  meanAnomaly: K.additionalBodiesReference.halleys.meanAnomaly,
+  trueAnomaly: K.additionalBodiesReference.halleys.trueAnomaly,
   // Model parameters (from model-parameters.json)
-  orbitalEccentricityBase: 0.96714291,
-  angleCorrection: -1.619816, 
-  perihelionEclipticYears: holisticyearLength, 
-  startpos: 80,
-  ascendingNodeInvPlane: 59.56,
-  inclinationCycleAnchor: 23.3195,
-  invPlaneInclinationMean: 150, invPlaneInclinationAmplitude: 0.1,
+  orbitalEccentricityBase: K.additionalBodies.halleys.orbitalEccentricityBase,
+  angleCorrection: K.additionalBodies.halleys.angleCorrection,
+  perihelionEclipticYears: latticeYears(K.additionalBodies.halleys.perihelionEclipticFraction),
+  startpos: K.additionalBodies.halleys.startpos,
+  ascendingNodeInvPlane: K.additionalBodies.halleys.ascendingNodeInvPlane,
+  inclinationCycleAnchor: K.additionalBodies.halleys.inclinationCycleAnchor,
+  invPlaneInclinationMean: K.additionalBodies.halleys.invPlaneInclinationMean, invPlaneInclinationAmplitude: K.additionalBodies.halleys.invPlaneInclinationAmplitude,
 };
 
 // Eros
 planets.eros = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 642.93, 
-  eclipticInclinationJ2000: 10.82760,
-  invPlaneInclinationJ2000: 9.25, 
-  axialTiltJ2000: 0, 
-  longitudePerihelion: 178.81322,
-  ascendingNode: 304.30993, 
-  meanAnomaly: 320.21552, 
-  trueAnomaly: 299.91713740,
+  solarYearInput: K.additionalBodiesReference.eros.solarYearInput,
+  eclipticInclinationJ2000: K.additionalBodiesReference.eros.eclipticInclinationJ2000,
+  invPlaneInclinationJ2000: K.additionalBodiesReference.eros.invPlaneInclinationJ2000,
+  axialTiltJ2000: K.additionalBodiesReference.eros.axialTiltJ2000,
+  longitudePerihelion: K.additionalBodiesReference.eros.longitudePerihelion,
+  ascendingNode: K.additionalBodiesReference.eros.ascendingNode,
+  meanAnomaly: K.additionalBodiesReference.eros.meanAnomaly,
+  trueAnomaly: K.additionalBodiesReference.eros.trueAnomaly,
   // Model parameters (from model-parameters.json)
-  orbitalEccentricityBase: 0.2229512,
-  angleCorrection: 0.047888, 
-  perihelionEclipticYears: holisticyearLength, 
-  startpos: 57.402,
-  ascendingNodeInvPlane: 10.36,
-  inclinationCycleAnchor: 203.3195,
-  invPlaneInclinationMean: 9.25, invPlaneInclinationAmplitude: 0.5,
+  orbitalEccentricityBase: K.additionalBodies.eros.orbitalEccentricityBase,
+  angleCorrection: K.additionalBodies.eros.angleCorrection,
+  perihelionEclipticYears: latticeYears(K.additionalBodies.eros.perihelionEclipticFraction),
+  startpos: K.additionalBodies.eros.startpos,
+  ascendingNodeInvPlane: K.additionalBodies.eros.ascendingNodeInvPlane,
+  inclinationCycleAnchor: K.additionalBodies.eros.inclinationCycleAnchor,
+  invPlaneInclinationMean: K.additionalBodies.eros.invPlaneInclinationMean, invPlaneInclinationAmplitude: K.additionalBodies.eros.invPlaneInclinationAmplitude,
 };
 
 // Ceres
 planets.ceres = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 1680.5, 
-  eclipticInclinationJ2000: 10.59407,
-  invPlaneInclinationJ2000: 0.4331698, 
-  axialTiltJ2000: 4, longitudePerihelion: 73.59769,
-  ascendingNode: 80.30533, meanAnomaly: 95.98772, 
-  trueAnomaly: 104.48097667,
+  solarYearInput: K.additionalBodiesReference.ceres.solarYearInput,
+  eclipticInclinationJ2000: K.additionalBodiesReference.ceres.eclipticInclinationJ2000,
+  invPlaneInclinationJ2000: K.additionalBodiesReference.ceres.invPlaneInclinationJ2000,
+  axialTiltJ2000: K.additionalBodiesReference.ceres.axialTiltJ2000,
+  longitudePerihelion: K.additionalBodiesReference.ceres.longitudePerihelion,
+  ascendingNode: K.additionalBodiesReference.ceres.ascendingNode,
+  meanAnomaly: K.additionalBodiesReference.ceres.meanAnomaly,
+  trueAnomaly: K.additionalBodiesReference.ceres.trueAnomaly,
   // Model parameters (from model-parameters.json)
-  orbitalEccentricityBase: 0.0755347,
-  angleCorrection: 0, 
-  perihelionEclipticYears: holisticyearLength, 
-  orbitDistance: 2.76596,
-  ascendingNodeInvPlane: 10.36,
-  inclinationCycleAnchor: 203.3195,
-  invPlaneInclinationMean: 0.43, invPlaneInclinationAmplitude: 0.05,
+  orbitalEccentricityBase: K.additionalBodies.ceres.orbitalEccentricityBase,
+  angleCorrection: K.additionalBodies.ceres.angleCorrection,
+  perihelionEclipticYears: latticeYears(K.additionalBodies.ceres.perihelionEclipticFraction),
+  startpos: K.additionalBodies.ceres.startpos,
+  orbitDistance: K.additionalBodies.ceres.orbitDistanceOverride,
+  // BUG FIX via migration: this read 10.36 — verbatim Eros's ascending node from
+  // the block above, a copy-paste. Ceres's value is 80.89, which this same file
+  // already carries as ceresAscendingNodeInvPlaneSouamiSouchay with the Souami &
+  // Souchay (2012) Table 2 citation, and which the JSON has always held.
+  // Invisible to a value-presence check: the key repeats across bodies so
+  // name-matching is disabled, and 80.89 does occur in the file — under the
+  // other name.
+  ascendingNodeInvPlane: K.additionalBodies.ceres.ascendingNodeInvPlane,
+  inclinationCycleAnchor: K.additionalBodies.ceres.inclinationCycleAnchor,
+  invPlaneInclinationMean: K.additionalBodies.ceres.invPlaneInclinationMean, invPlaneInclinationAmplitude: K.additionalBodies.ceres.invPlaneInclinationAmplitude,
 };
 
 // Derived phase offset for inclination path alignment with zodiac
@@ -3263,38 +3314,45 @@ const MOON_B = [
 ];
 
 // ─── C3. Body diameters (astro reference) ──────────────────────────────────────────────────
+// Local keys keep the `…Diameter` suffix (≈90 call sites read them that way);
+// the JSON keys are bare body names under bodyDiametersKm, which carries the
+// unit. Not presentation data — earthDiameter yields R_EARTH_M and the sun/moon
+// pair gives the eclipse-geometry radii.
 const diameters = {
-  sunDiameter      : 1392684.00,
-  moonDiameter     : 3474.8,
-  earthDiameter    : 12756.27,
-  mercuryDiameter  : 4879.40,
-  venusDiameter    : 12103.60,
-  marsDiameter     : 6779,
-  jupiterDiameter  : 139822,
-  saturnDiameter   : 116464,
-  uranusDiameter   : 50724,
-  neptuneDiameter  : 49244,
-  plutoDiameter    : 2376.6,
-  halleysDiameter  : 11,
-  erosDiameter     : 16.84,
+  sunDiameter      : K.bodyDiametersKm.sun,
+  moonDiameter     : K.bodyDiametersKm.moon,
+  earthDiameter    : K.bodyDiametersKm.earth,
+  mercuryDiameter  : K.bodyDiametersKm.mercury,
+  venusDiameter    : K.bodyDiametersKm.venus,
+  marsDiameter     : K.bodyDiametersKm.mars,
+  jupiterDiameter  : K.bodyDiametersKm.jupiter,
+  saturnDiameter   : K.bodyDiametersKm.saturn,
+  uranusDiameter   : K.bodyDiametersKm.uranus,
+  neptuneDiameter  : K.bodyDiametersKm.neptune,
+  plutoDiameter    : K.bodyDiametersKm.pluto,
+  halleysDiameter  : K.bodyDiametersKm.halleys,
+  erosDiameter     : K.bodyDiametersKm.eros,
 };
 
 // --- C4. Ascending nodes on invariable plane ---
 // Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
 // These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
 // Units: degrees at J2000.0 epoch
-const earthAscendingNodeInvPlaneSouamiSouchay = 284.51;  // Regresses with period holisticyearLength/5 in the invariant frame (ecliptic precession rate)
-const mercuryAscendingNodeInvPlaneSouamiSouchay = 32.22;
-const venusAscendingNodeInvPlaneSouamiSouchay = 52.31;
-const marsAscendingNodeInvPlaneSouamiSouchay = 352.95;
-const jupiterAscendingNodeInvPlaneSouamiSouchay = 306.92;
-const saturnAscendingNodeInvPlaneSouamiSouchay = 122.27;
-const uranusAscendingNodeInvPlaneSouamiSouchay = 308.44;
-const neptuneAscendingNodeInvPlaneSouamiSouchay = 189.28;
-const plutoAscendingNodeInvPlaneSouamiSouchay = 107.06;
-const halleysAscendingNodeInvPlaneSouamiSouchay = 59.56; // Approximation from ecliptic value
-const erosAscendingNodeInvPlaneSouamiSouchay = 10.36;    // Approximation from ecliptic value
-const ceresAscendingNodeInvPlaneSouamiSouchay = 80.89;   // From Souami & Souchay (2012) Table 2
+// From REFERENCE_DATA, not DEFAULT_CONSTANTS: these are what the model is
+// COMPARED AGAINST, so they are single-sourced but deliberately not injectable —
+// createModel refuses them (§2d). Same for the LL bounds and JPL trends below.
+const earthAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.earth;  // Regresses with period holisticyearLength/5 in the invariant frame (ecliptic precession rate)
+const mercuryAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.mercury;
+const venusAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.venus;
+const marsAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.mars;
+const jupiterAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.jupiter;
+const saturnAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.saturn;
+const uranusAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.uranus;
+const neptuneAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.neptune;
+const plutoAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.pluto;
+const halleysAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.halleys; // Approximation from ecliptic value
+const erosAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.eros;       // Approximation from ecliptic value
+const ceresAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.ceres;     // From Souami & Souchay (2012) Table 2
 
 
 // ─── C5. INCLINATION REFERENCE DATA ──────────────────────────────────────────────
@@ -3305,22 +3363,24 @@ const ceresAscendingNodeInvPlaneSouamiSouchay = 80.89;   // From Souami & Soucha
 // --- C5a. Laplace-Lagrange bounds & eigenmode phases ---
 // Theoretical bounds from Farside Table 10.4 (Brouwer & van Woerkom)
 // Source: https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
-const mercuryLLBoundsMin = 4.57;
-const mercuryLLBoundsMax = 9.86;
-const venusLLBoundsMin = 0.00;
-const venusLLBoundsMax = 3.38;
-const earthLLBoundsMin = 0.00;
-const earthLLBoundsMax = 2.95;
-const marsLLBoundsMin = 0.00;
-const marsLLBoundsMax = 5.84;
-const jupiterLLBoundsMin = 0.241;
-const jupiterLLBoundsMax = 0.489;
-const saturnLLBoundsMin = 0.797;
-const saturnLLBoundsMax = 1.02;
-const uranusLLBoundsMin = 0.902;
-const uranusLLBoundsMax = 1.11;
-const neptuneLLBoundsMin = 0.554;
-const neptuneLLBoundsMax = 0.800;
+// JSON stores each as a [min, max] pair. Saturn's is the bound the model fails
+// in verify-laws (44/45) — precisely why it must not be injectable.
+const mercuryLLBoundsMin = R.laplaceLagrangeBounds.mercury[0];
+const mercuryLLBoundsMax = R.laplaceLagrangeBounds.mercury[1];
+const venusLLBoundsMin = R.laplaceLagrangeBounds.venus[0];
+const venusLLBoundsMax = R.laplaceLagrangeBounds.venus[1];
+const earthLLBoundsMin = R.laplaceLagrangeBounds.earth[0];
+const earthLLBoundsMax = R.laplaceLagrangeBounds.earth[1];
+const marsLLBoundsMin = R.laplaceLagrangeBounds.mars[0];
+const marsLLBoundsMax = R.laplaceLagrangeBounds.mars[1];
+const jupiterLLBoundsMin = R.laplaceLagrangeBounds.jupiter[0];
+const jupiterLLBoundsMax = R.laplaceLagrangeBounds.jupiter[1];
+const saturnLLBoundsMin = R.laplaceLagrangeBounds.saturn[0];
+const saturnLLBoundsMax = R.laplaceLagrangeBounds.saturn[1];
+const uranusLLBoundsMin = R.laplaceLagrangeBounds.uranus[0];
+const uranusLLBoundsMax = R.laplaceLagrangeBounds.uranus[1];
+const neptuneLLBoundsMin = R.laplaceLagrangeBounds.neptune[0];
+const neptuneLLBoundsMax = R.laplaceLagrangeBounds.neptune[1];
 
 // Laplace-Lagrange inclination eigenmode phase angles (degrees)
 // Source: Farside Table 10.1 (Brouwer & van Woerkom refinement)
@@ -3350,14 +3410,16 @@ const EIGENMODE_PHASES = [
 // --- C5b. JPL ecliptic inclination trend rates (°/century) ---
 // Source: JPL Approximate Positions — https://ssd.jpl.nasa.gov/planets/approx_pos.html
 // Target rates for model verification.
-const mercuryEclipticInclinationTrendJPL = -0.00595;  // degrees/century (DECREASING)
-const venusEclipticInclinationTrendJPL = -0.00079;    // degrees/century (DECREASING)
-const marsEclipticInclinationTrendJPL = -0.00813;     // degrees/century (DECREASING)
-const jupiterEclipticInclinationTrendJPL = -0.00184;  // degrees/century (DECREASING)
-const saturnEclipticInclinationTrendJPL = +0.00194;   // degrees/century (INCREASING)
-const uranusEclipticInclinationTrendJPL = -0.00243;   // degrees/century (DECREASING)
-const neptuneEclipticInclinationTrendJPL = +0.00035;  // degrees/century (INCREASING)
-const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estimated)
+// Compared against the model's own computed trend (trendError, directionMatch)
+// — never an input to it, hence REFERENCE_DATA.
+const mercuryEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.mercury;  // degrees/century (DECREASING)
+const venusEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.venus;      // degrees/century (DECREASING)
+const marsEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.mars;        // degrees/century (DECREASING)
+const jupiterEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.jupiter;  // degrees/century (DECREASING)
+const saturnEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.saturn;    // degrees/century (INCREASING)
+const uranusEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.uranus;    // degrees/century (DECREASING)
+const neptuneEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.neptune;  // degrees/century (INCREASING)
+const plutoEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.pluto;      // degrees/century (estimated)
 
 // ─── C6. Astronomical reference object (ASTRO_REFERENCE) ─────────────────
 // J2000 epoch values, year/day lengths, perihelion reference, Meeus
@@ -3366,27 +3428,42 @@ const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estima
 const ASTRO_REFERENCE = {
   // --- 8a. Earth J2000 reference values ---
   // Source: IAU 2006 precession model (Capitaine et al. 2003)
+  //
+  // NOT MIGRATED, DELIBERATELY: obliquity stays a local literal because the JSON
+  // still holds IAU 1976/1980 (84381.448") while these are IAU 2006 (84381.406").
+  // Importing would pull the OLD standard into the browser — backwards. IAU 2006
+  // is the decision; adopting it JSON-side needs Step 6a then 6b regenerated,
+  // because the constant is a fit target. Tracked in KNOWN_DIVERGENCE
+  // (tools/constants/check-literals.mjs); migrate these two the moment it lands.
   obliquityJ2000_arcsec: 84381.406,                  // ε₀ at J2000.0
   obliquityJ2000_deg: 84381.406 / 3600,              // = 23.439279°
-  obliquityRate_arcsecPerCentury: -46.836769,
-  obliquityRate_degPerCentury: -46.836769 / 3600,    // = -0.013010°/century
+  obliquityRate_arcsecPerCentury: K.earthOrbital.obliquityRate_arcsecPerCentury,
+  obliquityRate_degPerCentury: K.earthOrbital.obliquityRate_arcsecPerCentury / 3600,  // = -0.013010°/century
   // Source: Astronomical Almanac, 1°34'43.3" at J2000.0, rate -18"/cy
-  earthInclinationJ2000_deg: 1.57869,
+  earthInclinationJ2000_deg: K.earthOrbital.earthInclinationJ2000_deg,
   earthInclinationRate_arcsecPerCentury: -18,
   // Source: JPL Horizons / Astronomical Almanac
-  eccentricityJ2000: 0.01671022,                     // Earth eccentricity at J2000.0
-  eccentricityDotJ2000: -0.000042037,                // Earth eccentricity rate at J2000 (per Julian cy) — secular-theory coefficient corroborated by modern ephemeris fits, the lunar node channel (doc 66 §1; v4 note: the old "s_Ω ≈ 1 measures ė" reading was superseded by the frame attribution — physical s_Ω = 0.867, effective 1.018), and the ancient timing record; not a raw observation. REFERENCE/Taylor-check anchor only: the shipped lunar channel does NOT consume it — the fully-derived H/3 fluctuation line PREDICTS −4.273e-5 (+1.7%; see _FW_ECC and docs/66 §1, incl. the falsified H/16-phase alternative −8.389e-6)
-  eccentricityDotDotJ2000: -0.0000002534,            // Earth eccentricity curvature at J2000 (per Julian cy²; 2× Meeus Eq. 25.4 T² coefficient). REFERENCE/Taylor-check anchor only — the derived H/3 line predicts −3.7e-8 (same sign; the documented divergence behind the drift meter's BCE M′/F rows)
-  perihelionLongitudeJ2000_deg: 102.947,             // Longitude of perihelion at J2000.0
-  sunMeanLongitudeJ2000_deg: 280.46646,              // Sun mean longitude at J2000.0 (D5 aberration anchor; source of truth astro-reference.json, synced by export-to-script.js)
-  elpW1T2Decomposition_arcsecPerCy2: {               // v4 K_PL budget primary sources (Chapront et al. 2002 + Lieske 1976; source of truth astro-reference.json, synced by export-to-script.js) — consumed by the split Lp carriers
-    planetary: 5.8665,
-    earthFigureJ2: 0.1925,
-    generalPrecessionPA_T2_Lieske1976: 1.11113,
+  eccentricityJ2000: K.earthOrbital.earthEccentricityJ2000,   // Earth eccentricity at J2000.0
+  eccentricityDotJ2000: K.earthOrbital.earthEccentricityDotJ2000,  // Earth eccentricity rate at J2000 (per Julian cy) — secular-theory coefficient corroborated by modern ephemeris fits, the lunar node channel (doc 66 §1; v4 note: the old "s_Ω ≈ 1 measures ė" reading was superseded by the frame attribution — physical s_Ω = 0.867, effective 1.018), and the ancient timing record; not a raw observation. REFERENCE/Taylor-check anchor only: the shipped lunar channel does NOT consume it — the fully-derived H/3 fluctuation line PREDICTS −4.273e-5 (+1.7%; see _FW_ECC and docs/66 §1, incl. the falsified H/16-phase alternative −8.389e-6)
+  eccentricityDotDotJ2000: K.earthOrbital.earthEccentricityDotDotJ2000,  // Earth eccentricity curvature at J2000 (per Julian cy²; 2× Meeus Eq. 25.4 T² coefficient). REFERENCE/Taylor-check anchor only — the derived H/3 line predicts −3.7e-8 (same sign; the documented divergence behind the drift meter's BCE M′/F rows)
+  // Was the truncated literal 102.947 against the JSON's 102.94719 — 0.684"
+  // apart. Not cosmetic: this feeds earthInvPlaneInclinationMean, the deep-time
+  // inclination oscillation and the Meeus mean anomaly, and tools/lib computes
+  // the same th0 = (periLong - inclinationCycleAnchor) from the FULL value. The
+  // two engines therefore disagreed by 3.3e-6 in cos(th0). Importing adopts the
+  // precise figure the JSON and the Node engine have always used.
+  perihelionLongitudeJ2000_deg: K.earthOrbital.earthPerihelionLongitudeJ2000,  // Longitude of perihelion at J2000.0
+  sunMeanLongitudeJ2000_deg: K.earthOrbital.sunMeanLongitudeJ2000_deg,  // Sun mean longitude at J2000.0 (D5 aberration anchor)
+  elpW1T2Decomposition_arcsecPerCy2: {               // v4 K_PL budget primary sources (Chapront et al. 2002 + Lieske 1976) — consumed by the split Lp carriers
+    // Three of the JSON block's six terms are used here; the tides* pair and
+    // the IAU2006 variant are analysis-only (tools/explore/v4-kpl-budget.js).
+    planetary: K.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.planetary,
+    earthFigureJ2: K.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.earthFigureJ2,
+    generalPrecessionPA_T2_Lieske1976: K.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976,
   },
-  perihelionPassageJ2000_JD: 2451547.042,            // Earth perihelion 2000 Jan 3 13:00 UTC (USNO)
+  perihelionPassageJ2000_JD: K.earthOrbital.perihelionPassageJ2000_JD,  // Earth perihelion 2000 Jan 3 13:00 UTC (USNO)
   // Source: USNO / timeanddate.com
-  juneSolstice2000_JD: 2451716.575,                  // June 21, 2000 01:48 UTC
+  juneSolstice2000_JD: K.earthOrbital.juneSolstice2000_JD,  // June 21, 2000 01:48 UTC
 
   // --- 8b. Model epoch offsets (June 21, 2000 00:00 UTC, JD 2451716.5) ---
   // Adjusted from J2000.0 for the 171.5 day offset (0.004696 centuries)
@@ -3407,32 +3484,37 @@ const ASTRO_REFERENCE = {
 
   // --- 8c. Year & day lengths (J2000.0) ---
   // Source: Meeus & Savoie (1992) "The history of the tropical year"
-  tropicalYearVEJ2000: 365.242374,                   // Vernal Equinox to Vernal Equinox
-  tropicalYearSSJ2000: 365.241626,                   // Summer Solstice to Summer Solstice
-  tropicalYearAEJ2000: 365.242018,                   // Autumnal Equinox to Autumnal Equinox
-  tropicalYearWSJ2000: 365.242740,                   // Winter Solstice to Winter Solstice
-  tropicalYearMeanJ2000: 365.2421897,                // Mean tropical year at J2000.0
-  tropicalYearRateSecPerCentury: -0.53,              // Secular change in tropical year length
+  // Local names carry a `J2000` suffix the JSON keys do not — the suffix marks
+  // these as the fixed J2000 anchors, distinct from the epoch-dependent values
+  // recomputeEpochAnchors produces.
+  tropicalYearVEJ2000: K.yearLengthRef.tropicalYearVE,        // Vernal Equinox to Vernal Equinox
+  tropicalYearSSJ2000: K.yearLengthRef.tropicalYearSS,        // Summer Solstice to Summer Solstice
+  tropicalYearAEJ2000: K.yearLengthRef.tropicalYearAE,        // Autumnal Equinox to Autumnal Equinox
+  tropicalYearWSJ2000: K.yearLengthRef.tropicalYearWS,        // Winter Solstice to Winter Solstice
+  tropicalYearMeanJ2000: K.yearLengthRef.tropicalYearMean,    // Mean tropical year at J2000.0
+  tropicalYearRateSecPerCentury: K.yearLengthRef.tropicalYearRateSecPerCentury,  // Secular change in tropical year length
   // Source: JPL Horizons
-  anomalisticYearJ2000: 365.259636,                  // Perihelion to perihelion
-  siderealYearJ2000: 365.256363004,                   // Fixed star reference (one complete orbit)
-  // Source: IERS Conventions / IAU definitions
-  solarDayJ2000: 86400.0,                            // Mean solar day (SI definition)
-  siderealDayJ2000: 86164.09053083288,               // ~23h 56m 4.0905s
-  stellarDayJ2000: 86164.0989036905,                 // ~23h 56m 4.0989s (slightly longer due to precession)
+  anomalisticYearJ2000: K.yearLengthRef.anomalisticYear,      // Perihelion to perihelion
+  siderealYearJ2000: K.yearLengthRef.siderealYear,            // Fixed star reference (one complete orbit)
+  // Source: IERS Conventions / IAU definitions.
+  // THREE distinct day lengths exist in this model — SI 86400 (definition),
+  // LOD_mean (the H/13 identity) and LOD_real (physical). This is the SI one.
+  solarDayJ2000: K.yearLengthRef.solarDay,                    // Mean solar day (SI definition)
+  siderealDayJ2000: K.yearLengthRef.siderealDay,              // ~23h 56m 4.0905s
+  stellarDayJ2000: K.yearLengthRef.stellarDay,                // ~23h 56m 4.0989s (slightly longer due to precession)
 
   // --- 8d. Lunar mean longitude coefficients (Meeus Ch. 47) ---
   // Used for lunar perturbation corrections (EoC, evection, variation, annual equation)
-  moonMeanAnomalyJ2000_deg: 134.9634,                // Moon's mean anomaly at J2000.0 (degrees)
-  moonMeanAnomalyRate_degPerDay: 13.06499295,         // Moon's mean anomaly rate (degrees/day)
-  moonMeanElongationJ2000_deg: 297.8502,              // Mean elongation Moon-Sun at J2000.0 (degrees)
-  moonMeanElongationRate_degPerDay: 12.19074912,      // Mean elongation rate (degrees/day)
-  sunMeanAnomalyJ2000_deg: 357.5291,                  // Sun's mean anomaly at J2000.0 (degrees)
-  sunMeanAnomalyRate_degPerDay: 0.98560028,           // Sun's mean anomaly rate (degrees/day)
-  moonArgLatJ2000_deg: 93.2720993,                    // Moon's argument of latitude F at J2000.0 (degrees)
-  moonArgLatRate_degPerCentury: 483202.0175273,        // F rate (degrees/Julian century)
-  moonMeanElongationJ2000Full_deg: 297.8502042,        // D at J2000.0 (full precision for latitude)
-  moonMeanElongationRate_degPerCentury: 445267.1115168, // D rate (degrees/Julian century)
+  moonMeanAnomalyJ2000_deg: K.moonMeeus.moonMeanAnomalyJ2000_deg,      // Moon's mean anomaly at J2000.0 (degrees)
+  moonMeanAnomalyRate_degPerDay: K.moonMeeus.moonMeanAnomalyRate_degPerDay,  // Moon's mean anomaly rate (degrees/day)
+  moonMeanElongationJ2000_deg: K.moonMeeus.moonMeanElongationJ2000_deg,      // Mean elongation Moon-Sun at J2000.0 (degrees)
+  moonMeanElongationRate_degPerDay: K.moonMeeus.moonMeanElongationRate_degPerDay,  // Mean elongation rate (degrees/day)
+  sunMeanAnomalyJ2000_deg: K.moonMeeus.sunMeanAnomalyJ2000_deg,        // Sun's mean anomaly at J2000.0 (degrees)
+  sunMeanAnomalyRate_degPerDay: K.moonMeeus.sunMeanAnomalyRate_degPerDay,    // Sun's mean anomaly rate (degrees/day)
+  moonArgLatJ2000_deg: K.moonMeeus.moonArgLatJ2000_deg,                // Moon's argument of latitude F at J2000.0 (degrees)
+  moonArgLatRate_degPerCentury: K.moonMeeus.moonArgLatRate_degPerCentury,    // F rate (degrees/Julian century)
+  moonMeanElongationJ2000Full_deg: K.moonMeeus.moonMeanElongationJ2000Full_deg,  // D at J2000.0 (full precision for latitude)
+  moonMeanElongationRate_degPerCentury: K.moonMeeus.moonMeanElongationRate_degPerCentury,  // D rate (degrees/Julian century)
 
   // --- 8e. Perihelion precession rates (1900–2100 trend) ---
   // Source: JPL SPICE/WebGeoCalc. Fluctuate over time; not valid for long-term predictions.
@@ -3729,7 +3811,7 @@ let   moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meanso
 // G_CONSTANT (6.6743e-20 km³/(kg·s²)) lives in section C3 "Deep-time physics anchors" near the top.
 
 // Earth-Moon mass ratio (DE440 SPICE kernel: GM_E/GM_M = 81.30056816).
-const MASS_RATIO_EARTH_MOON = 81.30056816;
+const MASS_RATIO_EARTH_MOON = K.physicalConstants.MASS_RATIO_EARTH_MOON;
 
 // Solar Δa correction for Moon's apparent semi-major axis (see doc 24).
 // Δa = a_M × M_M/(M_E + M_M) × m ≈ 349 km
@@ -3789,7 +3871,7 @@ const MASS_RATIO_SUN_EARTH_SYSTEM = M_SUN / M_EARTH_SYSTEM;   // ~328,899 (Earth
 // properties (surface gravity, escape velocity, density) use _ALONE.
 
 // Mercury (no moons, SYSTEM = ALONE)
-const MASS_RATIO_SUN_MERCURY_SYSTEM = 6023657.94;
+const MASS_RATIO_SUN_MERCURY_SYSTEM = K.physicalConstants.massRatioDE440.mercury;
 const MASS_RATIO_SUN_MERCURY_ALONE  = MASS_RATIO_SUN_MERCURY_SYSTEM;
 const GM_MERCURY_SYSTEM = GM_SUN / MASS_RATIO_SUN_MERCURY_SYSTEM;
 const GM_MERCURY_ALONE  = GM_MERCURY_SYSTEM;
@@ -3797,7 +3879,7 @@ const M_MERCURY_SYSTEM  = GM_MERCURY_SYSTEM / G_CONSTANT;
 const M_MERCURY_ALONE   = M_MERCURY_SYSTEM;
 
 // Venus (no moons, SYSTEM = ALONE)
-const MASS_RATIO_SUN_VENUS_SYSTEM = 408523.72;
+const MASS_RATIO_SUN_VENUS_SYSTEM = K.physicalConstants.massRatioDE440.venus;
 const MASS_RATIO_SUN_VENUS_ALONE  = MASS_RATIO_SUN_VENUS_SYSTEM;
 const GM_VENUS_SYSTEM = GM_SUN / MASS_RATIO_SUN_VENUS_SYSTEM;
 const GM_VENUS_ALONE  = GM_VENUS_SYSTEM;
@@ -3805,64 +3887,64 @@ const M_VENUS_SYSTEM  = GM_VENUS_SYSTEM / G_CONSTANT;
 const M_VENUS_ALONE   = M_VENUS_SYSTEM;
 
 // Mars (Phobos/Deimos negligible, <1 ppm)
-const MASS_RATIO_SUN_MARS_SYSTEM = 3098703.59;
-const MASS_RATIO_SUN_MARS_ALONE  = 3098703.71;
+const MASS_RATIO_SUN_MARS_SYSTEM = K.physicalConstants.massRatioDE440.mars;
+const MASS_RATIO_SUN_MARS_ALONE  = K.physicalConstants.massRatioDE440Alone.mars;
 const GM_MARS_SYSTEM = GM_SUN / MASS_RATIO_SUN_MARS_SYSTEM;
 const GM_MARS_ALONE  = GM_SUN / MASS_RATIO_SUN_MARS_ALONE;
 const M_MARS_SYSTEM  = GM_MARS_SYSTEM / G_CONSTANT;
 const M_MARS_ALONE   = GM_MARS_ALONE / G_CONSTANT;
 
 // Jupiter (Galileans + small moons = 207 ppm of system)
-const MASS_RATIO_SUN_JUPITER_SYSTEM = 1047.348625;
-const MASS_RATIO_SUN_JUPITER_ALONE  = 1047.5655;
+const MASS_RATIO_SUN_JUPITER_SYSTEM = K.physicalConstants.massRatioDE440.jupiter;
+const MASS_RATIO_SUN_JUPITER_ALONE  = K.physicalConstants.massRatioDE440Alone.jupiter;
 const GM_JUPITER_SYSTEM = GM_SUN / MASS_RATIO_SUN_JUPITER_SYSTEM;
 const GM_JUPITER_ALONE  = GM_SUN / MASS_RATIO_SUN_JUPITER_ALONE;
 const M_JUPITER_SYSTEM  = GM_JUPITER_SYSTEM / G_CONSTANT;
 const M_JUPITER_ALONE   = GM_JUPITER_ALONE / G_CONSTANT;
 
 // Saturn (Titan + others = 247 ppm of system)
-const MASS_RATIO_SUN_SATURN_SYSTEM = 3497.9018;
-const MASS_RATIO_SUN_SATURN_ALONE  = 3498.7667;
+const MASS_RATIO_SUN_SATURN_SYSTEM = K.physicalConstants.massRatioDE440.saturn;
+const MASS_RATIO_SUN_SATURN_ALONE  = K.physicalConstants.massRatioDE440Alone.saturn;
 const GM_SATURN_SYSTEM = GM_SUN / MASS_RATIO_SUN_SATURN_SYSTEM;
 const GM_SATURN_ALONE  = GM_SUN / MASS_RATIO_SUN_SATURN_ALONE;
 const M_SATURN_SYSTEM  = GM_SATURN_SYSTEM / G_CONSTANT;
 const M_SATURN_ALONE   = GM_SATURN_ALONE / G_CONSTANT;
 
 // Uranus (major moons = 105 ppm of system)
-const MASS_RATIO_SUN_URANUS_SYSTEM = 22902.944;
-const MASS_RATIO_SUN_URANUS_ALONE  = 22905.343;
+const MASS_RATIO_SUN_URANUS_SYSTEM = K.physicalConstants.massRatioDE440.uranus;
+const MASS_RATIO_SUN_URANUS_ALONE  = K.physicalConstants.massRatioDE440Alone.uranus;
 const GM_URANUS_SYSTEM = GM_SUN / MASS_RATIO_SUN_URANUS_SYSTEM;
 const GM_URANUS_ALONE  = GM_SUN / MASS_RATIO_SUN_URANUS_ALONE;
 const M_URANUS_SYSTEM  = GM_URANUS_SYSTEM / G_CONSTANT;
 const M_URANUS_ALONE   = GM_URANUS_ALONE / G_CONSTANT;
 
 // Neptune (Triton + others = 210 ppm of system)
-const MASS_RATIO_SUN_NEPTUNE_SYSTEM = 19412.237;
-const MASS_RATIO_SUN_NEPTUNE_ALONE  = 19416.299;
+const MASS_RATIO_SUN_NEPTUNE_SYSTEM = K.physicalConstants.massRatioDE440.neptune;
+const MASS_RATIO_SUN_NEPTUNE_ALONE  = K.physicalConstants.massRatioDE440Alone.neptune;
 const GM_NEPTUNE_SYSTEM = GM_SUN / MASS_RATIO_SUN_NEPTUNE_SYSTEM;
 const GM_NEPTUNE_ALONE  = GM_SUN / MASS_RATIO_SUN_NEPTUNE_ALONE;
 const M_NEPTUNE_SYSTEM  = GM_NEPTUNE_SYSTEM / G_CONSTANT;
 const M_NEPTUNE_ALONE   = GM_NEPTUNE_ALONE / G_CONSTANT;
 
 // Pluto (Charon binary — ALONE differs from SYSTEM by 10.85%, visible in panel)
-const MASS_RATIO_SUN_PLUTO_SYSTEM = 136045556;
-const MASS_RATIO_SUN_PLUTO_ALONE  = 152610777;
+const MASS_RATIO_SUN_PLUTO_SYSTEM = K.physicalConstants.massRatioDE440.pluto;
+const MASS_RATIO_SUN_PLUTO_ALONE  = K.physicalConstants.massRatioDE440Alone.pluto;
 const GM_PLUTO_SYSTEM = GM_SUN / MASS_RATIO_SUN_PLUTO_SYSTEM;
 const GM_PLUTO_ALONE  = GM_SUN / MASS_RATIO_SUN_PLUTO_ALONE;
 const M_PLUTO_SYSTEM  = GM_PLUTO_SYSTEM / G_CONSTANT;
 const M_PLUTO_ALONE   = GM_PLUTO_ALONE / G_CONSTANT;
 
 // Ceres: Mass from Dawn spacecraft (2015-2018)
-const GM_CERES = 62.6274;                            // km³/s² (Dawn radiometric tracking)
+const GM_CERES = K.physicalConstants.smallBodyMasses.ceresGmKm3PerS2;  // km³/s² (Dawn radiometric tracking)
 const M_CERES = GM_CERES / G_CONSTANT;               // ~9.38 × 10²⁰ kg
 
 // Halley's Comet: Mass estimated from size (~11×8×8 km) and density (~0.6 g/cm³)
 // No spacecraft has orbited it, so mass is approximate
-const M_HALLEYS = 2.2e14;                            // ~2.2 × 10¹⁴ kg (estimated)
+const M_HALLEYS = K.physicalConstants.smallBodyMasses.halleysMassKg;   // ~2.2 × 10¹⁴ kg (estimated)
 const GM_HALLEYS = M_HALLEYS * G_CONSTANT;           // ~1.47 × 10⁻⁵ km³/s²
 
 // 433 Eros: Mass precisely measured by NEAR Shoemaker spacecraft (2000-2001)
-const M_EROS = 6.687e15;                             // 6.687 × 10¹⁵ kg (measured)
+const M_EROS = K.physicalConstants.smallBodyMasses.erosMassKg;         // 6.687 × 10¹⁵ kg (measured)
 const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s²
 
 // ─── E2c. Derived planet inclination parameters (Fibonacci Laws) ────────
@@ -4729,8 +4811,11 @@ const halleysRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/
 // ═════════════════════════════════════════════════════════════════
 
 // ───── Tidal evolution rates ─────
-const CANONICAL_TIDAL_RATE_HR_PER_MA = 0.00526;     // Wells 1963 Phanerozoic / Patterson inverse
-const MODERN_TIDAL_RATE_HR_PER_MA    = 0.006;       // LLR-measured lunar-only (≈ 2.16 ms/century)
+// DELETED: CANONICAL_TIDAL_RATE_HR_PER_MA (0.00526, Wells 1963 Phanerozoic /
+// Patterson inverse) and MODERN_TIDAL_RATE_HR_PER_MA (0.006, LLR-measured
+// lunar-only). Both were declared and never referenced. The live tidal chain
+// runs through ALPHA_1 and meanLodSecondsAtAge; these two carried citations but
+// no callers. scripts/test_phase0_inline.js keeps its own mirrored copies.
 
 // ───── Earth physical constants ─────
 // EARTH_MOI_FACTOR (α at J2000) lives in section C3 "Deep-time physics anchors" near the top.
@@ -5438,8 +5523,10 @@ const HALLSTATT_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / HALLSTATT_L
 const HALLSTATT_OMEGA                  = 2 * Math.PI / HALLSTATT_PERIOD_YR;
 const HALLSTATT_COS_COEFF_S            = -72.94533763545279;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
 const HALLSTATT_SIN_COEFF_S            = 32.84779623125113;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
-const HALLSTATT_TAPER_FULL_HALFWIDTH_YR  = 300000;                 // same as Bond (widened 2026-07-12)
-const HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR = 400000;                 // same as Bond (widened 2026-07-12)
+// "same as Bond" is now enforced rather than asserted: all four ΔT channels read
+// the single JSON pair, so widening the taper moves them together.
+const HALLSTATT_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
+const HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;
 const HALLSTATT_DT_RAW_AT_J2000        = HALLSTATT_COS_COEFF_S * Math.cos(HALLSTATT_OMEGA * 2000)
                                        + HALLSTATT_SIN_COEFF_S * Math.sin(HALLSTATT_OMEGA * 2000);
 
@@ -5517,8 +5604,8 @@ const JOSE5_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE5_LATTICE_N
 const JOSE5_OMEGA                  = 2 * Math.PI / JOSE5_PERIOD_YR;
 const JOSE5_COS_COEFF_S            = -34.55484512708396;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
 const JOSE5_SIN_COEFF_S            = 36.13810562610113;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
-const JOSE5_TAPER_FULL_HALFWIDTH_YR  = 300000;                    // same as Bond/Hallstatt (widened 2026-07-12)
-const JOSE5_TAPER_TOTAL_HALFWIDTH_YR = 400000;                    // same as Bond/Hallstatt (widened 2026-07-12)
+const JOSE5_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
+const JOSE5_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;
 const JOSE5_DT_RAW_AT_J2000        = JOSE5_COS_COEFF_S * Math.cos(JOSE5_OMEGA * 2000)
                                    + JOSE5_SIN_COEFF_S * Math.sin(JOSE5_OMEGA * 2000);
 
@@ -5568,8 +5655,8 @@ const JOSE4_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE4_LATTICE_N
 const JOSE4_OMEGA                  = 2 * Math.PI / JOSE4_PERIOD_YR;
 const JOSE4_COS_COEFF_S            = 38.592083031774166;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
 const JOSE4_SIN_COEFF_S            = -31.7907396464544;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
-const JOSE4_TAPER_FULL_HALFWIDTH_YR  = 300000;                   // same as Bond/Hallstatt/Jose5 (widened 2026-07-12)
-const JOSE4_TAPER_TOTAL_HALFWIDTH_YR = 400000;                   // same as Bond/Hallstatt/Jose5 (widened 2026-07-12)
+const JOSE4_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
+const JOSE4_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;
 const JOSE4_DT_RAW_AT_J2000        = JOSE4_COS_COEFF_S * Math.cos(JOSE4_OMEGA * 2000)
                                     + JOSE4_SIN_COEFF_S * Math.sin(JOSE4_OMEGA * 2000);
 
@@ -5880,8 +5967,12 @@ function resonatorSwingLodRate(year) {
 // is 0 within ±300000 yr of J2000 → the "raw − raw@J2000" term drops out and
 // only `raw'(y)` contributes at J2000.
 function _dtCycleTaperDerivative(year) {
-  const HW_FULL = 300000;
-  const HW_TOTAL = 400000;
+  // The FIFTH copy of the taper halfwidths, and the easiest to miss because it
+  // is function-local rather than a top-level const. The derivative has to use
+  // the same window as the taper it differentiates, so it reads the same JSON
+  // pair as the four channel constants.
+  const HW_FULL = K.deepTime.dtStackTaperFullHalfwidthYr;
+  const HW_TOTAL = K.deepTime.dtStackTaperTotalHalfwidthYr;
   const dy = Math.abs(year - 2000);
   if (dy <= HW_FULL) return 0;
   if (dy >= HW_TOTAL) return 0;
@@ -8073,8 +8164,9 @@ for (const k of PLANET_KEYS) {
   _planetPerihelionSigns[k]    = sign;
 }
 
-// Earth equivalents — perihelion cycle (H/16, divisor=16)
-const EARTH_ECC_DIVISOR_N = 16;
+// DELETED: EARTH_ECC_DIVISOR_N = 16 (Earth perihelion cycle, H/16). Declared and
+// never referenced. The live H/16 relationship is carried by
+// perihelionCycleLength and by the perihelionEclipticFraction pairs in the JSON.
 
 // ───── PHASE 6.7 — Simulation time units (sDay/sYear/sMonth/sWeek/sHour/sMinute/sSecond) ─────
 // Re-derives the 7 time-unit conversion factors from the now-mutable
@@ -26662,7 +26754,7 @@ function deltaTEspenakMeeusRaw(year) {
 // re-anchor the reference curve to our model's ΔT(J2000) = 0 convention.
 // Computed from the polynomial at t=0, kept as a literal so a stale poly
 // coefficient bump doesn't silently drift the anchor.
-const DELTA_T_ESPENAK_J2000_S = 62.92;
+const DELTA_T_ESPENAK_J2000_S = R.externalCurveAnchors.deltaTEspenakJ2000Seconds;
 
 /** Espenak/Meeus ΔT re-anchored to ΔT(J2000) = 0 so it plots on the same
  *  axis as our model. */
@@ -59566,7 +59658,10 @@ function perihelionLongitudeEcliptic(precessionLayer, longitudePerihelion) {
 
 const JD_1800 = 2378496.5;  // ~January 1, 1800
 const JD_1900 = 2415191.5;  // ~January 1, 1900
-const JD_2000 = 2451716.5;  // June 21, 2000 (model start)
+// JD_2000 is the model start, i.e. the same quantity as foundational.startmodelJD
+// — it was a fourth copy of 2451716.5. The other three are plain calendar
+// reference points with no JSON entry, so only this one is sourced.
+const JD_2000 = K.foundational.startmodelJD;  // June 21, 2000 (model start)
 const JD_2100 = 2488069.5;  // ~January 1, 2100
 
 // Cache for perihelion values by Julian Day (calculated once on demand per JD)
@@ -61911,13 +62006,14 @@ function computeAnomalisticYearSecFromDaysFourier(currentYear, lengthofDay) {
 // for the surviving architecture.
 // ═══════════════════════════════════════════════════════════════════════════
 
-// LOD_ANCHOR_YEAR / LOD_ANCHOR_VALUE_SEC — retained for diagnostic reference.
-// After the 2026-07-14 investigation, the layered design was simplified: cycles are NOT
-// added to instantaneous LOD (they're ΔT residuals added post-integration). The framework's
-// physics (meanLodSecondsAtAge) at year 2000 gives ~86400.002745 by construction — this IS
-// the effective anchor, no calibration override needed.
-const LOD_ANCHOR_YEAR = 2000;
-const LOD_ANCHOR_VALUE_SEC = 86400.0024286198;
+// LOD_ANCHOR_YEAR / LOD_ANCHOR_VALUE_SEC were DELETED. They were retained as
+// "diagnostic reference" after the layered design was simplified — cycles are ΔT
+// residuals added post-integration, not added to instantaneous LOD, so no
+// calibration override is needed and nothing read them. Worse, the retained
+// value (86400.0024286198) disagreed with the figure its own comment quoted for
+// meanLodSecondsAtAge at year 2000 (~86400.002745), and it sat as a FOURTH
+// day-length value beside SI 86400, LOD_mean and LOD_real — exactly the
+// confusion the units discipline exists to prevent.
 
 /** LOD contribution from a ΔT-residual cyclic correction (Bond, Hallstatt) in seconds.
  *

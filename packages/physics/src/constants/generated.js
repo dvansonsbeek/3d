@@ -5,12 +5,17 @@
  * Source of truth: public/input/{model-parameters,astro-reference}.json
  * Classification and rationale: tools/constants/generate.mjs
  *
- * Deliberately EXCLUDED (§2d) — validation targets must never be injectable, or
- * a counterfactual could move the goalposts it is judged by:
+ * Two exports, deliberately separate (§2d):
+ *
+ *   DEFAULT_CONSTANTS  free parameters + measured anchors. INJECTABLE — this is
+ *                      the counterfactual surface, and what the hash covers.
+ *   REFERENCE_DATA     validation targets + presentation. Single-sourced so
+ *                      nothing duplicates them, but NOT injectable:
  *   ascendingNodesSouamiSouchay      target
  *   laplaceLagrangeBounds            target
  *   jplEclipticInclinationTrends     target
  *   eigenmodePhasesLaplaceLagrange   target
+ *   externalCurveAnchors             target
  *   knownValues                      target
  *   galaxyMotion                     presentation
  *
@@ -22,16 +27,22 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "f60956ce5df05db0";
+export const CONSTANTS_HASH = "2addbd3960fcef0f";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "f60956ce5df05db0",
+  hash: "2addbd3960fcef0f",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
       "orbitalEccentricityBase": 0.2488273,
       "type": "I",
+      "angleCorrection": 2.469281,
+      "startpos": 71.555,
+      "perihelionEclipticFraction": [
+        1,
+        1
+      ],
       "ascendingNodeInvPlane": 101.06,
       "inclinationCycleAnchor": 203.32,
       "invPlaneInclinationMean": 15.7162,
@@ -41,6 +52,12 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "name": "Halley's",
       "orbitalEccentricityBase": 0.96714291,
       "type": "III",
+      "angleCorrection": -1.619816,
+      "startpos": 80,
+      "perihelionEclipticFraction": [
+        1,
+        1
+      ],
       "ascendingNodeInvPlane": 59.56,
       "inclinationCycleAnchor": 23.3195,
       "invPlaneInclinationMean": 150,
@@ -50,6 +67,12 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "name": "Eros",
       "orbitalEccentricityBase": 0.2229512,
       "type": "II",
+      "angleCorrection": 0.047888,
+      "startpos": 57.402,
+      "perihelionEclipticFraction": [
+        1,
+        1
+      ],
       "ascendingNodeInvPlane": 10.36,
       "inclinationCycleAnchor": 203.3195,
       "invPlaneInclinationMean": 9.25,
@@ -59,6 +82,12 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "name": "Ceres",
       "orbitalEccentricityBase": 0.0755347,
       "orbitDistanceOverride": 2.76596,
+      "angleCorrection": 0,
+      "startpos": 0,
+      "perihelionEclipticFraction": [
+        1,
+        1
+      ],
       "ascendingNodeInvPlane": 80.89,
       "inclinationCycleAnchor": 203.3195,
       "invPlaneInclinationMean": 0.43,
@@ -69,21 +98,62 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "pluto": {
       "solarYearInput": 90465,
       "orbitalEccentricityJ2000": 0.2488273,
-      "invPlaneInclinationJ2000": 15.5639473
+      "eclipticInclinationJ2000": 17.14001,
+      "invPlaneInclinationJ2000": 15.5639473,
+      "axialTiltJ2000": 57.47,
+      "longitudePerihelion": 224.06891,
+      "ascendingNode": 110.30393,
+      "meanAnomaly": 15.55009,
+      "trueAnomaly": 26.31965048
     },
     "halleys": {
       "solarYearInput": 27503,
-      "orbitalEccentricityJ2000": 0.96714291
+      "orbitalEccentricityJ2000": 0.96714291,
+      "eclipticInclinationJ2000": 162.26269,
+      "invPlaneInclinationJ2000": 150,
+      "axialTiltJ2000": 0,
+      "longitudePerihelion": 111.33249,
+      "ascendingNode": 58.42008,
+      "meanAnomaly": 38.77481,
+      "trueAnomaly": 166.26774708
     },
     "eros": {
       "solarYearInput": 642.93,
-      "orbitalEccentricityJ2000": 0.2229512
+      "orbitalEccentricityJ2000": 0.2229512,
+      "eclipticInclinationJ2000": 10.8276,
+      "invPlaneInclinationJ2000": 9.25,
+      "axialTiltJ2000": 0,
+      "longitudePerihelion": 178.81322,
+      "ascendingNode": 304.30993,
+      "meanAnomaly": 320.21552,
+      "trueAnomaly": 299.9171374
     },
     "ceres": {
       "solarYearInput": 1680.5,
       "orbitalEccentricityJ2000": 0.0755347,
-      "invPlaneInclinationJ2000": 0.4331698
+      "eclipticInclinationJ2000": 10.59407,
+      "invPlaneInclinationJ2000": 0.4331698,
+      "axialTiltJ2000": 4,
+      "longitudePerihelion": 73.59769,
+      "ascendingNode": 80.30533,
+      "meanAnomaly": 95.98772,
+      "trueAnomaly": 104.48097667
     }
+  },
+  bodyDiametersKm: {
+    "sun": 1392684,
+    "moon": 3474.8,
+    "earth": 12756.27,
+    "mercury": 4879.4,
+    "venus": 12103.6,
+    "mars": 6779,
+    "jupiter": 139822,
+    "saturn": 116464,
+    "uranus": 50724,
+    "neptune": 49244,
+    "pluto": 2376.6,
+    "halleys": 11,
+    "eros": 16.84
   },
   cardinalPointAnchors: {
     "SS": 2451716.5748,
@@ -198,7 +268,21 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "jupiter": 1047.348625,
       "saturn": 3497.9018,
       "uranus": 22902.944,
-      "neptune": 19412.237
+      "neptune": 19412.237,
+      "pluto": 136045556
+    },
+    "massRatioDE440Alone": {
+      "mars": 3098703.71,
+      "jupiter": 1047.5655,
+      "saturn": 3498.7667,
+      "uranus": 22905.343,
+      "neptune": 19416.299,
+      "pluto": 152610777
+    },
+    "smallBodyMasses": {
+      "ceresGmKm3PerS2": 62.6274,
+      "erosMassKg": 6687000000000000,
+      "halleysMassKg": 220000000000000
     },
     "earthJ2": 0.00108262668,
     "earthEquatorialRadiusKm": 6378.1366
@@ -466,5 +550,110 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "solarDay": 86400,
     "siderealDay": 86164.09053083288,
     "stellarDay": 86164.0989036905
+  },
+});
+
+/**
+ * Validation targets and presentation data — SINGLE-SOURCED BUT NOT INJECTABLE.
+ *
+ * These are deliberately absent from DEFAULT_CONSTANTS. `createModel` never
+ * accepts them, so a counterfactual cannot move the goalposts it is judged by:
+ * laplaceLagrangeBounds is the bound Saturn fails in verify-laws (44/45), and
+ * making it injectable would let that documented failure be configured away.
+ *
+ * They are still emitted, because "must not be injectable" and "may be
+ * duplicated as literals" are different claims. Before this export existed,
+ * script.js carried its own copies of all of them with nothing keeping the two
+ * in step — they happened to agree, by nobody's design.
+ *
+ * @type {Readonly<Record<string, unknown>>}
+ */
+export const REFERENCE_DATA = Object.freeze({
+  ascendingNodesSouamiSouchay: {
+    "earth": 284.51,
+    "mercury": 32.22,
+    "venus": 52.31,
+    "mars": 352.95,
+    "jupiter": 306.92,
+    "saturn": 122.27,
+    "uranus": 308.44,
+    "neptune": 189.28,
+    "pluto": 107.06,
+    "halleys": 59.56,
+    "eros": 10.36,
+    "ceres": 80.89
+  },
+  eigenmodePhasesLaplaceLagrange: {
+    "gamma1": 20.23,
+    "gamma2": 318.3,
+    "gamma3": 255.6,
+    "gamma4": 296.9,
+    "gamma6": 127.3,
+    "gamma7": 315.6,
+    "gamma8": 202.8
+  },
+  externalCurveAnchors: {
+    "deltaTEspenakJ2000Seconds": 62.92
+  },
+  galaxyMotion: {
+    "milkywayDistance": 27500,
+    "sunSpeed": 828000,
+    "greatattractorDistance": 200000000,
+    "milkywaySpeed": 2160000
+  },
+  jplEclipticInclinationTrends: {
+    "mercury": -0.00595,
+    "venus": -0.00079,
+    "mars": -0.00813,
+    "jupiter": -0.00184,
+    "saturn": 0.00194,
+    "uranus": -0.00243,
+    "neptune": 0.00035,
+    "pluto": -0.001
+  },
+  knownValues: {
+    "jupiterSaturnConjunctionPeriod": 19.859,
+    "moonSynodicMonth": 29.530589,
+    "moonTropicalMonth": 27.321582,
+    "moonNodalPrecessionYears": 18.613,
+    "moonApsidalPrecessionYears": 8.849,
+    "moonDraconicYear": 346.62,
+    "fullMoonCycleDays": 411.78,
+    "sarosDays": 6585.32,
+    "exeligmosDays": 19755.96
+  },
+  laplaceLagrangeBounds: {
+    "mercury": [
+      4.57,
+      9.86
+    ],
+    "venus": [
+      0,
+      3.38
+    ],
+    "earth": [
+      0,
+      2.95
+    ],
+    "mars": [
+      0,
+      5.84
+    ],
+    "jupiter": [
+      0.241,
+      0.489
+    ],
+    "saturn": [
+      0.797,
+      1.02
+    ],
+    "uranus": [
+      0.902,
+      1.11
+    ],
+    "neptune": [
+      0.554,
+      0.8
+    ]
   },
 });

@@ -16,6 +16,7 @@
  *   exit 1 — a counterfactual is not expressible; §2d has regressed
  */
 import { createModel, DEFAULT_CONSTANTS, CONSTANTS_HASH } from '../src/index.js';
+import { REFERENCE_DATA } from '../src/constants/index.js';
 
 let failed = 0;
 /**
@@ -82,14 +83,24 @@ check('an explicit copy of the defaults is still the default',
 check('mutating the returned context is impossible',
   (() => { try { /** @type {any} */ (base.constants).foundational = null; return false; } catch { return true; } })());
 
-// ── validation targets must be absent (§2d) ──────────────────────────────────
-// If one were injectable, a counterfactual could move the goalposts it is
-// judged by. laplaceLagrangeBounds is the bound Saturn fails in verify-laws.
-for (const t of ['laplaceLagrangeBounds', 'knownValues', 'ascendingNodesSouamiSouchay',
-                 'jplEclipticInclinationTrends', 'eigenmodePhasesLaplaceLagrange']) {
-  check(`validation target absent: ${t}`, !(t in DEFAULT_CONSTANTS));
+// ── validation targets: absent AND refused (§2d) ─────────────────────────────
+// Absence alone only defeats the spread form `{...DEFAULT_CONSTANTS, x}`;
+// nothing stopped a caller passing a bound explicitly. Saturn fails its
+// Laplace-Lagrange bound in verify-laws (44/45), so a counterfactual able to
+// widen that bound would be measuring itself. Both properties are asserted.
+for (const t of Object.keys(REFERENCE_DATA)) {
+  check(`not injectable: ${t}`, !(t in DEFAULT_CONSTANTS));
+  check(`REFUSED if passed: ${t}`, (() => {
+    try { createModel({ ...DEFAULT_CONSTANTS, [t]: {} }); return false; } catch { return true; }
+  })());
 }
-check('presentation data absent: galaxyMotion', !('galaxyMotion' in DEFAULT_CONSTANTS));
+
+// The other half of the same design: reference data must still be REACHABLE, or
+// script.js goes back to keeping its own literal copies of all of it.
+check('REFERENCE_DATA carries the validation targets',
+  Object.keys(REFERENCE_DATA).length >= 6,
+  Object.keys(REFERENCE_DATA).join(', '));
+check('REFERENCE_DATA is frozen', Object.isFrozen(REFERENCE_DATA));
 
 console.log(`\n${'='.repeat(74)}`);
 if (failed) {

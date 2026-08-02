@@ -74,6 +74,172 @@ const MIGRATED = [
   'model.moon.moonStartposNodal',
   'model.moon.moonStartposMoon',
   'model.moon.moonMeeusLpCorrection',
+
+  // Phase 5f block 4 — astro.physicalConstants. Listed per-path rather than by
+  // prefix: earthJ2 and earthEquatorialRadiusKm are Node-side (NOT_IN_SCRIPT)
+  // and massRatioDE440 is not migrated, and MIGRATED is matched FIRST, so a
+  // prefix here would falsely claim all three.
+  //
+  // Four of these carry short local names in script.js that differ from their
+  // JSON keys — earthMoiFactorJ2000 -> EARTH_MOI_FACTOR, solarLuminosityW ->
+  // L_SUN_W, solarWindMassLossKgPerS -> SOLAR_WIND_KG_PER_S. That mapping used
+  // to live only inside export-to-script.js.
+  'astro.physicalConstants.currentAUDistance',
+  'astro.physicalConstants.speedOfLight',
+  'astro.physicalConstants.G_CONSTANT',
+  'astro.physicalConstants.MASS_RATIO_EARTH_MOON',
+  'astro.physicalConstants.earthMoiFactorJ2000',
+  'astro.physicalConstants.solarLuminosityW',
+  'astro.physicalConstants.solarWindMassLossKgPerS',
+  'astro.earthOrbital.perihelionalignmentYear',
+
+  // Phase 5f block 5 — astro.earthOrbital, minus obliquityJ2000_deg.
+  //
+  // obliquityJ2000_deg is NOT migrated ON PURPOSE. script.js holds IAU 2006
+  // (84381.406") and the JSON still holds IAU 1976/1980 (84381.448"), so
+  // importing would pull the OLD standard into the browser — the wrong
+  // direction. It migrates once the 6a->6b refit lands; see KNOWN_DIVERGENCE.
+  'astro.earthOrbital.obliquityRate_arcsecPerCentury',
+  'astro.earthOrbital.earthInclinationJ2000_deg',
+  'astro.earthOrbital.sunMeanLongitudeJ2000_deg',
+  'astro.earthOrbital.perihelionPassageJ2000_JD',
+  'astro.earthOrbital.juneSolstice2000_JD',
+  'astro.earthOrbital.earthInclinationCycleAnchor',
+  'astro.earthOrbital.deltaTStart',
+  'astro.earthOrbital.sunTilt',
+
+  // The three ELP W1 T^2 terms script.js actually consumes. The other three in
+  // that JSON block (tides* pair, IAU2006 variant) are analysis-only.
+  'astro.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.planetary',
+  'astro.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.earthFigureJ2',
+  'astro.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976',
+
+  // Phase 5f block 6 — astro.moonReference (moonInclinationConstantBrownELP is
+  // the documented Brown/ELP partner constant and is not carried by script.js)
+  // and the whole of astro.moonMeeus.
+  'astro.moonReference.moonSiderealMonthInput',
+  'astro.moonReference.moonApsidalPrecessionDaysInputICRF',
+  'astro.moonReference.moonNodalPrecessionDaysInputICRF',
+  'astro.moonReference.moonDistance',
+  'astro.moonReference.moonEclipticInclinationJ2000',
+  'astro.moonReference.moonOrbitalEccentricityBase',
+  'astro.moonReference.moonObliquityEclipticJ2000',
+  'astro.moonReference.moonTilt',
+  'astro.moonMeeus.moonMeanAnomalyJ2000_deg',
+  'astro.moonMeeus.moonMeanAnomalyRate_degPerDay',
+  'astro.moonMeeus.moonMeanElongationJ2000_deg',
+  'astro.moonMeeus.moonMeanElongationRate_degPerDay',
+  'astro.moonMeeus.sunMeanAnomalyJ2000_deg',
+  'astro.moonMeeus.sunMeanAnomalyRate_degPerDay',
+  'astro.moonMeeus.moonArgLatJ2000_deg',
+  'astro.moonMeeus.moonArgLatRate_degPerCentury',
+  'astro.moonMeeus.moonMeanElongationJ2000Full_deg',
+  'astro.moonMeeus.moonMeanElongationRate_degPerCentury',
+
+  // Phase 5f block 7 — astro.yearLengthRef. Local names carry a `J2000` suffix
+  // the JSON keys lack, marking them as the fixed anchors as opposed to the
+  // epoch-dependent values recomputeEpochAnchors produces. iauPrecessionJ2000
+  // stays out: script.js derives it (see NOT_IN_SCRIPT).
+  'astro.yearLengthRef.tropicalYearVE',
+  'astro.yearLengthRef.tropicalYearSS',
+  'astro.yearLengthRef.tropicalYearAE',
+  'astro.yearLengthRef.tropicalYearWS',
+  'astro.yearLengthRef.tropicalYearMean',
+  'astro.yearLengthRef.tropicalYearRateSecPerCentury',
+  'astro.yearLengthRef.anomalisticYear',
+  'astro.yearLengthRef.siderealYear',
+  'astro.yearLengthRef.solarDay',
+  'astro.yearLengthRef.siderealDay',
+  'astro.yearLengthRef.stellarDay',
+
+  // Phase 5f block 8 — all seven planets, both sources, plus the perihelion
+  // passage reference JDs. Prefixes are safe here: every leaf under these three
+  // roots is migrated.
+  //
+  // NOT migrated: perihelionEclipticYears / axialPrecessionYears /
+  // obliquityCycle. Those encode the H-lattice fractions the JSON stores as
+  // integer pairs ([8,11] written as H/(1+3/8)), so importing them would change
+  // the expression's form rather than its source. Phase 6 owns that.
+  'model.planets',
+  'astro.planetOrbitalElements',
+  'model.perihelionPassageRef',
+
+  // Phase 5f block 9 — DE440 mass ratios, deep-time alphas and tapers, the two
+  // Earth eccentricity anchors, and the four additional bodies.
+  //
+  // The Ceres migration FIXED A BUG: script.js had ascendingNodeInvPlane 10.36,
+  // verbatim Eros's value from the block above. Ceres is 80.89 — a figure the
+  // same file already carried as ceresAscendingNodeInvPlaneSouamiSouchay with a
+  // Souami & Souchay (2012) citation. A value-presence check could never find
+  // this: the key repeats across bodies so name-matching is off, and 80.89 does
+  // appear in the file, just under the other name. Importing removes the class
+  // of error entirely.
+  'astro.physicalConstants.massRatioDE440',
+  'model.deepTime.alpha3PerMa3',
+  'model.deepTime.alpha4PerMa4',
+  'model.deepTime.alphaClimateScalePerMille',
+  'model.deepTime.dtStackTaperFullHalfwidthYr',
+  'model.deepTime.dtStackTaperTotalHalfwidthYr',
+  'astro.earthOrbital.earthEccentricityJ2000',
+  'astro.earthOrbital.earthEccentricityDotJ2000',
+  'model.additionalBodies',
+
+  // Phase 5f block 10 — the H-lattice fraction pairs. script.js wrote these as
+  // hand-rolled arithmetic (`-holisticyearLength*8/65`) while the integer pairs
+  // sat in the JSON; latticeYears() now derives them. Verified bit-identical for
+  // all 21 (7 planets x peri/axial/obliquity) before the change.
+  'model.planets.mercury.perihelionEclipticFraction',
+  'model.planets.venus.perihelionEclipticFraction',
+
+  // Phase 5f block 11 — masses that had NO JSON source until now. The
+  // planet-ALONE ratios, Pluto (system and alone, 10.85% apart because of
+  // Charon), and the three small-body masses lived only as literals in
+  // script.js. Mercury/Venus/Earth-alone stay derived: no moons, so ALONE
+  // equals SYSTEM and a second stored copy would be a drift channel.
+  'astro.physicalConstants.massRatioDE440Alone',
+  'astro.physicalConstants.smallBodyMasses',
+
+  // Phase 5f block 12 — REFERENCE_DATA. Validation targets and presentation
+  // data now imported from the generator's second export rather than kept as
+  // literals. Single-sourced but NOT injectable: createModel refuses these keys,
+  // so a counterfactual still cannot move the goalposts it is judged by (§2d).
+  'astro.jplEclipticInclinationTrends',
+  'astro.laplaceLagrangeBounds',
+  'astro.ascendingNodesSouamiSouchay',
+  'astro.galaxyMotion',
+
+  // Phase 5f block 13 — the constants a manual read found after the automated
+  // sweep had reported clean. Body diameters (previously no JSON source at all,
+  // and NOT presentation: they yield R_EARTH_M and the eclipse radii), the full
+  // orbital-element set for the four additional bodies (only 2-3 of 8 fields
+  // per body had a JSON home), and three that my own allowlist had wrongly
+  // excluded — the last of which was diverging.
+  'astro.bodyDiametersKm',
+  'astro.additionalBodiesReference',
+  'model.deepTime.alpha1PerMa',
+  'astro.earthOrbital.earthEccentricityDotDotJ2000',
+  'astro.earthOrbital.earthPerihelionLongitudeJ2000',
+
+  // Phase 5f block 14 — the last three per additional body: angleCorrection,
+  // startpos and the perihelionEclipticFraction [1,1]. All four bodies now go
+  // through latticeYears() like the seven planets, so no hand-written lattice
+  // arithmetic remains anywhere in script.js.
+  'model.additionalBodies.pluto.angleCorrection',
+  'model.additionalBodies.pluto.startpos',
+  'model.additionalBodies.halleys.angleCorrection',
+  'model.additionalBodies.halleys.startpos',
+  'model.additionalBodies.eros.angleCorrection',
+  'model.additionalBodies.eros.startpos',
+  'model.additionalBodies.ceres.angleCorrection',
+  'model.additionalBodies.ceres.startpos',
+
+  // Phase 5f block 15 — earthAscendingNodeInvPlaneVerified. Same NUMBER as
+  // ascendingNodesSouamiSouchay.earth (284.51), different ROLE: this is the node
+  // the model ADOPTS, so it is an input and comes from the injectable anchor
+  // block; the S&S entry is the catalog value for the parallel
+  // EclipticInclinationSouamiSouchayDynamic comparison and stays in
+  // REFERENCE_DATA. Classification turns on function, not on value.
+  'astro.earthOrbital.earthAscendingNodeInvPlane',
 ];
 
 /**
@@ -92,11 +258,30 @@ const NOT_IN_SCRIPT = {
     + 'model, and the identity is used for internal consistency. Derived, so not a '
     + 'duplicated literal.',
   'model.earth.eccentricityAmplitudeK': 'consumed by tools/lib; script.js derives it',
-  'model.deepTime.alpha1PerMa': 'deep-time engine is Node-side (tools/lib/deep-time.js)',
-  'astro.earthOrbital.earthEccentricityDotDotJ2000': 'second derivative used by tools/lib only',
-  'astro.earthOrbital.earthPerihelionLongitudeJ2000': 'script.js derives perihelion longitude from the model',
+  // Three entries were REMOVED from here after review — all three were wrong,
+  // and all three hid a real copy in script.js:
+  //   alpha1PerMa                   -> script.js ALPHA_1, identical
+  //   earthEccentricityDotDotJ2000  -> ASTRO_REFERENCE.eccentricityDotDotJ2000, identical
+  //   earthPerihelionLongitudeJ2000 -> perihelionLongitudeJ2000_deg, DIVERGED by 0.684"
+  // See the LIMITATION note on the anti-masking guard below: it compares by key
+  // NAME, so a renamed copy slips past it. All three were renamed.
   'astro.physicalConstants.earthJ2': 'used by tools/lib figure-of-Earth term',
   'astro.physicalConstants.earthEquatorialRadiusKm': 'used by tools/lib figure-of-Earth term',
+
+  // The four additional bodies carry their eccentricity TWICE in the JSON —
+  // astro.additionalBodiesReference.<b>.orbitalEccentricityJ2000 and
+  // model.additionalBodies.<b>.orbitalEccentricityBase — with identical values
+  // (verified for all four). script.js holds one literal, now imported from the
+  // model side, so the astro-side key has no separate copy to check. The two
+  // JSON entries are themselves a duplication worth collapsing one day.
+  'astro.additionalBodiesReference.pluto.orbitalEccentricityJ2000':
+    'duplicate of model.additionalBodies.pluto.orbitalEccentricityBase (identical); script.js imports the model side',
+  'astro.additionalBodiesReference.halleys.orbitalEccentricityJ2000':
+    'duplicate of model.additionalBodies.halleys.orbitalEccentricityBase (identical); script.js imports the model side',
+  'astro.additionalBodiesReference.eros.orbitalEccentricityJ2000':
+    'duplicate of model.additionalBodies.eros.orbitalEccentricityBase (identical); script.js imports the model side',
+  'astro.additionalBodiesReference.ceres.orbitalEccentricityJ2000':
+    'duplicate of model.additionalBodies.ceres.orbitalEccentricityBase (identical); script.js imports the model side',
 };
 
 /**
@@ -214,6 +399,14 @@ for (const { path, key, value } of distinctive) {
     // moonMeeusLpCorrection was masked this way: JSON 0.010524, script.js
     // 0.010525, both fed to the same lunar-longitude expression. The allowlist
     // was written from a failed value lookup and hid a real divergence.
+    //
+    // LIMITATION — this guard matches by key NAME, so it is blind to a RENAMED
+    // copy. Three allowlist entries hid one that way and had to be found by
+    // reading: alpha1PerMa lived as ALPHA_1, earthEccentricityDotDotJ2000 as
+    // eccentricityDotDotJ2000, and earthPerihelionLongitudeJ2000 as
+    // perihelionLongitudeJ2000_deg — the last DIVERGED by 0.684". Adding an
+    // entry here on the strength of "the value isn't in script.js" is therefore
+    // not enough; confirm the quantity is genuinely absent under ANY name.
     const shadow = isUniqueKey(key) ? findByName(key) : null;
     rows.push(shadow !== null && !Object.is(shadow, value)
       ? { path, key, value, kind: 'MASKED-BY-ALLOWLIST', found: shadow }
