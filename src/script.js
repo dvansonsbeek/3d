@@ -6395,6 +6395,27 @@ const STARTMODEL_YEAR_SI = _jdToSIyear(startmodelJD);
 // reference STARTMODEL_YEAR_SI as anchor are automatically consistent with
 // the calendar-year drift correction.
 
+/** Year coordinate to feed a FITTED-HARMONIC formula, given an instant as JD.
+ *
+ *  Step 6b/6c/6d fit their harmonics against the scene-graph CSV on the SI-year
+ *  axis, because that is the axis the scene's precession rotations run on
+ *  (`moveModel` integrates `cyclesBetweenYears(_dtAnchor, _jdToSIyear(...), N)`)
+ *  and therefore the axis on which the measured signal is actually periodic.
+ *
+ *  Feeding these formulas a CALENDAR year instead is silently wrong at deep
+ *  time: Julian 365.25 vs SI 365.24189 diverge by ~6.7 yr per H cycle, which at
+ *  H/3's 0.635° obliquity amplitude is 0.83″ at the edge of the Step 6a window
+ *  — against a 0.006″ fit residual. Re-fitting on the calendar axis instead was
+ *  measured and is 63× worse (0.377″), because the basis has to spend harmonics
+ *  (H/4, H/7, H/10) absorbing a calendar artifact rather than describing
+ *  physics. The two axes agree at J2000, so this is invisible near the epoch.
+ *
+ *  Gated on the deep-time toggle to match the `_currentYearSI` idiom below:
+ *  under snapshot mode the formulas stay on the calendar axis they always used.
+ */
+const _formulaYearFromJD = (jd) =>
+  DEEP_TIME_MODE_ENABLED ? _jdToSIyear(jd) : julianDateToDecimalYear(jd);
+
 // ───── Phase 9.14 Option A verification: Meeus arguments vs integrator-derived ─────
 // Compares Meeus Ch. 47 polynomial values (Lp, D, M, M', F) to our
 // integrator-derived equivalents (built from Steps 1-3 Moon/Sun integrators
@@ -22608,7 +22629,7 @@ const VFP_CATEGORIES = [
     },
     fixedYRange: [22, 25], fixedYTicks: [22, 23, 24, 25],
     model: { name: 'This model', color: '#f0b040',
-      fn: year => computeObliquityEarth(year) },
+      fn: year => computeObliquityEarth(_formulaYearFromJD(yearToJDApprox(year))) },
     references: [
       { name: 'Laskar (1986)', color: '#4fc3f7', fn: meanObliquityLaskar1986, sourceUrl: 'https://en.wikipedia.org/wiki/Axial_tilt' },
       { name: 'Capitaine (2006)', color: '#81c784', fn: meanObliquityIAU2006, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
@@ -22710,7 +22731,7 @@ const VFP_CATEGORIES = [
       // TROPICAL_YEAR_HARMONICS were fit against the SI-day CSV so evaluated on
       // the frozen baseline they produce the Laskar-matching orbital-precession
       // curve without any LOD-drift contamination.
-      fn: year => evalYearFourier(year, MEAN_SOLAR_YEAR_J2000_DAYS, TROPICAL_YEAR_HARMONICS) },
+      fn: year => evalYearFourier(_formulaYearFromJD(yearToJDApprox(year)), MEAN_SOLAR_YEAR_J2000_DAYS, TROPICAL_YEAR_HARMONICS) },
     references: [
       { name: 'Laskar (1986)', color: '#4fc3f7', fn: tropicalYearLaskar, sourceUrl: 'https://en.wikipedia.org/wiki/Tropical_year' },
     ],
@@ -22858,8 +22879,12 @@ const VFP_CATEGORIES = [
     // Independent of sim epoch, no LOD-day contamination.
     model: { name: 'This model', color: '#f0b040',
       fn: year => {
-        const sidDays = evalYearFourier(year, SIDEREAL_YEAR_DAYS_KINEMATIC_J2000, SIDEREAL_YEAR_HARMONICS);
-        const solYear = evalYearFourier(year, MEAN_SOLAR_YEAR_J2000_DAYS,      TROPICAL_YEAR_HARMONICS);
+        // Chart x-axis is a JULIAN year shared with the Laskar reference curve;
+        // the fitted harmonics live on the SI axis. Convert so model and
+        // literature are sampled at the same instant (see _formulaYearFromJD).
+        const yF = _formulaYearFromJD(yearToJDApprox(year));
+        const sidDays = evalYearFourier(yF, SIDEREAL_YEAR_DAYS_KINEMATIC_J2000, SIDEREAL_YEAR_HARMONICS);
+        const solYear = evalYearFourier(yF, MEAN_SOLAR_YEAR_J2000_DAYS,      TROPICAL_YEAR_HARMONICS);
         const lod = MEAN_SIDEREAL_YEAR_J2000_S / sidDays;
         return computeAxialPrecessionRealLOD(MEAN_SIDEREAL_YEAR_J2000_S, solYear, lod);
       }},
@@ -28733,7 +28758,7 @@ function setupGUI() {
       const sunL = sunLon(jd);
       // Framework obliquity for THIS jd (jd may differ from o.julianDay in sweeps).
       // Was hardcoded 23.44 — drifted 0.28° at year -135 giving 40 km sub-solar error.
-      const epsDeg = computeObliquityEarth(julianDateToDecimalYear(jd));
+      const epsDeg = computeObliquityEarth(_formulaYearFromJD(jd));
       const lat = Math.asin(Math.sin(epsDeg * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
       return { lat, lon };
     }
@@ -29033,7 +29058,7 @@ function setupGUI() {
       const sunL = sunLon(jd_conj);
       // Framework obliquity for THIS jd_conj (may differ from o.julianDay in sweeps).
       // Was hardcoded 23.44 — drifted 0.28° at year -135 giving 40 km sub-solar error.
-      const epsDeg = computeObliquityEarth(julianDateToDecimalYear(jd_conj));
+      const epsDeg = computeObliquityEarth(_formulaYearFromJD(jd_conj));
       const lat = Math.asin(Math.sin(epsDeg * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
       return { lat, lon };
     }
@@ -30745,7 +30770,7 @@ function setupGUI() {
     // Earth radius from the codebase's diameter constant (consistent with
     // the rest of the project — diameters.earthDiameter / 2). Obliquity
     // is time-varying (precesses) → computed per JD inside umbraCenterGeo
-    // via computeObliquityEarth(julianDateToDecimalYear(jd_TT)).
+    // via computeObliquityEarth(_formulaYearFromJD(jd_TT)).
     const R_E_KM = diameters.earthDiameter / 2;
     const GAP_OK_KM       = 300;    // ≤ this → site match (✓ or ↻)
     const GAP_REGIONAL_KM = 1000;   // ≤ this → umbra in same region as site (↶)
@@ -39522,7 +39547,7 @@ async function runBalancedYearStateDiagnostic() {
   const formula_e = computeEccentricityEarth(o.currentYear, BALANCED_YEAR_J2000_FIXED,
                                               PERIHELION_CYCLE_LENGTH_J2000_FIXED,
                                               eccentricityBase, eccentricityAmplitude);
-  const formula_obl = computeObliquityEarth(o.currentYear);
+  const formula_obl = computeObliquityEarth(_formulaYearFromJD(o.julianDay));
   console.log(`  computeEccentricityEarth:  ${formula_e?.toFixed(8) ?? 'null'}`);
   console.log(`    Expected if AT balanced year: ${e_min.toFixed(8)} (= e_min)`);
   console.log(`    Range: [${e_min.toFixed(6)}, ${e_max.toFixed(6)}]`);
@@ -39645,7 +39670,7 @@ async function runBalancedYearStateDiagnostic() {
     const Y_rt = (jd !== null) ? julianDateToDecimalYear(jd) : null;
     const cyc = (Y_rt !== null) ? cyclesBetweenYears(BAL, Y_rt, 1) : null;
     const e_at = (Y_rt !== null) ? computeEccentricityEarth(Y_rt, BAL, cycleLen_scan, eccentricityBase, eccentricityAmplitude) : null;
-    const ob_at = (Y_rt !== null) ? computeObliquityEarth(Y_rt) : null;
+    const ob_at = (jd !== null) ? computeObliquityEarth(_formulaYearFromJD(jd)) : null;
     console.log(
       `  ${N >= 0 ? ' ' : ''}${N} | ${fmtN(Y, 3).padStart(13)} → ${fmtN(jd, 2).padStart(17)} → ${fmtN(Y_rt, 3).padStart(13)} `
       + `| ${fmtN(Y_rt - Y, 6).padStart(10)} | ${fmtE(cyc !== null ? cyc - N : NaN, 3).padStart(9)} `
@@ -39662,7 +39687,7 @@ async function runBalancedYearStateDiagnostic() {
     const Y_rt = julianDateToDecimalYear(jd);
     const cyc = cyclesBetweenYears(BAL, Y_rt, 1);
     const e_at = computeEccentricityEarth(Y_rt, BAL, cycleLen_scan, eccentricityBase, eccentricityAmplitude);
-    const ob_at = computeObliquityEarth(Y_rt);
+    const ob_at = computeObliquityEarth(_formulaYearFromJD(jd));
     console.log(
       `  ${N >= 0 ? ' ' : ''}${N} | ${fmtN(Y, 3).padStart(13)} → ${fmtN(jd, 2).padStart(17)} → ${fmtN(Y_rt, 3).padStart(13)} `
       + `| ${fmtN(Y_rt - Y, 6).padStart(10)} | ${fmtE(cyc !== null ? cyc - N : NaN, 3).padStart(9)} `
@@ -39717,7 +39742,7 @@ async function runBalancedYearStateDiagnostic() {
   console.log(`    julianDateToDecimalYear(nextBalancedJD_H) = ${nextYr}`);
   if (lastYr !== null) {
     const e_at_last = computeEccentricityEarth(lastYr, BAL, cycleLen_scan, eccentricityBase, eccentricityAmplitude);
-    const ob_at_last = computeObliquityEarth(lastYr);
+    const ob_at_last = computeObliquityEarth(_formulaYearFromJD(o.lastBalancedJD_H));
     console.log(`    → e at that year                       = ${e_at_last}   (Δ from e_min: ${(e_at_last - e_min).toExponential(3)})`);
     console.log(`    → obliquity at that year               = ${ob_at_last}°   (Δ: ${((ob_at_last - oblExpectedAtBalanced) * 3600).toFixed(2)}″)`);
   }
@@ -39920,7 +39945,7 @@ async function run8HConfigurationVerification() {
   const earthInclAmp = earthInvPlaneInclinationAmplitude;
   const earthInclMean = earthInvPlaneInclinationMean;
   const earthInclActual = computeInclinationEarth(o.currentYear, null, null, earthInclMean, earthInclAmp);
-  const earthObliq = computeObliquityEarth(o.currentYear);
+  const earthObliq = computeObliquityEarth(_formulaYearFromJD(o.julianDay));
   const earthEcc   = computeEccentricityEarth(o.currentYear, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);
   const earthCyclesIn8H = EIGHT_H / PERIHELION_CYCLE_LENGTH_J2000_FIXED;  // = 8 × 16 = 128
   console.log(`  Earth inclination:  ${earthInclActual.toFixed(6)}° (mean ${earthInclMean.toFixed(4)} ± ${earthInclAmp.toFixed(4)} → MIN expected)`);
