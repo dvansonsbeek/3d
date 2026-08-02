@@ -65,6 +65,52 @@ const BLOCKS = [
     expected: (fit) => capKeys(fit.ELONGATION_CORRECTION),
     expr: 'capitalisePlanetKeys(FIT.ELONGATION_CORRECTION)',
   },
+  {
+    name: 'MOON_CORRECTION',
+    expected: (fit) => fit.MOON_CORRECTION,
+    expr: 'FIT.MOON_CORRECTION',
+  },
+  {
+    name: 'MOON_CORRECTION_RESIDUAL',
+    expected: (fit) => fit.MOON_CORRECTION_RESIDUAL,
+    expr: 'FIT.MOON_CORRECTION_RESIDUAL',
+    note: 'JSON carries a _comment key; the generator strips documentation keys',
+  },
+  {
+    name: 'CARDINAL_POINT_ANCHORS',
+    expected: (fit) => fit.CARDINAL_POINT_ANCHORS_ADJUSTED,
+    expr: 'FIT.CARDINAL_POINT_ANCHORS_ADJUSTED',
+    note: 'script.js uses the ADJUSTED set — a rename that lived only in export-to-script.js',
+  },
+  {
+    name: 'CARDINAL_POINT_HARMONICS',
+    expected: (fit) => fit.CARDINAL_POINT_HARMONICS,
+    expr: 'FIT.CARDINAL_POINT_HARMONICS',
+    note: 'EXPECT REFUSAL — embedded copy is 6-decimal rounded (RSS 0.0149, worst 0.1360)',
+  },
+  {
+    name: 'PREDICT_COEFFS',
+    expected: (fit) => fit.PREDICT_COEFFS_PHYSICAL,
+    expr: 'FIT.PREDICT_COEFFS_PHYSICAL',
+    note: 'EXPECT REFUSAL — fmtSci kept 12 sig digits, so 16,909 of 16,919 differ at ~5e-13',
+  },
+  {
+    name: 'MOON_L',
+    expected: (fit) => fit.MEEUS_LONGITUDE_TERMS,
+    expr: 'FIT.MEEUS_LONGITUDE_TERMS',
+    note: 'source is meeus-lunar-tables.json, not fitted-coefficients.json',
+  },
+  {
+    name: 'MOON_B',
+    expected: (fit) => fit.MEEUS_LATITUDE_TERMS,
+    expr: 'FIT.MEEUS_LATITUDE_TERMS',
+  },
+  {
+    name: 'CLIMATE_FORMULA_COEFFS',
+    expected: (fit) => fit.CLIMATE_FORMULA_COEFFS,
+    expr: 'FIT.CLIMATE_FORMULA_COEFFS',
+    note: 'source is climate-formula-coefficients.json',
+  },
 ];
 
 // ── locate a top-level `const NAME = {…};` / `[…];` block by brace depth ──────
@@ -125,6 +171,23 @@ const argv = process.argv.slice(2);
 const write = argv.includes('--write');
 const only = argv.find((a) => !a.startsWith('--'));
 
+/**
+ * `--adopt=NAME` — migrate a block whose embedded copy DIFFERS, deliberately
+ * taking the generated value.
+ *
+ * Refusal is the default and must stay that way: the whole point is that a
+ * value cannot change without someone deciding it should. But two blocks reach
+ * script.js pre-rounded by the old exporter, and the correct fix IS to adopt the
+ * full-precision original — which the refusal path would otherwise block
+ * forever.
+ *
+ * Deliberately awkward: names one block at a time, never blanket, and prints
+ * the measured difference before applying. `--adopt` with no name does nothing.
+ */
+const adopt = new Set(
+  argv.filter((a) => a.startsWith('--adopt=')).map((a) => a.slice('--adopt='.length)),
+);
+
 const fit = (await import(join(ROOT, 'packages/physics/src/constants/coefficients.js')))
   .FITTED_COEFFICIENTS;
 
@@ -162,12 +225,19 @@ for (const block of targets) {
 
   const expected = block.expected(fit);
   const diff = firstDifference(embedded, expected);
-  if (diff) {
+  if (diff && !adopt.has(block.name)) {
     console.log(`  ${block.name.padEnd(26)} REFUSED — embedded value differs from the generated module`);
     console.log(`      ${diff}`);
-    console.log('      Migrating would CHANGE behaviour. Decide deliberately and edit by hand.');
+    console.log('      Migrating would CHANGE behaviour. To take the generated value');
+    console.log(`      deliberately: --adopt=${block.name}`);
     refused += 1;
     continue;
+  }
+  if (diff) {
+    console.log(`  ${block.name.padEnd(26)} ADOPTING a changed value (--adopt)`);
+    console.log(`      first difference: ${diff}`);
+    console.log('      This CHANGES model output. It is the right move only when the');
+    console.log('      embedded copy is known to be the degraded one.');
   }
 
   const kb = (found.end - found.start) / 1024;

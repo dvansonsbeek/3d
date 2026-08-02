@@ -80,6 +80,51 @@ const COEFFICIENT_KEYS = [
   'PARALLAX_RA_CORRECTION',
   'GRAVITATION_CORRECTION',
   'ELONGATION_CORRECTION',
+
+  // Moon RA/Dec patches. MOON_CORRECTION_RESIDUAL carries a `_comment` the
+  // embedded copy does not — stripped like every other documentation key.
+  'MOON_CORRECTION',
+  'MOON_CORRECTION_RESIDUAL',
+
+  // script.js's CARDINAL_POINT_ANCHORS is the ADJUSTED set, not the base one —
+  // a rename that lived only inside export-to-script.js. Both are emitted; the
+  // consumer picks.
+  'CARDINAL_POINT_ANCHORS',
+  'CARDINAL_POINT_ANCHORS_ADJUSTED',
+
+  // Also 6-decimal rounded on the way into script.js, and the largest such error
+  // found: RSS 0.0149, worst case 0.1360 in coefficient units across 96 terms.
+  // Missed by the first audit because it is an object-of-arrays rather than a
+  // plain array.
+  'CARDINAL_POINT_HARMONICS',
+
+  // 16,919 values. fmtSci kept 12 significant digits, so 16,909 of them differ
+  // from the JSON — but only at ~5e-13 relative, far below anything physical.
+  // Emitted verbatim anyway: there is no reason to ship a lossy copy.
+  'PREDICT_COEFFS_PHYSICAL',
+
+  // The mean/offset SCALARS that pair with the harmonic arrays above — each
+  // series is `mean + sum(harmonics)`, so shipping one from the JSON and the
+  // other as a literal would split a single fitted quantity across two sources.
+  //   PERI_OFFSET                    <-> PERI_HARMONICS
+  //   SOLSTICE_OBLIQUITY_MEAN_FITTED <-> SOLSTICE_OBLIQUITY_HARMONICS
+  //   SUN_LONGITUDE_MEAN             <-> SUN_LONGITUDE_HARMONICS
+  // They went through replaceConst, which never formatted, so all three were
+  // already full precision — an incomplete migration rather than a defect.
+  'PERI_OFFSET',
+  'SOLSTICE_OBLIQUITY_MEAN_FITTED',
+  'SUN_LONGITUDE_MEAN',
+];
+
+/**
+ * Coefficient blocks that come from OTHER files under public/input/. Same
+ * treatment — verbatim, no formatter — they simply do not live in
+ * fitted-coefficients.json.
+ */
+const EXTRA_COEFFICIENT_SOURCES = [
+  { file: 'meeus-lunar-tables.json', as: 'MEEUS_LONGITUDE_TERMS', pick: (j) => j.longitudeTerms.terms },
+  { file: 'meeus-lunar-tables.json', as: 'MEEUS_LATITUDE_TERMS', pick: (j) => j.latitudeTerms.terms },
+  { file: 'climate-formula-coefficients.json', as: 'CLIMATE_FORMULA_COEFFS', pick: (j) => j },
 ];
 
 /**
@@ -301,7 +346,12 @@ function buildCoefficients() {
   const missing = [];
   for (const k of COEFFICIENT_KEYS) {
     if (!(k in fc)) { missing.push(k); continue; }
-    out[k] = fc[k];
+    // `strip` drops `_`-prefixed documentation keys, which the embedded copies
+    // never carried (MOON_CORRECTION_RESIDUAL has a `_comment`).
+    out[k] = strip(fc[k]);
+  }
+  for (const { file, as, pick } of EXTRA_COEFFICIENT_SOURCES) {
+    out[as] = strip(pick(read(file)));
   }
   const hash = createHash('sha256')
     .update(JSON.stringify(canonical(out)))

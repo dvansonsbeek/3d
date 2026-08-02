@@ -450,7 +450,12 @@ if (fs.existsSync(balancePresetsPath)) {
 
 console.log('\n=== F. Climate Formula Coefficients ===');
 const climatePath = path.resolve(__dirname, '..', '..', 'public', 'input', 'climate-formula-coefficients.json');
-if (fs.existsSync(climatePath)) {
+if (MIGRATED_TO_IMPORT) {
+  // CLIMATE_FORMULA_COEFFS now imports from the generated module, so the tagged
+  // region this section rewrites no longer holds a literal. Left unguarded it
+  // reported "1 values to update" forever and turned the sync gate red.
+  console.log('  (migrated to the generated module — nothing to patch)');
+} else if (fs.existsSync(climatePath)) {
   const cfm = JSON.parse(fs.readFileSync(climatePath, 'utf8'));
   const BEGIN_TAG = '// CLIMATE_FORMULA_COEFFS_BEGIN';
   const END_TAG   = '// CLIMATE_FORMULA_COEFFS_END';
