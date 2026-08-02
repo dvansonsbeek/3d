@@ -298,6 +298,21 @@ const cycleOf = (process.env.SG_DEEP_TIME === '0')
 console.error(`Solar measurements export: 1-year steps, ${startYear} to ${endYear}`);
 console.error(`Total: ${totalYears} years × 6 types = ~${totalYears * 6} rows`);
 console.error(`Output: ${OUTPUT_CSV}`);
+
+// ─── Window report ─────────────────────────────────────────────────────────
+// The physically meaningful window is between two consecutive H-balanced
+// events, where obliquity and eccentricity each close exactly one cycle
+// whatever H(t) does. `startYear`/`endYear` cannot express that directly —
+// they are chaining-step counts, not instants — so report the cycle span the
+// run will actually achieve and let the `Cycle` column carry the truth.
+{
+  const b0 = DT.balancedYearAtCycle(0), b1 = DT.balancedYearAtCycle(1);
+  if (b0 !== null && b1 !== null) {
+    console.error(`Balanced bracket: cycle 0 at year ${b0.toFixed(3)} (JD ${DT.yearToJDDeepTime(b0).toFixed(3)})`);
+    console.error(`                  cycle 1 at year ${b1.toFixed(3)} (JD ${DT.yearToJDDeepTime(b1).toFixed(3)})`);
+    console.error(`Requested window: ${startYear} → ${endYear} = ${totalYears} chaining steps`);
+  }
+}
 console.error('');
 
 // Seed near J2000 (model epoch)
@@ -457,5 +472,17 @@ console.error(`Done in ${elapsed}s.`);
 console.error(`Total rows: ${allRows.length}`);
 for (const [type, cnt] of Object.entries(typeCounts)) {
   console.error(`  ${type}: ${cnt} rows`);
+}
+
+// Achieved cycle span per type. These diverge at deep time by design: SS/WS/
+// VE/AE chain on the tropical year, PERI/APH on the anomalistic one. A run
+// that brackets the balanced events spans exactly 1.000000 for the cardinals.
+console.error('');
+console.error('Achieved cycle span (balanced bracket = 1.000000):');
+for (const type of allTypes) {
+  const rows = allRows.filter(r => r.type === type);
+  if (!rows.length) continue;
+  const c0 = cycleOf(rows[0].jd), c1 = cycleOf(rows[rows.length - 1].jd);
+  console.error(`  ${type.padEnd(4)}: ${c0.toFixed(6)} → ${c1.toFixed(6)}  span ${(c1 - c0).toFixed(6)}`);
 }
 console.error(`CSV: ${OUTPUT_CSV}`);
