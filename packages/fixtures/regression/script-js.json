@@ -1,5 +1,5 @@
 {
-  "_comment": "REGRESSION fixture — what src/script.js does today, read at the J2000 epoch through window.__test__. Must never change unintentionally. Regenerate: npm run build && node test/browser/snapshot.test.mjs --write",
+  "_comment": "REGRESSION fixture — what src/script.js does today, through window.__test__. `anchor.*` and `f(Y)@year` are read at J2000; `epoch@tMa.*` re-reads the seven globals AT that epoch (they are meant to depend on it). epoch@0Ma equals anchor.* since B.3b: resetEpochToJ2000 restores the module-load seeds exactly, so the R16 hysteresis is gone and roundTripDrift.* keys no longer appear (they were recorded only when reset failed to restore). The 118 ms seed-vs-chain gap at J2000 is R1 fit basis and closes with the Phase C/D refit. Must never change unintentionally. Regenerate: npm run build && node test/browser/snapshot.test.mjs --write",
   "_source": "src/script.js via dist/, headless Chromium",
   "values": {
     "anchor.holisticyearLength": 335317,
@@ -90,13 +90,13 @@
     "epoch@-0.3Ma.meansiderealyearlengthinDays": 365.2291049558909,
     "epoch@-0.3Ma.meansolaryearlengthinDays": 365.2149463425383,
     "epoch@-0.3Ma.meansiderealyearlengthinDays_kinematic": 365.2291049558909,
-    "epoch@0Ma.holisticyearLength": 335317.0000000001,
-    "epoch@0Ma.H": 335317.0000000001,
-    "epoch@0Ma.meanlengthofday": 86399.99967597387,
+    "epoch@0Ma.holisticyearLength": 335317,
+    "epoch@0Ma.H": 335317,
+    "epoch@0Ma.meanlengthofday": 86399.99967597384,
     "epoch@0Ma.meansiderealyearlengthinSeconds": 31558149.7635456,
-    "epoch@0Ma.meansiderealyearlengthinDays": 365.25636437382184,
-    "epoch@0Ma.meansolaryearlengthinDays": 365.2422036461019,
-    "epoch@0Ma.meansiderealyearlengthinDays_kinematic": 365.25636437382184,
+    "epoch@0Ma.meansiderealyearlengthinDays": 365.256363004,
+    "epoch@0Ma.meansolaryearlengthinDays": 365.24220364610204,
+    "epoch@0Ma.meansiderealyearlengthinDays_kinematic": 365.25636437382195,
     "epoch@0.3Ma.holisticyearLength": 335292.7507954302,
     "epoch@0.3Ma.H": 335292.7507954302,
     "epoch@0.3Ma.meanlengthofday": 86393.75146527479,
@@ -117,12 +117,6 @@
     "epoch@5Ma.meansiderealyearlengthinSeconds": 31558120.416977607,
     "epoch@5Ma.meansiderealyearlengthinDays": 365.7047034026871,
     "epoch@5Ma.meansolaryearlengthinDays": 365.6905078768647,
-    "epoch@5Ma.meansiderealyearlengthinDays_kinematic": 365.7047034026871,
-    "roundTripDrift.holisticyearLength": 1.1641532182693481e-10,
-    "roundTripDrift.H": 1.1641532182693481e-10,
-    "roundTripDrift.meanlengthofday": 2.9103830456733704e-11,
-    "roundTripDrift.meansiderealyearlengthinDays": 0.0000013698218594981881,
-    "roundTripDrift.meansolaryearlengthinDays": -1.1368683772161603e-13,
-    "roundTripDrift.meansiderealyearlengthinDays_kinematic": -1.1368683772161603e-13
+    "epoch@5Ma.meansiderealyearlengthinDays_kinematic": 365.7047034026871
   }
 }

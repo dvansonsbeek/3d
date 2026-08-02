@@ -1014,6 +1014,28 @@ let   meansiderealyearlengthinDays_kinematic = meansolaryearlengthinDays * holis
 // MEAN LOD at J2000: 86399.99968 s under H=335,317 (from H/13 identity).
 // Supersedes Method B (which used the IAU tautology denominator + × 86400.00001).
 let   meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays_kinematic;  // Phase 1: mutable for deep-time mode
+
+// The sidereal Fourier BASELINE — frozen at the module-load kinematic value.
+// SIDEREAL_YEAR_HARMONICS were fitted around this constant. recomputeEpochAnchors
+// rewrites the `meansiderealyearlengthinDays_kinematic` GLOBAL for deep-time
+// display, and a formula baseline that moves with scene state is exactly the
+// transparency violation (f(Y) must depend on Y alone — plan §5c). Formula
+// sites read this const; display sites read the mutable global.
+const SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 = meansiderealyearlengthinDays_kinematic;
+
+// Module-load values of the seven epoch globals — what resetEpochToJ2000
+// restores (R16). These are the FITTED kinematic constants the shipped
+// coefficients were calibrated against; recomputeEpochAnchors(0) returns the
+// deep-time chain's values instead, 118 ms away on the sidereal year (that gap
+// is R1's fit basis and closes with the Phase C/D refit, not here). Snapshot
+// taken here, after the last of the seven is initialised.
+const _EPOCH_SEEDS_J2000 = Object.freeze({
+  holisticyearLength, H,
+  meanlengthofday, meansiderealyearlengthinSeconds,
+  meansiderealyearlengthinDays, meansolaryearlengthinDays,
+  meansiderealyearlengthinDays_kinematic,
+});
+
 let   meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday;  // Phase 6: mutable (Tier 2)
 let   meanStellarday = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)*STELLAR_DAY_RA_PROJECTION+meanSiderealday;  // Phase 6: mutable (Tier 2)
 // --- Coin rotation offsets (derived from day/year lengths and precession cycles) ---
@@ -2699,7 +2721,10 @@ function meanLodSecondsAtAgeActual(t_Ma) {
   if (mean_t === null) return null;
   const year_at_t = 2000 - t_Ma * 1e6;
   const Y_days_fourier = computeSiderealYearDaysDirect(year_at_t);
-  return mean_t * meansiderealyearlengthinDays_kinematic / Y_days_fourier;
+  // Frozen J2000 baseline, matching the Node twin (which uses the CONSTANT
+  // C.meanSiderealYearDaysKinematic) — reading the mutable global here leaked
+  // scene-epoch state into an f(t) formula.
+  return mean_t * SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 / Y_days_fourier;
 }
 
 /**
@@ -6315,9 +6340,37 @@ function setEpoch(calendar_year) {
   return setEpochByAge(t_Ma);
 }
 
-/** Reset every deep-time global to its J2000 value. */
+/**
+ * Reset every deep-time global to its J2000 value.
+ *
+ * RESTORES the module-load seeds (`_EPOCH_SEEDS_J2000`) rather than delegating
+ * to setEpochByAge(0) — which re-DERIVED the anchors through the deep-time
+ * chain and never actually restored them (R16): the chain's J2000 values sit
+ * 118 ms from the fitted kinematic seeds on the sidereal year, so which
+ * "J2000" you got depended on whether the epoch had ever moved. The downstream
+ * recompute phases then re-derive their state from the restored seeds, exactly
+ * as a fresh page load derives it from the same values.
+ */
 function resetEpochToJ2000() {
-  return setEpochByAge(0);
+  if (currentEpoch_t_Ma === 0) return true;
+  holisticyearLength = _EPOCH_SEEDS_J2000.holisticyearLength;
+  H = _EPOCH_SEEDS_J2000.H;
+  meanlengthofday = _EPOCH_SEEDS_J2000.meanlengthofday;
+  meansiderealyearlengthinSeconds = _EPOCH_SEEDS_J2000.meansiderealyearlengthinSeconds;
+  meansiderealyearlengthinDays = _EPOCH_SEEDS_J2000.meansiderealyearlengthinDays;
+  meansolaryearlengthinDays = _EPOCH_SEEDS_J2000.meansolaryearlengthinDays;
+  meansiderealyearlengthinDays_kinematic = _EPOCH_SEEDS_J2000.meansiderealyearlengthinDays_kinematic;
+  recomputeTimeUnitsForEpoch(0);          // mirrors recomputeEpochAnchors' tail
+  recomputeDerivedAnchorsForEpoch(0);
+  recomputeMoonAndAuForEpoch(0);
+  recomputeMoonDerivedForEpoch(0);
+  recomputePlanetCountsForEpoch(0);
+  recomputePlanetCyclesForEpoch(0);
+  rebuildPeriHarmonicsForEpoch(0);
+  updateAllObjectsForEpoch();
+  _invalidateUiCachesForEpoch();
+  currentEpoch_t_Ma = 0;
+  return true;
 }
 
 /** Enable auto-sync of setEpoch to o.currentYear via the animation-loop hook. */
@@ -22583,7 +22636,7 @@ const VFP_CATEGORIES = [
     // Step 6d harmonic fits — matches the tropical-year chart's source of truth
     // exactly, so at any year Y the tropical value implied here equals the
     // value shown on the "Tropical Year" chart (cross-consistent).
-    //   • sid_days  = meansiderealyearlengthinDays_kinematic + Σ SIDEREAL_YEAR_HARMONICS(year)
+    //   • sid_days  = SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 + Σ SIDEREAL_YEAR_HARMONICS(year)
     //                 (framework-native H/13 identity baseline — matches
     //                  computeSiderealYearDaysDirect used elsewhere; NOT the
     //                  IAU ASTRO_REFERENCE.siderealYearJ2000, which differs by
@@ -22595,7 +22648,7 @@ const VFP_CATEGORIES = [
     // Independent of sim epoch, no LOD-day contamination.
     model: { name: 'This model', color: '#f0b040',
       fn: year => {
-        const sidDays = evalYearFourier(year, meansiderealyearlengthinDays_kinematic, SIDEREAL_YEAR_HARMONICS);
+        const sidDays = evalYearFourier(year, SIDEREAL_YEAR_DAYS_KINEMATIC_J2000, SIDEREAL_YEAR_HARMONICS);
         const solYear = evalYearFourier(year, MEAN_SOLAR_YEAR_J2000_DAYS,      TROPICAL_YEAR_HARMONICS);
         const lod = MEAN_SIDEREAL_YEAR_J2000_S / sidDays;
         return computeAxialPrecessionRealLOD(MEAN_SIDEREAL_YEAR_J2000_S, solYear, lod);
@@ -57296,10 +57349,13 @@ function computeSiderealYearDaysDirect(currentYear) {
   // (matching the USNO 86400.0014 joint-world anchor) adds the H/5 ecliptic-precession
   // correction separately in the display layer — see doc 11 § "The H/5 LOD Correction".
   //
-  // Uses `meansiderealyearlengthinDays_kinematic` (immutable, computed from
-  // meansolaryearlengthinDays × H/(H-13) at module load), not the live-mutable
-  // `meansiderealyearlengthinDays` (which recomputeEpochAnchors overwrites).
-  return evalYearFourier(currentYear, meansiderealyearlengthinDays_kinematic, SIDEREAL_YEAR_HARMONICS);
+  // Uses SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 — the genuinely frozen module-load
+  // baseline the harmonics were fitted around. This comment used to claim the
+  // `_kinematic` GLOBAL was immutable while recomputeEpochAnchors overwrote it
+  // (the 2026-07-17 deep-time fix) — which made f(Y) depend on scene-epoch
+  // state, the exact violation the transparency gate tracks (plan §5c, R16).
+  // Deep-time displays read the mutable global; this formula reads the const.
+  return evalYearFourier(currentYear, SIDEREAL_YEAR_DAYS_KINEMATIC_J2000, SIDEREAL_YEAR_HARMONICS);
 }
 
 /**

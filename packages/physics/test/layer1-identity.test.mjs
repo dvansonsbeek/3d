@@ -42,11 +42,18 @@ const MAPPING = [
   { global: 'meansiderealyearlengthinDays_kinematic', view: L1.siderealYearDaysViaLattice },
 ];
 
+// t = 0 is EXCLUDED, deliberately. Since B.3b, resetEpochToJ2000 restores the
+// module-load SEEDS exactly, so epoch@0Ma.* records the fitted kinematic
+// constants — while layer1's f(2000) is the deep-time CHAIN at J2000. The two
+// differ by R1's fit-basis gap (118 ms on the sidereal year) until the Phase
+// C/D refit closes it. Comparing them here would assert the wrong identity.
+// The chain's own t=0 values are pinned elsewhere: the layer0 gate (12-epoch
+// grid includes 0) and the tools-lib fixture (deeptime.H@0Ma, lod.meanAtAge0).
 const EPOCHS_MA = [...new Set(
   Object.keys(recorded)
     .filter((k) => k.startsWith('epoch@'))
     .map((k) => Number(k.slice('epoch@'.length, k.indexOf('Ma.')))),
-)];
+)].filter((t) => t !== 0);
 
 let checked = 0;
 /** @type {{key: string, want: number, got: number|null}[]} */

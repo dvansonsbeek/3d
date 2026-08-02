@@ -89,7 +89,7 @@ if (pageErrors) console.log(`  note: ${pageErrors} page error(s) during load`);
 if (write) {
   mkdirSync(dirname(OUT), { recursive: true });
   writeFileSync(OUT, `${JSON.stringify({
-    _comment: 'REGRESSION fixture — what src/script.js does today, through window.__test__. `anchor.*` and `f(Y)@year` are read at J2000; `epoch@tMa.*` re-reads the seven globals AT that epoch (they are meant to depend on it); `roundTripDrift.*` records that resetEpochToJ2000 does NOT restore them — meansiderealyearlengthinDays lands 1.37e-6 d = 118 ms away, which is hysteresis, not rounding (plan R16). Must never change unintentionally. Regenerate: npm run build && node test/browser/snapshot.test.mjs --write',
+    _comment: 'REGRESSION fixture — what src/script.js does today, through window.__test__. `anchor.*` and `f(Y)@year` are read at J2000; `epoch@tMa.*` re-reads the seven globals AT that epoch (they are meant to depend on it). epoch@0Ma equals anchor.* since B.3b: resetEpochToJ2000 restores the module-load seeds exactly, so the R16 hysteresis is gone and roundTripDrift.* keys no longer appear (they were recorded only when reset failed to restore). The 118 ms seed-vs-chain gap at J2000 is R1 fit basis and closes with the Phase C/D refit. Must never change unintentionally. Regenerate: npm run build && node test/browser/snapshot.test.mjs --write',
     _source: 'src/script.js via dist/, headless Chromium',
     values: measured,
   }, null, 2)}\n`);
