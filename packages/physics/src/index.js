@@ -69,6 +69,17 @@ export { REFERENCE_DATA };
 export { FITTED_COEFFICIENTS, COEFFICIENTS_HASH } from './constants/index.js';
 
 /**
+ * Phase 6 surface — the epoch layer. `createEpochPrimitives` + `deriveEpochParams`
+ * are what `src/script.js` and `tools/lib/deep-time.js` converge on: one
+ * derivation of the parameter bundle, one implementation of the chain. The
+ * browser imports these; the Node engine is held bit-identical by the layer0
+ * identity gate until Phase C rewrites it as an adapter.
+ */
+export { createEpochPrimitives } from './layer0/index.js';
+export { deriveEpochParams } from './layer0/derive-params.js';
+export { createDerivedViews } from './layer1/index.js';
+
+/**
  * Build a model bound to a set of constants.
  *
  * Dependency injection rather than import is the key decision (§2d): it is what

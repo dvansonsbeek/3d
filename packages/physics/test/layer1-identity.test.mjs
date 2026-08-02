@@ -27,7 +27,7 @@ const DT = require(`${TOOLS_LIB}deep-time.js`);
 const FIXTURE = new URL('../../fixtures/regression/script-js.json', import.meta.url);
 const recorded = JSON.parse(readFileSync(FIXTURE, 'utf8')).values;
 
-const L0 = createEpochPrimitives({ params: DT.EPOCH_PARAMS, alphaAt: DT.alphaAtYear });
+const L0 = createEpochPrimitives({ params: DT.EPOCH_PARAMS, alphaAtAgeMa: DT.earthMoiFactorAtAge });
 const L1 = createDerivedViews({ primitives: L0 });
 
 // Global name in script.js -> the Layer 0/1 view that must reproduce it.

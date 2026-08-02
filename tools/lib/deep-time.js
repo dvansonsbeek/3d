@@ -1143,15 +1143,10 @@ const EPOCH_PARAMS = Object.freeze({
   solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
 });
 
-/**
- * The live α(t) channel in Layer 0's `f(year)` form.
- *
- * R2 is NOT applied here: when building an H-lattice table α must be pinned at
- * its J2000 reference, and that is a Phase C change. This is today's behaviour.
- * @param {number} year
- * @returns {number}
- */
-const alphaAtYear = (year) => earthMoiFactorAtAge((EPOCH_PARAMS.epochYear - year) / 1e6);
+// The α channel is injected into Layer 0 as `earthMoiFactorAtAge` directly —
+// it already speaks the t_Ma axis Layer 0's atAgeMa cores use, so no wrapper.
+// R2 (pinning α at its J2000 reference during a lattice-table build) is a
+// Phase C change; today's behaviour is the live α(t) everywhere.
 
 // ─── Year↔JD under deep time, and the H-balanced event finder ─────────────
 //
@@ -1306,10 +1301,10 @@ module.exports = {
   // Framework e_E: H/3 fluctuation line (production) + Laskar-band composite (A/B research)
   _fwEarthEcc,
   _fwEarthEccComposite,
-  // Layer 0 wiring (PHASE-B): the parameter bundle and the α channel, so every
-  // consumer builds the pure primitives from identical numbers.
+  // Layer 0 wiring (PHASE-B): the parameter bundle, so every consumer builds
+  // the pure primitives from identical numbers. Inject `earthMoiFactorAtAge`
+  // (exported above) as the α channel.
   EPOCH_PARAMS,
-  alphaAtYear,
   // Year↔JD under deep time + the balanced-event finder (PHASE-B-DUPLICATE).
   // Step 6a's `Cycle` column needs all four; `SI_TROPICAL_YEAR_DAYS` is the
   // axis they share, exported so a caller cannot re-derive it differently.
