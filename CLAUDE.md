@@ -80,12 +80,11 @@ would silently churn a structural claim for a rounding-level gain.
 - `data/02-solar-measurements.csv` is 160 MB and gitignored — no git recovery.
   Back it up before regenerating (2 h 24 m).
 - **The engine and that CSV agree bit-exactly since Phase C** (R1–R4, R6
-  restored): a 1990–2010 re-export reproduces the committed CSV with worst
-  JD delta 0.0000 s and worst `Cycle` delta 0.00e+0. Do not regenerate it —
-  2 h 24 m for an identical file. **Refitting 6b/6c/6d still WAITS for Phase
-  D**: the fitter-side fixes (R10, R12–R15) and the runtime evaluation forms
-  are a matched pair with the coefficients, and shipping one without the other
-  is a ~1162-minute-class error. See
+  restored), and **Phase D refit 6b/6d/6c against it** — cycle axis, event-row
+  anchors, the §10 derived cardinal form, all sixteen R-items closed. Do not
+  regenerate the CSV: 2 h 24 m for an identical file. Coefficients and runtime
+  evaluation forms are a MATCHED PAIR — never ship one without the other
+  (~1162-minute-class error). See
   `holisticuniverse/docs/plans/IP-deeptime-scene-graph-alignment_new.md` §5.
 
 ---
