@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit -p jsconfig.json",
     "check:boundaries": "node tools/check-boundaries.mjs",
     "test:purity": "node packages/physics/test/purity.test.mjs",
+    "test:layer0": "node packages/physics/test/layer0-identity.test.mjs",
     "test:counterfactual": "node packages/physics/test/counterfactual.test.mjs",
     "constants:generate": "node tools/constants/generate.mjs --write",
     "test:constants": "node tools/constants/generate.mjs",
@@ -26,7 +27,7 @@
     "test:transparency": "node test/browser/transparency.test.mjs",
     "test:browser": "npm run build && npm run test:snapshot",
     "targets": "node tools/fixtures/report-targets.mjs",
-    "check": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:purity && npm run test:constants && npm run test:counterfactual && npm run test:fixtures && npm run test:literals && npm run test:verify && npm run test:pipeline"
+    "check": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:purity && npm run test:layer0 && npm run test:constants && npm run test:counterfactual && npm run test:fixtures && npm run test:literals && npm run test:verify && npm run test:pipeline"
   },
   "dependencies": {
     "three": "^0.183.0",

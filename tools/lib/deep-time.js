@@ -1111,6 +1111,48 @@ function cyclesBetweenYears(yearA, yearB, divisor_N) {
   return divisor_N * (integral - correction);
 }
 
+/**
+ * The Layer 0 parameter bundle (PHASE-B).
+ *
+ * `packages/physics/src/layer0` is pure and takes every constant as an
+ * argument. This is where those arguments are derived — ONCE, from
+ * `tools/lib/constants.js` — so the browser, the Node engine and the tests all
+ * construct Layer 0 from the same numbers instead of each re-deriving them.
+ * Re-derivation is exactly how the five implementations drifted apart.
+ *
+ * `epochYear` is 2000, NOT `startmodelYear` (2000.5). The shipped chain uses
+ * `t_Ma = (2000 − year)/1e6` throughout; attempt-1's fitters used 2000.5. The
+ * two are half a year apart and nothing flagged it.
+ */
+const EPOCH_PARAMS = Object.freeze({
+  epochYear: 2000,
+  alpha1PerMa: ALPHA_1,
+  alpha3PerMa3: ALPHA_3,
+  alpha4PerMa4: ALPHA_4,
+  moonDistanceNowM: A_MOON_NOW_M,
+  moonLockDistanceM: A_LOCK_M,
+  totalAngularMomentumKgM2S: L_TOTAL_EM_KGM2_S,
+  moonMassKg: M_MOON_ALONE,
+  gmEarthMoonM3S2: GM_EM_M3S2,
+  moonEccentricityFactor: E_FACTOR_MOON,
+  earthMassKg: M_EARTH_ALONE,
+  earthRadiusM: R_EARTH_M,
+  holisticYearJ2000: HOLISTIC_YEAR_J2000,
+  lodNowH13Seconds: LOD_NOW_H13_S,
+  siderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
+  solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
+});
+
+/**
+ * The live α(t) channel in Layer 0's `f(year)` form.
+ *
+ * R2 is NOT applied here: when building an H-lattice table α must be pinned at
+ * its J2000 reference, and that is a Phase C change. This is today's behaviour.
+ * @param {number} year
+ * @returns {number}
+ */
+const alphaAtYear = (year) => earthMoiFactorAtAge((EPOCH_PARAMS.epochYear - year) / 1e6);
+
 // ─── Year↔JD under deep time, and the H-balanced event finder ─────────────
 //
 // PHASE-B-DUPLICATE. These five are ported from `src/script.js`
@@ -1264,6 +1306,10 @@ module.exports = {
   // Framework e_E: H/3 fluctuation line (production) + Laskar-band composite (A/B research)
   _fwEarthEcc,
   _fwEarthEccComposite,
+  // Layer 0 wiring (PHASE-B): the parameter bundle and the α channel, so every
+  // consumer builds the pure primitives from identical numbers.
+  EPOCH_PARAMS,
+  alphaAtYear,
   // Year↔JD under deep time + the balanced-event finder (PHASE-B-DUPLICATE).
   // Step 6a's `Cycle` column needs all four; `SI_TROPICAL_YEAR_DAYS` is the
   // axis they share, exported so a caller cannot re-derive it differently.
