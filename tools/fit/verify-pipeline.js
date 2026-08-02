@@ -101,10 +101,18 @@ for (let i = 0; i < stored.SOLSTICE_OBLIQUITY_HARMONICS.length; i++) {
   check(`OBLIQ[${i}] cos`, f[2], s[2]);
 }
 
-// Verify J2000 obliquity
+// Verify J2000 obliquity — on the CONVENTION THE FIT AND RUNTIME USE (Phase D):
+// integrated cycle axis (cyclesBetweenYears on the SI year), anchored at the
+// year-2000 SS ROW's instant, not at calendar 2000.0 with naive snapshot phase.
+// The old form here read 0.233" off after the R12/R13/R14 refit — which is the
+// documented anchor-mismatch class (0.2247"), surfacing in the CHECKER because
+// the checker was the last consumer still on the old convention.
+const DTv = require('../lib/deep-time');
+const jdSS2000 = C.CARDINAL_POINT_ANCHORS.SS;
+const cycSS2000 = DTv.cyclesBetweenYears(C.balancedYear, DTv._jdToSIyear(jdSS2000), 1);
 let obliq = C.SOLSTICE_OBLIQUITY_MEAN;
 for (const [div, sinC, cosC] of C.SOLSTICE_OBLIQUITY_HARMONICS) {
-  const phase = 2 * Math.PI * (2000 - C.balancedYear) / (C.H / div);
+  const phase = 2 * Math.PI * cycSS2000 * div;
   obliq += sinC * Math.sin(phase) + cosC * Math.cos(phase);
 }
 check('J2000 obliquity vs IAU', Math.abs(obliq - C.ASTRO_REFERENCE.obliquityJ2000_deg) * 3600, 0, 0.1); // within 0.1"

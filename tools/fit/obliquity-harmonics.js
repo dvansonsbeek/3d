@@ -40,6 +40,27 @@ function readSSData() {
   const header = lines[0];
   console.log(`CSV header: ${header}`);
 
+  // Phase is built HERE from each row's JD, on the SI-YEAR axis
+  // (`_jdToSIyear`, JD / 365.24189). That is the axis the scene's precession
+  // rotations run on at moveModel, and the obliquity in this CSV is a
+  // measurement OF that geometry — so it is the axis the signal is actually
+  // periodic on.
+  //
+  // Measured, same data, same 16 divisors:
+  //     SI-year axis        RMSE 0.006″   divisors 2,3,5,6,8,9,11,13,14,16,17,19,22,24,27,32
+  //     calendar-year axis  RMSE 0.377″   greedy needs H/4, H/7, H/10
+  // The calendar axis (Julian 365.25) differs from SI by ~6.7 yr per H, and
+  // forcing the fit onto it makes the basis spend harmonics absorbing a
+  // calendar artifact rather than describing the physics. 63× worse.
+  //
+  // The runtime was migrated to match (computeObliquityEarth now takes an SI
+  // year). Both axes agree at J2000, so anchor checks pass either way — the
+  // error only appears at deep time. Do not "fix" this to the consumer's old
+  // calendar axis; that direction was tried and measured.
+  const cols = header.split(',');
+  const iJD = cols.indexOf('JD');
+  if (iJD < 0) throw new Error('CSV has no `JD` column — re-run Step 6a.');
+
   // Collect all SS rows, then downsample by stepYears for fitting efficiency
   const allSS = [];
   for (let i = 1; i < lines.length; i++) {
@@ -47,18 +68,53 @@ function readSSData() {
     if (parts[0] !== 'SS') continue;
     const year = parseFloat(parts[1]);
     const obliq = parseFloat(parts[4]);
-    if (!isNaN(year) && !isNaN(obliq) && obliq > 0) {
-      allSS.push({ year, obliq });
+    const jd = parseFloat(parts[iJD]);
+    if (!isNaN(year) && !isNaN(obliq) && obliq > 0 && !isNaN(jd)) {
+      const cycle = cycleAtJD(jd);
+      if (cycle !== null) allSS.push({ year, obliq, cycle });
     }
   }
 
   // Downsample: J2000-anchored (filter (year - 2000) % step === 0 so year 2000
   // lands on the sampling line — matches year-length + cardinal-point fits).
+  // This stays on `Model Year`: it is a row SELECTOR, not a phase. Phase
+  // closure is supplied by each row's own integrated cycle, not by step
+  // dividing H.
   const step = C.stepYears || 20;
   const data = allSS.filter(r => ((r.year - 2000) % step + step) % step === 0);
   console.log(`Downsampled (J2000-anchored): ${allSS.length} → ${data.length} points (step=${step})`);
+  console.log(`Cycle range: ${data[0].cycle.toFixed(9)} → ${data[data.length - 1].cycle.toFixed(9)}`);
   return data;
 }
+
+// H-cycles from balancedYear to an instant given as a JD, on the SI-year axis.
+// This is the exact expression the runtime now evaluates inside
+// phaseAdvanceRadians: cyclesBetweenYears(BAL, _jdToSIyear(jd), div).
+const DT = require('../lib/deep-time');
+const cycleAtJD = (jd) => DT.cyclesBetweenYears(C.balancedYear, DT._jdToSIyear(jd), 1);
+
+// Integrated phase in radians for harmonic H/div at a given cycle.
+// At J2000 this agrees with the snapshot form, so J2000 anchors are preserved.
+const phaseOf = (cycle, div) => 2 * Math.PI * cycle * div;
+
+// ─── Truncation depth ────────────────────────────────────────────────────
+// How many harmonics to keep. This is a TRUNCATION choice, not a statistical
+// one, and it cannot be read off the data: the target is
+// √(e² + pa² + pb²) — a deterministic smooth function of the four generators
+// {H/3, H/5, H/8, H/16}, whose Fourier expansion has infinitely many
+// intermodulation terms. There is no noise floor to reach, so BIC keeps
+// improving indefinitely (measured: monotonic past 23 terms). Every added
+// term is real; the question is only how much of the series you want.
+//
+// Measured RMSE against depth (SI-axis cycle form, 14,580 SS points):
+//   15 terms 0.006239″ · 16 0.005776″ · 17 0.005274″ · 23 0.004847″
+//
+// Kept at 16. (The 6-decimal write rounding that once made depth moot is gone —
+// the generated constants module emits values verbatim since Phase 5g — but
+// going 16 → 23 would still only buy 0.0009″ against the 0.006″ residual, and
+// changing the shipped divisor-set structure is a deliberate decision with
+// downstream sync cost, not a refit side effect.)
+const MAX_HARMONICS = 16;
 
 // ─── Least squares harmonic fit ──────────────────────────────────────────
 // Solves: residual[i] = Σ_k (sinC_k * sin(phase_k) + cosC_k * cos(phase_k))
@@ -72,12 +128,11 @@ function fitHarmonics(data, mean, divisors) {
   const b = new Float64Array(n);
 
   for (let i = 0; i < n; i++) {
-    const t = data[i].year - C.balancedYear;
     const residual = data[i].obliq - mean;
     b[i] = residual;
     A[i] = new Float64Array(m);
     for (let k = 0; k < divisors.length; k++) {
-      const phase = 2 * Math.PI * t / (C.H / divisors[k]);
+      const phase = phaseOf(data[i].cycle, divisors[k]);
       A[i][2 * k] = Math.sin(phase);
       A[i][2 * k + 1] = Math.cos(phase);
     }
@@ -112,7 +167,7 @@ function fitHarmonics(data, mean, divisors) {
   for (let i = 0; i < n; i++) {
     let pred = mean;
     for (const [div, sinC, cosC] of harmonics) {
-      const phase = 2 * Math.PI * (data[i].year - C.balancedYear) / (C.H / div);
+      const phase = phaseOf(data[i].cycle, div);
       pred += sinC * Math.sin(phase) + cosC * Math.cos(phase);
     }
     const err = data[i].obliq - pred;
@@ -214,6 +269,24 @@ function main() {
   console.log(`\nPythagorean obliquity mean (time-average): ${pythagoreanMean.toFixed(8)}°`);
 
   const data = readSSData();
+  // Anchor on the year-2000 SS ROW, not on JD 2451545.0 (J2000.0 proper).
+  //
+  // Tempting to "correct" this: the IAU value is defined at J2000.0 = Jan 1.5,
+  // while the year-2000 SS row is the JUNE solstice, half a year later, and
+  // obliquity moves ~47″/century. But the scene is CALIBRATED so that the
+  // year-2000 solstice obliquity IS the IAU J2000 number:
+  //     CSV SS year 2000 = 23.439291000
+  //     ASTRO_REFERENCE  = 23.439291111   (0.0004″ apart)
+  // The fit's job is to reproduce the scene, so the anchor must sit where the
+  // scene puts it. Anchoring at JD 2451545.0 instead was measured: it leaves a
+  // CONSTANT +0.2247″ bias on all 335,318 rows while the scatter stays at the
+  // 0.0057″ fit residual — and the script's own "Verify at J2000" still reports
+  // 0.0000″, because it verifies at the anchor rather than against the data.
+  const rowAt = (y) => {
+    const r = data.find(d => d.year === y);
+    if (!r) throw new Error(`no SS row at year ${y} — cannot anchor`);
+    return r.cycle;
+  };
   console.log(`SS data points: ${data.length}`);
   console.log(`Year range: ${data[0].year} to ${data[data.length - 1].year}`);
   let obliqMin = Infinity, obliqMax = -Infinity;
@@ -260,9 +333,9 @@ function main() {
   // Check J2000 value
   const IAU_obliquity = C.ASTRO_REFERENCE.obliquityJ2000_deg;
   let obliq2000 = obliqMean;
+  const cycle2000 = rowAt(2000);
   for (const [div, sinC, cosC] of current.harmonics) {
-    const phase = 2 * Math.PI * (2000 - C.balancedYear) / (C.H / div);
-    obliq2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+    obliq2000 += sinC * Math.sin(phaseOf(cycle2000, div)) + cosC * Math.cos(phaseOf(cycle2000, div));
   }
   console.log(`\nObliquity at J2000: ${obliq2000.toFixed(6)}° (IAU 2006: ${IAU_obliquity}°)`);
   console.log(`J2000 error: ${((obliq2000 - IAU_obliquity) * 3600).toFixed(2)}"`);
@@ -270,7 +343,7 @@ function main() {
   // ─── Greedy search for better harmonics ────────────────────────────
   console.log('\n── Greedy harmonic selection (start from 5 Fibonacci) ──');
   const fibDivisors = [3, 5, 8, 13, 16];
-  const greedy = greedySelect(data, obliqMean, fibDivisors, 16, 120);
+  const greedy = greedySelect(data, obliqMean, fibDivisors, MAX_HARMONICS, 120);
 
   console.log(`\nFinal (${greedy.divisors.length} harmonics): RMSE = ${(greedy.rmse * 3600).toFixed(3)}"`);
   console.log('\nCoefficients:');
@@ -282,8 +355,7 @@ function main() {
   // Check J2000 with greedy harmonics
   let obliq2000g = obliqMean;
   for (const [div, sinC, cosC] of greedy.harmonics) {
-    const phase = 2 * Math.PI * (2000 - C.balancedYear) / (C.H / div);
-    obliq2000g += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+    obliq2000g += sinC * Math.sin(phaseOf(cycle2000, div)) + cosC * Math.cos(phaseOf(cycle2000, div));
   }
   console.log(`\nObliquity at J2000: ${obliq2000g.toFixed(6)}° (IAU 2006: ${IAU_obliquity}°)`);
   console.log(`J2000 error: ${((obliq2000g - IAU_obliquity) * 3600).toFixed(2)}"`);
@@ -310,12 +382,21 @@ function main() {
   // ─── Smart anchor: adjust mean so formula gives exact IAU obliquity at J2000 ──
   const IAU_J2000 = C.ASTRO_REFERENCE.obliquityJ2000_deg;
 
+  // What gets ANCHORED and WRITTEN is the shipped divisor set (`current`), not
+  // the greedy search output. The greedy run stays above as a diagnostic: it is
+  // a path-dependent heuristic, and at this depth its last pick is decided by a
+  // ~1e-6 arcsec margin — it swaps H/32 (= 2×H/16, a second harmonic of an
+  // existing generator) for H/12 on that basis. Measured: the two sets differ by
+  // 0.024% RMSE, and their curves by at most 0.0066″ anywhere. Adopting the
+  // greedy set would churn the divisor list through fitted-coefficients.json →
+  // the generated constants module → constants.ts for nothing. Change WRITE_SET
+  // deliberately, not by default.
+  const WRITE_SET = current.harmonics;
+
   // Evaluate harmonics at J2000
   let harmonicsAt2000 = 0;
-  const t2000 = 2000 - C.balancedYear;
-  for (const [div, sinC, cosC] of greedy.harmonics) {
-    const phase = 2 * Math.PI * t2000 / (C.H / div);
-    harmonicsAt2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  for (const [div, sinC, cosC] of WRITE_SET) {
+    harmonicsAt2000 += sinC * Math.sin(phaseOf(cycle2000, div)) + cosC * Math.cos(phaseOf(cycle2000, div));
   }
 
   // Adjusted mean: MEAN = IAU_J2000 - harmonics(2000)
@@ -336,10 +417,12 @@ function main() {
   const gridYear = C.gridYear;
   const iauAtGrid = C.iauObliquityAtGrid;
   let harmonicsAtGrid = 0;
-  const tGrid = gridYear - C.balancedYear;
-  for (const [div, sinC, cosC] of greedy.harmonics) {
-    const phase = 2 * Math.PI * tGrid / (C.H / div);
-    harmonicsAtGrid += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  // Same row-anchored convention as J2000 above. With gridYear === 2000 this is
+  // the same row, and iauObliquityAtGrid === obliquityJ2000_deg, so the two
+  // anchors coincide as they should.
+  const cycleGrid = rowAt(gridYear);
+  for (const [div, sinC, cosC] of WRITE_SET) {
+    harmonicsAtGrid += sinC * Math.sin(phaseOf(cycleGrid, div)) + cosC * Math.cos(phaseOf(cycleGrid, div));
   }
   const verifyGrid = adjustedMean + harmonicsAtGrid;
   console.log(`  Verify at grid ${gridYear}: ${verifyGrid.toFixed(6)}° (IAU: ${iauAtGrid.toFixed(6)}°, diff: ${((verifyGrid - iauAtGrid) * 3600).toFixed(4)}")`);
@@ -349,7 +432,7 @@ function main() {
     const jsonPath = path.join(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
     const fc = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
     fc.SOLSTICE_OBLIQUITY_MEAN_FITTED = adjustedMean;  // Smart anchor: IAU_J2000 - harmonics(2000)
-    fc.SOLSTICE_OBLIQUITY_HARMONICS = greedy.harmonics;
+    fc.SOLSTICE_OBLIQUITY_HARMONICS = WRITE_SET;
     fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
     console.log(`\n  ✓ Written SOLSTICE_OBLIQUITY_MEAN_FITTED = ${adjustedMean.toFixed(8)}° to fitted-coefficients.json`);
     console.log('  ✓ Written SOLSTICE_OBLIQUITY_HARMONICS to fitted-coefficients.json');
