@@ -363,45 +363,51 @@ let presetData;
 try {
   presetData = JSON.parse(fs.readFileSync(presetsPath, 'utf8'));
 } catch (e) {
-  console.log('  (Could not load balance-presets.json — skipping config uniqueness check)');
-  presetData = null;
+  // NOT optional. The falsification gate at the end of this file is the
+  // model's sharpest validity criterion and it reads this artifact. Skipping
+  // it on a missing tracked file is how a gate becomes decorative.
+  console.error(`\nFATAL — cannot read ${presetsPath}: ${e.message}`);
+  console.error('It is tracked and required. Regenerate with tools/verify/balance-search.js.');
+  process.exit(1);
 }
 
-if (presetData) {
-  const phaseGroups = ['in-phase', 'anti-phase'];
-  const planetOrder = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+const presetPhaseGroups = ['in-phase', 'anti-phase'];
+const presetPlanetOrder = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 
-  let mirrorCount = 0;
-  let config27Found = false;
+let mirrorCount = 0;
+let config27Found = false;
 
-  for (const preset of presetData.presets) {
-    const cfg = {};
-    let idx = 2;
-    for (const p of planetOrder) {
-      cfg[p] = { d: preset[idx], group: phaseGroups[preset[idx + 1]] };
-      idx += 2;
-    }
-    cfg.earth = { d: 3, group: 'in-phase' };
+for (const preset of presetData.presets) {
+  const cfg = {};
+  let idx = 2;
+  for (const p of presetPlanetOrder) {
+    cfg[p] = { d: preset[idx], group: presetPhaseGroups[preset[idx + 1]] };
+    idx += 2;
+  }
+  cfg.earth = { d: 3, group: 'in-phase' };
 
-    const isMirror =
-      cfg.mercury.d === cfg.uranus.d &&
-      cfg.venus.d === cfg.neptune.d &&
-      cfg.earth.d === cfg.saturn.d &&
-      cfg.mars.d === cfg.jupiter.d;
+  const isMirror =
+    cfg.mercury.d === cfg.uranus.d &&
+    cfg.venus.d === cfg.neptune.d &&
+    cfg.earth.d === cfg.saturn.d &&
+    cfg.mars.d === cfg.jupiter.d;
 
-    if (isMirror) {
-      mirrorCount++;
-      if (cfg.mercury.d === 21 && cfg.venus.d === 34 && cfg.mars.d === 5 && cfg.saturn.d === 3) {
-        config27Found = true;
-      }
+  if (isMirror) {
+    mirrorCount++;
+    if (cfg.mercury.d === 21 && cfg.venus.d === 34 && cfg.mars.d === 5 && cfg.saturn.d === 3) {
+      config27Found = true;
     }
   }
-
-  console.log(`Total valid configurations: ${presetData.presets.length}`);
-  console.log(`Mirror-symmetric configs:   ${mirrorCount}`);
-  check('Mirror-symmetric config found', config27Found, 'Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34');
-  check('Only 1 mirror config', mirrorCount === 1, `found ${mirrorCount}`);
 }
+
+// This block searches the CURATED presets (presetCount = 15). The gate at the
+// end of the file searches the deep-analysis candidates (96) using the
+// generator's own `mirror` / `isConfig7` fields — a different population and a
+// different question. Both are wanted.
+console.log(`Curated presets:          ${presetData.presets.length}`);
+console.log(`Mirror-symmetric configs: ${mirrorCount}`);
+check('Mirror-symmetric config found', config27Found, 'Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34');
+check('Only 1 mirror config among the curated presets', mirrorCount === 1, `found ${mirrorCount}`);
 
 // ══════════════════════════════════════════════════════════════════
 // FINDING 3: ECCENTRICITY BALANCE INDEPENDENCE
@@ -751,6 +757,94 @@ for (const key of planets) {
   );
   check(`${key} J2000 match < 0.1"`, Math.abs(diff) < 0.1, `${diff.toFixed(4)}"`);
 }
+
+// ══════════════════════════════════════════════════════════════════
+// FALSIFICATION GATE: Config 7 must still be the unique mirror config
+// ══════════════════════════════════════════════════════════════════
+//
+// The model is ONE configuration out of the 7,558,272 searched: Saturn in
+// antiphase, every other planet in phase, all eight mirror-paired. In
+// data/balance-presets.json that is the unique deep-analysis candidate with
+// `mirror === true`. If a regenerated balance-presets.json no longer contains
+// it, the model is invalid. That is the sharpest falsification criterion the
+// model has, and until now nothing checked it.
+//
+// NOT the same question as `allPass`. allPassCount is 0 and Config 7 reports
+// allPass: false (llPassCount 7, dirPassCount 2). That asks whether any
+// configuration satisfies all four physical constraints — stricter, and not
+// what makes the model valid or invalid. Conflating the two is how the older
+// "Config #7 uniquely passes all four constraints" claim came to be
+// unsupported by its own data file.
+//
+// balance-presets.json abbreviates planet keys and omits Earth: d_E = 3 is the
+// anchor the other seven are measured against, not a searched value.
+
+console.log('\n┌───────────────────────────────────────────────────────────────────────────┐');
+console.log('│  FALSIFICATION GATE: Config 7 unique among the deep-analysis candidates │');
+console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
+
+const candidates = (presetData.deepAnalysis && presetData.deepAnalysis.configs) || [];
+
+const ABBR = { me: 'mercury', ve: 'venus', ma: 'mars', ju: 'jupiter', sa: 'saturn', ur: 'uranus', ne: 'neptune' };
+const KEY_OF = Object.fromEntries(Object.entries(ABBR).map(([a, p]) => [p, a]));
+
+// d for any planet in the shipped model. Earth is absent from dValues.
+const shippedD = (p) => (p === 'earth' ? config.earth.d : C.planets[p].fibonacciD);
+const presetD = (p) => (p === 'earth' ? config.earth.d : c7 && c7.dValues[KEY_OF[p]]);
+
+const mirrored = candidates.filter((c) => c.mirror === true);
+const flagged = candidates.filter((c) => c.isConfig7 === true);
+const c7 = flagged[0];
+
+check(
+  'exactly one mirror-symmetric candidate',
+  mirrored.length === 1,
+  `${mirrored.length} of ${candidates.length} candidates have mirror === true`
+);
+
+check(
+  'the mirror candidate is the one flagged isConfig7',
+  flagged.length === 1 && mirrored.length === 1 && mirrored[0] === flagged[0],
+  `${flagged.length} flagged isConfig7; same object as the mirror candidate: ${mirrored[0] === flagged[0]}`
+);
+
+// Literal, per the falsification criterion — and it must also agree with the
+// antiPhase flags the model actually ships, so the two cannot drift together.
+const groups = (c7 && c7.groups) || {};
+const groupsOk =
+  Object.keys(ABBR).every((a) => groups[a] === (a === 'sa' ? 1 : 0)) &&
+  Object.keys(ABBR).every((a) => Boolean(C.planets[ABBR[a]].antiPhase) === (groups[a] === 1));
+check(
+  'phase groups: Saturn = 1, all others = 0 (and shipped antiPhase agrees)',
+  groupsOk,
+  Object.keys(ABBR).map((a) => `${a}=${groups[a]}`).join(' ')
+);
+
+const dMismatch = Object.values(ABBR).filter((p) => presetD(p) !== shippedD(p));
+check(
+  'preset d-values equal the shipped fibonacciD',
+  c7 !== undefined && dMismatch.length === 0,
+  dMismatch.length === 0
+    ? Object.values(ABBR).map((p) => `${KEY_OF[p]}=${shippedD(p)}`).join(' ')
+    : `differ for ${dMismatch.join(', ')}`
+);
+
+const pairErrors = [];
+for (const p of planets) {
+  const q = p === 'earth' ? 'saturn' : C.planets[p].mirrorPair;
+  if (!q) { pairErrors.push(`${p} has no mirrorPair`); continue; }
+  if (C.planets[q] ? C.planets[q].mirrorPair !== p : q !== 'earth' || C.planets[p].mirrorPair !== 'earth') {
+    pairErrors.push(`${p}<->${q} not reciprocal`);
+  }
+  if (presetD(p) !== presetD(q)) pairErrors.push(`${p}(${presetD(p)}) != ${q}(${presetD(q)})`);
+}
+check(
+  'd-values pair up according to mirrorPair',
+  c7 !== undefined && pairErrors.length === 0,
+  pairErrors.length === 0
+    ? 'me/ur=21  ve/ne=34  ma/ju=5  sa/earth=3'
+    : pairErrors.join('; ')
+);
 
 // ══════════════════════════════════════════════════════════════════
 // SUMMARY

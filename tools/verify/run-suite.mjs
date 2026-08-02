@@ -37,9 +37,9 @@ const V = (n) => join(ROOT, 'tools/verify', n);
  */
 const MANIFEST = [
   { n: 'verify-laws.js', class: 'gate', ms: 53,
-    expect: { passed: 44, total: 45 },
+    expect: { passed: 49, total: 50 },
     knownFailure: 'Saturn Laplace-Lagrange bound [0.920,1.050] not inside [0.797,1.020] — documented, not a regression',
-    note: 'Its own output contains `✓ saturn J2000 match < 0.1": 0.0000"` — the anchor tautology. Do not treat that line as a gate.' },
+    note: 'Its own output contains `✓ saturn J2000 match < 0.1": 0.0000"` — the anchor tautology. Do not treat that line as a gate. Checks 46-50 are the Config-7 falsification gate (§2j); each was shown to fail under injection.' },
 
   { n: 'dual-balance-optimizer.js', class: 'gate', ms: 658 },
 

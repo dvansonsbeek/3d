@@ -103,11 +103,19 @@ tracked state, not a broken checkout.
 nothing. `npm run test:verify:list` gives the classification: 2 gate · 4 liftable
 · 10 narrative · 1 generator. **Never run `balance-search.js` as a test** — it
 rewrites the tracked `data/balance-presets.json`. `verify-laws` is gated on its
-check count (44/45, Saturn's Laplace–Lagrange bound the documented failure), not
+check count (49/50, Saturn's Laplace–Lagrange bound the documented failure), not
 its exit code, so an unexplained *improvement* fails too.
 
 Reference values: Law 4 K = 3.4143e-6 · Law 5 balance = 99.8636% (use **base**
 eccentricity, not J2000) · Saturn Law 5 = 0.05371910.
+
+**The falsification criterion** (checks 46–50 of `verify-laws`). The model is one
+configuration out of 7,558,272: Saturn antiphase, the rest in phase, all eight
+mirror-paired. In `data/balance-presets.json` that is the *unique* deep-analysis
+candidate with `mirror === true`. If a regenerated file no longer contains it,
+the model is invalid. Do not confuse this with `allPass`: `allPassCount` is 0 and
+Config 7 reports `allPass: false` — a stricter question about all four physical
+constraints, and **not** what makes the model valid.
 
 ## Skills
 

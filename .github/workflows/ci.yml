@@ -82,7 +82,7 @@ jobs:
       # §5d — the model gates. Only 2 of the 17 tools/verify scripts have a
       # failing exit path; the runner encodes that classification and excludes
       # balance-search.js, which writes tracked data. verify-laws is checked on
-      # its CHECK COUNT (44/45, Saturn LL the documented failure), not its exit
+      # its CHECK COUNT (49/50, Saturn LL the documented failure), not its exit
       # code, so both a regression and an unexplained improvement are caught.
       - name: Model gates (tools/verify)
         run: npm run test:verify
