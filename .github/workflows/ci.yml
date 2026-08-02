@@ -133,10 +133,10 @@ jobs:
       - name: Regression (script.js golden masters, headless)
         run: npm run test:snapshot
 
-      # THE acceptance gate. Expected RED until Phase 6 removes the seven mutable
-      # epoch globals; `continue-on-error` keeps that honest without painting the
-      # whole run red. When this turns green, drop the flag — do not delete the
-      # step, and check the probes still resolve before celebrating.
-      - name: Referential transparency (EXPECTED RED until Phase 6)
+      # THE Phase 6 acceptance gate — GREEN since B.3b and REQUIRED from here on.
+      # It was red by design (21/84) while recomputeEpochAnchors mutated the
+      # sidereal Fourier baseline; the baseline is a frozen const now and reset
+      # restores the module-load seeds exactly (R16). f(Y) depends on Y alone.
+      # A red run here is a regression of the Phase 6 exit criterion.
+      - name: Referential transparency (Phase 6 exit criterion)
         run: npm run test:transparency
-        continue-on-error: true

@@ -5,17 +5,19 @@
  * scene state, not an argument: the year length at Y=1000 is a fact, and must
  * not change because someone called setEpochByAge(-1) first.
  *
- * THIS TEST IS EXPECTED TO FAIL TODAY. That is its job. `recomputeEpochAnchors`
- * mutates seven module globals read at ~1,000 sites (plan §5c), so f(Y) is
- * currently a function of (Y, epoch). Phase 6's exit criterion is that those
- * globals no longer exist and this test goes green — at which point it moves off
- * the browser and runs against `packages/physics` directly.
+ * GREEN SINCE PHASE B (B.3b), and required in CI. It failed 21/84 by design
+ * while `recomputeEpochAnchors` rewrote the sidereal Fourier baseline the
+ * probes read; the baseline is the frozen SIDEREAL_YEAR_DAYS_KINEMATIC_J2000
+ * const now, the seven globals are a cache over Layer 0 (B.3c), and
+ * resetEpochToJ2000 restores the module-load seeds exactly (R16). At Phase 8
+ * this moves off the browser and runs against `packages/physics` directly.
  *
- * A green run before Phase 6 means the test stopped testing, not that the code
- * got fixed. Check that the probes still resolve.
+ * A red run is a REGRESSION of the Phase 6 exit criterion. A green run still
+ * proves something only while the probes resolve — if window.__test__ loses a
+ * probe, the harness reports it rather than passing silently.
  *
- *   exit 0 — invariant (Phase 6 complete)
- *   exit 1 — violation (expected until then)
+ *   exit 0 — invariant (the required state)
+ *   exit 1 — violation (a regression)
  */
 import { openSimulator } from './harness.mjs';
 

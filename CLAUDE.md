@@ -104,9 +104,9 @@ pre-migration and join as Phase 8 extracts.
 
 `npm run test:browser` runs the `src/script.js` golden masters in headless
 Chromium — the only tier that guards Phase 8, which dissolves that file.
-`npm run test:transparency` is the Phase 6 acceptance gate and is **expected to
-fail** (21/84, all of it `computeSiderealYearDaysDirect`); red there is the
-tracked state, not a broken checkout.
+`npm run test:transparency` is the Phase 6 acceptance gate — **green (84/84,
+round-trip bit-exact) since Phase B** and required in CI; red there is a
+regression of the Phase 6 exit criterion, not a tracked state.
 
 `/gates` runs the standalone model checks. `tools/verify/` holds 17 scripts, and
 **15 of them cannot fail** — no exit path, no assertion, so running them proves
