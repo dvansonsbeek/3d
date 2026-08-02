@@ -246,8 +246,28 @@ function computeEccentricityEarth(currentYear) {
  * Source: script.js computeEccentricityEarth() ~line 33358
  */
 function computeEccentricity(currentYear, balancedYear, cycleLength, base, amplitude) {
+  // R6: the phase must be INTEGRATED under deep time, matching the browser's
+  // computeEccentricityEarth (phaseAdvanceRadians). This was a plain linear
+  // θ = 2π(year − anchor)/cycleLength, which made the two engines disagree on
+  // the eccentricity VALUE at deep time while already agreeing on the
+  // perihelion GEOMETRY (the scene rotates its precession objects via
+  // cyclesBetweenYears). Same quantity, two conventions, inside one scene —
+  // measured at 3e-14 at J2000, −1.10e-6 at −150 kyr, up to 7.4 s of
+  // cardinal-point timing at deep time.
+  //
+  // The snapshot branch is algebraically identical to the old linear form:
+  // (year − anchor) × (H/cycleLength) / H = (year − anchor)/cycleLength.
+  // Flag polarity matches the scene-graph default (R1: deep time ON,
+  // SG_DEEP_TIME=0 opts out into snapshot mode).
+  const divisor_N = C.H / cycleLength;
+  const snapshot = (currentYear - balancedYear) * divisor_N / C.H;
+  let cycles = snapshot;
+  if (process.env.SG_DEEP_TIME !== '0') {
+    const c = require('./deep-time').cyclesBetweenYears(balancedYear, currentYear, divisor_N);
+    if (c !== null) cycles = c;   // null past the tidal-lock asymptote → keep snapshot
+  }
   // Law of cosines: distance between two circular orbits
-  const θ = ((currentYear - balancedYear) / cycleLength) * 2 * Math.PI;
+  const θ = cycles * 2 * Math.PI;
   return Math.sqrt(base * base + amplitude * amplitude - 2 * base * amplitude * Math.cos(θ));
 }
 

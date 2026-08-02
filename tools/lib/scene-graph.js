@@ -493,7 +493,13 @@ function _fwEFactorTools(d_days, T, T2) {
 // JD↔pos conversion and derived-year math pick up the epoch shift. Toggle
 // OFF ⇒ bit-identical to prior J2000-only output. See doc
 // IP-deep-time-scene-graph-fitpipeline.md §5-6.
-const DEEP_TIME_ENABLED = process.env.SG_DEEP_TIME === '1';
+// R1: deep time is ON by default, matching the browser scene — which IS the
+// model. It used to default OFF, so Step 6a chained its event search with
+// C.meanSolarYearDays while the scene used SI_TROPICAL_YEAR_DAYS: a 1.37e-6 d
+// gap that put every measured year length 118 ms/yr out (measured directly as
+// a linear ramp, −1.182 s at 1990 → +1.182 s at 2010), and 4–6 HOURS on the
+// Babylonian eclipse set. Set SG_DEEP_TIME=0 to opt out (snapshot mode).
+const DEEP_TIME_ENABLED = process.env.SG_DEEP_TIME !== '0';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MINIMAL MATRIX4 (column-major, matches Three.js convention)
@@ -743,6 +749,27 @@ const startModelYearWithCorrection = C.startmodelYear + correctionYears;
 // J2000; only downstream JD↔pos conversions and H-derived periods pick
 // up the epoch shift. See IP-deep-time-scene-graph-fitpipeline.md §6.2.
 let _epochCache = { t_Ma: 0, H: H_J2000, mSY: MSY_J2000, sDay: sDay_J2000 };
+
+// ─── Scene time coordinate ↔ JD (R4) ───────────────────────────────────────
+// `pos` is the count of tropical years since startmodelJD. Under deep time the
+// year length varies, so the conversion must be the INTEGRAL of the rate:
+//   jd(pos) = startmodelJD + ∫₀^pos meanTropicalYearDaysAtAge dy
+// This REPLACES `pos = _epochCache.sDay × (jd − startmodelJD)` — the current
+// rate times the whole elapsed span, which doubles the accumulated drift
+// exactly for a drifting rate (Δt² growth: 3.313 d = 3.27° at the Step 6a
+// window edge). Under SG_DEEP_TIME off the rate is constant, the linear form
+// is exact, and it is kept bit-identical.
+function _posFromJDTools(jd) {
+  if (!DEEP_TIME_ENABLED) return sDay_J2000 * (jd - C.startmodelJD);
+  const p = DT.posFromJD(jd);
+  return p === null ? _epochCache.sDay * (jd - C.startmodelJD) : p;   // past tidal lock
+}
+
+function _jdFromPosTools(pos) {
+  if (!DEEP_TIME_ENABLED) return C.startmodelJD + pos * MSY_J2000;
+  const j = DT.jdFromPos(pos);
+  return j === null ? C.startmodelJD + pos * _epochCache.mSY : j;
+}
 
 function _syncEpochForJD(jd) {
   if (!DEEP_TIME_ENABLED) return _epochCache;
@@ -1191,7 +1218,13 @@ function moveModel(graph, pos) {
   // Compute dynamic eccentricities for all planets (oscillate at H/16)
   // Uses _epochCache.mSY so the pos→JD→year round-trip is consistent with
   // the caller's pos = _epochCache.sDay × (jd - C.startmodelJD).
-  const currentYear = C.balancedYear + (C.startmodelJD + pos * _epochCache.mSY - C.balancedJD) / _epochCache.mSY;
+  // pos IS the tropical-year count from startmodelJD, so the year is simply
+  // startModelYearWithCorrection + pos. The previous form reconstructed the JD
+  // as `startmodelJD + pos*mSY` and divided by mSY again — algebraically the
+  // same under a CONSTANT rate, but it mixes conventions now that pos comes
+  // from the integrated conversion, and its epoch-local mSY made the offset
+  // (startmodelJD - balancedJD)/mSY drift with epoch.
+  const currentYear = C.startModelYearWithCorrection + pos;
   const dynEcc = { earth: OE.computeEccentricity(currentYear, C.balancedYear, C.perihelionCycleLength, C.eccentricityBase, C.eccentricityAmplitude) };
   for (const [key, p] of Object.entries(C.planets)) {
     if (p.eccentricityPhaseJ2000 !== undefined) {
@@ -1217,7 +1250,7 @@ function moveModel(graph, pos) {
       // chains; measured as a spurious ~9.6° Moon-vs-ring plane divergence
       // at +52 kyr in the moon-on-ring meter). Anchor + SI-year coordinate
       // mirror src/script.js moveModel (_mAnchor = STARTMODEL_YEAR_SI, UT).
-      const _jdHere = C.startmodelJD + pos * _epochCache.mSY;
+      const _jdHere = _jdFromPosTools(pos);
       // TT clock (mirrors src/script.js): the Moon-chain layers run on the
       // SAME clock as the override arguments — the earlier UT convention made
       // the ring lag the Moon by precession-rate × ΔT at deep time.
@@ -1275,7 +1308,7 @@ function moveModel(graph, pos) {
       // Recover JD via epoch-consistent mSY so pos→jd round-trip is exact.
       // Sun harmonic phase below uses C.H (J2000 fixed) because the table was
       // fitted against J2000 mSY.
-      const jd = C.startmodelJD + pos * _epochCache.mSY;
+      const jd = _jdFromPosTools(pos);
       const year = 2000 + (jd - C.j2000JD) / 365.25;
       const t = year - C.balancedYear;
       let corr = C.SUN_LONGITUDE_MEAN || 0;
@@ -1302,7 +1335,7 @@ function moveModel(graph, pos) {
       // in dynamical time — this shift was MISSING in the tools mirror (the
       // browser had it), which was the whole browser-vs-tools deep-time delta
       // (~4 yr of ΔT at +200 kyr → args differing by ~150° in ϖ).
-      const d = _jdTTToolsFromUT(C.startmodelJD + pos * _epochCache.mSY) - C.j2000JD;
+      const d = _jdTTToolsFromUT(_jdFromPosTools(pos)) - C.j2000JD;
       const T = d / C.julianCenturyDays;
       const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
 
@@ -1437,7 +1470,7 @@ function moveModel(graph, pos) {
   // Uses _epochCache.mSY for pos→jd round-trip; yearsSinceBalanced then
   // uses the same mSY so the year count is epoch-consistent with the
   // caller's JD input.
-  const currentJD = C.startmodelJD + pos * _epochCache.mSY;
+  const currentJD = _jdFromPosTools(pos);
   const yearsSinceBalanced = (currentJD - C.balancedJD) / _epochCache.mSY;
 
   // Planets
@@ -1522,8 +1555,8 @@ function computePlanetPosition(target, jd) {
   // Must precede pos computation so pos uses the epoch-appropriate mSY.
   _syncEpochForJD(jd);
 
-  // Convert JD to pos (script.js: pos = sDay * (jd - startmodelJD))
-  const pos = _epochCache.sDay * (jd - C.startmodelJD);
+  // Convert JD to pos via the integrated conversion (R4; script.js: posFromJD)
+  const pos = _posFromJDTools(jd);
 
   // Animate all objects
   moveModel(graph, pos);
@@ -1893,7 +1926,7 @@ function thetaToRaHours(theta) {
 function getSunWorldAngle(jd) {
   const graph = getGraph();
   _syncEpochForJD(jd);
-  const pos = _epochCache.sDay * (jd - C.startmodelJD);
+  const pos = _posFromJDTools(jd);
   moveModel(graph, pos);
   const sunWP = graph.sunNodes.pivot.getWorldPosition();
   let angle = Math.atan2(sunWP[2], sunWP[0]) * 180 / Math.PI;
@@ -1908,7 +1941,7 @@ function getSunWorldAngle(jd) {
 function getWobbleSunDistAU(jd) {
   const graph = getGraph();
   _syncEpochForJD(jd);
-  const pos = _epochCache.sDay * (jd - C.startmodelJD);
+  const pos = _posFromJDTools(jd);
   moveModel(graph, pos);
   // WobbleCenter is at the scene origin (0,0,0)
   const sunWP = graph.sunNodes.pivot.getWorldPosition();
@@ -1925,10 +1958,12 @@ function getWobbleSunDistAU(jd) {
 function computeSunPositionFast(jd) {
   const graph = getGraph();
   _syncEpochForJD(jd);
-  const pos = _epochCache.sDay * (jd - C.startmodelJD);
+  const pos = _posFromJDTools(jd);
 
   // Compute Earth eccentricity for EoC — epoch-consistent mSY for round-trip.
-  const currentYear = C.balancedYear + (C.startmodelJD + pos * _epochCache.mSY - C.balancedJD) / _epochCache.mSY;
+  // pos IS the tropical-year count from startmodelJD (see the block at
+  // computePositions): startModelYearWithCorrection + pos, one convention.
+  const currentYear = C.startModelYearWithCorrection + pos;
   const earthEcc = OE.computeEccentricity(currentYear, C.balancedYear, C.perihelionCycleLength, C.eccentricityBase, C.eccentricityAmplitude);
 
   // Animate a single node: orbit.ry = θ (with EoC if applicable)

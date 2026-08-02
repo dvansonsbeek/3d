@@ -2369,15 +2369,44 @@ function _evalClimateL1Orbital(year) {
   return L1_sum * r.denormalization.y_std;
 }
 
+// R2 — the α lattice reference. When BUILDING an H-lattice table (the ∫1/H
+// and cumulative-days tables) α must be held at its J2000 reference, or the
+// lattice defines itself in terms of its own output: α(t) is exactly
+// 8H-periodic and its MEAN over the build window sits ~+1.24e-6 above the
+// IERS anchor (we live at an interglacial peak), which shifted the cycle
+// count by 141.6 d at cycle 0. The browser used to get this right only by
+// ACCIDENT — the tables built during module init, where reading the
+// CLIMATE_FORMULA_COEFFS const threw (TDZ) and a catch returned the anchor
+// value. Move one declaration and the model silently shifts. The flag makes
+// the physics a decision instead of a load-order artifact. Save/restore under
+// try/finally: without it a throw mid-build would leave EVERY α consumer —
+// live H, LOD, ΔT, the Moon chain — pinned for the rest of the session.
+let _latticeAlphaRef = false;
+let _latticeAlphaTdzWarned = false;
+function _withLatticeAlpha(build) {
+  const prev = _latticeAlphaRef;
+  _latticeAlphaRef = true;
+  try { build(); } finally { _latticeAlphaRef = prev; }
+}
+
 function earthMoiFactorAtAge(t_Ma) {
-  // CLIMATE_FORMULA_COEFFS is a `const` defined ~15k lines later. Some
-  // callers (cyclesBetweenYears via _ensureCumulIntegralTable, invoked
-  // during scene-graph setup at line ~7483) fire during module init,
-  // BEFORE the const is initialized. `typeof` on a TDZ const throws, so
-  // guard with try/catch: fall back to the J2000 anchor value during the
-  // window where the climate coefficients aren't ready yet.
+  if (_latticeAlphaRef) return EARTH_MOI_FACTOR;
+  // CLIMATE_FORMULA_COEFFS is a `const` defined ~16k lines later, so a caller
+  // firing during module init hits its TDZ (reading a TDZ const throws).
+  // This is now ONLY a crash guard — the lattice reference above carries the
+  // modelling decision. If it ever fires we want to know, because it means
+  // some init-time consumer is silently getting the anchor value instead of
+  // α(t): that consumer needs the explicit flag, not this fallback.
   let coeffs;
-  try { coeffs = CLIMATE_FORMULA_COEFFS; } catch (e) { return EARTH_MOI_FACTOR; }
+  try { coeffs = CLIMATE_FORMULA_COEFFS; } catch (e) {
+    if (!_latticeAlphaTdzWarned) {
+      _latticeAlphaTdzWarned = true;
+      console.warn('[alpha] earthMoiFactorAtAge hit the CLIMATE_FORMULA_COEFFS TDZ ' +
+                   'outside a lattice-table build — an init-time consumer is ' +
+                   'receiving EARTH_MOI_FACTOR instead of α(t). See _latticeAlphaRef.');
+    }
+    return EARTH_MOI_FACTOR;
+  }
   if (!coeffs) return EARTH_MOI_FACTOR;
   if (_alphaClimateL1_J2000 === null) {
     _alphaClimateL1_J2000 = _evalClimateL1Orbital(2000);
@@ -5238,6 +5267,10 @@ let   _cumulIntegralJ2000Idx   = -1;
 
 function _ensureCumulIntegralTable() {
   if (_cumulIntegralTable !== null) return;
+  _withLatticeAlpha(_buildCumulIntegralTable);   // R2: lattice tables pin α
+}
+
+function _buildCumulIntegralTable() {
   const N = Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP) + 1;
   const table = new Float64Array(N);
   const j2000Idx = Math.round((startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
@@ -5411,6 +5444,10 @@ let _cumulDaysTable = null;
 
 function _ensureCumulDaysTable() {
   if (_cumulDaysTable !== null) return;
+  _withLatticeAlpha(_buildCumulDaysTable);   // R2: lattice tables pin α
+}
+
+function _buildCumulDaysTable() {
   _ensureCumulIntegralTable();
   const N = _cumulIntegralTable.length;
   const j2000Idx = _cumulIntegralJ2000Idx;
@@ -5466,6 +5503,149 @@ function yearToJD(year) {
   return startmodelJD + daysFromStartmodel;
 }
 
+// ───── Scene time coordinate ↔ JD (R4) ─────────────────────────────────────
+// `pos` counts tropical years since startmodelJD; the Sun advances 2π per
+// unit. Under deep time the year length drifts, so the conversion must be the
+// INTEGRAL of the rate:  jd(pos) = startmodelJD + ∫₀^pos daysPerTropicalYear.
+// This REPLACES `pos = sDay·(jd − startmodelJD)` — the current rate times the
+// whole elapsed span. For a drifting rate that DOUBLES the accumulated drift
+// exactly (measured 2.0010/2.0037/1.9952/2.0123 at −50k/−100k/−200k/−302,612),
+// a Sun position error growing as Δt²: 0.372 d at −100 kyr, 3.313 d = 3.27° at
+// the Step 6a window edge, ~10 yr at 10 Myr. Under DEEP_TIME_MODE_ENABLED=false
+// the rate is constant, the linear form is exact, and it is kept bit-identical.
+//
+// Uses the REAL α(t), not the lattice reference: this is a physical time
+// conversion, not a lattice cycle count.
+let _cumulPosTable = null;
+const _posDpy = (year) => meanTropicalYearDaysAtAge((startmodelYear - year) / 1e6);
+// Anchor cell: integer index and startmodelYear's offset (years) inside it.
+let _posAnchorLo = null, _posAnchorDy0 = null;
+function _posAnchorLoIdx() {
+  if (_posAnchorLo === null) {
+    _posAnchorLo = Math.floor((startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
+    _posAnchorDy0 = startmodelYear - (_CUMUL_INTEGRAL_YEAR_MIN + _posAnchorLo * _CUMUL_INTEGRAL_STEP);
+  }
+  return _posAnchorLo;
+}
+function _posAnchorDy() { _posAnchorLoIdx(); return _posAnchorDy0; }
+
+function _ensureCumulPosTable() {
+  if (_cumulPosTable !== null) return;
+  _ensureCumulIntegralTable();                  // grid geometry
+  const N = _cumulIntegralTable.length;
+  const j2000Idx = _cumulIntegralJ2000Idx;
+  _cumulPosTable = new Float64Array(N);
+
+  const dpy = _posDpy;
+
+  const gridYearAtJ2000Idx = _CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP;
+  _cumulPosTable[j2000Idx] = -(startmodelYear - gridYearAtJ2000Idx) * dpy(startmodelYear);
+
+  let prev = dpy(gridYearAtJ2000Idx);
+  for (let i = j2000Idx + 1; i < N; i++) {
+    const curr = dpy(_CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP);
+    _cumulPosTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulPosTable[i - 1]))
+      ? _cumulPosTable[i - 1] + 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP : NaN;
+    prev = curr;
+  }
+  prev = dpy(gridYearAtJ2000Idx);
+  for (let i = j2000Idx - 1; i >= 0; i--) {
+    const curr = dpy(_CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP);
+    _cumulPosTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulPosTable[i + 1]))
+      ? _cumulPosTable[i + 1] - 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP : NaN;
+    prev = curr;
+  }
+
+  // Normalise so jdFromPos(0) === startmodelJD exactly. Without this the anchor
+  // cell carries a partial-cell artifact (seeded by linear extrapolation, read
+  // by interpolation across a 10-kyr cell) worth a constant 37 s.
+  // Must use the SAME analytic sub-cell integration the reader uses.
+  const lo0n = _posAnchorLoIdx(), dy0n = _posAnchorDy();
+  const yLo0n = _CUMUL_INTEGRAL_YEAR_MIN + lo0n * _CUMUL_INTEGRAL_STEP;
+  const v0 = _cumulPosTable[lo0n] + 0.5 * (_posDpy(yLo0n) + _posDpy(startmodelYear)) * dy0n;
+  if (Number.isFinite(v0)) for (let i = 0; i < N; i++) _cumulPosTable[i] -= v0;
+}
+
+/** Scene time coordinate → Julian Date. pos = 0 returns startmodelJD exactly. */
+function jdFromPos(pos) {
+  if (!DEEP_TIME_MODE_ENABLED) return startmodelJD + pos / sDay;
+  if (!Number.isFinite(pos)) return null;
+  _ensureCumulPosTable();
+  // Years from the anchor cell's lower edge — never via the absolute index
+  // fraction (idxF0 ~50,000 loses 1.1e-11, × STEP = 4e-5 d).
+  const lo0 = _posAnchorLoIdx();
+  const total = _posAnchorDy() + pos;
+  const k = Math.floor(total / _CUMUL_INTEGRAL_STEP);
+  const dyCell = total - k * _CUMUL_INTEGRAL_STEP;
+  const lo = lo0 + k;
+  if (lo < 0 || lo >= _cumulPosTable.length - 1) return startmodelJD + pos / sDay;
+  const a = _cumulPosTable[lo];
+  if (Number.isNaN(a)) return startmodelJD + pos / sDay;
+  // Integrate analytically across the partial cell: linear interpolation returns
+  // the cell's CHORD slope (the year length at the cell MIDPOINT), which on a
+  // 10-kyr grid is 18.6 ms of year length at J2000.
+  const yLo = _CUMUL_INTEGRAL_YEAR_MIN + lo * _CUMUL_INTEGRAL_STEP;
+  const f0 = _posDpy(yLo), f1 = _posDpy(yLo + dyCell);
+  if (f0 === null || f1 === null) return startmodelJD + pos / sDay;
+  return startmodelJD + a + 0.5 * (f0 + f1) * dyCell;
+}
+
+/** Julian Date → scene time coordinate. Exact inverse of jdFromPos.
+ *  Seeded from the linear estimate — this is on the hot path. */
+function posFromJD(jd) {
+  if (!DEEP_TIME_MODE_ENABLED) return sDay * (jd - startmodelJD);
+  if (!Number.isFinite(jd)) return null;
+  _ensureCumulPosTable();
+  const N = _cumulPosTable.length;
+  const target = jd - startmodelJD;
+  let lo = 0, hi = N - 1;
+  while (lo < N && Number.isNaN(_cumulPosTable[lo])) lo++;
+  while (hi >= 0 && Number.isNaN(_cumulPosTable[hi])) hi--;
+  if (lo >= hi) return sDay * (jd - startmodelJD);
+  if (target < _cumulPosTable[lo] || target > _cumulPosTable[hi]) return sDay * (jd - startmodelJD);
+
+  const guessYear = startmodelYear + target / SI_TROPICAL_YEAR_DAYS;
+  let g = Math.floor((guessYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
+  if (g < lo) g = lo; if (g > hi - 1) g = hi - 1;
+  if (_cumulPosTable[g] <= target && _cumulPosTable[g + 1] >= target) {
+    lo = g; hi = g + 1;
+  } else {
+    let span = 1, a = g, b = g;
+    while (span < N) {
+      a = Math.max(lo, g - span); b = Math.min(hi, g + span);
+      if (_cumulPosTable[a] <= target && _cumulPosTable[b] >= target) break;
+      span <<= 1;
+    }
+    lo = a; hi = b;
+    while (lo < hi - 1) {
+      const mid = (lo + hi) >> 1;
+      if (_cumulPosTable[mid] <= target) lo = mid; else hi = mid;
+    }
+  }
+  // Solve within the cell against the SAME analytic sub-integration jdFromPos
+  // uses, so the two are exact inverses.
+  const a2 = _cumulPosTable[lo];
+  const yLo = _CUMUL_INTEGRAL_YEAR_MIN + lo * _CUMUL_INTEGRAL_STEP;
+  const f0 = _posDpy(yLo);
+  let dy = (_cumulPosTable[hi] === a2) ? 0
+         : (target - a2) / (_cumulPosTable[hi] - a2) * _CUMUL_INTEGRAL_STEP * (hi - lo);
+  for (let it = 0; it < 4; it++) {
+    const f1 = _posDpy(yLo + dy);
+    if (f1 === null) break;
+    const g = a2 + 0.5 * (f0 + f1) * dy - target;
+    if (Math.abs(g) < 1e-11) break;
+    dy -= g / f1;
+  }
+  return (lo - _posAnchorLoIdx()) * _CUMUL_INTEGRAL_STEP - _posAnchorDy() + dy;
+}
+
+/** Civil date+time → scene time coordinate. Deliberately routes through
+ *  dateToDays (NOT dateTimeToJulianDay) to preserve its calendar convention
+ *  for pre-GREGORIAN_START dates; only the day fraction comes from timeToPos. */
+function posFromDateTime(dateStr, timeStr) {
+  return posFromJD(startmodelJD + dateToDays(dateStr) + timeToPos(timeStr) / sDay);
+}
+
 // ───── Phase 9.10b: pattern correction for snapshot-form-fitted harmonics ─────
 // All `*_HARMONICS` tables in this codebase (OBLIQUITY, ECCENTRICITY, CARDINAL,
 // SIDEREAL_YEAR, PERI, …) were fitted under the snapshot-form phase convention:
@@ -5509,15 +5689,16 @@ function cyclesBetweenYears(yearA, yearB, divisor_N) {
   if (DEEP_TIME_MODE_ENABLED) {
     const integral = integralInverseHFromYears(yearA, yearB);
     if (integral === null) return null;
-    // Apply pattern correction based on whichever endpoint is FARTHER from J2000
-    // (heuristically: the harmonic "anchor", e.g. BALANCED_YEAR_J2000_FIXED).
-    // The correction is signed by which side the anchor is on:
-    //   yearA is anchor (call shape: cyclesBetweenYears(anchor, currentYear)) → subtract drift_for(yearA)
-    //   yearB is anchor (call shape: cyclesBetweenYears(currentYear, anchor)) → subtract -drift_for(yearB)
-    // Both shapes produce snapshot-equivalent cycles at J2000.
-    const distA = Math.abs(yearA - startmodelyearwithCorrection);
-    const distB = Math.abs(yearB - startmodelyearwithCorrection);
-    const correction = (distA >= distB) ? _getJ2000Drift(yearA) : -_getJ2000Drift(yearB);
+    // R3: identify the anchor from the CALL SHAPE, not by distance. Two shapes
+    // exist — (anchor, movingYear, N), and (J2000, anchor, N) where yearA IS
+    // J2000 itself. The old distance heuristic flipped branch the moment the
+    // moving endpoint crossed the anchor: a 2·drift = 6.80e-5 cycle STEP
+    // discontinuity at yearB == yearA — a ~0.375° scene jump scrubbing across
+    // the balanced year, 0.393/0.402 d of apsis displacement in Step 6a's own
+    // output. The correction now depends only on a FIXED endpoint, so it is
+    // constant across a scan. Both shapes stay snapshot-equivalent at J2000.
+    const anchorIsA = (yearA !== startmodelyearwithCorrection);
+    const correction = anchorIsA ? _getJ2000Drift(yearA) : -_getJ2000Drift(yearB);
     return divisor_N * (integral - correction);
   }
   return divisor_N * (yearB - yearA) / holisticyearLength;
@@ -5684,16 +5865,15 @@ function recomputeTimeUnitsForEpoch(t_Ma) {
   sHour   = sDay / 24;
   sMinute = sHour / 60;
   sSecond = sMinute / 60;
-  // Preserve absolute JD across the sDay mutation: pos × sDay represents
-  // (JD − startmodelJD), which must stay invariant when sDay changes (e.g.
-  // under deep-time auto-sync mid-frame, or report's per-iteration setEpoch).
-  // Without this rescale, the 20Hz UI block's posToTime/dateTimeToJulianDay
-  // round-trip uses the new sDay against an old pos → small drift in displayed
-  // Time/JD (e.g. 4m48s = 288s = 0.041s/yr × 7000yr at year 9000, the
-  // mass-loss correction propagating through pos). Rescale closes that gap.
-  if (typeof o !== 'undefined' && Number.isFinite(o.pos) && sDay_old !== 0) {
-    o.pos *= sDay / sDay_old;
-  }
+  // R4 sequel: the `o.pos *= sDay / sDay_old` rescale that stood here is GONE.
+  // It existed to "preserve absolute JD across the sDay mutation" — but that
+  // premise WAS the bug: it assumed pos = sDay·(jd − startmodelJD). Under the
+  // integrated conversion, pos never depends on sDay (the deep-time branch of
+  // posFromJD touches sDay only in its degenerate/out-of-domain fallbacks), so
+  // rescaling would now CORRUPT pos on every epoch change. Its own comment
+  // described the symptom it papered over: "4m48s at year 9000, the mass-loss
+  // correction propagating through pos".
+  void sDay_old;
   return true;
 }
 
@@ -9616,13 +9796,13 @@ let o = {
     // construction; keeping the comparison J2000-anchored preserves the
     // "1 year/sec" semantic across epochs.
     if (this.speedFact === SYEAR_J2000) {
-      this.pos = dateToDays(addYears(this.Date, 1)) * sDay + timeToPos(this.Time);
+      this.pos = posFromDateTime(addYears(this.Date, 1), this.Time);
     } else if (this.speedFact === SYEAR_J2000 * 10) {
-      this.pos = dateToDays(addYears(this.Date, 10)) * sDay + timeToPos(this.Time);
+      this.pos = posFromDateTime(addYears(this.Date, 10), this.Time);
     } else if (this.speedFact === SYEAR_J2000 * 100) {
-      this.pos = dateToDays(addYears(this.Date, 100)) * sDay + timeToPos(this.Time);
+      this.pos = posFromDateTime(addYears(this.Date, 100), this.Time);
     } else if (this.speedFact === SYEAR_J2000 * 1000) {
-      this.pos = dateToDays(addYears(this.Date, 1000)) * sDay + timeToPos(this.Time);
+      this.pos = posFromDateTime(addYears(this.Date, 1000), this.Time);
     } else {
       this.pos += this.speedFact;
     }
@@ -9631,13 +9811,13 @@ let o = {
 
   'Step backward': function () {
     if (this.speedFact === SYEAR_J2000) {
-      this.pos = dateToDays(addYears(this.Date, -1)) * sDay + timeToPos(this.Time);
+      this.pos = posFromDateTime(addYears(this.Date, -1), this.Time);
     } else if (this.speedFact === SYEAR_J2000 * 10) {
-      this.pos = dateToDays(addYears(this.Date, -10)) * sDay + timeToPos(this.Time);
+      this.pos = posFromDateTime(addYears(this.Date, -10), this.Time);
     } else if (this.speedFact === SYEAR_J2000 * 100) {
-      this.pos = dateToDays(addYears(this.Date, -100)) * sDay + timeToPos(this.Time);
+      this.pos = posFromDateTime(addYears(this.Date, -100), this.Time);
     } else if (this.speedFact === SYEAR_J2000 * 1000) {
-      this.pos = dateToDays(addYears(this.Date, -1000)) * sDay + timeToPos(this.Time);
+      this.pos = posFromDateTime(addYears(this.Date, -1000), this.Time);
     } else {
       this.pos -= this.speedFact;
     }
@@ -9660,7 +9840,7 @@ let o = {
     const ss = String(now.getUTCSeconds()).padStart(2, '0');
     const timeStr = `${hh}:${mm}:${ss}`;
     // Calculate position: days + time offset
-    const newPos = sDay * dateToDays(dateStr) + timeToPos(timeStr);
+    const newPos = posFromDateTime(dateStr, timeStr);
     this.pos = newPos;
     controls.reset();
     positionChanged = true;
@@ -45615,7 +45795,7 @@ function jumpToJulianDay (jd) {
   // Calculate position from JD alone - Day already contains the time fraction
   // (Fixed: removed "+ timeToPos(o.Time)" which caused double-counting of time)
   o.Day = o.julianDay - startmodelJD;
-  o.pos = sDay * o.Day;
+  o.pos = posFromJD(o.julianDay);
 
   const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
   o.perihelionDate = `${p.date}`;
@@ -53641,9 +53821,12 @@ function changeZodiacScale() {
 }
 
 function updatePosition() {
-  o.pos = sDay * dateToDays(o.Date) + timeToPos(o.Time);
-  o.Day = posToDays(o.pos);
+  // Derive pos from the JD this function already computes, rather than from a
+  // second `sDay * days + timeToPos` path — that linear form is only exact for
+  // a constant rate (see the pos↔JD block near yearToJD).
   o.julianDay = dateTimeToJulianDay(o.Date, o.Time);
+  o.pos = posFromJD(o.julianDay);
+  o.Day = posToDays(o.pos);
   const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
   o.perihelionDate = `${p.date} ${p.time}`;
   positionChanged = true; // Signal animation loop to update scene
@@ -54867,11 +55050,12 @@ function addPolarGridHelper(inplanet, planetSize = 10) {
 }
 
 function posToDays(pos) {
-  return Math.floor(pos / sDay);  // REMOVE +12h shift
+  return Math.floor(jdFromPos(pos) - startmodelJD);  // REMOVE +12h shift
 }
 
 function posToTime(pos) {
-  let days = pos / sDay - Math.floor(pos / sDay);
+  const _d = jdFromPos(pos) - startmodelJD;
+  let days = _d - Math.floor(_d);
   let hours = Math.floor(days * 24);
   let minutes = Math.floor((days * 24 - hours) * 60);
   let seconds = Math.round(((days * 24 - hours) * 60 - minutes) * 60);

@@ -79,16 +79,14 @@ would silently churn a structural claim for a rounding-level gain.
   caught a 583.7″ regression.
 - `data/02-solar-measurements.csv` is 160 MB and gitignored — no git recovery.
   Back it up before regenerating (2 h 24 m).
-- **That CSV is AHEAD of the code, and nothing in the tree enforces it.** It
-  carries a `Cycle` column and 9-dp JDs, so it was produced by the deep-time-ON,
-  pos↔JD-integrated engine. The engine was then reverted; the CSV survived
-  because it is gitignored. The shipped coefficients predate it and match the
-  current runtime, so code and JSON are consistent — **only the CSV is ahead**.
-  Running 6b/6c/6d today therefore fits better measurements into a worse
-  runtime, and coefficients plus runtime form are a matched pair: that mismatch
-  is a ~1162-minute-class error, not a rounding one. Do not regenerate it and do
-  not refit from it until the engine is restored. See
-  `holisticuniverse/docs/plans/IP-deeptime-scene-graph-alignment_new.md` §0a.
+- **The engine and that CSV agree bit-exactly since Phase C** (R1–R4, R6
+  restored): a 1990–2010 re-export reproduces the committed CSV with worst
+  JD delta 0.0000 s and worst `Cycle` delta 0.00e+0. Do not regenerate it —
+  2 h 24 m for an identical file. **Refitting 6b/6c/6d still WAITS for Phase
+  D**: the fitter-side fixes (R10, R12–R15) and the runtime evaluation forms
+  are a matched pair with the coefficients, and shipping one without the other
+  is a ~1162-minute-class error. See
+  `holisticuniverse/docs/plans/IP-deeptime-scene-graph-alignment_new.md` §5.
 
 ---
 

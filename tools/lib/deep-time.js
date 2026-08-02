@@ -153,7 +153,23 @@ function _evalClimateL1Orbital(year) {
   return L1_sum * r.denormalization.y_std;
 }
 
+// R2 — the α lattice reference. When BUILDING an H-lattice table α must be
+// held at its J2000 reference (EARTH_MOI_FACTOR), or the lattice defines
+// itself in terms of its own output: α(t) is exactly 8H-periodic and its MEAN
+// over the build window sits ~+1.24e-6 above the IERS anchor, worth 141.6 d of
+// cycle-count at cycle 0. The browser pins this (declared since R2 landed;
+// accidentally via a TDZ before); Node integrated live α(t) and silently
+// disagreed. Save/restore under try/finally so a throw mid-build cannot leave
+// every α consumer pinned.
+let _latticeAlphaRef = false;
+function _withLatticeAlpha(build) {
+  const prev = _latticeAlphaRef;
+  _latticeAlphaRef = true;
+  try { build(); } finally { _latticeAlphaRef = prev; }
+}
+
 function earthMoiFactorAtAge(t_Ma) {
+  if (_latticeAlphaRef) return EARTH_MOI_FACTOR;
   if (_alphaClimateL1_J2000 === null) {
     _alphaClimateL1_J2000 = _evalClimateL1Orbital(2000);
   }
@@ -1027,6 +1043,10 @@ let _cumulIntegralJ2000Idx = -1;
 
 function _ensureCumulIntegralTable() {
   if (_cumulIntegralTable !== null) return;
+  _withLatticeAlpha(_buildCumulIntegralTable);   // R2: lattice tables pin α
+}
+
+function _buildCumulIntegralTable() {
   const N = Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP) + 1;
   const table = new Float64Array(N);
   const j2000Idx = Math.round((C.startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
@@ -1105,9 +1125,15 @@ function _getJ2000Drift(yearA) {
 function cyclesBetweenYears(yearA, yearB, divisor_N) {
   const integral = integralInverseHFromYears(yearA, yearB);
   if (integral === null) return null;
-  const distA = Math.abs(yearA - C.startModelYearWithCorrection);
-  const distB = Math.abs(yearB - C.startModelYearWithCorrection);
-  const correction = (distA >= distB) ? _getJ2000Drift(yearA) : -_getJ2000Drift(yearB);
+  // R3: identify the anchor from the CALL SHAPE, not by distance. Two shapes
+  // exist — (anchor, movingYear, N), and (J2000, anchor, N) where yearA IS
+  // J2000 itself. The old `distA >= distB` heuristic flipped branch the moment
+  // the moving endpoint crossed the anchor: a 2·drift = 6.80e-5 cycle STEP
+  // discontinuity at yearB == yearA, worth 0.393/0.402 d of apsis displacement
+  // and 100% of 6d's anomalistic residual. The correction now depends only on
+  // a FIXED endpoint, so it is constant across any scan.
+  const anchorIsA = (yearA !== C.startModelYearWithCorrection);
+  const correction = anchorIsA ? _getJ2000Drift(yearA) : -_getJ2000Drift(yearB);
   return divisor_N * (integral - correction);
 }
 
@@ -1204,6 +1230,10 @@ let _cumulDaysTable = null;
 
 function _ensureCumulDaysTable() {
   if (_cumulDaysTable !== null) return;
+  _withLatticeAlpha(_buildCumulDaysTable);   // R2: lattice tables pin α
+}
+
+function _buildCumulDaysTable() {
   _ensureCumulIntegralTable();
   const N = _cumulIntegralTable.length;
   const j2000Idx = _cumulIntegralJ2000Idx;
@@ -1296,6 +1326,139 @@ function balancedYearAtCycle(cycleOffset) {
   return Y;
 }
 
+// ─── Scene time coordinate ↔ JD (R4) ───────────────────────────────────────
+// `pos` counts tropical years since startmodelJD. Under deep time the year
+// length drifts, so the conversion is the INTEGRAL of the rate — replacing
+// `pos = sDay·(jd − startmodelJD)`, which doubles the accumulated drift
+// exactly for a drifting rate (Δt² growth: 3.313 d at the Step 6a window
+// edge). Same algorithm as the browser twin in src/script.js, kept
+// operation-for-operation so the two are bit-identical (Gate C). Node has no
+// snapshot mode here: out-of-domain returns null and the CALLER falls back,
+// mirroring how scene-graph.js guards every other deep-time read.
+//
+// Uses the REAL α(t), not the lattice reference: this is a physical time
+// conversion, not a lattice cycle count.
+let _cumulPosTable = null;
+const _posDpy = (year) => meanTropicalYearDaysAtAge((C.startmodelYear - year) / 1e6);
+let _posAnchorLo = null, _posAnchorDy0 = null;
+function _posAnchorLoIdx() {
+  if (_posAnchorLo === null) {
+    _posAnchorLo = Math.floor((C.startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
+    _posAnchorDy0 = C.startmodelYear - (_CUMUL_INTEGRAL_YEAR_MIN + _posAnchorLo * _CUMUL_INTEGRAL_STEP);
+  }
+  return _posAnchorLo;
+}
+function _posAnchorDy() { _posAnchorLoIdx(); return _posAnchorDy0; }
+
+function _ensureCumulPosTable() {
+  if (_cumulPosTable !== null) return;
+  _ensureCumulIntegralTable();                  // grid geometry
+  const N = _cumulIntegralTable.length;
+  const j2000Idx = _cumulIntegralJ2000Idx;
+  _cumulPosTable = new Float64Array(N);
+
+  const dpy = _posDpy;
+
+  const gridYearAtJ2000Idx = _CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP;
+  _cumulPosTable[j2000Idx] = -(C.startmodelYear - gridYearAtJ2000Idx) * dpy(C.startmodelYear);
+
+  let prev = dpy(gridYearAtJ2000Idx);
+  for (let i = j2000Idx + 1; i < N; i++) {
+    const curr = dpy(_CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP);
+    _cumulPosTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulPosTable[i - 1]))
+      ? _cumulPosTable[i - 1] + 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP : NaN;
+    prev = curr;
+  }
+  prev = dpy(gridYearAtJ2000Idx);
+  for (let i = j2000Idx - 1; i >= 0; i--) {
+    const curr = dpy(_CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP);
+    _cumulPosTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulPosTable[i + 1]))
+      ? _cumulPosTable[i + 1] - 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP : NaN;
+    prev = curr;
+  }
+
+  // Normalise so jdFromPos(0) === startmodelJD exactly. Without this the anchor
+  // cell carries a partial-cell artifact (seeded by linear extrapolation, read
+  // by interpolation across a 10-kyr cell) worth a constant 37 s.
+  // Must use the SAME analytic sub-cell integration the reader uses.
+  const lo0n = _posAnchorLoIdx(), dy0n = _posAnchorDy();
+  const yLo0n = _CUMUL_INTEGRAL_YEAR_MIN + lo0n * _CUMUL_INTEGRAL_STEP;
+  const v0 = _cumulPosTable[lo0n] + 0.5 * (_posDpy(yLo0n) + _posDpy(C.startmodelYear)) * dy0n;
+  if (Number.isFinite(v0)) for (let i = 0; i < N; i++) _cumulPosTable[i] -= v0;
+}
+
+/** Scene time coordinate → Julian Date. pos = 0 returns startmodelJD exactly;
+ *  null out of domain (caller falls back). */
+function jdFromPos(pos) {
+  if (!Number.isFinite(pos)) return null;
+  _ensureCumulPosTable();
+  // Years from the anchor cell's lower edge — never via the absolute index
+  // fraction (idxF0 ~50,000 loses 1.1e-11, × STEP = 4e-5 d).
+  const lo0 = _posAnchorLoIdx();
+  const total = _posAnchorDy() + pos;
+  const k = Math.floor(total / _CUMUL_INTEGRAL_STEP);
+  const dyCell = total - k * _CUMUL_INTEGRAL_STEP;
+  const lo = lo0 + k;
+  if (lo < 0 || lo >= _cumulPosTable.length - 1) return null;
+  const a = _cumulPosTable[lo];
+  if (Number.isNaN(a)) return null;
+  // Integrate analytically across the partial cell: linear interpolation returns
+  // the cell's CHORD slope (the year length at the cell MIDPOINT), which on a
+  // 10-kyr grid is 18.6 ms of year length at J2000.
+  const yLo = _CUMUL_INTEGRAL_YEAR_MIN + lo * _CUMUL_INTEGRAL_STEP;
+  const f0 = _posDpy(yLo), f1 = _posDpy(yLo + dyCell);
+  if (f0 === null || f1 === null) return null;
+  return C.startmodelJD + a + 0.5 * (f0 + f1) * dyCell;
+}
+
+/** Julian Date → scene time coordinate. Exact inverse of jdFromPos; null out
+ *  of domain. Seeded from the linear estimate — this is on the hot path. */
+function posFromJD(jd) {
+  if (!Number.isFinite(jd)) return null;
+  _ensureCumulPosTable();
+  const N = _cumulPosTable.length;
+  const target = jd - C.startmodelJD;
+  let lo = 0, hi = N - 1;
+  while (lo < N && Number.isNaN(_cumulPosTable[lo])) lo++;
+  while (hi >= 0 && Number.isNaN(_cumulPosTable[hi])) hi--;
+  if (lo >= hi) return null;
+  if (target < _cumulPosTable[lo] || target > _cumulPosTable[hi]) return null;
+
+  const guessYear = C.startmodelYear + target / SI_TROPICAL_YEAR_DAYS;
+  let g = Math.floor((guessYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
+  if (g < lo) g = lo; if (g > hi - 1) g = hi - 1;
+  if (_cumulPosTable[g] <= target && _cumulPosTable[g + 1] >= target) {
+    lo = g; hi = g + 1;
+  } else {
+    let span = 1, a = g, b = g;
+    while (span < N) {
+      a = Math.max(lo, g - span); b = Math.min(hi, g + span);
+      if (_cumulPosTable[a] <= target && _cumulPosTable[b] >= target) break;
+      span <<= 1;
+    }
+    lo = a; hi = b;
+    while (lo < hi - 1) {
+      const mid = (lo + hi) >> 1;
+      if (_cumulPosTable[mid] <= target) lo = mid; else hi = mid;
+    }
+  }
+  // Solve within the cell against the SAME analytic sub-integration jdFromPos
+  // uses, so the two are exact inverses.
+  const a2 = _cumulPosTable[lo];
+  const yLo = _CUMUL_INTEGRAL_YEAR_MIN + lo * _CUMUL_INTEGRAL_STEP;
+  const f0 = _posDpy(yLo);
+  let dy = (_cumulPosTable[hi] === a2) ? 0
+         : (target - a2) / (_cumulPosTable[hi] - a2) * _CUMUL_INTEGRAL_STEP * (hi - lo);
+  for (let it = 0; it < 4; it++) {
+    const f1 = _posDpy(yLo + dy);
+    if (f1 === null) break;
+    const g = a2 + 0.5 * (f0 + f1) * dy - target;
+    if (Math.abs(g) < 1e-11) break;
+    dy -= g / f1;
+  }
+  return (lo - _posAnchorLoIdx()) * _CUMUL_INTEGRAL_STEP - _posAnchorDy() + dy;
+}
+
 // ─── Exports ──────────────────────────────────────────────────────────────
 module.exports = {
   // Framework e_E: H/3 fluctuation line (production) + Laskar-band composite (A/B research)
@@ -1313,6 +1476,10 @@ module.exports = {
   yearToJDDeepTime,
   balancedYearAtCycle,
   SI_TROPICAL_YEAR_DAYS,
+  // pos↔JD under deep time (R4) — the integrated conversion; null out of
+  // domain, caller falls back to the linear form.
+  posFromJD,
+  jdFromPos,
   // Anchor constants (for callers that need them)
   HOLISTIC_YEAR_J2000,
   MEAN_SIDEREAL_YEAR_J2000_S,
