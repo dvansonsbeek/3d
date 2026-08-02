@@ -4,7 +4,7 @@
  *
  * Usage:
  *   node tools/fit/run-pipeline.js --phase1        # Steps 1-2 only (~2 min)
- *   node tools/fit/run-pipeline.js --phase2        # Steps 4a-9 (~2.5 hrs, requires Step 3 data)
+ *   node tools/fit/run-pipeline.js --phase2        # Steps 4a-10 (~2.5 hrs, requires Step 3 data)
  *   node tools/fit/run-pipeline.js --all           # Steps 1-2, then 4a-9
  *   node tools/fit/run-pipeline.js --from 5a       # Resume from Step 5a onwards
  *   node tools/fit/run-pipeline.js --iterate 20    # Repeat Steps 5a-5b 20 times (iterative convergence)
@@ -70,7 +70,7 @@ if (!flag) {
   console.error('It will not run without an explicit flag.\n');
   console.error('  --list        show the steps and exit (writes nothing)');
   console.error('  --phase1      Steps 1-2 only (~2 min)');
-  console.error('  --phase2      Steps 4a-9 (~2.5 hrs, needs Step 3 data)');
+  console.error('  --phase2      Steps 4a-10 (~2.5 hrs, needs Step 3 data)');
   console.error('  --all         Steps 1-2, then 4a-9');
   console.error('  --from <step> resume from a step');
   console.error('  --iterate <n> / --converge   repeat Steps 5a-5b');

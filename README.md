@@ -80,7 +80,7 @@ For more details see [holisticuniverse.com](https://holisticuniverse.com).
 ## Quick Start
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v16 or higher) — for the simulation and optimization tools
+- [Node.js](https://nodejs.org/) **20 or newer** — for the simulation and optimization tools. The headless-browser tests pull in Playwright, which requires ≥20; CI runs Node 22
 - [Python 3](https://www.python.org/) (optional) — needed for ML training (`tools/fit/python/`) and statistical analysis (`scripts/`)
 
 ### Installation
@@ -129,7 +129,8 @@ npm run build
 ### Verification
 
 ```bash
-npm run check             # lint, typecheck, boundaries, purity, fixtures, model gates
+npm run check             # ten gates: lint, typecheck, boundaries, purity, constants,
+                          # counterfactual, fixtures, literals, model gates, pipeline
 npm run test:browser      # golden masters in headless Chromium (builds first)
 npm run test:verify:list  # how the 17 tools/verify scripts classify
 ```
@@ -226,18 +227,18 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 
 ## Fitting Pipeline
 
-The model's constants are stored in 4 JSON files in `public/input/`. When you change any model parameter (e.g., H, eccentricityBase, planet orbital elements), the fitting pipeline recalibrates all derived coefficients so the simulation matches JPL Horizons observations.
+The model's constants are stored as JSON under `public/input/` — `model-parameters.json`, `astro-reference.json`, `fitted-coefficients.json`, `meeus-lunar-tables.json` and `climate-formula-coefficients.json`. When you change any model parameter (e.g., H, eccentricityBase, planet orbital elements), the fitting pipeline recalibrates all derived coefficients so the simulation matches JPL Horizons observations.
 
 ```bash
 node tools/fit/run-pipeline.js --all           # full pipeline (~2.5 hrs)
 node tools/fit/run-pipeline.js --phase1        # Steps 1-2 only (~2 min)
-node tools/fit/run-pipeline.js --phase2        # Steps 4a-9 (~2.5 hrs, requires Step 3 data)
+node tools/fit/run-pipeline.js --phase2        # Steps 4a-10 (~2.5 hrs, requires Step 3 data)
 node tools/fit/run-pipeline.js --from 5a       # resume from Step 5a onwards
 ```
 
-The pipeline runs across 6 phases: Sun geometry → planet alignment → perihelion harmonics → ML training → parallax corrections → solar measurements & harmonic fits → verify → sync to script.js. Step 3 (browser data export) is always manual. Step 6a (solar measurements) exports all cardinal points, perihelion/aphelion, and world-angles in a single scene-graph pass; steps 6b-6e fit harmonics from that data. See [tools/fit/README.md](tools/fit/README.md) for the full reference.
+The pipeline runs in phases: Sun geometry → planet alignment → perihelion harmonics → ML training → parallax corrections → solar measurements & harmonic fits → verify → regenerate the constants module `src/script.js` imports. Step 3 (browser data export) is always manual. Step 6a (solar measurements) exports all cardinal points, perihelion/aphelion, and world-angles in a single scene-graph pass; steps 6b-6e fit harmonics from that data. See [tools/fit/README.md](tools/fit/README.md) for the full reference.
 
-**Safety**: Step 8 (`verify-pipeline.js`) validates all results against IAU reference values before syncing to `script.js`. If any parameter change produces unrealistic values — e.g., year lengths that differ from IAU by more than 1 second, obliquity that doesn't match J2000 within 0.01", or planet baselines that regress — the pipeline stops and reports which checks failed. This prevents invalid parameter changes from propagating into the simulation.
+**Safety**: Step 8 (`verify-pipeline.js`) validates all results against IAU reference values before Step 9 regenerates the constants module. If any parameter change produces unrealistic values — e.g., year lengths that differ from IAU by more than 1 second, obliquity that doesn't match J2000 within 0.01", or planet baselines that regress — the pipeline stops and reports which checks failed. This prevents invalid parameter changes from propagating into the simulation.
 
 ---
 

@@ -568,6 +568,8 @@ Step 6d: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_
          All downsampled by stepYears. RMSE: tropical 0.002s, sidereal 0.001s,
          anomalistic 0.002s over full H.
          Updates: fitted-coefficients.json (auto-updated by script)
+         run-pipeline.js splits this into two steps — 6d `--type sidereal`
+         and 6e `--type anomalistic`. The bare invocation above does both.
 
 Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
          fit is now invoked as Step 0 (prerequisite, runs before Step 1)
