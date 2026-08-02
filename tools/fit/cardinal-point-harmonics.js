@@ -16,6 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 const C = require('../lib/constants');
+const OE = require('../lib/orbital-engine');   // §10: law-of-cosines e(t)
 
 const CSV_PATH = path.join(__dirname, '..', '..', 'data', '02-solar-measurements.csv');
 
@@ -55,31 +56,283 @@ function readData() {
   return { byType, allByType };
 }
 
+// ─── Deep-time drift term + integrated phase ──────────────────────────────
+// EXACT mirror of src/script.js `computeSolsticeJD`:
+//   jd = anchor + MSY_J2000·(Y − 2000)          <- linear
+//      + (Y − 2000)·[mSY(t_Ma) − MSY_J2000]     <- Option-B drift (deep time)
+//      + Σ harmonics(phase) − harmonics(phase0)
+//
+// The drift term MUST be subtracted from the fit target. It was not, so the
+// harmonics were absorbing the deep-time secular drift while the runtime added
+// it a SECOND time — a double count worth up to 7.04 days at the far edge of
+// the Step 6a window. It was invisible while the CSV was snapshot-mode, where
+// drift ≡ 0; the deep-time default flip exposed it.
+//
+// It also made the fit unfittable in principle: `jd − linear` contains a
+// SECULAR RAMP, which a Fourier basis on H-divisors cannot represent. With the
+// drift removed the target is a bounded ±3 d oscillation — which is exactly
+// what a harmonic basis can fit.
+//
+// ── The drift is a SUM, not a RECTANGLE (plan §5c-ii-b) ──────────────────────
+// The earlier form was
+//     (year − 2000) · [mSY(t) − MSY_J2000]
+// i.e. elapsed span × the deviation AT THE ENDPOINT. The accumulated drift in a
+// cardinal-point JD is Σ(T(y) − mean) over the intervening years — an integral,
+// not a product. At −302,635 the rectangle overstates it by +3.314 d.
+//
+// That error was CANCELLING the §5d pos↔JD bug, which displaced the same epoch
+// by −3.318 d: two rectangle-vs-integral errors of the same quantity, equal and
+// opposite. Fixing §5d alone therefore made this fit WORSE, and this is the
+// other half. (It is also the real content of the "7.04 day double count" noted
+// above: 7.04 d is the rectangle, 3.73 d is the true sum.)
+//
+// Amplitude is FIXED AT 1 — no fitted parameter. §5d-t measured the mass-loss
+// amplitude at 1.00, so the physics curve enters at unit scale.
+const DT = require('../lib/deep-time');
+const J2000_CALENDAR_YEAR = C.startmodelYear;   // 2000.5, mirrors the runtime
+
+// Year-length deviation from the linear term's reference year.
+// NOTE f(2000) = −0.118 s/yr, NOT zero: C.meanSolarYearDays is not the year the
+// scene actually produces (§5c-vi). Both endpoints are therefore required below.
+function driftIntegrand(year) {
+  const mSY = DT.meanTropicalYearDaysAtAge((J2000_CALENDAR_YEAR - year) / 1e6);
+  return (mSY === null) ? 0 : (mSY - C.meanSolarYearDays);
+}
+
+// Σ(T(y) − mean) from 2000 to `year`, as Simpson quadrature plus the
+// Euler–Maclaurin endpoint term that converts the integral into the discrete
+// sum. Accurate to ≤0.019 s against exact year-by-year summation across the
+// Step 6a window, versus 286,306 s for the rectangle.
+//
+// Node SPACING is what matters, not node count. `f` carries ~100-kyr structure
+// (the α/L1 content), so nodes must stay well inside that regardless of how far
+// `year` is from 2000 — `f` itself is smooth (second differences ~1e-5 s at
+// 1000-yr spacing), it is the sampling that fails.
+//
+// A FIXED count silently degrades with distance and would have shipped a
+// deep-time bug: at n=64, error is 0.0 s at the Step 6a window edge but +137.7 s
+// at −4 Myr, +571 s at −10 Myr and −33,758 s (9.4 h) at −380 Ma, where the year
+// is ~400 days. Fixed 2000-yr spacing matches exact year-by-year summation to
+// 0.001 s at −1 Myr.
+const DRIFT_NODE_SPACING_YEARS = 2000;
+const DRIFT_SIMPSON_N_MIN = 64;
+
+function driftTerm(year) {
+  const span = year - 2000;
+  if (span === 0) return 0;
+  let n = Math.ceil(Math.abs(span) / DRIFT_NODE_SPACING_YEARS);
+  if (n % 2) n++;                        // Simpson needs an even interval count
+  if (n < DRIFT_SIMPSON_N_MIN) n = DRIFT_SIMPSON_N_MIN;
+  const h = span / n;
+  const f0 = driftIntegrand(2000);
+  const fN = driftIntegrand(year);
+  let s = f0 + fN;
+  for (let i = 1; i < n; i++) {
+    s += driftIntegrand(2000 + i * h) * ((i % 2) ? 4 : 2);
+  }
+  return s * h / 3 - (fN - f0) / 2;
+}
+
+// Integrated phase, replacing the snapshot form 2π·div·(year − BAL)/H_J2000.
+// `year` stays the Model Year here — unlike computeObliquityEarth, whose
+// argument is an INSTANT, computeSolsticeJD's argument is an ordinal LABEL
+// ("which year's solstice"), and the runtime consumes it the same way for the
+// linear, drift and phase terms. Keeping one convention across all three is
+// what makes the fit reproduce the runtime.
+const phaseOf = (year, div) => {
+  const c = DT.cyclesBetweenYears(C.balancedYear, year, div);
+  return (c === null ? 0 : c) * 2 * Math.PI;
+};
+
+// ═══ §10 — cardinal points DERIVED from the Step 6d year-length model ═══════
+//
+//   JD_X(Y) = anchor_X + LINCOEF·(Y−2000) + driftTerm(Y) + Ih(Y) + δ_X(Y)
+//
+// The four cardinal points decompose exactly, because T_trop IS DEFINED as the
+// mean of their four intervals:
+//   T_X(Y) = T_trop(Y) + δ_X(Y),  Σ_X δ_X ≡ 0
+// so the COMMON mode (all the secular content) comes from 6d, and this step
+// fits only the DIFFERENTIAL mode — the braiding.
+//
+// Measured: spiral coherence 17× tighter than the old independent fit
+// (quadrature −0.79° → −0.03°, amplitude spread 2.18% → 0.13%). Accuracy is
+// unchanged; this buys structural correctness, not precision (§10e-bis).
+//
+// REQUIRES Step 6d to have run --write first. That is the reordering: 6d now
+// precedes 6c, and the year-length model — not the cardinal-point fit — is the
+// authoritative source of secular year-length behaviour.
+const _fcPath = path.join(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
+const _fc = JSON.parse(fs.readFileSync(_fcPath, 'utf8'));
+const TROP_HARMONICS = _fc.TROPICAL_YEAR_HARMONICS;
+const TROP_ANCHOR = _fc.YEAR_LENGTH_J2000_ANCHOR;
+if (!TROP_HARMONICS || !TROP_ANCHOR) {
+  throw new Error('Step 6c now derives from Step 6d — run `node tools/fit/year-length-harmonics.js --write` first.');
+}
+
+const analyticTropDays = (year) => {
+  const t_Ma = (J2000_CALENDAR_YEAR - year) / 1e6;
+  const sidSec = DT.meanSiderealYearSecondsAtAge(t_Ma);
+  const Ht = DT.meanHAtAge(t_Ma);
+  return (sidSec === null || Ht === null) ? null : (sidSec / 86400) * (1 - 13 / Ht);
+};
+
+const _cycleOf = (year) => {
+  const c = DT.cyclesBetweenYears(C.balancedYear, year, 1);
+  return c === null ? 0 : c;
+};
+const CYCLE_ANCHOR = _cycleOf(2000);
+
+// 6d's self-corrected harmonic series, evaluated as a year-length deviation.
+function tropHarmonicsAt(year) {
+  const c = _cycleOf(year);
+  let s = 0;
+  for (const [div, sinC, cosC] of TROP_HARMONICS) {
+    const th = 2 * Math.PI * div * c, th0 = 2 * Math.PI * div * CYCLE_ANCHOR;
+    s += sinC * (Math.sin(th) - Math.sin(th0)) + cosC * (Math.cos(th) - Math.cos(th0));
+  }
+  return s;
+}
+
+// H(c) as a LINEAR model over the fit window. H must stay INSIDE the integral
+// below: treating it as constant costs up to 5.2 s (§10c). This is the same
+// error class as §5d and §5c-ii-b — a rate held constant across a span where it
+// is not — for the third time in this campaign.
+let _Hc0 = null, _Hc1 = 0;
+function calibrateHModel(years) {
+  let sc = 0, sh = 0, scc = 0, sch = 0, n = 0;
+  for (const y of years) {
+    const H = DT.meanHAtAge((J2000_CALENDAR_YEAR - y) / 1e6);
+    if (H === null) continue;
+    const c = _cycleOf(y);
+    sc += c; sh += H; scc += c * c; sch += c * H; n++;
+  }
+  _Hc1 = (n * sch - sc * sh) / (n * scc - sc * sc);
+  _Hc0 = (sh - _Hc1 * sc) / n;
+}
+
+// Ih(Y) = Σ_{2000→Y} tropHarmonicsAt(y), in closed form.
+// dθ/dy = 2πn/H(y) ⇒ dy = H dc, so ∫ a·sin(2πnc)·H(c) dc with H linear in c has
+// an exact antiderivative. The trailing term is Euler–Maclaurin (integral →
+// discrete sum); without it the error is 6–13 s.
+function integratedTropHarmonics(year) {
+  if (_Hc0 === null) throw new Error('calibrateHModel() must run before integratedTropHarmonics()');
+  const cY = _cycleOf(year), c0 = CYCLE_ANCHOR;
+  let tot = 0, k0 = 0;
+  for (const [div, sinC, cosC] of TROP_HARMONICS) {
+    const k = 2 * Math.PI * div;
+    const F = (c) => {
+      const s = Math.sin(k * c), co = Math.cos(k * c), Hc = _Hc0 + _Hc1 * c;
+      return [-Hc * co / k + _Hc1 * s / (k * k), Hc * s / k + _Hc1 * co / (k * k)];
+    };
+    const a = F(c0), b = F(cY);
+    tot += sinC * (b[0] - a[0]) + cosC * (b[1] - a[1]);
+    const th0 = k * c0;
+    k0 += sinC * Math.sin(th0) + cosC * Math.cos(th0);
+  }
+  return tot - k0 * (year - 2000)
+       - (tropHarmonicsAt(year) - tropHarmonicsAt(2000)) / 2;
+}
+
+// Linear coefficient of the DERIVED model. 6d's model is
+//   T_trop(Y) = av + [A(Y) − A(2000)] + h(Y)
+// so Σ T_trop = [av − A(2000) + meanSolarYearDays]·(Y−2000) + driftTerm + Ih,
+// because driftTerm already carries Σ[A(y) − meanSolarYearDays].
+//
+// ── DO NOT use YEAR_LENGTH_J2000_ANCHOR.tropical here ──────────────────────
+// That constant is the INSTANTANEOUS 1-year interval at 2000. This term is a
+// rate to be INTEGRATED over 335,317 years, and the two differ by 0.03661 s/yr
+// (the 1-year value vs the step-N mean — an anchor-convention difference 6d
+// documents and tolerates, because for a year LENGTH it is a local offset).
+// Integrated, that offset becomes a −0.142 d = −12,276 s RAMP. It does not show
+// up as a 118 min RMSE because the δ_X harmonics ABSORB most of it — which is
+// exactly the §5c-ii failure this design exists to remove. Measured cost when
+// this was wrong: SS 5.66 → 6.02 min.
+//
+// Instead derive it from TOTAL ELAPSED TIME, so ΣT_trop reproduces the measured
+// accumulation by construction. One data-derived scalar, the integral's
+// counterpart to the per-point JD anchor — not a fitted parameter.
+let LINCOEF = null;
+function calibrateLincoef(byType) {
+  let acc = 0, n = 0;
+  for (const type of ['SS', 'WS', 'VE', 'AE']) {
+    const rows = byType[type];
+    if (!rows || rows.length < 2) continue;
+    const a = rows[0], b = rows[rows.length - 1];
+    const span = b.year - a.year;
+    if (!span) continue;
+    // elapsed JD, minus everything ΣT_trop already accounts for
+    const rest = (driftTerm(b.year) - driftTerm(a.year))
+               + (integratedTropHarmonics(b.year) - integratedTropHarmonics(a.year));
+    acc += ((b.jd - a.jd) - rest) / span;
+    n++;
+  }
+  LINCOEF = acc / n;
+  return LINCOEF;
+}
+
+/** Accumulated tropical years from 2000 to `year`, in days. */
+function sigmaTropical(year) {
+  if (LINCOEF === null) throw new Error('calibrateLincoef() must run before sigmaTropical()');
+  return LINCOEF * (year - 2000) + driftTerm(year) + integratedTropHarmonics(year);
+}
+
 // ─── Least squares harmonic fit ──────────────────────────────────────────
 // Uses the actual JD at year 2000 from the data as anchor (exact by construction).
 // Self-corrected harmonics: h(year) - h(2000), so at year 2000 the prediction
 // equals the anchor exactly. No year offsets needed.
 //
-// Runtime formula: JD = anchor + mean × (year - 2000) + h(year) - h(2000)
+// Runtime formula (§10): JD = anchor + ΣT_trop(year) + δ(year) − δ(2000)
+//
+// The EQUATION-OF-CENTRE basis replaces two sinusoid pairs (§10e-quater). The
+// cardinal-point offset goes as e(t)·sin(λ_X − ϖ), and the equation of centre is
+//   2e·sin M + (5/4)e²·sin 2M + (13/12)e³·sin 3M + …
+// so order n carries e(t)^n at angle nM. Crucially e(t) is the LAW OF COSINES
+//   e(t) = √(base² + amp² − 2·base·amp·cos θ)      (doc 39)
+// which collapses to base−amp at θ=0 — a cusp, not a sinusoid — so its Fourier
+// expansion has content at every multiple of θ. Fitting plain H/16 and H/32
+// sinusoids approximates a closed form we already have.
+//
+// REPLACE, never ADD: e(t) is dominated by its mean, so e(t)·sinθ and sinθ are
+// nearly parallel. Supplying both makes the fit split H/16 arbitrarily between
+// them — measured 179.58° quadrature error and 102% amplitude spread.
+const ECC_ORDER_DIVISORS = [16, 32];   // H/16 → e·sin(M), H/32 → e²·sin(2M)
+
+function eccentricityAt(year) {
+  return OE.computeEccentricityEarth(year);
+}
+
 function fitHarmonics(data, divisors) {
   const n = data.length;
-  const m = divisors.length * 2;
+  // sinusoid divisors, minus the two the equation-of-centre basis takes over
+  const sinDiv = divisors.filter(d => !ECC_ORDER_DIVISORS.includes(d));
+  const nEcc = ECC_ORDER_DIVISORS.length * 2;
+  const m = sinDiv.length * 2 + nEcc;
   const anchor = data[0].anchor;       // actual JD at anchor year
   const anchorYear = data[0].anchorYear; // year label of the anchor row
-  const tRef = anchorYear - C.balancedYear;
 
   const A = new Array(n);
   const b = new Float64Array(n);
+  const e0 = eccentricityAt(anchorYear);
 
   for (let i = 0; i < n; i++) {
-    b[i] = data[i].jd - (anchor + C.meanSolarYearDays * (data[i].year - anchorYear));
+    const yr = data[i].year;
+    b[i] = data[i].jd
+         - (anchor + sigmaTropical(yr) - sigmaTropical(anchorYear));
     A[i] = new Float64Array(m);
-    const t = data[i].year - C.balancedYear;
-    for (let k = 0; k < divisors.length; k++) {
-      const phase = 2 * Math.PI * t / (C.H / divisors[k]);
-      const phase0 = 2 * Math.PI * tRef / (C.H / divisors[k]);
+    for (let k = 0; k < sinDiv.length; k++) {
+      const phase = phaseOf(yr, sinDiv[k]);
+      const phase0 = phaseOf(anchorYear, sinDiv[k]);
       A[i][2 * k] = Math.sin(phase) - Math.sin(phase0);
       A[i][2 * k + 1] = Math.cos(phase) - Math.cos(phase0);
+    }
+    // equation-of-centre orders, self-corrected like the sinusoids
+    const e = eccentricityAt(yr);
+    const th = phaseOf(yr, 16), th0 = phaseOf(anchorYear, 16);
+    for (let ord = 1; ord <= ECC_ORDER_DIVISORS.length; ord++) {
+      const base = sinDiv.length * 2 + (ord - 1) * 2;
+      const eN = Math.pow(e, ord), eN0 = Math.pow(e0, ord);
+      A[i][base]     = eN * Math.sin(ord * th) - eN0 * Math.sin(ord * th0);
+      A[i][base + 1] = eN * Math.cos(ord * th) - eN0 * Math.cos(ord * th0);
     }
   }
 
@@ -100,29 +353,46 @@ function fitHarmonics(data, divisors) {
 
   const x = solveCholesky(ATA, ATb, m);
 
+  // Sinusoid terms keep the [div, sin, cos] shape. The equation-of-centre terms
+  // are tagged with `eccOrder` so the runtime evaluates them as e(t)^n·sin(nM)
+  // rather than as a plain sinusoid — an untagged consumer would silently read
+  // them as H/16 and H/32 sinusoids and be wrong by the whole braid.
   const harmonics = [];
-  for (let k = 0; k < divisors.length; k++) {
-    harmonics.push([divisors[k], x[2 * k], x[2 * k + 1]]);
+  for (let k = 0; k < sinDiv.length; k++) {
+    harmonics.push([sinDiv[k], x[2 * k], x[2 * k + 1]]);
+  }
+  const eccTerms = [];
+  for (let ord = 1; ord <= ECC_ORDER_DIVISORS.length; ord++) {
+    const base = sinDiv.length * 2 + (ord - 1) * 2;
+    eccTerms.push({ order: ord, sin: x[base], cos: x[base + 1] });
   }
 
-  // Compute RMSE using the runtime formula:
-  //   JD = anchor + mean × (year - anchorYear) + h(year) - h(anchorYear)
+  // RMSE using the RUNTIME formula (§10):
+  //   JD = anchor + ΣT_trop(year) − ΣT_trop(anchor) + δ(year) − δ(anchor)
   let sse = 0;
+  const sig0 = sigmaTropical(anchorYear);
   for (let i = 0; i < n; i++) {
-    const t = data[i].year - C.balancedYear;
-    let pred = anchor + C.meanSolarYearDays * (data[i].year - anchorYear);
+    const yr = data[i].year;
+    let pred = anchor + sigmaTropical(yr) - sig0;
     for (const [div, sinC, cosC] of harmonics) {
-      const phase = 2 * Math.PI * t / (C.H / div);
-      const phase0 = 2 * Math.PI * tRef / (C.H / div);
+      const phase = phaseOf(yr, div);
+      const phase0 = phaseOf(anchorYear, div);
       pred += sinC * (Math.sin(phase) - Math.sin(phase0))
             + cosC * (Math.cos(phase) - Math.cos(phase0));
+    }
+    const e = eccentricityAt(yr);
+    const th = phaseOf(yr, 16), th0 = phaseOf(anchorYear, 16);
+    for (const t of eccTerms) {
+      const eN = Math.pow(e, t.order), eN0 = Math.pow(e0, t.order);
+      pred += t.sin * (eN * Math.sin(t.order * th) - eN0 * Math.sin(t.order * th0))
+            + t.cos * (eN * Math.cos(t.order * th) - eN0 * Math.cos(t.order * th0));
     }
     const err = (data[i].jd - pred) * 24 * 60; // minutes
     sse += err * err;
   }
   const rmse = Math.sqrt(sse / n);
 
-  return { harmonics, rmse, anchorYear };
+  return { harmonics, eccTerms, rmse, anchorYear };
 }
 
 function solveCholesky(A, b, n) {
@@ -201,6 +471,19 @@ function main() {
   const fibDivisors = [3, 5, 8, 13, 16];
   const results = {};
 
+  // §10c — calibrate H(c) BEFORE any fit. H moves 27.59 yr (0.0082%) across the
+  // window, and it multiplies the integrated harmonic amplitude; holding it
+  // constant costs up to 5.2 s.
+  calibrateHModel(byType.SS.map(d => d.year));
+  calibrateLincoef(byType);          // must follow calibrateHModel — uses Ih()
+  console.log(`\n§10: deriving cardinal points from Step 6d's year-length model`);
+  console.log(`  TROPICAL_YEAR_HARMONICS: ${TROP_HARMONICS.length} terms [${TROP_HARMONICS.map(t => t[0]).join(',')}]`);
+  console.log(`  J2000 tropical anchor:   ${TROP_ANCHOR.tropical}`);
+  console.log(`  LINCOEF (elapsed-derived): ${LINCOEF}`);
+  console.log(`    vs 1-year anchor:        ${TROP_ANCHOR.tropical}  (Δ ${((LINCOEF - TROP_ANCHOR.tropical) * 86400).toFixed(5)} s/yr — see §10c note)`);
+  console.log(`  H(c) = ${_Hc0.toFixed(3)} + ${_Hc1.toFixed(3)}·c   (H is NOT fixed — §10c)`);
+  console.log(`  equation-of-centre basis replaces H/${ECC_ORDER_DIVISORS.join(', H/')}`);
+
   for (const type of types) {
     // Find the data row closest to the IAU J2000 anchor JD.
     // Year labels may be off by 1 due to the export's seed year (2000.5).
@@ -221,12 +504,47 @@ function main() {
     const current = fitHarmonics(data, currentDivisors);
     console.log(`  Current ${currentDivisors.length} harmonics [${currentDivisors.join(',')}]: RMSE = ${current.rmse.toFixed(2)} min`);
 
-    // Greedy selection
-    console.log('  Greedy selection:');
-    const greedy = greedySelect(data, fibDivisors, 24, 120);
-    console.log(`  Final: RMSE = ${greedy.rmse.toFixed(2)} min [${greedy.divisors.join(',')}]`);
+    // Greedy selection. SKIPPABLE: it dominates runtime (~10 min per type) and
+    // is a DIAGNOSTIC only — the shipped divisor set is deliberately fixed, so
+    // the search result is never written. Skip it while iterating on the model.
+    let greedy;
+    if (process.argv.includes('--no-greedy') || process.env.SKIP_GREEDY === '1') {
+      console.log('  Greedy selection: SKIPPED (--no-greedy)');
+      greedy = { ...current, divisors: currentDivisors };
+    } else {
+      console.log('  Greedy selection:');
+      greedy = greedySelect(data, fibDivisors, 24, 120);
+      console.log(`  Final: RMSE = ${greedy.rmse.toFixed(2)} min [${greedy.divisors.join(',')}]`);
+    }
+
+    // §10f gate — the four points are ONE rotating perihelion vector, so their
+    // order-1 equation-of-centre terms must sit in exact 90° quadrature with
+    // equal amplitudes. The fit does NOT enforce this, so a deviation is a real
+    // signal. Unfakeable, unlike RMSE (which extra freedom can always improve).
+    const e1 = current.eccTerms[0];
+    console.log(`  e·sin(M) term: amp ${Math.hypot(e1.sin, e1.cos).toExponential(4)}  ` +
+                `phase ${((Math.atan2(e1.sin, e1.cos) * 180 / Math.PI + 360) % 360).toFixed(2)}°`);
 
     results[type] = { current, greedy, anchor };
+  }
+
+  // §10f — quadrature summary across the four points
+  {
+    const ph = t => (Math.atan2(results[t].current.eccTerms[0].sin, results[t].current.eccTerms[0].cos) * 180 / Math.PI + 360) % 360;
+    const am = t => Math.hypot(results[t].current.eccTerms[0].sin, results[t].current.eccTerms[0].cos);
+    const base = ph('SS');
+    let worst = 0;
+    console.log('\n── §10f H/16 spiral coherence (equation-of-centre order 1) ──');
+    ['SS', 'AE', 'WS', 'VE'].forEach((t, i) => {
+      const d = (ph(t) - base + 360) % 360;
+      const err = ((d - i * 90 + 540) % 360) - 180;
+      if (Math.abs(err) > Math.abs(worst)) worst = err;
+      console.log(`  ${t}  Δphase ${d.toFixed(2)}°  (ideal ${i * 90}°, err ${err.toFixed(2)}°)`);
+    });
+    const A = ['SS', 'WS', 'VE', 'AE'].map(am);
+    const spread = (Math.max(...A) - Math.min(...A)) / (A.reduce((a, b) => a + b) / 4) * 100;
+    console.log(`  worst quadrature error: ${worst.toFixed(2)}°   amplitude spread: ${spread.toFixed(2)}%`);
+    console.log(`  (old independent fit: -0.79° / 2.18%)`);
   }
 
   // ─── Output ──────────────────────────────────────────────────────────
@@ -289,22 +607,24 @@ function main() {
       }
     }
 
-    const t2000 = j2000Year - C.balancedYear;
-    const tAnchor = anchorYear - C.balancedYear;
-
+    // Same integrated phase + drift convention as the fit above. Both years sit
+    // within 1999-2002 so the drift difference is ~0 here, but leaving this on
+    // the snapshot form would be a third convention in one file.
     let hAnchor = 0, h2000 = 0;
     for (const [div, sinC, cosC] of harmonics) {
-      const pA = 2 * Math.PI * tAnchor / (C.H / div);
-      const p0 = 2 * Math.PI * t2000 / (C.H / div);
+      const pA = phaseOf(anchorYear, div);
+      const p0 = phaseOf(j2000Year, div);
       hAnchor += sinC * Math.sin(pA) + cosC * Math.cos(pA);
       h2000   += sinC * Math.sin(p0) + cosC * Math.cos(p0);
     }
 
-    const j2000Anchor = dataAnchor - C.meanSolarYearDays * (anchorYear - j2000Year) - (hAnchor - h2000);
+    const j2000Anchor = dataAnchor - C.meanSolarYearDays * (anchorYear - j2000Year)
+                      - (driftTerm(anchorYear) - driftTerm(j2000Year)) - (hAnchor - h2000);
     adjustedAnchors[type] = j2000Anchor;
 
     // Verify: runtime at anchorYear should give dataAnchor
-    const verify = j2000Anchor + C.meanSolarYearDays * (anchorYear - j2000Year) + hAnchor - h2000;
+    const verify = j2000Anchor + C.meanSolarYearDays * (anchorYear - j2000Year)
+                 + (driftTerm(anchorYear) - driftTerm(j2000Year)) + hAnchor - h2000;
     const verifyErr = (verify - dataAnchor) * 24 * 60;
 
     const iauDiff = (j2000Anchor - iauAnchor) * 24 * 60;
@@ -315,15 +635,45 @@ function main() {
   if (process.argv.includes('--write')) {
     const jsonPath = path.join(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
     const fc = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    // WRITE THE SHIPPED DIVISOR SET (`current`), not the greedy search result.
+    // The greedy pass is a DIAGNOSTIC — the divisor set is a structural claim,
+    // not something to churn for a rounding-level gain. This wrote
+    // `results[type].greedy.harmonics`, the same trap Steps 6b and 6d both had.
     const harmonicsObj = {};
+    const eccObj = {};
     for (const type of types) {
-      harmonicsObj[type] = results[type].greedy.harmonics;
+      harmonicsObj[type] = results[type].current.harmonics;
+      eccObj[type] = results[type].current.eccTerms;
     }
     fc.CARDINAL_POINT_HARMONICS = harmonicsObj;
+    // §10e-quater — equation-of-centre terms. DELIBERATELY a separate key with a
+    // different shape ({order, sin, cos}, not [div, sin, cos]): these are
+    // e(t)^n·sin(nM) with e(t) the LAW OF COSINES, not sinusoids. A consumer
+    // that mistook them for H/16 and H/32 harmonics would be wrong by the whole
+    // braid (~1.78 d), so the shape difference is the guard.
+    fc.CARDINAL_POINT_ECC_TERMS = eccObj;
+    // §10 — constants the RUNTIME must reuse verbatim, never recompute.
+    //   lincoef : derived from TOTAL ELAPSED TIME over the fit window
+    //             (§10e-quinquies). Recomputing it from the 1-year anchor
+    //             injects a −12,276 s ramp.
+    //   h0/h1   : H(c) linear model. H moves 27.5 yr across the window and
+    //             multiplies the integrated harmonic amplitude; holding it
+    //             constant costs up to 5.2 s (§10c).
+    // Both are calibrated against THIS CSV window. If Step 6a's window changes,
+    // they change — which is exactly why they are written, not hardcoded.
+    fc.CARDINAL_POINT_DERIVED = {
+      lincoef: LINCOEF,
+      h0: _Hc0,
+      h1: _Hc1,
+      eccOrderDivisors: ECC_ORDER_DIVISORS,
+      note: 'Runtime must use these verbatim — see plan §10c / §10e-quinquies',
+    };
     fc.CARDINAL_POINT_ANCHORS_ADJUSTED = adjustedAnchors;
     fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
-    console.log('\n  ✓ Written CARDINAL_POINT_HARMONICS to fitted-coefficients.json');
-    console.log('  ✓ Written CARDINAL_POINT_ANCHORS_ADJUSTED to fitted-coefficients.json');
+    console.log('\n  ✓ Written CARDINAL_POINT_HARMONICS (shipped divisor set)');
+    console.log('  ✓ Written CARDINAL_POINT_ECC_TERMS (equation-of-centre orders)');
+    console.log('  ✓ Written CARDINAL_POINT_DERIVED (lincoef + H(c) model)');
+    console.log('  ✓ Written CARDINAL_POINT_ANCHORS_ADJUSTED');
   } else {
     console.log('\n  (dry run — add --write to update fitted-coefficients.json)');
   }

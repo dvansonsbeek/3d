@@ -25,6 +25,13 @@ const SUN_LONGITUDE_MEAN = data.SUN_LONGITUDE_MEAN;
 const SUN_LONGITUDE_HARMONICS = data.SUN_LONGITUDE_HARMONICS;
 const CARDINAL_POINT_HARMONICS = data.CARDINAL_POINT_HARMONICS;
 const CARDINAL_POINT_ANCHORS_ADJUSTED = data.CARDINAL_POINT_ANCHORS_ADJUSTED || null;
+// §10 (Phase D) — equation-of-centre braiding terms ({order, sin, cos}, NOT
+// the [div, sin, cos] harmonic shape) and the fit-calibrated lincoef + H(c)
+// model. The runtime must reuse these VERBATIM, never recompute (§10c,
+// §10e-quinquies: recomputing lincoef from the 1-year anchor injects a
+// −12,276 s ramp).
+const CARDINAL_POINT_ECC_TERMS = data.CARDINAL_POINT_ECC_TERMS || null;
+const CARDINAL_POINT_DERIVED = data.CARDINAL_POINT_DERIVED || null;
 const SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;  // Legacy alias
 const PARALLAX_DEC_CORRECTION = data.PARALLAX_DEC_CORRECTION;
 const PARALLAX_RA_CORRECTION = data.PARALLAX_RA_CORRECTION;
@@ -111,6 +118,8 @@ module.exports = {
   SUN_LONGITUDE_HARMONICS,
   CARDINAL_POINT_HARMONICS,
   CARDINAL_POINT_ANCHORS_ADJUSTED,
+  CARDINAL_POINT_ECC_TERMS,
+  CARDINAL_POINT_DERIVED,
   SOLSTICE_JD_HARMONICS,
 
   // Factory for dynamic values

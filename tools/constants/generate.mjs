@@ -96,6 +96,11 @@ const COEFFICIENT_KEYS = [
   // Missed by the first audit because it is an object-of-arrays rather than a
   // plain array.
   'CARDINAL_POINT_HARMONICS',
+  // §10 (Phase D) — the equation-of-centre braiding terms ({order, sin, cos},
+  // deliberately NOT the [div, sin, cos] shape) and the fit-calibrated
+  // lincoef + H(c) model the runtime must reuse VERBATIM, never recompute.
+  'CARDINAL_POINT_ECC_TERMS',
+  'CARDINAL_POINT_DERIVED',
 
   // 16,919 values. fmtSci kept 12 significant digits, so 16,909 of them differ
   // from the JSON — but only at ~5e-13 relative, far below anything physical.

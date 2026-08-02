@@ -1014,16 +1014,30 @@ function computeStellarSiderealOffset(stellarDay, siderealDay) {
 // Anchored at IAU J2000 values. Self-correcting: exact at year 2000.
 // See docs/14-solstice-prediction.md
 
-// Pre-compute harmonic contributions at J2000 for each cardinal point
-const _CP_T2000 = 2000 - C.balancedYear;
+// Self-correction at J2000. Must use the SAME basis as computeSolsticeJD —
+// integrated phase, and INCLUDING the equation-of-centre terms. It previously
+// used the snapshot form `2π·t/(H/div)` and omitted the ecc terms entirely,
+// which left computeSolsticeJD(2000) 0.54 d off its own anchor (R11).
 const _CP_HARMONICS_AT_J2000 = {};
-for (const type of ['SS', 'WS', 'VE', 'AE']) {
-  let h2000 = 0;
-  for (const [div, sinC, cosC] of C.CARDINAL_POINT_HARMONICS[type]) {
-    const phase = 2 * Math.PI * _CP_T2000 / (C.H / div);
-    h2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+{
+  const c0 = dtm().cyclesBetweenYears(C.balancedYear, 2000, 1) || 0;
+  for (const type of ['SS', 'WS', 'VE', 'AE']) {
+    let h2000 = 0;
+    for (const [div, sinC, cosC] of C.CARDINAL_POINT_HARMONICS[type]) {
+      const th = 2 * Math.PI * div * c0;
+      h2000 += sinC * Math.sin(th) + cosC * Math.cos(th);
+    }
+    const ecc = C.CARDINAL_POINT_ECC_TERMS && C.CARDINAL_POINT_ECC_TERMS[type];
+    if (ecc) {
+      const e0 = computeEccentricityEarth(2000);
+      const th0 = 2 * Math.PI * 16 * c0;
+      for (const t of ecc) {
+        const eN0 = Math.pow(e0, t.order);
+        h2000 += t.sin * eN0 * Math.sin(t.order * th0) + t.cos * eN0 * Math.cos(t.order * th0);
+      }
+    }
+    _CP_HARMONICS_AT_J2000[type] = h2000;
   }
-  _CP_HARMONICS_AT_J2000[type] = h2000;
 }
 
 /**
@@ -1064,15 +1078,96 @@ function computeSolsticeRA(year, type) {
  * @param {'SS'|'WS'|'VE'|'AE'} [type='SS'] - cardinal point type
  * @returns {number} Julian Day of the cardinal point
  */
+// ═══ §10 — ΣT_trop: the cardinal point is the year-length model INTEGRATED ══
+// EXACT mirror of src/script.js. Each piece has a measured cost if wrong:
+//   rectangle drift instead of the sum       → +3.314 d  (§5c-ii-b, R5)
+//   H held constant outside the integral     → up to 5.2 s (§10c, R7)
+//   lincoef from the 1-year anchor           → −12,276 s  (§10e-quinquies, R8)
+//   fixed Simpson node COUNT not spacing     → −33,758 s at −380 Ma (§5c-ii-f, R9)
+const _CP_DRIFT_NODE_SPACING_YEARS = 2000;
+const _CP_DRIFT_SIMPSON_N_MIN = 64;
+
+const _cpDriftIntegrand = (year) => {
+  const a = analyticYearDaysAt('tropical', year);
+  return a === null ? 0 : (a - C.meanSolarYearDays);
+};
+
+function _cpDriftTerm(year) {
+  const span = year - 2000;
+  if (span === 0) return 0;
+  let n = Math.ceil(Math.abs(span) / _CP_DRIFT_NODE_SPACING_YEARS);
+  if (n % 2) n++;
+  if (n < _CP_DRIFT_SIMPSON_N_MIN) n = _CP_DRIFT_SIMPSON_N_MIN;
+  const h = span / n;
+  const f0 = _cpDriftIntegrand(2000), fN = _cpDriftIntegrand(year);
+  let acc = f0 + fN;
+  for (let i = 1; i < n; i++) acc += _cpDriftIntegrand(2000 + i * h) * ((i % 2) ? 4 : 2);
+  return acc * h / 3 - (fN - f0) / 2;
+}
+
+const _cpCycleOf = (year) => {
+  const c = dtm().cyclesBetweenYears(C.balancedYear, year, 1);
+  return c === null ? 0 : c;
+};
+
+function _cpTropHarmonicsAt(year) {
+  const c = _cpCycleOf(year), c0 = _cpCycleOf(2000);
+  let s = 0;
+  for (const [div, sinC, cosC] of C.TROPICAL_YEAR_HARMONICS) {
+    const th = 2 * Math.PI * div * c, th0 = 2 * Math.PI * div * c0;
+    s += sinC * (Math.sin(th) - Math.sin(th0)) + cosC * (Math.cos(th) - Math.cos(th0));
+  }
+  return s;
+}
+
+function _cpIntegratedTropHarmonics(year) {
+  const D = C.CARDINAL_POINT_DERIVED;
+  const cY = _cpCycleOf(year), c0 = _cpCycleOf(2000);
+  let tot = 0, k0 = 0;
+  for (const [div, sinC, cosC] of C.TROPICAL_YEAR_HARMONICS) {
+    const k = 2 * Math.PI * div;
+    const F = (c) => {
+      const sn = Math.sin(k * c), cs = Math.cos(k * c), Hc = D.h0 + D.h1 * c;
+      return [-Hc * cs / k + D.h1 * sn / (k * k), Hc * sn / k + D.h1 * cs / (k * k)];
+    };
+    const a = F(c0), b = F(cY);
+    tot += sinC * (b[0] - a[0]) + cosC * (b[1] - a[1]);
+    k0 += sinC * Math.sin(k * c0) + cosC * Math.cos(k * c0);
+  }
+  return tot - k0 * (year - 2000)
+       - (_cpTropHarmonicsAt(year) - _cpTropHarmonicsAt(2000)) / 2;
+}
+
+function _cpSigmaTropical(year) {
+  const D = C.CARDINAL_POINT_DERIVED;
+  return D.lincoef * (year - 2000) + _cpDriftTerm(year) + _cpIntegratedTropHarmonics(year);
+}
+
 function computeSolsticeJD(year, type) {
   const cp = type || 'SS';
-  const t = year - C.balancedYear;
   const anchor = C.CARDINAL_POINT_ANCHORS[cp];
   const harmonics = C.CARDINAL_POINT_HARMONICS[cp];
-  let jd = anchor + C.meanSolarYearDays * (year - 2000);
+  const deep = deepTimeOn();
+
+  let jd = deep
+    ? anchor + _cpSigmaTropical(year)
+    : anchor + C.meanSolarYearDays * (year - 2000);
+
+  const cY = _cpCycleOf(year);
   for (const [div, sinC, cosC] of harmonics) {
-    const phase = 2 * Math.PI * t / (C.H / div);
-    jd += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+    jd += sinC * Math.sin(2 * Math.PI * div * cY) + cosC * Math.cos(2 * Math.PI * div * cY);
+  }
+  // δ_X equation-of-centre orders: e(t)^n·sin(nM) with e(t) the LAW OF COSINES.
+  // NOT sinusoids — reading them as H/16 and H/32 harmonics would be wrong by
+  // the whole braid (~1.78 d), hence the separate key and different shape.
+  const ecc = C.CARDINAL_POINT_ECC_TERMS && C.CARDINAL_POINT_ECC_TERMS[cp];
+  if (ecc) {
+    const e = computeEccentricityEarth(year);
+    const th = 2 * Math.PI * 16 * cY;
+    for (const t of ecc) {
+      const eN = Math.pow(e, t.order);
+      jd += t.sin * eN * Math.sin(t.order * th) + t.cos * eN * Math.cos(t.order * th);
+    }
   }
   jd -= _CP_HARMONICS_AT_J2000[cp];
   return jd;
