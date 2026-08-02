@@ -254,7 +254,7 @@ and must be run by hand when compute.ts changes.
 
 ### What each step does
 
-- **`export-to-holistic.js --write`** — writes Holistic's `src/lib/orbital/{constants,coefficients,cardinalPointHarmonics,deepTime}.ts` from the current fit JSONs + `public/input/astro-reference.json`. Delegates the 12 DT correction constants to `export-dt-corrections.js` (same helper the 3D script uses). Content-compares each field and only rewrites what actually changed. **Section 7 (fit-anchored scalars)** additionally patches the website's shipped measurement constants: `usnoLodJ2000` + `deltaTEspenakRmsSeconds` in `src/data/model-values.compute.ts` (from `data/deltaT-4flag-fit.json → optimum`), `ALPHA_CLIMATE_SCALE_NUM` + `DLOD_TIDAL/GIA/ALLCYCLES` in the same file (from `tools/lib/deep-time.js` — the dLOD channels via `dLodDtDecompositionAtAge(-5e-7)`, i.e. model epoch 2000.5), and `ALPHA_CLIMATE_SCALE`/`ALPHA_1` in `deepTime.ts`. Never hand-edit these on the website — they carry "AUTO-SYNCED" comments.
+- **`export-to-holistic.js --write`** — writes Holistic's `src/lib/orbital/{constants,coefficients,cardinalPointHarmonics,deepTime}.ts` from the current fit JSONs + `public/input/astro-reference.json`. Delegates the ΔT correction constants — 12 for the four cycles plus the RES_* resonator block — to `export-dt-corrections.js`. Content-compares each field and only rewrites what actually changed. **Section 7 (fit-anchored scalars)** additionally patches the website's shipped measurement constants: `usnoLodJ2000` + `deltaTEspenakRmsSeconds` in `src/data/model-values.compute.ts` (from `data/deltaT-4flag-fit.json → optimum`), `ALPHA_CLIMATE_SCALE_NUM` + `DLOD_TIDAL/GIA/ALLCYCLES` in the same file (from `tools/lib/deep-time.js` — the dLOD channels via `dLodDtDecompositionAtAge(-5e-7)`, i.e. model epoch 2000.5), and `ALPHA_CLIMATE_SCALE`/`ALPHA_1` in `deepTime.ts`. Never hand-edit these on the website — they carry "AUTO-SYNCED" comments.
 - **`pnpm run values:generate`** — runs `scripts/generate-model-values.mjs` on the Holistic side, which evaluates `src/data/model-values.compute.ts` and writes `src/data/model-values.generated.json`. This is the JSON that MDX pages read via `<V k="..."/>` tags. Downstream of `constants.ts` / `deepTime.ts` / `dayLength.ts`, so must run *after* export-to-holistic completes.
 - **`npx tsx docs/paper/generate-tex-values.ts`** — regenerates `docs/paper/model-values.tex` (the `\Mv…` macro file) from the same `MODEL_VALUES` registry. Not auto-triggered; must run by hand when compute.ts or its upstream inputs change.
 
@@ -265,7 +265,7 @@ and must be run by hand when compute.ts changes.
 | `src/lib/orbital/constants.ts` | Harmonics, planetary orbital elements, ΔT trend anchor (`DELTA_T_START_SECONDS`), perihelion-alignment year, other scalars | `export-to-holistic.js` |
 | `src/lib/orbital/cardinalPointHarmonics.ts` | Cardinal-point Fourier terms (4×24) | `export-to-holistic.js` |
 | `src/lib/orbital/coefficients.ts` | Prediction coefficients (7×2421) + `planets.ts` buildFeatures | `export-to-holistic.js` |
-| `src/lib/orbital/deepTime.ts` | Bond/Hallstatt/Jose5/Jose4 correction constants (12 total: LATTICE_N + COS_COEFF_S + SIN_COEFF_S per cycle); α(t) anchors `ALPHA_CLIMATE_SCALE` + `ALPHA_1` | delegated to `export-dt-corrections.js`; α anchors by Section 7 |
+| `src/lib/orbital/deepTime.ts` | Bond/Hallstatt/Jose5/Jose4 correction constants (12 total: LATTICE_N + COS_COEFF_S + SIN_COEFF_S per cycle) + the RES_* core-mantle resonator block; α(t) anchors `ALPHA_CLIMATE_SCALE` + `ALPHA_1` | delegated to `export-dt-corrections.js`; α anchors by Section 7 |
 | `src/data/model-values.compute.ts` | Fit-anchored measurement scalars: `usnoLodJ2000`, `deltaTEspenakRmsSeconds` (from `data/deltaT-4flag-fit.json`), `ALPHA_CLIMATE_SCALE_NUM`, `DLOD_TIDAL/GIA/ALLCYCLES` (from `tools/lib/deep-time.js`) | `export-to-holistic.js` Section 7 |
 | `src/data/model-values.generated.json` | 757 derived display keys (day/year lengths, precession rates, orbital elements at J2000, etc.) | `pnpm run values:generate` |
 | `docs/paper/model-values.tex` | ~500 `\Mv…` LaTeX macros used in the paper | `npx tsx docs/paper/generate-tex-values.ts` |
@@ -535,7 +535,8 @@ Step 5c: moon-eclipse-optimizer.js            → moonMeeusLpCorrection + MOON_C
 ── Phase 5: Solar measurements & harmonic fits ─────────────────────
 
 Step 6a: export-solar-measurements.js         → data/02-solar-measurements.csv
-         Single-pass scene-graph simulation (~80 min) measuring:
+         Single-pass scene-graph simulation (~2 h measured — see "Observed
+         timings" below; it is the pipeline bottleneck) measuring:
          - Cardinal points: SS (max dec), WS (min dec), VE (dec=0↑), AE (dec=0↓)
          - Perihelion (min wobble-center distance), Aphelion (max distance)
          - World-angle (sidereal position) at each event
@@ -745,13 +746,14 @@ Step 8:  verify-pipeline.js                   → pass/fail
          rate, perihelion longitude, e(J2000), all year lengths by formula, cardinal
          point JDs), and checks planet baselines against stored values in
          tools/results/baselines.json. Warns on regressions (>0.001°).
-         Must pass before syncing to script.js. Add --write to update baselines.
+         Must pass before Step 9. Add --write to update baselines.
 
 Step 9:  npm run constants:generate           → generated constants module
-         Regenerates the module src/script.js and tools/lib import.
-         Same command as Step 2-sync, and safe to run at any point —
-         there is no publish gate. `npm run check` and the headless-browser
-         golden masters are the verification.
+         Regenerates the module src/script.js imports. tools/lib reads the
+         JSON directly and needs nothing from this step.
+         Safe to run at any point — there is no publish gate; `npm run check`
+         and the headless-browser golden masters are the verification.
+         Rebuild (`npm run build`) if the browser is about to read the values.
 
 Manual:  export-to-holistic.js --write        → Holistic website repo
          (NOT in automated pipeline — run manually after Step 9)
@@ -830,17 +832,16 @@ Step 11: DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint 
          harmonics" for the full investigation trail.
 
 Step 12: node tools/fit/export-dt-corrections.js --write
-         → src/script.js + tools/lib/deep-time.js + website deepTime.ts
-         Patches the BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S and
-         _LATTICE_N constants in all three code sites from
-         data/deltaT-4flag-fit.json. Each target file is backed up as .bak
-         before write.
+         → website deepTime.ts — its only target
+         Patches BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S, _LATTICE_N
+         and the RES_* resonator constants (T0_LATTICE_N, Q, two kick epochs
+         and their cos/sin amplitudes) from data/deltaT-4flag-fit.json +
+         data/core-mantle-resonator-stage1.json. Backed up as .bak first.
 
-         Alternatively: `npm run constants:generate` (Step 9)
-         and `node tools/fit/export-to-holistic.js --write` (manual) both
-         delegate to export-dt-corrections.js as a tail step and pick up
-         data/deltaT-4flag-fit.json automatically — so if you're running the
-         full batch sync you don't need Step 12 separately.
+         src/script.js is covered by Step 9 — the same two JSONs feed the
+         generated module. tools/lib/deep-time.js reads them directly.
+         `export-to-holistic.js --write` delegates to this script as its tail
+         step, so a full website sync already covers Step 12.
 
          After sync, re-run browser L-5b test to confirm:
            - Model residual RMS near ~1629 s
@@ -850,7 +851,7 @@ Step 12: node tools/fit/export-dt-corrections.js --write
          phase is expected (different LSQ implementations converge to nearby
          local optima); accept if L-5b regression is < ~10 s in either metric.
 
-Note: `data/02-solar-measurements.csv` is generated by Step 6a (~80 min for full H at 1-year steps).
+Note: `data/02-solar-measurements.csv` is generated by Step 6a (~2 h for full H at 1-year steps).
 It contains all solar events (cardinal points + perihelion/aphelion) with world-angles.
 All downstream fitting steps (6b-6d) read from this single CSV and downsample by `stepYears`
 (currently 23) — no separate exports needed.
@@ -879,7 +880,7 @@ The cardinal-point-derived tropical year (Step 6c) is the authoritative runtime 
 | `perihelionalignmentYear` | 1, 3→4a, 6a→6d |
 | `stepYears` | Must divide H evenly. Affects 4a→4d, 6a→6d (downsampling) |
 | `siderealYearJ2000` (in yearLengthRef) | Derived: `meansiderealyearlengthinSeconds = siderealYearJ2000 × 86400` |
-| Bond / Hallstatt / Jose5 / Jose4 `_LATTICE_N` (divisor of 8H) | Steps 11 → 12 (Phase 8 only, independent of the orbital pipeline). The 4-flag ΔT stack has no upstream dependency on Steps 1–10; the fit re-runs against the Stephenson residual and syncs to code via `export-dt-corrections.js`. |
+| Bond / Hallstatt / Jose5 / Jose4 `_LATTICE_N` (divisor of 8H) | Steps 11 → 12 (Phase 8 only, independent of the orbital pipeline). The 4-flag ΔT stack has no upstream dependency on Steps 1–10; the fit re-runs against the Stephenson residual, reaches `src/script.js` and `tools/lib/deep-time.js` through the JSON (Step 9 / direct read), and the website via `export-dt-corrections.js`. |
 | `_TAPER_FULL_HALFWIDTH_YR` / `_TAPER_TOTAL_HALFWIDTH_YR` (Holocene taper) | None — the taper is applied at runtime and does not affect the shipped cos/sin coefficients. Verify L-5b after change. |
 | Stephenson polynomial (`public/input/stephenson-2016-deltaT-polynomial.json`) | Steps 11 → 12 (Phase 8). Fit target changed → all four cycles re-fit. |
 
@@ -900,7 +901,7 @@ All scripts default to **dry run** (print only). Add `--write` to update JSON fi
 Run `npm run constants:generate` to regenerate the module `src/script.js` imports.
 This can be done after each `--write` step, or once at the end.
 
-### Pre-requisite — JSON → script.js sync after foundational-constant edits
+### Pre-requisite — regenerate constants after foundational-constant edits
 
 If you have just edited one of the source-of-truth JSON files
 (`public/input/model-parameters.json`, `public/input/astro-reference.json`)
@@ -911,18 +912,21 @@ new JSON state before any pipeline step touches it:
 
 ```bash
 npm run constants:generate                   # Regenerate constants (pre-Phase 0)
+npm run build                                # only if the browser will read them (Step 3)
 ```
 
 Why this matters:
 - The Node pipeline (`tools/lib/constants.js`) reads JSON directly, so it
   always sees the new values.
-- The browser (`src/script.js`) has its own top-level `const` declarations
-  that mirror the JSON — but they don't auto-update. If you skip this sync,
-  Phase 2 (browser export) runs against a stale H / mean-solar-year and the
-  resulting `data/01-holistic-year-objects-data.xlsx` mismatches every
-  downstream fit.
-- Running this pre-sync is idempotent: if script.js is already in sync,
-  the tool reports "no changes" and exits.
+- The browser (`src/script.js`) imports the generated module, and nothing but
+  this command regenerates it. Skip it and Phase 2 (browser export) runs
+  against a stale H / mean-solar-year, so the resulting
+  `data/01-holistic-year-objects-data.xlsx` mismatches every downstream fit.
+- The browser also runs the BUNDLE, not the source — rebuild after
+  regenerating, or leave `npm run dev` running so Parcel picks it up.
+- Regeneration is idempotent: the module is a pure function of the JSON.
+  `npm run test:constants` is the same generator in check mode and prints
+  `PASS — generated modules match the JSON` when nothing has drifted.
 - The tool is auto-invoked again in Step 2-sync after Phase 1 optimizers
   update per-planet `startpos` — that later invocation will also carry
   any leftover JSON diffs.
@@ -1019,7 +1023,7 @@ node tools/fit/gravitation-correction.js --write                             # S
 node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5c
 
 # Phase 5: Solar measurements & harmonic fits
-node tools/fit/export-solar-measurements.js                                  # Step 6a (~80 min)
+node tools/fit/export-solar-measurements.js                                  # Step 6a (~2 h)
 node tools/fit/obliquity-harmonics.js --write                                # Step 6b
 node tools/fit/cardinal-point-harmonics.js --write                           # Step 6c
 node tools/fit/year-length-harmonics.js --write                              # Step 6d
@@ -1047,10 +1051,14 @@ node tools/export-dashboard-data.js                                          # S
 # The DT_CORRECTIONS_DISABLED=1 env var is REQUIRED for --write — it bypasses
 # the currently-shipped corrections so the fit sees the absolute residual, not
 # a delta on top of shipped.
-DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --write        # Step 11 → data/deltaT-4flag-fit.json
-node tools/fit/export-dt-corrections.js --write                               # Step 12 → src/script.js + Node port + website deepTime.ts
-# (Or: skip Step 12 explicitly and let Step 9 / manual export-to-holistic.js pick
-#  it up as their delegated tail step — either flow produces the same result.)
+# --joint is the AUTHORITATIVE fit. Plain --write is the legacy stage-wise
+# cascade — a diagnostic only; never ship from it (see Step 11 above).
+DT_CORRECTIONS_DISABLED=1 \
+  node tools/fit/dt-corrections-fit.js --joint --write                        # Step 11 → deltaT-4flag-fit.json + resonator + deltaTStart
+node tools/fit/validate-resonator.js                                          # OFF/ON validation sweep
+npm run constants:generate                                                    # → src/script.js (Step 9)
+node tools/fit/export-dt-corrections.js --write                               # Step 12 → website deepTime.ts only
+# (export-to-holistic.js --write below already covers Step 12 as its tail step.)
 # After sync: re-run browser L-5b and confirm RMS ~1625 s, medieval bump ~-640 @ 990.
 
 # Manual: Sync to Holistic website (NOT in pipeline runner)
@@ -1066,7 +1074,7 @@ node tools/fit/export-to-holistic.js --write                                 # �
 | Fitted coefficients (JSON) | `public/input/fitted-coefficients.json` ← single source of truth |
 | ML coefficients (Python) | `tools/lib/python/coefficients/*_coeffs*.py` |
 | Browser simulation | `src/script.js` ← imports the generated constants module |
-| Solar measurements (CSV) | `data/02-solar-measurements.csv` (1-year steps, ~120 MB) |
+| Solar measurements (CSV) | `data/02-solar-measurements.csv` (1-year steps, ~160 MB) |
 | Browser export (Excel) | `data/01-holistic-year-objects-data.xlsx` (1-year steps, ~300 MB) |
 | Dashboard data | `dashboard/data/*.json` |
 
