@@ -57501,11 +57501,40 @@ function updatePredictions() {
  * @param {Array} harmonics – array of [period_divisor, sin_coeff, cos_coeff]
  * @returns {number} year length in days
  */
-function evalYearFourier(currentYear, mean, harmonics) {
+function analyticYearDaysAt(kind, year) {
+  const t_Ma = (J2000_CALENDAR_YEAR - year) / 1e6;
+  const sidSec = meanSiderealYearSecondsAtAge(t_Ma);
+  const Ht = meanHAtAge(t_Ma);
+  if (sidSec === null || Ht === null || !Number.isFinite(sidSec) || !Number.isFinite(Ht)) return null;
+  const sid = sidSec / 86400;
+  if (kind === 'sidereal')    return sid;
+  if (kind === 'tropical')    return sid * (1 - 13 / Ht);
+  if (kind === 'anomalistic') return sid * (1 + 3 / Ht);
+  return null;
+}
+
+/** Deviation of the analytic curve from its value at the fit anchor (year 2000).
+ *  Zero at the anchor by construction, so it composes with the J2000-anchored
+ *  harmonic basis without disturbing the anchor identity. Returns 0 when `kind`
+ *  is absent or deep time is off — both mean "no shape". */
+function analyticYearShape(kind, year) {
+  if (!kind || !DEEP_TIME_MODE_ENABLED) return 0;
+  const a = analyticYearDaysAt(kind, year);
+  const a0 = analyticYearDaysAt(kind, 2000);
+  return (a === null || a0 === null) ? 0 : (a - a0);
+}
+
+function evalYearFourier(currentYear, mean, harmonics, kind) {
   // Phase 8.5: integrated phase using J2000-fixed anchor (frame-independent).
   // Replaces the snapshot form `phase = 2π × (year − balancedYear) × div / H`
   // with `phase = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, year, div)`.
-  let result = mean;
+  //
+  // `kind` selects the analytic deep-time shape (Step 6d fits with the shape
+  // SUBTRACTED). Deliberately unset at the secondary Fourier readout call
+  // sites (§10g): their means carry epoch state in mismatched units, and
+  // passing kind there double-counts the trend. The authoritative tropical
+  // year is the cardinal-point path.
+  let result = mean + analyticYearShape(kind, currentYear);
   for (const [div, sinC, cosC] of harmonics) {
     const phase = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, currentYear, div);
     if (phase === null) continue;

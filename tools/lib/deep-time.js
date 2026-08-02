@@ -210,10 +210,16 @@ function meanLodHoursAtAge(t_Ma) {
 // Uses the IAU baseline (C.meanSiderealYearDays = 365.256363004) so the derived
 // "Actual" LOD matches the simulator tweakpane readout exactly at J2000.
 function _evalSiderealYearFourierIAU(year) {
-  const t = year - C.balancedYear;
+  // Phase D: INTEGRATED phase (2π·div·cycles), the same expression the browser
+  // tweakpane evaluator this function claims to mirror now uses — the old
+  // snapshot form 2π·t·div/H evaluated the cycle-fitted 6d coefficients on a
+  // different axis than they were fitted on (the matched-pair error, caught by
+  // the tools-lib fixture as a 13 µs drift in lod.realAtAge0).
   let result = C.meanSiderealYearDays;
+  const cyc = cyclesBetweenYears(C.balancedYear, year, 1);
+  if (cyc === null) return result;
   for (const [div, sinC, cosC] of C.SIDEREAL_YEAR_HARMONICS) {
-    const phase = 2 * Math.PI * t / (C.H / div);
+    const phase = 2 * Math.PI * cyc * div;
     result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
   }
   return result;

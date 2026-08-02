@@ -762,12 +762,61 @@ function computeEclipticPrecession(axialPrecession) {
  * @param {Array} harmonics - array of [period_divisor, sin_coeff, cos_coeff]
  * @returns {number} year length in days
  */
-function evalYearFourier(year, mean, harmonics) {
-  const t = year - C.balancedYear;
-  let result = mean;
+// Lazy, memoised deep-time accessor. This module is required by deep-time's
+// own dependency chain, so a top-level require would be circular — the existing
+// inline `require('./deep-time')` calls exist for the same reason.
+let _dtMod = null;
+const dtm = () => (_dtMod || (_dtMod = require('./deep-time')));
+const deepTimeOn = () => process.env.SG_DEEP_TIME !== '0';
+
+// ─── §10 / §5c-ii-g — analytic deep-time year shape ──────────────────────
+// EXACT mirror of src/script.js analyticYearShape and of
+// tools/fit/year-length-harmonics.js analyticShape. Step 6d SUBTRACTS this
+// before fitting, so it MUST be added back — a deep-time year length carries a
+// secular trend a Fourier basis on H-divisors provably cannot represent, worth
+// ~0.93 s (measured 1.03 / 0.98 / 0.97 s without it, vs 0.008 / 0.002 / 0.018
+// with it). Amplitude is FIXED AT 1: §5d-t measured the mass-loss amplitude at
+// 1.0000 ± 5e-4 from two independent observables.
+//
+// Zero new constants — one quantity plus framework lattice integers:
+//   T_sid  = meanSiderealYearSecondsAtAge / 86400
+//   T_trop = T_sid · (1 − 13/H)   axial precession       H/13 =  25,794 yr
+//   T_anom = T_sid · (1 +  3/H)   perihelion inertial    H/3  = 111,772 yr
+// with 13 + 3 = 16: the climatic precession H/16 is their SUM, which is why the
+// cardinal points braid on H/16.
+function analyticYearDaysAt(kind, year) {
+  const t_Ma = (C.startmodelYear - year) / 1e6;
+  const sidSec = dtm().meanSiderealYearSecondsAtAge(t_Ma);
+  const Ht = dtm().meanHAtAge(t_Ma);
+  if (sidSec === null || Ht === null) return null;
+  const sid = sidSec / 86400;
+  if (kind === 'sidereal')    return sid;
+  if (kind === 'tropical')    return sid * (1 - 13 / Ht);
+  if (kind === 'anomalistic') return sid * (1 + 3 / Ht);
+  return null;
+}
+
+function analyticYearShape(kind, year) {
+  if (!kind || !deepTimeOn()) return 0;
+  const a = analyticYearDaysAt(kind, year);
+  const a0 = analyticYearDaysAt(kind, 2000);
+  return (a === null || a0 === null) ? 0 : (a - a0);
+}
+
+function evalYearFourier(year, mean, harmonics, kind) {
+  // Phase is INTEGRATED (∫ div/H(t) dt), not the snapshot 2π·t·div/H this used
+  // to compute. H is not fixed — it runs 335,292 → 335,320 across the Step 6a
+  // window — and the fits are on the integrated axis, so the runtime must match
+  // or it evaluates coefficients against a different model than they were
+  // fitted against.
+  let result = mean + analyticYearShape(kind, year);
+  const c0 = dtm().cyclesBetweenYears(C.balancedYear, 2000, 1);
+  const cY = dtm().cyclesBetweenYears(C.balancedYear, year, 1);
+  if (c0 === null || cY === null) return result;
   for (const [div, sinC, cosC] of harmonics) {
-    const phase = 2 * Math.PI * t / (C.H / div);
-    result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+    const th = 2 * Math.PI * div * cY, th0 = 2 * Math.PI * div * c0;
+    result += sinC * (Math.sin(th) - Math.sin(th0))
+            + cosC * (Math.cos(th) - Math.cos(th0));
   }
   return result;
 }

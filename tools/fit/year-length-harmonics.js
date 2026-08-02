@@ -20,6 +20,72 @@ const C = require('../lib/constants');
 
 const CSV_PATH = path.join(__dirname, '..', '..', 'data', '02-solar-measurements.csv');
 
+// ─── Integrated phase, SI-year axis ──────────────────────────────────────
+// H-cycles from balancedYear to an instant given as a JD, on the SI-year axis.
+// Mirrors the runtime exactly: evalYearFourier -> phaseAdvanceRadians ->
+// cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, _jdToSIyear(jd), div).
+const DT = require('../lib/deep-time');
+const cycleAtJD = (jd) => DT.cyclesBetweenYears(C.balancedYear, DT._jdToSIyear(jd), 1);
+
+// ─── Analytic deep-time shape (plan §5c-iv) ──────────────────────────────
+// A deep-time year length carries a SECULAR TREND that a Fourier basis on
+// H-divisors provably cannot represent (§5c-ii). Subtract the analytic curve
+// before fitting, so the harmonics only have to cover the bounded oscillation
+// that is actually harmonic.
+//
+// AMPLITUDE IS FIXED AT 1 — not a fitted parameter. §5d-t measured the
+// mass-loss amplitude at 1.0000 ± 5e-4 from two independent observables, so the
+// physics curve enters at unit scale. A FITTED slope would fix the window and
+// destroy everything outside it (§5c-iii: 41 min error at −400 Ma) and violates
+// `feedback_no_polynomial_corrections`.
+//
+// All three curves come from ONE quantity (the mass-loss sidereal year) plus
+// framework lattice integers — zero new constants:
+//
+//   T_sid (t)  = meanSiderealYearSecondsAtAge(t) / 86400
+//   T_trop(t)  = T_sid · (1 − 13/H(t))     axial precession,  H/13 = 25,794 yr
+//   T_anom(t)  = T_sid · (1 +  3/H(t))     perihelion inertial, H/3 = 111,772 yr
+//
+// with the lattice identity 13 + 3 = 16: the CLIMATIC precession H/16 is the
+// sum of the axial and perihelion rates, which is why the cardinal points braid
+// on H/16. Verified at J2000 against IAU: sidereal exact (by construction),
+// tropical 1.06 s, anomalistic 0.44 s.
+//
+// Both deep-time effects enter here: the year length decreasing into the past
+// (through T_sid) and H increasing in time (through the 13/H and 3/H terms).
+function analyticYearDays(kind, year) {
+  const t_Ma = (C.startmodelYear - year) / 1e6;
+  const sidSec = DT.meanSiderealYearSecondsAtAge(t_Ma);
+  const Ht = DT.meanHAtAge(t_Ma);
+  if (sidSec === null || Ht === null) return null;
+  const sid = sidSec / 86400;
+  if (kind === 'sidereal')    return sid;
+  if (kind === 'tropical')    return sid * (1 - 13 / Ht);
+  if (kind === 'anomalistic') return sid * (1 + 3 / Ht);
+  throw new Error(`analyticYearDays: unknown kind "${kind}"`);
+}
+
+// Deviation of the analytic curve from its value at the fit anchor. Zero at the
+// anchor by construction, so it composes with the J2000-anchored harmonic basis
+// without disturbing the anchor identity.
+function analyticShape(kind, year, anchorYear) {
+  const a = analyticYearDays(kind, year);
+  const a0 = analyticYearDays(kind, anchorYear);
+  return (a === null || a0 === null) ? 0 : (a - a0);
+}
+
+/** Cycle of the anchor row. The anchor must be a ROW, not a synthetic instant:
+ *  the fit's job is to reproduce the CSV, so it has to be pinned where the CSV
+ *  puts it. (Anchoring 6b at JD 2451545.0 instead of its year-2000 row left a
+ *  constant 0.2247" bias on all 335,318 rows while the script's own
+ *  "Verify at anchor" still printed 0.0000" — because that check re-evaluates
+ *  at the anchor it derived the mean from, and is therefore a tautology.) */
+function anchorCycleOf(data, anchorYear) {
+  const row = data.find(r => r.year === anchorYear);
+  if (!row) throw new Error(`no row at anchor year ${anchorYear} — cannot anchor`);
+  return row.cycle;
+}
+
 // ─── Read and compute year lengths from raw solar measurements CSV ────────
 // The CSV has 1-year step events: SS, WS, VE, AE, PERI, APH with JD and World Angle.
 // We compute:
@@ -93,7 +159,20 @@ function loadData() {
     const tropical = tropValues.length === 4 ? tropValues.reduce((a, b) => a + b) / 4 : NaN;
 
     if (!isNaN(sidereal) && !isNaN(anomalistic) && !isNaN(tropical)) {
-      rows.push({ year, tropical, sidereal, anomalistic });
+      // Integrated phase on the SI-year axis, from this row's own event JD —
+      // the same expression the runtime evaluates (evalYearFourier ->
+      // phaseAdvanceRadians -> cyclesBetweenYears(BAL, _jdToSIyear(jd), div)).
+      // Replaces the snapshot argument (year - balancedYear)/H: `Model Year` is
+      // a chaining step counter, not a year, so it is not a phase under deep
+      // time. See tools/fit/obliquity-harmonics.js for the measured comparison
+      // (SI axis 0.006" vs calendar axis 0.377" on the same data).
+      //
+      // Labelled at the SS ENDPOINT, matching the existing `year` label, even
+      // though the value is a mean over the preceding `step` years and is
+      // really centred half a step earlier. That centring question is
+      // pre-existing and deliberately not conflated with the axis migration.
+      const cycle = cycleAtJD(sampled.SS[i].jd);
+      rows.push({ year, cycle, tropical, sidereal, anomalistic });
     }
   }
 
@@ -162,16 +241,21 @@ function fitHarmonicsJ2000Anchored(data, meanField, anchorValue, anchorYear, div
 
   const A = new Array(n);
   const b = new Float64Array(n);
-  const tRef = anchorYear - C.balancedYear;
+  // phase0 must ride the SAME axis as the data, or the anchoring silently
+  // stops working — the whole point of the sin(phase) - sin(phase0) basis is
+  // that the two cancel exactly at the anchor row.
+  const cycleRef = anchorCycleOf(data, anchorYear);
 
   for (let i = 0; i < n; i++) {
-    const t = data[i].year - C.balancedYear;
-    b[i] = data[i][meanField] - anchorValue;
+    // Subtract the analytic deep-time curve (amplitude fixed at 1) so the
+    // harmonics only see the bounded oscillation. Zero at the anchor, so the
+    // sin(phase) − sin(phase0) anchor identity is untouched.
+    b[i] = data[i][meanField] - anchorValue
+         - analyticShape(meanField, data[i].year, anchorYear);
     A[i] = new Float64Array(m);
     for (let k = 0; k < divisors.length; k++) {
-      const omega = 2 * Math.PI * divisors[k] / C.H;
-      const phase = omega * t;
-      const phase0 = omega * tRef;
+      const phase = 2 * Math.PI * data[i].cycle * divisors[k];
+      const phase0 = 2 * Math.PI * cycleRef * divisors[k];
       A[i][2 * k] = Math.sin(phase) - Math.sin(phase0);
       A[i][2 * k + 1] = Math.cos(phase) - Math.cos(phase0);
     }
@@ -202,12 +286,11 @@ function fitHarmonicsJ2000Anchored(data, meanField, anchorValue, anchorYear, div
   // RMSE in seconds (relative to anchor form)
   let sse = 0;
   for (let i = 0; i < n; i++) {
-    const t = data[i].year - C.balancedYear;
-    let pred = anchorValue;
+    // Must mirror the target above: analytic curve back in, then harmonics.
+    let pred = anchorValue + analyticShape(meanField, data[i].year, anchorYear);
     for (const [div, sinC, cosC] of harmonics) {
-      const omega = 2 * Math.PI * div / C.H;
-      const phase = omega * t;
-      const phase0 = omega * tRef;
+      const phase = 2 * Math.PI * data[i].cycle * div;
+      const phase0 = 2 * Math.PI * cycleRef * div;
       pred += sinC * (Math.sin(phase) - Math.sin(phase0))
             + cosC * (Math.cos(phase) - Math.cos(phase0));
     }
@@ -229,11 +312,10 @@ function fitHarmonics(data, meanField, meanValue, divisors) {
   const b = new Float64Array(n);
 
   for (let i = 0; i < n; i++) {
-    const t = data[i].year - C.balancedYear;
     b[i] = data[i][meanField] - meanValue;
     A[i] = new Float64Array(m);
     for (let k = 0; k < divisors.length; k++) {
-      const phase = 2 * Math.PI * t / (C.H / divisors[k]);
+      const phase = 2 * Math.PI * data[i].cycle * divisors[k];
       A[i][2 * k] = Math.sin(phase);
       A[i][2 * k + 1] = Math.cos(phase);
     }
@@ -261,10 +343,9 @@ function fitHarmonics(data, meanField, meanValue, divisors) {
 
   let sse = 0;
   for (let i = 0; i < n; i++) {
-    const t = data[i].year - C.balancedYear;
     let pred = meanValue;
     for (const [div, sinC, cosC] of harmonics) {
-      const phase = 2 * Math.PI * t / (C.H / div);
+      const phase = 2 * Math.PI * data[i].cycle * div;
       pred += sinC * Math.sin(phase) + cosC * Math.cos(phase);
     }
     const err = (data[i][meanField] - pred) * 86400;
@@ -389,7 +470,10 @@ function main() {
 
   // ─── Tropical year (J2000-anchored) ───────────────────────────────
   console.log('\n── TROPICAL YEAR ──');
-  const tropicalDivisors = [3, 8, 16]; // current set
+  // The SHIPPED sets from public/input/fitted-coefficients.json — so the
+  // "Current" line compares against what actually runs, not a stale stub.
+  // (These were [3,8,16] / [3,8] / [3,8,16,24], which is not what ships.)
+  const tropicalDivisors = [3, 5, 6, 8, 11, 13, 14, 16, 19, 22, 24, 27];
   const tropical = fitHarmonicsJ2000Anchored(data, 'tropical', anchors.tropicalJ2000, anchors.anchorYear, tropicalDivisors);
   console.log(`  Current [${tropicalDivisors.join(',')}]: RMSE = ${tropical.rmse.toFixed(4)}s`);
   console.log('  Greedy:');
@@ -397,7 +481,7 @@ function main() {
 
   // ─── Sidereal year (J2000-anchored) ───────────────────────────────
   console.log('\n── SIDEREAL YEAR ──');
-  const siderealDivisors = [3, 8]; // current set
+  const siderealDivisors = [3, 5, 8, 9, 16, 32];
   const sidereal = fitHarmonicsJ2000Anchored(data, 'sidereal', anchors.siderealJ2000, anchors.anchorYear, siderealDivisors);
   console.log(`  Current [${siderealDivisors.join(',')}]: RMSE = ${sidereal.rmse.toFixed(4)}s`);
   console.log('  Greedy:');
@@ -405,7 +489,7 @@ function main() {
 
   // ─── Anomalistic year (J2000-anchored) ────────────────────────────
   console.log('\n── ANOMALISTIC YEAR ──');
-  const anomDivisors = [3, 8, 16, 24]; // current set
+  const anomDivisors = [3, 8, 9, 17, 18, 19, 20, 24];
   const anom = fitHarmonicsJ2000Anchored(data, 'anomalistic', anchors.anomalisticJ2000, anchors.anchorYear, anomDivisors);
   console.log(`  Current [${anomDivisors.join(',')}]: RMSE = ${anom.rmse.toFixed(4)}s`);
   console.log('  Greedy:');
@@ -440,9 +524,17 @@ function main() {
   if (process.argv.includes('--write')) {
     const jsonPath = path.join(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
     const fc = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-    fc.TROPICAL_YEAR_HARMONICS = tropicalGreedy.harmonics.map(([div, s, c]) => [div, s, c]);
-    fc.SIDEREAL_YEAR_HARMONICS = siderealGreedy.harmonics.map(([div, s, c]) => [div, s, c]);
-    fc.ANOMALISTIC_YEAR_HARMONICS = anomGreedy.harmonics.map(([div, s, c]) => [div, s, c]);
+    // WRITE THE SHIPPED DIVISOR SETS, not the greedy search result.
+    // The greedy re-search independently REPRODUCES these sets (sidereal
+    // identically; tropical differs only 13↔17, anomalistic only 20↔16, worth
+    // 0.0008 s) — which is evidence the shipped divisors are right, not licence
+    // to churn them. Swapping a lattice divisor changes the STRUCTURAL claim
+    // and every downstream sync for a rounding-level gain.
+    // (Same trap as Step 6b, which used to write `greedy.harmonics`.)
+    // Use the greedy result only as a diagnostic in the Summary table.
+    fc.TROPICAL_YEAR_HARMONICS = tropical.harmonics.map(([div, s, c]) => [div, s, c]);
+    fc.SIDEREAL_YEAR_HARMONICS = sidereal.harmonics.map(([div, s, c]) => [div, s, c]);
+    fc.ANOMALISTIC_YEAR_HARMONICS = anom.harmonics.map(([div, s, c]) => [div, s, c]);
     // J2000 anchor values (from CSV, used as Fourier baseline in runtime).
     // These make `computeLengthof*Year(2000)` reproduce step-6a's measurement exactly.
     fc.YEAR_LENGTH_J2000_ANCHOR = {
