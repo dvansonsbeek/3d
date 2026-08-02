@@ -26,12 +26,29 @@ const OUT = join(ROOT, 'packages/fixtures/regression/script-js.json');
 
 // Spread across the fit window and well outside it. Values AT the anchor alone
 // would be a tautology (CLAUDE.md), so the grid deliberately reaches away.
-const YEARS = [-4000, -2000, 0, 1000, 1500, 1900, 2000, 2025, 2100, 3000, 6000];
+//
+// The deep years are not decoration. Until they were added this grid stopped at
+// 6000 CE, so it could not see the deep-time chain at all — and that chain is
+// precisely what the Phase 6 port moves. An error growing as Δt² (the R4 class:
+// 0.005 d at −10 kyr, 3.3 d at −302 kyr) would have been bit-identical on every
+// value here and catastrophic at the Step 6a window edge. −302635 IS that edge.
+const YEARS = [
+  -302635, -100000, -25000,                        // deep — the H window
+  -4000, -2000, 0, 1000, 1500, 1900, 2000, 2025, 2100, 3000, 6000,
+  32682,                                            // deep — the far bracket
+];
+
+// Epochs at which to re-read the seven mutable globals. `anchors()` SHOULD
+// depend on the epoch — that is its job, and it is what `recomputeEpochAnchors`
+// exists to do. `f(Y)` is the thing that must not (transparency.test.mjs).
+// Recording anchors@t pins the deep-time chain's output, so Phase 6 cannot move
+// it while leaving f(Y) looking clean.
+const EPOCHS_MA = [-5, -1, -0.3, 0, 0.3, 1, 5];
 
 const write = process.argv.includes('--write');
 const s = await openSimulator();
 
-const measured = await s.page.evaluate(({ YEARS }) => {
+const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA }) => {
   const T = window.__test__;
   T.resetEpochToJ2000();
 
@@ -45,8 +62,24 @@ const measured = await s.page.evaluate(({ YEARS }) => {
     v[`solsticeSS@${y}`] = T.computeSolsticeYearLength(y, 'SS');
     v[`solsticeWS@${y}`] = T.computeSolsticeYearLength(y, 'WS');
   }
+
+  // The deep-time chain, read through the globals it fills. Restore J2000 after
+  // each so a failure mid-loop cannot leave the scene on a foreign epoch and
+  // silently poison every later value.
+  for (const t of EPOCHS_MA) {
+    T.setEpochByAge(t);
+    for (const [k, n] of Object.entries(T.anchors())) v[`epoch@${t}Ma.${k}`] = n;
+    T.resetEpochToJ2000();
+  }
+
+  // The reset must be exact, or every anchor above is measured against a
+  // drifting baseline. Recorded rather than asserted so the fixture shows it.
+  const back = T.anchors();
+  for (const [k, n] of Object.entries(back)) {
+    if (!Object.is(n, a[k])) v[`roundTripDrift.${k}`] = n - a[k];
+  }
   return v;
-}, { YEARS });
+}, { YEARS, EPOCHS_MA });
 
 const pageErrors = s.errors.length;
 await s.dispose();
@@ -56,7 +89,7 @@ if (pageErrors) console.log(`  note: ${pageErrors} page error(s) during load`);
 if (write) {
   mkdirSync(dirname(OUT), { recursive: true });
   writeFileSync(OUT, `${JSON.stringify({
-    _comment: 'REGRESSION fixture — what src/script.js does today, read at the J2000 epoch through window.__test__. Must never change unintentionally. Regenerate: npm run build && node test/browser/snapshot.test.mjs --write',
+    _comment: 'REGRESSION fixture — what src/script.js does today, through window.__test__. `anchor.*` and `f(Y)@year` are read at J2000; `epoch@tMa.*` re-reads the seven globals AT that epoch (they are meant to depend on it); `roundTripDrift.*` records that resetEpochToJ2000 does NOT restore them — meansiderealyearlengthinDays lands 1.37e-6 d = 118 ms away, which is hysteresis, not rounding (plan R16). Must never change unintentionally. Regenerate: npm run build && node test/browser/snapshot.test.mjs --write',
     _source: 'src/script.js via dist/, headless Chromium',
     values: measured,
   }, null, 2)}\n`);
