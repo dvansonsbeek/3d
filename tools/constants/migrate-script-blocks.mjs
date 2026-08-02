@@ -111,6 +111,12 @@ const BLOCKS = [
     expr: 'FIT.CLIMATE_FORMULA_COEFFS',
     note: 'source is climate-formula-coefficients.json',
   },
+  {
+    name: 'BALANCE_PRESETS',
+    expected: (fit) => fit.BALANCE_PRESETS,
+    expr: 'FIT.BALANCE_PRESETS',
+    note: 'the 15-row modal subset of the 262 KB data/balance-presets.json (§2j)',
+  },
 ];
 
 // ── locate a top-level `const NAME = {…};` / `[…];` block by brace depth ──────

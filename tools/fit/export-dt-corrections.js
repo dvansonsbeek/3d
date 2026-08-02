@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Sync 3-flag ΔT correction coefficients from data/deltaT-3flag-fit.json to
+ * Sync 4-flag ΔT correction coefficients from data/deltaT-4flag-fit.json to
  * the three code sites that hold the shipped values:
  *   • src/script.js                     (browser)
  *   • tools/lib/deep-time.js            (Node port)
@@ -32,13 +32,14 @@
 const fs = require('fs');
 const path = require('path');
 
-// Prefer the 4-flag artifact if present; fall back to the 3-flag artifact
-// for consumers that haven't re-run the fit tool yet. Both share the same
-// shape for the shared cycles (bond / hallstatt / jose5); the 4-flag file
-// adds a jose4 section.
+// The 4-flag artifact is the ONLY source. The 3-flag fallback was deleted: it
+// had been superseded, and keeping it was a live hazard rather than a courtesy —
+// its bond.cos_coeff_s is 165.927 against the shipped 145.595, so anything that
+// silently fell back to it would have swapped in a materially different Bond
+// channel. Jose5 and Jose4 are a coupled pair; a file lacking jose4 cannot
+// describe the shipped stack at all.
 const FIT_JSON_PATHS = [
   path.join(__dirname, '..', '..', 'data', 'deltaT-4flag-fit.json'),
-  path.join(__dirname, '..', '..', 'data', 'deltaT-3flag-fit.json'),
 ];
 const FIT_JSON_PATH = FIT_JSON_PATHS[0];  // preferred write target
 

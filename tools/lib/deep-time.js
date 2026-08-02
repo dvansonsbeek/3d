@@ -241,7 +241,9 @@ function meanYearInDaysAtAge(t_Ma) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// Sub-Milankovitch 8H-lattice ΔT corrections (3-flag stack, mirrors src/script.js)
+// Sub-Milankovitch 8H-lattice ΔT corrections (4-flag stack, mirrors src/script.js).
+// "3-flag" throughout this file was stale: Bond, Hallstatt, Jose5 AND Jose4 are
+// all implemented here, plus the core-mantle resonator — five functions, not three.
 // ═════════════════════════════════════════════════════════════════════════════
 // Three framework-native harmonic corrections applied post-integration on top
 // of the pure-tidal ΔT below. Each has a zero-fit structural period (drops
@@ -354,7 +356,7 @@ function jose4CycleDeltaTCorrection(year) {
   return taper * (raw - JOSE4_DT_RAW_AT_J2000);
 }
 
-// ─── Implied LOD corrections from the 3-flag stack (Phase-8 physical consistency) ───
+// ─── Implied LOD corrections from the 4-flag stack (Phase-8 physical consistency) ───
 // The ΔT corrections are additive post-integration terms on the pure-tidal ΔT
 // curve. Physically they imply corresponding sub-Milankovitch LOD variations
 // via the LOD ↔ ΔT relationship (see docs/102 § "Companion 8H lattice harmonics"
@@ -605,7 +607,7 @@ function resonatorSwingLodRate(year) {
 }
 
 /**
- * LOD in seconds at t_Ma, WITH 3-flag correction stack applied (physical
+ * LOD in seconds at t_Ma, WITH 4-flag correction stack applied (physical
  * consistency: this LOD's integral matches the corrected ΔT curve).
  * Use for display in dashboards / tweakpane. The pure-tidal
  * `meanLodSecondsAtAge` remains the physics-baseline function used by the
@@ -698,13 +700,13 @@ function dLodDtDecompositionAtAge(t_Ma) {
 
 // ─── ΔT integrator (mirrors src/script.js meanDeltaTSecondsAtAge) ───────────
 // Pure-tidal Simpson integration + post-integration 3-cycle H-lattice
-// corrections (Bond + Hallstatt + Jose5) matching the shipped 3-flag stack.
+// corrections (Bond + Hallstatt + Jose5 + Jose4) matching the shipped 4-flag stack.
 // Positive on both sides of J2000; ΔT(0) = 0 exactly by anchor construction.
 // This is FRAMEWORK'S OWN ΔT (LOD-based + lattice), NOT Espenak/Meeus.
 const _DELTA_T_CACHE = new Map();
 const _MAX_DELTA_T_CACHE = 512;
 
-// DT_CORRECTIONS_DISABLED=1 in env: bypasses the 3-flag stack (pure-tidal only).
+// DT_CORRECTIONS_DISABLED=1 in env: bypasses the 4-flag stack (pure-tidal only).
 // Used by tools/fit/dt-corrections-fit.js to compute the raw framework residual
 // before applying corrections. Mirrors SUN_HARMONICS_DISABLED=1 pattern.
 const DT_CORRECTIONS_ENABLED = process.env.DT_CORRECTIONS_DISABLED !== '1';

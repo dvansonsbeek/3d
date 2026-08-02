@@ -125,6 +125,35 @@ const EXTRA_COEFFICIENT_SOURCES = [
   { file: 'meeus-lunar-tables.json', as: 'MEEUS_LONGITUDE_TERMS', pick: (j) => j.longitudeTerms.terms },
   { file: 'meeus-lunar-tables.json', as: 'MEEUS_LATITUDE_TERMS', pick: (j) => j.latitudeTerms.terms },
   { file: 'climate-formula-coefficients.json', as: 'CLIMATE_FORMULA_COEFFS', pick: (j) => j },
+
+  // From data/, not public/input/.
+  //
+  // THE SUBSET MATTERS (§2j). balance-presets.json is 262 KB and serves two
+  // consumers: the website document needs the whole 767 -> 96 -> 51 reduction
+  // narrative, while script.js's modal needs only the 15 curated preset rows —
+  // ~2 KB. Emitting `presets` alone keeps the browser from carrying 260 KB it
+  // never reads, and leaves one source of truth rather than a third copy.
+  //
+  // Its producer, balance-search.js (Step 7b), is a GENERATOR: it rewrites this
+  // tracked file, and a plain inventory run of tools/verify/ once regenerated it
+  // with real numeric drift. tools/verify/run-suite.mjs excludes it by name.
+  { dir: 'data', file: 'balance-presets.json', as: 'BALANCE_PRESETS', pick: (j) => j.presets },
+
+  // The ΔT correction stack. FOUR channels — Bond, Hallstatt, Jose5, Jose4 —
+  // and Jose5/Jose4 are a COUPLED PAIR, so a 3-channel source cannot describe
+  // the shipped stack. The superseded deltaT-3flag-fit.json was deleted for
+  // exactly that reason: it carried bond.cos_coeff_s = 165.927 against the
+  // 145.595 actually shipped.
+  { dir: 'data', file: 'deltaT-4flag-fit.json', as: 'DT_STACK', pick: (j) => j.shipped_coefficients },
+
+  // The fourth ΔT driver, fitted separately (core-mantle swing, 2-kick damped
+  // oscillation). Its own file, its own fitter — hence its own entry.
+  {
+    dir: 'data',
+    file: 'core-mantle-resonator-stage1.json',
+    as: 'DT_RESONATOR',
+    pick: (j) => j.proposed_shipped_coefficients.resonator,
+  },
 ];
 
 /**
@@ -350,8 +379,11 @@ function buildCoefficients() {
     // never carried (MOON_CORRECTION_RESIDUAL has a `_comment`).
     out[k] = strip(fc[k]);
   }
-  for (const { file, as, pick } of EXTRA_COEFFICIENT_SOURCES) {
-    out[as] = strip(pick(read(file)));
+  for (const { dir, file, as, pick } of EXTRA_COEFFICIENT_SOURCES) {
+    const json = dir
+      ? JSON.parse(readFileSync(join(ROOT, dir, file), 'utf8'))
+      : read(file);
+    out[as] = strip(pick(json));
   }
   const hash = createHash('sha256')
     .update(JSON.stringify(canonical(out)))

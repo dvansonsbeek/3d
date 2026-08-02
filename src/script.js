@@ -2832,11 +2832,16 @@ function meanTropicalYearSecondsAtAge(t_Ma) {
 //         data/deltaT-bond-cycle-residual-fit.json (n=1825 paper original, archived)
 // ═════════════════════════════════════════════════════════════════════════════
 // BOND_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const BOND_LATTICE_N              = 1830;                       // integer n in 8H/n — 74 × J-S synodic; gcd(1830, H) = 61 shares H's 61 prime
+const BOND_LATTICE_N              = FIT.DT_STACK.bond.lattice_n;  // integer n in 8H/n — 74 × J-S synodic; gcd(1830, H) = 61 shares H's 61 prime
 const BOND_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / BOND_LATTICE_N;  // 1465.867 yr
 const BOND_OMEGA                  = 2 * Math.PI / BOND_PERIOD_YR;
-const BOND_COS_COEFF_S            = 145.59456999025969;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
-const BOND_SIN_COEFF_S            = 329.22555981262514;          // from data/deltaT-3flag-fit.json (Bond solo Stage A)
+// These cite the 4-flag fit, NOT the 3-flag one the comment used to name — the
+// 3-flag file gave bond.cos_coeff_s = 165.927 against the 145.595 shipped here,
+// so the old citation pointed at a materially different value. It has since been
+// deleted; Jose5 and Jose4 are a coupled pair, and a 3-channel file cannot
+// describe this stack.
+const BOND_COS_COEFF_S            = FIT.DT_STACK.bond.cos_coeff_s;
+const BOND_SIN_COEFF_S            = FIT.DT_STACK.bond.sin_coeff_s;
 // Cyclic-correction taper: full to ±300 kyr, fading to zero at ±400 kyr.
 //
 // The width is a SAFETY CHOICE, not a value derived from data, and it is not
@@ -2941,11 +2946,11 @@ function bondCycleDeltaTCorrection(year) {
 //   data/hallstatt-epica-fit.json               (CO₂ validation)
 // ═════════════════════════════════════════════════════════════════════════════
 // HALLSTATT_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const HALLSTATT_LATTICE_N              = 1104;                     // 8H/1104 = H/138 = 2·H/(6·23)
+const HALLSTATT_LATTICE_N              = FIT.DT_STACK.hallstatt.lattice_n;  // 8H/1104 = H/138 = 2·H/(6·23)
 const HALLSTATT_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / HALLSTATT_LATTICE_N;  // 2429.833 yr
 const HALLSTATT_OMEGA                  = 2 * Math.PI / HALLSTATT_PERIOD_YR;
-const HALLSTATT_COS_COEFF_S            = -72.94533763545279;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
-const HALLSTATT_SIN_COEFF_S            = 32.84779623125113;                // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
+const HALLSTATT_COS_COEFF_S            = FIT.DT_STACK.hallstatt.cos_coeff_s;  // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
+const HALLSTATT_SIN_COEFF_S            = FIT.DT_STACK.hallstatt.sin_coeff_s;  // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
 // "same as Bond" is now enforced rather than asserted: all four ΔT channels read
 // the single JSON pair, so widening the taper moves them together.
 const HALLSTATT_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
@@ -3022,11 +3027,11 @@ function hallstattCycleDeltaTCorrection(year) {
 //   L-5b Section 14 output                            (browser-side scan)
 // ═════════════════════════════════════════════════════════════════════════════
 // JOSE5_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const JOSE5_LATTICE_N              = 2989;                        // 8H/(7²·61); gcd(2989, H) = 61
+const JOSE5_LATTICE_N              = FIT.DT_STACK.jose5.lattice_n;  // 8H/(7²·61); gcd(2989, H) = 61
 const JOSE5_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE5_LATTICE_N;  // 897.47 yr
 const JOSE5_OMEGA                  = 2 * Math.PI / JOSE5_PERIOD_YR;
-const JOSE5_COS_COEFF_S            = -34.55484512708396;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
-const JOSE5_SIN_COEFF_S            = 36.13810562610113;                      // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
+const JOSE5_COS_COEFF_S            = FIT.DT_STACK.jose5.cos_coeff_s;  // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
+const JOSE5_SIN_COEFF_S            = FIT.DT_STACK.jose5.sin_coeff_s;  // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
 const JOSE5_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
 const JOSE5_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;
 const JOSE5_DT_RAW_AT_J2000        = JOSE5_COS_COEFF_S * Math.cos(JOSE5_OMEGA * 2000)
@@ -3073,11 +3078,11 @@ function jose5CycleDeltaTCorrection(year) {
 // (Stage C) to 13.9 s (Stage D) in the fit — a 28% reduction. See docs/102
 // § "Companion 8H lattice harmonics" (§ Jose4) for the empirical trail.
 // JOSE4_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const JOSE4_LATTICE_N              = 3749;                       // 3749 = 23 × 163; gcd(3749, H) = 23 shares H's 23 prime
+const JOSE4_LATTICE_N              = FIT.DT_STACK.jose4.lattice_n;  // 3749 = 23 × 163; gcd(3749, H) = 23 shares H's 23 prime
 const JOSE4_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE4_LATTICE_N;  // 715.53 yr
 const JOSE4_OMEGA                  = 2 * Math.PI / JOSE4_PERIOD_YR;
-const JOSE4_COS_COEFF_S            = 38.592083031774166;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
-const JOSE4_SIN_COEFF_S            = -31.7907396464544;         // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
+const JOSE4_COS_COEFF_S            = FIT.DT_STACK.jose4.cos_coeff_s;  // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
+const JOSE4_SIN_COEFF_S            = FIT.DT_STACK.jose4.sin_coeff_s;  // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
 const JOSE4_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
 const JOSE4_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;
 const JOSE4_DT_RAW_AT_J2000        = JOSE4_COS_COEFF_S * Math.cos(JOSE4_OMEGA * 2000)
@@ -3140,17 +3145,20 @@ function jose4CycleDeltaTCorrection(year) {
 // caveat, recorded once: the bare axiMC eigenmode is core-material physics;
 // the lattice label is the framework's clock-coherence convention for the
 // shipped component (numeric difference ~1e-6 over the episode's life).
-const RES_T0_LATTICE_N = 685;
-const RES_Q           = 1.8;
-const RES_KICK1_T_YR  = -1600;
-const RES_KICK1_COS_S = 0;
-const RES_KICK1_SIN_S = 760.3459514001411;
-const RES_KICK2_T_YR  = 1600;
-const RES_KICK2_COS_S = 0;
-const RES_KICK2_SIN_S = -75.18554900744495;
-const RES_TONE1_DN    = 726;
-const RES_TONE1_PHI_RAD = -0.4616152283022974;
-const RES_TONE1_AMP_S = 186.14;
+// The fourth ΔT driver, from data/core-mantle-resonator-stage1.json via the
+// generated module. Its own file and its own fitter, so its own export —
+// FIT.DT_RESONATOR rather than a fifth channel under DT_STACK.
+const RES_T0_LATTICE_N = FIT.DT_RESONATOR.T0_lattice_n;
+const RES_Q           = FIT.DT_RESONATOR.Q;
+const RES_KICK1_T_YR  = FIT.DT_RESONATOR.kick_epochs_year[0];
+const RES_KICK1_COS_S = FIT.DT_RESONATOR.kick_coefficients_s[0].cos;
+const RES_KICK1_SIN_S = FIT.DT_RESONATOR.kick_coefficients_s[0].sin;
+const RES_KICK2_T_YR  = FIT.DT_RESONATOR.kick_epochs_year[1];
+const RES_KICK2_COS_S = FIT.DT_RESONATOR.kick_coefficients_s[1].cos;
+const RES_KICK2_SIN_S = FIT.DT_RESONATOR.kick_coefficients_s[1].sin;
+const RES_TONE1_DN    = FIT.DT_RESONATOR.drive_tones[0].dn;
+const RES_TONE1_PHI_RAD = FIT.DT_RESONATOR.drive_tones[0].phi_locked_rad;
+const RES_TONE1_AMP_S = FIT.DT_RESONATOR.drive_tones[0].amp_s;
 
 const RES_T0_YR  = (8 * HOLISTIC_YEAR_J2000) / RES_T0_LATTICE_N;   // 3,916.11 yr
 const RES_W0     = 2 * Math.PI / RES_T0_YR;
@@ -15652,23 +15660,7 @@ const BALANCE_PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn
 // Phase: 0 = in-phase (rest), 1 = anti-phase (Saturn)
 // Scenarios: A = Ju5/Sa3, B = Ju8/Sa5, C = Ju13/Sa8, D = Ju21/Sa13
 /* eslint-disable */
-const BALANCE_PRESETS = [
-["A",99.99472335,34,1,34,0,3,0,5,0,3,1,8,0,34,1,99.8851,7,7,5.5,0,12,1,85,36,36,11,3,54.52,218.64,236.07,287.06,116.26,21.33,354.04],
-["A",99.99776122,55,1,34,0,3,0,5,0,3,1,8,0,34,1,99.883,7,7,5.1,0,15,1,85,36,36,11,3,54.52,218.64,236.07,287.06,116.26,21.33,354.04],
-["A",99.99422841,13,1,55,1,3,0,5,0,3,1,21,0,34,0,99.8669,7,7,3.5,0,2,1,85,36,36,12,3,54.52,38.64,236.07,287.06,116.26,21.33,174.04],
-["A",99.99744632,21,0,34,0,5,0,5,0,3,1,21,0,34,0,99.8636,7,7,5.1,1,9,1,62,36,36,12,3,234.52,218.64,236.07,287.06,116.26,21.33,174.04],
-["A",99.99403258,21,0,55,0,3,0,5,0,3,1,8,0,34,1,99.863,7,7,3.3,0,9,1,85,36,36,11,3,234.52,218.64,236.07,287.06,116.26,21.33,354.04],
-["B",99.99533836,21,1,34,1,21,0,8,0,5,1,13,0,34,1,99.3938,7,7,4,0,9,1,35,39,39,12,3,54.52,38.64,236.07,287.06,116.26,21.33,354.04],
-["B",99.99507246,21,1,55,1,34,0,8,0,5,1,13,0,34,1,99.3775,7,7,2.2,0,9,1,32,39,39,12,3,54.52,38.64,236.07,287.06,116.26,21.33,354.04],
-["B",99.9973888,55,1,55,1,55,0,8,0,5,1,13,0,34,1,99.3701,7,7,1.9,0,15,1,30,39,39,12,3,54.52,38.64,236.07,287.06,116.26,21.33,354.04],
-["B",99.99487306,13,0,55,1,55,1,8,0,5,1,13,0,34,1,99.3024,7,7,2.2,0,2,1,30,39,39,12,3,234.52,38.64,56.07,287.06,116.26,21.33,354.04],
-["B",99.99489711,13,1,55,0,34,1,8,0,5,1,13,0,34,1,99.2544,7,7,2.3,0,2,1,32,39,39,12,3,54.52,218.64,56.07,287.06,116.26,21.33,354.04],
-["B",99.99530411,21,0,55,0,13,1,8,0,5,1,13,0,34,1,99.2526,7,7,1.9,0,9,1,40,39,39,12,3,234.52,218.64,56.07,287.06,116.26,21.33,354.04],
-["B",99.99888453,34,1,55,0,21,1,8,0,5,1,13,0,34,1,99.2452,7,7,2.1,0,12,1,35,39,39,12,3,54.52,218.64,56.07,287.06,116.26,21.33,354.04],
-["A",99.99955827,13,0,34,0,3,1,5,0,3,1,8,0,55,1,99.1096,7,7,5.6,0,2,1,85,36,36,11,3,234.52,218.64,56.07,287.06,116.26,21.33,354.04],
-["A",99.99648216,21,1,55,1,5,1,5,0,3,1,8,0,55,1,99.1063,7,7,3.1,0,9,1,62,36,36,11,3,54.52,38.64,56.07,287.06,116.26,21.33,354.04],
-["A",99.99973521,55,0,34,1,5,1,5,0,3,1,8,0,55,1,99.086,7,7,4.9,0,15,1,62,36,36,11,3,234.52,38.64,56.07,287.06,116.26,21.33,354.04]
-];
+const BALANCE_PRESETS = FIT.BALANCE_PRESETS;
 /* eslint-enable */
 
 // Decode a preset row into a state object
