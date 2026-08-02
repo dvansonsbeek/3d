@@ -62,6 +62,13 @@ export { GENERATED as DEFAULT_CONSTANTS, CONSTANTS_HASH };
 export { REFERENCE_DATA };
 
 /**
+ * Fitting-pipeline output at full precision, with its own hash (§2j).
+ * Not part of the injectable context: a counterfactual perturbs the parameters
+ * we chose, not the 2,400-term output of a fit.
+ */
+export { FITTED_COEFFICIENTS, COEFFICIENTS_HASH } from './constants/index.js';
+
+/**
  * Build a model bound to a set of constants.
  *
  * Dependency injection rather than import is the key decision (§2d): it is what
@@ -88,13 +95,23 @@ export const createModel = (constants = GENERATED) => {
     }
   }
 
+  // Test the ARGUMENT, not the copy. `ctx` below is a fresh frozen object, so
+  // `ctx === GENERATED` is never true and the fast path never fired — every
+  // call fell through to isDefault(), which serialises the whole context twice.
+  // Harmless at 10 KB (~0.4 ms); ruinous once the fitted coefficients arrive,
+  // which are ~400 KB.
+  const isGeneratedDefault = constants === GENERATED;
+
   const ctx = Object.freeze({ ...constants });
 
   // The hash identifies THIS context, not the default one. A counterfactual
   // that reported the default hash would be unreproducible — you could not tell
   // from a stored result which constants produced it, which is the whole point
   // of carrying a hash (§2d). Recomputed rather than copied for that reason.
-  const hash = ctx === GENERATED || isDefault(ctx) ? CONSTANTS_HASH : hashOf(ctx);
+  //
+  // isDefault() still runs for a caller who passes a value-identical COPY
+  // (`{...DEFAULT_CONSTANTS}`); only the identity case is short-circuited.
+  const hash = isGeneratedDefault || isDefault(ctx) ? CONSTANTS_HASH : hashOf(ctx);
 
   return {
     constants: ctx,

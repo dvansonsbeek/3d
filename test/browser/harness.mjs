@@ -67,9 +67,47 @@ export async function openSimulator({ timeout = 90_000 } = {}) {
 
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e)));
-  page.on('console', (m) => { if (m.type() === 'error') errors.push(`console: ${m.text()}`); });
+  page.on('console', (m) => {
+    if (m.type() !== 'error') return;
+    // Do not count the resource failures WE caused. Blocking the remote textures
+    // makes Chromium log ~47 "Failed to load resource" lines; counting those
+    // would leave `errors` permanently non-empty and silently destroy the
+    // signal every caller uses to assert the page came up clean.
+    const t = m.text();
+    if (/net::ERR_FAILED|Failed to load resource/i.test(t)) return;
+    errors.push(`console: ${t}`);
+  });
 
-  await page.goto(`http://127.0.0.1:${server.port}/index.html`, { waitUntil: 'load', timeout });
+  // HERMETIC. In production the app deliberately fetches its data from
+  // raw.githubusercontent.com; the same files also live in `public/`. The
+  // original `waitUntil: 'load'` therefore waited on ~45 GitHub requests, so a
+  // golden-master test of pure arithmetic depended on GitHub being reachable and
+  // fast — it passed in CI and then hung for 90 s locally.
+  //
+  // Data files are SERVED FROM public/ so the page behaves as it does in
+  // production. Images are aborted: 40-odd planet textures cannot change a year
+  // length, and fetching them only makes the test slow.
+  const PUBLIC = join(ROOT, 'public');
+  await page.route('**/*', async (route) => {
+    const url = route.request().url();
+    if (url.startsWith(`http://127.0.0.1:${server.port}`) || url.startsWith('data:')) {
+      return route.continue();
+    }
+    const rel = url.replace(/^https?:\/\/[^/]+\/[^/]+\/[^/]+\/[^/]+\/public\//, '');
+    if (rel !== url && /\.(json|csv|txt)$/i.test(rel)) {
+      try {
+        const body = await readFile(join(PUBLIC, rel));
+        return route.fulfill({ status: 200, contentType: TYPES[extname(rel)] ?? 'application/json', body });
+      } catch { /* fall through to abort */ }
+    }
+    return route.abort();
+  });
+
+  // `domcontentloaded` + an explicit wait for the surface, rather than `load`:
+  // the values under test exist as soon as module scope finishes, and nothing
+  // later in the load event can change them.
+  await page.goto(`http://127.0.0.1:${server.port}/index.html`, { waitUntil: 'domcontentloaded', timeout });
+  await page.waitForFunction(() => typeof window.__test__ === 'object' && window.__test__ !== null, null, { timeout });
 
   const surface = await page.evaluate(() =>
     (typeof window.__test__ === 'object' && window.__test__ !== null)

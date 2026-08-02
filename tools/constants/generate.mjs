@@ -37,6 +37,50 @@ const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const IN = join(ROOT, 'public/input');
 const OUT_JS = join(ROOT, 'packages/physics/src/constants/generated.js');
 const OUT_DTS = join(ROOT, 'packages/physics/src/constants/generated.d.ts');
+const OUT_COEFFS = join(ROOT, 'packages/physics/src/constants/coefficients.js');
+
+/**
+ * Fitted coefficients emitted VERBATIM from fitted-coefficients.json (§2j).
+ *
+ * A SEPARATE export and a separate file, because the lifecycle differs: model
+ * parameters are chosen or measured and change deliberately; these are pipeline
+ * OUTPUT and change wholesale whenever a fit step runs. One hash over both could
+ * not distinguish "someone changed H" from "6b was rerun".
+ *
+ * WHY VERBATIM MATTERS. export-to-script.js did not merely format these — it
+ * rounded. Its fmtHarmonics3 wrote 6 decimal places, so the browser ran on
+ * coefficients measurably worse than the ones tools/lib reads:
+ *
+ *   PERI_HARMONICS           RSS 0.0076"  worst 0.0359"   1 term zeroed
+ *   OBLIQUITY_HARMONICS      RSS 0.0058"  worst 0.0219"   1 term zeroed
+ *   SUN_LONGITUDE_HARMONICS  RSS 0.0031"  worst 0.0055"
+ *
+ * against a 6b fit that targets 0.00641" out-of-sample. The fitter reached that
+ * and the export threw away as much again — in one engine only. Two coefficients
+ * were rounded to exactly zero. Emitting the JSON unchanged removes the whole
+ * class of error.
+ *
+ * Any rename or reshape script.js wants (PERI_HARMONICS_RAW -> PERI_HARMONICS,
+ * divisor n -> period H/n) happens THERE, visibly, not in a formatter here.
+ */
+const COEFFICIENT_KEYS = [
+  'TROPICAL_YEAR_HARMONICS',
+  'SIDEREAL_YEAR_HARMONICS',
+  'ANOMALISTIC_YEAR_HARMONICS',
+  'PERI_HARMONICS_RAW',
+  'SOLSTICE_OBLIQUITY_HARMONICS',
+  'SUN_LONGITUDE_HARMONICS',
+
+  // Correction tables. Audited for the same rounding: fmtParallax wrote FOUR
+  // decimals and the gravitation/elongation formatters six, but all four blocks
+  // came out bit-exact — the fitter already stores them at that precision, so
+  // the formatter had nothing to round away. Emitted verbatim regardless, so the
+  // question cannot arise again.
+  'PARALLAX_DEC_CORRECTION',
+  'PARALLAX_RA_CORRECTION',
+  'GRAVITATION_CORRECTION',
+  'ELONGATION_CORRECTION',
+];
 
 /**
  * Every top-level block of the two JSONs, classified. A block missing from this
@@ -250,8 +294,60 @@ ${Object.keys(reference).sort().map((b) => `  readonly ${b}: ${t(reference[b])};
 `;
 }
 
+/** Emit the fitted coefficients verbatim, with their own content hash. */
+function buildCoefficients() {
+  const fc = read('fitted-coefficients.json');
+  const out = {};
+  const missing = [];
+  for (const k of COEFFICIENT_KEYS) {
+    if (!(k in fc)) { missing.push(k); continue; }
+    out[k] = fc[k];
+  }
+  const hash = createHash('sha256')
+    .update(JSON.stringify(canonical(out)))
+    .digest('hex')
+    .slice(0, 16);
+  return { out, hash, missing };
+}
+
+function emitCoefficients({ out, hash }) {
+  const keys = Object.keys(out).sort();
+  return `/**
+ * GENERATED — do not edit. Regenerate:
+ *   node tools/constants/generate.mjs --write
+ *
+ * Source: public/input/fitted-coefficients.json, emitted VERBATIM.
+ *
+ * Separate from DEFAULT_CONSTANTS because the lifecycle differs (§2j): these are
+ * fitting-pipeline output, regenerated wholesale when a step runs, never
+ * hand-edited. COEFFICIENTS_HASH identifies the fit; CONSTANTS_HASH identifies
+ * the parameters we chose. A result is reproducible from the pair, and the two
+ * moving independently is the signal a dependency-aware pipeline needs.
+ *
+ * Full double precision, deliberately. The predecessor (export-to-script.js)
+ * rounded these to 6 decimals on their way into src/script.js, costing up to
+ * 0.0359" worst-case and zeroing two coefficients outright, against a fit that
+ * targets 0.00641". Renames and reshapes belong at the point of use, not here.
+ */
+
+/** @type {string} */
+export const COEFFICIENTS_HASH = ${JSON.stringify(hash)};
+
+/** @type {Readonly<Record<string, unknown>>} */
+export const FITTED_COEFFICIENTS = Object.freeze({
+${keys.map((k) => `  ${k}: ${JSON.stringify(out[k])},`).join('\n')}
+});
+`;
+}
+
 // ── run ──────────────────────────────────────────────────────────────────────
 const result = build();
+const coeffs = buildCoefficients();
+if (coeffs.missing.length) {
+  console.error('fitted-coefficients.json is missing expected keys:');
+  for (const k of coeffs.missing) console.error(`  ${k}`);
+  process.exit(1);
+}
 
 if (result.problems.length) {
   console.error('CLASSIFICATION out of step with the JSON:');
@@ -263,36 +359,43 @@ const js = emitJs(result);
 const dts = emitDts(result);
 const write = process.argv.includes('--write');
 
+const coeffJs = emitCoefficients(coeffs);
+
 if (write) {
   mkdirSync(dirname(OUT_JS), { recursive: true });
   writeFileSync(OUT_JS, js);
   writeFileSync(OUT_DTS, dts);
+  writeFileSync(OUT_COEFFS, coeffJs);
   console.log(`generated ${countLeaves(result.included)} values in ${Object.keys(result.included).length} blocks`);
-  console.log(`  hash ${result.hash}`);
+  console.log(`  constants hash    ${result.hash}`);
+  console.log(`  coefficients hash ${coeffs.hash}  (${Object.keys(coeffs.out).length} arrays, full precision)`);
   console.log(`  excluded: ${Object.entries(result.excluded).map(([b, c]) => `${b} (${c})`).join(', ')}`);
-  console.log('  -> packages/physics/src/constants/generated.{js,d.ts}');
+  console.log('  -> packages/physics/src/constants/{generated.js,generated.d.ts,coefficients.js}');
   process.exit(0);
 }
 
 let current = null;
 let currentDts = null;
+let currentCoeffs = null;
 try {
   current = readFileSync(OUT_JS, 'utf8');
   currentDts = readFileSync(OUT_DTS, 'utf8');
+  currentCoeffs = readFileSync(OUT_COEFFS, 'utf8');
 } catch { /* handled below */ }
 
 console.log('GENERATED CONSTANTS — check');
 console.log('='.repeat(74));
 console.log(`  ${countLeaves(result.included)} values · ${Object.keys(result.included).length} blocks · hash ${result.hash}`);
 console.log(`  excluded (never injectable): ${Object.keys(result.excluded).join(', ')}`);
+console.log(`  coefficients: ${Object.keys(coeffs.out).length} arrays · hash ${coeffs.hash}`);
 
-if (current === null) {
-  console.log('\nFAIL — generated module missing. Run with --write.');
+if (current === null || currentCoeffs === null) {
+  console.log('\nFAIL — a generated module is missing. Run with --write.');
   process.exit(1);
 }
-if (current !== js || currentDts !== dts) {
-  console.log('\nFAIL — generated module is STALE relative to the JSON source of truth.');
+if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs) {
+  console.log('\nFAIL — a generated module is STALE relative to the JSON source of truth.');
   console.log('Run: node tools/constants/generate.mjs --write');
   process.exit(1);
 }
-console.log('\nPASS — generated module matches the JSON.');
+console.log('\nPASS — generated modules match the JSON.');
