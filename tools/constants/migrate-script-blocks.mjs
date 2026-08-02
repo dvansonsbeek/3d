@@ -80,7 +80,7 @@ const BLOCKS = [
     name: 'CARDINAL_POINT_ANCHORS',
     expected: (fit) => fit.CARDINAL_POINT_ANCHORS_ADJUSTED,
     expr: 'FIT.CARDINAL_POINT_ANCHORS_ADJUSTED',
-    note: 'script.js uses the ADJUSTED set — a rename that lived only in export-to-script.js',
+    note: 'script.js uses the ADJUSTED set under the base name — renamed at the import',
   },
   {
     name: 'CARDINAL_POINT_HARMONICS',

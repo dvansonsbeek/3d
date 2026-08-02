@@ -225,7 +225,7 @@ python tools/fit/python/train_precession_physical.py --planet venus --write
 
 ### 4. Update JavaScript
 
-- **Tweakpane (`src/script.js`):** `node tools/fit/export-to-script.js --write` — replaces the `PREDICT_COEFFS` block in-place.
+- **Tweakpane (`src/script.js`):** `npm run constants:generate` — refreshes `PREDICT_COEFFS_PHYSICAL` in the generated constants module, which `src/script.js` imports.
 - **Holistic website:** `node tools/fit/export-to-holistic.js --write` — writes `coefficients.ts` (and verifies `planets.ts::buildFeatures` term count matches).
 - **Node verification (`tools/lib/orbital-engine.js`):** picks up coefficients automatically via `tools/lib/constants/fitted-coefficients.js`, which reads the JSON.
 

@@ -1212,7 +1212,7 @@ The full investigation is documented for future revisiting:
 Current shipped fit (sole runtime source of truth):
 
 - `tools/fit/dt-corrections-fit.js` — Node cascaded-LSQ fit tool (Phase 8 Step 11). Reads Stephenson polynomial, samples the pure-tidal framework residual (with `DT_CORRECTIONS_DISABLED=1` bypassing the shipped corrections), fits Bond→Hallstatt→Jose5→Jose4 in cascade, writes the artifact below.
-- `tools/fit/export-dt-corrections.js` — sync helper (Phase 8 Step 12). Patches `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` and `_LATTICE_N` in `src/script.js`, `tools/lib/deep-time.js`, and website `deepTime.ts`. Also exposes the in-memory API used by `export-to-script.js` and `export-to-holistic.js` as their delegated tail step.
+- `tools/fit/export-dt-corrections.js` — sync helper for the website only. Patches `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S`, `_LATTICE_N` and the `RES_*` resonator constants into `deepTime.ts`, and exposes the in-memory API `export-to-holistic.js` delegates to. `src/script.js` imports the same values from the generated constants module; `tools/lib/deep-time.js` reads the JSON directly.
 - `data/deltaT-4flag-fit.json` — combined 4-cycle fit output; sole authoritative source for the shipped coefficients.
 
 Archived Python exploration (superseded but retained for historical context):

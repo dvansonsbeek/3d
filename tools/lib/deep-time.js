@@ -43,6 +43,21 @@ const ALPHA_CLIMATE_SCALE      = C.ALPHA_CLIMATE_SCALE;
 const _CLIMATE_JSON_PATH       = path.join(__dirname, '..', '..', 'public', 'input', 'climate-formula-coefficients.json');
 const CLIMATE_FORMULA_COEFFS   = JSON.parse(fs.readFileSync(_CLIMATE_JSON_PATH, 'utf8'));
 
+// ΔT correction stack — read from JSON, the same way constants.js and the
+// climate coefficients above already are. These used to be literals kept in step
+// by export-dt-corrections.js patching this file; a sync ritual is not needed
+// for a file that can simply read its own source of truth.
+//
+// FOUR channels. Jose5 and Jose4 are a coupled pair, so the superseded
+// 3-flag artefact could not describe this stack — it is deleted.
+const _DT_FIT_PATH = path.join(__dirname, '..', '..', 'data', 'deltaT-4flag-fit.json');
+const _DT = JSON.parse(fs.readFileSync(_DT_FIT_PATH, 'utf8')).shipped_coefficients;
+
+// The fourth driver (core-mantle swing) is fitted separately and lives in its
+// own file — a 2-kick damped oscillation, not a sinusoid.
+const _RES_JSON_PATH = path.join(__dirname, '..', '..', 'data', 'core-mantle-resonator-stage1.json');
+const _RES = JSON.parse(fs.readFileSync(_RES_JSON_PATH, 'utf8')).proposed_shipped_coefficients.resonator;
+
 // Solar physics — Driver 2 mass loss (single source: astro-reference.json physicalConstants)
 const L_SUN_W              = C.SOLAR_LUMINOSITY_W;                    // IAU 2015 nominal solar luminosity (W)
 const SOLAR_WIND_KG_PER_S  = C.SOLAR_WIND_KG_PER_S;                   // Ulysses/ACE/Wind measurements
@@ -258,29 +273,29 @@ function meanYearInDaysAtAge(t_Ma) {
 
 const EIGHT_H = 8 * HOLISTIC_YEAR_J2000;
 
-const BOND_LATTICE_N = 1830;
+const BOND_LATTICE_N = _DT.bond.lattice_n;
 const BOND_PERIOD_YR = EIGHT_H / BOND_LATTICE_N;
 const BOND_OMEGA = 2 * Math.PI / BOND_PERIOD_YR;
-const BOND_COS_COEFF_S = 145.59456999025969;
-const BOND_SIN_COEFF_S = 329.22555981262514;
+const BOND_COS_COEFF_S = _DT.bond.cos_coeff_s;
+const BOND_SIN_COEFF_S = _DT.bond.sin_coeff_s;
 
-const HALLSTATT_LATTICE_N = 1104;
+const HALLSTATT_LATTICE_N = _DT.hallstatt.lattice_n;
 const HALLSTATT_PERIOD_YR = EIGHT_H / HALLSTATT_LATTICE_N;
 const HALLSTATT_OMEGA = 2 * Math.PI / HALLSTATT_PERIOD_YR;
-const HALLSTATT_COS_COEFF_S = -72.94533763545279;
-const HALLSTATT_SIN_COEFF_S = 32.84779623125113;
+const HALLSTATT_COS_COEFF_S = _DT.hallstatt.cos_coeff_s;
+const HALLSTATT_SIN_COEFF_S = _DT.hallstatt.sin_coeff_s;
 
-const JOSE5_LATTICE_N = 2989;
+const JOSE5_LATTICE_N = _DT.jose5.lattice_n;
 const JOSE5_PERIOD_YR = EIGHT_H / JOSE5_LATTICE_N;
 const JOSE5_OMEGA = 2 * Math.PI / JOSE5_PERIOD_YR;
-const JOSE5_COS_COEFF_S = -34.55484512708396;
-const JOSE5_SIN_COEFF_S = 36.13810562610113;
+const JOSE5_COS_COEFF_S = _DT.jose5.cos_coeff_s;
+const JOSE5_SIN_COEFF_S = _DT.jose5.sin_coeff_s;
 
-const JOSE4_LATTICE_N = 3749;
+const JOSE4_LATTICE_N = _DT.jose4.lattice_n;
 const JOSE4_PERIOD_YR = EIGHT_H / JOSE4_LATTICE_N;
 const JOSE4_OMEGA = 2 * Math.PI / JOSE4_PERIOD_YR;
-const JOSE4_COS_COEFF_S = 38.592083031774166;
-const JOSE4_SIN_COEFF_S = -31.7907396464544;
+const JOSE4_COS_COEFF_S = _DT.jose4.cos_coeff_s;
+const JOSE4_SIN_COEFF_S = _DT.jose4.sin_coeff_s;
 
 // Cyclic-correction taper: full to ±300 kyr, fading to zero at ±400 kyr.
 //
@@ -452,17 +467,17 @@ const DT_RESONATOR_ENABLED = process.env.DT_RESONATOR_DISABLED !== '1';
 // caveat, recorded once: the bare axiMC eigenmode is core-material physics;
 // the lattice label is the framework's clock-coherence convention for the
 // shipped component (numeric difference ~1e-6 over the episode's life).
-const RES_T0_LATTICE_N = 685;
-const RES_Q           = 1.8;
-const RES_KICK1_T_YR  = -1600;
-const RES_KICK1_COS_S = 0;
-const RES_KICK1_SIN_S = 760.3459514001411;
-const RES_KICK2_T_YR  = 1600;
-const RES_KICK2_COS_S = 0;
-const RES_KICK2_SIN_S = -75.18554900744495;
-const RES_TONE1_DN    = 726;
-const RES_TONE1_PHI_RAD = -0.4616152283022974;
-const RES_TONE1_AMP_S = 186.14;
+const RES_T0_LATTICE_N = _RES.T0_lattice_n;
+const RES_Q           = _RES.Q;
+const RES_KICK1_T_YR  = _RES.kick_epochs_year[0];
+const RES_KICK1_COS_S = _RES.kick_coefficients_s[0].cos;
+const RES_KICK1_SIN_S = _RES.kick_coefficients_s[0].sin;
+const RES_KICK2_T_YR  = _RES.kick_epochs_year[1];
+const RES_KICK2_COS_S = _RES.kick_coefficients_s[1].cos;
+const RES_KICK2_SIN_S = _RES.kick_coefficients_s[1].sin;
+const RES_TONE1_DN    = _RES.drive_tones[0].dn;
+const RES_TONE1_PHI_RAD = _RES.drive_tones[0].phi_locked_rad;
+const RES_TONE1_AMP_S = _RES.drive_tones[0].amp_s;
 
 const RES_T0_YR  = EIGHT_H / RES_T0_LATTICE_N;   // 3,916.11 yr
 const RES_W0     = 2 * Math.PI / RES_T0_YR;

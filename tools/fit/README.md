@@ -181,7 +181,7 @@ a full H):
 All fitting scripts support **dry run** by default (print results only).
 Add `--write` to actually update the JSON source-of-truth files.
 After all steps complete, run `verify-pipeline.js` (Step 8) to check for regressions,
-then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
+then `npm run constants:generate` (Step 9).
 
 ## Scripts
 
@@ -210,8 +210,9 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `../../scripts/archive/core_mantle_resonator_stage1.py` | `data/core-mantle-resonator-stage1.json` — the **Core-mantle swing (Resonator driver)** shipped block: a 2-kick EPISODE (windowed damped oscillation, T₀ = 8H/`RES_T0_LATTICE_N` lattice-labeled, Q, kick epochs/coefficients, phase-locked drive tone). Selection rule: pinned-lattice-T₀ guard-passers first (guard-aware solver — modern-window δLOD penalty rows). **Regeneration in the joint world: amplitudes refit automatically via `--joint --write` (tone menu derives from the active flags — generic over flag count). The episode CONVENTION (T₀ = 8H/685, Q = 1.8, epochs −1600/+1600, impulse-consistent shapes) is re-derived only if ever needed via the archived stage-1/stage-3/impulse scripts.** Kick epochs are a documented CONVENTION, not data-pinned — see the stage-3 stability artifact before moving them. | Stephenson residual after the shipped stack (node bridge to `tools/lib/deep-time.js`) + `data/deltaT-4flag-fit.json` (parents' phases for the locked tones) |
 | `../../scripts/archive/core_mantle_resonator_stage3_stability.py` | `data/core-mantle-resonator-stage3-stability.json` — kick-epoch stability: coordinate refinement, ridge map + 2% stability box, era jackknife. Verdict 2026-07: epochs NOT data-pinnable (broad t_exc/T₀ ridge, era-dependent jackknife) → shipped epochs stand as convention. | same residual |
 | `validate-resonator.js` | `data/core-mantle-resonator-stage3-validation.json` — runtime OFF/ON validation sweep of the CURRENT world (pipeline step: run after every `--joint --write` + sync): J2000 invariants, Layer-3 USNO anchor, Stephenson/Espenak-window RMS, deep-time bit-identity ±200 Myr. Joint-world reference values: ON Stephenson RMS ≈ 31.3 s, Espenak window ≈ 12.1 s. | production chain (`tools/lib/deep-time.js`) |
-| `export-dt-corrections.js` | Patches `BOND_/HALLSTATT_/JOSE5_ COS_/SIN_COEFF_S` (and `_LATTICE_N`) **and the resonator `RES_*` constants** in `src/script.js`, `tools/lib/deep-time.js`, and website `deepTime.ts` (targets lacking the constants skip silently). Also exposes an in-memory API (`loadFitJson`/`loadResonatorJson`/`applyToSource`) used by `export-to-script.js` and `export-to-holistic.js` as a delegated tail step. | `data/deltaT-4flag-fit.json` + `data/core-mantle-resonator-stage1.json` |
-| `export-to-script.js` | Syncs all JSON values → `src/script.js` (includes DT correction constants via `export-dt-corrections.js` delegate) | 4 JSON files in `public/input/` + `data/deltaT-4flag-fit.json` if present |
+| `export-dt-corrections.js` | Syncs the ΔT constants to the **website `deepTime.ts` only**. `src/script.js` and `tools/lib/deep-time.js` now read `data/deltaT-4flag-fit.json` and `data/core-mantle-resonator-stage1.json` directly, so patching them would write values they already hold. Retires with `export-to-holistic.js` at Phase 21, when the website consumes the published package as a delegated tail step. | `data/deltaT-4flag-fit.json` + `data/core-mantle-resonator-stage1.json` |
+| `../constants/generate.mjs` | Generates the constants module `src/script.js` imports, from `public/input/*.json` plus `data/{balance-presets,deltaT-4flag-fit,core-mantle-resonator-stage1}.json`. Emits values verbatim — no formatting, no rounding | the JSON source files |
+| `../constants/migrate-script-blocks.mjs` | One-off migration helper: replaces an embedded literal with its import, but only after proving the two bit-identical. `--adopt=NAME` for a deliberate value change | `src/script.js` |
 | `export-to-holistic.js` | Syncs all values → Holistic website repo (manual, not in pipeline). Covers `constants.ts` (harmonics + fitted scalars), `cardinalPointHarmonics.ts`, `coefficients.ts` (7×2421 terms + `planets.ts buildFeatures`), `deepTime.ts` DT constants (via `export-dt-corrections.js` delegate), and — as of 2026-07-18 — astro-reference scalar anchors (`DELTA_T_START_SECONDS`, `PERIHELION_ALIGNMENT_YEAR`) sourced from `public/input/astro-reference.json`. See **"Syncing to Holistic"** section below for the full command sequence. | `fitted-coefficients.json` + `model-parameters.json` + `data/balance-presets.json` + `data/significance-results.json` + `data/deltaT-4flag-fit.json` if present + `public/input/astro-reference.json` |
 | `reclassify-tiers.js` | Tier reclassification + JPL enrichment of Tier 1 data | `data/reference-data.json` |
 | `verify-pipeline.js` | Pass/fail verification of all 9 targets + correction stack | Scene-graph simulation |
@@ -394,12 +395,10 @@ Step 2:  node tools/optimize.js optimize <planet> startpos   (for each planet)
 
 ── Phase 2: Generate input data (manual) ──────────────────────────
 
-Step 2-sync: node tools/fit/export-to-script.js --write
-         After Steps 1–2, sync model-parameters.json changes (startpos,
-         angleCorrection, and any modified Fibonacci fractions) to src/script.js.
-         The browser simulation reads from script.js, so this sync is REQUIRED
-         before Step 3's browser export — otherwise Step 3 will use the old
-         pre-optimization values.
+Step 2-sync: npm run constants:generate && npm run build
+         Regenerate the constants module from the JSON Steps 1–2 wrote, then
+         rebuild the bundle. REQUIRED before Step 3: the browser reads the
+         built bundle, so without this Step 3 exports pre-optimization values.
 
 Step 3:  Export from browser GUI              → data/01-holistic-year-objects-data.xlsx
          (Perihelion/precession data for all planets, 1-year steps over full H)
@@ -748,15 +747,11 @@ Step 8:  verify-pipeline.js                   → pass/fail
          tools/results/baselines.json. Warns on regressions (>0.001°).
          Must pass before syncing to script.js. Add --write to update baselines.
 
-Step 9:  export-to-script.js --write          → src/script.js
-         Reads all 4 JSON files + balance-presets.json and patches script.js.
-         Handles: scalar consts, planet properties, arrays (harmonics, Moon tables),
-         objects (parallax corrections, cardinal point harmonics + anchors),
-         balance presets (from data/balance-presets.json).
-         Also delegates a tail step F to export-dt-corrections.js — if
-         data/deltaT-4flag-fit.json exists, its Bond/Hallstatt/Jose5 constants
-         are patched into script.js in the same run (see Phase 8).
-         Only run after Step 8 passes.
+Step 9:  npm run constants:generate           → generated constants module
+         Regenerates the module src/script.js and tools/lib import.
+         Same command as Step 2-sync, and safe to run at any point —
+         there is no publish gate. `npm run check` and the headless-browser
+         golden masters are the verification.
 
 Manual:  export-to-holistic.js --write        → Holistic website repo
          (NOT in automated pipeline — run manually after Step 9)
@@ -841,7 +836,7 @@ Step 12: node tools/fit/export-dt-corrections.js --write
          data/deltaT-4flag-fit.json. Each target file is backed up as .bak
          before write.
 
-         Alternatively: `node tools/fit/export-to-script.js --write` (Step 9)
+         Alternatively: `npm run constants:generate` (Step 9)
          and `node tools/fit/export-to-holistic.js --write` (manual) both
          delegate to export-dt-corrections.js as a tail step and pick up
          data/deltaT-4flag-fit.json automatically — so if you're running the
@@ -902,8 +897,8 @@ matches IAU 365.2422 d to 10 decimals.
 ## How to run
 
 All scripts default to **dry run** (print only). Add `--write` to update JSON files.
-Run `export-to-script.js --write` to sync JSON values to `src/script.js`.
-This can be done after each `--write` step, or once at the end — it patches all diffs in one pass.
+Run `npm run constants:generate` to regenerate the module `src/script.js` imports.
+This can be done after each `--write` step, or once at the end.
 
 ### Pre-requisite — JSON → script.js sync after foundational-constant edits
 
@@ -911,11 +906,11 @@ If you have just edited one of the source-of-truth JSON files
 (`public/input/model-parameters.json`, `public/input/astro-reference.json`)
 — e.g. changing `holisticyearLength`, `inputmeanlengthsolaryearindays`,
 `correctionDays`, `perihelionalignmentYear`, or any Meeus/IAU anchor —
-**run `export-to-script.js --write` FIRST** so `src/script.js` mirrors the
+**run `npm run constants:generate` FIRST** so the generated module reflects the
 new JSON state before any pipeline step touches it:
 
 ```bash
-node tools/fit/export-to-script.js --write   # Sync JSON → script.js (pre-Phase 0)
+npm run constants:generate                   # Regenerate constants (pre-Phase 0)
 ```
 
 Why this matters:
@@ -974,7 +969,7 @@ The Moon step (5c) runs once after the iteration completes.
 # Pre-requisite: sync JSON → script.js after any foundational-constant edit
 # (H, mean_solar_year, correctionDays, perihelionalignmentYear, Meeus/IAU anchors).
 # No-op if src/script.js is already in sync with JSON.
-node tools/fit/export-to-script.js --write                                   # Pre-Phase 0
+npm run constants:generate                                                   # Pre-Phase 0
 
 # Phase 0: Pre-fit Sun harmonic structure (prerequisite, run once)
 # Skip on routine refits — coefficients are stable. Re-run only when H,
@@ -996,7 +991,7 @@ node tools/optimize.js optimize neptune startpos --write                     # S
 
 # Step 2-sync: push startpos/angleCorrection + any Fibonacci changes to script.js
 # so the browser simulation uses the post-optimization values
-node tools/fit/export-to-script.js --write                                   # Step 2-sync
+npm run constants:generate && npm run build                                  # Step 2-sync
 
 # Phase 2: Generate input data (manual)
 # Reload the browser after Step 2-sync, THEN:
@@ -1040,7 +1035,7 @@ python3 scripts/fibonacci_significance.py --trials 100000                    # S
 # Phase 6: Verify & sync
 node tools/fit/verify-pipeline.js                                            # Step 8 (must pass)
 node tools/fit/verify-pipeline.js --write                                    # update baselines.json
-node tools/fit/export-to-script.js --write                                   # Step 9 (only after Step 8 passes)
+npm run constants:generate                                                   # Step 9
 
 # Phase 7: Dashboard
 node tools/export-dashboard-data.js                                          # Step 10
@@ -1070,7 +1065,7 @@ node tools/fit/export-to-holistic.js --write                                 # �
 | Model parameters (JSON) | `public/input/model-parameters.json` ← single source of truth |
 | Fitted coefficients (JSON) | `public/input/fitted-coefficients.json` ← single source of truth |
 | ML coefficients (Python) | `tools/lib/python/coefficients/*_coeffs*.py` |
-| Browser simulation | `src/script.js` ← patched by `export-to-script.js` |
+| Browser simulation | `src/script.js` ← imports the generated constants module |
 | Solar measurements (CSV) | `data/02-solar-measurements.csv` (1-year steps, ~120 MB) |
 | Browser export (Excel) | `data/01-holistic-year-objects-data.xlsx` (1-year steps, ~300 MB) |
 | Dashboard data | `dashboard/data/*.json` |
@@ -1113,10 +1108,11 @@ public/input/ (single source of truth)
          │    tools/lib/python/predictive_formula.py   ← 429-term ML feature matrix
          │    tools/lib/python/observed_formula.py     ← 225-term observed feature matrix
          │
-         └──→ export-to-script.js --write
-              src/script.js   ← Browser simulation (cannot load JSON at runtime)
+         └──→ npm run constants:generate
+              src/script.js   ← Browser simulation (imports the generated module;
+                                generated at build time, not fetched at runtime)
 
-Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script.js:
+Fitting scripts write to JSON, then `constants:generate` (Step 9) regenerates the module:
     fit_perihelion_harmonics.py  → fitted-coefficients.json  (Step 4a)
     train_precession_physical.py → fitted-coefficients.json  (Step 4c)
     train_observed.py            → fitted-coefficients.json  (Step 4d)

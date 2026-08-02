@@ -1736,15 +1736,17 @@ function runJointMode() {
   fs.writeFileSync(resJsonPath, JSON.stringify(resJson, null, 2) + '\n');
   console.log(`  ✓ wrote ${resJsonPath}`);
 
-  // astro-reference deltaTStart (single source; export-to-script propagates).
+  // astro-reference deltaTStart (single source; constants:generate propagates).
   const arPath = path.join(__dirname, '..', '..', 'public', 'input', 'astro-reference.json');
   const ar = JSON.parse(fs.readFileSync(arPath, 'utf8'));
   ar.earthOrbital.deltaTStart = best.dts;
   fs.writeFileSync(arPath, JSON.stringify(ar, null, 2) + '\n');
   console.log(`  ✓ wrote ${arPath} (deltaTStart = ${best.dts.toFixed(4)})`);
-  console.log('\n  Next (atomic package part 2): sync runtime constants via');
-  console.log('  export-dt-corrections (script + nodeDeepTime + astro targets),');
-  console.log('  flip both runtime defaults ON, re-run validation.');
+  console.log('\n  Next (atomic package part 2): src/script.js and');
+  console.log('  tools/lib/deep-time.js read this JSON directly — run');
+  console.log('  `npm run constants:generate` and rebuild. export-dt-corrections');
+  console.log('  now syncs only the website target. Then flip both runtime');
+  console.log('  defaults ON and re-run validation.');
 }
 
 // normal single-shot fit. The sweep does NOT write or sync — it prints a table

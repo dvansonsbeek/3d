@@ -7,10 +7,10 @@
  *   • ../Holistic/holisticuniverse/src/lib/orbital/deepTime.ts (website calc)
  *
  * Three entry points:
- *   1. Standalone CLI (all three targets, disk I/O):
+ *   1. Standalone CLI (disk I/O):
  *        node tools/fit/export-dt-corrections.js --write
  *
- *   2. Programmatic in-memory (used by export-to-script.js and export-to-holistic.js):
+ *   2. Programmatic in-memory (used by export-to-holistic.js):
  *        const dt = require('./export-dt-corrections');
  *        const fit = dt.loadFitJson();
  *        if (fit) {
@@ -43,15 +43,16 @@ const FIT_JSON_PATHS = [
 ];
 const FIT_JSON_PATH = FIT_JSON_PATHS[0];  // preferred write target
 
+// ONE TARGET. src/script.js and tools/lib/deep-time.js both read the ΔT
+// coefficients straight from data/deltaT-4flag-fit.json and
+// data/core-mantle-resonator-stage1.json, so there is nothing in them to patch
+// — and a text patcher whose literals have vanished is worse than useless: a
+// regex with no anchor slides onto neighbouring numbers.
+//
+// The website is the exception, and for the same reason export-to-holistic.js
+// exists: it lives across a repo boundary, so it cannot import until
+// @hum/physics is published (§2i, Phase 21). This script retires with that one.
 const TARGETS = {
-  script: {
-    label: 'src/script.js',
-    path:  path.join(__dirname, '..', '..', 'src', 'script.js'),
-  },
-  nodeDeepTime: {
-    label: 'tools/lib/deep-time.js',
-    path:  path.join(__dirname, '..', '..', 'tools', 'lib', 'deep-time.js'),
-  },
   // Optional downstream consumer — absent checkouts are skipped, not an error.
   // Override the location with HOLISTIC_ROOT; default is a sibling directory.
   websiteDeepTime: {
@@ -108,9 +109,9 @@ function applyToSource(src, fit) {
   }
   // NOTE: deltaTStart (auto-selected joint optimum) is NOT synced here — it's
   // written to public/input/astro-reference.json by syncAstroReference() below,
-  // and Step 9 of the pipeline (export-to-script.js) propagates it from JSON to
-  // src/script.js in the normal sync sweep. Keeping a single source of truth in
-  // astro-reference.json avoids two places writing the same const value.
+  // and Step 9 of the pipeline (npm run constants:generate) carries it from
+  // there into the module src/script.js imports. Keeping a single source of
+  // truth in astro-reference.json avoids two writers for one value.
 
   // ── Core-mantle swing (Resonator driver) — 2-kick episode constants ──
   // Source of truth: data/core-mantle-resonator-stage1.json (fitted by
@@ -183,8 +184,8 @@ function syncTargetToDisk(targetKey, fit, { dryRun }) {
 
 // ─── Sync auto-optimum deltaTStart to public/input/astro-reference.json ─────
 // The JSON is the source of truth for that constant; Step 9 of the pipeline
-// (export-to-script.js) then propagates it from astro-reference.json into
-// src/script.js. This keeps a single writer per const across the pipeline.
+// (npm run constants:generate) then carries it from astro-reference.json into
+// the module src/script.js imports. One writer per value across the pipeline.
 // No-op when fit.optimum.deltaTStart is null (--fixed-anchors or DT flag
 // unset — the sweep was skipped and the previous JSON value stays).
 function syncAstroReference(fit, { dryRun = false } = {}) {
@@ -228,9 +229,9 @@ function syncAstroReference(fit, { dryRun = false } = {}) {
 }
 
 // ─── Sync all targets (bulk mode, called by dt-corrections-fit.js) ─────────
-// Order: coefficient consts in the 3 code files, then deltaTStart in
-// astro-reference.json. The astro-reference.json update flows into script.js
-// separately via export-to-script.js at pipeline Step 9.
+// Order: coefficient consts in the website deepTime.ts, then deltaTStart in
+// astro-reference.json. The astro-reference.json update reaches script.js
+// separately, via `npm run constants:generate` at pipeline Step 9.
 function syncAllTargets(fit, { dryRun = false } = {}) {
   let total = 0;
   for (const key of Object.keys(TARGETS)) {

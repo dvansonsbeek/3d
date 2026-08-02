@@ -692,8 +692,8 @@ Both the search script (`tools/verify/balance-search.js`) and the application (`
 # 1. Run the exhaustive search (writes data/balance-presets.json)
 node tools/verify/balance-search.js
 
-# 2. Sync to script.js
-node tools/fit/export-to-script.js --write
+# 2. Regenerate the constants module src/script.js imports
+npm run constants:generate
 ```
 
 **When to regenerate**: any change to eccentricity, semi-major axis, mass ratios, the ψ-constant, or the Laplace-Lagrange bounds will shift the balance percentages and potentially change which configurations qualify.

@@ -82,8 +82,8 @@ fitted-coefficients.json (lowercase planet keys)
     │       └─→ tools/lib/constants.js (exports as C.PARALLAX_*, C.GRAVITATION_*, etc.)
     │               └─→ tools/lib/scene-graph.js (applies corrections)
     │
-    └─→ tools/fit/export-to-script.js (converts lowercase → Capitalized keys)
-            └─→ src/script.js (browser simulation)
+    └─→ tools/constants/generate.mjs → packages/physics constants module
+            └─→ src/script.js (browser simulation; capitalisePlanetKeys() on import)
 ```
 
 ## Planet Name Convention
@@ -99,7 +99,7 @@ Conversion functions in `correction-stack.js`:
 - `toDisplayName('mercury')` → `'Mercury'`
 - `toLowerName('Mercury')` → `'mercury'`
 
-The `export-to-script.js` uses `toDisplayName()` to convert all correction object keys when writing to `script.js`.
+The generated module carries the JSON's lowercase keys verbatim; `src/script.js` converts them with its own `capitalisePlanetKeys()` helper (`src/script.js:25`) at import.
 
 ## Adding a New Correction Layer
 
@@ -116,9 +116,10 @@ The `export-to-script.js` uses `toDisplayName()` to convert all correction objec
 
 4. Add data to `public/input/fitted-coefficients.json`
 
-5. Add `@AUTO:MY_CORRECTION` block in `src/script.js` with Capitalized keys
+5. Add `MY_CORRECTION` to `COEFFICIENT_KEYS` in `tools/constants/generate.mjs`, then
+   `npm run constants:generate`
 
-6. Add export block in `tools/fit/export-to-script.js` using `toDisplayName()`
+6. In `src/script.js`: `const MY_CORRECTION = capitalisePlanetKeys(FIT.MY_CORRECTION);`
 
 ## Key Files
 
@@ -130,7 +131,7 @@ The `export-to-script.js` uses `toDisplayName()` to convert all correction objec
 | `tools/fit/parallax-correction.js` | Fits Layer 1 (parallax) |
 | `tools/fit/gravitation-correction.js` | Fits Layers 2+3 (gravitation + elongation) |
 | `public/input/fitted-coefficients.json` | Single source of truth for all coefficients |
-| `tools/fit/export-to-script.js` | Syncs JSON → script.js with key conversion |
+| `tools/constants/generate.mjs` | Generates the constants module `src/script.js` imports, from the JSON |
 
 ## Related
 

@@ -47,7 +47,43 @@ const DATA_01 = path.join(ROOT, 'data', '01-holistic-year-objects-data.xlsx');
 // ─── Parse arguments ────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
-const flag = args[0] || '--all';
+
+// ─── GUARD ───────────────────────────────────────────────────────────────────
+// This runner invokes fitters with --write. They rewrite public/input/*.json —
+// the model's source of truth — and a full run takes ~2.5 hours.
+//
+// It used to default to `--all` for ANY input: `const flag = args[0] || '--all'`,
+// and an unrecognised flag fell straight through the --from/--iterate/--converge
+// chain into a complete run. That is not hypothetical. `--list`, typed in the
+// belief that it printed the step table, silently began refitting and had
+// rewritten correctionSun, earthtiltMean, eccentricityBase and four planets'
+// startpos/angleCorrection before it was noticed and killed.
+//
+// So: an unknown flag is now an ERROR, not a full run, and `--all` must be asked
+// for by name. Every other tool here makes --write opt-in; the orchestrator that
+// calls all of them should not be the exception.
+const KNOWN_FLAGS = ['--all', '--phase1', '--phase2', '--from', '--iterate', '--converge', '--list', '--dry-run', '--help'];
+
+const flag = args[0];
+if (!flag) {
+  console.error('run-pipeline.js writes to public/input/*.json and takes ~2.5 hours.');
+  console.error('It will not run without an explicit flag.\n');
+  console.error('  --list        show the steps and exit (writes nothing)');
+  console.error('  --phase1      Steps 1-2 only (~2 min)');
+  console.error('  --phase2      Steps 4a-9 (~2.5 hrs, needs Step 3 data)');
+  console.error('  --all         Steps 1-2, then 4a-9');
+  console.error('  --from <step> resume from a step');
+  console.error('  --iterate <n> / --converge   repeat Steps 5a-5b');
+  process.exit(1);
+}
+if (!KNOWN_FLAGS.includes(flag)) {
+  console.error(`Unknown flag "${flag}".`);
+  console.error('Refusing to run — this used to fall through to a full --all run,');
+  console.error(`which rewrites public/input/*.json.\n  Known flags: ${KNOWN_FLAGS.join(' ')}`);
+  process.exit(1);
+}
+
+const listOnly = flag === '--list' || flag === '--dry-run' || flag === '--help';
 let fromStep = null;
 let iterateCount = 0;
 let convergeMode = false;
@@ -132,8 +168,11 @@ const STEPS = [
   // Phase 7: Verify & sync
   { id: '8',  phase: 2, name: 'Verify pipeline',
     cmd: 'node tools/fit/verify-pipeline.js --write' },
-  { id: '9',  phase: 2, name: 'Export to script.js',
-    cmd: 'node tools/fit/export-to-script.js --write' },
+  // No publish gate here: src/script.js IMPORTS the generated module, so this
+  // step publishes nothing — it regenerates deterministically from the JSON and
+  // cannot corrupt a source file the way a regex patcher can. Runs every time.
+  { id: '9',  phase: 2, name: 'Regenerate constants module',
+    cmd: 'node tools/constants/generate.mjs --write' },
 
   // Phase 8: Dashboard data
   { id: '10', phase: 2, name: 'Export dashboard data',
@@ -159,6 +198,24 @@ function filterSteps() {
 // ─── Run ────────────────────────────────────────────────────────────────────
 
 const steps = (iterateCount > 0 || convergeMode) ? [] : filterSteps();
+
+// --list / --dry-run: print the plan and exit BEFORE anything can execute.
+if (listOnly) {
+  console.log('run-pipeline.js — DRY RUN, nothing will be written\n');
+  let phase = null;
+  for (const s of STEPS) {
+    if (s.phase !== phase) { phase = s.phase; console.log(`  ── Phase ${phase} ──`); }
+    const writes = / --write\b/.test(s.cmd) ? 'WRITES' : '      ';
+    console.log(`    ${String(s.id).padEnd(4)} ${writes}  ${s.name}`);
+    console.log(`           ${s.cmd}`);
+  }
+  const w = STEPS.filter((s) => / --write\b/.test(s.cmd)).length;
+  console.log(`\n  ${STEPS.length} steps · ${w} write to disk`);
+  console.log('  Step 3 (browser GUI export) is manual and has no command here.');
+  console.log('\n  To actually run: --phase1 | --phase2 | --all | --from <step>');
+  process.exit(0);
+}
+
 const needsPhase2 = steps.some(s => s.phase === 2);
 
 // Check Step 3 data exists before Phase 2

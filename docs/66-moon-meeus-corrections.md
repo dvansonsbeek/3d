@@ -561,7 +561,7 @@ composes `moonEclipticInclinationJ2000 + moonObliquityEclipticJ2000`
 (6.6997° in the scene's own convention) so the rendered spin-to-ecliptic
 obliquity equals the measured 1.5424° (previously the catalog 6.687°
 composition rendered 1.530°); `moonObliquityEclipticJ2000` lives in
-astro-reference.json with export-to-script sync and tools mirrors, and the
+astro-reference.json with tools mirrors, and the
 refuted "moonTilt − I_E ≈ i" display composition is replaced by the
 dynamical inclination constant.
 

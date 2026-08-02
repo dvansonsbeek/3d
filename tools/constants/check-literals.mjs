@@ -1,12 +1,12 @@
 /**
  * Guard the JSON values that `src/script.js` duplicates as literals (§2g).
  *
- * WHY THIS EXISTS. `export-to-script.js` patches ~129 of the 164 duplicated
- * values. The other 35 have no sync mechanism at all — they agree today only
- * because nobody has edited them. MASS_RATIO_EARTH_MOON, earthEccentricityJ2000
- * and moonSiderealMonthInput are in that group.
+ * WHY THIS EXISTS. Any value not yet migrated to the generated module agrees
+ * with the JSON today only because nobody has edited it — there is no sync
+ * mechanism holding it there. MASS_RATIO_EARTH_MOON, earthEccentricityJ2000 and
+ * moonSiderealMonthInput are in that group.
  *
- * Rather than extend a mirroring mechanism Phase 5 deletes, this CHECKS without
+ * Rather than mirror values into script.js, this CHECKS without
  * patching. It shrinks to nothing as values migrate to the generated module: a
  * migrated value must be ABSENT as a literal, which is how the ledger proves
  * migration actually happened rather than merely adding an unused import.
@@ -39,7 +39,7 @@ const read = (f) => JSON.parse(readFileSync(join(ROOT, 'public/input', f), 'utf8
 /**
  * Values migrated to the generated module (§5e). Each MUST have disappeared as
  * a literal from script.js. Grows one block at a time during Phase 5f; when it
- * covers everything, this file and export-to-script.js both retire.
+ * covers everything, this file retires.
  * @type {string[]}
  */
 const MIGRATED = [
@@ -82,8 +82,8 @@ const MIGRATED = [
   //
   // Four of these carry short local names in script.js that differ from their
   // JSON keys — earthMoiFactorJ2000 -> EARTH_MOI_FACTOR, solarLuminosityW ->
-  // L_SUN_W, solarWindMassLossKgPerS -> SOLAR_WIND_KG_PER_S. That mapping used
-  // to live only inside export-to-script.js.
+  // L_SUN_W, solarWindMassLossKgPerS -> SOLAR_WIND_KG_PER_S. The mapping is
+  // visible at the import site in script.js.
   'astro.physicalConstants.currentAUDistance',
   'astro.physicalConstants.speedOfLight',
   'astro.physicalConstants.G_CONSTANT',

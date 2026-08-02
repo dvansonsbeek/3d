@@ -98,9 +98,9 @@ data/cenco2pip-100kyr-bayesian.csv
        ▼  scripts/export_epica_browser.py             → public/input/epica-co2-data.json
        ▼  scripts/export_cenco2pip_browser.py         → public/input/cenco2pip-data.json
        │
-       ▼  node tools/fit/export-to-script.js --write  (sync coefficients into bundle)
+       ▼  npm run constants:generate                  (regenerate the constants module)
        │
-       ▼  src/script.js                               (CLIMATE_FORMULA_COEFFS const, ~22 KB embedded)
+       ▼  src/script.js                               (imports CLIMATE_FORMULA_COEFFS, ~22 KB)
        │
        ▼  Climate Formula Explorer modal renders the 8 tabs
 ```

@@ -86,9 +86,8 @@ const COEFFICIENT_KEYS = [
   'MOON_CORRECTION',
   'MOON_CORRECTION_RESIDUAL',
 
-  // script.js's CARDINAL_POINT_ANCHORS is the ADJUSTED set, not the base one —
-  // a rename that lived only inside export-to-script.js. Both are emitted; the
-  // consumer picks.
+  // script.js's CARDINAL_POINT_ANCHORS is the ADJUSTED set, not the base one.
+  // Both are emitted under their JSON names; the consumer picks.
   'CARDINAL_POINT_ANCHORS',
   'CARDINAL_POINT_ANCHORS_ADJUSTED',
 

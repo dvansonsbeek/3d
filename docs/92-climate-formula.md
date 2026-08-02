@@ -1248,9 +1248,9 @@ data/cenco2pip-100kyr-bayesian.csv
        ▼  scripts/export_epica_browser.py             → public/input/epica-co2-data.json
        ▼  scripts/export_cenco2pip_browser.py         → public/input/cenco2pip-data.json
        │
-       ▼  node tools/fit/export-to-script.js --write  (sync coefficients into bundle)
+       ▼  npm run constants:generate                  (regenerate the constants module)
        │
-       ▼  src/script.js                               (CLIMATE_FORMULA_COEFFS const, ~22 KB embedded)
+       ▼  src/script.js                               (imports CLIMATE_FORMULA_COEFFS, ~22 KB)
        │
        ▼  Climate Formula Explorer modal renders the 8 tabs
 ```
@@ -1271,12 +1271,12 @@ python3 scripts/export_cenogrid_browser.py
 python3 scripts/export_epica_browser.py
 python3 scripts/export_cenco2pip_browser.py
 
-# 4. Sync the coefficient block into src/script.js
-node tools/fit/export-to-script.js --write
-# → updates CLIMATE_FORMULA_COEFFS between BEGIN/END markers
+# 4. Regenerate the constants module src/script.js imports
+npm run constants:generate
+# → refreshes CLIMATE_FORMULA_COEFFS in packages/physics/src/constants/coefficients.js
 ```
 
-The `export-to-script.js` step is part of the broader `tools/fit/export-to-script.js` tool (it also syncs PREDICT_COEFFS, BALANCE_PRESETS, etc.) — the climate-formula block is section F.
+`constants:generate` regenerates every fitted block at once (PREDICT_COEFFS, BALANCE_PRESETS, the ΔT stack, …); the climate formula is one of them.
 
 To push the modal to GitHub raw (where the browser fetches at runtime):
 

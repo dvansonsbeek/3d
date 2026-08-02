@@ -72,19 +72,11 @@ jobs:
       - name: Counterfactual (injected constants)
         run: npm run test:counterfactual
 
-      # §2g interim gate — src/script.js mirrors ~42 numeric literals from
-      # public/input/*.json, and until Phase 5 replaces that with a generated
-      # module, nothing but memory kept them in step. Drift lands in the shipped
-      # bundle silently. Retires when export-to-script.js is deleted.
-      - name: Constants sync (script.js vs JSON source of truth)
-        run: npm run test:sync
-
-      # Covers the 35 duplicated values export-to-script.js does NOT patch —
-      # MASS_RATIO_EARTH_MOON, earthEccentricityJ2000, moonSiderealMonthInput
-      # among them. Checks rather than mirrors, and shrinks to nothing as values
-      # migrate to the generated module. Name-matching here is what surfaced the
-      # IAU 2006 vs IAU 1980 obliquity divergence between browser and Node.
-      - name: Constants literals (the values the exporter never covered)
+      # Guards values duplicated by NAME across src/script.js and the JSON,
+      # which `test:constants` cannot see — name-matching here is what surfaced
+      # the IAU 2006 vs IAU 1980 obliquity divergence between browser and Node,
+      # plus the truncated perihelion longitude.
+      - name: Constants literals (name-level agreement with the JSON)
         run: npm run test:literals
 
       # §5d — the model gates. Only 2 of the 17 tools/verify scripts have a
