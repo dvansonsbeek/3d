@@ -257,6 +257,44 @@ const totalYears = Math.round(endYear - startYear);
 
 const allTypes = ['SS', 'WS', 'VE', 'AE', 'PERI', 'APH'];
 
+// ─── Mode assertion (R1) ───────────────────────────────────────────────────
+// The chaining year MUST match the scene's or every measured year length is
+// biased by the difference. Deep time ON chains on SI_TROPICAL_YEAR_DAYS; OFF
+// chains on C.meanSolarYearDays. Mixing them is 118 ms/yr — measured directly
+// as a linear ramp in the event JDs, −1.182 s at 1990 to +1.182 s at 2010 —
+// and nothing announced it for a long time because nothing checked.
+const DT = require('../lib/deep-time');
+{
+  const dtOff = process.env.SG_DEEP_TIME === '0';
+  const chainYear = dtOff ? C.meanSolarYearDays : DT.SI_TROPICAL_YEAR_DAYS;
+  console.error(`Deep time: ${dtOff ? 'OFF (SG_DEEP_TIME=0)' : 'ON'}`);
+  console.error(`Chaining year: ${chainYear.toFixed(9)} d`);
+  if (dtOff) {
+    console.error('');
+    console.error('  ⚠  SNAPSHOT MODE. The browser scene runs deep time ON, so this CSV will');
+    console.error('     disagree with it by ~118 ms per year. Only use SG_DEEP_TIME=0 to');
+    console.error('     reproduce a historical snapshot-basis fit.');
+    console.error('');
+  }
+}
+
+// ─── Integrated-phase `Cycle` column (R15) ─────────────────────────────────
+// H-cycles from C.balancedYear to this row's OWN event JD. `Model Year` cannot
+// serve as the phase variable: it is a chaining-step COUNTER, and one step is a
+// tropical year for SS/WS/VE/AE but an ANOMALISTIC year for PERI/APH — so the
+// same label denotes different instants per type, diverging ~16 events across a
+// full-H window. Computed in the same convention the scene integrates
+// (`cyclesBetweenYears(anchor, _jdToSIyear(jd), N)` at moveModel), so a fit on
+// `Cycle × div` matches the runtime by construction rather than by calibration.
+// Under SG_DEEP_TIME=0 it falls back to the snapshot form so each mode stays
+// self-consistent.
+const cycleOf = (process.env.SG_DEEP_TIME === '0')
+  ? (jd) => (C.jdToYear(jd) - C.balancedYear) / C.H
+  : (jd) => {
+    const c = DT.cyclesBetweenYears(C.balancedYear, DT._jdToSIyear(jd), 1);
+    return c === null ? NaN : c;
+  };
+
 console.error(`Solar measurements export: 1-year steps, ${startYear} to ${endYear}`);
 console.error(`Total: ${totalYears} years × 6 types = ~${totalYears * 6} rows`);
 console.error(`Output: ${OUTPUT_CSV}`);
@@ -379,7 +417,7 @@ for (const type of allTypes) {
 }
 
 // ─── Write CSV ───────────────────────────────────────────────────────────────
-const csvHeader = 'Type,Model Year,JD,RA (deg),Obliquity (deg),World Angle (deg),Distance (AU)';
+const csvHeader = 'Type,Model Year,JD,RA (deg),Obliquity (deg),World Angle (deg),Distance (AU),Cycle';
 const csvLines = [csvHeader];
 for (const r of allRows) {
   csvLines.push([
@@ -404,6 +442,8 @@ for (const r of allRows) {
     r.obliqDeg !== null ? r.obliqDeg.toFixed(6) : '',
     r.worldAngle.toFixed(9),
     r.distAU.toFixed(6),
+    // 12 dp: one cycle spans 335,317 yr, so the LSB is ~1e-5 s of event time.
+    cycleOf(r.jd).toFixed(12),
   ].join(','));
 }
 fs.writeFileSync(OUTPUT_CSV, csvLines.join('\n') + '\n');
