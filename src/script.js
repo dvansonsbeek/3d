@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -2536,6 +2536,31 @@ const L_TOTAL_EM_KGM2_S = (I_EARTH * 2 * Math.PI / LOD_NOW_H13_S)
                        // ≈ 3.473 × 10³⁴ kg·m²/s (Earth-Moon total angular momentum)
 const A_LOCK_M        = (L_TOTAL_EM_KGM2_S / (M_MOON_ALONE * Math.sqrt(GM_EM_M3S2) * E_FACTOR_MOON)) ** 2;
                        // ≈ 555,623 km (tidal-lock asymptote, 87.1 R_E, reached ~50 Gyr ahead)
+
+// ── Layer 0 — the shared epoch chain (@hum/physics, Phase B) ───────────────
+// Built from the browser's OWN derived constants above — the bit-identical
+// twins of Node's EPOCH_PARAMS (the layer0 identity gate holds the two
+// derivations together; the epoch@tMa fixtures adjudicate the outputs).
+// recomputeEpochAnchors fills the seven epoch globals from this instance, so
+// the globals are a CACHE over Layer 0, no longer a definition (§2c). The
+// browser twin functions (meanHAtAge, meanLodSecondsAtAge, …) keep their other
+// callers until Phase 8 dissolves them.
+const _L0 = createEpochPrimitives({
+  params: Object.freeze({
+    epochYear: 2000,
+    alpha1PerMa: ALPHA_1, alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
+    moonDistanceNowM: A_MOON_NOW_M, moonLockDistanceM: A_LOCK_M,
+    totalAngularMomentumKgM2S: L_TOTAL_EM_KGM2_S,
+    moonMassKg: M_MOON_ALONE, gmEarthMoonM3S2: GM_EM_M3S2,
+    moonEccentricityFactor: E_FACTOR_MOON,
+    earthMassKg: M_EARTH_ALONE, earthRadiusM: R_EARTH_M,
+    holisticYearJ2000: HOLISTIC_YEAR_J2000,
+    lodNowH13Seconds: LOD_NOW_H13_S,
+    siderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
+    solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
+  }),
+  alphaAtAgeMa: earthMoiFactorAtAge,
+});
 
 // Farhat 2022 LSQ polynomial coefficients — Moon distance evolution
 // a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴   (no α₂)
@@ -5079,14 +5104,19 @@ function meanNeptuneOrbitalCyclesBetween(yearA, yearB) { return _moonChainCycles
 // derived day-counts (meansiderealyearlengthinDays, meansolaryearlengthinDays)
 // so the divisions use the deep-time LOD.
 function recomputeEpochAnchors(t_Ma) {
-  const H_t      = meanHAtAge(t_Ma);
-  const LOD_s    = meanLodSecondsAtAge(t_Ma);
+  // Phase B: filled from the shared Layer 0 (@hum/physics), not the browser
+  // twins — the globals are a cache over Layer 0, never a definition (§2c).
+  // f(year) axis; the t→year→t float wobble measurably never reaches output
+  // bits (200k-point sweep, pinned by the layer0 gate's non-round-tripping t).
+  const _epochYear = 2000 - t_Ma * 1e6;
+  const H_t      = _L0.holisticH(_epochYear);
+  const LOD_s    = _L0.lodSeconds(_epochYear);
   if (H_t === null || LOD_s === null) {
     console.warn(`recomputeEpochAnchors(${t_Ma}): past tidal-lock asymptote — anchors unchanged`);
     return false;
   }
-  const T_sid_s  = meanSiderealYearSecondsAtAge(t_Ma);
-  const T_trop_s = meanTropicalYearSecondsAtAge(t_Ma);
+  const T_sid_s  = _L0.siderealYearSeconds(_epochYear);
+  const T_trop_s = _L0.tropicalYearSeconds(_epochYear);
 
   holisticyearLength               = H_t;
   H                                = H_t;          // Phase 6.5: keep H alias in sync
