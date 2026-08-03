@@ -129,7 +129,10 @@ for (const name of readdirSync(join(ROOT, 'docs')).filter(f => f.endsWith('.md')
 }
 
 if (HOLISTIC) {
-  const contentRoot = join(HOLISTIC_ROOT, 'src', 'content');
+  // EN ONLY, deliberately: the NL tree lags the EN content and is synced by
+  // Dennis in translation batches — stamping it independently would version
+  // pages whose content is behind. NL joins when its content sync does.
+  const contentRoot = join(HOLISTIC_ROOT, 'src', 'content', 'en');
   if (!existsSync(contentRoot)) {
     console.error(`website content not found at ${contentRoot} (set HOLISTIC_ROOT)`);
   } else {
