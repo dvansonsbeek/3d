@@ -821,9 +821,17 @@ function evalYearFourier(year, mean, harmonics, kind) {
   return result;
 }
 
-/** Compute simplified tropical year length in days (Fourier harmonics around mean). */
+/** Compute simplified tropical year length in days — Fourier harmonics around
+ *  an EPOCH-AWARE base (T_trop_s/LOD_s at year, via deep-time). Mirrors the
+ *  browser's computeSolarYearDaysDirect: a frozen J2000 base loses the secular
+ *  LOD term entirely (the epoch-consistency gate class — the browser display
+ *  froze at J2000 until the matching fix). Falls back to the J2000 constant in
+ *  snapshot mode or past the tidal-lock asymptote. */
 function computeLengthOfSimplifiedSolarYear(year) {
-  return evalYearFourier(year, C.meanSolarYearDays, C.TROPICAL_YEAR_HARMONICS);
+  const base = (deepTimeOn()
+    ? require('./deep-time').meanYearInDaysAtAge((2000 - year) / 1e6)
+    : null) ?? C.meanSolarYearDays;
+  return evalYearFourier(year, base, C.TROPICAL_YEAR_HARMONICS);
 }
 
 /** Compute tropical year length in days as mean of 4 cardinal point year lengths.

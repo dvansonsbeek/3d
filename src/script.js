@@ -6643,6 +6643,10 @@ if (typeof window !== 'undefined') {
     // JD form too — its equation-of-centre path NaN'd for two phases with no
     // probe noticing (the year-length probes never touch it).
     computeSolsticeJD,
+    // Epoch-consistency gate (test/browser/epoch-consistency.test.mjs): the
+    // pure f(Y) evaluators must track the epoch-anchor chain.
+    computeSolarYearDaysDirect,
+    computeAnomalisticYearDaysDirect: (y) => computeAnomalisticYearSecFromDaysFourier(y, 1),
     // The seven globals recomputeEpochAnchors mutates, read live.
     anchors: () => ({
       holisticyearLength, H, meanlengthofday,
@@ -44744,7 +44748,8 @@ async function analyzeSolarDayMultiEpoch() {
       const ecc = computeEccentricityEarth(epochYear, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);  // Phase 8
       const tropicalYearDays = computeSolarYearDaysFromCardinals(epochYear);
       const siderealYearDays = computeSiderealYearDaysDirect(epochYear);
-      const anomalisticYearDays = evalYearFourier(epochYear, meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
+      const anomalisticYearDays = evalYearFourier(epochYear,
+        _epochYearDaysBase('anomalistic', epochYear) ?? meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
       results.push({
         epoch: epochYear,
         index: i,
@@ -57454,7 +57459,8 @@ function updatePredictions() {
   // Anomalistic year in days = MEASURED (Fourier-fitted) directly, no round-trip.
   // Anomalistic year in seconds = MEASURED days × meanlengthofday (framework kinematic day unit).
   {
-    const _anomDaysFourier = evalYearFourier(yearForFormula, meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
+    const _anomDaysFourier = evalYearFourier(yearForFormula,
+      _epochYearDaysBase('anomalistic', yearForFormula) ?? meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
     predictions.anomalisticYearSeconds = o.anomalisticYearSeconds = _anomDaysFourier * o.lodKinematic;
     predictions.anomalisticYearDays = o.anomalisticYearDays = _anomDaysFourier;
   }
@@ -57592,8 +57598,37 @@ function evalYearFourier(currentYear, mean, harmonics, kind) {
  * @param {number} currentYear – the calendar year
  * @returns {number} solarYearDays (in days)
  */
+// ── Epoch-aware Fourier baselines — pure f(Y) over Layer 0 ────────────────
+// Phase B froze computeSiderealYearDaysDirect's baseline to the J2000 const
+// to fix R16 (the mutable-global read made f(Y) depend on scene state), but
+// the pure replacement was never wired in: under deep time the baseline must
+// track the epoch. These are recomputeEpochAnchors' own recipes (and Node's
+// anomalisticYearDaysBase), evaluated AT Y instead of read from scene
+// globals — pure, so the transparency gate holds. Without this the whole
+// solar-day panel froze at J2000: LOD_real at +9001 read 86400.006 where the
+// model says 86400.156, ΔT rate 2.2 s/yr vs 57 s/yr. The
+// epoch-consistency gate (test/browser/epoch-consistency.test.mjs) fails on
+// that state. base(2000) ≡ the J2000 consts to 1e-13 (Layer 0 reproduces
+// the seeds).
+function _epochYearDaysBase(kind, year) {
+  if (!DEEP_TIME_MODE_ENABLED) return null;      // snapshot mode: J2000 consts
+  const H_t = _L0.holisticH(year);
+  const LOD_s = _L0.lodSeconds(year);
+  const T_trop_s = _L0.tropicalYearSeconds(year);
+  if (H_t === null || LOD_s === null || T_trop_s === null) return null;  // past asymptote
+  const tropDays = T_trop_s / LOD_s;
+  if (kind === 'tropical')    return tropDays;
+  if (kind === 'sidereal')    return tropDays * H_t / (H_t - 13);            // recomputeEpochAnchors' _kinematic recipe
+  if (kind === 'anomalistic') return tropDays * (H_t / 16) / (H_t / 16 - 1); // Node's anomalisticYearDaysBase
+  return null;
+}
+
 function computeSolarYearDaysDirect(currentYear) {
-  return evalYearFourier(currentYear, meansolaryearlengthinDays, TROPICAL_YEAR_HARMONICS);
+  // Epoch-aware base; the J2000 const fallback replaces the previous read of
+  // the MUTABLE meansolaryearlengthinDays global (a latent R16 impurity that
+  // escaped the transparency gate because this function is not probed).
+  const base = _epochYearDaysBase('tropical', currentYear) ?? MEAN_SOLAR_YEAR_J2000_DAYS;
+  return evalYearFourier(currentYear, base, TROPICAL_YEAR_HARMONICS);
 }
 
 function computeSolarYearDaysFromCardinals(currentYear) {
@@ -57638,7 +57673,8 @@ function computeSiderealYearDaysDirect(currentYear) {
   // (the 2026-07-17 deep-time fix) — which made f(Y) depend on scene-epoch
   // state, the exact violation the transparency gate tracks (plan §5c, R16).
   // Deep-time displays read the mutable global; this formula reads the const.
-  return evalYearFourier(currentYear, SIDEREAL_YEAR_DAYS_KINEMATIC_J2000, SIDEREAL_YEAR_HARMONICS);
+  const base = _epochYearDaysBase('sidereal', currentYear) ?? SIDEREAL_YEAR_DAYS_KINEMATIC_J2000;
+  return evalYearFourier(currentYear, base, SIDEREAL_YEAR_HARMONICS);
 }
 
 /**
@@ -57653,7 +57689,8 @@ function computeSiderealYearDaysDirect(currentYear) {
  * @returns {number} anomalisticYearSeconds (in seconds)
  */
 function computeAnomalisticYearSecFromDaysFourier(currentYear, lengthofDay) {
-  const anomDays = evalYearFourier(currentYear, meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
+  const anomDays = evalYearFourier(currentYear,
+    _epochYearDaysBase('anomalistic', currentYear) ?? meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
   return anomDays * lengthofDay;
 }
 
