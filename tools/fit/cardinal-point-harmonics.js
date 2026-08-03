@@ -525,8 +525,16 @@ function main() {
     const data = byType[type].map(d => ({ ...d, anchor, anchorYear }));
     console.log(`\n── ${type} (${data.length} points, anchor=${anchor.toFixed(3)} at year ${anchorYear}) ──`);
 
-    // Fit with current divisors from constants.js
-    const currentDivisors = C.CARDINAL_POINT_HARMONICS[type].map(h => h[0]);
+    // The SHIPPED divisor set — one SYMMETRIC basket for all four points.
+    // Historically each point carried its own greedy-frozen set (SS had
+    // {22,23}, WS {22,48}, VE/AE {23,48}), and every point's residual excess
+    // sat exactly at ITS missing divisors — WS carried a 72.7 s H/23 line,
+    // 2× the other points' RMS, purely because it was the one point without
+    // H/23. The braid law (δ_X = one rotating vector, doc 99) demands a
+    // basis that treats the four points identically; the union set enforces
+    // that. H/16 and H/32 stay excluded (equation-of-centre basis, §10e-quater).
+    const currentDivisors = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+      17, 18, 19, 22, 23, 24, 29, 40, 48];
     const current = fitHarmonics(data, currentDivisors);
     console.log(`  Current ${currentDivisors.length} harmonics [${currentDivisors.join(',')}]: RMSE = ${current.rmse.toFixed(2)} min`);
 

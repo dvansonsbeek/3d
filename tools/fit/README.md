@@ -561,7 +561,10 @@ Step 6c: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS + ANC
          §10g quadrature-locked JOINT sidebands: 52 coefficients SHARED
          across the four points (phase = order·λ_X − 2π·div·c,
          COUNTER-rotating — the sign is load-bearing), fitted as a second
-         stage on the stacked residuals. Interior RMSE 0.48-0.99 min,
+         stage on the stacked residuals. One SYMMETRIC divisor set for all
+         four points (the braid law's symmetry requirement — asymmetric sets
+         put each point's excess exactly at its missing divisors). Interior
+         RMSE 0.28-0.37 min,
          OOS ≡ in-sample (offset-grid, bias ≈ 0).
          Data-anchored at closest JD to IAU J2000 value, then derived to J2000.
          Tropical year = mean of 4 cardinal point derivatives (no separate step).

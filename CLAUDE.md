@@ -81,7 +81,7 @@ would silently churn a structural claim for a rounding-level gain.
 - `data/02-solar-measurements.csv` is 166 MB and gitignored — no git recovery.
   Back it up before regenerating (2 h 24 m).
 - **The deep-time alignment campaign is COMPLETE** — engine ≡ CSV bit-exact,
-  all sixteen R-items closed, 6c at 0.48–0.99 min over ±270 kyr via the §10
+  all sixteen R-items closed, 6c at 0.28–0.37 min over ±270 kyr via the §10
   derived form + edge-trim + the §10g quadrature-locked joint sidebands. Do
   not regenerate the CSV: 2 h 24 m for an identical file. Coefficients and
   runtime evaluation form are a MATCHED PAIR — never ship one without the

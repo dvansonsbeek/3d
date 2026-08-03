@@ -300,30 +300,36 @@ equation-of-centre braid, with e(t) the law of cosines. The law holds at
 three levels, each measured independently:
 
 1. **The carrier** (order 1): the four fitted e·sin(M) terms sit in 90°
-   quadrature with equal amplitudes to **0.22° / 0.69% spread** — a property
+   quadrature with equal amplitudes to **0.08° / 0.29% spread** — a property
    the fit does not enforce, so it cannot be faked by extra freedom.
 2. **Order 2**: the e²·sin(2M) terms repeat the pattern at phase 2λ_X
    (pairs: SS/WS vs VE/AE).
 3. **The modulation spectrum** (the §10g result): the residual mid-band
    content (divisors H/20–H/37) is captured by coefficients **shared across
    all four points** — 52 numbers with zero per-point freedom explain the
-   residual down to 0.48–0.99 min over ±270 kyr, and generalize perfectly
-   out of sample.
+   residual down to **0.28–0.37 min** over ±270 kyr, and generalize
+   perfectly out of sample.
+4. **The symmetry test**: the law requires the four points to be
+   *statistically identical*. When one point (WS) read 2× the others, the
+   cause was traced to the fit basis, not the physics: each point's excess
+   sat exactly at the divisors missing from its own historically-frozen
+   sinusoid set (WS carried a 72.7 s line at H/23 — the one divisor it
+   lacked). Symmetrizing the basis (one identical divisor set for all four
+   points) equalized the residuals at 0.28/0.28/0.36/0.37 min and
+   *tightened* the carrier quadrature from 0.22° to 0.08° — the asymmetric
+   basis had been leaking into the ecc terms. The anomaly was ours, not the
+   law's.
 
 **The sign experiment is what makes this evidence rather than curve
 fitting.** The carrier is e^(i(λ_X − θ₁₆)), so its sidebands must carry
 point-phase +n·λ_X against time-phase −θ_d — counter-rotating. Both senses
 were fitted with identical freedom: the counter-rotating lock captured the
-residual (1.67 → 0.48 min at SS); the co-rotating lock captured **nothing**
+residual (1.65 → 0.36 min at SS); the co-rotating lock captured **nothing**
 (RMSE unchanged). A wrong geometry would have failed both senses; an
 overfitting basis would have passed both. Exactly one sense passing is
 structure detection — the model's seasonal asymmetries, from the ±50 s
 per-point year lengths at J2000 down to the sub-minute sideband comb, are a
 single geometric object: the rotating perihelion vector.
-
-Recorded anomaly: WS retains ~1.0 min against ~0.55 for the other three —
-a type-specific excess the shared vector does not explain, documented in the
-alignment plan (§10g) as an open observation.
 
 ## The H/5 LOD correction — REAL_LOD from ecliptic precession
 
