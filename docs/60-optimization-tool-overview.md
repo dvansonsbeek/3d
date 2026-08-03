@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Optimization Tool — Architecture & Constraints
 
 **Goal**: Build a standalone tool that Claude can run autonomously to tune the model (planets, Moon, and Sun) against scientific reference data

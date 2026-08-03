@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Climate Summary — Gravitational Coupling, Not Insolation, Drives Earth's Climate
 
 > **The capstone synthesis.** Climate is forced by **gravitational coupling among

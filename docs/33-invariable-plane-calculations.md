@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Invariable Plane Calculations
 
 This document describes how planet heights above and below the invariable plane are calculated in the Holistic Universe Model.

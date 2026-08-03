@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Doc 98 — The Mechanism Behind the 8H/L1 Lattice
 
 ## Status

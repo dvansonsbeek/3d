@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # UI Panels Reference
 
 This document provides technical reference for the UI panels in the 3D Solar System Simulation.

@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Invariable Plane Overview
 
 This document provides a conceptual overview of the invariable plane and how the Holistic Universe Model uses it as a fundamental reference frame.

@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Formula Derivation and Analysis
 
 This document explains **how the planetary precession formulas were derived** — the physical reasoning, mathematical relationships, and coefficient breakdowns. For the practical "cookbook" formulas, see the [formulas reference](https://holisticuniverse.com/reference/formulas). For the technical training guide, see [PREDICTIVE_FORMULA_GUIDE.mdx](../tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx).

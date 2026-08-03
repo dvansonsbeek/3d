@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # 80 — Mercury: Scene Graph Setup
 
 This document explains **why** each value in Mercury's 5-layer scene graph hierarchy is set the way it is. It serves as a companion to the [Planet Inspector](51-planet-inspector-reference.md) and the [Scene Graph Hierarchy](41-scene-graph-hierarchy.md).

@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Fibonacci Laws of Planetary Motion
 
 This document describes the Fibonacci Laws of Planetary Motion as implemented in the Holistic Universe Model. Six laws form a symmetric architecture anchored on Earth and extending to all eight planets through Fibonacci numbers: an Earth-specific cycle hierarchy, paired inclination and eccentricity laws (amplitude constants + collective balance), and a three-planet coupling at H/8.

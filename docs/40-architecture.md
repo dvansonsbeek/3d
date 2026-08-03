@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Interactive 3D Solar System Simulation - Architecture Document
 
 **Version:** 2.1

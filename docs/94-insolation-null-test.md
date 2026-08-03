@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: historical
+---
+
 # Insolation Extension Test — Does Classical Berger Insolation Add Anything to L1+L2+L3?
 
 > **TL;DR.** We tested whether adding the classical Berger 1978 insolation features

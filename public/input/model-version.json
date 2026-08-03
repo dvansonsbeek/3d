@@ -1,0 +1,8 @@
+{
+  "_description": "The model version identifier (IP-unified-architecture §10). MAJOR = structural change (a law, a divisor set, H). MINOR = refit (coefficients move, structure does not). Deliberately OUTSIDE model-parameters.json: a version label must not change the model's content identity (CONSTANTS_HASH). The git tags v9/v10 mark the licence boundary and are unrelated to this scheme. Content identity is carried separately by CONSTANTS_HASH (model parameters) and COEFFICIENTS_HASH (the fit) in packages/physics/src/constants/.",
+  "modelVersion": "v1.0",
+  "scheme": {
+    "major": "structural: a law, a divisor set, H, a new term family",
+    "minor": "refit: coefficient values move, structure does not"
+  }
+}

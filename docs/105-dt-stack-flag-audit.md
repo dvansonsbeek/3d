@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # 105 — ΔT stack: what each flag buys
 
 Audit of the four ΔT correction flags (Bond 8H/1830, Hallstatt 8H/1104,

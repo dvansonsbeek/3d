@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: historical
+---
+
 # Doc 97 — Paleoclimate ECS Spectrum via 8H Lattice Decomposition
 
 **Status**: First-pass analysis complete; results in `data/climate-ecs-*.json`

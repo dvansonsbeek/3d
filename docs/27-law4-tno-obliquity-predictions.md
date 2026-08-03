@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Law-4 TNO Obliquity Predictions
 
 > **TL;DR.** Law 4 — `e_amp = K · sin(tilt) · √d / (√m · a^(3/2))` — is *bidirectional*. Solved for `sin(tilt)`, it predicts axial obliquity from secular eccentricity amplitude. Applied to 17 known TNOs under the proxy assumption `e_obs ≈ e_amp`, all require `sin(tilt) ≫ 1` — but this assumption is known to break for resonant and scattered-disk bodies, whose observed eccentricity is dominated by **base** eccentricity (resonance-forced or scattered), not by the **amplitude** Law 4 actually constrains. For 16 of the 17 the test is **inconclusive, not refutational**: their secular `e_amp` is not directly measured.

@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Planet Geocentric Parallax Corrections — Implementation Reference
 
 **Status**: Complete (up to 78-term correction for inner planets, 68 for outer, JPL-verified)

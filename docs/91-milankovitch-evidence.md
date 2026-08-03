@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Milankovitch Evidence — Empirical Tests and Hypothesis Tests
 
 > **Scope.** Empirical tests of the Holistic Universe Model's climate claims against the LR04 benthic δ¹⁸O stack (Lisiecki & Raymo 2005), the Cheng 2016 U-Th-dated Asian speleothem composite, the EPICA Dome C CO₂ record (Bereiter 2015), and the CENOGRID benthic record (Westerhold 2020). Sections 1–7 report the spectral fit and per-planet contributions. Sections 8–11 then report a pre-registered **super-cycle hypothesis test** that returned NULL, **fourteen follow-up hypothesis tests** (A–N) on independent framework predictions (16 positives / 2 partials / 5 nulls), the **405-kyr off-lattice characterization** (climate-internal carbon-cycle thermostat), and the combined interpretation. Companion to [doc 90 — Milankovitch Language](90-milankovitch-language.md), which states the framework's structural predictions; this document reports what the data show — both confirmations and limits.

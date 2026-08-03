@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # -135 Babylonian solar eclipse — case study
 
 **Status**: Framework places -135 Apr 15 Babylon at **BestGap ≈ 1,230 km at −1h45 offset** within the ±4h scan window (audit-26 scan 1232 km; case-study meter 1221 km — scan-grid spread); verdict **⚠ geographic (boundary)** — the umbra *centerline* passes ~1,200 km south of Babylon, at the regional/geographic class boundary. The class gate is an umbra-centerline distance, not eclipse visibility: at γ = 0.719 the shadow strikes the tilted Earth obliquely and the penumbral footprint spans thousands of km, so Babylon sits well inside the penumbra — the framework itself shows a deep partial over Mesopotamia (in-sim shadow render at the eclipse UT). Framework's own predicted UT for the eclipse (05:58) sits within 16 min of the documented UT (06:14) — not a ΔT-signal event; the framework and record broadly agree on *when* the eclipse happened, and the residual is *where* the umbra centerline lies. (Current values under the D5 derived-optics + carrier-split certification; audit history across the certified batches: 949 km legacy arguments → 1032 km astro-reference-anchored line → 1088 km framework-native skeleton → ~1,230 km current — same conclusion throughout. A channel experiment with the framework's smaller e_E slope landed this event at 303 km but broke BCE timing — recorded in docs/66 §1 as the T²-attribution clue.)

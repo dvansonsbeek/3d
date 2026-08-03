@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # User Guide: 3D Solar System Simulation
 
 This guide explains how to use the Interactive 3D Solar System Simulation - the heart of the Holistic Universe Model where theory becomes something you can explore and verify.

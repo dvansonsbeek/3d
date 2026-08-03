@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Universal Sun-side Δa Formula
 
 This document is the **Sun-side companion** to doc 25. Doc 25 generalized doc 24's Moon-side Δa to every moon-bearing planet (`GM_planet` from a moon's orbit). Doc 26 generalizes doc 24's Sun-side analog to every planet (`T_planet` from a heliocentric distance). Both are exact closed-form Kepler corrections built from the same algebraic identity.

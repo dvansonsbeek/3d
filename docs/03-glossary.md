@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Glossary of Essential Terms
 
 This glossary defines the key terms used throughout the documentation. For a complete glossary, see the [website glossary](https://www.holisticuniverse.com/en/reference/glossary).

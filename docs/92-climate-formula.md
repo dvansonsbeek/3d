@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Climate Formula — Architecture, Variance Decomposition & Implementation
 
 > **TL;DR.** The canonical 8H climate formula is **32 integer divisors of 8H = 2,682,536 yr (at J2000)** (L1 lattice: 25 framework integers from Berger 1978 + Laskar 2004 eigenmode beats + framework direct planet cycles from doc 55, plus 6 precession-band sidebands surfaced by doc 91 §12.12 Test L, plus n=141 Berger-quintet completion) **+ a 3-line 405-kyr carbon thermostat family** (L2) **+ up to 6 Heaviside step terms** (L3), fitted per regime with sequential ridge regression. Per-regime fits reach **R² = 0.8735 post-MPT**, **R² = 0.8452 EPICA CO₂**, **R² = 0.7626 CenCO2PIP 0–66 Ma**; the full-LR04 fit is **R² = 0.2553** (L1+L2+L3). This doc decomposes the residual into a layered taxonomy — **(L1) orbital lattice**, **(L2) climate-system internal periodic** (canonical: 405-kyr silicate-weathering thermostat + its 202 / 135 kyr harmonics; investigated but not deployed: 13H Boulila libration, 9-Myr long-period carbon resonance), **(L3) boundary-condition shifts** (MPT regime change, iNHG, Cenozoic secular trend, tectonic gateways), **(L4) chronology**, **(L5) stochastic residual** — and reports measured ΔR² for each addition.

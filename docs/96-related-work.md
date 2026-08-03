@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Related Work — Where This Framework Sits in the 2024 Literature
 
 > **The HUM framework is part of an active wave of revisions to classical

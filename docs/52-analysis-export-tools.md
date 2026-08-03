@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Analysis and Export Tools Reference
 
 This document describes all data export, report generation, and validation systems in the Holistic Universe Model simulation.

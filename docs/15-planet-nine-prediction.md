@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Planet Nine: A Falsifiable Prediction
 
 > **TL;DR.** The Fibonacci-Universe model's 8-planet mirror-symmetric balance structure tests proposed Planet Nine candidates on two tiers: (1) **Law-4 compliance** — observed eccentricity must be consistent with the framework's predicted oscillation amplitude e_amp = K · sin(tilt) · √d / (√m · a^(3/2)); and (2) the **canonical v-balance search** as a secondary confirmation. All proposed Batygin-Brown / Siraj candidates (4–10 M_Earth, e ≈ 0.22–0.60, a ≈ 290–700 AU) **fail Law-4 compliance by 4–7 orders of magnitude** — their observed eccentricities cannot be base+amplitude under Law 4 for any Fibonacci d. The v-balance test confirms the rejection for all candidates above ~10⁻⁴ M_Earth. This is incompatible with the conventional Planet Nine hypothesis, itself contested within the astronomy community (OSSOS null result, no detection after a decade of searching). The Vera Rubin Observatory (LSST) is expected to discriminate between the competing hypotheses by ~2030–2035. Either outcome teaches us something definitive about the model.

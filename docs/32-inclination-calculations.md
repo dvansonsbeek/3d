@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Inclination Calculations
 
 This document describes how planetary orbital inclinations are calculated in the Holistic Universe Model. Inclination calculations involve two distinct but related concepts:

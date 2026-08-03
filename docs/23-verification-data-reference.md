@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Verification Data Reference
 
 This document describes the astronomical verification data embedded in the simulation for validating planetary positions against known historical events.

@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Milankovitch Language of the Holistic Model
 
 > **TL;DR.** The Holistic model has **five** natural Milankovitch-band periods, all integer divisors of H, structured into a closed Fibonacci algebra: **H/3 inclination precession (111,772 yr), H/5 ecliptic precession (67,063 yr), H/8 obliquity oscillation (41,915 yr), H/13 axial precession (25,794 yr), and H/16 perihelion precession (20,957 yr)**. These satisfy four beat-frequency identities (13−5=8, 13+3=16, 8−5=3, 13−8=5) that close *only because* the divisors are Fibonacci. Standard secular theory recovers the same periods to within 0.06–2.8 % — including all six Berger 1978 climatic-precession peaks (at ~19–24 kyr) within 0.4 % when expressed as 8H/n integer divisors. *Note: in this framework H/16 = 20,957 yr is **perihelion precession** (the rotation of Earth's apsidal line in the ecliptic frame), distinct from **climatic precession** (~23.7 kyr dominant, the parameter e·sin ϖ that drives seasonal insolation — captured in the 8H lattice at n=113 and n=120).*

@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: historical
+---
+
 # Baseline Report — Before Optimization
 
 **Model epoch**: JD 2451716.5 (21 June 2000)

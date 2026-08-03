@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Moon-Earth Kepler Derivation: The Δa Correction
 
 This document describes how the model derives `GM_Earth` and `GM_Moon` from the Moon's orbit, using a physically-motivated correction `Δa = a_M · μ · m` to handle the Sun's perturbation on the otherwise-Keplerian two-body Earth-Moon problem.

@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Pure-tidal + L1-orbital-coupled α(t) validates against the historical lunar record
 
 **Status**: Validation complete — 267 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 (LLR-anchored α₁ giving da/dt = 3.82 cm/yr at J2000) + L1-orbital-coupled α(t) GIA model. Under the joint world (4-flag stack + Core-mantle swing, doc 104), framework mean |residual| **20.2 min (1212 s)**, with **117/267 events (43.8%)** falling closer to observation than NASA Espenak/Meeus's polynomial. NASA polynomial mean |residual|: 20.0 min (1199 s); Stephenson 2016 spline polynomial: 20.2 min (1211 s) — both are fit to essentially this exact dataset, so per-event residuals against either index fit quality against a smoothed representation of the observations rather than physical validity; the framework's excess over Stephenson's own fit is **2 s** — the dataset noise floor. The framework's independent validation is the [26-event solar-eclipse alignment audit](https://holisticuniverse.com/model/historical-eclipse-validation): 12/26 confirmed+off-peak, 6 regional, 0 with residual ΔT-signal (framework agrees with the documented UT on every event), 8 geographic-class events (umbra-*centerline* >1,000 km from the site — a centerline-distance gate, not visibility: at high γ the shadow strikes the tilted Earth obliquely and the penumbra can still cover the site with a deep partial, as at −135 Babylon; the class collects penumbra-only sites, attribution debates, and one 1000-km boundary case — all unrelated to physics).

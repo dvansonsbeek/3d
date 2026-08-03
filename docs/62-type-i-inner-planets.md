@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Type I Inner Planets -- Mercury & Venus Implementation
 
 **Status**: Complete (e/(1+e) derivation, EoC with phase-optimized fractions, period calibration)

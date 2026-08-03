@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # Universal Mass-from-Moon Formula
 
 This document generalizes doc 24's Δa correction to a single closed-form formula that approximates DE440 mass ratios for **every moon-bearing planet** in the solar system — from Earth out to Pluto, with residuals ranging from 3 ppm (Neptune) to 340 ppm (Mars). The formula has two physically-motivated correction terms, both computable from observable quantities. Earth-Moon and the outer planets sit on opposite ends of the same curve, not as special cases.

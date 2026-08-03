@@ -1,3 +1,10 @@
+---
+docVersion: 1.0
+modelVersion: v1.0
+coefficients: sha256:a13f3d25ef18af1f
+status: current
+---
+
 # L1 Lattice Attribution Reference — Berger vs Our Model
 
 > **One entry per L1 lattice integer.** For each integer this doc lists (a) the standard Berger / secular-theory attribution, (b) all solar-system family matches (planet-planet beats), and (c) the top-5 Earth-planet beat candidates ranked by physical plausibility (Jupiter > smaller planets; Axial/Obliq > other elements; 2-term > 3-term; Earth-bearing required). The complete ranked list (often 20+ combos for some n) is preserved in the companion JSON.
