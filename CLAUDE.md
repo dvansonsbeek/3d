@@ -5,9 +5,10 @@ System Resonance Theory (ESSRT). The model is analytic and parametric, valid
 across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
-**Scale:** `src/script.js` 64,673 lines · `tools/` 203 JS scripts across 7
+**Scale:** `src/script.js` ~60,850 lines · `tools/` 203 JS scripts across 7
 directories · 237 Python files · 71 docs · two web UIs (simulator, `dashboard/`).
-**`npm run check` enforces six gates; CI runs them plus a headless-browser job.**
+**`npm run check` enforces a twelve-step gate chain; CI runs it plus a
+headless-browser job.**
 Golden masters live in `packages/fixtures/`. Of the 17 scripts in `tools/verify/`,
 only 2 can actually fail — see the Verification section.
 
@@ -77,15 +78,30 @@ would silently churn a structural claim for a rounding-level gain.
   not a formula bug.
 - **Capture a baseline before touching shared machinery.** Two minutes; it has
   caught a 583.7″ regression.
-- `data/02-solar-measurements.csv` is 160 MB and gitignored — no git recovery.
+- `data/02-solar-measurements.csv` is 166 MB and gitignored — no git recovery.
   Back it up before regenerating (2 h 24 m).
-- **The engine and that CSV agree bit-exactly since Phase C** (R1–R4, R6
-  restored), and **Phase D refit 6b/6d/6c against it** — cycle axis, event-row
-  anchors, the §10 derived cardinal form, all sixteen R-items closed. Do not
-  regenerate the CSV: 2 h 24 m for an identical file. Coefficients and runtime
-  evaluation forms are a MATCHED PAIR — never ship one without the other
-  (~1162-minute-class error). See
-  `holisticuniverse/docs/plans/IP-deeptime-scene-graph-alignment_new.md` §5.
+- **The deep-time alignment campaign is COMPLETE** — engine ≡ CSV bit-exact,
+  all sixteen R-items closed, 6c at 0.48–0.99 min over ±270 kyr via the §10
+  derived form + edge-trim + the §10g quadrature-locked joint sidebands. Do
+  not regenerate the CSV: 2 h 24 m for an identical file. Coefficients and
+  runtime evaluation form are a MATCHED PAIR — never ship one without the
+  other (~1162-minute-class error), and the pair includes the NUMERICS: the
+  ∫1/H convention is the 10-kyr trapezoid table, built under the pinned
+  lattice α. Both campaign plans are archived in
+  `docs/archive/old-documents/` (untracked).
+- **The §10g minus sign is load-bearing.** Joint sideband phase is
+  order·λ_X − 2π·div·c, COUNTER-rotating; the co-rotating sense captures
+  nothing (measured — the sign experiment, doc 99 "braid law"). Do not "fix"
+  it, in any of the three runtimes.
+- **A purity freeze needs its pure twin.** Freezing a mutable-global read to
+  a J2000 const without wiring in the epoch-aware f(Y) replacement silently
+  freezes deep time (the solar-day panel read 86400.006 where the model says
+  86400.156). The epoch-consistency gate now pins the invariant; extend it
+  when adding f(Y) evaluators.
+- **A fit-window edge phase-locked to the lattice masquerades as physics.**
+  The "e(t)-minimum residual peak" was window-edge divergence — both bracket
+  ends sit at H/16 phase ≈ 0°. Check the edge/interior split before believing
+  any phase-binned feature; the 6c fitter edge-trims 8%/side for this reason.
 
 ---
 
@@ -100,7 +116,9 @@ and typecheck cover `packages/` and `test/`; `src/script.js` and `tools/` are
 pre-migration and join as Phase 8 extracts.
 
 `npm run test:browser` runs the `src/script.js` golden masters in headless
-Chromium — the only tier that guards Phase 8, which dissolves that file.
+Chromium — the only tier that guards Phase 8, which dissolves that file —
+plus the epoch-consistency gate (pure f(Y) evaluators ≡ the epoch-anchor
+chain at ±1/±5 Myr; the golden master cannot catch that class).
 `npm run test:transparency` is the Phase 6 acceptance gate — **green (84/84,
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
