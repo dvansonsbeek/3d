@@ -197,7 +197,7 @@ Two implementation routes tested:
 
 ### The shipped form (joint world)
 
-The production episode, as shipped by `tools/fit/dt-corrections-fit.js --joint --write` (constants in `data/core-mantle-resonator-stage1.json`, synced to `tools/lib/deep-time.js`, `src/script.js`, and the website's `deepTime.ts` by `tools/fit/export-dt-corrections.js`):
+The production episode, as shipped by `tools/fit/dt-corrections-fit.js --joint --write` (constants in `data/core-mantle-resonator-stage1.json` — read directly by `tools/lib/deep-time.js` and, via the generated constants module, `src/script.js`; the website's `deepTime.ts` is patched by `tools/fit/export-to-holistic.js`'s ΔT section):
 
 - **Eigenperiod** T₀ = 8H/685 = 3,916.1 yr (lattice-labeled by convention: the shipped resonator is the combined effect of the lattice cycles, so under H(t) evolution the episode scales with its drivers; the bare axiMC eigenmode is core-material physics — recorded caveat), **Q = 1.8**.
 - **Impulse-consistent 2-kick episode**: kicks are sin-only (displacement-continuous — ΔT is accumulated angle and must not step; the impulses live in the slope). Excitation at **−1600** (sin 760.35 s, just below the 773.3-s cap), termination at **+1600** (sin −75.19 s). The kick epochs are CONVENTION, not data-dated: the record starts at −720 with the swing already at full amplitude (so excitation genuinely predates −720), and the stability box t₁ ∈ [−2350, −750] is flat. The excitation kick steps δLOD by +3.878 ms/day — inside the SMH ±3–4 ms envelope — and Dumberry & Finlay-class core-flow reorganizations of that size within <100 yr are documented physics.

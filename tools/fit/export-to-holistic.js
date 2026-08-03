@@ -726,29 +726,92 @@ if (fs.existsSync(PLANETS_PATH)) {
 // ── ΔT correction coefficients (deepTime.ts) ──────────────────
 // Source of truth: data/deltaT-4flag-fit.json (fitted by tools/fit/dt-corrections-fit.js),
 // plus data/core-mantle-resonator-stage1.json for the RES_* constants.
-// Delegates to tools/fit/export-dt-corrections.js so the transform lives in one place.
+// ABSORBED from the deleted export-dt-corrections.js: the website is the only
+// remaining patch target — src/script.js and tools/lib/deep-time.js read the
+// JSONs directly — so the transform lives here with the rest of the website
+// sync. The fitter's own deltaTStart write (astro-reference.json) moved into
+// dt-corrections-fit.js: that is a 3d-internal value, not website sync.
 // deepTime.ts is independent of constants.ts so its changes are NOT folded into the
 // model-values staleness check below — DT corrections don't feed the LOD pipeline.
 {
   console.log('');
   console.log('  ── deepTime.ts (ΔT correction coefficients) ──');
-  const dt = require('./export-dt-corrections');
-  const fit = dt.loadFitJson();
-  const targetPath = dt.TARGETS.websiteDeepTime.path;
+  const dtFitPath     = path.join(__dirname, '..', '..', 'data', 'deltaT-4flag-fit.json');
+  const resonatorPath = path.join(__dirname, '..', '..', 'data', 'core-mantle-resonator-stage1.json');
+  const targetPath    = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'deepTime.ts');
+  const fit = fs.existsSync(dtFitPath) ? JSON.parse(fs.readFileSync(dtFitPath, 'utf8')) : null;
   if (!fit) {
     console.log('    (data/deltaT-4flag-fit.json not found — run dt-corrections-fit.js --write to generate)');
   } else if (!fs.existsSync(targetPath)) {
-    console.log(`    (${dt.TARGETS.websiteDeepTime.label} not found, skipping)`);
+    console.log('    (website deepTime.ts not found, skipping)');
   } else {
-    const before = fs.readFileSync(targetPath, 'utf8');
-    const { source: after, changes } = dt.applyToSource(before, fit);
-    if (changes === 0) {
+    // Only numeric assignments are edited — comment blocks preserved verbatim.
+    // The runtime derives BOND_DT_RAW_AT_J2000 etc. from cos/sin, so those are
+    // NOT synced. Jose5 and Jose4 are a COUPLED PAIR — the superseded 3-flag
+    // artefact cannot describe the shipped stack (its bond.cos_coeff_s is
+    // 165.927 vs the shipped 145.595), which is why only the 4-flag JSON is
+    // read. RES_* are skipped silently when the resonator JSON or the
+    // constants are absent from the target.
+    const c = fit.shipped_coefficients;
+    const replacements = [
+      ['BOND_LATTICE_N',        c.bond.lattice_n],
+      ['BOND_COS_COEFF_S',      c.bond.cos_coeff_s],
+      ['BOND_SIN_COEFF_S',      c.bond.sin_coeff_s],
+      ['HALLSTATT_LATTICE_N',   c.hallstatt.lattice_n],
+      ['HALLSTATT_COS_COEFF_S', c.hallstatt.cos_coeff_s],
+      ['HALLSTATT_SIN_COEFF_S', c.hallstatt.sin_coeff_s],
+      ['JOSE5_LATTICE_N',       c.jose5.lattice_n],
+      ['JOSE5_COS_COEFF_S',     c.jose5.cos_coeff_s],
+      ['JOSE5_SIN_COEFF_S',     c.jose5.sin_coeff_s],
+    ];
+    if (c.jose4) {
+      replacements.push(
+        ['JOSE4_LATTICE_N',    c.jose4.lattice_n],
+        ['JOSE4_COS_COEFF_S',  c.jose4.cos_coeff_s],
+        ['JOSE4_SIN_COEFF_S',  c.jose4.sin_coeff_s],
+      );
+    }
+    const resJson = fs.existsSync(resonatorPath)
+      ? JSON.parse(fs.readFileSync(resonatorPath, 'utf8')) : null;
+    const res = resJson ? (resJson.proposed_shipped_coefficients || {}).resonator : null;
+    if (res) {
+      const k = res.kick_epochs_year, kc = res.kick_coefficients_s, t1 = res.drive_tones[0];
+      replacements.push(
+        ['RES_T0_LATTICE_N',  res.T0_lattice_n],   // T₀ = 8H/n (lattice-labeled eigenperiod)
+        ['RES_Q',             res.Q],
+        ['RES_KICK1_T_YR',    k[0]],
+        ['RES_KICK1_COS_S',   kc[0].cos],
+        ['RES_KICK1_SIN_S',   kc[0].sin],
+        ['RES_KICK2_T_YR',    k[1]],
+        ['RES_KICK2_COS_S',   kc[1].cos],
+        ['RES_KICK2_SIN_S',   kc[1].sin],
+        ['RES_TONE1_DN',      t1.dn],
+        ['RES_TONE1_PHI_RAD', t1.phi_locked_rad],
+        ['RES_TONE1_AMP_S',   t1.amp_s],
+      );
+    }
+    let dtSrc = fs.readFileSync(targetPath, 'utf8');
+    let dtChanges = 0;
+    for (const [name, val] of replacements) {
+      const re = new RegExp(
+        `(const\\s+${name}\\s*=\\s*)(-?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)(\\s*;?)`,
+        'm'
+      );
+      const m = dtSrc.match(re);
+      if (!m) continue;         // constant not present in this file (skip silently)
+      const oldVal = parseFloat(m[2]);
+      if (Math.abs(oldVal - val) < 1e-14) continue;   // already in sync
+      console.log(`    ${name}: ${oldVal} → ${val}`);
+      dtSrc = dtSrc.replace(re, `$1${val}$3`);
+      dtChanges++;
+    }
+    if (dtChanges === 0) {
       console.log('    ✓ 4-flag ΔT constants already in sync');
     } else if (!WRITE) {
-      console.log(`    ${changes} ΔT constants pending. Run with --write to apply.`);
+      console.log(`    ${dtChanges} ΔT constants pending. Run with --write to apply.`);
     } else {
-      fs.writeFileSync(targetPath, after);
-      console.log(`    ✓ Written ${changes} ΔT constants to deepTime.ts`);
+      fs.writeFileSync(targetPath, dtSrc);
+      console.log(`    ✓ Written ${dtChanges} ΔT constants to deepTime.ts`);
     }
   }
 }
@@ -770,7 +833,7 @@ const MV_TS      = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
 //     the sim's model epoch 2000.5 (t_Ma = −5e-7) so they match the
 //     tweakpane's dLOD/dt decomposition rows digit-for-digit; plus
 //     ALPHA_CLIMATE_SCALE / ALPHA_1 into website deepTime.ts (the α(t)
-//     constants export-dt-corrections.js does not cover).
+//     constants the ΔT section above does not cover).
 //
 // Eclipse-audit / Bond-IRD / Babylon-135 numbers remain hand-maintained —
 // they come from docs 102/103 analyses with no machine-readable artifact.
@@ -885,7 +948,7 @@ const MV_TS      = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
   }
 
   // Deep-time physics anchors → website deepTime.ts (cycle coefficients are
-  // handled by export-dt-corrections.js above). Source of truth:
+  // handled by the ΔT section above). Source of truth:
   // astro-reference.json physicalConstants + model-parameters.json deepTime,
   // read via tools/lib/constants.js (same chain deep-time.js uses).
   const WEB_DEEPTIME = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'deepTime.ts');

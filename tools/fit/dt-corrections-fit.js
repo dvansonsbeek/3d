@@ -26,8 +26,9 @@
  *   • --write ships atomically: data/deltaT-4flag-fit.json (flag coefficients
  *     + optimum + usno_anchor), data/core-mantle-resonator-stage1.json
  *     (resonator amplitudes; T₀/Q/epochs stay the convention), and
- *     public/input/astro-reference.json (deltaTStart). Then sync runtime
- *     constants via export-dt-corrections and re-run
+ *     public/input/astro-reference.json (deltaTStart, --sync-code). The
+ *     engines read the JSONs directly; the website syncs separately via
+ *     export-to-holistic.js --write. Then re-run
  *     tools/fit/validate-resonator.js.
  *   Shipped state: USNO 86400.0014, deltaTStart 56.05, Espenak 12.60 s,
  *   full-window 31.3 s; episode −1600 → +1600; resonator default-ON runtime-
@@ -102,6 +103,55 @@
 
 const fs = require('fs');
 const path = require('path');
+
+// ─── Sync auto-optimum deltaTStart to public/input/astro-reference.json ─────
+// The JSON is the source of truth for that constant; Step 9 of the pipeline
+// (npm run constants:generate) then carries it from astro-reference.json into
+// the module src/script.js imports. One writer per value across the pipeline.
+// No-op when fit.optimum.deltaTStart is null (--fixed-anchors or DT flag
+// unset — the sweep was skipped and the previous JSON value stays).
+// Moved here from the deleted export-dt-corrections.js: this is the fitter's
+// own 3d-internal write, not website sync.
+const ASTRO_REFERENCE_PATH = path.join(__dirname, '..', '..', 'public', 'input', 'astro-reference.json');
+function syncAstroReference(fit, { dryRun = false } = {}) {
+  if (!fit.optimum || typeof fit.optimum.deltaTStart !== 'number') {
+    console.log('  → public/input/astro-reference.json  (auto-optimum not available, skipping)');
+    return 0;
+  }
+  if (!fs.existsSync(ASTRO_REFERENCE_PATH)) {
+    console.log('  → public/input/astro-reference.json  (not found, skipping)');
+    return 0;
+  }
+  console.log('  → public/input/astro-reference.json');
+  const raw = fs.readFileSync(ASTRO_REFERENCE_PATH, 'utf8');
+  const json = JSON.parse(raw);
+  const oldVal = json.earthOrbital && json.earthOrbital.deltaTStart;
+  const newVal = fit.optimum.deltaTStart;
+  if (typeof oldVal !== 'number') {
+    console.log('    (earthOrbital.deltaTStart not present or non-numeric — skipping)');
+    return 0;
+  }
+  if (Math.abs(oldVal - newVal) < 1e-9) {
+    console.log('    (already in sync: ' + oldVal + ')');
+    return 0;
+  }
+  console.log(`    deltaTStart: ${oldVal} → ${newVal}`);
+  if (dryRun) {
+    console.log('    1 change pending (dry run)');
+    return 1;
+  }
+  // Regex-patch the specific line so surrounding formatting is preserved.
+  const re = /("deltaTStart"\s*:\s*)(-?[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)/;
+  const m = raw.match(re);
+  if (!m) {
+    console.log('    (deltaTStart line pattern not found — skipping)');
+    return 0;
+  }
+  const patched = raw.replace(re, `$1${newVal}`);
+  fs.writeFileSync(ASTRO_REFERENCE_PATH, patched);
+  console.log('    ✓ deltaTStart updated (propagates to script.js at pipeline Step 9)');
+  return 1;
+}
 
 // ─── Guard: DT_CORRECTIONS_DISABLED must be set for --write ───
 const WRITE = process.argv.includes('--write');
@@ -1252,9 +1302,10 @@ function main() {
     collinearity_warnings: warnings,
     optimum: (effectiveDeltaTStart !== null) ? {
       // Joint-optimum values selected by findJointOptimum() against the
-      // ESPENAK_REFERENCE year list. Both propagate through export-dt-corrections.js
-      // when --sync-code is set: usno_target_lod_s stays inside the fit config
-      // (JSON) and deltaTStart is written to src/script.js.
+      // ESPENAK_REFERENCE year list. With --sync-code, deltaTStart is written
+      // to astro-reference.json (syncAstroReference above) and reaches
+      // src/script.js via pipeline Step 9; usno_target_lod_s stays inside the
+      // fit config (JSON).
       usno_target_lod_s: effectiveUsnoTarget,
       deltaTStart:       effectiveDeltaTStart,
       espenak_rms_s:     optimumRow ? optimumRow.rms : null,
@@ -1348,11 +1399,18 @@ function main() {
     fs.writeFileSync(outPath, JSON.stringify(output, null, 2) + '\n');
     console.log(`  ✓ Written to ${outPath}`);
     if (SYNC_CODE) {
-      console.log('  → Syncing to code files via export-dt-corrections.js...');
-      const { syncAllTargets } = require('./export-dt-corrections');
-      syncAllTargets(output, { dryRun: false });
+      // deltaTStart (auto-optimum) → public/input/astro-reference.json — the
+      // single writer for that value; pipeline Step 9 (constants:generate)
+      // carries it into the module src/script.js imports. INLINED from the
+      // deleted export-dt-corrections.js. The coefficient consts need no code
+      // sync — src/script.js and tools/lib/deep-time.js read the JSONs
+      // directly. The WEBSITE deepTime.ts is synced by export-to-holistic.js
+      // --write, deliberately manual: a fitter must not write across a repo
+      // boundary as a side effect of --write.
+      syncAstroReference(output, { dryRun: false });
+      console.log('  → website deepTime.ts: run `node tools/fit/export-to-holistic.js --write`');
     } else {
-      console.log('  (JSON only. Add --sync-code to also update src/script.js and Node/website ports.)');
+      console.log('  (JSON only. Add --sync-code to also update astro-reference.json deltaTStart.)');
     }
   } else {
     console.log('  (dry run — add --write to persist to data/deltaT-4flag-fit.json)');
@@ -1673,8 +1731,9 @@ function runJointMode() {
 
   // ── --write: ship the joint world (atomic default-ON package, part 1) ──
   // Anchors + coefficients move TOGETHER: 4-flag JSON, resonator JSON,
-  // astro-reference deltaTStart. Runtime constants then sync via
-  // export-dt-corrections (part 2); defaults flip in the same commit.
+  // astro-reference deltaTStart. The engines read the JSONs directly; the
+  // website syncs via export-to-holistic.js (part 2); defaults flip in the
+  // same commit.
   const flagNames = ['bond', 'hallstatt', 'jose5', 'jose4'];
   const fitPath = path.join(__dirname, '..', '..', 'data', 'deltaT-4flag-fit.json');
   const fitJson = JSON.parse(fs.readFileSync(fitPath, 'utf8'));
@@ -1744,8 +1803,8 @@ function runJointMode() {
   console.log(`  ✓ wrote ${arPath} (deltaTStart = ${best.dts.toFixed(4)})`);
   console.log('\n  Next (atomic package part 2): src/script.js and');
   console.log('  tools/lib/deep-time.js read this JSON directly — run');
-  console.log('  `npm run constants:generate` and rebuild. export-dt-corrections');
-  console.log('  now syncs only the website target. Then flip both runtime');
+  console.log('  `npm run constants:generate` and rebuild. The website syncs');
+  console.log('  via export-to-holistic.js --write. Then flip both runtime');
   console.log('  defaults ON and re-run validation.');
 }
 

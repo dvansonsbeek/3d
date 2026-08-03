@@ -481,8 +481,9 @@ function jose4CycleLodCorrection(year) {
 // still yields the fully-raw pure-tidal residual for fitting.
 const DT_RESONATOR_ENABLED = process.env.DT_RESONATOR_DISABLED !== '1';
 
-// Scalar constants (syncable by tools/fit/export-dt-corrections.js from
-// data/core-mantle-resonator-stage1.json — same regex machinery as the flags).
+// Scalar constants — read from data/core-mantle-resonator-stage1.json (_RES
+// above), the same JSON export-to-holistic.js patches the website's
+// deepTime.ts from.
 // The eigenperiod is LATTICE-LABELED (T₀ = 8H/685 ≈ 3,916 yr): the shipped
 // resonator is the combined effect of the lattice cycles, so under H(t)
 // evolution the episode scales WITH its drivers (clock coherence). Physical

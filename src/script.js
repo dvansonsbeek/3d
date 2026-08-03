@@ -3223,8 +3223,9 @@ function jose4CycleDeltaTCorrection(year) {
 // medieval shutdown is carried by flag interference); only the TOTAL is
 // anchor-clean, which is what the closure constrains.
 // RESONATOR_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-// Scalar constants (syncable by tools/fit/export-dt-corrections.js from
-// data/core-mantle-resonator-stage1.json — same regex machinery as the flags).
+// Scalar constants — imported from the generated constants module, sourced
+// from data/core-mantle-resonator-stage1.json (the website's deepTime.ts copy
+// is patched from the same JSON by export-to-holistic.js's ΔT section).
 // The eigenperiod is LATTICE-LABELED (T₀ = 8H/685 ≈ 3,916 yr): the shipped
 // resonator is the combined effect of the lattice cycles, so under H(t)
 // evolution the episode scales WITH its drivers (clock coherence). Physical
