@@ -731,6 +731,11 @@ const CARDINAL_POINT_HARMONICS = FIT.CARDINAL_POINT_HARMONICS;
 // runtime must reuse VERBATIM, never recompute (§10c, §10e-quinquies).
 const CARDINAL_POINT_ECC_TERMS = FIT.CARDINAL_POINT_ECC_TERMS;
 const CARDINAL_POINT_DERIVED = FIT.CARDINAL_POINT_DERIVED;
+// §10g — quadrature-locked joint sidebands: coefficients SHARED across the
+// four cardinal points, phase = order·λ_X − 2π·div·cycles (COUNTER-rotating —
+// the sign is load-bearing; see the fitter).
+const CARDINAL_POINT_JOINT_TERMS = FIT.CARDINAL_POINT_JOINT_TERMS;
+const CP_JOINT_LAMBDA = { SS: 0, AE: Math.PI / 2, WS: Math.PI, VE: 1.5 * Math.PI };
 
 // ─── D. MOON MEEUS TABLES (source: public/input/meeus-lunar-tables.json) ─
 // Meeus Ch. 47, Tables 47.A (longitude, 60 terms) and 47.B (latitude, 60 terms)
@@ -58244,6 +58249,20 @@ function computeSolsticeJD(currentYear, type) {
     }
   }
 
+  // §10g — quadrature-locked joint sidebands: SHARED coefficients, phase
+  // order·λ_X − 2π·div·c (counter-rotating), self-corrected at 2000 so the
+  // J2000 anchors are untouched. Mirrors tools/lib/orbital-engine.js.
+  if (typeof CARDINAL_POINT_JOINT_TERMS !== 'undefined' && CARDINAL_POINT_JOINT_TERMS) {
+    const lam = CP_JOINT_LAMBDA[cp];
+    const cJ = _cpCycleOf(currentYear);
+    const c2000 = _cpCycleOf(_CP_J2000_YEAR);
+    for (const t of CARDINAL_POINT_JOINT_TERMS.terms) {
+      const thJ  = t.order * lam - 2 * Math.PI * t.div * cJ;
+      const thJ0 = t.order * lam - 2 * Math.PI * t.div * c2000;
+      jd += t.sin * (Math.sin(thJ) - Math.sin(thJ0)) + t.cos * (Math.cos(thJ) - Math.cos(thJ0));
+    }
+  }
+
   jd -= _CP_HARMONICS_AT_J2000[cp];
   return jd;
 }
@@ -58323,6 +58342,18 @@ function computeSolsticeYearLength(currentYear, type) {
         length += t.sin * (n * eN1 * de * Math.sin(nth) + eN * n * thp * Math.cos(nth))
                 + t.cos * (n * eN1 * de * Math.cos(nth) - eN * n * thp * Math.sin(nth));
       }
+    }
+  }
+
+  // §10g joint sidebands: d/dY[sin(n·λ − k·c)] = −k·(dc/dY)·cos(n·λ − k·c),
+  //                       d/dY[cos(n·λ − k·c)] = +k·(dc/dY)·sin(n·λ − k·c)
+  if (typeof CARDINAL_POINT_JOINT_TERMS !== 'undefined' && CARDINAL_POINT_JOINT_TERMS) {
+    const lam = CP_JOINT_LAMBDA[cp];
+    const cJ = _cpCycleOf(currentYear);
+    for (const t of CARDINAL_POINT_JOINT_TERMS.terms) {
+      const k = 2 * Math.PI * t.div;
+      const thJ = t.order * lam - k * cJ;
+      length += k * dcdY * (-t.sin * Math.cos(thJ) + t.cos * Math.sin(thJ));
     }
   }
   return length;

@@ -100,6 +100,7 @@ const COEFFICIENT_KEYS = [
   // deliberately NOT the [div, sin, cos] shape) and the fit-calibrated
   // lincoef + H(c) model the runtime must reuse VERBATIM, never recompute.
   'CARDINAL_POINT_ECC_TERMS',
+  'CARDINAL_POINT_JOINT_TERMS',
   'CARDINAL_POINT_DERIVED',
 
   // 16,919 values. fmtSci kept 12 significant digits, so 16,909 of them differ

@@ -1177,9 +1177,27 @@ function computeSolsticeJD(year, type) {
       jd += t.sin * eN * Math.sin(t.order * th) + t.cos * eN * Math.cos(t.order * th);
     }
   }
+  // §10g — quadrature-locked joint sidebands: coefficients SHARED across the
+  // four points, phase = order·λ_X − 2π·div·c — COUNTER-rotating (the carrier
+  // is e^{i(λ_X − θ16)}; the co-rotating sense captures nothing — the sign is
+  // load-bearing). Self-corrected at 2000, so the J2000 anchors are untouched.
+  const joint = C.CARDINAL_POINT_JOINT_TERMS;
+  if (joint) {
+    const lam = _CP_JOINT_LAMBDA[cp];
+    const c2000 = _cpCycleOf(2000);
+    for (const t of joint.terms) {
+      const th  = t.order * lam - 2 * Math.PI * t.div * cY;
+      const th0 = t.order * lam - 2 * Math.PI * t.div * c2000;
+      jd += t.sin * (Math.sin(th) - Math.sin(th0)) + t.cos * (Math.cos(th) - Math.cos(th0));
+    }
+  }
   jd -= _CP_HARMONICS_AT_J2000[cp];
   return jd;
 }
+
+// §10g — the structural quadrature angles (the §10f one-rotating-vector law),
+// consumed by the joint sideband terms in computeSolsticeJD / YearLength.
+const _CP_JOINT_LAMBDA = { SS: 0, AE: Math.PI / 2, WS: Math.PI, VE: 1.5 * Math.PI };
 
 /**
  * Compute the cardinal-point tropical year length (time between consecutive events).
@@ -1260,6 +1278,18 @@ function computeSolsticeYearLength(year, type) {
       const eN = Math.pow(e, n), eN1 = Math.pow(e, n - 1);
       length += t.sin * (n * eN1 * de * Math.sin(nth) + eN * n * thp * Math.cos(nth))
               + t.cos * (n * eN1 * de * Math.cos(nth) - eN * n * thp * Math.sin(nth));
+    }
+  }
+
+  // §10g joint sidebands: d/dY[sin(n·λ − k·c)] = −k·(dc/dY)·cos(n·λ − k·c),
+  //                       d/dY[cos(n·λ − k·c)] = +k·(dc/dY)·sin(n·λ − k·c)
+  const joint = C.CARDINAL_POINT_JOINT_TERMS;
+  if (joint) {
+    const lam = _CP_JOINT_LAMBDA[cp];
+    for (const t of joint.terms) {
+      const k = 2 * Math.PI * t.div;
+      const th = t.order * lam - k * cY;
+      length += k * dcdY * (-t.sin * Math.cos(th) + t.cos * Math.sin(th));
     }
   }
   return length;

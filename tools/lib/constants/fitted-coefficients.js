@@ -32,6 +32,10 @@ const CARDINAL_POINT_ANCHORS_ADJUSTED = data.CARDINAL_POINT_ANCHORS_ADJUSTED || 
 // −12,276 s ramp).
 const CARDINAL_POINT_ECC_TERMS = data.CARDINAL_POINT_ECC_TERMS || null;
 const CARDINAL_POINT_DERIVED = data.CARDINAL_POINT_DERIVED || null;
+// §10g — quadrature-locked joint sidebands, SHARED across the four points:
+// phase = order·λ_X − 2π·div·cycles (COUNTER-rotating; the sign is
+// load-bearing — see the fitter). {quadratureDeg, terms:[{order,div,sin,cos}]}.
+const CARDINAL_POINT_JOINT_TERMS = data.CARDINAL_POINT_JOINT_TERMS || null;
 const SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;  // Legacy alias
 const PARALLAX_DEC_CORRECTION = data.PARALLAX_DEC_CORRECTION;
 const PARALLAX_RA_CORRECTION = data.PARALLAX_RA_CORRECTION;
@@ -120,6 +124,7 @@ module.exports = {
   CARDINAL_POINT_ANCHORS_ADJUSTED,
   CARDINAL_POINT_ECC_TERMS,
   CARDINAL_POINT_DERIVED,
+  CARDINAL_POINT_JOINT_TERMS,
   SOLSTICE_JD_HARMONICS,
 
   // Factory for dynamic values

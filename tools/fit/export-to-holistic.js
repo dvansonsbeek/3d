@@ -534,6 +534,62 @@ if (changeCount === 0) {
   console.log(`  ✓ Written ${changeCount} changes to constants.ts`);
 }
 
+// ── §10 COMPATIBILITY GUARD ───────────────────────────────────
+//
+// Coefficients and RUNTIME FORM are a matched pair. Since plan §10 the cardinal
+// points are DERIVED from the year-length model:
+//
+//   JD_X(Y) = anchor_X + ΣT_trop(Y) + δ_X(Y)
+//   ΣT_trop = lincoef·(Y−2000) + driftTerm(Y) + Ih(Y)
+//
+// and δ_X carries EQUATION-OF-CENTRE terms (e(t)^n·sin(nM)) in place of the
+// H/16 and H/32 sinusoid pairs. Shipping these coefficients into a runtime that
+// still evaluates the pre-§10 form — `anchor + mSY(Y)·(Y−2000) + harmonics` on
+// SNAPSHOT phase — is not a small error: that rectangle drift measured 1162 min
+// RMSE against a ~5.6 min target on the simulator, and the missing ecc terms are
+// worth the whole ~1.78 d braid.
+//
+// So refuse rather than corrupt. Remove this guard only once the website
+// implements the §10 form (plan §9 items 2–3 + §10d).
+{
+  const needed = ['CARDINAL_POINT_ECC_TERMS', 'CARDINAL_POINT_DERIVED'];
+  const missing = needed.filter(k => !fitted[k]);
+  const dayYearPath = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'dayYear.ts');
+  let siteHasS10 = false;
+  let siteHasJoint = false;
+  try {
+    const dy = fs.readFileSync(dayYearPath, 'utf8');
+    // The §10 marker: the website must build ΣT_trop, not multiply mSY by the span.
+    siteHasS10 = /sigmaTropical|ΣT_trop/.test(dy);
+    // The §10g marker: joint sidebands are SHARED counter-rotating terms — a
+    // runtime that ignores the export silently loses the whole stage (~1 min).
+    siteHasJoint = /CARDINAL_POINT_JOINT_TERMS/.test(dy);
+  } catch { /* missing repo → treat as not migrated */ }
+
+  if (fitted.CARDINAL_POINT_JOINT_TERMS && siteHasS10 && !siteHasJoint) {
+    console.log('\n  ✗ REFUSING to sync cardinal-point coefficients.');
+    console.log('    fitted-coefficients.json carries §10g JOINT sideband terms, but');
+    console.log('    ' + dayYearPath);
+    console.log('    does not evaluate CARDINAL_POINT_JOINT_TERMS — syncing would');
+    console.log('    silently drop the whole ~1 min stage. Port the joint terms first.');
+    process.exitCode = 1;
+    module.exports = {};
+    return;
+  }
+
+  if (!missing.length && !siteHasS10) {
+    console.log('\n  ✗ REFUSING to sync cardinal-point coefficients.');
+    console.log('    These are §10-fitted (derived form + equation-of-centre terms),');
+    console.log('    but ' + dayYearPath);
+    console.log('    still evaluates the pre-§10 rectangle form on snapshot phase.');
+    console.log('    Syncing would silently ship a ~1162 min class error.');
+    console.log('    Migrate the website first — see plan §9 / §10d — then remove this guard.');
+    process.exitCode = 1;
+    module.exports = {};
+    return;
+  }
+}
+
 // ── Cardinal point harmonics (separate file) ──────────────────
 
 const CP_PATH = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'cardinalPointHarmonics.ts');
@@ -546,6 +602,41 @@ if (fitted.CARDINAL_POINT_HARMONICS) {
       cpOut += `  [${C.H / div}, ${sinC}, ${cosC}],\n`;
     }
     cpOut += ']\n\n';
+  }
+  // §10 — the equation-of-centre terms REPLACE the H/16 and H/32 sinusoid pairs
+  // (hence those divisors are absent from the lists above). Different shape on
+  // purpose: {order, sin, cos}, not [period, sin, cos] — a consumer that read
+  // them as sinusoids would be wrong by the whole ~1.78 d braid.
+  if (fitted.CARDINAL_POINT_ECC_TERMS) {
+    cpOut += '// §10 — equation-of-centre terms for the cardinal-point braiding.\n';
+    cpOut += '// e(t)^n·sin(nM), with e(t) the LAW OF COSINES. NOT sinusoids.\n';
+    for (const type of ['SS', 'WS', 'VE', 'AE']) {
+      const terms = fitted.CARDINAL_POINT_ECC_TERMS[type]
+        .map(t => `{ order: ${t.order}, sin: ${t.sin}, cos: ${t.cos} }`).join(', ');
+      cpOut += `export const CARDINAL_POINT_ECC_TERMS_${type}: { order: number; sin: number; cos: number }[] = [${terms}]\n`;
+    }
+    cpOut += '\n';
+  }
+  // Calibrated by Step 6c against the Step 6a window. The runtime must use these
+  // VERBATIM — recomputing lincoef from the 1-year anchor injects a −12,276 s
+  // ramp, and holding H constant in the integrated amplitude costs up to 5.2 s.
+  if (fitted.CARDINAL_POINT_DERIVED) {
+    const d = fitted.CARDINAL_POINT_DERIVED;
+    cpOut += '// §10 — constants calibrated by Step 6c against the Step 6a window.\n';
+    cpOut += '// Use VERBATIM, never recompute.\n';
+    cpOut += 'export const CARDINAL_POINT_DERIVED = {\n';
+    cpOut += `  lincoef: ${d.lincoef},\n  h0: ${d.h0},\n  h1: ${d.h1},\n}\n`;
+  }
+  // §10g — quadrature-locked joint sidebands: SHARED across the four points,
+  // phase = order·λ_X − 2π·div·cycles, COUNTER-rotating (the sign is
+  // load-bearing). Shape keeps DIVISORS, unlike the per-point period lists.
+  if (fitted.CARDINAL_POINT_JOINT_TERMS) {
+    const terms = fitted.CARDINAL_POINT_JOINT_TERMS.terms
+      .map(t => `{ order: ${t.order}, div: ${t.div}, sin: ${t.sin}, cos: ${t.cos} }`).join(', ');
+    cpOut += '\n// §10g — quadrature-locked joint sidebands, SHARED across the four points.\n';
+    cpOut += '// phase = order·λ_X − 2π·div·cycles — COUNTER-rotating; the sign is load-bearing.\n';
+    cpOut += '// Shape keeps DIVISORS (not periods), unlike the per-point lists above.\n';
+    cpOut += `export const CARDINAL_POINT_JOINT_TERMS: { order: number; div: number; sin: number; cos: number }[] = [${terms}]\n`;
   }
   const oldCp = fs.existsSync(CP_PATH) ? fs.readFileSync(CP_PATH, 'utf8') : '';
   if (oldCp === cpOut) {

@@ -394,6 +394,7 @@ function fitHarmonics(data, divisors) {
   // RMSE using the RUNTIME formula (§10):
   //   JD = anchor + ΣT_trop(year) − ΣT_trop(anchor) + δ(year) − δ(anchor)
   let sse = 0;
+  const resid = [];   // per-row residuals (days) — consumed by the §10g joint stage
   const sig0 = sigmaTropical(anchorYear);
   for (let i = 0; i < n; i++) {
     const yr = data[i].year;
@@ -412,11 +413,12 @@ function fitHarmonics(data, divisors) {
             + t.cos * (eN * Math.cos(t.order * th) - eN0 * Math.cos(t.order * th0));
     }
     const err = (data[i].jd - pred) * 24 * 60; // minutes
+    resid.push({ year: yr, days: data[i].jd - pred });
     sse += err * err;
   }
   const rmse = Math.sqrt(sse / n);
 
-  return { harmonics, eccTerms, rmse, anchorYear };
+  return { harmonics, eccTerms, rmse, anchorYear, resid };
 }
 
 function solveCholesky(A, b, n) {
@@ -571,6 +573,81 @@ function main() {
     console.log(`  (old independent fit: -0.79° / 2.18%)`);
   }
 
+  // ═══ §10g — quadrature-locked JOINT sideband stage (stage 2) ═══════════════
+  //
+  // The braid is ONE rotating vector: δ_X = Im[e^{i·λ_X}·W(t)] with the §10f
+  // quadrature angles λ = 0/90/180/270° (SS→AE→WS→VE). Its modulation
+  // sidebands therefore share complex amplitudes across the four points —
+  // 2 parameters per (order, divisor) TOTAL, so the quadrature cannot degrade
+  // by construction (nothing free to leak, unlike the free per-point mid-band
+  // fit, which reached 5–6 s only by breaking the gate at 7.7°/17.6%).
+  //
+  // THE SIGN IS LOAD-BEARING: the carrier is e^{i(λ_X − θ16)}, so sidebands
+  // carry point-phase +n·λ_X against time-phase −θ_d — COUNTER-rotating. The
+  // co-rotating sense (the naive reading of §10f) captures NOTHING (measured:
+  // interior RMSE unchanged). Do not "fix" the minus sign.
+  //
+  // Orders: n=1 (e¹ carrier sidebands, quadrature offsets) and n=2 (e² carrier,
+  // point-phase 2λ_X — pairs, SS/WS vs VE/AE). Fitted as a SECOND STAGE on the
+  // stacked residuals of the four shipped per-point fits, so every existing
+  // coefficient is untouched and the key is purely additive.
+  //
+  // Band and orders are SHIPPED structural choices (plan Phase D+ measured
+  // table). The full 2–45 band only adds collinearity — adjacent shared
+  // amplitudes balloon to 200+ s in mutual cancellation. No greedy here (R10).
+  const JOINT_QUADRATURE_RAD = { SS: 0, AE: Math.PI / 2, WS: Math.PI, VE: 1.5 * Math.PI };
+  const JOINT_BAND = [20, 21, 25, 26, 27, 28, 30, 31, 33, 34, 35, 36, 37];
+  const JOINT_ORDERS = [1, 2];
+  let jointTerms = [];
+  {
+    const specs = [];
+    for (const order of JOINT_ORDERS) for (const div of JOINT_BAND) specs.push({ order, div });
+    const mJ = 2 * specs.length;
+    const jointCols = (type, year) => {
+      const out = new Float64Array(mJ);
+      for (let j = 0; j < specs.length; j++) {
+        const th  = specs[j].order * JOINT_QUADRATURE_RAD[type] - phaseOf(year, specs[j].div);
+        const th0 = specs[j].order * JOINT_QUADRATURE_RAD[type] - phaseOf(2000, specs[j].div);
+        out[2 * j]     = Math.sin(th) - Math.sin(th0);
+        out[2 * j + 1] = Math.cos(th) - Math.cos(th0);
+      }
+      return out;
+    };
+    const ATA = new Array(mJ);
+    const ATb = new Float64Array(mJ);
+    for (let j = 0; j < mJ; j++) ATA[j] = new Float64Array(mJ);
+    let nRows = 0;
+    for (const type of types) {
+      for (const r of results[type].current.resid) {
+        const a = jointCols(type, r.year);
+        for (let j = 0; j < mJ; j++) {
+          ATb[j] += a[j] * r.days;
+          for (let k = j; k < mJ; k++) ATA[j][k] += a[j] * a[k];
+        }
+        nRows++;
+      }
+    }
+    for (let j = 0; j < mJ; j++) for (let k = 0; k < j; k++) ATA[j][k] = ATA[k][j];
+    const xJ = solveCholesky(ATA, ATb, mJ);
+    jointTerms = specs.map((s, j) => ({ order: s.order, div: s.div, sin: xJ[2 * j], cos: xJ[2 * j + 1] }));
+
+    console.log(`\n── §10g quadrature-locked joint sidebands (counter-rotating; ${mJ} SHARED params, ${nRows} stacked rows) ──`);
+    console.log('  type | interior RMSE (min) | ±200yr RMS (s)');
+    for (const type of types) {
+      const before = [], after = [], wB = [], wA = [];
+      for (const r of results[type].current.resid) {
+        const a = jointCols(type, r.year);
+        let corr = 0;
+        for (let j = 0; j < mJ; j++) corr += a[j] * xJ[j];
+        before.push(r.days * 1440);
+        after.push((r.days - corr) * 1440);
+        if (Math.abs(r.year - 2000) <= 200) { wB.push(r.days * 86400); wA.push((r.days - corr) * 86400); }
+      }
+      const rms = arr => Math.sqrt(arr.reduce((s, v) => s + v * v, 0) / arr.length);
+      console.log(`  ${type} | ${rms(before).toFixed(2)} → ${rms(after).toFixed(3)} | ${rms(wB).toFixed(2)} → ${rms(wA).toFixed(2)}`);
+    }
+  }
+
   // ─── Output ──────────────────────────────────────────────────────────
   console.log('\n═══════════════════════════════════════════════════════════════');
   console.log('  COPY-PASTE OUTPUT');
@@ -693,11 +770,22 @@ function main() {
       note: 'Runtime must use these verbatim — see plan §10c / §10e-quinquies',
     };
     fc.CARDINAL_POINT_ANCHORS_ADJUSTED = adjustedAnchors;
+    // §10g — quadrature-locked joint sidebands. SHARED across the four points
+    // (not per-type!): phase = order·λ_X − 2π·div·c, COUNTER-rotating, with
+    // the structural quadrature angles recorded alongside. A consumer that
+    // evaluated these per-point or with the co-rotating sign would be wrong by
+    // the whole stage (~1 min class).
+    fc.CARDINAL_POINT_JOINT_TERMS = {
+      quadratureDeg: { SS: 0, AE: 90, WS: 180, VE: 270 },
+      terms: jointTerms,
+      note: 'phase = order*lambda_X - 2*pi*div*cycles, self-corrected at 2000; counter-rotating — see plan §10g',
+    };
     fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
     console.log('\n  ✓ Written CARDINAL_POINT_HARMONICS (shipped divisor set)');
     console.log('  ✓ Written CARDINAL_POINT_ECC_TERMS (equation-of-centre orders)');
     console.log('  ✓ Written CARDINAL_POINT_DERIVED (lincoef + H(c) model)');
     console.log('  ✓ Written CARDINAL_POINT_ANCHORS_ADJUSTED');
+    console.log('  ✓ Written CARDINAL_POINT_JOINT_TERMS (§10g shared sidebands)');
   } else {
     console.log('\n  (dry run — add --write to update fitted-coefficients.json)');
   }
