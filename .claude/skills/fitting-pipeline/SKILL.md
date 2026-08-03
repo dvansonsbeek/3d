@@ -91,6 +91,31 @@ reproducibility artefact is `export-solar-measurements.js` plus the constants �
 but that is a reason not to commit it, not a reason to be casual about losing it
 mid-campaign.
 
+## 8. Fit the structure, not the points
+
+When the theory says several fitted quantities share one object, fit the
+shared object — with the structural relation locked in the design matrix, not
+checked afterwards. Measured on the §10g cardinal-point sidebands:
+
+- **Free per-point fitting proves nothing and can destroy evidence.** 104
+  free mid-band parameters reached a 6× better RMSE — by splitting the braid
+  arbitrarily and breaking the quadrature gate (7.7°/17.6% spread). Free
+  parameters always improve RMSE; the gain carries no information.
+- **A structural lock makes RMSE evidential.** 52 parameters SHARED across
+  the four points (phase = order·λ_X − 2π·div·c, quadrature enforced by
+  construction) captured 3× of residual with zero per-point freedom and
+  OOS ≡ in-sample. Under a lock, captured variance is evidence FOR the
+  structure — there is nothing free to fake it with.
+- **Run the sign experiment.** Fit every discrete convention (rotation sense,
+  order pattern) with identical freedom. §10g: the counter-rotating lock
+  captured the residual; the co-rotating lock captured NOTHING. Wrong
+  geometry fails all senses; an overfitting basis passes all; exactly one
+  passing is structure detection. A null under one lock is not failure — it
+  is half of the measurement.
+- The lock's discrete choices (band, orders, angles, SIGN) are structural
+  claims. Document the refuted senses next to the shipped one so nobody
+  "fixes" a load-bearing minus sign.
+
 ## Checklist
 
 Before a fitter writes anything:
@@ -100,4 +125,6 @@ Before a fitter writes anything:
 - Does the emitted term shape match what the runtime parses — asserted, not assumed?
 - Out-of-sample rows held out, bias and scatter reported separately?
 - Which shipped anchors will move, and are their gates re-run?
+- Where quantities share a structural object: fitted jointly with the lock in
+  the design matrix, and the refuted senses recorded?
 - Is the 166 MB corpus backed up?

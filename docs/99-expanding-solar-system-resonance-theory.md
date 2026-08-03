@@ -284,6 +284,47 @@ This is the third member of the framework's family of **deep-time invariants** �
 
 Cross-references: deep-time implementation in `src/script.js` (`meanApsidalCyclesICRFAtAge`, `meanNodalCyclesICRFAtAge` — legacy names; of-date convention) and `tools/lib/deep-time.js`; anchor verification in `tools/explore/audit-moon-months.js`; seconds-frame Brouwer-Clemence scaling in [Moon-Kepler Derivation](24-moon-kepler-derivation.md).
 
+## The cardinal-point braid law — one rotating vector, including its spectrum
+
+The four cardinal points (solstices and equinoxes) do not carry independent
+physics. Their event-time offsets from the mean tropical year are **one
+complex function read through four fixed rotations**:
+
+```
+T_X = T_trop + δ_X          with  Σ_X δ_X ≡ 0
+δ_X(t) = Im[ e^(i·n·λ_X) · W_n(t) ]        λ = 0°/90°/180°/270°  (SS→AE→WS→VE)
+```
+
+W₁(t) is the perihelion vector of the H/16 cycle as seen in event time — the
+equation-of-centre braid, with e(t) the law of cosines. The law holds at
+three levels, each measured independently:
+
+1. **The carrier** (order 1): the four fitted e·sin(M) terms sit in 90°
+   quadrature with equal amplitudes to **0.22° / 0.69% spread** — a property
+   the fit does not enforce, so it cannot be faked by extra freedom.
+2. **Order 2**: the e²·sin(2M) terms repeat the pattern at phase 2λ_X
+   (pairs: SS/WS vs VE/AE).
+3. **The modulation spectrum** (the §10g result): the residual mid-band
+   content (divisors H/20–H/37) is captured by coefficients **shared across
+   all four points** — 52 numbers with zero per-point freedom explain the
+   residual down to 0.48–0.99 min over ±270 kyr, and generalize perfectly
+   out of sample.
+
+**The sign experiment is what makes this evidence rather than curve
+fitting.** The carrier is e^(i(λ_X − θ₁₆)), so its sidebands must carry
+point-phase +n·λ_X against time-phase −θ_d — counter-rotating. Both senses
+were fitted with identical freedom: the counter-rotating lock captured the
+residual (1.67 → 0.48 min at SS); the co-rotating lock captured **nothing**
+(RMSE unchanged). A wrong geometry would have failed both senses; an
+overfitting basis would have passed both. Exactly one sense passing is
+structure detection — the model's seasonal asymmetries, from the ±50 s
+per-point year lengths at J2000 down to the sub-minute sideband comb, are a
+single geometric object: the rotating perihelion vector.
+
+Recorded anomaly: WS retains ~1.0 min against ~0.55 for the other three —
+a type-specific excess the shared vector does not explain, documented in the
+alignment plan (§10g) as an open observation.
+
 ## The H/5 LOD correction — REAL_LOD from ecliptic precession
 
 Two structural relations sit between the framework's kinematic mean LOD and the observed physical LOD (USNO Earth Orientation Center measurement):
