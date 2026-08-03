@@ -25,6 +25,22 @@ const GRID_YEAR = C.gridYear;
 const DELTA_FROM_J2000 = C.gridYearDeltaFromJ2000;
 const GRID_ANCHORS = C.cardinalPointAnchorsAtGrid;
 
+// ─── Edge trim (fit protocol) ────────────────────────────────────────────
+// The export window is EXACTLY the balanced bracket (cycle 0 → 1 of H), so
+// both window ends sit at the same H/16 lattice phase and the least-squares
+// objective was dominated by truncated-basis EDGE DIVERGENCE: the outer 5% of
+// rows carried 38.9 min RMS against a 3.5 min interior — a leverage that
+// distorted the shipped coefficients EVERYWHERE (year-decile RMS profile
+// 10.3 | 3.2–4.1 flat | 10.3 min; the same divisor set refits the interior at
+// 1.4–1.8 min once the edges are excluded). Trimming is a fit-protocol
+// choice, not a model change: divisor set, runtime form and anchors are
+// untouched. The trimmed outer regions become extrapolation (fit-unconstrained)
+// — J2000 sits at 0.91 of the window, INSIDE the kept region with ~3,850 yr
+// of margin. NOTE: the edge error masqueraded as a physical feature at the
+// e(t) minimum (both edges share lattice phase ≈ 0°) until the edge/interior
+// split was measured — see the plan's 6c residual-map section.
+const FIT_EDGE_TRIM_FRACTION = 0.08;
+
 // ─── Read CSV data by type ───────────────────────────────────────────────
 function readData() {
   const raw = fs.readFileSync(CSV_PATH, 'utf8');
@@ -53,6 +69,14 @@ function readData() {
     byType[type] = allByType[type].filter(r => ((r.year - 2000) % step + step) % step === 0);
   }
   console.log(`Downsampled (J2000-anchored): ${allByType.SS.length} → ${byType.SS.length} per type (step=${step})`);
+  for (const type of ['SS', 'WS', 'VE', 'AE']) {
+    const ys = byType[type].map(r => r.year);
+    const lo = Math.min(...ys), hi = Math.max(...ys), span = hi - lo;
+    byType[type] = byType[type].filter(r =>
+      r.year >= lo + FIT_EDGE_TRIM_FRACTION * span &&
+      r.year <= hi - FIT_EDGE_TRIM_FRACTION * span);
+  }
+  console.log(`Edge-trimmed ${FIT_EDGE_TRIM_FRACTION * 100}% per side → ${byType.SS.length} rows per type`);
   return { byType, allByType };
 }
 

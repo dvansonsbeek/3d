@@ -550,8 +550,15 @@ Step 6b: obliquity-harmonics.js               → SOLSTICE_OBLIQUITY_HARMONICS
          Updates: fitted-coefficients.json (auto-updated by script)
 
 Step 6c: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS + ANCHORS
-         Reads SS/WS/VE/AE JDs from 02-solar-measurements.csv (downsampled by stepYears).
-         24 self-corrected harmonics per type, RMSE 0.03-0.05 min.
+         Reads SS/WS/VE/AE JDs from 02-solar-measurements.csv (downsampled by
+         stepYears, then EDGE-TRIMMED 8% per side: the export window is the
+         balanced bracket exactly, so both ends share lattice phase ≈ 0° and
+         carry truncated-basis edge divergence — 38.9 min RMS on the outer 5%
+         vs 3.5 min interior — which otherwise dominates the least squares
+         and distorts the interior coefficients. Trimmed zones are
+         extrapolation for the shipped fit.)
+         24 self-corrected harmonics per type (§10 derived form), interior
+         RMSE 1.4-1.8 min, OOS ≡ in-sample (offset-grid, bias ≈ 0).
          Data-anchored at closest JD to IAU J2000 value, then derived to J2000.
          Tropical year = mean of 4 cardinal point derivatives (no separate step).
          Updates: fitted-coefficients.json (auto-updated by script)
