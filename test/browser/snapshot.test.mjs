@@ -61,6 +61,10 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA }) => {
     v[`siderealYearDays@${y}`] = T.computeSiderealYearDaysDirect(y);
     v[`solsticeSS@${y}`] = T.computeSolsticeYearLength(y, 'SS');
     v[`solsticeWS@${y}`] = T.computeSolsticeYearLength(y, 'WS');
+    // The JD form has its own failure modes the year-length probes cannot see:
+    // its equation-of-centre path NaN'd for two phases with no probe noticing.
+    v[`solsticeJD_SS@${y}`] = T.computeSolsticeJD(y, 'SS');
+    v[`solsticeJD_VE@${y}`] = T.computeSolsticeJD(y, 'VE');
   }
 
   // The deep-time chain, read through the globals it fills. Restore J2000 after

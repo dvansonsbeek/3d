@@ -6640,6 +6640,9 @@ if (typeof window !== 'undefined') {
     computeSolarYearDaysFromCardinals,
     computeSiderealYearDaysDirect,
     computeSolsticeYearLength,
+    // JD form too — its equation-of-centre path NaN'd for two phases with no
+    // probe noticing (the year-length probes never touch it).
+    computeSolsticeJD,
     // The seven globals recomputeEpochAnchors mutates, read live.
     anchors: () => ({
       holisticyearLength, H, meanlengthofday,
@@ -25677,8 +25680,12 @@ function setupGUI() {
       const converted = dayToDate(newJD);
       o.Date = converted.date;
       o.Time = converted.time;
-      o.Day = newJD - startmodelJD;
-      o.pos = sDay * o.Day;
+      // R4: pos must come from the INTEGRATED pos↔JD map — the linear
+      // sDay·Δday rectangle lands the scene off by the accumulated deep-time
+      // drift (measured: entering the VE JD at −9.12 Myr moved the scene
+      // −2,972 d and showed the sun 17° from the equinox).
+      o.pos = posFromJD(newJD);
+      o.Day = posToDays(o.pos);
       const p = dayToDateNew(newJD, 'julianday', 'perihelion-calendar');
       o.perihelionDate = `${p.date}`;
       positionChanged = true;
@@ -26501,8 +26508,9 @@ function setupGUI() {
       const converted = dayToDate(newJD);
       o.Date = converted.date;
       o.Time = converted.time;
-      o.Day = newJD - startmodelJD;
-      o.pos = sDay * o.Day;
+      // R4: integrated pos↔JD map, not the linear rectangle (see jdCtrl).
+      o.pos = posFromJD(newJD);
+      o.Day = posToDays(o.pos);
       o.julianDay = newJD;
       const p = dayToDateNew(newJD, 'julianday', 'perihelion-calendar');
       o.perihelionDate = `${p.date}`;
@@ -58007,7 +58015,8 @@ for (const type of ['SS', 'WS', 'VE', 'AE']) {
   // (e^n·sin(nM) − e0^n·sin(nM0)); this is the runtime's matching subtraction.
   const eccTerms = (typeof CARDINAL_POINT_ECC_TERMS !== 'undefined') && CARDINAL_POINT_ECC_TERMS[type];
   if (eccTerms) {
-    const e0 = computeEccentricityEarth(_CP_J2000_YEAR);
+    const e0 = computeEccentricityEarth(_CP_J2000_YEAR, BALANCED_YEAR_J2000_FIXED,
+      PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);
     const th0 = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, _CP_J2000_YEAR, 16);
     for (const t of eccTerms) {
       const eN0 = Math.pow(e0, t.order);
@@ -58183,7 +58192,12 @@ function computeSolsticeJD(currentYear, type) {
   // shape ({order, sin, cos}).
   const eccTerms = CARDINAL_POINT_ECC_TERMS && CARDINAL_POINT_ECC_TERMS[cp];
   if (eccTerms) {
-    const e = computeEccentricityEarth(currentYear);
+    // Full Phase-8 argument list — the 1-arg call (inherited verbatim from
+    // attempt 1) left base/amplitude undefined and returned NaN, which NaN'd
+    // every computeSolsticeJD and the cardinal-panel dates. No fixture probed
+    // JD browser-side, which is why it was invisible (probes added since).
+    const e = computeEccentricityEarth(currentYear, BALANCED_YEAR_J2000_FIXED,
+      PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);
     const th = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, currentYear, 16);
     if (th !== null) {
       for (const t of eccTerms) {
@@ -58199,44 +58213,80 @@ function computeSolsticeJD(currentYear, type) {
 
 /** Compute cardinal point year length — time between consecutive events (days). */
 function computeSolsticeYearLength(currentYear, type) {
-  // Option A base (J2000 snapshot): analytical derivative of computeSolsticeJD.
-  // Uses J2000-frozen MEAN_SOLAR_YEAR_J2000_DAYS and HOLISTIC_YEAR_J2000
-  // and snapshot phase, matching Step 6c's fitting basis.
+  // Exact term-by-term derivative of computeSolsticeJD (§10 derived form):
+  //   d/dY[anchor + ΣT_trop + δ_sin + δ_ecc]
+  //     = lincoef + drift-integrand + dIh/dY + dδ_sin/dY + dδ_ecc/dY.
+  // Was the pre-§10 partial form (sinusoid derivatives only): measured ±50 s
+  // off at J2000 — the missing equation-of-centre braid derivative IS the
+  // textbook per-point season asymmetry (SS 365.24163 vs WS 365.24274).
   //
-  // Deep-time correction (Option B): keeps this return value in the
-  // "epoch-local days at Y" convention that the tweakpane's
-  // solarYearSeconds = solDays × lengthofDay depends on.
-  //
-  // Note: this deliberately DIVERGES from computeSolsticeJD's drift-term
-  // convention. computeSolsticeJD uses SI /86400 form (matches scene-graph
-  // JD advancement); this function uses real-LOD /LOD form (matches
-  // physical days-per-year at epoch, so the "400 real days at Devonian"
-  // headline number surfaces). The two are equal at J2000 and diverge
-  // gradually at deep time by the LOD/86400 ratio. Downstream consumers
-  // that need the SI-day form should subtract the drift term (see the
-  // tropical-year and axial-precession chart configs).
+  // ONE deliberate divergence from the exact derivative survives (documented
+  // since Option B): the DRIFT part stays in the real-LOD meanYearInDaysAtAge
+  // convention that the tweakpane's solarYearSeconds = solDays × lengthofDay
+  // depends on ("400 real days at the Devonian"), while computeSolsticeJD
+  // integrates the SI /86400 form. Equal at J2000 up to the known 118 ms
+  // fit-basis gap; diverges by the LOD/86400 ratio at deep time — measured
+  // ≡ the convention difference to ≤1.2 ms across ±250 kyr. Downstream
+  // consumers that need the SI-day form subtract the drift term (see the
+  // tropical-year and axial-precession chart configs). Neglected: the drift
+  // Euler–Maclaurin half-sample term's own derivative (f′/2, sub-µs).
   const cp = type || 'SS';
   const harmonics = CARDINAL_POINT_HARMONICS[cp];
   const _t_Ma = (J2000_CALENDAR_YEAR - currentYear) / 1e6;
-  let length = MEAN_SOLAR_YEAR_J2000_DAYS;
-  if (DEEP_TIME_MODE_ENABLED) {
-    const mSY_at = meanYearInDaysAtAge(_t_Ma);
-    if (mSY_at !== null) length += (mSY_at - MEAN_SOLAR_YEAR_J2000_DAYS);
-  }
-  // Integrated phase, matching computeSolsticeJD and Step 6c's fit basis.
-  // omega is the DERIVATIVE of that phase w.r.t. year, so under deep time it is
-  // 2π·div/H(t) — the epoch-local H — not the J2000 constant. This function is
-  // the analytical derivative of computeSolsticeJD; differentiating an
-  // integrated phase while holding H at its J2000 value would leave the two
-  // inconsistent by the same H(t)/H_J2000 ratio that the phase itself tracks.
+  // dc/dY — derivative of the integrated cycle count = 1/H(t) at the epoch.
+  // Differentiating an integrated phase while holding H at its J2000 value
+  // would leave JD and derivative inconsistent by the same H(t)/H_J2000
+  // ratio that the phase itself tracks.
   const _H_at = DEEP_TIME_MODE_ENABLED
     ? (meanHAtAge(_t_Ma) ?? HOLISTIC_YEAR_J2000)
     : HOLISTIC_YEAR_J2000;
+  const dcdY = 1 / _H_at;
+
+  let length;
+  if (DEEP_TIME_MODE_ENABLED && CARDINAL_POINT_DERIVED) {
+    length = CARDINAL_POINT_DERIVED.lincoef;
+    const mSY_at = meanYearInDaysAtAge(_t_Ma);
+    if (mSY_at !== null) length += (mSY_at - MEAN_SOLAR_YEAR_J2000_DAYS);
+    // dIh/dY = the k0-corrected tropical integrand, minus half the
+    // integrand's own derivative (the closed form's Euler–Maclaurin term).
+    length += _cpTropHarmonicsAt(currentYear);
+    const cY = _cpCycleOf(currentYear);
+    let dTrop = 0;
+    for (const [div, sinC, cosC] of TROPICAL_YEAR_HARMONICS) {
+      const k = 2 * Math.PI * div, th = k * cY;
+      dTrop += k * dcdY * (sinC * Math.cos(th) - cosC * Math.sin(th));
+    }
+    length -= dTrop / 2;
+  } else {
+    length = MEAN_SOLAR_YEAR_J2000_DAYS;
+  }
+
+  // δ_X sinusoids: d/dY[sin(phase)] = omega·cos(phase), omega = 2π·div/H(t).
   for (const [div, sinC, cosC] of harmonics) {
     const omega = 2 * Math.PI * div / _H_at;
     const phase = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, currentYear, div);
     if (phase === null) continue;
     length += sinC * omega * Math.cos(phase) - cosC * omega * Math.sin(phase);
+  }
+
+  // δ_X equation-of-centre orders: d/dY[eⁿ·sin(nθ)] with BOTH factors moving.
+  // e(t) is the law of cosines on the same divisor-16 integrated phase, so
+  //   de/dY = base·amp·sin(θ)·θ′ / e,   θ′ = 2π·16·(dc/dY).
+  const eccTerms = (typeof CARDINAL_POINT_ECC_TERMS !== 'undefined') && CARDINAL_POINT_ECC_TERMS[cp];
+  if (eccTerms) {
+    const th16 = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, currentYear, 16);
+    if (th16 !== null) {
+      const thp = 2 * Math.PI * 16 * dcdY;
+      const e = computeEccentricityEarth(currentYear, BALANCED_YEAR_J2000_FIXED,
+        PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);
+      const de = eccentricityBase * eccentricityAmplitude * Math.sin(th16) * thp / e;
+      for (const t of eccTerms) {
+        const n = t.order, nth = n * th16;
+        const eN = Math.pow(e, n), eN1 = Math.pow(e, n - 1);
+        length += t.sin * (n * eN1 * de * Math.sin(nth) + eN * n * thp * Math.cos(nth))
+                + t.cos * (n * eN1 * de * Math.cos(nth) - eN * n * thp * Math.sin(nth));
+      }
+    }
   }
   return length;
 }

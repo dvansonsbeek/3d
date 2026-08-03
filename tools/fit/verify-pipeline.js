@@ -297,35 +297,14 @@ function evalFourier(year, mean, harmonics) {
   return result;
 }
 
-// Helper: cardinal point year length (derivative of JD harmonics, same as script.js)
-function cardinalYearLength(year, type) {
-  const t = year - C.balancedYear;
-  const harmonics = C.CARDINAL_POINT_HARMONICS[type];
-  let length = C.meanSolarYearDays;
-  for (const [div, sinC, cosC] of harmonics) {
-    const omega = 2 * Math.PI / (C.H / div);
-    const phase = omega * t;
-    length += sinC * omega * Math.cos(phase) - cosC * omega * Math.sin(phase);
-  }
-  return length;
-}
-
-// Helper: cardinal point JD (same as script.js computeSolsticeJD)
-function cardinalJD(year, type) {
-  const t = year - C.balancedYear;
-  const anchor = C.CARDINAL_POINT_ANCHORS[type];
-  const harmonics = C.CARDINAL_POINT_HARMONICS[type];
-  const t2k = 2000 - C.balancedYear;
-  let h2000 = 0;
-  for (const [div, sinC, cosC] of harmonics) {
-    h2000 += sinC * Math.sin(2 * Math.PI * t2k / (C.H / div)) + cosC * Math.cos(2 * Math.PI * t2k / (C.H / div));
-  }
-  let jd = anchor + C.meanSolarYearDays * (year - 2000);
-  for (const [div, sinC, cosC] of harmonics) {
-    jd += sinC * Math.sin(2 * Math.PI * t / (C.H / div)) + cosC * Math.cos(2 * Math.PI * t / (C.H / div));
-  }
-  return jd - h2000;
-}
+// Helpers: cardinal point year length and JD — the RUNTIME evaluators
+// themselves, not local mirrors. The previous hand-rolled snapshot forms here
+// drifted from the engines twice (pre-§10 sinusoid derivative, then the
+// §10 δ-only harmonics made them a third stale convention) — the exact
+// checker-mirror class D+ retired for the obliquity checker.
+const OE = require('../lib/orbital-engine');
+const cardinalYearLength = (year, type) => OE.computeSolsticeYearLength(year, type);
+const cardinalJD = (year, type) => OE.computeSolsticeJD(year, type);
 
 // Helper: JD to date string
 function jdToDate(jd) {

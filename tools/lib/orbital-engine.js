@@ -1185,25 +1185,74 @@ function computeSolsticeJD(year, type) {
  * @returns {number} year length in days
  */
 function computeSolsticeYearLength(year, type) {
+  // Exact term-by-term derivative of computeSolsticeJD (§10 derived form):
+  //   d/dY[ anchor + ΣT_trop + δ_sin + δ_ecc ]
+  //     = lincoef + drift-integrand + dIh/dY + dδ_sin/dY + dδ_ecc/dY.
+  // Was the pre-§10 snapshot form (fixed H, snapshot phase, sinusoids only):
+  // measured 55 s off at J2000 (missing braid derivative — the ±50 s per-point
+  // season asymmetry) growing to ~1,170 s at −150 kyr (phase convention).
+  //
+  // ONE deliberate divergence from the exact derivative survives, documented
+  // since Option B: the DRIFT part uses real-LOD meanYearInDaysAtAge — the
+  // tweakpane's "epoch-local days at Y" convention ("~400 days at the
+  // Devonian") — where computeSolsticeJD integrates the SI-day form. Equal at
+  // J2000, diverging by the LOD/86400 ratio at deep time. Everything else
+  // (lincoef, tropical integrand, sinusoid + equation-of-centre derivatives)
+  // is the exact derivative. Neglected: the drift Euler–Maclaurin half-sample
+  // term's own derivative (f′/2, sub-µs).
   const cp = type || 'SS';
-  const t = year - C.balancedYear;
   const harmonics = C.CARDINAL_POINT_HARMONICS[cp];
-  let length = C.meanSolarYearDays;
-  // Deep-time (Option B) drift term — mirrors src/script.js:56704-56708
-  // computeSolsticeYearLength under DEEP_TIME_MODE_ENABLED. Keeps the
-  // dashboard's tropical year in the "real-LOD days at Y" convention that
-  // powers the tweakpane's lengthofsolarYear display, so the dashboard's
-  // deep-time curve tracks the "~400 days at the Devonian" story instead
-  // of freezing at the J2000 base. Result is not periodic in H — the
-  // secular LOD evolution surfaces through mSY_at_Y.
+  const deep = deepTimeOn();
+  const D = C.CARDINAL_POINT_DERIVED;
   const t_Ma = (2000 - year) / 1e6;
-  const mSY_at = require('./deep-time').meanYearInDaysAtAge(t_Ma);
-  if (mSY_at !== null) length += (mSY_at - C.meanSolarYearDays);
+  const DT = require('./deep-time');
+
+  // dc/dY — derivative of the integrated cycle count, 1/H(t) at the epoch.
+  // Verified against the numerical derivative of cyclesBetweenYears at 2e-6
+  // relative (µs-scale on the ~2 d harmonic amplitudes).
+  const H_at = deep ? (DT.meanHAtAge(t_Ma) ?? C.H) : C.H;
+  const dcdY = 1 / H_at;
+  const cY = _cpCycleOf(year);
+
+  let length;
+  if (deep && D) {
+    length = D.lincoef;
+    const mSY_at = DT.meanYearInDaysAtAge(t_Ma);
+    if (mSY_at !== null) length += (mSY_at - C.meanSolarYearDays);
+    // dIh/dY = the k0-corrected tropical integrand, minus half the integrand's
+    // own derivative (the closed form's Euler–Maclaurin half-sample term).
+    length += _cpTropHarmonicsAt(year);
+    let dTrop = 0;
+    for (const [div, sinC, cosC] of C.TROPICAL_YEAR_HARMONICS) {
+      const k = 2 * Math.PI * div, th = k * cY;
+      dTrop += k * dcdY * (sinC * Math.cos(th) - cosC * Math.sin(th));
+    }
+    length -= dTrop / 2;
+  } else {
+    length = C.meanSolarYearDays;
+  }
+
+  // δ_X sinusoids: d/dY[sin(k·c)] = k·(dc/dY)·cos(k·c)
   for (const [div, sinC, cosC] of harmonics) {
-    const period = C.H / div;
-    const omega = 2 * Math.PI / period;
-    const phase = omega * t;
-    length += sinC * omega * Math.cos(phase) - cosC * omega * Math.sin(phase);
+    const k = 2 * Math.PI * div, th = k * cY;
+    length += k * dcdY * (sinC * Math.cos(th) - cosC * Math.sin(th));
+  }
+
+  // δ_X equation-of-centre orders: d/dY[eⁿ·sin(nθ)] with BOTH factors moving.
+  // e(t) is the law of cosines on the same divisor-16 integrated phase, so
+  //   de/dY = base·amp·sin(θ)·θ′ / e,   θ′ = 2π·16·(dc/dY).
+  const ecc = C.CARDINAL_POINT_ECC_TERMS && C.CARDINAL_POINT_ECC_TERMS[cp];
+  if (ecc) {
+    const th16 = 2 * Math.PI * 16 * cY;
+    const thp = 2 * Math.PI * 16 * dcdY;
+    const e = computeEccentricityEarth(year);
+    const de = C.eccentricityBase * C.eccentricityAmplitude * Math.sin(th16) * thp / e;
+    for (const t of ecc) {
+      const n = t.order, nth = n * th16;
+      const eN = Math.pow(e, n), eN1 = Math.pow(e, n - 1);
+      length += t.sin * (n * eN1 * de * Math.sin(nth) + eN * n * thp * Math.cos(nth))
+              + t.cos * (n * eN1 * de * Math.cos(nth) - eN * n * thp * Math.sin(nth));
+    }
   }
   return length;
 }
