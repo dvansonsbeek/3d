@@ -1058,59 +1058,10 @@ function buildSceneGraph() {
  * @returns {number} ecliptic inclination in degrees
  */
 function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
-  const p = C.planets[key];
-  const genPrecRate = 1 / (C.H / 13);
-
-  // --- Earth's orbital plane ---
-  // Inclination oscillation: ICRF perihelion rate (H/3 for Earth)
-  const earthPrecYears = C.ASTRO_REFERENCE.earthInvPlanePrecessionYears;
-  const earthPhaseRad = (yearsSinceBalanced / earthPrecYears) * 2 * Math.PI;
-  const earthI = (C.earthInvPlaneInclinationMean
-    - C.earthInvPlaneInclinationAmplitude * Math.cos(earthPhaseRad)) * d2r;
-
-  // Earth Ω regresses at -H/5 (ecliptic precession rate), NOT at H/3.
-  const earthAscNodePeriod = -C.H / 5;
-  const earthOmegaRate = 360 / earthAscNodePeriod;
-  const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane
-    - earthOmegaRate * C.yearsFromBalancedToJ2000
-    + earthOmegaRate * yearsSinceBalanced) * d2r;
-
-  // --- Planet's orbital plane ---
-  // Inclination oscillation: uses ICRF perihelion rate
-  // ICRF rate = ecliptic rate - general precession
-  const eclRate = 1 / p.perihelionEclipticYears;
-  const icrfRate = (eclRate - genPrecRate) * 360;  // deg/yr
-  const periICRFDeg = p.longitudePerihelion
-    - icrfRate * C.yearsFromBalancedToJ2000
-    + icrfRate * yearsSinceBalanced;
-
-  const planetPhaseDeg = periICRFDeg - p.inclinationCycleAnchor;
-  const antiPhaseSign = p.antiPhase ? -1 : 1;
-  const planetI = (p.invPlaneInclinationMean
-    + antiPhaseSign * p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
-
-  // Planet Ω advances at the asc-node period (-8H/N from the model's integer
-  // assignment), NOT at the ecliptic perihelion period — they are different angles.
-  const planetAscNodePeriod = p.ascendingNodeCyclesIn8H
-    ? -(8 * C.H) / p.ascendingNodeCyclesIn8H
-    : p.perihelionEclipticYears;
-  const planetOmegaRate = 360 / planetAscNodePeriod;
-  const planetOmegaDeg = p.ascendingNodeInvPlane
-    - planetOmegaRate * C.yearsFromBalancedToJ2000
-    + planetOmegaRate * yearsSinceBalanced;
-  const planetOmega = planetOmegaDeg * d2r;
-
-  // --- Dot product of normal vectors → angle between orbital planes ---
-  const eNx = Math.sin(earthI) * Math.sin(earthOmega);
-  const eNy = Math.sin(earthI) * Math.cos(earthOmega);
-  const eNz = Math.cos(earthI);
-
-  const pNx = Math.sin(planetI) * Math.sin(planetOmega);
-  const pNy = Math.sin(planetI) * Math.cos(planetOmega);
-  const pNz = Math.cos(planetI);
-
-  const cosAngle = eNx * pNx + eNy * pNy + eNz * pNz;
-  return Math.acos(Math.max(-1, Math.min(1, cosAngle))) * (180 / Math.PI);
+  // 8.3-1 S-P4: one Ω anchor — the canonical form now lives in
+  // orbital-engine (computeEclipticInclinationFromBalanced); this body was
+  // moved there VERBATIM and this mirror delegates with its exact argument.
+  return OE.computeEclipticInclinationFromBalanced(key, yearsSinceBalanced);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

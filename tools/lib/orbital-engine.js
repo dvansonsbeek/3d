@@ -670,6 +670,14 @@ function computePlanetInvPlaneInclinationDynamic(planetName, currentYear, julian
  * @returns {number} ecliptic inclination in degrees
  */
 function computeEclipticInclination(planetName, currentYear) {
+  // 8.3-1 S-P4 RESOLUTION: this is NOT a duplicate of the scene form — it is
+  // the NODE-INTEGRATOR / dashboard convention (mirror of src/script.js
+  // getEclipticInclinationAtYear, which calculateDynamicAscendingNodeFromTilts
+  // consumes for its segment midpoints). The scene tilt is the OTHER quantity
+  // (computeEclipticInclinationFromBalanced below — balanced-year anchor,
+  // −8H/N node rate). Two conventions for two purposes, DELIBERATELY — the
+  // dual-β pattern. A first unification attempt was measured to move the
+  // positions ~5e-8 rad through the node integrator and reverted.
   const DEG = Math.PI / 180;
 
   // Planet inclination and ascending node on invariable plane
@@ -683,6 +691,67 @@ function computeEclipticInclination(planetName, currentYear) {
 
   const cosIncl = Math.cos(i_p) * Math.cos(i_e) + Math.sin(i_p) * Math.sin(i_e) * Math.cos(omega_p - omega_e);
   return Math.acos(Math.max(-1, Math.min(1, cosIncl))) / DEG;
+}
+
+/** Canonical ecliptic inclination — normal-vector dot product, balanced-year
+ *  anchoring, planet Ω on the −8H/N assignment (NOT the ecliptic perihelion
+ *  period), inclination oscillation on the ICRF perihelion rate. This is the
+ *  form the scene positions run on (scene-graph delegates here); it is the
+ *  mirror of src/script.js updateDynamicInclinations.
+ *  @param {string} key @param {number} yearsSinceBalanced
+ *  @returns {number} degrees */
+function computeEclipticInclinationFromBalanced(key, yearsSinceBalanced) {
+  const d2r = Math.PI / 180;
+  const p = C.planets[key];
+  const genPrecRate = 1 / (C.H / 13);
+
+  // --- Earth's orbital plane ---
+  const earthPrecYears = C.ASTRO_REFERENCE.earthInvPlanePrecessionYears;
+  const earthPhaseRad = (yearsSinceBalanced / earthPrecYears) * 2 * Math.PI;
+  const earthI = (C.earthInvPlaneInclinationMean
+    - C.earthInvPlaneInclinationAmplitude * Math.cos(earthPhaseRad)) * d2r;
+
+  // Earth Ω regresses at -H/5 (ecliptic precession rate), NOT at H/3.
+  const earthAscNodePeriod = -C.H / 5;
+  const earthOmegaRate = 360 / earthAscNodePeriod;
+  const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane
+    - earthOmegaRate * C.yearsFromBalancedToJ2000
+    + earthOmegaRate * yearsSinceBalanced) * d2r;
+
+  // --- Planet's orbital plane ---
+  const eclRate = 1 / p.perihelionEclipticYears;
+  const icrfRate = (eclRate - genPrecRate) * 360;  // deg/yr
+  const periICRFDeg = p.longitudePerihelion
+    - icrfRate * C.yearsFromBalancedToJ2000
+    + icrfRate * yearsSinceBalanced;
+
+  const planetPhaseDeg = periICRFDeg - p.inclinationCycleAnchor;
+  const antiPhaseSign = p.antiPhase ? -1 : 1;
+  const planetI = (p.invPlaneInclinationMean
+    + antiPhaseSign * p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
+
+  // Planet Ω advances at the asc-node period (-8H/N), NOT the ecliptic
+  // perihelion period — they are different angles.
+  const planetAscNodePeriod = p.ascendingNodeCyclesIn8H
+    ? -(8 * C.H) / p.ascendingNodeCyclesIn8H
+    : p.perihelionEclipticYears;
+  const planetOmegaRate = 360 / planetAscNodePeriod;
+  const planetOmegaDeg = p.ascendingNodeInvPlane
+    - planetOmegaRate * C.yearsFromBalancedToJ2000
+    + planetOmegaRate * yearsSinceBalanced;
+  const planetOmega = planetOmegaDeg * d2r;
+
+  // --- Dot product of normal vectors → angle between orbital planes ---
+  const eNx = Math.sin(earthI) * Math.sin(earthOmega);
+  const eNy = Math.sin(earthI) * Math.cos(earthOmega);
+  const eNz = Math.cos(earthI);
+
+  const pNx = Math.sin(planetI) * Math.sin(planetOmega);
+  const pNy = Math.sin(planetI) * Math.cos(planetOmega);
+  const pNz = Math.cos(planetI);
+
+  const cosAngle = eNx * pNx + eNy * pNy + eNz * pNz;
+  return Math.acos(Math.max(-1, Math.min(1, cosAngle))) * (180 / Math.PI);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1465,6 +1534,7 @@ module.exports = {
   computeInclinationEarth,
   computePlanetInvPlaneInclinationDynamic,
   computeEclipticInclination,
+  computeEclipticInclinationFromBalanced,   // 8.3-1 S-P4: the canonical balanced-year form (scene-graph delegates here)
 
   // Precession
   computeAxialPrecessionRealLOD,
