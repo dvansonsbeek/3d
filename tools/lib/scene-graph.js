@@ -1131,8 +1131,14 @@ function moveModel(graph, pos) {
   const dynEcc = { earth: OE.computeEccentricity(currentYear, C.balancedYear, C.perihelionCycleLength, C.eccentricityBase, C.eccentricityAmplitude) };
   for (const [key, p] of Object.entries(C.planets)) {
     if (p.eccentricityPhaseJ2000 !== undefined) {
-      const refYear = 2000 - (p.eccentricityPhaseJ2000 / 360) * C.perihelionCycleLength;
-      dynEcc[key] = OE.computeEccentricity(currentYear, refYear, C.perihelionCycleLength, p.orbitalEccentricityBase, p.orbitalEccentricityAmplitude);
+      // 8.3-1 S-P1: the oscillation rides each planet's OWN wobble period
+      // (the browser's certified form — anchor and period from the same
+      // beat). This mirror used H/16 for every planet: exact at the anchor
+      // by construction, wrong by the wobble/H16 ratio (1.3–6.7×) away from
+      // it — invisible to the modern-window RMS gate, divergent at depth.
+      // Node already computed p.wobblePeriod and simply didn't use it.
+      const refYear = 2000 - (p.eccentricityPhaseJ2000 / 360) * p.wobblePeriod;
+      dynEcc[key] = OE.computeEccentricity(currentYear, refYear, p.wobblePeriod, p.orbitalEccentricityBase, p.orbitalEccentricityAmplitude);
     }
   }
 
