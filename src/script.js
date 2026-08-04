@@ -12,6 +12,7 @@ import { Pane } from 'tweakpane';
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
 import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives } from '@hum/physics';
+import { createPhaseMachinery } from '@hum/physics/phase';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -5275,70 +5276,44 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
 const _CUMUL_INTEGRAL_YEAR_MIN = -500e6;
 const _CUMUL_INTEGRAL_YEAR_MAX = 500e6;
 const _CUMUL_INTEGRAL_STEP     = 10000;
-let   _cumulIntegralTable      = null;
-let   _cumulIntegralJ2000Idx   = -1;
-
-function _ensureCumulIntegralTable() {
-  if (_cumulIntegralTable !== null) return;
-  _withLatticeAlpha(_buildCumulIntegralTable);   // R2: lattice tables pin α
+// Phase 7.1 — the table arithmetic lives in @hum/physics/phase (ONE
+// implementation for every engine; the Node port of this very code delegated
+// first, fixtures bit-identical). This engine keeps its grid CONFIG
+// (injected above) and its OWN meanHAtAge twin as the integrand — the twins
+// dissolve into Layer 0 at Phase 8. R2 is honoured at construction:
+// ensureTable() runs under _withLatticeAlpha, so every invH evaluation sees
+// the constant MOI.
+let _phaseM = null;
+function _phase() {
+  if (_phaseM !== null) return _phaseM;
+  _phaseM = createPhaseMachinery({
+    holisticHAtAgeMa: (t_Ma) => meanHAtAge(t_Ma),
+    tableAnchorYear: startmodelYear,
+    driftRefYear: startmodelyearwithCorrection,
+    hJ2000: HOLISTIC_YEAR_J2000,
+    yearMin: _CUMUL_INTEGRAL_YEAR_MIN,
+    yearMax: _CUMUL_INTEGRAL_YEAR_MAX,
+    stepYears: _CUMUL_INTEGRAL_STEP,
+  });
+  _withLatticeAlpha(() => _phaseM.ensureTable());   // R2: lattice tables pin α
+  return _phaseM;
 }
+function _ensureCumulIntegralTable() { _phase(); }
+// Grid geometry for the days/pos tables below (they share this grid but keep
+// their own integrands until Phase 8 moves them).
+function _cumulIntegralJ2000IdxGet() { return _phase().grid().j2000Idx; }
+function _cumulIntegralLength() { return _phase().grid().length; }
 
-function _buildCumulIntegralTable() {
-  const N = Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP) + 1;
-  const table = new Float64Array(N);
-  const j2000Idx = Math.round((startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
-
-  const invH = (year) => {
-    const t_Ma = (startmodelYear - year) / 1e6;
-    const H = meanHAtAge(t_Ma);
-    return H === null ? null : 1 / H;
-  };
-
-  table[j2000Idx] = 0;
-  let prev = invH(_CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP);
-  for (let i = j2000Idx + 1; i < N; i++) {
-    const year_i = _CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP;
-    const curr = invH(year_i);
-    table[i] = (prev !== null && curr !== null)
-      ? table[i - 1] + 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
-      : NaN;
-    prev = curr;
-  }
-  prev = invH(_CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP);
-  for (let i = j2000Idx - 1; i >= 0; i--) {
-    const year_i = _CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP;
-    const curr = invH(year_i);
-    table[i] = (prev !== null && curr !== null)
-      ? table[i + 1] - 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
-      : NaN;
-    prev = curr;
-  }
-  _cumulIntegralTable    = table;
-  _cumulIntegralJ2000Idx = j2000Idx;
-}
-
-function _cumulIntegralAtYear(year) {
-  _ensureCumulIntegralTable();
-  if (year < _CUMUL_INTEGRAL_YEAR_MIN || year > _CUMUL_INTEGRAL_YEAR_MAX) return null;
-  const idx_f = (year - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP;
-  const idx_lo = Math.floor(idx_f);
-  const idx_hi = Math.min(idx_lo + 1, _cumulIntegralTable.length - 1);
-  const v_lo = _cumulIntegralTable[idx_lo];
-  const v_hi = _cumulIntegralTable[idx_hi];
-  if (Number.isNaN(v_lo) || Number.isNaN(v_hi)) return null;
-  return v_lo + (idx_f - idx_lo) * (v_hi - v_lo);
-}
+// Phase 7.1 — one-line delegates to @hum/physics/phase (arithmetic + the R3
+// comments moved into the package verbatim; R2 pin honoured in _phase()).
+function _cumulIntegralAtYear(year) { return _phase().cumulAtYear(year); }
 
 /** ∫_{yearA}^{yearB} 1/H(t') dt' via cumulative-table lookup. Years are calendar
  *  years (J2000 = 2000.5). Returns null if either endpoint is outside the
  *  precomputed range (±500 Myr symmetric).
  *  The `_N_unused` arg is kept for backward-compat with old callers. */
 function integralInverseHFromYears(yearA, yearB, _N_unused = 1000) {
-  if (yearA === yearB) return 0;
-  const cA = _cumulIntegralAtYear(yearA);
-  const cB = _cumulIntegralAtYear(yearB);
-  if (cA === null || cB === null) return null;
-  return cB - cA;
+  return _phase().integralBetween(yearA, yearB);
 }
 
 // ───── Phase 9.11: Balanced-year navigation helpers ─────
@@ -5348,24 +5323,7 @@ function integralInverseHFromYears(yearA, yearB, _N_unused = 1000) {
 // deep-time. Binary search on the monotonically increasing table, then
 // linear-interpolate between adjacent cells. Returns null if `targetCumul`
 // is outside the table's value range.
-function _yearAtCumulIntegral(targetCumul) {
-  _ensureCumulIntegralTable();
-  const N = _cumulIntegralTable.length;
-  // Skip leading/trailing NaN cells (past tidal-lock asymptote).
-  let lo = 0, hi = N - 1;
-  while (lo < N && Number.isNaN(_cumulIntegralTable[lo])) lo++;
-  while (hi >= 0 && Number.isNaN(_cumulIntegralTable[hi])) hi--;
-  if (lo >= hi) return null;
-  if (targetCumul < _cumulIntegralTable[lo] || targetCumul > _cumulIntegralTable[hi]) return null;
-  // Binary search for largest index where table[i] <= targetCumul.
-  while (lo < hi - 1) {
-    const mid = (lo + hi) >> 1;
-    if (_cumulIntegralTable[mid] <= targetCumul) lo = mid; else hi = mid;
-  }
-  const v_lo = _cumulIntegralTable[lo], v_hi = _cumulIntegralTable[hi];
-  const frac = (v_lo === v_hi) ? 0 : (targetCumul - v_lo) / (v_hi - v_lo);
-  return _CUMUL_INTEGRAL_YEAR_MIN + (lo + frac) * _CUMUL_INTEGRAL_STEP;
-}
+function _yearAtCumulIntegral(targetCumul) { return _phase().yearAtCumul(targetCumul); }
 
 /** Find the calendar year of the k-th H-balanced event relative to
  *  `BALANCED_YEAR_J2000_FIXED` (which is cycle k=0). Negative k = past,
@@ -5462,8 +5420,8 @@ function _ensureCumulDaysTable() {
 
 function _buildCumulDaysTable() {
   _ensureCumulIntegralTable();
-  const N = _cumulIntegralTable.length;
-  const j2000Idx = _cumulIntegralJ2000Idx;
+  const N = _cumulIntegralLength();
+  const j2000Idx = _cumulIntegralJ2000IdxGet();
   _cumulDaysTable = new Float64Array(N);
 
   const daysPerYear = (year) => {
@@ -5545,8 +5503,8 @@ function _posAnchorDy() { _posAnchorLoIdx(); return _posAnchorDy0; }
 function _ensureCumulPosTable() {
   if (_cumulPosTable !== null) return;
   _ensureCumulIntegralTable();                  // grid geometry
-  const N = _cumulIntegralTable.length;
-  const j2000Idx = _cumulIntegralJ2000Idx;
+  const N = _cumulIntegralLength();
+  const j2000Idx = _cumulIntegralJ2000IdxGet();
   _cumulPosTable = new Float64Array(N);
 
   const dpy = _posDpy;
@@ -5681,12 +5639,7 @@ function posFromDateTime(dateStr, timeStr) {
 // bound and hit V8's ~16.7M-entry cap ("Map maximum size exceeded") ~44
 // chunks into L-4. The computation is two cumulative-table lookups — cheaper
 // than the cache ever was.)
-function _getJ2000Drift(yearA) {
-  const integral = integralInverseHFromYears(yearA, startmodelyearwithCorrection);
-  if (integral === null) return 0;
-  const snapshot = (startmodelyearwithCorrection - yearA) / HOLISTIC_YEAR_J2000;
-  return integral - snapshot;
-}
+function _getJ2000Drift(yearA) { return _phase().j2000Drift(yearA); }
 
 /** Total cycles between two years for a cycle of period H/divisor_N (in years).
  *  E.g. Earth perihelion ecliptic cycle = H/16 → divisor_N = 16.
@@ -5700,20 +5653,12 @@ function _getJ2000Drift(yearA) {
  *  through this single function. */
 function cyclesBetweenYears(yearA, yearB, divisor_N) {
   if (DEEP_TIME_MODE_ENABLED) {
-    const integral = integralInverseHFromYears(yearA, yearB);
-    if (integral === null) return null;
-    // R3: identify the anchor from the CALL SHAPE, not by distance. Two shapes
-    // exist — (anchor, movingYear, N), and (J2000, anchor, N) where yearA IS
-    // J2000 itself. The old distance heuristic flipped branch the moment the
-    // moving endpoint crossed the anchor: a 2·drift = 6.80e-5 cycle STEP
-    // discontinuity at yearB == yearA — a ~0.375° scene jump scrubbing across
-    // the balanced year, 0.393/0.402 d of apsis displacement in Step 6a's own
-    // output. The correction now depends only on a FIXED endpoint, so it is
-    // constant across a scan. Both shapes stay snapshot-equivalent at J2000.
-    const anchorIsA = (yearA !== startmodelyearwithCorrection);
-    const correction = anchorIsA ? _getJ2000Drift(yearA) : -_getJ2000Drift(yearB);
-    return divisor_N * (integral - correction);
+    // Integrated form + R3 call-shape anchor rule — delegated to
+    // @hum/physics/phase (the comments moved there verbatim).
+    return _phase().cyclesBetween(yearA, yearB, divisor_N);
   }
+  // Snapshot branch stays engine-local: it reads the LIVE mutated H
+  // (pre-Phase-8 production behavior when deep time is off).
   return divisor_N * (yearB - yearA) / holisticyearLength;
 }
 
@@ -39747,7 +39692,7 @@ async function runBalancedYearStateDiagnostic() {
   console.log(`    ΔH from J2000: live H − H_J2000        = ${(holisticyearLength - HOLISTIC_YEAR_J2000).toExponential(4)}`);
   console.log('');
   console.log('  Live cumulative-integral tables (should be null-then-frozen after 1st touch):');
-  console.log(`    _cumulIntegralTable                    = ${_cumulIntegralTable !== null ? 'BUILT (' + _cumulIntegralTable.length + ' entries)' : 'null'}`);
+  console.log(`    phase table (@hum/physics/phase)       = ${_phaseM !== null ? 'BUILT (' + _cumulIntegralLength() + ' entries)' : 'null'}`);
   console.log(`    _cumulDaysTable                        = ${_cumulDaysTable !== null ? 'BUILT (' + _cumulDaysTable.length + ' entries)' : 'null'}`);
   console.log(`    _J2000_DRIFT_CACHE.size                = ${_J2000_DRIFT_CACHE.size}`);
   console.log('');
