@@ -38,6 +38,25 @@ const YEARS = [
   32682,                                            // deep — the far bracket
 ];
 
+// ── Phase 8.2-0 lunar probe grids ──────────────────────────────────────────
+// JDs: J2000, the model-start solstice, a modern date, the two Babylonian
+// anchors, ±100 kyr (inside the moon-cycle tables) and +275 kyr (beyond
+// _MCT_MAX, so the adaptive-Simpson fallback path is pinned too).
+const MOON_JDS = [
+  1608421.835171,   // -309 Aug 15 (Agathocles)
+  1671853.759762,   // -135 Apr 15 (Babylonian)
+  2451545.0,        // J2000
+  2451716.575,      // June solstice 2000 (model start)
+  2460310.5,        // 2024 Jan 1
+];
+const MOON_DEEP_JDS = [
+  2451545.0 - 100000 * 365.25,   // −100 kyr
+  2451545.0 + 100000 * 365.25,   // +100 kyr
+  2451545.0 + 275000 * 365.25,   // +275 kyr — past the table, Simpson path
+];
+const MOON_TMAS = [-5, -1, -0.3, 0, 0.3, 1, 5];
+const MOON_CHAIN_PAIRS = [[2000, 2100], [2000, -584], [2000, -100000], [2000, 251000], [2000, 300000]];
+
 // Epochs at which to re-read the seven mutable globals. `anchors()` SHOULD
 // depend on the epoch — that is its job, and it is what `recomputeEpochAnchors`
 // exists to do. `f(Y)` is the thing that must not (transparency.test.mjs).
@@ -48,7 +67,7 @@ const EPOCHS_MA = [-5, -1, -0.3, 0, 0.3, 1, 5];
 const write = process.argv.includes('--write');
 const s = await openSimulator();
 
-const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA }) => {
+const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_JDS, MOON_TMAS, MOON_CHAIN_PAIRS }) => {
   const T = window.__test__;
   T.resetEpochToJ2000();
 
@@ -84,6 +103,50 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA }) => {
     T.resetEpochToJ2000();
   }
 
+  // ── Phase 8.2-0: the lunar surface, three mode sections ───────────────────
+  // Section 1 — shipped defaults (framework-native args, deep time ON).
+  for (const jd of [...MOON_JDS, ...MOON_DEEP_JDS]) {
+    for (const [k, n] of Object.entries(T.moonArgsAt(jd))) v[`moonArgs.${k}@${jd}`] = n;
+    v[`moonEclLon@${jd}`] = T.eclMoonLon(jd);
+    v[`moonEclBeta@${jd}`] = T.eclMoonBeta(jd);
+    v[`moonEclDist@${jd}`] = T.eclMoonDistance(jd);
+    v[`moonEFactor@${jd}`] = T.fwEFactor(jd);
+  }
+  for (const t of MOON_TMAS) {
+    for (const [k, n] of Object.entries(T.moonAtAge(t))) v[`moonAtAge.${k}@${t}Ma`] = n;
+  }
+  for (const [a2, b2] of MOON_CHAIN_PAIRS) {
+    for (const [k, n] of Object.entries(T.moonChainCycles(a2, b2))) v[`moonChain.${k}@${a2}..${b2}`] = n;
+  }
+  for (const tYr of [-102000, -27000, -2584, 0, 100, 30000, 102000]) {
+    v[`moonFwEcc@${tYr}`] = T.fwEarthEcc(tYr);
+  }
+  for (const Tc of [-30, 0, 30, 500]) {
+    v[`moonChanInt.sW@${Tc}`] = T.fwChannelIntegral(Tc, 2.407);
+    v[`moonChanInt.sN@${Tc}`] = T.fwChannelIntegral(Tc, 1.018);
+  }
+  // The production Moon (doc 66): scene series + RA/Dec override, end to end.
+  for (const jd of [2451545.0, 1671853.759762, 2460310.5, MOON_DEEP_JDS[1]]) {
+    for (const [k, n] of Object.entries(T.moonSceneState(jd))) v[`moonScene.${k}@${jd}`] = n;
+  }
+
+  // Section 2 — pure-Meeus A/B reference args (the doc 66 §1 comparison side).
+  T.setMoonArgsFrameworkNative(false);
+  for (const jd of [...MOON_JDS, MOON_DEEP_JDS[1]]) {
+    for (const [k, n] of Object.entries(T.moonArgsAt(jd))) v[`moonArgsMeeus.${k}@${jd}`] = n;
+    v[`moonEclLonMeeus@${jd}`] = T.eclMoonLon(jd);
+    v[`moonEclBetaMeeus@${jd}`] = T.eclMoonBeta(jd);
+    v[`moonEFactorMeeus@${jd}`] = T.fwEFactor(jd);
+  }
+  T.setMoonArgsFrameworkNative(true);
+
+  // Section 3 — snapshot mode (deep time OFF): the polynomial-skeleton branch.
+  T.setDeepTimeMode(false);
+  for (const jd of MOON_JDS) {
+    for (const [k, n] of Object.entries(T.moonArgsAt(jd))) v[`moonArgsSnap.${k}@${jd}`] = n;
+  }
+  T.setDeepTimeMode(true);
+
   // The reset must be exact, or every anchor above is measured against a
   // drifting baseline. Recorded rather than asserted so the fixture shows it.
   const back = T.anchors();
@@ -91,7 +154,7 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA }) => {
     if (!Object.is(n, a[k])) v[`roundTripDrift.${k}`] = n - a[k];
   }
   return v;
-}, { YEARS, EPOCHS_MA });
+}, { YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_JDS, MOON_TMAS, MOON_CHAIN_PAIRS });
 
 const pageErrors = s.errors.length;
 await s.dispose();

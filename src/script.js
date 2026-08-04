@@ -6600,6 +6600,59 @@ if (typeof window !== 'undefined') {
       meansiderealyearlengthinSeconds, meansiderealyearlengthinDays,
       meansolaryearlengthinDays, meansiderealyearlengthinDays_kinematic,
     }),
+
+    // ── Phase 8.2-0 lunar surface ────────────────────────────────────────────
+    // Pins CURRENT behaviour before the moon extraction — including the
+    // documented dual-β (scene series vs truncated _eclMoon* helpers, doc 66
+    // §Layer 1b) and both argument modes. Test surface, not an API.
+    moonArgsAt: (jd) => _moonArgsAt(jd),
+    eclMoonLon: (jd) => _eclMoonLon(jd),
+    eclMoonBeta: (jd) => _eclMoonBeta(jd),
+    eclMoonDistance: (jd) => _eclMoonDistance(jd),
+    fwEarthEcc: (tYr) => _fwEarthEcc(tYr),
+    fwChannelIntegral: (T, s) => _fwChannelIntegral(T, s),
+    fwEFactor: (jdTT) => {
+      const T = (jdTT - j2000JD) / julianCenturyDays;
+      return _fwEFactor(jdTT, T, T * T);
+    },
+    moonAtAge: (tMa) => ({
+      distKm: meanMoonDistanceCorrectedAtAge(tMa),
+      sidereal: meanMoonSiderealMonthAtAge(tMa),
+      synodic: meanSynodicMonthAtAge(tMa),
+      tropical: meanTropicalMonthAtAge(tMa),
+      anomalistic: meanAnomalisticMonthAtAge(tMa),
+      nodalMonth: meanNodalMonthAtAge(tMa),
+      perigeePrecession: meanLunarPerigeePrecessionAtAge(tMa),
+      nodePrecession: meanLunarNodePrecessionAtAge(tMa),
+      apsidalMeetsNodal: meanApsidalMeetsNodalAtAge(tMa),
+      lunarLeveling: meanLunarLevelingCycleAtAge(tMa),
+    }),
+    moonChainCycles: (yearA, yearB) => ({
+      orbits: meanMoonOrbitsBetweenYears(yearA, yearB),
+      apsidal: meanMoonApsidalCyclesBetween(yearA, yearB),
+      nodal: meanMoonNodalCyclesBetween(yearA, yearB),
+      apsidalOfDate: meanMoonApsidalOfDateCyclesBetween(yearA, yearB),
+      nodalOfDate: meanMoonNodalOfDateCyclesBetween(yearA, yearB),
+      draconic: meanMoonDraconicOrbitsBetween(yearA, yearB),
+    }),
+    // The production Moon (doc 66): scene series + RA/Dec override, read from
+    // the moon object after a full scene update at the target JD.
+    moonSceneState: (jd) => {
+      const savedJD = o.julianDay;
+      jumpToJulianDay(jd);
+      forceSceneUpdate('light');
+      const r = {
+        lonDeg: moon._meeusLonDeg, latRad: moon._meeusLatRad,
+        distKm: moon._meeusDistKm, ra: moon.ra, dec: moon.dec,
+      };
+      jumpToJulianDay(savedJD);
+      forceSceneUpdate('light');
+      return r;
+    },
+    // Mode toggles — mutable `let`s, flipped per probe section and restored.
+    setMoonArgsFrameworkNative: (on) => { MOON_ARGS_FRAMEWORK_NATIVE = !!on; },
+    getMoonArgsFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
+    setDeepTimeMode: (on) => { DEEP_TIME_MODE_ENABLED = !!on; },
   };
 }
 

@@ -13,6 +13,7 @@
  * enough to re-record deliberately.
  */
 import { createRequire } from 'node:module';
+import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -72,6 +73,73 @@ function measure() {
       v[`cardinal.ra.${t}@${y}`] = OE.computeSolsticeRA(y, t);
     }
   }
+
+  // ─── Moon — the Phase 8.2 extraction safety net ───────────────────────────
+  // Pins CURRENT Node behaviour, divergences from the browser INCLUDED (the
+  // known S1/S2/S3 shape differences — see the 8.2 survey). These values
+  // move only with a deliberate, measured alignment commit.
+  //
+  // End-to-end through the scene graph (moveModel + series + RA/Dec override):
+  const SG = require(join(ROOT, 'tools/lib/scene-graph.js'));
+  const MOON_JDS = [
+    1608421.835171,               // -309 Aug 15 (Agathocles)
+    1671853.759762,               // -135 Apr 15 (Babylonian)
+    2451545.0,                    // J2000
+    2451716.575,                  // June solstice 2000 (model start)
+    2460310.5,                    // 2024 Jan 1
+    2451545.0 - 100000 * 365.25,  // −100 kyr (inside the moon-cycle tables)
+    2451545.0 + 100000 * 365.25,  // +100 kyr
+    2451545.0 + 275000 * 365.25,  // +275 kyr — past _MCT_MAX, Simpson path
+  ];
+  for (const jd of MOON_JDS) {
+    const p = SG.computePlanetPosition('moon', jd);
+    v[`moonPos.ra@${jd}`] = p.ra;
+    v[`moonPos.dec@${jd}`] = p.dec;
+    v[`moonPos.distAU@${jd}`] = p.distAU;
+    v[`moonPos.meeusDistKm@${jd}`] = p.meeusDistKm;
+  }
+
+  // The deep-time month/precession chain. meanApsidalMeetsNodalAtAge and
+  // meanLunarLevelingCycleAtAge deliberately absent: browser-only (S6).
+  const MOON_TMAS = [-5, -1, -0.3, 0, 0.3, 1, 5];
+  const MOON_ATAGE = [
+    'meanMoonDistanceCorrectedAtAge', 'meanMoonSiderealMonthAtAge',
+    'meanSynodicMonthAtAge', 'meanTropicalMonthAtAge',
+    'meanAnomalisticMonthAtAge', 'meanNodalMonthAtAge',
+    'meanLunarPerigeePrecessionAtAge', 'meanLunarNodePrecessionAtAge',
+  ];
+  for (const t of MOON_TMAS) {
+    for (const fn of MOON_ATAGE) v[`moonAtAge.${fn}@${t}Ma`] = DT[fn](t);
+  }
+
+  // The e_E channel — the KNOWN S1 divergence point (tools: linear snapshot
+  // phase; browser: integrated H/3). Pinned so the alignment commit shows
+  // exactly these values moving, and nothing else.
+  for (const tYr of [-102000, -27000, -2584, 0, 100, 30000, 102000]) {
+    v[`moonFwEcc@${tYr}`] = DT._fwEarthEcc(tYr);
+  }
+
+  // Mode sections — the toggles are process-env consts in the Node engine, so
+  // each alternate mode records in a child process.
+  const childProbe = (env, jds, prefix) => {
+    const script = `
+      const SG = require(${JSON.stringify(join(ROOT, 'tools/lib/scene-graph.js'))});
+      const out = {};
+      for (const jd of ${JSON.stringify(jds)}) {
+        const p = SG.computePlanetPosition('moon', jd);
+        out['${prefix}.ra@' + jd] = p.ra;
+        out['${prefix}.dec@' + jd] = p.dec;
+        out['${prefix}.meeusDistKm@' + jd] = p.meeusDistKm;
+      }
+      process.stdout.write(JSON.stringify(out));
+    `;
+    return JSON.parse(execFileSync(process.execPath, ['-e', script], {
+      env: { ...process.env, ...env },
+    }).toString());
+  };
+  const IN_WINDOW_JDS = [1671853.759762, 2451545.0, 2460310.5];
+  Object.assign(v, childProbe({ MOON_ARGS_PURE_MEEUS: '1' }, IN_WINDOW_JDS, 'moonPosMeeus'));
+  Object.assign(v, childProbe({ SG_DEEP_TIME: '0' }, IN_WINDOW_JDS, 'moonPosSnap'));
 
   return v;
 }
