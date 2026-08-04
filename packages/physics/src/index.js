@@ -78,6 +78,11 @@ export { FITTED_COEFFICIENTS, COEFFICIENTS_HASH } from './constants/index.js';
 export { createEpochPrimitives } from './layer0/index.js';
 export { deriveEpochParams } from './layer0/derive-params.js';
 export { createDerivedViews } from './layer1/index.js';
+// Phase 7 — the shared integrated-phase and cardinal-point machinery (CJS on
+// purpose: tools/lib requires the same files via the exports-map subpaths;
+// re-exported here so bundled ESM consumers need only the package root).
+export { createPhaseMachinery } from './phase/index.cjs';
+export { createCardinalModel } from './cardinal/index.cjs';
 
 /**
  * Build a model bound to a set of constants.

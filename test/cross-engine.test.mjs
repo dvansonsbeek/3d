@@ -13,11 +13,11 @@
  * Expectations, calibrated from measurement:
  *   - solstice JDs: BIT-EXACT (Object.is) — the two engines share the §10
  *     evaluation form and the integrated-phase convention; measured 0.000 ms.
- *   - year lengths: ≤ 6e-8 days (measured worst today: 5.58e-8 ≈ 4.8 ms) —
- *     the engines' real-LOD drift chains are hand-mirrored twins, not shared
- *     code. PHASE 7 SUCCESS CRITERION: once both engines delegate to
- *     physics/cardinal, TIGHTEN THIS TO BIT-EXACT — the gap IS the mirror.
- *   - RA: same tolerance policy as year lengths until measured tighter.
+ *   - year lengths: BIT-EXACT since Phase 7.2 — the pre-extraction ≤5.6e-8 d
+ *     gap turned out to be OPERATION-ORDER divergence between the two
+ *     hand-mirrors (per-div phaseAdvance vs 2π·div·c), not the twins; the
+ *     shared @hum/physics/cardinal implementation dissolved it.
+ *   - RA: bit-exact since the integrated-phase migration (same reason).
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -31,7 +31,7 @@ const OE = require(join(ROOT, 'tools/lib/orbital-engine.js'));
 const fixture = JSON.parse(readFileSync(
   join(ROOT, 'packages/fixtures/regression/script-js.json'), 'utf8')).values;
 
-const YL_TOL_DAYS = 6e-8;   // tighten to 0 (bit-exact) after Phase 7 lands
+const YL_TOL_DAYS = 0;      // bit-exact — achieved at Phase 7.2 (shared code)
 let exact = 0, withinTol = 0, failures = 0;
 
 for (const [key, browserVal] of Object.entries(fixture)) {
