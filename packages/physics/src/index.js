@@ -90,6 +90,7 @@ export { createMoonEccChannel } from './moon/ecc-channel.cjs';
 export { createMoonMonthChain } from './moon/month-chain.cjs';
 export { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 export { createMoonArguments } from './moon/arguments.cjs';
+export { createMoonSeries } from './moon/series.cjs';
 
 /**
  * Build a model bound to a set of constants.

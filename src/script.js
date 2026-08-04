@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -4027,71 +4027,53 @@ function _eclMoonBeta(jd)     { return _meeusMoonBeta(jd); }
 
 // ─── Meeus Ch. 47 implementations (canonical; ~60 terms each) ──────────────
 
-/** Moon's geocentric ecliptic longitude in degrees (0–360). Meeus Ch. 47 full
- *  series (60 longitude terms from MOON_L). Geocentric accuracy ~0.04° RMS
- *  near J2000, ~0.07° at year -135. Accepts JD_UT; converts internally to
- *  JD_TT via _eclDeltaT. */
-function _meeusMoonLon(jd) {
-  const _d2r = Math.PI / 180;
-  const jd_tt = jd + _eclDeltaT(jd) / 86400;
-  const T = (jd_tt - j2000JD) / julianCenturyDays;
-  const T2 = T * T;
-  const A = _moonArgsAt(jd_tt);
-  const Lp_mean = A.Lp;
-  const Dr = A.D * _d2r, Mr = A.M * _d2r, Mpr = A.Mp * _d2r, Fr = A.F * _d2r;
-  const E = _fwEFactor(jd_tt, T, T2);
-  const E2 = E * E;
-  let Sl = 0;
-  for (let i = 0; i < MOON_L.length; i++) {
-    const r = MOON_L[i];
-    const arg = r[0] * Dr + r[1] * Mr + r[2] * Mpr + r[3] * Fr;
-    let term = r[4] * Math.sin(arg);
-    const absM = r[1] < 0 ? -r[1] : r[1];
-    if (absM === 1) term *= E;
-    else if (absM === 2) term *= E2;
-    Sl += term;
-  }
-  const A1 = (119.75 +    131.849 * T) * _d2r;
-  const A2 = ( 53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290) * T) * _d2r;
-  Sl += 3958 * Math.sin(A1) + 1962 * Math.sin(Lp_mean * _d2r - Fr) + 318 * Math.sin(A2);
-  return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
-}
+// Phase 8.2-6: the Meeus Ch. 47 series lives ONCE in
+// @hum/physics/moon/series — BOTH forms: the full production scene
+// evaluation and the truncated eclipse-finder variant (doc 66 §Layer 1b,
+// the certified dual-β, deliberately preserved as two entries).
+const _moonSeries = (() => {
+  let m = null;
+  return () => {
+    if (!m) {
+      m = createMoonSeries({
+        constants: {
+          moonL: MOON_L, moonB: MOON_B,
+          j2000JD, julianCenturyDays,
+          moonMeeusLpCorrectionDeg: moonMeeusLpCorrection,
+          fwA2RateDegPerCy: FW_A2_RATE, fwA3RateDegPerCy: FW_A3_RATE,
+        },
+        fns: {
+          argsAt: _moonArgsAt,
+          eFactorForD: (d, T, T2) => _fwEFactor(j2000JD + d, T, T2),
+          eFactorAtJdTT: (jdTT, T, T2) => _fwEFactor(jdTT, T, T2),
+          getMoonDistanceKm: () => moonDistance,
+          getEccentricityBase: () => moonOrbitalEccentricityBase,
+          deltaTSeconds: (jd) => _eclDeltaT(jd),
+          jdToSIyear: (jd) => _jdToSIyear(jd),
+          tropicalOrbitsBetween: meanMoonOrbitsBetweenYears,
+          apsidalOfDateCyclesBetween: meanMoonApsidalOfDateCyclesBetween,
+          cyclesBetween: cyclesBetweenYears,
+          jupiterOrbitsBetween: (a, b) => meanJupiterOrbitalCyclesBetween(a, b),
+          isDeepTime: () => DEEP_TIME_MODE_ENABLED,
+          isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
+        },
+      });
+    }
+    return m;
+  };
+})();
 
-/** Moon's instantaneous geocentric distance in km. First-order harmonic
- *  approximation: D ≈ a × (1 − e × cos M'), accurate to ~0.1% (well within
- *  the ~1% range that affects lunar-eclipse type classification at the umbra
- *  boundary). Uses model-level moonDistance (mean, mutable for deep-time) and
- *  moonOrbitalEccentricityBase plus the Meeus mean lunar anomaly M' at JD.
- *  Refinement (future): full Meeus Ch. 47 distance series for ~10-km accuracy. */
-function _meeusMoonDistance(jd) {
-  const _d2r = Math.PI / 180;
-  const jd_tt = jd + _eclDeltaT(jd) / 86400;
-  const Mpr = _moonArgsAt(jd_tt).Mp * _d2r;
-  return moonDistance * (1 - moonOrbitalEccentricityBase * Math.cos(Mpr));
-}
+/** Moon's geocentric ecliptic longitude in degrees (0–360). TRUNCATED
+ *  eclipse-finder form (doc 66 §Layer 1b). Accepts JD_UT. */
+function _meeusMoonLon(jd) { return _moonSeries().truncatedLonDeg(jd); }
 
-/** Moon's geocentric ecliptic latitude in degrees. Meeus Ch. 47 (MOON_B). */
-function _meeusMoonBeta(jd) {
-  const _d2r = Math.PI / 180;
-  const jd_tt = jd + _eclDeltaT(jd) / 86400;
-  const T = (jd_tt - j2000JD) / julianCenturyDays;
-  const T2 = T * T;
-  const A = _moonArgsAt(jd_tt);
-  const Dr = A.D * _d2r, Mr = A.M * _d2r, Mpr = A.Mp * _d2r, Fr = A.F * _d2r;
-  const E = _fwEFactor(jd_tt, T, T2);
-  const E2 = E * E;
-  let Sb = 0;
-  for (let i = 0; i < MOON_B.length; i++) {
-    const r = MOON_B[i];
-    const arg = r[0] * Dr + r[1] * Mr + r[2] * Mpr + r[3] * Fr;
-    let term = r[4] * Math.sin(arg);
-    const absM = r[1] < 0 ? -r[1] : r[1];
-    if (absM === 1) term *= E;
-    else if (absM === 2) term *= E2;
-    Sb += term;
-  }
-  return Sb * 1e-6;
-}
+/** Moon's instantaneous geocentric distance in km (two-term ellipse). */
+function _meeusMoonDistance(jd) { return _moonSeries().truncatedDistanceKm(jd); }
+
+/** Moon's geocentric ecliptic latitude in degrees. TRUNCATED form — the six
+ *  additional corrections are deliberately absent (certified eclipse
+ *  statistics; see doc 66 §Layer 1b and the knife-edge canon boundaries). */
+function _meeusMoonBeta(jd) { return _moonSeries().truncatedBetaDeg(jd); }
 
 // ═════════════════════════════════════════════════════════════════════════════
 // LUNAR ECLIPSE PREDICTIVE FINDER
@@ -54532,101 +54514,17 @@ function moveModel(pos) {
           d += deltaT_sec_d / 86400;   // JD_UT → JD_TT
         }
       }
-      const _d2r = Math.PI / 180;
-      const T = d / julianCenturyDays;
-      const T2 = T * T;
-
-      // Fundamental arguments via the shared dispatcher (_moonArgsAt):
-      // framework-native skeleton by default, pure Meeus when
-      // MOON_ARGS_FRAMEWORK_NATIVE is OFF. The scene Moon and the eclipse
-      // machinery share ONE argument source (this block previously carried
-      // its own duplicate pure-Meeus polynomial copy, which extrapolated
-      // meaninglessly at deep time — args wrapped 50-140× at ±220 kyr).
-      const _args = _moonArgsAt(j2000JD + d);
-      const Lp  = _args.Lp * _d2r;
-      const Dr  = _args.D  * _d2r;
-      const Mr  = _args.M  * _d2r;
-      const Mpr = _args.Mp * _d2r;
-      const Fr  = _args.F  * _d2r;
-
-      // E correction for Sun's eccentricity — bounded framework form
-      const E = _fwEFactor(j2000JD + d, T, T2);
-      const E2 = E * E;
-
-      // Additional arguments. A1 rate is Meeus-observed (no lattice identity).
-      // A2/A3 rates are D2-derived; in deep-time mode they are CHAIN-INTEGRATED
-      // through their identified physical content so they evolve with the
-      // framework (tidal months, H(t) precession, Jupiter's Driver-2 year)
-      // instead of riding a frozen J2000 tangent:
-      //   A3 = sidereal Lp:      A3₀ + 360·(N_trop − N_p13)
-      //   A2 = Lp + ϖ − 2λ_J:    A2₀ + 360·(N_trop + N_apsOfDate − 2·N_J)
-      // All cycle counts are 0 at J2000 → anchors exact by construction.
-      const A1 = (119.75 + 131.849*T) * _d2r;
-      let _a2Deg = 53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T;
-      let _a3Deg = 313.45 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A3_RATE : 481266.484)*T;
-      if (DEEP_TIME_MODE_ENABLED && MOON_ARGS_FRAMEWORK_NATIVE) {
-        const _yA0 = _jdToSIyear(j2000JD);
-        const _yA  = _jdToSIyear(j2000JD + d);
-        const _Nt   = meanMoonOrbitsBetweenYears(_yA0, _yA);
-        const _Naps = meanMoonApsidalOfDateCyclesBetween(_yA0, _yA);
-        const _Np13 = cyclesBetweenYears(_yA0, _yA, 13);
-        const _Nj   = meanJupiterOrbitalCyclesBetween(_yA0, _yA);
-        if (_Nt !== null && _Naps !== null && _Np13 !== null && _Nj !== null) {
-          _a3Deg = 313.45 + 360 * (_Nt - _Np13);
-          _a2Deg = 53.09 + 360 * (_Nt + _Naps - 2 * _Nj);
-        }
-      }
-      const A2 = _a2Deg * _d2r;
-      const A3 = _a3Deg * _d2r;
-
-      // ── Sigma_l: longitude series (Table 47.A, 60 terms) ──
-      let Sl = 0;
-      for (let i = 0; i < MOON_L.length; i++) {
-        const r = MOON_L[i];
-        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
-        let term = r[4] * Math.sin(arg);
-        const absM = r[1] < 0 ? -r[1] : r[1];
-        if (absM === 1) term *= E;
-        else if (absM === 2) term *= E2;
-        Sl += term;
-      }
-      // Additional longitude corrections
-      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp - Fr) + 318*Math.sin(A2);
-
-      // Subtract EoC portion already provided by the off-center orbit geometry.
-      // Meeus main term: 6288774*sin(M') ≈ 6.289°; geometry provides half (e/2).
-      const eocHalf = moonOrbitalEccentricityBase / 2;
-      Sl -= (2 * eocHalf / _d2r * 1e6) * Math.sin(Mpr);
-      Sl -= (1.25 * eocHalf * eocHalf / _d2r * 1e6) * Math.sin(2*Mpr);
-
-      θ += Sl * 1e-6 * _d2r;
-
-      // ── Sigma_b: latitude series (Table 47.B, 60 terms) ──
-      let Sb = 0;
-      for (let i = 0; i < MOON_B.length; i++) {
-        const r = MOON_B[i];
-        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
-        let term = r[4] * Math.sin(arg);
-        const absM = r[1] < 0 ? -r[1] : r[1];
-        if (absM === 1) term *= E;
-        else if (absM === 2) term *= E2;
-        Sb += term;
-      }
-      // Additional latitude corrections
-      Sb += -2235*Math.sin(Lp) + 382*Math.sin(A3);
-      Sb += 175*Math.sin(A1 - Fr) + 175*Math.sin(A1 + Fr);
-      Sb += 127*Math.sin(Lp - Mpr) - 115*Math.sin(Lp + Mpr);
-
-      obj._meeusLatRad = Sb * 1e-6 * _d2r;
-
-      // Store full Meeus ecliptic longitude for post-hoc RA+Dec override in updatePositions.
-      // Re-add the EoC half that was subtracted from Sl for the hierarchy θ correction.
-      const fullSl = Sl + (2 * eocHalf / _d2r * 1e6) * Math.sin(Mpr)
-                       + (1.25 * eocHalf * eocHalf / _d2r * 1e6) * Math.sin(2*Mpr);
-      obj._meeusLonDeg = Lp / _d2r + fullSl * 1e-6 + moonMeeusLpCorrection;  // ecliptic longitude in degrees
-      obj._meeusT = T;  // store T for obliquity computation
-      // Meeus Ch. 47 first-order distance (matches _meeusMoonDistance / eclipse dispatchers)
-      obj._meeusDistKm = moonDistance * (1 - moonOrbitalEccentricityBase * Math.cos(Mpr));
+      // Phase 8.2-6: the full production evaluation lives in
+      // @hum/physics/moon/series (args dispatch, E-factor, A1/A2/A3 with
+      // the deep-time chain integration, both 60-term tables, all
+      // corrections, the EoC-half split, the two-term distance). The
+      // engine keeps the UT→TT conversion above and the scene writes.
+      const _sr = _moonSeries().sceneEvalAt(d);
+      θ += _sr.thetaAddRad;
+      obj._meeusLatRad = _sr.latRad;
+      obj._meeusLonDeg = _sr.lonDeg;   // ecliptic longitude in degrees (incl. moonMeeusLpCorrection)
+      obj._meeusT = _sr.T;             // store T for obliquity computation
+      obj._meeusDistKm = _sr.distKm;   // matches _meeusMoonDistance / eclipse dispatchers
     }
 
     // Dynamic geocentric elipticOrbit for Type II + III planets

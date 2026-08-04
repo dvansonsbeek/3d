@@ -333,6 +333,40 @@ function _moonArgsAtTools(jd_tt) {
   return _moonArgsM().argsAt(jd_tt);   // framework-native / pure-Meeus dispatch (env toggle injected)
 }
 
+// Phase 8.2-6: the Meeus Ch. 47 series lives ONCE in @hum/physics/moon/series.
+const { createMoonSeries } = require('@hum/physics/moon/series');
+let _moonSeriesMTools = null;
+function _moonSeriesM() {
+  if (_moonSeriesMTools === null) {
+    const DTmod = require('./deep-time');
+    _moonSeriesMTools = createMoonSeries({
+      constants: {
+        moonL: MEEUS_LUNAR.longitudeTerms.terms,
+        moonB: MEEUS_LUNAR.latitudeTerms.terms,
+        j2000JD: C.j2000JD, julianCenturyDays: C.julianCenturyDays,
+        moonMeeusLpCorrectionDeg: C.moonMeeusLpCorrection,
+        fwA2RateDegPerCy: _FW_A2_RATE, fwA3RateDegPerCy: _FW_A3_RATE,
+      },
+      fns: {
+        argsAt: _moonArgsAtTools,
+        eFactorForD: _fwEFactorTools,
+        eFactorAtJdTT: (jdTT, T, T2) => _fwEFactorTools(jdTT - C.j2000JD, T, T2),
+        getMoonDistanceKm: () => C.moonDistance,
+        getEccentricityBase: () => C.moonOrbitalEccentricity,
+        deltaTSeconds: (jd) => (_jdTTToolsFromUT(jd) - jd) * 86400,
+        jdToSIyear: _jdToSIyearTools,
+        tropicalOrbitsBetween: _mcTropical,
+        apsidalOfDateCyclesBetween: _mcApsidalOfDate,
+        cyclesBetween: DTmod.cyclesBetweenYears,
+        jupiterOrbitsBetween: _mcJupiter,
+        isDeepTime: () => DEEP_TIME_ENABLED,
+        isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
+      },
+    });
+  }
+  return _moonSeriesMTools;
+}
+
 /** Bounded Meeus E-factor mirror: e_E(t)/e_E(J2000) from the fully-derived
  *  framework H/3 fluctuation line (kills the polynomial blow-up at deep time). */
 function _fwEFactorTools(d_days, T, T2) {
@@ -1199,93 +1233,17 @@ function moveModel(graph, pos) {
       // browser had it), which was the whole browser-vs-tools deep-time delta
       // (~4 yr of ΔT at +200 kyr → args differing by ~150° in ϖ).
       const d = _jdTTToolsFromUT(_jdFromPosTools(pos)) - C.j2000JD;
-      const T = d / C.julianCenturyDays;
-      const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
-
-      // Fundamental arguments via the shared dispatcher mirror (one argument
-      // source with production; pure-Meeus A/B via MOON_ARGS_PURE_MEEUS=1)
-      const _args = _moonArgsAtTools(C.j2000JD + d);
-      const Lp = _args.Lp * d2r;
-      const Dr = _args.D * d2r;
-      const Mr = _args.M * d2r;
-      const Mpr = _args.Mp * d2r;
-      const Fr = _args.F * d2r;
-
-      // Bounded E-factor (framework e_E ratio; pure-Meeus polynomial in A/B mode)
-      const E = _fwEFactorTools(d, T, T2);
-      const E2 = E * E;
-      const AA = MEEUS_LUNAR.additionalArguments;
-      // D2 derived rates (mirrors src/script.js FW_A2_RATE/FW_A3_RATE):
-      // A3 = sidereal Lp rate (0.003 ppm); A2 = 2·Lp − M′ − 2·L_J (0.19 ppm);
-      // A1 stays Meeus-observed (no credible lattice identity). In deep-time
-      // mode A2/A3 are CHAIN-INTEGRATED through their identified content
-      // (mirrors src/script.js): A3 = A3₀ + 360·(N_trop − N_p13),
-      // A2 = A2₀ + 360·(N_trop + N_apsOfDate − 2·N_J); counts 0 at J2000.
-      const A1 = (AA.A1[0] + AA.A1[1]*T) * d2r;
-      let _a2Deg = AA.A2[0] + (MOON_ARGS_FRAMEWORK_NATIVE ? _FW_A2_RATE : AA.A2[1])*T;
-      let _a3Deg = AA.A3[0] + (MOON_ARGS_FRAMEWORK_NATIVE ? _FW_A3_RATE : AA.A3[1])*T;
-      if (DEEP_TIME_ENABLED && MOON_ARGS_FRAMEWORK_NATIVE) {
-        const _yA0 = _jdToSIyearTools(C.j2000JD);
-        const _yA  = _jdToSIyearTools(C.j2000JD + d);
-        const _Nt   = _mcTropical(_yA0, _yA);
-        const _Naps = _mcApsidalOfDate(_yA0, _yA);
-        const _Np13 = DT.cyclesBetweenYears(_yA0, _yA, 13);
-        const _Nj   = _mcJupiter(_yA0, _yA);
-        if (_Nt !== null && _Naps !== null && _Np13 !== null && _Nj !== null) {
-          _a3Deg = AA.A3[0] + 360 * (_Nt - _Np13);
-          _a2Deg = AA.A2[0] + 360 * (_Nt + _Naps - 2 * _Nj);
-        }
-      }
-      const A2 = _a2Deg * d2r;
-      const A3 = _a3Deg * d2r;
-
-      // Table 47.A longitude terms from centralized tables
-      const ML = MEEUS_LUNAR.longitudeTerms.terms;
-      let Sl = 0;
-      for (let i = 0; i < ML.length; i++) {
-        const r = ML[i];
-        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
-        let term = r[4] * Math.sin(arg);
-        const absM = r[1] < 0 ? -r[1] : r[1];
-        if (absM === 1) term *= E;
-        else if (absM === 2) term *= E2;
-        Sl += term;
-      }
-      const LC = MEEUS_LUNAR.longitudeCorrections;
-      Sl += LC.A1*Math.sin(A1) + LC.LpMinusF*Math.sin(Lp - Fr) + LC.A2*Math.sin(A2);
-      const eocHalf = C.moonOrbitalEccentricity / 2;
-      Sl -= (2 * eocHalf / d2r * 1e6) * Math.sin(Mpr);
-      Sl -= (1.25 * eocHalf * eocHalf / d2r * 1e6) * Math.sin(2*Mpr);
-      θ += Sl * 1e-6 * d2r;
-
-      // Table 47.B latitude terms from centralized tables
-      const MB = MEEUS_LUNAR.latitudeTerms.terms;
-      let Sb = 0;
-      for (let i = 0; i < MB.length; i++) {
-        const r = MB[i];
-        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
-        let term = r[4] * Math.sin(arg);
-        const absM = r[1] < 0 ? -r[1] : r[1];
-        if (absM === 1) term *= E;
-        else if (absM === 2) term *= E2;
-        Sb += term;
-      }
-      const BC = MEEUS_LUNAR.latitudeCorrections;
-      Sb += BC.Lp*Math.sin(Lp) + BC.A3*Math.sin(A3);
-      Sb += BC.A1minusF*Math.sin(A1 - Fr) + BC.A1plusF*Math.sin(A1 + Fr);
-      Sb += BC.LpMinusMp*Math.sin(Lp - Mpr) + BC.LpPlusMp*Math.sin(Lp + Mpr);
-      nodes._meeusLatDeg = Sb * 1e-6;
-
-      // Full Meeus ecliptic longitude for post-hoc RA override
-      const fullSl = Sl + (2 * eocHalf / d2r * 1e6) * Math.sin(Mpr)
-                       + (1.25 * eocHalf * eocHalf / d2r * 1e6) * Math.sin(2*Mpr);
-      nodes._meeusLonDeg = Lp / d2r + fullSl * 1e-6 + C.moonMeeusLpCorrection;
-      nodes._meeusT = T;
-      // Series distance (mirrors src/script.js obj._meeusDistKm — the
-      // two-term ellipse the browser places the Moon at). Exposed on the
-      // computePlanetPosition result so meters can pair override angles
-      // with the OVERRIDE distance instead of the raw pivot distance.
-      nodes._meeusDistKm = C.moonDistance * (1 - C.moonOrbitalEccentricity * Math.cos(Mpr));
+      // Phase 8.2-6: the full evaluation lives in @hum/physics/moon/series
+      // (shared with the browser scene block — one implementation). The
+      // engine keeps the pos→JD_TT conversion above and the node writes.
+      const _sr = _moonSeriesM().sceneEvalAt(d);
+      θ += _sr.thetaAddRad;
+      nodes._meeusLatDeg = _sr.latDeg;
+      nodes._meeusLonDeg = _sr.lonDeg;
+      nodes._meeusT = _sr.T;
+      // Series distance — exposed on the computePlanetPosition result so
+      // meters can pair override angles with the OVERRIDE distance.
+      nodes._meeusDistKm = _sr.distKm;
     }
     if (nodes.isEllipse) {
       const x = Math.cos(θ) * nodes.a;
