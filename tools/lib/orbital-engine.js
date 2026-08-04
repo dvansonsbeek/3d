@@ -150,20 +150,31 @@ function computePlanetObliquity(planetName, currentYear) {
   // Two-component obliquity (same structure as Earth's -cos(H/3) + cos(H/8)):
   //   1. Inclination component at ICRF perihelion period (NEGATIVE sign)
   //   2. Obliquity precession component at obliquityCycle period (POSITIVE sign)
-  // Both with same amplitude, anchored to axialTiltJ2000 at J2000
+  // Both with same amplitude, anchored to axialTiltJ2000 at J2000.
+  //
+  // 8.3-1 S-P3: J2000-fixed periods + INTEGRATED phase (frame-independent),
+  // mirroring the browser's primary branch (src/script.js
+  // computePlanetObliquity). This mirror previously used the snapshot form
+  // exclusively — identical at J2000 by anchoring, divergent as Δt² at deep
+  // time (the class Phase 7 dissolved for the cardinal points).
   const amp = p.invPlaneInclinationAmplitude;
-  const t = currentYear - C.balancedYear;
-  const t2000 = 2000 - C.balancedYear;
+  // 13/H, not 1/(H/13) — the browser's primary-branch operation order.
+  const icrfPeriod_J2000 = 1 / (1 / p.perihelionEclipticYears - 13 / C.H);
+  const N_icrf = C.H / Math.abs(icrfPeriod_J2000);
+  const N_obliq = C.H / Math.abs(p.obliquityCycle);
+  const cyclesBetween = require('./deep-time').cyclesBetweenYears;
+  const phaseAdv = (yearA, yearB, N) => {
+    const c = cyclesBetween(yearA, yearB, N);
+    return c === null ? null : c * 2 * Math.PI;
+  };
+  const phaseIncl_cur = phaseAdv(C.balancedYear, currentYear, N_icrf);
+  const phaseIncl_2000 = phaseAdv(C.balancedYear, 2000, N_icrf);
+  const phaseObliq_cur = phaseAdv(C.balancedYear, currentYear, N_obliq);
+  const phaseObliq_2000 = phaseAdv(C.balancedYear, 2000, N_obliq);
+  if (phaseIncl_cur === null || phaseObliq_cur === null) return tiltJ2000;
 
-  // Inclination component (ICRF perihelion period, NEGATIVE — like Earth's -cos(H/3))
-  const genPrecRate = 1 / (C.H / 13);
-  const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
-  const phaseIncl = 2 * Math.PI / icrfPeriod;
-  const inclComponent = -amp * (Math.cos(phaseIncl * t) - Math.cos(phaseIncl * t2000));
-
-  // Obliquity precession component (obliquityCycle, POSITIVE — like Earth's +cos(H/8))
-  const phaseObliq = 2 * Math.PI / p.obliquityCycle;
-  const obliqComponent = amp * (Math.cos(phaseObliq * t) - Math.cos(phaseObliq * t2000));
+  const inclComponent = -amp * (Math.cos(phaseIncl_cur) - Math.cos(phaseIncl_2000 ?? 0));
+  const obliqComponent = amp * (Math.cos(phaseObliq_cur) - Math.cos(phaseObliq_2000 ?? 0));
 
   return tiltJ2000 + inclComponent + obliqComponent;
 }
