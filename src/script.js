@@ -83,7 +83,7 @@ const systemResetN = K.foundational.systemResetN;         // Eccentricity anchor
 // harmonics) lives in the doc-block at the original call site — the pointers
 // below reference those source-of-truth locations. This section collects the
 // declarations at the top of the file for discoverability.
-const useVariableSpeed           = true;   // Equation of Center on planet orbits — see moveModel (~L54142)
+const useVariableSpeed           = K.foundational.useVariableSpeed;   // Equation of Center on planet orbits — see moveModel (~L54142). tools/lib reads the same JSON key; this was a hardcoded `true` that could silently diverge.
 const debugOn                    = false;  // Debug button flag (developer only)
 let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge (~L7080)
 let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction (Phase Z-B) — rationale ~L7066
