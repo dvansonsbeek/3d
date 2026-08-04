@@ -240,6 +240,18 @@ const MIGRATED = [
   // EclipticInclinationSouamiSouchayDynamic comparison and stays in
   // REFERENCE_DATA. Classification turns on function, not on value.
   'astro.earthOrbital.earthAscendingNodeInvPlane',
+
+  // Phase 8.1 — calendar/epoch references (j2000JD, julianCenturyDays,
+  // Gregorian start, the JD_1800/1900/2100 display anchors) and the astropixels
+  // June-solstice validation JDs. The solstice leaves are named `solsticeRefJD`
+  // in the JSON precisely because this file matches by leaf NAME: `jd:` occurs
+  // as a numeric property throughout the PLANET_TEST_DATES tables, and a first
+  // attempt with `solsticeJD` was caught by this very check — a diagnostic at
+  // ~L42939 declares `const solsticeJD = 2451716.5`.
+  // rotationPeriodDays (9 bodies) and model.planets.*.fibonacciD are covered
+  // by the block-8/13 prefixes above.
+  'astro.timeReference',
+  'astro.juneSolsticeReference',
 ];
 
 /**

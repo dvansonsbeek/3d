@@ -2,10 +2,10 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "2addbd3960fcef0f";
+export declare const CONSTANTS_HASH: "2ff0c10eeb4f897a";
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "2addbd3960fcef0f";
+  readonly hash: "2ff0c10eeb4f897a";
   readonly additionalBodies: {
     "pluto": {
       "name": string;
@@ -67,6 +67,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNode": number;
       "meanAnomaly": number;
       "trueAnomaly": number;
+      "rotationPeriodDays": number;
     };
     "halleys": {
       "solarYearInput": number;
@@ -78,6 +79,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNode": number;
       "meanAnomaly": number;
       "trueAnomaly": number;
+      "rotationPeriodDays": number;
     };
     "eros": {
       "solarYearInput": number;
@@ -89,6 +91,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNode": number;
       "meanAnomaly": number;
       "trueAnomaly": number;
+      "rotationPeriodDays": number;
     };
     "ceres": {
       "solarYearInput": number;
@@ -153,6 +156,7 @@ export declare const DEFAULT_CONSTANTS: {
     "earthInclinationCycleAnchor": number;
     "perihelionPassageJ2000_JD": number;
     "earthInclinationJ2000_deg": number;
+    "earthInclinationRate_arcsecPerCentury": number;
     "deltaTStart": number;
     "sunTilt": number;
   };
@@ -271,6 +275,7 @@ export declare const DEFAULT_CONSTANTS: {
       "invPlaneInclinationJ2000": number;
       "meanAnomaly": number;
       "trueAnomaly": number;
+      "rotationPeriodDays": number;
     };
     "mars": {
       "solarYearInput": number;
@@ -282,6 +287,7 @@ export declare const DEFAULT_CONSTANTS: {
       "invPlaneInclinationJ2000": number;
       "meanAnomaly": number;
       "trueAnomaly": number;
+      "rotationPeriodDays": number;
     };
     "jupiter": {
       "solarYearInput": number;
@@ -293,6 +299,7 @@ export declare const DEFAULT_CONSTANTS: {
       "invPlaneInclinationJ2000": number;
       "meanAnomaly": number;
       "trueAnomaly": number;
+      "rotationPeriodDays": number;
     };
     "saturn": {
       "solarYearInput": number;
@@ -304,6 +311,7 @@ export declare const DEFAULT_CONSTANTS: {
       "invPlaneInclinationJ2000": number;
       "meanAnomaly": number;
       "trueAnomaly": number;
+      "rotationPeriodDays": number;
     };
     "uranus": {
       "solarYearInput": number;
@@ -315,6 +323,7 @@ export declare const DEFAULT_CONSTANTS: {
       "invPlaneInclinationJ2000": number;
       "meanAnomaly": number;
       "trueAnomaly": number;
+      "rotationPeriodDays": number;
     };
     "neptune": {
       "solarYearInput": number;
@@ -326,6 +335,7 @@ export declare const DEFAULT_CONSTANTS: {
       "invPlaneInclinationJ2000": number;
       "meanAnomaly": number;
       "trueAnomaly": number;
+      "rotationPeriodDays": number;
     };
   };
   readonly planets: {
@@ -442,6 +452,14 @@ export declare const DEFAULT_CONSTANTS: {
       "axialPrecessionFraction": number[];
     };
   };
+  readonly timeReference: {
+    "j2000JD": number;
+    "julianCenturyDays": number;
+    "gregorianStartJD": number;
+    "jd1800": number;
+    "jd1900": number;
+    "jd2100": number;
+  };
   readonly yearLengthRef: {
     "tropicalYearVE": number;
     "tropicalYearSS": number;
@@ -503,6 +521,40 @@ export declare const REFERENCE_DATA: {
     "neptune": number;
     "pluto": number;
   };
+  readonly juneSolsticeReference: {
+    "1990": {
+      "solsticeRefJD": number;
+      "timeUTC": string;
+    };
+    "1995": {
+      "solsticeRefJD": number;
+      "timeUTC": string;
+    };
+    "2000": {
+      "solsticeRefJD": number;
+      "timeUTC": string;
+    };
+    "2005": {
+      "solsticeRefJD": number;
+      "timeUTC": string;
+    };
+    "2010": {
+      "solsticeRefJD": number;
+      "timeUTC": string;
+    };
+    "2015": {
+      "solsticeRefJD": number;
+      "timeUTC": string;
+    };
+    "2020": {
+      "solsticeRefJD": number;
+      "timeUTC": string;
+    };
+    "2025": {
+      "solsticeRefJD": number;
+      "timeUTC": string;
+    };
+  };
   readonly knownValues: {
     "jupiterSaturnConjunctionPeriod": number;
     "moonSynodicMonth": number;
@@ -523,5 +575,38 @@ export declare const REFERENCE_DATA: {
     "saturn": number[];
     "uranus": number[];
     "neptune": number[];
+  };
+  readonly perihelionPrecessionRatesJPL: {
+    "mercury": {
+      "min": number;
+      "max": number;
+    };
+    "venus": {
+      "min": number;
+      "max": number;
+    };
+    "earth": {
+      "value": number;
+    };
+    "mars": {
+      "min": number;
+      "max": number;
+    };
+    "jupiter": {
+      "min": number;
+      "max": number;
+    };
+    "saturn": {
+      "min": number;
+      "max": number;
+    };
+    "uranus": {
+      "min": number;
+      "max": number;
+    };
+    "neptune": {
+      "min": number;
+      "max": number;
+    };
   };
 };

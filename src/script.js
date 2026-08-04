@@ -127,8 +127,8 @@ const deltaTStart = K.earthOrbital.deltaTStart;                       // Delta-T
 // ─── E1. Early derived (needed before ASTRO_REFERENCE) ───────────────────
 let   perihelionCycleLength = holisticyearLength / 16;  // Phase 6: mutable (Tier 1 — math-critical, used by computeEccentricityEarth every frame)
 let   meansolaryearlengthinDays = Math.round(inputmeanlengthsolaryearindays * (holisticyearLength / 8)) / (holisticyearLength / 8);  // Phase 1: mutable for deep-time mode
-const j2000JD = 2451545.0;            // Standard J2000.0 epoch: Jan 1.5, 2000 TT
-const julianCenturyDays = 36525;      // IAU Julian century (365.25 × 100 days)
+const j2000JD = K.timeReference.j2000JD;                    // Standard J2000.0 epoch: Jan 1.5, 2000 TT (JD 2451545.0)
+const julianCenturyDays = K.timeReference.julianCenturyDays; // IAU Julian century (365.25 × 100 days)
 const tropicalCenturyDays = 100 * meansolaryearlengthinDays;  // 100 model tropical years
 // Sidereal day at J2000 (≈ 86164.09 s). Derived from `solarDay × N/(N+1)` where
 // N = tropical days per year — this is the standard relationship between mean
@@ -825,14 +825,15 @@ const EIGENMODE_PHASES = [
   { value: 120.38,   label: '120.38° (Sa)', group: 'model' },
   { value: 21.33,    label: '21.33° (Ur)', group: 'model' },
   { value: 354.04,   label: '354.04° (Ne)', group: 'model' },
-  // Laplace-Lagrange eigenmode phase angles (Farside Table 10.1)
-  { value: 202.8,  label: 'γ₈ = 202.8°' },
-  { value: 20.23,  label: 'γ₁ = 20.23°' },
-  { value: 255.6,  label: 'γ₃ = 255.6°' },
-  { value: 296.9,  label: 'γ₄ = 296.9°' },
-  { value: 127.3,  label: 'γ₆ = 127.3°' },
-  { value: 315.6,  label: 'γ₇ = 315.6°' },
-  { value: 318.3,  label: 'γ₂ = 318.3°' },
+  // Laplace-Lagrange eigenmode phase angles (Farside Table 10.1), from
+  // R.eigenmodePhasesLaplaceLagrange — labels render the same values as text.
+  { value: R.eigenmodePhasesLaplaceLagrange.gamma8, label: `γ₈ = ${R.eigenmodePhasesLaplaceLagrange.gamma8}°` },
+  { value: R.eigenmodePhasesLaplaceLagrange.gamma1, label: `γ₁ = ${R.eigenmodePhasesLaplaceLagrange.gamma1}°` },
+  { value: R.eigenmodePhasesLaplaceLagrange.gamma3, label: `γ₃ = ${R.eigenmodePhasesLaplaceLagrange.gamma3}°` },
+  { value: R.eigenmodePhasesLaplaceLagrange.gamma4, label: `γ₄ = ${R.eigenmodePhasesLaplaceLagrange.gamma4}°` },
+  { value: R.eigenmodePhasesLaplaceLagrange.gamma6, label: `γ₆ = ${R.eigenmodePhasesLaplaceLagrange.gamma6}°` },
+  { value: R.eigenmodePhasesLaplaceLagrange.gamma7, label: `γ₇ = ${R.eigenmodePhasesLaplaceLagrange.gamma7}°` },
+  { value: R.eigenmodePhasesLaplaceLagrange.gamma2, label: `γ₂ = ${R.eigenmodePhasesLaplaceLagrange.gamma2}°` },
   { value: 'custom', label: 'Custom...' }
 ];
 
@@ -870,7 +871,7 @@ const ASTRO_REFERENCE = {
   obliquityRate_degPerCentury: K.earthOrbital.obliquityRate_arcsecPerCentury / 3600,  // = -0.013010°/century
   // Source: Astronomical Almanac, 1°34'43.3" at J2000.0, rate -18"/cy
   earthInclinationJ2000_deg: K.earthOrbital.earthInclinationJ2000_deg,
-  earthInclinationRate_arcsecPerCentury: -18,
+  earthInclinationRate_arcsecPerCentury: K.earthOrbital.earthInclinationRate_arcsecPerCentury,
   // Source: JPL Horizons / Astronomical Almanac
   eccentricityJ2000: K.earthOrbital.earthEccentricityJ2000,   // Earth eccentricity at J2000.0
   eccentricityDotJ2000: K.earthOrbital.earthEccentricityDotJ2000,  // Earth eccentricity rate at J2000 (per Julian cy) — secular-theory coefficient corroborated by modern ephemeris fits, the lunar node channel (doc 66 §1; v4 note: the old "s_Ω ≈ 1 measures ė" reading was superseded by the frame attribution — physical s_Ω = 0.867, effective 1.018), and the ancient timing record; not a raw observation. REFERENCE/Taylor-check anchor only: the shipped lunar channel does NOT consume it — the fully-derived H/3 fluctuation line PREDICTS −4.273e-5 (+1.7%; see _FW_ECC and docs/66 §1, incl. the falsified H/16-phase alternative −8.389e-6)
@@ -947,16 +948,7 @@ const ASTRO_REFERENCE = {
 
   // --- 8e. Perihelion precession rates (1900–2100 trend) ---
   // Source: JPL SPICE/WebGeoCalc. Fluctuate over time; not valid for long-term predictions.
-  perihelionPrecessionRates: {
-    mercury: { min: 570, max: 575 },
-    venus:   { min: 0, max: 400 },
-    earth:   { value: 1163 },
-    mars:    { min: 1550, max: 1650 },
-    jupiter: { min: 800, max: 1800 },
-    saturn:  { min: -3400, max: -2000 },  // retrograde
-    uranus:  { min: 1100, max: 1300 },
-    neptune: { min: -200, max: 200 },
-  },
+  perihelionPrecessionRates: R.perihelionPrecessionRatesJPL,
 
   // --- 8f. Measurement offset corrections (derived from model geometry) ---
   // These offsets arise from measuring from Earth's precessing position rather
@@ -1419,7 +1411,12 @@ const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s
 // outputs the same. The current convention preserves the fitted model state
 // and is empirically valid; both conventions are calibration-equivalent. See
 // docs/25-universal-mass-from-moon-formula.md for the SYSTEM/ALONE distinction.
-const _fibD = { mercury: 21, venus: 34, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 };
+const _fibD = {
+  mercury: K.planets.mercury.fibonacciD, venus: K.planets.venus.fibonacciD,
+  mars: K.planets.mars.fibonacciD, jupiter: K.planets.jupiter.fibonacciD,
+  saturn: K.planets.saturn.fibonacciD, uranus: K.planets.uranus.fibonacciD,
+  neptune: K.planets.neptune.fibonacciD,
+};
 const _massFrac = {
   mercury: M_MERCURY_SYSTEM / M_SUN, venus: M_VENUS_SYSTEM / M_SUN, mars: M_MARS_SYSTEM / M_SUN,
   jupiter: M_JUPITER_SYSTEM / M_SUN, saturn: M_SATURN_SYSTEM / M_SUN, uranus: M_URANUS_SYSTEM / M_SUN, neptune: M_NEPTUNE_SYSTEM / M_SUN,
@@ -2163,7 +2160,7 @@ const venusRealOrbitalEccentricity = planets.venus.orbitalEccentricityBase/(1+pl
 const venusPerihelionDistance = (venusOrbitDistance*venusRealOrbitalEccentricity*100);
 const venusElipticOrbit = venusPerihelionDistance/2;
 const venusSpeed = (venusOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/venusSolarYearCount))/24;
-const venusRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/243.022699230302));
+const venusRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.venus.rotationPeriodDays));
 const venusEccentricityPerihelion = (venusPerihelionDistance/2)*planets.venus.orbitalEccentricityBase;
 const venusLowestPoint = 180-planets.venus.ascendingNode;
 
@@ -2174,7 +2171,7 @@ const marsRealOrbitalEccentricity = planets.mars.orbitalEccentricityBase/(1+plan
 const marsElipticOrbit = (((marsRealOrbitalEccentricity*marsOrbitDistance)/2))*100+((planets.mars.orbitalEccentricityBase*marsOrbitDistance)-(marsRealOrbitalEccentricity*marsOrbitDistance))*100;
 const marsPerihelionDistance = (marsOrbitDistance*planets.mars.orbitalEccentricityBase*100)+marsElipticOrbit;
 const marsSpeed = (marsOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/marsSolarYearCount))/24;
-const marsRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/1.02595659586635));
+const marsRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.mars.rotationPeriodDays));
 
 const erosSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.eros.solarYearInput));
 const erosOrbitDistance = (((holisticyearLength/erosSolarYearCount)**2)**(1/3));
@@ -2182,7 +2179,7 @@ const erosRealOrbitalEccentricity = planets.eros.orbitalEccentricityBase/(1+plan
 const erosElipticOrbit = (((erosRealOrbitalEccentricity*erosOrbitDistance)/2))*100+((planets.eros.orbitalEccentricityBase*erosOrbitDistance)-(erosRealOrbitalEccentricity*erosOrbitDistance))*100;
 const erosPerihelionDistance = (erosOrbitDistance*planets.eros.orbitalEccentricityBase*100)+erosElipticOrbit;
 const erosSpeed = (erosOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/erosSolarYearCount))/24;
-const erosRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/0.21958333344885));
+const erosRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.additionalBodiesReference.eros.rotationPeriodDays));
 
 // Planet calculations TYPE III
 // Geocentric correction: Earth's eccentricity creates annual parallax variation
@@ -2198,7 +2195,7 @@ const jupiterRealOrbitalEccentricity = planets.jupiter.orbitalEccentricityBase/(
 const jupiterElipticOrbit = geocentricElipticOrbit(planets.jupiter.longitudePerihelion);
 const jupiterPerihelionDistance = jupiterRealOrbitalEccentricity*jupiterOrbitDistance*100;
 const jupiterSpeed = (jupiterOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/jupiterSolarYearCount))/24;
-const jupiterRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/0.413541666975253));
+const jupiterRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.jupiter.rotationPeriodDays));
 
 let   saturnSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.saturn.solarYearInput));  // Phase 2.5: mutable
 let   saturnOrbitDistance = (((holisticyearLength/saturnSolarYearCount)**2)**(1/3));  // Phase 2.5: mutable
@@ -2206,7 +2203,7 @@ const saturnRealOrbitalEccentricity = planets.saturn.orbitalEccentricityBase/(1+
 const saturnElipticOrbit = geocentricElipticOrbit(planets.saturn.longitudePerihelion);
 const saturnPerihelionDistance = saturnRealOrbitalEccentricity*saturnOrbitDistance*100;
 const saturnSpeed = (saturnOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/saturnSolarYearCount))/24;
-const saturnRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/0.440023148755863));
+const saturnRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.saturn.rotationPeriodDays));
 
 let   uranusSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.uranus.solarYearInput));  // Phase 2.5: mutable
 let   uranusOrbitDistance = (((holisticyearLength/uranusSolarYearCount)**2)**(1/3));  // Phase 2.5: mutable
@@ -2214,7 +2211,7 @@ const uranusRealOrbitalEccentricity = planets.uranus.orbitalEccentricityBase/(1+
 const uranusElipticOrbit = geocentricElipticOrbit(planets.uranus.longitudePerihelion);
 const uranusPerihelionDistance = uranusRealOrbitalEccentricity*uranusOrbitDistance*100;
 const uranusSpeed = (uranusOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/uranusSolarYearCount))/24;
-const uranusRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/0.718329998141018));
+const uranusRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.uranus.rotationPeriodDays));
 
 let   neptuneSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.neptune.solarYearInput));  // Phase 2.5: mutable
 let   neptuneOrbitDistance = (((holisticyearLength/neptuneSolarYearCount)**2)**(1/3));  // Phase 2.5: mutable
@@ -2222,14 +2219,14 @@ const neptuneRealOrbitalEccentricity = planets.neptune.orbitalEccentricityBase/(
 const neptuneElipticOrbit = geocentricElipticOrbit(planets.neptune.longitudePerihelion);
 const neptunePerihelionDistance = neptuneRealOrbitalEccentricity*neptuneOrbitDistance*100;
 const neptuneSpeed = (neptuneOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/neptuneSolarYearCount))/24;
-const neptuneRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/0.671300001591743));
+const neptuneRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.neptune.rotationPeriodDays));
 
 const plutoSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.pluto.solarYearInput));
 const plutoOrbitDistance = (((holisticyearLength/plutoSolarYearCount)**2)**(1/3));
 const plutoPerihelionDistance = planets.pluto.orbitalEccentricityBase*plutoOrbitDistance*100;
 const plutoElipticOrbit = plutoPerihelionDistance/2;
 const plutoSpeed = (plutoOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/plutoSolarYearCount))/24;
-const plutoRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/6.38720012152536));
+const plutoRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.additionalBodiesReference.pluto.rotationPeriodDays));
 
 const halleysSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.halleys.solarYearInput));
 const halleysOrbitDistance = (((holisticyearLength/halleysSolarYearCount)**2)**(1/3));
@@ -2237,7 +2234,7 @@ const halleysRealOrbitalEccentricity = planets.halleys.orbitalEccentricityBase/(
 const halleysElipticOrbit = ((planets.halleys.orbitalEccentricityBase*halleysOrbitDistance)-(halleysRealOrbitalEccentricity*halleysOrbitDistance))*100; 
 const halleysPerihelionDistance = halleysRealOrbitalEccentricity*halleysOrbitDistance*2*100;
 const halleysSpeed = (halleysOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/halleysSolarYearCount))/24;
-const halleysRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/2.2));
+const halleysRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.additionalBodiesReference.halleys.rotationPeriodDays));
 
 // ═════════════════════════════════════════════════════════════════
 // DEEP-TIME CHAIN — ESSRT Architecture α  (PHASE 0: mean*AtAge funcs)
@@ -9588,8 +9585,8 @@ const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentrici
 //*************************************************************
 const GREGORIAN_START = { year: 1582, month: 10, day: 15};
 // Start of the Gregorian Calendar
-const GREGORIAN_START_JD = 2299160.5;
-// Start of the Gregorian Calendar in Juliandate
+const GREGORIAN_START_JD = K.timeReference.gregorianStartJD;
+// Start of the Gregorian Calendar in Juliandate (2299160.5)
 const REVISION_START_JD = perihelionalignmentJD;
 // Start of the Revised Julian Calendar in Juliandate
 
@@ -26961,7 +26958,7 @@ function setupGUI() {
   //                         k    = round(ratio × (N-1))   ← nearest grid step to J2000
   //                         err  = |ratio×(N-1) - k| × step   (in JD days)
   //   Best N = argmin err, searching ±2000 around target N for ~50-yr steps.
-  const J2000_JD = 2451545;
+  const J2000_JD = j2000JD;
   function bestNforJ2000(startJD, endJD) {
     if (!isFinite(startJD) || !isFinite(endJD) || endJD <= startJD) return null;
     const range    = endJD - startJD;
@@ -27889,7 +27886,7 @@ function setupGUI() {
     const sun_scene_ra_deg = ((_sun_alpha * 180 / Math.PI) + 360) % 360;
     const framework_GMST_deg = ((sun_scene_ra_deg - fw_subsolar_nasaUT.lon) % 360 + 360) % 360;
     // IAU standard (Meeus eq. 12.4)
-    const _d_j2000 = NASA_UT_greatest_JD - 2451545.0;
+    const _d_j2000 = NASA_UT_greatest_JD - j2000JD;
     const _Tcen = _d_j2000 / 36525;
     const iau_GMST_deg = (((280.46061837 + 360.98564736629 * _d_j2000 + 0.000387933 * _Tcen * _Tcen - _Tcen * _Tcen * _Tcen / 38710000) % 360) + 360) % 360;
     const gmst_diff_deg = ((framework_GMST_deg - iau_GMST_deg + 540) % 360) - 180;
@@ -28552,7 +28549,7 @@ function setupGUI() {
     const wrap180 = (x) => ((x % 360) + 540) % 360 - 180;
     const wrap360 = (x) => ((x % 360) + 360) % 360;
     const epochs = [
-      { jd: 2451545.0,      label: 'J2000.0 (anchor check — expect ~0)' },
+      { jd: j2000JD,        label: 'J2000.0 (anchor check — expect ~0)' },
       { jd: 1671853.759762, label: '-135 Apr 15 Babylonian' },
       { jd: 1608421.835171, label: '-309 Aug 15 Agathocles' },
       { jd: 1518118.032841, label: '-556 May 19 Nabonidus' },
@@ -31645,7 +31642,7 @@ function setupGUI() {
     // Moon's mean ascending node Ω from Meeus (1998) Ch. 47, eq. 47.7
     // (truncated to cubic — leading-period accuracy ~0.001° over a millennium).
     function moonOmega(jd) {
-      const T = (jd - 2451545.0) / 36525;
+      const T = (jd - j2000JD) / 36525;
       let omega = 125.0445479 - 1934.1362891 * T + 0.0020754 * T * T + T * T * T / 467441;
       omega = ((omega % 360) + 360) % 360;
       return omega;
@@ -39143,16 +39140,15 @@ function buildYearAnalysisArray() {
 // Reference June solstice Julian Dates (Source: astropixels.com, Jean Meeus algorithms)
 // JD convention: JD X.5 = midnight UTC, JD X.0 = noon UTC
 // Example: JD 2451716.5 = June 21, 2000 00:00 UTC
-const JUNE_SOLSTICE_REFERENCE = {
-  1990: { jd: 2448091.148148, time: '15:33' },   // June 21, 1990 15:33 UTC
-  1995: { jd: 2449919.357639, time: '20:34' },   // June 21, 1995 20:34 UTC
-  2000: { jd: 2451716.575000, time: '01:48' },   // June 21, 2000 01:48 UTC
-  2005: { jd: 2453542.781944, time: '06:46' },   // June 21, 2005 06:46 UTC
-  2010: { jd: 2455368.977778, time: '11:28' },   // June 21, 2010 11:28 UTC
-  2015: { jd: 2457195.193056, time: '16:38' },   // June 21, 2015 16:38 UTC
-  2020: { jd: 2459021.404861, time: '21:43' },   // June 20, 2020 21:43 UTC
-  2025: { jd: 2460847.612500, time: '02:42' },   // June 21, 2025 02:42 UTC
-};
+// Single-sourced from astro-reference.json (R.juneSolsticeReference); reshaped
+// to the {jd, time} form the consumers read. The JSON leaf is `solsticeRefJD`
+// because check-literals.mjs name-matches leaf keys, and both `jd:` and
+// `solsticeJD` occur as numeric declarations elsewhere in this file.
+const JUNE_SOLSTICE_REFERENCE = Object.fromEntries(
+  Object.entries(R.juneSolsticeReference).map(
+    ([year, v]) => [year, { jd: v.solsticeRefJD, time: v.timeUTC }],
+  ),
+);
 
 /** Calculate mean obliquity using IAU 2006 formula (P03 model) */
 function meanObliquityIAU2006(year) {
@@ -45303,7 +45299,7 @@ function compareSceneVsSceneGraph() {
                            Math.cos(sun.ra));
     const lonDeg = ((lam * 180 / Math.PI) % 360 + 360) % 360;
     const dLon = (((lonDeg - p.lon + 540) % 360) - 180) * 3600;
-    const yr = 2000 + (p.jd - 2451545) / 365.25;
+    const yr = 2000 + (p.jd - j2000JD) / 365.25;
     acc.push({ yr, dLon });
     console.log(`  ${p.jd.toFixed(1)}  ${yr.toFixed(1).padStart(9)}  ${dLon.toFixed(4).padStart(11)}` +
                 `      ${acc.length > 1 ? (dLon - acc[0].dLon).toFixed(4) : '(baseline)'}`);
@@ -55259,13 +55255,12 @@ function perihelionLongitudeEcliptic(precessionLayer, longitudePerihelion) {
 //
 // ================================================================
 
-const JD_1800 = 2378496.5;  // ~January 1, 1800
-const JD_1900 = 2415191.5;  // ~January 1, 1900
+const JD_1800 = K.timeReference.jd1800;  // ~January 1, 1800
+const JD_1900 = K.timeReference.jd1900;  // ~January 1, 1900
 // JD_2000 is the model start, i.e. the same quantity as foundational.startmodelJD
-// — it was a fourth copy of 2451716.5. The other three are plain calendar
-// reference points with no JSON entry, so only this one is sourced.
+// — it was a fourth copy of 2451716.5.
 const JD_2000 = K.foundational.startmodelJD;  // June 21, 2000 (model start)
-const JD_2100 = 2488069.5;  // ~January 1, 2100
+const JD_2100 = K.timeReference.jd2100;  // ~January 1, 2100
 
 // Cache for perihelion values by Julian Day (calculated once on demand per JD)
 const perihelionCache = {};

@@ -190,6 +190,10 @@ const CLASSIFICATION = {
     planetOrbitalElements: 'anchor',
     additionalBodiesReference: 'anchor',
     yearLengthRef: 'anchor',
+    // Calendar/epoch definitions (J2000 JD, Julian century, Gregorian start).
+    // Anchor, not presentation: j2000JD and julianCenturyDays parameterize the
+    // Meeus T argument throughout the browser formulas.
+    timeReference: 'anchor',
 
     // ── never injectable ────────────────────────────────────────────────────
     // Self-described: "Validation reference values for comparison".
@@ -204,8 +208,16 @@ const CLASSIFICATION = {
     // Feeds only trendError / directionMatch in script.js — compared against the
     // model's own computed trend, never an input to it.
     jplEclipticInclinationTrends: 'target',
-    // Farside Table 10.1 reference phases. No consumer at all today.
+    // Farside Table 10.1 reference phases. Consumed by the EIGENMODE_PHASES
+    // dropdown in script.js (display options, never a model input) since 8.1.
     eigenmodePhasesLaplaceLagrange: 'target',
+    // JPL SPICE 1900-2100 perihelion precession trends — comparison table only;
+    // zero computational consumers (script.js keeps it on ASTRO_REFERENCE for
+    // reference display).
+    perihelionPrecessionRatesJPL: 'target',
+    // Astropixels/Meeus June solstice JDs — feeds only the solstice validation
+    // report, compared against the model's own solstice detection.
+    juneSolsticeReference: 'target',
 
     // ── not physics ─────────────────────────────────────────────────────────
     // Self-described "visualization only"; zero consumers in tools/lib/constants.js.

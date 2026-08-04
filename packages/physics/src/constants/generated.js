@@ -18,6 +18,8 @@
  *   externalCurveAnchors             target
  *   knownValues                      target
  *   galaxyMotion                     presentation
+ *   perihelionPrecessionRatesJPL     target
+ *   juneSolsticeReference            target
  *
  * @typedef {typeof DEFAULT_CONSTANTS} GeneratedConstants
  */
@@ -27,11 +29,11 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "2addbd3960fcef0f";
+export const CONSTANTS_HASH = "2ff0c10eeb4f897a";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "2addbd3960fcef0f",
+  hash: "2ff0c10eeb4f897a",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -104,7 +106,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "longitudePerihelion": 224.06891,
       "ascendingNode": 110.30393,
       "meanAnomaly": 15.55009,
-      "trueAnomaly": 26.31965048
+      "trueAnomaly": 26.31965048,
+      "rotationPeriodDays": 6.38720012152536
     },
     "halleys": {
       "solarYearInput": 27503,
@@ -115,7 +118,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "longitudePerihelion": 111.33249,
       "ascendingNode": 58.42008,
       "meanAnomaly": 38.77481,
-      "trueAnomaly": 166.26774708
+      "trueAnomaly": 166.26774708,
+      "rotationPeriodDays": 2.2
     },
     "eros": {
       "solarYearInput": 642.93,
@@ -126,7 +130,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "longitudePerihelion": 178.81322,
       "ascendingNode": 304.30993,
       "meanAnomaly": 320.21552,
-      "trueAnomaly": 299.9171374
+      "trueAnomaly": 299.9171374,
+      "rotationPeriodDays": 0.21958333344885
     },
     "ceres": {
       "solarYearInput": 1680.5,
@@ -191,6 +196,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "earthInclinationCycleAnchor": 21.77,
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
+    "earthInclinationRate_arcsecPerCentury": -18,
     "deltaTStart": 56.04899719615156,
     "sunTilt": 7.155
   },
@@ -308,7 +314,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNode": 76.67877109,
       "invPlaneInclinationJ2000": 2.1545441,
       "meanAnomaly": 324.9668371,
-      "trueAnomaly": 324.5198504
+      "trueAnomaly": 324.5198504,
+      "rotationPeriodDays": 243.022699230302
     },
     "mars": {
       "solarYearInput": 686.93,
@@ -319,7 +326,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNode": 49.55737662,
       "invPlaneInclinationJ2000": 1.6311858,
       "meanAnomaly": 109.2630844,
-      "trueAnomaly": 118.9501056
+      "trueAnomaly": 118.9501056,
+      "rotationPeriodDays": 1.02595659586635
     },
     "jupiter": {
       "solarYearInput": 4330.53,
@@ -330,7 +338,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNode": 100.4877868,
       "invPlaneInclinationJ2000": 0.3219652,
       "meanAnomaly": 32.47179744,
-      "trueAnomaly": 35.69428061
+      "trueAnomaly": 35.69428061,
+      "rotationPeriodDays": 0.413541666975253
     },
     "saturn": {
       "solarYearInput": 10747,
@@ -341,7 +350,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNode": 113.6452856,
       "invPlaneInclinationJ2000": 0.9254704,
       "meanAnomaly": 325.663876,
-      "trueAnomaly": 321.7910116
+      "trueAnomaly": 321.7910116,
+      "rotationPeriodDays": 0.440023148755863
     },
     "uranus": {
       "solarYearInput": 30586,
@@ -352,7 +362,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNode": 74.00919023,
       "invPlaneInclinationJ2000": 0.9946692,
       "meanAnomaly": 145.7292678,
-      "trueAnomaly": 148.5142459
+      "trueAnomaly": 148.5142459,
+      "rotationPeriodDays": 0.718329998141018
     },
     "neptune": {
       "solarYearInput": 59800,
@@ -363,7 +374,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNode": 131.7853754,
       "invPlaneInclinationJ2000": 0.7354155,
       "meanAnomaly": 262.5003424,
-      "trueAnomaly": 261.2242728
+      "trueAnomaly": 261.2242728,
+      "rotationPeriodDays": 0.671300001591743
     }
   },
   planets: {
@@ -537,6 +549,14 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       ]
     }
   },
+  timeReference: {
+    "j2000JD": 2451545,
+    "julianCenturyDays": 36525,
+    "gregorianStartJD": 2299160.5,
+    "jd1800": 2378496.5,
+    "jd1900": 2415191.5,
+    "jd2100": 2488069.5
+  },
   yearLengthRef: {
     "tropicalYearVE": 365.242374,
     "tropicalYearSS": 365.241626,
@@ -611,6 +631,40 @@ export const REFERENCE_DATA = Object.freeze({
     "neptune": 0.00035,
     "pluto": -0.001
   },
+  juneSolsticeReference: {
+    "1990": {
+      "solsticeRefJD": 2448091.148148,
+      "timeUTC": "15:33"
+    },
+    "1995": {
+      "solsticeRefJD": 2449919.357639,
+      "timeUTC": "20:34"
+    },
+    "2000": {
+      "solsticeRefJD": 2451716.575,
+      "timeUTC": "01:48"
+    },
+    "2005": {
+      "solsticeRefJD": 2453542.781944,
+      "timeUTC": "06:46"
+    },
+    "2010": {
+      "solsticeRefJD": 2455368.977778,
+      "timeUTC": "11:28"
+    },
+    "2015": {
+      "solsticeRefJD": 2457195.193056,
+      "timeUTC": "16:38"
+    },
+    "2020": {
+      "solsticeRefJD": 2459021.404861,
+      "timeUTC": "21:43"
+    },
+    "2025": {
+      "solsticeRefJD": 2460847.6125,
+      "timeUTC": "02:42"
+    }
+  },
   knownValues: {
     "jupiterSaturnConjunctionPeriod": 19.859,
     "moonSynodicMonth": 29.530589,
@@ -655,5 +709,38 @@ export const REFERENCE_DATA = Object.freeze({
       0.554,
       0.8
     ]
+  },
+  perihelionPrecessionRatesJPL: {
+    "mercury": {
+      "min": 570,
+      "max": 575
+    },
+    "venus": {
+      "min": 0,
+      "max": 400
+    },
+    "earth": {
+      "value": 1163
+    },
+    "mars": {
+      "min": 1550,
+      "max": 1650
+    },
+    "jupiter": {
+      "min": 800,
+      "max": 1800
+    },
+    "saturn": {
+      "min": -3400,
+      "max": -2000
+    },
+    "uranus": {
+      "min": 1100,
+      "max": 1300
+    },
+    "neptune": {
+      "min": -200,
+      "max": 200
+    }
   },
 });

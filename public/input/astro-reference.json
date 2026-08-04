@@ -52,6 +52,7 @@
     "earthInclinationCycleAnchor": 21.77,
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
+    "earthInclinationRate_arcsecPerCentury": -18,
     "deltaTStart": 56.04899719615156,
     "sunTilt": 7.155
   },
@@ -135,7 +136,8 @@
       "ascendingNode": 76.67877109,
       "invPlaneInclinationJ2000": 2.1545441,
       "meanAnomaly": 324.9668371,
-      "trueAnomaly": 324.5198504
+      "trueAnomaly": 324.5198504,
+      "rotationPeriodDays": 243.022699230302
     },
     "mars": {
       "solarYearInput": 686.93,
@@ -146,7 +148,8 @@
       "ascendingNode": 49.55737662,
       "invPlaneInclinationJ2000": 1.6311858,
       "meanAnomaly": 109.2630844,
-      "trueAnomaly": 118.9501056
+      "trueAnomaly": 118.9501056,
+      "rotationPeriodDays": 1.02595659586635
     },
     "jupiter": {
       "solarYearInput": 4330.53,
@@ -157,7 +160,8 @@
       "ascendingNode": 100.4877868,
       "invPlaneInclinationJ2000": 0.3219652,
       "meanAnomaly": 32.47179744,
-      "trueAnomaly": 35.69428061
+      "trueAnomaly": 35.69428061,
+      "rotationPeriodDays": 0.413541666975253
     },
     "saturn": {
       "solarYearInput": 10747,
@@ -168,7 +172,8 @@
       "ascendingNode": 113.6452856,
       "invPlaneInclinationJ2000": 0.9254704,
       "meanAnomaly": 325.663876,
-      "trueAnomaly": 321.7910116
+      "trueAnomaly": 321.7910116,
+      "rotationPeriodDays": 0.440023148755863
     },
     "uranus": {
       "solarYearInput": 30586,
@@ -179,7 +184,8 @@
       "ascendingNode": 74.00919023,
       "invPlaneInclinationJ2000": 0.9946692,
       "meanAnomaly": 145.7292678,
-      "trueAnomaly": 148.5142459
+      "trueAnomaly": 148.5142459,
+      "rotationPeriodDays": 0.718329998141018
     },
     "neptune": {
       "solarYearInput": 59800,
@@ -190,7 +196,8 @@
       "ascendingNode": 131.7853754,
       "invPlaneInclinationJ2000": 0.7354155,
       "meanAnomaly": 262.5003424,
-      "trueAnomaly": 261.2242728
+      "trueAnomaly": 261.2242728,
+      "rotationPeriodDays": 0.671300001591743
     }
   },
   "additionalBodiesReference": {
@@ -204,7 +211,8 @@
       "longitudePerihelion": 224.06891,
       "ascendingNode": 110.30393,
       "meanAnomaly": 15.55009,
-      "trueAnomaly": 26.31965048
+      "trueAnomaly": 26.31965048,
+      "rotationPeriodDays": 6.38720012152536
     },
     "halleys": {
       "solarYearInput": 27503,
@@ -215,7 +223,8 @@
       "longitudePerihelion": 111.33249,
       "ascendingNode": 58.42008,
       "meanAnomaly": 38.77481,
-      "trueAnomaly": 166.26774708
+      "trueAnomaly": 166.26774708,
+      "rotationPeriodDays": 2.2
     },
     "eros": {
       "solarYearInput": 642.93,
@@ -226,7 +235,8 @@
       "longitudePerihelion": 178.81322,
       "ascendingNode": 304.30993,
       "meanAnomaly": 320.21552,
-      "trueAnomaly": 299.9171374
+      "trueAnomaly": 299.9171374,
+      "rotationPeriodDays": 0.21958333344885
     },
     "ceres": {
       "solarYearInput": 1680.5,
@@ -347,5 +357,36 @@
     "sunSpeed": 828000,
     "greatattractorDistance": 200000000,
     "milkywaySpeed": 2160000
+  },
+  "timeReference": {
+    "_description": "Calendar and epoch reference values (IAU / standard definitions). j2000JD is JD of J2000.0 (2000 Jan 1.5 TT); julianCenturyDays is the IAU Julian century (365.25 x 100 days); gregorianStartJD is the start of the Gregorian calendar (1582 Oct 15); jd1800/jd1900/jd2100 are ~Jan 1 calendar reference points used by display ranges.",
+    "j2000JD": 2451545.0,
+    "julianCenturyDays": 36525,
+    "gregorianStartJD": 2299160.5,
+    "jd1800": 2378496.5,
+    "jd1900": 2415191.5,
+    "jd2100": 2488069.5
+  },
+  "perihelionPrecessionRatesJPL": {
+    "_description": "Observed perihelion precession rates in arcsec/century, 1900-2100 trend. Source: JPL SPICE/WebGeoCalc. These fluctuate over time and are not valid for long-term predictions. Validation reference only, never a model input. Saturn is retrograde over this window.",
+    "mercury": { "min": 570, "max": 575 },
+    "venus": { "min": 0, "max": 400 },
+    "earth": { "value": 1163 },
+    "mars": { "min": 1550, "max": 1650 },
+    "jupiter": { "min": 800, "max": 1800 },
+    "saturn": { "min": -3400, "max": -2000 },
+    "uranus": { "min": 1100, "max": 1300 },
+    "neptune": { "min": -200, "max": 200 }
+  },
+  "juneSolsticeReference": {
+    "_description": "Reference June solstice Julian Dates (source: astropixels.com, Jean Meeus algorithms). JD convention: JD X.5 = midnight UTC, JD X.0 = noon UTC. Leaf is named solsticeRefJD (not jd, not solsticeJD) because tools/constants/check-literals.mjs name-matches leaf keys and both shorter names occur as numeric declarations in script.js. Validation reference only.",
+    "1990": { "solsticeRefJD": 2448091.148148, "timeUTC": "15:33" },
+    "1995": { "solsticeRefJD": 2449919.357639, "timeUTC": "20:34" },
+    "2000": { "solsticeRefJD": 2451716.575, "timeUTC": "01:48" },
+    "2005": { "solsticeRefJD": 2453542.781944, "timeUTC": "06:46" },
+    "2010": { "solsticeRefJD": 2455368.977778, "timeUTC": "11:28" },
+    "2015": { "solsticeRefJD": 2457195.193056, "timeUTC": "16:38" },
+    "2020": { "solsticeRefJD": 2459021.404861, "timeUTC": "21:43" },
+    "2025": { "solsticeRefJD": 2460847.6125, "timeUTC": "02:42" }
   }
 }
