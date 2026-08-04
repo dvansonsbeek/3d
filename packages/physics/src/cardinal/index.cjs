@@ -37,11 +37,44 @@
 
 'use strict';
 
+/** @type {Record<string, number>} */
 const JOINT_LAMBDA = { SS: 0, AE: Math.PI / 2, WS: Math.PI, VE: 1.5 * Math.PI };
 
 const DRIFT_NODE_SPACING_YEARS = 2000;
 const DRIFT_SIMPSON_N_MIN = 64;
 
+/** @typedef {{ lincoef: number, h0: number, h1: number }} DerivedCoefs */
+/** @typedef {{ order: number, sin: number, cos: number }} EccTerm */
+/** @typedef {{ order: number, div: number, sin: number, cos: number }} JointTerm */
+
+/**
+ * @param {{
+ *   isDeepTime: () => boolean,
+ *   constants: {
+ *     anchors: Record<string, number>,
+ *     harmonics: Record<string, Array<[number, number, number]>>,
+ *     eccTerms: (Record<string, EccTerm[]> | null),
+ *     jointTerms: ({ terms: JointTerm[] } | null),
+ *     derived: (DerivedCoefs | null),
+ *     tropicalHarmonics: Array<[number, number, number]>,
+ *     balancedYear: number,
+ *     meanSolarYearDays: number,
+ *     hJ2000: number,
+ *     eccentricityBase: number,
+ *     eccentricityAmplitude: number,
+ *     tiltMeanDeg: number,
+ *     raAngleDeg: number,
+ *     inclAmplitudeDeg: number,
+ *   },
+ *   fns: {
+ *     cyclesBetween: (yearA: number, yearB: number, divisorN: number) => (number | null),
+ *     analyticTropicalDays: (year: number) => (number | null),
+ *     meanHAtAgeMa: (tMa: number) => (number | null),
+ *     meanYearRealLodDays: (tMa: number) => (number | null),
+ *     eccentricityAt: (year: number) => number,
+ *   },
+ * }} deps
+ */
 function createCardinalModel({ isDeepTime, constants, fns }) {
   const {
     anchors,               // { SS, WS, VE, AE } — J2000 event JDs
@@ -67,16 +100,19 @@ function createCardinalModel({ isDeepTime, constants, fns }) {
     eccentricityAt,        // (year) => e(t), law of cosines on the H/16 phase
   } = fns;
 
+  /** @param {number} year */
   const cycleOf = (year) => {
     const c = cyclesBetween(balancedYear, year, 1);
     return c === null ? 0 : c;
   };
 
+  /** @param {number} year */
   const driftIntegrand = (year) => {
     const a = analyticTropicalDays(year);
     return a === null ? 0 : (a - meanSolarYearDays);
   };
 
+  /** @param {number} year */
   function driftTerm(year) {
     const span = year - 2000;
     if (span === 0) return 0;
@@ -90,7 +126,8 @@ function createCardinalModel({ isDeepTime, constants, fns }) {
     return acc * h / 3 - (fN - f0) / 2;
   }
 
-  /** Step 6d's self-corrected tropical harmonic series, as a length deviation. */
+  /** Step 6d's self-corrected tropical harmonic series, as a length deviation.
+   *  @param {number} year */
   function tropHarmonicsAt(year) {
     const c = cycleOf(year), c0 = cycleOf(2000);
     let s = 0;
@@ -103,13 +140,15 @@ function createCardinalModel({ isDeepTime, constants, fns }) {
 
   // Ih(Y) = Σ_{2000→Y} of the tropical harmonics, closed form. H stays INSIDE
   // the integral (h0 + h1·c) — it moves 27.5 yr across the window and
-  // multiplies the amplitude.
+  // multiplies the amplitude. Deep-time only, so `derived` is present here.
+  /** @param {number} year */
   function integratedTropHarmonics(year) {
-    const D = derived;
+    const D = /** @type {DerivedCoefs} */ (derived);
     const cY = cycleOf(year), c0 = cycleOf(2000);
     let tot = 0, k0 = 0;
     for (const [div, sinC, cosC] of tropicalHarmonics) {
       const k = 2 * Math.PI * div;
+      /** @param {number} c */
       const F = (c) => {
         const sn = Math.sin(k * c), cs = Math.cos(k * c), Hc = D.h0 + D.h1 * c;
         return [-Hc * cs / k + D.h1 * sn / (k * k), Hc * sn / k + D.h1 * cs / (k * k)];
@@ -122,13 +161,16 @@ function createCardinalModel({ isDeepTime, constants, fns }) {
          - (tropHarmonicsAt(year) - tropHarmonicsAt(2000)) / 2;
   }
 
+  /** @param {number} year */
   function sigmaTropical(year) {
-    return derived.lincoef * (year - 2000) + driftTerm(year) + integratedTropHarmonics(year);
+    const D = /** @type {DerivedCoefs} */ (derived);
+    return D.lincoef * (year - 2000) + driftTerm(year) + integratedTropHarmonics(year);
   }
 
   // δ_X(2000) — the self-correction that pins JD(2000) to the anchor exactly
   // (sinusoids + ecc orders; the §10g joint terms self-correct inline).
   // Computed lazily so the phase table builds on the caller's schedule.
+  /** @type {Record<string, number> | null} */
   let _selfCorr = null;
   function selfCorr() {
     if (_selfCorr !== null) return _selfCorr;
@@ -154,6 +196,7 @@ function createCardinalModel({ isDeepTime, constants, fns }) {
     return _selfCorr;
   }
 
+  /** @param {number} year @param {string} [type] */
   function computeSolsticeJD(year, type) {
     const cp = type || 'SS';
     const anchor = anchors[cp];
@@ -192,7 +235,8 @@ function createCardinalModel({ isDeepTime, constants, fns }) {
   /** The EXACT term-by-term derivative of computeSolsticeJD — except the
    *  drift part, which deliberately stays in the real-LOD convention (see
    *  the file header). Neglected: the drift Euler–Maclaurin half-sample
-   *  term's own derivative (f′/2, sub-µs). */
+   *  term's own derivative (f′/2, sub-µs).
+   *  @param {number} year @param {string} [type] */
   function computeSolsticeYearLength(year, type) {
     const cp = type || 'SS';
     const deep = isDeepTime();
@@ -250,10 +294,11 @@ function createCardinalModel({ isDeepTime, constants, fns }) {
 
   /** RA where a cardinal point occurs — fully derived, zero fitted constants.
    *  INTEGRATED phase: the formula describes where the SCENE puts the point,
-   *  and the scene's H/3 and H/8 objects rotate on integrated phase. */
+   *  and the scene's H/3 and H/8 objects rotate on integrated phase.
+   *  @param {number} year @param {string} [type] */
   function computeSolsticeRA(year, type) {
     const sinE = Math.sin(tiltMeanDeg * Math.PI / 180);
-    const baseRA = { SS: 90, WS: 270, VE: 0, AE: 180 }[type || 'SS'];
+    const baseRA = /** @type {Record<string, number>} */ ({ SS: 90, WS: 270, VE: 0, AE: 180 })[type || 'SS'];
     const raMean = baseRA - raAngleDeg / sinE;
     const amp = inclAmplitudeDeg / sinE;
     const cY = cycleOf(year);
@@ -263,7 +308,8 @@ function createCardinalModel({ isDeepTime, constants, fns }) {
   }
 
   /** Tropical year as the mean of the four cardinal intervals — the
-   *  physically correct definition (Σδ_X ≡ 0 makes the braid cancel). */
+   *  physically correct definition (Σδ_X ≡ 0 makes the braid cancel).
+   *  @param {number} year */
   function computeTropicalYearLength(year) {
     return (computeSolsticeYearLength(year, 'SS') +
             computeSolsticeYearLength(year, 'WS') +

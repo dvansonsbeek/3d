@@ -35,15 +35,31 @@
 
 'use strict';
 
+/**
+ * @param {{
+ *   holisticHAtAgeMa: (tMa: number) => (number | null),
+ *   tableAnchorYear: number,
+ *   driftRefYear: number,
+ *   hJ2000: number,
+ *   yearMin?: number,
+ *   yearMax?: number,
+ *   stepYears?: number,
+ * }} cfg — holisticHAtAgeMa MUST be the lattice-α form; tableAnchorYear is
+ *   startmodelYear (2000.5, table zero + t_Ma convention); driftRefYear is
+ *   startModelYearWithCorrection (the R3 drift anchor); hJ2000 the snapshot
+ *   rate the drift compares against; 10-kyr cells match both engines'
+ *   historic tables.
+ */
 function createPhaseMachinery({
-  holisticHAtAgeMa,   // (t_Ma) => H in years — MUST be the lattice-α form
-  tableAnchorYear,    // startmodelYear (2000.5): table zero + t_Ma convention
-  driftRefYear,       // startModelYearWithCorrection: R3 drift anchor
-  hJ2000,             // H at J2000 (the snapshot rate the drift compares against)
+  holisticHAtAgeMa,
+  tableAnchorYear,
+  driftRefYear,
+  hJ2000,
   yearMin = -500e6,
   yearMax = 500e6,
-  stepYears = 10000,  // 10 kyr per cell — matches both engines' historic tables
+  stepYears = 10000,
 }) {
+  /** @type {Float64Array | null} */
   let table = null;
   let j2000Idx = -1;
 
@@ -53,6 +69,7 @@ function createPhaseMachinery({
     const t = new Float64Array(N);
     j2000Idx = Math.round((tableAnchorYear - yearMin) / stepYears);
 
+    /** @param {number} year */
     const invH = (year) => {
       const t_Ma = (tableAnchorYear - year) / 1e6;
       const H = holisticHAtAgeMa(t_Ma);
@@ -82,20 +99,23 @@ function createPhaseMachinery({
   }
 
   /** Cumulative ∫1/H at a year (linear interpolation). null outside the range
-   *  or where the physics is undefined (past the tidal-lock asymptote). */
+   *  or where the physics is undefined (past the tidal-lock asymptote).
+   *  @param {number} year @returns {number | null} */
   function cumulAtYear(year) {
     ensureTable();
     if (year < yearMin || year > yearMax) return null;
+    const t = /** @type {Float64Array} */ (table);
     const idx_f = (year - yearMin) / stepYears;
     const idx_lo = Math.floor(idx_f);
-    const idx_hi = Math.min(idx_lo + 1, table.length - 1);
-    const v_lo = table[idx_lo];
-    const v_hi = table[idx_hi];
+    const idx_hi = Math.min(idx_lo + 1, t.length - 1);
+    const v_lo = t[idx_lo];
+    const v_hi = t[idx_hi];
     if (Number.isNaN(v_lo) || Number.isNaN(v_hi)) return null;
     return v_lo + (idx_f - idx_lo) * (v_hi - v_lo);
   }
 
-  /** ∫_{yearA}^{yearB} 1/H(t') dt'. null if either endpoint is out of domain. */
+  /** ∫_{yearA}^{yearB} 1/H(t') dt'. null if either endpoint is out of domain.
+   *  @param {number} yearA @param {number} yearB @returns {number | null} */
   function integralBetween(yearA, yearB) {
     if (yearA === yearB) return 0;
     const cA = cumulAtYear(yearA);
@@ -107,7 +127,8 @@ function createPhaseMachinery({
   /** How far the integrated form has drifted from the J2000-snapshot form over
    *  (yearA → driftRefYear). Subtracting it at the anchor restores the
    *  snapshot-fitted harmonic calibration at J2000 without changing the
-   *  integrated form's shape at deep time. */
+   *  integrated form's shape at deep time.
+   *  @param {number} yearA @returns {number} */
   function j2000Drift(yearA) {
     const integral = integralBetween(yearA, driftRefYear);
     if (integral === null) return 0;
@@ -119,7 +140,9 @@ function createPhaseMachinery({
    *  R3: the anchor is identified from the CALL SHAPE — two shapes exist,
    *  (anchor, movingYear, N) and (J2000, anchor, N) where yearA IS the J2000
    *  reference itself. The correction depends only on a FIXED endpoint, so it
-   *  is constant across any scan. Returns null past the tidal-lock asymptote. */
+   *  is constant across any scan. Returns null past the tidal-lock asymptote.
+   *  @param {number} yearA @param {number} yearB @param {number} divisorN
+   *  @returns {number | null} */
   function cyclesBetween(yearA, yearB, divisorN) {
     const integral = integralBetween(yearA, yearB);
     if (integral === null) return null;
@@ -129,20 +152,22 @@ function createPhaseMachinery({
   }
 
   /** Inverse of cumulAtYear — the year at a given cumulative ∫1/H (binary
-   *  search over the monotone table). null outside the table domain. */
+   *  search over the monotone table). null outside the table domain.
+   *  @param {number} targetCumul @returns {number | null} */
   function yearAtCumul(targetCumul) {
     ensureTable();
-    const N = table.length;
+    const t = /** @type {Float64Array} */ (table);
+    const N = t.length;
     let lo = 0, hi = N - 1;
-    while (lo < N && Number.isNaN(table[lo])) lo++;
-    while (hi >= 0 && Number.isNaN(table[hi])) hi--;
+    while (lo < N && Number.isNaN(t[lo])) lo++;
+    while (hi >= 0 && Number.isNaN(t[hi])) hi--;
     if (lo >= hi) return null;
-    if (targetCumul < table[lo] || targetCumul > table[hi]) return null;
+    if (targetCumul < t[lo] || targetCumul > t[hi]) return null;
     while (lo < hi - 1) {
       const mid = (lo + hi) >> 1;
-      if (table[mid] <= targetCumul) lo = mid; else hi = mid;
+      if (t[mid] <= targetCumul) lo = mid; else hi = mid;
     }
-    const v_lo = table[lo], v_hi = table[hi];
+    const v_lo = t[lo], v_hi = t[hi];
     const frac = (v_lo === v_hi) ? 0 : (targetCumul - v_lo) / (v_hi - v_lo);
     return yearMin + (lo + frac) * stepYears;
   }
@@ -151,7 +176,8 @@ function createPhaseMachinery({
    *  this grid but keep their own integrands (they move at Phase 8). */
   function grid() {
     ensureTable();
-    return { yearMin, yearMax, stepYears, j2000Idx, length: table.length };
+    const t = /** @type {Float64Array} */ (table);
+    return { yearMin, yearMax, stepYears, j2000Idx, length: t.length };
   }
 
   return { ensureTable, cumulAtYear, integralBetween, j2000Drift, cyclesBetween, yearAtCumul, grid };
