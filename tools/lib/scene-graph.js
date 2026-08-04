@@ -126,13 +126,21 @@ const _FW_A2_RATE = 2 * (360 * 36525 / C.moonTropicalMonth)
                   - 2 * (360 * 36525 / C.planets.jupiter.solarYearInput);
 const _FW_A3_RATE = 360 * 36525 / C.moonSiderealMonth;
 
-// Jupiter orbital chain (mirrors src/script.js meanJupiterOrbitalCyclesBetween:
-// Driver 2 — T_p(t) = T_p0·(1 − massloss·t)²) for the deep-time A2 argument.
-const _JUP_PERIOD_J2000_S = C.planets.jupiter.solarYearInput * 86400;
-const _meanJupiterOrbitalPeriodSecondsTools = (t_Ma) =>
-  t_Ma === 0 ? _JUP_PERIOD_J2000_S
-             : _JUP_PERIOD_J2000_S * Math.pow(1 - DT.SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6, 2);
-const _mcJupiter = (a, b) => _moonChainCyclesTools(_meanJupiterOrbitalPeriodSecondsTools, a, b);
+// Planet orbital chains (8.3-1 S-P2 — mirrors src/script.js
+// mean<Planet>OrbitalCyclesBetween: Driver 2, T_p(t) = T_p0·(1 − massloss·t)²).
+// Was Jupiter-only (the Moon A2 argument feed); the other six were MISSING —
+// under SG_DEEP_TIME=1 the Node planets ran frozen J2000 speeds (the same
+// gap class as the Phase 9.13 Moon mirror). One period fn per planet, stable
+// identity, so the shared chain-cycles tables key correctly.
+const _mcPlanet = {};
+for (const _pk of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+  const T0 = C.planets[_pk].solarYearInput * 86400;
+  const periodFn = (t_Ma) =>
+    t_Ma === 0 ? T0
+               : T0 * Math.pow(1 - DT.SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6, 2);
+  _mcPlanet[_pk] = (a, b) => _moonChainCyclesTools(periodFn, a, b);
+}
+const _mcJupiter = _mcPlanet.jupiter;   // the deep-time A2 argument feed (unchanged identity semantics)
 
 // Phase 8.2-5: the argument skeleton lives ONCE in
 // @hum/physics/moon/arguments (the _FW_MOON bundle, the Sun secular
@@ -1021,6 +1029,11 @@ function buildSceneGraph() {
         + (absPlanetSpeed - periPrecRate) * pos_peri;
       planetDef.perihelionPrecessionRate = periPrecRate;
     }
+    // 8.3-1 S-P2: deep-time orbital integrator tags (mirrors src/script.js
+    // Phase P-B1..B7; sign from the def's own speed — Mars is −1 by the
+    // scene-graph framing convention, not physics).
+    planetDef._dtPlanetIntegrator = _mcPlanet[key];
+    planetDef._dtPlanetSign = Math.sign(planetDef.speed);
     const planetNodes = makeObjectNodes(key, planetDef);
     realPeri.pivot.addChild(planetNodes.container);
 
@@ -1116,6 +1129,13 @@ function moveModel(graph, pos) {
       // the ring lag the Moon by precession-rate × ΔT at deep time.
       const _cyc = def._dtMoonIntegrator(C.startModelYearWithCorrection, _jdToSIyearTools(_jdTTToolsFromUT(_jdHere)));
       θ = (_cyc !== null ? _cyc : 0) * 2 * Math.PI * def._dtMoonSign - def.startPos * d2r;
+    } else if (DEEP_TIME_ENABLED && def._dtPlanetIntegrator) {
+      // 8.3-1 S-P2 (mirrors src/script.js Phase P-B0 dispatch): planet-chain
+      // integral form, Driver 2 Kepler + mass loss, on the TT clock — the
+      // same anchor/coordinate as the Moon branch above.
+      const _jdHereP = _jdFromPosTools(pos);
+      const _cycP = def._dtPlanetIntegrator(C.startModelYearWithCorrection, _jdToSIyearTools(_jdTTToolsFromUT(_jdHereP)));
+      θ = (_cycP !== null ? _cycP : 0) * 2 * Math.PI * def._dtPlanetSign - def.startPos * d2r;
     } else {
       θ = def.speed * pos - def.startPos * d2r;
     }
