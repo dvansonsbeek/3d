@@ -195,10 +195,14 @@ timing), with in-window rows at zero (the legacy pure-ICRF comparison
 drifts +1.4°/century). NASA full-canon recall 99.58 / tight-window 74.62 /
 type 98.66 (model event total 12,070 vs NASA's 12,064; all mismatch
 samples knife-edge at the γ ≈ 1.0/1.5 boundaries); 26-event historical
-audit split 1 confirmed · 11 off-peak · 6 regional · 0 ΔT-signal ·
-8 geographic (an umbra-centerline distance class, not visibility — the
-penumbra can still cover these sites; −708 Lu State sits at 1002 km, on
-the 1000-km class boundary); timed Babylonian lunar corpus (Almagest records, reduced via
+audit split 1 confirmed · 11 off-peak · 5 regional · 0 ΔT-signal ·
+9 geographic (an umbra-centerline distance class, not visibility — the
+penumbra can still cover these sites; post-§10g batch: the
+quadrature-locked joint sidebands + the symmetric divisor set moved the
+solar longitudes by tens of km at the umbra, flipping −647 over the
+1000-km gate at 1014 km and moving −708 Lu State 1002 → 1055 km — both
+remain boundary-class; the pre-§10g split was 6 regional · 8 geographic);
+timed Babylonian lunar corpus (Almagest records, reduced via
 local astronomy only — no external ΔT, no eclipse canon): non-deep
 skeleton mean +3 min / RMS 36 min (statistically identical to conventional
 secular theory's +2/34), deep-chains branch **−7 min / 37 min / 5-of-6 in
@@ -822,7 +826,8 @@ alignment audit (see
 [Historical Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)
 and [doc 103](103-135-babylonian-case-study.md)), -135 reports BestGap
 BestGap 1221 km (geographic verdict, at the regional boundary; audit
-history: 949 km legacy arguments → 1032 → 1088 → 1221 across the
+history: 949 km legacy arguments → 1032 → 1088 → 1221 → 1323 (post-§10g
+quadrature-locked sidebands + symmetric divisor set) across the
 certified batches) with the framework's predicted UT within 16 minutes of
 the documented UT — a *where* residual carried by Sun-side longitude, GMST
 convention, and umbra geometry, primarily not a *when* residual and
