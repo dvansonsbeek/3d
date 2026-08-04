@@ -460,16 +460,24 @@ function _fwMoonArgs(jd_tt) {
 }
 
 /** Argument dispatcher mirror: framework-native by default, pure Meeus
- *  polynomials (from the centralized tables) when MOON_ARGS_PURE_MEEUS=1. */
+ *  polynomials when MOON_ARGS_PURE_MEEUS=1.
+ *  8.2-1 S2 alignment: the polynomials are Meeus's EXACT FRACTIONS, verbatim
+ *  from src/script.js _moonArgsAt. The previous decimal coefficients from
+ *  meeus-lunar-tables.json contained two outright errors (Lp T⁴ off by
+ *  0.056%, F T⁴ in the 5th figure) — the fraction form is the original and
+ *  the two engines now evaluate identical expressions. */
 function _moonArgsAtTools(jd_tt) {
   if (MOON_ARGS_FRAMEWORK_NATIVE) return _fwMoonArgs(jd_tt);
   const T = (jd_tt - C.j2000JD) / 36525;
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
-  const FA = MEEUS_LUNAR.fundamentalArguments;
-  const pe = (c) => c[0] + c[1] * T + c[2] * T2 + c[3] * T3 + (c[4] || 0) * T4;
   const wrap = (x) => ((x % 360) + 360) % 360;
-  return { Lp: wrap(pe(FA.Lp)), D: wrap(pe(FA.D)), M: wrap(pe(FA.M)),
-           Mp: wrap(pe(FA.Mp)), F: wrap(pe(FA.F)) };
+  return {
+    Lp: wrap(218.3164477 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841 - T4 / 65194000),
+    D:  wrap(297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000),
+    M:  wrap(357.5291092 +  35999.0502909 * T - 0.0001536 * T2 + T3 / 24490000),
+    Mp: wrap(134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000),
+    F:  wrap( 93.2720950 + 483202.0175233 * T - 0.0036539 * T2 - T3 / 3526000 + T4 / 863310000),
+  };
 }
 
 /** Bounded Meeus E-factor mirror: e_E(t)/e_E(J2000) from the fully-derived
@@ -480,7 +488,10 @@ function _fwEFactorTools(d_days, T, T2) {
     return 1 + EC.e1 * T + EC.e2 * T2;
   }
   const DTmod = require('./deep-time');
-  return DTmod._fwEarthEcc(d_days / C.inputMeanSolarYear) / DTmod._fwEarthEcc(0);
+  // Denominator is the J2000 anchor CONST, not _fwEarthEcc(0): under the
+  // integrated phase (8.2-1 S1) cycles(2000→2000) carries the R3 drift
+  // correction and is not exactly zero. Mirrors src/script.js _fwEFactor.
+  return DTmod._fwEarthEcc(d_days / C.inputMeanSolarYear) / DTmod._FW_ECC_E0;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

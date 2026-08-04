@@ -915,16 +915,22 @@ function _fwEarthEccComposite(t_yr) {
 // amplitude = base/2, phase = ϖ_ICRF(J2000) − 21.77° = 81.18° past max.
 // Observed J2000 e (−0.86%) and ė (+1.7%) are PREDICTIONS, not inputs.
 // Supersedes the Laskar-band composite (retained for A/B) and the
-// fitted-phase line (solved φ = 78.6° hereby derived). Snapshot phase
-// (tools libs are pure snapshot kinematics; src adds deep-time integration).
+// fitted-phase line (solved φ = 78.6° hereby derived).
+// INTEGRATED phase via cyclesBetweenYears (∫3/H(t)dt), 8.2-1 S1 alignment:
+// this was a linear snapshot phase (wYr·t_yr) while the browser integrated —
+// the two agreed at J2000 and diverged as Δt² (measured: ~5e-7 in e at
+// ±100 kyr, inflating to ~2e4 s of perigee-precession period at −5 Ma).
+// One truth now, the browser's certified form (doc 66: the derived e_E line).
 const _FW_ECC = (() => {
   const AR = C.ASTRO_REFERENCE;
   const th0 = (AR.earthPerihelionLongitudeJ2000 - AR.earthInclinationCycleAnchor) * Math.PI / 180;
   const A = C.eccentricityBase / 2;
-  return { th0, A, c: C.eccentricityBase, e0: C.eccentricityBase + A * Math.cos(th0), wYr: 2 * Math.PI / (C.H / 3) };
+  return { th0, A, c: C.eccentricityBase, e0: C.eccentricityBase + A * Math.cos(th0) };
 })();
 function _fwEarthEcc(t_yr) {
-  return _FW_ECC.c + _FW_ECC.A * Math.cos(_FW_ECC.th0 + _FW_ECC.wYr * t_yr);
+  const cycles = cyclesBetweenYears(2000, 2000 + t_yr, 3);
+  if (cycles === null) return _FW_ECC.c;   // past tidal-lock asymptote — mean
+  return _FW_ECC.c + _FW_ECC.A * Math.cos(_FW_ECC.th0 + 2 * Math.PI * cycles);
 }
 const _FW_ECC_E0 = _FW_ECC.e0;                                     // J2000 value anchor (exact by construction)
 const _FW_ECC_G0 = Math.pow(1 - _FW_ECC_E0 * _FW_ECC_E0, -1.5);
@@ -1402,6 +1408,11 @@ function posFromJD(jd) {
 module.exports = {
   // Framework e_E: H/3 fluctuation line (production) + Laskar-band composite (A/B research)
   _fwEarthEcc,
+  // The J2000 anchor const — the E-factor denominator. NOT _fwEarthEcc(0):
+  // under integrated phase, cycles(2000→2000) carries the R3 drift correction
+  // and is not exactly zero, which is why the anchor is a const by
+  // construction (mirrors src/script.js _FW_ECC_E0).
+  _FW_ECC_E0,
   _fwEarthEccComposite,
   // Layer 0 wiring (PHASE-B): the parameter bundle, so every consumer builds
   // the pure primitives from identical numbers. Inject `earthMoiFactorAtAge`

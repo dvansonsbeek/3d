@@ -3,12 +3,12 @@
   "_description": "Lunar position perturbation tables. Each row: [D, M, M', F, coefficient]. D=mean elongation, M=Sun mean anomaly, M'=Moon mean anomaly, F=Moon argument of latitude. Coefficients in units of 1e-6 degrees.",
 
   "fundamentalArguments": {
-    "_description": "Polynomial coefficients for fundamental arguments (degrees). Format: [a0, a1, a2, a3, a4] where arg = a0 + a1*T + a2*T² + a3*T³ + a4*T⁴",
-    "Lp": [218.3164477, 481267.88123421, -0.0015786, 1.855835e-6, -1.534740e-8],
-    "D":  [297.8501921, 445267.1114034, -0.0018819, 1.831945e-6, -8.844768e-9],
-    "M":  [357.5291092, 35999.0502909, -0.0001536, 4.08329e-8, 0],
-    "Mp": [134.9633964, 477198.8675055, 0.0087414, 1.434740e-5, -6.797272e-8],
-    "F":  [93.2720950, 483202.0175233, -0.0036539, -2.836249e-7, 1.158384e-9]
+    "_description": "Polynomial coefficients for fundamental arguments (degrees). Format: [a0, a1, a2, a3, a4] where arg = a0 + a1*T + a2*T² + a3*T³ + a4*T⁴. The T³/T⁴ entries are the EXACT doubles of Meeus's fraction forms (e.g. Lp a3 = 1/538841, a4 = -1/65194000) — corrected at 8.2-1: the previous decimals included two outright errors (Lp a4 off by 0.056%, F a4 in the 5th figure). Runtimes evaluate the fractions directly (src/script.js _moonArgsAt, tools/lib/scene-graph.js _moonArgsAtTools); this block is the reference copy for the research scripts.",
+    "Lp": [218.3164477, 481267.88123421, -0.0015786, 1.855835023689734e-6, -1.5338834862103876e-8],
+    "D":  [297.8501921, 445267.1114034, -0.0018819, 1.8319447192361523e-6, -8.844469995135542e-9],
+    "M":  [357.5291092, 35999.0502909, -0.0001536, 4.083299305839118e-8, 0],
+    "Mp": [134.9633964, 477198.8675055, 0.0087414, 1.4347408140719379e-5, -6.797172376291463e-8],
+    "F":  [93.2720950, 483202.0175233, -0.0036539, -2.8360748723766307e-7, 1.1583324645839848e-9]
   },
 
   "additionalArguments": {
