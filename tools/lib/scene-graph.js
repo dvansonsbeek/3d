@@ -134,27 +134,50 @@ const _meanJupiterOrbitalPeriodSecondsTools = (t_Ma) =>
              : _JUP_PERIOD_J2000_S * Math.pow(1 - DT.SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6, 2);
 const _mcJupiter = (a, b) => _moonChainCyclesTools(_meanJupiterOrbitalPeriodSecondsTools, a, b);
 
-const _FW_MOON = (() => {
-  const LP0 = 218.3164477, D0 = 297.8501921, M0 = 357.5291092,
-        MP0 = 134.9633964, F0 = 93.2720950;
-  const LPR = 481267.88123421, DR = 445267.1114034, MR = 35999.0502909,
-        MPR = 477198.8675055,  FR = 483202.0175233;
-  const WDOT = LPR - MPR;
-  const NDOT = LPR - FR;
-  const E0 = C.ASTRO_REFERENCE.earthEccentricityJ2000, EDOT0 = C.ASTRO_REFERENCE.earthEccentricityDotJ2000;
-  const KAPPA = 3 * E0 * EDOT0 / (1 - E0 * E0);
-  const S_W = 2.407, S_N = 1.018;   // both Meeus-effective (v4 frame attribution; physical 2.479/0.867)
-  const T2_W = S_W * WDOT * KAPPA / 2;
-  const T2_N = S_N * NDOT * KAPPA / 2;
-  const EDDOT0 = C.ASTRO_REFERENCE.earthEccentricityDotDotJ2000;   // Taylor-check anchor (mirrors src/script.js _FW_MOON)
-  const KAPPA_DOT = 3 * (EDOT0 * EDOT0 + E0 * EDDOT0) / (1 - E0 * E0)
-                  + 6 * E0 * E0 * EDOT0 * EDOT0 / Math.pow(1 - E0 * E0, 2);
-  const T3_W = WDOT * (S_W * S_W * KAPPA * KAPPA + S_W * KAPPA_DOT) / 6;
-  const T3_N = NDOT * (S_N * S_N * KAPPA * KAPPA + S_N * KAPPA_DOT) / 6;
-  const T2_LP_TIDAL     = (-25.86 / 3600) / 2;
-  const T2_LP = T2_LP_TIDAL + (-0.0015786 - T2_LP_TIDAL);
-  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
-})();
+// Phase 8.2-5: the argument skeleton lives ONCE in
+// @hum/physics/moon/arguments (the _FW_MOON bundle, the Sun secular
+// deviations — now on the browser's CALENDAR year coordinate, closing S3 —
+// the two bounded Lp carriers with the anchor-const e0 (this mirror used
+// _fwEarthEcc(0)), and both argument branches). This engine injects its own
+// chain wrappers; env toggles ride along.
+const { createMoonArguments } = require('@hum/physics/moon/arguments');
+let _moonArgsMTools = null;
+function _moonArgsM() {
+  if (_moonArgsMTools === null) {
+    const DTmod = require('./deep-time');
+    const AR = C.ASTRO_REFERENCE;
+    _moonArgsMTools = createMoonArguments({
+      constants: {
+        j2000JD: C.j2000JD, julianCenturyDays: 36525,
+        holisticYearJ2000: C.H,
+        balancedYearJ2000: C.balancedYear,
+        meanSolarYearDays: C.meanSolarYearDays,
+        meanAnomalisticYearDays: C.meanAnomalisticYearDays,
+        tropicalYearHarmonics: C.TROPICAL_YEAR_HARMONICS,
+        anomalisticYearHarmonics: C.ANOMALISTIC_YEAR_HARMONICS,
+        eccentricityJ2000: AR.earthEccentricityJ2000,
+        eccentricityDotJ2000: AR.earthEccentricityDotJ2000,
+        eccentricityDotDotJ2000: AR.earthEccentricityDotDotJ2000,
+        elpEarthFigureJ2ArcsecPerCy2: AR.elpW1T2Decomposition_arcsecPerCy2.earthFigureJ2,
+        elpGeneralPrecessionPA_T2ArcsecPerCy2: AR.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976,
+        eccE0: DTmod._moonEcc().e0,
+      },
+      fns: {
+        eccAt: DTmod._fwEarthEcc,
+        channelIntegral: (T, s) => DTmod._moonEcc().channelIntegral(T, s),
+        computeObliquityEarth: OE.computeObliquityEarth,
+        jdToSIyear: _jdToSIyearTools,
+        tropicalOrbitsBetween: _mcTropical,
+        apsidalOfDateCyclesBetween: _mcApsidalOfDate,
+        nodalOfDateCyclesBetween: _mcNodalOfDate,
+        cyclesBetween: DTmod.cyclesBetweenYears,
+        isDeepTime: () => DEEP_TIME_ENABLED,
+        isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
+      },
+    });
+  }
+  return _moonArgsMTools;
+}
 
 /** Phase-aware channel-rate integral — delegates to the shared
  *  @hum/physics moon eccentricity channel (8.2-2). This mirror once
@@ -165,34 +188,10 @@ function _fwChannelIntegralTools(T, s) {
   return require('./deep-time')._moonEcc().channelIntegral(T, s);
 }
 
-const _FW_SUN_SEC = (() => {
-  const trop = C.TROPICAL_YEAR_HARMONICS, anom = C.ANOMALISTIC_YEAR_HARMONICS;
-  const PBAR = C.meanSolarYearDays, ABAR = C.meanAnomalisticYearDays, DBAR = ABAR - PBAR;
-  const KL = -(360 / PBAR);
-  const wbar = 360 * DBAR / ABAR;
-  const KA = wbar * PBAR / (ABAR * DBAR);
-  const KS = -wbar / DBAR;
-  const dP = (y, set) => { const t = y - C.balancedYear; let s = 0;
-    for (const [dv, sc, cc] of set) { const w = 2 * Math.PI / (C.H / dv);
-      s += sc * Math.sin(w * t) + cc * Math.cos(w * t); } return s; };
-  const intdP = (y, set) => { const t = y - C.balancedYear; let s = 0;
-    for (const [dv, sc, cc] of set) { const w = 2 * Math.PI / (C.H / dv);
-      s += (-sc * Math.cos(w * t) + cc * Math.sin(w * t)) / w; } return s; };
-  return { int0T: intdP(2000, trop), int0A: intdP(2000, anom),
-           slope0L: KL * dP(2000, trop),
-           slope0P: KA * dP(2000, anom) + KS * dP(2000, trop),
-           KL, KA, KS, dP, intdP, trop, anom };
-})();
-
-function _fwSunSecularDeviations(jd_tt) {
-  const y = 2000 + (jd_tt - C.j2000JD) / C.inputMeanSolarYear;
-  const S = _FW_SUN_SEC;
-  const iT = S.intdP(y, S.trop) - S.int0T, iA = S.intdP(y, S.anom) - S.int0A;
-  return {
-    dLs:   S.KL * iT - S.slope0L * (y - 2000),
-    dPeri: S.KA * iA + S.KS * iT - S.slope0P * (y - 2000),
-  };
-}
+// S3 closed: the shared module evaluates the Sun secular deviations on the
+// browser's CALENDAR year coordinate (this mirror used the linear
+// 2000 + d/inputMeanSolarYear approximation).
+function _fwSunSecularDeviations(jd_tt) { return _moonArgsM().sunSecularDeviations(jd_tt); }
 
 // ── Stage B deep-time branch (mirror of src/script.js _fwMoonArgsDeep) ─────
 // Always-chains: secular phases from the factored-law month/precession chains
@@ -309,104 +308,19 @@ function _jdTTToolsFromUT(jd) {
 // frame ṗ_A T² +1.11113 (equinox-of-date bridge; now DERIVED at 104% by the
 // ṗ composition chain, v4-pdot-composer3.js) + 0.077 Meeus-era
 // tidal-convention gap (Γ embedded −25.706 vs LLR −25.858).
-let _fwLpKplTools = null;
-function _fwLpPlanetaryCarrierTools(T) {
-  if (T === 0) return 0;
-  const DTmod = require('./deep-time');
-  if (_fwLpKplTools === null) {
-    const de2dT = Math.pow(DTmod._fwEarthEcc(50), 2) - Math.pow(DTmod._fwEarthEcc(-50), 2);
-    // v4 carrier split: channel part only (planetary + Meeus-era tidal gap);
-    // the figure+frame part moved to _fwLpObliquityCarrierTools. k = −2332,
-    // inside the adiabatic −2370 ± 40 (E5).
-    const _elp = C.ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2;
-    const _t2Obl = (_elp.earthFigureJ2 + _elp.generalPrecessionPA_T2_Lieske1976) / 3600;
-    _fwLpKplTools = 2 * (_FW_MOON.T2_LP - _FW_MOON.T2_LP_TIDAL - _t2Obl) / de2dT;
-  }
-  const e0 = DTmod._fwEarthEcc(0), e0sq = e0 * e0;
-  const f = (t) => { const e = DTmod._fwEarthEcc(t * 100); return e * e - e0sq; };
-  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
-  const h = T / N;
-  let sum = f(0) + f(T);
-  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
-  return _fwLpKplTools * sum * h / 3;
-}
+// 8.2-5: shared carrier. This mirror used _fwEarthEcc(0) for e0² where the
+// browser uses the channel's e0 anchor CONST — the shared module settles on
+// the const (the R3-drift-aware convention).
+function _fwLpPlanetaryCarrierTools(T) { return _moonArgsM().planetaryCarrier(T); }
 
 // v4 carrier split — bounded obliquity-line carrier mirror (src/script.js
 // _fwLpObliquityCarrier): the figure+frame remainder (+1.30363″/cy²) rides
 // the framework obliquity cycle; C_OBL = 2·T2_OBL/ε̇₀; zero new fitted values.
-let _fwLpOblTools = null;
-function _fwLpObliquityCarrierTools(T) {
-  if (T === 0) return 0;
-  if (_fwLpOblTools === null) {
-    const _elp = C.ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2;
-    const T2_OBL = (_elp.earthFigureJ2 + _elp.generalPrecessionPA_T2_Lieske1976) / 3600;
-    const eps0 = OE.computeObliquityEarth(2000);
-    const epsDot = OE.computeObliquityEarth(2050) - OE.computeObliquityEarth(1950);
-    _fwLpOblTools = { eps0, C: 2 * T2_OBL / epsDot };
-  }
-  const f = (t) => OE.computeObliquityEarth(2000 + t * 100) - _fwLpOblTools.eps0;
-  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 2000));
-  const h = T / N;
-  let sum = f(0) + f(T);
-  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
-  return _fwLpOblTools.C * sum * h / 3;
-}
+function _fwLpObliquityCarrierTools(T) { return _moonArgsM().obliquityCarrier(T); }
 
-let _fwArgsY0Tools = null;
-function _fwMoonArgsDeepTools(jd) {
-  const A = _FW_MOON;
-  if (_fwArgsY0Tools === null) _fwArgsY0Tools = _jdToSIyearTools(C.j2000JD);
-  const y = _jdToSIyearTools(jd);
-  const Ntrop = _moonChainCyclesTools(DT.meanTropicalMonthAtAge, _fwArgsY0Tools, y);
-  const Nanom = _moonChainCyclesTools(DT.meanAnomalisticMonthAtAge, _fwArgsY0Tools, y);
-  const Ndrac = _moonChainCyclesTools(DT.meanNodalMonthAtAge, _fwArgsY0Tools, y);
-  const Nperi = DT.cyclesBetweenYears(_fwArgsY0Tools, y, 16);
-  if (Ntrop === null || Nanom === null || Ndrac === null || Nperi === null) return null;
-  const wrap = (x) => ((x % 360) + 360) % 360;
-  const dev = _fwSunSecularDeviations(jd);
-  // Planetary Lp remainder — bounded e_E² carrier (see src comment)
-  const Tj = (jd - C.j2000JD) / 36525;
-  const Lp   = A.LP0 + 360 * Ntrop + _fwLpPlanetaryCarrierTools(Tj) + _fwLpObliquityCarrierTools(Tj);
-  const w    = (A.LP0 - A.MP0) + 360 * (Ntrop - Nanom);            // of-date perigee, advance
-  const om   = (A.LP0 - A.F0)  - 360 * (Ndrac - Ntrop);            // of-date node, regression
-  const Lsun = (A.LP0 - A.D0) + 360 * (y - _fwArgsY0Tools) + dev.dLs;
-  const ws   = (A.LP0 - A.D0 - A.M0) + 360 * Nperi + dev.dPeri;
-  return { Lp: wrap(Lp), D: wrap(Lp - Lsun), M: wrap(Lsun - ws),
-           Mp: wrap(Lp - w), F: wrap(Lp - om) };
-}
+function _fwMoonArgsDeepTools(jd) { return _moonArgsM().fwArgsDeep(jd); }
 
-function _fwMoonArgs(jd_tt) {
-  // Always-chains in deep-time mode (Stage B; mirrors src — no toggle,
-  // this is simply how deep-time mode works). Snapshot mode keeps the
-  // certified polynomial skeleton.
-  if (DEEP_TIME_ENABLED) {
-    const dt = _fwMoonArgsDeepTools(jd_tt);
-    if (dt !== null) return dt;
-  }
-  const A = _FW_MOON;
-  const T = (jd_tt - C.j2000JD) / 36525;
-  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
-  const wrap = (x) => ((x % 360) + 360) % 360;
-  // Polynomial tails clamped at |T| ≤ 100 cy (mirrors src/script.js — the
-  // unclamped T⁴ tail reverses lunar motion at year ~1.99e6)
-  const Tc = Math.max(-100, Math.min(100, T));
-  const Tc2 = Tc * Tc, Tc3 = Tc2 * Tc, Tc4 = Tc3 * Tc;
-  // D3 (v4): T³/T⁴ tails derived — see src/script.js note + tools/explore/v4-d3-tails.js
-  const Lp = A.LP0 + A.LPR * T + A.T2_LP * Tc2 + Tc3 / 538841 - Tc4 / 65194000;
-  // Phase-aware channel rate (mirror): rate = WDOT·(g/g₀)^s integrated exactly
-  const w  = (A.LP0 - A.MP0) + A.WDOT * (T + _fwChannelIntegralTools(T, A.S_W));
-  const om = (A.LP0 - A.F0)  + A.NDOT * (T + _fwChannelIntegralTools(T, A.S_N));
-  const dev  = _fwSunSecularDeviations(jd_tt);
-  const Lsun = (A.LP0 - A.D0) + (A.LPR - A.DR) * T + dev.dLs;
-  const ws   = (A.LP0 - A.D0 - A.M0) + (A.LPR - A.DR - A.MR) * T + dev.dPeri;
-  return {
-    Lp: wrap(Lp),
-    D:  wrap(Lp - Lsun),
-    M:  wrap(Lsun - ws),
-    Mp: wrap(Lp - w),
-    F:  wrap(Lp - om),
-  };
-}
+function _fwMoonArgs(jd_tt) { return _moonArgsM().fwArgs(jd_tt); }
 
 /** Argument dispatcher mirror: framework-native by default, pure Meeus
  *  polynomials when MOON_ARGS_PURE_MEEUS=1.
@@ -416,17 +330,7 @@ function _fwMoonArgs(jd_tt) {
  *  0.056%, F T⁴ in the 5th figure) — the fraction form is the original and
  *  the two engines now evaluate identical expressions. */
 function _moonArgsAtTools(jd_tt) {
-  if (MOON_ARGS_FRAMEWORK_NATIVE) return _fwMoonArgs(jd_tt);
-  const T = (jd_tt - C.j2000JD) / 36525;
-  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
-  const wrap = (x) => ((x % 360) + 360) % 360;
-  return {
-    Lp: wrap(218.3164477 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841 - T4 / 65194000),
-    D:  wrap(297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000),
-    M:  wrap(357.5291092 +  35999.0502909 * T - 0.0001536 * T2 + T3 / 24490000),
-    Mp: wrap(134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000),
-    F:  wrap( 93.2720950 + 483202.0175233 * T - 0.0036539 * T2 - T3 / 3526000 + T4 / 863310000),
-  };
+  return _moonArgsM().argsAt(jd_tt);   // framework-native / pure-Meeus dispatch (env toggle injected)
 }
 
 /** Bounded Meeus E-factor mirror: e_E(t)/e_E(J2000) from the fully-derived

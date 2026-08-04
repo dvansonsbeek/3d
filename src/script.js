@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -3828,34 +3828,51 @@ function _fwSunMeanElements(jd_ut) {
  *  Meeus parabola reaches 82°). Phases use the fixed J2000 lattice (snapshot
  *  form) — the documented approximation, matching the L1-lattice convention;
  *  KL/KA/KS capture the J2000 mean-year values at load time by design. */
-const _FW_SUN_SEC = (() => {
-  const trop = TROPICAL_YEAR_HARMONICS, anom = ANOMALISTIC_YEAR_HARMONICS;
-  const PBAR = meansolaryearlengthinDays, ABAR = meanAnomalisticYearinDays, DBAR = ABAR - PBAR;
-  const KL = -(360 / PBAR);                    // deg/yr per day of δT_trop (mean Sun longitude)
-  const wbar = 360 * DBAR / ABAR;              // mean of-date perihelion rate, deg/yr
-  const KA = wbar * PBAR / (ABAR * DBAR);      // deg/yr per day of δT_anom (perihelion)
-  const KS = -wbar / DBAR;                     // deg/yr per day of δT_trop (perihelion)
-  const dP = (y, set) => { const t = y - BALANCED_YEAR_J2000_FIXED; let s = 0;
-    for (const [d, sc, cc] of set) { const w = 2 * Math.PI / (holisticyearLength / d);
-      s += sc * Math.sin(w * t) + cc * Math.cos(w * t); } return s; };
-  const intdP = (y, set) => { const t = y - BALANCED_YEAR_J2000_FIXED; let s = 0;
-    for (const [d, sc, cc] of set) { const w = 2 * Math.PI / (holisticyearLength / d);
-      s += (-sc * Math.cos(w * t) + cc * Math.sin(w * t)) / w; } return s; };
-  return { int0T: intdP(2000, trop), int0A: intdP(2000, anom),
-           slope0L: KL * dP(2000, trop),
-           slope0P: KA * dP(2000, anom) + KS * dP(2000, trop),
-           KL, KA, KS, dP, intdP, trop, anom };
+// Phase 8.2-5: the argument skeleton lives ONCE in
+// @hum/physics/moon/arguments (the _FW_MOON bundle, the Sun secular
+// deviations with their S3 calendar coordinate, the two bounded Lp
+// carriers, the deep chains branch, the polynomial skeleton, and the
+// pure-Meeus reference). This engine delegates, injecting its own chain
+// wrappers so the deep/snapshot and framework/Meeus toggles ride along.
+const _moonArgsM = (() => {
+  let m = null;
+  return () => {
+    if (!m) {
+      m = createMoonArguments({
+        constants: {
+          j2000JD, julianCenturyDays,
+          holisticYearJ2000: HOLISTIC_YEAR_J2000,
+          balancedYearJ2000: BALANCED_YEAR_J2000_FIXED,
+          meanSolarYearDays: meansolaryearlengthinDays,
+          meanAnomalisticYearDays: meanAnomalisticYearinDays,
+          tropicalYearHarmonics: TROPICAL_YEAR_HARMONICS,
+          anomalisticYearHarmonics: ANOMALISTIC_YEAR_HARMONICS,
+          eccentricityJ2000: ASTRO_REFERENCE.eccentricityJ2000,
+          eccentricityDotJ2000: ASTRO_REFERENCE.eccentricityDotJ2000,
+          eccentricityDotDotJ2000: ASTRO_REFERENCE.eccentricityDotDotJ2000,
+          elpEarthFigureJ2ArcsecPerCy2: ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2.earthFigureJ2,
+          elpGeneralPrecessionPA_T2ArcsecPerCy2: ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976,
+          eccE0: _moonEcc().e0,
+        },
+        fns: {
+          eccAt: _fwEarthEcc,
+          channelIntegral: _fwChannelIntegral,
+          computeObliquityEarth,
+          jdToSIyear: (jd) => _jdToSIyear(jd),
+          tropicalOrbitsBetween: meanMoonOrbitsBetweenYears,
+          apsidalOfDateCyclesBetween: meanMoonApsidalOfDateCyclesBetween,
+          nodalOfDateCyclesBetween: meanMoonNodalOfDateCyclesBetween,
+          cyclesBetween: cyclesBetweenYears,
+          isDeepTime: () => DEEP_TIME_MODE_ENABLED,
+          isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
+        },
+      });
+    }
+    return m;
+  };
 })();
 
-function _fwSunSecularDeviations(jd_tt) {
-  const y = julianDateToDecimalYear(jd_tt);
-  const S = _FW_SUN_SEC;
-  const iT = S.intdP(y, S.trop) - S.int0T, iA = S.intdP(y, S.anom) - S.int0A;
-  return {
-    dLs:   S.KL * iT - S.slope0L * (y - 2000),
-    dPeri: S.KA * iA + S.KS * iT - S.slope0P * (y - 2000),
-  };
-}
+function _fwSunSecularDeviations(jd_tt) { return _moonArgsM().sunSecularDeviations(jd_tt); }
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Framework-native lunar fundamental arguments
@@ -3900,49 +3917,9 @@ function _fwSunSecularDeviations(jd_tt) {
 // MOON_ARGS_FRAMEWORK_NATIVE is declared in the toggle block at the top of the
 // file (next to RESONATOR_DT_CORRECTION_ENABLED) — default ON.
 
-const _FW_MOON = (() => {
-  // Meeus Ch. 47 J2000 anchors (phases + of-date rates: observational anchors)
-  const LP0 = 218.3164477, D0 = 297.8501921, M0 = 357.5291092,
-        MP0 = 134.9633964, F0 = 93.2720950;
-  const LPR = 481267.88123421, DR = 445267.1114034, MR = 35999.0502909,
-        MPR = 477198.8675055,  FR = 483202.0175233;
-  const P_DEGCY = 360 * 13 / holisticyearLength * 100;   // framework general precession, deg/Julian cy
-  const WDOT = LPR - MPR;   // perigee ϖ̇ of-date (+4069.0137) = ϖ̇_ICRF + p
-  const NDOT = LPR - FR;    // node   Ω̇ of-date (−1934.1363) = Ω̇_ICRF + p
-  // e_E channel Taylor CHECKS (documented J2000 reference values — the live
-  // path is the phase-aware _fwChannelIntegral along the derived H/3 line,
-  // which consumes only S_W/S_N + the anchors/rates; the T2_*/T3_* constants
-  // below are NOT consumed by _fwMoonArgs):
-  // d ln(perturbation strength)/dt = 3e·ė/(1−e²) with the astro-reference
-  // secular-theory anchors (the derived line PREDICTS ė at +1.7% of this).
-  const E0 = ASTRO_REFERENCE.eccentricityJ2000, EDOT0 = ASTRO_REFERENCE.eccentricityDotJ2000;
-  const KAPPA = 3 * E0 * EDOT0 / (1 - E0 * E0);
-  // v4 FRAME ATTRIBUTION: these are FRAME-EFFECTIVE exponents (of-date rates,
-  // Meeus T² absorbed whole). Physically, every of-date Meeus T² contains the
-  // IAU precession acceleration ṗ_A T² (+1.1054″/cy², IAU2006); removing it
-  // gives physical exponents s_ϖ 2.479 / s_Ω 0.867 — which the 3-body
-  // laboratory reproduces from pure gravity at 100.3% / 101.5% (E1 +
-  // tools/explore/v4-frame-audit.js). Effective form kept: exact vs Meeus by
-  // construction; explicit bounded frame carrier = D4-companion follow-up.
-  const S_W = 2.407, S_N = 1.018;
-  const T2_W = S_W * WDOT * KAPPA / 2;   // −0.010318 deg/cy²  (Meeus ϖ:  −0.010320)
-  const T2_N = S_N * NDOT * KAPPA / 2;   // +0.0020752 deg/cy² (Meeus Ω:  +0.0020753 — exact; S_N was 1.0/98.2% before the v4 frame attribution superseded the "theory pins 1" rationale)
-  const EDDOT0 = ASTRO_REFERENCE.eccentricityDotDotJ2000;    // per cy², astro-reference (2× Meeus 25.4 T²)
-  const KAPPA_DOT = 3 * (EDOT0 * EDOT0 + E0 * EDDOT0) / (1 - E0 * E0)
-                  + 6 * E0 * E0 * EDOT0 * EDOT0 / Math.pow(1 - E0 * E0, 2);
-  const T3_W = WDOT * (S_W * S_W * KAPPA * KAPPA + S_W * KAPPA_DOT) / 6;  // ≈ −1.30e-5 °/cy³ (Meeus ϖ: −1.25e-5)
-  const T3_N = NDOT * (S_N * S_N * KAPPA * KAPPA + S_N * KAPPA_DOT) / 6;  // ≈ +2.57e-6 °/cy³ (Meeus Ω: +2.14e-6)
-  // L′ carrier T²: framework tidal n̈/2 + explicit planetary secular remainder
-  const T2_LP_TIDAL     = (-25.86 / 3600) / 2;           // α₁-chain n̈ (= LLR), doc 66 §5
-  const T2_LP_PLANETARY = -0.0015786 - T2_LP_TIDAL;      // +7.247″/cy² — K_PL normalization for the derived bounded carrier.
-  // v4 BUDGET (closed, zero free parameters — astro-reference.json
-  // elpW1T2Decomposition_arcsecPerCy2 + tools/explore/v4-kpl-budget.js):
-  // +7.247 = planetary +5.8665 (Chapront et al. 2002; the e_E²-channel part)
-  //        + Earth-figure J2 +0.1925 + frame ṗ_A T² +1.11113 (of-date bridge)
-  //        + 0.077 Meeus-era tidal gap (Γ embedded −25.706 vs LLR −25.858).
-  const T2_LP = T2_LP_TIDAL + T2_LP_PLANETARY;
-  return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
-})();
+// The _FW_MOON bundle now lives inside @hum/physics/moon/arguments (8.2-5);
+// read via _moonArgsM().bundle. The v4 frame-attribution and K_PL budget
+// derivation records are preserved in the module header and doc 66 §1.
 
 // D2: derived additional-argument rates (deg/cy), captured at load from the
 // J2000 8H-lattice months (the month globals are epoch-mutable; these rates
@@ -3984,37 +3961,7 @@ const FW_A3_RATE = 360 * julianCenturyDays / moonSiderealMonth;
  *  the chain anchors vs Meeus rates (docs/66 §1): M′ ≈ −0.9° at −584,
  *  dominated by the framework's kinematically-derived anomalistic month
  *  being 0.171 s shorter than Meeus's MPR-implied value. */
-let _fwArgsY0 = null;   // SI-year label of J2000 (lazy: _jdToSIyear is declared later in the file)
-function _fwMoonArgsDeep(jd) {
-  const A = _FW_MOON;
-  if (_fwArgsY0 === null) _fwArgsY0 = _jdToSIyear(j2000JD);
-  const y = _jdToSIyear(jd);
-  const Ntrop = meanMoonOrbitsBetweenYears(_fwArgsY0, y);
-  const Naps  = meanMoonApsidalOfDateCyclesBetween(_fwArgsY0, y);
-  const Nnod  = meanMoonNodalOfDateCyclesBetween(_fwArgsY0, y);
-  const Nperi = cyclesBetweenYears(_fwArgsY0, y, 16);
-  if (Ntrop === null || Naps === null || Nnod === null || Nperi === null) return null;   // tidal-lock guard
-  const wrap = (x) => ((x % 360) + 360) % 360;
-  const dev  = _fwSunSecularDeviations(jd);
-  // Planetary Lp remainder (+7.25″/cy² at J2000): REQUIRED by the record
-  // (dropping it shifts BCE oppositions by hours — measured on the
-  // timed-Babylonian corpus). The chains carry the tidal content; the
-  // planetary content rides the bounded e_E²-channel carrier (its J2000
-  // Taylor truncation is the old (T2_LP − T2_LP_TIDAL)·T² polynomial).
-  const Tj   = (jd - j2000JD) / julianCenturyDays;
-  const Lp   = A.LP0 + 360 * Ntrop + _fwLpPlanetaryCarrier(Tj) + _fwLpObliquityCarrier(Tj);
-  const w    = (A.LP0 - A.MP0) + 360 * Naps;                      // perigee ϖ (of-date, advance)
-  const om   = (A.LP0 - A.F0)  - 360 * Nnod;                      // node Ω (of-date, regression)
-  const Lsun = (A.LP0 - A.D0) + 360 * (y - _fwArgsY0) + dev.dLs;  // mean Sun (model timeline)
-  const ws   = (A.LP0 - A.D0 - A.M0) + 360 * Nperi + dev.dPeri;   // Sun perihelion (H/16 chain)
-  return {
-    Lp: wrap(Lp),
-    D:  wrap(Lp - Lsun),
-    M:  wrap(Lsun - ws),
-    Mp: wrap(Lp - w),
-    F:  wrap(Lp - om),
-  };
-}
+function _fwMoonArgsDeep(jd) { return _moonArgsM().fwArgsDeep(jd); }
 
 /** Framework-native lunar fundamental arguments {Lp, D, M, Mp, F} in degrees
  *  (of-date, same convention as the Meeus Ch. 47 block). Takes JD_TT. */
@@ -4029,51 +3976,7 @@ function _fwMoonArgs(jd_tt) {
   // incl. the ~2-min bounded-carrier shape shift). Snapshot mode keeps the certified polynomial skeleton —
   // the same mode split the scene layers use (locked J2000 speeds vs
   // integrators), bit-equivalent at J2000 by construction.
-  if (DEEP_TIME_MODE_ENABLED) {
-    const dt = _fwMoonArgsDeep(jd_tt);
-    if (dt !== null) return dt;
-  }
-  const A = _FW_MOON;
-  const T = (jd_tt - j2000JD) / julianCenturyDays;
-  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
-  const wrap = (x) => ((x % 360) + 360) % 360;
-  // Polynomial tails clamped at |T| ≤ 100 cy (±10 kyr): the T²/T³/T⁴ terms
-  // are fitted truncations valid ±few kyr — unclamped, the T⁴ tail cancels
-  // the lunar mean motion at T ≈ 19,870 cy (year ~1.99e6) and reverses it
-  // beyond. With deep-time mode ON this path only serves epochs beyond the
-  // ±500 Myr chain table, where frozen tails keep clean prograde mean motion.
-  const Tc = Math.max(-100, Math.min(100, T));
-  const Tc2 = Tc * Tc, Tc3 = Tc2 * Tc, Tc4 = Tc3 * Tc;
-  // D3 (v4): the T³/T⁴ "tails" are DERIVED — T³ = Adams–Laplace channel
-  // curvature k·(e_S²)″/6 with the secular ë (+104.2%) + obliquity-carrier
-  // 2nd order (−6.5%) + frame p_A T³ (+1.2%) = 98.8% of 1/538841; T⁴ 41%
-  // channel (quadratic-e), remainder documented (tools/explore/v4-d3-tails.js).
-  // Literals kept: they embody the SECULAR-ë convention (the H/3 line's own
-  // ë would flip the T³ sign — the known BCE-divergence, localized here).
-  const Lp = A.LP0 + A.LPR * T + A.T2_LP * Tc2 + Tc3 / 538841 - Tc4 / 65194000;
-  // Perigee/node from the PHASE-AWARE channel rate: ϖ̇(t) = WDOT·(g(e_E(t))/g₀)^s
-  // integrated exactly along the framework H/3 fluctuation line — fully
-  // derived, e = base·(1 + cosθ_i/2), phase from the inclination anchor
-  // 21.77° — the rate speeds up and slows down with the H/3 wobble phase
-  // (NOT one value). Replaces the frozen-κ T²/T³ Taylor truncation (T2_W/
-  // T3_W etc. remain in _FW_MOON as the documented J2000 Taylor checks).
-  const w  = (A.LP0 - A.MP0) + A.WDOT * (T + _fwChannelIntegral(T, A.S_W));   // perigee ϖ (of-date)
-  const om = (A.LP0 - A.F0)  + A.NDOT * (T + _fwChannelIntegral(T, A.S_N));   // node Ω (of-date)
-  // Framework-native D and M: identity-composed (D ≡ Lp − L_sun restored
-  // exactly; M ≡ L_sun − ϖ_sun). Anchors/rates are Meeus-exact at J2000 by
-  // construction (Ls0 ≡ LP0−D0 absorbs the Ch. 25/47 convention offset);
-  // secular content = framework real-time integrals (_fwSunSecularDeviations),
-  // replacing the last unbounded Meeus polynomials in the skeleton.
-  const dev  = _fwSunSecularDeviations(jd_tt);
-  const Lsun = (A.LP0 - A.D0) + (A.LPR - A.DR) * T + dev.dLs;                  // of-date mean Sun
-  const ws   = (A.LP0 - A.D0 - A.M0) + (A.LPR - A.DR - A.MR) * T + dev.dPeri;  // of-date Sun perihelion
-  return {
-    Lp: wrap(Lp),
-    D:  wrap(Lp - Lsun),
-    M:  wrap(Lsun - ws),
-    Mp: wrap(Lp - w),
-    F:  wrap(Lp - om),
-  };
+  return _moonArgsM().fwArgs(jd_tt);
 }
 
 /** Lunar fundamental arguments {Lp, D, M, Mp, F} (degrees, of-date) at JD_TT,
@@ -4085,17 +3988,7 @@ let _moonArgsProbeOverride = null; // D/M-probe button hook: (jd_tt) => args; AL
 
 function _moonArgsAt(jd_tt) {
   if (_moonArgsProbeOverride) return _moonArgsProbeOverride(jd_tt);
-  if (MOON_ARGS_FRAMEWORK_NATIVE) return _fwMoonArgs(jd_tt);
-  const T = (jd_tt - j2000JD) / julianCenturyDays;
-  const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
-  const wrap = (x) => ((x % 360) + 360) % 360;
-  return {
-    Lp: wrap(218.3164477 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841 - T4 / 65194000),
-    D:  wrap(297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000),
-    M:  wrap(357.5291092 +  35999.0502909 * T - 0.0001536 * T2 + T3 / 24490000),
-    Mp: wrap(134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000),
-    F:  wrap( 93.2720950 + 483202.0175233 * T - 0.0036539 * T2 - T3 / 3526000 + T4 / 863310000),
-  };
+  return _moonArgsM().argsAt(jd_tt);   // framework-native / pure-Meeus dispatch
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -4748,27 +4641,7 @@ function _fwChannelIntegral(T, s) { return _moonEcc().channelIntegral(T, s); }
  *  a vs the conserved action — an m²-order bookkeeping difference, the same
  *  order as k itself). Direct planetary+J2 terms measured small (+0.47″/cy²,
  *  tools/explore/v4-e5-direct-planetary.js). */
-let _FW_LP_KPL = null;
-function _fwLpPlanetaryCarrier(T) {
-  if (T === 0) return 0;
-  if (_FW_LP_KPL === null) {
-    const de2dT = Math.pow(_fwEarthEcc(50), 2) - Math.pow(_fwEarthEcc(-50), 2);  // Δ(e²) per cy at J2000
-    // v4 carrier split: normalize to the CHANNEL part only (planetary
-    // +5.8665″ + the 0.077″ Meeus-era tidal gap); the figure+frame part
-    // (+1.30363″) moved to _fwLpObliquityCarrier. Resulting k = −2332 °/cy
-    // per e² — inside the convention-free adiabatic measurement −2370 ± 40.
-    const _elp = ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2;
-    const _t2Obl = (_elp.earthFigureJ2 + _elp.generalPrecessionPA_T2_Lieske1976) / 3600;
-    _FW_LP_KPL = 2 * (_FW_MOON.T2_LP - _FW_MOON.T2_LP_TIDAL - _t2Obl) / de2dT;
-  }
-  const e0sq = _moonEcc().e0 * _moonEcc().e0;
-  const f = (t) => { const e = _fwEarthEcc(t * 100); return e * e - e0sq; };
-  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
-  const h = T / N;
-  let sum = f(0) + f(T);
-  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
-  return _FW_LP_KPL * sum * h / 3;
-}
+function _fwLpPlanetaryCarrier(T) { return _moonArgsM().planetaryCarrier(T); }
 
 /** v4 carrier split — bounded OBLIQUITY-LINE carrier for the non-channel Lp
  *  remainder (Earth-figure J2 +0.1925″ + frame ṗ_A +1.11113″ = +1.30363″/cy²,
@@ -4782,23 +4655,7 @@ function _fwLpPlanetaryCarrier(T) {
  *  values — amplitude from documented constants, shape from the framework's
  *  own obliquity line. Same Simpson scheme as the channel carrier (finer
  *  step: the H/8 term needs ~2 kyr resolution). */
-let _FW_LP_OBL = null;
-function _fwLpObliquityCarrier(T) {
-  if (T === 0) return 0;
-  if (_FW_LP_OBL === null) {
-    const _elp = ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2;
-    const T2_OBL = (_elp.earthFigureJ2 + _elp.generalPrecessionPA_T2_Lieske1976) / 3600;   // °/cy²
-    const eps0 = computeObliquityEarth(2000);
-    const epsDot = computeObliquityEarth(2050) - computeObliquityEarth(1950);              // °/cy at J2000
-    _FW_LP_OBL = { eps0, C: 2 * T2_OBL / epsDot };
-  }
-  const f = (t) => computeObliquityEarth(2000 + t * 100) - _FW_LP_OBL.eps0;
-  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 2000));
-  const h = T / N;
-  let sum = f(0) + f(T);
-  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
-  return _FW_LP_OBL.C * sum * h / 3;
-}
+function _fwLpObliquityCarrier(T) { return _moonArgsM().obliquityCarrier(T); }
 
 /** e_E-channel rate modulation [g(t)/g₀]^s at age t_Ma (positive = past). ≡ 1 at J2000.
  *  Uses the framework H/3 fluctuation line (was: the Laskar-band composite). */
@@ -4826,7 +4683,7 @@ const _moonChain = (() => {
           moonApsidalJ2000Seconds: MOON_APSIDAL_J2000_S,
           moonNodalJ2000Seconds: MOON_NODAL_J2000_S,
           moonSiderealMonthJ2000Seconds: MOON_SIDEREAL_MONTH_J2000_S,
-          sPerigee: _FW_MOON.S_W, sNode: _FW_MOON.S_N,
+          sPerigee: _moonArgsM().bundle.S_W, sNode: _moonArgsM().bundle.S_N,
         },
         fns: {
           meanLodSecondsAtAge,
