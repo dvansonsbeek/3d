@@ -9,7 +9,8 @@
     ".": "./src/index.js",
     "./phase": "./src/phase/index.cjs",
     "./cardinal": "./src/cardinal/index.cjs",
-    "./moon/ecc-channel": "./src/moon/ecc-channel.cjs"
+    "./moon/ecc-channel": "./src/moon/ecc-channel.cjs",
+    "./moon/month-chain": "./src/moon/month-chain.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }

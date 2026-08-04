@@ -87,6 +87,7 @@ export { createCardinalModel } from './cardinal/index.cjs';
 // eccentricity channel → month chain → cycle tables → arguments → series →
 // apparent). Same CJS + root re-export convention.
 export { createMoonEccChannel } from './moon/ecc-channel.cjs';
+export { createMoonMonthChain } from './moon/month-chain.cjs';
 
 /**
  * Build a model bound to a set of constants.

@@ -183,14 +183,44 @@ function iEarthAtAge(t_Ma) {
 }
 
 // ─── LAYER 2 — Moon distance ──────────────────────────────────────────────
-function meanMoonDistanceMetresAtAge(t_Ma) {
-  const t = t_Ma;
-  return A_MOON_NOW_M * (1 + ALPHA_1*t + ALPHA_3*t*t*t + ALPHA_4*t*t*t*t);
+// Phase 8.2-3: the month/precession chain lives ONCE in
+// @hum/physics/moon/month-chain; this engine delegates, injecting its own
+// layer-0/1 evaluators, J2000 anchors, and the shared ecc channel's
+// modulation. Lazy so every module const exists at first use.
+const { createMoonMonthChain } = require('@hum/physics/moon/month-chain');
+let _moonChainM = null;
+function _moonChain() {
+  if (_moonChainM === null) {
+    _moonChainM = createMoonMonthChain({
+      constants: {
+        aMoonNowMetres: A_MOON_NOW_M,
+        alpha1PerMa: ALPHA_1, alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
+        gmEarthMoonM3PerS2: GM_EM_M3S2,
+        massRatioEarthMoon: C.MASS_RATIO_EARTH_MOON,
+        moonSiderealMonthInputDays: C.moonSiderealMonthInput,
+        holisticYearJ2000: HOLISTIC_YEAR_J2000,
+        meanSiderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
+        nApsidalOfDateJ2000: N_apsidalI_J2000,
+        nNodalOfDateJ2000: N_nodalI_J2000,
+        moonApsidalJ2000Seconds: MOON_APSIDAL_J2000_S,
+        moonNodalJ2000Seconds: MOON_NODAL_J2000_S,
+        moonSiderealMonthJ2000Seconds: MOON_SIDEREAL_MONTH_J2000_S,
+        sPerigee: _ECOMP_S_W, sNode: _ECOMP_S_N,
+      },
+      fns: {
+        meanLodSecondsAtAge,
+        meanSiderealYearSecondsAtAge,
+        meanHAtAge,
+        modulation: _eCompModulation,
+      },
+    });
+  }
+  return _moonChainM;
 }
 
-function meanMoonDistanceAtAge(t_Ma) {
-  return meanMoonDistanceMetresAtAge(t_Ma) / 1000;
-}
+function meanMoonDistanceMetresAtAge(t_Ma) { return _moonChain().distanceMetresAtAge(t_Ma); }
+
+function meanMoonDistanceAtAge(t_Ma) { return _moonChain().distanceKmAtAge(t_Ma); }
 
 // ─── LAYER 1 — Angular-momentum-conservation LOD ──────────────────────────
 function meanLodSecondsAtAge(t_Ma) {
@@ -820,70 +850,25 @@ function frameworkDeltaT(jd) {
   return Number.isFinite(dT) ? dT : 0;
 }
 
-// ─── Moon distance correction + Kepler month ──────────────────────────────
-function meanSolarDeltaAAtAge(t_Ma, a_apparent_km) {
-  const LOD_s = meanLodSecondsAtAge(t_Ma);
-  if (LOD_s === null) return null;
-  const T_sid_d_at_epoch = meanSiderealYearSecondsAtAge(t_Ma) / LOD_s;
-  return a_apparent_km * (1 / (C.MASS_RATIO_EARTH_MOON + 1)) *
-         (C.moonSiderealMonthInput / T_sid_d_at_epoch);
-}
+// ─── Moon distance correction + Kepler month (8.2-3: shared chain) ────────
+function meanSolarDeltaAAtAge(t_Ma, a_apparent_km) { return _moonChain().solarDeltaAKmAtAge(t_Ma, a_apparent_km); }
 
-function meanMoonDistanceCorrectedAtAge(t_Ma) {
-  const a_app = meanMoonDistanceAtAge(t_Ma);
-  const dA    = meanSolarDeltaAAtAge(t_Ma, a_app);
-  return (dA === null) ? null : a_app + dA;
-}
+function meanMoonDistanceCorrectedAtAge(t_Ma) { return _moonChain().distanceCorrectedKmAtAge(t_Ma); }
 
-function meanMoonSiderealMonthAtAge(t_Ma) {
-  const a_corr_km = meanMoonDistanceCorrectedAtAge(t_Ma);
-  if (a_corr_km === null) return null;
-  return 2 * Math.PI * Math.sqrt(Math.pow(a_corr_km * 1000, 3) / GM_EM_M3S2);
-}
+function meanMoonSiderealMonthAtAge(t_Ma) { return _moonChain().siderealMonthSecondsAtAge(t_Ma); }
 
-function meanSynodicMonthAtAge(t_Ma) {
-  const T_sm = meanMoonSiderealMonthAtAge(t_Ma);
-  if (T_sm === null) return null;
-  const T_yr = meanSiderealYearSecondsAtAge(t_Ma);
-  return T_sm * T_yr / (T_yr - T_sm);
-}
+function meanSynodicMonthAtAge(t_Ma) { return _moonChain().synodicMonthSecondsAtAge(t_Ma); }
 
-function meanTropicalMonthAtAge(t_Ma) {
-  const T_sm = meanMoonSiderealMonthAtAge(t_Ma);
-  if (T_sm === null) return null;
-  const T_yr = meanSiderealYearSecondsAtAge(t_Ma);
-  const H_t  = meanHAtAge(t_Ma);
-  return T_sm * (1 - 13 * T_sm / (H_t * T_yr));
-}
+function meanTropicalMonthAtAge(t_Ma) { return _moonChain().tropicalMonthSecondsAtAge(t_Ma); }
 
 // ─── Option C+ deep-time lunar precession (Brouwer-Clemence m² scaling) ──
-function meanApsidalCyclesICRFAtAge(t_Ma) {
-  const H_t = meanHAtAge(t_Ma);
-  if (H_t === null) return null;
-  return N_apsidalI_J2000 * Math.pow(H_t / HOLISTIC_YEAR_J2000, 2);
-}
+function meanApsidalCyclesICRFAtAge(t_Ma) { return _moonChain().apsidalCyclesOfDateAtAge(t_Ma); }
 
-function meanNodalCyclesICRFAtAge(t_Ma) {
-  const H_t = meanHAtAge(t_Ma);
-  if (H_t === null) return null;
-  return N_nodalI_J2000 * Math.pow(H_t / HOLISTIC_YEAR_J2000, 2);
-}
+function meanNodalCyclesICRFAtAge(t_Ma) { return _moonChain().nodalCyclesOfDateAtAge(t_Ma); }
 
-function meanApsidalPrecessionSecondsICRFAtAge(t_Ma) {
-  const N = meanApsidalCyclesICRFAtAge(t_Ma);
-  const H_t = meanHAtAge(t_Ma);
-  const T_yr_s = meanSiderealYearSecondsAtAge(t_Ma);
-  if (N === null || H_t === null) return null;
-  return H_t * T_yr_s / N;
-}
+function meanApsidalPrecessionSecondsICRFAtAge(t_Ma) { return _moonChain().apsidalPrecessionSecondsOfDateAtAge(t_Ma); }
 
-function meanNodalPrecessionSecondsICRFAtAge(t_Ma) {
-  const N = meanNodalCyclesICRFAtAge(t_Ma);
-  const H_t = meanHAtAge(t_Ma);
-  const T_yr_s = meanSiderealYearSecondsAtAge(t_Ma);
-  if (N === null || H_t === null) return null;
-  return H_t * T_yr_s / N;
-}
+function meanNodalPrecessionSecondsICRFAtAge(t_Ma) { return _moonChain().nodalPrecessionSecondsOfDateAtAge(t_Ma); }
 
 // ─── Framework Earth-eccentricity composite (A/B RESEARCH ONLY) ──
 // Mirror of src/script.js _ECOMP/_fwEarthEccComposite — SUPERSEDED as the
@@ -943,44 +928,24 @@ function _eCompModulation(t_Ma, s) {
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
  *  e_E-line modulation on the fully-derived H/3 fluctuation — the factored
  *  deep-time law). */
-function meanLunarPerigeePrecessionAtAge(t_Ma) {
-  if (t_Ma === 0) return MOON_APSIDAL_J2000_S;
-  const T_sm_t = meanMoonSiderealMonthAtAge(t_Ma);
-  const T_yr_t = meanSiderealYearSecondsAtAge(t_Ma);
-  if (T_sm_t === null) return null;
-  return MOON_APSIDAL_J2000_S
-    * Math.pow(T_yr_t / MEAN_SIDEREAL_YEAR_J2000_S, 2)
-    * (MOON_SIDEREAL_MONTH_J2000_S / T_sm_t)
-    / _eCompModulation(t_Ma, _ECOMP_S_W);
-}
+function meanLunarPerigeePrecessionAtAge(t_Ma) { return _moonChain().perigeePrecessionSecondsAtAge(t_Ma); }
 
 /** Lunar nodal precession period in seconds (Brouwer-Clemence scaling ×
  *  e_E-line modulation on the fully-derived H/3 fluctuation — the factored
  *  deep-time law). */
-function meanLunarNodePrecessionAtAge(t_Ma) {
-  if (t_Ma === 0) return MOON_NODAL_J2000_S;
-  const T_sm_t = meanMoonSiderealMonthAtAge(t_Ma);
-  const T_yr_t = meanSiderealYearSecondsAtAge(t_Ma);
-  if (T_sm_t === null) return null;
-  return MOON_NODAL_J2000_S
-    * Math.pow(T_yr_t / MEAN_SIDEREAL_YEAR_J2000_S, 2)
-    * (MOON_SIDEREAL_MONTH_J2000_S / T_sm_t)
-    / _eCompModulation(t_Ma, _ECOMP_S_N);
-}
+function meanLunarNodePrecessionAtAge(t_Ma) { return _moonChain().nodePrecessionSecondsAtAge(t_Ma); }
 
-function meanAnomalisticMonthAtAge(t_Ma) {
-  const T_sm  = meanMoonSiderealMonthAtAge(t_Ma);
-  const T_per = meanLunarPerigeePrecessionAtAge(t_Ma);
-  if (T_sm === null || T_per === null) return null;
-  return T_sm * T_per / (T_per - T_sm);
-}
+function meanAnomalisticMonthAtAge(t_Ma) { return _moonChain().anomalisticMonthSecondsAtAge(t_Ma); }
 
-function meanNodalMonthAtAge(t_Ma) {
-  const T_sm   = meanMoonSiderealMonthAtAge(t_Ma);
-  const T_node = meanLunarNodePrecessionAtAge(t_Ma);
-  if (T_sm === null || T_node === null) return null;
-  return T_sm * T_node / (T_node + T_sm);
-}
+function meanNodalMonthAtAge(t_Ma) { return _moonChain().nodalMonthSecondsAtAge(t_Ma); }
+
+// 8.2-3: the browser-only beat pair, gained by this engine via the shared
+// chain. The scene-graph node aliasing (_mcApsidalMeetsNodal =
+// _mcApsidalOfDate) is a SEPARATE, deliberate cancellation for the paired
+// scene nodes — these are the real physical beats for direct callers.
+function meanApsidalMeetsNodalAtAge(t_Ma) { return _moonChain().apsidalMeetsNodalSecondsAtAge(t_Ma); }
+
+function meanLunarLevelingCycleAtAge(t_Ma) { return _moonChain().lunarLevelingSecondsAtAge(t_Ma); }
 
 // ─── Anomalistic year + stellar/sidereal days ────────────────────────────
 function meanAnomalisticYearSecondsAtAge(t_Ma) {
@@ -1473,6 +1438,7 @@ module.exports = {
   meanApsidalPrecessionSecondsICRFAtAge, meanNodalPrecessionSecondsICRFAtAge,
   meanLunarPerigeePrecessionAtAge, meanLunarNodePrecessionAtAge,
   meanAnomalisticMonthAtAge, meanNodalMonthAtAge,
+  meanApsidalMeetsNodalAtAge, meanLunarLevelingCycleAtAge,   // 8.2-3: gained via the shared chain (were browser-only)
   // Earth derivations
   meanAnomalisticYearSecondsAtAge,
   meanStellarDayAtAge, meanSiderealDayAtAge,
