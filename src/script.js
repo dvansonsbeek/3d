@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -53698,34 +53698,38 @@ const _moonVisualCorrection = new THREE.Vector3();
 // globals are deep-time-mutable; same pattern as FW_A2_RATE).
 const _D5_RATE_L    = 360 / meansolaryearlengthinDays;                          // deg/day, tropical
 const _D5_RATE_PERI = 360 / ((holisticyearLength / 16) * meansolaryearlengthinDays);  // deg/day, H/16
-function _sunGeoVecEqD5(jd) {
-  const T = (jd - j2000JD) / julianCenturyDays;
-  const d = jd - j2000JD;
-  const L0 = ASTRO_REFERENCE.sunMeanLongitudeJ2000_deg + _D5_RATE_L * d;
-  const M = ((L0 - (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + _D5_RATE_PERI * d)) + 180) * Math.PI / 180;  // geocentric-perigee convention (Sun perigee = Earth perihelion + 180°)
-  const e = ASTRO_REFERENCE.eccentricityJ2000 + ASTRO_REFERENCE.eccentricityDotJ2000 * T;
-  const Ceq = ((2 * e - Math.pow(e, 3) / 4) * Math.sin(M)
-            + 1.25 * e * e * Math.sin(2 * M)
-            + (13 / 12) * Math.pow(e, 3) * Math.sin(3 * M)) * 180 / Math.PI;    // deg (Kepler EoC series)
-  const lam = (L0 + Ceq) * Math.PI / 180;
-  const v = M + Ceq * Math.PI / 180;
-  const R = (1 - e * e) / (1 + e * Math.cos(v)) * currentAUDistance;
-  const eps = computeObliquityEarth(2000 + d / 365.2425) * Math.PI / 180;
-  return [R * Math.cos(lam), R * Math.sin(lam) * Math.cos(eps), R * Math.sin(lam) * Math.sin(eps)];
-}
-function _moonAberrationRaDec(jd, ra, dec) {
-  const h = 0.02;                                        // days (central difference)
-  const a = _sunGeoVecEqD5(jd - h), b = _sunGeoVecEqD5(jd + h);
-  const s = 1 / (2 * h * 86400 * speedOfLight);
-  const kx = -(b[0] - a[0]) * s, ky = -(b[1] - a[1]) * s, kz = -(b[2] - a[2]) * s;   // v_E/c
-  const cd = Math.cos(dec);
-  const ux = cd * Math.cos(ra), uy = cd * Math.sin(ra), uz = Math.sin(dec);
-  const wx = ux - kx, wy = uy - ky, wz = uz - kz;        // SUBTRACT the aberration content
-  const wr = Math.sqrt(wx * wx + wy * wy + wz * wz);
-  let dRA = Math.atan2(wy, wx) - ra;
-  dRA = Math.atan2(Math.sin(dRA), Math.cos(dRA));
-  return { dRA, dDec: Math.asin(Math.max(-1, Math.min(1, wz / wr))) - dec };
-}
+// Phase 8.2-7: the D5 optics + RA/Dec override live ONCE in
+// @hum/physics/moon/apparent. S8: the override's obliquity stays
+// ENGINE-INJECTED per call (this engine passes the live scene value).
+const _moonApparent = (() => {
+  let m = null;
+  return () => {
+    if (!m) {
+      m = createMoonApparent({
+        constants: {
+          j2000JD, julianCenturyDays,
+          sunMeanLongitudeJ2000Deg: ASTRO_REFERENCE.sunMeanLongitudeJ2000_deg,
+          perihelionLongitudeJ2000Deg: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg,
+          eccentricityJ2000: ASTRO_REFERENCE.eccentricityJ2000,
+          eccentricityDotJ2000: ASTRO_REFERENCE.eccentricityDotJ2000,
+          d5RateLDegPerDay: _D5_RATE_L,
+          d5RatePeriDegPerDay: _D5_RATE_PERI,
+          speedOfLight,
+        },
+        fns: {
+          computeObliquityEarth,
+          getAuDistanceKm: () => currentAUDistance,
+          isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
+          getCorrectionResidual: () => MOON_CORRECTION_RESIDUAL,
+          getCorrectionLegacy: () => MOON_CORRECTION,
+        },
+      });
+    }
+    return m;
+  };
+})();
+function _sunGeoVecEqD5(jd) { return _moonApparent().sunGeoVecEqD5(jd); }
+function _moonAberrationRaDec(jd, ra, dec) { return _moonApparent().moonAberrationRaDec(jd, ra, dec); }
 
 // (Stage C ring lock REVERTED: the deep-time ring-vs-Moon misalignment
 // (~155° at +200 kyr) was root-caused to the Moon-chain layers running on
@@ -54026,44 +54030,14 @@ function updatePositions() {
       // at top of updatePositions so it's valid in both 'light' and 'full' modes.
       // Was: Meeus linear (23.4393 - 0.01300*T); framework has H/3+H/8 obliquity
       // harmonics that diverge from linear by ~11″ at present epoch and ~4′ at year -135.
-      const eps = o.obliquityEarth * (Math.PI / 180);
-      const cosE = Math.cos(eps), sinE = Math.sin(eps);
-      const lamR = obj._meeusLonDeg * (Math.PI / 180);
-      const betR = obj._meeusLatRad;
-      const sinLam = Math.sin(lamR), cosLam = Math.cos(lamR);
-      const sinBet = Math.sin(betR), cosBet = Math.cos(betR);
-
-      // Ecliptic → equatorial (Meeus eq. 13.3, 13.4)
-      let newRA = Math.atan2(sinLam * cosE - Math.tan(betR) * sinE, cosLam);
-      if (newRA < 0) newRA += 2 * Math.PI;
-      let newDec = Math.asin(sinBet * cosE + cosBet * sinE * sinLam);
-
-      // Post-Meeus RA/Dec correction. Framework-native (D5 derived optics):
-      // subtract the ANALYTIC annual aberration + the small fitted residual
-      // (MOON_CORRECTION_RESIDUAL). Pure-Meeus A/B mode keeps the legacy
-      // 3-argument fitted MOON_CORRECTION. See the D5 block near
-      // _moonAberrationRaDec for the derivation record.
-      if (MOON_ARGS_FRAMEWORK_NATIVE) {
-        // _moonAberrationRaDec returns the delta TO the aberration-removed
-        // direction (u − v/c) — apply it directly.
-        const _ab = _moonAberrationRaDec(j2000JD + (obj._meeusT || 0) * julianCenturyDays, newRA, newDec);
-        newRA  += _ab.dRA;
-        newDec += _ab.dDec;
-      }
-      const _mcPatch = MOON_ARGS_FRAMEWORK_NATIVE ? MOON_CORRECTION_RESIDUAL : MOON_CORRECTION;
-      if (_mcPatch) {
-        const _d2r = Math.PI / 180;
-        const _dJD = (obj._meeusT || 0) * julianCenturyDays;
-        const _Dc  = (297.850 + 12.19074912 * _dJD) * _d2r;
-        const _Mpc = (134.963 + 13.06499295 * _dJD) * _d2r;
-        const _Msc = (357.529 + 0.98560028 * _dJD) * _d2r;
-        newRA  -= (_mcPatch.raSinD  * Math.sin(_Dc) + _mcPatch.raCosD  * Math.cos(_Dc)
-                 + _mcPatch.raSinMp * Math.sin(_Mpc) + _mcPatch.raCosMp * Math.cos(_Mpc)
-                 + _mcPatch.raSinMs * Math.sin(_Msc) + _mcPatch.raCosMs * Math.cos(_Msc)) * _d2r;
-        newDec -= (_mcPatch.decSinD  * Math.sin(_Dc) + _mcPatch.decCosD  * Math.cos(_Dc)
-                 + _mcPatch.decSinMp * Math.sin(_Mpc) + _mcPatch.decCosMp * Math.cos(_Mpc)
-                 + _mcPatch.decSinMs * Math.sin(_Msc) + _mcPatch.decCosMs * Math.cos(_Msc)) * _d2r;
-      }
+      // Phase 8.2-7: ecl→eq + aberration + the fitted MOON_CORRECTION patch
+      // live in @hum/physics/moon/apparent. S8: this engine passes the LIVE
+      // scene obliquity (o.obliquityEarth, kept fresh above).
+      const _ov = _moonApparent().overrideRaDec({
+        lonDeg: obj._meeusLonDeg, betRad: obj._meeusLatRad,
+        meeusT: obj._meeusT, obliquityDeg: o.obliquityEarth,
+      });
+      const newRA = _ov.raRad, newDec = _ov.decRad;
 
       obj.ra  = newRA;                     // override RA
       obj.dec = Math.PI / 2 - newDec;      // override Dec (phi convention)

@@ -13,7 +13,8 @@
     "./moon/month-chain": "./src/moon/month-chain.cjs",
     "./chain-cycles": "./src/chain-cycles/index.cjs",
     "./moon/arguments": "./src/moon/arguments.cjs",
-    "./moon/series": "./src/moon/series.cjs"
+    "./moon/series": "./src/moon/series.cjs",
+    "./moon/apparent": "./src/moon/apparent.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }
