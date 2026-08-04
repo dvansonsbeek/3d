@@ -1062,13 +1062,20 @@ const _CP_HARMONICS_AT_J2000 = {};
  * @returns {number} RA in degrees
  */
 function computeSolsticeRA(year, type) {
-  const t = year - C.balancedYear;
   const sinE = Math.sin(C.earthtiltMean * Math.PI / 180);
   const baseRA = { SS: 90, WS: 270, VE: 0, AE: 180 }[type || 'SS'];
   const raMean = baseRA - C.earthRAAngle / sinE;
   const amp = C.earthInvPlaneInclinationAmplitude / sinE;
-  const phase3 = 2 * Math.PI * t / (C.H / 3);
-  const phase8 = 2 * Math.PI * t / (C.H / 8);
+  // INTEGRATED phase — mirrors src/script.js computeSolsticeRA: this formula
+  // describes where the SCENE puts the cardinal point, and the scene's H/3
+  // and H/8 objects rotate on integrated phase. It carries no fitted
+  // coefficients, so there is no fit basis to preserve — only the scene to
+  // agree with. (Was the snapshot form — a stale hand-mirror twin, caught by
+  // test/cross-engine.test.mjs on its FIRST run: up to 6.2″ divergence at the
+  // window edge, growing away from J2000.)
+  const cY = _cpCycleOf(year);
+  const phase3 = 2 * Math.PI * 3 * cY;
+  const phase8 = 2 * Math.PI * 8 * cY;
   return raMean + amp * (-Math.sin(phase3) + Math.sin(phase8));
 }
 

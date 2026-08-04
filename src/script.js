@@ -6649,6 +6649,7 @@ if (typeof window !== 'undefined') {
     // JD form too — its equation-of-centre path NaN'd for two phases with no
     // probe noticing (the year-length probes never touch it).
     computeSolsticeJD,
+    computeSolsticeRA,
     // Epoch-consistency gate (test/browser/epoch-consistency.test.mjs): the
     // pure f(Y) evaluators must track the epoch-anchor chain.
     computeSolarYearDaysDirect,

@@ -61,10 +61,18 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA }) => {
     v[`siderealYearDays@${y}`] = T.computeSiderealYearDaysDirect(y);
     v[`solsticeSS@${y}`] = T.computeSolsticeYearLength(y, 'SS');
     v[`solsticeWS@${y}`] = T.computeSolsticeYearLength(y, 'WS');
+    v[`solsticeVE@${y}`] = T.computeSolsticeYearLength(y, 'VE');
+    v[`solsticeAE@${y}`] = T.computeSolsticeYearLength(y, 'AE');
     // The JD form has its own failure modes the year-length probes cannot see:
     // its equation-of-centre path NaN'd for two phases with no probe noticing.
+    // ALL FOUR types + RA — the Phase 7 extraction gate needs the full surface
+    // (VE/AE year lengths, WS/AE JD and RA had no probes at all before it).
     v[`solsticeJD_SS@${y}`] = T.computeSolsticeJD(y, 'SS');
     v[`solsticeJD_VE@${y}`] = T.computeSolsticeJD(y, 'VE');
+    v[`solsticeJD_WS@${y}`] = T.computeSolsticeJD(y, 'WS');
+    v[`solsticeJD_AE@${y}`] = T.computeSolsticeJD(y, 'AE');
+    v[`solsticeRA_SS@${y}`] = T.computeSolsticeRA(y, 'SS');
+    v[`solsticeRA_VE@${y}`] = T.computeSolsticeRA(y, 'VE');
   }
 
   // The deep-time chain, read through the globals it fills. Restore J2000 after

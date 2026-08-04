@@ -56,6 +56,23 @@ function measure() {
     if (typeof DT[fn] === 'function') v[`dtstack.${fn}@0`] = DT[fn](0);
   }
 
+  // ─── Cardinal points — the Phase 7 extraction gate ────────────────────────
+  // The §10 + §10g family, ALL FOUR types, on the same deep-year grid the
+  // browser fixture uses. These are the values the physics/cardinal package
+  // extraction must keep BIT-IDENTICAL (plan §12a Phase 7). The raw
+  // integrated-phase primitive (cycles at divisor 1) is pinned too, so a
+  // phase-table error shows at the root, not only through its consumers.
+  const OE = require(join(ROOT, 'tools/lib/orbital-engine.js'));
+  const CP_YEARS = [-302635, -100000, -25000, -2000, 0, 1000, 2000, 3000, 6000, 32682];
+  for (const y of CP_YEARS) {
+    v[`phase.cycles@${y}`] = DT.cyclesBetweenYears(C.balancedYear, y, 1);
+    for (const t of ['SS', 'WS', 'VE', 'AE']) {
+      v[`cardinal.jd.${t}@${y}`] = OE.computeSolsticeJD(y, t);
+      v[`cardinal.yearLen.${t}@${y}`] = OE.computeSolsticeYearLength(y, t);
+      v[`cardinal.ra.${t}@${y}`] = OE.computeSolsticeRA(y, t);
+    }
+  }
+
   return v;
 }
 

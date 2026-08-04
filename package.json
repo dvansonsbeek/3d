@@ -24,7 +24,7 @@
     "test:verify": "node tools/verify/run-suite.mjs",
     "test:pipeline": "node tools/fit/verify-pipeline.js",
     "test:verify:list": "node tools/verify/run-suite.mjs --list",
-    "test:snapshot": "node test/browser/snapshot.test.mjs && node test/browser/epoch-consistency.test.mjs",
+    "test:snapshot": "node test/browser/snapshot.test.mjs && node test/browser/epoch-consistency.test.mjs && node test/cross-engine.test.mjs",
     "test:transparency": "node test/browser/transparency.test.mjs",
     "test:browser": "npm run build && npm run test:snapshot",
     "targets": "node tools/fixtures/report-targets.mjs",
