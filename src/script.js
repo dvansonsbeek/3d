@@ -3714,7 +3714,7 @@ function _eclDeltaT(jd) {
  *  active. Kept as MEAN for consistency with existing SUN_HARMONICS calibration. */
 function _eclSunLon(jd) {
   const _d2r = Math.PI / 180;
-  const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / 36525;
+  const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / julianCenturyDays;
   const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
   const M  = (357.52911 + 35999.05029 * T - 0.0001537 * T * T) * _d2r;
   const C  = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
@@ -3963,10 +3963,10 @@ const _FW_MOON = (() => {
 // Identification record: tools/explore/derive-a1a2a3.js;
 // mechanism + A2-amplitude confirmation (79%) + J2 negative control:
 // tools/explore/derive-planetary-lunar-terms.js.
-const FW_A2_RATE = 2 * (360 * 36525 / moonTropicalMonth)
-                 - (360 * 36525 / moonAnomalisticMonth)
-                 - 2 * (360 * 36525 / planets.jupiter.solarYearInput);
-const FW_A3_RATE = 360 * 36525 / moonSiderealMonth;
+const FW_A2_RATE = 2 * (360 * julianCenturyDays / moonTropicalMonth)
+                 - (360 * julianCenturyDays / moonAnomalisticMonth)
+                 - 2 * (360 * julianCenturyDays / planets.jupiter.solarYearInput);
+const FW_A3_RATE = 360 * julianCenturyDays / moonSiderealMonth;
 
 /** Deep-time secular phases for the five arguments — ALWAYS-CHAINS (Stage B):
  *  the same factored-law integrator chains that phase the scene layers
@@ -4004,7 +4004,7 @@ function _fwMoonArgsDeep(jd) {
   // timed-Babylonian corpus). The chains carry the tidal content; the
   // planetary content rides the bounded e_E²-channel carrier (its J2000
   // Taylor truncation is the old (T2_LP − T2_LP_TIDAL)·T² polynomial).
-  const Tj   = (jd - j2000JD) / 36525;
+  const Tj   = (jd - j2000JD) / julianCenturyDays;
   const Lp   = A.LP0 + 360 * Ntrop + _fwLpPlanetaryCarrier(Tj) + _fwLpObliquityCarrier(Tj);
   const w    = (A.LP0 - A.MP0) + 360 * Naps;                      // perigee ϖ (of-date, advance)
   const om   = (A.LP0 - A.F0)  - 360 * Nnod;                      // node Ω (of-date, regression)
@@ -4037,7 +4037,7 @@ function _fwMoonArgs(jd_tt) {
     if (dt !== null) return dt;
   }
   const A = _FW_MOON;
-  const T = (jd_tt - j2000JD) / 36525;
+  const T = (jd_tt - j2000JD) / julianCenturyDays;
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
   const wrap = (x) => ((x % 360) + 360) % 360;
   // Polynomial tails clamped at |T| ≤ 100 cy (±10 kyr): the T²/T³/T⁴ terms
@@ -4089,7 +4089,7 @@ let _moonArgsProbeOverride = null; // D/M-probe button hook: (jd_tt) => args; AL
 function _moonArgsAt(jd_tt) {
   if (_moonArgsProbeOverride) return _moonArgsProbeOverride(jd_tt);
   if (MOON_ARGS_FRAMEWORK_NATIVE) return _fwMoonArgs(jd_tt);
-  const T = (jd_tt - j2000JD) / 36525;
+  const T = (jd_tt - j2000JD) / julianCenturyDays;
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
   const wrap = (x) => ((x % 360) + 360) % 360;
   return {
@@ -4144,7 +4144,7 @@ function _eclMoonBeta(jd)     { return _meeusMoonBeta(jd); }
 function _meeusMoonLon(jd) {
   const _d2r = Math.PI / 180;
   const jd_tt = jd + _eclDeltaT(jd) / 86400;
-  const T = (jd_tt - j2000JD) / 36525;
+  const T = (jd_tt - j2000JD) / julianCenturyDays;
   const T2 = T * T;
   const A = _moonArgsAt(jd_tt);
   const Lp_mean = A.Lp;
@@ -4184,7 +4184,7 @@ function _meeusMoonDistance(jd) {
 function _meeusMoonBeta(jd) {
   const _d2r = Math.PI / 180;
   const jd_tt = jd + _eclDeltaT(jd) / 86400;
-  const T = (jd_tt - j2000JD) / 36525;
+  const T = (jd_tt - j2000JD) / julianCenturyDays;
   const T2 = T * T;
   const A = _moonArgsAt(jd_tt);
   const Dr = A.D * _d2r, Mr = A.M * _d2r, Mpr = A.Mp * _d2r, Fr = A.F * _d2r;
@@ -6409,7 +6409,7 @@ function meeusVsIntegratorDiagnostic(jd) {
   const decYear       = julianDateToDecimalYear(jd);  // for display only
 
   // ── Meeus polynomial values at this JD ──
-  const T = (jd - j2000JD) / 36525;
+  const T = (jd - j2000JD) / julianCenturyDays;
   const T2 = T*T, T3 = T2*T, T4 = T3*T;
   const Lp_meeus = wrap(218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000);
   const D_meeus  = wrap(297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000);
@@ -6418,7 +6418,7 @@ function meeusVsIntegratorDiagnostic(jd) {
   const F_meeus  = wrap( 93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000);
 
   // ── Meeus polynomial values at startmodel (anchor) ──
-  const Ta  = (startmodelJD - j2000JD) / 36525;
+  const Ta  = (startmodelJD - j2000JD) / julianCenturyDays;
   const Ta2 = Ta*Ta, Ta3 = Ta2*Ta, Ta4 = Ta3*Ta;
   const Lp_a = wrap(218.3164477 + 481267.88123421*Ta - 0.0015786*Ta2 + Ta3/538841 - Ta4/65194000);
   const D_a  = wrap(297.8501921 + 445267.1114034*Ta - 0.0018819*Ta2 + Ta3/545868 - Ta4/113065000);
@@ -22250,19 +22250,19 @@ function eccHarkness(year) {
 function eccMeeus(year) {
   // Meeus (1991), "Astronomical Algorithms", Eq. 25.4
   // Standard polynomial: e = 0.016708634 - 0.000042037*T - 0.0000001267*T^2
-  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  const T = (yearToJDApprox(year) - j2000JD) / julianCenturyDays;
   return 0.016708634 - 0.000042037 * T - 0.0000001267 * T * T;
 }
 
 function obliquityChapront2002(year) {
-  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  const T = (yearToJDApprox(year) - j2000JD) / julianCenturyDays;
   return (84381.406 - 46.836769 * T - 0.0001831 * T * T
     + 0.0020034 * Math.pow(T, 3) - 0.000000576 * Math.pow(T, 4)
     - 0.0000000434 * Math.pow(T, 5)) / 3600;
 }
 
 function perihelionMeeus(year) {
-  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  const T = (yearToJDApprox(year) - j2000JD) / julianCenturyDays;
   return ((102.937348 + 1.7195366 * T + 0.00045688 * T * T
     - 0.000000018 * Math.pow(T, 3)) % 360 + 360) % 360;
 }
@@ -22282,13 +22282,13 @@ function perihelionMeeusEarth(year) {
 }
 
 function tropicalYearLaskar(year) {
-  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  const T = (yearToJDApprox(year) - j2000JD) / julianCenturyDays;
   return 365.2421896698 - 0.00000615359 * T
     - 0.000000000729 * T * T + 0.000000000264 * Math.pow(T, 3);
 }
 
 function solarDayPeters(year) {
-  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  const T = (yearToJDApprox(year) - j2000JD) / julianCenturyDays;
   return 86400 + (T + 1.8) * 0.0017;
 }
 
@@ -22336,6 +22336,17 @@ function deltaTEspenakMeeusRaw(year) {
   return dT;
 }
 
+/** Meeus (1998) eq. 22.2 first-order mean obliquity, in RADIANS.
+ *  T is Julian centuries TT from J2000. DELIBERATELY the IAU 1976/1980
+ *  convention (23.4392911° = 84381.448″/3600 truncated, rate −46.8150″/cy)
+ *  because the Meeus-comparison reports that call it are checked against
+ *  Meeus's own worked values — NOT the same quantity as
+ *  ASTRO_REFERENCE.obliquityJ2000 (IAU 2006, 84381.406″). Five verbatim
+ *  copies of this line existed before 8.1b; this is the one. */
+function meeusMeanObliquityRad(T) {
+  return (23.4392911 - 0.0130042 * T) * (Math.PI / 180);
+}
+
 // ΔT(J2000) in the Espenak/Meeus convention — the value we subtract to
 // re-anchor the reference curve to our model's ΔT(J2000) = 0 convention.
 // Computed from the polynomial at t=0, kept as a literal so a stale poly
@@ -22350,13 +22361,13 @@ function deltaTEspenakMeeus(year) {
 }
 
 function siderealYearChapront(year) {
-  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  const T = (yearToJDApprox(year) - j2000JD) / julianCenturyDays;
   return 365.256362953 + 0.0000001139 * T
     - 0.000000000076 * T * T - 0.00000000000169 * Math.pow(T, 3);
 }
 
 function axialPrecessionCapitaine2009(year) {
-  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  const T = (yearToJDApprox(year) - j2000JD) / julianCenturyDays;
   const rateArcsecPerCy = 5028.796195 + 2.2108696 * T
     + 0.00023892 * T * T - 0.000095428 * Math.pow(T, 3)
     - 0.0000001915 * Math.pow(T, 4);
@@ -27263,7 +27274,7 @@ function setupGUI() {
       return Number.isFinite(dT) ? dT : 0;
     }
     function moonLp(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
       const T2 = T*T, T3 = T2*T, T4 = T3*T;
       const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
       const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
@@ -27288,7 +27299,7 @@ function setupGUI() {
       return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
     }
     function sunLon(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
       const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
       const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
       const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
@@ -27595,7 +27606,7 @@ function setupGUI() {
     function meeusSubSolar(jd_UT) {
       const dT = _eclDeltaT(jd_UT);
       const jd_TT = jd_UT + dT / 86400;
-      const T = (jd_TT - j2000JD) / 36525;
+      const T = (jd_TT - j2000JD) / julianCenturyDays;
       const T2 = T * T;
       const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T2;
       const M = ((357.52911 + 35999.05029 * T - 0.0001537 * T2) % 360 + 360) % 360 * _d2r;
@@ -27603,12 +27614,12 @@ function setupGUI() {
               + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
               + 0.000289 * Math.sin(3 * M);
       const λ = ((L0 + C) % 360 + 360) % 360 * _d2r;
-      const eps = (23.4392911 - 0.0130042 * T) * _d2r;
+      const eps = meeusMeanObliquityRad(T);
       const sinDec = Math.sin(eps) * Math.sin(λ);
       const dec = Math.asin(sinDec) * _r2d;
       let ra = Math.atan2(Math.cos(eps) * Math.sin(λ), Math.cos(λ)) * _r2d;
       if (ra < 0) ra += 360;
-      const T_UT = (jd_UT - j2000JD) / 36525;
+      const T_UT = (jd_UT - j2000JD) / julianCenturyDays;
       let gmst = (280.46061837 + 360.98564736629 * (jd_UT - j2000JD)
                 + 0.000387933 * T_UT * T_UT - T_UT ** 3 / 38710000) % 360;
       if (gmst < 0) gmst += 360;
@@ -27749,11 +27760,11 @@ function setupGUI() {
     console.log(`  Framework ΔT (L1-α at 1.00×):  ${Math.round(dT)} sec`);
 
     // Meeus method umbra prediction
-    const eps = (23.4392911 - 0.0130042 * (JD_135 - j2000JD) / 36525) * _d2r;
+    const eps = meeusMeanObliquityRad((JD_135 - j2000JD) / julianCenturyDays);
     const sun_dec = Math.asin(Math.sin(eps) * Math.sin(meeus_sun_lon * _d2r)) * _r2d;
     let sun_RA = Math.atan2(Math.cos(eps) * Math.sin(meeus_sun_lon * _d2r), Math.cos(meeus_sun_lon * _d2r)) * _r2d;
     if (sun_RA < 0) sun_RA += 360;
-    const T_UT = (JD_135 - j2000JD) / 36525;
+    const T_UT = (JD_135 - j2000JD) / julianCenturyDays;
     let gmst = (280.46061837 + 360.98564736629 * (JD_135 - j2000JD) + 0.000387933 * T_UT * T_UT) % 360;
     if (gmst < 0) gmst += 360;
     let ss_lon = sun_RA - gmst;
@@ -27887,7 +27898,7 @@ function setupGUI() {
     const framework_GMST_deg = ((sun_scene_ra_deg - fw_subsolar_nasaUT.lon) % 360 + 360) % 360;
     // IAU standard (Meeus eq. 12.4)
     const _d_j2000 = NASA_UT_greatest_JD - j2000JD;
-    const _Tcen = _d_j2000 / 36525;
+    const _Tcen = _d_j2000 / julianCenturyDays;
     const iau_GMST_deg = (((280.46061837 + 360.98564736629 * _d_j2000 + 0.000387933 * _Tcen * _Tcen - _Tcen * _Tcen * _Tcen / 38710000) % 360) + 360) % 360;
     const gmst_diff_deg = ((framework_GMST_deg - iau_GMST_deg + 540) % 360) - 180;
     console.log('    (C) GMST (Earth rotation angle) at NASA-UT:');
@@ -27965,12 +27976,12 @@ function setupGUI() {
       const meeus_moon_beta_e = _eclMoonBeta(jd);
       const meeus_sun_lon_e   = _eclSunLon(jd);
       const dT_sec_e = _eclDeltaT(jd);
-      const T_e = (jd + dT_sec_e / 86400 - j2000JD) / 36525;
-      const eps_e = (23.4392911 - 0.0130042 * T_e) * _d2r;
+      const T_e = (jd + dT_sec_e / 86400 - j2000JD) / julianCenturyDays;
+      const eps_e = meeusMeanObliquityRad(T_e);
       const sun_dec_e = Math.asin(Math.sin(eps_e) * Math.sin(meeus_sun_lon_e * _d2r)) * _r2d;
       let sun_RA_e = Math.atan2(Math.cos(eps_e) * Math.sin(meeus_sun_lon_e * _d2r), Math.cos(meeus_sun_lon_e * _d2r)) * _r2d;
       if (sun_RA_e < 0) sun_RA_e += 360;
-      const T_UT_e = (jd - j2000JD) / 36525;
+      const T_UT_e = (jd - j2000JD) / julianCenturyDays;
       let gmst_e = (280.46061837 + 360.98564736629 * (jd - j2000JD) + 0.000387933 * T_UT_e * T_UT_e) % 360;
       if (gmst_e < 0) gmst_e += 360;
       let ssLon_e = sun_RA_e - gmst_e;
@@ -28062,12 +28073,12 @@ function setupGUI() {
       const sunLon = _eclSunLon(synthetic_jd);
       const moonBeta = _eclMoonBeta(synthetic_jd);
       const moonDist = _eclMoonDistance(synthetic_jd);
-      const T_pu = (synthetic_jd + framework_dT_local/86400 - j2000JD) / 36525;
-      const eps_pu = (23.4392911 - 0.0130042 * T_pu) * _d2r;
+      const T_pu = (synthetic_jd + framework_dT_local/86400 - j2000JD) / julianCenturyDays;
+      const eps_pu = meeusMeanObliquityRad(T_pu);
       const sunDec = Math.asin(Math.sin(eps_pu) * Math.sin(sunLon * _d2r)) * _r2d;
       let sunRA_pu = Math.atan2(Math.cos(eps_pu) * Math.sin(sunLon * _d2r), Math.cos(sunLon * _d2r)) * _r2d;
       if (sunRA_pu < 0) sunRA_pu += 360;
-      const T_UT_pu = (jd_UT - j2000JD) / 36525;
+      const T_UT_pu = (jd_UT - j2000JD) / julianCenturyDays;
       let gmst_pu = (280.46061837 + 360.98564736629 * (jd_UT - j2000JD) + 0.000387933 * T_UT_pu * T_UT_pu) % 360;
       if (gmst_pu < 0) gmst_pu += 360;
       let ssLon_pu = sunRA_pu - gmst_pu;
@@ -28188,7 +28199,7 @@ function setupGUI() {
     console.log('Epoch                              year      Lp       D       M       M\'      F');
     const _d180 = (a, b) => { let d = a - b; while (d > 180) d -= 360; while (d < -180) d += 360; return d; };
     for (const { jd, label } of epochs) {
-      const T = (jd - j2000JD) / 36525, T2 = T*T, T3 = T2*T, T4 = T3*T;
+      const T = (jd - j2000JD) / julianCenturyDays, T2 = T*T, T3 = T2*T, T4 = T3*T;
       const wrapM = (x) => ((x % 360) + 360) % 360;
       const me = {
         Lp: wrapM(218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000),
@@ -28660,7 +28671,7 @@ function setupGUI() {
     }
 
     function moonLp(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
       const T2 = T*T, T3 = T2*T, T4 = T3*T;
       const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
       const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
@@ -28685,7 +28696,7 @@ function setupGUI() {
       return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
     }
     function moonBeta(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
       const T2 = T*T, T3 = T2*T, T4 = T3*T;
       const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
       const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
@@ -28706,7 +28717,7 @@ function setupGUI() {
       return Sb * 1e-6;
     }
     function sunLon(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
       const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
       const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
       const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
@@ -28907,7 +28918,7 @@ function setupGUI() {
       return Number.isFinite(dT) ? dT : 0;
     }
     function moonLp(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
       const T2 = T*T, T3 = T2*T, T4 = T3*T;
       const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
       const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
@@ -28932,7 +28943,7 @@ function setupGUI() {
       return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
     }
     function sunLon(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
       const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
       const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
       const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
@@ -28971,43 +28982,13 @@ function setupGUI() {
       }
       return (lo + hi) / 2;
     }
-    function stephensonDeltaT(year) {
-      let u, t, dT;
-      if (year < -500) {
-        u = (year - 1820) / 100;
-        dT = -20 + 32*u*u;
-      } else if (year < 500) {
-        u = year / 100;
-        dT = 10583.6 - 1014.41*u + 33.78311*u**2 - 5.952053*u**3
-           - 0.1798452*u**4 + 0.022174192*u**5 + 0.0090316521*u**6;
-      } else if (year < 1600) {
-        u = (year - 1000) / 100;
-        dT = 1574.2 - 556.01*u + 71.23472*u**2 + 0.319781*u**3
-           - 0.8503463*u**4 - 0.005050998*u**5 + 0.0083572073*u**6;
-      } else if (year < 1700) {
-        t = year - 1600; dT = 120 - 0.9808*t - 0.01532*t*t + t**3/7129;
-      } else if (year < 1800) {
-        t = year - 1700; dT = 8.83 + 0.1603*t - 0.0059285*t*t + 0.00013336*t**3 - t**4/1174000;
-      } else if (year < 1860) {
-        t = year - 1800; dT = 13.72 - 0.332447*t + 0.0068612*t*t + 0.0041116*t**3
-                            - 0.00037436*t**4 + 0.0000121272*t**5 - 0.0000001699*t**6
-                            + 0.000000000875*t**7;
-      } else if (year < 1900) {
-        t = year - 1860; dT = 7.62 + 0.5737*t - 0.251754*t*t + 0.01680668*t**3
-                            - 0.0004473624*t**4 + t**5/233174;
-      } else if (year < 1920) {
-        t = year - 1900; dT = -2.79 + 1.494119*t - 0.0598939*t*t + 0.0061966*t**3 - 0.000197*t**4;
-      } else if (year < 1941) {
-        t = year - 1920; dT = 21.20 + 0.84493*t - 0.076100*t*t + 0.0020936*t**3;
-      } else if (year < 1961) {
-        t = year - 1950; dT = 29.07 + 0.407*t - t*t/233 + t**3/2547;
-      } else if (year < 1986) {
-        t = year - 1975; dT = 45.45 + 1.067*t - t*t/260 - t**3/718;
-      } else {
-        t = year - 2000; dT = 62.92 + 0.32217*t + 0.005589*t*t;
-      }
-      return dT;
-    }
+    // The "steph" comparison column evaluates the Espenak & Meeus canon
+    // curve via the module-level deltaTEspenakMeeusRaw. A verbatim copy of
+    // that piecewise polynomial lived here under the MISLEADING local name
+    // stephensonDeltaT — it also shadowed the module-level
+    // stephensonDeltaT(year, poly), which is the actual Stephenson 2016
+    // evaluator. Every event year is within [-1999, 3000], so the shared
+    // function's range guard never fires for these inputs.
     function greatCircleKm(lat1, lon1, lat2, lon2) {
       const φ1 = lat1 * _d2r, φ2 = lat2 * _d2r;
       const Δφ = (lat2 - lat1) * _d2r;
@@ -29077,7 +29058,7 @@ function setupGUI() {
       const our_dT   = ourΔT(jd_conj);
       const best_dT  = bestDT(jd_conj, lat, lon);
       const decYear  = Y + (M - 1)/12 + (D - 1)/365;
-      const steph_dT = stephensonDeltaT(decYear);
+      const steph_dT = deltaTEspenakMeeusRaw(decYear);
 
       const pen = scanWindow(jd_conj, lat, lon, best_dT, PENUMBRA_KM);
       const isTotalish = (type === 'Total' || type === 'Annular' || type === 'Tot/Ann');
@@ -29212,7 +29193,7 @@ function setupGUI() {
 
     // Moon ecliptic longitude (Meeus Ch. 47, with our ΔT for TT correction)
     function moonLp(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
       const T2 = T*T, T3 = T2*T, T4 = T3*T;
       const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
       const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
@@ -29238,7 +29219,7 @@ function setupGUI() {
     }
 
     function sunLon(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / 36525;
+      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
       const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
       const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
       const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
@@ -29296,8 +29277,8 @@ function setupGUI() {
       // Meeus-method umbra: sub-solar point + Moon-β leverage (same construction
       // as the -135 case study's "Meeus method"; simplified, no Besselian elements).
       const lon_pred = subSolarLon(jd_conj);
-      const T_ec  = (jd_conj + ourΔT(jd_conj) / 86400 - j2000JD) / 36525;
-      const eps_r = (23.4392911 - 0.0130042 * T_ec) * _d2r;
+      const T_ec  = (jd_conj + ourΔT(jd_conj) / 86400 - j2000JD) / julianCenturyDays;
+      const eps_r = meeusMeanObliquityRad(T_ec);
       const sunDec = Math.asin(Math.sin(eps_r) * Math.sin(sunLon(jd_conj) * _d2r)) / _d2r;
       const beta   = _eclMoonBeta(jd_conj);
       const mDist  = _eclMoonDistance(jd_conj);
@@ -31642,7 +31623,7 @@ function setupGUI() {
     // Moon's mean ascending node Ω from Meeus (1998) Ch. 47, eq. 47.7
     // (truncated to cubic — leading-period accuracy ~0.001° over a millennium).
     function moonOmega(jd) {
-      const T = (jd - j2000JD) / 36525;
+      const T = (jd - j2000JD) / julianCenturyDays;
       let omega = 125.0445479 - 1934.1362891 * T + 0.0020754 * T * T + T * T * T / 467441;
       omega = ((omega % 360) + 360) % 360;
       return omega;
@@ -36170,7 +36151,7 @@ function setupGUI() {
     //   (deg per Julian-cy) × (SI-trop-days per Julian-cy⁻¹) / (360 deg per cycle)
     //   = coefPerJulCy / 36525 × SI_TROPICAL_YEAR_DAYS / 360
     const meeusPerSItropYr = (coefPerJulCy) =>
-      coefPerJulCy / 36525 * SI_TROPICAL_YEAR_DAYS / 360;   // cycles per SI-tropical-year
+      coefPerJulCy / julianCenturyDays * SI_TROPICAL_YEAR_DAYS / 360;   // cycles per SI-tropical-year
 
     const rate_meeus_Lp     = meeusPerSItropYr(481267.88123421);
     const rate_meeus_periSun_via_M = meeusPerSItropYr(36000.76983 - 35999.0502909);  // Lsun - M = perihelion advance, but Lsun and M coefficients aren't independently stated; use D-based: Lsun rate = Lp - D
@@ -53991,7 +53972,7 @@ const _moonVisualCorrection = new THREE.Vector3();
 const _D5_RATE_L    = 360 / meansolaryearlengthinDays;                          // deg/day, tropical
 const _D5_RATE_PERI = 360 / ((holisticyearLength / 16) * meansolaryearlengthinDays);  // deg/day, H/16
 function _sunGeoVecEqD5(jd) {
-  const T = (jd - j2000JD) / 36525;
+  const T = (jd - j2000JD) / julianCenturyDays;
   const d = jd - j2000JD;
   const L0 = ASTRO_REFERENCE.sunMeanLongitudeJ2000_deg + _D5_RATE_L * d;
   const M = ((L0 - (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + _D5_RATE_PERI * d)) + 180) * Math.PI / 180;  // geocentric-perigee convention (Sun perigee = Earth perihelion + 180°)
@@ -54338,14 +54319,14 @@ function updatePositions() {
       if (MOON_ARGS_FRAMEWORK_NATIVE) {
         // _moonAberrationRaDec returns the delta TO the aberration-removed
         // direction (u − v/c) — apply it directly.
-        const _ab = _moonAberrationRaDec(j2000JD + (obj._meeusT || 0) * 36525, newRA, newDec);
+        const _ab = _moonAberrationRaDec(j2000JD + (obj._meeusT || 0) * julianCenturyDays, newRA, newDec);
         newRA  += _ab.dRA;
         newDec += _ab.dDec;
       }
       const _mcPatch = MOON_ARGS_FRAMEWORK_NATIVE ? MOON_CORRECTION_RESIDUAL : MOON_CORRECTION;
       if (_mcPatch) {
         const _d2r = Math.PI / 180;
-        const _dJD = (obj._meeusT || 0) * 36525;
+        const _dJD = (obj._meeusT || 0) * julianCenturyDays;
         const _Dc  = (297.850 + 12.19074912 * _dJD) * _d2r;
         const _Mpc = (134.963 + 13.06499295 * _dJD) * _d2r;
         const _Msc = (357.529 + 0.98560028 * _dJD) * _d2r;
@@ -54696,7 +54677,7 @@ function moveModel(pos) {
       // reaches arcminutes, capturing the long-period structure that linear
       // scene motion can't represent.
       if (obj === sun) {
-        const T_jc = (o.julianDay - j2000JD) / 36525;
+        const T_jc = (o.julianDay - j2000JD) / julianCenturyDays;
         θ += 0.0003032 * T_jc * T_jc * (Math.PI / 180);
       }
     }
@@ -54807,7 +54788,7 @@ function moveModel(pos) {
         }
       }
       const _d2r = Math.PI / 180;
-      const T = d / 36525;
+      const T = d / julianCenturyDays;
       const T2 = T * T;
 
       // Fundamental arguments via the shared dispatcher (_moonArgsAt):
