@@ -88,6 +88,7 @@ export { createCardinalModel } from './cardinal/index.cjs';
 // apparent). Same CJS + root re-export convention.
 export { createMoonEccChannel } from './moon/ecc-channel.cjs';
 export { createMoonMonthChain } from './moon/month-chain.cjs';
+export { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 
 /**
  * Build a model bound to a set of constants.

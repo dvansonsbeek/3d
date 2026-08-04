@@ -203,72 +203,29 @@ function _fwSunSecularDeviations(jd_tt) {
 // (≈ 365.24189 — NOT the 365.2422 input constant).
 const _SI_TROP_DAYS = DT.MEAN_TROPICAL_YEAR_J2000_S / 86400;
 const _jdToSIyearTools = (jd) => C.startModelYearWithCorrection + (jd - C.startmodelJD) / _SI_TROP_DAYS;
-// Cumulative month-cycle tables (mirror of src/script.js _moonCycleTable):
-// fixed 10-yr grid over ±250 kyr, per-cell 3-point Simpson at build, linear
-// interpolation on read; deterministic, call-order independent. The adaptive
-// Simpson below stays as the out-of-range fallback.
-const _MOON_CYCLE_TABLES_T = new Map();
-const _MCT_MIN_T  = 2000 - 250000;
-const _MCT_MAX_T  = 2000 + 250000;
-const _MCT_STEP_T = 10;
-function _moonCycleTableTools(periodFn) {
-  let tab = _MOON_CYCLE_TABLES_T.get(periodFn);
-  if (tab !== undefined) return tab;
-  const N = Math.round((_MCT_MAX_T - _MCT_MIN_T) / _MCT_STEP_T);
-  const cum = new Float64Array(N + 1);
-  const j2000Idx = Math.round((2000 - _MCT_MIN_T) / _MCT_STEP_T);
-  const f = (y) => {
-    const t_Ma = (2000 - y) / 1e6;
-    const T_p = periodFn(t_Ma);
-    if (T_p === null) return null;
-    const T_yr = DT.meanTropicalYearSecondsAtAge(t_Ma);
-    return T_yr === null ? null : T_yr / T_p;
-  };
-  let ok = true;
-  let fPrev = f(_MCT_MIN_T);
-  for (let i = 1; i <= N; i++) {
-    const fMid = f(_MCT_MIN_T + (i - 0.5) * _MCT_STEP_T);
-    const fCur = f(_MCT_MIN_T + i * _MCT_STEP_T);
-    if (fPrev === null || fMid === null || fCur === null) { ok = false; break; }
-    cum[i] = cum[i - 1] + (fPrev + 4 * fMid + fCur) * (_MCT_STEP_T / 6);
-    fPrev = fCur;
+// Chain-cycle integrator — Phase 8.2-4: lives ONCE in
+// @hum/physics/chain-cycles. This mirror previously diverged from the
+// browser on THREE points, all closed by the shared module:
+//   S5  — no snapshot branch / periodFn(0) memo / fallback cache here;
+//   S12 — the age anchor was a literal 2000 where the browser uses
+//         startmodelYear (2000.5, the scene's t_Ma convention);
+//   (the table still anchors C(2000) = 0 — grid anchor ≠ age anchor,
+//   deliberately, cf. the phase machinery's anchor pair).
+const { createChainCycleIntegrator } = require('@hum/physics/chain-cycles');
+let _chainCyclesM = null;
+function _chainCyclesT() {
+  if (_chainCyclesM === null) {
+    _chainCyclesM = createChainCycleIntegrator({
+      ageAnchorYear: C.startmodelYear,
+      tropicalYearSecondsAtAge: DT.meanTropicalYearSecondsAtAge,
+      tropicalYearJ2000Seconds: C.meanSolarYearDays * C.meanLengthOfDay,
+      isDeepTime: () => DEEP_TIME_ENABLED,
+    });
   }
-  if (ok) {
-    const c0 = cum[j2000Idx];
-    for (let i = 0; i <= N; i++) cum[i] -= c0;
-    tab = cum;
-  } else {
-    tab = null;
-  }
-  _MOON_CYCLE_TABLES_T.set(periodFn, tab);
-  return tab;
+  return _chainCyclesM;
 }
-function _moonCycleTableAtTools(tab, y) {
-  const idx_f = (y - _MCT_MIN_T) / _MCT_STEP_T;
-  const i = Math.floor(idx_f);
-  return tab[i] + (idx_f - i) * (tab[i + 1] - tab[i]);
-}
-
 function _moonChainCyclesTools(periodFn, yearA, yearB) {
-  const dy = yearB - yearA;
-  if (dy === 0) return 0;
-  if (yearA > _MCT_MIN_T && yearA < _MCT_MAX_T && yearB > _MCT_MIN_T && yearB < _MCT_MAX_T) {
-    const tab = _moonCycleTableTools(periodFn);
-    if (tab !== null) return _moonCycleTableAtTools(tab, yearB) - _moonCycleTableAtTools(tab, yearA);
-  }
-  let n = Math.max(32, Math.ceil(Math.abs(dy) / 1000));
-  if (n > 1024) n = 1024;
-  if (n % 2 === 1) n++;
-  const h = dy / n;
-  let sum = 0;
-  for (let i = 0; i <= n; i++) {
-    const t_Ma = (2000 - (yearA + i * h)) / 1e6;
-    const T_p = periodFn(t_Ma);
-    const T_yr = DT.meanTropicalYearSecondsAtAge(t_Ma);
-    if (T_p === null || T_yr === null) return null;
-    sum += ((i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2)) * (T_yr / T_p);
-  }
-  return (sum * h) / 3;
+  return _chainCyclesT().cyclesBetween(periodFn, yearA, yearB);
 }
 // Named moon-chain wrappers (mirror of src/script.js meanMoon*Between family;
 // used by both the deep-time argument branch and the layer integrator branch)

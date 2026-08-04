@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -4582,136 +4582,30 @@ const MOON_TROPICAL_MONTH_J2000_S = MOON_SIDEREAL_MONTH_J2000_S *
 function meanApsidalMeetsNodalAtAge(t_Ma) { return _moonChain().apsidalMeetsNodalSecondsAtAge(t_Ma); }
 function meanLunarLevelingCycleAtAge(t_Ma) { return _moonChain().lunarLevelingSecondsAtAge(t_Ma); }
 
-// Cache slot per period function. Key = period function identity (WeakMap),
-// value = LRU Map of `yearA|yearB → cycles`.
-const _MOON_CYCLE_CACHES   = new WeakMap();
-const _MOON_CYCLE_J2000_S  = new WeakMap();  // memoized periodFn(0) value
-const _MAX_MOON_CYCLE_CACHE = 512;
-
-/** Generic Moon-chain cycle integrator.
- *
- *  Snapshot mode (deep-time OFF): linear at J2000 rate. Numerically equal
- *  to (locked) `obj.speed × Δyear / 2π`, so the integrator path is
- *  bit-equivalent to the snapshot path at recent epochs.
- *
- *  Deep-time mode: cumulative-table lookup (see _moonCycleTable below) for
- *  any span inside ±250 kyr — the hot path; per-call Simpson integration of
- *  (T_yr_SI / T_period_SI)(y) remains as the out-of-range fallback,
- *  capturing Farhat-derived period evolution for any Moon scene-graph cycle
- *  (tropical month, apsidal precession, nodal precession, apsidal-meets-
- *  nodal beat, lunar leveling cycle). Anchored at startmodelYear in the
- *  scene graph so currentYear==startmodelYear gives zero cycles (preserves
- *  the J2000 phase used by modern eclipses).
- *
- *  Per-periodFn bounded FIFO cache (~512 entries each) serves only the
- *  Simpson fallback; in-range calls return from the table and never touch
- *  it. */
-// ═══ Cumulative month-cycle tables ═══ Fixed 10-yr grid over ±250 kyr
-// around J2000, cumulative cycles per chain (per-cell 3-point Simpson at
-// build; linear interpolation on read). Deterministic and call-order
-// independent — replaces the per-call Simpson for all in-range spans, so a
-// full-canon scan pays two table lookups per chain instead of ~33 deep-chain
-// integrand evaluations (the L-4 92 s/century regression). The adaptive
-// Simpson below remains the out-of-range fallback (±Myr navigations).
-// Build is lazy, a fraction of a second per chain, once per session.
-const _MOON_CYCLE_TABLES = new Map();
-const _MCT_MIN  = 2000 - 250000;
-const _MCT_MAX  = 2000 + 250000;
-const _MCT_STEP = 10;
-function _moonCycleTable(periodFnSeconds) {
-  let tab = _MOON_CYCLE_TABLES.get(periodFnSeconds);
-  if (tab !== undefined) return tab;
-  const N = Math.round((_MCT_MAX - _MCT_MIN) / _MCT_STEP);
-  const cum = new Float64Array(N + 1);
-  const j2000Idx = Math.round((2000 - _MCT_MIN) / _MCT_STEP);
-  const f = (y) => {
-    const t_Ma = (J2000_CALENDAR_YEAR - y) / 1e6;
-    const T_period_s = periodFnSeconds(t_Ma);
-    if (T_period_s === null) return null;
-    const T_yr_s = meanTropicalYearSecondsAtAge(t_Ma);
-    return T_yr_s === null ? null : T_yr_s / T_period_s;
+/** Generic chain-cycle integrator — Phase 8.2-4: lives ONCE in
+ *  @hum/physics/chain-cycles. Snapshot mode: linear at the J2000 rate.
+ *  Deep time: cumulative 10-yr table over ±250 kyr (per-cell 3-point
+ *  Simpson at build, linear interpolation on read — the L-4 92 s/century
+ *  fix), adaptive Simpson beyond, bounded FIFO cache on the fallback.
+ *  Age anchor is startmodelYear (2000.5) — the scene's t_Ma convention —
+ *  while the table anchors C(2000) = 0: two constants, deliberately.
+ *  Serves the Moon chains AND the planet OrbitalCyclesBetween family. */
+const _chainCycles = (() => {
+  let m = null;
+  return () => {
+    if (!m) {
+      m = createChainCycleIntegrator({
+        ageAnchorYear: J2000_CALENDAR_YEAR,
+        tropicalYearSecondsAtAge: meanTropicalYearSecondsAtAge,
+        tropicalYearJ2000Seconds: MEAN_TROPICAL_YEAR_J2000_S,
+        isDeepTime: () => DEEP_TIME_MODE_ENABLED,
+      });
+    }
+    return m;
   };
-  let ok = true;
-  let fPrev = f(_MCT_MIN);
-  for (let i = 1; i <= N; i++) {
-    const fMid = f(_MCT_MIN + (i - 0.5) * _MCT_STEP);
-    const fCur = f(_MCT_MIN + i * _MCT_STEP);
-    if (fPrev === null || fMid === null || fCur === null) { ok = false; break; }
-    cum[i] = cum[i - 1] + (fPrev + 4 * fMid + fCur) * (_MCT_STEP / 6);
-    fPrev = fCur;
-  }
-  if (ok) {
-    const c0 = cum[j2000Idx];
-    for (let i = 0; i <= N; i++) cum[i] -= c0;   // anchor C(2000) = 0
-    tab = cum;
-  } else {
-    tab = null;   // chain unavailable somewhere in range — Simpson fallback
-  }
-  _MOON_CYCLE_TABLES.set(periodFnSeconds, tab);
-  return tab;
-}
-function _moonCycleTableAt(tab, y) {
-  const idx_f = (y - _MCT_MIN) / _MCT_STEP;
-  const i = Math.floor(idx_f);
-  return tab[i] + (idx_f - i) * (tab[i + 1] - tab[i]);
-}
-
+})();
 function _moonChainCycles(periodFnSeconds, yearA, yearB) {
-  const dy = yearB - yearA;
-  if (dy === 0) return 0;
-
-  let T_J2000 = _MOON_CYCLE_J2000_S.get(periodFnSeconds);
-  if (T_J2000 === undefined) {
-    T_J2000 = periodFnSeconds(0);
-    if (T_J2000 === null) return null;
-    _MOON_CYCLE_J2000_S.set(periodFnSeconds, T_J2000);
-  }
-
-  if (!DEEP_TIME_MODE_ENABLED) {
-    return dy * MEAN_TROPICAL_YEAR_J2000_S / T_J2000;
-  }
-
-  // Cumulative-table fast path (deterministic; see _moonCycleTable above)
-  if (yearA > _MCT_MIN && yearA < _MCT_MAX && yearB > _MCT_MIN && yearB < _MCT_MAX) {
-    const tab = _moonCycleTable(periodFnSeconds);
-    if (tab !== null) return _moonCycleTableAt(tab, yearB) - _moonCycleTableAt(tab, yearA);
-  }
-
-  let cache = _MOON_CYCLE_CACHES.get(periodFnSeconds);
-  if (!cache) {
-    cache = new Map();
-    _MOON_CYCLE_CACHES.set(periodFnSeconds, cache);
-  }
-  const cacheKey = yearA + '|' + yearB;
-  const hit = cache.get(cacheKey);
-  if (hit !== undefined) return hit;
-
-  // Adaptive Simpson: ~1 sample per 1 kyr, capped at 1024 to bound per-frame cost.
-  let n = Math.max(32, Math.ceil(Math.abs(dy) / 1000));
-  if (n > 1024) n = 1024;
-  if (n % 2 === 1) n++;
-  const h = dy / n;
-
-  let sum = 0;
-  for (let i = 0; i <= n; i++) {
-    const y = yearA + i * h;
-    const t_Ma = (J2000_CALENDAR_YEAR - y) / 1e6;
-    const T_period_s = periodFnSeconds(t_Ma);
-    if (T_period_s === null) return null;
-    const T_yr_s = meanTropicalYearSecondsAtAge(t_Ma);
-    if (T_yr_s === null) return null;
-    const integrand = T_yr_s / T_period_s;  // cycles per SI year
-    const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
-    sum += w * integrand;
-  }
-  const result = (sum * h) / 3;
-
-  if (cache.size >= _MAX_MOON_CYCLE_CACHE) {
-    const firstKey = cache.keys().next().value;
-    cache.delete(firstKey);
-  }
-  cache.set(cacheKey, result);
-  return result;
+  return _chainCycles().cyclesBetween(periodFnSeconds, yearA, yearB);
 }
 
 // Per-node wrappers — bound to specific period functions so the scene-graph
