@@ -6327,6 +6327,49 @@ if (typeof window !== 'undefined') {
     setMoonArgsFrameworkNative: (on) => { MOON_ARGS_FRAMEWORK_NATIVE = !!on; },
     getMoonArgsFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
     setDeepTimeMode: (on) => { DEEP_TIME_MODE_ENABLED = !!on; },
+
+    // ── Phase 8.3-0 planet surface ───────────────────────────────────────────
+    // Pins CURRENT behaviour before the planet extraction: the unrolled
+    // derived families, the ψ/K law outputs, the wobble/obliquity pairs, the
+    // runtime channels, and the deep-time orbit chains. Test surface only.
+    planetDerived: (k) => ({
+      mercury: { N: mercurySolarYearCount, a: mercuryOrbitDistance, elip: mercuryElipticOrbit, peri: mercuryPerihelionDistance, rot: mercuryRotationPeriod },
+      venus:   { N: venusSolarYearCount, a: venusOrbitDistance, elip: venusElipticOrbit, peri: venusPerihelionDistance, rot: venusRotationPeriod },
+      mars:    { N: marsSolarYearCount, a: marsOrbitDistance, elip: marsElipticOrbit, peri: marsPerihelionDistance, rot: marsRotationPeriod },
+      jupiter: { N: jupiterSolarYearCount, a: jupiterOrbitDistance, elip: jupiterElipticOrbit, peri: jupiterPerihelionDistance, rot: jupiterRotationPeriod },
+      saturn:  { N: saturnSolarYearCount, a: saturnOrbitDistance, elip: saturnElipticOrbit, peri: saturnPerihelionDistance, rot: saturnRotationPeriod },
+      uranus:  { N: uranusSolarYearCount, a: uranusOrbitDistance, elip: uranusElipticOrbit, peri: uranusPerihelionDistance, rot: uranusRotationPeriod },
+      neptune: { N: neptuneSolarYearCount, a: neptuneOrbitDistance, elip: neptuneElipticOrbit, peri: neptunePerihelionDistance, rot: neptuneRotationPeriod },
+      eros:    { N: erosSolarYearCount, a: erosOrbitDistance, elip: erosElipticOrbit, peri: erosPerihelionDistance, rot: erosRotationPeriod },
+      pluto:   { N: plutoSolarYearCount, a: plutoOrbitDistance, elip: plutoElipticOrbit, peri: plutoPerihelionDistance, rot: plutoRotationPeriod },
+      halleys: { N: halleysSolarYearCount, a: halleysOrbitDistance, elip: halleysElipticOrbit, peri: halleysPerihelionDistance, rot: halleysRotationPeriod },
+    })[k],
+    planetLaws: (k) => {
+      const p = planets[k];
+      return {
+        inclAmp: p.invPlaneInclinationAmplitude, inclMean: p.invPlaneInclinationMean,
+        eccAmp: p.orbitalEccentricityAmplitude, eccBase: p.orbitalEccentricityBase,
+        eccPhase: p.eccentricityPhaseJ2000,
+      };
+    },
+    planetWobble: (k) => ({
+      mercury: [mercuryWobblePeriod, mercuryObliquityMean],
+      venus: [venusWobblePeriod, venusObliquityMean],
+      mars: [marsWobblePeriod, marsObliquityMean],
+      jupiter: [jupiterWobblePeriod, jupiterObliquityMean],
+      saturn: [saturnWobblePeriod, saturnObliquityMean],
+      uranus: [uranusWobblePeriod, uranusObliquityMean],
+      neptune: [neptuneWobblePeriod, neptuneObliquityMean],
+    })[k],
+    planetEccAt: (k, year) => _eccentricityInline('eccentricity' + k.charAt(0).toUpperCase() + k.slice(1), year),
+    planetObliquityAt: (k, year) => computePlanetObliquity(k, year),
+    planetInvPlaneInclAt: (k, year) => computePlanetInvPlaneInclinationDynamic(k, year),
+    planetCyclesBetween: (k, yearA, yearB) => ({
+      mercury: meanMercuryOrbitalCyclesBetween, venus: meanVenusOrbitalCyclesBetween,
+      mars: meanMarsOrbitalCyclesBetween, jupiter: meanJupiterOrbitalCyclesBetween,
+      saturn: meanSaturnOrbitalCyclesBetween, uranus: meanUranusOrbitalCyclesBetween,
+      neptune: meanNeptuneOrbitalCyclesBetween,
+    })[k](yearA, yearB),
   };
 }
 

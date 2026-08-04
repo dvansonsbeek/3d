@@ -147,6 +147,34 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   }
   T.setDeepTimeMode(true);
 
+  // ── Phase 8.3-0: the planet surface (shipped defaults) ────────────────────
+  const P7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+  const P_ALL = [...P7, 'eros', 'pluto', 'halleys'];
+  for (const k of P_ALL) {
+    for (const [n, val] of Object.entries(T.planetDerived(k))) v[`planet.${k}.${n}`] = val;
+  }
+  for (const k of [...P7, 'ceres']) {
+    for (const [n, val] of Object.entries(T.planetLaws(k))) {
+      if (val !== undefined) v[`planetLaw.${k}.${n}`] = val;
+    }
+  }
+  for (const k of P7) {
+    const w = T.planetWobble(k);
+    v[`planetWobble.${k}`] = w[0];
+    v[`planetObliqMean.${k}`] = w[1];
+  }
+  const P_YEARS = [-25000, -2000, 0, 1000, 2000, 2100, 6000];
+  for (const k of P7) {
+    for (const y of P_YEARS) {
+      v[`planetEcc.${k}@${y}`] = T.planetEccAt(k, y);
+      v[`planetObliq.${k}@${y}`] = T.planetObliquityAt(k, y);
+      v[`planetInvIncl.${k}@${y}`] = T.planetInvPlaneInclAt(k, y);
+    }
+  }
+  for (const [a3, b3] of [[2000, 2100], [2000, -2000], [2000, 100000]]) {
+    for (const k of P7) v[`planetChain.${k}@${a3}..${b3}`] = T.planetCyclesBetween(k, a3, b3);
+  }
+
   // The reset must be exact, or every anchor above is measured against a
   // drifting baseline. Recorded rather than asserted so the fixture shows it.
   const back = T.anchors();

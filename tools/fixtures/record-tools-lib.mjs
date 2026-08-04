@@ -141,6 +141,41 @@ function measure() {
   Object.assign(v, childProbe({ MOON_ARGS_PURE_MEEUS: '1' }, IN_WINDOW_JDS, 'moonPosMeeus'));
   Object.assign(v, childProbe({ SG_DEEP_TIME: '0' }, IN_WINDOW_JDS, 'moonPosSnap'));
 
+  // ─── Planets — the Phase 8.3 extraction safety net ────────────────────────
+  // Pins CURRENT Node behaviour, KNOWN divergences from the browser included
+  // (S-P1 eccentricity period, S-P2 missing deep-time integrators, S-P3
+  // snapshot obliquity — the 8.3 survey). These move only with deliberate,
+  // measured alignment commits.
+  const P7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+  const P_JDS = [1671853.759762, 2451545.0, 2460310.5,
+                 2451545.0 - 100000 * 365.25, 2451545.0 + 100000 * 365.25];
+  for (const k of P7) {
+    for (const jd of P_JDS) {
+      const p = SG.computePlanetPosition(k, jd);
+      v[`planetPos.${k}.ra@${jd}`] = p.ra;
+      v[`planetPos.${k}.dec@${jd}`] = p.dec;
+      v[`planetPos.${k}.distAU@${jd}`] = p.distAU;
+    }
+  }
+  const P_YEARS = [-25000, -2000, 0, 1000, 2000, 2100, 6000];
+  for (const k of P7) {
+    for (const y of P_YEARS) {
+      v[`planetObliq.${k}@${y}`] = OE.computePlanetObliquity(k, y);
+      v[`planetAscNode.${k}@${y}`] = OE.computeAscendingNodeInvPlane(k, y);
+    }
+    const d = C.derived ? C.derived[k] : null;
+    if (d) for (const [n, val] of Object.entries(d)) {
+      if (typeof val === 'number') v[`planetDerived.${k}.${n}`] = val;
+    }
+    const p = C.planets[k];
+    v[`planetLaw.${k}.inclAmp`] = p.invPlaneInclinationAmplitude;
+    v[`planetLaw.${k}.inclMean`] = p.invPlaneInclinationMean;
+    v[`planetLaw.${k}.eccAmp`] = p.orbitalEccentricityAmplitude;
+    v[`planetLaw.${k}.eccBase`] = p.orbitalEccentricityBase;
+    v[`planetLaw.${k}.wobblePeriod`] = p.wobblePeriod;
+    v[`planetLaw.${k}.obliquityMean`] = p.obliquityMean;
+  }
+
   return v;
 }
 
