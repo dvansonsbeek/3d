@@ -1045,104 +1045,51 @@ const _CUMUL_INTEGRAL_YEAR_MAX =  500e6;   // +500 Myr (symmetric with past; was
                                            // exercised to ±1 Gyr by the paper figures)
 const _CUMUL_INTEGRAL_STEP     = 10000;    // 10 kyr per cell (matches browser)
 
-let _cumulIntegralTable    = null;
-let _cumulIntegralJ2000Idx = -1;
-
-function _ensureCumulIntegralTable() {
-  if (_cumulIntegralTable !== null) return;
-  _withLatticeAlpha(_buildCumulIntegralTable);   // R2: lattice tables pin α
+// Phase 7.1 — the table arithmetic lives in @hum/physics/phase (ONE
+// implementation for every engine; extracted verbatim from this file). This
+// engine keeps only its CONFIG (the grid constants above, injected) and its
+// OWN H(t) twin as the integrand — the twins dissolve into Layer 0 at
+// Phase 8. R2 is honoured at construction: ensureTable() runs under
+// _withLatticeAlpha, so every invH evaluation sees the constant MOI.
+const { createPhaseMachinery } = require('@hum/physics/phase');
+let _phaseM = null;
+function _phase() {
+  if (_phaseM !== null) return _phaseM;
+  _phaseM = createPhaseMachinery({
+    holisticHAtAgeMa: (t_Ma) => meanHAtAge(t_Ma),
+    tableAnchorYear: C.startmodelYear,
+    driftRefYear: C.startModelYearWithCorrection,
+    hJ2000: HOLISTIC_YEAR_J2000,
+    yearMin: _CUMUL_INTEGRAL_YEAR_MIN,
+    yearMax: _CUMUL_INTEGRAL_YEAR_MAX,
+    stepYears: _CUMUL_INTEGRAL_STEP,
+  });
+  _withLatticeAlpha(() => _phaseM.ensureTable());   // R2: lattice tables pin α
+  return _phaseM;
 }
+function _ensureCumulIntegralTable() { _phase(); }
+// Grid geometry for the days/pos tables below (they share this grid but keep
+// their own integrands until Phase 8 moves them).
+function _cumulIntegralJ2000IdxGet() { return _phase().grid().j2000Idx; }
+function _cumulIntegralLength() { return _phase().grid().length; }
 
-function _buildCumulIntegralTable() {
-  const N = Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP) + 1;
-  const table = new Float64Array(N);
-  const j2000Idx = Math.round((C.startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
-
-  const invH = (year) => {
-    const t_Ma = (C.startmodelYear - year) / 1e6;
-    const H = meanHAtAge(t_Ma);
-    return H === null ? null : 1 / H;
-  };
-
-  table[j2000Idx] = 0;
-  let prev = invH(_CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP);
-  for (let i = j2000Idx + 1; i < N; i++) {
-    const year_i = _CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP;
-    const curr = invH(year_i);
-    table[i] = (prev !== null && curr !== null)
-      ? table[i - 1] + 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
-      : NaN;
-    prev = curr;
-  }
-  prev = invH(_CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP);
-  for (let i = j2000Idx - 1; i >= 0; i--) {
-    const year_i = _CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP;
-    const curr = invH(year_i);
-    table[i] = (prev !== null && curr !== null)
-      ? table[i + 1] - 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
-      : NaN;
-    prev = curr;
-  }
-  _cumulIntegralTable    = table;
-  _cumulIntegralJ2000Idx = j2000Idx;
-}
-
-function _cumulIntegralAtYear(year) {
-  _ensureCumulIntegralTable();
-  if (year < _CUMUL_INTEGRAL_YEAR_MIN || year > _CUMUL_INTEGRAL_YEAR_MAX) return null;
-  const idx_f = (year - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP;
-  const idx_lo = Math.floor(idx_f);
-  const idx_hi = Math.min(idx_lo + 1, _cumulIntegralTable.length - 1);
-  const v_lo = _cumulIntegralTable[idx_lo];
-  const v_hi = _cumulIntegralTable[idx_hi];
-  if (Number.isNaN(v_lo) || Number.isNaN(v_hi)) return null;
-  return v_lo + (idx_f - idx_lo) * (v_hi - v_lo);
-}
+// Phase 7.1 — the four functions below are one-line delegates to
+// @hum/physics/phase; their arithmetic (trapezoid convention, R3 call-shape
+// anchor rule, the drift correction, and every comment that used to sit here)
+// moved into the package verbatim. The R2 α-pin is honoured at construction
+// (see _phase() above).
+function _cumulIntegralAtYear(year) { return _phase().cumulAtYear(year); }
 
 /** ∫_{yearA}^{yearB} 1/H(t') dt'. Returns null if either endpoint is outside
  *  the precomputed range (±500 Myr symmetric). */
-function integralInverseHFromYears(yearA, yearB) {
-  if (yearA === yearB) return 0;
-  const cA = _cumulIntegralAtYear(yearA);
-  const cB = _cumulIntegralAtYear(yearB);
-  if (cA === null || cB === null) return null;
-  return cB - cA;
-}
+function integralInverseHFromYears(yearA, yearB) { return _phase().integralBetween(yearA, yearB); }
 
-// Phase 9.10b drift correction: for a harmonic anchored at yearA, the
-// integrated form differs from the snapshot form at J2000 by a small
-// constant (~3.7 ppm × interval). Subtracting the drift at anchor makes
-// the two forms agree at startModelYearWithCorrection, restoring
-// snapshot-fitted harmonic calibration at J2000 without changing the
-// integrated form's shape at deep time.
-// (Cache removed — mirrors src/script.js: keyed by year, it grew one entry
-// per unique moving endpoint and hit V8's Map cap during canon scans; the
-// computation is two table lookups, cheaper than the cache.)
-function _getJ2000Drift(yearA) {
-  const integral = integralInverseHFromYears(yearA, C.startModelYearWithCorrection);
-  if (integral === null) return 0;
-  const snapshot = (C.startModelYearWithCorrection - yearA) / HOLISTIC_YEAR_J2000;
-  return integral - snapshot;
-}
+function _getJ2000Drift(yearA) { return _phase().j2000Drift(yearA); }
 
 /** Total cycles between two years for a cycle of period H/divisor_N.
- *  Integrated form always (toggle at caller). Applies Phase 9.10b drift
- *  correction relative to whichever endpoint is farther from J2000.
- *  Returns null past tidal-lock asymptote. */
-function cyclesBetweenYears(yearA, yearB, divisor_N) {
-  const integral = integralInverseHFromYears(yearA, yearB);
-  if (integral === null) return null;
-  // R3: identify the anchor from the CALL SHAPE, not by distance. Two shapes
-  // exist — (anchor, movingYear, N), and (J2000, anchor, N) where yearA IS
-  // J2000 itself. The old `distA >= distB` heuristic flipped branch the moment
-  // the moving endpoint crossed the anchor: a 2·drift = 6.80e-5 cycle STEP
-  // discontinuity at yearB == yearA, worth 0.393/0.402 d of apsis displacement
-  // and 100% of 6d's anomalistic residual. The correction now depends only on
-  // a FIXED endpoint, so it is constant across any scan.
-  const anchorIsA = (yearA !== C.startModelYearWithCorrection);
-  const correction = anchorIsA ? _getJ2000Drift(yearA) : -_getJ2000Drift(yearB);
-  return divisor_N * (integral - correction);
-}
+ *  Integrated form always (toggle at caller). R3 call-shape anchor rule
+ *  (see @hum/physics/phase). Returns null past tidal-lock asymptote. */
+function cyclesBetweenYears(yearA, yearB, divisor_N) { return _phase().cyclesBetween(yearA, yearB, divisor_N); }
 
 /**
  * The Layer 0 parameter bundle (PHASE-B).
@@ -1215,22 +1162,7 @@ const _jdToSIyear = (jd) =>
  * @param {number} targetCumul
  * @returns {number|null} null outside the table domain
  */
-function _yearAtCumulIntegral(targetCumul) {
-  _ensureCumulIntegralTable();
-  const N = _cumulIntegralTable.length;
-  let lo = 0, hi = N - 1;
-  while (lo < N && Number.isNaN(_cumulIntegralTable[lo])) lo++;
-  while (hi >= 0 && Number.isNaN(_cumulIntegralTable[hi])) hi--;
-  if (lo >= hi) return null;
-  if (targetCumul < _cumulIntegralTable[lo] || targetCumul > _cumulIntegralTable[hi]) return null;
-  while (lo < hi - 1) {
-    const mid = (lo + hi) >> 1;
-    if (_cumulIntegralTable[mid] <= targetCumul) lo = mid; else hi = mid;
-  }
-  const v_lo = _cumulIntegralTable[lo], v_hi = _cumulIntegralTable[hi];
-  const frac = (v_lo === v_hi) ? 0 : (targetCumul - v_lo) / (v_hi - v_lo);
-  return _CUMUL_INTEGRAL_YEAR_MIN + (lo + frac) * _CUMUL_INTEGRAL_STEP;
-}
+function _yearAtCumulIntegral(targetCumul) { return _phase().yearAtCumul(targetCumul); }
 
 /** ∫ daysPerYear dt from startmodelYear, on the same grid as the 1/H table. */
 let _cumulDaysTable = null;
@@ -1242,8 +1174,8 @@ function _ensureCumulDaysTable() {
 
 function _buildCumulDaysTable() {
   _ensureCumulIntegralTable();
-  const N = _cumulIntegralTable.length;
-  const j2000Idx = _cumulIntegralJ2000Idx;
+  const N = _cumulIntegralLength();
+  const j2000Idx = _cumulIntegralJ2000IdxGet();
   _cumulDaysTable = new Float64Array(N);
 
   const daysPerYear = (year) => meanYearInDaysAtAge((C.startmodelYear - year) / 1e6);
@@ -1360,8 +1292,8 @@ function _posAnchorDy() { _posAnchorLoIdx(); return _posAnchorDy0; }
 function _ensureCumulPosTable() {
   if (_cumulPosTable !== null) return;
   _ensureCumulIntegralTable();                  // grid geometry
-  const N = _cumulIntegralTable.length;
-  const j2000Idx = _cumulIntegralJ2000Idx;
+  const N = _cumulIntegralLength();
+  const j2000Idx = _cumulIntegralJ2000IdxGet();
   _cumulPosTable = new Float64Array(N);
 
   const dpy = _posDpy;

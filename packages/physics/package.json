@@ -5,5 +5,9 @@
   "description": "Pure physics core \u2014 no I/O, no globals, no DOM. Published; the website consumes this.",
   "type": "module",
   "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./phase": "./src/phase/index.cjs"
+  },
   "license": "AGPL-3.0-or-later"
 }
