@@ -83,6 +83,10 @@ export { createDerivedViews } from './layer1/index.js';
 // re-exported here so bundled ESM consumers need only the package root).
 export { createPhaseMachinery } from './phase/index.cjs';
 export { createCardinalModel } from './cardinal/index.cjs';
+// Phase 8.2 — the lunar machinery, extracted layer by layer (survey order:
+// eccentricity channel → month chain → cycle tables → arguments → series →
+// apparent). Same CJS + root re-export convention.
+export { createMoonEccChannel } from './moon/ecc-channel.cjs';
 
 /**
  * Build a model bound to a set of constants.

@@ -8,7 +8,8 @@
   "exports": {
     ".": "./src/index.js",
     "./phase": "./src/phase/index.cjs",
-    "./cardinal": "./src/cardinal/index.cjs"
+    "./cardinal": "./src/cardinal/index.cjs",
+    "./moon/ecc-channel": "./src/moon/ecc-channel.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }

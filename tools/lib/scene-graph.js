@@ -156,21 +156,13 @@ const _FW_MOON = (() => {
   return { LP0, D0, M0, MP0, F0, LPR, DR, MR, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
 })();
 
-/** Phase-aware channel-rate integral (mirror of src/script.js
- *  _fwChannelIntegral): ∫₀ᵀ [(g(e_E(t))/g₀)^s − 1] dt′ in Julian cy. */
+/** Phase-aware channel-rate integral — delegates to the shared
+ *  @hum/physics moon eccentricity channel (8.2-2). This mirror once
+ *  recomputed g₀ from _fwEarthEcc(0), which under integrated phase is not
+ *  exactly the anchor (the R3 drift correction); the channel's g₀ const is
+ *  the browser's convention and now the only one. */
 function _fwChannelIntegralTools(T, s) {
-  if (T === 0) return 0;
-  const DTmod = require('./deep-time');
-  const g0 = Math.pow(1 - Math.pow(DTmod._fwEarthEcc(0), 2), -1.5);
-  const f = (t) => {
-    const e = DTmod._fwEarthEcc(t * 100);
-    return Math.pow(Math.pow(1 - e * e, -1.5) / g0, s) - 1;
-  };
-  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
-  const h = T / N;
-  let sum = f(0) + f(T);
-  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
-  return sum * h / 3;
+  return require('./deep-time')._moonEcc().channelIntegral(T, s);
 }
 
 const _FW_SUN_SEC = (() => {
@@ -487,11 +479,10 @@ function _fwEFactorTools(d_days, T, T2) {
     const EC = MEEUS_LUNAR.eccentricityCorrection;
     return 1 + EC.e1 * T + EC.e2 * T2;
   }
-  const DTmod = require('./deep-time');
-  // Denominator is the J2000 anchor CONST, not _fwEarthEcc(0): under the
-  // integrated phase (8.2-1 S1) cycles(2000→2000) carries the R3 drift
-  // correction and is not exactly zero. Mirrors src/script.js _fwEFactor.
-  return DTmod._fwEarthEcc(d_days / C.inputMeanSolarYear) / DTmod._FW_ECC_E0;
+  // The shared channel's eFactorAt divides by its e0 anchor CONST, not
+  // eccAt(0) — under integrated phase cycles(2000→2000) carries the R3
+  // drift correction and is not exactly zero (8.2-1/8.2-2).
+  return require('./deep-time')._moonEcc().eFactorAt(d_days / C.inputMeanSolarYear);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

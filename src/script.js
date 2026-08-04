@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -4857,20 +4857,27 @@ const _ECOMP_G0 = Math.pow(1 - _fwEarthEccComposite(0) ** 2, -1.5);   // g at th
  *  perihelion law (e-max 1246, _eclSunLon) — this line is the Moon channel's
  *  view of the H/3 movement. Bounded [base/2, 3·base/2]; e-mean crossing
  *  ≈ 4739, locked to the inclination's; turning points ≈ −23,200 / +32,700.
- *  Deep-time aware via cyclesBetweenYears (integrated ∫3/H(t)dt when on). */
-const _FW_ECC = (() => {
-  const th0 = (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg
-             - earthInclinationCycleAnchor) * Math.PI / 180;   // 81.18° past max
-  const A = eccentricityBase / 2;
-  return { th0, A, c: eccentricityBase, e0: eccentricityBase + A * Math.cos(th0) };
+ *  Deep-time aware via cyclesBetweenYears (integrated ∫3/H(t)dt when on).
+ *
+ *  Phase 8.2-2: the line lives ONCE in @hum/physics/moon/ecc-channel; this
+ *  engine delegates, injecting its OWN cyclesBetweenYears so the deep-time /
+ *  snapshot toggle semantics ride along. Anchors e0/g0 are consts inside the
+ *  channel (never eccAt(0) — the R3 drift correction). */
+const _moonEcc = (() => {
+  let m = null;
+  return () => {
+    if (!m) {
+      m = createMoonEccChannel({
+        cyclesBetween: cyclesBetweenYears,
+        eccentricityBase,
+        perihelionLongitudeJ2000Deg: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg,
+        inclinationCycleAnchorDeg: earthInclinationCycleAnchor,
+      });
+    }
+    return m;
+  };
 })();
-function _fwEarthEcc(t_yr) {
-  const cycles = cyclesBetweenYears(2000, 2000 + t_yr, 3);
-  if (cycles === null) return _FW_ECC.c;   // past tidal-lock asymptote — mean
-  return _FW_ECC.c + _FW_ECC.A * Math.cos(_FW_ECC.th0 + 2 * Math.PI * cycles);
-}
-const _FW_ECC_E0 = _FW_ECC.e0;                                  // J2000 value anchor (exact by construction)
-const _FW_ECC_G0 = Math.pow(1 - _FW_ECC_E0 * _FW_ECC_E0, -1.5); // g at J2000 (exact anchor)
+function _fwEarthEcc(t_yr) { return _moonEcc().eccAt(t_yr); }
 
 /** Integral of the PHASE-AWARE channel rate: ∫₀ᵀ [(g(e(t))/g₀)^s − 1] dt′ in
  *  Julian centuries. The perigee/node rates are NOT constants — they speed up
@@ -4878,18 +4885,7 @@ const _FW_ECC_G0 = Math.pow(1 - _FW_ECC_E0 * _FW_ECC_E0, -1.5); // g at J2000 (e
  *  polynomial was this integral's Taylor truncation at J2000. Composite
  *  Simpson: 3 evaluations in-window (the integrand barely bends over
  *  centuries), step ≤ ~4,000 yr at deep time. Bounded at every epoch. */
-function _fwChannelIntegral(T, s) {
-  if (T === 0) return 0;
-  const f = (t) => {
-    const e = _fwEarthEcc(t * 100);   // t in cy → years
-    return Math.pow(Math.pow(1 - e * e, -1.5) / _FW_ECC_G0, s) - 1;
-  };
-  const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
-  const h = T / N;
-  let sum = f(0) + f(T);
-  for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
-  return sum * h / 3;
-}
+function _fwChannelIntegral(T, s) { return _moonEcc().channelIntegral(T, s); }
 
 /** Bounded planetary Lp carrier: the record's planetary T² remainder
  *  (T2_LP − T2_LP_TIDAL, +7.247″/cy²) is the J2000 Taylor truncation of
@@ -4930,7 +4926,7 @@ function _fwLpPlanetaryCarrier(T) {
     const _t2Obl = (_elp.earthFigureJ2 + _elp.generalPrecessionPA_T2_Lieske1976) / 3600;
     _FW_LP_KPL = 2 * (_FW_MOON.T2_LP - _FW_MOON.T2_LP_TIDAL - _t2Obl) / de2dT;
   }
-  const e0sq = _FW_ECC_E0 * _FW_ECC_E0;
+  const e0sq = _moonEcc().e0 * _moonEcc().e0;
   const f = (t) => { const e = _fwEarthEcc(t * 100); return e * e - e0sq; };
   const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
   const h = T / N;
@@ -4971,11 +4967,7 @@ function _fwLpObliquityCarrier(T) {
 
 /** e_E-channel rate modulation [g(t)/g₀]^s at age t_Ma (positive = past). ≡ 1 at J2000.
  *  Uses the framework H/3 fluctuation line (was: the Laskar-band composite). */
-function _eCompModulation(t_Ma, s) {
-  if (t_Ma === 0) return 1;
-  const e = _fwEarthEcc(-t_Ma * 1e6);
-  return Math.pow(Math.pow(1 - e * e, -1.5) / _FW_ECC_G0, s);
-}
+function _eCompModulation(t_Ma, s) { return _moonEcc().modulation(t_Ma, s); }
 
 /** Meeus E-factor (Earth-eccentricity scaling of the M-bearing series terms),
  *  bounded: E ≡ e_E(t)/e_E(J2000). Meeus's polynomial
@@ -4987,7 +4979,7 @@ function _eCompModulation(t_Ma, s) {
  *  amplitudes). Flag-consistent: pure-Meeus A/B mode keeps the polynomial. */
 function _fwEFactor(jd_tt, T, T2) {
   if (!MOON_ARGS_FRAMEWORK_NATIVE) return 1 - 0.002516 * T - 0.0000074 * T2;
-  return _fwEarthEcc((jd_tt - j2000JD) / inputmeanlengthsolaryearindays) / _FW_ECC_E0;
+  return _moonEcc().eFactorAt((jd_tt - j2000JD) / inputmeanlengthsolaryearindays);
 }
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
