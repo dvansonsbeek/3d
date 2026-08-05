@@ -101,6 +101,7 @@ export * as planetOrientation from './planets/orientation.cjs';
 export { integrateAscendingNode } from './planets/asc-node-integrator.cjs';
 export * as planetOrbitChain from './planets/orbit-chain.cjs';
 export { evaluateParallaxBasis } from './planets/corrections.cjs';
+export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from './planets/predict.cjs';
 
 /**
  * Build a model bound to a set of constants.

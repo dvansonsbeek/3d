@@ -21,7 +21,8 @@
     "./planets/orientation": "./src/planets/orientation.cjs",
     "./planets/asc-node-integrator": "./src/planets/asc-node-integrator.cjs",
     "./planets/orbit-chain": "./src/planets/orbit-chain.cjs",
-    "./planets/corrections": "./src/planets/corrections.cjs"
+    "./planets/corrections": "./src/planets/corrections.cjs",
+    "./planets/predict": "./src/planets/predict.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }
