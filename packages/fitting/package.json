@@ -16,7 +16,12 @@
     "./sun-longitude-harmonics": "./src/sun-longitude-harmonics.cjs",
     "./cardinal-point-harmonics": "./src/cardinal-point-harmonics.cjs",
     "./dt-corrections-fit": "./src/dt-corrections-fit.cjs",
-    "./validate-resonator": "./src/validate-resonator.cjs"
+    "./validate-resonator": "./src/validate-resonator.cjs",
+    "./eoc-fractions": "./src/eoc-fractions.cjs",
+    "./moon-eclipse-optimizer": "./src/moon-eclipse-optimizer.cjs",
+    "./export-solar-measurements": "./src/export-solar-measurements.cjs",
+    "./reclassify-tiers": "./src/reclassify-tiers.cjs",
+    "./run-pipeline": "./src/run-pipeline.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }
