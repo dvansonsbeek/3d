@@ -26,6 +26,12 @@
  *
  * Saturn's scene-side negation of elipticOrbit (antiPhase) is a SCENE
  * convention and stays engine-side.
+ *
+ * MINOR-BODY TYPES ARE PLACEHOLDERS (model-parameters.json _typeNote): the
+ * small bodies borrow the planet taxonomy geometrically but are more
+ * susceptible to planetary gravity disturbances; a perturbation-aware
+ * type is expected from the Phase 18 refit. It lands as ONE new branch
+ * here + a JSON type flip per body — both engines pick it up automatically.
  */
 
 'use strict';
