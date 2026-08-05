@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -53906,24 +53906,15 @@ function updatePositions() {
       const _ascNode = o[_planetAscNodeDynKey[obj.name]] || _planetAscNodeLookup[obj.name];
       const _u = (obj.ra * (180 / Math.PI) - _ascNode) * (Math.PI / 180);
       const _invD = 1 / obj.distAU;
-      const _invD2 = _invD * _invD;
       DELTA.subVectors(PLANET_POS, SUN_POS);
       const _invS = 100 / DELTA.length();
-      const _invS2 = _invS * _invS;
       const _T = (o.julianDay - j2000JD) / julianCenturyDays;
-      const _sinU = Math.sin(_u), _cosU = Math.cos(_u);
-      const _sin2U = Math.sin(2*_u), _cos2U = Math.cos(2*_u);
-      const _sin3U = Math.sin(3*_u), _cos3U = Math.cos(3*_u);
       // Conjunction phase (triple synodic period ~59.5yr, Jupiter-Saturn interaction)
       const _yr = startmodelYear + (o.julianDay - startmodelJD) / meansolaryearlengthinDays;
       const _cp = 2 * Math.PI * (_yr - 2000) / tripleSynodicYears;
-      const _sinCP = Math.sin(_cp), _cosCP = Math.cos(_cp);
-      const _sin2CP = Math.sin(2*_cp), _cos2CP = Math.cos(2*_cp);
       // Sun mean longitude (for Lsun basis functions AX-BK)
       const _dtJ = o.julianDay - j2000JD;
       const _Lsun = (280.460 + 0.9856474 * _dtJ) * (Math.PI / 180);
-      const _sinL = Math.sin(_Lsun), _cosL = Math.cos(_Lsun);
-      const _invD3 = _invD2 * _invD;
       // Planet mean anomaly for heliocentric orbital phase terms (BR-CA)
       // Uses dynamic M from EoC computation (stored on obj._meanAnomaly during animation)
       // Only for inner planets (Mercury, Venus, Mars) — outer planets have too few M cycles
@@ -53935,89 +53926,15 @@ function updatePositions() {
         _sinM = Math.sin(_Mpl); _cosM = Math.cos(_Mpl);
         _sin2M = Math.sin(2 * _Mpl); _cos2M = Math.cos(2 * _Mpl);
       }
+      // Phase 8.3 L8: the fitted 80-slot parallax basis lives ONCE in
+      // @hum/physics/planets/corrections (matched pair with the tables;
+      // the state derivation above stays engine-side).
+      const _pState = { u: _u, invD: _invD, invS: _invS, T: _T, cp: _cp, Lsun: _Lsun, sinM: _sinM, cosM: _cosM, sin2M: _sin2M, cos2M: _cos2M };
       if (_dc) {
-        const _invDS = _invD * _invS;
-        const _corrDec = _dc.A + _dc.B * _invD + (_dc.C || 0) * _T
-          + (_dc.D * _sinU + _dc.E * _cosU + _dc.F * _sin2U + _dc.G * _cos2U
-           + (_dc.H || 0) * _sin3U + (_dc.I || 0) * _cos3U) * _invD
-          + _T * ((_dc.J || 0) * _sinU + (_dc.K || 0) * _cosU) * _invD
-          + (_dc.L || 0) * _invS + (_dc.M || 0) * _sinU * _invD2
-          + (_dc.N || 0) * _sin2U * _invS + (_dc.O || 0) * _cosU * _invS
-          + (_dc.P || 0) * _T * _sin2U * _invD + (_dc.Q || 0) * _T * _cos2U * _invD
-          + (_dc.R || 0) * _T * _sinU * _invS
-          + (_dc.S || 0) * _T * _invD + (_dc.U || 0) * _cosU * _invD2
-          + (_dc.V || 0) * _invS2 + (_dc.W || 0) * _sinU * _invS2
-          + (_dc.X || 0) * _cos3U * _invS + (_dc.Y || 0) * _sin3U * _invS
-          + (_dc.Z || 0) * _invDS + (_dc.AA || 0) * _sinU * _invDS
-          + (_dc.AB || 0) * _cos2U * _invDS + (_dc.AC || 0) * _T * _sin2U * _invS
-          + (_dc.AD || 0) * _cos3U * _invD2 + (_dc.AE || 0) * _sin2U * _invS2
-          + (_dc.AF || 0) * _sin3U * _invS2 + (_dc.AG || 0) * _cos3U * _invS2
-          + (_dc.AH || 0) * _cosU * _invS2 + (_dc.AI || 0) * _sinU * _invD2 * _invS
-          + (_dc.AJ || 0) * Math.cos(4*_u) * _invS + (_dc.AK || 0) * _sin2U * _invD2 * _invS
-          + (_dc.AL || 0) * Math.sin(4*_u) * _invD + (_dc.AM || 0) * Math.cos(4*_u) * _invD
-          + (_dc.AN || 0) * _T * _sinU * _invD2 + (_dc.AO || 0) * _T * _cosU * _invD2
-          + (_dc.AP || 0) * _sinU * _invD2 * _invD + (_dc.AQ || 0) * _cosU * _invD2 * _invD
-          + (_dc.AR || 0) * _sinCP + (_dc.AS || 0) * _cosCP
-          + (_dc.AT || 0) * _sin2CP + (_dc.AU_ || 0) * _cos2CP
-          + (_dc.AV || 0) * _sinCP * _invD + (_dc.AW || 0) * _cosCP * _invD
-          + (_dc.AX || 0) * _sinL * _invD + (_dc.AY || 0) * _cosL * _invD
-          + (_dc.AZ || 0) * _sinL + (_dc.BA || 0) * _cosL
-          + (_dc.BB || 0) * _T * _sinL * _invD + (_dc.BC || 0) * _T * _cosL * _invD
-          + (_dc.BD || 0) * _T * _sinL + (_dc.BE || 0) * _T * _cosL
-          + (_dc.BF || 0) * _cosU * _sinL * _invD2 + (_dc.BG || 0) * _cosU * _cosL * _invD2
-          + (_dc.BH || 0) * _sinL * _invD3 + (_dc.BI || 0) * _cosL * _invD3
-          + (_dc.BJ || 0) * Math.sin(_u - _Lsun) * _invD2 + (_dc.BK || 0) * Math.cos(_u - _Lsun) * _invD2
-          + (_dc.BL || 0) * _T * _T * _invD + (_dc.BM || 0) * _T * _T * _sinU * _invD + (_dc.BN || 0) * _T * _T * _cosU * _invD
-          + (_dc.BO || 0) * _sin2U * _invD3 + (_dc.BP || 0) * _cos2U * _invD3
-          + (_dc.BQ || 0) * _sinU * _invD3 * _invD
-          + (_dc.BR || 0) * _sinM * _invD + (_dc.BS || 0) * _cosM * _invD
-          + (_dc.BT || 0) * _sin2M * _invD + (_dc.BU || 0) * _cos2M * _invD
-          + (_dc.BV || 0) * _sinM + (_dc.BW || 0) * _cosM
-          + (_dc.BX || 0) * _sin2M + (_dc.BY || 0) * _cos2M
-          + (_dc.BZ || 0) * _sinM * _invD2 + (_dc.CA || 0) * _cosM * _invD2;
-        obj.dec += _corrDec * (Math.PI / 180);
+        obj.dec += evaluateParallaxBasis(_dc, _pState) * (Math.PI / 180);
       }
       if (_rc) {
-        const _invDS = _invD * _invS;
-        const _corrRA = _rc.A + _rc.B * _invD + (_rc.C || 0) * _T
-          + (_rc.D * _sinU + _rc.E * _cosU + _rc.F * _sin2U + _rc.G * _cos2U
-           + (_rc.H || 0) * _sin3U + (_rc.I || 0) * _cos3U) * _invD
-          + _T * ((_rc.J || 0) * _sinU + (_rc.K || 0) * _cosU) * _invD
-          + (_rc.L || 0) * _invS + (_rc.M || 0) * _sinU * _invD2
-          + (_rc.N || 0) * _sin2U * _invS + (_rc.O || 0) * _cosU * _invS
-          + (_rc.P || 0) * _T * _sin2U * _invD + (_rc.Q || 0) * _T * _cos2U * _invD
-          + (_rc.R || 0) * _T * _sinU * _invS
-          + (_rc.S || 0) * _T * _invD + (_rc.U || 0) * _cosU * _invD2
-          + (_rc.V || 0) * _invS2 + (_rc.W || 0) * _sinU * _invS2
-          + (_rc.X || 0) * _cos3U * _invS + (_rc.Y || 0) * _sin3U * _invS
-          + (_rc.Z || 0) * _invDS + (_rc.AA || 0) * _sinU * _invDS
-          + (_rc.AB || 0) * _cos2U * _invDS + (_rc.AC || 0) * _T * _sin2U * _invS
-          + (_rc.AD || 0) * _cos3U * _invD2 + (_rc.AE || 0) * _sin2U * _invS2
-          + (_rc.AF || 0) * _sin3U * _invS2 + (_rc.AG || 0) * _cos3U * _invS2
-          + (_rc.AH || 0) * _cosU * _invS2 + (_rc.AI || 0) * _sinU * _invD2 * _invS
-          + (_rc.AJ || 0) * Math.cos(4*_u) * _invS + (_rc.AK || 0) * _sin2U * _invD2 * _invS
-          + (_rc.AL || 0) * Math.sin(4*_u) * _invD + (_rc.AM || 0) * Math.cos(4*_u) * _invD
-          + (_rc.AN || 0) * _T * _sinU * _invD2 + (_rc.AO || 0) * _T * _cosU * _invD2
-          + (_rc.AP || 0) * _sinU * _invD2 * _invD + (_rc.AQ || 0) * _cosU * _invD2 * _invD
-          + (_rc.AR || 0) * _sinCP + (_rc.AS || 0) * _cosCP
-          + (_rc.AT || 0) * _sin2CP + (_rc.AU_ || 0) * _cos2CP
-          + (_rc.AV || 0) * _sinCP * _invD + (_rc.AW || 0) * _cosCP * _invD
-          + (_rc.AX || 0) * _sinL * _invD + (_rc.AY || 0) * _cosL * _invD
-          + (_rc.AZ || 0) * _sinL + (_rc.BA || 0) * _cosL
-          + (_rc.BB || 0) * _T * _sinL * _invD + (_rc.BC || 0) * _T * _cosL * _invD
-          + (_rc.BD || 0) * _T * _sinL + (_rc.BE || 0) * _T * _cosL
-          + (_rc.BF || 0) * _cosU * _sinL * _invD2 + (_rc.BG || 0) * _cosU * _cosL * _invD2
-          + (_rc.BH || 0) * _sinL * _invD3 + (_rc.BI || 0) * _cosL * _invD3
-          + (_rc.BJ || 0) * Math.sin(_u - _Lsun) * _invD2 + (_rc.BK || 0) * Math.cos(_u - _Lsun) * _invD2
-          + (_rc.BL || 0) * _T * _T * _invD + (_rc.BM || 0) * _T * _T * _sinU * _invD + (_rc.BN || 0) * _T * _T * _cosU * _invD
-          + (_rc.BO || 0) * _sin2U * _invD3 + (_rc.BP || 0) * _cos2U * _invD3
-          + (_rc.BQ || 0) * _sinU * _invD3 * _invD
-          + (_rc.BR || 0) * _sinM * _invD + (_rc.BS || 0) * _cosM * _invD
-          + (_rc.BT || 0) * _sin2M * _invD + (_rc.BU || 0) * _cos2M * _invD
-          + (_rc.BV || 0) * _sinM + (_rc.BW || 0) * _cosM
-          + (_rc.BX || 0) * _sin2M + (_rc.BY || 0) * _cos2M
-          + (_rc.BZ || 0) * _sinM * _invD2 + (_rc.CA || 0) * _cosM * _invD2;
-        obj.ra -= _corrRA * (Math.PI / 180);
+        obj.ra -= evaluateParallaxBasis(_rc, _pState) * (Math.PI / 180);
       }
     }
 

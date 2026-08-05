@@ -1416,23 +1416,15 @@ function computePlanetPosition(target, jd) {
     const ascNode = OE.calculateDynamicAscendingNodeFromTilts(_p.orbitTilta, _p.orbitTiltb, _currentYear, target);
     const u = (sph.theta / d2r - ascNode) * d2r;
     const invD = 1 / distAU;
-    const invD2 = invD * invD;
     const invS = 1 / sunDistAU;
-    const invS2 = invS * invS;
     const T = (jd - C.j2000JD) / C.julianCenturyDays;  // centuries from J2000
-    const sinU = Math.sin(u), cosU = Math.cos(u);
-    const sin2U = Math.sin(2*u), cos2U = Math.cos(2*u);
-    const sin3U = Math.sin(3*u), cos3U = Math.cos(3*u);
 
     // Conjunction phase for Jupiter-Saturn interaction terms (AR-AW)
     const _yr = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
     const conjPhase = 2 * Math.PI * (_yr - 2000) / C.tripleSynodicYears;
-    const sinCP = Math.sin(conjPhase), cosCP = Math.cos(conjPhase);
-    const sin2CP = Math.sin(2 * conjPhase), cos2CP = Math.cos(2 * conjPhase);
 
     // Sun mean longitude for eccentricity-offset terms (AX-BA)
     const _Lsun = (280.460 + 0.9856474 * (jd - C.j2000JD)) * d2r;
-    const sinLsun = Math.sin(_Lsun), cosLsun = Math.cos(_Lsun);
 
     // Planet mean anomaly for heliocentric orbital phase terms (BR-CA)
     // Uses dynamic M from EoC computation in animateObject (stored on planet node)
@@ -1446,92 +1438,21 @@ function computePlanetPosition(target, jd) {
       sin2Mplanet = Math.sin(2 * _Mplanet); cos2Mplanet = Math.cos(2 * _Mplanet);
     }
 
+    // Phase 8.3 L8: the fitted 80-slot basis lives ONCE in
+    // @hum/physics/planets/corrections (browser association order — this
+    // mirror carried invD2·invD where the basis uses the precomputed invD3
+    // at five slots; any last-bit drift is measured by the fixtures).
+    const _pState = { u, invD, invS, T, cp: conjPhase, Lsun: _Lsun,
+                      sinM: sinMplanet, cosM: cosMplanet, sin2M: sin2Mplanet, cos2M: cos2Mplanet };
+    const _evalParallax = require('@hum/physics/planets/corrections').evaluateParallaxBasis;
     const dc = C.ASTRO_REFERENCE.decCorrection[target];
     if (dc) {
-      const invDS = invD * invS;
-      const corrDec = dc.A + dc.B * invD + (dc.C || 0) * T
-        + (dc.D * sinU + dc.E * cosU + dc.F * sin2U + dc.G * cos2U
-         + (dc.H || 0) * sin3U + (dc.I || 0) * cos3U) * invD
-        + T * ((dc.J || 0) * sinU + (dc.K || 0) * cosU) * invD
-        + (dc.L || 0) * invS + (dc.M || 0) * sinU * invD2
-        + (dc.N || 0) * sin2U * invS + (dc.O || 0) * cosU * invS
-        + (dc.P || 0) * T * sin2U * invD + (dc.Q || 0) * T * cos2U * invD
-        + (dc.R || 0) * T * sinU * invS
-        + (dc.S || 0) * T * invD + (dc.U || 0) * cosU * invD2
-        + (dc.V || 0) * invS2 + (dc.W || 0) * sinU * invS2
-        + (dc.X || 0) * cos3U * invS + (dc.Y || 0) * sin3U * invS
-        + (dc.Z || 0) * invDS + (dc.AA || 0) * sinU * invDS
-        + (dc.AB || 0) * cos2U * invDS + (dc.AC || 0) * T * sin2U * invS
-        + (dc.AD || 0) * cos3U * invD2 + (dc.AE || 0) * sin2U * invS2
-        + (dc.AF || 0) * sin3U * invS2 + (dc.AG || 0) * cos3U * invS2
-        + (dc.AH || 0) * cosU * invS2 + (dc.AI || 0) * sinU * invD2 * invS
-        + (dc.AJ || 0) * Math.cos(4*u) * invS + (dc.AK || 0) * sin2U * invD2 * invS
-        + (dc.AL || 0) * Math.sin(4*u) * invD + (dc.AM || 0) * Math.cos(4*u) * invD
-        + (dc.AN || 0) * T * sinU * invD2 + (dc.AO || 0) * T * cosU * invD2
-        + (dc.AP || 0) * sinU * invD2 * invD + (dc.AQ || 0) * cosU * invD2 * invD
-        + (dc.AR || 0) * sinCP + (dc.AS || 0) * cosCP
-        + (dc.AT || 0) * sin2CP + (dc.AU_ || 0) * cos2CP
-        + (dc.AV || 0) * sinCP * invD + (dc.AW || 0) * cosCP * invD
-        + (dc.AX || 0) * sinLsun * invD + (dc.AY || 0) * cosLsun * invD
-        + (dc.AZ || 0) * sinLsun + (dc.BA || 0) * cosLsun
-        + (dc.BB || 0) * T * sinLsun * invD + (dc.BC || 0) * T * cosLsun * invD
-        + (dc.BD || 0) * T * sinLsun + (dc.BE || 0) * T * cosLsun
-        + (dc.BF || 0) * cosU * sinLsun * invD2 + (dc.BG || 0) * cosU * cosLsun * invD2
-        + (dc.BH || 0) * sinLsun * invD2 * invD + (dc.BI || 0) * cosLsun * invD2 * invD
-        + (dc.BJ || 0) * Math.sin(u - _Lsun) * invD2 + (dc.BK || 0) * Math.cos(u - _Lsun) * invD2
-        + (dc.BL || 0) * T * T * invD + (dc.BM || 0) * T * T * sinU * invD + (dc.BN || 0) * T * T * cosU * invD
-        + (dc.BO || 0) * sin2U * invD2 * invD + (dc.BP || 0) * cos2U * invD2 * invD
-        + (dc.BQ || 0) * sinU * invD2 * invD * invD
-        + (dc.BR || 0) * sinMplanet * invD + (dc.BS || 0) * cosMplanet * invD
-        + (dc.BT || 0) * sin2Mplanet * invD + (dc.BU || 0) * cos2Mplanet * invD
-        + (dc.BV || 0) * sinMplanet + (dc.BW || 0) * cosMplanet
-        + (dc.BX || 0) * sin2Mplanet + (dc.BY || 0) * cos2Mplanet
-        + (dc.BZ || 0) * sinMplanet * invD2 + (dc.CA || 0) * cosMplanet * invD2;
-      sph.phi += corrDec * d2r;
+      sph.phi += _evalParallax(dc, _pState) * d2r;
     }
 
     const rc = C.ASTRO_REFERENCE.raCorrection && C.ASTRO_REFERENCE.raCorrection[target];
     if (rc) {
-      const invDS = invD * invS;
-      const corrRA = rc.A + rc.B * invD + (rc.C || 0) * T
-        + (rc.D * sinU + rc.E * cosU + rc.F * sin2U + rc.G * cos2U
-         + (rc.H || 0) * sin3U + (rc.I || 0) * cos3U) * invD
-        + T * ((rc.J || 0) * sinU + (rc.K || 0) * cosU) * invD
-        + (rc.L || 0) * invS + (rc.M || 0) * sinU * invD2
-        + (rc.N || 0) * sin2U * invS + (rc.O || 0) * cosU * invS
-        + (rc.P || 0) * T * sin2U * invD + (rc.Q || 0) * T * cos2U * invD
-        + (rc.R || 0) * T * sinU * invS
-        + (rc.S || 0) * T * invD + (rc.U || 0) * cosU * invD2
-        + (rc.V || 0) * invS2 + (rc.W || 0) * sinU * invS2
-        + (rc.X || 0) * cos3U * invS + (rc.Y || 0) * sin3U * invS
-        + (rc.Z || 0) * invDS + (rc.AA || 0) * sinU * invDS
-        + (rc.AB || 0) * cos2U * invDS + (rc.AC || 0) * T * sin2U * invS
-        + (rc.AD || 0) * cos3U * invD2 + (rc.AE || 0) * sin2U * invS2
-        + (rc.AF || 0) * sin3U * invS2 + (rc.AG || 0) * cos3U * invS2
-        + (rc.AH || 0) * cosU * invS2 + (rc.AI || 0) * sinU * invD2 * invS
-        + (rc.AJ || 0) * Math.cos(4*u) * invS + (rc.AK || 0) * sin2U * invD2 * invS
-        + (rc.AL || 0) * Math.sin(4*u) * invD + (rc.AM || 0) * Math.cos(4*u) * invD
-        + (rc.AN || 0) * T * sinU * invD2 + (rc.AO || 0) * T * cosU * invD2
-        + (rc.AP || 0) * sinU * invD2 * invD + (rc.AQ || 0) * cosU * invD2 * invD
-        + (rc.AR || 0) * sinCP + (rc.AS || 0) * cosCP
-        + (rc.AT || 0) * sin2CP + (rc.AU_ || 0) * cos2CP
-        + (rc.AV || 0) * sinCP * invD + (rc.AW || 0) * cosCP * invD
-        + (rc.AX || 0) * sinLsun * invD + (rc.AY || 0) * cosLsun * invD
-        + (rc.AZ || 0) * sinLsun + (rc.BA || 0) * cosLsun
-        + (rc.BB || 0) * T * sinLsun * invD + (rc.BC || 0) * T * cosLsun * invD
-        + (rc.BD || 0) * T * sinLsun + (rc.BE || 0) * T * cosLsun
-        + (rc.BF || 0) * cosU * sinLsun * invD2 + (rc.BG || 0) * cosU * cosLsun * invD2
-        + (rc.BH || 0) * sinLsun * invD2 * invD + (rc.BI || 0) * cosLsun * invD2 * invD
-        + (rc.BJ || 0) * Math.sin(u - _Lsun) * invD2 + (rc.BK || 0) * Math.cos(u - _Lsun) * invD2
-        + (rc.BL || 0) * T * T * invD + (rc.BM || 0) * T * T * sinU * invD + (rc.BN || 0) * T * T * cosU * invD
-        + (rc.BO || 0) * sin2U * invD2 * invD + (rc.BP || 0) * cos2U * invD2 * invD
-        + (rc.BQ || 0) * sinU * invD2 * invD * invD
-        + (rc.BR || 0) * sinMplanet * invD + (rc.BS || 0) * cosMplanet * invD
-        + (rc.BT || 0) * sin2Mplanet * invD + (rc.BU || 0) * cos2Mplanet * invD
-        + (rc.BV || 0) * sinMplanet + (rc.BW || 0) * cosMplanet
-        + (rc.BX || 0) * sin2Mplanet + (rc.BY || 0) * cos2Mplanet
-        + (rc.BZ || 0) * sinMplanet * invD2 + (rc.CA || 0) * cosMplanet * invD2;
-      sph.theta -= corrRA * d2r;
+      sph.theta -= _evalParallax(rc, _pState) * d2r;
     }
   }
 
