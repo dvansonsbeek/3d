@@ -175,6 +175,31 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     for (const k of P7) v[`planetChain.${k}@${a3}..${b3}`] = T.planetCyclesBetween(k, a3, b3);
   }
 
+  // ── Phase 8.4-0: the ΔT/LOD surface (shipped defaults) ────────────────────
+  // Pins CURRENT behaviour, KNOWN divergences from Node included (flag gates,
+  // taper wiring, the _eclDeltaT calendar-year vs frameworkDeltaT model-year
+  // convention — the 8.4 survey). These move only with deliberate, measured
+  // alignment commits.
+  const DT_YEARS = [-12000, -9000, -6000, -3000, -1000, 0, 1000, 1900, 2000, 2100];
+  for (const y of DT_YEARS) {
+    for (const [k, n] of Object.entries(T.dtCycleAt(y))) v[`dtCycle.${k}@${y}`] = n;
+  }
+  const DT_AGES = [-400, -66, -1, -0.1, 0, 0.1, 1, 66, 400];
+  for (const t of DT_AGES) {
+    for (const [k, n] of Object.entries(T.dtAtAge(t))) v[`dtAge.${k}@${t}Ma`] = n;
+    for (const [k, n] of Object.entries(T.dtDecompositionAtAge(t))) {
+      if (typeof n === 'number') v[`dtDecomp.${k}@${t}Ma`] = n;
+    }
+  }
+  const DT_JDS = [1671853.759762, 2451545.0, 2460310.5,
+                  2451545.0 - 100000 * 365.25, 2451545.0 + 100000 * 365.25];
+  for (const jd of DT_JDS) v[`dtFw@${jd}`] = T.dtFrameworkAt(jd);
+  // Espenak-Meeus piecewise polynomial — one probe per era segment (valid
+  // −1999..3000; browser-only, feeds the 8.5 eclipse machinery).
+  for (const y of [-500, 500, 1000, 1600, 1900, 1955, 2000, 2015, 2100, 3000]) {
+    for (const [k, n] of Object.entries(T.dtEspenakAt(y))) v[`dtEspenak.${k}@${y}`] = n;
+  }
+
   // The reset must be exact, or every anchor above is measured against a
   // drifting baseline. Recorded rather than asserted so the fixture shows it.
   const back = T.anchors();

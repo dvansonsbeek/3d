@@ -176,6 +176,41 @@ function measure() {
     v[`planetLaw.${k}.obliquityMean`] = p.obliquityMean;
   }
 
+  // ─── ΔT / LOD stack — the Phase 8.4 extraction safety net ─────────────────
+  // Pins CURRENT Node behaviour, KNOWN divergences from the browser included
+  // (flag gates and taper wiring on the cycle corrections; frameworkDeltaT's
+  // model-year convention vs the browser _eclDeltaT calendar-year convention;
+  // pureH5DeltaTAtAge / meanLodSecondsAtAgeMeanAlpha / Espenak-Meeus are
+  // browser-only — the 8.4 survey). These move only with deliberate, measured
+  // alignment commits. The year-0 dtstack.* keys above predate this section
+  // and stay (different key namespace, both load-bearing).
+  const DT_YEARS_84 = [-12000, -9000, -6000, -3000, -1000, 0, 1000, 1900, 2000, 2100];
+  const DT_CYCLES_84 = [
+    'bondCycleDeltaTCorrection', 'hallstattCycleDeltaTCorrection',
+    'jose5CycleDeltaTCorrection', 'jose4CycleDeltaTCorrection',
+    'resonatorSwingDeltaTCorrection',
+    'bondCycleLodCorrection', 'hallstattCycleLodCorrection',
+    'jose5CycleLodCorrection', 'jose4CycleLodCorrection',
+    'resonatorSwingLodCorrection', 'resonatorSwingLodRate',
+    'dtCycleLodCorrectionSum',
+  ];
+  for (const y of DT_YEARS_84) {
+    for (const fn of DT_CYCLES_84) v[`dtCycle.${fn}@${y}`] = DT[fn](y);
+  }
+  const DT_AGES_84 = [-400, -66, -1, -0.1, 0, 0.1, 1, 66, 400];
+  for (const t of DT_AGES_84) {
+    v[`dtAge.meanDeltaTSecondsAtAge@${t}Ma`] = DT.meanDeltaTSecondsAtAge(t);
+    v[`dtAge.meanLodSecondsAtAge@${t}Ma`] = DT.meanLodSecondsAtAge(t);
+    v[`dtAge.meanLodSecondsAtAgeActual@${t}Ma`] = DT.meanLodSecondsAtAgeActual(t);
+    v[`dtAge.meanLodSecondsWithCorrectionsAtAge@${t}Ma`] = DT.meanLodSecondsWithCorrectionsAtAge(t);
+    for (const [ch, val] of Object.entries(DT.dLodDtDecompositionAtAge(t))) {
+      if (typeof val === 'number') v[`dtDecomp.${ch}@${t}Ma`] = val;
+    }
+  }
+  const DT_JDS_84 = [1671853.759762, 2451545.0, 2460310.5,
+                     2451545.0 - 100000 * 365.25, 2451545.0 + 100000 * 365.25];
+  for (const jd of DT_JDS_84) v[`dtFw.frameworkDeltaT@${jd}`] = DT.frameworkDeltaT(jd);
+
   return v;
 }
 

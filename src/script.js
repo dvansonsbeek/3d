@@ -6424,6 +6424,40 @@ if (typeof window !== 'undefined') {
         t.orbitTilta, t.orbitTiltb, o.obliquityEarth, o.earthInvPlaneInclinationDynamic, year, k,
       );
     },
+    // ── Phase 8.4-0 ΔT/LOD surface ───────────────────────────────────────────
+    // Pins CURRENT behaviour before the climate/ΔT extraction — including the
+    // browser flag gates and taper wiring, and the _eclDeltaT year convention
+    // (KNOWN divergence from Node frameworkDeltaT: calendar-year vs model-year
+    // — the 8.4 survey). pureH5DeltaTAtAge, meanLodSecondsAtAgeMeanAlpha and
+    // the Espenak-Meeus pair are browser-only. Test surface, not an API.
+    dtCycleAt: (year) => ({
+      bondDt: bondCycleDeltaTCorrection(year),
+      hallstattDt: hallstattCycleDeltaTCorrection(year),
+      jose5Dt: jose5CycleDeltaTCorrection(year),
+      jose4Dt: jose4CycleDeltaTCorrection(year),
+      swingDt: resonatorSwingDeltaTCorrection(year),
+      bondLod: bondCycleLodCorrection(year),
+      hallstattLod: hallstattCycleLodCorrection(year),
+      jose5Lod: jose5CycleLodCorrection(year),
+      jose4Lod: jose4CycleLodCorrection(year),
+      swingLod: resonatorSwingLodCorrection(year),
+      swingLodRate: resonatorSwingLodRate(year),
+      cycleLodSum: dtCycleLodCorrectionSum(year),
+    }),
+    dtAtAge: (t_Ma) => ({
+      meanDeltaTSeconds: meanDeltaTSecondsAtAge(t_Ma),
+      pureH5DeltaT: pureH5DeltaTAtAge(t_Ma),
+      meanLodSeconds: meanLodSecondsAtAge(t_Ma),
+      meanLodSecondsMeanAlpha: meanLodSecondsAtAgeMeanAlpha(t_Ma),
+      meanLodSecondsActual: meanLodSecondsAtAgeActual(t_Ma),
+      meanLodSecondsWithCorrections: meanLodSecondsWithCorrectionsAtAge(t_Ma),
+    }),
+    dtDecompositionAtAge: (t_Ma) => dLodDtDecompositionAtAge(t_Ma),
+    dtFrameworkAt: (jd) => _eclDeltaT(jd),
+    dtEspenakAt: (year) => ({
+      raw: deltaTEspenakMeeusRaw(year),
+      blended: deltaTEspenakMeeus(year),
+    }),
   };
 }
 
