@@ -3584,7 +3584,11 @@ function dtCycleLodCorrectionSum(year) {
 function meanLodSecondsWithCorrectionsAtAge(t_Ma) {
   const tidal = meanLodSecondsAtAge(t_Ma);
   if (tidal === null) return null;
-  const year = J2000_CALENDAR_YEAR - t_Ma * 1e6;
+  // 8.4-1 S-D3: year anchor 2000, matching the meanDeltaTSecondsAtAge core
+  // this corrects AND the Node twin. It historically used J2000_CALENDAR_YEAR
+  // (= startmodelYear = 2000.5), a half-year phase offset in the cycle-sum
+  // evaluation the core itself does not have — measured at ~1e-5 s near J2000.
+  const year = 2000 - t_Ma * 1e6;
   return tidal + dtCycleLodCorrectionSum(year);
 }
 
