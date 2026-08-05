@@ -21,7 +21,11 @@
     "./moon-eclipse-optimizer": "./src/moon-eclipse-optimizer.cjs",
     "./export-solar-measurements": "./src/export-solar-measurements.cjs",
     "./reclassify-tiers": "./src/reclassify-tiers.cjs",
-    "./run-pipeline": "./src/run-pipeline.cjs"
+    "./run-pipeline": "./src/run-pipeline.cjs",
+    "./ascnode-correction": "./src/ascnode-correction.cjs",
+    "./derive-eccentricity-amplitudes": "./src/derive-eccentricity-amplitudes.cjs",
+    "./fetch-jpl-data": "./src/fetch-jpl-data.cjs",
+    "./parallax-greedy-select": "./src/parallax-greedy-select.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }
