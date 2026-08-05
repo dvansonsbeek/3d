@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusRawSeconds, evalClimateL1OrbitalPermil } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -2403,19 +2403,17 @@ const ALPHA_CLIMATE_REGIME_KEY = 'lr04-post-mpt';
 let _alphaClimateL1_J2000 = null;
 
 function _evalClimateL1Orbital(year) {
-  // δ¹⁸O contribution from L1 (orbital) layer only, in ‰. Excludes
-  // intercept, L2 (405-kyr carbon), L3 (regime steps), y_mean, and
-  // trend_slope — we want the *orbital fluctuation* around J2000, not
-  // the secular baseline.
-  const t_kyr_BP = (2000 - year) / 1000;
+  // δ¹⁸O contribution from L1 (orbital) layer only, in ‰ — the orbital
+  // fluctuation around J2000, not the secular baseline. 8.4-4: the
+  // harmonic loop lives in @hum/physics/climate/l1-orbital; the regime
+  // selection (and the TDZ-sensitive CLIMATE_FORMULA_COEFFS read) stays
+  // here.
   const r = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
-  const EIGHT_H = CLIMATE_FORMULA_COEFFS.config.eight_H_kyr;
-  let L1_sum = 0;
-  for (const c of r.L1) {
-    const omega = 2 * Math.PI * c.n / EIGHT_H;
-    L1_sum += c.a * Math.cos(omega * t_kyr_BP) + c.b * Math.sin(omega * t_kyr_BP);
-  }
-  return L1_sum * r.denormalization.y_std;
+  return evalClimateL1OrbitalPermil(year, {
+    l1Terms: r.L1,
+    yStdDenormalization: r.denormalization.y_std,
+    eightHKyr: CLIMATE_FORMULA_COEFFS.config.eight_H_kyr,
+  });
 }
 
 // R2 — the α lattice reference. When BUILDING an H-lattice table (the ∫1/H
@@ -21897,42 +21895,12 @@ function solarDayPeters(year) {
  *  with our model's ΔT-relative-to-J2000 convention (ΔT(2000) = 0), use
  *  deltaTEspenakMeeusRelJ2000 instead. */
 function deltaTEspenakMeeusRaw(year) {
-  let u, t, dT;
-  if (year < -1999 || year > 3000) return NaN;
-  if (year < -500) {
-    u = (year - 1820) / 100;
-    dT = -20 + 32 * u * u;
-  } else if (year < 500) {
-    u = year / 100;
-    dT = 10583.6 - 1014.41 * u + 33.78311 * u ** 2 - 5.952053 * u ** 3
-       - 0.1798452 * u ** 4 + 0.022174192 * u ** 5 + 0.0090316521 * u ** 6;
-  } else if (year < 1600) {
-    u = (year - 1000) / 100;
-    dT = 1574.2 - 556.01 * u + 71.23472 * u ** 2 + 0.319781 * u ** 3
-       - 0.8503463 * u ** 4 - 0.005050998 * u ** 5 + 0.0083572073 * u ** 6;
-  } else if (year < 1700) {
-    t = year - 1600; dT = 120 - 0.9808 * t - 0.01532 * t * t + t ** 3 / 7129;
-  } else if (year < 1800) {
-    t = year - 1700; dT = 8.83 + 0.1603 * t - 0.0059285 * t * t + 0.00013336 * t ** 3 - t ** 4 / 1174000;
-  } else if (year < 1860) {
-    t = year - 1800; dT = 13.72 - 0.332447 * t + 0.0068612 * t * t + 0.0041116 * t ** 3
-                        - 0.00037436 * t ** 4 + 0.0000121272 * t ** 5 - 0.0000001699 * t ** 6
-                        + 0.000000000875 * t ** 7;
-  } else if (year < 1900) {
-    t = year - 1860; dT = 7.62 + 0.5737 * t - 0.251754 * t * t + 0.01680668 * t ** 3
-                        - 0.0004473624 * t ** 4 + t ** 5 / 233174;
-  } else if (year < 1920) {
-    t = year - 1900; dT = -2.79 + 1.494119 * t - 0.0598939 * t * t + 0.0061966 * t ** 3 - 0.000197 * t ** 4;
-  } else if (year < 1941) {
-    t = year - 1920; dT = 21.20 + 0.84493 * t - 0.076100 * t * t + 0.0020936 * t ** 3;
-  } else if (year < 1961) {
-    t = year - 1950; dT = 29.07 + 0.407 * t - t * t / 233 + t ** 3 / 2547;
-  } else if (year < 1986) {
-    t = year - 1975; dT = 45.45 + 1.067 * t - t * t / 260 - t ** 3 / 718;
-  } else {
-    t = year - 2000; dT = 62.92 + 0.32217 * t + 0.005589 * t * t;
-  }
-  return dT;
+  // 8.4-4: the shipped rendition lives in @hum/physics/deltat/historical
+  // (single copy, Node gains it for the 8.5 eclipse work). The VARIANT
+  // renditions in tools/verify/moon-deltat-comparison.js and
+  // tools/fit/sun-longitude-harmonics.js are deliberately untouched —
+  // recorded for the Phase 9 no-duplicated-formulas gate.
+  return deltaTEspenakMeeusRawSeconds(year);
 }
 
 /** Meeus (1998) eq. 22.2 first-order mean obliquity, in RADIANS.

@@ -142,15 +142,14 @@ for (const k of ['mercury','venus','earth','mars','jupiter','saturn','uranus','n
 let _alphaClimateL1_J2000 = null;
 
 function _evalClimateL1Orbital(year) {
-  const t_kyr_BP = (2000 - year) / 1000;
-  const r        = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
-  const EIGHT_H  = CLIMATE_FORMULA_COEFFS.config.eight_H_kyr;
-  let L1_sum = 0;
-  for (const c of r.L1) {
-    const omega = 2 * Math.PI * c.n / EIGHT_H;
-    L1_sum += c.a * Math.cos(omega * t_kyr_BP) + c.b * Math.sin(omega * t_kyr_BP);
-  }
-  return L1_sum * r.denormalization.y_std;
+  // 8.4-4: the L1 harmonic loop lives in @hum/physics/climate/l1-orbital;
+  // the regime selection stays here.
+  const r = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
+  return require('@hum/physics/climate/l1-orbital').evalClimateL1OrbitalPermil(year, {
+    l1Terms: r.L1,
+    yStdDenormalization: r.denormalization.y_std,
+    eightHKyr: CLIMATE_FORMULA_COEFFS.config.eight_H_kyr,
+  });
 }
 
 // R2 — the α lattice reference. When BUILDING an H-lattice table α must be
