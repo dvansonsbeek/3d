@@ -6027,6 +6027,13 @@ if (typeof window !== 'undefined') {
       meeusMeanObliquityRad: meeusMeanObliquityRad((yearToJDApprox(year) - j2000JD) / julianCenturyDays),
     }),
     refStephensonAt: (year, poly) => stephensonDeltaT(year, poly),
+    // ── Phase 9-0 sun-harmonics surface (S-P8) ───────────────────────────────
+    // Pins the browser's H-lattice-filtered sun longitude correction before
+    // the three-copy dedup (browser fn + two Node scene-graph blocks). NOTE
+    // the browser phases against the MUTABLE holisticyearLength where Node
+    // deliberately uses fixed C.H (the fitted J2000 convention) — identical
+    // at fresh load, an S-item under epoch shift.
+    sunLonCorrectionAt: (jd) => sunLongitudeCorrection(jd),
   };
 }
 

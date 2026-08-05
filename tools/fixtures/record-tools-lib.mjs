@@ -211,6 +211,16 @@ function measure() {
                      2451545.0 - 100000 * 365.25, 2451545.0 + 100000 * 365.25];
   for (const jd of DT_JDS_84) v[`dtFw.frameworkDeltaT@${jd}`] = DT.frameworkDeltaT(jd);
 
+  // ─── Sun position — the Phase 9 S-P8 safety net ───────────────────────────
+  // Pins the sun-harmonics application end-to-end through BOTH scene-graph
+  // code paths (moveModel and the fast animator carry verbatim copies of the
+  // same 25-line evaluator — the S-P8 dedup target).
+  for (const jd of [1355795.0, 2415020.5, 2451545.0, 2460409.262836, 2634166.0]) {
+    const p = SG.computePlanetPosition('sun', jd);
+    v[`sunPos.ra@${jd}`] = p.ra;
+    v[`sunPos.dec@${jd}`] = p.dec;
+  }
+
   return v;
 }
 
