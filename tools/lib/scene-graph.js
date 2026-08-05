@@ -1457,22 +1457,26 @@ function computePlanetPosition(target, jd) {
   }
 
   // Gravitation correction (per-planet synodic periods, planet-planet perturbations)
+  // 8.3: term evaluation shared (@hum/physics/planets/corrections); applied
+  // PER TERM here — order and sign are engine application semantics.
   const gravCorr = C.GRAVITATION_CORRECTION && C.GRAVITATION_CORRECTION[target];
   if (gravCorr) {
     const _yr = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
-    for (const term of gravCorr) {
-      const phase = 2 * Math.PI * (_yr - 2000) / term.period;
-      const sp = Math.sin(phase), cp = Math.cos(phase);
-      sph.theta -= (term.raSin * sp + term.raCos * cp) * d2r;
-      sph.phi += (term.decSin * sp + term.decCos * cp) * d2r;
+    const _gravDeltas = require('@hum/physics/planets/corrections').gravitationTermDeltasDeg(gravCorr, _yr - 2000);
+    for (const gt of _gravDeltas) {
+      sph.theta -= gt.raDeg * d2r;
+      sph.phi += gt.decDeg * d2r;
     }
   }
 
   // Elongation offset correction (elongation × Earth perihelion geometry)
   // Applied to inner planets: Venus, Mars
+  // 8.3: the fitted 21-slot basis lives ONCE in @hum/physics/planets/
+  // corrections, in the BROWSER association form (precomputed invD²) — this
+  // mirror carried inline invD·invD at the six d² slots per table; the
+  // fixture recorders measured the last-bit drift at extraction.
   const _elCorr = C.ELONGATION_CORRECTION && C.ELONGATION_CORRECTION[target];
   if (_elCorr) {
-    const vc = _elCorr;
     const _yr = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
     // Compute Sun RA for elongation
     const _sunSph = computePlanetPosition('sun', jd, graph);
@@ -1486,55 +1490,10 @@ function computePlanetPosition(target, jd) {
     const _plCount = Math.round(C.totalDaysInH / C.planets[target].solarYearInput);
     const _synVE = 1 / Math.abs(1 - _plCount / C.H);
     const _synPhase = 2 * Math.PI * (_yr - 2000) / _synVE;
-    // 15 basis functions (1st-4th harmonics of V-ωE × sin(elongation) + synodic + d²-weighted)
-    const sinEl = Math.sin(_elong), cosEl = Math.cos(_elong);
-    const cosVwE = Math.cos(_vFromWE), sinVwE = Math.sin(_vFromWE);
-    const sin2VwE = Math.sin(2 * _vFromWE), cos2VwE = Math.cos(2 * _vFromWE);
-    const sin3VwE = Math.sin(3 * _vFromWE), cos3VwE = Math.cos(3 * _vFromWE);
-    const sin4VwE = Math.sin(4 * _vFromWE), cos4VwE = Math.cos(4 * _vFromWE);
-    const invD = 1 / distAU;
-    sph.theta -= ((vc.cosVwE_sinEl_ra || 0) * cosVwE * sinEl
-                + (vc.sinEl_d_ra || 0) * sinEl * invD
-                + (vc.sinVwE_sinEl_ra || 0) * sinVwE * sinEl
-                + (vc.sin2VwE_sinEl_ra || 0) * sin2VwE * sinEl
-                + (vc.cos2VwE_sinEl_ra || 0) * cos2VwE * sinEl
-                + (vc.cos4VwE_sinEl_ra || 0) * cos4VwE * sinEl
-                + (vc.sin4VwE_sinEl_ra || 0) * sin4VwE * sinEl
-                + (vc.sinVwE_sinEl_d2_ra || 0) * sinVwE * sinEl * invD * invD
-                + (vc.cos3VwE_sinEl_ra || 0) * cos3VwE * sinEl
-                + (vc.sin3VwE_sinEl_ra || 0) * sin3VwE * sinEl
-                + (vc.sin2syn_ra || 0) * Math.sin(2 * _synPhase)
-                + (vc.cos1syn_ra || 0) * Math.cos(_synPhase)
-                + (vc.sin3VwE_sinEl_d2_ra || 0) * sin3VwE * sinEl * invD * invD
-                + (vc.sin2VwE_sinEl_d2_ra || 0) * sin2VwE * sinEl * invD * invD
-                + (vc.cos2VwE_sinEl_d2_ra || 0) * cos2VwE * sinEl * invD * invD
-                + (vc.cosEl_d_ra || 0) * cosEl * invD
-                + (vc.cosVwE_cosEl_d_ra || 0) * cosVwE * cosEl * invD
-                + (vc.sinVwE_cosEl_d_ra || 0) * sinVwE * cosEl * invD
-                + (vc.cosEl_d2_ra || 0) * cosEl * invD * invD
-                + (vc.cosVwE_cosEl_d2_ra || 0) * cosVwE * cosEl * invD * invD
-                + (vc.sinVwE_cosEl_d2_ra || 0) * sinVwE * cosEl * invD * invD) * d2r;
-    sph.phi += ((vc.cosVwE_sinEl_dec || 0) * cosVwE * sinEl
-              + (vc.sinEl_d_dec || 0) * sinEl * invD
-              + (vc.sinVwE_sinEl_dec || 0) * sinVwE * sinEl
-              + (vc.sin2VwE_sinEl_dec || 0) * sin2VwE * sinEl
-              + (vc.cos2VwE_sinEl_dec || 0) * cos2VwE * sinEl
-              + (vc.cos4VwE_sinEl_dec || 0) * cos4VwE * sinEl
-              + (vc.sin4VwE_sinEl_dec || 0) * sin4VwE * sinEl
-              + (vc.sinVwE_sinEl_d2_dec || 0) * sinVwE * sinEl * invD * invD
-              + (vc.cos3VwE_sinEl_dec || 0) * cos3VwE * sinEl
-              + (vc.sin3VwE_sinEl_dec || 0) * sin3VwE * sinEl
-              + (vc.sin2syn_dec || 0) * Math.sin(2 * _synPhase)
-              + (vc.cos1syn_dec || 0) * Math.cos(_synPhase)
-              + (vc.sin3VwE_sinEl_d2_dec || 0) * sin3VwE * sinEl * invD * invD
-              + (vc.sin2VwE_sinEl_d2_dec || 0) * sin2VwE * sinEl * invD * invD
-              + (vc.cos2VwE_sinEl_d2_dec || 0) * cos2VwE * sinEl * invD * invD
-              + (vc.cosEl_d_dec || 0) * cosEl * invD
-              + (vc.cosVwE_cosEl_d_dec || 0) * cosVwE * cosEl * invD
-              + (vc.sinVwE_cosEl_d_dec || 0) * sinVwE * cosEl * invD
-              + (vc.cosEl_d2_dec || 0) * cosEl * invD * invD
-              + (vc.cosVwE_cosEl_d2_dec || 0) * cosVwE * cosEl * invD * invD
-              + (vc.sinVwE_cosEl_d2_dec || 0) * sinVwE * cosEl * invD * invD) * d2r;
+    const _evalElong = require('@hum/physics/planets/corrections').evaluateElongationBasis;
+    const _elState = { elongRad: _elong, vFromWERad: _vFromWE, synPhaseRad: _synPhase, invD: 1 / distAU };
+    sph.theta -= _evalElong(_elCorr, _elState, 'ra') * d2r;
+    sph.phi += _evalElong(_elCorr, _elState, 'dec') * d2r;
   }
 
   // Planet offset correction (time-dependent, fitted from Tier 1 observed data)

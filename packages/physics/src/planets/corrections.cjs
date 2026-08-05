@@ -17,10 +17,16 @@
  * the application sign convention (RA subtracts, Dec adds) — this module
  * only evaluates.
  *
- * Gravitation/elongation NOT here yet, deliberately: the engines apply
- * those PER TERM ((x−a)−b), and a summed shared evaluator would move the
- * fixture-pinned positions at the last bit — they join with probes-first
- * treatment in a later slice.
+ * GRAVITATION (planet-planet perturbation harmonics): evaluated here PER
+ * TERM — the engines apply each term inside their own loops, because
+ * (x−a)−b ≠ x−(a+b) at the last bit and the fixtures pin the per-term
+ * application order.
+ *
+ * ELONGATION (elongation × Earth-perihelion geometry, 21 fitted slots per
+ * axis): BROWSER ASSOCIATION FORM — the six d² slots per table use the
+ * precomputed invD² ((a·b)·invD²); the Node mirror carried inline
+ * invD·invD (((a·b)·invD)·invD) at those sites — same 1-ULP class as the
+ * five parallax slots, measured by the fixture recorders at extraction.
  */
 
 'use strict';
@@ -90,4 +96,72 @@ function evaluateParallaxBasis(c, s) {
     + (c.BZ || 0) * _sinM * _invD2 + (c.CA || 0) * _cosM * _invD2;
 }
 
-module.exports = { evaluateParallaxBasis };
+/**
+ * Gravitation-correction term deltas, in DEGREES, one entry per fitted
+ * term. The engines apply these PER TERM (sign convention and the
+ * degrees→radians conversion stay engine-side).
+ * @param {Array<{ period: number, raSin: number, raCos: number,
+ *   decSin: number, decCos: number }>} terms
+ * @param {number} yearsFrom2000
+ * @returns {Array<{ raDeg: number, decDeg: number }>} */
+function gravitationTermDeltasDeg(terms, yearsFrom2000) {
+  const out = [];
+  for (const term of terms) {
+    const phase = 2 * Math.PI * yearsFrom2000 / term.period;
+    const sp = Math.sin(phase), cp = Math.cos(phase);
+    out.push({
+      raDeg: term.raSin * sp + term.raCos * cp,
+      decDeg: term.decSin * sp + term.decCos * cp,
+    });
+  }
+  return out;
+}
+
+/**
+ * @typedef {{ elongRad: number, vFromWERad: number, synPhaseRad: number,
+ *   invD: number }} ElongationState
+ */
+
+/**
+ * Evaluate the fitted 21-slot elongation basis for one axis. Returns
+ * DEGREES; `suffix` selects the coefficient table ('ra' or 'dec' — same
+ * basis, different fitted slots). The engines derive the state (frame Sun
+ * RA, Earth-perihelion angle, exact synodic phase from the integer orbit
+ * count) and apply their own sign and rad conversion.
+ * @param {Record<string, number>} vc @param {ElongationState} s
+ * @param {'ra'|'dec'} suffix
+ * @returns {number} */
+function evaluateElongationBasis(vc, s, suffix) {
+  const sinEl = Math.sin(s.elongRad), cosEl = Math.cos(s.elongRad);
+  const cosVwE = Math.cos(s.vFromWERad), sinVwE = Math.sin(s.vFromWERad);
+  const sin2VwE = Math.sin(2 * s.vFromWERad), cos2VwE = Math.cos(2 * s.vFromWERad);
+  const sin3VwE = Math.sin(3 * s.vFromWERad), cos3VwE = Math.cos(3 * s.vFromWERad);
+  const sin4VwE = Math.sin(4 * s.vFromWERad), cos4VwE = Math.cos(4 * s.vFromWERad);
+  const invD = s.invD;
+  const invD2 = invD * invD;
+  /** @param {string} k @returns {number} */
+  const c = (k) => vc[k + suffix] || 0;
+  return c('cosVwE_sinEl_') * cosVwE * sinEl
+    + c('sinEl_d_') * sinEl * invD
+    + c('sinVwE_sinEl_') * sinVwE * sinEl
+    + c('sin2VwE_sinEl_') * sin2VwE * sinEl
+    + c('cos2VwE_sinEl_') * cos2VwE * sinEl
+    + c('cos4VwE_sinEl_') * cos4VwE * sinEl
+    + c('sin4VwE_sinEl_') * sin4VwE * sinEl
+    + c('sinVwE_sinEl_d2_') * sinVwE * sinEl * invD2
+    + c('cos3VwE_sinEl_') * cos3VwE * sinEl
+    + c('sin3VwE_sinEl_') * sin3VwE * sinEl
+    + c('sin2syn_') * Math.sin(2 * s.synPhaseRad)
+    + c('cos1syn_') * Math.cos(s.synPhaseRad)
+    + c('sin3VwE_sinEl_d2_') * sin3VwE * sinEl * invD2
+    + c('sin2VwE_sinEl_d2_') * sin2VwE * sinEl * invD2
+    + c('cos2VwE_sinEl_d2_') * cos2VwE * sinEl * invD2
+    + c('cosEl_d_') * cosEl * invD
+    + c('cosVwE_cosEl_d_') * cosVwE * cosEl * invD
+    + c('sinVwE_cosEl_d_') * sinVwE * cosEl * invD
+    + c('cosEl_d2_') * cosEl * invD2
+    + c('cosVwE_cosEl_d2_') * cosVwE * cosEl * invD2
+    + c('sinVwE_cosEl_d2_') * sinVwE * cosEl * invD2;
+}
+
+module.exports = { evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis };

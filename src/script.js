@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -53955,22 +53955,25 @@ function updatePositions() {
     }
 
     // Gravitation correction (planet-planet perturbations, per-planet synodic periods)
+    // 8.3: term evaluation shared (@hum/physics/planets/corrections); applied
+    // PER TERM here — order and sign are engine application semantics.
     const _conjTerms = GRAVITATION_CORRECTION[obj.name];
     if (_conjTerms) {
       const _cyr = startmodelYear + (o.julianDay - startmodelJD) / meansolaryearlengthinDays;
-      for (const _ct of _conjTerms) {
-        const _cph = 2 * Math.PI * (_cyr - 2000) / _ct.period;
-        const _sp = Math.sin(_cph), _cp = Math.cos(_cph);
-        obj.ra -= (_ct.raSin * _sp + _ct.raCos * _cp) * (Math.PI / 180);
-        obj.dec += (_ct.decSin * _sp + _ct.decCos * _cp) * (Math.PI / 180);
+      for (const _gt of gravitationTermDeltasDeg(_conjTerms, _cyr - 2000)) {
+        obj.ra -= _gt.raDeg * (Math.PI / 180);
+        obj.dec += _gt.decDeg * (Math.PI / 180);
       }
     }
 
     // Elongation offset correction (elongation × Earth perihelion geometry)
     // Applied to inner planets: Mercury, Venus, Mars
+    // 8.3: the fitted 21-slot basis lives ONCE in @hum/physics/planets/
+    // corrections (browser association form — precomputed invD²); the
+    // frame-state derivation (this frame's sun.ra, the exact synodic count)
+    // stays here.
     const _elCorr = ELONGATION_CORRECTION && ELONGATION_CORRECTION[obj.name];
     if (_elCorr) {
-      const _vc = _elCorr;
       const _vyr = startmodelYear + (o.julianDay - startmodelJD) / meansolaryearlengthinDays;
       // Sun RA for elongation (use stored sun position from this frame)
       const _sunRAv = sun.ra || 0;
@@ -53979,13 +53982,6 @@ function updatePositions() {
       // Earth perihelion angle
       const _wEv = (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + 360 / (holisticyearLength / 16) * (_vyr - 2000)) * (Math.PI / 180);
       const _vFromWE = _venusRAv - _wEv;
-      const _sinEl = Math.sin(_elong), _cosEl = Math.cos(_elong);
-      const _cosVwE = Math.cos(_vFromWE), _sinVwE = Math.sin(_vFromWE);
-      const _sin2VwE = Math.sin(2 * _vFromWE), _cos2VwE = Math.cos(2 * _vFromWE);
-      const _sin3VwE = Math.sin(3 * _vFromWE), _cos3VwE = Math.cos(3 * _vFromWE);
-      const _sin4VwE = Math.sin(4 * _vFromWE), _cos4VwE = Math.cos(4 * _vFromWE);
-      const _invDv = 1 / obj.distAU;
-      const _invDv2 = _invDv * _invDv;
       const _d2r = Math.PI / 180;
       // Planet-Earth synodic phase (exact from integer orbit count)
       const _plName = obj.name.toLowerCase();
@@ -53993,48 +53989,9 @@ function updatePositions() {
       const _vCnt = Math.round(holisticyearLength * meansolaryearlengthinDays / _plSolarYearInput);
       const _synVE = 1 / Math.abs(1 - _vCnt / holisticyearLength);
       const _synPh = 2 * Math.PI * (_vyr - 2000) / _synVE;
-      obj.ra -= ((_vc.cosVwE_sinEl_ra || 0) * _cosVwE * _sinEl
-               + (_vc.sinEl_d_ra || 0) * _sinEl * _invDv
-               + (_vc.sinVwE_sinEl_ra || 0) * _sinVwE * _sinEl
-               + (_vc.sin2VwE_sinEl_ra || 0) * _sin2VwE * _sinEl
-               + (_vc.cos2VwE_sinEl_ra || 0) * _cos2VwE * _sinEl
-               + (_vc.cos4VwE_sinEl_ra || 0) * _cos4VwE * _sinEl
-               + (_vc.sin4VwE_sinEl_ra || 0) * _sin4VwE * _sinEl
-               + (_vc.sinVwE_sinEl_d2_ra || 0) * _sinVwE * _sinEl * _invDv2
-               + (_vc.cos3VwE_sinEl_ra || 0) * _cos3VwE * _sinEl
-               + (_vc.sin3VwE_sinEl_ra || 0) * _sin3VwE * _sinEl
-               + (_vc.sin2syn_ra || 0) * Math.sin(2 * _synPh)
-               + (_vc.cos1syn_ra || 0) * Math.cos(_synPh)
-               + (_vc.sin3VwE_sinEl_d2_ra || 0) * _sin3VwE * _sinEl * _invDv2
-               + (_vc.sin2VwE_sinEl_d2_ra || 0) * _sin2VwE * _sinEl * _invDv2
-               + (_vc.cos2VwE_sinEl_d2_ra || 0) * _cos2VwE * _sinEl * _invDv2
-               + (_vc.cosEl_d_ra || 0) * _cosEl * _invDv
-               + (_vc.cosVwE_cosEl_d_ra || 0) * _cosVwE * _cosEl * _invDv
-               + (_vc.sinVwE_cosEl_d_ra || 0) * _sinVwE * _cosEl * _invDv
-               + (_vc.cosEl_d2_ra || 0) * _cosEl * _invDv2
-               + (_vc.cosVwE_cosEl_d2_ra || 0) * _cosVwE * _cosEl * _invDv2
-               + (_vc.sinVwE_cosEl_d2_ra || 0) * _sinVwE * _cosEl * _invDv2) * _d2r;
-      obj.dec += ((_vc.cosVwE_sinEl_dec || 0) * _cosVwE * _sinEl
-               + (_vc.sinEl_d_dec || 0) * _sinEl * _invDv
-               + (_vc.sinVwE_sinEl_dec || 0) * _sinVwE * _sinEl
-               + (_vc.sin2VwE_sinEl_dec || 0) * _sin2VwE * _sinEl
-               + (_vc.cos2VwE_sinEl_dec || 0) * _cos2VwE * _sinEl
-               + (_vc.cos4VwE_sinEl_dec || 0) * _cos4VwE * _sinEl
-               + (_vc.sin4VwE_sinEl_dec || 0) * _sin4VwE * _sinEl
-               + (_vc.sinVwE_sinEl_d2_dec || 0) * _sinVwE * _sinEl * _invDv2
-               + (_vc.cos3VwE_sinEl_dec || 0) * _cos3VwE * _sinEl
-               + (_vc.sin3VwE_sinEl_dec || 0) * _sin3VwE * _sinEl
-               + (_vc.sin2syn_dec || 0) * Math.sin(2 * _synPh)
-               + (_vc.cos1syn_dec || 0) * Math.cos(_synPh)
-               + (_vc.sin3VwE_sinEl_d2_dec || 0) * _sin3VwE * _sinEl * _invDv2
-               + (_vc.sin2VwE_sinEl_d2_dec || 0) * _sin2VwE * _sinEl * _invDv2
-               + (_vc.cos2VwE_sinEl_d2_dec || 0) * _cos2VwE * _sinEl * _invDv2
-               + (_vc.cosEl_d_dec || 0) * _cosEl * _invDv
-               + (_vc.cosVwE_cosEl_d_dec || 0) * _cosVwE * _cosEl * _invDv
-               + (_vc.sinVwE_cosEl_d_dec || 0) * _sinVwE * _cosEl * _invDv
-               + (_vc.cosEl_d2_dec || 0) * _cosEl * _invDv2
-               + (_vc.cosVwE_cosEl_d2_dec || 0) * _cosVwE * _cosEl * _invDv2
-               + (_vc.sinVwE_cosEl_d2_dec || 0) * _sinVwE * _cosEl * _invDv2) * _d2r;
+      const _elState = { elongRad: _elong, vFromWERad: _vFromWE, synPhaseRad: _synPh, invD: 1 / obj.distAU };
+      obj.ra -= evaluateElongationBasis(_elCorr, _elState, 'ra') * _d2r;
+      obj.dec += evaluateElongationBasis(_elCorr, _elState, 'dec') * _d2r;
     }
 
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.
