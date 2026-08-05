@@ -186,7 +186,10 @@ export default [
      * boundaries rules above still bar physics from ever importing it). */
     files: ['packages/fitting/src/**/*.js', 'packages/fitting/src/**/*.cjs'],
     languageOptions: {
-      globals: { console: 'readonly', process: 'readonly', URL: 'readonly', Buffer: 'readonly' },
+      globals: {
+        console: 'readonly', process: 'readonly', URL: 'readonly', Buffer: 'readonly',
+        __dirname: 'readonly', require: 'readonly', module: 'readonly',
+      },
     },
   },
 

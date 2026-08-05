@@ -23,7 +23,7 @@
     "test:fixtures": "node tools/fixtures/record-tools-lib.mjs",
     "test:literals": "node tools/constants/check-literals.mjs",
     "test:verify": "node tools/verify/run-suite.mjs",
-    "test:pipeline": "node tools/fit/verify-pipeline.js",
+    "test:pipeline": "node packages/fitting/src/verify-pipeline.cjs",
     "test:verify:list": "node tools/verify/run-suite.mjs --list",
     "test:snapshot": "node test/browser/snapshot.test.mjs && node test/browser/epoch-consistency.test.mjs && node test/cross-engine.test.mjs",
     "test:transparency": "node test/browser/transparency.test.mjs",

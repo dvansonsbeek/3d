@@ -7,7 +7,8 @@
   "main": "src/index.js",
   "exports": {
     ".": "./src/index.js",
-    "./correction-stack": "./src/correction-stack.cjs"
+    "./correction-stack": "./src/correction-stack.cjs",
+    "./verify-pipeline": "./src/verify-pipeline.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }
