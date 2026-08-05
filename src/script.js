@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -2677,15 +2677,51 @@ function meanMoonDistanceMetresAtAge(t_Ma) { return _moonChain().distanceMetresA
 
 // ───── LAYER 1 — Angular-momentum-conservation LOD ─────
 /** LOD in seconds at given age. Returns null past the tidal-lock asymptote. */
-function meanLodSecondsAtAge(t_Ma) {
-  const a = meanMoonDistanceMetresAtAge(t_Ma);
-  if (a <= 0 || a >= A_LOCK_M) return null;
-  // L_Earth(t) = L_Total − L_Moon(t)     [Earth-Moon angular momentum conservation; tidal channel]
-  // ω(t)      = L_Earth(t) / I_Earth(t)  [where I_Earth varies with α(t) via L1-orbital-coupled GIA]
-  // LOD(t)    = 2π / ω(t)
-  return (2 * Math.PI * iEarthAtAge(t_Ma)) /
-         (L_TOTAL_EM_KGM2_S - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
+// 8.4-3: the deep-time LOD/ΔT core lives ONCE in @hum/physics/deltat/
+// deep-time. This browser injects its moon chain, its GIA α(t) (the
+// lattice-α pin machinery stays engine-side in earthMoiFactorAtAge), the
+// IAU-base Fourier ripple evaluator (S-D2: the old Actual divided by the
+// epoch-aware f(Y) evaluator, double-counting the deep-time drift — it now
+// injects the same ripple form as Node), and its flag-gated cycle sums.
+// The ΔT cache and the sequential post-integration adds stay below.
+var _deepLodM = null;
+function _deepLod() {
+  if (!_deepLodM) {
+    _deepLodM = createDeepTimeLod({
+      constants: {
+        lTotalEmKgm2S: L_TOTAL_EM_KGM2_S, mMoonAloneKg: M_MOON_ALONE,
+        mEarthAloneKg: M_EARTH_ALONE, rEarthMetres: R_EARTH_M,
+        gmEmM3PerS2: GM_EM_M3S2, eFactorMoon: E_FACTOR_MOON, aLockMetres: A_LOCK_M,
+        aMoonNowMetres: A_MOON_NOW_M, alpha1PerMa: ALPHA_1,
+        alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
+        holisticYearJ2000: HOLISTIC_YEAR_J2000, lodNowH13Seconds: LOD_NOW_H13_S,
+        meanSiderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
+        solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
+        siderealYearDaysKinematicJ2000: SIDEREAL_YEAR_DAYS_KINEMATIC_J2000,
+      },
+      moonDistanceMetresAtAge: (t_Ma) => meanMoonDistanceMetresAtAge(t_Ma),
+      moiFactorAtAge: (t_Ma) => earthMoiFactorAtAge(t_Ma),
+      // The IAU-base integrated-phase Fourier ripple (mirrors the Node
+      // engine's _evalSiderealYearFourierIAU — the Phase D matched pair).
+      siderealYearDaysFourierAt: (year) => {
+        let result = ASTRO_REFERENCE.siderealYearJ2000;
+        const cyc = cyclesBetweenYears(balancedYear, year, 1);
+        if (cyc === null) return result;
+        for (const [div, sinC, cosC] of SIDEREAL_YEAR_HARMONICS) {
+          const phase = 2 * Math.PI * cyc * div;
+          result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+        }
+        return result;
+      },
+      cycleLodSumAt: (year) => dtCycleLodCorrectionSum(year),
+      swingLodAt: (year) => resonatorSwingLodCorrection(year),
+      swingLodRateAt: (year) => resonatorSwingLodRate(year),
+    });
+  }
+  return _deepLodM;
 }
+
+function meanLodSecondsAtAge(t_Ma) { return _deepLod().lodSecondsAtAge(t_Ma); }
 
 /** Same as meanLodSecondsAtAge but with α held at its LONG-TERM (climate) MEAN
  *  value. Since ⟨L1⟩ over orbital cycles → 0 (harmonic average), the mean α is
@@ -2696,22 +2732,16 @@ function meanLodSecondsAtAge(t_Ma) {
  *  model curve oscillates around this line instead of around the J2000-snapshot
  *  line. Used by the Solar Day chart's "α at climate mean" reference curve. */
 function meanLodSecondsAtAgeMeanAlpha(t_Ma) {
-  const a = meanMoonDistanceMetresAtAge(t_Ma);
-  if (a <= 0 || a >= A_LOCK_M) return null;
+  // 8.4-3: α computed here (engine climate machinery), the LOD shape shared.
   if (_alphaClimateL1_J2000 === null) {
     _alphaClimateL1_J2000 = _evalClimateL1Orbital(2000);
   }
   const alpha_mean = EARTH_MOI_FACTOR + ALPHA_CLIMATE_SCALE * _alphaClimateL1_J2000;
-  const I_Earth_mean = alpha_mean * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
-  return (2 * Math.PI * I_Earth_mean) /
-         (L_TOTAL_EM_KGM2_S - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
+  return _deepLod().lodSecondsAtAgeWithAlpha(t_Ma, alpha_mean);
 }
 
 /** LOD in hours at given age. */
-function meanLodHoursAtAge(t_Ma) {
-  const s = meanLodSecondsAtAge(t_Ma);
-  return (s === null) ? null : s / 3600;
-}
+function meanLodHoursAtAge(t_Ma) { return _deepLod().lodHoursAtAge(t_Ma); }
 
 /** dLOD/dt decomposition at given age, in ms/century.
  *
@@ -2740,68 +2770,12 @@ function meanLodHoursAtAge(t_Ma) {
  *  dJ₂/dt via factor-2.0 J₂→α conversion). The stack is fit against Espenak
  *  history 1650-2017 as a documented design choice. */
 function dLodDtDecompositionAtAge(t_Ma) {
-  const nullResult = { tidal: null, gia: null, stack: null, resonator: null,
-                       net_L2: null, net_L3: null, net_L4: null };
-  const a = meanMoonDistanceMetresAtAge(t_Ma);
-  if (a === null || a <= 0 || a >= A_LOCK_M) return nullResult;
-  const lod_s = meanLodSecondsAtAge(t_Ma);
-  if (lod_s === null) return nullResult;
-  const alpha  = earthMoiFactorAtAge(t_Ma);
-  const I_E    = alpha * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
-  const year   = J2000_CALENDAR_YEAR - t_Ma * 1e6;
-
-  // Moon distance derivative from Farhat polynomial: da/dt in m/yr (calendar time).
-  //   a(t_Ma) = A_MOON_NOW × (1 + α₁·t + α₃·t³ + α₄·t⁴), with t_Ma > 0 = past
-  //   d(a)/d(t_Ma) = A_MOON_NOW × (α₁ + 3α₃·t² + 4α₄·t³)   ← per Ma of AGE
-  //   d(a)/d(year_calendar) = d(a)/d(t_Ma) × (−1e−6)         ← convert to forward-time yr
-  // At J2000: −A_MOON_NOW × α₁ / 1e6 = +0.0382 m/yr = +3.82 cm/yr (LLR anchor) ✓
-  const da_dt_yr = -A_MOON_NOW_M * (ALPHA_1 + 3*ALPHA_3*t_Ma*t_Ma + 4*ALPHA_4*t_Ma*t_Ma*t_Ma) / 1e6;
-  const SEC_PER_YR = 365.25 * 86400;
-  const da_dt_s = da_dt_yr / SEC_PER_YR;
-
-  // Tidal channel: dL_M/dt = m_M × (1/2) × √(GM/a) × (da/dt) × √(1−e²)
-  const dLm_dt = M_MOON_ALONE * 0.5 * Math.sqrt(GM_EM_M3S2 / a) * da_dt_s * E_FACTOR_MOON;
-  const domega_dt_tidal = -dLm_dt / I_E;   // dL_E = -dL_M, dω = dL_E/I
-  const dLod_dt_tidal_s_per_s = -(lod_s * lod_s) / (2 * Math.PI) * domega_dt_tidal;
-  const dLod_dt_tidal_ms_per_cy = dLod_dt_tidal_s_per_s * SEC_PER_YR * 100 * 1000;
-
-  // GIA channel: dLOD/dt = LOD × (dα/dt)/α. Compute dα/dt via numerical
-  // differentiation on earthMoiFactorAtAge (cheap; handles the L1-orbital
-  // form without duplicating its harmonic expansion here).
-  const EPS_MA = 1e-4;   // 100 yr — well below any L1 harmonic period
-  const alpha_plus  = earthMoiFactorAtAge(t_Ma - EPS_MA);   // future (year+100)
-  const alpha_minus = earthMoiFactorAtAge(t_Ma + EPS_MA);   // past   (year−100)
-  const dalpha_dyr = (alpha_plus - alpha_minus) / (2 * EPS_MA * 1e6);
-  const dLod_dt_gia_s_per_yr = lod_s * dalpha_dyr / alpha;
-  const dLod_dt_gia_ms_per_cy = dLod_dt_gia_s_per_yr * 100 * 1000;
-
-  // All-cycles (flags-only) stack rate: 50-yr central difference on the
-  // FLAGS-ONLY sum (sum minus the resonator term). The flags are smooth, so
-  // the 50-yr window is aliasing-safe (shortest harmonic Jose4 = 716 yr) and
-  // smear-free. The resonator channel uses the ANALYTIC rate instead: the
-  // episode's δLOD has genuine steps at the kicks (impulses), which a
-  // central difference would smear into 100-yr rectangles (the 1550–1650
-  // notch first seen in the LOD-Climate modal). Mirrors deep-time.js.
-  const DYR = 50;   // yr half-window
-  const dFlags_dyr = ((dtCycleLodCorrectionSum(year + DYR) - resonatorSwingLodCorrection(year + DYR))
-                    - (dtCycleLodCorrectionSum(year - DYR) - resonatorSwingLodCorrection(year - DYR)))
-                    / (2 * DYR);
-  const dLod_dt_stack_only_ms_per_cy = dFlags_dyr * 100 * 1000;   // s/yr → ms/century
-  const dLod_dt_resonator_ms_per_cy = resonatorSwingLodRate(year) * 100 * 1000;
-
-  const net_L2 = dLod_dt_tidal_ms_per_cy + dLod_dt_gia_ms_per_cy;
-  const net_L3 = net_L2 + dLod_dt_stack_only_ms_per_cy;
-  const net_L4 = net_L3 + dLod_dt_resonator_ms_per_cy;
-
-  return {
-    tidal:  dLod_dt_tidal_ms_per_cy,
-    gia:    dLod_dt_gia_ms_per_cy,
-    stack:  dLod_dt_stack_only_ms_per_cy,
-    resonator: dLod_dt_resonator_ms_per_cy,
-    net_L2: net_L2,
-    net_L3: net_L3,
-    net_L4: net_L4,
-  };
+  // 8.4-3 S-D5: shared module — which anchors the cycle-channel year at
+  // 2000, matching the ΔT core and the Node engine. This browser copy
+  // historically used J2000_CALENDAR_YEAR (2000.5, the S-D3 class) —
+  // measured at 1e-4..1e-2 relative in the stack/resonator channels near
+  // J2000; the affected fixtures were re-recorded deliberately.
+  return _deepLod().dLodDtDecompositionAtAge(t_Ma);
 }
 
 /** ACTUAL LOD in seconds at given age, including Fourier fluctuations.
@@ -2817,14 +2791,13 @@ function dLodDtDecompositionAtAge(t_Ma) {
  *  For deep time, tidal LOD growth (mean) is modulated by the small Fourier
  *  ripple in the sidereal-year daycount at year_at_t = 2000 − t_Ma × 1e6. */
 function meanLodSecondsAtAgeActual(t_Ma) {
-  const mean_t = meanLodSecondsAtAge(t_Ma);
-  if (mean_t === null) return null;
-  const year_at_t = 2000 - t_Ma * 1e6;
-  const Y_days_fourier = computeSiderealYearDaysDirect(year_at_t);
-  // Frozen J2000 baseline, matching the Node twin (which uses the CONSTANT
-  // C.meanSiderealYearDaysKinematic) — reading the mutable global here leaked
-  // scene-epoch state into an f(t) formula.
-  return mean_t * SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 / Y_days_fourier;
+  // 8.4-3 S-D2 (measured change): shared module, which divides by the
+  // IAU-base Fourier RIPPLE evaluator with FIXED bases — the deep-time
+  // drift is already in mean(t). This browser copy historically divided by
+  // computeSiderealYearDaysDirect, the epoch-aware f(Y) evaluator, which
+  // double-counted the drift (12% at −400 Ma; zero production consumers).
+  // The 9 dtAge.meanLodSecondsActual fixtures were re-recorded deliberately.
+  return _deepLod().lodSecondsActualAtAge(t_Ma);
 }
 
 /**
@@ -2854,11 +2827,7 @@ function h5Correction(year) {
 
 // ───── STEP 2 — Earth Fundamental Cycle H(t) ─────
 /** H(t) in years. Returns HOLISTIC_YEAR_J2000 (335,317) exactly at t_Ma = 0. */
-function meanHAtAge(t_Ma) {
-  const LOD_s = meanLodSecondsAtAge(t_Ma);
-  if (LOD_s === null) return null;
-  return HOLISTIC_YEAR_J2000 * LOD_s / LOD_NOW_H13_S;
-}
+function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
 
 // ───── Driver 2 — AU and year_s ─────
 /** Earth semi-major axis in km at given epoch (adiabatic a × M = const).
@@ -2868,11 +2837,7 @@ function meanAuAtAge(t_Ma) {
 }
 
 /** Sidereal year in seconds (Kepler, dT/T = −2 dM/M). */
-function meanSiderealYearSecondsAtAge(t_Ma) {
-  if (t_Ma === 0) return MEAN_SIDEREAL_YEAR_J2000_S;
-  const mass_loss_fraction = SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6;
-  return MEAN_SIDEREAL_YEAR_J2000_S * (1 - 2 * mass_loss_fraction);
-}
+function meanSiderealYearSecondsAtAge(t_Ma) { return _deepLod().siderealYearSecondsAtAge(t_Ma); }
 
 /** Tropical year in seconds at given epoch.
  *
@@ -2884,12 +2849,7 @@ function meanSiderealYearSecondsAtAge(t_Ma) {
  *  so the derived axial precession period T_axial = T_sid/(T_sid − T_trop)
  *  comes out exactly H(t)/13 at all epochs. At J2000 reproduces
  *  MEAN_TROPICAL_YEAR_J2000_S to within ~2 s. */
-function meanTropicalYearSecondsAtAge(t_Ma) {
-  const sidSec = meanSiderealYearSecondsAtAge(t_Ma);
-  const Ht = meanHAtAge(t_Ma);
-  if (Ht === null) return sidSec * (1 - 13 / HOLISTIC_YEAR_J2000);
-  return sidSec * (1 - 13 / Ht);
-}
+function meanTropicalYearSecondsAtAge(t_Ma) { return _deepLod().tropicalYearSecondsAtAge(t_Ma); }
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Bond-scale ΔT correction — 8H/1830 = 74 × Jupiter-Saturn synodic (gcd=61)
@@ -3408,14 +3368,9 @@ function dtCycleLodCorrectionSum(year) {
  *  Physical consistency: this LOD's integral matches the corrected ΔT curve.
  *  Ported from tools/lib/deep-time.js:374 (2026-07-17, Stage 2c). */
 function meanLodSecondsWithCorrectionsAtAge(t_Ma) {
-  const tidal = meanLodSecondsAtAge(t_Ma);
-  if (tidal === null) return null;
-  // 8.4-1 S-D3: year anchor 2000, matching the meanDeltaTSecondsAtAge core
-  // this corrects AND the Node twin. It historically used J2000_CALENDAR_YEAR
-  // (= startmodelYear = 2000.5), a half-year phase offset in the cycle-sum
-  // evaluation the core itself does not have — measured at ~1e-5 s near J2000.
-  const year = 2000 - t_Ma * 1e6;
-  return tidal + dtCycleLodCorrectionSum(year);
+  // 8.4-1 S-D3 (year anchor 2000, matching the ΔT core and the Node twin);
+  // 8.4-3: the composite lives in the shared module.
+  return _deepLod().lodSecondsWithCorrectionsAtAge(t_Ma);
 }
 
 // ───── ΔT integrator — ephemeris time (JD_UT → JD_TT) for the eclipse chain ─────
@@ -3465,31 +3420,11 @@ function meanDeltaTSecondsAtAge(t_Ma) {
   const hit = _DELTA_T_CACHE.get(cacheKey);
   if (hit !== undefined) return hit;
 
-  const absSpan = Math.abs(t_Ma);
-  let n = Math.max(32, Math.ceil(absSpan * 10));
-  if (n > 1024) n = 1024;
-  if (n % 2 === 1) n++;
-  const h = t_Ma / n;
-
-  let sum = 0;
-  for (let i = 0; i <= n; i++) {
-    const tau = i * h;
-    const lodMean = meanLodSecondsAtAge(tau);
-    if (lodMean === null) return NaN;
-    const yearS = meanTropicalYearSecondsAtAge(tau);
-    // H/5 ecliptic-precession "missing motion" — adds ~3.5 ms at J2000 to
-    // give the raw H/5 kinematic LOD (86400.003 s at J2000). Overshoots the
-    // USNO anchor (86400.0014 s) by ~2.14 ms; the calibrated Bond/Hallstatt/
-    // Jose5/Jose4 post-integration stack closes Layer 4 LOD_real onto the
-    // USNO anchor. Correctly reproduces the positive dΔT/dt slope near J2000.
-    const H_local  = meanHAtAge(tau);
-    const mSY_days = meanTropicalYearDaysAtAge(tau);
-    const lodH5Raw = lodMean + lodMean / ((H_local / 5) * mSY_days);
-    const integrand = (86400 - lodH5Raw) * yearS * 1e6 / 86400;
-    const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
-    sum += w * integrand;
-  }
-  let result = (sum * h) / 3;
+  // 8.4-3: the Simpson integrator + H/5 integrand live in the shared module
+  // (deltaTRawSecondsAtAge). The flag-keyed cache and the SEQUENTIAL
+  // post-integration adds below stay here — pre-summing the corrections
+  // would change the FP association.
+  let result = _deepLod().deltaTRawSecondsAtAge(t_Ma);
   // Sub-Milankovitch H-lattice ΔT corrections (Option B). Post-integration
   // additive terms. Each correction is anchored to 0 at J2000 by construction,
   // so ΔT(J2000) remains exactly 0 regardless of which subset is enabled.
@@ -3524,26 +3459,9 @@ function meanDeltaTSecondsAtAge(t_Ma) {
  *  Hallstatt/Jose5/Jose4 stack to match Espenak/Stephenson history and hit the
  *  USNO 86400.0014 s J2000 anchor exactly (joint world: incl. resonator). */
 function pureH5DeltaTAtAge(t_Ma) {
-  if (t_Ma === 0) return 0;
-  const absSpan = Math.abs(t_Ma);
-  let n = Math.max(32, Math.ceil(absSpan * 10));
-  if (n > 1024) n = 1024;
-  if (n % 2 === 1) n++;
-  const h = t_Ma / n;
-  let sum = 0;
-  for (let i = 0; i <= n; i++) {
-    const tau = i * h;
-    const lodMean = meanLodSecondsAtAge(tau);
-    if (lodMean === null) return NaN;
-    const yearS = meanTropicalYearSecondsAtAge(tau);
-    const H_local  = meanHAtAge(tau);
-    const mSY_days = meanTropicalYearDaysAtAge(tau);
-    const lodH5Raw = lodMean + lodMean / ((H_local / 5) * mSY_days);
-    const integrand = (86400 - lodH5Raw) * yearS * 1e6 / 86400;
-    const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
-    sum += w * integrand;
-  }
-  return (sum * h) / 3;
+  // 8.4-3: identical to the shared module's raw integral (Simpson + H/5,
+  // no cycle corrections) — this browser-only "V-curve" was a third copy.
+  return _deepLod().deltaTRawSecondsAtAge(t_Ma);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -4237,17 +4155,10 @@ function findSolarEclipsesInRange(jdStart, jdEnd) {
 /** Tropical year in SI 86400-s days at given epoch. Phase 9.2 sDay anchor —
  *  used so scene orbital periods in JD are Kepler-invariant across epochs
  *  (mass-loss correction only; essentially constant). */
-function meanTropicalYearDaysAtAge(t_Ma) {
-  const seconds = meanTropicalYearSecondsAtAge(t_Ma);
-  return seconds === null ? null : seconds / 86400;
-}
+function meanTropicalYearDaysAtAge(t_Ma) { return _deepLod().tropicalYearDaysAtAge(t_Ma); }
 
 /** Diagnostic: days/year at epoch (tropical year ÷ LOD at epoch). */
-function meanYearInDaysAtAge(t_Ma) {
-  const LOD_s = meanLodSecondsAtAge(t_Ma);
-  if (LOD_s === null) return null;
-  return meanTropicalYearSecondsAtAge(t_Ma) / LOD_s;
-}
+function meanYearInDaysAtAge(t_Ma) { return _deepLod().yearInDaysAtAge(t_Ma); }
 
 // ───── Moon distance correction + Kepler month ─────
 // Phase 8.2-3: bodies live in @hum/physics/moon/month-chain (see _moonChain).

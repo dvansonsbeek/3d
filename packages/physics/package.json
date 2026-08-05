@@ -24,7 +24,8 @@
     "./planets/corrections": "./src/planets/corrections.cjs",
     "./planets/predict": "./src/planets/predict.cjs",
     "./planets/model": "./src/planets/model.cjs",
-    "./deltat/cycles": "./src/deltat/cycles.cjs"
+    "./deltat/cycles": "./src/deltat/cycles.cjs",
+    "./deltat/deep-time": "./src/deltat/deep-time.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }
