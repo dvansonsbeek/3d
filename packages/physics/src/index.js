@@ -99,6 +99,7 @@ export * as planetFibonacciLaws from './planets/fibonacci-laws.cjs';
 export { eccentricityFromCycles, computeEccentricityIntegrated } from './planets/ecc-channel.cjs';
 export * as planetOrientation from './planets/orientation.cjs';
 export { integrateAscendingNode } from './planets/asc-node-integrator.cjs';
+export * as planetOrbitChain from './planets/orbit-chain.cjs';
 
 /**
  * Build a model bound to a set of constants.

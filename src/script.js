@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -2861,11 +2861,10 @@ function meanHAtAge(t_Ma) {
 }
 
 // ───── Driver 2 — AU and year_s ─────
-/** Earth semi-major axis in km at given epoch (adiabatic a × M = const). */
+/** Earth semi-major axis in km at given epoch (adiabatic a × M = const).
+ *  Phase 8.3 L6: the linear mass-loss law lives in @hum/physics. */
 function meanAuAtAge(t_Ma) {
-  if (t_Ma === 0) return AU_J2000_KM;
-  const mass_loss_fraction = SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6;
-  return AU_J2000_KM * (1 - mass_loss_fraction);
+  return _POC.massLossScaledLinearAtAge(t_Ma, AU_J2000_KM, SOLAR_MASS_LOSS_FRAC_PER_YR);
 }
 
 /** Sidereal year in seconds (Kepler, dT/T = −2 dM/M). */
@@ -4794,16 +4793,14 @@ function meanEarthNeptuneDistanceAtAge(t_Ma) { return _earthPlanetDist(meanAuAtA
 
 /** Planet orbital period in seconds at given age (Kepler with mass loss). */
 function meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s) {
-  if (t_Ma === 0) return T_p_J2000_s;
-  const mass_loss_fraction = SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6;
-  return T_p_J2000_s * Math.pow(1 - mass_loss_fraction, 2);
+  // Phase 8.3 L6: Driver 2 (Kepler under mass loss) lives in @hum/physics.
+  return _POC.driver2PeriodSecondsAtAge(t_Ma, T_p_J2000_s, SOLAR_MASS_LOSS_FRAC_PER_YR);
 }
 
 /** Earth-planet synodic period in seconds. */
 function meanEarthPlanetSynodicPeriodAtAge(t_Ma, T_p_J2000_s) {
-  const T_p_t  = meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s);
-  const T_yr_t = meanSiderealYearSecondsAtAge(t_Ma);
-  return T_p_t * T_yr_t / Math.abs(T_p_t - T_yr_t);
+  return _POC.synodicPeriodSeconds(meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s),
+                                   meanSiderealYearSecondsAtAge(t_Ma));
 }
 
 /** Planet rotation period in seconds. Earth follows LOD(t); others constant. */

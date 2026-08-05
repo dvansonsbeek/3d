@@ -133,11 +133,12 @@ const _FW_A3_RATE = 360 * 36525 / C.moonSiderealMonth;
 // gap class as the Phase 9.13 Moon mirror). One period fn per planet, stable
 // identity, so the shared chain-cycles tables key correctly.
 const _mcPlanet = {};
+const { driver2PeriodSecondsAtAge } = require('@hum/physics/planets/orbit-chain');
 for (const _pk of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
   const T0 = C.planets[_pk].solarYearInput * 86400;
-  const periodFn = (t_Ma) =>
-    t_Ma === 0 ? T0
-               : T0 * Math.pow(1 - DT.SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6, 2);
+  // 8.3 L6: Driver 2 shared; one period fn per planet (stable identity for
+  // the chain-cycles tables).
+  const periodFn = (t_Ma) => driver2PeriodSecondsAtAge(t_Ma, T0, DT.SOLAR_MASS_LOSS_FRAC_PER_YR);
   _mcPlanet[_pk] = (a, b) => _moonChainCyclesTools(periodFn, a, b);
 }
 const _mcJupiter = _mcPlanet.jupiter;   // the deep-time A2 argument feed (unchanged identity semantics)

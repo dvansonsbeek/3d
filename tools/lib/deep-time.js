@@ -278,9 +278,9 @@ function meanHAtAge(t_Ma) {
 
 // ─── Driver 2 — AU and year_s ─────────────────────────────────────────────
 function meanAuAtAge(t_Ma) {
-  if (t_Ma === 0) return C.currentAUDistance;
-  const mass_loss_fraction = SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6;
-  return C.currentAUDistance * (1 - mass_loss_fraction);
+  // Phase 8.3 L6: the linear mass-loss law lives in @hum/physics.
+  return require('@hum/physics/planets/orbit-chain')
+    .massLossScaledLinearAtAge(t_Ma, C.currentAUDistance, SOLAR_MASS_LOSS_FRAC_PER_YR);
 }
 
 function meanSiderealYearSecondsAtAge(t_Ma) {
@@ -986,9 +986,10 @@ function meanSiderealDayAtAge(t_Ma) {
 function meanPlanetSemiMajorAxisAtAge(planetName, t_Ma) {
   const a_J2000 = _planetA_J2000[planetName];
   if (a_J2000 === undefined) return null;
-  if (t_Ma === 0) return a_J2000;
-  const mass_loss_fraction = SOLAR_MASS_LOSS_FRAC_PER_YR * t_Ma * 1e6;
-  return a_J2000 * (1 - mass_loss_fraction);
+  // Phase 8.3 L6: same linear mass-loss law as meanAuAtAge (S-P11 resolved —
+  // the engines shared this driver all along; units are the caller's).
+  return require('@hum/physics/planets/orbit-chain')
+    .massLossScaledLinearAtAge(t_Ma, a_J2000, SOLAR_MASS_LOSS_FRAC_PER_YR);
 }
 
 const meanMercurySemiMajorAxisAtAge = t => meanPlanetSemiMajorAxisAtAge('mercury', t);
