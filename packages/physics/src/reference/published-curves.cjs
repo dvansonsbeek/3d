@@ -120,12 +120,8 @@ const _VONDRAK_PA = [
  * central difference at h = 0.01 cy). @param {number} year @returns {number} */
 function axialPrecessionVondrak2011(year) {
   const T = (year - 2000) / 100; // Julian centuries from J2000
-  // Polynomial part of p_A (accumulated general precession, arcsec)
-  let pA = 8134.017132 + 5043.0520035 * T - 0.00710733 * T * T + 271e-9 * Math.pow(T, 3);
-  for (const [P, Cp, Sp] of _VONDRAK_PA) {
-    const arg = 2 * Math.PI * T / P;
-    pA += Cp * Math.cos(arg) + Sp * Math.sin(arg);
-  }
+  // Only the RATE dp_A/dT is used (central difference below); the browser
+  // original also accumulated p_A itself at T, dead code lint rejects here.
   const h = 0.01;
   const T1 = T + h, T2 = T - h;
   let pA1 = 8134.017132 + 5043.0520035 * T1 - 0.00710733 * T1 * T1 + 271e-9 * Math.pow(T1, 3);
