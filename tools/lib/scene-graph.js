@@ -683,6 +683,27 @@ function _jdFromPosTools(pos) {
   return j === null ? C.startmodelJD + pos * _epochCache.mSY : j;
 }
 
+// 9-1 S-P8: the fitted sun-longitude harmonic stack lives ONCE in
+// @hum/physics/sun/longitude-correction (J2000-fixed deps — the fitted
+// convention). This engine's TWO former inline copies (moveModel + the
+// fast animator) both delegate through this lazy factory.
+const { createSunLongitudeCorrection } = require('@hum/physics/sun/longitude-correction');
+let _sunLonCorrM = null;
+function _sunLonCorr() {
+  if (!_sunLonCorrM) {
+    _sunLonCorrM = createSunLongitudeCorrection({
+      hYears: C.H,
+      balancedYear: C.balancedYear,
+      j2000JD: C.j2000JD,
+      meanDeg: C.SUN_LONGITUDE_MEAN || 0,
+      harmonics: C.SUN_LONGITUDE_HARMONICS,
+      nNodalJ2000: C.N_nodalI,
+      nApsidalJ2000: C.N_apsidalI,
+    });
+  }
+  return _sunLonCorrM;
+}
+
 function _syncEpochForJD(jd) {
   if (!DEEP_TIME_ENABLED) return _epochCache;
   // Approximate year from JD using J2000 mSY (self-consistent iteration
@@ -1186,27 +1207,11 @@ function moveModel(graph, pos) {
     // silently skipped.
     const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
     if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
+      // 9-1 S-P8: the filtered harmonic stack lives ONCE in @hum/physics/
+      // sun/longitude-correction (J2000-fixed deps — the fitted convention).
       // Recover JD via epoch-consistent mSY so pos→jd round-trip is exact.
-      // Sun harmonic phase below uses C.H (J2000 fixed) because the table was
-      // fitted against J2000 mSY.
       const jd = _jdFromPosTools(pos);
-      const year = 2000 + (jd - C.j2000JD) / 365.25;
-      const t = year - C.balancedYear;
-      let corr = C.SUN_LONGITUDE_MEAN || 0;
-      const H_round = Math.round(C.H);
-      for (const h of C.SUN_LONGITUDE_HARMONICS) {
-        const divisor = h[0];
-        const isYearMultiple      = divisor >= H_round && divisor % H_round === 0;
-        const isPrecessionDivisor = divisor > 0 && divisor <= 20;
-        const isLunarPrecession   = divisor === C.N_nodalI || divisor === C.N_apsidalI;
-        // Clause (d) "sharesFactorWithH" removed 2026-07-15 — admitted
-        // mid-range fit artifacts (divisors 84, 92, 115, 122) not physically
-        // motivated. See tools/fit/sun-longitude-harmonics.js for rationale.
-        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession) continue;
-        const phase = 2 * Math.PI * t / (C.H / divisor);
-        corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
-      }
-      θ -= corr * d2r;
+      θ -= _sunLonCorr().correctionDegAt(jd) * d2r;
     }
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
     // Meeus formulas require T from standard J2000.0 (JD 2451545.0) in Julian centuries (36525 days)
@@ -1647,26 +1652,11 @@ function computeSunPositionFast(jd) {
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
     }
     // Phase Z-B (2026-06): Sun longitude harmonics applied to SUN NODE only.
-    // Mirror of the moveModel() Sun-only block above. See there for full notes.
+    // Mirror of the moveModel() Sun-only block above. 9-1 S-P8: both blocks
+    // delegate to @hum/physics/sun/longitude-correction.
     const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
     if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
-      const year = 2000 + (jd - C.j2000JD) / 365.25;
-      const t = year - C.balancedYear;
-      let corr = C.SUN_LONGITUDE_MEAN || 0;
-      const H_round = Math.round(C.H);
-      for (const h of C.SUN_LONGITUDE_HARMONICS) {
-        const divisor = h[0];
-        const isYearMultiple      = divisor >= H_round && divisor % H_round === 0;
-        const isPrecessionDivisor = divisor > 0 && divisor <= 20;
-        const isLunarPrecession   = divisor === C.N_nodalI || divisor === C.N_apsidalI;
-        // Clause (d) "sharesFactorWithH" removed 2026-07-15 — admitted
-        // mid-range fit artifacts (divisors 84, 92, 115, 122) not physically
-        // motivated. See tools/fit/sun-longitude-harmonics.js for rationale.
-        if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession) continue;
-        const phase = 2 * Math.PI * t / (C.H / divisor);
-        corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
-      }
-      θ -= corr * d2r;
+      θ -= _sunLonCorr().correctionDegAt(jd) * d2r;
     }
     nodes.orbit.ry = θ;
   }

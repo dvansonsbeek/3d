@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -692,33 +692,28 @@ const SUN_LONGITUDE_HARMONICS = FIT.SUN_LONGITUDE_HARMONICS;
 // Euclidean gcd — used by sunLongitudeCorrection's H-lattice filter.
 function _gcdInt(a, b) { a = Math.abs(a); b = Math.abs(b); while (b !== 0) { const t = b; b = a % b; a = t; } return a; }
 
-function sunLongitudeCorrection(jd) {
-  const year = 2000 + (jd - j2000JD) / 365.25;
-  const t = year - balancedYear;
-  let corr = SUN_LONGITUDE_MEAN;
-  const H_round = Math.round(holisticyearLength);
-  for (const h of SUN_LONGITUDE_HARMONICS) {
-    const divisor = h[0];
-    // H-lattice filter: a divisor is structurally on-lattice if EITHER
-    //   (a) it is a year-multiple of H (integer year period), OR
-    //   (b) it is a small precession divisor (1..20 — Earth's Fibonacci
-    //       named cycles H/3, H/5, H/8, H/13, H/16, etc.), OR
-    //   (c) it is one of the two lunar precession divisors (auto-tracked
-    //       from Meeus anchors via N_apsidalI_J2000, N_nodalI_J2000).
-    // Divisors that fail all three are H-lattice design-rule violating
-    // and silently skipped. (Clause (d) "sharesFactorWithH" was removed
-    // 2026-07-15 — it admitted mid-range fit artifacts like divisors 84,
-    // 92, 115, 122 that are not physically motivated. See sun-longitude-
-    // harmonics.js for rationale.)
-    const isYearMultiple      = divisor >= H_round && divisor % H_round === 0;
-    const isPrecessionDivisor = divisor > 0 && divisor <= 20;
-    const isLunarPrecession   = divisor === N_nodalI_J2000 || divisor === N_apsidalI_J2000;
-    if (!isYearMultiple && !isPrecessionDivisor && !isLunarPrecession) continue;
-    const phase = 2 * Math.PI * t / (holisticyearLength / divisor);
-    corr += h[1] * Math.sin(phase) + h[2] * Math.cos(phase);
+// 9-1 S-P8: the fitted H-lattice harmonic stack (and the lattice-filter
+// rationale) lives ONCE in @hum/physics/sun/longitude-correction. Deps are
+// the J2000-FIXED values — the fitted convention; this browser copy
+// historically read the mutable holisticyearLength/balancedYear globals
+// (measured divergence under epoch shift: 8.2e-10 deg, aligned here).
+// var + lazy: the fixed consts below this line are read at first call.
+var _sunLonCorrM = null;
+function _sunLonCorr() {
+  if (!_sunLonCorrM) {
+    _sunLonCorrM = createSunLongitudeCorrection({
+      hYears: HOLISTIC_YEAR_J2000,
+      balancedYear: BALANCED_YEAR_J2000_FIXED,
+      j2000JD: j2000JD,
+      meanDeg: SUN_LONGITUDE_MEAN,
+      harmonics: SUN_LONGITUDE_HARMONICS,
+      nNodalJ2000: N_nodalI_J2000,
+      nApsidalJ2000: N_apsidalI_J2000,
+    });
   }
-  return corr;
+  return _sunLonCorrM;
 }
+function sunLongitudeCorrection(jd) { return _sunLonCorr().correctionDegAt(jd); }
 
 // ─── B5. Cardinal point harmonics (fitted) ───────────────────────────────
 // Source: public/input/fitted-coefficients.json

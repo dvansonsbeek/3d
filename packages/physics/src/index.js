@@ -115,6 +115,8 @@ export { createEclipseFinders } from './eclipse/finders.cjs';
 // Phase 8.6 — the published reference curves (external comparison formulas
 // and datasets, exactly as published; comparison references, never inputs).
 export * as publishedCurves from './reference/published-curves.cjs';
+// Phase 9 — S-P8: the fitted sun-longitude harmonic stack (three copies → one).
+export { createSunLongitudeCorrection } from './sun/longitude-correction.cjs';
 
 /**
  * Build a model bound to a set of constants.

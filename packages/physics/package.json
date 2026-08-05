@@ -29,7 +29,8 @@
     "./deltat/historical": "./src/deltat/historical.cjs",
     "./climate/l1-orbital": "./src/climate/l1-orbital.cjs",
     "./eclipse/finders": "./src/eclipse/finders.cjs",
-    "./reference/published-curves": "./src/reference/published-curves.cjs"
+    "./reference/published-curves": "./src/reference/published-curves.cjs",
+    "./sun/longitude-correction": "./src/sun/longitude-correction.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }
