@@ -74,53 +74,14 @@ const R2D = 180 / Math.PI;
 // Accurate to a few seconds over 1500-2150. Required so Meeus _eclSunLon
 // interprets JD as UT (matching production); inside it converts to JD_TT.
 function deltaT(year) {
-  let t, u;
-  if (year < 1500) {
-    u = (year - 1820) / 100;
-    return -20 + 32 * u * u;
-  } else if (year < 1600) {
-    t = (year - 1500) / 100;
-    return 10583.6 - 1014.41*t + 33.78311*t**2 - 5.952053*t**3
-         - 0.1798452*t**4 + 0.022174192*t**5 + 0.0090316521*t**6;
-  } else if (year < 1700) {
-    t = (year - 1600) / 100;
-    return 120 - 98.08*t - 153.2*t**2 + t**3/0.007129;
-  } else if (year < 1800) {
-    t = (year - 1700) / 100;
-    return 8.83 + 16.03*t - 59.285*t**2 + 133.36*t**3 - t**4/0.01174;
-  } else if (year < 1860) {
-    t = (year - 1800) / 100;
-    return 13.72 - 33.2447*t + 68.612*t**2 + 4111.6*t**3
-         - 37436*t**4 + 121272*t**5 - 169900*t**6 + 87500*t**7;
-  } else if (year < 1900) {
-    t = (year - 1860) / 100;
-    return 7.62 + 57.37*t - 2517.54*t**2 + 16806.68*t**3
-         - 44736.24*t**4 + t**5/0.0000233174;
-  } else if (year < 1920) {
-    t = (year - 1900) / 100;
-    return -2.79 + 149.4119*t - 598.939*t**2 + 6196.6*t**3 - 19700*t**4;
-  } else if (year < 1941) {
-    t = (year - 1920) / 100;
-    return 21.20 + 84.493*t - 761.00*t**2 + 2093.6*t**3;
-  } else if (year < 1961) {
-    t = (year - 1941) / 100;
-    return 29.07 + 40.7*t - t**2/0.0233 + t**3/0.002547;
-  } else if (year < 1986) {
-    t = (year - 1961) / 100;
-    return 45.45 + 106.7*t - t**2/0.026 - t**3/0.000718;
-  } else if (year < 2005) {
-    t = (year - 1986) / 100;
-    return 63.86 + 33.45*t - 603.74*t**2 + 1727.5*t**3
-         + 65181.4*t**4 + 237359.9*t**5;
-  } else if (year < 2050) {
-    t = year - 2000;
-    return 62.92 + 0.32217*t + 0.005589*t*t;
-  } else if (year < 2150) {
-    return -20 + 32 * ((year - 1820)/100)**2 - 0.5628 * (2150 - year);
-  } else {
-    u = (year - 1820) / 100;
-    return -20 + 32 * u * u;
-  }
+  // 9-2 (§12g item 0, measured): the published canon from @hum/physics.
+  // The former local variant carried genuine transcription errors —
+  // wrong t-anchors in the 1941–1961/1961–1986 segments and ×1000
+  // coefficients in the 1986–2005 branch — giving ΔT wrong by up to
+  // 123.5 s (at 2004.5; +35.4 s at 2000; 11.1 s RMS over 1800–2200,
+  // the default fit window). The SUN_LONGITUDE coefficients regenerated
+  // with this swap in the same commit (matched pair).
+  return require('@hum/physics/deltat/historical').deltaTEspenakMeeusCanonSeconds(year);
 }
 
 function jdToYear(jd) {
