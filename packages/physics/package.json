@@ -23,7 +23,8 @@
     "./planets/orbit-chain": "./src/planets/orbit-chain.cjs",
     "./planets/corrections": "./src/planets/corrections.cjs",
     "./planets/predict": "./src/planets/predict.cjs",
-    "./planets/model": "./src/planets/model.cjs"
+    "./planets/model": "./src/planets/model.cjs",
+    "./deltat/cycles": "./src/deltat/cycles.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }

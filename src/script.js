@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -2987,31 +2987,45 @@ const BOND_SIN_COEFF_S            = FIT.DT_STACK.bond.sin_coeff_s;
 // fixed-period assumption is valid. Constant name kept for historical
 // continuity though the window is no longer literally "Holocene".
 // BOND_TAPER_FULL/TOTAL_HALFWIDTH_YR live in section C3 "Deep-time physics anchors" near the top.
-// Anchor calibration constant: Bond cyclic value at exactly year 2000.
-// Subtracted from the raw cyclic evaluation so bondCycleDeltaTCorrection(2000) === 0.
-const BOND_DT_RAW_AT_J2000        = BOND_COS_COEFF_S * Math.cos(BOND_OMEGA * 2000)
-                                  + BOND_SIN_COEFF_S * Math.sin(BOND_OMEGA * 2000);
-
-/** Smooth cosine taper 1 → 0 between the full and total halfwidths from J2000. */
-function bondHoloceneTaper(year) {
-  const dy = Math.abs(year - 2000);
-  if (dy <= BOND_TAPER_FULL_HALFWIDTH_YR) return 1.0;
-  if (dy >= BOND_TAPER_TOTAL_HALFWIDTH_YR) return 0.0;
-  const u = (dy - BOND_TAPER_FULL_HALFWIDTH_YR)
-          / (BOND_TAPER_TOTAL_HALFWIDTH_YR - BOND_TAPER_FULL_HALFWIDTH_YR);
-  return 0.5 * (1.0 + Math.cos(Math.PI * u));
+// 8.4-2: the taper, the four anchored cycle corrections, their δLOD twins,
+// and the Core-mantle swing episode live ONCE in @hum/physics/deltat/cycles.
+// This browser injects FIT.DT_STACK / FIT.DT_RESONATOR (the Node engine
+// injects the fit-output data JSONs) and keeps its research-toggle gates.
+// var + lazy factory: the hallstatt/jose/resonator constants below are read
+// at first call, after module evaluation.
+var _dtCyclesM = null;
+function _dtCycles() {
+  if (!_dtCyclesM) {
+    _dtCyclesM = createDeltaTCycles({
+      eightHYears: 8 * HOLISTIC_YEAR_J2000,
+      taperFullHalfwidthYears: BOND_TAPER_FULL_HALFWIDTH_YR,
+      taperTotalHalfwidthYears: BOND_TAPER_TOTAL_HALFWIDTH_YR,
+      tropicalYearSecondsJ2000: MEAN_TROPICAL_YEAR_J2000_S,
+      cycles: {
+        bond:      { latticeN: BOND_LATTICE_N,      cosCoeffSeconds: BOND_COS_COEFF_S,      sinCoeffSeconds: BOND_SIN_COEFF_S },
+        hallstatt: { latticeN: HALLSTATT_LATTICE_N, cosCoeffSeconds: HALLSTATT_COS_COEFF_S, sinCoeffSeconds: HALLSTATT_SIN_COEFF_S },
+        jose5:     { latticeN: JOSE5_LATTICE_N,     cosCoeffSeconds: JOSE5_COS_COEFF_S,     sinCoeffSeconds: JOSE5_SIN_COEFF_S },
+        jose4:     { latticeN: JOSE4_LATTICE_N,     cosCoeffSeconds: JOSE4_COS_COEFF_S,     sinCoeffSeconds: JOSE4_SIN_COEFF_S },
+      },
+      resonator: {
+        t0LatticeN: RES_T0_LATTICE_N, q: RES_Q,
+        kicks: [
+          { tYear: RES_KICK1_T_YR, cosSeconds: RES_KICK1_COS_S, sinSeconds: RES_KICK1_SIN_S },
+          { tYear: RES_KICK2_T_YR, cosSeconds: RES_KICK2_COS_S, sinSeconds: RES_KICK2_SIN_S },
+        ],
+        tones: [{ dn: RES_TONE1_DN, phiLockedRad: RES_TONE1_PHI_RAD, ampSeconds: RES_TONE1_AMP_S }],
+      },
+    });
+  }
+  return _dtCyclesM;
 }
 
 /** Anchored Bond cycle ΔT correction at calendar year (CE), in seconds.
  *  Returns 0 when the feature flag is OFF, exactly 0 at year 2000 by
- *  construction, and 0 outside the Holocene taper window. */
+ *  construction, and 0 outside the taper window. */
 function bondCycleDeltaTCorrection(year) {
   if (!BOND_DT_CORRECTION_ENABLED) return 0;
-  const taper = bondHoloceneTaper(year);
-  if (taper <= 0) return 0;
-  const raw = BOND_COS_COEFF_S * Math.cos(BOND_OMEGA * year)
-            + BOND_SIN_COEFF_S * Math.sin(BOND_OMEGA * year);
-  return taper * (raw - BOND_DT_RAW_AT_J2000);
+  return _dtCycles().cycleDeltaTSecondsAt('bond', year);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -3074,31 +3088,14 @@ const HALLSTATT_SIN_COEFF_S            = FIT.DT_STACK.hallstatt.sin_coeff_s;  //
 // the single JSON pair, so widening the taper moves them together.
 const HALLSTATT_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
 const HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;
-const HALLSTATT_DT_RAW_AT_J2000        = HALLSTATT_COS_COEFF_S * Math.cos(HALLSTATT_OMEGA * 2000)
-                                       + HALLSTATT_SIN_COEFF_S * Math.sin(HALLSTATT_OMEGA * 2000);
-
-/** Smooth cosine taper 1 → 0 between the Hallstatt full and total halfwidths.
- *  Uses the same window as Bond by design — no independent evidence yet for
- *  a longer Hallstatt persistence in deep time. */
-function hallstattHoloceneTaper(year) {
-  const dy = Math.abs(year - 2000);
-  if (dy <= HALLSTATT_TAPER_FULL_HALFWIDTH_YR) return 1.0;
-  if (dy >= HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR) return 0.0;
-  const u = (dy - HALLSTATT_TAPER_FULL_HALFWIDTH_YR)
-          / (HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR - HALLSTATT_TAPER_FULL_HALFWIDTH_YR);
-  return 0.5 * (1.0 + Math.cos(Math.PI * u));
-}
-
 /** Anchored Hallstatt cycle ΔT correction at calendar year (CE), in seconds.
  *  Same structure as bondCycleDeltaTCorrection: returns 0 when flag OFF,
- *  exactly 0 at year 2000, and 0 outside the taper window. */
+ *  exactly 0 at year 2000, and 0 outside the taper window (8.4-2: shared
+ *  module — one taper serves all cycles; the per-cycle taper copies read
+ *  the same JSON pair and are dissolved). */
 function hallstattCycleDeltaTCorrection(year) {
   if (!HALLSTATT_DT_CORRECTION_ENABLED) return 0;
-  const taper = hallstattHoloceneTaper(year);
-  if (taper <= 0) return 0;
-  const raw = HALLSTATT_COS_COEFF_S * Math.cos(HALLSTATT_OMEGA * year)
-            + HALLSTATT_SIN_COEFF_S * Math.sin(HALLSTATT_OMEGA * year);
-  return taper * (raw - HALLSTATT_DT_RAW_AT_J2000);
+  return _dtCycles().cycleDeltaTSecondsAt('hallstatt', year);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -3153,30 +3150,13 @@ const JOSE5_COS_COEFF_S            = FIT.DT_STACK.jose5.cos_coeff_s;  // triple-
 const JOSE5_SIN_COEFF_S            = FIT.DT_STACK.jose5.sin_coeff_s;  // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
 const JOSE5_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
 const JOSE5_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;
-const JOSE5_DT_RAW_AT_J2000        = JOSE5_COS_COEFF_S * Math.cos(JOSE5_OMEGA * 2000)
-                                   + JOSE5_SIN_COEFF_S * Math.sin(JOSE5_OMEGA * 2000);
-
-/** Smooth cosine taper 1 → 0 between the Jose5 full and total halfwidths.
- *  Uses the same window as Bond and Hallstatt for consistency. */
-function jose5HoloceneTaper(year) {
-  const dy = Math.abs(year - 2000);
-  if (dy <= JOSE5_TAPER_FULL_HALFWIDTH_YR) return 1.0;
-  if (dy >= JOSE5_TAPER_TOTAL_HALFWIDTH_YR) return 0.0;
-  const u = (dy - JOSE5_TAPER_FULL_HALFWIDTH_YR)
-          / (JOSE5_TAPER_TOTAL_HALFWIDTH_YR - JOSE5_TAPER_FULL_HALFWIDTH_YR);
-  return 0.5 * (1.0 + Math.cos(Math.PI * u));
-}
-
 /** Anchored Jose5 cycle ΔT correction at calendar year (CE), in seconds.
  *  Same structure as Bond and Hallstatt: returns 0 when flag OFF, exactly
- *  0 at year 2000 by construction, 0 outside the taper window. */
+ *  0 at year 2000 by construction, 0 outside the taper window (8.4-2:
+ *  shared module). */
 function jose5CycleDeltaTCorrection(year) {
   if (!JOSE5_DT_CORRECTION_ENABLED) return 0;
-  const taper = jose5HoloceneTaper(year);
-  if (taper <= 0) return 0;
-  const raw = JOSE5_COS_COEFF_S * Math.cos(JOSE5_OMEGA * year)
-            + JOSE5_SIN_COEFF_S * Math.sin(JOSE5_OMEGA * year);
-  return taper * (raw - JOSE5_DT_RAW_AT_J2000);
+  return _dtCycles().cycleDeltaTSecondsAt('jose5', year);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -3204,30 +3184,13 @@ const JOSE4_COS_COEFF_S            = FIT.DT_STACK.jose4.cos_coeff_s;  // quad-fi
 const JOSE4_SIN_COEFF_S            = FIT.DT_STACK.jose4.sin_coeff_s;  // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
 const JOSE4_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
 const JOSE4_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;
-const JOSE4_DT_RAW_AT_J2000        = JOSE4_COS_COEFF_S * Math.cos(JOSE4_OMEGA * 2000)
-                                    + JOSE4_SIN_COEFF_S * Math.sin(JOSE4_OMEGA * 2000);
-
-/** Smooth cosine taper 1 → 0 between the Jose4 full and total halfwidths.
- *  Uses the same Holocene window as the other three cycles for consistency. */
-function jose4HoloceneTaper(year) {
-  const dy = Math.abs(year - 2000);
-  if (dy <= JOSE4_TAPER_FULL_HALFWIDTH_YR) return 1.0;
-  if (dy >= JOSE4_TAPER_TOTAL_HALFWIDTH_YR) return 0.0;
-  const u = (dy - JOSE4_TAPER_FULL_HALFWIDTH_YR)
-          / (JOSE4_TAPER_TOTAL_HALFWIDTH_YR - JOSE4_TAPER_FULL_HALFWIDTH_YR);
-  return 0.5 * (1.0 + Math.cos(Math.PI * u));
-}
-
 /** Anchored Jose4 cycle ΔT correction at calendar year (CE), in seconds.
  *  Same structure as Bond/Hallstatt/Jose5: returns 0 when flag OFF, exactly
- *  0 at year 2000 by construction, 0 outside the taper window. */
+ *  0 at year 2000 by construction, 0 outside the taper window (8.4-2:
+ *  shared module). */
 function jose4CycleDeltaTCorrection(year) {
   if (!JOSE4_DT_CORRECTION_ENABLED) return 0;
-  const taper = jose4HoloceneTaper(year);
-  if (taper <= 0) return 0;
-  const raw = JOSE4_COS_COEFF_S * Math.cos(JOSE4_OMEGA * year)
-            + JOSE4_SIN_COEFF_S * Math.sin(JOSE4_OMEGA * year);
-  return taper * (raw - JOSE4_DT_RAW_AT_J2000);
+  return _dtCycles().cycleDeltaTSecondsAt('jose4', year);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -3280,110 +3243,10 @@ const RES_TONE1_DN    = FIT.DT_RESONATOR.drive_tones[0].dn;
 const RES_TONE1_PHI_RAD = FIT.DT_RESONATOR.drive_tones[0].phi_locked_rad;
 const RES_TONE1_AMP_S = FIT.DT_RESONATOR.drive_tones[0].amp_s;
 
-const RES_T0_YR  = (8 * HOLISTIC_YEAR_J2000) / RES_T0_LATTICE_N;   // 3,916.11 yr
-const RES_W0     = 2 * Math.PI / RES_T0_YR;
-const RES_LAMBDA = RES_W0 / (2 * RES_Q);
-const RES_WD     = RES_W0 * Math.sqrt(1 - 1 / (4 * RES_Q * RES_Q));
-const RES_KICKS = [
-  { t: RES_KICK1_T_YR, cos_s: RES_KICK1_COS_S, sin_s: RES_KICK1_SIN_S },
-  { t: RES_KICK2_T_YR, cos_s: RES_KICK2_COS_S, sin_s: RES_KICK2_SIN_S },
-];
-// Drive tones: Δn difference tones of the ACTIVE flag set, kick-1-envelope-
-// shared. Regenerate via core_mantle_resonator_stage1.py after ANY stack
-// change (3rd/5th cycle) — the tone menu derives from the flags.
-const RES_TONES = [
-  { dn: RES_TONE1_DN, omega: 2 * Math.PI * RES_TONE1_DN / (8 * HOLISTIC_YEAR_J2000),
-    phi_locked: RES_TONE1_PHI_RAD, amp_s: RES_TONE1_AMP_S },
-];
-
-// IMPULSE-CONSISTENT episode (2026-07-23): kicks are sin-only (cos_s ≡ 0 —
-// displacement-continuous, the true impulse response of the damped
-// oscillator; ΔT is accumulated angle and must not step). The drive tone is
-// SWITCH-ON COMPENSATED: its displacement at the excitation epoch is
-// cancelled by an eigenmode transient (physical switched-on drive; slope
-// discontinuities at the kicks are allowed — they are the impulses).
-function _resonatorToneC0(t) {
-  return Math.cos(t.omega * RES_KICKS[0].t - t.phi_locked);
-}
-function _resonatorRaw(year) {
-  let v = 0;
-  for (const k of RES_KICKS) {
-    const dt = year - k.t;
-    if (dt < 0) continue;
-    const e = Math.exp(-RES_LAMBDA * dt);
-    v += e * (k.cos_s * Math.cos(RES_WD * dt) + k.sin_s * Math.sin(RES_WD * dt));
-  }
-  const dt1 = year - RES_KICKS[0].t;
-  if (dt1 >= 0) {
-    const e1 = Math.exp(-RES_LAMBDA * dt1);
-    for (const t of RES_TONES) {
-      v += e1 * t.amp_s * (Math.cos(t.omega * year - t.phi_locked)
-                           - _resonatorToneC0(t) * Math.cos(RES_WD * dt1));
-    }
-  }
-  return v;
-}
-
-function _resonatorRawPrime(year) {
-  let v = 0;
-  for (const k of RES_KICKS) {
-    const dt = year - k.t;
-    if (dt < 0) continue;
-    const e = Math.exp(-RES_LAMBDA * dt);
-    v += e * ((-RES_LAMBDA * k.cos_s + RES_WD * k.sin_s) * Math.cos(RES_WD * dt)
-            + (-RES_LAMBDA * k.sin_s - RES_WD * k.cos_s) * Math.sin(RES_WD * dt));
-  }
-  const dt1 = year - RES_KICKS[0].t;
-  if (dt1 >= 0) {
-    const e1 = Math.exp(-RES_LAMBDA * dt1);
-    for (const t of RES_TONES) {
-      const c0 = _resonatorToneC0(t);
-      // d/dy of e1·[cos(ωy−φ) − c0·cos(w_d·dt1)] — product rule
-      v += e1 * t.amp_s * (-RES_LAMBDA * (Math.cos(t.omega * year - t.phi_locked)
-                                          - c0 * Math.cos(RES_WD * dt1))
-                           - t.omega * Math.sin(t.omega * year - t.phi_locked)
-                           + c0 * RES_WD * Math.sin(RES_WD * dt1));
-    }
-  }
-  return v;
-}
-
-// Analytic SECOND derivative of the raw episode (d²C/dy²) — mirrors
-// tools/lib/deep-time.js _resonatorRawSecond. Used by the dLOD/dt
-// decomposition so the kick impulses render as clean steps instead of the
-// 50-yr-window rectangles a finite difference produces (the 1550–1650 notch
-// first seen in the LOD-Climate modal). Kick terms: the derivative maps
-// (a,b) → (−λa + w_d·b, −λb − w_d·a); apply twice. Compensated tone
-// amp·e·A: d²/dy² = amp·e·(λ²A − 2λA′ + A″).
-function _resonatorRawSecond(year) {
-  let v = 0;
-  for (const k of RES_KICKS) {
-    const dt = year - k.t;
-    if (dt < 0) continue;
-    const e = Math.exp(-RES_LAMBDA * dt);
-    const a1 = -RES_LAMBDA * k.cos_s + RES_WD * k.sin_s;
-    const b1 = -RES_LAMBDA * k.sin_s - RES_WD * k.cos_s;
-    const a2 = -RES_LAMBDA * a1 + RES_WD * b1;
-    const b2 = -RES_LAMBDA * b1 - RES_WD * a1;
-    v += e * (a2 * Math.cos(RES_WD * dt) + b2 * Math.sin(RES_WD * dt));
-  }
-  const dt1 = year - RES_KICKS[0].t;
-  if (dt1 >= 0) {
-    const e1 = Math.exp(-RES_LAMBDA * dt1);
-    for (const t of RES_TONES) {
-      const c0 = _resonatorToneC0(t);
-      const A  = Math.cos(t.omega * year - t.phi_locked) - c0 * Math.cos(RES_WD * dt1);
-      const A1 = -t.omega * Math.sin(t.omega * year - t.phi_locked)
-               + c0 * RES_WD * Math.sin(RES_WD * dt1);
-      const A2 = -t.omega * t.omega * Math.cos(t.omega * year - t.phi_locked)
-               + c0 * RES_WD * RES_WD * Math.cos(RES_WD * dt1);
-      v += t.amp_s * e1 * (RES_LAMBDA * RES_LAMBDA * A - 2 * RES_LAMBDA * A1 + A2);
-    }
-  }
-  return v;
-}
-
-const RES_DT_RAW_AT_J2000 = _resonatorRaw(2000);
+// 8.4-2: the resonator episode (derived constants, raw/prime/second,
+// impulse-consistent tone compensation, J2000 anchor) lives in
+// @hum/physics/deltat/cycles — see the _dtCycles factory in the Bond
+// section. Only the research-toggle gates remain here.
 
 /** Anchored Core-mantle swing ΔT correction at calendar year (CE), seconds.
  *  Same anchoring conventions as the four flags: 0 when flag OFF, exactly 0
@@ -3391,20 +3254,14 @@ const RES_DT_RAW_AT_J2000 = _resonatorRaw(2000);
  *  driver taxonomy: Resonator. */
 function resonatorSwingDeltaTCorrection(year) {
   if (!RESONATOR_DT_CORRECTION_ENABLED) return 0;
-  const taper = bondHoloceneTaper(year);   // shared taper widths
-  if (taper <= 0) return 0;
-  return taper * (_resonatorRaw(year) - RES_DT_RAW_AT_J2000);
+  return _dtCycles().swingDeltaTSecondsAt(year);
 }
 
 /** Instantaneous δLOD implied by the Core-mantle swing episode (seconds to
  *  add to LOD_mean). Product rule over taper × (raw − raw@J2000). */
 function resonatorSwingLodCorrection(year) {
   if (!RESONATOR_DT_CORRECTION_ENABLED) return 0;
-  const taper = bondHoloceneTaper(year);
-  if (taper <= 0) return 0;
-  const dCdy = _dtCycleTaperDerivative(year) * (_resonatorRaw(year) - RES_DT_RAW_AT_J2000)
-             + taper * _resonatorRawPrime(year);
-  return 86400 * dCdy / MEAN_TROPICAL_YEAR_J2000_S;
+  return _dtCycles().swingLodSecondsAt(year);
 }
 
 /** Analytic RATE of the resonator's δLOD contribution, d(δLOD)/dy in
@@ -3414,12 +3271,7 @@ function resonatorSwingLodCorrection(year) {
  *  as clean steps instead of finite-difference rectangles. */
 function resonatorSwingLodRate(year) {
   if (!RESONATOR_DT_CORRECTION_ENABLED) return 0;
-  const taper = bondHoloceneTaper(year);
-  if (taper <= 0) return 0;
-  if (taper >= 1) {
-    return 86400 * _resonatorRawSecond(year) / MEAN_TROPICAL_YEAR_J2000_S;
-  }
-  return (resonatorSwingLodCorrection(year + 1) - resonatorSwingLodCorrection(year - 1)) / 2;
+  return _dtCycles().swingLodRateAt(year);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -3512,54 +3364,28 @@ function resonatorSwingLodRate(year) {
 // contributions are best inspected via the "ΔT Breakdown (H/5 physics vs Bond
 // stack)" console test rather than frozen here — they rescale each refit.
 
-// Shared Holocene taper derivative — all 4 cycles use identical 300000/400000
-// half-widths in script.js (verified 2026-07-17). Reuse bondHoloceneTaper for
-// the value; add derivative below. Under the current tapers, the derivative
-// is 0 within ±300000 yr of J2000 → the "raw − raw@J2000" term drops out and
-// only `raw'(y)` contributes at J2000.
-function _dtCycleTaperDerivative(year) {
-  // The FIFTH copy of the taper halfwidths, and the easiest to miss because it
-  // is function-local rather than a top-level const. The derivative has to use
-  // the same window as the taper it differentiates, so it reads the same JSON
-  // pair as the four channel constants.
-  const HW_FULL = K.deepTime.dtStackTaperFullHalfwidthYr;
-  const HW_TOTAL = K.deepTime.dtStackTaperTotalHalfwidthYr;
-  const dy = Math.abs(year - 2000);
-  if (dy <= HW_FULL) return 0;
-  if (dy >= HW_TOTAL) return 0;
-  const width = HW_TOTAL - HW_FULL;
-  const u = (dy - HW_FULL) / width;
-  const sign = year >= 2000 ? 1 : -1;
-  return -0.5 * Math.PI * Math.sin(Math.PI * u) / width * sign;
-}
-
-/** Instantaneous δLOD from a single ΔT cyclic correction. Returns seconds
- *  to add to LOD_mean. See _cycleLodCorrection in tools/lib/deep-time.js. */
-function _cycleLodCorrection(year, cos_coeff, sin_coeff, omega, raw_at_j2000) {
-  const taper = bondHoloceneTaper(year);   // all 4 cycles share identical taper widths
-  if (taper <= 0) return 0;
-  const raw       = cos_coeff * Math.cos(omega * year) + sin_coeff * Math.sin(omega * year);
-  const raw_prime = omega * (sin_coeff * Math.cos(omega * year) - cos_coeff * Math.sin(omega * year));
-  const taper_prime = _dtCycleTaperDerivative(year);
-  const dCdy = taper_prime * (raw - raw_at_j2000) + taper * raw_prime;
-  return 86400 * dCdy / MEAN_TROPICAL_YEAR_J2000_S;
-}
+// Under the current 300000/400000 half-widths, the taper derivative is 0
+// within ±300 kyr of J2000 → the "raw − raw@J2000" term drops out and only
+// `raw'(y)` contributes at J2000.
+// 8.4-2: the taper derivative (formerly the FIFTH copy of the halfwidth
+// pair) and the per-cycle δLOD product rule live in the shared module —
+// see the _dtCycles factory in the Bond section. Flags stay here.
 
 function bondCycleLodCorrection(year) {
   if (!BOND_DT_CORRECTION_ENABLED) return 0;
-  return _cycleLodCorrection(year, BOND_COS_COEFF_S, BOND_SIN_COEFF_S, BOND_OMEGA, BOND_DT_RAW_AT_J2000);
+  return _dtCycles().cycleLodSecondsAt('bond', year);
 }
 function hallstattCycleLodCorrection(year) {
   if (!HALLSTATT_DT_CORRECTION_ENABLED) return 0;
-  return _cycleLodCorrection(year, HALLSTATT_COS_COEFF_S, HALLSTATT_SIN_COEFF_S, HALLSTATT_OMEGA, HALLSTATT_DT_RAW_AT_J2000);
+  return _dtCycles().cycleLodSecondsAt('hallstatt', year);
 }
 function jose5CycleLodCorrection(year) {
   if (!JOSE5_DT_CORRECTION_ENABLED) return 0;
-  return _cycleLodCorrection(year, JOSE5_COS_COEFF_S, JOSE5_SIN_COEFF_S, JOSE5_OMEGA, JOSE5_DT_RAW_AT_J2000);
+  return _dtCycles().cycleLodSecondsAt('jose5', year);
 }
 function jose4CycleLodCorrection(year) {
   if (!JOSE4_DT_CORRECTION_ENABLED) return 0;
-  return _cycleLodCorrection(year, JOSE4_COS_COEFF_S, JOSE4_SIN_COEFF_S, JOSE4_OMEGA, JOSE4_DT_RAW_AT_J2000);
+  return _dtCycles().cycleLodSecondsAt('jose4', year);
 }
 
 /** Sum of DT cyclic LOD contributions at year. At J2000 the shipped 4-cycle sum

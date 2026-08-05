@@ -105,6 +105,8 @@ export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from './plane
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).
 export { createPlanetModel } from './planets/model.cjs';
+// Phase 8.4 — the climate/ΔT machinery, extracted layer by layer.
+export { createDeltaTCycles } from './deltat/cycles.cjs';
 
 /**
  * Build a model bound to a set of constants.
