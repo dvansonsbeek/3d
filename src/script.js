@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -6411,6 +6411,19 @@ if (typeof window !== 'undefined') {
     })[k](yearA, yearB),
     // 8.3 L9: the predictive-precession path through the shared feature basis.
     planetPredictAt: (k, year) => predictGeocentricPrecession(year, k),
+    // 8.3 S-P5: the browser 6-arg dynamic ascending node, with the scene's
+    // live tilt objects — pins the sampling+bisection critical-point path.
+    planetAscNodeDynAt: (k, year) => {
+      const t = ({
+        mercury: mercuryRealPerihelionAtSun, venus: venusRealPerihelionAtSun,
+        mars: marsRealPerihelionAtSun, jupiter: jupiterRealPerihelionAtSun,
+        saturn: saturnRealPerihelionAtSun, uranus: uranusRealPerihelionAtSun,
+        neptune: neptuneRealPerihelionAtSun, pluto: plutoRealPerihelionAtSun,
+      })[k];
+      return calculateDynamicAscendingNodeFromTilts(
+        t.orbitTilta, t.orbitTiltb, o.obliquityEarth, o.earthInvPlaneInclinationDynamic, year, k,
+      );
+    },
   };
 }
 
@@ -55234,164 +55247,74 @@ function getEclipticInclinationAtYear(planetName, year) {
  * @returns {number} Dynamic ascending node longitude (degrees, 0-360)
  */
 function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentObliquity, earthInclination, currentYear, planetName) {
-  const DEG2RAD = Math.PI / 180;
+  // 8.3 S-P5: the segment-integration law (dΩ/dε = −sin Ω / tan i, with
+  // sign flips at obliquity extrema and Earth-inclination crossovers) lives
+  // in @hum/physics/planets/asc-node-integrator — L5 delegated the Node
+  // mirror; this browser 6-arg variant now delegates too. What stays HERE:
+  // the Tychosium orbitTilta/orbitTiltb decomposition (§2h — those names
+  // never enter the package), the `|| planetInclination` fallbacks (folded
+  // into the injected closure), and the sampling+bisection obliquity-extrema
+  // search — this engine's critical-point discovery method (the Node engine
+  // injects its precomputed extrema table instead): same law, engine-owned
+  // critical points. currentObliquity/earthInclination are unused (kept for
+  // the caller signature, as before).
   const RAD2DEG = 180 / Math.PI;
-
-  // Extract the static ascending node and inclination from tilts
   const staticOmegaDeg = Math.atan2(orbitTilta, orbitTiltb) * RAD2DEG;
-  const staticOmega = ((staticOmegaDeg % 360) + 360) % 360;
   const planetInclination = Math.sqrt(orbitTilta * orbitTilta + orbitTiltb * orbitTiltb);
 
-  // If inclination is essentially zero, ascending node is undefined
-  if (planetInclination < 1e-6) {
-    return staticOmega;
-  }
+  return integrateAscendingNode(
+    { ascendingNodeDeg: staticOmegaDeg, inclinationDeg: planetInclination },
+    currentYear,
+    {
+      obliquityAt: getObliquityAtYear,
+      earthInclinationAt: getEarthInclinationAtYear,
+      obliquityExtremaInRange: (yearMin, yearMax) => {
+        // Sample to find obliquity direction changes, bisect to the extremum.
+        const extrema = [];
+        const sampleStep = Math.min(1000, (yearMax - yearMin) / 100);
+        if (sampleStep > 0) {
+          let prevObl = getObliquityAtYear(yearMin);
+          let prevDir = 0;
 
-  const i = planetInclination * DEG2RAD;
-  const OmegaRad = staticOmega * DEG2RAD;
+          for (let y = yearMin + sampleStep; y <= yearMax; y += sampleStep) {
+            const obl = getObliquityAtYear(y);
+            const curDir = obl > prevObl ? 1 : (obl < prevObl ? -1 : 0);
 
-  const tanI = Math.tan(i);
-  if (Math.abs(tanI) < 1e-10) {
-    return staticOmega;
-  }
+            if (prevDir !== 0 && curDir !== 0 && prevDir !== curDir) {
+              // Direction changed - refine to find extremum
+              let lo = y - sampleStep;
+              let hi = y;
+              for (let iter = 0; iter < 20; iter++) {
+                const mid = (lo + hi) / 2;
+                const oblLo = getObliquityAtYear(lo);
+                const oblMid = getObliquityAtYear(mid);
+                const oblHi = getObliquityAtYear(hi);
 
-  // Base perturbation rate: dΩ/dε = -sin(Ω) / tan(i)
-  const sinOmega = Math.sin(OmegaRad);
-  const baseDOmegaDeps = -sinOmega / tanI;
-
-  // ================================================================
-  // RATE-BASED INTEGRATION WITH SEGMENT HANDLING
-  // ================================================================
-  //
-  // We integrate the ascending node change from the "balanced year" (where
-  // obliquity and inclination are at their mean values) to the current year.
-  //
-  // IMPORTANT: The staticOmega values are calibrated for EPOCH year 2000.
-  // To use balanced year as the reference, we need to:
-  //   1. Calculate the effect from balanced year to epoch (2000)
-  //   2. Subtract that from staticOmega to get the "balanced year baseline"
-  //   3. Then add the effect from balanced year to current year
-  //
-  // This simplifies to: just calculate the effect from EPOCH to currentYear,
-  // since the balanced year portions cancel out:
-  //   result = staticOmega - effect(balanced→epoch) + effect(balanced→current)
-  //          = staticOmega + effect(epoch→current)
-  //
-  // But we WANT to use balanced year as reference for proper cycle handling.
-  // So we compute effect(balanced→current) - effect(balanced→epoch).
-  //
-  // The integration must account for:
-  // 1. Obliquity direction changes (extrema in the obliquity cycle)
-  // 2. Inclination crossovers (when Earth incl = planet incl)
-  //
-  // At each segment boundary, the direction of the effect may reverse.
-  // ================================================================
-
-  const EPOCH_YEAR = 2000; // Year when staticOmega values are calibrated
-
-  // Helper function to integrate effect between two years
-  const integrateEffect = (fromYear, toYear) => {
-    if (Math.abs(toYear - fromYear) < 0.1) return 0;
-
-    const yearMin = Math.min(fromYear, toYear);
-    const yearMax = Math.max(fromYear, toYear);
-    const dir = toYear >= fromYear ? 1 : -1;
-
-    // Collect critical points: obliquity extrema and inclination crossings
-    let criticalYears = [yearMin, yearMax];
-
-    // Sample to find obliquity direction changes
-    const sampleStep = Math.min(1000, (yearMax - yearMin) / 100);
-    if (sampleStep > 0) {
-      let prevObl = getObliquityAtYear(yearMin);
-      let prevDir = 0;
-
-      for (let y = yearMin + sampleStep; y <= yearMax; y += sampleStep) {
-        const obl = getObliquityAtYear(y);
-        const curDir = obl > prevObl ? 1 : (obl < prevObl ? -1 : 0);
-
-        if (prevDir !== 0 && curDir !== 0 && prevDir !== curDir) {
-          // Direction changed - refine to find extremum
-          let lo = y - sampleStep;
-          let hi = y;
-          for (let iter = 0; iter < 20; iter++) {
-            const mid = (lo + hi) / 2;
-            const oblLo = getObliquityAtYear(lo);
-            const oblMid = getObliquityAtYear(mid);
-            const oblHi = getObliquityAtYear(hi);
-
-            if ((oblMid > oblLo && oblMid > oblHi) || (oblMid < oblLo && oblMid < oblHi)) {
-              criticalYears.push(mid);
-              break;
-            } else if ((oblMid - oblLo) * prevDir > 0) {
-              lo = mid;
-            } else {
-              hi = mid;
+                if ((oblMid > oblLo && oblMid > oblHi) || (oblMid < oblLo && oblMid < oblHi)) {
+                  extrema.push(mid);
+                  break;
+                } else if ((oblMid - oblLo) * prevDir > 0) {
+                  lo = mid;
+                } else {
+                  hi = mid;
+                }
+              }
             }
+
+            if (curDir !== 0) prevDir = curDir;
+            prevObl = obl;
           }
         }
-
-        if (curDir !== 0) prevDir = curDir;
-        prevObl = obl;
-      }
-    }
-
-    // Find ALL inclination crossings (only if planet is within Earth's inclination range)
-    // This is critical for long time spans where there may be many crossings
-    const minEarthIncl = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude;
-    const maxEarthIncl = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude;
-
-    // When planetName is provided, dynamic inclination could enter Earth's range
-    if (planetName || (planetInclination >= minEarthIncl && planetInclination <= maxEarthIncl)) {
-      const crossIncl = planetName
-        ? (getEclipticInclinationAtYear(planetName, (yearMin + yearMax) / 2) || planetInclination)
-        : planetInclination;
-      const allCrossings = findAllInclinationCrossings(crossIncl, yearMin, yearMax);
-      criticalYears.push(...allCrossings);
-    }
-
-    // Sort critical years and remove duplicates
-    criticalYears = [...new Set(criticalYears)].sort((a, b) => a - b);
-
-    // Integrate over segments
-    let effect = 0;
-    for (let idx = 0; idx < criticalYears.length - 1; idx++) {
-      const segStart = criticalYears[idx];
-      const segEnd = criticalYears[idx + 1];
-
-      const oblStart = getObliquityAtYear(segStart);
-      const oblEnd = getObliquityAtYear(segEnd);
-      const deltaObl = (oblEnd - oblStart) * DEG2RAD;
-
-      const midYear = (segStart + segEnd) / 2;
-      const earthInclAtMid = getEarthInclinationAtYear(midYear);
-
-      // Use dynamic ecliptic inclination when planetName is provided
-      const dynIncl = planetName
-        ? (getEclipticInclinationAtYear(planetName, midYear) || planetInclination)
-        : planetInclination;
-      const inclDirection = earthInclAtMid > dynIncl ? 1 : -1;
-      const dynTanI = Math.tan(dynIncl * DEG2RAD);
-      if (Math.abs(dynTanI) < 1e-10) continue;
-      const segRate = -sinOmega / dynTanI;
-
-      effect += segRate * inclDirection * deltaObl * RAD2DEG;
-    }
-
-    return effect * dir;
-  };
-
-  // Calculate the net effect: from epoch (2000) to current year
-  // This properly handles all obliquity direction changes and inclination crossovers
-  const effectFromEpoch = integrateEffect(EPOCH_YEAR, currentYear);
-
-  // Apply accumulated effect to the static (epoch) value
-  let newOmega = staticOmega + effectFromEpoch;
-
-  // Normalize to 0-360
-  newOmega = ((newOmega % 360) + 360) % 360;
-
-  return newOmega;
+        return extrema;
+      },
+      inclinationCrossingsInRange: (crossIncl, yearMin, yearMax) => findAllInclinationCrossings(crossIncl, yearMin, yearMax),
+      eclipticInclinationAt: planetName
+        ? (y) => getEclipticInclinationAtYear(planetName, y) || planetInclination
+        : null,
+      earthInclinationMeanDeg: earthInvPlaneInclinationMean,
+      earthInclinationAmplitudeDeg: earthInvPlaneInclinationAmplitude,
+    },
+  );
 }
 
 /**
