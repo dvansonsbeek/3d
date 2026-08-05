@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -1421,14 +1421,22 @@ const _massFrac = {
   mercury: M_MERCURY_SYSTEM / M_SUN, venus: M_VENUS_SYSTEM / M_SUN, mars: M_MARS_SYSTEM / M_SUN,
   jupiter: M_JUPITER_SYSTEM / M_SUN, saturn: M_SATURN_SYSTEM / M_SUN, uranus: M_URANUS_SYSTEM / M_SUN, neptune: M_NEPTUNE_SYSTEM / M_SUN,
 };
-const psiConstant = 3 * earthInvPlaneInclinationAmplitude * Math.sqrt(M_EARTH_ALONE / M_SUN);
+// Phase 8.3 L2: the ψ law lives ONCE in @hum/physics/planets/fibonacci-laws.
+const psiConstant = _FL.computePsiConstant({
+  earthInvPlaneInclinationAmplitude, massEarthAlone: M_EARTH_ALONE, massSun: M_SUN,
+});
 for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune']) {
   const p = planets[key];
   if (p && _fibD[key] && _massFrac[key]) {
-    p.invPlaneInclinationAmplitude = psiConstant / (_fibD[key] * Math.sqrt(_massFrac[key]));
-    const _antiPhase = p.antiPhase ? -1 : 1;
-    p.invPlaneInclinationMean = p.invPlaneInclinationJ2000
-      - _antiPhase * p.invPlaneInclinationAmplitude * Math.cos((p.longitudePerihelion - p.inclinationCycleAnchor) * Math.PI / 180);
+    const _il = _FL.computeInclinationLaw({
+      fibonacciD: _fibD[key], massFrac: _massFrac[key],
+      invPlaneInclinationJ2000: p.invPlaneInclinationJ2000,
+      longitudePerihelion: p.longitudePerihelion,
+      inclinationCycleAnchor: p.inclinationCycleAnchor,
+      antiPhase: p.antiPhase,
+    }, psiConstant);
+    p.invPlaneInclinationAmplitude = _il.amplitude;
+    p.invPlaneInclinationMean = _il.mean;
   }
 }
 
@@ -1442,16 +1450,11 @@ for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune
 // Earth check: periICRF = H/3, |−13/H − 3/H| = 16/H → H/16 ✓
 // If |axial| > 8H (frozen, e.g. Uranus ~200 Myr, Neptune ~23 Myr), treat as
 // infinite: wobble = |ICRF| exactly. Gives Uranus 8H/80 and Neptune 8H/100.
+// Phase 8.3 L2: the wobble law lives ONCE in @hum/physics (this delegate
+// reads the LIVE holisticyearLength, so recomputePlanetCyclesForEpoch keeps
+// its epoch semantics; the sign-free beat convention is in the module).
 function calcWobblePeriod(periEclYr, axialYr) {
-  const H13 = holisticyearLength / 13;
-  const inclICRF = (periEclYr * H13) / (H13 - periEclYr);
-  if (Math.abs(axialYr) > 8 * holisticyearLength) return Math.abs(inclICRF);
-  // Beat of two absolute rates: sign convention of axial/ICRF is irrelevant —
-  // wobble is the magnitude of the frequency difference, not a signed rate.
-  // This matters for Venus (prograde axial, retrograde ICRF); matches other
-  // planets where axial and ICRF share a sign (result identical).
-  const wobbleRate = Math.abs(1 / Math.abs(axialYr) - 1 / Math.abs(inclICRF));
-  return 1 / wobbleRate;
+  return _FL.computeWobblePeriodYears(periEclYr, axialYr, holisticyearLength);
 }
 let   mercuryWobblePeriod  = calcWobblePeriod(planets.mercury.perihelionEclipticYears, planets.mercury.axialPrecessionYears);  // Phase 5: mutable
 let   venusWobblePeriod    = calcWobblePeriod(planets.venus.perihelionEclipticYears,   planets.venus.axialPrecessionYears);    // Phase 5: mutable
@@ -1471,12 +1474,12 @@ let   neptuneWobblePeriod  = calcWobblePeriod(planets.neptune.perihelionEcliptic
 // Aliases: source of truth is planets.<key>.obliquityCycle (declared in the
 // planet blocks above). Kept as named constants for compact downstream use.
 let   mercuryObliquityCycle = planets.mercury.obliquityCycle;   // 8H/3 = 894,179 yr (Bills 2005 ~895 kyr, 0.2% match) — Phase 5: mutable
-let   venusObliquityCycle   = Math.abs(1 / (1 / planets.venus.perihelionEclipticYears - 13 / holisticyearLength));   // = |ICRF| (tidally damped, cancels) — Phase 5: mutable
+let   venusObliquityCycle   = _FL.resolveObliquityCycleYears(undefined, planets.venus.perihelionEclipticYears, holisticyearLength);   // = |ICRF| (tidally damped, cancels) — Phase 5: mutable
 let   marsObliquityCycle    = planets.mars.obliquityCycle;       // 8H/21 = 127,740 yr — Phase 5: mutable
 let   jupiterObliquityCycle = planets.jupiter.obliquityCycle;    // H/2 = 167,659 yr — Phase 5: mutable
 let   saturnObliquityCycle  = planets.saturn.obliquityCycle;     // H/3 = 111,765 yr — Phase 5: mutable
 let   uranusObliquityCycle  = planets.uranus.obliquityCycle;     // H/2 = 167,659 yr — Phase 5: mutable
-let   neptuneObliquityCycle = Math.abs(1 / (1 / planets.neptune.perihelionEclipticYears - 13 / holisticyearLength));  // = |ICRF| (tidally damped, cancels) — Phase 5: mutable
+let   neptuneObliquityCycle = _FL.resolveObliquityCycleYears(undefined, planets.neptune.perihelionEclipticYears, holisticyearLength);  // = |ICRF| (tidally damped, cancels) — Phase 5: mutable
 
 // Mean obliquity (analytical, averaged over 8H = Solar System Resonance Cycle)
 // mean = tiltJ2000 + amp×cos(ωᵢ·t₂₀₀₀) − amp×cos(ωₒ·t₂₀₀₀)
@@ -1507,12 +1510,16 @@ function calcObliquityMean(planetKey, obliqCycle) {
     return p.axialTiltJ2000 + amp * Math.cos(2 * Math.PI * cyc_icrf)
                             - amp * Math.cos(2 * Math.PI * cyc_obliq);
   } catch (e) {
-    // Module-load fallback (TDZ) — snapshot mode using live J2000 globals
-    const t2000 = 2000 - (balancedYear - systemResetN * holisticyearLength);
-    const genPrecRate = 1 / (holisticyearLength / 13);
-    const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
-    return p.axialTiltJ2000 + amp * Math.cos(2 * Math.PI * t2000 / icrfPeriod)
-                            - amp * Math.cos(2 * Math.PI * t2000 / obliqCycle);
+    // Module-load fallback (TDZ) — snapshot law from @hum/physics (8.3 L2),
+    // live J2000 globals for H and the eccentricity anchor.
+    return _FL.computeObliquityMeanSnapshot({
+      axialTiltJ2000: p.axialTiltJ2000,
+      invPlaneInclinationAmplitude: amp,
+      perihelionEclipticYears: p.perihelionEclipticYears,
+    }, obliqCycle, {
+      H: holisticyearLength,
+      t2000: 2000 - (balancedYear - systemResetN * holisticyearLength),
+    });
   }
 }
 let   mercuryObliquityMean = calcObliquityMean('mercury', mercuryObliquityCycle);  // Phase 5: mutable
@@ -1533,7 +1540,10 @@ let   neptuneObliquityMean = calcObliquityMean('neptune', neptuneObliquityCycle)
 //                 270° for Saturn (anti-phase, mean, falling at anchor)
 //   base = amp·cos(θ) + √(e_J2000² − amp²·sin²(θ))
 // Closes the full loop: PSI → incl amp → mean tilt → K → ecc amp → phase → base
-const _kConstant = eccentricityAmplitude * Math.sqrt(M_EARTH_ALONE / M_SUN) / (Math.sin(earthtiltMean * Math.PI / 180) * Math.sqrt(3));
+const _kConstant = _FL.computeKConstant({
+  eccentricityAmplitude, massEarthAlone: M_EARTH_ALONE, massSun: M_SUN,
+  earthTiltMeanDeg: earthtiltMean,
+});
 const _obliqMeans = { mercury: mercuryObliquityMean, venus: venusObliquityMean, mars: marsObliquityMean,
   jupiter: jupiterObliquityMean, saturn: saturnObliquityMean, uranus: uranusObliquityMean, neptune: neptuneObliquityMean };
 const _wobblePeriods = { mercury: mercuryWobblePeriod, venus: venusWobblePeriod, mars: marsWobblePeriod,
@@ -1543,19 +1553,20 @@ let   _eccentricityAnchor = balancedYear - systemResetN * holisticyearLength;  /
 const _t2000 = 2000 - _eccentricityAnchor;
 for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune']) {
   const p = planets[key];
-  const a = Math.pow(p.solarYearInput / _P_earth, 2 / 3);
-  p.orbitalEccentricityAmplitude = _kConstant * Math.sin(Math.abs(_obliqMeans[key]) * Math.PI / 180) * Math.sqrt(_fibD[key])
-    / (Math.sqrt(_massFrac[key]) * Math.pow(a, 1.5));
-  // Base from anchor phase with offset (90° in-phase, 270° Saturn)
-  const amp = p.orbitalEccentricityAmplitude;
-  const eJ2000 = p.orbitalEccentricityJ2000;
-  const phaseOffset = p.antiPhase ? 270 : 90;
-  const phaseDeg = (_t2000 / _wobblePeriods[key]) * 360 + phaseOffset;
-  const cosTheta = Math.cos(phaseDeg * Math.PI / 180);
-  const sinTheta = Math.sin(phaseDeg * Math.PI / 180);
-  const disc = eJ2000 * eJ2000 - amp * amp * sinTheta * sinTheta;
-  p.orbitalEccentricityBase = amp * cosTheta + Math.sqrt(Math.max(0, disc));
-  p.eccentricityPhaseJ2000 = ((phaseDeg % 360) + 360) % 360;
+  // Phase 8.3 L2: the K law lives ONCE in @hum/physics/planets/fibonacci-laws.
+  const _el = _FL.computeEccentricityLaw({
+    fibonacciD: _fibD[key], massFrac: _massFrac[key],
+    solarYearInput: p.solarYearInput,
+    orbitalEccentricityJ2000: p.orbitalEccentricityJ2000,
+    antiPhase: p.antiPhase,
+  }, {
+    kConstant: _kConstant, obliquityMeanDeg: _obliqMeans[key],
+    wobblePeriodYears: _wobblePeriods[key], t2000: _t2000,
+    meanSolarYearDays: _P_earth,
+  });
+  p.orbitalEccentricityAmplitude = _el.amplitude;
+  p.orbitalEccentricityBase = _el.base;
+  p.eccentricityPhaseJ2000 = _el.phaseJ2000;
 }
 
 // ─── E3. Orbital formulas ───────────────────────────────────────────────

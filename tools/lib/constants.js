@@ -434,7 +434,12 @@ const M_SUN = GM_SUN / G_CONSTANT;
 massFraction.earth = (GM_EARTH_ALONE / G_CONSTANT) / M_SUN;
 
 // PSI derived from Earth's fitted inclination amplitude: PSI = d_Earth × amp_Earth × √m_Earth
-const PSI = 3 * earthInvPlaneInclinationAmplitude * Math.sqrt(massFraction.earth);
+// Phase 8.3 L2: the Fibonacci laws live ONCE in @hum/physics/planets/fibonacci-laws.
+const FL = require('@hum/physics/planets/fibonacci-laws');
+const PSI = FL.computePsiConstant({
+  earthInvPlaneInclinationAmplitude,
+  massEarthAlone: GM_EARTH_ALONE / G_CONSTANT, massSun: M_SUN,
+});
 
 const eccJ2000 = {
   mercury: planets.mercury.orbitalEccentricityJ2000,
@@ -454,10 +459,15 @@ const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
 // Uses perihelion longitude (ICRF reference) instead of ascending node
 for (const [key, p] of Object.entries(planets)) {
   if (p.fibonacciD && massFraction[key] && p.invPlaneInclinationJ2000 !== undefined) {
-    p.invPlaneInclinationAmplitude = utils.computeInvPlaneInclinationAmplitude(PSI, p.fibonacciD, massFraction[key]);
-    p.invPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
-      p.invPlaneInclinationJ2000, p.invPlaneInclinationAmplitude,
-      p.longitudePerihelion, p.inclinationCycleAnchor, p.antiPhase);
+    const il = FL.computeInclinationLaw({
+      fibonacciD: p.fibonacciD, massFrac: massFraction[key],
+      invPlaneInclinationJ2000: p.invPlaneInclinationJ2000,
+      longitudePerihelion: p.longitudePerihelion,
+      inclinationCycleAnchor: p.inclinationCycleAnchor,
+      antiPhase: p.antiPhase,
+    }, PSI);
+    p.invPlaneInclinationAmplitude = il.amplitude;
+    p.invPlaneInclinationMean = il.mean;
   }
 }
 
@@ -465,26 +475,19 @@ for (const [key, p] of Object.entries(planets)) {
 // Matches script.js calcWobblePeriod(). Needed before K derivation for base eccentricity.
 // If |axial| > 8H (effectively frozen, e.g. Uranus ~200 Myr, Neptune ~23 Myr),
 // treat as infinite: wobble = |ICRF period| exactly.
-const H13 = H / 13;
-const FROZEN_THRESHOLD = 8 * H;
 for (const [key, p] of Object.entries(planets)) {
   if (p.perihelionEclipticYears && p.axialPrecessionYears) {
-    const inclICRF = (p.perihelionEclipticYears * H13) / (H13 - p.perihelionEclipticYears);
-    if (Math.abs(p.axialPrecessionYears) > FROZEN_THRESHOLD) {
-      p.wobblePeriod = Math.abs(inclICRF);
-    } else {
-      // Magnitude of frequency difference — sign of axial vs ICRF is irrelevant.
-      // Needed so Venus (prograde axial, retrograde ICRF) gives the slow beat.
-      const wobbleRate = Math.abs(1 / Math.abs(p.axialPrecessionYears) - 1 / Math.abs(inclICRF));
-      p.wobblePeriod = 1 / wobbleRate;
-    }
+    p.wobblePeriod = FL.computeWobblePeriodYears(p.perihelionEclipticYears, p.axialPrecessionYears, H);
   }
 }
 
 // K derived from Earth: K = e_amp × √m / (sin(meanObliquity) × √d)
 // Symmetric with PSI: eccentricity amplitude = K × sin(meanObliquity) × √d / (√m × a^1.5)
-eccentricityAmplitudeK = eccentricityAmplitude * Math.sqrt(massFraction.earth)
-  / (Math.sin(earthtiltMean * Math.PI / 180) * Math.sqrt(3));
+eccentricityAmplitudeK = FL.computeKConstant({
+  eccentricityAmplitude,
+  massEarthAlone: GM_EARTH_ALONE / G_CONSTANT, massSun: M_SUN,
+  earthTiltMeanDeg: earthtiltMean,
+});
 
 // Obliquity cycles (loaded per-planet from model-parameters.json via p.obliquityCycle).
 // Mercury: 8H/3 (Fibonacci decomposition). Mars: 8H/21 (= Jupiter axial, mirror swap).
@@ -499,46 +502,30 @@ const eccentricityAnchor = balancedYear - systemResetN * H;
 const t2000 = 2000 - eccentricityAnchor;
 for (const [key, p] of Object.entries(planets)) {
   if (!p.fibonacciD || !massFraction[key]) continue;
-  // Mean obliquity: remove J2000 oscillation offset
-  const obliqPeriod = p.obliquityCycle;
-  if (obliqPeriod && p.invPlaneInclinationAmplitude) {
-    const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
-    p.obliquityMean = p.axialTiltJ2000
-      + p.invPlaneInclinationAmplitude * Math.cos(2 * Math.PI * t2000 / icrfPeriod)
-      - p.invPlaneInclinationAmplitude * Math.cos(2 * Math.PI * t2000 / obliqPeriod);
-  } else {
-    p.obliquityMean = p.axialTiltJ2000;
-  }
-  // Eccentricity amplitude from K using mean obliquity
-  const a = Math.pow(p.solarYearInput / meanSolarYearDays, 2 / 3);
-  p.orbitalEccentricityAmplitude = eccentricityAmplitudeK
-    * Math.sin(Math.abs(p.obliquityMean) * Math.PI / 180) * Math.sqrt(p.fibonacciD)
-    / (Math.sqrt(massFraction[key]) * Math.pow(a, 1.5));
-  // Base eccentricity from phase at eccentricity anchor
-  // Phase at J2000 = phaseOffset + (2000 - anchor) / wobblePeriod × 360°
-  // Phase offset: 90° for in-phase planets (mean, rising at anchor)
-  //               270° for Saturn (anti-phase, mean, falling at anchor)
-  // This encodes the physical state at n=7: all planets at mean eccentricity,
-  // with Saturn falling and others rising (mirrors inclination alignment).
-  // Then solve: e_J2000² = base² + amp² - 2·base·amp·cos(θ)
-  const amp = p.orbitalEccentricityAmplitude;
-  const eJ2000 = p.orbitalEccentricityJ2000;
-  if (p.wobblePeriod) {
-    const phaseOffset = p.antiPhase ? 270 : 90;
-    const phaseDeg = (t2000 / p.wobblePeriod) * 360 + phaseOffset;
-    const cosTheta = Math.cos(phaseDeg * Math.PI / 180);
-    const sinTheta = Math.sin(phaseDeg * Math.PI / 180);
-    const disc = eJ2000 * eJ2000 - amp * amp * sinTheta * sinTheta;
-    p.orbitalEccentricityBase = amp * cosTheta + Math.sqrt(Math.max(0, disc));
-    p.eccentricityPhaseJ2000 = ((phaseDeg % 360) + 360) % 360;
-  } else {
-    // No wobble period — use J2000 as base, derive phase from law of cosines
-    p.orbitalEccentricityBase = eJ2000;
-    const base = eJ2000;
-    const cosTheta = (base * base + amp * amp - eJ2000 * eJ2000) / (2 * base * amp);
-    p.eccentricityPhaseJ2000 = Math.abs(cosTheta) <= 1
-      ? Math.acos(cosTheta) * 180 / Math.PI : (cosTheta > 1 ? 0 : 180);
-  }
+  // Mean obliquity — the shared snapshot law (8.3 L2; the browser's TDZ
+  // fallback form, which is what both engines ship at load).
+  p.obliquityMean = FL.computeObliquityMeanSnapshot({
+    axialTiltJ2000: p.axialTiltJ2000,
+    invPlaneInclinationAmplitude: p.invPlaneInclinationAmplitude,
+    perihelionEclipticYears: p.perihelionEclipticYears,
+  }, p.obliquityCycle, { H, t2000 });
+  // K law — the shared implementation (8.3 L2). The old no-wobblePeriod
+  // `else` branch was DEAD code (this loop is fibonacciD-guarded and all
+  // seven carriers have wobble periods) and is dropped — the fixtures
+  // adjudicate.
+  const el = FL.computeEccentricityLaw({
+    fibonacciD: p.fibonacciD, massFrac: massFraction[key],
+    solarYearInput: p.solarYearInput,
+    orbitalEccentricityJ2000: p.orbitalEccentricityJ2000,
+    antiPhase: p.antiPhase,
+  }, {
+    kConstant: eccentricityAmplitudeK, obliquityMeanDeg: p.obliquityMean,
+    wobblePeriodYears: p.wobblePeriod, t2000,
+    meanSolarYearDays,
+  });
+  p.orbitalEccentricityAmplitude = el.amplitude;
+  p.orbitalEccentricityBase = el.base;
+  p.eccentricityPhaseJ2000 = el.phaseJ2000;
 }
 
 

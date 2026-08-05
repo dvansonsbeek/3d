@@ -15,7 +15,8 @@
     "./moon/arguments": "./src/moon/arguments.cjs",
     "./moon/series": "./src/moon/series.cjs",
     "./moon/apparent": "./src/moon/apparent.cjs",
-    "./planets/geometry": "./src/planets/geometry.cjs"
+    "./planets/geometry": "./src/planets/geometry.cjs",
+    "./planets/fibonacci-laws": "./src/planets/fibonacci-laws.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }
