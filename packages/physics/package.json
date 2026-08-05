@@ -18,7 +18,8 @@
     "./planets/geometry": "./src/planets/geometry.cjs",
     "./planets/fibonacci-laws": "./src/planets/fibonacci-laws.cjs",
     "./planets/ecc-channel": "./src/planets/ecc-channel.cjs",
-    "./planets/orientation": "./src/planets/orientation.cjs"
+    "./planets/orientation": "./src/planets/orientation.cjs",
+    "./planets/asc-node-integrator": "./src/planets/asc-node-integrator.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }

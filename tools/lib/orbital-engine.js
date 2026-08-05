@@ -382,90 +382,27 @@ function findAllInclinationCrossings(targetInclination, startYear, endYear) {
  * @returns {number} Dynamic ascending node longitude (0-360°)
  */
 function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentYear, planetName) {
-  const DEG2RAD = Math.PI / 180;
+  // Phase 8.3 L5: the segment integration lives ONCE in
+  // @hum/physics/planets/asc-node-integrator. The Tychosium orbitTilt
+  // decomposition stays HERE (§2h — the scheme names never enter the
+  // package); the engine's evaluators are injected per call. The browser's
+  // 6-arg variant (S-P5) remains engine-side pending probes — recorded
+  // follow-up for the factory pass.
   const RAD2DEG = 180 / Math.PI;
-
-  // Extract static ascending node and inclination from tilts
   const staticOmegaDeg = Math.atan2(orbitTilta, orbitTiltb) * RAD2DEG;
-  const staticOmega = ((staticOmegaDeg % 360) + 360) % 360;
-  const planetInclination = Math.sqrt(orbitTilta * orbitTilta + orbitTiltb * orbitTiltb);
+  const ascendingNodeDeg = ((staticOmegaDeg % 360) + 360) % 360;
+  const inclinationDeg = Math.sqrt(orbitTilta * orbitTilta + orbitTiltb * orbitTiltb);
 
-  if (planetInclination < 1e-6) return staticOmega;
-
-  const i = planetInclination * DEG2RAD;
-  const OmegaRad = staticOmega * DEG2RAD;
-  const tanI = Math.tan(i);
-  if (Math.abs(tanI) < 1e-10) return staticOmega;
-
-  // Base perturbation rate: dΩ/dε = -sin(Ω) / tan(i)
-  const sinOmega = Math.sin(OmegaRad);
-  const baseDOmegaDeps = -sinOmega / tanI;
-
-  const EPOCH_YEAR = 2000;
-
-  // Helper: integrate effect between two years with segment handling
-  const integrateEffect = (fromYear, toYear) => {
-    if (Math.abs(toYear - fromYear) < 0.1) return 0;
-
-    const yearMin = Math.min(fromYear, toYear);
-    const yearMax = Math.max(fromYear, toYear);
-    const dir = toYear >= fromYear ? 1 : -1;
-
-    let criticalYears = [yearMin, yearMax];
-
-    // Look up precomputed obliquity extrema (O(log n) binary search)
-    criticalYears.push(..._getObliquityExtremaInRange(yearMin, yearMax));
-
-    // Find ALL inclination crossings
-    const minEarthIncl = C.earthInvPlaneInclinationMean - C.earthInvPlaneInclinationAmplitude;
-    const maxEarthIncl = C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude;
-
-    // When planetName is provided, the ecliptic inclination is dynamic and could enter
-    // Earth's range even if the J2000 value is outside — always search for crossovers
-    if (planetName || (planetInclination >= minEarthIncl && planetInclination <= maxEarthIncl)) {
-      const crossIncl = planetName
-        ? computeEclipticInclination(planetName, (yearMin + yearMax) / 2)
-        : planetInclination;
-      const allCrossings = findAllInclinationCrossings(crossIncl, yearMin, yearMax);
-      criticalYears.push(...allCrossings);
-    }
-
-    // Sort and deduplicate
-    criticalYears = [...new Set(criticalYears)].sort((a, b) => a - b);
-
-    // Integrate over segments
-    let effect = 0;
-    for (let idx = 0; idx < criticalYears.length - 1; idx++) {
-      const segStart = criticalYears[idx];
-      const segEnd = criticalYears[idx + 1];
-
-      const oblStart = computeObliquityEarth(segStart);
-      const oblEnd = computeObliquityEarth(segEnd);
-      const deltaObl = (oblEnd - oblStart) * DEG2RAD;
-
-      const midYear = (segStart + segEnd) / 2;
-      const earthInclAtMid = computeInclinationEarth(midYear);
-
-      // Use dynamic ecliptic inclination when planetName is provided
-      const dynIncl = planetName
-        ? computeEclipticInclination(planetName, midYear)
-        : planetInclination;
-      const inclDirection = earthInclAtMid > dynIncl ? 1 : -1;
-      const dynTanI = Math.tan(dynIncl * DEG2RAD);
-      if (Math.abs(dynTanI) < 1e-10) continue; // skip near-zero inclination
-      const segRate = -sinOmega / dynTanI;
-
-      effect += segRate * inclDirection * deltaObl * RAD2DEG;
-    }
-
-    return effect * dir;
-  };
-
-  // Calculate net effect from epoch (2000) to current year
-  const effectFromEpoch = integrateEffect(EPOCH_YEAR, currentYear);
-
-  let newOmega = staticOmega + effectFromEpoch;
-  return ((newOmega % 360) + 360) % 360;
+  return require('@hum/physics/planets/asc-node-integrator').integrateAscendingNode(
+    { ascendingNodeDeg, inclinationDeg }, currentYear, {
+      obliquityAt: computeObliquityEarth,
+      earthInclinationAt: computeInclinationEarth,
+      obliquityExtremaInRange: _getObliquityExtremaInRange,
+      inclinationCrossingsInRange: findAllInclinationCrossings,
+      eclipticInclinationAt: planetName ? (year) => computeEclipticInclination(planetName, year) : null,
+      earthInclinationMeanDeg: C.earthInvPlaneInclinationMean,
+      earthInclinationAmplitudeDeg: C.earthInvPlaneInclinationAmplitude,
+    });
 }
 
 /**
