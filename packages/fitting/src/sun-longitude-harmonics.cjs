@@ -271,8 +271,8 @@ function solveCholesky(A, b, n) {
 // output (e.g. earthInvPlaneInclinationAmplitude shifted by ~90 arcsec).
 // Limiting to (a)+(b)+(c) keeps only physically-motivated harmonics.
 const H_ROUND = Math.round(C.H);
-// eslint-disable-next-line no-unused-vars -- dead since the sharesFactorWithH whitelist clause was removed (2026-07-15); kept during the 9-3d move, deletion candidate at the fitter refactor
-function _gcdInt(a, b) { a = Math.abs(a); b = Math.abs(b); while (b !== 0) { const t = b; b = a % b; a = t; } return a; }
+// (_gcdInt was deleted at 9-3e — orphaned when the sharesFactorWithH
+// whitelist clause was removed, 2026-07-15; git history preserves it.)
 function _isRuntimeWhitelisted(divisor) {
   const isYearMultiple      = divisor >= H_ROUND && divisor % H_ROUND === 0;
   const isPrecessionDivisor = divisor > 0 && divisor <= 20;

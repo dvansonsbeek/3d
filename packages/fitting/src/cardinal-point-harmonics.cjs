@@ -196,13 +196,10 @@ if (!TROP_HARMONICS || !TROP_ANCHOR) {
   throw new Error('Step 6c now derives from Step 6d — run `node tools/fit/year-length-harmonics.js --write` first.');
 }
 
-// eslint-disable-next-line no-unused-vars -- dead since the table-interpolation path shipped; kept as the analytic reference during the 9-3d move, deletion candidate at the fitter refactor
-const analyticTropDays = (year) => {
-  const t_Ma = (J2000_CALENDAR_YEAR - year) / 1e6;
-  const sidSec = DT.meanSiderealYearSecondsAtAge(t_Ma);
-  const Ht = DT.meanHAtAge(t_Ma);
-  return (sidSec === null || Ht === null) ? null : (sidSec / 86400) * (1 - 13 / Ht);
-};
+// (The analyticTropDays reference evaluator was deleted at 9-3e — dead
+// since the table-interpolation path shipped; the analytic form lives in
+// @hum/physics/deltat/deep-time tropicalYearDaysAtAge, and git history
+// preserves the old local copy.)
 
 const _cycleOf = (year) => {
   const c = DT.cyclesBetweenYears(C.balancedYear, year, 1);

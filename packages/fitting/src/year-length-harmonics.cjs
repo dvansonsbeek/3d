@@ -305,60 +305,10 @@ function fitHarmonicsJ2000Anchored(data, meanField, anchorValue, anchorYear, div
   return { harmonics, rmse, anchorValue, anchorYear };
 }
 
-// Backwards-compat wrapper: fits with base = meanValue (unchanged old behavior).
-// Kept so any other callers/scripts that import this file still work.
-// eslint-disable-next-line no-unused-vars -- see above: retained for external callers; deletion candidate at the fitter refactor
-function fitHarmonics(data, meanField, meanValue, divisors) {
-  const n = data.length;
-  const m = divisors.length * 2;
-
-  const A = new Array(n);
-  const b = new Float64Array(n);
-
-  for (let i = 0; i < n; i++) {
-    b[i] = data[i][meanField] - meanValue;
-    A[i] = new Float64Array(m);
-    for (let k = 0; k < divisors.length; k++) {
-      const phase = 2 * Math.PI * data[i].cycle * divisors[k];
-      A[i][2 * k] = Math.sin(phase);
-      A[i][2 * k + 1] = Math.cos(phase);
-    }
-  }
-
-  const ATA = new Array(m);
-  const ATb = new Float64Array(m);
-  for (let j = 0; j < m; j++) {
-    ATA[j] = new Float64Array(m);
-    for (let k = 0; k < m; k++) {
-      let s = 0;
-      for (let i = 0; i < n; i++) s += A[i][j] * A[i][k];
-      ATA[j][k] = s;
-    }
-    let s = 0;
-    for (let i = 0; i < n; i++) s += A[i][j] * b[i];
-    ATb[j] = s;
-  }
-
-  const x = solveCholesky(ATA, ATb, m);
-  const harmonics = [];
-  for (let k = 0; k < divisors.length; k++) {
-    harmonics.push([divisors[k], x[2 * k], x[2 * k + 1]]);
-  }
-
-  let sse = 0;
-  for (let i = 0; i < n; i++) {
-    let pred = meanValue;
-    for (const [div, sinC, cosC] of harmonics) {
-      const phase = 2 * Math.PI * data[i].cycle * div;
-      pred += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-    }
-    const err = (data[i][meanField] - pred) * 86400;
-    sse += err * err;
-  }
-  const rmse = Math.sqrt(sse / n);
-
-  return { harmonics, rmse };
-}
+// (The mean-based fitHarmonics backwards-compat wrapper was deleted at
+// 9-3e: its "kept for external callers" claim was phantom — this CLI has
+// no module.exports, so nothing could ever import it. The J2000-anchored
+// fitter above is the only live path; git history preserves the old form.)
 
 function solveCholesky(A, b, n) {
   const L = new Array(n);
