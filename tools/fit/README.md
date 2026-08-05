@@ -1,5 +1,14 @@
 # Fitting & Derivation Scripts
 
+> **Phase 9 (9-3a–9-3h):** the implementations live in
+> **`packages/fitting/src/`** (`@hum/fitting`) — moved with `git mv`, history
+> preserved. Every `tools/fit/*.js` path documented below still works: each is
+> a one-line shim into the package (argv/env pass through), kept so this
+> README, the pipeline steps, and muscle memory stay valid. Exceptions still
+> living here: `export-to-holistic.js` (deletes at Phase 21) and `python/`
+> (§2f). The verify suite stays in `tools/verify` with its run-suite
+> classification until `tools/lib` becomes adapters.
+
 All scripts that produce fitted coefficients or derived constants live here.
 Output values are stored in `public/input/fitted-coefficients.json`.
 
