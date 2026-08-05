@@ -237,6 +237,22 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     v[`ecl.umbraNASA@${jd}.gamma`] = un.gamma;
   }
 
+  // ── Phase 8.6-0: the published reference curves (browser-only family) ─────
+  // NaN-valued cells (outside a curve's validity window) record as null via
+  // JSON round-trip — that is itself pinned behaviour.
+  for (const y of [-200000, -50000, -10000, -1000, 0, 1000, 1950, 2000, 2024, 50000, 100000]) {
+    for (const [k, n] of Object.entries(T.refCurvesAt(y))) v[`refCurve.${k}@${y}`] = n;
+  }
+  // Stephenson evaluator with a synthetic poly literal — pins the pure spline
+  // (the real poly is fetch-loaded app data).
+  const STEPH_TEST_POLY = { segments: [
+    { y0: -720, y1: 400, a: [10583.6, -7000.5, 1200.25, -33.125] },
+    { y0: 400, y1: 2016, a: [120.0, -95.5, 40.0625, -1.5] },
+  ] };
+  for (const y of [-500, 1000, 2000]) {
+    v[`refSteph@${y}`] = T.refStephensonAt(y, STEPH_TEST_POLY);
+  }
+
   // The reset must be exact, or every anchor above is measured against a
   // drifting baseline. Recorded rather than asserted so the fixture shows it.
   const back = T.anchors();

@@ -6008,6 +6008,24 @@ if (typeof window !== 'undefined') {
     eclFindSolar: (jdStart, jdEnd) => findSolarEclipsesInRange(jdStart, jdEnd),
     eclUmbraSceneAt: (jd) => umbraFromSceneAtJd(jd),
     eclUmbraNASAAt: (jd) => umbraNASAConventionAtJd(jd),
+    // ── Phase 8.6-0 published-reference-curve surface ────────────────────────
+    // Pins CURRENT behaviour of the external comparison curves before the
+    // reports/reference extraction (browser-only; published formulas +
+    // datasets: Laskar 2004 analytic + La2004 N-body table, Berger 1978,
+    // Vondrák 2011, Chapront, Capitaine 2009, Peters, Stephenson 2016).
+    refCurvesAt: (year) => ({
+      tropicalYearLaskar: tropicalYearLaskar(year),
+      solarDayPeters: solarDayPeters(year),
+      siderealYearChapront: siderealYearChapront(year),
+      axialPrecessionCapitaine: axialPrecessionCapitaine2009(year),
+      eccBerger1978: eccBerger1978(year),
+      obliquityBerger1978: obliquityBerger1978(year),
+      axialPrecessionVondrak: axialPrecessionVondrak2011(year),
+      eccLa2004: eccLa2004(year),
+      obliquityLa2004: obliquityLa2004(year),
+      meeusMeanObliquityRad: meeusMeanObliquityRad((yearToJDApprox(year) - j2000JD) / julianCenturyDays),
+    }),
+    refStephensonAt: (year, poly) => stephensonDeltaT(year, poly),
   };
 }
 
