@@ -478,10 +478,9 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentY
  */
 function computeAscendingNodeInvPlane(planetName, year) {
   const p = C.planets[planetName];
-  if (!p || !p.ascendingNodeInvPlane) return 0;
-  const period = p.ascendingNodePeriod || p.perihelionEclipticYears;
-  const rate = 360 / period;
-  return ((p.ascendingNodeInvPlane + rate * (year - 2000)) % 360 + 360) % 360;
+  if (!p) return 0;
+  // 8.3 L4: the linear year-2000 node convention lives in @hum/physics.
+  return require('@hum/physics/planets/orientation').ascendingNodeInvPlaneLinearAt(p, year);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -624,36 +623,21 @@ function computePlanetInvPlaneInclinationDynamic(planetName, currentYear, julian
   const p = C.planets[planetName];
   if (!p) return 0;
 
-  const i_J2000 = p.invPlaneInclinationJ2000;
-  const i_mean = p.invPlaneInclinationMean;
-  const amplitude = p.invPlaneInclinationAmplitude;
-  const phaseOffset = p.inclinationCycleAnchor;
-
-  if (i_J2000 === undefined || amplitude === undefined) {
-    return i_J2000 || 0;
-  }
-
-  if (amplitude === 0) return i_J2000;
-
-  // ICRF perihelion period: Earth = H/3 directly, others = 1/(1/eclP - 1/(H/13))
-  const genPrecRate = 1 / (C.H / 13);
-  const icrfPeriod = (planetName === 'earth')
-    ? C.H / 3
-    : 1 / (1 / p.perihelionEclipticYears - genPrecRate);
-  const icrfRate = 360 / icrfPeriod;
-
+  // 8.3 L4: the ICRF-linked oscillation lives in @hum/physics (this engine
+  // honors its year/JD argument; the browser wrapper keeps its historical
+  // scene-JD coupling — see the module header).
   const jd = julianDay || C.yearToJD(currentYear);
   const yearsSinceBalanced = (jd - C.balancedJD) / C.meanSolarYearDays;
-
-  const periLongJ2000 = p.longitudePerihelion;
-  const periAtBalanced = periLongJ2000 - icrfRate * C.yearsFromBalancedToJ2000;
-  const periCurrent = periAtBalanced + icrfRate * yearsSinceBalanced;
-
-  const currentPhaseDeg = periCurrent - phaseOffset;
-  const currentPhaseRad = currentPhaseDeg * Math.PI / 180;
-
-  const antiPhaseSign = p.antiPhase ? -1 : 1;
-  return i_mean + antiPhaseSign * amplitude * Math.cos(currentPhaseRad);
+  return require('@hum/physics/planets/orientation').invPlaneInclinationAt({
+    isEarth: planetName === 'earth',
+    invPlaneInclinationJ2000: p.invPlaneInclinationJ2000,
+    invPlaneInclinationMean: p.invPlaneInclinationMean,
+    invPlaneInclinationAmplitude: p.invPlaneInclinationAmplitude,
+    inclinationCycleAnchor: p.inclinationCycleAnchor,
+    longitudePerihelion: p.longitudePerihelion,
+    perihelionEclipticYears: p.perihelionEclipticYears,
+    antiPhase: p.antiPhase,
+  }, yearsSinceBalanced, { H: C.H, yearsFromBalancedToJ2000: C.yearsFromBalancedToJ2000 });
 }
 
 /**
@@ -702,57 +686,17 @@ function computeEclipticInclination(planetName, currentYear) {
  *  @param {string} key @param {number} yearsSinceBalanced
  *  @returns {number} degrees */
 function computeEclipticInclinationFromBalanced(key, yearsSinceBalanced) {
-  const d2r = Math.PI / 180;
-  const p = C.planets[key];
-  const genPrecRate = 1 / (C.H / 13);
-
-  // --- Earth's orbital plane ---
-  const earthPrecYears = C.ASTRO_REFERENCE.earthInvPlanePrecessionYears;
-  const earthPhaseRad = (yearsSinceBalanced / earthPrecYears) * 2 * Math.PI;
-  const earthI = (C.earthInvPlaneInclinationMean
-    - C.earthInvPlaneInclinationAmplitude * Math.cos(earthPhaseRad)) * d2r;
-
-  // Earth Ω regresses at -H/5 (ecliptic precession rate), NOT at H/3.
-  const earthAscNodePeriod = -C.H / 5;
-  const earthOmegaRate = 360 / earthAscNodePeriod;
-  const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane
-    - earthOmegaRate * C.yearsFromBalancedToJ2000
-    + earthOmegaRate * yearsSinceBalanced) * d2r;
-
-  // --- Planet's orbital plane ---
-  const eclRate = 1 / p.perihelionEclipticYears;
-  const icrfRate = (eclRate - genPrecRate) * 360;  // deg/yr
-  const periICRFDeg = p.longitudePerihelion
-    - icrfRate * C.yearsFromBalancedToJ2000
-    + icrfRate * yearsSinceBalanced;
-
-  const planetPhaseDeg = periICRFDeg - p.inclinationCycleAnchor;
-  const antiPhaseSign = p.antiPhase ? -1 : 1;
-  const planetI = (p.invPlaneInclinationMean
-    + antiPhaseSign * p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
-
-  // Planet Ω advances at the asc-node period (-8H/N), NOT the ecliptic
-  // perihelion period — they are different angles.
-  const planetAscNodePeriod = p.ascendingNodeCyclesIn8H
-    ? -(8 * C.H) / p.ascendingNodeCyclesIn8H
-    : p.perihelionEclipticYears;
-  const planetOmegaRate = 360 / planetAscNodePeriod;
-  const planetOmegaDeg = p.ascendingNodeInvPlane
-    - planetOmegaRate * C.yearsFromBalancedToJ2000
-    + planetOmegaRate * yearsSinceBalanced;
-  const planetOmega = planetOmegaDeg * d2r;
-
-  // --- Dot product of normal vectors → angle between orbital planes ---
-  const eNx = Math.sin(earthI) * Math.sin(earthOmega);
-  const eNy = Math.sin(earthI) * Math.cos(earthOmega);
-  const eNz = Math.cos(earthI);
-
-  const pNx = Math.sin(planetI) * Math.sin(planetOmega);
-  const pNy = Math.sin(planetI) * Math.cos(planetOmega);
-  const pNz = Math.cos(planetI);
-
-  const cosAngle = eNx * pNx + eNy * pNy + eNz * pNz;
-  return Math.acos(Math.max(-1, Math.min(1, cosAngle))) * (180 / Math.PI);
+  // 8.3 L4: the canonical dot-product form lives in @hum/physics
+  // (moved VERBATIM; scene-graph keeps delegating here, so positions ride
+  // one implementation end to end).
+  return require('@hum/physics/planets/orientation').eclipticInclinationFromBalanced(
+    C.planets[key], {
+      invPlanePrecessionYears: C.ASTRO_REFERENCE.earthInvPlanePrecessionYears,
+      inclinationMean: C.earthInvPlaneInclinationMean,
+      inclinationAmplitude: C.earthInvPlaneInclinationAmplitude,
+      ascendingNodeInvPlane: C.ASTRO_REFERENCE.earthAscendingNodeInvPlane,
+    }, yearsSinceBalanced,
+    { H: C.H, yearsFromBalancedToJ2000: C.yearsFromBalancedToJ2000 });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

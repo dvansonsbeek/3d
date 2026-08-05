@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -58204,42 +58204,23 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     return i_J2000;
   }
 
-  // ICRF perihelion-based approach: inclination oscillation linked to perihelion longitude
-  //
-  // Formula: i(t) = mean + A × cos(ω̃_ICRF(t) - phaseAngle)
-  //
-  // where:
-  //   mean = center of oscillation (derived from J2000 constraint)
-  //   A = amplitude (from ψ / (d × √m))
-  //   ω̃_ICRF(t) = perihelion longitude in ICRF at time t
-  //   phaseAngle = ω̃_ICRF at max inclination (from balanced year)
-  //
-  // The ICRF perihelion precesses with time, using balancedYear as epoch:
-  //   ω̃_balanced = ω̃_J2000 - rate × (J2000 - balancedYear)
-  //   ω̃(t) = ω̃_balanced + rate × (t - balancedYear)
-  //
-  // Earth is sole prograde (+H/3); all others retrograde in ICRF.
-  // All ICRF periods divide the Solar System Resonance Cycle (8H) evenly.
-
+  // Phase 8.3 L4: the ICRF-linked oscillation law lives ONCE in
+  // @hum/physics/planets/orientation.
+  // FINDING (preserved, not fixed): currentYear is SHADOWED by the live
+  // scene JD below — historical behaviour; the 8.3-0 fixtures recorded
+  // identical values at every probed epoch. The pure module takes explicit
+  // time, so honouring currentYear later is a one-line, measured change.
   const yearsSinceBalanced = (o.julianDay - balancedJD) / meansolaryearlengthinDays;
-
-  // ICRF perihelion precession rate
-  const icrfRate = 360 / icrfPeriod;  // deg/yr (positive=prograde, negative=retrograde)
-
-  // Back-calculate perihelion longitude at balancedYear from J2000 values
-  const periAtBalanced = periLongJ2000 - icrfRate * yearsFromBalancedToJ2000;
-
-  // Calculate current perihelion longitude from balancedYear reference
-  const periCurrent = periAtBalanced + icrfRate * yearsSinceBalanced;
-
-  // Calculate current phase from ICRF perihelion longitude
-  const currentPhaseDeg = periCurrent - phaseOffset;
-  const currentPhaseRad = currentPhaseDeg * Math.PI / 180;
-
-  // Dynamic inclination centered on the mean
-  // Saturn is anti-phase: cos sign flipped (MAX at balanced year, others at MIN)
-  const antiPhaseSign = (planets[planet] && planets[planet].antiPhase) ? -1 : 1;
-  return i_mean + antiPhaseSign * amplitude * Math.cos(currentPhaseRad);
+  return _PO.invPlaneInclinationAt({
+    isEarth: planet === 'earth',
+    invPlaneInclinationJ2000: i_J2000,
+    invPlaneInclinationMean: i_mean,
+    invPlaneInclinationAmplitude: amplitude,
+    inclinationCycleAnchor: phaseOffset,
+    longitudePerihelion: periLongJ2000,
+    perihelionEclipticYears: planets[planet] ? planets[planet].perihelionEclipticYears : 0,
+    antiPhase: !!(planets[planet] && planets[planet].antiPhase),
+  }, yearsSinceBalanced, { H: holisticyearLength, yearsFromBalancedToJ2000 });
 }
 
 /**
