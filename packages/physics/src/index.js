@@ -102,6 +102,9 @@ export { integrateAscendingNode } from './planets/asc-node-integrator.cjs';
 export * as planetOrbitChain from './planets/orbit-chain.cjs';
 export { evaluateParallaxBasis } from './planets/corrections.cjs';
 export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from './planets/predict.cjs';
+// L10 — the composition front door: one law set, N body records. Thin by
+// design; engines keep their direct call sites (see planets/model.cjs).
+export { createPlanetModel } from './planets/model.cjs';
 
 /**
  * Build a model bound to a set of constants.
