@@ -28,7 +28,8 @@
     "./deltat/deep-time": "./src/deltat/deep-time.cjs",
     "./deltat/historical": "./src/deltat/historical.cjs",
     "./climate/l1-orbital": "./src/climate/l1-orbital.cjs",
-    "./eclipse/finders": "./src/eclipse/finders.cjs"
+    "./eclipse/finders": "./src/eclipse/finders.cjs",
+    "./reference/published-curves": "./src/reference/published-curves.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }

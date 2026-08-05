@@ -112,6 +112,9 @@ export { deltaTEspenakMeeusCanonSeconds } from './deltat/historical.cjs';
 export { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
 // Phase 8.5 — eclipse geometry (single-copy: the browser had no Node twin).
 export { createEclipseFinders } from './eclipse/finders.cjs';
+// Phase 8.6 — the published reference curves (external comparison formulas
+// and datasets, exactly as published; comparison references, never inputs).
+export * as publishedCurves from './reference/published-curves.cjs';
 
 /**
  * Build a model bound to a set of constants.
