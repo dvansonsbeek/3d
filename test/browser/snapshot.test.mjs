@@ -200,6 +200,43 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     for (const [k, n] of Object.entries(T.dtEspenakAt(y))) v[`dtEspenak.${k}@${y}`] = n;
   }
 
+  // ── Phase 8.5-0: the eclipse surface (browser-only family) ────────────────
+  // Pins CURRENT behaviour before the eclipse-geometry extraction: the
+  // Meeus Ch.25 sun longitude, both predictive finders (a modern and an
+  // ancient window), and the scene-umbra conventions. The umbra probes
+  // navigate the scene, so they run LAST (before the round-trip check).
+  for (const jd of [1355795.0, 2451545.0, 2460409.262836, 2634166.0]) {
+    v[`ecl.sunLon@${jd}`] = T.eclSunLonAt(jd);
+  }
+  const ECL_WINDOWS = [
+    ['modern', 2451545.0, 2451545.0 + 3 * 365.25],   // 2000–2003
+    ['ancient', 1355795.0, 1355795.0 + 3 * 365.25],  // ~1000 BCE, 3 yr
+  ];
+  for (const [tag, a4, b4] of ECL_WINDOWS) {
+    T.eclFindLunar(a4, b4).forEach((e, i) => {
+      v[`ecl.lunar.${tag}[${i}].jd`] = e.jd;
+      v[`ecl.lunar.${tag}[${i}].type`] = e.type;
+      v[`ecl.lunar.${tag}[${i}].beta`] = e.beta;
+      v[`ecl.lunar.${tag}[${i}].magU`] = e.magnitudeUmbral;
+      v[`ecl.lunar.${tag}[${i}].magP`] = e.magnitudePenumbral;
+    });
+    T.eclFindSolar(a4, b4).forEach((e, i) => {
+      v[`ecl.solar.${tag}[${i}].jd`] = e.jd;
+      v[`ecl.solar.${tag}[${i}].type`] = e.type;
+      v[`ecl.solar.${tag}[${i}].beta`] = e.beta;
+      v[`ecl.solar.${tag}[${i}].ratio`] = e.moonSunRatio;
+    });
+  }
+  for (const jd of [2460409.262836, 2451401.971, 2460232.245]) {
+    const us = T.eclUmbraSceneAt(jd);
+    if (us) { v[`ecl.umbraScene@${jd}.lat`] = us.lat; v[`ecl.umbraScene@${jd}.lon`] = us.lon; }
+    else v[`ecl.umbraScene@${jd}`] = null;
+    const un = T.eclUmbraNASAAt(jd);
+    v[`ecl.umbraNASA@${jd}.lat`] = un.lat;
+    v[`ecl.umbraNASA@${jd}.lon`] = un.lon;
+    v[`ecl.umbraNASA@${jd}.gamma`] = un.gamma;
+  }
+
   // The reset must be exact, or every anchor above is measured against a
   // drifting baseline. Recorded rather than asserted so the fixture shows it.
   const back = T.anchors();

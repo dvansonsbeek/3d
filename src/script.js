@@ -6197,6 +6197,17 @@ if (typeof window !== 'undefined') {
       raw: deltaTEspenakMeeusRaw(year),
       blended: deltaTEspenakMeeus(year),
     }),
+    // ── Phase 8.5-0 eclipse surface ──────────────────────────────────────────
+    // Pins CURRENT behaviour before the eclipse-geometry extraction. The
+    // finders are browser-only (the moon series beneath them is shared since
+    // 8.2; there is no Node twin to align). The umbra probes NAVIGATE the
+    // scene (jumpToJulianDay + forceSceneUpdate) — call them LAST in any
+    // recording order so earlier probes see the fresh-load scene state.
+    eclSunLonAt: (jd) => _eclSunLon(jd),
+    eclFindLunar: (jdStart, jdEnd) => findLunarEclipsesInRange(jdStart, jdEnd),
+    eclFindSolar: (jdStart, jdEnd) => findSolarEclipsesInRange(jdStart, jdEnd),
+    eclUmbraSceneAt: (jd) => umbraFromSceneAtJd(jd),
+    eclUmbraNASAAt: (jd) => umbraNASAConventionAtJd(jd),
   };
 }
 
