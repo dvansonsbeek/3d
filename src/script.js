@@ -57838,11 +57838,16 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
 
   // Phase 8.3 L4: the ICRF-linked oscillation law lives ONCE in
   // @hum/physics/planets/orientation.
-  // FINDING (preserved, not fixed): currentYear is SHADOWED by the live
-  // scene JD below — historical behaviour; the 8.3-0 fixtures recorded
-  // identical values at every probed epoch. The pure module takes explicit
-  // time, so honouring currentYear later is a one-line, measured change.
-  const yearsSinceBalanced = (o.julianDay - balancedJD) / meansolaryearlengthinDays;
+  // 8.3-13: currentYear is HONOURED (measured change). Historically it was
+  // shadowed by the live scene JD, so any query at a non-scene year got the
+  // scene-year value — in particular the asc-node integrator's mid-segment
+  // inclination samples all collapsed to "now", diverging from the Node
+  // engine, which honours its year argument. Same year→JD convention as
+  // Node's yearToJD. Measured deltas: inclination ≤1.33° at ±25 kyr,
+  // ascending node ≤38.3° at −5 kyr; the affected browser fixtures were
+  // re-recorded deliberately with this change.
+  const _jdAtYear = startmodelJD + (currentYear - startmodelYear) * meansolaryearlengthinDays;
+  const yearsSinceBalanced = (_jdAtYear - balancedJD) / meansolaryearlengthinDays;
   return _PO.invPlaneInclinationAt({
     isEarth: planet === 'earth',
     invPlaneInclinationJ2000: i_J2000,
