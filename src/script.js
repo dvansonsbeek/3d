@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -3496,14 +3496,37 @@ function _eclDeltaT(jd) {
  *  longitude cleanly, SUN_HARMONICS would need to be refit with the correction
  *  active. Kept as MEAN for consistency with existing SUN_HARMONICS calibration. */
 function _eclSunLon(jd) {
-  const _d2r = Math.PI / 180;
-  const T = (jd + _eclDeltaT(jd) / 86400 - j2000JD) / julianCenturyDays;
-  const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
-  const M  = (357.52911 + 35999.05029 * T - 0.0001537 * T * T) * _d2r;
-  const C  = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
-           + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
-           + 0.000289 * Math.sin(3 * M);
-  return ((L0 + C) % 360 + 360) % 360;
+  // 8.5-1: the Meeus Ch.25 evaluator (and the MEAN-not-apparent
+  // calibration rationale) lives in @hum/physics/eclipse/finders.
+  return _eclipse().sunLonDegAt(jd);
+}
+
+// 8.5-1: the eclipse finders + sun longitude live ONCE in @hum/physics/
+// eclipse/finders. This browser injects its truncated moon series (shared
+// since 8.2), its calendar-convention ΔT (_eclDeltaT — S-D4), and its live
+// epoch-mutable globals. The scene-umbra conventions stay engine-side:
+// they navigate the THREE scene through the Tychosium-derived scaffold,
+// which never enters the package (§2h).
+var _eclipseM = null;
+function _eclipse() {
+  if (!_eclipseM) {
+    _eclipseM = createEclipseFinders({
+      moonLonDegAt: (jd) => _eclMoonLon(jd),
+      moonBetaDegAt: (jd) => _eclMoonBeta(jd),
+      moonDistanceKmAt: (jd) => _eclMoonDistance(jd),
+      deltaTSecondsAt: (jd) => _eclDeltaT(jd),
+      getSynodicMonthDays: () => moonSynodicMonth,
+      getSunDistanceKm: () => currentAUDistance,
+      constants: {
+        rEarthMetres: R_EARTH_M,
+        moonDiameterKm: diameters.moonDiameter,
+        sunDiameterKm: diameters.sunDiameter,
+        j2000JD: j2000JD,
+        julianCenturyDays: julianCenturyDays,
+      },
+    });
+  }
+  return _eclipseM;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -3888,102 +3911,11 @@ function _meeusMoonBeta(jd) { return _moonSeries().truncatedBetaDeg(jd); }
 // Returns array of {jd, beta, type, magnitudeUmbral, magnitudePenumbral}.
 // ═════════════════════════════════════════════════════════════════════════════
 
-/** Find all lunar-eclipse-class oppositions in [jdStart, jdEnd]. */
+/** Find all lunar-eclipse-class oppositions in [jdStart, jdEnd].
+ *  8.5-1: the geometry (Danjon-enlarged per-event shadow thresholds,
+ *  opposition bisection) lives in @hum/physics/eclipse/finders. */
 function findLunarEclipsesInRange(jdStart, jdEnd) {
-  // Step size: small fraction of synodic month for reliable zero-crossing
-  // detection. Synodic motion ≈ 360° / moonSynodicMonth ≈ 12.19°/day at J2000.
-  // moonSynodicMonth/60 ≈ 0.49 d → ~6° diff change per step (well clear of the
-  // 30° wrap-filter threshold).
-  const STEP_DAYS = moonSynodicMonth / 60;
-
-  // Per-event-distance geometry — body sizes are model constants; the shadow
-  // angular radii are computed PER OPPOSITION using each event's Moon distance
-  // (perigee vs apogee varies the threshold by ~5.5%, which dominates the
-  // type-classification at boundary cases). Sun distance variation (~0.5%
-  // from Earth orbital eccentricity) is currently neglected — uses scene-state
-  // currentAUDistance — refinement deferred (Phase L-4).
-  const _rad2deg   = 180 / Math.PI;
-  const R_EARTH_KM = R_EARTH_M / 1000;
-  const R_MOON_KM  = diameters.moonDiameter / 2;
-  const R_SUN_KM   = diameters.sunDiameter / 2;
-  const D_SUN_KM   = currentAUDistance;
-  const umbraApex_rad    = Math.atan((R_SUN_KM - R_EARTH_KM) / D_SUN_KM);
-  const penumbraApex_rad = Math.atan((R_SUN_KM + R_EARTH_KM) / D_SUN_KM);
-
-  // Compute classification thresholds (in degrees) for a given Moon distance D.
-  // Returns {moonR, umbraR, penumbraR, totalMax, partialMax, penumMax}.
-  // Shadow radii carry the standard ~2% atmospheric enlargement (Danjon rule /
-  // Chauvenet's 1/50, as used by the NASA Lunar Canon and Meeus Ch. 54) — the
-  // pure geometric shadow under-classifies borderline events (e.g. 2021-05-26:
-  // geometric umbral magnitude 0.961 "Partial" vs NASA 1.009 Total).
-  const SHADOW_ENLARGEMENT = 1.02;
-  const _shadowGeometry = (D_MOON_KM) => {
-    const moonR   = Math.atan(R_MOON_KM / D_MOON_KM) * _rad2deg;
-    const umbraR  = Math.atan((R_EARTH_KM - D_MOON_KM * Math.tan(umbraApex_rad))    / D_MOON_KM) * _rad2deg * SHADOW_ENLARGEMENT;
-    const penumR  = Math.atan((R_EARTH_KM + D_MOON_KM * Math.tan(penumbraApex_rad)) / D_MOON_KM) * _rad2deg * SHADOW_ENLARGEMENT;
-    return {
-      moonR, umbraR, penumR,
-      totalMax:   umbraR - moonR,
-      partialMax: umbraR + moonR,
-      penumMax:   penumR + moonR,
-    };
-  };
-
-  // Wrapped opposition diff: 0 means Moon at opposition (Sun + 180°)
-  const oppDiff = (jd) => {
-    let d = _eclMoonLon(jd) - _eclSunLon(jd) - 180;
-    while (d > 180) d -= 360;
-    while (d <= -180) d += 360;
-    return d;
-  };
-
-  const results = [];
-  let prevJD   = jdStart;
-  let prevDiff = oppDiff(prevJD);
-
-  for (let jd = jdStart + STEP_DAYS; jd <= jdEnd; jd += STEP_DAYS) {
-    const d = oppDiff(jd);
-    // Zero-crossing detection: sign change from − to + with no wrap discontinuity
-    if (prevDiff < 0 && d >= 0 && (d - prevDiff) < 30) {
-      // Bisect to refine opposition to ~1-second precision
-      let lo = prevJD, hi = jd;
-      for (let i = 0; i < 40; i++) {
-        const mid = (lo + hi) / 2;
-        if (oppDiff(mid) < 0) lo = mid; else hi = mid;
-        if (hi - lo < 1 / 86400) break;
-      }
-      const jdOpp = (lo + hi) / 2;
-      const beta  = _eclMoonBeta(jdOpp);
-      const absB  = Math.abs(beta);
-
-      // Per-event shadow geometry using actual Moon distance at this opposition.
-      // Closes the ~5.5% perigee/apogee variation in classification threshold.
-      const D_moon_jd = _eclMoonDistance(jdOpp);
-      const G = _shadowGeometry(D_moon_jd);
-
-      let type = null;
-      if      (absB <= G.totalMax)   type = 'Total';
-      else if (absB <= G.partialMax) type = 'Partial';
-      else if (absB <= G.penumMax)   type = 'Penumbral';
-
-      if (type) {
-        const magUmbral    = Math.max(0, (G.partialMax - absB) / (2 * G.moonR));
-        const magPenumbral = Math.max(0, (G.penumMax   - absB) / (2 * G.moonR));
-        results.push({
-          jd:                 jdOpp,
-          beta:               beta,
-          moonDistance_km:    D_moon_jd,
-          type:               type,
-          magnitudeUmbral:    magUmbral,    // 0 for Penumbral-only; (0,1) Partial; ≥1 Total
-          magnitudePenumbral: magPenumbral,
-        });
-      }
-    }
-    prevDiff = d;
-    prevJD   = jd;
-  }
-
-  return results;
+  return _eclipse().findLunarEclipsesInRange(jdStart, jdEnd);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -4010,144 +3942,12 @@ function findLunarEclipsesInRange(jdStart, jdEnd) {
 // moonSunRatio}.
 // ═════════════════════════════════════════════════════════════════════════════
 
-/** Find all solar-eclipse-class conjunctions in [jdStart, jdEnd]. */
+/** Find all solar-eclipse-class conjunctions in [jdStart, jdEnd].
+ *  8.5-1: the geometry (topocentric total/annular discrimination,
+ *  min-γ refinement to NASA's greatest-eclipse convention) lives in
+ *  @hum/physics/eclipse/finders. */
 function findSolarEclipsesInRange(jdStart, jdEnd) {
-  const STEP_DAYS = moonSynodicMonth / 60;
-  const _rad2deg   = 180 / Math.PI;
-  const R_EARTH_KM = R_EARTH_M / 1000;
-  const R_MOON_KM  = diameters.moonDiameter / 2;
-  const R_SUN_KM   = diameters.sunDiameter / 2;
-  const D_SUN_KM   = currentAUDistance;
-  const sunAppR    = Math.atan(R_SUN_KM / D_SUN_KM) * _rad2deg;  // ~0.266°
-
-  // Per-event geometry computed at conjunction.
-  // Eclipse limits (Meeus Ch. 54 simplified geocentric form):
-  //   Partial: any observer on Earth sees partial overlap
-  //   Central: Moon's umbra/antumbra cone reaches Earth's surface
-  const _solarGeometry = (D_MOON_KM) => {
-    const moonAppR_geo  = Math.atan(R_MOON_KM / D_MOON_KM) * _rad2deg;
-    const moonAppR_topo = Math.atan(R_MOON_KM / (D_MOON_KM - R_EARTH_KM)) * _rad2deg;
-    const parallax      = Math.atan(R_EARTH_KM / D_MOON_KM) * _rad2deg;  // ~0.95°
-    return {
-      moonAppR_geo, moonAppR_topo, parallax, sunAppR,
-      partialLim: sunAppR + moonAppR_geo + parallax,
-      centralLim: parallax - Math.abs(moonAppR_topo - sunAppR),
-      isTotal:    moonAppR_topo > sunAppR,
-    };
-  };
-
-  // Wrapped conjunction diff: 0 means Moon at conjunction (same ecl. lon. as Sun)
-  const conjDiff = (jd) => {
-    let d = _eclMoonLon(jd) - _eclSunLon(jd);
-    while (d >  180) d -= 360;
-    while (d <= -180) d += 360;
-    return d;
-  };
-
-  // Geocentric γ (Earth-radii) at JD: perpendicular distance from Earth's
-  // center to the line through the Sun and Moon. NASA's "greatest eclipse"
-  // TD is the moment of MINIMUM γ — which differs from ecliptic-longitude
-  // conjunction (above) by typically 5-15 min, because at conjunction the
-  // Moon may still be moving in β-direction such that the axis keeps
-  // approaching Earth for a few more minutes. Bisecting on conjDiff alone
-  // would miss NASA TD by exactly that offset; refining for min γ here
-  // matches the NASA Five Millennium Canon convention.
-  const _d2r = Math.PI / 180;
-  const gammaAtJd = (jd) => {
-    const sunLonR  = _eclSunLon(jd)   * _d2r;
-    const moonLonR = _eclMoonLon(jd)  * _d2r;
-    const moonBetR = _eclMoonBeta(jd) * _d2r;
-    const D_moon = _eclMoonDistance(jd);
-    const D_sun  = D_SUN_KM;
-    const sX = D_sun * Math.cos(sunLonR),  sY = D_sun * Math.sin(sunLonR);
-    const cb = Math.cos(moonBetR);
-    const mX = D_moon * cb * Math.cos(moonLonR);
-    const mY = D_moon * cb * Math.sin(moonLonR);
-    const mZ = D_moon * Math.sin(moonBetR);
-    const dX = mX - sX, dY = mY - sY, dZ = mZ;
-    const dLen = Math.sqrt(dX*dX + dY*dY + dZ*dZ);
-    const ux = dX/dLen, uy = dY/dLen, uz = dZ/dLen;
-    // Perpendicular distance from origin (Earth center) to line through Moon along u
-    const proj = mX*ux + mY*uy + mZ*uz;
-    const perpX = mX - proj*ux, perpY = mY - proj*uy, perpZ = mZ - proj*uz;
-    return Math.sqrt(perpX*perpX + perpY*perpY + perpZ*perpZ) / R_EARTH_KM;
-  };
-
-  // Refine conjunction-JD to true min-γ JD. Coarse 1-min scan over ±20 min
-  // around conjunction (which bounds the conjunction-vs-greatest offset for
-  // any real eclipse), then parabolic interpolation on the 3 points around
-  // the discrete minimum for sub-minute precision in a single extra eval.
-  const refineMinGamma = (jdConj) => {
-    const stepMin = 1 / (24 * 60);
-    let bestJD = jdConj, bestG = gammaAtJd(jdConj);
-    for (let dt = -20; dt <= 20; dt++) {
-      if (dt === 0) continue;
-      const jd = jdConj + dt * stepMin;
-      const g = gammaAtJd(jd);
-      if (g < bestG) { bestG = g; bestJD = jd; }
-    }
-    // Parabolic refinement on the 3 samples bracketing bestJD
-    const yL = gammaAtJd(bestJD - stepMin);
-    const y0 = bestG;
-    const yR = gammaAtJd(bestJD + stepMin);
-    const denom = yL - 2*y0 + yR;
-    if (Math.abs(denom) > 1e-15) {
-      const delta = 0.5 * (yL - yR) / denom;  // fractional offset in [-1, +1]
-      if (Math.abs(delta) < 1) {
-        const refinedJD = bestJD + delta * stepMin;
-        const refinedG = gammaAtJd(refinedJD);
-        if (refinedG < bestG) return refinedJD;
-      }
-    }
-    return bestJD;
-  };
-
-  const results = [];
-  let prevJD   = jdStart;
-  let prevDiff = conjDiff(prevJD);
-
-  for (let jd = jdStart + STEP_DAYS; jd <= jdEnd; jd += STEP_DAYS) {
-    const d = conjDiff(jd);
-    if (prevDiff < 0 && d >= 0 && (d - prevDiff) < 30) {
-      // Bisect to ~1-second precision on conjunction (Moon-Sun longitude alignment)
-      let lo = prevJD, hi = jd;
-      for (let i = 0; i < 40; i++) {
-        const mid = (lo + hi) / 2;
-        if (conjDiff(mid) < 0) lo = mid; else hi = mid;
-        if (hi - lo < 1 / 86400) break;
-      }
-      const jdConj = (lo + hi) / 2;
-      // Refine to NASA's "greatest eclipse" convention (minimum γ).
-      const jdGreatest = refineMinGamma(jdConj);
-      const beta   = _eclMoonBeta(jdGreatest);
-      const absB   = Math.abs(beta);
-      const D_moon = _eclMoonDistance(jdGreatest);
-      const G      = _solarGeometry(D_moon);
-
-      let type = null;
-      if (absB <= G.centralLim) {
-        type = G.isTotal ? 'Total' : 'Annular';
-      } else if (absB <= G.partialLim) {
-        type = 'Partial';
-      }
-
-      if (type) {
-        results.push({
-          jd:               jdGreatest,
-          beta:             beta,
-          moonDistance_km:  D_moon,
-          type:             type,
-          moonAppR_topo:    G.moonAppR_topo,
-          sunAppR:          G.sunAppR,
-          moonSunRatio:     G.moonAppR_topo / G.sunAppR,
-        });
-      }
-    }
-    prevDiff = d;
-    prevJD   = jd;
-  }
-
-  return results;
+  return _eclipse().findSolarEclipsesInRange(jdStart, jdEnd);
 }
 
 /** Tropical year in SI 86400-s days at given epoch. Phase 9.2 sDay anchor —

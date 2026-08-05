@@ -110,6 +110,8 @@ export { createDeltaTCycles } from './deltat/cycles.cjs';
 export { createDeepTimeLod } from './deltat/deep-time.cjs';
 export { deltaTEspenakMeeusCanonSeconds } from './deltat/historical.cjs';
 export { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
+// Phase 8.5 — eclipse geometry (single-copy: the browser had no Node twin).
+export { createEclipseFinders } from './eclipse/finders.cjs';
 
 /**
  * Build a model bound to a set of constants.
