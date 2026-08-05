@@ -613,7 +613,7 @@ export const REFERENCE_DATA = Object.freeze({
     "gamma8": 202.8
   },
   externalCurveAnchors: {
-    "deltaTEspenakJ2000Seconds": 62.92
+    "deltaTEspenakJ2000Seconds": 63.86
   },
   galaxyMotion: {
     "milkywayDistance": 27500,

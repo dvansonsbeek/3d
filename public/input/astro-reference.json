@@ -337,7 +337,7 @@
   },
   "externalCurveAnchors": {
     "_description": "Offsets used ONLY to re-anchor a published external curve onto the model's axis for comparison. Never inputs — nothing downstream of the model reads them.",
-    "deltaTEspenakJ2000Seconds": 62.92
+    "deltaTEspenakJ2000Seconds": 63.86
   },
   "knownValues": {
     "_description": "Validation reference values for comparison (used by moon-cycles.js). Moon month inputs are in moonReference — not duplicated here.",

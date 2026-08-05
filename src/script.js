@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusRawSeconds, evalClimateL1OrbitalPermil } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -21895,12 +21895,13 @@ function solarDayPeters(year) {
  *  with our model's ΔT-relative-to-J2000 convention (ΔT(2000) = 0), use
  *  deltaTEspenakMeeusRelJ2000 instead. */
 function deltaTEspenakMeeusRaw(year) {
-  // 8.4-4: the shipped rendition lives in @hum/physics/deltat/historical
-  // (single copy, Node gains it for the 8.5 eclipse work). The VARIANT
-  // renditions in tools/verify/moon-deltat-comparison.js and
-  // tools/fit/sun-longitude-harmonics.js are deliberately untouched —
-  // recorded for the Phase 9 no-duplicated-formulas gate.
-  return deltaTEspenakMeeusRawSeconds(year);
+  // 8.4-4c (measured change): EXACTLY the published NASA canon, from
+  // @hum/physics/deltat/historical. The previously shipped simplification
+  // (1986–2005 merged into the 62.92-branch, NaN outside −1999..3000)
+  // differed by ≤4.6 s in 1986–2005 and 52 s at 2100, and its chart was
+  // labeled "NASA Canon" while not plotting it. The display anchor
+  // (deltaTEspenakJ2000Seconds) moved 62.92 → 63.86 with it — matched pair.
+  return deltaTEspenakMeeusCanonSeconds(year);
 }
 
 /** Meeus (1998) eq. 22.2 first-order mean obliquity, in RADIANS.
@@ -21917,7 +21918,9 @@ function meeusMeanObliquityRad(T) {
 // ΔT(J2000) in the Espenak/Meeus convention — the value we subtract to
 // re-anchor the reference curve to our model's ΔT(J2000) = 0 convention.
 // Computed from the polynomial at t=0, kept as a literal so a stale poly
-// coefficient bump doesn't silently drift the anchor.
+// coefficient bump doesn't silently drift the anchor. 8.4-4c: 63.86 — the
+// CANON 1986–2005 segment's value at 2000 (was 62.92, the shipped
+// simplification's value); curve and anchor moved together.
 const DELTA_T_ESPENAK_J2000_S = R.externalCurveAnchors.deltaTEspenakJ2000Seconds;
 
 /** Espenak/Meeus ΔT re-anchored to ΔT(J2000) = 0 so it plots on the same
