@@ -8,7 +8,9 @@
   "exports": {
     ".": "./src/index.js",
     "./correction-stack": "./src/correction-stack.cjs",
-    "./verify-pipeline": "./src/verify-pipeline.cjs"
+    "./verify-pipeline": "./src/verify-pipeline.cjs",
+    "./parallax-correction": "./src/parallax-correction.cjs",
+    "./gravitation-correction": "./src/gravitation-correction.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }
