@@ -14,7 +14,9 @@
     "./obliquity-harmonics": "./src/obliquity-harmonics.cjs",
     "./year-length-harmonics": "./src/year-length-harmonics.cjs",
     "./sun-longitude-harmonics": "./src/sun-longitude-harmonics.cjs",
-    "./cardinal-point-harmonics": "./src/cardinal-point-harmonics.cjs"
+    "./cardinal-point-harmonics": "./src/cardinal-point-harmonics.cjs",
+    "./dt-corrections-fit": "./src/dt-corrections-fit.cjs",
+    "./validate-resonator": "./src/validate-resonator.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }
