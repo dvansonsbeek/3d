@@ -546,37 +546,34 @@ for (const [key, p] of Object.entries(planets)) {
 // 10. PLANET DERIVED CALCULATIONS
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Phase 8.3 L1: the geometry law lives ONCE in @hum/physics/planets/geometry
+// (browser expression forms — this mirror's last-ulp variants dissolve).
+const { derivePlanetGeometry } = require('@hum/physics/planets/geometry');
+const _GEOM_ENV = {
+  holisticYears: H,
+  meanSolarYearDays,
+  currentAUDistanceKm: currentAUDistance,
+  earthEccentricityJ2000: ASTRO_REFERENCE.earthEccentricityJ2000,
+  earthPerihelionLongitudeJ2000Deg: ASTRO_REFERENCE.earthPerihelionLongitudeJ2000,
+};
+
 function computePlanetDerived(key) {
   const p = planets[key];
-  const solarYearCount = Math.round(totalDaysInH / p.solarYearInput);
-  const orbitDistance = ((H / solarYearCount) ** 2) ** (1/3);
-  const period = H / solarYearCount;
-
-  let perihelionDistance, elipticOrbit, realOrbitalEccentricity;
-
-  if (p.type === 'I') {
-    realOrbitalEccentricity = p.orbitalEccentricityBase / (1 + p.orbitalEccentricityBase);
-    perihelionDistance = orbitDistance * realOrbitalEccentricity * 100;
-    elipticOrbit = perihelionDistance / 2;
-  } else if (p.type === 'II') {
-    realOrbitalEccentricity = p.orbitalEccentricityBase / (1 + p.orbitalEccentricityBase);
-    elipticOrbit = (realOrbitalEccentricity * orbitDistance * 100) / 2 + (p.orbitalEccentricityBase - realOrbitalEccentricity) * orbitDistance * 100;
-    perihelionDistance = (orbitDistance * p.orbitalEccentricityBase * 100) + elipticOrbit;
-  } else { // Type III
-    realOrbitalEccentricity = p.orbitalEccentricityBase / (1 + p.orbitalEccentricityBase);
-    const dw = (ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - p.longitudePerihelion) * Math.PI / 180;
-    elipticOrbit = 2 * ASTRO_REFERENCE.earthEccentricityJ2000 * 100 * Math.sin(dw);
-    perihelionDistance = realOrbitalEccentricity * orbitDistance * 100;
-  }
-
+  const g = derivePlanetGeometry({
+    key, type: p.type,
+    solarYearInput: p.solarYearInput,
+    orbitalEccentricityBase: p.orbitalEccentricityBase,
+    longitudePerihelion: p.longitudePerihelion,
+    ascendingNode: p.ascendingNode,
+  }, _GEOM_ENV);
   return {
-    solarYearCount,
-    orbitDistance,
-    period,
-    perihelionDistance,
-    elipticOrbit,
-    realOrbitalEccentricity,
-    speed_kmh: (orbitDistance * currentAUDistance * Math.PI * 2) / (meanSolarYearDays * period) / 24,
+    solarYearCount: g.solarYearCount,
+    orbitDistance: g.orbitDistance,
+    period: g.periodYears,
+    perihelionDistance: g.perihelionDistance,
+    elipticOrbit: g.elipticOrbit,
+    realOrbitalEccentricity: g.realOrbitalEccentricity,
+    speed_kmh: g.speedKmh,
   };
 }
 
@@ -591,10 +588,25 @@ function rebuildDerived(key) {
 
 function computeAdditionalDerived(key) {
   const b = additionalBodies[key];
-  const solarYearCount = Math.round(totalDaysInH / b.solarYearInput);
-  const orbitDistance = b.orbitDistanceOverride || ((H / solarYearCount) ** 2) ** (1/3);
-  const period = H / solarYearCount;
-  return { solarYearCount, orbitDistance, period };
+  // 8.3 L1: full geometry via the shared law (this engine previously returned
+  // only {N, a, period} for the minor bodies — part of the S-P6 coverage gap;
+  // the ellipse family for pluto/halleys/eros is NEW capability here).
+  const g = derivePlanetGeometry({
+    key, type: b.type || (key === 'eros' ? 'II' : undefined),
+    solarYearInput: b.solarYearInput,
+    orbitalEccentricityBase: b.orbitalEccentricityBase,
+    longitudePerihelion: b.longitudePerihelion,
+    ascendingNode: b.ascendingNode,
+    orbitDistanceOverride: b.orbitDistanceOverride,
+  }, _GEOM_ENV);
+  return {
+    solarYearCount: g.solarYearCount,
+    orbitDistance: g.orbitDistance,
+    period: g.periodYears,
+    perihelionDistance: g.perihelionDistance,
+    elipticOrbit: g.elipticOrbit,
+    realOrbitalEccentricity: g.realOrbitalEccentricity,
+  };
 }
 
 const additionalDerived = {};

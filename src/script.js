@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -2143,98 +2143,128 @@ const OrbitalFormulas = {
 // Everything below this line uses the constants defined above.
 // ─────────────────────────────────────────────────────────────────────────
 
-// Planet calculations TYPE I
-let   mercurySolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.mercury.solarYearInput));  // Phase 2.5: mutable
-let   mercuryOrbitDistance = (((holisticyearLength/mercurySolarYearCount)**2)**(1/3));  // Phase 2.5: mutable
-const mercuryRealOrbitalEccentricity = planets.mercury.orbitalEccentricityBase/(1+planets.mercury.orbitalEccentricityBase);
-const mercuryPerihelionDistance = mercuryOrbitDistance*mercuryRealOrbitalEccentricity*100;
-const mercuryElipticOrbit = mercuryPerihelionDistance/2;
-const mercurySpeed = (mercuryOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/mercurySolarYearCount))/24;
-let   mercuryRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(mercurySolarYearCount*3/2);  // Phase 3.5: mutable (Mercury 3:2 spin-orbit lock)
-const mercuryEccentricityPerihelion = (mercuryPerihelionDistance/2)*planets.mercury.orbitalEccentricityBase;
-const mercuryLowestPoint = 180-planets.mercury.ascendingNode;
-
-let   venusSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.venus.solarYearInput));  // Phase 2.5: mutable
-let   venusOrbitDistance = (((holisticyearLength/venusSolarYearCount)**2)**(1/3));  // Phase 2.5: mutable
-const venusRealOrbitalEccentricity = planets.venus.orbitalEccentricityBase/(1+planets.venus.orbitalEccentricityBase);
-const venusPerihelionDistance = (venusOrbitDistance*venusRealOrbitalEccentricity*100);
-const venusElipticOrbit = venusPerihelionDistance/2;
-const venusSpeed = (venusOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/venusSolarYearCount))/24;
-const venusRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.venus.rotationPeriodDays));
-const venusEccentricityPerihelion = (venusPerihelionDistance/2)*planets.venus.orbitalEccentricityBase;
-const venusLowestPoint = 180-planets.venus.ascendingNode;
-
-// Planet calculations TYPE II
-let   marsSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.mars.solarYearInput));  // Phase 2.5: mutable
-let   marsOrbitDistance = (((holisticyearLength/marsSolarYearCount)**2)**(1/3));  // Phase 2.5: mutable
-const marsRealOrbitalEccentricity = planets.mars.orbitalEccentricityBase/(1+planets.mars.orbitalEccentricityBase);
-const marsElipticOrbit = (((marsRealOrbitalEccentricity*marsOrbitDistance)/2))*100+((planets.mars.orbitalEccentricityBase*marsOrbitDistance)-(marsRealOrbitalEccentricity*marsOrbitDistance))*100;
-const marsPerihelionDistance = (marsOrbitDistance*planets.mars.orbitalEccentricityBase*100)+marsElipticOrbit;
-const marsSpeed = (marsOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/marsSolarYearCount))/24;
-const marsRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.mars.rotationPeriodDays));
-
-const erosSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.eros.solarYearInput));
-const erosOrbitDistance = (((holisticyearLength/erosSolarYearCount)**2)**(1/3));
-const erosRealOrbitalEccentricity = planets.eros.orbitalEccentricityBase/(1+planets.eros.orbitalEccentricityBase);
-const erosElipticOrbit = (((erosRealOrbitalEccentricity*erosOrbitDistance)/2))*100+((planets.eros.orbitalEccentricityBase*erosOrbitDistance)-(erosRealOrbitalEccentricity*erosOrbitDistance))*100;
-const erosPerihelionDistance = (erosOrbitDistance*planets.eros.orbitalEccentricityBase*100)+erosElipticOrbit;
-const erosSpeed = (erosOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/erosSolarYearCount))/24;
-const erosRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.additionalBodiesReference.eros.rotationPeriodDays));
-
-// Planet calculations TYPE III
-// Geocentric correction: Earth's eccentricity creates annual parallax variation
-// proportional to sin(ω_Earth - ω_planet). Factor of 2 from off-center geometry.
-function geocentricElipticOrbit(planetLongPeri) {
-  const dw = (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - planetLongPeri) * Math.PI / 180;
-  return 2 * ASTRO_REFERENCE.eccentricityJ2000 * 100 * Math.sin(dw);
+// Phase 8.3 L1: the geometry derivation lives ONCE in
+// @hum/physics/planets/geometry — one type-branched law over body records
+// (this replaces the hand-unrolled per-planet block; the aliases keep their
+// exact names and epoch MUTABILITY — recomputePlanetCountsForEpoch and the
+// update*ForEpoch family still reassign the `let`s, untouched).
+const _rotationInputDays = {
+  venus: K.planetOrbitalElements.venus.rotationPeriodDays,
+  mars: K.planetOrbitalElements.mars.rotationPeriodDays,
+  jupiter: K.planetOrbitalElements.jupiter.rotationPeriodDays,
+  saturn: K.planetOrbitalElements.saturn.rotationPeriodDays,
+  uranus: K.planetOrbitalElements.uranus.rotationPeriodDays,
+  neptune: K.planetOrbitalElements.neptune.rotationPeriodDays,
+  eros: K.additionalBodiesReference.eros.rotationPeriodDays,
+  pluto: K.additionalBodiesReference.pluto.rotationPeriodDays,
+  halleys: K.additionalBodiesReference.halleys.rotationPeriodDays,
+};
+const _planetGeom = {};
+for (const _k of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'eros', 'pluto', 'halleys']) {
+  const _rec = K.planets[_k] || K.additionalBodies[_k];
+  _planetGeom[_k] = derivePlanetGeometry({
+    key: _k, type: _rec.type,
+    solarYearInput: planets[_k].solarYearInput,
+    orbitalEccentricityBase: planets[_k].orbitalEccentricityBase,
+    longitudePerihelion: planets[_k].longitudePerihelion,
+    ascendingNode: planets[_k].ascendingNode,
+    rotationPeriodDays: _rotationInputDays[_k],
+  }, {
+    holisticYears: holisticyearLength,
+    meanSolarYearDays: meansolaryearlengthinDays,
+    currentAUDistanceKm: currentAUDistance,
+    earthEccentricityJ2000: ASTRO_REFERENCE.eccentricityJ2000,
+    earthPerihelionLongitudeJ2000Deg: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg,
+  });
 }
 
-let   jupiterSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.jupiter.solarYearInput));  // Phase 2.5: mutable
-let   jupiterOrbitDistance = (((holisticyearLength/jupiterSolarYearCount)**2)**(1/3));  // Phase 2.5: mutable
-const jupiterRealOrbitalEccentricity = planets.jupiter.orbitalEccentricityBase/(1+planets.jupiter.orbitalEccentricityBase);
-const jupiterElipticOrbit = geocentricElipticOrbit(planets.jupiter.longitudePerihelion);
-const jupiterPerihelionDistance = jupiterRealOrbitalEccentricity*jupiterOrbitDistance*100;
-const jupiterSpeed = (jupiterOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/jupiterSolarYearCount))/24;
-const jupiterRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.jupiter.rotationPeriodDays));
+// Planet calculations TYPE I
+let   mercurySolarYearCount = _planetGeom.mercury.solarYearCount;  // Phase 2.5: mutable
+let   mercuryOrbitDistance = _planetGeom.mercury.orbitDistance;  // Phase 2.5: mutable
+const mercuryRealOrbitalEccentricity = _planetGeom.mercury.realOrbitalEccentricity;
+const mercuryPerihelionDistance = _planetGeom.mercury.perihelionDistance;
+const mercuryElipticOrbit = _planetGeom.mercury.elipticOrbit;
+const mercurySpeed = _planetGeom.mercury.speedKmh;
+let   mercuryRotationPeriod = _planetGeom.mercury.rotationPeriodHours;  // Phase 3.5: mutable (Mercury 3:2 spin-orbit lock)
+const mercuryEccentricityPerihelion = _planetGeom.mercury.eccentricityPerihelion;
+const mercuryLowestPoint = _planetGeom.mercury.lowestPoint;
 
-let   saturnSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.saturn.solarYearInput));  // Phase 2.5: mutable
-let   saturnOrbitDistance = (((holisticyearLength/saturnSolarYearCount)**2)**(1/3));  // Phase 2.5: mutable
-const saturnRealOrbitalEccentricity = planets.saturn.orbitalEccentricityBase/(1+planets.saturn.orbitalEccentricityBase);
-const saturnElipticOrbit = geocentricElipticOrbit(planets.saturn.longitudePerihelion);
-const saturnPerihelionDistance = saturnRealOrbitalEccentricity*saturnOrbitDistance*100;
-const saturnSpeed = (saturnOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/saturnSolarYearCount))/24;
-const saturnRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.saturn.rotationPeriodDays));
+let   venusSolarYearCount = _planetGeom.venus.solarYearCount;  // Phase 2.5: mutable
+let   venusOrbitDistance = _planetGeom.venus.orbitDistance;  // Phase 2.5: mutable
+const venusRealOrbitalEccentricity = _planetGeom.venus.realOrbitalEccentricity;
+const venusPerihelionDistance = _planetGeom.venus.perihelionDistance;
+const venusElipticOrbit = _planetGeom.venus.elipticOrbit;
+const venusSpeed = _planetGeom.venus.speedKmh;
+const venusRotationPeriod = _planetGeom.venus.rotationPeriodHours;
+const venusEccentricityPerihelion = _planetGeom.venus.eccentricityPerihelion;
+const venusLowestPoint = _planetGeom.venus.lowestPoint;
 
-let   uranusSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.uranus.solarYearInput));  // Phase 2.5: mutable
-let   uranusOrbitDistance = (((holisticyearLength/uranusSolarYearCount)**2)**(1/3));  // Phase 2.5: mutable
-const uranusRealOrbitalEccentricity = planets.uranus.orbitalEccentricityBase/(1+planets.uranus.orbitalEccentricityBase);
-const uranusElipticOrbit = geocentricElipticOrbit(planets.uranus.longitudePerihelion);
-const uranusPerihelionDistance = uranusRealOrbitalEccentricity*uranusOrbitDistance*100;
-const uranusSpeed = (uranusOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/uranusSolarYearCount))/24;
-const uranusRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.uranus.rotationPeriodDays));
+// Planet calculations TYPE II
+let   marsSolarYearCount = _planetGeom.mars.solarYearCount;  // Phase 2.5: mutable
+let   marsOrbitDistance = _planetGeom.mars.orbitDistance;  // Phase 2.5: mutable
+const marsRealOrbitalEccentricity = _planetGeom.mars.realOrbitalEccentricity;
+const marsElipticOrbit = _planetGeom.mars.elipticOrbit;
+const marsPerihelionDistance = _planetGeom.mars.perihelionDistance;
+const marsSpeed = _planetGeom.mars.speedKmh;
+const marsRotationPeriod = _planetGeom.mars.rotationPeriodHours;
 
-let   neptuneSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.neptune.solarYearInput));  // Phase 2.5: mutable
-let   neptuneOrbitDistance = (((holisticyearLength/neptuneSolarYearCount)**2)**(1/3));  // Phase 2.5: mutable
-const neptuneRealOrbitalEccentricity = planets.neptune.orbitalEccentricityBase/(1+planets.neptune.orbitalEccentricityBase);
-const neptuneElipticOrbit = geocentricElipticOrbit(planets.neptune.longitudePerihelion);
-const neptunePerihelionDistance = neptuneRealOrbitalEccentricity*neptuneOrbitDistance*100;
-const neptuneSpeed = (neptuneOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/neptuneSolarYearCount))/24;
-const neptuneRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.planetOrbitalElements.neptune.rotationPeriodDays));
+const erosSolarYearCount = _planetGeom.eros.solarYearCount;
+const erosOrbitDistance = _planetGeom.eros.orbitDistance;
+const erosRealOrbitalEccentricity = _planetGeom.eros.realOrbitalEccentricity;
+const erosElipticOrbit = _planetGeom.eros.elipticOrbit;
+const erosPerihelionDistance = _planetGeom.eros.perihelionDistance;
+const erosSpeed = _planetGeom.eros.speedKmh;
+const erosRotationPeriod = _planetGeom.eros.rotationPeriodHours;
 
-const plutoSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.pluto.solarYearInput));
-const plutoOrbitDistance = (((holisticyearLength/plutoSolarYearCount)**2)**(1/3));
-const plutoPerihelionDistance = planets.pluto.orbitalEccentricityBase*plutoOrbitDistance*100;
-const plutoElipticOrbit = plutoPerihelionDistance/2;
-const plutoSpeed = (plutoOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/plutoSolarYearCount))/24;
-const plutoRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.additionalBodiesReference.pluto.rotationPeriodDays));
+// Planet calculations TYPE III (geocentric elipticOrbit — Earth-eccentricity
+// parallax, sin(ω_Earth − ω_planet), factor 2 from off-centre geometry —
+// now inside the shared law)
+let   jupiterSolarYearCount = _planetGeom.jupiter.solarYearCount;  // Phase 2.5: mutable
+let   jupiterOrbitDistance = _planetGeom.jupiter.orbitDistance;  // Phase 2.5: mutable
+const jupiterRealOrbitalEccentricity = _planetGeom.jupiter.realOrbitalEccentricity;
+const jupiterElipticOrbit = _planetGeom.jupiter.elipticOrbit;
+const jupiterPerihelionDistance = _planetGeom.jupiter.perihelionDistance;
+const jupiterSpeed = _planetGeom.jupiter.speedKmh;
+const jupiterRotationPeriod = _planetGeom.jupiter.rotationPeriodHours;
 
-const halleysSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.halleys.solarYearInput));
-const halleysOrbitDistance = (((holisticyearLength/halleysSolarYearCount)**2)**(1/3));
-const halleysRealOrbitalEccentricity = planets.halleys.orbitalEccentricityBase/(1+planets.halleys.orbitalEccentricityBase);
-const halleysElipticOrbit = ((planets.halleys.orbitalEccentricityBase*halleysOrbitDistance)-(halleysRealOrbitalEccentricity*halleysOrbitDistance))*100; 
-const halleysPerihelionDistance = halleysRealOrbitalEccentricity*halleysOrbitDistance*2*100;
-const halleysSpeed = (halleysOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/halleysSolarYearCount))/24;
-const halleysRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/K.additionalBodiesReference.halleys.rotationPeriodDays));
+let   saturnSolarYearCount = _planetGeom.saturn.solarYearCount;  // Phase 2.5: mutable
+let   saturnOrbitDistance = _planetGeom.saturn.orbitDistance;  // Phase 2.5: mutable
+const saturnRealOrbitalEccentricity = _planetGeom.saturn.realOrbitalEccentricity;
+const saturnElipticOrbit = _planetGeom.saturn.elipticOrbit;
+const saturnPerihelionDistance = _planetGeom.saturn.perihelionDistance;
+const saturnSpeed = _planetGeom.saturn.speedKmh;
+const saturnRotationPeriod = _planetGeom.saturn.rotationPeriodHours;
+
+let   uranusSolarYearCount = _planetGeom.uranus.solarYearCount;  // Phase 2.5: mutable
+let   uranusOrbitDistance = _planetGeom.uranus.orbitDistance;  // Phase 2.5: mutable
+const uranusRealOrbitalEccentricity = _planetGeom.uranus.realOrbitalEccentricity;
+const uranusElipticOrbit = _planetGeom.uranus.elipticOrbit;
+const uranusPerihelionDistance = _planetGeom.uranus.perihelionDistance;
+const uranusSpeed = _planetGeom.uranus.speedKmh;
+const uranusRotationPeriod = _planetGeom.uranus.rotationPeriodHours;
+
+let   neptuneSolarYearCount = _planetGeom.neptune.solarYearCount;  // Phase 2.5: mutable
+let   neptuneOrbitDistance = _planetGeom.neptune.orbitDistance;  // Phase 2.5: mutable
+const neptuneRealOrbitalEccentricity = _planetGeom.neptune.realOrbitalEccentricity;
+const neptuneElipticOrbit = _planetGeom.neptune.elipticOrbit;
+const neptunePerihelionDistance = _planetGeom.neptune.perihelionDistance;
+const neptuneSpeed = _planetGeom.neptune.speedKmh;
+const neptuneRotationPeriod = _planetGeom.neptune.rotationPeriodHours;
+
+const plutoSolarYearCount = _planetGeom.pluto.solarYearCount;
+const plutoOrbitDistance = _planetGeom.pluto.orbitDistance;
+const plutoPerihelionDistance = _planetGeom.pluto.perihelionDistance;
+const plutoElipticOrbit = _planetGeom.pluto.elipticOrbit;
+const plutoSpeed = _planetGeom.pluto.speedKmh;
+const plutoRotationPeriod = _planetGeom.pluto.rotationPeriodHours;
+
+const halleysSolarYearCount = _planetGeom.halleys.solarYearCount;
+const halleysOrbitDistance = _planetGeom.halleys.orbitDistance;
+const halleysRealOrbitalEccentricity = _planetGeom.halleys.realOrbitalEccentricity;
+const halleysElipticOrbit = _planetGeom.halleys.elipticOrbit;
+const halleysPerihelionDistance = _planetGeom.halleys.perihelionDistance;
+const halleysSpeed = _planetGeom.halleys.speedKmh;
+const halleysRotationPeriod = _planetGeom.halleys.rotationPeriodHours;
 
 // ═════════════════════════════════════════════════════════════════
 // DEEP-TIME CHAIN — ESSRT Architecture α  (PHASE 0: mean*AtAge funcs)
