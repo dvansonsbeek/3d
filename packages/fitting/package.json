@@ -10,7 +10,11 @@
     "./correction-stack": "./src/correction-stack.cjs",
     "./verify-pipeline": "./src/verify-pipeline.cjs",
     "./parallax-correction": "./src/parallax-correction.cjs",
-    "./gravitation-correction": "./src/gravitation-correction.cjs"
+    "./gravitation-correction": "./src/gravitation-correction.cjs",
+    "./obliquity-harmonics": "./src/obliquity-harmonics.cjs",
+    "./year-length-harmonics": "./src/year-length-harmonics.cjs",
+    "./sun-longitude-harmonics": "./src/sun-longitude-harmonics.cjs",
+    "./cardinal-point-harmonics": "./src/cardinal-point-harmonics.cjs"
   },
   "license": "AGPL-3.0-or-later"
 }
