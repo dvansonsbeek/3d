@@ -96,6 +96,7 @@ export { createMoonApparent } from './moon/apparent.cjs';
 // (survey order: geometry → Fibonacci laws → channels → chains → corrections).
 export { derivePlanetGeometry } from './planets/geometry.cjs';
 export * as planetFibonacciLaws from './planets/fibonacci-laws.cjs';
+export { eccentricityFromCycles, computeEccentricityIntegrated } from './planets/ecc-channel.cjs';
 
 /**
  * Build a model bound to a set of constants.

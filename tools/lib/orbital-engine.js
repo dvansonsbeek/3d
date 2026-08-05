@@ -277,9 +277,10 @@ function computeEccentricity(currentYear, balancedYear, cycleLength, base, ampli
     const c = require('./deep-time').cyclesBetweenYears(balancedYear, currentYear, divisor_N);
     if (c !== null) cycles = c;   // null past the tidal-lock asymptote → keep snapshot
   }
-  // Law of cosines: distance between two circular orbits
-  const θ = cycles * 2 * Math.PI;
-  return Math.sqrt(base * base + amplitude * amplitude - 2 * base * amplitude * Math.cos(θ));
+  // Phase 8.3 L3: the law of cosines lives ONCE in
+  // @hum/physics/planets/ecc-channel (this engine keeps its documented R6
+  // snapshot-fallback dispatch above; cycles is always a number here).
+  return require('@hum/physics/planets/ecc-channel').eccentricityFromCycles(cycles, base, amplitude);
 }
 
 /**

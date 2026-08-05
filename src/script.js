@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated } from '@hum/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -57555,21 +57555,12 @@ function computeEccentricityEarth(
   // At J2000 the integrated value matches the snapshot to ppm; at deep time
   // the integrated value is the physically correct frame-independent answer
   // (see doc 99 Phase 8 + IP doc Phase 8 detail).
-  const divisor_N = HOLISTIC_YEAR_J2000 / cycleLengthYearsJ2000;
-  const phase = phaseAdvanceRadians(anchorYearJ2000, currentYear, divisor_N);
-  if (phase === null) {
-    // Past tidal-lock asymptote — fall back to mean eccentricity
-    return Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
-  }
-  // Law of cosines: distance between two circular orbits
-  // Earth orbits wobble-center at radius `amplitude` (H/13 clockwise)
-  // Wobble-center orbits Sun at radius `base`
-  // e(t) = sqrt(base² + amp² - 2·base·amp·cos(θ))
-  return Math.sqrt(
-    eccentricityBase * eccentricityBase +
-    eccentricityAmplitude * eccentricityAmplitude -
-    2 * eccentricityBase * eccentricityAmplitude * Math.cos(phase)
-  );
+  // Phase 8.3 L3: the law-of-cosines channel lives ONCE in
+  // @hum/physics/planets/ecc-channel; this engine's cyclesBetweenYears
+  // (deep/snapshot toggle + null → mean past tidal lock) rides along.
+  return computeEccentricityIntegrated(currentYear, anchorYearJ2000, cycleLengthYearsJ2000,
+    eccentricityBase, eccentricityAmplitude,
+    { holisticYearJ2000: HOLISTIC_YEAR_J2000, cyclesBetween: cyclesBetweenYears });
 }
 
 
