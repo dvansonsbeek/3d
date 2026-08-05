@@ -180,6 +180,17 @@ export default [
   },
 
   {
+    /* `@hum/fitting` is the production fitting pipeline — Node-only tooling
+     * (§2a); nothing shipped to a browser imports it. Fitters log progress
+     * and read the environment, so Node globals are legitimate here (the
+     * boundaries rules above still bar physics from ever importing it). */
+    files: ['packages/fitting/src/**/*.js', 'packages/fitting/src/**/*.cjs'],
+    languageOptions: {
+      globals: { console: 'readonly', process: 'readonly', URL: 'readonly', Buffer: 'readonly' },
+    },
+  },
+
+  {
     /* The §5c golden-master harness. It runs in Node and drives headless
      * Chromium, and the callbacks handed to `page.evaluate()` execute IN the
      * browser — so this is the one place that legitimately sees both global

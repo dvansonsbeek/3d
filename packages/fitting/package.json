@@ -5,5 +5,9 @@
   "description": "The production fitting pipeline (fit + verify + pipeline). Node only.",
   "type": "module",
   "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./correction-stack": "./src/correction-stack.cjs"
+  },
   "license": "AGPL-3.0-or-later"
 }
