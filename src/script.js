@@ -95,7 +95,7 @@ let   RESONATOR_DT_CORRECTION_ENABLED = true;  // Core-mantle swing (Resonator d
 let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argument skeleton (_fwMoonArgs via _moonArgsAt) feeding the _eclMoon* dispatchers: frame-decomposed rates + solar-eccentricity-channel T²/T³ (derivation record: docs/66 §1). OFF = pure Meeus Ch. 47 argument polynomials (A/B reference; flip via console for comparison runs)
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
-const earthtiltMean = K.earth.earthtiltMean;              // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
+const earthtiltMean = K.earth.earthtiltMean;              // Scene-geometry solved: obliquity at J2000 = IAU 2006 23.4392794°
 const earthInvPlaneInclinationAmplitude = K.earth.earthInvPlaneInclinationAmplitude; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
 // The optimizer must NEVER touch this — it is set by the Law 5 balance constraint.
 const eccentricityBase = K.earth.eccentricityBase;        // Law 5 balance-locked
@@ -854,14 +854,10 @@ const ASTRO_REFERENCE = {
   // --- 8a. Earth J2000 reference values ---
   // Source: IAU 2006 precession model (Capitaine et al. 2003)
   //
-  // NOT MIGRATED, DELIBERATELY: obliquity stays a local literal because the JSON
-  // still holds IAU 1976/1980 (84381.448") while these are IAU 2006 (84381.406").
-  // Importing would pull the OLD standard into the browser — backwards. IAU 2006
-  // is the decision; adopting it JSON-side needs Step 6a then 6b regenerated,
-  // because the constant is a fit target. Tracked in KNOWN_DIVERGENCE
-  // (tools/constants/check-literals.mjs); migrate these two the moment it lands.
-  obliquityJ2000_arcsec: 84381.406,                  // ε₀ at J2000.0
-  obliquityJ2000_deg: 84381.406 / 3600,              // = 23.439279°
+  // §12e landed: the JSON is on IAU 2006 now, so these migrate at last —
+  // the arcsec form is derived (deg × 3600) rather than a second literal.
+  obliquityJ2000_arcsec: K.earthOrbital.obliquityJ2000_deg * 3600,   // ε₀ at J2000.0
+  obliquityJ2000_deg: K.earthOrbital.obliquityJ2000_deg,             // = 23.439279°
   obliquityRate_arcsecPerCentury: K.earthOrbital.obliquityRate_arcsecPerCentury,
   obliquityRate_degPerCentury: K.earthOrbital.obliquityRate_arcsecPerCentury / 3600,  // = -0.013010°/century
   // Source: Astronomical Almanac, 1°34'43.3" at J2000.0, rate -18"/cy

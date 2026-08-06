@@ -558,7 +558,27 @@ Step 6b: obliquity-harmonics.js               → SOLSTICE_OBLIQUITY_HARMONICS
          16 harmonics, RMSE 0.004", J2000-anchored (exact IAU obliquity).
          Updates: fitted-coefficients.json (auto-updated by script)
 
-Step 6c: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS + ANCHORS
+RENAME: the year-length fit is now **Step 6c** and runs BEFORE the
+cardinal-point fit, now **Step 6d** — the §10e-bis reordering made the
+year-length model the authoritative source of secular year-length behaviour,
+and the step ids now follow the execution order. In documents written before
+this rename, "6c" = cardinal-point and "6d"/"6e" = year-length.
+
+Step 6c: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS
+         Computes year lengths from raw events in 02-solar-measurements.csv:
+         - Tropical: mean of 4 cardinal point JD intervals
+         - Sidereal: world-angle advancement at cardinal points
+         - Anomalistic: mean of perihelion + aphelion intervals
+         All downsampled by stepYears. RMSE: tropical 0.002s, sidereal 0.001s,
+         anomalistic 0.002s over full H.
+         One bare `--write` fits and writes ALL THREE sets plus
+         YEAR_LENGTH_J2000_ANCHOR (the old `--type sidereal` /
+         `--type anomalistic` split no longer exists).
+         MUST run before Step 6d — the cardinal-point fit derives from this
+         step's tropical model and hard-fails without it.
+         Updates: fitted-coefficients.json (auto-updated by script)
+
+Step 6d: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS + ANCHORS
          Reads SS/WS/VE/AE JDs from 02-solar-measurements.csv (downsampled by
          stepYears, then EDGE-TRIMMED 8% per side: the export window is the
          balanced bracket exactly, so both ends share lattice phase ≈ 0° and
@@ -566,7 +586,9 @@ Step 6c: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS + ANC
          vs 3.5 min interior — which otherwise dominates the least squares
          and distorts the interior coefficients. Trimmed zones are
          extrapolation for the shipped fit.)
-         24 self-corrected harmonics per type (§10 derived form), plus the
+         24 self-corrected harmonics per type (§10 derived form — the COMMON
+         secular mode comes from Step 6c's year-length model; this step fits
+         only the DIFFERENTIAL mode), plus the
          §10g quadrature-locked JOINT sidebands: 52 coefficients SHARED
          across the four points (phase = order·λ_X − 2π·div·c,
          COUNTER-rotating — the sign is load-bearing), fitted as a second
@@ -576,23 +598,11 @@ Step 6c: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS + ANC
          RMSE 0.28-0.37 min,
          OOS ≡ in-sample (offset-grid, bias ≈ 0).
          Data-anchored at closest JD to IAU J2000 value, then derived to J2000.
-         Tropical year = mean of 4 cardinal point derivatives (no separate step).
          Updates: fitted-coefficients.json (auto-updated by script)
          Skip criteria: See "When does a coefficient re-fit actually need to
          run?" near the top of this README — runtime formula tweaks (Option
          A/B snapshot vs integrated phase, deep-time mSY drift, Method B
-         LOD anchor, IAU sidereal-year anchor) do NOT need Step 6c to re-run.
-
-Step 6d: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS
-         Computes year lengths from raw events in 02-solar-measurements.csv:
-         - Tropical: mean of 4 cardinal point JD intervals
-         - Sidereal: world-angle advancement at cardinal points
-         - Anomalistic: mean of perihelion + aphelion intervals
-         All downsampled by stepYears. RMSE: tropical 0.002s, sidereal 0.001s,
-         anomalistic 0.002s over full H.
-         Updates: fitted-coefficients.json (auto-updated by script)
-         run-pipeline.js splits this into two steps — 6d `--type sidereal`
-         and 6e `--type anomalistic`. The bare invocation above does both.
+         LOD anchor, IAU sidereal-year anchor) do NOT need Step 6d to re-run.
 
 Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
          fit is now invoked as Step 0 (prerequisite, runs before Step 1)
@@ -880,7 +890,9 @@ Step 12: node tools/fit/export-to-holistic.js --write   (ΔT section)
 > `data/02-solar-measurements.csv` was produced by the deep-time-ON,
 > pos↔JD-integrated engine; Phase C restored that engine (a 1990–2010
 > re-export reproduces the CSV bit-exactly — do not regenerate, 2 h 24 m for
-> an identical file, no git copy), and Phase D refit 6b → 6d → 6c against it
+> an identical file, no git copy), and Phase D refit 6b → 6c → 6d
+> (obliquity → year-length → cardinal-point; pre-rename it read "6b → 6d →
+> 6c") against it
 > on the corrected basis: per-row cycle axis (R12/R13), event-row anchors
 > (R14), shipped divisor sets (R10), and the §10 derived cardinal form
 > (R5/R7/R8/R9) with its runtime mirrors (R11).
@@ -894,8 +906,8 @@ Note: `data/02-solar-measurements.csv` is generated by Step 6a (~2 h for full H 
 It contains all solar events (cardinal points + perihelion/aphelion) with world-angles.
 All downstream fitting steps (6b-6d) read from this single CSV and downsample by `stepYears`
 (currently 23) — no separate exports needed.
-Tropical year harmonics are fitted alongside sidereal and anomalistic (Step 6d).
-The cardinal-point-derived tropical year (Step 6c) is the authoritative runtime version.
+Tropical year harmonics are fitted alongside sidereal and anomalistic (Step 6c).
+The cardinal-point-derived tropical year (Step 6d) is the authoritative runtime version.
 
 ## What triggers a refit?
 
@@ -996,8 +1008,9 @@ Step 3 (browser export) is always manual — the runner checks the data file exi
 - Steps 5a-c (Planet corrections): **~1 min combined**
 - **Step 6a (CSV export): ~2 hours** — this is the pipeline bottleneck. Default step timeout raised to 3 h.
 - Step 6b (Obliquity): ~90 sec
-- **Step 6c (Cardinal-point): ~40 min** — greedy fit × 4 CPs × 24 harmonics per CP. Default step timeout was 10 min (too short); raised to 60 min. Observed to complete in ~30 min.
-- Steps 6d-10 (year-length, balance, verify, export, dashboard): ~5-10 min combined
+- Step 6c (Year-length): ~2 min
+- **Step 6d (Cardinal-point): ~40 min** — greedy fit × 4 CPs × 24 harmonics per CP. Default step timeout was 10 min (too short); raised to 60 min. Observed to complete in ~30 min.
+- Steps 7a-10 (balance, verify, export, dashboard): ~5-10 min combined
 - **TOTAL Phase 2: ~2.5-3 hours** dominated by Step 6a.
 
 The `--iterate` / `--converge` flags repeat the planet correction fitting steps (5a parallax →
@@ -1064,8 +1077,8 @@ node tools/fit/moon-eclipse-optimizer.js --write                             # S
 # Phase 5: Solar measurements & harmonic fits
 node tools/fit/export-solar-measurements.js                                  # Step 6a (~2 h)
 node tools/fit/obliquity-harmonics.js --write                                # Step 6b
-node tools/fit/cardinal-point-harmonics.js --write                           # Step 6c
-node tools/fit/year-length-harmonics.js --write                              # Step 6d
+node tools/fit/year-length-harmonics.js --write                              # Step 6c (BEFORE 6d — 6d derives from it)
+node tools/fit/cardinal-point-harmonics.js --write                           # Step 6d
 # (Sun longitude harmonics moved to Phase 0 — see top of this block.
 # It does NOT need to re-run here as part of routine refits.)
 
@@ -1166,8 +1179,8 @@ Fitting scripts write to JSON, then `constants:generate` (Step 9) regenerates th
     gravitation-correction.js    → fitted-coefficients.json  (Step 5b)
     moon-eclipse-optimizer.js    → model-parameters.json     (Step 5c)
     obliquity-harmonics.js       → fitted-coefficients.json  (Step 6b)
-    cardinal-point-harmonics.js  → fitted-coefficients.json  (Step 6c)
-    year-length-harmonics.js     → fitted-coefficients.json  (Step 6d)
+    year-length-harmonics.js     → fitted-coefficients.json  (Step 6c)
+    cardinal-point-harmonics.js  → fitted-coefficients.json  (Step 6d)
     optimize.js                  → model-parameters.json       (Steps 1, 2)
     balance-search.js            → data/balance-presets.json    (Step 7b)
     fibonacci_significance.py    → data/significance-results.json (Step 7d)

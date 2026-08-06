@@ -81,7 +81,8 @@ would silently churn a structural claim for a rounding-level gain.
 - `data/02-solar-measurements.csv` is 166 MB and gitignored — no git recovery.
   Back it up before regenerating (2 h 24 m).
 - **The deep-time alignment campaign is COMPLETE** — engine ≡ CSV bit-exact,
-  all sixteen R-items closed, 6c at 0.28–0.37 min over ±270 kyr via the §10
+  all sixteen R-items closed, the cardinal-point fit (now Step 6d; "6c" in
+  campaign-era docs) at 0.28–0.37 min over ±270 kyr via the §10
   derived form + edge-trim + the §10g quadrature-locked joint sidebands. Do
   not regenerate the CSV: 2 h 24 m for an identical file. Coefficients and
   runtime evaluation form are a MATCHED PAIR — never ship one without the
@@ -101,7 +102,8 @@ would silently churn a structural claim for a rounding-level gain.
 - **A fit-window edge phase-locked to the lattice masquerades as physics.**
   The "e(t)-minimum residual peak" was window-edge divergence — both bracket
   ends sit at H/16 phase ≈ 0°. Check the edge/interior split before believing
-  any phase-binned feature; the 6c fitter edge-trims 8%/side for this reason.
+  any phase-binned feature; the cardinal-point fitter (Step 6d) edge-trims
+  8%/side for this reason.
 
 ---
 

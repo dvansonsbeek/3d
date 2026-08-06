@@ -1442,7 +1442,7 @@ function main() {
 // default-ON package (new anchors + coefficients must move together).
 
 function runJointMode() {
-  const resPath = path.join(__dirname, '..', '..', 'data', 'core-mantle-resonator-stage1.json');
+  const resPath = path.join(ROOT, 'data', 'core-mantle-resonator-stage1.json');
   const res = JSON.parse(fs.readFileSync(resPath, 'utf8')).proposed_shipped_coefficients.resonator;
   const T0 = EIGHT_H / res.T0_lattice_n;
   const w0 = 2 * Math.PI / T0;

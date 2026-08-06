@@ -278,8 +278,8 @@ function main() {
   // while the year-2000 SS row is the JUNE solstice, half a year later, and
   // obliquity moves ~47″/century. But the scene is CALIBRATED so that the
   // year-2000 solstice obliquity IS the IAU J2000 number:
-  //     CSV SS year 2000 = 23.439291000
-  //     ASTRO_REFERENCE  = 23.439291111   (0.0004″ apart)
+  //     CSV SS year 2000 = 23.439279      (column precision 1e-6°)
+  //     ASTRO_REFERENCE  = 23.439279444   (IAU 2006; ≤0.002″ apart)
   // The fit's job is to reproduce the scene, so the anchor must sit where the
   // scene puts it. Anchoring at JD 2451545.0 instead was measured: it leaves a
   // CONSTANT +0.2247″ bias on all 335,318 rows while the scatter stays at the

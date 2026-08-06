@@ -93,12 +93,11 @@ const MIGRATED = [
   'astro.physicalConstants.solarWindMassLossKgPerS',
   'astro.earthOrbital.perihelionalignmentYear',
 
-  // Phase 5f block 5 — astro.earthOrbital, minus obliquityJ2000_deg.
-  //
-  // obliquityJ2000_deg is NOT migrated ON PURPOSE. script.js holds IAU 2006
-  // (84381.406") and the JSON still holds IAU 1976/1980 (84381.448"), so
-  // importing would pull the OLD standard into the browser — the wrong
-  // direction. It migrates once the 6a->6b refit lands; see KNOWN_DIVERGENCE.
+  // Phase 5f block 5 — astro.earthOrbital, COMPLETE since the §12e refit:
+  // the JSON adopted IAU 2006, so obliquityJ2000_deg finally migrated
+  // (script.js reads K.earthOrbital.obliquityJ2000_deg; the arcsec form is
+  // derived deg × 3600, no second literal).
+  'astro.earthOrbital.obliquityJ2000_deg',
   'astro.earthOrbital.obliquityRate_arcsecPerCentury',
   'astro.earthOrbital.earthInclinationJ2000_deg',
   'astro.earthOrbital.sunMeanLongitudeJ2000_deg',
@@ -303,16 +302,10 @@ const NOT_IN_SCRIPT = {
  * @type {Record<string, string>}
  */
 const KNOWN_DIVERGENCE = {
-  'astro.earthOrbital.obliquityJ2000_deg':
-    'DECIDED, NOT YET ADOPTED — blocked on a refit. src/script.js uses IAU 2006 '
-    + '(84381.406", Capitaine 2003); the JSON, and so tools/lib/constants.js, still '
-    + 'holds IAU 1976/1980 (84381.448"). 0.042" apart, ~6.5x the 0.00641" out-of-sample '
-    + 'RMS the obliquity fit targets. IAU 2006 IS the intended value. It is not in yet '
-    + 'because this constant is a FIT TARGET (tools/lib/optimizer.js:218, '
-    + 'tools/fit/obliquity-harmonics.js), so adopting it requires regenerating Step 6a '
-    + 'and then Step 6b — not a constant swap. Swapping it alone was measured: '
-    + 'verify-pipeline went 0.0000" -> 0.0420" and failed, since the shipped harmonics '
-    + 'stay anchored to the old value. Remove this entry when the refit lands.',
+  // (empty since the §12e IAU 2006 adoption landed — the obliquityJ2000_deg
+  // entry resolved with the full Step 0 + 6a–6e + corrections refit. The
+  // checker flags stale entries by design, which is why the resolution is
+  // recorded by REMOVAL.)
 };
 
 // ── collect distinctive JSON leaves ──────────────────────────────────────────

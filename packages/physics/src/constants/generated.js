@@ -29,11 +29,11 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "2ff0c10eeb4f897a";
+export const CONSTANTS_HASH = "147e9bae6a997659";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "2ff0c10eeb4f897a",
+  hash: "147e9bae6a997659",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -175,17 +175,17 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "dtStackTaperTotalHalfwidthYr": 400000
   },
   earth: {
-    "earthtiltMean": 23.41353942374053,
-    "earthInvPlaneInclinationAmplitude": 0.6360412216221447,
-    "eccentricityBase": 0.015386008387504473,
-    "eccentricityAmplitude": 0.0013559453578636752,
+    "earthtiltMean": 23.413527499101747,
+    "earthInvPlaneInclinationAmplitude": 0.6360475695866625,
+    "eccentricityBase": 0.015386009686374918,
+    "eccentricityAmplitude": 0.0013559440307290061,
     "eccentricityAmplitudeK": 0.0000034149201282126695
   },
   earthOrbital: {
     "j2000EpochYear": 2000,
     "perihelionalignmentYear": 1246.03125,
     "juneSolstice2000_JD": 2451716.575,
-    "obliquityJ2000_deg": 23.439291111,
+    "obliquityJ2000_deg": 23.439279444444445,
     "obliquityRate_arcsecPerCentury": -46.836769,
     "earthEccentricityJ2000": 0.01671022,
     "earthEccentricityDotJ2000": -0.000042037,
@@ -197,7 +197,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
     "earthInclinationRate_arcsecPerCentury": -18,
-    "deltaTStart": 56.04899719615156,
+    "deltaTStart": 55.85417672145975,
     "sunTilt": 7.155
   },
   foundational: {
@@ -207,7 +207,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "startmodelJD": 2451716.5,
     "startmodelYear": 2000.5,
     "correctionDays": -0.828832119703292,
-    "correctionSun": 0.4967673207590977,
+    "correctionSun": 0.4968839022012559,
     "temperatureGraphMostLikely": 14.5,
     "startAngleModel": 89.91949879,
     "useVariableSpeed": true,
@@ -217,7 +217,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "moonStartposApsidal": 347.5476,
     "moonStartposNodal": 64.0435,
     "moonStartposMoon": 67.8443,
-    "moonMeeusLpCorrection": 0.010524
+    "moonMeeusLpCorrection": 0.010576278829833089
   },
   moonMeeus: {
     "elpW1T2Decomposition_arcsecPerCy2": {
@@ -382,8 +382,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "mercury": {
       "name": "Mercury",
       "eocFraction": -0.527,
-      "startpos": 83.65049392346397,
-      "angleCorrection": 0.9715969391605945,
+      "startpos": 83.65212772217342,
+      "angleCorrection": 0.971595956003533,
       "perihelionEclipticFraction": [
         8,
         11
@@ -407,8 +407,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "venus": {
       "name": "Venus",
       "eocFraction": 0.436,
-      "startpos": 249.32539285801533,
-      "angleCorrection": -2.750623585711864,
+      "startpos": 249.28769121856186,
+      "angleCorrection": -2.7506208719906127,
       "perihelionEclipticFraction": [
         -8,
         6
@@ -430,7 +430,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "name": "Mars",
       "eocFraction": -0.066224,
       "startpos": 121.4634461571797,
-      "angleCorrection": -2.1102648138849744,
+      "angleCorrection": -2.110262688821635,
       "perihelionEclipticFraction": [
         8,
         36
@@ -454,8 +454,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "jupiter": {
       "name": "Jupiter",
       "eocFraction": 0.495,
-      "startpos": 13.887251714696855,
-      "angleCorrection": 0.9306123041099745,
+      "startpos": 13.887946755371052,
+      "angleCorrection": 0.9306112039524912,
       "perihelionEclipticFraction": [
         8,
         39
@@ -479,8 +479,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "saturn": {
       "name": "Saturn",
       "eocFraction": 0.54,
-      "startpos": 11.280368711684483,
-      "angleCorrection": -0.1788736536157458,
+      "startpos": 11.279046793476084,
+      "angleCorrection": -0.17887349563889998,
       "perihelionEclipticFraction": [
         -8,
         65
@@ -505,7 +505,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "name": "Uranus",
       "eocFraction": 0.53,
       "startpos": 44.900388945775106,
-      "angleCorrection": -0.7329076961290184,
+      "angleCorrection": -0.7329070274012324,
       "perihelionEclipticFraction": [
         1,
         3
@@ -530,7 +530,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "name": "Neptune",
       "eocFraction": 0.585,
       "startpos": 47.9552024382285,
-      "angleCorrection": 2.332350100136672,
+      "angleCorrection": 2.332347646694906,
       "perihelionEclipticFraction": [
         2,
         1

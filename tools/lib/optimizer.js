@@ -210,7 +210,7 @@ function solveAmplitudeForObliquityRate() {
 
 /**
  * Solve for earthtiltMean such that sun.dec at the June solstice 2000 equals
- * ASTRO_REFERENCE.obliquityJ2000_deg (23.439291°).
+ * ASTRO_REFERENCE.obliquityJ2000_deg (IAU 2006: 23.4392794°).
  *
  * Monotonically: larger earthtiltMean → larger obliquity at J2000.
  */
@@ -992,7 +992,7 @@ function nelderMead(planet, paramNames, options = {}) {
   //   eccentricityBase      → perihelion longitude (barycenter.RA = 102.947° at J2000)
   //   eccentricityAmplitude → base + e(J2000) = 0.01671022
   //   earthInvPlaneInclinationAmplitude → obliquity rate = IAU -46.836769"/cy (bisection)
-  //   earthtiltMean         → obliquity at J2000 = IAU 23.439291° (bisection)
+  //   earthtiltMean         → obliquity at J2000 = IAU 2006 23.4392794° (bisection)
   if (planet === 'sun') {
     const derived = ['eccentricityBase', 'eccentricityAmplitude',
                      'earthInvPlaneInclinationAmplitude', 'earthtiltMean'];
@@ -1002,7 +1002,7 @@ function nelderMead(planet, paramNames, options = {}) {
       console.warn(`            eccentricityBase  → derived from perihelion longitude (barycenter.RA = 102.947°)`);
       console.warn(`            eccentricityAmplitude → derived from base + e(J2000) = 0.01671022`);
       console.warn(`            earthInvPlaneInclinationAmplitude → derived from IAU obliquity rate -46.836769"/cy`);
-      console.warn(`            earthtiltMean → derived from IAU obliquity at J2000 = 23.439291°`);
+      console.warn(`            earthtiltMean → derived from IAU 2006 obliquity at J2000 = 23.4392794°`);
       paramNames = paramNames.filter(p => !derived.includes(p));
     }
 

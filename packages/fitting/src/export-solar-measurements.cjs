@@ -15,10 +15,10 @@
  *
  * Downstream consumers:
  *   - obliquity-harmonics.js (step 6b) — reads SS obliquity
- *   - cardinal-point-harmonics.js (step 6c) — reads cardinal point JDs
- *   - year-length-harmonics.js --type sidereal (step 6d) — reads world-angles
- *   - year-length-harmonics.js --type anomalistic (step 6e) — reads PERI/APH JDs
- *   - Tropical year: derived from cardinal point harmonics (no separate step)
+ *   - year-length-harmonics.js (step 6c) — reads cardinal JDs, world-angles and
+ *     PERI/APH JDs; one --write fits all three year types incl. tropical
+ *   - cardinal-point-harmonics.js (step 6d) — reads cardinal point JDs and
+ *     derives from 6c's year-length model (must run AFTER 6c)
  *
  * Usage:
  *   node tools/fit/export-solar-measurements.js                    # full H (~50 min)

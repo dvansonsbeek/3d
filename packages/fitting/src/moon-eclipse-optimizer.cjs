@@ -250,14 +250,15 @@ function fitComponent(getError) {
 
 const raC = fitComponent(e => e.dRA);
 const decC = fitComponent(e => e.dDec);
-const round6 = v => Math.round(v * 1000000) / 1000000;
+// §12f: persist full doubles — rounding at the write destroys precision no
+// downstream consumer can recover.
 const bestMoonCorrection = {
-  raSinD: round6(raC[0]), raCosD: round6(raC[1]),
-  raSinMp: round6(raC[2]), raCosMp: round6(raC[3]),
-  raSinMs: round6(raC[4]), raCosMs: round6(raC[5]),
-  decSinD: round6(decC[0]), decCosD: round6(decC[1]),
-  decSinMp: round6(decC[2]), decCosMp: round6(decC[3]),
-  decSinMs: round6(decC[4]), decCosMs: round6(decC[5]),
+  raSinD: raC[0], raCosD: raC[1],
+  raSinMp: raC[2], raCosMp: raC[3],
+  raSinMs: raC[4], raCosMs: raC[5],
+  decSinD: decC[0], decCosD: decC[1],
+  decSinMp: decC[2], decCosMp: decC[3],
+  decSinMs: decC[4], decCosMs: decC[5],
 };
 
 console.log('Fitted coefficients:');
@@ -275,7 +276,7 @@ console.log(`\nMoon RMS after 3-term correction: ${finalBaseline.rmsTotal.toFixe
 if (process.argv.includes('--write')) {
   const mpPath = path.resolve(ROOT, 'public', 'input', 'model-parameters.json');
   const mp = JSON.parse(fs.readFileSync(mpPath, 'utf8'));
-  mp.moon.moonMeeusLpCorrection = Math.round(bestLpCorrection * 1000000) / 1000000;
+  mp.moon.moonMeeusLpCorrection = bestLpCorrection;  // §12f: full double
   fs.writeFileSync(mpPath, JSON.stringify(mp, null, 2) + '\n');
 
   const fcPath = path.resolve(ROOT, 'public', 'input', 'fitted-coefficients.json');

@@ -30,22 +30,22 @@
     "smallBodyMasses": {
       "_description": "Ceres from Dawn radiometric tracking (2015-2018). Eros measured by NEAR Shoemaker (2000-2001). Halley's is an ESTIMATE from size (~11x8x8 km) and density (~0.6 g/cm3) — no spacecraft has orbited it.",
       "ceresGmKm3PerS2": 62.6274,
-      "erosMassKg": 6.687e15,
-      "halleysMassKg": 2.2e14
+      "erosMassKg": 6687000000000000,
+      "halleysMassKg": 220000000000000
     },
-    "earthJ2": 1.08262668e-3,
+    "earthJ2": 0.00108262668,
     "earthEquatorialRadiusKm": 6378.1366
   },
   "earthOrbital": {
     "j2000EpochYear": 2000,
     "perihelionalignmentYear": 1246.03125,
     "juneSolstice2000_JD": 2451716.575,
-    "_obliquityJ2000Note": "HOLDS IAU 1976/1980 (23.439291111 = 84381.448 arcsec) DELIBERATELY, pending a refit. src/script.js is already on IAU 2006 (84381.406/3600 = 23.439279444444445, Capitaine et al. 2003), so browser and Node disagree by 0.042 arcsec — about 6.5x the 0.00641 arcsec out-of-sample RMS the obliquity fit targets. IAU 2006 is the intended value; it is not adopted yet because this constant is a FIT TARGET (tools/lib/optimizer.js, tools/fit/obliquity-harmonics.js), so changing it requires regenerating Step 6a and then Step 6b. Swapping the value alone was measured: verify-pipeline goes from 0.0000 to 0.0420 arcsec and fails, because the shipped harmonics remain anchored to the old value. Guarded by KNOWN_DIVERGENCE in tools/constants/check-literals.mjs.",
-    "obliquityJ2000_deg": 23.439291111,
+    "_obliquityJ2000Note": "IAU 2006 (84381.406 arcsec / 3600, Capitaine et al. 2003) — adopted at the 12e refit (full Step 0 + 6a-6e + corrections regeneration under this anchor; the prior IAU 1976/1980 deferral note is in git history).",
+    "obliquityJ2000_deg": 23.439279444444445,
     "obliquityRate_arcsecPerCentury": -46.836769,
     "earthEccentricityJ2000": 0.01671022,
     "earthEccentricityDotJ2000": -0.000042037,
-    "earthEccentricityDotDotJ2000": -0.0000002534,
+    "earthEccentricityDotDotJ2000": -2.534e-7,
     "earthPerihelionLongitudeJ2000": 102.94719,
     "sunMeanLongitudeJ2000_deg": 280.46646,
     "earthAscendingNodeInvPlane": 284.51,
@@ -53,12 +53,12 @@
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
     "earthInclinationRate_arcsecPerCentury": -18,
-    "deltaTStart": 56.04899719615156,
+    "deltaTStart": 55.85417672145975,
     "sunTilt": 7.155
   },
   "bodyDiametersKm": {
     "_description": "Mean body diameters in km. NOT presentation-only: earthDiameter yields R_EARTH_M for the physics, and sunDiameter/moonDiameter give the radii the eclipse geometry uses. Halley's and Eros are irregular; the figure is a mean.",
-    "sun": 1392684.0,
+    "sun": 1392684,
     "moon": 3474.8,
     "earth": 12756.27,
     "mercury": 4879.4,
@@ -360,7 +360,7 @@
   },
   "timeReference": {
     "_description": "Calendar and epoch reference values (IAU / standard definitions). j2000JD is JD of J2000.0 (2000 Jan 1.5 TT); julianCenturyDays is the IAU Julian century (365.25 x 100 days); gregorianStartJD is the start of the Gregorian calendar (1582 Oct 15); jd1800/jd1900/jd2100 are ~Jan 1 calendar reference points used by display ranges.",
-    "j2000JD": 2451545.0,
+    "j2000JD": 2451545,
     "julianCenturyDays": 36525,
     "gregorianStartJD": 2299160.5,
     "jd1800": 2378496.5,
@@ -369,24 +369,71 @@
   },
   "perihelionPrecessionRatesJPL": {
     "_description": "Observed perihelion precession rates in arcsec/century, 1900-2100 trend. Source: JPL SPICE/WebGeoCalc. These fluctuate over time and are not valid for long-term predictions. Validation reference only, never a model input. Saturn is retrograde over this window.",
-    "mercury": { "min": 570, "max": 575 },
-    "venus": { "min": 0, "max": 400 },
-    "earth": { "value": 1163 },
-    "mars": { "min": 1550, "max": 1650 },
-    "jupiter": { "min": 800, "max": 1800 },
-    "saturn": { "min": -3400, "max": -2000 },
-    "uranus": { "min": 1100, "max": 1300 },
-    "neptune": { "min": -200, "max": 200 }
+    "mercury": {
+      "min": 570,
+      "max": 575
+    },
+    "venus": {
+      "min": 0,
+      "max": 400
+    },
+    "earth": {
+      "value": 1163
+    },
+    "mars": {
+      "min": 1550,
+      "max": 1650
+    },
+    "jupiter": {
+      "min": 800,
+      "max": 1800
+    },
+    "saturn": {
+      "min": -3400,
+      "max": -2000
+    },
+    "uranus": {
+      "min": 1100,
+      "max": 1300
+    },
+    "neptune": {
+      "min": -200,
+      "max": 200
+    }
   },
   "juneSolsticeReference": {
-    "_description": "Reference June solstice Julian Dates (source: astropixels.com, Jean Meeus algorithms). JD convention: JD X.5 = midnight UTC, JD X.0 = noon UTC. Leaf is named solsticeRefJD (not jd, not solsticeJD) because tools/constants/check-literals.mjs name-matches leaf keys and both shorter names occur as numeric declarations in script.js. Validation reference only.",
-    "1990": { "solsticeRefJD": 2448091.148148, "timeUTC": "15:33" },
-    "1995": { "solsticeRefJD": 2449919.357639, "timeUTC": "20:34" },
-    "2000": { "solsticeRefJD": 2451716.575, "timeUTC": "01:48" },
-    "2005": { "solsticeRefJD": 2453542.781944, "timeUTC": "06:46" },
-    "2010": { "solsticeRefJD": 2455368.977778, "timeUTC": "11:28" },
-    "2015": { "solsticeRefJD": 2457195.193056, "timeUTC": "16:38" },
-    "2020": { "solsticeRefJD": 2459021.404861, "timeUTC": "21:43" },
-    "2025": { "solsticeRefJD": 2460847.6125, "timeUTC": "02:42" }
+    "1990": {
+      "solsticeRefJD": 2448091.148148,
+      "timeUTC": "15:33"
+    },
+    "1995": {
+      "solsticeRefJD": 2449919.357639,
+      "timeUTC": "20:34"
+    },
+    "2000": {
+      "solsticeRefJD": 2451716.575,
+      "timeUTC": "01:48"
+    },
+    "2005": {
+      "solsticeRefJD": 2453542.781944,
+      "timeUTC": "06:46"
+    },
+    "2010": {
+      "solsticeRefJD": 2455368.977778,
+      "timeUTC": "11:28"
+    },
+    "2015": {
+      "solsticeRefJD": 2457195.193056,
+      "timeUTC": "16:38"
+    },
+    "2020": {
+      "solsticeRefJD": 2459021.404861,
+      "timeUTC": "21:43"
+    },
+    "2025": {
+      "solsticeRefJD": 2460847.6125,
+      "timeUTC": "02:42"
+    },
+    "_description": "Reference June solstice Julian Dates (source: astropixels.com, Jean Meeus algorithms). JD convention: JD X.5 = midnight UTC, JD X.0 = noon UTC. Leaf is named solsticeRefJD (not jd, not solsticeJD) because tools/constants/check-literals.mjs name-matches leaf keys and both shorter names occur as numeric declarations in script.js. Validation reference only."
   }
 }

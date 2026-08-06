@@ -94,7 +94,8 @@ function anchorCycleOf(data, anchorYear) {
 // We compute:
 //   - Sidereal year: days × 360° / Δ(world-angle) at cardinal points
 //   - Anomalistic year: mean of perihelion + aphelion intervals
-// Tropical year is derived from cardinal point harmonics (step 6c), not fitted here.
+// Tropical year: mean of the 4 cardinal-point JD intervals — fitted HERE since
+// the §10e-bis reordering; the cardinal-point fit (step 6d) derives from it.
 function loadData() {
   const raw = fs.readFileSync(CSV_PATH, 'utf8');
   const lines = raw.trim().split('\n');
@@ -496,6 +497,10 @@ function main() {
       tropical: anchors.tropicalJ2000,
       sidereal: anchors.siderealJ2000,
       anomalistic: anchors.anomalisticJ2000,
+      // Matched-pair stamp: the CSV this fit was made against. Step 6d
+      // (cardinal-point) refuses to run when the current CSV doesn't match —
+      // key EXISTENCE alone let a stale fit through once.
+      sourceCsvMtimeMs: fs.statSync(CSV_PATH).mtimeMs,
     };
     fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
     console.log('\n✓ Written TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS to fitted-coefficients.json');

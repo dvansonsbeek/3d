@@ -240,8 +240,10 @@ for (const target of targets) {
 
   // Collect for JSON output
   const decObj = {}, raObj = {};
-  usedLabels.forEach((l, i) => { decObj[l] = parseFloat(bestTier.decBeta[i].toFixed(4)); });
-  usedLabels.forEach((l, i) => { raObj[l] = parseFloat(bestTier.raBeta[i].toFixed(4)); });
+  // §12f: persist full doubles — the old toFixed(4) rounding truncated the
+  // shipped coefficients while the fit residuals were measured un-truncated.
+  usedLabels.forEach((l, i) => { decObj[l] = bestTier.decBeta[i]; });
+  usedLabels.forEach((l, i) => { raObj[l] = bestTier.raBeta[i]; });
   allDecCorrections[target] = decObj;
   allRaCorrections[target] = raObj;
 }

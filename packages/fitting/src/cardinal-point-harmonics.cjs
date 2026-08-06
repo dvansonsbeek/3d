@@ -41,7 +41,8 @@ const GRID_ANCHORS = C.cardinalPointAnchorsAtGrid;
 // — J2000 sits at 0.91 of the window, INSIDE the kept region with ~3,850 yr
 // of margin. NOTE: the edge error masqueraded as a physical feature at the
 // e(t) minimum (both edges share lattice phase ≈ 0°) until the edge/interior
-// split was measured — see the plan's 6c residual-map section.
+// split was measured — see the plan's 6c residual-map section (pre-rename
+// numbering: there "6c" = this cardinal-point fit).
 const FIT_EDGE_TRIM_FRACTION = 0.08;
 
 // ─── Read CSV data by type ───────────────────────────────────────────────
@@ -171,29 +172,41 @@ const phaseOf = (year, div) => {
   return (c === null ? 0 : c) * 2 * Math.PI;
 };
 
-// ═══ §10 — cardinal points DERIVED from the Step 6d year-length model ═══════
+// ═══ §10 — cardinal points DERIVED from the Step 6c year-length model ═══════
 //
 //   JD_X(Y) = anchor_X + LINCOEF·(Y−2000) + driftTerm(Y) + Ih(Y) + δ_X(Y)
 //
 // The four cardinal points decompose exactly, because T_trop IS DEFINED as the
 // mean of their four intervals:
 //   T_X(Y) = T_trop(Y) + δ_X(Y),  Σ_X δ_X ≡ 0
-// so the COMMON mode (all the secular content) comes from 6d, and this step
+// so the COMMON mode (all the secular content) comes from 6c, and this step
 // fits only the DIFFERENTIAL mode — the braiding.
 //
 // Measured: spiral coherence 17× tighter than the old independent fit
 // (quadrature −0.79° → −0.03°, amplitude spread 2.18% → 0.13%). Accuracy is
 // unchanged; this buys structural correctness, not precision (§10e-bis).
 //
-// REQUIRES Step 6d to have run --write first. That is the reordering: 6d now
-// precedes 6c, and the year-length model — not the cardinal-point fit — is the
-// authoritative source of secular year-length behaviour.
+// REQUIRES the year-length fit (Step 6c — renamed from 6d when this fit
+// became 6d) to have run --write first. That is the reordering:
+// year-length precedes cardinal-point, and the year-length model — not the
+// cardinal-point fit — is the authoritative source of secular year-length
+// behaviour.
 const _fcPath = path.join(ROOT, 'public', 'input', 'fitted-coefficients.json');
 const _fc = JSON.parse(fs.readFileSync(_fcPath, 'utf8'));
 const TROP_HARMONICS = _fc.TROPICAL_YEAR_HARMONICS;
 const TROP_ANCHOR = _fc.YEAR_LENGTH_J2000_ANCHOR;
 if (!TROP_HARMONICS || !TROP_ANCHOR) {
-  throw new Error('Step 6c now derives from Step 6d — run `node tools/fit/year-length-harmonics.js --write` first.');
+  throw new Error('The cardinal-point fit (6d) derives from the year-length fit (6c) — run `node tools/fit/year-length-harmonics.js --write` first.');
+}
+// Stale-input guard: 6c's keys EXISTING is not enough — they must be fitted
+// from THIS CSV. Measured failure: a cardinal-point run consumed year-length
+// keys fitted from the previous CSV; the existence-only check let it
+// through silently.
+if (TROP_ANCHOR.sourceCsvMtimeMs !== fs.statSync(CSV_PATH).mtimeMs) {
+  throw new Error(
+    'Step 6c (year-length) was fitted from a DIFFERENT CSV than the one on disk '
+    + `(stamp ${TROP_ANCHOR.sourceCsvMtimeMs}, disk ${fs.statSync(CSV_PATH).mtimeMs}). `
+    + 'Re-run `node tools/fit/year-length-harmonics.js --write` against the current CSV first.');
 }
 
 // (The analyticTropDays reference evaluator was deleted at 9-3e — dead
@@ -207,7 +220,7 @@ const _cycleOf = (year) => {
 };
 const CYCLE_ANCHOR = _cycleOf(2000);
 
-// 6d's self-corrected harmonic series, evaluated as a year-length deviation.
+// 6c's self-corrected harmonic series, evaluated as a year-length deviation.
 function tropHarmonicsAt(year) {
   const c = _cycleOf(year);
   let s = 0;
@@ -258,7 +271,7 @@ function integratedTropHarmonics(year) {
        - (tropHarmonicsAt(year) - tropHarmonicsAt(2000)) / 2;
 }
 
-// Linear coefficient of the DERIVED model. 6d's model is
+// Linear coefficient of the DERIVED model. 6c's model is
 //   T_trop(Y) = av + [A(Y) − A(2000)] + h(Y)
 // so Σ T_trop = [av − A(2000) + meanSolarYearDays]·(Y−2000) + driftTerm + Ih,
 // because driftTerm already carries Σ[A(y) − meanSolarYearDays].
@@ -266,7 +279,7 @@ function integratedTropHarmonics(year) {
 // ── DO NOT use YEAR_LENGTH_J2000_ANCHOR.tropical here ──────────────────────
 // That constant is the INSTANTANEOUS 1-year interval at 2000. This term is a
 // rate to be INTEGRATED over 335,317 years, and the two differ by 0.03661 s/yr
-// (the 1-year value vs the step-N mean — an anchor-convention difference 6d
+// (the 1-year value vs the step-N mean — an anchor-convention difference 6c
 // documents and tolerates, because for a year LENGTH it is a local offset).
 // Integrated, that offset becomes a −0.142 d = −12,276 s RAMP. It does not show
 // up as a 118 min RMSE because the δ_X harmonics ABSORB most of it — which is
@@ -296,9 +309,20 @@ function calibrateLincoef(byType) {
 }
 
 /** Accumulated tropical years from 2000 to `year`, in days. */
+// Memoized: pure in `year` once calibrateHModel/calibrateLincoef have run
+// (both execute exactly once, before any fit). The greedy re-evaluates the
+// same rows ~119× per round through the candidate-invariant b[] — without
+// the memo, each row re-runs the Simpson drift integral (~10¹⁰ deep-time
+// calls across a full run; measured as hours of wall clock).
+const _sigmaMemo = new Map();
 function sigmaTropical(year) {
   if (LINCOEF === null) throw new Error('calibrateLincoef() must run before sigmaTropical()');
-  return LINCOEF * (year - 2000) + driftTerm(year) + integratedTropHarmonics(year);
+  let v = _sigmaMemo.get(year);
+  if (v === undefined) {
+    v = LINCOEF * (year - 2000) + driftTerm(year) + integratedTropHarmonics(year);
+    _sigmaMemo.set(year, v);
+  }
+  return v;
 }
 
 // ─── Least squares harmonic fit ──────────────────────────────────────────
@@ -503,7 +527,7 @@ function main() {
   // constant costs up to 5.2 s.
   calibrateHModel(byType.SS.map(d => d.year));
   calibrateLincoef(byType);          // must follow calibrateHModel — uses Ih()
-  console.log(`\n§10: deriving cardinal points from Step 6d's year-length model`);
+  console.log(`\n§10: deriving cardinal points from the Step 6c year-length model`);
   console.log(`  TROPICAL_YEAR_HARMONICS: ${TROP_HARMONICS.length} terms [${TROP_HARMONICS.map(t => t[0]).join(',')}]`);
   console.log(`  J2000 tropical anchor:   ${TROP_ANCHOR.tropical}`);
   console.log(`  LINCOEF (elapsed-derived): ${LINCOEF}`);
@@ -748,7 +772,8 @@ function main() {
     // WRITE THE SHIPPED DIVISOR SET (`current`), not the greedy search result.
     // The greedy pass is a DIAGNOSTIC — the divisor set is a structural claim,
     // not something to churn for a rounding-level gain. This wrote
-    // `results[type].greedy.harmonics`, the same trap Steps 6b and 6d both had.
+    // `results[type].greedy.harmonics`, the same trap Steps 6b and 6c
+    // (year-length) both had.
     const harmonicsObj = {};
     const eccObj = {};
     for (const type of types) {

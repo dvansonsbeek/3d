@@ -390,7 +390,7 @@ if (command === 'diagnose') {
       const o = d.obliquity;
       const okV = Math.abs(o.diffArcsec) < 0.01 ? '✓ OK' : '⚠ NEEDS FIX';
       console.log();
-      console.log('── Obliquity at J2000 (IAU: 23.439291°) ──');
+      console.log('── Obliquity at J2000 (IAU 2006: 23.4392794°) ──');
       console.log('  earthtiltMean               :', o.earthtiltMean.toFixed(8));
       console.log('  earthInvPlaneInclinationAmpl:', o.earthInvPlaneInclinationAmplitude.toFixed(8));
       console.log('  earthInvPlaneInclinationMean:', o.earthInvPlaneInclinationMean.toFixed(8));

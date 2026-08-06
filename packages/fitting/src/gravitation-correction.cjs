@@ -148,11 +148,12 @@ for (const [planet, periods] of Object.entries(conjConfig)) {
   }
 
   if (anySignificant) {
-    const round6 = v => Math.round(v * 1000000) / 1000000;
+    // §12f: persist full doubles — rounding at the write destroys precision
+    // no downstream consumer can recover.
     corrections[planet] = terms.filter(t => t.significant).map(t => ({
-      period: round6(t.period),
-      raSin: round6(t.raSin), raCos: round6(t.raCos),
-      decSin: round6(t.decSin), decCos: round6(t.decCos),
+      period: t.period,
+      raSin: t.raSin, raCos: t.raCos,
+      decSin: t.decSin, decCos: t.decCos,
     }));
   }
   console.log('');
@@ -270,12 +271,12 @@ for (const elPlanet of elongationPlanets) {
     elssDec += (e.dDec - cDec) ** 2;
   }
   const elNewRMS = Math.sqrt((elssRA + elssDec) / nel);
-  const round6 = v => Math.round(v * 1000000) / 1000000;
 
+  // §12f: full doubles on write (see synodic block above).
   const elCorr = {};
   for (let k = 0; k < mel; k++) {
-    elCorr[elBasis[k].name + '_ra'] = round6(elxRA[k]);
-    elCorr[elBasis[k].name + '_dec'] = round6(elxDec[k]);
+    elCorr[elBasis[k].name + '_ra'] = elxRA[k];
+    elCorr[elBasis[k].name + '_dec'] = elxDec[k];
   }
 
   elongationCorrections[elPlanet] = elCorr;

@@ -143,14 +143,20 @@ const STEPS = [
     cmd: 'node tools/fit/export-solar-measurements.js', timeout: 3 * 60 * 60 * 1000 },
   { id: '6b', phase: 2, name: 'Obliquity harmonics',
     cmd: 'node tools/fit/obliquity-harmonics.js --write' },
-  // 6c observed: SS+WS+VE+AE greedy fit, ~10 min per CP × 4 = ~40 min total.
+  // ORDER + RENAME: year-length is 6c and runs BEFORE the
+  // cardinal-point fit, which is now 6d. The §10e-bis reordering made the
+  // year-length model the authoritative source of secular year-length
+  // behaviour; the cardinal-point fit derives its linear terms from
+  // TROPICAL_YEAR_HARMONICS + YEAR_LENGTH_J2000_ANCHOR and hard-fails
+  // without them. One bare --write fits ALL THREE year types (the old
+  // --type sidereal/anomalistic split no longer exists). In docs written
+  // before this rename, "6c" = cardinal-point and "6d"/"6e" = year-length.
+  { id: '6c', phase: 2, name: 'Year-length harmonics (tropical+sidereal+anomalistic)',
+    cmd: 'node tools/fit/year-length-harmonics.js --write' },
+  // 6d observed: SS+WS+VE+AE greedy fit, ~10 min per CP × 4 = ~40 min total.
   // Default 10-min per-step timeout would abort mid-VE. Use 60 min.
-  { id: '6c', phase: 2, name: 'Cardinal point harmonics (~40 min)',
+  { id: '6d', phase: 2, name: 'Cardinal point harmonics (~40 min)',
     cmd: 'node tools/fit/cardinal-point-harmonics.js --write', timeout: 60 * 60 * 1000 },
-  { id: '6d', phase: 2, name: 'Sidereal year harmonics',
-    cmd: 'node tools/fit/year-length-harmonics.js --write --type sidereal' },
-  { id: '6e', phase: 2, name: 'Anomalistic year harmonics',
-    cmd: 'node tools/fit/year-length-harmonics.js --write --type anomalistic' },
   // Step 6f (sun-longitude-harmonics) intentionally OMITTED — see header
   // comment. It runs once as Phase 0 prerequisite, not as part of the
   // routine cascade.
@@ -167,7 +173,7 @@ const STEPS = [
   // pure-tidal framework, not framework + previously-shipped corrections.
   // See tools/fit/dt-corrections-fit.js docstring + docs/102.
   { id: '7c', phase: 2, name: 'ΔT correction stack (Bond+Hallstatt+Jose5+Jose4)',
-    cmd: 'DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --write' },
+    cmd: 'DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write' },
 
   // Phase 7: Verify & sync
   { id: '8',  phase: 2, name: 'Verify pipeline',
