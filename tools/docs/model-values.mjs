@@ -18,6 +18,13 @@
  * artifact — never a typed literal, or the registry becomes the thing that
  * goes stale. If a value cannot be derived outside the browser, do NOT add it:
  * leave the doc manual and say so, rather than bake a guess into automation.
+ *
+ * KEY NAMES AND RENDERING ARE THE WEBSITE'S CONTRACT. When the site imports
+ * this registry it stops computing these numbers, so any name or precision we
+ * choose differently silently changes what every page displays. Match
+ * `model-values.generated.json` exactly — `tools/docs/parity-model-values.mjs`
+ * measures it. Keys the site does not define are fine; keys it defines
+ * DIFFERENTLY are a defect in this file until proven otherwise.
  */
 import { readFileSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
@@ -57,46 +64,48 @@ export const VALUES = {
     render: (v) => String(v),
     note: 'H without thousands separators (code contexts)',
   },
-  deltaTStartSeconds: {
+  deltaTStart: {
     get: () => dtFit.optimum.deltaTStart,
-    render: (v) => Number(v).toFixed(3),
+    render: (v) => Number(v).toFixed(2),
     unit: 's',
     note: 'ΔT trend anchor at J2000, joint-fit optimum',
   },
   usnoLodJ2000: {
     get: () => dtFit.optimum.usno_target_lod_s,
-    render: (v) => Number(v).toFixed(4),
+    render: (v) => thousands(v, 4),
     unit: 's',
     note: 'USNO Earth Orientation Center J2000 LOD anchor — the joint fit\'s hard-equality closure target',
   },
-  espenakRmsSeconds: {
+  deltaTEspenakRmsSeconds: {
     get: () => dtFit.optimum.espenak_rms_s,
-    render: (v) => Number(v).toFixed(2),
+    render: (v) => Number(v).toFixed(1),
     unit: 's',
     note: 'joint-fit RMS over the Espenak window. NOT the validate-resonator sweep figure (different window) — the two differ and have been confused before',
   },
+  meanObliquity: {
+    get: () => model.earth.earthtiltMean,
+    render: (v) => Number(v).toFixed(5),
+    unit: '°',
+    note: 'earthtiltMean — solved so the scene reproduces the obliquity anchor at the June-2000 solstice',
+  },
+  eccentricityBase: {
+    get: () => model.earth.eccentricityBase,
+    render: (v) => Number(v).toFixed(6),
+    note: 'Earth eccentricity base (locked by the Law 5 balance constraint)',
+  },
+  correctionSun: {
+    get: () => model.foundational.correctionSun,
+    render: (v) => Number(v).toFixed(5),
+    unit: '°',
+    note: 'Sun orbital starting angle',
+  },
+  // Ours-only: the docs need a comma-free H for code contexts, and the IAU
+  // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
     get: () => astro.earthOrbital.obliquityJ2000_deg,
     render: (v) => Number(v).toFixed(6),
     unit: '°',
     note: 'IAU 2006 obliquity at J2000 (84381.406″)',
-  },
-  earthtiltMean: {
-    get: () => model.earth.earthtiltMean,
-    render: (v) => Number(v).toFixed(8),
-    unit: '°',
-    note: 'solved so the scene reproduces the obliquity anchor at the June-2000 solstice',
-  },
-  eccentricityBase: {
-    get: () => model.earth.eccentricityBase,
-    render: (v) => Number(v).toFixed(8),
-    note: 'Earth eccentricity base (locked by the Law 5 balance constraint)',
-  },
-  correctionSun: {
-    get: () => model.foundational.correctionSun,
-    render: (v) => Number(v).toFixed(6),
-    unit: '°',
-    note: 'Sun orbital starting angle',
   },
 };
 
