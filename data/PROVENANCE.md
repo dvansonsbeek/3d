@@ -59,6 +59,8 @@ Listed so their absence from the sections above is not read as an omission.
 |---|---|
 | `insolation-features.csv` | `scripts/extract_insolation_features.js` |
 | `02-solar-measurements.csv` | `tools/fit/export-solar-measurements.js` — gitignored, ~2 h 24 m to rebuild |
+| `nbody_cache_10myr.npz` | A REBOUND N-body integration of Sun + 8 planets, retained because **it has no working generator in this repo** and therefore could not otherwise be reproduced: WHFast symplectic integrator, dt = 5 days (< 1/20 of Mercury's period), 10 Myr forward, osculating elements written every 1,000 yr (10,001 samples: `times` + `ecc_/inc_/sma_` per planet). Read by `scripts/l1_vs_laskar_eigenmodes.py` and `scripts/l1_vs_laskar_50myr.py`. The setup above is the provenance — an independent REBOUND run with these parameters reproduces equivalent data. |
+| `nbody_cache_50myr_backward.npz` | `scripts/nbody_50myr_backward.py` (requires `rebound`) — **not committed and not present**; regenerate before running `scripts/l1_vs_laskar_50myr.py`, which needs both caches |
 | `*.json` results under `data/` | the analysis scripts that name them; each records its generating script in a `meta` block |
 
 ### Lunar series — `data/lunar-series/` (55 files, 11 MB)

@@ -171,13 +171,16 @@ The 8H/1825 = 1,469.88 yr "Bond cycle" lattice harmonic was investigated as a ca
 
 `test_phase0_inline.js` and `verify_cumul_integral.js` — JavaScript test/verification utilities for the deep-time chain's cumulative-integral implementation.
 
-### Archived scripts
+### Completed searches — not shipped
 
-Completed search scripts moved to `archive/`:
-- `fibonacci_law4_reformulation_search.py` — R² pair reformulation search (concluded: at noise level)
-- `fibonacci_law4_verify.py` — R² pair constraint verification (superseded by Law 4 = K constant)
-- `milankovitch_amplitude_fit.py` — early 8-candidate multi-component fit (superseded by `milankovitch_candidate_amplitudes.py` and `milankovitch_climate_formula.py`)
-- `generate_lr04_json.py` — one-shot utility converting `data/lr04-stack.txt` to `public/input/lr04-data.json` (output committed; no re-runs expected)
+These finished their job and are not part of the repo. Their conclusions are
+recorded here so the negative results are not lost, and their successors are
+named where one exists:
+
+- R² pair reformulation search — concluded: all forms at noise level. Live successor: `fibonacci_law4_balance_search.py`
+- R² pair constraint verification — superseded by Law 4 = K constant
+- early 8-candidate multi-component amplitude fit — superseded by `milankovitch_candidate_amplitudes.py` and `milankovitch_climate_formula.py`
+- one-shot `data/lr04-stack.txt` → `public/input/lr04-data.json` converter — output is committed, no re-runs expected
 
 ---
 

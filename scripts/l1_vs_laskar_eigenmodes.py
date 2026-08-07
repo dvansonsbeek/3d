@@ -47,7 +47,7 @@ from milankovitch_climate_formula import EIGHT_H, L1_LATTICE_INTEGERS
 
 REPO = Path(__file__).resolve().parents[1]
 
-NBODY_CACHE = REPO / "scripts/archive/nbody_cache_10myr.npz"
+NBODY_CACHE = REPO / "data/nbody_cache_10myr.npz"
 OUTPUT = REPO / "data/l1-vs-laskar-eigenmodes.json"
 
 # Laskar 2004 secular eigenfrequencies (arcsec/yr), from Laskar et al. 2004 A&A 428, 261.

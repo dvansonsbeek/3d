@@ -52,7 +52,7 @@ from l1_vs_laskar_eigenmodes import (
 
 REPO = Path(__file__).resolve().parents[1]
 
-FWD_CACHE = REPO / "scripts/archive/nbody_cache_10myr.npz"
+FWD_CACHE = REPO / "data/nbody_cache_10myr.npz"
 BWD_CACHE = REPO / "data/nbody_cache_50myr_backward.npz"
 OUTPUT = REPO / "data/l1-vs-laskar-50myr.json"
 
