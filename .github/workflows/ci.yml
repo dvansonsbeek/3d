@@ -90,6 +90,15 @@ jobs:
       - name: Python physics boundary (§2f)
         run: npm run test:py-physics
 
+      # §10 — every `status: current` doc must carry the CURRENT coefficients
+      # hash, so a refit cannot silently leave the prose describing an older
+      # model. This was not wired up, and the IAU 2006 refit duly left all 67
+      # current docs stale (the website tree too, at a different hash). Fix
+      # after any refit: `node tools/docs/stamp-frontmatter.mjs --write`
+      # (add --holistic for the website tree).
+      - name: Docs freshness (§10 frontmatter tracks the model)
+        run: npm run test:docs-fresh
+
       # §5d — the model gates. Only 2 of the 17 tools/verify scripts have a
       # failing exit path; the runner encodes that classification and excludes
       # balance-search.js, which writes tracked data. verify-laws is checked on
