@@ -9,8 +9,9 @@
  *   DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint          # report
  *   DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write  # SHIP
  *
- * Design (see runJointMode below; prototypes in scripts/archive/core_mantle_
- * joint_fit_stage4.py + core_mantle_joint_impulse_variant.py):
+ * Design (see runJointMode below; the joint/impulse prototypes that shaped it
+ * are not shipped — pre-joint-world scripts that cannot reproduce; the design
+ * and its evidence live here and in docs/104):
  *   • columns: 4 flag cos/sin pairs + 3 resonator IMPULSE-CONSISTENT unit
  *     shapes (sin-only kicks — displacement-continuous; switch-on-compensated
  *     drive tone; phases locked to the convention) + free intercept (= the
@@ -193,7 +194,7 @@ const CONFIG = {
       fit_stage:  'with_bond_hallstatt_jose5',
       target_amp_s: 50 },
     { name: 'h253',     lattice_n: 2024,
-      structural: 'H/253 = H/(11·23) = 1,325.4 yr; gcd(2024, H) = 23; 184th harmonic of 8H/11 (Earth ecliptic-perihelion family). Identified 2026-07-22 by L-5b §14 post-4-flag residual scan (flat ΔR²=0.031 peak n=2015-2024, gcd-compliant flank chosen) — see scripts/archive/lod_residual_h253_fifth_cycle.py (GO verdict: medieval 990-bump window 98→17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, lattice_harmonic_scan); Steinhilber marginal (~95% threshold); cap-only ship keeps the amplitude below the free fit.',
+      structural: 'H/253 = H/(11·23) = 1,325.4 yr; gcd(2024, H) = 23; 184th harmonic of 8H/11 (Earth ecliptic-perihelion family). Identified 2026-07-22 by L-5b §14 post-4-flag residual scan (flat ΔR²=0.031 peak n=2015-2024, gcd-compliant flank chosen) — see data/deltaT-h253-fifth-cycle-scan.json (GO verdict: medieval 990-bump window 98→17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, lattice_harmonic_scan); Steinhilber marginal (~95% threshold); cap-only ship keeps the amplitude below the free fit.',
       fit_stage:  'frozen_residual_after_D',
       target_amp_s: 75 },
     // Eddy (8H/2684 = 999.45 yr) TESTED AND ROLLED BACK 2026-07-12: the 5-cycle
@@ -612,7 +613,8 @@ const ESPENAK_REFERENCE = {
 // optimum pays it in every formulation — and its deficit is what the
 // post-closure phantom check quantifies as the apparent ~1,326-yr line.
 // Implementations preserved in git history (commit with this note); evidence:
-// scripts/archive/lod_residual_h253_fifth_cycle.py + data/deltaT-h253-fifth-cycle-scan.json.
+// data/deltaT-h253-fifth-cycle-scan.json (the derivation script is not
+// shipped — pre-joint world, cannot reproduce; the JSON is the record).
 
 // ─── Quiet fit: run all 4 stages + shipping + Bond adjustment for a given
 // USNO anchor value. Returns the shipped coefficients + fit metrics WITHOUT
@@ -1113,7 +1115,7 @@ function main() {
   // left. This is structurally immune to the Bond-collinearity blowup that
   // rolled back Eddy-999 (1,326 yr vs Bond 1,466 yr beat ≈ 14 kyr — a joint
   // fit would be near-degenerate over the 2.7-kyr window; the frozen fit
-  // sidesteps it). GO evidence: scripts/archive/lod_residual_h253_fifth_cycle.py.
+  // sidesteps it). GO evidence: data/deltaT-h253-fifth-cycle-scan.json.
   const h253Cycle = CONFIG.cycles.find(c => c.name === 'h253');
   const frozenFour = [bondForShipRaw, hallForShip, joseForShip, jose4ForShip];
   const residualE = years.map((y, i) => {
@@ -1169,7 +1171,7 @@ function main() {
     // ~74 s Bond amplitude cost is the SHADOW PRICE of the USNO anchor itself
     // (the constrained optimum pays it in every formulation), and its deficit
     // is what the post-closure phantom check below quantifies as the apparent
-    // ~1,326-yr residual line. See scripts/archive/lod_residual_h253_fifth_cycle.py;
+    // ~1,326-yr residual line. See data/deltaT-h253-fifth-cycle-scan.json;
     // rejected closure implementations preserved in git history (see the
     // closure-design experiment note above the quiet-fit section).
     const preAdjSum = cycleLodAtJ2000(bondForShipRaw)
@@ -1428,7 +1430,7 @@ function main() {
 // Motivation: sequential iterate-and-close oscillates (Bond, the 3,695-yr
 // drive tone and deltaTStart are collinear in the 2.7-kyr window — see
 // data/core-mantle-resonator-default-on-convergence.json). The joint design
-// (prototyped in scripts/archive/core_mantle_joint_fit_stage4.py):
+// (the stage-4 prototype is not shipped — pre-joint world, cannot reproduce):
 //   minimize ||A·x − residual||²  s.t.  Σ δLOD_j(2000)·x_j = targetOffset
 //   columns: 4 flag cos/sin pairs (8) + 3 resonator UNIT SHAPES with phases
 //   LOCKED to the Stage-1/3 convention (free phases let the cap cascade lock
@@ -1728,8 +1730,8 @@ function runJointMode() {
   if (!WRITE) {
     console.log('\n  Dry run — add --write to ship the joint world (updates');
     console.log('  data/deltaT-4flag-fit.json, data/core-mantle-resonator-stage1.json,');
-    console.log('  public/input/astro-reference.json). Prototype cross-check:');
-    console.log('  scripts/archive/core_mantle_joint_fit_stage4.py (12.53 s @ 86400.0016, 2-yr grid).');
+    console.log('  public/input/astro-reference.json). Prototype cross-check');
+    console.log('  (historical, pre-joint world): 12.53 s @ 86400.0016, 2-yr grid.');
     return;
   }
 

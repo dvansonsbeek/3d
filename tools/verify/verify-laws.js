@@ -519,9 +519,9 @@ for (const key of planets) {
 // candidate space. Three independent searches confirmed the clustering is
 // not a derivable physical law:
 //
-//   1. scripts/archive/fibonacci_law4_search.py found no universal constant
-//      ξ × f(params) = const exists across the 8 planets.
-//   2. scripts/fibonacci_law4_reformulation_search.py tried 7 R-definitions
+//   1. A universal-constant search (historical, not shipped) found no
+//      ξ × f(params) = const across the 8 planets.
+//   2. A reformulation search (historical, not shipped) tried 7 R-definitions
 //      and 5 pair forms — all give errors at noise level.
 //   3. scripts/fibonacci_law4_balance_search.py confirmed exactly ONE
 //      physical balance equation exists in (m, a, d) space: Law 5 itself.

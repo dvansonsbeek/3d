@@ -16,7 +16,7 @@ Laskar dynamics).
 
 Method
 ------
-Identical setup to scripts/archive/fibonacci_nbody_proper.py:
+Identical setup to the (unshipped) fibonacci_nbody_proper.py study:
   - REBOUND simulation with Sun + 8 planets from JPL Horizons J2000
   - WHFast symplectic integrator, 4-day timestep
   - Output osculating elements every 1 kyr

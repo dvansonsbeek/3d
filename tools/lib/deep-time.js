@@ -462,9 +462,11 @@ function jose4CycleLodCorrection(year) { return _dtCycles().cycleLodSecondsAt('j
 // raw_at_j2000 subtraction and wrapped in the same ±300/400-kyr taper as the
 // flags (fades the small pre-episode constant at deep time).
 //
-// Fitted by scripts/core_mantle_resonator_stage1.py (variant V5, physical-
-// consistency selection rule); constants synced from
-// data/core-mantle-resonator-stage1.json. Narrative: docs/104 §6/§8.
+// Constants synced from data/core-mantle-resonator-stage1.json (variant V5,
+// physical-consistency selection rule) — that artifact IS the provenance and
+// ships in this repo. The stage-1 derivation script does not: it ran against
+// the pre-joint world and cannot reproduce these numbers (see docs/104 §6/§8
+// for the narrative and the tracked result JSONs for the evidence).
 //
 // DEFAULT ON since the JOINT-world flip (2026-07-23): the resonator ships as
 // the 4th driver, fitted JOINTLY with the flags (--joint mode in

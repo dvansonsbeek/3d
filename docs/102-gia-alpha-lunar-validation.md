@@ -856,8 +856,8 @@ eclipse cycle — so every subset of the catalog reproduces the peak
 because every subset shares the observing cadence. The physical ceiling
 seals the verdict: a real 0.15-ms decadal LOD line integrates to only
 ~0.12 s of ΔT, four orders of magnitude below the fitted peak amplitude.
-No framework component is warranted (kill archived:
-`scripts/archive/lod_residual_142yr_window_test.py`).
+No framework component is warranted (kill recorded in
+`data/deltaT-142yr-window-test.json`).
 
 (History: the earlier |t|-symmetric analysis labelled the peak a window
 artifact for the wrong reason — it tested the 10–30 yr band peak at

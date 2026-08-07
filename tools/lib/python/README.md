@@ -29,7 +29,7 @@ All constants originate from `tools/lib/constants.js` (the single source of trut
 
 | Directory | Description |
 |-----------|-------------|
-| `coefficients/` | Per-planet coefficient modules. `*_coeffs_physical.py` (7 files, 2421 terms) are the **active** predictive coefficients consumed by `predict_precession.py`, `validate_precession.py`, and the sync pipeline. `*_coeffs.py` are for `observed_formula.py`. Legacy `*_coeffs_unified.py` (429-term) are archived in `scripts/archive/`. |
+| `coefficients/` | Per-planet coefficient modules. `*_coeffs_physical.py` (7 files, 2421 terms) are the **active** predictive coefficients consumed by `predict_precession.py`, `validate_precession.py`, and the sync pipeline. `*_coeffs.py` are for `observed_formula.py`. Legacy `*_coeffs_unified.py` (429-term) were superseded and are not shipped. |
 
 ### Usage scripts
 

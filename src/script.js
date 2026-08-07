@@ -3155,9 +3155,11 @@ function jose4CycleDeltaTCorrection(year) {
 // inversion); decayed thereafter. Anchored to 0 at J2000 (raw_at_j2000
 // subtraction) and wrapped in the same ±300/400-kyr taper as the flags.
 //
-// Fitted by scripts/core_mantle_resonator_stage1.py (variant V5, physical-
-// consistency selection rule — shipped T₀ must be the physically determined
-// eigenperiod). Constants synced from data/core-mantle-resonator-stage1.json.
+// Constants synced from data/core-mantle-resonator-stage1.json (variant V5,
+// physical-consistency selection rule — shipped T₀ must be the physically
+// determined eigenperiod). That artifact IS the provenance and ships here;
+// the stage-1 derivation script does not — it ran against the pre-joint
+// world and cannot reproduce these numbers.
 // Mirrors tools/lib/deep-time.js. Narrative: docs/104 §6/§8.
 //
 // JOINT world (2026-07-23): amplitudes come from the joint equality-
@@ -32486,7 +32488,7 @@ function setupGUI() {
         console.log('    88-lunation eclipse cycle), which is why every subset shares it (same catalog');
         console.log('    cadence). Physical ceiling: a real 0.15-ms decadal LOD line integrates to ~0.12 s');
         console.log('    of ΔT — four orders below the fitted peak amplitude. No framework component');
-        console.log('    warranted. (Archived kill: scripts/archive/lod_residual_142yr_window_test.py.)');
+        console.log('    warranted. (Kill recorded in data/deltaT-142yr-window-test.json.)');
       } else if (failures === 3) {
         console.log(`  VERDICT: ✗ All 3 tests failed — the ${TARGET_PERIOD} yr peak is a WINDOW/NOISE ARTIFACT.`);
         console.log('  The single "significant" peak from the original OLD-α periodogram was the kind of');
