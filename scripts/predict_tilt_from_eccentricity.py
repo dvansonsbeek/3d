@@ -279,7 +279,7 @@ print(f"""
 """)
 
 tilts_test = {
-    'Model mean (23.41357)': EARTH_OBLIQUITY_MEAN,
+    f'Model mean ({EARTH_OBLIQUITY_MEAN:.5f})': EARTH_OBLIQUITY_MEAN,
     'J2000 IAU  (23.4393)':  23.4393,
 }
 
@@ -295,7 +295,7 @@ for label, tilt in tilts_test.items():
 
 print(f"""
   With J2000 IAU obliquity, ψ²/π improves to 0.014% but ψ^(11/5) worsens.
-  However, the model uses mean obliquity (23.41357°) consistently. Using
+  However, the model uses mean obliquity (earthtiltMean) consistently. Using
   J2000 obliquity for K while keeping mean values elsewhere is inconsistent.
 
   CONCLUSION: K must be evaluated at mean values. The ψ²/π relation holds

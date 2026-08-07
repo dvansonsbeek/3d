@@ -79,6 +79,17 @@ jobs:
       - name: Constants literals (name-level agreement with the JSON)
         run: npm run test:literals
 
+      # §2f — Python is analysis only: it may READ the JSON via
+      # constants_scripts.py, never define model physics. Ledger-based, so a
+      # frozen analysis may pin the value it ran at; the gate then asserts that
+      # every pin still matches the live model, turning a latent drift into an
+      # alarm the next time H or the tilt is recalibrated. All three rules
+      # (unlisted pin / drifted pin / stale ledger entry) shown to fail on a
+      # planted violation; the drift rule caught its first real one — a tilt
+      # label left at 23.41357 by the IAU 2006 refit.
+      - name: Python physics boundary (§2f)
+        run: npm run test:py-physics
+
       # §5d — the model gates. Only 2 of the 17 tools/verify scripts have a
       # failing exit path; the runner encodes that classification and excludes
       # balance-search.js, which writes tracked data. verify-laws is checked on

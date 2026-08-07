@@ -22,6 +22,7 @@
     "test:constants": "node tools/constants/generate.mjs",
     "test:fixtures": "node tools/fixtures/record-tools-lib.mjs",
     "test:literals": "node tools/constants/check-literals.mjs",
+    "test:py-physics": "node tools/check-python-physics.mjs",
     "test:verify": "node tools/verify/run-suite.mjs",
     "test:pipeline": "node packages/fitting/src/verify-pipeline.cjs",
     "test:verify:list": "node tools/verify/run-suite.mjs --list",
@@ -29,7 +30,7 @@
     "test:transparency": "node test/browser/transparency.test.mjs",
     "test:browser": "npm run build && npm run test:snapshot",
     "targets": "node tools/fixtures/report-targets.mjs",
-    "check": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:purity && npm run test:layer0 && npm run test:layer1 && npm run test:constants && npm run test:counterfactual && npm run test:planet-model && npm run test:fixtures && npm run test:literals && npm run test:verify && npm run test:pipeline"
+    "check": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:purity && npm run test:layer0 && npm run test:layer1 && npm run test:constants && npm run test:counterfactual && npm run test:planet-model && npm run test:fixtures && npm run test:literals && npm run test:py-physics && npm run test:verify && npm run test:pipeline"
   },
   "dependencies": {
     "three": "^0.183.0",
