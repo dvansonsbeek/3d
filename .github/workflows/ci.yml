@@ -99,6 +99,16 @@ jobs:
       - name: Docs freshness (§10 frontmatter tracks the model)
         run: npm run test:docs-fresh
 
+      # §10 "numbers in docs are generated, never typed" — for static .md that
+      # cannot mean transclusion (GitHub has no templating and strips unknown
+      # tags), so values live between invisible HTML-comment markers and this
+      # renderer owns what sits between them. Same contract as the website's
+      # <V k="…"/>, over the SAME registry (tools/docs/model-values.mjs), which
+      # the website imports once it consumes the published package.
+      # Fix a failure with: npm run docs:values:write
+      - name: Doc values match the model (§10)
+        run: npm run docs:values
+
       # §5d — the model gates. Only 2 of the 17 tools/verify scripts have a
       # failing exit path; the runner encodes that classification and excludes
       # balance-search.js, which writes tracked data. verify-laws is checked on
