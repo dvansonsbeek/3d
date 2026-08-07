@@ -46,6 +46,22 @@ const thousands = (n, dp = 0) => {
   return i.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (f ? '.' + f : '');
 };
 
+/** One named cycle of the H lattice: `<name>Years` = H/divisor and
+ *  `<name>Formula` = "335,317 / divisor". `dp` undefined means the website
+ *  rounds to whole years and prefixes `~`. */
+const hDivisor = (name, divisor, note, dp) => ({
+  [`${name}Years`]: {
+    get: () => C.H / divisor,
+    render: (v) => (dp === undefined ? `~${thousands(Math.round(v))}` : thousands(v, dp)),
+    unit: 'yr',
+    note: `${note} — H/${divisor}`,
+  },
+  [`${name}Formula`]: {
+    get: () => C.H,
+    render: (v) => `${thousands(v)} / ${divisor}`,
+  },
+});
+
 /**
  * key -> { get, render, unit, note }
  *   get()    derives the raw number
@@ -99,6 +115,52 @@ export const VALUES = {
     unit: '°',
     note: 'Sun orbital starting angle',
   },
+  // ── The H-divisor family ────────────────────────────────────────────────
+  // Each named cycle is H/divisor. The website's convention, reproduced
+  // exactly: a `~` prefix on the rounded ones, and axial precession alone
+  // carried to 2dp (it is the one compared against the IAU figure).
+  holisticYear: { get: () => C.H, render: (v) => thousands(v), note: 'alias of H' },
+  grandHolisticOctave: {
+    get: () => 8 * C.H,
+    render: (v) => thousands(v),
+    note: 'Solar System Resonance Cycle, 8H',
+  },
+  grandHolisticOctaveFormula: {
+    get: () => C.H,
+    render: (v) => `8 × ${thousands(v)}`,
+  },
+  ...hDivisor('inclPrec', 3, 'inclination precession'),
+  ...hDivisor('eclPrec', 5, 'ecliptic precession'),
+  ...hDivisor('obliqCycle', 8, 'obliquity cycle'),
+  ...hDivisor('axialPrec', 13, 'axial precession', 2),
+  ...hDivisor('periPrec', 16, 'perihelion precession'),
+  // Two cycles the website also surfaces at the other rounding.
+  axialPrecRound: {
+    get: () => C.H / 13,
+    render: (v) => `~${thousands(Math.round(v))}`,
+    unit: 'yr',
+    note: 'axial precession, whole years (axialPrecYears carries 2dp)',
+  },
+  periPrecYearsExact: {
+    get: () => C.H / 16,
+    render: (v) => thousands(v, 2),
+    unit: 'yr',
+  },
+  // Bare divisors and multiples of H, rounded to whole years.
+  ...Object.fromEntries([2, 21, 34].map((d) => [`hDiv${d}`, {
+    get: () => C.H / d,
+    render: (v) => thousands(Math.round(v)),
+    unit: 'yr',
+    note: `H/${d}`,
+  }])),
+  ...Object.fromEntries([['twoH', 2], ['threeH', 3], ['eightH', 8], ['thirteenH', 13]]
+    .map(([name, m]) => [name, {
+      get: () => m * C.H,
+      render: (v) => thousands(v),
+      unit: 'yr',
+      note: `${m}H`,
+    }])),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
