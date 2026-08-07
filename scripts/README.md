@@ -4,6 +4,21 @@ Python (and a few JavaScript) scripts for investigating, verifying, and reproduc
 
 These scripts were used during the research to discover and verify the six Fibonacci Laws that connect planetary orbital tilts, eccentricities, and precession rates to the Earth Fundamental Cycle timescale (H; see [Constants Reference](../docs/20-constants-reference.md)).
 
+> **§2f — analysis only, and it is enforced.** Python here may **read** the
+> model: import from [`tools/lib/python/constants_scripts.py`](../tools/lib/python/constants_scripts.py),
+> which loads `public/input/*.json`. It must never **define** model physics.
+> With JS and Python side by side there is no compiler keeping the two in
+> step, so the boundary is checked rather than trusted:
+> [`tools/check-python-physics.mjs`](../tools/check-python-physics.mjs)
+> runs in `npm run check` and in CI.
+>
+> A *frozen* analysis may pin the value it ran at — that is provenance, not a
+> fork — but the pin goes on the gate's ledger, and the gate then asserts the
+> pin still matches the live model. Sixteen scripts currently pin
+> `H = 335317`; the day H is recalibrated they all go red at once, which is
+> the intended behaviour. New work should import from `constants_scripts`
+> rather than add a ledger entry.
+
 > **How this README is organized.** Each section lists the **canonical entry-point script(s)** for a given topic with a short description, followed by a one-line note pointing at the supporting scripts in the same folder (and the doc that catalogs them per test). This README is intentionally curated — for the full per-test mapping, see the corresponding doc. Browse the folder directly for the supporting scripts.
 
 ---
