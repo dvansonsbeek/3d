@@ -474,6 +474,56 @@ export const VALUES = {
     unit: '°',
   },
 
+  // ── Cycle timing (phase-dependent scans) ────────────────────────────────
+  // These ask WHEN, not how much — extremum searches over the runtime
+  // evaluators. The obliquity/inclination evaluators were probed pointwise
+  // against the website's before adding (22.5147 at year 13664; inclination
+  // max near −23204), so the scans agree end-to-end.
+  ...(() => {
+    const oe = () => require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
+    let obliqScan, inclScan;
+    const nextObliqMin = () => {
+      if (!obliqScan) {
+        const f = oe().computeObliquityEarth;
+        let mn = Infinity, mnYr = 0;
+        for (let y = 2000; y <= 35000; y++) {
+          const o = f(y);
+          if (o < mn) { mn = o; mnYr = y; }
+        }
+        obliqScan = { mn, mnYr };
+      }
+      return obliqScan;
+    };
+    const lastInclMax = () => {
+      if (!inclScan) {
+        const f = oe().computeInclinationEarth;
+        let mx = -Infinity, mxYr = 0;
+        for (let y = 2000; y >= -120000; y--) {
+          const i = f(y);
+          if (i > mx) { mx = i; mxYr = y; }
+        }
+        inclScan = { mx, mxYr };
+      }
+      return inclScan;
+    };
+    return {
+      obliquityNextMin: { get: () => nextObliqMin().mn, render: (v) => Number(v).toFixed(2), unit: '°' },
+      obliquityNextMinYear: { get: () => nextObliqMin().mnYr, render: (v) => thousands(v) },
+      inclinationLastMaxYear: {
+        get: () => lastInclMax().mxYr,
+        render: (v) => (v < 0 ? `${thousands(-v)} BC` : thousands(v)),
+        note: 'most recent past maximum of Earth\'s invariable-plane inclination',
+      },
+    };
+  })(),
+  // DEFERRED: the six axialPrec/periPrec scan keys (MinPeriod/MinYear/…,
+  // CycleMin/Max). They scan sid/(sid−sol) and anom-based ratios to +35 kyr
+  // and over a full H — where the snapshot-vs-integrated PHASE AXIS question
+  // stops cancelling (unlike the envelope extrema and the J2000 rates). The
+  // right basis needs deciding with the lodReal/day-unit investigation, not
+  // assumed here; a forced match would bury exactly the divergence the §12h
+  // exercise exists to surface.
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
