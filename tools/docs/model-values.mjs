@@ -242,6 +242,94 @@ export const VALUES = {
     unit: 'km',
   },
 
+  // ── Earth eccentricity family ───────────────────────────────────────────
+  // base and amplitude are the fitted pair (model-parameters); the rest are
+  // derived: mean = √(base² + amp²) — the RMS of the two-component cycle, the
+  // same formula the website's EARTH_ECC_MEAN uses — and min/max = base ∓ amp,
+  // which the website types as prose ('~0.0140'/'~0.0167') but we derive.
+  j2000Eccentricity: {
+    get: () => astro.earthOrbital.earthEccentricityJ2000,
+    render: (v) => Number(v).toFixed(8),
+    note: 'JPL DE440 observed reference — a calibration input, not a fit product',
+  },
+  eccentricityDerivedMean: {
+    get: () => Math.hypot(model.earth.eccentricityBase, model.earth.eccentricityAmplitude),
+    render: (v) => Number(v).toFixed(7),
+  },
+  eccentricityMin: {
+    get: () => model.earth.eccentricityBase - model.earth.eccentricityAmplitude,
+    render: (v) => `~${Number(v).toFixed(4)}`,
+  },
+  eccentricityMax: {
+    get: () => model.earth.eccentricityBase + model.earth.eccentricityAmplitude,
+    render: (v) => `~${Number(v).toFixed(4)}`,
+  },
+  eccentricityAmplitude: {
+    get: () => model.earth.eccentricityAmplitude,
+    render: (v) => Number(v).toFixed(6),
+    note: 'fitted pair with eccentricityBase',
+  },
+
+  // ── Earth–Sun distances and insolation (from the AU chain + eccentricity) ─
+  // AU = currentAUDistance — the parallax-chain value astro-reference ships
+  // (matched pair of earthParallaxRadiusKm). Distances use the OBSERVED
+  // e(J2000); the insolation extremes use the model's base ∓ amplitude, i.e.
+  // 1/√(1−e²) − 1 at the eccentricity-cycle extremes.
+  earthSunOffsetKm: {
+    get: () => Math.round(astro.earthOrbital.earthEccentricityJ2000 * astro.physicalConstants.currentAUDistance),
+    render: (v) => thousands(v),
+    unit: 'km',
+    note: 'a × e — the wobble-center offset',
+  },
+  earthPerihelionDistanceKm: {
+    get: () => Math.round(astro.physicalConstants.currentAUDistance * (1 - astro.earthOrbital.earthEccentricityJ2000)),
+    render: (v) => thousands(v),
+    unit: 'km',
+  },
+  earthAphelionDistanceKm: {
+    get: () => Math.round(astro.physicalConstants.currentAUDistance * (1 + astro.earthOrbital.earthEccentricityJ2000)),
+    render: (v) => thousands(v),
+    unit: 'km',
+  },
+  earthApsidalDifferenceKm: {
+    get: () => Math.round(2 * astro.earthOrbital.earthEccentricityJ2000 * astro.physicalConstants.currentAUDistance),
+    render: (v) => thousands(v),
+    unit: 'km',
+  },
+  earthPeriApoFluxRatioPct: {
+    get: () => {
+      const e = astro.earthOrbital.earthEccentricityJ2000;
+      return ((1 + e) / (1 - e)) ** 2 * 100 - 100;
+    },
+    render: (v) => Number(v).toFixed(1),
+    unit: '%',
+  },
+  earthInsolationIncreaseMaxPct: {
+    get: () => {
+      const e = model.earth.eccentricityBase + model.earth.eccentricityAmplitude;
+      return (1 / Math.sqrt(1 - e * e) - 1) * 100;
+    },
+    render: (v) => Number(v).toFixed(3),
+    unit: '%',
+  },
+  earthInsolationIncreaseMinPct: {
+    get: () => {
+      const e = model.earth.eccentricityBase - model.earth.eccentricityAmplitude;
+      return (1 / Math.sqrt(1 - e * e) - 1) * 100;
+    },
+    render: (v) => Number(v).toFixed(3),
+    unit: '%',
+  },
+  earthInsolationDifferencePct: {
+    get: () => {
+      const hi = model.earth.eccentricityBase + model.earth.eccentricityAmplitude;
+      const lo = model.earth.eccentricityBase - model.earth.eccentricityAmplitude;
+      return ((1 / Math.sqrt(1 - hi * hi)) - (1 / Math.sqrt(1 - lo * lo))) * 100;
+    },
+    render: (v) => Number(v).toFixed(3),
+    unit: '%',
+  },
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
