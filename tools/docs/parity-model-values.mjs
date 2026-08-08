@@ -96,6 +96,6 @@ if (process.argv.includes('--missing')) {
 if (extra.length) console.log(`\n  ours only: ${extra.join(', ')}`);
 
 console.log(`\n${line}`);
-console.log(`${match.length}/${total} at parity. Finish line: 853/853, at which the website`);
+console.log(`${match.length}/${total} at parity. Finish line: ${total}/${total}, at which the website`);
 console.log('imports this registry and deletes its six ported modules (Phase 21).');
 console.log(line);

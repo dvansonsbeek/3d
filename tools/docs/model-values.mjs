@@ -161,6 +161,39 @@ export const VALUES = {
       note: `${m}H`,
     }])),
 
+  // ── Precession/obliquity rates ──────────────────────────────────────────
+  // The pure-lattice rates: a full circle of arcseconds per cycle period,
+  // 1,296,000 × divisor / H, at 3dp — the website's exact form.
+  ...Object.fromEntries([
+    ['inclRateICRF', 3], ['inclRateEcl', 5], ['obliqRateEcl', 8],
+    ['axialRateICRF', 13], ['periRate', 16],
+  ].map(([name, d]) => [name, {
+    get: () => (1296000 * d) / C.H,
+    render: (v) => Number(v).toFixed(3),
+    unit: '″/yr',
+    note: `lattice rate, 1,296,000·${d}/H`,
+  }])),
+  obliquityRateJ2000: {
+    get: () => {
+      const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
+      return ((oe.computeObliquityEarth(2001) - oe.computeObliquityEarth(1999)) / 2) * 3600;
+    },
+    render: (v) => Number(v).toFixed(4),
+    unit: '″/yr',
+    note: 'central difference of the fitted obliquity formula at J2000 — engine matches the website exactly',
+  },
+  // DEFERRED from this tier, with reasons (§12h rule: investigate, never force):
+  //   axialRateJ2000   engine 50.294 vs website 50.289 — the kinematic-vs-IAU
+  //                    sidereal-baseline split, 1.4e-6 d in (sid − sol).
+  //                    Which baseline is CORRECT for this readout must be
+  //                    decided, not averaged.
+  //   periRateJ2000    a typed literal '61.889' in the website's own
+  //                    compute.ts — no derivation exists on either side yet.
+  //   earthCircumference / earthDiameter
+  //                    radius constants differ: ours 6378.1366 km (IERS),
+  //                    website 6378.137 km (WGS-84) — 0.01 km in the
+  //                    circumference. One constant must win first.
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
