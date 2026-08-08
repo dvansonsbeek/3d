@@ -252,6 +252,11 @@
       "trueAnomaly": 104.48097667
     }
   },
+  "obliquityChapront2002": {
+    "_description": "Chapront, Chapront-Touze & Francou (2002, A&A 387, 700) obliquity citation values at the ±12 kyr comparison epochs. Consumed by the model-values registry (obliqChapront* keys) for the Model-vs-literature obliquity tables; the website previously typed these as literals.",
+    "deg10000BC": 24.3053,
+    "deg10000AD": 22.637
+  },
   "ascendingNodesSouamiSouchay": {
     "_description": "Raw ascending nodes on invariable plane from Souami & Souchay (2012) Table 2",
     "earth": 284.51,

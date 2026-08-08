@@ -11,6 +11,7 @@
  *                      the counterfactual surface, and what the hash covers.
  *   REFERENCE_DATA     validation targets + presentation. Single-sourced so
  *                      nothing duplicates them, but NOT injectable:
+ *   obliquityChapront2002            target
  *   ascendingNodesSouamiSouchay      target
  *   laplaceLagrangeBounds            target
  *   jplEclipticInclinationTrends     target
@@ -710,6 +711,10 @@ export const REFERENCE_DATA = Object.freeze({
       0.554,
       0.8
     ]
+  },
+  obliquityChapront2002: {
+    "deg10000BC": 24.3053,
+    "deg10000AD": 22.637
   },
   perihelionPrecessionRatesJPL: {
     "mercury": {

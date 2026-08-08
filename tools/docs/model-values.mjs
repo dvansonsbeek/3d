@@ -669,6 +669,101 @@ export const VALUES = {
     };
   })(),
 
+  // ── Obliquity reference tables (11-2n) — Model vs La2004 vs Chapront ────
+  // Model values from the engine's computeObliquityEarth; La2004 values
+  // DERIVED from the tracked artifact public/input/la2004-orbital-solution
+  // .json (1-kyr grid, years-from-J2000 axis, linear interpolation at the
+  // three off-grid epochs) — the website typed all twelve as literals citing
+  // exactly that file; Chapront (2002) citation values from astro-reference's
+  // obliquityChapront2002 block (the 11-2i Souami pattern: citations live in
+  // the tracked reference JSON, one source).
+  ...(() => {
+    const laskarObliquityDeg = (calYear) => {
+      const rows = new Map(rd('public/input/la2004-orbital-solution.json').data
+        .map((r) => [r.year, r.obliquity]));
+      const t = calYear - 2000;
+      if (rows.has(t)) return rows.get(t);
+      const lo = Math.floor(t / 1000) * 1000;
+      const hi = lo + 1000;
+      if (!rows.has(lo) || !rows.has(hi)) {
+        throw new Error(`model-values: La2004 grid has no bracket for calendar year ${calYear}`);
+      }
+      return rows.get(lo) + ((t - lo) / 1000) * (rows.get(hi) - rows.get(lo));
+    };
+    const oeOb = (y) => require(join(ROOT, 'tools', 'lib', 'orbital-engine.js')).computeObliquityEarth(y);
+    const refs = [
+      { year: -10000, key: '10000BC', chapront: 'deg10000BC' },
+      { year: -9233,  key: '9233BC' },
+      { year: -1000,  key: '1000BC' },
+      { year: 2000,   key: '2000AD' },
+      { year: 2050,   key: '2050AD' },
+      { year: 3000,   key: '3000AD' },
+      { year: 5000,   key: '5000AD' },
+      { year: 7000,   key: '7000AD' },
+      { year: 10000,  key: '10000AD', chapront: 'deg10000AD' },
+      { year: 11725,  key: '11725AD' },
+      { year: 12000,  key: '12000AD' },
+      { year: 20000,  key: '20000AD' },
+    ];
+    const out = {};
+    for (const r of refs) {
+      out[`obliqModel${r.key}`] = {
+        get: () => oeOb(r.year),
+        render: (v) => Number(v).toFixed(4),
+        unit: '°',
+      };
+      out[`obliqLaskar${r.key}`] = {
+        get: () => laskarObliquityDeg(r.year),
+        render: (v) => Number(v).toFixed(4),
+        unit: '°',
+        note: 'La2004 obliquity from the tracked artifact (interpolated where off-grid)',
+      };
+      if (r.chapront) {
+        out[`obliqChapront${r.key}`] = {
+          get: () => astro.obliquityChapront2002[r.chapront],
+          render: (v) => Number(v).toFixed(4),
+          unit: '°',
+          note: 'Chapront, Chapront-Touze & Francou (2002) citation value',
+        };
+      }
+    }
+    out.obliquityCurrent = {
+      get: () => oeOb(2000),
+      render: (v) => Number(v).toFixed(4),
+      unit: '°',
+    };
+    return out;
+  })(),
+
+  // Next turning points of the millennial LOD cycle — sign-change scan of the
+  // 4-flag + swing δLOD sum, mirroring the website's forward scan (descending
+  // phase at J2000, so trough first, then peak).
+  ...(() => {
+    let turns = null;
+    const stackTurns = () => {
+      if (!turns) {
+        let prev = dtl().dtCycleLodCorrectionSum(2000);
+        let prevSign = 0, trough = 0, peak = 0;
+        for (let y = 2001; y <= 6000 && (trough === 0 || peak === 0); y++) {
+          const v = dtl().dtCycleLodCorrectionSum(y);
+          const s = Math.sign(v - prev);
+          if (prevSign !== 0 && s !== 0 && s !== prevSign) {
+            if (prevSign < 0 && trough === 0) trough = y - 1;
+            else if (prevSign > 0 && trough !== 0 && peak === 0) peak = y - 1;
+          }
+          if (s !== 0) prevSign = s;
+          prev = v;
+        }
+        turns = { trough, peak };
+      }
+      return turns;
+    };
+    return {
+      stackNextTroughYear: { get: () => stackTurns().trough, render: (v) => thousands(v) },
+      stackNextPeakYear:   { get: () => stackTurns().peak, render: (v) => thousands(v) },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {

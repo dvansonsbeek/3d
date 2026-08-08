@@ -577,6 +577,10 @@ export declare const REFERENCE_DATA: {
     "uranus": number[];
     "neptune": number[];
   };
+  readonly obliquityChapront2002: {
+    "deg10000BC": number;
+    "deg10000AD": number;
+  };
   readonly perihelionPrecessionRatesJPL: {
     "mercury": {
       "min": number;

@@ -259,6 +259,10 @@ const MIGRATED = [
  * @type {Record<string, string>}
  */
 const NOT_IN_SCRIPT = {
+  'astro.obliquityChapront2002':
+    'Chapront (2002) obliquity citation values — consumed only by the model-values '
+    + 'registry (obliqChapront* keys) for the Model-vs-literature tables; the browser '
+    + 'never quotes them',
   'astro.knownValues': 'validation targets, consumed by tools/explore/moon-cycles.js only',
   'astro.moonMeeus.elpW1T2Decomposition_arcsecPerCy2': 'ELP W1 T^2 budget — analysis only, tools/explore/v4-kpl-budget.js',
   'astro.cardinalPointAnchors': 'Node-side anchors; script.js derives cardinal points from the scene',
