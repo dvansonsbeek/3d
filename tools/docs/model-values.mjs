@@ -382,6 +382,33 @@ export const VALUES = {
     note: 'how far the J2000 observation sits above the oscillation midpoint',
   },
 
+  // ── Per-planet inclinations and ascending nodes ─────────────────────────
+  // InclEcl: the J2000 ecliptic inclination (composed constants).
+  // OmegaSS: Souami & Souchay (2012) Table 2 invariable-plane nodes — the
+  //   website TYPES these as literals; we derive them from astro-reference's
+  //   ascendingNodesSouamiSouchay block (same digits, one source).
+  // OmegaDelta: the model's invariable-plane node minus the S&S reference —
+  //   the "verified delta" the site quotes per planet.
+  ...Object.fromEntries(['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']
+    .flatMap((p) => [
+      [`${p}InclEcl`, {
+        get: () => C.planets[p].eclipticInclinationJ2000,
+        render: (v) => Number(v).toFixed(3),
+        unit: '°',
+      }],
+      [`${p}OmegaSS`, {
+        get: () => astro.ascendingNodesSouamiSouchay[p],
+        render: (v) => Number(v).toFixed(2),
+        unit: '°',
+        note: 'Souami & Souchay 2012, external reference',
+      }],
+      [`${p}OmegaDelta`, {
+        get: () => C.planets[p].ascendingNodeInvPlane - astro.ascendingNodesSouamiSouchay[p],
+        render: (v) => fmtSignedPct(v, 2),
+        unit: '°',
+      }],
+    ])),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
