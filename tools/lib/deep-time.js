@@ -587,31 +587,94 @@ function _l0() {
   return _l0M;
 }
 
+/** Browser twin of script.js _epochYearDaysBase (deep-time branch): the
+ *  epoch-aware Fourier baseline for a year kind, or null past the tidal-lock
+ *  asymptote (caller falls back to the J2000 constant). */
+function _epochYearDaysBaseKind(kind, year) {
+  const H_t = _l0().holisticH(year);
+  const LOD_s = _l0().lodSeconds(year);
+  const T_trop_s = _l0().tropicalYearSeconds(year);
+  if (H_t === null || LOD_s === null || T_trop_s === null) return null;
+  const tropDays = T_trop_s / LOD_s;
+  if (kind === 'tropical')    return tropDays;
+  if (kind === 'sidereal')    return tropDays * H_t / (H_t - 13);            // recomputeEpochAnchors' _kinematic recipe
+  if (kind === 'anomalistic') return tropDays * (H_t / 16) / (H_t / 16 - 1); // browser/Node anomalisticYearDaysBase
+  return null;
+}
+
+/** Browser twin of script.js evalYearFourier (deep-time branch, no `kind`):
+ *  base + Σ harmonics on integrated phase. cycles(div) is computed as
+ *  div × cycles(1) — bit-identical to the per-divisor call (the shared phase
+ *  module returns divisorN × (integral − correction), and 1 × x === x), and
+ *  hoists the ∫1/H work out of the harmonic loop for the scan keys. */
+function _evalYearFourierBrowser(year, base, harmonics) {
+  let result = base;
+  const c1 = cyclesBetweenYears(C.balancedYear, year, 1);
+  if (c1 === null) return result;   // mirrors the browser's per-term `continue`
+  for (const [div, sinC, cosC] of harmonics) {
+    const phase = div * c1 * 2 * Math.PI;
+    result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  return result;
+}
+
 /** Browser twin of script.js computeSiderealYearDaysDirect (deep-time branch,
  *  the shipped default): sidereal year length in days at `year` — epoch-aware
  *  kinematic base plus the Step 6d SIDEREAL_YEAR_HARMONICS ripple on
  *  integrated phase. Past the tidal-lock asymptote the base falls back to the
- *  J2000 kinematic constant and null-phase terms are skipped, mirroring
- *  _epochYearDaysBase's null contract and evalYearFourier's `continue`. */
+ *  J2000 kinematic constant and the ripple is skipped. */
 function computeSiderealYearDaysDirect(year) {
-  const H_t = _l0().holisticH(year);
-  const LOD_s = _l0().lodSeconds(year);
-  const T_trop_s = _l0().tropicalYearSeconds(year);
-  let base;
-  if (H_t === null || LOD_s === null || T_trop_s === null) {
-    base = C.meanSiderealYearDaysKinematic;
+  const base = _epochYearDaysBaseKind('sidereal', year) ?? C.meanSiderealYearDaysKinematic;
+  return _evalYearFourierBrowser(year, base, C.SIDEREAL_YEAR_HARMONICS);
+}
+
+/** Browser twin of script.js computeSolarYearDaysDirect: tropical year length
+ *  in days — epoch-aware base + TROPICAL_YEAR_HARMONICS, integrated phase. */
+function computeSolarYearDaysDirect(year) {
+  const base = _epochYearDaysBaseKind('tropical', year) ?? C.meanSolarYearDays;
+  return _evalYearFourierBrowser(year, base, C.TROPICAL_YEAR_HARMONICS);
+}
+
+/** Browser twin of the script.js anomalistic-days Fourier (:56327):
+ *  anomalistic year length in days — epoch-aware base +
+ *  ANOMALISTIC_YEAR_HARMONICS, integrated phase. */
+function computeAnomalisticYearDaysDirect(year) {
+  const base = _epochYearDaysBaseKind('anomalistic', year) ?? C.meanAnomalisticYearDays;
+  return _evalYearFourierBrowser(year, base, C.ANOMALISTIC_YEAR_HARMONICS);
+}
+
+/** All three year-length Fourier evaluations at one year, with the Layer-0
+ *  chain evaluated ONCE — value-identical to the three compute*DaysDirect
+ *  calls (the base recipes below are a MATCHED PAIR with
+ *  _epochYearDaysBaseKind and the Layer-0 cores: holisticHCore =
+ *  holisticYearJ2000·lod/lodNow, siderealYearSecondsCore, tropical =
+ *  sid·(1−13/H)). Exists because the α climate series inside every Layer-0
+ *  LOD call dominates the cost (~27 µs) and the registry's full-H precession
+ *  scans evaluate 3 × 335k years. Returns {sidereal, tropical, anomalistic}
+ *  in days. */
+function computeYearDaysDirectAll(year) {
+  const LOD_s = _l0().lodSeconds(year);      // the one α evaluation
+  let sidB, tropB, anomB;
+  if (LOD_s === null) {
+    sidB = C.meanSiderealYearDaysKinematic;
+    tropB = C.meanSolarYearDays;
+    anomB = C.meanAnomalisticYearDays;
   } else {
+    const t = _l0().tMa(year);
+    const H_t = EPOCH_PARAMS.holisticYearJ2000 * LOD_s / EPOCH_PARAMS.lodNowH13Seconds;
+    const sidSec = (t === 0) ? EPOCH_PARAMS.siderealYearJ2000Seconds
+      : EPOCH_PARAMS.siderealYearJ2000Seconds * (1 - 2 * EPOCH_PARAMS.solarMassLossFracPerYear * t * 1e6);
+    const T_trop_s = sidSec * (1 - 13 / H_t);
     const tropDays = T_trop_s / LOD_s;
-    base = tropDays * H_t / (H_t - 13);   // recomputeEpochAnchors' _kinematic recipe
+    tropB = tropDays;
+    sidB = tropDays * H_t / (H_t - 13);
+    anomB = tropDays * (H_t / 16) / (H_t / 16 - 1);
   }
-  let result = base;
-  for (const [div, sinC, cosC] of C.SIDEREAL_YEAR_HARMONICS) {
-    const cycles = cyclesBetweenYears(C.balancedYear, year, div);
-    if (cycles === null) continue;
-    const phase = cycles * 2 * Math.PI;
-    result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-  }
-  return result;
+  return {
+    sidereal:    _evalYearFourierBrowser(year, sidB, C.SIDEREAL_YEAR_HARMONICS),
+    tropical:    _evalYearFourierBrowser(year, tropB, C.TROPICAL_YEAR_HARMONICS),
+    anomalistic: _evalYearFourierBrowser(year, anomB, C.ANOMALISTIC_YEAR_HARMONICS),
+  };
 }
 
 /** Browser twin of script.js h5Correction: H/5 ecliptic "missing motion" LOD
@@ -1298,8 +1361,9 @@ module.exports = {
   bondCycleLodCorrection, hallstattCycleLodCorrection, jose5CycleLodCorrection, jose4CycleLodCorrection,
   dtCycleLodCorrectionSum,
   // Layer-4 solar-day composite (§12h strangler — browser tweakpane twin)
-  computeSiderealYearDaysDirect, h5Correction,
-  computeLodKinematicSecondsAtEpoch, computeLodRealSecondsAtEpoch,
+  computeSiderealYearDaysDirect, computeSolarYearDaysDirect, computeAnomalisticYearDaysDirect,
+  computeYearDaysDirectAll,
+  h5Correction, computeLodKinematicSecondsAtEpoch, computeLodRealSecondsAtEpoch,
   // Core-mantle swing (Resonator driver) — episode component, default ON (joint world)
   resonatorSwingDeltaTCorrection, resonatorSwingLodCorrection, resonatorSwingLodRate,
   DT_RESONATOR_ENABLED,

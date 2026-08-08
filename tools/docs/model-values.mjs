@@ -602,18 +602,72 @@ export const VALUES = {
       },
     };
   })(),
-  // DEFERRED: the six axialPrec/periPrec scan keys (MinPeriod/MinYear/…,
-  // CycleMin/Max). They scan sid/(sid−sol) and anom-based ratios to +35 kyr
-  // and over a full H — where the snapshot-vs-integrated PHASE AXIS question
-  // stops cancelling (unlike the envelope extrema and the J2000 rates).
-  // The basis is now DECIDED (§12h lodReal investigation): the browser ships
-  // DEEP_TIME_MODE_ENABLED = true (script.js:88), so every displayed value
-  // rides the INTEGRATED axis (epoch-aware Layer-0 base + R3-corrected
-  // phase) and the 6d coefficients are cycle-fitted on that same axis. Port
-  // these scans through the deep-time engine twins (see
-  // tools/lib/deep-time.js `computeSiderealYearDaysDirect`); the snapshot
-  // form agrees only at J2000 (~1 ULP, measured) and diverges over the scan
-  // ranges.
+  // ── Precession family (11-2m) — the formerly deferred scan keys ─────────
+  // Browser-route ratios (script.js :56309/:56339/:56340): seconds = direct
+  // Fourier days × o.lodKinematic, so lodKinematic cancels and the DAYS
+  // routes decide the values — the direct Step 6d fits on the integrated
+  // axis (deep-time.js compute*DaysDirect, bit-proven against the live
+  // page). Porting these surfaced the fourth WEBSITE defect: its forecast
+  // scan used the cardinal-mean solar year + snapshot-phase sidereal Fourier
+  // and read 25,314 @ 12,411 where the simulator computes 25,312 @ 12,440
+  // (site routes corrected in dayYear.ts/precession.ts, snapshot
+  // regenerated). The full-cycle envelope and J2000 rates were robust to the
+  // route difference; only the ±35 kyr forecast extrema moved.
+  ...(() => {
+    const precAt = (y) => {
+      const d = dtl().computeYearDaysDirectAll(y);
+      const lodKin = C.meanSiderealYearSeconds / d.sidereal;
+      const sidS = d.sidereal * lodKin;
+      const solS = d.tropical * lodKin;
+      const anomS = d.anomalistic * lodKin;
+      return { a: sidS / (sidS - solS), p: anomS / (anomS - solS), i: anomS / (anomS - sidS) };
+    };
+    let forecast = null, cycle = null;
+    const axialForecast = () => {
+      if (!forecast) {
+        let mn = Infinity, mnYr = 0, mx = -Infinity, mxYr = 0;
+        for (let y = 2000; y <= 35000; y++) {
+          const a = precAt(y).a;
+          if (a < mn) { mn = a; mnYr = y; }
+          if (a > mx) { mx = a; mxYr = y; }
+        }
+        forecast = { mn, mnYr, mx, mxYr };
+      }
+      return forecast;
+    };
+    const cycleScan = () => {
+      if (!cycle) {
+        let aMn = Infinity, aMx = -Infinity, pMn = Infinity, pMx = -Infinity, iMn = Infinity, iMx = -Infinity;
+        for (let y = 2000; y <= 2000 + C.H; y++) {
+          const r = precAt(y);
+          if (r.a < aMn) aMn = r.a;
+          if (r.a > aMx) aMx = r.a;
+          if (r.p < pMn) pMn = r.p;
+          if (r.p > pMx) pMx = r.p;
+          if (r.i < iMn) iMn = r.i;
+          if (r.i > iMx) iMx = r.i;
+        }
+        cycle = { aMn, aMx, pMn, pMx, iMn, iMx };
+      }
+      return cycle;
+    };
+    const wholeYears = (v) => thousands(Math.round(v));
+    return {
+      axialPrecMinPeriod: { get: () => axialForecast().mn, render: wholeYears, unit: 'yr', note: 'next forecast minimum of the axial precession period (scan 2000..+35000)' },
+      axialPrecMinYear:   { get: () => axialForecast().mnYr, render: (v) => thousands(v) },
+      axialPrecMaxPeriod: { get: () => axialForecast().mx, render: wholeYears, unit: 'yr' },
+      axialPrecMaxYear:   { get: () => axialForecast().mxYr, render: (v) => thousands(v) },
+      axialPrecCycleMin:  { get: () => cycleScan().aMn, render: wholeYears, unit: 'yr', note: 'axial precession period extrema over one full H' },
+      axialPrecCycleMax:  { get: () => cycleScan().aMx, render: wholeYears, unit: 'yr' },
+      periPrecCycleMin:   { get: () => cycleScan().pMn, render: wholeYears, unit: 'yr' },
+      periPrecCycleMax:   { get: () => cycleScan().pMx, render: wholeYears, unit: 'yr' },
+      inclPrecCycleMin:   { get: () => cycleScan().iMn, render: wholeYears, unit: 'yr' },
+      inclPrecCycleMax:   { get: () => cycleScan().iMx, render: wholeYears, unit: 'yr' },
+      axialPrecJ2000:     { get: () => precAt(2000).a, render: wholeYears, unit: 'yr', note: 'instantaneous J2000 axial precession period (direct-route ratio)' },
+      periPrecJ2000:      { get: () => precAt(2000).p, render: wholeYears, unit: 'yr' },
+      inclPrecJ2000:      { get: () => precAt(2000).i, render: wholeYears, unit: 'yr' },
+    };
+  })(),
 
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
