@@ -62,6 +62,14 @@ const hDivisor = (name, divisor, note, dp) => ({
   },
 });
 
+/** The website's signed-percent convention: below the rendering threshold the
+ *  string is "< 0.01"-style rather than a misleading "+0.00". */
+const fmtSignedPct = (n, decimals = 2) => {
+  const abs = Math.abs(n);
+  if (abs < 10 ** -decimals) return `< 0.${'0'.repeat(decimals - 1)}1`;
+  return `${n >= 0 ? '+' : '-'}${abs.toFixed(decimals)}`;
+};
+
 /**
  * key -> { get, render, unit, note }
  *   get()    derives the raw number
@@ -328,6 +336,50 @@ export const VALUES = {
     },
     render: (v) => Number(v).toFixed(3),
     unit: '%',
+  },
+
+  // ── Per-planet eccentricities ───────────────────────────────────────────
+  // 3d SHIPS these (model-parameters: orbitalEccentricityBase locked by the
+  // Law 5 balance constraint, orbitalEccentricityJ2000 the JPL observation);
+  // the website RE-DERIVES its bases from the K constant + phase machinery.
+  // Parity across this family is therefore a live check that the website's
+  // Law-4/5 re-implementation still lands on the shipped values.
+  // Decimal places per planet vary DELIBERATELY on the site (venus/earth/mars
+  // 1dp in VsJ2000 because the deviations are large; the rest 2dp).
+  ...Object.fromEntries(['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']
+    .flatMap((p) => [
+      // NB: these live on the engine's composed constants (C.planets — the
+      // K-derivation output), NOT in raw model-parameters.json.
+      [`${p}EccBase`, {
+        get: () => C.planets[p].orbitalEccentricityBase,
+        render: (v) => Number(v).toFixed(5),
+      }],
+      [`${p}EccJ2000`, {
+        get: () => C.planets[p].orbitalEccentricityJ2000,
+        render: (v) => Number(v).toFixed(5),
+        note: 'JPL observed',
+      }],
+      [`${p}EccVsJ2000`, {
+        get: () => (C.planets[p].orbitalEccentricityBase
+          / C.planets[p].orbitalEccentricityJ2000 - 1) * 100,
+        render: (v) => fmtSignedPct(v, { venus: 1, mars: 1 }[p] ?? 2),
+        unit: '%',
+      }],
+    ])),
+  earthEccBase: {
+    get: () => model.earth.eccentricityBase,
+    render: (v) => Number(v).toFixed(5),
+  },
+  earthEccVsJ2000: {
+    get: () => (model.earth.eccentricityBase / astro.earthOrbital.earthEccentricityJ2000 - 1) * 100,
+    render: (v) => fmtSignedPct(v, 1),
+    unit: '%',
+  },
+  earthEccJ2000VsBasePct: {
+    get: () => (astro.earthOrbital.earthEccentricityJ2000 / model.earth.eccentricityBase - 1) * 100,
+    render: (v) => Number(v).toFixed(1),
+    unit: '%',
+    note: 'how far the J2000 observation sits above the oscillation midpoint',
   },
 
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
