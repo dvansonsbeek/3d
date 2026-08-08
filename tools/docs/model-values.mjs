@@ -182,13 +182,43 @@ export const VALUES = {
     unit: '″/yr',
     note: 'central difference of the fitted obliquity formula at J2000 — engine matches the website exactly',
   },
-  // DEFERRED from this tier, with reasons (§12h rule: investigate, never force):
-  //   axialRateJ2000   engine 50.294 vs website 50.289 — the kinematic-vs-IAU
-  //                    sidereal-baseline split, 1.4e-6 d in (sid − sol).
-  //                    Which baseline is CORRECT for this readout must be
-  //                    decided, not averaged.
-  //   periRateJ2000    a typed literal '61.889' in the website's own
-  //                    compute.ts — no derivation exists on either side yet.
+  // J2000-instantaneous precession rates. UNITS LESSON (measured, 2026-08):
+  // the engine's computeLengthOfSiderealYear counts the year in LOD-days
+  // (deep-time base T_sid_s/LOD_s — correct for the tweakpane mirror), while
+  // computeLengthOfSolarYear counts SI-JD days. Feeding that mix into
+  // sid/(sid−sol) inflates the denominator by 1e-4 and gives 50.294 against
+  // the IAU-confirmed 50.289 (period 25,771 yr). The ratio needs ONE day
+  // unit, so the sidereal term is re-based onto the IAU SI-day mean here.
+  // SI days ≠ LOD days — the first naming rule, as arithmetic.
+  axialRateJ2000: {
+    get: () => {
+      const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
+      const dt = require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
+      const sidSI = oe.computeLengthOfSiderealYear(2000)
+        - dt.meanSiderealYearSecondsAtAge(0) / dt.meanLodSecondsAtAge(0)
+        + C.meanSiderealYearDays;
+      const sol = oe.computeLengthOfSolarYear(2000);
+      return (1296000 * (sidSI - sol)) / sidSI;
+    },
+    render: (v) => Number(v).toFixed(3),
+    unit: '″/yr',
+    note: 'axial precession rate at J2000 from the Fourier year lengths, consistent SI-day basis',
+  },
+  // The website pins this as a literal '61.889' "to avoid a visible number
+  // shift" — measured here: the current formula REPRODUCES the pin at 3dp,
+  // so it can derive on both sides. anom/(anom−sol), same day unit each.
+  periRateJ2000: {
+    get: () => {
+      const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
+      const anom = oe.computeLengthOfAnomalisticYearDays(2000);
+      const sol = oe.computeLengthOfSolarYear(2000);
+      return (1296000 * (anom - sol)) / anom;
+    },
+    render: (v) => Number(v).toFixed(3),
+    unit: '″/yr',
+    note: 'perihelion (climatic) precession rate at J2000 — replaces the website\'s stability pin',
+  },
+  // STILL DEFERRED (§12h rule: investigate, never force):
   //   earthCircumference / earthDiameter
   //                    radius constants differ: ours 6378.1366 km (IERS),
   //                    website 6378.137 km (WGS-84) — 0.01 km in the
