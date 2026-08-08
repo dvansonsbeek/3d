@@ -409,6 +409,71 @@ export const VALUES = {
       }],
     ])),
 
+  // ── Obliquity family ────────────────────────────────────────────────────
+  // Two distinct means, per the model's taxonomy: earthtiltMean (the solved
+  // scene parameter, "axial tilt" family) and SOLSTICE_OBLIQUITY_MEAN (the
+  // fitted Fourier mean of the 16-term solstice-obliquity series,
+  // "pythagorean" on the site). Min/max are the envelope of the full series
+  // over one H (10,000 samples, same as the website's _obliqEnvelope — the
+  // series is H-periodic, so the phase origin cancels in the extrema).
+  pythagoreanMeanObliquity: {
+    get: () => C.SOLSTICE_OBLIQUITY_MEAN,
+    render: (v) => Number(v).toFixed(3),
+    unit: '°',
+  },
+  meanObliquityVsJ2000Diff: {
+    get: () => Math.abs(astro.earthOrbital.obliquityJ2000_deg - model.earth.earthtiltMean),
+    render: (v) => Number(v).toFixed(3),
+    unit: '°',
+  },
+  obliquityAmplitude: {
+    get: () => 2 * model.earth.earthInvPlaneInclinationAmplitude,
+    render: (v) => Number(v).toFixed(5),
+    unit: '°',
+    note: 'peak-to-peak of the inclination-driven component, 2A',
+  },
+  ...(() => {
+    const envelope = () => {
+      const steps = 10000;
+      let min = Infinity, max = -Infinity;
+      for (let i = 0; i < steps; i++) {
+        const c = i / steps;
+        let obliq = C.SOLSTICE_OBLIQUITY_MEAN;
+        for (const [div, sinC, cosC] of C.SOLSTICE_OBLIQUITY_HARMONICS) {
+          const phase = 2 * Math.PI * c * div;
+          obliq += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+        }
+        if (obliq < min) min = obliq;
+        if (obliq > max) max = obliq;
+      }
+      return { min, max };
+    };
+    let cached;
+    const env = () => (cached ??= envelope());
+    return {
+      obliquityMin: { get: () => env().min, render: (v) => Number(v).toFixed(2), unit: '°' },
+      obliquityMax: { get: () => env().max, render: (v) => Number(v).toFixed(2), unit: '°' },
+      obliquityMinRound: { get: () => env().min, render: (v) => Number(v).toFixed(2), unit: '°' },
+      obliquityMaxRound: { get: () => env().max, render: (v) => Number(v).toFixed(2), unit: '°' },
+      obliquityRangeInline: {
+        // get() must return a number for resolveAll's sanity guard; render
+        // reads both extrema from the cached envelope directly.
+        get: () => env().min,
+        render: () => `~${env().min.toFixed(2)}° – ~${env().max.toFixed(2)}°`,
+      },
+    };
+  })(),
+  axialTiltMin: {
+    get: () => model.earth.earthtiltMean - model.earth.earthInvPlaneInclinationAmplitude,
+    render: (v) => Number(v).toFixed(2),
+    unit: '°',
+  },
+  axialTiltMax: {
+    get: () => model.earth.earthtiltMean + model.earth.earthInvPlaneInclinationAmplitude,
+    render: (v) => Number(v).toFixed(2),
+    unit: '°',
+  },
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
