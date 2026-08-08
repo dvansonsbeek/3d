@@ -5415,7 +5415,8 @@ function updateSafeObjectsForEpoch() {
 // mutation here is INTENTIONALLY retained even though the new
 // `_dtPlanetIntegrator` dispatch (added in Phase P-B0+) supersedes it under
 // DEEP_TIME_MODE_ENABLED=true. The snapshot path `obj.speed × pos` remains
-// the fallback whenever DEEP_TIME_MODE_ENABLED=false (production default) or
+// the fallback whenever DEEP_TIME_MODE_ENABLED=false (non-default — the flag
+// ships true, :88) or
 // when the user explicitly calls setEpoch() with the toggle off. Removing
 // these mutations would silently break the snapshot path at any non-J2000
 // epoch — see "Why we keep both paths" in
@@ -8747,7 +8748,7 @@ const neptuneWobbleCenter = {
 // supersede the snapshot `obj.speed × pos` for deep-time-mode rendering, the
 // snapshot mutations in updateMercuryForEpoch() etc. (script.js ~line 5837+) are
 // INTENTIONALLY retained. The snapshot path is the fallback when
-// DEEP_TIME_MODE_ENABLED=false (production default) and when the user navigates
+// DEEP_TIME_MODE_ENABLED=false (non-default — the flag ships true, :88) and when the user navigates
 // via setEpoch() with the toggle off. Removing those mutations would silently
 // break the snapshot path at any non-J2000 epoch.
 //
@@ -56244,8 +56245,10 @@ function updatePredictions() {
   // at balanced clicks — otherwise leaks per-harmonic drift back in time (commit 27db4cc pattern).
   //
   // Tropical year uses computeSolarYearDaysDirect (TROPICAL_YEAR_HARMONICS,
-  // Step 6d direct year-length fit). Matches raw CSV year-2000 measurement exactly
-  // (365.242190370 by J2000 anchor construction; see year-length-harmonics.js).
+  // Step 6d direct year-length fit). Since the edge-trimmed 2026-08 refit the
+  // fit no longer interpolates the raw CSV year-2000 measurement exactly —
+  // Fourier(2000) sits ~1.4e-6 d above YEAR_LENGTH_J2000_ANCHOR (the fit's
+  // year-2000 residual; doc 99 § "The two J2000 day bases").
   // Consistent with sidereal + anomalistic displays (also Step 6d).
   predictions.solarYearDays = o.solarYearDays = computeSolarYearDaysDirect(yearForFormula);
   o.siderealYearDays = computeSiderealYearDaysDirect(yearForFormula);
@@ -56259,9 +56262,12 @@ function updatePredictions() {
   // Sidereal year in seconds = MEASURED days × o.lodKinematic (round-trip identity → = IAU_sid_sec = 31,558,149.7635 s).
   predictions.siderealYearSeconds = o.siderealYearSeconds = o.siderealYearDays * o.lodKinematic;
   // Tweakpane display: LOD_real = o.lodKinematic + H/5 ecliptic missing-motion + DT cyclic sum incl. swing (Layer 4).
-  // At J2000: raw H/5 kinematic = 86400.003527 s → Layer 4 = 86400.003527 + (~−2.14 ms from
-  // calibrated 4-flag stack + Core-mantle swing) = 86400.0014 s → matches the USNO joint-world
-  // anchor exactly, by construction of the fit. Layer 3 is the same sum with the
+  // At J2000: raw H/5 kinematic = 86400.003522 s → Layer 4 = 86400.003522 + (~−2.14 ms from
+  // calibrated 4-flag stack + Core-mantle swing) = 86400.001380 s → closes on the USNO
+  // closure target (86400.0017) in the fit's MEASURED-day basis; the 0.32 ms spread is
+  // the measured-vs-Fourier sidereal-days difference at 2000 (doc 99 § "The two J2000
+  // day bases"; engine twin computeLodRealSecondsAtEpoch in tools/lib/deep-time.js).
+  // Layer 3 is the same sum with the
   // swing left out — see `solarDayLayer3` below, which subtracts it back off.
   //
   // The Layer 3/4 baseline is `o.lodKinematic` (IAU-anchored kinematic) NOT `_gia`

@@ -36,6 +36,8 @@ const require = createRequire(import.meta.url);
 const rd = (p) => JSON.parse(readFileSync(join(ROOT, p), 'utf8'));
 
 const C = require(join(ROOT, 'tools', 'lib', 'constants.js'));
+/** Lazy deep-time engine (loads the ΔT/LOD chain on first key that needs it). */
+const dtl = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
 const model = rd('public/input/model-parameters.json');
 const astro = rd('public/input/astro-reference.json');
 const dtFit = rd('data/deltaT-4flag-fit.json');
@@ -105,6 +107,90 @@ export const VALUES = {
     render: (v) => Number(v).toFixed(1),
     unit: 's',
     note: 'joint-fit RMS over the Espenak window. NOT the validate-resonator sweep figure (different window) — the two differ and have been confused before',
+  },
+  // ── Layer-4 solar-day family (§12h) — engine twins of the tweakpane ─────
+  // Website contract: lodRealPhysical / lodH5Only / stackNetLodJ2000Ms in
+  // model-values.compute.ts (the dayLength.ts port). All in the DISPLAY basis
+  // (lodKinematic = IAU sidereal seconds / FOURIER sidereal days at 2000);
+  // the fit's closure target `usnoLodJ2000` is expressed in the MEASURED-
+  // anchor basis (IAU seconds / fc.YEAR_LENGTH_J2000_ANCHOR.sidereal). The
+  // two bases differ by 0.32 ms at J2000 — the measured-vs-Fourier sidereal-
+  // length spread, not an error — and the gate inside lodRealPhysical holds
+  // that identity to 1e-8 s on every docs build.
+  lodRealPhysical: {
+    get: () => {
+      const v = dtl().computeLodRealSecondsAtEpoch(2000);
+      // §12h basis-consistency gate: display-basis composite + basis spread
+      // must land exactly on the fit's closure target. Ties the engine, the
+      // 6d anchor (fitted-coefficients.json) and the joint fit
+      // (deltaT-4flag-fit.json) together — fires if any is reshipped without
+      // the others. Tolerance covers the fitter's 86400-approx h5 and its
+      // linear-algebra Σ vs the runtime Σ (measured ~8e-10 s). Assumes the
+      // shipped flag set: running docs under DT_*_DISABLED= envs fails here
+      // by design — the doc numbers assert the shipped world.
+      const fc = rd('public/input/fitted-coefficients.json');
+      const lodKinMeasured = C.meanSiderealYearSeconds / fc.YEAR_LENGTH_J2000_ANCHOR.sidereal;
+      const lodKinFourier = dtl().computeLodKinematicSecondsAtEpoch(2000);
+      const closes = v + (lodKinMeasured - lodKinFourier);
+      const target = dtFit.optimum.usno_target_lod_s;
+      if (Math.abs(closes - target) > 1e-8) {
+        throw new Error('model-values: lodRealPhysical basis-consistency gate FAILED: '
+          + `display composite ${v} + basis spread ${lodKinMeasured - lodKinFourier} `
+          + `= ${closes}, but the joint fit's USNO closure target is ${target}. `
+          + 'The engine, the 6d year-length anchor and the ΔT joint fit have desynced.');
+      }
+      return v;
+    },
+    render: (v) => thousands(v, 6),
+    unit: 's',
+    note: 'Layer-4 physical solar day at J2000 (tweakpane Solar Day, display basis) — closes on usnoLodJ2000 in the fit\'s measured-day basis',
+  },
+  lodH5Only: {
+    get: () => dtl().computeLodKinematicSecondsAtEpoch(2000) + dtl().h5Correction(2000),
+    render: (v) => thousands(v, 6),
+    unit: 's',
+    note: 'raw H/5 kinematic solar day at J2000 (no ΔT cycles) — intermediate, not the physical readout',
+  },
+  stackNetLodJ2000Ms: {
+    get: () => dtl().dtCycleLodCorrectionSum(2000) * 1000,
+    render: (v) => fmtSignedPct(v, 2),
+    unit: 'ms',
+    note: '4-flag stack + Core-mantle swing δLOD sum at J2000 — basis-independent (= lodRealPhysical − lodH5Only)',
+  },
+  h5LodCorrectionMs: {
+    get: () => dtl().h5Correction(2000) * 1000,
+    render: (v) => Number(v).toFixed(3),
+    unit: 'ms',
+    note: 'H/5 ecliptic missing-motion LOD correction at J2000',
+  },
+  // Ours-only: doc 99 quotes the Layer-2-vs-Layer-4 display gap.
+  layer2MinusLayer4GapMs: {
+    get: () => {
+      const tMa = (C.startmodelYear - 2000) / 1e6;
+      const layer2 = dtl().meanLodSecondsAtAge(tMa) + dtl().h5Correction(2000);
+      return (layer2 - dtl().computeLodRealSecondsAtEpoch(2000)) * 1000;
+    },
+    render: (v) => Number(v).toFixed(2),
+    unit: 'ms',
+    note: 'Layer 2 (tidal+GIA physics baseline + H/5) minus Layer 4 (shipped observable) at J2000',
+  },
+  // Ours-only: doc 99's solar-day layer table. Layer 1 (climate-MEAN α) stays
+  // manual — its α-mean chain (meanLodSecondsAtAgeMeanAlpha) is browser-only.
+  solarDayLayer2J2000: {
+    get: () => {
+      const tMa = (C.startmodelYear - 2000) / 1e6;
+      return dtl().meanLodSecondsAtAge(tMa) + dtl().h5Correction(2000);
+    },
+    render: (v) => thousands(v, 6),
+    unit: 's',
+    note: 'Layer 2 solar day at J2000: tidal + GIA physics baseline + H/5 (browser solarDayLayer2 at year 2000)',
+  },
+  solarDayLayer3J2000: {
+    get: () => dtl().computeLodKinematicSecondsAtEpoch(2000) + dtl().h5Correction(2000)
+             + (dtl().dtCycleLodCorrectionSum(2000) - dtl().resonatorSwingLodCorrection(2000)),
+    render: (v) => thousands(v, 6),
+    unit: 's',
+    note: 'Layer 3 solar day at J2000: kinematic + H/5 + 4-flag cycles WITHOUT the Core-mantle swing (browser solarDayLayer3 at year 2000)',
   },
   meanObliquity: {
     get: () => model.earth.earthtiltMean,
@@ -519,10 +605,15 @@ export const VALUES = {
   // DEFERRED: the six axialPrec/periPrec scan keys (MinPeriod/MinYear/…,
   // CycleMin/Max). They scan sid/(sid−sol) and anom-based ratios to +35 kyr
   // and over a full H — where the snapshot-vs-integrated PHASE AXIS question
-  // stops cancelling (unlike the envelope extrema and the J2000 rates). The
-  // right basis needs deciding with the lodReal/day-unit investigation, not
-  // assumed here; a forced match would bury exactly the divergence the §12h
-  // exercise exists to surface.
+  // stops cancelling (unlike the envelope extrema and the J2000 rates).
+  // The basis is now DECIDED (§12h lodReal investigation): the browser ships
+  // DEEP_TIME_MODE_ENABLED = true (script.js:88), so every displayed value
+  // rides the INTEGRATED axis (epoch-aware Layer-0 base + R3-corrected
+  // phase) and the 6d coefficients are cycle-fitted on that same axis. Port
+  // these scans through the deep-time engine twins (see
+  // tools/lib/deep-time.js `computeSiderealYearDaysDirect`); the snapshot
+  // form agrees only at J2000 (~1 ULP, measured) and diverges over the scan
+  // ranges.
 
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
@@ -539,15 +630,16 @@ export const VALUES = {
  * outside the browser. Listed so their absence is a recorded decision rather
  * than an oversight, and so nobody "helpfully" adds them as literals.
  *
- *   lodReal (Layer 4 solar day)  the shipped composite is assembled in
- *     src/script.js from `o.lodKinematic + h5 + dtCycleLodCorrectionSum`, and
- *     `o.lodKinematic` is scene state with no engine twin. The tweakpane reads
- *     86400.001379; the joint fit's closure target is 86400.0017. That 0.32 ms
- *     is UNEXPLAINED. Do not automate either number until it is resolved —
- *     baking the wrong one in is worse than leaving the doc manual.
- *   raw H/5 kinematic, Layer-2−Layer-4 gap  same dependency chain.
+ * Currently EMPTY. The founding entries (lodReal / rawH5Kinematic /
+ * layer2MinusLayer4Gap) lifted into VALUES as lodRealPhysical / lodH5Only /
+ * stackNetLodJ2000Ms / layer2MinusLayer4GapMs after the §12h strangler
+ * extraction (tools/lib/deep-time.js `computeLodRealSecondsAtEpoch`,
+ * bit-identical to the tweakpane) resolved the 0.32 ms fit-vs-display gap as
+ * a day-basis spread — measured-anchor vs Fourier-direct sidereal days at
+ * 2000. The basis identity is now enforced on every docs build by the gate
+ * inside lodRealPhysical's get().
  */
-export const NOT_DERIVABLE = ['lodReal', 'rawH5Kinematic', 'layer2MinusLayer4Gap'];
+export const NOT_DERIVABLE = [];
 
 /** key -> rendered string, for the renderers to substitute. */
 export function resolveAll() {

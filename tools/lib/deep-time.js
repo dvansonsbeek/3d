@@ -544,6 +544,106 @@ function dtCycleLodCorrectionSum(year) {
        + resonatorSwingLodCorrection(year);   // 0 unless DT_RESONATOR_ENABLED=1
 }
 
+// ─── Layer-4 solar-day composite — the browser tweakpane twin (§12h) ────────
+// Strangler extraction of src/script.js:56288
+//   `predictions.lodReal = o.lodKinematic + _h5 + _cycleSum`
+// lifted VERBATIM (same ingredient functions, same addition order), so the
+// headline solar-day number the docs quote is derivable outside the browser.
+// Reproduces the tweakpane's J2000 reading (86400.001379 displayed) bit-for-
+// bit — proven ingredient-by-ingredient against the live headless page via
+// the __test__ surface (Object.is on every exposed ingredient).
+//
+// INTEGRATED AXIS, decided (the §12h axis decision): DEEP_TIME_MODE_ENABLED
+// is `true` at script.js:88 — deep time IS the shipped default (the
+// "production default false" comments at script.js:5418/8750 are stale), so
+// the browser evaluates this composite with the epoch-aware Layer-0 base and
+// INTEGRATED phase (R3 anchor rule), and the current 6d coefficients are
+// cycle-fitted on that same axis (the matched pair — see
+// _evalSiderealYearFourierIAU's Phase D note above). The snapshot form
+// (kinematic const base + 2π·div·(year−balancedYear)/H) agrees at J2000 only
+// to ~1 ULP — measured, NOT bit-identical — and diverges away from it, so it
+// is deliberately NOT what this implements.
+//
+// THREE sidereal-year Fourier evaluators now exist in the engine; they are
+// NOT interchangeable:
+//   • _evalSiderealYearFourierIAU (above) — IAU base 365.256363004,
+//     INTEGRATED phase; feeds lodSecondsActualAtAge and the fixtures'
+//     `lod.realAtAge*` keys (the "Actual LOD" family — NOT this composite,
+//     despite the fixture key's name).
+//   • orbital-engine's evalYearFourier — difference form (subtracts the
+//     year-2000 ripple; its `mean` is the value AT 2000).
+//   • computeSiderealYearDaysDirect below — the browser's function of the
+//     same name, verbatim: epoch-aware KINEMATIC base (Layer-0
+//     tropDays·H_t/(H_t−13), the _epochYearDaysBase 'sidereal' recipe) +
+//     integrated phase.
+
+// Layer-0 instance for the epoch-aware base — same parameter bundle and α
+// channel the browser's _L0 is built from (the layer0 identity gate pins the
+// two constructions equal).
+const { createEpochPrimitives } = require('@hum/physics');
+let _l0M = null;
+function _l0() {
+  if (!_l0M) _l0M = createEpochPrimitives({ params: EPOCH_PARAMS, alphaAtAgeMa: earthMoiFactorAtAge });
+  return _l0M;
+}
+
+/** Browser twin of script.js computeSiderealYearDaysDirect (deep-time branch,
+ *  the shipped default): sidereal year length in days at `year` — epoch-aware
+ *  kinematic base plus the Step 6d SIDEREAL_YEAR_HARMONICS ripple on
+ *  integrated phase. Past the tidal-lock asymptote the base falls back to the
+ *  J2000 kinematic constant and null-phase terms are skipped, mirroring
+ *  _epochYearDaysBase's null contract and evalYearFourier's `continue`. */
+function computeSiderealYearDaysDirect(year) {
+  const H_t = _l0().holisticH(year);
+  const LOD_s = _l0().lodSeconds(year);
+  const T_trop_s = _l0().tropicalYearSeconds(year);
+  let base;
+  if (H_t === null || LOD_s === null || T_trop_s === null) {
+    base = C.meanSiderealYearDaysKinematic;
+  } else {
+    const tropDays = T_trop_s / LOD_s;
+    base = tropDays * H_t / (H_t - 13);   // recomputeEpochAnchors' _kinematic recipe
+  }
+  let result = base;
+  for (const [div, sinC, cosC] of C.SIDEREAL_YEAR_HARMONICS) {
+    const cycles = cyclesBetweenYears(C.balancedYear, year, div);
+    if (cycles === null) continue;
+    const phase = cycles * 2 * Math.PI;
+    result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  return result;
+}
+
+/** Browser twin of script.js h5Correction: H/5 ecliptic "missing motion" LOD
+ *  correction (~3.527 ms at J2000) on the deep-time mean-LOD chain. */
+function h5Correction(year) {
+  const t_Ma = (C.startmodelYear - year) / 1e6;  // browser J2000_CALENDAR_YEAR = startmodelYear = 2000.5
+  const lodMean = meanLodSecondsAtAge(t_Ma);
+  if (lodMean === null) return 0;
+  const H_local = meanHAtAge(t_Ma);
+  if (H_local === null) return 0;
+  const mSY_days = meanTropicalYearDaysAtAge(t_Ma);
+  return lodMean / ((H_local / 5) * mSY_days);
+}
+
+/** Epoch-specific kinematic LOD — script.js `o.lodKinematic`: IAU sidereal
+ *  seconds / Fourier sidereal days (≈ 86399.99999487 s at year 2000). The
+ *  cardinal-point MEASURED route (IAU seconds / fc.YEAR_LENGTH_J2000_ANCHOR
+ *  .sidereal = 86400.00031536 s) is a DIFFERENT quantity — the joint fit's
+ *  USNO-closure basis; the 0.32 ms between them is the tweakpane-vs-fit-target
+ *  spread, not an error (see the §12h note in tools/docs/model-values.mjs). */
+function computeLodKinematicSecondsAtEpoch(year) {
+  return C.meanSiderealYearSeconds / computeSiderealYearDaysDirect(year);
+}
+
+/** Layer-4 solar day in seconds (the shipped observable, tweakpane "Solar
+ *  day"): kinematic LOD + H/5 ecliptic missing motion + calibrated ΔT cycle
+ *  stack incl. Core-mantle swing. script.js:56288 verbatim;
+ *  86400.00137950659 at year 2000. */
+function computeLodRealSecondsAtEpoch(year) {
+  return computeLodKinematicSecondsAtEpoch(year) + h5Correction(year) + dtCycleLodCorrectionSum(year);
+}
+
 /** dLOD/dt driver decomposition at t_Ma, in ms/century per channel.
  *  Mirrors src/script.js dLodDtDecompositionAtAge (tweakpane dLOD/dt
  *  decomposition sub-folder: Tidal baseline / GIA / All cycles /
@@ -1197,6 +1297,9 @@ module.exports = {
   // Implied LOD corrections from the 4-flag ΔT stack (physical-consistency helper)
   bondCycleLodCorrection, hallstattCycleLodCorrection, jose5CycleLodCorrection, jose4CycleLodCorrection,
   dtCycleLodCorrectionSum,
+  // Layer-4 solar-day composite (§12h strangler — browser tweakpane twin)
+  computeSiderealYearDaysDirect, h5Correction,
+  computeLodKinematicSecondsAtEpoch, computeLodRealSecondsAtEpoch,
   // Core-mantle swing (Resonator driver) — episode component, default ON (joint world)
   resonatorSwingDeltaTCorrection, resonatorSwingLodCorrection, resonatorSwingLodRate,
   DT_RESONATOR_ENABLED,

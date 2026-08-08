@@ -1762,7 +1762,19 @@ function runJointMode() {
     selected_by: 'joint mode (--joint --write; flags + resonator, hard closure, caps)',
   };
   fitJson.usno_anchor.usno_target_lod_s = best.usno;
-  fitJson.usno_anchor.derived_target_offset_s = computeUsnoTargetOffset(best.usno).targetOffset;
+  // Refresh the WHOLE derivation record, not just the offset: patching
+  // derived_target_offset_s alone left a fossil `derivation` sub-block from
+  // the last legacy full write. After the 2026-08 6d anchor move that fossil
+  // (old fc sidereal anchor 365.25636296…) sat beside an offset computed from
+  // the new anchor (365.25636167…) — an internally inconsistent record that
+  // made the fit-vs-tweakpane 0.32 ms day-basis spread look unexplained.
+  const usnoDerivWrite = computeUsnoTargetOffset(best.usno);
+  fitJson.usno_anchor.derived_target_offset_s = usnoDerivWrite.targetOffset;
+  fitJson.usno_anchor.derivation = {
+    lod_kinematic_at_j2000_s: usnoDerivWrite.lodKinematic,
+    fitted_sidereal_days_at_2000: usnoDerivWrite.sidDays2000,
+    h5_correction_s: usnoDerivWrite.h5At2000,
+  };
   fitJson.usno_anchor.shipped_sum_lod_at_j2000_s = closure;
   fitJson.usno_anchor.joint_mode_note =
     'JOINT world (2026-07-23): closure sum includes the Core-mantle swing '
