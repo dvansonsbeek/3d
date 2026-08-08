@@ -34,7 +34,9 @@
       "halleysMassKg": 220000000000000
     },
     "earthJ2": 0.00108262668,
-    "earthEquatorialRadiusKm": 6378.1366
+    "earthEquatorialRadiusKm": 6378.1366,
+    "earthParallaxRadiusKm": 6378.1369994839,
+    "_earthRadiiNote": "TWO radius quantities, deliberately distinct. earthEquatorialRadiusKm = IAU 2015 nominal equatorial radius (geodetic convention; the correct radius for the J2 figure-of-Earth term). earthParallaxRadiusKm = the parallax-consistent radius, matched pair of currentAUDistance via the appendix chain: r / solarParallax(8.794143836 arcsec) x (648000/pi) = 149,597,870.698828 km. The website's EARTH_RADIUS_KM and the earthRadius/Diameter/Circumference display keys use the parallax radius. Merging them would conflate a geodetic convention with the parallax/AU system's length (IAU 1976 a_E was 6378.140) — same unit-conflation class as LOD-days vs SI-days."
   },
   "earthOrbital": {
     "j2000EpochYear": 2000,

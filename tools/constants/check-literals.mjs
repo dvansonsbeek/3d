@@ -278,6 +278,7 @@ const NOT_IN_SCRIPT = {
   // NAME, so a renamed copy slips past it. All three were renamed.
   'astro.physicalConstants.earthJ2': 'used by tools/lib figure-of-Earth term',
   'astro.physicalConstants.earthEquatorialRadiusKm': 'used by tools/lib figure-of-Earth term',
+  'astro.physicalConstants.earthParallaxRadiusKm': 'AU matched pair (appendix chain); consumed by the model-values registry, not script.js',
 
   // The four additional bodies carry their eccentricity TWICE in the JSON —
   // astro.additionalBodiesReference.<b>.orbitalEccentricityJ2000 and

@@ -762,6 +762,7 @@ module.exports = {
   // is exported above)
   earthJ2: astroRef.physicalConstants.earthJ2,
   earthEquatorialRadiusKm: astroRef.physicalConstants.earthEquatorialRadiusKm,
+  earthParallaxRadiusKm: astroRef.physicalConstants.earthParallaxRadiusKm,
 
   // Planet derived
   derived,

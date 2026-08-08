@@ -218,11 +218,29 @@ export const VALUES = {
     unit: '″/yr',
     note: 'perihelion (climatic) precession rate at J2000 — replaces the website\'s stability pin',
   },
-  // STILL DEFERRED (§12h rule: investigate, never force):
-  //   earthCircumference / earthDiameter
-  //                    radius constants differ: ours 6378.1366 km (IERS),
-  //                    website 6378.137 km (WGS-84) — 0.01 km in the
-  //                    circumference. One constant must win first.
+  // ── Earth figure (display) ──────────────────────────────────────────────
+  // Derived from the PARALLAX radius, not the IAU nominal equatorial radius:
+  // two distinct quantities, both shipped in astro-reference (see
+  // _earthRadiiNote there). The parallax radius is the matched pair of
+  // currentAUDistance via the appendix chain and is what the website's
+  // EARTH_RADIUS_KM carries; the equatorial nominal (6378.1366) serves the
+  // J2 figure-of-Earth term. Resolved with Dennis 2026-08 after the earlier
+  // "one constant must win" framing turned out to be a unit conflation.
+  earthRadius: {
+    get: () => astro.physicalConstants.earthParallaxRadiusKm,
+    render: (v) => thousands(v, 2),
+    unit: 'km',
+  },
+  earthDiameter: {
+    get: () => 2 * astro.physicalConstants.earthParallaxRadiusKm,
+    render: (v) => thousands(v, 2),
+    unit: 'km',
+  },
+  earthCircumference: {
+    get: () => 2 * Math.PI * astro.physicalConstants.earthParallaxRadiusKm,
+    render: (v) => thousands(v, 2),
+    unit: 'km',
+  },
 
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
