@@ -1094,6 +1094,39 @@ export const VALUES = {
     };
   })(),
 
+  // ── Sun-wobble radii + Moon precession lattice (11-2u) ──────────────────
+  // Radii: eccentricity base/amplitude × the model AU. Moon precession:
+  // the H-lattice counts N = round(8·H·mSY / precessionDaysInput)/8, with
+  // periods H/N and the Lunar Precession Invariant H²/N (T × H = const) —
+  // all from engine constants; the ICRF/Earth day-values are the engine's
+  // month-chain outputs.
+  ...(() => {
+    const TOTAL_DAYS = () => C.H * C.meanSolarYearDays;
+    const nApsidal = () => Math.round(8 * TOTAL_DAYS() / C.moonApsidalPrecessionDaysInputICRF) / 8;
+    const nNodal = () => Math.round(8 * TOTAL_DAYS() / C.moonNodalPrecessionDaysInputICRF) / 8;
+    return {
+      wobbleCenterKm:    { get: () => Math.round(model.earth.eccentricityAmplitude * C.currentAUDistance), render: (v) => thousands(v), unit: 'km', note: 'eccentricity amplitude × model AU' },
+      perihelionPointKm: { get: () => Math.round(model.earth.eccentricityBase * C.currentAUDistance), render: (v) => thousands(v), unit: 'km', note: 'eccentricity base × model AU' },
+      fullMoonCycleEarth:      { get: () => C.moonFullMoonCycleEarth, render: (v) => thousands(v, 2), unit: 'd', note: 'observed supermoon cycle' },
+      fullMoonCycleEarthExact: { get: () => C.moonFullMoonCycleEarth, render: (v) => thousands(v, 10), unit: 'd' },
+      draconicYearICRF:  { get: () => C.moonDraconicYearICRF, render: (v) => thousands(v, 10), unit: 'd', note: 'H/13-frame lattice partner' },
+      draconicYearEarth: { get: () => C.moonDraconicYearEarth, render: (v) => thousands(v, 10), unit: 'd', note: 'observed eclipse year' },
+      apsidalPrecICRF:      { get: () => C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 2), unit: 'yr' },
+      apsidalPrecICRFexact: { get: () => C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr' },
+      apsidalPrecEarth:     { get: () => C.moonApsidalPrecessionDaysEarth / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr' },
+      nodalPrecICRF:        { get: () => C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 1), unit: 'yr' },
+      nodalPrecICRFexact:   { get: () => C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr' },
+      nodalPrecEarth:       { get: () => C.moonNodalPrecessionDaysEarth / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr' },
+      moonApsidalCyclesPerH: { get: nApsidal, render: (v) => thousands(v, 1).replace(/\.0$/, ''), note: 'N = round(8·H·mSY/T_apsidal)/8 — eighth-integer lattice count' },
+      moonNodalCyclesPerH:   { get: nNodal, render: (v) => thousands(v, 3).replace(/0+$/, '').replace(/\.$/, '') },
+      moonApsidalPeriodYr:   { get: () => C.H / nApsidal(), render: (v) => thousands(v, 3), unit: 'yr' },
+      moonNodalPeriodYr:     { get: () => C.H / nNodal(), render: (v) => thousands(v, 3), unit: 'yr' },
+      lunarPrecInvariantApsidalYrSq: { get: () => C.H * C.H / nApsidal(), render: (v) => thousands(v, 0), unit: 'yr²', note: 'T_apsidal × H — the Lunar Precession Invariant' },
+      lunarPrecInvariantNodalYrSq:   { get: () => C.H * C.H / nNodal(), render: (v) => thousands(v, 0), unit: 'yr²' },
+      moonLevelingCycle: { get: () => C.moonLunarLevelingCycleDays / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 2), unit: 'yr' },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
