@@ -1736,6 +1736,37 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Mercury epoch tables + prose approximations (11-2ah) ────────────────
+  // The 1800/1900/2000/2100 helio/geo/anomaly tables run through the shared
+  // predictive machinery (+ the general-precession drift for geocentric);
+  // the prose approximations derive from their tracked exact counterparts
+  // (orbital path = 2π·AU to the nearest 10M km; period = the IAU mean
+  // tropical year; mass ratio and synodic month rounded). The Chandler /
+  // Milky Way / Jupiter-barycenter values are literature citations in
+  // knownValues.
+  ...(() => {
+    const pm = predictiveMachinery;
+    const out = {};
+    for (const y of [1800, 1900, 2000, 2100]) {
+      out[`mercuryHelio${y}`] = { get: () => pm().totalPrecession(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy' };
+      out[`mercuryGeo${y}`] = { get: () => pm().totalPrecession(y, 'mercury') + astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy' };
+      out[`mercuryAnomaly${y}`] = { get: () => pm().fluct(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy' };
+    }
+    Object.assign(out, {
+      earthOrbitalPath: { get: () => Math.round(2 * Math.PI * C.currentAUDistance / 1e7) * 1e7, render: (v) => `~${thousands(v)}`, unit: 'km' },
+      earthOrbitalPeriod: { get: () => astro.yearLengthRef.tropicalYearMean, render: (v) => `~${Number(v).toFixed(5)}`, unit: 'd', note: 'IAU mean tropical year, prose approximation' },
+      earthMoonMassRatio: { get: () => C.MASS_RATIO_EARTH_MOON, render: (v) => `~${thousands(v, 1)}` },
+      lunarMonthApprox: { get: () => C.moonSynodicMonth, render: (v) => `~${thousands(v, 2)}`, unit: 'd' },
+      chandlerWobbleCycle: { get: () => astro.knownValues.chandlerWobbleCycleMonths, render: (v) => `~${v}`, unit: 'months', note: 'citation' },
+      chandlerWobbleAmplitude: { get: () => astro.knownValues.chandlerWobbleAmplitudeRange, render: (v) => String(v), unit: 'm', note: 'citation' },
+      jupiterBarycenterPeriod: { get: () => astro.knownValues.jupiterBarycenterPeriodYears, render: (v) => `~${v}`, unit: 'yr', note: 'citation' },
+      milkyWayDistance: { get: () => astro.knownValues.milkyWayDistanceRangeLy, render: (v) => `~${v}`, unit: 'ly', note: 'citation' },
+      milkyWaySpeed: { get: () => astro.knownValues.milkyWaySpeedKmS, render: (v) => `~${v}`, unit: 'km/s', note: 'citation' },
+      milkyWayPeriod: { get: () => astro.knownValues.milkyWayPeriodMyr, render: (v) => `~${v}`, unit: 'Myr', note: 'citation' },
+    });
+    return out;
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {

@@ -594,6 +594,12 @@ export declare const REFERENCE_DATA: {
     "ascNodeJointRmsArcsec": number;
     "generalPrecessionArcsecCy": number;
     "bepiColomboPrecisionArcsec": number;
+    "chandlerWobbleCycleMonths": number;
+    "chandlerWobbleAmplitudeRange": string;
+    "jupiterBarycenterPeriodYears": number;
+    "milkyWayDistanceRangeLy": string;
+    "milkyWaySpeedKmS": number;
+    "milkyWayPeriodMyr": number;
     "mainstreamAxialPrecKyr": number;
     "mainstreamPeriPrecKyr": number;
     "mainstreamObliqCycleKyr": number;
