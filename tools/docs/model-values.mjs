@@ -1259,6 +1259,59 @@ export const VALUES = {
     };
   })(),
 
+  // ── Planet perihelion lattice + J2000 eccentricities (11-2z) ────────────
+  // Periods and rates are pure H-lattice structure (the dynamical divisors —
+  // Jupiter 8H/39, Saturn −8H/65 per the J/S reframe; signs mark
+  // ecliptic-retrograde); formulas are the structural labels; eccentricities
+  // from the per-planet JPL DE440 J2000 elements in model-parameters (Earth
+  // from astro earthOrbital).
+  ...(() => {
+    const periDivisors = {
+      mercury: { num: 8, den: 11, sign: 1, formula: 'H×(8/11)', roundFirst: false },
+      venus:   { num: 8, den: 6,  sign: -1, formula: '−8H/6', roundFirst: true },
+      mars:    { num: 8, den: 36, sign: 1, formula: 'H×(8/36)', roundFirst: false },
+      jupiter: { num: 8, den: 39, sign: 1, formula: '8H/39', roundFirst: true },
+      saturn:  { num: 8, den: 65, sign: -1, formula: '−8H/65', roundFirst: true },
+      uranus:  { num: 8, den: 24, sign: 1, formula: 'H/3', roundFirst: true },
+      neptune: { num: 16, den: 8, sign: 1, formula: '2H', roundFirst: true },
+      pluto:   { num: 8, den: 8,  sign: 1, formula: 'H/1', roundFirst: true },
+    };
+    const out = {};
+    for (const [planet, d] of Object.entries(periDivisors)) {
+      const periodYears = () => (C.H * d.num) / d.den;
+      out[`${planet}PeriPeriod`] = {
+        get: periodYears,
+        render: d.roundFirst ? ((v) => thousands(Math.round(v))) : ((v) => thousands(v, 0)),
+        unit: 'yr',
+      };
+      out[`${planet}PeriFormula`] = { get: () => d.formula, render: (v) => String(v) };
+      if (planet !== 'pluto') {
+        const rateKey = `${planet}PeriRate`;
+        out[rateKey] = {
+          get: () => d.sign * 360 / periodYears(),
+          render: (v) => thousands(v, 6),
+          unit: '°/yr',
+        };
+      }
+    }
+    // Earth's rate uses the H/16 effective period, not a peri divisor above.
+    out.earthPeriRate = { get: () => 360 / (C.H / 16), render: (v) => thousands(v, 6), unit: '°/yr', note: 'H/16 effective period' };
+    const eccSources = {
+      mercury: () => C.planets.mercury.orbitalEccentricityJ2000,
+      venus:   () => C.planets.venus.orbitalEccentricityJ2000,
+      earth:   () => astro.earthOrbital.earthEccentricityJ2000,
+      mars:    () => C.planets.mars.orbitalEccentricityJ2000,
+      jupiter: () => C.planets.jupiter.orbitalEccentricityJ2000,
+      saturn:  () => C.planets.saturn.orbitalEccentricityJ2000,
+      uranus:  () => C.planets.uranus.orbitalEccentricityJ2000,
+      neptune: () => C.planets.neptune.orbitalEccentricityJ2000,
+    };
+    for (const [planet, get] of Object.entries(eccSources)) {
+      out[`${planet}EccJ2000`] = { get, render: (v) => Number(v).toFixed(5), note: 'JPL DE440 J2000 element' };
+    }
+    return out;
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
