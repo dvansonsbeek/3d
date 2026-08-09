@@ -1381,6 +1381,53 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Pluto inclination + min/max envelopes + H factorization (11-2ac) ────
+  // Pluto's mean/amplitude are STORED values (model additionalBodies — no
+  // mass fraction for the ψ law), its Ω is the model's VERIFIED node
+  // (101.06, ascendingNodeInvPlane — deliberately ≠ the raw S&S 107.06;
+  // docs/32 table). Min/max are mean ∓ amplitude at 2 dp; the *Round keys
+  // are the 3-dp J2000 table forms. holisticYearFactors is DERIVED by
+  // actually factorizing C.H — the 23 × 61 × 239 structure is load-bearing
+  // (the gcd rules of the ΔT stack ride on these primes), so the key fails
+  // loudly if H ever changes.
+  ...(() => {
+    const pl = () => model.additionalBodies.pluto;
+    const inclOf = (planet) => (planet === 'pluto'
+      ? { mean: pl().invPlaneInclinationMean, amp: pl().invPlaneInclinationAmplitude }
+      : { mean: C.planets[planet].invPlaneInclinationMean, amp: C.planets[planet].invPlaneInclinationAmplitude });
+    const j2000Of = (planet) => {
+      if (planet === 'earth') return astro.earthOrbital.earthInclinationJ2000_deg;
+      if (planet === 'pluto') return astro.additionalBodiesReference.pluto.invPlaneInclinationJ2000;
+      return astro.planetOrbitalElements[planet].invPlaneInclinationJ2000;
+    };
+    const out = {
+      plutoInclMean: { get: () => pl().invPlaneInclinationMean, render: (v) => Number(v).toFixed(6), unit: '°', note: 'stored value — no ψ-law mass fraction for Pluto' },
+      plutoInclAmp: { get: () => pl().invPlaneInclinationAmplitude, render: (v) => Number(v).toFixed(6), unit: '°' },
+      plutoInclCycleAnchor: { get: () => pl().inclinationCycleAnchor, render: (v) => Number(v).toFixed(2), unit: '°' },
+      plutoOmegaJ2000: { get: () => pl().ascendingNodeInvPlane, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the model\'s VERIFIED node — deliberately ≠ raw S&S 107.06 (docs/32)' },
+      plutoInclJ2000: { get: () => astro.additionalBodiesReference.pluto.invPlaneInclinationJ2000, render: (v) => String(v), unit: '°' },
+      holisticYearFactors: {
+        get: () => {
+          const factors = [];
+          let n = C.H;
+          for (let f = 2; f * f <= n; f++) while (n % f === 0) { factors.push(f); n /= f; }
+          if (n > 1) factors.push(n);
+          return factors.join(' × ');
+        },
+        render: (v) => String(v),
+        note: 'derived prime factorization of H — the ΔT-stack gcd rules ride on these primes',
+      },
+    };
+    for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto']) {
+      out[`${planet}InclMin`] = { get: () => inclOf(planet).mean - inclOf(planet).amp, render: (v) => Number(v).toFixed(2), unit: '°' };
+      out[`${planet}InclMax`] = { get: () => inclOf(planet).mean + inclOf(planet).amp, render: (v) => Number(v).toFixed(2), unit: '°' };
+    }
+    for (const planet of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto']) {
+      out[`${planet}InclJ2000Round`] = { get: () => j2000Of(planet), render: (v) => Number(v).toFixed(3), unit: '°' };
+    }
+    return out;
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
