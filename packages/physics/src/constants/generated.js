@@ -32,11 +32,11 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "b87b5f38f3cf5b80";
+export const CONSTANTS_HASH = "b596258f72604195";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "b87b5f38f3cf5b80",
+  hash: "b596258f72604195",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -408,6 +408,10 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "axialPrecessionFraction": [
         -8,
         9
+      ],
+      "eccentricityCycleFraction": [
+        2,
+        21
       ]
     },
     "venus": {
@@ -430,6 +434,10 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "axialPrecessionFraction": [
         8,
         91
+      ],
+      "eccentricityCycleFraction": [
+        8,
+        19
       ]
     },
     "mars": {
@@ -455,6 +463,10 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "axialPrecessionFraction": [
         -1,
         2
+      ],
+      "eccentricityCycleFraction": [
+        8,
+        52
       ]
     },
     "jupiter": {
@@ -480,6 +492,10 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "axialPrecessionFraction": [
         -8,
         21
+      ],
+      "eccentricityCycleFraction": [
+        8,
+        44
       ]
     },
     "saturn": {
@@ -505,6 +521,10 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "axialPrecessionFraction": [
         -4,
         3
+      ],
+      "eccentricityCycleFraction": [
+        8,
+        163
       ]
     },
     "uranus": {
@@ -530,7 +550,12 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "axialPrecessionFraction": [
         610,
         1
-      ]
+      ],
+      "eccentricityCycleFraction": [
+        1,
+        10
+      ],
+      "eccentricityCycleApprox": true
     },
     "neptune": {
       "name": "Neptune",
@@ -552,7 +577,12 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "axialPrecessionFraction": [
         -68,
         1
-      ]
+      ],
+      "eccentricityCycleFraction": [
+        2,
+        25
+      ],
+      "eccentricityCycleApprox": true
     }
   },
   timeReference: {

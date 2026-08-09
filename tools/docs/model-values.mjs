@@ -2022,6 +2022,40 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Eccentricity cycles + phases + ascending nodes (11-2an) ─────────────
+  // Cycle periods LIVE from the engine's wobble beat (which lands exactly on
+  // the lattice); labels derived from the new per-planet
+  // eccentricityCycleFraction in model-parameters (Dennis review: structure
+  // belongs there, not in the citations file), '≈'-prefixed via the stored
+  // approx flag (the tidally-damped pair — a physical caveat, not numeric
+  // looseness). Phases from the engine planet fields (Earth = perihelion
+  // longitude + 90°, the e_E-line convention); ascending-node periods and
+  // 8H cycle counts from the engine (Earth = −H/5, the ecliptic precession).
+  ...(() => {
+    const eccLabel = (p) => {
+      const [num, den] = model.planets[p].eccentricityCycleFraction;
+      const approx = model.planets[p].eccentricityCycleApprox ? '≈' : '';
+      const n = Math.abs(num);
+      if (n === 1) return `${approx}H/${den}`;
+      if (den === 1) return `${approx}${n}H`;
+      return `${approx}${n}H/${den}`;
+    };
+    const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    const out = {
+      earthEccPhaseJ2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000 + 90, render: (v) => Number(v).toFixed(2), unit: '°', note: 'perihelion longitude + 90° — the e_E-line phase convention' },
+      earthAscNodePeriod: { get: () => -C.H / 5, render: (v) => thousands(Math.round(v)), unit: 'yr', note: '−H/5, the ecliptic precession' },
+      earthAscNodeN: { get: () => Math.round(-8 * C.H / (-C.H / 5)), render: (v) => String(v) },
+    };
+    for (const p of planets7) {
+      out[`${p}EccCycle`] = { get: () => C.planets[p].wobblePeriod, render: (v) => thousands(Math.round(v)), unit: 'yr' };
+      out[`${p}EccCycleFormula`] = { get: () => eccLabel(p), render: (v) => String(v) };
+      out[`${p}EccPhaseJ2000`] = { get: () => C.planets[p].eccentricityPhaseJ2000, render: (v) => Number(v).toFixed(2), unit: '°' };
+      out[`${p}AscNodePeriod`] = { get: () => C.planets[p].ascendingNodePeriod, render: (v) => thousands(Math.round(v)), unit: 'yr' };
+      out[`${p}AscNodeN`] = { get: () => Math.round(-8 * C.H / C.planets[p].ascendingNodePeriod), render: (v) => String(v) };
+    }
+    return out;
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {

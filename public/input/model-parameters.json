@@ -52,6 +52,10 @@
       "axialPrecessionFraction": [
         -8,
         9
+      ],
+      "eccentricityCycleFraction": [
+        2,
+        21
       ]
     },
     "venus": {
@@ -74,6 +78,10 @@
       "axialPrecessionFraction": [
         8,
         91
+      ],
+      "eccentricityCycleFraction": [
+        8,
+        19
       ]
     },
     "mars": {
@@ -99,6 +107,10 @@
       "axialPrecessionFraction": [
         -1,
         2
+      ],
+      "eccentricityCycleFraction": [
+        8,
+        52
       ]
     },
     "jupiter": {
@@ -124,6 +136,10 @@
       "axialPrecessionFraction": [
         -8,
         21
+      ],
+      "eccentricityCycleFraction": [
+        8,
+        44
       ]
     },
     "saturn": {
@@ -149,6 +165,10 @@
       "axialPrecessionFraction": [
         -4,
         3
+      ],
+      "eccentricityCycleFraction": [
+        8,
+        163
       ]
     },
     "uranus": {
@@ -174,7 +194,12 @@
       "axialPrecessionFraction": [
         610,
         1
-      ]
+      ],
+      "eccentricityCycleFraction": [
+        1,
+        10
+      ],
+      "eccentricityCycleApprox": true
     },
     "neptune": {
       "name": "Neptune",
@@ -196,7 +221,12 @@
       "axialPrecessionFraction": [
         -68,
         1
-      ]
+      ],
+      "eccentricityCycleFraction": [
+        2,
+        25
+      ],
+      "eccentricityCycleApprox": true
     }
   },
   "additionalBodies": {

@@ -2,10 +2,10 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "b87b5f38f3cf5b80";
+export declare const CONSTANTS_HASH: "b596258f72604195";
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "b87b5f38f3cf5b80";
+  readonly hash: "b596258f72604195";
   readonly additionalBodies: {
     "pluto": {
       "name": string;
@@ -357,6 +357,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeCyclesIn8H": number;
       "obliquityCycleFraction": number[];
       "axialPrecessionFraction": number[];
+      "eccentricityCycleFraction": number[];
     };
     "venus": {
       "name": string;
@@ -373,6 +374,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeCyclesIn8H": number;
       "obliquityCycleFraction": null;
       "axialPrecessionFraction": number[];
+      "eccentricityCycleFraction": number[];
     };
     "mars": {
       "name": string;
@@ -389,6 +391,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeCyclesIn8H": number;
       "obliquityCycleFraction": number[];
       "axialPrecessionFraction": number[];
+      "eccentricityCycleFraction": number[];
     };
     "jupiter": {
       "name": string;
@@ -405,6 +408,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeCyclesIn8H": number;
       "obliquityCycleFraction": number[];
       "axialPrecessionFraction": number[];
+      "eccentricityCycleFraction": number[];
     };
     "saturn": {
       "name": string;
@@ -421,6 +425,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeCyclesIn8H": number;
       "obliquityCycleFraction": number[];
       "axialPrecessionFraction": number[];
+      "eccentricityCycleFraction": number[];
     };
     "uranus": {
       "name": string;
@@ -437,6 +442,8 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeCyclesIn8H": number;
       "obliquityCycleFraction": number[];
       "axialPrecessionFraction": number[];
+      "eccentricityCycleFraction": number[];
+      "eccentricityCycleApprox": boolean;
     };
     "neptune": {
       "name": string;
@@ -453,6 +460,8 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeCyclesIn8H": number;
       "obliquityCycleFraction": null;
       "axialPrecessionFraction": number[];
+      "eccentricityCycleFraction": number[];
+      "eccentricityCycleApprox": boolean;
     };
   };
   readonly timeReference: {
