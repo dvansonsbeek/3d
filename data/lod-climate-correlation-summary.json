@@ -1,0 +1,9 @@
+{
+  "_description": "LOD-Climate Rhythm empirical validation summary (docs/102 item 7): Pearson correlation of the joint-world cumulative stack deltaLOD (4 flags + Core-mantle swing) against Bond 2001 North-Atlantic IRD over the validated window, out-of-sample (the stack was fit against the Stephenson 2016 deltaT residual, not any climate proxy); GISP2 shown for comparison; sign-convention hits on the five named in-window events (Maunder Minimum misses). SHIPPED AS 'OPEN CORRESPONDENCE, NOT VALIDATION' — the correlation fails every formal null test (docs/103); the framework's own docs carry that caveat and any consumer of these numbers must too. Consumed by the model-values registry (LOD-climate keys).",
+  "bondIrdPearsonR": 0.36,
+  "gisp2PearsonR": 0.24,
+  "signConventionHits": 4,
+  "signConventionTotal": 5,
+  "validatedWindowStartYear": -4000,
+  "validatedWindowEndYear": 1800
+}

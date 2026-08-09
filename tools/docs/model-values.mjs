@@ -955,6 +955,49 @@ export const VALUES = {
     };
   })(),
 
+  // ── Eclipse audit + LOD-climate + 8H cycle periods (11-2r) ──────────────
+  // The eclipse and correlation numbers are MEASURED CAMPAIGN RESULTS with
+  // no engine derivation; their tracked homes are the two new data/ summary
+  // JSONs (provenance in each _description — the website typed all of them
+  // as literals). The framework-vs-NASA gap keys and percentages are DERIVED
+  // from the artifact so a re-run flows through. The 8H cycle periods are
+  // structural lattice integers over C.H — zero-fit.
+  ...(() => {
+    const ecl = rd('data/eclipse-audit-summary.json');
+    const clim = rd('data/lod-climate-correlation-summary.json');
+    const L = ecl.lunar, S = ecl.solar;
+    return {
+      lunarResidualRmsSeconds:   { get: () => L.frameworkMeanAbsResidualSeconds, render: (v) => thousands(v), unit: 's' },
+      lunarResidualMinutes:      { get: () => L.frameworkMeanAbsResidualSeconds / 60, render: (v) => Number(v).toFixed(1), unit: 'min' },
+      solarResidualSecondsModel: { get: () => S.frameworkMeanAbsResidualSeconds, render: (v) => thousands(v), unit: 's' },
+      solarResidualMinutes:      { get: () => S.frameworkMeanAbsResidualSeconds / 60, render: (v) => Number(v).toFixed(1), unit: 'min' },
+      nasaLunarResidualSeconds:  { get: () => L.nasaMeanAbsResidualSeconds, render: (v) => thousands(v), unit: 's' },
+      nasaLunarResidualMinutes:  { get: () => L.nasaMeanAbsResidualSeconds / 60, render: (v) => Number(v).toFixed(1), unit: 'min' },
+      solarResidualSecondsNasa:  { get: () => S.nasaMeanAbsResidualSeconds, render: (v) => thousands(v), unit: 's' },
+      nasaSolarResidualMinutes:  { get: () => S.nasaMeanAbsResidualSeconds / 60, render: (v) => Number(v).toFixed(1), unit: 'min' },
+      lunarEventsBeatingNasa:    { get: () => L.eventsBeatingNasa, render: (v) => thousands(v) },
+      lunarEventsTotal:          { get: () => L.eventsTotal, render: (v) => thousands(v) },
+      lunarEventsRawTotal:       { get: () => L.eventsRawTotal, render: (v) => thousands(v), note: 'raw count before the NASA-polynomial validity filter' },
+      lunarBeatingNasaPct:       { get: () => 100 * L.eventsBeatingNasa / L.eventsTotal, render: (v) => Number(v).toFixed(1), unit: '%' },
+      solarEventsBeatingNasa:    { get: () => S.eventsBeatingNasa, render: (v) => thousands(v) },
+      solarEventsTotal:          { get: () => S.eventsTotal, render: (v) => thousands(v) },
+      solarBeatingNasaPct:       { get: () => 100 * S.eventsBeatingNasa / S.eventsTotal, render: (v) => Number(v).toFixed(1), unit: '%' },
+      lunarResidualGapAboveNasaSeconds: { get: () => L.frameworkMeanAbsResidualSeconds - L.nasaMeanAbsResidualSeconds, render: (v) => thousands(v), unit: 's' },
+      lunarResidualGapAboveNasaMinutes: { get: () => (L.frameworkMeanAbsResidualSeconds - L.nasaMeanAbsResidualSeconds) / 60, render: (v) => Number(v).toFixed(1), unit: 'min' },
+      solarResidualGapAboveNasaSeconds: { get: () => S.frameworkMeanAbsResidualSeconds - S.nasaMeanAbsResidualSeconds, render: (v) => fmtSignedPct(v, 0), unit: 's' },
+      bondIrdCorrelation:            { get: () => clim.bondIrdPearsonR, render: (v) => fmtSignedPct(v, 2), note: 'out-of-sample Pearson r vs Bond 2001 IRD — shipped as open correspondence, NOT validation (fails the docs/103 null tests)' },
+      gisp2CorrelationForComparison: { get: () => clim.gisp2PearsonR, render: (v) => fmtSignedPct(v, 2) },
+      signConventionHitsWindow:      { get: () => clim.signConventionHits, render: (v) => String(v) },
+      signConventionTotalWindow:     { get: () => clim.signConventionTotal, render: (v) => String(v) },
+      validatedWindowStartBC:        { get: () => -clim.validatedWindowStartYear, render: (v) => thousands(v), note: 'rendered as the BC year number' },
+      validatedWindowEndAD:          { get: () => clim.validatedWindowEndYear, render: (v) => thousands(v) },
+      bondYr:      { get: () => Math.round(C.H * 8 / 1830), render: (v) => thousands(v), unit: 'yr', note: '8H/1830 — Bond 2001 ~1470 yr N-Atlantic IRD (gcd 61)' },
+      hallstattYr: { get: () => Math.round(C.H * 8 / 1104), render: (v) => thousands(v), unit: 'yr', note: '8H/1104 = H/138 — Hallstatt solar-activity cycle (gcd 23)' },
+      joseFiveYr:  { get: () => Math.round(C.H * 8 / 2989), render: (v) => thousands(v), unit: 'yr', note: '8H/2989 — 5 × Charvátová Jose 179 (gcd 61)' },
+      joseFourYr:  { get: () => Math.round(C.H * 8 / 3749), render: (v) => thousands(v), unit: 'yr', note: '8H/3749 — 4 × Charvátová Jose 179 (gcd 23)' },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
