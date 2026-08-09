@@ -1825,6 +1825,57 @@ export const VALUES = {
     };
   })(),
 
+  // ── Law 2/3/5 balance + AMD partition + ecc weights (11-2aj) ────────────
+  // Balance percentages from the tracked data/balance-presets.json
+  // currentConfig (the falsification-criterion artifact — Law 5 uses BASE
+  // eccentricity, per the CLAUDE.md reference values); presetCount is the
+  // JSON's `count` (767 threshold-passers — its `presetCount` field is the
+  // 15 deep survivors, a different quantity). AMD shares derive as √a/d²
+  // over the eight planets; ecc weights as √m·a^1.5/√d·e_base (in-phase =
+  // seven non-Saturn planets vs Saturn anti-phase alone). The AMD α-scan
+  // spreads and the LL residual are campaign snapshots in knownValues
+  // (scripts/fibonacci_amd_structure.py, Law 3 verification).
+  ...(() => {
+    let balM = null;
+    const bal = () => { if (!balM) balM = rd('data/balance-presets.json'); return balM; };
+    const planets8 = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    const semiMajor = (p) => (p === 'earth' ? 1 : Math.pow(C.planets[p].solarYearInput / C.meanSolarYearDays, 2 / 3));
+    const dFibo = (p) => (p === 'earth' ? 3 : model.planets[p].fibonacciD);
+    const eccBase = (p) => (p === 'earth' ? C.eccentricityBase : C.planets[p].orbitalEccentricityBase);
+    const antiPhase = (p) => (p === 'earth' ? false : !!model.planets[p].antiPhase);
+    const eccWeight = (p) => Math.sqrt(C.massFraction[p]) * Math.pow(semiMajor(p), 1.5) / Math.sqrt(dFibo(p)) * eccBase(p);
+    const amdWeights = () => {
+      const w = {};
+      let total = 0;
+      for (const p of planets8) { w[p] = Math.sqrt(semiMajor(p)) / (dFibo(p) ** 2); total += w[p]; }
+      return { w, total };
+    };
+    const out = {
+      amdAlphaOptimalSpreadPct:  { get: () => astro.knownValues.amdAlphaOptimalSpreadPct, render: (v) => String(v), unit: '%', note: 'α = 0.50 optimum spread — AMD √m exponent scan snapshot' },
+      amdAlphaNextBestSpreadPct: { get: () => astro.knownValues.amdAlphaNextBestSpreadPct, render: (v) => String(v), unit: '%' },
+      laplaceLagrangeResidualDeg: { get: () => astro.knownValues.laplaceLagrangeResidualDeg, render: (v) => String(v), unit: '°', note: 'Σ(i_amp·√m) vs the LL amplitude-sum prediction — Law 3 verification snapshot' },
+      amdShareEarth:   { get: () => { const { w, total } = amdWeights(); return 100 * w.earth / total; }, render: (v) => Number(v).toFixed(1), unit: '%' },
+      amdShareSaturn:  { get: () => { const { w, total } = amdWeights(); return 100 * w.saturn / total; }, render: (v) => Number(v).toFixed(1), unit: '%' },
+      amdShareJupiter: { get: () => { const { w, total } = amdWeights(); return 100 * w.jupiter / total; }, render: (v) => Number(v).toFixed(1), unit: '%' },
+      amdShareEarthSaturn: { get: () => { const { w, total } = amdWeights(); return 100 * (w.earth + w.saturn) / total; }, render: (v) => Number(v).toFixed(0), unit: '%' },
+      amdShareEJS: { get: () => { const { w, total } = amdWeights(); return 100 * (w.earth + w.jupiter + w.saturn) / total; }, render: (v) => Number(v).toFixed(0), unit: '%' },
+      balanceInclPct:     { get: () => bal().currentConfig.inclBalance, render: (v) => Number(v).toFixed(4) + '%', note: 'Law 3' },
+      balanceEccPct:      { get: () => bal().currentConfig.eccBalance, render: (v) => Number(v).toFixed(4) + '%', note: 'Law 5, BASE eccentricity — the 99.8636 reference value' },
+      balanceEccResidualPct: { get: () => 100 - bal().currentConfig.eccBalance, render: (v) => Number(v).toFixed(2) + '%' },
+      balanceEccJ2000Pct: { get: () => bal().currentConfig.eccBalanceJ2000, render: (v) => Number(v).toFixed(4) + '%' },
+      saturnPredErr:      { get: () => Math.abs(bal().currentConfig.saturnPredErrPct), render: (v) => Number(v).toFixed(2) + '%', note: 'Finding 4 — Saturn e predicted vs observed' },
+      balanceThreshold:   { get: () => bal().threshold, render: (v) => Number(v).toFixed(3) + '%' },
+      balancePresetCount: { get: () => bal().count, render: (v) => String(v), note: 'threshold-passing configs (the JSON presetCount field is the 15 deep survivors)' },
+      innerFourEccWeight: { get: () => eccWeight('mercury') + eccWeight('venus') + eccWeight('earth') + eccWeight('mars'), render: (v) => Number(v).toFixed(5) },
+      inPhaseEccWeightTotal:   { get: () => planets8.filter((p) => !antiPhase(p)).reduce((s, p) => s + eccWeight(p), 0), render: (v) => Number(v).toFixed(5) },
+      antiPhaseEccWeightTotal: { get: () => planets8.filter(antiPhase).reduce((s, p) => s + eccWeight(p), 0), render: (v) => Number(v).toFixed(5), note: 'Saturn alone' },
+    };
+    for (const p of planets8) {
+      out[`${p}EccWeight`] = { get: () => eccWeight(p), render: (v) => Number(v).toFixed(5), note: '√m·a^1.5/√d · e_base' };
+    }
+    return out;
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
