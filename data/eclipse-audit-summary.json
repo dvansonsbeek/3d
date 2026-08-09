@@ -49,7 +49,7 @@
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
       "tools/explore/umbra-scene-node-twin.js": "sha256:d7d7055238cc02105c3a060b8d370ba67266a2ba4d51fa6a7025ef5a56982223",
       "tools/lib/scene-graph.js": "sha256:85f630e203406631e934fa988e016b9409b3d7d1aef8bae11b881a2291c1a1c1",
-      "tools/verify/eclipse-audit.js": "sha256:2cb56ae765bc8140a04c3d62cc97c1ef0e4aa597d357f921d906fff506e369fa"
+      "tools/verify/eclipse-audit.js": "sha256:bd2a597da830c653487503f29868a1e43cb84a4514e3dfbb6c182721620c7979"
     }
   }
 }

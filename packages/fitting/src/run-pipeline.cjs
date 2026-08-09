@@ -179,13 +179,16 @@ const STEPS = [
   // pipeline pass leaves no generated artifact stale; the artifact-freshness
   // gate in `npm run check` then verifies the recorded input hashes on every
   // check without re-running these).
-  { id: '7d', phase: 2, name: 'Cassini moontilt results (runs both labs)',
+  // Campaign-artifact generators (§12h follow-ups). IDs start at 7f: the fit
+  // README's canonical numbering already assigns 7d (verify-laws) and 7e
+  // (fibonacci_significance) to manual steps the runner does not execute.
+  { id: '7f', phase: 2, name: 'Cassini moontilt results (runs both labs)',
     cmd: 'node tools/verify/cassini-results.js --write', timeout: 20 * 60 * 1000 },
-  { id: '7e', phase: 2, name: 'Prediction fit stats (evaluation, ~7 min)',
+  { id: '7g', phase: 2, name: 'Prediction fit stats (evaluation, ~7 min)',
     cmd: 'python3 tools/fit/python/eval_precession_physical.py --write', timeout: 30 * 60 * 1000 },
-  { id: '7f', phase: 2, name: 'LOD-climate correlation summary',
+  { id: '7h', phase: 2, name: 'LOD-climate correlation summary',
     cmd: 'node tools/verify/lod-climate-correlation.js --write' },
-  { id: '7g', phase: 2, name: 'Eclipse audit summary (L-5b/L-7 + audit-26, ~2-4 min)',
+  { id: '7i', phase: 2, name: 'Eclipse audit summary (L-5b/L-7 + audit-26, ~2-4 min)',
     cmd: 'node tools/verify/eclipse-audit.js --write', timeout: 15 * 60 * 1000 },
 
   // Phase 7: Verify & sync

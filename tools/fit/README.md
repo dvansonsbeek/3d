@@ -214,7 +214,7 @@ then `npm run constants:generate` (Step 9).
 | `python/greedy_features_physical.py` | Candidate features for ML (physical-beat basis) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
 | `../../scripts/fibonacci_significance.py` | `data/significance-results.json` (combined p + sigma via Stouffer's Z with correlation correction; Fisher's reported for transparency; 11 tests × 3 null distributions) | `tools/lib/python/constants_scripts.py` |
-| `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond 8H/1830, Hallstatt 8H/1104, Jose5 8H/2989, Jose4 8H/3749) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (USNO 86400.0014, deltaTStart 56.05, Espenak RMS 12.60 s, full-window 31.31 s). The legacy single-shot cascade remains as a stage-wise diagnostic — **its `fit_metrics.stage_*` entries in `deltaT-4flag-fit.json` rank the flags differently from the shipped fit and must not be used to judge whether a flag earns its place** (worked example and the correct method in [doc 105](../../docs/105-dt-stack-flag-audit.md)); the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
+| `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond 8H/1830, Hallstatt 8H/1104, Jose5 8H/2989, Jose4 8H/3749) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (current joint optimum: USNO 86,400.0017, deltaTStart 55.85, Espenak fit-target RMS 12.60 s, full-window 31.27 s — read the live values from `data/deltaT-4flag-fit.json → optimum` and the stage-3 validation artifact, never from this sentence). The legacy single-shot cascade remains as a stage-wise diagnostic — **its `fit_metrics.stage_*` entries in `deltaT-4flag-fit.json` rank the flags differently from the shipped fit and must not be used to judge whether a flag earns its place** (worked example and the correct method in [doc 105](../../docs/105-dt-stack-flag-audit.md)); the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
 | `../../scripts/lattice_harmonic_scan.py` | `data/lattice-scan-<tag>.json` — universal 8H-lattice harmonic scan across multiple paleoclimate archives (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem δ18O, EPICA CO2, LR04 δ18O). Enumerates gcd-compliant divisors in a period band, fits each candidate against each dataset, ranks by cross-dataset consistency. Used to identify Jose4 (4×Jose 715 yr) as the 4th flag with cross-archive coherence. | Multiple paleoclimate proxies in `data/` and `public/input/` |
 | `data/core-mantle-resonator-stage1.json` (artifact — no shipped generator) | the **Core-mantle swing (Resonator driver)** shipped block: a 2-kick EPISODE (windowed damped oscillation, T₀ = 8H/`RES_T0_LATTICE_N` lattice-labeled, Q, kick epochs/coefficients, phase-locked drive tone). Selection rule: pinned-lattice-T₀ guard-passers first (guard-aware solver — modern-window δLOD penalty rows). **Regeneration in the joint world: amplitudes refit automatically via `--joint --write` (tone menu derives from the active flags — generic over flag count). The episode CONVENTION (T₀ = 8H/685, Q = 1.8, epochs −1600/+1600, impulse-consistent shapes) is a DOCUMENTED CONVENTION, not a build-time derivation — it is not re-derivable from anything in this repo. Its evidence is the tracked result JSONs (`data/core-mantle-resonator-*.json`) plus the docs/104 narrative; the stage-1/stage-3/impulse scripts that originally established it ran against the pre-joint world, cannot reproduce today's numbers, and are deliberately not shipped.** Kick epochs are a documented CONVENTION, not data-pinned — see the stage-3 stability artifact before moving them. | Stephenson residual after the shipped stack (node bridge to `tools/lib/deep-time.js`) + `data/deltaT-4flag-fit.json` (parents' phases for the locked tones) |
 | `data/core-mantle-resonator-stage3-stability.json` (artifact — no shipped generator) | kick-epoch stability: coordinate refinement, ridge map + 2% stability box, era jackknife. Verdict 2026-07: epochs NOT data-pinnable (broad t_exc/T₀ ridge, era-dependent jackknife) → shipped epochs stand as convention. | same residual |
@@ -276,7 +276,7 @@ and must be run by hand when compute.ts changes.
 | `src/lib/orbital/coefficients.ts` | Prediction coefficients (7×2421) + `planets.ts` buildFeatures | `export-to-holistic.js` |
 | `src/lib/orbital/deepTime.ts` | Bond/Hallstatt/Jose5/Jose4 correction constants (12 total: LATTICE_N + COS_COEFF_S + SIN_COEFF_S per cycle) + the RES_* core-mantle resonator block; α(t) anchors `ALPHA_CLIMATE_SCALE` + `ALPHA_1` | ΔT section (inline); α anchors by Section 7 |
 | `src/data/model-values.compute.ts` | Fit-anchored measurement scalars: `usnoLodJ2000`, `deltaTEspenakRmsSeconds` (from `data/deltaT-4flag-fit.json`), `ALPHA_CLIMATE_SCALE_NUM`, `DLOD_TIDAL/GIA/ALLCYCLES` (from `tools/lib/deep-time.js`) | `export-to-holistic.js` Section 7 |
-| `src/data/model-values.generated.json` | 757 derived display keys (day/year lengths, precession rates, orbital elements at J2000, etc.) | `pnpm run values:generate` |
+| `src/data/model-values.generated.json` | 852 derived display keys (day/year lengths, precession rates, orbital elements at J2000, etc.) — kept at parity with the `3d` model-values registry (`npm run docs:parity`) | `pnpm run values:generate` |
 | `docs/paper/model-values.tex` | ~500 `\Mv…` LaTeX macros used in the paper | `npx tsx docs/paper/generate-tex-values.ts` |
 
 ### When drift happens (and how to catch it)
@@ -368,7 +368,7 @@ Step 0:  SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --wr
              · `SUN_HARMONICS_ENABLED` toggle between framework-native
                and Meeus-parity modes.
            (Same "stable across normal refits" pattern as
-           fibonacci_significance.py / Step 7d.)
+           fibonacci_significance.py / Step 7e.)
          - Running it FIRST means Step 1 calibrates correctionSun with
            harmonics already applied → single-pass convergence. If 6f
            ran after Step 1 (legacy order), Step 1 would need to re-run
@@ -774,6 +774,33 @@ Step 7e: fibonacci_significance.py            → data/significance-results.json
          **Required by export-to-holistic.js** — the website combined p-values,
          sigma range, and test counts all derive from this output.
 
+Steps 7f-7i: campaign-artifact generators     → data/*.json (inputs-stamped)
+         The §12h anti-staleness generators. Each owns a campaign artifact,
+         stamps an `inputs` block (sha256 of every input file including the
+         generator itself), and is verified by the artifact-freshness gate
+         (`npm run check:artifacts`, part of `npm run check` and
+         `check:docs`) — the gate fails naming the exact regeneration
+         command whenever an input moves without a re-run. All four run in
+         the automated pipeline by default.
+
+         7f: node tools/verify/cassini-results.js --write
+             → data/cassini-moontilt-results.json (runs both Cassini labs
+             live via their --json result lines; fast)
+         7g: python3 tools/fit/python/eval_precession_physical.py --write
+             → data/planet-prediction-fit-stats.json (~7 min; reads the
+             319 MB appendix xlsx)
+         7h: node tools/verify/lod-climate-correlation.js --write
+             → data/lod-climate-correlation-summary.json (Pearson r of the
+             ΔT-stack ΣLOD vs the tracked climate proxies; seconds)
+         7i: node tools/verify/eclipse-audit.js --write
+             → data/eclipse-audit-summary.json, all four sections: L-5b
+             lunar + L-7 solar primary-source comparisons, the 26-preset
+             alignment audit and the Babylon −135 scan row on the proven
+             scene-umbra Node twin (~2-4 min). Plain --write REFUSES on
+             divergence from the recorded values (a legitimate refit makes
+             this step fail loudly); `--rebaseline` is the conscious
+             re-measurement path.
+
 ── Phase 6: Verify & sync ─────────────────────────────────────────
 
 Step 8:  verify-pipeline.js                   → pass/fail
@@ -1010,7 +1037,8 @@ Step 3 (browser export) is always manual — the runner checks the data file exi
 - Step 6b (Obliquity): ~90 sec
 - Step 6c (Year-length): ~2 min
 - **Step 6d (Cardinal-point): ~40 min** — greedy fit × 4 CPs × 24 harmonics per CP. Default step timeout was 10 min (too short); raised to 60 min. Observed to complete in ~30 min.
-- Steps 7a-10 (balance, verify, export, dashboard): ~5-10 min combined
+- Steps 7a-7c, 8-10 (balance, verify, export, dashboard): ~5-10 min combined
+- Steps 7f-7i (campaign-artifact generators): ~10-15 min combined, dominated by 7g (prediction-fit evaluation, ~7 min) and 7i (eclipse audit, ~2-4 min)
 - **TOTAL Phase 2: ~2.5-3 hours** dominated by Step 6a.
 
 The `--iterate` / `--converge` flags repeat the planet correction fitting steps (5a parallax →

@@ -7,10 +7,10 @@ across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 
 **Scale:** `src/script.js` ~60,850 lines · `tools/` 203 JS scripts across 7
 directories · 237 Python files · 71 docs · two web UIs (simulator, `dashboard/`).
-**`npm run check` enforces a twelve-step gate chain; CI runs it plus a
+**`npm run check` enforces a seventeen-step gate chain; CI runs it plus a
 headless-browser job.**
-Golden masters live in `packages/fixtures/`. Of the 17 scripts in `tools/verify/`,
-only 2 can actually fail — see the Verification section.
+Golden masters live in `packages/fixtures/`. Of the 21 scripts in `tools/verify/`,
+only 3 can actually fail — see the Verification section.
 
 ---
 
@@ -111,7 +111,9 @@ would silently churn a structural claim for a rounding-level gain.
 
 `npm run check` is the enforced chain — lint (§4 boundaries), typecheck (JSDoc +
 `checkJs`), `check:boundaries` (the §2h licensing invariant), purity,
-`test:fixtures` (the `tools/lib` golden masters), `test:verify` (the model gates).
+`test:fixtures` (the `tools/lib` golden masters), `check:artifacts` (generated
+campaign artifacts vs their recorded input hashes — fails naming the exact
+regeneration command), `test:verify` (the model gates).
 Every gate has been shown to **fail on a planted violation**, not merely to pass
 on clean code — the two fixture gates on a 1-ULP change, ~1.6e-16 relative. Lint
 and typecheck cover `packages/` and `test/`; `src/script.js` and `tools/` are
@@ -137,11 +139,14 @@ chain at ±1/±5 Myr; the golden master cannot catch that class).
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
-`/gates` runs the standalone model checks. `tools/verify/` holds 17 scripts, and
-**15 of them cannot fail** — no exit path, no assertion, so running them proves
-nothing. `npm run test:verify:list` gives the classification: 2 gate · 4 liftable
-· 10 narrative · 1 generator. **Never run `balance-search.js` as a test** — it
-rewrites the tracked `data/balance-presets.json`. `verify-laws` is gated on its
+`/gates` runs the standalone model checks. `tools/verify/` holds 21 scripts, and
+**18 of them cannot fail** — no exit path, no assertion, so running them proves
+nothing. `npm run test:verify:list` gives the classification: 3 gate · 4 liftable
+· 10 narrative · 4 generator (the suite FAILS on any unclassified script). **Never
+run a generator as a test** — `balance-search.js` rewrites the tracked
+`data/balance-presets.json`, and the three campaign generators
+(cassini-results / lod-climate-correlation / eclipse-audit) rewrite their
+`data/*.json` under `--write`. `verify-laws` is gated on its
 check count (49/50, Saturn's Laplace–Lagrange bound the documented failure), not
 its exit code, so an unexplained *improvement* fails too.
 

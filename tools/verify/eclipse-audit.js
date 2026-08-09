@@ -42,7 +42,7 @@
  *
  * --write REFUSES on any divergence from the recorded values (the guard
  * against accidental drift — a refit that legitimately moves these numbers
- * makes pipeline step 7g fail loudly instead of silently rewriting a
+ * makes pipeline step 7i fail loudly instead of silently rewriting a
  * published value). --rebaseline is the conscious path: it accepts the
  * computed values as the new baseline. First used for the Babylon −135
  * correction: the recorded 1232 km / −1h45 was measured 2026-07 under the

@@ -51,6 +51,15 @@ const MANIFEST = [
 
   { n: 'balance-search.js', class: 'generator', ms: 2645,
     writes: 'data/balance-presets.json (tracked)' },
+  { n: 'cassini-results.js', class: 'generator', ms: 8000,
+    writes: 'data/cassini-moontilt-results.json (tracked; --write only — runs both Cassini labs live)' },
+  { n: 'lod-climate-correlation.js', class: 'generator', ms: 2000,
+    writes: 'data/lod-climate-correlation-summary.json (tracked; --write only)' },
+  { n: 'eclipse-audit.js', class: 'generator', ms: 180000, slow: true,
+    writes: 'data/eclipse-audit-summary.json (tracked; --write only, REFUSES on divergence — --rebaseline is the conscious re-measurement path)' },
+
+  { n: 'artifact-freshness.js', class: 'gate', ms: 1000,
+    note: 'the campaign-artifact freshness gate — also runs as its own chain step (npm run check:artifacts); re-hashes every generated artifact\'s recorded inputs' },
 
   { n: 'analytical-ascending-nodes.js', class: 'narrative', ms: 43 },
   { n: 'ascending-node-optimization.js', class: 'narrative', ms: 42 },
@@ -71,10 +80,26 @@ const all = args.includes('--all');
 
 const counts = MANIFEST.reduce((a, m) => ({ ...a, [m.class]: (a[m.class] ?? 0) + 1 }), {});
 
-console.log('tools/verify — 17 scripts');
+// Completeness: every .js in this directory must be classified — an
+// unclassified script silently escapes the suite (measured: four scripts
+// accumulated outside the manifest before this check existed).
+{
+  const { readdirSync } = await import('node:fs');
+  const here = fileURLToPath(new URL('.', import.meta.url));
+  const onDisk = readdirSync(here).filter((f) => f.endsWith('.js'));
+  const known = new Set(MANIFEST.map((m) => m.n));
+  const unclassified = onDisk.filter((f) => !known.has(f));
+  if (unclassified.length) {
+    console.error(`FAIL — unclassified script(s) in tools/verify: ${unclassified.join(', ')}`);
+    console.error('Add each to the MANIFEST in run-suite.mjs with a class (gate/liftable/narrative/generator).');
+    process.exit(1);
+  }
+}
+
+console.log(`tools/verify — ${MANIFEST.length} scripts`);
 console.log('='.repeat(78));
 console.log(`  gate ${counts.gate} · liftable ${counts.liftable} · narrative ${counts.narrative} · generator ${counts.generator}`);
-console.log('  15 of 17 have NO failing exit path. Running those proves nothing.');
+console.log(`  ${MANIFEST.length - counts.gate} of ${MANIFEST.length} have NO failing exit path. Running those proves nothing.`);
 
 if (list) {
   for (const cls of ['gate', 'liftable', 'generator', 'narrative']) {

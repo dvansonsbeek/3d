@@ -129,26 +129,39 @@ npm run build
 ### Verification
 
 ```bash
-npm run check             # ten gates: lint, typecheck, boundaries, purity, constants,
-                          # counterfactual, fixtures, literals, model gates, pipeline
+npm run check             # the full gate chain (~9 min): lint, typecheck, boundaries,
+                          # purity, layer identities, constants, counterfactual,
+                          # planet model, fixtures, literals, python-physics pins,
+                          # docs freshness, artifact freshness, doc values,
+                          # model gates, pipeline
+npm run check:docs        # scoped tier (~20 s) for docs/registry/marker edits
+npm run check:engine      # scoped tier (~2 min) for tools/lib + packages/physics edits
 npm run test:browser      # golden masters in headless Chromium (builds first)
-npm run test:verify:list  # how the 17 tools/verify scripts classify
+npm run test:verify:list  # how the 21 tools/verify scripts classify
+npm run docs:parity       # model-values registry vs the website's published keys
+npm run check:artifacts   # campaign artifacts vs their recorded input hashes
 ```
 
-`npm run check` is the gate that must stay green. Every check in it has been
-shown to fail on a deliberately planted violation, not merely to pass on clean
-code — the golden masters detect a change of one floating-point ULP.
+`npm run check` is the gate that must stay green — CI runs the full chain on
+every push, so the scoped tiers are a local convenience keyed to what a change
+touches. Every check in it has been shown to fail on a deliberately planted
+violation, not merely to pass on clean code — the golden masters detect a
+change of one floating-point ULP, and the artifact-freshness gate fails naming
+the exact regeneration command when any input of a generated `data/*.json`
+moves without a re-run.
 
 Two things worth knowing before you read a red result as breakage:
 
-- `npm run test:transparency` is an **acceptance gate for work still in progress**
-  and is expected to fail. It asserts that a year's computed values do not depend
-  on which epoch the scene happens to be set to; that holds for three of its four
-  probes today. Red there is the tracked state.
-- Of the 17 scripts in `tools/verify/`, only two can actually fail — the rest
-  print analysis without asserting anything. `test:verify` runs the real gates and
-  deliberately skips `balance-search.js`, which regenerates a tracked data file
-  rather than checking it.
+- `npm run test:transparency` (referential transparency, 84 probes) is **green
+  and required in CI** — a year's computed values do not depend on which epoch
+  the scene happens to be set to, bit-exact on the round trip. Red there is a
+  regression of a closed acceptance criterion, not a tracked state.
+- Of the 21 scripts in `tools/verify/`, only the three gates can actually fail —
+  the rest print analysis without asserting anything. `test:verify` runs the real
+  gates and deliberately skips the four generators (`balance-search.js` plus the
+  three campaign-artifact generators), which regenerate tracked data files rather
+  than checking them. The suite fails on any unclassified script, so the
+  inventory cannot silently drift again.
 
 ---
 
