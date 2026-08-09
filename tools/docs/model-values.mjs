@@ -764,6 +764,61 @@ export const VALUES = {
     };
   })(),
 
+  // ── Earth invariable-plane inclination family (11-2o) ───────────────────
+  // The MEAN is DERIVED in both runtimes — J2000 inclination minus
+  // amplitude·cos(perihelionLong − cycleAnchor), the engine's
+  // earthInvPlaneInclinationMean (the website types the result, 1.48113, as
+  // a literal). Amplitude from model-parameters; J2000 / node / anchor from
+  // astro-reference earthOrbital (the node is the Souami & Souchay value).
+  earthInclMean: {
+    get: () => C.earthInvPlaneInclinationMean,
+    render: (v) => Number(v).toFixed(5),
+    unit: '°',
+    note: 'derived: earthInclinationJ2000 − amplitude·cos(perihelionLongJ2000 − cycleAnchor)',
+  },
+  earthInclAmplitude: {
+    get: () => C.earthInvPlaneInclinationAmplitude,
+    render: (v) => Number(v).toFixed(5),
+    unit: '°',
+  },
+  earthInclAmp: {
+    get: () => C.earthInvPlaneInclinationAmplitude,
+    render: (v) => Number(v).toFixed(5),
+    unit: '°',
+    note: 'alias of earthInclAmplitude (both shipped by the website)',
+  },
+  earthInclD: {
+    get: () => 3,
+    render: (v) => String(v),
+    note: 'H-lattice divisor of the inclination cycle (H/3) — structural integer',
+  },
+  earthInclMin: {
+    get: () => C.earthInvPlaneInclinationMean - C.earthInvPlaneInclinationAmplitude,
+    render: (v) => Number(v).toFixed(3),
+    unit: '°',
+  },
+  earthInclMax: {
+    get: () => C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude,
+    render: (v) => Number(v).toFixed(3),
+    unit: '°',
+  },
+  earthInclJ2000: {
+    get: () => astro.earthOrbital.earthInclinationJ2000_deg,
+    render: (v) => Number(v).toFixed(5),
+    unit: '°',
+  },
+  earthAscNodeJ2000: {
+    get: () => astro.earthOrbital.earthAscendingNodeInvPlane,
+    render: (v) => Number(v).toFixed(2),
+    unit: '°',
+    note: 'Souami & Souchay invariable-plane ascending node',
+  },
+  earthInclCycleAnchor: {
+    get: () => astro.earthOrbital.earthInclinationCycleAnchor,
+    render: (v) => Number(v).toFixed(2),
+    unit: '°',
+  },
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
