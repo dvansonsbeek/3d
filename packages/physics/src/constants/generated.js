@@ -596,6 +596,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
  */
 export const REFERENCE_DATA = Object.freeze({
   ascendingNodesSouamiSouchay: {
+    "invariablePlaneOnEclipticDeg": 107.582,
     "earth": 284.51,
     "mercury": 32.22,
     "venus": 52.31,
@@ -689,6 +690,18 @@ export const REFERENCE_DATA = Object.freeze({
     "sunModelTrueErrorDeg": 0.003,
     "sunTropicalYearDiffSeconds": 0.1,
     "sunSiderealYearDiffSeconds": 0.02,
+    "mainstreamAxialPrecKyr": 26,
+    "mainstreamPeriPrecKyr": 21,
+    "mainstreamObliqCycleKyr": 41,
+    "mainstreamInclCycleKyr": 69,
+    "mainstreamApsidalPrecKyr": 112,
+    "mainstreamObliqRangeMinDeg": 22.1,
+    "mainstreamObliqRangeMaxDeg": 24.5,
+    "mainstreamAxialPrecExactYr": 25771,
+    "mainstreamPeriPrecExactYr": 20951,
+    "mainstreamObliqCycleExactYr": 41040,
+    "mainstreamInclCycleExactYr": 68700,
+    "mainstreamApsidalPrecExactYr": 112000,
     "jupiterSaturnConjunctionPeriod": 19.859,
     "moonSynodicMonth": 29.530589,
     "moonTropicalMonth": 27.321582,

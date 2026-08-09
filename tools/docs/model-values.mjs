@@ -1221,6 +1221,44 @@ export const VALUES = {
     };
   })(),
 
+  // ── IPO circle + Fibonacci-law constants + mainstream comparisons (11-2y) ─
+  // IPO mirrors the apo family with the eccentricity BASE and the H/3
+  // inclination cycle (not H/13). ψ and K come LIVE from the engine's
+  // Fibonacci-law derivations (C.PSI, C.eccentricityAmplitudeK — Law 4's
+  // K = 3.4143e-6 is a CLAUDE.md reference value). The mainstream* family
+  // is conventional-theory literature for the comparison tables, tracked in
+  // knownValues; the invariable plane's own ecliptic node joins the Souami
+  // block.
+  ...(() => {
+    const ipoRadius = () => model.earth.eccentricityBase * C.currentAUDistance;
+    return {
+      ipoRadius:        { get: ipoRadius, render: (v) => thousands(v, 2), unit: 'km' },
+      ipoDiameter:      { get: () => 2 * ipoRadius(), render: (v) => thousands(v, 2), unit: 'km' },
+      ipoCircumference: { get: () => 2 * Math.PI * ipoRadius(), render: (v) => thousands(v, 2), unit: 'km' },
+      ipoSpeed:         { get: () => (2 * Math.PI * ipoRadius()) / ((C.H / 3) * 24 * 365.25), render: (v) => thousands(v, 10), unit: 'km/h', note: 'perihelion-point speed over the H/3 inclination cycle' },
+      ipoSpeedKmYear:   { get: () => (2 * Math.PI * ipoRadius()) / (C.H / 3), render: (v) => thousands(v, 0), unit: 'km/yr' },
+      psiFormula: { get: () => 'd_E × amp_E × √m_E (from Earth)', render: (v) => String(v), note: 'structural formula label (Law 3)' },
+      psiValue:   { get: () => C.PSI, render: (v) => `${(v * 1e3).toFixed(4)} × 10⁻³` },
+      psiDecimal: { get: () => C.PSI, render: (v) => Number(v).toFixed(6) },
+      kValue:     { get: () => C.eccentricityAmplitudeK, render: (v) => `${(v * 1e6).toFixed(4)} × 10⁻⁶`, note: 'Law 4 K — reference value 3.4143e-6' },
+      invPlaneAscNode: { get: () => astro.ascendingNodesSouamiSouchay.invariablePlaneOnEclipticDeg, render: (v) => String(v), unit: '°', note: 'the invariable plane\'s node on the ecliptic (Souami & Souchay 2012)' },
+      mainstreamAxialPrec:  { get: () => astro.knownValues.mainstreamAxialPrecKyr, render: (v) => `~${v}k`, unit: 'yr' },
+      mainstreamPeriPrec:   { get: () => astro.knownValues.mainstreamPeriPrecKyr, render: (v) => `~${v}k`, unit: 'yr' },
+      mainstreamObliqCycle: { get: () => astro.knownValues.mainstreamObliqCycleKyr, render: (v) => `~${v}k`, unit: 'yr' },
+      mainstreamInclCycle:  { get: () => astro.knownValues.mainstreamInclCycleKyr, render: (v) => `~${v}k`, unit: 'yr' },
+      mainstreamApsidalPrec: { get: () => astro.knownValues.mainstreamApsidalPrecKyr, render: (v) => `~${v}k`, unit: 'yr' },
+      mainstreamObliqRange: {
+        get: () => astro.knownValues.mainstreamObliqRangeMinDeg,
+        render: (v) => `~${v}° to ~${astro.knownValues.mainstreamObliqRangeMaxDeg}°`,
+      },
+      mainstreamAxialPrecExact:  { get: () => astro.knownValues.mainstreamAxialPrecExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },
+      mainstreamPeriPrecExact:   { get: () => astro.knownValues.mainstreamPeriPrecExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },
+      mainstreamObliqCycleExact: { get: () => astro.knownValues.mainstreamObliqCycleExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },
+      mainstreamInclCycleExact:  { get: () => astro.knownValues.mainstreamInclCycleExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },
+      mainstreamApsidalPrecExact: { get: () => astro.knownValues.mainstreamApsidalPrecExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {

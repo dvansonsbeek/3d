@@ -259,6 +259,9 @@ const MIGRATED = [
  * @type {Record<string, string>}
  */
 const NOT_IN_SCRIPT = {
+  'astro.ascendingNodesSouamiSouchay.invariablePlaneOnEclipticDeg':
+    'the invariable PLANE\'s own node on the ecliptic (docs/05) — registry key; '
+    + 'script.js consumes only the per-planet nodes.',
   'astro.physicalConstants.solarParallaxArcsec':
     'IAU 1976 parallax-chain member — registry key + the appendix chain note; '
     + 'script.js consumes only the chain products (currentAUDistance, parallax radius).',

@@ -483,6 +483,7 @@ export declare const DEFAULT_CONSTANTS: {
 // createModel does not accept these (§2d).
 export declare const REFERENCE_DATA: {
   readonly ascendingNodesSouamiSouchay: {
+    "invariablePlaneOnEclipticDeg": number;
     "earth": number;
     "mercury": number;
     "venus": number;
@@ -576,6 +577,18 @@ export declare const REFERENCE_DATA: {
     "sunModelTrueErrorDeg": number;
     "sunTropicalYearDiffSeconds": number;
     "sunSiderealYearDiffSeconds": number;
+    "mainstreamAxialPrecKyr": number;
+    "mainstreamPeriPrecKyr": number;
+    "mainstreamObliqCycleKyr": number;
+    "mainstreamInclCycleKyr": number;
+    "mainstreamApsidalPrecKyr": number;
+    "mainstreamObliqRangeMinDeg": number;
+    "mainstreamObliqRangeMaxDeg": number;
+    "mainstreamAxialPrecExactYr": number;
+    "mainstreamPeriPrecExactYr": number;
+    "mainstreamObliqCycleExactYr": number;
+    "mainstreamInclCycleExactYr": number;
+    "mainstreamApsidalPrecExactYr": number;
     "jupiterSaturnConjunctionPeriod": number;
     "moonSynodicMonth": number;
     "moonTropicalMonth": number;
