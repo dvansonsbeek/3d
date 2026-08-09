@@ -1474,6 +1474,69 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Term aggregates + Mercury anomaly + observed-rate citations (11-2ae) ─
+  // The aggregates derive live from the shipped coefficient arrays; the
+  // Mercury J2000 anomaly derives by evaluating the engine's OWN predictive
+  // feature basis against the shipped physical coefficients (the same
+  // features·coeffs product the browser and site compute — reproduced 38.03″
+  // before porting); baseline diff = |textbook Newtonian − lattice baseline|.
+  // The observed-rate family are WebGeocalc/literature citations in
+  // knownValues (see its _perihelionRatesNote).
+  ...(() => {
+    const termLengths = () => {
+      const P = rd('public/input/fitted-coefficients.json').PREDICT_COEFFS_PHYSICAL;
+      return Object.values(P).map((a) => a.length);
+    };
+    const mercuryFluctuation2000 = () => {
+      const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
+      const f = oe.buildPredictiveFeatures(2000, 'mercury');
+      const c = rd('public/input/fitted-coefficients.json').PREDICT_COEFFS_PHYSICAL.mercury;
+      let s = 0;
+      for (let i = 0; i < c.length; i++) s += f[i] * c[i];
+      return s;
+    };
+    const kv = () => astro.knownValues;
+    return {
+      predTermsApprox: {
+        get: () => Math.round(termLengths().reduce((a, b) => a + b, 0) / termLengths().length / 100) * 100,
+        render: (v) => `~${thousands(v)}`,
+        note: 'mean of the shipped per-planet term counts, to the nearest hundred',
+      },
+      predTermsRange: {
+        get: () => Math.min(...termLengths()),
+        render: (v) => `${thousands(v)}–${thousands(Math.max(...termLengths()))}`,
+        note: 'min–max of the shipped array lengths',
+      },
+      ascNodeJointRms: { get: () => kv().ascNodeJointRmsArcsec, render: (v) => String(v), unit: '″', note: 'asc-node fit run RMS — recorded snapshot, fitter prints it live' },
+      mercuryNewtonian:    { get: () => kv().mercuryNewtonianArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'textbook Newtonian rate — citation' },
+      mercuryObservedICRF: { get: () => kv().mercuryObservedICRFArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'textbook 532 + 43 chain' },
+      mercuryPark2017Rate: { get: () => kv().mercuryPark2017RateArcsecCy, render: (v) => String(v), unit: '″/cy', note: 'Park 2017 MESSENGER-era determination' },
+      mercuryAnomalyClassic: { get: () => kv().mercuryAnomalyClassicArcsecCy, render: (v) => String(v), unit: '″/cy', note: 'the classic GR anomaly — citation' },
+      mercuryBaselineDiff: {
+        get: () => {
+          const [num, den] = model.planets.mercury.perihelionEclipticFraction;
+          const baseline = 1296000 / ((C.H * Math.abs(num)) / den) * 100;
+          return Math.abs(kv().mercuryNewtonianArcsecCy - baseline);
+        },
+        render: (v) => thousands(v, 1),
+        unit: '″/cy',
+        note: 'textbook Newtonian vs the lattice baseline',
+      },
+      mercuryAnomalyJ2000:    { get: mercuryFluctuation2000, render: (v) => thousands(v, 0), unit: '″/cy', note: 'derived: engine feature basis · shipped physical coefficients at 2000' },
+      mercuryEpoch2000Offset: { get: mercuryFluctuation2000, render: (v) => thousands(v, 1), unit: '″/cy' },
+      mercuryObservedRate: { get: () => kv().mercuryObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'WebGeocalc 1900–2000 heliocentric trend' },
+      venusObservedRate:   { get: () => kv().venusObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: '~0 — flips sign across sub-windows' },
+      earthObservedRate:   { get: () => kv().earthObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'geocentric, wrt moving equinox' },
+      earthObservedRateHelio: { get: () => kv().earthObservedRateHelioArcsecCy, render: (v) => thousands(v), unit: '″/cy' },
+      marsObservedRate:    { get: () => kv().marsObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy' },
+      jupiterObservedRate: { get: () => kv().jupiterObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy' },
+      saturnObservedRate:  { get: () => kv().saturnObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'ecliptic-retrograde' },
+      saturnMissingAdvanceArcsec: { get: () => kv().saturnMissingAdvanceArcsec, render: (v) => thousands(v), unit: '″', note: 'bridges heliocentric baseline to geocentric rate' },
+      uranusObservedRate:  { get: () => kv().uranusObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy' },
+      neptuneObservedRate: { get: () => kv().neptuneObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy' },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
