@@ -1875,8 +1875,8 @@ export const VALUES = {
       return { w, total };
     };
     const out = {
-      amdAlphaOptimalSpreadPct:  { get: () => astro.knownValues.amdAlphaOptimalSpreadPct, render: (v) => String(v), unit: '%', note: 'α = 0.50 optimum spread — AMD √m exponent scan snapshot' },
-      amdAlphaNextBestSpreadPct: { get: () => astro.knownValues.amdAlphaNextBestSpreadPct, render: (v) => String(v), unit: '%' },
+      // (amdAlpha* removed: the α-scan claim was retired as numerology —
+      // no longer published on the website or in the docs.)
       laplaceLagrangeResidualDeg: { get: () => astro.knownValues.laplaceLagrangeResidualDeg, render: (v) => String(v), unit: '°', note: 'Σ(i_amp·√m) vs the LL amplitude-sum prediction — Law 3 verification snapshot' },
       amdShareEarth:   { get: () => { const { w, total } = amdWeights(); return 100 * w.earth / total; }, render: (v) => Number(v).toFixed(1), unit: '%' },
       amdShareSaturn:  { get: () => { const { w, total } = amdWeights(); return 100 * w.saturn / total; }, render: (v) => Number(v).toFixed(1), unit: '%' },
