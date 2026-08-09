@@ -41,6 +41,8 @@ const REQUIRED = [
   'data/cassini-moontilt-results.json',
   // stamped in Phase 2:
   'data/lod-climate-correlation-summary.json',
+  // stamped in Phase 3 (lunar/solar sections; audit26/babylon135 still hand-recorded):
+  'data/eclipse-audit-summary.json',
 ];
 
 const DATA = path.join(ROOT, 'data');
