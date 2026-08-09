@@ -45,6 +45,26 @@ const dtl = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
  *  deep-time Earth scalars (integrated-phase perihelion/ERD/obliquity,
  *  epoch-H ERD ω). Lazy singleton shared by every key family that evaluates
  *  fluctuations. */
+/** Law 2/5 weight machinery over the eight planets — √a/d² AMD shares and
+ *  the √m·a^1.5/√d·e_base eccentricity weights (Earth from its own
+ *  constants; anti-phase = Saturn). Shared by the balance/AMD key families. */
+let _balanceHelpersM = null;
+function balanceMachinery() {
+  if (_balanceHelpersM) return _balanceHelpersM;
+  let balM = null;
+  const bal = () => { if (!balM) balM = rd('data/balance-presets.json'); return balM; };
+  const planets8 = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+  const semiMajor = (p) => (p === 'earth' ? 1 : Math.pow(C.planets[p].solarYearInput / C.meanSolarYearDays, 2 / 3));
+  const dFibo = (p) => (p === 'earth' ? 3 : model.planets[p].fibonacciD);
+  const eccBase = (p) => (p === 'earth' ? C.eccentricityBase : C.planets[p].orbitalEccentricityBase);
+  const antiPhase = (p) => (p === 'earth' ? false : !!model.planets[p].antiPhase);
+  const eccWeightCoeff = (p) => Math.sqrt(C.massFraction[p]) * Math.pow(semiMajor(p), 1.5) / Math.sqrt(dFibo(p));
+  const eccWeight = (p) => eccWeightCoeff(p) * eccBase(p);
+  const inPhaseTotal = () => planets8.filter((p) => !antiPhase(p)).reduce((s, p) => s + eccWeight(p), 0);
+  _balanceHelpersM = { bal, planets8, semiMajor, dFibo, eccBase, antiPhase, eccWeightCoeff, eccWeight, inPhaseTotal };
+  return _balanceHelpersM;
+}
+
 let _predictHelpersM = null;
 function predictiveMachinery() {
   if (_predictHelpersM) return _predictHelpersM;
@@ -1836,14 +1856,7 @@ export const VALUES = {
   // spreads and the LL residual are campaign snapshots in knownValues
   // (scripts/fibonacci_amd_structure.py, Law 3 verification).
   ...(() => {
-    let balM = null;
-    const bal = () => { if (!balM) balM = rd('data/balance-presets.json'); return balM; };
-    const planets8 = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-    const semiMajor = (p) => (p === 'earth' ? 1 : Math.pow(C.planets[p].solarYearInput / C.meanSolarYearDays, 2 / 3));
-    const dFibo = (p) => (p === 'earth' ? 3 : model.planets[p].fibonacciD);
-    const eccBase = (p) => (p === 'earth' ? C.eccentricityBase : C.planets[p].orbitalEccentricityBase);
-    const antiPhase = (p) => (p === 'earth' ? false : !!model.planets[p].antiPhase);
-    const eccWeight = (p) => Math.sqrt(C.massFraction[p]) * Math.pow(semiMajor(p), 1.5) / Math.sqrt(dFibo(p)) * eccBase(p);
+    const { bal, planets8, semiMajor, dFibo, antiPhase, eccWeight } = balanceMachinery();
     const amdWeights = () => {
       const w = {};
       let total = 0;
@@ -1872,6 +1885,43 @@ export const VALUES = {
     };
     for (const p of planets8) {
       out[`${p}EccWeight`] = { get: () => eccWeight(p), render: (v) => Number(v).toFixed(5), note: '√m·a^1.5/√d · e_base' };
+    }
+    return out;
+  })(),
+
+  // ── Saturn prediction + Sci weights + Config #N + start inputs (11-2ak) ─
+  // Saturn's predicted eccentricity = in-phase total / Saturn's coefficient
+  // (the Law 5 identity — derived, so it moves with the weights); the Sci
+  // variants render the same derived weights; Config #N and the
+  // deep-analysis funnel from the falsification-criterion artifact; the
+  // start-model inputs from the engine constants (startSolstice = 1 is the
+  // June-solstice start convention, the structural companion of JD
+  // 2,451,716.5).
+  ...(() => {
+    const { bal, planets8, antiPhase, eccWeightCoeff, eccWeight, inPhaseTotal } = balanceMachinery();
+    const out = {
+      saturnEccCoeff: { get: () => eccWeightCoeff('saturn'), render: (v) => Number(v).toFixed(4) },
+      saturnEccPredicted: { get: () => inPhaseTotal() / eccWeightCoeff('saturn'), render: (v) => Number(v).toFixed(5), note: 'Law 5: in-phase total / Saturn coefficient' },
+      jupiterInPhaseShare: { get: () => 100 * eccWeight('jupiter') / inPhaseTotal(), render: (v) => Number(v).toFixed(0), unit: '%' },
+      uranusInPhaseShare:  { get: () => 100 * eccWeight('uranus') / inPhaseTotal(), render: (v) => Number(v).toFixed(0), unit: '%' },
+      neptuneInPhaseShare: { get: () => 100 * eccWeight('neptune') / inPhaseTotal(), render: (v) => Number(v).toFixed(0), unit: '%' },
+      innerFourEccWeightSci: { get: () => eccWeight('mercury') + eccWeight('venus') + eccWeight('earth') + eccWeight('mars'), render: (v) => fmtSci(v, 1) },
+      inPhaseEccWeightTotalSci: { get: inPhaseTotal, render: (v) => fmtSci(v, 3) },
+      antiPhaseEccWeightTotalSci: { get: () => planets8.filter(antiPhase).reduce((s, p) => s + eccWeight(p), 0), render: (v) => fmtSci(v, 3) },
+      configNumber: { get: () => bal().currentConfig.rank, render: (v) => String(v) },
+      configSearchSpace: { get: () => bal().searchSpace, render: (v) => thousands(v) },
+      configSearchPct: { get: () => 100 / bal().searchSpace, render: (v) => `${Number(v).toFixed(7)}%`, note: 'one configuration out of the exhaustive space' },
+      deepEccThreshold: { get: () => bal().deepAnalysis.eccThreshold, render: (v) => String(v), unit: '%' },
+      deepCandidateCount: { get: () => bal().deepAnalysis.candidateCount, render: (v) => String(v) },
+      deepLLValidCount: { get: () => bal().deepAnalysis.llValidCount, render: (v) => String(v) },
+      deepSurvivorCount: { get: () => bal().deepAnalysis.survivorCount, render: (v) => String(v) },
+      deepMaxRateError: { get: () => bal().deepAnalysis.maxRateError, render: (v) => String(v), unit: '″' },
+      startModelJD: { get: () => C.startmodelJD, render: (v) => thousands(v, 1), unit: 'JD' },
+      startModelYear: { get: () => C.startmodelYear, render: (v) => String(v) },
+      startSolstice: { get: () => 1, render: (v) => String(v), note: 'June-solstice start convention (structural, pairs with startModelJD)' },
+    };
+    for (const p of planets8) {
+      out[`${p}EccWeightSci`] = { get: () => eccWeight(p), render: (v) => fmtSci(v, 3) };
     }
     return out;
   })(),
