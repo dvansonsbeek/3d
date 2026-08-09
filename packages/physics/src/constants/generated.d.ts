@@ -562,6 +562,18 @@ export declare const REFERENCE_DATA: {
   };
   readonly knownValues: {
     "iersObservedDLodDtMsPerCy": number;
+    "llrTidalGammaArcsecPerCy2": number;
+    "moonKeplerEffectiveDistanceKm": number;
+    "meeusA1RateDegPerCy": number;
+    "meeusEclipsesTestCount": number;
+    "meeusEclipseRmsMinutes": number;
+    "meeusParallaxResidualArcsec": number;
+    "meeusPearsonR": number;
+    "meeusJplDecRmsDeg": number;
+    "sunModelDecRmsDeg": number;
+    "sunModelTrueErrorDeg": number;
+    "sunTropicalYearDiffSeconds": number;
+    "sunSiderealYearDiffSeconds": number;
     "jupiterSaturnConjunctionPeriod": number;
     "moonSynodicMonth": number;
     "moonTropicalMonth": number;

@@ -1153,6 +1153,51 @@ export const VALUES = {
     };
   })(),
 
+  // ── Input constants + Meeus/Sun validation stats (11-2w) ────────────────
+  // Inputs from the engine constants and astro-reference; the eccDot pair
+  // renders in exponent form with the site's unicode leading minus; the
+  // validation statistics live in knownValues (recorded campaign snapshots,
+  // per its _description). meeusLongitude/LatitudeTerms are the Meeus 47.A/B
+  // CANONICAL counts (structural, like earthInclD): the tracked longitude
+  // table carries 59 rows because the canonical 60th is the
+  // zero-longitude-coefficient distance-only term.
+  ...(() => {
+    const uMinus = (s) => s.replace(/^-/, '−');
+    return {
+      moonOrbitalEccentricity:     { get: () => C.moonOrbitalEccentricity, render: (v) => Number(v).toFixed(4) },
+      moonOrbitalEccentricityFull: { get: () => C.moonOrbitalEccentricity, render: (v) => String(v) },
+      inputMeanSolarYear:    { get: () => model.foundational.inputmeanlengthsolaryearindays, render: (v) => Number(v).toFixed(4), unit: 'd' },
+      siderealYearInputDays: { get: () => C.meanSiderealYearSeconds / 86400, render: (v) => Number(v).toFixed(9), unit: 'd', note: 'IAU J2000 sidereal year input' },
+      massRatioEarthMoon:    { get: () => C.MASS_RATIO_EARTH_MOON, render: (v) => String(v), note: 'DE440 SPICE kernel' },
+      llrTidalGamma:         { get: () => astro.knownValues.llrTidalGammaArcsecPerCy2, render: (v) => uMinus(Number(v).toFixed(2)), unit: '″/cy²', note: 'LLR tidal acceleration (α₁ chain anchor)' },
+      earthEccDotJ2000:      { get: () => astro.earthOrbital.earthEccentricityDotJ2000, render: (v) => uMinus(Number(v).toExponential()), unit: '/cy' },
+      earthEccDotDotJ2000:   { get: () => astro.earthOrbital.earthEccentricityDotDotJ2000, render: (v) => uMinus(Number(v).toExponential()), unit: '/cy²' },
+      inclinationCycleAnchorEarth: { get: () => astro.earthOrbital.earthInclinationCycleAnchor, render: (v) => Number(v).toFixed(2), unit: '°', note: 'e_E line phase anchor (alias of earthInclCycleAnchor)' },
+      earthPerihelionLongitudeJ2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000, render: (v) => Number(v).toFixed(3), unit: '°' },
+      sunMeanLongitudeJ2000: { get: () => astro.earthOrbital.sunMeanLongitudeJ2000_deg, render: (v) => String(v), unit: '°', note: 'D5 aberration anchor' },
+      moonSiderealMonthInput: { get: () => C.moonSiderealMonthInput, render: (v) => Number(v).toFixed(8), unit: 'd', note: 'the one dynamical lunar input' },
+      moonAxialTilt: { get: () => C.moonTilt, render: (v) => String(v), unit: '°', note: 'to orbit plane' },
+      moonApsidalPrecessionDaysInput: { get: () => C.moonApsidalPrecessionDaysInputICRF, render: (v) => thousands(v, 3), unit: 'd' },
+      moonNodalPrecessionDaysInput:   { get: () => C.moonNodalPrecessionDaysInputICRF, render: (v) => thousands(v, 2), unit: 'd' },
+      moonKeplerEffectiveDistance: { get: () => astro.knownValues.moonKeplerEffectiveDistanceKm, render: (v) => thousands(v), unit: 'km', note: 'DLT-1 §3 three-body a (vs two-body 384,748)' },
+      a1RateDegPerCy: { get: () => astro.knownValues.meeusA1RateDegPerCy, render: (v) => String(v), unit: '°/cy', note: 'Meeus A1 rate (18V−16E−M′ resonance) — duplicated from script.js:26562' },
+      meeusLongitudeTerms: { get: () => 60, render: (v) => String(v), note: 'Meeus 47.A canonical count — tracked table carries 59 (60th is the distance-only term)' },
+      meeusLatitudeTerms:  { get: () => 60, render: (v) => String(v), note: 'Meeus 47.B canonical count' },
+      meeusEclipsesTestCount: { get: () => astro.knownValues.meeusEclipsesTestCount, render: (v) => String(v) },
+      meeusEclipseRMS:        { get: () => astro.knownValues.meeusEclipseRmsMinutes, render: (v) => Number(v).toFixed(2), unit: 'min' },
+      meeusParallaxResidual:  { get: () => astro.knownValues.meeusParallaxResidualArcsec, render: (v) => Number(v).toFixed(2), unit: '″' },
+      meeusPearsonR:          { get: () => astro.knownValues.meeusPearsonR, render: (v) => String(v) },
+      meeusJPLDecRMS:         { get: () => astro.knownValues.meeusJplDecRmsDeg, render: (v) => Number(v).toFixed(2), unit: '°' },
+      sunModelDecRMS:    { get: () => astro.knownValues.sunModelDecRmsDeg, render: (v) => String(v), unit: '°' },
+      sunModelTrueError: { get: () => astro.knownValues.sunModelTrueErrorDeg, render: (v) => String(v), unit: '°' },
+      sunTropicalYearDiff: { get: () => astro.knownValues.sunTropicalYearDiffSeconds, render: (v) => fmtSignedPct(v, 2), unit: 's' },
+      sunSiderealYearDiff: { get: () => astro.knownValues.sunSiderealYearDiffSeconds, render: (v) => fmtSignedPct(v, 2), unit: 's' },
+      sunDiameter: { get: () => astro.bodyDiametersKm.sun, render: (v) => thousands(v), unit: 'km' },
+      sunOrbitalCircumference: { get: () => 2 * Math.PI * C.currentAUDistance, render: (v) => thousands(v, 2), unit: 'km', note: '2π × model AU' },
+      arcsecInCircle: { get: () => 360 * 3600, render: (v) => thousands(v), note: 'structural: 360 × 3600' },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
