@@ -557,6 +557,7 @@ export declare const REFERENCE_DATA: {
     };
   };
   readonly knownValues: {
+    "iersObservedDLodDtMsPerCy": number;
     "jupiterSaturnConjunctionPeriod": number;
     "moonSynodicMonth": number;
     "moonTropicalMonth": number;

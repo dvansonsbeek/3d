@@ -668,6 +668,7 @@ export const REFERENCE_DATA = Object.freeze({
     }
   },
   knownValues: {
+    "iersObservedDLodDtMsPerCy": 1.75,
     "jupiterSaturnConjunctionPeriod": 19.859,
     "moonSynodicMonth": 29.530589,
     "moonTropicalMonth": 27.321582,

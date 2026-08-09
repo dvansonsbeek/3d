@@ -347,7 +347,8 @@
     "deltaTEspenakJ2000Seconds": 63.86
   },
   "knownValues": {
-    "_description": "Validation reference values for comparison (used by moon-cycles.js). Moon month inputs are in moonReference — not duplicated here.",
+    "_description": "Validation reference values for comparison (used by moon-cycles.js and the model-values registry). Moon month inputs are in moonReference — not duplicated here.",
+    "iersObservedDLodDtMsPerCy": 1.75,
     "jupiterSaturnConjunctionPeriod": 19.859,
     "moonSynodicMonth": 29.530589,
     "moonTropicalMonth": 27.321582,

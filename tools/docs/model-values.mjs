@@ -901,6 +901,60 @@ export const VALUES = {
     };
   })(),
 
+  // ── dLOD/dt decomposition + J2000 day identities (11-2q) ────────────────
+  // The channels come LIVE from the engine's dLodDtDecompositionAtAge at
+  // t_Ma = −5e-7 (model epoch 2000.5 — the same convention
+  // export-to-holistic.js Section 7 syncs the website's DLOD_* literals
+  // from), so the registry replaces the synced-literal chain with the
+  // derivation itself. Nets are the engine's own net_L2/L3/L4, not sums of
+  // rounded channels — verified to render identically. solarDayJ2000 is the
+  // SI day definition (86400 exactly), NOT lodRealPhysical.
+  ...(() => {
+    let dlod = null;
+    const dl = () => { if (!dlod) dlod = dtl().dLodDtDecompositionAtAge(-5e-7); return dlod; };
+    const signed2 = (v) => fmtSignedPct(v, 2);
+    return {
+      dLodDtTidalJ2000:      { get: () => dl().tidal, render: signed2, unit: 'ms/cy', note: 'Moon-recession tidal baseline (Farhat 2022 / LLR α₁)' },
+      dLodDtGiaJ2000:        { get: () => dl().gia, render: signed2, unit: 'ms/cy', note: 'GIA channel (L1-orbital α(t))' },
+      dLodDtAllCyclesJ2000:  { get: () => dl().stack, render: signed2, unit: 'ms/cy', note: 'Σ d/dt of the 4-flag stack' },
+      dLodDtResonatorJ2000:  { get: () => dl().resonator, render: signed2, unit: 'ms/cy', note: 'Core-mantle swing (analytic rate)' },
+      dLodDtNetSecularJ2000: { get: () => dl().net_L2, render: signed2, unit: 'ms/cy', note: 'tidal + GIA ≈ IERS +1.75' },
+      dLodDtNetL3J2000:      { get: () => dl().net_L3, render: signed2, unit: 'ms/cy' },
+      dLodDtNetFullJ2000:    { get: () => dl().net_L4, render: signed2, unit: 'ms/cy', note: 'the shipped Layer-4 observable rate' },
+      iersObservedDLodDt: {
+        get: () => astro.knownValues.iersObservedDLodDtMsPerCy,
+        render: signed2,
+        unit: 'ms/cy',
+        note: 'IERS observed secular LOD rate — citation, the model comparator',
+      },
+      solarDayJ2000: {
+        get: () => 86400,
+        render: (v) => thousands(v, 6),
+        unit: 's',
+        note: 'the SI day definition — NOT lodRealPhysical (Layer-4 actual LOD)',
+      },
+      eclipticSiderealDayJ2000: {
+        get: () => {
+          const sol = dtl().computeSolarYearDaysDirect(2000);
+          const sidDay = (sol * dtl().computeLodKinematicSecondsAtEpoch(2000)) / (sol + 1);
+          const meanSidDay = (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay;
+          const axialCoinMs = (meanSidDay / (C.H / 13)) / (C.meanSolarYearDays + 1) * 1000;
+          return sidDay + axialCoinMs / 1000;
+        },
+        render: (v) => thousands(v, 6),
+        unit: 's',
+        note: 'sidereal day + the UNPROJECTED per-day precession (ecliptic-longitude counterpart of the stellar day)',
+      },
+      stackOvershootMs: {
+        get: () => ((dtl().computeLodKinematicSecondsAtEpoch(2000) + dtl().h5Correction(2000))
+                    - dtl().computeLodRealSecondsAtEpoch(2000)) * 1000,
+        render: (v) => thousands(v, 2),
+        unit: 'ms',
+        note: 'raw H/5 kinematic minus Layer 4 — |stackNetLodJ2000Ms|, kept in lockstep by derivation',
+      },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
