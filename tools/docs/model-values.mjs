@@ -1260,35 +1260,42 @@ export const VALUES = {
   })(),
 
   // ── Planet perihelion lattice + J2000 eccentricities (11-2z) ────────────
-  // Periods and rates are pure H-lattice structure (the dynamical divisors —
-  // Jupiter 8H/39, Saturn −8H/65 per the J/S reframe; signs mark
-  // ecliptic-retrograde); formulas are the structural labels; eccentricities
-  // from the per-planet JPL DE440 J2000 elements in model-parameters (Earth
-  // from astro earthOrbital).
+  // Everything derives from the STORED per-planet lattice fraction
+  // (model-parameters `perihelionEclipticFraction: [num, den]`, signed for
+  // ecliptic-retrograde — the same data the engine derives
+  // perihelionEclipticYears from): period = H·num/den, rate = 360/period
+  // (signed), and the formula label by one rule (|num|=1 → H/den; den=1 →
+  // numH; else numH/den, '−' prefix when retrograde). Eccentricities from
+  // the per-planet JPL DE440 J2000 elements (Earth from astro earthOrbital).
   ...(() => {
-    const periDivisors = {
-      mercury: { num: 8, den: 11, sign: 1, formula: 'H×(8/11)', roundFirst: false },
-      venus:   { num: 8, den: 6,  sign: -1, formula: '−8H/6', roundFirst: true },
-      mars:    { num: 8, den: 36, sign: 1, formula: 'H×(8/36)', roundFirst: false },
-      jupiter: { num: 8, den: 39, sign: 1, formula: '8H/39', roundFirst: true },
-      saturn:  { num: 8, den: 65, sign: -1, formula: '−8H/65', roundFirst: true },
-      uranus:  { num: 8, den: 24, sign: 1, formula: 'H/3', roundFirst: true },
-      neptune: { num: 16, den: 8, sign: 1, formula: '2H', roundFirst: true },
-      pluto:   { num: 8, den: 8,  sign: 1, formula: 'H/1', roundFirst: true },
+    const periFraction = (planet) => (planet === 'pluto'
+      ? model.additionalBodies.pluto.perihelionEclipticFraction
+      : model.planets[planet].perihelionEclipticFraction);
+    const periLabel = ([num, den]) => {
+      const sign = num < 0 ? '−' : '';
+      const n = Math.abs(num);
+      if (n === 1) return `${sign}H/${den}`;
+      if (den === 1) return `${sign}${n}H`;
+      return `${sign}${n}H/${den}`;
     };
     const out = {};
-    for (const [planet, d] of Object.entries(periDivisors)) {
-      const periodYears = () => (C.H * d.num) / d.den;
+    for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto']) {
+      const periodYears = () => {
+        const [num, den] = periFraction(planet);
+        return (C.H * Math.abs(num)) / den;
+      };
       out[`${planet}PeriPeriod`] = {
         get: periodYears,
-        render: d.roundFirst ? ((v) => thousands(Math.round(v))) : ((v) => thousands(v, 0)),
+        render: (v) => thousands(Math.round(v)),
         unit: 'yr',
       };
-      out[`${planet}PeriFormula`] = { get: () => d.formula, render: (v) => String(v) };
+      out[`${planet}PeriFormula`] = { get: () => periLabel(periFraction(planet)), render: (v) => String(v) };
       if (planet !== 'pluto') {
-        const rateKey = `${planet}PeriRate`;
-        out[rateKey] = {
-          get: () => d.sign * 360 / periodYears(),
+        out[`${planet}PeriRate`] = {
+          get: () => {
+            const [num, den] = periFraction(planet);
+            return Math.sign(num) * 360 / ((C.H * Math.abs(num)) / den);
+          },
           render: (v) => thousands(v, 6),
           unit: '°/yr',
         };
