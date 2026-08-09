@@ -1978,6 +1978,50 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Planet orientation lattice (11-2am) ─────────────────────────────────
+  // Perihelion longitudes from the tracked elements; axial periods from the
+  // engine's per-planet axialPrecessionYears (Earth = H/13), with the
+  // Uranus/Neptune frozen estimates rendered by floor-to-3-significant-
+  // figures (reproduces the site's 204,000,000 / 22,800,000 exactly);
+  // signed ICRF periods via the n8 − 104 frame identity (Earth alone
+  // prograde); obliquity cycles and means from the engine's derived planet
+  // fields (Venus/Neptune tidally damped: cycle = |ICRF|).
+  ...(() => {
+    const n8 = (p) => {
+      if (p === 'earth') return 128;
+      const [num, den] = model.planets[p].perihelionEclipticFraction;
+      return (8 * den / Math.abs(num)) * Math.sign(num);
+    };
+    const floor3sig = (x) => {
+      const m10 = Math.pow(10, Math.floor(Math.log10(x)) - 2);
+      return Math.floor(x / m10) * m10;
+    };
+    const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    const out = {
+      earthAxialPeriod: { get: () => C.H / 13, render: (v) => thousands(Math.round(v)), unit: 'yr' },
+      earthIcrfPeriod: { get: () => (8 * C.H) / Math.abs(n8('earth') - 104), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'prograde — the only positive sign in the family' },
+    };
+    for (const p of planets7) {
+      out[`${p}PeriLongJ2000`] = { get: () => C.planets[p].longitudePerihelion, render: (v) => Number(v).toFixed(3), unit: '°' };
+      out[`${p}AxialPeriod`] = {
+        get: () => Math.abs(C.planets[p].axialPrecessionYears),
+        render: (p === 'uranus' || p === 'neptune')
+          ? (v) => thousands(floor3sig(v))
+          : (v) => thousands(Math.round(v)),
+        unit: 'yr',
+        note: (p === 'uranus' || p === 'neptune') ? 'frozen estimate — floor to 3 significant figures' : undefined,
+      };
+      out[`${p}IcrfPeriod`] = {
+        get: () => { const s = n8(p) - 104; return Math.sign(s) * (8 * C.H) / Math.abs(s); },
+        render: (v) => thousands(Math.round(v)),
+        unit: 'yr',
+      };
+      out[`${p}ObliqCycle`] = { get: () => Math.abs(C.planets[p].obliquityCycle), render: (v) => thousands(Math.round(v)), unit: 'yr' };
+      out[`${p}MeanObliq`] = { get: () => C.planets[p].obliquityMean, render: (v) => Number(v).toFixed(2), unit: '°' };
+    }
+    return out;
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
