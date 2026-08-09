@@ -157,8 +157,15 @@ const hDivisor = (name, divisor, note, dp) => ({
  *  superscript exponent (e.g. -3.93 × 10⁻⁷). Replicates its fmtSci exactly. */
 const fmtSci = (n, mantissaDecimals = 1) => {
   if (!Number.isFinite(n) || n === 0) return String(n);
-  const exp = Math.floor(Math.log10(Math.abs(n)));
-  const mantissa = n / Math.pow(10, exp);
+  let exp = Math.floor(Math.log10(Math.abs(n)));
+  let mantissa = n / Math.pow(10, exp);
+  // Normalize the rounding boundary: 9.99999e-7 at 1 dp is '1.0 × 10⁻⁶',
+  // not '10.0 × 10⁻⁷'. (The site's fmtSci shares this latent edge but only
+  // ever receives pre-rounded literals, so it never fires there.)
+  if (Math.abs(Number(mantissa.toFixed(mantissaDecimals))) >= 10) {
+    mantissa /= 10;
+    exp += 1;
+  }
   const supMap = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
   const expStr = String(exp).split('').map((c) => supMap[c] ?? c).join('');
   return `${mantissa.toFixed(mantissaDecimals)} × 10${expStr}`;
@@ -1765,6 +1772,57 @@ export const VALUES = {
       milkyWayPeriod: { get: () => astro.knownValues.milkyWayPeriodMyr, render: (v) => `~${v}`, unit: 'Myr', note: 'citation' },
     });
     return out;
+  })(),
+
+  // ── Lattice-significance statistics (11-2ai) ────────────────────────────
+  // All from the tracked campaign artifact data/significance-results.json
+  // (1e6 trials, seeded, git-sha stamped — a generator-owned result file).
+  // Headline = the direct joint permutation test; Stouffer (measured-r
+  // corrected) and Fisher (floor-clamp sensitive) are supporting/legacy;
+  // fisherP/fisherSigma/fisherPermP/fisherUniformP are the site's
+  // backward-compatible aliases of headline/Stouffer. Porting surfaced
+  // website defect #10 (double-rounding): its correlationFactor literal
+  // 1.85 re-rounded to '1.9' where the artifact's exact 1.8478 renders
+  // '1.8' — site now carries full precision.
+  ...(() => {
+    let sigM = null;
+    const sig = () => { if (!sigM) sigM = rd('data/significance-results.json'); return sigM; };
+    const sci1 = (v) => fmtSci(v, 1);
+    const r1 = (v) => Number(v).toFixed(1);
+    const r2 = (v) => Number(v).toFixed(2);
+    const r3 = (v) => Number(v).toFixed(3);
+    return {
+      headlineP:     { get: () => sig().headline_p, render: sci1, note: 'direct joint permutation test — the citable number' },
+      headlineSigma: { get: () => sig().headline_sigma, render: r1 },
+      jointPermP:    { get: () => sig().joint_combined.permutation.p, render: sci1 },
+      jointLogUnifP: { get: () => sig().joint_combined.log_uniform.p, render: sci1 },
+      jointUnifP:    { get: () => sig().joint_combined.uniform.p, render: sci1 },
+      jointSigmaPerm:    { get: () => sig().joint_combined.permutation.sigma, render: r2 },
+      jointSigmaLogUnif: { get: () => sig().joint_combined.log_uniform.sigma, render: r2 },
+      jointSigmaUnif:    { get: () => sig().joint_combined.uniform.sigma, render: r2 },
+      empiricalRPerm:    { get: () => sig().method.empirical_correlation_permutation, render: r3 },
+      empiricalRLogUnif: { get: () => sig().method.empirical_correlation_log_uniform, render: r3 },
+      empiricalRUnif:    { get: () => sig().method.empirical_correlation_uniform, render: r3 },
+      fisherP:        { get: () => sig().headline_p, render: sci1, note: 'backward-compatible alias of headlineP' },
+      fisherSigma:    { get: () => sig().headline_sigma, render: r1 },
+      fisherPermP:    { get: () => sig().stouffer_combined_corrected.permutation, render: sci1, note: 'alias of the corrected Stouffer p' },
+      fisherUniformP: { get: () => sig().stouffer_combined_corrected.uniform, render: sci1 },
+      stoufferPermP:    { get: () => sig().stouffer_combined_corrected.permutation, render: sci1 },
+      stoufferLogUnifP: { get: () => sig().stouffer_combined_corrected.log_uniform, render: sci1 },
+      stoufferUnifP:    { get: () => sig().stouffer_combined_corrected.uniform, render: sci1 },
+      stoufferSigmaPerm:    { get: () => sig().stouffer_sigma_corrected.permutation, render: r1 },
+      stoufferSigmaLogUnif: { get: () => sig().stouffer_sigma_corrected.log_uniform, render: r1 },
+      stoufferSigmaUnif:    { get: () => sig().stouffer_sigma_corrected.uniform, render: r1 },
+      fisherLegacyPermP:    { get: () => sig().fisher_combined.permutation, render: sci1 },
+      fisherLegacyLogUnifP: { get: () => sig().fisher_combined.log_uniform, render: sci1 },
+      fisherLegacyUnifP:    { get: () => sig().fisher_combined.uniform, render: sci1 },
+      sigTestCount:         { get: () => sig().counts.total, render: (v) => String(v) },
+      sigLawCount:          { get: () => sig().counts.lawCount, render: (v) => String(v) },
+      sigEmpiricalCount:    { get: () => sig().counts.empirical, render: (v) => String(v) },
+      sigMcCombinableCount: { get: () => sig().counts.mc_combinable, render: (v) => String(v) },
+      sigStructuralCount:   { get: () => sig().counts.structural, render: (v) => String(v) },
+      sigCorrelationFactor: { get: () => sig().method.correlation_factor, render: r1, note: '1 + (k−1)·r̄ at full precision (the 2-dp site literal double-rounded to 1.9)' },
+    };
   })(),
 
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
