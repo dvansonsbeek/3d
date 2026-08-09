@@ -1359,6 +1359,28 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Planet invariable-plane inclination family (11-2ab) ─────────────────
+  // Mean/amplitude LIVE from the engine's inclination-law derivation
+  // (C.planets — amplitude = ψ/(d·√m), mean anchored at the ICRF perihelion
+  // phase); anchors and Fibonacci d from model-parameters; Ω and i_J2000
+  // from the tracked elements. Porting this surfaced website defect #7
+  // (precision-loss class): the site derived its table from 5-dp EARTH_INCLIN
+  // constants and a 4-dp Mars perihelion longitude, leaving five table
+  // values 1 µdeg off the simulator — both site tables now carry the 3d
+  // full-precision values.
+  ...(() => {
+    const out = {};
+    for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      out[`${planet}InclMean`] = { get: () => C.planets[planet].invPlaneInclinationMean, render: (v) => Number(v).toFixed(6), unit: '°' };
+      out[`${planet}InclAmp`] = { get: () => C.planets[planet].invPlaneInclinationAmplitude, render: (v) => Number(v).toFixed(6), unit: '°' };
+      out[`${planet}InclCycleAnchor`] = { get: () => model.planets[planet].inclinationCycleAnchor, render: (v) => Number(v).toFixed(2), unit: '°' };
+      out[`${planet}InclD`] = { get: () => model.planets[planet].fibonacciD, render: (v) => String(v), note: 'Fibonacci divisor of the inclination law' };
+      out[`${planet}OmegaJ2000`] = { get: () => C.planets[planet].ascendingNodeInvPlane, render: (v) => Number(v).toFixed(2), unit: '°' };
+      out[`${planet}InclJ2000`] = { get: () => astro.planetOrbitalElements[planet].invPlaneInclinationJ2000, render: (v) => String(v), unit: '°' };
+    }
+    return out;
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
