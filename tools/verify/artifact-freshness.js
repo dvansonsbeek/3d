@@ -30,7 +30,22 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 const { ROOT, hashFile } = require('../lib/artifact-inputs');
+
+// A recorded input that is MISSING is only a failure when git tracks it.
+// Gitignored datasets (the 319 MB xlsx, the 166 MB CSV class) are absent in
+// a clean checkout / CI by design — there the hash is UNVERIFIABLE, not
+// stale: we skip with a note, and any machine that has the file still gets
+// full drift detection.
+function isGitIgnored(relPath) {
+  try {
+    execFileSync('git', ['check-ignore', '-q', relPath], { cwd: ROOT });
+    return true;   // exit 0 → ignored
+  } catch {
+    return false;  // exit 1 → not ignored (or not a repo — treat as tracked)
+  }
+}
 
 // Artifacts that MUST carry an inputs block (grows with generator adoption —
 // see the plan's §12h follow-up list for the queue: LOD-climate correlation,
@@ -48,6 +63,7 @@ const REQUIRED = [
 const DATA = path.join(ROOT, 'data');
 let checked = 0;
 let failures = [];
+let skipped = [];
 
 const artifacts = fs.readdirSync(DATA).filter((f) => f.endsWith('.json'));
 const governed = new Set(REQUIRED);
@@ -86,6 +102,10 @@ for (const rel of [...governed].sort()) {
     try {
       current = hashFile(inputRel);
     } catch {
+      if (isGitIgnored(inputRel)) {
+        skipped.push(`${rel}: input ${inputRel} is a gitignored dataset absent here — hash unverifiable, skipped`);
+        continue;
+      }
       failures.push(`${rel}: input ${inputRel} no longer exists — regenerate: ${inputs.generator}`);
       continue;
     }
@@ -100,6 +120,7 @@ console.log(line);
 console.log('  ARTIFACT FRESHNESS  (campaign artifacts vs their recorded inputs)');
 console.log(line);
 console.log(`  ${governed.size} governed artifact(s) · ${checked} input hash(es) verified`);
+for (const s of skipped) console.log(`  SKIP   ${s}`);
 if (failures.length) {
   console.log('');
   for (const f of failures) console.log(`  STALE  ${f}`);
