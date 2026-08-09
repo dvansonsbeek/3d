@@ -491,7 +491,7 @@ This gap is not fixed — it oscillates with the glacial cycle. Over the ~100 ky
 
 Cross-references: `meanLodSecondsAtAgeMeanAlpha` in `src/script.js` (Layer 1 tidal chain with climate-mean α), `meanLodSecondsAtAge` (Layer 2 tidal + GIA at α(t)), `dtCycleLodCorrectionSum` (cycles + swing sum), `resonatorSwingLodCorrection` (the Layer-4 addition), predictions bindings `solarDayLayer1` / `solarDayLayer2` / `solarDayLayer3` / `lodReal`.
 
-**Sidereal / stellar day source.** `siderealDayReal` and `stellarDayReal` are derived from `o.lodKinematic` (the IAU-anchored baseline), *not* from `lodReal` (which additionally carries the H/5 and cyclic corrections). This preserves the round-trip identity `siderealYearDays × o.lodKinematic = meansiderealyearlengthinSeconds = 31,558,149.7635 s` at every epoch. J2000 values: 86164.090540 s (sidereal) and 86164.099661 s (stellar).
+**Sidereal / stellar day source.** `siderealDayReal` and `stellarDayReal` are derived from `o.lodKinematic` (the IAU-anchored baseline), *not* from `lodReal` (which additionally carries the H/5 and cyclic corrections). This preserves the round-trip identity `siderealYearDays × o.lodKinematic = meansiderealyearlengthinSeconds = 31,558,149.7635 s` at every epoch. J2000 values: <!--v:siderealDayJ2000-->86,164.090527<!--/v--> s (sidereal) and <!--v:stellarDayJ2000-->86,164.098896<!--/v--> s (stellar, of-date-obliquity RA projection).
 
 ### dLOD/dt decomposition at J2000
 

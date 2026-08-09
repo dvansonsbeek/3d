@@ -819,6 +819,88 @@ export const VALUES = {
     unit: '°',
   },
 
+  // ── Year/day-length family (11-2p) — the unit-trap tier ─────────────────
+  // Every quantity pinned to its exact browser twin. MEAN family: the
+  // H/13-identity constants (kinematic day basis — meanLengthOfDay, NOT the
+  // SI day and NOT Layer-4 LOD_real). J2000 family: the direct Step 6d
+  // Fourier evaluations, seconds = days × lodKinematic (the tweakpane's
+  // convention, preserving the sidereal round-trip identity).
+  // stellarDayJ2000 uses OF-DATE obliquity at 2000 (script.js:56318) —
+  // porting it surfaced the fifth website defect: its J2000 constant used
+  // the MEAN-ε RA projection, one final digit below the simulator's readout
+  // (86,164.098895 vs .098896; fixed website-side, snapshot regenerated).
+  ...(() => {
+    const meanSiderealDaySeconds = () =>
+      (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay;
+    const meanStellarDaySeconds = () => {
+      const raProjMean = Math.cos((C.SOLSTICE_OBLIQUITY_MEAN * Math.PI) / 180);
+      const d = meanSiderealDaySeconds();
+      return (d / (C.H / 13)) / (C.meanSolarYearDays + 1) * raProjMean + d;
+    };
+    const siderealDayJ2000Seconds = () => {
+      const sol = dtl().computeSolarYearDaysDirect(2000);
+      return (sol * dtl().computeLodKinematicSecondsAtEpoch(2000)) / (sol + 1);
+    };
+    return {
+      meanSolarYearDays:     { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 7), unit: 'd' },
+      meanSolarYearDaysFull: { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 12), unit: 'd', note: 'full-precision form for derivation contexts' },
+      inputSolarYearDays:    { get: () => model.foundational.inputmeanlengthsolaryearindays, render: (v) => String(v), unit: 'd', note: 'the mean-tropical-year INPUT parameter' },
+      daysPerPeriPrec:       { get: () => Math.round((C.H / 16) * C.meanSolarYearDays), render: (v) => thousands(v), note: 'days per perihelion-precession cycle, (H/16)·mSY' },
+      solarYearJ2000Days:    { get: () => dtl().computeSolarYearDaysDirect(2000), render: (v) => thousands(v, 7), unit: 'd' },
+      solarYearJ2000Seconds: { get: () => dtl().computeSolarYearDaysDirect(2000) * dtl().computeLodKinematicSecondsAtEpoch(2000), render: (v) => thousands(v, 2), unit: 's', note: 'tweakpane predictions.solarYearSeconds = days × lodKinematic' },
+      meanSiderealYearDays:  { get: () => C.meanSiderealYearDaysKinematic, render: (v) => thousands(v, 7), unit: 'd', note: 'framework H/13-kinematic mean — NOT the IAU 365.256363004 Fourier baseline' },
+      siderealYearSeconds:   { get: () => C.meanSiderealYearSeconds, render: (v) => thousands(v, 2), unit: 's', note: 'IAU sidereal year in SI seconds (31,558,149.7635)' },
+      siderealYearJ2000Days: { get: () => dtl().computeSiderealYearDaysDirect(2000), render: (v) => thousands(v, 8), unit: 'd' },
+      anomalisticYearDays:   { get: () => C.meanAnomalisticYearDays, render: (v) => thousands(v, 7), unit: 'd' },
+      anomalisticYearSeconds: { get: () => C.meanAnomalisticYearDays * C.meanLengthOfDay, render: (v) => thousands(v, 2), unit: 's' },
+      anomalisticYearJ2000Days: { get: () => dtl().computeAnomalisticYearDaysDirect(2000), render: (v) => thousands(v, 7), unit: 'd' },
+      anomalisticYearJ2000Seconds: { get: () => dtl().computeAnomalisticYearDaysDirect(2000) * dtl().computeLodKinematicSecondsAtEpoch(2000), render: (v) => thousands(v, 2), unit: 's' },
+      siderealSolarDiffSeconds: {
+        get: () => {
+          const lodKin = dtl().computeLodKinematicSecondsAtEpoch(2000);
+          return dtl().computeSiderealYearDaysDirect(2000) * lodKin
+               - dtl().computeSolarYearDaysDirect(2000) * lodKin;
+        },
+        render: (v) => thousands(v, 1),
+        unit: 's',
+        note: 'sidereal − tropical year at J2000, both in lodKinematic seconds',
+      },
+      siderealSolarMeanDiffSeconds: {
+        get: () => (C.meanSiderealYearDaysKinematic - C.meanSolarYearDays) * C.meanLengthOfDay,
+        render: (v) => thousands(v, 2),
+        unit: 's',
+      },
+      meanSolarDaySeconds:    { get: () => C.meanLengthOfDay, render: (v) => thousands(v, 6), unit: 's', note: 'LOD_mean, the H/13-identity kinematic day' },
+      meanSiderealDaySeconds: { get: meanSiderealDaySeconds, render: (v) => thousands(v, 7), unit: 's' },
+      meanStellarDaySeconds:  { get: meanStellarDaySeconds, render: (v) => thousands(v, 7), unit: 's' },
+      stellarSiderealDayDiffMs: {
+        get: () => (meanStellarDaySeconds() - meanSiderealDaySeconds()) * 1000,
+        render: (v) => thousands(v, 2),
+        unit: 'ms',
+        note: 'the RA-projected (m = p·cos ε) offset — compare IAU 8.373 ms',
+      },
+      axialCoinRotationMs: {
+        get: () => (meanSiderealDaySeconds() / (C.H / 13)) / (C.meanSolarYearDays + 1) * 1000,
+        render: (v) => thousands(v, 2),
+        unit: 'ms',
+        note: 'UNPROJECTED ecliptic-lattice count (one extra sidereal day per axial cycle) — deliberately not the 8.37 ms projected offset',
+      },
+      siderealDayJ2000: { get: siderealDayJ2000Seconds, render: (v) => thousands(v, 6), unit: 's' },
+      stellarDayJ2000: {
+        get: () => {
+          const sol = dtl().computeSolarYearDaysDirect(2000);
+          const d = siderealDayJ2000Seconds();
+          const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
+          const raProj = Math.cos((oe.computeObliquityEarth(2000) * Math.PI) / 180);
+          return (d / (C.H / 13)) / (sol + 1) * raProj + d;
+        },
+        render: (v) => thousands(v, 6),
+        unit: 's',
+        note: 'OF-DATE obliquity projection at 2000 — the simulator readout (script.js:56318)',
+      },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
