@@ -1428,6 +1428,52 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Axial-precession identities + perihelion baselines + term counts (11-2ad)
+  // Baselines are the lattice periods as ″/cy (1,296,000/T × 100, signed from
+  // the stored fractions — Earth on its ICRF H/3 apsidal rate); the
+  // prediction term counts derive LIVE from the shipped
+  // PREDICT_COEFFS_PHYSICAL array lengths (which caught the site's stale
+  // Jupiter/Saturn 2,407s — website defect #8, both predated the J/S
+  // reframe). The R²/RMSE stats stay in the queue until the evaluation
+  // generator lands (plan follow-up item 6) — never record suspect numbers.
+  ...(() => {
+    const fc = () => rd('public/input/fitted-coefficients.json');
+    const n8 = (planet) => {
+      const [num, den] = model.planets[planet].perihelionEclipticFraction;
+      return (8 * den / Math.abs(num)) * Math.sign(num);
+    };
+    const baselineArcsecCy = (planet) => {
+      if (planet === 'earth' || planet === 'uranus') {
+        const sign = planet === 'earth' ? 1 : Math.sign(n8(planet));
+        return sign * 1296000 / (C.H / 3) * 100;
+      }
+      const T = (8 * C.H) / Math.abs(n8(planet));
+      return Math.sign(n8(planet)) * 1296000 / T * 100;
+    };
+    const out = {
+      axialPrecExact: { get: () => C.H / 13, render: (v) => thousands(v, 2), unit: 'yr' },
+      siderealYearsPerAxialPrec: { get: () => Math.round(C.H / 13) - 1, render: (v) => thousands(v), note: 'one fewer sidereal year than tropical years per cycle (coin rotation)' },
+      saturnEclipticRateArcsec: { get: () => Math.sign(n8('saturn')) * 1296000 / ((8 * C.H) / Math.abs(n8('saturn'))), render: (v) => thousands(v, 1), unit: '″/yr' },
+      saturnICRFRateArcsec: { get: () => -1296000 / ((8 * C.H) / Math.abs(n8('saturn') - 104)), render: (v) => thousands(v, 1), unit: '″/yr', note: 'ICRF divisor via the n8 − 104 frame identity' },
+    };
+    for (const planet of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      out[`${planet}ModelBaseline`] = {
+        get: () => baselineArcsecCy(planet),
+        render: (v) => thousands(v, 1),
+        unit: '″/cy',
+        note: planet === 'earth' ? 'ICRF apsidal rate (H/3)' : 'lattice perihelion rate',
+      };
+    }
+    for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      out[`${planet}PredTerms`] = {
+        get: () => fc().PREDICT_COEFFS_PHYSICAL[planet].length,
+        render: (v) => thousands(v),
+        note: 'live length of the shipped physical-beat coefficient array',
+      };
+    }
+    return out;
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
