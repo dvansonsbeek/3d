@@ -11,6 +11,7 @@
  *                      the counterfactual surface, and what the hash covers.
  *   REFERENCE_DATA     validation targets + presentation. Single-sourced so
  *                      nothing duplicates them, but NOT injectable:
+ *   moonGrailWilliams2014            target
  *   giaCoxChaoPeltier                target
  *   obliquityChapront2002            target
  *   ascendingNodesSouamiSouchay      target
@@ -717,6 +718,11 @@ export const REFERENCE_DATA = Object.freeze({
       0.554,
       0.8
     ]
+  },
+  moonGrailWilliams2014: {
+    "j2E6": 203.305,
+    "c22E6": 22.4261,
+    "cMR2": 0.392728
   },
   obliquityChapront2002: {
     "deg10000BC": 24.3053,

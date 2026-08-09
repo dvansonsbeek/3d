@@ -1,0 +1,7 @@
+{
+  "_description": "Cassini-state lunar obliquity lab results (the v4 lab campaign, sim docs/66-adjacent): the derived spin-to-ecliptic obliquity under three treatments, against the measured 1.5424 deg. GENERATORS EXIST AND REPRODUCE THE EPSILON VALUES: tools/explore/cassini-moontilt.js (rigid-ellipse torque-averaged 1.5528, coupled real-orbit average 1.5551) and tools/explore/moon-euler-rotation.js (full Euler integration 1.5470, no averaging assumption — closes 64 percent of the averaged-balance gap via libration-pole coupling). Only a --write mode is missing (see the plan's section-12h follow-up list); until then this file is the recorded snapshot of the lab outputs, pct ratios as published in the campaign writeup. Consumed by the model-values registry (cassiniObliquity* keys).",
+  "measuredObliquityEclipticDeg": 1.5424,
+  "rigidEllipse": { "epsilonDeg": 1.5528, "pctOfMeasured": 100.7 },
+  "coupledAverage": { "epsilonDeg": 1.5551, "pctOfMeasured": 100.83 },
+  "eulerIntegration": { "epsilonDeg": 1.5470, "pctOfMeasured": 100.30 }
+}

@@ -252,6 +252,12 @@
       "trueAnomaly": 104.48097667
     }
   },
+  "moonGrailWilliams2014": {
+    "_description": "Lunar degree-2 gravity + polar moment citations (GRAIL + LLR; Williams et al. 2014): unnormalized J2 and C22 in units of 1e-6, and C/MR2. Inputs of the Cassini-state moontilt labs (tools/explore/cassini-moontilt.js, moon-euler-rotation.js — which carry local copies) and the model-values registry (moonJ2Grail / moonC22Grail / moonCMR2 keys). Citations, never model inputs.",
+    "j2E6": 203.305,
+    "c22E6": 22.4261,
+    "cMR2": 0.392728
+  },
   "giaCoxChaoPeltier": {
     "_description": "GIA calibration literature anchors: Cox & Chao (2002, Science 297) satellite-gravimetry dJ2/dt and the Peltier ICE-6G LOD-coupling axisymmetric-GIA J2-to-alpha conversion factor. The SHIPPED product is the calibrated alphaClimateScalePerMille (model-parameters deepTime — calibrated so dalpha/dt at J2000 = dJ2Dt/factor = -1.35e-11/yr); these two are the citation inputs of that calibration, consumed only by the model-values registry (coxChaoDJ2Dt / giaJ2ToAlphaFactor / derived dAlphaDtJ2000 keys). The browser carries them in comments only (script.js ~:2375).",
     "dJ2DtPerYr": -2.7e-11,

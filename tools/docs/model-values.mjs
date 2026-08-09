@@ -1127,6 +1127,32 @@ export const VALUES = {
     };
   })(),
 
+  // ── Moon inclination + Cassini obliquity labs (11-2v) ───────────────────
+  // The dynamical inclination and Brown/ELP constant from astro moonReference
+  // (the DYNAMICAL 5.1573 vs the theory constant 5.1454 — documented
+  // partners, not interchangeable); GRAIL/LLR gravity from the new
+  // moonGrailWilliams2014 citation block; the Cassini lab results from
+  // data/cassini-moontilt-results.json (both generator scripts exist and
+  // reproduce the ε values — only --write is missing, see the plan's
+  // follow-up list; pct ratios as published).
+  ...(() => {
+    const cas = rd('data/cassini-moontilt-results.json');
+    return {
+      moonEclipticInclination: { get: () => astro.moonReference.moonEclipticInclinationJ2000, render: (v) => String(v), unit: '°', note: 'dynamical mean osculating inclination (v4 E3c)' },
+      moonInclinationConstantBrownELP: { get: () => astro.moonReference.moonInclinationConstantBrownELP, render: (v) => String(v), unit: '°', note: 'Brown/ELP latitude sinF normalization constant' },
+      moonObliquityEcliptic: { get: () => astro.moonReference.moonObliquityEclipticJ2000, render: (v) => String(v), unit: '°', note: 'measured lunar spin-to-ecliptic obliquity' },
+      moonJ2Grail:  { get: () => astro.moonGrailWilliams2014.j2E6, render: (v) => String(v), note: 'lunar J₂ ×10⁻⁶ (GRAIL; Williams 2014)' },
+      moonC22Grail: { get: () => astro.moonGrailWilliams2014.c22E6, render: (v) => String(v), note: 'lunar C₂₂ ×10⁻⁶ (GRAIL; Williams 2014)' },
+      moonCMR2:     { get: () => astro.moonGrailWilliams2014.cMR2, render: (v) => String(v), note: 'lunar polar moment C/MR² (GRAIL+LLR)' },
+      cassiniObliquityDerived:    { get: () => cas.rigidEllipse.epsilonDeg, render: (v) => Number(v).toFixed(4), unit: '°', note: 'rigid-figure torque-averaged Cassini equilibrium' },
+      cassiniObliquityPct:        { get: () => cas.rigidEllipse.pctOfMeasured, render: (v) => Number(v).toFixed(1), unit: '%' },
+      cassiniObliquityCoupled:    { get: () => cas.coupledAverage.epsilonDeg, render: (v) => Number(v).toFixed(4), unit: '°', note: 'coupled average over the real ELP orbit' },
+      cassiniObliquityCoupledPct: { get: () => cas.coupledAverage.pctOfMeasured, render: (v) => Number(v).toFixed(2), unit: '%' },
+      cassiniObliquityEuler:      { get: () => cas.eulerIntegration.epsilonDeg, render: (v) => Number(v).toFixed(4), unit: '°', note: 'full Euler integration — no averaging assumption' },
+      cassiniObliquityEulerPct:   { get: () => cas.eulerIntegration.pctOfMeasured, render: (v) => Number(v).toFixed(2), unit: '%' },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {

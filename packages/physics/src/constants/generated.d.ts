@@ -582,6 +582,11 @@ export declare const REFERENCE_DATA: {
     "uranus": number[];
     "neptune": number[];
   };
+  readonly moonGrailWilliams2014: {
+    "j2E6": number;
+    "c22E6": number;
+    "cMR2": number;
+  };
   readonly obliquityChapront2002: {
     "deg10000BC": number;
     "deg10000AD": number;

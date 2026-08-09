@@ -259,6 +259,10 @@ const MIGRATED = [
  * @type {Record<string, string>}
  */
 const NOT_IN_SCRIPT = {
+  'astro.moonGrailWilliams2014':
+    'GRAIL/LLR lunar gravity citations (Williams 2014) — consumed by the Cassini '
+    + 'moontilt labs (tools/explore, which carry local copies) and the model-values '
+    + 'registry; the browser never quotes them.',
   'astro.giaCoxChaoPeltier':
     'GIA calibration citation anchors (Cox & Chao dJ2/dt, Peltier factor) — the shipped '
     + 'product is the calibrated alphaClimateScalePerMille; script.js cites these in '

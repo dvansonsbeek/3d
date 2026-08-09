@@ -209,6 +209,9 @@ const CLASSIFICATION = {
     // Cox & Chao dJ2/dt + Peltier factor — citation inputs of the shipped
     // alphaClimateScale calibration; consumed only by the registry.
     giaCoxChaoPeltier: 'target',
+    // GRAIL/LLR lunar gravity citations (Williams 2014) — Cassini lab inputs
+    // and registry keys; never model inputs.
+    moonGrailWilliams2014: 'target',
     // Consumed only by tools/verify/ascending-node-*.
     ascendingNodesSouamiSouchay: 'target',
     // Feeds only trendError / directionMatch in script.js — compared against the
