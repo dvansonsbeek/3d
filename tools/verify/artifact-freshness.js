@@ -39,6 +39,8 @@ const REQUIRED = [
   // stamped in Phase 1:
   'data/planet-prediction-fit-stats.json',
   'data/cassini-moontilt-results.json',
+  // stamped in Phase 2:
+  'data/lod-climate-correlation-summary.json',
 ];
 
 const DATA = path.join(ROOT, 'data');
