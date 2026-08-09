@@ -512,6 +512,10 @@ export declare const REFERENCE_DATA: {
     "greatattractorDistance": number;
     "milkywaySpeed": number;
   };
+  readonly giaCoxChaoPeltier: {
+    "dJ2DtPerYr": number;
+    "j2ToAlphaFactor": number;
+  };
   readonly jplEclipticInclinationTrends: {
     "mercury": number;
     "venus": number;

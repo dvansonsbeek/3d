@@ -259,6 +259,10 @@ const MIGRATED = [
  * @type {Record<string, string>}
  */
 const NOT_IN_SCRIPT = {
+  'astro.giaCoxChaoPeltier':
+    'GIA calibration citation anchors (Cox & Chao dJ2/dt, Peltier factor) — the shipped '
+    + 'product is the calibrated alphaClimateScalePerMille; script.js cites these in '
+    + 'comments only (~:2375). Consumed by the model-values registry.',
   'astro.obliquityChapront2002':
     'Chapront (2002) obliquity citation values — consumed only by the model-values '
     + 'registry (obliqChapront* keys) for the Model-vs-literature tables; the browser '

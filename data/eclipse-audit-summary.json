@@ -12,5 +12,20 @@
     "nasaMeanAbsResidualSeconds": 672,
     "eventsBeatingNasa": 42,
     "eventsTotal": 89
+  },
+  "audit26": {
+    "_description": "26-event solar-eclipse alignment audit (docs/103 line 226) — verdict counts per category, re-measured 2026-07-24 under the joint world after the 1133 + -584 preset re-registrations (audit-26 browser run: 0 deltaT-signal verdicts, 0 no-site rows). The alignment/scan-reach/total rollups are DERIVED by the registry. Same maintenance status and planned generator as the file-level note.",
+    "confirmed": 1,
+    "offPeak": 11,
+    "regional": 6,
+    "dtRegional": 0,
+    "geographic": 8
+  },
+  "babylon135": {
+    "_description": "-135 April 15 Babylonian solar eclipse case study (docs/103) — a geographic-boundary event: framework UT within 9 min of the documented UT (NOT a deltaT-signal event; the residual is umbra-centerline geography). Values certified under the fully-derived e_E channel (sim docs/66 section 1); BestGap from the audit-26 scan (the case-study meter reads 1221 km — scan-grid spread).",
+    "bestGapKm": 1232,
+    "bestDeltaUT": "-1h45",
+    "frameworkUT": "05:58",
+    "documentedUT": "06:14"
   }
 }

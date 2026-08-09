@@ -206,6 +206,9 @@ const CLASSIFICATION = {
     // Chapront et al. (2002) obliquity citation values — Model-vs-literature
     // comparison tables only (registry obliqChapront* keys), never an input.
     obliquityChapront2002: 'target',
+    // Cox & Chao dJ2/dt + Peltier factor — citation inputs of the shipped
+    // alphaClimateScale calibration; consumed only by the registry.
+    giaCoxChaoPeltier: 'target',
     // Consumed only by tools/verify/ascending-node-*.
     ascendingNodesSouamiSouchay: 'target',
     // Feeds only trendError / directionMatch in script.js — compared against the

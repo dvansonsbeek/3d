@@ -11,6 +11,7 @@
  *                      the counterfactual surface, and what the hash covers.
  *   REFERENCE_DATA     validation targets + presentation. Single-sourced so
  *                      nothing duplicates them, but NOT injectable:
+ *   giaCoxChaoPeltier                target
  *   obliquityChapront2002            target
  *   ascendingNodesSouamiSouchay      target
  *   laplaceLagrangeBounds            target
@@ -622,6 +623,10 @@ export const REFERENCE_DATA = Object.freeze({
     "sunSpeed": 828000,
     "greatattractorDistance": 200000000,
     "milkywaySpeed": 2160000
+  },
+  giaCoxChaoPeltier: {
+    "dJ2DtPerYr": -2.7e-11,
+    "j2ToAlphaFactor": 2
   },
   jplEclipticInclinationTrends: {
     "mercury": -0.00595,

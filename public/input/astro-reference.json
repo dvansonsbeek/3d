@@ -252,6 +252,11 @@
       "trueAnomaly": 104.48097667
     }
   },
+  "giaCoxChaoPeltier": {
+    "_description": "GIA calibration literature anchors: Cox & Chao (2002, Science 297) satellite-gravimetry dJ2/dt and the Peltier ICE-6G LOD-coupling axisymmetric-GIA J2-to-alpha conversion factor. The SHIPPED product is the calibrated alphaClimateScalePerMille (model-parameters deepTime — calibrated so dalpha/dt at J2000 = dJ2Dt/factor = -1.35e-11/yr); these two are the citation inputs of that calibration, consumed only by the model-values registry (coxChaoDJ2Dt / giaJ2ToAlphaFactor / derived dAlphaDtJ2000 keys). The browser carries them in comments only (script.js ~:2375).",
+    "dJ2DtPerYr": -2.7e-11,
+    "j2ToAlphaFactor": 2.0
+  },
   "obliquityChapront2002": {
     "_description": "Chapront, Chapront-Touze & Francou (2002, A&A 387, 700) obliquity citation values at the ±12 kyr comparison epochs. Consumed by the model-values registry (obliqChapront* keys) for the Model-vs-literature obliquity tables; the website previously typed these as literals.",
     "deg10000BC": 24.3053,

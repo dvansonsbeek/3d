@@ -64,6 +64,17 @@ const hDivisor = (name, divisor, note, dp) => ({
   },
 });
 
+/** The website's scientific-notation convention: mantissa × 10 with unicode
+ *  superscript exponent (e.g. -3.93 × 10⁻⁷). Replicates its fmtSci exactly. */
+const fmtSci = (n, mantissaDecimals = 1) => {
+  if (!Number.isFinite(n) || n === 0) return String(n);
+  const exp = Math.floor(Math.log10(Math.abs(n)));
+  const mantissa = n / Math.pow(10, exp);
+  const supMap = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const expStr = String(exp).split('').map((c) => supMap[c] ?? c).join('');
+  return `${mantissa.toFixed(mantissaDecimals)} × 10${expStr}`;
+};
+
 /** The website's signed-percent convention: below the rendering threshold the
  *  string is "< 0.01"-style rather than a misleading "+0.00". */
 const fmtSignedPct = (n, decimals = 2) => {
@@ -998,6 +1009,42 @@ export const VALUES = {
     };
   })(),
 
+  // ── GIA α(t) constants + audit-26 + Babylon −135 (11-2s) ────────────────
+  // alphaJ2000 from astro physicalConstants; the calibrated scale LIVE from
+  // the engine (deep-time.js ALPHA_CLIMATE_SCALE — the value
+  // export-to-holistic syncs to the website); Cox & Chao dJ2/dt and the
+  // Peltier factor from the new giaCoxChaoPeltier citation block, with
+  // dAlphaDtJ2000 DERIVED (= dJ2Dt / factor) so the calibration identity
+  // auto-holds. The audit-26 verdict counts and the Babylon −135 case study
+  // are campaign measurements — recorded in eclipse-audit-summary.json's
+  // audit26/babylon135 sections (same maintenance note + planned generator),
+  // with the alignment/scan-reach/total rollups derived.
+  ...(() => {
+    const ecl = rd('data/eclipse-audit-summary.json');
+    const a26 = ecl.audit26, b135 = ecl.babylon135;
+    const alignment = () => a26.confirmed + a26.offPeak;
+    const scanReach = () => alignment() + a26.regional + a26.dtRegional;
+    return {
+      alphaJ2000:         { get: () => astro.physicalConstants.earthMoiFactorJ2000, render: (v) => String(v), note: 'IERS Conventions 2010 Earth moment-of-inertia factor' },
+      alphaClimateScale:  { get: () => dtl().ALPHA_CLIMATE_SCALE, render: (v) => fmtSci(v, 2), unit: 'per ‰', note: 'calibrated so dα/dt(J2000) matches Cox & Chao — live from the engine' },
+      dAlphaDtJ2000:      { get: () => astro.giaCoxChaoPeltier.dJ2DtPerYr / astro.giaCoxChaoPeltier.j2ToAlphaFactor, render: (v) => fmtSci(v, 2), unit: '/yr', note: 'DERIVED: dJ₂/dt ÷ Peltier factor, so the identity auto-holds' },
+      coxChaoDJ2Dt:       { get: () => astro.giaCoxChaoPeltier.dJ2DtPerYr, render: (v) => fmtSci(v, 1), unit: '/yr', note: 'Cox & Chao 2002 satellite gravimetry — citation' },
+      giaJ2ToAlphaFactor: { get: () => astro.giaCoxChaoPeltier.j2ToAlphaFactor, render: (v) => Number(v).toFixed(1), note: 'Peltier ICE-6G LOD-coupling axisymmetric-GIA factor — citation' },
+      solarAudit26Confirmed:  { get: () => a26.confirmed, render: (v) => thousands(v) },
+      solarAudit26OffPeak:    { get: () => a26.offPeak, render: (v) => thousands(v) },
+      solarAudit26Regional:   { get: () => a26.regional, render: (v) => thousands(v) },
+      solarAudit26DTRegional: { get: () => a26.dtRegional, render: (v) => thousands(v) },
+      solarAudit26Geographic: { get: () => a26.geographic, render: (v) => thousands(v) },
+      solarAudit26Alignment:  { get: alignment, render: (v) => thousands(v), note: 'derived: confirmed + off-peak' },
+      solarAudit26ScanReach:  { get: scanReach, render: (v) => thousands(v), note: 'derived: alignment + regional + ΔT-regional' },
+      solarAudit26Total:      { get: () => scanReach() + a26.geographic, render: (v) => thousands(v), note: 'derived rollup of the five verdict categories' },
+      babylon135BestGapKm:   { get: () => b135.bestGapKm, render: (v) => String(v), unit: 'km' },
+      babylon135BestDeltaUT: { get: () => b135.bestDeltaUT, render: (v) => String(v) },
+      babylon135FrameworkUT: { get: () => b135.frameworkUT, render: (v) => String(v) },
+      babylon135DocumentedUT: { get: () => b135.documentedUT, render: (v) => String(v) },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
@@ -1029,7 +1076,8 @@ export function resolveAll() {
   const out = new Map();
   for (const [key, spec] of Object.entries(VALUES)) {
     const raw = spec.get();
-    if (raw === undefined || raw === null || Number.isNaN(Number(raw))) {
+    const okString = typeof raw === 'string' && raw.length > 0;   // e.g. the Babylon UT strings
+    if (!okString && (raw === undefined || raw === null || Number.isNaN(Number(raw)))) {
       throw new Error(`model-values: key "${key}" resolved to ${raw} — the engine or artifact it reads has moved`);
     }
     out.set(key, spec.render(raw));
