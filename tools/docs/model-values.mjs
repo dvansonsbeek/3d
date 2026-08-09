@@ -2123,6 +2123,55 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Asc-node residuals + climate/ECS + null tests (11-2ap — the last
+  // actionable batch). Residuals LIVE from the falsification artifact's
+  // deep-analysis best anchor (porting caught five of seven site snapshots
+  // stale vs the current artifact — defect #11); Charney ECS trio from the
+  // seeded Monte-Carlo artifact; ice-albedo shares and the MPT pair from
+  // the per-regime artifact (the +31 pp shift DERIVED from its own pre/post
+  // values); the doc 97/98/103 campaign scalars from knownValues.
+  ...(() => {
+    const { bal } = balanceMachinery();
+    let ecsM = null, regM = null;
+    const ecs = () => { if (!ecsM) ecsM = rd('data/climate-ecs-monte-carlo.json'); return ecsM; };
+    const reg = () => { if (!regM) regM = rd('data/climate-ecs-per-regime.json'); return regM; };
+    const share = (regime, band) => 100 * reg()[regime].by_band[band].ice_share_weighted;
+    const residual = (p) => bal().deepAnalysis.configs[11].bestAnchor.perPlanet[p].errArcsec;
+    const kv = () => astro.knownValues;
+    const out = {
+      charneyECS:     { get: () => ecs().overall.median, render: (v) => Number(v).toFixed(2), unit: 'K' },
+      charneyECSLow:  { get: () => ecs().overall.p5, render: (v) => Number(v).toFixed(2), unit: 'K' },
+      charneyECSHigh: { get: () => ecs().overall.p95, render: (v) => Number(v).toFixed(2), unit: 'K' },
+      iceAlbedoShare100k:       { get: () => share('post_mpt', '100-kyr band (75-130)'), render: (v) => String(Math.round(v)), unit: '%' },
+      iceAlbedoShareObliquity:  { get: () => share('post_mpt', 'obliquity (35-50)'), render: (v) => String(Math.round(v)), unit: '%' },
+      iceAlbedoSharePrecession: { get: () => share('post_mpt', 'precession (18-26)'), render: (v) => String(Math.round(v)), unit: '%' },
+      iceAlbedoShareLong: { get: () => kv().iceAlbedoShareLongPct, render: (v) => String(v), unit: '%', note: 'doc 97 table — the per-regime artifact carries only the sub-130-kyr bands' },
+      mptObliquityIceSharePre:  { get: () => share('inhg_mpt', 'obliquity (35-50)'), render: (v) => String(Math.round(v)), unit: '%' },
+      mptObliquityIceSharePost: { get: () => share('post_mpt', 'obliquity (35-50)'), render: (v) => String(Math.round(v)), unit: '%' },
+      mptObliquityShiftPP: {
+        get: () => Math.round(share('inhg_mpt', 'obliquity (35-50)')) - Math.round(share('post_mpt', 'obliquity (35-50)')),
+        render: (v) => `+${v}`,
+        unit: 'pp',
+        note: 'derived from the artifact pre/post shares',
+      },
+      chengR2: { get: () => kv().chengR2, render: (v) => String(v) },
+      testAObliquityLagPercentile: { get: () => kv().testAObliquityLagPercentile, render: (v) => String(v), unit: '%' },
+      testAObliquityPeakMatch: { get: () => kv().testAObliquityPeakMatch, render: (v) => String(v) },
+      testAEccentricityNull: { get: () => kv().testAEccentricityNullPct, render: (v) => String(v), unit: '%' },
+      eightHDerivabilityTopPct: { get: () => kv().eightHDerivabilityTopPct, render: (v) => String(v), unit: '%' },
+      testCInvariantObliquityPct: { get: () => kv().testCInvariantObliquityPct, render: (v) => String(v), unit: '%' },
+      testCInvariantRandomPct: { get: () => kv().testCInvariantRandomPct, render: (v) => String(v), unit: '%' },
+      testCBalanceSaturnMult: { get: () => kv().testCBalanceSaturnMult, render: (v) => String(v) },
+      testCBalancePValue: { get: () => kv().testCBalancePValue, render: (v) => fmtSci(v, 0) },
+      testCLibrationPValue: { get: () => kv().testCLibrationPValue, render: (v) => String(v) },
+      testC50Window: { get: () => kv().testC50WindowMyr, render: (v) => `−${Math.abs(v)}`, unit: 'Myr' },
+    };
+    for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      out[`${p}AscNodeResidual`] = { get: () => residual(p), render: (v) => Number(v).toFixed(2), unit: '″/cy', note: 'live from the deep-analysis best anchor' };
+    }
+    return out;
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
