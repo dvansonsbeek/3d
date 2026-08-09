@@ -609,8 +609,6 @@ export declare const REFERENCE_DATA: {
     "milkyWayDistanceRangeLy": string;
     "milkyWaySpeedKmS": number;
     "milkyWayPeriodMyr": number;
-    "amdAlphaOptimalSpreadPct": number;
-    "amdAlphaNextBestSpreadPct": number;
     "laplaceLagrangeResidualDeg": number;
     "patternEarthAgeGyr": number;
     "moonGenesisAgeGa": number;

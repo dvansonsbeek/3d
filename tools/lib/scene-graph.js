@@ -149,7 +149,7 @@ const _mcJupiter = _mcPlanet.jupiter;   // the deep-time A2 argument feed (uncha
 // the two bounded Lp carriers with the anchor-const e0 (this mirror used
 // _fwEarthEcc(0)), and both argument branches). This engine injects its own
 // chain wrappers; env toggles ride along.
-const { createMoonArguments } = require('@hum/physics/moon/arguments');
+const { createMoonArguments, jdToDecimalYear } = require('@hum/physics/moon/arguments');
 let _moonArgsMTools = null;
 function _moonArgsM() {
   if (_moonArgsMTools === null) {
@@ -305,7 +305,12 @@ function _moonAberrationRaDecTools(jd, ra, dec) { return _moonApparentM().moonAb
 // TT — one clock for the ring and the Moon at every epoch.
 function _jdTTToolsFromUT(jd) {
   if (!DEEP_TIME_ENABLED) return jd;
-  const t_Ma = -(jd - C.j2000JD) / 365.2425 / 1e6;
+  // Browser convention (script.js Moon-series UT→TT, Phase 9.16): t_Ma from
+  // the CALENDAR decimal year vs J2000_CALENDAR_YEAR (= startmodelYear).
+  // This mirror carried a linear 365.2425 approximation — ~5-6 s of ΔT and
+  // ~1e-3° of Moon longitude adrift at the Babylonian epochs (measured
+  // against the browser via the -135 decomposition probe; modern was fine).
+  const t_Ma = (C.startmodelYear - jdToDecimalYear(jd)) / 1e6;
   const dT = DT.meanDeltaTSecondsAtAge(t_Ma);
   return Number.isFinite(dT) ? jd + dT / 86400 : jd;
 }

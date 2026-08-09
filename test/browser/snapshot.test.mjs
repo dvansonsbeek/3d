@@ -227,7 +227,13 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
       v[`ecl.solar.${tag}[${i}].ratio`] = e.moonSunRatio;
     });
   }
-  for (const jd of [2460409.262836, 2451401.971, 2460232.245]) {
+  // The three modern JDs pin the chain where NASA paths are known; the three
+  // ancient ones (the -135 Babylon preset JD, a point near its audit-scan
+  // minimum, and the -309 Babylon JD) pin the deep end the audit-26/Babylon
+  // Node port rides — the modern probes alone cannot see an ancient-epoch
+  // divergence in the spin/ΔT chain.
+  for (const jd of [2460409.262836, 2451401.971, 2460232.245,
+                    1671853.759762, 1671853.686, 1608421.835171]) {
     const us = T.eclUmbraSceneAt(jd);
     if (us) { v[`ecl.umbraScene@${jd}.lat`] = us.lat; v[`ecl.umbraScene@${jd}.lon`] = us.lon; }
     else v[`ecl.umbraScene@${jd}`] = null;

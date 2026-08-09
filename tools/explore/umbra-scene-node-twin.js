@@ -8,10 +8,14 @@
  * ride) in pure Node, verified against the regression fixture's
  * `ecl.umbraScene@JD` probes:
  *
- *   MEASURED (first verified run): 0.210 / 0.208 / 0.187 km gap at the
- *   three fixture JDs (2024 Dallas, 1999 Constanța, 2023 annular) —
- *   ~200 m, far below the audit's 300/1000 km verdict thresholds and its
- *   6–20 km scan sampling floor.
+ *   MEASURED: ≤ 0.001 km at ALL six fixture JDs — the three modern
+ *   (2024 Dallas, 1999 Constanța, 2023 annular) AND the three ancient
+ *   Babylonian probes. The first verified run read 0.19–0.21 km modern /
+ *   7–9 km ancient; both residuals were ONE bug — the engine's UT→TT
+ *   helper used a linear 365.2425 t_Ma while the browser uses the
+ *   calendar decimal year (fixed in tools/lib/scene-graph.js
+ *   _jdTTToolsFromUT). Far below the audit's 300/1000 km verdict
+ *   thresholds and its 6–20 km scan sampling floor.
  *
  * THE CHAIN (each piece was isolated before composing):
  *   · Sun + Earth: scene-graph scaffold world positions

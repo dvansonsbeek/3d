@@ -743,8 +743,6 @@ export const REFERENCE_DATA = Object.freeze({
     "milkyWayDistanceRangeLy": "25,000-28,000",
     "milkyWaySpeedKmS": 230,
     "milkyWayPeriodMyr": 250,
-    "amdAlphaOptimalSpreadPct": 0.11,
-    "amdAlphaNextBestSpreadPct": 28,
     "laplaceLagrangeResidualDeg": 0.001,
     "patternEarthAgeGyr": 4.54,
     "moonGenesisAgeGa": 4.498,
