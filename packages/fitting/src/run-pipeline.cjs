@@ -175,6 +175,15 @@ const STEPS = [
   { id: '7c', phase: 2, name: 'ΔT correction stack (Bond+Hallstatt+Jose5+Jose4)',
     cmd: 'DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write' },
 
+  // Phase 6b: Campaign artifacts (§12h follow-up work — runs by default so a
+  // pipeline pass leaves no generated artifact stale; the artifact-freshness
+  // gate in `npm run check` then verifies the recorded input hashes on every
+  // check without re-running these).
+  { id: '7d', phase: 2, name: 'Cassini moontilt results (runs both labs)',
+    cmd: 'node tools/verify/cassini-results.js --write', timeout: 20 * 60 * 1000 },
+  { id: '7e', phase: 2, name: 'Prediction fit stats (evaluation, ~7 min)',
+    cmd: 'python3 tools/fit/python/eval_precession_physical.py --write', timeout: 30 * 60 * 1000 },
+
   // Phase 7: Verify & sync
   { id: '8',  phase: 2, name: 'Verify pipeline',
     cmd: 'node tools/fit/verify-pipeline.js --write' },

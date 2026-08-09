@@ -312,9 +312,11 @@ console.log(`    sidereal year ${SIDEREAL_YEAR_D} d · M_E/M_M = ${MASS_RATIO_EM
 console.log(`  Measured target: ε_ecl = ${EPS_MEASURED}°`);
 console.log('─'.repeat(76));
 
+let EPS_RIGID_BROWN = null;   // captured for the --json result line (the shipped rigid-ellipse value)
 for (const [label, iDeg] of [['Brown/ELP i = 5.1453964° (catalog convention)', I_BROWN],
                              ['dynamical  i = 5.1573°   (DLT-1 shipped)',       I_DYNAMICAL]]) {
   const epsNum = solveEps(iDeg);
+  if (iDeg === I_BROWN) EPS_RIGID_BROWN = epsNum;
   const epsCF  = closedForm(iDeg);
   console.log(`  ${label}`);
   console.log(`    numerical torque-averaged equilibrium: ε = ${epsNum.toFixed(4)}°  (${(100*epsNum/EPS_MEASURED).toFixed(2)}% of measured)`);
@@ -421,4 +423,14 @@ if (process.argv.includes('--probe')) {
   console.log('      period wrong by 56 d. The residual is a real dynamical channel, and');
   console.log('      identifying it is now an explicit open item — not an attribution.');
   console.log('═'.repeat(76));
+
+  // Machine-readable result for tools/verify/cassini-results.js --write (the
+  // generator that owns data/cassini-moontilt-results.json).
+  if (process.argv.includes('--json')) {
+    console.log('@@CASSINI_JSON@@ ' + JSON.stringify({
+      rigidEllipse: EPS_RIGID_BROWN,
+      coupledAverage: epsPert,
+      measured: EPS_MEASURED,
+    }));
+  }
 }

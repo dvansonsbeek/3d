@@ -33,8 +33,10 @@
 const ELP = require('../lib/elp2000-82b');
 
 const DEG = Math.PI / 180;
-const YEARS = parseFloat(process.argv[2] || '250');
-const H = parseFloat(process.argv[3] || '0.5');          // integration step, days
+// Positional args (span years, step days) — flags like --json are skipped.
+const _positional = process.argv.slice(2).filter((a) => !a.startsWith('--'));
+const YEARS = parseFloat(_positional[0] || '250');
+const H = parseFloat(_positional[1] || '0.5');           // integration step, days
 
 // ── Constants (identical to the Cassini lab) ────────────────────────────────
 const J2_MOON = 203.305e-6, C22_MOON = 22.4261e-6, C_MR2 = 0.392728;
@@ -208,3 +210,12 @@ console.log('  Convergence: means agree between the two starts and are unchanged
 console.log('  the step size — the free modes (libration ~1057 d, precession ~81 yr) are');
 console.log('  oscillatory about the forced state and average out over this span.');
 console.log('═'.repeat(78));
+
+// Machine-readable result for tools/verify/cassini-results.js --write (the
+// generator that owns data/cassini-moontilt-results.json).
+if (process.argv.includes('--json')) {
+  console.log('@@CASSINI_JSON@@ ' + JSON.stringify({
+    eulerIntegration: epsEuler,
+    measured: EPS_MEASURED,
+  }));
+}
