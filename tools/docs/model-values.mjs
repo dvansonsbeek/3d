@@ -38,6 +38,95 @@ const rd = (p) => JSON.parse(readFileSync(join(ROOT, p), 'utf8'));
 const C = require(join(ROOT, 'tools', 'lib', 'constants.js'));
 /** Lazy deep-time engine (loads the ΔT/LOD chain on first key that needs it). */
 const dtl = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
+
+/** The SHIPPED predictive-precession basis, browser-true: the shared
+ *  @hum/physics predict module (snapshot planet-side phases — the basis the
+ *  physical coefficients were fitted against) wired with the browser's
+ *  deep-time Earth scalars (integrated-phase perihelion/ERD/obliquity,
+ *  epoch-H ERD ω). Lazy singleton shared by every key family that evaluates
+ *  fluctuations. */
+let _predictHelpersM = null;
+function predictiveMachinery() {
+  if (_predictHelpersM) return _predictHelpersM;
+  const phaseAt = (year, div) => {
+    const c = dtl().cyclesBetweenYears(C.balancedYear, year, div);
+    return c === null ? null : c * 2 * Math.PI;
+  };
+  const erdBrowserForm = (year) => {
+    const H_at = dtl().meanHAtAge((C.startmodelYear - year) / 1e6);
+    if (H_at === null) return 0;
+    let erd = 0;
+    for (const [period, sinC, cosC] of C.PERI_HARMONICS) {
+      const div = C.H / period;
+      const omega = 2 * Math.PI * div / H_at;
+      const ph = phaseAt(year, div);
+      if (ph === null) continue;
+      erd += sinC * omega * Math.cos(ph) - cosC * omega * Math.sin(ph);
+    }
+    return erd;
+  };
+  let predictM = null;
+  const predict = () => {
+    if (!predictM) {
+      const { createPredictivePrecession } = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'predict.cjs'));
+      const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
+      predictM = createPredictivePrecession({
+        getHYears: () => C.H,
+        getBalancedYear: () => C.balancedYear,
+        getPlanetFields: (k) => C.planets[k],
+        calcEarthPerihelionDeg: (year) => {
+          const mc = dtl().cyclesBetweenYears(C.balancedYear, year, 16);
+          if (mc === null) return 270.0;
+          let L = 270.0 + 360.0 * mc;
+          for (const [period, sinC, cosC] of C.PERI_HARMONICS) {
+            const ph = phaseAt(year, C.H / period);
+            if (ph === null) continue;
+            L += sinC * Math.sin(ph) + cosC * Math.cos(ph);
+          }
+          return ((L + C.PERI_OFFSET) % 360 + 360) % 360;
+        },
+        calcErdRate: erdBrowserForm,
+        computeObliquityEarthDeg: (year) => {
+          let o = C.SOLSTICE_OBLIQUITY_MEAN;
+          for (const [div, sinC, cosC] of C.SOLSTICE_OBLIQUITY_HARMONICS) {
+            const ph = phaseAt(year, div);
+            if (ph === null) continue;
+            o += sinC * Math.sin(ph) + cosC * Math.cos(ph);
+          }
+          return o;
+        },
+        computeEccentricityEarth: (year) => oe.computeEccentricityEarth(year),
+        obliquityMeanDeg: C.SOLSTICE_OBLIQUITY_MEAN,
+        eccentricityMean: Math.sqrt(C.eccentricityBase ** 2 + C.eccentricityAmplitude ** 2),
+      });
+    }
+    return predictM;
+  };
+  let coeffsM = null;
+  const coeffs = (p) => {
+    if (!coeffsM) coeffsM = rd('public/input/fitted-coefficients.json').PREDICT_COEFFS_PHYSICAL;
+    return coeffsM[p];
+  };
+  const fluct = (y, p) => {
+    const f = predict().buildPredictiveFeatures(y, p);
+    const c = coeffs(p);
+    let s = 0;
+    for (let i = 0; i < c.length; i++) s += f[i] * c[i];
+    return s;
+  };
+  const periFraction8 = (planet) => {
+    const [num, den] = model.planets[planet].perihelionEclipticFraction;
+    return (8 * den / Math.abs(num)) * Math.sign(num);
+  };
+  const latticeBaseline = (planet) => {
+    if (planet === 'uranus') return Math.sign(periFraction8(planet)) * 1296000 / (C.H / 3) * 100;
+    const n8 = periFraction8(planet);
+    return Math.sign(n8) * 1296000 / ((8 * C.H) / Math.abs(n8)) * 100;
+  };
+  const totalPrecession = (y, p) => latticeBaseline(p) + fluct(y, p);
+  _predictHelpersM = { fluct, erdBrowserForm, totalPrecession, latticeBaseline };
+  return _predictHelpersM;
+}
 const model = rd('public/input/model-parameters.json');
 const astro = rd('public/input/astro-reference.json');
 const dtFit = rd('data/deltaT-4flag-fit.json');
@@ -1550,67 +1639,7 @@ export const VALUES = {
   // to the year. Geocentric chain = ICRF citations + the general-precession
   // equinox drift (knownValues).
   ...(() => {
-    let predictM = null;
-    const phaseAt = (year, div) => {
-      const c = dtl().cyclesBetweenYears(C.balancedYear, year, div);
-      return c === null ? null : c * 2 * Math.PI;
-    };
-    const predict = () => {
-      if (!predictM) {
-        const { createPredictivePrecession } = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'predict.cjs'));
-        const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
-        predictM = createPredictivePrecession({
-          getHYears: () => C.H,
-          getBalancedYear: () => C.balancedYear,
-          getPlanetFields: (k) => C.planets[k],
-          calcEarthPerihelionDeg: (year) => {
-            const mc = dtl().cyclesBetweenYears(C.balancedYear, year, 16);
-            if (mc === null) return 270.0;
-            let L = 270.0 + 360.0 * mc;
-            for (const [period, sinC, cosC] of C.PERI_HARMONICS) {
-              const ph = phaseAt(year, C.H / period);
-              if (ph === null) continue;
-              L += sinC * Math.sin(ph) + cosC * Math.cos(ph);
-            }
-            return ((L + C.PERI_OFFSET) % 360 + 360) % 360;
-          },
-          calcErdRate: erdBrowserForm,
-          computeObliquityEarthDeg: (year) => {
-            let o = C.SOLSTICE_OBLIQUITY_MEAN;
-            for (const [div, sinC, cosC] of C.SOLSTICE_OBLIQUITY_HARMONICS) {
-              const ph = phaseAt(year, div);
-              if (ph === null) continue;
-              o += sinC * Math.sin(ph) + cosC * Math.cos(ph);
-            }
-            return o;
-          },
-          computeEccentricityEarth: (year) => oe.computeEccentricityEarth(year),
-          obliquityMeanDeg: C.SOLSTICE_OBLIQUITY_MEAN,
-          eccentricityMean: Math.sqrt(C.eccentricityBase ** 2 + C.eccentricityAmplitude ** 2),
-        });
-      }
-      return predictM;
-    };
-    function erdBrowserForm(year) {
-      const H_at = dtl().meanHAtAge((C.startmodelYear - year) / 1e6);
-      if (H_at === null) return 0;
-      let erd = 0;
-      for (const [period, sinC, cosC] of C.PERI_HARMONICS) {
-        const div = C.H / period;
-        const omega = 2 * Math.PI * div / H_at;
-        const ph = phaseAt(year, div);
-        if (ph === null) continue;
-        erd += sinC * omega * Math.cos(ph) - cosC * omega * Math.sin(ph);
-      }
-      return erd;
-    }
-    const fluct = (y, p) => {
-      const f = predict().buildPredictiveFeatures(y, p);
-      const c = rd('public/input/fitted-coefficients.json').PREDICT_COEFFS_PHYSICAL[p];
-      let s = 0;
-      for (let i = 0; i < c.length; i++) s += f[i] * c[i];
-      return s;
-    };
+    const { fluct, erdBrowserForm } = predictiveMachinery();
     let scans = null;
     const scan = () => {
       if (!scans) {
@@ -1669,6 +1698,40 @@ export const VALUES = {
     for (const p of ['venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${p}FluctuationMin`] = { get: () => scan()[p].mn, render: fmtSignedInt, unit: '″/cy' };
       out[`${p}FluctuationMax`] = { get: () => scan()[p].mx, render: fmtSignedInt, unit: '″/cy' };
+    }
+    return out;
+  })(),
+
+  // ── J2000 rates + BepiColombo projection (11-2ag) ───────────────────────
+  // All through the shared predictive machinery: J2000 rate = lattice
+  // baseline + fluctuation(2000); the Bepi chain projects MESSENGER's Park
+  // 2017 measurement forward 14 yr (2013→2027) with the model's own
+  // per-century rate decrease, so all three values stay self-consistent by
+  // derivation. Earth's row is the observed heliocentric citation (its own
+  // apsidal derivation, not the 7-planet formula).
+  ...(() => {
+    const pm = predictiveMachinery;
+    const rateDecreasePerCy = () => (pm().totalPrecession(1800, 'mercury') - pm().totalPrecession(2100, 'mercury')) / 3;
+    const bepiPredictedDiff = () => rateDecreasePerCy() * 14 / 100;   // MESSENGER ~2013 → BepiColombo ~2027
+    const fmtSignedInt = (v) => `${v >= 0 ? '+' : '-'}${thousands(Math.abs(Math.round(v)))}`;
+    const out = {
+      mercuryRateDecreasePerCy: { get: rateDecreasePerCy, render: (v) => thousands(v, 1), unit: '″/cy per cy', note: '1800→2100 delta ÷ 3' },
+      mercuryBepiPredictedDiff: { get: bepiPredictedDiff, render: (v) => thousands(v, 2), unit: '″' },
+      mercuryBepiPrecisionRatio: {
+        get: () => Math.round(bepiPredictedDiff() / astro.knownValues.bepiColomboPrecisionArcsec / 100) * 100,
+        render: (v) => thousands(v),
+        note: 'predicted gap over BepiColombo\'s 0.0015″ precision, to the nearest hundred',
+      },
+      mercuryBepicolomboPredict: {
+        get: () => astro.knownValues.mercuryPark2017RateArcsecCy - bepiPredictedDiff(),
+        render: (v) => thousands(v, 2),
+        unit: '″/cy',
+      },
+      earthJ2000Rate: { get: () => astro.knownValues.earthObservedRateHelioArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'observed heliocentric citation — Earth has its own apsidal derivation' },
+    };
+    for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      out[`${p}J2000Rate`] = { get: () => pm().totalPrecession(2000, p), render: (v) => thousands(Math.round(v)), unit: '″/cy' };
+      out[`${p}J2000Fluct`] = { get: () => pm().fluct(2000, p), render: fmtSignedInt, unit: '″/cy' };
     }
     return out;
   })(),

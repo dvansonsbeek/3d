@@ -593,6 +593,7 @@ export declare const REFERENCE_DATA: {
     "neptuneObservedRateArcsecCy": number;
     "ascNodeJointRmsArcsec": number;
     "generalPrecessionArcsecCy": number;
+    "bepiColomboPrecisionArcsec": number;
     "mainstreamAxialPrecKyr": number;
     "mainstreamPeriPrecKyr": number;
     "mainstreamObliqCycleKyr": number;
