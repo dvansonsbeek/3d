@@ -705,6 +705,7 @@ export const REFERENCE_DATA = Object.freeze({
     "uranusObservedRateArcsecCy": 1100,
     "neptuneObservedRateArcsecCy": 200,
     "ascNodeJointRmsArcsec": 5.8,
+    "generalPrecessionArcsecCy": 5028.8,
     "mainstreamAxialPrecKyr": 26,
     "mainstreamPeriPrecKyr": 21,
     "mainstreamObliqCycleKyr": 41,
