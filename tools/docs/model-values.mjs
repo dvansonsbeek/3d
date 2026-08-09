@@ -1319,6 +1319,46 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── ICRF perihelion periods (11-2aa) ────────────────────────────────────
+  // Structural identity, verified against all eight site divisors: the ICRF
+  // perihelion rate is the ecliptic rate minus the H/13 axial frame term —
+  // in eighths-of-8H, n8_ICRF = n8_ecliptic − 104. Derives entirely from the
+  // stored perihelionEclipticFraction (Earth from its structural H/16
+  // effective period, n8 = 128 → 8H/24 = H/3); no new data.
+  ...(() => {
+    const n8Ecliptic = (planet) => {
+      if (planet === 'earth') return 128;   // H/16 effective period
+      const [num, den] = model.planets[planet].perihelionEclipticFraction;
+      return (8 * den / Math.abs(num)) * Math.sign(num);
+    };
+    const out = {};
+    for (const planet of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      out[`${planet}PeriPeriodICRF`] = {
+        get: () => (8 * C.H) / Math.abs(n8Ecliptic(planet) - 104),
+        render: (v) => thousands(Math.round(v)),
+        unit: 'yr',
+        note: 'ecliptic lattice rate − H/13 frame term',
+      };
+    }
+    return out;
+  })(),
+
+  // ── Semi-major axes (11-2aa) — Kepler over the quantized year inputs ────
+  // a = (T_planet / mSY)^(2/3), T from the tracked per-planet solarYearInput
+  // (the model's quantized orbital period in days); Earth 1.0 by definition.
+  ...(() => {
+    const out = { earthSemiMajor: { get: () => 1, render: (v) => Number(v).toFixed(4), unit: 'AU', note: 'by definition' } };
+    for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      out[`${planet}SemiMajor`] = {
+        get: () => Math.pow(C.planets[planet].solarYearInput / C.meanSolarYearDays, 2 / 3),
+        render: (v) => Number(v).toFixed(4),
+        unit: 'AU',
+        note: 'Kepler: (solarYearInput / mSY)^(2/3)',
+      };
+    }
+    return out;
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
