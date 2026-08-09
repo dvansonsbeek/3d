@@ -144,7 +144,18 @@ function predictiveMachinery() {
     return Math.sign(n8) * 1296000 / ((8 * C.H) / Math.abs(n8)) * 100;
   };
   const totalPrecession = (y, p) => latticeBaseline(p) + fluct(y, p);
-  _predictHelpersM = { fluct, erdBrowserForm, totalPrecession, latticeBaseline };
+  const calcEarthPerihelionDeg = (year) => {
+    const mc = dtl().cyclesBetweenYears(C.balancedYear, year, 16);
+    if (mc === null) return 270.0;
+    let L = 270.0 + 360.0 * mc;
+    for (const [period, sinC, cosC] of C.PERI_HARMONICS) {
+      const ph = phaseAt(year, C.H / period);
+      if (ph === null) continue;
+      L += sinC * Math.sin(ph) + cosC * Math.cos(ph);
+    }
+    return ((L + C.PERI_OFFSET) % 360 + 360) % 360;
+  };
+  _predictHelpersM = { fluct, erdBrowserForm, totalPrecession, latticeBaseline, calcEarthPerihelionDeg };
   return _predictHelpersM;
 }
 const model = rd('public/input/model-parameters.json');
@@ -1922,6 +1933,47 @@ export const VALUES = {
     };
     for (const p of planets8) {
       out[`${p}EccWeightSci`] = { get: () => eccWeight(p), render: (v) => fmtSci(v, 3) };
+    }
+    return out;
+  })(),
+
+  // ── Calibration scalars + periLong/ecc comparison tables (11-2al) ───────
+  // Model perihelion longitudes through the shared browser-form evaluator;
+  // Meeus (1998) citations in knownValues; Laskar eccentricities DERIVED
+  // from the tracked la2004 artifact (the site types them while citing that
+  // file — same pattern as the obliquity tables); calibration scalars from
+  // model-parameters foundational; earthRAAngle is the derived 2A − A²/ε.
+  ...(() => {
+    const laskarEcc = (calYear) => {
+      const rows = new Map(rd('public/input/la2004-orbital-solution.json').data.map((r) => [r.year, r.eccentricity]));
+      const t = calYear - 2000;
+      if (rows.has(t)) return rows.get(t);
+      const lo = Math.floor(t / 1000) * 1000;
+      const hi = lo + 1000;
+      if (!rows.has(lo) || !rows.has(hi)) throw new Error(`model-values: La2004 grid has no bracket for ${calYear}`);
+      return rows.get(lo) + ((t - lo) / 1000) * (rows.get(hi) - rows.get(lo));
+    };
+    const oeEcc = (y) => require(join(ROOT, 'tools', 'lib', 'orbital-engine.js')).computeEccentricityEarth(y);
+    const out = {
+      startAngleModel: { get: () => model.foundational.startAngleModel, render: (v) => Number(v).toFixed(8), unit: '°' },
+      correctionDays: { get: () => model.foundational.correctionDays, render: (v) => Number(v).toFixed(4), unit: 'd' },
+      earthRAAngle: {
+        get: () => 2 * C.earthInvPlaneInclinationAmplitude - C.earthInvPlaneInclinationAmplitude ** 2 / model.earth.earthtiltMean,
+        render: (v) => `~${Number(v).toFixed(3)}`,
+        unit: '°',
+        note: 'derived: 2A − A²/ε',
+      },
+      speedOfLight: { get: () => astro.physicalConstants.speedOfLight, render: (v) => thousands(v, 3), unit: 'km/s' },
+      periLongJ2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000, render: (v) => Number(v).toFixed(3), unit: '°' },
+      periLongShift1246to2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000 - 90, render: (v) => Number(v).toFixed(3), unit: '°', note: 'derived: J2000 longitude − the 90° alignment value' },
+    };
+    for (const [year, key] of [[1000, '1000AD'], [1246, '1246AD'], [2000, '2000AD'], [2500, '2500AD'], [3000, '3000AD']]) {
+      out[`periLongModel${key}`] = { get: () => predictiveMachinery().calcEarthPerihelionDeg(year), render: (v) => Number(v).toFixed(3), unit: '°' };
+      out[`periLongMeeus${key}`] = { get: () => astro.knownValues[`meeusPeriLong${key}`], render: (v) => Number(v).toFixed(3), unit: '°', note: 'Meeus (1998) citation' };
+    }
+    for (const [year, key] of [[2000, '2000AD'], [3000, '3000AD'], [5000, '5000AD'], [10000, '10000AD'], [11725, '11725AD'], [12000, '12000AD'], [15000, '15000AD'], [27000, '27000AD']]) {
+      out[`eccModel${key}`] = { get: () => oeEcc(year), render: (v) => Number(v).toFixed(5) };
+      out[`eccLaskar${key}`] = { get: () => laskarEcc(year), render: (v) => Number(v).toFixed(5), note: 'La2004 from the tracked artifact (interpolated where off-grid)' };
     }
     return out;
   })(),

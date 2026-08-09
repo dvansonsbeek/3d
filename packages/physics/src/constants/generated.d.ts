@@ -603,6 +603,11 @@ export declare const REFERENCE_DATA: {
     "amdAlphaOptimalSpreadPct": number;
     "amdAlphaNextBestSpreadPct": number;
     "laplaceLagrangeResidualDeg": number;
+    "meeusPeriLong1000AD": number;
+    "meeusPeriLong1246AD": number;
+    "meeusPeriLong2000AD": number;
+    "meeusPeriLong2500AD": number;
+    "meeusPeriLong3000AD": number;
     "mainstreamAxialPrecKyr": number;
     "mainstreamPeriPrecKyr": number;
     "mainstreamObliqCycleKyr": number;
