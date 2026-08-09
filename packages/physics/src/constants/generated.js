@@ -32,11 +32,11 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "5a036e22fb272a0f";
+export const CONSTANTS_HASH = "b87b5f38f3cf5b80";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "5a036e22fb272a0f",
+  hash: "b87b5f38f3cf5b80",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -295,7 +295,9 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     },
     "earthJ2": 0.00108262668,
     "earthEquatorialRadiusKm": 6378.1366,
-    "earthParallaxRadiusKm": 6378.1369994839
+    "earthParallaxRadiusKm": 6378.1369994839,
+    "solarParallaxArcsec": 8.794143836,
+    "arcsecDisplacementKm": 725.270943796471
   },
   planetOrbitalElements: {
     "mercury": {

@@ -259,6 +259,12 @@ const MIGRATED = [
  * @type {Record<string, string>}
  */
 const NOT_IN_SCRIPT = {
+  'astro.physicalConstants.solarParallaxArcsec':
+    'IAU 1976 parallax-chain member — registry key + the appendix chain note; '
+    + 'script.js consumes only the chain products (currentAUDistance, parallax radius).',
+  'astro.physicalConstants.arcsecDisplacementKm':
+    'historical parallax-chain primitive (the website builds ONE_AU_KM from it) — '
+    + 'registry key; script.js consumes only currentAUDistance.',
   'astro.moonGrailWilliams2014':
     'GRAIL/LLR lunar gravity citations (Williams 2014) — consumed by the Cassini '
     + 'moontilt labs (tools/explore, which carry local copies) and the model-values '

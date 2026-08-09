@@ -36,6 +36,9 @@
     "earthJ2": 0.00108262668,
     "earthEquatorialRadiusKm": 6378.1366,
     "earthParallaxRadiusKm": 6378.1369994839,
+    "solarParallaxArcsec": 8.794143836,
+    "arcsecDisplacementKm": 725.270943796471,
+    "_parallaxChainNote": "Two more members of the appendix parallax chain (see _earthRadiiNote): solarParallaxArcsec is the IAU 1976 defining constant; arcsecDisplacementKm is the 1-arcsec displacement at 1 AU, the historical-chain primitive the website builds its ONE_AU_KM from (displacement x 648000/pi = 149,597,870.6988278 — matches currentAUDistance to 0.2 mm at stored precision; the radius/parallax route reproduces AU to ~8 m, the documented tiny inconsistency). Consumed by the model-values registry (solarParallax / arcsecDisplacement keys); the browser uses neither directly.",
     "_earthRadiiNote": "TWO radius quantities, deliberately distinct. earthEquatorialRadiusKm = IAU 2015 nominal equatorial radius (geodetic convention; the correct radius for the J2 figure-of-Earth term). earthParallaxRadiusKm = the parallax-consistent radius, matched pair of currentAUDistance via the appendix chain: r / solarParallax(8.794143836 arcsec) x (648000/pi) = 149,597,870.698828 km. The website's EARTH_RADIUS_KM and the earthRadius/Diameter/Circumference display keys use the parallax radius. Merging them would conflate a geodetic convention with the parallax/AU system's length (IAU 1976 a_E was 6378.140) — same unit-conflation class as LOD-days vs SI-days."
   },
   "earthOrbital": {

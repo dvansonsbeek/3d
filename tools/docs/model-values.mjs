@@ -1198,6 +1198,29 @@ export const VALUES = {
     };
   })(),
 
+  // ── Parallax chain + wobble-circle geometry (11-2x) ─────────────────────
+  // The parallax-chain members from astro physicalConstants (solarParallax is
+  // the IAU 1976 defining constant; arcsecDisplacement is the historical
+  // primitive the website builds its AU from — displacement × 648000/π =
+  // currentAUDistance to 0.2 mm, see the chain note). The apo family is the
+  // wobble circle: radius = eccentricity amplitude × model AU, swept once
+  // per H/13 axial cycle.
+  ...(() => {
+    const APR = () => (180 * 3600) / Math.PI;
+    const apoRadius = () => model.earth.eccentricityAmplitude * C.currentAUDistance;
+    return {
+      arcsecPerRadian:    { get: APR, render: (v) => thousands(v, 9), note: 'structural: 180·3600/π' },
+      arcsecDisplacement: { get: () => astro.physicalConstants.arcsecDisplacementKm, render: (v) => thousands(v, 12), unit: 'km', note: '1-arcsec displacement at 1 AU — the historical parallax-chain primitive' },
+      oneParsec:          { get: () => C.currentAUDistance * APR(), render: (v) => thousands(v, 1), unit: 'km' },
+      solarParallax:      { get: () => astro.physicalConstants.solarParallaxArcsec, render: (v) => String(v), unit: '″', note: 'IAU 1976 defining constant' },
+      apoRadius:        { get: apoRadius, render: (v) => thousands(v, 2), unit: 'km' },
+      apoDiameter:      { get: () => 2 * apoRadius(), render: (v) => thousands(v, 2), unit: 'km' },
+      apoCircumference: { get: () => 2 * Math.PI * apoRadius(), render: (v) => thousands(v, 2), unit: 'km' },
+      apoSpeed:         { get: () => (2 * Math.PI * apoRadius()) / ((C.H / 13) * 24 * 365.25), render: (v) => thousands(v, 10), unit: 'km/h', note: 'wobble-circle speed over the H/13 cycle (Julian-year hours)' },
+      apoSpeedKmYear:   { get: () => (2 * Math.PI * apoRadius()) / (C.H / 13), render: (v) => thousands(v, 0), unit: 'km/yr' },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
