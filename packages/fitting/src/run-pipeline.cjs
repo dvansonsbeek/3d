@@ -185,8 +185,8 @@ const STEPS = [
     cmd: 'python3 tools/fit/python/eval_precession_physical.py --write', timeout: 30 * 60 * 1000 },
   { id: '7f', phase: 2, name: 'LOD-climate correlation summary',
     cmd: 'node tools/verify/lod-climate-correlation.js --write' },
-  { id: '7g', phase: 2, name: 'Eclipse audit summary (L-5b/L-7 sections)',
-    cmd: 'node tools/verify/eclipse-audit.js --write' },
+  { id: '7g', phase: 2, name: 'Eclipse audit summary (L-5b/L-7 + audit-26, ~2-4 min)',
+    cmd: 'node tools/verify/eclipse-audit.js --write', timeout: 15 * 60 * 1000 },
 
   // Phase 7: Verify & sync
   { id: '8',  phase: 2, name: 'Verify pipeline',

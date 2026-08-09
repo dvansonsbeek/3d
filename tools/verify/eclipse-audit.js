@@ -23,12 +23,18 @@
  *   4. Mean |residual| vs observation per model + events where the
  *      framework lands closer than NASA.
  *
- * The `audit26` and `babylon135` sections need the scene-umbra geography
- * chain (browser `umbraFromSceneAtJd` — analytic sphere-piercing on scene
- * world positions + Earth's world quaternion, which the finders package
- * deliberately excludes, §2h). Until that chain has a proven Node twin,
- * this generator PRESERVES those sections verbatim as the hand-recorded
- * snapshots they are (marked so in their `_description`s).
+ * Campaigns (b) audit-26 and (c) Babylon −135 (Phase 3b/3c) ride the
+ * scene-umbra chain, ported here on top of the PROVEN Node twin
+ * (tools/explore/umbra-scene-node-twin.js — 0.19–0.21 km against the
+ * browser fixture's ecl.umbraScene probes; thresholds are 300/1000 km):
+ * the browser's 26-preset loop verbatim — model UT from the shared
+ * @hum/physics eclipse finders (wired to the engine's truncated Meeus
+ * series + framework ΔT), umbra gap at preset/model UT, the ±4h scan at
+ * 30-s steps, and the five-way verdict classification
+ * (script.js:30127-30190). The audit26/babylon135 sections are written
+ * GENERATED only when the run reproduces the recorded verdict counts and
+ * Babylon numbers exactly; on any divergence they are preserved verbatim
+ * and the divergence is reported (exact-reproduction rule).
  *
  *   node tools/verify/eclipse-audit.js            # compute + compare
  *   node tools/verify/eclipse-audit.js --write    # + write artifact
@@ -38,6 +44,10 @@ const fs = require('fs');
 const path = require('path');
 const { ROOT, buildInputsBlock } = require('../lib/artifact-inputs');
 const DT = require('../lib/deep-time');
+const C = require('../lib/constants.js');
+const SG = require('../lib/scene-graph.js');
+const { umbraFromSceneAtJdNode } = require('../explore/umbra-scene-node-twin.js');
+const { createEclipseFinders } = require('@hum/physics/eclipse/finders');
 
 const OUT = path.join(ROOT, 'data', 'eclipse-audit-summary.json');
 const WRITE = process.argv.includes('--write');
@@ -50,6 +60,15 @@ const INPUT_FILES = [
   'data/deltaT-4flag-fit.json',
   'data/core-mantle-resonator-stage1.json',
   'packages/physics/src/deltat/cycles.cjs',
+  // the audit-26 / Babylon scene-umbra chain:
+  'tools/explore/umbra-scene-node-twin.js',
+  'tools/lib/scene-graph.js',
+  'packages/physics/src/eclipse/finders.cjs',
+  'packages/physics/src/moon/series.cjs',
+  'packages/physics/src/moon/apparent.cjs',
+  'public/input/astro-reference.json',
+  'public/input/model-parameters.json',
+  'public/input/fitted-coefficients.json',
 ];
 
 function rd(rel) {
@@ -126,6 +145,280 @@ for (const [section, computed] of [['lunar', lunar], ['solar', solar]]) {
   }
 }
 
+// ─── Campaigns (b)+(c): the 26-preset alignment audit + Babylon −135 ────────
+// Browser 'Audit all 26 solar eclipse presets' loop verbatim, on the proven
+// umbra twin. Constants and data are exact copies of the button's.
+
+const GAP_OK_KM = 300;
+const GAP_REGIONAL_KM = 1000;
+const SCAN_WIN_H = 4;
+const SCAN_STEP_MIN = 0.5;
+const PRESET_JD_OFF_MIN = 30;
+const BABYLON_JD = 1671853.759762;
+
+// { jd, label } from ECLIPSE_PRESETS (script.js:24253) — the audit uses only these two fields.
+const ECLIPSE_PRESETS = [
+  { jd: 2461265.241042, label: '2026 Aug 12 Total' },
+  { jd: 2460409.262050, label: '2024 Apr 8 Total' },
+  { jd: 2457987.267733, label: '2017 Aug 21 Total' },
+  { jd: 2451401.960508, label: '1999 Aug 11 Total' },
+  { jd: 2441863.985208, label: '1973 Jun 30 Total' },
+  { jd: 2422108.047858, label: '1919 May 29 Total' },
+  { jd: 2347572.902675, label: '1715 May 3 Total' },
+  { jd: 2325394.925106, label: '1654 Aug 12 Total' },
+  { jd: 2173756.000111, label: '1239 Jun 3 Total' },
+  { jd: 2154000.058445, label: '1185 May 1 Annular' },
+  { jd: 2135100.002430, label: '1133 Aug 2 Total' },
+  { jd: 2087792.051441, label: '1004 Jan 24 Annular' },
+  { jd: 2083982.839931, label: '993 Aug 20 Annular' },
+  { jd: 2081030.093891, label: '985 Jul 20 Annular' },
+  { jd: 2078785.134930, label: '979 May 28 Annular' },
+  { jd: 2078431.006474, label: '978 Jun 8 Annular' },
+  { jd: 2078253.853718, label: '977 Dec 13 Total' },
+  { jd: 1747068.890110, label: '71 Mar 20 Total' },
+  { jd: 1671853.759762, label: '-135 Apr 15 Total' },
+  { jd: 1608421.835171, label: '-309 Aug 15 Total' },
+  { jd: 1564215.113895, label: '-430 Aug 3 Annular' },
+  { jd: 1518118.032841, label: '-556 May 19 Partial' },
+  { jd: 1507900.104145, label: '-584 May 28 Total' },
+  { jd: 1484836.848499, label: '-647 Apr 6 Partial' },
+  { jd: 1462658.779682, label: '-708 Jul 17 Total' },
+  { jd: 1442902.839207, label: '-762 Jun 15 Total' },
+];
+
+// Site coordinates (script.js audit button, keyed by preset JD).
+const SITES = new Map([
+  [2461265.241042, { name: 'Burgos–central path', lat: 42.34, lon: -3.70 }],
+  [2460409.262050, { name: 'Dallas–central path', lat: 32.78, lon: -96.80 }],
+  [2457987.267733, { name: 'Carbondale, IL', lat: 37.73, lon: -89.22 }],
+  [2451401.960508, { name: 'Constanța, Romania', lat: 44.18, lon: 28.65 }],
+  [2441863.985208, { name: 'Niger (Agadez)', lat: 16.97, lon: 7.99 }],
+  [2422108.047858, { name: 'Príncipe (Eddington)', lat: 1.60, lon: 7.40 }],
+  [2347572.902675, { name: 'London (Halley)', lat: 51.50, lon: -0.10 }],
+  [2325394.925106, { name: 'London (European total)', lat: 51.50, lon: -0.10 }],
+  [2173756.000111, { name: 'Tuscany (Cerchiari)', lat: 43.70, lon: 10.40 }],
+  [2154000.058445, { name: 'Russia (Igor’s Tale)', lat: 50.00, lon: 38.00 }],
+  [2135100.002430, { name: 'England (Henry I)', lat: 52.00, lon: -2.00 }],
+  [2087792.051441, { name: 'Cairo (Ibn Yunus)', lat: 30.05, lon: 31.24 }],
+  [2083982.839931, { name: 'Cairo (Ibn Yunus)', lat: 30.05, lon: 31.24 }],
+  [2081030.093891, { name: 'Cairo (Said-Stephenson)', lat: 30.05, lon: 31.24 }],
+  [2078785.134930, { name: 'Cairo (Said-Stephenson)', lat: 30.05, lon: 31.24 }],
+  [2078431.006474, { name: 'Cairo (Said-Stephenson)', lat: 30.05, lon: 31.24 }],
+  [2078253.853718, { name: 'Cairo (Ibn Yunus)', lat: 30.05, lon: 31.24 }],
+  [1747068.890110, { name: 'Aegean (Plutarch)', lat: 38.00, lon: 25.00 }],
+  [1671853.759762, { name: 'Babylon', lat: 32.50, lon: 44.40 }],
+  [1608421.835171, { name: 'Babylon (Antigonus)', lat: 32.50, lon: 44.40 }],
+  [1564215.113895, { name: 'Athens (Thucydides)', lat: 37.97, lon: 23.72 }],
+  [1518118.032841, { name: 'Babylon (Nabonidus)', lat: 32.50, lon: 44.40 }],
+  [1507900.104145, { name: 'Anatolia (Thales/Halys)', lat: 39.00, lon: 35.00 }],
+  [1484836.848499, { name: 'Babylon (early diary)', lat: 32.50, lon: 44.40 }],
+  [1462658.779682, { name: 'Lu State (Chinese)', lat: 35.60, lon: 117.00 }],
+  [1442902.839207, { name: 'Nineveh (Bur-Sagale)', lat: 36.36, lon: 43.16 }],
+]);
+
+const AR_FULL = rd('public/input/astro-reference.json');
+const BD = AR_FULL.bodyDiametersKm;
+
+// gcKmFromLatLon (script.js:45208) — haversine on the codebase's Earth radius.
+function gcKm(lat1, lon1, lat2, lon2) {
+  const d2r = Math.PI / 180;
+  const R_E_km = BD.earth / 2;
+  const f1 = lat1 * d2r, f2 = lat2 * d2r;
+  const df = (lat2 - lat1) * d2r;
+  const dl = (lon2 - lon1) * d2r;
+  const a = Math.sin(df / 2) ** 2 + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) ** 2;
+  return 2 * R_E_km * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function jdToHMM(jd) {
+  const frac = (jd + 0.5) - Math.floor(jd + 0.5);
+  const totalMin = Math.round(frac * 24 * 60);
+  const h = Math.floor(totalMin / 60) % 24;
+  const m = totalMin % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+function fmtDt(dtMin) {   // ASCII '-' where the browser prints U+2212
+  const sign = dtMin >= 0 ? '+' : '-';
+  const absDt = Math.abs(dtMin);
+  const h = Math.floor(absDt / 60);
+  const m = Math.round(absDt - h * 60);
+  return `${sign}${h}h${String(m).padStart(2, '0')}`;
+}
+
+// The shared eclipse finders, wired like the browser's _eclipse() but with
+// the engine twins: the truncated Meeus series + frameworkDeltaT.
+const MS = SG._moonSeriesForProbe();
+const finders = createEclipseFinders({
+  moonLonDegAt: (jd) => MS.truncatedLonDeg(jd),
+  moonBetaDegAt: (jd) => MS.truncatedBetaDeg(jd),
+  moonDistanceKmAt: (jd) => MS.truncatedDistanceKm(jd),
+  deltaTSecondsAt: (jd) => DT.frameworkDeltaT(jd),
+  getSynodicMonthDays: () => C.moonSynodicMonth,
+  getSunDistanceKm: () => C.currentAUDistance,
+  constants: {
+    rEarthMetres: (BD.earth / 2) * 1000,
+    moonDiameterKm: BD.moon,
+    sunDiameterKm: BD.sun,
+    j2000JD: C.j2000JD,
+    julianCenturyDays: C.julianCenturyDays,
+  },
+});
+
+function runAudit26() {
+  const stepDays = (SCAN_STEP_MIN / 60) / 24;
+  const halfWin = SCAN_WIN_H / 24;
+  const counts = { confirmed: 0, offPeak: 0, regional: 0, dtSignal: 0,
+    dtAndOffPeak: 0, dtAndRegional: 0, dtAndGeo: 0, geographic: 0, noSite: 0 };
+  let babylon = null;
+
+  for (const preset of ECLIPSE_PRESETS) {
+    let site = SITES.get(preset.jd);
+    if (!site) {
+      for (const [k, v] of SITES) {
+        if (Math.abs(k - preset.jd) < 0.5) { site = v; break; }
+      }
+    }
+    if (!site) { counts.noSite++; continue; }
+
+    let nearestModelJD = preset.jd;
+    let foundAny = false;
+    try {
+      const events = finders.findSolarEclipsesInRange(preset.jd - 1, preset.jd + 1);
+      let minDiff = Infinity;
+      for (const evt of events) {
+        const diff = Math.abs(evt.jd - preset.jd);
+        if (diff < minDiff) { minDiff = diff; nearestModelJD = evt.jd; foundAny = true; }
+      }
+    } catch { /* no events — preset.jd fallback */ }
+    const deltaJD_min = (nearestModelJD - preset.jd) * 24 * 60;
+
+    const um0 = umbraFromSceneAtJdNode(preset.jd);
+    const gap0 = (um0 === null) ? null : gcKm(site.lat, site.lon, um0.lat, um0.lon);
+    const umMdl = foundAny ? umbraFromSceneAtJdNode(nearestModelJD) : null;
+    const gapMdl = (umMdl === null) ? null : gcKm(site.lat, site.lon, umMdl.lat, umMdl.lon);
+
+    let bestGap = Infinity, bestDt = 0;
+    for (let dt = -halfWin; dt <= halfWin + 1e-9; dt += stepDays) {
+      const um = umbraFromSceneAtJdNode(preset.jd + dt);
+      if (um === null) continue;
+      const g = gcKm(site.lat, site.lon, um.lat, um.lon);
+      if (g < bestGap) { bestGap = g; bestDt = dt; }
+    }
+
+    const timingOff = foundAny && Math.abs(deltaJD_min) > PRESET_JD_OFF_MIN;
+    const geoAtPrsOk = (gap0 !== null && gap0 <= GAP_OK_KM);
+    const geoAtMdlOk = (gapMdl !== null && gapMdl <= GAP_OK_KM);
+    const geoBestOk = (bestGap <= GAP_OK_KM);
+    const geoAtMdlReg = (gapMdl !== null && gapMdl <= GAP_REGIONAL_KM);
+    const geoBestRegional = (bestGap <= GAP_REGIONAL_KM);
+
+    let verdict;
+    if (!timingOff && geoAtPrsOk) { verdict = 'confirmed'; counts.confirmed++; }
+    else if (!timingOff && geoBestOk) { verdict = 'offPeak'; counts.offPeak++; }
+    else if (!timingOff && geoBestRegional) { verdict = 'regional'; counts.regional++; }
+    else if (timingOff && geoAtMdlOk) { verdict = 'dtSignal'; counts.dtSignal++; }
+    else if (timingOff && geoBestOk) { verdict = 'dtAndOffPeak'; counts.dtAndOffPeak++; }
+    else if (timingOff && (geoAtMdlReg || geoBestRegional)) { verdict = 'dtAndRegional'; counts.dtAndRegional++; }
+    else if (timingOff) { verdict = 'dtAndGeo'; counts.dtAndGeo++; }
+    else { verdict = 'geographic'; counts.geographic++; }
+
+    console.log(`    ${preset.label.padEnd(22)} ${site.name.padEnd(26)} bestGap ${bestGap.toFixed(0).padStart(6)} km  bestDt ${fmtDt(bestDt * 24 * 60).padStart(6)}  ${verdict}`);
+
+    if (preset.jd === BABYLON_JD) {
+      babylon = {
+        bestGapKm: Math.round(bestGap),
+        bestDeltaUT: fmtDt(bestDt * 24 * 60),
+        frameworkUT: foundAny ? jdToHMM(nearestModelJD) : null,
+      };
+    }
+  }
+  return { counts, babylon };
+}
+
+console.log('\n  audit-26 (±4h scan at 30-s steps, ~25k umbra evaluations — 1-3 min)...');
+const audit = runAudit26();
+const a = audit.counts;
+console.log('  verdicts: confirmed %d | offPeak %d | regional %d | dtRegional %d | geographic %d (dtSignal %d, dtAndOffPeak %d, dtAndGeo %d, noSite %d)',
+  a.confirmed, a.offPeak, a.regional, a.dtAndRegional, a.geographic,
+  a.dtSignal, a.dtAndOffPeak, a.dtAndGeo, a.noSite);
+console.log('  babylon135: bestGap %d km | bestΔUT %s | frameworkUT %s',
+  audit.babylon.bestGapKm, audit.babylon.bestDeltaUT, audit.babylon.frameworkUT);
+
+// Exact-reproduction comparison for the two hand-recorded sections. The
+// recorded run had zero ΔT-signal-class verdicts and zero no-site rows, so
+// those buckets must be zero for the five-key mapping to hold at all.
+const audit26Cmp = [
+  ['confirmed', prev.audit26.confirmed, a.confirmed],
+  ['offPeak', prev.audit26.offPeak, a.offPeak],
+  ['regional', prev.audit26.regional, a.regional],
+  ['dtRegional', prev.audit26.dtRegional, a.dtAndRegional],
+  ['geographic', prev.audit26.geographic, a.geographic],
+  ['(zero dtSignal)', 0, a.dtSignal],
+  ['(zero dtAndOffPeak)', 0, a.dtAndOffPeak],
+  ['(zero dtAndGeo)', 0, a.dtAndGeo],
+  ['(zero noSite)', 0, a.noSite],
+];
+const babylonCmp = [
+  ['bestGapKm', prev.babylon135.bestGapKm, audit.babylon.bestGapKm],
+  ['bestDeltaUT', prev.babylon135.bestDeltaUT, audit.babylon.bestDeltaUT],
+  ['frameworkUT', prev.babylon135.frameworkUT, audit.babylon.frameworkUT],
+];
+let audit26Diverged = 0;
+for (const [k, was, now] of audit26Cmp) {
+  const same = now === was;
+  if (!same) audit26Diverged++;
+  console.log(`  ${same ? 'REPRODUCED' : 'DIVERGED  '} audit26 ${k}: recorded ${was}, computed ${now}`);
+}
+let babylonDiverged = 0;
+for (const [k, was, now] of babylonCmp) {
+  const same = now === was;
+  if (!same) babylonDiverged++;
+  console.log(`  ${same ? 'REPRODUCED' : 'DIVERGED  '} babylon135 ${k}: recorded ${was}, computed ${now}`);
+}
+
+const audit26Section = audit26Diverged ? prev.audit26 : {
+  _description:
+    '26-event solar-eclipse alignment audit (docs/103) — GENERATED by ' +
+    'tools/verify/eclipse-audit.js --write (Node port of the browser audit ' +
+    'button on the proven scene-umbra twin, verified to reproduce the ' +
+    'recorded verdict counts exactly before taking ownership). Verdict ' +
+    'counts per category under the joint world; the recorded run has zero ' +
+    'deltaT-signal-class verdicts and zero no-site rows, asserted on every ' +
+    'regeneration. The alignment/scan-reach/total rollups are DERIVED by ' +
+    'the registry.',
+  confirmed: a.confirmed,
+  offPeak: a.offPeak,
+  regional: a.regional,
+  dtRegional: a.dtAndRegional,
+  geographic: a.geographic,
+};
+const babylon135Section = babylonDiverged ? prev.babylon135 : {
+  _description:
+    '-135 April 15 Babylonian solar eclipse case study (docs/103) — a ' +
+    'geographic-boundary event: framework UT close to the documented UT ' +
+    '(NOT a deltaT-signal event; the residual is umbra-centerline ' +
+    'geography). GENERATED by tools/verify/eclipse-audit.js --write — the ' +
+    'audit-26 scan row for the Babylon preset, exact-reproduction-verified ' +
+    'before ownership (the browser case-study meter reads 1221 km — ' +
+    'scan-grid spread).',
+  bestGapKm: audit.babylon.bestGapKm,
+  bestDeltaUT: audit.babylon.bestDeltaUT,
+  frameworkUT: audit.babylon.frameworkUT,
+  documentedUT: prev.babylon135.documentedUT,
+};
+if (audit26Diverged) {
+  console.log('  → audit26 section will be PRESERVED verbatim (divergence above).');
+}
+if (babylonDiverged) {
+  // Known state at first port: bestGapKm 1255 vs recorded 1232 and bestDeltaUT
+  // -1h46 vs -1h45 — the flat-minimum scan-grid sensitivity (the browser's own
+  // case-study meter reads 1221 km vs the audit's 1232) compounded by twin
+  // fidelity at -135 being unverified (the fixture umbraScene probes are
+  // modern-only). Adoption needs an ancient-JD browser probe first — see the
+  // §12h follow-up item in the plan.
+  console.log('  → babylon135 section will be PRESERVED verbatim (divergence above).');
+}
+
 const artifact = {
   _description:
     'Historical eclipse audit summary. The `lunar` and `solar` sections are ' +
@@ -141,25 +434,27 @@ const artifact = {
     'docs/102-gia-alpha-lunar-validation.md. Consumed by the model-values ' +
     'registry (eclipse-audit keys); the framework-vs-NASA gap keys are ' +
     'DERIVED from these so a re-run flows through automatically. The audit26 ' +
-    'and babylon135 sections remain hand-recorded snapshots (marked in their ' +
-    'own _descriptions) until the scene-umbra geography chain has a proven ' +
-    'Node twin — see the §12h follow-up items in the plan. The inputs block ' +
-    'is verified by the artifact-freshness gate on every npm run check.',
+    'and babylon135 sections are generated by the same script (the 26-preset ' +
+    'audit loop + the Babylon scan row on the proven scene-umbra Node twin) ' +
+    'once exact-reproduction was met; on any divergence a run preserves them ' +
+    'verbatim and reports. The inputs block is verified by the ' +
+    'artifact-freshness gate on every npm run check.',
   lunar,
   solar,
-  audit26: prev.audit26,
-  babylon135: prev.babylon135,
+  audit26: audit26Section,
+  babylon135: babylon135Section,
   inputs: buildInputsBlock('node tools/verify/eclipse-audit.js --write', INPUT_FILES),
 };
 
 if (WRITE) {
   if (diverged) {
-    console.log('\nREFUSING to write: computed values diverge from the recorded snapshot.');
+    console.log('\nREFUSING to write: lunar/solar values diverge from the recorded snapshot.');
     console.log('Investigate before letting the generator take ownership (exact-reproduction rule).');
     process.exit(1);
   }
   fs.writeFileSync(OUT, JSON.stringify(artifact, null, 2) + '\n');
-  console.log(`\n  ✓ wrote ${path.relative(ROOT, OUT)} (audit26/babylon135 preserved verbatim)`);
+  const preserved = [audit26Diverged && 'audit26', babylonDiverged && 'babylon135'].filter(Boolean);
+  console.log(`\n  ✓ wrote ${path.relative(ROOT, OUT)}${preserved.length ? ` (${preserved.join('/')} preserved verbatim)` : ' (all four sections generated)'}`);
 } else {
   console.log('\n  dry run — pass --write to update the artifact');
 }
