@@ -612,6 +612,13 @@ export declare const REFERENCE_DATA: {
     "amdAlphaOptimalSpreadPct": number;
     "amdAlphaNextBestSpreadPct": number;
     "laplaceLagrangeResidualDeg": number;
+    "patternEarthAgeGyr": number;
+    "moonGenesisAgeGa": number;
+    "wellsTidalRateHrPerMa": number;
+    "wellsRecessionCmYr": number;
+    "modernLLRRecessionCmYr": number;
+    "tidalLockApproachGyr": number;
+    "essrtFormulaHorizonGyr": number;
     "meeusPeriLong1000AD": number;
     "meeusPeriLong1246AD": number;
     "meeusPeriLong2000AD": number;

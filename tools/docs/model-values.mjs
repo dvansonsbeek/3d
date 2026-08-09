@@ -2056,6 +2056,73 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Deep-time epoch tables + tidal-lock + Driver-2 scalars (11-2ao) ─────
+  // Everything runs LIVE through the deep-time engine at the named epochs:
+  // Devonian t = 380 Ma, Hadean t = the moon-genesis age (rigid-Roche
+  // crossing, 4498 Ma — the epochs derive from the recorded age), future
+  // t = −200 Ma. Moon distances use the RAW Farhat recession polynomial
+  // (the site convention — the solar-Δa corrected engine value differs by
+  // ~300 km). Lock-state values derive from the angular-momentum asymptote
+  // (Kepler at a_lock gives the 47-day mutual day; days/year uses the
+  // rounded 47 by the site's convention). Shrink ppm = mass-loss fraction ×
+  // elapsed years (the site's Hadean 423 was a hand-rounding of the derived
+  // 422 — fixed site-side).
+  ...(() => {
+    const P = () => dtl().EPOCH_PARAMS;
+    const rawMoonKm = (tMa) => {
+      const p = P();
+      return p.moonDistanceNowM * (1 + p.alpha1PerMa * tMa + p.alpha3PerMa3 * tMa ** 3 + p.alpha4PerMa4 * tMa ** 4) / 1000;
+    };
+    const genesisMa = () => astro.knownValues.moonGenesisAgeGa * 1000;
+    const totalDays0 = () => C.H * C.meanSolarYearDays;
+    const driftPpm = (tMa) => (dtl().meanHAtAge(tMa) * dtl().meanYearInDaysAtAge(tMa) / totalDays0() - 1) * 1e6;
+    const lockLodSeconds = () => {
+      const p = P();
+      return 2 * Math.PI * Math.sqrt(p.moonLockDistanceM ** 3 / p.gmEarthMoonM3S2);
+    };
+    const epochs = { Devonian: () => 380, Hadean: genesisMa, '200MyrFuture': () => -200 };
+    const out = {
+      daysPerYearAtDevonian: { get: () => dtl().meanYearInDaysAtAge(380), render: (v) => Number(v).toFixed(2), unit: 'd/yr', note: 'matches Wells 1963 ~400 to 0.01%' },
+      moonDistanceAtHadeanRE: { get: () => rawMoonKm(genesisMa()) / astro.physicalConstants.earthParallaxRadiusKm, render: (v) => Number(v).toFixed(2), unit: 'R_E' },
+      tidalLockDaysPerYear: { get: () => C.meanSolarYearDays / Math.round(lockLodSeconds() / 86400), render: (v) => Number(v).toFixed(1), unit: 'd/yr', note: 'over the rounded 47-day lock LOD (site convention)' },
+      tidalLockLodDays: { get: () => lockLodSeconds() / 86400, render: (v) => Number(v).toFixed(0), unit: 'd' },
+      tidalLockApproachGyr: { get: () => astro.knownValues.tidalLockApproachGyr, render: (v) => String(v), unit: 'Gyr', note: 'prose estimate — beyond the red-giant phase' },
+      wellsTidalRate: { get: () => astro.knownValues.wellsTidalRateHrPerMa, render: (v) => String(v), unit: 'hr/Ma', note: 'Wells 1963 citation' },
+      wellsRecessionCmYr: { get: () => astro.knownValues.wellsRecessionCmYr, render: (v) => String(v), unit: 'cm/yr' },
+      modernLLRRecessionCmYr: { get: () => astro.knownValues.modernLLRRecessionCmYr, render: (v) => String(v), unit: 'cm/yr', note: 'the framework α₁ anchor' },
+      ageFromLinearRate: { get: () => 24 / astro.knownValues.wellsTidalRateHrPerMa / 1000, render: (v) => Number(v).toFixed(2), unit: 'Gyr', note: 'derived: 24 hr ÷ the Wells rate' },
+      patternEarthAgeGyr: { get: () => astro.knownValues.patternEarthAgeGyr, render: (v) => String(v), unit: 'Gyr', note: 'Patterson 1956 citation' },
+      moonGenesisAgeGa: { get: () => astro.knownValues.moonGenesisAgeGa, render: (v) => String(v), unit: 'Ga', note: 'rigid-Roche crossing of the recession polynomial' },
+      solarMassLossFracPerYr: { get: () => P().solarMassLossFracPerYear, render: (v) => fmtSci(v, 1), unit: '/yr' },
+      solarSystemShrinkDevonianPpm: { get: () => P().solarMassLossFracPerYear * 380e6 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
+      solarSystemShrinkHadeanPpm: { get: () => P().solarMassLossFracPerYear * astro.knownValues.patternEarthAgeGyr * 1e9 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
+      totalDaysInH: { get: totalDays0, render: (v) => thousands(Math.round(v)), note: 'H × mSY — the day-count near-invariant' },
+      essrtEffectiveDomainGyr: { get: () => astro.knownValues.patternEarthAgeGyr + astro.knownValues.essrtFormulaHorizonGyr, render: (v) => Number(v).toFixed(1), unit: 'Gyr' },
+      essrtCurrentEpochPct: {
+        get: () => {
+          const dom = Math.round((astro.knownValues.patternEarthAgeGyr + astro.knownValues.essrtFormulaHorizonGyr) * 10) / 10;
+          return 100 * astro.knownValues.patternEarthAgeGyr / dom;
+        },
+        render: (v) => String(Math.round(v)),
+        unit: '%',
+      },
+      hOneGyrAgoPct: { get: () => 100 * dtl().meanHAtAge(1000) / C.H, render: (v) => `~${Math.round(v)}`, unit: '%' },
+      tidalLockKm: { get: () => P().moonLockDistanceM / 1000, render: (v) => thousands(Math.round(v)), unit: 'km' },
+      tidalLockRE: { get: () => P().moonLockDistanceM / 1000 / astro.physicalConstants.earthParallaxRadiusKm, render: (v) => Number(v).toFixed(1), unit: 'R_E' },
+    };
+    for (const [key, tOf] of Object.entries(epochs)) {
+      out[`hAt${key}`] = { get: () => dtl().meanHAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr' };
+      out[`lodAt${key}Hr`] = { get: () => dtl().meanLodSecondsAtAge(tOf()) / 3600, render: (v) => Number(v).toFixed(2), unit: 'hr' };
+      out[`eightHAt${key}`] = { get: () => 8 * dtl().meanHAtAge(tOf()) / 1e6, render: (v) => Number(v).toFixed(3), unit: 'Myr' };
+      out[`moonDistanceAt${key}`] = { get: () => rawMoonKm(tOf()), render: (v) => thousands(Math.round(v)), unit: 'km' };
+      out[`axialPrecAt${key}`] = { get: () => dtl().meanHAtAge(tOf()) / 13, render: (v) => thousands(Math.round(v)), unit: 'yr' };
+      if (key !== '200MyrFuture') {
+        out[`driftAt${key}Ppm`] = { get: () => driftPpm(tOf()), render: (v) => `−${Math.abs(Math.round(v))}`, unit: 'ppm' };
+      }
+    }
+    return out;
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
