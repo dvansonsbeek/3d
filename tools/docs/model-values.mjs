@@ -1045,6 +1045,55 @@ export const VALUES = {
     };
   })(),
 
+  // ── Scene anchors + Moon months (11-2t) ─────────────────────────────────
+  // Anchor years/JDs and offsets from the engine constants (porting these
+  // surfaced the SIXTH website defect: its hardcoded PERI_ALIGN_JD 2,176,152
+  // sat one day below the simulator's constant 2,176,153 — the raw value
+  // lands on a 0.5 rounding boundary and the sim's FP evaluation is the
+  // shipped convention; fixed website-side, both dependent keys moved). The
+  // ecc-extremum years are H/16 phase arithmetic off the perihelion
+  // alignment year. Moon months from the engine's H-lattice month chain.
+  ...(() => {
+    const HDIV16 = () => C.H / 16;
+    return {
+      meanSolarDay: { get: () => C.meanLengthOfDay, render: (v) => '~' + thousands(v, 0), unit: 's', note: 'prose approximation' },
+      siderealDay:  { get: () => (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay, render: (v) => '~' + thousands(v, 2), unit: 's' },
+      stellarDay: {
+        get: () => {
+          const d = (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay;
+          return (d / (C.H / 13)) / (C.meanSolarYearDays + 1) * Math.cos((C.SOLSTICE_OBLIQUITY_MEAN * Math.PI) / 180) + d;
+        },
+        render: (v) => '~' + thousands(v, 2),
+        unit: 's',
+      },
+      oneAU: { get: () => C.currentAUDistance, render: (v) => thousands(v, 6), unit: 'km', note: 'the model-derived AU' },
+      balancedYear:     { get: () => C.balancedYear, render: (v) => thousands(v) },
+      balancedYearBC:   { get: () => Math.abs(C.balancedYear), render: (v) => thousands(v) + ' BC' },
+      periAlignYear:    { get: () => C.perihelionalignmentYear, render: (v) => String(v) },
+      periAlignYearRound: { get: () => C.perihelionalignmentYear, render: (v) => Number(v).toFixed(2) },
+      periAlignJD:      { get: () => C.perihelionalignmentJD, render: (v) => thousands(v), unit: 'JD' },
+      eccNextMax:  { get: () => Math.round(C.perihelionalignmentYear + HDIV16()), render: (v) => thousands(v), note: 'perihelion alignment + H/16' },
+      eccNextMin:  { get: () => Math.round(C.perihelionalignmentYear + HDIV16() / 2), render: (v) => thousands(v) },
+      eccPrevMin:  { get: () => Math.round(Math.abs(C.perihelionalignmentYear - HDIV16() / 2)), render: (v) => thousands(v) },
+      eccPrevMinBC: { get: () => Math.round(Math.abs(C.perihelionalignmentYear - HDIV16() / 2)), render: (v) => thousands(v) + ' BC' },
+      eccPrevMinJD: { get: () => C.perihelionalignmentJD - (HDIV16() * C.meanSolarYearDays / 2), render: (v) => thousands(v, 1), unit: 'JD' },
+      nextBalancedYear: { get: () => C.balancedYear + C.H, render: (v) => thousands(v) },
+      tempGraphMostLikely: { get: () => C.temperatureGraphMostLikely, render: (v) => String(v), note: 'temperature-graph phase pick (14.5 H/16 cycles)' },
+      balancedYearOffset: { get: () => Math.round(C.temperatureGraphMostLikely * HDIV16()), render: (v) => thousands(v), unit: 'yr' },
+      anchorYearOffset:   { get: () => Math.abs(C.balancedYear), render: (v) => thousands(v), unit: 'yr' },
+      systemResetYearBC:  { get: () => Math.abs(C.balancedYear - 7 * C.H), render: (v) => thousands(v) + ' BC', note: 'balancedYear − 7H (the System Reset anchor)' },
+      moonDiameter:       { get: () => astro.bodyDiametersKm.moon, render: (v) => thousands(v, 1), unit: 'km' },
+      moonOrbitalRadius:  { get: () => C.moonDistance, render: (v) => thousands(v, 2), unit: 'km' },
+      moonOrbitalCircumference: { get: () => 2 * Math.PI * C.moonDistance, render: (v) => thousands(v, 2), unit: 'km' },
+      siderealMonth:    { get: () => C.moonSiderealMonth, render: (v) => thousands(v, 10), unit: 'd' },
+      synodicMonth:     { get: () => C.moonSynodicMonth, render: (v) => thousands(v, 10), unit: 'd' },
+      anomalisticMonth: { get: () => C.moonAnomalisticMonth, render: (v) => thousands(v, 10), unit: 'd' },
+      draconicMonth:    { get: () => C.moonNodalMonth, render: (v) => thousands(v, 10), unit: 'd' },
+      tropicalMonth:    { get: () => C.moonTropicalMonth, render: (v) => thousands(v, 10), unit: 'd' },
+      fullMoonCycleICRF: { get: () => C.moonFullMoonCycleICRF, render: (v) => thousands(v, 10), unit: 'd' },
+    };
+  })(),
+
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.
   obliquityJ2000Deg: {
