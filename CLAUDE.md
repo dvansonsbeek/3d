@@ -117,6 +117,18 @@ on clean code — the two fixture gates on a 1-ULP change, ~1.6e-16 relative. Li
 and typecheck cover `packages/` and `test/`; `src/script.js` and `tools/` are
 pre-migration and join as Phase 8 extracts.
 
+**Scoped tiers** (measured: the full chain is ~8.6 min, and 96% of it is
+`test:pipeline` re-running the fitter cores + `test:fixtures` recomputing the
+golden masters — steps a docs/registry edit cannot affect). Pick by what the
+change touches; CI runs the FULL chain on every push regardless, so the full
+local run is only needed when the change touches what the heavy steps verify:
+
+| changed | local gate | ~time |
+|---|---|---|
+| `tools/docs/`, `docs/*.md`, markers | `npm run check:docs` (+ `docs:parity`) | ~20 s |
+| `tools/lib/`, `packages/physics/` | `npm run check:engine` | ~2 min |
+| fit JSONs, `packages/fitting/`, `src/script.js`, `tools/constants/` | full `npm run check` | ~9 min |
+
 `npm run test:browser` runs the `src/script.js` golden masters in headless
 Chromium — the only tier that guards Phase 8, which dissolves that file —
 plus the epoch-consistency gate (pure f(Y) evaluators ≡ the epoch-anchor
