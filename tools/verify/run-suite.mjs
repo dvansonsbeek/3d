@@ -60,6 +60,8 @@ const MANIFEST = [
 
   { n: 'artifact-freshness.js', class: 'gate', ms: 1000,
     note: 'the campaign-artifact freshness gate — also runs as its own chain step (npm run check:artifacts); re-hashes every generated artifact\'s recorded inputs' },
+  { n: 'predict-form-pinning.js', class: 'gate', ms: 4000,
+    note: '§12g-3: PREDICT_COEFFS and their trained (Node J2000-anchored) scalar form are a matched pair — pins 35 fluctuation values to a fixture and bounds the browser-form dual divergence; --write re-records ONLY after a conscious retrain' },
 
   { n: 'analytical-ascending-nodes.js', class: 'narrative', ms: 43 },
   { n: 'ascending-node-optimization.js', class: 'narrative', ms: 42 },

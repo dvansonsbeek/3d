@@ -2231,6 +2231,11 @@ export const VALUES = {
 export const NOT_DERIVABLE = [];
 
 /** key -> rendered string, for the renderers to substitute. */
+// §12g-3: the predict-form pinning gate (tools/verify/predict-form-pinning.js)
+// compares the TRAINED Node scalar form against this module's browser-form
+// mirror (the §12h parity-proven wiring above). Exported for that gate only.
+export const _predictiveMachineryForGate = () => predictiveMachinery();
+
 export function resolveAll() {
   const out = new Map();
   for (const [key, spec] of Object.entries(VALUES)) {
