@@ -289,7 +289,6 @@ const NOT_IN_SCRIPT = {
     + 'value, and says so in a comment: the difference is higher-order terms in the IAU '
     + 'model, and the identity is used for internal consistency. Derived, so not a '
     + 'duplicated literal.',
-  'model.earth.eccentricityAmplitudeK': 'consumed by tools/lib; script.js derives it',
   // Three entries were REMOVED from here after review — all three were wrong,
   // and all three hid a real copy in script.js:
   //   alpha1PerMa                   -> script.js ALPHA_1, identical

@@ -19,8 +19,7 @@
     "earthtiltMean": 23.413527499101747,
     "earthInvPlaneInclinationAmplitude": 0.6360475695866625,
     "eccentricityBase": 0.015386009686374918,
-    "eccentricityAmplitude": 0.0013559440307290061,
-    "eccentricityAmplitudeK": 0.0000034149201282126695
+    "eccentricityAmplitude": 0.0013559440307290061
   },
   "moon": {
     "moonStartposApsidal": 347.5476,

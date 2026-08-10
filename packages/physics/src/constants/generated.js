@@ -32,11 +32,11 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "b596258f72604195";
+export const CONSTANTS_HASH = "d36050ef216d137f";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "b596258f72604195",
+  hash: "d36050ef216d137f",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -181,8 +181,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "earthtiltMean": 23.413527499101747,
     "earthInvPlaneInclinationAmplitude": 0.6360475695866625,
     "eccentricityBase": 0.015386009686374918,
-    "eccentricityAmplitude": 0.0013559440307290061,
-    "eccentricityAmplitudeK": 0.0000034149201282126695
+    "eccentricityAmplitude": 0.0013559440307290061
   },
   earthOrbital: {
     "j2000EpochYear": 2000,

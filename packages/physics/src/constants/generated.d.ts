@@ -2,10 +2,10 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "b596258f72604195";
+export declare const CONSTANTS_HASH: "d36050ef216d137f";
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "b596258f72604195";
+  readonly hash: "d36050ef216d137f";
   readonly additionalBodies: {
     "pluto": {
       "name": string;
@@ -139,7 +139,6 @@ export declare const DEFAULT_CONSTANTS: {
     "earthInvPlaneInclinationAmplitude": number;
     "eccentricityBase": number;
     "eccentricityAmplitude": number;
-    "eccentricityAmplitudeK": number;
   };
   readonly earthOrbital: {
     "j2000EpochYear": number;

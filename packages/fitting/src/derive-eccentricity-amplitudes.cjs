@@ -39,12 +39,16 @@ console.log(`    fibonacciD            = ${earthD}`);
 console.log(`    K = ${K.toExponential(10)}`);
 console.log('');
 
-const storedK = C.eccentricityAmplitudeK;
-if (Math.abs(K - storedK) / K > 1e-6) {
-  console.log(`  ⚠ Stored K (${storedK.toExponential(10)}) differs from derived by ${((storedK/K - 1) * 100).toFixed(4)}%`);
-  console.log('    → Will update eccentricityAmplitudeK in model-parameters.json');
+// K is never stored — it is a closed-form derivation of two stored anchors
+// (eccentricityAmplitude, earthtiltMean), computed at runtime in constants.js.
+// This cross-checks the runtime derivation against this script's independent
+// computation; a mismatch means the constants.js derivation changed.
+const runtimeK = C.eccentricityAmplitudeK;
+if (Math.abs(K - runtimeK) / K > 1e-6) {
+  console.log(`  ⚠ Runtime K (${runtimeK.toExponential(10)}) differs from this script's derivation by ${((runtimeK/K - 1) * 100).toFixed(4)}%`);
+  console.log('    → check the constants.js computeKConstant derivation');
 } else {
-  console.log(`  ✓ Stored K matches derived (diff < 0.0001%)`);
+  console.log(`  ✓ Runtime K matches this script's derivation (diff < 0.0001%)`);
 }
 console.log('');
 

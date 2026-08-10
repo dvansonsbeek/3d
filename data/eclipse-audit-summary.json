@@ -45,7 +45,7 @@
       "public/input/fitted-coefficients.json": "sha256:2145337c376bbc4968c000414be518b2c61f6c3fdd68698da35f5f001ed45d02",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
-      "public/input/model-parameters.json": "sha256:004d18c239cc53fb6d1e3b96c1d0300f1ee6c39b86050176607fefe8fc758b44",
+      "public/input/model-parameters.json": "sha256:e89ff4dc167cd25a2a50b68b4fa12ff52bd14eead5d41f225dd9a7106772eb66",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
       "tools/explore/umbra-scene-node-twin.js": "sha256:d7d7055238cc02105c3a060b8d370ba67266a2ba4d51fa6a7025ef5a56982223",
       "tools/lib/scene-graph.js": "sha256:85f630e203406631e934fa988e016b9409b3d7d1aef8bae11b881a2291c1a1c1",

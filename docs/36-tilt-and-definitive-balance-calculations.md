@@ -102,7 +102,7 @@ amplitude of this fluctuation is:
 
     e_amplitude = K * sin(tilt_mean) * sqrt(d) / (sqrt(m) * a^(3/2))
 
-where K = <!--v:eccentricityAmplitudeK-->3.4143 × 10⁻⁶<!--/v-->, derived from Earth:
+where K = <!--v:kValue-->3.4143 × 10⁻⁶<!--/v-->, derived from Earth:
 
     K = e_amp_Earth * sqrt(m_Earth) * a_Earth^(3/2) / (sin(tilt_Earth) * sqrt(d_Earth))
     K = 0.0013559 * sqrt(3.00350e-6) * 1.0 / (sin(23.41353 deg) * sqrt(3))
