@@ -6,7 +6,8 @@
  * computed by a 1,690-line `model-values.compute.ts` that imports six
  * WEBSITE-AUTHORED reimplementations of this repo's physics (only
  * `coefficients.ts` is synced from here). Collapsing that duplication is
- * Phase 21's gate; §12h approaches it from this end by re-expressing each key
+ * the website-split phase's gate (14 post-renumber, formerly 21); §12h
+ * approaches it from this end by re-expressing each key
  * against the ORIGINAL engine in `tools/docs/model-values.mjs`.
  *
  * This harness exists BEFORE the porting, deliberately — the same discipline
@@ -97,5 +98,5 @@ if (extra.length) console.log(`\n  ours only: ${extra.join(', ')}`);
 
 console.log(`\n${line}`);
 console.log(`${match.length}/${total} at parity. Finish line: ${total}/${total}, at which the website`);
-console.log('imports this registry and deletes its six ported modules (Phase 21).');
+console.log('imports this registry and deletes its six ported modules (the website-split phase).');
 console.log(line);

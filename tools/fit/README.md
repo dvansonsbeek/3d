@@ -5,7 +5,7 @@
 > preserved. Every `tools/fit/*.js` path documented below still works: each is
 > a one-line shim into the package (argv/env pass through), kept so this
 > README, the pipeline steps, and muscle memory stay valid. Exceptions still
-> living here: `export-to-holistic.js` (deletes at Phase 21) and `python/`
+> living here: `export-to-holistic.js` (deletes at the website-split phase — 14 after the 2026-08 renumber, formerly 21) and `python/`
 > (§2f). The verify suite stays in `tools/verify` with its run-suite
 > classification until `tools/lib` becomes adapters.
 
