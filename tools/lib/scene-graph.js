@@ -1346,6 +1346,19 @@ function getGraph() {
 /** Invalidate cached scene graph (forces rebuild on next use). */
 function _invalidateGraph() {
   _graph = null;
+  // §12g-5: the moon-series factory captures C.moonMeeusLpCorrection BY VALUE
+  // at creation (measured: moon-eclipse-optimizer's mutations never reached
+  // the series — the "after Lp" RMS line could not move and consecutive
+  // --write runs oscillated between two Lp values instead of converging).
+  // Dropping the series here re-wires it with the live constant; creation is
+  // closure-only (the Meeus term arrays are module-level, not rebuilt).
+  //
+  // ONLY the series is dropped, deliberately. The other singletons capture no
+  // fit-mutated values — MOON_CORRECTION reaches moonApparent through LIVE
+  // getters already — and _chainCyclesM memoizes Float64Array integral
+  // tables: a blanket reset here was measured to turn the ~1-min optimizer
+  // step into a >10-min run by rebuilding those tables every iteration.
+  _moonSeriesMTools = null;
 }
 
 /**

@@ -180,16 +180,39 @@ const { baseline: computeJPLBaseline } = require(path.join(TOOLS_LIB, 'optimizer
 // production geometry), not the scan output.
 setParams(origNodal, origApsidal, origMoon);
 
+// §12g-5 knob self-test input: bias at the SHIPPED Lp, measured first.
+// This fitter once ran for weeks with a dead knob — the moon factory
+// captured C.moonMeeusLpCorrection by value at creation and
+// _invalidateGraph() didn't drop the factory, so zeroing the constant
+// changed nothing and consecutive --write runs oscillated instead of
+// converging. The assertion below makes a dead knob fatal.
+const meanRABias = (b) => {
+  let s = 0;
+  for (const e of b.entries) s += e.dRA;
+  return s / b.entries.length;
+};
+const biasAtShipped = meanRABias(computeJPLBaseline('moon'));
+
 // Save current Lp correction, then zero it out to measure raw bias
 const origLpCorr = C.moonMeeusLpCorrection;
 C.moonMeeusLpCorrection = 0;
 _invalidateGraph();
 
 const rawBaseline = computeJPLBaseline('moon');
-let sumRA = 0;
-for (const e of rawBaseline.entries) sumRA += e.dRA;
-const rawBias = sumRA / rawBaseline.entries.length;
+const rawBias = meanRABias(rawBaseline);
 const bestLpCorrection = -rawBias;
+
+// Knob self-test: zeroing Lp must move the measured bias by ≈ the shipped
+// value (1:1 up to the ecliptic→RA projection, measured 0.18%). Tolerance 5%.
+if (Math.abs(origLpCorr) > 1e-6) {
+  const knobDelta = rawBias - biasAtShipped;
+  if (Math.abs(knobDelta + origLpCorr) > Math.abs(origLpCorr) * 0.05) {
+    console.error(`FATAL: the Lp knob is disconnected — zeroing Lp moved the measured bias by ${knobDelta.toFixed(6)}° where ≈ ${(-origLpCorr).toFixed(6)}° was expected.`);
+    console.error('The moon factory is not seeing C mutations; check that _invalidateGraph() drops the module singletons (tools/lib/scene-graph.js).');
+    process.exit(1);
+  }
+  console.log(`Knob self-test: zeroing Lp moved the bias by ${(rawBias - biasAtShipped).toFixed(6)}° (shipped Lp ${origLpCorr.toFixed(6)}) ✓`);
+}
 
 console.log(`Raw RA bias (no Lp correction): ${rawBias.toFixed(6)}° (${rawBaseline.entries.length} JPL points)`);
 console.log(`Optimal Lp correction: ${bestLpCorrection.toFixed(6)}° (was ${origLpCorr})`);
