@@ -60,6 +60,8 @@ const MANIFEST = [
 
   { n: 'artifact-freshness.js', class: 'gate', ms: 1000,
     note: 'the campaign-artifact freshness gate — also runs as its own chain step (npm run check:artifacts); re-hashes every generated artifact\'s recorded inputs' },
+  { n: 'data-provenance.js', class: 'gate', ms: 1500,
+    note: 'Phase 12: every tracked file under data/ must be manifest-covered (PROVENANCE.md row, directory, or self-describing/ledgered generated JSON); no dangling rows; ledger scripts exist' },
   { n: 'predict-form-pinning.js', class: 'gate', ms: 4000,
     note: '§12g-3: PREDICT_COEFFS and their trained (Node J2000-anchored) scalar form are a matched pair — pins 35 fluctuation values to a fixture and bounds the browser-form dual divergence; --write re-records ONLY after a conscious retrain' },
 

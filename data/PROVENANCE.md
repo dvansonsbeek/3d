@@ -57,6 +57,7 @@ Listed so their absence from the sections above is not read as an omission.
 
 | file | produced by |
 |---|---|
+| `01-holistic-year-objects-data.xlsx` | The Step 3 browser export (simulator → SheetJS workbook; `tools/fit/README.md` pipeline) — the ML-training observation workbook read by `fit_perihelion_harmonics.py` / `train_precession_physical.py` / `eval_precession_physical.py`. Gitignored at 319 MB; regenerate via the browser export before running Phase-2 pipeline steps. |
 | `insolation-features.csv` | `scripts/extract_insolation_features.js` |
 | `02-solar-measurements.csv` | `tools/fit/export-solar-measurements.js` — gitignored, ~2 h 24 m to rebuild |
 | `nbody_cache_10myr.npz` | A REBOUND N-body integration of Sun + 8 planets, retained because **it has no working generator in this repo** and therefore could not otherwise be reproduced: WHFast symplectic integrator, dt = 5 days (< 1/20 of Mercury's period), 10 Myr forward, osculating elements written every 1,000 yr (10,001 samples: `times` + `ecc_/inc_/sma_` per planet). Read by `scripts/l1_vs_laskar_eigenmodes.py` and `scripts/l1_vs_laskar_50myr.py`. The setup above is the provenance — an independent REBOUND run with these parameters reproduces equivalent data. |

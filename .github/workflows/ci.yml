@@ -109,9 +109,16 @@ jobs:
       - name: Doc values match the model (§10)
         run: npm run docs:values
 
-      # §5d — the model gates. Only 2 of the 17 tools/verify scripts have a
+      # Phase 12 — every tracked file under data/ must be covered by a
+      # PROVENANCE.md entry, a manifest directory, or (for generated JSONs) a
+      # meta/inputs block or the @hum/data generated ledger. Enforces the
+      # manifest's own maintenance rule, which was unenforced prose before.
+      - name: Data provenance (PROVENANCE.md coverage)
+        run: npm run check:data
+
+      # §5d — the model gates. Only 5 of the 23 tools/verify scripts have a
       # failing exit path; the runner encodes that classification and excludes
-      # balance-search.js, which writes tracked data. verify-laws is checked on
+      # the four generators, which write tracked data. verify-laws is checked on
       # its CHECK COUNT (49/50, Saturn LL the documented failure), not its exit
       # code, so both a regression and an unexplained improvement are caught.
       - name: Model gates (tools/verify)
