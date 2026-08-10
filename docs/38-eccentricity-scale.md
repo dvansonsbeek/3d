@@ -173,7 +173,7 @@ While eccentricity base values are determined by the balance system (no single f
 e_amp = K × sin(tilt) × √d / (√m × a^1.5)
 ```
 
-K = 3.4149 × 10⁻⁶ — derived from Earth's mean parameters (obliquity = 23.41354°, eccentricity amplitude = 0.001356). This is the eccentricity analog of the ψ-constant for inclination amplitudes.
+K = <!--v:eccentricityAmplitudeK-->3.4143 × 10⁻⁶<!--/v--> — derived from Earth's mean parameters (obliquity = <!--v:meanObliquity-->23.41353<!--/v-->°, eccentricity amplitude = 0.0013559). This is the eccentricity analog of the ψ-constant for inclination amplitudes.
 
 **SYSTEM/ALONE mass convention** (same as for ψ — see [doc 10 §Universal Constants](10-fibonacci-laws.md#the-universal-constants-ψ-and-k) and [doc 25 §Sun/System vs Sun/Planet-Alone](25-universal-mass-from-moon-formula.md#sunsystem-vs-sunplanet-alone)): Earth uses M_Earth_ALONE in K calibration; other planets use M_planet_SYSTEM in the e_amp formula above. The Moon's contribution is empirically absorbed into the fitted `e_amp_Earth`.
 

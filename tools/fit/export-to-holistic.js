@@ -173,8 +173,10 @@ console.log('  ── Earth scalars ──');
 
 // Round to match the precision used in constants.ts
 const earthScalars = {
-  EARTH_INCLIN_MEAN: { val: C.earthInvPlaneInclinationMean, prec: 5 },
-  EARTH_INCLIN_AMPL: { val: C.earthInvPlaneInclinationAmplitude, prec: 5 },
+  // Full precision (prec -1): the §12h parity port fixed the website's 5-dp
+  // truncation of these two — a 5-dp write here would reintroduce the defect.
+  EARTH_INCLIN_MEAN: { val: C.earthInvPlaneInclinationMean, prec: -1 },
+  EARTH_INCLIN_AMPL: { val: C.earthInvPlaneInclinationAmplitude, prec: -1 },
   EARTH_OBLIQ_MEAN: { val: C.earthtiltMean, prec: 6 },
   EARTH_ECC_BASE: { val: C.eccentricityBase, prec: -1 },
   EARTH_ECC_AMP: { val: C.eccentricityAmplitude, prec: -1 },
@@ -264,7 +266,11 @@ if (fs.existsSync(sigResultsPath)) {
     `empiricalR_logUniform:  ${empR('log_uniform')},`,
     `empiricalR_uniform:     ${empR('uniform')},`,
     `// Derived Brown-style variance inflation factor using MEASURED r̄:`,
-    `correlationFactor:  ${Number((sr.method && sr.method.correlation_factor || 1).toFixed(2))},      // 1 + (k-1)*r̄_permutation`,
+    // Full precision, deliberately: a 2-dp write here (1.85) re-rounded to
+    // '1.9' at display where the exact value renders '1.8' — the
+    // double-rounding defect the §12h parity harness caught (tenth website
+    // defect). Never round values that a renderer rounds again.
+    `correlationFactor:  ${sr.method && sr.method.correlation_factor || 1},   // 1 + (k-1)*r̄_permutation (full precision — display rounds)`,
     `// HEADLINE (recommended for citation): direct joint permutation test`,
     `// — studentized T = Sum z_i, p = fraction of nulls with T_null >= T_obs.`,
     `// Model-independent; joint null captures inter-test correlation.`,
@@ -900,7 +906,10 @@ const MV_TS      = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
     // Genesis epoch = the rigid-Roche crossing (~9,500 km) of the recession
     // polynomial; the "Hadean" key names are kept for macro compatibility.
     {
-      const R_E_KM = 6371, ROCHE_RIGID_KM = 9500;
+      // Parallax radius, matching the registry's moonDistanceAtHadeanRE
+      // derivation — the old mean-radius 6371 rounded to '1.49', a
+      // hand-rounding-class defect the §12h port fixed website-side.
+      const R_E_KM = C.earthParallaxRadiusKm, ROCHE_RIGID_KM = 9500;
       const fmtInt = x => Math.round(x).toLocaleString('en-US');
       const uMinus = s => String(s).replace('-', '−');
       const TOTAL_DAYS = DT.meanHAtAge(0) * DT.meanYearInDaysAtAge(0);
@@ -1001,6 +1010,29 @@ if (fs.existsSync(MV_COMPUTE) && fs.existsSync(MV_JSON)) {
   console.log('');
   console.log('  ── model-values.ts (legacy layout) ──');
   console.log('    ✓ All values match (via constants.ts single source of truth)');
+}
+
+// ── §10 stamping authority (Phase 11-3) ─────────────────────────────────────
+// A refit export moves website content derived from the coefficients, so the
+// website EN tree's frontmatter (modelVersion + coefficients hash) must move
+// with it. The 3d stamper is the ONE stamping authority for both trees —
+// invoked here so no export can leave the website carrying a superseded hash
+// (the 11-1 incident class: two trees stale at two DIFFERENT hashes because
+// the stamper was wired into nothing).
+console.log('');
+console.log('  ── §10 frontmatter stamping (both trees, Phase 11-3) ──');
+if (WRITE) {
+  const { execFileSync } = require('child_process');
+  const stamper = path.resolve(__dirname, '..', 'docs', 'stamp-frontmatter.mjs');
+  const out = execFileSync('node', [stamper, '--write', '--holistic'], {
+    cwd: path.resolve(__dirname, '..', '..'),
+    env: { ...process.env, HOLISTIC_ROOT },
+    encoding: 'utf8',
+  });
+  for (const l of out.trimEnd().split('\n')) console.log(`    ${l}`);
+} else {
+  console.log('    ℹ --write also re-stamps 3d docs + the website EN tree');
+  console.log('      (stamp-frontmatter.mjs --write --holistic; NL is excluded by design — it lags EN)');
 }
 
 console.log('');

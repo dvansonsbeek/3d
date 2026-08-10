@@ -246,6 +246,17 @@ export const VALUES = {
     unit: 's',
     note: 'joint-fit RMS over the Espenak window. NOT the validate-resonator sweep figure (different window) — the two differ and have been confused before',
   },
+  stephensonFullWindowRmsSeconds: {
+    get: () => rd('data/core-mantle-resonator-stage3-validation.json').on.steph_rms_demeaned,
+    render: (v) => Number(v).toFixed(2),
+    unit: 's',
+    note: 'joint-world ON Stephenson full-window RMS (stage-3 validation artifact) — the doc-105 shipped-configuration column',
+  },
+  eccentricityAmplitudeK: {
+    get: () => C.eccentricityAmplitudeK,
+    render: (v) => fmtSci(v, 4),
+    note: 'Law 4 K, DERIVED live (e_amp·√m/(sin(meanObliquity)·√d)) — moves with refits. The stored model-parameters copy (3.4149e-6) is a stale vintage; docs 36/38 carried two further vintages before markerization',
+  },
   // ── Layer-4 solar-day family (§12h) — engine twins of the tweakpane ─────
   // Website contract: lodRealPhysical / lodH5Only / stackNetLodJ2000Ms in
   // model-values.compute.ts (the dayLength.ts port). All in the DISPLAY basis

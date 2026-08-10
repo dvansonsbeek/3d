@@ -138,7 +138,7 @@ The model has 6 free parameters:
 
 1. **H** — the Earth Fundamental Cycle (335,317 years at J2000) — 1 DOF
 2. **Fibonacci divisors** — {3, 5, 8, 13, 21, 34} — 3 DOF (assumed, not derived)
-3. **Mean obliquity** — Earth's mean axial tilt (23.4135°) — 1 DOF
+3. **Mean obliquity** — Earth's mean axial tilt (<!--v:meanObliquity-->23.41353<!--/v-->°) — 1 DOF
 4. **Inclination amplitude** — Earth's invariable-plane amplitude (0.6360°) — 1 DOF
 5. **Planet configuration** — which d goes to which planet — 0 DOF (unique mirror-symmetric solution among 42 viable candidates from 7,558,272 exhaustively tested; five successive physical filters)
 

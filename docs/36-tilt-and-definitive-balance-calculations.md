@@ -102,11 +102,11 @@ amplitude of this fluctuation is:
 
     e_amplitude = K * sin(tilt_mean) * sqrt(d) / (sqrt(m) * a^(3/2))
 
-where K = 3.414483e-6, derived from Earth:
+where K = <!--v:eccentricityAmplitudeK-->3.4143 × 10⁻⁶<!--/v-->, derived from Earth:
 
     K = e_amp_Earth * sqrt(m_Earth) * a_Earth^(3/2) / (sin(tilt_Earth) * sqrt(d_Earth))
-    K = 0.001356 * sqrt(3.00352e-6) * 1.0 / (sin(23.41354 deg) * sqrt(3))
-    K = 3.414483e-6
+    K = 0.0013559 * sqrt(3.00350e-6) * 1.0 / (sin(23.41353 deg) * sqrt(3))
+    K = 3.4143e-6
 
 ### Key Property: Law 5 Weight Change
 
@@ -128,7 +128,7 @@ mass or position.
 |---------|------------|---------------|-----------------|-------------------|
 | Mercury |   0.03     | 2.338e-5      | 0.011%          | Negligible        |
 | Venus   |   2.6392   | 9.526e-4      | 14.057%         | Negligible (tiny v) |
-| Earth   |  23.41354  | 1.356e-3      | 8.116%          | 0.05% of total    |
+| Earth   |  <!--v:meanObliquity-->23.41353<!--/v-->  | 1.356e-3      | 8.116%          | 0.05% of total    |
 | Mars    |  25.19     | 3.066e-3      | 3.283%          | 0.14% of total    |
 | Jupiter |   3.13     | 1.134e-6      | 0.002%          | Negligible        |
 | Saturn  |  26.73     | 5.360e-6      | 0.010%          | Negligible        |
@@ -146,7 +146,7 @@ does not change over time. Only the direction of the perihelion precesses — th
 perihelion point rotates around the Sun, but its distance remains the same.
 
 **Step 2 — Mean axial tilt.**
-Each planet has a mean axial obliquity. For Earth this is 23.41354 deg.
+Each planet has a mean axial obliquity. For Earth this is <!--v:meanObliquity-->23.41353<!--/v--> deg.
 
 **Step 3 — Axial tilt oscillation.**
 The axial tilt fluctuates over time with a period equal to the obliquity cycle.

@@ -218,7 +218,7 @@ through the cardinal points over the 20,957-year (at J2000) H/16 cycle.
 ### 4. Obliquity mean is derived from the Pythagorean tilt model
 
 The simple geometric obliquity formula `earthtiltMean − A·cos(H/3) + A·cos(H/8)` has a
-mean of 23.41354° (the time-average of cosines is zero). But the obliquity **actually
+mean of <!--v:meanObliquity-->23.41353<!--/v-->° (the time-average of cosines is zero). But the obliquity **actually
 measured at the summer solstice** (max declination) averages 23.45326° — a systematic
 +0.040° (143") offset.
 
