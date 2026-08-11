@@ -303,7 +303,7 @@
     "neptune": 2409432.4
   },
   "deepTime": {
-    "_description": "Deep-time (ESSRT) fitted/calibrated anchors — single source of truth. alpha1PerMa is LLR-anchored (da/dt = 3.82 cm/yr, Dickey 1994 / Chapront 2002); alpha3/alpha4 are the Farhat 2022 LSQ deep-time fit; alphaClimateScalePerMille is calibrated so dalpha/dt at J2000 = -1.35e-11/yr (Cox & Chao 2002 dJ2/dt / 2.0 Peltier factor); the taper halfwidths bound the 4-flag DT stack. src/script.js imports these via the generated constants module (npm run constants:generate); tools/lib/deep-time.js reads via tools/lib/constants.js; the website deepTime.ts is synced by tools/fit/export-to-holistic.js.",
+    "_description": "Deep-time (ESSRT) fitted/calibrated anchors — single source of truth. alpha1PerMa is LLR-anchored (da/dt = 3.82 cm/yr, Dickey 1994 / Chapront 2002); alpha3/alpha4 are the Farhat 2022 LSQ deep-time fit; alphaClimateScalePerMille is calibrated so dalpha/dt at J2000 = -1.35e-11/yr (Cox & Chao 2002 dJ2/dt / 2.0 Peltier factor); the taper halfwidths bound the 4-flag DT stack. src/script.js imports these via the generated constants module (npm run constants:generate); tools/lib/deep-time.js reads via tools/lib/constants.js; the website consumes these through the published @essrt/physics package (DEFAULT_CONSTANTS.deepTime).",
     "alpha1PerMa": -0.000099375895103,
     "alpha3PerMa3": -6.4186463489e-12,
     "alpha4PerMa4": 1.3619800519e-16,

@@ -28,8 +28,9 @@
  *     + optimum + usno_anchor), data/core-mantle-resonator-stage1.json
  *     (resonator amplitudes; T₀/Q/epochs stay the convention), and
  *     public/input/astro-reference.json (deltaTStart, --sync-code). The
- *     engines read the JSONs directly; the website syncs separately via
- *     export-to-holistic.js --write. Then re-run
+ *     engines read the JSONs directly; the website consumes the published
+ *     packages — regenerate + republish @essrt/model-values after a refit
+ *     (npm run values:package:write). Then re-run
  *     tools/fit/validate-resonator.js.
  *   Shipped state: USNO 86400.0014, deltaTStart 56.05, Espenak 12.60 s,
  *   full-window 31.3 s; episode −1600 → +1600; resonator default-ON runtime-
@@ -1409,11 +1410,12 @@ function main() {
       // carries it into the module src/script.js imports. INLINED from the
       // deleted export-dt-corrections.js. The coefficient consts need no code
       // sync — src/script.js and tools/lib/deep-time.js read the JSONs
-      // directly. The WEBSITE deepTime.ts is synced by export-to-holistic.js
-      // --write, deliberately manual: a fitter must not write across a repo
-      // boundary as a side effect of --write.
+      // directly. The WEBSITE consumes the published @essrt packages; a
+      // refit reaches it via values:package:write + republish, deliberately
+      // manual: a fitter must not publish across a repo boundary as a side
+      // effect of --write.
       syncAstroReference(output, { dryRun: false });
-      console.log('  → website deepTime.ts: run `node tools/fit/export-to-holistic.js --write`');
+      console.log('  → website: regenerate + republish @essrt/model-values (npm run values:package:write)');
     } else {
       console.log('  (JSON only. Add --sync-code to also update astro-reference.json deltaTStart.)');
     }
@@ -1738,8 +1740,8 @@ function runJointMode() {
   // ── --write: ship the joint world (atomic default-ON package, part 1) ──
   // Anchors + coefficients move TOGETHER: 4-flag JSON, resonator JSON,
   // astro-reference deltaTStart. The engines read the JSONs directly; the
-  // website syncs via export-to-holistic.js (part 2); defaults flip in the
-  // same commit.
+  // website consumes the published packages (values:package:write +
+  // republish); defaults flip in the same commit.
   const flagNames = ['bond', 'hallstatt', 'jose5', 'jose4'];
   const fitPath = path.join(ROOT, 'data', 'deltaT-4flag-fit.json');
   const fitJson = JSON.parse(fs.readFileSync(fitPath, 'utf8'));
@@ -1822,7 +1824,7 @@ function runJointMode() {
   console.log('\n  Next (atomic package part 2): src/script.js and');
   console.log('  tools/lib/deep-time.js read this JSON directly — run');
   console.log('  `npm run constants:generate` and rebuild. The website syncs');
-  console.log('  via export-to-holistic.js --write. Then flip both runtime');
+  console.log('  via npm run values:package:write + package republish. Then flip both runtime');
   console.log('  defaults ON and re-run validation.');
 }
 

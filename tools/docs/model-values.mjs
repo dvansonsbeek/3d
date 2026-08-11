@@ -1047,9 +1047,9 @@ export const VALUES = {
 
   // ── dLOD/dt decomposition + J2000 day identities (11-2q) ────────────────
   // The channels come LIVE from the engine's dLodDtDecompositionAtAge at
-  // t_Ma = −5e-7 (model epoch 2000.5 — the same convention
-  // export-to-holistic.js Section 7 syncs the website's DLOD_* literals
-  // from), so the registry replaces the synced-literal chain with the
+  // t_Ma = −5e-7 (model epoch 2000.5 — the convention the retired
+  // export-to-holistic.js Section 7 used for the website's DLOD_* literals),
+  // so the registry replaces the synced-literal chain with the
   // derivation itself. Nets are the engine's own net_L2/L3/L4, not sums of
   // rounded channels — verified to render identically. solarDayJ2000 is the
   // SI day definition (86400 exactly), NOT lodRealPhysical.
@@ -1144,8 +1144,8 @@ export const VALUES = {
 
   // ── GIA α(t) constants + audit-26 + Babylon −135 (11-2s) ────────────────
   // alphaJ2000 from astro physicalConstants; the calibrated scale LIVE from
-  // the engine (deep-time.js ALPHA_CLIMATE_SCALE — the value
-  // export-to-holistic syncs to the website); Cox & Chao dJ2/dt and the
+  // the engine (deep-time.js ALPHA_CLIMATE_SCALE — reaching the website
+  // through @essrt/model-values); Cox & Chao dJ2/dt and the
   // Peltier factor from the new giaCoxChaoPeltier citation block, with
   // dAlphaDtJ2000 DERIVED (= dJ2Dt / factor) so the calibration identity
   // auto-holds. The audit-26 verdict counts and the Babylon −135 case study

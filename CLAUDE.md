@@ -127,7 +127,7 @@ local run is only needed when the change touches what the heavy steps verify:
 
 | changed | local gate | ~time |
 |---|---|---|
-| `tools/docs/`, `docs/*.md`, markers | `npm run check:docs` (+ `docs:parity`) | ~20 s |
+| `tools/docs/`, `docs/*.md`, markers | `npm run check:docs` | ~20 s |
 | `tools/lib/`, `packages/physics/` | `npm run check:engine` | ~2 min |
 | fit JSONs, `packages/fitting/`, `src/script.js`, `tools/constants/` | full `npm run check` | ~9 min |
 

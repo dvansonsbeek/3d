@@ -28,7 +28,7 @@ These scripts were used during the research to discover and verify the six Fibon
 ```bash
 # Run the statistical significance test (~2–3 min, 100k MC trials)
 python fibonacci_significance.py
-# → writes data/significance-results.json (consumed by tools/fit/export-to-holistic.js)
+# → writes data/significance-results.json (consumed by the model-values registry → @essrt/model-values)
 
 # Verify J2000 eccentricity formation constraints
 python fibonacci_j2000_eccentricity.py

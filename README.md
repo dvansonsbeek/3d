@@ -138,7 +138,7 @@ npm run check:docs        # scoped tier (~20 s) for docs/registry/marker edits
 npm run check:engine      # scoped tier (~2 min) for tools/lib + packages/physics edits
 npm run test:browser      # golden masters in headless Chromium (builds first)
 npm run test:verify:list  # how the 24 tools/verify scripts classify
-npm run docs:parity       # model-values registry vs the website's published keys
+npm run values:package    # packaged @essrt/model-values vs the live registry
 npm run check:artifacts   # campaign artifacts vs their recorded input hashes
 ```
 

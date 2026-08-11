@@ -39,7 +39,6 @@
     "check:engine": "npm run check:docs && npm run test:purity && npm run test:layer0 && npm run test:layer1 && npm run test:constants && npm run test:counterfactual && npm run test:planet-model && npm run test:verify && npm run test:fixtures",
     "docs:values": "node tools/docs/render-doc-values.mjs",
     "docs:values:write": "node tools/docs/render-doc-values.mjs --write",
-    "docs:parity": "node tools/docs/parity-model-values.mjs",
     "values:package": "node tools/docs/export-model-values-package.mjs",
     "values:package:write": "node tools/docs/export-model-values-package.mjs --write"
   },

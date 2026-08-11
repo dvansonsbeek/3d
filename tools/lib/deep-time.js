@@ -479,8 +479,8 @@ function jose4CycleLodCorrection(year) { return _dtCycles().cycleLodSecondsAt('j
 const DT_RESONATOR_ENABLED = process.env.DT_RESONATOR_DISABLED !== '1';
 
 // Scalar constants — read from data/core-mantle-resonator-stage1.json (_RES
-// above), the same JSON export-to-holistic.js patches the website's
-// deepTime.ts from.
+// above), which reaches the website through the published packages
+// (DT_RESONATOR in @essrt/physics; rendered values in @essrt/model-values).
 // The eigenperiod is LATTICE-LABELED (T₀ = 8H/685 ≈ 3,916 yr): the shipped
 // resonator is the combined effect of the lattice cycles, so under H(t)
 // evolution the episode scales WITH its drivers (clock coherence). Physical
@@ -710,9 +710,9 @@ function computeLodRealSecondsAtEpoch(year) {
 /** dLOD/dt driver decomposition at t_Ma, in ms/century per channel.
  *  Mirrors src/script.js dLodDtDecompositionAtAge (tweakpane dLOD/dt
  *  decomposition sub-folder: Tidal baseline / GIA / All cycles /
- *  Tidal + GIA / Tidal + GIA + all cycles). Consumed by
- *  tools/fit/export-to-holistic.js to sync the website's shipped
- *  measurement constants (model-values.compute.ts dLodDt* V-keys). */
+ *  Tidal + GIA / Tidal + GIA + all cycles). Consumed by the model-values
+ *  registry (dLodDt* keys), which reaches the website via
+ *  @essrt/model-values. */
 // 8.4-3: the driver decomposition lives in the shared module. NOTE its
 // tidal/gia association: the module carries the browser's two-step form
 // ((s/s → ms/cy) staged) — this mirror's chained one-liners computed the

@@ -64,10 +64,13 @@ that broke orthogonality and sent an amplitude to 1e7.
 
 ## 5. Refits move anchors — check what else moved
 
-Fitted scalars propagate. `export-to-holistic.js` Section 7 auto-syncs website
-measurement constants (`usnoLodJ2000`, `deltaTEspenakRmsSeconds`,
-`ALPHA_CLIMATE_SCALE_NUM`, `DLOD_*`) from fit artefacts. Those carry
-`AUTO-SYNCED` comments and must never be hand-edited.
+Fitted scalars propagate. Since the Phase-14 website split, the website
+consumes the published packages (`@essrt/physics` + `@essrt/model-values`) —
+a refit reaches it by `npm run values:package:write` + publishing new
+package versions, never by file sync. The `values:package` check in the
+chain fails if the packaged values lag the registry. (Historical:
+`export-to-holistic.js` Section 7 used to auto-sync website measurement
+constants from fit artefacts — retired with the split.)
 
 After a refit, the question is not "did the fit improve" but "which shipped
 anchors moved, and does every downstream gate still pass with the new values".
