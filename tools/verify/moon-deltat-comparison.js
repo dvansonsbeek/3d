@@ -146,12 +146,12 @@ function deltaT_stephensonMorrison(year) {
 // ─────────────────────────────────────────────────────────────────
 
 function deltaT_espenakMeeus(y) {
-  // 8.4-4b: the full published canon lives in @hum/physics/deltat/historical.
+  // 8.4-4b: the full published canon lives in @essrt/physics/deltat/historical.
   // This script compares PUBLISHED formulas against eclipse records, so it
   // uses the CANON rendition (separate 1986–2005 segment, far-range
   // parabola) — deliberately NOT the browser's shipped simplification; the
   // two renditions and their consumers are documented in the module header.
-  return require('@hum/physics/deltat/historical').deltaTEspenakMeeusCanonSeconds(y);
+  return require('@essrt/physics/deltat/historical').deltaTEspenakMeeusCanonSeconds(y);
 }
 
 // ─────────────────────────────────────────────────────────────────

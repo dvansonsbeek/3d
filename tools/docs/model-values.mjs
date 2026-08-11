@@ -9,7 +9,7 @@
  * derivation, one rounding. That is this file.
  *
  * Trajectory (§2i, Phases 20/21): this registry moves into the published
- * `@hum/physics` package, and the website's `src/data/model-values.compute.ts`
+ * `@essrt/physics` package, and the website's `src/data/model-values.compute.ts`
  * imports it instead of computing from synced copies of the constants. Until
  * then it lives here and reads the engine directly — which is already one copy
  * fewer than the alternative, because the engine IS the original.
@@ -40,7 +40,7 @@ const C = require(join(ROOT, 'tools', 'lib', 'constants.js'));
 const dtl = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
 
 /** The SHIPPED predictive-precession basis, browser-true: the shared
- *  @hum/physics predict module (snapshot planet-side phases — the basis the
+ *  @essrt/physics predict module (snapshot planet-side phases — the basis the
  *  physical coefficients were fitted against) wired with the browser's
  *  deep-time Earth scalars (integrated-phase perihelion/ERD/obliquity,
  *  epoch-H ERD ω). Lazy singleton shared by every key family that evaluates
@@ -1672,7 +1672,7 @@ export const VALUES = {
 
   // ── Fluctuation scans + geocentric chain (11-2af) ───────────────────────
   // The scans evaluate the SHIPPED predictive basis: the shared
-  // @hum/physics/planets/predict module (snapshot planet-side phases — the
+  // @essrt/physics/planets/predict module (snapshot planet-side phases — the
   // basis the physical coefficients were fitted against) wired with the
   // BROWSER's deep-time Earth scalars (integrated-phase perihelion/ERD/
   // obliquity, epoch-H ERD ω) — the exact hybrid the simulator ships.

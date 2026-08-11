@@ -39,7 +39,7 @@
     "skipLibCheck": true,
     "maxNodeModuleJsDepth": 0,
     "paths": {
-      "@hum/*": ["./packages/*/src"]
+      "@essrt/*": ["./packages/*/src"]
     }
   },
   "include": ["packages/*/src/**/*.js", "packages/*/test/**/*.mjs"],

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 9-3g: the solar-measurements CSV generator lives in @hum/fitting
+ * 9-3g: the solar-measurements CSV generator lives in @essrt/fitting
  * (packages/fitting/src/export-solar-measurements.cjs). Shim keeps the
  * documented CLI path; argv passes through unchanged.
  *

@@ -1,6 +1,6 @@
 /**
- * @hum/fitting — the production fitting pipeline (fit + verify + pipeline).
- * Node only; consumes @hum/physics (and, during the migration, the
+ * @essrt/fitting — the production fitting pipeline (fit + verify + pipeline).
+ * Node only; consumes @essrt/physics (and, during the migration, the
  * pre-migration tools/lib engine through runtime-assembled requires that
  * keep the type checker out of unmigrated code — the layer0 bridge
  * pattern).

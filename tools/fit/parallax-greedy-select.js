@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 9-3h: the parallax greedy-selection DIAGNOSTIC lives in @hum/fitting
+ * 9-3h: the parallax greedy-selection DIAGNOSTIC lives in @essrt/fitting
  * (packages/fitting/src/parallax-greedy-select.cjs). Shim keeps the
  * documented CLI path; argv passes through unchanged. Reminder
  * (fitting-pipeline skill): the greedy pass is a diagnostic — fitters

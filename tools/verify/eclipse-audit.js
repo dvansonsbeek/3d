@@ -28,7 +28,7 @@
  * (tools/explore/umbra-scene-node-twin.js — 0.19–0.21 km against the
  * browser fixture's ecl.umbraScene probes; thresholds are 300/1000 km):
  * the browser's 26-preset loop verbatim — model UT from the shared
- * @hum/physics eclipse finders (wired to the engine's truncated Meeus
+ * @essrt/physics eclipse finders (wired to the engine's truncated Meeus
  * series + framework ΔT), umbra gap at preset/model UT, the ±4h scan at
  * 30-s steps, and the five-way verdict classification
  * (script.js:30127-30190). The audit26/babylon135 sections are written
@@ -59,7 +59,7 @@ const DT = require('../lib/deep-time');
 const C = require('../lib/constants.js');
 const SG = require('../lib/scene-graph.js');
 const { umbraFromSceneAtJdNode } = require('../explore/umbra-scene-node-twin.js');
-const { createEclipseFinders } = require('@hum/physics/eclipse/finders');
+const { createEclipseFinders } = require('@essrt/physics/eclipse/finders');
 
 const OUT = path.join(ROOT, 'data', 'eclipse-audit-summary.json');
 const WRITE = process.argv.includes('--write');

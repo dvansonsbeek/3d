@@ -1,5 +1,5 @@
 /**
- * @hum/fixtures — golden masters.
+ * @essrt/fixtures — golden masters.
  *
  * Two tiers that answer different questions; see README.md.
  *   regression/  what the tree does today  — must stay green

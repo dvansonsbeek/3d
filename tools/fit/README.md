@@ -1,7 +1,7 @@
 # Fitting & Derivation Scripts
 
 > **Phase 9 (9-3a–9-3h):** the implementations live in
-> **`packages/fitting/src/`** (`@hum/fitting`) — moved with `git mv`, history
+> **`packages/fitting/src/`** (`@essrt/fitting`) — moved with `git mv`, history
 > preserved. Every `tools/fit/*.js` path documented below still works: each is
 > a one-line shim into the package (argv/env pass through), kept so this
 > README, the pipeline steps, and muscle memory stay valid. Exceptions still

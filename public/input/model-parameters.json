@@ -230,7 +230,7 @@
   },
   "additionalBodies": {
     "_description": "angleCorrection, startpos and perihelionEclipticFraction were literals in src/script.js with no source of truth until now. The fraction is [1,1] for all four — one full H, unlike the planets' 8H/N divisors — and is stored as a pair so it reads the same way as planets.*.perihelionEclipticFraction.",
-    "_typeNote": "The minor-body `type` assignments are GEOMETRIC PLACEHOLDERS (borrowed from the planet I/II/III taxonomy so the shared geometry law can derive them). These bodies are more susceptible to planetary gravity disturbances and are expected to receive their own perturbation-aware type(s) in the Phase 18 refit (planetary perturbations). Note pluto/halleys currently derive via body-unique branches keyed on the body name in @hum/physics/planets/geometry — their `type` field is not consumed by the derivation, so redefining it later changes nothing until the new branch is wired deliberately.",
+    "_typeNote": "The minor-body `type` assignments are GEOMETRIC PLACEHOLDERS (borrowed from the planet I/II/III taxonomy so the shared geometry law can derive them). These bodies are more susceptible to planetary gravity disturbances and are expected to receive their own perturbation-aware type(s) in the precision-programme refit (Phase 20 post-renumber; pre-renumber 18). Note pluto/halleys currently derive via body-unique branches keyed on the body name in @essrt/physics/planets/geometry — their `type` field is not consumed by the derivation, so redefining it later changes nothing until the new branch is wired deliberately.",
     "pluto": {
       "name": "Pluto",
       "orbitalEccentricityBase": 0.2488273,

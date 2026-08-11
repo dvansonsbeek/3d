@@ -1,5 +1,5 @@
 /**
- * @hum/data — the provenance manifest, machine-readable (Phase 12).
+ * @essrt/data — the provenance manifest, machine-readable (Phase 12).
  *
  * `data/PROVENANCE.md` is the single human-authored manifest of every
  * third-party dataset (source, licence, redistribution right). This module

@@ -45,11 +45,11 @@
       "public/input/fitted-coefficients.json": "sha256:2145337c376bbc4968c000414be518b2c61f6c3fdd68698da35f5f001ed45d02",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
-      "public/input/model-parameters.json": "sha256:e89ff4dc167cd25a2a50b68b4fa12ff52bd14eead5d41f225dd9a7106772eb66",
+      "public/input/model-parameters.json": "sha256:4e0c708933d7c1cb549cd5e08a3d00857daf6999ace915ee5320512a8caf1c0e",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
       "tools/explore/umbra-scene-node-twin.js": "sha256:d7d7055238cc02105c3a060b8d370ba67266a2ba4d51fa6a7025ef5a56982223",
-      "tools/lib/scene-graph.js": "sha256:5f274b742e2466fb81747f7ce4bf9da013a953f4f2c585423cb9ae4e86dc58ef",
-      "tools/verify/eclipse-audit.js": "sha256:bd2a597da830c653487503f29868a1e43cb84a4514e3dfbb6c182721620c7979"
+      "tools/lib/scene-graph.js": "sha256:4c5e437ea68d6003920d84ea2486861a13448532b1b898597bf65cdd82185dc8",
+      "tools/verify/eclipse-audit.js": "sha256:d605ae80ecc8e907ff1ce11911e19578f7ed17aca9f5f12d1556474ea703b8c0"
     }
   }
 }

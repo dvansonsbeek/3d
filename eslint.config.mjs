@@ -167,7 +167,7 @@ export default [
   },
 
   {
-    /* `@hum/fixtures` reads its JSON from disk at call time rather than importing
+    /* `@essrt/fixtures` reads its JSON from disk at call time rather than importing
      * it, so a stale fixture cannot be baked into a bundle and consumers need no
      * import-attributes support. That makes it Node-side test infrastructure that
      * legitimately uses `node:` builtins — nothing shipped to a browser imports
@@ -180,7 +180,7 @@ export default [
   },
 
   {
-    /* `@hum/fitting` is the production fitting pipeline — Node-only tooling
+    /* `@essrt/fitting` is the production fitting pipeline — Node-only tooling
      * (§2a); nothing shipped to a browser imports it. Fitters log progress
      * and read the environment, so Node globals are legitimate here (the
      * boundaries rules above still bar physics from ever importing it). */

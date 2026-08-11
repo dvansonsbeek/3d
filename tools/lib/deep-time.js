@@ -142,10 +142,10 @@ for (const k of ['mercury','venus','earth','mars','jupiter','saturn','uranus','n
 let _alphaClimateL1_J2000 = null;
 
 function _evalClimateL1Orbital(year) {
-  // 8.4-4: the L1 harmonic loop lives in @hum/physics/climate/l1-orbital;
+  // 8.4-4: the L1 harmonic loop lives in @essrt/physics/climate/l1-orbital;
   // the regime selection stays here.
   const r = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
-  return require('@hum/physics/climate/l1-orbital').evalClimateL1OrbitalPermil(year, {
+  return require('@essrt/physics/climate/l1-orbital').evalClimateL1OrbitalPermil(year, {
     l1Terms: r.L1,
     yStdDenormalization: r.denormalization.y_std,
     eightHKyr: CLIMATE_FORMULA_COEFFS.config.eight_H_kyr,
@@ -183,10 +183,10 @@ function iEarthAtAge(t_Ma) {
 
 // ─── LAYER 2 — Moon distance ──────────────────────────────────────────────
 // Phase 8.2-3: the month/precession chain lives ONCE in
-// @hum/physics/moon/month-chain; this engine delegates, injecting its own
+// @essrt/physics/moon/month-chain; this engine delegates, injecting its own
 // layer-0/1 evaluators, J2000 anchors, and the shared ecc channel's
 // modulation. Lazy so every module const exists at first use.
-const { createMoonMonthChain } = require('@hum/physics/moon/month-chain');
+const { createMoonMonthChain } = require('@essrt/physics/moon/month-chain');
 let _moonChainM = null;
 function _moonChain() {
   if (_moonChainM === null) {
@@ -222,12 +222,12 @@ function meanMoonDistanceMetresAtAge(t_Ma) { return _moonChain().distanceMetresA
 function meanMoonDistanceAtAge(t_Ma) { return _moonChain().distanceKmAtAge(t_Ma); }
 
 // ─── LAYER 1 — Angular-momentum-conservation LOD ──────────────────────────
-// 8.4-3: the deep-time LOD/ΔT core lives ONCE in @hum/physics/deltat/
+// 8.4-3: the deep-time LOD/ΔT core lives ONCE in @essrt/physics/deltat/
 // deep-time. This engine injects its moon chain, its GIA α(t) (the
 // lattice-α pin machinery stays engine-side in earthMoiFactorAtAge), the
 // IAU Fourier evaluator, and its env-gated cycle sums. The ΔT cache and
 // the sequential post-integration adds stay below.
-const { createDeepTimeLod } = require('@hum/physics/deltat/deep-time');
+const { createDeepTimeLod } = require('@essrt/physics/deltat/deep-time');
 let _deepLodM = null;
 function _deepLod() {
   if (!_deepLodM) {
@@ -291,8 +291,8 @@ function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
 
 // ─── Driver 2 — AU and year_s ─────────────────────────────────────────────
 function meanAuAtAge(t_Ma) {
-  // Phase 8.3 L6: the linear mass-loss law lives in @hum/physics.
-  return require('@hum/physics/planets/orbit-chain')
+  // Phase 8.3 L6: the linear mass-loss law lives in @essrt/physics.
+  return require('@essrt/physics/planets/orbit-chain')
     .massLossScaledLinearAtAge(t_Ma, C.currentAUDistance, SOLAR_MASS_LOSS_FRAC_PER_YR);
 }
 
@@ -378,12 +378,12 @@ const HOLOCENE_TAPER_FULL_HALFWIDTH_YR = C.DT_STACK_TAPER_FULL_HALFWIDTH_YR;
 const HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR = C.DT_STACK_TAPER_TOTAL_HALFWIDTH_YR;
 
 // 8.4-2: the taper, the four anchored cycle corrections, their δLOD twins,
-// and the Core-mantle swing episode live ONCE in @hum/physics/deltat/cycles.
+// and the Core-mantle swing episode live ONCE in @essrt/physics/deltat/cycles.
 // This engine injects its constant set (the fit-output data JSONs — the
 // browser injects FIT.DT_STACK/FIT.DT_RESONATOR) and keeps its env-var
 // gates. The factory is lazy: the RES_* scalars below it are read at first
 // call, after module evaluation.
-const { createDeltaTCycles } = require('@hum/physics/deltat/cycles');
+const { createDeltaTCycles } = require('@essrt/physics/deltat/cycles');
 let _dtCyclesM = null;
 function _dtCycles() {
   if (!_dtCyclesM) {
@@ -500,7 +500,7 @@ const RES_TONE1_PHI_RAD = _RES.drive_tones[0].phi_locked_rad;
 const RES_TONE1_AMP_S = _RES.drive_tones[0].amp_s;
 
 // 8.4-2: the resonator episode (raw/prime/second, tone compensation, J2000
-// anchor) lives in @hum/physics/deltat/cycles — see the factory above. Only
+// anchor) lives in @essrt/physics/deltat/cycles — see the factory above. Only
 // the env-var gates remain here.
 
 function resonatorSwingDeltaTCorrection(year) {
@@ -580,7 +580,7 @@ function dtCycleLodCorrectionSum(year) {
 // Layer-0 instance for the epoch-aware base — same parameter bundle and α
 // channel the browser's _L0 is built from (the layer0 identity gate pins the
 // two constructions equal).
-const { createEpochPrimitives } = require('@hum/physics');
+const { createEpochPrimitives } = require('@essrt/physics');
 let _l0M = null;
 function _l0() {
   if (!_l0M) _l0M = createEpochPrimitives({ params: EPOCH_PARAMS, alphaAtAgeMa: earthMoiFactorAtAge });
@@ -837,11 +837,11 @@ function _fwEarthEccComposite(t_yr) {
 // Observed J2000 e (−0.86%) and ė (+1.7%) are PREDICTIONS, not inputs.
 // Supersedes the Laskar-band composite (retained for A/B) and the
 // fitted-phase line (solved φ = 78.6° hereby derived).
-// Phase 8.2-2: the line lives ONCE in @hum/physics/moon/ecc-channel (the
+// Phase 8.2-2: the line lives ONCE in @essrt/physics/moon/ecc-channel (the
 // 8.2-1 S1 alignment made the two engines bit-exact first, so this delegation
 // is provably behaviour-preserving). This engine injects its own
 // cyclesBetweenYears (always integrated here — DT has no snapshot toggle).
-const { createMoonEccChannel } = require('@hum/physics/moon/ecc-channel');
+const { createMoonEccChannel } = require('@essrt/physics/moon/ecc-channel');
 let _moonEccM = null;
 function _moonEcc() {
   if (_moonEccM === null) {
@@ -924,7 +924,7 @@ function meanPlanetSemiMajorAxisAtAge(planetName, t_Ma) {
   if (a_J2000 === undefined) return null;
   // Phase 8.3 L6: same linear mass-loss law as meanAuAtAge (S-P11 resolved —
   // the engines shared this driver all along; units are the caller's).
-  return require('@hum/physics/planets/orbit-chain')
+  return require('@essrt/physics/planets/orbit-chain')
     .massLossScaledLinearAtAge(t_Ma, a_J2000, SOLAR_MASS_LOSS_FRAC_PER_YR);
 }
 
@@ -952,13 +952,13 @@ const _CUMUL_INTEGRAL_YEAR_MAX =  500e6;   // +500 Myr (symmetric with past; was
                                            // exercised to ±1 Gyr by the paper figures)
 const _CUMUL_INTEGRAL_STEP     = 10000;    // 10 kyr per cell (matches browser)
 
-// Phase 7.1 — the table arithmetic lives in @hum/physics/phase (ONE
+// Phase 7.1 — the table arithmetic lives in @essrt/physics/phase (ONE
 // implementation for every engine; extracted verbatim from this file). This
 // engine keeps only its CONFIG (the grid constants above, injected) and its
 // OWN H(t) twin as the integrand — the twins dissolve into Layer 0 at
 // Phase 8. R2 is honoured at construction: ensureTable() runs under
 // _withLatticeAlpha, so every invH evaluation sees the constant MOI.
-const { createPhaseMachinery } = require('@hum/physics/phase');
+const { createPhaseMachinery } = require('@essrt/physics/phase');
 let _phaseM = null;
 function _phase() {
   if (_phaseM !== null) return _phaseM;
@@ -981,7 +981,7 @@ function _cumulIntegralJ2000IdxGet() { return _phase().grid().j2000Idx; }
 function _cumulIntegralLength() { return _phase().grid().length; }
 
 // Phase 7.1 — the four functions below are one-line delegates to
-// @hum/physics/phase; their arithmetic (trapezoid convention, R3 call-shape
+// @essrt/physics/phase; their arithmetic (trapezoid convention, R3 call-shape
 // anchor rule, the drift correction, and every comment that used to sit here)
 // moved into the package verbatim. The R2 α-pin is honoured at construction
 // (see _phase() above).
@@ -995,7 +995,7 @@ function _getJ2000Drift(yearA) { return _phase().j2000Drift(yearA); }
 
 /** Total cycles between two years for a cycle of period H/divisor_N.
  *  Integrated form always (toggle at caller). R3 call-shape anchor rule
- *  (see @hum/physics/phase). Returns null past tidal-lock asymptote. */
+ *  (see @essrt/physics/phase). Returns null past tidal-lock asymptote. */
 function cyclesBetweenYears(yearA, yearB, divisor_N) { return _phase().cyclesBetween(yearA, yearB, divisor_N); }
 
 /**
@@ -1309,7 +1309,7 @@ function posFromJD(jd) {
 module.exports = {
   // Framework e_E: H/3 fluctuation line (production) + Laskar-band composite (A/B research)
   _fwEarthEcc,
-  // The shared @hum/physics moon eccentricity channel (8.2-2) — scene-graph's
+  // The shared @essrt/physics moon eccentricity channel (8.2-2) — scene-graph's
   // E-factor and channel-integral mirrors read it from here so the anchors
   // e0/g0 stay the channel's consts (never eccAt(0) — the R3 drift
   // correction makes cycles(2000→2000) nonzero).

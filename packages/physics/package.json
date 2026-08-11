@@ -1,5 +1,5 @@
 {
-  "name": "@hum/physics",
+  "name": "@essrt/physics",
   "version": "0.0.0",
   "private": true,
   "description": "Pure physics core \u2014 no I/O, no globals, no DOM. Published; the website consumes this.",

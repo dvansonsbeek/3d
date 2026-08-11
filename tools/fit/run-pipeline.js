@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 9-3g: the pipeline orchestrator lives in @hum/fitting
+ * 9-3g: the pipeline orchestrator lives in @essrt/fitting
  * (packages/fitting/src/run-pipeline.cjs). Shim keeps the documented CLI
  * path; argv passes through unchanged. Its step cmds keep spawning the
  * tools/fit/*.js paths — which are now these one-line shims — so the

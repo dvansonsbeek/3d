@@ -1,5 +1,5 @@
 /**
- * @hum/physics — the pure physics core.
+ * @essrt/physics — the pure physics core.
  *
  * PHASE 2 SKELETON. No physics has moved yet; `script.js` remains the
  * implementation. This file exists so the architecture rules have something to

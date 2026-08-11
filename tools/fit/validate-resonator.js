@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 9-3f: the resonator validation lives in @hum/fitting
+ * 9-3f: the resonator validation lives in @essrt/fitting
  * (packages/fitting/src/validate-resonator.cjs). Shim keeps the
  * documented CLI path; argv passes through unchanged.
  */

@@ -16,7 +16,7 @@
  *   - year lengths: BIT-EXACT since Phase 7.2 — the pre-extraction ≤5.6e-8 d
  *     gap turned out to be OPERATION-ORDER divergence between the two
  *     hand-mirrors (per-div phaseAdvance vs 2π·div·c), not the twins; the
- *     shared @hum/physics/cardinal implementation dissolved it.
+ *     shared @essrt/physics/cardinal implementation dissolved it.
  *   - RA: bit-exact since the integrated-phase migration (same reason).
  */
 import { readFileSync } from 'node:fs';

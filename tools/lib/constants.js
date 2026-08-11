@@ -434,8 +434,8 @@ const M_SUN = GM_SUN / G_CONSTANT;
 massFraction.earth = (GM_EARTH_ALONE / G_CONSTANT) / M_SUN;
 
 // PSI derived from Earth's fitted inclination amplitude: PSI = d_Earth × amp_Earth × √m_Earth
-// Phase 8.3 L2: the Fibonacci laws live ONCE in @hum/physics/planets/fibonacci-laws.
-const FL = require('@hum/physics/planets/fibonacci-laws');
+// Phase 8.3 L2: the Fibonacci laws live ONCE in @essrt/physics/planets/fibonacci-laws.
+const FL = require('@essrt/physics/planets/fibonacci-laws');
 const PSI = FL.computePsiConstant({
   earthInvPlaneInclinationAmplitude,
   massEarthAlone: GM_EARTH_ALONE / G_CONSTANT, massSun: M_SUN,
@@ -533,9 +533,9 @@ for (const [key, p] of Object.entries(planets)) {
 // 10. PLANET DERIVED CALCULATIONS
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Phase 8.3 L1: the geometry law lives ONCE in @hum/physics/planets/geometry
+// Phase 8.3 L1: the geometry law lives ONCE in @essrt/physics/planets/geometry
 // (browser expression forms — this mirror's last-ulp variants dissolve).
-const { derivePlanetGeometry } = require('@hum/physics/planets/geometry');
+const { derivePlanetGeometry } = require('@essrt/physics/planets/geometry');
 const _GEOM_ENV = {
   holisticYears: H,
   meanSolarYearDays,

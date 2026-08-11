@@ -3,7 +3,7 @@
  * PREDICT SCALAR-FORM PINNING GATE (§12g item 3)
  * ===============================================
  *
- * The predictive-precession feature basis is shared (@hum/physics/planets/
+ * The predictive-precession feature basis is shared (@essrt/physics/planets/
  * predict), but the Earth scalars are a documented DUAL quantity: the Node
  * engine wires the J2000-anchored forms — the form the shipped
  * PREDICT_COEFFS were TRAINED against (verified in

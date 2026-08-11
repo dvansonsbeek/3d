@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection } from '@hum/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection } from '@essrt/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -693,7 +693,7 @@ const SUN_LONGITUDE_HARMONICS = FIT.SUN_LONGITUDE_HARMONICS;
 function _gcdInt(a, b) { a = Math.abs(a); b = Math.abs(b); while (b !== 0) { const t = b; b = a % b; a = t; } return a; }
 
 // 9-1 S-P8: the fitted H-lattice harmonic stack (and the lattice-filter
-// rationale) lives ONCE in @hum/physics/sun/longitude-correction. Deps are
+// rationale) lives ONCE in @essrt/physics/sun/longitude-correction. Deps are
 // the J2000-FIXED values — the fitted convention; this browser copy
 // historically read the mutable holisticyearLength/balancedYear globals
 // (measured divergence under epoch shift: 8.2e-10 deg, aligned here).
@@ -1412,7 +1412,7 @@ const _massFrac = {
   mercury: M_MERCURY_SYSTEM / M_SUN, venus: M_VENUS_SYSTEM / M_SUN, mars: M_MARS_SYSTEM / M_SUN,
   jupiter: M_JUPITER_SYSTEM / M_SUN, saturn: M_SATURN_SYSTEM / M_SUN, uranus: M_URANUS_SYSTEM / M_SUN, neptune: M_NEPTUNE_SYSTEM / M_SUN,
 };
-// Phase 8.3 L2: the ψ law lives ONCE in @hum/physics/planets/fibonacci-laws.
+// Phase 8.3 L2: the ψ law lives ONCE in @essrt/physics/planets/fibonacci-laws.
 const psiConstant = _FL.computePsiConstant({
   earthInvPlaneInclinationAmplitude, massEarthAlone: M_EARTH_ALONE, massSun: M_SUN,
 });
@@ -1441,7 +1441,7 @@ for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune
 // Earth check: periICRF = H/3, |−13/H − 3/H| = 16/H → H/16 ✓
 // If |axial| > 8H (frozen, e.g. Uranus ~200 Myr, Neptune ~23 Myr), treat as
 // infinite: wobble = |ICRF| exactly. Gives Uranus 8H/80 and Neptune 8H/100.
-// Phase 8.3 L2: the wobble law lives ONCE in @hum/physics (this delegate
+// Phase 8.3 L2: the wobble law lives ONCE in @essrt/physics (this delegate
 // reads the LIVE holisticyearLength, so recomputePlanetCyclesForEpoch keeps
 // its epoch semantics; the sign-free beat convention is in the module).
 function calcWobblePeriod(periEclYr, axialYr) {
@@ -1501,7 +1501,7 @@ function calcObliquityMean(planetKey, obliqCycle) {
     return p.axialTiltJ2000 + amp * Math.cos(2 * Math.PI * cyc_icrf)
                             - amp * Math.cos(2 * Math.PI * cyc_obliq);
   } catch (e) {
-    // Module-load fallback (TDZ) — snapshot law from @hum/physics (8.3 L2),
+    // Module-load fallback (TDZ) — snapshot law from @essrt/physics (8.3 L2),
     // live J2000 globals for H and the eccentricity anchor.
     return _FL.computeObliquityMeanSnapshot({
       axialTiltJ2000: p.axialTiltJ2000,
@@ -1544,7 +1544,7 @@ let   _eccentricityAnchor = balancedYear - systemResetN * holisticyearLength;  /
 const _t2000 = 2000 - _eccentricityAnchor;
 for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune']) {
   const p = planets[key];
-  // Phase 8.3 L2: the K law lives ONCE in @hum/physics/planets/fibonacci-laws.
+  // Phase 8.3 L2: the K law lives ONCE in @essrt/physics/planets/fibonacci-laws.
   const _el = _FL.computeEccentricityLaw({
     fibonacciD: _fibD[key], massFrac: _massFrac[key],
     solarYearInput: p.solarYearInput,
@@ -2146,7 +2146,7 @@ const OrbitalFormulas = {
 // ─────────────────────────────────────────────────────────────────────────
 
 // Phase 8.3 L1: the geometry derivation lives ONCE in
-// @hum/physics/planets/geometry — one type-branched law over body records
+// @essrt/physics/planets/geometry — one type-branched law over body records
 // (this replaces the hand-unrolled per-planet block; the aliases keep their
 // exact names and epoch MUTABILITY — recomputePlanetCountsForEpoch and the
 // update*ForEpoch family still reassign the `let`s, untouched).
@@ -2396,7 +2396,7 @@ let _alphaClimateL1_J2000 = null;
 function _evalClimateL1Orbital(year) {
   // δ¹⁸O contribution from L1 (orbital) layer only, in ‰ — the orbital
   // fluctuation around J2000, not the secular baseline. 8.4-4: the
-  // harmonic loop lives in @hum/physics/climate/l1-orbital; the regime
+  // harmonic loop lives in @essrt/physics/climate/l1-orbital; the regime
   // selection (and the TDZ-sensitive CLIMATE_FORMULA_COEFFS read) stays
   // here.
   const r = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
@@ -2604,7 +2604,7 @@ const L_TOTAL_EM_KGM2_S = (I_EARTH * 2 * Math.PI / LOD_NOW_H13_S)
 const A_LOCK_M        = (L_TOTAL_EM_KGM2_S / (M_MOON_ALONE * Math.sqrt(GM_EM_M3S2) * E_FACTOR_MOON)) ** 2;
                        // ≈ 555,623 km (tidal-lock asymptote, 87.1 R_E, reached ~50 Gyr ahead)
 
-// ── Layer 0 — the shared epoch chain (@hum/physics, Phase B) ───────────────
+// ── Layer 0 — the shared epoch chain (@essrt/physics, Phase B) ───────────────
 // Built from the browser's OWN derived constants above — the bit-identical
 // twins of Node's EPOCH_PARAMS (the layer0 identity gate holds the two
 // derivations together; the epoch@tMa fixtures adjudicate the outputs).
@@ -2666,7 +2666,7 @@ function meanMoonDistanceMetresAtAge(t_Ma) { return _moonChain().distanceMetresA
 
 // ───── LAYER 1 — Angular-momentum-conservation LOD ─────
 /** LOD in seconds at given age. Returns null past the tidal-lock asymptote. */
-// 8.4-3: the deep-time LOD/ΔT core lives ONCE in @hum/physics/deltat/
+// 8.4-3: the deep-time LOD/ΔT core lives ONCE in @essrt/physics/deltat/
 // deep-time. This browser injects its moon chain, its GIA α(t) (the
 // lattice-α pin machinery stays engine-side in earthMoiFactorAtAge), the
 // IAU-base Fourier ripple evaluator (S-D2: the old Actual divided by the
@@ -2820,7 +2820,7 @@ function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
 
 // ───── Driver 2 — AU and year_s ─────
 /** Earth semi-major axis in km at given epoch (adiabatic a × M = const).
- *  Phase 8.3 L6: the linear mass-loss law lives in @hum/physics. */
+ *  Phase 8.3 L6: the linear mass-loss law lives in @essrt/physics. */
 function meanAuAtAge(t_Ma) {
   return _POC.massLossScaledLinearAtAge(t_Ma, AU_J2000_KM, SOLAR_MASS_LOSS_FRAC_PER_YR);
 }
@@ -2937,7 +2937,7 @@ const BOND_SIN_COEFF_S            = FIT.DT_STACK.bond.sin_coeff_s;
 // continuity though the window is no longer literally "Holocene".
 // BOND_TAPER_FULL/TOTAL_HALFWIDTH_YR live in section C3 "Deep-time physics anchors" near the top.
 // 8.4-2: the taper, the four anchored cycle corrections, their δLOD twins,
-// and the Core-mantle swing episode live ONCE in @hum/physics/deltat/cycles.
+// and the Core-mantle swing episode live ONCE in @essrt/physics/deltat/cycles.
 // This browser injects FIT.DT_STACK / FIT.DT_RESONATOR (the Node engine
 // injects the fit-output data JSONs) and keeps its research-toggle gates.
 // var + lazy factory: the hallstatt/jose/resonator constants below are read
@@ -3196,7 +3196,7 @@ const RES_TONE1_AMP_S = FIT.DT_RESONATOR.drive_tones[0].amp_s;
 
 // 8.4-2: the resonator episode (derived constants, raw/prime/second,
 // impulse-consistent tone compensation, J2000 anchor) lives in
-// @hum/physics/deltat/cycles — see the _dtCycles factory in the Bond
+// @essrt/physics/deltat/cycles — see the _dtCycles factory in the Bond
 // section. Only the research-toggle gates remain here.
 
 /** Anchored Core-mantle swing ΔT correction at calendar year (CE), seconds.
@@ -3490,11 +3490,11 @@ function _eclDeltaT(jd) {
  *  active. Kept as MEAN for consistency with existing SUN_HARMONICS calibration. */
 function _eclSunLon(jd) {
   // 8.5-1: the Meeus Ch.25 evaluator (and the MEAN-not-apparent
-  // calibration rationale) lives in @hum/physics/eclipse/finders.
+  // calibration rationale) lives in @essrt/physics/eclipse/finders.
   return _eclipse().sunLonDegAt(jd);
 }
 
-// 8.5-1: the eclipse finders + sun longitude live ONCE in @hum/physics/
+// 8.5-1: the eclipse finders + sun longitude live ONCE in @essrt/physics/
 // eclipse/finders. This browser injects its truncated moon series (shared
 // since 8.2), its calendar-convention ΔT (_eclDeltaT — S-D4), and its live
 // epoch-mutable globals. The scene-umbra conventions stay engine-side:
@@ -3631,7 +3631,7 @@ function _fwSunMeanElements(jd_ut) {
  *  form) — the documented approximation, matching the L1-lattice convention;
  *  KL/KA/KS capture the J2000 mean-year values at load time by design. */
 // Phase 8.2-5: the argument skeleton lives ONCE in
-// @hum/physics/moon/arguments (the _FW_MOON bundle, the Sun secular
+// @essrt/physics/moon/arguments (the _FW_MOON bundle, the Sun secular
 // deviations with their S3 calendar coordinate, the two bounded Lp
 // carriers, the deep chains branch, the polynomial skeleton, and the
 // pure-Meeus reference). This engine delegates, injecting its own chain
@@ -3719,7 +3719,7 @@ function _fwSunSecularDeviations(jd_tt) { return _moonArgsM().sunSecularDeviatio
 // MOON_ARGS_FRAMEWORK_NATIVE is declared in the toggle block at the top of the
 // file (next to RESONATOR_DT_CORRECTION_ENABLED) — default ON.
 
-// The _FW_MOON bundle now lives inside @hum/physics/moon/arguments (8.2-5);
+// The _FW_MOON bundle now lives inside @essrt/physics/moon/arguments (8.2-5);
 // read via _moonArgsM().bundle. The v4 frame-attribution and K_PL budget
 // derivation records are preserved in the module header and doc 66 §1.
 
@@ -3830,7 +3830,7 @@ function _eclMoonBeta(jd)     { return _meeusMoonBeta(jd); }
 // ─── Meeus Ch. 47 implementations (canonical; ~60 terms each) ──────────────
 
 // Phase 8.2-6: the Meeus Ch. 47 series lives ONCE in
-// @hum/physics/moon/series — BOTH forms: the full production scene
+// @essrt/physics/moon/series — BOTH forms: the full production scene
 // evaluation and the truncated eclipse-finder variant (doc 66 §Layer 1b,
 // the certified dual-β, deliberately preserved as two entries).
 const _moonSeries = (() => {
@@ -3906,7 +3906,7 @@ function _meeusMoonBeta(jd) { return _moonSeries().truncatedBetaDeg(jd); }
 
 /** Find all lunar-eclipse-class oppositions in [jdStart, jdEnd].
  *  8.5-1: the geometry (Danjon-enlarged per-event shadow thresholds,
- *  opposition bisection) lives in @hum/physics/eclipse/finders. */
+ *  opposition bisection) lives in @essrt/physics/eclipse/finders. */
 function findLunarEclipsesInRange(jdStart, jdEnd) {
   return _eclipse().findLunarEclipsesInRange(jdStart, jdEnd);
 }
@@ -3938,7 +3938,7 @@ function findLunarEclipsesInRange(jdStart, jdEnd) {
 /** Find all solar-eclipse-class conjunctions in [jdStart, jdEnd].
  *  8.5-1: the geometry (topocentric total/annular discrimination,
  *  min-γ refinement to NASA's greatest-eclipse convention) lives in
- *  @hum/physics/eclipse/finders. */
+ *  @essrt/physics/eclipse/finders. */
 function findSolarEclipsesInRange(jdStart, jdEnd) {
   return _eclipse().findSolarEclipsesInRange(jdStart, jdEnd);
 }
@@ -3952,7 +3952,7 @@ function meanTropicalYearDaysAtAge(t_Ma) { return _deepLod().tropicalYearDaysAtA
 function meanYearInDaysAtAge(t_Ma) { return _deepLod().yearInDaysAtAge(t_Ma); }
 
 // ───── Moon distance correction + Kepler month ─────
-// Phase 8.2-3: bodies live in @hum/physics/moon/month-chain (see _moonChain).
+// Phase 8.2-3: bodies live in @essrt/physics/moon/month-chain (see _moonChain).
 /** Solar Δa correction (km) for Moon's apparent semi-major axis (doc 24). */
 function meanSolarDeltaAAtAge(t_Ma, a_apparent_km) { return _moonChain().solarDeltaAKmAtAge(t_Ma, a_apparent_km); }
 
@@ -4030,7 +4030,7 @@ function meanApsidalMeetsNodalAtAge(t_Ma) { return _moonChain().apsidalMeetsNoda
 function meanLunarLevelingCycleAtAge(t_Ma) { return _moonChain().lunarLevelingSecondsAtAge(t_Ma); }
 
 /** Generic chain-cycle integrator — Phase 8.2-4: lives ONCE in
- *  @hum/physics/chain-cycles. Snapshot mode: linear at the J2000 rate.
+ *  @essrt/physics/chain-cycles. Snapshot mode: linear at the J2000 rate.
  *  Deep time: cumulative 10-yr table over ±250 kyr (per-cell 3-point
  *  Simpson at build, linear interpolation on read — the L-4 92 s/century
  *  fix), adaptive Simpson beyond, bounded FIFO cache on the fallback.
@@ -4141,7 +4141,7 @@ const _ECOMP_G0 = Math.pow(1 - _fwEarthEccComposite(0) ** 2, -1.5);   // g at th
  *  ≈ 4739, locked to the inclination's; turning points ≈ −23,200 / +32,700.
  *  Deep-time aware via cyclesBetweenYears (integrated ∫3/H(t)dt when on).
  *
- *  Phase 8.2-2: the line lives ONCE in @hum/physics/moon/ecc-channel; this
+ *  Phase 8.2-2: the line lives ONCE in @essrt/physics/moon/ecc-channel; this
  *  engine delegates, injecting its OWN cyclesBetweenYears so the deep-time /
  *  snapshot toggle semantics ride along. Anchors e0/g0 are consts inside the
  *  channel (never eccAt(0) — the R3 drift correction). */
@@ -4216,7 +4216,7 @@ function _fwLpObliquityCarrier(T) { return _moonArgsM().obliquityCarrier(T); }
 function _eCompModulation(t_Ma, s) { return _moonEcc().modulation(t_Ma, s); }
 
 // Phase 8.2-3: the month/precession chain lives ONCE in
-// @hum/physics/moon/month-chain; this engine delegates, injecting its own
+// @essrt/physics/moon/month-chain; this engine delegates, injecting its own
 // layer-0/1 evaluators and J2000 anchors. Lazy so the injected _FW_MOON
 // sensitivities and anchors are read after all module-scope consts exist.
 const _moonChain = (() => {
@@ -4325,7 +4325,7 @@ function meanEarthNeptuneDistanceAtAge(t_Ma) { return _earthPlanetDist(meanAuAtA
 
 /** Planet orbital period in seconds at given age (Kepler with mass loss). */
 function meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s) {
-  // Phase 8.3 L6: Driver 2 (Kepler under mass loss) lives in @hum/physics.
+  // Phase 8.3 L6: Driver 2 (Kepler under mass loss) lives in @essrt/physics.
   return _POC.driver2PeriodSecondsAtAge(t_Ma, T_p_J2000_s, SOLAR_MASS_LOSS_FRAC_PER_YR);
 }
 
@@ -4386,7 +4386,7 @@ function meanNeptuneOrbitalCyclesBetween(yearA, yearB) { return _moonChainCycles
 // derived day-counts (meansiderealyearlengthinDays, meansolaryearlengthinDays)
 // so the divisions use the deep-time LOD.
 function recomputeEpochAnchors(t_Ma) {
-  // Phase B: filled from the shared Layer 0 (@hum/physics), not the browser
+  // Phase B: filled from the shared Layer 0 (@essrt/physics), not the browser
   // twins — the globals are a cache over Layer 0, never a definition (§2c).
   // f(year) axis; the t→year→t float wobble measurably never reaches output
   // bits (200k-point sweep, pinned by the layer0 gate's non-round-tripping t).
@@ -4515,7 +4515,7 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
 const _CUMUL_INTEGRAL_YEAR_MIN = -500e6;
 const _CUMUL_INTEGRAL_YEAR_MAX = 500e6;
 const _CUMUL_INTEGRAL_STEP     = 10000;
-// Phase 7.1 — the table arithmetic lives in @hum/physics/phase (ONE
+// Phase 7.1 — the table arithmetic lives in @essrt/physics/phase (ONE
 // implementation for every engine; the Node port of this very code delegated
 // first, fixtures bit-identical). This engine keeps its grid CONFIG
 // (injected above) and its OWN meanHAtAge twin as the integrand — the twins
@@ -4543,7 +4543,7 @@ function _ensureCumulIntegralTable() { _phase(); }
 function _cumulIntegralJ2000IdxGet() { return _phase().grid().j2000Idx; }
 function _cumulIntegralLength() { return _phase().grid().length; }
 
-// Phase 7.1 — one-line delegates to @hum/physics/phase (arithmetic + the R3
+// Phase 7.1 — one-line delegates to @essrt/physics/phase (arithmetic + the R3
 // comments moved into the package verbatim; R2 pin honoured in _phase()).
 function _cumulIntegralAtYear(year) { return _phase().cumulAtYear(year); }
 
@@ -4893,7 +4893,7 @@ function _getJ2000Drift(yearA) { return _phase().j2000Drift(yearA); }
 function cyclesBetweenYears(yearA, yearB, divisor_N) {
   if (DEEP_TIME_MODE_ENABLED) {
     // Integrated form + R3 call-shape anchor rule — delegated to
-    // @hum/physics/phase (the comments moved there verbatim).
+    // @essrt/physics/phase (the comments moved there verbatim).
     return _phase().cyclesBetween(yearA, yearB, divisor_N);
   }
   // Snapshot branch stays engine-local: it reads the LIVE mutated H
@@ -5280,7 +5280,7 @@ function recomputePlanetCyclesForEpoch(t_Ma) {
   neptuneObliquityMean = calcObliquityMean('neptune', neptuneObliquityCycle);
 
   // Invalidate the predictive-formula feature-template cache (held by the
-  // @hum/physics predict factory since 8.3 L9). Templates are built from
+  // @essrt/physics predict factory since 8.3 L9). Templates are built from
   // planets.X.perihelionEclipticYears / axialPrecessionYears /
   // obliquityCycle + mercuryWobblePeriod etc. — all of which we just mutated
   // above. Without this reset, the factory returns the template frozen at
@@ -17479,7 +17479,7 @@ async function loadStephensonDtPolynomial() {
 
 /** Evaluate the Stephenson 2016 ΔT polynomial spline at a given year.
  *  Returns null if year is outside the [-720, 2016] window.
- *  8.6-1: the pure evaluator lives in @hum/physics/reference/
+ *  8.6-1: the pure evaluator lives in @essrt/physics/reference/
  *  published-curves; the poly itself is app-loaded JSON data. */
 function stephensonDeltaT(year, poly) {
   return _PC.stephensonDeltaT(year, poly);
@@ -21704,7 +21704,7 @@ function perihelionMeeusEarth(year) {
     + 0.0002 * arcsecToDeg * Math.pow(T, 6)) % 360 + 360) % 360;
 }
 
-// 8.6-1: the published reference curves live in @hum/physics/reference/
+// 8.6-1: the published reference curves live in @essrt/physics/reference/
 // published-curves — exactly as published, per-curve provenance in the
 // module header. This browser injects its approximate calendar→JD
 // conversion for the four T-based analytic polynomials.
@@ -21731,7 +21731,7 @@ function solarDayPeters(year) { return _pubCurves().solarDayPeters(year); }
  *  deltaTEspenakMeeusRelJ2000 instead. */
 function deltaTEspenakMeeusRaw(year) {
   // 8.4-4c (measured change): EXACTLY the published NASA canon, from
-  // @hum/physics/deltat/historical. The previously shipped simplification
+  // @essrt/physics/deltat/historical. The previously shipped simplification
   // (1986–2005 merged into the 62.92-branch, NaN outside −1999..3000)
   // differed by ≤4.6 s in 1986–2005 and 52 s at 2100, and its chart was
   // labeled "NASA Canon" while not plotting it. The display anchor
@@ -21770,20 +21770,20 @@ function siderealYearChapront(year) { return _pubCurves().siderealYearChapront(y
 function axialPrecessionCapitaine2009(year) { return _pubCurves().axialPrecessionCapitaine2009(year); }
 
 // ── Berger (1978) trigonometric series ────────────────────────────
-// 8.6-1: series + evaluators live in @hum/physics/reference/published-curves.
+// 8.6-1: series + evaluators live in @essrt/physics/reference/published-curves.
 
 function eccBerger1978(year) { return _PC.eccBerger1978(year); }
 
 function obliquityBerger1978(year) { return _PC.obliquityBerger1978(year); }
 
 // ── Vondrák et al. (2011) long-term precession ──────────────────
-// 8.6-1: table + evaluator live in @hum/physics/reference/published-curves.
+// 8.6-1: table + evaluator live in @essrt/physics/reference/published-curves.
 
 function axialPrecessionVondrak2011(year) { return _PC.axialPrecessionVondrak2011(year); }
 
 // ── Laskar La2004 N-body solution (IMCCE) ────────────────────────
 // 8.6-1: the 351-row published table + interpolants live in
-// @hum/physics/reference/published-curves.
+// @essrt/physics/reference/published-curves.
 
 function eccLa2004(year) { return _PC.eccLa2004(year); }
 function obliquityLa2004(year) { return _PC.obliquityLa2004(year); }
@@ -38933,7 +38933,7 @@ async function runBalancedYearStateDiagnostic() {
   console.log(`    ΔH from J2000: live H − H_J2000        = ${(holisticyearLength - HOLISTIC_YEAR_J2000).toExponential(4)}`);
   console.log('');
   console.log('  Live cumulative-integral tables (should be null-then-frozen after 1st touch):');
-  console.log(`    phase table (@hum/physics/phase)       = ${_phaseM !== null ? 'BUILT (' + _cumulIntegralLength() + ' entries)' : 'null'}`);
+  console.log(`    phase table (@essrt/physics/phase)       = ${_phaseM !== null ? 'BUILT (' + _cumulIntegralLength() + ' entries)' : 'null'}`);
   console.log(`    _cumulDaysTable                        = ${_cumulDaysTable !== null ? 'BUILT (' + _cumulDaysTable.length + ' entries)' : 'null'}`);
   console.log(`    _J2000_DRIFT_CACHE.size                = ${_J2000_DRIFT_CACHE.size}`);
   console.log('');
@@ -53238,7 +53238,7 @@ const _moonVisualCorrection = new THREE.Vector3();
 const _D5_RATE_L    = 360 / meansolaryearlengthinDays;                          // deg/day, tropical
 const _D5_RATE_PERI = 360 / ((holisticyearLength / 16) * meansolaryearlengthinDays);  // deg/day, H/16
 // Phase 8.2-7: the D5 optics + RA/Dec override live ONCE in
-// @hum/physics/moon/apparent. S8: the override's obliquity stays
+// @essrt/physics/moon/apparent. S8: the override's obliquity stays
 // ENGINE-INJECTED per call (this engine passes the live scene value).
 const _moonApparent = (() => {
   let m = null;
@@ -53385,7 +53385,7 @@ function updatePositions() {
         _sin2M = Math.sin(2 * _Mpl); _cos2M = Math.cos(2 * _Mpl);
       }
       // Phase 8.3 L8: the fitted 80-slot parallax basis lives ONCE in
-      // @hum/physics/planets/corrections (matched pair with the tables;
+      // @essrt/physics/planets/corrections (matched pair with the tables;
       // the state derivation above stays engine-side).
       const _pState = { u: _u, invD: _invD, invS: _invS, T: _T, cp: _cp, Lsun: _Lsun, sinM: _sinM, cosM: _cosM, sin2M: _sin2M, cos2M: _cos2M };
       if (_dc) {
@@ -53397,7 +53397,7 @@ function updatePositions() {
     }
 
     // Gravitation correction (planet-planet perturbations, per-planet synodic periods)
-    // 8.3: term evaluation shared (@hum/physics/planets/corrections); applied
+    // 8.3: term evaluation shared (@essrt/physics/planets/corrections); applied
     // PER TERM here — order and sign are engine application semantics.
     const _conjTerms = GRAVITATION_CORRECTION[obj.name];
     if (_conjTerms) {
@@ -53410,7 +53410,7 @@ function updatePositions() {
 
     // Elongation offset correction (elongation × Earth perihelion geometry)
     // Applied to inner planets: Mercury, Venus, Mars
-    // 8.3: the fitted 21-slot basis lives ONCE in @hum/physics/planets/
+    // 8.3: the fitted 21-slot basis lives ONCE in @essrt/physics/planets/
     // corrections (browser association form — precomputed invD²); the
     // frame-state derivation (this frame's sun.ra, the exact synodic count)
     // stays here.
@@ -53444,7 +53444,7 @@ function updatePositions() {
       // Was: Meeus linear (23.4393 - 0.01300*T); framework has H/3+H/8 obliquity
       // harmonics that diverge from linear by ~11″ at present epoch and ~4′ at year -135.
       // Phase 8.2-7: ecl→eq + aberration + the fitted MOON_CORRECTION patch
-      // live in @hum/physics/moon/apparent. S8: this engine passes the LIVE
+      // live in @essrt/physics/moon/apparent. S8: this engine passes the LIVE
       // scene obliquity (o.obliquityEarth, kept fresh above).
       const _ov = _moonApparent().overrideRaDec({
         lonDeg: obj._meeusLonDeg, betRad: obj._meeusLatRad,
@@ -53902,7 +53902,7 @@ function moveModel(pos) {
         }
       }
       // Phase 8.2-6: the full production evaluation lives in
-      // @hum/physics/moon/series (args dispatch, E-factor, A1/A2/A3 with
+      // @essrt/physics/moon/series (args dispatch, E-factor, A1/A2/A3 with
       // the deep-time chain integration, both 60-term tables, all
       // corrections, the EoC-half split, the two-term distance). The
       // engine keeps the UT→TT conversion above and the scene writes.
@@ -54648,7 +54648,7 @@ function getEclipticInclinationAtYear(planetName, year) {
 function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentObliquity, earthInclination, currentYear, planetName) {
   // 8.3 S-P5: the segment-integration law (dΩ/dε = −sin Ω / tan i, with
   // sign flips at obliquity extrema and Earth-inclination crossovers) lives
-  // in @hum/physics/planets/asc-node-integrator — L5 delegated the Node
+  // in @essrt/physics/planets/asc-node-integrator — L5 delegated the Node
   // mirror; this browser 6-arg variant now delegates too. What stays HERE:
   // the Tychosium orbitTilta/orbitTiltb decomposition (§2h — those names
   // never enter the package), the `|| planetInclination` fallbacks (folded
@@ -56800,7 +56800,7 @@ function computeEccentricityEarth(
   // the integrated value is the physically correct frame-independent answer
   // (see doc 99 Phase 8 + IP doc Phase 8 detail).
   // Phase 8.3 L3: the law-of-cosines channel lives ONCE in
-  // @hum/physics/planets/ecc-channel; this engine's cyclesBetweenYears
+  // @essrt/physics/planets/ecc-channel; this engine's cyclesBetweenYears
   // (deep/snapshot toggle + null → mean past tidal lock) rides along.
   return computeEccentricityIntegrated(currentYear, anchorYearJ2000, cycleLengthYearsJ2000,
     eccentricityBase, eccentricityAmplitude,
@@ -56896,7 +56896,7 @@ function computeObliquityEarth(currentYear) {
 }
 
 // Phase 7.2 — the entire §10/§10g cardinal family lives in
-// @hum/physics/cardinal (ONE implementation for every engine; the Node
+// @essrt/physics/cardinal (ONE implementation for every engine; the Node
 // engine delegated first, fixtures bit-identical). This engine injects its
 // constants and its own twins; the public functions below are one-line
 // delegates. The R11 self-correction, drift Simpson, Ih closed form, joint
@@ -56963,7 +56963,7 @@ function _cpAnalyticTropDays(year) {
 }
 
 // Phase 7.2 — drift Simpson, Ih closed form, σ_tropical: see
-// @hum/physics/cardinal (the implementation, with its measured-cost
+// @essrt/physics/cardinal (the implementation, with its measured-cost
 // comments, moved into the package verbatim; _cpAnalyticTropDays above stays
 // as the injected integrand base).
 
@@ -57093,12 +57093,12 @@ function calcERD(year) {
 }
 
 function calcPlanetPerihelionLong(theta0, period, year) {
-  // 8.3 L9: the linear form lives in @hum/physics/planets/predict.
+  // 8.3 L9: the linear form lives in @essrt/physics/planets/predict.
   return calcPlanetPerihelionLongDeg(theta0, period, year);
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Predictive-precession feature basis — @hum/physics/planets/predict (8.3 L9).
+// Predictive-precession feature basis — @essrt/physics/planets/predict (8.3 L9).
 // ONE implementation for both engines. This browser injects its deep-time
 // epoch-aware Earth scalar forms (calcEarthPerihelionPredictive / calcERD
 // evaluate H_at_year via phaseAdvanceRadians; the Node engine injects its
@@ -57284,7 +57284,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   }
 
   // Phase 8.3 L4: the ICRF-linked oscillation law lives ONCE in
-  // @hum/physics/planets/orientation.
+  // @essrt/physics/planets/orientation.
   // 8.3-13: currentYear is HONOURED (measured change). Historically it was
   // shadowed by the live scene JD, so any query at a non-scene year got the
   // scene-year value — in particular the asc-node integrator's mid-segment

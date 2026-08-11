@@ -1,6 +1,6 @@
 /**
  * Correction Stack — single source of truth for planet position correction
- * layers (Phase 9-3a: the first `@hum/fitting` module, moved from
+ * layers (Phase 9-3a: the first `@essrt/fitting` module, moved from
  * tools/lib/correction-stack.js; that path remains as a one-line shim for
  * the pre-migration fitter CLIs).
  *

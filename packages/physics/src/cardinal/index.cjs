@@ -32,7 +32,7 @@
  *
  * The `cyclesBetween` the caller injects is the ENGINE'S OWN function, so
  * each engine's deep-time/snapshot toggle semantics are preserved exactly;
- * under deep time both engines now route it through @hum/physics/phase.
+ * under deep time both engines now route it through @essrt/physics/phase.
  */
 
 'use strict';

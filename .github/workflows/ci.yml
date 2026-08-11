@@ -111,7 +111,7 @@ jobs:
 
       # Phase 12 — every tracked file under data/ must be covered by a
       # PROVENANCE.md entry, a manifest directory, or (for generated JSONs) a
-      # meta/inputs block or the @hum/data generated ledger. Enforces the
+      # meta/inputs block or the @essrt/data generated ledger. Enforces the
       # manifest's own maintenance rule, which was unenforced prose before.
       - name: Data provenance (PROVENANCE.md coverage)
         run: npm run check:data

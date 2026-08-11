@@ -1,5 +1,5 @@
 {
-  "name": "@hum/fitting",
+  "name": "@essrt/fitting",
   "version": "0.0.0",
   "private": true,
   "description": "The production fitting pipeline (fit + verify + pipeline). Node only.",

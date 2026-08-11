@@ -77,14 +77,14 @@ const R2D = 180 / Math.PI;
 // Accurate to a few seconds over 1500-2150. Required so Meeus _eclSunLon
 // interprets JD as UT (matching production); inside it converts to JD_TT.
 function deltaT(year) {
-  // 9-2 (§12g item 0, measured): the published canon from @hum/physics.
+  // 9-2 (§12g item 0, measured): the published canon from @essrt/physics.
   // The former local variant carried genuine transcription errors —
   // wrong t-anchors in the 1941–1961/1961–1986 segments and ×1000
   // coefficients in the 1986–2005 branch — giving ΔT wrong by up to
   // 123.5 s (at 2004.5; +35.4 s at 2000; 11.1 s RMS over 1800–2200,
   // the default fit window). The SUN_LONGITUDE coefficients regenerated
   // with this swap in the same commit (matched pair).
-  return require('@hum/physics/deltat/historical').deltaTEspenakMeeusCanonSeconds(year);
+  return require('@essrt/physics/deltat/historical').deltaTEspenakMeeusCanonSeconds(year);
 }
 
 function jdToYear(jd) {

@@ -1,5 +1,5 @@
 {
-  "name": "@hum/analysis",
+  "name": "@essrt/analysis",
   "version": "0.0.0",
   "private": true,
   "description": "Python analysis. Reads fitted-coefficients.json; never defines physics.",

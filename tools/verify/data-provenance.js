@@ -11,7 +11,7 @@
  *   1. COVERAGE: every git-TRACKED file under data/ must be covered by a
  *      manifest entry, a manifest directory, or — for generated *.json
  *      artifacts — be SELF-DESCRIBING (meta/_meta/inputs/_description/
- *      generated_by field) or listed in the @hum/data generated ledger.
+ *      generated_by field) or listed in the @essrt/data generated ledger.
  *   2. NO DANGLING ROWS: every file-level manifest entry must exist on disk
  *      or be gitignored-by-design (the documented not-tracked datasets), or
  *      appear in the ALLOWED_ABSENT list below.

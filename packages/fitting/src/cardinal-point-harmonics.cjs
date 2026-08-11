@@ -211,7 +211,7 @@ if (TROP_ANCHOR.sourceCsvMtimeMs !== fs.statSync(CSV_PATH).mtimeMs) {
 
 // (The analyticTropDays reference evaluator was deleted at 9-3e — dead
 // since the table-interpolation path shipped; the analytic form lives in
-// @hum/physics/deltat/deep-time tropicalYearDaysAtAge, and git history
+// @essrt/physics/deltat/deep-time tropicalYearDaysAtAge, and git history
 // preserves the old local copy.)
 
 const _cycleOf = (year) => {

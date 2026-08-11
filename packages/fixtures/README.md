@@ -1,4 +1,4 @@
-# @hum/fixtures — golden masters
+# @essrt/fixtures — golden masters
 
 Two tiers. They answer different questions, and conflating them is what makes a
 strangler-fig migration untrustworthy.

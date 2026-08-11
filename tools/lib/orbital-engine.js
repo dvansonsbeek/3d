@@ -278,9 +278,9 @@ function computeEccentricity(currentYear, balancedYear, cycleLength, base, ampli
     if (c !== null) cycles = c;   // null past the tidal-lock asymptote → keep snapshot
   }
   // Phase 8.3 L3: the law of cosines lives ONCE in
-  // @hum/physics/planets/ecc-channel (this engine keeps its documented R6
+  // @essrt/physics/planets/ecc-channel (this engine keeps its documented R6
   // snapshot-fallback dispatch above; cycles is always a number here).
-  return require('@hum/physics/planets/ecc-channel').eccentricityFromCycles(cycles, base, amplitude);
+  return require('@essrt/physics/planets/ecc-channel').eccentricityFromCycles(cycles, base, amplitude);
 }
 
 /**
@@ -383,7 +383,7 @@ function findAllInclinationCrossings(targetInclination, startYear, endYear) {
  */
 function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentYear, planetName) {
   // Phase 8.3 L5: the segment integration lives ONCE in
-  // @hum/physics/planets/asc-node-integrator. The Tychosium orbitTilt
+  // @essrt/physics/planets/asc-node-integrator. The Tychosium orbitTilt
   // decomposition stays HERE (§2h — the scheme names never enter the
   // package); the engine's evaluators are injected per call. The browser's
   // 6-arg variant (S-P5) remains engine-side pending probes — recorded
@@ -393,7 +393,7 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentY
   const ascendingNodeDeg = ((staticOmegaDeg % 360) + 360) % 360;
   const inclinationDeg = Math.sqrt(orbitTilta * orbitTilta + orbitTiltb * orbitTiltb);
 
-  return require('@hum/physics/planets/asc-node-integrator').integrateAscendingNode(
+  return require('@essrt/physics/planets/asc-node-integrator').integrateAscendingNode(
     { ascendingNodeDeg, inclinationDeg }, currentYear, {
       obliquityAt: computeObliquityEarth,
       earthInclinationAt: computeInclinationEarth,
@@ -416,8 +416,8 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentY
 function computeAscendingNodeInvPlane(planetName, year) {
   const p = C.planets[planetName];
   if (!p) return 0;
-  // 8.3 L4: the linear year-2000 node convention lives in @hum/physics.
-  return require('@hum/physics/planets/orientation').ascendingNodeInvPlaneLinearAt(p, year);
+  // 8.3 L4: the linear year-2000 node convention lives in @essrt/physics.
+  return require('@essrt/physics/planets/orientation').ascendingNodeInvPlaneLinearAt(p, year);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -500,8 +500,8 @@ function calcERD(year) {
  * @returns {number} longitude in degrees [0, 360)
  */
 function calcPlanetPerihelionLong(theta0, period, year) {
-  // 8.3 L9: the linear form lives in @hum/physics/planets/predict.
-  return require('@hum/physics/planets/predict').calcPlanetPerihelionLongDeg(theta0, period, year);
+  // 8.3 L9: the linear form lives in @essrt/physics/planets/predict.
+  return require('@essrt/physics/planets/predict').calcPlanetPerihelionLongDeg(theta0, period, year);
 }
 
 /**
@@ -561,12 +561,12 @@ function computePlanetInvPlaneInclinationDynamic(planetName, currentYear, julian
   const p = C.planets[planetName];
   if (!p) return 0;
 
-  // 8.3 L4: the ICRF-linked oscillation lives in @hum/physics (this engine
+  // 8.3 L4: the ICRF-linked oscillation lives in @essrt/physics (this engine
   // honors its year/JD argument; the browser wrapper keeps its historical
   // scene-JD coupling — see the module header).
   const jd = julianDay || C.yearToJD(currentYear);
   const yearsSinceBalanced = (jd - C.balancedJD) / C.meanSolarYearDays;
-  return require('@hum/physics/planets/orientation').invPlaneInclinationAt({
+  return require('@essrt/physics/planets/orientation').invPlaneInclinationAt({
     isEarth: planetName === 'earth',
     invPlaneInclinationJ2000: p.invPlaneInclinationJ2000,
     invPlaneInclinationMean: p.invPlaneInclinationMean,
@@ -624,10 +624,10 @@ function computeEclipticInclination(planetName, currentYear) {
  *  @param {string} key @param {number} yearsSinceBalanced
  *  @returns {number} degrees */
 function computeEclipticInclinationFromBalanced(key, yearsSinceBalanced) {
-  // 8.3 L4: the canonical dot-product form lives in @hum/physics
+  // 8.3 L4: the canonical dot-product form lives in @essrt/physics
   // (moved VERBATIM; scene-graph keeps delegating here, so positions ride
   // one implementation end to end).
-  return require('@hum/physics/planets/orientation').eclipticInclinationFromBalanced(
+  return require('@essrt/physics/planets/orientation').eclipticInclinationFromBalanced(
     C.planets[key], {
       invPlanePrecessionYears: C.ASTRO_REFERENCE.earthInvPlanePrecessionYears,
       inclinationMean: C.earthInvPlaneInclinationMean,
@@ -986,13 +986,13 @@ function computeStellarSiderealOffset(stellarDay, siderealDay) {
 // See docs/14-solstice-prediction.md
 
 // Phase 7.2 — the entire §10/§10g cardinal family lives in
-// @hum/physics/cardinal (ONE implementation for every engine; extracted
+// @essrt/physics/cardinal (ONE implementation for every engine; extracted
 // verbatim from this file). This engine injects its constants and its own
 // twins; the four public functions below are one-line delegates. The
 // self-correction (R11), the drift Simpson, the Ih closed form, the joint
 // sidebands, the exact derivative — and every load-bearing comment that
 // used to sit here — moved into the package.
-const { createCardinalModel } = require('@hum/physics/cardinal');
+const { createCardinalModel } = require('@essrt/physics/cardinal');
 let _cardinalM = null;
 function _cardinal() {
   if (_cardinalM !== null) return _cardinalM;
@@ -1054,7 +1054,7 @@ function computeSolsticeRA(year, type) { return _cardinal().computeSolsticeRA(ye
  * @param {'SS'|'WS'|'VE'|'AE'} [type='SS'] - cardinal point type
  * @returns {number} Julian Day of the cardinal point
  */
-// ═══ §10 — ΣT_trop and the δ_X families: see @hum/physics/cardinal ═════════
+// ═══ §10 — ΣT_trop and the δ_X families: see @essrt/physics/cardinal ═════════
 // (Phase 7.2 — the implementation, with its measured-cost table and every
 // R5/R7/R8/R9 comment, moved into the package verbatim.)
 
@@ -1089,11 +1089,11 @@ function computeSolsticeYearLength(year, type) { return _cardinal().computeSolst
  * @returns {number[]} feature array (~2421 elements for Venus)
  */
 // 8.3 L9: the feature basis, period algebra, beats, and template cache live
-// in @hum/physics/planets/predict — ONE implementation for both engines.
+// in @essrt/physics/planets/predict — ONE implementation for both engines.
 // This engine injects its J2000-anchored Earth scalar forms (the browser
 // injects its deep-time epoch-aware ones); the PREDICT_* dot products and
 // their guard semantics stay engine-side below.
-const { createPredictivePrecession } = require('@hum/physics/planets/predict');
+const { createPredictivePrecession } = require('@essrt/physics/planets/predict');
 
 let _predictM = null;
 function _predict() {

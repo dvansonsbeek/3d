@@ -133,7 +133,7 @@ const _FW_A3_RATE = 360 * 36525 / C.moonSiderealMonth;
 // gap class as the Phase 9.13 Moon mirror). One period fn per planet, stable
 // identity, so the shared chain-cycles tables key correctly.
 const _mcPlanet = {};
-const { driver2PeriodSecondsAtAge } = require('@hum/physics/planets/orbit-chain');
+const { driver2PeriodSecondsAtAge } = require('@essrt/physics/planets/orbit-chain');
 for (const _pk of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
   const T0 = C.planets[_pk].solarYearInput * 86400;
   // 8.3 L6: Driver 2 shared; one period fn per planet (stable identity for
@@ -144,12 +144,12 @@ for (const _pk of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'n
 const _mcJupiter = _mcPlanet.jupiter;   // the deep-time A2 argument feed (unchanged identity semantics)
 
 // Phase 8.2-5: the argument skeleton lives ONCE in
-// @hum/physics/moon/arguments (the _FW_MOON bundle, the Sun secular
+// @essrt/physics/moon/arguments (the _FW_MOON bundle, the Sun secular
 // deviations — now on the browser's CALENDAR year coordinate, closing S3 —
 // the two bounded Lp carriers with the anchor-const e0 (this mirror used
 // _fwEarthEcc(0)), and both argument branches). This engine injects its own
 // chain wrappers; env toggles ride along.
-const { createMoonArguments, jdToDecimalYear } = require('@hum/physics/moon/arguments');
+const { createMoonArguments, jdToDecimalYear } = require('@essrt/physics/moon/arguments');
 let _moonArgsMTools = null;
 function _moonArgsM() {
   if (_moonArgsMTools === null) {
@@ -189,7 +189,7 @@ function _moonArgsM() {
 }
 
 /** Phase-aware channel-rate integral — delegates to the shared
- *  @hum/physics moon eccentricity channel (8.2-2). This mirror once
+ *  @essrt/physics moon eccentricity channel (8.2-2). This mirror once
  *  recomputed g₀ from _fwEarthEcc(0), which under integrated phase is not
  *  exactly the anchor (the R3 drift correction); the channel's g₀ const is
  *  the browser's convention and now the only one. */
@@ -212,14 +212,14 @@ function _fwSunSecularDeviations(jd_tt) { return _moonArgsM().sunSecularDeviatio
 const _SI_TROP_DAYS = DT.MEAN_TROPICAL_YEAR_J2000_S / 86400;
 const _jdToSIyearTools = (jd) => C.startModelYearWithCorrection + (jd - C.startmodelJD) / _SI_TROP_DAYS;
 // Chain-cycle integrator — Phase 8.2-4: lives ONCE in
-// @hum/physics/chain-cycles. This mirror previously diverged from the
+// @essrt/physics/chain-cycles. This mirror previously diverged from the
 // browser on THREE points, all closed by the shared module:
 //   S5  — no snapshot branch / periodFn(0) memo / fallback cache here;
 //   S12 — the age anchor was a literal 2000 where the browser uses
 //         startmodelYear (2000.5, the scene's t_Ma convention);
 //   (the table still anchors C(2000) = 0 — grid anchor ≠ age anchor,
 //   deliberately, cf. the phase machinery's anchor pair).
-const { createChainCycleIntegrator } = require('@hum/physics/chain-cycles');
+const { createChainCycleIntegrator } = require('@essrt/physics/chain-cycles');
 let _chainCyclesM = null;
 function _chainCyclesT() {
   if (_chainCyclesM === null) {
@@ -269,9 +269,9 @@ const _mcApsidalMeetsNodal = _mcApsidalOfDate;
 // is measured by the fixtures.
 function _sunGeoVecEqD5Tools(jd) { return _moonApparentM().sunGeoVecEqD5(jd); }
 // Phase 8.2-7: the D5 optics + RA/Dec override live ONCE in
-// @hum/physics/moon/apparent (S8: obliquity stays engine-injected — this
+// @essrt/physics/moon/apparent (S8: obliquity stays engine-injected — this
 // engine recomputes it for the scene year).
-const { createMoonApparent } = require('@hum/physics/moon/apparent');
+const { createMoonApparent } = require('@essrt/physics/moon/apparent');
 let _moonApparentMTools = null;
 function _moonApparentM() {
   if (_moonApparentMTools === null) {
@@ -353,8 +353,8 @@ function _moonArgsAtTools(jd_tt) {
   return _moonArgsM().argsAt(jd_tt);   // framework-native / pure-Meeus dispatch (env toggle injected)
 }
 
-// Phase 8.2-6: the Meeus Ch. 47 series lives ONCE in @hum/physics/moon/series.
-const { createMoonSeries } = require('@hum/physics/moon/series');
+// Phase 8.2-6: the Meeus Ch. 47 series lives ONCE in @essrt/physics/moon/series.
+const { createMoonSeries } = require('@essrt/physics/moon/series');
 let _moonSeriesMTools = null;
 function _moonSeriesM() {
   if (_moonSeriesMTools === null) {
@@ -689,10 +689,10 @@ function _jdFromPosTools(pos) {
 }
 
 // 9-1 S-P8: the fitted sun-longitude harmonic stack lives ONCE in
-// @hum/physics/sun/longitude-correction (J2000-fixed deps — the fitted
+// @essrt/physics/sun/longitude-correction (J2000-fixed deps — the fitted
 // convention). This engine's TWO former inline copies (moveModel + the
 // fast animator) both delegate through this lazy factory.
-const { createSunLongitudeCorrection } = require('@hum/physics/sun/longitude-correction');
+const { createSunLongitudeCorrection } = require('@essrt/physics/sun/longitude-correction');
 let _sunLonCorrM = null;
 function _sunLonCorr() {
   if (!_sunLonCorrM) {
@@ -1212,7 +1212,7 @@ function moveModel(graph, pos) {
     // silently skipped.
     const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
     if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
-      // 9-1 S-P8: the filtered harmonic stack lives ONCE in @hum/physics/
+      // 9-1 S-P8: the filtered harmonic stack lives ONCE in @essrt/physics/
       // sun/longitude-correction (J2000-fixed deps — the fitted convention).
       // Recover JD via epoch-consistent mSY so pos→jd round-trip is exact.
       const jd = _jdFromPosTools(pos);
@@ -1227,7 +1227,7 @@ function moveModel(graph, pos) {
       // browser had it), which was the whole browser-vs-tools deep-time delta
       // (~4 yr of ΔT at +200 kyr → args differing by ~150° in ϖ).
       const d = _jdTTToolsFromUT(_jdFromPosTools(pos)) - C.j2000JD;
-      // Phase 8.2-6: the full evaluation lives in @hum/physics/moon/series
+      // Phase 8.2-6: the full evaluation lives in @essrt/physics/moon/series
       // (shared with the browser scene block — one implementation). The
       // engine keeps the pos→JD_TT conversion above and the node writes.
       const _sr = _moonSeriesM().sceneEvalAt(d);
@@ -1462,12 +1462,12 @@ function computePlanetPosition(target, jd) {
     }
 
     // Phase 8.3 L8: the fitted 80-slot basis lives ONCE in
-    // @hum/physics/planets/corrections (browser association order — this
+    // @essrt/physics/planets/corrections (browser association order — this
     // mirror carried invD2·invD where the basis uses the precomputed invD3
     // at five slots; any last-bit drift is measured by the fixtures).
     const _pState = { u, invD, invS, T, cp: conjPhase, Lsun: _Lsun,
                       sinM: sinMplanet, cosM: cosMplanet, sin2M: sin2Mplanet, cos2M: cos2Mplanet };
-    const _evalParallax = require('@hum/physics/planets/corrections').evaluateParallaxBasis;
+    const _evalParallax = require('@essrt/physics/planets/corrections').evaluateParallaxBasis;
     const dc = C.ASTRO_REFERENCE.decCorrection[target];
     if (dc) {
       sph.phi += _evalParallax(dc, _pState) * d2r;
@@ -1480,12 +1480,12 @@ function computePlanetPosition(target, jd) {
   }
 
   // Gravitation correction (per-planet synodic periods, planet-planet perturbations)
-  // 8.3: term evaluation shared (@hum/physics/planets/corrections); applied
+  // 8.3: term evaluation shared (@essrt/physics/planets/corrections); applied
   // PER TERM here — order and sign are engine application semantics.
   const gravCorr = C.GRAVITATION_CORRECTION && C.GRAVITATION_CORRECTION[target];
   if (gravCorr) {
     const _yr = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
-    const _gravDeltas = require('@hum/physics/planets/corrections').gravitationTermDeltasDeg(gravCorr, _yr - 2000);
+    const _gravDeltas = require('@essrt/physics/planets/corrections').gravitationTermDeltasDeg(gravCorr, _yr - 2000);
     for (const gt of _gravDeltas) {
       sph.theta -= gt.raDeg * d2r;
       sph.phi += gt.decDeg * d2r;
@@ -1494,7 +1494,7 @@ function computePlanetPosition(target, jd) {
 
   // Elongation offset correction (elongation × Earth perihelion geometry)
   // Applied to inner planets: Venus, Mars
-  // 8.3: the fitted 21-slot basis lives ONCE in @hum/physics/planets/
+  // 8.3: the fitted 21-slot basis lives ONCE in @essrt/physics/planets/
   // corrections, in the BROWSER association form (precomputed invD²) — this
   // mirror carried inline invD·invD at the six d² slots per table; the
   // fixture recorders measured the last-bit drift at extraction.
@@ -1513,7 +1513,7 @@ function computePlanetPosition(target, jd) {
     const _plCount = Math.round(C.totalDaysInH / C.planets[target].solarYearInput);
     const _synVE = 1 / Math.abs(1 - _plCount / C.H);
     const _synPhase = 2 * Math.PI * (_yr - 2000) / _synVE;
-    const _evalElong = require('@hum/physics/planets/corrections').evaluateElongationBasis;
+    const _evalElong = require('@essrt/physics/planets/corrections').evaluateElongationBasis;
     const _elState = { elongRad: _elong, vFromWERad: _vFromWE, synPhaseRad: _synPhase, invD: 1 / distAU };
     sph.theta -= _evalElong(_elCorr, _elState, 'ra') * d2r;
     sph.phi += _evalElong(_elCorr, _elState, 'dec') * d2r;
@@ -1540,7 +1540,7 @@ function computePlanetPosition(target, jd) {
     // alignment (Moon-chain layers + args on one clock).
     const currentYear = C.balancedYear + (jd - C.balancedJD) / _epochCache.mSY;
     // Phase 8.2-7: ecl→eq + aberration + the fitted MOON_CORRECTION patch
-    // live in @hum/physics/moon/apparent. S8: this engine RECOMPUTES the
+    // live in @essrt/physics/moon/apparent. S8: this engine RECOMPUTES the
     // obliquity for the scene year (the browser passes its live scene value).
     const _ov = _moonApparentM().overrideRaDec({
       lonDeg: graph.moonNodes._meeusLonDeg,
@@ -1671,7 +1671,7 @@ function computeSunPositionFast(jd) {
     }
     // Phase Z-B (2026-06): Sun longitude harmonics applied to SUN NODE only.
     // Mirror of the moveModel() Sun-only block above. 9-1 S-P8: both blocks
-    // delegate to @hum/physics/sun/longitude-correction.
+    // delegate to @essrt/physics/sun/longitude-correction.
     const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
     if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
       θ -= _sunLonCorr().correctionDegAt(jd) * d2r;
