@@ -1,10 +1,32 @@
 {
   "name": "@essrt/physics",
-  "version": "0.0.0",
-  "private": true,
-  "description": "Pure physics core \u2014 no I/O, no globals, no DOM. Published; the website consumes this.",
+  "version": "1.0.0",
+  "description": "ESSRT (Expanding Solar System Resonance Theory) physics core \u2014 pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
+  "essrt": {
+    "modelVersion": "v10.0",
+    "_note": "The model identity this package version ships (IP-unified-architecture \u00a710: package semver tracks the API axis; the model version + CONSTANTS_HASH/COEFFICIENTS_HASH in src/constants/ carry the scientific identity). The version-pinning gate enforces this pairing against public/input/model-version.json."
+  },
   "type": "module",
   "main": "src/index.js",
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dvansonsbeek/3d.git",
+    "directory": "packages/physics"
+  },
+  "homepage": "https://3d.holisticuniverse.com",
+  "keywords": [
+    "essrt",
+    "astronomy",
+    "solar-system",
+    "deep-time",
+    "eclipse",
+    "precession",
+    "geocentric-model"
+  ],
   "exports": {
     ".": "./src/index.js",
     "./phase": "./src/phase/index.cjs",

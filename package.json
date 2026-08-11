@@ -29,6 +29,7 @@
     "test:verify:list": "node tools/verify/run-suite.mjs --list",
     "test:snapshot": "node test/browser/snapshot.test.mjs && node test/browser/epoch-consistency.test.mjs && node test/cross-engine.test.mjs",
     "test:transparency": "node test/browser/transparency.test.mjs",
+    "test:package": "node test/package-install.test.mjs",
     "test:browser": "npm run build && npm run test:snapshot",
     "targets": "node tools/fixtures/report-targets.mjs",
     "check": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:purity && npm run test:layer0 && npm run test:layer1 && npm run test:constants && npm run test:counterfactual && npm run test:planet-model && npm run test:fixtures && npm run test:literals && npm run test:py-physics && npm run test:docs-fresh && npm run check:artifacts && npm run check:data && npm run docs:values && npm run test:verify && npm run test:pipeline",

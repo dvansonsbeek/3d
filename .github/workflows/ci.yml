@@ -116,6 +116,13 @@ jobs:
       - name: Data provenance (PROVENANCE.md coverage)
         run: npm run check:data
 
+      # Phase 13 — "package installable" demonstrated, not asserted: npm pack
+      # @essrt/physics, install the tarball into a clean project, prove the
+      # installed copy resolves (ESM root + CJS subpath) and carries the
+      # workspace model identity (COEFFICIENTS_HASH bit-equal).
+      - name: Package installability (@essrt/physics)
+        run: npm run test:package
+
       # §5d — the model gates. Only 5 of the 23 tools/verify scripts have a
       # failing exit path; the runner encodes that classification and excludes
       # the four generators, which write tracked data. verify-laws is checked on

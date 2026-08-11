@@ -139,9 +139,9 @@ chain at ±1/±5 Myr; the golden master cannot catch that class).
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
-`/gates` runs the standalone model checks. `tools/verify/` holds 23 scripts, and
+`/gates` runs the standalone model checks. `tools/verify/` holds 24 scripts, and
 **18 of them cannot fail** — no exit path, no assertion, so running them proves
-nothing. `npm run test:verify:list` gives the classification: 5 gate · 4 liftable
+nothing. `npm run test:verify:list` gives the classification: 6 gate · 4 liftable
 · 10 narrative · 4 generator (the suite FAILS on any unclassified script). **Never
 run a generator as a test** — `balance-search.js` rewrites the tracked
 `data/balance-presets.json`, and the three campaign generators

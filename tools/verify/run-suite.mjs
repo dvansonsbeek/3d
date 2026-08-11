@@ -60,6 +60,8 @@ const MANIFEST = [
 
   { n: 'artifact-freshness.js', class: 'gate', ms: 1000,
     note: 'the campaign-artifact freshness gate — also runs as its own chain step (npm run check:artifacts); re-hashes every generated artifact\'s recorded inputs' },
+  { n: 'version-pinning.js', class: 'gate', ms: 100,
+    note: 'Phase 13: @essrt/physics semver + the essrt.modelVersion pairing vs model-version.json — a refit can never ship without a version bump recording it' },
   { n: 'data-provenance.js', class: 'gate', ms: 1500,
     note: 'Phase 12: every tracked file under data/ must be manifest-covered (PROVENANCE.md row, directory, or self-describing/ledgered generated JSON); no dangling rows; ledger scripts exist' },
   { n: 'predict-form-pinning.js', class: 'gate', ms: 4000,
