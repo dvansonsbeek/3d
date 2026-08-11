@@ -22,21 +22,30 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'packages', 'physics', 'package.json'), 'utf8'));
 const mv = JSON.parse(fs.readFileSync(path.join(ROOT, 'public', 'input', 'model-version.json'), 'utf8'));
 
 const failures = [];
-if (!pkg.essrt || pkg.essrt.modelVersion !== mv.modelVersion) {
-  failures.push(`pairing broken: package essrt.modelVersion=${pkg.essrt && pkg.essrt.modelVersion} vs model-version.json=${mv.modelVersion} — a refit/structural change must update BOTH (and bump the package version)`);
+const versions = [];
+for (const name of ['physics', 'model-values']) {
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'packages', name, 'package.json'), 'utf8'));
+  versions.push(`@essrt/${name} ${pkg.version}`);
+  if (!pkg.essrt || pkg.essrt.modelVersion !== mv.modelVersion) {
+    failures.push(`${name}: pairing broken — essrt.modelVersion=${pkg.essrt && pkg.essrt.modelVersion} vs model-version.json=${mv.modelVersion}; a refit/structural change must update BOTH (and bump the package version)`);
+  }
+  if (!/^[1-9]\d*\.\d+\.\d+$/.test(pkg.version)) {
+    failures.push(`${name}: version "${pkg.version}" is not MAJOR.MINOR.PATCH semver ≥ 1.0.0`);
+  }
+  if (pkg.private) {
+    failures.push(`packages/${name} is marked private — it is a published artefact`);
+  }
 }
-if (!/^[1-9]\d*\.\d+\.\d+$/.test(pkg.version)) {
-  failures.push(`package version "${pkg.version}" is not MAJOR.MINOR.PATCH semver ≥ 1.0.0`);
-}
-if (pkg.private) {
-  failures.push('packages/physics is marked private — it is the published artefact');
+// The packaged values must also carry the CURRENT model identity.
+const gen = JSON.parse(fs.readFileSync(path.join(ROOT, 'packages', 'model-values', 'src', 'model-values.generated.json'), 'utf8'));
+if (gen._meta.modelVersion !== mv.modelVersion) {
+  failures.push(`model-values.generated.json ships ${gen._meta.modelVersion} vs model-version.json ${mv.modelVersion} — regenerate: npm run values:package:write`);
 }
 
-console.log(`version pinning — @essrt/physics ${pkg.version} ships model ${mv.modelVersion}`);
+console.log(`version pinning — ${versions.join(' · ')} ship model ${mv.modelVersion}`);
 if (failures.length) {
   for (const f of failures) console.error(`  FAIL ${f}`);
   process.exit(1);
