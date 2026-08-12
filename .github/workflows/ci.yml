@@ -184,3 +184,42 @@ jobs:
       # A red run here is a regression of the Phase 6 exit criterion.
       - name: Referential transparency (Phase 6 exit criterion)
         run: npm run test:transparency
+
+  # ── Deploy the simulator to GitHub Pages (3d.holisticuniverse.com) ────────
+  # Runs ONLY on green main pushes — both gate jobs must pass first, so the
+  # hosted scene is a pure function of a verified repo state. No stored
+  # credentials: actions/deploy-pages uses GitHub's short-lived OIDC token
+  # (the reason Pages beat FTP for a public repo). Source maps stay out of
+  # the deploy; textures/input JSONs load via the simulator's GitHub-raw
+  # fallback exactly as they always have.
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [check, browser]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Build simulator
+        run: npm run build
+      - name: Strip source maps + set custom domain
+        run: |
+          find dist -name "*.map" -delete
+          echo "3d.holisticuniverse.com" > dist/CNAME
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
