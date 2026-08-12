@@ -7,8 +7,9 @@ across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 
 **Scale:** `src/script.js` ~60,850 lines · `tools/` 203 JS scripts across 7
 directories · 237 Python files · 71 docs · two web UIs (simulator, `dashboard/`).
-**`npm run check` enforces a seventeen-step gate chain; CI runs it plus a
-headless-browser job.**
+**`npm run check` enforces a nineteen-step gate chain; CI runs it plus a
+headless-browser job and auto-deploys the simulator to GitHub Pages on
+green main.**
 Golden masters live in `packages/fixtures/`. Of the 23 scripts in `tools/verify/`,
 only 5 can actually fail — see the Verification section.
 
@@ -113,7 +114,9 @@ would silently churn a structural claim for a rounding-level gain.
 `checkJs`), `check:boundaries` (the §2h licensing invariant), purity,
 `test:fixtures` (the `tools/lib` golden masters), `check:artifacts` (generated
 campaign artifacts vs their recorded input hashes — fails naming the exact
-regeneration command), `test:verify` (the model gates).
+regeneration command), `check:data` (every tracked dataset manifest-covered
+in PROVENANCE.md), `values:package` (the published @essrt/model-values ≡
+the live registry), `test:verify` (the model gates).
 Every gate has been shown to **fail on a planted violation**, not merely to pass
 on clean code — the two fixture gates on a 1-ULP change, ~1.6e-16 relative. Lint
 and typecheck cover `packages/` and `test/`; `src/script.js` and `tools/` are
@@ -185,11 +188,15 @@ what actually made corrections stick here.
 |---|---|
 | `src/script.js` | browser scene + UI + formulas (monolith) |
 | `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
-| `tools/fit/` | the fitting pipeline (Steps 6a–6d) |
-| `tools/verify/` | 17 verification scripts |
+| `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
+| `tools/verify/` | 24 scripts: 6 gate · 4 liftable · 10 narrative · 4 generator (`npm run test:verify:list`) |
+| `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | 140 research one-offs — findings live in `docs/` |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |
 | `docs/` | 71 numbered docs; `40-architecture`, `99-essrt` are cross-referenced |
+
+The simulator at 3d.holisticuniverse.com auto-deploys from every green main
+push (the Pages job in ci.yml) — nothing is hand-uploaded anywhere.
 
 ## Working notes
 
