@@ -671,8 +671,8 @@
     }
   },
   "meta": {
-    "script": "/home/dennis/code/3d/scripts/milankovitch_8h_variance_budget.py",
-    "doc": "docs/18-climate-formula.md",
-    "runtime_sec": 1.0835111141204834
+    "script": "milankovitch_8h_variance_budget.py",
+    "doc": "docs/92-climate-formula.md",
+    "runtime_sec": 0.7433128356933594
   }
 }

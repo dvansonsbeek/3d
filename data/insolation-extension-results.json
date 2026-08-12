@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "script": "/home/dennis/code/3d/scripts/milankovitch_insolation_extension.py",
+    "script": "milankovitch_insolation_extension.py",
     "H_kyr": 335.317,
     "eight_H_kyr": 2682.536,
     "L1_n_components": 32,
@@ -10,7 +10,7 @@
       "e\u00b7sin(\u03d6)",
       "e\u00b7cos(\u03d6)"
     ],
-    "runtime_sec": 0.2639918327331543
+    "runtime_sec": 0.11229896545410156
   },
   "regime_results": {
     "post-mpt": {

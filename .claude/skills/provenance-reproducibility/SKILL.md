@@ -58,11 +58,14 @@ and a small committed fixture subset for CI — not the artefact.
 
 ## 4. Provenance fields must be relative
 
-A generated artefact recording `"script": "/home/dennis/code/3d/scripts/x.py"`
-leaks a path nobody else has and tells a reader nothing. Emit the bare filename.
+A generated artefact recording `"script": "/home/<user>/code/3d/scripts/x.py"`
+leaks a path nobody else has and tells a reader nothing. Emit the bare filename
+(or a repo-relative path for data files).
 
 Ten generators already did this correctly and nine did not; the inconsistency
-survived because nobody compared them.
+survived because nobody compared them — until `check:data` Rule 4 (fail-proven)
+started rejecting machine-absolute paths in any tracked JSON, which immediately
+caught nine fossil artifacts whose generators had long been fixed.
 
 ## 5. Use and redistribute are different rights
 

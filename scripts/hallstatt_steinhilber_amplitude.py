@@ -210,7 +210,7 @@ def main():
                             'literature but not H-lattice compliant on gcd rule). Also tests Bond '
                             '(8H/1851) as a comparison anchor.'),
             'source_script': 'scripts/hallstatt_steinhilber_amplitude.py',
-            'source_data': str(STEIN_PATH),
+            'source_data': str(STEIN_PATH.relative_to(REPO)),
             'H_yr': H, 'eight_H_yr': EIGHT_H,
         },
         'series_summary': {

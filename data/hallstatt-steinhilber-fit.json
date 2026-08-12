@@ -2,7 +2,7 @@
   "_meta": {
     "description": "Hallstatt cycle amplitude test using Steinhilber 2012 solar modulation \u03a6 as an independent proxy. Compares framework 8H/1104 (= H/138 = 2430 yr, gcd-compliant on H-lattice) vs canonical 8H/1166 (= 2300 yr, closer to literature but not H-lattice compliant on gcd rule). Also tests Bond (8H/1851) as a comparison anchor.",
     "source_script": "scripts/hallstatt_steinhilber_amplitude.py",
-    "source_data": "/home/dennis/code/3d/data/steinhilber-2012-solar.txt",
+    "source_data": "data/steinhilber-2012-solar.txt",
     "H_yr": 335317,
     "eight_H_yr": 2682536
   },

@@ -782,8 +782,8 @@
     "promoted": []
   },
   "meta": {
-    "script": "/home/dennis/code/3d/scripts/milankovitch_8h_variance_budget_tier_b.py",
-    "doc": "docs/18-climate-formula.md",
-    "runtime_sec": 5.031579971313477
+    "script": "milankovitch_8h_variance_budget_tier_b.py",
+    "doc": "docs/92-climate-formula.md",
+    "runtime_sec": 3.277698516845703
   }
 }

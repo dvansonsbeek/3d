@@ -2,7 +2,7 @@
   "_meta": {
     "description": "Extended Hallstatt cycle test using Cheng 2016 speleothem \u03b4\u00b9\u2078O (640 kyr, ~76 yr resolution). Detrends Milankovitch bands (405k, 100k, 41k, 23k, 19k yr) then fits sub-orbital residual for Hallstatt-band candidates. Compares framework H-lattice candidates 8H/1104 (H/138, gcd=23) and 8H/1150 (gcd=23) with canonical 8H/1166 and the empirical peak found by fine-grained scan.",
     "source_script": "scripts/hallstatt_cheng_speleothem.py",
-    "source_data": "/home/dennis/code/3d/data/cheng2016-speleothem.txt",
+    "source_data": "data/cheng2016-speleothem.txt",
     "H_yr": 335317,
     "eight_H_yr": 2682536
   },

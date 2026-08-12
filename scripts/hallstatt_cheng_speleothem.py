@@ -263,7 +263,7 @@ def main():
                             '(H/138, gcd=23) and 8H/1150 (gcd=23) with canonical 8H/1166 and '
                             'the empirical peak found by fine-grained scan.'),
             'source_script': 'scripts/hallstatt_cheng_speleothem.py',
-            'source_data': str(CHENG_PATH),
+            'source_data': str(CHENG_PATH.relative_to(REPO)),
             'H_yr': H, 'eight_H_yr': EIGHT_H,
         },
         'series_summary': {

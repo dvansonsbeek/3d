@@ -2,7 +2,7 @@
   "_meta": {
     "description": "Third Hallstatt proxy test using EPICA 800 kyr CO\u2082 (Bereiter 2015). Median 420-yr resolution: Hallstatt (~2400 yr) is 5.7\u00d7 above Nyquist. Following weak Steinhilber solar \u03a6 signal and null Cheng speleothem, this test provides a third independent look at whether a Hallstatt-band cycle is a persistent long-term feature or a Holocene-solar artifact.",
     "source_script": "scripts/hallstatt_epica_co2.py",
-    "source_data": "/home/dennis/code/3d/data/epica-co2-bereiter2015.txt",
+    "source_data": "data/epica-co2-bereiter2015.txt",
     "H_yr": 335317,
     "eight_H_yr": 2682536
   },

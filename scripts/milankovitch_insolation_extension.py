@@ -278,7 +278,7 @@ def main():
     # Save results
     out = {
         'metadata': {
-            'script': __file__,
+            'script': Path(__file__).name,
             'H_kyr': H,
             'eight_H_kyr': EIGHT_H,
             'L1_n_components': len(L1_LATTICE_INTEGERS),

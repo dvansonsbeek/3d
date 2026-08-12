@@ -17,6 +17,9 @@
  *      appear in the ALLOWED_ABSENT list below.
  *   3. LEDGER HONESTY: every ledger attribution must name a script that
  *      still exists.
+ *   4. NO ABSOLUTE PATHS: no tracked JSON (data/ or public/input/) may carry
+ *      a machine-absolute path in any string field — provenance records
+ *      repo-relative paths only.
  *
  * Runs as `npm run check:data`, inside `npm run check`, in CI, and as a
  * gate in the tools/verify suite.
@@ -89,6 +92,31 @@ async function main() {
   for (const [file, script] of Object.entries(ledger)) {
     if (!fs.existsSync(path.join(ROOT, script))) {
       failures.push(`generated-ledger: ${file} attributed to ${script}, which does not exist`);
+    }
+  }
+
+  // Rule 4 — no machine-absolute paths in tracked JSON. A provenance field
+  // recording /home/<user>/... ships the generating machine's layout — one
+  // reached the published @essrt/physics package via
+  // public/input/climate-formula-coefficients.json before this rule existed.
+  // Generators must record repo-relative paths.
+  const ABS_PATH_RE = /^(\/home\/|\/Users\/|[A-Za-z]:\\)/;
+  const jsonFiles = [
+    ...tracked.filter((f) => f.endsWith('.json')).map((f) => `data/${f}`),
+    ...execFileSync('git', ['ls-files', 'public/input/*.json'], { cwd: ROOT, encoding: 'utf8' })
+      .trim().split('\n').filter(Boolean),
+  ];
+  for (const rel of jsonFiles) {
+    let doc = null;
+    try { doc = JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8')); } catch { continue; }
+    const hits = [];
+    (function walk(node, at) {
+      if (typeof node === 'string') { if (ABS_PATH_RE.test(node)) hits.push(`${at} = ${node}`); return; }
+      if (Array.isArray(node)) { node.forEach((v, i) => walk(v, `${at}[${i}]`)); return; }
+      if (node && typeof node === 'object') { for (const [k, v] of Object.entries(node)) walk(v, `${at}.${k}`); }
+    })(doc, '');
+    for (const h of hits.slice(0, 3)) {
+      failures.push(`${rel}: machine-absolute path in tracked JSON — record repo-relative paths (${h})`);
     }
   }
 

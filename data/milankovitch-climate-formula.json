@@ -192,7 +192,7 @@
         "a_cos": 0.1926144837989506,
         "b_sin": -0.08027363744834279,
         "amp": 0.20867246161945804,
-        "label": "s\u2085\u2212s\u2081 Jupiter-Mercury nodal / Uranus AscNode = 8H/12"
+        "label": "s\u2085\u2212s\u2081 Jupiter-Mercury nodal"
       },
       "14": {
         "a_cos": -0.07376696219638579,
@@ -258,7 +258,7 @@
         "a_cos": -0.17980145973884273,
         "b_sin": -0.13200740318932486,
         "amp": 0.22305721109394258,
-        "label": "Mars apsidal = 8H/35"
+        "label": "Earth.Axial(104) \u2212 Mercury.ICRF(93) + Saturn.Obliq(24) (3-term beat; close to Mars apsidal at 8H/36)"
       },
       "38": {
         "a_cos": -0.35935078890494554,
@@ -288,7 +288,7 @@
         "a_cos": -0.03154642045353693,
         "b_sin": -0.04574486149529552,
         "amp": 0.055567697420849674,
-        "label": "Mars Ecc cycle = 8H/53"
+        "label": "Mars.AscNode(64) \u2212 Uranus.AscNode(11) s-beat (close to Mars Ecc cycle at 8H/52)"
       },
       "65": {
         "a_cos": -0.23249742943974713,
@@ -604,7 +604,7 @@
         "epica_amp": 0.7114863478818647,
         "ratio": 3.409584294737245,
         "period_kyr": 223.54466666666667,
-        "label": "s\u2085\u2212s\u2081 Jupiter-Mercury nodal / Uranus AscNode = 8H/12"
+        "label": "s\u2085\u2212s\u2081 Jupiter-Mercury nodal"
       },
       "14": {
         "lr04_post_mpt_amp": 0.09999995786236582,
@@ -681,7 +681,7 @@
         "epica_amp": 0.2013943007986291,
         "ratio": 0.9028818203676457,
         "period_kyr": 76.64388571428572,
-        "label": "Mars apsidal = 8H/35"
+        "label": "Earth.Axial(104) \u2212 Mercury.ICRF(93) + Saturn.Obliq(24) (3-term beat; close to Mars apsidal at 8H/36)"
       },
       "38": {
         "lr04_post_mpt_amp": 0.5378750524448507,
@@ -716,7 +716,7 @@
         "epica_amp": 0.11341146031290357,
         "ratio": 2.0409602264777345,
         "period_kyr": 50.61388679245283,
-        "label": "Mars Ecc cycle = 8H/53"
+        "label": "Mars.AscNode(64) \u2212 Uranus.AscNode(11) s-beat (close to Mars Ecc cycle at 8H/52)"
       },
       "65": {
         "lr04_post_mpt_amp": 0.3712810553368371,
@@ -844,9 +844,8 @@
     }
   },
   "meta": {
-    "script": "/home/dennis/code/3d/scripts/milankovitch_climate_formula.py",
+    "script": "milankovitch_climate_formula.py",
     "doc": "docs/92-climate-formula.md",
-    "predecessor": "scripts/milankovitch_climate_formula_v1_legacy.py (25 components, single-layer)",
-    "runtime_sec": 1.2418725490570068
+    "runtime_sec": 0.4241926670074463
   }
 }

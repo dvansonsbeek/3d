@@ -612,7 +612,7 @@
     "test_c_significant_count": 0
   },
   "meta": {
-    "runtime_sec": 1.6780683994293213,
-    "script": "/home/dennis/code/3d/scripts/milankovitch_inclination_test.py"
+    "runtime_sec": 0.7381691932678223,
+    "script": "milankovitch_inclination_test.py"
   }
 }

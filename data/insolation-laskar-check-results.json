@@ -1,12 +1,12 @@
 {
   "metadata": {
-    "script": "/home/dennis/code/3d/scripts/milankovitch_insolation_laskar_check.py",
+    "script": "milankovitch_insolation_laskar_check.py",
     "data_source": "Laskar et al. (2011), A&A 532, A89 \u2014 La2010a solution",
     "window_kyr": [
       0,
       500
     ],
-    "runtime_sec": 0.10256004333496094,
+    "runtime_sec": 0.03233671188354492,
     "obliquity_source": "model (computeObliquityEarth) \u2014 held identical in both variants",
     "eccentricity_perihelion_sources": {
       "V1": "model",

@@ -194,7 +194,7 @@ def main():
                             'this test provides a third independent look at whether a Hallstatt-band '
                             'cycle is a persistent long-term feature or a Holocene-solar artifact.'),
             'source_script': 'scripts/hallstatt_epica_co2.py',
-            'source_data': str(EPICA_PATH),
+            'source_data': str(EPICA_PATH.relative_to(REPO)),
             'H_yr': H, 'eight_H_yr': EIGHT_H,
         },
         'series_summary': {

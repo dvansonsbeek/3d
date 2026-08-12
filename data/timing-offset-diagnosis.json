@@ -295,7 +295,7 @@
     ]
   },
   "meta": {
-    "runtime_sec": 1.5027797222137451,
-    "script": "/home/dennis/code/3d/scripts/milankovitch_timing_offset_diagnosis.py"
+    "runtime_sec": 1.042830467224121,
+    "script": "milankovitch_timing_offset_diagnosis.py"
   }
 }
