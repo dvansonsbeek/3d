@@ -104,7 +104,7 @@ The same epoch-dependent scaling applies to multiple system parameters. All valu
 | Moon-Earth distance (a_apparent) | 384,399 km | **<!--v:moonDistanceAtDevonian-->369,749<!--/v--> km** | **<!--v:moonDistanceAt200MyrFuture-->392,059<!--/v--> km** | Layer 2 polynomial (Farhat-anchored) |
 | Obliquity main beat (n=65) | 41.27 kyr | **37.68 kyr** | **43.40 kyr** | 8H/65 scales with H |
 | Jupiter perihelion ecliptic (8H/39) | <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr | **62,808 yr** | **72,328 yr** | 8H/39 scales with H |
-| Saturn perihelion ecliptic (8H/65) | 41,270 yr | **37,685 yr** | **43,397 yr** | 8H/65 scales with H |
+| Saturn perihelion ecliptic (8H/65) | <!--v:saturnPeriPeriod-->41,270<!--/v--> yr | **37,685 yr** | **43,397 yr** | 8H/65 scales with H |
 | Earth axial precession (H/13) | <!--v:earthAxialPeriod-->25,794<!--/v--> yr | **<!--v:axialPrecAtDevonian-->23,553<!--/v--> yr** | **<!--v:axialPrecAt200MyrFuture-->27,123<!--/v--> yr** | H/13 scales with H |
 | Earth obliquity cycle (H/8) | 41,915 yr | **38,635 yr** | **43,833 yr** | H/8 scales with H |
 
@@ -897,15 +897,15 @@ All L1 integers including planetary ecliptic perihelion precessions scale with H
 | Quantity | Integer | Modern | Devonian (−380 Ma) | +200 Myr Future |
 |:---|:---|---:|---:|---:|
 | Mercury perihelion ecliptic | 8H/11 | <!--v:mercuryPeriPeriod-->243,867<!--/v--> yr | **222,683 yr** | **256,437 yr** |
-| Venus perihelion ecliptic | 8H/6 (retrograde) | 447,089 yr | **408,253 yr** | **470,134 yr** |
+| Venus perihelion ecliptic | 8H/6 (retrograde) | <!--v:venusPeriPeriod-->447,089<!--/v--> yr | **408,253 yr** | **470,134 yr** |
 | Mars perihelion ecliptic | 8H/36 | <!--v:marsPeriPeriod-->74,515<!--/v--> yr | **68,042 yr** | **78,356 yr** |
 | **Jupiter perihelion ecliptic** | **8H/39** | **<!--v:jupiterPeriPeriod-->68,783<!--/v--> yr** | **62,808 yr** | **72,328 yr** |
-| **Saturn perihelion ecliptic** | **8H/65** | **41,270 yr** | **37,685 yr** | **43,397 yr** |
+| **Saturn perihelion ecliptic** | **8H/65** | **<!--v:saturnPeriPeriod-->41,270<!--/v--> yr** | **37,685 yr** | **43,397 yr** |
 | Uranus perihelion ecliptic | H/3 = 8H/24 | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | **102,063 yr** | **117,533 yr** |
 | Neptune perihelion ecliptic | 2H = 8H/4 | <!--v:twoH-->670,634<!--/v--> yr | **612,379 yr** | **705,201 yr** |
 | Saturn ICRF perihelion | 8H/169 (retrograde) | <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr | **14,494 yr** | **16,691 yr** |
 | Earth ICRF perihelion | +H/3 = 8H/24 | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | **102,063 yr** | **117,533 yr** |
-| Jupiter ICRF perihelion | 8H/65 (retrograde) | 41,270 yr | **37,685 yr** | **43,397 yr** |
+| Jupiter ICRF perihelion | 8H/65 (retrograde) | <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | **37,685 yr** | **43,397 yr** |
 
 **Note on the Saturn-Jupiter resonance lock (Law 6)**: The framework's Law 6 — Saturn ecliptic perihelion = Jupiter ICRF perihelion = 8H/65 — is preserved across all epochs because both scale with H. The structural identity persists; only the absolute period evolves.
 
@@ -2023,7 +2023,7 @@ All values from the proper-physics two-layer formula. The `H × days/yr` near-in
 | Long ecc 405 (L2, NOT scaled, kyr) | 405 | 405 | 405 | 405 |
 | Axial precession (H/13, yr) | <!--v:earthAxialPeriod-->25,794<!--/v--> | 24,695 | <!--v:axialPrecAtDevonian-->23,553<!--/v--> | <!--v:axialPrecAt200MyrFuture-->27,123<!--/v--> |
 | Jupiter perihelion ecliptic (8H/39, yr) | <!--v:jupiterPeriPeriod-->68,783<!--/v--> | 65,852 | 62,808 | 72,328 |
-| Saturn perihelion ecliptic (8H/65, yr) | 41,270 | 39,511 | 37,685 | 43,397 |
+| Saturn perihelion ecliptic (8H/65, yr) | <!--v:saturnPeriPeriod-->41,270<!--/v--> | 39,511 | 37,685 | 43,397 |
 
 **Key observation**: the bottom rows (periods) all expand together with H(t), reflecting Driver 1 (tidal evolution). The structural near-invariant `H × days/year ≈ TOTAL_DAYS_IN_H` drifts smoothly with t_Ma under Driver 2 (solar mass loss): −33 ppm at Jurassic, −71 ppm at Devonian, +37 ppm at +200 Myr future (year_s shifts longer in future because Sun has lost more mass). The drift is monotonic and small but real — about 5 ppm per 50 Ma. This combination of strict structural lattice scaling + tracked Driver 2 drift is ESSRT's deepest self-consistency check.
 

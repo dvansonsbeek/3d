@@ -154,13 +154,13 @@ The inclination oscillation period equals the absolute ICRF perihelion period fo
 | Planet | Ecliptic Period | ICRF Period | ICRF Direction |
 |--------|----------------|-------------|----------------|
 | Mercury | `H × 8/11` | `8H/93` ≈ <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr | Retrograde |
-| Venus | `−8H/6` | `8H/110` ≈ 24,387 yr | Retrograde |
+| Venus | `−8H/6` | `8H/110` ≈ <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr | Retrograde |
 | Earth | `H / 3` | `H/3` ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | Prograde (sole) |
 | Mars | `H × 8/36` | `8H/68` ≈ <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr | Retrograde |
-| Jupiter | `8H/39` | `8H/65` ≈ 41,270 yr | Retrograde |
+| Jupiter | `8H/39` | `8H/65` ≈ <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | Retrograde |
 | Saturn | `−8H/65` | `8H/169` ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr | Retrograde |
-| Uranus | `H / 3` | `H/16` ≈ 20,957 yr | Retrograde |
-| Neptune | `H × 2` | `2H/25` ≈ 26,825 yr | Retrograde |
+| Uranus | `H / 3` | `H/10` ≈ <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr | Retrograde |
+| Neptune | `H × 2` | `2H/25` ≈ <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr | Retrograde |
 | Pluto | `H` | `H/14` ≈ 23,951 yr | Retrograde |
 
 For computed period values, see [Constants Reference](20-constants-reference.md).

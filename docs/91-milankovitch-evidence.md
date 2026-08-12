@@ -212,11 +212,11 @@ For Jupiter, Saturn, Uranus, and Neptune, standard secular theory reports **no r
 
 | Planet | Published literature | Model H/n prediction |
 |---|---|---:|
-| Venus | tidally damped at 177° (Correia & Laskar 2003) | 8H/110 = **24,387 yr** (model: net residual after two opposing precession components nearly cancel — see doc 37) |
+| Venus | tidally damped at 177° (Correia & Laskar 2003) | 8H/110 = **<!--v:venusObliqCycle-->24,387<!--/v--> yr** (model: net residual after two opposing precession components nearly cancel — see doc 37) |
 | Jupiter | "No regular cycle" — Gyr secular trend 3.1° → 6–37° (Saillenfest 2020) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
 | Saturn | "No regular cycle" — Gyr trend 26.7° → 65°+ via Neptune resonance (Saillenfest 2021; Wisdom 2022) | H/3 = **<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr** |
 | Uranus | Frozen — > 100 Myr precession (Saillenfest 2022) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
-| Neptune | Frozen (Rogoszinski & Hamilton 2020) | 8H/100 = **26,825 yr** |
+| Neptune | Frozen (Rogoszinski & Hamilton 2020) | 8H/100 = **<!--v:neptuneObliqCycle-->26,825<!--/v--> yr** |
 
 This is a **falsifiable but currently un-testable set of predictions**: no kiloyear-resolution obliquity observations exist for the outer planets, so neither the "no cycle" standard view nor the model's specific period can be directly verified at present. Future precision astrometry from probes (Juno extended mission for Jupiter; dedicated Saturn-system or ice-giant missions) could discriminate. See [doc 37 — Planetary Precession Cycles](37-planets-precession-cycles.md) §"Reference: Obliquity Oscillation" for the canonical model-vs-standard comparison table.
 
@@ -1113,7 +1113,7 @@ The 405-kyr cycle is a **real, empirically observed climate signal**. Across CEN
 
 | Planet | Laskar (g_i) apsidal period | Framework (doc 55) ecliptic perihelion |
 |---|---:|---:|
-| Venus | ~174 kyr (g₂ = 7.453″/yr) | **−447,089 yr** (= −8H/6, retrograde) |
+| Venus | ~174 kyr (g₂ = 7.453″/yr) | **−<!--v:venusPeriPeriod-->447,089<!--/v--> yr** (= −8H/6, retrograde) |
 | Jupiter | ~305 kyr (g₅ = 4.257″/yr) | **+<!--v:jupiterPeriPeriod-->68,783<!--/v--> yr** (= 8H/39) |
 
 In the framework's planet motions, Venus's and Jupiter's perihelion-precession rates produce a beat at ~58 or ~79 kyr (depending on sign convention), **not 405 kyr**. The §13.3 mathematical proof confirms it: no combination of any cycles in doc 55 reaches the 405-kyr range. The framework simply does not have a Venus-Jupiter beat at 405 kyr.

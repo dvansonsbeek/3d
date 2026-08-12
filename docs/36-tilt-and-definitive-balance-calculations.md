@@ -13,7 +13,7 @@ framework. It explains how the perihelion distance is fixed, how tilt and
 inclination oscillations produce a small eccentricity fluctuation, and how the
 eccentricity balance is maintained at every epoch.
 
-> **Scope note (ESSRT).** The balance laws themselves (Law 3 vector inclination balance, Law 5 scalar eccentricity balance with `δv = K · sin(tilt)`) are scale-invariant — they hold at any epoch. PSI, K, base eccentricities, axial tilts, the per-planet d-values, and the period denominators (H/N, 8H/N) are scale-invariant structural constants. The **literal year-count values** in the period tables (H = <!--v:H-->335,317<!--/v-->; H/16 = 20,957; 8H/65 = 41,270; the balanced-year anchor at -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->; the perihelion-precession periods <!--v:mercuryPeriPeriod-->243,867<!--/v--> / 447,089 / <!--v:marsPeriPeriod-->74,515<!--/v--> / <!--v:jupiterPeriPeriod-->68,783<!--/v--> / <!--v:twoH-->670,634<!--/v--> yr) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling every literal year count proportionally. The balance machinery this document describes therefore holds at any epoch with epoch-consistent inputs — §11 ("Why the Balance Holds at All Epochs") makes the temporal robustness explicit.
+> **Scope note (ESSRT).** The balance laws themselves (Law 3 vector inclination balance, Law 5 scalar eccentricity balance with `δv = K · sin(tilt)`) are scale-invariant — they hold at any epoch. PSI, K, base eccentricities, axial tilts, the per-planet d-values, and the period denominators (H/N, 8H/N) are scale-invariant structural constants. The **literal year-count values** in the period tables (H = <!--v:H-->335,317<!--/v-->; H/16 = <!--v:earthPeriPeriod-->20,957<!--/v-->; 8H/65 = <!--v:saturnPeriPeriod-->41,270<!--/v-->; the balanced-year anchor at -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->; the perihelion-precession periods <!--v:mercuryPeriPeriod-->243,867<!--/v--> / <!--v:venusPeriPeriod-->447,089<!--/v--> / <!--v:marsPeriPeriod-->74,515<!--/v--> / <!--v:jupiterPeriPeriod-->68,783<!--/v--> / <!--v:twoH-->670,634<!--/v--> yr) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling every literal year count proportionally. The balance machinery this document describes therefore holds at any epoch with epoch-consistent inputs — §11 ("Why the Balance Holds at All Epochs") makes the temporal robustness explicit.
 
 ---
 
@@ -164,7 +164,7 @@ DIFFERENT periods, their combined effect produces a real eccentricity fluctuatio
 at the planet's eccentricity cycle — the meeting frequency where axial precession
 meets inclination precession. Each planet has its own eccentricity cycle (see
 Section 10 and `docs/37-planets-precession-cycles.md`). For Earth the eccentricity
-cycle is H/16 = 20,957 years, resulting in an amplitude of <!--v:eccentricityAmplitude-->0.001356<!--/v--> AU.
+cycle is H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> years, resulting in an amplitude of <!--v:eccentricityAmplitude-->0.001356<!--/v--> AU.
 
 **Step 6 — Eccentricity balance is maintained at every epoch.**
 The mean perihelion distances (base eccentricities) achieve ~99.9% Law 5 balance.
@@ -380,8 +380,8 @@ occurs at each planet's eccentricity cycle (see Section 10).
 | Planet  | Period (years)      | Fibonacci Expression | Direction  |
 |---------|---------------------|----------------------|------------|
 | Mercury | <!--v:mercuryPeriPeriod-->243,867<!--/v-->             | H / (1 + 3/8)       | Prograde   |
-| Venus   | -447,089            | -8H / 6              | Retrograde |
-| Earth   |  20,957             | H / 16               | Prograde   |
+| Venus   | -<!--v:venusPeriPeriod-->447,089<!--/v--> | -8H / 6              | Retrograde |
+| Earth   |  <!--v:earthPeriPeriod-->20,957<!--/v--> | H / 16               | Prograde   |
 | Mars    |  <!--v:marsPeriPeriod-->74,515<!--/v-->             | H × 8/36             | Prograde   |
 | Jupiter |  <!--v:jupiterPeriPeriod-->68,783<!--/v-->             | 8H / 39              | Prograde   |
 | Saturn  | <!--v:jupiterIcrfPeriod-->-41,270<!--/v-->             | -8H / 65             | Retrograde |
@@ -416,7 +416,7 @@ In code: `computeEccentricityEarth(t, t_ref, T_ecc, e_base, e_amp)` in `src/scri
 Each planet oscillates at its own eccentricity cycle — the meeting frequency of its
 axial precession and perihelion ICRF precession. The eccentricity cycle is computed
 by `calcWobblePeriod(perihelionEclipticYears, axialPrecessionYears)` in
-`src/script.js`. For Earth, this gives H/16 = 20,957 years. Other planets have
+`src/script.js`. For Earth, this gives H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> years. Other planets have
 different eccentricity cycles (see `docs/37-planets-precession-cycles.md` for the
 full derivation and values).
 
@@ -475,7 +475,7 @@ Eccentricity phases are now derived at runtime from the balanced-year phase: `ph
 | Symbol | Value | Source |
 |--------|-------|--------|
 | K | 3.4149201316e-6 | `eccentricityAmplitudeK` in constants.js |
-| T_wobble (Earth) | 20,957 years | `perihelionCycleLength` in script.js |
+| T_wobble (Earth) | <!--v:earthPeriPeriod-->20,957<!--/v--> years | `perihelionCycleLength` in script.js |
 | T_wobble (per planet) | Varies | `calcWobblePeriod()` in script.js, see doc 37 |
 | e_amplitude per planet | See Section 5 table | `orbitalEccentricityAmplitude` in constants.js |
 | axial tilt per planet | See Section 8 table | `axialTiltJ2000` in constants.js |

@@ -47,7 +47,7 @@ The rate at which the ascending node on the invariable plane regresses. These ra
 The period of the planet's axial tilt oscillation. This is a beat frequency derived from the Fibonacci decomposition of the ecliptic perihelion rate. For Earth: obliquity = beat of inclination (H/3) and ecliptic precession (H/5) = H/8. Venus and Neptune have obliquity cycle = |ICRF period| per planet (Venus: 8H/110, Neptune: 8H/100) — the two-component formula cancels exactly, producing constant obliquity.
 
 ### 6. Eccentricity Cycle (Wobble Period)
-The wobble period: the beat frequency between the axial precession and the ICRF perihelion precession. This determines how long the eccentricity takes to complete one full oscillation. For Earth this is H/16 = 20,957 yr (the perihelion precession period). Computed via `calcWobblePeriod()`.
+The wobble period: the beat frequency between the axial precession and the ICRF perihelion precession. This determines how long the eccentricity takes to complete one full oscillation. For Earth this is H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr (the perihelion precession period). Computed via `calcWobblePeriod()`.
 
 ## Complete Period Table
 
@@ -78,13 +78,13 @@ Notes:
 | Planet | Axial prec. | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|--:|--:|--:|--:|--:|--:|
 | Mercury | **−<!--v:mercuryAxialPeriod-->298,060<!--/v-->** | <!--v:mercuryPeriPeriod-->243,867<!--/v--> | −<!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> | **−<!--v:mercuryAxialPeriod-->298,060<!--/v-->** | <!--v:mercuryObliqCycle-->894,179<!--/v--> | <!--v:mercuryEccCycle-->31,935<!--/v--> |
-| Venus | +<!--v:venusAxialPeriod-->29,478<!--/v--> | −447,089 | −24,387 | **−<!--v:eightH-->2,682,536<!--/v-->** | 24,387 | <!--v:venusEccCycle-->141,186<!--/v--> |
-| **Earth** | **−<!--v:earthAxialPeriod-->25,794<!--/v-->** | **20,957** | **+<!--v:earthPeriPeriodICRF-->111,772<!--/v-->** | **−67,063** | **41,915** | **20,957** |
-| Mars | −<!--v:hDiv2-->167,659<!--/v--> | <!--v:marsPeriPeriod-->74,515<!--/v--> | −<!--v:marsPeriPeriodICRF-->39,449<!--/v--> | **−41,915** | 127,740 | <!--v:marsEccCycle-->51,587<!--/v--> |
-| Jupiter | −127,740 | <!--v:jupiterPeriPeriod-->68,783<!--/v--> | −41,270 | **−<!--v:marsPeriPeriod-->74,515<!--/v-->** | <!--v:hDiv2-->167,659<!--/v--> | <!--v:jupiterEccCycle-->60,967<!--/v--> |
-| Saturn | −447,089 | −41,270 | −<!--v:saturnPeriPeriodICRF-->15,873<!--/v--> | **−<!--v:marsPeriPeriod-->74,515<!--/v-->** | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> | <!--v:saturnEccCycle-->16,457<!--/v--> |
-| Uranus | ~∞ | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> | −<!--v:uranusPeriPeriodICRF-->33,532<!--/v--> | **−<!--v:mercuryPeriPeriod-->243,867<!--/v-->** | <!--v:hDiv2-->167,659<!--/v--> | <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> |
-| Neptune | ~∞ | <!--v:twoH-->670,634<!--/v--> | −26,825 | **−<!--v:mercuryObliqCycle-->894,179<!--/v-->** | 26,825 | 26,825 |
+| Venus | +<!--v:venusAxialPeriod-->29,478<!--/v--> | −<!--v:venusPeriPeriod-->447,089<!--/v--> | −<!--v:venusPeriPeriodICRF-->24,387<!--/v--> | **−<!--v:eightH-->2,682,536<!--/v-->** | <!--v:venusObliqCycle-->24,387<!--/v--> | <!--v:venusEccCycle-->141,186<!--/v--> |
+| **Earth** | **−<!--v:earthAxialPeriod-->25,794<!--/v-->** | **<!--v:earthPeriPeriod-->20,957<!--/v-->** | **+<!--v:earthPeriPeriodICRF-->111,772<!--/v-->** | **−<!--v:hDiv5-->67,063<!--/v-->** | **<!--v:hDiv8-->41,915<!--/v-->** | **<!--v:earthPeriPeriod-->20,957<!--/v-->** |
+| Mars | −<!--v:marsAxialPeriod-->167,659<!--/v--> | <!--v:marsPeriPeriod-->74,515<!--/v--> | −<!--v:marsPeriPeriodICRF-->39,449<!--/v--> | **−<!--v:hDiv8-->41,915<!--/v-->** | <!--v:marsObliqCycle-->127,740<!--/v--> | <!--v:marsEccCycle-->51,587<!--/v--> |
+| Jupiter | −<!--v:jupiterAxialPeriod-->127,740<!--/v--> | <!--v:jupiterPeriPeriod-->68,783<!--/v--> | −<!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> | **−<!--v:marsPeriPeriod-->74,515<!--/v-->** | <!--v:jupiterObliqCycle-->167,659<!--/v--> | <!--v:jupiterEccCycle-->60,967<!--/v--> |
+| Saturn | −<!--v:saturnAxialPeriod-->447,089<!--/v--> | −<!--v:saturnPeriPeriod-->41,270<!--/v--> | −<!--v:saturnPeriPeriodICRF-->15,873<!--/v--> | **−<!--v:marsPeriPeriod-->74,515<!--/v-->** | <!--v:saturnObliqCycle-->111,772<!--/v--> | <!--v:saturnEccCycle-->16,457<!--/v--> |
+| Uranus | ~∞ | <!--v:uranusPeriPeriod-->111,772<!--/v--> | −<!--v:uranusPeriPeriodICRF-->33,532<!--/v--> | **−<!--v:mercuryPeriPeriod-->243,867<!--/v-->** | <!--v:uranusObliqCycle-->167,659<!--/v--> | <!--v:uranusEccCycle-->33,532<!--/v--> |
+| Neptune | ~∞ | <!--v:neptunePeriPeriod-->670,634<!--/v--> | −<!--v:neptunePeriPeriodICRF-->26,825<!--/v--> | **−<!--v:mercuryObliqCycle-->894,179<!--/v-->** | <!--v:neptuneObliqCycle-->26,825<!--/v--> | <!--v:neptuneEccCycle-->26,825<!--/v--> |
 
 (+ = prograde, − = retrograde, ~∞ = frozen)
 
@@ -111,7 +111,7 @@ Many divisors are products of small Fibonacci numbers:
 
 The Fibonacci anchors (40 = 5 × 8, 64 = 8², 168 = 8 × 21) factor through 8; the 8H-lattice secular values factor through 13. Earth's axial precession (8H/104 = 8 × 13) is the bridge: the frame conversion N_ICRF = 104 − N_ecl is exactly what carries Jupiter and Saturn onto the 13-lattice.
 
-**Earth sits between Jupiter and Saturn.** In the ecliptic frame the four periods order as **39 < 40 < 64 < 65**: Jupiter ecliptic perihelion (8H/39 = <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr), Earth ecliptic precession (8H/40 = H/5 = 67,063 yr), Earth obliquity (8H/64 = H/8 = 41,915 yr), and Saturn ecliptic perihelion (8H/65 = 41,270 yr). Earth's two Fibonacci values each sit exactly one 8H-step off a gas-giant period — its ecliptic precession just *below* Jupiter's, its obliquity just *above* Saturn's. The two gas giants move in opposite senses (Jupiter prograde, Saturn retrograde) and drive Earth's orbital plane from both sides; the clean Fibonacci anchors are the balance point in between. The relationship is exact through the obliquity beat: Earth's obliquity = axial(104) − Earth ecliptic(40) = 64, while the climate-recorded beat = axial(104) − Jupiter's nodal drive(39) = 65.
+**Earth sits between Jupiter and Saturn.** In the ecliptic frame the four periods order as **39 < 40 < 64 < 65**: Jupiter ecliptic perihelion (8H/39 = <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr), Earth ecliptic precession (8H/40 = H/5 = <!--v:hDiv5-->67,063<!--/v--> yr), Earth obliquity (8H/64 = H/8 = <!--v:hDiv8-->41,915<!--/v--> yr), and Saturn ecliptic perihelion (8H/65 = <!--v:saturnPeriPeriod-->41,270<!--/v--> yr). Earth's two Fibonacci values each sit exactly one 8H-step off a gas-giant period — its ecliptic precession just *below* Jupiter's, its obliquity just *above* Saturn's. The two gas giants move in opposite senses (Jupiter prograde, Saturn retrograde) and drive Earth's orbital plane from both sides; the clean Fibonacci anchors are the balance point in between. The relationship is exact through the obliquity beat: Earth's obliquity = axial(104) − Earth ecliptic(40) = 64, while the climate-recorded beat = axial(104) − Jupiter's nodal drive(39) = 65.
 
 ### The Three Fibonacci Levels
 1. **Level 1** — Fibonacci d-values (Law 2): d = 3, 5, 21, 34

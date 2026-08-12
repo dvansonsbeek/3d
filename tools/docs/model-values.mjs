@@ -385,7 +385,7 @@ export const VALUES = {
     unit: 'yr',
   },
   // Bare divisors and multiples of H, rounded to whole years.
-  ...Object.fromEntries([2, 21, 34].map((d) => [`hDiv${d}`, {
+  ...Object.fromEntries([2, 5, 8, 21, 34].map((d) => [`hDiv${d}`, {
     get: () => C.H / d,
     render: (v) => thousands(Math.round(v)),
     unit: 'yr',
@@ -1435,6 +1435,7 @@ export const VALUES = {
     }
     // Earth's rate uses the H/16 effective period, not a peri divisor above.
     out.earthPeriRate = { get: () => 360 / (C.H / 16), render: (v) => thousands(v, 6), unit: '°/yr', note: 'H/16 effective period' };
+    out.earthPeriPeriod = { get: () => C.H / 16, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'H/16 effective period' };
     const eccSources = {
       mercury: () => C.planets.mercury.orbitalEccentricityJ2000,
       venus:   () => C.planets.venus.orbitalEccentricityJ2000,

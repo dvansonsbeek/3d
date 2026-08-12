@@ -9,7 +9,7 @@ status: current
 
 Every orbital oscillation in the model — inclination, eccentricity, and obliquity — derives from two empirical constants and a set of observed J2000 anchor values. Nothing is fitted per planet. The loop is fully closed.
 
-> **Scope note (ESSRT).** The closed-loop derivation chain is structurally scale-invariant: Fibonacci divisors (3, 5, 8, 13, 21, 34), 8H/N lattice integers, balance-law forms (Law 3 vector, Law 5 scalar), and the PSI/K formula structures hold at any epoch. The numerical values of the constants — PSI (3.307×10⁻³), K (3.415×10⁻⁶), the mean obliquity (23.4135°), Earth's inclination amplitude (0.6360°) — and the literal year counts (H = <!--v:H-->335,317<!--/v-->; 8H = <!--v:eightH-->2,682,536<!--/v-->; H/13 = <!--v:earthAxialPeriod-->25,794<!--/v-->; H/16 = 20,957; System Reset year ≈ −2,649,854) are J2000-anchored. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling the literal year counts proportionally; PSI and K, being derived from J2000 Earth, would be re-evaluated at any other epoch by the same closed loop using that epoch's Earth values. The architecture of the loop — what derives from what — is permanent; the numerical snapshot is the J2000 instance.
+> **Scope note (ESSRT).** The closed-loop derivation chain is structurally scale-invariant: Fibonacci divisors (3, 5, 8, 13, 21, 34), 8H/N lattice integers, balance-law forms (Law 3 vector, Law 5 scalar), and the PSI/K formula structures hold at any epoch. The numerical values of the constants — PSI (3.307×10⁻³), K (3.415×10⁻⁶), the mean obliquity (23.4135°), Earth's inclination amplitude (0.6360°) — and the literal year counts (H = <!--v:H-->335,317<!--/v-->; 8H = <!--v:eightH-->2,682,536<!--/v-->; H/13 = <!--v:earthAxialPeriod-->25,794<!--/v-->; H/16 = <!--v:earthPeriPeriod-->20,957<!--/v-->; System Reset year ≈ −2,649,854) are J2000-anchored. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling the literal year counts proportionally; PSI and K, being derived from J2000 Earth, would be re-evaluated at any other epoch by the same closed loop using that epoch's Earth values. The architecture of the loop — what derives from what — is permanent; the numerical snapshot is the J2000 instance.
 
 ## The Two Constants
 
@@ -93,7 +93,7 @@ The beat frequency of the inclination and axial cycles: 1/P_obliquity = |1/P_inc
 
 ### 4. Eccentricity cycle (perihelion wobble)
 
-The eccentricity oscillates around its base value with the K-derived amplitude at the **ecliptic perihelion precession period**. For Earth this is H/16 (20,957 yr). The ecliptic perihelion rate is the sum of the ICRF perihelion rate and the general precession: 1/(H/16) = 1/(H/3) + 1/(H/13), or equivalently 3 + 13 = 16 in the Fibonacci framework.
+The eccentricity oscillates around its base value with the K-derived amplitude at the **ecliptic perihelion precession period**. For Earth this is H/16 (<!--v:earthPeriPeriod-->20,957<!--/v--> yr). The ecliptic perihelion rate is the sum of the ICRF perihelion rate and the general precession: 1/(H/16) = 1/(H/3) + 1/(H/13), or equivalently 3 + 13 = 16 in the Fibonacci framework.
 
 ### 5. Ascending node cycle (invariable plane)
 

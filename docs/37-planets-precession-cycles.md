@@ -71,11 +71,11 @@ precession hierarchy.
 | Planet | Observed ("/cy) | Observed period | H Ratio | H-predicted ("/cy) | H-predicted period |
 |--------|----------------|-----------------|---------|-------------------|-------------------|
 | Mercury | ~570 | ~227 kyr | H × 8/11 | 531.4 | <!--v:mercuryPeriPeriod-->243,867<!--/v--> yr |
-| Venus | ~0 | — | −8H/6 | −289.9 | −447,089 yr (r) |
-| Earth | ~6,186 | <!--v:periPrecYears-->~20,957<!--/v--> yr | H/16 | 6,186.5 | 20,957 yr |
+| Venus | ~0 | — | −8H/6 | −289.9 | −<!--v:venusPeriPeriod-->447,089<!--/v--> yr (r) |
+| Earth | ~6,186 | <!--v:periPrecYears-->~20,957<!--/v--> yr | H/16 | 6,186.5 | <!--v:earthPeriPeriod-->20,957<!--/v--> yr |
 | Mars | ~1,600 | ~81 kyr | H × 8/36 | 1,739.3 | <!--v:marsPeriPeriod-->74,515<!--/v--> yr |
 | Jupiter | ~1,800 | ~72 kyr | 8H/39 | <!--v:jupiterModelBaseline-->1,884.2<!--/v--> | <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr |
-| Saturn | ~−3,400 | ~38 kyr (r) | −8H/65 | −3,140.0 | 41,270 yr |
+| Saturn | ~−3,400 | ~38 kyr (r) | −8H/65 | −3,140.0 | <!--v:saturnPeriPeriod-->41,270<!--/v--> yr |
 | Uranus | ~1,100 | ~118 kyr | H/3 | 1,159.5 | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr |
 | Neptune | ~200 | ~648 kyr | H × 2 | 193.3 | <!--v:twoH-->670,634<!--/v--> yr |
 
@@ -159,7 +159,7 @@ Mars.Peri_ecl (8H/36) equals Jupiter.AscNode (also 8H/36) exactly.
 | Ecliptic precession | 5/H | H/5 = 67,063 yr | **?** | **?** (predicted 3H/5) |
 | Obliquity cycle | 8/H | H/8 = 41,915 yr | 21/(8H) | 8H/21 = 127,740 yr |
 | Axial precession | 13/H | H/13 = <!--v:earthAxialPeriod-->25,794<!--/v--> yr | 2/H | H/2 = <!--v:hDiv2-->167,659<!--/v--> yr |
-| Perihelion (ecliptic) | 16/H | H/16 = 20,957 yr | 36/(8H) | 8H/36 = <!--v:marsPeriPeriod-->74,515<!--/v--> yr |
+| Perihelion (ecliptic) | 16/H | H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr | 36/(8H) | 8H/36 = <!--v:marsPeriPeriod-->74,515<!--/v--> yr |
 | Perihelion (ICRF) | 3/H | H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | 68/(8H) | 8H/68 = <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
 
 ### Fibonacci analysis
@@ -229,7 +229,7 @@ is not a Fibonacci number, suggesting either:
 | Ecliptic precession | 67,063 yr | H/5 | 5 |
 | Obliquity cycle | 41,915 yr | H/8 | 8 |
 | Axial precession | <!--v:earthAxialPeriod-->25,794<!--/v--> yr | H/13 | 13 |
-| Perihelion (ecliptic) | 20,957 yr | H/16 | 16 |
+| Perihelion (ecliptic) | <!--v:earthPeriPeriod-->20,957<!--/v--> yr | H/16 | 16 |
 | Perihelion (ICRF) | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | H/3 | 3 |
 
 Earth's perihelion ICRF = H/3 comes from converting the ecliptic value:
@@ -292,13 +292,13 @@ The wobble is the **meeting frequency** of these two motions:
 | Planet | Perihelion Ecliptic | H expr | → Perihelion (ICRF) | H expr | Dir |
 |--------|--------------------|---------|--------------------|--------|-----|
 | Mercury | <!--v:mercuryPeriPeriod-->243,867<!--/v--> yr | H×8/11 | −<!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr | −8H/93 | retro |
-| Venus | −447,089 yr (r) | −8H/6 | −24,387 yr | −8H/110 | retro |
-| Earth | 20,957 yr | H/16 | +<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | +H/3 | **pro** |
+| Venus | −<!--v:venusPeriPeriod-->447,089<!--/v--> yr (r) | −8H/6 | −<!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr | −8H/110 | retro |
+| Earth | <!--v:earthPeriPeriod-->20,957<!--/v--> yr | H/16 | +<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | +H/3 | **pro** |
 | Mars | <!--v:marsPeriPeriod-->74,515<!--/v--> yr | 8H/36 | −<!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr | −8H/68 | retro |
-| Jupiter | <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr | 8H/39 | −41,270 yr | −8H/65 | retro |
-| Saturn | −41,270 yr (r) | −8H/65 | −<!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr | −8H/169 | retro |
+| Jupiter | <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr | 8H/39 | −<!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | −8H/65 | retro |
+| Saturn | −<!--v:saturnPeriPeriod-->41,270<!--/v--> yr (r) | −8H/65 | −<!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr | −8H/169 | retro |
 | Uranus | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | H/3 | −<!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr | −H/10 | retro |
-| Neptune | <!--v:twoH-->670,634<!--/v--> yr | H×2 | −26,825 yr | −2H/25 | retro |
+| Neptune | <!--v:twoH-->670,634<!--/v--> yr | H×2 | −<!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr | −2H/25 | retro |
 
 Notable ICRF patterns (8H-lattice secular): Jupiter = **8H/65**, Saturn = **8H/169** — these sit near the Fibonacci anchors H/8 (F6) and H/21 (F8).
 Earth is the only planet with prograde perihelion ICRF.
@@ -322,12 +322,12 @@ Earth is the only planet with prograde perihelion ICRF.
 |--------|-----------|---------------|---------|-------------|--------|--------|
 | Mercury | retro | retro | same: \|diff\| | 84/(8H) | <!--v:mercuryEccCycle-->31,935<!--/v--> yr | 2H/21 |
 | Venus | pro | retro | opp: sum | 191/(8H) | 14,045 yr | 8H/191 |
-| Earth | retro | pro | opp: sum | 16/H | 20,957 yr | **H/16** |
+| Earth | retro | pro | opp: sum | 16/H | <!--v:earthPeriPeriod-->20,957<!--/v--> yr | **H/16** |
 | Mars | retro | retro | same: \|diff\| | 20/(3H) | 50,298 yr | 3H/20 |
 | Jupiter | retro | retro | same: \|diff\| | 44/(8H) | <!--v:jupiterEccCycle-->60,967<!--/v--> yr | 8H/44 |
 | Saturn | retro | retro | same: \|diff\| | 163/(8H) | <!--v:saturnEccCycle-->16,457<!--/v--> yr | 8H/163 |
 | Uranus | pro | retro | opp: sum | ≈10/H | <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr | ≈H/10 |
-| Neptune | retro | retro | same: \|diff\| | ≈25/(2H) | 26,825 yr | ≈2H/25 |
+| Neptune | retro | retro | same: \|diff\| | ≈25/(2H) | <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr | ≈2H/25 |
 
 Calculation detail:
 - **Mercury**: |9/(8H) − 93/(8H)| = 84/(8H) = 21/(2H) (21 = F₈)
@@ -399,7 +399,7 @@ Three cross-planet period matches link obliquity cycles to other planets' preces
 |-----------|--------|-------------|
 | Mars obliquity = Jupiter axial | 8H/21 = 127,740 yr | Exact match, mirror pair (d=5), 21 = F₈ |
 | Mercury obliquity ≈ 2 × Saturn axial | 8H/3 ≈ 2 × H×4/3 | <!--v:mercuryObliqCycle-->894,179<!--/v--> ≈ 894,178 yr |
-| Jupiter peri ICRF = Saturn peri ecl (Law 6 lock) | 8H/65 = 41,270 yr | Drives Earth's obliquity; Earth's own H/8 (= 8H/64 = 41,915 yr) sits one 8H-step off |
+| Jupiter peri ICRF = Saturn peri ecl (Law 6 lock) | 8H/65 = <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | Drives Earth's obliquity; Earth's own H/8 (= 8H/64 = 41,915 yr) sits one 8H-step off |
 
 The Mars-Jupiter connection is the strongest: both are mirror pairs (d=5) and the
 match is exact. If this reciprocity extends: **Jupiter obliquity = Mars axial = H/2**.

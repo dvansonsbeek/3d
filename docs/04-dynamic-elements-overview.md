@@ -276,13 +276,13 @@ Key behavioral notes:
 | Planet | Ecliptic formula | Ecliptic period (yr) | ICRF period (yr) | ICRF direction |
 |--------|------------------|---------------------|------------------|----------------|
 | Mercury | H × 8/11 | <!--v:mercuryPeriPeriod-->243,867<!--/v--> | <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> | Retrograde |
-| Venus | −8H/6 | 447,089 | 24,387 | Retrograde |
-| Earth | H / 16 (ecliptic) / H / 3 (ICRF) | 20,957 | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> | **Prograde (sole)** |
+| Venus | −8H/6 | <!--v:venusPeriPeriod-->447,089<!--/v--> | <!--v:venusPeriPeriodICRF-->24,387<!--/v--> | Retrograde |
+| Earth | H / 16 (ecliptic) / H / 3 (ICRF) | <!--v:earthPeriPeriod-->20,957<!--/v--> | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> | **Prograde (sole)** |
 | Mars | H × 8/36 | <!--v:marsPeriPeriod-->74,515<!--/v--> | <!--v:marsPeriPeriodICRF-->39,449<!--/v--> | Retrograde |
-| Jupiter | 8H / 39 | <!--v:jupiterPeriPeriod-->68,783<!--/v--> | 41,270 | Retrograde |
-| Saturn | −8H / 65 | 41,270 | <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> | Retrograde |
-| Uranus | H / 3 | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> | <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> | Retrograde |
-| Neptune | H × 2 | <!--v:twoH-->670,634<!--/v--> | 26,825 | Retrograde |
+| Jupiter | 8H / 39 | <!--v:jupiterPeriPeriod-->68,783<!--/v--> | <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> | Retrograde |
+| Saturn | −8H / 65 | <!--v:saturnPeriPeriod-->41,270<!--/v--> | <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> | Retrograde |
+| Uranus | H / 3 | <!--v:uranusPeriPeriod-->111,772<!--/v--> | <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> | Retrograde |
+| Neptune | H × 2 | <!--v:neptunePeriPeriod-->670,634<!--/v--> | <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> | Retrograde |
 
 The ICRF period is derived from the ecliptic period by subtracting the general precession rate (H/13): `1/P_ICRF = 1/P_ecliptic − 13/H`. Earth is the only planet with a prograde ICRF perihelion. All ICRF periods divide 8H = <!--v:eightH-->2,682,536<!--/v--> years at J2000 exactly (the Solar System Resonance Cycle). The inclination oscillation is driven by the ICRF period, not the ecliptic period.
 
