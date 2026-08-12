@@ -1452,6 +1452,40 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Full-precision J2000 catalog elements (doc-20 reference tables) ─────
+  // Straight reads of astro-reference planetOrbitalElements — the JPL/SPICE
+  // catalog inputs, rendered at stored precision (String of the raw value).
+  ...(() => {
+    const out = {};
+    for (const [planet, el] of Object.entries(astro.planetOrbitalElements)) {
+      if (planet.startsWith('_') || typeof el !== 'object') continue;
+      out[`${planet}EccJ2000Full`] = { get: () => el.orbitalEccentricityJ2000, render: (v) => String(v), note: 'JPL J2000 catalog input' };
+      out[`${planet}PeriLongJ2000Full`] = { get: () => el.longitudePerihelion, render: (v) => String(v), unit: 'deg', note: 'JPL J2000 catalog input' };
+      out[`${planet}EclInclJ2000Full`] = { get: () => el.eclipticInclinationJ2000, render: (v) => String(v), unit: 'deg', note: 'JPL/SPICE catalog input' };
+      out[`${planet}AscNodeEclJ2000`] = { get: () => el.ascendingNode, render: (v) => String(v), unit: 'deg', note: 'JPL/SPICE catalog input' };
+      out[`${planet}MeanAnomalyJ2000`] = { get: () => el.meanAnomaly, render: (v) => String(v), unit: 'deg', note: 'JPL J2000 catalog input' };
+      out[`${planet}TrueAnomalyJ2000`] = { get: () => el.trueAnomaly, render: (v) => String(v), unit: 'deg', note: 'JPL J2000 catalog input' };
+    }
+    return out;
+  })(),
+
+  // ── External year/day-length inputs (astro-reference yearLengthRef) ─────
+  ...(() => {
+    const y = astro.yearLengthRef;
+    return {
+      tropicalYearMeanJ2000Days: { get: () => y.tropicalYearMean, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
+      tropicalYearVEJ2000Days: { get: () => y.tropicalYearVE, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
+      tropicalYearSSJ2000Days: { get: () => y.tropicalYearSS, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
+      tropicalYearAEJ2000Days: { get: () => y.tropicalYearAE, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
+      tropicalYearWSJ2000Days: { get: () => y.tropicalYearWS, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
+      anomalisticYearInputDays: { get: () => y.anomalisticYear, render: (v) => String(v), unit: 'days', note: 'JPL Horizons' },
+      siderealDayInputSeconds: { get: () => y.siderealDay, render: (v) => thousands(v, 6), unit: 's', note: 'IERS input' },
+      stellarDayInputSeconds: { get: () => y.stellarDay, render: (v) => thousands(v, 6), unit: 's', note: 'IERS input' },
+      obliquityJ2000Arcsec: { get: () => astro.earthOrbital.obliquityJ2000_deg * 3600, render: (v) => v.toFixed(3), unit: 'arcsec', note: 'IAU 2006' },
+      obliquityRateArcsecPerCy: { get: () => astro.earthOrbital.obliquityRate_arcsecPerCentury, render: (v) => String(v), unit: 'arcsec/cy', note: 'IAU 2006' },
+    };
+  })(),
+
   // ── ICRF perihelion periods (11-2aa) ────────────────────────────────────
   // Structural identity, verified against all eight site divisors: the ICRF
   // perihelion rate is the ecliptic rate minus the H/13 axial frame term —

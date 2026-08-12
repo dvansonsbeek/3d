@@ -62,8 +62,8 @@ The six true degrees of freedom that define the model. Everything else is derive
 | 1 | Earth Fundamental Cycle | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1 | [Part 1 — Earth Fundamental Cycle](#the-earth-fundamental-cycle-h) |
 | 2 | Balanced year | `balancedYear` | −<!--v:anchorYearOffset-->302,635<!--/v--> (derived) | 0 | [Part 2 — Time Constants](#time-constants) |
 | 3 | Fibonacci divisors | — | 3, 5, 8, 13, 21, 34 | 3 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
-| 4 | Mean obliquity | `earthtiltMean` | 23.41354° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
-| 5 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | 0.63603° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
+| 4 | Mean obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
+| 5 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63605<!--/v-->° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
 | 6 | Planet config | the default configuration | Unique mirror-symmetric solution | 0 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
 
 Total: **6 DOF** (items 2 and 6 are derived/constrained, not independently free).
@@ -76,24 +76,24 @@ Reference values from astronomical observations (IAU, JPL, Meeus) used to anchor
 |-----------|----------|-------|
 | Perihelion-solstice alignment | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
 | Long. perihelion (J2000) | `perihelionLongitudeJ2000_deg` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v-->° |
-| Obliquity (J2000) | `obliquityJ2000_arcsec` | 84381.406" (<!--v:obliquityJ2000Deg-->23.439279<!--/v-->°) |
+| Obliquity (J2000) | `obliquityJ2000_arcsec` | <!--v:obliquityJ2000Arcsec-->84381.406<!--/v-->" (<!--v:obliquityJ2000Deg-->23.439279<!--/v-->°) |
 | Obliquity rate (J2000) | `obliquityRate_arcsecPerCentury` | −46.836769"/cy |
 | Obliquity range | — | <!--v:mainstreamObliqRange-->~22.1° to ~24.5°<!--/v--> |
 | Earth incl. (J2000) | `earthInclinationJ2000_deg` | <!--v:earthInclJ2000-->1.57869<!--/v-->° |
 | Eccentricity (J2000) | `eccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> |
-| Sidereal year (J2000) | `siderealYearJ2000` | 365.25636301 days |
-| Tropical year mean (J2000) | `tropicalYearMeanJ2000` | 365.2421897 days |
-| Tropical year VE (J2000) | `tropicalYearVEJ2000` | 365.242374 days |
-| Tropical year SS (J2000) | `tropicalYearSSJ2000` | 365.241626 days |
-| Tropical year AE (J2000) | `tropicalYearAEJ2000` | 365.242018 days |
+| Sidereal year (J2000) | `siderealYearJ2000` | <!--v:siderealYearInputDays-->365.256363004<!--/v--> days |
+| Tropical year mean (J2000) | `tropicalYearMeanJ2000` | <!--v:tropicalYearMeanJ2000Days-->365.2421897<!--/v--> days |
+| Tropical year VE (J2000) | `tropicalYearVEJ2000` | <!--v:tropicalYearVEJ2000Days-->365.242374<!--/v--> days |
+| Tropical year SS (J2000) | `tropicalYearSSJ2000` | <!--v:tropicalYearSSJ2000Days-->365.241626<!--/v--> days |
+| Tropical year AE (J2000) | `tropicalYearAEJ2000` | <!--v:tropicalYearAEJ2000Days-->365.242018<!--/v--> days |
 | Tropical year WS (J2000) | `tropicalYearWSJ2000` | 365.242740 days |
-| Anomalistic year (J2000) | `anomalisticYearJ2000` | 365.259636 days |
+| Anomalistic year (J2000) | `anomalisticYearJ2000` | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days |
 | Tropical year rate | `tropicalYearRateSecPerCentury` | −0.53 s/cy |
 | Axial precession (J2000) | `iauPrecessionJ2000` | 25,771.58 years |
 | June Solstice 2000 JD | `juneSolstice2000_JD` | 2451716.575 |
 | Solar day (J2000) | `solarDayJ2000` | 86400.0 s |
-| Sidereal day (J2000) | `siderealDayJ2000` | 86164.090531 s |
-| Stellar day (J2000) | `stellarDayJ2000` | 86164.098904 s |
+| Sidereal day (J2000) | `siderealDayJ2000` | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s |
+| Stellar day (J2000) | `stellarDayJ2000` | <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s |
 | Perihelion passage JD | `perihelionPassageJ2000_JD` | 2451547.042 |
 | Moon mean anomaly (J2000) | `moonMeanAnomalyJ2000_deg` | 134.9634° |
 | Moon mean anomaly rate | `moonMeanAnomalyRate_degPerDay` | 13.06499295°/day |
@@ -125,10 +125,10 @@ The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce 
 |----------|----------|-------|-------------|
 | Base Eccentricity | `eccentricityBase` | <!--v:eccentricityBase-->0.015386<!--/v--> | Base orbital eccentricity (derived from perihelion longitude) |
 | Eccentricity Amplitude | `eccentricityAmplitude` | <!--v:eccentricityAmplitude-->0.001356<!--/v--> | Oscillation amplitude (derived from base + e(J2000) constraint) |
-| Mean Obliquity | `earthtiltMean` | 23.41354 deg | Mean axial tilt (derived from obliquity at J2000) |
+| Mean Obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v--> deg | Mean axial tilt (derived from obliquity at J2000) |
 | RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
-| Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.481134 deg | Mean orbital inclination to invariable plane (derived) |
-| Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.63603 deg | Oscillation amplitude (derived from obliquity rate) |
+| Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | <!--v:earthInclMean-->1.48113<!--/v--> deg | Mean orbital inclination to invariable plane (derived) |
+| Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63605<!--/v--> deg | Oscillation amplitude (derived from obliquity rate) |
 | Inclination Cycle Anchor | `earthInclinationCycleAnchor` | 21.77 deg | ICRF perihelion longitude where Earth reaches MAX inclination (anchor for the oscillation) |
 | Perihelion Ref JD | `perihelionRefJD` | 2451547.042 | JD of Earth perihelion 2000 (Jan 3.542) |
 
@@ -199,12 +199,12 @@ These are computed from foundational constants. The formula is the definition; t
 
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
-| Mean Solar Year | `meanSolarYearDays` | round(inputMeanSolarYear × H/8) / (H/8) | 365.242203646 days |
+| Mean Solar Year | `meanSolarYearDays` | round(inputMeanSolarYear × H/8) / (H/8) | <!--v:meanSolarYearDaysFull-->365.242203646102<!--/v--> days |
 | Mean Sidereal Year | `meanSiderealYearDays` | meanSolarYearDays × (H/13) / ((H/13) - 1) | 365.256364374 days |
 | Mean Anomalistic Year | `meanAnomalisticYearDays` | meanSolarYearDays / (H/16 - 1) + meanSolarYearDays | 365.259632390 days |
 | Mean Length of Day | `meanLengthOfDay` | meanSiderealYearSeconds / meanSiderealYearDays | ~86,400.0 s |
-| Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | 86,164.0902 s |
-| Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/(H/13)) / (meanSolarYearDays+1) + meanSiderealDay | 86,164.0993 s |
+| Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0902182<!--/v--> s |
+| Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/(H/13)) / (meanSolarYearDays+1) + meanSiderealDay | <!--v:meanStellarDaySeconds-->86,164.0985857<!--/v--> s |
 | Balanced Year | `balancedYear` | perihelionalignmentYear - (14.5 × H/16) | <!--v:balancedYear-->-302,635<!--/v--> |
 | Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
 | Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,957<!--/v--> years |
@@ -283,14 +283,14 @@ All 8 planets, combining inner planet J2000 values with outer planet pre-dual-ba
 
 | Planet | `eccJ2000` | Source |
 |--------|-----------|--------|
-| Mercury | 0.20563593 | J2000 (same as model) |
-| Venus | 0.00677672 | J2000 (same as model) |
+| Mercury | <!--v:mercuryEccJ2000Full-->0.20563593<!--/v--> | J2000 (same as model) |
+| Venus | <!--v:venusEccJ2000Full-->0.00677672<!--/v--> | J2000 (same as model) |
 | Earth | <!--v:j2000Eccentricity-->0.01671022<!--/v--> | J2000 (from ASTRO_REFERENCE) |
 | Mars | 0.09339410 | J2000 (same as model) |
-| Jupiter | 0.04838624 | J2000 (base derived from phase) |
-| Saturn | 0.05386179 | J2000 (base derived from phase) |
-| Uranus | 0.04725744 | J2000 (base derived from phase) |
-| Neptune | 0.00859048 | J2000 (base derived from phase) |
+| Jupiter | <!--v:jupiterEccJ2000Full-->0.04838624<!--/v--> | J2000 (base derived from phase) |
+| Saturn | <!--v:saturnEccJ2000Full-->0.05386179<!--/v--> | J2000 (base derived from phase) |
+| Uranus | <!--v:uranusEccJ2000Full-->0.04725744<!--/v--> | J2000 (base derived from phase) |
+| Neptune | <!--v:neptuneEccJ2000Full-->0.00859048<!--/v--> | J2000 (base derived from phase) |
 
 ## Planet Inclination Parameters (from ψ formula)
 
@@ -301,7 +301,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 |--------|----------|---------------|-----------|-------------|-------------|
 | Mercury | 6.703207 | 0.386478 | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | 8H/93 ≈ <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr |
 | Venus | <!--v:venusInclMean-->2.151359<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | 8H/110 ≈ <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr |
-| Earth | 1.481134 | 0.636032 | 0.85 - 2.12 | 21.77° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr |
+| Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> | 0.85 - 2.12 | <!--v:earthInclCycleAnchor-->21.77<!--/v-->° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr |
 | Mars | 1.833251 | 1.164218 | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | 8H/68 ≈ <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
 | Jupiter | <!--v:jupiterInclMean-->0.321086<!--/v--> | <!--v:jupiterInclAmp-->0.021404<!--/v--> | 0.30 - 0.34 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | 8H/65 ≈ <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr |
 | Saturn | 0.984965 | 0.065193 | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | 8H/169 ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr |
@@ -413,8 +413,8 @@ These come from external astronomical sources and do not change with the model.
 
 | Constant | Variable | Value | Source |
 |----------|----------|-------|--------|
-| Obliquity | `obliquityJ2000_arcsec` | 84381.406" (<!--v:obliquityJ2000Deg-->23.439279<!--/v--> deg) | IAU 2006 (Capitaine et al. 2003) |
-| Obliquity rate | `obliquityRate_arcsecPerCentury` | -46.836769"/cy | IAU 2006 |
+| Obliquity | `obliquityJ2000_arcsec` | <!--v:obliquityJ2000Arcsec-->84381.406<!--/v-->" (<!--v:obliquityJ2000Deg-->23.439279<!--/v--> deg) | IAU 2006 (Capitaine et al. 2003) |
+| Obliquity rate | `obliquityRate_arcsecPerCentury` | <!--v:obliquityRateArcsecPerCy-->-46.836769<!--/v-->"/cy | IAU 2006 |
 | Obliquity range | - | ~22.1 deg to ~24.5 deg | Laskar 1993 |
 | Earth inclination | `earthInclinationJ2000_deg` | <!--v:earthInclJ2000-->1.57869<!--/v--> deg | Astronomical Almanac |
 | Earth inclination rate | `earthInclinationRate_arcsecPerCentury` | -18"/cy | Astronomical Almanac |
@@ -428,14 +428,14 @@ These come from external astronomical sources and do not change with the model.
 
 | Constant | Variable | Value | Source |
 |----------|----------|-------|--------|
-| Tropical year (mean) | `tropicalYearMeanJ2000` | 365.2421897 days | Meeus & Savoie 1992 |
-| Tropical year (VE) | `tropicalYearVEJ2000` | 365.242374 days | Meeus & Savoie 1992 |
-| Tropical year (SS) | `tropicalYearSSJ2000` | 365.241626 days | Meeus & Savoie 1992 |
-| Tropical year (AE) | `tropicalYearAEJ2000` | 365.242018 days | Meeus & Savoie 1992 |
+| Tropical year (mean) | `tropicalYearMeanJ2000` | <!--v:tropicalYearMeanJ2000Days-->365.2421897<!--/v--> days | Meeus & Savoie 1992 |
+| Tropical year (VE) | `tropicalYearVEJ2000` | <!--v:tropicalYearVEJ2000Days-->365.242374<!--/v--> days | Meeus & Savoie 1992 |
+| Tropical year (SS) | `tropicalYearSSJ2000` | <!--v:tropicalYearSSJ2000Days-->365.241626<!--/v--> days | Meeus & Savoie 1992 |
+| Tropical year (AE) | `tropicalYearAEJ2000` | <!--v:tropicalYearAEJ2000Days-->365.242018<!--/v--> days | Meeus & Savoie 1992 |
 | Tropical year (WS) | `tropicalYearWSJ2000` | 365.242740 days | Meeus & Savoie 1992 |
 | Tropical year rate | `tropicalYearRateSecPerCentury` | -0.53 s/cy | Meeus & Savoie 1992 |
-| Anomalistic year | `anomalisticYearJ2000` | 365.259636 days | JPL Horizons |
-| Sidereal year | `siderealYearJ2000` | 365.25636301 days | JPL Horizons (adjusted for LOD=86400) |
+| Anomalistic year | `anomalisticYearJ2000` | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days | JPL Horizons |
+| Sidereal year | `siderealYearJ2000` | <!--v:siderealYearInputDays-->365.256363004<!--/v--> days | JPL Horizons (adjusted for LOD=86400) |
 | Solar day | `solarDayJ2000` | 86400.0 s | SI definition |
 | Sidereal day | `siderealDayJ2000` | 86164.09053083288 s (~23h 56m 4.0905s) | IERS |
 | Stellar day | `stellarDayJ2000` | 86164.0989036905 s (~23h 56m 4.0989s) | IERS |
@@ -490,25 +490,25 @@ The per-day rates are used for EoC phase computation; the per-century rates are 
 
 | Planet | Eccentricity (J2000) | Long. Perihelion (deg) | Source |
 |--------|---------------------|----------------------|--------|
-| Mercury | 0.20563593 | 77.4569131 | JPL J2000 |
-| Venus | 0.00677672 | 131.5765919 | JPL J2000 |
-| Mars | 0.09339410 | 336.0650681 | JPL J2000 |
-| Jupiter | 0.04838624 | 14.70659401 | JPL J2000 |
-| Saturn | 0.05386179 | 92.12794343 | JPL J2000 |
-| Uranus | 0.04725744 | 170.7308251 | JPL J2000 |
-| Neptune | 0.00859048 | 45.80124471 | JPL J2000 |
+| Mercury | <!--v:mercuryEccJ2000Full-->0.20563593<!--/v--> | <!--v:mercuryPeriLongJ2000Full-->77.4569131<!--/v--> | JPL J2000 |
+| Venus | <!--v:venusEccJ2000Full-->0.00677672<!--/v--> | <!--v:venusPeriLongJ2000Full-->131.5765919<!--/v--> | JPL J2000 |
+| Mars | 0.09339410 | <!--v:marsPeriLongJ2000Full-->336.0650681<!--/v--> | JPL J2000 |
+| Jupiter | <!--v:jupiterEccJ2000Full-->0.04838624<!--/v--> | <!--v:jupiterPeriLongJ2000Full-->14.70659401<!--/v--> | JPL J2000 |
+| Saturn | <!--v:saturnEccJ2000Full-->0.05386179<!--/v--> | <!--v:saturnPeriLongJ2000Full-->92.12794343<!--/v--> | JPL J2000 |
+| Uranus | <!--v:uranusEccJ2000Full-->0.04725744<!--/v--> | <!--v:uranusPeriLongJ2000Full-->170.7308251<!--/v--> | JPL J2000 |
+| Neptune | <!--v:neptuneEccJ2000Full-->0.00859048<!--/v--> | <!--v:neptunePeriLongJ2000Full-->45.80124471<!--/v--> | JPL J2000 |
 
 ### Ecliptic Inclinations & Ascending Nodes
 
 | Planet | Inclination (deg) | Ascending Node (deg) | Source |
 |--------|------------------|---------------------|--------|
-| Mercury | 7.00497902 | 48.33033155 | JPL/SPICE |
-| Venus | 3.39467605 | 76.67877109 | JPL/SPICE |
-| Mars | 1.84969142 | 49.55737662 | JPL/SPICE |
-| Jupiter | 1.30439695 | 100.4877868 | JPL/SPICE |
-| Saturn | 2.48599187 | 113.6452856 | JPL/SPICE |
-| Uranus | 0.77263783 | 74.00919023 | JPL/SPICE |
-| Neptune | 1.77004347 | 131.7853754 | JPL/SPICE |
+| Mercury | <!--v:mercuryEclInclJ2000Full-->7.00497902<!--/v--> | <!--v:mercuryAscNodeEclJ2000-->48.33033155<!--/v--> | JPL/SPICE |
+| Venus | <!--v:venusEclInclJ2000Full-->3.39467605<!--/v--> | <!--v:venusAscNodeEclJ2000-->76.67877109<!--/v--> | JPL/SPICE |
+| Mars | <!--v:marsEclInclJ2000Full-->1.84969142<!--/v--> | <!--v:marsAscNodeEclJ2000-->49.55737662<!--/v--> | JPL/SPICE |
+| Jupiter | <!--v:jupiterEclInclJ2000Full-->1.30439695<!--/v--> | <!--v:jupiterAscNodeEclJ2000-->100.4877868<!--/v--> | JPL/SPICE |
+| Saturn | <!--v:saturnEclInclJ2000Full-->2.48599187<!--/v--> | <!--v:saturnAscNodeEclJ2000-->113.6452856<!--/v--> | JPL/SPICE |
+| Uranus | <!--v:uranusEclInclJ2000Full-->0.77263783<!--/v--> | <!--v:uranusAscNodeEclJ2000-->74.00919023<!--/v--> | JPL/SPICE |
+| Neptune | <!--v:neptuneEclInclJ2000Full-->1.77004347<!--/v--> | <!--v:neptuneAscNodeEclJ2000-->131.7853754<!--/v--> | JPL/SPICE |
 | Pluto | 17.14001 | 110.30393 | JPL Horizons |
 | Moon | <!--v:moonEclipticInclination-->5.1573<!--/v--> (dynamical mean osc; theory constant <!--v:moonInclinationConstantBrownELP-->5.1453964<!--/v-->) | — | — |
 
@@ -535,13 +535,13 @@ JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic
 
 | Planet | Mean Anomaly (deg) | True Anomaly (deg) | Source |
 |--------|-------------------|-------------------|--------|
-| Mercury | 156.6364301 | 164.1669319 | JPL J2000 |
-| Venus | 324.9668371 | 324.5198504 | JPL J2000 |
-| Mars | 109.2630844 | 118.9501056 | JPL J2000 |
-| Jupiter | 32.47179744 | 35.69428061 | JPL J2000 |
-| Saturn | 325.663876 | 321.7910116 | JPL J2000 |
-| Uranus | 145.7292678 | 148.5142459 | JPL J2000 |
-| Neptune | 262.5003424 | 261.2242728 | JPL J2000 |
+| Mercury | <!--v:mercuryMeanAnomalyJ2000-->156.6364301<!--/v--> | <!--v:mercuryTrueAnomalyJ2000-->164.1669319<!--/v--> | JPL J2000 |
+| Venus | <!--v:venusMeanAnomalyJ2000-->324.9668371<!--/v--> | <!--v:venusTrueAnomalyJ2000-->324.5198504<!--/v--> | JPL J2000 |
+| Mars | <!--v:marsMeanAnomalyJ2000-->109.2630844<!--/v--> | <!--v:marsTrueAnomalyJ2000-->118.9501056<!--/v--> | JPL J2000 |
+| Jupiter | <!--v:jupiterMeanAnomalyJ2000-->32.47179744<!--/v--> | <!--v:jupiterTrueAnomalyJ2000-->35.69428061<!--/v--> | JPL J2000 |
+| Saturn | <!--v:saturnMeanAnomalyJ2000-->325.663876<!--/v--> | <!--v:saturnTrueAnomalyJ2000-->321.7910116<!--/v--> | JPL J2000 |
+| Uranus | <!--v:uranusMeanAnomalyJ2000-->145.7292678<!--/v--> | <!--v:uranusTrueAnomalyJ2000-->148.5142459<!--/v--> | JPL J2000 |
+| Neptune | <!--v:neptuneMeanAnomalyJ2000-->262.5003424<!--/v--> | <!--v:neptuneTrueAnomalyJ2000-->261.2242728<!--/v--> | JPL J2000 |
 | Pluto | 15.55009 | 26.31965048 | JPL J2000 |
 
 ### Axial Tilts
@@ -836,13 +836,13 @@ Per-planet configuration for the predictive perihelion precession formula:
 
 | Planet | Period Formula | Theta0 (deg) | Baseline (arcsec/cy) |
 |--------|---------------|---------------|---------------------|
-| Mercury | H × 8/11 | 77.4569131 | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Venus | -8H / 6 | 131.5765919 | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
-| Mars | H × 8/35 | 336.0650681 | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Jupiter | H / 5 | 14.70659401 | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Saturn | H / 8 | 92.12794343 | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
-| Uranus | H / 3 | 170.7308251 | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Neptune | H × 2 | 45.80124471 | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Mercury | H × 8/11 | <!--v:mercuryPeriLongJ2000Full-->77.4569131<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Venus | -8H / 6 | <!--v:venusPeriLongJ2000Full-->131.5765919<!--/v--> | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
+| Mars | H × 8/35 | <!--v:marsPeriLongJ2000Full-->336.0650681<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Jupiter | H / 5 | <!--v:jupiterPeriLongJ2000Full-->14.70659401<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Saturn | H / 8 | <!--v:saturnPeriLongJ2000Full-->92.12794343<!--/v--> | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
+| Uranus | H / 3 | <!--v:uranusPeriLongJ2000Full-->170.7308251<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Neptune | H × 2 | <!--v:neptunePeriLongJ2000Full-->45.80124471<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
 
 ### Predictive Normalization Constants
 
