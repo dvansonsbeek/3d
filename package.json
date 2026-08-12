@@ -9,7 +9,7 @@
     "dev": "parcel src/index.html",
     "dashboard": "npx serve dashboard -l 5050",
     "dashboard:export": "node tools/export-dashboard-data.js",
-    "build": "parcel build src/index.html --dist-dir dist",
+    "build": "parcel build src/index.html --dist-dir dist --public-url ./",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p jsconfig.json",
     "check:boundaries": "node tools/check-boundaries.mjs",
