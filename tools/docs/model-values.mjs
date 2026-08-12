@@ -1486,6 +1486,62 @@ export const VALUES = {
     };
   })(),
 
+  // ── Reference + tuned-parameter keys (doc-20 remainder) ─────────────────
+  // Mass ratios, Meeus lunar/solar mean elements, JPL inclination trends,
+  // minor-body catalog elements, per-planet tuned parameters — all straight
+  // reads of astro-reference / model-parameters / the engine.
+  ...(() => {
+    const group = (v) => { const [i, f] = String(v).split('.'); return i.replace(/(\d)(?=(\d{3})+$)/g, '$1,') + (f ? '.' + f : ''); };
+    const out = {};
+    for (const [p, v] of Object.entries(astro.physicalConstants.massRatioDE440)) {
+      out[`${p}MassRatioDE440`] = { get: () => v, render: group, note: 'DE440 M_Sun / M_body' };
+    }
+    for (const p of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      out[`${p}MassFraction`] = { get: () => C.massFraction[p], render: (v) => fmtSci(v, 3), note: 'M_planet / M_Sun' };
+    }
+    for (const [k, v] of Object.entries(astro.moonMeeus)) {
+      if (k.startsWith('_') || typeof v !== 'number') continue;
+      const key = k.replace(/_deg$/, 'Deg').replace(/_degPerDay$/, 'DegPerDay').replace(/_degPerCentury$/, 'DegPerCentury');
+      out[key] = { get: () => v, render: (v2) => String(v2), note: 'Meeus Ch. 47 mean element' };
+    }
+    for (const [p, v] of Object.entries(astro.jplEclipticInclinationTrends)) {
+      if (p.startsWith('_') || typeof v !== 'number') continue;
+      out[`${p}EclInclTrendDegPerCy`] = { get: () => v, render: (v2) => String(v2), unit: 'deg/cy', note: 'JPL approx_pos catalog trend' };
+    }
+    for (const b of ['pluto', 'ceres']) {
+      out[`${b}OmegaSS`] = { get: () => astro.ascendingNodesSouamiSouchay[b], render: (v) => String(v), unit: 'deg', note: 'Souami & Souchay 2012' };
+    }
+    for (const [p, el] of Object.entries(astro.planetOrbitalElements)) {
+      if (p.startsWith('_') || typeof el !== 'object') continue;
+      out[`${p}OrbitalPeriodInputDays`] = { get: () => el.solarYearInput, render: (v) => String(v), unit: 'days', note: 'JPL orbital period input' };
+      out[`${p}AxialTiltJ2000`] = { get: () => el.axialTiltJ2000, render: (v) => String(v), unit: 'deg', note: 'IAU' };
+    }
+    for (const [b, el] of Object.entries(astro.additionalBodiesReference)) {
+      if (b.startsWith('_') || typeof el !== 'object') continue;
+      out[`${b}OrbitalPeriodInputDays`] = { get: () => el.solarYearInput, render: group, unit: 'days', note: 'JPL orbital period input' };
+      out[`${b}EccJ2000Full`] = { get: () => el.orbitalEccentricityJ2000, render: (v) => String(v), note: 'JPL J2000 catalog input' };
+      out[`${b}EclInclJ2000Full`] = { get: () => el.eclipticInclinationJ2000, render: (v) => String(v), unit: 'deg', note: 'JPL catalog input' };
+      out[`${b}PeriLongJ2000Full`] = { get: () => el.longitudePerihelion, render: (v) => String(v), unit: 'deg', note: 'JPL catalog input' };
+      out[`${b}AscNodeEclJ2000`] = { get: () => el.ascendingNode, render: (v) => String(v), unit: 'deg', note: 'JPL catalog input' };
+      out[`${b}InvPlaneInclJ2000`] = { get: () => el.invPlaneInclinationJ2000, render: (v) => String(v), unit: 'deg', note: 'S&S 2012' };
+    }
+    for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      const pl = model.planets[p];
+      out[`${p}StartPosDeg`] = { get: () => pl.startpos, render: (v) => v.toFixed(2), unit: 'deg', note: 'tuned (optimizer step 2)' };
+      out[`${p}AngleCorrectionDeg`] = { get: () => pl.angleCorrection, render: (v) => v.toFixed(6), unit: 'deg', note: 'derived from longitudePerihelion (step 2)' };
+      out[`${p}EocFraction`] = { get: () => pl.eocFraction, render: (v) => String(v), note: 'tuned EoC fraction' };
+    }
+    out.moonStartposApsidalDeg = { get: () => model.moon.moonStartposApsidal, render: (v) => String(v), unit: 'deg', note: 'J2000-element anchored (docs/66 §4)' };
+    out.moonStartposNodalDeg = { get: () => model.moon.moonStartposNodal, render: (v) => String(v), unit: 'deg', note: 'J2000-element anchored (docs/66 §4)' };
+    out.moonStartposMoonDeg = { get: () => model.moon.moonStartposMoon, render: (v) => String(v), unit: 'deg', note: 'J2000-element anchored (docs/66 §4)' };
+    out.correctionSunDeg = { get: () => model.foundational.correctionSun, render: (v) => v.toFixed(5), unit: 'deg', note: 'tuned (optimizer step 1)' };
+    out.eocEccentricityValue = { get: () => C.eocEccentricity, render: (v) => v.toFixed(5), note: 'derived: derivedMean − base/2' };
+    out.periPhaseOffsetDeg = { get: () => C.perihelionPhaseOffset, render: (v) => v.toFixed(4), unit: 'deg', note: 'derived (constants.js)' };
+    out.perihelionPassageJD = { get: () => astro.earthOrbital.perihelionPassageJ2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (2000 Jan 3)' };
+    out.juneSolstice2000JD = { get: () => astro.earthOrbital.juneSolstice2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (June 21, 2000)' };
+    return out;
+  })(),
+
   // ── ICRF perihelion periods (11-2aa) ────────────────────────────────────
   // Structural identity, verified against all eight site divisors: the ICRF
   // perihelion rate is the ecliptic rate minus the H/13 axial frame term —
