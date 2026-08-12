@@ -5,10 +5,8 @@
 > preserved. Every `tools/fit/*.js` path documented below still works: each is
 > a one-line shim into the package (argv/env pass through), kept so this
 > README, the pipeline steps, and muscle memory stay valid. Exception still
-> living here: `python/` (§2f). (`export-to-holistic.js` was DELETED at the
-> website split — Phase 14; the website consumes the published @essrt
-> packages instead, see "Publishing to the website" below.) The verify suite stays in `tools/verify` with its run-suite
-> classification until `tools/lib` becomes adapters.
+> living here: `python/` (§2f). The verify suite stays in `tools/verify`
+> with its run-suite classification until `tools/lib` becomes adapters.
 
 All scripts that produce fitted coefficients or derived constants live here.
 Output values are stored in `public/input/fitted-coefficients.json`.
@@ -73,11 +71,13 @@ of the cyclic scene-graph motion.
 ## Runtime formula conventions
 
 The coefficients this pipeline produces feed **runtime evaluation formulas**
-in `src/script.js` and the Holistic website's `src/lib/orbital/`. Several
-design choices at the runtime layer must stay in sync with the basis those
-coefficients were fit on. Changing them does **not** require re-running any
-fit — but they must be identical in the simulator and the website or the
-two calculators drift apart.
+in `src/script.js` and the engine (`tools/lib`, published as
+`@essrt/physics`). The Holistic website wires the package factories directly
+through its adapter (`src/lib/essrt.ts`), so website-side identity is by
+construction. Several design choices at the runtime layer must stay in sync
+with the basis those coefficients were fit on. Changing them does **not**
+require re-running any fit — but they must be identical in the simulator and
+the engine or the two calculators drift apart.
 
 ### Option A — Snapshot phase basis (RA, JD, year-length)
 
@@ -92,8 +92,8 @@ Runtime evaluation **must use this same snapshot form**. The earlier
 "Phase 9.10b integrated phase" form (`2π · N · ∫ 1/H(t) dt`) drifts by hours
 across ±12 kyr because integrated phase and snapshot phase only agree at
 the anchor year, not at every epoch. Both `computeSolsticeRA/JD/YearLength`
-(simulator) and `calcCardinalPointRA/JD/YearLen` + `calcSolarYear` (website)
-use snapshot phase.
+(simulator) and `calcCardinalPointRA/JD/YearLen` + `calcSolarYear` (website
+adapter over the package's `createCardinalModel`) use snapshot phase.
 
 ### Option B — Deep-time mSY drift
 
@@ -116,9 +116,9 @@ to their base length (derivative of the drift is `≈ mSY(t_Ma) − mSY_J2000`).
 Days-per-year at epoch is computed as `T_tropical_s(t_Ma) / LOD_s(t_Ma)`
 — the **epoch-local** convention where a "day" tracks the actual rotation
 period. Both sides use this: simulator `meanYearInDaysAtAge`
-([src/script.js:5339](../../src/script.js#L5339)), website
-`meanTropicalYearInDaysAtAge`
-(website `src/lib/orbital/deepTime.ts:387`).
+([src/script.js:5339](../../src/script.js#L5339)); the cardinal factory in
+`@essrt/physics` takes it through its `meanYearRealLodDays` hook, which the
+website adapter wires to `deepLod.yearInDaysAtAge` (`src/lib/essrt.ts`).
 At J2000 both equal the IAU anchor exactly; at deep time they diverge from
 the SI-anchored `/86400` form by a few percent at ±100 Myr.
 
@@ -134,8 +134,8 @@ and downstream period conversions is 86400.00001 s — the physics-derived
 value from the angular-momentum-conservation chain at J2000, not the SI
 definition. See project memory `meanlengthofday-j2000-value`. Both the
 simulator (`ASTRO_REFERENCE.siderealYearJ2000 × 86400.00001`) and the
-website (`SIDEREAL_YEAR_J2000_DAYS × 86400.00001`) agree on this
-convention.
+engine agree on this convention; the website inherits it through the
+published package constants.
 
 ### Sidereal-year J2000 anchor: IAU 365.25636308 d
 
@@ -206,6 +206,7 @@ then `npm run constants:generate` (Step 9).
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |
 | `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
+| `gravitation-correction.js` | `GRAVITATION_CORRECTION` + `ELONGATION_CORRECTION` (Step 5b two-stage post-parallax correction) | `data/reference-data.json` |
 | `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
 | `moon-eclipse-optimizer.js` | `moonMeeusLpCorrection`, `MOON_CORRECTION` | 58 solar eclipses (2000–2025) + JPL baseline — run separately, not part of standard pipeline. `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
 | `python/fit_perihelion_harmonics.py` | `PERI_HARMONICS_RAW`, `PERI_OFFSET` | `data/01-holistic-year-objects-data.xlsx` |
@@ -220,10 +221,8 @@ then `npm run constants:generate` (Step 9).
 | `data/core-mantle-resonator-stage1.json` (artifact — no shipped generator) | the **Core-mantle swing (Resonator driver)** shipped block: a 2-kick EPISODE (windowed damped oscillation, T₀ = 8H/`RES_T0_LATTICE_N` lattice-labeled, Q, kick epochs/coefficients, phase-locked drive tone). Selection rule: pinned-lattice-T₀ guard-passers first (guard-aware solver — modern-window δLOD penalty rows). **Regeneration in the joint world: amplitudes refit automatically via `--joint --write` (tone menu derives from the active flags — generic over flag count). The episode CONVENTION (T₀ = 8H/685, Q = 1.8, epochs −1600/+1600, impulse-consistent shapes) is a DOCUMENTED CONVENTION, not a build-time derivation — it is not re-derivable from anything in this repo. Its evidence is the tracked result JSONs (`data/core-mantle-resonator-*.json`) plus the docs/104 narrative; the stage-1/stage-3/impulse scripts that originally established it ran against the pre-joint world, cannot reproduce today's numbers, and are deliberately not shipped.** Kick epochs are a documented CONVENTION, not data-pinned — see the stage-3 stability artifact before moving them. | Stephenson residual after the shipped stack (node bridge to `tools/lib/deep-time.js`) + `data/deltaT-4flag-fit.json` (parents' phases for the locked tones) |
 | `data/core-mantle-resonator-stage3-stability.json` (artifact — no shipped generator) | kick-epoch stability: coordinate refinement, ridge map + 2% stability box, era jackknife. Verdict 2026-07: epochs NOT data-pinnable (broad t_exc/T₀ ridge, era-dependent jackknife) → shipped epochs stand as convention. | same residual |
 | `validate-resonator.js` | `data/core-mantle-resonator-stage3-validation.json` — runtime OFF/ON validation sweep of the CURRENT world (pipeline step: run after every `--joint --write` + sync): J2000 invariants, Layer-3 USNO anchor, Stephenson/Espenak-window RMS, deep-time bit-identity ±200 Myr. Joint-world reference values: ON Stephenson RMS ≈ 31.3 s, Espenak window ≈ 12.1 s. | production chain (`tools/lib/deep-time.js`) |
-| ~~`export-dt-corrections.js`~~ | **DELETED — absorbed, then its successor retired too.** The `deltaTStart` → `astro-reference.json` write lives in `dt-corrections-fit.js --sync-code`; the website-patching half moved to `export-to-holistic.js`, itself DELETED at the Phase-14 split (the website consumes the published @essrt packages). `src/script.js` and `tools/lib/deep-time.js` read the JSONs directly and need no patching. | — |
 | `../constants/generate.mjs` | Generates the constants module `src/script.js` imports, from `public/input/*.json` plus `data/{balance-presets,deltaT-4flag-fit,core-mantle-resonator-stage1}.json`. Emits values verbatim — no formatting, no rounding | the JSON source files |
 | `../constants/migrate-script-blocks.mjs` | One-off migration helper: replaces an embedded literal with its import, but only after proving the two bit-identical. `--adopt=NAME` for a deliberate value change | `src/script.js` |
-| ~~`export-to-holistic.js`~~ | **DELETED at the Phase-14 website split.** The website consumes the published packages instead: `@essrt/physics` (all fitted tables, DT stack, resonator) and `@essrt/model-values` (rendered display keys). See **"Publishing to the website"** below. | — |
 | `reclassify-tiers.js` | Tier reclassification + JPL enrichment of Tier 1 data | `data/reference-data.json` |
 | `verify-pipeline.js` | Pass/fail verification of all 9 targets + correction stack | Scene-graph simulation |
 
@@ -264,9 +263,7 @@ npx tsx docs/paper/generate-tex-values.ts       # refreshes docs/paper/model-val
 Anti-staleness is enforced, not remembered: `npm run values:package`
 (in `check` and `check:docs`) fails naming the drifted keys whenever the
 packaged values lag the registry, and the version-pinning gate refuses a
-model change that isn't paired with a version bump. (Historical: the
-retired `export-to-holistic.js` used to patch six website files directly —
-its drift classes are documented in git history at this section.)
+model change that isn't paired with a version bump.
 
 ## Dependency chain
 
@@ -792,20 +789,13 @@ Step 9:  npm run constants:generate           → generated constants module
          and the headless-browser golden masters are the verification.
          Rebuild (`npm run build`) if the browser is about to read the values.
 
-Manual:  export-to-holistic.js --write        → Holistic website repo
-         (NOT in automated pipeline — run manually after Step 9)
-         Requires Steps 7b (balance-search.js) and 7d
-         (fibonacci_significance.py) to have run first — both produce JSON
-         files this script reads (data/balance-presets.json,
-         data/significance-results.json).
-         Syncs all fitted values to the Holistic website TypeScript files:
-         - constants.ts: harmonics, Earth scalars, eccentricity + inclination
-           records, BALANCE_RESULTS, SIGNIFICANCE_RESULTS
-         - coefficients.ts: 429-term prediction coefficients (7 planets)
-         - model-values.ts: display strings (auto-derived from above imports)
-         - deepTime.ts: Bond/Hallstatt/Jose5/Jose4 correction constants (inline
-           ΔT section; pulls from data/deltaT-4flag-fit.json
-           if present — see Phase 8)
+Publish: the website consumes the published packages — after Step 9, run
+         `npm run values:package:write`, bump versions per the two-axis
+         contract, and `npm publish` both packages (full commands in
+         "Publishing to the website (Phase-14 flow)" above). Requires the
+         Step 7b and 7e artifacts (data/balance-presets.json,
+         data/significance-results.json) — the model-values registry reads
+         both.
 
 ── Phase 7: Dashboard ─────────────────────────────────────────────
 
@@ -827,7 +817,9 @@ Step 10: node tools/export-dashboard-data.js  → dashboard/data/*.json
 
 ── Phase 8: ΔT correction stack (Bond + Hallstatt + Jose5 + Jose4) ─
 
-Step 11: DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write
+Step 11 (= pipeline step 7c — the runner executes it in a normal pass;
+         this section is the deep dive):
+         DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write
          → data/deltaT-4flag-fit.json + resonator JSON + deltaTStart
          (JOINT WORLD — authoritative; the cascade description below is the
          legacy diagnostic path, retained for its stage-wise instrumentation)
@@ -849,7 +841,7 @@ Step 11: DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint 
          DOWN preserving phase (Hallstatt, Jose5). This prevents inflating a
          modest signal above what the joint fit actually finds.
 
-         Runs OUTSIDE the main orbital pipeline (Steps 1–10) — the 4 correction
+         Independent of the orbital steps (1–10) — the 4 correction
          cycles are post-integration cosmetic corrections to the framework's
          historical ΔT curve, not part of the LOD physics. They do NOT feed
          Steps 6a/6c/6d and do NOT affect the dashboard's model-values snapshot.
@@ -868,22 +860,16 @@ Step 11: DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint 
          in `data/lattice-scan-*.json`. See docs/102 § "Companion 8H lattice
          harmonics" for the full investigation trail.
 
-Step 12: node tools/fit/export-to-holistic.js --write   (ΔT section)
-         → website deepTime.ts — its only target
-         Patches BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S, _LATTICE_N
-         and the RES_* resonator constants (T0_LATTICE_N, Q, two kick epochs
-         and their cos/sin amplitudes) from data/deltaT-4flag-fit.json +
-         data/core-mantle-resonator-stage1.json. Backed up as .bak first.
+         After the joint fit: Step 9 regenerates the constants module for
+         `src/script.js` (`tools/lib/deep-time.js` reads the JSONs directly),
+         and the website receives the BOND_/HALLSTATT_/JOSE5_/JOSE4_ and
+         RES_* resonator constants inside the republished `@essrt/physics`
+         (see "Publishing to the website").
 
-         src/script.js is covered by Step 9 — the same two JSONs feed the
-         generated module. tools/lib/deep-time.js reads them directly.
-         `export-to-holistic.js --write` delegates to this script as its tail
-         step, so a full website sync already covers Step 12.
-
-         After sync, re-run browser L-5b test to confirm:
-           - Model residual RMS near ~1629 s
-           - Medieval bump peak near -580 s @ year 1000
-           - MWP shape verdict remains ✓ CONSISTENT
+         Then re-run the browser L-5b test and confirm the model-residual
+         RMS and medieval-bump shape are unchanged (verdict stays
+         ✓ CONSISTENT — read the live numbers from the L-5b panel and
+         data/eclipse-audit-summary.json, not from this README).
          A Node-vs-Python fit variance of a few degrees in Hallstatt/Jose5
          phase is expected (different LSQ implementations converge to nearby
          local optima); accept if L-5b regression is < ~10 s in either metric.
@@ -915,7 +901,7 @@ The cardinal-point-derived tropical year (Step 6d) is the authoritative runtime 
 
 | Parameter changed | Steps to rerun |
 |-------------------|----------------|
-| `H` (holisticyearLength) | ALL (1→10) — and Phase 8 (Steps 11–12) because `BOND_PERIOD_YR = 8·H / BOND_LATTICE_N`, so `ω = 2π/period` re-derives for all four cycles. |
+| `H` (holisticyearLength) | ALL (1→10) — and Phase 8 (Step 11 = 7c) because `BOND_PERIOD_YR = 8·H / BOND_LATTICE_N`, so `ω = 2π/period` re-derives for all four cycles. |
 | `longitudePerihelion` (any planet) | 2 (that planet only) |
 | `earthtiltMean` | 1, 3→4d, 6a→6d |
 | `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a→6d |
@@ -933,9 +919,9 @@ The cardinal-point-derived tropical year (Step 6d) is the authoritative runtime 
 | `perihelionalignmentYear` | 1, 3→4a, 6a→6d |
 | `stepYears` | Must divide H evenly. Affects 4a→4d, 6a→6d (downsampling) |
 | `siderealYearJ2000` (in yearLengthRef) | Derived: `meansiderealyearlengthinSeconds = siderealYearJ2000 × 86400` |
-| Bond / Hallstatt / Jose5 / Jose4 `_LATTICE_N` (divisor of 8H) | Steps 11 → 12 (Phase 8 only, independent of the orbital pipeline). The 4-flag ΔT stack has no upstream dependency on Steps 1–10; the fit re-runs against the Stephenson residual, reaches `src/script.js` and `tools/lib/deep-time.js` through the JSON (Step 9 / direct read), and the website via `export-to-holistic.js` (ΔT section). |
+| Bond / Hallstatt / Jose5 / Jose4 `_LATTICE_N` (divisor of 8H) | Step 11 (= 7c; independent of the orbital steps). The 4-flag ΔT stack has no upstream dependency on Steps 1–10; the fit re-runs against the Stephenson residual, reaches `src/script.js` and `tools/lib/deep-time.js` through the JSON (Step 9 / direct read), and the website via the republished `@essrt/physics` (see "Publishing to the website"). |
 | `_TAPER_FULL_HALFWIDTH_YR` / `_TAPER_TOTAL_HALFWIDTH_YR` (Holocene taper) | None — the taper is applied at runtime and does not affect the shipped cos/sin coefficients. Verify L-5b after change. |
-| Stephenson polynomial (`public/input/stephenson-2016-deltaT-polynomial.json`) | Steps 11 → 12 (Phase 8). Fit target changed → all four cycles re-fit. |
+| Stephenson polynomial (`public/input/stephenson-2016-deltaT-polynomial.json`) | Step 11 (= 7c). Fit target changed → all four cycles re-fit. |
 
 **When H changes:** Update `holisticyearLength` in `model-parameters.json`.
 Also update `stepYears` to a value that divides H evenly (factorize H to find options).
@@ -1012,7 +998,7 @@ Step 3 (browser export) is always manual — the runner checks the data file exi
 - Step 6b (Obliquity): ~90 sec
 - Step 6c (Year-length): ~2 min
 - **Step 6d (Cardinal-point): ~40 min** — greedy fit × 4 CPs × 24 harmonics per CP. Default step timeout was 10 min (too short); raised to 60 min. Observed to complete in ~30 min.
-- Steps 7a-7c, 8-10 (balance, verify, export, dashboard): ~5-10 min combined
+- Steps 7a-7c, 8-10 (balance, ΔT joint fit, verify, constants, dashboard): ~5-10 min combined
 - Steps 7f-7i (campaign-artifact generators): ~10-15 min combined, dominated by 7g (prediction-fit evaluation, ~7 min) and 7i (eclipse audit, ~2-4 min)
 - **TOTAL Phase 2: ~2.5-3 hours** dominated by Step 6a.
 
@@ -1087,9 +1073,9 @@ node tools/fit/cardinal-point-harmonics.js --write                           # S
 
 # Phase 5b: Balance law verification
 node tools/verify/balance-search.js                                          # Step 7b (balance presets)
-node tools/verify/verify-laws.js                                             # Step 7c (must pass)
-node tools/verify/eccentricity-balance.js                                    # Step 7c (convergence report)
-python3 scripts/fibonacci_significance.py --trials 100000                    # Step 7d (~2-3 min, before export-to-holistic.js)
+node tools/verify/verify-laws.js                                             # Step 7d (must pass)
+node tools/verify/eccentricity-balance.js                                    # Step 7d (convergence report)
+python3 scripts/fibonacci_significance.py --trials 100000                    # Step 7e (~2-3 min; feeds the model-values registry)
 
 # Phase 6: Verify & sync
 node tools/fit/verify-pipeline.js                                            # Step 8 (must pass)
@@ -1100,7 +1086,7 @@ npm run constants:generate                                                   # S
 node tools/export-dashboard-data.js                                          # Step 10
 
 # Phase 8: Sub-Milankovitch ΔT correction stack (independent of Phases 1–7)
-# Runs OUTSIDE the pipeline runner. Re-run only on Phase-8 triggers (see
+# Automated in the runner as step 7c. Re-run standalone only on Phase-8 triggers (see
 # "What triggers a refit?" table): change to a Bond/Hallstatt/Jose5/Jose4 _LATTICE_N,
 # or refresh of the Stephenson polynomial input, or change to H.
 # The DT_CORRECTIONS_DISABLED=1 env var is REQUIRED for --write — it bypasses
@@ -1112,12 +1098,12 @@ DT_CORRECTIONS_DISABLED=1 \
   node tools/fit/dt-corrections-fit.js --joint --write                        # Step 11 → deltaT-4flag-fit.json + resonator + deltaTStart
 node tools/fit/validate-resonator.js                                          # OFF/ON validation sweep
 npm run constants:generate                                                    # → src/script.js (Step 9)
-# Step 12 (website deepTime.ts) is the ΔT section of export-to-holistic.js --write below.
-# After sync: re-run browser L-5b and confirm RMS ~1625 s, medieval bump ~-640 @ 990.
+# After the fit: re-run browser L-5b and confirm the ✓ CONSISTENT verdict.
 
-# Manual: Sync to Holistic website (NOT in pipeline runner)
-# Requires Steps 7b (balance-search) and 7d (fibonacci_significance.py) to have run.
-node tools/fit/export-to-holistic.js --write                                 # → constants.ts, model-values.ts, deepTime.ts, etc.
+# Publish to the website (requires the Step 7b and 7e artifacts):
+npm run values:package:write     # re-render @essrt/model-values + re-stamp docs
+# bump versions (two-axis contract), then publish both packages — see
+# "Publishing to the website (Phase-14 flow)" for the full command block.
 ```
 
 ## Where outputs are stored

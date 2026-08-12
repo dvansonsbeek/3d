@@ -4,9 +4,8 @@
  *
  * Renders every registry key (tools/docs/model-values.mjs resolveAll) into
  * packages/model-values/src/model-values.generated.json — the published
- * supply for the website's <V k=…/> tags, replacing the retired
- * export-to-holistic sync machinery with the same npm boundary as
- * @essrt/physics.
+ * supply for the website's <V k=…/> tags, published behind the same npm
+ * boundary as @essrt/physics.
  *
  *   node tools/docs/export-model-values-package.mjs           check (exit 1 on drift)
  *   node tools/docs/export-model-values-package.mjs --write   regenerate
@@ -47,8 +46,7 @@ const rendered = JSON.stringify(doc, null, 2) + '\n';
 if (WRITE) {
   writeFileSync(OUT, rendered);
   console.log(`✓ wrote ${resolved.size} keys -> packages/model-values/src/model-values.generated.json (${modelVersion}, ${coefficients})`);
-  // §10 stamping authority (Phase 11-3, rehomed here from the retired
-  // export-to-holistic.js): a refit that regenerates the packaged values
+  // §10 stamping authority: a refit that regenerates the packaged values
   // also re-stamps both doc trees, so neither can sit at a superseded
   // coefficients hash.
   const { execFileSync } = await import('node:child_process');

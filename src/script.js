@@ -191,8 +191,8 @@ const moonTilt = K.moonReference.moonTilt;                // Moon axial tilt —
 // Single source of truth: public/input/astro-reference.json (physicalConstants)
 // + public/input/model-parameters.json (deepTime), reaching this file through
 // the generated constants module; tools/lib/deep-time.js reads the JSONs via
-// tools/lib/constants.js; the website deepTime.ts is synced by
-// tools/fit/export-to-holistic.js. Derivation notes live in the JSON
+// tools/lib/constants.js; the website consumes the same values through the
+// published @essrt/physics package. Derivation notes live in the JSON
 // _description fields and at the usage sites below.
 // These four carry SHORT local names that differ from their JSON keys; naming
 // the mapping here makes the correspondence visible at the declaration.
@@ -3171,8 +3171,8 @@ function jose4CycleDeltaTCorrection(year) {
 // anchor-clean, which is what the closure constrains.
 // RESONATOR_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
 // Scalar constants — imported from the generated constants module, sourced
-// from data/core-mantle-resonator-stage1.json (the website's deepTime.ts copy
-// is patched from the same JSON by export-to-holistic.js's ΔT section).
+// from data/core-mantle-resonator-stage1.json (the website reads the same
+// values through the published @essrt/physics package).
 // The eigenperiod is LATTICE-LABELED (T₀ = 8H/685 ≈ 3,916 yr): the shipped
 // resonator is the combined effect of the lattice cycles, so under H(t)
 // evolution the episode scales WITH its drivers (clock coherence). Physical

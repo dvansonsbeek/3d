@@ -2092,7 +2092,7 @@ Valid IDs (in order):
 
     # ══════════════════════════════════════════════════════════════════
     # WRITE SIGNIFICANCE RESULTS TO JSON
-    # (consumed by export-to-holistic.js → website + paper)
+    # (consumed by the model-values registry → website + paper)
     # ══════════════════════════════════════════════════════════════════
     if len(selected_ordered) == len(TEST_IDS) and fisher_combined:
         # Only write the JSON when a full run is performed. Partial runs
@@ -2191,7 +2191,7 @@ Valid IDs (in order):
                 }
                 for planet, jk in jackknife_results.items()
             },
-            # Kept for backward compatibility with export-to-holistic.js
+            # Fisher's combined reported for transparency alongside Stouffer's Z
             "fisher_combined": {
                 "permutation": fisher_combined.get("Permutation"),
                 "log_uniform": fisher_combined.get("Log-uniform"),

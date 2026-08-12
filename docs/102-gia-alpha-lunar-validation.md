@@ -1219,7 +1219,7 @@ The full investigation is documented for future revisiting:
 Current shipped fit (sole runtime source of truth):
 
 - `tools/fit/dt-corrections-fit.js` — Node cascaded-LSQ fit tool (Phase 8 Step 11). Reads Stephenson polynomial, samples the pure-tidal framework residual (with `DT_CORRECTIONS_DISABLED=1` bypassing the shipped corrections), fits Bond→Hallstatt→Jose5→Jose4 in cascade, writes the artifact below.
-- The website consumes the ΔT-stack and resonator constants through the published `@essrt/physics` package (`FITTED_COEFFICIENTS.DT_STACK` / `DT_RESONATOR`) since the Phase-14 split — the file-patching exporter (`export-to-holistic.js`, which had absorbed the deleted `export-dt-corrections.js`) is retired. `src/script.js` imports the same values from the generated constants module; `tools/lib/deep-time.js` reads the JSON directly.
+- The website consumes the ΔT-stack and resonator constants through the published `@essrt/physics` package (`FITTED_COEFFICIENTS.DT_STACK` / `DT_RESONATOR`). `src/script.js` imports the same values from the generated constants module; `tools/lib/deep-time.js` reads the JSON directly.
 - `data/deltaT-4flag-fit.json` — combined 4-cycle fit output; sole authoritative source for the shipped coefficients.
 
 Archived Python exploration (superseded but retained for historical context):

@@ -40,6 +40,11 @@ corrections, predict, model, fibonacci-laws, …), deltat (cycles, deep-time,
 historical), cardinal points, phase, chain-cycles, sun, climate, eclipse
 finders, and the published reference curves.
 
+For rendered display values (day/year lengths, precession rates, orbital
+elements as preformatted strings), see
+[`@essrt/model-values`](https://www.npmjs.com/package/@essrt/model-values) —
+generated from this engine at the same model version.
+
 ## Provenance
 
 Every value derives from the model parameters and fitted coefficients in

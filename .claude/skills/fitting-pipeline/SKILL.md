@@ -68,9 +68,7 @@ Fitted scalars propagate. Since the Phase-14 website split, the website
 consumes the published packages (`@essrt/physics` + `@essrt/model-values`) —
 a refit reaches it by `npm run values:package:write` + publishing new
 package versions, never by file sync. The `values:package` check in the
-chain fails if the packaged values lag the registry. (Historical:
-`export-to-holistic.js` Section 7 used to auto-sync website measurement
-constants from fit artefacts — retired with the split.)
+chain fails if the packaged values lag the registry.
 
 After a refit, the question is not "did the fit improve" but "which shipped
 anchors moved, and does every downstream gate still pass with the new values".

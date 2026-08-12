@@ -1047,10 +1047,9 @@ export const VALUES = {
 
   // ── dLOD/dt decomposition + J2000 day identities (11-2q) ────────────────
   // The channels come LIVE from the engine's dLodDtDecompositionAtAge at
-  // t_Ma = −5e-7 (model epoch 2000.5 — the convention the retired
-  // export-to-holistic.js Section 7 used for the website's DLOD_* literals),
-  // so the registry replaces the synced-literal chain with the
-  // derivation itself. Nets are the engine's own net_L2/L3/L4, not sums of
+  // t_Ma = −5e-7 (model epoch 2000.5 — the convention the website's DLOD_*
+  // keys are defined on), so the registry carries the derivation itself
+  // rather than synced literals. Nets are the engine's own net_L2/L3/L4, not sums of
   // rounded channels — verified to render identically. solarDayJ2000 is the
   // SI day definition (86400 exactly), NOT lodRealPhysical.
   ...(() => {
