@@ -165,7 +165,8 @@ function perihelionLa2004(year) {
   const i = Math.floor(idx);
   if (i >= _LA2004.length - 1) return _LA2004[_LA2004.length - 1][3];
   const frac = idx - i;
-  let v0 = _LA2004[i][3], v1 = _LA2004[i + 1][3];
+  const v0 = _LA2004[i][3];
+  let v1 = _LA2004[i + 1][3];
   // Unwrap: if values jump by more than 180°, adjust
   if (v1 - v0 > 180) v1 -= 360;
   else if (v0 - v1 > 180) v1 += 360;

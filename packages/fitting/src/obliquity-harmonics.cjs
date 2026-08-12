@@ -221,7 +221,7 @@ function solveCholesky(A, b, n) {
 // ─── Greedy harmonic selection ───────────────────────────────────────────
 // Start with 5 Fibonacci fundamentals, then greedily add harmonics
 function greedySelect(data, mean, baseDivisors, maxHarmonics, candidateRange) {
-  let currentDivisors = [...baseDivisors];
+  const currentDivisors = [...baseDivisors];
   let best = fitHarmonics(data, mean, currentDivisors);
 
   console.log(`\n  Base (${currentDivisors.length} harmonics): RMSE = ${(best.rmse * 3600).toFixed(3)}"`);

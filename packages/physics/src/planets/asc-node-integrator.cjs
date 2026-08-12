@@ -113,7 +113,7 @@ function integrateAscendingNode(tilt, currentYear, deps) {
 
   const effectFromEpoch = integrateEffect(EPOCH_YEAR, currentYear);
 
-  let newOmega = staticOmega + effectFromEpoch;
+  const newOmega = staticOmega + effectFromEpoch;
   return ((newOmega % 360) + 360) % 360;
 }
 

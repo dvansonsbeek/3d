@@ -1106,9 +1106,9 @@ function main() {
   // cascade shipping: Bond=solo, Hallstatt=Stage B, Jose5=Stage C, Jose4=Stage D.
   const anchorActive = CONFIG.usno_anchor.enabled && fitD.anchorAchieved !== null;
   const bondForShipRaw = anchorActive ? bondD : bondSolo;
-  let hallForShip = anchorActive ? shipCycle(hallCycle, hallD) : hallShipped;
-  let joseForShip = anchorActive ? shipCycle(joseCycle, joseD) : joseShipped;
-  let jose4ForShip = jose4Shipped;   // always from Stage D (unchanged)
+  const hallForShip = anchorActive ? shipCycle(hallCycle, hallD) : hallShipped;
+  const joseForShip = anchorActive ? shipCycle(joseCycle, joseD) : joseShipped;
+  const jose4ForShip = jose4Shipped;   // always from Stage D (unchanged)
 
   // ─── Stage E: h253 frozen-residual fit (2026-07-22) ────────────────────
   // The four Stage-D cycles are FROZEN (post-cap shipped values) and their
@@ -1129,7 +1129,7 @@ function main() {
   });
   const fitE = fitCycles(years, residualE, [h253Cycle.lattice_n], null, sampleWeights);
   const h253Free = fitE.cycles[0];
-  let h253ForShip = shipCycle(h253Cycle, h253Free);
+  const h253ForShip = shipCycle(h253Cycle, h253Free);
   console.log('── Stage E: h253 (frozen-residual fit after the four Stage-D cycles) ──');
   console.log(`  R² = ${fitE.r2.toFixed(4)}, RMS post = ${fitE.rms_post.toFixed(1)} s (all)  ${fitE.rms_post_modern ? fitE.rms_post_modern.toFixed(1) + ' s (≥1600)' : ''}`);
   console.log(`  h253 free amp = ${h253Free.amplitude.toFixed(2)} s  phase = ${h253Free.phase_deg.toFixed(2)}°`);

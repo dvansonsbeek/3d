@@ -288,7 +288,7 @@ function _isRuntimeWhitelisted(divisor) {
 // minImprovementArcsec stops the loop when the next term saves less than this.
 function greedySelect(samples, mean, seedDivisors, candidates, maxHarmonics,
                        maxAmpArcsec = 600, minImprovementArcsec = 0.05) {
-  let currentDivs = [...seedDivisors];
+  const currentDivs = [...seedDivisors];
   let best = fitHarmonics(samples, mean, currentDivs);
   console.log(`  Seed (${currentDivs.length} harm, divs ${currentDivs.join(',')}): RMSE = ${(best.rmse * 3600).toFixed(2)}"`);
 

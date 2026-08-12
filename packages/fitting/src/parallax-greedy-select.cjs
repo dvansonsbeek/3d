@@ -141,7 +141,7 @@ for (const target of targets) {
   console.log(`\n${target.toUpperCase()} (n=${n}, ${cvLabel})  30p CV=${baseCV.total.toFixed(4)}`);
 
   // Greedy forward: find best 31st–40th
-  let selected = [];
+  const selected = [];
   let currentCV = baseCV.total;
 
   for (let round = 0; round < 10; round++) {

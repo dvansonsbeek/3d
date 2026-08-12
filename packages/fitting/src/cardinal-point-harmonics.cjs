@@ -474,7 +474,7 @@ function solveCholesky(A, b, n) {
 
 // ─── Greedy harmonic selection ───────────────────────────────────────────
 function greedySelect(data, baseDivisors, maxHarmonics, candidateRange) {
-  let currentDivisors = [...baseDivisors];
+  const currentDivisors = [...baseDivisors];
   let best = fitHarmonics(data, currentDivisors);
 
   console.log(`    Base (${currentDivisors.length}): RMSE = ${best.rmse.toFixed(2)} min`);

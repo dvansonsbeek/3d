@@ -131,7 +131,7 @@ function loadData() {
     const year = sampled.SS[i].year;
 
     // Sidereal year: mean of 4 cardinal point world-angle advancements
-    let sidValues = [];
+    const sidValues = [];
     for (const type of cardinals) {
       const curr = sampled[type][i];
       const prev = sampled[type][i - 1];
@@ -154,7 +154,7 @@ function loadData() {
     const anomalistic = (!isNaN(periInt) && !isNaN(aphInt)) ? (periInt + aphInt) / (2 * step) : NaN;
 
     // Tropical year: mean of 4 cardinal point JD intervals
-    let tropValues = [];
+    const tropValues = [];
     for (const type of cardinals) {
       const curr = sampled[type][i];
       const prev = sampled[type][i - 1];
@@ -339,7 +339,7 @@ function solveCholesky(A, b, n) {
 
 // ─── Greedy selection (J2000-anchored) ───────────────────────────────────
 function greedySelect(data, meanField, anchorValue, anchorYear, baseDivisors, maxHarmonics) {
-  let current = [...baseDivisors];
+  const current = [...baseDivisors];
   let best = fitHarmonicsJ2000Anchored(data, meanField, anchorValue, anchorYear, current);
   console.log(`    Base (${current.length}): RMSE = ${best.rmse.toFixed(4)}s`);
 

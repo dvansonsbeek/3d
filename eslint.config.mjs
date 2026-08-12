@@ -5,11 +5,17 @@
  * document is advice; a boundary in CI is a boundary. This file is the §4 table
  * of IP-unified-architecture.md, executable.
  *
- * SCOPE. `packages/` and `test/` are linted. `src/script.js` (64,714 lines),
+ * SCOPE. `packages/` and `test/` are linted. `src/script.js` (~59,300 lines),
  * `tools/`, `scripts/` and `dashboard/` are pre-migration code — linting them
  * now would produce thousands of findings that say nothing about the
- * architecture and would train everyone to ignore the output. They join as
- * Phase 8 extracts.
+ * architecture and would train everyone to ignore the output. Phase 8's
+ * physics extraction is complete; these trees join when `tools/lib`
+ * collapses to adapters.
+ *
+ * `.cjs` IS IN SCOPE — the physics domain modules are CommonJS. The rules
+ * blocks matched only *.js/*.mjs until the post-Phase-14 review found the
+ * whole extracted core had silently escaped the boundary and purity rules
+ * (the Phase-2 planted-violation proofs predate the .cjs modules).
  *
  * `packages/research` and `packages/analysis` are exempt by policy (§2e, §2f):
  * frozen one-offs and Python respectively.
@@ -34,7 +40,7 @@ export default [
   js.configs.recommended,
 
   {
-    files: ['packages/**/*.js', 'packages/**/*.mjs'],
+    files: ['packages/**/*.js', 'packages/**/*.mjs', 'packages/**/*.cjs'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
@@ -54,14 +60,15 @@ export default [
     },
     settings: {
       'boundaries/elements': [
-        { type: 'physics',   pattern: 'packages/physics/*' },
-        { type: 'fixtures',  pattern: 'packages/fixtures/*' },
-        { type: 'data',      pattern: 'packages/data/*' },
+        { type: 'physics',      pattern: 'packages/physics/*' },
+        { type: 'fixtures',     pattern: 'packages/fixtures/*' },
+        { type: 'data',         pattern: 'packages/data/*' },
+        { type: 'model-values', pattern: 'packages/model-values/*' },
         { type: 'fitting',   pattern: 'packages/fitting/*' },
         { type: 'adapter',   pattern: 'packages/(api|mcp|render)/*', capture: ['name'] },
         { type: 'app',       pattern: 'packages/(simulator|dashboard)/*', capture: ['name'] },
       ],
-      'boundaries/include': ['packages/**/*.js', 'packages/**/*.mjs'],
+      'boundaries/include': ['packages/**/*.js', 'packages/**/*.mjs', 'packages/**/*.cjs'],
     },
     rules: {
       /* ── §2b dependency rules ─────────────────────────────────────────── */
@@ -98,12 +105,25 @@ export default [
             disallow: { to: { module: { origin: 'external' } } },
             message: 'fixtures imports only physics (§2b).',
           },
+          // model-values is a data-only published package: its rendered JSON
+          // plus a thin index. Nothing external, nothing upward.
+          {
+            from: { element: { type: 'model-values' } },
+            disallow: { to: { module: { origin: 'external' } } },
+            message: 'model-values ships rendered values only — no external imports.',
+          },
+          {
+            from: { element: { type: 'model-values' } },
+            disallow: { to: { module: { origin: 'core' } } },
+            message: 'model-values must not import Node builtins — it is bundled for browsers.',
+          },
 
           // Who may depend on whom. Adapters and apps may use physics and data,
           // never each other, and nothing may depend upward.
           { from: { element: { type: 'physics' } },  disallow: { to: { element: { types: { anyOf: ['data', 'fitting', 'adapter', 'app'] } } } }, message: 'physics may depend on nothing but physics (§2b).' },
           { from: { element: { type: 'fixtures' } }, disallow: { to: { element: { types: { anyOf: ['data', 'fitting', 'adapter', 'app'] } } } }, message: 'fixtures imports only physics (§2b).' },
           { from: { element: { type: 'data' } },     disallow: { to: { element: { types: { anyOf: ['fitting', 'adapter', 'app'] } } } }, message: 'data may not depend on its consumers (§2b).' },
+          { from: { element: { type: 'model-values' } }, disallow: { to: { element: { types: { anyOf: ['physics', 'data', 'fitting', 'adapter', 'app'] } } } }, message: 'model-values is rendered output — it depends on nothing (the registry generates it).' },
           { from: { element: { type: 'adapter' } },  disallow: { to: { element: { types: { anyOf: ['adapter', 'app', 'fitting'] } } } }, message: 'adapters may use physics and data, never each other (§2b).' },
           { from: { element: { type: 'app' } },      disallow: { to: { element: { types: { anyOf: ['adapter', 'app', 'fitting'] } } } }, message: 'apps may use physics and data, never each other (§2b).' },
         ],
@@ -123,8 +143,32 @@ export default [
   },
 
   {
+    /* .cjs modules are CommonJS — override the parser mode and grant the CJS
+     * ambient identifiers the module system itself provides. The boundaries
+     * and purity rules from the blocks above still apply; only the language
+     * plumbing differs. The type-aware rule is off here: the project service
+     * covers *.js/*.mjs and the CJS modules are synchronous factories. */
+    files: ['packages/**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      parserOptions: { projectService: false },
+      globals: {
+        require: 'readonly', module: 'writable', exports: 'writable',
+        __dirname: 'readonly', __filename: 'readonly',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'off',
+      // The .cjs modules use the deliberate `x == null` idiom (catches null AND
+      // undefined). Rewriting those 31 sites to `===` would change semantics in
+      // physics code for zero architectural gain — permit the idiom, nothing else.
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
+    },
+  },
+
+  {
     /* ── physics only: purity + documentation ───────────────────────────── */
-    files: ['packages/physics/**/*.js'],
+    files: ['packages/physics/**/*.js', 'packages/physics/**/*.cjs'],
     rules: {
       // A platform global in the core makes it un-runnable server-side and
       // un-bundleable offline — §8 calls purity an NFR, not a style preference.
@@ -197,7 +241,8 @@ export default [
     /* The §5c golden-master harness. It runs in Node and drives headless
      * Chromium, and the callbacks handed to `page.evaluate()` execute IN the
      * browser — so this is the one place that legitimately sees both global
-     * sets in a single file. Retires at Phase 8 with the harness. */
+     * sets in a single file. Retires with the harness when the monolith
+     * fully dissolves (the tools/lib adapter collapse). */
     files: ['test/**/*.mjs'],
     languageOptions: {
       ecmaVersion: 2022,
