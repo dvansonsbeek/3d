@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -11,9 +11,9 @@ status: current
 
 The **Climate Formula Explorer** is a modal panel in the Tools menu that visualizes the canonical **L1+L2+L3 climate formula** (the orbital-forcing + carbon-cycle-thermostat + boundary-condition-step decomposition; see [doc 92](92-climate-formula.md)) overlaid on each of the four climate proxy records — **CenCO2PIP** (deep-time atmospheric CO₂, 0–66 Ma), **CENOGRID** (Cenozoic benthic δ¹⁸O / δ¹³C, 0–67 Ma), **LR04** (Pliocene-Pleistocene benthic δ¹⁸O, 0–5.3 Ma), and **EPICA Dome C** (atmospheric CO₂, 0–800 kyr). The modal exposes the same formula evaluated across 8 time windows from the deep-time 67-Myr CENOGRID record down to a forward projection of the next 250 kyr.
 
-This is the panel that grounds the Holistic Universe Model's climate claims in *observation*. The 32-integer L1 lattice (orbital integer divisors of 8H = 2,682,536 yr at J2000), the 3-line L2 carbon thermostat family (405 / 202 / 135 kyr), and the 6-step L3 Heaviside boundary-condition transitions (PETM, EOT, Mi-1, MMCT, iNHG, MPT) are all fitted with sequential ridge regression per regime — see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula) for the canonical architecture.
+This is the panel that grounds the Holistic Universe Model's climate claims in *observation*. The 32-integer L1 lattice (orbital integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000), the 3-line L2 carbon thermostat family (405 / 202 / 135 kyr), and the 6-step L3 Heaviside boundary-condition transitions (PETM, EOT, Mi-1, MMCT, iNHG, MPT) are all fitted with sequential ridge regression per regime — see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula) for the canonical architecture.
 
-> **Scope note (ESSRT).** The L1 lattice integer-divisor structure (n where T = 8H/n) is scale-invariant — the integers stay fixed at any epoch. The 8H = 2,682,536 yr literal value and the per-line periods (8H/n in kyr) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent drift over the LR04 5.3-Myr window, ~0.04% over the 67-Myr CENOGRID window, and starts to matter for the 13H ≈ 4.36 Myr Boulila libration comparison covered in doc 92.
+> **Scope note (ESSRT).** The L1 lattice integer-divisor structure (n where T = 8H/n) is scale-invariant — the integers stay fixed at any epoch. The 8H = <!--v:eightH-->2,682,536<!--/v--> yr literal value and the per-line periods (8H/n in kyr) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent drift over the LR04 5.3-Myr window, ~0.04% over the 67-Myr CENOGRID window, and starts to matter for the 13H ≈ 4.36 Myr Boulila libration comparison covered in doc 92.
 
 ## Accessing the Explorer
 

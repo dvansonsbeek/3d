@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -211,7 +211,7 @@ The `-135 Babylonian case study` diagnostic button includes a direct α(t) tunin
 
 **Empirical sensitivity**: ~3.3 km per 100 s of ΔT change.
 
-Implication: the α(t) constants shipped in the framework (α = 0.3306947 from IERS, dα/dt = -1.35e-11/yr from Cox & Chao dJ₂/dt with the Peltier ICE-6G factor-2.0 J₂→α conversion) are *empirically uncloseable* against the -135 event — tuning α(t) across its full literature uncertainty range shifts the umbra by only tens of km, far less than the ~1000 km BestGap residual. This is the direct empirical proof that the choice of Peltier ICE-6G defaults is not load-bearing on the lunar-timing or solar-visibility results — a stronger statement than an abstract "zero fitting" assertion, because it demonstrates the residual is dominated by the Sun-side and GMST-side physics rather than by the α(t) constants.
+Implication: the α(t) constants shipped in the framework (α = <!--v:alphaJ2000-->0.3306947<!--/v--> from IERS, dα/dt = -1.35e-11/yr from Cox & Chao dJ₂/dt with the Peltier ICE-6G factor-2.0 J₂→α conversion) are *empirically uncloseable* against the -135 event — tuning α(t) across its full literature uncertainty range shifts the umbra by only tens of km, far less than the ~1000 km BestGap residual. This is the direct empirical proof that the choice of Peltier ICE-6G defaults is not load-bearing on the lunar-timing or solar-visibility results — a stronger statement than an abstract "zero fitting" assertion, because it demonstrates the residual is dominated by the Sun-side and GMST-side physics rather than by the α(t) constants.
 
 ---
 

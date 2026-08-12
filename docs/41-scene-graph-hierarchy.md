@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -38,7 +38,7 @@ At its core, the entire simulation is based upon two surprisingly simple calcula
 Since the circumference of a circle is `2π × r`, all calculations derive from these two values:
 
 - **Length of a Solar year:** 1 year = 2π radians = 365.2422 days
-- **Length of an AU:** 100 scene units = 149,597,870.698828 km (currently)
+- **Length of an AU:** 100 scene units = <!--v:oneAU-->149,597,870.698828<!--/v--> km (currently)
 
 All other calculations are relative to:
 - The solar year as **2π**
@@ -356,7 +356,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Constant | Value | Description |
 |----------|-------|-------------|
 | 1 Solar year | 2π radians | `meanSolarYearDays` days |
-| 1 AU | 100 scene units | 149,597,870.698828 km |
+| 1 AU | 100 scene units | <!--v:oneAU-->149,597,870.698828<!--/v--> km |
 | Mean obliquity | `earthtiltMean` | Earth's mean axial tilt |
 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | Earth's orbital tilt oscillation |
 | Base eccentricity | `eccentricityBase` | Earth's base orbital eccentricity |

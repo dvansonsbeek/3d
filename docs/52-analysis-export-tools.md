@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -236,7 +236,7 @@ All functions support JD chaining (`prevJD`) for efficient sequential-year searc
 
 ### Related
 
-For the solstice RA and JD prediction formulas (Fibonacci harmonics, valid across 335,317 years), see [14 — Solstice Prediction](14-solstice-prediction.md).
+For the solstice RA and JD prediction formulas (Fibonacci harmonics, valid across <!--v:H-->335,317<!--/v--> years), see [14 — Solstice Prediction](14-solstice-prediction.md).
 
 ---
 

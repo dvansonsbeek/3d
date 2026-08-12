@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -104,7 +104,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 52 | [Analysis & Export Tools](52-analysis-export-tools.md) | Report generation, data export, and console validation tests |
 | 53 | [Balance Explorer Reference](53-balance-explorer-reference.md) | Invariable Plane Balance Explorer — interactive Fibonacci Law testing |
 | 54 | [Vector Balance Analysis](54-vector-balance-analysis.md) | Dynamic angular-momentum vector balance + configuration verification. Default config (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34, Saturn anti-phase) shown to be the most likely correct Fibonacci d-value configuration |
-| 55 | [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Period table for the 8H = 2,682,536 yr Solar System Resonance Cycle. Every major planetary cycle divides 8H evenly as an integer; documents the System Reset epoch (~-2,649,854) |
+| 55 | [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Period table for the 8H = <!--v:eightH-->2,682,536<!--/v--> yr Solar System Resonance Cycle. Every major planetary cycle divides 8H evenly as an integer; documents the System Reset epoch (~-2,649,854) |
 | 56 | [WebGeoCalc Explorer](56-webgeocalc-explorer.md) | Tools-menu modal showing actual observed perihelion-precession history (1900–2026 JPL NAIF WebGeoCalc) for each planet. Grounds the framework's `perihelionEclipticYears` calibration in observation rather than secular theory |
 | 57 | [Formula Verification](57-formula-verification.md) | Tools-menu modal comparing the framework's predictions against published analytical formulas (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Peters, Harkness) across ±12,000 yr for 9 quantities. Analytical twin of the WebGeoCalc Explorer (doc 56) |
 | 58 | [Climate Formula Explorer](58-climate-formula-explorer.md) | Tools-menu modal visualizing the canonical L1+L2+L3 climate formula against LR04 / CENOGRID / EPICA / CenCO2PIP across multiple time windows — the panel that grounds the model's climate claims in observation |
@@ -152,7 +152,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 96 | [Related Work — 2024 Literature Context](96-related-work.md) | Positions the framework relative to active 2018–2024 revisions to classical Milankovitch theory: 405-kyr metronome stability, Mars-Earth 2.4-Myr gravitational coupling, 9-Myr/36-Myr Grand cycles, red-noise/orbital balance, tidal-vs-insolation community gap |
 | 97 | [Paleoclimate ECS Spectrum via 8H Lattice Decomposition](97-paleo-ecs-decomposition.md) | Frequency-resolved decomposition of L1 lattice amplitudes per orbital band → Charney climate sensitivity ECS estimate from paleoclimate δ¹⁸O |
 | 98 | [The Mechanism Behind the 8H/L1 Lattice](98-lattice-mechanism.md) | Active research doc establishing that the 8H/L1 lattice is real spectral structure in solar-system orbital dynamics. Action-angle closure of obliquity-sector secular dynamics forces eigenfrequencies onto integer divisors of 8H |
-| 99 | [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | The Solar System Resonance Cycle (8H) and integer-divisor lattice as structural invariants; H(t) expands monotonically with geological time, driven by Earth-Moon tidal evolution (Driver 1) and solar mass loss (Driver 2). L1 integer LABELS are scale-invariant; LITERAL PERIODS scale with current H. Deep-time predictions: Hadean Moon at the rigid Roche limit at the giant-impact age (~4.498 Ga); Devonian H ≈ 306,189 yr matching Wells 1963 to −0.01% + Wu et al. 2024 across 650 Myr; future tidal-lock asymptote at ~87 R_⊕ |
+| 99 | [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | The Solar System Resonance Cycle (8H) and integer-divisor lattice as structural invariants; H(t) expands monotonically with geological time, driven by Earth-Moon tidal evolution (Driver 1) and solar mass loss (Driver 2). L1 integer LABELS are scale-invariant; LITERAL PERIODS scale with current H. Deep-time predictions: Hadean Moon at the rigid Roche limit at the giant-impact age (~4.498 Ga); Devonian H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr matching Wells 1963 to −0.01% + Wu et al. 2024 across 650 Myr; future tidal-lock asymptote at ~87 R_⊕ |
 
 ### 100–109 ΔT & Historical Eclipse Validation
 
@@ -275,10 +275,10 @@ See the [Python Scripts README](../scripts/README.md) and [Predictive Formula Gu
 
 | Concept | Value | Description |
 |---------|-------|-------------|
-| Earth Fundamental Cycle (H) | 335,317 years | Complete cycle unifying all precession movements |
-| Axial Precession | H/13 (~25,794 yr) | Earth's wobble around the EARTH-WOBBLE-CENTER |
-| Inclination Precession | H/3 (~111,772 yr) | PERIHELION-OF-EARTH orbit period |
-| Perihelion Precession | H/16 (~20,957 yr) | Combined cycle where axial meets inclination |
+| Earth Fundamental Cycle (H) | <!--v:H-->335,317<!--/v--> years | Complete cycle unifying all precession movements |
+| Axial Precession | H/13 (<!--v:axialPrecRound-->~25,794<!--/v--> yr) | Earth's wobble around the EARTH-WOBBLE-CENTER |
+| Inclination Precession | H/3 (<!--v:inclPrecYears-->~111,772<!--/v--> yr) | PERIHELION-OF-EARTH orbit period |
+| Perihelion Precession | H/16 (<!--v:periPrecYears-->~20,957<!--/v--> yr) | Combined cycle where axial meets inclination |
 | Obliquity Range | ~22.1° – ~24.5° | Earth's axial tilt oscillation |
 
 For all constants and their sources, see the [Constants Reference](20-constants-reference.md).

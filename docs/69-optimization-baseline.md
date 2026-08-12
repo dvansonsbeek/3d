@@ -1,13 +1,13 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: historical
 ---
 
 # Baseline Report — Before Optimization
 
-**Model epoch**: JD 2451716.5 (21 June 2000)
+**Model epoch**: JD <!--v:startModelJD-->2,451,716.5<!--/v--> (21 June 2000)
 **Comparison**: Model RA/Dec (standalone scene graph engine) vs JPL Horizons RA/Dec
 
 > **Note**: This document records the starting baseline before any optimization was applied. For current baselines after EoC, parallax correction, and parameter optimization, run `node tools/optimize.js baseline all` or see [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) §5.

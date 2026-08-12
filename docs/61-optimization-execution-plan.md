@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: historical
 ---
 
@@ -63,13 +63,13 @@ Note: `earthWobbleCenter` is NOT in the main chain (used for labels/tracking onl
 - **Earth** orbits EARTH-WOBBLE-CENTER clockwise at H/13 (mean axial precession)
 - **PERIHELION-OF-EARTH** orbits the Sun counter-clockwise at H/3 (inclination precession)
 - Because they rotate in **opposite directions**, their meeting frequency is additive: 1/(H/13) + 1/(H/3) = 16/H (perihelion precession cycle, H/16)
-- The **observed/experienced** precession period (~25,771 yr currently) differs from the mean (H/13) because the instantaneous rate varies through the cycle. The model's H/13 mean is correct.
+- The **observed/experienced** precession period (<!--v:mainstreamAxialPrecExact-->~25,771<!--/v--> yr currently) differs from the mean (H/13) because the instantaneous rate varies through the cycle. The model's H/13 mean is correct.
 
 **Fibonacci precession periods:**
 
 | Node | Period | Fibonacci | Known comparison | Notes |
 |------|--------|-----------|-----------------|-------|
-| `earth` | H/13 | 13 | ~25,771 yr (current obs.) | Mean is correct; current obs. rate varies |
+| `earth` | H/13 | 13 | <!--v:mainstreamAxialPrecExact-->~25,771<!--/v--> yr (current obs.) | Mean is correct; current obs. rate varies |
 | `earthInclinationPrecession` | H/3 | 3 | Inclination precession | Counter-clockwise, drives perihelion-of-earth |
 | `earthEclipticPrecession` | H/5 | 5 | ~68,000-70,000 yr | Ecliptic pole precession |
 | `earthObliquityPrecession` | H/8 | 8 | ~41,000 yr (Milankovitch) | Retrograde; matches climate records |
@@ -79,9 +79,9 @@ Note: `earthWobbleCenter` is NOT in the main chain (used for labels/tracking onl
 - `eccentricityBase` = orbital radius of PERIHELION-OF-EARTH around the Sun (see [Constants Reference](20-constants-reference.md))
 - `eccentricityAmplitude` = orbital radius of Earth around EARTH-WOBBLE-CENTER (see [Constants Reference](20-constants-reference.md))
 - **Observed eccentricity** = distance between Earth and PERIHELION-OF-EARTH at any given time
-  - **Maximum** (same side): `eccentricityBase + eccentricityAmplitude` — matches J2000 observed 0.01671022
+  - **Maximum** (same side): `eccentricityBase + eccentricityAmplitude` — matches J2000 observed <!--v:j2000Eccentricity-->0.01671022<!--/v-->
   - **Minimum** (opposite sides): `eccentricityBase − eccentricityAmplitude`
-  - Range: ~0.0139 to ~0.0167, oscillating with the H/16 perihelion cycle
+  - Range: ~0.0139 to <!--v:eccentricityMax-->~0.0167<!--/v-->, oscillating with the H/16 perihelion cycle
 - At J2000 we are near maximum eccentricity (last perihelion alignment: 1246 AD)
 - The model correctly reproduces the J2000 eccentricity without additional tuning
 
@@ -108,7 +108,7 @@ The Sun is a child of `barycenterEarthAndSun` with:
 
 **The standard claim**: In heliocentric astronomy, Earth's elliptical orbit (e ~ 0.0167) causes the Sun's apparent angular speed to vary by +/-3.3%, producing the "equation of center" (~2 deg annual variation). The model's circular Sun orbit at constant speed cannot reproduce this.
 
-**But in our geocentric model**, the Sun orbits the `barycenterEarthAndSun` (= PERIHELION-OF-EARTH) at 1 AU. This point is NOT at Earth's center — it is offset by the eccentricity distance (~0.0167 AU at J2000). The offset arises from the counter-rotating precession layers: `earthPerihelionPrecession2` carries `orbitCentera: -eccentricityBase*100` and `barycenterEarthAndSun` carries `orbitRadius: eccentricityAmplitude*100`. Because the Sun orbits an off-center point at constant speed, its apparent angular speed as seen from Earth naturally varies through the year — faster when the Sun is closer (perihelion), slower when farther (aphelion). **The question is whether this existing mechanism already captures the observed variation, partially captures it, or misses it entirely.**
+**But in our geocentric model**, the Sun orbits the `barycenterEarthAndSun` (= PERIHELION-OF-EARTH) at 1 AU. This point is NOT at Earth's center — it is offset by the eccentricity distance (<!--v:eccentricityMax-->~0.0167<!--/v--> AU at J2000). The offset arises from the counter-rotating precession layers: `earthPerihelionPrecession2` carries `orbitCentera: -eccentricityBase*100` and `barycenterEarthAndSun` carries `orbitRadius: eccentricityAmplitude*100`. Because the Sun orbits an off-center point at constant speed, its apparent angular speed as seen from Earth naturally varies through the year — faster when the Sun is closer (perihelion), slower when farther (aphelion). **The question is whether this existing mechanism already captures the observed variation, partially captures it, or misses it entirely.**
 
 **What is observationally established (model-independent):**
 - The seasons are unequal in length (known since Hipparchus, ~150 BCE)
@@ -192,12 +192,12 @@ earth.pivotObj
 **Input constants** (lines 78-88):
 | Constant | Value | Purpose |
 |----------|-------|---------|
-| `moonSiderealMonthInput` | 27.32166156 d | Sidereal month (fixed stars) |
+| `moonSiderealMonthInput` | <!--v:moonSiderealMonthInput-->27.32166156<!--/v--> d | Sidereal month (fixed stars) |
 | `moonAnomalisticMonthInput` | 27.55454988 d | Anomalistic month (perigee to perigee) |
 | `moonNodalMonthInput` | 27.21222082 d | Nodal month (ascending node to ascending node) |
-| `moonDistance` | 384,399.07 km | Mean Earth-Moon distance |
-| `moonOrbitalEccentricity` | 0.054900489 | Orbital eccentricity |
-| `moonEclipticInclinationJ2000` | 5.1573° | Inclination to ecliptic (dynamical mean osculating; Brown/ELP constant 5.1453964 = `moonInclinationConstantBrownELP`) |
+| `moonDistance` | <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km | Mean Earth-Moon distance |
+| `moonOrbitalEccentricity` | <!--v:moonOrbitalEccentricityFull-->0.054900489<!--/v--> | Orbital eccentricity |
+| `moonEclipticInclinationJ2000` | <!--v:moonEclipticInclination-->5.1573<!--/v-->° | Inclination to ecliptic (dynamical mean osculating; Brown/ELP constant <!--v:moonInclinationConstantBrownELP-->5.1453964<!--/v--> = `moonInclinationConstantBrownELP`) |
 | `moonTilt` | 6.687° | Moon's axial tilt |
 | `moonStartposApsidal/Nodal/Moon` | 330° / 64° / 132.105° | Start positions (aligned to Stellarium) |
 
@@ -215,7 +215,7 @@ earth.pivotObj
 
 **Same constant-speed limitation as Sun, but 3.3× larger:**
 
-The Moon's eccentricity (e = 0.0549) is 3.3× Earth's (0.0167). The same off-center circle analysis applies:
+The Moon's eccentricity (e = <!--v:moonOrbitalEccentricity-->0.0549<!--/v-->) is 3.3× Earth's (0.0167). The same off-center circle analysis applies:
 - Off-center circle captures: **±e = ±5.49%** angular speed variation ≈ **±3.15°** position error
 - Keplerian ellipse produces: **±2e = ±10.98%** (observed)
 - **Missing: ~3.15° monthly sinusoidal residual** — much larger than the Sun's ~1°
@@ -246,7 +246,7 @@ The Moon hierarchy correctly models the precession cycles and eclipse cycle arit
 
 **Assessment tasks (remaining for implementation phase):**
 1. Verify Saros/Exeligmos/Callippic derived values match known values (arithmetic check)
-2. Compare model's nodal precession period against observed ~18.613 yr
+2. Compare model's nodal precession period against observed ~<!--v:moonNodalPeriodYr-->18.613<!--/v--> yr
 3. Compare model's apsidal precession period against observed ~8.849 yr
 4. Quantify the actual RA/Dec residual for the Moon against JPL Horizons over a full nodal cycle
 5. If eclipse timing residuals show a ~1-year periodic pattern superimposed on the monthly pattern, that confirms the Sun's annual error propagating
@@ -634,7 +634,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 **2. Resonance loop (resonance-loop.js):**
 - ALL Fibonacci beat frequency identities are **algebraically EXACT** (zero residual) — this is pure number theory (F(n) + F(n+1) = F(n+2))
 - Earth meeting frequency: 1/(H/13) + 1/(H/3) = 1/(H/16) — EXACT (16 = 13 + 3)
-- Psi-constant: ψ = (5 × 21²) / (2 × H) = 3.288 × 10⁻³ (H=335,317)
+- Psi-constant: ψ = (5 × 21²) / (2 × H) = 3.288 × 10⁻³ (H=<!--v:H-->335,317<!--/v-->)
 - Perihelion precession: Uranus at clean Fibonacci H/3; Jupiter and Saturn at 8H-lattice secular 8H/39 and −8H/65 (Fibonacci anchors H/5, −H/8). Others use rational fractions of H.
 
 **3. Conjunction periods (conjunction-periods.js):**
@@ -654,9 +654,9 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 - Saros cycle: 223 synodic = 6585.32 days, matching known value to 0.06 hours
 - 242 draconic months differ from 223 synodic months by only 0.83 hours (confirms Saros eclipse repetition)
 - Apsidal precession: 8.851 years (model) vs ~8.849 years (known) — 12 hours difference
-- Nodal precession: star-referenced = 18.5994 yr (the `…Earth`-named variable), **equinox-of-date = 18.613 yr** (the `…ICRF`-named variable — legacy naming; exact match to the known observed 18.613-yr cycle, which is the equinox-of-date figure)
+- Nodal precession: star-referenced = 18.5994 yr (the `…Earth`-named variable), **equinox-of-date = <!--v:moonNodalPeriodYr-->18.613<!--/v--> yr** (the `…ICRF`-named variable — legacy naming; exact match to the known observed <!--v:moonNodalPeriodYr-->18.613<!--/v-->-yr cycle, which is the equinox-of-date figure)
 - Draconic year: 346.620 days — matches known ~346.62 days to 0.004 hours
-- Full Moon Cycle: 411.783 days — matches known ~411.78 days to 0.003 days
+- Full Moon Cycle: 411.783 days — matches known ~<!--v:fullMoonCycleEarth-->411.78<!--/v--> days to 0.003 days
 - Metonic cycle: 235 synodic = 19 solar years to within 2.1 hours
 
 **6. Year lengths (year-lengths.js):**
@@ -920,7 +920,7 @@ Mars now has 923 Tier 1C observations (weight 5) vs 144 Tier 2 ephemeris entries
 - Eccentricity: 0.01671044 (expected ~0.01671)
 - Obliquity: 23.4393° (expected ~23.44°)
 - Perihelion longitude: 102.95° (expected ~102.9°)
-- Precession: 25,794 years (H/13 mean; IAU J2000 instantaneous rate is ~25,772)
+- Precession: <!--v:earthAxialPeriod-->25,794<!--/v--> years (H/13 mean; IAU J2000 instantaneous rate is ~25,772)
 - All 6 explore scripts pass with re-exported constants
 
 **Key finding:** Planet inclination mean/amplitude values were stored as individual globals in script.js (lines 345-398), not in the per-planet objects. These have now been populated in the constants module's `planets` object for tool use.
@@ -993,7 +993,7 @@ PerihelionDurationEcliptic1 → PerihelionFromEarth → PerihelionDurationEclipt
 - Type III (Jupiter+): `realPeriStartPos = startpos*2`, speed = `-2π`; Saturn has negative elliptic orbit radius
 - Mars planet speed is negative (retrograde in model frame)
 
-**Validation results at model start (JD 2451716.5 = 21 Jun 2000):**
+**Validation results at model start (JD <!--v:startModelJD-->2,451,716.5<!--/v--> = 21 Jun 2000):**
 
 | Target | Model RA | Reference RA | RA Error | Dec |
 |--------|----------|--------------|----------|-----|
@@ -1041,7 +1041,7 @@ The growing errors at historical dates are the **model's own prediction error** 
 - Geocentric astrometric RA/Dec in decimal degrees (CENTER=500@399, QUANTITIES=1, ANG_FORMAT=DEG)
 
 **Validation:**
-- Mars at JD 2451716.5: returned RA=93.294°, Dec=24.208° (matches JPL reference)
+- Mars at JD <!--v:startModelJD-->2,451,716.5<!--/v-->: returned RA=93.294°, Dec=24.208° (matches JPL reference)
 - Batch of 3 dates: 1 cached + 2 uncached fetched in single API call (815ms)
 - Cache repeat: 0ms (instant)
 
@@ -1164,7 +1164,7 @@ All tooling is built and validated. This section documents the execution plan an
 
 **NEVER change (observational/structural):**
 - `eclipticInclinationJ2000`, `orbitalEccentricityBase`, `ascendingNode`, `longitudePerihelion` (JPL/SPICE data)
-- `holisticyearLength` (335,317 — core model constant, tuned to align precession with IAU)
+- `holisticyearLength` (<!--v:H-->335,317<!--/v--> — core model constant, tuned to align precession with IAU)
 - `perihelionEclipticYears` (derived from H — Fibonacci structure)
 - `moonEclipticInclinationJ2000`, `moonOrbitalEccentricity`, `moonDistance` (observational)
 
@@ -1323,7 +1323,7 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 
 | Step | Target | Status | Before RMS | After RMS | Params Changed |
 |------|--------|--------|-----------|-----------|----------------|
-| 1 | All | DONE | See below | — | H=335317, useVariableSpeed: true, dynamic perihelion phase |
+| 1 | All | DONE | See below | — | H=<!--v:HPlain-->335317<!--/v-->, useVariableSpeed: true, dynamic perihelion phase |
 | 2 | Sun | DONE | 0.714° | 0.003° | eocEccentricity & perihelionPhaseOffset derived; correctionSun: 0.5292; earthRAAngle: 1.282779; validated 1600-2200 (600yr) |
 | 3 | Moon | DONE | 6.267° | 0.01° | Full Meeus Ch. 47 (60L+60B), RA+Dec override; see `docs/66-moon-meeus-corrections.md` |
 | 4a | Jupiter | DONE | 1.974° | 0.06° | solarYearInput: 4330.5, eocFraction: 0.484, startpos: 13.85, 36p parallax |
@@ -1337,7 +1337,7 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 
 **Step 1 results** (JPL Horizons 2000-2025, 26 yearly dates): Full report at `tools/results/baseline-before.md` and `docs/69-optimization-baseline.md`
 
-**Step 2 results — Sun optimization (updated for H=335,317, derived EoC constants):**
+**Step 2 results — Sun optimization (updated for H=<!--v:H-->335,317<!--/v-->, derived EoC constants):**
 - Constants changed:
   - `eocEccentricity`: now **derived** as `eccentricityDerivedMean - eccentricityBase/2` = 0.007753
   - `perihelionPhaseOffset`: was hardcoded 2°, now **derived** from EP1 precession phase + correctionSun + perihelion date = ~0.51°
@@ -1494,7 +1494,7 @@ Once the tool is built, Claude runs this self-improving loop in two stages:
 
 1. **Reference data audit**: Every entry in `reference-data.json` has tier, weight, source, and reliability flags
 2. **PLANET_TEST_DATES updated**: All in-code entries annotated with tier/weight/source/dateReliable/positionReliable/notes
-3. **Matrix chain validation**: Compute Mercury RA at JD 2451716.5 -> must match 7.412897222h (+/-0.1 min of time)
+3. **Matrix chain validation**: Compute Mercury RA at JD <!--v:startModelJD-->2,451,716.5<!--/v--> -> must match 7.412897222h (+/-0.1 min of time)
 4. **All-planet cross-check**: Compare standalone engine output for all `PLANET_TEST_DATES` entries with RA values -> must match browser simulation within 0.01 deg
 5. **JPL baseline**: Run `validate` for years 2000-2020 -> establish error metrics before optimization
 6. **INPOP cross-check**: For a sample of dates, verify JPL and INPOP agree (confirming Tier 2 data is consistent)

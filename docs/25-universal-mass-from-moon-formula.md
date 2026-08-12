@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -100,7 +100,7 @@ The strongest test: apply the formula to **every major moon** of each planet and
 
 | Moon | a (km) | T (d) | bare ratio | corrected ratio | solar ppm | J2 ppm |
 |---|---|---|---|---|---|---|
-| Moon | 384,399.07 | 27.32166 | 329,796.93 | **328,899.35** | +2,727 | 0.5 |
+| Moon | <!--v:moonOrbitalRadius-->384,399.07<!--/v--> | 27.32166 | 329,796.93 | **328,899.35** | +2,727 | 0.5 |
 
 Corrected formula matches DE440 to **3.7 ppm**. The 2,727 ppm shift between bare and corrected reflects the full Earth-Moon Δa = 349 km (doc 24). The residual 3.7 ppm is the Hill-Brown m⁴-and-beyond floor of the 3-body problem.
 
@@ -176,7 +176,7 @@ The bare formula's output `GM_P_system` covers **planet + all moons**. To conver
 | Planet | Moons' share of system mass | DE440 Sun/System | DE440 Sun/Planet-Alone | Multiplier `Sun/alone ÷ Sun/system` |
 |---|---|---|---|---|
 | Earth | **1.2151%** | 328,900.56 | **332,946.05** | 1.012301 |
-| Mars | 0.0000% | 3,098,703.55 | 3,098,703.71 | 1.000000 |
+| Mars | 0.0000% | 3,098,703.55 | 3,098,703.71 | <!--v:saturnPredR2-->1.000000<!--/v--> |
 | Jupiter | 0.0207% | 1,047.349 | **1,047.566** | 1.000207 |
 | Saturn | 0.0247% | 3,497.902 | **3,498.769** | 1.000247 |
 | Uranus | 0.0104% | 22,902.944 | **22,905.337** | 1.000105 |
@@ -206,7 +206,7 @@ Comparing the universal formula's output (with corrections and the moon-mass spl
 | Planet | Best moon (split via mass ratio) | Our Sun/Alone | DE440 reference | Δ |
 |---|---|---|---|---|
 | Neptune | Triton | **19,416.35** | 19,416.299 | **3 ppm** |
-| Earth | Moon (÷ 81.30056816) | **332,944.79** | 332,946.05 | **3.8 ppm** |
+| Earth | Moon (÷ <!--v:massRatioEarthMoon-->81.30056816<!--/v-->) | **332,944.79** | 332,946.05 | **3.8 ppm** |
 | Saturn | Titan | 3,498.71 | 3,498.769 | 17 ppm |
 | Pluto | Charon (÷ 8.213, from DE440 `BODY999`/(`BODY9`−`BODY999`)) | 152,617,440 | 152,610,777 | 44 ppm |
 | Jupiter | Callisto | 1,047.62 | 1,047.566 | 49 ppm |

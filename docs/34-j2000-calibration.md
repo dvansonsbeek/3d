@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -147,15 +147,15 @@ const erosAscendingNodeInvPlaneVerified = 10.36;      // was 10.58, Δ = -0.22°
 
 | Planet | Souami & Souchay Ω | Verified Ω | Change |
 |--------|-------------------|------------|--------|
-| Earth | 284.51° | 284.51° | 0.00° |
+| Earth | <!--v:earthAscNodeJ2000-->284.51<!--/v-->° | <!--v:earthAscNodeJ2000-->284.51<!--/v-->° | 0.00° |
 | Mercury | 32.22° | 32.83° | +0.61° |
 | Venus | 52.31° | 54.70° | +2.39° |
-| Mars | 352.95° | 354.87° | +1.92° |
-| Jupiter | 306.92° | 312.89° | +5.97° |
-| Saturn | 122.27° | 118.81° | -3.46° |
-| Uranus | 308.44° | 307.80° | -0.64° |
-| Neptune | 189.28° | 192.04° | +2.76° |
-| Pluto | 107.06° | 101.06° | -6.00° |
+| Mars | <!--v:marsOmegaSS-->352.95<!--/v-->° | <!--v:marsOmegaJ2000-->354.87<!--/v-->° | +1.92° |
+| Jupiter | <!--v:jupiterOmegaSS-->306.92<!--/v-->° | <!--v:jupiterOmegaJ2000-->312.89<!--/v-->° | +5.97° |
+| Saturn | <!--v:saturnOmegaSS-->122.27<!--/v-->° | <!--v:saturnOmegaJ2000-->118.81<!--/v-->° | -3.46° |
+| Uranus | <!--v:uranusOmegaSS-->308.44<!--/v-->° | <!--v:uranusOmegaJ2000-->307.80<!--/v-->° | -0.64° |
+| Neptune | <!--v:neptuneOmegaSS-->189.28<!--/v-->° | <!--v:neptuneOmegaJ2000-->192.04<!--/v-->° | +2.76° |
+| Pluto | 107.06° | <!--v:plutoOmegaJ2000-->101.06<!--/v-->° | -6.00° |
 
 ### Inclinations
 
@@ -163,14 +163,14 @@ The existing `<planet>Inclination` constants from Souami & Souchay (2012) are us
 
 | Planet | Constant Name | Value | Notes |
 |--------|---------------|-------|-------|
-| Mercury | `mercuryInvPlaneInclinationJ2000` | 6.3472858° | S&S unchanged |
-| Venus | `venusInvPlaneInclinationJ2000` | 2.1545441° | S&S unchanged |
-| Mars | `marsInvPlaneInclinationJ2000` | 1.6311858° | S&S unchanged |
-| Jupiter | `jupiterInvPlaneInclinationJ2000` | 0.3219652° | S&S unchanged |
-| Saturn | `saturnInvPlaneInclinationJ2000` | 0.9254704° | S&S unchanged |
-| Uranus | `uranusInvPlaneInclinationJ2000` | 0.9946692° | S&S unchanged |
-| Neptune | `neptuneInvPlaneInclinationJ2000` | 0.7354155° | S&S unchanged |
-| Pluto | `plutoInvPlaneInclinationJ2000` | 15.5639473° | **Adjusted** from S&S 15.5541473° (+0.0098°) |
+| Mercury | `mercuryInvPlaneInclinationJ2000` | <!--v:mercuryInclJ2000-->6.3472858<!--/v-->° | S&S unchanged |
+| Venus | `venusInvPlaneInclinationJ2000` | <!--v:venusInclJ2000-->2.1545441<!--/v-->° | S&S unchanged |
+| Mars | `marsInvPlaneInclinationJ2000` | <!--v:marsInclJ2000-->1.6311858<!--/v-->° | S&S unchanged |
+| Jupiter | `jupiterInvPlaneInclinationJ2000` | <!--v:jupiterInclJ2000-->0.3219652<!--/v-->° | S&S unchanged |
+| Saturn | `saturnInvPlaneInclinationJ2000` | <!--v:saturnInclJ2000-->0.9254704<!--/v-->° | S&S unchanged |
+| Uranus | `uranusInvPlaneInclinationJ2000` | <!--v:uranusInclJ2000-->0.9946692<!--/v-->° | S&S unchanged |
+| Neptune | `neptuneInvPlaneInclinationJ2000` | <!--v:neptuneInclJ2000-->0.7354155<!--/v-->° | S&S unchanged |
+| Pluto | `plutoInvPlaneInclinationJ2000` | <!--v:plutoInclJ2000-->15.5639473<!--/v-->° | **Adjusted** from S&S 15.5541473° (+0.0098°) |
 
 ### Verification Results at J2000
 
@@ -384,7 +384,7 @@ The differences between Souami & Souchay (2012) ascending nodes and our verified
 
 ## Notes
 
-- Earth's ascending node (284.51° - Souami & Souchay 2012) is the reference - all other ascending nodes are adjusted relative to this
+- Earth's ascending node (<!--v:earthAscNodeJ2000-->284.51<!--/v-->° - Souami & Souchay 2012) is the reference - all other ascending nodes are adjusted relative to this
 - Pluto shows a residual 0.014° error due to geometric constraints (high inclination limits precision)
 - Halley's and Eros values are approximations pending proper verification against reference data
 

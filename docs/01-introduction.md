@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -30,7 +30,7 @@ The model introduces two key gravitational centers that govern all observed prec
 This point simulates **axial precession** - Earth's historical "precession of the equinoxes."
 
 - Earth orbits this center in a **clockwise** direction
-- One complete orbit takes approximately **H/13 years** (~25,794 years; see [Constants Reference](20-constants-reference.md))
+- One complete orbit takes approximately **H/13 years** (<!--v:axialPrecRound-->~25,794<!--/v--> years; see [Constants Reference](20-constants-reference.md))
 - This is what causes the equinox to move westward through the zodiac
 - The mechanism involves tidal forces from the Sun and Moon acting on Earth's equatorial bulge
 
@@ -41,7 +41,7 @@ In the 3D simulation, this point is visualized as "The Death Star."
 This point determines Earth's varying distance to the Sun throughout the year (perihelion around January 3rd, aphelion around July 4th).
 
 - It orbits **counter-clockwise** around the EARTH-WOBBLE-CENTER
-- One complete orbit takes approximately **H/3 years** (~111,772 years, inclination precession; see [Constants Reference](20-constants-reference.md))
+- One complete orbit takes approximately **H/3 years** (<!--v:inclPrecYears-->~111,772<!--/v--> years, inclination precession; see [Constants Reference](20-constants-reference.md))
 - This slowly changes Earth's argument of periapsis relative to the fixed stars
 
 In the 3D simulation, this appears as a white dot.
@@ -99,7 +99,7 @@ Several Earth parameters oscillate over long timescales:
 
 ### Obliquity (Axial Tilt)
 
-Earth's axial tilt is not constant but oscillates over approximately H/8 years (~41,915 years). The orbital eccentricity and inclination to the invariable plane also oscillate over the Earth Fundamental Cycle. See [Constants Reference](20-constants-reference.md) for all current values (mean, amplitude, and range for each parameter).
+Earth's axial tilt is not constant but oscillates over approximately H/8 years (<!--v:obliqCycleYears-->~41,915<!--/v--> years). The orbital eccentricity and inclination to the invariable plane also oscillate over the Earth Fundamental Cycle. See [Constants Reference](20-constants-reference.md) for all current values (mean, amplitude, and range for each parameter).
 
 ---
 

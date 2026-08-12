@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -95,7 +95,7 @@ The integer `solarYearCount` means periods change in discrete steps:
 
 | Planet  | Count   | Step size (days) |
 |---------|---------|------------------|
-| Mercury | 1,392,228 | 0.00006          |
+| Mercury | 1,392,228 | <!--v:innerFourEccWeight-->0.00006<!--/v-->          |
 | Venus   | 545,059  | 0.0004           |
 | Mars    | 178,289  | 0.004            |
 | Jupiter | 28,281   | 0.15             |

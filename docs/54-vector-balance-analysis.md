@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -13,7 +13,7 @@ This document presents the analysis of the **dynamic vector balance** — whethe
 
 the default configuration's *d-values and phase groups* are unchanged. What was refined later (2026-04-09 audit) are two non-d-value parameters:
 - The **asc-node integer assignments** `ascendingNodeCyclesIn8H` (Mercury 9, Venus 1, Mars 63, Jupiter/Saturn 36, Uranus 12, Neptune 3) — re-fit so all 7 fitted planets match JPL ecliptic-inclination trend directions in the J2000-fixed frame, with Jupiter+Saturn locked to share N=36.
-- Four **cycle anchors** (Mercury, Venus, Mars, Neptune) re-anchored so all 7 fitted planets share the same balanced-year extremum at n=7 (≈ -2,649,854 BC).
+- Four **cycle anchors** (Mercury, Venus, Mars, Neptune) re-anchored so all 7 fitted planets share the same balanced-year extremum at n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->).
 
 The d-values, the antiPhase grouping, and Saturn's role as the sole anti-phase planet are exactly as analyzed below.
 
@@ -181,7 +181,7 @@ The 2026-04-05 ICRF-period-for-Ω workaround was making two errors that happened
 | Total trend error (J2000-fixed frame) | ~4.3″/century across 7 planets | ✓ |
 | Mirror symmetry | 4/4 | ✓ |
 | Asc-node integers (re-fit 2026-04-09) | Me9 Ve1 Ma63 Ju36 Sa36 Ur12 Ne3, J+S lockstep | ✓ |
-| Phase angles (re-anchored to n=7) | All 7 fitted planets at -2,649,854 BC | ✓ |
+| Phase angles (re-anchored to n=7) | All 7 fitted planets at -<!--v:systemResetYearBC-->2,649,854 BC<!--/v--> | ✓ |
 | Vector balance (multi-mode) | 100% (B-matrix eigenmode representation) | ✓ |
 
 ## Step 2 FINDINGS (2026-04-05)
@@ -229,7 +229,7 @@ The original April 2026 analysis treated "which Ω rate for trend computation" a
 
 The d-values, antiPhase grouping, and Saturn's role as the sole anti-phase planet are unchanged from the April 2026 analysis. The 2026-04-09 audit added two complementary results:
 
-1. **JPL ecliptic-inclination trends now match in the J2000-fixed frame** for all 7 fitted planets, with a total residual of ~4.3″/century. This required re-fitting `ascendingNodeCyclesIn8H` per planet (Mercury 9, Venus 1, Mars 63, Jupiter 36, Saturn 36, Uranus 12, Neptune 3, with Jupiter+Saturn locked) and re-anchoring 4 cycle anchors (Mercury, Venus, Mars, Neptune) to balanced year n=7 (≈ -2,649,854 BC).
+1. **JPL ecliptic-inclination trends now match in the J2000-fixed frame** for all 7 fitted planets, with a total residual of ~4.3″/century. This required re-fitting `ascendingNodeCyclesIn8H` per planet (Mercury 9, Venus 1, Mars 63, Jupiter 36, Saturn 36, Uranus 12, Neptune 3, with Jupiter+Saturn locked) and re-anchoring 4 cycle anchors (Mercury, Venus, Mars, Neptune) to balanced year n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->).
 
 2. **Law 4 is the eccentricity amplitude constant K** — a single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt: `e_amp = K × sin(tilt) × √d / (√m × a^1.5)`. See [10-fibonacci-laws.md § Law 4](10-fibonacci-laws.md#law-4-the-eccentricity-amplitude-constant).
 

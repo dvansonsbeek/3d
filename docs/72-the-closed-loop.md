@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -9,7 +9,7 @@ status: current
 
 Every orbital oscillation in the model — inclination, eccentricity, and obliquity — derives from two empirical constants and a set of observed J2000 anchor values. Nothing is fitted per planet. The loop is fully closed.
 
-> **Scope note (ESSRT).** The closed-loop derivation chain is structurally scale-invariant: Fibonacci divisors (3, 5, 8, 13, 21, 34), 8H/N lattice integers, balance-law forms (Law 3 vector, Law 5 scalar), and the PSI/K formula structures hold at any epoch. The numerical values of the constants — PSI (3.307×10⁻³), K (3.415×10⁻⁶), the mean obliquity (23.4135°), Earth's inclination amplitude (0.6360°) — and the literal year counts (H = 335,317; 8H = 2,682,536; H/13 = 25,794; H/16 = 20,957; System Reset year ≈ −2,649,854) are J2000-anchored. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling the literal year counts proportionally; PSI and K, being derived from J2000 Earth, would be re-evaluated at any other epoch by the same closed loop using that epoch's Earth values. The architecture of the loop — what derives from what — is permanent; the numerical snapshot is the J2000 instance.
+> **Scope note (ESSRT).** The closed-loop derivation chain is structurally scale-invariant: Fibonacci divisors (3, 5, 8, 13, 21, 34), 8H/N lattice integers, balance-law forms (Law 3 vector, Law 5 scalar), and the PSI/K formula structures hold at any epoch. The numerical values of the constants — PSI (3.307×10⁻³), K (3.415×10⁻⁶), the mean obliquity (23.4135°), Earth's inclination amplitude (0.6360°) — and the literal year counts (H = <!--v:H-->335,317<!--/v-->; 8H = <!--v:eightH-->2,682,536<!--/v-->; H/13 = <!--v:earthAxialPeriod-->25,794<!--/v-->; H/16 = 20,957; System Reset year ≈ −2,649,854) are J2000-anchored. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling the literal year counts proportionally; PSI and K, being derived from J2000 Earth, would be re-evaluated at any other epoch by the same closed loop using that epoch's Earth values. The architecture of the loop — what derives from what — is permanent; the numerical snapshot is the J2000 instance.
 
 ## The Two Constants
 
@@ -83,7 +83,7 @@ The inclination amplitude equals the axial tilt amplitude — they are the same 
 
 ### 2. Axial precession cycle
 
-The period for each planet's spin axis to precess around its orbit normal. For Earth: H/13 (25,794 yr). For other planets: set from observations where known, predicted from Fibonacci ratios (H × d-combinations) where not yet observed.
+The period for each planet's spin axis to precess around its orbit normal. For Earth: H/13 (<!--v:earthAxialPeriod-->25,794<!--/v--> yr). For other planets: set from observations where known, predicted from Fibonacci ratios (H × d-combinations) where not yet observed.
 
 ### 3. Obliquity cycle
 
@@ -130,17 +130,17 @@ This is the physically motivated symmetry: at n=7, every cycle type (inclination
 
 The inclination cycle anchors are a direct consequence: each planet's cycle anchor equals its ICRF perihelion longitude at the System Reset (minus 180° for in-phase planets). This is not a coincidence — the System Reset defines the phase geometry. The cycle anchors are derived, not fitted.
 
-The System Reset occurs once per Solar System Resonance Cycle (8H = 2,682,536 years at J2000). It is the moment when the inclination oscillation "resets" — all planets return to their extreme positions simultaneously, like the hands of a clock aligning at midnight.
+The System Reset occurs once per Solar System Resonance Cycle (8H = <!--v:eightH-->2,682,536<!--/v--> years at J2000). It is the moment when the inclination oscillation "resets" — all planets return to their extreme positions simultaneously, like the hands of a clock aligning at midnight.
 
 ## The Complete Picture
 
 The model has 6 free parameters:
 
-1. **H** — the Earth Fundamental Cycle (335,317 years at J2000) — 1 DOF
+1. **H** — the Earth Fundamental Cycle (<!--v:H-->335,317<!--/v--> years at J2000) — 1 DOF
 2. **Fibonacci divisors** — {3, 5, 8, 13, 21, 34} — 3 DOF (assumed, not derived)
 3. **Mean obliquity** — Earth's mean axial tilt (<!--v:meanObliquity-->23.41353<!--/v-->°) — 1 DOF
 4. **Inclination amplitude** — Earth's invariable-plane amplitude (0.6360°) — 1 DOF
-5. **Planet configuration** — which d goes to which planet — 0 DOF (unique mirror-symmetric solution among 42 viable candidates from 7,558,272 exhaustively tested; five successive physical filters)
+5. **Planet configuration** — which d goes to which planet — 0 DOF (unique mirror-symmetric solution among 42 viable candidates from <!--v:configSearchSpace-->7,558,272<!--/v--> exhaustively tested; five successive physical filters)
 
 From these free parameters, the model derives:
 

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -23,7 +23,7 @@ The simulation includes several interactive panels for inspecting planetary data
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
 | **Invariable Plane Balance Explorer** | Test Fibonacci Law assignments interactively |
 | **Eccentricity Balance Scale** | Visualize Law 5 balance per target planet (waterfall chart + buildup table) |
-| **Solar System Resonance Cycle** | All periods as integer divisors of 8H = 2,682,536 yr at J2000 (8 planets × 6 cycles) |
+| **Solar System Resonance Cycle** | All periods as integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000 (8 planets × 6 cycles) |
 | **WebGeoCalc Explorer** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet — see [doc 56](56-webgeocalc-explorer.md) |
 | **Climate Formula Explorer** | L1+L2+L3 climate formula visualized across LR04 / CENOGRID / EPICA / CenCO2PIP, multiple time windows — see [doc 58](58-climate-formula-explorer.md) |
 | **ESSRT Explorer** | Deep-time evolution of H, LOD, year length, Moon distance under Expanding Solar System Resonance Theory — see [doc 59](59-essrt-explorer.md) |
@@ -413,7 +413,7 @@ An interactive modal for testing different planetary group assignments and Fibon
 | **Phase angle selection** | Choose between per-planet model phases, Laplace-Lagrange eigenmodes, or custom angles |
 | **Fibonacci divisor dropdown** | Common Fibonacci values (1–55) plus custom input |
 | **Editable precession periods** | Modify ascending node precession rates |
-| **42 presets** | Deep-analysis survivors: pass inclination balance ≥99.994%, eccentricity balance ≥99%, LL bounds, direction match ≤5″ (per-config optimised). Sorted by eccentricity balance. |
+| **42 presets** | Deep-analysis survivors: pass inclination balance ≥<!--v:balanceThreshold-->99.994%<!--/v-->, eccentricity balance ≥99%, LL bounds, direction match ≤5″ (per-config optimised). Sorted by eccentricity balance. |
 | **Dual balance display** | Inclination (Law 3) and eccentricity (Law 5) balance percentages |
 | **Per-planet results table** | Amplitude, mean, range, LL bounds check, trend comparison |
 | **Earth locked** | Earth's parameters (d=3, in-phase, 21.77°) are derived from the temperature model and cannot be changed |
@@ -464,7 +464,7 @@ See [38 — The Eccentricity Balance Scale](38-eccentricity-scale.md) for the ph
 
 ### Purpose
 
-Shows all 8 planets × 6 cycle types (axial precession, ecliptic perihelion, ICRF perihelion / inclination, ascending node regression, obliquity oscillation, eccentricity cycle) as integer divisors of the Solar System Resonance Cycle 8H = 2,682,536 years (at J2000). Every cycle for every planet divides 8H evenly — this is the super-period that resets the whole system once every ~2.68 million years.
+Shows all 8 planets × 6 cycle types (axial precession, ecliptic perihelion, ICRF perihelion / inclination, ascending node regression, obliquity oscillation, eccentricity cycle) as integer divisors of the Solar System Resonance Cycle 8H = <!--v:eightH-->2,682,536<!--/v--> years (at J2000). Every cycle for every planet divides 8H evenly — this is the super-period that resets the whole system once every ~2.68 million years.
 
 ### Accessing the Panel
 
@@ -693,7 +693,7 @@ The tilt is then: `arccos(L_total.y / |L_total|)`
 | Souami & Souchay (2012) | 1.5787° | Reference |
 | Our calculation | 1.5786° | 0.0001° (0.36 arcsec) |
 
-This 99.994% accuracy validates that our orbital elements are consistent with published values.
+This <!--v:balanceThreshold-->99.994%<!--/v--> accuracy validates that our orbital elements are consistent with published values.
 
 ---
 

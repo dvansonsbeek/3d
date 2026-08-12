@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -13,7 +13,7 @@ The Invariable Plane Balance Explorer is an interactive modal for testing planet
 
 The explorer allows users to experiment with alternative configurations to understand why certain planetary assignments are uniquely constrained — for example, why the mirror-symmetric d-assignments are the only solution satisfying all six laws simultaneously.
 
-> **Scope note (ESSRT).** The balance machinery this explorer evaluates (Law 3 inclination balance, Law 5 eccentricity balance, the amplitude formula `ψ/(d·√m)`, the d-value choices) is scale-invariant — the formulas hold at any epoch. ψ, the balanced-year anchor (~302,635 BC), J2000 ICRF perihelion longitudes, JPL trend values (1900–2100), and H = 335,317 are J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts and the balanced-year date proportionally. The explorer's interactive UI is intrinsically a present-epoch exploration tool; the underlying structural laws it tests are not.
+> **Scope note (ESSRT).** The balance machinery this explorer evaluates (Law 3 inclination balance, Law 5 eccentricity balance, the amplitude formula `ψ/(d·√m)`, the d-value choices) is scale-invariant — the formulas hold at any epoch. ψ, the balanced-year anchor (~<!--v:balancedYearBC-->302,635 BC<!--/v-->), J2000 ICRF perihelion longitudes, JPL trend values (1900–2100), and H = <!--v:H-->335,317<!--/v--> are J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts and the balanced-year date proportionally. The explorer's interactive UI is intrinsically a present-epoch exploration tool; the underlying structural laws it tests are not.
 
 **Related Documentation:**
 - [Fibonacci Laws of Planetary Motion](10-fibonacci-laws.md) — the six laws and their derivations
@@ -83,7 +83,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 
 ### Preset Dropdown
 
-A dropdown in the header offers **42 deep-analysis survivors** — configurations passing all five physical filters (inclination balance ≥99.994%, eccentricity balance ≥99%, LL bounds, direction match ≤5″, per-config optimised anchor and ascending nodes). Each candidate's eccentricity balance is computed with its own recomputed bases (not the default config's) for a fair comparison. Sorted by this per-config eccentricity balance, grouped by Jupiter/Saturn scenario:
+A dropdown in the header offers **42 deep-analysis survivors** — configurations passing all five physical filters (inclination balance ≥<!--v:balanceThreshold-->99.994%<!--/v-->, eccentricity balance ≥99%, LL bounds, direction match ≤5″, per-config optimised anchor and ascending nodes). Each candidate's eccentricity balance is computed with its own recomputed bases (not the default config's) for a fair comparison. Sorted by this per-config eccentricity balance, grouped by Jupiter/Saturn scenario:
 
 | Scenario | Jupiter d | Saturn d |
 |----------|-----------|----------|
@@ -104,7 +104,7 @@ A dropdown per planet to select the inclination cycle anchor. Each planet has a 
 | γ₁–γ₈ | Various | Laplace-Lagrange eigenmode angles |
 | Custom | User input | Any angle 0°–360° |
 
-Cycle anchors are per-planet values derived from the balanced year (~302,635 BC). They cluster near LL eigenmodes. See [Fibonacci Laws — Phase Groups](10-fibonacci-laws.md#phase-groups).
+Cycle anchors are per-planet values derived from the balanced year (~<!--v:balancedYearBC-->302,635 BC<!--/v-->). They cluster near LL eigenmodes. See [Fibonacci Laws — Phase Groups](10-fibonacci-laws.md#phase-groups).
 
 ### ω̃ J2000 (Read-Only)
 
@@ -198,7 +198,7 @@ A configuration is valid when:
 
 | Check | Criterion |
 |-------|-----------|
-| **Inclination balance** | ≥99.994% (TNO margin) |
+| **Inclination balance** | ≥<!--v:balanceThreshold-->99.994%<!--/v--> (TNO margin) |
 | **Eccentricity balance** | ~99.9% for the model configuration (phase-derived bases) |
 | **LL bounds** | All 8 planets within Laplace-Lagrange bounds (the default configuration has Saturn at +0.028° excess — within 0.03° LL uncertainty) |
 | **Trend directions** | All 7 fitted planets match JPL direction in the J2000-fixed frame (7/7 ✓) |
@@ -235,14 +235,14 @@ The model's default (and uniquely determined) configuration:
 
 | Planet | Phase | d | Fibonacci | Mirror partner |
 |--------|-------|---|-----------|----------------|
-| Mercury | In-phase (234.52°) | 21 | F₈ | Uranus |
-| Venus | In-phase (218.64°) | 34 | F₉ | Neptune |
+| Mercury | In-phase (<!--v:mercuryInclCycleAnchor-->234.52<!--/v-->°) | 21 | F₈ | Uranus |
+| Venus | In-phase (<!--v:venusInclCycleAnchor-->218.64<!--/v-->°) | 34 | F₉ | Neptune |
 | Earth | In-phase (21.77°) | 3 | F₄ | Saturn |
-| Mars | In-phase (236.07°) | 5 | F₅ | Jupiter |
-| Jupiter | In-phase (287.06°) | 5 | F₅ | Mars |
-| Saturn | Anti-phase (116.26°) | 3 | F₄ | Earth |
+| Mars | In-phase (<!--v:marsInclCycleAnchor-->236.07<!--/v-->°) | 5 | F₅ | Jupiter |
+| Jupiter | In-phase (<!--v:jupiterInclCycleAnchor-->287.06<!--/v-->°) | 5 | F₅ | Mars |
+| Saturn | Anti-phase (<!--v:saturnInclCycleAnchor-->116.26<!--/v-->°) | 3 | F₄ | Earth |
 | Uranus | In-phase (21.33°) | 21 | F₈ | Mercury |
-| Neptune | In-phase (174.04°) | 34 | F₉ | Venus |
+| Neptune | In-phase (<!--v:neptuneInclCycleAnchor-->174.04<!--/v-->°) | 34 | F₉ | Venus |
 
 Expected results:
 - Inclination balance: **~100%** (99.997%)
@@ -500,7 +500,7 @@ The ascending node periods (whether 8H/N or Laskar's values) describe motion ove
 - A wobbling rate (multi-mode sum of 7 eigenfrequencies)
 - A fundamentally different period that produces the same J2000 snapshot
 
-The model's 8H/N predictions and Laskar's N-body measurements both produce indistinguishable motion over observable timescales. The difference is philosophical: Laskar extracts 8 independent numbers from a simulation; our model derives all 7 from a single constant (H = 335,317) with a Fibonacci structure that also explains the scalar balance, the d-values, and the mirror symmetry.
+The model's 8H/N predictions and Laskar's N-body measurements both produce indistinguishable motion over observable timescales. The difference is philosophical: Laskar extracts 8 independent numbers from a simulation; our model derives all 7 from a single constant (H = <!--v:H-->335,317<!--/v-->) with a Fibonacci structure that also explains the scalar balance, the d-values, and the mirror symmetry.
 
 ### Current ascending node integers
 

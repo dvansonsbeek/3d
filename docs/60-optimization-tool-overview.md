@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -22,7 +22,7 @@ status: current
 - [69-optimization-baseline.md](69-optimization-baseline.md) — Baseline results
 - [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); optimization runs against modern-era JPL/Horizons reference data are present-epoch
 
-> **Scope note (ESSRT).** The optimization framework (Fibonacci orbit-count constraint, Kepler's 3rd law, parameter classification, optimizer architecture, reference-data ingestion) is scale-invariant. The literal H = 335,317 solar years value used in the orbit-count formula and the balanced-year anchor (n=7 ≈ -2,649,854 BC) referenced in the inclination cycle-anchor descriptions are J2000-anchored snapshots. Optimization campaigns run against modern-era JPL Horizons / Excel reference data are intrinsically present-epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), but the modern-era optimization window (1800–2200 typical) sees sub-ppm drift below the noise floor.
+> **Scope note (ESSRT).** The optimization framework (Fibonacci orbit-count constraint, Kepler's 3rd law, parameter classification, optimizer architecture, reference-data ingestion) is scale-invariant. The literal H = <!--v:H-->335,317<!--/v--> solar years value used in the orbit-count formula and the balanced-year anchor (n=7 ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->) referenced in the inclination cycle-anchor descriptions are J2000-anchored snapshots. Optimization campaigns run against modern-era JPL Horizons / Excel reference data are intrinsically present-epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), but the modern-era optimization window (1800–2200 typical) sees sub-ppm drift below the noise floor.
 
 ---
 
@@ -53,7 +53,7 @@ The model is fundamentally built on **Fibonacci number relationships between pla
 
 ### 2.1 How Orbit Counts Work
 
-Each planet has an integer orbit count in the Earth Fundamental Cycle (H = 335,317 solar years at J2000):
+Each planet has an integer orbit count in the Earth Fundamental Cycle (H = <!--v:H-->335,317<!--/v--> solar years at J2000):
 
 ```
 SolarYearCount = round(H x meanSolarYear / SolarYearInput)
@@ -138,7 +138,7 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 | `SolarYearInput` | 87.9683 days | Orbital period |
 | `EclipticInclinationJ2000` | 7.00497902 deg | Inclination to ecliptic (JPL) |
 | `OrbitalEccentricity` | 0.20563593 | Orbital eccentricity (JPL) |
-| `InvPlaneInclinationJ2000` | 6.3472858 deg | Incl. to invariable plane |
+| `InvPlaneInclinationJ2000` | <!--v:mercuryInclJ2000-->6.3472858<!--/v--> deg | Incl. to invariable plane |
 | `LongitudePerihelion` | 77.4569131 deg | Perihelion longitude (JPL J2000) |
 | `AscendingNode` | 48.33033155 deg | Ecliptic ascending node (SPICE) |
 | `AngleCorrection` | 0.9709 deg | Perihelion alignment fine-tune |
@@ -146,7 +146,7 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 | `Startpos` | 83.653 deg | Starting orbital position |
 | `InvPlaneInclinationMean` | 6.703207 deg | Inclination oscillation center (Mercury, post n=7 re-anchor) |
 | `InvPlaneInclinationAmplitude` | 0.386478 deg | Inclination oscillation range |
-| `InclinationCycleAnchor` | Per-planet | ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -2,649,854 BC (e.g. Mercury: 234.52°) |
+| `InclinationCycleAnchor` | Per-planet | ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v--> (e.g. Mercury: <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->°) |
 
 ### 3.2 Perihelion Precession Periods (ecliptic frame, as used by the simulation)
 | Planet | Formula | Direction |
@@ -275,7 +275,7 @@ A thorough audit reveals that **ALL** data in `PLANET_TEST_DATES` (lines 6825-75
 
 5. **Occultation entries** (Venus-Mercury, Jupiter-Mars, etc.) from Project Pluto and Wikipedia have **no positional data** -- only dates.
 
-6. **RA is almost entirely absent.** Only the "Model start date" (JD 2451716.5) per planet has RA. All transit/opposition/conjunction entries lack RA. Validation has been declination-only.
+6. **RA is almost entirely absent.** Only the "Model start date" (JD <!--v:startModelJD-->2,451,716.5<!--/v-->) per planet has RA. All transit/opposition/conjunction entries lack RA. Validation has been declination-only.
 
 7. **Jupiter-Saturn conjunction data is duplicated** -- the same 70 entries appear in both arrays.
 
@@ -529,7 +529,7 @@ function computePlanetPosition(planetKey, pos) {
 }
 ```
 
-**Validation checkpoint:** At JD 2451716.5 (model start), Mercury RA must equal 7.412897222 hours. This is the acid test that proves the matrix chain is correct.
+**Validation checkpoint:** At JD <!--v:startModelJD-->2,451,716.5<!--/v--> (model start), Mercury RA must equal 7.412897222 hours. This is the acid test that proves the matrix chain is correct.
 
 ---
 
@@ -546,7 +546,7 @@ These are the raw input values at the top of `script.js`. Changing them is strai
 | Parameter | Example (Mercury) | What it controls | Propagation effects |
 |-----------|-------------------|------------------|-------------------|
 | `SolarYearInput` | 87.9683 days | Orbital period -> feeds into `SolarYearCount` -> `OrbitDistance` (Kepler's 3rd) -> `PerihelionDistance` -> orbit speed, orbit radius | **High cascade**: changing this changes orbit size, speed, and all derived geometry |
-| `Startpos` | 83.653 deg | Starting orbital angle at model epoch | **Isolated**: only affects where the planet is at JD 2451716.5 |
+| `Startpos` | 83.653 deg | Starting orbital angle at model epoch | **Isolated**: only affects where the planet is at JD <!--v:startModelJD-->2,451,716.5<!--/v--> |
 | `AngleCorrection` | 0.9709 deg | Fine-tunes perihelion alignment -> feeds into `orbitCentera`/`orbitCenterb` of the PerihelionFromEarth object | **Medium cascade**: affects perihelion direction vector |
 | `InvPlaneInclinationMean` | 6.703207 deg | Center of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
 | `InvPlaneInclinationAmplitude` | 0.386478 deg | Range of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
@@ -645,12 +645,12 @@ Additionally, there are less well-known cycles that may need modeling:
 | `InvPlaneInclinationJ2000` | Souami & Souchay (2012) research paper |
 | `LongitudePerihelion` | JPL J2000 reference -- defines perihelion direction |
 | `PerihelionEclipticYears` | Derived from H/n -- the Fibonacci/Earth Fundamental Cycle structure is fundamental |
-| `holisticyearLength` | Core model constant (335,317) -- the entire model is built on this |
-| `perihelionalignmentYear` | Historical reference (1246.03125 AD) |
+| `holisticyearLength` | Core model constant (<!--v:H-->335,317<!--/v-->) -- the entire model is built on this |
+| `perihelionalignmentYear` | Historical reference (<!--v:periAlignYear-->1246.03125<!--/v--> AD) |
 | `AscendingNodeInvPlaneVerified` | Optimized from Souami & Souchay to match J2000 ecliptic inclinations |
-| `moonEclipticInclinationJ2000` | 5.1573 deg -- dynamical mean osculating inclination (measured from the Meeus series, v4 E3c; the Brown/ELP theory constant 5.1453964 is the documented partner) |
-| `moonOrbitalEccentricity` | 0.054900489 -- observational data |
-| `moonDistance` | 384399.07 km -- measured (Lunar Laser Ranging) |
+| `moonEclipticInclinationJ2000` | <!--v:moonEclipticInclination-->5.1573<!--/v--> deg -- dynamical mean osculating inclination (measured from the Meeus series, v4 E3c; the Brown/ELP theory constant <!--v:moonInclinationConstantBrownELP-->5.1453964<!--/v--> is the documented partner) |
+| `moonOrbitalEccentricity` | <!--v:moonOrbitalEccentricityFull-->0.054900489<!--/v--> -- observational data |
+| `moonDistance` | <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km -- measured (Lunar Laser Ranging) |
 | Laplace-Lagrange bounds | Scientific reference data from Farside Table 10.4 |
 | JPL ecliptic inclination trend rates | Scientific reference data from JPL |
 

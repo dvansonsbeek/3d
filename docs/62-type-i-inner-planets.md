@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -9,7 +9,7 @@ status: current
 
 **Status**: Complete (e/(1+e) derivation, EoC with phase-optimized fractions, period calibration)
 
-> **Scope note (ESSRT).** The Type I geometric formulas (`realOrbitalEccentricity = e/(1+e)`, `perihelionDistance = orbitDistance × realOrbitalEccentricity × 100`, EoC speed variation) are scale-invariant. Perihelion-period denominators are Fibonacci/8H expressions (`H/(1+3/8)`, `−8H/6`) that stay constant at any epoch. Literal J2000-anchored values (the balanced year n=7 ≈ -2,649,854 BC, `solarYearCount` values 1,392,228 / 545,059, `perihelionRef_JD` constants, and the JPL 2000-2200 calibration baseline) reflect the present epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally. The Type I scene-graph configuration this document describes is therefore the J2000 snapshot of an underlying scale-invariant structure.
+> **Scope note (ESSRT).** The Type I geometric formulas (`realOrbitalEccentricity = e/(1+e)`, `perihelionDistance = orbitDistance × realOrbitalEccentricity × 100`, EoC speed variation) are scale-invariant. Perihelion-period denominators are Fibonacci/8H expressions (`H/(1+3/8)`, `−8H/6`) that stay constant at any epoch. Literal J2000-anchored values (the balanced year n=7 ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, `solarYearCount` values 1,392,228 / 545,059, `perihelionRef_JD` constants, and the JPL 2000-2200 calibration baseline) reflect the present epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally. The Type I scene-graph configuration this document describes is therefore the J2000 snapshot of an underlying scale-invariant structure.
 
 ---
 
@@ -195,7 +195,7 @@ the geocentric observation geometry: Type I planets are seen from outside their
 orbit, and the apparent speed pattern differs from the heliocentric one.
 
 Venus's fraction (0.436) yields a very small effective amplitude (0.003),
-consistent with its tiny orbital eccentricity (0.00678).
+consistent with its tiny orbital eccentricity (<!--v:venusEccJ2000-->0.00678<!--/v-->).
 
 #### Historical context: circular-vs-elliptical test
 
@@ -292,7 +292,7 @@ mirrorPair:                'neptune'     (paired planet)
 | Value                  | Mercury   | Venus     |
 |------------------------|-----------|-----------|
 | solarYearCount         | 1392228   | 545059    |
-| orbitDistance (AU)      | 0.3871    | 0.7233    |
+| orbitDistance (AU)      | <!--v:mercurySemiMajor-->0.3871<!--/v-->    | <!--v:venusSemiMajor-->0.7233<!--/v-->    |
 | realOrbitalEccentricity| 0.17056   | 0.00671   |
 | perihelionDistance      | 6.603     | 0.485     |
 | elipticOrbit           | 3.301     | 0.243     |

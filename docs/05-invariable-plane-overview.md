@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -9,7 +9,7 @@ status: current
 
 This document provides a conceptual overview of the invariable plane and how the Holistic Universe Model uses it as a fundamental reference frame.
 
-> **Scope note (ESSRT).** The invariable plane itself (perpendicular to total angular momentum) is fixed in space; the angular-momentum conservation argument that defines it is scale-invariant. Period denominators (H/3, H/5, 8H/N) are scale-invariant Fibonacci/lattice divisors that stay constant at any epoch. The literal year values (67,063 yr ≈ −H/5, 111,772 yr ≈ H/3 in §"The Inclination Cycle") and the Year 50000 projection are J2000-evaluated; the J2000 invariable-plane orientation (1.578° inclination, 107.58° ascending node from Souami & Souchay 2012) is the present-epoch snapshot. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally; the structural picture this document describes holds at any epoch.
+> **Scope note (ESSRT).** The invariable plane itself (perpendicular to total angular momentum) is fixed in space; the angular-momentum conservation argument that defines it is scale-invariant. Period denominators (H/3, H/5, 8H/N) are scale-invariant Fibonacci/lattice divisors that stay constant at any epoch. The literal year values (67,063 yr ≈ −H/5, <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr ≈ H/3 in §"The Inclination Cycle") and the Year 50000 projection are J2000-evaluated; the J2000 invariable-plane orientation (1.578° inclination, 107.58° ascending node from Souami & Souchay 2012) is the present-epoch snapshot. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally; the structural picture this document describes holds at any epoch.
 
 ---
 
@@ -65,7 +65,7 @@ Since the ecliptic IS Earth's orbital plane, we can flip the perspective:
 | Viewpoint | Value | Meaning |
 |-----------|-------|---------|
 | Invariable plane's ascending node on ecliptic | 107.58° | Where invariable plane crosses *up* through ecliptic |
-| Earth's ascending node on invariable plane | 284.51° | Where Earth's orbit crosses *up* through invariable plane |
+| Earth's ascending node on invariable plane | <!--v:earthAscNodeJ2000-->284.51<!--/v-->° | Where Earth's orbit crosses *up* through invariable plane |
 
 These values differ by ~177° (not exactly 180°) due to measurement precision and the fact that the "mean ecliptic" is a defined plane, not identical to Earth's instantaneous orbit.
 
@@ -157,7 +157,7 @@ Year 50000 (minimum tilt):
 - Maximum height: sin(0.85°) × 1 AU ≈ 0.015 AU ≈ 2.2 million km (min ~0.848°)
 ```
 
-The crossing dates shift as Earth's ascending node circulates through 360°. Earth's Ω regresses at the ecliptic precession rate of −H/5 ≈ 67,063 years (Earth's *inclination* itself oscillates on the H/3 ≈ 111,772-year ICRF perihelion cycle — these are two distinct angles evolving at different rates).
+The crossing dates shift as Earth's ascending node circulates through 360°. Earth's Ω regresses at the ecliptic precession rate of −H/5 ≈ 67,063 years (Earth's *inclination* itself oscillates on the H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v-->-year ICRF perihelion cycle — these are two distinct angles evolving at different rates).
 
 ---
 
@@ -261,7 +261,7 @@ L_z = L × (-sin(i) × cos(Ω))
 | Parameter | Value |
 |-----------|-------|
 | Inclination to ecliptic (J2000) | 1°34'43.3" = **1.5787°** |
-| Ascending node on ecliptic | 107°34'56" = **107.582°** |
+| Ascending node on ecliptic | 107°34'56" = **<!--v:invPlaneAscNode-->107.582<!--/v-->°** |
 
 ### Important: Two Different Reference Frames
 

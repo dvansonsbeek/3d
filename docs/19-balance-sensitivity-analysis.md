@@ -1,13 +1,13 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
 # Doc 19 — Dual-Balance Sensitivity Analysis
 
-> **Scope.** The Holistic-Universe model's eight-planet dual balance closes to 99.997% on Law 3 (inclination) and 99.862% on Law 5 (eccentricity) using phase-derived base eccentricities ([doc 10](10-fibonacci-laws.md)). The remaining 0.14% eccentricity-balance gap is small but real. This document decomposes that gap into per-planet contributions (§2), computes single-parameter sensitivities Δm/m, Δa/a, Δe/e per planet (§3), and shows that the gap cannot be attributed to any single observed planetary parameter being mis-measured — the required shifts are 4–6 orders of magnitude larger than the precision of DE440 masses and JPL orbital periods (§4). §5 then extends the framework's own Law 4 to external bodies, showing that **every body following Law 4 contributes a uniform `v = K · sin(tilt) ≈ 1.7 × 10⁻⁶` to the balance equation** — independent of mass and distance, because the huge `a^(3/2)` factor cancels with the tiny Law-4-predicted eccentricity amplitude. Random ± aggregation across N ≈ 625 such bodies gives σ ≈ 4.3 × 10⁻⁵, matching the framework's observed residual. **Per [doc 27](27-law4-tno-obliquity-predictions.md), the relevant population is the sub-200-km low-`e` classical-belt KBOs (the Law-4-admissible regime); large named TNOs (Pluto, Eris, Haumea, ...) are *not* part of the N = 625 because their externally-forced `e_amp` values give individual `v` contributions ~10–40× larger than K · sin(tilt).** §6 uses this result to derive the principled Law 5 threshold at 99.862% — exactly the framework's current achievement — analogous to Law 3's Li-2019-derived 99.994%, and distinguishes it from the looser 99% screening filter used in `balance-search.js`. Reproducible via [`tools/verify/dual-balance-optimizer.js`](../tools/verify/dual-balance-optimizer.js) and [`scripts/tno_balance_test.py`](../scripts/tno_balance_test.py).
+> **Scope.** The Holistic-Universe model's eight-planet dual balance closes to 99.997% on Law 3 (inclination) and 99.862% on Law 5 (eccentricity) using phase-derived base eccentricities ([doc 10](10-fibonacci-laws.md)). The remaining 0.14% eccentricity-balance gap is small but real. This document decomposes that gap into per-planet contributions (§2), computes single-parameter sensitivities Δm/m, Δa/a, Δe/e per planet (§3), and shows that the gap cannot be attributed to any single observed planetary parameter being mis-measured — the required shifts are 4–6 orders of magnitude larger than the precision of DE440 masses and JPL orbital periods (§4). §5 then extends the framework's own Law 4 to external bodies, showing that **every body following Law 4 contributes a uniform `v = K · sin(tilt) ≈ 1.7 × 10⁻⁶` to the balance equation** — independent of mass and distance, because the huge `a^(3/2)` factor cancels with the tiny Law-4-predicted eccentricity amplitude. Random ± aggregation across N ≈ 625 such bodies gives σ ≈ 4.3 × 10⁻⁵, matching the framework's observed residual. **Per [doc 27](27-law4-tno-obliquity-predictions.md), the relevant population is the sub-200-km low-`e` classical-belt KBOs (the Law-4-admissible regime); large named TNOs (Pluto, Eris, Haumea, ...) are *not* part of the N = 625 because their externally-forced `e_amp` values give individual `v` contributions ~10–40× larger than K · sin(tilt).** §6 uses this result to derive the principled Law 5 threshold at 99.862% — exactly the framework's current achievement — analogous to Law 3's Li-2019-derived <!--v:balanceThreshold-->99.994%<!--/v-->, and distinguishes it from the looser 99% screening filter used in `balance-search.js`. Reproducible via [`tools/verify/dual-balance-optimizer.js`](../tools/verify/dual-balance-optimizer.js) and [`scripts/tno_balance_test.py`](../scripts/tno_balance_test.py).
 
 > **Scope note (ESSRT).** The dual-balance laws (Law 3 vector inclination + Law 5 scalar eccentricity), per-planet sensitivities (Δm/m, Δa/a, Δe/e), and the Law-4 extension to external bodies are scale-invariant — they hold at any epoch. K, the per-planet v contributions, and the DE440/JPL planet parameters used here are J2000-anchored snapshots. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), but the balance-gap analysis (0.14% residual) is structural and epoch-invariant — the σ ≈ 4.3 × 10⁻⁵ external-body aggregation result holds at any epoch with epoch-consistent inputs.
 
@@ -213,11 +213,11 @@ This means the assumption **fails individually for resonant/scattered bodies** (
 
 ## 6. Setting a principled Law 5 threshold
 
-### 6.1 How Law 3's 99.994% threshold was derived
+### 6.1 How Law 3's <!--v:balanceThreshold-->99.994%<!--/v--> threshold was derived
 
-The Law 3 threshold sits at 99.994% — i.e. configurations are accepted if their inclination balance is ≥ 99.994%. The number is not arbitrary: it is set by the *measured* external-body contribution to the invariable plane.
+The Law 3 threshold sits at <!--v:balanceThreshold-->99.994%<!--/v--> — i.e. configurations are accepted if their inclination balance is ≥ <!--v:balanceThreshold-->99.994%<!--/v-->. The number is not arbitrary: it is set by the *measured* external-body contribution to the invariable plane.
 
-**Li, Xia & Zhou 2019** ([arXiv:1909.11293](https://arxiv.org/abs/1909.11293)) integrated the Trans-Neptunian Object population to compute its net tilt of the invariable plane. They found **~1.25″** — equivalent to **0.006%** of the invariable-plane angle. Adding this to the 8-planet sum closes the inclination balance to exactly 100%; therefore an 8-planet-only framework should land at 100% − 0.006% = **99.994%**, and any configuration below that fails to leave room for the TNO contribution. The threshold is principled, externally derived, and falsifiable.
+**Li, Xia & Zhou 2019** ([arXiv:1909.11293](https://arxiv.org/abs/1909.11293)) integrated the Trans-Neptunian Object population to compute its net tilt of the invariable plane. They found **~1.25″** — equivalent to **0.006%** of the invariable-plane angle. Adding this to the 8-planet sum closes the inclination balance to exactly 100%; therefore an 8-planet-only framework should land at 100% − 0.006% = **<!--v:balanceThreshold-->99.994%<!--/v-->**, and any configuration below that fails to leave room for the TNO contribution. The threshold is principled, externally derived, and falsifiable.
 
 ### 6.2 The Law-5 analogue using Law-4 extension
 
@@ -274,7 +274,7 @@ The §6.2 analysis distinguishes two different thresholds that the framework's p
 
 | Quantity | Value | Notes |
 |---|---:|---|
-| Law 3 threshold (Li 2019 derivation) | 99.994% | TNO-margin derived |
+| Law 3 threshold (Li 2019 derivation) | <!--v:balanceThreshold-->99.994%<!--/v--> | TNO-margin derived |
 | **Law 5 scientific bound (Law-4 extension, calibrated)** | **99.862%** | **derived in §6.2** |
 | Law 5 current achievement (8 planets) | 99.862% | passes by construction ✓ |
 | balance-search.js search filter | 99.000% | screening filter (not the scientific bound) |
@@ -323,7 +323,7 @@ The sensitivity table in §3 should be read as a **diagnostic tool**, not as a l
 
 - **The Δm/m and Δa/a columns** are sensitivity readings. They quantify how *unlikely* it is that the gap is due to mis-measured masses or orbits: the required shifts are 4–6 orders of magnitude larger than DE440 / JPL precision. This is itself an important result — it formally rules out the simplest "the masses are slightly wrong" explanation.
 
-- **The implication** is that the gap is not in the planets; it is in what's missing from the eight-planet sum. §5 shows the gap is quantitatively consistent with random ± contributions from ~625 minor bodies (calibrated N) under the framework's own Law 4 extension. §6 derives the corresponding principled threshold at 99.862% — equal to the framework's current achievement by construction — analogous to Law 3's Li-2019-derived 99.994%. The 99% filter in `balance-search.js` is a separate screening tool, not the scientific bound (§6.3).
+- **The implication** is that the gap is not in the planets; it is in what's missing from the eight-planet sum. §5 shows the gap is quantitatively consistent with random ± contributions from ~625 minor bodies (calibrated N) under the framework's own Law 4 extension. §6 derives the corresponding principled threshold at 99.862% — equal to the framework's current achievement by construction — analogous to Law 3's Li-2019-derived <!--v:balanceThreshold-->99.994%<!--/v-->. The 99% filter in `balance-search.js` is a separate screening tool, not the scientific bound (§6.3).
 
 ---
 

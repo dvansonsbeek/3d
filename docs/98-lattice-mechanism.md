@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -10,7 +10,7 @@ status: current
 ## Status
 Active research.
 
-> **Scope note (ESSRT).** This document is one of the foundational ESSRT-mechanism research docs — it asks *why* the 8H/L1 lattice exists as a real spectral structure, and discusses deep-time consequences directly: H(t) evolution under tidal LOD growth, the k-involving vs pure-orbital beat asymmetry, integer-label invariance vs period rescaling, the Snowball-Earth thermal-tide-lock break ~600 Ma as the one regime change between Precambrian and current dynamics. The literal values H = 335,317 yr and 8H = 2,682,536 yr in this doc are J2000-anchored; the deep-time scaling rule is given by [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) (Farhat 2022 polynomial + angular-momentum conservation), and the empirical 50-Myr test is in [doc 97 §4 Test C-50](97-paleo-ecs-decomposition.md). Findings here that the integer structure is *invariant* under H(t) drift but k-involving period labels *track* LOD evolution are themselves part of the ESSRT framework.
+> **Scope note (ESSRT).** This document is one of the foundational ESSRT-mechanism research docs — it asks *why* the 8H/L1 lattice exists as a real spectral structure, and discusses deep-time consequences directly: H(t) evolution under tidal LOD growth, the k-involving vs pure-orbital beat asymmetry, integer-label invariance vs period rescaling, the Snowball-Earth thermal-tide-lock break ~600 Ma as the one regime change between Precambrian and current dynamics. The literal values H = <!--v:H-->335,317<!--/v--> yr and 8H = <!--v:eightH-->2,682,536<!--/v--> yr in this doc are J2000-anchored; the deep-time scaling rule is given by [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) (Farhat 2022 polynomial + angular-momentum conservation), and the empirical 50-Myr test is in [doc 97 §4 Test C-50](97-paleo-ecs-decomposition.md). Findings here that the integer structure is *invariant* under H(t) drift but k-involving period labels *track* LOD evolution are themselves part of the ESSRT framework.
 
 ## Why this doc exists
 
@@ -301,7 +301,7 @@ breaks the periodicity.
 
 **Strongly supported, for the obliquity sector.** The mechanism behind
 the 8H lattice IS action-angle closure: the secular system has a
-closed-orbit period of 8H = 2,682,536 yr (at J2000) in the obliquity sector, and
+closed-orbit period of 8H = <!--v:eightH-->2,682,536<!--/v--> yr (at J2000) in the obliquity sector, and
 the eigenfrequencies are commensurate at that period.
 
 This **directly explains the integer-divisor structure of L1**:
@@ -323,7 +323,7 @@ Hamiltonian.
 
 | Question | Status after Exp A |
 |:---|:---|
-| Why 8H specifically (vs. some other period)? | Still open — the *value* 2,682,536 yr must be derivable from solar-system parameters but we haven't shown how |
+| Why 8H specifically (vs. some other period)? | Still open — the *value* <!--v:eightH-->2,682,536<!--/v--> yr must be derivable from solar-system parameters but we haven't shown how |
 | Why L1 selects 32 specific integers from the broader integer divisor set | Still open — the obliquity spectrum has peaks at 66, 67, 68, 69, 70 (all integer divisors) but L1 only includes 66, 68 — climate-activity selection criterion needed |
 | Why obliquity is 100% on lattice but eccentricity is only 74% | Resolved — Mercury chaos breaks closure for eccentricity but not for obliquity (consistent with Laskar 1989/1994 inner-planet chaos restricted to eccentricity) |
 | Does this generalize to other planetary systems? | Open — Experiment D (exoplanet survey) would test |
@@ -358,7 +358,7 @@ Output: `data/action-closure.json`.
 The mechanism for the 8H period is identified. The remaining open
 questions are:
 
-1. **Why specifically 2,682,536 yr?** This number must be derivable
+1. **Why specifically <!--v:eightH-->2,682,536<!--/v--> yr?** This number must be derivable
    from solar-system masses and semi-major axes. A first-principles
    derivation of 8H from Laplace-Lagrange secular theory would close
    the loop.
@@ -465,7 +465,7 @@ the unique global minimum.** The framework's choice of 8H is
 defensible — it gives clean low-integer alignment of the obliquity
 spectrum at n = 65-70 — but it is not forced by the data alone.
 
-A more complete answer to "why 2,682,536 yr?" likely requires
+A more complete answer to "why <!--v:eightH-->2,682,536<!--/v--> yr?" likely requires
 **first-principles derivation from solar-system masses and semi-major
 axes via the Laplace-Lagrange secular matrix**. The empirical
 commensurability test confirms 8H is in the natural-period neighborhood
@@ -520,7 +520,7 @@ of H. This validates the framework's "Solar System Resonance Cycle"
 definition at the strongest possible level given the H choice.
 
 (2) The runner-up is 23 × H = 7.712 Myr. **The number 23 is also a
-prime factor of H itself** (H = 23 × 61 × 239), and 23 appears as
+prime factor of H itself** (H = <!--v:holisticYearFactors-->23 × 61 × 239<!--/v-->), and 23 appears as
 `stepYears = 23` elsewhere in the framework. So 23H = 23² × 61 × 239
 has additional structural meaning. The framework's structural use of
 23 is independently corroborated by the commensurability optimum.
@@ -695,7 +695,7 @@ so, when did the transition happen?
 
 ### The structural relation: H = 13 × precession period
 
-The framework's H = 335,317 yr (at J2000) satisfies H ≈ 13 × 25,771 yr = 335,023 yr
+The framework's H = <!--v:H-->335,317<!--/v--> yr (at J2000) satisfies H ≈ 13 × <!--v:axialPrecJ2000-->25,771<!--/v--> yr = 335,023 yr
 (Earth's modern precession period times Fibonacci F₇ = 13), matching
 to 0.09%. This is almost certainly the structural definition: H is
 *tied to Earth's precession period via the Fibonacci coupling integer
@@ -703,7 +703,7 @@ to 0.09%. This is almost certainly the structural definition: H is
 
 **Crucial consequence:** Earth's precession period depends on LOD
 (k ∝ ω = 2π/LOD). As LOD has evolved over geological time, H must
-have evolved with it. The "8H = 2,682,536 yr" we observe is *the
+have evolved with it. The "8H = <!--v:eightH-->2,682,536<!--/v--> yr" we observe is *the
 configuration as of now*. In the past, the equivalent closure period
 was different.
 
@@ -786,7 +786,7 @@ The framework's invariants are:
 3. The closure of the 8H lattice (with appropriate paleo-correction)
 
 The framework's epoch-dependent quantities:
-1. The specific value of H (335,317 yr now, was ~309,000 yr in Devonian under the proper-physics two-layer formula — see doc 99 § "Proper-physics LOD formula")
+1. The specific value of H (<!--v:H-->335,317<!--/v--> yr now, was ~309,000 yr in Devonian under the proper-physics two-layer formula — see doc 99 § "Proper-physics LOD formula")
 2. The specific value of 8H (2.68 Myr now, was 2.47 Myr in Devonian)
 3. The specific L1 integer labels (n=65 for obliquity main now, n=68
    in Devonian — i.e., the obliquity period shifts to a different lattice integer at deep time)

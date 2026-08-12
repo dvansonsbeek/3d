@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -46,7 +46,7 @@ structure in the residual after GIA correction is captured by the
 framework-native 4-flag 8H-lattice stack — a millennial-scale
 lattice-harmonic decomposition (Bond 8H/1830 = 1466 yr = 74 × J-S synodic,
 gcd=61, dominant) whose periods are zero-fit structural predictions of the
-Earth Fundamental Cycle H = 335,317 yr framework.
+Earth Fundamental Cycle H = <!--v:H-->335,317<!--/v--> yr framework.
 
 ---
 

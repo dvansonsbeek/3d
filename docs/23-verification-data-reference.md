@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -205,7 +205,7 @@ Each verification entry has the following structure:
 
 ### Pluto, Halley's Comet, Eros (1 entry each)
 
-**Data Type:** Model start date position only (JD 2451716.5 = 21 June 2000)
+**Data Type:** Model start date position only (JD <!--v:startModelJD-->2,451,716.5<!--/v--> = 21 June 2000)
 
 **Purpose:** Baseline position verification at simulation start.
 

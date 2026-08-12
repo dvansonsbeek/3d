@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -12,7 +12,7 @@ This document describes how planetary orbital inclinations are calculated in the
 1. **Inclination to the Invariable Plane** - How much each planet's orbital plane tilts relative to the solar system's fundamental reference plane (oscillates over time)
 2. **Inclination to the Ecliptic** - How much each planet's orbital plane tilts relative to Earth's orbital plane (changes as both planes move)
 
-> **Scope note (ESSRT).** The inclination oscillation formula (`i(t) = mean + amplitude × cos(ω̃_ICRF(t) − cycleAnchor)`) and the two-normal dot product for ecliptic inclination are scale-invariant. Period denominators are written as Fibonacci divisors (H/3, H/5, H/13, H/16, 8H/N) that stay constant at any epoch. Literal year-count values shown in the ICRF period and Ω regression tables, balanced-year anchors (-2,649,854 BC), the Earth inclination range (0.85°–2.12°), and the J2000 calibration constants are all J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), which scales every literal year count proportionally while leaving the divisor structure intact.
+> **Scope note (ESSRT).** The inclination oscillation formula (`i(t) = mean + amplitude × cos(ω̃_ICRF(t) − cycleAnchor)`) and the two-normal dot product for ecliptic inclination are scale-invariant. Period denominators are written as Fibonacci divisors (H/3, H/5, H/13, H/16, 8H/N) that stay constant at any epoch. Literal year-count values shown in the ICRF period and Ω regression tables, balanced-year anchors (-<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->), the Earth inclination range (0.85°–2.12°), and the J2000 calibration constants are all J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), which scales every literal year count proportionally while leaving the divisor structure intact.
 
 ---
 
@@ -83,20 +83,20 @@ Each planet's inclination cycle anchor is the ICRF perihelion longitude where th
 
 | Planet | Cycle Anchor | Balance Group | n | Balanced Year | ICRF Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|----------|-------------|----------------|----------------------|
-| Mercury | 234.52° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
-| Venus | 218.64° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
-| Earth | 21.77° | In-phase | n=0 (locked) | -302,635 | Prograde | Decreasing |
-| Mars | 236.07° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
-| Jupiter | 287.06° | In-phase | n=7 (= n=0)* | -2,649,854 | Retrograde | Decreasing |
-| **Saturn** | **116.26°** | **Anti-phase** | n=7 (= n=0)* | -2,649,854 | **Retrograde** | **Increasing** |
+| Mercury | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Venus | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Earth | 21.77° | In-phase | n=0 (locked) | <!--v:balancedYear-->-302,635<!--/v--> | Prograde | Decreasing |
+| Mars | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Jupiter | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | In-phase | n=7 (= n=0)* | -2,649,854 | Retrograde | Decreasing |
+| **Saturn** | **<!--v:saturnInclCycleAnchor-->116.26<!--/v-->°** | **Anti-phase** | n=7 (= n=0)* | -2,649,854 | **Retrograde** | **Increasing** |
 | Uranus | 21.33° | In-phase | n=7 (= n=0)* | -2,649,854 | Retrograde | Decreasing |
-| Neptune | 174.04° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
-| Pluto | 203.32° | — | — | — | Retrograde | — |
+| Neptune | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Pluto | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | — | — | — | Retrograde | — |
 
 \* Jupiter, Saturn, and Uranus have ICRF perihelion periods that divide H exactly, so their phase at n=7 coincides numerically with their phase at n=0. The conceptual anchor is still n=7 — the oldest balanced year of the current 8H octave.
 
 **Key insights**:
-- All seven fitted planets share the same balanced-year anchor (n=7, ≈ -2,649,854 BC = the **start of the current Solar System Resonance Cycle**).
+- All seven fitted planets share the same balanced-year anchor (n=7, ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v--> = the **start of the current Solar System Resonance Cycle**).
 - Earth's cycle anchor is set independently from the IAU obliquity model and is locked to the n=0 reference; this is consistent with n=7 because Earth's H/3 ICRF return divides 8H seven times.
 - Balance groups are determined by the **invariable plane balance condition**: Σ(in-phase) w = Σ(anti-phase) w (Law 3, scalar form).
 - Saturn is **anti-phase**: its inclination is at MAX at n=7 while all other planets are at MIN.
@@ -153,12 +153,12 @@ The inclination oscillation period equals the absolute ICRF perihelion period fo
 
 | Planet | Ecliptic Period | ICRF Period | ICRF Direction |
 |--------|----------------|-------------|----------------|
-| Mercury | `H × 8/11` | `8H/93` ≈ 28,844 yr | Retrograde |
+| Mercury | `H × 8/11` | `8H/93` ≈ <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr | Retrograde |
 | Venus | `−8H/6` | `8H/110` ≈ 24,387 yr | Retrograde |
-| Earth | `H / 3` | `H/3` ≈ 111,772 yr | Prograde (sole) |
-| Mars | `H × 8/36` | `8H/68` ≈ 39,449 yr | Retrograde |
+| Earth | `H / 3` | `H/3` ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | Prograde (sole) |
+| Mars | `H × 8/36` | `8H/68` ≈ <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr | Retrograde |
 | Jupiter | `8H/39` | `8H/65` ≈ 41,270 yr | Retrograde |
-| Saturn | `−8H/65` | `8H/169` ≈ 15,873 yr | Retrograde |
+| Saturn | `−8H/65` | `8H/169` ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr | Retrograde |
 | Uranus | `H / 3` | `H/16` ≈ 20,957 yr | Retrograde |
 | Neptune | `H × 2` | `2H/25` ≈ 26,825 yr | Retrograde |
 | Pluto | `H` | `H/14` ≈ 23,951 yr | Retrograde |
@@ -167,7 +167,7 @@ For computed period values, see [Constants Reference](20-constants-reference.md)
 
 ### Solar System Resonance Cycle (8H)
 
-All ICRF perihelion periods divide evenly into 8H = 2,682,536 years at J2000 (the "Solar System Resonance Cycle"), ensuring all 8 planets return simultaneously to their balanced-year configuration. This is a structural consequence of the Fibonacci period ratios.
+All ICRF perihelion periods divide evenly into 8H = <!--v:eightH-->2,682,536<!--/v--> years at J2000 (the "Solar System Resonance Cycle"), ensuring all 8 planets return simultaneously to their balanced-year configuration. This is a structural consequence of the Fibonacci period ratios.
 
 ---
 
@@ -225,13 +225,13 @@ Both Earth's and each planet's ascending node on the invariable plane evolve lin
 | Body | N | Ω period (yr) | Notes |
 |------|---|---------------|-------|
 | Earth | 40 | −H/5 ≈ −67,063 | Ecliptic precession rate (= −(8H)/40) |
-| Mercury | 9 | −298,060 | |
-| Venus | 1 | −2,682,536 (= −8H, at J2000) | Full Solar System Resonance Cycle |
+| Mercury | 9 | −<!--v:mercuryAxialPeriod-->298,060<!--/v--> | |
+| Venus | 1 | −<!--v:eightH-->2,682,536<!--/v--> (= −8H, at J2000) | Full Solar System Resonance Cycle |
 | Mars | 64 | −41,915 | |
-| Jupiter | 36 | −74,515 | Shared with Saturn (J+S lockstep) |
-| Saturn | 36 | −74,515 | Shared with Jupiter |
-| Uranus | 11 | −243,867 | |
-| Neptune | 3 | −894,179 | |
+| Jupiter | 36 | −<!--v:marsPeriPeriod-->74,515<!--/v--> | Shared with Saturn (J+S lockstep) |
+| Saturn | 36 | −<!--v:marsPeriPeriod-->74,515<!--/v--> | Shared with Jupiter |
+| Uranus | 11 | −<!--v:mercuryPeriPeriod-->243,867<!--/v--> | |
+| Neptune | 3 | −<!--v:mercuryObliqCycle-->894,179<!--/v--> | |
 
 The integers were chosen to fit JPL ecliptic-inclination trends to <2″/century each in the J2000-fixed frame. Jupiter and Saturn share N=36 because the gas-giant pair's invariable-plane balance requires their nodes to regress in lockstep. See [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) for the full derivation.
 
@@ -364,7 +364,7 @@ The model needs to produce exact J2000 ecliptic inclinations while using a physi
 
 For each planet, the ascending node is adjusted so that at J2000:
 - Using dynamic Earth inclination (~1.578°)
-- Using Earth's ascending node (284.51° - Souami & Souchay 2012)
+- Using Earth's ascending node (<!--v:earthAscNodeJ2000-->284.51<!--/v-->° - Souami & Souchay 2012)
 - The calculated ecliptic inclination matches the J2000 reference
 
 The mathematical solution:
@@ -390,7 +390,7 @@ Where:
 
 ### Verified Ascending Node Values (J2000 starting points)
 
-The values in the table below are the **J2000 starting points** for each planet's ascending node on the invariable plane. They were originally calibrated to reproduce the JPL J2000 ecliptic inclination given Earth's reference Ω of 284.51°. In the current model these starting values are paired with the linear precession rate `−(8H)/N` from the table above (and `−H/5` for Earth) — so Ω(t) = Ω_J2000 + (360 / period) · (t − 2000), and the J2000 ecliptic inclinations remain matched to within ~10⁻⁵°.
+The values in the table below are the **J2000 starting points** for each planet's ascending node on the invariable plane. They were originally calibrated to reproduce the JPL J2000 ecliptic inclination given Earth's reference Ω of <!--v:earthAscNodeJ2000-->284.51<!--/v-->°. In the current model these starting values are paired with the linear precession rate `−(8H)/N` from the table above (and `−H/5` for Earth) — so Ω(t) = Ω_J2000 + (360 / period) · (t − 2000), and the J2000 ecliptic inclinations remain matched to within ~10⁻⁵°.
 
 Values calibrated with `earthAscendingNodeInvPlaneVerified = 284.51°` (Souami & Souchay 2012):
 
@@ -398,17 +398,17 @@ Values calibrated with `earthAscendingNodeInvPlaneVerified = 284.51°` (Souami &
 |--------|---------------|--------------------|-----------|
 | Mercury | 32.22 | 32.83 | +0.61° |
 | Venus | 52.31 | 54.70 | +2.39° |
-| Earth | 284.51 | 284.51 | 0.00° |
-| Mars | 352.95 | 354.87 | +1.92° |
-| Jupiter | 306.92 | 312.89 | +5.97° |
-| Saturn | 122.27 | 118.81 | -3.46° |
-| Uranus | 308.44 | 307.80 | -0.64° |
-| Neptune | 189.28 | 192.04 | +2.76° |
-| Pluto | 107.06 | 101.06 | -6.00° |
+| Earth | <!--v:earthAscNodeJ2000-->284.51<!--/v--> | <!--v:earthAscNodeJ2000-->284.51<!--/v--> | 0.00° |
+| Mars | <!--v:marsOmegaSS-->352.95<!--/v--> | <!--v:marsOmegaJ2000-->354.87<!--/v--> | +1.92° |
+| Jupiter | <!--v:jupiterOmegaSS-->306.92<!--/v--> | <!--v:jupiterOmegaJ2000-->312.89<!--/v--> | +5.97° |
+| Saturn | <!--v:saturnOmegaSS-->122.27<!--/v--> | <!--v:saturnOmegaJ2000-->118.81<!--/v--> | -3.46° |
+| Uranus | <!--v:uranusOmegaSS-->308.44<!--/v--> | <!--v:uranusOmegaJ2000-->307.80<!--/v--> | -0.64° |
+| Neptune | <!--v:neptuneOmegaSS-->189.28<!--/v--> | <!--v:neptuneOmegaJ2000-->192.04<!--/v--> | +2.76° |
+| Pluto | 107.06 | <!--v:plutoOmegaJ2000-->101.06<!--/v--> | -6.00° |
 
 ### Earth's Ascending Node
 
-The value 284.51° for `earthAscendingNodeInvPlaneVerified` is the original Souami & Souchay (2012) value for Earth's ascending node on the invariable plane at J2000.
+The value <!--v:earthAscNodeJ2000-->284.51<!--/v-->° for `earthAscendingNodeInvPlaneVerified` is the original Souami & Souchay (2012) value for Earth's ascending node on the invariable plane at J2000.
 
 ---
 
@@ -468,7 +468,7 @@ The displayed error simplifies to `|trend_J2000_fixed − JPL_catalog|` — a di
 
 #### Why the frame correction is large
 
-Earth's orbital plane precesses around the invariable plane at -H/5 (~67,063 yr). This ecliptic precession shifts the reference plane by ~0.01°/cy — large enough to flip the apparent sign of the inclination trend for most planets. For example, Mercury's inclination is *increasing* in the moving frame (+0.00488°/cy) but *decreasing* in the J2000-fixed frame (-0.00605°/cy), because the ecliptic is tilting away from Mercury's orbit faster than Mercury's orbit converges toward it.
+Earth's orbital plane precesses around the invariable plane at -H/5 (<!--v:eclPrecYears-->~67,063<!--/v--> yr). This ecliptic precession shifts the reference plane by ~0.01°/cy — large enough to flip the apparent sign of the inclination trend for most planets. For example, Mercury's inclination is *increasing* in the moving frame (+0.00488°/cy) but *decreasing* in the J2000-fixed frame (-0.00605°/cy), because the ecliptic is tilting away from Mercury's orbit faster than Mercury's orbit converges toward it.
 
 #### Why only inclination needs a frame correction
 

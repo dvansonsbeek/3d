@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -9,7 +9,7 @@ status: current
 
 **Status**: Complete (dynamic implementation, sensitivity analysis done)
 
-> **Scope note (ESSRT).** The Type II hybrid formula (`eo = eccDist/2 − eo_geocentric/2`), the dynamic-geocentric update, and the `e/(1+e)` derivation are scale-invariant. The perihelion-period denominators (`H/(4+3/8)`, `H × 8/36`) stay constant at any epoch. Literal J2000-anchored values (H = 335,317 in the §"Perihelion precession" prose, the balanced year n=7 ≈ -2,649,854 BC, `solarYearCount` = 178,289, `perihelionRef_JD` = 2456505.6, and the JPL 2000-2200 + Tycho 1582-1600 calibration baselines) reflect the present epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally. The Mars implementation this document describes is the J2000 snapshot of an underlying scale-invariant structure.
+> **Scope note (ESSRT).** The Type II hybrid formula (`eo = eccDist/2 − eo_geocentric/2`), the dynamic-geocentric update, and the `e/(1+e)` derivation are scale-invariant. The perihelion-period denominators (`H/(4+3/8)`, `H × 8/36`) stay constant at any epoch. Literal J2000-anchored values (H = <!--v:H-->335,317<!--/v--> in the §"Perihelion precession" prose, the balanced year n=7 ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, `solarYearCount` = 178,289, `perihelionRef_JD` = 2456505.6, and the JPL 2000-2200 + Tycho 1582-1600 calibration baselines) reflect the present epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally. The Mars implementation this document describes is the J2000 snapshot of an underlying scale-invariant structure.
 
 ---
 
@@ -70,8 +70,8 @@ eo = (e_Mars * d * 100) / 2  -  (2 * e_Earth * 100 * sin(delta_omega)) / 2
 
 Where:
 - `e_Mars` = Mars orbital eccentricity (0.09146580)
-- `d` = Mars orbit distance in AU (1.5237, from Kepler's 3rd law)
-- `e_Earth` = Earth's orbital eccentricity (0.01671022)
+- `d` = Mars orbit distance in AU (<!--v:marsSemiMajor-->1.5237<!--/v-->, from Kepler's 3rd law)
+- `e_Earth` = Earth's orbital eccentricity (<!--v:j2000Eccentricity-->0.01671022<!--/v-->)
 - `delta_omega` = angle between Earth's and Mars's ecliptic perihelion
   longitudes (precesses over time)
 - `100` = scale factor (1 AU = 100 scene units)
@@ -379,11 +379,11 @@ best tradeoff.
 | Parameter                 | Current    | Best Tycho | Tycho at best | JPL at best | Leverage |
 |---------------------------|------------|------------|---------------|-------------|----------|
 | **angleCorrection**       | -2.107     | -4.0       | 0.90 deg      | 0.78 deg    | High     |
-| **longitudePerihelion**   | 336.065    | 330.0      | 0.78 deg      | 0.93 deg    | High     |
-| **orbitalEccentricityBase**   | 0.09339    | 0.110      | 0.80 deg      | 0.90 deg    | High     |
+| **longitudePerihelion**   | <!--v:marsPeriLongJ2000-->336.065<!--/v-->    | 330.0      | 0.78 deg      | 0.93 deg    | High     |
+| **orbitalEccentricityBase**   | <!--v:marsEccJ2000-->0.09339<!--/v-->    | 0.110      | 0.80 deg      | 0.90 deg    | High     |
 | solarYearInput            | 686.931    | 686.942    | 1.08 deg      | 0.87 deg    | Moderate |
 | ascendingNode             | 49.557     | 55.0       | 1.11 deg      | 0.69 deg    | Low      |
-| inclinationCycleAnchor    | 236.07     | 100.0      | 1.15 deg      | 0.79 deg    | Minimal  |
+| inclinationCycleAnchor    | <!--v:marsInclCycleAnchor-->236.07<!--/v-->     | 100.0      | 1.15 deg      | 0.79 deg    | Minimal  |
 | eclipticInclinationJ2000  | 1.850      | (no effect)| 1.20 deg      | 0.78 deg    | None     |
 
 Three parameters have strong leverage on Tycho Dec: `angleCorrection`,
@@ -420,14 +420,14 @@ best combined Tycho + JPL Dec configuration:
 
 | Configuration | angleCorr | longPeri | ecc    | Tycho Dec | JPL Dec  | Combined |
 |---------------|-----------|----------|--------|-----------|----------|----------|
-| Current       | -2.107    | 336.065  | 0.0934 | 1.20 deg  | 0.78 deg | 1.43 deg  |
+| Current       | -2.107    | <!--v:marsPeriLongJ2000-->336.065<!--/v-->  | 0.0934 | 1.20 deg  | 0.78 deg | 1.43 deg  |
 | **Best comb.**| **-4.5**  | **336**  | **0.10**| **0.69 deg** | **0.76 deg** | **1.03 deg** |
 
 The best combined configuration:
 - Improves Tycho Dec by **42%** (1.20 deg -> 0.69 deg)
 - Improves JPL Dec by **3%** (0.78 deg -> 0.76 deg)
 - Reduces combined metric by **28%** (1.43 deg -> 1.03 deg)
-- Barely changes `longitudePerihelion` (336.065 -> 336)
+- Barely changes `longitudePerihelion` (<!--v:marsPeriLongJ2000-->336.065<!--/v--> -> 336)
 - The two effective changes are `angleCorrection` (-2.1 -> -4.5) and
   `orbitalEccentricityBase` (0.0934 -> 0.10)
 
@@ -502,7 +502,7 @@ eo = 2 * 0.01671022 * 100 * sin(omega_Earth - omega_planet)
 ```
 
 Where:
-- `e_Earth` = 0.01671022 (Earth's orbital eccentricity)
+- `e_Earth` = <!--v:j2000Eccentricity-->0.01671022<!--/v--> (Earth's orbital eccentricity)
 - `omega_Earth` = ~102.9 deg (Earth's ecliptic longitude of perihelion)
 - `omega_planet` = planet's ecliptic longitude of perihelion (precesses)
 - The factor of 2 arises because the off-center orbit geometry provides

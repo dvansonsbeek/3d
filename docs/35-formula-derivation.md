@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -11,7 +11,7 @@ This document explains **how the planetary precession formulas were derived** �
 
 > **Purpose of this document**: Understanding *why* the formulas work, not just *how* to use them. This is valuable for researchers who want to verify, extend, or critique the model.
 
-> **Scope note (ESSRT).** This document derives planetary precession formulas using period divisors of the form H/F (Fibonacci anchors) and 8H/N (lattice-secular periods). **The divisor structure (3, 5, 8, 13, 21, 34, 39, 65, 169, …) is scale-invariant** and the same at any epoch. Literal year values quoted throughout (Fibonacci hierarchy table, obliquity-cycle table, 41,270 yr / 68,783 yr / 670,634 yr / 894,179 yr / etc.) are J2000-evaluated; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling every literal year count proportionally. §13.1 of this doc already notes that "all derived periods scale with H."
+> **Scope note (ESSRT).** This document derives planetary precession formulas using period divisors of the form H/F (Fibonacci anchors) and 8H/N (lattice-secular periods). **The divisor structure (3, 5, 8, 13, 21, 34, 39, 65, 169, …) is scale-invariant** and the same at any epoch. Literal year values quoted throughout (Fibonacci hierarchy table, obliquity-cycle table, 41,270 yr / <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr / <!--v:twoH-->670,634<!--/v--> yr / <!--v:mercuryObliqCycle-->894,179<!--/v--> yr / etc.) are J2000-evaluated; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling every literal year count proportionally. §13.1 of this doc already notes that "all derived periods scale with H."
 
 ### Quick Reference
 
@@ -55,10 +55,10 @@ This section documents the timescale hierarchy that forms Law 1 of the Fibonacci
 
 | Fibonacci | H/F | Period (years) | Earth's astronomical cycle |
 |-----------|-----|----------------|----------------------------|
-| 3 | H/3 | **111,772** | Inclination precession (ICRF perihelion) |
+| 3 | H/3 | **<!--v:earthPeriPeriodICRF-->111,772<!--/v-->** | Inclination precession (ICRF perihelion) |
 | 5 | H/5 | **67,063** | Ecliptic precession |
 | 8 | H/8 | **41,915** | Obliquity cycle |
-| 13 | H/13 | **25,794** | Axial precession |
+| 13 | H/13 | **<!--v:earthAxialPeriod-->25,794<!--/v-->** | Axial precession |
 | 21 | H/21 | **15,953** | Beat: axial + obliquity |
 | 34 | H/34 | **9,853** | Beat: axial + ecliptic |
 | 55 | H/55 | **6,091** | Higher-order resonance |
@@ -191,19 +191,19 @@ Where δ = θ_E − θ_M (relative angle) and σ = θ_E + θ_M (sum angle).
 
 > **Formula Type**: This section documents the **observed formula** (uses Excel data, 328 terms, R² = 0.999999, RMSE = 0.46″/cy). Venus also has a **predictive formula** (unified 429-term system, year-only input, R² = 0.999955, RMSE = 3.47″/cy).
 
-Venus presents a fundamentally different challenge than Mercury. With an eccentricity of only 0.00678 (compared to Mercury's 0.20564), Venus has a nearly circular orbit where geometric modulation effects are minimal. Instead, Venus's fluctuation is dominated by **variations in Earth's axial precession rate**.
+Venus presents a fundamentally different challenge than Mercury. With an eccentricity of only <!--v:venusEccJ2000-->0.00678<!--/v--> (compared to Mercury's <!--v:mercuryEccJ2000-->0.20564<!--/v-->), Venus has a nearly circular orbit where geometric modulation effects are minimal. Instead, Venus's fluctuation is dominated by **variations in Earth's axial precession rate**.
 
 ### 5.1 The Earth Rate Deviation Model
 
 The Venus formula is based on the physical principle that:
 
 1. **Perihelion points move at eccentricity distance** from orbit center
-   - Venus: e = 0.00678, so perihelion is only 0.0049 AU from center (poorly defined)
+   - Venus: e = <!--v:venusEccJ2000-->0.00678<!--/v-->, so perihelion is only 0.0049 AU from center (poorly defined)
    - Earth: e = 0.01671, so perihelion is 0.0167 AU from center
 
 2. **Earth's reference frame rotates** due to axial precession
    - Mean period: H/13 years
-   - Current period: ~25,771 years (varying with obliquity)
+   - Current period: <!--v:mainstreamAxialPrecExact-->~25,771<!--/v--> years (varying with obliquity)
 
 3. **Earth Rate Deviation (ERD)** captures this variation:
    ```
@@ -248,7 +248,7 @@ Where δ = θ_E − θ_V (relative angle between Earth and Venus perihelions).
 
 ## 6. Mars Formula: Coefficient Breakdown
 
-Mars presents a unique challenge among the terrestrial planets. With an eccentricity of 0.09339 (between Venus's near-circular orbit and Mercury's highly elliptical one), Mars shows moderate geometric modulation effects combined with strong coupling to Earth's orbital dynamics.
+Mars presents a unique challenge among the terrestrial planets. With an eccentricity of <!--v:marsEccJ2000-->0.09339<!--/v--> (between Venus's near-circular orbit and Mercury's highly elliptical one), Mars shows moderate geometric modulation effects combined with strong coupling to Earth's orbital dynamics.
 
 ### 6.1 Physical Driver
 
@@ -263,9 +263,9 @@ Mars's precession fluctuation is driven by:
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H×8/36 (~74,515 years) |
-| **Eccentricity** | 0.09339 |
-| **Formula R²** | **1.000000** |
+| **Perihelion period** | H×8/36 (~<!--v:marsPeriPeriod-->74,515<!--/v--> years) |
+| **Eccentricity** | <!--v:marsEccJ2000-->0.09339<!--/v--> |
+| **Formula R²** | **<!--v:saturnPredR2-->1.000000<!--/v-->** |
 | **RMSE** | 0.03 arcsec/century |
 | **Features** | 225 terms |
 
@@ -295,16 +295,16 @@ Jupiter's precession fluctuation is driven by:
 
 1. **Saturn resonance**: Jupiter and Saturn are locked in gravitational resonance
 2. **Earth's reference frame motion**: ERD effects still contribute
-3. **Fibonacci hierarchy**: Jupiter's Fibonacci anchor (H/5) is a key division; its 8H-lattice secular ecliptic-perihelion period is 8H/39 (~68,783 yr)
+3. **Fibonacci hierarchy**: Jupiter's Fibonacci anchor (H/5) is a key division; its 8H-lattice secular ecliptic-perihelion period is 8H/39 (~<!--v:jupiterPeriPeriod-->68,783<!--/v--> yr)
 4. **Long-term stability**: Jupiter's massive orbit shows slow, predictable precession
 
 ### 7.2 Formula Summary
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period (ecliptic)** | 8H/39 (~68,783 yr) |
+| **Perihelion period (ecliptic)** | 8H/39 (~<!--v:jupiterPeriPeriod-->68,783<!--/v--> yr) |
 | **Eccentricity** | 0.04839 |
-| **Formula R²** | **1.000000** |
+| **Formula R²** | **<!--v:saturnPredR2-->1.000000<!--/v-->** |
 | **RMSE** | 0.06 arcsec/century |
 | **Features** | 225 terms |
 
@@ -344,8 +344,8 @@ Saturn's precession fluctuation is driven by:
 | Property | Value |
 |----------|-------|
 | **Perihelion period (ecliptic)** | 8H/65 (~41,270 yr) — **ECLIPTIC-RETROGRADE** |
-| **Eccentricity** | 0.05386 |
-| **Formula R²** | **1.000000** |
+| **Eccentricity** | <!--v:saturnEccJ2000-->0.05386<!--/v--> |
+| **Formula R²** | **<!--v:saturnPredR2-->1.000000<!--/v-->** |
 | **RMSE** | 0.05 arcsec/century |
 | **Features** | 225 terms |
 
@@ -410,9 +410,9 @@ Uranus's precession fluctuation is driven by:
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H/3 (~111,772 years) |
-| **Eccentricity** | 0.04726 |
-| **Formula R²** | **1.000000** |
+| **Perihelion period** | H/3 (<!--v:inclPrecYears-->~111,772<!--/v--> years) |
+| **Eccentricity** | <!--v:uranusEccJ2000-->0.04726<!--/v--> |
+| **Formula R²** | **<!--v:saturnPredR2-->1.000000<!--/v-->** |
 | **RMSE** | 0.01 arcsec/century |
 | **Features** | 225 terms |
 
@@ -446,7 +446,7 @@ Neptune's precession fluctuation is driven by:
 | Property | Value |
 |----------|-------|
 | **Perihelion period** | H×2 (~670,634 years) |
-| **Eccentricity** | 0.00859 (nearly circular) |
+| **Eccentricity** | <!--v:neptuneEccJ2000-->0.00859<!--/v--> (nearly circular) |
 | **Formula R²** | **0.999999** |
 | **RMSE** | 0.02 arcsec/century |
 | **Features** | 225 terms |
@@ -489,8 +489,8 @@ A = Baseline × e_Mercury = 531.4 × 0.20564 ≈ 109 arcsec/century
 ```
 
 Where:
-- **Baseline** = 531.4 arcsec/century (Mercury's Newtonian precession rate = 1,296,000″ ÷ (H×8/11) × 100)
-- **e_Mercury** = 0.20564 (Mercury's orbital eccentricity)
+- **Baseline** = 531.4 arcsec/century (Mercury's Newtonian precession rate = <!--v:arcsecInCircle-->1,296,000<!--/v-->″ ÷ (H×8/11) × 100)
+- **e_Mercury** = <!--v:mercuryEccJ2000-->0.20564<!--/v--> (Mercury's orbital eccentricity)
 
 The actual coefficients in the formula are optimized jointly with ERD terms, resulting in values that differ from simple geometric predictions. The dominant cos(2θM) and eccentricity coupling terms reflect the complex interplay between geometric effects and Earth Rate Deviation.
 
@@ -504,7 +504,7 @@ The table below shows two sets of formula accuracy values:
 
 | Property | Mercury | Venus | Mars | Jupiter | Saturn | Uranus | Neptune |
 |----------|---------|-------|------|---------|--------|--------|---------|
-| Eccentricity | 0.20564 | 0.00678 | 0.09339 | 0.04839 | 0.05386 | 0.04726 | 0.00859 |
+| Eccentricity | <!--v:mercuryEccJ2000-->0.20564<!--/v--> | <!--v:venusEccJ2000-->0.00678<!--/v--> | <!--v:marsEccJ2000-->0.09339<!--/v--> | 0.04839 | <!--v:saturnEccJ2000-->0.05386<!--/v--> | <!--v:uranusEccJ2000-->0.04726<!--/v--> | <!--v:neptuneEccJ2000-->0.00859<!--/v--> |
 | Period | H×8/11 | −8H/6 | H×8/35 | H/5 | H/8 | H/3 | H×2 |
 
 ### Observed Formula Accuracy (using Excel data)
@@ -513,10 +513,10 @@ The table below shows two sets of formula accuracy values:
 |--------|-----|-------------|----------|
 | Mercury | 0.999994 | 0.22 | 225 |
 | Venus | **0.999999** | **0.46** | **328** |
-| Mars | 1.000000 | 0.03 | 225 |
-| Jupiter | 1.000000 | 0.06 | 225 |
-| Saturn | 1.000000 | 0.05 | 225 |
-| Uranus | 1.000000 | 0.01 | 225 |
+| Mars | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.03 | 225 |
+| Jupiter | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.06 | 225 |
+| Saturn | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.05 | 225 |
+| Uranus | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.01 | 225 |
 | Neptune | 0.999999 | 0.02 | 225 |
 
 ### Predictive Formula Accuracy (year-only input, unified 429-term system)
@@ -542,7 +542,7 @@ The table below shows two sets of formula accuracy values:
 
 **Mars (Transition)**:
 - Intermediate eccentricity (0.09) shows both geometric and ERD effects
-- Achieves perfect fit (R² = 1.000000) when using observed perihelion data
+- Achieves perfect fit (R² = <!--v:saturnPredR2-->1.000000<!--/v-->) when using observed perihelion data
 - Acts as a bridge between inner planet and outer planet dynamics
 
 **Outer Planets (Jupiter, Saturn, Uranus, Neptune)**:
@@ -759,10 +759,10 @@ All planetary formulas are implemented in Python for consistency and to handle t
 |--------|-----|-------------|----------|----------------|
 | Mercury | 0.999994 | 0.22 | 225 | H×8/11 |
 | Venus | **0.999999** | **0.46** | **328** | −8H/6 |
-| Mars | 1.000000 | 0.03 | 225 | H×8/35 |
-| Jupiter | 1.000000 | 0.06 | 225 | 8H/39 |
-| Saturn | 1.000000 | 0.05 | 225 | −8H/65 |
-| Uranus | 1.000000 | 0.01 | 225 | H/3 |
+| Mars | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.03 | 225 | H×8/35 |
+| Jupiter | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.06 | 225 | 8H/39 |
+| Saturn | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.05 | 225 | −8H/65 |
+| Uranus | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.01 | 225 | H/3 |
 | Neptune | 0.999999 | 0.02 | 225 | H×2 |
 
 > **Python Implementation**: A unified Python script provides all implementations:
@@ -792,13 +792,13 @@ where `inclination(t)` is the dynamic invariable-plane inclination from `calc_pl
 
 | Planet | Period | H-expression | Status |
 |--------|--------|-------------|--------|
-| Mercury | 894,179 yr | 8H/3 | Confirmed (0.1% vs ~895 kyr, Bills 2005) |
+| Mercury | <!--v:mercuryObliqCycle-->894,179<!--/v--> yr | 8H/3 | Confirmed (0.1% vs ~895 kyr, Bills 2005) |
 | Venus | N/A | — | Tidally damped at 177° |
 | Earth | 41,915 yr | H/8 | Confirmed (2% vs ~41 kyr) |
 | Mars | 125,744 yr | 3H/8 | Confirmed (0.8% vs ~124,800 yr, Laskar 2004) |
-| Jupiter | 167,659 yr | H/2 | Prediction |
-| Saturn | 111,772 yr | H/3 | Prediction (mirror-pair with Earth) |
-| Uranus | 167,659 yr | H/2 | Prediction (tentative) |
+| Jupiter | <!--v:hDiv2-->167,659<!--/v--> yr | H/2 | Prediction |
+| Saturn | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | H/3 | Prediction (mirror-pair with Earth) |
+| Uranus | <!--v:hDiv2-->167,659<!--/v--> yr | H/2 | Prediction (tentative) |
 | Neptune | N/A | — | Frozen at ~28° |
 
 **Implementation:** `calc_planet_obliquity()` in [predictive_formula.py](../tools/lib/python/predictive_formula.py), `computePlanetObliquity()` in script.js and [orbital-engine.js](../tools/lib/orbital-engine.js).

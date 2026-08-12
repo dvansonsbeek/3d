@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -72,7 +72,7 @@ elipticOrbit = 2 * e_Earth * 100 * sin(omega_Earth - omega_planet)
 ```
 
 Where:
-- `e_Earth` = Earth's orbital eccentricity (0.01671022)
+- `e_Earth` = Earth's orbital eccentricity (<!--v:j2000Eccentricity-->0.01671022<!--/v-->)
 - `omega_Earth` = Earth's ecliptic longitude of perihelion (~102.9 deg)
 - `omega_planet` = Planet's ecliptic longitude of perihelion
 - `100` = scale factor (1 AU = 100 scene units)
@@ -330,7 +330,7 @@ scene-graph tools.
 ## Startpos Calibration
 
 Each planet's `startpos` is tuned via Newton-Raphson sensitivity analysis to
-match JPL Horizons RA at the model start date (JD 2451716.5). Current values
+match JPL Horizons RA at the model start date (JD <!--v:startModelJD-->2,451,716.5<!--/v-->). Current values
 achieve start-date RA within 0.02° for all Type III planets.
 
 | Planet  | startpos | Start ΔRA |

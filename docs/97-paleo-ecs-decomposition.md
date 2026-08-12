@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: historical
 ---
 
@@ -9,7 +9,7 @@ status: historical
 
 **Status**: First-pass analysis complete; results in `data/climate-ecs-*.json`
 
-> **Scope note (ESSRT).** This document is one of the most explicitly ESSRT-integrated docs in the cluster — §4 includes a re-analysis section that compares the *fixed modern lattice* (8H/n with H held constant at J2000) against the *proper-physics ESSRT lattice* (8H(t)/n with H(t) from Farhat 2022 + angular-momentum conservation, per [doc 99](99-expanding-solar-system-resonance-theory.md)). The verdict — "drift <4% across canonical Milankovitch beats" — holds under both baselines. The empirical asymmetry between k-involving beats (which rescale with H(t)) and pure orbital beats (which sit at LOD-independent eigenfrequencies) is itself an ESSRT-derived refinement. The 8H = 2,682,536 yr and H = 335,317 yr literals in this doc are J2000-anchored snapshots; the ESSRT formalism for deep-time scaling lives in [doc 99](99-expanding-solar-system-resonance-theory.md).
+> **Scope note (ESSRT).** This document is one of the most explicitly ESSRT-integrated docs in the cluster — §4 includes a re-analysis section that compares the *fixed modern lattice* (8H/n with H held constant at J2000) against the *proper-physics ESSRT lattice* (8H(t)/n with H(t) from Farhat 2022 + angular-momentum conservation, per [doc 99](99-expanding-solar-system-resonance-theory.md)). The verdict — "drift <4% across canonical Milankovitch beats" — holds under both baselines. The empirical asymmetry between k-involving beats (which rescale with H(t)) and pure orbital beats (which sit at LOD-independent eigenfrequencies) is itself an ESSRT-derived refinement. The 8H = <!--v:eightH-->2,682,536<!--/v--> yr and H = <!--v:H-->335,317<!--/v--> yr literals in this doc are J2000-anchored snapshots; the ESSRT formalism for deep-time scaling lives in [doc 99](99-expanding-solar-system-resonance-theory.md).
 
 ---
 
@@ -17,7 +17,7 @@ status: historical
 
 The canonical climate formula (L1 + L2 + L3, doc 92) fits paleoclimate δ¹⁸O
 and CO₂ records using a fixed 32-integer lattice on the 8H Solar System Resonance
-Cycle. Each L1 line is an exact integer divisor of 8H = 2,682,536 yr at J2000, anchored
+Cycle. Each L1 line is an exact integer divisor of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000, anchored
 in orbital theory and **not** fit to climate data.
 
 Question: can this fixed-lattice framework produce a useful paleoclimate
@@ -622,9 +622,9 @@ physically meaningful — they are specific combinations of g_j, s_j
 eigenfrequencies that happen to divide 8H near-evenly.
 
 Two questions remain open:
-1. **Did the framework discover that 8H = 2,682,536 yr is the natural
+1. **Did the framework discover that 8H = <!--v:eightH-->2,682,536<!--/v--> yr is the natural
    synchronization period** (i.e., the period for which the maximum number
-   of Laskar beats fall on small-integer divisors)? Or was H = 335,317
+   of Laskar beats fall on small-integer divisors)? Or was H = <!--v:H-->335,317<!--/v-->
    chosen post-hoc to make this true?
 2. **Does the 97% match persist back 50 Myr?** Laskar 1989's chaos
    analysis suggests inner-planet eigenfrequencies drift over 50+ Myr.
@@ -861,7 +861,7 @@ hierarchy our Fibonacci classification recovers is already known from
 mainstream celestial mechanics.
 
 **What this supports:** The framework's structural choices align with
-the empirical stability hierarchy. The fact that H = 335,317 was chosen
+the empirical stability hierarchy. The fact that H = <!--v:H-->335,317<!--/v--> was chosen
 such that H/8 = 41,914 yr ≈ k+s_3 obliquity beat (the most stable
 Milankovitch cycle) is internally consistent with the framework's
 dynamical adherence to Laskar. This is a consistency result, not a
@@ -1233,7 +1233,7 @@ Under this model, the 50-Myr drift is one phase of a longer cycle,
 not monotonic tidal recession.
 
 **Reconciliation with the measured drift.** The relevant beat is
-k+s₃ (Earth spin + Earth nodal precession), where k ≈ 1/25,771 yr⁻¹
+k+s₃ (Earth spin + Earth nodal precession), where k ≈ 1/<!--v:axialPrecJ2000-->25,771<!--/v--> yr⁻¹
 and |s₃| ≈ 1/68,800 yr⁻¹. The weight factor is k/(k+s₃) ≈ **1.59** —
 so a 1% drift in k produces 1.59% drift in the beat period (not 0.86%
 as an earlier draft incorrectly stated).
@@ -1794,7 +1794,7 @@ Items 1, 2, 3, 4 from the original follow-up list are now **completed** in
     simulations with planet masses slightly perturbed from observed
     values. For each perturbed solar system, find the H' value that
     maximizes integer-divisor matches to its eigenmode beats. If our
-    solar system's H = 335,317 is *uniquely* well-matched (much higher
+    solar system's H = <!--v:H-->335,317<!--/v--> is *uniquely* well-matched (much higher
     matching fraction than perturbed systems), that's structural
     evidence for view A/β. If random perturbed systems also achieve
     high matching with their own H' values, the matching is generic

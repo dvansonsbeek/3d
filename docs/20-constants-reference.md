@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -23,7 +23,7 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 
 - **Rule A — Formulas stay, computed numbers go.** Write "H/13" not a specific year count.
 - **Rule B — Theory-intrinsic integers stay inline.** Fibonacci numbers, cycle counts (13, 3, 16), and ratios are part of the theory.
-- **Rule C — Approximate values for readability.** Use "H/13 (~25,794 years; see [Constants Reference](20-constants-reference.md))" when a number aids understanding.
+- **Rule C — Approximate values for readability.** Use "H/13 (<!--v:axialPrecRound-->~25,794<!--/v--> years; see [Constants Reference](20-constants-reference.md))" when a number aids understanding.
 - **Rule D — Tables reference this document.** If a doc repeats planet parameters, add: "For current values see [Constants Reference](20-constants-reference.md)."
 
 ---
@@ -33,21 +33,21 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md), the model has two distinct categories of "constants":
 
 - **Scale-invariant integers** — Fibonacci divisors (3, 5, 8, 13, 16, 21, 34), L1 integer labels (n = 9, 12, ..., 65, 66, 68, ..., 185 — 32 components total), integer divisors of 8H. These are **the same at every epoch** — structural constants of the solar system.
-- **Epoch-dependent literal periods, lengths, and seconds-values** — these scale with the current value of H(t). **Most numeric values tabulated below** (H = 335,317 yr; sidereal year = 365.25636 days; LOD = 86,400 s; Moon distance = 384,399 km; planet orbital periods in years; etc.) are **J2000-epoch values** — the model's primary calibration anchor. They apply to the modern era; for deep-time / future-projection work, use the epoch-dependent helpers in `src/script.js`:
+- **Epoch-dependent literal periods, lengths, and seconds-values** — these scale with the current value of H(t). **Most numeric values tabulated below** (H = <!--v:H-->335,317<!--/v--> yr; sidereal year = 365.25636 days; LOD = 86,400 s; Moon distance = 384,399 km; planet orbital periods in years; etc.) are **J2000-epoch values** — the model's primary calibration anchor. They apply to the modern era; for deep-time / future-projection work, use the epoch-dependent helpers in `src/script.js`:
 
 | J2000-anchored constant in this doc | Epoch-dependent helper (accepts `t_Ma` argument) |
 |---|---|
-| `holisticyearLength` (H = 335,317 yr) | `meanHAtAge(t_Ma)` |
+| `holisticyearLength` (H = <!--v:H-->335,317<!--/v--> yr) | `meanHAtAge(t_Ma)` |
 | `meanLengthOfDay` (~86,400.0 s) | `meanLodSecondsAtAge(t_Ma)` |
 | `meanSiderealYearSeconds` (`siderealYearJ2000 × 86400`) | `meanSiderealYearSecondsAtAge(t_Ma)` |
 | Tropical year (from `meanSolarYearDays`) | `meanTropicalYearSecondsAtAge(t_Ma)` |
-| Moon distance (`moonDistance` = 384,399.07 km) | `meanMoonDistanceMetresAtAge(t_Ma)` |
+| Moon distance (`moonDistance` = <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km) | `meanMoonDistanceMetresAtAge(t_Ma)` |
 | Planet orbital periods (Part 4 `solarYearInput`) | `meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s)` |
 | α(t) GIA correction → ΔT | `meanDeltaTSecondsAtAge(t_Ma)` |
 
-H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ 306,189 yr; at J2000 H = 335,317 yr; at +200 Myr H ≈ 352,600 yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
+H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr; at J2000 H = <!--v:H-->335,317<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->352,600<!--/v--> yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
 
-For the canonical 9-step derivation chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the canonical reference at `docs/hidden/old-documents/IP-deep-time-extension.md`. For the Solar System Resonance Cycle (8H = 2,682,536 yr at J2000) period table covering all major planetary cycles as integer divisors of 8H, see [Doc 55](55-solar-system-resonance-cycle-periods.md).
+For the canonical 9-step derivation chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the canonical reference at `docs/hidden/old-documents/IP-deep-time-extension.md`. For the Solar System Resonance Cycle (8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000) period table covering all major planetary cycles as integer divisors of 8H, see [Doc 55](55-solar-system-resonance-cycle-periods.md).
 
 ---
 
@@ -59,8 +59,8 @@ The six true degrees of freedom that define the model. Everything else is derive
 
 | # | Parameter | Variable | Value | DOF | Section |
 |---|-----------|----------|-------|-----|---------|
-| 1 | Earth Fundamental Cycle | `holisticyearLength` | 335,317 years | 1 | [Part 1 — Earth Fundamental Cycle](#the-earth-fundamental-cycle-h) |
-| 2 | Balanced year | `balancedYear` | −302,635 (derived) | 0 | [Part 2 — Time Constants](#time-constants) |
+| 1 | Earth Fundamental Cycle | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1 | [Part 1 — Earth Fundamental Cycle](#the-earth-fundamental-cycle-h) |
+| 2 | Balanced year | `balancedYear` | −<!--v:anchorYearOffset-->302,635<!--/v--> (derived) | 0 | [Part 2 — Time Constants](#time-constants) |
 | 3 | Fibonacci divisors | — | 3, 5, 8, 13, 21, 34 | 3 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
 | 4 | Mean obliquity | `earthtiltMean` | 23.41354° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
 | 5 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | 0.63603° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
@@ -74,13 +74,13 @@ Reference values from astronomical observations (IAU, JPL, Meeus) used to anchor
 
 | Parameter | Variable | Value |
 |-----------|----------|-------|
-| Perihelion-solstice alignment | `perihelionalignmentYear` | 1246.03125 AD |
+| Perihelion-solstice alignment | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
 | Long. perihelion (J2000) | `perihelionLongitudeJ2000_deg` | 102.947° |
-| Obliquity (J2000) | `obliquityJ2000_arcsec` | 84381.406" (23.439279°) |
+| Obliquity (J2000) | `obliquityJ2000_arcsec` | 84381.406" (<!--v:obliquityJ2000Deg-->23.439279<!--/v-->°) |
 | Obliquity rate (J2000) | `obliquityRate_arcsecPerCentury` | −46.836769"/cy |
-| Obliquity range | — | ~22.1° to ~24.5° |
-| Earth incl. (J2000) | `earthInclinationJ2000_deg` | 1.57869° |
-| Eccentricity (J2000) | `eccentricityJ2000` | 0.01671022 |
+| Obliquity range | — | <!--v:mainstreamObliqRange-->~22.1° to ~24.5°<!--/v--> |
+| Earth incl. (J2000) | `earthInclinationJ2000_deg` | <!--v:earthInclJ2000-->1.57869<!--/v-->° |
+| Eccentricity (J2000) | `eccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> |
 | Sidereal year (J2000) | `siderealYearJ2000` | 365.25636301 days |
 | Tropical year mean (J2000) | `tropicalYearMeanJ2000` | 365.2421897 days |
 | Tropical year VE (J2000) | `tropicalYearVEJ2000` | 365.242374 days |
@@ -113,8 +113,8 @@ These constants define the model. Changing any of them changes the theory.
 
 | Constant | Variable | Value |
 |----------|----------|-------|
-| Earth Fundamental Cycle | `holisticyearLength` (H) | **335,317** years |
-| Perihelion alignment year | `perihelionalignmentYear` | 1246.03125 AD |
+| Earth Fundamental Cycle | `holisticyearLength` (H) | **<!--v:H-->335,317<!--/v-->** years |
+| Perihelion alignment year | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
 | Obliquity cycle position | `temperatureGraphMostLikely` | 14.5 (of 16) |
 
 The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce all Earth precession cycles (see [Part 2 — Derived Constants](#part-2--derived-constants)).
@@ -123,8 +123,8 @@ The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce 
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Base Eccentricity | `eccentricityBase` | 0.015386 | Base orbital eccentricity (derived from perihelion longitude) |
-| Eccentricity Amplitude | `eccentricityAmplitude` | 0.001356 | Oscillation amplitude (derived from base + e(J2000) constraint) |
+| Base Eccentricity | `eccentricityBase` | <!--v:eccentricityBase-->0.015386<!--/v--> | Base orbital eccentricity (derived from perihelion longitude) |
+| Eccentricity Amplitude | `eccentricityAmplitude` | <!--v:eccentricityAmplitude-->0.001356<!--/v--> | Oscillation amplitude (derived from base + e(J2000) constraint) |
 | Mean Obliquity | `earthtiltMean` | 23.41354 deg | Mean axial tilt (derived from obliquity at J2000) |
 | RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
 | Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.481134 deg | Mean orbital inclination to invariable plane (derived) |
@@ -136,36 +136,36 @@ The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce 
 
 | Planet | Fibonacci Divisor (d) | Phase Group | Mirror Pair | EoC Type |
 |--------|----------------------|-------------|-------------|----------|
-| Mercury | 21 | In-phase (234.52°) | Uranus | I |
-| Venus | 34 | In-phase (218.64°) | Neptune | I |
+| Mercury | 21 | In-phase (<!--v:mercuryInclCycleAnchor-->234.52<!--/v-->°) | Uranus | I |
+| Venus | 34 | In-phase (<!--v:venusInclCycleAnchor-->218.64<!--/v-->°) | Neptune | I |
 | Earth | 3 | In-phase (21.77°) | Saturn | — |
-| Mars | 5 | In-phase (236.07°) | Jupiter | II |
-| Jupiter | 5 | In-phase (287.06°) | Mars | III |
-| Saturn | 3 | Anti-phase (116.26°) | Earth | III |
+| Mars | 5 | In-phase (<!--v:marsInclCycleAnchor-->236.07<!--/v-->°) | Jupiter | II |
+| Jupiter | 5 | In-phase (<!--v:jupiterInclCycleAnchor-->287.06<!--/v-->°) | Mars | III |
+| Saturn | 3 | Anti-phase (<!--v:saturnInclCycleAnchor-->116.26<!--/v-->°) | Earth | III |
 | Uranus | 21 | In-phase (21.33°) | Mercury | III |
-| Neptune | 34 | In-phase (174.04°) | Venus | III |
+| Neptune | 34 | In-phase (<!--v:neptuneInclCycleAnchor-->174.04<!--/v-->°) | Venus | III |
 
-Phase angles re-anchored 2026-04-09 to balanced year n=7 (≈ -2,649,854 BC). See [10-fibonacci-laws.md § Phase Groups](10-fibonacci-laws.md#phase-groups) and [32-inclination-calculations.md § Per-Planet Phase Angles](32-inclination-calculations.md#per-planet-phase-angles).
+Phase angles re-anchored 2026-04-09 to balanced year n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->). See [10-fibonacci-laws.md § Phase Groups](10-fibonacci-laws.md#phase-groups) and [32-inclination-calculations.md § Per-Planet Phase Angles](32-inclination-calculations.md#per-planet-phase-angles).
 
 ## Model Start & Alignment
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Start Model JD | `startmodelJD` | 2451716.5 | June Solstice 2000 00:00 UTC |
-| Start Model Year | `startmodelYear` | 2000.5 | Decimal year of model start |
-| Start Angle | `startAngleModel` | 89.91949879 deg | Sun ecliptic longitude at model start |
-| Correction Days | `correctionDays` | -0.8288 | Correction for solstice alignment offset |
+| Start Model JD | `startmodelJD` | <!--v:startModelJD-->2,451,716.5<!--/v--> | June Solstice 2000 00:00 UTC |
+| Start Model Year | `startmodelYear` | <!--v:startModelYear-->2000.5<!--/v--> | Decimal year of model start |
+| Start Angle | `startAngleModel` | <!--v:startAngleModel-->89.91949879<!--/v--> deg | Sun ecliptic longitude at model start |
+| Correction Days | `correctionDays` | <!--v:correctionDays-->-0.8288<!--/v--> | Correction for solstice alignment offset |
 | Variable Speed | `useVariableSpeed` | true | Enables equation of center (Kepler's 2nd law) |
 
 ## Physical Constants
 
 | Constant | Variable | Value |
 |----------|----------|-------|
-| Speed of Light | `speedOfLight` | 299,792.458 km/s |
-| Astronomical Unit | `currentAUDistance` | 149,597,870.698828 km |
+| Speed of Light | `speedOfLight` | <!--v:speedOfLight-->299,792.458<!--/v--> km/s |
+| Astronomical Unit | `currentAUDistance` | <!--v:oneAU-->149,597,870.698828<!--/v--> km |
 | Mean Sidereal Year | `meanSiderealYearSeconds` | siderealYearJ2000 × 86400 (derived) |
 | Gravitational Constant | `G_CONSTANT` | 6.6743 × 10⁻²⁰ km³/(kg·s²) |
-| Earth/Moon Mass Ratio | `MASS_RATIO_EARTH_MOON` | 81.30056816 |
+| Earth/Moon Mass Ratio | `MASS_RATIO_EARTH_MOON` | <!--v:massRatioEarthMoon-->81.30056816<!--/v--> |
 
 ### DE440 Sun/Planet Mass Ratios
 
@@ -189,11 +189,11 @@ These are computed from foundational constants. The formula is the definition; t
 
 | Cycle | Formula | Period (years) | Direction |
 |-------|---------|----------------|-----------|
-| Inclination Precession | H / 3 | ~111,772 | Counter-clockwise |
-| Ecliptic Precession | H / 5 | ~67,063 | Counter-clockwise |
-| Obliquity Cycle | H / 8 | ~41,915 | Clockwise (negative) |
-| Axial Precession | H / 13 | ~25,794 | Clockwise (negative) |
-| Perihelion Precession | H / 16 | ~20,957 | Both directions |
+| Inclination Precession | H / 3 | <!--v:inclPrecYears-->~111,772<!--/v--> | Counter-clockwise |
+| Ecliptic Precession | H / 5 | <!--v:eclPrecYears-->~67,063<!--/v--> | Counter-clockwise |
+| Obliquity Cycle | H / 8 | <!--v:obliqCycleYears-->~41,915<!--/v--> | Clockwise (negative) |
+| Axial Precession | H / 13 | <!--v:axialPrecRound-->~25,794<!--/v--> | Clockwise (negative) |
+| Perihelion Precession | H / 16 | <!--v:periPrecYears-->~20,957<!--/v--> | Both directions |
 
 ## Time Constants
 
@@ -205,15 +205,15 @@ These are computed from foundational constants. The formula is the definition; t
 | Mean Length of Day | `meanLengthOfDay` | meanSiderealYearSeconds / meanSiderealYearDays | ~86,400.0 s |
 | Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | 86,164.0902 s |
 | Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/(H/13)) / (meanSolarYearDays+1) + meanSiderealDay | 86,164.0993 s |
-| Balanced Year | `balancedYear` | perihelionalignmentYear - (14.5 × H/16) | -302,635 |
-| Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~2,176,153 |
-| Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | ~20,957 years |
-| Total Days in H | `totalDaysInH` | H × meanSolarYearDays | ~122,471,920 days |
+| Balanced Year | `balancedYear` | perihelionalignmentYear - (14.5 × H/16) | <!--v:balancedYear-->-302,635<!--/v--> |
+| Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
+| Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,957<!--/v--> years |
+| Total Days in H | `totalDaysInH` | H × meanSolarYearDays | ~<!--v:totalDaysInH-->122,471,920<!--/v--> days |
 | J2000.0 epoch JD | `j2000JD` | startmodelJD - (startmodelYear - 2000) × meanSolarYearDays | ~2451545.0 |
 | Julian century | `julianCenturyDays` | 36525 (100 × 365.25) | 36,525 days (IAU Julian century) |
 | Earth rotations/year | `meanEarthRotationsPerYear` | meanSolarYearDays + 1 | 366.2422 |
 | Start year corrected | `startModelYearWithCorrection` | startmodelYear + correctionDays / meanSolarYearDays | ~2000.4977 |
-| Years balanced→J2000 | `yearsFromBalancedToJ2000` | (startmodelJD - balancedJD) / meanSolarYearDays | ~302,635 |
+| Years balanced→J2000 | `yearsFromBalancedToJ2000` | (startmodelJD - balancedJD) / meanSolarYearDays | ~<!--v:anchorYearOffset-->302,635<!--/v--> |
 
 Input constants used in the formulas above:
 
@@ -285,7 +285,7 @@ All 8 planets, combining inner planet J2000 values with outer planet pre-dual-ba
 |--------|-----------|--------|
 | Mercury | 0.20563593 | J2000 (same as model) |
 | Venus | 0.00677672 | J2000 (same as model) |
-| Earth | 0.01671022 | J2000 (from ASTRO_REFERENCE) |
+| Earth | <!--v:j2000Eccentricity-->0.01671022<!--/v--> | J2000 (from ASTRO_REFERENCE) |
 | Mars | 0.09339410 | J2000 (same as model) |
 | Jupiter | 0.04838624 | J2000 (base derived from phase) |
 | Saturn | 0.05386179 | J2000 (base derived from phase) |
@@ -299,15 +299,15 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | 6.703207 | 0.386478 | 6.32 - 7.09 | 234.52° | 8H/93 ≈ 28,844 yr |
-| Venus | 2.151359 | 0.062165 | 2.09 - 2.21 | 218.64° | 8H/110 ≈ 24,387 yr |
-| Earth | 1.481134 | 0.636032 | 0.85 - 2.12 | 21.77° | H/3 ≈ 111,772 yr |
-| Mars | 1.833251 | 1.164218 | 0.67 - 3.00 | 236.07° | 8H/68 ≈ 39,449 yr |
-| Jupiter | 0.321086 | 0.021404 | 0.30 - 0.34 | 287.06° | 8H/65 ≈ 41,270 yr |
-| Saturn | 0.984965 | 0.065193 | 0.92 - 1.05 | 116.26° (anti-phase) | 8H/169 ≈ 15,873 yr |
-| Uranus | 1.015182 | 0.023831 | 0.99 - 1.04 | 21.33° | H/16 ≈ 20,957 yr |
-| Neptune | 0.743803 | 0.013551 | 0.73 - 0.76 | 174.04° | 2H/25 ≈ 26,825 yr |
-| Pluto | 15.716200 | 0.717024 | 15.00 - 16.43 | 203.32° | H/14 ≈ 23,951 yr |
+| Mercury | 6.703207 | 0.386478 | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | 8H/93 ≈ <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr |
+| Venus | <!--v:venusInclMean-->2.151359<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | 8H/110 ≈ 24,387 yr |
+| Earth | 1.481134 | 0.636032 | 0.85 - 2.12 | 21.77° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr |
+| Mars | 1.833251 | 1.164218 | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | 8H/68 ≈ <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
+| Jupiter | <!--v:jupiterInclMean-->0.321086<!--/v--> | <!--v:jupiterInclAmp-->0.021404<!--/v--> | 0.30 - 0.34 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | 8H/65 ≈ 41,270 yr |
+| Saturn | 0.984965 | 0.065193 | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | 8H/169 ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr |
+| Uranus | <!--v:uranusInclMean-->1.015182<!--/v--> | <!--v:uranusInclAmp-->0.023831<!--/v--> | 0.99 - 1.04 | 21.33° | H/16 ≈ 20,957 yr |
+| Neptune | <!--v:neptuneInclMean-->0.743803<!--/v--> | <!--v:neptuneInclAmp-->0.013551<!--/v--> | 0.73 - 0.76 | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | 2H/25 ≈ 26,825 yr |
+| Pluto | <!--v:plutoInclMean-->15.716200<!--/v--> | <!--v:plutoInclAmp-->0.717024<!--/v--> | 15.00 - 16.43 | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | H/14 ≈ 23,951 yr |
 
 **Formula**: `i(t) = mean + amplitude × cos(ω̃_ICRF(t) - cycleAnchor)` (Saturn: sign flipped, anti-phase)
 
@@ -315,10 +315,10 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 
 | Planet | Orbit Count in H | Distance (AU) | Period (years) |
 |--------|-----------------|---------------|----------------|
-| Mercury | 1,392,228 | 0.3871 | 0.2408 |
-| Venus | 545,059 | 0.7233 | 0.6152 |
-| Mars | 178,289 | 1.5237 | 1.8808 |
-| Jupiter | 28,281 | 5.1996 | 11.8566 |
+| Mercury | 1,392,228 | <!--v:mercurySemiMajor-->0.3871<!--/v--> | 0.2408 |
+| Venus | 545,059 | <!--v:venusSemiMajor-->0.7233<!--/v--> | 0.6152 |
+| Mars | 178,289 | <!--v:marsSemiMajor-->1.5237<!--/v--> | 1.8808 |
+| Jupiter | 28,281 | <!--v:jupiterSemiMajor-->5.1996<!--/v--> | 11.8566 |
 | Saturn | 11,396 | 9.5309 | 29.4243 |
 | Uranus | 4,004 | 19.1414 | 83.7417 |
 | Neptune | 2,048 | 29.9284 | 163.7270 |
@@ -327,13 +327,13 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 
 | Planet | Formula | Period (years) |
 |--------|---------|----------------|
-| Mercury | H / (1 + 3/8) | ~243,867 |
+| Mercury | H / (1 + 3/8) | ~<!--v:mercuryPeriPeriod-->243,867<!--/v--> |
 | Venus | -8H / 6 | ~-447,089 (retrograde) |
-| Earth | H / 16 | ~20,957 |
-| Mars | H × 8/36 | ~74,515 |
-| Jupiter | 8H / 39 | ~68,783 |
-| Saturn | -8H / 65 | ~-41,270 (retrograde) |
-| Uranus | H / 3 | ~111,772 |
+| Earth | H / 16 | <!--v:periPrecYears-->~20,957<!--/v--> |
+| Mars | H × 8/36 | ~<!--v:marsPeriPeriod-->74,515<!--/v--> |
+| Jupiter | 8H / 39 | ~<!--v:jupiterPeriPeriod-->68,783<!--/v--> |
+| Saturn | -8H / 65 | ~<!--v:jupiterIcrfPeriod-->-41,270<!--/v--> (retrograde) |
+| Uranus | H / 3 | <!--v:inclPrecYears-->~111,772<!--/v--> |
 | Neptune | H × 2 | ~670,634 |
 
 ## Moon Derived Cycles
@@ -360,7 +360,7 @@ All Moon cycles are derived from the 3 input months (sidereal, anomalistic, noda
 | Lunar Leveling Cycle | `moonLunarLevelingCycleDays` | ~61,250 | ~167.7 |
 | Draconic Year (ICRF) | `moonDraconicYearICRF` | ~346.620 | — |
 | Draconic Year (Earth frame) | `moonDraconicYearEarth` | ~346.597 | — |
-| Full Moon Cycle (Earth frame) | `moonFullMoonCycleEarth` | ~411.78 | — |
+| Full Moon Cycle (Earth frame) | `moonFullMoonCycleEarth` | ~<!--v:fullMoonCycleEarth-->411.78<!--/v--> | — |
 | Full Moon Cycle (ICRF) | `moonFullMoonCycleICRF` | ~411.86 | — |
 
 Eclipse cycles (from derived months): Saros = 223 synodic ≈ 6585.32 days, Exeligmos = 3 × Saros, Callippic = 940 synodic ≈ 76 solar years.
@@ -413,12 +413,12 @@ These come from external astronomical sources and do not change with the model.
 
 | Constant | Variable | Value | Source |
 |----------|----------|-------|--------|
-| Obliquity | `obliquityJ2000_arcsec` | 84381.406" (23.439279 deg) | IAU 2006 (Capitaine et al. 2003) |
+| Obliquity | `obliquityJ2000_arcsec` | 84381.406" (<!--v:obliquityJ2000Deg-->23.439279<!--/v--> deg) | IAU 2006 (Capitaine et al. 2003) |
 | Obliquity rate | `obliquityRate_arcsecPerCentury` | -46.836769"/cy | IAU 2006 |
 | Obliquity range | - | ~22.1 deg to ~24.5 deg | Laskar 1993 |
-| Earth inclination | `earthInclinationJ2000_deg` | 1.57869 deg | Astronomical Almanac |
+| Earth inclination | `earthInclinationJ2000_deg` | <!--v:earthInclJ2000-->1.57869<!--/v--> deg | Astronomical Almanac |
 | Earth inclination rate | `earthInclinationRate_arcsecPerCentury` | -18"/cy | Astronomical Almanac |
-| Eccentricity | `earthEccentricityJ2000` | 0.01671022 | JPL Horizons |
+| Eccentricity | `earthEccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> | JPL Horizons |
 | Long. of perihelion | `earthPerihelionLongitudeJ2000` | 102.947 deg | JPL Horizons |
 | Perihelion passage J2000 | `perihelionRefJD` | 2451547.042 | USNO (2000 Jan 3 13:00 UTC) |
 | IAU precession period | `iauPrecessionJ2000` | 25,771.57634 years | IAU 2006 |
@@ -459,12 +459,12 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Sidereal Month | `moonSiderealMonthInput` | 27.32166156 days | Return to same star |
+| Sidereal Month | `moonSiderealMonthInput` | <!--v:moonSiderealMonthInput-->27.32166156<!--/v--> days | Return to same star |
 | Anomalistic Month | `moonAnomalisticMonthInput` | 27.55454988 days | Perigee to perigee |
 | Nodal Month | `moonNodalMonthInput` | 27.21222082 days | Node to node |
-| Mean Distance | `moonDistance` | 384,399.07 km | Mean Earth-Moon distance |
-| Orbital Eccentricity | `moonOrbitalEccentricity` | 0.054900489 | |
-| Ecliptic Inclination | `moonEclipticInclinationJ2000` | 5.1573 deg | Dynamical mean osculating inclination (v4 E3c); the Brown/ELP theory constant 5.1453964 (latitude sinF normalization) is kept as `moonInclinationConstantBrownELP` |
+| Mean Distance | `moonDistance` | <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km | Mean Earth-Moon distance |
+| Orbital Eccentricity | `moonOrbitalEccentricity` | <!--v:moonOrbitalEccentricityFull-->0.054900489<!--/v--> | |
+| Ecliptic Inclination | `moonEclipticInclinationJ2000` | <!--v:moonEclipticInclination-->5.1573<!--/v--> deg | Dynamical mean osculating inclination (v4 E3c); the Brown/ELP theory constant <!--v:moonInclinationConstantBrownELP-->5.1453964<!--/v--> (latitude sinF normalization) is kept as `moonInclinationConstantBrownELP` |
 | Moon Tilt | `moonTilt` | 6.687 deg | |
 
 ### Lunar Mean Longitude Coefficients (Meeus Ch. 47)
@@ -510,7 +510,7 @@ The per-day rates are used for EoC phase computation; the per-century rates are 
 | Uranus | 0.77263783 | 74.00919023 | JPL/SPICE |
 | Neptune | 1.77004347 | 131.7853754 | JPL/SPICE |
 | Pluto | 17.14001 | 110.30393 | JPL Horizons |
-| Moon | 5.1573 (dynamical mean osc; theory constant 5.1453964) | — | — |
+| Moon | <!--v:moonEclipticInclination-->5.1573<!--/v--> (dynamical mean osc; theory constant <!--v:moonInclinationConstantBrownELP-->5.1453964<!--/v-->) | — | — |
 
 ### Ecliptic Inclination Trend Rates
 
@@ -564,28 +564,28 @@ JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic
 
 | Planet | J2000 Value (deg) | Source |
 |--------|------------------|--------|
-| Mercury | 6.3472858 | S&S 2012 |
-| Venus | 2.1545441 | S&S 2012 |
+| Mercury | <!--v:mercuryInclJ2000-->6.3472858<!--/v--> | S&S 2012 |
+| Venus | <!--v:venusInclJ2000-->2.1545441<!--/v--> | S&S 2012 |
 | Earth | 1.57866663 | S&S 2012 |
-| Mars | 1.6311858 | S&S 2012 |
-| Jupiter | 0.3219652 | S&S 2012 |
-| Saturn | 0.9254704 | S&S 2012 |
-| Uranus | 0.9946692 | S&S 2012 |
-| Neptune | 0.7354155 | S&S 2012 |
-| Pluto | 15.5639473 | S&S 2012 (adjusted) |
+| Mars | <!--v:marsInclJ2000-->1.6311858<!--/v--> | S&S 2012 |
+| Jupiter | <!--v:jupiterInclJ2000-->0.3219652<!--/v--> | S&S 2012 |
+| Saturn | <!--v:saturnInclJ2000-->0.9254704<!--/v--> | S&S 2012 |
+| Uranus | <!--v:uranusInclJ2000-->0.9946692<!--/v--> | S&S 2012 |
+| Neptune | <!--v:neptuneInclJ2000-->0.7354155<!--/v--> | S&S 2012 |
+| Pluto | <!--v:plutoInclJ2000-->15.5639473<!--/v--> | S&S 2012 (adjusted) |
 
 ### Ascending Nodes (S&S original values)
 
 | Planet | Value (deg) | Source |
 |--------|-----------|--------|
-| Earth | 284.51 | S&S 2012 |
+| Earth | <!--v:earthAscNodeJ2000-->284.51<!--/v--> | S&S 2012 |
 | Mercury | 32.22 | S&S 2012 |
 | Venus | 52.31 | S&S 2012 |
-| Mars | 352.95 | S&S 2012 |
-| Jupiter | 306.92 | S&S 2012 |
-| Saturn | 122.27 | S&S 2012 |
-| Uranus | 308.44 | S&S 2012 |
-| Neptune | 189.28 | S&S 2012 |
+| Mars | <!--v:marsOmegaSS-->352.95<!--/v--> | S&S 2012 |
+| Jupiter | <!--v:jupiterOmegaSS-->306.92<!--/v--> | S&S 2012 |
+| Saturn | <!--v:saturnOmegaSS-->122.27<!--/v--> | S&S 2012 |
+| Uranus | <!--v:uranusOmegaSS-->308.44<!--/v--> | S&S 2012 |
+| Neptune | <!--v:neptuneOmegaSS-->189.28<!--/v--> | S&S 2012 |
 | Pluto | 107.06 | S&S 2012 |
 | Ceres | 80.89 | S&S 2012 |
 
@@ -623,19 +623,19 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 
 ### Inclination Cycle Anchors
 
-Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the planet reaches MAX inclination, evaluated at one of the eight balanced-year anchors). After the 2026-04-09 audit, the seven fitted planets share anchor n=7 (≈ -2,649,854 BC, the start of the current Solar System Resonance Cycle); Earth is locked to its IAU-derived n=0 reference.
+Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the planet reaches MAX inclination, evaluated at one of the eight balanced-year anchors). After the 2026-04-09 audit, the seven fitted planets share anchor n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, the start of the current Solar System Resonance Cycle); Earth is locked to its IAU-derived n=0 reference.
 
 | Planet | Cycle Anchor | Balanced Year | Notes |
 |--------|-------------|--------|-------|
-| Mercury | 234.52° | n=7 | |
-| Venus | 218.64° | n=7 | |
+| Mercury | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | n=7 | |
+| Venus | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | n=7 | |
 | Earth | 21.77° | n=0 | locked, IAU reference |
-| Mars | 236.07° | n=7 | |
-| Jupiter | 287.06° | n=7* | |
-| Saturn | 116.26° | n=7* | anti-phase |
+| Mars | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | n=7 | |
+| Jupiter | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | n=7* | |
+| Saturn | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° | n=7* | anti-phase |
 | Uranus | 21.33° | n=7* | |
-| Neptune | 174.04° | n=7 | |
-| Pluto | 203.32° | — | not fitted |
+| Neptune | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | n=7 | |
+| Pluto | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | — | not fitted |
 
 \* Jupiter, Saturn, and Uranus have ICRF periods that divide H exactly; their phase at n=7 numerically coincides with their phase at n=0 (and any other anchor).
 
@@ -781,15 +781,15 @@ Calibrated to reproduce exact J2000 ecliptic inclinations (optimized by [Ascendi
 
 | Planet | `ascendingNodeInvPlane` | Delta from S&S |
 |--------|------------------------|--------------|
-| Earth | 284.51 | 0.00 deg (S&S 2012) |
+| Earth | <!--v:earthAscNodeJ2000-->284.51<!--/v--> | 0.00 deg (S&S 2012) |
 | Mercury | 32.83 | +0.61 deg |
 | Venus | 54.70 | +2.39 deg |
-| Mars | 354.87 | +1.92 deg |
-| Jupiter | 312.89 | +5.97 deg |
-| Saturn | 118.81 | -3.46 deg |
-| Uranus | 307.80 | -0.64 deg |
-| Neptune | 192.04 | +2.76 deg |
-| Pluto | 101.06 | -6.00 deg |
+| Mars | <!--v:marsOmegaJ2000-->354.87<!--/v--> | +1.92 deg |
+| Jupiter | <!--v:jupiterOmegaJ2000-->312.89<!--/v--> | +5.97 deg |
+| Saturn | <!--v:saturnOmegaJ2000-->118.81<!--/v--> | -3.46 deg |
+| Uranus | <!--v:uranusOmegaJ2000-->307.80<!--/v--> | -0.64 deg |
+| Neptune | <!--v:neptuneOmegaJ2000-->192.04<!--/v--> | +2.76 deg |
+| Pluto | <!--v:plutoOmegaJ2000-->101.06<!--/v--> | -6.00 deg |
 
 See [34-j2000-calibration.md](34-j2000-calibration.md) for the methodology.
 **Verification**: [Ascending Node Verification](../tools/verify/ascending-node-verification.js) verifies correct J2000 ecliptic inclinations. [Ascending Node Souami-Souchay](../tools/verify/ascending-node-souami-souchay.js) compares S&S vs Verified values.
@@ -836,13 +836,13 @@ Per-planet configuration for the predictive perihelion precession formula:
 
 | Planet | Period Formula | Theta0 (deg) | Baseline (arcsec/cy) |
 |--------|---------------|---------------|---------------------|
-| Mercury | H × 8/11 | 77.4569131 | 1296000/period×100 |
-| Venus | -8H / 6 | 131.5765919 | -1296000/period×100 (retrograde) |
-| Mars | H × 8/35 | 336.0650681 | 1296000/period×100 |
-| Jupiter | H / 5 | 14.70659401 | 1296000/period×100 |
-| Saturn | H / 8 | 92.12794343 | -1296000/period×100 (retrograde) |
-| Uranus | H / 3 | 170.7308251 | 1296000/period×100 |
-| Neptune | H × 2 | 45.80124471 | 1296000/period×100 |
+| Mercury | H × 8/11 | 77.4569131 | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Venus | -8H / 6 | 131.5765919 | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
+| Mars | H × 8/35 | 336.0650681 | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Jupiter | H / 5 | 14.70659401 | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Saturn | H / 8 | 92.12794343 | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
+| Uranus | H / 3 | 170.7308251 | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Neptune | H × 2 | 45.80124471 | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
 
 ### Predictive Normalization Constants
 
@@ -851,7 +851,7 @@ Per-planet configuration for the predictive perihelion precession formula:
 | Obliquity mean | `PREDICT_OBLIQ_MEAN` | 23.414 deg | Normalization center for obliquity features |
 | Eccentricity base | `PREDICT_ECC_BASE` | 0.015321 | Training normalization (frozen at training-time value) |
 | Eccentricity amplitude | `PREDICT_ECC_AMP` | 0.0014226 | Training normalization (frozen at training-time value) |
-| Eccentricity mean | `PREDICT_ECC_MEAN` | sqrt(base² + amp²) ≈ 0.01539 | Normalization center |
+| Eccentricity mean | `PREDICT_ECC_MEAN` | sqrt(base² + amp²) ≈ <!--v:earthEccBase-->0.01539<!--/v--> | Normalization center |
 
 ### Predictive Coefficients (`PREDICT_COEFFS`)
 

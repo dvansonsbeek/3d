@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -13,7 +13,7 @@ framework. It explains how the perihelion distance is fixed, how tilt and
 inclination oscillations produce a small eccentricity fluctuation, and how the
 eccentricity balance is maintained at every epoch.
 
-> **Scope note (ESSRT).** The balance laws themselves (Law 3 vector inclination balance, Law 5 scalar eccentricity balance with `δv = K · sin(tilt)`) are scale-invariant — they hold at any epoch. PSI, K, base eccentricities, axial tilts, the per-planet d-values, and the period denominators (H/N, 8H/N) are scale-invariant structural constants. The **literal year-count values** in the period tables (H = 335,317; H/16 = 20,957; 8H/65 = 41,270; the balanced-year anchor at -2,649,854 BC; the perihelion-precession periods 243,867 / 447,089 / 74,515 / 68,783 / 670,634 yr) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling every literal year count proportionally. The balance machinery this document describes therefore holds at any epoch with epoch-consistent inputs — §11 ("Why the Balance Holds at All Epochs") makes the temporal robustness explicit.
+> **Scope note (ESSRT).** The balance laws themselves (Law 3 vector inclination balance, Law 5 scalar eccentricity balance with `δv = K · sin(tilt)`) are scale-invariant — they hold at any epoch. PSI, K, base eccentricities, axial tilts, the per-planet d-values, and the period denominators (H/N, 8H/N) are scale-invariant structural constants. The **literal year-count values** in the period tables (H = <!--v:H-->335,317<!--/v-->; H/16 = 20,957; 8H/65 = 41,270; the balanced-year anchor at -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->; the perihelion-precession periods <!--v:mercuryPeriPeriod-->243,867<!--/v--> / 447,089 / <!--v:marsPeriPeriod-->74,515<!--/v--> / <!--v:jupiterPeriPeriod-->68,783<!--/v--> / <!--v:twoH-->670,634<!--/v--> yr) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling every literal year count proportionally. The balance machinery this document describes therefore holds at any epoch with epoch-consistent inputs — §11 ("Why the Balance Holds at All Epochs") makes the temporal robustness explicit.
 
 ---
 
@@ -58,7 +58,7 @@ Saturn alone carries 50.0% of total Law 5 weight, making it the decisive planet.
 
 | Symbol | Value                | Source                                      |
 |--------|----------------------|---------------------------------------------|
-| H      | 335317               | Earth Fundamental Cycle Length                         |
+| H      | <!--v:HPlain-->335317<!--/v-->               | Earth Fundamental Cycle Length                         |
 | PSI    | 3.3069e-3 (d_E × amp_E × √m_E) | Inclination amplitude constant (Law 2, from Earth) |
 | K      | 3.414920e-6          | Tilt-eccentricity constant (derived from Earth) |
 
@@ -71,14 +71,14 @@ K is derived in Section 4 below.
 
 | Planet  | d  | Phase (deg)  | Group      | Mirror Pair |
 |---------|----|--------------|------------|-------------|
-| Mercury | 21 | 234.52       | In-phase   | Uranus      |
-| Venus   | 34 | 218.64       | In-phase   | Neptune     |
+| Mercury | 21 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->       | In-phase   | Uranus      |
+| Venus   | 34 | <!--v:venusInclCycleAnchor-->218.64<!--/v-->       | In-phase   | Neptune     |
 | Earth   |  3 |  21.77       | In-phase   | Saturn      |
-| Mars    |  5 | 236.07       | In-phase   | Jupiter     |
-| Jupiter |  5 | 287.06       | In-phase   | Mars        |
-| Saturn  |  3 | 116.26       | Anti-phase | Earth       |
+| Mars    |  5 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->       | In-phase   | Jupiter     |
+| Jupiter |  5 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->       | In-phase   | Mars        |
+| Saturn  |  3 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->       | Anti-phase | Earth       |
 | Uranus  | 21 |  21.33       | In-phase   | Mercury     |
-| Neptune | 34 | 174.04       | In-phase   | Venus       |
+| Neptune | 34 | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->       | In-phase   | Venus       |
 
 Phase angles anchored to balanced year n=7. d-values, antiPhase, mirror pairs unchanged.
 
@@ -105,7 +105,7 @@ amplitude of this fluctuation is:
 where K = <!--v:kValue-->3.4143 × 10⁻⁶<!--/v-->, derived from Earth:
 
     K = e_amp_Earth * sqrt(m_Earth) * a_Earth^(3/2) / (sin(tilt_Earth) * sqrt(d_Earth))
-    K = 0.0013559 * sqrt(3.00350e-6) * 1.0 / (sin(23.41353 deg) * sqrt(3))
+    K = 0.0013559 * sqrt(3.00350e-6) * 1.0 / (sin(<!--v:meanObliquity-->23.41353<!--/v--> deg) * sqrt(3))
     K = 3.4143e-6
 
 ### Key Property: Law 5 Weight Change
@@ -141,7 +141,7 @@ The following chain describes what happens for each planet:
 
 **Step 1 — Fixed orbital eccentricity (base value).**
 Each planet's orbit has a fixed offset between its geometric center and the Sun.
-For Earth this offset is eccentricityBase = 0.015386 AU. This base eccentricity
+For Earth this offset is eccentricityBase = <!--v:eccentricityBase-->0.015386<!--/v--> AU. This base eccentricity
 does not change over time. Only the direction of the perihelion precesses — the
 perihelion point rotates around the Sun, but its distance remains the same.
 
@@ -164,7 +164,7 @@ DIFFERENT periods, their combined effect produces a real eccentricity fluctuatio
 at the planet's eccentricity cycle — the meeting frequency where axial precession
 meets inclination precession. Each planet has its own eccentricity cycle (see
 Section 10 and `docs/37-planets-precession-cycles.md`). For Earth the eccentricity
-cycle is H/16 = 20,957 years, resulting in an amplitude of 0.001356 AU.
+cycle is H/16 = 20,957 years, resulting in an amplitude of <!--v:eccentricityAmplitude-->0.001356<!--/v--> AU.
 
 **Step 6 — Eccentricity balance is maintained at every epoch.**
 The mean perihelion distances (base eccentricities) achieve ~99.9% Law 5 balance.
@@ -198,7 +198,7 @@ and therefore the most significant eccentricity oscillations.
 
 **Derivation of base eccentricities:**
 
-- **Earth**: eccentricityBase = 0.015386 (tuned parameter in the model)
+- **Earth**: eccentricityBase = <!--v:eccentricityBase-->0.015386<!--/v--> (tuned parameter in the model)
 - **Saturn**: 0.05386607 (dual-balance optimized, sole anti-phase group member)
 - **Jupiter, Uranus**: Dual-balanced from Law 5 optimization
 - **Venus, Mars**: Derived by fitting a cosine to JPL Horizons eccentricity
@@ -239,14 +239,14 @@ The JPL J2000 values represent the actual eccentricity at that epoch:
 |---------|---------------|---------------|---------------|
 | Mercury | 0.20563593    | 0.20563593    |  0.000%       |
 | Venus   | 0.00677672    | 0.00677672    |  0.000%       |
-| Earth   | 0.01671022    | 0.01671022    |  0.000%       |
+| Earth   | <!--v:j2000Eccentricity-->0.01671022<!--/v-->    | <!--v:j2000Eccentricity-->0.01671022<!--/v-->    |  0.000%       |
 | Mars    | 0.09339410    | 0.09339410    |  0.000%       |
 | Jupiter | 0.04838624    | 0.04838624    |  0.000%       |
 | Saturn  | 0.05386179    | 0.05386179    |  0.000%       |
 | Uranus  | 0.04725744    | 0.04725744    |  0.000%       |
 | Neptune | 0.00859048    | 0.00859048    |  0.000%       |
 
-At J2000, **Earth and Mars are above their base eccentricities** (Earth: 0.01671 vs base 0.01539; Mars: 0.09339 vs base 0.09147), while **Venus is below its base** (0.00678 vs 0.00771). The differences reflect each planet's phase in its own eccentricity oscillation at the J2000 epoch. The outer giants (Jupiter, Saturn, Uranus, Neptune) have base eccentricities calibrated very close to their J2000 values (differences ≤ 1.5×10⁻⁵, well below 0.1%), so their J2000 model values match the base values at the precision shown above. The current phase-derived calibration makes the outer-planet differences much smaller than under earlier calibrations, where Laplace-Lagrange secular exchange was invoked to explain ~0.2–1.1% offsets (see Section 10).
+At J2000, **Earth and Mars are above their base eccentricities** (Earth: 0.01671 vs base <!--v:earthEccBase-->0.01539<!--/v-->; Mars: <!--v:marsEccJ2000-->0.09339<!--/v--> vs base 0.09147), while **Venus is below its base** (<!--v:venusEccJ2000-->0.00678<!--/v--> vs <!--v:venusEccBase-->0.00771<!--/v-->). The differences reflect each planet's phase in its own eccentricity oscillation at the J2000 epoch. The outer giants (Jupiter, Saturn, Uranus, Neptune) have base eccentricities calibrated very close to their J2000 values (differences ≤ 1.5×10⁻⁵, well below 0.1%), so their J2000 model values match the base values at the precision shown above. The current phase-derived calibration makes the outer-planet differences much smaller than under earlier calibrations, where Laplace-Lagrange secular exchange was invoked to explain ~0.2–1.1% offsets (see Section 10).
 
 ### Law 5 Weight Contributions
 
@@ -269,14 +269,14 @@ At J2000, **Earth and Mars are above their base eccentricities** (Earth: 0.01671
 
 | Planet  | Mean Incl (deg) | Amplitude (deg) | J2000 Incl (deg) | Range (deg)      |
 |---------|-----------------|------------------|-------------------|------------------|
-| Mercury |  6.703207       | 0.386478         | 6.3472858         | 6.32 to 7.09    |
-| Venus   |  2.151359       | 0.062165         | 2.1545441         | 2.09 to 2.21    |
+| Mercury |  6.703207       | 0.386478         | <!--v:mercuryInclJ2000-->6.3472858<!--/v-->         | 6.32 to 7.09    |
+| Venus   |  <!--v:venusInclMean-->2.151359<!--/v-->       | 0.062165         | <!--v:venusInclJ2000-->2.1545441<!--/v-->         | 2.09 to 2.21    |
 | Earth   |  1.481134       | 0.636032        | 1.5786900         | 0.85 to 2.12    |
-| Mars    |  1.915105       | 1.164222         | 1.6311858         | 0.75 to 3.08    |
-| Jupiter |  0.321086       | 0.021404         | 0.3219652         | 0.30 to 0.34    |
-| Saturn  |  0.984965       | 0.065193         | 0.9254704         | 0.92 to 1.05    |
-| Uranus  |  1.015182       | 0.023831         | 0.9946692         | 0.99 to 1.04    |
-| Neptune |  0.743803       | 0.013551         | 0.7354155         | 0.73 to 0.76    |
+| Mars    |  1.915105       | 1.164222         | <!--v:marsInclJ2000-->1.6311858<!--/v-->         | 0.75 to 3.08    |
+| Jupiter |  <!--v:jupiterInclMean-->0.321086<!--/v-->       | <!--v:jupiterInclAmp-->0.021404<!--/v-->         | <!--v:jupiterInclJ2000-->0.3219652<!--/v-->         | 0.30 to 0.34    |
+| Saturn  |  0.984965       | 0.065193         | <!--v:saturnInclJ2000-->0.9254704<!--/v-->         | 0.92 to 1.05    |
+| Uranus  |  <!--v:uranusInclMean-->1.015182<!--/v-->       | <!--v:uranusInclAmp-->0.023831<!--/v-->         | <!--v:uranusInclJ2000-->0.9946692<!--/v-->         | 0.99 to 1.04    |
+| Neptune |  <!--v:neptuneInclMean-->0.743803<!--/v-->       | <!--v:neptuneInclAmp-->0.013551<!--/v-->         | <!--v:neptuneInclJ2000-->0.7354155<!--/v-->         | 0.73 to 0.76    |
 
 ### Amplitude Derivation
 
@@ -292,10 +292,10 @@ Inclination amplitudes are derived from the PSI formula:
 | Venus   |  34 | 1.5646e-3      | 0.062165             | 0.062165         | Yes   |
 | Earth   |   3 | 1.7331e-3      | 0.636              | 0.63603         | 0.0% |
 | Mars    |   5 | 5.6808e-4      | 1.164222             | 1.164222         | Yes   |
-| Jupiter |   5 | 3.0900e-2      | 0.021404             | 0.021404         | Yes   |
+| Jupiter |   5 | 3.0900e-2      | <!--v:jupiterInclAmp-->0.021404<!--/v-->             | <!--v:jupiterInclAmp-->0.021404<!--/v-->         | Yes   |
 | Saturn  |   3 | 1.6908e-2      | 0.065193             | 0.065193         | Yes   |
-| Uranus  |  21 | 6.6078e-3      | 0.023831             | 0.023831         | Yes   |
-| Neptune |  34 | 7.1772e-3      | 0.013551             | 0.013551         | Yes   |
+| Uranus  |  21 | 6.6078e-3      | <!--v:uranusInclAmp-->0.023831<!--/v-->             | <!--v:uranusInclAmp-->0.023831<!--/v-->         | Yes   |
+| Neptune |  34 | 7.1772e-3      | <!--v:neptuneInclAmp-->0.013551<!--/v-->             | <!--v:neptuneInclAmp-->0.013551<!--/v-->         | Yes   |
 
 Earth shows a ~0.5% mismatch because its amplitude was independently tuned for IAU 2006
 precession rate (0.63603). The Fibonacci formula (ψ/(d×√m)) gives 0.636, matching exactly since ψ is derived from Earth.
@@ -333,13 +333,13 @@ For each planet, six parameters fully describe the orbital dynamics:
 | Planet  | 1. Tilt    | 2. Amp Tilt | 3. Mean Ecc  | 4. Amp Ecc    | 5. Mean Incl | 6. Amp Incl |
 |---------|------------|-------------|---------------|---------------|--------------|-------------|
 | Mercury |   0.03     | 0.386478    | 0.20563022    | 2.338e-5      |  6.703207    | 0.386478    |
-| Venus   |   2.6392   | 0.062165    | 0.00770652    | 9.526e-4      |  2.151359    | 0.062165    |
+| Venus   |   2.6392   | 0.062165    | 0.00770652    | 9.526e-4      |  <!--v:venusInclMean-->2.151359<!--/v-->    | 0.062165    |
 | Earth   |  23.41354  | 0.636032   | 0.01538578    | 1.356e-3      |  1.481134   | 0.636032   |
 | Mars    |  25.19     | 1.164222    | 0.09146580    | 3.066e-3      |  1.915105    | 1.164222    |
-| Jupiter |   3.13     | 0.021404    | 0.04838630    | 1.134e-6      |  0.321086    | 0.021404    |
+| Jupiter |   3.13     | <!--v:jupiterInclAmp-->0.021404<!--/v-->    | 0.04838630    | 1.134e-6      |  <!--v:jupiterInclMean-->0.321086<!--/v-->    | <!--v:jupiterInclAmp-->0.021404<!--/v-->    |
 | Saturn  |  26.73     | 0.065193    | 0.05386607    | 5.360e-6      |  0.984965    | 0.065193    |
-| Uranus  |  82.23     | 0.023831    | 0.04724317    | 2.802e-5      |  1.015182    | 0.023831    |
-| Neptune |  28.32     | 0.013551    | 0.00859679    | 8.039e-6      |  0.743803    | 0.013551    |
+| Uranus  |  82.23     | <!--v:uranusInclAmp-->0.023831<!--/v-->    | 0.04724317    | 2.802e-5      |  <!--v:uranusInclMean-->1.015182<!--/v-->    | <!--v:uranusInclAmp-->0.023831<!--/v-->    |
+| Neptune |  28.32     | <!--v:neptuneInclAmp-->0.013551<!--/v-->    | 0.00859679    | 8.039e-6      |  <!--v:neptuneInclMean-->0.743803<!--/v-->    | <!--v:neptuneInclAmp-->0.013551<!--/v-->    |
 
 Note: Columns 2 and 6 are identical — the amplitude of axial tilt oscillation IS the
 amplitude of inclination oscillation, both derived from PSI / (d * sqrt(m)).
@@ -379,14 +379,14 @@ occurs at each planet's eccentricity cycle (see Section 10).
 
 | Planet  | Period (years)      | Fibonacci Expression | Direction  |
 |---------|---------------------|----------------------|------------|
-| Mercury | 243,867             | H / (1 + 3/8)       | Prograde   |
+| Mercury | <!--v:mercuryPeriPeriod-->243,867<!--/v-->             | H / (1 + 3/8)       | Prograde   |
 | Venus   | -447,089            | -8H / 6              | Retrograde |
 | Earth   |  20,957             | H / 16               | Prograde   |
-| Mars    |  74,515             | H × 8/36             | Prograde   |
-| Jupiter |  68,783             | 8H / 39              | Prograde   |
-| Saturn  | -41,270             | -8H / 65             | Retrograde |
-| Uranus  | 111,772             | H / 3                | Prograde   |
-| Neptune | 670,634             | H * 2                | Prograde   |
+| Mars    |  <!--v:marsPeriPeriod-->74,515<!--/v-->             | H × 8/36             | Prograde   |
+| Jupiter |  <!--v:jupiterPeriPeriod-->68,783<!--/v-->             | 8H / 39              | Prograde   |
+| Saturn  | <!--v:jupiterIcrfPeriod-->-41,270<!--/v-->             | -8H / 65             | Retrograde |
+| Uranus  | <!--v:earthPeriPeriodICRF-->111,772<!--/v-->             | H / 3                | Prograde   |
+| Neptune | <!--v:twoH-->670,634<!--/v-->             | H * 2                | Prograde   |
 
 ---
 
@@ -435,14 +435,14 @@ Phase angles are stored as `<planet>EccentricityPhaseJ2000` in `src/script.js`.
 
 Earth's eccentricity phase relates to its longitude of perihelion:
 
-    φ_Earth = ω + 90° = 102.947° + 90.000° ≈ 192.95°
+    φ_Earth = ω + 90° = 102.947° + <!--v:periLongModel1246AD-->90.000<!--/v-->° ≈ <!--v:earthEccPhaseJ2000-->192.95<!--/v-->°
 
 This anchors Earth's phase to an observable orbital parameter. The exact
 analytical solution gives 193.0129° ≈ ω + 90.07° (0.002% match).
 
 ### Inner Planets: Tilt-Driven Regime
 
-The phase is derived from the **System Reset anchor (n=7, -2,649,854 BC)** with a balance-group offset: `phase = phaseOffset + (2000 - systemReset) / wobblePeriod × 360°`, where `phaseOffset = 90°` for in-phase planets and `270°` for Saturn (anti-phase). At the anchor, every planet passes through its mean eccentricity — in-phase rising, Saturn falling — mirroring the inclination alignment. The base eccentricity follows from the law of cosines with the J2000 eccentricity and K-derived amplitude. All values are computed at runtime by constants.js.
+The phase is derived from the **System Reset anchor (n=7, -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->)** with a balance-group offset: `phase = phaseOffset + (2000 - systemReset) / wobblePeriod × 360°`, where `phaseOffset = 90°` for in-phase planets and `270°` for Saturn (anti-phase). At the anchor, every planet passes through its mean eccentricity — in-phase rising, Saturn falling — mirroring the inclination alignment. The base eccentricity follows from the law of cosines with the J2000 eccentricity and K-derived amplitude. All values are computed at runtime by constants.js.
 
 The predictive formula works for these planets because the tilt mechanism is
 the dominant source of eccentricity variation over each planet's eccentricity cycle.

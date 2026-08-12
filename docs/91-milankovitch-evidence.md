@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -9,13 +9,13 @@ status: current
 
 > **Scope.** Empirical tests of the Holistic Universe Model's climate claims against the LR04 benthic δ¹⁸O stack (Lisiecki & Raymo 2005), the Cheng 2016 U-Th-dated Asian speleothem composite, the EPICA Dome C CO₂ record (Bereiter 2015), and the CENOGRID benthic record (Westerhold 2020). Sections 1–7 report the spectral fit and per-planet contributions. Sections 8–11 then report a pre-registered **super-cycle hypothesis test** that returned NULL, **fourteen follow-up hypothesis tests** (A–N) on independent framework predictions (16 positives / 2 partials / 5 nulls), the **405-kyr off-lattice characterization** (climate-internal carbon-cycle thermostat), and the combined interpretation. Companion to [doc 90 — Milankovitch Language](90-milankovitch-language.md), which states the framework's structural predictions; this document reports what the data show — both confirmations and limits.
 
-> **Scope note (ESSRT).** Every spectral test in this document is anchored at J2000. The 32 L1 integer-divisor positions of the 8H lattice and the Fibonacci structure used to derive them are scale-invariant. The literal year counts (H = 335,317; 8H = 2,682,536; 1H..8H = 335.3..2682.5 kyr in the §11.5 super-cycle table; 13H = 4.359 Myr in Test C) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent over the post-MPT (0–1 Myr) and full-LR04 (0–5.3 Myr) windows covered here. For the deep-time projections in Test C (13H ≈ 4.36 Myr vs Boulila ~4.5 Myr) and the full 66-Myr CENOGRID context, the cumulative drift begins to matter; see [doc 99](99-expanding-solar-system-resonance-theory.md) for the per-driver Δ-H formulas.
+> **Scope note (ESSRT).** Every spectral test in this document is anchored at J2000. The 32 L1 integer-divisor positions of the 8H lattice and the Fibonacci structure used to derive them are scale-invariant. The literal year counts (H = <!--v:H-->335,317<!--/v-->; 8H = <!--v:eightH-->2,682,536<!--/v-->; 1H..8H = 335.3..2682.5 kyr in the §11.5 super-cycle table; 13H = 4.359 Myr in Test C) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent over the post-MPT (0–1 Myr) and full-LR04 (0–5.3 Myr) windows covered here. For the deep-time projections in Test C (13H ≈ 4.36 Myr vs Boulila ~4.5 Myr) and the full 66-Myr CENOGRID context, the cumulative drift begins to matter; see [doc 99](99-expanding-solar-system-resonance-theory.md) for the per-driver Δ-H formulas.
 
 ---
 
 ## 1. Summary
 
-Earth's climate-relevant orbital forcing arises from the gravitational interplay of all eight planets. Their orbital and rotational cycles synchronise over a common **Solar System Resonance Cycle of 8H = 2,682,536 years (at J2000)**, and every climate-relevant cycle on Earth therefore lands at an integer divisor of 8H. Spectral analysis of LR04 confirms this structure empirically and yields an explicit predictive formula.
+Earth's climate-relevant orbital forcing arises from the gravitational interplay of all eight planets. Their orbital and rotational cycles synchronise over a common **Solar System Resonance Cycle of 8H = <!--v:eightH-->2,682,536<!--/v--> years (at J2000)**, and every climate-relevant cycle on Earth therefore lands at an integer divisor of 8H. Spectral analysis of LR04 confirms this structure empirically and yields an explicit predictive formula.
 
 > **Orbital forcing is not climate.** The formula and analysis in this document capture the **orbital-forcing component** of climate only. Canonical full-LR04 fit explains ~25.5% of the observed variance (R² = 0.2553, L1+L2+L3); the remaining ~74% comes from non-orbital sources — ice-sheet hysteresis, CO₂ and carbon-cycle feedbacks, internal variability (Heinrich events, Dansgaard-Oeschger cycles), and regional asymmetries that distinguish, say, Antarctic from Greenland records. The model takes no position on those components. Orbital cycles are the **clock** that sets the timing of glacial-interglacial transitions; the **magnitude** of the observed climate response is dominated by Earth-system feedbacks, not orbital forcing directly. Within the well-resolved post-MPT window (0–1 Myr), R² reaches **0.8735** — the orbital signal is ~87% of climate variance there, with the conflated full-record number suppressed by regime change. Every prediction in this document — including the forward projection of the next natural glaciation — therefore describes when the orbital clock makes a phase transition possible, not when surface climate necessarily follows.
 
@@ -23,7 +23,7 @@ Earth's climate-relevant orbital forcing arises from the gravitational interplay
 
 The standard Milankovitch / Laskar framework proceeds **top-down**: start from observed climate spectral peaks (LR04 at ~100, ~41, ~23 kyr), construct beat frequencies (k + g_j, g_i − g_j, …) from Laplace–Lagrange secular eigenmodes, and *select which beat explains which climate peak* by fitting amplitudes against the data. The eigenmodes themselves are mathematically rigorous — they are the diagonalisation of the secular perturbation matrix — but the interpretive overlay that maps a particular beat onto a particular climate signal is climate-data-driven inference. Successive theoretical refinements (Laplace's Great Inequality, mode mixing, post-Newtonian GR corrections, chaotic-diffusion modelling) accumulate to reconcile predicted with observed planetary motion. Open puzzles persist where no clean beat explanation matches: the **100-kyr problem** (eccentricity forcing too weak by orders of magnitude to drive ice ages on its own — [Hays-Imbrie-Shackleton 1976](https://www.science.org/doi/10.1126/science.194.4270.1121) onwards), the **405-kyr absence** in post-MPT LR04 (Berger's theoretically dominant g₂−g₅ eccentricity beat is empirically absent at the predicted amplitude — §7.1), and the **Mid-Pleistocene Transition** (no first-principles mechanism explains the 41-kyr → 100-kyr regime shift).
 
-This framework proceeds **bottom-up** from directly observed orbital motion. Earth's principal precession periods are measured against IAU/JPL/Horizons reference data and anchored observationally (the 1246 AD perihelion-solstice alignment fixes the Earth Fundamental Cycle **H = 335,317 yr (at J2000)** within recorded astronomical history). All eight planets' principal cycle periods are then measured against [JPL Horizons / WebGeoCalc](56-webgeocalc-explorer.md) data (1800–2100 AD; verified to RMS < 0.09°), and turn out to divide a single longer cycle **8H = 2,682,536 yr (at J2000)** as integer fractions 8H/N — the **Solar System Resonance Cycle** of the title (doc 55). Only after this integer-divisor structure is established from motion alone is the 8H lattice **overlaid onto the climate record**: the L1 orbital-forcing layer of the canonical Climate Formula ([doc 92](92-climate-formula.md)) is the 32 lattice integers, with positions *fixed by orbital geometry* and only the amplitudes (a_n, b_n) fitted to LR04 / CENOGRID / EPICA / CenCO2PIP.
+This framework proceeds **bottom-up** from directly observed orbital motion. Earth's principal precession periods are measured against IAU/JPL/Horizons reference data and anchored observationally (the 1246 AD perihelion-solstice alignment fixes the Earth Fundamental Cycle **H = <!--v:H-->335,317<!--/v--> yr (at J2000)** within recorded astronomical history). All eight planets' principal cycle periods are then measured against [JPL Horizons / WebGeoCalc](56-webgeocalc-explorer.md) data (1800–2100 AD; verified to RMS < 0.09°), and turn out to divide a single longer cycle **8H = <!--v:eightH-->2,682,536<!--/v--> yr (at J2000)** as integer fractions 8H/N — the **Solar System Resonance Cycle** of the title (doc 55). Only after this integer-divisor structure is established from motion alone is the 8H lattice **overlaid onto the climate record**: the L1 orbital-forcing layer of the canonical Climate Formula ([doc 92](92-climate-formula.md)) is the 32 lattice integers, with positions *fixed by orbital geometry* and only the amplitudes (a_n, b_n) fitted to LR04 / CENOGRID / EPICA / CenCO2PIP.
 
 The structural difference is what makes the model **falsifiable in a way standard theory is not**. In Laskar's framework the set of available beats is large and flexible — almost any climate peak between roughly 10 and 500 kyr can be reached by *some* combination of g_i and s_j eigenmodes with k = Earth's general precession, so the spectral peaks themselves can't disconfirm the framework. In this framework the 8H lattice is a **structural commitment**: climate peaks at frequencies not equal to 8H/N for any integer N would falsify the orbital-forcing layer. The closure test (§7.3) verifies exactly this — fitting all 200 integer divisors of 8H jointly to LR04 leaves zero residual peaks in empty lattice regions (n ≈ 43.5, n ≈ 80, etc.). The framework's commitment to integer-divisor structure survives the test the standard framework does not have to take.
 
@@ -60,7 +60,7 @@ A reader looking at the canonical 32-integer L1 lattice in [doc 92 §2.3](92-cli
 The other planets do **not** measurably speed up, slow down, or push Earth around on yearly timescales. Earth's orbital period (1 year) is constant. What planetary gravity *does* do, integrated over millions of years, is slowly reshape four secular parameters of Earth's orbit:
 
 - **Eccentricity (e)** — how elliptical the orbit is. Oscillates between ~0.014 and ~0.017.
-- **Obliquity (ε)** — axial tilt ranges ~22.21° – ~24.72°.
+- **Obliquity (ε)** — axial tilt ranges <!--v:obliquityRangeInline-->~22.21° – ~24.72°<!--/v-->.
 - **Longitude of perihelion (ϖ)** — direction the ellipse points.
 - **Longitude of ascending node (Ω)** — orientation of the orbital plane.
 
@@ -200,7 +200,7 @@ The model's obliquity-period claims for the inner solar system (from doc 90 §5)
 
 | Planet | Published period | Reference | Model H/n | Period (yr) | Deviation |
 |---|---|---|---|---|---|
-| **Mercury** | 895,000 yr | Bills & Comstock 2005, *JGR-Planets* 110, E04006 | **8H/3** | 894,179 | **+0.09 %** |
+| **Mercury** | 895,000 yr | Bills & Comstock 2005, *JGR-Planets* 110, E04006 | **8H/3** | <!--v:mercuryObliqCycle-->894,179<!--/v--> | **+0.09 %** |
 | **Earth** | 41,000 yr | Laskar 2004 (La2004); Berger 1978 | **H/8** | 41,915 | **+2.2 %** |
 | **Mars** | 124,800 yr (chaotic mean) | Ward 1973 *Science* 181; Laskar 2004 *Icarus* 170 | **8H/21** | 127,740 | **+2.4 %** |
 
@@ -213,9 +213,9 @@ For Jupiter, Saturn, Uranus, and Neptune, standard secular theory reports **no r
 | Planet | Published literature | Model H/n prediction |
 |---|---|---:|
 | Venus | tidally damped at 177° (Correia & Laskar 2003) | 8H/110 = **24,387 yr** (model: net residual after two opposing precession components nearly cancel — see doc 37) |
-| Jupiter | "No regular cycle" — Gyr secular trend 3.1° → 6–37° (Saillenfest 2020) | H/2 = **167,659 yr** |
-| Saturn | "No regular cycle" — Gyr trend 26.7° → 65°+ via Neptune resonance (Saillenfest 2021; Wisdom 2022) | H/3 = **111,772 yr** |
-| Uranus | Frozen — > 100 Myr precession (Saillenfest 2022) | H/2 = **167,659 yr** |
+| Jupiter | "No regular cycle" — Gyr secular trend 3.1° → 6–37° (Saillenfest 2020) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
+| Saturn | "No regular cycle" — Gyr trend 26.7° → 65°+ via Neptune resonance (Saillenfest 2021; Wisdom 2022) | H/3 = **<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr** |
+| Uranus | Frozen — > 100 Myr precession (Saillenfest 2022) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
 | Neptune | Frozen (Rogoszinski & Hamilton 2020) | 8H/100 = **26,825 yr** |
 
 This is a **falsifiable but currently un-testable set of predictions**: no kiloyear-resolution obliquity observations exist for the outer planets, so neither the "no cycle" standard view nor the model's specific period can be directly verified at present. Future precision astrometry from probes (Juno extended mission for Jupiter; dedicated Saturn-system or ice-giant missions) could discriminate. See [doc 37 — Planetary Precession Cycles](37-planets-precession-cycles.md) §"Reference: Obliquity Oscillation" for the canonical model-vs-standard comparison table.
@@ -580,9 +580,9 @@ A striking pattern in the late Cenozoic geological time-scale: the Pliocene and 
 
 | Cycle | Start | End | Duration | Match to 1 × 8H |
 |---|---:|---:|---:|---:|
-| Pliocene 8H cycle (Cycle −2) | 5,332,390 BC | 2,649,854 BC | 2,682,536 yr | exact (anchored) |
-| Pleistocene 8H cycle (Cycle −1) | 2,649,854 BC | 32,682 AD | 2,682,536 yr | exact (anchored) |
-| **Next cycle (Cycle 0) — see §15 for naming** | **32,682 AD** | **2,715,218 AD** | 2,682,536 yr | exact by construction |
+| Pliocene 8H cycle (Cycle −2) | 5,332,390 BC | <!--v:systemResetYearBC-->2,649,854 BC<!--/v--> | <!--v:eightH-->2,682,536<!--/v--> yr | exact (anchored) |
+| Pleistocene 8H cycle (Cycle −1) | <!--v:systemResetYearBC-->2,649,854 BC<!--/v--> | <!--v:nextBalancedYear-->32,682<!--/v--> AD | <!--v:eightH-->2,682,536<!--/v--> yr | exact (anchored) |
+| **Next cycle (Cycle 0) — see §15 for naming** | **<!--v:nextBalancedYear-->32,682<!--/v--> AD** | **2,715,218 AD** | <!--v:eightH-->2,682,536<!--/v--> yr | exact by construction |
 
 The Holocene (≈ last 11,700 yr) is a sub-feature of the current Pleistocene cycle — a brief interglacial near the end of Cycle −1.
 
@@ -594,7 +594,7 @@ The question §§8–11 ask is whether this pattern reflects a real *physical pa
 
 **H1 (one-sided)**: Major Phanerozoic geological and climatic events have median fractional residual from the nearest integer multiple of 8H that is *less* than the median expected under uniform random placement of events on [0, 600 Myr].
 
-**Sharpened version**: Same as H1 but tested against the nearest integer multiple of H = 335,317 yr — 8× more stringent because of the smaller half-period.
+**Sharpened version**: Same as H1 but tested against the nearest integer multiple of H = <!--v:H-->335,317<!--/v--> yr — 8× more stringent because of the smaller half-period.
 
 **H0**: Events are placed uniformly at random in [0, 600 Myr], so fractional residuals from the nearest integer multiple are uniformly distributed on [0, 1].
 
@@ -669,7 +669,7 @@ The H test is **essentially null** — observed median is indistinguishable from
 
 ### 11.5 Complementary global-spectral test on CENOGRID
 
-§11.1–§11.4 tested *event-clustering*. This test asks the parallel *spectral* question: does the continuous 67-Myr CENOGRID record show enhanced power at any integer multiple of H, from 1H (the Earth Fundamental Cycle = 335,317 yr at J2000) to 8H (the Solar System Resonance Cycle / orbital-forcing period = 2,682,536 yr at J2000)? Uniquely enabled by CENOGRID's length — at LR04's 5.3 Myr, 8H fits only ~2 cycles (Rayleigh-unresolved); at 67 Myr it fits 25 cycles, properly resolved. Methodology: Thomson MTM F-test (K=5 DPSS tapers, NW=3) on LOESS-smoothed δ¹⁸O and δ¹³C, 5-kyr grid; F-critical (α=0.05, F(2,8)) = 4.46; empirical null from 1000 random periods uniform in [100, 10000] kyr.
+§11.1–§11.4 tested *event-clustering*. This test asks the parallel *spectral* question: does the continuous 67-Myr CENOGRID record show enhanced power at any integer multiple of H, from 1H (the Earth Fundamental Cycle = <!--v:H-->335,317<!--/v--> yr at J2000) to 8H (the Solar System Resonance Cycle / orbital-forcing period = <!--v:eightH-->2,682,536<!--/v--> yr at J2000)? Uniquely enabled by CENOGRID's length — at LR04's 5.3 Myr, 8H fits only ~2 cycles (Rayleigh-unresolved); at 67 Myr it fits 25 cycles, properly resolved. Methodology: Thomson MTM F-test (K=5 DPSS tapers, NW=3) on LOESS-smoothed δ¹⁸O and δ¹³C, 5-kyr grid; F-critical (α=0.05, F(2,8)) = 4.46; empirical null from 1000 random periods uniform in [100, 10000] kyr.
 
 Literal `nH` period values in the table below are J2000-evaluated; over the 67-Myr CENOGRID span the cumulative drift in H(t) per ESSRT Drivers 1 and 2 is small but non-negligible (see doc 99).
 
@@ -1114,7 +1114,7 @@ The 405-kyr cycle is a **real, empirically observed climate signal**. Across CEN
 | Planet | Laskar (g_i) apsidal period | Framework (doc 55) ecliptic perihelion |
 |---|---:|---:|
 | Venus | ~174 kyr (g₂ = 7.453″/yr) | **−447,089 yr** (= −8H/6, retrograde) |
-| Jupiter | ~305 kyr (g₅ = 4.257″/yr) | **+68,783 yr** (= 8H/39) |
+| Jupiter | ~305 kyr (g₅ = 4.257″/yr) | **+<!--v:jupiterPeriPeriod-->68,783<!--/v--> yr** (= 8H/39) |
 
 In the framework's planet motions, Venus's and Jupiter's perihelion-precession rates produce a beat at ~58 or ~79 kyr (depending on sign convention), **not 405 kyr**. The §13.3 mathematical proof confirms it: no combination of any cycles in doc 55 reaches the 405-kyr range. The framework simply does not have a Venus-Jupiter beat at 405 kyr.
 
@@ -1362,15 +1362,15 @@ The super-cycle null result (§4) appropriately bounds the framework's claims. T
 
 Independent of the super-cycle deep-time question, it remains useful to refer to specific 8H intervals in the recent past and near future. The framework introduces a numerical convention for internal use, anchored at the Plio-Pleistocene boundary at 2.58 Ma:
 
-- **Resonance Cycle −2** = Pliocene 8H Cycle: 5,332,390 BC → 2,649,854 BC
-- **Resonance Cycle −1** = Pleistocene 8H Cycle: 2,649,854 BC → 32,682 AD ← **we are here** (in its final ~30,000 years)
-- **Resonance Cycle 0** = **Exocene 8H Cycle**: 32,682 AD → 2,715,218 AD ← **next cycle**
+- **Resonance Cycle −2** = Pliocene 8H Cycle: 5,332,390 BC → <!--v:systemResetYearBC-->2,649,854 BC<!--/v-->
+- **Resonance Cycle −1** = Pleistocene 8H Cycle: <!--v:systemResetYearBC-->2,649,854 BC<!--/v--> → <!--v:nextBalancedYear-->32,682<!--/v--> AD ← **we are here** (in its final ~30,000 years)
+- **Resonance Cycle 0** = **Exocene 8H Cycle**: <!--v:nextBalancedYear-->32,682<!--/v--> AD → 2,715,218 AD ← **next cycle**
 - **Resonance Cycle +1**: 2,715,218 AD → 5,397,754 AD
 - (and so on)
 
 ### 15.1 The "Exocene" name
 
-The proposed name for **Resonance Cycle 0** (starting 32,682 AD) is **Exocene**, from Greek ἔξω (*exō*) = "outside, beyond" + the standard -cene suffix used throughout the Cenozoic (Holocene, Pleistocene, Pliocene, Miocene, Oligocene, Eocene, Paleocene).
+The proposed name for **Resonance Cycle 0** (starting <!--v:nextBalancedYear-->32,682<!--/v--> AD) is **Exocene**, from Greek ἔξω (*exō*) = "outside, beyond" + the standard -cene suffix used throughout the Cenozoic (Holocene, Pleistocene, Pliocene, Miocene, Oligocene, Eocene, Paleocene).
 
 The name captures three converging themes that characterize the era starting from the present:
 
@@ -1389,7 +1389,7 @@ The name captures three converging themes that characterize the era starting fro
 ### 15.3 Usage
 
 In docs and the simulation, refer to:
-- **Exocene 8H Cycle** (or "Exocene cycle") for the specific 8H interval starting 32,682 AD
+- **Exocene 8H Cycle** (or "Exocene cycle") for the specific 8H interval starting <!--v:nextBalancedYear-->32,682<!--/v--> AD
 - **Resonance Cycle 0** (or "Cycle 0") as the numerical internal-model reference
 - Future cycles increment (Resonance Cycle +1, +2, …); past cycles count backward (Cycle −1 for Pleistocene, Cycle −2 for Pliocene)
 

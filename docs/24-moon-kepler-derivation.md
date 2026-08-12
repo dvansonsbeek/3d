@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -51,7 +51,7 @@ Each factor is a natural quantity of the Earth-Moon-Sun system:
 
 | Factor | Physical meaning | Value |
 |---|---|---|
-| `a_M` | Moon's geometric distance from Earth | 384,399.07 km |
+| `a_M` | Moon's geometric distance from Earth | <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km |
 | `a_M · μ` | **Earth's wobble around the Earth-Moon barycenter** | ≈ 4,670 km |
 | `m` | **Orbital phase ratio**: the fraction of Earth's heliocentric orbit completed during one lunar orbit | ≈ 7.5% |
 
@@ -177,7 +177,7 @@ So the Kepler-correction picture for both bodies is **symmetric but opposite in 
 
 | Body | Geometric a | Kepler-effective a | Δa | Direction |
 |---|---|---|---|---|
-| **Moon** (deriving GM_Earth+Moon **system**) | 384,399.07 km | 384,748.44 km | **+349.37 km** | ADD a moon's contribution |
+| **Moon** (deriving GM_Earth+Moon **system**) | <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km | 384,748.44 km | **+349.37 km** | ADD a moon's contribution |
 | **Earth/Sun** (deriving GM_Sun **alone**) | 149,597,870.70 km (1 AU) | 149,597,720.93 km | **−149.77 km** | SUBTRACT Earth's contribution |
 
 The two derivations use structurally different forms:

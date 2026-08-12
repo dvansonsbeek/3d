@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -871,9 +871,9 @@ To derive `GM` from orbits, the model uses:
 - **For other planets:** Use the DE440 mass ratios: `GM_planet = GM_Sun / massRatio_DE440[planet]`
 
 **Available for Earth-Moon:**
-- `moonDistance` = 384,399.07 km (Moon's semi-major axis)
-- `moonSiderealMonth` = 27.32166156 days
-- `MASS_RATIO_EARTH_MOON` = 81.30056816 (DE440 SPICE kernel)
+- `moonDistance` = <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km (Moon's semi-major axis)
+- `moonSiderealMonth` = <!--v:moonSiderealMonthInput-->27.32166156<!--/v--> days
+- `MASS_RATIO_EARTH_MOON` = <!--v:massRatioEarthMoon-->81.30056816<!--/v--> (DE440 SPICE kernel)
 
 Result: `M_Earth ≈ 5.97219 × 10²⁴ kg` (matches CODATA 2022 to ~3.7 ppm — limited by Brown's lunar theory floor in the 3-body system; see [doc 24](24-moon-kepler-derivation.md) for the precision analysis).
 
@@ -1782,7 +1782,7 @@ This section documents the perihelion precession formulas - purely Newtonian mec
 **Simplified:** `precessionRate = 129,600,000 / period_years`
 
 **Where:**
-- 1,296,000 = 360° × 3600 arcsec/degree (full circle in arcseconds)
+- <!--v:arcsecInCircle-->1,296,000<!--/v--> = 360° × 3600 arcsec/degree (full circle in arcseconds)
 - Result is in arcseconds per century
 
 **Implementation:**
@@ -1837,9 +1837,9 @@ precessionEclipticToICRF: (ecliptic_years, reference_years) => {
 ```
 
 **Example for Mercury:**
-- ICRF period: ~243,867 years
-- Reference (H/13): ~25,794 years
-- Ecliptic period: ~28,844 years
+- ICRF period: ~<!--v:mercuryPeriPeriod-->243,867<!--/v--> years
+- Reference (H/13): <!--v:axialPrecRound-->~25,794<!--/v--> years
+- Ecliptic period: ~<!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> years
 
 #### 10.2.2 ICRF to Ecliptic Transformation
 

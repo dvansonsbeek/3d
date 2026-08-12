@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -75,7 +75,7 @@ classical constant:
   time through their identified content (A3 = A3₀ + 360·(N_trop − N_p13);
   A2 = A2₀ + 360·(N_trop + N_apsOfDate − 2·N_Jupiter), Jupiter via the
   Driver-2 chain) so they evolve with the tidal months, H(t) precession,
-  and solar mass loss. The A1 rate (131.849 °/cy) is observationally
+  and solar mass loss. The A1 rate (<!--v:a1RateDegPerCy-->131.849<!--/v--> °/cy) is observationally
   defined by nature: it sits on the 18V−16E−M′ near-resonance where ppm in
   planetary years moves the beat by °/cy (hypersensitivity, experimentally
   demonstrated); its amplitude is gravity-sized (18-kyr lab: single line,
@@ -166,7 +166,7 @@ classical constant:
   month plus solar parameters alone — the three Moon inputs are not
   independent. The emergent periods are the true star-referenced ones
   (3232.60 d apsidal / 6793.48 d nodal, reproduced at ±0.5‱/±0.3‱ in the
-  full system); the catalog inputs 3231.493/6798.38 are their
+  full system); the catalog inputs <!--v:moonApsidalPrecessionDaysInput-->3,231.493<!--/v-->/<!--v:moonNodalPrecessionDaysInput-->6,798.38<!--/v--> are their
   equinox-of-date partners (∓13 counts per H).
   The frame term ṗ_A is itself derived: the composition
   (`tools/explore/v4-pdot-composer{,2,3}.js`) builds the general-precession
@@ -464,9 +464,9 @@ other basis coefficients are dust (≤ 0.13″) in both the prediction and
 the shipped patch.
 
 **The inclination convention.** The input `moonEclipticInclinationJ2000`
-is the Moon's DYNAMICAL mean osculating inclination **5.1573°** (measured
+is the Moon's DYNAMICAL mean osculating inclination **<!--v:moonEclipticInclination-->5.1573<!--/v-->°** (measured
 from the theory itself: h-vector over 2 node cycles; oscillation range
-[4.98°, 5.30°]); the Brown/ELP THEORY CONSTANT 5.1453964° (the latitude
+[4.98°, 5.30°]); the Brown/ELP THEORY CONSTANT <!--v:moonInclinationConstantBrownELP-->5.1453964<!--/v-->° (the latitude
 sinF-coefficient normalization, 5.128122/0.99665) is kept as the documented
 partner `moonInclinationConstantBrownELP`. Pure gravity maps between the two
 at 0.01% (compression 0.9944). With the D1 lab calibrated on the dynamical
@@ -478,18 +478,18 @@ compression to 1″ at the real Moon and is disproved as a theorem by m-scaling
 leakage-clean estimator (open research).
 
 **The Cassini axial tilt — ε_ecl derived.** The Moon's obliquity to the
-ecliptic (measured ε_ecl = 1.5424° — the only independently measured member
+ecliptic (measured ε_ecl = <!--v:moonObliquityEcliptic-->1.5424<!--/v-->° — the only independently measured member
 of the catalog composition moonTilt 6.687° = i + ε) is derived as the
 equilibrium of Cassini state 2 (`tools/explore/cassini-moontilt.js`):
 numerical gravity-gradient torque averaging over the locked triaxial figure
 (elliptical orbit, uniform synchronous rotation, perigee-azimuth averaged;
 solar term 2-D-averaged) balanced against the framework's of-date node
 regression. Inputs: three documented observed constants of the lunar gravity
-field (J₂ = 203.305e-6, C₂₂ = 22.4261e-6, C/MR² = 0.392728 — GRAIL+LLR,
+field (J₂ = <!--v:moonJ2Grail-->203.305<!--/v-->e-6, C₂₂ = <!--v:moonC22Grail-->22.4261<!--/v-->e-6, C/MR² = <!--v:moonCMR2-->0.392728<!--/v--> — GRAIL+LLR,
 Williams et al. 2014) plus framework rates (sidereal month, of-date nodal
 period 6798.3303 d, sidereal year, mass ratio; the Earth-only torque mass
 fraction M_E/(M_E+M_M) is a 1.2% term first-order treatments miss). Result:
-**ε = 1.5528° at the Brown-convention i (100.7% of measured; 1.5563° at the
+**ε = <!--v:cassiniObliquityDerived-->1.5528<!--/v-->° at the Brown-convention i (100.7% of measured; 1.5563° at the
 dynamical i — ∂ε/∂i ≈ 0.295 makes the convention worth 13″)**. The
 rigid-figure remainder of **37″** is **not attributed** — every candidate
 named so far has been measured and rejected, and the record says so rather
@@ -518,16 +518,16 @@ ELP-2000/82B orbit, RK4, no averaging anywhere — gives
 
 | | ε | vs measured |
 |---|---:|---:|
-| averaged balance, fixed axis | 1.5551° | +45.7″ |
-| **full Euler rotation** | **1.5470°** | **+16.5″** |
-| measured | 1.5424° | — |
+| averaged balance, fixed axis | <!--v:cassiniObliquityCoupled-->1.5551<!--/v-->° | +45.7″ |
+| **full Euler rotation** | **<!--v:cassiniObliquityEuler-->1.5470<!--/v-->°** | **+16.5″** |
+| measured | <!--v:moonObliquityEcliptic-->1.5424<!--/v-->° | — |
 
 The libration–pole coupling is worth **−29.3″, i.e. 64% of the gap**, and the
 residual falls to **16.5″ (0.30%)** — for the first time the same size as the
 named ~0.1% channels (elasticity k₂, degree-3 gravity, the core) rather than
 5–10× larger than all of them combined. Verification: the integrated mean is
-independent of the starting obliquity to **0.6″** (runs from 1.5551° and
-1.5424° converge to the same forced state) and unchanged at half the step
+independent of the starting obliquity to **0.6″** (runs from <!--v:cassiniObliquityCoupled-->1.5551<!--/v-->° and
+<!--v:moonObliquityEcliptic-->1.5424<!--/v-->° converge to the same forced state) and unchanged at half the step
 size; the free modes (libration ~1057 d, free precession ~81 yr) are
 oscillatory about the forced state and average out over the 250-yr span.
 
@@ -543,7 +543,7 @@ adopted, with nothing fitted.
 
 The coupled average (`--` the whole-orbit torque integral over the real
 ELP-2000/82B orbit, 18.6 yr, in the frame co-rotating with the mean node)
-therefore gives **ε = 1.5551° (100.83%)** against the rigid pass's 1.5528°
+therefore gives **ε = <!--v:cassiniObliquityCoupled-->1.5551<!--/v-->° (<!--v:cassiniObliquityCoupledPct-->100.83<!--/v-->%)** against the rigid pass's <!--v:cassiniObliquityDerived-->1.5528<!--/v-->°
 (100.7%). Neither averaged pass reaches the measurement, and no input can
 absorb the difference: that would require C/MR² wrong by 0.8% (known to
 3×10⁻⁵), J₂ wrong by 0.8% (known to 10⁻⁹), or the node period wrong by 56
@@ -565,12 +565,12 @@ number will differ.
 A framework cross-connection worth recording: the ⟨r⁻³⟩ enhancement of
 0.276% over the Keplerian ellipse is the torque-problem face of the same
 m²-class solar modification that DLT-1 §3 identifies for the semi-major axis
-(the "which a" question — two-body Kepler 384,748 km vs three-body 386,321 km).
+(the "which a" question — two-body Kepler 384,748 km vs three-body <!--v:moonKeplerEffectiveDistance-->386,321<!--/v--> km).
 The torque needs the properly averaged ⟨r⁻³⟩, which the lab now computes
 directly rather than choosing an `a`. Scene fix (shipped): the mesh tilt
 composes `moonEclipticInclinationJ2000 + moonObliquityEclipticJ2000`
 (6.6997° in the scene's own convention) so the rendered spin-to-ecliptic
-obliquity equals the measured 1.5424° (previously the catalog 6.687°
+obliquity equals the measured <!--v:moonObliquityEcliptic-->1.5424<!--/v-->° (previously the catalog 6.687°
 composition rendered 1.530°); `moonObliquityEclipticJ2000` lives in
 astro-reference.json with tools mirrors, and the
 refuted "moonTilt − I_E ≈ i" display composition is replaced by the
@@ -644,7 +644,7 @@ The apsidal/nodal values carry a micro-recalibration for the 8H-count layer
 rates (hence the last-digit drift from the first anchoring pass). The
 anchoring meter's node-rate row reads the **world frame**: the nodal layer
 spins at the of-date period (6798.33 d, −19.3411°/yr) in its local frame, and
-Earth's axial-precession parent adds the equinox precession (~0.0140°/yr, both
+Earth's axial-precession parent adds the equinox precession (<!--v:eccentricityMin-->~0.0140<!--/v-->°/yr, both
 retrograde), so the measured world-frame regression is the star-referenced
 −19.3551°/yr.
 
@@ -663,7 +663,7 @@ retrograde), so the measured world-frame regression is the star-referenced
 - Solar eclipses are topocentric events. The Moon's parallax (~0.95 degrees)
   means the geocentric Moon-Sun separation at eclipse time is approximately
   |gamma| x 0.95 degrees, where gamma is the eclipse shadow offset.
-- Pearson r(|gamma|, geocentric_sep) = 0.9945 (r^2 = 0.989)
+- Pearson r(|gamma|, geocentric_sep) = <!--v:meeusPearsonR-->0.9945<!--/v--> (r^2 = 0.989)
 - Residual RMS after subtracting expected parallax: **0.04 degrees**
 - To improve beyond 0.81 degrees would require topocentric correction
   (accounting for the observer's location on Earth).
@@ -955,7 +955,7 @@ Medieval, Ancient). Shows how accuracy degrades with time distance from J2000.
 
 `tools/explore/moon-parallax-analysis.js` -- Proves the 0.81° RMS at modern
 eclipses is the geocentric parallax limit. Correlates Moon-Sun separation with
-NASA gamma parameter (Pearson r=0.9945). Shows residual RMS of 0.04° after
+NASA gamma parameter (Pearson r=<!--v:meeusPearsonR-->0.9945<!--/v-->). Shows residual RMS of 0.04° after
 subtracting expected parallax.
 
 `tools/explore/moon-full-meeus-test.js` -- Standalone test comparing 3

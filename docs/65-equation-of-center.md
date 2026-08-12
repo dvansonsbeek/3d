@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -172,8 +172,8 @@ on its orbit to align cardinal points (solstices/equinoxes) with observed dates.
 | `useVariableSpeed` | true | Toggle |
 
 The geometric orbit offset parameters are **unchanged**:
-- `eccentricityBase` = 0.015386 (offset of circle center from Earth)
-- `eccentricityAmplitude` = 0.001356 (oscillation amplitude over H/16 cycle)
+- `eccentricityBase` = <!--v:eccentricityBase-->0.015386<!--/v--> (offset of circle center from Earth)
+- `eccentricityAmplitude` = <!--v:eccentricityAmplitude-->0.001356<!--/v--> (oscillation amplitude over H/16 cycle)
 
 ### Results
 
@@ -356,7 +356,7 @@ divisor type, applying ONLY:
 
 | Allowed | Example divisors |
 |---|---|
-| Year-multiple: divisor ≥ round(H) AND divisor % round(H) == 0 | 335317 (1 yr), 670634 (½ yr), 1005951 (⅓ yr), … |
+| Year-multiple: divisor ≥ round(H) AND divisor % round(H) == 0 | <!--v:HPlain-->335317<!--/v--> (1 yr), 670634 (½ yr), 1005951 (⅓ yr), … |
 | Small precession: divisor ∈ [1, 20] | 3, 5, 8, 13, 16 (Earth Fibonacci hierarchy) |
 | Lunar precession ICRF | 18015 (nodal, 18.6 yr), 37899 (apsidal, 8.85 yr) |
 
@@ -367,7 +367,7 @@ because divisor 168 doesn't match any allowed category.
 
 The design rule (see [tools/fit/README.md](../tools/fit/README.md) "Design
 rule: only cyclic, lattice-compatible corrections"): every correction
-divisor must share a factor with H = 23 × 61 × 239. The framework is
+divisor must share a factor with H = <!--v:holisticYearFactors-->23 × 61 × 239<!--/v-->. The framework is
 fundamentally cyclic — polynomial-in-T corrections and arbitrary fit
 frequencies are NOT allowed because they don't extrapolate cleanly to
 deep time.
@@ -378,7 +378,7 @@ After the runtime filter:
 
 | Divisor | Period | sin coefficient | cos coefficient | Amplitude |
 |---:|---|---:|---:|---:|
-| 335317 | 1 yr | +0.076405 ° | +0.013550 ° | ~280" (dominant) |
+| <!--v:HPlain-->335317<!--/v--> | 1 yr | +0.076405 ° | +0.013550 ° | ~280" (dominant) |
 | 670634 | ½ yr | +0.002478 ° | +0.000226 ° | ~9" |
 | 1005951 | ⅓ yr | +0.000033 ° | +0.000009 ° | ~0.1" |
 | ~~168~~ | ~~1996 yr~~ | ~~+0.004832 °~~ | ~~−0.004998 °~~ | ~~~25" — FILTERED OUT~~ |
@@ -541,7 +541,7 @@ After any future changes to this system:
 
 1. Run year analysis report in browser -- check cardinal point timing
 2. Verify season lengths: VE-SS ~92.7d, SS-AE ~93.7d, AE-WS ~89.9d
-3. Check precession period is still ~25,771 years
+3. Check precession period is still <!--v:mainstreamAxialPrecExact-->~25,771<!--/v--> years
 4. Check year lengths match IAU to within a few seconds
 5. Verify Sun visually speeds up in January and slows down in July
 6. Check equation of center display in UI shows correct values

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -218,7 +218,7 @@ Based on the relationship between Earth's inclination (~1.58° at J2000, decreas
 | Neptune | 1.768° | ABOVE | ABOVE | **DECREASING** ↓ |
 | Pluto | 17.142° | ABOVE | ABOVE | **DECREASING** ↓ |
 
-**Note**: Mars (1.850°), Jupiter (1.305°), and Neptune (1.768°) have **ecliptic inclinations** within Earth's **invariable plane inclination** range (0.85°-2.12°). The ascending node algorithm compares these values, so these planets experience Ω direction reversals whenever Earth's inclination crosses theirs over the H/3 ≈ 111,772-year inclination-oscillation cycle (driven by Earth's ICRF perihelion). Note that Earth's ascending node Ω itself regresses on a separate −H/5 ≈ 67,063-year cycle.
+**Note**: Mars (1.850°), Jupiter (1.305°), and Neptune (1.768°) have **ecliptic inclinations** within Earth's **invariable plane inclination** range (0.85°-2.12°). The ascending node algorithm compares these values, so these planets experience Ω direction reversals whenever Earth's inclination crosses theirs over the H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v-->-year inclination-oscillation cycle (driven by Earth's ICRF perihelion). Note that Earth's ascending node Ω itself regresses on a separate −H/5 ≈ 67,063-year cycle.
 
 ### Ecliptic Inclination Direction
 
@@ -275,16 +275,16 @@ Key behavioral notes:
 
 | Planet | Ecliptic formula | Ecliptic period (yr) | ICRF period (yr) | ICRF direction |
 |--------|------------------|---------------------|------------------|----------------|
-| Mercury | H × 8/11 | 243,867 | 28,844 | Retrograde |
+| Mercury | H × 8/11 | <!--v:mercuryPeriPeriod-->243,867<!--/v--> | <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> | Retrograde |
 | Venus | −8H/6 | 447,089 | 24,387 | Retrograde |
-| Earth | H / 16 (ecliptic) / H / 3 (ICRF) | 20,957 | 111,772 | **Prograde (sole)** |
-| Mars | H × 8/36 | 74,515 | 39,449 | Retrograde |
-| Jupiter | 8H / 39 | 68,783 | 41,270 | Retrograde |
-| Saturn | −8H / 65 | 41,270 | 15,873 | Retrograde |
-| Uranus | H / 3 | 111,772 | 33,532 | Retrograde |
-| Neptune | H × 2 | 670,634 | 26,825 | Retrograde |
+| Earth | H / 16 (ecliptic) / H / 3 (ICRF) | 20,957 | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> | **Prograde (sole)** |
+| Mars | H × 8/36 | <!--v:marsPeriPeriod-->74,515<!--/v--> | <!--v:marsPeriPeriodICRF-->39,449<!--/v--> | Retrograde |
+| Jupiter | 8H / 39 | <!--v:jupiterPeriPeriod-->68,783<!--/v--> | 41,270 | Retrograde |
+| Saturn | −8H / 65 | 41,270 | <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> | Retrograde |
+| Uranus | H / 3 | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> | <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> | Retrograde |
+| Neptune | H × 2 | <!--v:twoH-->670,634<!--/v--> | 26,825 | Retrograde |
 
-The ICRF period is derived from the ecliptic period by subtracting the general precession rate (H/13): `1/P_ICRF = 1/P_ecliptic − 13/H`. Earth is the only planet with a prograde ICRF perihelion. All ICRF periods divide 8H = 2,682,536 years at J2000 exactly (the Solar System Resonance Cycle). The inclination oscillation is driven by the ICRF period, not the ecliptic period.
+The ICRF period is derived from the ecliptic period by subtracting the general precession rate (H/13): `1/P_ICRF = 1/P_ecliptic − 13/H`. Earth is the only planet with a prograde ICRF perihelion. All ICRF periods divide 8H = <!--v:eightH-->2,682,536<!--/v--> years at J2000 exactly (the Solar System Resonance Cycle). The inclination oscillation is driven by the ICRF period, not the ecliptic period.
 
 ### The Key Insight
 

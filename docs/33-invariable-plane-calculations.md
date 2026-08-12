@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -193,13 +193,13 @@ Each body's ascending node Ω on the invariable plane precesses linearly at a bo
 | Body | N | Ω Period | Notes |
 |------|---|----------|-------|
 | **Earth** | 40 | −H/5 ≈ −67,063 yr | = −(8H)/40, the ecliptic precession rate |
-| Mercury | 9 | −298,060 yr | |
-| Venus | 1 | −2,682,536 yr | = −8H, full Solar System Resonance Cycle |
+| Mercury | 9 | −<!--v:mercuryAxialPeriod-->298,060<!--/v--> yr | |
+| Venus | 1 | −<!--v:eightH-->2,682,536<!--/v--> yr | = −8H, full Solar System Resonance Cycle |
 | Mars | 64 | −41,915 yr | |
-| Jupiter | 36 | −74,515 yr | Shared with Saturn (lockstep) |
-| Saturn | 36 | −74,515 yr | Shared with Jupiter (lockstep) |
-| Uranus | 11 | −243,867 yr | |
-| Neptune | 3 | −894,179 yr | |
+| Jupiter | 36 | −<!--v:marsPeriPeriod-->74,515<!--/v--> yr | Shared with Saturn (lockstep) |
+| Saturn | 36 | −<!--v:marsPeriPeriod-->74,515<!--/v--> yr | Shared with Jupiter (lockstep) |
+| Uranus | 11 | −<!--v:mercuryPeriPeriod-->243,867<!--/v--> yr | |
+| Neptune | 3 | −<!--v:mercuryObliqCycle-->894,179<!--/v--> yr | |
 
 The signed period is negative because Ω regresses (retrograde) for every body. The per-planet `N` integer is stored as `ascendingNodeCyclesIn8H` in `data/planets.json`; constants.js precomputes the corresponding signed period as `ascendingNodePeriod = -(8H)/N`. The integers were chosen to fit JPL ecliptic-inclination trends to <2″/century each in the J2000-fixed frame; see [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) for the full derivation.
 
@@ -299,8 +299,8 @@ This value oscillates ~±7° due to the equatorial-frame perihelion fluctuation 
 
 **Verification at J2000:**
 - Earth's longitude of perihelion: ϖ ≈ 102.947°
-- Earth's ascending node on inv. plane: Ω_inv = 284.51°
-- Direct calculation: ω = (102.947 − 284.51 + 360) % 360 = 178.437°
+- Earth's ascending node on inv. plane: Ω_inv = <!--v:earthAscNodeJ2000-->284.51<!--/v-->°
+- Direct calculation: ω = (102.947 − <!--v:earthAscNodeJ2000-->284.51<!--/v--> + 360) % 360 = 178.437°
 - Mean formula: 180° − 1.5786° = 178.421°
 - Agreement within ~0.016°
 

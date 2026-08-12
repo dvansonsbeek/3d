@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -33,7 +33,7 @@ where:
 |--------|--------|-------------|-------------|-------------|
 | Mercury | 0.205630 | 2.338e-5 | 0.205607 | 99.99% |
 | Venus | 0.007707 | 9.526e-4 | 0.006754 | 87.64% |
-| Earth | 0.015386 | 1.356e-3 | 0.014030 | 91.19% |
+| Earth | <!--v:eccentricityBase-->0.015386<!--/v--> | 1.356e-3 | 0.014030 | 91.19% |
 | Mars | 0.091466 | 3.066e-3 | 0.088400 | 96.65% |
 | Jupiter | 0.048386 | 1.134e-6 | 0.048385 | 100.00% |
 | Saturn | 0.053866 | 5.360e-6 | 0.053861 | 99.99% |
@@ -166,7 +166,7 @@ Ten directions were explored in search of a universal eccentricity constant (ana
 
 ### The regression formula (exploratory, not a law)
 
-The best multivariate fit (5 parameters, R² = 0.9945):
+The best multivariate fit (5 parameters, R² = <!--v:meeusPearsonR-->0.9945<!--/v-->):
 
 ```
 e = χ × a^0.59 × m^(-0.48) × tilt^(-0.40) × i_amp^(-0.35) × T_prec^(-1.44)

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -26,7 +26,7 @@ The canonical climate formula has **three layers** totalling **41 components**:
 | **L3** | 6 | Heaviside step components (PETM, EOT, Mi-1, MMCT, iNHG, MPT) | Tectonic / cryosphere regime shifts — **NOT** periodic | [doc 92 §4](92-climate-formula.md) |
 | **Total** | **41** | | | |
 
-**Why L2 and L3 are excluded from this doc:** the Earth-planet beat search assumes orbital integer-divisor structure. L2 is off-lattice (405 kyr is not a divisor of 8H = 2,682,536 yr at J2000) and arises from carbon-cycle internal resonance, not orbital forcing directly. L3 is non-periodic — boundary-condition step shifts at known Cenozoic transitions. Different mechanism class, different attribution.
+**Why L2 and L3 are excluded from this doc:** the Earth-planet beat search assumes orbital integer-divisor structure. L2 is off-lattice (405 kyr is not a divisor of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000) and arises from carbon-cycle internal resonance, not orbital forcing directly. L3 is non-periodic — boundary-condition step shifts at known Cenozoic transitions. Different mechanism class, different attribution.
 
 **The n=7 LR04 4σ peak is L2's shadow, not L1.** The LR04 full-record spectrum has a 4σ peak at T = 383.22 kyr (= 8H/7). The well-established 405-kyr eccentricity line sits 21.8 kyr away and is **off the 8H lattice** — its spectral energy leaks into the nearest lattice bin (n=7), which the divisor-spectrum then detects but classifies as "Unpredicted" (no family-level beat predicts 383 kyr exactly). Including n=7 in L1 would double-count with L2. It is correctly excluded from the canonical L1 list of 32 integers.
 

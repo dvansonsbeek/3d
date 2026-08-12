@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -11,9 +11,9 @@ status: current
 
 The planetary eccentricities are determined by a balance scale — not by individual per-planet formulas, but by a system of simultaneous relationships that constrains all 8 eccentricities at once, analogous to how Kepler's T² = a³ relates all periods to distances through a single principle.
 
-The eccentricities used in this balance are the **base eccentricities** — the long-term mean values around which each planet's eccentricity oscillates over its eccentricity cycle. These differ slightly from the J2000 measured values (e.g., Earth's base = 0.015386 vs J2000 = 0.016710).
+The eccentricities used in this balance are the **base eccentricities** — the long-term mean values around which each planet's eccentricity oscillates over its eccentricity cycle. These differ slightly from the J2000 measured values (e.g., Earth's base = <!--v:eccentricityBase-->0.015386<!--/v--> vs J2000 = 0.016710).
 
-> **Scope note (ESSRT).** The balance equation, weight formula `W_j = √(m_j/m_target × d_target/d_j × a_j/a_target)`, and amplitude formula `e_amp = K × sin(tilt) × √d / (√m × a^1.5)` are scale-invariant — they hold at any epoch. K, the base eccentricities, axial tilts, and Earth's ~20,957-yr eccentricity cycle (H/16) are J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally. The balance machinery this document describes therefore applies at any epoch with epoch-consistent inputs — Open Question §2 below already addresses temporal stability.
+> **Scope note (ESSRT).** The balance equation, weight formula `W_j = √(m_j/m_target × d_target/d_j × a_j/a_target)`, and amplitude formula `e_amp = K × sin(tilt) × √d / (√m × a^1.5)` are scale-invariant — they hold at any epoch. K, the base eccentricities, axial tilts, and Earth's <!--v:periPrecYears-->~20,957<!--/v-->-yr eccentricity cycle (H/16) are J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally. The balance machinery this document describes therefore applies at any epoch with epoch-consistent inputs — Open Question §2 below already addresses temporal stability.
 
 The balance equation (Law 5) can be expressed as a physical scale:
 
@@ -177,7 +177,7 @@ K = <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> — derived from Earth's mean par
 
 **SYSTEM/ALONE mass convention** (same as for ψ — see [doc 10 §Universal Constants](10-fibonacci-laws.md#the-universal-constants-ψ-and-k) and [doc 25 §Sun/System vs Sun/Planet-Alone](25-universal-mass-from-moon-formula.md#sunsystem-vs-sunplanet-alone)): Earth uses M_Earth_ALONE in K calibration; other planets use M_planet_SYSTEM in the e_amp formula above. The Moon's contribution is empirically absorbed into the fitted `e_amp_Earth`.
 
-Each planet's eccentricity oscillates around its base value over an **eccentricity cycle** (the meeting frequency of axial and perihelion precession in ICRF). For Earth this cycle is ~20,957 years; other planets have their own cycle periods. At any given time:
+Each planet's eccentricity oscillates around its base value over an **eccentricity cycle** (the meeting frequency of axial and perihelion precession in ICRF). For Earth this cycle is <!--v:periPrecYears-->~20,957<!--/v--> years; other planets have their own cycle periods. At any given time:
 
 ```
 e(t) = √(e_base² + e_amp²) + (-e_amp - h₁·cos θ)·cos θ

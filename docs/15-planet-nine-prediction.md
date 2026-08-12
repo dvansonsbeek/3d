@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -56,7 +56,7 @@ By ~2030-2035, the Vera Rubin Observatory (LSST) is expected to provide a defini
 
 ## 2. The Fibonacci Model's 8-Planet Architecture
 
-The Fibonacci-Universe model has a **unique configuration** that achieves Law 3 (inclination) balance 99.997% — passing the canonical screening threshold of 99.994% (the Li 2019 TNO-margin) — and Law 5 (eccentricity) balance 99.862% with phase-derived base eccentricities ([doc 19](19-balance-sensitivity-analysis.md)). The structure is the **4-mirror-pair**, where each planet is paired with another across the asteroid belt via Fibonacci-numbered "d" divisors:
+The Fibonacci-Universe model has a **unique configuration** that achieves Law 3 (inclination) balance 99.997% — passing the canonical screening threshold of <!--v:balanceThreshold-->99.994%<!--/v--> (the Li 2019 TNO-margin) — and Law 5 (eccentricity) balance 99.862% with phase-derived base eccentricities ([doc 19](19-balance-sensitivity-analysis.md)). The structure is the **4-mirror-pair**, where each planet is paired with another across the asteroid belt via Fibonacci-numbered "d" divisors:
 
 | Pair | Fibonacci d | Phase grouping |
 |---|---|---|
@@ -65,7 +65,7 @@ The Fibonacci-Universe model has a **unique configuration** that achieves Law 3 
 | **Earth ↔ Saturn** | 3 (F₄) | Earth in-phase / **Saturn anti-phase** |
 | Mars ↔ Jupiter | 5 (F₅) | both in-phase |
 
-This is **the unique mirror-symmetric configuration** discovered in the canonical 7,558,272-configuration search (`tools/verify/balance-search.js`).
+This is **the unique mirror-symmetric configuration** discovered in the canonical <!--v:configSearchSpace-->7,558,272<!--/v-->-configuration search (`tools/verify/balance-search.js`).
 
 The structure has a key topological property: **mirror symmetry requires an even number of planets**. 9 bodies cannot form 4½ pairs.
 
@@ -89,7 +89,7 @@ For distant low-mass bodies, this predicts very small amplitudes. Any candidate 
 
 If Law-4 compliance is bypassed (treating the candidate's observed e as if it were e_base, like for the 8 primary planets), the canonical balance search adds a 9th body and checks closure. For each of:
 
-- **7,558,272** 8-planet configurations (5 free planets × 9 Fibonacci d × 2 groups × 4 Jupiter-Saturn scenarios)
+- **<!--v:configSearchSpace-->7,558,272<!--/v-->** 8-planet configurations (5 free planets × 9 Fibonacci d × 2 groups × 4 Jupiter-Saturn scenarios)
 - × **9** Planet Nine candidate masses/distances (published Batygin-Brown / Siraj estimates + smaller test bodies)
 - × **18** Planet Nine options (9 Fibonacci d × 2 groups)
 
@@ -101,7 +101,7 @@ we compute:
 
 Total: **1,224,440,064 balance evaluations** across the complete canonical search space.
 
-The implementation in [`scripts/planet_nine_analysis.py`](../scripts/planet_nine_analysis.py) is verified to **reproduce exactly** the canonical search's 767 surviving 8-planet configs at the 99.994% Law 3 threshold — confirming the implementation matches `balance-search.js` to machine precision.
+The implementation in [`scripts/planet_nine_analysis.py`](../scripts/planet_nine_analysis.py) is verified to **reproduce exactly** the canonical search's 767 surviving 8-planet configs at the <!--v:balanceThreshold-->99.994%<!--/v--> Law 3 threshold — confirming the implementation matches `balance-search.js` to machine precision.
 
 ---
 
@@ -300,7 +300,7 @@ The Fibonacci-Universe model rejects all proposed Planet Nine candidates on two 
 
 - **Primary test (Law-4 compliance):** All candidates fail by 3 to 7 orders of magnitude. Their observed eccentricities are far too large for the framework's Law 4 amplitude prediction `e_amp = K · sin(tilt) · √d / (√m · a^(3/2))`, regardless of which Fibonacci d is assumed. The candidate (m, a, e) tuples are structurally incompatible with being Fibonacci-balanced primary planets.
 
-- **Secondary confirmation (v-balance):** Across the complete canonical 7,558,272-configuration search × 18 Planet Nine options, no Fibonacci configuration accommodates a Batygin-Brown-mass (4-10 M_Earth) Planet Nine at typical hundreds-of-AU distance. Best achievable Law 5 balance with a 5 M_Earth body: ~9%, versus the current 8-planet 99.86% baseline.
+- **Secondary confirmation (v-balance):** Across the complete canonical <!--v:configSearchSpace-->7,558,272<!--/v-->-configuration search × 18 Planet Nine options, no Fibonacci configuration accommodates a Batygin-Brown-mass (4-10 M_Earth) Planet Nine at typical hundreds-of-AU distance. Best achievable Law 5 balance with a 5 M_Earth body: ~9%, versus the current 8-planet 99.86% baseline.
 
 The Fibonacci-Universe model is structurally **complete with 8 planets**. The 4 mirror pairs (Mercury-Uranus, Venus-Neptune, Earth-Saturn, Mars-Jupiter) uniquely balance Laws 3 and 5 with Saturn as the anti-phase anchor. Adding any major 9th planet at proposed parameters fails the framework's structural constraints — first by violating Law 4 (the eccentricity amplitude scaling), and second by disrupting the v-balance equation.
 

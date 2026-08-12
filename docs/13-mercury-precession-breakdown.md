@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -106,7 +106,7 @@ We use numerical integration (1000 steps) rather than series expansion because:
 | Perturber | α      | b₃/₂⁽¹⁾(α) |
 |-----------|--------|------------|
 | Venus     | 0.5352 | 3.036      |
-| Earth     | 0.3871 | 1.576      |
+| Earth     | <!--v:mercurySemiMajor-->0.3871<!--/v--> | 1.576      |
 | Mars      | 0.2541 | 0.864      |
 | Jupiter   | 0.0744 | 0.226      |
 | Saturn    | 0.0406 | 0.122      |
@@ -186,7 +186,7 @@ frame. The theory assumes this frame is a stable inertial reference.
 **But the ecliptic is not a stable inertial frame.** Two things move relative
 to the ICRF (true inertial):
 
-1. **General precession (H/13 ≈ 25,794 yr)** — Earth's axial precession
+1. **General precession (H/13 ≈ <!--v:earthAxialPeriod-->25,794<!--/v--> yr)** — Earth's axial precession
    carries the equinox westward through the inertial sky at ~50 ″/yr. The
    "ecliptic-of-date" frame rotates at this rate relative to the ICRF.
 2. **Ecliptic precession (H/5 ≈ 67,063 yr)** — Earth's orbital plane itself

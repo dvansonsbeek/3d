@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -24,7 +24,7 @@ status: current
 **Status:** synthesis of the doc 90–94 cluster.
 No new measurements in this document — all R² values are computed in the cited scripts and reproduced from `data/milankovitch-climate-formula.json`, `data/insolation-extension-results.json`, and `data/insolation-laskar-check-results.json`.
 
-> **Scope note (ESSRT).** The two-paradigm comparison and the structural argument that the L1 lattice strictly subsumes the Berger insolation parameterization are scale-invariant — they hold at any epoch. The literal year counts (8H = 2,682,536 yr; the 405-kyr L2 family) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally — sub-percent over the LR04/EPICA windows where the empirical case is made. The "climate is gravitational coupling, not insolation" thesis is structural and therefore epoch-independent; the numerical R² values are present-epoch measurements.
+> **Scope note (ESSRT).** The two-paradigm comparison and the structural argument that the L1 lattice strictly subsumes the Berger insolation parameterization are scale-invariant — they hold at any epoch. The literal year counts (8H = <!--v:eightH-->2,682,536<!--/v--> yr; the 405-kyr L2 family) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally — sub-percent over the LR04/EPICA windows where the empirical case is made. The "climate is gravitational coupling, not insolation" thesis is structural and therefore epoch-independent; the numerical R² values are present-epoch measurements.
 
 ---
 
@@ -44,7 +44,7 @@ These three are themselves derived from the gravitational coupling among the pla
 
 ### 1.2 The 8H-lattice paradigm (this framework)
 
-Climate is driven by the **gravitational rhythm of the entire solar system**, parameterized as integer divisors of the 8H = 2,682,536-yr (at J2000) Solar System Resonance Cycle. Each integer corresponds to a specific planet–planet beat or a direct planet-cycle harmonic. The full L1 set is 32 integers (see [doc 93](93-l1-attribution-reference.md) for per-integer attribution).
+Climate is driven by the **gravitational rhythm of the entire solar system**, parameterized as integer divisors of the 8H = <!--v:eightH-->2,682,536<!--/v-->-yr (at J2000) Solar System Resonance Cycle. Each integer corresponds to a specific planet–planet beat or a direct planet-cycle harmonic. The full L1 set is 32 integers (see [doc 93](93-l1-attribution-reference.md) for per-integer attribution).
 
 The two paradigms are **not contradictory** — they describe the same gravitational physics. They differ in:
 
@@ -66,7 +66,7 @@ Berger's three insolation features ε(t), e(t), ϖ(t) are themselves *defined* a
 | Climatic precession 22.4 kyr | k + g₂ (Venus) | n = 120 |
 | Obliquity 41.2 kyr | k + s₃ (Earth nodal) | n = 65 |
 
-The periods in the first column are computed from the Laskar 2004 eigenmode beats — e.g. for the obliquity row, k + s₃ = 50.29 − 18.85 = 31.44″/yr, giving period 1,296,000 / 31.44 = 41,222 yr ≈ 41.2 kyr. The often-cited textbook rounding "41 kyr" (Berger 1978) and our model's 8H/65 = 41.27 kyr both refer to this same Laskar eigenmode period.
+The periods in the first column are computed from the Laskar 2004 eigenmode beats — e.g. for the obliquity row, k + s₃ = 50.29 − 18.85 = 31.44″/yr, giving period <!--v:arcsecInCircle-->1,296,000<!--/v--> / 31.44 = 41,222 yr ≈ 41.2 kyr. The often-cited textbook rounding "41 kyr" (Berger 1978) and our model's 8H/65 = 41.27 kyr both refer to this same Laskar eigenmode period.
 
 Every Berger insolation peak is *somewhere* in the L1 lattice (see [doc 93](93-l1-attribution-reference.md) for the full mapping). The lattice contains all of Berger, plus integer-divisor structure that Berger's reduction does not surface (planet-planet beats not historically considered insolation-relevant, like 8H/16 Mars Axial, 8H/35 Earth-Mercury-Saturn 3-term beat, etc.).
 
@@ -133,7 +133,7 @@ The conventional summary "climate is driven by Milankovitch insolation forcing" 
 
 ### 5.2 For solar-system dynamics
 
-- The 8H = 2,682,536-yr (at J2000) period **is a real resonance period** for the solar system, not a mathematical artifact. Every L1 integer corresponds to a specific planet–planet beat or planet-cycle harmonic; the lattice is dense at low n (frequencies coalesce around obliquity, precession, and eccentricity bands) and sparse at high n.
+- The 8H = <!--v:eightH-->2,682,536<!--/v-->-yr (at J2000) period **is a real resonance period** for the solar system, not a mathematical artifact. Every L1 integer corresponds to a specific planet–planet beat or planet-cycle harmonic; the lattice is dense at low n (frequencies coalesce around obliquity, precession, and eccentricity bands) and sparse at high n.
 - Earth's orbital elements are not independent — they are determined by the secular coupling with the other seven planets. This is well-known (Laskar 2004 derives it explicitly); what this work adds is that the **integer-divisor structure of the resonance period maps directly onto climate variance**.
 - The lattice exposes that Berger's "Venus precession", "Jupiter precession", etc., are not separate phenomena — they are individual integer divisors of the same fundamental 8H period.
 
@@ -183,7 +183,7 @@ Each row is a measured quantity with a script that reproduces it:
 
 | Quantity | Value | Source / script |
 |----------|-------|-----------------|
-| 8H Solar System Resonance Cycle | 2,682,536 yr (at J2000) | [doc 55](55-solar-system-resonance-cycle-periods.md), `model-parameters.json` |
+| 8H Solar System Resonance Cycle | <!--v:eightH-->2,682,536<!--/v--> yr (at J2000) | [doc 55](55-solar-system-resonance-cycle-periods.md), `model-parameters.json` |
 | L1 lattice integers | 32 | [doc 93](93-l1-attribution-reference.md) |
 | L1 alone, post-MPT LR04 | R² = 0.870 | `scripts/milankovitch_climate_formula.py` |
 | L1+L2+L3, post-MPT LR04 | R² = 0.8735 | `data/milankovitch-climate-formula.json` |

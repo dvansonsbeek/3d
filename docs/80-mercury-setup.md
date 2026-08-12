@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -14,21 +14,21 @@ This document explains **why** each value in Mercury's 5-layer scene graph hiera
 | Quantity | Value | Source |
 |----------|-------|--------|
 | Semi-major axis | 0.38711 AU | Kepler's 3rd law from H × 8/11 period |
-| Eccentricity (J2000) | 0.20564 | JPL J2000 |
-| Base eccentricity | 0.20563 | Phase-derived (≈ J2000, amp negligible) |
+| Eccentricity (J2000) | <!--v:mercuryEccJ2000-->0.20564<!--/v--> | JPL J2000 |
+| Base eccentricity | <!--v:mercuryEccBase-->0.20563<!--/v--> | Phase-derived (≈ J2000, amp negligible) |
 | Eccentricity amplitude | 2.34×10⁻⁵ | K formula × sin(0.0084°) — tiny |
 | Inclination (J2000, inv. plane) | 6.3473° | JPL J2000 |
 | Mean inclination | 6.7032° | Derived from J2000 constraint (mean = i_J2000 − amp·cos(ω̃_J2000 − cycleAnchor)) |
 | Inclination amplitude | 0.3865° | PSI / (d × √m), d = 21 |
 | Mean obliquity | 0.0084° | Axial tilt + oscillation offset at System Reset (see Step B) |
-| **Ecliptic perihelion** | **243,867 yr** | **H × 8/11 (Fibonacci Law 1)** |
-| **Axial precession** | **−298,060 yr** | **−8H/9 (Cassini state, MESSENGER)** |
-| **Obliquity cycle** | **894,179 yr** | **8H/3 (Fibonacci 11 = 3 + 8)** |
-| **Eccentricity cycle** | **31,935 yr** | **2H/21 = 8H/84 (beat of axial × ICRF peri: 84 = \|93 − 9\|)** |
-| **Inclination cycle (= ICRF peri)** | **28,844 yr** | **8H/93 (drives the inclination oscillation)** |
+| **Ecliptic perihelion** | **<!--v:mercuryPeriPeriod-->243,867<!--/v--> yr** | **H × 8/11 (Fibonacci Law 1)** |
+| **Axial precession** | **−<!--v:mercuryAxialPeriod-->298,060<!--/v--> yr** | **−8H/9 (Cassini state, MESSENGER)** |
+| **Obliquity cycle** | **<!--v:mercuryObliqCycle-->894,179<!--/v--> yr** | **8H/3 (Fibonacci 11 = 3 + 8)** |
+| **Eccentricity cycle** | **<!--v:mercuryEccCycle-->31,935<!--/v--> yr** | **2H/21 = 8H/84 (beat of axial × ICRF peri: 84 = \|93 − 9\|)** |
+| **Inclination cycle (= ICRF peri)** | **<!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr** | **8H/93 (drives the inclination oscillation)** |
 | Orbit center (scene) | (−6.4682, −1.3244, 0) | Derived from base × direction |
 | Inclination phase at J2000 | 22.94° (just past MIN, heading to MAX; next MIN ≈ 29,006 AD) | Current angle in inclination cycle (intuitive convention) |
-| Eccentricity phase at J2000 | 104.12° (past mean rising, heading to MAX) | Current angle in eccentricity cycle (intuitive convention) |
+| Eccentricity phase at J2000 | <!--v:mercuryEccPhaseJ2000-->104.12<!--/v-->° (past mean rising, heading to MAX) | Current angle in eccentricity cycle (intuitive convention) |
 | Spin axis tilt | −0.03° | JPL J2000 (nearly zero) |
 
 **Two distinct phases — two different oscillations**
@@ -37,30 +37,30 @@ Both phases are computed in the ICRF frame and describe **where Mercury currentl
 
 | | Inclination | Eccentricity |
 |---|---|---|
-| **Cycle period** | 28,844 yr (8H/93 = ICRF perihelion) | 31,935 yr (2H/21 = beat freq) |
+| **Cycle period** | <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr (8H/93 = ICRF perihelion) | <!--v:mercuryEccCycle-->31,935<!--/v--> yr (2H/21 = beat freq) |
 | **Phase 0°** | MIN inclination (6.3167°) | MIN eccentricity (base − amp) |
 | **Phase 90°** | mean, rising | mean, rising (System Reset for in-phase) |
 | **Phase 180°** | MAX inclination (7.0897°) | MAX eccentricity (base + amp) |
 | **Phase 270°** | mean, falling | mean, falling (System Reset for Saturn) |
-| **Current phase at J2000** | **22.94°** (just past MIN) | **104.12°** (past mean rising, heading to MAX) |
-| **Current value at J2000** | 6.3473° (≈ MIN, only 0.031° above) | 0.20564 (essentially constant) |
+| **Current phase at J2000** | **22.94°** (just past MIN) | **<!--v:mercuryEccPhaseJ2000-->104.12<!--/v-->°** (past mean rising, heading to MAX) |
+| **Current value at J2000** | 6.3473° (≈ MIN, only 0.031° above) | <!--v:mercuryEccJ2000-->0.20564<!--/v--> (essentially constant) |
 
 **How to read Mercury's inclination phase (22.94°)**:
 - At J2000, Mercury is **22.94° past MIN**, climbing toward MAX
-- 22.94° / 360° × 28,844 yr = **1,838 years past MIN**
+- 22.94° / 360° × <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr = **1,838 years past MIN**
 - Mercury reached its minimum inclination around year **162 AD**
-- Will reach the next MAX inclination around year **14,585 AD** (157.06° further in cycle: (180° − 22.94°)/360° × 28,844 yr)
-- Will reach the next MIN inclination around year **29,006 AD** (full cycle later: previous MIN + 28,844 yr)
+- Will reach the next MAX inclination around year **14,585 AD** (157.06° further in cycle: (180° − 22.94°)/360° × <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr)
+- Will reach the next MIN inclination around year **29,006 AD** (full cycle later: previous MIN + <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr)
 
-**How to read Mercury's eccentricity phase (104.12°)**:
+**How to read Mercury's eccentricity phase (<!--v:mercuryEccPhaseJ2000-->104.12<!--/v-->°)**:
 - 90° = "mean rising" alignment at the System Reset (where all in-phase planets pass through mean simultaneously)
-- 104.12° = 14.12° past that alignment, still heading toward MAX (180°)
-- Time since System Reset alignment: 14.12° / 360° × 31,935 yr = ~1,253 years
+- <!--v:mercuryEccPhaseJ2000-->104.12<!--/v-->° = 14.12° past that alignment, still heading toward MAX (180°)
+- Time since System Reset alignment: 14.12° / 360° × <!--v:mercuryEccCycle-->31,935<!--/v--> yr = ~1,253 years
 - But because Mercury's amplitude is so tiny (2×10⁻⁵), the actual eccentricity hardly moves throughout the entire cycle.
 
 ### Note on the model parameter `inclinationCycleAnchor`
 
-The model stores `inclinationCycleAnchor = 234.52°` for Mercury. This is **not** the user-facing phase value above — it's the ICRF perihelion longitude at which Mercury reaches its inclination MAX, used as the anchor for the formula `i(t) = mean + amp × cos(ω̃_ICRF(t) − 234.52°)`. In formula coordinates, MAX occurs when cos = +1 (ω̃_ICRF = 234.52°) and MIN when cos = −1 (ω̃_ICRF = 234.52° + 180°).
+The model stores `inclinationCycleAnchor = 234.52°` for Mercury. This is **not** the user-facing phase value above — it's the ICRF perihelion longitude at which Mercury reaches its inclination MAX, used as the anchor for the formula `i(t) = mean + amp × cos(ω̃_ICRF(t) − 234.52°)`. In formula coordinates, MAX occurs when cos = +1 (ω̃_ICRF = <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->°) and MIN when cos = −1 (ω̃_ICRF = <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° + 180°).
 
 The user-facing **22.94°** is derived as: `((ω̃_ICRF(J2000) − 234.52°) − 180° + 360°) mod 360°`. The −180° shift converts from the cycle anchor (MAX at 0°) to the intuitive convention (MIN at 0°).
 
@@ -88,13 +88,13 @@ barycenterEarthAndSun (the Sun)
 
 | Property | Value | How it's derived |
 |----------|-------|-----------------|
-| speed | `+2π / perihelionEclipticYears` = +2π / 243,867 rad/yr | From `planets.mercury.perihelionEclipticYears` (= H × 8/11, a Fibonacci ratio). Positive = prograde. |
+| speed | `+2π / perihelionEclipticYears` = +2π / <!--v:mercuryPeriPeriod-->243,867<!--/v--> rad/yr | From `planets.mercury.perihelionEclipticYears` (= H × 8/11, a Fibonacci ratio). Positive = prograde. |
 | startPos | 0° | No initial offset — the precession starts from the reference orientation. |
 | orbitRadius | 0 | Pure rotation, no translation. |
 | orbitCenter | (0, 0, 0) | No offset — rotation around the parent's origin (the Sun). |
 | tilt | 0° | No tilt — precession is in the ecliptic plane. |
 
-**Why this value?** Mercury's ecliptic perihelion period is H × 8/11 ≈ 243,867 years. This comes from the [Fibonacci cycle hierarchy](10-fibonacci-laws.md) (Law 1): Mercury's period ratio 8/11 is the ratio of two Fibonacci-adjacent numbers minus one step. The ecliptic rate is the observable precession in the simulation's reference frame.
+**Why this value?** Mercury's ecliptic perihelion period is H × 8/11 ≈ <!--v:mercuryPeriPeriod-->243,867<!--/v--> years. This comes from the [Fibonacci cycle hierarchy](10-fibonacci-laws.md) (Law 1): Mercury's period ratio 8/11 is the ratio of two Fibonacci-adjacent numbers minus one step. The ecliptic rate is the observable precession in the simulation's reference frame.
 
 ---
 
@@ -116,12 +116,12 @@ The orbit center places Mercury's perihelion point at the correct distance and d
 
 1. **The distance** = `mercuryPerihelionDistance` = `orbitDistance × realEccentricity × 100`
    - `orbitDistance` = 0.38711 AU (from Kepler's 3rd law: `(H / solarYearCount)^(2/3)`)
-   - `realEccentricity` = `e_base / (1 + e_base)` = 0.20563 / 1.20563 = 0.17056. Here `e_base` is `orbitalEccentricityBase` (0.20563) — the model's phase-derived **base** eccentricity (the midpoint of the eccentricity oscillation cycle), essentially equal to the J2000 snapshot (0.20564) because Mercury's amplitude is tiny. The formula converts the orbital eccentricity to the geometric focus offset as a fraction of the semi-major axis.
+   - `realEccentricity` = `e_base / (1 + e_base)` = <!--v:mercuryEccBase-->0.20563<!--/v--> / 1.20563 = 0.17056. Here `e_base` is `orbitalEccentricityBase` (<!--v:mercuryEccBase-->0.20563<!--/v-->) — the model's phase-derived **base** eccentricity (the midpoint of the eccentricity oscillation cycle), essentially equal to the J2000 snapshot (<!--v:mercuryEccJ2000-->0.20564<!--/v-->) because Mercury's amplitude is tiny. The formula converts the orbital eccentricity to the geometric focus offset as a fraction of the semi-major axis.
    - `× 100` = scene-graph scale factor (1 AU = 100 scene units)
    - Result: **6.6024 scene units**
 
-2. **The direction** = `longitudePerihelion + angleCorrection` = 77.457° + 0.972° = **78.429°**
-   - `longitudePerihelion` = 77.457° (JPL J2000 ecliptic longitude of Mercury's perihelion)
+2. **The direction** = `longitudePerihelion + angleCorrection` = <!--v:mercuryPeriLongJ2000-->77.457<!--/v-->° + 0.972° = **78.429°**
+   - `longitudePerihelion` = <!--v:mercuryPeriLongJ2000-->77.457<!--/v-->° (JPL J2000 ecliptic longitude of Mercury's perihelion)
    - `angleCorrection` = 0.972° (fitted offset so the model's perihelion RA matches JPL at J2000; see [optimization](61-optimization-execution-plan.md))
    - The two components of orbitCenter are the X and Y projections:
      - `orbitCentera` = cos(angle + 90°) × distance = cos(168.43°) × 6.6024 = **−6.4682**
@@ -130,7 +130,7 @@ The orbit center places Mercury's perihelion point at the correct distance and d
 
 **In plain terms**: the perihelion point is placed 6.60 scene units from the Sun, in the direction 78.4° ecliptic longitude. This matches Mercury's observed perihelion direction at J2000.
 
-### How orbitalEccentricityBase (0.20563) is derived
+### How orbitalEccentricityBase (<!--v:mercuryEccBase-->0.20563<!--/v-->) is derived
 
 The base eccentricity is **not** an input — it's derived at runtime from the closed-loop chain PSI → K → eccentricity amplitude → phase → base. Here is the full derivation for Mercury:
 
@@ -169,11 +169,11 @@ Inputs:
   denominator     = 4.074×10⁻⁴ × 0.2408              = 9.81×10⁻⁵
   e_amp           = 2.295×10⁻⁹ / 9.81×10⁻⁵           ≈ 2.34×10⁻⁵
 ```
-Mercury has an extremely tiny eccentricity amplitude (~0.01% of base) because its mean obliquity is nearly zero — the `sin(tilt)` factor in the K formula makes the amplitude proportional to the tilt. As a consequence, Mercury's eccentricity is essentially constant at the J2000 value over the entire 31,935-year cycle (variation ≤ 0.01%).
+Mercury has an extremely tiny eccentricity amplitude (~0.01% of base) because its mean obliquity is nearly zero — the `sin(tilt)` factor in the K formula makes the amplitude proportional to the tilt. As a consequence, Mercury's eccentricity is essentially constant at the J2000 value over the entire <!--v:mercuryEccCycle-->31,935<!--/v-->-year cycle (variation ≤ 0.01%).
 
 **Step D: Phase at J2000** (where in the eccentricity cycle Mercury is right now)
 
-The eccentricity anchor is the **System Reset** (n=7, -2,649,854 BC), when all planets simultaneously reach inclination extremes. At the anchor, in-phase planets are at eccentricity MEAN + rising (phase 90°); Saturn (anti-phase) is at MEAN + falling (phase 270°).
+The eccentricity anchor is the **System Reset** (n=7, -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->), when all planets simultaneously reach inclination extremes. At the anchor, in-phase planets are at eccentricity MEAN + rising (phase 90°); Saturn (anti-phase) is at MEAN + falling (phase 270°).
 
 ```
 anchor = balancedYear − 7H = −2,649,854 (System Reset)
@@ -203,7 +203,7 @@ base = amp·cos(θ) + √discriminant
      ≈ 0.20563
 ```
 
-This is the **arithmetic midpoint** of Mercury's eccentricity oscillation — the value it oscillates around over its 31,935-year cycle (2H/21). Because Mercury's amplitude is extremely small (~2×10⁻⁵), the base is essentially equal to the J2000 value.
+This is the **arithmetic midpoint** of Mercury's eccentricity oscillation — the value it oscillates around over its <!--v:mercuryEccCycle-->31,935<!--/v-->-year cycle (2H/21). Because Mercury's amplitude is extremely small (~2×10⁻⁵), the base is essentially equal to the J2000 value.
 
 ---
 
@@ -213,7 +213,7 @@ This is the **arithmetic midpoint** of Mercury's eccentricity oscillation — th
 
 | Property | Value | How it's derived |
 |----------|-------|-----------------|
-| speed | `−2π / perihelionEclipticYears` = −2π / 243,867 rad/yr | Exact negative of Step 1. |
+| speed | `−2π / perihelionEclipticYears` = −2π / <!--v:mercuryPeriPeriod-->243,867<!--/v--> rad/yr | Exact negative of Step 1. |
 | startPos | 0° | Matches Step 1. |
 | orbitRadius | 0 | Pure rotation. |
 | orbitCenter | (0, 0, 0) | No offset. |
@@ -272,10 +272,10 @@ This is the only fitted value per planet (besides angleCorrection). It's optimis
 
 | Parameter | Source | Type |
 |-----------|--------|------|
-| `perihelionEclipticYears` (243,867 yr) | H × 8/11 (Fibonacci Law 1) | Model prediction |
-| `longitudePerihelion` (77.457°) | JPL J2000 | Observed input |
+| `perihelionEclipticYears` (<!--v:mercuryPeriPeriod-->243,867<!--/v--> yr) | H × 8/11 (Fibonacci Law 1) | Model prediction |
+| `longitudePerihelion` (<!--v:mercuryPeriLongJ2000-->77.457<!--/v-->°) | JPL J2000 | Observed input |
 | `angleCorrection` (0.972°) | Fitted to match JPL RA at J2000 | Calibration |
-| `orbitalEccentricityBase` (0.20563) | Phase-derived from K + J2000 eccentricity | Model derived |
+| `orbitalEccentricityBase` (<!--v:mercuryEccBase-->0.20563<!--/v-->) | Phase-derived from K + J2000 eccentricity | Model derived |
 | `ascendingNode` (48.330°) | JPL J2000 | Observed input |
 | `eclipticInclinationJ2000` (7.005°) | JPL J2000 | Observed input |
 | `startpos` (83.652°) | Fitted to match JPL RA at J2000 | Calibration |
@@ -293,7 +293,7 @@ Mercury is in a **Cassini state** — confirmed by MESSENGER spacecraft observat
 
 | Input | Value | Source |
 |-------|-------|--------|
-| Ecliptic perihelion | H × 8/11 = 243,867 yr | Fibonacci Law 1 (model) |
+| Ecliptic perihelion | H × 8/11 = <!--v:mercuryPeriPeriod-->243,867<!--/v--> yr | Fibonacci Law 1 (model) |
 | Ascending node N | 9 cycles in 8H | Fitted to JPL ecliptic-inclination trend |
 | Cassini state | axial rate = node rate | MESSENGER observation |
 
@@ -332,9 +332,9 @@ Note: 21 is Fibonacci F₈, and 84 = 4 × 21.
 
 | Cycle | Period | 8H/N | Compare to | Error |
 |-------|--------|------|------------|-------|
-| Axial precession | −298,060 yr | 8H/9 | Peale 2006: ~300 kyr | 0.7% |
-| Obliquity | 894,179 yr | 8H/3 | Bills 2005: ~895 kyr | 0.1% |
-| Eccentricity | 31,935 yr | 8H/84 | ~32 kyr (secular models) | — |
+| Axial precession | −<!--v:mercuryAxialPeriod-->298,060<!--/v--> yr | 8H/9 | Peale 2006: ~300 kyr | 0.7% |
+| Obliquity | <!--v:mercuryObliqCycle-->894,179<!--/v--> yr | 8H/3 | Bills 2005: ~895 kyr | 0.1% |
+| Eccentricity | <!--v:mercuryEccCycle-->31,935<!--/v--> yr | 8H/84 | ~32 kyr (secular models) | — |
 
 All three literature values are **theoretical** (not directly observed), making them independent predictions from different models. The Holistic Universe Model derives them from the Cassini state + Fibonacci ecliptic rate + ascending node integer, with no fitting to these values.
 

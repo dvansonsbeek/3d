@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -15,7 +15,7 @@ points (VE, SS, AE, WS) using **24 harmonics** per cardinal point:
 nonlinear interactions between the precession cycles.
 
 These harmonics replace the conventional Meeus polynomial approach, extending
-the valid prediction range from ±2,000 years to the full **335,317-year** Earth Fundamental Cycle (at J2000).
+the valid prediction range from ±2,000 years to the full **<!--v:H-->335,317<!--/v-->-year** Earth Fundamental Cycle (at J2000).
 
 Three formulas are provided for each cardinal point:
 
@@ -25,7 +25,7 @@ Three formulas are provided for each cardinal point:
 
 **Key result:** With one astronomical observation per cardinal point (the J2000 date)
 and the model's existing constants, all cardinal point dates across the full
-335,317-year Earth Fundamental Cycle (at J2000) can be predicted to **0.05–1.0 minutes** accuracy.
+<!--v:H-->335,317<!--/v-->-year Earth Fundamental Cycle (at J2000) can be predicted to **0.05–1.0 minutes** accuracy.
 The RA position requires **zero observations** — it is fully derived from model parameters.
 
 | Cardinal Point | Detection | RMSE (JD) | J2000 Anchor |
@@ -35,7 +35,7 @@ The RA position requires **zero observations** — it is fully derived from mode
 | **AE** (Autumnal Equinox) | Dec crosses 0° descending | **0.6 min** | 2451810.304 (Sep 22, 19:18 UTC) |
 | **WS** (Winter Solstice) | Min declination | **1.0 min** | 2451900.067 (Dec 21, 01:37 UTC) |
 
-> **Scope note (ESSRT).** This document describes cardinal-point prediction within a single Earth Fundamental Cycle evaluated at J2000. The Fibonacci divisors (H/3, H/5, H/8, H/13, H/16, …) are scale-invariant L1 lattice structure — they remain integer divisors at any epoch. The literal year counts (335,317; 20,957; mean year length `meanSolarYearDays`) and the 14,579-point harmonic fits are J2000-anchored: under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) and `meanSolarYearSeconds` evolve via Driver 1 (Earth-Moon tidal LOD growth) and Driver 2 (solar mass loss → Kepler), so the absolute timings would shift at deep time even though the harmonic structure does not. See [doc 20](20-constants-reference.md) for the J2000 → `meanSiderealYearSecondsAtAge` / `meanHAtAge` helper map.
+> **Scope note (ESSRT).** This document describes cardinal-point prediction within a single Earth Fundamental Cycle evaluated at J2000. The Fibonacci divisors (H/3, H/5, H/8, H/13, H/16, …) are scale-invariant L1 lattice structure — they remain integer divisors at any epoch. The literal year counts (<!--v:H-->335,317<!--/v-->; 20,957; mean year length `meanSolarYearDays`) and the 14,579-point harmonic fits are J2000-anchored: under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) and `meanSolarYearSeconds` evolve via Driver 1 (Earth-Moon tidal LOD growth) and Driver 2 (solar mass loss → Kepler), so the absolute timings would shift at deep time even though the harmonic structure does not. See [doc 20](20-constants-reference.md) for the J2000 → `meanSiderealYearSecondsAtAge` / `meanHAtAge` helper map.
 
 ---
 

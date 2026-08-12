@@ -1,15 +1,15 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
 # Milankovitch Language of the Holistic Model
 
-> **TL;DR.** The Holistic model has **five** natural Milankovitch-band periods, all integer divisors of H, structured into a closed Fibonacci algebra: **H/3 inclination precession (111,772 yr), H/5 ecliptic precession (67,063 yr), H/8 obliquity oscillation (41,915 yr), H/13 axial precession (25,794 yr), and H/16 perihelion precession (20,957 yr)**. These satisfy four beat-frequency identities (13−5=8, 13+3=16, 8−5=3, 13−8=5) that close *only because* the divisors are Fibonacci. Standard secular theory recovers the same periods to within 0.06–2.8 % — including all six Berger 1978 climatic-precession peaks (at ~19–24 kyr) within 0.4 % when expressed as 8H/n integer divisors. *Note: in this framework H/16 = 20,957 yr is **perihelion precession** (the rotation of Earth's apsidal line in the ecliptic frame), distinct from **climatic precession** (~23.7 kyr dominant, the parameter e·sin ϖ that drives seasonal insolation — captured in the 8H lattice at n=113 and n=120).*
+> **TL;DR.** The Holistic model has **five** natural Milankovitch-band periods, all integer divisors of H, structured into a closed Fibonacci algebra: **H/3 inclination precession (<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr), H/5 ecliptic precession (67,063 yr), H/8 obliquity oscillation (41,915 yr), H/13 axial precession (<!--v:earthAxialPeriod-->25,794<!--/v--> yr), and H/16 perihelion precession (20,957 yr)**. These satisfy four beat-frequency identities (13−5=8, 13+3=16, 8−5=3, 13−8=5) that close *only because* the divisors are Fibonacci. Standard secular theory recovers the same periods to within 0.06–2.8 % — including all six Berger 1978 climatic-precession peaks (at ~19–24 kyr) within 0.4 % when expressed as 8H/n integer divisors. *Note: in this framework H/16 = 20,957 yr is **perihelion precession** (the rotation of Earth's apsidal line in the ecliptic frame), distinct from **climatic precession** (~23.7 kyr dominant, the parameter e·sin ϖ that drives seasonal insolation — captured in the 8H lattice at n=113 and n=120).*
 >
-> For the **100-kyr ice age problem**, the model's H/3 = 111,772 yr inclination precession lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
+> For the **100-kyr ice age problem**, the model's H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr inclination precession lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
 >
 > Companion docs: [17 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) (empirical 31-component 8H Orbital Forcing Formula + 14 hypothesis tests + 405-kyr off-lattice characterization); [18 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md) (canonical L1+L2+L3 modular formula + per-regime ridge fits across LR04 / CENOGRID / EPICA / CenCO2PIP + Climate Formula Explorer modal).
 
@@ -22,7 +22,7 @@ status: current
 - Website: [model/supporting-evidence](https://www.holisticuniverse.com/en/model/supporting-evidence) §1 (100-kyr problem) and §12 (eigenfrequency convergence)
 - Source: `src/script.js` `perihelionCycleLength` (line 63) and `eclipticPrecessionPeriod` family
 
-> **Scope note (ESSRT).** The Fibonacci-closure algebra (13−5=8, 13+3=16, 8−5=3, 13−8=5) and the integer-divisor structure of H/N and 8H/N are scale-invariant — they hold at any epoch. The literal year counts (H = 335,317; 8H = 2,682,536; the five Milankovitch periods 111,772 / 67,063 / 41,915 / 25,794 / 20,957; deep-time multiples 3H = 1,005,951 and 13H = 4,359,121) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — so the periods shown in §§ 2 and 4 are present-epoch values, and the comparison with the geological record across the past 1.2 Myr (LR04, CENOGRID, EPICA) assumes drift over that window is sub-percent (verified ~0.05% over 1 Myr). For Boulila 2018's ~4.5 Myr resonance comparison (line 128) the cumulative drift starts to matter — see doc 99 for the per-driver Δ-H formulas.
+> **Scope note (ESSRT).** The Fibonacci-closure algebra (13−5=8, 13+3=16, 8−5=3, 13−8=5) and the integer-divisor structure of H/N and 8H/N are scale-invariant — they hold at any epoch. The literal year counts (H = <!--v:H-->335,317<!--/v-->; 8H = <!--v:eightH-->2,682,536<!--/v-->; the five Milankovitch periods <!--v:earthPeriPeriodICRF-->111,772<!--/v--> / 67,063 / 41,915 / <!--v:earthAxialPeriod-->25,794<!--/v--> / 20,957; deep-time multiples 3H = <!--v:threeH-->1,005,951<!--/v--> and 13H = <!--v:thirteenH-->4,359,121<!--/v-->) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — so the periods shown in §§ 2 and 4 are present-epoch values, and the comparison with the geological record across the past 1.2 Myr (LR04, CENOGRID, EPICA) assumes drift over that window is sub-percent (verified ~0.05% over 1 Myr). For Boulila 2018's ~4.5 Myr resonance comparison (line 128) the cumulative drift starts to matter — see doc 99 for the per-driver Δ-H formulas.
 
 ---
 
@@ -45,14 +45,14 @@ The "100-kyr problem" is that standard eccentricity has *split* peaks at 95 & 12
 
 ## 2. The Model's Five Natural Milankovitch Periods
 
-**H = 335,317 years (at J2000)** is the **Earth Fundamental Cycle** — the model's master timescale, anchored observationally to the verified 1246 AD perihelion-solstice alignment. See [doc 10 — Fibonacci Laws](10-fibonacci-laws.md) and [website fundamental-cycles](https://www.holisticuniverse.com/en/model/fundamental-cycles) for derivation.
+**H = <!--v:H-->335,317<!--/v--> years (at J2000)** is the **Earth Fundamental Cycle** — the model's master timescale, anchored observationally to the verified 1246 AD perihelion-solstice alignment. See [doc 10 — Fibonacci Laws](10-fibonacci-laws.md) and [website fundamental-cycles](https://www.holisticuniverse.com/en/model/fundamental-cycles) for derivation.
 
 | Cycle | Model formula | Years | Source |
 |---|---|---:|---|
-| **Inclination precession** | H/3 | **111,772** | Earth's orbital plane → invariable plane oscillation |
-| **Ecliptic precession** | H/5 | **67,063** | Earth's orbital plane regression around the invariable plane = **nodal regression** (`f_nodal` in §3); coincides with Jupiter's *Fibonacci-anchor* perihelion (Jupiter's 8H-lattice secular ecliptic perihelion is 8H/39 = 68,783 yr) |
+| **Inclination precession** | H/3 | **<!--v:earthPeriPeriodICRF-->111,772<!--/v-->** | Earth's orbital plane → invariable plane oscillation |
+| **Ecliptic precession** | H/5 | **67,063** | Earth's orbital plane regression around the invariable plane = **nodal regression** (`f_nodal` in §3); coincides with Jupiter's *Fibonacci-anchor* perihelion (Jupiter's 8H-lattice secular ecliptic perihelion is 8H/39 = <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr) |
 | **Obliquity oscillation** | H/8 | **41,915** | Beat: f_axial − f_nodal (13 − 5 = 8 in H/n indices) |
-| **Axial precession** | H/13 | **25,794** | Earth's spin-axis equinox precession |
+| **Axial precession** | H/13 | **<!--v:earthAxialPeriod-->25,794<!--/v-->** | Earth's spin-axis equinox precession |
 | **Perihelion precession** | H/16 | **20,957** | Beat: f_axial + f_apsidal (13 + 3 = 16). Also the Berger climatic-precession centroid in the ~19–24 kyr band; dominant Berger peak is at 23.7 kyr (n=113, see §4.2). |
 
 All five periods are integer divisors of H using divisors from the Fibonacci-related set {3, 5, 8, 13, 16 = 2·F₆}. There is no degree of freedom; every Milankovitch period in the model is locked to H by integer arithmetic.
@@ -86,15 +86,15 @@ All five model periods are integer divisors of H with **zero free parameters** �
 
 | Model | Standard value | Source | Deviation |
 |---|---|---|---|
-| H/3 = 111,772 yr | ~111,700 yr (apsidal precession incl GR) | Bretagnon 1974, Standish 1992 | **0.06 %** |
+| H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | ~111,700 yr (apsidal precession incl GR) | Bretagnon 1974, Standish 1992 | **0.06 %** |
 | H/5 = 67,063 yr | 68,761 yr (s₃ Earth nodal eigenfrequency) | Laskar 2004 | **2.5 %** |
 | H/8 = 41,915 yr | ~41,000 yr (Berger obliquity peak) | Berger 1978 | **2.2 %** |
-| H/13 = 25,794 yr | ~25,772 yr (axial precession k) | IAU 2006 | **0.08 %** |
+| H/13 = <!--v:earthAxialPeriod-->25,794<!--/v--> yr | ~25,772 yr (axial precession k) | IAU 2006 | **0.08 %** |
 | H/16 = 20,957 yr | 19/22/23 kyr triplet centroid ~22 kyr | Berger 1978 | **< 5 %** (within band) |
 
 ### 4.2 Berger 1978 climatic-precession spectrum
 
-The **Solar System Resonance Cycle** is 8H = **2,682,536 yr (at J2000)** — the smallest period in which every planet's principal precession cycles return to alignment simultaneously (each cycle's period divides 8H by some integer). See [website fundamental-cycles](https://www.holisticuniverse.com/en/model/fundamental-cycles).
+The **Solar System Resonance Cycle** is 8H = **<!--v:eightH-->2,682,536<!--/v--> yr (at J2000)** — the smallest period in which every planet's principal precession cycles return to alignment simultaneously (each cycle's period divides 8H by some integer). See [website fundamental-cycles](https://www.holisticuniverse.com/en/model/fundamental-cycles).
 
 The Berger climatic-precession spectrum is a **set of six** peaks from `g_j + k` beats (apsidal eigenfrequencies plus axial precession k). Every Berger peak matches integer divisors of 8H to within 0.4 %:
 
@@ -105,7 +105,7 @@ The Berger climatic-precession spectrum is a **set of six** peaks from `g_j + k`
 | 22,428 | g₂ + k (Venus) | n = 120 → 22,354 | 0.33 % | **Earth.Axial(104) + Jupiter.Obliq(16)** (clean 2-term beat) |
 | 19,155 | g₃ + k (Earth) | n = 140 → 19,161 | 0.03 % | — (not in canonical L1) |
 | 18,976 | g₄ + k (Mars) | n = 141 → 19,025 | 0.26 % | Earth.Axial(104) + Jupiter.Axial(21) + Jupiter.Obliq(16) (3-term) |
-| 16,469 | g₆ + k (Saturn) | n = 163 → 16,457 | 0.07 % | — (not in canonical L1) |
+| 16,469 | g₆ + k (Saturn) | n = 163 → <!--v:saturnEccCycle-->16,457<!--/v--> | 0.07 % | — (not in canonical L1) |
 
 All six peaks match an integer-divisor position. **Berger names each peak after a single planet** (g_j + k convention) while the Holistic model derives the same LR04 lattice peaks via **multi-planet beats from PLANET_CYCLES** — see [doc 93 — L1 attribution reference](93-l1-attribution-reference.md) for all 32 L1 lattice components with full ranked attribution alternatives. The structural decomposition is `n = 104 + δ_j` where 104 = 8 × 13 is Earth's axial precession integer (see website [eigenfrequencies.mdx §"Berger climatic precession peaks"](https://www.holisticuniverse.com/model/eigenfrequencies#berger-climatic-precession-peaks)).
 
@@ -113,7 +113,7 @@ All six peaks match an integer-divisor position. **Berger names each peak after 
 
 The Laskar (La2004) secular solution decomposes eccentricity and inclination into eight g_j and s_j eigenmodes. **Multiple independent combinations converge on H/3 and H/5**:
 
-**H/3 = 111,772 yr** matches three independent combinations:
+**H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr** matches three independent combinations:
 
 | Combination | Physical meaning | Period (yr) | Deviation |
 |---|---|---:|---:|
@@ -134,8 +134,8 @@ The ~111-kyr region is "crowded": three distinct physical mechanisms all land wi
 
 | Multiple | Years | Matched geological cycle | Standard | Deviation |
 |---|---:|---|---:|---:|
-| **3H** | 1,005,951 | g₁ − g₅ Mercury–Jupiter eccentricity envelope | ~980,000 yr | **2.6 %** |
-| **13H** | 4,359,121 | Earth–Mars secular resonance libration (Boulila 2018) | ~4,500,000 yr | **3.1 %** |
+| **3H** | <!--v:threeH-->1,005,951<!--/v--> | g₁ − g₅ Mercury–Jupiter eccentricity envelope | ~980,000 yr | **2.6 %** |
+| **13H** | <!--v:thirteenH-->4,359,121<!--/v--> | Earth–Mars secular resonance libration (Boulila 2018) | ~4,500,000 yr | **3.1 %** |
 
 The Boulila et al. 2018 *EPSL* result identifies a ~4.5 Myr cycle in Mesozoic-Cenozoic sediments from the resonant argument θ = 2(g₄ − g₃) − (s₄ − s₃). The model's 13H falls within range.
 

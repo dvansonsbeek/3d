@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -64,14 +64,14 @@ Switching Earth to M_Earth_SYSTEM would shift ψ and K each by 0.612% (= √(82.
 
 | Planet | Mass (M☉) | √m | a (AU) | e | i J2000 (°) | Ω J2000 (°) |
 |--------|-----------|-----|--------|---|------------|-------------|
-| Mercury | 1.6601 × 10⁻⁷ | 4.074 × 10⁻⁴ | 0.3871 | 0.2056 | 6.3473 | 32.83 |
-| Venus | 2.4478 × 10⁻⁶ | 1.564 × 10⁻³ | 0.7233 | 0.0068 | 2.1545 | 54.70 |
-| Earth | 3.0027 × 10⁻⁶ | 1.733 × 10⁻³ | 1.0000 | 0.0167 | 1.5787 | 284.51 |
-| Mars | 3.2271 × 10⁻⁷ | 5.681 × 10⁻⁴ | 1.5237 | 0.0934 | 1.6312 | 354.87 |
-| Jupiter | 9.5479 × 10⁻⁴ | 3.090 × 10⁻² | 5.2029 | 0.0484 | 0.3220 | 312.89 |
-| Saturn | 2.8588 × 10⁻⁴ | 1.691 × 10⁻² | 9.5367 | 0.0539 | 0.9255 | 118.81 |
-| Uranus | 4.3662 × 10⁻⁵ | 6.608 × 10⁻³ | 19.189 | 0.0473 | 0.9947 | 307.80 |
-| Neptune | 5.1514 × 10⁻⁵ | 7.177 × 10⁻³ | 30.070 | 0.0086 | 0.7354 | 192.04 |
+| Mercury | 1.6601 × 10⁻⁷ | 4.074 × 10⁻⁴ | <!--v:mercurySemiMajor-->0.3871<!--/v--> | 0.2056 | 6.3473 | 32.83 |
+| Venus | 2.4478 × 10⁻⁶ | 1.564 × 10⁻³ | <!--v:venusSemiMajor-->0.7233<!--/v--> | 0.0068 | 2.1545 | 54.70 |
+| Earth | 3.0027 × 10⁻⁶ | <!--v:neptuneEccWeightSci-->1.733 × 10⁻³<!--/v--> | <!--v:earthSemiMajor-->1.0000<!--/v--> | 0.0167 | 1.5787 | <!--v:earthAscNodeJ2000-->284.51<!--/v--> |
+| Mars | 3.2271 × 10⁻⁷ | 5.681 × 10⁻⁴ | <!--v:marsSemiMajor-->1.5237<!--/v--> | 0.0934 | 1.6312 | <!--v:marsOmegaJ2000-->354.87<!--/v--> |
+| Jupiter | 9.5479 × 10⁻⁴ | 3.090 × 10⁻² | 5.2029 | 0.0484 | 0.3220 | <!--v:jupiterOmegaJ2000-->312.89<!--/v--> |
+| Saturn | 2.8588 × 10⁻⁴ | 1.691 × 10⁻² | 9.5367 | 0.0539 | 0.9255 | <!--v:saturnOmegaJ2000-->118.81<!--/v--> |
+| Uranus | 4.3662 × 10⁻⁵ | 6.608 × 10⁻³ | 19.189 | 0.0473 | 0.9947 | <!--v:uranusOmegaJ2000-->307.80<!--/v--> |
+| Neptune | 5.1514 × 10⁻⁵ | 7.177 × 10⁻³ | 30.070 | 0.0086 | 0.7354 | <!--v:neptuneOmegaJ2000-->192.04<!--/v--> |
 
 Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invariable plane at J2000, Ω J2000 = longitude of ascending node on the invariable plane at J2000 epoch (Souami & Souchay 2012, verified).
 
@@ -189,7 +189,7 @@ At the **8H-lattice secular** level the identity is exact and structural: Jupite
 
 **Why Earth's obliquity is one step off (8H/64 vs 8H/65).** Earth's obliquity is the beat of its axial precession against the precession of the ecliptic plane: in 8H-integer terms, 104 (axial, H/13) − (ecliptic). With Law 1's Fibonacci ecliptic anchor H/5 = 40, the beat is 104 − 40 = 64 → H/8. With the gas giants' real ecliptic period 8H/39 = 39 (Laskar's s₃), it is 104 − 39 = 65 → 8H/65. The single-integer shift in the ecliptic period (40 → 39) propagates one-for-one into the obliquity beat (64 → 65). Law 1 sets Earth's Fibonacci hierarchy; Law 6 explains why the gas-giant-driven obliquity recorded in climate lands one step over.
 
-**Earth sits between Jupiter and Saturn.** On the 8H lattice the four periods line up as **39 < 40 < 64 < 65**: Jupiter's ecliptic perihelion (8H/39), Earth's ecliptic precession (8H/40 = H/5), Earth's obliquity (8H/64 = H/8), and Saturn's ecliptic perihelion (8H/65). Earth's two Fibonacci values each sit exactly one 8H-step off a gas-giant period — its ecliptic precession just *below* Jupiter's (67,063 vs 68,783), its obliquity just *above* Saturn's (41,915 vs 41,270). The two gas giants move in opposite senses (Jupiter prograde, Saturn retrograde) and push Earth's orbital plane and spin-axis beat from both sides; the clean Fibonacci anchors are the balance point in between. (The integer relationships are exact; the directional "push from each side" is the physical reading.)
+**Earth sits between Jupiter and Saturn.** On the 8H lattice the four periods line up as **39 < 40 < 64 < 65**: Jupiter's ecliptic perihelion (8H/39), Earth's ecliptic precession (8H/40 = H/5), Earth's obliquity (8H/64 = H/8), and Saturn's ecliptic perihelion (8H/65). Earth's two Fibonacci values each sit exactly one 8H-step off a gas-giant period — its ecliptic precession just *below* Jupiter's (67,063 vs <!--v:jupiterPeriPeriod-->68,783<!--/v-->), its obliquity just *above* Saturn's (41,915 vs 41,270). The two gas giants move in opposite senses (Jupiter prograde, Saturn retrograde) and push Earth's orbital plane and spin-axis beat from both sides; the clean Fibonacci anchors are the balance point in between. (The integer relationships are exact; the directional "push from each side" is the physical reading.)
 
 The Fibonacci beat-loop itself — 1/(H/3) + 1/(H/5) = 1/(H/8) and 1/(H/5) + 1/(H/8) = 1/(H/13) — is **Earth's own** precession hierarchy (Law 1): inclination + ecliptic = obliquity, ecliptic + obliquity = axial. It is *not* a relation among the three planets' periods (Jupiter and Saturn sit at 8H/39 and 8H/65, not H/5 and H/8). The genuine three-body content of Law 6 is the dynamical 8H/65 lock above.
 
@@ -218,14 +218,14 @@ Each planet has a per-planet cycle anchor for inclination extremes (in-phase at 
 
 | Planet | Cycle Anchor | Group | Balanced Year |
 |--------|-------------|-------|--------|
-| Mercury | 234.52° | In-phase | n=7 |
-| Venus | 218.64° | In-phase | n=7 |
+| Mercury | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | In-phase | n=7 |
+| Venus | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | In-phase | n=7 |
 | Earth | 21.77° | In-phase | n=0 (locked) |
-| Mars | 236.07° | In-phase | n=7 |
-| Jupiter | 287.06° | In-phase | n=7* |
-| **Saturn** | **116.26°** | **Anti-phase** | n=7* |
+| Mars | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | In-phase | n=7 |
+| Jupiter | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | In-phase | n=7* |
+| **Saturn** | **<!--v:saturnInclCycleAnchor-->116.26<!--/v-->°** | **Anti-phase** | n=7* |
 | Uranus | 21.33° | In-phase | n=7* |
-| Neptune | 174.04° | In-phase | n=7 |
+| Neptune | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | In-phase | n=7 |
 
 \* Jupiter, Saturn, and Uranus have ICRF perihelion periods that divide H exactly, so their phase value at n=7 coincides numerically with their phase at n=0 (and at any other anchor).
 
@@ -244,7 +244,7 @@ The group assignment is constrained by: (1) each planet's oscillation range must
 | Uranus | H/3 |
 | Neptune | 2H |
 
-The inclination oscillation uses the **ICRF perihelion period** (ecliptic rate − general precession H/13). All ICRF periods divide 8H = 2,682,536 years at J2000 (the Solar System Resonance Cycle).
+The inclination oscillation uses the **ICRF perihelion period** (ecliptic rate − general precession H/13). All ICRF periods divide 8H = <!--v:eightH-->2,682,536<!--/v--> years at J2000 (the Solar System Resonance Cycle).
 
 ---
 
@@ -267,11 +267,11 @@ Earth–Saturn is the only pair with opposite balance groups (in-phase vs anti-p
 
 ### Finding 2: Configuration Uniqueness
 
-The exhaustive search evaluates 7,558,272 candidates (see [Exhaustive Search](#exhaustive-search-and-preset-generation)). Five successive physical filters narrow these to a single mirror-symmetric solution:
+The exhaustive search evaluates <!--v:configSearchSpace-->7,558,272<!--/v--> candidates (see [Exhaustive Search](#exhaustive-search-and-preset-generation)). Five successive physical filters narrow these to a single mirror-symmetric solution:
 
 | Filter | Surviving |
 |--------|----------|
-| Inclination balance ≥ 99.994% (TNO margin) | 767 |
+| Inclination balance ≥ <!--v:balanceThreshold-->99.994%<!--/v--> (TNO margin) | 767 |
 | + Eccentricity balance ≥ 99% | 96 |
 | + Per-config optimised anchor gives LL bounds 8/8 | 51 |
 | + Direction match + rate error ≤ 5″ (Jupiter–Saturn shared ascending node) | 42 |
@@ -287,7 +287,7 @@ The sole mirror-symmetric survivor is the **default configuration** (Me=21, Ve=3
 
 - **Mirror symmetry requires Scenario A.** Since Earth is locked at d=3, the Earth↔Saturn mirror pair forces Sa=3, which only occurs in Scenario A (Ju=5, Sa=3). Scenarios B/C/D have zero mirror-symmetric candidates.
 - **LL bounds impose a floor of d ≥ 5** for the free mirror pairs (Mercury↔Uranus and Venus↔Neptune).
-- **Balance selects one.** Among those 36 LL-valid mirror + Saturn-solo configs, only the default configuration achieves balance ≥ 99.994%.
+- **Balance selects one.** Among those 36 LL-valid mirror + Saturn-solo configs, only the default configuration achieves balance ≥ <!--v:balanceThreshold-->99.994%<!--/v-->.
 
 The mirror symmetry, combined with the six laws, uniquely determines all 8 Fibonacci divisor assignments.
 
@@ -388,7 +388,7 @@ Jupiter (d=5) contributes the dominant in-phase weight (1.408 × 10⁻²). The r
 
 ### TNO Contribution
 
-The balance considers only the 8 major planets, which carry 99.994% of the solar system's orbital angular momentum. Trans-Neptunian Objects (TNOs) contribute the remaining ~0.006%, tilting the invariable plane by approximately 1.25″ ([Li, Xia & Zhou 2019](https://arxiv.org/abs/1909.11293)). The 0.0002% residual imbalance is well within this TNO margin.
+The balance considers only the 8 major planets, which carry <!--v:balanceThreshold-->99.994%<!--/v--> of the solar system's orbital angular momentum. Trans-Neptunian Objects (TNOs) contribute the remaining ~0.006%, tilting the invariable plane by approximately 1.25″ ([Li, Xia & Zhou 2019](https://arxiv.org/abs/1909.11293)). The 0.0002% residual imbalance is well within this TNO margin.
 
 ---
 
@@ -435,8 +435,8 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 | Venus | In-phase | 34 | 1.119 × 10⁻⁶ |
 | Earth | In-phase | 3 | 1.672 × 10⁻⁵ |
 | Mars | In-phase | 5 | 4.463 × 10⁻⁵ |
-| Jupiter | In-phase | 5 | 7.928 × 10⁻³ |
-| Uranus | In-phase | 21 | 5.705 × 10⁻³ |
+| Jupiter | In-phase | 5 | <!--v:jupiterEccWeightSci-->7.928 × 10⁻³<!--/v--> |
+| Uranus | In-phase | 21 | <!--v:uranusEccWeightSci-->5.705 × 10⁻³<!--/v--> |
 | Neptune | In-phase | 34 | 1.734 × 10⁻³ |
 | Saturn | Anti-phase | 3 | 1.547 × 10⁻² |
 
@@ -447,7 +447,7 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 Balance: 99.8632%
 ```
 
-Saturn alone carries the entire anti-phase contribution. The in-phase group is dominated by Jupiter (7.928 × 10⁻³), Uranus (5.705 × 10⁻³), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.6 × 10⁻⁵ combined.
+Saturn alone carries the entire anti-phase contribution. The in-phase group is dominated by Jupiter (<!--v:jupiterEccWeightSci-->7.928 × 10⁻³<!--/v-->), Uranus (<!--v:uranusEccWeightSci-->5.705 × 10⁻³<!--/v-->), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.6 × 10⁻⁵ combined.
 
 ### Mirror Pair Decomposition
 
@@ -674,7 +674,7 @@ The search iterates over:
   - A: Ju=5, Sa=3 — B: Ju=8, Sa=5 — C: Ju=13, Sa=8 — D: Ju=21, Sa=13
 - **Earth**: locked at d=3, in-phase group
 
-This produces 9 × 2 × 9 × 2 × 9 × 2 × 9 × 2 × 9 × 2 × 4 = 7,558,272 configurations per run.
+This produces 9 × 2 × 9 × 2 × 9 × 2 × 9 × 2 × 9 × 2 × 4 = <!--v:configSearchSpace-->7,558,272<!--/v--> configurations per run.
 
 ### What the Search Computes
 
@@ -683,7 +683,7 @@ For each configuration, the script computes:
 2. **LL bounds check** — whether each planet's `[mean - amp, mean + amp]` falls within Laplace-Lagrange bounds
 3. **Direction check** — whether the inclination trend at 1900→2100 matches JPL sign
 
-Only configurations with balance ≥ 99.994% (the TNO margin) are retained.
+Only configurations with balance ≥ <!--v:balanceThreshold-->99.994%<!--/v--> (the TNO margin) are retained.
 
 ### Output
 
@@ -737,7 +737,7 @@ npm run constants:generate
 
 4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of the valid configurations, only one is also mirror-symmetric — the default configuration.
 
-5. **Saturn eccentricity prediction from Law 5** — Law 5 (eccentricity balance) is one equation in eight unknowns, sufficient to uniquely determine Saturn's eccentricity from the other seven. The prediction (0.05373) matches the J2000 observed value (0.05386) to ~0.23%. The d-values were originally chosen to match Laws 1, 2, and 3 — *not* tuned for eccentricity — yet they produce a Law 5 balance equation that nevertheless predicts Saturn's eccentricity to sub-percent accuracy.
+5. **Saturn eccentricity prediction from Law 5** — Law 5 (eccentricity balance) is one equation in eight unknowns, sufficient to uniquely determine Saturn's eccentricity from the other seven. The prediction (0.05373) matches the J2000 observed value (<!--v:saturnEccJ2000-->0.05386<!--/v-->) to ~0.23%. The d-values were originally chosen to match Laws 1, 2, and 3 — *not* tuned for eccentricity — yet they produce a Law 5 balance equation that nevertheless predicts Saturn's eccentricity to sub-percent accuracy.
 
 ### Assessment
 

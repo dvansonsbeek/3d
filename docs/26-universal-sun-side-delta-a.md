@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v10.0
-coefficients: sha256:6ff0418968c5f28e
+coefficients: sha256:19f53e968ab084a9
 status: current
 ---
 
@@ -73,7 +73,7 @@ Computed with the model's mass-ratio constants and standard semi-major axes:
 |---|---|---|---|---|---|
 | Mercury | 0.387098 | 57,909,037 | 1.66×10⁻⁷ | **3.21** | 5.5×10⁻⁸ |
 | Venus | 0.723332 | 108,208,927 | 2.45×10⁻⁶ | **88.29** | 8.2×10⁻⁷ |
-| Earth | 1.000000 | 149,597,871 | 3.00×10⁻⁶ | **149.77** | 1.0×10⁻⁶ |
+| Earth | <!--v:saturnPredR2-->1.000000<!--/v--> | 149,597,871 | 3.00×10⁻⁶ | **149.77** | 1.0×10⁻⁶ |
 | Mars | 1.523679 | 227,939,134 | 3.23×10⁻⁷ | **24.52** | 1.1×10⁻⁷ |
 | Jupiter | 5.202600 | 778,297,882 | 9.55×10⁻⁴ | **247,782** | 3.2×10⁻⁴ |
 | Saturn | 9.554900 | 1,429,392,695 | 2.86×10⁻⁴ | **136,227** | 9.5×10⁻⁵ |
@@ -203,7 +203,7 @@ The chart computes the SSB position analytically (mass-weighted vector sum of ea
 - **Inclination** to invariable plane `o.<planet>InvPlaneInclinationDynamic` (oscillates over ~10⁵ years)
 - **Ascending node** on invariable plane `o.<planet>AscendingNodeInvPlane` (regresses over ~10⁴ years)
 
-This means the chart's current-position marker matches the simulation exactly, and **all four orbital anchors evolve consistently with the model's Fibonacci-driven dynamics** across long simulated timescales. Within the ±25-year chart window the inclination/node changes are sub-arcsecond (effectively constant); the long-term anchor at `currentYear` still moves correctly across centuries / millennia. Fallbacks to J2000 references (`planets.<key>.invPlaneInclinationJ2000`, `ascendingNodeInvPlane`; for Earth: `ASTRO_REFERENCE.earthInclinationJ2000_deg` 1.58° and `earthAscendingNodeInvPlaneVerified` 284.51° from Souami & Souchay 2012) are kept only to handle the first-frame initialization case.
+This means the chart's current-position marker matches the simulation exactly, and **all four orbital anchors evolve consistently with the model's Fibonacci-driven dynamics** across long simulated timescales. Within the ±25-year chart window the inclination/node changes are sub-arcsecond (effectively constant); the long-term anchor at `currentYear` still moves correctly across centuries / millennia. Fallbacks to J2000 references (`planets.<key>.invPlaneInclinationJ2000`, `ascendingNodeInvPlane`; for Earth: `ASTRO_REFERENCE.earthInclinationJ2000_deg` 1.58° and `earthAscendingNodeInvPlaneVerified` <!--v:earthAscNodeJ2000-->284.51<!--/v-->° from Souami & Souchay 2012) are kept only to handle the first-frame initialization case.
 
 ### Computation Details (reproducible)
 
@@ -220,7 +220,7 @@ M_b(t)  =  M_b(now)  +  360° · (t − currentYear) / T_b
 where:
 - `M_b(now) = o.<planet>MeanAnomaly` — live current mean anomaly (degrees). Updated each frame by `updatePlanetAnomalies()` from `M = planets.<key>.meanAnomaly + 360° · (JD − modelEpochJD) / period_days` so it advances linearly in time (textbook `M = E − e·sin E`).
 - `currentYear = o.currentYear`
-- `T_b = H / <planet>SolarYearCount` — orbital period in mean solar years (H = 335,317)
+- `T_b = H / <planet>SolarYearCount` — orbital period in mean solar years (H = <!--v:H-->335,317<!--/v-->)
 
 The mean anomaly will be converted to the true anomaly ν in Step 2 (via Kepler's equation), which gives the planet's actual position along its elliptical orbit.
 
