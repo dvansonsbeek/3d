@@ -75,7 +75,7 @@ Reference values from astronomical observations (IAU, JPL, Meeus) used to anchor
 | Parameter | Variable | Value |
 |-----------|----------|-------|
 | Perihelion-solstice alignment | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
-| Long. perihelion (J2000) | `perihelionLongitudeJ2000_deg` | 102.947° |
+| Long. perihelion (J2000) | `perihelionLongitudeJ2000_deg` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v-->° |
 | Obliquity (J2000) | `obliquityJ2000_arcsec` | 84381.406" (<!--v:obliquityJ2000Deg-->23.439279<!--/v-->°) |
 | Obliquity rate (J2000) | `obliquityRate_arcsecPerCentury` | −46.836769"/cy |
 | Obliquity range | — | <!--v:mainstreamObliqRange-->~22.1° to ~24.5°<!--/v--> |
@@ -219,7 +219,7 @@ Input constants used in the formulas above:
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Input Solar Year | `inputMeanSolarYear` | 365.2422 days | Input mean solar year |
+| Input Solar Year | `inputMeanSolarYear` | <!--v:inputMeanSolarYear-->365.2422<!--/v--> days | Input mean solar year |
 | Sidereal Year (seconds) | `meanSiderealYearSeconds` | siderealYearJ2000 × 86400 | Derived from IAU sidereal year reference |
 
 ## Eccentricity Derived Values
@@ -334,7 +334,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 | Jupiter | 8H / 39 | ~<!--v:jupiterPeriPeriod-->68,783<!--/v--> |
 | Saturn | -8H / 65 | ~<!--v:jupiterIcrfPeriod-->-41,270<!--/v--> (retrograde) |
 | Uranus | H / 3 | <!--v:inclPrecYears-->~111,772<!--/v--> |
-| Neptune | H × 2 | ~670,634 |
+| Neptune | H × 2 | ~<!--v:neptunePeriPeriod-->670,634<!--/v--> |
 
 ## Moon Derived Cycles
 
@@ -419,7 +419,7 @@ These come from external astronomical sources and do not change with the model.
 | Earth inclination | `earthInclinationJ2000_deg` | <!--v:earthInclJ2000-->1.57869<!--/v--> deg | Astronomical Almanac |
 | Earth inclination rate | `earthInclinationRate_arcsecPerCentury` | -18"/cy | Astronomical Almanac |
 | Eccentricity | `earthEccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> | JPL Horizons |
-| Long. of perihelion | `earthPerihelionLongitudeJ2000` | 102.947 deg | JPL Horizons |
+| Long. of perihelion | `earthPerihelionLongitudeJ2000` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v--> deg | JPL Horizons |
 | Perihelion passage J2000 | `perihelionRefJD` | 2451547.042 | USNO (2000 Jan 3 13:00 UTC) |
 | IAU precession period | `iauPrecessionJ2000` | 25,771.57634 years | IAU 2006 |
 | June Solstice 2000 JD | `juneSolstice2000_JD` | 2451716.575 | USNO (June 21, 2000 01:48 UTC) |
@@ -465,7 +465,7 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 | Mean Distance | `moonDistance` | <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km | Mean Earth-Moon distance |
 | Orbital Eccentricity | `moonOrbitalEccentricity` | <!--v:moonOrbitalEccentricityFull-->0.054900489<!--/v--> | |
 | Ecliptic Inclination | `moonEclipticInclinationJ2000` | <!--v:moonEclipticInclination-->5.1573<!--/v--> deg | Dynamical mean osculating inclination (v4 E3c); the Brown/ELP theory constant <!--v:moonInclinationConstantBrownELP-->5.1453964<!--/v--> (latitude sinF normalization) is kept as `moonInclinationConstantBrownELP` |
-| Moon Tilt | `moonTilt` | 6.687 deg | |
+| Moon Tilt | `moonTilt` | <!--v:moonAxialTilt-->6.687<!--/v--> deg | |
 
 ### Lunar Mean Longitude Coefficients (Meeus Ch. 47)
 
