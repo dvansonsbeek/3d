@@ -45,6 +45,28 @@ elements as preformatted strings), see
 [`@essrt/model-values`](https://www.npmjs.com/package/@essrt/model-values) —
 generated from this engine at the same model version.
 
+## Consuming the package — write a small adapter
+
+The package is deliberately a **parts library, not an assembled engine**.
+Each factory receives everything through one deps object — plain numbers
+plus functions — and no module imports another. That is what makes
+counterfactual runs first-class (inject different constants, get a
+different solar system) and lets the same core run in Node and the
+browser.
+
+The cost is assembly. `createEpochPrimitives`, for example, takes
+`{ params, alphaAtAgeMa }` — a block of scalars drawn from
+`DEFAULT_CONSTANTS` plus the Earth moment-of-inertia α(t) channel — and
+its outputs (`lodSeconds`, `holisticH`, the year lengths) feed the
+cardinal-point, ΔT and lunar factories in turn. Consumers write a thin
+**adapter** that does this wiring once and exposes friendly names.
+
+The reference adapter is `tools/lib/` in the
+[public repository](https://github.com/dvansonsbeek/3d) — the hosted
+simulator and the project's verification gates run on it; copy its wiring
+for the modules you need. A pre-assembled service surface (API/MCP) is on
+the project roadmap.
+
 ## Provenance
 
 Every value derives from the model parameters and fitted coefficients in
