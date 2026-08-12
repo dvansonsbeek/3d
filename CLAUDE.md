@@ -5,7 +5,7 @@ System Resonance Theory (ESSRT). The model is analytic and parametric, valid
 across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
-**Scale:** `src/script.js` ~60,850 lines · `tools/` 203 JS scripts across 7
+**Scale:** `src/script.js` ~59,300 lines · `tools/` 203 JS scripts across 7
 directories · 237 Python files · 71 docs · two web UIs (simulator, `dashboard/`).
 **`npm run check` enforces a nineteen-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on

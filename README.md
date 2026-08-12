@@ -6,7 +6,7 @@
 
 ![Solar System Simulation](https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/readme.png)
 
-> **[Live Demo](https://3d.holisticuniverse.com)** — Experience the simulation in your browser
+> **[Live Demo](https://3d.holisticuniverse.com)** — Experience the simulation in your browser (auto-deployed from every verified commit)
 >
 > **[Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4)** — Read the accompanying research paper
 
@@ -51,14 +51,14 @@ The model implements six laws — anchored on Earth and extending to all eight p
 
 1. **Fibonacci Cycle Hierarchy** — Earth's major precession periods divide H by Fibonacci numbers (H/3, H/5, H/8, H/13). A hierarchy unique to Earth.
 2. **Inclination Amplitude Constant** — A single constant ψ predicts all eight inclination amplitudes from Fibonacci divisors and mass alone
-3. **The Inclination Balance** — Seven planets' angular-momentum-weighted oscillations balance against Saturn alone (anti-phase) to 99.9975%
+3. **The Inclination Balance** — Seven planets' angular-momentum-weighted oscillations balance against Saturn alone (anti-phase) to 99.9974%
 4. **Eccentricity Amplitude Constant** — A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt
 5. **The Eccentricity Balance** — Seven planets' eccentricities balance against Saturn alone using the same Fibonacci divisors and phase groups as Law 3 (99.86%)
 6. **Saturn-Jupiter-Earth Resonance** — Jupiter's ICRF perihelion and Saturn's ecliptic perihelion lock to one period, 8H/65 (a structural balance, not a coincidence); this is the obliquity beat in Earth's climate record, one 8H-lattice step from Earth's Fibonacci obliquity H/8 (= 8H/64). The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock
 
 The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of 7,558,272 candidate configurations, four successive physical filters (inclination balance ≥99.994%, eccentricity balance ≥99%, Laplace–Lagrange bounds, direction match) narrow the field to 15 deep-analysis survivors — of which mirror symmetry then picks out only one (Config #7).
 
-See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full derivation, and [verify-laws.js](tools/verify/verify-laws.js) for comprehensive verification (44/45 checks pass).
+See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full derivation, and [verify-laws.js](tools/verify/verify-laws.js) for comprehensive verification (49/50 checks pass — the one carried failure is Saturn's Laplace–Lagrange bound, documented).
 
 ---
 
@@ -93,6 +93,20 @@ npm start
 ```
 
 The simulation will open in your browser at `http://localhost:1234`
+
+### Use the Model as a Package
+
+The complete physics core — constants, fitted coefficients, every factory —
+is published as [`@essrt/physics`](https://www.npmjs.com/package/@essrt/physics)
+(AGPL-3.0), and the 850+ rendered display values as
+[`@essrt/model-values`](https://www.npmjs.com/package/@essrt/model-values).
+Every published version immutably ships one recorded model identity
+(`modelVersion` + coefficient hashes), so any number you compute from a pinned
+version is reproducible forever:
+
+```bash
+npm install @essrt/physics @essrt/model-values
+```
 
 ### Orbital Data Explorer (Dashboard)
 
@@ -132,8 +146,8 @@ npm run build
 npm run check             # the full gate chain (~9 min): lint, typecheck, boundaries,
                           # purity, layer identities, constants, counterfactual,
                           # planet model, fixtures, literals, python-physics pins,
-                          # docs freshness, artifact freshness, doc values,
-                          # model gates, pipeline
+                          # docs freshness, artifact freshness, data provenance,
+                          # doc values, packaged model-values, model gates, pipeline
 npm run check:docs        # scoped tier (~20 s) for docs/registry/marker edits
 npm run check:engine      # scoped tier (~2 min) for tools/lib + packages/physics edits
 npm run test:browser      # golden masters in headless Chromium (builds first)
@@ -231,7 +245,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 **Investigation & Verification:**
 - [Python Scripts](scripts/) — Statistical significance tests, exoplanet Fibonacci tests, eccentricity analysis, Milankovitch paleoclimate tests
 - [Milankovitch Framework (Doc 90)](docs/90-milankovitch-language.md), [Milankovitch Evidence & Hypothesis Tests (Doc 91)](docs/91-milankovitch-evidence.md), and [LR04 / CENOGRID Variance Decomposition + Canonical Climate Formula + Modal Implementation (Doc 92)](docs/92-climate-formula.md) — Spectral analysis of LR04 + Cheng 2016 U-Th-dated speleothems + Westerhold 2020 CENOGRID 67-Myr Cenozoic record + Bereiter 2015 EPICA Dome C CO₂ + CenCO2PIP Consortium 2023 deep-time CO₂. Doc 90 states the framework; doc 91 covers the canonical 32-component **8H Orbital Forcing Formula**, per-planet contributions, the 100-kyr-band centroid (Mercury–Mars s₁−s₄ nodal beat at 107 kyr), the pre-registered super-cycle hypothesis test (NULL), fourteen falsifiable follow-up tests (16 positive / 2 partials / 5 nulls), and the dedicated 405-kyr off-lattice characterization (carbon-cycle silicate-weathering thermostat resonance). Doc 92 documents the canonical L1 + L2 + L3 modular formula with sequential ridge fitting per regime (post-MPT, iNHG-MPT, pre-iNHG, lr04-full, CENOGRID δ¹⁸O / δ¹³C, EPICA CO₂, CenCO2PIP), stitched per-regime evaluation, the Climate Formula Explorer modal (8 tabs in `src/script.js`), and the full reproducing pipeline
-- [Historical Eclipse Validation (Docs 102–103)](docs/102-gia-alpha-lunar-validation.md) — The model's ΔT formula (pure-tidal Farhat 2022 with LLR-anchored α₁ + **L1-orbital-coupled α(t) GIA** anchored on Cox & Chao 2002 satellite gravimetry with J₂→α conversion factor 2.0 in the Peltier ICE-6G LOD-coupling range; **zero parameters fitted to eclipse data in the α(t) machinery** — the sub-Milankovitch stack below carries structurally-predicted periods with fit-derived amplitudes/phases) tested on two independent tracks: a **26-event eclipse alignment audit** on documented solar eclipses spanning -762 BCE to 2026 CE (12/26 confirmed+off-peak, 6 regional, 0 with residual ΔT-signal — the framework agrees with the documented UT on every event — and 8 geographic-class events — an umbra-*centerline* distance gate, not visibility: at high γ the shadow strikes the tilted Earth obliquely and the penumbra can still cover the site with a deep partial (e.g. −135 Babylon); the class collects penumbra-only sites, attribution debates, and one boundary case (−708 at 1002 km vs the 1000-km threshold); see the website's [Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation) for the current audit), and a 267-event primary-source lunar timing test ([Doc 102](docs/102-gia-alpha-lunar-validation.md); **20.2-min mean \|residual\|**, with **117/267 events (43.8%) falling closer to observation than NASA Espenak/Meeus's polynomial**; four traditions — Babylonian, Greek, Chinese, Arab — agree on the residual magnitude). The **full** Munk-MacDonald (~5-6 ms/cy) non-tidal postulate is rejected; the GIA-scale channel is included via α(t), with the medieval-era residual decomposing structurally into the framework-native **4-flag 8H-lattice stack (Bond 8H/1830 = 1466 yr + Hallstatt 8H/1104 = 2430 yr + Jose5 8H/2989 = 897 yr + Jose4 8H/3749 = 716 yr)** plus the **Core-mantle swing** (time-varying mantle-core coupling; doc 104) plus observation noise. [Doc 103](docs/103-135-babylonian-case-study.md) documents the -135 Babylonian case study — BestGap ≈ 1,230 km (at the regional/geographic class boundary), with the framework's predicted UT within 16 minutes of the documented UT.
+- [Historical Eclipse Validation (Docs 102–103)](docs/102-gia-alpha-lunar-validation.md) — The model's ΔT formula (pure-tidal Farhat 2022 with LLR-anchored α₁ + **L1-orbital-coupled α(t) GIA** anchored on Cox & Chao 2002 satellite gravimetry with J₂→α conversion factor 2.0 in the Peltier ICE-6G LOD-coupling range; **zero parameters fitted to eclipse data in the α(t) machinery** — the sub-Milankovitch stack below carries structurally-predicted periods with fit-derived amplitudes/phases) tested on two independent tracks: a **26-event eclipse alignment audit** on documented solar eclipses spanning -762 BCE to 2026 CE (12/26 confirmed+off-peak, 6 regional, 0 with residual ΔT-signal — the framework agrees with the documented UT on every event — and 8 geographic-class events — an umbra-*centerline* distance gate, not visibility: at high γ the shadow strikes the tilted Earth obliquely and the penumbra can still cover the site with a deep partial (e.g. −135 Babylon); the class collects penumbra-only sites, attribution debates, and one boundary case (71 CE Aegean at 1011 km vs the 1000-km threshold, with −708 just inside at 983 km); see the website's [Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation) for the current audit), and a 267-event primary-source lunar timing test ([Doc 102](docs/102-gia-alpha-lunar-validation.md); **20.2-min mean \|residual\|**, with **117/267 events (43.8%) falling closer to observation than NASA Espenak/Meeus's polynomial**; four traditions — Babylonian, Greek, Chinese, Arab — agree on the residual magnitude). The **full** Munk-MacDonald (~5-6 ms/cy) non-tidal postulate is rejected; the GIA-scale channel is included via α(t), with the medieval-era residual decomposing structurally into the framework-native **4-flag 8H-lattice stack (Bond 8H/1830 = 1466 yr + Hallstatt 8H/1104 = 2430 yr + Jose5 8H/2989 = 897 yr + Jose4 8H/3749 = 716 yr)** plus the **Core-mantle swing** (time-varying mantle-core coupling; doc 104) plus observation noise. [Doc 103](docs/103-135-babylonian-case-study.md) documents the -135 Babylonian case study — BestGap ≈ 1,260 km (at the regional/geographic class boundary), with the framework's predicted UT within 16 minutes of the documented UT.
 - [The Derived Moon — Doc 66 technical record](docs/66-moon-meeus-corrections.md) — the framework's lunar theory, **"The Derived Moon" (DLT-1)**, presents Meeus Ch. 47 with every constant carrying its origin: the periodic-series amplitudes derived from gravity by the framework's own three-body laboratory (top-20 longitude at 100.0±0.1%; latitude family at 100.02% after the inclination-convention resolution), the linear rates from the framework's general precession (closing a ±1.4°/century frame drift with zero new constants), the full secular T² budget decomposed against primary sources to 0.08″/cy² with zero free parameters (tidal + Adams–Laplace planetary channel + Earth-figure + frame precession), the T³ "tail" derived at 98.8%, the precession acceleration ṗ composed from lab gravity + framework cycles at 104%, and the fitted RA/Dec patch dissolved into analytic aberration plus a single 5.1″ truncation residual. Certified statistically indistinguishable from the pure-Meeus polynomials across the full 12,064-event NASA lunar canon while remaining bounded at deep time. The 5-layer scene hierarchy is J2000-element anchored with signed layer rates summing exactly to the tropical month.
 - [Fitting Pipeline](tools/fit/README.md) — Pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, solar measurements, obliquity/cardinal-point/year-length harmonics
 - [Predictive Formula Guide](tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — ~2421-term physical-beat ML system for planetary precession prediction (R² > 0.99999 per planet; superseded the 429-term unified system on 2026-04-20)
@@ -249,7 +263,7 @@ node tools/fit/run-pipeline.js --phase2        # Steps 4a-10 (~2.5 hrs, requires
 node tools/fit/run-pipeline.js --from 5a       # resume from Step 5a onwards
 ```
 
-The pipeline runs in phases: Sun geometry → planet alignment → perihelion harmonics → ML training → parallax corrections → solar measurements & harmonic fits → verify → regenerate the constants module `src/script.js` imports. Step 3 (browser data export) is always manual. Step 6a (solar measurements) exports all cardinal points, perihelion/aphelion, and world-angles in a single scene-graph pass; steps 6b-6e fit harmonics from that data. See [tools/fit/README.md](tools/fit/README.md) for the full reference.
+The pipeline runs in phases: Sun geometry → planet alignment → perihelion harmonics → ML training → parallax corrections → solar measurements & harmonic fits → verify → regenerate the constants module `src/script.js` imports. Step 3 (browser data export) is always manual. Step 6a (solar measurements) exports all cardinal points, perihelion/aphelion, and world-angles in a single scene-graph pass; steps 6b–6d fit harmonics from that data. See [tools/fit/README.md](tools/fit/README.md) for the full reference.
 
 The cardinal points (solstices/equinoxes) are **derived, not independently fitted**: their dates come from the tropical year-length model integrated over time, plus one shared braiding term — the rotating perihelion vector, whose equation-of-centre orders and modulation sidebands are locked in 90° quadrature across all four points ([the braid law, doc 99](docs/99-expanding-solar-system-resonance-theory.md)). The lock is falsifiable and passed its sign test: only the geometrically required rotation sense captures the residual. Achieved accuracy: 0.28–0.37 min RMS per event over ±270,000 years — the four points statistically identical, as the law requires — with the per-point tropical year lengths matching the IAU values at J2000 to 0.2–3.2 s, the ~91-second seasonal spread emerging from the geometry rather than from per-point fitting.
 

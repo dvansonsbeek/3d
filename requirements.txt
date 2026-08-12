@@ -1,4 +1,11 @@
 # Core — used across scripts/ and tools/
+#
+# Deliberately unpinned: these are research/fitting tools, not shipped
+# runtime — the shipped artifacts are hash-stamped, and the check chain's
+# freshness gates catch any regeneration drift, whatever the library
+# versions. Known-good set (the environment the current fitted artifacts
+# were produced with, Python 3.12):
+#   numpy 2.4.1 · pandas 3.0.1 · openpyxl 3.1.5 · scipy 1.17.0 · astropy 7.2.0
 numpy
 pandas
 openpyxl
