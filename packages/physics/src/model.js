@@ -18,6 +18,8 @@
  * which itself mirrors tools/lib/constants.js §9.
  */
 import { deriveEpochParams } from './layer0/derive-params.js';
+import * as FL from './planets/fibonacci-laws.cjs';
+import * as planetOrientation from './planets/orientation.cjs';
 import { createPhaseMachinery } from './phase/index.cjs';
 import { createCardinalModel } from './cardinal/index.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
@@ -399,6 +401,128 @@ export function assembleModel(C, F) {
   /** @param {number} year @returns {number} */
   const deltaTSeconds = (year) => C.earthOrbital.deltaTStart + meanDeltaTSecondsAtAge(yearToTMa(year));
 
+  // ── Planets: Fibonacci-law derivation chain + orientation ─────────────────
+  const PLANET_KEYS = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+  const massEarthAlone = GM_EARTH_ALONE / G_CONSTANT;
+  /** @type {Record<string, number>} */
+  const massFraction = {};
+  for (const k of PLANET_KEYS) massFraction[k] = 1 / C.physicalConstants.massRatioDE440[k];
+  massFraction.earth = massEarthAlone / M_SUN;
+
+  const PSI = FL.computePsiConstant({
+    earthInvPlaneInclinationAmplitude: earthInclAmplitude,
+    massEarthAlone,
+    massSun: M_SUN,
+  });
+  const eccentricityAmplitudeK = FL.computeKConstant({
+    eccentricityAmplitude,
+    massEarthAlone,
+    massSun: M_SUN,
+    earthTiltMeanDeg: earthtiltMean,
+  });
+  const systemResetN = C.foundational.systemResetN;
+  const t2000 = 2000 - (balancedYear - systemResetN * H);
+  const balancedJD = startmodelJD - meanSolarYearDays * (startModelYearWithCorrection - balancedYear);
+
+  /** @param {[number, number]|null} frac @returns {number|null} */
+  const fractionToYears = (frac) => (frac === null ? null : (H * frac[0]) / frac[1]);
+
+  /** @type {Record<string, Record<string, any>>} */
+  const PLANET_RECORDS = {};
+  for (const k of PLANET_KEYS) {
+    const mp = C.planets[k];
+    const ar = C.planetOrbitalElements[k];
+    const ecl = /** @type {number} */ (fractionToYears(mp.perihelionEclipticFraction));
+    const axial = /** @type {number} */ (fractionToYears(mp.axialPrecessionFraction));
+    const obliquityCycle = fractionToYears(mp.obliquityCycleFraction)
+      ?? Math.abs(1 / (1 / ecl - 1 / (H / 13)));
+    const wobble = FL.computeWobblePeriodYears(ecl, axial, H);
+    const il = FL.computeInclinationLaw({
+      fibonacciD: mp.fibonacciD,
+      massFrac: massFraction[k],
+      invPlaneInclinationJ2000: ar.invPlaneInclinationJ2000,
+      longitudePerihelion: ar.longitudePerihelion,
+      inclinationCycleAnchor: mp.inclinationCycleAnchor,
+      antiPhase: mp.antiPhase || false,
+    }, PSI);
+    const obliquityMean = FL.computeObliquityMeanSnapshot({
+      axialTiltJ2000: ar.axialTiltJ2000,
+      invPlaneInclinationAmplitude: il.amplitude,
+      perihelionEclipticYears: ecl,
+    }, obliquityCycle, { H, t2000 });
+    const el = FL.computeEccentricityLaw({
+      fibonacciD: mp.fibonacciD,
+      massFrac: massFraction[k],
+      solarYearInput: ar.solarYearInput,
+      orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
+      antiPhase: mp.antiPhase || false,
+    }, {
+      kConstant: eccentricityAmplitudeK,
+      obliquityMeanDeg: obliquityMean,
+      wobblePeriodYears: wobble,
+      t2000,
+      meanSolarYearDays,
+    });
+    PLANET_RECORDS[k] = Object.freeze({
+      name: mp.name,
+      perihelionEclipticYears: ecl,
+      longitudePerihelion: ar.longitudePerihelion,
+      ascendingNodeCyclesIn8H: mp.ascendingNodeCyclesIn8H,
+      ascendingNodePeriod: -(8 * H) / mp.ascendingNodeCyclesIn8H,
+      axialPrecessionYears: axial,
+      obliquityCycle,
+      wobblePeriod: wobble,
+      fibonacciD: mp.fibonacciD,
+      antiPhase: mp.antiPhase || false,
+      ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
+      inclinationCycleAnchor: mp.inclinationCycleAnchor,
+      invPlaneInclinationJ2000: ar.invPlaneInclinationJ2000,
+      invPlaneInclinationAmplitude: il.amplitude,
+      invPlaneInclinationMean: il.mean,
+      obliquityMean,
+      orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
+      orbitalEccentricityAmplitude: el.amplitude,
+      orbitalEccentricityBase: el.base,
+      eccentricityPhaseJ2000: el.phaseJ2000,
+      solarYearInput: ar.solarYearInput,
+      axialTiltJ2000: ar.axialTiltJ2000,
+    });
+  }
+
+  /** Perihelion longitude (linear lattice rate). @param {string} k @param {number} year @returns {number} */
+  const planetPerihelionDeg = (k, year) => {
+    const p = PLANET_RECORDS[k];
+    return (((p.longitudePerihelion + (360.0 * (year - 2000)) / p.perihelionEclipticYears) % 360) + 360) % 360;
+  };
+  /** Ascending node on the invariable plane. @param {string} k @param {number} year @returns {number} */
+  const planetAscNodeDeg = (k, year) => {
+    const p = PLANET_RECORDS[k];
+    return planetOrientation.ascendingNodeInvPlaneLinearAt({
+      ascendingNodeInvPlane: p.ascendingNodeInvPlane,
+      ascendingNodePeriod: p.ascendingNodePeriod,
+      perihelionEclipticYears: p.perihelionEclipticYears,
+    }, year);
+  };
+  /** Invariable-plane inclination (signed ICRF rate, scene year→JD axis). @param {string} k @param {number} year @returns {number} */
+  const planetInclinationDeg = (k, year) => {
+    const p = PLANET_RECORDS[k];
+    const jd = startmodelJD + (year - startmodelYear) * meanSolarYearDays;
+    const yearsSinceBalanced = (jd - balancedJD) / meanSolarYearDays;
+    return planetOrientation.invPlaneInclinationAt({
+      isEarth: false,
+      invPlaneInclinationJ2000: p.invPlaneInclinationJ2000,
+      invPlaneInclinationMean: p.invPlaneInclinationMean,
+      invPlaneInclinationAmplitude: p.invPlaneInclinationAmplitude,
+      inclinationCycleAnchor: p.inclinationCycleAnchor,
+      longitudePerihelion: p.longitudePerihelion,
+      perihelionEclipticYears: p.perihelionEclipticYears,
+      antiPhase: p.antiPhase,
+    }, yearsSinceBalanced, {
+      H,
+      yearsFromBalancedToJ2000: (startmodelJD - balancedJD) / meanSolarYearDays,
+    });
+  };
+
   // ── Time axis: exact JD ↔ model-year conversion ───────────────────────────
   // The model's `year` inputs live on the SI axis (the axis the fits were
   // anchored on — tools/lib `_jdToSIyear`): linear in SI 86400-s days from the
@@ -458,6 +582,13 @@ export function assembleModel(C, F) {
     moon: Object.freeze({
       distanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,
       siderealMonthDaysAtYear: moonSiderealMonthDaysAt,
+    }),
+    planets: Object.freeze({
+      keys: Object.freeze([...PLANET_KEYS]),
+      record: /** @param {string} k @returns {Record<string, any>|undefined} */ (k) => PLANET_RECORDS[k],
+      perihelionLongitudeDeg: planetPerihelionDeg,
+      ascendingNodeInvPlaneDeg: planetAscNodeDeg,
+      invPlaneInclinationDeg: planetInclinationDeg,
     }),
   });
 }

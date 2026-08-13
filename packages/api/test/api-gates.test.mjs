@@ -69,6 +69,91 @@ for (const field of REQUIRED_META_FIELDS) {
   if (/immutable/.test(listing.headers['cache-control'] ?? '')) failures.push('mutable listing marked immutable');
 }
 
+// ── Slice-1: determinism + envelope over EVERY route ────────────────────────
+const SAMPLE_REQUESTS = [
+  '/v1/epoch?year=2000',
+  '/v1/epoch?jd=2451545',
+  '/v1/epoch?start=2000&stop=2100&step=50',
+  '/v1/cardinal-points?year=2000&types=SS,VE',
+  '/v1/earth?year=2000',
+  '/v1/earth?years=2000,1000,-2000',
+  '/v1/moon?year=2000',
+  '/v1/bodies',
+  '/v1/bodies/mercury',
+  '/v1/bodies/saturn?year=1000',
+  '/v1/values',
+  '/v1/values/usnoLodJ2000',
+  '/v1/derivations/axialPrecession',
+];
+/** @param {string} url @returns {{path: string, query: Record<string, string>}} */
+const parseUrl = (url) => {
+  const [path, qs] = url.split('?');
+  return { path, query: Object.fromEntries(new URLSearchParams(qs ?? '')) };
+};
+for (const url of SAMPLE_REQUESTS) {
+  const { path, query } = parseUrl(url);
+  const a = handle({ method: 'GET', path, query });
+  const b = handle({ method: 'GET', path, query });
+  if (a.status !== 200) { failures.push(`${url}: status ${a.status} — ${a.body.slice(0, 120)}`); continue; }
+  for (const d of determinismDefects(a, b)) failures.push(`${url}: ${d}`);
+  const parsed = JSON.parse(a.body);
+  for (const d of envelopeDefects(parsed.meta)) failures.push(`${url}: meta missing "${d}"`);
+}
+
+// ── Semantic anchors ────────────────────────────────────────────────────────
+{
+  /** @param {string} url @returns {any} */
+  const dataOf = (url) => { const { path, query } = parseUrl(url); return JSON.parse(handle({ method: 'GET', path, query }).body).data; };
+  const ep = dataOf('/v1/epoch?year=2000').epochs[0];
+  if (Math.abs(ep.h - 335317) > 1e-6) failures.push(`epoch H@2000: ${ep.h}`);
+  const dev = dataOf('/v1/epoch?year=-379998000').epochs[0];
+  if (Math.round(dev.h) !== 306189) failures.push(`epoch H@Devonian: ${dev.h}`);
+  const earth = dataOf('/v1/earth?year=2000').years[0];
+  if (Math.abs(earth.obliquityDeg - 23.4393) > 0.0002) failures.push(`earth obliquity@2000: ${earth.obliquityDeg}`);
+  const ss = dataOf('/v1/cardinal-points?year=2000&types=SS').years[0].points.SS;
+  if (Math.abs(ss.jd - 2451716.575) > 0.1) failures.push(`SS 2000 JD: ${ss.jd}`);
+  const val = dataOf('/v1/values/usnoLodJ2000');
+  if (val.value !== '86,400.0017') failures.push(`values/usnoLodJ2000: ${val.value}`);
+  const deriv = dataOf('/v1/derivations/axialPrecession');
+  if (deriv.latticeDivisor !== 13) failures.push(`derivations/axialPrecession divisor: ${deriv.latticeDivisor}`);
+  const merc = dataOf('/v1/bodies/mercury');
+  if (Math.round(merc.record.perihelionEclipticYears) !== 243867) failures.push(`mercury ecl period: ${merc.record.perihelionEclipticYears}`);
+  if (!merc.accuracy || !merc.accuracy.statement) failures.push('bodies/mercury: missing accuracy statement');
+  // JD input equivalence: same instant via jd= and via year= must agree.
+  const viaJd = dataOf('/v1/earth?jd=2451545').years[0];
+  const viaYearNum = JSON.parse(handle({ method: 'GET', path: '/v1/epoch', query: { jd: '2451545' } }).body).data.epochs[0].year;
+  const viaYear = dataOf(`/v1/earth?year=${viaYearNum}`).years[0];
+  if (viaJd.obliquityDeg !== viaYear.obliquityDeg) failures.push('jd= vs year= inequivalent on /v1/earth');
+}
+
+// ── Refusals: out-of-domain, range cap, unknown section/type/key ────────────
+{
+  /** @param {string} url @returns {{status: number, body: string, headers: Record<string, string>}} */
+  const res = (url) => { const { path, query } = parseUrl(url); return handle({ method: 'GET', path, query }); };
+  const outOfDomain = res('/v1/epoch?year=600000000');
+  if (outOfDomain.status !== 422) failures.push(`out-of-domain status: ${outOfDomain.status}`);
+  const oodDoc = JSON.parse(outOfDomain.body);
+  if (!oodDoc.validRange || oodDoc.validRange.maxYear === undefined) failures.push('out-of-domain problem lacks machine-readable validRange');
+  const tooMany = res('/v1/epoch?start=0&stop=1000000&step=1');
+  if (tooMany.status !== 422 || !JSON.parse(tooMany.body).maxPoints) failures.push('range cap problem lacks maxPoints');
+  if (res('/v1/epoch?year=2000&sections=nope').status !== 400) failures.push('unknown section not refused');
+  if (res('/v1/values/notAKey').status !== 404) failures.push('unknown value key not 404');
+  if (res('/v1/bodies/pluto').status !== 404) failures.push('unknown body not 404');
+  // CSV negotiation
+  const csv = res('/v1/epoch?start=2000&stop=2010&step=5&format=csv');
+  if (!/text\/csv/.test(csv.headers['content-type'] ?? '') || !csv.body.startsWith('year,')) failures.push('csv format not served');
+}
+
+// ── OpenAPI conformance: handler routes ≡ contract paths, both directions ──
+{
+  const { readFileSync } = await import('node:fs');
+  const { ROUTE_TEMPLATES } = await import('../src/app.js');
+  const spec = JSON.parse(readFileSync(new URL('../openapi.json', import.meta.url), 'utf8'));
+  const specPaths = Object.keys(spec.paths);
+  for (const r of ROUTE_TEMPLATES) if (!specPaths.includes(r)) failures.push(`route ${r} missing from openapi.json`);
+  for (const p of specPaths) if (!ROUTE_TEMPLATES.includes(p)) failures.push(`openapi path ${p} not implemented`);
+}
+
 // ── RFC 9457: errors are problem+json with typed members, correct statuses ──
 {
   const missing = handle({ method: 'GET', path: '/v1/nope' });

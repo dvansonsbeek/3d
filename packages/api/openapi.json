@@ -1,0 +1,92 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ESSRT Model API",
+    "version": "0.1.0",
+    "description": "HTTP surface over the assembled ESSRT model (@essrt/physics createModel). Deterministic: same model version + same request => byte-identical body, verifiable by ETag. Every response carries the provenance envelope; out-of-domain epochs are refused (RFC 9457 problem+json), never extrapolated. JD inputs are JD(TT).",
+    "license": { "name": "AGPL-3.0-or-later" }
+  },
+  "components": {
+    "schemas": {
+      "Meta": {
+        "type": "object",
+        "required": ["apiVersion", "modelVersion", "constantsHash", "coefficientsHash", "timescale", "inputEcho", "citation"],
+        "properties": {
+          "apiVersion": { "type": "string" },
+          "modelVersion": { "type": "string" },
+          "constantsHash": { "type": "string" },
+          "coefficientsHash": { "type": "string" },
+          "timescale": { "type": "string", "enum": ["TT"] },
+          "inputEcho": { "type": "object" },
+          "citation": { "type": "string" }
+        }
+      },
+      "Envelope": {
+        "type": "object",
+        "required": ["meta", "data"],
+        "properties": { "meta": { "$ref": "#/components/schemas/Meta" }, "data": {} }
+      },
+      "Problem": {
+        "type": "object",
+        "required": ["type", "title", "status", "detail"],
+        "properties": {
+          "type": { "type": "string", "format": "uri" },
+          "title": { "type": "string" },
+          "status": { "type": "integer" },
+          "detail": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "parameters": {
+      "year": { "name": "year", "in": "query", "schema": { "type": "number" }, "description": "single epoch as a model year (SI axis)" },
+      "jd": { "name": "jd", "in": "query", "schema": { "type": "number" }, "description": "single epoch as JD(TT)" },
+      "years": { "name": "years", "in": "query", "schema": { "type": "string" }, "description": "comma-separated model years (max 10000)" },
+      "jds": { "name": "jds", "in": "query", "schema": { "type": "string" }, "description": "comma-separated JD(TT) epochs (max 10000)" },
+      "start": { "name": "start", "in": "query", "schema": { "type": "number" } },
+      "stop": { "name": "stop", "in": "query", "schema": { "type": "number" } },
+      "step": { "name": "step", "in": "query", "schema": { "type": "number", "exclusiveMinimum": 0 } }
+    },
+    "responses": {
+      "Problem": {
+        "description": "RFC 9457 problem",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } }
+      }
+    }
+  },
+  "paths": {
+    "/v1/versions": {
+      "get": { "summary": "List model releases (changelog, hashes, citation, validity spans)", "responses": { "200": { "description": "Envelope", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Envelope" } } } } } }
+    },
+    "/v1/versions/{id}": {
+      "get": { "summary": "One model release, immutable (cacheable forever)", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "Envelope (Cache-Control: immutable)" }, "404": { "$ref": "#/components/responses/Problem" } } }
+    },
+    "/v1/epoch": {
+      "get": { "summary": "Deep-time epoch quantities: H, LOD, alpha, deltaT, sidereal-year seconds, Moon distance", "parameters": [{ "$ref": "#/components/parameters/year" }, { "$ref": "#/components/parameters/jd" }, { "$ref": "#/components/parameters/years" }, { "$ref": "#/components/parameters/jds" }, { "$ref": "#/components/parameters/start" }, { "$ref": "#/components/parameters/stop" }, { "$ref": "#/components/parameters/step" }, { "name": "sections", "in": "query", "schema": { "type": "string" }, "description": "comma-list of h,lod,alpha,deltaT,siderealYearSeconds,moonDistanceKm" }, { "name": "format", "in": "query", "schema": { "type": "string", "enum": ["csv"] }, "description": "CSV rendering for time series" }], "responses": { "200": { "description": "Envelope (or text/csv)" }, "400": { "$ref": "#/components/responses/Problem" }, "422": { "$ref": "#/components/responses/Problem" } } }
+    },
+    "/v1/cardinal-points": {
+      "get": { "summary": "Solstice/equinox JD, RA, per-point year length", "parameters": [{ "$ref": "#/components/parameters/year" }, { "$ref": "#/components/parameters/jd" }, { "$ref": "#/components/parameters/years" }, { "$ref": "#/components/parameters/jds" }, { "$ref": "#/components/parameters/start" }, { "$ref": "#/components/parameters/stop" }, { "$ref": "#/components/parameters/step" }, { "name": "types", "in": "query", "schema": { "type": "string" }, "description": "comma-list of SS,WS,VE,AE" }], "responses": { "200": { "description": "Envelope" }, "400": { "$ref": "#/components/responses/Problem" }, "422": { "$ref": "#/components/responses/Problem" } } }
+    },
+    "/v1/earth": {
+      "get": { "summary": "Earth elements at epoch(s): obliquity, eccentricity, inclination, perihelion, ascending node", "parameters": [{ "$ref": "#/components/parameters/year" }, { "$ref": "#/components/parameters/jd" }, { "$ref": "#/components/parameters/years" }, { "$ref": "#/components/parameters/jds" }, { "$ref": "#/components/parameters/start" }, { "$ref": "#/components/parameters/stop" }, { "$ref": "#/components/parameters/step" }], "responses": { "200": { "description": "Envelope" }, "422": { "$ref": "#/components/responses/Problem" } } }
+    },
+    "/v1/moon": {
+      "get": { "summary": "Moon distance and sidereal month at epoch(s)", "parameters": [{ "$ref": "#/components/parameters/year" }, { "$ref": "#/components/parameters/jd" }, { "$ref": "#/components/parameters/years" }, { "$ref": "#/components/parameters/jds" }, { "$ref": "#/components/parameters/start" }, { "$ref": "#/components/parameters/stop" }, { "$ref": "#/components/parameters/step" }], "responses": { "200": { "description": "Envelope" }, "422": { "$ref": "#/components/responses/Problem" } } }
+    },
+    "/v1/bodies": {
+      "get": { "summary": "List bodies + the accuracy statement", "responses": { "200": { "description": "Envelope" } } }
+    },
+    "/v1/bodies/{body}": {
+      "get": { "summary": "One body: structural record + elements at epoch(s), with accuracy statement", "parameters": [{ "name": "body", "in": "path", "required": true, "schema": { "type": "string" } }, { "$ref": "#/components/parameters/year" }, { "$ref": "#/components/parameters/jd" }], "responses": { "200": { "description": "Envelope" }, "404": { "$ref": "#/components/responses/Problem" } } }
+    },
+    "/v1/values": {
+      "get": { "summary": "The rendered model-values registry: key list + coefficients identity", "responses": { "200": { "description": "Envelope" } } }
+    },
+    "/v1/values/{key}": {
+      "get": { "summary": "One rendered value", "parameters": [{ "name": "key", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "Envelope" }, "404": { "$ref": "#/components/responses/Problem" } } }
+    },
+    "/v1/derivations/{quantity}": {
+      "get": { "summary": "Structural derivation for a quantity: formula, lattice divisor, docs, registry key", "parameters": [{ "name": "quantity", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "Envelope" }, "404": { "$ref": "#/components/responses/Problem" } } }
+    }
+  }
+}
