@@ -48,9 +48,9 @@ const capitalisePlanetKeys = (o) =>
   axial precession (H/13), inclination precession (H/3) and perihelion precession
   (H/16) through Fibonacci number ratios; under deep-time mode H slowly evolves
   via Earth-Moon tidal evolution, and the scene renders the integrated state
-  via cumulative ∫1/H(t)dt cycle math. 70 model parameters (Earth 11, Moon 3,
-  7 planets x 8) and 75 calibration inputs from astronomical observations
-  (astro-reference.json).
+  via cumulative ∫1/H(t)dt cycle math. Only 6 parameters are free; every other
+  number is derived or anchored to astronomical observations — the canonical
+  parameter accounting is docs/20-constants-reference.md § Parameter Summary.
 
   Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v4
   Website:  https://holisticuniverse.com
