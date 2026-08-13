@@ -1,9 +1,12 @@
 {
   "name": "@essrt/api",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "HTTP + OpenAPI. Thin adapter over physics; contains zero physics.",
+  "description": "HTTP API over the assembled ESSRT model (@essrt/physics createModel) — §7a. Build-only until the hosting decision; zero runtime dependencies by design (thin adapter, node:http).",
   "type": "module",
-  "main": "src/index.js",
-  "license": "AGPL-3.0-or-later"
+  "license": "AGPL-3.0-or-later",
+  "exports": {
+    ".": "./src/app.js",
+    "./server": "./src/server.js"
+  }
 }
