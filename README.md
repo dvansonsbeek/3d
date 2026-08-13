@@ -147,7 +147,7 @@ npm run build
 ```bash
 npm run check             # the full gate chain (~9 min): lint, typecheck, boundaries,
                           # purity, layer identities, constants, counterfactual,
-                          # planet model, fixtures, literals, python-physics pins,
+                          # planet model, createModel parity, fixtures, literals, python-physics pins,
                           # docs freshness, artifact freshness, data provenance,
                           # doc values, packaged model-values, model gates, pipeline
 npm run check:docs        # scoped tier (~20 s) for docs/registry/marker edits

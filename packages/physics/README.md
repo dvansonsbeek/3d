@@ -45,27 +45,50 @@ elements as preformatted strings), see
 [`@essrt/model-values`](https://www.npmjs.com/package/@essrt/model-values) —
 generated from this engine at the same model version.
 
-## Consuming the package — write a small adapter
+## The assembled model — `createModel()`
 
-The package is deliberately a **parts library, not an assembled engine**.
-Each factory receives everything through one deps object — plain numbers
-plus functions — and no module imports another. That is what makes
-counterfactual runs first-class (inject different constants, get a
-different solar system) and lets the same core run in Node and the
-browser.
+The canonical assembly, wired once inside the package:
 
-The cost is assembly. `createEpochPrimitives`, for example, takes
-`{ params, alphaAtAgeMa }` — a block of scalars drawn from
-`DEFAULT_CONSTANTS` plus the Earth moment-of-inertia α(t) channel — and
-its outputs (`lodSeconds`, `holisticH`, the year lengths) feed the
-cardinal-point, ΔT and lunar factories in turn. Consumers write a thin
-**adapter** that does this wiring once and exposes friendly names.
+```js
+import { createModel, DEFAULT_CONSTANTS } from '@essrt/physics';
 
-The reference adapter is `tools/lib/` in the
+const model = createModel();
+model.identity.modelVersion;          // 'v10.0' + both content hashes
+model.epoch.hAtYear(2000 - 380e6);    // 306189 — Devonian H (the Wells 1963 match)
+model.earth.obliquityDeg(2000);       // 23.4393
+model.cardinal.jd(2000, 'SS');        // 2451716.575 — June solstice 2000 (USNO)
+model.lengths.tropicalYearDays(2000); // 365.24219
+
+// Counterfactual (§2d): inject different constants, get a different solar
+// system — self-identifying, with its own constants hash.
+const cf = createModel({
+  ...DEFAULT_CONSTANTS,
+  foundational: { ...DEFAULT_CONSTANTS.foundational, holisticyearLength: 400000 },
+});
+cf.epoch.hAtYear(2000);               // 400000
+cf.identity.counterfactual;           // true
+```
+
+The surface groups: `time` (exact JD ↔ model-year conversion on the SI
+axis the fits were anchored on — callers holding a JD convert here, never
+with their own formula), `identity` (version + hashes + citation DOI), `epoch`
+(H, LOD, α, ΔT, deep-time quantities at any year ±500 Myr), `earth`
+(obliquity, eccentricity, inclination, perihelion), `lengths` (year and
+day lengths), `cardinal` (solstice/equinox JD, RA, year length), `moon`
+(distance, sidereal month). Validation targets are refused as inputs —
+a counterfactual cannot move the goalposts it is judged by.
+
+## Underneath: a parts library
+
+`createModel()` is assembly over unassembled factories. Each factory
+receives everything through one deps object — plain numbers plus
+functions — and no module imports another; that is what makes
+counterfactuals first-class and lets the same core run in Node and the
+browser. For custom wiring (different α channel, subset assembly), use
+the factories directly: the reference adapter is `tools/lib/` in the
 [public repository](https://github.com/dvansonsbeek/3d) — the hosted
-simulator and the project's verification gates run on it; copy its wiring
-for the modules you need. A pre-assembled service surface (API/MCP) is on
-the project roadmap.
+simulator and the project's verification gates run on it. A service
+surface (API/MCP) over `createModel()` is on the project roadmap.
 
 ## Provenance
 

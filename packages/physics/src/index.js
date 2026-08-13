@@ -22,6 +22,8 @@
  */
 
 import { DEFAULT_CONSTANTS as GENERATED, CONSTANTS_HASH, MODEL_VERSION, PREPRINT_DOI, REFERENCE_DATA } from './constants/index.js';
+import { FITTED_COEFFICIENTS as FITTED, COEFFICIENTS_HASH as COEFF_HASH } from './constants/index.js';
+import { assembleModel } from './model.js';
 
 /**
  * Keys `createModel` refuses. Derived from REFERENCE_DATA rather than listed by
@@ -36,11 +38,26 @@ const NEVER_INJECTABLE = Object.keys(REFERENCE_DATA);
  */
 
 /**
- * @typedef {Object} Model
- * @property {Constants} constants   the resolved context, frozen
- * @property {string} hash           identifies this context; differs for a counterfactual
- * @property {() => {axialPrecessionPeriodYears: number, inclinationPrecessionPeriodYears: number, perihelionPrecessionPeriodYears: number}} computeLatticePeriodsYears
- * @property {(year: number) => number} eccentricity
+ * @typedef {ReturnType<typeof assembleModel>} ModelSurfaces
+ */
+
+/**
+ * @typedef {Object} ModelIdentity
+ * @property {string} modelVersion
+ * @property {string} constantsHash    THIS context's hash — distinct for a counterfactual
+ * @property {string} coefficientsHash
+ * @property {boolean} counterfactual
+ * @property {string} preprintDoi
+ */
+
+/**
+ * @typedef {{
+ *   constants: Constants,
+ *   hash: string,
+ *   computeLatticePeriodsYears: () => {axialPrecessionPeriodYears: number, inclinationPrecessionPeriodYears: number, perihelionPrecessionPeriodYears: number},
+ *   eccentricity: (year: number) => number,
+ *   identity: ModelIdentity,
+ * } & ModelSurfaces} Model
  */
 
 /**
@@ -163,6 +180,10 @@ export const createModel = (constants = GENERATED) => {
   // (`{...DEFAULT_CONSTANTS}`); only the identity case is short-circuited.
   const hash = isGeneratedDefault || isDefault(ctx) ? CONSTANTS_HASH : hashOf(ctx);
 
+  // The §7a assembly: every factory wired from THIS context, so counterfactual
+  // constants flow through the entire motion model.
+  const surfaces = assembleModel(ctx, FITTED);
+
   return {
     constants: ctx,
     hash,
@@ -196,13 +217,27 @@ export const createModel = (constants = GENERATED) => {
     },
 
     /**
+     * Earth eccentricity at a year — the Phase-6 promise, fulfilled by the
+     * §7a assembly (law-of-cosines on the integrated H/16 phase).
      * @param {number} year
      * @returns {number}
      */
-    eccentricity: (year) => {
-      void year; void ctx;
-      throw new Error('physics: not implemented until Phase 6 — see IP-technical-design.md §6');
-    },
+    eccentricity: (year) => surfaces.earth.eccentricity(year),
+
+    /**
+     * Model identity (§10 two-axis): the hash is THIS context's hash, so a
+     * counterfactual assembly is self-identifying.
+     */
+    identity: Object.freeze({
+      modelVersion: MODEL_VERSION,
+      constantsHash: hash,
+      coefficientsHash: COEFF_HASH,
+      counterfactual: hash !== CONSTANTS_HASH,
+      preprintDoi: PREPRINT_DOI,
+    }),
+
+    // The assembled surfaces (§7a step 1): epoch, earth, lengths, cardinal, moon.
+    ...surfaces,
   };
 };
 
