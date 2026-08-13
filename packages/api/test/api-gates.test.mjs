@@ -84,6 +84,10 @@ const SAMPLE_REQUESTS = [
   '/v1/values',
   '/v1/values/usnoLodJ2000',
   '/v1/derivations/axialPrecession',
+  '/v1/climate?year=2000',
+  '/v1/climate?start=0&stop=100000&step=50000',
+  '/v1/cross-validation/obliquity-berger1978?years=2000,-100000',
+  '/v1/cross-validation/deltat-stephenson2016?year=1000',
 ];
 /** @param {string} url @returns {{path: string, query: Record<string, string>}} */
 const parseUrl = (url) => {
@@ -124,6 +128,44 @@ for (const url of SAMPLE_REQUESTS) {
   const viaYearNum = JSON.parse(handle({ method: 'GET', path: '/v1/epoch', query: { jd: '2451545' } }).body).data.epochs[0].year;
   const viaYear = dataOf(`/v1/earth?year=${viaYearNum}`).years[0];
   if (viaJd.obliquityDeg !== viaYear.obliquityDeg) failures.push('jd= vs year= inequivalent on /v1/earth');
+}
+
+// ── Counterfactual POST: determinism, own hash, flow, refusals ──────────────
+{
+  const body = JSON.stringify({ overrides: { 'foundational.holisticyearLength': 400000 }, year: 2000 });
+  const a = handle({ method: 'POST', path: '/v1/counterfactual', body });
+  const b = handle({ method: 'POST', path: '/v1/counterfactual', body });
+  if (a.status !== 200) failures.push(`counterfactual: status ${a.status} — ${a.body.slice(0, 140)}`);
+  else {
+    if (a.body !== b.body) failures.push('counterfactual: nondeterministic');
+    const doc = JSON.parse(a.body);
+    for (const d of envelopeDefects(doc.meta)) failures.push(`counterfactual meta missing "${d}"`);
+    const base = JSON.parse(handle({ method: 'GET', path: '/v1/versions' }).body).meta.constantsHash;
+    if (doc.meta.constantsHash === base) failures.push('counterfactual: served the DEFAULT hash');
+    if (Math.abs(doc.data.epoch.h - 400000) > 1e-6) failures.push(`counterfactual H did not flow: ${doc.data.epoch.h}`);
+    if (!/no-store/.test(a.headers['cache-control'] ?? '')) failures.push('counterfactual not no-store');
+  }
+  // Refusals: validation-target injection, unknown path, non-numeric value, bad JSON.
+  const cases = [
+    [JSON.stringify({ overrides: { 'laplaceLagrangeBounds': 1 } }), 422],
+    [JSON.stringify({ overrides: { 'foundational.notAThing': 1 } }), 422],
+    [JSON.stringify({ overrides: { 'foundational.holisticyearLength': 'big' } }), 422],
+    ['{nope', 400],
+  ];
+  for (const [cfBody, want] of cases) {
+    const r = handle({ method: 'POST', path: '/v1/counterfactual', body: String(cfBody) });
+    if (r.status !== want) failures.push(`counterfactual refusal (${String(cfBody).slice(0, 40)}): status ${r.status}, want ${want}`);
+    if (!/problem\+json/.test(r.headers['content-type'] ?? '')) failures.push('counterfactual refusal not problem+json');
+  }
+}
+
+// ── Cross-validation semantics ──────────────────────────────────────────────
+{
+  const res = JSON.parse(handle({ method: 'GET', path: '/v1/cross-validation/obliquity-berger1978', query: { year: '2000' } }).body);
+  const row = res.data.years[0];
+  if (Math.abs(row.model - row.published) > 0.05) failures.push(`obliquity model vs Berger @2000 diverges: ${row.delta}`);
+  const unknown = handle({ method: 'GET', path: '/v1/cross-validation/nope', query: { year: '2000' } });
+  if (unknown.status !== 404) failures.push('unknown curve not 404');
 }
 
 // ── Refusals: out-of-domain, range cap, unknown section/type/key ────────────

@@ -583,6 +583,9 @@ export function assembleModel(C, F) {
       distanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,
       siderealMonthDaysAtYear: moonSiderealMonthDaysAt,
     }),
+    climate: Object.freeze({
+      l1OrbitalPermil: evalClimateL1,
+    }),
     planets: Object.freeze({
       keys: Object.freeze([...PLANET_KEYS]),
       record: /** @param {string} k @returns {Record<string, any>|undefined} */ (k) => PLANET_RECORDS[k],

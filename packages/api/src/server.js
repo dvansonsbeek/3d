@@ -17,13 +17,19 @@ export function startServer(port = 8787) {
   const { handle } = createApi();
   const server = createServer((req, res) => {
     const url = new URL(req.url ?? '/', 'http://localhost');
-    const out = handle({
-      method: req.method ?? 'GET',
-      path: url.pathname,
-      query: Object.fromEntries(url.searchParams),
+    /** @type {Buffer[]} */
+    const chunks = [];
+    req.on('data', (c) => chunks.push(c));
+    req.on('end', () => {
+      const out = handle({
+        method: req.method ?? 'GET',
+        path: url.pathname,
+        query: Object.fromEntries(url.searchParams),
+        body: chunks.length ? Buffer.concat(chunks).toString('utf8') : undefined,
+      });
+      res.writeHead(out.status, out.headers);
+      res.end(out.body);
     });
-    res.writeHead(out.status, out.headers);
-    res.end(out.body);
   });
   server.listen(port);
   return server;

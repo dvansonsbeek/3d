@@ -12,7 +12,9 @@
  * earth, moon, bodies, values, derivations). The OpenAPI 3.1 contract lives
  * in ../openapi.json; the conformance gate keeps handler and contract equal.
  */
-import { createModel } from '../../physics/src/index.js';
+import { readFileSync } from 'node:fs';
+import { createModel, DEFAULT_CONSTANTS } from '../../physics/src/index.js';
+import * as curves from '../../physics/src/reference/published-curves.cjs';
 import { MODEL_VALUES, MODEL_VALUES_META } from '../../model-values/src/index.js';
 import { envelope, API_VERSION } from './envelope.js';
 import { problem, notFound, methodNotAllowed } from './problem.js';
@@ -35,7 +37,23 @@ export const ROUTE_TEMPLATES = Object.freeze([
   '/v1/values',
   '/v1/values/{key}',
   '/v1/derivations/{quantity}',
+  '/v1/climate',
+  '/v1/cross-validation/{curve}',
+  '/v1/counterfactual',
 ]);
+
+/** Cross-validation curves: model quantity vs the published reference. */
+const CURVES = Object.freeze({
+  'obliquity-berger1978': { published: curves.obliquityBerger1978, model: 'obliquityDeg', unit: 'deg' },
+  'eccentricity-berger1978': { published: curves.eccBerger1978, model: 'eccentricity', unit: '' },
+  'obliquity-la2004': { published: curves.obliquityLa2004, model: 'obliquityDeg', unit: 'deg' },
+  'eccentricity-la2004': { published: curves.eccLa2004, model: 'eccentricity', unit: '' },
+  'deltat-stephenson2016': { published: null, model: 'deltaTSeconds', unit: 's' },
+});
+const STEPHENSON_POLY = JSON.parse(readFileSync(new URL('../../../public/input/stephenson-2016-deltaT-polynomial.json', import.meta.url), 'utf8'));
+
+/** Counterfactual limits: overrides count and value type. */
+const MAX_OVERRIDES = 20;
 
 /** The §9 honesty statement served with every planetary-position payload. */
 const PLANET_ACCURACY = Object.freeze({
@@ -48,7 +66,7 @@ const EPOCH_SECTIONS = Object.freeze(['h', 'lod', 'alpha', 'deltaT', 'siderealYe
 const CARDINAL_TYPES = Object.freeze(['SS', 'WS', 'VE', 'AE']);
 
 /**
- * @returns {{ handle: (req: {method: string, path: string, query?: Record<string, string>}) => {status: number, headers: Record<string, string>, body: string}, model: ReturnType<typeof createModel> }}
+ * @returns {{ handle: (req: {method: string, path: string, query?: Record<string, string>, body?: string}) => {status: number, headers: Record<string, string>, body: string}, model: ReturnType<typeof createModel> }}
  */
 export function createApi() {
   const model = createModel();
@@ -237,6 +255,91 @@ export function createApi() {
         return problem(404, 'unknown-value-key', 'Unknown value key', `No registry key "${key}".`, { instance: path });
       }
       return envelope({ identity: id, inputEcho: { path, key }, data: { key, value } });
+    }
+
+    // ── /climate ────────────────────────────────────────────────────────────
+    if (path === `/${API_VERSION}/climate`) {
+      if (!get()) return methodNotAllowed(method, path);
+      const t = epochs(query);
+      if ('problem' in t) return t.problem;
+      const rows = t.years.map((y) => ({ year: y, l1OrbitalPermil: model.climate.l1OrbitalPermil(y) }));
+      return envelope({ identity: id, inputEcho: { path, ...t.echo }, data: { years: rows, note: 'L1 orbital forcing component (permil), the 32-component 8H lattice formula — docs/91.' } });
+    }
+
+    // ── /cross-validation ───────────────────────────────────────────────────
+    const curveMatch = path.match(new RegExp(`^/${API_VERSION}/cross-validation/([a-z0-9\\-]+)$`));
+    if (curveMatch) {
+      if (!get()) return methodNotAllowed(method, path);
+      const curveKey = curveMatch[1];
+      const curve = /** @type {Record<string, any>} */ (CURVES)[curveKey];
+      if (!curve) {
+        return problem(404, 'unknown-curve', 'Unknown cross-validation curve', `No curve "${curveKey}".`, { curves: Object.keys(CURVES), instance: path });
+      }
+      const t = epochs(query);
+      if ('problem' in t) return t.problem;
+      const rows = t.years.map((y) => {
+        const modelValue = curve.model === 'deltaTSeconds' ? model.epoch.deltaTSecondsAtYear(y)
+          : curve.model === 'obliquityDeg' ? model.earth.obliquityDeg(y)
+            : model.earth.eccentricity(y);
+        const published = curveKey === 'deltat-stephenson2016'
+          ? curves.stephensonDeltaT(y, STEPHENSON_POLY)
+          : curve.published(y);
+        return { year: y, model: modelValue, published, delta: published === null ? null : modelValue - published };
+      });
+      return envelope({ identity: id, inputEcho: { path, curve: curveKey, ...t.echo }, data: { curve: curveKey, unit: curve.unit, years: rows, note: 'The model is the source; the published curve is the comparison reference (cross-validate in one place).' } });
+    }
+
+    // ── /counterfactual (POST) ──────────────────────────────────────────────
+    if (path === `/${API_VERSION}/counterfactual`) {
+      if (method !== 'POST') return methodNotAllowed(method, path);
+      /** @type {any} */
+      let parsed;
+      try { parsed = JSON.parse(/** @type {any} */ (req).body ?? ''); } catch {
+        return problem(400, 'invalid-json', 'Invalid JSON body', 'The request body must be a JSON object.');
+      }
+      const overrides = parsed?.overrides;
+      const year = Number(parsed?.year ?? 2000);
+      if (!overrides || typeof overrides !== 'object' || Array.isArray(overrides)) {
+        return problem(400, 'invalid-counterfactual', 'Invalid counterfactual request', 'Body must be { "overrides": { "<dotted.path>": number }, "year": <number> }.');
+      }
+      const entries = Object.entries(overrides);
+      if (entries.length === 0 || entries.length > MAX_OVERRIDES) {
+        return problem(422, 'override-count', 'Override count out of range', `1..${MAX_OVERRIDES} overrides supported.`, { maxOverrides: MAX_OVERRIDES });
+      }
+      const altered = JSON.parse(JSON.stringify(DEFAULT_CONSTANTS));
+      for (const [dotted, value] of entries) {
+        if (typeof value !== 'number' || !Number.isFinite(value)) {
+          return problem(422, 'invalid-override-value', 'Override values must be finite numbers', `"${dotted}" is ${typeof value}.`);
+        }
+        const parts = dotted.split('.');
+        let node = altered;
+        for (let i = 0; i < parts.length - 1; i++) {
+          node = node?.[parts[i]];
+          if (node === undefined || node === null || typeof node !== 'object') {
+            return problem(422, 'unknown-override-path', 'Unknown constants path', `"${dotted}" does not exist in the injectable constants.`, { path: dotted });
+          }
+        }
+        const leaf = parts[parts.length - 1];
+        if (typeof node[leaf] !== 'number') {
+          return problem(422, 'unknown-override-path', 'Unknown constants path', `"${dotted}" does not name a numeric constant.`, { path: dotted });
+        }
+        node[leaf] = value;
+      }
+      /** @type {ReturnType<typeof createModel>} */
+      let cf;
+      try { cf = createModel(altered); } catch (e) {
+        return problem(422, 'validation-target-injection', 'Validation targets cannot be injected', String(e instanceof Error ? e.message : e));
+      }
+      const data = {
+        overrides,
+        year,
+        latticePeriodsYears: cf.computeLatticePeriodsYears(),
+        epoch: { h: cf.epoch.hAtYear(year), lodSeconds: cf.epoch.lodSecondsAtYear(year), deltaTSeconds: cf.epoch.deltaTSecondsAtYear(year) },
+        earth: { obliquityDeg: cf.earth.obliquityDeg(year), eccentricity: cf.earth.eccentricity(year), inclinationDeg: cf.earth.inclinationDeg(year) },
+      };
+      const res = envelope({ identity: cf.identity, inputEcho: { path, overrides, year }, data });
+      res.headers['cache-control'] = 'no-store';
+      return res;
     }
 
     // ── /derivations ────────────────────────────────────────────────────────
