@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software or the model's results, please cite it as below."
+title: "Fibonacci Laws of Planetary Motion — Holistic Universe Model simulator"
+authors:
+  - family-names: "van Sonsbeek"
+    given-names: "Dennis"
+    email: "dennis@holisticuniverse.com"
+    orcid: "https://orcid.org/0009-0009-2818-3172"
+license: AGPL-3.0-or-later
+repository-code: "https://github.com/dvansonsbeek/3d"
+url: "https://3d.holisticuniverse.com"
+identifiers:
+  - type: doi
+    value: "10.21203/rs.3.rs-8758810/v4"
+    description: "Preprint: Fibonacci Laws of Planetary Motion"
+preferred-citation:
+  type: article
+  title: "Fibonacci Laws of Planetary Motion"
+  authors:
+    - family-names: "van Sonsbeek"
+      given-names: "Dennis"
+      orcid: "https://orcid.org/0009-0009-2818-3172"
+  doi: "10.21203/rs.3.rs-8758810/v4"

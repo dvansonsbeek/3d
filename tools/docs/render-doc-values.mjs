@@ -59,9 +59,15 @@ const unknown = [];      // spans naming a key the registry does not define
 let spansSeen = 0;
 let filesTouched = 0;
 
-for (const name of readdirSync(DOCS).filter(f => f.endsWith('.md')).sort()) {
-  const rel = relative(ROOT, join(DOCS, name));
-  const src = readFileSync(join(DOCS, name), 'utf8');
+const targets = [
+  // The repo README quotes the same refit-mobile numbers as the doc tree and
+  // is the most public page of all — it is marker-managed like docs/.
+  join(ROOT, 'README.md'),
+  ...readdirSync(DOCS).filter(f => f.endsWith('.md')).sort().map(f => join(DOCS, f)),
+];
+for (const path of targets) {
+  const rel = relative(ROOT, path);
+  const src = readFileSync(path, 'utf8');
   let dirty = false;
 
   const next = src.replace(SPAN, (whole, key, current) => {
@@ -77,7 +83,7 @@ for (const name of readdirSync(DOCS).filter(f => f.endsWith('.md')).sort()) {
     return `<!--v:${key}-->${want}<!--/v-->`;
   });
 
-  if (dirty && WRITE) { writeFileSync(join(DOCS, name), next); filesTouched++; }
+  if (dirty && WRITE) { writeFileSync(path, next); filesTouched++; }
 }
 
 const line = '='.repeat(74);
