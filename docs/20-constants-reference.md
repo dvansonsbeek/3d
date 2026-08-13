@@ -51,7 +51,12 @@ For the canonical 9-step derivation chain from `t_Ma` through LOD, H, AU, M_Sun,
 
 ---
 
-## Parameter Summary (mirrors 3D scene → About panel)
+## Parameter Summary
+
+**This section is the canonical parameter accounting.** The model has only
+**6 free parameters**; every other number is either derived or anchored to
+astronomical observations. Other documents (and the simulator's About panel)
+should reference this section rather than carrying their own counts.
 
 ### Free Parameters (6 DOF)
 
@@ -68,9 +73,14 @@ The six true degrees of freedom that define the model. Everything else is derive
 
 Total: **6 DOF** (items 2 and 6 are derived/constrained, not independently free).
 
-### Calibration Inputs (28)
+### Core Calibration Inputs (28 — Earth, Sun & Moon)
 
-Reference values from astronomical observations (IAU, JPL, Meeus) used to anchor the model. All are in [Part 3 — External Reference Values](#part-3--external-reference-values).
+The 28 Earth/Sun/Moon reference values from astronomical observations (IAU,
+JPL, Meeus) used to anchor the model, tabulated below. The **per-planet**
+calibration inputs (J2000 orbital elements, orbital periods, mass ratios,
+axial tilts) are tabulated in [Part 3 — External Reference Values](#part-3--external-reference-values)
+and [Part 4 — Tuned/Optimized Parameters](#part-4--tunedoptimized-parameters);
+they anchor per-planet geometry but carry no model freedom.
 
 | Parameter | Variable | Value |
 |-----------|----------|-------|
