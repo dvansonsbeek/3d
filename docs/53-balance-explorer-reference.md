@@ -221,11 +221,11 @@ Earth's inclination amplitude (~0.636°) is defined by the model and used to der
 
 ```
 amplitude = ψ / (3 × √m_Earth)
-          = 3.307e-3 / (3 × 1.7331e-3)
+          = 3.3069e-3 / (3 × 1.7331e-3)
           = 0.636°
 ```
 
-The model's calibrated value (<!--v:earthInclAmp-->0.63605<!--/v-->°) is 0.47% higher, tuned to match IAU observations. Changing Earth's d would break this relationship.
+The model's calibrated value (<!--v:earthInclAmp-->0.63605<!--/v-->°) is set from the IAU obliquity rate; ψ is defined from it, so the Law-2 relation reproduces it exactly by construction. Changing Earth's d would break this relationship.
 
 ---
 

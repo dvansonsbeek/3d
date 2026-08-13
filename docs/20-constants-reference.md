@@ -89,7 +89,7 @@ Reference values from astronomical observations (IAU, JPL, Meeus) used to anchor
 | Tropical year WS (J2000) | `tropicalYearWSJ2000` | 365.242740 days |
 | Anomalistic year (J2000) | `anomalisticYearJ2000` | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days |
 | Tropical year rate | `tropicalYearRateSecPerCentury` | −0.53 s/cy |
-| Axial precession (J2000) | `iauPrecessionJ2000` | 25,771.58 years |
+| Axial precession (J2000) | `iauPrecessionJ2000` | <!--v:iauPrecessionInputYears-->25,770.73<!--/v--> years (input, model day basis; published IAU exact 25,771.57634) |
 | June Solstice 2000 JD | `juneSolstice2000_JD` | <!--v:juneSolstice2000JD-->2451716.575<!--/v--> |
 | Solar day (J2000) | `solarDayJ2000` | 86400.0 s |
 | Sidereal day (J2000) | `siderealDayJ2000` | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s |
@@ -421,7 +421,7 @@ These come from external astronomical sources and do not change with the model.
 | Eccentricity | `earthEccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> | JPL Horizons |
 | Long. of perihelion | `earthPerihelionLongitudeJ2000` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v--> deg | JPL Horizons |
 | Perihelion passage J2000 | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | USNO (2000 Jan 3 13:00 UTC) |
-| IAU precession period | `iauPrecessionJ2000` | 25,771.57634 years | IAU 2006 |
+| IAU precession period | `iauPrecessionJ2000` | <!--v:iauPrecessionInputYears-->25,770.73<!--/v--> years | IAU 2006 rate re-expressed on the model day basis (published exact: 25,771.57634 yr) |
 | June Solstice 2000 JD | `juneSolstice2000_JD` | <!--v:juneSolstice2000JD-->2451716.575<!--/v--> | USNO (June 21, 2000 01:48 UTC) |
 
 ## Year & Day Lengths (J2000)

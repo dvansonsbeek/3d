@@ -1542,6 +1542,12 @@ export const VALUES = {
     out.periPhaseOffsetDeg = { get: () => C.perihelionPhaseOffset, render: (v) => v.toFixed(4), unit: 'deg', note: 'derived (constants.js)' };
     out.perihelionPassageJD = { get: () => astro.earthOrbital.perihelionPassageJ2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (2000 Jan 3)' };
     out.juneSolstice2000JD = { get: () => astro.earthOrbital.juneSolstice2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (June 21, 2000)' };
+    out.iauPrecessionInputYears = { get: () => astro.yearLengthRef.iauPrecessionJ2000, render: (v) => thousands(v, 2), unit: 'yr', note: 'stored iauPrecessionJ2000 input — IAU 2006 rate on the model day basis' };
+    out.earthEccCycle = { get: () => C.H / 16, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'eccentricity cycle = ecliptic perihelion period (H/16)' };
+    for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      const n = model.planets[p].ascendingNodeCyclesIn8H;
+      out[`${p}AscNodeCycleYears`] = { get: () => (8 * C.H) / n, render: (v) => thousands(Math.round(v)), unit: 'yr', note: `asc-node cycle = 8H/${n}` };
+    }
     return out;
   })(),
 
