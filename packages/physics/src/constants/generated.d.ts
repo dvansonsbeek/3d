@@ -4,6 +4,10 @@
 
 export declare const CONSTANTS_HASH: "d36050ef216d137f";
 
+export declare const MODEL_VERSION: string;
+
+export declare const PREPRINT_DOI: string;
+
 export declare const DEFAULT_CONSTANTS: {
   readonly hash: "d36050ef216d137f";
   readonly additionalBodies: {

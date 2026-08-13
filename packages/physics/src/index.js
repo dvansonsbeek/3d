@@ -21,7 +21,7 @@
  * All three are enforced: `npm run lint` and `npm run check:boundaries`.
  */
 
-import { DEFAULT_CONSTANTS as GENERATED, CONSTANTS_HASH, REFERENCE_DATA } from './constants/index.js';
+import { DEFAULT_CONSTANTS as GENERATED, CONSTANTS_HASH, MODEL_VERSION, PREPRINT_DOI, REFERENCE_DATA } from './constants/index.js';
 
 /**
  * Keys `createModel` refuses. Derived from REFERENCE_DATA rather than listed by
@@ -52,7 +52,7 @@ const NEVER_INJECTABLE = Object.keys(REFERENCE_DATA);
  * goalposts it is judged by (§2d).
  * @type {Constants}
  */
-export { GENERATED as DEFAULT_CONSTANTS, CONSTANTS_HASH };
+export { GENERATED as DEFAULT_CONSTANTS, CONSTANTS_HASH, MODEL_VERSION, PREPRINT_DOI };
 
 /**
  * Validation targets and presentation data. Single-sourced so nothing keeps a

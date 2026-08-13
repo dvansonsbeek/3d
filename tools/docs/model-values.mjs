@@ -160,6 +160,7 @@ function predictiveMachinery() {
 }
 const model = rd('public/input/model-parameters.json');
 const astro = rd('public/input/astro-reference.json');
+const versionInfo = rd('public/input/model-version.json');
 const dtFit = rd('data/deltaT-4flag-fit.json');
 
 /** `1234567.89` -> `1,234,567.89` (the form the prose uses for H). */
@@ -1217,6 +1218,7 @@ export const VALUES = {
       anchorYearOffset:   { get: () => Math.abs(C.balancedYear), render: (v) => thousands(v), unit: 'yr' },
       systemResetYearBC:  { get: () => Math.abs(C.balancedYear - 7 * C.H), render: (v) => thousands(v) + ' BC', note: 'balancedYear − 7H (the System Reset anchor)' },
       systemResetYearPlain: { get: () => Math.abs(C.balancedYear - 7 * C.H), render: (v) => thousands(v), note: 'systemResetYearBC without the BC suffix (for signed prose)' },
+      preprintDoi: { get: () => versionInfo.preprintDoi, render: (v) => String(v), note: 'canonical preprint DOI — single source: model-version.json' },
       moonDiameter:       { get: () => astro.bodyDiametersKm.moon, render: (v) => thousands(v, 1), unit: 'km' },
       moonOrbitalRadius:  { get: () => C.moonDistance, render: (v) => thousands(v, 2), unit: 'km' },
       moonOrbitalCircumference: { get: () => 2 * Math.PI * C.moonDistance, render: (v) => thousands(v, 2), unit: 'km' },

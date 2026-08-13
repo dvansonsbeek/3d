@@ -110,6 +110,34 @@ if (WRITE) {
   process.exit(0);
 }
 
+// ── DOI consistency (single source: model-version.json → preprintDoi key) ──
+// Markdown link URLs cannot carry markers (an HTML comment inside the URL
+// breaks the link), so every doi.org mention in the outward-facing files is
+// CHECKED against the canonical DOI instead. Change the DOI in ONE place —
+// model-version.json — and this gate lists every file still carrying the old.
+const canonicalDoi = values.get('preprintDoi');
+// Only police OUR preprint's DOI (any /vN vintage of it) — citation DOIs of
+// other papers are supposed to differ and pass untouched.
+const doiRoot = canonicalDoi.replace(/\/v\d+$/, '');
+const doiMismatches = [];
+const DOI_FILES = [
+  'README.md', 'CITATION.cff', 'CLAUDE.md', 'src/script.js',
+  'packages/physics/README.md', 'packages/model-values/README.md',
+  ...targets.map((p) => relative(ROOT, p)),
+];
+for (const rel of [...new Set(DOI_FILES)]) {
+  let src;
+  try { src = readFileSync(join(ROOT, rel), 'utf8'); } catch { continue; }
+  for (const m of src.matchAll(/doi\.org\/([^\s)\]'"<>,;]+)/g)) {
+    const found = m[1].replace(/[.,]$/, '');
+    if (found.startsWith(doiRoot) && found !== canonicalDoi) doiMismatches.push({ file: rel, found });
+  }
+}
+if (doiMismatches.length) {
+  console.log(`\n  ${doiMismatches.length} DOI mismatch(es) vs model-version.json (${canonicalDoi}):`);
+  for (const d of doiMismatches) console.log(`    ${d.file}: doi.org/${d.found}`);
+}
+
 if (changed.length) {
   console.log(`\n  ${changed.length} STALE span(s) — the doc disagrees with the model:`);
   for (const c of changed.slice(0, 25)) {
@@ -120,8 +148,8 @@ if (changed.length) {
 }
 
 console.log(`\n${line}`);
-if (changed.length || unknown.length) {
-  console.log(`FAIL — ${changed.length} stale, ${unknown.length} unknown key(s).`);
+if (changed.length || unknown.length || doiMismatches.length) {
+  console.log(`FAIL — ${changed.length} stale, ${unknown.length} unknown key(s), ${doiMismatches.length} DOI mismatch(es).`);
   console.log(line);
   process.exit(1);
 }

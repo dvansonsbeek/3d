@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection } from '@essrt/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -24463,6 +24463,26 @@ function setupGUI() {
   // ── About ── (Laws, Free Parameters, Calibration Inputs, Model Parameters)
   const aboutFolder = gui.addFolder({ title: 'About', expanded: false });
   addFolderTooltip(aboutFolder, 'Six Fibonacci Laws, 6 free parameters, and all calibration and model parameters that define the solar system.');
+
+  // --- Model Identity (§10 two-axis provenance: cite as "model vX.Y") ---
+  {
+    const idFolder = aboutFolder.addFolder({ title: 'Model Identity', expanded: false });
+    addFolderTooltip(idFolder, 'The exact model this deployment runs: version label plus the two content hashes. Cite computed results as "model ' + MODEL_VERSION + '".');
+    const c = idFolder.element.querySelector('.tp-fldv_c');
+    const line = (html) => {
+      const d = document.createElement('div');
+      d.style.cssText = 'padding: 3px 8px; font-size: 11px; line-height: 1.45; color: hsla(210,15%,75%,1);';
+      d.innerHTML = html;
+      c.appendChild(d);
+    };
+    const a = (href, text) => '<a href="' + href + '" target="_blank" rel="noopener" '
+      + 'style="color: hsla(210,60%,65%,1); text-decoration: none;">' + text + '</a>';
+    line('Model <b>' + MODEL_VERSION + '</b>');
+    line('Constants ' + CONSTANTS_HASH + ' · Coefficients ' + COEFFICIENTS_HASH);
+    line('Preprint: ' + a('https://doi.org/' + PREPRINT_DOI, 'doi.org/' + PREPRINT_DOI));
+    line('Packages: ' + a('https://www.npmjs.com/package/@essrt/physics', '@essrt/physics')
+      + ' · ' + a('https://www.npmjs.com/package/@essrt/model-values', '@essrt/model-values'));
+  }
 
   // --- Licence & Credits (AGPL-3.0 s13: offer source to network users) ---
   {

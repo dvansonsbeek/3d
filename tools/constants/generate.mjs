@@ -299,6 +299,7 @@ const countLeaves = (o) =>
   Object.values(o).reduce((n, v) => n + (v && typeof v === 'object' ? countLeaves(v) : 1), 0);
 
 function emitJs({ included, reference, excluded, hash }) {
+  const version = read('model-version.json');
   const blocks = Object.keys(included).sort();
   const refBlocks = Object.keys(reference).sort();
   const exNote = Object.entries(excluded)
@@ -351,6 +352,12 @@ ${exNote}
  */
 export const CONSTANTS_HASH = ${JSON.stringify(hash)};
 
+/** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
+export const MODEL_VERSION = ${JSON.stringify(version.modelVersion)};
+
+/** Canonical preprint DOI — single source: public/input/model-version.json. */
+export const PREPRINT_DOI = ${JSON.stringify(version.preprintDoi)};
+
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
   hash: ${JSON.stringify(hash)},
@@ -380,6 +387,10 @@ function emitDts({ included, reference, hash }) {
 // packages/physics stays JavaScript.
 
 export declare const CONSTANTS_HASH: ${JSON.stringify(hash)};
+
+export declare const MODEL_VERSION: string;
+
+export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
   readonly hash: ${JSON.stringify(hash)};

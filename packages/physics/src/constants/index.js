@@ -19,7 +19,7 @@
  * outright, because a counterfactual must not be able to move the goalposts it
  * is judged by. See CLASSIFICATION in the generator.
  */
-export { DEFAULT_CONSTANTS, CONSTANTS_HASH, REFERENCE_DATA } from './generated.js';
+export { DEFAULT_CONSTANTS, CONSTANTS_HASH, MODEL_VERSION, PREPRINT_DOI, REFERENCE_DATA } from './generated.js';
 
 /**
  * Fitting-pipeline output, at full double precision (§2j). Kept apart from

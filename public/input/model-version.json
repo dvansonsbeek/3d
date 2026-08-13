@@ -1,6 +1,8 @@
 {
   "_description": "The model version identifier (IP-unified-architecture §10). MAJOR = structural change (a law, a divisor set, H). MINOR = refit (coefficients move, structure does not). Deliberately OUTSIDE model-parameters.json: a version label must not change the model's content identity (CONSTANTS_HASH). Seeded at v10.0 continuing the repo's existing v9/v10 tag lineage (owner decision); MAJOR/MINOR bumps proceed from here under this scheme. Content identity is carried separately by CONSTANTS_HASH (model parameters) and COEFFICIENTS_HASH (the fit) in packages/physics/src/constants/.",
   "modelVersion": "v10.0",
+  "_preprintDoiNote": "The canonical preprint DOI — SINGLE SOURCE. Programmatic consumers import PREPRINT_DOI from @essrt/physics; doc prose uses the preprintDoi registry key; markdown link URLs (which markers cannot transclude) are checked against this value by the docs:values gate.",
+  "preprintDoi": "10.21203/rs.3.rs-8758810/v4",
   "scheme": {
     "major": "structural: a law, a divisor set, H, a new term family",
     "minor": "refit: coefficient values move, structure does not"
