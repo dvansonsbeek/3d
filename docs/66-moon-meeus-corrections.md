@@ -479,7 +479,7 @@ leakage-clean estimator (open research).
 
 **The Cassini axial tilt — ε_ecl derived.** The Moon's obliquity to the
 ecliptic (measured ε_ecl = <!--v:moonObliquityEcliptic-->1.5424<!--/v-->° — the only independently measured member
-of the catalog composition moonTilt 6.687° = i + ε) is derived as the
+of the catalog composition moonTilt <!--v:moonAxialTilt-->6.687<!--/v-->° = i + ε) is derived as the
 equilibrium of Cassini state 2 (`tools/explore/cassini-moontilt.js`):
 numerical gravity-gradient torque averaging over the locked triaxial figure
 (elliptical orbit, uniform synchronous rotation, perigee-azimuth averaged;
@@ -570,7 +570,7 @@ The torque needs the properly averaged ⟨r⁻³⟩, which the lab now computes
 directly rather than choosing an `a`. Scene fix (shipped): the mesh tilt
 composes `moonEclipticInclinationJ2000 + moonObliquityEclipticJ2000`
 (6.6997° in the scene's own convention) so the rendered spin-to-ecliptic
-obliquity equals the measured <!--v:moonObliquityEcliptic-->1.5424<!--/v-->° (previously the catalog 6.687°
+obliquity equals the measured <!--v:moonObliquityEcliptic-->1.5424<!--/v-->° (previously the catalog <!--v:moonAxialTilt-->6.687<!--/v-->°
 composition rendered 1.530°); `moonObliquityEclipticJ2000` lives in
 astro-reference.json with tools mirrors, and the
 refuted "moonTilt − I_E ≈ i" display composition is replaced by the
