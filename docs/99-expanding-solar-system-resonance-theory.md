@@ -128,7 +128,7 @@ This near-invariance follows from two scalings that almost cancel:
 H_now × days/yr_now = 335,317 × 365.2422036 = 122,471,920 days  (exact at IAU year length)
 ```
 
-(Using the rounded 365.2422 gives 122,471,919 — the integer anchor TOTAL_DAYS_IN_H = <!--v:totalDaysInH-->122,471,920<!--/v--> corresponds to mean solar year = <!--v:meanSolarYearDays-->365.2422036<!--/v-->, slightly more precise than 4-decimal rounding.)
+(Using the rounded <!--v:inputMeanSolarYear-->365.2422<!--/v--> gives 122,471,919 — the integer anchor TOTAL_DAYS_IN_H = <!--v:totalDaysInH-->122,471,920<!--/v--> corresponds to mean solar year = <!--v:meanSolarYearDays-->365.2422036<!--/v-->, slightly more precise than 4-decimal rounding.)
 
 **Verified at Devonian (−380 Ma) — proper-physics values:**
 ```
@@ -144,7 +144,7 @@ H_paleo = 301,906 yr, days/yr_paleo (tropical) = 405.630
 
 **Physical interpretation:** at any given moment, Earth's annual rotation count is set by (tropical year in seconds) / LOD. Both quantities evolve over geological time — LOD via tidal recession (Driver 1), tropical year_s via solar mass loss (Driver 2) — but to first order their *product* is preserved because Driver 2 acts ~10× more slowly than Driver 1 in fractional terms (year_s drifts ~70 ppm at Devonian; LOD drifts ~7.8 % at Devonian).
 
-This is a clean structural near-identity equivalent to "TOTAL_DAYS_IN_H = 13 × axial precession (yr) × 365.2422 days/yr at J2000" — and what *makes it useful* is that the small Phanerozoic drift (~70 ppm at 380 Ma) is well within the precision of paleontological day-count measurements (Wells 1963 coral rings have ±1–2 % uncertainty per epoch).
+This is a clean structural near-identity equivalent to "TOTAL_DAYS_IN_H = 13 × axial precession (yr) × <!--v:inputMeanSolarYear-->365.2422<!--/v--> days/yr at J2000" — and what *makes it useful* is that the small Phanerozoic drift (~70 ppm at 380 Ma) is well within the precision of paleontological day-count measurements (Wells 1963 coral rings have ±1–2 % uncertainty per epoch).
 
 > 📊 **Refinement under Architecture α** — `TOTAL_DAYS_IN_H = 122,471,920` is exact at
 > J2000 (the **anchor value**). At deep time it drifts very slightly because the
@@ -985,7 +985,7 @@ The proper-physics two-layer formula naturally bounds the past evolution. Run ba
 | LOD | **4.64 hr** (= 16,704 s) |
 | H | **<!--v:hAtHadean-->64,883<!--/v--> yr** (19.3 % of modern) |
 | 8H | **0.519 Myr** (19.3 % of modern) |
-| Moon distance | **9,471 km = 1.49 R_E** (rigid Roche) |
+| Moon distance | **<!--v:moonDistanceAtHadean-->9,471<!--/v--> km = 1.49 R_E** (rigid Roche) |
 | Fluid Roche zone (~2.9 R_E) | crossed at ~4,444 Ma |
 
 **The proper-physics formula naturally places the Moon at the rigid Roche limit at ~4.498 Ga — the canonical giant-impact Moon-formation age (~4.5 Ga), itself ~40 Myr after Patterson's Pb-Pb Earth age (4.54 Ga).** This is a self-validation: no Hadean constraint was used in the fit (α₁ is LLR-anchored at J2000; α₃, α₄ were calibrated to Farhat 2022 deep-time anchors), yet the formula puts the Moon's birth at the independently isotope-dated impact epoch — and in the right order: Earth first, Moon shortly after.
@@ -1127,14 +1127,14 @@ Replaces the earlier piecewise (Phanerozoic-linear + Proterozoic-stall + Hadean-
 | 550 (Cambrian) | 75,809.7 | 21.058 | 362,983 | 294,216 | 2.354 |
 | 1,000 (Mesoproterozoic) | 68,113.0 | 18.920 | 343,784 | 264,346 | 2.115 |
 | 2,500 (Archean) | 44,584.8 | 12.385 | 252,392 | 173,033 | 1.384 |
-| 4,498 (Earth-Moon genesis, rigid Roche) | 16,718.2 | 4.644 | **9,471** | <!--v:hAtHadean-->64,883<!--/v--> | 0.519 |
+| 4,498 (Earth-Moon genesis, rigid Roche) | 16,718.2 | 4.644 | **<!--v:moonDistanceAtHadean-->9,471<!--/v-->** | <!--v:hAtHadean-->64,883<!--/v--> | 0.519 |
 | **−200 (+200 Ma future)** | 90,853.4 | 25.237 | <!--v:moonDistanceAt200MyrFuture-->392,059<!--/v--> | <!--v:hAt200MyrFuture-->352,600<!--/v--> | 2.821 |
 | **−1,000 (+1 Gyr future)** | 116,016.1 | 32.227 | 425,119 | 450,257 | 3.602 |
 | **−3,000 (+3 Gyr future)** | — | — | — | — | beyond tidal lock |
 
 **Past → future range:** the formula's polynomial extrapolation naturally **reaches the tidal-lock distance** (a → <!--v:tidalLockKm-->555,623<!--/v--> km) at t ≈ −3 Gyr from present, beyond which the formula returns `null`. This is a FORMULA horizon, not a physical event: in reality, Earth-Moon approaches true synchronous rotation over ~50 Gyr (the proper-physics polynomial doesn't model the future tidal-Q decay that slows the recession). For projections past +2.5 Gyr a more careful tidal-Q model is required. By comparison, pure-linear extrapolations would predict LOD = 39 hr at +3 Gyr — also physically wrong, but in the opposite direction (linear has no asymptote at all).
 
-**Genesis validation**: the recession polynomial crosses the rigid Roche limit (**9,471 km = 1.49 R_E**) at **~4.498 Ga** — the canonical giant-impact Moon-formation age (~4.5 Ga, isotope-dated), ~40 Myr after Patterson's Pb-Pb Earth age (4.54 Ga). The physics validates itself: no Hadean constraint was used in the fit, yet the formula puts the Moon's birth exactly where and when it physically must have been — at the Roche distance, just after the giant impact.
+**Genesis validation**: the recession polynomial crosses the rigid Roche limit (**<!--v:moonDistanceAtHadean-->9,471<!--/v--> km = 1.49 R_E**) at **~4.498 Ga** — the canonical giant-impact Moon-formation age (~4.5 Ga, isotope-dated), ~40 Myr after Patterson's Pb-Pb Earth age (4.54 Ga). The physics validates itself: no Hadean constraint was used in the fit, yet the formula puts the Moon's birth exactly where and when it physically must have been — at the Roche distance, just after the giant impact.
 
 **Devonian shift note**: the LLR-anchored refit moved H_dev from 309,083 yr (pre-refit proper physics; previously 307,391 yr under pure-linear LOD) to **<!--v:hAtDevonian-->306,189<!--/v--> yr**, improving the Wells 1963 days-per-year match to essentially exact (−0.01 %). The curvature term that builds up inside the Phanerozoic was missing from the linear approximation.
 
@@ -1969,7 +1969,7 @@ ESSRT's Law 6 structural identity (Saturn ecliptic perihelion = Jupiter ICRF per
 **Status**: Theoretical prediction; would be confirmed by sufficiently detailed deep-time observation of planetary orbital evolution.
 
 ### 6. Earth-Moon genesis at the rigid Roche limit at the giant-impact age
-The proper-physics formula, run backwards, crosses the rigid Roche limit at **9,471 km ≈ 1.49 R_E** at ~4.498 Ga — the canonical giant-impact Moon-formation age (~4.5 Ga, isotope-dated), ~40 Myr after Patterson's Pb-Pb Earth age of 4.54 Gyr. The fluid Roche zone (~2.9 R_E) is crossed at ~4.44 Ga. No Hadean constraint was used in the fit.
+The proper-physics formula, run backwards, crosses the rigid Roche limit at **<!--v:moonDistanceAtHadean-->9,471<!--/v--> km ≈ 1.49 R_E** at ~4.498 Ga — the canonical giant-impact Moon-formation age (~4.5 Ga, isotope-dated), ~40 Myr after Patterson's Pb-Pb Earth age of 4.54 Gyr. The fluid Roche zone (~2.9 R_E) is crossed at ~4.44 Ga. No Hadean constraint was used in the fit.
 **Status**: Self-validation. The match is independent confirmation that the framework's α₁ (LLR-anchored, 3.82 cm/yr) is the right physics anchor.
 
 ### 7. LOD oscillates with Milankovitch orbital forcing

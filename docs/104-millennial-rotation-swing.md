@@ -107,8 +107,8 @@ Hypothesis (formulated as a falsifiable prediction, tested before publication): 
 **Result: no lock, at every level.**
 
 - Bond events are quasi-periodic (Rayleigh vs 1,465.9 yr: p ≈ 0.75–0.82; spacings 800–2,200 yr, mean 1,338 ± 430);
-- the Bond stack's spectrum peaks at **~1,000 and ~2,450 yr** with almost nothing at 1,466 (R² = 0.046) — independently reproducing Obrochta et al. 2012 (*Quat. Sci. Rev.* 55:23, the "1,500-yr cycle" as a ~1,000/~2,000-yr mixture); note the 2,450-yr peak coincides with the framework's Hallstatt label (8H/1104 = 2,430 yr);
-- CFF core-flow episodes: Rayleigh p ≈ 0.9; CFF spectral power at 1,466 yr ≈ 0.004 (its peaks: ~3,000–3,300 yr);
+- the Bond stack's spectrum peaks at **~1,000 and ~2,450 yr** with almost nothing at <!--v:bondYr-->1,466<!--/v--> (R² = 0.046) — independently reproducing Obrochta et al. 2012 (*Quat. Sci. Rev.* 55:23, the "1,500-yr cycle" as a ~1,000/~2,000-yr mixture); note the 2,450-yr peak coincides with the framework's Hallstatt label (8H/1104 = <!--v:hallstattYr-->2,430<!--/v--> yr);
+- CFF core-flow episodes: Rayleigh p ≈ 0.9; CFF spectral power at <!--v:bondYr-->1,466<!--/v--> yr ≈ 0.004 (its peaks: ~3,000–3,300 yr);
 - cross-coherence (millennial band, ±1,000-yr lags): max r = 0.34, below the phase-randomized null p95 = 0.49.
 
 The 8H/1830 flag is what the eclipse window shows it to be — the periodic part of the millennial fluctuation over the last 2.7 kyr — **not** a Holocene-wide shared clock. Caveat: CFF posterior σ (~2 ms) limits statistical power before ~2000 BCE.
@@ -150,7 +150,7 @@ Framing discipline: this is a **kinematic identification with a candidate physic
 
 ### Climate-archive corollary
 
-If multiple slow systems (core, and the solar/heliospheric modulation recorded in radionuclides) rectify the same beat structure, the *archives record the difference tones, not the carriers*. This would explain in one stroke: (a) why the Bond IRD spectrum peaks at ~1,000 yr (≈ the 1,014-yr hallstatt−jose4 tone; the "Eddy" band of the solar literature) and ~2,450 yr (Hallstatt itself) rather than at the 1,466-yr flag; and (b) why the Hallstatt cycle's attribution is genuinely contested between solar and geomagnetic origins (Usoskin vs Pavón-Carrasco) — both record the same rectified beat. Testable: difference-tone *phases* in the climate archives.
+If multiple slow systems (core, and the solar/heliospheric modulation recorded in radionuclides) rectify the same beat structure, the *archives record the difference tones, not the carriers*. This would explain in one stroke: (a) why the Bond IRD spectrum peaks at ~1,000 yr (≈ the 1,014-yr hallstatt−jose4 tone; the "Eddy" band of the solar literature) and ~2,450 yr (Hallstatt itself) rather than at the <!--v:bondYr-->1,466<!--/v-->-yr flag; and (b) why the Hallstatt cycle's attribution is genuinely contested between solar and geomagnetic origins (Usoskin vs Pavón-Carrasco) — both record the same rectified beat. Testable: difference-tone *phases* in the climate archives.
 
 ### The resonator formula, quantified
 

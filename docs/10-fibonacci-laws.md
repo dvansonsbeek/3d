@@ -176,7 +176,7 @@ The eccentricity amplitudes used in the balance are predicted by Law 4 (the K co
 
 ### Law 6: Saturn-Jupiter-Earth Resonance
 
-**Jupiter's ICRF perihelion period and Saturn's ecliptic perihelion period lock to a single period: 8H/65 (~41,270 yr). This is a structural balance of the solar system — not a coincidence — and it is the obliquity beat that dominates Earth's climate record. Earth's own obliquity cycle sits one lattice step away at H/8 (= 8H/64): obliquity is Earth's axial precession (H/13) beating against the ecliptic, so beating against the gas giants' actual ecliptic period (8H/39) gives 8H/65, while beating against Law 1's Fibonacci anchor (H/5) gives H/8. The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock.**
+**Jupiter's ICRF perihelion period and Saturn's ecliptic perihelion period lock to a single period: 8H/65 (~<!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr). This is a structural balance of the solar system — not a coincidence — and it is the obliquity beat that dominates Earth's climate record. Earth's own obliquity cycle sits one lattice step away at H/8 (= 8H/64): obliquity is Earth's axial precession (H/13) beating against the ecliptic, so beating against the gas giants' actual ecliptic period (8H/39) gives 8H/65, while beating against Law 1's Fibonacci anchor (H/5) gives H/8. The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock.**
 
 Two levels (the gas-giant perihelion lock):
 

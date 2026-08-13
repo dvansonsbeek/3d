@@ -199,7 +199,7 @@ The Venus formula is based on the physical principle that:
 
 1. **Perihelion points move at eccentricity distance** from orbit center
    - Venus: e = <!--v:venusEccJ2000-->0.00678<!--/v-->, so perihelion is only 0.0049 AU from center (poorly defined)
-   - Earth: e = 0.01671, so perihelion is 0.0167 AU from center
+   - Earth: e = <!--v:earthEccJ2000-->0.01671<!--/v-->, so perihelion is 0.0167 AU from center
 
 2. **Earth's reference frame rotates** due to axial precession
    - Mean period: H/13 years
@@ -303,7 +303,7 @@ Jupiter's precession fluctuation is driven by:
 | Property | Value |
 |----------|-------|
 | **Perihelion period (ecliptic)** | 8H/39 (~<!--v:jupiterPeriPeriod-->68,783<!--/v--> yr) |
-| **Eccentricity** | 0.04839 |
+| **Eccentricity** | <!--v:jupiterEccJ2000-->0.04839<!--/v--> |
 | **Formula R²** | **<!--v:saturnPredR2-->1.000000<!--/v-->** |
 | **RMSE** | 0.06 arcsec/century |
 | **Features** | 225 terms |
@@ -328,7 +328,7 @@ For full implementation details, see [jupiter_coeffs.py](../tools/lib/python/coe
 
 ## 8. Saturn Formula: Coefficient Breakdown
 
-Saturn's perihelion precesses **retrograde in the ecliptic frame** — opposite to orbital motion — with a period of 8H/65 (~41,270 yr).
+Saturn's perihelion precesses **retrograde in the ecliptic frame** — opposite to orbital motion — with a period of 8H/65 (~<!--v:saturnPeriPeriod-->41,270<!--/v--> yr).
 
 ### 8.1 Physical Driver
 
@@ -343,7 +343,7 @@ Saturn's precession fluctuation is driven by:
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period (ecliptic)** | 8H/65 (~41,270 yr) — **ECLIPTIC-RETROGRADE** |
+| **Perihelion period (ecliptic)** | 8H/65 (~<!--v:saturnPeriPeriod-->41,270<!--/v--> yr) — **ECLIPTIC-RETROGRADE** |
 | **Eccentricity** | <!--v:saturnEccJ2000-->0.05386<!--/v--> |
 | **Formula R²** | **<!--v:saturnPredR2-->1.000000<!--/v-->** |
 | **RMSE** | 0.05 arcsec/century |
@@ -445,7 +445,7 @@ Neptune's precession fluctuation is driven by:
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H×2 (~670,634 years) |
+| **Perihelion period** | H×2 (~<!--v:neptunePeriPeriod-->670,634<!--/v--> years) |
 | **Eccentricity** | <!--v:neptuneEccJ2000-->0.00859<!--/v--> (nearly circular) |
 | **Formula R²** | **0.999999** |
 | **RMSE** | 0.02 arcsec/century |
@@ -504,7 +504,7 @@ The table below shows two sets of formula accuracy values:
 
 | Property | Mercury | Venus | Mars | Jupiter | Saturn | Uranus | Neptune |
 |----------|---------|-------|------|---------|--------|--------|---------|
-| Eccentricity | <!--v:mercuryEccJ2000-->0.20564<!--/v--> | <!--v:venusEccJ2000-->0.00678<!--/v--> | <!--v:marsEccJ2000-->0.09339<!--/v--> | 0.04839 | <!--v:saturnEccJ2000-->0.05386<!--/v--> | <!--v:uranusEccJ2000-->0.04726<!--/v--> | <!--v:neptuneEccJ2000-->0.00859<!--/v--> |
+| Eccentricity | <!--v:mercuryEccJ2000-->0.20564<!--/v--> | <!--v:venusEccJ2000-->0.00678<!--/v--> | <!--v:marsEccJ2000-->0.09339<!--/v--> | <!--v:jupiterEccJ2000-->0.04839<!--/v--> | <!--v:saturnEccJ2000-->0.05386<!--/v--> | <!--v:uranusEccJ2000-->0.04726<!--/v--> | <!--v:neptuneEccJ2000-->0.00859<!--/v--> |
 | Period | H×8/11 | −8H/6 | H×8/35 | H/5 | H/8 | H/3 | H×2 |
 
 ### Observed Formula Accuracy (using Excel data)

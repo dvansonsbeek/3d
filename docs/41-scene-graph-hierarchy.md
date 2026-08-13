@@ -37,7 +37,7 @@ At its core, the entire simulation is based upon two surprisingly simple calcula
 
 Since the circumference of a circle is `2π × r`, all calculations derive from these two values:
 
-- **Length of a Solar year:** 1 year = 2π radians = 365.2422 days
+- **Length of a Solar year:** 1 year = 2π radians = <!--v:inputMeanSolarYear-->365.2422<!--/v--> days
 - **Length of an AU:** 100 scene units = <!--v:oneAU-->149,597,870.698828<!--/v--> km (currently)
 
 All other calculations are relative to:

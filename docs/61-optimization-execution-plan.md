@@ -113,7 +113,7 @@ The Sun is a child of `barycenterEarthAndSun` with:
 **What is observationally established (model-independent):**
 - The seasons are unequal in length (known since Hipparchus, ~150 BCE)
 - The Sun's apparent daily motion varies through the year (~0.953 deg/day to ~1.020 deg/day)
-- Different year lengths exist: tropical (~365.2422 days), sidereal (~365.2564 days), anomalistic (~365.2596 days)
+- Different year lengths exist: tropical (~<!--v:inputMeanSolarYear-->365.2422<!--/v--> days), sidereal (~365.2564 days), anomalistic (~365.2596 days)
 - Eclipse timings constrain where the Sun must be at specific moments
 
 **What is model-dependent interpretation:**
@@ -412,10 +412,10 @@ All planets use `PerihelionDurationEcliptic1` (+ω_prec) and `PerihelionDuration
 |--------|----------------------|-----------|----------------|
 | Mercury | H/(1+3/8) | — | ~570 |
 | Venus | −8H/6 | 6 (retrograde) | ~−290 (model) |
-| Mars | H/(4+3/8) | — | ~1,600 |
+| Mars | H/(4+3/8) | — | ~<!--v:marsObservedRate-->1,600<!--/v--> |
 | Jupiter | 8H/39 | 39 = 3×13 | ~1,884 |
 | Saturn | −8H/65 | 65 = 5×13 (retrograde) | ~−3,140 |
-| Uranus | H/3 | 3 | ~1,100 |
+| Uranus | H/3 | 3 | ~<!--v:uranusObservedRate-->1,100<!--/v--> |
 | Neptune | H×2 | — | ~200 |
 
 Mercury and Mars use non-Fibonacci periods (rational fractions of H). Jupiter and Saturn use their *8H-lattice secular* periods (8H/39, −8H/65; one 8H-lattice integer off the clean Fibonacci anchors H/5, −H/8 — see Law 6); Uranus uses a clean Fibonacci division. Venus and Saturn both precess ecliptic-retrograde.

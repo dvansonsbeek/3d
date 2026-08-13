@@ -202,7 +202,7 @@ The model's obliquity-period claims for the inner solar system (from doc 90 §5)
 |---|---|---|---|---|---|
 | **Mercury** | 895,000 yr | Bills & Comstock 2005, *JGR-Planets* 110, E04006 | **8H/3** | <!--v:mercuryObliqCycle-->894,179<!--/v--> | **+0.09 %** |
 | **Earth** | 41,000 yr | Laskar 2004 (La2004); Berger 1978 | **H/8** | <!--v:hDiv8-->41,915<!--/v--> | **+2.2 %** |
-| **Mars** | 124,800 yr (chaotic mean) | Ward 1973 *Science* 181; Laskar 2004 *Icarus* 170 | **8H/21** | 127,740 | **+2.4 %** |
+| **Mars** | 124,800 yr (chaotic mean) | Ward 1973 *Science* 181; Laskar 2004 *Icarus* 170 | **8H/21** | <!--v:marsObliqCycle-->127,740<!--/v--> | **+2.4 %** |
 
 **Three for three** on planets with published values, all within 2.5 %. Mercury's 0.09 % match against an independent dynamical calculation (Bills & Comstock used Cassini-state forced-obliquity theory, corroborated by Yseboodt & Margot 2006, Peale 2005, Bois & Rambaux 2007) is the model's tightest cross-validation against non-Holistic published references.
 

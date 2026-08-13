@@ -51,11 +51,11 @@ The WebGeoCalc trends extracted by the Explorer for the 1900–2026 window are s
 |--------|-------------------------|---------------------|------------------------------|
 | Mercury | ~570 ″/cy prograde | ✓ resolvable | 531 (H × 8/11) |
 | Venus | ~0 ″/cy (flips sign across windows) | ✗ un-determined | −290 (−8H/6) |
-| Earth | ~6,186 ″/cy prograde (wrt equinox) | ✓ resolvable | 6,187 (H/16) |
-| Mars | ~1,600 ″/cy prograde | ✓ resolvable | 1,691 (H × 8/35) |
-| Jupiter | ~1,800 ″/cy prograde (current epoch) | ✗ un-determined | 1,884 (8H/39) |
+| Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> ″/cy prograde (wrt equinox) | ✓ resolvable | 6,187 (H/16) |
+| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> ″/cy prograde | ✓ resolvable | 1,691 (H × 8/35) |
+| Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> ″/cy prograde (current epoch) | ✗ un-determined | 1,884 (8H/39) |
 | Saturn | retrograde, ~−1,800 to −3,600 ″/cy depending on window | ✗ un-determined (magnitude window-sensitive) | −3,140 (−8H/65) |
-| Uranus | ~1,100 ″/cy (current epoch) | ✗ un-determined | 1,160 (H/3) |
+| Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> ″/cy (current epoch) | ✗ un-determined | 1,160 (H/3) |
 | Neptune | ~200 ″/cy (current epoch) | ✗ un-determined | 193 (2H) |
 
 The five un-determined planets (Venus, Jupiter, Saturn, Uranus, Neptune) fall into two categories. **Venus, Jupiter, Uranus, Neptune** have perihelion oscillation periods that exceed (or are comparable to) the 126-year observational baseline; their apparent rate flips sign across sub-windows and only the instantaneous slope is accessible. **Saturn** is different — its sign stays retrograde across most plausible windows, but the *magnitude* swings by a factor of ~2 (sliding-window OLS gives anywhere from −1,800 to −3,600 ″/cy, with non-linear midpoint residuals of 0.4° indicating the rate is not steady-linear over 1800–2100). Saturn is therefore reported as un-determined too — sign retrograde, magnitude not pinpointable from this baseline. Earth is omitted from the panel itself because its ecliptic inclination is zero by definition and its ascending node is numerically undefined.

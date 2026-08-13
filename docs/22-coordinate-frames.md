@@ -338,7 +338,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Constant | Description |
 |----------|-------------|
 | `earthtiltMean` | Mean obliquity |
-| Default fallback | 23.4393° | Used when dynamic value unavailable |
+| Default fallback | <!--v:obliquityCurrent-->23.4393<!--/v-->° | Used when dynamic value unavailable |
 
 ### 5.3 General Precession
 

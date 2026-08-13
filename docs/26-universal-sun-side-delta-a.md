@@ -126,7 +126,7 @@ The Moon-side Δa (doc 25) and Sun-side Δa (doc 26) are mirror images of the sa
 | Input | Moon's geometric `a_M`, `T_M` | Planet's heliocentric `a_b` |
 | Output | `GM_planet_system` | `T_planet` (in days) |
 | Correction sign | **Add** `Δa = a_M · μ · m` (moon's a too small geometrically) | **Subtract** `Δa = a_b · (...)` (planet's a too large for system-mass denominator) |
-| Earth example | Moon: `Δa = 349 km` (add to a_M) → `GM_Earth+Moon = 403,505 km³/s²` | Earth: `Δa = 149.77 km` (subtract from AU) → `T_sid = 365.25636 days` (→ 365.2422 solar days × H/13) |
+| Earth example | Moon: `Δa = 349 km` (add to a_M) → `GM_Earth+Moon = 403,505 km³/s²` | Earth: `Δa = 149.77 km` (subtract from AU) → `T_sid = 365.25636 days` (→ <!--v:inputMeanSolarYear-->365.2422<!--/v--> solar days × H/13) |
 | Universal | All 7 moon-bearing planets | All 9 planets |
 | Algebraic status | Re-parameterization of Hill-Brown `m²` correction (~3% in our solar system) | **Exact identity** — no approximation |
 
