@@ -156,8 +156,8 @@ Mars.Peri_ecl (8H/36) equals Jupiter.AscNode (also 8H/36) exactly.
 | Precession type | Earth rate | Earth period | Mars rate | Mars period |
 |----------------|-----------|-------------|----------|-------------|
 | Inclination (inv. plane) | 3/H | H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | 68/(8H) | 8H/68 = <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr (= ICRF) |
-| Ecliptic precession | 5/H | H/5 = 67,063 yr | **?** | **?** (predicted 3H/5) |
-| Obliquity cycle | 8/H | H/8 = 41,915 yr | 21/(8H) | 8H/21 = 127,740 yr |
+| Ecliptic precession | 5/H | H/5 = <!--v:hDiv5-->67,063<!--/v--> yr | **?** | **?** (predicted 3H/5) |
+| Obliquity cycle | 8/H | H/8 = <!--v:hDiv8-->41,915<!--/v--> yr | 21/(8H) | 8H/21 = 127,740 yr |
 | Axial precession | 13/H | H/13 = <!--v:earthAxialPeriod-->25,794<!--/v--> yr | 2/H | H/2 = <!--v:hDiv2-->167,659<!--/v--> yr |
 | Perihelion (ecliptic) | 16/H | H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr | 36/(8H) | 8H/36 = <!--v:marsPeriPeriod-->74,515<!--/v--> yr |
 | Perihelion (ICRF) | 3/H | H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | 68/(8H) | 8H/68 = <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
@@ -226,8 +226,8 @@ is not a Fibonacci number, suggesting either:
 | Phenomenon | Period | H expression | Rate (1/H units) |
 |-----------|--------|-------------|------------------|
 | Inclination (inv. plane) | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | H/3 | 3 |
-| Ecliptic precession | 67,063 yr | H/5 | 5 |
-| Obliquity cycle | 41,915 yr | H/8 | 8 |
+| Ecliptic precession | <!--v:hDiv5-->67,063<!--/v--> yr | H/5 | 5 |
+| Obliquity cycle | <!--v:hDiv8-->41,915<!--/v--> yr | H/8 | 8 |
 | Axial precession | <!--v:earthAxialPeriod-->25,794<!--/v--> yr | H/13 | 13 |
 | Perihelion (ecliptic) | <!--v:earthPeriPeriod-->20,957<!--/v--> yr | H/16 | 16 |
 | Perihelion (ICRF) | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | H/3 | 3 |
@@ -385,7 +385,7 @@ both the obliquity and ecliptic precession rates.
 | Planet | Peri ecl rate | Base | N | Decomp | Obliquity | Period | Observed | Error |
 |--------|-------------|------|---|--------|-----------|--------|----------|-------|
 | Mercury | 11/(8H) | 1/(8H) | 11 | 3 + 8 | 3/(8H) | 8H/3 = <!--v:mercuryObliqCycle-->894,179<!--/v--> yr | ~895 kyr (Bills 2005, theoretical) | 0.1% |
-| Earth | 8/H (obliquity level) | 1/H | 8 | 5 + 3 | 8/H | H/8 = 41,915 yr | ~41,000 yr | 2% |
+| Earth | 8/H (obliquity level) | 1/H | 8 | 5 + 3 | 8/H | H/8 = <!--v:hDiv8-->41,915<!--/v--> yr | ~41,000 yr | 2% |
 | Mars | 35/(8H) | 1/(8H) | 35 | 8 + 27 | 8/(8H) | 8H/8 = <!--v:H-->335,317<!--/v--> yr | ~124,800 yr | — |
 
 All three confirmed obliquity cycles involve the Fibonacci number **8** in the period
@@ -399,7 +399,7 @@ Three cross-planet period matches link obliquity cycles to other planets' preces
 |-----------|--------|-------------|
 | Mars obliquity = Jupiter axial | 8H/21 = 127,740 yr | Exact match, mirror pair (d=5), 21 = F₈ |
 | Mercury obliquity ≈ 2 × Saturn axial | 8H/3 ≈ 2 × H×4/3 | <!--v:mercuryObliqCycle-->894,179<!--/v--> ≈ 894,178 yr |
-| Jupiter peri ICRF = Saturn peri ecl (Law 6 lock) | 8H/65 = <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | Drives Earth's obliquity; Earth's own H/8 (= 8H/64 = 41,915 yr) sits one 8H-step off |
+| Jupiter peri ICRF = Saturn peri ecl (Law 6 lock) | 8H/65 = <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | Drives Earth's obliquity; Earth's own H/8 (= 8H/64 = <!--v:hDiv8-->41,915<!--/v--> yr) sits one 8H-step off |
 
 The Mars-Jupiter connection is the strongest: both are mirror pairs (d=5) and the
 match is exact. If this reciprocity extends: **Jupiter obliquity = Mars axial = H/2**.
@@ -505,7 +505,7 @@ Under the System Reset (n=7) anchor convention:
 | Planet | J2000 tilt | Formula midpoint | Shift | Amplitude |
 |--------|-----------|---------------------|-------|-----------|
 | Mercury | 0.0300° | 0.0084° | −0.0216° | ±0.3865° |
-| Venus | 2.6392° | 2.6392° | — | (cancels: cycle=ICRF) |
+| Venus | <!--v:venusAxialTiltJ2000-->2.6392<!--/v-->° | <!--v:venusAxialTiltJ2000-->2.6392<!--/v-->° | — | (cancels: cycle=ICRF) |
 | Earth | 23.4393° | 23.4533° | +0.0140° | ±0.6360° |
 | Mars | 25.1900° | 25.4022° | +0.2122° | ±1.1642° |
 | Jupiter | 3.1300° | 3.1188° | −0.0112° | ±0.0214° |

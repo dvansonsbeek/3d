@@ -608,16 +608,16 @@ Stored in `ASTRO_REFERENCE` in both `src/script.js` and `tools/lib/constants.js`
 
 | Constant | Value | Unit | Source |
 |----------|-------|------|--------|
-| moonMeanAnomalyJ2000_deg | 134.9634 | deg | Meeus Ch. 47 |
-| moonMeanAnomalyRate_degPerDay | 13.06499295 | deg/day | Meeus Ch. 47 |
-| moonMeanElongationJ2000_deg | 297.8502 | deg | Meeus Ch. 47 |
-| moonMeanElongationRate_degPerDay | 12.19074912 | deg/day | Meeus Ch. 47 |
-| sunMeanAnomalyJ2000_deg | 357.5291 | deg | Meeus Ch. 25 |
-| sunMeanAnomalyRate_degPerDay | 0.98560028 | deg/day | Meeus Ch. 25 |
-| moonArgLatJ2000_deg | 93.2720993 | deg | Meeus Ch. 47 |
-| moonArgLatRate_degPerCentury | 483202.0175273 | deg/century | Meeus Ch. 47 |
-| moonMeanElongationJ2000Full_deg | 297.8502042 | deg | Meeus Ch. 47 |
-| moonMeanElongationRate_degPerCentury | 445267.1115168 | deg/century | Meeus Ch. 47 |
+| moonMeanAnomalyJ2000_deg | <!--v:moonMeanAnomalyJ2000Deg-->134.9634<!--/v--> | deg | Meeus Ch. 47 |
+| moonMeanAnomalyRate_degPerDay | <!--v:moonMeanAnomalyRateDegPerDay-->13.06499295<!--/v--> | deg/day | Meeus Ch. 47 |
+| moonMeanElongationJ2000_deg | <!--v:moonMeanElongationJ2000Deg-->297.8502<!--/v--> | deg | Meeus Ch. 47 |
+| moonMeanElongationRate_degPerDay | <!--v:moonMeanElongationRateDegPerDay-->12.19074912<!--/v--> | deg/day | Meeus Ch. 47 |
+| sunMeanAnomalyJ2000_deg | <!--v:sunMeanAnomalyJ2000Deg-->357.5291<!--/v--> | deg | Meeus Ch. 25 |
+| sunMeanAnomalyRate_degPerDay | <!--v:sunMeanAnomalyRateDegPerDay-->0.98560028<!--/v--> | deg/day | Meeus Ch. 25 |
+| moonArgLatJ2000_deg | <!--v:moonArgLatJ2000Deg-->93.2720993<!--/v--> | deg | Meeus Ch. 47 |
+| moonArgLatRate_degPerCentury | <!--v:moonArgLatRateDegPerCentury-->483202.0175273<!--/v--> | deg/century | Meeus Ch. 47 |
+| moonMeanElongationJ2000Full_deg | <!--v:moonMeanElongationJ2000FullDeg-->297.8502042<!--/v--> | deg | Meeus Ch. 47 |
+| moonMeanElongationRate_degPerCentury | <!--v:moonMeanElongationRateDegPerCentury-->445267.1115168<!--/v--> | deg/century | Meeus Ch. 47 |
 
 Note: Two sets of mean elongation constants exist. The per-day rates are used
 for the longitude perturbations (computed from `d`). The per-century rates are
@@ -636,9 +636,9 @@ unchanged — that metric is Meeus-override-framed).
 
 | Parameter | Legacy (optimizer-tuned) | Current (J2000-anchored) |
 |-----------|--------------------------|--------------------------|
-| moonStartposApsidal | 347.622 | 347.5476 |
-| moonStartposNodal | -83.630 | 64.0435 |
-| moonStartposMoon | 131.930 | 67.8443 (in-plane anchor via the unmask meter, mean Δlon ≈ 0; the anchoring meter's L row reads the Meeus-overridden *true* Moon, so its ~3° Δ against the mean-longitude target is the equation-of-center reading, not an anchor error) |
+| moonStartposApsidal | 347.622 | <!--v:moonStartposApsidalDeg-->347.5476<!--/v--> |
+| moonStartposNodal | -83.630 | <!--v:moonStartposNodalDeg-->64.0435<!--/v--> |
+| moonStartposMoon | 131.930 | <!--v:moonStartposMoonDeg-->67.8443<!--/v--> (in-plane anchor via the unmask meter, mean Δlon ≈ 0; the anchoring meter's L row reads the Meeus-overridden *true* Moon, so its ~3° Δ against the mean-longitude target is the equation-of-center reading, not an anchor error) |
 
 The apsidal/nodal values carry a micro-recalibration for the 8H-count layer
 rates (hence the last-digit drift from the first anchoring pass). The

@@ -81,7 +81,7 @@ The observed obliquity oscillation (spin axis relative to the invariable plane) 
 
 $$k + s_3 \;=\; 50.29 - 18.85 \;=\; 31.44 \text{ ″/yr} \;\;\rightarrow\;\; P = 41,\!221 \text{ yr} \;=\; n=65$$
 
-The model's intrinsic H/8 = 41,915 yr is the rate Earth's spin axis would precess in its *own* orbital frame, with the orbital plane held fixed. But the orbital plane is **not** fixed — it's being tilted at rate s₃ by planetary gravity — so what climate actually measures is intrinsic minus orbital-plane motion. The H/8 clock is still running; it just isn't what insolation sees.
+The model's intrinsic H/8 = <!--v:hDiv8-->41,915<!--/v--> yr is the rate Earth's spin axis would precess in its *own* orbital frame, with the orbital plane held fixed. But the orbital plane is **not** fixed — it's being tilted at rate s₃ by planetary gravity — so what climate actually measures is intrinsic minus orbital-plane motion. The H/8 clock is still running; it just isn't what insolation sees.
 
 Same logic for climatic precession. The intrinsic H/16 = 20.96 kyr is the rate of perihelion motion in Earth's own frame, but seasonal climate depends on perihelion *relative to equinox* — so what's observed is the beat `k + g_j` against each planet's apsidal eigenmode:
 
@@ -201,7 +201,7 @@ The model's obliquity-period claims for the inner solar system (from doc 90 §5)
 | Planet | Published period | Reference | Model H/n | Period (yr) | Deviation |
 |---|---|---|---|---|---|
 | **Mercury** | 895,000 yr | Bills & Comstock 2005, *JGR-Planets* 110, E04006 | **8H/3** | <!--v:mercuryObliqCycle-->894,179<!--/v--> | **+0.09 %** |
-| **Earth** | 41,000 yr | Laskar 2004 (La2004); Berger 1978 | **H/8** | 41,915 | **+2.2 %** |
+| **Earth** | 41,000 yr | Laskar 2004 (La2004); Berger 1978 | **H/8** | <!--v:hDiv8-->41,915<!--/v--> | **+2.2 %** |
 | **Mars** | 124,800 yr (chaotic mean) | Ward 1973 *Science* 181; Laskar 2004 *Icarus* 170 | **8H/21** | 127,740 | **+2.4 %** |
 
 **Three for three** on planets with published values, all within 2.5 %. Mercury's 0.09 % match against an independent dynamical calculation (Bills & Comstock used Cassini-state forced-obliquity theory, corroborated by Yseboodt & Margot 2006, Peale 2005, Bois & Rambaux 2007) is the model's tightest cross-validation against non-Holistic published references.

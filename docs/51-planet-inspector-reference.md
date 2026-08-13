@@ -197,7 +197,7 @@ The geometry uses LOCAL positions (flat at y=0), but the coloring decision uses 
 | Parameter | Value | Source |
 |-----------|-------|--------|
 | Orbital inclination | 3.394667° | Model constant |
-| Ascending node longitude | 76.67877109° | Model constant |
+| Ascending node longitude | <!--v:venusAscNodeEclJ2000-->76.67877109<!--/v-->° | Model constant |
 
 ### Calendar Dates to Ecliptic Longitude (Approximate)
 | Date | Ecliptic Longitude |

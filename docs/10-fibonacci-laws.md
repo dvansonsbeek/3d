@@ -50,8 +50,8 @@ H = see Constants Reference for current value
 Two empirical constants, both derived from Earth's fitted parameters, predict all 8 planets' oscillation amplitudes:
 
 ```
-ψ = d_Earth × inclAmp_Earth × √m_Earth = 3.307 × 10⁻³   (inclination amplitudes)
-K = e_amp_Earth × √m_Earth / (sin(tilt_Earth) × √d_Earth) = 3.415 × 10⁻⁶   (eccentricity amplitudes)
+ψ = d_Earth × inclAmp_Earth × √m_Earth = 3.3069 × 10⁻³   (inclination amplitudes)
+K = e_amp_Earth × √m_Earth / (sin(tilt_Earth) × √d_Earth) = 3.4143 × 10⁻⁶   (eccentricity amplitudes)
 ```
 
 **SYSTEM/ALONE mass convention** (intentional asymmetry — see [doc 25 §Sun/System vs Sun/Planet-Alone](25-universal-mass-from-moon-formula.md#sunsystem-vs-sunplanet-alone)):
@@ -106,7 +106,7 @@ A single constant ψ predicts all eight inclination amplitudes from Fibonacci di
 d × amplitude × √m = ψ     →     amplitude = ψ / (d × √m)
 ```
 
-ψ = 3.307 × 10⁻³, derived from Earth's fitted inclination amplitude. This holds for all 8 planets with zero free parameters.
+ψ = <!--v:psiValue-->3.3069 × 10⁻³<!--/v-->, derived from Earth's fitted inclination amplitude. This holds for all 8 planets with zero free parameters.
 
 ### Law 3: The Inclination Balance
 
@@ -136,14 +136,14 @@ A single constant K predicts all eight eccentricity amplitudes from Fibonacci di
 e_amp = K × sin(tilt) × √d / (√m × a^1.5)
 ```
 
-K = 3.4149 × 10⁻⁶, derived from Earth's eccentricity amplitude and axial tilt. This is the eccentricity analog of ψ (Law 2) for inclination amplitudes.
+K = <!--v:kValue-->3.4143 × 10⁻⁶<!--/v-->, derived from Earth's eccentricity amplitude and axial tilt. This is the eccentricity analog of ψ (Law 2) for inclination amplitudes.
 
 **The parallel:**
 
 | | Law 2 (inclination) | Law 4 (eccentricity) |
 |---|---|---|
 | **Formula** | amp = ψ / (d × √m) | e_amp = K × sin(tilt) × √d / (√m × a^1.5) |
-| **Constant** | ψ = 3.307 × 10⁻³ | K = 3.415 × 10⁻⁶ |
+| **Constant** | ψ = <!--v:psiValue-->3.3069 × 10⁻³<!--/v--> | K = <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> |
 | **Variables** | d, m | d, m, a, tilt |
 | **Predicts** | 8 inclination amplitudes | 8 eccentricity amplitudes |
 | **Free parameters** | 0 | 0 |
@@ -527,12 +527,12 @@ Earth has Fibonacci divisor d = 3 (= F₄). Step by step:
 
 | Quantity | Expression | Value |
 |----------|-----------|-------|
-| ψ | d_E × amp_E × √m_E | 3.307 × 10⁻³ |
+| ψ | d_E × amp_E × √m_E | <!--v:psiValue-->3.3069 × 10⁻³<!--/v--> |
 | d | F₄ | 3 |
 | m | Earth mass (JPL DE440) | 3.0027 × 10⁻⁶ M☉ |
 | √m | | 1.7331 × 10⁻³ |
 | d × √m | 3 × 1.7331 × 10⁻³ | 5.1992 × 10⁻³ |
-| **amplitude** | **3.307 × 10⁻³ / 5.1992 × 10⁻³** | **0.636 °** |
+| **amplitude** | **<!--v:psiValue-->3.3069 × 10⁻³<!--/v--> / 5.1992 × 10⁻³** | **0.636 °** |
 
 The mean is computed from the J2000 constraint:
 
@@ -563,7 +563,7 @@ where A is the amplitude, phase₃ is the H/3 inclination cycle, and phase₈ is
 ```javascript
 // Fundamental constants
 const H = 335317; // See Constants Reference for current value
-const PSI = 3 * earthInclAmp * Math.sqrt(earthMass);  // = 3.307 × 10⁻³ (from Earth)
+const PSI = 3 * earthInclAmp * Math.sqrt(earthMass);  // = 3.3069 × 10⁻³ (from Earth)
 
 // Fibonacci divisors
 const FIBONACCI_D = {

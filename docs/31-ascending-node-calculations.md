@@ -453,13 +453,13 @@ These are the ascending node values encoded in the `orbitTilta`/`orbitTiltb` par
 
 | Planet | Ascending Node (Ω) |
 |--------|-------------------|
-| Mercury | 48.33033155° |
-| Venus | 76.67877109° |
-| Mars | 49.55737662° |
-| Jupiter | 100.4877868° |
-| Saturn | 113.6452856° |
+| Mercury | <!--v:mercuryAscNodeEclJ2000-->48.33033155<!--/v-->° |
+| Venus | <!--v:venusAscNodeEclJ2000-->76.67877109<!--/v-->° |
+| Mars | <!--v:marsAscNodeEclJ2000-->49.55737662<!--/v-->° |
+| Jupiter | <!--v:jupiterAscNodeEclJ2000-->100.4877868<!--/v-->° |
+| Saturn | <!--v:saturnAscNodeEclJ2000-->113.6452856<!--/v-->° |
 | Uranus | 73.98118815° |
-| Neptune | 131.7853754° |
+| Neptune | <!--v:neptuneAscNodeEclJ2000-->131.7853754<!--/v-->° |
 | Pluto | 110.30347° |
 | Halley's Comet | 59.5607834844° |
 | Eros | 304.4115785804° |

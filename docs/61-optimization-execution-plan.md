@@ -1327,11 +1327,11 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 | 2 | Sun | DONE | 0.714° | 0.003° | eocEccentricity & perihelionPhaseOffset derived; correctionSun: 0.5292; earthRAAngle: 1.282779; validated 1600-2200 (600yr) |
 | 3 | Moon | DONE | 6.267° | 0.01° | Full Meeus Ch. 47 (60L+60B), RA+Dec override; see `docs/66-moon-meeus-corrections.md` |
 | 4a | Jupiter | DONE | 1.974° | 0.06° | solarYearInput: 4330.5, eocFraction: 0.484, startpos: 13.85, 36p parallax |
-| 4b | Saturn | DONE | 3.291° | 0.10° | solarYearInput: 10747, eocFraction: 0.543, startpos: 11.32, 24p parallax |
+| 4b | Saturn | DONE | 3.291° | 0.10° | solarYearInput: <!--v:saturnOrbitalPeriodInputDays-->10747<!--/v-->, eocFraction: 0.543, startpos: 11.32, 24p parallax |
 | 5 | Mars | DONE | 3.121° | 0.02° | solarYearInput: 686.931, eocFraction: -0.066, startpos: 121.47, 30p parallax |
 | 6a | Mercury | DONE | 4.908° | 0.01° | eocFraction: -0.527, startpos: 83.53, 36p parallax |
 | 6b | Uranus | DONE | 1.372° | 0.01° | eocFraction: 0.5, startpos: 44.88, 15p parallax |
-| 6c | Venus | DONE | 3.709° | 0.24° | solarYearInput: 224.695, eocFraction: 0.436, startpos: 249.312, 36p parallax |
+| 6c | Venus | DONE | 3.709° | 0.24° | solarYearInput: <!--v:venusOrbitalPeriodInputDays-->224.695<!--/v-->, eocFraction: 0.436, startpos: 249.312, 36p parallax |
 | 6d | Neptune | DONE | 1.496° | 0.01° | eocFraction: 0.5, startpos: 47.96, 18p parallax |
 | 7 | All | DONE | — | All ≤0.24° | Cross-validated; see `docs/67-planet-parallax-corrections.md` §5 |
 
@@ -1343,7 +1343,7 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
   - `perihelionPhaseOffset`: was hardcoded 2°, now **derived** from EP1 precession phase + correctionSun + perihelion date = ~0.51°
   - `correctionSun`: 0.5292 (optimized for Sun RA across 26 JPL reference points 2000-2025, validated across 1600-2200)
   - `earthRAAngle`: 1.282779 (re-tuned for solstice timing alignment after correctionSun change)
-  - `perihelionRefJD`: 2451547.042 (moved to ASTRO_REFERENCE in script.js)
+  - `perihelionRefJD`: <!--v:perihelionPassageJD-->2451547.042<!--/v--> (moved to ASTRO_REFERENCE in script.js)
 - Two free parameters eliminated: eocEccentricity and perihelionPhaseOffset are now pure physics derivations
 - Sun RMS: **0.003°** — 20× improvement from 0.065° (with IAU precession frame correction)
 - Validated across 600 years (1600-2200) with only ~0.23 arcsec/century drift from slight precession rate mismatch

@@ -192,10 +192,10 @@ Each body's ascending node Ω on the invariable plane precesses linearly at a bo
 
 | Body | N | Ω Period | Notes |
 |------|---|----------|-------|
-| **Earth** | 40 | −H/5 ≈ −67,063 yr | = −(8H)/40, the ecliptic precession rate |
+| **Earth** | 40 | −H/5 ≈ −<!--v:hDiv5-->67,063<!--/v--> yr | = −(8H)/40, the ecliptic precession rate |
 | Mercury | 9 | −<!--v:mercuryAxialPeriod-->298,060<!--/v--> yr | |
 | Venus | 1 | −<!--v:eightH-->2,682,536<!--/v--> yr | = −8H, full Solar System Resonance Cycle |
-| Mars | 64 | −41,915 yr | |
+| Mars | 64 | −<!--v:hDiv8-->41,915<!--/v--> yr | |
 | Jupiter | 36 | −<!--v:marsPeriPeriod-->74,515<!--/v--> yr | Shared with Saturn (lockstep) |
 | Saturn | 36 | −<!--v:marsPeriPeriod-->74,515<!--/v--> yr | Shared with Jupiter (lockstep) |
 | Uranus | 11 | −<!--v:mercuryPeriPeriod-->243,867<!--/v--> yr | |

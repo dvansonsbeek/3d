@@ -243,7 +243,7 @@ const jupiterPerihelionDistance = jupiterRealOrbitalEccentricity*jupiterOrbitDis
 
 ### Impact
 
-The change is small in absolute terms (e.g. Jupiter: 0.04838624 → 0.04615181,
+The change is small in absolute terms (e.g. Jupiter: <!--v:jupiterEccJ2000Full-->0.04838624<!--/v--> → 0.04615181,
 a 4.6% reduction in perihelion offset) but it **decouples** the perihelion
 distance from the EoC angular velocity tuning. This made it possible to tune
 the Jupiter-Saturn conjunction timing via EoC fractions without affecting

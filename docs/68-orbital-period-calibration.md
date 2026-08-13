@@ -69,12 +69,12 @@ RMS values below are from the time of calibration (before parallax correction wa
 | Planet  | solarYearInput | Drift   | RMS before | RMS after | Change  |
 |---------|---------------|---------|------------|-----------|---------|
 | Mercury | 87.9686       | +0.77   | 1.379      | 1.379     | --      |
-| Venus   | 224.695       | -1.42   | 2.661      | 2.617     | -1.7%   |
+| Venus   | <!--v:venusOrbitalPeriodInputDays-->224.695<!--/v-->       | -1.42   | 2.661      | 2.617     | -1.7%   |
 | Mars    | 686.931       | +3.89   | 1.794      | 1.702     | -5.1%   |
 | Jupiter | 4330.5        | +1.87   | 0.477      | 0.277     | -41.9%  |
 | Saturn  | 10747.0       | +0.21   | 0.466      | 0.562     | +20.6%  |
 
-**Note:** Since this calibration, several `solarYearInput` values have been further adjusted through pipeline refits: Mercury 87.9686→87.9683, Mars 686.931→686.93, Jupiter 4330.5→4330.53. The drift values above reflect the state at calibration time. Current orbit counts are in the Quantization table below. For current baselines see [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) §5.
+**Note:** Since this calibration, several `solarYearInput` values have been further adjusted through pipeline refits: Mercury 87.9686→<!--v:mercuryOrbitalPeriodInputDays-->87.9683<!--/v-->, Mars 686.931→<!--v:marsOrbitalPeriodInputDays-->686.93<!--/v-->, Jupiter 4330.5→<!--v:jupiterOrbitalPeriodInputDays-->4330.53<!--/v-->. The drift values above reflect the state at calibration time. Current orbit counts are in the Quantization table below. For current baselines see [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) §5.
 
 ### Trade-offs
 

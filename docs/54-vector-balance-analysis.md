@@ -243,7 +243,7 @@ The d-values, antiPhase grouping, and Saturn's role as the sole anti-phase plane
 | Total trend error (J2000-fixed frame) | ~4.3″/century across 7 planets | ✓ |
 | Mirror symmetry | 4/4 | ✓ |
 | Asc-node integers (re-fit 2026-04-09, J+S lockstep) | Me9 Ve1 Ma63 Ju36 Sa36 Ur12 Ne3 | ✓ |
-| Phase anchor (n=7, balanced year ≈ -2,649,854) | All 7 fitted planets | ✓ |
+| Phase anchor (n=7, balanced year ≈ -<!--v:systemResetYearPlain-->2,649,854<!--/v-->) | All 7 fitted planets | ✓ |
 | Vector balance (multi-mode B-matrix) | 100.0000% | ✓ |
 | Eccentricity amplitude constant (Law 4) | K predicts all 8 amplitudes | ✓ |
 | Ranked #1 out of 4.3M valid configs (by scalar balance) | Unchanged | ✓ |

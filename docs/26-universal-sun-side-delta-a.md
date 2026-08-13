@@ -334,7 +334,7 @@ The simple Kepler period (no Δa, same result to machine precision):
 T_col = ( 2*PI() * SQRT( Q_col^3 / ($G$11 + $G$15) ) / $A$28 ) * $B$29
 ```
 
-For every planet, both `T_col` forms produce the same value: Mercury 87.97 d, Venus 224.69 d, Earth 365.24 d, Mars 686.93 d, Jupiter 4330.54 d, Saturn 10,746.92 d, Uranus 30,587.39 d, Neptune 59,800.74 d.
+For every planet, both `T_col` forms produce the same value: Mercury 87.97 d, Venus 224.69 d, Earth 365.24 d, Mars <!--v:marsOrbitalPeriodInputDays-->686.93<!--/v--> d, Jupiter 4330.54 d, Saturn 10,746.92 d, Uranus 30,587.39 d, Neptune 59,800.74 d.
 
 ## Summary
 

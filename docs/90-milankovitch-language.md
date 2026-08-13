@@ -50,8 +50,8 @@ The "100-kyr problem" is that standard eccentricity has *split* peaks at 95 & 12
 | Cycle | Model formula | Years | Source |
 |---|---|---:|---|
 | **Inclination precession** | H/3 | **<!--v:earthPeriPeriodICRF-->111,772<!--/v-->** | Earth's orbital plane → invariable plane oscillation |
-| **Ecliptic precession** | H/5 | **67,063** | Earth's orbital plane regression around the invariable plane = **nodal regression** (`f_nodal` in §3); coincides with Jupiter's *Fibonacci-anchor* perihelion (Jupiter's 8H-lattice secular ecliptic perihelion is 8H/39 = <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr) |
-| **Obliquity oscillation** | H/8 | **41,915** | Beat: f_axial − f_nodal (13 − 5 = 8 in H/n indices) |
+| **Ecliptic precession** | H/5 | **<!--v:hDiv5-->67,063<!--/v-->** | Earth's orbital plane regression around the invariable plane = **nodal regression** (`f_nodal` in §3); coincides with Jupiter's *Fibonacci-anchor* perihelion (Jupiter's 8H-lattice secular ecliptic perihelion is 8H/39 = <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr) |
+| **Obliquity oscillation** | H/8 | **<!--v:hDiv8-->41,915<!--/v-->** | Beat: f_axial − f_nodal (13 − 5 = 8 in H/n indices) |
 | **Axial precession** | H/13 | **<!--v:earthAxialPeriod-->25,794<!--/v-->** | Earth's spin-axis equinox precession |
 | **Perihelion precession** | H/16 | **<!--v:earthPeriPeriod-->20,957<!--/v-->** | Beat: f_axial + f_apsidal (13 + 3 = 16). Also the Berger climatic-precession centroid in the ~19–24 kyr band; dominant Berger peak is at 23.7 kyr (n=113, see §4.2). |
 
@@ -87,8 +87,8 @@ All five model periods are integer divisors of H with **zero free parameters** �
 | Model | Standard value | Source | Deviation |
 |---|---|---|---|
 | H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | ~111,700 yr (apsidal precession incl GR) | Bretagnon 1974, Standish 1992 | **0.06 %** |
-| H/5 = 67,063 yr | 68,761 yr (s₃ Earth nodal eigenfrequency) | Laskar 2004 | **2.5 %** |
-| H/8 = 41,915 yr | ~41,000 yr (Berger obliquity peak) | Berger 1978 | **2.2 %** |
+| H/5 = <!--v:hDiv5-->67,063<!--/v--> yr | 68,761 yr (s₃ Earth nodal eigenfrequency) | Laskar 2004 | **2.5 %** |
+| H/8 = <!--v:hDiv8-->41,915<!--/v--> yr | ~41,000 yr (Berger obliquity peak) | Berger 1978 | **2.2 %** |
 | H/13 = <!--v:earthAxialPeriod-->25,794<!--/v--> yr | ~25,772 yr (axial precession k) | IAU 2006 | **0.08 %** |
 | H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr | 19/22/23 kyr triplet centroid ~22 kyr | Berger 1978 | **< 5 %** (within band) |
 
@@ -121,7 +121,7 @@ The Laskar (La2004) secular solution decomposes eccentricity and inclination int
 | g₃ − g₁ | Earth–Mercury eccentricity beat | 109,950 | **1.2 %** |
 | \|s₂ − s₃\| | Venus–Earth inclination beat | 109,851 | **1.3 %** |
 
-**H/5 = 67,063 yr** matches two combinations:
+**H/5 = <!--v:hDiv5-->67,063<!--/v--> yr** matches two combinations:
 
 | Combination | Physical meaning | Period (yr) | Deviation |
 |---|---|---:|---:|

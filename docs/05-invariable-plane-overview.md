@@ -9,7 +9,7 @@ status: current
 
 This document provides a conceptual overview of the invariable plane and how the Holistic Universe Model uses it as a fundamental reference frame.
 
-> **Scope note (ESSRT).** The invariable plane itself (perpendicular to total angular momentum) is fixed in space; the angular-momentum conservation argument that defines it is scale-invariant. Period denominators (H/3, H/5, 8H/N) are scale-invariant Fibonacci/lattice divisors that stay constant at any epoch. The literal year values (67,063 yr ≈ −H/5, <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr ≈ H/3 in §"The Inclination Cycle") and the Year 50000 projection are J2000-evaluated; the J2000 invariable-plane orientation (1.578° inclination, 107.58° ascending node from Souami & Souchay 2012) is the present-epoch snapshot. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally; the structural picture this document describes holds at any epoch.
+> **Scope note (ESSRT).** The invariable plane itself (perpendicular to total angular momentum) is fixed in space; the angular-momentum conservation argument that defines it is scale-invariant. Period denominators (H/3, H/5, 8H/N) are scale-invariant Fibonacci/lattice divisors that stay constant at any epoch. The literal year values (<!--v:hDiv5-->67,063<!--/v--> yr ≈ −H/5, <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr ≈ H/3 in §"The Inclination Cycle") and the Year 50000 projection are J2000-evaluated; the J2000 invariable-plane orientation (1.578° inclination, 107.58° ascending node from Souami & Souchay 2012) is the present-epoch snapshot. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally; the structural picture this document describes holds at any epoch.
 
 ---
 
@@ -157,7 +157,7 @@ Year 50000 (minimum tilt):
 - Maximum height: sin(0.85°) × 1 AU ≈ 0.015 AU ≈ 2.2 million km (min ~0.848°)
 ```
 
-The crossing dates shift as Earth's ascending node circulates through 360°. Earth's Ω regresses at the ecliptic precession rate of −H/5 ≈ 67,063 years (Earth's *inclination* itself oscillates on the H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v-->-year ICRF perihelion cycle — these are two distinct angles evolving at different rates).
+The crossing dates shift as Earth's ascending node circulates through 360°. Earth's Ω regresses at the ecliptic precession rate of −H/5 ≈ <!--v:hDiv5-->67,063<!--/v--> years (Earth's *inclination* itself oscillates on the H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v-->-year ICRF perihelion cycle — these are two distinct angles evolving at different rates).
 
 ---
 
@@ -166,7 +166,7 @@ The crossing dates shift as Earth's ascending node circulates through 360°. Ear
 All planetary orbital planes **precess around the invariable plane** like spinning tops. Each planet's plane has **two distinct angles** evolving at different rates:
 
 - **Inclination** `i(t)` — oscillates with the planet's *ICRF perihelion period* (e.g., Earth: H/3, Jupiter: 8H/65). This is the "nodding" of the orbital plane.
-- **Ascending node** `Ω(t)` — regresses linearly at `−(8H)/N` years for some planet-specific integer N (Earth: N=40, period −H/5 ≈ −67,063 years). This is the "spinning" of the line of nodes.
+- **Ascending node** `Ω(t)` — regresses linearly at `−(8H)/N` years for some planet-specific integer N (Earth: N=40, period −H/5 ≈ −<!--v:hDiv5-->67,063<!--/v--> years). This is the "spinning" of the line of nodes.
 
 Per-planet integer assignments are listed in [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md). The invariable plane itself varies < 0.1 mas over 100 years and is treated as fixed for all model purposes.
 

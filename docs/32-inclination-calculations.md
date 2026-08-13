@@ -79,18 +79,18 @@ For Saturn (anti-phase), the sign is flipped: MAX at balanced year (where others
 
 ### Per-Planet Cycle Anchors
 
-Each planet's inclination cycle anchor is the ICRF perihelion longitude where the planet reaches its inclination extremum (MAX for in-phase, MIN for Saturn). The JPL ecliptic-inclination trends were re-fitted in the J2000-fixed frame, and the asc-node integers `ascendingNodeCyclesIn8H` adjusted accordingly; all seven fitted planets share the **same balanced-year anchor**: **n=7, year ≈ -2,649,854** (the oldest of the eight anchors in the current Solar System Resonance Cycle).
+Each planet's inclination cycle anchor is the ICRF perihelion longitude where the planet reaches its inclination extremum (MAX for in-phase, MIN for Saturn). The JPL ecliptic-inclination trends were re-fitted in the J2000-fixed frame, and the asc-node integers `ascendingNodeCyclesIn8H` adjusted accordingly; all seven fitted planets share the **same balanced-year anchor**: **n=7, year ≈ -<!--v:systemResetYearPlain-->2,649,854<!--/v-->** (the oldest of the eight anchors in the current Solar System Resonance Cycle).
 
 | Planet | Cycle Anchor | Balance Group | n | Balanced Year | ICRF Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|----------|-------------|----------------|----------------------|
-| Mercury | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
-| Venus | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Mercury | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
+| Venus | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
 | Earth | 21.77° | In-phase | n=0 (locked) | <!--v:balancedYear-->-302,635<!--/v--> | Prograde | Decreasing |
-| Mars | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
-| Jupiter | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | In-phase | n=7 (= n=0)* | -2,649,854 | Retrograde | Decreasing |
-| **Saturn** | **<!--v:saturnInclCycleAnchor-->116.26<!--/v-->°** | **Anti-phase** | n=7 (= n=0)* | -2,649,854 | **Retrograde** | **Increasing** |
-| Uranus | 21.33° | In-phase | n=7 (= n=0)* | -2,649,854 | Retrograde | Decreasing |
-| Neptune | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Mars | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
+| Jupiter | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | In-phase | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
+| **Saturn** | **<!--v:saturnInclCycleAnchor-->116.26<!--/v-->°** | **Anti-phase** | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | **Retrograde** | **Increasing** |
+| Uranus | 21.33° | In-phase | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
+| Neptune | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
 | Pluto | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | — | — | — | Retrograde | — |
 
 \* Jupiter, Saturn, and Uranus have ICRF perihelion periods that divide H exactly, so their phase at n=7 coincides numerically with their phase at n=0. The conceptual anchor is still n=7 — the oldest balanced year of the current 8H octave.
@@ -185,7 +185,7 @@ When we talk about a planet's "ecliptic inclination", there are **two distinct q
 2. **Inclination to the ecliptic of date** (instantaneous)
    The angle between the planet's orbital plane at time *t* and Earth's orbital plane *also at time t*. The reference plane is moving — Earth's orbital plane oscillates at the H/3 ICRF cycle and its node regresses at −H/5.
 
-The two definitions agree exactly **only at the J2000 instant**. A century away from J2000, Earth's plane has drifted by ~0.015°, and a planet's "ecliptic inclination" looks different in the two frames by a comparable amount. For Saturn (JPL `dI/dt` = +0.00194°/cy ≈ 7″/cy) and Neptune (+0.00035°/cy ≈ 1.27″/cy), this Earth-plane drift is **larger than the trend itself** and changes its sign.
+The two definitions agree exactly **only at the J2000 instant**. A century away from J2000, Earth's plane has drifted by ~0.015°, and a planet's "ecliptic inclination" looks different in the two frames by a comparable amount. For Saturn (JPL `dI/dt` = +<!--v:saturnEclInclTrendDegPerCy-->0.00194<!--/v-->°/cy ≈ 7″/cy) and Neptune (+<!--v:neptuneEclInclTrendDegPerCy-->0.00035<!--/v-->°/cy ≈ 1.27″/cy), this Earth-plane drift is **larger than the trend itself** and changes its sign.
 
 **Always compare the model against the J2000-fixed frame when comparing to JPL `dI/dt` values.** All trend-search and verification scripts in `tools/` use the J2000-fixed frame for JPL comparison, even though the visual scene-graph and the dynamic balance simulator use the moving Earth plane internally (since that's what physically rotates with the rest of the system).
 
@@ -224,10 +224,10 @@ Both Earth's and each planet's ascending node on the invariable plane evolve lin
 
 | Body | N | Ω period (yr) | Notes |
 |------|---|---------------|-------|
-| Earth | 40 | −H/5 ≈ −67,063 | Ecliptic precession rate (= −(8H)/40) |
+| Earth | 40 | −H/5 ≈ −<!--v:hDiv5-->67,063<!--/v--> | Ecliptic precession rate (= −(8H)/40) |
 | Mercury | 9 | −<!--v:mercuryAxialPeriod-->298,060<!--/v--> | |
 | Venus | 1 | −<!--v:eightH-->2,682,536<!--/v--> (= −8H, at J2000) | Full Solar System Resonance Cycle |
-| Mars | 64 | −41,915 | |
+| Mars | 64 | −<!--v:hDiv8-->41,915<!--/v--> | |
 | Jupiter | 36 | −<!--v:marsPeriPeriod-->74,515<!--/v--> | Shared with Saturn (J+S lockstep) |
 | Saturn | 36 | −<!--v:marsPeriPeriod-->74,515<!--/v--> | Shared with Jupiter |
 | Uranus | 11 | −<!--v:mercuryPeriPeriod-->243,867<!--/v--> | |
@@ -404,7 +404,7 @@ Values calibrated with `earthAscendingNodeInvPlaneVerified = 284.51°` (Souami &
 | Saturn | <!--v:saturnOmegaSS-->122.27<!--/v--> | <!--v:saturnOmegaJ2000-->118.81<!--/v--> | -3.46° |
 | Uranus | <!--v:uranusOmegaSS-->308.44<!--/v--> | <!--v:uranusOmegaJ2000-->307.80<!--/v--> | -0.64° |
 | Neptune | <!--v:neptuneOmegaSS-->189.28<!--/v--> | <!--v:neptuneOmegaJ2000-->192.04<!--/v--> | +2.76° |
-| Pluto | 107.06 | <!--v:plutoOmegaJ2000-->101.06<!--/v--> | -6.00° |
+| Pluto | <!--v:plutoOmegaSS-->107.06<!--/v--> | <!--v:plutoOmegaJ2000-->101.06<!--/v--> | -6.00° |
 
 ### Earth's Ascending Node
 
@@ -486,13 +486,13 @@ All seven fitted planets match JPL's J2000-fixed-frame trends in both sign and m
 
 | Planet | Model moving (°/cy) | Model J2000 (°/cy) | JPL catalog (°/cy) | Error |
 |--------|-------|-------|-------|-------|
-| Mercury | +0.00488 | -0.00605 | -0.00595 | 0.4″ |
-| Venus | +0.00284 | -0.00124 | -0.00079 | 1.6″ |
-| Mars | +0.00207 | -0.00825 | -0.00813 | 0.4″ |
-| Jupiter | -0.00359 | -0.00182 | -0.00184 | 0.1″ |
-| Saturn | -0.00246 | +0.00242 | +0.00194 | 1.7″ |
-| Uranus | +0.00209 | -0.00240 | -0.00243 | 0.1″ |
-| Neptune | -0.00901 | +0.00034 | +0.00035 | 0.0″ |
+| Mercury | +0.00488 | -0.00605 | <!--v:mercuryEclInclTrendDegPerCy-->-0.00595<!--/v--> | 0.4″ |
+| Venus | +0.00284 | -0.00124 | <!--v:venusEclInclTrendDegPerCy-->-0.00079<!--/v--> | 1.6″ |
+| Mars | +0.00207 | -0.00825 | <!--v:marsEclInclTrendDegPerCy-->-0.00813<!--/v--> | 0.4″ |
+| Jupiter | -0.00359 | -0.00182 | <!--v:jupiterEclInclTrendDegPerCy-->-0.00184<!--/v--> | 0.1″ |
+| Saturn | -0.00246 | +0.00242 | +<!--v:saturnEclInclTrendDegPerCy-->0.00194<!--/v--> | 1.7″ |
+| Uranus | +0.00209 | -0.00240 | <!--v:uranusEclInclTrendDegPerCy-->-0.00243<!--/v--> | 0.1″ |
+| Neptune | -0.00901 | +0.00034 | +<!--v:neptuneEclInclTrendDegPerCy-->0.00035<!--/v--> | 0.0″ |
 
 ---
 

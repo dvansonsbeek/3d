@@ -627,12 +627,12 @@ The analysis tools compare against these IAU J2000 reference values:
 
 | Measurement | IAU J2000 Value |
 |-------------|-----------------|
-| Tropical Year (VE) | 365.242374 days |
-| Tropical Year (SS) | 365.241626 days |
-| Tropical Year (AE) | 365.242018 days |
+| Tropical Year (VE) | <!--v:tropicalYearVEJ2000Days-->365.242374<!--/v--> days |
+| Tropical Year (SS) | <!--v:tropicalYearSSJ2000Days-->365.241626<!--/v--> days |
+| Tropical Year (AE) | <!--v:tropicalYearAEJ2000Days-->365.242018<!--/v--> days |
 | Tropical Year (WS) | 365.242740 days |
 | Tropical Year (Mean) | 365.242189 days |
-| Anomalistic Year | 365.259636 days |
+| Anomalistic Year | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days |
 | Sidereal Year | 365.256363 days |
 | IAU Precession Period | 25,771.57 years |
 

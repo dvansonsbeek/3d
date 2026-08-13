@@ -155,7 +155,7 @@ const erosAscendingNodeInvPlaneVerified = 10.36;      // was 10.58, Δ = -0.22°
 | Saturn | <!--v:saturnOmegaSS-->122.27<!--/v-->° | <!--v:saturnOmegaJ2000-->118.81<!--/v-->° | -3.46° |
 | Uranus | <!--v:uranusOmegaSS-->308.44<!--/v-->° | <!--v:uranusOmegaJ2000-->307.80<!--/v-->° | -0.64° |
 | Neptune | <!--v:neptuneOmegaSS-->189.28<!--/v-->° | <!--v:neptuneOmegaJ2000-->192.04<!--/v-->° | +2.76° |
-| Pluto | 107.06° | <!--v:plutoOmegaJ2000-->101.06<!--/v-->° | -6.00° |
+| Pluto | <!--v:plutoOmegaSS-->107.06<!--/v-->° | <!--v:plutoOmegaJ2000-->101.06<!--/v-->° | -6.00° |
 
 ### Inclinations
 

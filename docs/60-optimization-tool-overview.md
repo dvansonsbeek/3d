@@ -135,12 +135,12 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 **Per-planet constants (13 each, Mercury-Neptune + Pluto, Halley's, Eros, Ceres):**
 | Constant | Example (Mercury) | Purpose |
 |----------|-------------------|---------|
-| `SolarYearInput` | 87.9683 days | Orbital period |
-| `EclipticInclinationJ2000` | 7.00497902 deg | Inclination to ecliptic (JPL) |
-| `OrbitalEccentricity` | 0.20563593 | Orbital eccentricity (JPL) |
+| `SolarYearInput` | <!--v:mercuryOrbitalPeriodInputDays-->87.9683<!--/v--> days | Orbital period |
+| `EclipticInclinationJ2000` | <!--v:mercuryEclInclJ2000Full-->7.00497902<!--/v--> deg | Inclination to ecliptic (JPL) |
+| `OrbitalEccentricity` | <!--v:mercuryEccJ2000Full-->0.20563593<!--/v--> | Orbital eccentricity (JPL) |
 | `InvPlaneInclinationJ2000` | <!--v:mercuryInclJ2000-->6.3472858<!--/v--> deg | Incl. to invariable plane |
-| `LongitudePerihelion` | 77.4569131 deg | Perihelion longitude (JPL J2000) |
-| `AscendingNode` | 48.33033155 deg | Ecliptic ascending node (SPICE) |
+| `LongitudePerihelion` | <!--v:mercuryPeriLongJ2000Full-->77.4569131<!--/v--> deg | Perihelion longitude (JPL J2000) |
+| `AscendingNode` | <!--v:mercuryAscNodeEclJ2000-->48.33033155<!--/v--> deg | Ecliptic ascending node (SPICE) |
 | `AngleCorrection` | 0.9709 deg | Perihelion alignment fine-tune |
 | `PerihelionEclipticYears` | H/(1+3/8) | Perihelion precession period |
 | `Startpos` | 83.653 deg | Starting orbital position |
@@ -545,7 +545,7 @@ These are the raw input values at the top of `script.js`. Changing them is strai
 
 | Parameter | Example (Mercury) | What it controls | Propagation effects |
 |-----------|-------------------|------------------|-------------------|
-| `SolarYearInput` | 87.9683 days | Orbital period -> feeds into `SolarYearCount` -> `OrbitDistance` (Kepler's 3rd) -> `PerihelionDistance` -> orbit speed, orbit radius | **High cascade**: changing this changes orbit size, speed, and all derived geometry |
+| `SolarYearInput` | <!--v:mercuryOrbitalPeriodInputDays-->87.9683<!--/v--> days | Orbital period -> feeds into `SolarYearCount` -> `OrbitDistance` (Kepler's 3rd) -> `PerihelionDistance` -> orbit speed, orbit radius | **High cascade**: changing this changes orbit size, speed, and all derived geometry |
 | `Startpos` | 83.653 deg | Starting orbital angle at model epoch | **Isolated**: only affects where the planet is at JD <!--v:startModelJD-->2,451,716.5<!--/v--> |
 | `AngleCorrection` | 0.9709 deg | Fine-tunes perihelion alignment -> feeds into `orbitCentera`/`orbitCenterb` of the PerihelionFromEarth object | **Medium cascade**: affects perihelion direction vector |
 | `InvPlaneInclinationMean` | 6.703207 deg | Center of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |

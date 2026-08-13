@@ -106,7 +106,7 @@ The same epoch-dependent scaling applies to multiple system parameters. All valu
 | Jupiter perihelion ecliptic (8H/39) | <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr | **62,808 yr** | **72,328 yr** | 8H/39 scales with H |
 | Saturn perihelion ecliptic (8H/65) | <!--v:saturnPeriPeriod-->41,270<!--/v--> yr | **37,685 yr** | **43,397 yr** | 8H/65 scales with H |
 | Earth axial precession (H/13) | <!--v:earthAxialPeriod-->25,794<!--/v--> yr | **<!--v:axialPrecAtDevonian-->23,553<!--/v--> yr** | **<!--v:axialPrecAt200MyrFuture-->27,123<!--/v--> yr** | H/13 scales with H |
-| Earth obliquity cycle (H/8) | 41,915 yr | **38,635 yr** | **43,833 yr** | H/8 scales with H |
+| Earth obliquity cycle (H/8) | <!--v:hDiv8-->41,915<!--/v--> yr | **38,635 yr** | **43,833 yr** | H/8 scales with H |
 
 ---
 
@@ -392,7 +392,7 @@ The two counts differ by 1.35 × 10⁻⁶ days — the 6d Fourier fit's residual
 
 The correction represents Earth's need to rotate slightly MORE per solar day to compensate for the ecliptic's precession in ICRF over the ecliptic-precession period H/5. The mean solar day is measured against the Sun, whose apparent motion follows the ecliptic — so it is the ecliptic frame, not the invariable-plane frame, that sets the meridian passage.
 
-Over one full ecliptic-precession cycle (H/5 = 67,063 yr at J2000), the ecliptic completes one full revolution of its orientation in ICRF. Over one solar day (= 1/mSY of one year), the ecliptic direction therefore precesses by:
+Over one full ecliptic-precession cycle (H/5 = <!--v:hDiv5-->67,063<!--/v--> yr at J2000), the ecliptic completes one full revolution of its orientation in ICRF. Over one solar day (= 1/mSY of one year), the ecliptic direction therefore precesses by:
 
 ```
 δ_rev = 1 / ((H/5) × mSY) revolutions per day
@@ -447,7 +447,7 @@ What IS constant is the **fractional correction** `δ_LOD_H5 / LOD_mean ≈ 5 / 
 | Age (Ma) | H (yr) | H/5 (yr) | LOD_mean (s) | δ_LOD_H5 (ms) | raw H/5 kinematic (s) |
 |---:|---:|---:|---:|---:|---:|
 | +200 | <!--v:hAt200MyrFuture-->352,600<!--/v--> | 70,520 | 90,853.4 | ~3.71 | ~90,853.404 |
-| 0 (anchor) | **<!--v:H-->335,317<!--/v-->** | **67,063** | **86,400.000** | **3.527** | **86,400.003** |
+| 0 (anchor) | **<!--v:H-->335,317<!--/v-->** | **<!--v:hDiv5-->67,063<!--/v-->** | **86,400.000** | **3.527** | **86,400.003** |
 | −380 (Devonian) | <!--v:hAtDevonian-->306,189<!--/v--> | 61,238 | 78,894.8 | ~3.22 | ~78,894.803 |
 | −1000 | 264,346 | 52,869 | 68,113.0 | ~2.78 | ~68,113.003 |
 

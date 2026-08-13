@@ -104,7 +104,7 @@ The strongest test: apply the formula to **every major moon** of each planet and
 
 Corrected formula matches DE440 to **3.7 ppm**. The 2,727 ppm shift between bare and corrected reflects the full Earth-Moon Δa = 349 km (doc 24). The residual 3.7 ppm is the Hill-Brown m⁴-and-beyond floor of the 3-body problem.
 
-### Mars (2 moons) — DE440 Sun/System ratio: **3,098,703.59**
+### Mars (2 moons) — DE440 Sun/System ratio: **<!--v:marsMassRatioDE440-->3,098,703.59<!--/v-->**
 
 | Moon | a (km) | T (d) | bare ratio | corrected ratio | solar ppm | J2 ppm |
 |---|---|---|---|---|---|---|
@@ -113,7 +113,7 @@ Corrected formula matches DE440 to **3.7 ppm**. The 2,727 ppm shift between bare
 
 **Range corrected:** 3,096,545 – 3,097,640 (340 ppm spread). Median: **3,097,640**. Within ~340 ppm of DE440 — limited by both moons being tiny captured asteroids with imprecise orbital determinations.
 
-### Jupiter (4 Galilean moons) — DE440 Sun/System ratio: **1,047.348625**
+### Jupiter (4 Galilean moons) — DE440 Sun/System ratio: **<!--v:jupiterMassRatioDE440-->1,047.348625<!--/v-->**
 
 | Moon | a (km) | T (d) | bare ratio | corrected ratio | solar ppm | J2 ppm |
 |---|---|---|---|---|---|---|
@@ -124,7 +124,7 @@ Corrected formula matches DE440 to **3.7 ppm**. The 2,727 ppm shift between bare
 
 **Range corrected:** 1,047.27 – 1,047.61 (320 ppm spread). Median: **1,047.45**. Within ~100 ppm of DE440. Outer Galileans (Callisto, Ganymede) match DE440 to 100 ppm directly; inner Io needs the largest J2 correction.
 
-### Saturn (7 major moons) — DE440 Sun/System ratio: **3,497.9018**
+### Saturn (7 major moons) — DE440 Sun/System ratio: **<!--v:saturnMassRatioDE440-->3,497.9018<!--/v-->**
 
 | Moon | a (km) | T (d) | bare ratio | corrected ratio | solar ppm | J2 ppm |
 |---|---|---|---|---|---|---|
@@ -138,7 +138,7 @@ Corrected formula matches DE440 to **3.7 ppm**. The 2,727 ppm shift between bare
 
 **Range bare:** 3,489.51 – 3,497.65 (2,300 ppm spread — dominated by J2). **Range corrected:** 3,497.15 – 3,498.81 (475 ppm spread). Median: **3,498.52**. The J2 correction collapses Saturn's spread by **~5×**, demonstrating the formula captures the right physics.
 
-### Uranus (5 major moons) — DE440 Sun/System ratio: **22,902.944**
+### Uranus (5 major moons) — DE440 Sun/System ratio: **<!--v:uranusMassRatioDE440-->22,902.944<!--/v-->**
 
 | Moon | a (km) | T (d) | bare ratio | corrected ratio | solar ppm | J2 ppm |
 |---|---|---|---|---|---|---|
@@ -150,7 +150,7 @@ Corrected formula matches DE440 to **3.7 ppm**. The 2,727 ppm shift between bare
 
 **Range corrected:** 22,893 – 22,901 (350 ppm spread). Median: **22,899**. Within ~200 ppm of DE440. Titania is closest to DE440; Miranda/Oberon residuals reflect modest data precision.
 
-### Neptune (2 moons) — DE440 Sun/System ratio: **19,412.237**
+### Neptune (2 moons) — DE440 Sun/System ratio: **<!--v:neptuneMassRatioDE440-->19,412.237<!--/v-->**
 
 | Moon | a (km) | T (d) | bare ratio | corrected ratio | solar ppm | J2 ppm |
 |---|---|---|---|---|---|---|
@@ -159,7 +159,7 @@ Corrected formula matches DE440 to **3.7 ppm**. The 2,727 ppm shift between bare
 
 **Triton corrected:** 19,412.31 — matches DE440 to **4 ppm**. Nereid sits 200 ppm high, consistent with its highly eccentric (e ≈ 0.75) and inclined orbit being less precisely determined.
 
-### Pluto (Charon) — DE440 Sun/System ratio: **136,045,556**
+### Pluto (Charon) — DE440 Sun/System ratio: **<!--v:plutoMassRatioDE440-->136,045,556<!--/v-->**
 
 | Moon | a (km) | T (d) | bare ratio | corrected ratio | solar ppm | J2 ppm |
 |---|---|---|---|---|---|---|
@@ -179,9 +179,9 @@ The bare formula's output `GM_P_system` covers **planet + all moons**. To conver
 | Mars | 0.0000% | 3,098,703.55 | 3,098,703.71 | <!--v:saturnPredR2-->1.000000<!--/v--> |
 | Jupiter | 0.0207% | 1,047.349 | **1,047.566** | 1.000207 |
 | Saturn | 0.0247% | 3,497.902 | **3,498.769** | 1.000247 |
-| Uranus | 0.0104% | 22,902.944 | **22,905.337** | 1.000105 |
+| Uranus | 0.0104% | <!--v:uranusMassRatioDE440-->22,902.944<!--/v--> | **22,905.337** | 1.000105 |
 | Neptune | 0.0208% | 19,412.260 | **19,416.299** | 1.000208 |
-| Pluto | **10.8546%** | 136,045,556 | **152,610,777** | **1.121676** |
+| Pluto | **10.8546%** | <!--v:plutoMassRatioDE440-->136,045,556<!--/v--> | **152,610,777** | **1.121676** |
 
 **Two systems stand out** as binary-like: Earth (1.2% moon share) and especially Pluto (10.9% — Charon takes a tenth of the system's mass). For these the system / planet-alone distinction shifts the ratio by **percent-level**, far larger than any data precision. For Jupiter/Saturn/Uranus/Neptune the shift is just 100-250 ppm, but it's still resolvable.
 
@@ -197,8 +197,8 @@ Comparing the universal formula's output (with corrections and the moon-mass spl
 | Earth | Moon | **328,899.35** | 328,900.56 | **3.7 ppm** |
 | Saturn | Titan | 3,497.85 | 3,497.902 | 15 ppm |
 | Jupiter | Callisto | 1,047.40 | 1,047.349 | 49 ppm |
-| Pluto | Charon | 136,052,934 | 136,045,556 | 54 ppm |
-| Uranus | Titania | 22,901.38 | 22,902.944 | 68 ppm |
+| Pluto | Charon | 136,052,934 | <!--v:plutoMassRatioDE440-->136,045,556<!--/v--> | 54 ppm |
+| Uranus | Titania | 22,901.38 | <!--v:uranusMassRatioDE440-->22,902.944<!--/v--> | 68 ppm |
 | Mars | Phobos | 3,097,640 | 3,098,703.55 | 340 ppm |
 
 ### Sun/Planet-Alone (after planet/moon split)

@@ -15,13 +15,13 @@ The **Solar System Resonance Cycle** (8H = <!--v:eightH-->2,682,536<!--/v--> yea
 
 ### System Reset
 
-The **System Reset** is the epoch within each Solar System Resonance Cycle when all seven fitted planets simultaneously reach their inclination extremes: the seven in-phase planets at minimum inclination, Saturn (anti-phase) at maximum. This occurs once per 8H. The current System Reset is at approximately **-2,649,854** (balanced year anchor n=7, the oldest of the eight anchors in the current octave).
+The **System Reset** is the epoch within each Solar System Resonance Cycle when all seven fitted planets simultaneously reach their inclination extremes: the seven in-phase planets at minimum inclination, Saturn (anti-phase) at maximum. This occurs once per 8H. The current System Reset is at approximately **-<!--v:systemResetYearPlain-->2,649,854<!--/v-->** (balanced year anchor n=7, the oldest of the eight anchors in the current octave).
 
 At the System Reset, every planet's ICRF perihelion phase = 180° (in-phase) or 0° (Saturn anti-phase), meaning the inclination oscillations are perfectly synchronized. At intermediate balanced years (n=0 through n=6), only a subset of planets are at their extremes — the others have drifted because their ICRF periods don't divide H evenly.
 
 | Epoch | Year | What's at extreme |
 |-------|------|-------------------|
-| System Reset (n=7) | ≈ -2,649,854 | All 7 fitted planets |
+| System Reset (n=7) | ≈ -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | All 7 fitted planets |
 | Balanced Year (n=0) | ≈ <!--v:balancedYear-->-302,635<!--/v--> | Jupiter, Saturn, Uranus (+ Earth by definition) |
 | n=1 through n=6 | intermediate | Planet-dependent subsets |
 
@@ -198,10 +198,10 @@ N_ecl = N_obliq + N_eclPrec
 |--------|-------|----------------------|------------------------|
 | Mercury | 11 | 3 + 8 | H (<!--v:H-->335,317<!--/v--> yr) |
 | Venus | 6 | 110 + (−104) | H/13 (<!--v:earthAxialPeriod-->25,794<!--/v--> yr) |
-| Earth | 128 | 64 + 64 | H/8 (41,915 yr) |
+| Earth | 128 | 64 + 64 | H/8 (<!--v:hDiv8-->41,915<!--/v--> yr) |
 | Mars | 35 | 21 + 14 | 8H/14 (191,610 yr) |
 | Jupiter | 40 | 16 + 24 | H/3 (<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr) |
-| Saturn | 64 | 24 + 40 | H/5 (67,063 yr) |
+| Saturn | 64 | 24 + 40 | H/5 (<!--v:hDiv5-->67,063<!--/v--> yr) |
 | Uranus | 24 | 16 + 8 | H (<!--v:H-->335,317<!--/v--> yr) |
 | Neptune | 4 | 100 + (−96) | 8H/96 (27,943 yr) |
 

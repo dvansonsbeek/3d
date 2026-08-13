@@ -200,8 +200,8 @@ These are computed from foundational constants. The formula is the definition; t
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
 | Mean Solar Year | `meanSolarYearDays` | round(inputMeanSolarYear × H/8) / (H/8) | <!--v:meanSolarYearDaysFull-->365.242203646102<!--/v--> days |
-| Mean Sidereal Year | `meanSiderealYearDays` | meanSolarYearDays × (H/13) / ((H/13) - 1) | 365.256364374 days |
-| Mean Anomalistic Year | `meanAnomalisticYearDays` | meanSolarYearDays / (H/16 - 1) + meanSolarYearDays | 365.259632390 days |
+| Mean Sidereal Year | `meanSiderealYearDays` | meanSolarYearDays × (H/13) / ((H/13) - 1) | <!--v:meanSiderealYearDaysFull-->365.256364374<!--/v--> days |
+| Mean Anomalistic Year | `meanAnomalisticYearDays` | meanSolarYearDays / (H/16 - 1) + meanSolarYearDays | <!--v:anomalisticYearDaysFull-->365.259632390<!--/v--> days |
 | Mean Length of Day | `meanLengthOfDay` | meanSiderealYearSeconds / meanSiderealYearDays | ~86,400.0 s |
 | Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0902182<!--/v--> s |
 | Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/(H/13)) / (meanSolarYearDays+1) + meanSiderealDay | <!--v:meanStellarDaySeconds-->86,164.0985857<!--/v--> s |
@@ -586,7 +586,7 @@ JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic
 | Saturn | <!--v:saturnOmegaSS-->122.27<!--/v--> | S&S 2012 |
 | Uranus | <!--v:uranusOmegaSS-->308.44<!--/v--> | S&S 2012 |
 | Neptune | <!--v:neptuneOmegaSS-->189.28<!--/v--> | S&S 2012 |
-| Pluto | 107.06 | S&S 2012 |
+| Pluto | <!--v:plutoOmegaSS-->107.06<!--/v--> | S&S 2012 |
 | Ceres | 80.89 | S&S 2012 |
 
 ## Perihelion Precession Rates (1900–2100)

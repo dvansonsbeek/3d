@@ -61,9 +61,9 @@ All three mean year lengths derive from `inputmeanlengthsolaryearindays` and the
 
 | Year type | Formula | Mean (days) |
 |-----------|---------|-------------|
-| Tropical | `round(input × H/8) / (H/8)` | 365.242203646 |
-| Sidereal | `tropical × H / (H − 13)` | 365.256364374 |
-| Anomalistic | `tropical × H / (H − 16)` | 365.259632390 |
+| Tropical | `round(input × H/8) / (H/8)` | <!--v:meanSolarYearDaysFull-->365.242203646102<!--/v--> |
+| Sidereal | `tropical × H / (H − 13)` | <!--v:meanSiderealYearDaysFull-->365.256364374<!--/v--> |
+| Anomalistic | `tropical × H / (H − 16)` | <!--v:anomalisticYearDaysFull-->365.259632390<!--/v--> |
 
 Note: The tropical year mean is quantized at H/8 resolution (the obliquity cycle). The sidereal and anomalistic means follow algebraically.
 
@@ -238,8 +238,8 @@ All precession periods emerge from ratios of year lengths:
 | Axial | `Y_sid / (Y_sid − Y_trop)` | H/13 ≈ <!--v:earthAxialPeriod-->25,794<!--/v--> yr |
 | Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ <!--v:earthPeriPeriod-->20,957<!--/v--> yr |
 | Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr |
-| Obliquity | axial × 13/8 | H/8 ≈ 41,915 yr |
-| Ecliptic | axial × 13/5 | H/5 ≈ 67,063 yr |
+| Obliquity | axial × 13/8 | H/8 ≈ <!--v:hDiv8-->41,915<!--/v--> yr |
+| Ecliptic | axial × 13/5 | H/5 ≈ <!--v:hDiv5-->67,063<!--/v--> yr |
 
 These are time-varying — each uses the instantaneous year lengths at the given epoch, so precession periods themselves oscillate slightly.
 
@@ -259,7 +259,7 @@ The coin rotation paradox manifests at every timescale:
 |----------|-------------|-----------|
 | Tropical year | 365.242190 days | 365.242190 days (IAU) |
 | Sidereal year | 365.256363 days | 365.256363 days (IAU) |
-| Anomalistic year | 365.259633 days | 365.259636 days (IAU) |
+| Anomalistic year | 365.259633 days | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days (IAU) |
 | LOD_mean (kinematic, H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | — |
 | LOD_real (Layer 4: physical, +H/5 correction + DT cycles + swing) | <!--v:lodRealPhysical-->86,400.001380<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0017<!--/v--> s (fit's measured-day basis) |
 | Sidereal day | 86164.091 s | 86164.091 s (IAU) |

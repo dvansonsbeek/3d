@@ -56,8 +56,8 @@ This section documents the timescale hierarchy that forms Law 1 of the Fibonacci
 | Fibonacci | H/F | Period (years) | Earth's astronomical cycle |
 |-----------|-----|----------------|----------------------------|
 | 3 | H/3 | **<!--v:earthPeriPeriodICRF-->111,772<!--/v-->** | Inclination precession (ICRF perihelion) |
-| 5 | H/5 | **67,063** | Ecliptic precession |
-| 8 | H/8 | **41,915** | Obliquity cycle |
+| 5 | H/5 | **<!--v:hDiv5-->67,063<!--/v-->** | Ecliptic precession |
+| 8 | H/8 | **<!--v:hDiv8-->41,915<!--/v-->** | Obliquity cycle |
 | 13 | H/13 | **<!--v:earthAxialPeriod-->25,794<!--/v-->** | Axial precession |
 | 21 | H/21 | **15,953** | Beat: axial + obliquity |
 | 34 | H/34 | **9,853** | Beat: axial + ecliptic |
@@ -794,7 +794,7 @@ where `inclination(t)` is the dynamic invariable-plane inclination from `calc_pl
 |--------|--------|-------------|--------|
 | Mercury | <!--v:mercuryObliqCycle-->894,179<!--/v--> yr | 8H/3 | Confirmed (0.1% vs ~895 kyr, Bills 2005) |
 | Venus | N/A | — | Tidally damped at 177° |
-| Earth | 41,915 yr | H/8 | Confirmed (2% vs ~41 kyr) |
+| Earth | <!--v:hDiv8-->41,915<!--/v--> yr | H/8 | Confirmed (2% vs ~41 kyr) |
 | Mars | 125,744 yr | 3H/8 | Confirmed (0.8% vs ~124,800 yr, Laskar 2004) |
 | Jupiter | <!--v:hDiv2-->167,659<!--/v--> yr | H/2 | Prediction |
 | Saturn | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | H/3 | Prediction (mirror-pair with Earth) |

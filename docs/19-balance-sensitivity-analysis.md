@@ -118,7 +118,7 @@ $$
 v = \sqrt{m} \cdot a^{3/2} \cdot e_{\text{amp}} / \sqrt{d} = K \cdot \sin(\text{tilt})
 $$
 
-**Every body where actual `e_amp` matches the Law-4 intrinsic prediction contributes the SAME v to the eccentricity balance, regardless of its mass or distance.** This is the framework-natural extension of Law 5 to external bodies. (Which bodies actually satisfy `actual ≈ intrinsic` is the central population question — see §5.2 caveat and §5.4.) With K = 3.4149 × 10⁻⁶ and ⟨sin(tilt)⟩ ≈ 0.5 (isotropic average for unmeasured TNO axial obliquities):
+**Every body where actual `e_amp` matches the Law-4 intrinsic prediction contributes the SAME v to the eccentricity balance, regardless of its mass or distance.** This is the framework-natural extension of Law 5 to external bodies. (Which bodies actually satisfy `actual ≈ intrinsic` is the central population question — see §5.2 caveat and §5.4.) With K = <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> and ⟨sin(tilt)⟩ ≈ 0.5 (isotropic average for unmeasured TNO axial obliquities):
 
 $$
 v_{\text{per body}} \approx 1.7 \times 10^{-6}

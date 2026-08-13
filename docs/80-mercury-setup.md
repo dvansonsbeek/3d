@@ -279,7 +279,7 @@ This is the only fitted value per planet (besides angleCorrection). It's optimis
 | `ascendingNode` (48.330°) | JPL J2000 | Observed input |
 | `eclipticInclinationJ2000` (7.005°) | JPL J2000 | Observed input |
 | `startpos` (83.652°) | Fitted to match JPL RA at J2000 | Calibration |
-| `solarYearInput` (87.9683 days) | JPL orbital period | Observed input |
+| `solarYearInput` (<!--v:mercuryOrbitalPeriodInputDays-->87.9683<!--/v--> days) | JPL orbital period | Observed input |
 
 The orbit center (−6.4682, −1.3244) is **fully derived** — it follows from the observed perihelion direction and the model-derived eccentricity. No fitting is needed for the orbit center itself.
 

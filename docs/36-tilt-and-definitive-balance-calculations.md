@@ -60,7 +60,7 @@ Saturn alone carries 50.0% of total Law 5 weight, making it the decisive planet.
 |--------|----------------------|---------------------------------------------|
 | H      | <!--v:HPlain-->335317<!--/v-->               | Earth Fundamental Cycle Length                         |
 | PSI    | 3.3069e-3 (d_E × amp_E × √m_E) | Inclination amplitude constant (Law 2, from Earth) |
-| K      | 3.414920e-6          | Tilt-eccentricity constant (derived from Earth) |
+| K      | <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> | Tilt-eccentricity constant (derived from Earth) |
 
 PSI is defined in `tools/lib/constants.js` line 421.
 K is derived in Section 4 below.
@@ -127,7 +127,7 @@ mass or position.
 | Planet  | Tilt (deg) | e_amplitude   | % of J2000 ecc | Effect on balance |
 |---------|------------|---------------|-----------------|-------------------|
 | Mercury |   0.03     | 2.338e-5      | 0.011%          | Negligible        |
-| Venus   |   2.6392   | 9.526e-4      | 14.057%         | Negligible (tiny v) |
+| Venus   |   <!--v:venusAxialTiltJ2000-->2.6392<!--/v-->   | 9.526e-4      | 14.057%         | Negligible (tiny v) |
 | Earth   |  <!--v:meanObliquity-->23.41353<!--/v-->  | 1.356e-3      | 8.116%          | 0.05% of total    |
 | Mars    |  25.19     | 3.066e-3      | 3.283%          | 0.14% of total    |
 | Jupiter |   3.13     | 1.134e-6      | 0.002%          | Negligible        |
@@ -151,12 +151,12 @@ Each planet has a mean axial obliquity. For Earth this is <!--v:meanObliquity-->
 **Step 3 — Axial tilt oscillation.**
 The axial tilt fluctuates over time with a period equal to the obliquity cycle.
 The amplitude of this oscillation equals the inclination amplitude (see Step 4).
-For Earth: amplitude = 0.63603 deg.
+For Earth: amplitude = <!--v:earthInclAmp-->0.63605<!--/v--> deg.
 
 **Step 4 — Inclination oscillation.**
 The inclination to the invariable plane fluctuates with a period equal to the
 inclination precession cycle. The amplitude equals the axial tilt amplitude:
-i_amplitude = PSI / (d * sqrt(m)). For Earth: amplitude = 0.63603 deg.
+i_amplitude = PSI / (d * sqrt(m)). For Earth: amplitude = <!--v:earthInclAmp-->0.63605<!--/v--> deg.
 
 **Step 5 — Eccentricity fluctuation from combined effect.**
 Because the axial tilt oscillation and the inclination oscillation operate at
@@ -237,14 +237,14 @@ The JPL J2000 values represent the actual eccentricity at that epoch:
 
 | Planet  | J2000 Model   | J2000 JPL     | Diff from JPL |
 |---------|---------------|---------------|---------------|
-| Mercury | 0.20563593    | 0.20563593    |  0.000%       |
-| Venus   | 0.00677672    | 0.00677672    |  0.000%       |
+| Mercury | <!--v:mercuryEccJ2000Full-->0.20563593<!--/v-->    | <!--v:mercuryEccJ2000Full-->0.20563593<!--/v-->    |  0.000%       |
+| Venus   | <!--v:venusEccJ2000Full-->0.00677672<!--/v-->    | <!--v:venusEccJ2000Full-->0.00677672<!--/v-->    |  0.000%       |
 | Earth   | <!--v:j2000Eccentricity-->0.01671022<!--/v-->    | <!--v:j2000Eccentricity-->0.01671022<!--/v-->    |  0.000%       |
 | Mars    | 0.09339410    | 0.09339410    |  0.000%       |
-| Jupiter | 0.04838624    | 0.04838624    |  0.000%       |
-| Saturn  | 0.05386179    | 0.05386179    |  0.000%       |
-| Uranus  | 0.04725744    | 0.04725744    |  0.000%       |
-| Neptune | 0.00859048    | 0.00859048    |  0.000%       |
+| Jupiter | <!--v:jupiterEccJ2000Full-->0.04838624<!--/v-->    | <!--v:jupiterEccJ2000Full-->0.04838624<!--/v-->    |  0.000%       |
+| Saturn  | <!--v:saturnEccJ2000Full-->0.05386179<!--/v-->    | <!--v:saturnEccJ2000Full-->0.05386179<!--/v-->    |  0.000%       |
+| Uranus  | <!--v:uranusEccJ2000Full-->0.04725744<!--/v-->    | <!--v:uranusEccJ2000Full-->0.04725744<!--/v-->    |  0.000%       |
+| Neptune | <!--v:neptuneEccJ2000Full-->0.00859048<!--/v-->    | <!--v:neptuneEccJ2000Full-->0.00859048<!--/v-->    |  0.000%       |
 
 At J2000, **Earth and Mars are above their base eccentricities** (Earth: 0.01671 vs base <!--v:earthEccBase-->0.01539<!--/v-->; Mars: <!--v:marsEccJ2000-->0.09339<!--/v--> vs base 0.09147), while **Venus is below its base** (<!--v:venusEccJ2000-->0.00678<!--/v--> vs <!--v:venusEccBase-->0.00771<!--/v-->). The differences reflect each planet's phase in its own eccentricity oscillation at the J2000 epoch. The outer giants (Jupiter, Saturn, Uranus, Neptune) have base eccentricities calibrated very close to their J2000 values (differences ≤ 1.5×10⁻⁵, well below 0.1%), so their J2000 model values match the base values at the precision shown above. The current phase-derived calibration makes the outer-planet differences much smaller than under earlier calibrations, where Laplace-Lagrange secular exchange was invoked to explain ~0.2–1.1% offsets (see Section 10).
 
@@ -271,7 +271,7 @@ At J2000, **Earth and Mars are above their base eccentricities** (Earth: 0.01671
 |---------|-----------------|------------------|-------------------|------------------|
 | Mercury |  6.703207       | 0.386478         | <!--v:mercuryInclJ2000-->6.3472858<!--/v-->         | 6.32 to 7.09    |
 | Venus   |  <!--v:venusInclMean-->2.151359<!--/v-->       | 0.062165         | <!--v:venusInclJ2000-->2.1545441<!--/v-->         | 2.09 to 2.21    |
-| Earth   |  1.481134       | 0.636032        | 1.5786900         | 0.85 to 2.12    |
+| Earth   |  <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> | <!--v:earthInclJ2000-->1.57869<!--/v--> | 0.85 to 2.12    |
 | Mars    |  1.915105       | 1.164222         | <!--v:marsInclJ2000-->1.6311858<!--/v-->         | 0.75 to 3.08    |
 | Jupiter |  <!--v:jupiterInclMean-->0.321086<!--/v-->       | <!--v:jupiterInclAmp-->0.021404<!--/v-->         | <!--v:jupiterInclJ2000-->0.3219652<!--/v-->         | 0.30 to 0.34    |
 | Saturn  |  0.984965       | 0.065193         | <!--v:saturnInclJ2000-->0.9254704<!--/v-->         | 0.92 to 1.05    |
@@ -290,7 +290,7 @@ Inclination amplitudes are derived from the PSI formula:
 |---------|-----|----------------|----------------------|------------------|-------|
 | Mercury |  21 | 4.0745e-4      | 0.386478             | 0.386478         | Yes   |
 | Venus   |  34 | 1.5646e-3      | 0.062165             | 0.062165         | Yes   |
-| Earth   |   3 | 1.7331e-3      | 0.636              | 0.63603         | 0.0% |
+| Earth   |   3 | 1.7331e-3      | 0.636              | <!--v:earthInclAmp-->0.63605<!--/v--> | 0.0% |
 | Mars    |   5 | 5.6808e-4      | 1.164222             | 1.164222         | Yes   |
 | Jupiter |   5 | 3.0900e-2      | <!--v:jupiterInclAmp-->0.021404<!--/v-->             | <!--v:jupiterInclAmp-->0.021404<!--/v-->         | Yes   |
 | Saturn  |   3 | 1.6908e-2      | 0.065193             | 0.065193         | Yes   |
@@ -298,7 +298,7 @@ Inclination amplitudes are derived from the PSI formula:
 | Neptune |  34 | 7.1772e-3      | <!--v:neptuneInclAmp-->0.013551<!--/v-->             | <!--v:neptuneInclAmp-->0.013551<!--/v-->         | Yes   |
 
 Earth shows a ~0.5% mismatch because its amplitude was independently tuned for IAU 2006
-precession rate (0.63603). The Fibonacci formula (ψ/(d×√m)) gives 0.636, matching exactly since ψ is derived from Earth.
+precession rate (<!--v:earthInclAmp-->0.63605<!--/v-->). The Fibonacci formula (ψ/(d×√m)) gives 0.636, matching exactly since ψ is derived from Earth.
 All other planets match exactly.
 
 ### Inclination Balance Result
@@ -333,8 +333,8 @@ For each planet, six parameters fully describe the orbital dynamics:
 | Planet  | 1. Tilt    | 2. Amp Tilt | 3. Mean Ecc  | 4. Amp Ecc    | 5. Mean Incl | 6. Amp Incl |
 |---------|------------|-------------|---------------|---------------|--------------|-------------|
 | Mercury |   0.03     | 0.386478    | 0.20563022    | 2.338e-5      |  6.703207    | 0.386478    |
-| Venus   |   2.6392   | 0.062165    | 0.00770652    | 9.526e-4      |  <!--v:venusInclMean-->2.151359<!--/v-->    | 0.062165    |
-| Earth   |  23.41354  | 0.636032   | 0.01538578    | 1.356e-3      |  1.481134   | 0.636032   |
+| Venus   |   <!--v:venusAxialTiltJ2000-->2.6392<!--/v-->   | 0.062165    | 0.00770652    | 9.526e-4      |  <!--v:venusInclMean-->2.151359<!--/v-->    | 0.062165    |
+| Earth   |  <!--v:meanObliquity-->23.41353<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> | 0.01538578    | 1.356e-3      |  <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> |
 | Mars    |  25.19     | 1.164222    | 0.09146580    | 3.066e-3      |  1.915105    | 1.164222    |
 | Jupiter |   3.13     | <!--v:jupiterInclAmp-->0.021404<!--/v-->    | 0.04838630    | 1.134e-6      |  <!--v:jupiterInclMean-->0.321086<!--/v-->    | <!--v:jupiterInclAmp-->0.021404<!--/v-->    |
 | Saturn  |  26.73     | 0.065193    | 0.05386607    | 5.360e-6      |  0.984965    | 0.065193    |
@@ -347,7 +347,7 @@ amplitude of inclination oscillation, both derived from PSI / (d * sqrt(m)).
 **Earth's amplitude: mean vs instantaneous.**
 The ψ formula gives the **mean amplitude over the full H cycle**: 0.632469°.
 This is the structural value that achieves 100% Law 3 inclination balance.
-However, the IAU obliquity rate at J2000 (-46.836769"/cy) constrains the
+However, the IAU obliquity rate at J2000 (<!--v:obliquityRateArcsecPerCy-->-46.836769<!--/v-->"/cy) constrains the
 **instantaneous amplitude** to 0.636055° — a 0.57% difference (12.9 arcsec).
 
 This is not an exception but a predictable phase effect. The instantaneous

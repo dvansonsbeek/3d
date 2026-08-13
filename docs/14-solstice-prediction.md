@@ -30,7 +30,7 @@ The RA position requires **zero observations** — it is fully derived from mode
 
 | Cardinal Point | Detection | RMSE (JD) | J2000 Anchor |
 |----------------|-----------|-----------|--------------|
-| **SS** (Summer Solstice) | Max declination | **1.0 min** | 2451716.575 (Jun 21, 01:48 UTC) |
+| **SS** (Summer Solstice) | Max declination | **1.0 min** | <!--v:juneSolstice2000JD-->2451716.575<!--/v--> (Jun 21, 01:48 UTC) |
 | **VE** (Vernal Equinox) | Dec crosses 0° ascending | **0.05 min** | 2451623.738 (Mar 20, 05:42 UTC) |
 | **AE** (Autumnal Equinox) | Dec crosses 0° descending | **0.6 min** | 2451810.304 (Sep 22, 19:18 UTC) |
 | **WS** (Winter Solstice) | Min declination | **1.0 min** | 2451900.067 (Dec 21, 01:37 UTC) |
@@ -144,7 +144,7 @@ At J2000, the four cardinal point year lengths differ by up to 98 seconds:
 | SS | 365.24160 | −51 s (shortest) |
 | VE | 365.24233 | +12 s |
 | AE | 365.24204 | −13 s |
-| WS | 365.24274 | +47 s (longest) |
+| WS | <!--v:tropicalYearWSJ2000Days-->365.24274<!--/v--> | +47 s (longest) |
 
 Mean of 4: 365.24218 days (≈ meanSolarYearDays = 365.24219).
 
@@ -287,11 +287,11 @@ All implementations return exact J2000 anchor values by construction. Legacy `SO
 | `CARDINAL_POINT_HARMONICS` | 4 × 24 × [div, sin, cos] | Fitted from 14,579 simulation observations per type |
 | `SOLSTICE_OBLIQUITY_MEAN` | 23.45326° | **Derived at startup** from Pythagorean tilt model (zero fitting) |
 | `SOLSTICE_OBLIQUITY_HARMONICS` | 16 × [div, sin, cos] | Fitted from 14,579 SS observations |
-| `earthInvPlaneInclinationMean` | 1.481134° | Model parameter (mean orbital plane tilt to invariable plane) |
+| `earthInvPlaneInclinationMean` | <!--v:earthInclMean-->1.48113<!--/v-->° | Model parameter (mean orbital plane tilt to invariable plane) |
 | `earthRAAngle` | 1.25478° | Scene graph parameter (perihelion precession tilt) |
-| `earthInvPlaneInclinationAmplitude` | 0.63603° | Model parameter (inclination oscillation) |
-| `earthtiltMean` | 23.41354° | Model parameter (mean obliquity) |
-| `meanSolarYearDays` | 365.242203646 | Derived from H/8 quantization |
+| `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63605<!--/v-->° | Model parameter (inclination oscillation) |
+| `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | Model parameter (mean obliquity) |
+| `meanSolarYearDays` | <!--v:meanSolarYearDaysFull-->365.242203646102<!--/v--> | Derived from H/8 quantization |
 
 ## Related Documents
 

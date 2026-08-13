@@ -9,7 +9,7 @@ status: current
 
 Every orbital oscillation in the model — inclination, eccentricity, and obliquity — derives from two empirical constants and a set of observed J2000 anchor values. Nothing is fitted per planet. The loop is fully closed.
 
-> **Scope note (ESSRT).** The closed-loop derivation chain is structurally scale-invariant: Fibonacci divisors (3, 5, 8, 13, 21, 34), 8H/N lattice integers, balance-law forms (Law 3 vector, Law 5 scalar), and the PSI/K formula structures hold at any epoch. The numerical values of the constants — PSI (3.307×10⁻³), K (3.415×10⁻⁶), the mean obliquity (23.4135°), Earth's inclination amplitude (0.6360°) — and the literal year counts (H = <!--v:H-->335,317<!--/v-->; 8H = <!--v:eightH-->2,682,536<!--/v-->; H/13 = <!--v:earthAxialPeriod-->25,794<!--/v-->; H/16 = <!--v:earthPeriPeriod-->20,957<!--/v-->; System Reset year ≈ −2,649,854) are J2000-anchored. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling the literal year counts proportionally; PSI and K, being derived from J2000 Earth, would be re-evaluated at any other epoch by the same closed loop using that epoch's Earth values. The architecture of the loop — what derives from what — is permanent; the numerical snapshot is the J2000 instance.
+> **Scope note (ESSRT).** The closed-loop derivation chain is structurally scale-invariant: Fibonacci divisors (3, 5, 8, 13, 21, 34), 8H/N lattice integers, balance-law forms (Law 3 vector, Law 5 scalar), and the PSI/K formula structures hold at any epoch. The numerical values of the constants — PSI (<!--v:psiValue-->3.3069 × 10⁻³<!--/v-->), K (<!--v:kValue-->3.4143 × 10⁻⁶<!--/v-->), the mean obliquity (23.4135°), Earth's inclination amplitude (0.6360°) — and the literal year counts (H = <!--v:H-->335,317<!--/v-->; 8H = <!--v:eightH-->2,682,536<!--/v-->; H/13 = <!--v:earthAxialPeriod-->25,794<!--/v-->; H/16 = <!--v:earthPeriPeriod-->20,957<!--/v-->; System Reset year ≈ −<!--v:systemResetYearPlain-->2,649,854<!--/v-->) are J2000-anchored. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling the literal year counts proportionally; PSI and K, being derived from J2000 Earth, would be re-evaluated at any other epoch by the same closed loop using that epoch's Earth values. The architecture of the loop — what derives from what — is permanent; the numerical snapshot is the J2000 instance.
 
 ## The Two Constants
 
@@ -17,8 +17,8 @@ Both constants are derived from Earth alone:
 
 | Constant | Formula | Value | Controls |
 |----------|---------|-------|----------|
-| **PSI** (ψ) | d × inclAmp × √m | 3.307 × 10⁻³ | Inclination amplitudes |
-| **K** | e_amp × √m × a^1.5 / (sin(tiltMean) × √d) | 3.415 × 10⁻⁶ | Eccentricity amplitudes |
+| **PSI** (ψ) | d × inclAmp × √m | <!--v:psiValue-->3.3069 × 10⁻³<!--/v--> | Inclination amplitudes |
+| **K** | e_amp × √m × a^1.5 / (sin(tiltMean) × √d) | <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> | Eccentricity amplitudes |
 
 Each planet receives a Fibonacci divisor **d** from the unique mirror-symmetric configuration:
 
@@ -115,7 +115,7 @@ The base eccentricities (mean eccentricities around which each planet oscillates
 
 ## System Reset
 
-The System Reset epoch is the year where all 7 non-Earth planets simultaneously reach their inclination extremes. For the default configuration, it falls at anchor n=7 within the Solar System Resonance Cycle (≈ −2,649,854). Other viable configurations may have a different optimal anchor (n ∈ {0..7}); the deep analysis in `balance-search.js` determines the best n for each. **Each candidate's eccentricity balance is computed using its OWN bases** — recomputed with the candidate's d-values, anti-phase assignments, and optimal anchor — not the default config's bases. This makes the ranking a fair physical comparison.
+The System Reset epoch is the year where all 7 non-Earth planets simultaneously reach their inclination extremes. For the default configuration, it falls at anchor n=7 within the Solar System Resonance Cycle (≈ −<!--v:systemResetYearPlain-->2,649,854<!--/v-->). Other viable configurations may have a different optimal anchor (n ∈ {0..7}); the deep analysis in `balance-search.js` determines the best n for each. **Each candidate's eccentricity balance is computed using its OWN bases** — recomputed with the candidate's d-values, anti-phase assignments, and optimal anchor — not the default config's bases. This makes the ranking a fair physical comparison.
 
 - In-phase planets (Mercury, Venus, Mars, Jupiter, Uranus, Neptune): all at **minimum** inclination
 - Anti-phase planet (Saturn): also at **minimum** inclination in the model's sign convention. The "anti-phase" designation refers to Saturn's *opposite contribution to the angular-momentum-weighted balance sum*, not the opposite inclination extreme. Concretely: the model formula `i(t) = mean + antiPhaseSign × amp × cos(ω̃ − cycleAnchor)` uses `antiPhaseSign = −1` for Saturn so that its oscillation enters the balance sum with reversed sign; at the System Reset all 7 planets land at MIN inclination simultaneously, and Saturn's reversed sign is what makes the weighted sum cancel to ≈ 99.998%.

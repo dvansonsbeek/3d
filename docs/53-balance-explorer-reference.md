@@ -135,7 +135,7 @@ The ICRF perihelion period for each planet, editable for exploration. The period
 
 ### Earth Row (Locked)
 
-Earth's controls are locked (grayed out): phase = 21.77°, d = 3, in-phase group. Earth's amplitude is independently calibrated from the obliquity rate (0.63603°), so its parameters cannot be freely varied.
+Earth's controls are locked (grayed out): phase = <!--v:earthInclCycleAnchor-->21.77<!--/v-->°, d = 3, in-phase group. Earth's amplitude is independently calibrated from the obliquity rate (<!--v:earthInclAmp-->0.63605<!--/v-->°), so its parameters cannot be freely varied.
 
 ### Instant Recalculation
 
@@ -225,7 +225,7 @@ amplitude = ψ / (3 × √m_Earth)
           = 0.636°
 ```
 
-The model's calibrated value (0.63603°) is 0.47% higher, tuned to match IAU observations. Changing Earth's d would break this relationship.
+The model's calibrated value (<!--v:earthInclAmp-->0.63605<!--/v-->°) is 0.47% higher, tuned to match IAU observations. Changing Earth's d would break this relationship.
 
 ---
 

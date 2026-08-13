@@ -168,7 +168,7 @@ on its orbit to align cardinal points (solstices/equinoxes) with observed dates.
 |-----------|-------|----------------|
 | `eocEccentricity` | 0.007753 | **Derived**: `eccentricityDerivedMean - eccentricityBase / 2` |
 | `perihelionPhaseOffset` | ~0.51 deg | **Derived**: from EP1 precession phase + correctionSun + perihelion date |
-| `correctionSun` | 0.49552 | **Tuned**: aligns summer solstice timing + Sun RA |
+| `correctionSun` | <!--v:correctionSunDeg-->0.49688<!--/v--> | **Tuned**: aligns summer solstice timing + Sun RA |
 | `useVariableSpeed` | true | Toggle |
 
 The geometric orbit offset parameters are **unchanged**:
@@ -262,7 +262,7 @@ M = theta - perihelionPhase
 The perihelion phase is computed from:
 - Sun's theta at model start: `-correctionSun * PI/180`
 - Angular distance from model start to perihelion: `2*PI * (days_since_perihelion / year_length)`
-- Earth perihelion 2000: JD 2451547.042 (January 3.542), stored in `ASTRO_REFERENCE.perihelionPassageJ2000_JD`
+- Earth perihelion 2000: JD <!--v:perihelionPassageJD-->2451547.042<!--/v--> (January 3.542), stored in `ASTRO_REFERENCE.perihelionPassageJ2000_JD`
 - Plus the derived `perihelionPhaseOffset`
 
 The phase precesses dynamically at `2*PI / (H/16)` radians per simulation year.
@@ -356,7 +356,7 @@ divisor type, applying ONLY:
 
 | Allowed | Example divisors |
 |---|---|
-| Year-multiple: divisor ≥ round(H) AND divisor % round(H) == 0 | <!--v:HPlain-->335317<!--/v--> (1 yr), 670634 (½ yr), 1005951 (⅓ yr), … |
+| Year-multiple: divisor ≥ round(H) AND divisor % round(H) == 0 | <!--v:HPlain-->335317<!--/v--> (1 yr), 670634 (½ yr), <!--v:threeH-->1,005,951<!--/v--> (⅓ yr), … |
 | Small precession: divisor ∈ [1, 20] | 3, 5, 8, 13, 16 (Earth Fibonacci hierarchy) |
 | Lunar precession ICRF | 18015 (nodal, 18.6 yr), 37899 (apsidal, 8.85 yr) |
 
@@ -380,7 +380,7 @@ After the runtime filter:
 |---:|---|---:|---:|---:|
 | <!--v:HPlain-->335317<!--/v--> | 1 yr | +0.076405 ° | +0.013550 ° | ~280" (dominant) |
 | 670634 | ½ yr | +0.002478 ° | +0.000226 ° | ~9" |
-| 1005951 | ⅓ yr | +0.000033 ° | +0.000009 ° | ~0.1" |
+| <!--v:threeH-->1,005,951<!--/v--> | ⅓ yr | +0.000033 ° | +0.000009 ° | ~0.1" |
 | ~~168~~ | ~~1996 yr~~ | ~~+0.004832 °~~ | ~~−0.004998 °~~ | ~~~25" — FILTERED OUT~~ |
 
 `SUN_LONGITUDE_MEAN = -0.001122 °` (~−4", the constant DC component from
