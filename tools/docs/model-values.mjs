@@ -1572,6 +1572,23 @@ export const VALUES = {
         note: 'ecliptic lattice rate − H/13 frame term',
       };
     }
+    // Minor bodies ride the same identity over their stored fractions. All
+    // four currently store the [1,1] default (ecliptic period = H → ICRF
+    // H/12, retrograde) — the fraction is a default, not a fitted claim; a
+    // per-body fit would flow through automatically.
+    for (const [body, el] of Object.entries(model.additionalBodies)) {
+      if (body.startsWith('_') || !el?.perihelionEclipticFraction) continue;
+      out[`${body}PeriPeriodICRF`] = {
+        get: () => {
+          const [num, den] = el.perihelionEclipticFraction;
+          const n8 = (8 * den / Math.abs(num)) * Math.sign(num);
+          return (8 * C.H) / Math.abs(n8 - 104);
+        },
+        render: (v) => thousands(Math.round(v)),
+        unit: 'yr',
+        note: 'ecliptic lattice rate − H/13 frame term (fraction is the [1,1] default, not fitted)',
+      };
+    }
     return out;
   })(),
 

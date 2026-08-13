@@ -307,7 +307,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 | Saturn | 0.984965 | 0.065193 | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | 8H/169 ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr |
 | Uranus | <!--v:uranusInclMean-->1.015182<!--/v--> | <!--v:uranusInclAmp-->0.023831<!--/v--> | 0.99 - 1.04 | 21.33° | H/10 ≈ <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr |
 | Neptune | <!--v:neptuneInclMean-->0.743803<!--/v--> | <!--v:neptuneInclAmp-->0.013551<!--/v--> | 0.73 - 0.76 | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | 2H/25 ≈ <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr |
-| Pluto | <!--v:plutoInclMean-->15.716200<!--/v--> | <!--v:plutoInclAmp-->0.717024<!--/v--> | 15.00 - 16.43 | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | H/14 ≈ 23,951 yr |
+| Pluto | <!--v:plutoInclMean-->15.716200<!--/v--> | <!--v:plutoInclAmp-->0.717024<!--/v--> | 15.00 - 16.43 | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | H/12 ≈ <!--v:plutoPeriPeriodICRF-->27,943<!--/v--> yr |
 
 **Formula**: `i(t) = mean + amplitude × cos(ω̃_ICRF(t) - cycleAnchor)` (Saturn: sign flipped, anti-phase)
 

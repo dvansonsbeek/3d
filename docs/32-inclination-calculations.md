@@ -161,7 +161,7 @@ The inclination oscillation period equals the absolute ICRF perihelion period fo
 | Saturn | `−8H/65` | `8H/169` ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr | Retrograde |
 | Uranus | `H / 3` | `H/10` ≈ <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr | Retrograde |
 | Neptune | `H × 2` | `2H/25` ≈ <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr | Retrograde |
-| Pluto | `H` | `H/14` ≈ 23,951 yr | Retrograde |
+| Pluto | `H` | `H/12` ≈ <!--v:plutoPeriPeriodICRF-->27,943<!--/v--> yr | Retrograde |
 
 For computed period values, see [Constants Reference](20-constants-reference.md).
 
