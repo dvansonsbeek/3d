@@ -5,6 +5,7 @@
  *
  *   node packages/api/src/server.js [port]
  */
+import { Buffer } from 'node:buffer';
 import { createServer } from 'node:http';
 import { URL } from 'node:url';
 import { createApi } from './app.js';

@@ -13,6 +13,7 @@
  * in ../openapi.json; the conformance gate keeps handler and contract equal.
  */
 import { readFileSync } from 'node:fs';
+import { URL } from 'node:url';
 import { createModel, DEFAULT_CONSTANTS } from '../../physics/src/index.js';
 import * as curves from '../../physics/src/reference/published-curves.cjs';
 import { MODEL_VALUES, MODEL_VALUES_META } from '../../model-values/src/index.js';
