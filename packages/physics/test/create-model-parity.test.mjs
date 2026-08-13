@@ -93,9 +93,52 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   if (!(Math.abs(jdSS - 2451716.575) < 0.1)) failures.push(`SS 2000 JD: ${jdSS}`);
 }
 
+// Lunar chain (slice-2b): the package assembly vs the engine's series probe
+// and ΔT-on-JD convention. Same shared factories, same wiring — the expected
+// agreement is BIT-EXACT (tolerance 0); any drift means the wiring diverged.
+{
+  const SG = require(join(ROOT, 'tools', 'lib', 'scene-graph.js'));
+  const MS = SG._moonSeriesForProbe();
+  // J2000 · 2024 Dallas totality · 1800 · JD0-era · Babylonian (−135 class)
+  const JDS = [2451545.0, 2460409.26, 2378496.5, 1721057.5, 1257207.5];
+  for (const jd of JDS) {
+    check('moonLonDeg', jd, model.moon.lonDegAtJD(jd), MS.truncatedLonDeg(jd), 0);
+    check('moonBetaDeg', jd, model.moon.betaDegAtJD(jd), MS.truncatedBetaDeg(jd), 0);
+    check('moonDistanceKm', jd, model.moon.distanceKmAtJD(jd), MS.truncatedDistanceKm(jd), 0);
+    check('frameworkDeltaT', jd, model.eclipse.deltaTSecondsAtJD(jd), dt.frameworkDeltaT(jd), 0);
+  }
+}
+
+// Eclipse finders: the 2024 canon — 2 solar (Apr 8 Total, Oct 2 Annular) and
+// 2 lunar (Mar 25 Penumbral, Sep 18 Partial) at their known greatest-eclipse
+// JDs. Semantic anchors, not engine deltas: the finder is package code on the
+// already-bit-exact series, so what needs pinning is the event list itself.
+{
+  const solar = model.eclipse.findSolarInRange(2460310.5, 2460676.5);
+  const lunar = model.eclipse.findLunarInRange(2460310.5, 2460676.5);
+  /** @type {Array<[number, string]>} */
+  const expectSolar = [[2460409.263, 'Total'], [2460586.283, 'Annular']];
+  /** @type {Array<[number, string]>} */
+  const expectLunar = [[2460394.794, 'Penumbral'], [2460571.609, 'Partial']];
+  if (solar.length !== 2) failures.push(`eclipse: ${solar.length} solar events in 2024, expected 2`);
+  if (lunar.length !== 2) failures.push(`eclipse: ${lunar.length} lunar events in 2024, expected 2`);
+  expectSolar.forEach(([jd, type], i) => {
+    const e = solar[i];
+    if (!e || e.type !== type || Math.abs(e.jd - jd) > 0.01) {
+      failures.push(`eclipse solar[${i}]: got ${e && `${e.jd.toFixed(3)} ${e.type}`}, expected ${jd} ${type}`);
+    }
+  });
+  expectLunar.forEach(([jd, type], i) => {
+    const e = lunar[i];
+    if (!e || e.type !== type || Math.abs(e.jd - jd) > 0.01) {
+      failures.push(`eclipse lunar[${i}]: got ${e && `${e.jd.toFixed(3)} ${e.type}`}, expected ${jd} ${type}`);
+    }
+  });
+}
+
 if (failures.length) {
   console.error(`createModel parity — ${failures.length} FAILURE(S):`);
   for (const f of failures) console.error('  ' + f);
   process.exit(1);
 }
-console.log(`createModel parity — ${YEARS.length} epochs x 5 epoch quantities + deltaT trend + identity + counterfactual + cardinal: PASS`);
+console.log(`createModel parity — ${YEARS.length} epochs x 5 epoch quantities + deltaT trend + identity + counterfactual + cardinal + lunar chain (bit-exact) + 2024 eclipse canon: PASS`);

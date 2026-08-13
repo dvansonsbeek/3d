@@ -25,6 +25,13 @@ import { createCardinalModel } from './cardinal/index.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
 import { createDeepTimeLod } from './deltat/deep-time.cjs';
 import { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
+import { createMoonEccChannel } from './moon/ecc-channel.cjs';
+import { createMoonMonthChain } from './moon/month-chain.cjs';
+import { createChainCycleIntegrator } from './chain-cycles/index.cjs';
+import { createMoonArguments, jdToDecimalYear } from './moon/arguments.cjs';
+import { createMoonSeries } from './moon/series.cjs';
+import { createEclipseFinders } from './eclipse/finders.cjs';
+import { driver2PeriodSecondsAtAge } from './planets/orbit-chain.cjs';
 
 /**
  * RA-day-offset Fourier amplitudes (ms). KNOWN EXCEPTION carried over from
@@ -35,6 +42,17 @@ import { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
 const RA_DAY_OFFSET_MEAN_MS = -14.194;
 const RA_DAY_OFFSET_ECC_MS = -5.64;
 const RA_DAY_OFFSET_OBLIQ_MS = -1.684;
+
+/**
+ * Moon-channel eccentricity sensitivities (perigee/node), the [g/g₀]^s
+ * exponents of the factored deep-time law. Same known-exception class as the
+ * RA offsets above: single source src/script.js _FW_MOON, mirrored as
+ * literals in tools/lib/deep-time.js (_ECOMP_S_W/_ECOMP_S_N). Both are
+ * Meeus-effective — S_N moved 1.0 → 1.018 with the v4 frame-attribution
+ * batch.
+ */
+const MOON_ECC_SENSITIVITY_PERIGEE = 2.407;
+const MOON_ECC_SENSITIVITY_NODE = 1.018;
 
 /**
  * Assemble the model surfaces from a resolved constants context + fitted
@@ -536,6 +554,235 @@ export function assembleModel(C, F) {
   /** JD(TT) at a model year (SI axis). @param {number} year @returns {number} */
   const jdFromYear = (year) => startmodelJD + (year - startModelYearWithCorrection) * siTropicalYearDays;
 
+  // ── Lunar theory: the shared-chain assembly (§7a slice-2b) ────────────────
+  // Wiring mirrors the engine call sites exactly — tools/lib/deep-time.js
+  // (ecc channel, month chain, J2000 precession anchors),
+  // tools/lib/scene-graph.js (chain-cycles, arguments, series) and
+  // tools/verify/eclipse-audit.js (finders). Deep-time and framework-native
+  // are hardwired ON here: they are the shipped defaults; the A/B env
+  // toggles (SG_DEEP_TIME/MOON_ARGS_PURE_MEEUS) stay an engine concern.
+  const j2000JD = 2451545.0;
+  const julianCenturyDays = 36525;
+
+  // J2000 Moon precession anchors (Option C+ — of-date observational anchors
+  // in the legacy-'ICRF'-named inputs; the E values are star-referenced ∓13)
+  const nApsidalIJ2000 = Math.round((8 * totalDaysInH) / C.moonReference.moonApsidalPrecessionDaysInputICRF) / 8;
+  const nNodalIJ2000 = Math.round((8 * totalDaysInH) / C.moonReference.moonNodalPrecessionDaysInputICRF) / 8;
+  const nApsidalEJ2000 = nApsidalIJ2000 - 13;
+  const nNodalEJ2000 = nNodalIJ2000 + 13;
+  const moonApsidalJ2000Seconds = (totalDaysInH / nApsidalEJ2000) * meanLengthOfDay;
+  const moonNodalJ2000Seconds = (totalDaysInH / nNodalEJ2000) * meanLengthOfDay;
+  const moonSiderealMonthJ2000Seconds = moonSiderealMonth * meanLengthOfDay;
+
+  // 8H-lattice derived months (constants.js §Moon derived months)
+  const nSid = Math.round((8 * totalDaysInH) / moonSiderealMonthInput) / 8;
+  const moonTropicalMonthDays = totalDaysInH / (nSid + 13);
+  const moonAnomalisticMonthDays = totalDaysInH / (nSid - nApsidalEJ2000);
+  const moonSynodicMonthDays = totalDaysInH / (nSid + 13 - H);
+
+  // The framework H/3 eccentricity line (the Moon channel's view of the
+  // wobble movement — NOT the H/16 orbital eccentricity above)
+  const moonEcc = createMoonEccChannel({
+    cyclesBetween,
+    eccentricityBase,
+    perihelionLongitudeJ2000Deg: C.earthOrbital.earthPerihelionLongitudeJ2000,
+    inclinationCycleAnchorDeg: C.earthOrbital.earthInclinationCycleAnchor,
+  });
+
+  // Layer-2 month/precession chain (Brouwer-Clemence m² scaling × the
+  // e_E-line modulation)
+  const moonChain = createMoonMonthChain({
+    constants: {
+      aMoonNowMetres: EPOCH_PARAMS.moonDistanceNowM,
+      alpha1PerMa: EPOCH_PARAMS.alpha1PerMa,
+      alpha3PerMa3: EPOCH_PARAMS.alpha3PerMa3,
+      alpha4PerMa4: EPOCH_PARAMS.alpha4PerMa4,
+      gmEarthMoonM3PerS2: EPOCH_PARAMS.gmEarthMoonM3S2,
+      massRatioEarthMoon: MASS_RATIO_EARTH_MOON,
+      moonSiderealMonthInputDays: moonSiderealMonthInput,
+      holisticYearJ2000: H,
+      meanSiderealYearJ2000Seconds: meanSiderealYearSeconds,
+      nApsidalOfDateJ2000: nApsidalIJ2000,
+      nNodalOfDateJ2000: nNodalIJ2000,
+      moonApsidalJ2000Seconds,
+      moonNodalJ2000Seconds,
+      moonSiderealMonthJ2000Seconds,
+      sPerigee: MOON_ECC_SENSITIVITY_PERIGEE,
+      sNode: MOON_ECC_SENSITIVITY_NODE,
+    },
+    fns: {
+      meanLodSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.lodSecondsAtAge(tMa),
+      meanSiderealYearSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.siderealYearSecondsAtAge(tMa),
+      meanHAtAge: /** @param {number} tMa */ (tMa) => deepLod.hAtAge(tMa),
+      modulation: /** @param {number} tMa @param {number} s */ (tMa, s) => moonEcc.modulation(tMa, s),
+    },
+  });
+
+  // Chain-cycle integrator. S5/S12 conventions: age anchor = startmodelYear
+  // (the scene's t_Ma convention), grid anchor C(2000) = 0 — grid anchor ≠
+  // age anchor, deliberately. One stable period fn per chain so the shared
+  // Float64Array tables key correctly and persist.
+  const chainCycles = createChainCycleIntegrator({
+    ageAnchorYear: startmodelYear,
+    tropicalYearSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.tropicalYearSecondsAtAge(tMa),
+    tropicalYearJ2000Seconds: meanTropicalYearJ2000Seconds,
+    isDeepTime: () => true,
+  });
+  /** @param {number} tMa @returns {number|null} */
+  const nodalMonthPeriodFn = (tMa) => moonChain.nodalMonthSecondsAtAge(tMa);
+  /** @param {number} tMa @returns {number|null} */
+  const tropicalMonthPeriodFn = (tMa) => moonChain.tropicalMonthSecondsAtAge(tMa);
+  /** @param {number} tMa @returns {number|null} */
+  const anomalisticMonthPeriodFn = (tMa) => moonChain.anomalisticMonthSecondsAtAge(tMa);
+  const jupiterT0Seconds = C.planetOrbitalElements.jupiter.solarYearInput * 86400;
+  /** @param {number} tMa @returns {number} */
+  const jupiterPeriodFn = (tMa) => driver2PeriodSecondsAtAge(tMa, jupiterT0Seconds, EPOCH_PARAMS.solarMassLossFracPerYear);
+  /** @param {number} a @param {number} b @returns {number|null} */
+  const mcDraconic = (a, b) => chainCycles.cyclesBetween(nodalMonthPeriodFn, a, b);
+  /** @param {number} a @param {number} b @returns {number|null} */
+  const mcTropical = (a, b) => chainCycles.cyclesBetween(tropicalMonthPeriodFn, a, b);
+  /** @param {number} a @param {number} b @returns {number|null} */
+  const mcAnomalistic = (a, b) => chainCycles.cyclesBetween(anomalisticMonthPeriodFn, a, b);
+  /** @param {number} a @param {number} b @returns {number|null} */
+  const mcJupiter = (a, b) => chainCycles.cyclesBetween(jupiterPeriodFn, a, b);
+  /** @param {number} a @param {number} b @returns {number|null} */
+  const mcApsidalOfDate = (a, b) => {
+    const t = mcTropical(a, b), n = mcAnomalistic(a, b);
+    return (t === null || n === null) ? null : t - n;
+  };
+  /** @param {number} a @param {number} b @returns {number|null} */
+  const mcNodalOfDate = (a, b) => {
+    const dr = mcDraconic(a, b), t = mcTropical(a, b);
+    return (dr === null || t === null) ? null : dr - t;
+  };
+
+  // Snapshot-phase obliquity — the engine's computeObliquityEarth convention
+  // for the lunar chain (linear H-lattice phase; orbital-engine.js). NOT the
+  // integrated-phase display obliquity above — the chain was certified
+  // against this form.
+  /** @param {number} year @returns {number} */
+  const obliquitySnapshotDeg = (year) => {
+    const t = year - balancedYear;
+    let obliq = solsticeObliquityMean;
+    for (const [div, sinC, cosC] of F.SOLSTICE_OBLIQUITY_HARMONICS) {
+      const ph = (2 * Math.PI * t) / (H / div);
+      obliq += sinC * Math.sin(ph) + cosC * Math.cos(ph);
+    }
+    return obliq;
+  };
+
+  // The argument skeleton (the _FW_MOON bundle; Sun secular deviations on
+  // the CALENDAR year coordinate — S3)
+  const moonArgs = createMoonArguments({
+    constants: {
+      j2000JD,
+      julianCenturyDays,
+      holisticYearJ2000: H,
+      balancedYearJ2000: balancedYear,
+      meanSolarYearDays,
+      meanAnomalisticYearDays,
+      tropicalYearHarmonics: F.TROPICAL_YEAR_HARMONICS,
+      anomalisticYearHarmonics: F.ANOMALISTIC_YEAR_HARMONICS,
+      eccentricityJ2000: C.earthOrbital.earthEccentricityJ2000,
+      eccentricityDotJ2000: C.earthOrbital.earthEccentricityDotJ2000,
+      eccentricityDotDotJ2000: C.earthOrbital.earthEccentricityDotDotJ2000,
+      elpEarthFigureJ2ArcsecPerCy2: C.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.earthFigureJ2,
+      elpGeneralPrecessionPA_T2ArcsecPerCy2: C.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976,
+      eccE0: moonEcc.e0,
+    },
+    fns: {
+      eccAt: /** @param {number} tYr */ (tYr) => moonEcc.eccAt(tYr),
+      channelIntegral: /** @param {number} T @param {number} s */ (T, s) => moonEcc.channelIntegral(T, s),
+      computeObliquityEarth: obliquitySnapshotDeg,
+      jdToSIyear: yearFromJD,
+      tropicalOrbitsBetween: mcTropical,
+      apsidalOfDateCyclesBetween: mcApsidalOfDate,
+      nodalOfDateCyclesBetween: mcNodalOfDate,
+      cyclesBetween,
+      isDeepTime: () => true,
+      isFrameworkNative: () => true,
+    },
+  });
+
+  // UT→TT on the CALENDAR decimal-year coordinate (script.js Phase 9.16 —
+  // a linear-year approximation here once cost ~5–6 s of ΔT and ~1e-3° of
+  // Moon longitude at the Babylonian epochs)
+  /** @param {number} jd @returns {number} */
+  const jdTTFromUT = (jd) => {
+    const tMa = (startmodelYear - jdToDecimalYear(jd)) / 1e6;
+    const dT = meanDeltaTSecondsAtAge(tMa);
+    return Number.isFinite(dT) ? jd + dT / 86400 : jd;
+  };
+  // ΔT at a JD on the CALENDAR-year axis (mirrors deep-time frameworkDeltaT;
+  // NOT deltaTSeconds above, which adds the deltaTStart anchor)
+  /** @param {number} jd @returns {number} */
+  const frameworkDeltaTSecondsAtJD = (jd) => {
+    const decYear = startmodelYear + (jd - startmodelJD) / meanSolarYearDays;
+    const dT = meanDeltaTSecondsAtAge((startmodelYear - decYear) / 1e6);
+    return Number.isFinite(dT) ? dT : 0;
+  };
+
+  // Bounded Meeus E-factor from the H/3 line (framework-native branch only;
+  // the pure-Meeus polynomial A/B branch stays engine-local)
+  /** @param {number} dDays @returns {number} */
+  const fwEFactor = (dDays) => moonEcc.eFactorAt(dDays / C.foundational.inputmeanlengthsolaryearindays);
+
+  // D2 derived additional-argument rates (deg/cy, J2000 8H-lattice months;
+  // record: tools/explore/derive-a1a2a3.js)
+  const fwA2RateDegPerCy = 2 * ((360 * 36525) / moonTropicalMonthDays)
+    - (360 * 36525) / moonAnomalisticMonthDays
+    - 2 * ((360 * 36525) / C.planetOrbitalElements.jupiter.solarYearInput);
+  const fwA3RateDegPerCy = (360 * 36525) / moonSiderealMonth;
+
+  // Meeus Ch. 47 truncated series (framework-native arguments + E-factor)
+  const moonSeries = createMoonSeries({
+    constants: {
+      moonL: F.MEEUS_LONGITUDE_TERMS,
+      moonB: F.MEEUS_LATITUDE_TERMS,
+      j2000JD,
+      julianCenturyDays,
+      moonMeeusLpCorrectionDeg: C.moon.moonMeeusLpCorrection,
+      fwA2RateDegPerCy,
+      fwA3RateDegPerCy,
+    },
+    fns: {
+      argsAt: /** @param {number} jdTT */ (jdTT) => moonArgs.argsAt(jdTT),
+      eFactorForD: fwEFactor,
+      eFactorAtJdTT: /** @param {number} jdTT */ (jdTT) => fwEFactor(jdTT - j2000JD),
+      getMoonDistanceKm: () => moonDistanceKm,
+      getEccentricityBase: () => C.moonReference.moonOrbitalEccentricityBase,
+      deltaTSeconds: /** @param {number} jd */ (jd) => (jdTTFromUT(jd) - jd) * 86400,
+      jdToSIyear: yearFromJD,
+      tropicalOrbitsBetween: mcTropical,
+      apsidalOfDateCyclesBetween: mcApsidalOfDate,
+      cyclesBetween,
+      jupiterOrbitsBetween: mcJupiter,
+      isDeepTime: () => true,
+      isFrameworkNative: () => true,
+    },
+  });
+
+  // Eclipse finders — wired like the engine probe (tools/verify/
+  // eclipse-audit.js). The finder axis is JD(UT): the series wrapper applies
+  // UT→TT internally. Ground-track/umbra paths deliberately absent: the
+  // scene-umbra projection navigates the Tychosium-derived scaffold, which
+  // never enters this package (§2h).
+  const eclipseFinders = createEclipseFinders({
+    moonLonDegAt: /** @param {number} jd */ (jd) => moonSeries.truncatedLonDeg(jd),
+    moonBetaDegAt: /** @param {number} jd */ (jd) => moonSeries.truncatedBetaDeg(jd),
+    moonDistanceKmAt: /** @param {number} jd */ (jd) => moonSeries.truncatedDistanceKm(jd),
+    deltaTSecondsAt: frameworkDeltaTSecondsAtJD,
+    getSynodicMonthDays: () => moonSynodicMonthDays,
+    getSunDistanceKm: () => currentAUDistance,
+    constants: {
+      rEarthMetres: (C.bodyDiametersKm.earth / 2) * 1000,
+      moonDiameterKm: C.bodyDiametersKm.moon,
+      sunDiameterKm: C.bodyDiametersKm.sun,
+      j2000JD,
+      julianCenturyDays,
+    },
+  });
+
   // ── The assembled surface ─────────────────────────────────────────────────
   return Object.freeze({
     time: Object.freeze({
@@ -582,6 +829,18 @@ export function assembleModel(C, F) {
     moon: Object.freeze({
       distanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,
       siderealMonthDaysAtYear: moonSiderealMonthDaysAt,
+      synodicMonthDays: moonSynodicMonthDays,
+      // The apparent-position chain (truncated Meeus Ch. 47 series on
+      // framework-native arguments). JD(UT) axis — UT→TT applied internally.
+      lonDegAtJD: /** @param {number} jd @returns {number} */ (jd) => moonSeries.truncatedLonDeg(jd),
+      betaDegAtJD: /** @param {number} jd @returns {number} */ (jd) => moonSeries.truncatedBetaDeg(jd),
+      distanceKmAtJD: /** @param {number} jd @returns {number} */ (jd) => moonSeries.truncatedDistanceKm(jd),
+    }),
+    eclipse: Object.freeze({
+      sunLonDegAtJD: /** @param {number} jd @returns {number} */ (jd) => eclipseFinders.sunLonDegAt(jd),
+      findLunarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findLunarEclipsesInRange(jdStart, jdEnd),
+      findSolarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findSolarEclipsesInRange(jdStart, jdEnd),
+      deltaTSecondsAtJD: frameworkDeltaTSecondsAtJD,
     }),
     climate: Object.freeze({
       l1OrbitalPermil: evalClimateL1,

@@ -88,6 +88,8 @@ const SAMPLE_REQUESTS = [
   '/v1/climate?start=0&stop=100000&step=50000',
   '/v1/cross-validation/obliquity-berger1978?years=2000,-100000',
   '/v1/cross-validation/deltat-stephenson2016?year=1000',
+  '/v1/eclipses/solar?startYear=2024&stopYear=2025',
+  '/v1/eclipses/lunar?startJd=2460310.5&stopJd=2460676.5',
 ];
 /** @param {string} url @returns {{path: string, query: Record<string, string>}} */
 const parseUrl = (url) => {
@@ -128,6 +130,36 @@ for (const url of SAMPLE_REQUESTS) {
   const viaYearNum = JSON.parse(handle({ method: 'GET', path: '/v1/epoch', query: { jd: '2451545' } }).body).data.epochs[0].year;
   const viaYear = dataOf(`/v1/earth?year=${viaYearNum}`).years[0];
   if (viaJd.obliquityDeg !== viaYear.obliquityDeg) failures.push('jd= vs year= inequivalent on /v1/earth');
+}
+
+// ── Eclipses: the 2024 canon, UT timescale, refusals ────────────────────────
+{
+  const solar = JSON.parse(handle({ method: 'GET', path: '/v1/eclipses/solar', query: { startYear: '2024', stopYear: '2025' } }).body);
+  if (solar.meta.timescale !== 'UT') failures.push(`eclipses timescale: ${solar.meta.timescale}, want UT`);
+  if (solar.data.count !== 2) failures.push(`eclipses solar 2024 count: ${solar.data.count}, want 2`);
+  const apr8 = solar.data.events[0];
+  if (!apr8 || apr8.type !== 'Total' || Math.abs(apr8.jd - 2460409.263) > 0.01) {
+    failures.push(`eclipses: 2024-04-08 Total not found (got ${apr8 && `${apr8.jd} ${apr8.type}`})`);
+  }
+  if (apr8 && !(apr8.jdTT > apr8.jd)) failures.push('eclipses: jdTT must exceed jd (positive deltaT in 2024)');
+  const lunar = JSON.parse(handle({ method: 'GET', path: '/v1/eclipses/lunar', query: { startJd: '2460310.5', stopJd: '2460676.5' } }).body);
+  if (lunar.data.count !== 2 || lunar.data.events[1].type !== 'Partial') {
+    failures.push(`eclipses lunar 2024: count ${lunar.data.count}, [1] ${lunar.data.events[1] && lunar.data.events[1].type}`);
+  }
+  // Refusals: no window / both window forms → 400; oversized window → 422; unknown kind → 404.
+  const cases = [
+    ['/v1/eclipses/solar', 400],
+    ['/v1/eclipses/solar?startYear=2000&stopYear=2001&startJd=1&stopJd=2', 400],
+    ['/v1/eclipses/solar?startYear=2000&stopYear=1999', 400],
+    ['/v1/eclipses/solar?startYear=0&stopYear=1000', 422],
+    ['/v1/eclipses/annular?startYear=2024&stopYear=2025', 404],
+  ];
+  for (const [url, want] of cases) {
+    const { path, query } = parseUrl(String(url));
+    const r = handle({ method: 'GET', path, query });
+    if (r.status !== want) failures.push(`eclipses refusal ${url}: status ${r.status}, want ${want}`);
+    if (!/problem\+json/.test(r.headers['content-type'] ?? '')) failures.push(`eclipses refusal ${url}: not problem+json`);
+  }
 }
 
 // ── Counterfactual POST: determinism, own hash, flow, refusals ──────────────

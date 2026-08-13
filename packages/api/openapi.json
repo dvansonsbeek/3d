@@ -94,6 +94,24 @@
     "/v1/cross-validation/{curve}": {
       "get": { "summary": "Model vs published reference curve (Berger 1978, La2004, Stephenson 2016)", "parameters": [{ "name": "curve", "in": "path", "required": true, "schema": { "type": "string", "enum": ["obliquity-berger1978", "eccentricity-berger1978", "obliquity-la2004", "eccentricity-la2004", "deltat-stephenson2016"] } }, { "$ref": "#/components/parameters/year" }, { "$ref": "#/components/parameters/jd" }, { "$ref": "#/components/parameters/years" }, { "$ref": "#/components/parameters/jds" }, { "$ref": "#/components/parameters/start" }, { "$ref": "#/components/parameters/stop" }, { "$ref": "#/components/parameters/step" }], "responses": { "200": { "description": "Envelope" }, "404": { "$ref": "#/components/responses/Problem" }, "422": { "$ref": "#/components/responses/Problem" } } }
     },
+    "/v1/eclipses/{kind}": {
+      "get": {
+        "summary": "Geocentric eclipse search over a window: type, greatest-eclipse JD (UT + TT), magnitudes/ratio, beta, Moon distance. Ground tracks are a documented non-goal.",
+        "parameters": [
+          { "name": "kind", "in": "path", "required": true, "schema": { "type": "string", "enum": ["solar", "lunar"] } },
+          { "name": "startYear", "in": "query", "schema": { "type": "number" }, "description": "window start as a model year (pair with stopYear)" },
+          { "name": "stopYear", "in": "query", "schema": { "type": "number" }, "description": "window end as a model year" },
+          { "name": "startJd", "in": "query", "schema": { "type": "number" }, "description": "window start as JD on the UT axis (pair with stopJd)" },
+          { "name": "stopJd", "in": "query", "schema": { "type": "number" }, "description": "window end as JD on the UT axis" }
+        ],
+        "responses": {
+          "200": { "description": "Envelope (meta.timescale = UT; events at greatest eclipse)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Envelope" } } } },
+          "400": { "$ref": "#/components/responses/Problem" },
+          "404": { "$ref": "#/components/responses/Problem" },
+          "422": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
     "/v1/counterfactual": {
       "post": { "summary": "Inject overridden constants (§2d) — outputs carry the counterfactual's OWN constants hash; validation targets are refused", "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["overrides"], "properties": { "overrides": { "type": "object", "additionalProperties": { "type": "number" }, "maxProperties": 20 }, "year": { "type": "number", "default": 2000 } } } } } }, "responses": { "200": { "description": "Envelope (meta.constantsHash is the counterfactual's own; Cache-Control: no-store)" }, "400": { "$ref": "#/components/responses/Problem" }, "422": { "$ref": "#/components/responses/Problem" } } }
     }

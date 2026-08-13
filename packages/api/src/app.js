@@ -41,6 +41,7 @@ export const ROUTE_TEMPLATES = Object.freeze([
   '/v1/climate',
   '/v1/cross-validation/{curve}',
   '/v1/counterfactual',
+  '/v1/eclipses/{kind}',
 ]);
 
 /** Cross-validation curves: model quantity vs the published reference. */
@@ -65,6 +66,11 @@ const PLANET_ACCURACY = Object.freeze({
 
 const EPOCH_SECTIONS = Object.freeze(['h', 'lod', 'alpha', 'deltaT', 'siderealYearSeconds', 'moonDistanceKm']);
 const CARDINAL_TYPES = Object.freeze(['SS', 'WS', 'VE', 'AE']);
+
+/** Eclipse search: kinds and the per-request window cap (the finder scans
+ * ~60 steps per synodic month, so cost is linear in the window). */
+const ECLIPSE_KINDS = Object.freeze(['solar', 'lunar']);
+const MAX_ECLIPSE_WINDOW_YEARS = 500;
 
 /**
  * @returns {{ handle: (req: {method: string, path: string, query?: Record<string, string>, body?: string}) => {status: number, headers: Record<string, string>, body: string}, model: ReturnType<typeof createModel> }}
@@ -341,6 +347,72 @@ export function createApi() {
       const res = envelope({ identity: cf.identity, inputEcho: { path, overrides, year }, data });
       res.headers['cache-control'] = 'no-store';
       return res;
+    }
+
+    // ── /eclipses ───────────────────────────────────────────────────────────
+    // Geocentric eclipse search over a JD window. The finder axis is JD(UT):
+    // the model applies its own UT→TT internally, so the results carry both
+    // jd (UT) and jdTT. Ground tracks are a documented non-goal: the umbra
+    // path conventions navigate the scene scaffold, which never enters the
+    // package (§2h).
+    const eclipseMatch = path.match(new RegExp(`^/${API_VERSION}/eclipses/([a-z]+)$`));
+    if (eclipseMatch) {
+      if (!get()) return methodNotAllowed(method, path);
+      const kind = eclipseMatch[1];
+      if (!ECLIPSE_KINDS.includes(kind)) {
+        return problem(404, 'unknown-eclipse-kind', 'Unknown eclipse kind', `No eclipse kind "${kind}".`, { kinds: ECLIPSE_KINDS, instance: path });
+      }
+      const hasYears = query.startYear !== undefined || query.stopYear !== undefined;
+      const hasJds = query.startJd !== undefined || query.stopJd !== undefined;
+      if (hasYears === hasJds) {
+        return problem(400, 'invalid-eclipse-window', 'Invalid search window', 'Provide exactly one of startYear+stopYear (model years) or startJd+stopJd (JD, UT axis).');
+      }
+      let jdStart, jdEnd;
+      /** @type {Record<string, number>} */
+      let echo;
+      if (hasYears) {
+        const a = Number(query.startYear), b = Number(query.stopYear);
+        if (!Number.isFinite(a) || !Number.isFinite(b) || b <= a) {
+          return problem(400, 'invalid-eclipse-window', 'Invalid search window', 'startYear and stopYear must be finite numbers with stopYear > startYear.');
+        }
+        jdStart = model.time.jdFromYear(a);
+        jdEnd = model.time.jdFromYear(b);
+        echo = { startYear: a, stopYear: b };
+      } else {
+        jdStart = Number(query.startJd);
+        jdEnd = Number(query.stopJd);
+        if (!Number.isFinite(jdStart) || !Number.isFinite(jdEnd) || jdEnd <= jdStart) {
+          return problem(400, 'invalid-eclipse-window', 'Invalid search window', 'startJd and stopJd must be finite numbers with stopJd > startJd.');
+        }
+        echo = { startJd: jdStart, stopJd: jdEnd };
+      }
+      const windowYears = (jdEnd - jdStart) / 365.25;
+      if (windowYears > MAX_ECLIPSE_WINDOW_YEARS) {
+        return problem(422, 'window-too-large', 'Search window too large', `Maximum ${MAX_ECLIPSE_WINDOW_YEARS} years per request; got ${Math.round(windowYears)}.`, { maxYears: MAX_ECLIPSE_WINDOW_YEARS });
+      }
+      if (model.time.yearFromJD(jdStart) < -498e6 || model.time.yearFromJD(jdEnd) > 502e6) {
+        return problem(422, 'outside-validity', 'Epoch outside model validity', 'The search window must lie within the model validity span.', { minYear: -498e6, maxYear: 502e6 });
+      }
+      const events = kind === 'solar'
+        ? model.eclipse.findSolarInRange(jdStart, jdEnd)
+        : model.eclipse.findLunarInRange(jdStart, jdEnd);
+      const rows = events.map((e) => {
+        const deltaT = model.eclipse.deltaTSecondsAtJD(e.jd);
+        return { ...e, jdTT: e.jd + deltaT / 86400, deltaTSeconds: deltaT };
+      });
+      return envelope({
+        identity: id,
+        inputEcho: { path, kind, ...echo },
+        timescale: 'UT',
+        data: {
+          kind,
+          jdStart,
+          jdEnd,
+          count: rows.length,
+          events: rows,
+          note: 'Geocentric elements at greatest eclipse (minimum-gamma for solar, opposition for lunar). jd is on the UT axis; jdTT adds the model deltaT. Ground tracks are a documented non-goal (the umbra-path conventions belong to the scene, not the package).',
+        },
+      });
     }
 
     // ── /derivations ────────────────────────────────────────────────────────
