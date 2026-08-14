@@ -1216,6 +1216,14 @@ The framework's structural near-invariant `H × days/yr ≈ TOTAL_DAYS_IN_H = 12
 - The orbital year length (in seconds) must stay fixed
 - Therefore `days/yr = year_seconds / LOD` must change inversely with LOD
 
+**The exact form.** The near-invariant's drift is not noise — it is derivable, and correcting for it closes the relation exactly. Since `H ∝ LOD` (the structural identity), `H × days/yr = (H₀/LOD₀) × year_seconds(t)` — the drift *is* the Driver-2 year-length change. Kepler under adiabatic mass loss ties that change to the AU (`a ∝ 1/M`, `T ∝ M⁻²`, hence `T ∝ AU²`), so the composition
+
+```
+H(t) × days/yr(t) × (AU₀ / AU(t))² = TOTAL_DAYS_IN_H     (exact)
+```
+
+holds to <!--v:dayCountInvariantAuCorrectedDriftPpm-->0.17<!--/v--> ppm across the model's entire 4.5-Gyr domain (the residual being the second-order term of the linearized mass-loss forms) — one relation over H, LOD, year length and the AU, with the Moon entering through the angular-momentum budget that sets LOD. Verification: `tools/explore/deep-time-sensitivity.js` §5.
+
 Earth's rotation rate CANNOT change in isolation — angular momentum is conserved. So if Earth loses spin angular momentum, **something else must gain it**.
 
 The only mass available to absorb Earth's spin angular momentum is the Moon, via orbital coupling. Conservation gives:

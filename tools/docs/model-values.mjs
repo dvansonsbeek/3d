@@ -2226,6 +2226,20 @@ export const VALUES = {
       solarSystemShrinkDevonianPpm: { get: () => P().solarMassLossFracPerYear * 380e6 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
       solarSystemShrinkHadeanPpm: { get: () => P().solarMassLossFracPerYear * astro.knownValues.patternEarthAgeGyr * 1e9 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
       totalDaysInH: { get: totalDays0, render: (v) => thousands(Math.round(v)), note: 'H × mSY — the day-count near-invariant' },
+      dayCountInvariantAuCorrectedDriftPpm: {
+        get: () => {
+          // The EXACT form of the day-count invariant: H·(days/yr)·(AU₀/AU)²
+          // (the Kepler AU² factor absorbs the Driver-2 year-seconds drift;
+          // tools/explore/deep-time-sensitivity.js §5). Residual at a deep
+          // representative epoch (4.4 Ga) — the second-order linearization
+          // remainder, ~ppb-to-sub-ppm class.
+          const au0 = dtl().meanAuAtAge(0);
+          const K = (t) => dtl().meanHAtAge(t) * (dtl().meanSiderealYearSecondsAtAge(t) / dtl().meanLodSecondsAtAge(t));
+          return Math.abs((K(4400) * Math.pow(au0 / dtl().meanAuAtAge(4400), 2)) / K(0) - 1) * 1e6;
+        },
+        render: (v) => Number(v).toFixed(2),
+        unit: 'ppm',
+      },
       essrtEffectiveDomainGyr: { get: () => astro.knownValues.patternEarthAgeGyr + astro.knownValues.essrtFormulaHorizonGyr, render: (v) => Number(v).toFixed(1), unit: 'Gyr' },
       essrtCurrentEpochPct: {
         get: () => {

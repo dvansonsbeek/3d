@@ -166,9 +166,12 @@ async function main() {
     const o = observe(m);
     console.log(`   ${name}: H(gen) ${(((o.hGenesisYr / baseObs.hGenesisYr) - 1) * 100).toFixed(2)}% | Moon(gen) ${(((o.moonGenesisRE / baseObs.moonGenesisRE) - 1) * 100).toFixed(2)}%`);
   }
-  console.log('   → α₃ is the single most powerful lever at genesis (−23.7% Moon per +1%),');
-  console.log('     ahead of α₁ (−18.1%). The recession-history SHAPE — not any modern');
-  console.log('     constant — owns the early solar system.');
+  console.log('   → RECORDED FROM THE PRE-REGIME MODEL: α₃ was the strongest genesis');
+  console.log('     lever (−23.7% Moon per +1%, ahead of α₁ at −18.1%) — the finding');
+  console.log('     that motivated the regime-aware promotion. In the SHIPPED model');
+  console.log('     these rows read ~0: the genesis state is owned by the regime knots');
+  console.log('     and the Roche endpoint, not the quartic α terms — the promotion');
+  console.log('     moved the sensitivity to anchor-fitted, gate-bound parameters.');
   console.log('');
 
   // ── 4. Invariant scan: is there a hidden relation between H, Moon, AU,
@@ -205,6 +208,46 @@ async function main() {
   console.log('   T_apsidal·H over the last 2 Gyr); no undocumented H↔AU coupling in the');
   console.log('   model; the physical bridge between the chains is the solar tidal torque');
   console.log('   (~1/5 of braking) — the honest missing-component candidate (Phase 20).');
+  console.log('');
+
+  // ── 5. THE EXACT INVARIANT (2026-08-14 third pass) ───────────────────────
+  // The 0.08% drift of H·days/yr is not noise — it is DERIVABLE. Inside the
+  // model: H ∝ LOD exactly (the structural identity), so
+  //   H·(yearSec/LOD) = (H₀/LOD₀)·yearSec(t)
+  // — the drift IS the Driver-2 year-seconds change. Kepler under adiabatic
+  // mass loss ties that to the AU: a ∝ 1/M and T ∝ M⁻² give T ∝ a², i.e.
+  //   yearSec(t)/AU(t)² = const.
+  // Composing the two:
+  //
+  //   H(t) · daysPerYr(t) · (AU₀/AU(t))² = TOTAL_DAYS_IN_H   (exact)
+  //
+  // — ONE equation containing H, LOD, year length and AU; the Moon closes
+  // the web through the angular-momentum budget that sets LOD
+  // (2πI·α/LOD + m√(GM·a_moon)·√(1−e²) = L_EM). Measured across the full
+  // history the AU²-corrected form is flat to ~0.17 ppm at genesis — a
+  // ~4,800× tightening over the plain day-count near-invariant — and the
+  // residual is exactly the second-order term of the model's linearized
+  // mass-loss forms (frac·t)², i.e. the relation is exact in the model's
+  // own algebra.
+  {
+    const { createRequire } = await import('node:module');
+    const requireCjs = createRequire(`file://${process.argv[1]}`);
+    const dtm = requireCjs('../lib/deep-time.js');
+    const au0 = dtm.meanAuAtAge(0);
+    const K = (t) => dtm.meanHAtAge(t) * (dtm.meanSiderealYearSecondsAtAge(t) / dtm.meanLodSecondsAtAge(t));
+    const K0 = K(0);
+    console.log('5. THE EXACT INVARIANT — H · days/yr · (AU₀/AU)² (drift vs J2000, ppm):');
+    console.log('   t_Ma | plain H·days/yr | AU²-corrected');
+    for (const t of [4400, 3000, 2000, 1000, 380, 0, -200, -900]) {
+      const k1 = K(t) / K0 - 1;
+      const k2 = (K(t) * Math.pow(au0 / dtm.meanAuAtAge(t), 2)) / K0 - 1;
+      console.log(`   ${String(t).padStart(5)} | ${(k1 * 1e6).toFixed(1).padStart(9)} | ${(k2 * 1e6).toFixed(3).padStart(9)}`);
+    }
+    console.log('   → the day-count near-invariant becomes EXACT under the Kepler AU²');
+    console.log('     correction: one relation over H, LOD, year length and AU, with the');
+    console.log('     Moon entering through the L budget that sets LOD. Documented in');
+    console.log('     doc 99 §The Day-Count Near-Invariant.');
+  }
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
