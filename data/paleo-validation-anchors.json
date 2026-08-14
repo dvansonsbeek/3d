@@ -20,7 +20,8 @@
       "williams2000": "Williams, G.E. 2000. Geological constraints on the Precambrian history of Earth's rotation. Rev. Geophys. 38, 37–59 (Elatina tidal rhythmites)",
       "mitchellKirscher2023": "Mitchell, R.N. & Kirscher, U. 2023. Mid-Proterozoic day length stalled by tidal resonance. Nature Geoscience 16, 567–569",
       "wu2024": "Wu, Malinverno, Meyers, et al. 2024. A 650-Myr history of Earth's axial precession frequency... Science Advances, doi:10.1126/sciadv.ado2412",
-      "patterson1956": "Patterson, C. 1956. Age of meteorites and the earth. Geochim. Cosmochim. Acta 10, 230–237 (Pb–Pb age → giant-impact epoch consistency)"
+      "patterson1956": "Patterson, C. 1956. Age of meteorites and the earth. Geochim. Cosmochim. Acta 10, 230–237 (Pb–Pb age → giant-impact epoch consistency)",
+      "farhat2022": "Farhat, Auclair-Desrotour, Boué & Laskar 2022. The resonant tidal evolution of the Earth-Moon distance. A&A 665, L1 (arXiv 2207.00438). Proxy anchors from their Tables 2-3: Joffre cyclostratigraphy, Weeli Wolli tidal rhythmites, Moodies Group tidal bundles"
     },
     "rights": "Observed values are published scientific measurements (facts, not creative works) reproduced with citation for validation purposes."
   },
@@ -58,6 +59,10 @@
     { "id": "wu-moon-500", "ageMa": 500, "quantity": "moonDistanceRE", "observedRange": [53.0, 54.0], "source": "wu2024", "method": "TimeOptB inversion", "expectation": { "type": "deviationBandOutsideRange", "band": [2.5, 5.0] }, "note": "documented Pangea interval deviation (docs/99)" },
     { "id": "wu-moon-650", "ageMa": 650, "quantity": "moonDistanceRE", "observed": 56.73, "source": "wu2024", "method": "TimeOptB inversion (endpoint)", "expectation": { "type": "relativePct", "tolerancePct": 2.0 }, "note": "the independent-method endpoint agreement (docs/99)" },
 
-    { "id": "hadean-roche", "ageMa": 4498, "quantity": "moonDistanceRawRE", "observedRange": [1.4, 1.6], "source": "patterson1956", "method": "rigid Roche limit ≈ 1.49 R⊕ at the giant-impact epoch implied by the Pb–Pb Earth age", "expectation": { "type": "range", "outsideToleranceAbs": 0.05 }, "note": "the Farhat polynomial extrapolated to the Patterson age must place the Moon at the rigid Roche limit (docs/99, docs/00)" }
+    { "id": "hadean-roche", "ageMa": 4498, "quantity": "moonDistanceRawRE", "observedRange": [1.4, 1.6], "source": "patterson1956", "method": "rigid Roche limit ≈ 1.49 R⊕ at the giant-impact epoch implied by the Pb–Pb Earth age", "expectation": { "type": "range", "outsideToleranceAbs": 0.05 }, "note": "the Farhat polynomial extrapolated to the Patterson age must place the Moon at the rigid Roche limit (docs/99, docs/00)" },
+
+    { "id": "farhat-joffre-2460", "ageMa": 2460, "quantity": "lodHr", "observed": 16.98, "source": "farhat2022", "method": "Joffre cyclostratigraphy (±0.50 h)", "expectation": { "type": "deviationBandPct", "band": [-30, -22] }, "note": "THE UNGATED MID-PRECAMBRIAN WINDOW (1-3.5 Ga): the shipped smooth quartic cannot follow the resonant-staircase recession history (Farhat 2022's central result) and runs ~26% fast on LOD here. Documented as a known divergence, Williams-620-style; the regime-aware candidate history (tools/explore/regime-aware-recession-study.js) sits at 0.1σ. An unexplained improvement of the SHIPPED model fails this gate." },
+    { "id": "farhat-weeliwolli-2450", "ageMa": 2450, "quantity": "lodHr", "observed": 17.95, "source": "farhat2022", "method": "Weeli Wolli tidal rhythmites (±1.32 h)", "expectation": { "type": "deviationBandPct", "band": [-34, -25] }, "note": "same ungated-window class as farhat-joffre-2460" },
+    { "id": "farhat-moodies-3200", "ageMa": 3200, "quantity": "moonDistanceRawRE", "observed": 46.45, "source": "farhat2022", "method": "Moodies Group tidal bundles (±1.50 R⊕)", "expectation": { "type": "deviationBandPct", "band": [-42, -32] }, "note": "same ungated-window class: the quartic dives ~37% below the staircase here (tools/explore/farhat-divergence-probe.js)" }
   ]
 }

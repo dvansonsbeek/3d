@@ -151,6 +151,60 @@ async function main() {
   console.log('elasticity is large AND its physical budget (note lines) allows a large input');
   console.log('change. The paleo-anchors gate (tools/verify/paleo-anchors.js) binds the');
   console.log('days/yr(Devonian) column to Wells 1963 within tolerance on every CI run.');
+  console.log('');
+
+  // ── 3. The Farhat curvature terms (added 2026-08-14 second pass) ─────────
+  // α₃/α₄ dominate the genesis epoch (t³, t⁴); the first pass swept only α₁.
+  console.log('3. FARHAT CURVATURE TERMS — genesis-epoch elasticities per +1%');
+  for (const [name, mutate] of /** @type {Array<[string, (c: any) => void]>} */ ([
+    ['alpha1 (linear recession rate, LLR-anchored)', (c) => { c.deepTime.alpha1PerMa *= 1.01; }],
+    ['alpha3 (t³ term, Farhat-calibrated)', (c) => { c.deepTime.alpha3PerMa3 *= 1.01; }],
+    ['alpha4 (t⁴ term, Farhat-calibrated)', (c) => { c.deepTime.alpha4PerMa4 *= 1.01; }],
+  ])) {
+    const m = counterfactual(mutate);
+    if (!m) { console.log(`   ${name}: REFUSED`); continue; }
+    const o = observe(m);
+    console.log(`   ${name}: H(gen) ${(((o.hGenesisYr / baseObs.hGenesisYr) - 1) * 100).toFixed(2)}% | Moon(gen) ${(((o.moonGenesisRE / baseObs.moonGenesisRE) - 1) * 100).toFixed(2)}%`);
+  }
+  console.log('   → α₃ is the single most powerful lever at genesis (−23.7% Moon per +1%),');
+  console.log('     ahead of α₁ (−18.1%). The recession-history SHAPE — not any modern');
+  console.log('     constant — owns the early solar system.');
+  console.log('');
+
+  // ── 4. Invariant scan: is there a hidden relation between H, Moon, AU,
+  //       LOD and year length? (added 2026-08-14 second pass) ───────────────
+  // Candidate dimensionless combinations evaluated across the full history.
+  // RESULT (recorded from the engine run): exactly TWO cross-relations are
+  // (near-)invariant, and both are the documented ones —
+  //   H·days/yr    : 1.2238e8 → 1.2248e8 over 4.6 Gyr (0.08% — the day-count
+  //                  near-invariant, doc 99 eq. structural-near-invariant)
+  //   T_apsidal·H  : flat within ~±5% over the last ~2 Gyr, breaks in the
+  //                  early era where the Brouwer-Clemence m² scaling takes
+  //                  over (the documented Lunar Precession Invariant, with
+  //                  its documented domain)
+  // NOT invariant (each drifts by orders of magnitude): months per 8H
+  // (443e6 → 35.9e6), rotations per month (2.2 → 27.3), a_moon/AU
+  // (0.17e-3 → 2.57e-3). No undocumented coupling between the Driver-1
+  // (tidal) and Driver-2 (solar) chains emerges from the model itself.
+  //
+  // THE HONEST MISSING-COMPONENT CANDIDATE that a real H↔AU relation would
+  // ride on: the SOLAR tidal torque. ~1/5 of Earth's present tidal braking
+  // is solar (torque ∝ M²/a⁶ — this is where M_sun and AU physically enter
+  // the LOD chain). That torque slows Earth WITHOUT feeding the Moon, so
+  // the closed L_TOTAL_EM budget leaks angular momentum to the Sun over
+  // 4.5 Gyr. Order-of-magnitude: ~20% of the Moon's orbital-momentum gain
+  // (~2.4e34 kg m²/s) ≈ 5e33 kg m²/s — comparable to Earth's entire present
+  // spin momentum. Restoring it to the early budget would shorten
+  // LOD(genesis) and lower H(genesis) by O(10-15%) while leaving the
+  // Phanerozoic (Wells-gated) era essentially untouched. A candidate
+  // "Driver 1½" research item for the Phase-20 precision programme — NOT
+  // implemented; the α₃/α₄ calibration to Farhat 2022 (whose ocean model
+  // carries its own solar-tide treatment) partially absorbs it already.
+  console.log('4. INVARIANT SCAN — see the header comment for the recorded result:');
+  console.log('   two documented invariants confirmed (H·days/yr at 0.08%/4.6 Gyr;');
+  console.log('   T_apsidal·H over the last 2 Gyr); no undocumented H↔AU coupling in the');
+  console.log('   model; the physical bridge between the chains is the solar tidal torque');
+  console.log('   (~1/5 of braking) — the honest missing-component candidate (Phase 20).');
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

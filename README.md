@@ -208,7 +208,7 @@ The framework is documented in [Doc 99 — Expanding Solar System Resonance Theo
 - **Wu et al. 2024** (650-Myr cyclostratigraphy from sedimentary records): predicted H(t) matches Wu's reconstruction across the entire Phanerozoic to within ~1 %
 - **Patterson 1956 Pb-Pb Earth age** (4.55 Gyr): the model places the Moon at the Roche limit at that epoch — **no Hadean constraint was used in the fit**; the result emerges from the same proper-physics chain that produces the modern Moon distance
 
-The full evidence — 30 published anchors, per-anchor tolerances, the documented deviations, and the gate that re-checks all of it on every CI run — is assembled in the [Deep-Time Validation Dossier (Doc 106)](docs/106-deep-time-validation-dossier.md).
+The full evidence — 33 published anchors, per-anchor tolerances, the documented deviations, and the gate that re-checks all of it on every CI run — is assembled in the [Deep-Time Validation Dossier (Doc 106)](docs/106-deep-time-validation-dossier.md).
 
 Because the 6 free parameters are fit against modern J2000 data and then projected backward and forward via the proper-physics chain, the deep-time match is a **falsifiable prediction, not a fit**. The same 6 free parameters that reproduce the modern solar system to JPL Horizons precision (~1800–2200 AD) also reproduce paleontological day-counts at Devonian, cyclostratigraphic precession at 650 Ma, and the Hadean Moon-distance constraint at Earth formation — internally consistent across **the full 4.5-Gyr lifetime of the solar system**.
 

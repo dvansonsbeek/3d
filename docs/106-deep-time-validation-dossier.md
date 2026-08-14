@@ -26,12 +26,13 @@ because a miss that silently becomes a hit means the formula changed.
 ## A. Rotational and tidal chronology — gate-backed
 
 The model's H(t)/LOD(t)/Moon-distance curve against the published
-paleontological record: **30 anchors** across Wells 1963 (coral growth
+paleontological record: **33 anchors** across Wells 1963 (coral growth
 bands, ×9), de Winter 2020 (rudist bivalve), Pannella 1972 (bivalves), a
 Triassic compilation, Williams 2000 (Elatina tidal rhythmites),
 Mitchell–Kirscher 2023 (multi-proxy LOD), Wu et al. 2024 (34-record
-cyclostratigraphic inversion, LOD + Moon distance) and the Patterson 1956 /
-rigid-Roche consistency check.
+cyclostratigraphic inversion, LOD + Moon distance), the Patterson 1956 /
+rigid-Roche consistency check, and the Farhat 2022 mid-Precambrian proxy
+set (Joffre, Weeli Wolli, Moodies — documented-deviation bands, §D).
 
 | Statistic (days/yr anchors) | Phanerozoic (0–500 Ma) | All (0–620 Ma) |
 |:---|:---:|:---:|
@@ -97,7 +98,8 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
 
 | Item | Status | Where |
 |:---|:---|:---|
-| Williams 2000 (620 Ma rhythmites) | documented <!--v:anchorWilliams620DeltaPct-->+5.70<!--/v-->% miss of the smooth formula at the Snowball boundary; asserted as a band — an unexplained improvement fails the gate | [doc 99 §Williams](99-expanding-solar-system-resonance-theory.md#the-williams-2000-620-ma-discrepancy--honest-discussion) |
+| Williams 2000 (620 Ma rhythmites) | documented <!--v:anchorWilliams620DeltaPct-->+5.70<!--/v-->% miss of the smooth formula at the Snowball boundary; asserted as a band — an unexplained improvement fails the gate. Regime analysis shows Williams conflicts with Wu's 650 Ma anchor and stays the outlier under every history tried | [doc 99 §Williams](99-expanding-solar-system-resonance-theory.md#the-williams-2000-620-ma-discrepancy--honest-discussion) |
+| The ungated mid-Precambrian window (1–3.5 Ga) | the shipped smooth quartic cannot follow the resonant-STAIRCASE recession history (Farhat 2022's central result: ocean-resonance crossings concentrate recession late). Against the proxies Farhat fit, the shipped curve runs <!--v:anchorFarhatJoffre2460DeltaPct-->−26.09<!--/v-->% on LOD at 2.46 Ga (Joffre) and <!--v:anchorFarhatMoodies3200DeltaPct-->−36.95<!--/v-->% on Moon distance at 3.2 Ga (Moodies) — all three anchors gated as deviation bands. Every *claimed* validation (0–650 Ma + genesis endpoint) is outside this window. A regime-aware candidate history (plateau through the >1 Ga thermal-tide-lock era + insolation-driven pump) reaches 0.1σ on Joffre with the gated era bit-identical — the Driver 1½ research thread | `tools/explore/farhat-divergence-probe.js`, `tools/explore/regime-aware-recession-study.js` |
 | Wu 2024 Pangea interval (200–500 Ma Moon rows) | the smooth Farhat polynomial cannot capture the supercontinent-era high-dissipation recession; deviations asserted as bands | [doc 99 §Pangea](99-expanding-solar-system-resonance-theory.md#the-pangea-high-tidal-dissipation-interval-the-mid-range-mismatch) |
 | Saturn Laplace–Lagrange bound | the model's documented physical-constraint failure (verify-laws 44/45; `allPass: false`) — distinct from the Config-7 mirror uniqueness, which holds | `tools/verify/verify-laws.js`, CLAUDE.md §falsification |
 | LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 95](95-climate-summary.md) |
