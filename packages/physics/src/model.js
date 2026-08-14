@@ -24,6 +24,7 @@ import { createPhaseMachinery } from './phase/index.cjs';
 import { createCardinalModel } from './cardinal/index.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
 import { createDeepTimeLod } from './deltat/deep-time.cjs';
+import { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
 import { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
 import { createMoonEccChannel } from './moon/ecc-channel.cjs';
 import { createMoonMonthChain } from './moon/month-chain.cjs';
@@ -158,11 +159,38 @@ export function assembleModel(C, F) {
     gmEarthMoonSystemKm3S2: GM_EARTH_MOON_SYSTEM,
   });
 
-  /** Farhat polynomial on the t_Ma axis. @param {number} tMa @returns {number} */
-  const moonDistanceMetresAtAge = (tMa) => EPOCH_PARAMS.moonDistanceNowM
-    * (1 + EPOCH_PARAMS.alpha1PerMa * tMa
-      + EPOCH_PARAMS.alpha3PerMa3 * tMa * tMa * tMa
-      + EPOCH_PARAMS.alpha4PerMa4 * tMa * tMa * tMa * tMa);
+  // ── Driver 1½: regime-aware recession history + the solar channels ────────
+  // The quartic stays bit-identical ≤ jointMa (the Wells/Wu-gated era);
+  // beyond, the fitted staircase spline to the Roche crossing, and the
+  // ocean-leak/thermal-pump channels make L_EM time-dependent.
+  const REGIME = C.deepTime.recessionRegime;
+  const recession = createMoonRecessionHistory({
+    aMoonNowMetres: EPOCH_PARAMS.moonDistanceNowM,
+    alpha1PerMa: EPOCH_PARAMS.alpha1PerMa,
+    alpha3PerMa3: EPOCH_PARAMS.alpha3PerMa3,
+    alpha4PerMa4: EPOCH_PARAMS.alpha4PerMa4,
+    regime: {
+      jointMa: REGIME.jointMa,
+      knotAgesMa: REGIME.knotAgesMa,
+      knotDistancesKm: REGIME.knotDistancesKm,
+      genesisMa: REGIME.genesisMa,
+      rocheLimitKm: REGIME.rocheLimitKm,
+    },
+  });
+  const moonDistanceMetresAtAge = recession.distanceMetresAtAge;
+  const solarBudget = createSolarChannelBudget({
+    lTotalJ2000KgM2S: EPOCH_PARAMS.totalAngularMomentumKgM2S,
+    mMoonAloneKg: EPOCH_PARAMS.moonMassKg,
+    gmEmM3PerS2: EPOCH_PARAMS.gmEarthMoonM3S2,
+    eFactorMoon: EPOCH_PARAMS.moonEccentricityFactor,
+    beta0: REGIME.solarOceanLeakBeta0,
+    pumpStartMa: REGIME.thermalPumpStartMa,
+    pumpEndMa: REGIME.thermalPumpEndMa,
+    pumpFactor: REGIME.thermalPumpFactor,
+    jointMa: REGIME.jointMa,
+    genesisMa: REGIME.genesisMa,
+    distanceMetresAtAge: moonDistanceMetresAtAge,
+  });
 
   const DT = F.DT_STACK;
   const RES = F.DT_RESONATOR;
@@ -222,6 +250,7 @@ export function assembleModel(C, F) {
     cycleLodSumAt: dtCycleLodCorrectionSum,
     swingLodAt: (year) => dtCycles.swingLodSecondsAt(year),
     swingLodRateAt: (year) => dtCycles.swingLodRateAt(year),
+    lEmAtAgeKgm2S: solarBudget.lEmAtAgeKgm2S,
   });
 
   // ── Integrated ∫1/H(t)dt phase (R2 α-pin honoured while building) ─────────
@@ -615,6 +644,7 @@ export function assembleModel(C, F) {
       meanSiderealYearSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.siderealYearSecondsAtAge(tMa),
       meanHAtAge: /** @param {number} tMa */ (tMa) => deepLod.hAtAge(tMa),
       modulation: /** @param {number} tMa @param {number} s */ (tMa, s) => moonEcc.modulation(tMa, s),
+      distanceMetresAtAge: moonDistanceMetresAtAge,
     },
   });
 

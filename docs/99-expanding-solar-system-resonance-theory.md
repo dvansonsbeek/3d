@@ -694,11 +694,13 @@ Three plausible interpretations, in honest order:
 
 This is documented honestly as a known small-epoch discrepancy of the smooth formula. For Phanerozoic work (≤500 Ma), the proper-physics formula is uniformly better than the linear approximation.
 
-### The ungated mid-Precambrian window (1–3.5 Ga) — honest discussion
+### The mid-Precambrian window (1–3.5 Ga) — the regime-aware recession history (Driver 1½)
 
-The same class of discrepancy, at larger scale, exists in the window between the last cyclostratigraphic gate (Wu 2024, 650 Ma) and the genesis endpoint: Farhat 2022's central result is that lunar recession followed a resonant **staircase** — long slow-recession plateaus between ocean-resonance crossings, with most of the recession concentrated late — and a single smooth quartic anchored at the modern rate, the gated 0–650 Ma era and the Roche crossing cannot follow a staircase through the middle. Against the proxies Farhat fit, the shipped curve runs <!--v:anchorFarhatJoffre2460DeltaPct-->−26.09<!--/v-->% on LOD at 2.46 Ga (Joffre cyclostratigraphy, 16.98 ± 0.50 hr), <!--v:anchorFarhatWeeliwolli2450DeltaPct-->−29.85<!--/v-->% at 2.45 Ga (Weeli Wolli rhythmites) and <!--v:anchorFarhatMoodies3200DeltaPct-->−36.95<!--/v-->% on Moon distance at 3.2 Ga (Moodies tidal bundles, 46.45 ± 1.50 R⊕). All three are gated as documented-deviation bands in `data/paleo-validation-anchors.json` — an unexplained improvement fails CI, the same convention as the Williams row.
+This window — between the last Wu 2024 gate at 650 Ma and the genesis endpoint — was, until 2026-08, ungated and divergent: Farhat 2022's central result is that lunar recession followed a resonant **staircase** (long slow-recession plateaus between ocean-resonance crossings, with most of the recession concentrated late), and the earlier single smooth quartic ran −26% fast on LOD at 2.46 Ga and −37% low on Moon distance at 3.2 Ga against the proxies Farhat fit (the pre-regime state is preserved in git history and in `tools/explore/farhat-divergence-probe.js`).
 
-No *claimed* validation is affected: every agreement asserted in this document lives in the 0–650 Ma record or at the genesis endpoint. A regime-aware candidate history — the shipped curve kept bit-identical to 1 Ga, a slow-recession plateau through the >1 Ga thermal-tide-lock era (Bartlett–Stevenson 2016; Mitchell–Kirscher 2023; doc 98 §Three regimes), and the insolation-driven thermal-tide pump carrying angular momentum from the Sun into the Earth-Moon system during the lock — reaches 0.1σ on Joffre with the Phanerozoic untouched (`tools/explore/regime-aware-recession-study.js`). In that budget the Sun delivers a few percent of the present Earth-Moon angular momentum through the atmosphere, which is the honest form of the H ↔ AU coupling: radiative (insolation ∝ L☉/AU²), era-bound to the lock regime, and switched off by the Snowball unlock — the event the climate record and the rotation record share.
+**The shipped model now carries the regime-aware history** (`@essrt/physics/deltat/recession-history`, parameters in `model-parameters.json → deepTime.recessionRegime`): the calibrated quartic stays **bit-identical through the entire gated 0–1000 Ma era**, a monotone spline through five fitted knots runs beyond it to the rigid Roche limit at the unchanged 4,498 Ma genesis, and two explicit solar angular-momentum channels make L_EM time-dependent there — the ocean solar-tide leak (β₀ (a/a₀)⁶ of the lunar torque) and the insolation-driven **thermal-tide pump** (Zahnle–Walker 1987; Bartlett–Stevenson 2016; Mitchell–Kirscher 2023), which carries angular momentum from the Sun into the Earth-Moon system through the atmosphere. The fit (`tools/explore/fit-regime-recession.js`) runs against eleven published anchors — Lantink 2022 (Joffre), Weeli Wolli, Zhou 2024's three paired distance+LOD epochs, Meyers–Malinverno 2018 (Xiamaling), Nanfen 2023, and Moodies — all reproduced within 1.3σ; shipped residuals: <!--v:anchorFarhatJoffre2460DeltaPct-->+0.16<!--/v-->% on LOD at 2.46 Ga, <!--v:anchorFarhatWeeliwolli2450DeltaPct-->−5.24<!--/v-->% at 2.45 Ga (inside the wide ±1.32 h rhythmite uncertainty), <!--v:anchorFarhatMoodies3200DeltaPct-->−0.03<!--/v-->% on Moon distance at 3.2 Ga. All eleven are agreement rows in `data/paleo-validation-anchors.json`, checked by the paleo-anchors gate on every CI run.
+
+Two honesty notes ride with the mechanism. First, the pump's strength is genuinely contested in the literature — Mitchell–Kirscher 2023 argue a ~19 h day-length stall held by the thermal-tide resonance across 2.0–1.0 Ga, while Zhou 2024 argue the Lamb resonance is unlikely and the era simply had weak ocean dissipation; the fit lets the data decide, and they choose a **partial** pump (zero disfavoured at ~2.4σ, with the factor×window product the constrained quantity, not each separately). Second, the net solar delivery over the full history is **small**: L_EM(t) reconstructed directly from Zhou's paired data is flat at −0.2% versus today across 1634–1215 Ma, and the shipped budget matches — the H ↔ AU coupling is real as a mechanism (radiative, insolation ∝ L☉/AU², era-bound to the lock, switched off by the Snowball unlock that the climate and rotation records share) but its integrated effect is at the fraction-of-a-percent level. H at genesis is <!--v:hAtHadean-->64,614<!--/v--> yr under the shipped budget.
 
 ### Wu et al. 2024 — 650-Myr cyclostratigraphic compilation
 
@@ -997,7 +999,7 @@ The proper-physics two-layer formula naturally bounds the past evolution. Run ba
 | Quantity | Value |
 |:---|---:|
 | LOD | **4.64 hr** (= 16,704 s) |
-| H | **<!--v:hAtHadean-->64,883<!--/v--> yr** (19.3 % of modern) |
+| H | **<!--v:hAtHadean-->64,614<!--/v--> yr** (19.3 % of modern) |
 | 8H | **0.519 Myr** (19.3 % of modern) |
 | Moon distance | **<!--v:moonDistanceAtHadean-->9,471<!--/v--> km = 1.49 R_E** (rigid Roche) |
 | Fluid Roche zone (~2.9 R_E) | crossed at ~4,444 Ma |
@@ -1141,7 +1143,7 @@ Replaces the earlier piecewise (Phanerozoic-linear + Proterozoic-stall + Hadean-
 | 550 (Cambrian) | 75,809.7 | 21.058 | 362,983 | 294,216 | 2.354 |
 | 1,000 (Mesoproterozoic) | 68,113.0 | 18.920 | 343,784 | 264,346 | 2.115 |
 | 2,500 (Archean) | 44,584.8 | 12.385 | 252,392 | 173,033 | 1.384 |
-| 4,498 (Earth-Moon genesis, rigid Roche) | 16,718.2 | 4.644 | **<!--v:moonDistanceAtHadean-->9,471<!--/v-->** | <!--v:hAtHadean-->64,883<!--/v--> | 0.519 |
+| 4,498 (Earth-Moon genesis, rigid Roche) | 16,718.2 | 4.644 | **<!--v:moonDistanceAtHadean-->9,471<!--/v-->** | <!--v:hAtHadean-->64,614<!--/v--> | 0.519 |
 | **−200 (+200 Ma future)** | 90,853.4 | 25.237 | <!--v:moonDistanceAt200MyrFuture-->392,059<!--/v--> | <!--v:hAt200MyrFuture-->352,600<!--/v--> | 2.821 |
 | **−1,000 (+1 Gyr future)** | 116,016.1 | 32.227 | 425,119 | 450,257 | 3.602 |
 | **−3,000 (+3 Gyr future)** | — | — | — | — | beyond tidal lock |

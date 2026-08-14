@@ -32,7 +32,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "d36050ef216d137f";
+export const CONSTANTS_HASH = "471a3f440b88cd86";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v10.0";
@@ -42,7 +42,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "d36050ef216d137f",
+  hash: "471a3f440b88cd86",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -181,7 +181,30 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "alpha4PerMa4": 1.3619800519e-16,
     "alphaClimateScalePerMille": -3.93e-7,
     "dtStackTaperFullHalfwidthYr": 300000,
-    "dtStackTaperTotalHalfwidthYr": 400000
+    "dtStackTaperTotalHalfwidthYr": 400000,
+    "recessionRegime": {
+      "jointMa": 1000,
+      "knotAgesMa": [
+        1400,
+        1900,
+        2450,
+        3200,
+        3900
+      ],
+      "knotDistancesKm": [
+        337531.908,
+        322949.311,
+        322533.193,
+        296189.703,
+        275119.896
+      ],
+      "genesisMa": 4498,
+      "rocheLimitKm": 9439.643,
+      "solarOceanLeakBeta0": 0.2,
+      "thermalPumpStartMa": 1000,
+      "thermalPumpEndMa": 1307,
+      "thermalPumpFactor": 0.454
+    }
   },
   earth: {
     "earthtiltMean": 23.413527499101747,

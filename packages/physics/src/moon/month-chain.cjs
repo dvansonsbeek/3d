@@ -67,10 +67,14 @@
  *     meanSiderealYearSecondsAtAge: (tMa: number) => number,
  *     meanHAtAge: (tMa: number) => (number | null),
  *     modulation: (tMa: number, s: number) => number,
+ *     distanceMetresAtAge?: (tMa: number) => number,
  *   },
  * }} deps — fns are the ENGINE'S OWN layer-0/1 evaluators and the shared
  *   eccentricity channel's modulation; constants are the engine's derived
  *   J2000 anchors (both engines derive them from the same JSON).
+ *   fns.distanceMetresAtAge, when present, OVERRIDES the internal quartic —
+ *   the Driver-1½ regime-aware history (recession-history.cjs); absent, the
+ *   internal quartic is the pure twin (bit-identical for t ≤ jointMa).
  */
 function createMoonMonthChain({ constants, fns }) {
   const {
@@ -85,10 +89,11 @@ function createMoonMonthChain({ constants, fns }) {
 
   /** Farhat α₁/α₃/α₄ polynomial — Earth–Moon distance in metres at age t_Ma.
    *  @param {number} tMa @returns {number} */
-  function distanceMetresAtAge(tMa) {
+  function quarticMetresAtAge(tMa) {
     const t = tMa;
     return aMoonNowMetres * (1 + alpha1PerMa * t + alpha3PerMa3 * t * t * t + alpha4PerMa4 * t * t * t * t);
   }
+  const distanceMetresAtAge = fns.distanceMetresAtAge ?? quarticMetresAtAge;
 
   /** @param {number} tMa @returns {number} */
   function distanceKmAtAge(tMa) {

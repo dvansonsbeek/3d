@@ -309,6 +309,18 @@
     "alpha4PerMa4": 1.3619800519e-16,
     "alphaClimateScalePerMille": -3.93e-7,
     "dtStackTaperFullHalfwidthYr": 300000,
-    "dtStackTaperTotalHalfwidthYr": 400000
+    "dtStackTaperTotalHalfwidthYr": 400000,
+    "recessionRegime": {
+      "_description": "Driver 1½ regime-aware lunar recession (2026-08): the quartic stays BIT-IDENTICAL ≤ jointMa (the Wells/Wu-gated era — its alpha set is the calibrated effective closed-budget pair); beyond, a monotone cubic Hermite through the fitted knots to the rigid Roche limit at genesisMa, plus the two explicit solar angular-momentum channels (ocean leak beta0·(a/a0)^6·tau_moon; insolation-driven thermal-tide pump factor·(tau_moon+leak) inside the window — Zahnle-Walker 1987 / Bartlett-Stevenson 2016 / Mitchell-Kirscher 2023, Zhou 2024's contrary reading recorded). Fit: tools/explore/fit-regime-recession.js against 11 published anchors (Lantink 2022 Joffre · Weeli Wolli · Zhou 2024 ×3 paired a+LOD · Meyers-Malinverno 2018 Xiamaling · Nanfen 2023 · Moodies via Farhat 2022), all ≤1.3σ; genesis PINNED at the shipped 4498 Ma Roche crossing (the genesis chi² profile is flat — the data do not constrain it); pump factor 2.4σ preferred over zero, with the factor×window product the constrained quantity (0.454×~300 Myr ≈ 0.15×~900 Myr degeneracy recorded). Knot values are the shipped definition (metre-rounded at fit time). Consumed via @essrt/physics deltat/recession-history.",
+      "jointMa": 1000,
+      "knotAgesMa": [1400, 1900, 2450, 3200, 3900],
+      "knotDistancesKm": [337531.908, 322949.311, 322533.193, 296189.703, 275119.896],
+      "genesisMa": 4498,
+      "rocheLimitKm": 9439.643,
+      "solarOceanLeakBeta0": 0.2,
+      "thermalPumpStartMa": 1000,
+      "thermalPumpEndMa": 1307,
+      "thermalPumpFactor": 0.454
+    }
   }
 }

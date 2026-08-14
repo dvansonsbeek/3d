@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection } from '@essrt/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -2661,6 +2661,46 @@ const ORBITS_PER_H = {
 };
 
 // ───── LAYER 2 — Moon distance evolution ─────
+// Driver 1½ (2026-08): the regime-aware recession history + the solar
+// angular-momentum channels live ONCE in @essrt/physics/deltat/
+// recession-history — the quartic stays bit-identical ≤ jointMa (the
+// Wells/Wu-gated era), the fitted staircase spline runs beyond it, and the
+// ocean-leak/thermal-pump channels make L_EM(t) time-dependent there.
+// Mirrors tools/lib/deep-time.js _recessionHistory/_solarBudget exactly.
+var _recessionM = null;
+function _recessionHistory() {
+  if (!_recessionM) {
+    const R = K.deepTime.recessionRegime;
+    _recessionM = createMoonRecessionHistory({
+      aMoonNowMetres: A_MOON_NOW_M,
+      alpha1PerMa: ALPHA_1, alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
+      regime: {
+        jointMa: R.jointMa, knotAgesMa: R.knotAgesMa,
+        knotDistancesKm: R.knotDistancesKm, genesisMa: R.genesisMa,
+        rocheLimitKm: R.rocheLimitKm,
+      },
+    });
+  }
+  return _recessionM;
+}
+var _solarBudgetM = null;
+function _solarBudget() {
+  if (!_solarBudgetM) {
+    const R = K.deepTime.recessionRegime;
+    _solarBudgetM = createSolarChannelBudget({
+      lTotalJ2000KgM2S: L_TOTAL_EM_KGM2_S,
+      mMoonAloneKg: M_MOON_ALONE, gmEmM3PerS2: GM_EM_M3S2,
+      eFactorMoon: E_FACTOR_MOON,
+      beta0: R.solarOceanLeakBeta0,
+      pumpStartMa: R.thermalPumpStartMa, pumpEndMa: R.thermalPumpEndMa,
+      pumpFactor: R.thermalPumpFactor,
+      jointMa: R.jointMa, genesisMa: R.genesisMa,
+      distanceMetresAtAge: _recessionHistory().distanceMetresAtAge,
+    });
+  }
+  return _solarBudgetM;
+}
+
 /** Moon semi-major axis at given geological age (METRES). t_Ma > 0 = past. */
 function meanMoonDistanceMetresAtAge(t_Ma) { return _moonChain().distanceMetresAtAge(t_Ma); }
 
@@ -2690,6 +2730,7 @@ function _deepLod() {
       },
       moonDistanceMetresAtAge: (t_Ma) => meanMoonDistanceMetresAtAge(t_Ma),
       moiFactorAtAge: (t_Ma) => earthMoiFactorAtAge(t_Ma),
+      lEmAtAgeKgm2S: _solarBudget().lEmAtAgeKgm2S,
       // The IAU-base integrated-phase Fourier ripple (mirrors the Node
       // engine's _evalSiderealYearFourierIAU — the Phase D matched pair).
       siderealYearDaysFourierAt: (year) => {
@@ -4243,6 +4284,7 @@ const _moonChain = (() => {
           meanLodSecondsAtAge,
           meanSiderealYearSecondsAtAge,
           meanHAtAge,
+          distanceMetresAtAge: _recessionHistory().distanceMetresAtAge,
           modulation: _eCompModulation,
         },
       });
@@ -27311,7 +27353,7 @@ function setupGUI() {
       if (a <= 0 || a >= A_LOCK_M) return null;
       const iE = _alphaScaledL1(t_Ma_arg, scale) * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
       return (2 * Math.PI * iE) /
-             (L_TOTAL_EM_KGM2_S - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
+             (_solarBudget().lEmAtAgeKgm2S(t_Ma_arg) - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
     }
     function _tropYearScaledL1(t_Ma_arg, scale) {
       const sidSec = meanSiderealYearSecondsAtAge(t_Ma_arg);

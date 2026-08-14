@@ -211,6 +211,7 @@ function _moonChain() {
         meanSiderealYearSecondsAtAge,
         meanHAtAge,
         modulation: _eCompModulation,
+        distanceMetresAtAge: _recessionHistory().distanceMetresAtAge,
       },
     });
   }
@@ -222,6 +223,45 @@ function meanMoonDistanceMetresAtAge(t_Ma) { return _moonChain().distanceMetresA
 function meanMoonDistanceAtAge(t_Ma) { return _moonChain().distanceKmAtAge(t_Ma); }
 
 // ─── LAYER 1 — Angular-momentum-conservation LOD ──────────────────────────
+// Driver 1½ (2026-08): the regime-aware recession history + the solar
+// angular-momentum channels live ONCE in @essrt/physics/deltat/
+// recession-history. The quartic stays bit-identical ≤ jointMa; the
+// channels are explicit only beyond it. Lazy for module-const ordering.
+const { createMoonRecessionHistory, createSolarChannelBudget } = require('@essrt/physics/deltat/recession-history');
+let _recessionM = null;
+function _recessionHistory() {
+  if (!_recessionM) {
+    const R = C.RECESSION_REGIME;
+    _recessionM = createMoonRecessionHistory({
+      aMoonNowMetres: A_MOON_NOW_M,
+      alpha1PerMa: ALPHA_1, alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
+      regime: {
+        jointMa: R.jointMa, knotAgesMa: R.knotAgesMa,
+        knotDistancesKm: R.knotDistancesKm, genesisMa: R.genesisMa,
+        rocheLimitKm: R.rocheLimitKm,
+      },
+    });
+  }
+  return _recessionM;
+}
+let _solarBudgetM = null;
+function _solarBudget() {
+  if (!_solarBudgetM) {
+    const R = C.RECESSION_REGIME;
+    _solarBudgetM = createSolarChannelBudget({
+      lTotalJ2000KgM2S: L_TOTAL_EM_KGM2_S,
+      mMoonAloneKg: M_MOON_ALONE, gmEmM3PerS2: GM_EM_M3S2,
+      eFactorMoon: E_FACTOR_MOON,
+      beta0: R.solarOceanLeakBeta0,
+      pumpStartMa: R.thermalPumpStartMa, pumpEndMa: R.thermalPumpEndMa,
+      pumpFactor: R.thermalPumpFactor,
+      jointMa: R.jointMa, genesisMa: R.genesisMa,
+      distanceMetresAtAge: _recessionHistory().distanceMetresAtAge,
+    });
+  }
+  return _solarBudgetM;
+}
+
 // 8.4-3: the deep-time LOD/ΔT core lives ONCE in @essrt/physics/deltat/
 // deep-time. This engine injects its moon chain, its GIA α(t) (the
 // lattice-α pin machinery stays engine-side in earthMoiFactorAtAge), the
@@ -249,6 +289,7 @@ function _deepLod() {
       cycleLodSumAt: dtCycleLodCorrectionSum,
       swingLodAt: resonatorSwingLodCorrection,
       swingLodRateAt: resonatorSwingLodRate,
+      lEmAtAgeKgm2S: _solarBudget().lEmAtAgeKgm2S,
     });
   }
   return _deepLodM;

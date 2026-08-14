@@ -649,6 +649,7 @@ module.exports = {
   ALPHA_1: modelParams.deepTime.alpha1PerMa,
   ALPHA_3: modelParams.deepTime.alpha3PerMa3,
   ALPHA_4: modelParams.deepTime.alpha4PerMa4,
+  RECESSION_REGIME: modelParams.deepTime.recessionRegime,
   ALPHA_CLIMATE_SCALE: modelParams.deepTime.alphaClimateScalePerMille,
   DT_STACK_TAPER_FULL_HALFWIDTH_YR: modelParams.deepTime.dtStackTaperFullHalfwidthYr,
   DT_STACK_TAPER_TOTAL_HALFWIDTH_YR: modelParams.deepTime.dtStackTaperTotalHalfwidthYr,

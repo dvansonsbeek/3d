@@ -49,6 +49,7 @@
     "./deltat/cycles": "./src/deltat/cycles.cjs",
     "./deltat/deep-time": "./src/deltat/deep-time.cjs",
     "./deltat/historical": "./src/deltat/historical.cjs",
+    "./deltat/recession-history": "./src/deltat/recession-history.cjs",
     "./climate/l1-orbital": "./src/climate/l1-orbital.cjs",
     "./eclipse/finders": "./src/eclipse/finders.cjs",
     "./reference/published-curves": "./src/reference/published-curves.cjs",

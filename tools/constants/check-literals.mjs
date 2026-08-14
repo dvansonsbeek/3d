@@ -179,6 +179,11 @@ const MIGRATED = [
   'model.deepTime.alphaClimateScalePerMille',
   'model.deepTime.dtStackTaperFullHalfwidthYr',
   'model.deepTime.dtStackTaperTotalHalfwidthYr',
+  // Driver 1½ (2026-08) — the regime-aware recession block, consumed whole
+  // via `K.deepTime.recessionRegime` (script.js _recessionHistory/_solarBudget
+  // → @essrt/physics/deltat/recession-history). Prefix: every leaf under it
+  // is imported, none exists as a literal.
+  'model.deepTime.recessionRegime',
   'astro.earthOrbital.earthEccentricityJ2000',
   'astro.earthOrbital.earthEccentricityDotJ2000',
   'model.additionalBodies',

@@ -125,6 +125,7 @@ export { createPlanetModel } from './planets/model.cjs';
 // Phase 8.4 — the climate/ΔT machinery, extracted layer by layer.
 export { createDeltaTCycles } from './deltat/cycles.cjs';
 export { createDeepTimeLod } from './deltat/deep-time.cjs';
+export { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
 export { deltaTEspenakMeeusCanonSeconds } from './deltat/historical.cjs';
 export { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
 // Phase 8.5 — eclipse geometry (single-copy: the browser had no Node twin).

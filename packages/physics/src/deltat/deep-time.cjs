@@ -64,19 +64,24 @@
  * @property {(year: number) => number} cycleLodSumAt - gated δLOD sum (incl. swing)
  * @property {(year: number) => number} swingLodAt - gated swing δLOD alone
  * @property {(year: number) => number} swingLodRateAt - gated analytic swing rate
+ * @property {(tMa: number) => number} [lEmAtAgeKgm2S] - OPTIONAL time-dependent
+ *   Earth-Moon angular momentum (the Driver-1½ solar channels,
+ *   recession-history.cjs). Absent → the J2000 constant, which the budget
+ *   module equals exactly for t ≤ jointMa — the pure-twin convention.
  */
 
 /** @param {DeepTimeLodDeps} deps */
 function createDeepTimeLod(deps) {
   const K = deps.constants;
+  const lEmAt = deps.lEmAtAgeKgm2S ?? (() => K.lTotalEmKgm2S);
 
-  /** Layer 1/2 mean LOD: LOD = 2π·I(t) / (L_total − L_moon(t)).
+  /** Layer 1/2 mean LOD: LOD = 2π·I(t) / (L_EM(t) − L_moon(t)).
    * @param {number} t_Ma @returns {number|null} seconds, null past tidal lock */
   function lodSecondsAtAge(t_Ma) {
     const a = deps.moonDistanceMetresAtAge(t_Ma);
     if (a <= 0 || a >= K.aLockMetres) return null;
     return (2 * Math.PI * (deps.moiFactorAtAge(t_Ma) * K.mEarthAloneKg * K.rEarthMetres * K.rEarthMetres)) /
-           (K.lTotalEmKgm2S - K.mMoonAloneKg * Math.sqrt(K.gmEmM3PerS2 * a) * K.eFactorMoon);
+           (lEmAt(t_Ma) - K.mMoonAloneKg * Math.sqrt(K.gmEmM3PerS2 * a) * K.eFactorMoon);
   }
 
   /** Same LOD with an EXPLICIT α (the browser's "α at climate mean" curve).
@@ -86,7 +91,7 @@ function createDeepTimeLod(deps) {
     if (a <= 0 || a >= K.aLockMetres) return null;
     const iEarth = alpha * K.mEarthAloneKg * K.rEarthMetres * K.rEarthMetres;
     return (2 * Math.PI * iEarth) /
-           (K.lTotalEmKgm2S - K.mMoonAloneKg * Math.sqrt(K.gmEmM3PerS2 * a) * K.eFactorMoon);
+           (lEmAt(t_Ma) - K.mMoonAloneKg * Math.sqrt(K.gmEmM3PerS2 * a) * K.eFactorMoon);
   }
 
   /** @param {number} t_Ma @returns {number|null} */
