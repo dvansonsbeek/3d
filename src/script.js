@@ -25,7 +25,8 @@ const capitalisePlanetKeys = (o) =>
   Object.fromEntries(Object.entries(o).map(([k, v]) => [k.charAt(0).toUpperCase() + k.slice(1), v]));
 
 /*
-  Fibonacci Laws of Planetary Motion — Holistic Universe Model v10
+  Fibonacci Laws of Planetary Motion — Holistic Universe Model
+  (model version: see MODEL_VERSION from the generated constants)
 
   Copyright (C) 2025-2026 D. van Sonsbeek
   Licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
@@ -19484,12 +19485,30 @@ const ESSRT_QTY_SPECS = {
     subtitle: 'Earth\'s polar axis precession cycle = H/13 (Fibonacci structural identity).',
     yLabel:   'Period (years)',
     compute:  (t_Ma) => { const H = meanHAtAge(t_Ma); return H === null ? null : H / 13; },
+    // Physical axial precession (doc 99 §"Structural vs physical axial
+    // precession at deep time") — the definition the cyclostratigraphic
+    // inversions measure. The structural H/13 scales with spin alone; the
+    // PHYSICAL torque rate adds the lunar 1/a³ term (the closer Moon drove
+    // faster physical precession). J2000 anchor = the model's own modern
+    // rate; solar/lunar split 16.8/33.4 ″/yr as fractions (doc 99's
+    // reconciliation, landing on Wu 2024's 67.64 ″/yr at 650 Ma to 0.2%).
+    compute2: (t_Ma) => {
+      const H0 = meanHAtAge(0), H = meanHAtAge(t_Ma);
+      const lod0 = meanLodSecondsAtAge(0), lod = meanLodSecondsAtAge(t_Ma);
+      const a0 = meanMoonDistanceMetresAtAge(0), a = meanMoonDistanceMetresAtAge(t_Ma);
+      if (H === null || H0 === null || lod === null || lod0 === null || a <= 0) return null;
+      const psi0 = 1296000 / (H0 / 13);                    // ″/yr — modern total, model-anchored
+      const F_SOLAR = 16.8 / 50.2, F_LUNAR = 33.4 / 50.2;  // doc 99 J2000 torque split
+      const rate = psi0 * (lod0 / lod) * (F_SOLAR + F_LUNAR * Math.pow(a0 / a, 3));
+      return 1296000 / rate;
+    },
+    label2:   'physical (solar + lunar torque)',
     yFmt:     (v) => Math.round(v).toLocaleString('en-US') + ' yr',
     yMin: 0, yMax: 40000,
     hasWu:    true,
     wuKey:    'axial_arcsec_yr',
     wuConvert:(rate) => 1296000 / rate,
-    footnote: 'Note: shown is the structural mean H/13. The real axial precession also oscillates by ~50-500 years around this mean on shorter cycles of ~21,000 and ~42,000 years (the H/16 perihelion and H/8 obliquity cycles). These short-period fluctuations are invisible at the modal\'s deep-time scale (one chart pixel spans ~590,000 years on the Phanerozoic view), but show up in the orbital calculator at modern epochs.',
+    footnote: 'Note: the solid curve is the structural mean H/13 (the Fibonacci identity — spin-scaled). The dashed curve on the Phanerozoic view is the PHYSICAL axial precession from the solar + lunar torque formula: the lunar term scales with 1/a³, so the closer Moon drove physical precession faster than spin-scaling alone — this is the quantity cyclostratigraphic inversions (Wu et al. 2024) measure, and the two definitions deliberately diverge into the past while agreeing at J2000. The real axial precession also oscillates by ~50-500 years around the mean on the ~21,000 and ~42,000-year cycles (H/16 and H/8), invisible at this scale.',
   },
   obliqCycle: {
     title:    'Obliquity Cycle Period (H/8)',
@@ -19588,6 +19607,16 @@ function essrtRenderChart(qtyKey, rangeKey) {
 
   // Compute series
   const allSeries = [{ samples: essrtComputeSeries(spec, t_lo, t_hi, N) }];
+  // Optional secondary curve (e.g. the PHYSICAL axial precession next to the
+  // structural H/13 — doc 99 §structural-vs-physical). Rendered only on the
+  // Phanerozoic view, where the published anchors it reconciles are shown.
+  if (spec.compute2 && rangeKey === 'phanero') {
+    allSeries.push({
+      samples: essrtComputeSeries({ ...spec, compute: spec.compute2 }, t_lo, t_hi, N),
+      color: '#7dd87d',
+      dash: '6,4',
+    });
+  }
 
   // Y range. Each spec declares yMin/yMax so we never get pathological
   // auto-ranging when a quantity approaches its asymptote (e.g., LOD past
@@ -19704,7 +19733,9 @@ function essrtRenderChart(qtyKey, rangeKey) {
       d += `${cmd}${xPos(p.t_cal).toFixed(1)} ${yPosClipped(p.value).toFixed(1)} `;
       prevNull = false;
     });
-    return `<path d="${d}" fill="none" stroke="${CURVE_COLOR}" stroke-width="2" opacity="1" filter="url(#essrt-glow)"/>`;
+    const strokeCol = s.color || CURVE_COLOR;
+    const dashAttr = s.dash ? ` stroke-dasharray="${s.dash}"` : '';
+    return `<path d="${d}" fill="none" stroke="${strokeCol}" stroke-width="2"${dashAttr} opacity="1" filter="url(#essrt-glow)"/>`;
   }).join('');
 
   // Subtle glow filter for the data line — gives it the premium look
@@ -19787,6 +19818,13 @@ function essrtRenderChart(qtyKey, rangeKey) {
       <circle cx="${margin.left + plotW - 210}" cy="${margin.top + 14}" r="5" fill="#ff9a3c" stroke="#fff" stroke-width="0.8"/>
       <text x="${margin.left + plotW - 198}" y="${margin.top + 18}" font-size="11" fill="#e0e0e0" font-weight="500" text-decoration="underline">Wu et al. 2024 (±2σ)</text>
     </a>`;
+    if (spec.compute2 && spec.label2) {
+      wuLegend += `
+        <line x1="${margin.left + plotW - 216}" y1="${margin.top + 32}" x2="${margin.left + plotW - 204}" y2="${margin.top + 32}" stroke="#7dd87d" stroke-width="2" stroke-dasharray="6,4"/>
+        <text x="${margin.left + plotW - 198}" y="${margin.top + 36}" font-size="11" fill="#e0e0e0" font-weight="500">${spec.label2}</text>
+        <line x1="${margin.left + plotW - 216}" y1="${margin.top + 50}" x2="${margin.left + plotW - 204}" y2="${margin.top + 50}" stroke="${CURVE_COLOR}" stroke-width="2"/>
+        <text x="${margin.left + plotW - 198}" y="${margin.top + 54}" font-size="11" fill="#e0e0e0" font-weight="500">structural H/13</text>`;
+    }
   }
 
   const frame = `<rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#0a0d11" stroke="#5a5f68" stroke-width="0.8"/>`;
@@ -24412,16 +24450,13 @@ function setupGUI() {
   if (titleEl) {
     const versionEl = document.createElement('div');
     versionEl.style.cssText = 'font-size: 9px; font-weight: 400; letter-spacing: 0.05em; opacity: 0.60; margin-top: 2px; cursor: help;';
-    versionEl.textContent = 'Holistic Universe Model v10';
+    versionEl.textContent = 'Holistic Universe Model ' + MODEL_VERSION;
     versionEl.title =
-      'v10 highlights (2026-07-18):\n' +
-      '• ΔT & Layer-4 LOD auto-fit to Espenak history (~12 s RMS across 1650-2017).\n' +
-      '• dt-corrections-fit pipeline fully automated: joint-optimum sweep over USNO anchor + deltaTStart runs by default; astro-reference.json + script.js sync end-to-end.\n' +
-      '• Layer-4 solar day at J2000 = 86400.0014 s (USNO Earth Orientation Center-aligned, joint world).\n' +
-      '• Days & Years report ~3× faster (±2-day search window in cardinal-point scans).\n' +
-      '• CSV labelling (Step 6a): calendar-year alignment for all 6 event types — matches XLSX report row-by-row.\n' +
-      '• Formula Verification chart: new "Export Recent" (1650-2050) view + ΔT chart re-anchored to the model trend rather than IERS instantaneous.\n' +
-      '• Tweakpane cleanup: consolidated ΔT display to a single "ΔT trend (s)" row; removed 18 orphaned iau*Ref schema fields; per-frame Rate now includes DT cycles for consistency with Solar Day = REAL.';
+      MODEL_VERSION + ' highlights:\n' +
+      '• Regime-aware lunar recession history (Driver 1½): the calibrated curve holds bit-identical through 0–1000 Ma; beyond it a fitted staircase spline (Farhat 2022 resonant crossings) runs to the rigid Roche limit at genesis.\n' +
+      '• Two explicit solar angular-momentum channels beyond 1 Ga: the ocean solar-tide leak and the insolation-driven atmospheric thermal-tide pump (Zahnle-Walker / Bartlett-Stevenson / Mitchell-Kirscher; strength fitted, Zhou 2024 counter-reading recorded).\n' +
+      '• Mid-Precambrian validation: eleven published anchors (Lantink/Joffre, Weeli Wolli, Zhou 2024 paired distance+LOD, Xiamaling, Nanfen, Moodies) reproduced within their published uncertainties, 1.1–3.2 Ga.\n' +
+      '• Deep-time H/LOD/Moon curves in this panel and the ESSRT explorer follow the regime-aware history; the Phanerozoic and modern eras are unchanged.';
     titleEl.appendChild(versionEl);
   }
 
@@ -36162,7 +36197,7 @@ if (!o.Performance) stats.dom.style.display = 'none';
 /* Watermark / branding — bottom-right */
 const sceneWatermark = document.createElement('div');
 sceneWatermark.id = 'sceneWatermark';
-sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">v10</span>';
+sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">' + MODEL_VERSION + '</span>';
 document.body.appendChild(sceneWatermark);
 
 /* Simulation date HUD — bottom-left */
