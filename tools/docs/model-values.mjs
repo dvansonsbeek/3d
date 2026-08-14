@@ -2311,6 +2311,11 @@ export const VALUES = {
     out.paleoWithin2All = { get: () => `${deltas(daysSet).filter((d) => Math.abs(d) < 2).length}/${daysSet.length}`, render: (v) => String(v) };
     out.paleoWithin1Phan = { get: () => `${deltas(phan()).filter((d) => Math.abs(d) < 1).length}/${phan().length}`, render: (v) => String(v) };
     out.paleoWithin2Phan = { get: () => `${deltas(phan()).filter((d) => Math.abs(d) < 2).length}/${phan().length}`, render: (v) => String(v) };
+    // Generic days/yr-at-age keys for the website's Wu et al. 2024 rows
+    // (its table converts Wu's inversion to days/yr at round ages).
+    for (const t of [100, 200, 300, 400, 500, 620, 650]) {
+      out[`daysPerYearAt${t}Ma`] = { get: () => dtl().meanYearInDaysAtAge(t), render: (v) => Number(v).toFixed(2), unit: 'd/yr' };
+    }
     return out;
   })(),
 
