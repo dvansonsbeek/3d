@@ -19442,6 +19442,7 @@ const ESSRT_QTY_SPECS = {
     hasWu:    true,
     wuKey:    'lod_hr',
     wuConvert:(v) => v,
+    footnote: 'Note: the small mid-Phanerozoic offset below the Wu et al. 2024 anchors (largest ~0.8 hr at 200 Ma) is the documented Pangea high-tidal-dissipation interval — Wu\'s key finding is that lunar recession ran non-uniformly (~7.0 cm/yr in the supercontinent era vs ~2.2 before it), which the calibrated smooth 0–1000 Ma branch deliberately averages over. The deviation is recorded and gated as documented bands (docs/99 §Pangea interval).',
   },
   year: {
     title:    'Length of Year (days at epoch)',
@@ -19469,6 +19470,7 @@ const ESSRT_QTY_SPECS = {
     hasWu:    true,
     wuKey:    'lod_hr',
     wuConvert:(lod_hr) => MEAN_TROPICAL_YEAR_J2000_S / (lod_hr * 3600),
+    footnote: 'Note: the Wu et al. 2024 points here are derived from their LOD anchors, so the same documented Pangea-interval offset applies as on the Length-of-Day tab (docs/99 §Pangea interval).',
   },
   h: {
     title:    'Earth Fundamental Cycle H(t)',
@@ -19533,7 +19535,7 @@ const ESSRT_QTY_SPECS = {
   },
   moon: {
     title:    'Earth-Moon Distance',
-    subtitle: 'Tidal recession under Driver 1 (Farhat 2022 polynomial fit). Moon at the rigid Roche limit (~9,500 km) at Earth-Moon genesis — the giant-impact epoch, ~4.5 Ga.',
+    subtitle: 'Tidal recession under Driver 1 — the regime-aware history: the calibrated curve through 0–1000 Ma, the fitted staircase spline (Farhat 2022 resonant crossings) beyond, ending at the rigid Roche limit (~9,500 km) at Earth-Moon genesis, ~4.5 Ga.',
     yLabel:   'Moon distance (km)',
     // Returns kilometres directly so tick labels render as natural numbers.
     compute:  (t_Ma) => { const m = meanMoonDistanceMetresAtAge(t_Ma); return m === null ? null : m / 1000; },
@@ -19544,6 +19546,7 @@ const ESSRT_QTY_SPECS = {
     wuKey:    'moon_er',
     // ER → km: R_EARTH_M is metres; ER × R_EARTH_M = metres; ÷1000 = km
     wuConvert:(er) => (er * R_EARTH_M) / 1000,
+    footnote: 'Note: the 300–500 Ma Wu et al. 2024 distance anchors sit ~4–5 Earth radii below the curve — the documented Pangea high-tidal-dissipation interval. Wu\'s key finding is that recession ran non-uniformly (~7.0 cm/yr during supercontinent assembly, 325–200 Ma, vs ~2.2 cm/yr before it); the calibrated smooth 0–1000 Ma branch deliberately averages over this regime, and the deviation is recorded and gated as documented bands (docs/99 §Pangea interval). The endpoints agree: 650 Ma within 2%, J2000 exact.',
   },
 };
 
