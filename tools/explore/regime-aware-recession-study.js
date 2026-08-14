@@ -256,19 +256,60 @@ for (const endSlope of [-2, -5, -8, -12, -16]) {
       };
       const LFn = integrateBudgetGated(aFn, { pumpFactor });
       const lod = lodHrOf(aFn, LFn);
-      const joffre = (lod(2460) - 16.98) / 0.50;
-      const weeli = (lod(2450) - 17.95) / 1.32;
-      const band = [1200, 1500, 1800].map((t) => {
-        const v = lod(t);
-        return v < 19 ? (v - 19) / 1.0 : v > 21 ? (v - 21) / 1.0 : 0;
-      });
+      // LOD anchors: Joffre + Weeli Wolli + Zhou 2024 ×3 + Xiamaling + Nanfen
+      const LOD_ANCHORS = [
+        [2460, 16.98, 0.50], [2450, 17.95, 1.32],
+        [1634, 17.82, 0.15], [1480, 18.12, 0.19], [1215, 18.86, 0.17],
+        [1400, 18.68, 0.25], [1100, 18.94, 0.39],
+      ];
       const genLod = lod(GENESIS_MA - 1);
       if (genLod < 2.5 || !Number.isFinite(genLod)) continue;
-      const chi2 = joffre ** 2 + weeli ** 2 + band.reduce((s, b) => s + b * b, 0);
+      const chi2 = LOD_ANCHORS.reduce((s, [t, v, sig]) => s + ((lod(t) - v) / sig) ** 2, 0);
       if (!best || chi2 < best.chi2) best = { chi2, endSlope, lockEnd, pumpFactor, lod, LFn, aFn };
     }
   }
 }
+
+// ── Theoretical background + the enlarged anchor set (2026-08-14 research) ──
+// Sources (fetched via web, values quoted exactly):
+//   Lantink et al. 2022 PNAS (Joffre BIF):        2460 Ma  LOD 16.98 ± 0.50 h
+//   Weeli Wolli rhythmites (via Farhat Table 3):  2450 Ma  LOD 17.95 ± 1.32 h
+//   Moodies tidal bundles (via Farhat Table 3):   3200 Ma  a 46.45 ± 1.50 R⊕
+//   Zhou et al. 2024 Sci. Adv. (Table S3):        1634 Ma  LOD 17.82 ± 0.15 h · a 330,290 km
+//                                                 1480 Ma  LOD 18.12 ± 0.19 h · a 333,560 km
+//                                                 1215 Ma  LOD 18.86 ± 0.17 h · a 341,370 km
+//   Meyers & Malinverno 2018 PNAS (Xiamaling):    1400 Ma  LOD 18.68 ± 0.25 h
+//   Nanfen Fm (J. Geol. Soc. 2023):               1100 Ma  LOD 18.94 ± 0.39 h
+//   Mitchell & Kirscher 2023 Nat. Geosci.:        stall ~19 h across 2.0–1.0 Ga —
+//     accelerative THERMAL-TIDE torque (solar, atmospheric) balancing the
+//     decelerative lunar ocean torque (Zahnle-Walker 1987 / Bartlett-
+//     Stevenson 2016 mechanism).
+//   Zhou et al. 2024 CONTESTS the lock ("Lamb resonance unlikely in the
+//     Mesoproterozoic") — their data show GRADUAL slow recession instead.
+//
+// The scientific state, honestly: the SHAPE (a slow-recession era ~1.7-1.0
+// Ga, ~3× slower than the Phanerozoic) is multi-source robust; the
+// MECHANISM (thermal pump vs weak ocean dissipation) is contested. For the
+// model this is ideal: the pump factor is a FITTED parameter — 0 means the
+// pure-ocean staircase (Farhat/Zhou), >0 the Mitchell-Kirscher lock — and
+// the anchor set now has the power to decide.
+console.log('L_EM(t) RECONSTRUCTED FROM DATA (Zhou 2024 joint a+LOD pairs):');
+console.log('  epoch      L_orb        L_spin       L_EM        vs today');
+const ZHOU = [
+  [1634, 330290, 17.82], [1480, 333560, 18.12], [1215, 341370, 18.86],
+];
+for (const [age, aKm, lodH] of ZHOU) {
+  const lo = lOrb(aKm);
+  const ls = I_EARTH * 2 * Math.PI / (lodH * 3600);
+  const lem = lo + ls;
+  console.log(`  ${age} Ma  ${(lo / 1e34).toFixed(3)}e34   ${(ls / 1e33).toFixed(3)}e33   ${(lem / 1e34).toFixed(3)}e34   ${((lem / L_TOTAL_J2000 - 1) * 100).toFixed(1)}%`);
+}
+console.log(`  today     ${(lOrb(384399) / 1e34).toFixed(3)}e34   ${(I_EARTH * 2 * Math.PI / 86164 / 1e33).toFixed(3)}e33   ${(L_TOTAL_J2000 / 1e34).toFixed(3)}e34   (anchor)`);
+console.log('  CAVEAT: cyclostratigraphic a and LOD are jointly inverted from the');
+console.log('  precession frequency through an assumed AM budget — the pairs are not');
+console.log('  fully independent, so this reconstruction tests CONVENTIONS as much as');
+console.log('  physics. Rhythmite day-counts (Weeli Wolli) are the independent check.');
+console.log('');
 
 if (best) {
   const chain = chainOf(best.lod);
