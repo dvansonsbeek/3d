@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "essrt-model": {
+      "command": "node",
+      "args": ["packages/api/src/mcp-server.js"]
+    }
+  }
+}

@@ -2,11 +2,13 @@
   "name": "@essrt/api",
   "version": "0.1.0",
   "private": true,
-  "description": "HTTP API over the assembled ESSRT model (@essrt/physics createModel) — §7a. Build-only until the hosting decision; zero runtime dependencies by design (thin adapter, node:http).",
+  "description": "Service surface over the assembled ESSRT model (@essrt/physics createModel) — §7a + Phase 16. One handler, two transports: HTTP (node:http) and MCP (stdio). Build-only until the hosting decision; zero runtime dependencies by design.",
   "type": "module",
   "license": "AGPL-3.0-or-later",
   "exports": {
     ".": "./src/app.js",
-    "./server": "./src/server.js"
+    "./server": "./src/server.js",
+    "./mcp": "./src/mcp.js",
+    "./mcp-server": "./src/mcp-server.js"
   }
 }
