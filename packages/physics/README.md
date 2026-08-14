@@ -53,7 +53,7 @@ The canonical assembly, wired once inside the package:
 import { createModel, DEFAULT_CONSTANTS } from '@essrt/physics';
 
 const model = createModel();
-model.identity.modelVersion;          // 'v10.0' + both content hashes
+model.identity.modelVersion;          // the shipped model identity (e.g. 'v11.0') + both content hashes
 model.epoch.hAtYear(2000 - 380e6);    // 306189 — Devonian H (the Wells 1963 match)
 model.earth.obliquityDeg(2000);       // 23.4393
 model.cardinal.jd(2000, 'SS');        // 2451716.575 — June solstice 2000 (USNO)
