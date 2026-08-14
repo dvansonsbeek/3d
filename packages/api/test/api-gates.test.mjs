@@ -32,7 +32,8 @@ const determinismDefects = (a, b) => {
   if (determinismDefects(real, fake).length === 0) failures.push('FAIL-PROOF: determinism checker accepted a differing pair');
 }
 // Real: /versions and /versions/{id} twice each.
-for (const path of ['/v1/versions', '/v1/versions/v10.0']) {
+const LIVE_VERSION = JSON.parse(handle({ method: 'GET', path: '/v1/versions' }).body).data.current;
+for (const path of ['/v1/versions', `/v1/versions/${LIVE_VERSION}`]) {
   const a = handle({ method: 'GET', path });
   const b = handle({ method: 'GET', path });
   if (a.status !== 200) { failures.push(`${path}: status ${a.status}`); continue; }
@@ -50,20 +51,24 @@ for (const field of REQUIRED_META_FIELDS) {
   }
 }
 // Real responses must be defect-free and self-consistent with the model identity.
+// The pinned id is read from the live listing (LIVE_VERSION above) —
+// hardcoding it broke on the v10.0 → v11.0 bump (the version event is
+// exactly what this must survive).
+const CURRENT_VERSION = LIVE_VERSION;
 {
-  const res = JSON.parse(handle({ method: 'GET', path: '/v1/versions/v10.0' }).body);
+  const res = JSON.parse(handle({ method: 'GET', path: `/v1/versions/${CURRENT_VERSION}` }).body);
   const defects = envelopeDefects(res.meta);
   for (const d of defects) failures.push(`meta missing "${d}"`);
   if (res.meta.modelVersion !== res.data.modelVersion) failures.push('meta/data modelVersion mismatch');
   if (!/^doi:10\./.test(String(res.meta.citation))) failures.push(`citation malformed: ${res.meta.citation}`);
-  if (!String(res.meta.inputEcho && JSON.stringify(res.meta.inputEcho)).includes('/v1/versions/v10.0')) {
+  if (!String(res.meta.inputEcho && JSON.stringify(res.meta.inputEcho)).includes(`/v1/versions/${CURRENT_VERSION}`)) {
     failures.push('inputEcho does not echo the request');
   }
 }
 
 // ── Immutability caching: pinned resource is immutable, listing is not ──────
 {
-  const pinned = handle({ method: 'GET', path: '/v1/versions/v10.0' });
+  const pinned = handle({ method: 'GET', path: `/v1/versions/${CURRENT_VERSION}` });
   const listing = handle({ method: 'GET', path: '/v1/versions' });
   if (!/immutable/.test(pinned.headers['cache-control'] ?? '')) failures.push('pinned version not cache-immutable');
   if (/immutable/.test(listing.headers['cache-control'] ?? '')) failures.push('mutable listing marked immutable');
