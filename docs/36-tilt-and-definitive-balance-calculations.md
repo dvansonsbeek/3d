@@ -126,14 +126,14 @@ mass or position.
 
 | Planet  | Tilt (deg) | e_amplitude   | % of J2000 ecc | Effect on balance |
 |---------|------------|---------------|-----------------|-------------------|
-| Mercury |   0.03     | 2.338e-5      | 0.011%          | Negligible        |
-| Venus   |   <!--v:venusAxialTiltJ2000-->2.6392<!--/v-->   | 9.526e-4      | 14.057%         | Negligible (tiny v) |
-| Earth   |  <!--v:meanObliquity-->23.41353<!--/v-->  | 1.356e-3      | 8.116%          | 0.05% of total    |
-| Mars    |  25.19     | 3.066e-3      | 3.283%          | 0.14% of total    |
-| Jupiter |   3.13     | 1.134e-6      | 0.002%          | Negligible        |
-| Saturn  |  26.73     | 5.360e-6      | 0.010%          | Negligible        |
-| Uranus  |  82.23     | 2.802e-5      | 0.059%          | Negligible        |
-| Neptune |  28.32     | 8.039e-6      | 0.094%          | Negligible        |
+| Mercury |   <!--v:mercuryAxialTiltJ2000-->0.03<!--/v-->     | <!--v:mercuryEccAmp-->2.337e-5<!--/v-->      | 0.011%          | Negligible        |
+| Venus   |   <!--v:venusAxialTiltJ2000-->2.6392<!--/v-->   | <!--v:venusEccAmp-->9.524e-4<!--/v-->      | 14.057%         | Negligible (tiny v) |
+| Earth   |  <!--v:meanObliquity-->23.41353<!--/v-->  | <!--v:eccentricityAmplitude-->0.001356<!--/v-->      | 8.116%          | 0.05% of total    |
+| Mars    |  <!--v:marsAxialTiltJ2000-->25.19<!--/v-->     | <!--v:marsEccAmp-->3.056e-3<!--/v-->      | 3.283%          | 0.14% of total    |
+| Jupiter |   <!--v:jupiterAxialTiltJ2000-->3.13<!--/v-->     | <!--v:jupiterEccAmp-->1.134e-6<!--/v-->      | 0.002%          | Negligible        |
+| Saturn  |  <!--v:saturnAxialTiltJ2000-->26.73<!--/v-->     | <!--v:saturnEccAmp-->5.359e-6<!--/v-->      | 0.010%          | Negligible        |
+| Uranus  |  <!--v:uranusAxialTiltJ2000-->82.23<!--/v-->     | <!--v:uranusEccAmp-->2.802e-5<!--/v-->      | 0.059%          | Negligible        |
+| Neptune |  <!--v:neptuneAxialTiltJ2000-->28.32<!--/v-->     | <!--v:neptuneEccAmp-->8.037e-6<!--/v-->      | 0.094%          | Negligible        |
 
 ### The Physical Mechanism: How Eccentricity Arises from Tilt and Inclination
 
@@ -288,12 +288,12 @@ Inclination amplitudes are derived from the PSI formula:
 
 | Planet  | d  | sqrt(m)        | PSI / (d * sqrt(m)) | Actual amplitude | Match |
 |---------|-----|----------------|----------------------|------------------|-------|
-| Mercury |  21 | 4.0745e-4      | 0.386478             | 0.386478         | Yes   |
-| Venus   |  34 | 1.5646e-3      | 0.062165             | 0.062165         | Yes   |
+| Mercury |  21 | 4.0745e-4      | <!--v:mercuryInclAmp-->0.386488<!--/v-->             | <!--v:mercuryInclAmp-->0.386488<!--/v-->         | Yes   |
+| Venus   |  34 | 1.5646e-3      | <!--v:venusInclAmp-->0.062166<!--/v-->             | <!--v:venusInclAmp-->0.062166<!--/v-->         | Yes   |
 | Earth   |   3 | 1.7331e-3      | 0.636              | <!--v:earthInclAmp-->0.63605<!--/v--> | 0.0% |
-| Mars    |   5 | 5.6808e-4      | 1.164222             | 1.164222         | Yes   |
+| Mars    |   5 | 5.6808e-4      | <!--v:marsInclAmp-->1.164246<!--/v-->             | <!--v:marsInclAmp-->1.164246<!--/v-->         | Yes   |
 | Jupiter |   5 | 3.0900e-2      | <!--v:jupiterInclAmp-->0.021404<!--/v-->             | <!--v:jupiterInclAmp-->0.021404<!--/v-->         | Yes   |
-| Saturn  |   3 | 1.6908e-2      | 0.065193             | 0.065193         | Yes   |
+| Saturn  |   3 | 1.6908e-2      | <!--v:saturnInclAmp-->0.065194<!--/v-->             | <!--v:saturnInclAmp-->0.065194<!--/v-->         | Yes   |
 | Uranus  |  21 | 6.6078e-3      | <!--v:uranusInclAmp-->0.023831<!--/v-->             | <!--v:uranusInclAmp-->0.023831<!--/v-->         | Yes   |
 | Neptune |  34 | 7.1772e-3      | <!--v:neptuneInclAmp-->0.013551<!--/v-->             | <!--v:neptuneInclAmp-->0.013551<!--/v-->         | Yes   |
 
@@ -332,14 +332,14 @@ For each planet, six parameters fully describe the orbital dynamics:
 
 | Planet  | 1. Tilt    | 2. Amp Tilt | 3. Mean Ecc  | 4. Amp Ecc    | 5. Mean Incl | 6. Amp Incl |
 |---------|------------|-------------|---------------|---------------|--------------|-------------|
-| Mercury |   0.03     | 0.386478    | 0.20563022    | 2.338e-5      |  6.703207    | 0.386478    |
-| Venus   |   <!--v:venusAxialTiltJ2000-->2.6392<!--/v-->   | 0.062165    | 0.00770652    | 9.526e-4      |  <!--v:venusInclMean-->2.151359<!--/v-->    | 0.062165    |
-| Earth   |  <!--v:meanObliquity-->23.41353<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> | 0.01538578    | 1.356e-3      |  <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> |
-| Mars    |  25.19     | 1.164222    | 0.09146580    | 3.066e-3      |  1.915105    | 1.164222    |
-| Jupiter |   3.13     | <!--v:jupiterInclAmp-->0.021404<!--/v-->    | 0.04838630    | 1.134e-6      |  <!--v:jupiterInclMean-->0.321086<!--/v-->    | <!--v:jupiterInclAmp-->0.021404<!--/v-->    |
-| Saturn  |  26.73     | 0.065193    | 0.05386607    | 5.360e-6      |  0.984965    | 0.065193    |
-| Uranus  |  82.23     | <!--v:uranusInclAmp-->0.023831<!--/v-->    | 0.04724317    | 2.802e-5      |  <!--v:uranusInclMean-->1.015182<!--/v-->    | <!--v:uranusInclAmp-->0.023831<!--/v-->    |
-| Neptune |  28.32     | <!--v:neptuneInclAmp-->0.013551<!--/v-->    | 0.00859679    | 8.039e-6      |  <!--v:neptuneInclMean-->0.743803<!--/v-->    | <!--v:neptuneInclAmp-->0.013551<!--/v-->    |
+| Mercury |   <!--v:mercuryAxialTiltJ2000-->0.03<!--/v-->     | <!--v:mercuryInclAmp-->0.386488<!--/v-->    | <!--v:mercuryEccBase-->0.20563<!--/v-->    | <!--v:mercuryEccAmp-->2.337e-5<!--/v-->      |  <!--v:mercuryInclMean-->6.703216<!--/v-->    | <!--v:mercuryInclAmp-->0.386488<!--/v-->    |
+| Venus   |   <!--v:venusAxialTiltJ2000-->2.6392<!--/v-->   | <!--v:venusInclAmp-->0.062166<!--/v-->    | <!--v:venusEccBase-->0.00771<!--/v-->    | <!--v:venusEccAmp-->9.524e-4<!--/v-->      |  <!--v:venusInclMean-->2.151359<!--/v-->    | <!--v:venusInclAmp-->0.062166<!--/v-->    |
+| Earth   |  <!--v:meanObliquity-->23.41353<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> | <!--v:earthEccBase-->0.01539<!--/v-->    | <!--v:eccentricityAmplitude-->0.001356<!--/v-->      |  <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> |
+| Mars    |  <!--v:marsAxialTiltJ2000-->25.19<!--/v-->     | <!--v:marsInclAmp-->1.164246<!--/v-->    | <!--v:marsEccBase-->0.09165<!--/v-->    | <!--v:marsEccAmp-->3.056e-3<!--/v-->      |  <!--v:marsInclMean-->1.833256<!--/v-->    | <!--v:marsInclAmp-->1.164246<!--/v-->    |
+| Jupiter |   <!--v:jupiterAxialTiltJ2000-->3.13<!--/v-->     | <!--v:jupiterInclAmp-->0.021404<!--/v-->    | <!--v:jupiterEccBase-->0.04839<!--/v-->    | <!--v:jupiterEccAmp-->1.134e-6<!--/v-->      |  <!--v:jupiterInclMean-->0.321086<!--/v-->    | <!--v:jupiterInclAmp-->0.021404<!--/v-->    |
+| Saturn  |  <!--v:saturnAxialTiltJ2000-->26.73<!--/v-->     | <!--v:saturnInclAmp-->0.065194<!--/v-->    | <!--v:saturnEccBase-->0.05387<!--/v-->    | <!--v:saturnEccAmp-->5.359e-6<!--/v-->      |  <!--v:saturnInclMean-->0.984967<!--/v-->    | <!--v:saturnInclAmp-->0.065194<!--/v-->    |
+| Uranus  |  <!--v:uranusAxialTiltJ2000-->82.23<!--/v-->     | <!--v:uranusInclAmp-->0.023831<!--/v-->    | <!--v:uranusEccBase-->0.04724<!--/v-->    | <!--v:uranusEccAmp-->2.802e-5<!--/v-->      |  <!--v:uranusInclMean-->1.015182<!--/v-->    | <!--v:uranusInclAmp-->0.023831<!--/v-->    |
+| Neptune |  <!--v:neptuneAxialTiltJ2000-->28.32<!--/v-->     | <!--v:neptuneInclAmp-->0.013551<!--/v-->    | <!--v:neptuneEccBase-->0.00860<!--/v-->    | <!--v:neptuneEccAmp-->8.037e-6<!--/v-->      |  <!--v:neptuneInclMean-->0.743803<!--/v-->    | <!--v:neptuneInclAmp-->0.013551<!--/v-->    |
 
 Note: Columns 2 and 6 are identical — the amplitude of axial tilt oscillation IS the
 amplitude of inclination oscillation, both derived from PSI / (d * sqrt(m)).

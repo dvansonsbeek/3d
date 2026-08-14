@@ -309,12 +309,12 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | 6.703207 | 0.386478 | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | 8H/93 ≈ <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr |
+| Mercury | <!--v:mercuryInclMean-->6.703216<!--/v--> | <!--v:mercuryInclAmp-->0.386488<!--/v--> | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | 8H/93 ≈ <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr |
 | Venus | <!--v:venusInclMean-->2.151359<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | 8H/110 ≈ <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr |
 | Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> | 0.85 - 2.12 | <!--v:earthInclCycleAnchor-->21.77<!--/v-->° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr |
-| Mars | 1.833251 | 1.164218 | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | 8H/68 ≈ <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
+| Mars | <!--v:marsInclMean-->1.833256<!--/v--> | <!--v:marsInclAmp-->1.164246<!--/v--> | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | 8H/68 ≈ <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
 | Jupiter | <!--v:jupiterInclMean-->0.321086<!--/v--> | <!--v:jupiterInclAmp-->0.021404<!--/v--> | 0.30 - 0.34 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | 8H/65 ≈ <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr |
-| Saturn | 0.984965 | 0.065193 | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | 8H/169 ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr |
+| Saturn | <!--v:saturnInclMean-->0.984967<!--/v--> | <!--v:saturnInclAmp-->0.065194<!--/v--> | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | 8H/169 ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr |
 | Uranus | <!--v:uranusInclMean-->1.015182<!--/v--> | <!--v:uranusInclAmp-->0.023831<!--/v--> | 0.99 - 1.04 | 21.33° | H/10 ≈ <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr |
 | Neptune | <!--v:neptuneInclMean-->0.743803<!--/v--> | <!--v:neptuneInclAmp-->0.013551<!--/v--> | 0.73 - 0.76 | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | 2H/25 ≈ <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr |
 | Pluto | <!--v:plutoInclMean-->15.716200<!--/v--> | <!--v:plutoInclAmp-->0.717024<!--/v--> | 15.00 - 16.43 | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | H/12 ≈ <!--v:plutoPeriPeriodICRF-->27,943<!--/v--> yr |

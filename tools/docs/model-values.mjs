@@ -585,6 +585,11 @@ export const VALUES = {
         get: () => C.planets[p].orbitalEccentricityBase,
         render: (v) => Number(v).toFixed(5),
       }],
+      [`${p}EccAmp`, {
+        get: () => C.planets[p].orbitalEccentricityAmplitude,
+        render: (v) => Number(v).toExponential(3),
+        note: 'K-law amplitude',
+      }],
       [`${p}EccJ2000`, {
         get: () => C.planets[p].orbitalEccentricityJ2000,
         render: (v) => Number(v).toFixed(5),
