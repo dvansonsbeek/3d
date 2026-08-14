@@ -75,8 +75,13 @@ with their own formula), `identity` (version + hashes + citation DOI), `epoch`
 (H, LOD, α, ΔT, deep-time quantities at any year ±500 Myr), `earth`
 (obliquity, eccentricity, inclination, perihelion), `lengths` (year and
 day lengths), `cardinal` (solstice/equinox JD, RA, year length), `moon`
-(distance, sidereal month). Validation targets are refused as inputs —
-a counterfactual cannot move the goalposts it is judged by.
+(distance and months at epoch, plus the apparent-position chain on the
+JD(UT) axis — ecliptic longitude, latitude and distance from the shared
+Meeus series over framework-native arguments), `eclipse` (geocentric
+solar/lunar eclipse search over a JD window, greatest-eclipse convention),
+`climate` (the L1 orbital-forcing formula) and `planets` (the Fibonacci-law
+records and orientation at epoch). Validation targets are refused as
+inputs — a counterfactual cannot move the goalposts it is judged by.
 
 ## Underneath: a parts library
 
@@ -88,7 +93,9 @@ browser. For custom wiring (different α channel, subset assembly), use
 the factories directly: the reference adapter is `tools/lib/` in the
 [public repository](https://github.com/dvansonsbeek/3d) — the hosted
 simulator and the project's verification gates run on it. A service
-surface (API/MCP) over `createModel()` is on the project roadmap.
+surface over `createModel()` lives in the same repository
+(`packages/api`, an OpenAPI 3.1 handler with zero runtime dependencies)
+— build-only until the hosting decision.
 
 ## Provenance
 
