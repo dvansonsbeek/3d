@@ -1,0 +1,116 @@
+---
+docVersion: 1.0
+modelVersion: v10.0
+coefficients: sha256:19f53e968ab084a9
+status: current
+---
+
+# 106 — Deep-Time Validation Dossier
+
+The single entry point for the question *"how well does the model match the
+geological and historical record, and how would we know if it stopped?"*
+Every claim here is one of three things: **gate-backed** (a script in the
+enforced chain fails if it breaks), **artifact-backed** (a generated result
+whose freshness `check:artifacts` guards), or **correspondence** (an observed
+pattern the null tests could not promote to validation — stated as such).
+Nothing in this document is a number typed by hand: every value is a
+registry-owned marker span, recomputed from the engine by `docs:values`.
+
+The honest-miss rows are load-bearing. A dossier that only lists agreements
+is an advertisement; the documented deviations (§D) are asserted by the same
+gates as the agreements — an unexplained *improvement* fails the chain too,
+because a miss that silently becomes a hit means the formula changed.
+
+---
+
+## A. Rotational and tidal chronology — gate-backed
+
+The model's H(t)/LOD(t)/Moon-distance curve against the published
+paleontological record: **30 anchors** across Wells 1963 (coral growth
+bands, ×9), de Winter 2020 (rudist bivalve), Pannella 1972 (bivalves), a
+Triassic compilation, Williams 2000 (Elatina tidal rhythmites),
+Mitchell–Kirscher 2023 (multi-proxy LOD), Wu et al. 2024 (34-record
+cyclostratigraphic inversion, LOD + Moon distance) and the Patterson 1956 /
+rigid-Roche consistency check.
+
+| Statistic (days/yr anchors) | Phanerozoic (0–500 Ma) | All (0–620 Ma) |
+|:---|:---:|:---:|
+| Mean absolute deviation | **<!--v:paleoMadPhanPct-->0.18<!--/v-->%** | <!--v:paleoMadAllPct-->0.61<!--/v-->% |
+| RMS deviation | <!--v:paleoRmsPhanPct-->0.24<!--/v-->% | <!--v:paleoRmsAllPct-->1.55<!--/v-->% |
+| Within 1% | <!--v:paleoWithin1Phan-->12/12<!--/v--> | <!--v:paleoWithin1All-->13/14<!--/v--> |
+
+Flagship: Wells's Devonian 400 days/yr vs the model's
+<!--v:daysPerYearAtDevonian-->399.96<!--/v--> (H at 380 Ma =
+<!--v:hAtDevonian-->306,189<!--/v--> yr, vs <!--v:H-->335,317<!--/v--> at
+J2000) — with **zero free parameters** in the H/13 coupling: the deep-time
+trajectory is calibrated to Farhat 2022 and the modern LLR recession rate,
+never to the fossil data it is tested against.
+
+- Anchors + sources + tolerances: [`data/paleo-validation-anchors.json`](../data/paleo-validation-anchors.json)
+- Gate: `tools/verify/paleo-anchors.js` (in `npm run test:verify` and CI)
+- Full tables and the per-anchor discussion: [doc 99 §Validation](99-expanding-solar-system-resonance-theory.md#validation-against-published-paleontological-measurements)
+- The Hadean endpoint: the Farhat polynomial extrapolated to the Patterson
+  1956 Pb–Pb age places the Moon at
+  <!--v:anchorHadeanRochePred-->1.48<!--/v--> R⊕ — the rigid Roche limit at
+  the giant-impact epoch, an unfitted consistency check across 4.5 Gyr.
+
+## B. Cyclostratigraphy and climate spectra — artifact-backed
+
+The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
+
+- **Cenogrid spectral evidence** — MTM F-tests and windowed spectra of the
+  Westerhold 2020 CENOGRID stack against the 8H lattice:
+  [doc 91](91-milankovitch-evidence.md) with generated artifacts
+  (`data/milankovitch-8h-cenogrid-*.json`, `data/cenogrid-mtm-ftest.json`)
+  under `check:artifacts` freshness.
+- **Devonian obliquity beat** — the n=65 band predicted at 37.68 kyr at the
+  Devonian (8.7% shorter than modern) matches published 36–38 kyr
+  observations (Meyers 2008, Boulila 2018): [doc 99 §Predicted L1 periods](99-expanding-solar-system-resonance-theory.md#predicted-l1-periods-at-each-age--obliquity-band).
+- **The 405-kyr caveat, stated plainly** — the Laskar g₂−g₅ eccentricity
+  eigenbeat is *off* the 8H lattice; the record's 405-kyr power is
+  carbon-cycle amplified and is not claimed for the lattice:
+  [doc 93](93-l1-attribution-reference.md).
+- **Discriminating power, stated plainly** — the 66-Ma record cannot
+  distinguish a fixed lattice from an H(t)-rescaled one (2.4σ):
+  [doc 98](98-lattice-mechanism.md). The LOD-climate correlation fails its
+  null tests and is recorded as **open correspondence, not validation**:
+  [doc 95](95-climate-summary.md), [doc 94](94-insolation-null-test.md).
+
+## C. Historical era — gate- and artifact-backed
+
+- **Babylonian eclipse case study (−135)** — the framework places the
+  totality path <!--v:babylon135BestGapKm-->1257<!--/v--> km from Babylon at
+  ΔUT <!--v:babylon135BestDeltaUT-->-1h46<!--/v--> (framework
+  <!--v:babylon135FrameworkUT-->05:58<!--/v--> vs documented
+  <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
+  [doc 103](103-135-babylonian-case-study.md), eclipse-audit artifacts under
+  freshness guard.
+- **ΔT vs Stephenson 2016** — the framework ΔT stack against the published
+  polynomial, served live as an api cross-validation endpoint
+  (`/v1/cross-validation/deltat-stephenson2016`) and pinned by the fit
+  metrics ([doc 105](105-dt-stack-flag-audit.md)).
+- **Eclipse canon** — the 2024 events (Apr 8 Total, Oct 2 Annular, both
+  lunar) are semantic anchors in the `createModel` parity gate
+  (`test:model`), recomputed from the shipped physics on every CI run.
+
+## D. The honesty ledger — what does NOT validate, asserted anyway
+
+| Item | Status | Where |
+|:---|:---|:---|
+| Williams 2000 (620 Ma rhythmites) | documented <!--v:anchorWilliams620DeltaPct-->+5.70<!--/v-->% miss of the smooth formula at the Snowball boundary; asserted as a band — an unexplained improvement fails the gate | [doc 99 §Williams](99-expanding-solar-system-resonance-theory.md#the-williams-2000-620-ma-discrepancy--honest-discussion) |
+| Wu 2024 Pangea interval (200–500 Ma Moon rows) | the smooth Farhat polynomial cannot capture the supercontinent-era high-dissipation recession; deviations asserted as bands | [doc 99 §Pangea](99-expanding-solar-system-resonance-theory.md#the-pangea-high-tidal-dissipation-interval-the-mid-range-mismatch) |
+| Saturn Laplace–Lagrange bound | the model's documented physical-constraint failure (verify-laws 44/45; `allPass: false`) — distinct from the Config-7 mirror uniqueness, which holds | `tools/verify/verify-laws.js`, CLAUDE.md §falsification |
+| LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 95](95-climate-summary.md) |
+| Lattice vs H(t) discrimination | 2.4σ — the 66-Ma record cannot decide | [doc 98](98-lattice-mechanism.md) |
+| Uniform secular solar drift | bounded at r = −0.13 ± 0.09 ms/cy; a uniform −0.5 is disfavoured ~4σ | fit-anchor documentation |
+| The falsification criterion | the shipped configuration must remain the *unique* mirror-symmetric deep-analysis candidate among 7,558,272; checks 46–50 of verify-laws | CLAUDE.md §falsification |
+
+## Re-running everything
+
+```
+npm run test:verify     # the gate suite, incl. paleo-anchors
+npm run check           # the full enforced chain
+```
+
+`/gates` runs the standalone model checks. The anchor gate alone:
+`node tools/verify/paleo-anchors.js`.

@@ -208,6 +208,8 @@ The framework is documented in [Doc 99 — Expanding Solar System Resonance Theo
 - **Wu et al. 2024** (650-Myr cyclostratigraphy from sedimentary records): predicted H(t) matches Wu's reconstruction across the entire Phanerozoic to within ~1 %
 - **Patterson 1956 Pb-Pb Earth age** (4.55 Gyr): the model places the Moon at the Roche limit at that epoch — **no Hadean constraint was used in the fit**; the result emerges from the same proper-physics chain that produces the modern Moon distance
 
+The full evidence — 30 published anchors, per-anchor tolerances, the documented deviations, and the gate that re-checks all of it on every CI run — is assembled in the [Deep-Time Validation Dossier (Doc 106)](docs/106-deep-time-validation-dossier.md).
+
 Because the 6 free parameters are fit against modern J2000 data and then projected backward and forward via the proper-physics chain, the deep-time match is a **falsifiable prediction, not a fit**. The same 6 free parameters that reproduce the modern solar system to JPL Horizons precision (~1800–2200 AD) also reproduce paleontological day-counts at Devonian, cyclostratigraphic precession at 650 Ma, and the Hadean Moon-distance constraint at Earth formation — internally consistent across **the full 4.5-Gyr lifetime of the solar system**.
 
 ---
@@ -242,7 +244,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 | 70–79 | Verification | [Ascending Node Limitations](docs/70-ascending-node-limitations.md) |
 | 80–89 | Per-Planet Setup | [Mercury Scene Graph Setup](docs/80-mercury-setup.md) |
 | 90–99 | Climate Analysis | [Climate Formula (Doc 92)](docs/92-climate-formula.md), [Climate Summary (Doc 95)](docs/95-climate-summary.md), [ESSRT (Doc 99)](docs/99-expanding-solar-system-resonance-theory.md) |
-| 100–109 | ΔT & Historical Eclipse Validation | [GIA α(t) lunar validation (Doc 102)](docs/102-gia-alpha-lunar-validation.md), [-135 Babylonian case study (Doc 103)](docs/103-135-babylonian-case-study.md), [Millennial rotation swing (Doc 104)](docs/104-millennial-rotation-swing.md), [ΔT stack flag audit (Doc 105)](docs/105-dt-stack-flag-audit.md) |
+| 100–109 | ΔT, Historical Eclipse & Deep-Time Validation | [GIA α(t) lunar validation (Doc 102)](docs/102-gia-alpha-lunar-validation.md), [-135 Babylonian case study (Doc 103)](docs/103-135-babylonian-case-study.md), [Millennial rotation swing (Doc 104)](docs/104-millennial-rotation-swing.md), [ΔT stack flag audit (Doc 105)](docs/105-dt-stack-flag-audit.md), [Deep-Time Validation Dossier (Doc 106)](docs/106-deep-time-validation-dossier.md) |
 
 **Investigation & Verification:**
 - [Python Scripts](scripts/) — Statistical significance tests, exoplanet Fibonacci tests, eccentricity analysis, Milankovitch paleoclimate tests

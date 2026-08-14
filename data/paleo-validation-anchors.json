@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "description": "Deep-time validation anchors: published paleontological / cyclostratigraphic measurements vs the model's proper-physics two-layer predictions (Phase 19 dossier). OBSERVED values are verbatim from the cited sources (as tabulated in docs/99 §'Validation against published paleontological measurements'); the model predictions are NOT stored here — tools/verify/paleo-anchors.js recomputes them live from the engine and asserts each expectation. Documented deviations (Williams 620 Ma, the Wu Pangea interval) are encoded as deviation BANDS: the gate fails on an unexplained IMPROVEMENT too (verify-laws precedent — a suddenly-matching miss means the formula changed).",
+    "recipes": {
+      "daysPerYear": "tools/lib/deep-time.js meanYearInDaysAtAge(ageMa)",
+      "lodHr": "meanLodSecondsAtAge(ageMa) / 3600",
+      "moonDistanceRE": "meanMoonDistanceCorrectedAtAge(ageMa) / earthParallaxRadiusKm (raw meanMoonDistanceAtAge for the Hadean row — the solar-Δa correction is a modern-orbit construct)",
+      "expectationTypes": {
+        "relativePct": "|predicted/observed - 1| * 100 <= tolerancePct",
+        "range": "predicted inside [lo, hi], allowing outsideToleranceAbs beyond either edge",
+        "deviationBandPct": "(predicted/observed - 1) * 100 inside band [lo, hi] — a DOCUMENTED deviation that must persist",
+        "deviationBandOutsideRange": "signed distance outside the observed range (positive above hi, negative below lo) inside band [lo, hi]"
+      }
+    },
+    "sources": {
+      "wells1963": "Wells, J.W. 1963. Coral growth and geochronometry. Nature 197, 948–950 (table via Arbab 2001 review)",
+      "winter2020": "de Winter et al. 2020. Subdaily-scale chemical variability in a Torreites sanchezi rudist shell. Paleoceanography and Paleoclimatology 35, e2019PA003723",
+      "pannella1972": "Pannella 1972 / Scrutton — bivalve growth increments, ~90 Ma",
+      "triassic": "Triassic compilation (docs/99 multi-source table)",
+      "williams2000": "Williams, G.E. 2000. Geological constraints on the Precambrian history of Earth's rotation. Rev. Geophys. 38, 37–59 (Elatina tidal rhythmites)",
+      "mitchellKirscher2023": "Mitchell, R.N. & Kirscher, U. 2023. Mid-Proterozoic day length stalled by tidal resonance. Nature Geoscience 16, 567–569",
+      "wu2024": "Wu, Malinverno, Meyers, et al. 2024. A 650-Myr history of Earth's axial precession frequency... Science Advances, doi:10.1126/sciadv.ado2412",
+      "patterson1956": "Patterson, C. 1956. Age of meteorites and the earth. Geochim. Cosmochim. Acta 10, 230–237 (Pb–Pb age → giant-impact epoch consistency)"
+    },
+    "rights": "Observed values are published scientific measurements (facts, not creative works) reproduced with citation for validation purposes."
+  },
+  "anchors": [
+    { "id": "wells-65", "ageMa": 65, "quantity": "daysPerYear", "observed": 371, "source": "wells1963", "method": "coral growth bands (Maastrichtian)", "expectation": { "type": "relativePct", "tolerancePct": 0.5 } },
+    { "id": "wells-136", "ageMa": 136, "quantity": "daysPerYear", "observed": 377, "source": "wells1963", "method": "coral growth bands (Early Cretaceous)", "expectation": { "type": "relativePct", "tolerancePct": 0.5 } },
+    { "id": "wells-180", "ageMa": 180, "quantity": "daysPerYear", "observed": 381, "source": "wells1963", "method": "coral growth bands (Jurassic)", "expectation": { "type": "relativePct", "tolerancePct": 0.5 } },
+    { "id": "wells-230", "ageMa": 230, "quantity": "daysPerYear", "observed": 385, "source": "wells1963", "method": "coral growth bands (Triassic)", "expectation": { "type": "relativePct", "tolerancePct": 0.5 } },
+    { "id": "wells-280", "ageMa": 280, "quantity": "daysPerYear", "observed": 390, "source": "wells1963", "method": "coral growth bands (Permian)", "expectation": { "type": "relativePct", "tolerancePct": 0.5 } },
+    { "id": "wells-345", "ageMa": 345, "quantity": "daysPerYear", "observed": 396, "source": "wells1963", "method": "coral growth bands (Mississippian)", "expectation": { "type": "relativePct", "tolerancePct": 0.5 } },
+    { "id": "wells-405", "ageMa": 405, "quantity": "daysPerYear", "observed": 402, "source": "wells1963", "method": "coral growth bands (Early Devonian)", "expectation": { "type": "relativePct", "tolerancePct": 0.5 } },
+    { "id": "wells-500", "ageMa": 500, "quantity": "daysPerYear", "observed": 412, "source": "wells1963", "method": "coral growth bands (Cambrian)", "expectation": { "type": "relativePct", "tolerancePct": 0.5 } },
+    { "id": "wells-600", "ageMa": 600, "quantity": "daysPerYear", "observed": 424, "source": "wells1963", "method": "coral curve (Late Precambrian)", "expectation": { "type": "relativePct", "tolerancePct": 1.0 }, "note": "inside coral-count uncertainty (docs/99)" },
+
+    { "id": "winter2020-70", "ageMa": 70, "quantity": "daysPerYear", "observed": 372, "source": "winter2020", "method": "Torreites rudist bivalve daily laminae", "expectation": { "type": "relativePct", "tolerancePct": 0.5 } },
+    { "id": "pannella-90", "ageMa": 90, "quantity": "daysPerYear", "observed": 372.6, "source": "pannella1972", "method": "bivalve growth increments", "expectation": { "type": "relativePct", "tolerancePct": 0.5 } },
+    { "id": "triassic-200", "ageMa": 200, "quantity": "daysPerYear", "observed": 385.9, "source": "triassic", "method": "compilation", "expectation": { "type": "relativePct", "tolerancePct": 1.2 } },
+    { "id": "wells-flagship-380", "ageMa": 380, "quantity": "daysPerYear", "observed": 400, "source": "wells1963", "method": "Devonian corals (the flagship anchor)", "expectation": { "type": "relativePct", "tolerancePct": 0.2 } },
+    { "id": "williams-620", "ageMa": 620, "quantity": "daysPerYear", "observed": 400.3, "source": "williams2000", "method": "Elatina tidal rhythmites", "expectation": { "type": "deviationBandPct", "band": [4.5, 7.0] }, "note": "DOCUMENTED +5.7% miss of the smooth Farhat-anchored formula at the Snowball boundary — docs/99 §'The Williams 2000 (620 Ma) discrepancy'. An unexplained improvement fails this gate." },
+    { "id": "mitchell-kirscher-650", "ageMa": 650, "quantity": "lodHr", "observedRange": [21.0, 22.0], "source": "mitchellKirscher2023", "method": "multi-proxy LOD compilation", "expectation": { "type": "deviationBandOutsideRange", "band": [-0.9, -0.1] }, "note": "documented 'slightly below range' (docs/99)" },
+
+    { "id": "wu-lod-0", "ageMa": 0, "quantity": "lodHr", "observed": 24.0, "source": "wu2024", "method": "modern anchor", "expectation": { "type": "relativePct", "tolerancePct": 0.1 } },
+    { "id": "wu-lod-100", "ageMa": 100, "quantity": "lodHr", "observedRange": [23.5, 23.8], "source": "wu2024", "method": "TimeOptB inversion of 34 cyclostratigraphic records", "expectation": { "type": "range", "outsideToleranceAbs": 0.3 } },
+    { "id": "wu-lod-200", "ageMa": 200, "quantity": "lodHr", "observedRange": [23.6, 23.8], "source": "wu2024", "method": "TimeOptB inversion", "expectation": { "type": "deviationBandOutsideRange", "band": [-1.2, -0.4] }, "note": "documented 'LOD short by 0.8 hr' (docs/99 Wu table)" },
+    { "id": "wu-lod-300", "ageMa": 300, "quantity": "lodHr", "observedRange": [22.5, 23.0], "source": "wu2024", "method": "TimeOptB inversion", "expectation": { "type": "range", "outsideToleranceAbs": 0.3 } },
+    { "id": "wu-lod-400", "ageMa": 400, "quantity": "lodHr", "observedRange": [21.5, 22.0], "source": "wu2024", "method": "TimeOptB inversion", "expectation": { "type": "range", "outsideToleranceAbs": 0.3 } },
+    { "id": "wu-lod-500", "ageMa": 500, "quantity": "lodHr", "observedRange": [20.9, 21.5], "source": "wu2024", "method": "TimeOptB inversion", "expectation": { "type": "range", "outsideToleranceAbs": 0.3 } },
+    { "id": "wu-lod-650", "ageMa": 650, "quantity": "lodHr", "observed": 20.94, "source": "wu2024", "method": "TimeOptB inversion (endpoint)", "expectation": { "type": "relativePct", "tolerancePct": 2.0 }, "note": "the independent-method endpoint agreement (docs/99)" },
+
+    { "id": "wu-moon-0", "ageMa": 0, "quantity": "moonDistanceRE", "observed": 60.27, "source": "wu2024", "method": "modern anchor (LLR)", "expectation": { "type": "relativePct", "tolerancePct": 0.5 } },
+    { "id": "wu-moon-100", "ageMa": 100, "quantity": "moonDistanceRE", "observedRange": [59.0, 60.0], "source": "wu2024", "method": "TimeOptB inversion", "expectation": { "type": "range", "outsideToleranceAbs": 0.3 } },
+    { "id": "wu-moon-200", "ageMa": 200, "quantity": "moonDistanceRE", "observedRange": [58.0, 59.0], "source": "wu2024", "method": "TimeOptB inversion", "expectation": { "type": "range", "outsideToleranceAbs": 0.3 } },
+    { "id": "wu-moon-300", "ageMa": 300, "quantity": "moonDistanceRE", "observedRange": [53.0, 55.0], "source": "wu2024", "method": "TimeOptB inversion", "expectation": { "type": "deviationBandOutsideRange", "band": [3.0, 5.5] }, "note": "documented Pangea high-dissipation interval — the smooth Farhat polynomial cannot capture the regime-dependent recession (docs/99 §'The Pangea high-tidal-dissipation interval')" },
+    { "id": "wu-moon-400", "ageMa": 400, "quantity": "moonDistanceRE", "observedRange": [52.0, 53.0], "source": "wu2024", "method": "TimeOptB inversion", "expectation": { "type": "deviationBandOutsideRange", "band": [4.0, 6.0] }, "note": "documented Pangea interval deviation (docs/99)" },
+    { "id": "wu-moon-500", "ageMa": 500, "quantity": "moonDistanceRE", "observedRange": [53.0, 54.0], "source": "wu2024", "method": "TimeOptB inversion", "expectation": { "type": "deviationBandOutsideRange", "band": [2.5, 5.0] }, "note": "documented Pangea interval deviation (docs/99)" },
+    { "id": "wu-moon-650", "ageMa": 650, "quantity": "moonDistanceRE", "observed": 56.73, "source": "wu2024", "method": "TimeOptB inversion (endpoint)", "expectation": { "type": "relativePct", "tolerancePct": 2.0 }, "note": "the independent-method endpoint agreement (docs/99)" },
+
+    { "id": "hadean-roche", "ageMa": 4498, "quantity": "moonDistanceRawRE", "observedRange": [1.4, 1.6], "source": "patterson1956", "method": "rigid Roche limit ≈ 1.49 R⊕ at the giant-impact epoch implied by the Pb–Pb Earth age", "expectation": { "type": "range", "outsideToleranceAbs": 0.05 }, "note": "the Farhat polynomial extrapolated to the Patterson age must place the Moon at the rigid Roche limit (docs/99, docs/00)" }
+  ]
+}

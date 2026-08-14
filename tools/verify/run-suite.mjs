@@ -66,6 +66,8 @@ const MANIFEST = [
     note: 'Phase 12: every tracked file under data/ must be manifest-covered (PROVENANCE.md row, directory, or self-describing/ledgered generated JSON); no dangling rows; ledger scripts exist' },
   { n: 'predict-form-pinning.js', class: 'gate', ms: 4000,
     note: '§12g-3: PREDICT_COEFFS and their trained (Node J2000-anchored) scalar form are a matched pair — pins 35 fluctuation values to a fixture and bounds the browser-form dual divergence; --write re-records ONLY after a conscious retrain' },
+  { n: 'paleo-anchors.js', class: 'gate', ms: 2000,
+    note: 'Phase 19: 30 deep-time anchors (Wells 1963 · Winter 2020 · Pannella 1972 · Williams 2000 · Mitchell-Kirscher 2023 · Wu 2024 · Patterson/Roche) recomputed LIVE from the engine vs data/paleo-validation-anchors.json; documented deviations (Williams 620 Ma, the Wu Pangea interval) are BANDS — an unexplained improvement fails too (the verify-laws precedent)' },
 
   { n: 'analytical-ascending-nodes.js', class: 'narrative', ms: 43 },
   { n: 'ascending-node-optimization.js', class: 'narrative', ms: 42 },

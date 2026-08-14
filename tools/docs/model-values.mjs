@@ -2252,6 +2252,68 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Phase 19: paleo-validation anchors (the dossier's live numbers) ──────
+  // Predictions recomputed from the engine with the SAME recipes as the
+  // paleo-anchors gate (tools/verify/paleo-anchors.js); observed values and
+  // the anchor list come from data/paleo-validation-anchors.json — ONE
+  // source for the gate, the doc tables and the summary statistics. Porting
+  // these caught the doc-99 statistical summary carrying a pre-proper-physics
+  // vintage (claimed max 1.35% Cambrian / 4.16% Williams where the shipped
+  // formula gives −0.15% / +5.70%).
+  ...(() => {
+    const anchors = rd('data/paleo-validation-anchors.json').anchors;
+    const RE = () => astro.physicalConstants.earthParallaxRadiusKm;
+    /** @type {Record<string, (t: number) => number>} */
+    const predictOf = {
+      daysPerYear: (t) => dtl().meanYearInDaysAtAge(t),
+      lodHr: (t) => dtl().meanLodSecondsAtAge(t) / 3600,
+      moonDistanceRE: (t) => dtl().meanMoonDistanceCorrectedAtAge(t) / RE(),
+      moonDistanceRawRE: (t) => dtl().meanMoonDistanceAtAge(t) / RE(),
+    };
+    const unitOf = { daysPerYear: 'd/yr', lodHr: 'hr', moonDistanceRE: 'R_E', moonDistanceRawRE: 'R_E' };
+    const camel = (id) => id.split('-').map((s, i) => (i === 0 ? s : s.charAt(0).toUpperCase() + s.slice(1))).join('').replace(/[^A-Za-z0-9]/g, '');
+    /** @type {Record<string, any>} */
+    const out = {};
+    for (const a of anchors) {
+      const cid = camel(a.id);
+      out[`anchor${cid.charAt(0).toUpperCase() + cid.slice(1)}Pred`] = {
+        get: () => predictOf[a.quantity](a.ageMa),
+        render: (v) => Number(v).toFixed(2),
+        unit: unitOf[a.quantity],
+        note: `paleo anchor ${a.id} (${a.source})`,
+      };
+      if (a.observed !== undefined) {
+        out[`anchor${cid.charAt(0).toUpperCase() + cid.slice(1)}DeltaPct`] = {
+          get: () => (predictOf[a.quantity](a.ageMa) / a.observed - 1) * 100,
+          render: (v) => `${v >= 0 ? '+' : '−'}${Math.abs(Number(v)).toFixed(2)}`,
+          unit: '%',
+        };
+      }
+    }
+    // Summary statistics over the scalar days/yr set (the doc-99 "independent
+    // paleontological datapoints" — Wells ×9 + Winter + Pannella + Triassic +
+    // the flagship 380 + Williams).
+    const daysSet = anchors.filter((a) => a.quantity === 'daysPerYear' && a.observed !== undefined);
+    const deltas = (list) => list.map((a) => (predictOf[a.quantity](a.ageMa) / a.observed - 1) * 100);
+    const phan = () => daysSet.filter((a) => a.ageMa <= 500);
+    const mad = (ds) => ds.reduce((s, d) => s + Math.abs(d), 0) / ds.length;
+    const rms = (ds) => Math.sqrt(ds.reduce((s, d) => s + d * d, 0) / ds.length);
+    const maxAbs = (ds) => Math.max(...ds.map(Math.abs));
+    out.paleoAnchorCountAll = { get: () => daysSet.length, render: (v) => String(v), note: 'scalar days/yr anchors in the dossier set' };
+    out.paleoAnchorCountPhan = { get: () => phan().length, render: (v) => String(v) };
+    out.paleoMadPhanPct = { get: () => mad(deltas(phan())), render: (v) => Number(v).toFixed(2), unit: '%' };
+    out.paleoMadAllPct = { get: () => mad(deltas(daysSet)), render: (v) => Number(v).toFixed(2), unit: '%' };
+    out.paleoRmsPhanPct = { get: () => rms(deltas(phan())), render: (v) => Number(v).toFixed(2), unit: '%' };
+    out.paleoRmsAllPct = { get: () => rms(deltas(daysSet)), render: (v) => Number(v).toFixed(2), unit: '%' };
+    out.paleoMaxPhanPct = { get: () => maxAbs(deltas(phan())), render: (v) => Number(v).toFixed(2), unit: '%' };
+    out.paleoMaxAllPct = { get: () => maxAbs(deltas(daysSet)), render: (v) => Number(v).toFixed(2), unit: '%' };
+    out.paleoWithin1All = { get: () => `${deltas(daysSet).filter((d) => Math.abs(d) < 1).length}/${daysSet.length}`, render: (v) => String(v) };
+    out.paleoWithin2All = { get: () => `${deltas(daysSet).filter((d) => Math.abs(d) < 2).length}/${daysSet.length}`, render: (v) => String(v) };
+    out.paleoWithin1Phan = { get: () => `${deltas(phan()).filter((d) => Math.abs(d) < 1).length}/${phan().length}`, render: (v) => String(v) };
+    out.paleoWithin2Phan = { get: () => `${deltas(phan()).filter((d) => Math.abs(d) < 2).length}/${phan().length}`, render: (v) => String(v) };
+    return out;
+  })(),
+
   // ── Asc-node residuals + climate/ECS + null tests (11-2ap — the last
   // actionable batch). Residuals LIVE from the falsification artifact's
   // deep-analysis best anchor (porting caught five of seven site snapshots

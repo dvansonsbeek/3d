@@ -647,15 +647,15 @@ The full table published in Wells 1963 (data extracted via Arbab 2001 review):
 
 | Age (Ma) | Wells observed days/yr | Framework prediction | Difference | Status |
 |---:|---:|---:|---:|:---|
-| 65 (Maastrichtian) | 371 | 371.09 | +0.02% | ✓ |
-| 136 (Early Cretaceous) | 377 | 377.50 | +0.13% | ✓ |
-| 180 (Jurassic) | 381 | 381.50 | +0.13% | ✓ |
-| 230 (Triassic) | 385 | 386.07 | +0.28% | ✓ |
-| 280 (Permian) | 390 | 390.67 | +0.17% | ✓ |
-| 345 (Mississippian) | 396 | 396.71 | +0.18% | ✓ |
-| 405 (Early Devonian) | 402 | 402.34 | +0.09% | ✓ |
-| 500 (Cambrian) | 412 | 411.41 | −0.14% | ✓ |
-| 600 (Late Precambrian) | 424 | 421.18 | −0.67% | ✓ |
+| 65 (Maastrichtian) | 371 | <!--v:anchorWells65Pred-->371.08<!--/v--> | <!--v:anchorWells65DeltaPct-->+0.02<!--/v-->% | ✓ |
+| 136 (Early Cretaceous) | 377 | <!--v:anchorWells136Pred-->377.49<!--/v--> | <!--v:anchorWells136DeltaPct-->+0.13<!--/v-->% | ✓ |
+| 180 (Jurassic) | 381 | <!--v:anchorWells180Pred-->381.49<!--/v--> | <!--v:anchorWells180DeltaPct-->+0.13<!--/v-->% | ✓ |
+| 230 (Triassic) | 385 | <!--v:anchorWells230Pred-->386.05<!--/v--> | <!--v:anchorWells230DeltaPct-->+0.27<!--/v-->% | ✓ |
+| 280 (Permian) | 390 | <!--v:anchorWells280Pred-->390.65<!--/v--> | <!--v:anchorWells280DeltaPct-->+0.17<!--/v-->% | ✓ |
+| 345 (Mississippian) | 396 | <!--v:anchorWells345Pred-->396.68<!--/v--> | <!--v:anchorWells345DeltaPct-->+0.17<!--/v-->% | ✓ |
+| 405 (Early Devonian) | 402 | <!--v:anchorWells405Pred-->402.31<!--/v--> | <!--v:anchorWells405DeltaPct-->+0.08<!--/v-->% | ✓ |
+| 500 (Cambrian) | 412 | <!--v:anchorWells500Pred-->411.37<!--/v--> | <!--v:anchorWells500DeltaPct-->−0.15<!--/v-->% | ✓ |
+| 600 (Late Precambrian) | 424 | <!--v:anchorWells600Pred-->421.13<!--/v--> | <!--v:anchorWells600DeltaPct-->−0.68<!--/v-->% | ✓ |
 
 **Phanerozoic (65–500 Ma) match: all within 0.3%.** The framework's structural relation reproduces Wells's directly-counted coral data across 500 million years of geological time without any free parameters. The Cambrian and Late Precambrian errors (−0.14% and −0.67% respectively) fall well inside the coral-count uncertainty.
 
@@ -666,17 +666,17 @@ The proper-physics formula **substantially improves the Cambrian / Late Precambr
 | Age (Ma) | Source | Measurement | Observed days/yr | Framework | Match |
 |---:|:---|:---|---:|---:|:---|
 | 0 | IERS modern | atomic clock | 365.242 | 365.242 | exact (anchor) |
-| 70 | **Winter 2020** | *Torreites* rudist bivalve | 372 | 371.53 | **−0.13%** ✓ |
-| 90 | Pannella 1972 / Scrutton | bivalves (23.5 hr) | 372.6 | 373.33 | **+0.20%** ✓ |
-| 200 | Triassic compilation | various | 385.9 | 383.31 | −0.67% ✓ |
-| 380 | **Wells 1963** | Devonian corals | 400 | <!--v:daysPerYearAtDevonian-->399.96<!--/v--> | **−0.01%** ✓ |
-| 620 | **Williams 2000** | Elatina tidal rhythmites (21.9 hr) | 400.3 | 423.11 | **+5.70%** ⚠️ |
+| 70 | **Winter 2020** | *Torreites* rudist bivalve | 372 | <!--v:anchorWinter202070Pred-->371.53<!--/v--> | **<!--v:anchorWinter202070DeltaPct-->−0.13<!--/v-->%** ✓ |
+| 90 | Pannella 1972 / Scrutton | bivalves (23.5 hr) | 372.6 | <!--v:anchorPannella90Pred-->373.33<!--/v--> | **<!--v:anchorPannella90DeltaPct-->+0.20<!--/v-->%** ✓ |
+| 200 | Triassic compilation | various | 385.9 | <!--v:anchorTriassic200Pred-->383.31<!--/v--> | <!--v:anchorTriassic200DeltaPct-->−0.67<!--/v-->% ✓ |
+| 380 | **Wells 1963** | Devonian corals | 400 | <!--v:daysPerYearAtDevonian-->399.96<!--/v--> | **<!--v:anchorWellsFlagship380DeltaPct-->−0.01<!--/v-->%** ✓ |
+| 620 | **Williams 2000** | Elatina tidal rhythmites (21.9 hr) | 400.3 | <!--v:anchorWilliams620Pred-->423.11<!--/v--> | **<!--v:anchorWilliams620DeltaPct-->+5.70<!--/v-->%** ⚠️ |
 
 **Independent confirmation at 5 epochs spanning 0–380 Ma**: framework matches within 0.7% at every Phanerozoic point (flagship Wells 1963 at −0.01%). The Winter 2020 Cretaceous result (*Torreites* bivalve, peer-reviewed *Paleoceanography*) and Pannella's bivalve count at ~90 Ma are particularly clean validations at epochs Wells didn't directly cover.
 
 ### The Williams 2000 (620 Ma) discrepancy — honest discussion
 
-The proper-physics formula misses Williams's Elatina rhythmite at 620 Ma by **+5.7 %** (predicted 423.1 days/yr vs measured 400.3). This is a regression relative to the earlier pure-linear LOD formula, which hit Williams almost exactly (−0.01 %).
+The proper-physics formula misses Williams's Elatina rhythmite at 620 Ma by **<!--v:anchorWilliams620DeltaPct-->+5.70<!--/v--> %** (predicted <!--v:anchorWilliams620Pred-->423.11<!--/v--> days/yr vs measured 400.3). This is a regression relative to the earlier pure-linear LOD formula, which hit Williams almost exactly (−0.01 %).
 
 Why? The pure-linear formula's `LOD = 24 − 0.00526·t_Ma` happens to pass through 21.90 hr at 620 Ma — coincidentally matching Williams. The proper-physics formula is calibrated to Farhat 2022's smooth numerical curve, which dips to LOD ≈ 21.02 hr at 620 Ma — a 4 % mismatch with Williams.
 
@@ -688,8 +688,8 @@ Three plausible interpretations, in honest order:
 
 | Source | Method | Reported value | Framework | Match |
 |:---|:---|:---|:---|:---|
-| Wells 1963 (extrapolated) | Coral curve extrapolation | 424 days/yr | 423.11 | −0.21% ✓ |
-| Williams 2000 (direct) | Elatina tidal rhythmite | 21.9 hr / 400 d/yr | 423.11 | **+5.70%** ⚠️ |
+| Wells 1963 (extrapolated) | Coral curve extrapolation | 424 days/yr | <!--v:anchorWilliams620Pred-->423.11<!--/v--> | −0.21% ✓ |
+| Williams 2000 (direct) | Elatina tidal rhythmite | 21.9 hr / 400 d/yr | <!--v:anchorWilliams620Pred-->423.11<!--/v--> | **<!--v:anchorWilliams620DeltaPct-->+5.70<!--/v-->%** ⚠️ |
 | Mitchell-Kirscher 2023 | Multi-proxy compilation | 21–22 hr range | LOD 20.71 hr | slightly below range |
 
 This is documented honestly as a known small-epoch discrepancy of the smooth formula. For Phanerozoic work (≤500 Ma), the proper-physics formula is uniformly better than the linear approximation.
@@ -702,13 +702,13 @@ Wu, Malinverno, et al. 2024 ("A 650-Myr history of Earth's axial precession freq
 
 | Age (Ma) | Wu et al. 2024 (cyclostratigraphy + Bayesian inversion) | Our framework (Farhat-anchored proper-physics) | Δ |
 |---:|---:|---:|---:|
-| 0 | LOD 24.00 hr, Moon 60.27 R⊕ | 24.00 hr, 60.34 R⊕ | exact (anchor) |
-| 100 | LOD 23.5–23.8 hr, Moon 59–60 R⊕ | 23.42 hr, 59.74 R⊕ | within range ✓ |
-| 200 | LOD 23.6–23.8 hr, Moon 58–59 R⊕ | 22.87 hr, 59.13 R⊕ | LOD short by 0.8 hr ⚠ |
-| 300 | LOD 22.5–23.0 hr, Moon 53–55 R⊕ | 22.33 hr, 58.53 R⊕ | LOD OK; Moon far by ~4 R⊕ ⚠ |
-| 400 | LOD 21.5–22.0 hr, Moon 52–53 R⊕ | 21.81 hr, 57.91 R⊕ | LOD OK; Moon far by ~5 R⊕ ⚠ |
-| 500 | LOD 20.9–21.5 hr, Moon 53–54 R⊕ | 21.31 hr, 57.29 R⊕ | LOD OK; Moon far by ~4 R⊕ ⚠ |
-| **650** | **LOD 20.94 hr, Moon 56.73 R⊕** | **20.57 hr, 56.33 R⊕** | **within 2 % ✓** |
+| 0 | LOD 24.00 hr, Moon 60.27 R⊕ | <!--v:anchorWuLod0Pred-->24.00<!--/v--> hr, <!--v:anchorWuMoon0Pred-->60.32<!--/v--> R⊕ | exact (anchor) |
+| 100 | LOD 23.5–23.8 hr, Moon 59–60 R⊕ | <!--v:anchorWuLod100Pred-->23.42<!--/v--> hr, <!--v:anchorWuMoon100Pred-->59.72<!--/v--> R⊕ | within range ✓ |
+| 200 | LOD 23.6–23.8 hr, Moon 58–59 R⊕ | <!--v:anchorWuLod200Pred-->22.87<!--/v--> hr, <!--v:anchorWuMoon200Pred-->59.12<!--/v--> R⊕ | LOD short by 0.8 hr ⚠ |
+| 300 | LOD 22.5–23.0 hr, Moon 53–55 R⊕ | <!--v:anchorWuLod300Pred-->22.33<!--/v--> hr, <!--v:anchorWuMoon300Pred-->58.51<!--/v--> R⊕ | LOD OK; Moon far by ~4 R⊕ ⚠ |
+| 400 | LOD 21.5–22.0 hr, Moon 52–53 R⊕ | <!--v:anchorWuLod400Pred-->21.81<!--/v--> hr, <!--v:anchorWuMoon400Pred-->57.90<!--/v--> R⊕ | LOD OK; Moon far by ~5 R⊕ ⚠ |
+| 500 | LOD 20.9–21.5 hr, Moon 53–54 R⊕ | <!--v:anchorWuLod500Pred-->21.31<!--/v--> hr, <!--v:anchorWuMoon500Pred-->57.27<!--/v--> R⊕ | LOD OK; Moon far by ~4 R⊕ ⚠ |
+| **650** | **LOD 20.94 hr, Moon 56.73 R⊕** | **<!--v:anchorWuLod650Pred-->20.57<!--/v--> hr, <!--v:anchorWuMoon650Pred-->56.31<!--/v--> R⊕** | **within 2 % ✓** |
 
 **The 0 and 650 Ma endpoints agree to <1 % between two completely independent methods** — Wu's Bayesian inversion of 34 cyclostratigraphic records vs our angular-momentum-conservation formula fit to Farhat 2022. This is non-trivial cross-validation.
 
@@ -778,15 +778,23 @@ So Wu et al.'s **67.64 ″/yr at 650 Ma is model-derived**, inseparable from the
 
 ### Statistical summary
 
-Across 13 independent paleontological datapoints (0 to 620 Ma):
+Across <!--v:paleoAnchorCountAll-->14<!--/v--> independent paleontological datapoints (0 to 620 Ma):
 
 | Statistic | Phanerozoic (0–500 Ma) | Including Precambrian (0–620 Ma) |
 |:---|:---:|:---:|
-| Mean absolute deviation | **0.62%** | 1.27% |
-| Max deviation in Phanerozoic | 1.35% (Cambrian, 500 Ma) | 4.16% (Williams 620 Ma) |
-| RMS deviation | 0.75% | 1.62% |
-| Datapoints within 1% | 9/11 | 10/13 |
-| Datapoints within 2% | 11/11 | 12/13 |
+| Mean absolute deviation | **<!--v:paleoMadPhanPct-->0.18<!--/v-->%** | <!--v:paleoMadAllPct-->0.61<!--/v-->% |
+| Max deviation | <!--v:paleoMaxPhanPct-->0.67<!--/v-->% (Triassic compilation, 200 Ma) | <!--v:paleoMaxAllPct-->5.70<!--/v-->% (Williams 620 Ma) |
+| RMS deviation | <!--v:paleoRmsPhanPct-->0.24<!--/v-->% | <!--v:paleoRmsAllPct-->1.55<!--/v-->% |
+| Datapoints within 1% | <!--v:paleoWithin1Phan-->12/12<!--/v--> | <!--v:paleoWithin1All-->13/14<!--/v--> |
+| Datapoints within 2% | <!--v:paleoWithin2Phan-->12/12<!--/v--> | <!--v:paleoWithin2All-->13/14<!--/v--> |
+
+The observed values, sources and per-anchor tolerances live in
+[`data/paleo-validation-anchors.json`](../data/paleo-validation-anchors.json);
+`tools/verify/paleo-anchors.js` (gate class) recomputes every prediction in
+these tables live from the engine on each `npm run check` and fails on drift
+— **including an unexplained improvement of a documented deviation** (the
+Williams 620 Ma miss and the Wu Pangea-interval rows are asserted as bands,
+not skipped).
 
 **The framework's prediction matches every direct Phanerozoic paleontological measurement within 0.3%** (Phanerozoic 65-500 Ma) and within 0.7% out to Late Precambrian (600 Ma), across 500+ million years of geological time, using ZERO free parameters in the H/13 Fibonacci coupling (the only fitted parameters are the two Layer-2 polynomial constants α₃, α₄, calibrated to Farhat 2022, not to the Wells/Williams data).
 
