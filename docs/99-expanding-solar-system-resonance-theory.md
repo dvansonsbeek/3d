@@ -286,6 +286,7 @@ This is the third member of the framework's family of **deep-time invariants** �
 | Invariant | Form | Governed by | Drift at Hadean |
 |:---|:---|:---|---:|
 | Day-count near-invariant | `H × days/yr ≈ TOTAL_DAYS_IN_H` (<!--v:totalDaysInH-->122,471,920<!--/v--> at J2000 anchor) | Driver 1 + Driver 2 | ~−850 ppm (Driver 2 residual) |
+| Day-count invariant, exact form | `H × days/yr × (AU₀/AU)² = TOTAL_DAYS_IN_H` | Drivers 1+2 composed (Kepler ∘ H∝LOD) | 0 ppm (algebraic identity) |
 | Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | 0 ppm (definitional) |
 | **Lunar Precession Invariant** | **`T_apsidal × H = const`, `T_nodal × H = const`** | **Driver 1 + Brown m²** | **0 ppm (structural)** |
 
@@ -458,6 +459,7 @@ What IS constant is the **fractional correction** `δ_LOD_H5 / LOD_mean ≈ 5 / 
 | Invariant / Relation | Form | Governed by | Status |
 |:---|:---|:---|:---|
 | Day-count near-invariant | `H × days/yr ≈ TOTAL_DAYS_IN_H` | Driver 1 + Driver 2 | Structural (Driver 2 residual) |
+| Day-count invariant, exact form | `H × days/yr × (AU₀/AU)² = TOTAL_DAYS_IN_H` | Drivers 1+2 composed (Kepler ∘ H∝LOD) | Structural (algebraic identity, 0 ppm) |
 | Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | Structural (definitional) |
 | Lunar Precession Invariant | `T_apsidal × H = const`, `T_nodal × H = const` | Driver 1 + Brown m² | Structural (0 ppm across epochs) |
 | **Raw H/5 LOD kinematic correction** | **`δ_LOD_H5 = LOD_mean/((H/5)·mSY)`** | **Driver 1 + ecliptic precession** | **Structural (parameter-free geometry); fractional correction 4.08 × 10⁻⁸, absolute 3.527 ms at J2000** |
@@ -1223,6 +1225,8 @@ H(t) × days/yr(t) × (AU₀ / AU(t))² = TOTAL_DAYS_IN_H     (exact)
 ```
 
 holds to <!--v:dayCountInvariantAuCorrectedDriftPpm-->0.00<!--/v--> ppm — floating-point exact — across the model's entire 4.5-Gyr domain: the year length follows the same exact Kepler product form `T ∝ (1−Δm)²` as the planetary Driver-2 law, so the relation is an algebraic identity of the model, not an approximation. One relation over H, LOD, year length and the AU, with the Moon entering through the angular-momentum budget that sets LOD. Verification: `tools/explore/deep-time-sensitivity.js` §5.
+
+**Classification, stated honestly.** The AU² factor is textbook celestial mechanics (Kepler's third law composed with the adiabatic invariant `a·M = const` gives `T ∝ AU²`); the `H ∝ LOD` factor is ESSRT's own structural postulate, and the composition is a theorem of the two — not an independent new law. Its scientific value is that **mainstream physics does not predict this constancy** (mainstream has no H, and physical axial precession is *not* proportional to LOD — the lunar `1/a³` torque term breaks that, as the Wu 2024 comparison shows). The invariant is therefore ESSRT's most compact falsifiable statement: a paleontological day-count and a cyclostratigraphic lattice period measured at the *same* epoch must satisfy this one equation. The Devonian already exercises exactly this cross-check — Wells's ~400 days/yr and the observed ~37 kyr obliquity beat (Meyers 2008; Boulila 2018) are the two sides of the identity at 380 Ma.
 
 Earth's rotation rate CANNOT change in isolation — angular momentum is conserved. So if Earth loses spin angular momentum, **something else must gain it**.
 

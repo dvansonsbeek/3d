@@ -52,6 +52,12 @@ never to the fossil data it is tested against.
 
 - Anchors + sources + tolerances: [`data/paleo-validation-anchors.json`](../data/paleo-validation-anchors.json)
 - Gate: `tools/verify/paleo-anchors.js` (in `npm run test:verify` and CI)
+- The single-equation cross-check binding the two proxy classes: the exact
+  day-count invariant `H × days/yr × (AU₀/AU)² = TOTAL_DAYS_IN_H`
+  ([doc 99 §near-invariant](99-expanding-solar-system-resonance-theory.md))
+  requires a day-count and a lattice period measured at the *same* epoch to
+  agree — the Devonian passes it (Wells's ~400 days/yr against the observed
+  ~37 kyr obliquity beat, Meyers 2008 / Boulila 2018).
 - Full tables and the per-anchor discussion: [doc 99 §Validation](99-expanding-solar-system-resonance-theory.md#validation-against-published-paleontological-measurements)
 - The Hadean endpoint: the Farhat polynomial extrapolated to the Patterson
   1956 Pb–Pb age places the Moon at
