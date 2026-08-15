@@ -2225,19 +2225,38 @@ export const VALUES = {
       solarMassLossFracPerYr: { get: () => P().solarMassLossFracPerYear, render: (v) => fmtSci(v, 1), unit: '/yr' },
       solarSystemShrinkDevonianPpm: { get: () => P().solarMassLossFracPerYear * 380e6 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
       solarSystemShrinkHadeanPpm: { get: () => P().solarMassLossFracPerYear * astro.knownValues.patternEarthAgeGyr * 1e9 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
-      totalDaysInH: { get: totalDays0, render: (v) => thousands(Math.round(v)), note: 'H × mSY — the day-count near-invariant' },
+      totalDaysInH: { get: totalDays0, render: (v) => thousands(Math.round(v)), note: 'H × mSY — the day-count near-invariant; the ONE canonical day count (÷H = solar-year days, ÷(H−13) = sidereal-year days)' },
+      totalDaysInHSiderealFrame: {
+        get: () => totalDays0() * C.H / (C.H - 13),
+        render: (v) => thousands(Math.round(v)),
+        note: 'TOTAL_DAYS_IN_H × H₀/(H₀−13) — the constant of the EXACT invariant H·(sidYearSec/LOD)·(AU₀/AU)²; derived from the canonical 122,471,920 via the dual-divisor bridge, not an independent constant',
+      },
       dayCountInvariantAuCorrectedDriftPpm: {
         get: () => {
-          // The EXACT form of the day-count invariant: H·(days/yr)·(AU₀/AU)²
-          // (the Kepler AU² factor absorbs the Driver-2 year-seconds drift;
-          // tools/explore/deep-time-sensitivity.js §5). Residual at a deep
-          // representative epoch (4.4 Ga) — the second-order linearization
-          // remainder, ~ppb-to-sub-ppm class.
+          // The EXACT invariant: H·(sidYearSec/LOD)·(AU₀/AU)² — SIDEREAL
+          // year seconds (the Kepler AU² factor absorbs the Driver-2 drift
+          // exactly; tools/explore/deep-time-sensitivity.js §5). Constant =
+          // TOTAL_DAYS_IN_H·H₀/(H₀−13) (totalDaysInHSiderealFrame). Residual
+          // at a deep representative epoch (4.4 Ga): floating-point rounding.
           const au0 = dtl().meanAuAtAge(0);
           const K = (t) => dtl().meanHAtAge(t) * (dtl().meanSiderealYearSecondsAtAge(t) / dtl().meanLodSecondsAtAge(t));
           return Math.abs((K(4400) * Math.pow(au0 / dtl().meanAuAtAge(4400), 2)) / K(0) - 1) * 1e6;
         },
         render: (v) => Number(v).toFixed(2),
+        unit: 'ppm',
+      },
+      dayCountTropicalAuDriftAtGenesisPpm: {
+        get: () => {
+          // The TROPICAL-days form H·tropDays·(AU₀/AU)² vs the canonical
+          // TOTAL_DAYS_IN_H: the residual is the structural 13/H precession
+          // bridge (13 axial cycles per H — as H shrinks, 13/H grows), NOT a
+          // numerical artifact. Evaluated at the 4.4 Ga representative epoch.
+          const au0 = dtl().meanAuAtAge(0);
+          const K = dtl().meanHAtAge(4400) * dtl().meanYearInDaysAtAge(4400)
+            * Math.pow(au0 / dtl().meanAuAtAge(4400), 2);
+          return (K / totalDays0() - 1) * 1e6;
+        },
+        render: (v) => `−${Math.abs(Number(v)).toFixed(0)}`,
         unit: 'ppm',
       },
       essrtEffectiveDomainGyr: { get: () => astro.knownValues.patternEarthAgeGyr + astro.knownValues.essrtFormulaHorizonGyr, render: (v) => Number(v).toFixed(1), unit: 'Gyr' },

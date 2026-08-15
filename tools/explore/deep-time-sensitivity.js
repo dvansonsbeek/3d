@@ -219,7 +219,15 @@ async function main() {
   //   yearSec(t)/AU(t)² = const.
   // Composing the two:
   //
-  //   H(t) · daysPerYr(t) · (AU₀/AU(t))² = TOTAL_DAYS_IN_H   (exact)
+  //   H(t) · (sidYear_s/LOD)(t) · (AU₀/AU(t))² = TOTAL_DAYS_IN_H · H₀/(H₀−13)   (exact)
+  //
+  // THE CONSTANT: TOTAL_DAYS_IN_H (122,471,920) is the ONE canonical day
+  // count with the dual-divisor structure — ÷H gives solar-year days,
+  // ÷(H−13) sidereal-year days. The exact-invariant constant
+  // 122,476,668.33 is TOTAL·H₀/(H₀−13), NOT an independent number. The
+  // TROPICAL-days form H·tropDays·AU² retains a −118 ppm residual at
+  // genesis — the structural 13/H precession bridge — and the factor
+  // [H/(H−13)]·[(H₀−13)/H₀] restores exactness with the canonical constant.
   //
   // — ONE equation containing H, LOD, year length and AU; the Moon closes
   // the web through the angular-momentum budget that sets LOD
@@ -245,7 +253,9 @@ async function main() {
       const k2 = (K(t) * Math.pow(au0 / dtm.meanAuAtAge(t), 2)) / K0 - 1;
       console.log(`   ${String(t).padStart(5)} | ${(k1 * 1e6).toFixed(1).padStart(9)} | ${(k2 * 1e6).toFixed(3).padStart(9)}`);
     }
-    console.log('   → the day-count near-invariant becomes EXACT under the Kepler AU²');
+    console.log('   → constant = TOTAL_DAYS_IN_H · H₀/(H₀−13) (the canonical 122,471,920');
+    console.log('     through the dual-divisor bridge — see the header note); the');
+    console.log('     day-count near-invariant becomes EXACT under the Kepler AU²');
     console.log('     correction: one relation over H, LOD, year length and AU, with the');
     console.log('     Moon entering through the L budget that sets LOD. Documented in');
     console.log('     doc 99 §The Day-Count Near-Invariant.');

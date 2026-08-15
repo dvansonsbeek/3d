@@ -53,7 +53,7 @@ never to the fossil data it is tested against.
 - Anchors + sources + tolerances: [`data/paleo-validation-anchors.json`](../data/paleo-validation-anchors.json)
 - Gate: `tools/verify/paleo-anchors.js` (in `npm run test:verify` and CI)
 - The single-equation cross-check binding the two proxy classes: the exact
-  day-count invariant `H × days/yr × (AU₀/AU)² = TOTAL_DAYS_IN_H`
+  day-count invariant `H × (sidYear_s/LOD) × (AU₀/AU)² = TOTAL_DAYS_IN_H × H₀/(H₀−13)`
   ([doc 99 §near-invariant](99-expanding-solar-system-resonance-theory.md))
   requires a day-count and a lattice period measured at the *same* epoch to
   agree — the Devonian passes it (Wells's ~400 days/yr against the observed
