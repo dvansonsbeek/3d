@@ -113,7 +113,15 @@ function createDeepTimeLod(deps) {
   function siderealYearSecondsAtAge(t_Ma) {
     if (t_Ma === 0) return K.meanSiderealYearJ2000Seconds;
     const mass_loss_fraction = K.solarMassLossFracPerYear * t_Ma * 1e6;
-    return K.meanSiderealYearJ2000Seconds * (1 - 2 * mass_loss_fraction);
+    // Exact Kepler under the model's mass-history convention (a·M = const,
+    // a(t) = a₀·(1−Δm)): T ∝ M⁻² ⇒ T(t) = T₀·(1−Δm)² — the SAME Driver-2
+    // law the planet chains use (orbit-chain driver2PeriodSecondsAtAge).
+    // The previous (1 − 2Δm) was this law's first-order Taylor — the one
+    // form in the model inconsistent with it, and the entire source of the
+    // day-count invariant's 0.17 ppm residual: with the product form,
+    // H·(days/yr)·(AU₀/AU)² = TOTAL_DAYS_IN_H holds EXACTLY
+    // (tools/explore/deep-time-sensitivity.js §5; docs/99 §near-invariant).
+    return K.meanSiderealYearJ2000Seconds * (1 - mass_loss_fraction) * (1 - mass_loss_fraction);
   }
 
   /** @param {number} t_Ma @returns {number} tropical = sidereal · (1 − 13/H(t)) */

@@ -223,12 +223,14 @@ async function main() {
   //
   // — ONE equation containing H, LOD, year length and AU; the Moon closes
   // the web through the angular-momentum budget that sets LOD
-  // (2πI·α/LOD + m√(GM·a_moon)·√(1−e²) = L_EM). Measured across the full
-  // history the AU²-corrected form is flat to ~0.17 ppm at genesis — a
-  // ~4,800× tightening over the plain day-count near-invariant — and the
-  // residual is exactly the second-order term of the model's linearized
-  // mass-loss forms (frac·t)², i.e. the relation is exact in the model's
-  // own algebra.
+  // (2πI·α/LOD + m√(GM·a_moon)·√(1−e²) = L_EM). When first measured this
+  // was flat to ~0.17 ppm — and that residual turned out to be a REAL
+  // inconsistency: the sidereal year still used the first-order Taylor
+  // (1 − 2Δm) of the Driver-2 law while the planets and the AU used the
+  // exact forms (T₀·(1−Δm)², a₀·(1−Δm)). With the year aligned to the
+  // product form (deltat/deep-time.cjs + layer0), the relation holds to
+  // FLOATING-POINT ROUNDING (~1e-16 relative) at every epoch — an
+  // algebraic identity of the model, not an approximation.
   {
     const { createRequire } = await import('node:module');
     const requireCjs = createRequire(`file://${process.argv[1]}`);

@@ -118,7 +118,12 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
    */
   const siderealYearSecondsCore = (t) => {
     if (t === 0) return p.siderealYearJ2000Seconds;
-    return p.siderealYearJ2000Seconds * (1 - 2 * p.solarMassLossFracPerYear * t * 1e6);
+    // Exact Kepler product form (T ∝ M⁻² under a·M = const, a(t) = a₀·(1−Δm))
+    // — the same Driver-2 law as the planet chains and deltat/deep-time.cjs.
+    // MUST stay the bit-exact twin of siderealYearSecondsAtAge there (the
+    // transparency gate holds the pair at 84/84 round-trip).
+    const dm = p.solarMassLossFracPerYear * t * 1e6;
+    return p.siderealYearJ2000Seconds * (1 - dm) * (1 - dm);
   };
 
   /**

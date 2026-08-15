@@ -169,7 +169,7 @@
     "correctionSunDeg": "0.49688",
     "coxChaoDJ2Dt": "-2.7 × 10⁻¹¹",
     "dAlphaDtJ2000": "-1.35 × 10⁻¹¹",
-    "dayCountInvariantAuCorrectedDriftPpm": "0.17",
+    "dayCountInvariantAuCorrectedDriftPpm": "0.00",
     "daysPerPeriPrec": "7,654,495",
     "daysPerYearAt100Ma": "374.24",
     "daysPerYearAt200Ma": "383.31",

@@ -1222,7 +1222,7 @@ The framework's structural near-invariant `H × days/yr ≈ TOTAL_DAYS_IN_H = 12
 H(t) × days/yr(t) × (AU₀ / AU(t))² = TOTAL_DAYS_IN_H     (exact)
 ```
 
-holds to <!--v:dayCountInvariantAuCorrectedDriftPpm-->0.17<!--/v--> ppm across the model's entire 4.5-Gyr domain (the residual being the second-order term of the linearized mass-loss forms) — one relation over H, LOD, year length and the AU, with the Moon entering through the angular-momentum budget that sets LOD. Verification: `tools/explore/deep-time-sensitivity.js` §5.
+holds to <!--v:dayCountInvariantAuCorrectedDriftPpm-->0.00<!--/v--> ppm — floating-point exact — across the model's entire 4.5-Gyr domain: the year length follows the same exact Kepler product form `T ∝ (1−Δm)²` as the planetary Driver-2 law, so the relation is an algebraic identity of the model, not an approximation. One relation over H, LOD, year length and the AU, with the Moon entering through the angular-momentum budget that sets LOD. Verification: `tools/explore/deep-time-sensitivity.js` §5.
 
 Earth's rotation rate CANNOT change in isolation — angular momentum is conserved. So if Earth loses spin angular momentum, **something else must gain it**.
 
