@@ -32,7 +32,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "471a3f440b88cd86";
+export const CONSTANTS_HASH = "c27d98c2f75e949b";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v11.0";
@@ -42,7 +42,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "471a3f440b88cd86",
+  hash: "c27d98c2f75e949b",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -248,7 +248,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "moonStartposApsidal": 347.5476,
     "moonStartposNodal": 64.0435,
     "moonStartposMoon": 67.8443,
-    "moonMeeusLpCorrection": 0.010576278829833089
+    "moonMeeusLpCorrection": 0.009382053237928125
   },
   moonMeeus: {
     "elpW1T2Decomposition_arcsecPerCy2": {
