@@ -2856,6 +2856,24 @@ function h5Correction(year) {
   return lodMean / ((H_local / 5) * mSY_days);
 }
 
+/** Pure epoch-aware sidereal-year seconds: Layer-0 (Driver-2 aware, ≡ the IAU
+ *  31,558,149.7635 s at J2000 exactly) in deep-time mode; the frozen J2000
+ *  seed in snapshot mode or past the tidal-lock asymptote. Replaces reads of
+ *  the mutable meansiderealyearlengthinSeconds global in pure chains. */
+function _siderealYearSecondsPure(year) {
+  return (DEEP_TIME_MODE_ENABLED ? _L0.siderealYearSeconds(year) : null)
+      ?? _EPOCH_SEEDS_J2000.meansiderealyearlengthinSeconds;
+}
+
+/** Layer-4 solar day (LOD_real) in seconds at `year` — THE one composite:
+ *  epoch-aware kinematic + H/5 ecliptic missing motion + calibrated ΔT cycle
+ *  stack incl. Core-mantle swing (dtCycleLodCorrectionSum). Engine twin
+ *  (bit-exact): tools/lib/deep-time.js computeLodRealSecondsAtEpoch. */
+function computeLodRealSecondsAtEpoch(year) {
+  const lodKin = _siderealYearSecondsPure(year) / computeSiderealYearDaysDirect(year);
+  return lodKin + h5Correction(year) + dtCycleLodCorrectionSum(year);
+}
+
 // ───── STEP 2 — Earth Fundamental Cycle H(t) ─────
 /** H(t) in years. Returns HOLISTIC_YEAR_J2000 (335,317) exactly at t_Ma = 0. */
 function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
@@ -5883,6 +5901,8 @@ if (typeof window !== 'undefined') {
     // pure f(Y) evaluators must track the epoch-anchor chain.
     computeSolarYearDaysDirect,
     computeAnomalisticYearDaysDirect: (y) => computeAnomalisticYearSecFromDaysFourier(y, 1),
+    // Delegation gate (Phase 20.2): the ONE Layer-4 composite, pure.
+    computeLodRealSecondsAtEpoch,
     // The seven globals recomputeEpochAnchors mutates, read live.
     anchors: () => ({
       holisticyearLength, H, meanlengthofday,
@@ -25995,7 +26015,7 @@ function setupGUI() {
   const siderealYrFolder = astroFolder.addFolder({ title: 'Sidereal Year' });
   addTooltip(siderealYrFolder.addBinding(predictions, 'siderealYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Sidereal year in seconds — MEASURED days × o.lodKinematic. Round-trip identity: sid_days × o.lodKinematic = meansiderealyearlengthinSeconds = 31,558,149.7635 s (pure IAU) at any epoch.');
+  }), 'Sidereal year in seconds — MEASURED days × o.lodKinematic. Round-trip identity: sid_days × o.lodKinematic = sidYear_s(year), the Driver-2-aware Layer-0 sidereal year — equals the pure IAU 31,558,149.7635 s at J2000.');
   addTooltip(siderealYrFolder.addBinding(predictions, 'siderealYearDays', {
     label: 'Model (days)', readonly: true, format: fmt8
   }), 'Sidereal year in days — Step 6d direct Fourier fit, J2000-anchored.');
@@ -43250,13 +43270,11 @@ async function measureSolarDayIntervals(startJD, numDays = 365) {
   // is the KINEMATIC day and a different quantity. Using the kinematic
   // constant silently under-reported the mean by ~1.7 ms.
   //
-  // Composition mirrors secondsExcessPerDay() / the tweakpane Layer 4 exactly,
-  // evaluated once at the report epoch:
-  //   LOD_real = o.lodKinematic + h5Correction + dtCycleLodCorrectionSum(year)
+  // Delegates to computeLodRealSecondsAtEpoch — the same composite the
+  // tweakpane Layer 4 shows, evaluated once at the report epoch.
   jumpToJulianDay(startJD);
   forceSceneUpdate();
-  const _reportH5 = o.lodKinematic / ((holisticyearLength / 5) * meansolaryearlengthinDays);
-  const _reportLodReal = o.lodKinematic + _reportH5 + dtCycleLodCorrectionSum(o.currentYear);
+  const _reportLodReal = computeLodRealSecondsAtEpoch(o.currentYear);
 
   // Find nearest solar noon to startJD (adapted from analyzeSolarDay)
   const findNearestNoon = (jd) => {
@@ -46639,16 +46657,12 @@ async function generateAndDisplayReport(planetKey) {
 //  Negative  => Earth day is shorter            ➜ ΔT decreases
 // ---------------------------------------------------------------------------
 function secondsExcessPerDay () {
-  // Matches the tweakpane's Layer 4 Solar Day = REAL (dtCycleLodCorrectionSum
-  // includes the Core-mantle swing, which is what makes this Layer 4, not 3):
-  //   LOD_real = o.lodKinematic + h5Correction + dtCycleLodCorrectionSum(year)
-  // (kinematic-anchored, USNO-tuned at J2000 by the DT-corrections fit).
-  // `dtCycleLodCorrectionSum` MUST stay in this sum: omitting it desyncs the
-  // Rate cell from the displayed Solar Day = REAL.
-  const h5 = o.lodKinematic / ((holisticyearLength / 5) * meansolaryearlengthinDays);
-  const dt = dtCycleLodCorrectionSum(o.currentYear);
-  const lodReal = o.lodKinematic + h5 + dt;
-  return lodReal - 86400;
+  // Matches the tweakpane's Layer 4 Solar Day = REAL by construction — both
+  // delegate to computeLodRealSecondsAtEpoch (kinematic + H/5 + ΔT cycle sum
+  // incl. Core-mantle swing, which is what makes this Layer 4, not 3;
+  // USNO-tuned at J2000 by the DT-corrections fit). The cycle sum MUST stay
+  // in the composite: omitting it desyncs the Rate cell from the display.
+  return computeLodRealSecondsAtEpoch(o.currentYear) - 86400;
 }
 
 // ---------------------------------------------------------------------------
@@ -46658,12 +46672,9 @@ function secondsExcessPerDay () {
 function updateDeltaT() {
   const currentJD = o.julianDay;                       // use your existing value
   const daysElapsed = currentJD - state.prevJD;
-  // Layer 4 LOD (kinematic + H/5 + DT cyclic sum incl. swing) — same value as tweakpane
-  // Solar Day = REAL. USNO-anchored at J2000 after the DT-corrections fit.
-  const h5 = o.lodKinematic / ((holisticyearLength / 5) * meansolaryearlengthinDays);
-  const dt = dtCycleLodCorrectionSum(o.currentYear);
-  const lodReal = o.lodKinematic + h5 + dt;
-  const excess = lodReal - 86400;
+  // Layer 4 LOD — same value as tweakpane Solar Day = REAL, via the shared
+  // computeLodRealSecondsAtEpoch composite.
+  const excess = computeLodRealSecondsAtEpoch(o.currentYear) - 86400;
 
   if (isNaN(excess) || isNaN(daysElapsed)) {
     console.warn("Bad input to updateDeltaT", { excess, daysElapsed });
@@ -56353,13 +56364,18 @@ function updatePredictions() {
   predictions.solarYearDays = o.solarYearDays = computeSolarYearDaysDirect(yearForFormula);
   o.siderealYearDays = computeSiderealYearDaysDirect(yearForFormula);
   // o.lodKinematic MUST be assigned BEFORE any downstream calc that uses it.
-  // o.lodKinematic = epoch-specific kinematic = IAU_sid_sec / Fourier_sid_days ≈ 86400.000000 at J2000
+  // o.lodKinematic = epoch-specific kinematic = sidYear_s(Y) / Fourier_sid_days ≈ 86400.000000 at J2000.
+  // The numerator is PURE (_siderealYearSecondsPure): Layer-0 Driver-2-aware
+  // sidereal-year seconds in deep-time mode (≡ the IAU 31,558,149.7635 s at
+  // J2000 exactly, ×(1−Δm)² away from it), the frozen J2000 seed in snapshot
+  // mode — replacing the mutable meansiderealyearlengthinSeconds global read
+  // (same value when the anchor cache is fresh; no scene-state dependence).
   // (86400.000312 is the SCENE-MEASURED route — IAU_sid_sec / the cardinal-point
   //  measured sidereal year — which the Days & Years report shows in section 4.
   //  It is a different quantity; do not use it to sanity-check this line.)
   // (includes SIDEREAL_YEAR_HARMONICS Fourier ripple).
-  o.lodKinematic = meansiderealyearlengthinSeconds / o.siderealYearDays;
-  // Sidereal year in seconds = MEASURED days × o.lodKinematic (round-trip identity → = IAU_sid_sec = 31,558,149.7635 s).
+  o.lodKinematic = _siderealYearSecondsPure(yearForFormula) / o.siderealYearDays;
+  // Sidereal year in seconds = MEASURED days × o.lodKinematic (round-trip identity → = sidYear_s(year); = the IAU 31,558,149.7635 s at J2000 only).
   predictions.siderealYearSeconds = o.siderealYearSeconds = o.siderealYearDays * o.lodKinematic;
   // Tweakpane display: LOD_real = o.lodKinematic + H/5 ecliptic missing-motion + DT cyclic sum incl. swing (Layer 4).
   // At J2000: raw H/5 kinematic = 86400.003522 s → Layer 4 = 86400.003522 + (~−2.14 ms from
@@ -56391,7 +56407,7 @@ function updatePredictions() {
     const _cycleSum = dtCycleLodCorrectionSum(yearForFormula);
     const _resLod = resonatorSwingLodCorrection(yearForFormula);
     predictions.solarDayLayer3 = o.lodKinematic + _h5 + (_cycleSum - _resLod);
-    predictions.lodReal = o.lodKinematic + _h5 + _cycleSum;
+    predictions.lodReal = computeLodRealSecondsAtEpoch(yearForFormula);
 
     // dLOD/dt decomposition (tidal + GIA + stack), in ms/century, live per-frame.
     // At J2000: tidal +2.12, GIA −0.35, stack ≈ 0, net L2 +1.77 ≈ IERS +1.75.

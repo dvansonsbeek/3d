@@ -703,8 +703,8 @@ function computeYearDaysDirectAll(year) {
   } else {
     const t = _l0().tMa(year);
     const H_t = EPOCH_PARAMS.holisticYearJ2000 * LOD_s / EPOCH_PARAMS.lodNowH13Seconds;
-    const sidSec = (t === 0) ? EPOCH_PARAMS.siderealYearJ2000Seconds
-      : EPOCH_PARAMS.siderealYearJ2000Seconds * (1 - 2 * EPOCH_PARAMS.solarMassLossFracPerYear * t * 1e6);
+    const dm = EPOCH_PARAMS.solarMassLossFracPerYear * t * 1e6;
+    const sidSec = EPOCH_PARAMS.siderealYearJ2000Seconds * (1 - dm) * (1 - dm);
     const T_trop_s = sidSec * (1 - 13 / H_t);
     const tropDays = T_trop_s / LOD_s;
     tropB = tropDays;
@@ -730,14 +730,18 @@ function h5Correction(year) {
   return lodMean / ((H_local / 5) * mSY_days);
 }
 
-/** Epoch-specific kinematic LOD — script.js `o.lodKinematic`: IAU sidereal
- *  seconds / Fourier sidereal days (≈ 86399.99999487 s at year 2000). The
+/** Epoch-specific kinematic LOD — script.js `o.lodKinematic`: pure Layer-0
+ *  sidereal-year seconds (Driver-2 aware — ≡ the IAU constant at J2000
+ *  exactly, ×(1−Δm)² away from it; falls back to the constant past the
+ *  tidal-lock asymptote) / Fourier sidereal days (≈ 86399.99999487 s at
+ *  year 2000). The
  *  cardinal-point MEASURED route (IAU seconds / fc.YEAR_LENGTH_J2000_ANCHOR
  *  .sidereal = 86400.00031536 s) is a DIFFERENT quantity — the joint fit's
  *  USNO-closure basis; the 0.32 ms between them is the tweakpane-vs-fit-target
  *  spread, not an error (see the §12h note in tools/docs/model-values.mjs). */
 function computeLodKinematicSecondsAtEpoch(year) {
-  return C.meanSiderealYearSeconds / computeSiderealYearDaysDirect(year);
+  const sidSec = _l0().siderealYearSeconds(year) ?? C.meanSiderealYearSeconds;
+  return sidSec / computeSiderealYearDaysDirect(year);
 }
 
 /** Layer-4 solar day in seconds (the shipped observable, tweakpane "Solar

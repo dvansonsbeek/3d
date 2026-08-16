@@ -27,6 +27,7 @@ import { createRequire } from 'node:module';
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(join(ROOT, 'package.json'));
 const OE = require(join(ROOT, 'tools/lib/orbital-engine.js'));
+const DT = require(join(ROOT, 'tools/lib/deep-time.js'));
 
 const fixture = JSON.parse(readFileSync(
   join(ROOT, 'packages/fixtures/regression/script-js.json'), 'utf8')).values;
@@ -46,6 +47,10 @@ for (const [key, browserVal] of Object.entries(fixture)) {
   } else if ((m = key.match(/^solsticeRA_(SS|WS|VE|AE)@(-?\d+)$/))) {
     nodeVal = OE.computeSolsticeRA(Number(m[2]), m[1]);
     klass = 'tol';
+  } else if ((m = key.match(/^lodReal@(-?\d+(?:\.\d+)?)Ma$/))) {
+    // Phase 20.2 delegation gate: browser Layer-4 composite ≡ engine twin.
+    nodeVal = DT.computeLodRealSecondsAtEpoch(2000 - Number(m[1]) * 1e6);
+    klass = 'exact';
   } else {
     continue;
   }

@@ -34,8 +34,11 @@ const rows = await s.page.evaluate(({ EPOCHS_MA }) => {
   for (const t of EPOCHS_MA) {
     T.setEpochByAge(t);
     const a = T.anchors();
-    T.resetEpochToJ2000();
     const year = 2000 - t * 1e6;
+    // Phase 20.2 delegation-gate purity pin: evaluate the Layer-4 composite
+    // while the scene sits on the foreign epoch...
+    const lodRealMutated = T.computeLodRealSecondsAtEpoch(year);
+    T.resetEpochToJ2000();
     const H_t = a.holisticyearLength;
     out.push({
       t, year,
@@ -48,6 +51,9 @@ const rows = await s.page.evaluate(({ EPOCHS_MA }) => {
       sidEval: T.computeSiderealYearDaysDirect(year),
       solEval: T.computeSolarYearDaysDirect(year),
       anomEval: T.computeAnomalisticYearDaysDirect(year),
+      // ...and again at J2000 scene state — must be bit-equal (purity).
+      lodRealPure: T.computeLodRealSecondsAtEpoch(year),
+      lodRealMutated,
     });
   }
   return out;
@@ -74,9 +80,19 @@ for (const r of rows) {
   }
 }
 
+// Delegation-gate purity pin (Phase 20.2): the Layer-4 composite must be
+// scene-state independent — bit-equal on the mutated epoch and at J2000 state.
+for (const r of rows) {
+  const ok = Object.is(r.lodRealPure, r.lodRealMutated);
+  if (!ok) fail++;
+  console.log(`${ok ? '  ok ' : 'FAIL '} ${String(r.t).padStart(4)} Ma  lodReal purity`
+    + `         ${Number(r.lodRealPure).toFixed(9)} s ${ok ? '(bit-equal)' : `vs mutated ${r.lodRealMutated}`}`);
+}
+
 if (fail) {
   console.log(`\nFAIL — ${fail} evaluator/anchor mismatches: the f(Y) year-length`
-    + ' baselines are not tracking the epoch (frozen at J2000?).');
+    + ' baselines are not tracking the epoch (frozen at J2000?), or the lodReal'
+    + ' composite has become scene-state dependent.');
   process.exit(1);
 }
 console.log('\nPASS — f(Y) year-length evaluators track the epoch-anchor chain.');

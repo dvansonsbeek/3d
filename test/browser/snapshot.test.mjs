@@ -103,6 +103,12 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     T.resetEpochToJ2000();
   }
 
+  // Phase 20.2 delegation-gate feed: the Layer-4 composite at the deep epochs,
+  // evaluated PURE (J2000 scene state). Cross-engine matches the Node twin.
+  for (const t of EPOCHS_MA) {
+    v[`lodReal@${t}Ma`] = T.computeLodRealSecondsAtEpoch(2000 - t * 1e6);
+  }
+
   // ── Phase 8.2-0: the lunar surface, three mode sections ───────────────────
   // Section 1 — shipped defaults (framework-native args, deep time ON).
   for (const jd of [...MOON_JDS, ...MOON_DEEP_JDS]) {
