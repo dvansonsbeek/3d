@@ -198,9 +198,94 @@
       "stephensonSplineRmsSeconds": 760
     }
   },
+  "dtBounds": {
+    "S10": {
+      "label": "untimed total/annular solar",
+      "n": 34,
+      "oneSided": 0,
+      "bracketed": 0,
+      "frameworkInside": 28,
+      "stephensonSplineInside": 31
+    },
+    "S11": {
+      "label": "untimed partial solar",
+      "n": 9,
+      "oneSided": 3,
+      "bracketed": 4,
+      "frameworkInside": 3,
+      "stephensonSplineInside": 3
+    },
+    "S12": {
+      "label": "solar rose/set eclipsed",
+      "n": 3,
+      "oneSided": 0,
+      "bracketed": 3,
+      "frameworkInside": 3,
+      "stephensonSplineInside": 3
+    },
+    "S13": {
+      "label": "lunar rose/set eclipsed",
+      "n": 7,
+      "oneSided": 7,
+      "bracketed": 0,
+      "frameworkInside": 7,
+      "stephensonSplineInside": 6
+    },
+    "S14": {
+      "label": "lunar obscuration estimates",
+      "n": 5,
+      "frameworkMeanAbsSeconds": 612,
+      "frameworkRmsSeconds": 716,
+      "stephensonSplineMeanAbsSeconds": 605,
+      "stephensonSplineRmsSeconds": 698
+    },
+    "babylon135": {
+      "boundsLowSeconds": 11220,
+      "boundsHighSeconds": 12140,
+      "frameworkSeconds": 12012,
+      "frameworkInside": true
+    }
+  },
+  "dtBandsByCentury": {
+    "-800": {
+      "n": 2,
+      "meanObservedHours": 5.69,
+      "meanFrameworkHours": 5.65,
+      "residualHours": -0.04
+    },
+    "-700": {
+      "n": 8,
+      "meanObservedHours": 5.42,
+      "meanFrameworkHours": 5.32,
+      "residualHours": -0.11
+    },
+    "-600": {
+      "n": 21,
+      "meanObservedHours": 5.03,
+      "meanFrameworkHours": 4.92,
+      "residualHours": -0.11
+    },
+    "-500": {
+      "n": 17,
+      "meanObservedHours": 4.55,
+      "meanFrameworkHours": 4.36,
+      "residualHours": -0.19
+    },
+    "-400": {
+      "n": 27,
+      "meanObservedHours": 4.33,
+      "meanFrameworkHours": 4.1,
+      "residualHours": -0.23
+    }
+  },
   "inputs": {
     "generator": "node tools/verify/lunar-alignment.js --write",
     "files": {
+      "data/rspa20160404supp2/Table-S10.txt": "sha256:67a949e3a80574880b3e79338c3527fe9b7be639dd2c06080a098b75610abe7f",
+      "data/rspa20160404supp2/Table-S11.txt": "sha256:19538f6ff8889df919da4ed1587296d540c9827d1155b605d9f3da0428916d2c",
+      "data/rspa20160404supp2/Table-S12.txt": "sha256:f8f24b020db4af857c184cc164212e07d5109efda2a9c6da7551130022f1abc6",
+      "data/rspa20160404supp2/Table-S13.txt": "sha256:515a56e47aeec316f35f509ab699187a3ed8f0b220ad131c34133ec34dddc7ce",
+      "data/rspa20160404supp2/Table-S14.txt": "sha256:67485e0c349f5c2e7ec3aa4f7952e93832fc1d6728f4bd8f4bfbcd26f7c6a6e6",
       "packages/api/src/app.js": "sha256:4db13eff87f620b0711a789367adc45e579e3257983f1bacea50f695259ae782",
       "packages/physics/src/eclipse/finders.cjs": "sha256:9603c94c13524b419bbdf7feaf79822ea4089d68c50d32a4886049b0536be4b0",
       "packages/physics/src/moon/apparent.cjs": "sha256:fba578d19fa107d66cb6b655a56b5d81b4b11219ab88296022abd9379f53df37",
@@ -212,7 +297,7 @@
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/model-parameters.json": "sha256:9427dc915ab0b9b91b692d1f365a6ceabd008af532b095ce8e1e3e1248e05e93",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
-      "tools/verify/lunar-alignment.js": "sha256:b840bf51155b77c10c1567edb7176f57a60d866a339a548a3c71038e3e30b47d"
+      "tools/verify/lunar-alignment.js": "sha256:34812d77a99d0adc756304fb9b78bf284443171dfb3c4a2591e2a4a0718932bb"
     }
   }
 }

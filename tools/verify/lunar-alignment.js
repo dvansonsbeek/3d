@@ -53,6 +53,11 @@ const INPUT_FILES = [
   'public/input/lunar-eclipses-historical.json',
   'public/input/lunar-eclipses-documented.json',
   'public/input/stephenson-2016-deltaT-polynomial.json',
+  'data/rspa20160404supp2/Table-S10.txt',
+  'data/rspa20160404supp2/Table-S11.txt',
+  'data/rspa20160404supp2/Table-S12.txt',
+  'data/rspa20160404supp2/Table-S13.txt',
+  'data/rspa20160404supp2/Table-S14.txt',
   'packages/physics/src/eclipse/finders.cjs',
   'packages/physics/src/moon/series.cjs',
   'packages/physics/src/moon/apparent.cjs',
@@ -77,6 +82,42 @@ const REGION_CITIES = [
 const BABYLON = { lat: 32.5364, lon: 44.4209 };
 
 const NASA_TYPE = { N: 'Penumbral', P: 'Partial', T: 'Total' };
+
+/**
+ * Parse a Stephenson-2016 untimed-eclipse supplement table (raw text, as
+ * published). Row quirks handled: negatives typeset with stray spaces
+ * ("- 500", "-  60"), square brackets marking doubtful bounds (kept,
+ * counted), "..." marking a one-sided bound (null). Column order differs
+ * per table: S10 is DT-U then DT-L; S11–S13 are DT-L then DT-U; S14 is a
+ * single DT estimate.
+ * @param {string} rel @param {'UL'|'LU'|'single'} order
+ * @returns {Array<{year:number, low:number|null, high:number|null, region:string, bracketed:boolean}>}
+ */
+function parseBoundsTable(rel, order) {
+  const text = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  const rows = [];
+  for (const raw of text.split('\n')) {
+    const line = raw.replace(/-\s+(?=\d)/g, '-');
+    const m = line.match(/^\s*1[0-4]\s+(-?\d+)\s+(\S+)(?:\s+(\S+))?\s+(\S+)\s*$/);
+    if (!m) continue;
+    const year = parseInt(m[1], 10);
+    const bracketed = /\[/.test(line);
+    /** @param {string|undefined} s @returns {number|null} */
+    const num = (s) => {
+      if (s === undefined || s.includes('...')) return null;
+      const v = parseInt(s.replace(/[[\]]/g, ''), 10);
+      return Number.isFinite(v) ? v : null;
+    };
+    if (order === 'single') {
+      rows.push({ year, low: num(m[2]), high: num(m[2]), region: m[4] ?? m[3] ?? '', bracketed });
+    } else {
+      const a = num(m[2]), b = num(m[3]);
+      const [low, high] = order === 'UL' ? [b, a] : [a, b];
+      rows.push({ year, low, high, region: m[4] ?? '', bracketed });
+    }
+  }
+  return rows;
+}
 
 /** Flatten leaf primitives to dotted keys for exact reproduction compare. */
 function flatten(obj, prefix, out) {
@@ -232,12 +273,96 @@ async function main() {
     };
   }
 
+  // ── Section 5: dtBounds (the UNTIMED tablets — S10–S14, never used before) ─
+  // Each untimed record (a totality/partial/rise-set statement at a site)
+  // yields a published ΔT INTERVAL rather than a value — the least
+  // curve-dependent constraint class in the corpus. The framework's
+  // eclipse-independent ΔT is tested for containment per event.
+  const BOUNDS_TABLES = /** @type {const} */ ([
+    ['S10', 'data/rspa20160404supp2/Table-S10.txt', 'UL', 'untimed total/annular solar'],
+    ['S11', 'data/rspa20160404supp2/Table-S11.txt', 'LU', 'untimed partial solar'],
+    ['S12', 'data/rspa20160404supp2/Table-S12.txt', 'LU', 'solar rose/set eclipsed'],
+    ['S13', 'data/rspa20160404supp2/Table-S13.txt', 'LU', 'lunar rose/set eclipsed'],
+  ]);
+  /** @type {Record<string, any>} */
+  const dtBounds = {};
+  for (const [key, rel, order, label] of BOUNDS_TABLES) {
+    const rows = parseBoundsTable(rel, /** @type {'UL'|'LU'} */ (order));
+    let fwIn = 0, spIn = 0, oneSided = 0, bracketed = 0;
+    for (const r of rows) {
+      const fw = DT.meanDeltaTSecondsAtAge((2000 - r.year) / 1e6);
+      const sp = stephensonDeltaT(r.year, stephPoly);
+      const inside = (/** @type {number} */ v) => (r.low === null || v >= r.low) && (r.high === null || v <= r.high);
+      if (r.low === null || r.high === null) oneSided += 1;
+      if (r.bracketed) bracketed += 1;
+      if (inside(fw)) fwIn += 1;
+      if (inside(sp)) spIn += 1;
+    }
+    dtBounds[key] = { label, n: rows.length, oneSided, bracketed, frameworkInside: fwIn, stephensonSplineInside: spIn };
+  }
+  // S14: single degree-of-obscuration ΔT estimates — residual stats like dtBands.
+  {
+    const rows = parseBoundsTable('data/rspa20160404supp2/Table-S14.txt', 'single');
+    let sumF = 0, sqF = 0, sumS = 0, sqS = 0;
+    for (const r of rows) {
+      const fw = DT.meanDeltaTSecondsAtAge((2000 - r.year) / 1e6);
+      const sp = stephensonDeltaT(r.year, stephPoly);
+      const rF = /** @type {number} */ (r.low) - fw, rS = /** @type {number} */ (r.low) - sp;
+      sumF += Math.abs(rF); sqF += rF * rF; sumS += Math.abs(rS); sqS += rS * rS;
+    }
+    dtBounds.S14 = {
+      label: 'lunar obscuration estimates', n: rows.length,
+      frameworkMeanAbsSeconds: Math.round(sumF / rows.length),
+      frameworkRmsSeconds: Math.round(Math.sqrt(sqF / rows.length)),
+      stephensonSplineMeanAbsSeconds: Math.round(sumS / rows.length),
+      stephensonSplineRmsSeconds: Math.round(Math.sqrt(sqS / rows.length)),
+    };
+  }
+  // Headline row: the -135 Babylon totality bounds vs the framework curve.
+  {
+    const s10 = parseBoundsTable('data/rspa20160404supp2/Table-S10.txt', 'UL');
+    const b = s10.find((r) => r.year === -135 && /babylon/i.test(r.region));
+    const fw = DT.meanDeltaTSecondsAtAge((2000 - (-135)) / 1e6);
+    dtBounds.babylon135 = b ? {
+      boundsLowSeconds: b.low, boundsHighSeconds: b.high,
+      frameworkSeconds: Math.round(fw),
+      frameworkInside: (b.low === null || fw >= b.low) && (b.high === null || fw <= b.high),
+    } : null;
+  }
+
+  // ── Section 6: dtBandsByCentury (the doc-102 Babylonian convergence, pinned)
+  // Cuneiform-tablet centuries -800..-300: per-century mean observed ΔT vs
+  // the framework curve, across the Babylonian timed lunar tables S01/S02/S04.
+  /** @type {Record<string, {n:number, sumObs:number, sumFw:number}>} */
+  const centBins = {};
+  for (const obs of steph.entries) {
+    if (obs.dt_observed_sec == null) continue;
+    if (!/^S0[124]$/.test(obs.source_table)) continue;
+    if (obs.year < -800 || obs.year > -301) continue;
+    const cent = String(Math.floor(obs.year / 100) * 100);
+    const b = centBins[cent] ?? (centBins[cent] = { n: 0, sumObs: 0, sumFw: 0 });
+    b.n += 1; b.sumObs += obs.dt_observed_sec; b.sumFw += DT.meanDeltaTSecondsAtAge((2000 - obs.year) / 1e6);
+  }
+  /** @type {Record<string, Record<string, number>>} */
+  const dtBandsByCentury = {};
+  for (const [cent, b] of Object.entries(centBins).sort(([a], [c]) => Number(a) - Number(c))) {
+    const obsHr = b.sumObs / b.n / 3600, fwHr = b.sumFw / b.n / 3600;
+    dtBandsByCentury[cent] = {
+      n: b.n,
+      meanObservedHours: Math.round(obsHr * 100) / 100,
+      meanFrameworkHours: Math.round(fwHr * 100) / 100,
+      residualHours: Math.round((fwHr - obsHr) * 100) / 100,
+    };
+  }
+
   const computed = {
     _description: 'Lunar-eclipse alignment summary — GENERATED by tools/verify/lunar-alignment.js --write. canonGeometry: model lunar finder vs the NASA 5-Millennium Canon 1600-2200 on the TT AXIS (isolates lunar geometry from the deltaT model, which eclipse-audit L-5b tests on the UT axis). visibility: documented visibility regions vs the shipped api observer tier (geometric horizon at maximum eclipse; deep-inside-region cities). babylon746: the -746 Feb 6 Babylonian partial eclipse anchor. dtBands: the Stephenson-2016 raw-timing reductions (their reduction of the primary timings, weights not applied) vs the framework deltaT curve and the published Stephenson spline, per source table. A plain run recomputes and FAILS on divergence from this file; --write refuses on divergence; --write --rebaseline is the conscious re-measurement path.',
     canonGeometry,
     visibility,
     babylon746,
     dtBands,
+    dtBounds,
+    dtBandsByCentury,
     inputs: buildInputsBlock('node tools/verify/lunar-alignment.js --write', INPUT_FILES),
   };
 
@@ -248,6 +373,17 @@ async function main() {
     babylon746.type, babylon746.magnitudeUmbral, babylon746.canonMagnitudeUmbral, babylon746.ttResidualMinutes, babylon746.visibleFromBabylon, babylon746.babylonMoonAltitudeDeg);
   console.log('  dtBands overall (n=%d): framework meanAbs %d s | stephenson spline meanAbs %d s',
     dtBands.overall.n, dtBands.overall.frameworkMeanAbsSeconds, dtBands.overall.stephensonSplineMeanAbsSeconds);
+  for (const [k, v] of Object.entries(dtBounds)) {
+    if (k === 'babylon135' || k === 'S14') continue;
+    console.log('  dtBounds %s (%s): framework inside %d/%d | spline inside %d/%d', k, v.label, v.frameworkInside, v.n, v.stephensonSplineInside, v.n);
+  }
+  console.log('  dtBounds S14 (%s, n=%d): framework meanAbs %d s | spline meanAbs %d s',
+    dtBounds.S14.label, dtBounds.S14.n, dtBounds.S14.frameworkMeanAbsSeconds, dtBounds.S14.stephensonSplineMeanAbsSeconds);
+  if (dtBounds.babylon135) console.log('  dtBounds babylon135: framework %d s vs bounds [%d, %d] → inside=%s',
+    dtBounds.babylon135.frameworkSeconds, dtBounds.babylon135.boundsLowSeconds, dtBounds.babylon135.boundsHighSeconds, dtBounds.babylon135.frameworkInside);
+  for (const [cent, v] of Object.entries(dtBandsByCentury)) {
+    console.log('  century %s: n=%d obs %s hr | framework %s hr | residual %s hr', cent, v.n, v.meanObservedHours, v.meanFrameworkHours, v.residualHours);
+  }
 
   // ── Recording convention ──────────────────────────────────────────────────
   if (!fs.existsSync(OUT)) {
