@@ -86,6 +86,12 @@ const MIGRATED = [
   // visible at the import site in script.js.
   'astro.physicalConstants.currentAUDistance',
   'astro.physicalConstants.speedOfLight',
+  // 20.3 eclipse-chain constants (consumed via K.physicalConstants.* in the
+  // umbra apparent-place chain; nutation block accessed through an alias so
+  // the nested keys are ledgered by prefix).
+  'astro.physicalConstants.earthFlatteningInverseWGS84',
+  'astro.physicalConstants.aberrationConstantArcsec',
+  'astro.physicalConstants.nutationLeadingTermsArcsec',
   'astro.physicalConstants.G_CONSTANT',
   'astro.physicalConstants.MASS_RATIO_EARTH_MOON',
   'astro.physicalConstants.earthMoiFactorJ2000',

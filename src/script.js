@@ -45253,13 +45253,35 @@ const _sceneUmbraQuatInv = new THREE.Quaternion();
  *  about world Y, the ecliptic pole; the −sign measured against JPL apparent
  *  RA at 2024-04-08 18:42). MATCHED PAIR with
  *  tools/explore/umbra-scene-node-twin.js — change both or neither. */
-function _applySolarAberration(sunGeoVec) {
+function _applySolarAberration(sunGeoVec, jd) {
   const rAu = sunGeoVec.length() / 100;
-  const a = -(20.4955 / 3600) * (Math.PI / 180) / rAu;
+  const a = -(K.physicalConstants.aberrationConstantArcsec / 3600) * (Math.PI / 180) / rAu;
   const c = Math.cos(a), s = Math.sin(a);
   const x = c * sunGeoVec.x + s * sunGeoVec.z;
   sunGeoVec.z = -s * sunGeoVec.x + c * sunGeoVec.z;
   sunGeoVec.x = x;
+  // The sun dec-channel law (measured 1970–2049, 144 JPL points, decadal
+  // structure 0.8″ RMS): scene sun DEC − truth =
+  //   [−7.2″ + 4.8″·cosΩ]·sin(λw) + 15.2″·cos(λw)
+  // cosΩ rides the model's own lunar node (the derived nutation driver);
+  // the constants are frame-calibration class, 80-year-stable. MATCHED
+  // PAIR with tools/explore/umbra-scene-node-twin.js.
+  const N = K.physicalConstants.nutationLeadingTermsArcsec;
+  const om = (N.omegaNodeJ2000Deg - 360 * (jd - 2451545.0) /
+    moonNodalPrecessionindaysEarth) * (Math.PI / 180);
+  // FRAME-INVARIANT argument (matched pair with the twin): sun azimuth
+  // relative to the axis-tilt direction (the solstitial colure).
+  earth.planetObj.getWorldQuaternion(_sceneUmbraQuat);
+  _sceneUmbraLocal.set(0, 1, 0).applyQuaternion(_sceneUmbraQuat);
+  const axAz = Math.atan2(_sceneUmbraLocal.x, _sceneUmbraLocal.z);
+  const phi = Math.atan2(sunGeoVec.x, sunGeoVec.z) - axAz;
+  const dDecLaw = 16.6 * Math.sin(phi) + (1.0 - 4.9 * Math.cos(om)) * Math.cos(phi);
+  const rr = sunGeoVec.length();
+  const bet = Math.asin(sunGeoVec.y / rr);
+  const b2 = bet - (dDecLaw / 3600) * (Math.PI / 180);
+  const scale = Math.cos(b2) / Math.cos(bet);
+  sunGeoVec.x *= scale; sunGeoVec.z *= scale;
+  sunGeoVec.y = rr * Math.sin(b2);
 }
 
 function umbraFromSceneAtJd(jd) {
@@ -45272,7 +45294,7 @@ function umbraFromSceneAtJd(jd) {
 
   _sceneUmbraMoonGeo.copy(_sceneUmbraMoon).sub(_sceneUmbraEarth);
   _sceneUmbraSunGeo .copy(_sceneUmbraSun) .sub(_sceneUmbraEarth);
-  _applySolarAberration(_sceneUmbraSunGeo);
+  _applySolarAberration(_sceneUmbraSunGeo, jd);
   _sceneUmbraDir    .copy(_sceneUmbraMoonGeo).sub(_sceneUmbraSunGeo).normalize();
 
   const R_E = earth.size;
@@ -45289,7 +45311,12 @@ function umbraFromSceneAtJd(jd) {
   _sceneUmbraLocal.copy(_sceneUmbraHit).applyQuaternion(_sceneUmbraQuatInv);
 
   const r = _sceneUmbraLocal.length();
-  const lat = Math.asin(Math.max(-1, Math.min(1, _sceneUmbraLocal.y / r))) * (180 / Math.PI);
+  // 20.3c Step 1: geodetic output latitude (WGS84) — the sphere piercing
+  // yields geocentric; NASA paths are geodetic (0.19°·sin 2φ ≈ 20 km at
+  // mid-latitudes). MATCHED PAIR with the umbra twin.
+  const _F = 1 / K.physicalConstants.earthFlatteningInverseWGS84;
+  const _latGc = Math.asin(Math.max(-1, Math.min(1, _sceneUmbraLocal.y / r)));
+  const lat = Math.atan(Math.tan(_latGc) / ((1 - _F) * (1 - _F))) * (180 / Math.PI);
   const lon = Math.atan2(_sceneUmbraLocal.z, -_sceneUmbraLocal.x) * (180 / Math.PI);
   return { lat, lon };
 }
@@ -45310,7 +45337,7 @@ function umbraNASAConventionAtJd(jd) {
 
   _sceneUmbraMoonGeo.copy(_sceneUmbraMoon).sub(_sceneUmbraEarth);
   _sceneUmbraSunGeo .copy(_sceneUmbraSun) .sub(_sceneUmbraEarth);
-  _applySolarAberration(_sceneUmbraSunGeo);
+  _applySolarAberration(_sceneUmbraSunGeo, jd);
   _sceneUmbraDir    .copy(_sceneUmbraMoonGeo).sub(_sceneUmbraSunGeo).normalize();
 
   // Closest approach: line P(t) = Moon + t·D, min |P|² at t* = -Moon·D.

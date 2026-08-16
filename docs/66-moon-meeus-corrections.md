@@ -706,6 +706,51 @@ retrograde), so the measured world-frame regression is the star-referenced
 - 25 eclipses within 0.5 degrees
 - Best match: 2020-Jun-21 annular eclipse at 0.11 degrees
 
+### The umbra apparent-place chain (the 20.3 correction stack)
+
+The scene-umbra ground track (audit-26, the Babylon −135 case, the NASA
+path comparisons) carries a correction stack between the scene's
+mean-frame bodies and the apparent sky, every term derived, attributed,
+or measured-and-era-proven — applied as a MATCHED PAIR in
+`src/script.js` (`_applySolarAberration` + the umbra functions) and
+`tools/explore/umbra-scene-node-twin.js`, pinned by the twin-parity
+probe (worst 0.25 km):
+
+1. **Solar annual aberration** — κ/r about the ecliptic pole
+   (κ = 20.4955″, `astro-reference.json`). Applied to the Sun only:
+   stellar aberration is ~20.5″ for the distant Sun but light-time
+   class (~0.7″) for the nearby Moon — the asymmetry is physical.
+2. **The sidereal-phase anchor** — `earth.rotationPhase =
+   −π/tropical-year-days` (118.3 s of rotation): the startmodelJD
+   midnight anchor carried a noon-convention initial orientation,
+   measured as a constant −1.98 min sub-solar offset at six modern
+   eclipses (EoT-independent; EoT(anchor) excluded by 15 s).
+3. **Geodetic output latitude** — the sphere piercing yields geocentric
+   latitude; NASA paths are geodetic on WGS84 (0.19°·sin 2φ ≈ 20 km at
+   mid-latitudes). One attributed constant
+   (`earthFlatteningInverseWGS84`).
+4. **The Sun dec-channel law** — measured against 144 JPL apparent
+   points spanning 1970–2049 (decadal structure at 0.8″ RMS, era-split
+   proven constant): `dDec = 16.6″·sin φ + (1.0 − 4.9·cos Ω)″·cos φ`,
+   where φ is the Sun's azimuth from the axis-tilt direction (the
+   solstitial colure — FRAME-INVARIANT: the two engines' world frames
+   differ by ~68° of yaw, and the twin-parity gate rejected the
+   frame-dependent first form) and Ω is the model's own lunar node —
+   the cos Ω term is the derived-nutation driver
+   (`derive-nutation-torque-integration.js` recovers the IAU 1980
+   amplitudes at 100.3%/100.1% from the framework torque law with
+   zero new constants).
+
+Result, in the shadow-plane metric (ground gap × sin sun-altitude —
+the invariant measure; ground kilometres amplify by 1/sin alt, 6.9× at
+the low-sun 2026 Spain crossing): five modern eclipses vs their NASA
+path-table centerlines at **3.7″/7.8″/9.6″/13.1″/17.3″** (2024, 2023
+held-out, 2026, 2017, 1999 held-out) — from 88 km pre-stack. The
+remaining scatter is consistent with the certified Moon class (~3″,
+§JPL comparison below — the dense-corpus residual laws are all ≤1.4″,
+which is also why the in-repo ELP/MPP02 series lift is BANKED: it
+would buy ~2″), the Sun-law residual (~4.5″), and reference precision.
+
 ### Geocentric parallax limit
 - The 0.81-degree RMS is the **theoretical best** for geocentric coordinates.
 - Solar eclipses are topocentric events. The Moon's parallax (~0.95 degrees)

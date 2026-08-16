@@ -23,7 +23,7 @@ const path = require('path');
 
 // ─── Physical constants (literature-anchored, not framework-derived) ──────
 
-const EARTH_DIAMETER_KM = 12756.27;                                  // IERS WGS84
+const EARTH_DIAMETER_KM = C.EARTH_DIAMETER_KM;                       // single source: astro-reference bodyDiametersKm.earth (IERS WGS84)
 const R_EARTH_M = (EARTH_DIAMETER_KM / 2) * 1000;
 // α at J2000 (IERS Conventions 2010) — single source: astro-reference.json physicalConstants
 const EARTH_MOI_FACTOR = C.EARTH_MOI_FACTOR;

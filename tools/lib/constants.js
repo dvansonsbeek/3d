@@ -644,6 +644,10 @@ module.exports = {
   // Deep-time physics anchors (single source of truth:
   // astro-reference.json physicalConstants + model-parameters.json deepTime)
   EARTH_MOI_FACTOR: astroRef.physicalConstants.earthMoiFactorJ2000,
+  EARTH_FLATTENING_INVERSE_WGS84: astroRef.physicalConstants.earthFlatteningInverseWGS84,
+  EARTH_DIAMETER_KM: astroRef.bodyDiametersKm.earth,
+  NUTATION_LEADING_TERMS_ARCSEC: astroRef.physicalConstants.nutationLeadingTermsArcsec,
+  ABERRATION_CONSTANT_ARCSEC: astroRef.physicalConstants.aberrationConstantArcsec,
   SOLAR_LUMINOSITY_W: astroRef.physicalConstants.solarLuminosityW,
   SOLAR_WIND_KG_PER_S: astroRef.physicalConstants.solarWindMassLossKgPerS,
   ALPHA_1: modelParams.deepTime.alpha1PerMa,

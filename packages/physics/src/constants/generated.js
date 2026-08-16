@@ -32,7 +32,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "c27d98c2f75e949b";
+export const CONSTANTS_HASH = "e86ba5bb7a5e7c45";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v11.0";
@@ -42,7 +42,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "c27d98c2f75e949b",
+  hash: "e86ba5bb7a5e7c45",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -296,6 +296,19 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "MASS_RATIO_EARTH_MOON": 81.30056816,
     "speedOfLight": 299792.458,
     "earthMoiFactorJ2000": 0.3306947,
+    "earthFlatteningInverseWGS84": 298.257223563,
+    "aberrationConstantArcsec": 20.4955,
+    "nutationLeadingTermsArcsec": {
+      "psiOmega": -17.2,
+      "psi2Ls": -1.32,
+      "psi2Lm": -0.23,
+      "psi2Omega": 0.21,
+      "epsOmega": 9.2,
+      "eps2Ls": 0.57,
+      "eps2Lm": 0.1,
+      "eps2Omega": -0.09,
+      "omegaNodeJ2000Deg": 125.04452
+    },
     "solarLuminosityW": 3.828e+26,
     "solarWindMassLossKgPerS": 1600000000,
     "massRatioDE440": {

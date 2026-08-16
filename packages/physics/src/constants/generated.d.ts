@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "c27d98c2f75e949b";
+export declare const CONSTANTS_HASH: "e86ba5bb7a5e7c45";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "c27d98c2f75e949b";
+  readonly hash: "e86ba5bb7a5e7c45";
   readonly additionalBodies: {
     "pluto": {
       "name": string;
@@ -239,6 +239,19 @@ export declare const DEFAULT_CONSTANTS: {
     "MASS_RATIO_EARTH_MOON": number;
     "speedOfLight": number;
     "earthMoiFactorJ2000": number;
+    "earthFlatteningInverseWGS84": number;
+    "aberrationConstantArcsec": number;
+    "nutationLeadingTermsArcsec": {
+      "psiOmega": number;
+      "psi2Ls": number;
+      "psi2Lm": number;
+      "psi2Omega": number;
+      "epsOmega": number;
+      "eps2Ls": number;
+      "eps2Lm": number;
+      "eps2Omega": number;
+      "omegaNodeJ2000Deg": number;
+    };
     "solarLuminosityW": number;
     "solarWindMassLossKgPerS": number;
     "massRatioDE440": {

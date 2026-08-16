@@ -6,6 +6,14 @@
     "MASS_RATIO_EARTH_MOON": 81.30056816,
     "speedOfLight": 299792.458,
     "earthMoiFactorJ2000": 0.3306947,
+    "earthFlatteningInverseWGS84": 298.257223563,
+    "aberrationConstantArcsec": 20.4955,
+    "nutationLeadingTermsArcsec": {
+      "_description": "IAU 1980 nutation, four leading terms. dPsi (longitude) = psiOmega*sin(Om) + psi2Ls*sin(2Ls) + psi2Lm*sin(2Lm) + psi2Omega*sin(2Om); dEps (obliquity) = epsOmega*cos(Om) + eps2Ls*cos(2Ls) + eps2Lm*cos(2Lm) + eps2Omega*cos(2Om). Om = lunar ascending node longitude (the model's own nodal machinery is the driver), Ls/Lm = mean solar/lunar longitudes. Units arcsec.",
+      "psiOmega": -17.20, "psi2Ls": -1.32, "psi2Lm": -0.23, "psi2Omega": 0.21,
+      "epsOmega": 9.20, "eps2Ls": 0.57, "eps2Lm": 0.10, "eps2Omega": -0.09,
+      "omegaNodeJ2000Deg": 125.04452
+    },
     "solarLuminosityW": 3.828e+26,
     "solarWindMassLossKgPerS": 1600000000,
     "_massRatioNote": "SYSTEM = planet + its moons; ALONE = planet only. They differ materially where a massive satellite exists — Pluto/Charon by 10.85%. Mercury and Venus have no moons, so ALONE = SYSTEM and src/script.js derives it rather than storing a second copy; Earth-alone is likewise derived via MASS_RATIO_EARTH_MOON.",
