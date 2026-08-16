@@ -39,10 +39,13 @@
  * Section (d) `centerlines` is the 20.3 accuracy instrument: the scene-umbra
  * twin evaluated at 15 fixed-UT NASA path-table CENTRAL-LINE points across
  * the five modern events (2024/2017/2026/1999/2023, two of them held-outs of
- * the 20.3c stack), reported in the SHADOW-PLANE metric — ground gap ×
- * sin(sun altitude), in km and in arcsec at the 1.86 km/″ Moon-distance
- * lever. Ground km are NOT comparable across events (1/sin alt amplifies
- * 6.9× at the low-sun 2026 crossing); shadow-plane arcsec are. Unlike the
+ * the 20.3c stack), reported in the SHADOW-PLANE metric — the VECTOR
+ * projection of the surface chord onto the plane ⊥ the sun direction (the
+ * true axis separation; round 3 replaced the scalar ground×sin(alt), which
+ * is exact only for gaps along the sun azimuth and understated oblique
+ * ones) — in km and in arcsec at the 1.86 km/″ Moon-distance lever. Ground
+ * km are NOT comparable across events (1/sin alt amplifies 6.9× at the
+ * low-sun 2026 crossing); shadow-plane arcsec are. Unlike the
  * audit-26 site scan, there is no ±4h search: fixed UT vs the table's own
  * central line — longitude-channel error cannot hide. Same
  * exact-reproduction convention as the other sections.
@@ -463,7 +466,7 @@ const CL = rd('public/input/solar-eclipse-centerlines-nasa.json');
 const D2R = Math.PI / 180;
 // ground gap via the file-level gcKm (haversine on the codebase Earth radius)
 
-function sunAltDegAt(jd, latDeg, lonDeg) {
+function sunGeomAt(jd, latDeg, lonDeg) {
   SG.computePlanetPosition('moon', jd);
   const g = SG._getGraphForProbe();
   const sun = g.sunNodes.pivot.getWorldPosition();
@@ -481,8 +484,19 @@ function sunAltDegAt(jd, latDeg, lonDeg) {
   const T = (jd - 2451545.0) / 36525;
   const gmst = (280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T) % 360;
   const H = ((gmst + lonDeg) * D2R) - ra;
-  return Math.asin(Math.sin(latDeg * D2R) * Math.sin(dec) +
+  const altDeg = Math.asin(Math.sin(latDeg * D2R) * Math.sin(dec) +
     Math.cos(latDeg * D2R) * Math.cos(dec) * Math.cos(H)) / D2R;
+  // sub-solar point (the sun direction in the earth-fixed chart)
+  const ssLat = dec / D2R;
+  const ssLon = ((ra / D2R - gmst + 540) % 360) - 180;
+  return { altDeg, ssLat, ssLon };
+}
+
+// earth-fixed chart unit vector for a lat/lon (the umbra twins' convention:
+// lon = atan2(z, −x)); any consistent chart works — this is pure geometry.
+function efUnit(latDeg, lonDeg) {
+  const la = latDeg * D2R, lo = lonDeg * D2R;
+  return [-Math.cos(la) * Math.cos(lo), Math.sin(la), Math.cos(la) * Math.sin(lo)];
 }
 
 const r1 = (x) => Math.round(x * 10) / 10;
@@ -491,8 +505,18 @@ const clEvents = CL.events.map((ev) => {
   const points = ev.points.map((p) => {
     const u = umbraFromSceneAtJdNode(p.jd);
     const groundKm = gcKm(p.latDeg, p.lonDeg, u.lat, u.lon);
-    const altDeg = sunAltDegAt(p.jd, p.latDeg, p.lonDeg);
-    const shadowKm = groundKm * Math.sin(altDeg * D2R);
+    const sg = sunGeomAt(p.jd, p.latDeg, p.lonDeg);
+    const altDeg = sg.altDeg;
+    // VECTOR shadow-plane projection (round 3): the chord between the two
+    // surface points minus its component along the sun direction — the true
+    // axis-separation. The scalar ground×sin(alt) is exact only when the gap
+    // runs along the sun azimuth and UNDERSTATES oblique gaps (2026 read 9.6″
+    // under the scalar form vs the honest oblique value).
+    const R_E_KM = BD.earth / 2;   // codebase Earth radius (same as gcKm)
+    const a = efUnit(p.latDeg, p.lonDeg), b = efUnit(u.lat, u.lon), s = efUnit(sg.ssLat, sg.ssLon);
+    const gv = [(b[0] - a[0]) * R_E_KM, (b[1] - a[1]) * R_E_KM, (b[2] - a[2]) * R_E_KM];
+    const dot = gv[0] * s[0] + gv[1] * s[1] + gv[2] * s[2];
+    const shadowKm = Math.hypot(gv[0] - dot * s[0], gv[1] - dot * s[1], gv[2] - dot * s[2]);
     return {
       utc: p.utc,
       groundGapKm: r1(groundKm),
@@ -547,13 +571,16 @@ const centerlinesSection = (clDiverged && !REBASELINE) ? prev.centerlines : {
     'fixed UT vs the NASA GSFC path-table CENTRAL LINE ' +
     '(public/input/solar-eclipse-centerlines-nasa.json, cross-checked ' +
     'rows — see its _meta for the limit-column trap), in the SHADOW-PLANE ' +
-    'metric: ground gap × sin(sun altitude), and arcsec at the 1.86 km/″ ' +
-    'Moon-distance lever. Ground km are not comparable across events ' +
-    '(1/sin alt); shadow-plane arcsec are. No time scan: fixed UT, so the ' +
-    'longitude channel cannot hide. The five events include two held-outs ' +
-    'of the 20.3c apparent-place stack (1999, 2023). Sun altitude here is ' +
-    'metric normalization only (GMST expression, 0.4° vs the tables), not ' +
-    'part of the model chain.',
+    'metric: the VECTOR projection of the surface chord onto the plane ' +
+    'perpendicular to the sun direction (the true axis separation; the ' +
+    'round-3 rebaseline — the earlier scalar ground×sin(alt) is exact only ' +
+    'for gaps along the sun azimuth and understated oblique ones), and ' +
+    'arcsec at the 1.86 km/″ Moon-distance lever. Ground km are not ' +
+    'comparable across events (1/sin alt); shadow-plane arcsec are. No ' +
+    'time scan: fixed UT, so the longitude channel cannot hide. The five ' +
+    'events include two held-outs of the 20.3c apparent-place stack ' +
+    '(1999, 2023). Sun geometry here is metric normalization only (GMST ' +
+    'expression, altitude 0.4° vs the tables), not part of the model chain.',
   events: clEvents,
   meanShadowPlaneArcsec: clMeanArcsec,
   maxShadowPlaneArcsec: clMaxArcsec,

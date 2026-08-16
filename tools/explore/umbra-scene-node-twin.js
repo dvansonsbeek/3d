@@ -102,20 +102,34 @@ function umbraFromSceneAtJdNode(jd) {
   const moonGeo = apply(R, vLocal);
   const sunGeo = [sun[0] - earth[0], sun[1] - earth[1], sun[2] - earth[2]];
 
-  // B1: solar annual aberration — the apparent Sun lags the geometric Sun
-  // by κ/r along the ecliptic (κ = 20.4955″). The scene Sun is geometric;
-  // JPL, the NASA canon and the sky are apparent. Rotation about world Y
-  // (the ecliptic pole); the −sign was measured against JPL (framework Sun
-  // RA 17.93245° → 17.92714°, toward JPL 17.91943° at 2024-04-08 18:42).
-  // MATCHED PAIR with src/script.js umbraFromSceneAtJd — change both or
-  // neither.
+  // B1 (generalized in round 3): ANNUAL ABERRATION FOR BOTH BODIES. The
+  // observer-velocity (v/c) apparent shift is DISTANCE-INDEPENDENT and
+  // applies to every body: Δλ = −(κ/r)·cos(λ_body − λ_sun)/cos β, a
+  // rotation about the ecliptic pole (world Y). For the Sun this reduces
+  // exactly to the original B1 term (cos 0 = 1); for the Moon at syzygy it
+  // applies the SAME rotation, so aberration CANCELS in the elongation.
+  // The original Sun-only form broke the relative geometry by exactly κ —
+  // the round-3 constant: +20″ elongation error at all five modern events
+  // (1999 read −0.2″ once common-mode; the earlier "Moon aberration is
+  // light-time class ~0.7″" note confused light-time with stellar
+  // aberration). Moon light-time (~0.7″) stays unmodeled; the Δβ
+  // aberration component (∝ sin(λ−λ_s)·sin β) vanishes at syzygy and is
+  // skipped. MATCHED PAIR with src/script.js umbraFromSceneAtJd — change
+  // both or neither.
   {
     const rAu = Math.hypot(sunGeo[0], sunGeo[1], sunGeo[2]) / 100;
-    const a = -(C.ABERRATION_CONSTANT_ARCSEC / 3600) * (Math.PI / 180) / rAu;
-    const c0 = Math.cos(a), s0 = Math.sin(a);
-    const x = c0 * sunGeo[0] + s0 * sunGeo[2];
-    sunGeo[2] = -s0 * sunGeo[0] + c0 * sunGeo[2];
-    sunGeo[0] = x;
+    const aS = -(C.ABERRATION_CONSTANT_ARCSEC / 3600) * (Math.PI / 180) / rAu;
+    const rotY = (v, a) => {
+      const c0 = Math.cos(a), s0 = Math.sin(a);
+      const x = c0 * v[0] + s0 * v[2];
+      v[2] = -s0 * v[0] + c0 * v[2];
+      v[0] = x;
+    };
+    const lamS = Math.atan2(sunGeo[0], sunGeo[2]);
+    const lamM = Math.atan2(moonGeo[0], moonGeo[2]);
+    const betM = Math.asin(moonGeo[1] / Math.hypot(moonGeo[0], moonGeo[1], moonGeo[2]));
+    rotY(sunGeo, aS);
+    rotY(moonGeo, aS * Math.cos(lamM - lamS) / Math.cos(betM));
   }
 
   // 20.3c: the solstitial-axis plane tilt — the scene sun's ecliptic
@@ -152,6 +166,29 @@ function umbraFromSceneAtJdNode(jd) {
     const scale = Math.cos(b2) / Math.cos(bet);
     sunGeo[0] *= scale; sunGeo[2] *= scale;
     sunGeo[1] = rr * Math.sin(b2);
+  }
+
+  // Round-3 Sun LONGITUDE law — the λ twin of the dec law. Measured against
+  // 960 JPL apparent-Sun points 1970–2049 through the frame-invariant
+  // recipe (L = φ + 90°, φ the solstitial-colure angle; the mean-vs-true
+  // equinox frame column separated cleanly at coefficient −1.004):
+  //   dλ = 6.72 − 0.84·sin L + 3.64·sin 2L − 0.46·cos 2L   (arcsec)
+  // Era-split proven on the shipped terms (sin2L 3.77/3.52, const
+  // 6.53/6.88 across 1970–2009 vs 2010–2049); the era-UNSTABLE cosL term
+  // (−1.7 → +4.6) is deliberately not shipped. Applied as a rotation about
+  // the ecliptic pole by −dλ. Same observationally-defined class as the
+  // dec law; source attribution is the banked follow-up. MATCHED PAIR with
+  // src/script.js.
+  {
+    const lamW = Math.atan2(sunGeo[0], sunGeo[2]);
+    const axAz = Math.atan2(R[0][1], R[2][1]);
+    const L = lamW - axAz + Math.PI / 2;
+    const dLam = 6.72 - 0.84 * Math.sin(L) + 3.64 * Math.sin(2 * L) - 0.46 * Math.cos(2 * L);
+    const a = -(dLam / 3600) * (Math.PI / 180);
+    const c0 = Math.cos(a), s0 = Math.sin(a);
+    const x = c0 * sunGeo[0] + s0 * sunGeo[2];
+    sunGeo[2] = -s0 * sunGeo[0] + c0 * sunGeo[2];
+    sunGeo[0] = x;
   }
 
   let d = [moonGeo[0] - sunGeo[0], moonGeo[1] - sunGeo[1], moonGeo[2] - sunGeo[2]];

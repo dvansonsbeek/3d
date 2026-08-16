@@ -30387,18 +30387,21 @@ function setupGUI() {
   // Centerlines: the 20.3 shadow-plane accuracy instrument — in-sim view.
   // Same 15 fixed-UT NASA path-table CENTRAL-LINE points and metric as the
   // Node gate (tools/verify/eclipse-audit.js section d; recorded in
-  // data/eclipse-audit-summary.json `centerlines`): ground gap ×
-  // sin(sun altitude), arcsec at the 1.86 km/″ Moon-distance lever.
-  // Fixed UT, no scan — the longitude channel cannot hide (unlike the
-  // ±4h BestGap above, which absorbs it). Ground km are NOT comparable
+  // data/eclipse-audit-summary.json `centerlines`): the VECTOR projection
+  // of the surface chord onto the plane ⊥ the sun direction (the true
+  // axis separation — round 3 replaced the scalar ground×sin(alt), which
+  // understated oblique gaps), arcsec at the 1.86 km/″ Moon-distance
+  // lever. Fixed UT, no scan — the longitude channel cannot hide (unlike
+  // the ±4h BestGap above, which absorbs it). Ground km are NOT comparable
   // across events: 1/sin(alt) amplifies ground error 6.9× at the low-sun
-  // 2026 Iberia crossing. Sun altitude is metric NORMALIZATION only,
-  // computed geometrically in the scene's own earth-fixed frame (the Node
-  // gate uses the GMST convention; they agree to <0.01°, i.e. <0.01″).
+  // 2026 Iberia crossing. Sun direction is metric NORMALIZATION only,
+  // computed in the scene's own earth-fixed frame (the Node gate uses the
+  // GMST convention; they agree to <0.01°).
   // ────────────────────────────────────────────────────────────────────────
   addTestButton('Centerlines: shadow-plane vs NASA path tables (15 pts)', async () => {
     let cl = null;
-    for (const url of ['input/solar-eclipse-centerlines-nasa.json',
+    for (const url of ['https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/solar-eclipse-centerlines-nasa.json',
+                       'input/solar-eclipse-centerlines-nasa.json',
                        './input/solar-eclipse-centerlines-nasa.json']) {
       try {
         const res = await fetch(url);
@@ -30416,26 +30419,28 @@ function setupGUI() {
 
     const _d2r = Math.PI / 180;
     const r1 = (x) => Math.round(x * 10) / 10;
-    // sin(sun altitude) at a reference point: rotate the sun's geocentric
-    // vector into the earth-fixed frame (same quaternion path as the umbra
-    // ground mapping) and dot it with the point's zenith direction.
-    const sinSunAlt = (latDeg, lonDeg) => {
+    const R_E_KM = diameters.earthDiameter / 2;
+    // earth-fixed chart unit vector (inverse of the umbra lat/lon mapping:
+    // local = (−cosφ·cosλ, sinφ, cosφ·sinλ))
+    const efUnit = (latDeg, lonDeg) => {
+      const la = latDeg * _d2r, lo = lonDeg * _d2r;
+      return [-Math.cos(la) * Math.cos(lo), Math.sin(la), Math.cos(la) * Math.sin(lo)];
+    };
+    // sun direction in the earth-fixed frame (same quaternion path as the
+    // umbra ground mapping). MATCHED PAIR with the Node gate's sunGeomAt.
+    const sunDirEF = () => {
       sun.planetObj.getWorldPosition(_sceneUmbraSun);
       earth.planetObj.getWorldPosition(_sceneUmbraEarth);
       _sceneUmbraSunGeo.copy(_sceneUmbraSun).sub(_sceneUmbraEarth);
       earth.planetObj.getWorldQuaternion(_sceneUmbraQuat);
       _sceneUmbraQuatInv.copy(_sceneUmbraQuat).invert();
       _sceneUmbraSunGeo.applyQuaternion(_sceneUmbraQuatInv).normalize();
-      const la = latDeg * _d2r, lo = lonDeg * _d2r;
-      // inverse of the lat/lon output mapping: local = (−cosφ·cosλ, sinφ, cosφ·sinλ)
-      return _sceneUmbraSunGeo.x * (-Math.cos(la) * Math.cos(lo))
-           + _sceneUmbraSunGeo.y * Math.sin(la)
-           + _sceneUmbraSunGeo.z * (Math.cos(la) * Math.sin(lo));
+      return [_sceneUmbraSunGeo.x, _sceneUmbraSunGeo.y, _sceneUmbraSunGeo.z];
     };
 
     console.log('\n════════════════════════════════════════════════════════════════════════════════════════');
     console.log('  Centerlines: scene umbra vs NASA path-table CENTRAL LINE — fixed UT, shadow-plane metric');
-    console.log('  shadow-plane = ground gap × sin(sun alt);  arcsec at the 1.86 km/″ Moon-distance lever');
+    console.log('  shadow-plane = surface chord projected ⊥ sun direction;  arcsec at the 1.86 km/″ Moon-distance lever');
     console.log('  Ground km are NOT comparable across events (1/sin alt); shadow-plane arcsec are.');
     console.log('  Recorded baseline: data/eclipse-audit-summary.json `centerlines` (the Node gate).');
     console.log('════════════════════════════════════════════════════════════════════════════════════════');
@@ -30448,8 +30453,17 @@ function setupGUI() {
           const um = umbraFromSceneAtJd(p.jd);
           if (um === null) { console.log(`  ${ev.label} ${p.utc}: umbra misses Earth (!)`); continue; }
           const groundKm = gcKmFromLatLon(p.latDeg, p.lonDeg, um.lat, um.lon);
-          const sAlt = sinSunAlt(p.latDeg, p.lonDeg);
-          const shadowKm = groundKm * sAlt;
+          // VECTOR shadow-plane projection (round 3, matched with the Node
+          // gate): surface chord minus its component along the sun direction
+          // — the true axis separation; the scalar ground×sin(alt) is exact
+          // only for gaps along the sun azimuth.
+          const s = sunDirEF();
+          const a = efUnit(p.latDeg, p.lonDeg), b = efUnit(um.lat, um.lon);
+          const gv = [(b[0] - a[0]) * R_E_KM, (b[1] - a[1]) * R_E_KM, (b[2] - a[2]) * R_E_KM];
+          const dot = gv[0] * s[0] + gv[1] * s[1] + gv[2] * s[2];
+          const shadowKm = Math.hypot(gv[0] - dot * s[0], gv[1] - dot * s[1], gv[2] - dot * s[2]);
+          const zen = efUnit(p.latDeg, p.lonDeg);
+          const sAlt = zen[0] * s[0] + zen[1] * s[1] + zen[2] * s[2];
           const arcsec = shadowKm / 1.86;
           allArcsec.push(arcsec);
           rows.push(`${p.utc} UT  ground ${groundKm.toFixed(1).padStart(6)} km · alt ${(Math.asin(sAlt) / _d2r).toFixed(1).padStart(5)}° · shadow-plane ${shadowKm.toFixed(1).padStart(5)} km = ${arcsec.toFixed(1).padStart(5)}″`);
@@ -30467,7 +30481,7 @@ function setupGUI() {
     }
   }, 'The 20.3 accuracy instrument: scene umbra vs the NASA GSFC path-table central lines at 15 ' +
      'fixed UT instants across 5 modern eclipses (2024/2017/2026/1999/2023), in the shadow-plane ' +
-     'metric (ground gap × sin sun-alt, arcsec at the Moon-distance lever). No time scan — fixed ' +
+     'metric (vector projection ⊥ sun direction, arcsec at the Moon-distance lever). No time scan — fixed ' +
      'UT — so longitude error cannot hide. Same dataset + metric as the Node gate ' +
      '(tools/verify/eclipse-audit.js); recorded baseline in data/eclipse-audit-summary.json. ' +
      'Saves + restores the scene. Runtime ~2 s.');
@@ -45341,13 +45355,32 @@ const _sceneUmbraQuatInv = new THREE.Quaternion();
  *  about world Y, the ecliptic pole; the −sign measured against JPL apparent
  *  RA at 2024-04-08 18:42). MATCHED PAIR with
  *  tools/explore/umbra-scene-node-twin.js — change both or neither. */
-function _applySolarAberration(sunGeoVec, jd) {
+function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
+  // B1 generalized (round 3): ANNUAL ABERRATION FOR BOTH BODIES. The
+  // observer-velocity (v/c) apparent shift is distance-independent:
+  // Δλ = −(κ/r)·cos(λ_body − λ_sun)/cos β, a rotation about the ecliptic
+  // pole. For the Sun this reduces exactly to the original term; for the
+  // Moon at syzygy it applies the SAME rotation, so aberration CANCELS in
+  // the elongation — the Sun-only form broke the relative geometry by
+  // exactly κ (+20″ elongation error at all five modern events). MATCHED
+  // PAIR with tools/explore/umbra-scene-node-twin.js — change both or
+  // neither.
   const rAu = sunGeoVec.length() / 100;
   const a = -(K.physicalConstants.aberrationConstantArcsec / 3600) * (Math.PI / 180) / rAu;
+  const _lamS0 = Math.atan2(sunGeoVec.x, sunGeoVec.z);
   const c = Math.cos(a), s = Math.sin(a);
   const x = c * sunGeoVec.x + s * sunGeoVec.z;
   sunGeoVec.z = -s * sunGeoVec.x + c * sunGeoVec.z;
   sunGeoVec.x = x;
+  if (moonGeoVec) {
+    const lamM = Math.atan2(moonGeoVec.x, moonGeoVec.z);
+    const betM = Math.asin(moonGeoVec.y / moonGeoVec.length());
+    const aM = a * Math.cos(lamM - _lamS0) / Math.cos(betM);
+    const cM = Math.cos(aM), sM = Math.sin(aM);
+    const xM = cM * moonGeoVec.x + sM * moonGeoVec.z;
+    moonGeoVec.z = -sM * moonGeoVec.x + cM * moonGeoVec.z;
+    moonGeoVec.x = xM;
+  }
   // The sun dec-channel law (measured 1970–2049, 144 JPL points, decadal
   // structure 0.8″ RMS): scene sun DEC − truth =
   //   [−7.2″ + 4.8″·cosΩ]·sin(λw) + 15.2″·cos(λw)
@@ -45370,6 +45403,18 @@ function _applySolarAberration(sunGeoVec, jd) {
   const scale = Math.cos(b2) / Math.cos(bet);
   sunGeoVec.x *= scale; sunGeoVec.z *= scale;
   sunGeoVec.y = rr * Math.sin(b2);
+  // Round-3 Sun LONGITUDE law — the λ twin of the dec law (960 JPL
+  // apparent-Sun points 1970–2049, frame-invariant argument L = φ + 90°;
+  // era-split proven on the shipped terms, the era-unstable cosL term is
+  // deliberately not shipped). Applied as a rotation about the ecliptic
+  // pole by −dλ. MATCHED PAIR with the twin.
+  const L = Math.atan2(sunGeoVec.x, sunGeoVec.z) - axAz + Math.PI / 2;
+  const dLam = 6.72 - 0.84 * Math.sin(L) + 3.64 * Math.sin(2 * L) - 0.46 * Math.cos(2 * L);
+  const aL = -(dLam / 3600) * (Math.PI / 180);
+  const cL = Math.cos(aL), sL = Math.sin(aL);
+  const xL = cL * sunGeoVec.x + sL * sunGeoVec.z;
+  sunGeoVec.z = -sL * sunGeoVec.x + cL * sunGeoVec.z;
+  sunGeoVec.x = xL;
 }
 
 function umbraFromSceneAtJd(jd) {
@@ -45382,7 +45427,7 @@ function umbraFromSceneAtJd(jd) {
 
   _sceneUmbraMoonGeo.copy(_sceneUmbraMoon).sub(_sceneUmbraEarth);
   _sceneUmbraSunGeo .copy(_sceneUmbraSun) .sub(_sceneUmbraEarth);
-  _applySolarAberration(_sceneUmbraSunGeo, jd);
+  _applySolarAberration(_sceneUmbraSunGeo, jd, _sceneUmbraMoonGeo);
   _sceneUmbraDir    .copy(_sceneUmbraMoonGeo).sub(_sceneUmbraSunGeo).normalize();
 
   const R_E = earth.size;
@@ -45425,7 +45470,7 @@ function umbraNASAConventionAtJd(jd) {
 
   _sceneUmbraMoonGeo.copy(_sceneUmbraMoon).sub(_sceneUmbraEarth);
   _sceneUmbraSunGeo .copy(_sceneUmbraSun) .sub(_sceneUmbraEarth);
-  _applySolarAberration(_sceneUmbraSunGeo, jd);
+  _applySolarAberration(_sceneUmbraSunGeo, jd, _sceneUmbraMoonGeo);
   _sceneUmbraDir    .copy(_sceneUmbraMoonGeo).sub(_sceneUmbraSunGeo).normalize();
 
   // Closest approach: line P(t) = Moon + t·D, min |P|² at t* = -Moon·D.

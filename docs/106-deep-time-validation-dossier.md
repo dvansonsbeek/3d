@@ -89,8 +89,8 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->1419<!--/v--> km from Babylon at
-  ΔUT <!--v:babylon135BestDeltaUT-->-1h50<!--/v--> (framework
+  totality path <!--v:babylon135BestGapKm-->1411<!--/v--> km from Babylon at
+  ΔUT <!--v:babylon135BestDeltaUT-->-1h49<!--/v--> (framework
   <!--v:babylon135FrameworkUT-->05:58<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
   [doc 103](103-135-babylonian-case-study.md), eclipse-audit artifacts under
