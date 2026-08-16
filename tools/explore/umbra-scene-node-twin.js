@@ -82,6 +82,22 @@ function umbraFromSceneAtJdNode(jd) {
   const moonGeo = apply(R, vLocal);
   const sunGeo = [sun[0] - earth[0], sun[1] - earth[1], sun[2] - earth[2]];
 
+  // B1: solar annual aberration — the apparent Sun lags the geometric Sun
+  // by κ/r along the ecliptic (κ = 20.4955″). The scene Sun is geometric;
+  // JPL, the NASA canon and the sky are apparent. Rotation about world Y
+  // (the ecliptic pole); the −sign was measured against JPL (framework Sun
+  // RA 17.93245° → 17.92714°, toward JPL 17.91943° at 2024-04-08 18:42).
+  // MATCHED PAIR with src/script.js umbraFromSceneAtJd — change both or
+  // neither.
+  {
+    const rAu = Math.hypot(sunGeo[0], sunGeo[1], sunGeo[2]) / 100;
+    const a = -(20.4955 / 3600) * (Math.PI / 180) / rAu;
+    const c0 = Math.cos(a), s0 = Math.sin(a);
+    const x = c0 * sunGeo[0] + s0 * sunGeo[2];
+    sunGeo[2] = -s0 * sunGeo[0] + c0 * sunGeo[2];
+    sunGeo[0] = x;
+  }
+
   let d = [moonGeo[0] - sunGeo[0], moonGeo[1] - sunGeo[1], moonGeo[2] - sunGeo[2]];
   const dl = Math.hypot(d[0], d[1], d[2]);
   d = [d[0] / dl, d[1] / dl, d[2] / dl];

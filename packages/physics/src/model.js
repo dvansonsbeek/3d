@@ -769,6 +769,9 @@ export function assembleModel(C, F) {
     constants: {
       moonL: F.MEEUS_LONGITUDE_TERMS,
       moonB: F.MEEUS_LATITUDE_TERMS,
+      moonR: F.MEEUS_DISTANCE_TERMS.terms,
+      moonRMeanKm: F.MEEUS_DISTANCE_TERMS.meanKm,
+      moonDistanceJ2000Km: C.moonReference.moonDistance,
       j2000JD,
       julianCenturyDays,
       moonMeeusLpCorrectionDeg: C.moon.moonMeeusLpCorrection,

@@ -129,6 +129,7 @@ const COEFFICIENT_KEYS = [
 const EXTRA_COEFFICIENT_SOURCES = [
   { file: 'meeus-lunar-tables.json', as: 'MEEUS_LONGITUDE_TERMS', pick: (j) => j.longitudeTerms.terms },
   { file: 'meeus-lunar-tables.json', as: 'MEEUS_LATITUDE_TERMS', pick: (j) => j.latitudeTerms.terms },
+  { file: 'meeus-lunar-tables.json', as: 'MEEUS_DISTANCE_TERMS', pick: (j) => ({ meanKm: j.distanceTerms.meanKm, terms: j.distanceTerms.terms }) },
   { file: 'climate-formula-coefficients.json', as: 'CLIMATE_FORMULA_COEFFS', pick: (j) => j },
 
   // From data/, not public/input/.

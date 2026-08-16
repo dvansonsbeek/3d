@@ -363,6 +363,9 @@ function _moonSeriesM() {
       constants: {
         moonL: MEEUS_LUNAR.longitudeTerms.terms,
         moonB: MEEUS_LUNAR.latitudeTerms.terms,
+        moonR: MEEUS_LUNAR.distanceTerms.terms,
+        moonRMeanKm: MEEUS_LUNAR.distanceTerms.meanKm,
+        moonDistanceJ2000Km: C.moonDistance,
         j2000JD: C.j2000JD, julianCenturyDays: C.julianCenturyDays,
         moonMeeusLpCorrectionDeg: C.moonMeeusLpCorrection,
         fwA2RateDegPerCy: _FW_A2_RATE, fwA3RateDegPerCy: _FW_A3_RATE,

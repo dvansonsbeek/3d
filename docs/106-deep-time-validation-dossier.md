@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v11.0
-coefficients: sha256:1f1692da72c0e10a
+coefficients: sha256:bf011174cdd73175
 status: current
 ---
 
@@ -89,8 +89,8 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->1254<!--/v--> km from Babylon at
-  ΔUT <!--v:babylon135BestDeltaUT-->-1h46<!--/v--> (framework
+  totality path <!--v:babylon135BestGapKm-->1360<!--/v--> km from Babylon at
+  ΔUT <!--v:babylon135BestDeltaUT-->-1h49<!--/v--> (framework
   <!--v:babylon135FrameworkUT-->05:58<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
   [doc 103](103-135-babylonian-case-study.md), eclipse-audit artifacts under
@@ -106,12 +106,12 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   gate + generator, same convention as eclipse-audit; owns
   `data/lunar-alignment-summary.json`): the model's lunar finder vs the
   NASA 5-Millennium Canon on the TT axis
-  (<!--v:lunarCanonMatched-->1,446<!--/v-->/<!--v:lunarCanonEvents-->1,450<!--/v-->
-  matched 1600–2200, <!--v:lunarCanonTypeAgree-->1,432<!--/v--> types agree);
+  (<!--v:lunarCanonMatched-->1,450<!--/v-->/<!--v:lunarCanonEvents-->1,450<!--/v-->
+  matched 1600–2200, <!--v:lunarCanonTypeAgree-->1,447<!--/v--> types agree);
   documented visibility regions vs the api observer tier
   (<!--v:lunarVisibilityInsideAgree-->14<!--/v-->/<!--v:lunarVisibilityChecked-->14<!--/v-->
   both directions); the −746 Feb 6 Babylonian partial (magnitude
-  <!--v:lunarBabylon746MagnitudeUmbral-->0.904<!--/v--> vs canon
+  <!--v:lunarBabylon746MagnitudeUmbral-->0.901<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
   Babylon at <!--v:lunarBabylon746AltitudeDeg-->36.4<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
@@ -125,7 +125,7 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s contains the
   framework's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,012<!--/v--> s);
   and the measured framework-vs-ELP lunar-theory drift
-  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->1.09<!--/v--> ″/cy²) with the
+  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->1.08<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time
   machinery exists — [doc 102 §per-century convergence](102-gia-alpha-lunar-validation.md).
 

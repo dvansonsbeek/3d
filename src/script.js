@@ -737,6 +737,9 @@ const CARDINAL_POINT_JOINT_TERMS = FIT.CARDINAL_POINT_JOINT_TERMS;
 // Each row: [D, M, M', F, coefficient (×10⁻⁶ degrees)]
 const MOON_L = FIT.MEEUS_LONGITUDE_TERMS;
 const MOON_B = FIT.MEEUS_LATITUDE_TERMS;
+// Table 47.A Σr column (cos convention, 0.001 km) + Meeus's 385,000.56 km
+// time-averaged mean — the full-series distance replacing the two-term ellipse.
+const MOON_R = FIT.MEEUS_DISTANCE_TERMS;
 
 // ─── C3. Body diameters (astro reference) ──────────────────────────────────────────────────
 // Local keys keep the `…Diameter` suffix (≈90 call sites read them that way);
@@ -3900,6 +3903,8 @@ const _moonSeries = (() => {
       m = createMoonSeries({
         constants: {
           moonL: MOON_L, moonB: MOON_B,
+          moonR: MOON_R.terms, moonRMeanKm: MOON_R.meanKm,
+          moonDistanceJ2000Km: A_MOON_NOW_M / 1000,
           j2000JD, julianCenturyDays,
           moonMeeusLpCorrectionDeg: moonMeeusLpCorrection,
           fwA2RateDegPerCy: FW_A2_RATE, fwA3RateDegPerCy: FW_A3_RATE,
@@ -45232,6 +45237,20 @@ const _sceneUmbraQuatInv = new THREE.Quaternion();
  * positions exactly. Returns null if the umbra misses Earth at this JD.
  * UV convention: -X local = Greenwich, +Z local = 90°E, +Y = north pole
  * (per public/Earth.jpg, which is Pacific-centered). */
+/** B1: solar annual aberration for the umbra chain — the apparent Sun lags
+ *  the geometric scene Sun by κ/r along the ecliptic (κ = 20.4955″; rotation
+ *  about world Y, the ecliptic pole; the −sign measured against JPL apparent
+ *  RA at 2024-04-08 18:42). MATCHED PAIR with
+ *  tools/explore/umbra-scene-node-twin.js — change both or neither. */
+function _applySolarAberration(sunGeoVec) {
+  const rAu = sunGeoVec.length() / 100;
+  const a = -(20.4955 / 3600) * (Math.PI / 180) / rAu;
+  const c = Math.cos(a), s = Math.sin(a);
+  const x = c * sunGeoVec.x + s * sunGeoVec.z;
+  sunGeoVec.z = -s * sunGeoVec.x + c * sunGeoVec.z;
+  sunGeoVec.x = x;
+}
+
 function umbraFromSceneAtJd(jd) {
   jumpToJulianDay(jd);
   forceSceneUpdate('light');
@@ -45242,6 +45261,7 @@ function umbraFromSceneAtJd(jd) {
 
   _sceneUmbraMoonGeo.copy(_sceneUmbraMoon).sub(_sceneUmbraEarth);
   _sceneUmbraSunGeo .copy(_sceneUmbraSun) .sub(_sceneUmbraEarth);
+  _applySolarAberration(_sceneUmbraSunGeo);
   _sceneUmbraDir    .copy(_sceneUmbraMoonGeo).sub(_sceneUmbraSunGeo).normalize();
 
   const R_E = earth.size;
@@ -45279,6 +45299,7 @@ function umbraNASAConventionAtJd(jd) {
 
   _sceneUmbraMoonGeo.copy(_sceneUmbraMoon).sub(_sceneUmbraEarth);
   _sceneUmbraSunGeo .copy(_sceneUmbraSun) .sub(_sceneUmbraEarth);
+  _applySolarAberration(_sceneUmbraSunGeo);
   _sceneUmbraDir    .copy(_sceneUmbraMoonGeo).sub(_sceneUmbraSunGeo).normalize();
 
   // Closest approach: line P(t) = Moon + t·D, min |P|² at t* = -Moon·D.

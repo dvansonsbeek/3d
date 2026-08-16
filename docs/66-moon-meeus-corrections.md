@@ -1,13 +1,13 @@
 ---
 docVersion: 1.0
 modelVersion: v11.0
-coefficients: sha256:1f1692da72c0e10a
+coefficients: sha256:bf011174cdd73175
 status: current
 ---
 
 # Moon Meeus Corrections -- Implementation Reference
 
-**Status**: Complete (full Meeus Ch. 47: 60L+60B terms, RA+Dec override, JPL-verified)
+**Status**: Complete (full Meeus Ch. 47: 60L+60B terms + the 46-term Σr distance column, RA+Dec override, JPL-verified; Σr derived-validated at 100.0% weighted by Stage D1-r)
 
 **Public capstone**: the derivation program documented here is presented as the
 website document **"The Derived Moon" (DLT-1)** — a framework-native lunar
@@ -308,7 +308,55 @@ subtracted because the off-center orbit geometry already provides half.
 Same table-driven approach for ecliptic latitude (beta).
 Additional corrections: -2235*sin(L'), A3, and Venus/flattening terms.
 
-### 1.3 Post-hoc RA+Dec Override
+### 1.3 Distance Series (Table 47.A Σr column, 46 non-zero terms)
+
+The geocentric distance is the full Meeus Ch. 47 Σr series:
+
+```
+r = [385,000.56 km + Σr·10⁻³] × (a_M(t) / a_M(J2000))
+```
+
+Same table-driven summation as Σl but with **cosine** of the argument
+(the Σr convention) and the same E/E² factors on |M|=1/2 terms; the
+framework-native arguments are shared with the longitude/latitude
+evaluation, and the trailing ratio carries the Driver-1 deep-time
+scaling. Source: `public/input/meeus-lunar-tables.json → distanceTerms`,
+single-sourced to all three runtimes through the constants generator.
+
+This replaced a two-term ellipse form (`a_M·(1 − e·cos M′)`) whose
+missing 2D-family terms (evection −3,699, variation −2,956 km, …) all
+peak at syzygy — every solar eclipse saw the Moon systematically too
+far, measured at +5,712 km against JPL at the 2024 Apr 8 eclipse; the
+full series lands 0.1 km from JPL at the same instant. Downstream: the
+lunar-canon gate rose to 1450/1450 matched with 99.8% type agreement
+(the knife-edge total/annular/partial classifications were exactly the
+missing terms), and pipeline step 5c is invariant under the change
+(dry-run confirmed bit-identical Lp and correction coefficients —
+geocentric RA/Dec is orthogonal to r).
+
+**Derivation status — Stage D1-r
+(`tools/explore/derive-meeus-distance-amplitudes.js`).** The same 3-body
+laboratory that derives the Σl amplitudes at 100.0 ± 0.1% derives the
+distance column from framework constants alone: the top-12 Σr
+amplitudes emerge at 99.5–100.1% (amplitude-weighted **100.0%**), and
+the constant term itself emerges at **384,993 km — −19 ppm of Meeus's
+385,000.56 km** — from the framework's a_M = 384,399.07 km
+input, demonstrating from first principles that Meeus's constant is the
+time-averaged mean and the framework's is the LLR/parallax mean
+(the doc 24 taxonomy): the ~601 km offset between the two definitions
+is gravity, not a discrepancy.
+
+Two documented limits of the deep-time scaling (the 20.3 ladder carries
+both): the ratio scales all amplitudes linearly with a_M(t) — the
+second-order m(t)-dependence of the evection/variation amplitudes (the
+month/year ratio also evolves under Driver 1) is not modeled, negligible
+against the modern accuracy floor and relevant only to Myr-scale eclipse
+work; and the tools/lib engine's series pins the ratio at 1 (its
+getter returns the J2000 constant) — correct for every historical-era
+gate it serves, but the epoch-aware getter must be wired there before
+any deep-time eclipse work runs through that path.
+
+### 1.4 Post-hoc RA+Dec Override
 
 The full Meeus ecliptic longitude (L' + Sigma_l) and latitude (Sigma_b) are
 stored in moveModel. In updatePositions, both RA and Dec are overridden with

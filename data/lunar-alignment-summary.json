@@ -6,15 +6,15 @@
       2200
     ],
     "canonEvents": 1450,
-    "modelEvents": 1451,
-    "matched": 1446,
-    "unmatchedModel": 5,
-    "unmatchedCanon": 4,
-    "typeAgree": 1432,
-    "meanAbsResidualMinutes": 8.493,
-    "meanAbsResidualMinutesFull": 8.493092691997274,
-    "rmsResidualMinutes": 9.796,
-    "rmsResidualMinutesFull": 9.795671625203065,
+    "modelEvents": 1456,
+    "matched": 1450,
+    "unmatchedModel": 6,
+    "unmatchedCanon": 0,
+    "typeAgree": 1447,
+    "meanAbsResidualMinutes": 8.511,
+    "meanAbsResidualMinutesFull": 8.511486897437736,
+    "rmsResidualMinutes": 9.815,
+    "rmsResidualMinutesFull": 9.814596706587052,
     "maxAbsResidualMinutes": 19.379
   },
   "visibility": {
@@ -141,7 +141,7 @@
     "found": true,
     "type": "Partial",
     "canonType": "Partial",
-    "magnitudeUmbral": 0.9037,
+    "magnitudeUmbral": 0.9006,
     "canonMagnitudeUmbral": 0.9199,
     "ttResidualMinutes": -11.52,
     "visibleFromBabylon": true,
@@ -291,8 +291,8 @@
         "signedMeanMinutes": -2.88
       },
       "1000": {
-        "n": 190,
-        "signedMeanMinutes": -1.6
+        "n": 191,
+        "signedMeanMinutes": -1.52
       },
       "1500": {
         "n": 180,
@@ -307,56 +307,56 @@
         "signedMeanMinutes": 1.12
       },
       "-750": {
-        "n": 189,
-        "signedMeanMinutes": -13.09
+        "n": 190,
+        "signedMeanMinutes": -13.04
       },
       "-650": {
         "n": 204,
         "signedMeanMinutes": -11.23
       },
       "-550": {
-        "n": 204,
-        "signedMeanMinutes": -11.05
+        "n": 203,
+        "signedMeanMinutes": -10.98
       },
       "-450": {
-        "n": 190,
-        "signedMeanMinutes": -9.6
+        "n": 192,
+        "signedMeanMinutes": -9.8
       },
       "-350": {
-        "n": 181,
-        "signedMeanMinutes": -7.99
+        "n": 185,
+        "signedMeanMinutes": -8.42
       },
       "-250": {
         "n": 183,
         "signedMeanMinutes": -8.48
       },
       "-100": {
-        "n": 199,
-        "signedMeanMinutes": -6.35
+        "n": 201,
+        "signedMeanMinutes": -6.38
       }
     },
     "driftVsModernMinutes": {
       "100": -5.39,
       "500": -3.26,
-      "1000": -1.98,
+      "1000": -1.9,
       "1500": -0.79,
       "1800": 0.04,
       "2000": 0.74,
-      "-750": -13.47,
+      "-750": -13.42,
       "-650": -11.61,
-      "-550": -11.43,
-      "-450": -9.98,
-      "-350": -8.37,
+      "-550": -11.36,
+      "-450": -10.18,
+      "-350": -8.8,
       "-250": -8.86,
-      "-100": -6.73
+      "-100": -6.76
     },
-    "effectiveDeltaNdotArcsecPerCy2": 1.09,
+    "effectiveDeltaNdotArcsecPerCy2": 1.08,
     "predictedReducedResidualMinutes": {
-      "-800": 11.1,
+      "-800": 11,
       "-700": 5,
       "-600": 4.8,
-      "-500": -1.4,
-      "-400": -5.4
+      "-500": -1.2,
+      "-400": -5
     }
   },
   "inputs": {
@@ -370,7 +370,7 @@
       "packages/api/src/app.js": "sha256:4db13eff87f620b0711a789367adc45e579e3257983f1bacea50f695259ae782",
       "packages/physics/src/eclipse/finders.cjs": "sha256:9603c94c13524b419bbdf7feaf79822ea4089d68c50d32a4886049b0536be4b0",
       "packages/physics/src/moon/apparent.cjs": "sha256:fba578d19fa107d66cb6b655a56b5d81b4b11219ab88296022abd9379f53df37",
-      "packages/physics/src/moon/series.cjs": "sha256:75aa5b32cd1221980e3a3a768c1d237b2cc0209702972537abf29c94aec34b53",
+      "packages/physics/src/moon/series.cjs": "sha256:229156d192fc4448fcea8882c382d28044875fbef952e4d5ddafa46a7fcb2584",
       "public/input/fitted-coefficients.json": "sha256:4afc9fff426f08850302acaaab92755a84de51af12e33e3479e0d36908af0fe1",
       "public/input/lunar-eclipses-documented.json": "sha256:586806e4f83c3f0ebd2d5afefce41c19664d8fa24023b7a9e0f79b7c8a668558",
       "public/input/lunar-eclipses-historical.json": "sha256:81dd0c83007eb899abeb97b0b987ae2d128d0e7ec4356622c7d15ed8175ad6c1",

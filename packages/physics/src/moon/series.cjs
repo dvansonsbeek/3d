@@ -35,6 +35,9 @@
  *   constants: {
  *     moonL: MeeusTermTable,
  *     moonB: MeeusTermTable,
+ *     moonR: MeeusTermTable,
+ *     moonRMeanKm: number,
+ *     moonDistanceJ2000Km: number,
  *     j2000JD: number,
  *     julianCenturyDays: number,
  *     moonMeeusLpCorrectionDeg: number,
@@ -64,7 +67,7 @@
  */
 function createMoonSeries({ constants, fns }) {
   const {
-    moonL, moonB, j2000JD, julianCenturyDays,
+    moonL, moonB, moonR, moonRMeanKm, moonDistanceJ2000Km, j2000JD, julianCenturyDays,
     moonMeeusLpCorrectionDeg, fwA2RateDegPerCy, fwA3RateDegPerCy,
   } = constants;
   const {
@@ -115,6 +118,40 @@ function createMoonSeries({ constants, fns }) {
     return s;
   }
 
+  /** Σr table pass — COSINE of the argument (Meeus 47.A distance column),
+   *  same E/E² convention. Units 0.001 km.
+   *  @param {MeeusTermTable} table @param {number} Dr @param {number} Mr
+   *  @param {number} Mpr @param {number} Fr @param {number} E
+   *  @param {number} E2 @returns {number} */
+  function sumTableCos(table, Dr, Mr, Mpr, Fr, E, E2) {
+    let s = 0;
+    for (let i = 0; i < table.length; i++) {
+      const r = table[i];
+      if (r[4] === 0) continue;
+      const arg = r[0] * Dr + r[1] * Mr + r[2] * Mpr + r[3] * Fr;
+      let term = r[4] * Math.cos(arg);
+      const absM = r[1] < 0 ? -r[1] : r[1];
+      if (absM === 1) term *= E;
+      else if (absM === 2) term *= E2;
+      s += term;
+    }
+    return s;
+  }
+
+  /** Full Meeus Ch. 47 distance: r = meanKm + Σr·10⁻³ km, scaled by the
+   *  framework's Driver-1 distance ratio (≡ 1 at J2000; the epoch-mutable
+   *  getter over the J2000 constant, preserving the deep-time scaling the
+   *  previous two-term ellipse form carried). ~2 km vs JPL at syzygy where
+   *  the two-term form was ~5,700 km too far (the 2D-family terms all peak
+   *  at eclipses).
+   *  @param {number} Dr @param {number} Mr @param {number} Mpr
+   *  @param {number} Fr @param {number} E @param {number} E2
+   *  @returns {number} km */
+  function fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2) {
+    const Sr = sumTableCos(moonR, Dr, Mr, Mpr, Fr, E, E2);
+    return (moonRMeanKm + Sr * 1e-3) * (getMoonDistanceKm() / moonDistanceJ2000Km);
+  }
+
   /** The PRODUCTION scene evaluation at d days TT from J2000 (the caller
    *  owns the UT→TT conversion — engine timing conventions differ).
    *  Returns everything the scene blocks write:
@@ -155,7 +192,7 @@ function createMoonSeries({ constants, fns }) {
     const fullSl = Sl + (2 * eocHalf / D2R * 1e6) * Math.sin(Mpr)
                      + (1.25 * eocHalf * eocHalf / D2R * 1e6) * Math.sin(2 * Mpr);
     const lonDeg = Lp / D2R + fullSl * 1e-6 + moonMeeusLpCorrectionDeg;
-    const distKm = getMoonDistanceKm() * (1 - getEccentricityBase() * Math.cos(Mpr));
+    const distKm = fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2);
     return { thetaAddRad, lonDeg, latRad, latDeg, distKm, T };
   }
 
@@ -197,12 +234,15 @@ function createMoonSeries({ constants, fns }) {
     return sumTable(moonB, Dr, Mr, Mpr, Fr, E, E2) * 1e-6;
   }
 
-  /** Two-term ellipse distance at JD_UT (shared with the scene form).
+  /** Full Meeus Ch. 47 distance at JD_UT (shared with the scene form).
    *  @param {number} jdUT @returns {number} km */
   function truncatedDistanceKm(jdUT) {
     const jdTT = jdUT + deltaTSeconds(jdUT) / 86400;
-    const Mpr = argsAt(jdTT).Mp * D2R;
-    return getMoonDistanceKm() * (1 - getEccentricityBase() * Math.cos(Mpr));
+    const T = (jdTT - j2000JD) / julianCenturyDays;
+    const args = argsAt(jdTT);
+    const Dr = args.D * D2R, Mr = args.M * D2R, Mpr = args.Mp * D2R, Fr = args.F * D2R;
+    const E = eFactorAtJdTT(jdTT, T, T * T);
+    return fullDistanceKm(Dr, Mr, Mpr, Fr, E, E * E);
   }
 
   return { sceneEvalAt, truncatedLonDeg, truncatedBetaDeg, truncatedDistanceKm, additionalArgs };
