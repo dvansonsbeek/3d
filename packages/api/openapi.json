@@ -96,13 +96,16 @@
     },
     "/v1/eclipses/{kind}": {
       "get": {
-        "summary": "Geocentric eclipse search over a window: type, greatest-eclipse JD (UT + TT), magnitudes/ratio, beta, Moon distance. Ground tracks are a documented non-goal.",
+        "summary": "Geocentric eclipse search over a window: type, greatest-eclipse JD (UT + TT), magnitudes/ratio, beta, Moon distance. Lunar only: lat+lon annotate each event with geometric horizon visibility at maximum eclipse; refused for solar until the arcsecond accuracy class ships. Ground tracks are a documented non-goal.",
         "parameters": [
           { "name": "kind", "in": "path", "required": true, "schema": { "type": "string", "enum": ["solar", "lunar"] } },
           { "name": "startYear", "in": "query", "schema": { "type": "number" }, "description": "window start as a model year (pair with stopYear)" },
           { "name": "stopYear", "in": "query", "schema": { "type": "number" }, "description": "window end as a model year" },
           { "name": "startJd", "in": "query", "schema": { "type": "number" }, "description": "window start as JD on the UT axis (pair with stopJd)" },
-          { "name": "stopJd", "in": "query", "schema": { "type": "number" }, "description": "window end as JD on the UT axis" }
+          { "name": "stopJd", "in": "query", "schema": { "type": "number" }, "description": "window end as JD on the UT axis" },
+          { "name": "lat", "in": "query", "schema": { "type": "number", "minimum": -90, "maximum": 90 }, "description": "observer latitude in degrees (lunar only; pair with lon; era limited to years -8000..12000). Adds moonAltitudeDeg + visible per event: GEOMETRIC horizon at maximum eclipse, no refraction or topocentric parallax (~±1° band)" },
+          { "name": "lon", "in": "query", "schema": { "type": "number", "minimum": -180, "maximum": 180 }, "description": "observer longitude in degrees, east-positive (lunar only; pair with lat)" },
+          { "name": "visibleOnly", "in": "query", "schema": { "type": "boolean" }, "description": "return only events visible from the observer (requires lat+lon); visibleCount always reports the unfiltered count" }
         ],
         "responses": {
           "200": { "description": "Envelope (meta.timescale = UT; events at greatest eclipse)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Envelope" } } } },

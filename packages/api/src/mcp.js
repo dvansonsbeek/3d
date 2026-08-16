@@ -105,9 +105,9 @@ const TOOLS = Object.freeze({
     covers: ['/v1/cross-validation/{curve}'],
   },
   essrt_eclipses: {
-    description: 'Geocentric eclipse search over a window (max 500 years): type, greatest-eclipse JD (UT axis, jdTT alongside), magnitudes, Moon distance. kind: solar or lunar. Window: startYear+stopYear or startJd+stopJd. Ground tracks are a documented non-goal.',
-    inputSchema: { type: 'object', properties: { kind: { type: 'string', enum: ['solar', 'lunar'] }, startYear: { type: 'number' }, stopYear: { type: 'number' }, startJd: { type: 'number' }, stopJd: { type: 'number' } }, required: ['kind'] },
-    request: (/** @type {any} */ a) => ({ method: 'GET', path: `/${API_VERSION}/eclipses/${a.kind}`, query: queryOf(a, ['startYear', 'stopYear', 'startJd', 'stopJd']) }),
+    description: 'Geocentric eclipse search over a window (max 500 years): type, greatest-eclipse JD (UT axis, jdTT alongside), magnitudes, Moon distance. kind: solar or lunar. Window: startYear+stopYear or startJd+stopJd. Lunar only: lat+lon (degrees, lon east-positive) annotate each event with geometric horizon visibility at maximum eclipse (moonAltitudeDeg, visible; visibleOnly filters); refused for solar until the arcsecond accuracy class ships. Ground tracks are a documented non-goal.',
+    inputSchema: { type: 'object', properties: { kind: { type: 'string', enum: ['solar', 'lunar'] }, startYear: { type: 'number' }, stopYear: { type: 'number' }, startJd: { type: 'number' }, stopJd: { type: 'number' }, lat: { type: 'number' }, lon: { type: 'number' }, visibleOnly: { type: 'boolean' } }, required: ['kind'] },
+    request: (/** @type {any} */ a) => ({ method: 'GET', path: `/${API_VERSION}/eclipses/${a.kind}`, query: queryOf(a, ['startYear', 'stopYear', 'startJd', 'stopJd', 'lat', 'lon', 'visibleOnly']) }),
     covers: ['/v1/eclipses/{kind}'],
   },
   essrt_counterfactual: {

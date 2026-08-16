@@ -355,6 +355,27 @@ export function createApi() {
     // jd (UT) and jdTT. Ground tracks are a documented non-goal: the umbra
     // path conventions navigate the scene scaffold, which never enters the
     // package (§2h).
+    //
+    // Observer tier (lunar only): geometric Moon altitude at JD(UT) — the
+    // apparent chain's ecliptic lon/β rotated by obliquity of date, hour
+    // angle from GMST (Meeus 12.4; sub-minute in the supported era, ample
+    // for a visibility boolean against the Moon's 15°/hr motion). Geometric
+    // horizon: no refraction or topocentric parallax (~±1° band).
+    /** @param {number} jd @param {number} latDeg @param {number} lonDeg @returns {number} */
+    function moonAltitudeDegAt(jd, latDeg, lonDeg) {
+      const D2R = Math.PI / 180;
+      const lon = model.moon.lonDegAtJD(jd) * D2R;
+      const bet = model.moon.betaDegAtJD(jd) * D2R;
+      const eps = model.earth.obliquityDeg(model.time.yearFromJD(jd)) * D2R;
+      const dec = Math.asin(Math.sin(bet) * Math.cos(eps) + Math.cos(bet) * Math.sin(eps) * Math.sin(lon));
+      const ra = Math.atan2(Math.sin(lon) * Math.cos(eps) - Math.tan(bet) * Math.sin(eps), Math.cos(lon));
+      const T = (jd - 2451545.0) / 36525;
+      const gmstDeg = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T - T * T * T / 38710000;
+      const hourAngle = ((gmstDeg + lonDeg) * D2R) - ra;
+      const lat = latDeg * D2R;
+      const sinAlt = Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(hourAngle);
+      return Math.asin(sinAlt) / D2R;
+    }
     const eclipseMatch = path.match(new RegExp(`^/${API_VERSION}/eclipses/([a-z]+)$`));
     if (eclipseMatch) {
       if (!get()) return methodNotAllowed(method, path);
@@ -393,24 +414,64 @@ export function createApi() {
       if (model.time.yearFromJD(jdStart) < -498e6 || model.time.yearFromJD(jdEnd) > 502e6) {
         return problem(422, 'outside-validity', 'Epoch outside model validity', 'The search window must lie within the model validity span.', { minYear: -498e6, maxYear: 502e6 });
       }
+      // Observer params (lunar visibility tier). Solar local circumstances are
+      // deliberately refused until the arcsecond accuracy class ships: at
+      // minutes-class timing the umbra (~0.5–1 km/s ground speed) lands tens
+      // of km wrong at the path edges — a confident wrong answer.
+      const hasLat = query.lat !== undefined, hasLon = query.lon !== undefined;
+      /** @type {{latDeg:number, lonDeg:number}|null} */
+      let observer = null;
+      if (hasLat || hasLon) {
+        if (kind === 'solar') {
+          return problem(422, 'solar-location-unavailable', 'Solar location tier not available', 'Observer lat/lon on solar eclipses requires the arcsecond accuracy class, which this model version does not ship. Lunar horizon visibility is available on /v1/eclipses/lunar.', { instance: path });
+        }
+        if (!hasLat || !hasLon) {
+          return problem(400, 'invalid-observer', 'Invalid observer', 'Provide both lat and lon (degrees, lon east-positive), or neither.');
+        }
+        const lat = Number(query.lat), lon = Number(query.lon);
+        if (!Number.isFinite(lat) || Math.abs(lat) > 90 || !Number.isFinite(lon) || Math.abs(lon) > 180) {
+          return problem(400, 'invalid-observer', 'Invalid observer', 'lat must be in [-90, 90] and lon in [-180, 180] (degrees, lon east-positive).');
+        }
+        if (model.time.yearFromJD(jdStart) < -8000 || model.time.yearFromJD(jdEnd) > 12000) {
+          return problem(422, 'observer-outside-era', 'Observer tier outside supported era', 'Horizon visibility depends on the hour angle, which accumulated length-of-day drift invalidates at deep time. Observer queries are limited to years -8000..12000.', { minYear: -8000, maxYear: 12000 });
+        }
+        observer = { latDeg: lat, lonDeg: lon };
+      }
+      const visibleOnly = query.visibleOnly === 'true';
+      if (visibleOnly && !observer) {
+        return problem(400, 'invalid-observer', 'Invalid observer', 'visibleOnly requires lat and lon.');
+      }
       const events = kind === 'solar'
         ? model.eclipse.findSolarInRange(jdStart, jdEnd)
         : model.eclipse.findLunarInRange(jdStart, jdEnd);
-      const rows = events.map((e) => {
+      let rows = events.map((e) => {
         const deltaT = model.eclipse.deltaTSecondsAtJD(e.jd);
         return { ...e, jdTT: e.jd + deltaT / 86400, deltaTSeconds: deltaT };
       });
+      /** @type {number|undefined} */
+      let visibleCount;
+      if (observer) {
+        rows = rows.map((e) => {
+          const alt = moonAltitudeDegAt(e.jd, observer.latDeg, observer.lonDeg);
+          return { ...e, moonAltitudeDeg: alt, visible: alt > 0 };
+        });
+        visibleCount = rows.filter((e) => /** @type {any} */ (e).visible).length;
+        if (visibleOnly) rows = rows.filter((e) => /** @type {any} */ (e).visible);
+      }
       return envelope({
         identity: id,
-        inputEcho: { path, kind, ...echo },
+        inputEcho: { path, kind, ...echo, ...(observer ? { lat: observer.latDeg, lon: observer.lonDeg, visibleOnly } : {}) },
         timescale: 'UT',
         data: {
           kind,
           jdStart,
           jdEnd,
           count: rows.length,
+          ...(visibleCount !== undefined ? { visibleCount } : {}),
           events: rows,
-          note: 'Geocentric elements at greatest eclipse (minimum-gamma for solar, opposition for lunar). jd is on the UT axis; jdTT adds the model deltaT. Ground tracks are a documented non-goal (the umbra-path conventions belong to the scene, not the package).',
+          note: observer
+            ? 'Geocentric elements at greatest eclipse (opposition for lunar). jd is on the UT axis; jdTT adds the model deltaT. moonAltitudeDeg/visible are GEOMETRIC horizon visibility at maximum eclipse (no refraction or topocentric parallax, ~±1° band near the horizon).'
+            : 'Geocentric elements at greatest eclipse (minimum-gamma for solar, opposition for lunar). jd is on the UT axis; jdTT adds the model deltaT. Ground tracks are a documented non-goal (the umbra-path conventions belong to the scene, not the package).',
         },
       });
     }

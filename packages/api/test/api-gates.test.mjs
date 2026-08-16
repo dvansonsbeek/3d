@@ -250,9 +250,59 @@ for (const url of SAMPLE_REQUESTS) {
   }
 }
 
+// ── Observer tier (lunar visibility): annotation, identity, refusals ────────
+{
+  /** @param {string} pathAndQuery @returns {{status:number, body:any}} */
+  const res = (pathAndQuery) => {
+    const [p, qs] = pathAndQuery.split('?');
+    const query = Object.fromEntries(new URLSearchParams(qs ?? ''));
+    const r = handle({ method: 'GET', path: p, query });
+    return { status: r.status, body: JSON.parse(r.body) };
+  };
+  const plain = res('/v1/eclipses/lunar?startYear=2024&stopYear=2025');
+  const rio = res('/v1/eclipses/lunar?startYear=2024&stopYear=2025&lat=-22.9&lon=-43.2');
+  const antipode = res('/v1/eclipses/lunar?startYear=2024&stopYear=2025&lat=22.9&lon=136.8');
+  if (plain.body.data.events.some((/** @type {any} */ e) => e.visible !== undefined)) failures.push('observer fields present without observer');
+  if (plain.body.data.visibleCount !== undefined) failures.push('visibleCount present without observer');
+  if (rio.status !== 200 || rio.body.data.count === 0) failures.push('observer request failed or found no events');
+  for (const [i, e] of rio.body.data.events.entries()) {
+    if (typeof e.moonAltitudeDeg !== 'number' || typeof e.visible !== 'boolean') failures.push(`event ${i}: observer fields missing`);
+    // Structural identity: the exact antipode sees the negated geometric
+    // altitude — sin(alt) flips sign under (lat, lon) → (−lat, lon+180°).
+    // Self-checking with no external truth; fails on any convention slip.
+    const anti = antipode.body.data.events[i];
+    if (Math.abs(e.moonAltitudeDeg + anti.moonAltitudeDeg) > 1e-9) failures.push(`event ${i}: antipodal altitude identity broken (${e.moonAltitudeDeg} vs ${anti.moonAltitudeDeg})`);
+  }
+  if (rio.body.data.visibleCount !== rio.body.data.events.filter((/** @type {any} */ e) => e.visible).length) failures.push('visibleCount disagrees with per-event flags');
+  // Semantic anchor: both 2024 lunar eclipses (Mar 25 penumbral, Sep 18
+  // partial) were in fact visible from Rio de Janeiro — altitudes 27°/69°.
+  if (rio.body.data.visibleCount !== 2) failures.push(`semantic anchor: Rio 2024 visibleCount ${rio.body.data.visibleCount}, expected 2`);
+  const only = res('/v1/eclipses/lunar?startYear=2024&stopYear=2025&lat=-22.9&lon=-43.2&visibleOnly=true');
+  if (only.body.data.events.length !== only.body.data.visibleCount) failures.push('visibleOnly did not filter to visibleCount');
+  if (only.body.data.events.some((/** @type {any} */ e) => !e.visible)) failures.push('visibleOnly returned an invisible event');
+  // Refusals — each must be the documented problem, not a silent answer.
+  /** @type {Array<[string, string, number, string]>} */
+  const refusals = [
+    ['solar + observer', '/v1/eclipses/solar?startYear=2024&stopYear=2025&lat=0&lon=0', 422, 'solar-location-unavailable'],
+    ['lat without lon', '/v1/eclipses/lunar?startYear=2024&stopYear=2025&lat=10', 400, 'invalid-observer'],
+    ['lat out of range', '/v1/eclipses/lunar?startYear=2024&stopYear=2025&lat=91&lon=0', 400, 'invalid-observer'],
+    ['visibleOnly without observer', '/v1/eclipses/lunar?startYear=2024&stopYear=2025&visibleOnly=true', 400, 'invalid-observer'],
+    ['observer at deep time', '/v1/eclipses/lunar?startYear=-20000&stopYear=-19900&lat=0&lon=0', 422, 'observer-outside-era'],
+  ];
+  for (const [label, pq, status, type] of refusals) {
+    const r = res(pq);
+    if (r.status !== status) failures.push(`observer refusal "${label}": status ${r.status}, expected ${status}`);
+    else if (!String(r.body.type).endsWith(type)) failures.push(`observer refusal "${label}": problem type ${r.body.type}`);
+  }
+  // Determinism on the new parameter path.
+  const a = handle({ method: 'GET', path: '/v1/eclipses/lunar', query: { startYear: '2024', stopYear: '2025', lat: '-22.9', lon: '-43.2' } });
+  const b = handle({ method: 'GET', path: '/v1/eclipses/lunar', query: { startYear: '2024', stopYear: '2025', lat: '-22.9', lon: '-43.2' } });
+  for (const d of determinismDefects(a, b)) failures.push(`observer determinism: ${d}`);
+}
+
 if (failures.length) {
   console.error(`api gates — ${failures.length} FAILURE(S):`);
   for (const f of failures) console.error('  ' + f);
   process.exit(1);
 }
-console.log('api gates — determinism (fail-proven) + provenance envelope (fail-proven per field) + immutability caching + RFC 9457 errors: PASS');
+console.log('api gates — determinism (fail-proven) + provenance envelope (fail-proven per field) + immutability caching + RFC 9457 errors + observer tier (antipodal identity + refusals): PASS');
