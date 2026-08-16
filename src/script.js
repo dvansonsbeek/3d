@@ -30383,6 +30383,94 @@ function setupGUI() {
      'time offset that minimises the gap. Saves + restores the user\'s scene state. Runtime ~30 s ' +
      'on modern hardware. Verdict per preset: ★/↻/◇/◇⚠/⚠ — read interpretation block in the output.');
 
+  // ────────────────────────────────────────────────────────────────────────
+  // Centerlines: the 20.3 shadow-plane accuracy instrument — in-sim view.
+  // Same 15 fixed-UT NASA path-table CENTRAL-LINE points and metric as the
+  // Node gate (tools/verify/eclipse-audit.js section d; recorded in
+  // data/eclipse-audit-summary.json `centerlines`): ground gap ×
+  // sin(sun altitude), arcsec at the 1.86 km/″ Moon-distance lever.
+  // Fixed UT, no scan — the longitude channel cannot hide (unlike the
+  // ±4h BestGap above, which absorbs it). Ground km are NOT comparable
+  // across events: 1/sin(alt) amplifies ground error 6.9× at the low-sun
+  // 2026 Iberia crossing. Sun altitude is metric NORMALIZATION only,
+  // computed geometrically in the scene's own earth-fixed frame (the Node
+  // gate uses the GMST convention; they agree to <0.01°, i.e. <0.01″).
+  // ────────────────────────────────────────────────────────────────────────
+  addTestButton('Centerlines: shadow-plane vs NASA path tables (15 pts)', async () => {
+    let cl = null;
+    for (const url of ['input/solar-eclipse-centerlines-nasa.json',
+                       './input/solar-eclipse-centerlines-nasa.json']) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const text = await res.text();
+        if (text.trimStart().startsWith('<')) continue;
+        cl = JSON.parse(text);
+        break;
+      } catch (e) { /* try next */ }
+    }
+    if (!cl) {
+      console.log('Could not load input/solar-eclipse-centerlines-nasa.json — centerline references unavailable.');
+      return;
+    }
+
+    const _d2r = Math.PI / 180;
+    const r1 = (x) => Math.round(x * 10) / 10;
+    // sin(sun altitude) at a reference point: rotate the sun's geocentric
+    // vector into the earth-fixed frame (same quaternion path as the umbra
+    // ground mapping) and dot it with the point's zenith direction.
+    const sinSunAlt = (latDeg, lonDeg) => {
+      sun.planetObj.getWorldPosition(_sceneUmbraSun);
+      earth.planetObj.getWorldPosition(_sceneUmbraEarth);
+      _sceneUmbraSunGeo.copy(_sceneUmbraSun).sub(_sceneUmbraEarth);
+      earth.planetObj.getWorldQuaternion(_sceneUmbraQuat);
+      _sceneUmbraQuatInv.copy(_sceneUmbraQuat).invert();
+      _sceneUmbraSunGeo.applyQuaternion(_sceneUmbraQuatInv).normalize();
+      const la = latDeg * _d2r, lo = lonDeg * _d2r;
+      // inverse of the lat/lon output mapping: local = (−cosφ·cosλ, sinφ, cosφ·sinλ)
+      return _sceneUmbraSunGeo.x * (-Math.cos(la) * Math.cos(lo))
+           + _sceneUmbraSunGeo.y * Math.sin(la)
+           + _sceneUmbraSunGeo.z * (Math.cos(la) * Math.sin(lo));
+    };
+
+    console.log('\n════════════════════════════════════════════════════════════════════════════════════════');
+    console.log('  Centerlines: scene umbra vs NASA path-table CENTRAL LINE — fixed UT, shadow-plane metric');
+    console.log('  shadow-plane = ground gap × sin(sun alt);  arcsec at the 1.86 km/″ Moon-distance lever');
+    console.log('  Ground km are NOT comparable across events (1/sin alt); shadow-plane arcsec are.');
+    console.log('  Recorded baseline: data/eclipse-audit-summary.json `centerlines` (the Node gate).');
+    console.log('════════════════════════════════════════════════════════════════════════════════════════');
+    const _saveJD = o.julianDay;
+    try {
+      const allArcsec = [];
+      for (const ev of cl.events) {
+        const rows = [];
+        for (const p of ev.points) {
+          const um = umbraFromSceneAtJd(p.jd);
+          if (um === null) { console.log(`  ${ev.label} ${p.utc}: umbra misses Earth (!)`); continue; }
+          const groundKm = gcKmFromLatLon(p.latDeg, p.lonDeg, um.lat, um.lon);
+          const sAlt = sinSunAlt(p.latDeg, p.lonDeg);
+          const shadowKm = groundKm * sAlt;
+          const arcsec = shadowKm / 1.86;
+          allArcsec.push(arcsec);
+          rows.push(`${p.utc} UT  ground ${groundKm.toFixed(1).padStart(6)} km · alt ${(Math.asin(sAlt) / _d2r).toFixed(1).padStart(5)}° · shadow-plane ${shadowKm.toFixed(1).padStart(5)} km = ${arcsec.toFixed(1).padStart(5)}″`);
+        }
+        const mean = rows.length ? r1(allArcsec.slice(-rows.length).reduce((s, a) => s + a, 0) / rows.length) : null;
+        console.log(`\n  ${ev.label}   (event mean ${mean}″)`);
+        for (const row of rows) console.log(`    ${row}`);
+      }
+      const mean = r1(allArcsec.reduce((s, a) => s + a, 0) / allArcsec.length);
+      console.log(`\n  OVERALL: mean ${mean}″ | max ${r1(Math.max(...allArcsec))}″  (${allArcsec.length} points)`);
+      console.log('════════════════════════════════════════════════════════════════════════════════════════');
+    } finally {
+      jumpToJulianDay(_saveJD);
+      forceSceneUpdate();
+    }
+  }, 'The 20.3 accuracy instrument: scene umbra vs the NASA GSFC path-table central lines at 15 ' +
+     'fixed UT instants across 5 modern eclipses (2024/2017/2026/1999/2023), in the shadow-plane ' +
+     'metric (ground gap × sin sun-alt, arcsec at the Moon-distance lever). No time scan — fixed ' +
+     'UT — so longitude error cannot hide. Same dataset + metric as the Node gate ' +
+     '(tools/verify/eclipse-audit.js); recorded baseline in data/eclipse-audit-summary.json. ' +
+     'Saves + restores the scene. Runtime ~2 s.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Lunar Eclipses & Validation

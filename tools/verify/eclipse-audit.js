@@ -36,6 +36,17 @@
  * Babylon numbers exactly; on any divergence they are preserved verbatim
  * and the divergence is reported (exact-reproduction rule).
  *
+ * Section (d) `centerlines` is the 20.3 accuracy instrument: the scene-umbra
+ * twin evaluated at 15 fixed-UT NASA path-table CENTRAL-LINE points across
+ * the five modern events (2024/2017/2026/1999/2023, two of them held-outs of
+ * the 20.3c stack), reported in the SHADOW-PLANE metric — ground gap ×
+ * sin(sun altitude), in km and in arcsec at the 1.86 km/″ Moon-distance
+ * lever. Ground km are NOT comparable across events (1/sin alt amplifies
+ * 6.9× at the low-sun 2026 crossing); shadow-plane arcsec are. Unlike the
+ * audit-26 site scan, there is no ±4h search: fixed UT vs the table's own
+ * central line — longitude-channel error cannot hide. Same
+ * exact-reproduction convention as the other sections.
+ *
  *   node tools/verify/eclipse-audit.js                        # compute + compare
  *   node tools/verify/eclipse-audit.js --write                # + write artifact
  *   node tools/verify/eclipse-audit.js --write --rebaseline   # conscious re-measurement
@@ -79,6 +90,7 @@ const INPUT_FILES = [
   'packages/physics/src/eclipse/finders.cjs',
   'packages/physics/src/moon/series.cjs',
   'packages/physics/src/moon/apparent.cjs',
+  'public/input/solar-eclipse-centerlines-nasa.json',
   'public/input/astro-reference.json',
   'public/input/model-parameters.json',
   'public/input/fitted-coefficients.json',
@@ -437,6 +449,116 @@ if (babylonDiverged && REBASELINE) {
   console.log('  → babylon135 section will be PRESERVED verbatim (divergence above).');
 }
 
+// ---------------------------------------------------------------------------
+// Section (d): NASA path-table centerlines — the 20.3 accuracy instrument.
+// Fixed-UT scene-umbra hits vs the tables' central line, in the shadow-plane
+// metric. Sun altitude at the reference point is computed from the scene sun
+// via the standard GMST expression — metric NORMALIZATION only (sin alt),
+// verified within 0.4° of the tables' own altitude column; it is not part of
+// the model chain. The 1.86 km/″ lever is the Moon-distance body-direction
+// class (60 Earth radii; Earth-orientation terms act at 31 m/″ and cancel
+// between the co-located Sun and Moon at eclipse).
+// ---------------------------------------------------------------------------
+const CL = rd('public/input/solar-eclipse-centerlines-nasa.json');
+const D2R = Math.PI / 180;
+// ground gap via the file-level gcKm (haversine on the codebase Earth radius)
+
+function sunAltDegAt(jd, latDeg, lonDeg) {
+  SG.computePlanetPosition('moon', jd);
+  const g = SG._getGraphForProbe();
+  const sun = g.sunNodes.pivot.getWorldPosition();
+  const earth = g.earthNodes.rotAxis.getWorldPosition();
+  const M = g.earthNodes.rotAxis.worldMatrix.e;
+  const R = [[M[0], M[4], M[8]], [M[1], M[5], M[9]], [M[2], M[6], M[10]]];
+  const sg = [sun[0] - earth[0], sun[1] - earth[1], sun[2] - earth[2]];
+  const e = [
+    R[0][0] * sg[0] + R[1][0] * sg[1] + R[2][0] * sg[2],
+    R[0][1] * sg[0] + R[1][1] * sg[1] + R[2][1] * sg[2],
+    R[0][2] * sg[0] + R[1][2] * sg[1] + R[2][2] * sg[2],
+  ];
+  const ra = Math.atan2(e[0], e[2]);
+  const dec = Math.asin(e[1] / Math.hypot(...e));
+  const T = (jd - 2451545.0) / 36525;
+  const gmst = (280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T) % 360;
+  const H = ((gmst + lonDeg) * D2R) - ra;
+  return Math.asin(Math.sin(latDeg * D2R) * Math.sin(dec) +
+    Math.cos(latDeg * D2R) * Math.cos(dec) * Math.cos(H)) / D2R;
+}
+
+const r1 = (x) => Math.round(x * 10) / 10;
+console.log('\n  centerlines (fixed-UT shadow-plane vs NASA central lines, 15 points)...');
+const clEvents = CL.events.map((ev) => {
+  const points = ev.points.map((p) => {
+    const u = umbraFromSceneAtJdNode(p.jd);
+    const groundKm = gcKm(p.latDeg, p.lonDeg, u.lat, u.lon);
+    const altDeg = sunAltDegAt(p.jd, p.latDeg, p.lonDeg);
+    const shadowKm = groundKm * Math.sin(altDeg * D2R);
+    return {
+      utc: p.utc,
+      groundGapKm: r1(groundKm),
+      sunAltDeg: r1(altDeg),
+      shadowPlaneKm: r1(shadowKm),
+      shadowPlaneArcsec: r1(shadowKm / 1.86),
+    };
+  });
+  const meanArcsec = r1(points.reduce((s, p) => s + p.shadowPlaneArcsec, 0) / points.length);
+  console.log(`    ${ev.label.padEnd(36)} mean ${String(meanArcsec).padStart(5)}″  (${points.map((p) => `${p.utc} ${p.shadowPlaneArcsec}″`).join(' | ')})`);
+  return { label: ev.label, points, meanShadowPlaneArcsec: meanArcsec };
+});
+const clAll = clEvents.flatMap((ev) => ev.points.map((p) => p.shadowPlaneArcsec));
+const clMeanArcsec = r1(clAll.reduce((s, a) => s + a, 0) / clAll.length);
+const clMaxArcsec = r1(Math.max(...clAll));
+console.log(`    overall: mean ${clMeanArcsec}″ | max ${clMaxArcsec}″`);
+
+let clDiverged = 0;
+if (prev.centerlines) {
+  for (let i = 0; i < clEvents.length; i++) {
+    const was = prev.centerlines.events && prev.centerlines.events[i];
+    const now = clEvents[i];
+    for (let j = 0; j < now.points.length; j++) {
+      const w = was && was.points && was.points[j] ? was.points[j].shadowPlaneArcsec : undefined;
+      if (w !== now.points[j].shadowPlaneArcsec) {
+        clDiverged++;
+        console.log(`  DIVERGED   centerlines ${now.label} ${now.points[j].utc}: recorded ${w}″, computed ${now.points[j].shadowPlaneArcsec}″`);
+      }
+    }
+    const same = was && was.meanShadowPlaneArcsec === now.meanShadowPlaneArcsec;
+    if (!same) clDiverged++;
+    console.log(`  ${same ? 'REPRODUCED' : 'DIVERGED  '} centerlines mean [${now.label}]: recorded ${was && was.meanShadowPlaneArcsec}″, computed ${now.meanShadowPlaneArcsec}″`);
+  }
+  for (const [k, now] of [['meanShadowPlaneArcsec', clMeanArcsec], ['maxShadowPlaneArcsec', clMaxArcsec]]) {
+    const was = prev.centerlines[k];
+    const same = was === now;
+    if (!same) clDiverged++;
+    console.log(`  ${same ? 'REPRODUCED' : 'DIVERGED  '} centerlines.${k}: recorded ${was}, computed ${now}`);
+  }
+  if (clDiverged && !REBASELINE) {
+    console.log('  → centerlines section will be PRESERVED verbatim (divergence above).');
+  } else if (clDiverged) {
+    console.log('  → centerlines REBASELINED: computed values adopted as the new baseline.');
+  }
+} else {
+  console.log('  centerlines: NEW section — first --write adopts the computed baseline.');
+}
+const centerlinesSection = (clDiverged && !REBASELINE) ? prev.centerlines : {
+  _description:
+    'The 20.3 solar-eclipse accuracy instrument — GENERATED by ' +
+    'tools/verify/eclipse-audit.js --write. Scene-umbra ground point at ' +
+    'fixed UT vs the NASA GSFC path-table CENTRAL LINE ' +
+    '(public/input/solar-eclipse-centerlines-nasa.json, cross-checked ' +
+    'rows — see its _meta for the limit-column trap), in the SHADOW-PLANE ' +
+    'metric: ground gap × sin(sun altitude), and arcsec at the 1.86 km/″ ' +
+    'Moon-distance lever. Ground km are not comparable across events ' +
+    '(1/sin alt); shadow-plane arcsec are. No time scan: fixed UT, so the ' +
+    'longitude channel cannot hide. The five events include two held-outs ' +
+    'of the 20.3c apparent-place stack (1999, 2023). Sun altitude here is ' +
+    'metric normalization only (GMST expression, 0.4° vs the tables), not ' +
+    'part of the model chain.',
+  events: clEvents,
+  meanShadowPlaneArcsec: clMeanArcsec,
+  maxShadowPlaneArcsec: clMaxArcsec,
+};
+
 const artifact = {
   _description:
     'Historical eclipse audit summary. The `lunar` and `solar` sections are ' +
@@ -461,6 +583,7 @@ const artifact = {
   solar,
   audit26: audit26Section,
   babylon135: babylon135Section,
+  centerlines: centerlinesSection,
   inputs: buildInputsBlock('node tools/verify/eclipse-audit.js --write', INPUT_FILES),
 };
 
@@ -471,8 +594,9 @@ if (WRITE) {
     process.exit(1);
   }
   fs.writeFileSync(OUT, JSON.stringify(artifact, null, 2) + '\n');
-  const preserved = [audit26Diverged && 'audit26', babylonDiverged && 'babylon135'].filter(Boolean);
-  console.log(`\n  ✓ wrote ${path.relative(ROOT, OUT)}${preserved.length ? ` (${preserved.join('/')} preserved verbatim)` : ' (all four sections generated)'}`);
+  const preserved = [audit26Diverged && 'audit26', babylonDiverged && 'babylon135',
+    (clDiverged && !REBASELINE) && 'centerlines'].filter(Boolean);
+  console.log(`\n  ✓ wrote ${path.relative(ROOT, OUT)}${preserved.length ? ` (${preserved.join('/')} preserved verbatim)` : ' (all five sections generated)'}`);
 } else {
   console.log('\n  dry run — pass --write to update the artifact');
 }
