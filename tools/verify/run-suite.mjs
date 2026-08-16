@@ -57,6 +57,8 @@ const MANIFEST = [
     writes: 'data/lod-climate-correlation-summary.json (tracked; --write only)' },
   { n: 'eclipse-audit.js', class: 'generator', ms: 180000, slow: true,
     writes: 'data/eclipse-audit-summary.json (tracked; --write only, REFUSES on divergence — --rebaseline is the conscious re-measurement path)' },
+  { n: 'lunar-alignment.js', class: 'generator', ms: 82000, slow: true,
+    writes: 'data/lunar-alignment-summary.json (tracked; same convention as eclipse-audit: plain run = reproduction check, --write refuses on divergence, --rebaseline adopts). Sections: canon TT-axis geometry 1600-2200 · documented visibility via the api observer tier · the -746 Babylonian lunar anchor · Stephenson-2016 raw-timing deltaT bands vs framework + spline' },
 
   { n: 'artifact-freshness.js', class: 'gate', ms: 1000,
     note: 'the campaign-artifact freshness gate — also runs as its own chain step (npm run check:artifacts); re-hashes every generated artifact\'s recorded inputs' },
