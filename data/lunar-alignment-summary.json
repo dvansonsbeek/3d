@@ -278,6 +278,87 @@
       "residualHours": -0.23
     }
   },
+  "theoryDrift": {
+    "binHalfWidthYears": 40,
+    "modernBaselineMinutes": 0.38,
+    "bins": {
+      "100": {
+        "n": 196,
+        "signedMeanMinutes": -5.01
+      },
+      "500": {
+        "n": 201,
+        "signedMeanMinutes": -2.88
+      },
+      "1000": {
+        "n": 190,
+        "signedMeanMinutes": -1.6
+      },
+      "1500": {
+        "n": 180,
+        "signedMeanMinutes": -0.41
+      },
+      "1800": {
+        "n": 202,
+        "signedMeanMinutes": 0.42
+      },
+      "2000": {
+        "n": 183,
+        "signedMeanMinutes": 1.12
+      },
+      "-750": {
+        "n": 189,
+        "signedMeanMinutes": -13.09
+      },
+      "-650": {
+        "n": 204,
+        "signedMeanMinutes": -11.23
+      },
+      "-550": {
+        "n": 204,
+        "signedMeanMinutes": -11.05
+      },
+      "-450": {
+        "n": 190,
+        "signedMeanMinutes": -9.6
+      },
+      "-350": {
+        "n": 181,
+        "signedMeanMinutes": -7.99
+      },
+      "-250": {
+        "n": 183,
+        "signedMeanMinutes": -8.48
+      },
+      "-100": {
+        "n": 199,
+        "signedMeanMinutes": -6.35
+      }
+    },
+    "driftVsModernMinutes": {
+      "100": -5.39,
+      "500": -3.26,
+      "1000": -1.98,
+      "1500": -0.79,
+      "1800": 0.04,
+      "2000": 0.74,
+      "-750": -13.47,
+      "-650": -11.61,
+      "-550": -11.43,
+      "-450": -9.98,
+      "-350": -8.37,
+      "-250": -8.86,
+      "-100": -6.73
+    },
+    "effectiveDeltaNdotArcsecPerCy2": 1.09,
+    "predictedReducedResidualMinutes": {
+      "-800": 11.1,
+      "-700": 5,
+      "-600": 4.8,
+      "-500": -1.4,
+      "-400": -5.4
+    }
+  },
   "inputs": {
     "generator": "node tools/verify/lunar-alignment.js --write",
     "files": {
@@ -297,7 +378,7 @@
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/model-parameters.json": "sha256:9427dc915ab0b9b91b692d1f365a6ceabd008af532b095ce8e1e3e1248e05e93",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
-      "tools/verify/lunar-alignment.js": "sha256:34812d77a99d0adc756304fb9b78bf284443171dfb3c4a2591e2a4a0718932bb"
+      "tools/verify/lunar-alignment.js": "sha256:d76f1f5fb9367f748fd237800086de7ff60f40e7f5a22bcc0cc7c8927a5bfb78"
     }
   }
 }

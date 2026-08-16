@@ -478,6 +478,40 @@ untimed-bounds section of the same gate places the framework ΔT at −135
 tablet's published totality window
 [<!--v:lunarDtBoundsBabylon135LowSeconds-->11,220<!--/v-->, <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s.
 
+### The residual trend is the lunar-theory convention — measured
+
+Every `dt_observed_sec` in the corpus was produced by converting the raw
+tablet timing through the Stephenson team's ELP-class lunar ephemeris with
+its constant-ṅ convention. The framework's Moon is not that Moon: its
+month evolution is chain-integrated on the H-lattice. The `theoryDrift`
+section of the same gate measures the difference directly, on the TT axis
+(framework opposition vs the NASA canon's greatest-eclipse instant, era
+bins ±40 yr, modern definitional baseline subtracted): a smooth secular
+drift reaching <!--v:lunarDrift800Minutes-->−13.5<!--/v--> min at the −750 era
+and vanishing toward the present — an effective
+Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->1.09<!--/v--> ″/cy² between the two
+theories. A re-reduction of the tablets with the framework's own Moon
+shifts each century's implied ΔT by exactly that drift, which converts
+the one-sided residual column above into sign-mixed, noise-class scatter:
+
+| Century | residual today | **pre-registered** residual after framework re-reduction |
+|---|---:|---:|
+| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.04<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+11.1<!--/v--> min |
+| -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.11<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->+5.0<!--/v--> min |
+| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.11<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->+4.8<!--/v--> min |
+| -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−1.4<!--/v--> min |
+| -400…-301 | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr | <!--v:lunarPredictedReduced400Minutes-->−5.4<!--/v--> min |
+
+These predictions are recorded in the gate BEFORE the contact-time
+re-reduction machinery exists — first-order only (contacts assumed to
+shift with the opposition; the moonrise conversion shares part of the
+drift; century and era bins are offset by 50 yr). When the re-reduction
+campaign runs, landing near this column confirms the framework's
+dLOD/dt at the corpus noise floor with zero free parameters; landing
+significantly elsewhere is a discovery about out-of-window LOD
+structure. Either outcome is informative — that is why the column is
+pinned now.
+
 ### Remaining medieval residual — brief preview
 
 Years 1000-1200 CE show the model slightly overshooting observations

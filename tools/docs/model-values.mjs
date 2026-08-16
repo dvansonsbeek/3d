@@ -1210,6 +1210,29 @@ export const VALUES = {
       keys[`lunarCentury${tag}FrameworkHours`] = { get: () => row.meanFrameworkHours, render: (v) => Number(v).toFixed(2), unit: 'hr' };
       keys[`lunarCentury${tag}ResidualHours`] = { get: () => row.residualHours, render: (v) => (v < 0 ? '−' : v > 0 ? '+' : '') + Math.abs(v).toFixed(2), unit: 'hr' };
     }
+    // Headline rollups for the doc-106 dossier entry.
+    keys.lunarCanonEvents = { get: () => la.canonGeometry.canonEvents, render: (v) => thousands(v) };
+    keys.lunarCanonMatched = { get: () => la.canonGeometry.matched, render: (v) => thousands(v) };
+    keys.lunarCanonTypeAgree = { get: () => la.canonGeometry.typeAgree, render: (v) => thousands(v) };
+    keys.lunarVisibilityInsideAgree = { get: () => la.visibility.insideAgree, render: (v) => String(v) };
+    keys.lunarVisibilityChecked = { get: () => la.visibility.entriesChecked, render: (v) => String(v) };
+    keys.lunarBabylon746MagnitudeUmbral = { get: () => la.babylon746.magnitudeUmbral, render: (v) => Number(v).toFixed(3) };
+    keys.lunarBabylon746CanonMagnitudeUmbral = { get: () => la.babylon746.canonMagnitudeUmbral, render: (v) => Number(v).toFixed(3) };
+    keys.lunarBabylon746AltitudeDeg = { get: () => la.babylon746.babylonMoonAltitudeDeg, render: (v) => Number(v).toFixed(1), unit: '°' };
+    keys.lunarDtBandsFrameworkMeanAbsSeconds = { get: () => la.dtBands.overall.frameworkMeanAbsSeconds, render: (v) => thousands(v), unit: 's' };
+    keys.lunarDtBandsSplineMeanAbsSeconds = { get: () => la.dtBands.overall.stephensonSplineMeanAbsSeconds, render: (v) => thousands(v), unit: 's' };
+    keys.lunarDtBandsN = { get: () => la.dtBands.overall.n, render: (v) => String(v) };
+    keys.lunarS13FrameworkInside = { get: () => la.dtBounds.S13.frameworkInside, render: (v) => String(v) };
+    keys.lunarS13N = { get: () => la.dtBounds.S13.n, render: (v) => String(v) };
+    // theoryDrift: the framework-vs-ELP-class secular drift and the
+    // pre-registered re-reduction prediction (doc 102 §lunar-theory drift).
+    const signedMin = (/** @type {number} */ v) => (v < 0 ? '−' : v > 0 ? '+' : '') + Math.abs(v).toFixed(1);
+    keys.lunarTheoryDriftDeltaNdot = { get: () => la.theoryDrift.effectiveDeltaNdotArcsecPerCy2, render: (v) => Number(v).toFixed(2), unit: '″/cy²' };
+    for (const [cent, bin] of [['-800', '-750'], ['-700', '-650'], ['-600', '-550'], ['-500', '-450'], ['-400', '-350']]) {
+      const tag = String(Math.abs(Number(cent)));
+      keys[`lunarDrift${tag}Minutes`] = { get: () => la.theoryDrift.driftVsModernMinutes[bin], render: (v) => signedMin(v), unit: 'min' };
+      keys[`lunarPredictedReduced${tag}Minutes`] = { get: () => la.theoryDrift.predictedReducedResidualMinutes[cent], render: (v) => signedMin(v), unit: 'min' };
+    }
     return keys;
   })(),
 

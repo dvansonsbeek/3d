@@ -102,6 +102,32 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
 - **Eclipse canon** — the 2024 events (Apr 8 Total, Oct 2 Annular, both
   lunar) are semantic anchors in the `createModel` parity gate
   (`test:model`), recomputed from the shipped physics on every CI run.
+- **Lunar alignment** — `tools/verify/lunar-alignment.js` (reproduction
+  gate + generator, same convention as eclipse-audit; owns
+  `data/lunar-alignment-summary.json`): the model's lunar finder vs the
+  NASA 5-Millennium Canon on the TT axis
+  (<!--v:lunarCanonMatched-->1,446<!--/v-->/<!--v:lunarCanonEvents-->1,450<!--/v-->
+  matched 1600–2200, <!--v:lunarCanonTypeAgree-->1,432<!--/v--> types agree);
+  documented visibility regions vs the api observer tier
+  (<!--v:lunarVisibilityInsideAgree-->14<!--/v-->/<!--v:lunarVisibilityChecked-->14<!--/v-->
+  both directions); the −746 Feb 6 Babylonian partial (magnitude
+  <!--v:lunarBabylon746MagnitudeUmbral-->0.904<!--/v--> vs canon
+  <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->36.4<!--/v-->°); the
+  <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
+  (framework ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,212<!--/v--> s —
+  statistically identical to Stephenson's own fitted spline at
+  <!--v:lunarDtBandsSplineMeanAbsSeconds-->1,211<!--/v--> s, with zero eclipse
+  input); the untimed tablets S10–S14 as published ΔT intervals (lunar
+  rise/set <!--v:lunarS13FrameworkInside-->7<!--/v-->/<!--v:lunarS13N-->7<!--/v-->
+  contained; the −135 Babylon totality window
+  [<!--v:lunarDtBoundsBabylon135LowSeconds-->11,220<!--/v-->,
+  <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s contains the
+  framework's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,012<!--/v--> s);
+  and the measured framework-vs-ELP lunar-theory drift
+  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->1.09<!--/v--> ″/cy²) with the
+  PRE-REGISTERED re-reduction prediction pinned before the contact-time
+  machinery exists — [doc 102 §per-century convergence](102-gia-alpha-lunar-validation.md).
 
 ## D. The honesty ledger — what does NOT validate, asserted anyway
 
