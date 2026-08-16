@@ -5397,6 +5397,17 @@ function updateEarthForEpoch() {
   //   SI_TROPICAL_YEAR_DAYS          — captured at module init from J2000
   // (_siderealDaySec_J2000 hoisted to module scope in section E1 at top of file)
   earth.rotationSpeed = Math.PI * 2 * SI_TROPICAL_YEAR_DAYS * 86400 / _siderealDaySec_J2000;
+  // 20.3c: sidereal-phase anchor correction — startmodelJD (2451716.5) is a
+  // MIDNIGHT-UT anchor, but the initial orientation was calibrated on the
+  // noon convention. The solar-day arithmetic hides the half-day slip (one
+  // solar day ≡ 1 JD exactly); the SIDEREAL excess accrued in that half day
+  // — 2π·0.5/tropical-year-days = π/365.2422 = 0.4928° = 118.3 s of
+  // rotation — displaced every ground point ~53 km west, CONSTANT across
+  // dates (measured at six modern eclipses: −1.98 min at every epoch,
+  // EoT-independent; EoT(anchor) = −1.72 min is excluded by 15 s). Derived
+  // constant, zero fit. MATCHED PAIR with the umbra twin's spin
+  // (tools/explore/umbra-scene-node-twin.js).
+  earth.rotationPhase = -Math.PI / SI_TROPICAL_YEAR_DAYS;
   earth.size          = (diameters.earthDiameter / 2 / currentAUDistance) * 100;
 }
 
@@ -54110,7 +54121,7 @@ function moveModel(pos) {
         // at the umbra-centerline level (empirical finding 2026-06-24;
         // the earlier ΔT-rotation overlay double-applied ΔT and
         // over-rotated Earth by ~47° at year -135 / ~71° at Thales -584).
-        obj.planetObj.rotation.y = obj.rotationSpeed * pos;
+        obj.planetObj.rotation.y = obj.rotationSpeed * pos + (obj.rotationPhase || 0);
       }
     }
 

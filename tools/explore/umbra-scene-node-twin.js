@@ -110,7 +110,9 @@ function umbraFromSceneAtJdNode(jd) {
   const hit = [moonGeo[0] + s * d[0], moonGeo[1] + s * d[1], moonGeo[2] + s * d[2]];
 
   const v = applyT(R, hit);
-  const spin = ROTATION_SPEED * DT.posFromJD(jd);
+  // 20.3c sidereal-phase anchor correction — MATCHED PAIR with the browser's
+  // earth.rotationPhase (π/tropical-year-days; see src/script.js).
+  const spin = ROTATION_SPEED * DT.posFromJD(jd) - Math.PI / SI_TROPICAL_YEAR_DAYS;
   const c = Math.cos(-spin), sn = Math.sin(-spin);
   const local = [c * v[0] + sn * v[2], v[1], -sn * v[0] + c * v[2]];
   const rr = Math.hypot(local[0], local[1], local[2]);
