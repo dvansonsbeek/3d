@@ -451,19 +451,32 @@ property of the framework, not regional observational bias.
 ### Per-century convergence at ancient Babylonian era
 
 The deepest, hardest-to-fit observations — the cuneiform tablets
-from Babylon, -800 to -300 BCE — converge to within ~2 minutes:
+from Babylon, -800 to -300 BCE — are reproduced per century to within
+<!--v:lunarCenturyResidualMinMinutes-->2<!--/v-->–<!--v:lunarCenturyResidualMaxMinutes-->14<!--/v--> minutes
+of an observed ΔT signal of 4–6 **hours** (0.5–5% relative). The table
+is CI-pinned by the `lunar-alignment` gate
+(`data/lunar-alignment-summary.json` §dtBandsByCentury) — a silent
+drift in either direction fails the chain:
 
 | Century | n | obs ΔT (hr) | model ΔT (hr) | residual |
 |---|---:|---:|---:|---:|
-| -800…-701 | 2 | 5.69 | 5.72 | −0.03 hr |
-| -700…-601 | 8 | 5.42 | 5.43 | −0.01 hr |
-| -600…-501 | 21 | 5.03 | 5.07 | −0.04 hr |
-| -500…-401 | 17 | 4.55 | 4.55 |  0.00 hr |
-| -400…-301 | 27 | 4.33 | 4.31 | +0.02 hr |
+| -800…-701 | <!--v:lunarCentury800N-->2<!--/v--> | <!--v:lunarCentury800ObsHours-->5.69<!--/v--> | <!--v:lunarCentury800FrameworkHours-->5.65<!--/v--> | <!--v:lunarCentury800ResidualHours-->−0.04<!--/v--> hr |
+| -700…-601 | <!--v:lunarCentury700N-->8<!--/v--> | <!--v:lunarCentury700ObsHours-->5.42<!--/v--> | <!--v:lunarCentury700FrameworkHours-->5.32<!--/v--> | <!--v:lunarCentury700ResidualHours-->−0.11<!--/v--> hr |
+| -600…-501 | <!--v:lunarCentury600N-->21<!--/v--> | <!--v:lunarCentury600ObsHours-->5.03<!--/v--> | <!--v:lunarCentury600FrameworkHours-->4.92<!--/v--> | <!--v:lunarCentury600ResidualHours-->−0.11<!--/v--> hr |
+| -500…-401 | <!--v:lunarCentury500N-->17<!--/v--> | <!--v:lunarCentury500ObsHours-->4.55<!--/v--> | <!--v:lunarCentury500FrameworkHours-->4.36<!--/v--> | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr |
+| -400…-301 | <!--v:lunarCentury400N-->27<!--/v--> | <!--v:lunarCentury400ObsHours-->4.33<!--/v--> | <!--v:lunarCentury400FrameworkHours-->4.10<!--/v--> | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr |
 
 Three thousand years deep, observations from clay tablets, reproduced
 by a model whose every physical constant comes from independent
 literature — zero fitting parameters. That this works is the headline.
+The small residual trend toward -400 (the model runs ~0.1–0.2 hr below
+the tablet reductions there) is recorded and gated rather than tuned
+away; the reductions carry the Stephenson team's conversion assumptions,
+and the assumption-light cross-check agrees with the framework — the
+untimed-bounds section of the same gate places the framework ΔT at −135
+(<!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,012<!--/v--> s) inside the
+tablet's published totality window
+[<!--v:lunarDtBoundsBabylon135LowSeconds-->11,220<!--/v-->, <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s.
 
 ### Remaining medieval residual — brief preview
 

@@ -1185,6 +1185,34 @@ export const VALUES = {
     };
   })(),
 
+  // ── Lunar-alignment gate artifact (Phase A) ──────────────────────────────
+  // Keys read data/lunar-alignment-summary.json — the recorded baseline of
+  // tools/verify/lunar-alignment.js (same reproduction convention as
+  // eclipse-audit). Docs 102/103/106 consume the per-century Babylonian
+  // convergence and the −135 untimed-bounds headline.
+  ...(() => {
+    const la = rd('data/lunar-alignment-summary.json');
+    const b = la.dtBounds.babylon135;
+    const centuries = Object.entries(la.dtBandsByCentury);
+    const absResMin = centuries.map(([, r]) => Math.abs(r.residualHours) * 60);
+    /** @type {Record<string, any>} */
+    const keys = {
+      lunarDtBoundsBabylon135LowSeconds:  { get: () => b.boundsLowSeconds, render: (v) => thousands(v), unit: 's' },
+      lunarDtBoundsBabylon135HighSeconds: { get: () => b.boundsHighSeconds, render: (v) => thousands(v), unit: 's' },
+      lunarDtBoundsBabylon135FrameworkSeconds: { get: () => b.frameworkSeconds, render: (v) => thousands(v), unit: 's' },
+      lunarCenturyResidualMinMinutes: { get: () => Math.round(Math.min(...absResMin)), render: (v) => String(v), unit: 'min', note: 'derived: smallest per-century |residual| across the Babylonian bins' },
+      lunarCenturyResidualMaxMinutes: { get: () => Math.round(Math.max(...absResMin)), render: (v) => String(v), unit: 'min', note: 'derived: largest per-century |residual| across the Babylonian bins' },
+    };
+    for (const [cent, row] of centuries) {
+      const tag = String(Math.abs(Number(cent)));
+      keys[`lunarCentury${tag}N`] = { get: () => row.n, render: (v) => String(v) };
+      keys[`lunarCentury${tag}ObsHours`] = { get: () => row.meanObservedHours, render: (v) => Number(v).toFixed(2), unit: 'hr' };
+      keys[`lunarCentury${tag}FrameworkHours`] = { get: () => row.meanFrameworkHours, render: (v) => Number(v).toFixed(2), unit: 'hr' };
+      keys[`lunarCentury${tag}ResidualHours`] = { get: () => row.residualHours, render: (v) => (v < 0 ? '−' : v > 0 ? '+' : '') + Math.abs(v).toFixed(2), unit: 'hr' };
+    }
+    return keys;
+  })(),
+
   // ── Scene anchors + Moon months (11-2t) ─────────────────────────────────
   // Anchor years/JDs and offsets from the engine constants (porting these
   // surfaced the SIXTH website defect: its hardcoded PERI_ALIGN_JD 2,176,152
