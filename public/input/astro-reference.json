@@ -8,6 +8,9 @@
     "earthMoiFactorJ2000": 0.3306947,
     "earthFlatteningInverseWGS84": 298.257223563,
     "aberrationConstantArcsec": 20.4955,
+    "gmstMeanSiderealT0Deg": 280.46061837,
+    "gmstMeanSiderealRateDegPerDay": 360.98564736629,
+    "gmstMeanSiderealT2Deg": 0.000387933,
     "nutationLeadingTermsArcsec": {
       "_description": "IAU 1980 nutation, four leading terms. dPsi (longitude) = psiOmega*sin(Om) + psi2Ls*sin(2Ls) + psi2Lm*sin(2Lm) + psi2Omega*sin(2Om); dEps (obliquity) = epsOmega*cos(Om) + eps2Ls*cos(2Ls) + eps2Lm*cos(2Lm) + eps2Omega*cos(2Om). Om = lunar ascending node longitude (the model's own nodal machinery is the driver), Ls/Lm = mean solar/lunar longitudes. Units arcsec.",
       "psiOmega": -17.20, "psi2Ls": -1.32, "psi2Lm": -0.23, "psi2Omega": 0.21,

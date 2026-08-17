@@ -71,6 +71,9 @@ const CARDINAL_TYPES = Object.freeze(['SS', 'WS', 'VE', 'AE']);
  * ~60 steps per synodic month, so cost is linear in the window). */
 const ECLIPSE_KINDS = Object.freeze(['solar', 'lunar']);
 const MAX_ECLIPSE_WINDOW_YEARS = 500;
+// Solar OBSERVER requests run a per-event contact solver (±4 h scan +
+// bisection on the full series) — bounded so one request stays interactive.
+const MAX_SOLAR_LOCATION_WINDOW_YEARS = 20;
 
 /**
  * @returns {{ handle: (req: {method: string, path: string, query?: Record<string, string>, body?: string}) => {status: number, headers: Record<string, string>, body: string}, model: ReturnType<typeof createModel> }}
@@ -414,17 +417,17 @@ export function createApi() {
       if (model.time.yearFromJD(jdStart) < -498e6 || model.time.yearFromJD(jdEnd) > 502e6) {
         return problem(422, 'outside-validity', 'Epoch outside model validity', 'The search window must lie within the model validity span.', { minYear: -498e6, maxYear: 502e6 });
       }
-      // Observer params (lunar visibility tier). Solar local circumstances are
-      // deliberately refused until the arcsecond accuracy class ships: at
-      // minutes-class timing the umbra (~0.5–1 km/s ground speed) lands tens
-      // of km wrong at the path edges — a confident wrong answer.
+      // Observer params. Lunar: horizon visibility. Solar: local
+      // circumstances on the 20.3g location tier (physics
+      // eclipse/besselian.cjs — shadow geometry on the FULL shared series
+      // at the model's absolute TT; measured 6.3″ mean / 9.1″ max
+      // shadow-plane against 15 NASA path-table centerline points, within
+      // every NASA path half-width — the accuracy class the former
+      // `solar-location-unavailable` refusal was waiting for).
       const hasLat = query.lat !== undefined, hasLon = query.lon !== undefined;
       /** @type {{latDeg:number, lonDeg:number}|null} */
       let observer = null;
       if (hasLat || hasLon) {
-        if (kind === 'solar') {
-          return problem(422, 'solar-location-unavailable', 'Solar location tier not available', 'Observer lat/lon on solar eclipses requires the arcsecond accuracy class, which this model version does not ship. Lunar horizon visibility is available on /v1/eclipses/lunar.', { instance: path });
-        }
         if (!hasLat || !hasLon) {
           return problem(400, 'invalid-observer', 'Invalid observer', 'Provide both lat and lon (degrees, lon east-positive), or neither.');
         }
@@ -434,6 +437,9 @@ export function createApi() {
         }
         if (model.time.yearFromJD(jdStart) < -8000 || model.time.yearFromJD(jdEnd) > 12000) {
           return problem(422, 'observer-outside-era', 'Observer tier outside supported era', 'Horizon visibility depends on the hour angle, which accumulated length-of-day drift invalidates at deep time. Observer queries are limited to years -8000..12000.', { minYear: -8000, maxYear: 12000 });
+        }
+        if (kind === 'solar' && windowYears > MAX_SOLAR_LOCATION_WINDOW_YEARS) {
+          return problem(422, 'location-window-too-large', 'Location window too large', `Solar local circumstances run a per-event contact solver; maximum ${MAX_SOLAR_LOCATION_WINDOW_YEARS} years per observer request.`, { maxYears: MAX_SOLAR_LOCATION_WINDOW_YEARS });
         }
         observer = { latDeg: lat, lonDeg: lon };
       }
@@ -451,10 +457,26 @@ export function createApi() {
       /** @type {number|undefined} */
       let visibleCount;
       if (observer) {
-        rows = rows.map((e) => {
-          const alt = moonAltitudeDegAt(e.jd, observer.latDeg, observer.lonDeg);
-          return { ...e, moonAltitudeDeg: alt, visible: alt > 0 };
-        });
+        const obs = observer;
+        rows = kind === 'solar'
+          ? rows.map((e) => {
+            const lc = model.eclipse.solarLocalCircumstances(e.jd, obs.latDeg, obs.lonDeg);
+            return {
+              ...e,
+              local: {
+                kind: lc.kind,
+                magnitude: lc.magnitude,
+                maxJd: lc.maxJd,
+                contacts: lc.contacts,
+                centralDurationSeconds: lc.centralDurationSeconds,
+              },
+              visible: lc.kind !== 'none',
+            };
+          })
+          : rows.map((e) => {
+            const alt = moonAltitudeDegAt(e.jd, obs.latDeg, obs.lonDeg);
+            return { ...e, moonAltitudeDeg: alt, visible: alt > 0 };
+          });
         visibleCount = rows.filter((e) => /** @type {any} */ (e).visible).length;
         if (visibleOnly) rows = rows.filter((e) => /** @type {any} */ (e).visible);
       }
@@ -470,8 +492,10 @@ export function createApi() {
           ...(visibleCount !== undefined ? { visibleCount } : {}),
           events: rows,
           note: observer
-            ? 'Geocentric elements at greatest eclipse (opposition for lunar). jd is on the UT axis; jdTT adds the model deltaT. moonAltitudeDeg/visible are GEOMETRIC horizon visibility at maximum eclipse (no refraction or topocentric parallax, ~±1° band near the horizon).'
-            : 'Geocentric elements at greatest eclipse (minimum-gamma for solar, opposition for lunar). jd is on the UT axis; jdTT adds the model deltaT. Ground tracks are a documented non-goal (the umbra-path conventions belong to the scene, not the package).',
+            ? (kind === 'solar'
+              ? 'Geocentric elements at greatest eclipse plus observer LOCAL CIRCUMSTANCES (the 20.3g location tier): local.kind none/partial/annular/total, Besselian magnitude (>1 inside totality), max/contact JDs on the UT axis (C1/C4 penumbral, C2/C3 central), central duration in seconds. Shadow geometry on the full shared series at the model absolute deltaT; measured 6.3 arcsec mean / 9.1 arcsec max shadow-plane against 15 NASA path-table centerline points (12-20 km ground, within every NASA path half-width). Sea-level geometric contacts: no refraction, no lunar-limb profile.'
+              : 'Geocentric elements at greatest eclipse (opposition for lunar). jd is on the UT axis; jdTT adds the model deltaT. moonAltitudeDeg/visible are GEOMETRIC horizon visibility at maximum eclipse (no refraction or topocentric parallax, ~±1° band near the horizon).')
+            : 'Geocentric elements at greatest eclipse (minimum-gamma for solar, opposition for lunar). jd is on the UT axis; jdTT adds the model deltaT. Geocentric-only rows carry no ground track; pass lat/lon for solar local circumstances (the 20.3g tier) or lunar horizon visibility.',
         },
       });
     }

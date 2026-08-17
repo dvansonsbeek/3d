@@ -32,6 +32,7 @@ import { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 import { createMoonArguments, jdToDecimalYear } from './moon/arguments.cjs';
 import { createMoonSeries } from './moon/series.cjs';
 import { createEclipseFinders } from './eclipse/finders.cjs';
+import { createBesselian } from './eclipse/besselian.cjs';
 import { driver2PeriodSecondsAtAge } from './planets/orbit-chain.cjs';
 
 /**
@@ -816,6 +817,39 @@ export function assembleModel(C, F) {
     },
   });
 
+  // 20.3g — the solar-eclipse LOCATION tier: shadow geometry on the FULL
+  // series (sceneEvalAt — the truncated finder forms omit the fitted Lp
+  // anchor and the −2235·sin(Lp) β family, deliberate for finder
+  // statistics, required here) at the model's ABSOLUTE TT (deltaTStart +
+  // curve, the same convention every other ΔT consumer reads). Both axis
+  // conventions are measured against the NASA path-table centerlines —
+  // see eclipse/besselian.cjs.
+  const besselian = createBesselian({
+    moonFullAtDaysTT: /** @param {number} dDaysTT */ (dDaysTT) => {
+      const ev = moonSeries.sceneEvalAt(dDaysTT);
+      return { lonDeg: ev.lonDeg, latDeg: ev.latDeg, distKm: ev.distKm };
+    },
+    sunLonDegAt: /** @param {number} jdUT */ (jdUT) => eclipseFinders.sunLonDegAt(jdUT),
+    deltaTSecondsAt: /** @param {number} jd */ (jd) => (jdTTFromUT(jd) - jd) * 86400,
+    obliquityDegAt: obliquityDeg,
+    eccentricityAt,
+    perihelionLongitudeDegAt: earthPerihelionDeg,
+    yearFromJD,
+    constants: {
+      j2000JD,
+      julianCenturyDays,
+      earthDiameterKm: C.bodyDiametersKm.earth,
+      moonDiameterKm: C.bodyDiametersKm.moon,
+      sunDiameterKm: C.bodyDiametersKm.sun,
+      sunDistanceKm: currentAUDistance,
+      earthFlatteningInverse: C.physicalConstants.earthFlatteningInverseWGS84,
+      ttBridgeSeconds: C.earthOrbital.deltaTStart,
+      gmstMeanSiderealT0Deg: C.physicalConstants.gmstMeanSiderealT0Deg,
+      gmstMeanSiderealRateDegPerDay: C.physicalConstants.gmstMeanSiderealRateDegPerDay,
+      gmstMeanSiderealT2Deg: C.physicalConstants.gmstMeanSiderealT2Deg,
+    },
+  });
+
   // ── The assembled surface ─────────────────────────────────────────────────
   return Object.freeze({
     time: Object.freeze({
@@ -874,6 +908,9 @@ export function assembleModel(C, F) {
       findLunarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findLunarEclipsesInRange(jdStart, jdEnd),
       findSolarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findSolarEclipsesInRange(jdStart, jdEnd),
       deltaTSecondsAtJD: frameworkDeltaTSecondsAtJD,
+      // 20.3g location tier (see eclipse/besselian.cjs):
+      umbraGroundAtJD: /** @param {number} jd @returns {{latDeg: number, lonDeg: number} | null} */ (jd) => besselian.umbraGroundAt(jd),
+      solarLocalCircumstances: /** @param {number} jdGreatest @param {number} latDeg @param {number} lonDeg */ (jdGreatest, latDeg, lonDeg) => besselian.localCircumstances(jdGreatest, latDeg, lonDeg),
     }),
     climate: Object.freeze({
       l1OrbitalPermil: evalClimateL1,

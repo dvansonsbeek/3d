@@ -32,7 +32,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "e86ba5bb7a5e7c45";
+export const CONSTANTS_HASH = "fa3230753655d190";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v11.0";
@@ -42,7 +42,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "e86ba5bb7a5e7c45",
+  hash: "fa3230753655d190",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -298,6 +298,9 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "earthMoiFactorJ2000": 0.3306947,
     "earthFlatteningInverseWGS84": 298.257223563,
     "aberrationConstantArcsec": 20.4955,
+    "gmstMeanSiderealT0Deg": 280.46061837,
+    "gmstMeanSiderealRateDegPerDay": 360.98564736629,
+    "gmstMeanSiderealT2Deg": 0.000387933,
     "nutationLeadingTermsArcsec": {
       "psiOmega": -17.2,
       "psi2Ls": -1.32,

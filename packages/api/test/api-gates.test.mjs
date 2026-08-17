@@ -13,7 +13,7 @@ import { createApi } from '../src/app.js';
 import { envelopeDefects, REQUIRED_META_FIELDS } from '../src/envelope.js';
 
 const failures = [];
-const { handle } = createApi();
+const { handle, model: apiModel } = createApi();
 
 // ── Determinism gate: same request twice ⇒ byte-identical body + same ETag ──
 /** @param {{status:number, headers:Record<string,string>, body:string}} a @param {{status:number, headers:Record<string,string>, body:string}} b @returns {string[]} */
@@ -283,7 +283,7 @@ for (const url of SAMPLE_REQUESTS) {
   // Refusals — each must be the documented problem, not a silent answer.
   /** @type {Array<[string, string, number, string]>} */
   const refusals = [
-    ['solar + observer', '/v1/eclipses/solar?startYear=2024&stopYear=2025&lat=0&lon=0', 422, 'solar-location-unavailable'],
+    ['solar observer window too large', '/v1/eclipses/solar?startYear=2000&stopYear=2025&lat=0&lon=0', 422, 'location-window-too-large'],
     ['lat without lon', '/v1/eclipses/lunar?startYear=2024&stopYear=2025&lat=10', 400, 'invalid-observer'],
     ['lat out of range', '/v1/eclipses/lunar?startYear=2024&stopYear=2025&lat=91&lon=0', 400, 'invalid-observer'],
     ['visibleOnly without observer', '/v1/eclipses/lunar?startYear=2024&stopYear=2025&visibleOnly=true', 400, 'invalid-observer'],
@@ -298,6 +298,72 @@ for (const url of SAMPLE_REQUESTS) {
   const a = handle({ method: 'GET', path: '/v1/eclipses/lunar', query: { startYear: '2024', stopYear: '2025', lat: '-22.9', lon: '-43.2' } });
   const b = handle({ method: 'GET', path: '/v1/eclipses/lunar', query: { startYear: '2024', stopYear: '2025', lat: '-22.9', lon: '-43.2' } });
   for (const d of determinismDefects(a, b)) failures.push(`observer determinism: ${d}`);
+
+  // ── Solar location tier (20.3g) ───────────────────────────────────────────
+  // Semantic anchors against the historical record: totality durations and
+  // magnitudes at documented sites, and the Madrid/Zaragoza 2026 knife-edge
+  // (the umbral band passes just NORTH of Madrid — a widely documented miss).
+  {
+    /** @param {string} pq @returns {any[]} */
+    const solarEvents = (pq) => res(pq).body.data.events;
+    const dallas = solarEvents('/v1/eclipses/solar?startYear=2024&stopYear=2025&lat=32.78&lon=-96.80')
+      .filter((/** @type {any} */ e) => e.local.kind === 'total');
+    if (dallas.length !== 1) failures.push(`solar location: Dallas 2024 total count ${dallas.length}, expected 1`);
+    else {
+      const d = dallas[0].local;
+      // Observed: totality 3m52s (232 s), mag 1.018, max 18:42:41 UT.
+      if (!(d.magnitude > 1.0 && d.magnitude < 1.05)) failures.push(`Dallas 2024 magnitude ${d.magnitude}`);
+      if (!(d.centralDurationSeconds > 200 && d.centralDurationSeconds < 260)) failures.push(`Dallas 2024 central duration ${d.centralDurationSeconds}`);
+      if (Math.abs(d.maxJd - 2460409.2796) > 0.005) failures.push(`Dallas 2024 maxJd ${d.maxJd} (expected ~18:43 UT)`);
+      if (!(d.contacts.c1 < d.contacts.c2 && d.contacts.c2 < d.maxJd
+        && d.maxJd < d.contacts.c3 && d.contacts.c3 < d.contacts.c4)) failures.push('Dallas 2024 contact ordering broken');
+    }
+    const carbondale = solarEvents('/v1/eclipses/solar?startYear=2017&stopYear=2018&lat=37.73&lon=-89.22')
+      .filter((/** @type {any} */ e) => e.local.kind === 'total');
+    // Observed: 2m38s (158 s) of totality at Carbondale.
+    if (carbondale.length !== 1 || !(carbondale[0].local.centralDurationSeconds > 130 && carbondale[0].local.centralDurationSeconds < 180)) {
+      failures.push(`Carbondale 2017 totality: ${JSON.stringify(carbondale.map((/** @type {any} */ e) => e.local.centralDurationSeconds))}`);
+    }
+    const madrid = solarEvents('/v1/eclipses/solar?startYear=2026&stopYear=2027&lat=40.42&lon=-3.70')
+      .filter((/** @type {any} */ e) => e.local.kind !== 'none');
+    const zaragoza = solarEvents('/v1/eclipses/solar?startYear=2026&stopYear=2027&lat=41.65&lon=-0.88')
+      .filter((/** @type {any} */ e) => e.local.kind !== 'none');
+    if (!madrid.some((/** @type {any} */ e) => e.local.kind === 'partial' && e.local.magnitude > 0.9)) failures.push('Madrid 2026: expected a deep partial (the band passes just north)');
+    if (madrid.some((/** @type {any} */ e) => e.local.kind === 'total')) failures.push('Madrid 2026: reported total — the documented miss became a hit');
+    if (!zaragoza.some((/** @type {any} */ e) => e.local.kind === 'total')) failures.push('Zaragoza 2026: expected totality');
+    // Determinism on the solar observer path.
+    const s1 = handle({ method: 'GET', path: '/v1/eclipses/solar', query: { startYear: '2024', stopYear: '2025', lat: '32.78', lon: '-96.80' } });
+    const s2 = handle({ method: 'GET', path: '/v1/eclipses/solar', query: { startYear: '2024', stopYear: '2025', lat: '32.78', lon: '-96.80' } });
+    for (const d of determinismDefects(s1, s2)) failures.push(`solar observer determinism: ${d}`);
+  }
+
+  // ── 20.3g ACCEPTANCE: the umbra ground track vs the NASA path-table
+  // centerlines (public/input/solar-eclipse-centerlines-nasa.json, the same
+  // cross-checked reference the scene-side gate uses). Recorded class:
+  // ≤20.3 km ground across all 15 points — the gate threshold 25 km catches
+  // any regression of the convention-offset class (~35″ ≈ 65 km) while
+  // leaving room for sub-arcsecond jitter.
+  {
+    const { readFileSync } = await import('node:fs');
+    const { DEFAULT_CONSTANTS } = await import('@essrt/physics');
+    const CL = JSON.parse(readFileSync(new URL('../../../public/input/solar-eclipse-centerlines-nasa.json', import.meta.url), 'utf8'));
+    const R_E_KM = DEFAULT_CONSTANTS.bodyDiametersKm.earth / 2;
+    /** @type {(la1:number, lo1:number, la2:number, lo2:number) => number} */
+    const gcKm = (la1, lo1, la2, lo2) => {
+      const D2R = Math.PI / 180;
+      const f1 = la1 * D2R, f2 = la2 * D2R, df = (la2 - la1) * D2R, dl = (lo2 - lo1) * D2R;
+      const h = Math.sin(df / 2) ** 2 + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) ** 2;
+      return 2 * R_E_KM * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+    };
+    for (const ev of CL.events) {
+      for (const p of ev.points) {
+        const u = apiModel.eclipse.umbraGroundAtJD(p.jd);
+        if (!u) { failures.push(`centerline acceptance: umbra off Earth at ${ev.label} ${p.utc}`); continue; }
+        const gap = gcKm(p.latDeg, p.lonDeg, u.latDeg, u.lonDeg);
+        if (gap > 25) failures.push(`centerline acceptance: ${ev.label} ${p.utc} gap ${gap.toFixed(1)} km > 25 km`);
+      }
+    }
+  }
 }
 
 if (failures.length) {
