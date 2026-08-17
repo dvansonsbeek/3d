@@ -323,6 +323,22 @@ evaluation, and the trailing ratio carries the Driver-1 deep-time
 scaling. Source: `public/input/meeus-lunar-tables.json → distanceTerms`,
 single-sourced to all three runtimes through the constants generator.
 
+**Deep-time completeness (20.3d).** (i) The Driver-1 ratio is evaluated
+AT THE EVALUATED EPOCH in all three runtimes (the series threads the
+evaluation jdTT to the distance getter; each runtime answers with its
+pure a_M(t) evaluator under bit-identical age arithmetic — the SI-linear
+year against the corrected model-start anchor). (ii) The AMPLITUDE
+scaling study: the Σ-series amplitudes are J2000-frozen, but classical
+lunar theory scales the m-family terms with the month/year ratio
+(evection ∝ m, variation and parallactic inequality ∝ m²), which
+evolves under Driver 1. Measured against the model's own m(t): the
+frozen-amplitude error is < 0.5″ within ±1 Myr, ≈ 9″ at ±10 Myr,
+≈ 1.5′ at ±100 Myr and ≈ 4′ at −300 Myr — an amplitude-scaling layer
+is BANKED until a deep-time lunar consumer needs the ≥10 Myr range.
+The eccentricity-family scaling (annual equation, E/E² terms) needs no
+layer: the framework E-factor already rides the derived e(t) channel,
+so it is epoch-aware in-chain.
+
 This replaced a two-term ellipse form (`a_M·(1 − e·cos M′)`) whose
 missing 2D-family terms (evection −3,699, variation −2,956 km, …) all
 peak at syzygy — every solar eclipse saw the Moon systematically too
