@@ -374,7 +374,15 @@ function _moonSeriesM() {
         argsAt: _moonArgsAtTools,
         eFactorForD: _fwEFactorTools,
         eFactorAtJdTT: (jdTT, T, T2) => _fwEFactorTools(jdTT - C.j2000JD, T, T2),
-        getMoonDistanceKm: () => C.moonDistance,
+        // 20.3d(i): the Driver-1 ratio at the EVALUATED epoch (per-jd pure
+        // evaluator, matched with the browser and package getters;
+        // bit-equal to C.moonDistance at year 2000). Snapshot mode
+        // (SG_DEEP_TIME=0) keeps the J2000 constant — prior bit-parity.
+        getMoonDistanceKm: (jdTT) => {
+          if (!DEEP_TIME_ENABLED || jdTT === undefined) return C.moonDistance;
+          const d = DTmod.meanMoonDistanceMetresAtAge((C.startModelYearWithCorrection - _jdToSIyearTools(jdTT)) / 1e6);
+          return d === null ? C.moonDistance : d / 1000;
+        },
         getEccentricityBase: () => C.moonOrbitalEccentricity,
         deltaTSeconds: (jd) => (_jdTTToolsFromUT(jd) - jd) * 86400,
         jdToSIyear: _jdToSIyearTools,

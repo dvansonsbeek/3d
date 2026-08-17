@@ -48,7 +48,7 @@
  *     argsAt: (jdTT: number) => {Lp: number, D: number, M: number, Mp: number, F: number},
  *     eFactorForD: (dDaysTT: number, T: number, T2: number) => number,
  *     eFactorAtJdTT: (jdTT: number, T: number, T2: number) => number,
- *     getMoonDistanceKm: () => number,
+ *     getMoonDistanceKm: (jdTT?: number) => number,
  *     getEccentricityBase: () => number,
  *     deltaTSeconds: (jdUT: number) => number,
  *     jdToSIyear: (jd: number) => number,
@@ -147,9 +147,17 @@ function createMoonSeries({ constants, fns }) {
    *  @param {number} Dr @param {number} Mr @param {number} Mpr
    *  @param {number} Fr @param {number} E @param {number} E2
    *  @returns {number} km */
-  function fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2) {
+  // 20.3d(i): the Driver-1 ratio is evaluated AT THE EVALUATED EPOCH — the
+  // getter receives the evaluation jdTT so each engine can answer with its
+  // pure a_M(t) evaluator (per-jd deterministic; previously the browser
+  // answered with whatever epoch the render loop last set — a scene-state
+  // timing accident — while the Node engines pinned the J2000 constant).
+  // Engines whose getter ignores the argument keep their old behavior.
+  /** @param {number} Dr @param {number} Mr @param {number} Mpr @param {number} Fr
+   *  @param {number} E @param {number} E2 @param {number} [jdTT] @returns {number} */
+  function fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2, jdTT) {
     const Sr = sumTableCos(moonR, Dr, Mr, Mpr, Fr, E, E2);
-    return (moonRMeanKm + Sr * 1e-3) * (getMoonDistanceKm() / moonDistanceJ2000Km);
+    return (moonRMeanKm + Sr * 1e-3) * (getMoonDistanceKm(jdTT) / moonDistanceJ2000Km);
   }
 
   /** The PRODUCTION scene evaluation at d days TT from J2000 (the caller
@@ -192,7 +200,7 @@ function createMoonSeries({ constants, fns }) {
     const fullSl = Sl + (2 * eocHalf / D2R * 1e6) * Math.sin(Mpr)
                      + (1.25 * eocHalf * eocHalf / D2R * 1e6) * Math.sin(2 * Mpr);
     const lonDeg = Lp / D2R + fullSl * 1e-6 + moonMeeusLpCorrectionDeg;
-    const distKm = fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2);
+    const distKm = fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2, j2000JD + d);
     return { thetaAddRad, lonDeg, latRad, latDeg, distKm, T };
   }
 
@@ -242,7 +250,7 @@ function createMoonSeries({ constants, fns }) {
     const args = argsAt(jdTT);
     const Dr = args.D * D2R, Mr = args.M * D2R, Mpr = args.Mp * D2R, Fr = args.F * D2R;
     const E = eFactorAtJdTT(jdTT, T, T * T);
-    return fullDistanceKm(Dr, Mr, Mpr, Fr, E, E * E);
+    return fullDistanceKm(Dr, Mr, Mpr, Fr, E, E * E, jdTT);
   }
 
   return { sceneEvalAt, truncatedLonDeg, truncatedBetaDeg, truncatedDistanceKm, additionalArgs };

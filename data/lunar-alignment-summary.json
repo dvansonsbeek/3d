@@ -370,7 +370,7 @@
       "packages/api/src/app.js": "sha256:ff000985ebbc76b672e90309b76ec8c21ec0809f1007d016a4742fb519c207aa",
       "packages/physics/src/eclipse/finders.cjs": "sha256:9603c94c13524b419bbdf7feaf79822ea4089d68c50d32a4886049b0536be4b0",
       "packages/physics/src/moon/apparent.cjs": "sha256:fba578d19fa107d66cb6b655a56b5d81b4b11219ab88296022abd9379f53df37",
-      "packages/physics/src/moon/series.cjs": "sha256:229156d192fc4448fcea8882c382d28044875fbef952e4d5ddafa46a7fcb2584",
+      "packages/physics/src/moon/series.cjs": "sha256:d8bdbefbbbefec74f168c7d87ff58cdb758abf8d23476c8b59addbe46335d0cf",
       "public/input/fitted-coefficients.json": "sha256:4afc9fff426f08850302acaaab92755a84de51af12e33e3479e0d36908af0fe1",
       "public/input/lunar-eclipses-documented.json": "sha256:586806e4f83c3f0ebd2d5afefce41c19664d8fa24023b7a9e0f79b7c8a668558",
       "public/input/lunar-eclipses-historical.json": "sha256:81dd0c83007eb899abeb97b0b987ae2d128d0e7ec4356622c7d15ed8175ad6c1",

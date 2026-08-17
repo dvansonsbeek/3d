@@ -182,7 +182,7 @@
       "packages/physics/src/deltat/cycles.cjs": "sha256:f94661f5c41951c3fec823bce9e8148ee0ed6fd80da9d95f56e2c607df4891e1",
       "packages/physics/src/eclipse/finders.cjs": "sha256:9603c94c13524b419bbdf7feaf79822ea4089d68c50d32a4886049b0536be4b0",
       "packages/physics/src/moon/apparent.cjs": "sha256:fba578d19fa107d66cb6b655a56b5d81b4b11219ab88296022abd9379f53df37",
-      "packages/physics/src/moon/series.cjs": "sha256:229156d192fc4448fcea8882c382d28044875fbef952e4d5ddafa46a7fcb2584",
+      "packages/physics/src/moon/series.cjs": "sha256:d8bdbefbbbefec74f168c7d87ff58cdb758abf8d23476c8b59addbe46335d0cf",
       "public/input/astro-reference.json": "sha256:6fe989a0455e6a3b04b9bed4b32e06f41c646b5501267d7e096681490140c437",
       "public/input/fitted-coefficients.json": "sha256:4afc9fff426f08850302acaaab92755a84de51af12e33e3479e0d36908af0fe1",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
@@ -191,7 +191,7 @@
       "public/input/solar-eclipse-centerlines-nasa.json": "sha256:94db908fc18e739fa362f36b695a0ca952e80da1ad97695896a1d38f314975af",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
       "tools/explore/umbra-scene-node-twin.js": "sha256:207c3f41e39f36e4c1b5155691e80dfca62d385693ae247380136abc6db315de",
-      "tools/lib/scene-graph.js": "sha256:0bf0b19d0dd9fa5c2abf0fa71fd1a5042baa8a9bcec36ce45a41f147216cfc7d",
+      "tools/lib/scene-graph.js": "sha256:2eba0499186010b741af4d3339eae118ead2ad8f881e4b92423649db07c32fff",
       "tools/verify/eclipse-audit.js": "sha256:25b6dfe5db3ad249c9d892945c6893a5a99f5e228439f69f9564584c78096247"
     }
   }

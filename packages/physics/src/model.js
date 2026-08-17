@@ -783,7 +783,20 @@ export function assembleModel(C, F) {
       argsAt: /** @param {number} jdTT */ (jdTT) => moonArgs.argsAt(jdTT),
       eFactorForD: fwEFactor,
       eFactorAtJdTT: /** @param {number} jdTT */ (jdTT) => fwEFactor(jdTT - j2000JD),
-      getMoonDistanceKm: () => moonDistanceKm,
+      // 20.3d(i): the Driver-1 ratio at the EVALUATED epoch (per-jd pure
+      // evaluator). MATCHED TRIPLE with the tools-lib and browser getters:
+      // identical age arithmetic — the SI-linear year (yearFromJD, never
+      // the calendar year: the recorded linear-vs-calendar mirror trap)
+      // against the MODEL-START anchor (startModelYearWithCorrection, the
+      // browser's J2000_CALENDAR_YEAR — NOT this model's 2000.0 yearToTMa
+      // convention: the 0.4977-yr difference is 4.95e-11 of distance and
+      // failed the bit-exact parity gate). Falls back to the J2000
+      // constant without a jd (legacy call shape) or past the domain.
+      getMoonDistanceKm: /** @param {number} [jdTT] */ (jdTT) => {
+        if (jdTT === undefined) return moonDistanceKm;
+        const d = moonDistanceMetresAtAge((startModelYearWithCorrection - yearFromJD(jdTT)) / 1e6);
+        return d === null ? moonDistanceKm : d / 1000;
+      },
       getEccentricityBase: () => C.moonReference.moonOrbitalEccentricityBase,
       deltaTSeconds: /** @param {number} jd */ (jd) => (jdTTFromUT(jd) - jd) * 86400,
       jdToSIyear: yearFromJD,

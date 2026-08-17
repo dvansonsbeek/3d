@@ -3913,7 +3913,23 @@ const _moonSeries = (() => {
           argsAt: _moonArgsAt,
           eFactorForD: (d, T, T2) => _fwEFactor(j2000JD + d, T, T2),
           eFactorAtJdTT: (jdTT, T, T2) => _fwEFactor(jdTT, T, T2),
-          getMoonDistanceKm: () => moonDistance,
+          // 20.3d(i): the Driver-1 ratio at the EVALUATED epoch — the pure
+          // per-jd evaluator (matched with tools-lib and the package
+          // getters), replacing the mutable-global read whose value
+          // depended on when the render loop last synced the epoch (the
+          // eclipse tools navigate synchronously and never trigger the
+          // per-frame setEpoch, so button runs silently used the
+          // pre-button epoch). Deep-time OFF keeps the global (J2000
+          // parity). Bit-equal to the global at year 2000.
+          getMoonDistanceKm: (jdTT) => {
+            if (!DEEP_TIME_MODE_ENABLED || jdTT === undefined) return moonDistance;
+            // SI-linear year + corrected start anchor — MATCHED TRIPLE with
+            // tools-lib and the package (bit-identical age arithmetic; the
+            // calendar year here would trip the recorded linear-vs-calendar
+            // mirror trap).
+            const dKm = meanMoonDistanceAtAge((startmodelyearwithCorrection - _jdToSIyear(jdTT)) / 1e6);
+            return dKm === null ? moonDistance : dKm;
+          },
           getEccentricityBase: () => moonOrbitalEccentricityBase,
           deltaTSeconds: (jd) => _eclDeltaT(jd),
           jdToSIyear: (jd) => _jdToSIyear(jd),
