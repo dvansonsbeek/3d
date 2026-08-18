@@ -182,6 +182,19 @@ function _moonArgsM() {
         cyclesBetween: DTmod.cyclesBetweenYears,
         isDeepTime: () => DEEP_TIME_ENABLED,
         isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
+        // (d′) of-date rate completion — MATCHED TRIPLE with model.js and
+        // the browser: dynamical (tweakpane day-form) + kinematic beats.
+        pDynDegPerYearAt: /** @param {number} year */ (year) => {
+          const sid = DTmod.computeSiderealYearDaysDirect(year);
+          const sol = DTmod.computeSolarYearDaysDirect(year);
+          return 360 * (sid - sol) / sid;
+        },
+        pKinDegPerYearAt: /** @param {number} year */ (year) => {
+          const t = (C.startmodelYear - year) / 1e6;
+          const sid = DTmod.meanSiderealYearSecondsAtAge(t);
+          const trop = DTmod.meanTropicalYearSecondsAtAge(t);
+          return (sid === null || trop === null) ? 0 : 360 * (sid - trop) / sid;
+        },
       },
     });
   }

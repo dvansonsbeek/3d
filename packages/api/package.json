@@ -1,6 +1,6 @@
 {
   "name": "@essrt/api",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Service surface over the assembled ESSRT model (@essrt/physics createModel) — §7a + Phase 16. One handler, two transports: HTTP (node:http) and MCP (stdio). Build-only until the hosting decision; zero runtime dependencies by design.",
   "type": "module",

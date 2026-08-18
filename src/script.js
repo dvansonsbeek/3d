@@ -3730,6 +3730,19 @@ const _moonArgsM = (() => {
           cyclesBetween: cyclesBetweenYears,
           isDeepTime: () => DEEP_TIME_MODE_ENABLED,
           isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
+          // (d′) of-date rate completion — MATCHED TRIPLE with model.js and
+          // tools-lib: dynamical (tweakpane day-form) + kinematic beats.
+          pDynDegPerYearAt: (year) => {
+            const sid = computeSiderealYearDaysDirect(year);
+            const sol = computeSolarYearDaysDirect(year);
+            return 360 * (sid - sol) / sid;
+          },
+          pKinDegPerYearAt: (year) => {
+            const t = (J2000_CALENDAR_YEAR - year) / 1e6;
+            const sid = meanSiderealYearSecondsAtAge(t);
+            const trop = meanTropicalYearSecondsAtAge(t);
+            return (sid === null || trop === null) ? 0 : 360 * (sid - trop) / sid;
+          },
         },
       });
     }

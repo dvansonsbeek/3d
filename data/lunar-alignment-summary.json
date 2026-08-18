@@ -11,11 +11,11 @@
     "unmatchedModel": 6,
     "unmatchedCanon": 0,
     "typeAgree": 1447,
-    "meanAbsResidualMinutes": 8.511,
-    "meanAbsResidualMinutesFull": 8.511486897437736,
-    "rmsResidualMinutes": 9.815,
-    "rmsResidualMinutesFull": 9.814596706587052,
-    "maxAbsResidualMinutes": 19.379
+    "meanAbsResidualMinutes": 8.517,
+    "meanAbsResidualMinutesFull": 8.516823391359427,
+    "rmsResidualMinutes": 9.823,
+    "rmsResidualMinutesFull": 9.82259129560331,
+    "maxAbsResidualMinutes": 19.293
   },
   "visibility": {
     "entriesChecked": 14,
@@ -42,7 +42,7 @@
       {
         "label": "2024 Sep 18 Partial",
         "bestInsideCity": "Kansas City",
-        "bestInsideAltitudeDeg": 25,
+        "bestInsideAltitudeDeg": 24.99,
         "insideVisible": true,
         "outsideCity": "Delhi",
         "outsideVisible": false
@@ -58,7 +58,7 @@
       {
         "label": "2023 Oct 28 Partial",
         "bestInsideCity": "Nairobi",
-        "bestInsideAltitudeDeg": 70.33,
+        "bestInsideAltitudeDeg": 70.32,
         "insideVisible": true,
         "outsideCity": "Kansas City",
         "outsideVisible": false
@@ -66,7 +66,7 @@
       {
         "label": "2023 May 5 Penumbral",
         "bestInsideCity": "Delhi",
-        "bestInsideAltitudeDeg": 41.03,
+        "bestInsideAltitudeDeg": 41.02,
         "insideVisible": true,
         "outsideCity": "Berlin",
         "outsideVisible": false
@@ -82,7 +82,7 @@
       {
         "label": "2022 May 16 Total",
         "bestInsideCity": "Kansas City",
-        "bestInsideAltitudeDeg": 25.29,
+        "bestInsideAltitudeDeg": 25.28,
         "insideVisible": true,
         "outsideCity": "Delhi",
         "outsideVisible": false
@@ -98,7 +98,7 @@
       {
         "label": "2021 May 26 Total",
         "bestInsideCity": "Sydney",
-        "bestInsideAltitudeDeg": 53.03,
+        "bestInsideAltitudeDeg": 53.02,
         "insideVisible": true,
         "outsideCity": "Berlin",
         "outsideVisible": false
@@ -122,7 +122,7 @@
       {
         "label": "2020 Jun 5 Penumbral",
         "bestInsideCity": "Nairobi",
-        "bestInsideAltitudeDeg": 50.85,
+        "bestInsideAltitudeDeg": 50.84,
         "insideVisible": true,
         "outsideCity": "Kansas City",
         "outsideVisible": false
@@ -141,11 +141,11 @@
     "found": true,
     "type": "Partial",
     "canonType": "Partial",
-    "magnitudeUmbral": 0.9006,
+    "magnitudeUmbral": 0.9107,
     "canonMagnitudeUmbral": 0.9199,
-    "ttResidualMinutes": -11.52,
+    "ttResidualMinutes": -1.97,
     "visibleFromBabylon": true,
-    "babylonMoonAltitudeDeg": 36.39
+    "babylonMoonAltitudeDeg": 34.38
   },
   "dtBands": {
     "overall": {
@@ -280,27 +280,27 @@
   },
   "theoryDrift": {
     "binHalfWidthYears": 40,
-    "modernBaselineMinutes": 0.38,
+    "modernBaselineMinutes": 0.7,
     "bins": {
       "100": {
         "n": 196,
-        "signedMeanMinutes": -5.01
+        "signedMeanMinutes": -0.13
       },
       "500": {
         "n": 201,
-        "signedMeanMinutes": -2.88
+        "signedMeanMinutes": 0.24
       },
       "1000": {
         "n": 191,
-        "signedMeanMinutes": -1.52
+        "signedMeanMinutes": 0.15
       },
       "1500": {
         "n": 180,
-        "signedMeanMinutes": -0.41
+        "signedMeanMinutes": 0.3
       },
       "1800": {
         "n": 202,
-        "signedMeanMinutes": 0.42
+        "signedMeanMinutes": 0.69
       },
       "2000": {
         "n": 183,
@@ -308,55 +308,55 @@
       },
       "-750": {
         "n": 190,
-        "signedMeanMinutes": -13.04
+        "signedMeanMinutes": -2.16
       },
       "-650": {
         "n": 204,
-        "signedMeanMinutes": -11.23
+        "signedMeanMinutes": -1.3
       },
       "-550": {
-        "n": 203,
-        "signedMeanMinutes": -10.98
+        "n": 204,
+        "signedMeanMinutes": -1.95
       },
       "-450": {
         "n": 192,
-        "signedMeanMinutes": -9.8
+        "signedMeanMinutes": -1.45
       },
       "-350": {
-        "n": 185,
-        "signedMeanMinutes": -8.42
+        "n": 186,
+        "signedMeanMinutes": -0.94
       },
       "-250": {
         "n": 183,
-        "signedMeanMinutes": -8.48
+        "signedMeanMinutes": -1.61
       },
       "-100": {
         "n": 201,
-        "signedMeanMinutes": -6.38
+        "signedMeanMinutes": -0.43
       }
     },
     "driftVsModernMinutes": {
-      "100": -5.39,
-      "500": -3.26,
-      "1000": -1.9,
-      "1500": -0.79,
-      "1800": 0.04,
-      "2000": 0.74,
-      "-750": -13.42,
-      "-650": -11.61,
-      "-550": -11.36,
-      "-450": -10.18,
-      "-350": -8.8,
-      "-250": -8.86,
-      "-100": -6.76
+      "100": -0.83,
+      "500": -0.46,
+      "1000": -0.55,
+      "1500": -0.4,
+      "1800": -0.01,
+      "2000": 0.42,
+      "-750": -2.86,
+      "-650": -2,
+      "-550": -2.65,
+      "-450": -2.15,
+      "-350": -1.64,
+      "-250": -2.31,
+      "-100": -1.13
     },
-    "effectiveDeltaNdotArcsecPerCy2": 1.08,
+    "effectiveDeltaNdotArcsecPerCy2": 0.23,
     "predictedReducedResidualMinutes": {
-      "-800": 11,
-      "-700": 5,
-      "-600": 4.8,
-      "-500": -1.2,
-      "-400": -5
+      "-800": 0.5,
+      "-700": -4.6,
+      "-600": -3.9,
+      "-500": -9.2,
+      "-400": -12.2
     }
   },
   "inputs": {
@@ -367,16 +367,16 @@
       "data/rspa20160404supp2/Table-S12.txt": "sha256:f8f24b020db4af857c184cc164212e07d5109efda2a9c6da7551130022f1abc6",
       "data/rspa20160404supp2/Table-S13.txt": "sha256:515a56e47aeec316f35f509ab699187a3ed8f0b220ad131c34133ec34dddc7ce",
       "data/rspa20160404supp2/Table-S14.txt": "sha256:67485e0c349f5c2e7ec3aa4f7952e93832fc1d6728f4bd8f4bfbcd26f7c6a6e6",
-      "packages/api/src/app.js": "sha256:ff000985ebbc76b672e90309b76ec8c21ec0809f1007d016a4742fb519c207aa",
+      "packages/api/src/app.js": "sha256:3d65beb6339fc0cc6c936e40041442430d223bd9fcedfa9c02078137aca0992e",
       "packages/physics/src/eclipse/finders.cjs": "sha256:9603c94c13524b419bbdf7feaf79822ea4089d68c50d32a4886049b0536be4b0",
       "packages/physics/src/moon/apparent.cjs": "sha256:fba578d19fa107d66cb6b655a56b5d81b4b11219ab88296022abd9379f53df37",
       "packages/physics/src/moon/series.cjs": "sha256:d8bdbefbbbefec74f168c7d87ff58cdb758abf8d23476c8b59addbe46335d0cf",
-      "public/input/fitted-coefficients.json": "sha256:4afc9fff426f08850302acaaab92755a84de51af12e33e3479e0d36908af0fe1",
+      "public/input/fitted-coefficients.json": "sha256:ab49affba70d8ce680ffa124d7385f6fcbf97ad038f12c5a9aec66bb6c7ef306",
       "public/input/lunar-eclipses-documented.json": "sha256:586806e4f83c3f0ebd2d5afefce41c19664d8fa24023b7a9e0f79b7c8a668558",
       "public/input/lunar-eclipses-historical.json": "sha256:81dd0c83007eb899abeb97b0b987ae2d128d0e7ec4356622c7d15ed8175ad6c1",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
-      "public/input/model-parameters.json": "sha256:9427dc915ab0b9b91b692d1f365a6ceabd008af532b095ce8e1e3e1248e05e93",
+      "public/input/model-parameters.json": "sha256:15fa564ec017b86ff41794bde8bde1d0ece49ccb945c9504f369b926a1087664",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
       "tools/verify/lunar-alignment.js": "sha256:d76f1f5fb9367f748fd237800086de7ff60f40e7f5a22bcc0cc7c8927a5bfb78"
     }

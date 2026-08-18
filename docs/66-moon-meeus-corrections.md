@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v11.0
-coefficients: sha256:bf011174cdd73175
+coefficients: sha256:17f2ead87bad401e
 status: current
 ---
 
@@ -161,6 +161,55 @@ classical constant:
   note: with the derived H/3 line's own ë (−3.7e-8) the channel T³ flips
   sign — the Meeus literal embodies the SECULAR-theory ë, the same
   documented divergence as the BCE drift-meter rows.
+  The always-chains deep branch carries the same secular-ë convention
+  through a THIRD carrier, `lpSecularCompletion`:
+  `K_PL · ∫₀ᵀ [½·Δ(e²)″·t′² + ⅙·(e²)‴_sec·t′³] · env(t′) dt′` with
+  Δ(e²)″ = the secular-Taylor curvature minus the H/3 line's own (both
+  from existing constants — zero new values) and env = a cos² taper on
+  the H/12 quarter period (≈ 279 cy ≈ the ~100-kyr eccentricity
+  eigenbeat quarter, where the local secular Taylor decorrelates).
+  Without it the chains lose exactly the tail — measured as a
+  +0.91″/cy² Lp secular gap vs the certified snapshot over T = −27..0
+  cy, closing exactly as +0.68 tail (quadratic-aliased over the span)
+  + 0.22 the channel's own curvature + 0.03 integrator convention
+  (`tools/explore/u2-args-branch-isolation.mjs`,
+  `u2-lp-decomposition.mjs`) — and the tail is empirically ×1.0 of
+  Meeus: a 300-epoch DE441 fit with periodic regressors reads
+  canon−DE441 2c = +0.11 ± 0.13″/cy² (`u2-dense-de441.mjs`; 19-epoch
+  probes alias at the ±0.7″/cy² level). The completion is zero through
+  T² by construction (modern era: ULP-class), and saturates beyond the
+  taper — the frozen offset is the honest statement of the multi-mode
+  e(t) divergence, not a claim of zero.
+  The of-date RATES are completed the same way (the rate-completion
+  pair in `fwArgsDeep`): (i) `pFix = ∫(p_dyn − p_kin) dy` on Lp —
+  p_dyn is the DYNAMICAL axial precession, the day-form beat of the
+  sidereal/solar year evaluators (the tweakpane identity: 25,771.1 yr
+  at J2000 ≈ IAU, epoch-valid at any age; exposed as
+  `model.epoch.axialPrecessionYearsAtYear`); p_kin is the kinematic
+  pair's beat the chains embed (≡ the H/13 lattice mean by
+  construction, Δp = 0.044″/yr at J2000 — visible in the tropical
+  month as a 0.006 s offset from the certified-implied period).
+  Natively BOUNDED at deep time (p_dyn oscillates about the lattice
+  mean); two-tier cumulative table, frozen beyond ±1 Myr. Its
+  in-window ṗΔ·T²/2 (the model-native precession acceleration,
+  0.658″/cy² — 60% of Lieske's) is REMOVED from the obliquity-carrier
+  normalization so the total Lp T² stays the certified,
+  DE441-validated budget: the model-vs-Lieske ṗ difference lives in
+  one visible derived term. (ii) SELF-MEASURED residual rate anchors
+  on all five of-date compositions (±25-yr central difference of the
+  raw compositions vs the certified bundle rates at build; timeline
+  conversion measured from the injected jdToSIyear — the chains'
+  construction residues against the model's own catalog inputs),
+  applied through the H/12 cos² taper — full in the historical window,
+  frozen ≤ ~0.9° at deep time. ϖ/Ω deliberately do NOT carry pFix:
+  their chains' own curvature is already certified-consistent, and
+  pFix there double-counts the acceleration (measured −1.5″/cy²).
+  Certified state of the completed deep branch: the isolation reads
+  ≤0.06″/cy linears and ≤0.18″/cy² quadratics on ALL five arguments;
+  dense-DE441 reads deep ≡ canon in const/linear/quadratic; at the
+  −135 eclipse instant deep−canon = +8.9″, with the residual vs DE441
+  there being the certified skeleton's OWN periodic scatter (56–73″
+  RMS class) — a series-accuracy question, not an argument one.
   The same laboratory derives the top-20 longitude amplitudes at
   100.0 ± 0.1% and the apsidal/nodal precession periods from the sidereal
   month plus solar parameters alone — the three Moon inputs are not
@@ -186,7 +235,16 @@ classical constant:
   27.32→29.42 d at +500 Myr), and the Meeus-polynomial fallback clamps its
   T²/T³/T⁴ tails at |T| ≤ 100 cy — unclamped, the fitted T⁴ tail cancels
   the lunar mean motion at year ≈ 1,989,000 and reverses it beyond. The
-  scene Moon is prograde at every epoch out to ±1 Gyr by construction.
+  secular-ë completion carrier saturates at its taper edge (±28 kyr) to a
+  frozen Lp offset of −17.5° (past) / +7.0° (future) — bounded by
+  construction, so no polynomial reaches deep time and the H-lattice
+  claim is untouched. The (d′) rate completion is likewise bounded: the
+  pFix table freezes beyond ±1 Myr (the beat integral is
+  bounded-oscillating by the lattice-mean claim), the five rate anchors
+  freeze at the H/12 taper edge (≤ ~0.9°), and Mp/F inherit Lp's
+  bounded pFix oscillation uncancelled at deep time (physically p-free
+  arguments; display-class). The scene Moon is prograde at every epoch
+  out to ±1 Gyr by construction.
 
 Certified references of the framework-native default (fully-derived e_E
 line): argument drift vs Meeus M′ +0.37° at −135 / +0.58° at −584 with

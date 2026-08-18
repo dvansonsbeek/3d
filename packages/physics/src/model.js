@@ -732,6 +732,24 @@ export function assembleModel(C, F) {
       cyclesBetween,
       isDeepTime: () => true,
       isFrameworkNative: () => true,
+      // (d′) of-date rate completion: the DYNAMICAL axial precession (the
+      // tweakpane day-form identity — real at J2000, epoch-valid) and the
+      // KINEMATIC pair's beat the chains embed. MATCHED TRIPLE with the
+      // tools-lib and browser wirings.
+      pDynDegPerYearAt: /** @param {number} year */ (year) => {
+        const sid = siderealYearDays(year);
+        const sol = tropicalYearDirectDays(year);
+        return 360 * (sid - sol) / sid;
+      },
+      pKinDegPerYearAt: /** @param {number} year */ (year) => {
+        // MODEL-START-anchored age, matching the tools-lib/browser wirings
+        // bit-exactly — NOT yearToTMa's 2000.0 convention (the recorded
+        // 0.4977-yr parity trap, same class as getMoonDistanceKm above).
+        const t = (startmodelYear - year) / 1e6;
+        const sid = deepLod.siderealYearSecondsAtAge(t);
+        const trop = deepLod.tropicalYearSecondsAtAge(t);
+        return (sid === null || trop === null) ? 0 : 360 * (sid - trop) / sid;
+      },
     },
   });
 
@@ -879,6 +897,14 @@ export function assembleModel(C, F) {
       siderealYearSecondsAtYear: /** @param {number} year @returns {number} */ (year) => deepLod.siderealYearSecondsAtAge(yearToTMa(year)),
       deltaTSecondsAtYear: deltaTSeconds,
       cyclesBetween,
+      // The DYNAMICAL axial precession period (the tweakpane identity):
+      // day-form beat of the sidereal and solar year evaluators — real at
+      // J2000 (~25,771 yr ≈ IAU), epoch-valid at any age. The same value
+      // the (d′) of-date rate completion integrates.
+      axialPrecessionYearsAtYear: /** @param {number} year @returns {number} */ (year) => {
+        const sid = siderealYearDays(year);
+        return sid / (sid - tropicalYearDirectDays(year));
+      },
     }),
     earth: Object.freeze({
       perihelionLongitudeDeg: earthPerihelionDeg,

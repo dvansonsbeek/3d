@@ -64,7 +64,7 @@ const PLANET_ACCURACY = Object.freeze({
   reference: 'JPL Horizons, 1800–2200 AD',
 });
 
-const EPOCH_SECTIONS = Object.freeze(['h', 'lod', 'alpha', 'deltaT', 'siderealYearSeconds', 'moonDistanceKm']);
+const EPOCH_SECTIONS = Object.freeze(['h', 'lod', 'alpha', 'deltaT', 'siderealYearSeconds', 'moonDistanceKm', 'axialPrecessionYears']);
 const CARDINAL_TYPES = Object.freeze(['SS', 'WS', 'VE', 'AE']);
 
 /** Eclipse search: kinds and the per-request window cap (the finder scans
@@ -117,6 +117,10 @@ export function createApi() {
     if (sections.includes('deltaT')) rec.deltaTSeconds = model.epoch.deltaTSecondsAtYear(year);
     if (sections.includes('siderealYearSeconds')) rec.siderealYearSeconds = model.epoch.siderealYearSecondsAtYear(year);
     if (sections.includes('moonDistanceKm')) rec.moonDistanceKm = model.epoch.moonDistanceKmAtYear(year);
+    // The DYNAMICAL axial precession period (day-form sidereal/solar-year
+    // beat — real at J2000, epoch-valid); the LATTICE identity H/13 lives
+    // in /v1/derivations as the structural mean.
+    if (sections.includes('axialPrecessionYears')) rec.axialPrecessionYears = model.epoch.axialPrecessionYearsAtYear(year);
     return rec;
   };
 
