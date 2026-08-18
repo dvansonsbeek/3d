@@ -53283,6 +53283,35 @@ function updateSunlightForPlanet(planetMesh, pad = 1.1) {
   sun.planetObj.getWorldPosition(_sunWS);
   planetMesh   .getWorldPosition(_planetWS);
 
+  /* 1b. 20.3i series-aligned shadow light (Earth only): the VISIBLE
+   * umbra/penumbra must land where the model's certified umbra chain
+   * says. The scaffold sun's of-date declination is arcsec-class
+   * modern but ~360″ off at −135 (see _applySolarAberration) — so the
+   * shadow-map light takes the series-built geocentric sun DIRECTION
+   * (same λ + ε construction, geometric — pairing with the geometric
+   * visible Moon pivot; the ~20″ aberration common-mode of the
+   * measurement chain is a documented visual-chain limit, tens of km
+   * of umbra, sub-disc). The rendered Sun sphere stays scaffold-placed
+   * (≤0.1° apart at deep antiquity — not visible); other look-at
+   * bodies keep the scaffold light. */
+  if (planetMesh === earth.planetObj) {
+    const _jdL = jdFromPos(pos);
+    if (Number.isFinite(_jdL)) {
+      const lamS = _eclSunLon(_jdL) * Math.PI / 180;
+      const eps = computeObliquityEarth(2000 + (_jdL - 2451545.0) / 365.25) * Math.PI / 180;
+      const decS = Math.asin(Math.sin(eps) * Math.sin(lamS));
+      const raS = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
+      const rS = _sunWS.distanceTo(_planetWS);
+      earth.rotationAxis.getWorldQuaternion(_sceneUmbraQuat);
+      _sceneUmbraLocal.set(
+        rS * Math.cos(decS) * Math.sin(raS),
+        rS * Math.sin(decS),
+        rS * Math.cos(decS) * Math.cos(raS),
+      ).applyQuaternion(_sceneUmbraQuat);
+      _sunWS.copy(_planetWS).add(_sceneUmbraLocal);
+    }
+  }
+
   /* 2. move the light to the Sun & aim at planet ----------------- */
   sunLight.position.copy(_sunWS);
   sunLight.target.position.copy(_planetWS);
