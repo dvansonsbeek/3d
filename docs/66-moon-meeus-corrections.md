@@ -253,13 +253,14 @@ timing), with in-window rows at zero (the legacy pure-ICRF comparison
 drifts +1.4°/century). NASA full-canon recall 99.58 / tight-window 74.62 /
 type 98.66 (model event total 12,070 vs NASA's 12,064; all mismatch
 samples knife-edge at the γ ≈ 1.0/1.5 boundaries); 26-event historical
-audit split 1 confirmed · 11 off-peak · 5 regional · 0 ΔT-signal ·
-9 geographic (an umbra-centerline distance class, not visibility — the
-penumbra can still cover these sites; post-§10g batch: the
-quadrature-locked joint sidebands + the symmetric divisor set moved the
-solar longitudes by tens of km at the umbra, flipping −647 over the
-1000-km gate at 1014 km and moving −708 Lu State 1002 → 1055 km — both
-remain boundary-class; the pre-§10g split was 6 regional · 8 geographic);
+audit split 2 confirmed · 14 off-peak · 5 regional · 0 ΔT-signal ·
+5 geographic (an umbra-centerline distance class, not visibility — the
+penumbra can still cover these sites; under the series-injected umbra
+chain + the deep-branch secular completions the entire first-hand
+ancient corpus is off-peak class — Lu 51 km, Nabonidus 99, Nineveh 168,
+Thales 215, Babylon −135 223 — and the remaining geographic five are
+the four adjudicated Said-Stephenson Cairo attributions plus the −647
+early-diary partial; prior batch splits live in git history);
 timed Babylonian lunar corpus (Almagest records, reduced via
 local astronomy only — no external ΔT, no eclipse canon): non-deep
 skeleton mean +3 min / RMS 36 min (statistically identical to conventional
@@ -813,43 +814,36 @@ probe (worst 0.25 km):
    latitude; NASA paths are geodetic on WGS84 (0.19°·sin 2φ ≈ 20 km at
    mid-latitudes). One attributed constant
    (`earthFlatteningInverseWGS84`).
-4. **The Sun dec-channel law** — measured against 144 JPL apparent
-   points spanning 1970–2049 (decadal structure at 0.8″ RMS, era-split
-   proven constant): `dDec = 16.6″·sin φ + (1.0 − 4.9·cos Ω)″·cos φ`,
-   where φ is the Sun's azimuth from the axis-tilt direction (the
-   solstitial colure — FRAME-INVARIANT: the two engines' world frames
-   differ by ~68° of yaw, and the twin-parity gate rejected the
-   frame-dependent first form) and Ω is the model's own lunar node —
-   the cos Ω term is the derived-nutation driver
-   (`derive-nutation-torque-integration.js` recovers the IAU 1980
-   amplitudes at 100.3%/100.1% from the framework torque law with
-   zero new constants).
-5. **The Sun longitude law** (round 3) — the λ twin of the dec law,
-   measured against 960 JPL apparent-Sun points 1970–2049 through the
-   frame-invariant recipe (L = φ + 90°; the mean-vs-true equinox frame
-   column separated cleanly at coefficient −1.004, validating the
-   harness): `dλ = 6.72 − 0.84·sin L + 3.64·sin 2L − 0.46·cos 2L`
-   arcsec, applied as a rotation about the ecliptic pole by −dλ.
-   Era-split proven on the shipped terms (sin 2L: 3.77 vs 3.52, const:
-   6.53 vs 6.88 across 1970–2009 / 2010–2049); the era-UNSTABLE cos L
-   term (−1.7 → +4.6) is deliberately not shipped. Same
-   observationally-defined class as the dec law; source attribution is
-   the banked follow-up.
+4. **The series-injected Sun** — the symmetric cure to the Moon
+   override: the geocentric sun vector is rebuilt from the certified
+   of-date sun longitude (the shared finders' evaluator, the same one
+   the Besselian tier rides) in the rotationAxis equatorial frame,
+   placed exactly like the Moon override (dec = asin(sin ε sin λ),
+   ra = atan2(cos ε sin λ, cos λ); distance keeps the scaffold value —
+   the shadow DIRECTION is the accuracy carrier; NOT bridged by
+   deltaTStart: the scene rides the raw-curve clock, and bridging
+   measured 8.9″ → 10.3″ on the centerlines). This RETIRED the two
+   modern-measured calibration-law families that previously corrected
+   the scaffold sun (the solstitial dec law with its node term, and
+   the round-3 λ law): they were arcsec-class stand-ins for the
+   of-date truth at modern epochs whose unattributed layer phases
+   grew to ~360″ of declination at −135 — the whole ancient
+   cross-track umbra miss (measured: scene-vs-tier 2,018 km → 20 km
+   at the −135 instant with the injection; the retired laws and their
+   measurement records live in git history).
 
 Round 3 also replaced the scalar shadow-plane metric with the exact
 one: the VECTOR projection of the surface chord onto the plane
 perpendicular to the sun direction (the true axis separation —
 `ground × sin alt` is exact only for gaps along the sun azimuth and
 understated the oblique 2026 gap by ~2.7×). Under this honest metric
-the five events read **~12″/5.4″/5.5″/5.2″/5.2″** (2024, 2023
-held-out, 2026, 2017, 1999 held-out; recorded values live in the
-gate artifact) — mean ~6.7″, from 88 km pre-stack. The along-track
-attribution is closed: the residual is the framework−JPL ELONGATION
-error measured at each instant (agreement within ~3″ at every event).
-What remains: 2024's Moon-side per-event scatter (the syzygy λ
-residual exceeds the 2.5″ all-phase RMS at that event), a consistent
-~−4.5″ cross-track bias, and reference precision — the path to ~2–3″
-runs through the Moon's syzygy-specific terms, which is also why the
+and the series-injected Sun the scoreboard reads mean **8.9″** / max
+16.2″ across the five reference events (2026 low-sun at 1.3″; the
+recorded per-point values are the generated `centerlines` section of
+the gate artifact) — from 88 km pre-stack, with ZERO fitted sun
+constants remaining in the chain. The path to ~2–3″ runs through the
+Moon's syzygy-specific terms and the certified series' own residual
+class vs the numerical ephemerides (20.3h), which is also why the
 in-repo ELP/MPP02 series lift stays BANKED (it would buy ~2″).
 
 This scoreboard is machine-owned, not prose: the `centerlines` section

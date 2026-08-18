@@ -47,6 +47,35 @@ const path = require('path');
 const SG = require(path.join(__dirname, '../lib/scene-graph.js'));
 const DT = require(path.join(__dirname, '../lib/deep-time.js'));
 const C = require(path.join(__dirname, '../lib/constants.js'));
+const OE = require(path.join(__dirname, '../lib/orbital-engine.js'));
+const { createEclipseFinders } = require('@essrt/physics/eclipse/finders');
+
+// 20.3i series-injected Sun: the shared finders' of-date sun longitude —
+// the SAME evaluator the Besselian tier and the eclipse finders ride
+// (wired like tools/verify/eclipse-audit.js).
+const _MS = SG._moonSeriesForProbe();
+const _AR_JSON = JSON.parse(require('fs').readFileSync(
+  path.join(__dirname, '../../public/input/astro-reference.json'), 'utf8'));
+const _BD = _AR_JSON.bodyDiametersKm;
+// NOTE (measured): the Besselian tier bridges its finder-axis input by
+// deltaTStart (bodiesAt); the SCENE's Moon rides the raw-curve clock, so
+// the injected sun must NOT be bridged — bridging degraded the modern
+// centerlines 8.9″ → 10.3″ (clock consistency beats tier mimicry here).
+const _finders = createEclipseFinders({
+  moonLonDegAt: (jd) => _MS.truncatedLonDeg(jd),
+  moonBetaDegAt: (jd) => _MS.truncatedBetaDeg(jd),
+  moonDistanceKmAt: (jd) => _MS.truncatedDistanceKm(jd),
+  deltaTSecondsAt: (jd) => DT.frameworkDeltaT(jd),
+  getSynodicMonthDays: () => C.moonSynodicMonth,
+  getSunDistanceKm: () => C.currentAUDistance,
+  constants: {
+    rEarthMetres: (_BD.earth / 2) * 1000,
+    moonDiameterKm: _BD.moon,
+    sunDiameterKm: _BD.sun,
+    j2000JD: C.j2000JD,
+    julianCenturyDays: C.julianCenturyDays,
+  },
+});
 
 const EARTH_DIAMETER_KM = C.EARTH_DIAMETER_KM; // single source: astro-reference bodyDiametersKm.earth
 const SI_TROPICAL_YEAR_DAYS = (C.meanSolarYearDays * C.meanLengthOfDay) / 86400;
@@ -100,7 +129,27 @@ function umbraFromSceneAtJdNode(jd) {
   const th = res.ra, ph = res.dec;
   const vLocal = [r * Math.sin(ph) * Math.sin(th), r * Math.cos(ph), r * Math.sin(ph) * Math.cos(th)];
   const moonGeo = apply(R, vLocal);
-  const sunGeo = [sun[0] - earth[0], sun[1] - earth[1], sun[2] - earth[2]];
+  // 20.3i: SERIES-INJECTED SUN — the symmetric cure to the Moon override.
+  // The scaffold sun rides the scene's of-date layer composition, whose
+  // unattributed phase offsets are arcsec-class modern (the retired dec/λ
+  // calibration laws below) but grow to ~360″ of dec at −135 (measured:
+  // the scene-vs-tier reconciliation probes — the whole ancient
+  // cross-track miss). Rebuild the geocentric sun vector from the
+  // certified of-date sun longitude (the shared finders' sunLonDegAt —
+  // the same evaluator the Besselian tier uses) in the rotAxis
+  // equatorial frame, placed exactly like the Moon override:
+  // dec = asin(sin ε sin λ), ra = atan2(cos ε sin λ, cos λ). Distance
+  // keeps the scaffold value (the shadow DIRECTION is the accuracy
+  // carrier). MATCHED PAIR with src/script.js _applySolarAberration.
+  const sunGeoRaw = [sun[0] - earth[0], sun[1] - earth[1], sun[2] - earth[2]];
+  const sunGeo = (() => {
+    const lamS = _finders.sunLonDegAt(jd) * Math.PI / 180;
+    const eps = OE.computeObliquityEarth(2000 + (jd - 2451545.0) / 365.25) * Math.PI / 180;
+    const dec = Math.asin(Math.sin(eps) * Math.sin(lamS));
+    const ra = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
+    const rS = Math.hypot(sunGeoRaw[0], sunGeoRaw[1], sunGeoRaw[2]);
+    return apply(R, [rS * Math.cos(dec) * Math.sin(ra), rS * Math.sin(dec), rS * Math.cos(dec) * Math.cos(ra)]);
+  })();
 
   // B1 (generalized in round 3): ANNUAL ABERRATION FOR BOTH BODIES. The
   // observer-velocity (v/c) apparent shift is DISTANCE-INDEPENDENT and
@@ -132,64 +181,10 @@ function umbraFromSceneAtJdNode(jd) {
     rotY(moonGeo, aS * Math.cos(lamM - lamS) / Math.cos(betM));
   }
 
-  // 20.3c: the solstitial-axis plane tilt — the scene sun's ecliptic
-  // latitude sits 20.0″·cos λ BELOW the true apparent sun (measured against
-  // JPL over 120 points spanning 2000–2049; CONSTANT across the two
-  // 25-year halves at −19.9″/−20.0″ — a calibration-class layer-phase
-  // offset, not secular drift; node on the solstitial axis, matching the
-  // scene's solstice-anchor construction). This single term IS the
-  // seasonal relative-dec error at eclipses (+13.6″ Apr / −22″ Aug).
-  // Applied by rebuilding the vector from corrected ecliptic angles.
-  // MEASUREMENT-CALIBRATED constant (observationally-defined class);
-  // source attribution in the of-date layer phases is the banked follow-up.
-  {
-    const rr = Math.hypot(sunGeo[0], sunGeo[1], sunGeo[2]);
-    const lamW = Math.atan2(sunGeo[0], sunGeo[2]);
-    const bet = Math.asin(sunGeo[1] / rr);
-    // World-frame law, measured over 1970–2049 (144 JPL points, decadal
-    // structure at 0.8″ RMS): scene sun DEC − truth =
-    //   [−7.2″ + 4.8″·cosΩ]·sin(λw) + 15.2″·cos(λw)
-    // The cosΩ oscillation rides the model's OWN lunar node (the derived
-    // nutation driver; projection factor measured); the two constants are
-    // frame-calibration class (80-year-stable, era-split proven).
-    // FRAME-INVARIANT argument: sun azimuth relative to the axis-tilt
-    // direction (the solstitial colure) — each engine computes it in its
-    // own world frame; the twin-parity gate caught the frame-dependent
-    // first form (the engines' world yaws differ by ~68° by construction).
-    const om = (C.NUTATION_LEADING_TERMS_ARCSEC.omegaNodeJ2000Deg
-      - 360 * (jd - 2451545.0) / C.moonNodalPrecessionDaysEarth) * (Math.PI / 180);
-    const axAz = Math.atan2(R[0][1], R[2][1]);   // axis dir = R column 2 (x,z)
-    const phi = lamW - axAz;
-    const dDecLaw = 16.6 * Math.sin(phi) + (1.0 - 4.9 * Math.cos(om)) * Math.cos(phi);
-    const dBet = -(dDecLaw / 3600) * (Math.PI / 180);
-    const b2 = bet + dBet;
-    const scale = Math.cos(b2) / Math.cos(bet);
-    sunGeo[0] *= scale; sunGeo[2] *= scale;
-    sunGeo[1] = rr * Math.sin(b2);
-  }
-
-  // Round-3 Sun LONGITUDE law — the λ twin of the dec law. Measured against
-  // 960 JPL apparent-Sun points 1970–2049 through the frame-invariant
-  // recipe (L = φ + 90°, φ the solstitial-colure angle; the mean-vs-true
-  // equinox frame column separated cleanly at coefficient −1.004):
-  //   dλ = 6.72 − 0.84·sin L + 3.64·sin 2L − 0.46·cos 2L   (arcsec)
-  // Era-split proven on the shipped terms (sin2L 3.77/3.52, const
-  // 6.53/6.88 across 1970–2009 vs 2010–2049); the era-UNSTABLE cosL term
-  // (−1.7 → +4.6) is deliberately not shipped. Applied as a rotation about
-  // the ecliptic pole by −dλ. Same observationally-defined class as the
-  // dec law; source attribution is the banked follow-up. MATCHED PAIR with
-  // src/script.js.
-  {
-    const lamW = Math.atan2(sunGeo[0], sunGeo[2]);
-    const axAz = Math.atan2(R[0][1], R[2][1]);
-    const L = lamW - axAz + Math.PI / 2;
-    const dLam = 6.72 - 0.84 * Math.sin(L) + 3.64 * Math.sin(2 * L) - 0.46 * Math.cos(2 * L);
-    const a = -(dLam / 3600) * (Math.PI / 180);
-    const c0 = Math.cos(a), s0 = Math.sin(a);
-    const x = c0 * sunGeo[0] + s0 * sunGeo[2];
-    sunGeo[2] = -s0 * sunGeo[0] + c0 * sunGeo[2];
-    sunGeo[0] = x;
-  }
+  // (The 20.3c solstitial dec law and the round-3 λ law — modern-measured
+  // calibrations of the SCAFFOLD sun against JPL — are RETIRED by the
+  // series injection above: it supplies directly the of-date truth those
+  // laws approximated, at every epoch. MATCHED PAIR with src/script.js.)
 
   let d = [moonGeo[0] - sunGeo[0], moonGeo[1] - sunGeo[1], moonGeo[2] - sunGeo[2]];
   const dl = Math.hypot(d[0], d[1], d[2]);

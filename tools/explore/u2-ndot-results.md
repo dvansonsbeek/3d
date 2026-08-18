@@ -62,11 +62,15 @@ DE441 in const/linear/quadratic; **deep−canon at the −135 instant =
   reproduced exactly**, max 12.4 → 12.0; canonGeometry 1450/1450
   matched, mean-abs 8.52 min; modern fixtures moved 1–2 ULP (2000) /
   1.4e-4″ (2024); full 19-step chain green.
-- **P7 (ancient audit rows improve)** — Babylon bestGap 1,411 →
-  **1,269 km**: improved, NOT tier-class (≤~300 km). As pre-registered,
-  P7 was conditioned on the PARALLEL scene ground-mapping fix, which
-  has not run — the audit metric is scene-side; the physics tier
-  (local circumstances, required-ΔT) improved as above.
+- **P7 (ancient audit rows improve)** — PASS with the pre-registered
+  parallel scene fix landed (the series-injected Sun): Babylon bestGap
+  1,411 → **223 km** (tier-class, verdict off-peak), and the whole
+  first-hand ancient corpus reclassified — Lu 51 km, Nabonidus 99,
+  Nineveh 168, Thales 215; audit-26 geographic class 9 → 5 (the
+  remaining five are the adjudicated Cairo second-hand set + the −647
+  early-diary partial). Scene ≡ tier at ~20 km at the −135 instant;
+  the retired scaffold-sun calibration laws are recorded in doc 66 §
+  the umbra stack.
 
 ## Falsification clauses
 
@@ -84,9 +88,12 @@ DE441 in const/linear/quadratic; **deep−canon at the −135 instant =
 The model-owned ancient-era lunar secular is CLOSED, measured three
 independent ways (argument isolation, dense DE441, the −135 instant),
 with the modern era invariant and every gate green. The frozen numeric
-bands written from the single-cause model scored: 3 pass / 2 near-miss
-/ 2 miss-with-measured-attribution — the misses are the pre-registered
+bands written from the single-cause model scored: 4 pass (P1 substance,
+P3, P4, P6, plus P7 once the pre-registered parallel scene fix landed)
+/ 2 near-miss (P5) / 1 miss-with-measured-attribution (P2) — the
+misses are the pre-registered
 error model's incompleteness (canon's own residual; instrument noise
-wider than band), each now measured and named, not absorbed. Remaining,
-outside this campaign: the canon-vs-DE441 series class (20.3h), and the
-scene ground-mapping reconciliation (P7's blocker).
+wider than band), each now measured and named, not absorbed. The
+parallel scene ground-mapping reconciliation landed (the
+series-injected Sun; P7 above), completing the campaign's scope.
+Remaining, outside it: the canon-vs-DE441 series class (20.3h).

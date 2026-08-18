@@ -45385,6 +45385,36 @@ const _sceneUmbraQuatInv = new THREE.Quaternion();
  *  RA at 2024-04-08 18:42). MATCHED PAIR with
  *  tools/explore/umbra-scene-node-twin.js — change both or neither. */
 function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
+  // 20.3i: SERIES-INJECTED SUN — the symmetric cure to the Moon override.
+  // The scaffold sun rides the scene's of-date layer composition, whose
+  // unattributed phase offsets are arcsec-class modern (the retired dec/λ
+  // calibration laws below) but grow to ~360″ of dec at −135 — the whole
+  // ancient cross-track umbra miss (measured: the scene-vs-tier
+  // reconciliation probes; scene−tier 2,018 km → 20 km at −135 with the
+  // injection). Rebuild the geocentric sun vector from the certified
+  // of-date sun longitude (_eclSunLon — the shared finders evaluator the
+  // Besselian tier uses) in the rotationAxis equatorial frame, placed
+  // exactly like the Moon override: dec = asin(sin ε sin λ),
+  // ra = atan2(cos ε sin λ, cos λ). Distance keeps the scaffold value
+  // (the shadow DIRECTION is the accuracy carrier). MATCHED PAIR with
+  // tools/explore/umbra-scene-node-twin.js — change both or neither.
+  {
+    // NOTE (measured): NOT bridged by deltaTStart — the scene Moon rides
+    // the raw-curve clock; bridging the sun degraded the modern
+    // centerlines 8.9″ → 10.3″ (clock consistency beats tier mimicry).
+    const lamS = _eclSunLon(jd) * Math.PI / 180;
+    const eps = computeObliquityEarth(2000 + (jd - 2451545.0) / 365.25) * Math.PI / 180;
+    const decS = Math.asin(Math.sin(eps) * Math.sin(lamS));
+    const raS = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
+    const rS = sunGeoVec.length();
+    earth.rotationAxis.getWorldQuaternion(_sceneUmbraQuat);
+    _sceneUmbraLocal.set(
+      rS * Math.cos(decS) * Math.sin(raS),
+      rS * Math.sin(decS),
+      rS * Math.cos(decS) * Math.cos(raS),
+    ).applyQuaternion(_sceneUmbraQuat);
+    sunGeoVec.copy(_sceneUmbraLocal);
+  }
   // B1 generalized (round 3): ANNUAL ABERRATION FOR BOTH BODIES. The
   // observer-velocity (v/c) apparent shift is distance-independent:
   // Δλ = −(κ/r)·cos(λ_body − λ_sun)/cos β, a rotation about the ecliptic
@@ -45410,40 +45440,10 @@ function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
     moonGeoVec.z = -sM * moonGeoVec.x + cM * moonGeoVec.z;
     moonGeoVec.x = xM;
   }
-  // The sun dec-channel law (measured 1970–2049, 144 JPL points, decadal
-  // structure 0.8″ RMS): scene sun DEC − truth =
-  //   [−7.2″ + 4.8″·cosΩ]·sin(λw) + 15.2″·cos(λw)
-  // cosΩ rides the model's own lunar node (the derived nutation driver);
-  // the constants are frame-calibration class, 80-year-stable. MATCHED
-  // PAIR with tools/explore/umbra-scene-node-twin.js.
-  const N = K.physicalConstants.nutationLeadingTermsArcsec;
-  const om = (N.omegaNodeJ2000Deg - 360 * (jd - 2451545.0) /
-    moonNodalPrecessionindaysEarth) * (Math.PI / 180);
-  // FRAME-INVARIANT argument (matched pair with the twin): sun azimuth
-  // relative to the axis-tilt direction (the solstitial colure).
-  earth.planetObj.getWorldQuaternion(_sceneUmbraQuat);
-  _sceneUmbraLocal.set(0, 1, 0).applyQuaternion(_sceneUmbraQuat);
-  const axAz = Math.atan2(_sceneUmbraLocal.x, _sceneUmbraLocal.z);
-  const phi = Math.atan2(sunGeoVec.x, sunGeoVec.z) - axAz;
-  const dDecLaw = 16.6 * Math.sin(phi) + (1.0 - 4.9 * Math.cos(om)) * Math.cos(phi);
-  const rr = sunGeoVec.length();
-  const bet = Math.asin(sunGeoVec.y / rr);
-  const b2 = bet - (dDecLaw / 3600) * (Math.PI / 180);
-  const scale = Math.cos(b2) / Math.cos(bet);
-  sunGeoVec.x *= scale; sunGeoVec.z *= scale;
-  sunGeoVec.y = rr * Math.sin(b2);
-  // Round-3 Sun LONGITUDE law — the λ twin of the dec law (960 JPL
-  // apparent-Sun points 1970–2049, frame-invariant argument L = φ + 90°;
-  // era-split proven on the shipped terms, the era-unstable cosL term is
-  // deliberately not shipped). Applied as a rotation about the ecliptic
-  // pole by −dλ. MATCHED PAIR with the twin.
-  const L = Math.atan2(sunGeoVec.x, sunGeoVec.z) - axAz + Math.PI / 2;
-  const dLam = 6.72 - 0.84 * Math.sin(L) + 3.64 * Math.sin(2 * L) - 0.46 * Math.cos(2 * L);
-  const aL = -(dLam / 3600) * (Math.PI / 180);
-  const cL = Math.cos(aL), sL = Math.sin(aL);
-  const xL = cL * sunGeoVec.x + sL * sunGeoVec.z;
-  sunGeoVec.z = -sL * sunGeoVec.x + cL * sunGeoVec.z;
-  sunGeoVec.x = xL;
+  // (The 20.3c solstitial dec law and the round-3 λ law — modern-measured
+  // calibrations of the SCAFFOLD sun against JPL — are RETIRED by the
+  // series injection above: it supplies directly the of-date truth those
+  // laws approximated, at every epoch. MATCHED PAIR with the twin.)
 }
 
 function umbraFromSceneAtJd(jd) {
