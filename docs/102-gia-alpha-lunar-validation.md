@@ -520,6 +520,41 @@ re-derived (`--rebaseline`, a conscious re-measurement) whenever the
 lunar arguments change; prior states live in git history. The Phase C
 re-reduction measures against this column as pinned.
 
+### The Phase C verdict — the re-reduction has run
+
+The differential contact-time re-reduction (the gate's `phaseC`
+section; per observation `ΔT_re = ΔT_obs + (TT_greatest_ours −
+TT_greatest_canon)` — the raw tablet time and the shadow-enlargement
+convention cancel identically) identifies **69 of 75** Babylonian
+timed observations (S01/S02/S04, −800..−301; 4 via the ±1-yr calendar
+straddle; one 16-min three-way ambiguity and one no-night-candidate
+drop). Century statistic: the MEDIAN with MAD-derived standard error —
+measured rationale: within-century pairs of high-Stephenson-weight
+tablets can contradict each other beyond LOD-continuity (the −593 w10
+vs −587 w6 pair implies a −2,700 ms/day mean LOD offset over six
+years), so weights must not concentrate a century into one tablet.
+
+| Century | measured median ± SE (min) | pre-registered (min) | z |
+|---|---:|---:|---:|
+| -800…-701 | +13.4 ± 39.8 | +0.5 | +0.3 |
+| -700…-601 | −20.7 ± 8.7 | −4.6 | −1.9 |
+| -600…-501 | −10.6 ± 6.1 | −3.9 | −1.1 |
+| -500…-401 | −20.0 ± 14.3 | −9.2 | −0.8 |
+| -400…-301 | −10.4 ± 2.7 | −12.2 | +0.7 |
+
+**χ² = 5.8 over 5 centuries** (5.8/5 median-primary; 3.7/5 under
+Stephenson weights — consistent under both estimators), with no
+common offset across centuries (−1.0 ± 2.3 min). The re-reduced
+tablet corpus is statistically consistent with the column that was
+pinned before the machinery existed: **the framework's dLOD/dt stack
+survives its pre-registered falsification test.** Stated limits: the
+−800 bin is unconstraining (n = 2); the column itself is first-order
+(the bin-offset and moonrise-conversion caveats above); the test's
+discriminating power is minutes-scale — the S05–S09 dense-target
+programme through this same machinery is the planned power upgrade.
+S02 (−225..−79) lies outside the pinned window and remains available
+as a future extension of the measured curve.
+
 ### Remaining medieval residual — brief preview
 
 Years 1000-1200 CE show the model slightly overshooting observations

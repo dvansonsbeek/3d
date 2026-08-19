@@ -127,7 +127,11 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   and the measured framework-vs-ELP lunar-theory drift
   (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.23<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time
-  machinery exists — [doc 102 §per-century convergence](102-gia-alpha-lunar-validation.md).
+  machinery existed — and now MEASURED against it: the Phase C
+  differential re-reduction (69/75 Babylonian observations identified)
+  is statistically consistent with the pinned column, χ² = 5.8 over 5
+  centuries with no common offset — the dLOD/dt stack survives its
+  falsification test — [doc 102 §Phase C verdict](102-gia-alpha-lunar-validation.md).
 
 ## D. The honesty ledger — what does NOT validate, asserted anyway
 

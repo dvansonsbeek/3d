@@ -412,8 +412,114 @@ async function main() {
     predictedReducedResidualMinutes,
   };
 
+  // ── Section 8: Phase C — the differential contact-time re-reduction ──────
+  // The pre-registered falsification test (plan §12i item 1). Per Babylonian
+  // timed observation (S01/S02/S04, −800..−301): identify the canon eclipse
+  // (year ± the Babylonian calendar straddle; night at Babylon at the implied
+  // UT), then DT_re = DT_obs + (frameworkTT − canonTT) — the raw tablet time
+  // and the shadow-enlargement convention cancel identically. Century
+  // statistic: the MEDIAN with MAD-derived SE (measured rationale: high-
+  // weight tablet pairs can contradict each other beyond LOD-continuity —
+  // −593 w10 vs −587 w6 imply −2,700 ms/day over 6 yr — so weights must not
+  // concentrate a century into one tablet; the median's SE also measured
+  // tighter). Identification tolerance 15 min = half the per-event scatter
+  // floor (the mis-ID-insensitivity property: both candidates' differentials
+  // move together). Compared against the PRE-REGISTERED column, snapshotted
+  // here from the same recorded artifact — never re-derived for comparison.
+  // Development record: tools/explore/phase-c-rereduction-{poc,hardened}.mjs.
+  const D2R = Math.PI / 180;
+  const pcObs = steph.entries.filter((e) =>
+    /^S0[124]$/.test(e.source_table) && e.year >= -800 && e.year <= -301 && e.dt_observed_sec != null);
+  const pcGmst = (jd) => {
+    const T = (jd - 2451545.0) / 36525;
+    return ((280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T) % 360 + 360) % 360;
+  };
+  const pcSunAlt = (jdUT) => {
+    const lam = model.eclipse.sunLonDegAtJD(jdUT) * D2R;
+    const eps = model.earth.obliquityDeg(model.time.yearFromJD(jdUT)) * D2R;
+    const ra = Math.atan2(Math.sin(lam) * Math.cos(eps), Math.cos(lam));
+    const dec = Math.asin(Math.sin(lam) * Math.sin(eps));
+    const H = ((pcGmst(jdUT) + 44.4) * D2R) - ra;
+    return Math.asin(Math.sin(32.5 * D2R) * Math.sin(dec) + Math.cos(32.5 * D2R) * Math.cos(dec) * Math.cos(H)) / D2R;
+  };
+  const pcCanonByYear = new Map();
+  for (const c of canon.entries) {
+    const m = /^(-?\d+)/.exec(c.date);
+    if (!m) continue;
+    const y = parseInt(m[1], 10);
+    if (!pcCanonByYear.has(y)) pcCanonByYear.set(y, []);
+    pcCanonByYear.get(y).push(c);
+  }
+  const pcVisible = (year, dtObs) => (pcCanonByYear.get(year) || [])
+    .filter((c) => c.type_nasa !== 'N')
+    .filter((c) => pcSunAlt(c.jd_TD - dtObs / 86400) < 0);
+  const pcShift = (c) => {
+    const evs = model.eclipse.findLunarInRange(c.jd_TD - 20, c.jd_TD + 20);
+    let best = null, bestD = 2;
+    for (const ev of evs) {
+      const evTT = ev.jd + model.eclipse.deltaTSecondsAtJD(ev.jd) / 86400;
+      const d = Math.abs(evTT - c.jd_TD);
+      if (d < bestD) { best = evTT; bestD = d; }
+    }
+    return best === null ? null : (best - c.jd_TD) * 86400;
+  };
+  let pcIdentified = 0, pcStraddled = 0, pcAmbiguous = 0, pcDropped = 0;
+  /** @type {Array<{year: number, residReMin: number}>} */
+  const pcRows = [];
+  for (const obs of pcObs) {
+    const w = obs.weight === null || obs.weight === undefined ? 1 : obs.weight;
+    if (w === 0) continue;
+    let cands = pcVisible(obs.year, obs.dt_observed_sec);
+    if (cands.length === 0) {
+      cands = [...pcVisible(obs.year - 1, obs.dt_observed_sec), ...pcVisible(obs.year + 1, obs.dt_observed_sec)];
+      if (cands.length > 0) pcStraddled += 1;
+    }
+    const shifts = cands.map(pcShift).filter((s) => s !== null);
+    if (shifts.length === 0) { pcDropped += 1; continue; }
+    const spread = Math.max(...shifts) - Math.min(...shifts);
+    if (shifts.length > 1 && spread > 900) { pcAmbiguous += 1; continue; }
+    pcIdentified += 1;
+    const shiftSec = shifts.reduce((s, v) => s + v, 0) / shifts.length;
+    const fwSec = DT.meanDeltaTSecondsAtAge((2000 - obs.year) / 1e6);
+    pcRows.push({ year: obs.year, residReMin: (fwSec - (obs.dt_observed_sec + shiftSec)) / 60 });
+  }
+  /** @type {Record<string, {n: number, medianMinutes: number, seMinutes: number, preRegisteredMinutes: number | null, z: number | null}>} */
+  const pcPerCentury = {};
+  let pcChi2 = 0, pcChiN = 0;
+  const pcCents = {};
+  for (const r of pcRows) {
+    const c = String(Math.floor(r.year / 100) * 100);
+    (pcCents[c] ?? (pcCents[c] = [])).push(r.residReMin);
+  }
+  for (const cent of Object.keys(pcCents).sort((a, b) => Number(a) - Number(b))) {
+    const vals = pcCents[cent].slice().sort((a, b) => a - b);
+    const med = vals[Math.floor(vals.length / 2)];
+    const mad = vals.map((x) => Math.abs(x - med)).sort((a, b) => a - b)[Math.floor(vals.length / 2)];
+    const se = 1.4826 * mad / Math.sqrt(vals.length);
+    const p = predictedReducedResidualMinutes[cent];
+    const z = (p !== undefined && se > 0) ? (med - p) / se : null;
+    if (z !== null) { pcChi2 += z * z; pcChiN += 1; }
+    pcPerCentury[cent] = {
+      n: vals.length,
+      medianMinutes: Math.round(med * 10) / 10,
+      seMinutes: Math.round(se * 10) / 10,
+      preRegisteredMinutes: p !== undefined ? p : null,
+      z: z !== null ? Math.round(z * 10) / 10 : null,
+    };
+  }
+  const phaseC = {
+    window: 'S01/S02/S04, years −800..−301, weight>0 (null=1)',
+    identified: pcIdentified,
+    viaYearStraddle: pcStraddled,
+    ambiguous: pcAmbiguous,
+    dropped: pcDropped,
+    perCentury: pcPerCentury,
+    chi2: Math.round(pcChi2 * 10) / 10,
+    chi2Centuries: pcChiN,
+  };
+
   const computed = {
-    _description: 'Lunar-eclipse alignment summary — GENERATED by tools/verify/lunar-alignment.js --write. canonGeometry: model lunar finder vs the NASA 5-Millennium Canon 1600-2200 on the TT AXIS (isolates lunar geometry from the deltaT model, which eclipse-audit L-5b tests on the UT axis). visibility: documented visibility regions vs the shipped api observer tier (geometric horizon at maximum eclipse; deep-inside-region cities). babylon746: the -746 Feb 6 Babylonian partial eclipse anchor. dtBands: the Stephenson-2016 raw-timing reductions (their reduction of the primary timings, weights not applied) vs the framework deltaT curve and the published Stephenson spline, per source table. A plain run recomputes and FAILS on divergence from this file; --write refuses on divergence; --write --rebaseline is the conscious re-measurement path.',
+    _description: 'Lunar-eclipse alignment summary — GENERATED by tools/verify/lunar-alignment.js --write. canonGeometry: model lunar finder vs the NASA 5-Millennium Canon 1600-2200 on the TT AXIS (isolates lunar geometry from the deltaT model, which eclipse-audit L-5b tests on the UT axis). visibility: documented visibility regions vs the shipped api observer tier (geometric horizon at maximum eclipse; deep-inside-region cities). babylon746: the -746 Feb 6 Babylonian partial eclipse anchor. dtBands: the Stephenson-2016 raw-timing reductions (their reduction of the primary timings, weights not applied) vs the framework deltaT curve and the published Stephenson spline, per source table. phaseC: the differential contact-time re-reduction (the pre-registered falsification test) — per-century MEDIAN re-reduced residuals ± MAD-SE vs the pre-registered column, χ² over the covered centuries. A plain run recomputes and FAILS on divergence from this file; --write refuses on divergence; --write --rebaseline is the conscious re-measurement path.',
     canonGeometry,
     visibility,
     babylon746,
@@ -421,6 +527,7 @@ async function main() {
     dtBounds,
     dtBandsByCentury,
     theoryDrift,
+    phaseC,
     inputs: buildInputsBlock('node tools/verify/lunar-alignment.js --write', INPUT_FILES),
   };
 
@@ -444,6 +551,12 @@ async function main() {
   }
   console.log('  theoryDrift: baseline %s min | -750 drift %s min | effective Δṅ %s ″/cy²',
     theoryDrift.modernBaselineMinutes, driftMinutes['-750'], effectiveDeltaNdot);
+  console.log('  phaseC: identified %d (%d straddle) | ambiguous %d | dropped %d | χ² %s/%d',
+    phaseC.identified, phaseC.viaYearStraddle, phaseC.ambiguous, phaseC.dropped, phaseC.chi2, phaseC.chi2Centuries);
+  for (const [cent, v] of Object.entries(phaseC.perCentury)) {
+    console.log('  phaseC %s: n=%d | median %s ± %s min | pre-reg %s | z %s',
+      cent, v.n, v.medianMinutes, v.seMinutes, v.preRegisteredMinutes, v.z);
+  }
   console.log('  pre-registered re-reduction residuals (min):',
     Object.entries(predictedReducedResidualMinutes).map(([c, v]) => `${c}: ${v}`).join(' | '));
 
