@@ -146,6 +146,9 @@ jobs:
   # so the Chromium download is cached independently of the fast checks above.
   browser:
     runs-on: ubuntu-latest
+    # Belt-and-braces against infra hangs (the 6-hour default once burned
+    # 2.5 h on an apt-mirror flake): the whole job comfortably fits here.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -158,6 +161,7 @@ jobs:
         run: npm ci
 
       - name: Cache Chromium
+        id: pw-cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
@@ -166,7 +170,14 @@ jobs:
       # SwiftShader supplies the GL context. `new THREE.WebGLRenderer(...)` sits
       # at module scope (src/script.js:12486), so the page cannot load without
       # one — jsdom is not an option.
+      #
+      # Cache HIT → skip the install entirely: `--with-deps` runs apt against
+      # the Azure mirrors, which flake into multi-hour hangs (measured twice).
+      # Cache MISS → install, but time-boxed to 15 min so a mirror hang fails
+      # fast and retriably instead of burning the 6-hour job limit.
       - name: Install Chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 15
         run: npx playwright install --with-deps chromium
 
       - name: Build simulator
