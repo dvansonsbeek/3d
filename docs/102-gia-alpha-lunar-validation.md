@@ -577,9 +577,49 @@ for Hallstatt this stands in open tension with the canon-based
 ablation above, which validated it — different dataset, different
 centuries; recorded as tension, not verdict). Residual structure
 remains at full-stack χ²/dof ≈ 3.4 (e.g. −400 at −627 ± 162 s) —
-the "tune or extend the stack" question is now legitimately open,
-to be decided by data as a deliberate follow-up, with the
-out-of-sample cost stated whenever eclipse targets enter any fit.
+characterized in the next section: it is not Earth rotation, and
+the stack stays as shipped.
+
+### The residual structure is not Earth rotation — the stack stays
+
+The "tune or extend the stack" question the χ²/dof ≈ 3.4 opened has
+a measured answer (`tools/explore/dense-targets-residual-structure.mjs`,
+same 244-row corpus and machinery as the gate): **neither** — no cycle
+is added, removed, or retuned.
+
+**Attribution.** The framework curve and Stephenson's own 2016 spline
+agree to −6..−103 s at every century midpoint, yet *both* miss the
+timed-lunar observations by the same −1,200..+500 s century medians
+(e.g. −300: fw −1,222 vs spline −1,175). Stephenson's solution misfits
+the timed subset of his own corpus the same way — his spline rides the
+solar and untimed constraints. Whatever the structure is, it is not a
+defect of either ΔT curve.
+
+**Two physical vetoes.** (1) *LOD-continuity*: the century medians
+swing −1,198 → −627 → −1,222 s across −500/−400/−300. A real ΔT cannot
+do that — it would require ~16 ms/day LOD excursions flipping sign
+century to century. The same test that adjudicates individual tablets
+kills the ensemble structure. (2) *The LOD-amplitude bound*: the
+weighted lattice periodogram's best tone (a broad band around
+8H/2300 ≈ 1,165 yr, amplitude 430 s, Δχ² 22) implies a **6.4 ms** LOD
+amplitude — above the ~4 ms millennial bound that already excluded
+mid-period closing cycles. The best candidate "new cycle" is
+disqualified by the model's own standing bound.
+
+The residual structure is therefore **observation-class systematics**
+— per-era/per-source reduction conventions in the timed corpus — with
+a century-correlated noise floor of roughly ±600 s. A naive
+shape-regression against the shipped cycles exposes the same thing:
+the corpus "wants" Hallstatt ×3.8 and the Joses ×4–5 (instantly
+unphysical — they would smash the LOD bound), which reclassifies its
+resonator coefficient (k = −0.65 ± 0.19, nominally "scale down") as
+the same noise-class artifact rather than evidence. The ablation
+validations above (resonator, Bond) stand: shape *necessity* across
+many centuries is robust to century-correlated systematics in a way
+amplitude-tuning is not. Future gains in this corpus come from
+per-source-group reduction modeling (S07 per-row lunar/solar typing,
+S02's ziqpu-star timing class, per-era offsets), not from the ΔT
+stack.
 
 ### Remaining medieval residual — brief preview
 
