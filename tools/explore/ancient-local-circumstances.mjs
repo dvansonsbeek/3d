@@ -18,7 +18,10 @@
 // Day-side pre-filter: the site must be within 100 deg of the sub-solar
 // point at greatest (an eclipse is only observable on the day side).
 //
-// FIRST-RUN RESULTS (the Cairo-cluster resolution + the −135 date answer):
+// FIRST-RUN RESULTS (pre-ṅ-closure stack; the current shipped-stack
+// values live in docs/107-ancient-record-review.md — the adjudications
+// below all held, and Thucydides' near-tie flipped marginally to the
+// traditional −430):
 //  · Cairo 993 + 1004 (Ibn Yunus first-hand): deep partials at the
 //    traditional dates, mag 0.961 / 0.989 — CONSISTENT with records of
 //    measured partial phases; their audit "geographic" class was the

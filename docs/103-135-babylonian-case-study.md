@@ -314,6 +314,7 @@ geometry the physics tier does.
 ## Cross-references
 
 - [Doc 102 — GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) — L1-orbital-coupled α(t) GIA formulation, 4-flag lattice stack, L-5b lunar and L-7 solar validation infrastructure
+- [Doc 107 — Ancient-record review](107-ancient-record-review.md) — the identification adjudication of the audit's ancient rows (the Cairo cluster, the Lu ganzhi filter, the multi-candidate date scans this case study's ±25-yr scan belongs to)
 - [Doc 66 — Moon Meeus corrections](66-moon-meeus-corrections.md) — polynomial accuracy table across lunar theories at antiquity
 - [IP-framework-native-sun-ecliptic-longitude.md](hidden/IP-framework-native-sun-ecliptic-longitude.md) — framework's Sun formula, Section 7 dual-mechanism prediction, Stage 4 antiquity-fit proposal
 - Diary attribution: Stephenson & Steele 2006 *JHA*; Sachs & Hunger *ADART* Vol. III; Huber & De Meis 2004, *Babylonian Eclipse Observations from 750 BC to 1 BC*
