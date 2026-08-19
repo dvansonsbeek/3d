@@ -518,6 +518,109 @@ async function main() {
     chi2Centuries: pcChiN,
   };
 
+  // ── Section 9: denseTargets — the full timed corpus + cycle ablation ─────
+  // Plan §12i item 3: S01/S02/S04 (Babylon) + S05 (Chinese, Luoyang) +
+  // S09 (Arab, Baghdad), −800..+1280, through the same differential
+  // machinery (sites screen visibility only — the differential is
+  // site-free). S07 EXCLUDED: its rows mix lunar and solar without a type
+  // marker (the 364 trio is Theon's SOLAR eclipse) — re-admission requires
+  // per-row typing. Q1: per-century median ± MAD-SE vs the full framework
+  // curve — the density goal (σ ≤ 140–220 s) is met in the dense
+  // centuries. Q2: out-of-sample cycle discrimination — χ² = Σ(median/SE)²
+  // over centuries with n ≥ 5, for the full stack, each cycle removed, and
+  // no cycles. Development record: tools/explore/dense-targets-s05-s09.mjs.
+  const DT_SITES = {
+    S01: { lat: 32.5, lon: 44.4 }, S02: { lat: 32.5, lon: 44.4 },
+    S04: { lat: 32.5, lon: 44.4 }, S05: { lat: 34.7, lon: 112.5 },
+    S09: { lat: 33.3, lon: 44.4 },
+  };
+  const dtSunAlt = (jdUT, site) => {
+    const lam = model.eclipse.sunLonDegAtJD(jdUT) * D2R;
+    const eps = model.earth.obliquityDeg(model.time.yearFromJD(jdUT)) * D2R;
+    const ra = Math.atan2(Math.sin(lam) * Math.cos(eps), Math.cos(lam));
+    const dec = Math.asin(Math.sin(lam) * Math.sin(eps));
+    const H = ((pcGmst(jdUT) + site.lon) * D2R) - ra;
+    return Math.asin(Math.sin(site.lat * D2R) * Math.sin(dec) + Math.cos(site.lat * D2R) * Math.cos(dec) * Math.cos(H)) / D2R;
+  };
+  const dtVisible = (year, dtObs, site) => (pcCanonByYear.get(year) || [])
+    .filter((c) => c.type_nasa !== 'N')
+    .filter((c) => dtSunAlt(c.jd_TD - dtObs / 86400, site) < 0);
+  const dtObsSet = steph.entries.filter((e) =>
+    /^S0[12459]$/.test(e.source_table) && e.dt_observed_sec != null);
+  let dtIdentified = 0, dtStraddled = 0, dtAmbiguous = 0, dtDropped = 0, dtW0 = 0;
+  /** @type {Array<{year: number, residSec: number}>} */
+  const dtRows = [];
+  for (const obs of dtObsSet) {
+    const w = obs.weight === null || obs.weight === undefined ? 1 : obs.weight;
+    if (w === 0) { dtW0 += 1; continue; }
+    const site = DT_SITES[obs.source_table];
+    let cands = dtVisible(obs.year, obs.dt_observed_sec, site);
+    if (cands.length === 0) {
+      cands = [...dtVisible(obs.year - 1, obs.dt_observed_sec, site),
+               ...dtVisible(obs.year + 1, obs.dt_observed_sec, site)];
+      if (cands.length > 0) dtStraddled += 1;
+    }
+    const shifts = cands.map(pcShift).filter((s) => s !== null);
+    if (shifts.length === 0) { dtDropped += 1; continue; }
+    const spread = Math.max(...shifts) - Math.min(...shifts);
+    if (shifts.length > 1 && spread > 900) { dtAmbiguous += 1; continue; }
+    dtIdentified += 1;
+    const shiftSec = shifts.reduce((s, v) => s + v, 0) / shifts.length;
+    const fwSec = DT.meanDeltaTSecondsAtAge((2000 - obs.year) / 1e6);
+    dtRows.push({ year: obs.year, residSec: fwSec - (obs.dt_observed_sec + shiftSec) });
+  }
+  const DT_CYCLES = {
+    bond: DT.bondCycleDeltaTCorrection,
+    hallstatt: DT.hallstattCycleDeltaTCorrection,
+    jose5: DT.jose5CycleDeltaTCorrection,
+    jose4: DT.jose4CycleDeltaTCorrection,
+    resonator: DT.resonatorSwingDeltaTCorrection,
+  };
+  const dtCents = {};
+  for (const r of dtRows) {
+    const c = String(Math.floor(r.year / 100) * 100);
+    (dtCents[c] ?? (dtCents[c] = [])).push(r);
+  }
+  /** @param {number[]} vals */
+  const dtStats = (vals) => {
+    const v = vals.slice().sort((a, b) => a - b);
+    const med = v[Math.floor(v.length / 2)];
+    const mad = v.map((x) => Math.abs(x - med)).sort((a, b) => a - b)[Math.floor(v.length / 2)];
+    return { med, se: 1.4826 * mad / Math.sqrt(v.length), n: v.length };
+  };
+  /** @type {Record<string, {n: number, medianSeconds: number, seSeconds: number}>} */
+  const dtPerCentury = {};
+  for (const c of Object.keys(dtCents).sort((a, b) => Number(a) - Number(b))) {
+    const { med, se, n } = dtStats(dtCents[c].map((r) => r.residSec));
+    dtPerCentury[c] = { n, medianSeconds: Math.round(med), seSeconds: Math.round(se) };
+  }
+  const dtUsable = Object.keys(dtCents).filter((c) => dtCents[c].length >= 5);
+  /** @param {Array<(y: number) => number>} removeFns */
+  const dtChi2 = (removeFns) => {
+    let chi2 = 0;
+    for (const c of dtUsable) {
+      const vals = dtCents[c].map((r) => r.residSec - removeFns.reduce((s, f) => s + f(r.year), 0));
+      const { med, se } = dtStats(vals);
+      if (se > 0) chi2 += (med / se) ** 2;
+    }
+    return Math.round(chi2 * 10) / 10;
+  };
+  /** @type {Record<string, number>} */
+  const ablationChi2 = { fullStack: dtChi2([]) };
+  for (const [name, fn] of Object.entries(DT_CYCLES)) ablationChi2['minus_' + name] = dtChi2([fn]);
+  ablationChi2.noCycles = dtChi2(Object.values(DT_CYCLES));
+  const denseTargets = {
+    window: 'S01/S02/S04/S05/S09, years −800..+1280, weight>0 (null=1); S07 excluded (unmarked lunar/solar mix)',
+    identified: dtIdentified,
+    viaYearStraddle: dtStraddled,
+    ambiguous: dtAmbiguous,
+    dropped: dtDropped,
+    weightZeroExcluded: dtW0,
+    perCentury: dtPerCentury,
+    chi2CenturiesUsed: dtUsable.sort((a, b) => Number(a) - Number(b)),
+    ablationChi2,
+  };
+
   const computed = {
     _description: 'Lunar-eclipse alignment summary — GENERATED by tools/verify/lunar-alignment.js --write. canonGeometry: model lunar finder vs the NASA 5-Millennium Canon 1600-2200 on the TT AXIS (isolates lunar geometry from the deltaT model, which eclipse-audit L-5b tests on the UT axis). visibility: documented visibility regions vs the shipped api observer tier (geometric horizon at maximum eclipse; deep-inside-region cities). babylon746: the -746 Feb 6 Babylonian partial eclipse anchor. dtBands: the Stephenson-2016 raw-timing reductions (their reduction of the primary timings, weights not applied) vs the framework deltaT curve and the published Stephenson spline, per source table. phaseC: the differential contact-time re-reduction (the pre-registered falsification test) — per-century MEDIAN re-reduced residuals ± MAD-SE vs the pre-registered column, χ² over the covered centuries. A plain run recomputes and FAILS on divergence from this file; --write refuses on divergence; --write --rebaseline is the conscious re-measurement path.',
     canonGeometry,
@@ -528,6 +631,7 @@ async function main() {
     dtBandsByCentury,
     theoryDrift,
     phaseC,
+    denseTargets,
     inputs: buildInputsBlock('node tools/verify/lunar-alignment.js --write', INPUT_FILES),
   };
 
@@ -556,6 +660,12 @@ async function main() {
   for (const [cent, v] of Object.entries(phaseC.perCentury)) {
     console.log('  phaseC %s: n=%d | median %s ± %s min | pre-reg %s | z %s',
       cent, v.n, v.medianMinutes, v.seMinutes, v.preRegisteredMinutes, v.z);
+  }
+  console.log('  denseTargets: identified %d/%d (%d straddle, %d w0) | ablation χ²: full %s | noCycles %s',
+    denseTargets.identified, dtObsSet.length, denseTargets.viaYearStraddle, denseTargets.weightZeroExcluded,
+    ablationChi2.fullStack, ablationChi2.noCycles);
+  for (const [k, v] of Object.entries(ablationChi2)) {
+    if (k.startsWith('minus_')) console.log('  denseTargets ablation %s: χ² %s', k, v);
   }
   console.log('  pre-registered re-reduction residuals (min):',
     Object.entries(predictedReducedResidualMinutes).map(([c, v]) => `${c}: ${v}`).join(' | '));

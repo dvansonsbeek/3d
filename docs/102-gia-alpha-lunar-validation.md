@@ -555,6 +555,32 @@ programme through this same machinery is the planned power upgrade.
 S02 (−225..−79) lies outside the pinned window and remains available
 as a future extension of the measured curve.
 
+### The dense-target corpus — the record now discriminates the cycles
+
+The full timed corpus (the gate's `denseTargets` section:
+S01/S02/S04 Babylonian + S05 Chinese + S09 Arab, −800..+1280;
+S07 excluded pending per-row lunar/solar typing — the 364 trio is
+Theon's SOLAR eclipse) runs through the same differential machinery:
+**244 of 256 observations identified**, with per-century MAD-SEs
+reaching **124–215 s in the dense centuries** (+1000: ±124 s,
+n = 38; −400: ±162 s, n = 27) — below the cycle contributions
+(200–550 s), so the eclipse record genuinely discriminates the ΔT
+stack, out of sample (the cycle fit window is 1650–2017). The
+per-cycle ablation χ² (13 centuries with n ≥ 5): full stack 44.5;
+**minus resonator 129.6 and minus bond 63.8 — the Core-mantle swing
+and the Bond cycle are independently confirmed by the eclipse
+record**; no cycles 97.0 (the stack halves the misfit); minus
+jose5/hallstatt/jose4 = 43.4/41.7/40.3 — the Joses and Hallstatt
+receive no independent support from this corpus (for the Joses,
+consistent with their ~179-yr period averaging out in century bins;
+for Hallstatt this stands in open tension with the canon-based
+ablation above, which validated it — different dataset, different
+centuries; recorded as tension, not verdict). Residual structure
+remains at full-stack χ²/dof ≈ 3.4 (e.g. −400 at −627 ± 162 s) —
+the "tune or extend the stack" question is now legitimately open,
+to be decided by data as a deliberate follow-up, with the
+out-of-sample cost stated whenever eclipse targets enter any fit.
+
 ### Remaining medieval residual — brief preview
 
 Years 1000-1200 CE show the model slightly overshooting observations

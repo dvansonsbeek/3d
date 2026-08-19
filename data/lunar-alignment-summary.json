@@ -405,6 +405,115 @@
     "chi2": 5.8,
     "chi2Centuries": 5
   },
+  "denseTargets": {
+    "window": "S01/S02/S04/S05/S09, years −800..+1280, weight>0 (null=1); S07 excluded (unmarked lunar/solar mix)",
+    "identified": 244,
+    "viaYearStraddle": 10,
+    "ambiguous": 2,
+    "dropped": 1,
+    "weightZeroExcluded": 9,
+    "perCentury": {
+      "400": {
+        "n": 5,
+        "medianSeconds": -308,
+        "seSeconds": 425
+      },
+      "500": {
+        "n": 11,
+        "medianSeconds": -285,
+        "seSeconds": 200
+      },
+      "800": {
+        "n": 5,
+        "medianSeconds": 480,
+        "seSeconds": 289
+      },
+      "900": {
+        "n": 17,
+        "medianSeconds": -442,
+        "seSeconds": 244
+      },
+      "1000": {
+        "n": 38,
+        "medianSeconds": 142,
+        "seSeconds": 124
+      },
+      "1100": {
+        "n": 4,
+        "medianSeconds": 855,
+        "seSeconds": 236
+      },
+      "1200": {
+        "n": 17,
+        "medianSeconds": 397,
+        "seSeconds": 145
+      },
+      "-800": {
+        "n": 2,
+        "medianSeconds": 804,
+        "seSeconds": 2386
+      },
+      "-700": {
+        "n": 6,
+        "medianSeconds": -1244,
+        "seSeconds": 519
+      },
+      "-600": {
+        "n": 21,
+        "medianSeconds": -636,
+        "seSeconds": 363
+      },
+      "-500": {
+        "n": 13,
+        "medianSeconds": -1198,
+        "seSeconds": 857
+      },
+      "-400": {
+        "n": 27,
+        "medianSeconds": -627,
+        "seSeconds": 162
+      },
+      "-300": {
+        "n": 13,
+        "medianSeconds": -1222,
+        "seSeconds": 1176
+      },
+      "-200": {
+        "n": 50,
+        "medianSeconds": -41,
+        "seSeconds": 215
+      },
+      "-100": {
+        "n": 15,
+        "medianSeconds": 93,
+        "seSeconds": 375
+      }
+    },
+    "chi2CenturiesUsed": [
+      "-700",
+      "-600",
+      "-500",
+      "-400",
+      "-300",
+      "-200",
+      "-100",
+      "400",
+      "500",
+      "800",
+      "900",
+      "1000",
+      "1200"
+    ],
+    "ablationChi2": {
+      "fullStack": 44.5,
+      "minus_bond": 63.8,
+      "minus_hallstatt": 41.7,
+      "minus_jose5": 43.4,
+      "minus_jose4": 40.3,
+      "minus_resonator": 129.6,
+      "noCycles": 97
+    }
+  },
   "inputs": {
     "generator": "node tools/verify/lunar-alignment.js --write",
     "files": {
@@ -424,7 +533,7 @@
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/model-parameters.json": "sha256:15fa564ec017b86ff41794bde8bde1d0ece49ccb945c9504f369b926a1087664",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
-      "tools/verify/lunar-alignment.js": "sha256:845cc53ef99e0029df1fed3057c7e3f098eda30fe664f2d16044e029d7d0a7be"
+      "tools/verify/lunar-alignment.js": "sha256:13f43de1837ea86881ee8b9df4588fd679a53e4a155b12639e9c2dc69f4d016b"
     }
   }
 }
