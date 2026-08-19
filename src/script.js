@@ -24415,11 +24415,11 @@ const ECLIPSE_PRESETS = [
   { jd: 2173756.000111, label: '1239 Jun 3 Total',         loc: 'Tuscany — Cerchiari chronicle',           gamma: 0.325,  era: 'Medieval' },
   { jd: 2154000.058445, label: '1185 May 1 Annular',       loc: "Russia — Igor's Tale Primary Chronicle",  gamma: 0.541,  era: 'Medieval' },
   { jd: 2135100.002430, label: '1133 Aug 2 Total',         loc: 'England — King Henry I',                  gamma: 0.554,  era: 'Medieval' },
-  { jd: 2087792.051441, label: '1004 Jan 24 Annular',      loc: 'Cairo — Ibn Yunus famous observation',    gamma: 0.226,  era: 'Medieval' },
-  { jd: 2083982.839931, label: '993 Aug 20 Annular',       loc: 'Cairo — Ibn Yunus Hakemite Tables',       gamma: 0.242,  era: 'Medieval' },
-  { jd: 2081030.093891, label: '985 Jul 20 Annular',       loc: 'Cairo — Said-Stephenson catalog',         gamma: 0.284,  era: 'Medieval' },
-  { jd: 2078785.134930, label: '979 May 28 Annular',       loc: 'Cairo — Said-Stephenson catalog',         gamma: 0.603,  era: 'Medieval' },
-  { jd: 2078431.006474, label: '978 Jun 8 Annular',        loc: 'Cairo — Said-Stephenson catalog',         gamma: -0.110, era: 'Medieval' },
+  { jd: 2087792.051441, label: '1004 Jan 24 Hybrid',       loc: 'Cairo — Ibn Yunus famous observation (central-line end at Cairo)', gamma: 0.226,  era: 'Medieval' },
+  { jd: 2083982.839931, label: '993 Aug 20 Total',         loc: 'Cairo — Ibn Yunus Hakemite Tables (central line over N Egypt)',    gamma: 0.242,  era: 'Medieval' },
+  { jd: 2081030.093891, label: '985 Jul 20 Total',         loc: 'N Atlantic→C Africa path — Cairo partial (Said record, misdated)', gamma: 0.284,  era: 'Medieval' },
+  { jd: 2078785.134930, label: '979 May 28 Annular',       loc: 'N Canada→Russia path — Cairo partial (Said record, duplicate of 977)', gamma: 0.603, era: 'Medieval' },
+  { jd: 2078431.006474, label: '978 Jun 8 Annular',        loc: 'Sahel (Mali) path — Cairo partial (Said record, duplicate of 977)', gamma: -0.110, era: 'Medieval' },
   { jd: 2078253.853718, label: '977 Dec 13 Total',         loc: 'Cairo (partial) — NASA total at 3°N,55°E', gamma: 0.458, era: 'Medieval' },
   // Classical antiquity
   { jd: 1747068.890110, label: '71 Mar 20 Total',          loc: 'Aegean — Plutarch De Facie 19',           gamma: 0.635,  era: 'Classical' },
@@ -28056,10 +28056,13 @@ function setupGUI() {
 
     // Format: [year_astro, month, day, lat, lon_E, type, name+source]
     // Same curated list as the Historic Eclipse Validation button, augmented
-    // with the 5 additional Ibn Yunus events from his Hakemite Tables.
+    // with the additional Cairo events: Ibn Yunus first-hand (977, 993,
+    // 1004) and Said al-Andalusi second-hand (978, 979, 985 — adjudicated
+    // as duplicates/misdated, docs/107). Types are the NASA canon eclipse
+    // types (the local circumstance at the site can differ).
     const EVENTS = [
       [-762,  6, 15, 36.36,  43.16, 'Total',   'Bur-Sagale (Assyrian)'],
-      [-708,  7, 17, 35.0,  113.0,  'Total',   'Chinese Spring/Autumn'],
+      [-708,  7, 17, 35.60, 116.98, 'Total',   'Chinese Spring/Autumn (Lu/Qufu)'],
       [-647,  4,  6, 32.5,   44.4,  'Partial', 'Babylonian early'],
       [-584,  5, 28, 39.0,   35.0,  'Total',   'Thales (Halys/Anatolia)'],
       [-556,  5, 19, 32.5,   44.4,  'Partial', 'Babylonian Nabonidus'],
@@ -28067,12 +28070,12 @@ function setupGUI() {
       [-309,  8, 15, 32.5,   44.4,  'Total',   'Babylonian (Antigonus)'],
       [-135,  4, 15, 32.5,   44.4,  'Total',   'Babylonian best diary'],
       [  71,  3, 20, 38.0,   25.0,  'Total',   'Plutarch De Facie (Aegean)'],
-      [ 977, 12, 13, 30.05,  31.24, 'Annular', 'Ibn Yunus 977 (Cairo)'],
-      [ 978,  6,  8, 30.05,  31.24, 'Partial', 'Ibn Yunus 978 (Cairo)'],
-      [ 979,  5, 28, 30.05,  31.24, 'Partial', 'Ibn Yunus 979 (Cairo)'],
-      [ 985,  7, 20, 30.05,  31.24, 'Annular', 'Ibn Yunus 985 (Cairo)'],
-      [ 993,  8, 20, 30.05,  31.24, 'Annular', 'Ibn Yunus 993 (Cairo)'],
-      [1004,  1, 24, 30.05,  31.24, 'Tot/Ann', 'Ibn Yunus 1004 (Cairo)'],
+      [ 977, 12, 13, 30.05,  31.24, 'Total',   'Ibn Yunus 977 (Cairo)'],
+      [ 978,  6,  8, 30.05,  31.24, 'Annular', 'Said 978 (Cairo)'],
+      [ 979,  5, 28, 30.05,  31.24, 'Annular', 'Said 979 (Cairo)'],
+      [ 985,  7, 20, 30.05,  31.24, 'Total',   'Said 985 (Cairo)'],
+      [ 993,  8, 20, 30.05,  31.24, 'Total',   'Ibn Yunus 993 (Cairo)'],
+      [1004,  1, 24, 30.05,  31.24, 'Hybrid',  'Ibn Yunus 1004 (Cairo)'],
       [1133,  8,  2, 52.0,   -2.0,  'Total',   'Henry I death (England)'],
       [1185,  5,  1, 50.0,   38.0,  'Annular', 'Igors Tale (Russia)'],
       [1239,  6,  3, 43.7,   10.4,  'Total',   'Cerchiari Tuscany'],
@@ -28313,7 +28316,7 @@ function setupGUI() {
 
     const EVENTS = [
       [-762,  6, 15, 36.36,  43.16, 'Total',   'Bur-Sagale (Assyrian)'],
-      [-708,  7, 17, 35.0,  113.0,  'Total',   'Chinese Spring/Autumn'],
+      [-708,  7, 17, 35.60, 116.98, 'Total',   'Chinese Spring/Autumn (Lu/Qufu)'],
       [-647,  4,  6, 32.5,   44.4,  'Partial', 'Babylonian early'],
       [-584,  5, 28, 39.0,   35.0,  'Total',   'Thales (Halys/Anatolia)'],
       [-556,  5, 19, 32.5,   44.4,  'Partial', 'Babylonian Nabonidus'],
@@ -28321,12 +28324,12 @@ function setupGUI() {
       [-309,  8, 15, 32.5,   44.4,  'Total',   'Babylonian (Antigonus)'],
       [-135,  4, 15, 32.5,   44.4,  'Total',   'Babylonian best diary'],
       [  71,  3, 20, 38.0,   25.0,  'Total',   'Plutarch De Facie (Aegean)'],
-      [ 977, 12, 13, 30.05,  31.24, 'Annular', 'Ibn Yunus 977 (Cairo)'],
-      [ 978,  6,  8, 30.05,  31.24, 'Partial', 'Ibn Yunus 978 (Cairo)'],
-      [ 979,  5, 28, 30.05,  31.24, 'Partial', 'Ibn Yunus 979 (Cairo)'],
-      [ 985,  7, 20, 30.05,  31.24, 'Annular', 'Ibn Yunus 985 (Cairo)'],
-      [ 993,  8, 20, 30.05,  31.24, 'Annular', 'Ibn Yunus 993 (Cairo)'],
-      [1004,  1, 24, 30.05,  31.24, 'Tot/Ann', 'Ibn Yunus 1004 (Cairo)'],
+      [ 977, 12, 13, 30.05,  31.24, 'Total',   'Ibn Yunus 977 (Cairo)'],
+      [ 978,  6,  8, 30.05,  31.24, 'Annular', 'Said 978 (Cairo)'],
+      [ 979,  5, 28, 30.05,  31.24, 'Annular', 'Said 979 (Cairo)'],
+      [ 985,  7, 20, 30.05,  31.24, 'Total',   'Said 985 (Cairo)'],
+      [ 993,  8, 20, 30.05,  31.24, 'Total',   'Ibn Yunus 993 (Cairo)'],
+      [1004,  1, 24, 30.05,  31.24, 'Hybrid',  'Ibn Yunus 1004 (Cairo)'],
       [1133,  8,  2, 52.0,   -2.0,  'Total',   'Henry I death (England)'],
       [1185,  5,  1, 50.0,   38.0,  'Annular', 'Igors Tale (Russia)'],
       [1239,  6,  3, 43.7,   10.4,  'Total',   'Cerchiari Tuscany'],

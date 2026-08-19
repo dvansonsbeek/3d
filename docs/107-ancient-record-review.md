@@ -72,6 +72,21 @@ gaps on exactly the second-hand rows are identification errors in the
 transmission chain, and the −647 row (the fifth geographic verdict) is
 an early-diary partial of the same local-circumstance character.
 
+**The paths themselves are NASA-verified.** For all six Cairo-dated
+eclipses the model's central-path ground point at the catalog instant
+agrees with the NASA canon's greatest-eclipse coordinates to
+**65–290 km**. The 985 Jul 20 event is a NASA *total* with greatest at
+35.9 N, 26.6 W — mid-Atlantic — whose partial zone grazes Egypt at
+sunset: a location-based NASA search therefore returns it "for Cairo"
+while its central line never approaches the city. The paths run: 977
+C. Africa → Indian Ocean (greatest off the Horn of Africa); 978
+Brazil → Sahel → Horn of Africa; 979 N. Canada → SW Russia; 985
+N. Atlantic → C. Africa; 993 central line across N. Egypt (237 km from
+Cairo); 1004 S. Atlantic with the central-line end at Cairo (54 km).
+Event names in the audit and simulator carry these path regions, and
+three catalog types are corrected there (985 and 993 are totals, 1004
+is a hybrid).
+
 **Babylon −135 cannot be rescued by a date shift — and doesn't need
 one.** No candidate in ±25 yr is total at Babylon; the traditional date
 is the best match in its window, and the ΔT-free identification cascade
