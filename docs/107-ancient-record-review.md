@@ -84,8 +84,11 @@ Brazil → Sahel → Horn of Africa; 979 N. Canada → SW Russia; 985
 N. Atlantic → C. Africa; 993 central line across N. Egypt (237 km from
 Cairo); 1004 S. Atlantic with the central-line end at Cairo (54 km).
 Event names in the audit and simulator carry these path regions, and
-three catalog types are corrected there (985 and 993 are totals, 1004
-is a hybrid).
+the same NASA type-check across the full 26-event list corrected seven
+catalog types in all: 985, 993, 1185, −556, and −647 are totals, 71
+and 1004 are hybrids — the −556 and −647 rows had carried the record's
+*partial circumstance at Babylon* as the eclipse type, the same
+site/eclipse conflation the Cairo naming had.
 
 **Babylon −135 cannot be rescued by a date shift — and doesn't need
 one.** No candidate in ±25 yr is total at Babylon; the traditional date

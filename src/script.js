@@ -24413,7 +24413,7 @@ const ECLIPSE_PRESETS = [
   { jd: 2325394.925106, label: '1654 Aug 12 Total',        loc: 'England — European total (Gregorian)',    gamma: 0.489,  era: '17th c.' },
   // Medieval
   { jd: 2173756.000111, label: '1239 Jun 3 Total',         loc: 'Tuscany — Cerchiari chronicle',           gamma: 0.325,  era: 'Medieval' },
-  { jd: 2154000.058445, label: '1185 May 1 Annular',       loc: "Russia — Igor's Tale Primary Chronicle",  gamma: 0.541,  era: 'Medieval' },
+  { jd: 2154000.058445, label: '1185 May 1 Total',         loc: "Russia (partial) — Igor's Tale Primary Chronicle", gamma: 0.541, era: 'Medieval' },
   { jd: 2135100.002430, label: '1133 Aug 2 Total',         loc: 'England — King Henry I',                  gamma: 0.554,  era: 'Medieval' },
   { jd: 2087792.051441, label: '1004 Jan 24 Hybrid',       loc: 'Cairo — Ibn Yunus famous observation (central-line end at Cairo)', gamma: 0.226,  era: 'Medieval' },
   { jd: 2083982.839931, label: '993 Aug 20 Total',         loc: 'Cairo — Ibn Yunus Hakemite Tables (central line over N Egypt)',    gamma: 0.242,  era: 'Medieval' },
@@ -24422,14 +24422,14 @@ const ECLIPSE_PRESETS = [
   { jd: 2078431.006474, label: '978 Jun 8 Annular',        loc: 'Sahel (Mali) path — Cairo partial (Said record, duplicate of 977)', gamma: -0.110, era: 'Medieval' },
   { jd: 2078253.853718, label: '977 Dec 13 Total',         loc: 'Cairo (partial) — NASA total at 3°N,55°E', gamma: 0.458, era: 'Medieval' },
   // Classical antiquity
-  { jd: 1747068.890110, label: '71 Mar 20 Total',          loc: 'Aegean — Plutarch De Facie 19',           gamma: 0.635,  era: 'Classical' },
+  { jd: 1747068.890110, label: '71 Mar 20 Hybrid',         loc: 'Aegean — Plutarch De Facie 19',           gamma: 0.635,  era: 'Classical' },
   // Ancient
   { jd: 1671853.759762, label: '-135 Apr 15 Total',        loc: 'Babylon — best-preserved diary',          gamma: 0.719,  era: 'Ancient' },
   { jd: 1608421.835171, label: '-309 Aug 15 Total',        loc: 'Babylon — Antigonus death era',           gamma: 0.348,  era: 'Ancient' },
   { jd: 1564215.113895, label: '-430 Aug 3 Annular',       loc: 'Athens — Thucydides 2.28',                gamma: 0.798,  era: 'Ancient' },
-  { jd: 1518118.032841, label: '-556 May 19 Partial',      loc: 'Babylon — Nabonidus reign',               gamma: 0.307,  era: 'Ancient' },
+  { jd: 1518118.032841, label: '-556 May 19 Total',        loc: 'Babylon (partial) — Nabonidus reign',     gamma: 0.307,  era: 'Ancient' },
   { jd: 1507900.104145, label: '-584 May 28 Total',        loc: 'Anatolia — Thales predicted',             gamma: 0.331,  era: 'Ancient' },
-  { jd: 1484836.848499, label: '-647 Apr 6 Partial',       loc: 'Babylon — early astronomical diary',      gamma: 0.705,  era: 'Ancient' },
+  { jd: 1484836.848499, label: '-647 Apr 6 Total',         loc: 'Babylon (partial) — early astronomical diary', gamma: 0.705, era: 'Ancient' },
   { jd: 1462658.779682, label: '-708 Jul 17 Total',        loc: 'Lu State — Chinese Spring/Autumn Annals', gamma: 0.484,  era: 'Ancient' },
   { jd: 1442902.839207, label: '-762 Jun 15 Total',        loc: 'Nineveh — Bur-Sagale Assyrian Eponym',    gamma: 0.275,  era: 'Ancient' },
 ];
@@ -28063,13 +28063,13 @@ function setupGUI() {
     const EVENTS = [
       [-762,  6, 15, 36.36,  43.16, 'Total',   'Bur-Sagale (Assyrian)'],
       [-708,  7, 17, 35.60, 116.98, 'Total',   'Chinese Spring/Autumn (Lu/Qufu)'],
-      [-647,  4,  6, 32.5,   44.4,  'Partial', 'Babylonian early'],
+      [-647,  4,  6, 32.5,   44.4,  'Total',   'Babylonian early (partial at Babylon)'],
       [-584,  5, 28, 39.0,   35.0,  'Total',   'Thales (Halys/Anatolia)'],
-      [-556,  5, 19, 32.5,   44.4,  'Partial', 'Babylonian Nabonidus'],
+      [-556,  5, 19, 32.5,   44.4,  'Total',   'Babylonian Nabonidus (partial at Babylon)'],
       [-430,  8,  3, 37.97,  23.72, 'Annular', 'Thucydides 2.28 (Athens)'],
       [-309,  8, 15, 32.5,   44.4,  'Total',   'Babylonian (Antigonus)'],
       [-135,  4, 15, 32.5,   44.4,  'Total',   'Babylonian best diary'],
-      [  71,  3, 20, 38.0,   25.0,  'Total',   'Plutarch De Facie (Aegean)'],
+      [  71,  3, 20, 38.0,   25.0,  'Hybrid',  'Plutarch De Facie (Aegean)'],
       [ 977, 12, 13, 30.05,  31.24, 'Total',   'Ibn Yunus 977 (Cairo)'],
       [ 978,  6,  8, 30.05,  31.24, 'Annular', 'Said 978 (Cairo)'],
       [ 979,  5, 28, 30.05,  31.24, 'Annular', 'Said 979 (Cairo)'],
@@ -28077,7 +28077,7 @@ function setupGUI() {
       [ 993,  8, 20, 30.05,  31.24, 'Total',   'Ibn Yunus 993 (Cairo)'],
       [1004,  1, 24, 30.05,  31.24, 'Hybrid',  'Ibn Yunus 1004 (Cairo)'],
       [1133,  8,  2, 52.0,   -2.0,  'Total',   'Henry I death (England)'],
-      [1185,  5,  1, 50.0,   38.0,  'Annular', 'Igors Tale (Russia)'],
+      [1185,  5,  1, 50.0,   38.0,  'Total',   'Igors Tale (Russia, partial at site)'],
       [1239,  6,  3, 43.7,   10.4,  'Total',   'Cerchiari Tuscany'],
       [1654,  8, 12, 51.5,   -0.1,  'Total',   'European total (London)'],
     ];
@@ -28317,13 +28317,13 @@ function setupGUI() {
     const EVENTS = [
       [-762,  6, 15, 36.36,  43.16, 'Total',   'Bur-Sagale (Assyrian)'],
       [-708,  7, 17, 35.60, 116.98, 'Total',   'Chinese Spring/Autumn (Lu/Qufu)'],
-      [-647,  4,  6, 32.5,   44.4,  'Partial', 'Babylonian early'],
+      [-647,  4,  6, 32.5,   44.4,  'Total',   'Babylonian early (partial at Babylon)'],
       [-584,  5, 28, 39.0,   35.0,  'Total',   'Thales (Halys/Anatolia)'],
-      [-556,  5, 19, 32.5,   44.4,  'Partial', 'Babylonian Nabonidus'],
+      [-556,  5, 19, 32.5,   44.4,  'Total',   'Babylonian Nabonidus (partial at Babylon)'],
       [-430,  8,  3, 37.97,  23.72, 'Annular', 'Thucydides 2.28 (Athens)'],
       [-309,  8, 15, 32.5,   44.4,  'Total',   'Babylonian (Antigonus)'],
       [-135,  4, 15, 32.5,   44.4,  'Total',   'Babylonian best diary'],
-      [  71,  3, 20, 38.0,   25.0,  'Total',   'Plutarch De Facie (Aegean)'],
+      [  71,  3, 20, 38.0,   25.0,  'Hybrid',  'Plutarch De Facie (Aegean)'],
       [ 977, 12, 13, 30.05,  31.24, 'Total',   'Ibn Yunus 977 (Cairo)'],
       [ 978,  6,  8, 30.05,  31.24, 'Annular', 'Said 978 (Cairo)'],
       [ 979,  5, 28, 30.05,  31.24, 'Annular', 'Said 979 (Cairo)'],
@@ -28331,7 +28331,7 @@ function setupGUI() {
       [ 993,  8, 20, 30.05,  31.24, 'Total',   'Ibn Yunus 993 (Cairo)'],
       [1004,  1, 24, 30.05,  31.24, 'Hybrid',  'Ibn Yunus 1004 (Cairo)'],
       [1133,  8,  2, 52.0,   -2.0,  'Total',   'Henry I death (England)'],
-      [1185,  5,  1, 50.0,   38.0,  'Annular', 'Igors Tale (Russia)'],
+      [1185,  5,  1, 50.0,   38.0,  'Total',   'Igors Tale (Russia, partial at site)'],
       [1239,  6,  3, 43.7,   10.4,  'Total',   'Cerchiari Tuscany'],
       [1654,  8, 12, 51.5,   -0.1,  'Total',   'European total (London)'],
     ];
@@ -28497,7 +28497,7 @@ function setupGUI() {
       const steph_dT = deltaTEspenakMeeusRaw(decYear);
 
       const pen = scanWindow(jd_conj, lat, lon, best_dT, PENUMBRA_KM);
-      const isTotalish = (type === 'Total' || type === 'Annular' || type === 'Tot/Ann');
+      const isTotalish = (type === 'Total' || type === 'Annular' || type === 'Hybrid');
       const umb = isTotalish ? scanWindow(jd_conj, lat, lon, best_dT, UMBRA_KM) : null;
 
       const ourD   = distAt(jd_conj, lat, lon, our_dT);
@@ -28596,17 +28596,17 @@ function setupGUI() {
     // Format: [year_astro, month, day, lat, lon_E, type, name+source]
     const HISTORIC = [
       [-762,  6, 15, 36.36, 43.16, 'Total',   'Bur-Sagale (Assyrian Eponym Canon, Nineveh)'],
-      [-708,  7, 17, 35.0,  113.0, 'Total',   'Chinese Spring/Autumn (Lu State, Shih Ching)'],
-      [-647,  4,  6, 32.5,  44.4,  'Partial', 'Babylonian early diary'],
+      [-708,  7, 17, 35.60, 116.98, 'Total',  'Chinese Spring/Autumn (Lu State, Qufu)'],
+      [-647,  4,  6, 32.5,  44.4,  'Total',   'Babylonian early diary (partial at Babylon)'],
       [-584,  5, 28, 39.0,  35.0,  'Total',   'Thales (Herodotus 1.74, Halys/Anatolia)'],
-      [-556,  5, 19, 32.5,  44.4,  'Partial', 'Babylonian Nabonidus'],
+      [-556,  5, 19, 32.5,  44.4,  'Total',   'Babylonian Nabonidus (partial at Babylon)'],
       [-430,  8,  3, 37.97, 23.72, 'Annular', 'Thucydides 2.28 (Athens, Peloponnesian War)'],
       [-309,  8, 15, 32.5,  44.4,  'Total',   'Babylonian (death of Antigonus era)'],
       [-135,  4, 15, 32.5,  44.4,  'Total',   'Babylonian (best-preserved diary)'],
-      [  71,  3, 20, 38.0,  25.0,  'Total',   'Plutarch De Facie 19 (Aegean)'],
-      [1004,  1, 24, 30.05, 31.24, 'Total',   'Ibn Yunus al-Hakemite (Cairo)'],
+      [  71,  3, 20, 38.0,  25.0,  'Hybrid',  'Plutarch De Facie 19 (Aegean)'],
+      [1004,  1, 24, 30.05, 31.24, 'Hybrid',  'Ibn Yunus al-Hakemite (Cairo)'],
       [1133,  8,  2, 52.0,  -2.0,  'Total',   'Henry I death (English chronicles)'],
-      [1185,  5,  1, 50.0,  38.0,  'Annular', 'Igor’s Tale (Russian Primary Chronicle)'],
+      [1185,  5,  1, 50.0,  38.0,  'Total',   'Igor’s Tale (Russian Primary Chronicle, partial at site)'],
       [1239,  6,  3, 43.7,  10.4,  'Total',   'Cerchiari Tuscany (Italian chronicle)'],
       [1654,  8, 12, 51.5,  -0.1,  'Total',   'European total (London)'],
     ];
@@ -28814,17 +28814,17 @@ function setupGUI() {
     // Format: [year_astro, month, day, lat, lon_E, type, name+source]
     const HISTORIC = [
       [-762,  6, 15, 36.36, 43.16, 'Total',   'Bur-Sagale (Assyrian Eponym Canon, Nineveh)'],
-      [-708,  7, 17, 35.0,  113.0, 'Total',   'Chinese Spring/Autumn (Lu State, Shih Ching)'],
-      [-647,  4,  6, 32.5,  44.4,  'Partial', 'Babylonian early diary'],
+      [-708,  7, 17, 35.60, 116.98, 'Total',  'Chinese Spring/Autumn (Lu State, Qufu)'],
+      [-647,  4,  6, 32.5,  44.4,  'Total',   'Babylonian early diary (partial at Babylon)'],
       [-584,  5, 28, 39.0,  35.0,  'Total',   'Thales (Herodotus 1.74, Halys/Anatolia)'],
-      [-556,  5, 19, 32.5,  44.4,  'Partial', 'Babylonian Nabonidus'],
+      [-556,  5, 19, 32.5,  44.4,  'Total',   'Babylonian Nabonidus (partial at Babylon)'],
       [-430,  8,  3, 37.97, 23.72, 'Annular', 'Thucydides 2.28 (Athens, Peloponnesian War)'],
       [-309,  8, 15, 32.5,  44.4,  'Total',   'Babylonian (death of Antigonus era)'],
       [-135,  4, 15, 32.5,  44.4,  'Total',   'Babylonian (best-preserved diary)'],
-      [  71,  3, 20, 38.0,  25.0,  'Total',   'Plutarch De Facie 19 (Aegean)'],
-      [1004,  1, 24, 30.05, 31.24, 'Total',   'Ibn Yunus al-Hakemite (Cairo)'],
+      [  71,  3, 20, 38.0,  25.0,  'Hybrid',  'Plutarch De Facie 19 (Aegean)'],
+      [1004,  1, 24, 30.05, 31.24, 'Hybrid',  'Ibn Yunus al-Hakemite (Cairo)'],
       [1133,  8,  2, 52.0,  -2.0,  'Total',   'Henry I death (English chronicles)'],
-      [1185,  5,  1, 50.0,  38.0,  'Annular', "Igor's Tale (Russian Primary Chronicle)"],
+      [1185,  5,  1, 50.0,  38.0,  'Total',   "Igor's Tale (Russian Primary Chronicle, partial at site)"],
       [1239,  6,  3, 43.7,  10.4,  'Total',   'Cerchiari Tuscany (Italian chronicle)'],
       [1654,  8, 12, 51.5,  -0.1,  'Total',   "European total (London)"],
     ];
@@ -29023,7 +29023,7 @@ function setupGUI() {
       [-762,  6, 15, 36.36,  43.16, 'Total',   '-762 Bur-Sagale (Nineveh — Assyrian Eponym Canon, ΔT anchor)'],
       // Omitted from trend (still in 25-event audit / Validation buttons):
       //   1654 Aug 12 London   — path crossed N Europe / Scotland, not London
-      //   1185 May  1 Russia   — annular path far east; Igor saw partial
+      //   1185 May  1 Russia   — NASA Total, path Atlantic→Scandinavia; Igor saw partial
       //   1004 Jan 24 Cairo    — NASA Hybrid; Cairo saw deep PARTIAL
       //   71   Mar 20 Aegean   — NASA Hybrid; Aegean ~4° north of central line
       //   -430 Aug  3 Athens   — Annular globally, but antumbra never reached
@@ -29624,7 +29624,7 @@ function setupGUI() {
         desc: 'Assyrian Eponym Canon: "in the eponymy of Bur-Sagale, governor of Guzana, ' +
               'revolt in the city of Aššur. In the month of Sîvān an eclipse of the Sun took place." ' +
               'Modern reduction: 15 June 763 BC, total over Nineveh.' },
-      { name: 'Chinese Spring/Autumn (Lu)',  lat: 35.0,  lon: 113.0, year: -708, window: 15,
+      { name: 'Chinese Spring/Autumn (Lu)',  lat: 35.60, lon: 116.98, year: -708, window: 15,
         desc: 'Confucius Spring and Autumn Annals record an eclipse in 709 BC. ' +
               'Modern reduction: 17 July 709 BC.' },
       { name: 'Thales (Herodotus)',          lat: 39.0,  lon: 35.0,  year: -584, window: 30,
