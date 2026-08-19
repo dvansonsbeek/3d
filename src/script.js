@@ -11765,6 +11765,8 @@ const _scale  = new THREE.Vector3();
 
 const _sunWS      = new THREE.Vector3();          // Sun (world space)
 const _planetWS   = new THREE.Vector3();          // Planet (world space)
+const _uslSeries  = new THREE.Vector3();          // series sun dir (shadow-light aim; PRIVATE to updateSunlightForPlanet)
+const _uslQuat    = new THREE.Quaternion();       // rotAxis quat (idem)
 const _cornersLS  = [...Array(8)].map(() => new THREE.Vector3());
 const _wsBox      = new THREE.Box3();
 const _lsBox      = new THREE.Box3();             // Light-space AABB (reusable)
@@ -53283,6 +53285,35 @@ function updateSunlightForPlanet(planetMesh, pad = 1.1) {
   sun.planetObj.getWorldPosition(_sunWS);
   planetMesh   .getWorldPosition(_planetWS);
 
+  /* 1b. 20.3i series-aligned SHADOW LIGHT (Earth only): the shadow map
+   * is the visible PENUMBRA — the Moon's soft cast shadow. The scaffold
+   * sun's of-date declination is ~360″ off at −135 (see
+   * _applySolarAberration / updateUmbraDisc), so the LIGHT POSITION is
+   * rebuilt on the series-built sun direction (same λ + ε construction,
+   * geometric, scaffold distance kept). Position — not aim: the ortho
+   * shadow camera's pad step multiplies ABSOLUTE light-space box
+   * coordinates, which is only valid with the planet ON the light axis
+   * (an off-axis aim shifts the frustum off the planet and kills the
+   * shadow entirely at epochs where the correction is large — measured).
+   * Nothing else reads sunLight.position; the visible Sun sphere stays
+   * scaffold-placed (≤0.1° apart — not visible). Private temps
+   * (_uslSeries/_uslQuat) + the module _sunWS this function owns. */
+  if (planetMesh === earth.planetObj && Number.isFinite(o.julianDay)) {
+    const _jdL = o.julianDay;
+    const lamS = _eclSunLon(_jdL) * Math.PI / 180;
+    const eps  = computeObliquityEarth(2000 + (_jdL - 2451545.0) / 365.25) * Math.PI / 180;
+    const decS = Math.asin(Math.sin(eps) * Math.sin(lamS));
+    const raS  = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
+    const rS   = _sunWS.distanceTo(_planetWS);
+    earth.rotationAxis.getWorldQuaternion(_uslQuat);
+    _uslSeries.set(
+      rS * Math.cos(decS) * Math.sin(raS),
+      rS * Math.sin(decS),
+      rS * Math.cos(decS) * Math.cos(raS),
+    ).applyQuaternion(_uslQuat);
+    _sunWS.copy(_planetWS).add(_uslSeries);
+  }
+
   /* 2. move the light to the Sun & aim at planet ----------------- */
   sunLight.position.copy(_sunWS);
   sunLight.target.position.copy(_planetWS);
@@ -57926,6 +57957,7 @@ function makeRealisticEarth(pd){
     const _udcNormal    = new THREE.Vector3();
     const _udcQuat      = new THREE.Quaternion();
     const _udcQuatInv   = new THREE.Quaternion();
+    const _udcAxisQuat  = new THREE.Quaternion();
     const _udcZAxis     = new THREE.Vector3(0, 0, 1);
 
     function updateUmbraDisc() {
@@ -57940,6 +57972,33 @@ function makeRealisticEarth(pd){
 
         _udcMoonGeo.copy(_udcMoon).sub(_udcEarth);
         _udcSunGeo .copy(_udcSun) .sub(_udcEarth);
+
+        /* 20.3i series-aligned disc sun: the Moon above is already the
+         * series Moon (the _moonVisualCorrection pivot override), but the
+         * scaffold sun's of-date declination is ~360″ off at −135 (see
+         * _applySolarAberration) — putting the visible umbra ~1,200 km
+         * from where the certified umbra chain says. Replace the sun
+         * DIRECTION with the series-built geocentric one (same λ + ε
+         * construction, geometric to pair with the geometric Moon),
+         * preserving the scaffold distance. All state here is private
+         * closure scratch — nothing outside this function reads it. */
+        {
+          const _jdU = o.julianDay;
+          if (Number.isFinite(_jdU)) {
+            const lamS = _eclSunLon(_jdU) * Math.PI / 180;
+            const eps  = computeObliquityEarth(2000 + (_jdU - 2451545.0) / 365.25) * Math.PI / 180;
+            const decS = Math.asin(Math.sin(eps) * Math.sin(lamS));
+            const raS  = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
+            const rS   = _udcSunGeo.length();
+            earth.rotationAxis.getWorldQuaternion(_udcAxisQuat);
+            _udcSunGeo.set(
+              rS * Math.cos(decS) * Math.sin(raS),
+              rS * Math.sin(decS),
+              rS * Math.cos(decS) * Math.cos(raS),
+            ).applyQuaternion(_udcAxisQuat);
+          }
+        }
+
         _udcDir    .copy(_udcMoonGeo).sub(_udcSunGeo).normalize();
 
         const R_E   = radius;                        // mesh radius (= captured pd.size)
