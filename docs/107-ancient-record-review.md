@@ -109,12 +109,20 @@ names** — a continuous 60-day cycle independent of any year chronology,
 giving a 1-in-60 identification filter that no calendar reconstruction
 can bias.
 
-The JD↔ganzhi anchor is **verified, not assumed**: two independent
-Chunqiu eclipse records — −719 Feb 22 (day *jisi*, #6) and −708 Jul 17
-(day *renchen*, #29) — yield the **same offset K = 50** in
-`ganzhi# = (localDayNumber + 50) mod 60` (local civil day at Lu). A
-wrong day name in either record would break the agreement 59 times
-in 60.
+The JD↔ganzhi anchor is **verified against the received primary text,
+not assumed**: the day names were read from the Chunqiu itself
+(ctext.org, *Chun Qiu Zuo Zhuan*, full-text search for 日有食之). Six
+ganzhi-dated solar-eclipse records — Yin 3 (己巳 *jisi* #6, −719
+Feb 22), Huan 3 (壬辰 *renchen* #29 朔 既, −708 Jul 17), Zhuang 25
+(辛未 *xinwei* #8 朔, −668 May 27), Zhuang 26 (癸亥 *guihai* #60 朔,
+−667 Nov 10), Zhuang 30 (庚午 *gengwu* #7 朔, −663 Aug 28), and Xi 5
+(戊申 *wushen* #45 朔, −654 Aug 19) — all yield the **same offset
+K = 50** in `ganzhi# = (localDayNumber + 50) mod 60` (local civil day
+at Lu). Each of the last four is additionally the *unique* ganzhi
+match among the 7–8 model eclipses in its ±1-yr window, on the
+standard scholarly date, with a consistent Zhou-calendar month lag —
+the anchor is confirmed at (1/60)⁵ coincidence odds relative to a
+single calibrator.
 
 Applied to the −708 window (±30 yr, local magnitude ≥ 0.6 at Qufu
 35.60 N, 116.98 E): **20 candidates → the renchen filter keeps 3**
@@ -133,10 +141,11 @@ confirms.
   they carry the series' own ancient error budget (~0.01 magnitude
   class at −2 kyr) — rankings are robust to it, absolute totality
   verdicts at the 0.99 boundary are not.
-- The ganzhi day names and site identifications follow Stephenson 1997
-  Ch. 8; the day-name encodings are to be re-verified against the
-  printed source before publication (same convention as the timed
-  Babylonian corpus caveat in [doc 66](66-moon-meeus-corrections.md)).
+- The ganzhi day-name encodings are verified against the received
+  Chunqiu text (ctext.org; six records, all at K = 50, four uniquely
+  matched in-window) — the earlier "re-verify against printed
+  Stephenson 1997 Ch. 8" caveat is closed; Stephenson's role is now
+  only the site identifications and era context.
 - The 0.6 magnitude display threshold is a reporting choice, not a
   visibility claim; sub-0.6 own-date values for the Said rows are
   quoted directly.

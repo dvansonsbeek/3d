@@ -7,16 +7,26 @@
 // 1-in-60 identification filter: whatever the year mapping, the eclipse
 // day must carry the recorded ganzhi name.
 //
-// JD↔ganzhi anchor — VERIFIED, not assumed: two independent Chunqiu
-// eclipse records (Stephenson 1997 Ch. 8 identifications; day names to
-// be re-verified against the printed source before publication)
-//   · −719 Feb 22, day jisi   (sexagenary #6)
-//   · −708 Jul 17, day renchen (#29), total, first day of the month
-// both yield the SAME offset K = 50 in
+// JD↔ganzhi anchor — VERIFIED against the received primary text, not
+// assumed: the day names below were read from the Chunqiu itself
+// (ctext.org, Chun Qiu Zuo Zhuan; full-text search for 日有食之) —
+// SIX ganzhi-dated solar-eclipse records, and every one yields the
+// SAME offset K = 50 in
 //   ganzhi# = ((localDayNumber + 50) mod 60)   (1..60, #1 = jiazi)
 // with localDayNumber = floor(jd_UT + lon/360 + 0.5) at Lu (the local
-// civil midnight-start day). A wrong recollection of either record
-// would break the agreement 59 times in 60.
+// civil midnight-start day):
+//   · Yin 3,    royal 2nd mo, 己巳 jisi   #6  → −719 Feb 22
+//   · Huan 3,   7th mo 朔 既,  壬辰 renchen #29 → −708 Jul 17 (total)
+//   · Zhuang 25, 6th mo 朔,   辛未 xinwei  #8  → −668 May 27
+//   · Zhuang 26, 12th mo 朔,  癸亥 guihai  #60 → −667 Nov 10
+//   · Zhuang 30, 9th mo 朔,   庚午 gengwu  #7  → −663 Aug 28
+//   · Xi 5,     9th mo 朔,    戊申 wushen  #45 → −654 Aug 19
+// Each of the last four is the UNIQUE ganzhi match among the 7–8 model
+// eclipses in its ±1-yr window, on the standard scholarly date, with a
+// consistent Zhou-calendar month lag — the anchor is confirmed at
+// (1/60)^5 coincidence odds relative to a single calibrator, and the
+// old "re-verify against printed Stephenson 1997 Ch. 8" caveat is
+// CLOSED (the received text is the primary source).
 //
 // RESULT (shipped stack): scanning ±30 yr around −708 for eclipses with
 // local magnitude ≥ 0.6 at Lu (Qufu 35.60 N, 116.98 E) gives 20
@@ -48,11 +58,15 @@ function jdToJulianDate(jd) {
 const dayNumber = (jd) => Math.floor(jd + LU.lon / 360 + 0.5);
 const ganzhi = (jd) => (((dayNumber(jd) + 50) % 60 + 60) % 60) || 60;
 
-// 1. Anchor verification — both records must give the same offset.
+// 1. Anchor verification — every record must give the same offset.
 console.log('1. JD↔ganzhi anchor verification (offset K in ganzhi# = (dayN + K) mod 60):');
 const REFS = [
-  { name: '−719 Feb 22, jisi (#6)', jd0: jdFromJulianCal(-719, 2, 22), gz: 6 },
-  { name: '−708 Jul 17, renchen (#29)', jd0: jdFromJulianCal(-708, 7, 17), gz: 29 },
+  { name: 'Yin 3     jisi #6     −719 Feb 22', jd0: jdFromJulianCal(-719, 2, 22), gz: 6 },
+  { name: 'Huan 3    renchen #29 −708 Jul 17', jd0: jdFromJulianCal(-708, 7, 17), gz: 29 },
+  { name: 'Zhuang 25 xinwei #8   −668 May 27', jd0: jdFromJulianCal(-668, 5, 27), gz: 8 },
+  { name: 'Zhuang 26 guihai #60  −667 Nov 10', jd0: jdFromJulianCal(-667, 11, 10), gz: 60 },
+  { name: 'Zhuang 30 gengwu #7   −663 Aug 28', jd0: jdFromJulianCal(-663, 8, 28), gz: 7 },
+  { name: 'Xi 5      wushen #45  −654 Aug 19', jd0: jdFromJulianCal(-654, 8, 19), gz: 45 },
 ];
 for (const r of REFS) {
   const evs = model.eclipse.findSolarInRange(r.jd0 - 5, r.jd0 + 5);
