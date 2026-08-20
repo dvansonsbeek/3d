@@ -48,6 +48,19 @@
  *     coefficients: 8" at ±100 yr, 16" at ±200 yr, 50" at ±250 yr,
  *     134" at ±1000 yr. Past ±200 yr the fit absorbs Meeus reference
  *     drift into its coefficients and regresses modern-eclipse accuracy.
+ *
+ *   MATCHED-PAIR DOWNSTREAM (20.3h): the location tier's Sun planetary
+ *     completion (packages/physics/src/eclipse/sun-planetary-completion.cjs)
+ *     was fitted against the CURRENT finder Sun — this chain's rate + EoC
+ *     + the SUN_HARMONICS this fitter writes. Any --write refit here
+ *     changes the residual that table corrects and silently stales it:
+ *     after a refit, re-derive with
+ *       node tools/explore/sun-planetary-completion-fit.mjs
+ *     (fetches JPL Horizons live, refits the 10-term basis, drift-checks
+ *     the shipped table) and update the table's literals. The api
+ *     centerline gate (test:api, ≤8" shadow-plane) catches gross
+ *     staleness but a few-arcsec refit can slip under it — the re-derive
+ *     step is part of the refit, not optional.
  *     --range >200 warns; --range >500 refuses to run.
  *
  *   --write also REQUIRES `SUN_HARMONICS_DISABLED=1`:

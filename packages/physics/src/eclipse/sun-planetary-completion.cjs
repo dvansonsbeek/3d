@@ -33,6 +33,16 @@
  *
  * Sign convention: the table models (framework − truth), so consumers
  * SUBTRACT the evaluation from the finder Sun longitude.
+ *
+ * MATCHED PAIR: these amplitudes are fitted against the CURRENT finder
+ * Sun (framework rate + EoC + SUN_HARMONICS). The ARGUMENTS are physics
+ * and stand; the AMPLITUDES are the residual of that specific chain vs
+ * JPL and must be RE-MEASURED whenever the chain moves — a SUN_HARMONICS
+ * refit (pipeline Step 0; its fitter header carries the reciprocal
+ * note), an eccentricity/perihelion definition change, or the 20.3e
+ * derived-tables decision. Re-derivation:
+ *   node tools/explore/sun-planetary-completion-fit.mjs
+ * The api centerline gate (≤8″ shadow-plane) backstops gross staleness.
  */
 
 'use strict';
