@@ -42,7 +42,13 @@
  * note), an eccentricity/perihelion definition change, or the 20.3e
  * derived-tables decision. Re-derivation:
  *   node tools/explore/sun-planetary-completion-fit.mjs
- * The api centerline gate (≤8″ shadow-plane) backstops gross staleness.
+ * ENFORCED, not just documented: PAIRED_SUN_HARMONICS_SHA256 below is
+ * the fingerprint of the SUN_LONGITUDE_HARMONICS this table was fitted
+ * under; the create-model parity gate (test:model, in `npm run check`)
+ * recomputes it from the live constants and fails on mismatch — so a
+ * Step-0 refit cannot land without a conscious re-derivation of this
+ * table. The api centerline gate (≤8″ shadow-plane) backstops gross
+ * staleness independently.
  */
 
 'use strict';
@@ -95,4 +101,8 @@ function sunPlanetaryCompletionDeg(T) {
   return arcsec / 3600;
 }
 
-module.exports = { sunPlanetaryCompletionDeg };
+/** sha256/16 of JSON.stringify(FITTED_COEFFICIENTS.SUN_LONGITUDE_HARMONICS)
+ *  at fit time — the matched-pair fingerprint asserted by test:model. */
+const PAIRED_SUN_HARMONICS_SHA256 = 'e2cf42e9770c9e0a';
+
+module.exports = { sunPlanetaryCompletionDeg, PAIRED_SUN_HARMONICS_SHA256 };

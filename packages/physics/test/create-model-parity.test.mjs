@@ -136,6 +136,27 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   });
 }
 
+// ── Matched-pair fingerprint: sun planetary completion ↔ SUN_HARMONICS ──
+// The 20.3h completion table's amplitudes are the residual of the CURRENT
+// finder Sun vs JPL; a Step-0 SUN_HARMONICS refit changes that residual and
+// stales the table by a few arcseconds — under the api centerline gate's
+// threshold, so it needs its own check. On mismatch: re-derive with
+//   node tools/explore/sun-planetary-completion-fit.mjs
+// then update the table's literals AND its PAIRED_SUN_HARMONICS_SHA256.
+{
+  const { createHash } = await import('node:crypto');
+  const { FITTED_COEFFICIENTS } = await import('../src/constants/coefficients.js');
+  const { PAIRED_SUN_HARMONICS_SHA256 } = require('../src/eclipse/sun-planetary-completion.cjs');
+  const live = createHash('sha256')
+    .update(JSON.stringify(FITTED_COEFFICIENTS.SUN_LONGITUDE_HARMONICS))
+    .digest('hex').slice(0, 16);
+  if (live !== PAIRED_SUN_HARMONICS_SHA256) {
+    failures.push(`sun-completion matched pair: SUN_LONGITUDE_HARMONICS hash ${live} != paired ${PAIRED_SUN_HARMONICS_SHA256}`
+      + ' — Step 0 was refit without re-deriving eclipse/sun-planetary-completion.cjs'
+      + ' (run node tools/explore/sun-planetary-completion-fit.mjs, update the table + fingerprint)');
+  }
+}
+
 if (failures.length) {
   console.error(`createModel parity — ${failures.length} FAILURE(S):`);
   for (const f of failures) console.error('  ' + f);

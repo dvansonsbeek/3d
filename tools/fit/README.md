@@ -341,6 +341,19 @@ Step 0:  SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --wr
                and Meeus-parity modes.
            (Same "stable across normal refits" pattern as
            fibonacci_significance.py / Step 7e.)
+         - MATCHED-PAIR DOWNSTREAM (20.3h): the package location tier's
+           Sun planetary completion
+           (packages/physics/src/eclipse/sun-planetary-completion.cjs)
+           was fitted against the finder Sun WITH the current
+           SUN_HARMONICS applied. Any --write refit here (i.e. any of
+           the trigger conditions above) stales that table's
+           amplitudes: after the refit, re-derive with
+             node tools/explore/sun-planetary-completion-fit.mjs
+           and update the table's literals. The api centerline gate
+           (test:api, ≤8" shadow-plane on the 15 NASA points) catches
+           gross staleness only — a few-arcsec refit slips under it,
+           so the re-derivation is part of the refit, not optional.
+           (Reciprocal notes live in both file headers.)
          - Running it FIRST means Step 1 calibrates correctionSun with
            harmonics already applied → single-pass convergence. If 6f
            ran after Step 1 (legacy order), Step 1 would need to re-run
