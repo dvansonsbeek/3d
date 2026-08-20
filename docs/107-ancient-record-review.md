@@ -48,15 +48,15 @@ completions).
 | Record | Window | Traditional date | Verdict |
 |---|---|---|---|
 | Lu −708 (Chunqiu, total, day *renchen*) | ±30 yr | −708-07-17, **total, mag 1.019** | **UNIQUE** — ganzhi + totality filter |
-| Babylon −135 (diary, "stars visible") | ±25 yr | −135-04-15, mag 0.988 | Best in window; no total candidate exists — the date stands ([doc 103](103-135-babylonian-case-study.md)) |
+| Babylon −135 (diary, "stars visible") | ±25 yr | −135-04-15, mag 0.986 | Best in window; no total candidate exists — the date stands ([doc 103](103-135-babylonian-case-study.md)) |
 | Thales −584 (Herodotus) | ±30 yr | −584-05-28, mag 0.975 | Clearly best (next: −587 annular 0.955) |
 | Thucydides −430 (crescent + stars, Athens) | ±10 yr | −430-08-03, mag 0.870 | Near-tie with −435 (0.861), traditional marginally ahead — an honest ambiguity historians also debate |
-| Plutarch +71 (near-total, Aegean) | ±15 yr | +71-03-20, **total, mag 1.000** | Clearly best |
+| Plutarch +71 (near-total, Aegean) | ±15 yr | +71-03-20, **mag 1.000 (totality boundary)** | Clearly best |
 | Cairo 993 (Ibn Yunus, first-hand) | ±3 yr | 993-08-20, mag 0.959 | Deep partial at the traditional date — validates |
-| Cairo 1004 (Ibn Yunus, first-hand) | ±3 yr | 1004-01-24, mag 0.981 | Deep partial at the traditional date — validates |
-| Cairo 977 (Ibn Yunus, first-hand) | ±3 yr | 977-12-13, mag 0.600 | Visible partial at the traditional date — validates |
-| Cairo 978 (Said, second-hand) | ±3 yr | own date mag 0.498 | **Duplicate/misdated** — window best is the *same* 977-12-13 event (0.600) |
-| Cairo 979 (Said, second-hand) | ±3 yr | own date mag 0.455 | **Duplicate/misdated** — window best again 977-12-13 (0.600) |
+| Cairo 1004 (Ibn Yunus, first-hand) | ±3 yr | 1004-01-24, mag 0.980 | Deep partial at the traditional date — validates |
+| Cairo 977 (Ibn Yunus, first-hand) | ±3 yr | 977-12-13, mag 0.601 | Visible partial at the traditional date — validates |
+| Cairo 978 (Said, second-hand) | ±3 yr | own date mag 0.498 | **Duplicate/misdated** — window best is the *same* 977-12-13 event (0.601) |
+| Cairo 979 (Said, second-hand) | ±3 yr | own date mag 0.455 | **Duplicate/misdated** — window best again 977-12-13 (0.601) |
 | Cairo 985 (Said, second-hand) | ±3 yr | own date mag 0.282 | **Misdated ~3 yr** — window best 982-09-20 (0.621) |
 
 Three findings carry the weight:

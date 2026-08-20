@@ -31,6 +31,7 @@ import { createMoonMonthChain } from './moon/month-chain.cjs';
 import { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 import { createMoonArguments, jdToDecimalYear } from './moon/arguments.cjs';
 import { createMoonSeries } from './moon/series.cjs';
+import { sunPlanetaryCompletionDeg } from './eclipse/sun-planetary-completion.cjs';
 import { createEclipseFinders } from './eclipse/finders.cjs';
 import { createBesselian } from './eclipse/besselian.cjs';
 import { driver2PeriodSecondsAtAge } from './planets/orbit-chain.cjs';
@@ -861,6 +862,7 @@ export function assembleModel(C, F) {
       return { lonDeg: ev.lonDeg, latDeg: ev.latDeg, distKm: ev.distKm };
     },
     sunLonDegAt: /** @param {number} jdUT */ (jdUT) => eclipseFinders.sunLonDegAt(jdUT),
+    sunCompletionDeg: sunPlanetaryCompletionDeg,
     deltaTSecondsAt: /** @param {number} jd */ (jd) => (jdTTFromUT(jd) - jd) * 86400,
     obliquityDegAt: obliquityDeg,
     eccentricityAt,

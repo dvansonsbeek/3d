@@ -855,6 +855,50 @@ the exact-reproduction convention, and the in-sim test button
 "Centerlines: shadow-plane vs NASA path tables" prints the same table
 from the live scene.
 
+#### The Sun planetary completion (20.3h — package location tier)
+
+The PACKAGE location tier (`@essrt/physics` `eclipse/besselian.cjs`)
+additionally carries the **Sun planetary completion**
+(`eclipse/sun-planetary-completion.cjs`): the finder Sun omits the
+classical planetary perturbations of the geocentric Sun, measured as
+10.0″ RMS of all-phase longitude scatter against JPL Horizons (960
+deterministic epochs 1970–2049, leading-nutation-bridged). Ten
+era-stable terms on classical two-planet arguments — V−E, 2(V−E),
+3(V−E), 2V−3E (Venus), E−J, 2(E−J), E−2J (Jupiter), 2(E−M) (Mars),
+2lE (semiannual), and the Earth-around-EMB wobble on the Moon's mean
+elongation D (fitted 6.6″ vs the 6.44″ parallax theory) — remove the
+coherent part, 10.0″ → 2.9″ RMS. The table ships **without a constant
+term**: the all-phase fit attributes the constant to the tier's
+existing anchors, which is what removes the +6″ syzygy-mean penalty
+that killed the eclipse-sample fit of the same terms (at new moon the
+EMB argument locks near D ≈ 0 and its cos component becomes a
+constant — the 20.3h-lite trap). Verified both ways before shipping:
+179-eclipse-syzygy elongation mean +1.1″ → +1.5″ with RMS
+10.6″ → 5.5″, and the 15 NASA centerline points at shadow-plane mean
+6.0″ → 3.6″ / max 5.0″, every event improved. The api gate now
+asserts the VECTOR shadow-plane metric (≤8″ per point, with a 60 km
+ground backstop): at the 2026 Iberia low-sun points the remaining
+along-sun arcseconds project onto the ground at 6–9×, so the old
+25 km ground threshold read the completion's improvement as a
+regression — the projection artifact, not the physics. Terms that
+failed the half-sample era-stability test or lack a unique two-planet
+argument at the window's frequency resolution (the ~8-yr band, the
+414-day blend, E−M, E−S; ~1.5″ RSS) are deliberately unshipped. The
+finders stay on the bare Sun — their fitted anchors and certified
+canon statistics were produced on it, and elongation-class timing
+absorbs the omission into the fitted phases. Measured consequences
+elsewhere: the record-review magnitudes moved at the third decimal
+(Babylon −135 local magnitude 0.988 → 0.986; the +71 hybrid's
+knife-edge site circumstance now reads totality-boundary at
+mag 1.000) with every adjudication ranking unchanged (docs 103/107).
+The remaining syzygy scatter is Moon-side: the truncated Ch. 47
+series' dense tail (3.7″ at syzygy, measured refit-resistant — the
+coherent content is ≤1.5″ across 24 Delaunay/planetary candidate
+combos, and shipping the three stable Moon terms fails the
+centerline-scoreboard preview), which is why the syzygy fleet stands
+at 5.4″ rather than the ≤~4″ 20.3h target: reaching 2–3″ is the
+banked MPP02/ELP series decision (20.3f), not a term refit.
+
 ### Geocentric parallax limit
 - The 0.81-degree RMS is the **theoretical best** for geocentric coordinates.
 - Solar eclipses are topocentric events. The Moon's parallax (~0.95 degrees)

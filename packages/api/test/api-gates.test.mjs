@@ -339,28 +339,61 @@ for (const url of SAMPLE_REQUESTS) {
 
   // ── 20.3g ACCEPTANCE: the umbra ground track vs the NASA path-table
   // centerlines (public/input/solar-eclipse-centerlines-nasa.json, the same
-  // cross-checked reference the scene-side gate uses). Recorded class:
-  // ≤20.3 km ground across all 15 points — the gate threshold 25 km catches
-  // any regression of the convention-offset class (~35″ ≈ 65 km) while
-  // leaving room for sub-arcsecond jitter.
+  // cross-checked reference the scene-side gate uses). The acceptance metric
+  // is the VECTOR SHADOW-PLANE separation (the true axis distance — the
+  // round-3 convention): ground-km amplify by 1/sin(sun-alt) and at the 2026
+  // Iberia low-sun points a purely along-sun residual reads 6–9× larger on
+  // the ground than the axis error it represents (measured when the 20.3h
+  // sun completion landed: shadow-plane mean 6.0″ → 3.6″ / max 5.4″ while
+  // the 2026 GROUND numbers ROSE — the projection artifact, not a
+  // regression). Recorded class after the completion: ≤5.4″ shadow-plane
+  // across all 15 points — the 8″ gate catches any regression of the
+  // convention-offset class (~35″) with margin; the coarse 60 km ground
+  // bound stays as a wild-miss backstop at any sun altitude.
   {
     const { readFileSync } = await import('node:fs');
     const { DEFAULT_CONSTANTS } = await import('@essrt/physics');
     const CL = JSON.parse(readFileSync(new URL('../../../public/input/solar-eclipse-centerlines-nasa.json', import.meta.url), 'utf8'));
     const R_E_KM = DEFAULT_CONSTANTS.bodyDiametersKm.earth / 2;
+    const D2R = Math.PI / 180;
     /** @type {(la1:number, lo1:number, la2:number, lo2:number) => number} */
     const gcKm = (la1, lo1, la2, lo2) => {
-      const D2R = Math.PI / 180;
       const f1 = la1 * D2R, f2 = la2 * D2R, df = (la2 - la1) * D2R, dl = (lo2 - lo1) * D2R;
       const h = Math.sin(df / 2) ** 2 + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) ** 2;
       return 2 * R_E_KM * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+    };
+    // earth-fixed chart unit vector (any consistent chart — pure geometry)
+    /** @type {(latDeg:number, lonDeg:number) => [number,number,number]} */
+    const efUnit = (latDeg, lonDeg) => {
+      const la = latDeg * D2R, lo = lonDeg * D2R;
+      return [-Math.cos(la) * Math.cos(lo), Math.sin(la), Math.cos(la) * Math.sin(lo)];
+    };
+    // sub-solar point from the tier's own sun (metric normalization only)
+    /** @type {(jdUT:number) => {ssLat:number, ssLon:number}} */
+    const subSolar = (jdUT) => {
+      const jb = jdUT + DEFAULT_CONSTANTS.earthOrbital.deltaTStart / 86400;
+      const year = apiModel.time.yearFromJD(jb);
+      const eps = apiModel.earth.obliquityDeg(year) * D2R;
+      const lam = apiModel.eclipse.sunLonDegAtJD(jb) * D2R;
+      const K2 = DEFAULT_CONSTANTS.physicalConstants;
+      const T = (jdUT - 2451545.0) / 36525;
+      const gmst = ((K2.gmstMeanSiderealT0Deg + K2.gmstMeanSiderealRateDegPerDay * (jdUT - 2451545.0)
+        + K2.gmstMeanSiderealT2Deg * T * T) % 360 + 360) % 360;
+      const ra = Math.atan2(Math.sin(lam) * Math.cos(eps), Math.cos(lam)) / D2R;
+      return { ssLat: Math.asin(Math.sin(lam) * Math.sin(eps)) / D2R, ssLon: ((ra - gmst + 540) % 360) - 180 };
     };
     for (const ev of CL.events) {
       for (const p of ev.points) {
         const u = apiModel.eclipse.umbraGroundAtJD(p.jd);
         if (!u) { failures.push(`centerline acceptance: umbra off Earth at ${ev.label} ${p.utc}`); continue; }
-        const gap = gcKm(p.latDeg, p.lonDeg, u.latDeg, u.lonDeg);
-        if (gap > 25) failures.push(`centerline acceptance: ${ev.label} ${p.utc} gap ${gap.toFixed(1)} km > 25 km`);
+        const groundKm = gcKm(p.latDeg, p.lonDeg, u.latDeg, u.lonDeg);
+        const ss = subSolar(p.jd);
+        const a = efUnit(p.latDeg, p.lonDeg), b = efUnit(u.latDeg, u.lonDeg), s = efUnit(ss.ssLat, ss.ssLon);
+        const gv = [(b[0] - a[0]) * R_E_KM, (b[1] - a[1]) * R_E_KM, (b[2] - a[2]) * R_E_KM];
+        const dot = gv[0] * s[0] + gv[1] * s[1] + gv[2] * s[2];
+        const shadowArcsec = Math.hypot(gv[0] - dot * s[0], gv[1] - dot * s[1], gv[2] - dot * s[2]) / 1.86;
+        if (shadowArcsec > 8) failures.push(`centerline acceptance: ${ev.label} ${p.utc} shadow-plane ${shadowArcsec.toFixed(1)}″ > 8″`);
+        if (groundKm > 60) failures.push(`centerline acceptance: ${ev.label} ${p.utc} ground gap ${groundKm.toFixed(1)} km > 60 km`);
       }
     }
   }

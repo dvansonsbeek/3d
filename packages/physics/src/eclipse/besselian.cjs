@@ -57,6 +57,7 @@
  * @property {(dDaysTT: number) => {lonDeg: number, latDeg: number, distKm: number}} moonFullAtDaysTT
  *   full-series Moon: ecliptic-of-date longitude/latitude (deg) + distance (km), TT axis (days since J2000)
  * @property {(jdUT: number) => number} sunLonDegAt - geometric mean sun longitude (deg), JD(UT) axis with the finder's internal ΔT
+ * @property {(T: number) => number} sunCompletionDeg - planetary completion (deg) at T centuries TT, SUBTRACTED from the finder sun (see eclipse/sun-planetary-completion.cjs; the finders deliberately stay without it — their fitted anchors and certified canon statistics were produced on the bare form, and elongation-class timing absorbs the omission into the fitted phases)
  * @property {(jd: number) => number} deltaTSecondsAt - framework ΔT (J2000-zeroed convention)
  * @property {(year: number) => number} obliquityDegAt - framework obliquity (deg) at calendar year
  * @property {(year: number) => number} eccentricityAt - framework Earth-orbit eccentricity at calendar year
@@ -122,8 +123,8 @@ function createBesselian(deps) {
     const jb = jdUT + K.ttBridgeSeconds / 86400;          // finder-axis input → its internal ΔT lands on true TT
     const year = deps.yearFromJD(jb);
     const eps = deps.obliquityDegAt(year) * D2R;
-    const sunLon = deps.sunLonDegAt(jb);
     const dTT = (jb - K.j2000JD) + deps.deltaTSecondsAt(jb) / 86400;
+    const sunLon = deps.sunLonDegAt(jb) - deps.sunCompletionDeg(dTT / K.julianCenturyDays);
     const moon = deps.moonFullAtDaysTT(dTT);
     return {
       S: eclToEq(sunLon, 0, sunDistanceKm(year, sunLon), eps),
