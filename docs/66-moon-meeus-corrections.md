@@ -855,6 +855,27 @@ the exact-reproduction convention, and the in-sim test button
 "Centerlines: shadow-plane vs NASA path tables" prints the same table
 from the live scene.
 
+#### The fresh-load heal (the init-vs-epoch-chain split)
+
+The scene's object literals and the deep-time epoch updaters are two
+hand-maintained copies of the same parameters, and they had drifted: a
+freshly loaded page (start date inside the auto-sync guard's 1-yr
+threshold, or simply paused — the render loop's activity gate never
+reaches the UI tick) ran the umbra chain ~0.5° of longitude from the
+certified state, so the in-sim 26-event audit read 260/100/15 km where
+the node twin and the recorded artifact read 223/51/46. The missing
+20.3c sidereal-phase anchor (`earth.rotationPhase`, set only by
+`updateEarthForEpoch`) was one component; the net offset was the sum of
+several literal-vs-updater mismatches. The fix is structural: the
+startup heal (module tail, before the first `requestAnimationFrame`)
+runs the epoch recompute cascade once at J2000, making fresh-load state
+≡ chain state by construction — `resetEpochToJ2000` cannot do this (it
+early-returns at epoch 0). Gated: the browser golden master's FIRST
+recorded key is a fresh-state umbra pin (`ecl.umbraSceneFresh@…`,
+probed before any epoch call) that must equal the healed value
+bit-for-bit — fail-proven (planting the heal's removal drifts exactly
+that pin, exit 1).
+
 #### The Sun planetary completion (20.3h — package location tier)
 
 The PACKAGE location tier (`@essrt/physics` `eclipse/besselian.cjs`)

@@ -6714,6 +6714,14 @@ const earth = {
   startPos: 0,    
   speed: -Math.PI*2/(holisticyearLength/13),
   rotationSpeed: Math.PI*2 * SI_TROPICAL_YEAR_DAYS * 86400 * (meansolaryearlengthinDays+1) / (meanlengthofday * meansolaryearlengthinDays),  // Phase 9.5b: sidereal rotations per SI year (LOD-aware); at J2000 ≡ 2π × (meansol+1) to ppm
+  // 20.3c sidereal-phase anchor — MATCHED PAIR with updateEarthForEpoch()
+  // and the node twin (umbra-scene-node-twin.js). MUST be initialized here:
+  // a fresh page never runs the epoch updaters (the start date sits inside
+  // the deep-time auto-sync guard's 1-yr threshold), and without it the
+  // umbra/ground chain runs un-anchored (+0.4928° lon ≈ 53 km on every
+  // ground point; the 26-event audit read 260/100/15 km where the certified
+  // chain reads 223/51/46 — measured 2026-08, the fresh-vs-healed split).
+  rotationPhase: -Math.PI/SI_TROPICAL_YEAR_DAYS,
   tilt: -earthtiltMean,
   orbitRadius: -eccentricityAmplitude*100,
   orbitCentera: 0,
@@ -36668,6 +36676,26 @@ function render(now) {
   }
   //stats.end();
 }
+// ── Startup heal: fresh-load state ≡ epoch-chain state at J2000 ─────────────
+// The object literals and the epoch updaters are two hand-maintained copies
+// of the same parameters, and they had drifted (measured 2026-08: a fresh
+// page computed the umbra chain ~0.5° of longitude away from the healed
+// state — the 26-event audit read 260/100/15 km where the certified chain
+// reads 223/51/46). resetEpochToJ2000() cannot repair this at startup (it
+// early-returns at epoch 0), and the deep-time auto-sync never fires here
+// (the start date sits inside its 1-yr guard, and a paused page never
+// reaches the UI tick). Run the recompute cascade once so every object
+// carries the chain-derived values from frame zero — the same list
+// resetEpochToJ2000 runs, minus the seed restoration (the seeds ARE the
+// module-load values here). MATCHED SET with resetEpochToJ2000's body.
+recomputeTimeUnitsForEpoch(0);
+recomputeDerivedAnchorsForEpoch(0);
+recomputeMoonAndAuForEpoch(0);
+recomputeMoonDerivedForEpoch(0);
+recomputePlanetCountsForEpoch(0);
+recomputePlanetCyclesForEpoch(0);
+rebuildPeriHarmonicsForEpoch(0);
+updateAllObjectsForEpoch();
 requestAnimationFrame(render);
 
 //*************************************************************
