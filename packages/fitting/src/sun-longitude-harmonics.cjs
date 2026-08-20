@@ -55,7 +55,7 @@
  *     + the SUN_HARMONICS this fitter writes. Any --write refit here
  *     changes the residual that table corrects and silently stales it:
  *     after a refit, re-derive with
- *       node tools/fit/sun-planetary-completion-fit.mjs
+ *       node tools/fit/sun-planetary-completion-fit.js
  *     (fetches JPL Horizons live, refits the 10-term basis, drift-checks
  *     the shipped table) and update the table's literals. The api
  *     centerline gate (test:api, ≤8" shadow-plane) catches gross

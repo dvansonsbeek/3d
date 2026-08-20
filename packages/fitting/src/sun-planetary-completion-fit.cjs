@@ -30,16 +30,20 @@
 //  the 20.3h-lite lesson, "preview the gate scoreboard before
 //  shipping", applied and confirmed.
 //
-//   node tools/fit/sun-planetary-completion-fit.mjs
-import { createModel, DEFAULT_CONSTANTS } from '@essrt/physics';
-import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
-import { join } from 'node:path';
-import { readFileSync } from 'node:fs';
+//   node tools/fit/sun-planetary-completion-fit.js
+'use strict';
+/* global fetch -- Node ≥18 built-in; this fitter queries JPL Horizons live */
 
-const ROOT = fileURLToPath(new URL('../../', import.meta.url));
-const require2 = createRequire(join(ROOT, 'package.json'));
-const { sunPlanetaryCompletionDeg } = require2('@essrt/physics/eclipse/sun-planetary-completion');
+const { join } = require('node:path');
+const { readFileSync } = require('node:fs');
+const { sunPlanetaryCompletionDeg } = require('@essrt/physics/eclipse/sun-planetary-completion');
+
+const ROOT = join(__dirname, '..', '..', '..');
+
+(async () => {
+
+// @essrt/physics is ESM (index.js) — dynamic import from this CJS fitter.
+const { createModel, DEFAULT_CONSTANTS } = await import('@essrt/physics');
 
 const model = createModel(DEFAULT_CONSTANTS);
 const C = DEFAULT_CONSTANTS;
@@ -196,3 +200,5 @@ for (const ev of CL.events) {
   console.log(`   ${ev.label.padEnd(36)} ${per.map((v) => v.toFixed(1) + '″').join('  ')}`);
 }
 console.log(`   overall mean ${(all.reduce((a, v) => a + v, 0) / all.length).toFixed(1)}″ | max ${Math.max(...all).toFixed(1)}″  [shipping run: 3.6 / 5.0]`);
+
+})().catch((e) => { console.error(e); process.exit(1); });
