@@ -36,7 +36,7 @@
  *    MATCHED-PAIR DOWNSTREAM: a Step-0 refit stales the location tier's
  *    Sun planetary completion (packages/physics/src/eclipse/
  *    sun-planetary-completion.cjs) — re-derive it afterwards with
- *      node tools/explore/sun-planetary-completion-fit.mjs
+ *      node tools/fit/sun-planetary-completion-fit.mjs
  *    and update its table + PAIRED_SUN_HARMONICS_SHA256. Enforced: the
  *    test:model parity gate fingerprints the pair and fails `npm run
  *    check` if Step 0 was refit without the re-derivation.

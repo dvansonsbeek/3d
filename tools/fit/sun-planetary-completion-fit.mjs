@@ -30,7 +30,7 @@
 //  the 20.3h-lite lesson, "preview the gate scoreboard before
 //  shipping", applied and confirmed.
 //
-//   node tools/explore/sun-planetary-completion-fit.mjs
+//   node tools/fit/sun-planetary-completion-fit.mjs
 import { createModel, DEFAULT_CONSTANTS } from '@essrt/physics';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';

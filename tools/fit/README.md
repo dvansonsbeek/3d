@@ -203,6 +203,7 @@ then `npm run constants:generate` (Step 9).
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
 | `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/02-solar-measurements.csv` |
 | `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (H-lattice terms; **see design rule above** — only divisors n where H/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime H-lattice filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. |
+| `sun-planetary-completion-fit.mjs` | NOTHING (read-only, the Step-0 companion — 20.3h) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Re-derives the 10-term planetary completion shipped as literals in `packages/physics/src/eclipse/sun-planetary-completion.cjs`, drift-checks the shipped table, re-runs the syzygy + NASA-centerline scoreboards. Run after ANY Step-0 refit and update the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |
 | `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
@@ -348,7 +349,7 @@ Step 0:  SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --wr
            SUN_HARMONICS applied. Any --write refit here (i.e. any of
            the trigger conditions above) stales that table's
            amplitudes: after the refit, re-derive with
-             node tools/explore/sun-planetary-completion-fit.mjs
+             node tools/fit/sun-planetary-completion-fit.mjs
            and update the table's literals. The api centerline gate
            (test:api, ≤8" shadow-plane on the 15 NASA points) catches
            gross staleness only — a few-arcsec refit slips under it,

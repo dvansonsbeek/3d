@@ -41,7 +41,7 @@
  * refit (pipeline Step 0; its fitter header carries the reciprocal
  * note), an eccentricity/perihelion definition change, or the 20.3e
  * derived-tables decision. Re-derivation:
- *   node tools/explore/sun-planetary-completion-fit.mjs
+ *   node tools/fit/sun-planetary-completion-fit.mjs
  * ENFORCED, not just documented: PAIRED_SUN_HARMONICS_SHA256 below is
  * the fingerprint of the SUN_LONGITUDE_HARMONICS this table was fitted
  * under; the create-model parity gate (test:model, in `npm run check`)
