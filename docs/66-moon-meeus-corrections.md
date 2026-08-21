@@ -784,13 +784,23 @@ retrograde), so the measured world-frame regression is the star-referenced
 
 ### The umbra apparent-place chain (the 20.3 correction stack)
 
-The scene-umbra ground track (audit-26, the Babylon −135 case, the NASA
-path comparisons) carries a correction stack between the scene's
-mean-frame bodies and the apparent sky, every term derived, attributed,
-or measured-and-era-proven — applied as a MATCHED PAIR in
-`src/script.js` (`_applySolarAberration` + the umbra functions) and
-`tools/explore/umbra-scene-node-twin.js`, pinned by the twin-parity
-probe (worst 0.25 km):
+**THE UMBRA STRANGLER (U1–U3) — the certified umbra is now the package
+tier.** Since U1/U2 every certified umbra consumer — the eclipse-audit
+generator (audit-26, Babylon −135, the NASA centerlines), the browser
+audit and eclipse buttons, and the always-on umbra disc's position —
+rides ONE implementation: `@essrt/physics` `eclipse/besselian.cjs`
+(`createModel().eclipse.umbraGroundAtJD`), the api-gate-certified 2.7″
+chain (derived Sun planetary completion + derived Moon tails + exact
+axis∩ellipsoid ground mapping). The browser's `umbraFromSceneAtJd` is a
+thin delegation to it; the former scene-navigation body, its Node twin
+(`umbra-scene-node-twin.js`), and their empirically pinned alignment
+constants were retired in U3 (git history). Measured at the switch: the
+audit centerlines went 9.7″ → 2.7″ mean, audit-26 gained a confirmed
+verdict (1973 Agadez) with no downgrades, and Babylon −135 tightened
+223 → 206 km. What remains below describes the SCENE-side correction
+stack — now serving only the scene-relative NASA-convention γ diagnostic
+(`umbraNASAConventionAtJd`) and the historical record of how the scene
+chain reached its accuracy before the strangler:
 
 1. **Annual aberration, BOTH bodies** (round 3 corrected the Sun-only
    form) — `Δλ = −(κ/r)·cos(λ_body − λ_sun)/cos β` about the ecliptic

@@ -5434,8 +5434,9 @@ function updateEarthForEpoch() {
   // rotation — displaced every ground point ~53 km west, CONSTANT across
   // dates (measured at six modern eclipses: −1.98 min at every epoch,
   // EoT-independent; EoT(anchor) = −1.72 min is excluded by 15 s). Derived
-  // constant, zero fit. MATCHED PAIR with the umbra twin's spin
-  // (tools/explore/umbra-scene-node-twin.js).
+  // constant, zero fit. (The former Node umbra twin that mirrored this spin
+  // was deleted in U3 — the certified umbra now delegates to the tier; this
+  // anchor still drives the rendered scene + the NASA-convention diagnostic.)
   earth.rotationPhase = -Math.PI / SI_TROPICAL_YEAR_DAYS;
   earth.size          = (diameters.earthDiameter / 2 / currentAUDistance) * 100;
 }
@@ -6715,7 +6716,8 @@ const earth = {
   speed: -Math.PI*2/(holisticyearLength/13),
   rotationSpeed: Math.PI*2 * SI_TROPICAL_YEAR_DAYS * 86400 * (meansolaryearlengthinDays+1) / (meanlengthofday * meansolaryearlengthinDays),  // Phase 9.5b: sidereal rotations per SI year (LOD-aware); at J2000 ≡ 2π × (meansol+1) to ppm
   // 20.3c sidereal-phase anchor — MATCHED PAIR with updateEarthForEpoch()
-  // and the node twin (umbra-scene-node-twin.js). MUST be initialized here:
+  // (the Node umbra twin that mirrored it was deleted in U3). MUST be
+  // initialized here:
   // a fresh page never runs the epoch updaters (the start date sits inside
   // the deep-time auto-sync guard's 1-yr threshold), and without it the
   // umbra/ground chain runs un-anchored (+0.4928° lon ≈ 53 km on every
@@ -45412,11 +45414,13 @@ const _sceneUmbraQuatInv = new THREE.Quaternion();
  * positions exactly. Returns null if the umbra misses Earth at this JD.
  * UV convention: -X local = Greenwich, +Z local = 90°E, +Y = north pole
  * (per public/Earth.jpg, which is Pacific-centered). */
-/** B1: solar annual aberration for the umbra chain — the apparent Sun lags
- *  the geometric scene Sun by κ/r along the ecliptic (κ = 20.4955″; rotation
- *  about world Y, the ecliptic pole; the −sign measured against JPL apparent
- *  RA at 2024-04-08 18:42). MATCHED PAIR with
- *  tools/explore/umbra-scene-node-twin.js — change both or neither. */
+/** B1: solar annual aberration for the SCENE shadow machinery — the apparent
+ *  Sun lags the geometric scene Sun by κ/r along the ecliptic (κ = 20.4955″;
+ *  rotation about world Y, the ecliptic pole; the −sign measured against JPL
+ *  apparent RA at 2024-04-08 18:42). Since U2/U3 the CERTIFIED umbra is the
+ *  tier delegation above; this function serves only umbraNASAConventionAtJd
+ *  (the scene-relative γ diagnostic). The Node twin that mirrored it was
+ *  deleted in U3. */
 function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
   // 20.3i: SERIES-INJECTED SUN — the symmetric cure to the Moon override.
   // The scaffold sun rides the scene's of-date layer composition, whose
@@ -45429,8 +45433,7 @@ function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
   // Besselian tier uses) in the rotationAxis equatorial frame, placed
   // exactly like the Moon override: dec = asin(sin ε sin λ),
   // ra = atan2(cos ε sin λ, cos λ). Distance keeps the scaffold value
-  // (the shadow DIRECTION is the accuracy carrier). MATCHED PAIR with
-  // tools/explore/umbra-scene-node-twin.js — change both or neither.
+  // (the shadow DIRECTION is the accuracy carrier).
   {
     // NOTE (measured): NOT bridged by deltaTStart — the scene Moon rides
     // the raw-curve clock; bridging the sun degraded the modern
@@ -45454,9 +45457,7 @@ function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
   // pole. For the Sun this reduces exactly to the original term; for the
   // Moon at syzygy it applies the SAME rotation, so aberration CANCELS in
   // the elongation — the Sun-only form broke the relative geometry by
-  // exactly κ (+20″ elongation error at all five modern events). MATCHED
-  // PAIR with tools/explore/umbra-scene-node-twin.js — change both or
-  // neither.
+  // exactly κ (+20″ elongation error at all five modern events).
   const rAu = sunGeoVec.length() / 100;
   const a = -(K.physicalConstants.aberrationConstantArcsec / 3600) * (Math.PI / 180) / rAu;
   const _lamS0 = Math.atan2(sunGeoVec.x, sunGeoVec.z);

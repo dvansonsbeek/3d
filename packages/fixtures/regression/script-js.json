@@ -4,6 +4,8 @@
   "values": {
     "ecl.umbraSceneFresh@1671853.759762.lat": 50.95235823309842,
     "ecl.umbraSceneFresh@1671853.759762.lon": 64.65232262036346,
+    "ecl.umbraNASAFresh@1671853.759762.lat": 68.8436091644457,
+    "ecl.umbraNASAFresh@1671853.759762.lon": -26.156301837647167,
     "anchor.holisticyearLength": 335317,
     "anchor.H": 335317,
     "anchor.meanlengthofday": 86399.99967597384,

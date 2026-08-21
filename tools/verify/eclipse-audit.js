@@ -76,10 +76,10 @@ const C = require('../lib/constants.js');
 const SG = require('../lib/scene-graph.js');
 // U1 — THE UMBRA STRANGLER: the package besselian tier is the SINGLE umbra
 // implementation (the same createModel chain the api centerline gate
-// certifies at the 2.7″ class vs the NASA path tables). The scene twin
-// (tools/explore/umbra-scene-node-twin.js) is no longer consumed here —
-// its empirically pinned ground-mapping constants stay out of the
-// certified numbers. require(esm): Node ≥22.12 (local 22.19, CI node 22).
+// certifies at the 2.7″ class vs the NASA path tables). The former scene
+// twin (deleted in U3; git history) is no longer consumed — its
+// empirically pinned ground-mapping constants stay out of the certified
+// numbers. require(esm): Node ≥22.12 (local 22.19, CI node 22).
 const { createModel } = require('@essrt/physics');
 const TIER = createModel();
 /** Tier umbra in the audit's {lat, lon} shape. @param {number} jd @returns {{lat:number,lon:number}|null} */
