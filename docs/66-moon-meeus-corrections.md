@@ -1010,9 +1010,13 @@ the syzygy fleet (RMS 3.99″) near perigee, where the series tail is
 largest. The 2001 Atlantic event — now the largest tracked residual at
 5.1″ — has the identical anatomy (elongation −5.39″, predicted 5.27″
 vs measured 5.0″). That residual class is series-tail content (the
-20.3e / further-derived-terms path), not geometry. Antarctica (6.9″)
-stays exploratory pending a conscious tracking decision — it now fits
-the ≤8″ gate.
+20.3e / further-derived-terms path), not geometry. Antarctica is now TRACKED
+(owner decision): the A2 planetary tail improved it further to 5.2″
+(2.8″ of gate margin), and it stays in the set as the extreme-geometry
+stressor — highest latitude and lowest sun in the sample, the class
+where the sphere bug hid; a gate trip there is interpretable because
+the diagnosis is complete. Tracked set: 14 events / 42 points, mean
+2.9″ / max 6.2″.
 
 **The A2 planetary tail (shipped in the same landing, owner decision).**
 The Moon's direct planetary perturbations — the last derived tail —

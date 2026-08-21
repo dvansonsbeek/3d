@@ -385,9 +385,36 @@
           }
         ],
         "meanShadowPlaneArcsec": 1.8
+      },
+      {
+        "label": "2021 Dec 04 Total (Antarctica)",
+        "points": [
+          {
+            "utc": "07:28",
+            "groundGapKm": 10,
+            "sunAltDeg": 16.9,
+            "shadowPlaneKm": 9.6,
+            "shadowPlaneArcsec": 5.2
+          },
+          {
+            "utc": "07:32",
+            "groundGapKm": 10.5,
+            "sunAltDeg": 17.2,
+            "shadowPlaneKm": 9.6,
+            "shadowPlaneArcsec": 5.2
+          },
+          {
+            "utc": "07:36",
+            "groundGapKm": 11.1,
+            "sunAltDeg": 17.1,
+            "shadowPlaneKm": 9.6,
+            "shadowPlaneArcsec": 5.2
+          }
+        ],
+        "meanShadowPlaneArcsec": 5.2
       }
     ],
-    "meanShadowPlaneArcsec": 2.7,
+    "meanShadowPlaneArcsec": 2.9,
     "maxShadowPlaneArcsec": 6.2
   },
   "inputs": {
@@ -408,7 +435,7 @@
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/model-parameters.json": "sha256:15fa564ec017b86ff41794bde8bde1d0ece49ccb945c9504f369b926a1087664",
-      "public/input/solar-eclipse-centerlines-nasa.json": "sha256:fb3a5e6e125bf4e85a3a8371745b45862d2357b52754a6e0679f5503fce16697",
+      "public/input/solar-eclipse-centerlines-nasa.json": "sha256:995d1b38879e6bd1983a1f2895c1269b9f8f4fa917ccb047bfc7b0be3da5985c",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
       "tools/lib/scene-graph.js": "sha256:f7f3d4589f6ead9a6667aeac69adc64e42731816dc90bd8f5ba2bae450c3331f",
       "tools/verify/eclipse-audit.js": "sha256:dc9699204defcf2e2b2c8d43c13d66939e0953f0a3188ff719662c574d997b7d"
