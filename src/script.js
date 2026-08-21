@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection, createModel } from '@essrt/physics';
 
 /**
  * The correction tables key planets lowercase in JSON and capitalised here
@@ -30229,7 +30229,7 @@ function setupGUI() {
 
     console.log('\n══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
     console.log('  Audit: all 26 solar eclipse presets — model vs documented record');
-    console.log('  Uses SCENE STATE (framework\'s scene-graph). Matches the always-on umbra disc and GREEN-marker positions exactly.');
+    console.log('  Uses the UMBRA TIER (@essrt/physics besselian — the single umbra implementation, api-gate-certified 2.7″ class). Matches the always-on umbra disc exactly (the disc is positioned from the same tier).');
     console.log('  PrsUT = preset documented UT   |   MdlUT = model\'s nearest eclipse UT   |   ΔJD = MdlUT − PrsUT');
     console.log('  Gap@PrsUT / Gap@MdlUT = distance from site to model umbra at preset UT / model\'s UT');
     console.log('  BestΔUT / BestGap / Umbra@Best = closest umbra↔site over ±4h scan, with umbra coords at that moment');
@@ -30246,7 +30246,7 @@ function setupGUI() {
     // at the end so the user's view returns to where it was when they clicked.
     const _saveJD = o.julianDay;
     const _t0     = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-    console.log(`  Computing — ~25,000 scene-graph navigations with full Meeus β correction (full ±4h scan at 30-sec resolution). May take 45-90 s...`);
+    console.log(`  Computing — ~25,000 tier-umbra evaluations (full ±4h scan at 30-sec resolution; no scene navigation since U2)...`);
 
     try {
     for (const preset of ECLIPSE_PRESETS) {
@@ -30382,7 +30382,7 @@ function setupGUI() {
 
     console.log('  ' + '─'.repeat(158));
     console.log(`  Summary:  ${nConfirm} confirmed · ${nOffPeak} off-peak · ${nRegional} regional · ${nDtSignal} ΔT-signal · ${nDtAndOffPeak} ΔT+off-peak · ${nDtAndRegional} ΔT+regional · ${nDtAndGeo} ΔT+geo · ${nGeo} geographic · ${nNoSite} no-site-coords`);
-    console.log(`  Runtime: ${_elapsed_s.toFixed(1)} s (scene navigated to ${ECLIPSE_PRESETS.length} presets × ~243 time samples each)`);
+    console.log(`  Runtime: ${_elapsed_s.toFixed(1)} s (tier umbra at ${ECLIPSE_PRESETS.length} presets × ~243 time samples each; no scene navigation)`);
     console.log('');
     console.log('  Interpretation — what each verdict means about OUR FRAMEWORK\'s prediction (the record itself is treated as ground truth):');
     console.log('    ✓ confirmed                       → framework agrees with record on UT AND geography (≤ 300 km).');
@@ -45479,41 +45479,23 @@ function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
   // laws approximated, at every epoch. MATCHED PAIR with the twin.)
 }
 
+let _tierUmbraModel = null;
+const _umbraTierMemo = { jd: NaN, out: null };
 function umbraFromSceneAtJd(jd) {
-  jumpToJulianDay(jd);
-  forceSceneUpdate('light');
-
-  sun  .planetObj.getWorldPosition(_sceneUmbraSun);
-  moon .planetObj.getWorldPosition(_sceneUmbraMoon);
-  earth.planetObj.getWorldPosition(_sceneUmbraEarth);
-
-  _sceneUmbraMoonGeo.copy(_sceneUmbraMoon).sub(_sceneUmbraEarth);
-  _sceneUmbraSunGeo .copy(_sceneUmbraSun) .sub(_sceneUmbraEarth);
-  _applySolarAberration(_sceneUmbraSunGeo, jd, _sceneUmbraMoonGeo);
-  _sceneUmbraDir    .copy(_sceneUmbraMoonGeo).sub(_sceneUmbraSunGeo).normalize();
-
-  const R_E = earth.size;
-  const MdotD = _sceneUmbraMoonGeo.dot(_sceneUmbraDir);
-  const MdotM = _sceneUmbraMoonGeo.dot(_sceneUmbraMoonGeo);
-  const disc  = MdotD * MdotD - (MdotM - R_E * R_E);
-  if (disc < 0) return null;
-
-  const s = -MdotD - Math.sqrt(disc);
-  _sceneUmbraHit.copy(_sceneUmbraDir).multiplyScalar(s).add(_sceneUmbraMoonGeo);
-
-  earth.planetObj.getWorldQuaternion(_sceneUmbraQuat);
-  _sceneUmbraQuatInv.copy(_sceneUmbraQuat).invert();
-  _sceneUmbraLocal.copy(_sceneUmbraHit).applyQuaternion(_sceneUmbraQuatInv);
-
-  const r = _sceneUmbraLocal.length();
-  // 20.3c Step 1: geodetic output latitude (WGS84) — the sphere piercing
-  // yields geocentric; NASA paths are geodetic (0.19°·sin 2φ ≈ 20 km at
-  // mid-latitudes). MATCHED PAIR with the umbra twin.
-  const _F = 1 / K.physicalConstants.earthFlatteningInverseWGS84;
-  const _latGc = Math.asin(Math.max(-1, Math.min(1, _sceneUmbraLocal.y / r)));
-  const lat = Math.atan(Math.tan(_latGc) / ((1 - _F) * (1 - _F))) * (180 / Math.PI);
-  const lon = Math.atan2(_sceneUmbraLocal.z, -_sceneUmbraLocal.x) * (180 / Math.PI);
-  return { lat, lon };
+  // U2 (the umbra strangler): DELEGATED to the package besselian tier — the
+  // SINGLE umbra implementation, the api-gate-certified 2.7″ chain (derived
+  // Sun planetary completion + derived Moon tails + exact axis∩ellipsoid
+  // ground mapping). The former scene-navigation body — and the empirically
+  // pinned alignment constants it rode — lives in git history; scene state
+  // is NO LONGER navigated here, so callers' save/restore wrappers now guard
+  // only their own other scene reads. Historical "FromScene" name kept until
+  // the U3 rename. The one-JD memo serves the per-frame umbra-disc caller.
+  if (_tierUmbraModel === null) _tierUmbraModel = createModel();
+  if (jd === _umbraTierMemo.jd) return _umbraTierMemo.out;
+  const u = _tierUmbraModel.eclipse.umbraGroundAtJD(jd);
+  _umbraTierMemo.jd = jd;
+  _umbraTierMemo.out = u ? { lat: u.latDeg, lon: u.lonDeg } : null;
+  return _umbraTierMemo.out;
 }
 
 /** Alternative umbra convention: NASA/Espenak "greatest eclipse coordinates."
@@ -57981,13 +57963,11 @@ function makeRealisticEarth(pd){
     const _udcEarth     = new THREE.Vector3();
     const _udcMoonGeo   = new THREE.Vector3();
     const _udcSunGeo    = new THREE.Vector3();
-    const _udcDir       = new THREE.Vector3();
     const _udcHit       = new THREE.Vector3();
     const _udcMoonToHit = new THREE.Vector3();
     const _udcLocal     = new THREE.Vector3();
     const _udcNormal    = new THREE.Vector3();
     const _udcQuat      = new THREE.Quaternion();
-    const _udcQuatInv   = new THREE.Quaternion();
     const _udcAxisQuat  = new THREE.Quaternion();
     const _udcZAxis     = new THREE.Vector3(0, 0, 1);
 
@@ -58030,25 +58010,33 @@ function makeRealisticEarth(pd){
           }
         }
 
-        _udcDir    .copy(_udcMoonGeo).sub(_udcSunGeo).normalize();
-
         const R_E   = radius;                        // mesh radius (= captured pd.size)
-        const MdotD = _udcMoonGeo.dot(_udcDir);
-        const MdotM = _udcMoonGeo.dot(_udcMoonGeo);
-        const disc_ = MdotD * MdotD - (MdotM - R_E * R_E);
-
-        if (disc_ < 0) {                             // umbra misses Earth — no eclipse
+        /* U2 (the umbra strangler): the disc POSITION comes from the tier
+         * umbra — the single implementation the audit and the gates certify
+         * — so the visible disc IS the certified prediction (delegated
+         * umbraFromSceneAtJd; one-JD memo makes the per-frame call cheap).
+         * The scene vectors above stay only for the cone-RADIUS geometry
+         * (visual km-class). Chart: core-local, -X = Greenwich, +Z = 90°E,
+         * +Y = north (public/Earth.jpg); the tier's geodetic latitude is
+         * converted back to geocentric for the spherical mesh. */
+        const _jdDisc = o.julianDay;
+        const _tp = Number.isFinite(_jdDisc) ? umbraFromSceneAtJd(_jdDisc) : null;
+        if (_tp === null) {                          // umbra misses Earth — no eclipse
             umbraDisc.visible = false;
             umbraHalo.visible = false;
             return;
         }
-
-        const s = -MdotD - Math.sqrt(disc_);
-        _udcHit.copy(_udcDir).multiplyScalar(s).add(_udcMoonGeo);
-
+        const _D2Ru = Math.PI / 180;
+        const _fEl = 1 / K.physicalConstants.earthFlatteningInverseWGS84;
+        const _latGc = Math.atan(Math.tan(_tp.lat * _D2Ru) * (1 - _fEl) * (1 - _fEl));
+        const _lamU = _tp.lon * _D2Ru;
+        _udcLocal.set(
+            -Math.cos(_latGc) * Math.cos(_lamU),
+            Math.sin(_latGc),
+            Math.cos(_latGc) * Math.sin(_lamU),
+        ).multiplyScalar(R_E);
         core.getWorldQuaternion(_udcQuat);
-        _udcQuatInv.copy(_udcQuat).invert();
-        _udcLocal.copy(_udcHit).applyQuaternion(_udcQuatInv);
+        _udcHit.copy(_udcLocal).applyQuaternion(_udcQuat);   // world-frame hit for the radius geometry
 
         /* True umbra width via umbra-cone apex geometry (NOT the parallel-
          * ray approximation that Three.js renders). For a Moon-cone apex
