@@ -38,3 +38,8 @@ data/Snyder_Data_Figures/
 
 # Downloaded but never used by any script or doc — no reason to hold rights to it.
 data/rahmstorf-2015-amoc-index.txt
+
+# Instrument-local working data: each tools/explore instrument regenerates its
+# own *.local.json (integration dumps; JPL caches rebuild deterministically
+# from seeded epoch lists). The instruments are tracked, their data is not.
+tools/explore/*.local.json

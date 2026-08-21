@@ -1,5 +1,15 @@
 // THE SUN PLANETARY COMPLETION — fit + verification instrument (20.3h).
-// The dev record behind packages/physics/src/eclipse/sun-planetary-completion.cjs.
+// The dev record behind the v1 fitted table of
+// packages/physics/src/eclipse/sun-planetary-completion.cjs.
+//
+// SUPERSEDED BY STAGE D2 (plan §12i item 10): the shipped module is now
+// the DERIVED 68-term table extracted from the framework's own 8-body
+// integration — re-derivation goes through the D2 instrument chain
+// (tools/explore/d2-derived-sun.mjs → d2-sun-table-extraction.mjs →
+// d2-joint-preview.mjs), NOT through a re-run of this fitter. Part 1's
+// coefficient-drift comparison no longer applies (the shipped basis is
+// no longer the 10-term fit basis); parts 3–4 (the shipped-model
+// scoreboards) remain valid verification instruments.
 //
 // Fetches JPL Horizons live (ObsEcLon, COMMAND 10/301, CENTER 500@399,
 // QUANTITIES 31, TLIST of JD UT — the u2-dense-de441 convention) at:
@@ -36,7 +46,10 @@
 
 const { join } = require('node:path');
 const { readFileSync } = require('node:fs');
-const { sunPlanetaryCompletionDeg } = require('@essrt/physics/eclipse/sun-planetary-completion');
+const { createSunPlanetaryCompletion } = require('@essrt/physics/eclipse/sun-planetary-completion');
+// Frozen dev-record value of the derived EMB wobble (a_M·μ/AU); the live
+// model computes it from constants — this instrument only needs parity.
+const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({ embWobbleArcsec: 6.4399 });
 
 const ROOT = join(__dirname, '..', '..', '..');
 

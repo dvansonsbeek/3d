@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "NASA GSFC path-table CENTRAL LINE reference points for the modern solar-eclipse accuracy instrument (eclipse-audit 'centerlines' section). Each point: UT instant + the path table's central-line latitude/longitude. THE COLUMN TRAP, twice encountered while building this set: the SEpath tables print northern limit / southern limit / central line as three look-alike coordinate pairs, and casual extraction returns a LIMIT (half a path width of phantom error - the 1999 first fetch returned the northern limit; a 2017 re-fetch did the same). Every row below is cross-checked: 2017 against the table's own greatest-duration point (18:21:49 at 37 35N 89 07W), 2024 against the greatest-eclipse point (18:17:18 at 25 17.2N 104 08.3W) and the Dallas site geometry, 1999 re-fetched with full column headers, 2023 taken from the explicit three-pair row (third pair = center). The audit compares the scene-umbra ground point at each UT against these and reports both ground km and the SHADOW-PLANE metric (ground x sin sun-altitude, sun altitude from the model - verified within 0.4 deg of the tables' own alt column where captured); ground km are NOT comparable across events (1/sin alt amplification, 6.9x at the low-sun 2026 Spain crossing).",
+    "description": "NASA GSFC path-table CENTRAL LINE reference points for the modern solar-eclipse accuracy instrument (eclipse-audit 'centerlines' section). Each point: UT instant + the path table's central-line latitude/longitude. THE COLUMN TRAP, now THREE times encountered while building this set: the SEpath tables print northern limit / southern limit / central line as three look-alike coordinate pairs, and casual extraction returns a LIMIT (half a path width of phantom error - the 1999 first fetch returned the northern limit; a 2017 re-fetch did the same; the 2001 Jun 21 11:56 first fetch returned the northern limit 10 49.7S 0 17.9E where the true central line is 11 43.0S 000 26.0E). Every row below is cross-checked: 2017 against the table's own greatest-duration point (18:21:49 at 37 35N 89 07W), 2024 against the greatest-eclipse point (18:17:18 at 25 17.2N 104 08.3W) and the Dallas site geometry, 1999 re-fetched with full column headers, 2023 taken from the explicit three-pair row (third pair = center), the 2001-2020 widening rows verified by sibling-consistency across each event's three instants plus full-column re-fetch of any outlier. The audit compares the scene-umbra ground point at each UT against these and reports both ground km and the SHADOW-PLANE metric (ground x sin sun-altitude, sun altitude from the model - verified within 0.4 deg of the tables' own alt column where captured); ground km are NOT comparable across events (1/sin alt amplification, 6.9x at the low-sun 2026 Spain crossing). The 2001-2020 events were added as the Stage-D2 widening (fetched 2026-08-21): the original 5-event sample's -2.56 arcsec mean was sampling structure, not fleet bias (-0.14 arcsec over 179 syzygies); acceptance decisions read the widened set. The 2021 Dec 04 Antarctica crossing is deliberately NOT tracked here - its anomaly is DIAGNOSED (docs/66: half was the sphere-vs-ellipsoid ground-mapping bug, fixed in besselian umbraGroundAt; the remaining 6.9 arcsec is a verified ordinary apparent-place tail, JPL-closed to 0.05 arcsec) and it now fits the 8 arcsec gate, but promotion to the tracked set is a separate conscious decision.",
     "source": "https://eclipse.gsfc.nasa.gov/SEpath/ (Espenak, NASA GSFC; SEpath1951 + SEpath2001 series), path tables per event as cited in each entry",
     "timeAxis": "UT as printed in the tables (the tables' own deltaT per event applies to their construction, not to this comparison - the scene umbra is evaluated at the same UT instant)"
   },
@@ -29,6 +29,46 @@
     { "label": "2023 Apr 20 Hybrid (Timor)", "table": "SEpath2001/SE2023Apr20Hpath.html",
       "points": [
         { "utc": "04:14", "jd": 2460054.676388889, "latDeg": -10.241666666666667, "lonDeg": 125.15 },
-        { "utc": "04:16", "jd": 2460054.6777777778, "latDeg": -9.77, "lonDeg": 125.60833333333333 } ] }
+        { "utc": "04:16", "jd": 2460054.6777777778, "latDeg": -9.77, "lonDeg": 125.60833333333333 } ] },
+    { "label": "2001 Jun 21 Total (Atlantic-Africa)", "table": "SEpath2001/SE2001Jun21Tpath.html",
+      "points": [
+        { "utc": "11:56", "jd": 2452081.9972222224, "latDeg": -11.7167, "lonDeg": 0.4333 },
+        { "utc": "12:06", "jd": 2452082.004166667, "latDeg": -11.1517, "lonDeg": 3.4417 },
+        { "utc": "12:16", "jd": 2452082.011111111, "latDeg": -10.8433, "lonDeg": 6.48 } ] },
+    { "label": "2002 Dec 04 Total (Africa-Indian O.)", "table": "SEpath2001/SE2002Dec04Tpath.html",
+      "points": [
+        { "utc": "06:30", "jd": 2452612.7708333335, "latDeg": -25.8917, "lonDeg": 35.2683 },
+        { "utc": "07:00", "jd": 2452612.7916666665, "latDeg": -33.6717, "lonDeg": 47.1317 },
+        { "utc": "07:30", "jd": 2452612.8125, "latDeg": -39.2767, "lonDeg": 59.055 } ] },
+    { "label": "2006 Mar 29 Total (Africa-Turkey)", "table": "SEpath2001/SE2006Mar29Tpath.html",
+      "points": [
+        { "utc": "09:30", "jd": 2453823.8958333335, "latDeg": 11.2333, "lonDeg": 5.7433 },
+        { "utc": "09:40", "jd": 2453823.902777778, "latDeg": 14.1183, "lonDeg": 8.605 },
+        { "utc": "09:50", "jd": 2453823.909722222, "latDeg": 16.995, "lonDeg": 11.2717 } ] },
+    { "label": "2008 Aug 01 Total (Arctic-Siberia)", "table": "SEpath2001/SE2008Aug01Tpath.html",
+      "points": [
+        { "utc": "10:12", "jd": 2454679.925, "latDeg": 69.7417, "lonDeg": 67.2867 },
+        { "utc": "10:20", "jd": 2454679.9305555555, "latDeg": 66.1467, "lonDeg": 71.755 },
+        { "utc": "10:28", "jd": 2454679.936111111, "latDeg": 62.6033, "lonDeg": 75.49 } ] },
+    { "label": "2009 Jul 22 Total (China-Pacific)", "table": "SEpath2001/SE2009Jul22Tpath.html",
+      "points": [
+        { "utc": "01:30", "jd": 2455034.5625, "latDeg": 30.8183, "lonDeg": 116.275 },
+        { "utc": "02:00", "jd": 2455034.5833333335, "latDeg": 29.1617, "lonDeg": 131.1033 },
+        { "utc": "02:30", "jd": 2455034.6041666665, "latDeg": 25.1233, "lonDeg": 142.3433 } ] },
+    { "label": "2012 Nov 13 Total (Pacific)", "table": "SEpath2001/SE2012Nov13Tpath.html",
+      "points": [
+        { "utc": "21:00", "jd": 2456245.375, "latDeg": -25.845, "lonDeg": 165.0133 },
+        { "utc": "21:30", "jd": 2456245.3958333335, "latDeg": -33.3967, "lonDeg": -179.8133 },
+        { "utc": "22:00", "jd": 2456245.4166666665, "latDeg": -38.4883, "lonDeg": -166.655 } ] },
+    { "label": "2019 Jul 02 Total (S Pacific-Chile)", "table": "SEpath2001/SE2019Jul02Tpath.html",
+      "points": [
+        { "utc": "19:16", "jd": 2458667.302777778, "latDeg": -17.525, "lonDeg": -111.2117 },
+        { "utc": "19:22", "jd": 2458667.3069444443, "latDeg": -17.4, "lonDeg": -109.3083 },
+        { "utc": "19:28", "jd": 2458667.311111111, "latDeg": -17.375, "lonDeg": -107.4083 } ] },
+    { "label": "2020 Dec 14 Total (Pacific-Chile)", "table": "SEpath2001/SE2020Dec14Tpath.html",
+      "points": [
+        { "utc": "15:30", "jd": 2459198.1458333335, "latDeg": -33.56, "lonDeg": -86.6283 },
+        { "utc": "15:42", "jd": 2459198.154166667, "latDeg": -35.93, "lonDeg": -81.56 },
+        { "utc": "15:54", "jd": 2459198.1625, "latDeg": -37.9117, "lonDeg": -76.4867 } ] }
   ]
 }

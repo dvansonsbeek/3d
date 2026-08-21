@@ -203,7 +203,7 @@ then `npm run constants:generate` (Step 9).
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
 | `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/02-solar-measurements.csv` |
 | `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (H-lattice terms; **see design rule above** — only divisors n where H/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime H-lattice filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. |
-| `sun-planetary-completion-fit.js` | NOTHING (read-only, the Step-0 companion — 20.3h) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Re-derives the 10-term planetary completion shipped as literals in `packages/physics/src/eclipse/sun-planetary-completion.cjs`, drift-checks the shipped table, re-runs the syzygy + NASA-centerline scoreboards. Run after ANY Step-0 refit and update the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
+| `sun-planetary-completion-fit.js` | NOTHING (read-only, the Step-0 companion — 20.3h, SUPERSEDED by Stage D2) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Was the dev record behind the v1 fitted 10-term table; the shipped table is now the DERIVED 68-term Stage-D2 extraction (`tools/explore/d2-derived-sun.mjs` → `d2-sun-table-extraction.mjs` → `d2-joint-preview.mjs`), so its coefficient-drift part no longer applies — its syzygy + NASA-centerline scoreboards remain valid verification. After ANY Step-0 refit, re-run the D2 chain and re-embed the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |
 | `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
@@ -342,19 +342,20 @@ Step 0:  SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --wr
                and Meeus-parity modes.
            (Same "stable across normal refits" pattern as
            fibonacci_significance.py / Step 7e.)
-         - MATCHED-PAIR DOWNSTREAM (20.3h): the package location tier's
-           Sun planetary completion
+         - MATCHED-PAIR DOWNSTREAM (20.3h → Stage D2): the package
+           location tier's Sun planetary completion
            (packages/physics/src/eclipse/sun-planetary-completion.cjs)
-           was fitted against the finder Sun WITH the current
+           corrects the residual of the finder Sun WITH the current
            SUN_HARMONICS applied. Any --write refit here (i.e. any of
-           the trigger conditions above) stales that table's
-           amplitudes: after the refit, re-derive with
-             node tools/fit/sun-planetary-completion-fit.js
-           and update the table's literals. The api centerline gate
-           (test:api, ≤8" shadow-plane on the 15 NASA points) catches
-           gross staleness only — a few-arcsec refit slips under it,
-           so the re-derivation is part of the refit, not optional.
-           (Reciprocal notes live in both file headers.)
+           the trigger conditions above) stales that correction: after
+           the refit, re-derive through the Stage-D2 instrument chain
+           (tools/explore/d2-derived-sun.mjs →
+           d2-sun-table-extraction.mjs → d2-joint-preview.mjs) and
+           re-embed the table + PAIRED_SUN_HARMONICS_SHA256. The api
+           centerline gate (test:api, ≤8" shadow-plane on the NASA
+           points) catches gross staleness only — a few-arcsec refit
+           slips under it, so the re-derivation is part of the refit,
+           not optional. (Reciprocal notes live in the file headers.)
          - Running it FIRST means Step 1 calibrates correctionSun with
            harmonics already applied → single-pass convergence. If 6f
            ran after Step 1 (legacy order), Step 1 would need to re-run

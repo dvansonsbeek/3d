@@ -169,10 +169,226 @@
           }
         ],
         "meanShadowPlaneArcsec": 9.8
+      },
+      {
+        "label": "2001 Jun 21 Total (Atlantic-Africa)",
+        "points": [
+          {
+            "utc": "11:56",
+            "groundGapKm": 41.8,
+            "sunAltDeg": 54.8,
+            "shadowPlaneKm": 41.3,
+            "shadowPlaneArcsec": 22.2
+          },
+          {
+            "utc": "12:06",
+            "groundGapKm": 41.3,
+            "sunAltDeg": 55.1,
+            "shadowPlaneKm": 41.3,
+            "shadowPlaneArcsec": 22.2
+          },
+          {
+            "utc": "12:16",
+            "groundGapKm": 41.4,
+            "sunAltDeg": 54.3,
+            "shadowPlaneKm": 41.3,
+            "shadowPlaneArcsec": 22.2
+          }
+        ],
+        "meanShadowPlaneArcsec": 22.2
+      },
+      {
+        "label": "2002 Dec 04 Total (Africa-Indian O.)",
+        "points": [
+          {
+            "utc": "06:30",
+            "groundGapKm": 22.6,
+            "sunAltDeg": 49.2,
+            "shadowPlaneKm": 20.3,
+            "shadowPlaneArcsec": 10.9
+          },
+          {
+            "utc": "07:00",
+            "groundGapKm": 21.1,
+            "sunAltDeg": 64.9,
+            "shadowPlaneKm": 20.9,
+            "shadowPlaneArcsec": 11.3
+          },
+          {
+            "utc": "07:30",
+            "groundGapKm": 23.1,
+            "sunAltDeg": 72.2,
+            "shadowPlaneKm": 22.9,
+            "shadowPlaneArcsec": 12.3
+          }
+        ],
+        "meanShadowPlaneArcsec": 11.5
+      },
+      {
+        "label": "2006 Mar 29 Total (Africa-Turkey)",
+        "points": [
+          {
+            "utc": "09:30",
+            "groundGapKm": 20.8,
+            "sunAltDeg": 56.4,
+            "shadowPlaneKm": 19.8,
+            "shadowPlaneArcsec": 10.6
+          },
+          {
+            "utc": "09:40",
+            "groundGapKm": 20.3,
+            "sunAltDeg": 60.7,
+            "shadowPlaneKm": 19.9,
+            "shadowPlaneArcsec": 10.7
+          },
+          {
+            "utc": "09:50",
+            "groundGapKm": 20,
+            "sunAltDeg": 64.1,
+            "shadowPlaneKm": 19.9,
+            "shadowPlaneArcsec": 10.7
+          }
+        ],
+        "meanShadowPlaneArcsec": 10.7
+      },
+      {
+        "label": "2008 Aug 01 Total (Arctic-Siberia)",
+        "points": [
+          {
+            "utc": "10:12",
+            "groundGapKm": 22.9,
+            "sunAltDeg": 33,
+            "shadowPlaneKm": 19.3,
+            "shadowPlaneArcsec": 10.4
+          },
+          {
+            "utc": "10:20",
+            "groundGapKm": 24.1,
+            "sunAltDeg": 33.5,
+            "shadowPlaneKm": 20.1,
+            "shadowPlaneArcsec": 10.8
+          },
+          {
+            "utc": "10:28",
+            "groundGapKm": 25.6,
+            "sunAltDeg": 33.3,
+            "shadowPlaneKm": 20.9,
+            "shadowPlaneArcsec": 11.2
+          }
+        ],
+        "meanShadowPlaneArcsec": 10.8
+      },
+      {
+        "label": "2009 Jul 22 Total (China-Pacific)",
+        "points": [
+          {
+            "utc": "01:30",
+            "groundGapKm": 7.1,
+            "sunAltDeg": 50.2,
+            "shadowPlaneKm": 6.9,
+            "shadowPlaneArcsec": 3.7
+          },
+          {
+            "utc": "02:00",
+            "groundGapKm": 7.5,
+            "sunAltDeg": 69.4,
+            "shadowPlaneKm": 7.4,
+            "shadowPlaneArcsec": 4
+          },
+          {
+            "utc": "02:30",
+            "groundGapKm": 8,
+            "sunAltDeg": 84.9,
+            "shadowPlaneKm": 8,
+            "shadowPlaneArcsec": 4.3
+          }
+        ],
+        "meanShadowPlaneArcsec": 4
+      },
+      {
+        "label": "2012 Nov 13 Total (Pacific)",
+        "points": [
+          {
+            "utc": "21:00",
+            "groundGapKm": 26.5,
+            "sunAltDeg": 37.8,
+            "shadowPlaneKm": 16.3,
+            "shadowPlaneArcsec": 8.7
+          },
+          {
+            "utc": "21:30",
+            "groundGapKm": 18.9,
+            "sunAltDeg": 56.5,
+            "shadowPlaneKm": 16.1,
+            "shadowPlaneArcsec": 8.7
+          },
+          {
+            "utc": "22:00",
+            "groundGapKm": 18,
+            "sunAltDeg": 66.9,
+            "shadowPlaneKm": 17.5,
+            "shadowPlaneArcsec": 9.4
+          }
+        ],
+        "meanShadowPlaneArcsec": 8.9
+      },
+      {
+        "label": "2019 Jul 02 Total (S Pacific-Chile)",
+        "points": [
+          {
+            "utc": "19:16",
+            "groundGapKm": 7.7,
+            "sunAltDeg": 49.3,
+            "shadowPlaneKm": 5.8,
+            "shadowPlaneArcsec": 3.1
+          },
+          {
+            "utc": "19:22",
+            "groundGapKm": 7.8,
+            "sunAltDeg": 49.6,
+            "shadowPlaneKm": 5.9,
+            "shadowPlaneArcsec": 3.2
+          },
+          {
+            "utc": "19:28",
+            "groundGapKm": 7.8,
+            "sunAltDeg": 49.5,
+            "shadowPlaneKm": 6,
+            "shadowPlaneArcsec": 3.2
+          }
+        ],
+        "meanShadowPlaneArcsec": 3.2
+      },
+      {
+        "label": "2020 Dec 14 Total (Pacific-Chile)",
+        "points": [
+          {
+            "utc": "15:30",
+            "groundGapKm": 20,
+            "sunAltDeg": 59.5,
+            "shadowPlaneKm": 19.2,
+            "shadowPlaneArcsec": 10.3
+          },
+          {
+            "utc": "15:42",
+            "groundGapKm": 20,
+            "sunAltDeg": 65.1,
+            "shadowPlaneKm": 19.8,
+            "shadowPlaneArcsec": 10.6
+          },
+          {
+            "utc": "15:54",
+            "groundGapKm": 20.5,
+            "sunAltDeg": 69.5,
+            "shadowPlaneKm": 20.5,
+            "shadowPlaneArcsec": 11
+          }
+        ],
+        "meanShadowPlaneArcsec": 10.6
       }
     ],
-    "meanShadowPlaneArcsec": 8.9,
-    "maxShadowPlaneArcsec": 16.2
+    "meanShadowPlaneArcsec": 9.7,
+    "maxShadowPlaneArcsec": 22.2
   },
   "inputs": {
     "generator": "node tools/verify/eclipse-audit.js --write",
@@ -188,7 +404,7 @@
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/model-parameters.json": "sha256:15fa564ec017b86ff41794bde8bde1d0ece49ccb945c9504f369b926a1087664",
-      "public/input/solar-eclipse-centerlines-nasa.json": "sha256:94db908fc18e739fa362f36b695a0ca952e80da1ad97695896a1d38f314975af",
+      "public/input/solar-eclipse-centerlines-nasa.json": "sha256:fb3a5e6e125bf4e85a3a8371745b45862d2357b52754a6e0679f5503fce16697",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
       "tools/explore/umbra-scene-node-twin.js": "sha256:cb52f24c80fc4421e79b666cd5407a0a7a95472220d878a7009e5f523d44b17d",
       "tools/lib/scene-graph.js": "sha256:f7f3d4589f6ead9a6667aeac69adc64e42731816dc90bd8f5ba2bae450c3331f",

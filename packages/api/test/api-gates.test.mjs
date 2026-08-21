@@ -346,8 +346,12 @@ for (const url of SAMPLE_REQUESTS) {
   // the ground than the axis error it represents (measured when the 20.3h
   // sun completion landed: shadow-plane mean 6.0″ → 3.6″ / max 5.4″ while
   // the 2026 GROUND numbers ROSE — the projection artifact, not a
-  // regression). Recorded class after the completion: ≤5.4″ shadow-plane
-  // across all 15 points — the 8″ gate catches any regression of the
+  // regression). Recorded class after the Stage-D2 derived tables, the
+  // exact axis∩ellipsoid ground mapping, and the A2 planetary Moon tail:
+  // mean 2.7″ / max 6.2″ across the 13-event / 39-point widened set (the
+  // A2 landing trades this correlated 13-event sample −0.5″ for fleet-wide
+  // JPL gains — the owner-accepted tension recorded in
+  // moon/series-extension.cjs). The 8″ gate catches any regression of the
   // convention-offset class (~35″) with margin; the coarse 60 km ground
   // bound stays as a wild-miss backstop at any sun altitude.
   {

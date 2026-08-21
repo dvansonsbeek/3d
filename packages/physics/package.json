@@ -1,6 +1,6 @@
 {
   "name": "@essrt/physics",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core \u2014 pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
     "modelVersion": "v11.0",
@@ -36,6 +36,7 @@
     "./chain-cycles": "./src/chain-cycles/index.cjs",
     "./moon/arguments": "./src/moon/arguments.cjs",
     "./moon/series": "./src/moon/series.cjs",
+    "./moon/series-extension": "./src/moon/series-extension.cjs",
     "./moon/apparent": "./src/moon/apparent.cjs",
     "./planets/geometry": "./src/planets/geometry.cjs",
     "./planets/fibonacci-laws": "./src/planets/fibonacci-laws.cjs",

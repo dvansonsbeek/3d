@@ -58,6 +58,7 @@
  *   full-series Moon: ecliptic-of-date longitude/latitude (deg) + distance (km), TT axis (days since J2000)
  * @property {(jdUT: number) => number} sunLonDegAt - geometric mean sun longitude (deg), JD(UT) axis with the finder's internal ΔT
  * @property {(T: number) => number} sunCompletionDeg - planetary completion (deg) at T centuries TT, SUBTRACTED from the finder sun (see eclipse/sun-planetary-completion.cjs; the finders deliberately stay without it — their fitted anchors and certified canon statistics were produced on the bare form, and elongation-class timing absorbs the omission into the fitted phases)
+ * @property {(T: number) => {dLonDeg: number, dLatDeg: number}} moonExtensionAt - derived series-extension tail (deg) at T centuries TT, ADDED to the full-series Moon longitude/latitude (see moon/series-extension.cjs; same finder-scoping rationale as sunCompletionDeg — the finders stay on the bare series)
  * @property {(jd: number) => number} deltaTSecondsAt - framework ΔT (J2000-zeroed convention)
  * @property {(year: number) => number} obliquityDegAt - framework obliquity (deg) at calendar year
  * @property {(year: number) => number} eccentricityAt - framework Earth-orbit eccentricity at calendar year
@@ -126,29 +127,41 @@ function createBesselian(deps) {
     const dTT = (jb - K.j2000JD) + deps.deltaTSecondsAt(jb) / 86400;
     const sunLon = deps.sunLonDegAt(jb) - deps.sunCompletionDeg(dTT / K.julianCenturyDays);
     const moon = deps.moonFullAtDaysTT(dTT);
+    const ext = deps.moonExtensionAt(dTT / K.julianCenturyDays);
     return {
       S: eclToEq(sunLon, 0, sunDistanceKm(year, sunLon), eps),
-      M: eclToEq(moon.lonDeg, moon.latDeg, moon.distKm, eps),
+      M: eclToEq(moon.lonDeg + ext.dLonDeg, moon.latDeg + ext.dLatDeg, moon.distKm, eps),
     };
   }
 
   /** Umbra-axis ground intersection at JD(UT): geodetic latitude, east
    *  longitude — or null when the axis misses the ellipsoid.
+   *  EXACT axis ∩ ellipsoid: scaling z by 1/(1−f) turns the WGS84 quadric
+   *  into a sphere of radius R_E. The earlier R_E-SPHERE intersection put
+   *  the hit up to R_E·f·sin²φ ≈ 21 km above the true surface, and the
+   *  offset projects into the shadow-plane metric as ~height·cos(alt) —
+   *  a latitude/sun-altitude-correlated phantom error (measured: 2021
+   *  Antarctica 12.8″ → 6.9″, 2008 Arctic 7.3″ → 1.6″, 2026 Iberia
+   *  low-sun 4.4″ → 1.2″; NASA path tables are ellipsoid-based). The
+   *  geodetic latitude is then exact for the on-surface point:
+   *  tan φ = z / ((1−f)²·ρ).
    *  @param {number} jdUT @returns {{latDeg: number, lonDeg: number} | null} */
   function umbraGroundAt(jdUT) {
     const { S, M } = bodiesAt(jdUT);
     const dv = [M[0] - S[0], M[1] - S[1], M[2] - S[2]];
     const dl = Math.hypot(dv[0], dv[1], dv[2]);
     const d = [dv[0] / dl, dv[1] / dl, dv[2] / dl];
-    const MdotD = M[0] * d[0] + M[1] * d[1] + M[2] * d[2];
-    const MdotM = M[0] * M[0] + M[1] * M[1] + M[2] * M[2];
-    const disc = MdotD * MdotD - (MdotM - R_E_KM * R_E_KM);
+    const w = 1 / (1 - F);
+    const Ms = [M[0], M[1], M[2] * w], ds = [d[0], d[1], d[2] * w];
+    const A = ds[0] * ds[0] + ds[1] * ds[1] + ds[2] * ds[2];
+    const B = Ms[0] * ds[0] + Ms[1] * ds[1] + Ms[2] * ds[2];
+    const Cq = Ms[0] * Ms[0] + Ms[1] * Ms[1] + Ms[2] * Ms[2] - R_E_KM * R_E_KM;
+    const disc = B * B - A * Cq;
     if (disc < 0) return null;
-    const s = -MdotD - Math.sqrt(disc);
+    const s = (-B - Math.sqrt(disc)) / A;
     const hit = [M[0] + s * d[0], M[1] + s * d[1], M[2] + s * d[2]];
-    const r = Math.hypot(hit[0], hit[1], hit[2]);
-    const latGc = Math.asin(Math.max(-1, Math.min(1, hit[2] / r)));
-    const latDeg = Math.atan(Math.tan(latGc) / ((1 - F) * (1 - F))) / D2R;
+    const rho = Math.hypot(hit[0], hit[1]);
+    const latDeg = Math.atan2(hit[2], (1 - F) * (1 - F) * rho) / D2R;
     let lonDeg = Math.atan2(hit[1], hit[0]) / D2R - gmstDeg(jdUT);
     lonDeg = ((lonDeg + 540) % 360) - 180;
     return { latDeg, lonDeg };

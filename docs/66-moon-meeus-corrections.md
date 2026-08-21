@@ -928,6 +928,102 @@ framework-native and the 2–3″ ambition is out of reach BY CHOICE.
 Extending the framework's OWN series (more Ch. 47-class terms on
 framework-native arguments) remains the only sanctioned path lower.
 
+#### The derived series extension (Stage D2 — the sanctioned path, taken)
+
+That sanctioned path shipped as **Stage D2**: both location-tier tails
+are now DERIVED from the framework's own integrations, with JPL used
+only as out-of-sample validation.
+
+**Moon** (`moon/series-extension.cjs`): the Stage-D1 3-body lab
+(framework constants, RK4, IC calibration to the free elements) joint-fit
+over [Meeus-60 head + extended Delaunay catalog] reproduces the shipped
+head at 100.00–100.03% and yields 47 longitude + 30 latitude terms
+beyond it (2.02″/0.80″ RMS content, dt-halving drift 0.000″). JPL
+out-of-sample: shipped-Moon residual λ 3.68″ → 3.12″ (the lab predicted
+3.08″) and β 1.04″ → 0.65″ (predicted 0.66″); the sign-flipped control
+degrades both — the integrator predicted reality.
+
+**Sun** (`eclipse/sun-planetary-completion.cjs` v2): twin epoch-phased
+8-body integrations (planet phases from the engine scene graph,
+full-vs-base3 differential, the EMB secular-perihelion channel projected
+out — it belongs to the framework's own ϖ(t)/e(t) laws) give the
+planetary signal at corr −0.997 / slope −0.999 against the JPL residual.
+Its analytic reading — 68 terms: main synodic tones plus
+eccentricity-modulation sidebands (main ± modulator anomaly, main ± M_E),
+0.64″ table-vs-signal fidelity — replaces the v1 fitted 10-term table.
+The sidebands are why constant-amplitude fitting stalled: the largest
+single terms are sidebands (2(E−J)−M_E 8.3″, E−M−M_Ma 7.5″), invisible
+to a stability filter that expects constant tones. The v1 fitted wobble
+−6.64″ is replaced by the DERIVED parallactic amplitude a_M·μ/AU
+(6.4399″, computed live from package constants in `model.js`); the one
+declared-fitted survivor is the +1.42″ 2lE finder-annual artifact, to be
+absorbed at the next Step-0.
+
+Measured jointly (the pre-registered acceptance — all four, never a
+subset): all-phase JPL Sun 3.48″ → 2.12″; syzygy fleet 5.51″ → 3.99″
+(the ≤~4″ 20.3h target met); NASA centerlines on the WIDENED reference
+set (13 tracked events / 39 points, `solar-eclipse-centerlines-nasa.json`)
+shadow-plane mean 2.2″, max 5.1″ at this stage (2001 Atlantic; the two
+follow-up landings below move the final endpoint — the ellipsoid fix
+and the A2 planetary tail).
+The Moon extension alone had DEGRADED the original 5-event sample
+(3.61″ → 4.72″) — sampling structure, not fleet bias (−0.14″ mean over
+179 syzygies vs −2.56″ at those 5 events), which is what forced both the
+joint landing and the widening. The scene umbra has NOT adopted the D2
+tables (a separate conscious event); the eclipse-audit centerlines
+section records the scene state.
+Instruments: `tools/explore/d2-*.mjs`; their `.local.json` working data
+is gitignored and regenerates from the instruments themselves.
+
+**The ellipsoid-intersection fix (the "Antarctica anomaly", resolved).**
+The 2021 Antarctica crossing read 12–13″ where the tracked mean was 3.3″.
+Diagnosis split it exactly in two. (1) A geometry bug: `umbraGroundAt`
+intersected the umbra axis with a SPHERE of the equatorial radius before
+converting to geodetic latitude, but the true ellipsoid lies
+R_E·f·sin²φ ≈ 21·sin²φ km below that sphere, and the offset projects
+into the shadow-plane metric as ~height·cos(alt) — a latitude/sun-
+altitude-correlated phantom error maximized by Antarctica's −74…−78°
+at 17° sun. The exact axis∩ellipsoid intersection (z scaled by 1/(1−f);
+geodetic latitude then exact on-surface) took Antarctica 12.8″ → 6.9″,
+2008 Arctic 7.3″ → 1.6″, Iberia low-sun 4.4″ → 1.2″, and the tracked
+set mean 3.27″ → 2.22″ / max 7.66″ → 5.08″. NASA path tables are
+ellipsoid-based, so this is correctness, not tuning. (`observerVec` and
+the local-circumstance chain already used the proper ellipsoid — the
+sphere shortcut existed only in the centerline ground mapping.)
+(2) The remaining 6.9″ is an ORDINARY apparent-place tail, verified by
+closure: JPL at the three instants gives elongation error −7.24″ /
+β +1.69″, predicting a 6.91″ shadow-plane gap against the measured
+6.85–6.88″ — agreement to 0.05″. Nothing about the geometry is special
+once the ellipsoid is honest; the event simply sits on a ~1.8σ tail of
+the syzygy fleet (RMS 3.99″) near perigee, where the series tail is
+largest. The 2001 Atlantic event — now the largest tracked residual at
+5.1″ — has the identical anatomy (elongation −5.39″, predicted 5.27″
+vs measured 5.0″). That residual class is series-tail content (the
+20.3e / further-derived-terms path), not geometry. Antarctica (6.9″)
+stays exploratory pending a conscious tracking decision — it now fits
+the ≤8″ gate.
+
+**The A2 planetary tail (shipped in the same landing, owner decision).**
+The Moon's direct planetary perturbations — the last derived tail —
+shipped as the second section of `moon/series-extension.cjs`: 15 λ terms
+(0.896″ content) from epoch-phased twin 8-body integrations, both
+Phase-A2 refinements resolved (epoch-realistic ICs incl. the Moon's own
+Delaunay phases; per-system run-own arguments with a main-problem
+absorber catalog, absorbers discarded). Cross-validated against the
+independent JPL fit (V−E +0.849″ vs +0.85; E−J −0.681″ vs −0.69 — the
+epoch-phasing fixed A2-bare's −0.56) and out-of-sample: all-phase λ
+scatter 3.12″ → 3.03″ (predicted 2.98; sign-flip control 3.47″), syzygy
+fleet 3.99″ → 3.82″ improving in every era. The β rows (0.074″) do not
+ship — measured unhelpful. THE RECORDED TENSION: the 13-event centerline
+scoreboard moves 2.22″ → 2.68″ mean / 5.1″ → 6.2″ max — measured to be
+the A1-class correlated-subsample effect (the tracked events sit −1.6″
+below the +1.4″ fleet mean; the era split refutes anchor
+double-counting, the modern era improves most). The owner shipped on
+the principle that the fleet-wide JPL truth governs and every value is
+derived; the ≤8″ api gate holds. Final location-tier state: all-phase
+Sun 2.12″ / Moon λ 3.03″ / β 0.65″; syzygy 3.82″; tracked centerlines
+2.68″ mean, 6.2″ max.
+
 ### Geocentric parallax limit
 - The 0.81-degree RMS is the **theoretical best** for geocentric coordinates.
 - Solar eclipses are topocentric events. The Moon's parallax (~0.95 degrees)

@@ -31,7 +31,8 @@ import { createMoonMonthChain } from './moon/month-chain.cjs';
 import { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 import { createMoonArguments, jdToDecimalYear } from './moon/arguments.cjs';
 import { createMoonSeries } from './moon/series.cjs';
-import { sunPlanetaryCompletionDeg } from './eclipse/sun-planetary-completion.cjs';
+import { createSunPlanetaryCompletion } from './eclipse/sun-planetary-completion.cjs';
+import { moonSeriesExtensionDeg } from './moon/series-extension.cjs';
 import { createEclipseFinders } from './eclipse/finders.cjs';
 import { createBesselian } from './eclipse/besselian.cjs';
 import { driver2PeriodSecondsAtAge } from './planets/orbit-chain.cjs';
@@ -856,6 +857,11 @@ export function assembleModel(C, F) {
   // curve, the same convention every other ΔT consumer reads). Both axis
   // conventions are measured against the NASA path-table centerlines —
   // see eclipse/besselian.cjs.
+  // Derived Earth-around-EMB wobble for the Sun completion: a_M·μ/AU,
+  // μ = 1/(1+M_E/M_M) — 6.4399″ at current constants, tracks them live.
+  const embWobbleArcsec = (moonDistanceKm / (MASS_RATIO_EARTH_MOON + 1) / currentAUDistance)
+    * (648000 / Math.PI);
+  const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({ embWobbleArcsec });
   const besselian = createBesselian({
     moonFullAtDaysTT: /** @param {number} dDaysTT */ (dDaysTT) => {
       const ev = moonSeries.sceneEvalAt(dDaysTT);
@@ -863,6 +869,7 @@ export function assembleModel(C, F) {
     },
     sunLonDegAt: /** @param {number} jdUT */ (jdUT) => eclipseFinders.sunLonDegAt(jdUT),
     sunCompletionDeg: sunPlanetaryCompletionDeg,
+    moonExtensionAt: moonSeriesExtensionDeg,
     deltaTSecondsAt: /** @param {number} jd */ (jd) => (jdTTFromUT(jd) - jd) * 86400,
     obliquityDegAt: obliquityDeg,
     eccentricityAt,

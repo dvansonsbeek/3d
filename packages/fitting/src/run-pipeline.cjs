@@ -35,11 +35,14 @@
  *    stable across normal refits. See tools/fit/README.md Phase 0.
  *    MATCHED-PAIR DOWNSTREAM: a Step-0 refit stales the location tier's
  *    Sun planetary completion (packages/physics/src/eclipse/
- *    sun-planetary-completion.cjs) — re-derive it afterwards with
- *      node tools/fit/sun-planetary-completion-fit.js
- *    and update its table + PAIRED_SUN_HARMONICS_SHA256. Enforced: the
- *    test:model parity gate fingerprints the pair and fails `npm run
- *    check` if Step 0 was refit without the re-derivation.
+ *    sun-planetary-completion.cjs) — re-derive it afterwards through the
+ *    Stage-D2 instrument chain (tools/explore/d2-derived-sun.mjs →
+ *    d2-sun-table-extraction.mjs → d2-joint-preview.mjs) and re-embed
+ *    the table + PAIRED_SUN_HARMONICS_SHA256; the old 10-term fitter
+ *    (tools/fit/sun-planetary-completion-fit.js) is superseded, its
+ *    scoreboards remain valid verification. Enforced: the test:model
+ *    parity gate fingerprints the pair and fails `npm run check` if
+ *    Step 0 was refit without the re-derivation.
  *  - Step 5c (moon-eclipse-optimizer.js) — separate eclipse-anchored fit.
  */
 
