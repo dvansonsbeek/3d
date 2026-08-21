@@ -24,17 +24,19 @@
  *      framework lands closer than NASA.
  *
  * Campaigns (b) audit-26 and (c) Babylon −135 (Phase 3b/3c) ride the
- * scene-umbra chain, ported here on top of the PROVEN Node twin
- * (tools/explore/umbra-scene-node-twin.js — 0.19–0.21 km against the
- * browser fixture's ecl.umbraScene probes; thresholds are 300/1000 km):
- * the browser's 26-preset loop verbatim — model UT from the shared
- * @essrt/physics eclipse finders (wired to the engine's truncated Meeus
- * series + framework ΔT), umbra gap at preset/model UT, the ±4h scan at
- * 30-s steps, and the five-way verdict classification
- * (script.js:30127-30190). The audit26/babylon135 sections are written
- * GENERATED only when the run reproduces the recorded verdict counts and
- * Babylon numbers exactly; on any divergence they are preserved verbatim
- * and the divergence is reported (exact-reproduction rule).
+ * UMBRA TIER — since U1 (the umbra strangler) the package besselian is
+ * the SINGLE umbra implementation, the same createModel chain the api
+ * centerline gate certifies (2.7″-class vs the NASA path tables; the
+ * former scene twin and its empirically pinned ground-mapping constants
+ * are retired from the certified numbers): the browser's 26-preset loop
+ * — model UT from the shared @essrt/physics eclipse finders (wired to
+ * the engine's truncated Meeus series + framework ΔT), umbra gap at
+ * preset/model UT, the ±4h scan at 30-s steps, and the five-way verdict
+ * classification (script.js:30127-30190). The audit26/babylon135
+ * sections are written GENERATED only when the run reproduces the
+ * recorded verdict counts and Babylon numbers exactly; on any divergence
+ * they are preserved verbatim and the divergence is reported
+ * (exact-reproduction rule).
  *
  * Section (d) `centerlines` is the 20.3 accuracy instrument: the scene-umbra
  * twin evaluated at 15 fixed-UT NASA path-table CENTRAL-LINE points across
@@ -72,7 +74,19 @@ const { ROOT, buildInputsBlock } = require('../lib/artifact-inputs');
 const DT = require('../lib/deep-time');
 const C = require('../lib/constants.js');
 const SG = require('../lib/scene-graph.js');
-const { umbraFromSceneAtJdNode } = require('../explore/umbra-scene-node-twin.js');
+// U1 — THE UMBRA STRANGLER: the package besselian tier is the SINGLE umbra
+// implementation (the same createModel chain the api centerline gate
+// certifies at the 2.7″ class vs the NASA path tables). The scene twin
+// (tools/explore/umbra-scene-node-twin.js) is no longer consumed here —
+// its empirically pinned ground-mapping constants stay out of the
+// certified numbers. require(esm): Node ≥22.12 (local 22.19, CI node 22).
+const { createModel } = require('@essrt/physics');
+const TIER = createModel();
+/** Tier umbra in the audit's {lat, lon} shape. @param {number} jd @returns {{lat:number,lon:number}|null} */
+function umbraTierAtJd(jd) {
+  const u = TIER.eclipse.umbraGroundAtJD(jd);
+  return u ? { lat: u.latDeg, lon: u.lonDeg } : null;
+}
 const { createEclipseFinders } = require('@essrt/physics/eclipse/finders');
 
 const OUT = path.join(ROOT, 'data', 'eclipse-audit-summary.json');
@@ -87,8 +101,12 @@ const INPUT_FILES = [
   'data/deltaT-4flag-fit.json',
   'data/core-mantle-resonator-stage1.json',
   'packages/physics/src/deltat/cycles.cjs',
-  // the audit-26 / Babylon scene-umbra chain:
-  'tools/explore/umbra-scene-node-twin.js',
+  // the audit-26 / Babylon / centerlines umbra chain — U1: the package
+  // besselian tier (single implementation; the scene twin is retired here):
+  'packages/physics/src/model.js',
+  'packages/physics/src/eclipse/besselian.cjs',
+  'packages/physics/src/eclipse/sun-planetary-completion.cjs',
+  'packages/physics/src/moon/series-extension.cjs',
   'tools/lib/scene-graph.js',
   'packages/physics/src/eclipse/finders.cjs',
   'packages/physics/src/moon/series.cjs',
@@ -320,14 +338,14 @@ function runAudit26() {
     } catch { /* no events — preset.jd fallback */ }
     const deltaJD_min = (nearestModelJD - preset.jd) * 24 * 60;
 
-    const um0 = umbraFromSceneAtJdNode(preset.jd);
+    const um0 = umbraTierAtJd(preset.jd);
     const gap0 = (um0 === null) ? null : gcKm(site.lat, site.lon, um0.lat, um0.lon);
-    const umMdl = foundAny ? umbraFromSceneAtJdNode(nearestModelJD) : null;
+    const umMdl = foundAny ? umbraTierAtJd(nearestModelJD) : null;
     const gapMdl = (umMdl === null) ? null : gcKm(site.lat, site.lon, umMdl.lat, umMdl.lon);
 
     let bestGap = Infinity, bestDt = 0;
     for (let dt = -halfWin; dt <= halfWin + 1e-9; dt += stepDays) {
-      const um = umbraFromSceneAtJdNode(preset.jd + dt);
+      const um = umbraTierAtJd(preset.jd + dt);
       if (um === null) continue;
       const g = gcKm(site.lat, site.lon, um.lat, um.lon);
       if (g < bestGap) { bestGap = g; bestDt = dt; }
@@ -467,22 +485,19 @@ const D2R = Math.PI / 180;
 // ground gap via the file-level gcKm (haversine on the codebase Earth radius)
 
 function sunGeomAt(jd, latDeg, lonDeg) {
-  SG.computePlanetPosition('moon', jd);
-  const g = SG._getGraphForProbe();
-  const sun = g.sunNodes.pivot.getWorldPosition();
-  const earth = g.earthNodes.rotAxis.getWorldPosition();
-  const M = g.earthNodes.rotAxis.worldMatrix.e;
-  const R = [[M[0], M[4], M[8]], [M[1], M[5], M[9]], [M[2], M[6], M[10]]];
-  const sg = [sun[0] - earth[0], sun[1] - earth[1], sun[2] - earth[2]];
-  const e = [
-    R[0][0] * sg[0] + R[1][0] * sg[1] + R[2][0] * sg[2],
-    R[0][1] * sg[0] + R[1][1] * sg[1] + R[2][1] * sg[2],
-    R[0][2] * sg[0] + R[1][2] * sg[1] + R[2][2] * sg[2],
-  ];
-  const ra = Math.atan2(e[0], e[2]);
-  const dec = Math.asin(e[1] / Math.hypot(...e));
+  // U1: tier-side normalization (the api-gate convention) — the tier's own
+  // sun, obliquity and GMST constants; metric NORMALIZATION only, not part
+  // of the model chain.
+  const K2 = TIER.constants.physicalConstants;
+  const jb = jd + TIER.constants.earthOrbital.deltaTStart / 86400;
+  const year = TIER.time.yearFromJD(jb);
+  const eps = TIER.earth.obliquityDeg(year) * D2R;
+  const lam = TIER.eclipse.sunLonDegAtJD(jb) * D2R;
   const T = (jd - 2451545.0) / 36525;
-  const gmst = (280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T) % 360;
+  const gmst = ((K2.gmstMeanSiderealT0Deg + K2.gmstMeanSiderealRateDegPerDay * (jd - 2451545.0)
+    + K2.gmstMeanSiderealT2Deg * T * T) % 360 + 360) % 360;
+  const ra = Math.atan2(Math.sin(lam) * Math.cos(eps), Math.cos(lam));
+  const dec = Math.asin(Math.sin(lam) * Math.sin(eps));
   const H = ((gmst + lonDeg) * D2R) - ra;
   const altDeg = Math.asin(Math.sin(latDeg * D2R) * Math.sin(dec) +
     Math.cos(latDeg * D2R) * Math.cos(dec) * Math.cos(H)) / D2R;
@@ -500,10 +515,10 @@ function efUnit(latDeg, lonDeg) {
 }
 
 const r1 = (x) => Math.round(x * 10) / 10;
-console.log('\n  centerlines (fixed-UT shadow-plane vs NASA central lines, 15 points)...');
+console.log(`\n  centerlines (fixed-UT shadow-plane vs NASA central lines, ${CL.events.reduce((s, e) => s + e.points.length, 0)} points)...`);
 const clEvents = CL.events.map((ev) => {
   const points = ev.points.map((p) => {
-    const u = umbraFromSceneAtJdNode(p.jd);
+    const u = umbraTierAtJd(p.jd);
     const groundKm = gcKm(p.latDeg, p.lonDeg, u.lat, u.lon);
     const sg = sunGeomAt(p.jd, p.latDeg, p.lonDeg);
     const altDeg = sg.altDeg;
@@ -621,7 +636,8 @@ if (WRITE) {
     process.exit(1);
   }
   fs.writeFileSync(OUT, JSON.stringify(artifact, null, 2) + '\n');
-  const preserved = [audit26Diverged && 'audit26', babylonDiverged && 'babylon135',
+  const preserved = [(audit26Diverged && !REBASELINE) && 'audit26',
+    (babylonDiverged && !REBASELINE) && 'babylon135',
     (clDiverged && !REBASELINE) && 'centerlines'].filter(Boolean);
   console.log(`\n  ✓ wrote ${path.relative(ROOT, OUT)}${preserved.length ? ` (${preserved.join('/')} preserved verbatim)` : ' (all five sections generated)'}`);
 } else {

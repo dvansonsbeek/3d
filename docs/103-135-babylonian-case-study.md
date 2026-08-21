@@ -7,7 +7,7 @@ status: current
 
 # -135 Babylonian solar eclipse — case study
 
-**Status**: Framework places -135 Apr 15 Babylon at **BestGap <!--v:babylon135BestGapKm-->223<!--/v--> km at ΔUT <!--v:babylon135BestDeltaUT-->-0h54<!--/v-->** within the ±4h scan window; verdict **off-peak** — the umbra centerline reaches ~220 km from Babylon, comfortably inside the regional class and consistent with the diary's totality report at the identification-cascade level (the ΔT-free matcher places the traditional date as the unique survivor with required-ΔT inside Stephenson's published totality window; local magnitude 0.986). The framework's own predicted UT (<!--v:babylon135FrameworkUT-->06:05<!--/v-->) sits within 9 min of the documented UT (<!--v:babylon135DocumentedUT-->06:14<!--/v-->) — not a ΔT-signal event. Values are generated (`tools/verify/eclipse-audit.js --write`) under the full 20.3 eclipse-chain stack: series-injected Sun AND Moon in the umbra chain (both bodies from the certified of-date series — the scaffold bodies and the retired modern-calibration laws are gone), solar aberration for both bodies, the full Σr Moon distance, the sidereal-phase anchor, ground-mapping nutation, and the WGS84 geodetic output convention, with the doc-66 §1 deep-branch secular completions in the arguments. Prior certified-batch values live in git history.
+**Status**: Framework places -135 Apr 15 Babylon at **BestGap <!--v:babylon135BestGapKm-->206<!--/v--> km at ΔUT <!--v:babylon135BestDeltaUT-->-0h55<!--/v-->** within the ±4h scan window; verdict **off-peak** — the umbra centerline reaches ~205 km from Babylon, comfortably inside the regional class and consistent with the diary's totality report at the identification-cascade level (the ΔT-free matcher places the traditional date as the unique survivor with required-ΔT inside Stephenson's published totality window; local magnitude 0.986). The framework's own predicted UT (<!--v:babylon135FrameworkUT-->06:05<!--/v-->) sits within 9 min of the documented UT (<!--v:babylon135DocumentedUT-->06:14<!--/v-->) — not a ΔT-signal event. Values are generated (`tools/verify/eclipse-audit.js --write`) through the UMBRA TIER — since U1 (the umbra strangler) the package besselian is the single umbra implementation, the same `@essrt/physics` chain the api centerline gate certifies at the 2.7″ class: the certified of-date Sun with the derived 68-term planetary completion, the full-series Moon with the derived Delaunay + planetary tails, the elliptical Sun distance, the exact axis∩ellipsoid ground mapping, and the WGS84 geodetic output convention, with the doc-66 §1 deep-branch secular completions in the arguments. Prior certified-batch values (the retired scene-umbra chain) live in git history.
 
 The residual decomposes into three quantifiable physics contributors (Sun ecl_lon drift at antiquity, ΔT-convention gap vs Stephenson, GMST-convention gap vs IAU) plus the piercing-point-vs-radial-projection greatest-eclipse convention difference. The Meeus Ch. 47 Moon polynomial is exonerated (all modern lunar theories converge within 0.001° at year -135). Empirical α(t) tuning across the full Peltier ICE-6G literature uncertainty range shifts the umbra by only ~3.3 km per 100 s of ΔT change, confirming the α(t) constants are not the load-bearing residual driver.
 
@@ -43,8 +43,8 @@ Audit-26 result for -135 Apr 15 (documented UT 06:14):
 |---|---:|
 | Framework's own eclipse UT (MdlUT) | <!--v:babylon135FrameworkUT-->06:05<!--/v--> |
 | Documented UT | <!--v:babylon135DocumentedUT-->06:14<!--/v--> |
-| BestΔUT (offset giving minimum umbra↔site distance) | <!--v:babylon135BestDeltaUT-->-0h54<!--/v--> |
-| **BestGap (umbra↔site at BestΔUT)** | **<!--v:babylon135BestGapKm-->223<!--/v--> km** |
+| BestΔUT (offset giving minimum umbra↔site distance) | <!--v:babylon135BestDeltaUT-->-0h55<!--/v--> |
+| **BestGap (umbra↔site at BestΔUT)** | **<!--v:babylon135BestGapKm-->206<!--/v--> km** |
 | Verdict | **off-peak** |
 
 The framework and the record agree on the eclipse UT to within 9 minutes, and the umbra track passes ~220 km from the site within the scan window. (Generated rows — `tools/verify/eclipse-audit.js --write`; prior certified-batch values live in git history.)
@@ -181,8 +181,10 @@ A separate 5000+ km discrepancy exists between two geometric definitions of "gre
 
 ## Component-level decomposition — the BestGap residual
 
-Under the current umbra chain (series-injected Sun and Moon), the BestGap
-is <!--v:babylon135BestGapKm-->223<!--/v--> km. The components:
+Under the current umbra chain (the U1 umbra tier — the package besselian,
+certified Sun with the derived planetary completion + full-series Moon
+with the derived tails + exact ellipsoid mapping), the BestGap
+is <!--v:babylon135BestGapKm-->206<!--/v--> km. The components:
 
 | Component | Current state at −135 | Assessment |
 |---|---|---|
@@ -193,7 +195,7 @@ is <!--v:babylon135BestGapKm-->223<!--/v--> km. The components:
 | Moon arguments (D/M substitution) | ≤ 0.0061° / 39 km | Exonerated |
 | Umbra "greatest" convention (piercing point vs radial projection) | Definitional spread between catalog conventions | Not physics |
 
-The residual ~220 km is the composite of the remaining along-track dial
+The residual ~205 km is the composite of the remaining along-track dial
 degeneracy, the certified skeleton's own instant residual class vs DE441
 (a series-accuracy topic, 20.3h), and scan-grid sampling. Prior
 decompositions of the pre-injection chain live in git history.
@@ -232,7 +234,7 @@ Under the current shipped stack (LLR α₁ + L1-orbital α(t) + 4-flag lattice s
 | ◇ ΔT-signal (any) | 0 | Framework agrees with the documented UT on every event |
 | ⚠ geographic offset | 5 | Umbra *centerline* >1000 km from site at every scanned moment (an umbra-distance gate, not visibility — the penumbra can still cover the site) |
 
-Total: 26 events. Modern eclipses (1900+): all within ~130 km BestGap (Carbondale 20 km, Burgos 27 km, Príncipe 28 km, Dallas 46 km, Constanța 75 km, Agadez 130 km). Mid-CE (1004–1715): off-peak or regional (Tuscany 22 km, Halley 1715 76 km, Cairo 1004 122 km, Cairo 993 235 km, England 1133 332 km, London 1654 642 km, Russia 1185 865 km). Deep antiquity (BCE) under the series-injected umbra chain: **-708 Lu 51 km · -556 Nabonidus 99 km · -762 Nineveh 168 km · -584 Thales 215 km · -135 Babylon 223 km — the entire first-hand ancient corpus off-peak class**; regional: -309 Antigonus 780 km, -430 Athens 865 km; geographic: -647 (early diary partial, 1,540 km) plus the four Said-Stephenson Cairo attributions (the record-review's adjudicated second-hand/misdated set). (Per-event values from the generated audit run — `tools/verify/eclipse-audit.js`.)
+Total: 26 events. Modern eclipses (1900+): all within ~130 km BestGap (Carbondale 12 km, Príncipe 24 km, Burgos 25 km, Dallas 47 km, Constanța 66 km, Agadez 128 km — now confirmed). Mid-CE (1004–1715): off-peak or regional (Tuscany 15 km, Halley 1715 86 km, Cairo 1004 94 km, Cairo 993 239 km, England 1133 326 km, London 1654 644 km, Russia 1185 882 km). Deep antiquity (BCE) under the U1 umbra tier: **-708 Lu 29 km · -556 Nabonidus 111 km · -762 Nineveh 174 km · -584 Thales 212 km · -135 Babylon 206 km — the entire first-hand ancient corpus off-peak class**; regional: -309 Antigonus 786 km, -430 Athens 879 km; geographic: -647 (early diary partial, 1,563 km) plus the four Said-Stephenson Cairo attributions (the record-review's adjudicated second-hand/misdated set). (Per-event values from the generated audit run — `tools/verify/eclipse-audit.js`.)
 
 The -135 event is off-peak class: the umbra track reaches ~220 km from Babylon while agreeing with the documented UT to 9 minutes, and at this high-γ presentation the framework computes deep-totality-boundary circumstances at the site (local magnitude 0.986) — consistent with the diary's language (planets and Normal Stars visible).
 

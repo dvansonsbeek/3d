@@ -253,12 +253,13 @@ timing), with in-window rows at zero (the legacy pure-ICRF comparison
 drifts +1.4°/century). NASA full-canon recall 99.58 / tight-window 74.62 /
 type 98.66 (model event total 12,070 vs NASA's 12,064; all mismatch
 samples knife-edge at the γ ≈ 1.0/1.5 boundaries); 26-event historical
-audit split 2 confirmed · 14 off-peak · 5 regional · 0 ΔT-signal ·
+audit split 3 confirmed · 13 off-peak · 5 regional · 0 ΔT-signal ·
 5 geographic (an umbra-centerline distance class, not visibility — the
-penumbra can still cover these sites; under the series-injected umbra
-chain + the deep-branch secular completions the entire first-hand
-ancient corpus is off-peak class — Lu 51 km, Nabonidus 99, Nineveh 168,
-Thales 215, Babylon −135 223 — and the remaining geographic five are
+penumbra can still cover these sites; under the U1 umbra-tier chain —
+the package besselian, the single umbra implementation since the
+strangler — the entire first-hand ancient corpus is off-peak class —
+Lu 29 km, Nabonidus 111, Nineveh 174, Thales 212, Babylon −135 206 —
+1973 Agadez rises to confirmed, and the remaining geographic five are
 the four adjudicated Said-Stephenson Cairo attributions plus the −647
 early-diary partial; prior batch splits live in git history);
 timed Babylonian lunar corpus (Almagest records, reduced via
