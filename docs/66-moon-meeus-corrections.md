@@ -353,12 +353,15 @@ movement's coupling imprint, e₁₆(t) − (base/2)·(cos φ₃(t) − cos φ�
 on the integrated H/3 phase — the J2000-anchored difference form keeps
 the H/16 law the owner of today's value, so no epoch is privileged. That
 assembled e(t), together with the f(Y) year-harmonic rate drift in the
-mean longitude (the "T²-attribution clue" recorded under (a) above,
-cashed in), is now the certified eclipse chain's Sun in all three
-runtimes: it beats the Meeus Ch. 25 basis in-window against JPL (0.95″
-vs 1.28″ scatter) and across the ancient corpus (BCE detrended timing
-0.37 vs 0.50 min; dense-target Babylonian χ² 44.5 → 30.9), with zero
-fitted sun constants ([doc 103 §E4
+mean longitude PLUS the derived cos-ε torque term (E5: δp =
+−p₀·tan ε·δε on the two-component obliquity law — the year harmonics
+carry only the tilt nodes' geometric equinox displacement, the exact
+8:3 amplitude signature; the "T²-attribution clue" recorded under (a)
+above, cashed in twice), is now the certified eclipse chain's Sun in
+all three runtimes: it beats the Meeus Ch. 25 basis in-window against
+JPL (0.95″ vs 1.28″ scatter) and across the ancient solar corpus
+(Babylon −135 at 194 km vs the Meeus-era 206; −708 Lu at 9 km), with
+zero fitted sun constants ([doc 103 §E4/E5
 update](103-135-babylonian-case-study.md)). The lunar channel above is
 unchanged — the same H/3 movement now feeds both consumers.
 

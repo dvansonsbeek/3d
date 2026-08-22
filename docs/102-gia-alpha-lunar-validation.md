@@ -487,20 +487,20 @@ month evolution is chain-integrated on the H-lattice. The `theoryDrift`
 section of the same gate measures the difference directly, on the TT axis
 (framework opposition vs the NASA canon's greatest-eclipse instant, era
 bins ±40 yr, modern definitional baseline subtracted): a smooth secular
-drift reaching <!--v:lunarDrift800Minutes-->−9.1<!--/v--> min at the −750 era
+drift reaching <!--v:lunarDrift800Minutes-->−3.2<!--/v--> min at the −750 era
 and vanishing toward the present — an effective
-Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.73<!--/v--> ″/cy² between the two
+Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.25<!--/v--> ″/cy² between the two
 theories. A re-reduction of the tablets with the framework's own Moon
 shifts each century's implied ΔT by exactly that drift, which converts
 the one-sided residual column above into sign-mixed, noise-class scatter:
 
 | Century | residual today | **pre-registered** residual after framework re-reduction |
 |---|---:|---:|
-| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.04<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+6.7<!--/v--> min |
-| -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.11<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->+1.1<!--/v--> min |
-| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.11<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->+1.2<!--/v--> min |
-| -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−4.7<!--/v--> min |
-| -400…-301 | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr | <!--v:lunarPredictedReduced400Minutes-->−8.2<!--/v--> min |
+| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.04<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+0.8<!--/v--> min |
+| -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.11<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−4.4<!--/v--> min |
+| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.11<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−3.9<!--/v--> min |
+| -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−9.4<!--/v--> min |
+| -400…-301 | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr | <!--v:lunarPredictedReduced400Minutes-->−12.4<!--/v--> min |
 
 These predictions are recorded in the gate BEFORE the contact-time
 re-reduction machinery exists — first-order only (contacts assumed to
@@ -536,21 +536,25 @@ years), so weights must not concentrate a century into one tablet.
 
 | Century | measured median ± SE (min) | pre-registered (min) | z |
 |---|---:|---:|---:|
-| -800…-701 | +19.4 ± 40.0 | +6.7 | +0.3 |
-| -700…-601 | −16.4 ± 7.9 | +1.1 | −2.2 |
-| -600…-501 | −6.1 ± 5.6 | +1.2 | −1.3 |
-| -500…-401 | −15.9 ± 14.0 | −4.7 | −0.8 |
-| -400…-301 | −6.6 ± 2.8 | −8.2 | +0.6 |
+| -800…-701 | +13.5 ± 39.8 | +0.8 | +0.3 |
+| -700…-601 | −21.4 ± 8.3 | −4.4 | −2.1 |
+| -600…-501 | −10.6 ± 6.0 | −3.9 | −1.1 |
+| -500…-401 | −20.0 ± 13.9 | −9.4 | −0.8 |
+| -400…-301 | −10.5 ± 2.7 | −12.4 | +0.7 |
 
-**χ² = 7.7 over 5 centuries** (median-primary). The re-reduced
+**χ² = 6.7 over 5 centuries** (median-primary). The re-reduced
 tablet corpus remains statistically consistent with the pinned
 column: **the framework's dLOD/dt stack survives its pre-registered
 falsification test.** Both the column and the measured medians are
-the conscious E4 re-measurement — the framework-native Sun changed
-the chain's TT_greatest, so the column re-derived per the convention
-above; the pre-E4 state (χ² 5.8/5, with the 3.7/5
-Stephenson-weight variant and the −1.0 ± 2.3 min common-offset
-check) lives in git history. Stated limits: the −800 bin is
+the conscious E5 re-measurement (the framework-native Sun with the
+derived torque term changed the chain's TT_greatest, so the column
+re-derived per the convention above) — and they land essentially on
+the ORIGINAL pre-E4 values (e.g. −400: −10.5 vs the original −10.4;
+pre-reg −12.4 vs −12.2): the torque term restores Meeus-class BCE
+timing from derived physics. Intermediate states (pre-E4 χ² 5.8/5
+with the 3.7/5 Stephenson-weight variant and the −1.0 ± 2.3 min
+common-offset check; the torqueless E4 state at 7.7/5) live in git
+history. Stated limits: the −800 bin is
 unconstraining (n = 2); the column itself is first-order (the
 bin-offset and moonrise-conversion caveats above); the test's
 discriminating power is minutes-scale — the S05–S09 dense-target
@@ -565,24 +569,26 @@ S01/S02/S04 Babylonian + S05 Chinese + S09 Arab, −800..+1280;
 S07 excluded pending per-row lunar/solar typing — the 364 trio is
 Theon's SOLAR eclipse) runs through the same differential machinery:
 **244 of 256 observations identified**, with per-century MAD-SEs
-reaching **123–215 s in the dense centuries** (+1000: ±123 s,
-n = 38; −400: ±166 s, n = 27) — below the cycle contributions
+reaching **122–215 s in the dense centuries** (+1000: ±122 s,
+n = 38; −400: ±164 s, n = 27) — below the cycle contributions
 (200–550 s), so the eclipse record genuinely discriminates the ΔT
 stack, out of sample (the cycle fit window is 1650–2017). The
-per-cycle ablation χ² (13 centuries with n ≥ 5), under the E4
-framework-native Sun: full stack 30.9 (44.5 on the pre-E4 Meeus
-basis — the Sun's missing rate drift was carrying roughly a third
-of the misfit; see the next section); **minus resonator 98.7 and
-minus bond 63.3 — the Core-mantle swing and the Bond cycle are
-independently confirmed by the eclipse record**; no cycles 79.7
-(the stack more than halves the misfit); minus
-jose5/hallstatt/jose4 = 31.2/29.0/28.5 — the Joses and Hallstatt
+per-cycle ablation χ² (13 centuries with n ≥ 5), under the E5
+framework-native Sun (the derived torque term): full stack 46.0 —
+back at the pre-E4 Meeus-basis class (44.5), as it must be, since
+the torque term restores Meeus-class BCE timing; the torqueless E4
+intermediate read 30.9, a transient that partially fit the vetoed
+corpus-systematics structure below; **minus resonator 135.8 and
+minus bond 59.3 — the Core-mantle swing and the Bond cycle are
+independently confirmed by the eclipse record**; no cycles 95.4
+(the stack halves the misfit); minus
+jose5/hallstatt/jose4 = 45.0/45.9/40.6 — the Joses and Hallstatt
 receive no independent support from this corpus (for the Joses,
 consistent with their ~179-yr period averaging out in century bins;
 for Hallstatt this stands in open tension with the canon-based
 ablation above, which validated it — different dataset, different
 centuries; recorded as tension, not verdict). Residual structure
-remains at full-stack χ²/dof ≈ 2.4 (e.g. −300 at −1,004 ± 1,200 s)
+remains at full-stack χ²/dof ≈ 3.5 (e.g. −300 at −1,245 ± 1,184 s)
 — characterized in the next section: it is not Earth rotation, and
 the stack stays as shipped.
 
@@ -591,15 +597,19 @@ the stack stays as shipped.
 The "tune or extend the stack" question the pre-E4 χ²/dof ≈ 3.4 opened
 has a measured answer (`tools/explore/dense-targets-residual-structure.mjs`,
 same 244-row corpus and machinery as the gate, run on the pre-E4 basis):
-**neither** — no cycle is added, removed, or retuned. The E4 landing
-vindicated the verdict from an unexpected direction: the two physical
-vetoes below said the structure is not Earth rotation, and part of it
-turned out to be the SUN — the framework-native Sun's f(Y) rate drift
-took the full-stack χ² from 44.5 to 30.9 with zero ΔT changes. The
-per-century median figures quoted in this section are the pre-E4
-measurements the campaign analyzed; the conclusion stands on the new
-basis (the remaining χ²/dof ≈ 2.4 still fails the same vetoes as
-Earth rotation and remains corpus-systematics class).
+**neither** — no cycle is added, removed, or retuned. The 3b Sun
+campaign then stress-tested the verdict from an unexpected direction:
+the torqueless E4 intermediate dropped the full-stack χ² to 30.9,
+briefly suggesting a third of the structure "was the Sun" — but the
+completed E5 Sun (geometric + derived torque drift, the form the
+SOLAR corpus and phaseC independently select) returns it to 46.0,
+the pre-E4 class. The dip was the torqueless drift partially fitting
+this vetoed structure — corroborating, not contradicting, the
+verdict: the structure fails the LOD-continuity veto, Stephenson's
+own spline misfits it identically, and no admissible Sun form
+absorbs it. The per-century median figures quoted in this section
+are the pre-E4 measurements the campaign analyzed; the conclusion
+stands unchanged on the E5 basis.
 
 **Attribution.** The framework curve and Stephenson's own 2016 spline
 agree to −6..−103 s at every century midpoint, yet *both* miss the

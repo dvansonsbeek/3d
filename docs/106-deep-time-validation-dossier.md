@@ -89,9 +89,9 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->277<!--/v--> km from Babylon at
-  ΔUT <!--v:babylon135BestDeltaUT-->-0h58<!--/v--> (framework
-  <!--v:babylon135FrameworkUT-->06:02<!--/v--> vs documented
+  totality path <!--v:babylon135BestGapKm-->194<!--/v--> km from Babylon at
+  ΔUT <!--v:babylon135BestDeltaUT-->-0h54<!--/v--> (framework
+  <!--v:babylon135FrameworkUT-->06:05<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
   [doc 103](103-135-babylonian-case-study.md), eclipse-audit artifacts under
   freshness guard.
@@ -111,9 +111,9 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   documented visibility regions vs the api observer tier
   (<!--v:lunarVisibilityInsideAgree-->14<!--/v-->/<!--v:lunarVisibilityChecked-->14<!--/v-->
   both directions); the −746 Feb 6 Babylonian partial (magnitude
-  <!--v:lunarBabylon746MagnitudeUmbral-->0.898<!--/v--> vs canon
+  <!--v:lunarBabylon746MagnitudeUmbral-->0.908<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
-  Babylon at <!--v:lunarBabylon746AltitudeDeg-->36.1<!--/v-->°); the
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->34.7<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
   (framework ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,212<!--/v--> s —
   statistically identical to Stephenson's own fitted spline at
@@ -125,22 +125,24 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s contains the
   framework's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,012<!--/v--> s);
   and the measured framework-vs-ELP lunar-theory drift
-  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.73<!--/v--> ″/cy²) with the
+  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.25<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time
   machinery existed — and now MEASURED against it: the Phase C
   differential re-reduction (69/75 Babylonian observations identified)
-  is statistically consistent with the pinned column, χ² = 7.7 over 5
-  centuries under the E4 basis — the dLOD/dt stack survives its
+  is statistically consistent with the pinned column, χ² = 6.7 over 5
+  centuries under the E5 basis — the dLOD/dt stack survives its
   falsification test — [doc 102 §Phase C verdict](102-gia-alpha-lunar-validation.md).
-- **The framework-native Sun (E4)** — the certified eclipse chain's Sun
-  is assembled entirely from the model's own laws (the H/16 eccentricity
-  channel + the derived H/3 inclination coupling; L₀ + the mean tropical
-  rate + the f(Y) year-harmonic drift shape), zero fitted sun constants,
-  shared by all three runtimes. It beats the Meeus Ch. 25 basis against
-  JPL in-window (0.95″ vs 1.28″ scatter) and against the ancient corpus
-  timing structure (0.37 vs 0.50 min detrended), and it improved the
-  dense-target Babylonian χ² from 44.5 to 30.9 with zero ΔT changes —
-  [doc 103 §E4 update](103-135-babylonian-case-study.md).
+- **The framework-native Sun (E4/E5)** — the certified eclipse chain's
+  Sun is assembled entirely from the model's own laws (the H/16
+  eccentricity channel + the derived H/3 inclination coupling; L₀ + the
+  mean tropical rate + the f(Y) year-harmonic drift shape + the derived
+  cos-ε torque term on the two-component obliquity law), zero fitted
+  sun constants, shared by all three runtimes. It beats the Meeus Ch. 25
+  basis against JPL in-window (0.95″ vs 1.28″ scatter) and against the
+  ancient solar corpus (Babylon −135 at 194 km vs the Meeus-era 206;
+  −708 Lu at 9 km), with the torque term's per-divisor structure
+  blind-selected by the corpus before its derivation existed —
+  [doc 103 §E4/E5 update](103-135-babylonian-case-study.md).
 
 ## D. The honesty ledger — what does NOT validate, asserted anyway
 

@@ -7,9 +7,9 @@ status: current
 
 # -135 Babylonian solar eclipse — case study
 
-**Status**: Framework places -135 Apr 15 Babylon at **BestGap <!--v:babylon135BestGapKm-->277<!--/v--> km at ΔUT <!--v:babylon135BestDeltaUT-->-0h58<!--/v-->** within the ±4h scan window; verdict **off-peak** — the umbra centerline reaches within ~280 km of Babylon, comfortably inside the regional class and consistent with the diary's totality report at the identification-cascade level (the ΔT-free matcher places the traditional date as the unique survivor with required-ΔT inside Stephenson's published totality window; local magnitude 0.986 in the pre-E4 matcher run). The framework's own predicted UT (<!--v:babylon135FrameworkUT-->06:02<!--/v-->) sits within 12 min of the documented UT (<!--v:babylon135DocumentedUT-->06:14<!--/v-->) — not a ΔT-signal event. Values are generated (`tools/verify/eclipse-audit.js --write`) through the UMBRA TIER — since U1 (the umbra strangler) the package besselian is the single umbra implementation, the same `@essrt/physics` chain the api centerline gate certifies: the E4 framework-native Sun with the derived 68-term planetary completion, the full-series Moon with the derived Delaunay + planetary tails, the elliptical Sun distance, the exact axis∩ellipsoid ground mapping, and the WGS84 geodetic output convention, with the doc-66 §1 deep-branch secular completions in the arguments. Prior certified-batch values (the retired scene-umbra chain) live in git history.
+**Status**: Framework places -135 Apr 15 Babylon at **BestGap <!--v:babylon135BestGapKm-->194<!--/v--> km at ΔUT <!--v:babylon135BestDeltaUT-->-0h54<!--/v-->** within the ±4h scan window; verdict **off-peak** — the umbra centerline reaches within ~200 km of Babylon, comfortably inside the regional class and consistent with the diary's totality report at the identification-cascade level (the ΔT-free matcher places the traditional date as the unique survivor with required-ΔT inside Stephenson's published totality window; local magnitude 0.986 in the pre-E4 matcher run). The framework's own predicted UT (<!--v:babylon135FrameworkUT-->06:05<!--/v-->) sits within 9 min of the documented UT (<!--v:babylon135DocumentedUT-->06:14<!--/v-->) — not a ΔT-signal event. Values are generated (`tools/verify/eclipse-audit.js --write`) through the UMBRA TIER — since U1 (the umbra strangler) the package besselian is the single umbra implementation, the same `@essrt/physics` chain the api centerline gate certifies: the E4 framework-native Sun with the derived 68-term planetary completion, the full-series Moon with the derived Delaunay + planetary tails, the elliptical Sun distance, the exact axis∩ellipsoid ground mapping, and the WGS84 geodetic output convention, with the doc-66 §1 deep-branch secular completions in the arguments. Prior certified-batch values (the retired scene-umbra chain) live in git history.
 
-**E4 update — the framework-native Sun is now the certified basis.** Exploration 3b landed the assembled framework Sun in the eclipse chain across all three runtimes (package tier, audit, browser finders): mean longitude = L₀ + the mean tropical rate + the f(Y) year-harmonic drift shape in SI/TT, and eccentricity = the H/16 channel law + the derived H/3 inclination-coupling imprint (amplitude base/2, lattice phase) — zero fitted sun constants; the Meeus Ch. 25 polynomial remains only as the finders' un-injected default. Under this basis the values above regenerated (previously 206 km / −0h55 / 06:05 on the Meeus basis), the audit-26 verdict counts reproduce exactly, the −135 required-ΔT sits inside Stephenson's window (12,012 s in [11,220, 12,140]), and the Babylonian timed lunar corpus improves (dense-targets full-stack χ² 44.5 → 30.9). The assembled Sun beats the Meeus basis against JPL in-window (0.95″ vs 1.28″ scatter) and against the ancient corpus timing structure (0.37 vs 0.50 min detrended). The "Sun ecl_lon drift at antiquity" section below is the pre-E4 attribution — it now applies only to the scene wheels' linear-rate Sun, not to the certified eclipse chain, which carries the drift natively.
+**E4/E5 update — the framework-native Sun is now the certified basis.** Exploration 3b landed the assembled framework Sun in the eclipse chain across all three runtimes (package tier, audit, browser finders): mean longitude = L₀ + the mean tropical rate + the f(Y) year-harmonic drift shape in SI/TT **plus the derived torque term (E5)** — the year harmonics carry only the geometric equinox displacement of the tilt nodes (the exact 8:3 amplitude signature), and the classical luni-solar torque adds the precession-rate modulation δp = −p₀·tan ε·δε(t) on the model's own two-component obliquity law, per-divisor drift scale 1 + p₀·tan²ε·H/(2π·div) — and eccentricity = the H/16 channel law + the derived H/3 inclination-coupling imprint (amplitude base/2, lattice phase). Zero fitted sun constants end to end; the Meeus Ch. 25 polynomial remains only as the finders' un-injected default. Under this basis the values above regenerated: **194 km — better than the 206 km of the Meeus-era basis** (the torqueless E4 intermediate read 277 km; the ancient corpus blind-selected the torque term's per-divisor structure before its derivation existed); the audit-26 verdict counts reproduce exactly, −708 Lu drops to 9 km, and the −135 required-ΔT sits inside Stephenson's window (12,012 s in [11,220, 12,140]). The assembled Sun beats the Meeus basis against JPL in-window (0.95″ vs 1.28″ scatter) and against the ancient corpus timing structure. The "Sun ecl_lon drift at antiquity" section below is the pre-E4 attribution — it now applies only to the scene wheels' linear-rate Sun, not to the certified eclipse chain, which carries the drift natively.
 
 The residual decomposes into three quantifiable physics contributors (Sun ecl_lon drift at antiquity, ΔT-convention gap vs Stephenson, GMST-convention gap vs IAU) plus the piercing-point-vs-radial-projection greatest-eclipse convention difference. The Meeus Ch. 47 Moon polynomial is exonerated (all modern lunar theories converge within 0.001° at year -135). Empirical α(t) tuning across the full Peltier ICE-6G literature uncertainty range shifts the umbra by only ~3.3 km per 100 s of ΔT change, confirming the α(t) constants are not the load-bearing residual driver.
 
@@ -17,7 +17,7 @@ The residual decomposes into three quantifiable physics contributors (Sun ecl_lo
 
 ## Thesis
 
-The Babylonian astronomical diary recording the 15 April 136 BCE (= -135 astronomical) solar eclipse is one of the most scholarly-secure attributions in the historical eclipse corpus. Framework's prediction for that event is **off-peak class** — the umbra centerline reaches within ~280 km of Babylon within the scan window while agreeing with the documented UT to 12 minutes, and the ΔT-free identification cascade selects the traditional date uniquely with the required ΔT inside Stephenson's published totality window. The residual budget below documents the component-level physics (the antiquity Sun ecl_lon story, ΔT and GMST conventions, the greatest-eclipse geographic definition); two formerly load-bearing components are RESOLVED and documented in their own sections — the deep-branch lunar argument secular (doc 66 §1 completions) and the scene umbra chain's Sun frame (the series-injected Sun). The Moon polynomial is exonerated by direct testing against all modern lunar theories.
+The Babylonian astronomical diary recording the 15 April 136 BCE (= -135 astronomical) solar eclipse is one of the most scholarly-secure attributions in the historical eclipse corpus. Framework's prediction for that event is **off-peak class** — the umbra centerline reaches within ~200 km of Babylon within the scan window while agreeing with the documented UT to 9 minutes, and the ΔT-free identification cascade selects the traditional date uniquely with the required ΔT inside Stephenson's published totality window. The residual budget below documents the component-level physics (the antiquity Sun ecl_lon story, ΔT and GMST conventions, the greatest-eclipse geographic definition); two formerly load-bearing components are RESOLVED and documented in their own sections — the deep-branch lunar argument secular (doc 66 §1 completions) and the scene umbra chain's Sun frame (the series-injected Sun). The Moon polynomial is exonerated by direct testing against all modern lunar theories.
 
 ---
 
@@ -31,7 +31,7 @@ The Babylonian astronomical diary recording the 15 April 136 BCE eclipse is rega
 - **Stephenson & Steele 2006** (*JHA*) re-examined and re-confirmed
 - **No scholarly alternative proposed** in ADART or Stephenson 2016
 
-The attribution is rock-solid — and the framework now agrees with it at the off-peak class: umbra track within ~280 km, UT within 12 minutes, and the ΔT-free cascade selecting the traditional date uniquely.
+The attribution is rock-solid — and the framework now agrees with it at the off-peak class: umbra track within ~200 km, UT within 9 minutes, and the ΔT-free cascade selecting the traditional date uniquely.
 
 ---
 
@@ -43,13 +43,13 @@ Audit-26 result for -135 Apr 15 (documented UT 06:14):
 
 | Quantity | Value |
 |---|---:|
-| Framework's own eclipse UT (MdlUT) | <!--v:babylon135FrameworkUT-->06:02<!--/v--> |
+| Framework's own eclipse UT (MdlUT) | <!--v:babylon135FrameworkUT-->06:05<!--/v--> |
 | Documented UT | <!--v:babylon135DocumentedUT-->06:14<!--/v--> |
-| BestΔUT (offset giving minimum umbra↔site distance) | <!--v:babylon135BestDeltaUT-->-0h58<!--/v--> |
-| **BestGap (umbra↔site at BestΔUT)** | **<!--v:babylon135BestGapKm-->277<!--/v--> km** |
+| BestΔUT (offset giving minimum umbra↔site distance) | <!--v:babylon135BestDeltaUT-->-0h54<!--/v--> |
+| **BestGap (umbra↔site at BestΔUT)** | **<!--v:babylon135BestGapKm-->194<!--/v--> km** |
 | Verdict | **off-peak** |
 
-The framework and the record agree on the eclipse UT to within 12 minutes, and the umbra track passes within ~280 km of the site within the scan window. (Generated rows — `tools/verify/eclipse-audit.js --write`; prior certified-batch values live in git history.)
+The framework and the record agree on the eclipse UT to within 9 minutes, and the umbra track passes within ~200 km of the site within the scan window. (Generated rows — `tools/verify/eclipse-audit.js --write`; prior certified-batch values live in git history.)
 
 ---
 
@@ -186,7 +186,7 @@ A separate 5000+ km discrepancy exists between two geometric definitions of "gre
 Under the current umbra chain (the U1 umbra tier — the package besselian,
 certified Sun with the derived planetary completion + full-series Moon
 with the derived tails + exact ellipsoid mapping), the BestGap
-is <!--v:babylon135BestGapKm-->277<!--/v--> km. The components:
+is <!--v:babylon135BestGapKm-->194<!--/v--> km. The components:
 
 | Component | Current state at −135 | Assessment |
 |---|---|---|
@@ -236,9 +236,9 @@ Under the current shipped stack (LLR α₁ + L1-orbital α(t) + 4-flag lattice s
 | ◇ ΔT-signal (any) | 0 | Framework agrees with the documented UT on every event |
 | ⚠ geographic offset | 5 | Umbra *centerline* >1000 km from site at every scanned moment (an umbra-distance gate, not visibility — the penumbra can still cover the site) |
 
-Total: 26 events. Modern eclipses (1900+): all within ~130 km BestGap (Carbondale 12 km, Príncipe 23 km, Burgos 26 km, Dallas 48 km, Constanța 66 km, Agadez 127 km — confirmed). Mid-CE (1004–1715): off-peak or regional (Tuscany 15 km, Cairo 1004 76 km, Halley 1715 87 km, Cairo 993 238 km, England 1133 327 km, London 1654 642 km, Russia 1185 884 km). Deep antiquity under the E4 framework-native Sun: **71 Plutarch 35 km (confirmed, ΔUT +0h01) · -556 Nabonidus 38 km · -708 Lu 118 km · -762 Nineveh 178 km · -584 Thales 203 km · -135 Babylon 277 km — the entire first-hand ancient corpus confirmed/off-peak class**; regional: -309 Antigonus 774 km, -430 Athens 979 km; geographic: -647 (early diary partial, 1,545 km) plus the four Said-Stephenson Cairo attributions (the record-review's adjudicated second-hand/misdated set). (Per-event values from the generated audit run — `tools/verify/eclipse-audit.js`.)
+Total: 26 events. Modern eclipses (1900+): all within ~130 km BestGap (Carbondale 12 km, Príncipe 23 km, Burgos 26 km, Dallas 48 km, Constanța 66 km, Agadez 127 km — confirmed). Mid-CE (1004–1715): off-peak or regional (Tuscany 12 km, Halley 1715 87 km, Cairo 1004 103 km, Cairo 993 241 km, England 1133 319 km, London 1654 642 km, Russia 1185 886 km). Deep antiquity under the E5 framework-native Sun (geometric + derived torque drift): **-708 Lu 9 km · 71 Plutarch 36 km (confirmed, ΔUT +0h05) · -556 Nabonidus 104 km · -762 Nineveh 174 km · -135 Babylon 194 km · -584 Thales 213 km — the entire first-hand ancient corpus confirmed/off-peak class**; regional: -309 Antigonus 790 km, -430 Athens 853 km; geographic: -647 (early diary partial, 1,561 km) plus the four Said-Stephenson Cairo attributions (the record-review's adjudicated second-hand/misdated set). (Per-event values from the generated audit run — `tools/verify/eclipse-audit.js`.)
 
-The -135 event is off-peak class: the umbra track reaches within ~280 km of Babylon while agreeing with the documented UT to 12 minutes, and at this high-γ presentation the framework computes deep-totality-boundary circumstances at the site — consistent with the diary's language (planets and Normal Stars visible).
+The -135 event is off-peak class: the umbra track reaches within ~200 km of Babylon while agreeing with the documented UT to 9 minutes, and at this high-γ presentation the framework computes deep-totality-boundary circumstances at the site — consistent with the diary's language (planets and Normal Stars visible).
 
 ---
 
@@ -305,7 +305,7 @@ inside the tablet's published totality window
 (`u2-dt-free-matcher.mjs`) — the framework's reduction and
 Stephenson's overlap. The theory-difference drift against ELP-class
 reductions is Δṅ ≈
-<!--v:lunarTheoryDriftDeltaNdot-->0.73<!--/v--> ″/cy² ([doc 102](102-gia-alpha-lunar-validation.md)).
+<!--v:lunarTheoryDriftDeltaNdot-->0.25<!--/v--> ″/cy² ([doc 102](102-gia-alpha-lunar-validation.md)).
 The scene umbra chain shares this accuracy class: with the
 series-injected Sun (both bodies from the certified of-date series;
 the scaffold Sun and its modern-calibration laws retired), the scene
