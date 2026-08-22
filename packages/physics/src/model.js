@@ -837,9 +837,18 @@ export function assembleModel(C, F) {
   //          osculating e = H/16 channel + inclination coupling.
   //   L(t) = L0 + the mean tropical rate + the f(Y) drift SHAPE only,
   //          ∫(rate_SI(y) − rate_SI(2000)) dy: the rate ANCHOR stays the mean
-  //          year (eclipse-endorsed); the drift is the Step 6d year-harmonic
+  //          year (eclipse-endorsed); the drift is the Step 6c year-harmonic
   //          claim in SI/TT (year-in-days × LOD — the LOD-day part of the
-  //          raw drift is UT-vs-TT and stays ΔT's job). Trapezoid table,
+  //          raw drift is UT-vs-TT and stays ΔT's job) PLUS the derived
+  //          TORQUE term (E5): the year harmonics carry only the GEOMETRIC
+  //          equinox displacement (the tilt nodes — the exact 8:3 amplitude
+  //          signature); the classical luni-solar torque adds a precession-
+  //          RATE modulation δp = −p₀·tan ε·δε(t) on the model's own
+  //          two-component obliquity law (−A cos φ₃ + A cos φ₈). Both
+  //          lengthen the year at obliquity max, so they ADD; per-divisor
+  //          drift scale 1 + p₀·tan²ε·H/(2π·div) = 1.306 (H/8) / 1.815
+  //          (H/3) — the structure the ancient corpus blind-selected before
+  //          the derivation existed. Zero new constants. Trapezoid table,
   //          10-yr steps over −3000..3000; outside, the drift freezes at the
   //          edge (rate reverts to linear — the finder domain is the corpus
   //          era).
@@ -861,10 +870,19 @@ export function assembleModel(C, F) {
     const Y_LO = -3000, Y_HI = 3000, STEP = 10;
     /** @type {Float64Array|null} */
     let cum = null;
+    const precessionP0DegPerYr = 13 * 360 / H;
+    const tanEps = Math.tan(earthtiltMean * Math.PI / 180);
+    /** E5 — the two-component obliquity excursion, radians, integrated phase.
+     * @param {number} year @returns {number} */
+    const obliquityExcursionRad = (year) => (
+      -earthInclAmplitude * Math.cos(phaseRadians(balancedYear, year, 3))
+      + earthInclAmplitude * Math.cos(phaseRadians(balancedYear, year, 8))
+    ) * Math.PI / 180;
     /** @param {number} year @returns {number} */
     const rateSIYr = (year) => 360 * (365.25 * 86400)
       / (tropicalYearDirectDays(year)
-        * (deepLod.lodSecondsAtAge(yearToTMa(year)) ?? meanLengthOfDay));
+        * (deepLod.lodSecondsAtAge(yearToTMa(year)) ?? meanLengthOfDay))
+      - precessionP0DegPerYr * tanEps * obliquityExcursionRad(year);
     return /** @param {number} year @returns {number} */ (year) => {
       if (cum === null) {
         const n = (Y_HI - Y_LO) / STEP + 1;
