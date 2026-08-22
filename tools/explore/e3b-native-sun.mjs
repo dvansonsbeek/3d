@@ -372,3 +372,117 @@ for (const [name, lonAt] of LVARIANTS) {
   const det = Math.sqrt(pts.reduce((s2, [x, yv]) => s2 + (yv - (my + slope * (x - mx))) ** 2, 0) / n2);
   console.log(`   ${name.padEnd(18)} modern mean ${s.m.toFixed(2)}″ scatter ${s.sd.toFixed(2)}″ · BCE mean ${my.toFixed(1)} min · trend ${(slope * 100).toFixed(2)} min/cy · detrended sd ${det.toFixed(2)} min`);
 }
+
+// ── 6. PERIOD EXPLORATION (why some numbers worsened; H/8, H/5 probes) ──
+// Diagnosis carried in from the E4 rebaselines: the ±4h umbra scan absorbs
+// along-track error, so the Babylon −135 gap change (206 → 277 km) is
+// CROSS-TRACK — the syzygy shift moves the Moon's node offset (β at
+// syzygy), ~74 km of track latitude per 165 s. The BCE MEAN/TREND
+// therefore has a real umbra cost (not fully ΔT-degenerate) and is owned
+// by the L(t) DRIFT SHAPE; the SEASONAL detrended sd is owned by the
+// e-COUPLING period. 6a: which tropical-year harmonic carries the BCE
+// drift. 6b: drift-shape subsets × C1, with the −746 lunar probe (the
+// babylon746 ttRes mover) and the −135 shift. 6c: e-coupling period
+// variants — DIAGNOSTIC amplitudes (base/2 each); a period that helps
+// then needs a DERIVED amplitude before it can ship (the AMD-α-scan
+// precedent: fitted-scan amplitudes are numerology).
+const HARM = C.TROPICAL_YEAR_HARMONICS;
+const c1of = (y) => DT.cyclesBetweenYears(C.balancedYear, y, 1);
+const harmDays = (y, subset) => {
+  const c = c1of(y);
+  let s = 0;
+  for (const [div, sinC, cosC] of HARM) {
+    if (subset && !subset.includes(div)) continue;
+    const ph = div * c * 2 * Math.PI;
+    s += sinC * Math.sin(ph) + cosC * Math.cos(ph);
+  }
+  return s;
+};
+// cheap perturbative rate for a harmonic subset on the mean base (SI-clean:
+// LOD held at 86400 — the LOD part of the drift is ΔT's job)
+const rateSubsetYr = (subset) => (y) => 360 * 365.25
+  / (C.meanSolarYearDays + harmDays(y, subset));
+const B746 = 1448617.7999;   // −746 Feb 6 canon jd_TD
+console.log('\n6a. PER-HARMONIC drift-only ΔL, as syzygy-timing minutes (rel. rate 0.5086°/h):');
+console.log('   div    period(kyr)   δt(−135) min   δt(−746) min');
+for (const [div] of HARM) {
+  const L = mkCum(rateSubsetYr([div]), rateSubsetYr([div])(2000));
+  const lin = (y) => L0deg + RATEcy * (y - 2000) / 100;
+  const dmin = (y) => (L(y) - lin(y)) / 0.5086 * 60;
+  console.log(`   H/${String(div).padEnd(3)} ${(C.H / div / 1000).toFixed(1).padStart(9)} ${dmin(-135).toFixed(2).padStart(13)} ${dmin(-746).toFixed(2).padStart(14)}`);
+}
+
+console.log('\n6b. DRIFT-SHAPE subsets × C1 — BCE decomposition + the −746/−135 probes:');
+const DVARIANTS = [
+  ['full f(Y) (shipped)', LDRIFT],
+  ['H/8 only', mkCum(rateSubsetYr([8]), rateSubsetYr([8])(2000))],
+  ['all but H/8', mkCum(rateSubsetYr(HARM.map(h => h[0]).filter(d => d !== 8)), rateSubsetYr(HARM.map(h => h[0]).filter(d => d !== 8))(2000))],
+  ['H/8 + H/3 only', mkCum(rateSubsetYr([3, 8]), rateSubsetYr([3, 8])(2000))],
+  ['linear (no drift)', null],
+  // DIAGNOSTIC scale scan (a fitted scale cannot ship — it asks what drift
+  // magnitude the corpus wants; cf. the −0.33 vs −0.53 s/cy local-slope
+  // undershoot vs Meeus):
+  ...[1.2, 1.33, 1.45, 1.6].map((k) => [
+    `full drift × ${k}`,
+    (y) => {
+      const lin = L0deg + RATEcy * (y - 2000) / 100;
+      return lin + k * (LDRIFT(y) - lin);
+    },
+  ]),
+];
+const b746meeus = meeus.findLunarEclipsesInRange(B746 - 5, B746 + 5)[0];
+const b135meeus = meeus.findSolarEclipsesInRange(1671853.76 - 20, 1671853.76 + 20)[0];
+for (const [name, lonAt] of DVARIANTS) {
+  const f = mkNative(C1ecc, lonAt);
+  const pts = [];
+  for (const [, jd] of BCE) {
+    const a = meeus.findSolarEclipsesInRange(jd - 20, jd + 20);
+    const b = f.findSolarEclipsesInRange(jd - 20, jd + 20);
+    if (a.length && b.length) pts.push([2000 + (jd - C.j2000JD) / 365.25, (b[0].jd - a[0].jd) * 1440]);
+  }
+  const n2 = pts.length, mx = pts.reduce((s, p) => s + p[0], 0) / n2, my = pts.reduce((s, p) => s + p[1], 0) / n2;
+  let sxy = 0, sxx = 0;
+  for (const [x, yv] of pts) { sxy += (x - mx) * (yv - my); sxx += (x - mx) ** 2; }
+  const slope = sxy / sxx;
+  const det = Math.sqrt(pts.reduce((s, [x, yv]) => s + (yv - (my + slope * (x - mx))) ** 2, 0) / n2);
+  const b746 = f.findLunarEclipsesInRange(B746 - 5, B746 + 5)[0];
+  const b135 = f.findSolarEclipsesInRange(1671853.76 - 20, 1671853.76 + 20)[0];
+  const d746 = (b746.jd - b746meeus.jd) * 1440, d135 = (b135.jd - b135meeus.jd) * 1440;
+  console.log(`   ${name.padEnd(20)} BCE mean ${my.toFixed(1).padStart(6)} · trend ${(slope * 100).toFixed(2).padStart(6)} · det sd ${det.toFixed(2)} min · δ(−746) ${d746.toFixed(1).padStart(6)} min · δ(−135) ${d135.toFixed(1).padStart(6)} min`);
+}
+
+console.log('\n6c. e-COUPLING period variants (each base/2, J2000-anchored diff form) × shipped drift:');
+const cosN = (n) => (y) => Math.cos((n * (y - C.balancedYear) / C.H * 360 - 180) * D2R);
+const mkCoup = (...terms) => (y) => eH16(y)
+  + terms.reduce((s, cN) => s + (C.eccentricityBase / 2) * (cN(y) - cN(2000)), 0);
+const CVARIANTS = [
+  ['H/3 (shipped C1)', C1ecc],
+  ['H/8', mkCoup(cosN(8))],
+  ['H/5', mkCoup(cosN(5))],
+  ['H/3 + H/8', mkCoup(cosN(3), cosN(8))],
+  ['H/3 + H/5', mkCoup(cosN(3), cosN(5))],
+];
+for (const [name, eccAt] of CVARIANTS) {
+  const f = mkNative(eccAt, LDRIFT);
+  const rr = [];
+  for (const [jd, , , jplSun] of cache.rows) {
+    const jb = jd + BRIDGE;
+    const om = (N.omegaNodeJ2000Deg - 360 * (jb - 2451545.0) / C.moonNodalPrecessionDaysEarth) * D2R;
+    const dPsiDeg = (N.psiOmega * Math.sin(om)) / 3600;
+    const T = (jb - 2451545.0) / 36525;
+    rr.push(wrap(f.sunLonDegAt(jb) - (jplSun - dPsiDeg)) * AS - sunPlanetaryCompletionDeg(T) * AS);
+  }
+  const s = stats(rr);
+  const pts = [];
+  for (const [, jd] of BCE) {
+    const a = meeus.findSolarEclipsesInRange(jd - 20, jd + 20);
+    const b = f.findSolarEclipsesInRange(jd - 20, jd + 20);
+    if (a.length && b.length) pts.push([2000 + (jd - C.j2000JD) / 365.25, (b[0].jd - a[0].jd) * 1440]);
+  }
+  const n2 = pts.length, mx = pts.reduce((s2, p) => s2 + p[0], 0) / n2, my = pts.reduce((s2, p) => s2 + p[1], 0) / n2;
+  let sxy = 0, sxx = 0;
+  for (const [x, yv] of pts) { sxy += (x - mx) * (yv - my); sxx += (x - mx) ** 2; }
+  const slope = sxy / sxx;
+  const det = Math.sqrt(pts.reduce((s2, [x, yv]) => s2 + (yv - (my + slope * (x - mx))) ** 2, 0) / n2);
+  console.log(`   ${name.padEnd(18)} modern scatter ${s.sd.toFixed(2)}″ · ė(J2000) ${((eccAt(2050) - eccAt(1950))).toExponential(2)} · BCE det sd ${det.toFixed(2)} min`);
+}
