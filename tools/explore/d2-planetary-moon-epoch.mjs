@@ -243,6 +243,8 @@ const runArg = (i) => {
     M: (357.5291092 + (35999.0502909 - 0.0001536 * Tc) * Tc) * D2R,
     VE: (fV.a + fV.b * t) - LS, EJ: LS - (fJ.a + fJ.b * t),
     EMa: LS - (fMa.a + fMa.b * t), ESa: LS - (fSa.a + fSa.b * t),
+    // 20.3h r2: the Jupiter−Saturn synodic (19.86 yr; 6 cycles in 120 yr)
+    JS: (fJ.a + fJ.b * t) - (fSa.a + fSa.b * t),
     T: t / 36525,
   };
 };
@@ -267,6 +269,10 @@ for (const k of Object.keys(realRates)) {
 }
 
 /** planetary candidates (SHIPPABLE rows) — name, run-argFn */
+// 20.3h ROUND 2 (M20H_R2=1): the SLOW families the alias-breaker's ~17-yr
+// band pointed at — the Jupiter−Saturn synodic and its lunar sidebands.
+// Without the flag the instrument reproduces the D2 record byte-for-byte.
+const R2 = process.env.M20H_R2 === '1';
 const PLAN = [
   ['V-E', (a) => a.VE], ['2(V-E)', (a) => 2 * a.VE], ['3(V-E)', (a) => 3 * a.VE],
   ['E-J', (a) => a.EJ], ['2(E-J)', (a) => 2 * a.EJ],
@@ -276,6 +282,11 @@ const PLAN = [
   ['V-E+Mp', (a) => a.VE + a.Mp], ['V-E-Mp', (a) => a.VE - a.Mp],
   ['E-J+Mp', (a) => a.EJ + a.Mp], ['E-J-Mp', (a) => a.EJ - a.Mp],
   ['E-Ma+Mp', (a) => a.EMa + a.Mp], ['E-Ma-Mp', (a) => a.EMa - a.Mp],
+  ...(R2 ? [
+    ['J-S', (a) => a.JS], ['2(J-S)', (a) => 2 * a.JS],
+    ['J-S+Mp', (a) => a.JS + a.Mp], ['J-S-Mp', (a) => a.JS - a.Mp],
+    ['J-S+2D', (a) => a.JS + 2 * a.D], ['J-S-2D', (a) => a.JS - 2 * a.D],
+  ] : []),
 ];
 /** main-problem absorbers on run args (leakage sinks) — DISCARDED at shipping.
  *  Includes the ANNUAL (M) family: the EMB e/ϖ secular drift between systems
@@ -402,5 +413,6 @@ let bestB = [];
   console.log(`  planetary β content RMS ${Math.sqrt(rssB / 2).toFixed(3)}″`);
 }
 
-writeFileSync(HERE + 'd2-planetary-moon-terms.local.json', JSON.stringify({ jd0: JD0, years: YEARS, dt: DT, lon: tableL, lat: bestB }, null, 1));
-console.log('\ndumped → d2-planetary-moon-terms.local.json');
+const OUT = R2 ? 'm20h-planetary-r2-terms.local.json' : 'd2-planetary-moon-terms.local.json';
+writeFileSync(HERE + OUT, JSON.stringify({ jd0: JD0, years: YEARS, dt: DT, lon: tableL, lat: bestB }, null, 1));
+console.log('\ndumped → ' + OUT);

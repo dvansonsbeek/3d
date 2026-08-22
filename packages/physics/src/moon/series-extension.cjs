@@ -62,7 +62,14 @@ const DELAUNAY = {
 };
 
 /** Longitude tail: [kD, kM, kMp, kF, sin″] — 47 derived terms ≥ 0.1″
- *  (RMS content 2.02″). */
+ *  (RMS content 2.02″), plus the 20.3h ROUND-2 block at the end: five
+ *  dt-halving-converged terms beyond the D2 catalog's order-7 bound
+ *  (m20h-extraction-r2.mjs, the same D1 3-body lab). The lead term
+ *  [6,0,−2,0] extracted at 0.572″ vs the MPP02-comparison target 0.57″
+ *  (m20h-alias-breaker.mjs) — the integrator predicted the independent
+ *  reference again. 4-gate out-of-sample (m20h-gate-preview.mjs):
+ *  all-phase λ 3.03 → 2.96″, β unchanged, fleet improves, centerlines
+ *  2.71 → 2.69″ with the 2001 max 7.3 → 6.7″. */
 const LON_TERMS = [
   [2, 0, 1, 2, -0.9900],
   [2, 0, -4, 0, 0.9465],
@@ -111,6 +118,12 @@ const LON_TERMS = [
   [1, 0, -3, 0, -0.1252],
   [2, 0, 2, 2, -0.1236],
   [1, -1, 1, 0, -0.1225],
+  // 20.3h ROUND 2 — beyond the order-7 catalog bound (see header note):
+  [6, 0, -2, 0, 0.572],
+  [6, 0, -3, 0, 0.294],
+  [4, 0, -2, 2, -0.169],
+  [4, -2, -2, 0, 0.161],
+  [0, 0, 5, 0, 0.112],
 ];
 
 /** Latitude tail: [kD, kM, kMp, kF, sin″] — 30 derived terms ≥ 0.1″
