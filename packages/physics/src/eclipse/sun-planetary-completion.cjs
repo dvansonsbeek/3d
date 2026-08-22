@@ -58,6 +58,17 @@
  * recomputes it from live constants and fails on mismatch. The api
  * centerline gate (≤8″ shadow-plane) backstops gross staleness
  * independently.
+ *
+ * E4/E5 PAIRING VERDICT (20.3h Phase 0): the framework-native Sun
+ * landing REPLACED the finder Sun form (Meeus Ch. 25 → the assembled
+ * framework Sun with the f(Y)+torque drift). The re-derivation this
+ * header calls for was MEASURED INSTEAD: the residual 2lE re-fit under
+ * the new chain is noise (−0.12″ sin / −0.03″ cos vs the declared-fitted
+ * +1.42″ — tools/explore/e3b-native-sun.mjs §2), the all-phase Sun
+ * residual improved to 0.95″, and every gate stayed green — the table's
+ * planetary content is chain-independent physics and the pairing holds
+ * WITHOUT re-extraction. The +1.42″ 2lE term is thereby measured to be
+ * genuinely planetary-class, not a Meeus-EoC absorber.
  */
 
 'use strict';
