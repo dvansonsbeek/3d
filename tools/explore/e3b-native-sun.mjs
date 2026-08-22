@@ -429,6 +429,21 @@ const DVARIANTS = [
       return lin + k * (LDRIFT(y) - lin);
     },
   ]),
+  // PER-DIVISOR scaling (which structure carries the ×1.4: the H/8 term
+  // alone = "obliquity amplitude bigger"; H/3 alone; or a per-divisor law).
+  // Geometry note (measured): the fitted year harmonics are the derivative
+  // of ONE equinox-longitude oscillation, equal mirror amplitudes
+  // A₃ = A₈ = 1.467° = δε_amp (0.6357°) × cot ε — internally derived-
+  // consistent, so the ×1.4 must enter via the tilt amplitude, a missing
+  // term, or per-divisor structure.
+  ...[[1.4, 1.0, 'H/8×1.4 · H/3×1.0'], [1.0, 2.3, 'H/8×1.0 · H/3×2.3'],
+      [1.3, 1.8, 'H/8×1.3 · H/3×1.8'], [1.45, 1.45, 'both × 1.45']].map(([k8, k3, label]) => {
+    const r8 = rateSubsetYr([8]), r3 = rateSubsetYr([3]);
+    const rest = rateSubsetYr(HARM.map(h => h[0]).filter(d => d !== 8 && d !== 3));
+    const rf = (y) => rateLinYr + k8 * (r8(y) - rateLinYr) + k3 * (r3(y) - rateLinYr)
+      + (rest(y) - rateLinYr);
+    return [label, mkCum(rf, rf(2000))];
+  }),
 ];
 const b746meeus = meeus.findLunarEclipsesInRange(B746 - 5, B746 + 5)[0];
 const b135meeus = meeus.findSolarEclipsesInRange(1671853.76 - 20, 1671853.76 + 20)[0];
@@ -449,6 +464,56 @@ for (const [name, lonAt] of DVARIANTS) {
   const b135 = f.findSolarEclipsesInRange(1671853.76 - 20, 1671853.76 + 20)[0];
   const d746 = (b746.jd - b746meeus.jd) * 1440, d135 = (b135.jd - b135meeus.jd) * 1440;
   console.log(`   ${name.padEnd(20)} BCE mean ${my.toFixed(1).padStart(6)} · trend ${(slope * 100).toFixed(2).padStart(6)} · det sd ${det.toFixed(2)} min · δ(−746) ${d746.toFixed(1).padStart(6)} min · δ(−135) ${d135.toFixed(1).padStart(6)} min`);
+}
+
+// ── 6d. THE DERIVED TORQUE TERM (cos-ε modulation of H/13 precession) ───
+// The engine's precession is CONSTANT-RATE H/13; its year harmonics carry
+// only the GEOMETRIC equinox displacement (A·sin φ per tilt node — the
+// 8:3-ratio signature). The classical luni-solar torque ∝ cos ε adds a
+// RATE modulation: δp = −p₀·tan ε·δε(t), with δε the model's own
+// two-component law (−A cos φ₃ + A cos φ₈). Both mechanisms lengthen the
+// year at obliquity max, so they ADD; the derived per-divisor drift scale
+// is 1 + p₀·tan²ε·H/(2π·div) = 1.306 (H/8) / 1.815 (H/3) — the blind
+// 'H/8×1.3 · H/3×1.8' row above already showed this combination lands the
+// corpus. ZERO new constants: p₀ = 13·360/H, ε = earthtiltMean,
+// A = earthInvPlaneInclinationAmplitude.
+{
+  const P0 = 13 * 360 / C.H;                              // deg/yr
+  const TAN_E = Math.tan(C.earthtiltMean * D2R);
+  const A_INCL = C.earthInvPlaneInclinationAmplitude;     // 0.63605 deg
+  const dEpsRad = (y) => {
+    const c = c1of(y) * 2 * Math.PI;
+    return (-A_INCL * Math.cos(3 * c) + A_INCL * Math.cos(8 * c)) * D2R;
+  };
+  const rateTorque = (y) => rateYrSI(y) - P0 * TAN_E * dEpsRad(y);
+  const LT = mkCum(rateTorque, rateTorque(2000));
+  console.log('\n6d. DERIVED torque-corrected drift (f(Y) + cos-ε rate modulation, zero new constants):');
+  for (const [name, lonAt] of [['f(Y) + torque', LT], ['f(Y) only (shipped)', LDRIFT]]) {
+    const f = mkNative(C1ecc, lonAt);
+    const rr = [];
+    for (const [jd, , , jplSun] of cache.rows) {
+      const jb = jd + BRIDGE;
+      const om = (N.omegaNodeJ2000Deg - 360 * (jb - 2451545.0) / C.moonNodalPrecessionDaysEarth) * D2R;
+      const dPsiDeg = (N.psiOmega * Math.sin(om)) / 3600;
+      const T = (jb - 2451545.0) / 36525;
+      rr.push(wrap(f.sunLonDegAt(jb) - (jplSun - dPsiDeg)) * AS - sunPlanetaryCompletionDeg(T) * AS);
+    }
+    const s = stats(rr);
+    const pts = [];
+    for (const [, jd] of BCE) {
+      const a = meeus.findSolarEclipsesInRange(jd - 20, jd + 20);
+      const b = f.findSolarEclipsesInRange(jd - 20, jd + 20);
+      if (a.length && b.length) pts.push([2000 + (jd - C.j2000JD) / 365.25, (b[0].jd - a[0].jd) * 1440]);
+    }
+    const n2 = pts.length, mx = pts.reduce((s2, p) => s2 + p[0], 0) / n2, my = pts.reduce((s2, p) => s2 + p[1], 0) / n2;
+    let sxy = 0, sxx = 0;
+    for (const [x, yv] of pts) { sxy += (x - mx) * (yv - my); sxx += (x - mx) ** 2; }
+    const slope = sxy / sxx;
+    const det = Math.sqrt(pts.reduce((s2, [x, yv]) => s2 + (yv - (my + slope * (x - mx))) ** 2, 0) / n2);
+    const b746 = f.findLunarEclipsesInRange(B746 - 5, B746 + 5)[0];
+    const b135 = f.findSolarEclipsesInRange(1671853.76 - 20, 1671853.76 + 20)[0];
+    console.log(`   ${name.padEnd(20)} modern ${s.m.toFixed(2)}″/${s.sd.toFixed(2)}″ · BCE mean ${my.toFixed(1).padStart(6)} · trend ${(slope * 100).toFixed(2).padStart(6)} · det sd ${det.toFixed(2)} · δ746 ${((b746.jd - b746meeus.jd) * 1440).toFixed(1).padStart(6)} · δ135 ${((b135.jd - b135meeus.jd) * 1440).toFixed(1).padStart(6)} min`);
+  }
 }
 
 console.log('\n6c. e-COUPLING period variants (each base/2, J2000-anchored diff form) × shipped drift:');
