@@ -36,6 +36,17 @@
 'use strict';
 
 /**
+ * @typedef {Object} FrameworkSunDeps
+ * @property {number} sunMeanLongitudeJ2000Deg - L0 anchor (input anchor, 280.46646)
+ * @property {number} tropicalRateDegPerCy - the framework tropical rate (from the year chain)
+ * @property {(year: number) => number} eccentricityAt - the framework e(t) law
+ * @property {(year: number) => number} perihelionLongitudeDegAt - the framework ϖ(t) law (heliocentric)
+ * @property {(year: number) => number} [meanLongitudeDegAt] - optional epoch-dependent
+ *   mean longitude L(t) (e.g. L0 + ∫rate·dt from the f(Y) tropical-year chain);
+ *   absent = the linear form L0 + rate·T
+ */
+
+/**
  * @typedef {Object} EclipseFinderDeps
  * @property {(jd: number) => number} moonLonDegAt - truncated-series ecliptic longitude
  * @property {(jd: number) => number} moonBetaDegAt - truncated-series ecliptic latitude
@@ -43,6 +54,13 @@
  * @property {(jd: number) => number} deltaTSecondsAt - the engine's ΔT convention
  * @property {() => number} getSynodicMonthDays - live (epoch-mutable)
  * @property {() => number} getSunDistanceKm - live (epoch-mutable)
+ * @property {FrameworkSunDeps} [frameworkSun] - E4 (the native-Sun landing,
+ *   plan §12i item 11): when present, sunLonDegAt uses the FRAMEWORK form —
+ *   linear tropical rate + Kepler EoC (to e³) on the framework e(t)/ϖ(t)
+ *   laws, TT clock unchanged — instead of the Meeus Ch. 25 polynomials.
+ *   Absent = the historical Meeus form (every certified number's current
+ *   basis). The swap is a conscious matched-pair event: the D2 completion's
+ *   fitted 2lE residue and the certified statistics re-measure with it.
  * @property {{ rEarthMetres: number, moonDiameterKm: number,
  *   sunDiameterKm: number, j2000JD: number, julianCenturyDays: number }} constants
  */
@@ -52,10 +70,27 @@ function createEclipseFinders(deps) {
   const K = deps.constants;
 
   /** Sun's geocentric ecliptic longitude in degrees (0–360) at given JD_UT.
-   * MEAN GEOMETRIC — see the module header. @param {number} jd @returns {number} */
+   * MEAN GEOMETRIC — see the module header. Two forms (E4): the framework
+   * form when deps.frameworkSun is injected, else Meeus Ch. 25.
+   * @param {number} jd @returns {number} */
   function sunLonDegAt(jd) {
     const _d2r = Math.PI / 180;
     const T = (jd + deps.deltaTSecondsAt(jd) / 86400 - K.j2000JD) / K.julianCenturyDays;
+    if (deps.frameworkSun) {
+      // E4 framework form: linear tropical rate + Kepler EoC (to e³) on the
+      // framework e(t)/ϖ(t) laws. Same TT clock; same L0 input anchor.
+      const F = deps.frameworkSun;
+      const year = 2000 + T * 100;
+      const L = F.meanLongitudeDegAt
+        ? F.meanLongitudeDegAt(year)
+        : F.sunMeanLongitudeJ2000Deg + F.tropicalRateDegPerCy * T;
+      const e = F.eccentricityAt(year);
+      const M = (L - (F.perihelionLongitudeDegAt(year) + 180)) * _d2r;
+      const C = (2 * e - e * e * e / 4) * Math.sin(M)
+              + 1.25 * e * e * Math.sin(2 * M)
+              + (13 / 12) * e * e * e * Math.sin(3 * M);
+      return ((L + C / _d2r) % 360 + 360) % 360;
+    }
     const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
     const M = (357.52911 + 35999.05029 * T - 0.0001537 * T * T) * _d2r;
     const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)

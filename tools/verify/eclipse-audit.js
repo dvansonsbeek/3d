@@ -298,6 +298,10 @@ const finders = createEclipseFinders({
   moonLonDegAt: (jd) => MS.truncatedLonDeg(jd),
   moonBetaDegAt: (jd) => MS.truncatedBetaDeg(jd),
   moonDistanceKmAt: (jd) => MS.truncatedDistanceKm(jd),
+  // E4 — the framework-native Sun: the SAME assembly the tier's own finders
+  // and umbra chain use (model.js), so finder UT and umbra ground track stay
+  // a matched pair. Never rebuild these deps locally.
+  frameworkSun: TIER.eclipse.frameworkSunDeps,
   deltaTSecondsAt: (jd) => DT.frameworkDeltaT(jd),
   getSynodicMonthDays: () => C.moonSynodicMonth,
   getSunDistanceKm: () => C.currentAUDistance,

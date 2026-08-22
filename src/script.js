@@ -3566,10 +3566,16 @@ function _eclSunLon(jd) {
 var _eclipseM = null;
 function _eclipse() {
   if (!_eclipseM) {
+    // E4 — the framework-native Sun: the SAME assembly as the package
+    // tier's finders and umbra chain (model.js frameworkSunDeps), so the
+    // browser finder UT and the delegated umbra ground track stay a
+    // matched pair (three-runtimes rule; cf. tools/verify/eclipse-audit.js).
+    if (_tierUmbraModel === null) _tierUmbraModel = createModel();
     _eclipseM = createEclipseFinders({
       moonLonDegAt: (jd) => _eclMoonLon(jd),
       moonBetaDegAt: (jd) => _eclMoonBeta(jd),
       moonDistanceKmAt: (jd) => _eclMoonDistance(jd),
+      frameworkSun: _tierUmbraModel.eclipse.frameworkSunDeps,
       deltaTSecondsAt: (jd) => _eclDeltaT(jd),
       getSynodicMonthDays: () => moonSynodicMonth,
       getSunDistanceKm: () => currentAUDistance,

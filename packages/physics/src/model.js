@@ -829,6 +829,63 @@ export function assembleModel(C, F) {
     },
   });
 
+  // ── E4: the framework-native Sun (§12i item 11 — the 3b landing) ─────────
+  // Assembled from the model's own laws, ZERO fitted sun constants:
+  //   e(t) = the H/16 eccentricity-channel law + the derived H/3
+  //          inclination-coupling imprint (amplitude base/2, lattice phase,
+  //          J2000-anchored difference form) — the osculating decomposition:
+  //          osculating e = H/16 channel + inclination coupling.
+  //   L(t) = L0 + the mean tropical rate + the f(Y) drift SHAPE only,
+  //          ∫(rate_SI(y) − rate_SI(2000)) dy: the rate ANCHOR stays the mean
+  //          year (eclipse-endorsed); the drift is the Step 6d year-harmonic
+  //          claim in SI/TT (year-in-days × LOD — the LOD-day part of the
+  //          raw drift is UT-vs-TT and stays ΔT's job). Trapezoid table,
+  //          10-yr steps over −3000..3000; outside, the drift freezes at the
+  //          edge (rate reverts to linear — the finder domain is the corpus
+  //          era).
+  //   ϖ(t) = the shipped H/16 perihelion law (earthPerihelionDeg).
+  // Measured (tools/explore/e3b-native-sun.mjs): beats the Meeus Ch. 25
+  // basis on JPL all-phase (0.95″ vs 1.28″ scatter) and on ancient-corpus
+  // timing structure (0.37 vs 0.50 min detrended vs Meeus-T²); required-ΔT
+  // shift 2–4 min ≈ 0.23σ of Stephenson scatter (lunar bias improves); the
+  // D2 completion table is unchanged (residual 2lE re-fit ≈ 0.1″ — noise).
+  const sunL0Deg = C.earthOrbital.sunMeanLongitudeJ2000_deg;
+  const sunTropicalRateDegPerCy = 360 * julianCenturyDays / meanSolarYearDays;
+  /** @param {number} year @returns {number} */
+  const sunEccentricityAt = (year) => {
+    const cos3 = -Math.cos(phaseRadians(balancedYear, year, 3));
+    const cos3J2000 = -Math.cos(phaseRadians(balancedYear, 2000, 3));
+    return eccentricityAt(year) + (eccentricityBase / 2) * (cos3 - cos3J2000);
+  };
+  const sunMeanLongitudeDegAt = (() => {
+    const Y_LO = -3000, Y_HI = 3000, STEP = 10;
+    /** @type {Float64Array|null} */
+    let cum = null;
+    /** @param {number} year @returns {number} */
+    const rateSIYr = (year) => 360 * (365.25 * 86400)
+      / (tropicalYearDirectDays(year)
+        * (deepLod.lodSecondsAtAge(yearToTMa(year)) ?? meanLengthOfDay));
+    return /** @param {number} year @returns {number} */ (year) => {
+      if (cum === null) {
+        const n = (Y_HI - Y_LO) / STEP + 1;
+        cum = new Float64Array(n);
+        const ref = rateSIYr(2000);
+        let prev = rateSIYr(Y_LO) - ref;
+        for (let i = 1; i < n; i++) {
+          const next = rateSIYr(Y_LO + i * STEP) - ref;
+          cum[i] = cum[i - 1] + 0.5 * (prev + next) * STEP;
+          prev = next;
+        }
+        const at2000 = cum[(2000 - Y_LO) / STEP];
+        for (let i = 0; i < n; i++) cum[i] -= at2000;
+      }
+      const x = (Math.min(Math.max(year, Y_LO), Y_HI) - Y_LO) / STEP;
+      const i = Math.min(Math.floor(x), cum.length - 2);
+      const drift = cum[i] + (x - i) * (cum[i + 1] - cum[i]);
+      return sunL0Deg + sunTropicalRateDegPerCy * (year - 2000) / 100 + drift;
+    };
+  })();
+
   // Eclipse finders — wired like the engine probe (tools/verify/
   // eclipse-audit.js). The finder axis is JD(UT): the series wrapper applies
   // UT→TT internally. Ground-track/umbra paths deliberately absent: the
@@ -841,6 +898,13 @@ export function assembleModel(C, F) {
     deltaTSecondsAt: frameworkDeltaTSecondsAtJD,
     getSynodicMonthDays: () => moonSynodicMonthDays,
     getSunDistanceKm: () => currentAUDistance,
+    frameworkSun: {
+      sunMeanLongitudeJ2000Deg: sunL0Deg,
+      tropicalRateDegPerCy: sunTropicalRateDegPerCy,
+      eccentricityAt: sunEccentricityAt,
+      perihelionLongitudeDegAt: earthPerihelionDeg,
+      meanLongitudeDegAt: sunMeanLongitudeDegAt,
+    },
     constants: {
       rEarthMetres: (C.bodyDiametersKm.earth / 2) * 1000,
       moonDiameterKm: C.bodyDiametersKm.moon,
@@ -956,6 +1020,18 @@ export function assembleModel(C, F) {
       findLunarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findLunarEclipsesInRange(jdStart, jdEnd),
       findSolarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findSolarEclipsesInRange(jdStart, jdEnd),
       deltaTSecondsAtJD: frameworkDeltaTSecondsAtJD,
+      // E4 — the framework-native Sun deps, exported so the OTHER finder
+      // construction sites (tools/verify/eclipse-audit.js, the browser
+      // _eclipse twins) spread the SAME assembly into their own
+      // createEclipseFinders call instead of triplicating it (the
+      // three-runtimes rule — cf. recession-history):
+      frameworkSunDeps: Object.freeze({
+        sunMeanLongitudeJ2000Deg: sunL0Deg,
+        tropicalRateDegPerCy: sunTropicalRateDegPerCy,
+        eccentricityAt: sunEccentricityAt,
+        perihelionLongitudeDegAt: earthPerihelionDeg,
+        meanLongitudeDegAt: sunMeanLongitudeDegAt,
+      }),
       // 20.3g location tier (see eclipse/besselian.cjs):
       umbraGroundAtJD: /** @param {number} jd @returns {{latDeg: number, lonDeg: number} | null} */ (jd) => besselian.umbraGroundAt(jd),
       solarLocalCircumstances: /** @param {number} jdGreatest @param {number} latDeg @param {number} lonDeg */ (jdGreatest, latDeg, lonDeg) => besselian.localCircumstances(jdGreatest, latDeg, lonDeg),
