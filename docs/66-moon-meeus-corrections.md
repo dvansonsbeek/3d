@@ -345,6 +345,23 @@ framework prediction: deep-time e_max ≈ 0.023 (conventional secular theory:
 constrained ridge fit, 21 coefficients, 405-kyr g₂−g₅ labeled OFF-lattice)
 is retained in code for A/B research only (superseded as the production e_E).
 
+**E4 resolution — the osculating decomposition (exploration 3b).** The
+firewall in the experiment log ("the channel quantity is not the
+osculating eccentricity") resolved into a decomposition rather than a
+separation: the Sun's osculating e(t) = the H/16 orbit law + THIS
+movement's coupling imprint, e₁₆(t) − (base/2)·(cos φ₃(t) − cos φ₃(J2000))
+on the integrated H/3 phase — the J2000-anchored difference form keeps
+the H/16 law the owner of today's value, so no epoch is privileged. That
+assembled e(t), together with the f(Y) year-harmonic rate drift in the
+mean longitude (the "T²-attribution clue" recorded under (a) above,
+cashed in), is now the certified eclipse chain's Sun in all three
+runtimes: it beats the Meeus Ch. 25 basis in-window against JPL (0.95″
+vs 1.28″ scatter) and across the ancient corpus (BCE detrended timing
+0.37 vs 0.50 min; dense-target Babylonian χ² 44.5 → 30.9), with zero
+fitted sun constants ([doc 103 §E4
+update](103-135-babylonian-case-study.md)). The lunar channel above is
+unchanged — the same H/3 movement now feeds both consumers.
+
 Open research item — the 1.2° azimuthal family: three independent ~1.2°
 tensions live in the node/phase sector while all magnitudes are stiff:
 (1) reconciling the RAW Souami & Souchay planetary nodes with JPL ecliptic
