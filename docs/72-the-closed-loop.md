@@ -124,7 +124,7 @@ The System Reset also defines the **eccentricity phase alignment**:
 - In-phase planets: at **base** eccentricity, **rising** (phase 90°)
 - Anti-phase (Saturn): at **base** eccentricity, **falling** (phase 270°)
 
-(Verified empirically via `run8HConfigurationVerification` in the model — see also `docs/hidden/old-documents/eccentricity-wobble-formula-analysis.md` for the formula reconciliation that made all 7 planets land at exactly these phases at every 8H.)
+(Verified empirically via `run8HConfigurationVerification` in the model — see also `docs/archive/old-documents/eccentricity-wobble-formula-analysis.md` (untracked archive) for the formula reconciliation that made all 7 planets land at exactly these phases at every 8H.)
 
 This is the physically motivated symmetry: at n=7, every cycle type (inclination, eccentricity) reaches its reference state simultaneously. The direction of eccentricity change (rising vs falling) encodes the balance group — the same grouping that produces the 99.9975% inclination balance.
 

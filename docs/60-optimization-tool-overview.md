@@ -43,7 +43,7 @@ A tool that Claude can run **without user intervention** to:
 ### Why now
 - We verified that **JPL Horizons API** can provide RA/Dec data for any planet at any date (tested successfully for all 8 planets)
 - The **Excel comparison** ([01-holistic-year-objects-data.xlsx](../data/01-holistic-year-objects-data.xlsx)) showed the model's positions diverge from JPL: ~0.9° RA/century for the Sun, 1-7° for planets
-- The existing ~80 standalone test scripts in `docs/hidden/testscripts/` prove the pattern works: pure math Node.js scripts that replicate model formulas and run with `node`
+- The existing ~80 standalone test scripts in `docs/archive/testscripts/` (untracked archive) prove the pattern works: pure math Node.js scripts that replicate model formulas and run with `node`
 
 ---
 
@@ -115,7 +115,7 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 
 ## 3. Current Model Architecture
 
-### 3.1 Input Constants (lines 25-460 of script.js)
+### 3.1 Input Constants (the constants block at the top of script.js)
 
 **Global constants** (for current values, see [Constants Reference](20-constants-reference.md)):
 | Constant | Purpose |
@@ -191,7 +191,7 @@ barycenter
           -> planet on orbit           speed: 2pi / (H/solarYearCount)
 ```
 
-**RA/Dec computation** (lines 27890-27901):
+**RA/Dec computation** (`src/script.js`):
 1. Get planet's **world position** = product of all ancestor transforms x local position
 2. Transform into **Earth's equatorial frame** = inverse of Earth's rotation axis world matrix
 3. Convert to **spherical coordinates**: RA = theta, Dec = phi
@@ -200,7 +200,7 @@ This is the key Three.js coupling -- but it's mathematically just a chain of 4x4
 
 ### 3.4 Report Generation Pipeline
 
-The existing `generatePlanetReport()` (line 21120):
+The existing `generatePlanetReport()`:
 1. Pauses simulation, saves state
 2. For each entry in `PLANET_TEST_DATES`:
    - Calls `jumpToJulianDay(jd)` -- sets date (pure math)
@@ -212,10 +212,10 @@ The existing `generatePlanetReport()` (line 21120):
 ### 3.5 Existing Calibration Infrastructure
 
 Already in the codebase:
-- `findOptimalEarthRAAngle()` (line 15761) -- optimizes 3 Earth parameters against IAU 2006
-- `analyzeSensitivity()` (line 16526) -- measures parameter sensitivity
-- `OrbitalFormulas.secularPrecessionContribution()` (line 1613) -- Laplace-Lagrange secular perturbation theory
-- ~80 standalone Node.js optimization scripts in `docs/hidden/testscripts/` (e.g., `mercury-optimize-params.js`, `all-planets-optimization-v2.js`)
+- `findOptimalEarthRAAngle()` -- optimizes 3 Earth parameters against IAU 2006
+- `analyzeSensitivity()` -- measures parameter sensitivity
+- `OrbitalFormulas.secularPrecessionContribution()` -- Laplace-Lagrange secular perturbation theory
+- ~80 standalone Node.js optimization scripts in `docs/archive/testscripts/` (untracked archive; e.g., `mercury-optimize-params.js`, `all-planets-optimization-v2.js`)
 
 ---
 
@@ -251,7 +251,7 @@ Not all data is equal. We must distinguish between:
 
 ### 4.3 Complete Audit of PLANET_TEST_DATES
 
-A thorough audit reveals that **ALL** data in `PLANET_TEST_DATES` (lines 6825-7580) is **computed from ephemeris models**, not from observations:
+A thorough audit reveals that **ALL** data in `PLANET_TEST_DATES` is **computed from ephemeris models**, not from observations:
 
 | Planet | Source | Data Type | Computed From | Entries | Has RA? |
 |--------|--------|-----------|---------------|---------|---------|
@@ -537,7 +537,7 @@ function computePlanetPosition(planetKey, pos) {
 
 The model's tunability is more nuanced than a simple list of constants. There are **three categories** of possible changes, each with different implications:
 
-### 6.1 Category A: Input Constants (lines 25-460)
+### 6.1 Category A: Input Constants (the top-of-file constants block)
 
 These are the raw input values at the top of `script.js`. Changing them is straightforward but **one input often affects multiple derived quantities**, so changes propagate through the calculation chain.
 
@@ -567,7 +567,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `correctionSun` | Sun and PerihelionFromEarth `startPos` | Affects solar/perihelion angular alignment |
 | `temperatureGraphMostLikely` | Determines `balancedYear` -> all Earth precession `startPos` values | **Affects ALL precession starting angles** |
 
-### 6.2 Category B: Derived Calculations (lines 960-1770)
+### 6.2 Category B: Derived Calculations (the derived-constants block)
 
 These are the formulas that transform input constants into scene graph properties. Changing a **calculation formula** is a different kind of tuning -- it means the mathematical relationship itself is wrong, not just a parameter value.
 

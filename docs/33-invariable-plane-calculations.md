@@ -253,7 +253,7 @@ There are two independent reasons ω_inv = ϖ − Ω_inv varies over time:
 | ϖ | Longitude of perihelion (ϖ) | `o.<planet>Perihelion` | Earth equatorial | `apparentRaFromPdA()` |
 | Ω_inv | Ascending Node on Inv. Plane (Ω) | `o.<planet>AscendingNodeInvPlane` | ICRF | Linear precession |
 
-The longitude of perihelion is computed by `apparentRaFromPdA()` (line 28092), which:
+The longitude of perihelion is computed by `apparentRaFromPdA()` (in `src/script.js`), which:
 1. Reads the 3D world positions of the perihelion marker objects
 2. Transforms them into Earth's equatorial frame via `earth.rotationAxis.worldToLocal()`
 3. Returns the apparent direction as seen from Earth

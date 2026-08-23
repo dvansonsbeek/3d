@@ -100,10 +100,10 @@ When Step 4 (RealPerihelionAtSun) is selected:
 
 | Component | Location |
 |-----------|----------|
-| `hierarchyInspector` state | script.js:7547-7597 |
-| `PLANET_HIERARCHIES` registry | script.js:6629-6750 |
-| `createVisualHelpers()` | script.js:7808+ |
-| `updateHierarchyLiveData()` | script.js:11096+ |
+| `hierarchyInspector` state | `src/script.js` (search the identifier) |
+| `PLANET_HIERARCHIES` registry | `src/script.js` |
+| `createVisualHelpers()` | `src/script.js` |
+| `updateHierarchyLiveData()` | `src/script.js` |
 
 ---
 

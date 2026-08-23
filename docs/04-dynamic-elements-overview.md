@@ -351,7 +351,7 @@ The Y-rotations through the tilted apsidal frame cause the ascending node to pre
 |----------|----------|---------|
 | `updatePlanetInvariablePlaneHeights()` | [script.js](../src/script.js) | Updates Ω on invariable plane |
 | `updateDynamicInclinations()` | [script.js](../src/script.js) | Calculates dynamic planet inclinations and ecliptic inclinations |
-| `computePlanetInvPlaneInclinationDynamic()` | [script.js:19515-19585](../src/script.js#L19515-L19585) | Computes oscillating planet inclination using ICRF perihelion |
+| `computePlanetInvPlaneInclinationDynamic()` | `src/script.js` | Computes oscillating planet inclination using ICRF perihelion |
 | `calculateDynamicAscendingNodeFromTilts()` | [script.js](../src/script.js) | Calculates Ω on ecliptic |
 | `updateAscendingNodes()` | [script.js](../src/script.js) | Updates all ascending nodes |
 | `updateOrbitalPlaneRotations()` | [script.js](../src/script.js) | Applies to 3D visualizations |
@@ -361,9 +361,9 @@ The Y-rotations through the tilted apsidal frame cause the ascending node to pre
 
 | Constant Type | Location | Purpose |
 |---------------|----------|---------|
-| `<planet>InvPlaneInclinationMean` | [script.js:292-332](../src/script.js#L292-L332) | Laplace-Lagrange midpoint (center of oscillation) |
-| `<planet>InclinationAmplitude` | [script.js:292-332](../src/script.js#L292-L332) | Half of oscillation range from Laplace-Lagrange bounds |
-| `<planet>InclinationCycleAnchor` | [script.js:359-369](../src/script.js#L359-L369) | ICRF perihelion longitude where MAX inclination occurs (evaluated at balanced year) |
+| `<planet>InvPlaneInclinationMean` | `src/script.js` constants block | Laplace-Lagrange midpoint (center of oscillation) |
+| `<planet>InclinationAmplitude` | `src/script.js` constants block | Half of oscillation range from Laplace-Lagrange bounds |
+| `<planet>InclinationCycleAnchor` | `src/script.js` constants block | ICRF perihelion longitude where MAX inclination occurs (evaluated at balanced year) |
 
 ## References
 

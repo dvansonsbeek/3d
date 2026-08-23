@@ -25,9 +25,9 @@ The simulation provides four export / validation systems:
 
 | System | Purpose | Output Format | Location |
 |--------|---------|---------------|----------|
-| **Planet Positions & Orbits** | All planets over a date range | Excel (.xlsx) or TSV | Reports menu |
+| **Planet Positions, Perihelion & Inclination** | All planets over a date range | Excel (.xlsx) or TSV | Reports menu |
 | **Solstices & Equinoxes** | Annual solstice/equinox data | Excel (.xlsx) | Reports menu |
-| **Year Length Analysis** | Tropical, anomalistic, sidereal year lengths | Excel (.xlsx) | Reports menu |
+| **Days, Years & Precession** (year-length analysis) | Tropical, anomalistic, sidereal year lengths | Excel (.xlsx) | Reports menu |
 | **Planet Position Reports** | Detailed validation for individual planets | Excel (.xlsx) or Clipboard | Hierarchy Inspector |
 
 Console validation tests are under **Tools > Console Tests (F12)**.
@@ -40,19 +40,28 @@ All Excel exports use the [SheetJS library](https://sheetjs.com/) loaded on-dema
 
 ```
 Reports (observed category)
-├── Planet Positions & Orbits
+├── Planet Positions, Perihelion & Inclination
 ├── Solstices & Equinoxes
-└── Year Length Analysis
+├── Days, Years & Precession
+└── Solar Day
 
 Tools
 ├── Planet Inspector          [opens Hierarchy Inspector]
 ├── Invariable Plane Inspector
+├── Eccentricity Balance Scale
+├── Solar System Resonance Cycle
+├── WebGeoCalc Explorer
+├── LOD-Climate Rhythm
+├── Climate Formula Explorer
+├── ESSRT Explorer
+├── Formula Verification
+├── Data Explorer             [opens data.holisticuniverse.com]
 └── Console Tests (F12)
 ```
 
 ---
 
-## Part 1: Planet Positions & Orbits
+## Part 1: Planet Positions, Perihelion & Inclination
 
 ### Purpose
 
@@ -60,7 +69,7 @@ Exports comprehensive planetary position and orbital element data for all object
 
 ### Location
 
-`Reports > Planet Positions & Orbits`
+`Reports > Planet Positions, Perihelion & Inclination`
 
 ### Controls
 
@@ -240,7 +249,7 @@ For the solstice RA and JD prediction formulas (Fibonacci harmonics, valid acros
 
 ---
 
-## Part 3: Year Length Analysis
+## Part 3: Days, Years & Precession (Year Length Analysis)
 
 ### Purpose
 
@@ -248,7 +257,7 @@ Generates a comprehensive Excel file containing year-by-year astronomical measur
 
 ### Location
 
-`Reports > Year Length Analysis`
+`Reports > Days, Years & Precession`
 
 ### Controls
 

@@ -931,5 +931,5 @@ Per-planet configuration for the predictive perihelion precession formula:
 
 ---
 
-**Previous**: [Glossary](03-glossary.md)
+**Previous**: [19 - Balance Sensitivity Analysis](19-balance-sensitivity-analysis.md)
 **Next**: [Orbital Formulas Reference](21-orbital-formulas-reference.md)

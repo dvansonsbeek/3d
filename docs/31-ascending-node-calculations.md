@@ -226,7 +226,7 @@ Finds the year when Earth's inclination equals a target value (for detecting cro
 
 ### Update Function
 
-`updateAscendingNodes()` is called each frame to update all planet ascending nodes. Location: [script.js:9379](../src/script.js#L9379)
+`updateAscendingNodes()` is called each frame to update all planet ascending nodes. Location: `src/script.js`.
 
 ## Worked Example: Mars (2000 → 2100)
 

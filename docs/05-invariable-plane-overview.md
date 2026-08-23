@@ -287,7 +287,7 @@ These differ by ~177° (not exactly 180° due to 3D geometry). The simulation us
 3. **Debugging**: If values diverge, indicates data inconsistency
 4. **Independence**: Two different calculation methods should agree
 
-**Location:** `script.js` lines 19007-19089
+**Location:** `script.js` (search the function name)
 
 ---
 
@@ -330,7 +330,7 @@ The simulation can track balance over time to verify convergence to zero:
 | `stopBalanceTracking()` | Pauses tracking (preserves data) |
 | `resetBalanceTracking()` | Clears all tracking data |
 
-**Location:** `script.js` lines 18861-18991
+**Location:** `script.js` (search the function name)
 
 ---
 

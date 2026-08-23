@@ -214,14 +214,14 @@ The geometry uses LOCAL positions (flat at y=0), but the coloring decision uses 
 
 | Component | File | Description |
 |-----------|------|-------------|
-| Venus constants | [script.js:91-103](../src/script.js#L91-L103) | Orbital parameters |
-| hierarchyInspector state | [script.js:7547-7597](../src/script.js#L7547-L7597) | Inspector state with all marker references |
-| PLANET_HIERARCHIES registry | [script.js:6629-6750](../src/script.js#L6629-L6750) | Per-planet 5-step hierarchy definitions |
-| createVisualHelpers() | [script.js:7808+](../src/script.js#L7808) | Node detection and half-plane rendering |
-| Live data updates | [script.js:11096+](../src/script.js#L11096) | Dynamic marker position updates |
-| Dynamic ascending node calculation | [script.js:28619+](../src/script.js#L28619) | Main calculation function |
-| updateAscendingNodes() | [script.js:28815+](../src/script.js#L28815) | Updates all planet ascending nodes |
-| updateOrbitalPlaneRotations() | [script.js:28920+](../src/script.js#L28920) | Updates container rotations |
+| Venus constants | `src/script.js` constants block | Orbital parameters |
+| hierarchyInspector state | `src/script.js` (`hierarchyInspector`) | Inspector state with all marker references |
+| PLANET_HIERARCHIES registry | `src/script.js` (`PLANET_HIERARCHIES`) | Per-planet 5-step hierarchy definitions |
+| createVisualHelpers() | `src/script.js` | Node detection and half-plane rendering |
+| Live data updates | `src/script.js` (`updateHierarchyLiveData`) | Dynamic marker position updates |
+| Dynamic ascending node calculation | `src/script.js` (`calculateDynamicAscendingNodeFromTilts`) | Main calculation function |
+| updateAscendingNodes() | `src/script.js` | Updates all planet ascending nodes |
+| updateOrbitalPlaneRotations() | `src/script.js` | Updates container rotations |
 
 ---
 

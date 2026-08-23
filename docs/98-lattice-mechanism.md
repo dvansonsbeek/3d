@@ -811,7 +811,7 @@ orbital boundary:
   points respectively. Mars-Jupiter and inner-planet secular eigenfrequency
   differences are LOD-independent; they do not rescale with H(t).
 
-The "L1 integer labels SHIFT with LOD" claim above (line 769) therefore
+The "L1 integer labels SHIFT with LOD" claim above therefore
 applies strictly to **k-involving lattice integers** (which physically
 involve Earth's spin rate k). **Pure orbital beats sit at their own
 LOD-independent eigenfrequencies on the lattice and do not rescale**;

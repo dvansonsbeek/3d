@@ -26,7 +26,7 @@ The explorer allows users to experiment with alternative configurations to under
 
 1. Open the Tweakpane control panel
 2. Expand the **"Invariable Plane Positions"** folder
-3. Click **"Invariable Plane Balance Explorer"**
+3. Click **"Invariable Plane Inspector"**
 4. The modal overlay appears centered on screen
 
 ---
@@ -424,15 +424,15 @@ fits = (mean − amplitude ≥ LL_min − 0.01) AND (mean + amplitude ≤ LL_max
 
 | Component | Location |
 |-----------|----------|
-| `BALANCE_PLANETS` array | [script.js:9207](../src/script.js#L9207) |
+| `BALANCE_PLANETS` array | `src/script.js` |
 | `BALANCE_PRESETS` (15 configs, loaded from `data/balance-presets.json`) | `const BALANCE_PRESETS = FIT.BALANCE_PRESETS` in `src/script.js` |
-| `D_VALUE_OPTIONS` | [script.js:9330](../src/script.js#L9330) |
-| `BALANCE_CONFIG` | [script.js:9348](../src/script.js#L9348) |
-| `computeBalanceResults()` | [script.js:9497](../src/script.js#L9497) |
-| `createBalanceExplorerPanel()` | [script.js:9619](../src/script.js#L9619) |
-| `updateBalanceExplorerResults()` | [script.js:9868](../src/script.js#L9868) |
-| `openBalanceExplorer()` / `closeBalanceExplorer()` | [script.js:9966](../src/script.js#L9966) |
-| Menu button in Tweakpane panel | [script.js:11535](../src/script.js#L11535) |
+| `D_VALUE_OPTIONS` | `src/script.js` |
+| `BALANCE_CONFIG` | `src/script.js` |
+| `computeBalanceResults()` | `src/script.js` |
+| `createBalanceExplorerPanel()` | `src/script.js` |
+| `updateBalanceExplorerResults()` | `src/script.js` |
+| `openBalanceExplorer()` / `closeBalanceExplorer()` | `src/script.js` |
+| Menu button in Tweakpane panel | `src/script.js` (Tweakpane Tools folder) |
 | CSS styles (`.fbe-` prefix) | [style.css](../src/style.css) |
 
 ---

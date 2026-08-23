@@ -154,7 +154,7 @@ including the 43 arcsec/century anomaly explained by general relativity.
 
 ### No dynamic geocentric update
 
-The `moveModel()` dynamic geocentric block (scene-graph.js line 784) only
+The `moveModel()` dynamic geocentric block (`tools/lib/scene-graph.js`) only
 applies to Type II and Type III planets:
 
 ```javascript
@@ -249,7 +249,7 @@ phase-optimized reference JD providing the correct initial phase alignment.
 
 ## Constants Reference
 
-### Mercury (tools/lib/constants.js lines 41-59, src/script.js lines 93-105)
+### Mercury (planet blocks in tools/lib/constants.js and src/script.js)
 
 ```
 solarYearInput:            87.9683       (orbital period in days)
@@ -268,7 +268,7 @@ type:                      'I'           (formula selector)
 mirrorPair:                'uranus'      (paired planet)
 ```
 
-### Venus (tools/lib/constants.js lines 60-78, src/script.js lines 108-119)
+### Venus (planet blocks in tools/lib/constants.js and src/script.js)
 
 ```
 solarYearInput:            224.695       (orbital period in days, calibrated)

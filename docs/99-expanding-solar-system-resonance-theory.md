@@ -27,12 +27,12 @@ The L1 integer LABELS are scale-invariant constants of the system (n=9, 12, ...,
 > H(t) period**. Within each H cycle, actual instantaneous values oscillate around
 > these means via Fourier harmonics (24 cardinal point terms for solstices/equinoxes,
 > 5 sidereal, 8 anomalistic). The 3D model measures these oscillations at runtime
-> on top of the means provided by the canonical chain. See `docs/hidden/old-documents/IP-deep-time-extension.md`
+> on top of the means provided by the canonical chain. See `docs/archive/old-documents/IP-deep-time-extension.md`
 > for the implementation distinction between mean-value functions (`mean*AtAge`) and
 > the harmonic runtime layer.
 
 > 🎯 **For precise implementation values**, see the canonical 9-step chain in
-> `docs/hidden/old-documents/IP-deep-time-extension.md`. That doc gives Architecture α — the
+> `docs/archive/old-documents/IP-deep-time-extension.md`. That doc gives Architecture α — the
 > deterministic chain from `t_Ma` through `LOD(t)`, `H(t)`, AU(t), `T_sidereal(t)`,
 > Moon distance, Moon period, anomalistic year, and stellar/sidereal day. The
 > tables in doc 99 use rounded LOD inputs for narrative clarity; the IP doc provides
@@ -151,7 +151,7 @@ This is a clean structural near-identity equivalent to "TOTAL_DAYS_IN_H = 13 × 
 > tropical (and sidereal) year in seconds also evolves via solar mass loss
 > (Driver 2): `drift in H × d/yr = −2 × mass_loss_fraction = −1.86 × 10⁻⁷ × t_Ma`.
 > The drift is negligible at Phanerozoic for narrative purposes but grows
-> linearly at Gyr scale — see `docs/hidden/old-documents/IP-deep-time-extension.md` for the full
+> linearly at Gyr scale — see `docs/archive/old-documents/IP-deep-time-extension.md` for the full
 > deep-time treatment. The "near-invariance" claim above holds to <100 ppm
 > across the Phanerozoic, which is well within the precision of paleontological
 > day-count measurements.
@@ -2129,7 +2129,7 @@ All values from the proper-physics two-layer formula. The `H × days/yr` near-in
 - `scripts/paleo_lod_comparison.py` — LOD model comparison
 - `docs/97-paleo-ecs-decomposition.md` — Test C series (validation in deep time)
 - `docs/98-lattice-mechanism.md` — action-angle closure as the underlying mechanism
-- `docs/hidden/old-documents/IP-deep-time-extension.md` — implementation plan for adding deep-time mode to script.js
+- `docs/archive/old-documents/IP-deep-time-extension.md` — implementation plan for adding deep-time mode to script.js
 
 ## Key references
 

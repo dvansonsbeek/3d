@@ -109,7 +109,7 @@ Conversion functions in `correction-stack.js`:
 - `toDisplayName('mercury')` → `'Mercury'`
 - `toLowerName('Mercury')` → `'mercury'`
 
-The generated module carries the JSON's lowercase keys verbatim; `src/script.js` converts them with its own `capitalisePlanetKeys()` helper (`src/script.js:25`) at import.
+The generated module carries the JSON's lowercase keys verbatim; `src/script.js` converts them with its own `capitalisePlanetKeys()` helper (top of `src/script.js`) at import.
 
 ## Adding a New Correction Layer
 

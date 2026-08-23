@@ -175,5 +175,5 @@ The yellow and blue curves tracking each other over 1900–2026 is the visual va
 | Data generator | `tools/explore/wgc-perihelion-rates.js` |
 | WebGeoCalc HTTP client | `tools/lib/webgeocalc-client.js` |
 | Committed data | `public/input/wgc-perihelion-data.json` |
-| Tools-menu button | "WebGeoCalc Explorer" in Tweakpane Tools folder (`src/script.js` near line 26229) |
+| Tools-menu button | "WebGeoCalc Explorer" in Tweakpane Tools folder (`src/script.js`) |
 | CSS | `.wgc-*` classes in `src/style.css` |

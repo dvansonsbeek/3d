@@ -484,5 +484,5 @@ In short: **Layer 3 governs all validated rotation physics, Layer 2 governs epoc
 
 ---
 
-**Previous**: [05 - Invariable Plane Overview](05-invariable-plane-overview.md)
-**Next**: [20 - Constants Reference](20-constants-reference.md)
+**Previous**: [40 - Architecture](40-architecture.md)
+**Next**: [50 - UI Panels Reference](50-ui-panels-reference.md)

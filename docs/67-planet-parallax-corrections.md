@@ -266,8 +266,8 @@ The correction is applied in two places that must be kept in sync:
 
 | File | Function / Location | Planet name keys |
 |------|---------------------|-----------------|
-| `tools/lib/scene-graph.js` | `computePlanetPosition()` ~line 909 | lowercase |
-| `src/script.js` | Planet display loop ~line 29142 | Capitalized |
+| `tools/lib/scene-graph.js` | `computePlanetPosition()` | lowercase |
+| `src/script.js` | Planet display loop in `moveModel` | Capitalized |
 
 Both compute the same formula. The structure is:
 

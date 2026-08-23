@@ -265,7 +265,7 @@ Two test buttons quantify the framework's -135 prediction:
 
 The -135 residual has three separable components. Investigation of the Sun ecl_lon component found it reference-limited, not fit-limited. In decreasing order of leverage:
 
-1. **Sun ecl_lon fit-window extension** — investigated and closed as not-viable with current reference (Stage 4 in [`IP-framework-native-sun-ecliptic-longitude.md`](hidden/IP-framework-native-sun-ecliptic-longitude.md)):
+1. **Sun ecl_lon fit-window extension** — investigated and closed as not-viable with current reference (Stage 4 in `IP-framework-native-sun-ecliptic-longitude.md`, private plans repo):
    - Sampling framework Sun ecl_lon vs Meeus Ch. 25 across -800 to +3000 AD revealed a smooth T²-shaped residual (~-1974" at -800, near zero at J2000, ~-329" at +3000)
    - The T² shape matches Meeus L₀ and M polynomial terms (+0.0003032 and -0.0001537 °/T²); framework's mean motion is linear-rate by design
    - The residual is dominated by Meeus reference degradation past ±2000 yr, not by real framework physics error to correct
@@ -324,7 +324,7 @@ geometry the physics tier does.
 - [Doc 102 — GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) — L1-orbital-coupled α(t) GIA formulation, 4-flag lattice stack, L-5b lunar and L-7 solar validation infrastructure
 - [Doc 107 — Ancient-record review](107-ancient-record-review.md) — the identification adjudication of the audit's ancient rows (the Cairo cluster, the Lu ganzhi filter, the multi-candidate date scans this case study's ±25-yr scan belongs to)
 - [Doc 66 — Moon Meeus corrections](66-moon-meeus-corrections.md) — polynomial accuracy table across lunar theories at antiquity
-- [IP-framework-native-sun-ecliptic-longitude.md](hidden/IP-framework-native-sun-ecliptic-longitude.md) — framework's Sun formula, Section 7 dual-mechanism prediction, Stage 4 antiquity-fit proposal
+- `IP-framework-native-sun-ecliptic-longitude.md` (private plans repo) — framework's Sun formula, Section 7 dual-mechanism prediction, Stage 4 antiquity-fit proposal
 - Diary attribution: Stephenson & Steele 2006 *JHA*; Sachs & Hunger *ADART* Vol. III; Huber & De Meis 2004, *Babylonian Eclipse Observations from 750 BC to 1 BC*
 
 ---

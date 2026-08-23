@@ -67,7 +67,7 @@ The ecliptic frame uses Earth's orbital plane as the reference.
 | Ecliptic latitude (β) | Angle above/below ecliptic plane |
 | Ecliptic inclination | Planet's orbital tilt relative to ecliptic |
 
-**Calculation (line 29317):**
+**Calculation (`src/script.js`):**
 ```
 Ecliptic longitude = Ascending node + Argument of periapsis + True anomaly
 ```
@@ -130,7 +130,7 @@ Where:
 - ε = obliquity (~23.44°)
 - RA = Right Ascension
 
-**Implementation (lines 11758-11779):**
+**Implementation (`src/script.js`):**
 
 | Function | Input | Output |
 |----------|-------|--------|
@@ -159,7 +159,7 @@ ecliptic_period = (ICRF × reference) / (ICRF + reference)
 Where:
 - reference = general precession period (H/13)
 
-**Implementation (lines 916-931):**
+**Implementation (`src/script.js`):**
 
 | Function | Description |
 |----------|-------------|
@@ -197,7 +197,7 @@ Where:
 - λ = ecliptic longitude
 - r = heliocentric distance
 
-**Implementation (lines 18737-18847):**
+**Implementation (`src/script.js`):**
 - Function: `updatePlanetInvariablePlaneHeights()`
 - Outputs: `o.{planet}HeightAboveInvPlane` (AU), `o.{planet}AboveInvPlane` (boolean)
 
@@ -215,7 +215,7 @@ Where:
 - i = orbital inclination
 - u = argument of latitude = ω + ν (argument of periapsis + true anomaly)
 
-**Implementation (lines 728-731):**
+**Implementation (`src/script.js`):**
 ```javascript
 heliocentricLatitude(i_deg, omega_deg, nu_deg)
 ```
@@ -239,7 +239,7 @@ Where:
 - ω̃_ICRF(t) = current ICRF perihelion longitude
 - cycleAnchor = per-planet cycle anchor (ICRF perihelion where MAX inclination occurs, at the balanced year)
 
-**Implementation (lines 19905-20026):**
+**Implementation (`src/script.js`):**
 - Function: `computePlanetInvPlaneInclinationDynamic(planet, currentYear)`
 - Calibration: Guarantees i(2000) = i_J2000 for each planet
 
@@ -261,7 +261,7 @@ n_ecl = (sin(i_E) × sin(Ω_E), sin(i_E) × cos(Ω_E), cos(i_E))
 i_app = arccos(n_ecl · n_planet)
 ```
 
-**Implementation (lines 19109-19191):**
+**Implementation (`src/script.js`):**
 - Function: `updateDynamicInclinations()`
 - Two versions calculated:
   - `o.{planet}EclipticInclinationDynamic` (J2000-verified nodes)
@@ -398,5 +398,5 @@ const _liveDataTiltMatrix = new THREE.Matrix4();
 
 ---
 
-**Previous**: [34 - J2000 Calibration](34-j2000-calibration.md)
-**Next**: [40 - Architecture](40-architecture.md)
+**Previous**: [21 - Orbital Formulas Reference](21-orbital-formulas-reference.md)
+**Next**: [23 - Verification Data Reference](23-verification-data-reference.md)

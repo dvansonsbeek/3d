@@ -978,8 +978,8 @@ const OrbitalFormulas = {
 ### A.3.4 Files Modified
 
 1. **script.js** (main file):
-   - Added `GM_SUN` derived constant (~line 307-310)
-   - Added `OrbitalFormulas` helper object (~line 312-380)
+   - Added `GM_SUN` derived constant
+   - Added `OrbitalFormulas` helper object
    - Added Eccentric Anomaly calculation to `updatePlanetAnomalies()` for all planets
    - Added formula entries to `planetStats` for all 10 planets (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, Halley's, Eros)
    - Each planet has: geometric parameters (b, p, c), velocities (v, vₚ, vₐ, vᵣ, vₜ), energy/momentum (ε, h), longitudes (λ, L, u), time calculations, and mean motion

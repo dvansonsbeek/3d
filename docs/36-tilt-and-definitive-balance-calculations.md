@@ -62,7 +62,7 @@ Saturn alone carries 50.0% of total Law 5 weight, making it the decisive planet.
 | PSI    | 3.3069e-3 (d_E × amp_E × √m_E) | Inclination amplitude constant (Law 2, from Earth) |
 | K      | <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> | Tilt-eccentricity constant (derived from Earth) |
 
-PSI is defined in `tools/lib/constants.js` line 421.
+PSI is defined in `tools/lib/constants.js` (search `PSI`).
 K is derived in Section 4 below.
 
 ---

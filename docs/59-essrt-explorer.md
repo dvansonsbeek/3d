@@ -168,7 +168,7 @@ Full per-anchor agreement table + statistical summary at [doc 99 §"Validation a
 | Export trigger | `essrtExport(rangeKey)` |
 | Tick computer | `essrtNiceTicks(min, max, targetTicks)` — round-number Y-axis ticks |
 | Series sampler | `essrtComputeSeries(spec, t_lo, t_hi, N, planetKey)` |
-| Underlying physics | `meanLodSecondsAtAge`, `meanHAtAge`, `meanSiderealYearSecondsAtAge`, `meanTropicalYearSecondsAtAge`, `meanMoonDistanceMetresAtAge`, `meanAuAtAge`, `meanPlanetOrbitalPeriodAtAge` (all in `src/script.js` near line 4700) |
+| Underlying physics | `meanLodSecondsAtAge`, `meanHAtAge`, `meanSiderealYearSecondsAtAge`, `meanTropicalYearSecondsAtAge`, `meanMoonDistanceMetresAtAge`, `meanAuAtAge`, `meanPlanetOrbitalPeriodAtAge` (all in the deep-time block of `src/script.js`) |
 | Tools-menu button | "ESSRT Explorer" in Tweakpane Tools folder |
 | CSS | `.cfm-*` classes shared with Climate Formula Explorer + ESSRT-specific overrides |
 

@@ -352,7 +352,7 @@ The result is narrow and defensible. It is **not** the claim that "this model is
 
 ### Deep-time integration is not the lever here
 
-A natural follow-up question: would activating the model's deep-time machinery (Phase 9.11/9.12 — time-evolving H, AU, LOD, Moon distance, see [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md)) improve these residuals further? Direct calculation using the model's own constants (see [the deep-time formulas in `src/script.js:4600+`](../src/script.js)) shows the corrections at year 1583 are:
+A natural follow-up question: would activating the model's deep-time machinery (Phase 9.11/9.12 — time-evolving H, AU, LOD, Moon distance, see [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md)) improve these residuals further? Direct calculation using the model's own constants (see the `*AtAge` deep-time formulas in `src/script.js`) shows the corrections at year 1583 are:
 
 | Driver | Magnitude at year 1583 | Position impact |
 |---|---|---:|
@@ -419,5 +419,5 @@ To add new verification entries:
 
 ---
 
-**Previous**: [41 - Scene Graph Hierarchy](41-scene-graph-hierarchy.md)
-**Next**: [20 - Constants Reference](20-constants-reference.md)
+**Previous**: [22 - Coordinate Frames](22-coordinate-frames.md)
+**Next**: [24 - Moon Kepler Derivation](24-moon-kepler-derivation.md)

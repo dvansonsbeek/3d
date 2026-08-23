@@ -297,11 +297,11 @@ re-optimized to absorb this offset.
 - `src/script.js`:
   - Input constants: line ~48 (`useVariableSpeed`)
   - Astronomical reference: `ASTRO_REFERENCE.perihelionPassageJ2000_JD` (line ~862)
-  - Derived constants: after `eccentricityDerivedMean` (~line 980): `eocEccentricity`, `perihelionPhaseOffset`
-  - Sun object: ~line 2447 (`eccentricity: eocEccentricity`, `perihelionPhaseJ2000`)
-  - moveModel: ~line 29200 (equation of center gate and formula)
-- `tools/lib/constants.js`: lines 208-216 (derived constants)
-- `tools/lib/scene-graph.js`: line 399 (Sun eccentricity), line 547 (moveModel)
+  - Derived constants: after `eccentricityDerivedMean`: `eocEccentricity`, `perihelionPhaseOffset`
+  - Sun object definition (`eccentricity: eocEccentricity`, `perihelionPhaseJ2000`)
+  - `moveModel` (equation of center gate and formula)
+- `tools/lib/constants.js`: derived-constants block
+- `tools/lib/scene-graph.js`: Sun eccentricity in the body defs; `moveModel`
 - `tools/explore/eoc-constants.js`: numerical verification script
 
 ---
@@ -465,7 +465,7 @@ A greedy re-fit under Z-B confirmed: no additional H-lattice-compliant
 candidates improve RMSE above the 0.05" threshold. Long-period drift-proxy
 terms (e.g. H/152 at 2206 yr, H/167 at 2008 yr) are found by greedy but
 ALL violate the H-lattice design rule (`gcd(n, H) = 1`) and are rejected
-per `docs/hidden/lessons-learned-lunar-framework-native.md` Addendum 5
+per `docs/archive/old-documents/lessons-learned-lunar-framework-native.md` Addendum 5
 (Path A2 lesson on drift proxies).
 
 The current 3-term active set (1 yr, ½ yr, ⅓ yr) is therefore the
@@ -543,10 +543,10 @@ the full pipeline integration.
 ### Code locations
 
 - `src/script.js`:
-  - `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` constants (~line 2988)
-  - `sunLongitudeCorrection(jd)` function with runtime filter (~line 2999)
-  - `SUN_HARMONICS_ENABLED` toggle flag (~line 6822)
-  - Application gate in `moveModel` (~line 53470): `if (SUN_HARMONICS_ENABLED && obj === sun) θ -= sunLongitudeCorrection(jd) * D2R`
+  - `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` constants
+  - `sunLongitudeCorrection(jd)` function with runtime filter
+  - `SUN_HARMONICS_ENABLED` toggle flag
+  - Application gate in `moveModel`: `if (SUN_HARMONICS_ENABLED && obj === sun) θ -= sunLongitudeCorrection(jd) * D2R`
 - `tools/lib/scene-graph.js`:
   - Application gate in `moveModel` (Sun-only, env-toggle aware)
   - Mirror in `animateFast` (used by `computeSunPositionFast`)
@@ -559,7 +559,7 @@ the full pipeline integration.
 
 ### Full investigation trail
 
-See [`docs/hidden/lessons-learned-lunar-framework-native.md`](hidden/lessons-learned-lunar-framework-native.md)
+See `docs/archive/old-documents/lessons-learned-lunar-framework-native.md` (untracked archive)
 Addendum 5 for the complete record of approaches tried (Phase S-A strict-
 design fit, Phase Z-1 tidal-force perturbation prototype, Phase Z-A
 classical corrections diagnostic, Phase Z-B annual harmonic integration)

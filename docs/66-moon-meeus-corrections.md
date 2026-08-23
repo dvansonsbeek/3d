@@ -1119,7 +1119,7 @@ statement is the 26-event eclipse alignment audit — doc 103.)
 
 ### Consistency with Architecture α deep-time Moon model
 
-The deep-time Moon model (Architecture α; see doc 99 and `docs/hidden/old-documents/IP-deep-time-extension.md`)
+The deep-time Moon model (Architecture α; see doc 99 and `docs/archive/old-documents/IP-deep-time-extension.md`)
 adds a Farhat 2022 polynomial for Moon orbital evolution:
 
 ```
@@ -1261,7 +1261,7 @@ differences ≤ 0.12° against the same references.
 **DE441 cross-check (one-time A/B; the test infrastructure is no longer in the codebase):** a full A/B
 of the 26-event audit with JPL DE441 lunar positions injected in place of
 the framework Meeus series (session notes archived at
-`docs/hidden/old-documents/session-2026-07-19-jup1740-de441-h-tuning.md`)
+`docs/archive/old-documents/session-2026-07-19-jup1740-de441-h-tuning.md`)
 found mean Δ = −7 km ("unchanged") with a clean epoch pattern: modern era
 slightly worse under DE441 (the framework Meeus is tightly calibrated at
 present), late-ancient (+71…−430) worse by +206…+1133 km (framework ΔT
@@ -1274,7 +1274,7 @@ under DE441 — NOT a Moon problem (misidentification/partial-zone/Sun-side).
 the durable finding.)
 
 **Forward path:** the full ELP-2000/82 series
-([`docs/hidden/old-documents/IP-elp2000-moon-polynomial.md`](hidden/old-documents/IP-elp2000-moon-polynomial.md))
+(`docs/archive/old-documents/IP-elp2000-moon-polynomial.md`, untracked archive)
 remains available as a general deep-time precision option, but the -135
 test shows all modern lunar theories agree at the audited epochs, so it is
 not blocking and fixes no audited event. The framework-native fundamental
@@ -1351,14 +1351,14 @@ per hour, timing uncertainty of ±3 hours translates to ±1.5° position error.
 
 | File | Changes |
 |------|---------|
-| `src/script.js` ~line 881 | ASTRO_REFERENCE constants |
-| `src/script.js` ~line 2606 | `lunarPerturbations: true` on Moon object |
-| `src/script.js` ~line 29259 | Longitude perturbations + Meeus latitude in moveModel |
-| `src/script.js` ~line 29008 | Post-hoc Dec correction + visual position correction in updatePositions |
-| `tools/lib/constants.js` ~line 218 | ASTRO_REFERENCE constants |
-| `tools/lib/scene-graph.js` ~line 458 | `lunarPerturbations: true` on moonDef |
-| `tools/lib/scene-graph.js` ~line 555 | Longitude perturbations + Meeus latitude storage |
-| `tools/lib/scene-graph.js` ~line 715 | Post-hoc Dec correction in computePlanetPosition |
+| `src/script.js` (constants block) | ASTRO_REFERENCE constants |
+| `src/script.js` (Moon object definition) | `lunarPerturbations: true` on Moon object |
+| `src/script.js` (`moveModel`) | Longitude perturbations + Meeus latitude in moveModel |
+| `src/script.js` (`updatePositions`) | Post-hoc Dec correction + visual position correction in updatePositions |
+| `tools/lib/constants.js` | ASTRO_REFERENCE constants |
+| `tools/lib/scene-graph.js` (moonDef) | `lunarPerturbations: true` on moonDef |
+| `tools/lib/scene-graph.js` (`moveModel`) | Longitude perturbations + Meeus latitude storage |
+| `tools/lib/scene-graph.js` (`computePlanetPosition`) | Post-hoc Dec correction in computePlanetPosition |
 
 ---
 

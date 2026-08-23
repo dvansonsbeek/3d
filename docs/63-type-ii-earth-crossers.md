@@ -90,7 +90,7 @@ perihelion longitudes precess at different rates.
 
 ### Static initialization (script.js)
 
-The initial `marsElipticOrbit` value in `src/script.js` (line 1764) uses a
+The initial `marsElipticOrbit` value in `src/script.js` uses a
 legacy formula with a second-order eccentricity correction:
 
 ```javascript
@@ -199,10 +199,10 @@ calculation on the first frame, so its exact value is inconsequential.
 
 **`src/script.js`:**
 - Mars constants: lines 122-133
-- `marsElipticOrbit` static computation: ~line 1764
+- `marsElipticOrbit` static computation (search the identifier)
 - `marsRealPerihelionAtSun` object: lines 3009-3035
 - Dynamic update in `moveModel()`: lines 29449-29466
-- `perihelionLongitudeEcliptic()` helper: ~line 29739
+- `perihelionLongitudeEcliptic()` helper
 
 **`tools/lib/scene-graph.js`:**
 - Type II derived values: `computePlanetDerived()` lines 299-305
@@ -211,7 +211,7 @@ calculation on the first frame, so its exact value is inconsequential.
 
 **`tools/lib/constants.js`:**
 - Mars planet entry: lines 79-97
-- Mars perihelion reference JD: line 250 (`2458669.2`, phase-optimized from 2018 Sep 16)
+- Mars perihelion reference JD: `perihelionRef_JD` (`2458669.2`, phase-optimized from 2018 Sep 16)
 
 ---
 

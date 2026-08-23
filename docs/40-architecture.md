@@ -241,7 +241,7 @@ The monolithic script.js (~59,800 lines) is organized into logical sections. Con
 ├─────────────────────────────────────────────────────────────────────┤
 │  MASTER ARRAYS & SCENE SETUP (Lines ~4550-7590)                     │
 │  - planetObjects / tracePlanets arrays                              │
-│  - Global state object 'o' (~line 5003)                             │
+│  - Global state object 'o'                                          │
 │  - Renderer, camera, orbit controls                                 │
 │  - createPlanet calls and hierarchy wiring (.add() calls)           │
 │  - Invariable plane system, node markers                            │
@@ -729,7 +729,7 @@ The application is fully self-contained with no runtime API dependencies. All ca
 
 ## Key Algorithms
 
-### Kepler Equation Solver (`OrbitalFormulas.eccentricAnomaly`, line 1135)
+### Kepler Equation Solver (`OrbitalFormulas.eccentricAnomaly`)
 
 ```javascript
 // Newton-Raphson iteration for eccentric anomaly

@@ -1041,7 +1041,7 @@ Data: [data/milankovitch-8h-xval-phase.json](../data/milankovitch-8h-xval-phase.
 
 ### 12.14 Test N — 405-kyr line position measurement on CENOGRID
 
-A ~405-kyr long-eccentricity cycle is well-documented in pre-Pleistocene climate records. Standard Milankovitch (Laskar 2004) attributes it to a g₂ − g₅ secular eigenbeat at 3.196 arcsec/yr; this framework's planet motions ([doc 55](55-solar-system-resonance-cycle-periods.md)) don't produce this period via any planet-pair beat (see §6 for the dedicated investigation). Test N measures where the empirical peak sits in CENOGRID across Cenozoic intervals where the long-eccentricity signal is strong:
+A ~405-kyr long-eccentricity cycle is well-documented in pre-Pleistocene climate records. Standard Milankovitch (Laskar 2004) attributes it to a g₂ − g₅ secular eigenbeat at 3.196 arcsec/yr; this framework's planet motions ([doc 55](55-solar-system-resonance-cycle-periods.md)) don't produce this period via any planet-pair beat (see §13 for the dedicated investigation). Test N measures where the empirical peak sits in CENOGRID across Cenozoic intervals where the long-eccentricity signal is strong:
 
 | Interval | Span | Empirical peak | Distance to Laskar 405 |
 |---|---:|---:|---:|
@@ -1052,7 +1052,7 @@ A ~405-kyr long-eccentricity cycle is well-documented in pre-Pleistocene climate
 
 **Finding: the 405-kyr line sits at 402.90–405.99 kyr in CENOGRID** — consistent with Laskar's prediction within ~3 kyr in every interval where it dominates. The nearest integer divisors of 8H are 8H/6 = 447.09 kyr (above) and 8H/7 = 383.22 kyr (below); the empirical line sits in the gap between them, **off the 8H lattice**.
 
-This finding triggers the deeper investigation in [§6](#6-the-405-kyr-investigation-an-off-lattice-climate-signal), which characterises the off-lattice nature of the 405-kyr cycle and its carbon-cycle amplification mechanism.
+This finding triggers the deeper investigation in [§13](#13-the-405-kyr-investigation-an-off-lattice-climate-signal), which characterises the off-lattice nature of the 405-kyr cycle and its carbon-cycle amplification mechanism.
 
 Data: [data/milankovitch-8h-405k-head-to-head.json](../data/milankovitch-8h-405k-head-to-head.json); script: [scripts/milankovitch_8h_405k_head_to_head.py](../scripts/milankovitch_8h_405k_head_to_head.py).
 
@@ -1082,7 +1082,7 @@ Data: [data/milankovitch-8h-405k-head-to-head.json](../data/milankovitch-8h-405k
 | **K: 100k integer-hopping (refined)** | ✅ **POSITIVE** | mean 2.26 kyr to nearest framework integer |
 | **L: All-integer MTM scan (200 positions)** | ✅ **POSITIVE** | 13/13 significant lines fall within canonical 32-integer formula (enrichment → infinite) |
 | M: Cross-validated phase across MPT | PARTIAL | median 18 kyr offset (canonical 32-component); 29% within ±10 kyr, 55% within ±20 kyr |
-| **N: 405-kyr line position** | empirically at 405 (off the 8H lattice) — see [§6](#6-the-405-kyr-investigation-an-off-lattice-climate-signal) |
+| **N: 405-kyr line position** | empirically at 405 (off the 8H lattice) — see [§13](#13-the-405-kyr-investigation-an-off-lattice-climate-signal) |
 
 **Sixteen clean positive sub-results, two partials, five nulls; the 405-kyr cycle empirically sits off the 8H lattice and is investigated separately in §6.**
 
@@ -1093,7 +1093,7 @@ The 8H integer-divisor structure of orbital cycles is broadly supported:
 - phase partially generalises across the MPT (Test M, ~30% within ±10 kyr)
 - explains LR04 variance well above random-period nulls (Test C)
 
-The 405-kyr cycle is an empirical climate signal that sits off the 8H lattice. Standard Milankovitch labels it as the Laskar g₂−g₅ Venus-Jupiter eigenbeat; this framework's planet motions don't produce such a beat. The framework models the 405-kyr cycle as a carbon-cycle internal phenomenon — the silicate-weathering thermostat resonance — loosely entrained by long-period orbital forcing. See §6 for the full characterisation.
+The 405-kyr cycle is an empirical climate signal that sits off the 8H lattice. Standard Milankovitch labels it as the Laskar g₂−g₅ Venus-Jupiter eigenbeat; this framework's planet motions don't produce such a beat. The framework models the 405-kyr cycle as a carbon-cycle internal phenomenon — the silicate-weathering thermostat resonance — loosely entrained by long-period orbital forcing. See §13 for the full characterisation.
 
 The remaining nulls trace to four distinct physical phenomena: (a) Rayleigh resolution at T < 8H (B0); (b) MPT amplitude non-stationarity (F1, F2; M-partial); (c) proxy-specific spectral concentration (H2, B2 trending); and (d) non-linear climate-system lags between orbital forcing and CO₂ feedback (H3).
 
@@ -1336,7 +1336,7 @@ The combined picture from §4 + §5 is sharp: the 8H framework's claims hold str
 | All-integer F-test: framework integers carry 100% of significant lines (13/13) | ✅ supported (Test L — canonical 32-integer) |
 | Band centroids stable in time-frequency (no off-lattice drift) | ✅ supported (Test K) |
 | Phase prediction generalizes partially across the MPT | ⚠ partial (Test M — 30% within ±10 kyr out-of-sample) |
-| **405-kyr empirical climate line is off the 8H lattice and not reproducible by any doc-55 beat** | ✅ characterised (§6 — explained as Layer-2 carbon-cycle thermostat resonance, not orbital in this framework) |
+| **405-kyr empirical climate line is off the 8H lattice and not reproducible by any doc-55 beat** | ✅ characterised (§13 — explained as Layer-2 carbon-cycle thermostat resonance, not orbital in this framework) |
 | 8H or H as deep-time geological-event pacer | ❌ rejected (§11.1–§11.4) |
 | H-multiples (1H..8H) as global continuous-record spectral pacers (CENOGRID 67-Myr MTM F-test) | ❌ rejected (§11.5 — 16/16 cells NULL) |
 | H-multiples as Plio-Pleistocene-specific climate amplifiers (windowed CENOGRID MTM + OLS) | ❌ rejected (§11.6 — W1 ranks bottom-half on every nH) |

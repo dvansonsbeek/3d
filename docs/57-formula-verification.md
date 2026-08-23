@@ -180,5 +180,5 @@ Cases where the model *disagrees* with a reference are also documented in the pa
 | Reference formulas (polynomial) | `eccMeeus`, `eccHarkness`, `obliquityChapront2002`, `perihelionMeeus`, `perihelionMeeusEarth`, `tropicalYearLaskar`, `solarDayPeters`, `siderealYearChapront`, `axialPrecessionCapitaine2009` in `src/script.js` |
 | Reference formulas (trig series) | `eccBerger1978`, `obliquityBerger1978`, `axialPrecessionVondrak2011` in `src/script.js` |
 | Reference formulas (N-body tables) | `eccLa2004`, `obliquityLa2004`, `perihelionLa2004`, `inclinationLa2010`, `ascNodeLa2010` in `src/script.js` (data arrays `_LA2004`, `_LA2010`) |
-| Tools-menu button | "Formula Verification" in Tweakpane Tools folder (`src/script.js` near line 26231) |
+| Tools-menu button | "Formula Verification" in Tweakpane Tools folder (`src/script.js`) |
 | CSS | `.vfp-*` classes in `src/style.css` |
