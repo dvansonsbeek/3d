@@ -12,9 +12,9 @@
     "unmatchedCanon": 0,
     "typeAgree": 1447,
     "meanAbsResidualMinutes": 8.531,
-    "meanAbsResidualMinutesFull": 8.531393148878525,
+    "meanAbsResidualMinutesFull": 8.531393147028727,
     "rmsResidualMinutes": 9.842,
-    "rmsResidualMinutesFull": 9.842134709867283,
+    "rmsResidualMinutesFull": 9.842129239287406,
     "maxAbsResidualMinutes": 19.756
   },
   "visibility": {
@@ -141,9 +141,9 @@
     "found": true,
     "type": "Partial",
     "canonType": "Partial",
-    "magnitudeUmbral": 0.9085,
+    "magnitudeUmbral": 0.9084,
     "canonMagnitudeUmbral": 0.9199,
-    "ttResidualMinutes": -3.38,
+    "ttResidualMinutes": -3.41,
     "visibleFromBabylon": true,
     "babylonMoonAltitudeDeg": 34.67
   },
@@ -308,31 +308,31 @@
       },
       "-750": {
         "n": 190,
-        "signedMeanMinutes": -2.14
+        "signedMeanMinutes": -2.16
       },
       "-650": {
         "n": 204,
-        "signedMeanMinutes": -1.13
+        "signedMeanMinutes": -1.15
       },
       "-550": {
         "n": 204,
-        "signedMeanMinutes": -1.63
+        "signedMeanMinutes": -1.65
       },
       "-450": {
         "n": 192,
-        "signedMeanMinutes": -0.98
+        "signedMeanMinutes": -1
       },
       "-350": {
         "n": 186,
-        "signedMeanMinutes": -0.35
+        "signedMeanMinutes": -0.36
       },
       "-250": {
         "n": 183,
-        "signedMeanMinutes": -0.92
+        "signedMeanMinutes": -0.93
       },
       "-100": {
         "n": 201,
-        "signedMeanMinutes": 0.43
+        "signedMeanMinutes": 0.42
       }
     },
     "driftVsModernMinutes": {
@@ -342,15 +342,15 @@
       "1500": -0.06,
       "1800": -0.03,
       "2000": 0.1,
-      "-750": -3.16,
-      "-650": -2.15,
-      "-550": -2.65,
-      "-450": -2,
-      "-350": -1.37,
-      "-250": -1.94,
-      "-100": -0.59
+      "-750": -3.18,
+      "-650": -2.17,
+      "-550": -2.67,
+      "-450": -2.02,
+      "-350": -1.38,
+      "-250": -1.95,
+      "-100": -0.6
     },
-    "effectiveDeltaNdotArcsecPerCy2": 0.25,
+    "effectiveDeltaNdotArcsecPerCy2": 0.26,
     "predictedReducedResidualMinutes": {
       "-800": 0.8,
       "-700": -4.4,
@@ -376,13 +376,13 @@
       "-700": {
         "n": 6,
         "medianMinutes": -21.4,
-        "seMinutes": 8.3,
+        "seMinutes": 8.2,
         "preRegisteredMinutes": -4.4,
         "z": -2.1
       },
       "-600": {
         "n": 21,
-        "medianMinutes": -10.6,
+        "medianMinutes": -10.5,
         "seMinutes": 6,
         "preRegisteredMinutes": -3.9,
         "z": -1.1
@@ -396,7 +396,7 @@
       },
       "-400": {
         "n": 27,
-        "medianMinutes": -10.5,
+        "medianMinutes": -10.4,
         "seMinutes": 2.7,
         "preRegisteredMinutes": -12.4,
         "z": 0.7
@@ -420,7 +420,7 @@
       },
       "500": {
         "n": 11,
-        "medianSeconds": -387,
+        "medianSeconds": -386,
         "seSeconds": 184
       },
       "800": {
@@ -450,7 +450,7 @@
       },
       "-800": {
         "n": 2,
-        "medianSeconds": 808,
+        "medianSeconds": 810,
         "seSeconds": 2391
       },
       "-700": {
@@ -460,22 +460,22 @@
       },
       "-600": {
         "n": 21,
-        "medianSeconds": -634,
+        "medianSeconds": -633,
         "seSeconds": 358
       },
       "-500": {
         "n": 13,
-        "medianSeconds": -1199,
+        "medianSeconds": -1198,
         "seSeconds": 834
       },
       "-400": {
         "n": 27,
-        "medianSeconds": -628,
+        "medianSeconds": -627,
         "seSeconds": 164
       },
       "-300": {
         "n": 13,
-        "medianSeconds": -1245,
+        "medianSeconds": -1244,
         "seSeconds": 1184
       },
       "-200": {
@@ -507,11 +507,11 @@
     "ablationChi2": {
       "fullStack": 46,
       "minus_bond": 59.3,
-      "minus_hallstatt": 45.9,
-      "minus_jose5": 45,
-      "minus_jose4": 40.6,
-      "minus_resonator": 135.8,
-      "noCycles": 95.4
+      "minus_hallstatt": 45.8,
+      "minus_jose5": 44.9,
+      "minus_jose4": 40.5,
+      "minus_resonator": 135.6,
+      "noCycles": 95.2
     }
   },
   "inputs": {
