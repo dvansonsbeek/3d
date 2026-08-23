@@ -925,6 +925,7 @@ The cardinal-point-derived tropical year (Step 6d) is the authoritative runtime 
 |-------------------|----------------|
 | `H` (holisticyearLength) | ALL (1→10) — and Phase 8 (Step 11 = 7c) because `BOND_PERIOD_YR = 8·H / BOND_LATTICE_N`, so `ω = 2π/period` re-derives for all four cycles. |
 | `longitudePerihelion` (any planet) | 2 (that planet only) |
+| `solarYearInput` (any planet) / `inputmeanlengthsolaryearindays` / `moonSiderealMonthInput` / `yearLengthRef.siderealYear` | **The v3 Sun-completion carriers ride these** (FQ-5 N3: `model.js` computes the carrier rates live). Re-run the N3 extraction chain (`tools/explore/n2-sun-framework-carriers.mjs` → `n3-carrier-swap-preview.mjs`), re-embed the TERMS + `PAIRED_CARRIER_RATES_SHA256` in `eclipse/sun-planetary-completion.cjs` — the test:model fingerprint gate FAILS until you do (fail-proven). Plus the planet's own step 2 where applicable. |
 | `earthtiltMean` | 1, 3→4d, 6a→6d |
 | `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a→6d |
 | `earthInvPlaneInclinationMean` | 3, 6a→6d |

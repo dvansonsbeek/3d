@@ -235,4 +235,16 @@ function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy })
  *  landings. */
 const PAIRED_SUN_HARMONICS_SHA256 = 'e2cf42e9770c9e0a';
 
-module.exports = { createSunPlanetaryCompletion, PAIRED_SUN_HARMONICS_SHA256 };
+/** sha256/16 of JSON.stringify([...planets, moonElongation]) — the seven
+ *  full-precision carrier rates (deg/cy TT) the TERMS table was extracted
+ *  under at N3. The model wiring recomputes the rates live from the planet
+ *  records, so a planet-period / year / month input change moves the
+ *  carriers automatically while the table stays frozen — a silent few-
+ *  arcsec stale below the api gate's ≤8″ backstop. test:model recomputes
+ *  this fingerprint from live constants (identical arithmetic to model.js)
+ *  and fails on mismatch: re-run the N3 extraction chain
+ *  (tools/explore/n2-sun-framework-carriers.mjs →
+ *  n3-carrier-swap-preview.mjs), re-embed TERMS, and update this value. */
+const PAIRED_CARRIER_RATES_SHA256 = '893e055ee12343bd';
+
+module.exports = { createSunPlanetaryCompletion, PAIRED_SUN_HARMONICS_SHA256, PAIRED_CARRIER_RATES_SHA256 };

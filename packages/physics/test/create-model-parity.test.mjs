@@ -157,6 +157,39 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   }
 }
 
+// FQ-5 N3 matched pair: the completion's TERMS were extracted under the
+// FRAMEWORK carrier rates the model wiring computes live from the planet
+// records. A planet-period / year / month input change moves the carriers
+// automatically while the table stays frozen — a silent few-arcsec stale
+// below the api centerline gate's ≤8″ backstop, so it needs its own check.
+// On mismatch: re-run the N3 extraction chain
+// (tools/explore/n2-sun-framework-carriers.mjs → n3-carrier-swap-preview.mjs),
+// re-embed TERMS, and update PAIRED_CARRIER_RATES_SHA256.
+{
+  const { createHash } = await import('node:crypto');
+  const { PAIRED_CARRIER_RATES_SHA256 } = require('../src/eclipse/sun-planetary-completion.cjs');
+  const { DEFAULT_CONSTANTS: C } = await import('../src/index.js');
+  const H = C.foundational.holisticyearLength;
+  const mSY = Math.round(C.foundational.inputmeanlengthsolaryearindays * (H / 8)) / (H / 8);
+  const dpc = (/** @type {number} */ f) => 360 * 36525 * f;
+  const liveRates = [
+    dpc(1 / C.planetOrbitalElements.mercury.solarYearInput),
+    dpc(1 / C.planetOrbitalElements.venus.solarYearInput),
+    dpc(1 / mSY),
+    dpc(1 / C.planetOrbitalElements.mars.solarYearInput),
+    dpc(1 / C.planetOrbitalElements.jupiter.solarYearInput),
+    dpc(1 / C.planetOrbitalElements.saturn.solarYearInput),
+    dpc(1 / C.moonReference.moonSiderealMonthInput - 1 / C.yearLengthRef.siderealYear),
+  ];
+  const liveFp = createHash('sha256').update(JSON.stringify(liveRates)).digest('hex').slice(0, 16);
+  if (liveFp !== PAIRED_CARRIER_RATES_SHA256) {
+    failures.push(`sun-completion matched pair: carrier rates hash ${liveFp} != paired ${PAIRED_CARRIER_RATES_SHA256}`
+      + ' — a planet-period / year / month input moved without re-deriving the v3 TERMS'
+      + ' (re-run the N3 extraction chain: n2-sun-framework-carriers.mjs → n3-carrier-swap-preview.mjs,'
+      + ' re-embed the table + fingerprint)');
+  }
+}
+
 if (failures.length) {
   console.error(`createModel parity — ${failures.length} FAILURE(S):`);
   for (const f of failures) console.error('  ' + f);
