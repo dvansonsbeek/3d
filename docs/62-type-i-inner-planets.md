@@ -122,7 +122,7 @@ barycenter
 | RealPeri speed         | -2pi                       | synodic rate                | -2pi                      |
 | RealPeri startPos      | 180 - ascendingNode        | startpos * 2                | startpos * 2              |
 | elipticOrbit           | static (PD/2)              | dynamic (eccDist/2 - geo/2) | dynamic (geocentric)      |
-| EoC fraction           | Merc: -0.53, Ven: +0.44   | -0.06 (near zero)           | 0.51-0.56 (near e/2)     |
+| EoC fraction           | Merc: -0.53, Ven: +0.44   | -0.07 (near zero)           | 0.495-0.585 (near e/2)     |
 | Dynamic geocentric     | No                         | Yes                         | Yes                       |
 
 ### PerihelionFromEarth layer
@@ -229,7 +229,9 @@ phase-optimized reference JD providing the correct initial phase alignment.
 
 ---
 
-## Current Baselines (JPL, 2000-2200)
+## Baselines at tuning time (JPL, 2000-2200)
+
+*(Historical record of the tuning run. The reference datasets have since been enriched to ~5,000–9,000 points per planet and the current RMS values are in [doc 67 §5](67-planet-parallax-corrections.md) — Mercury 0.079°, Venus 0.041°.)*
 
 ### Mercury (95 Tier 2 reference points)
 
@@ -259,9 +261,9 @@ realOrbitalEccentricity:   0.17056221    (e/(1+e) -- DERIVED)
 eocFraction:               -0.527        (EoC multiplier, negative = anti-Keplerian)
 longitudePerihelion:        77.4569131    (ecliptic longitude of perihelion, degrees)
 ascendingNode:             48.33033155   (ecliptic ascending node, degrees)
-angleCorrection:           0.9709        (perihelion alignment offset, degrees)
-startpos:                  83.653        (orbital phase at model start, degrees)
-perihelionEclipticYears:   H / (1+3/8)  (perihelion precession period)
+angleCorrection:           0.9715960     (perihelion alignment offset, degrees)
+startpos:                  83.6521277    (orbital phase at model start, degrees)
+perihelionEclipticYears:   8H / 11      (perihelion precession period)
 perihelionRef_JD:          2460335.9     (phase-optimized)
 inclinationCycleAnchor:    234.52        (ICRF perihelion longitude where MAX inclination occurs, at balanced year n=7 ≈ -2,649,854 BC, degrees)
 type:                      'I'           (formula selector)
@@ -278,8 +280,8 @@ realOrbitalEccentricity:   0.00673113    (e/(1+e) -- DERIVED)
 eocFraction:               0.436         (EoC multiplier)
 longitudePerihelion:        131.5765919   (ecliptic longitude of perihelion, degrees)
 ascendingNode:             76.67877109   (ecliptic ascending node, degrees)
-angleCorrection:           -2.8029       (perihelion alignment offset, degrees)
-startpos:                  249.364       (orbital phase at model start, degrees)
+angleCorrection:           -2.7506209    (perihelion alignment offset, degrees)
+startpos:                  249.2876912   (orbital phase at model start, degrees)
 perihelionEclipticYears:   -8H / 6       (perihelion precession period, retrograde)
 perihelionRef_JD:          2455464.42    (phase-optimized)
 inclinationCycleAnchor:    218.64        (ICRF perihelion longitude where MAX inclination occurs, at balanced year n=7 ≈ -2,649,854 BC, degrees)
@@ -293,7 +295,7 @@ mirrorPair:                'neptune'     (paired planet)
 |------------------------|-----------|-----------|
 | solarYearCount         | 1392228   | 545059    |
 | orbitDistance (AU)      | <!--v:mercurySemiMajor-->0.3871<!--/v-->    | <!--v:venusSemiMajor-->0.7233<!--/v-->    |
-| realOrbitalEccentricity| 0.17056   | 0.00671   |
+| realOrbitalEccentricity| 0.17056   | 0.00673   |
 | perihelionDistance      | 6.603     | 0.485     |
 | elipticOrbit           | 3.301     | 0.243     |
 | eccentricityPerihelion | 0.679     | 0.001     |

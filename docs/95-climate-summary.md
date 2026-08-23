@@ -80,7 +80,7 @@ All numbers from the canonical regression scripts:
 
 | Test | LR04 (post-MPT, 0–1000 kyr) | LR04 (0–500 kyr, Laskar window) | EPICA CO₂ (0–800 kyr) |
 |------|----------------------------:|--------------------------------:|----------------------:|
-| **L1 alone** (32 lattice integers) | **R² = 0.870** | R² ≈ 0.93 | R² ≈ 0.80 |
+| **L1 alone** (32 lattice integers) | **R² = 0.870** | R² ≈ 0.93 | R² = 0.8336 |
 | **L1+L2+L3** (canonical formula) | **R² = 0.8735** | **R² = 0.9424** | **R² = 0.8452** |
 | Berger insolation alone (model e/ϖ) | R² = 0.049 | R² = 0.188 | R² = 0.096 |
 | **Berger insolation alone (Laskar e/ϖ)** | — | **R² = 0.293** | **R² = 0.172** |
@@ -192,7 +192,7 @@ Each row is a measured quantity with a script that reproduces it:
 | Berger insolation alone, LR04 0–500 kyr | R² = 0.293 (Laskar e) | `scripts/milankovitch_insolation_laskar_check.py` |
 | Berger insolation added to L1+L2+L3 | ΔR² = 0.00000 (LR04), 0.00001 (EPICA CO₂) | same |
 | L3 step at MPT (LR04 jump) | β = +1.13 | `data/milankovitch-climate-formula.json` |
-| L1 dual-attribution rate | 32 / 32 integers | [doc 93](93-l1-attribution-reference.md) |
+| L1 dual-attribution rate | 32 / 32 Holistic attributions (27 / 32 also carry a Berger label) | [doc 93](93-l1-attribution-reference.md) |
 | Forward-projection R² across MPT | −0.87 (failure) | doc 92 Tier B R3-3 |
 
 All numbers reproducible with `python3 scripts/milankovitch_*.py` (deterministic, no random seeds).

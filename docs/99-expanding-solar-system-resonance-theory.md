@@ -106,7 +106,7 @@ The same epoch-dependent scaling applies to multiple system parameters. All valu
 | Jupiter perihelion ecliptic (8H/39) | <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr | **62,808 yr** | **72,328 yr** | 8H/39 scales with H |
 | Saturn perihelion ecliptic (8H/65) | <!--v:saturnPeriPeriod-->41,270<!--/v--> yr | **37,685 yr** | **43,397 yr** | 8H/65 scales with H |
 | Earth axial precession (H/13) | <!--v:earthAxialPeriod-->25,794<!--/v--> yr | **<!--v:axialPrecAtDevonian-->23,553<!--/v--> yr** | **<!--v:axialPrecAt200MyrFuture-->27,123<!--/v--> yr** | H/13 scales with H |
-| Earth obliquity cycle (H/8) | <!--v:hDiv8-->41,915<!--/v--> yr | **38,635 yr** | **43,833 yr** | H/8 scales with H |
+| Earth obliquity cycle (H/8) | <!--v:hDiv8-->41,915<!--/v--> yr | **38,274 yr** | **44,075 yr** | H/8 scales with H |
 
 ---
 
@@ -267,7 +267,7 @@ Unlike the day-count near-invariant (`H × days/yr`), which drifts at deep time 
 | −380 (Devonian) | <!--v:hAtDevonian-->306,189<!--/v--> | 31,600.718 | 9.689318 | 2,966,767 | 0 ppm |
 | −500 | 297,687 | 29,870.094 | 9.966058 | 2,966,767 | 0 ppm |
 | −1000 | 264,346 | 23,553.793 | 11.223060 | 2,966,767 | 0 ppm |
-| −2500 | 173,033 | 10,091.914 | 17.145689 | 2,966,767 | 0 ppm |
+| −2500 | 237,173 | 18,960.350 | 12.508880 | 2,966,767 | 0 ppm |
 
 The `T_apsidal × H` column is the **J2000-anchored value 2,966,767 yr²** (exact: H₀² / N_apsidal,J2000 = 2,966,766.68 yr²), held constant by the framework's `(H/H₀)²` scaling. N is real-valued (not rounded to integer except at the J2000 anchor). Both H (integer) and T_apsidal (6 decimals) are display-rounded, so the hand-reproduction `T × H ≈ 2,966,767` is accurate to within ±10 yr² (well below the displayed precision). Same pattern for nodal: `T_nodal × H = H₀² / N_nodal,J2000 = 6,241,326 yr²` at every age.
 
@@ -804,7 +804,7 @@ Our framework's structural identity **H/13 = axial precession period** gives, at
 
 2. **Physical axial precession** = solar torque term + lunar torque term. Standard celestial-mechanics formula:
    `ψ̇ = -(3/ω) × [n_S² + n_M² × (factor)] × (J₂/2) × cos(ε)`
-   The solar term scales as ω (linear in spin rate). The lunar term scales as ω × a_moon⁻³ (because n_M² ∝ a_moon⁻³ by Kepler). When the Moon was 56.73 R⊕ (vs 60.27 today), the lunar contribution was (60.27/56.73)³ = **1.20× stronger** — pushing physical precession faster than spin-rate scaling alone predicts.
+   The solar term scales as ω (linear in spin rate). The lunar term scales as ω × a_moon⁻³ (because n_M² ∝ a_moon⁻³ by Kepler). When the Moon was 56.31 R⊕ (the framework's 650 Ma value; Wu's anchor reads 56.73), the lunar contribution was (60.27/56.31)³ = **1.23× stronger** — pushing physical precession faster than spin-rate scaling alone predicts.
 
 Quantitative reconciliation at 650 Ma using the physical formula:
 
@@ -1066,9 +1066,9 @@ For Farhat 2022's canonical Moon-formation epoch of **4.42 Gyr ago** (giant-impa
 
 | Quantity | Farhat 2022 value | Proper-physics formula |
 |:---|---:|---:|
-| LOD | 5.25 hr | **5.05 hr** (−3.8 %) |
-| H | 73,351 yr | **70,625 yr** (−3.7 %) |
-| 8H | 0.587 Myr | **0.565 Myr** |
+| LOD | 5.25 hr | **5.67 hr** (+8.0 %) |
+| H | 73,351 yr | **79,248 yr** (+8.0 %) |
+| 8H | 0.587 Myr | **0.634 Myr** |
 | Moon distance | ~3 R_E ≈ 19,000 km | **22,482 km = 3.53 R_E** |
 
 The proper-physics formula agrees with Farhat to ~4 % at this Hadean epoch. The honest read: **our rigid-Roche crossing (4.498 Ga) sits between Patterson's Earth age (4.54 Ga) and Farhat's Hf-W-dated formation epoch (4.42 Ga)** — within ~1–2 % of both. For most purposes either picture works.
@@ -1080,24 +1080,24 @@ Two parallel views — Farhat 2022 published values (left) and proper-physics fo
 | Age (Gyr) | LOD<sub>Farhat</sub> | 8H<sub>Farhat</sub> | LOD<sub>formula</sub> | 8H<sub>formula</sub> |
 |---:|---:|---:|---:|---:|
 | **4.498 (genesis, rigid Roche)** | — | — | **4.64 hr** | **0.519 Myr** |
-| **4.42 (Farhat Moon-formation)** | **5.25 hr** | **0.587 Myr** | 5.05 hr | 0.565 Myr |
-| 3.25 | 10.00 hr | 1.118 Myr | 9.42 hr | 1.053 Myr |
-| 2.50 | 13.00 hr | 1.453 Myr | 12.38 hr | 1.384 Myr |
+| **4.42 (Farhat Moon-formation)** | **5.25 hr** | **0.587 Myr** | 5.67 hr | 0.634 Myr |
+| 3.25 | 10.00 hr | 1.118 Myr | 14.87 hr | 1.662 Myr |
+| 2.50 | 13.00 hr | 1.453 Myr | 16.98 hr | 1.897 Myr |
 | 1.00 | 18.00 hr | 2.012 Myr | 18.92 hr | 2.115 Myr |
 | 0.60 (Ediacaran) | 21.00 hr | 2.347 Myr | 20.81 hr | 2.326 Myr |
 | 0.35 | 22.50 hr | 2.515 Myr | 22.07 hr | 2.467 Myr |
 | **0 (Modern)** | **24.00 hr** | **2.683 Myr** | **24.00 hr** | **2.683 Myr** |
 | +0.2 future | 24.36 hr | 2.723 Myr | 25.24 hr | 2.821 Myr |
 
-The two columns agree to ≤6 % across 4.5 Gyr. Farhat's published table is the literature reference (full ocean-tidal numerical model); the proper-physics formula is our closed-form fit to it. At deep future (+0.2 Gyr), our formula projects forward at the current Phanerozoic rate, while Farhat's model already accounts for future recession-rate slowdown — hence the ~4 % divergence there.
+The two columns agree closely in the Phanerozoic and near the Hadean endpoint. In the mid-Precambrian (1–3.5 Ga) the shipped regime-aware recession history (Driver 1½, § "The mid-Precambrian window" above) **deliberately departs from Farhat's smooth curve** to follow the paleo-anchor LOD stall — that is where the 14.9 hr-vs-10.0 hr class of differences comes from, and it is anchored to measurements, not to Farhat. At deep future (+0.2 Gyr), our formula projects forward at the current Phanerozoic rate, while Farhat's model already accounts for future recession-rate slowdown — hence the ~4 % divergence there.
 
 ### Total number of 8H cycles since Earth-Moon genesis
 
 Integrating `∫(1/8H(t)) dt` from the Earth-Moon genesis (4.498 Gyr, rigid-Roche crossing) to present using the proper-physics formula:
 
-**~3,540 complete 8H cycles** between genesis and now.
+**~2,660 complete 8H cycles** between genesis and now (shipped regime-aware history).
 
-Average 8H duration over the Moon's history: ~1.3 Myr — about half of the current value. The Earth-Moon system spent more than half its history with 8H below 1.5 Myr.
+Average 8H duration over the Moon's history: ~1.69 Myr — about 63% of the current value. The Earth-Moon system spent its first ~1.1 Gyr with 8H below 1.5 Myr.
 
 The growth has been slow but cumulative: 8H grew from 0.52 Myr at genesis to 2.68 Myr today — a factor of 5.2× over 4.5 Gyr.
 
@@ -1122,9 +1122,9 @@ Other useful conversions (all anchored at modern LLR 3.82 cm/yr da/dt, Dickey 19
 - **Per 100 million years**: 2.19 % per 100 Myr
 - **Per Gyr**: 21.9 % per Gyr
 
-So in 1 Gyr (1,000 Myr), H would grow by about **22 %** under the linear approximation. This means **linear extrapolation: 1 Gyr ago H ≈ 78 % of current**. The proper-physics formula (with the α₃·t³ + α₄·t⁴ curvature) gives a more nuanced value: H at 1 Gyr ago = **80.6 %** of current. Farhat 2022's full ocean-tidal model gives **75 %**. All three are within ~3–5 % of each other — close enough that for narrative purposes "about 75–80 % of modern" is the right framing.
+So in 1 Gyr (1,000 Myr), H would grow by about **22 %** under the linear approximation. This means **linear extrapolation: 1 Gyr ago H ≈ 78 % of current**. The shipped regime-aware history gives a more nuanced value: H at 1 Gyr ago = **78.8 %** of current (264,346 yr). Farhat 2022's full ocean-tidal model gives **75 %**. All three are within ~4 % of each other — close enough that for narrative purposes "about 75–80 % of modern" is the right framing.
 
-**Each 8H cycle (~2.68 Myr) the framework's structure stretches by ~197 years in H (or ~1,580 years in 8H).** Over ~3,540 cycles since Earth-Moon genesis, this compounds to the full ~21 % → 100 % increase.
+**Each 8H cycle (~2.68 Myr) the framework's structure stretches by ~197 years in H (or ~1,580 years in 8H).** Over ~2,660 cycles since Earth-Moon genesis, this compounds to the full ~21 % → 100 % increase.
 
 **Important caveat: the rate isn't constant.** It was much higher at Moon formation (Earth-Moon system far from equilibrium, strong tidal coupling) and slows asymptotically as the system approaches tidal-lock equilibrium. The 0.022 %/Myr current value is the *modern* rate, not a time-average. The proper-physics formula captures this curvature via the α₃·t³ + α₄·t⁴ terms.
 
@@ -1139,7 +1139,7 @@ The name "Expanding Solar System Resonance Theory" deliberately echoes Hubble's 
 | **What expands** | Distances between galaxies | Periods within the solar-system lattice (H, 8H, every H/N divisor) |
 | **Direction of change** | Monotonic — distances grow | Monotonic — periods grow |
 | **Driving mechanism** | Metric expansion of space (dark energy / Λ) | Earth-Moon tidal evolution + solar mass loss |
-| **Beginning** | Big Bang (~13.8 Gyr ago) | Earth-Moon genesis (~4.54 Gyr ago, Patterson Pb-Pb age — where the proper-physics formula naturally places Moon at the Roche limit) |
+| **Beginning** | Big Bang (~13.8 Gyr ago) | Earth-Moon genesis (~<!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr ago — where the formula naturally places Moon at the rigid Roche limit, between Patterson's 4.54 Pb-Pb Earth age and Farhat's 4.42 Hf-W date) |
 | **Asymptotic future** | Heat death (de Sitter expansion forever) | Earth-Moon tidal lock (LOD → ∞ at a_Moon → <!--v:tidalLockKm-->555,623<!--/v--> km, ~50 Gyr ahead) |
 | **Defining constant** | Hubble parameter `H₀ ≈ 70 km/s/Mpc` | Earth Fundamental Cycle `H_now = 335,317 yr`, rate `dH/dt ≈ 0.022 %/Myr` (= 0.059 %/8H cycle, canonical Wells anchor) |
 | **Measurement anchor** | Cosmic Microwave Background + redshift surveys | LOD (J2000) + Farhat 2022 deep-time + paleontological day counts (Wells 1963) |
@@ -1157,7 +1157,7 @@ The parallel is rhetorical and pedagogical, not physical equivalence. ESSRT borr
 
 ### 🛠️ Proper-physics LOD formula (Architecture α, 2026-06)
 
-Replaces the earlier piecewise (Phanerozoic-linear + Proterozoic-stall + Hadean-linear) approximation with a single smooth two-layer formula. Past 4.5 Gyr matches Farhat 2022 to ≤7.5 %; future is **physically bounded** by the tidal-lock asymptote (no more linear extrapolation diverging to infinity).
+Replaces the earlier piecewise (Phanerozoic-linear + Proterozoic-stall + Hadean-linear) approximation with a single smooth two-layer formula. Past 4.5 Gyr the smooth base matched Farhat 2022 to ≤7.5 %; the SHIPPED history additionally applies the Driver-1½ regime-aware correction (§ "The mid-Precambrian window"), which deliberately departs from Farhat in the 1–3.5 Ga stall interval to follow the paleo anchors. Future is **physically bounded** by the tidal-lock asymptote (no more linear extrapolation diverging to infinity).
 
 ```
   Layer 1 — Moon distance evolution:
@@ -1185,7 +1185,7 @@ Replaces the earlier piecewise (Phanerozoic-linear + Proterozoic-stall + Hadean-
 **Properties:**
 - Modern LOD = 86,400 s exactly (anchor preserved)
 - Modern lunar recession = 3.82 cm/yr at J2000 (LLR anchor, Dickey 1994 / Chapront 2002)
-- Past 4.5 Gyr matches Farhat 2022 within ≤7.5 % max error
+- Past 4.5 Gyr tracks Farhat 2022 in the Phanerozoic and Hadean; the mid-Precambrian follows the paleo-anchored Driver-1½ stall regime instead of Farhat's smooth curve
 - Hadean Moon distance lands at the rigid Roche limit (~1.5 R_E) **naturally** — physics validates itself
 - Future LOD approaches the tidal-lock asymptote (LOD → ∞ at a → <!--v:tidalLockKm-->555,623<!--/v--> km, reached ~50 Gyr ahead)
 - Single smooth formula, no piecewise discontinuities
@@ -1198,7 +1198,7 @@ Replaces the earlier piecewise (Phanerozoic-linear + Proterozoic-stall + Hadean-
 | 380 (Devonian) | 78,894.8 | 21.915 | <!--v:moonDistanceAtDevonian-->369,749<!--/v--> | **<!--v:hAtDevonian-->306,189<!--/v-->** | 2.450 |
 | 550 (Cambrian) | 75,809.7 | 21.058 | 362,983 | 294,216 | 2.354 |
 | 1,000 (Mesoproterozoic) | 68,113.0 | 18.920 | 343,784 | 264,346 | 2.115 |
-| 2,500 (Archean) | 44,584.8 | 12.385 | 252,392 | 173,033 | 1.384 |
+| 2,500 (Archean) | 61,111.6 | 16.975 | 322,160 | 237,173 | 1.897 |
 | 4,498 (Earth-Moon genesis, rigid Roche) | 16,718.2 | 4.644 | **<!--v:moonDistanceAtHadean-->9,471<!--/v-->** | <!--v:hAtHadean-->64,614<!--/v--> | 0.519 |
 | **−200 (+200 Ma future)** | 90,853.4 | 25.237 | <!--v:moonDistanceAt200MyrFuture-->392,059<!--/v--> | <!--v:hAt200MyrFuture-->352,600<!--/v--> | 2.821 |
 | **−1,000 (+1 Gyr future)** | 116,016.1 | 32.227 | 425,119 | 450,257 | 3.602 |
@@ -1424,8 +1424,8 @@ So as we go back in time (more massive Sun), Earth's orbital period was **shorte
 |:---|---:|---:|---:|---:|
 | Cretaceous | 100 | −1,391 km | −587 s | −19 ppm |
 | **Devonian** | **380** | **−5,285 km** | **−2,230 s** | **−71 ppm** |
-| Cambrian | 1,000 | −13,907 km | −5,867 s | −186 ppm |
-| Mesoproterozoic | 2,000 | −27,814 km | −11,735 s | −372 ppm |
+| Neoproterozoic (Tonian) | 1,000 | −13,907 km | −5,867 s | −186 ppm |
+| Paleoproterozoic | 2,000 | −27,814 km | −11,735 s | −372 ppm |
 | Hadean | 4,543 | −63,178 km | −26,655 s | −845 ppm |
 
 Under Architecture α (proper-physics formulation), H(t) scales strictly with LOD (Driver 1); Driver 2's effect appears as a drift in the structural near-invariant `H × days/yr = TOTAL_DAYS_IN_H` rather than as a shift in H itself. The sign convention is: TOTAL_DAYS_IN_H is *smaller* at past epochs because year_s is *shorter* (Sun was more massive).
@@ -1871,7 +1871,7 @@ Ran `scripts/test_evolving_8h_climate_formula.py` to compare constant-8H vs phas
 | LR04 post-MPT (0-1 Myr) | +0.00001 | +0.00043 | 0.02 kyr |
 | LR04 iNHG-MPT (1-2.7 Myr) | +0.00003 | +0.00141 | 0.13 kyr |
 | LR04 pre-iNHG (2.7-5.3 Myr) | +0.00041 | +0.00032 | 0.44 kyr |
-| LR04 full (0-5.3 Myr) | +0.00010 | +<!--v:earthEccWeight-->0.00002<!--/v--> | 0.59 kyr |
+| LR04 full (0-5.3 Myr) | +0.00010 | +0.00002 | 0.59 kyr |
 | **CENOGRID (0-66 Myr)** | **+0.00013** | **-0.00003** | **159.9 kyr** |
 
 **Result: time-evolving 8H does NOT materially improve R²** — all improvements are below 0.002, mostly below 0.001. For CENOGRID (the longest window where the phase shift is most significant at 160 kyr), R² actually decreases slightly.
@@ -1906,7 +1906,7 @@ These come from *entirely* independent measurements: paleontological day counts 
 
 **The Wells rate is the characteristic long-term-stable rate of Earth-Moon tidal evolution.** The match to Earth's age is *consistent* with — and the proper-physics formula now *demonstrates* — that this rate held across most of Earth's history in some effective average sense.
 
-Earth-Moon evolution is NOT actually piecewise linear at Wells rate — Farhat 2022's full ocean-tidal model shows the rate has varied across geological history (faster in late Proterozoic ~7 ms/century at 600–1000 Ma, slower in mid-Proterozoic ~3 ms/century at 1–2.5 Gyr, close to Wells in the Archean ~4 ms/century at 2.5–4.4 Gyr). The proper-physics formula captures this variation via the α₃·t³ and α₄·t⁴ terms, and the modern LLR anchor sets α₁. The match to Earth's age happens because these variations time-average to ~Wells rate: the proper-physics formula's smooth polynomial fit *automatically* reproduces this average and naturally places the Roche-limit crossing at 4.54 Gyr (Patterson's Earth age) rather than the giant-impact-dated 4.42 Gyr.
+Earth-Moon evolution is NOT actually piecewise linear at Wells rate — Farhat 2022's full ocean-tidal model shows the rate has varied across geological history (faster in late Proterozoic ~7 ms/century at 600–1000 Ma, slower in mid-Proterozoic ~3 ms/century at 1–2.5 Gyr, close to Wells in the Archean ~4 ms/century at 2.5–4.4 Gyr). The proper-physics formula captures this variation via the α₃·t³ and α₄·t⁴ terms, and the modern LLR anchor sets α₁. The match to Earth's age happens because these variations time-average to ~Wells rate: the proper-physics formula's smooth fit *automatically* reproduces this average and naturally places the Roche-limit crossing at <!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr — between Patterson's Earth age (4.54) and the giant-impact-dated 4.42 Gyr.
 
 ### What "non-coincidence" means structurally
 
@@ -1921,7 +1921,7 @@ The proper-physics two-layer formula has α₁ set from LLR (3.82 cm/yr Moon rec
 - **Modern LOD = 24 hr exactly** (anchored)
 - **Phanerozoic days/yr match Wells 1963 corals to −0.01%** at 380 Ma
 - **Moon at the rigid Roche limit at t = <!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr** — naturally, with no Hadean constraint used
-- **Match to Farhat 2022's deep-time anchors** at ≤7.5 % across the full 4.5 Gyr range
+- **Match to Farhat 2022's Phanerozoic and Hadean anchors**; in the mid-Precambrian the shipped Driver-1½ history follows the paleo-anchor stall instead of Farhat's smooth curve
 
 The "non-coincidence" insight is that four independent calibrations converge: LLR (modern J2000 instantaneous), Wells (Phanerozoic paleontological average), Patterson (Hadean radiometric chronology), and Farhat (full tidal-modelling). The polynomial α₃, α₄ terms carry the deep-time curvature that reconciles the modern LLR rate with the Phanerozoic-averaged Wells rate.
 
@@ -1933,7 +1933,7 @@ The framework does not need an explicit Proterozoic thermal-tide-lock stall (Bar
 
 ## When will the 8H cycle end?
 
-If the cycle had a beginning (Earth-Moon genesis at ~4.54 Gyr ago), it also has an ending. **The Earth-Moon-Sun system's evolution is bounded — the cycle cannot grow indefinitely.**
+If the cycle had a beginning (Earth-Moon genesis at ~4.5 Gyr ago), it also has an ending. **The Earth-Moon-Sun system's evolution is bounded — the cycle cannot grow indefinitely.**
 
 ### The physical limit: tidal-lock equilibrium
 
@@ -2009,8 +2009,8 @@ If ESSRT is correct, here's what should happen over the next 100–1000 Myr (all
 
 ### Next 50 Myr (Cenozoic-future)
 - Moon distance: **+1,704 km** further out (386,103 km vs current 384,399)
-- LOD: **+15.8 minutes** longer day (24.27 hr)
-- H: **+3,712 yr** longer (339,029 yr)
+- LOD: **+17.9 minutes** longer day (24.30 hr)
+- H: **+4,166 yr** longer (339,483 yr)
 - Climate cycles: 1.1 % longer periods (essentially unchanged at human timescales)
 - **Observable effect: negligible at human/civilization timescales**
 
@@ -2030,9 +2030,9 @@ If ESSRT is correct, here's what should happen over the next 100–1000 Myr (all
 - **Observable effect: dramatic; entirely different day-night and climate-cycle patterns** (if humans still exist)
 
 ### Beyond +2 Gyr (approaching the proper-physics formula's horizon)
-- Moon distance: 473,136 km at +2 Gyr (~85 % of tidal-lock asymptote)
-- LOD: 52.3 hr (= 2.18 days) at +2 Gyr
-- H: 730,622 yr at +2 Gyr, 8H = 5.85 Myr (more than 2× modern)
+- Moon distance: 481,375 km at +2 Gyr (~87 % of tidal-lock asymptote)
+- LOD: 58.3 hr (= 2.43 days) at +2 Gyr
+- H: 815,081 yr at +2 Gyr, 8H = 6.52 Myr (more than 2.4× modern)
 - **Beyond +3 Gyr: formula returns `null`** (Moon reaches tidal-lock asymptote ~<!--v:tidalLockKm-->555,623<!--/v--> km). For projections to Sun's red giant phase at +5 Gyr, an extended physics model with explicit tidal-Q decay would be required.
 
 ---
@@ -2118,7 +2118,7 @@ All values from the proper-physics two-layer formula. The `H × days/yr` near-in
 | Jupiter perihelion ecliptic (8H/39, yr) | <!--v:jupiterPeriPeriod-->68,783<!--/v--> | 65,852 | 62,808 | 72,328 |
 | Saturn perihelion ecliptic (8H/65, yr) | <!--v:saturnPeriPeriod-->41,270<!--/v--> | 39,511 | 37,685 | 43,397 |
 
-**Key observation**: the bottom rows (periods) all expand together with H(t), reflecting Driver 1 (tidal evolution). The structural near-invariant `H × days/year ≈ TOTAL_DAYS_IN_H` drifts smoothly with t_Ma under Driver 2 (solar mass loss): −33 ppm at Jurassic, −71 ppm at Devonian, +37 ppm at +200 Myr future (year_s shifts longer in future because Sun has lost more mass). The drift is monotonic and small but real — about 5 ppm per 50 Ma. This combination of strict structural lattice scaling + tracked Driver 2 drift is ESSRT's deepest self-consistency check.
+**Key observation**: the bottom rows (periods) all expand together with H(t), reflecting Driver 1 (tidal evolution). The structural near-invariant `H × days/year ≈ TOTAL_DAYS_IN_H` drifts smoothly with t_Ma under Driver 2 (solar mass loss): −35 ppm at Jurassic, −74 ppm at Devonian, +39 ppm at +200 Myr future (year_s shifts longer in future because Sun has lost more mass). The drift is monotonic and small but real — about 5 ppm per 50 Ma. This combination of strict structural lattice scaling + tracked Driver 2 drift is ESSRT's deepest self-consistency check.
 
 ---
 

@@ -111,7 +111,7 @@ Sidereal year variations are much smaller than tropical — the orbital period i
 Y_anom(t) = meanAnomalisticYear + Σ harmonics
 ```
 
-The anomalistic year is measured from perihelion-to-perihelion and aphelion-to-aphelion intervals, averaged. The dominant H/24 term is the beat frequency between the inclination (H/3) and obliquity (H/8) cycles.
+The anomalistic year is measured from perihelion-to-perihelion and aphelion-to-aphelion intervals, averaged. The dominant term is H/18 (0.060 s), followed by H/19 and H/17; the H/24 beat frequency between the inclination (H/3) and obliquity (H/8) cycles is the fourth-largest (0.020 s).
 
 
 ## Derived Day and Year Quantities
@@ -276,7 +276,7 @@ The coin rotation paradox manifests at every timescale:
 |-----------|-------------------|-----------------|
 | Tropical | H/8 (obliquity) | Measures solstice/equinox-to-same — steeper ecliptic angle (higher obliquity) means faster equator crossing → shorter tropical year |
 | Sidereal | H/8 + H/3 (tiny) | Measures full orbit — nearly constant, with only tiny perturbations from planetary gravitational interactions |
-| Anomalistic | H/24 (beat freq) | Measures perihelion-to-perihelion — sensitive to the interplay between inclination and obliquity cycles |
+| Anomalistic | H/18 (with H/19, H/17, H/24 close behind) | Measures perihelion-to-perihelion — sensitive to the interplay between inclination and obliquity cycles |
 
 ### Cardinal Point Tropical Year Variation (J2000)
 

@@ -257,7 +257,7 @@ The model value uses the predictive formula at year 1900 (the epoch of Le Verrie
 
 ### 1.7 Historical Context
 
-First-order secular theory **overestimates by ~0.4%** compared to Park et al. (2017) for Mercury:
+First-order secular theory **overestimates by ~4%** compared to Park et al. (2017) for Mercury (553 vs 532 ″/cy — see §1.2 and §1.5); the model's own value sits within ~0.1%:
 
 | Source | Mercury Total |
 |--------|---------------|
@@ -655,7 +655,7 @@ null,
    hover : [`Jupiter (outer): Largest contributor due to mass and proximity. α = 0.293`]},
   {label : () => `├ Saturn`,
    value : [ { v: () => OrbitalFormulas.getMarsPrecessionBreakdown(o).contributions.find(c => c.perturber === 'Saturn')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Saturn (outer): Second largest contributor. α = 0.159`]},
+   hover : [`Saturn (outer): Third-largest contributor. α = 0.159`]},
   {label : () => `├ Earth`,
    value : [ { v: () => OrbitalFormulas.getMarsPrecessionBreakdown(o).contributions.find(c => c.perturber === 'Earth')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
    hover : [`Earth (inner): Second-largest contributor. Inner perturbers contribute prograde via the α·ᾱ = α weighting. α = 0.656`]},
@@ -779,7 +779,7 @@ null,
 | Uranus | ~25 % | Missing off-diagonal coupling with Saturn/Neptune |
 | Neptune | ~34 % | Missing off-diagonal coupling |
 
-The Holistic Universe Model's Fibonacci rates match all eight planets to 3–10 %, as
+The Holistic Universe Model's Fibonacci rates match six of the eight planets to 3–10 % (Venus's observed rate is indeterminate — it flips sign across windows — and Saturn's observed magnitude is window-sensitive), as
 documented in §7.1 and [docs/37-planets-precession-cycles.md](37-planets-precession-cycles.md).
 
 ### 5.3 Notable Discrepancies
@@ -853,7 +853,8 @@ The table below compares, for each planet:
 **Key observation:** First-order L-L is a reasonable approximation for Mercury and
 Mars but fails significantly for every other planet. The Holistic Universe Model's
 Fibonacci rates, which are calibrated to WebGeoCalc, match observations to 3–10 %
-across all planets, including the cases where L-L fails by factors of 2–10 or
+across the six determinable planets (Venus and Saturn's observed rates are
+window-indeterminate), including the cases where L-L fails by factors of 2–10 or
 gives the wrong sign. L-L is a theoretical simplification; the Fibonacci framework
 is observationally grounded.
 

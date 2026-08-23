@@ -1479,8 +1479,8 @@ tidalAcceleration: (GM, r_km, delta_r_km) => {
 
 **Physical Application:** For the Moon's tidal effect on Earth:
 - r = 384,400 km (Moon's distance)
-- Δr = 12,742 km (Earth's diameter)
-- Result: ~1.1 × 10⁻⁶ m/s² differential acceleration across Earth
+- Δr = 6,371 km (Earth's radius — center to surface)
+- Result: ~1.1 × 10⁻⁶ m/s² differential acceleration between Earth's center and surface
 
 ---
 
@@ -2139,7 +2139,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 **How values are sourced:**
 - **Eccentricity**: Derived at runtime from balanced-year phase (`planets.{name}.orbitalEccentricityBase`)
 - **Inclination (inv)**: Derived from the Fibonacci ψ formula (see [Fibonacci Laws](10-fibonacci-laws.md))
-- **Semi-major axis**: Derived from period via Kepler's 3rd Law: `a = (H / solarYearCount)^(2/3)` where `solarYearCount = meanSolarYearDays / solarYearInput`
+- **Semi-major axis**: Derived from period via Kepler's 3rd Law: `a = (H / solarYearCount)^(2/3)` where `solarYearCount = round(H × meanSolarYearDays / solarYearInput)` — the integer number of orbits in one H (doc 20 § Quantization)
 - **Period**: Input constant per planet (`planets.{name}.solarYearInput`)
 
 ### Live Variables Summary

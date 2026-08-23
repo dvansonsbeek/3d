@@ -385,7 +385,7 @@ Each array entry: `[period_divisor, sin_coeff, cos_coeff]` — period = H / divi
 |-------|-------|-----|---------------|
 | `TROPICAL_YEAR_HARMONICS` | 12 | 0.002 s | H/8 (obliquity) |
 | `SIDEREAL_YEAR_HARMONICS` | 6 | 0.001 s | H/8 + H/3 |
-| `ANOMALISTIC_YEAR_HARMONICS` | 8 | 0.002 s | H/24 (beat) |
+| `ANOMALISTIC_YEAR_HARMONICS` | 8 | 0.002 s | H/18 |
 
 Note: The tropical year's **primary display path** is `TROPICAL_YEAR_HARMONICS` via `computeSolarYearDaysDirect` (Step 6c). The `CARDINAL_POINT_HARMONICS` derivative route (23 harmonics per type + ECC/JOINT/DERIVED families) is kept for chart consistency in cardinal-point report paths.
 
@@ -477,8 +477,8 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
-| Perihelion Coin Rotation | `perihelionCoinRotationMs` | meanlengthofday / (H/16) / meansolaryearlengthinDays × 1000 | ~11.34 ms/day |
-| Yearly accumulation | `perihelionCoinRotationYearlySeconds` | offset × meansolaryearlengthinDays | ~4.14 s/year |
+| Perihelion Coin Rotation | `perihelionCoinRotationMs` | meanlengthofday / (H/16) / meansolaryearlengthinDays × 1000 | ~11.29 ms/day |
+| Yearly accumulation | `perihelionCoinRotationYearlySeconds` | offset × meansolaryearlengthinDays | ~4.12 s/year |
 | Axial Coin Rotation | `axialCoinRotationMs` | meanSiderealday / (H/13) / (meansolaryearlengthinDays + 1) × 1000 | ~9.12 ms/sidereal day |
 | Yearly accumulation | `axialCoinRotationYearlySeconds` | offset × (meansolaryearlengthinDays + 1) | ~3.34 s/year |
 
@@ -628,7 +628,7 @@ Observed linear trend rates from JPL SPICE/WebGeoCalc. These fluctuate over time
 |--------|-----------------|-------|--------|
 | Mercury | ~570 | single value | JPL SPICE |
 | Venus | ~0 | single value | JPL SPICE |
-| Earth | 1163 | single value | JPL SPICE |
+| Earth | 1,164 (heliocentric; 6,186 wrt equinox) | single value | JPL SPICE |
 | Mars | ~1550–1650 | min–max | JPL SPICE |
 | Jupiter | ~800–1800 | min–max | JPL SPICE |
 | Saturn | ~-3400 to -2000 | retrograde | JPL SPICE |

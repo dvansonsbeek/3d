@@ -92,7 +92,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 **Key observations:**
 
 1. **Giant planets have small inclinations** (0.32°-1.02°) because they collectively define the invariable plane through their dominant angular momentum
-2. **Inner planets have larger inclinations** (1.57°-6.35°) because they contribute negligibly to total angular momentum
+2. **Inner planets have larger inclinations** (means 1.48°-6.70°) because they contribute negligibly to total angular momentum
 3. **For all planets except Earth**, inclination to the invariable plane is smaller than inclination to the ecliptic
 
 ---

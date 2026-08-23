@@ -9,7 +9,7 @@ status: current
 
 > **Scope.** Empirical tests of the Holistic Universe Model's climate claims against the LR04 benthic δ¹⁸O stack (Lisiecki & Raymo 2005), the Cheng 2016 U-Th-dated Asian speleothem composite, the EPICA Dome C CO₂ record (Bereiter 2015), and the CENOGRID benthic record (Westerhold 2020). Sections 1–7 report the spectral fit and per-planet contributions. Sections 8–11 then report a pre-registered **super-cycle hypothesis test** that returned NULL, **fourteen follow-up hypothesis tests** (A–N) on independent framework predictions (16 positives / 2 partials / 5 nulls), the **405-kyr off-lattice characterization** (climate-internal carbon-cycle thermostat), and the combined interpretation. Companion to [doc 90 — Milankovitch Language](90-milankovitch-language.md), which states the framework's structural predictions; this document reports what the data show — both confirmations and limits.
 
-> **Scope note (ESSRT).** Every spectral test in this document is anchored at J2000. The 32 L1 integer-divisor positions of the 8H lattice and the Fibonacci structure used to derive them are scale-invariant. The literal year counts (H = <!--v:H-->335,317<!--/v-->; 8H = <!--v:eightH-->2,682,536<!--/v-->; 1H..8H = 335.3..2682.5 kyr in the §11.5 super-cycle table; 13H = 4.359 Myr in Test C) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent over the post-MPT (0–1 Myr) and full-LR04 (0–5.3 Myr) windows covered here. For the deep-time projections in Test C (13H ≈ 4.36 Myr vs Boulila ~4.5 Myr) and the full 66-Myr CENOGRID context, the cumulative drift begins to matter; see [doc 99](99-expanding-solar-system-resonance-theory.md) for the per-driver Δ-H formulas.
+> **Scope note (ESSRT).** Every spectral test in this document is anchored at J2000. The 32 L1 integer-divisor positions of the 8H lattice and the Fibonacci structure used to derive them are scale-invariant. The literal year counts (H = <!--v:H-->335,317<!--/v-->; 8H = <!--v:eightH-->2,682,536<!--/v-->; 1H..8H = 335.3..2682.5 kyr in the §11.5 super-cycle table; 13H = 4.359 Myr in Test A) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent over the post-MPT (0–1 Myr) and full-LR04 (0–5.3 Myr) windows covered here. For the deep-time projections in Test C (13H ≈ 4.36 Myr vs Boulila ~4.5 Myr) and the full 66-Myr CENOGRID context, the cumulative drift begins to matter; see [doc 99](99-expanding-solar-system-resonance-theory.md) for the per-driver Δ-H formulas.
 
 ---
 
@@ -135,7 +135,7 @@ For each climate peak, cross-reference against the full doc 55 8H/n period table
 
 | Planet | Exact direct matches | Near (±1) | Total | Exclusive direct matches |
 |---|---:|---:|---:|---|
-| **Mars** | 2 | 3 | 5 | **n=35 (Peri_ecl), n=53 (Ecc)** — both unique to Mars in doc 55 |
+| **Mars** | 2 | 3 | 5 | **n=35 (near Mars Peri_ecl 8H/36), n=53 (near Mars Ecc 8H/52)** — both unique to Mars in doc 55, each one lattice step off the shipped integer |
 | Jupiter | 0 | 5 | 5 | none (shared integers with Mars Obliq, Earth AscNode, Saturn Peri_ecl, Uranus Obliq) |
 | Saturn | 0 | 4 | 4 | none (shared integers) |
 | Mercury | 2 | 1 | 3 | n=9 (Axial = AscNode by Cassini lock) |
@@ -196,7 +196,7 @@ Three pre-MPT-only peaks correspond to **Venus-Neptune, Earth-Uranus, and Neptun
 
 ### 3.6 Cross-planet obliquity validation
 
-The model's obliquity-period claims for the inner solar system (from doc 90 §5) match three independent peer-reviewed references with **zero free parameters**:
+The model's obliquity-period claims for the inner solar system (doc 37 § obliquity table) match three independent peer-reviewed references with **zero free parameters**:
 
 | Planet | Published period | Reference | Model H/n | Period (yr) | Deviation |
 |---|---|---|---|---|---|
@@ -266,7 +266,7 @@ Direct-eccentricity attribution and the inclination-side / H-divisor framework d
 | Eccentricity-beat phase coupling (§4.4) | **Predicts strong; not detected (consistent with M-M 1997)** | No contradiction |
 | 100-kyr-band centroid identification | **Predicts 95–99 kyr eccentricity beats; observed centroid at 107 kyr is a *nodal* beat** | **Mercury-Mars nodal (s₁−s₄) at n=25 = 107 kyr — matches** |
 | Cross-planet obliquity periods (§3.6) | No direct prediction | **Mercury 0.09 %, Earth 2.2 %, Mars 2.4 %** |
-| Berger 1978 climatic-precession 6-peak spectrum | Not predicted by direct eccentricity (these are k+g_j sub-peaks, not eccentricity-beat periods) | **All 6 peaks match H/n divisors to <0.4 %** (see doc 90 §4.2) |
+| Berger 1978 climatic-precession 6-peak spectrum | Not predicted by direct eccentricity (these are k+g_j sub-peaks, not eccentricity-beat periods) | **All 6 peaks match H/n divisors to <0.7 %** (see doc 90 §4.2) |
 
 The eccentricity story has *specific* empirical headwinds (405-kyr absence + no beat coupling + wrong-family centroid) that the inclination-side framework does not.
 
@@ -304,8 +304,8 @@ These are real follow-ups, not hand-waves. None are immediate but all are tracta
 The following findings of the model are **independent of which attribution wins the 100-kyr debate**:
 
 - Five Milankovitch periods are H-divisors closed by Fibonacci beat algebra (doc 90 §3)
-- All six Berger 1978 climatic-precession peaks match 8H/n integer fractions to < 0.4 % (doc 90 §4.2)
-- Three independent eigenmode combinations converge at H/3 ± 1.3 %; two converge at H/5 (doc 90 §4.3)
+- All six Berger 1978 climatic-precession peaks match 8H/n integer fractions to < 0.7 % (doc 90 §4.2)
+- Three independent eigenmode combinations converge at H/3 ± 1.8 %; two converge at H/5 (doc 90 §4.3)
 - Cross-planet obliquity validation: Mercury 0.09 %, Earth 2.2 %, Mars 2.4 % (§3.6)
 - 405-kyr term essentially absent in post-MPT LR04 (ratio 0.12, §4.4)
 - No eccentricity-beat phase coupling in LR04 (§4.4)
@@ -759,7 +759,7 @@ Because the closure test is blocked at this scale, three alternative chronology-
 
 #### 12.2.1 B1 — Multi-band centroid agreement ✅ POSITIVE
 
-For each well-resolved climate band, find the Lomb-Scargle peak period in LR04 (orbitally-tuned) and Cheng (U-Th-dated absolute) on the matched 0–640 kyr window, then test whether the two records put the band centroid at the same period to within Rayleigh resolution. Multi-band extension of the §14.1 single-band chronology-bias check in [milankovitch_spectral_tests.py](../scripts/milankovitch_spectral_tests.py).
+For each well-resolved climate band, find the Lomb-Scargle peak period in LR04 (orbitally-tuned) and Cheng (U-Th-dated absolute) on the matched 0–640 kyr window, then test whether the two records put the band centroid at the same period to within Rayleigh resolution. Multi-band extension of the single-band chronology-bias check in [milankovitch_spectral_tests.py](../scripts/milankovitch_spectral_tests.py).
 
 | Band | Predicted (8H/n) | LR04 peak | Cheng peak | \|diff\| | Rayleigh ΔP | Agree? |
 |---|---:|---:|---:|---:|---:|:---:|
@@ -769,7 +769,7 @@ For each well-resolved climate band, find the Lomb-Scargle peak period in LR04 (
 
 **Verdict: POSITIVE — 3/3 bands agree on independent chronologies.** This is the strongest chronology-independence result. Three independent band centroids align between an orbitally-tuned record and a U-Th-dated absolute-chronology record, well within Rayleigh resolution at each band. The band structure is real, not a tuning artifact.
 
-The 100-kyr band peak at ~99 kyr in both records sits in the 0–640 kyr window where the post-MPT modes dominate and the 8H/26 ≈ 103 kyr divisor (g₄−g₅, Mars-Jupiter eccentricity beat) carries more amplitude than 8H/25; on the full 5320-kyr LR04 the centroid shifts toward n=25 ≈ 107 kyr where the Mercury-Mars nodal beat dominates ([§4.2](#42-the-100-kyr-centroid-is-the-mercury-mars-nodal-beat)).
+The 100-kyr band peak at ~99 kyr in both records sits in the 0–640 kyr window where the post-MPT modes dominate and the 8H/26 ≈ 103 kyr divisor carries more amplitude than 8H/25 (the g₄−g₅ Mars-Jupiter eccentricity beat itself sits at n=28 ≈ 95.8 kyr); on the full 5320-kyr LR04 the centroid shifts toward n=25 ≈ 107 kyr where the Mercury-Mars nodal beat dominates ([§4.2](#42-the-100-kyr-centroid-is-the-mercury-mars-nodal-beat)).
 
 #### 12.2.2 B2 — Permutation test on Cheng formula-integer amplitudes (NULL trend)
 
@@ -1084,7 +1084,7 @@ Data: [data/milankovitch-8h-405k-head-to-head.json](../data/milankovitch-8h-405k
 | M: Cross-validated phase across MPT | PARTIAL | median 18 kyr offset (canonical 32-component); 29% within ±10 kyr, 55% within ±20 kyr |
 | **N: 405-kyr line position** | empirically at 405 (off the 8H lattice) — see [§13](#13-the-405-kyr-investigation-an-off-lattice-climate-signal) |
 
-**Sixteen clean positive sub-results, two partials, five nulls; the 405-kyr cycle empirically sits off the 8H lattice and is investigated separately in §6.**
+**Sixteen clean positive sub-results, two partials, five nulls; the 405-kyr cycle empirically sits off the 8H lattice and is investigated separately in §13.**
 
 The 8H integer-divisor structure of orbital cycles is broadly supported:
 - band centroids within Rayleigh resolution across the full 67-Myr Cenozoic (Tests A, B1, H1, I, K)
@@ -1361,9 +1361,9 @@ These are climate-system regime changes, not orbital-cycle events. The continuou
 
 Test D2 is, in the author's view, the most consequential new result in this document. The empirical finding that the 100-kyr band and the 41-kyr obliquity band share phase information in LR04 ($p = 0.01$) is a direct test of the inclination-eigenspace assignment that distinguishes the 8H framework from the standard Milankovitch reading. Replication on independent paleoclimate records (longer than LR04, or with different age models) would further strengthen this; that is open future work.
 
-Test A is the closest thing the framework has to an *external numerical cross-check*: Boulila et al. (2020) computed their 4.5 Myr libration period from secular-resonance dynamics with no reference to the 8H framework, and the framework's 13H = 4.36 Myr falls within the published range. This is exactly the kind of independent agreement that anchors a model.
+Test A is the closest thing the framework has to an *external numerical cross-check*: Boulila et al. (2018) computed their 4.5 Myr libration period from secular-resonance dynamics with no reference to the 8H framework, and the framework's 13H = 4.36 Myr falls within the published range. This is exactly the kind of independent agreement that anchors a model.
 
-The super-cycle null result (§4) appropriately bounds the framework's claims. The framework describes an orbital-forcing structure that *paces possible climate transitions*, not a structural clock that *causes geological events*.
+The super-cycle null result (§§8–11) appropriately bounds the framework's claims. The framework describes an orbital-forcing structure that *paces possible climate transitions*, not a structural clock that *causes geological events*.
 
 ---
 
@@ -1414,7 +1414,7 @@ The Holocene (≈ last 11,700 yr) remains a *sub-feature* of the current Pleisto
 4. **Per-tier sub-tests of the super-cycle**: do mass extinctions (Tier 1) align with 8H multiples differently from epoch boundaries (Tier 2)? Tier 1 has higher dating precision and biological independence, though sample size is small.
 5. **Continuous spectrum tests on the geological time scale**: rather than testing a specific period, run a spectral analysis of the major-event date list and ask whether *any* period gives statistically significant clustering. If yes, what is it?
 
-These are honest extensions, not rescue attempts. The negative super-cycle result in §4 stands as part of the appropriate scientific record alongside the positive results in §5.
+These are honest extensions, not rescue attempts. The negative super-cycle result in §§8–11 stands as part of the appropriate scientific record alongside the positive results in §12.
 
 ---
 

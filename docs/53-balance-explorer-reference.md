@@ -25,7 +25,7 @@ The explorer allows users to experiment with alternative configurations to under
 ## Accessing the Explorer
 
 1. Open the Tweakpane control panel
-2. Expand the **"Invariable Plane Positions"** folder
+2. Expand the **Tools** folder
 3. Click **"Invariable Plane Inspector"**
 4. The modal overlay appears centered on screen
 
@@ -50,7 +50,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │  │ Mars   │ [▼ 97.0°] │336.07  │[▼] │ 8H/68      │ PRO │ +1.68 │  │
 │  │ Jupiter│ [▼287.1°] │ 14.71  │[▼] │ 8H/65      │ PRO │ +1.94 │  │
 │  │ Saturn │ [▼116.3°] │ 92.13  │[▼] │ 8H/169     │ ANT │ -3.11 │  │
-│  │ Uranus │ [▼ 21.3°] │170.73  │[▼] │ H/16       │ PRO │ +1.16 │  │
+│  │ Uranus │ [▼ 21.3°] │170.73  │[▼] │ H/10       │ PRO │ +1.16 │  │
 │  │ Neptune│ [▼354.0°] │ 45.80  │[▼] │ 2H/25      │ PRO │ +0.19 │  │
 │  └────────┴──────────┴────────┴────┴────────────┴─────┴───────┘  │
 │                                                                  │
@@ -200,7 +200,7 @@ A configuration is valid when:
 |-------|-----------|
 | **Inclination balance** | ≥<!--v:balanceThreshold-->99.994%<!--/v--> (TNO margin) |
 | **Eccentricity balance** | ~99.9% for the model configuration (phase-derived bases) |
-| **LL bounds** | All 8 planets within Laplace-Lagrange bounds (the default configuration has Saturn at +0.028° excess — within 0.03° LL uncertainty) |
+| **LL bounds** | 7 of 8 planets within Laplace-Lagrange bounds (the default configuration has Saturn at +0.030° excess over its upper bound — the documented margin case) |
 | **Trend directions** | All 7 fitted planets match JPL direction in the J2000-fixed frame (7/7 ✓) |
 
 ### Exploring Configurations
@@ -247,7 +247,7 @@ The model's default (and uniquely determined) configuration:
 Expected results:
 - Inclination balance: **~100%** (99.997%)
 - Eccentricity balance: **~99.9%**
-- LL bounds: **8/8 pass** (Saturn: +0.028° excess, within 0.03° LL uncertainty)
+- LL bounds: **7/8 pass** (Saturn: +0.030° excess over its upper bound — the documented margin case)
 - Trend directions: **7/7 fitted planets match JPL direction** (J2000-fixed frame)
 - Total trend error: **~4.3″/century** across all 7 fitted planets
 

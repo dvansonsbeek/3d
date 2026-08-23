@@ -133,7 +133,7 @@ Each nesting layer applies its rotation to all children, creating composite prec
 
 ## Part 5: Earth Precession Layers
 
-### 4.1 Earth Layer (Core)
+### 5.1 Earth Layer (Core)
 
 The Earth object itself represents **Axial Precession**:
 
@@ -144,7 +144,7 @@ The Earth object itself represents **Axial Precession**:
 | rotationSpeed | 2π × sidereal rotations per SI year — **locked to the J2000 sidereal day** in both modes (see §14.4) | Daily spin |
 | tilt | -`earthtiltMean` | Mean axial tilt (obliquity) |
 
-### 4.2 Inclination Precession
+### 5.2 Inclination Precession
 
 | Property | Value | Meaning |
 |----------|-------|---------|
@@ -153,7 +153,7 @@ The Earth object itself represents **Axial Precession**:
 
 **Purpose:** Opposes Earth's axial precession motion. The inclination precession and axial precession are "balancing out in both ways" - they have opposite directions.
 
-### 4.3 Ecliptic Precession
+### 5.3 Ecliptic Precession
 
 | Property | Value | Meaning |
 |----------|-------|---------|
@@ -162,7 +162,7 @@ The Earth object itself represents **Axial Precession**:
 
 **Purpose:** Models the ecliptic plane's precession component.
 
-### 4.4 Obliquity Cycle
+### 5.4 Obliquity Cycle
 
 | Property | Value | Meaning |
 |----------|-------|---------|
@@ -173,7 +173,7 @@ The Earth object itself represents **Axial Precession**:
 
 **Key insight:** The ecliptic and obliquity layers have **opposite tilt values** (-`earthInvPlaneInclinationAmplitude` and +`earthInvPlaneInclinationAmplitude`) that balance each other.
 
-### 4.5 Perihelion Precession 1 & 2
+### 5.5 Perihelion Precession 1 & 2
 
 Both layers use the same period but opposite signs:
 
@@ -187,7 +187,7 @@ Both layers use the same period but opposite signs:
 
 The paired inverse rotations maintain equilibrium during Earth's two counter-motions.
 
-### 4.6 Summary Table
+### 5.6 Summary Table
 
 | Layer | Period | Speed Sign | orbitTiltb |
 |-------|--------|------------|------------|
@@ -221,13 +221,13 @@ This 14.5-cycle offset positions the obliquity fluctuation to correctly explain 
 
 ## Part 7: Sun and Perihelion Point
 
-### 6.1 Barycenter Sun
+### 7.1 Barycenter Sun
 
 | Property | Value | Meaning |
 |----------|-------|---------|
 | orbitRadius | eccentricityAmplitude × 100 | Marks center of Sun's oscillation |
 
-### 6.2 Sun Position
+### 7.2 Sun Position
 
 | Property | Value | Meaning |
 |----------|-------|---------|
@@ -274,7 +274,7 @@ on the moon container below the nodal spin; with the tilt on the nodal layer
 itself, the plane silently followed the parent sum — prograde — masked by the
 RA/Dec override).
 
-### 7.1 Moon Precession Cycles (framework-native composition)
+### 8.1 Moon Precession Cycles (framework-native composition)
 
 | Layer | Period | Physical Meaning |
 |-------|--------|------------------|
@@ -305,7 +305,7 @@ barycenterEarthAndSun.pivotObj
 │     └── ...
 ```
 
-### 8.1 Planet Perihelion Precession Pattern
+### 9.1 Planet Perihelion Precession Pattern
 
 Each planet has a 4-layer precession structure with forward and reverse components (similar to Earth's perihelion layers).
 
@@ -327,7 +327,7 @@ For current computed values, see [Constants Reference](20-constants-reference.md
 
 ## Part 10: How Rotations Compose
 
-### 9.1 The Transformation Chain
+### 10.1 The Transformation Chain
 
 To find any object's world position, the engine computes the product of all parent transformation matrices:
 
@@ -337,7 +337,7 @@ WorldMatrix = M_earth × M_inclinationPrecession × M_eclipticPrecession
             × M_barycenter × M_planet
 ```
 
-### 9.2 Reference Frame Implications
+### 10.2 Reference Frame Implications
 
 **When measuring from Earth's equatorial frame:** All precession layers apply, causing apparent fluctuations in measurements.
 
@@ -378,7 +378,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 ## Part 13: Key Composition Principles
 
-### 12.1 Balancing Counter-Motions
+### 13.1 Balancing Counter-Motions
 
 The perihelion precession layers demonstrate a key principle: "Both have complete opposite values for 'Startpos' and 'Speed' because the movement of Axial precession and Inclination precession are balancing out in both ways."
 
@@ -387,7 +387,7 @@ This applies throughout the model:
 - Ecliptic tilt (-amplitude) vs. Obliquity tilt (+amplitude)
 - Perihelion 1 (forward) vs. Perihelion 2 (reverse)
 
-### 12.2 Nested Rotation Benefits
+### 13.2 Nested Rotation Benefits
 
 1. **Composability** - Each cycle is independent; changing one doesn't affect others
 2. **Accuracy** - Rotations compose mathematically correctly via matrix multiplication
@@ -432,7 +432,7 @@ This applies throughout the model:
 
 The scene graph described above operates in two rendering modes, selected by the `DEEP_TIME_MODE_ENABLED` flag in `src/script.js`.
 
-### 14.1 Snapshot mode (default — `DEEP_TIME_MODE_ENABLED = false`)
+### 15.1 Snapshot mode (`DEEP_TIME_MODE_ENABLED = false`)
 
 Modern-era / J2000-anchored simulation. Each frame's rotation is the standard snapshot multiplication described in §2.2:
 
@@ -442,7 +442,7 @@ Modern-era / J2000-anchored simulation. Each frame's rotation is the standard sn
 
 This is correct when the rate `obj.speed` has been constant since simulation start — i.e., across the modern era (~±10 millennia around J2000). The H/n divisors and per-planet periods are held at their J2000-anchored values.
 
-### 14.2 Integrator mode (`DEEP_TIME_MODE_ENABLED = true`)
+### 15.2 Integrator mode (`DEEP_TIME_MODE_ENABLED = true` — the shipped default)
 
 Deep-time / Phanerozoic / Hadean simulation. The same scene graph is rendered, but each frame's rotation is computed via **per-node integrator tags** that account for the epoch-dependent evolution of H(t), LOD(t), and planet orbital periods per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md). Four tag families cover the scene graph:
 
@@ -455,7 +455,7 @@ Deep-time / Phanerozoic / Hadean simulation. The same scene graph is rendered, b
 
 The asymmetric time-base treatment (Moon-chain stays on UT, planet orbitals go to TT) is principled, not arbitrary: doc 101's eclipse-visibility validation (19/19) was co-developed under the Moon-chain UT convention, while planets have no analogous validation tied to the time-base choice. The full rationale is in `docs/archive/old-documents/IP-planet-deep-time-scene-graph.md` (untracked archive) § "Why the asymmetry... is principled, not arbitrary".
 
-### 14.3 Both modes use the same scene graph
+### 15.3 Both modes use the same scene graph
 
 The scene-graph hierarchy from Parts 3, 7, and 8 is identical in both modes. The only difference is **how each node's rotation is computed each frame**:
 
@@ -464,7 +464,7 @@ The scene-graph hierarchy from Parts 3, 7, and 8 is identical in both modes. The
 
 Integrator mode preserves bit-equivalence to snapshot mode at the J2000 anchor (`anchor === STARTMODEL_YEAR_SI` → integrator returns 0 cycles → composition reduces to the snapshot path). At deep time, integrator mode produces physically-correct positions while snapshot mode would silently apply the J2000 rate retroactively to the full simulated interval.
 
-### 14.4 Earth's daily spin and the ΔT / LOD layering — three consumers
+### 15.4 Earth's daily spin and the ΔT / LOD layering — three consumers
 
 The three dLOD/dt layers (L1 tidal baseline · L2 + GIA α(t) · L3 + 4-flag ΔT stack) are consumed at three distinct places in `src/script.js`, each deliberately using a different depth:
 
@@ -476,7 +476,7 @@ The three dLOD/dt layers (L1 tidal baseline · L2 + GIA α(t) · L3 + 4-flag ΔT
 
 In short: **Layer 3 governs all validated rotation physics, Layer 2 governs epoch means, and the rendered globe uses a fixed J2000 convention.** Deep-time LOD/H evolution remains visible in the calculator displays and the ESSRT modal, which read `meanLodSecondsAtAge()` / `meanHAtAge()` directly.
 
-### 14.5 References
+### 15.5 References
 
 - `docs/archive/old-documents/IP-planet-deep-time-scene-graph.md` (untracked archive) — full implementation history (Phases P-A through P-F) including the math problem, frame-composition risk, per-phase rollout, naming convention summary, and the "Future Phase Z" discussion of Moon-chain TT correctness
 - [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — canonical 9-step chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, planet orbital + synodic periods

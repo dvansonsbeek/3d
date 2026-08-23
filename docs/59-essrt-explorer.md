@@ -47,7 +47,7 @@ The two-tab-row layout matches the layered look of the Climate Formula Explorer 
 
 | Tab key | Range | Label |
 |---|---|---|
-| `full` | −4,540 Ma → +1,000 Ma (5.54 Gyr) | "Full (−4.54 to +1 Gyr)" |
+| `full` | −4,498 Ma → +1,000 Ma (5.50 Gyr) | "Full (−4.5 to +1 Gyr)" |
 | `phanero` | −650 Ma → 0 Ma (Phanerozoic eon) | "Phanerozoic (650 Ma)" |
 
 The **Full** range spans from Earth-Moon genesis (~4.54 Ga) to +1 Gyr in the future, covering the entire geological + projected lifespan of the formalism. The **Phanerozoic** range zooms into the past 650 Myr where cyclostratigraphy data (Wu 2024) provides direct validation anchors.
@@ -87,7 +87,7 @@ Five geological-era vertical markers anchor the time axis:
 
 | t_cal (Ma) | Era | Color | Style |
 |---|---|---|---|
-| −4540 | Earth-Moon genesis | `#a66` reddish | dashed, 1.1 stroke |
+| −4498 | Earth-Moon genesis | `#a66` reddish | dashed, 1.1 stroke |
 | −541 | Cambrian | `#699` teal-grey | dashed, 0.8 stroke |
 | −380 | Devonian | `#6a9` green-grey | dashed, 0.8 stroke |
 | −250 | Pangea (mid) | `#c95` orange-tan | dashed, 0.8 stroke |

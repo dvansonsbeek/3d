@@ -193,13 +193,13 @@ Comparing the universal formula's output (with corrections and the moon-mass spl
 
 | Planet | Best moon | Our Sun/System | DE440 reference | Δ |
 |---|---|---|---|---|
-| Neptune | Triton | **19,412.31** | 19,412.260 | **3 ppm** |
+| Neptune | Triton | **19,412.31** | <!--v:neptuneMassRatioDE440-->19,412.237<!--/v--> | **4 ppm** |
 | Earth | Moon | **328,899.35** | 328,900.56 | **3.7 ppm** |
 | Saturn | Titan | 3,497.85 | 3,497.902 | 15 ppm |
 | Jupiter | Callisto | 1,047.40 | 1,047.349 | 49 ppm |
 | Pluto | Charon | 136,052,934 | <!--v:plutoMassRatioDE440-->136,045,556<!--/v--> | 54 ppm |
 | Uranus | Titania | 22,901.38 | <!--v:uranusMassRatioDE440-->22,902.944<!--/v--> | 68 ppm |
-| Mars | Phobos | 3,097,640 | 3,098,703.55 | 340 ppm |
+| Mars | Phobos | 3,097,640 | <!--v:marsMassRatioDE440-->3,098,703.59<!--/v--> | 343 ppm |
 
 ### Sun/Planet-Alone (after planet/moon split)
 
@@ -219,7 +219,7 @@ For planets with multiple moons, each moon's Kepler derivation yields a slightly
 
 | Planet | Our derived Sun/Alone range | DE440 reference | Spread |
 |---|---|---|---|
-| Mars (2 moons) | 3,096,545.59 – 3,097,640.56 | 3,098,703.71 | 353 ppm |
+| Mars (2 moons) | 3,096,545.59 – 3,097,640.56 | 3,098,703.75 | 353 ppm |
 | Jupiter (4 Galileans) | 1,047.487 – 1,047.827 | 1,047.566 | 325 ppm |
 | Saturn (7 majors) | 3,498.01 – 3,499.68 | 3,498.767 | 475 ppm |
 | Uranus (5 majors) | 22,895.67 – 22,903.77 | 22,905.343 | 354 ppm |

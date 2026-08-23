@@ -458,11 +458,11 @@ These are the ascending node values encoded in the `orbitTilta`/`orbitTiltb` par
 | Mars | <!--v:marsAscNodeEclJ2000-->49.55737662<!--/v-->° |
 | Jupiter | <!--v:jupiterAscNodeEclJ2000-->100.4877868<!--/v-->° |
 | Saturn | <!--v:saturnAscNodeEclJ2000-->113.6452856<!--/v-->° |
-| Uranus | 73.98118815° |
+| Uranus | 74.00919023° |
 | Neptune | <!--v:neptuneAscNodeEclJ2000-->131.7853754<!--/v-->° |
-| Pluto | 110.30347° |
-| Halley's Comet | 59.5607834844° |
-| Eros | 304.4115785804° |
+| Pluto | 110.30393° |
+| Halley's Comet | 58.42008° |
+| Eros | 304.30993° |
 
 ## Code Locations
 

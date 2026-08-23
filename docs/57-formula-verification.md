@@ -136,7 +136,7 @@ At any point the panel answers: *"Does our model agree with published celestial 
 
 ## Why this panel matters for the model's claims
 
-The Holistic Universe Model is a geometric/Fibonacci framework, not a derivation from Newtonian secular theory. A natural skeptical question is: "how does a pure Fibonacci model compare with the polynomial and N-body formulas that the astronomy community already uses?" This panel answers that question visually, quantitatively, and for nine independent quantities at once.
+The Holistic Universe Model is a geometric/Fibonacci framework, not a derivation from Newtonian secular theory. A natural skeptical question is: "how does a pure Fibonacci model compare with the polynomial and N-body formulas that the astronomy community already uses?" This panel answers that question visually, quantitatively, and for ten independent quantities at once.
 
 Cases where the model *disagrees* with a reference are also documented in the panel — rather than hidden. The residual chart and J2000 table make the gaps numerical and reproducible. Together with WebGeoCalc (the observational comparison), this panel is the second leg of the model's validation.
 

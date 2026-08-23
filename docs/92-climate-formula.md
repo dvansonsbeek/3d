@@ -194,7 +194,7 @@ Fit strategy: add a single explicit `cos(2π·t/404.5) + sin(2π·t/404.5)` pair
 
 ### 3.2 The 13H = 4.36-Myr Boulila libration (Tier A3)
 
-Position: **13H = <!--v:thirteenH-->4,359,121<!--/v--> yr** — an integer *multiple* of H, not an integer divisor of 8H (8H / 13H = 0.615 — non-integer). 13H is therefore outside the 8H/N divisor lattice; it lives as a long-period extension at the secular-resonance libration period identified by Boulila et al. 2020 at ~4.5 Myr.
+Position: **13H = <!--v:thirteenH-->4,359,121<!--/v--> yr** — an integer *multiple* of H, not an integer divisor of 8H (8H / 13H = 0.615 — non-integer). 13H is therefore outside the 8H/N divisor lattice; it lives as a long-period extension at the secular-resonance libration period identified by Boulila et al. 2018 at ~4.5 Myr.
 
 Empirical signature:
 - **Match to Boulila 2018**: 4.36 Myr (framework) vs 4.5 Myr (Boulila) = 3.1% difference
@@ -311,7 +311,7 @@ Joint-fit headlines on CENOGRID (piecewise-6 detrend, 0–67 Myr):
 
 ### 4.1 The MPT regime split (Tier A5)
 
-Doc 91 §3.3 documents post/pre Mid-Pleistocene Transition amplitude ratios:
+Doc 91 §5.4 documents post/pre Mid-Pleistocene Transition amplitude ratios:
 
 | Band | Post/pre ratio | Direction |
 |------|---------------|-----------|
@@ -347,7 +347,7 @@ Why this works:
 
 Before iNHG, LR04 is dominated by 41-kyr obliquity with smaller amplitude. After iNHG, ice volume grows secularly and amplitude ramps up. The §4.1 two-window cut (pre-MPT 1.2–3 Ma / post-MPT 0–1 Ma) straddles iNHG.
 
-The sharper three-regime split — **pre-iNHG (2.7–5.3 Ma) / iNHG-to-MPT (1.0–2.7 Ma) / post-MPT (0–1.0 Ma)** — is **now the canonical fit** (§9.3): R² = 0.430 / 0.723 / 0.868 respectively. The pre-iNHG R² = 0.44 is genuinely lower than the broader pre-MPT 0.72 because the pre-iNHG regime has no Northern Hemisphere ice sheets and therefore weaker orbital amplification — see §8.4 R3-3.
+The sharper three-regime split — **pre-iNHG (2.7–5.3 Ma) / iNHG-to-MPT (1.0–2.7 Ma) / post-MPT (0–1.0 Ma)** — is **now the canonical fit** (§9.3): R² = 0.430 / 0.723 / 0.8735 respectively. The pre-iNHG R² = 0.44 is genuinely lower than the broader pre-MPT 0.72 because the pre-iNHG regime has no Northern Hemisphere ice sheets and therefore weaker orbital amplification — see §8.4 R3-3.
 
 ### 4.3 Cenozoic secular trend (CENOGRID only)
 
@@ -808,7 +808,7 @@ The Boulila 2018 match (4.36 Myr vs 4.5 Myr ≈ 3% difference) and the strong δ
 3. **L1/L2 dichotomy is empirical, not architectural**: ratio classification works at the per-line level
 4. **Step components at known transitions add huge δ¹⁸O variance on CENOGRID** (B5, R² 0.03 → 0.68)
 5. **MPT is a true regime change**: line amplitudes don't transfer across it
-6. **Per-regime R² is high** (post-MPT 0.90, iNHG-MPT 0.73, pre-iNHG 0.44, EPICA CO₂ 0.90)
+6. **Per-regime R² is high** (post-MPT 0.8735, iNHG-MPT 0.73, pre-iNHG 0.44, EPICA CO₂ 0.8452)
 
 **Cautioned findings**:
 1. **L2 lines are not linear responses to L1**: simple ODE models don't apply (R3-2)
@@ -838,9 +838,9 @@ into a canonical, deployable formula at
 
 ### Inclusion / exclusion summary
 
-The canonical formula is **31 + 3 + 6 = 40 structural components**. The variance-budget research investigated more — some were absorbed into L1 by collinearity, some failed cross-window stability, some were captured implicitly via existing components, some failed promotion criteria. The full inventory:
+The canonical formula is **32 + 3 + 6 = 41 structural components**. The variance-budget research investigated more — some were absorbed into L1 by collinearity, some failed cross-window stability, some were captured implicitly via existing components, some failed promotion criteria. The full inventory:
 
-**Deployed in canonical formula (40 components):**
+**Deployed in canonical formula (41 components):**
 
 | Layer | Count | What | Investigation trail |
 |---|---:|---|---|
@@ -1017,7 +1017,7 @@ state = f.to_dict()         # serializable fitted coefficients + window + L3 tra
 The formula's predictive power is **honest about its limits**:
 
 - **Within the current (post-MPT) regime**: high confidence, R² = 0.87 baseline + L2/L3 refinements
-- **Forward 0–250 kyr from now**: stays in post-MPT regime, no scheduled boundary-condition shift — projection is in-scope. With the ridge fix in §9.5, the predicted forward range stays inside the LR04 data range (peak-to-peak ≈ 2.2 ‰); plain OLS would extrapolate to peak-to-peak ≈ 23.7 ‰, which is unphysical.
+- **Forward 0–250 kyr from now**: stays in post-MPT regime, no scheduled boundary-condition shift — projection is in-scope. With the ridge fix in §9.5, the predicted forward range stays inside the LR04 data range (peak-to-peak ≈ 4.8 ‰ in the full canonical projection — §9.7's table; §9.5's ridge-diagnostic figure alone reads 2.2 ‰); plain OLS would extrapolate to peak-to-peak ≈ 23.7 ‰, which is unphysical.
 - **Forward >250 kyr or backward across MPT/iNHG**: out of scope — the C5/R3-3 forward-prediction tests showed R² goes catastrophically negative when crossing regime boundaries
 
 #### Canonical forward projection — next 250 kyr
@@ -1352,6 +1352,6 @@ All four scripts deterministic — no random seeds, identical output on rerun.
 ## See Also
 
 - [10 — Fibonacci Laws](10-fibonacci-laws.md) — the underlying 8H lattice structure (Law 1)
-- [16 — Milankovitch Language](90-milankovitch-language.md) — framework terminology, Berger / Laskar eigenmode notation, 5 H-divisor periods
-- [17 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) — empirical 25/32-integer fit (§2), per-planet contributions (§3), 100-kyr-band centroid (§4), pre-MPT/post-MPT analysis (§5), pre-registered super-cycle null (§§8–11), 14 follow-up hypothesis tests (§12), 405-kyr off-lattice characterization (§13)
+- [90 — Milankovitch Language](90-milankovitch-language.md) — framework terminology, Berger / Laskar eigenmode notation, 5 H-divisor periods
+- [91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) — empirical 25/32-integer fit (§2), per-planet contributions (§3), 100-kyr-band centroid (§4), pre-MPT/post-MPT analysis (§5), pre-registered super-cycle null (§§8–11), 14 follow-up hypothesis tests (§12), 405-kyr off-lattice characterization (§13)
 - [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); per-driver Δ-H formulas relevant for the 13H Boulila comparison and the 67-Myr CENOGRID window

@@ -9,7 +9,7 @@ status: current
 
 ## Overview
 
-The Planet Hierarchy Inspector displays orbital plane information for Step 4 objects (PerihelionFromSun). This document describes how the calculations work, including the **dynamic ascending node** feature that updates orbital plane visualizations in real-time as Earth's obliquity changes.
+The Planet Hierarchy Inspector displays orbital plane information for Step 4 objects (`[Planet]RealPerihelionAtSun`). This document describes how the calculations work, including the **dynamic ascending node** feature that updates orbital plane visualizations in real-time as Earth's obliquity changes.
 
 **Related Documentation:**
 - [Ascending Node Calculations](31-ascending-node-calculations.md) - Full details on the ascending node calculation algorithm
@@ -43,7 +43,7 @@ Therefore:
 
 ### Example: Venus
 ```javascript
-const venusEclipticInclinationJ2000 = 3.394667;    // i = 3.39°
+const venusEclipticInclinationJ2000 = 3.39467605;  // i = 3.39°
 const venusAscendingNode = 76.67877109;      // Ω = 76.68°
 
 // Calculated values:
@@ -182,6 +182,14 @@ for (let i = 0; i < numSamples; i++) {
 }
 ```
 
+> **Note on the crossing sense**: this excerpt labels a negative→positive world-y
+> crossing "descending" because the *sampling loop* here runs in the clockwise
+> orbital direction; §8's algorithm description ("ascending: y negative →
+> positive") states the convention in the physical orbital direction. The
+> shipped code computes `ascendingNodePos` directly from the node angle
+> (`descendingNodePos` is its point reflection), so neither sampling comment is
+> load-bearing.
+
 ### Half-Plane Coloring
 
 - **Green half-plane**: Segments where WORLD y > 0 (above ecliptic)
@@ -196,7 +204,7 @@ The geometry uses LOCAL positions (flat at y=0), but the coloring decision uses 
 ### Venus Orbital Parameters
 | Parameter | Value | Source |
 |-----------|-------|--------|
-| Orbital inclination | 3.394667° | Model constant |
+| Orbital inclination | 3.39467605° | Model constant |
 | Ascending node longitude | <!--v:venusAscNodeEclJ2000-->76.67877109<!--/v-->° | Model constant |
 
 ### Calendar Dates to Ecliptic Longitude (Approximate)

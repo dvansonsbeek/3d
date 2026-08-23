@@ -10,8 +10,8 @@ directories · 237 Python files · 71 docs · two web UIs (simulator, `dashboard
 **`npm run check` enforces a nineteen-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
-Golden masters live in `packages/fixtures/`. Of the 23 scripts in `tools/verify/`,
-only 5 can actually fail — see the Verification section.
+Golden masters live in `packages/fixtures/`. Of the 26 scripts in `tools/verify/`,
+only 7 can actually fail — see the Verification section.
 
 ---
 
@@ -142,10 +142,10 @@ chain at ±1/±5 Myr; the golden master cannot catch that class).
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
-`/gates` runs the standalone model checks. `tools/verify/` holds 24 scripts, and
-**18 of them cannot fail** — no exit path, no assertion, so running them proves
-nothing. `npm run test:verify:list` gives the classification: 6 gate · 4 liftable
-· 10 narrative · 4 generator (the suite FAILS on any unclassified script). **Never
+`/gates` runs the standalone model checks. `tools/verify/` holds 26 scripts, and
+**19 of them cannot fail** — no exit path, no assertion, so running them proves
+nothing. `npm run test:verify:list` gives the classification: 7 gate · 4 liftable
+· 10 narrative · 5 generator (the suite FAILS on any unclassified script). **Never
 run a generator as a test** — `balance-search.js` rewrites the tracked
 `data/balance-presets.json`, and the three campaign generators
 (cassini-results / lod-climate-correlation / eclipse-audit) rewrite their
@@ -189,7 +189,7 @@ what actually made corrections stick here.
 | `src/script.js` | browser scene + UI + formulas (monolith) |
 | `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
-| `tools/verify/` | 24 scripts: 6 gate · 4 liftable · 10 narrative · 4 generator (`npm run test:verify:list`) |
+| `tools/verify/` | 26 scripts: 7 gate · 4 liftable · 10 narrative · 5 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | 140 research one-offs — findings live in `docs/` |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |

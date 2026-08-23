@@ -59,10 +59,10 @@ This section documents the timescale hierarchy that forms Law 1 of the Fibonacci
 | 5 | H/5 | **<!--v:hDiv5-->67,063<!--/v-->** | Ecliptic precession |
 | 8 | H/8 | **<!--v:hDiv8-->41,915<!--/v-->** | Obliquity cycle |
 | 13 | H/13 | **<!--v:earthAxialPeriod-->25,794<!--/v-->** | Axial precession |
-| 21 | H/21 | **15,953** | Beat: axial + obliquity |
-| 34 | H/34 | **9,853** | Beat: axial + ecliptic |
-| 55 | H/55 | **6,091** | Higher-order resonance |
-| 89 | H/89 | **3,764** | Higher-order resonance |
+| 21 | H/21 | **15,967** | Beat: axial + obliquity (13 + 8) |
+| 34 | H/34 | **9,862** | Beat: axial + H/21 (13 + 21) |
+| 55 | H/55 | **6,097** | Higher-order resonance |
+| 89 | H/89 | **3,768** | Higher-order resonance |
 
 The gas giants' perihelions sit on the 8H lattice **one integer off** the nearest Fibonacci anchors. Jupiter's ecliptic perihelion is **8H/39** (Fibonacci anchor H/5 = 8H/40), Jupiter's ICRF perihelion is **8H/65** (anchor H/8 = 8H/64), Saturn's ecliptic perihelion is **−8H/65** (same anchor, retrograde), and Saturn's ICRF perihelion is **8H/169** (anchor H/21 = 8H/168). Jupiter's ICRF perihelion and Saturn's ecliptic perihelion share the same **8H/65** period — the **Law 6 gas-giant lock** that drives Earth's obliquity beat, one 8H-lattice step from Earth's Fibonacci anchor H/8 = 8H/64. This one-step offset is the subject of Law 6, not Law 1. The remaining planets' precession periods divide 8H by various integers, mostly non-Fibonacci.
 
@@ -119,7 +119,7 @@ When these angular rates combine, they create new "sideband" frequencies through
 | 2×(φ_E - φ_M) + (φ_E + φ_M) | **8H/373** | Dominant mixing frequency |
 | 2×(φ_E - φ_M) - (φ_E + φ_M) | **8H/95** | Difference mixing frequency |
 | 2×φ_M | H×4/11 | Mercury double-angle |
-| Jupiter perihelion | **H/5** | Saturn-Jupiter resonance |
+| Jupiter perihelion | **H/5** (Fibonacci anchor; lattice secular period is 8H/39) | Saturn-Jupiter resonance |
 | Mercury/22 | **H×4/121** | Mercury harmonic |
 | Saturn×0.30 | **H×3/80** | Saturn fraction |
 | H/34 (Fibonacci) | **H/34** | Earth + Saturn beat |
@@ -140,7 +140,7 @@ All periods in the formula have physical derivations:
 | **H×3/80** | Saturn×0.30 fraction | (H/8) × 0.30 |
 | **H/34** | Fibonacci hierarchy | H ÷ 34 |
 | **H×8/561** | Mercury/51 harmonic | (H×8/11) ÷ 51 |
-| **H/91** | Mars/21 Fibonacci harmonic | (H×8/35) ÷ (91/35) = H/91 |
+| **H/91** | Mars-derived harmonic (fit-era identity, built on the pre-8H/36 Mars period H×8/35) | (H×8/35) ÷ (8×91/35) = H/91 |
 
 **Note**: The periods are all physically derived from Mercury, Jupiter, Saturn, or Fibonacci harmonics.
 
@@ -629,7 +629,7 @@ $$
 
 Where:
 - $\frac{d\theta_E}{dt}$ = Instantaneous Earth perihelion rate (°/year)
-- $\omega_0 = \frac{360°}{H/16} = 0.01720°$/year — Expected (mean) rate
+- $\omega_0 = \frac{360°}{H/16} = 0.017178°$/year — Expected (mean) rate
 
 The derivative is computed as:
 
@@ -786,7 +786,7 @@ Each planet's obliquity oscillates over time as its orbital plane tilts relative
 obliquity(t) = axialTilt_J2000 + (inclination(t) - inclination(J2000))
 ```
 
-where `inclination(t)` is the dynamic invariable-plane inclination from `calc_planet_inclination()`. This anchors the obliquity to the known J2000 axial tilt and ties the oscillation to the inclination dynamics.
+where `inclination(t)` is the dynamic invariable-plane inclination from `calc_planet_inclination()`. This anchors the obliquity to the known J2000 axial tilt and ties the oscillation to the inclination dynamics. **Note:** this single-component form is the Python pipeline's approximation (`predictive_formula.py`); the shipped JS runtimes (`computePlanetObliquity` in `src/script.js` and `tools/lib/orbital-engine.js`) use the **two-component** law (−A·cos ωᵢt + A·cos ωₒt) documented in doc 37 § "Two-component obliquity formula".
 
 **Predicted obliquity cycles:**
 

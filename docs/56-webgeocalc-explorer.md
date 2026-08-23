@@ -141,7 +141,7 @@ The model's instantaneous rate at year Y is:
 ```
 
 - **Baseline rate**: constant, equal to `360°·3600 / H·fraction = Fibonacci long-term mean`.
-- **Missing advance**: year-dependent, fitted via the 429-term `PREDICT_COEFFS` predictive formula to reproduce observed behaviour.
+- **Missing advance**: year-dependent, fitted via the unified `PREDICT_COEFFS` predictive formula (~2,400 coefficients per planet) to reproduce observed behaviour.
 
 The yellow and blue curves tracking each other over 1900–2026 is the visual validation that the Fibonacci + missing-advance combination matches the 1900–2026 reality.
 

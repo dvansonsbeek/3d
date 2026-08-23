@@ -1378,7 +1378,7 @@ The remaining steps were executed as a systematic campaign covering:
 
 All 9 targets within 0.22°. Seven under 0.06°. Average improvement: 98%.
 
-> **Note**: The Sun improved from 0.065° to 0.003° after the IAU precession frame correction was applied (see §8.5). correctionSun was subsequently retuned to 0.49552 (earthRAAngle is now derived: 2A − A²/ε ≈ 1.25478). Parallax tiers were expanded again after this log froze — the shipped correction tables hold **78 slots for Mercury/Venus and 68 for the other planets**. Reference data spans ~1800–2200 for most planets. See `docs/67-planet-parallax-corrections.md` for current details.
+> **Note**: The Sun improved from 0.065° to 0.003° after the IAU precession frame correction was applied (see §8.5). correctionSun was subsequently retuned (currently 0.49688; earthRAAngle is now derived: 2A − A²/ε ≈ 1.25478). Parallax tiers were expanded again after this log froze — the shipped correction tables hold **78 slots for Mercury/Venus and 68 for the other planets**. Reference data spans ~1800–2200 for most planets. See `docs/67-planet-parallax-corrections.md` for current details.
 
 ### 8.5 JPL Reference Frame Limitation — Critical Finding
 
@@ -1486,7 +1486,7 @@ Once the tool is built, Claude runs this self-improving loop in two stages:
 | `tools/lib/precession.js` | all | IAU 1976 precession correction |
 | `docs/41-scene-graph-hierarchy.md` | all | Complete scene graph hierarchy documentation |
 | `docs/10-fibonacci-laws.md` | all | Six Fibonacci Laws, mirror pairs, resonance loop, psi-constant |
-| `docs/hidden/testscripts/*.js` | all | ~80 existing standalone optimization scripts |
+| `docs/archive/testscripts/*.js` (untracked archive) | all | ~70 standalone optimization scripts |
 
 ---
 

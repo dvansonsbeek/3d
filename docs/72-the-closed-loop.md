@@ -105,7 +105,7 @@ Not to be confused with the ascending node on the ecliptic, which is the commonl
 
 The Fibonacci divisors and balance groups produce two independent balance conditions:
 
-- **Inclination balance** (Law 3): The angular-momentum-weighted inclination oscillations of seven in-phase planets balance against Saturn's anti-phase oscillation. Result: **99.9975%**.
+- **Inclination balance** (Law 3): The angular-momentum-weighted inclination oscillations of seven in-phase planets balance against Saturn's anti-phase oscillation. Result: **99.9974%**.
 
 - **Eccentricity balance** (Law 5): The same divisors and groups produce a balance on base eccentricities. Result: **99.86%**.
 

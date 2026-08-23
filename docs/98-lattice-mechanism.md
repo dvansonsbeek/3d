@@ -599,15 +599,15 @@ LL doesn't capture).
 | Eigenfrequency × 8H | Nearest integer | Error |
 |---:|---:|---:|
 | 1.314 (Neptune g) | 1 | **31.4%** ✗ |
-| 5.603 (Mars g) | 6 | 6.6% |
-| 7.725 (Earth g) | 8 | 3.4% ✓ |
-| 11.304 (Venus g) | 11 | 2.8% ✓ |
-| 15.202 (Mercury g) | 15 | 1.3% ✓ |
-| 35.866 (Jupiter g) | 36 | 0.4% ✓ |
+| 5.603 (Uranus g₇) | 6 | 6.6% |
+| 7.725 (Jupiter g₅) | 8 | 3.4% ✓ |
+| 11.304 (Mercury g₁) | 11 | 2.8% ✓ |
+| 15.202 (Venus g₂) | 15 | 1.3% ✓ |
+| 35.866 (Earth g₃) | 36 | 0.4% ✓ |
 | 37.258 | 37 | 0.7% ✓ |
 | 46.606 (Saturn g, undercomputed) | 47 | 0.8% ✓ |
 | 53.801 (Saturn s) | 54 | 0.4% ✓ |
-| 38.796 (Jupiter s) | 39 | 0.5% ✓ |
+| 38.796 (Earth s₃) | 39 | 0.5% ✓ |
 | 36.494, 13.597, 10.764, 6.020 | 36, 14, 11, 6 | 0.3-2.9% ✓ |
 | 1.405 (Neptune s) | 1 | **40.5%** ✗ |
 
@@ -802,7 +802,7 @@ tested the integer-label-invariance claim directly across the
 -50 Myr Cenozoic. The result splits cleanly along the k-involving / pure
 orbital boundary:
 
-- **k-involving obliquity main beats** (n=65 k+s₃, n=66 k+s₄): max |shift|
+- **k-involving obliquity main beats** (n=65 k+s₃, n=68 k+s₄): max |shift|
   *decreases* under the proper-physics 8H(t)/n lattice — by 0.4 percentage
   points on both. The framework's predicted LOD-driven shift correctly
   captures their deep-time evolution.

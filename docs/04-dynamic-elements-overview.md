@@ -245,7 +245,7 @@ Saturn's published JPL ecliptic-inclination trend (`+0.00194°/century`, increas
 
 2. **Asc-node integer assignment**: Saturn (and the other six fitted planets) now use `ascendingNodeCyclesIn8H` integers chosen to match the J2000-frame JPL trends to <2″/century. See [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) for the full integer assignment.
 
-The total trend error across all 7 fitted planets in the J2000-fixed frame is now ~4.3″/century, all directions match JPL, and Saturn's residual is the second-largest (1.7″) after a small structural Saturn LL-bound excess (~0.025°) that is being tracked separately.
+The total trend error across all 7 fitted planets in the J2000-fixed frame is now ~4.3″/century, all directions match JPL, and Saturn's residual is the second-largest (1.7″) after a small structural Saturn LL-bound excess (~0.030°) that is being tracked separately.
 
 ## Detailed Planet Behavior
 

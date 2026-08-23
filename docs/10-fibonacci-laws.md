@@ -68,10 +68,10 @@ Switching Earth to M_Earth_SYSTEM would shift ψ and K each by 0.612% (= √(82.
 | Venus | 2.4478 × 10⁻⁶ | 1.564 × 10⁻³ | <!--v:venusSemiMajor-->0.7233<!--/v--> | 0.0068 | 2.1545 | 54.70 |
 | Earth | 3.0027 × 10⁻⁶ | 1.733 × 10⁻³ | <!--v:earthSemiMajor-->1.0000<!--/v--> | 0.0167 | 1.5787 | <!--v:earthAscNodeJ2000-->284.51<!--/v--> |
 | Mars | 3.2271 × 10⁻⁷ | 5.681 × 10⁻⁴ | <!--v:marsSemiMajor-->1.5237<!--/v--> | 0.0934 | 1.6312 | <!--v:marsOmegaJ2000-->354.87<!--/v--> |
-| Jupiter | 9.5479 × 10⁻⁴ | 3.090 × 10⁻² | 5.2029 | 0.0484 | 0.3220 | <!--v:jupiterOmegaJ2000-->312.89<!--/v--> |
-| Saturn | 2.8588 × 10⁻⁴ | 1.691 × 10⁻² | 9.5367 | 0.0539 | 0.9255 | <!--v:saturnOmegaJ2000-->118.81<!--/v--> |
-| Uranus | 4.3662 × 10⁻⁵ | 6.608 × 10⁻³ | 19.189 | 0.0473 | 0.9947 | <!--v:uranusOmegaJ2000-->307.80<!--/v--> |
-| Neptune | 5.1514 × 10⁻⁵ | 7.177 × 10⁻³ | 30.070 | 0.0086 | 0.7354 | <!--v:neptuneOmegaJ2000-->192.04<!--/v--> |
+| Jupiter | 9.5479 × 10⁻⁴ | 3.090 × 10⁻² | 5.1996 | 0.0484 | 0.3220 | <!--v:jupiterOmegaJ2000-->312.89<!--/v--> |
+| Saturn | 2.8588 × 10⁻⁴ | 1.691 × 10⁻² | 9.5310 | 0.0539 | 0.9255 | <!--v:saturnOmegaJ2000-->118.81<!--/v--> |
+| Uranus | 4.3662 × 10⁻⁵ | 6.608 × 10⁻³ | 19.1408 | 0.0473 | 0.9947 | <!--v:uranusOmegaJ2000-->307.80<!--/v--> |
+| Neptune | 5.1514 × 10⁻⁵ | 7.177 × 10⁻³ | 29.9282 | 0.0086 | 0.7354 | <!--v:neptuneOmegaJ2000-->192.04<!--/v--> |
 
 Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invariable plane at J2000, Ω J2000 = longitude of ascending node on the invariable plane at J2000 epoch (Souami & Souchay 2012, verified).
 
@@ -92,7 +92,7 @@ Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invari
 | 8 | H/8 | Obliquity cycle |
 | 13 | H/13 | Axial precession |
 | 21 | H/21 | Beat: axial + obliquity |
-| 34 | H/34 | Beat: axial + ecliptic |
+| 34 | H/34 | Beat: axial (13) + H/21 (21) |
 
 Beat frequency rule: `1/H(n) + 1/H(n+1) = 1/H(n+2)` — an algebraic identity from the Fibonacci recurrence (3+5=8, 5+8=13, 8+13=21, …).
 
@@ -126,7 +126,7 @@ Substituting Law 2 and simplifying:
 where w_j = √(m_j × a_j(1-e_j²)) / d_j
 ```
 
-**Result: 99.9975% balance.** See [Inclination Balance Derivation](#inclination-balance-derivation) for the full treatment.
+**Result: 99.9974% balance.** See [Inclination Balance Derivation](#inclination-balance-derivation) for the full treatment.
 
 ### Law 4: The Eccentricity Amplitude Constant K
 
@@ -274,14 +274,14 @@ The exhaustive search evaluates <!--v:configSearchSpace-->7,558,272<!--/v--> can
 | Inclination balance ≥ <!--v:balanceThreshold-->99.994%<!--/v--> (TNO margin) | 767 |
 | + Eccentricity balance ≥ 99% | 96 |
 | + Per-config optimised anchor gives LL bounds 8/8 | 51 |
-| + Direction match + rate error ≤ 5″ (Jupiter–Saturn shared ascending node) | 42 |
+| + Direction match + rate error ≤ 6″ (Jupiter–Saturn shared ascending node) | 15 |
 | + Mirror symmetry | **1** |
 
 Each of the 96 candidates passing both balance thresholds is evaluated at its own optimal anchor position (*n*) and ascending node integers (*N* per planet), making the LL and direction checks fair — not biased toward any single configuration. Jupiter and Saturn are constrained to share the same *N*.
 
-**Per-config eccentricity balance** (deep analysis refinement): after the optimal *n* is found for each candidate, the base eccentricities are **recomputed using the candidate's own d-values, anti-phase assignments, and that optimal anchor** — not the default config's bases. This is the fair comparison: each config is evaluated against its own physical reference point. Final ranking uses this per-config eccentricity balance. Under this fair ranking, the default configuration places at #11 of 42 survivors; top non-mirror configs reach ~99.999% (at anchors n=0 or n=4 with different anti-phase patterns), while mirror symmetry remains the unique structural property of the default.
+**Per-config eccentricity balance** (deep analysis refinement): after the optimal *n* is found for each candidate, the base eccentricities are **recomputed using the candidate's own d-values, anti-phase assignments, and that optimal anchor** — not the default config's bases. This is the fair comparison: each config is evaluated against its own physical reference point. Final ranking uses this per-config eccentricity balance. Under this fair ranking, the default configuration places at #4 of 15 survivors; top non-mirror configs reach ~99.999% (at anchors n=0 or n=4 with different anti-phase patterns), while mirror symmetry remains the unique structural property of the default.
 
-The sole mirror-symmetric survivor is the **default configuration** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34), ranking #11 of 42 by eccentricity balance (99.86%). All 42 candidates are available for comparison in the [interactive Balance Explorer](https://3d.holisticuniverse.com).
+The sole mirror-symmetric survivor is the **default configuration** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34), ranking #4 of 15 by eccentricity balance (99.86%). All 15 survivors are available for comparison in the [interactive Balance Explorer](https://3d.holisticuniverse.com).
 
 **Key structural constraints:**
 
@@ -298,7 +298,7 @@ The eccentricity balance (Law 5) is genuinely independent from the inclination b
 - The weight formulas differ: `w_j = √(m·a(1-e²))/d` (inclination) vs `v_j = √m × a^(3/2) × e / √d` (eccentricity)
 - The ratio v_j/w_j varies by a factor of ~150 across planets — the two balance conditions are not proportional
 - The coefficient `√m × a^(3/2) / √d` alone (without e) gives only 74% balance; the actual eccentricity values improve it to 99.86%
-- Random eccentricity values in the same weight formula give 50–85% balance
+- Random eccentricity values in the same weight formula rarely reach the shipped balance (19 of 1,000 random trials exceed 99%, per `verify-laws.js` Finding 3)
 
 The two balances also differ structurally. The inclination balance is a **global** property — all mass in the solar system contributes (TNOs provide a 0.0002% correction). The eccentricity balance is a **closed-system** property of the 8 planets — the mirror pairs act as "communicating vessels" exchanging Angular Momentum Deficit (AMD), and TNOs cannot participate because (a) they lack paired counterparts, (b) the a^(3/2) weighting makes them far too heavy for any Fibonacci d-factor, and (c) they are test particles that cannot shape the eigenmode structure. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the quantitative analysis.
 
@@ -312,10 +312,10 @@ e_Saturn = Σ(in-phase group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 
 | Source | e_Saturn | vs J2000 |
 |--------|----------|----------|
-| Law 5 prediction (eccentricity balance) | 0.053728 | −0.23% |
-| J2000 observed (JPL DE440) | 0.053858 | — |
+| Law 5 prediction (eccentricity balance) | 0.0537191 | −0.27% |
+| J2000 observed (JPL DE440) | 0.0538658 | — |
 
-**Why this is significant:** Saturn's eccentricity oscillates secularly between ~0.01 and ~0.09 (a factor-of-9 dynamic range). Law 5 — an equation involving all eight planets simultaneously — predicts the J2000 value to within 0.23% from a single balance condition that was originally derived from Fibonacci d-values chosen to satisfy Law 3 (inclination balance), not Law 5. This is a non-trivial cross-validation: the d-values were not optimized for eccentricity, yet they produce an eccentricity balance equation that predicts Saturn's eccentricity to within ~0.2% of the observed value.
+**Why this is significant:** Saturn's eccentricity oscillates secularly between ~0.01 and ~0.09 (a factor-of-9 dynamic range). Law 5 — an equation involving all eight planets simultaneously — predicts the J2000 value to within 0.27% from a single balance condition that was originally derived from Fibonacci d-values chosen to satisfy Law 3 (inclination balance), not Law 5. This is a non-trivial cross-validation: the d-values were not optimized for eccentricity, yet they produce an eccentricity balance equation that predicts Saturn's eccentricity to within ~0.2% of the observed value.
 
 **Epoch independence:** The agreement is not specific to the J2000 epoch. The mirror pairs act as communicating vessels that exchange AMD (Angular Momentum Deficit) secularly: when Saturn's eccentricity rises, Earth's falls, and vice versa. When all four pairs co-evolve with AMD conservation, Law 5's balance stays within 99.8–99.9% across Saturn's entire upper secular range (e = 0.054–0.088), compared to a 36–100% swing if Saturn oscillated alone. See [epoch-independence.js](../tools/verify/epoch-independence.js) for the full analysis.
 
@@ -380,8 +380,8 @@ Where `w_j = √(m_j × a_j(1-e_j²)) / d_j` is the structural weight for each p
 Σ(in-phase) w = 1.7374 × 10⁻²
 Σ(anti-phase)  w = 1.7374 × 10⁻²
 
-Difference: 9.6 × 10⁻⁷
-Balance: 99.9975%
+Difference: 8.87 × 10⁻⁷
+Balance: 99.9974%
 ```
 
 Jupiter (d=5) contributes the dominant in-phase weight (1.408 × 10⁻²). The remaining six planets collectively contribute 3.29 × 10⁻³ to match Saturn's total of 1.737 × 10⁻².
@@ -432,9 +432,9 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 | Planet | Group | d | v_j = √m × a^(3/2) × e / √d |
 |--------|-------|---|------|
 | Mercury | In-phase | 21 | 4.404 × 10⁻⁶ |
-| Venus | In-phase | 34 | 1.119 × 10⁻⁶ |
-| Earth | In-phase | 3 | 1.672 × 10⁻⁵ |
-| Mars | In-phase | 5 | 4.463 × 10⁻⁵ |
+| Venus | In-phase | 34 | 1.272 × 10⁻⁶ |
+| Earth | In-phase | 3 | 1.539 × 10⁻⁵ |
+| Mars | In-phase | 5 | 4.379 × 10⁻⁵ |
 | Jupiter | In-phase | 5 | <!--v:jupiterEccWeightSci-->7.928 × 10⁻³<!--/v--> |
 | Uranus | In-phase | 21 | <!--v:uranusEccWeightSci-->5.705 × 10⁻³<!--/v--> |
 | Neptune | In-phase | 34 | 1.734 × 10⁻³ |
@@ -447,7 +447,7 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 Balance: 99.8636%
 ```
 
-Saturn alone carries the entire anti-phase contribution. The in-phase group is dominated by Jupiter (<!--v:jupiterEccWeightSci-->7.928 × 10⁻³<!--/v-->), Uranus (<!--v:uranusEccWeightSci-->5.705 × 10⁻³<!--/v-->), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.6 × 10⁻⁵ combined.
+Saturn alone carries the entire anti-phase contribution. The in-phase group is dominated by Jupiter (<!--v:jupiterEccWeightSci-->7.928 × 10⁻³<!--/v-->), Uranus (<!--v:uranusEccWeightSci-->5.705 × 10⁻³<!--/v-->), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.5 × 10⁻⁵ combined.
 
 ### Mirror Pair Decomposition
 
@@ -455,13 +455,13 @@ The gap decomposes by mirror pair into four contributions that nearly cancel:
 
 | Pair | d | Gap contribution | % of total gap |
 |------|---|-----------------|----------------|
-| Earth ↔ Saturn | 3 | +1.545 × 10⁻² | +42,504% |
-| Mars ↔ Jupiter | 5 | −7.973 × 10⁻³ | −21,928% |
-| Mercury ↔ Uranus | 21 | −5.710 × 10⁻³ | −15,704% |
-| Venus ↔ Neptune | 34 | −1.735 × 10⁻³ | −4,773% |
-| **Sum** | | **3.636 × 10⁻⁵** | **100%** |
+| Earth ↔ Saturn | 3 | +1.546 × 10⁻² | +36,680% |
+| Mars ↔ Jupiter | 5 | −7.972 × 10⁻³ | −18,917% |
+| Mercury ↔ Uranus | 21 | −5.709 × 10⁻³ | −13,548% |
+| Venus ↔ Neptune | 34 | −1.735 × 10⁻³ | −4,115% |
+| **Sum** | | **4.214 × 10⁻⁵** | **100%** |
 
-Four numbers spanning ±42,000% cancel to leave a negligible residual. The Earth–Saturn pair dominates because Saturn (anti-phase group) is 925× heavier than Earth in eccentricity weight, creating a large surplus. The three in-phase-only pairs (Mars–Jupiter, Mercury–Uranus, Venus–Neptune) collectively compensate, with Jupiter and Uranus providing the bulk of the compensation. The balance emerges from the "communicating vessel" structure of AMD exchange between paired planets.
+Four numbers spanning ±37,000% cancel to leave a negligible residual. The Earth–Saturn pair dominates because Saturn (anti-phase group) is ~1,005× heavier than Earth in eccentricity weight, creating a large surplus. The three in-phase-only pairs (Mars–Jupiter, Mercury–Uranus, Venus–Neptune) collectively compensate, with Jupiter and Uranus providing the bulk of the compensation. The balance emerges from the "communicating vessel" structure of AMD exchange between paired planets.
 
 ### Non-Triviality
 
@@ -508,18 +508,18 @@ The eccentricity balance (Law 5) operates on linear e rather than e², suggestin
 
 | Planet | d | Phase | Amplitude (°) | Mean (°) | Range (°) | LL bounds (°) | Margin (°) |
 |--------|---|-------|---------------|----------|-----------|---------------|-----------|
-| Mercury | 21 | In-phase | 0.386 | 6.728 | 6.34 – 7.11 | 4.57 – 9.86 | +1.772 |
-| Venus | 34 | In-phase | 0.062 | 2.208 | 2.15 – 2.27 | 0.00 – 3.38 | +1.110 |
-| Earth | 3 | In-phase | 0.636 | 1.481 | 0.85 – 2.12 | 0.00 – 2.95 | +0.833 |
-| Mars | 5 | In-phase | 1.163 | 2.653 | 1.49 – 3.82 | 0.00 – 5.84 | +1.491 |
-| Jupiter | 5 | In-phase | 0.021 | 0.329 | 0.31 – 0.35 | 0.24 – 0.49 | +0.067 |
-| Saturn | 3 | Anti-phase | 0.065 | 0.932 | 0.87 – 1.00 | 0.797 – 1.02 | +0.023 |
-| Uranus | 21 | In-phase | 0.024 | 1.001 | 0.98 – 1.02 | 0.90 – 1.11 | +0.075 |
-| Neptune | 34 | In-phase | 0.014 | 0.722 | 0.71 – 0.74 | 0.55 – 0.80 | +0.064 |
+| Mercury | 21 | In-phase | 0.386 | 6.703 | 6.32 – 7.09 | 4.57 – 9.86 | +1.75 |
+| Venus | 34 | In-phase | 0.062 | 2.151 | 2.09 – 2.21 | 0.00 – 3.38 | +1.17 |
+| Earth | 3 | In-phase | 0.636 | 1.481 | 0.85 – 2.12 | 0.00 – 2.95 | +0.83 |
+| Mars | 5 | In-phase | 1.164 | 1.833 | 0.67 – 3.00 | 0.00 – 5.84 | +0.67 |
+| Jupiter | 5 | In-phase | 0.021 | 0.321 | 0.30 – 0.34 | 0.24 – 0.49 | +0.06 |
+| Saturn | 3 | Anti-phase | 0.065 | 0.985 | 0.92 – 1.05 | 0.797 – 1.02 | **−0.03** |
+| Uranus | 21 | In-phase | 0.024 | 1.015 | 0.99 – 1.04 | 0.90 – 1.11 | +0.07 |
+| Neptune | 34 | In-phase | 0.014 | 0.744 | 0.73 – 0.76 | 0.55 – 0.80 | +0.04 |
 
-**LL bounds: 8/8 pass** — All 8 planets' inclination ranges fit within Laplace-Lagrange secular theory bounds.
+**LL bounds: 7/8 pass** — Saturn's range exceeds its Laplace-Lagrange upper bound by 0.030° (the documented margin case, `verify-laws` checks 44/45); the other seven planets fit.
 
-The non-trivial test is that these Fibonacci divisors simultaneously satisfy three independent constraints: (1) all 8 planets fit within their Laplace-Lagrange bounds (within 0.03° uncertainty), (2) the inclination structural weights balance to 99.9975% (Law 3), and (3) the eccentricity weights balance to 99.8636% (Law 5). The fact that pure Fibonacci numbers achieve all three is the core prediction of the theory.
+The non-trivial test is that these Fibonacci divisors simultaneously satisfy three independent constraints: (1) 7 of 8 planets fit within their Laplace-Lagrange bounds, with Saturn exceeding its upper bound by only 0.030°, (2) the inclination structural weights balance to 99.9974% (Law 3), and (3) the eccentricity weights balance to 99.8636% (Law 5). The fact that pure Fibonacci numbers achieve all three is the core prediction of the theory.
 
 ### Worked Example: Earth's Inclination Amplitude
 
@@ -541,7 +541,7 @@ mean = inclJ2000 - amplitude × cos(ω̃_J2000 - cycleAnchor)
      = 1.57867° - 0.636° × cos(102.947° - 21.77°)
      = 1.57867° - 0.636° × cos(81.177°)
      = 1.57867° - 0.636° × 0.15315
-     = 1.48188°
+     = 1.48126°   (shipped registry mean: 1.48113° — full-precision inputs)
 ```
 
 #### How ψ is derived from Earth
@@ -619,7 +619,7 @@ function computeEccentricityBalance(planets) {
 
   const residual = Math.abs(sumPro - sumAnti);
   const balance = 1 - residual / (sumPro + sumAnti);
-  return { sumPro, sumAnti, balance };  // balance ≈ 0.9988
+  return { sumPro, sumAnti, balance };  // balance ≈ 0.998636
 }
 ```
 
@@ -637,7 +637,7 @@ Compute `mean ± amplitude` for each planet and verify the range falls within th
 
 ### Test 3: Inclination Balance
 
-Verify `Σ(in-phase) w_j = Σ(anti-phase) w_j` to 99.9975% balance.
+Verify `Σ(in-phase) w_j = Σ(anti-phase) w_j` to 99.9974% balance.
 
 ### Test 4: Eccentricity Balance
 
@@ -721,7 +721,7 @@ npm run constants:generate
 
 ### What builds on established theory
 
-**Law 3 (Inclination Balance)** is rooted in **angular momentum conservation**. The weight factor `√(m·a(1-e²))` is proportional to a planet's orbital angular momentum `L`. The invariable plane is defined as the plane perpendicular to the total angular momentum vector, so inclination oscillations must balance around it — that is what makes it the invariable plane. The novel contribution is that dividing by a Fibonacci divisor `d` preserves the balance to 99.9975%.
+**Law 3 (Inclination Balance)** is rooted in **angular momentum conservation**. The weight factor `√(m·a(1-e²))` is proportional to a planet's orbital angular momentum `L`. The invariable plane is defined as the plane perpendicular to the total angular momentum vector, so inclination oscillations must balance around it — that is what makes it the invariable plane. The novel contribution is that dividing by a Fibonacci divisor `d` preserves the balance to 99.9974%.
 
 **Phase angles** are per-planet values (ICRF perihelion longitude at the balanced year) that cluster near the **eigenmodes of Laplace-Lagrange secular perturbation theory** (γ₁-γ₈) within 1-10°. Saturn's anti-phase behavior (MAX inclination at balanced year, opposite to all other planets) is consistent with its known retrograde precession in secular theory.
 
@@ -737,7 +737,7 @@ npm run constants:generate
 
 4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of the valid configurations, only one is also mirror-symmetric — the default configuration.
 
-5. **Saturn eccentricity prediction from Law 5** — Law 5 (eccentricity balance) is one equation in eight unknowns, sufficient to uniquely determine Saturn's eccentricity from the other seven. The prediction (0.05373) matches the J2000 observed value (<!--v:saturnEccJ2000-->0.05386<!--/v-->) to ~0.23%. The d-values were originally chosen to match Laws 1, 2, and 3 — *not* tuned for eccentricity — yet they produce a Law 5 balance equation that nevertheless predicts Saturn's eccentricity to sub-percent accuracy.
+5. **Saturn eccentricity prediction from Law 5** — Law 5 (eccentricity balance) is one equation in eight unknowns, sufficient to uniquely determine Saturn's eccentricity from the other seven. The prediction (0.05372) matches the J2000 observed value (<!--v:saturnEccJ2000-->0.05386<!--/v-->) to ~0.27%. The d-values were originally chosen to match Laws 1, 2, and 3 — *not* tuned for eccentricity — yet they produce a Law 5 balance equation that nevertheless predicts Saturn's eccentricity to sub-percent accuracy.
 
 ### Assessment
 

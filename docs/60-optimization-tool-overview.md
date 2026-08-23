@@ -43,7 +43,7 @@ A tool that Claude can run **without user intervention** to:
 ### Why now
 - We verified that **JPL Horizons API** can provide RA/Dec data for any planet at any date (tested successfully for all 8 planets)
 - The **Excel comparison** ([01-holistic-year-objects-data.xlsx](../data/01-holistic-year-objects-data.xlsx)) showed the model's positions diverge from JPL: ~0.9° RA/century for the Sun, 1-7° for planets
-- The existing ~80 standalone test scripts in `docs/archive/testscripts/` (untracked archive) prove the pattern works: pure math Node.js scripts that replicate model formulas and run with `node`
+- The existing ~70 standalone test scripts in `docs/archive/testscripts/` (untracked archive) prove the pattern works: pure math Node.js scripts that replicate model formulas and run with `node`
 
 ---
 
@@ -80,11 +80,11 @@ Documented in detail in `docs/10-fibonacci-laws.md`. Summary:
 | 13 | H/13 | Axial precession |
 | 16 | H/16 | Perihelion precession cycle |
 | 21 | H/21 | Beat: axial + obliquity |
-| 34 | H/34 | Beat: axial + ecliptic |
+| 34 | H/34 | Beat: axial (13) + H/21 (21) |
 
 The gas giants' perihelions sit on the 8H lattice **one integer off** the nearest Fibonacci anchors: Jupiter's ecliptic perihelion is **8H/39** (Fibonacci anchor H/5 = 8H/40), Jupiter's ICRF perihelion is **8H/65** (anchor H/8 = 8H/64), Saturn's ecliptic perihelion is **−8H/65** (same anchor, retrograde), and Saturn's ICRF perihelion is **8H/169** (anchor H/21 = 8H/168). Jupiter's ICRF perihelion and Saturn's ecliptic perihelion share the same **8H/65** period — the **Law 6 gas-giant lock**. The remaining planets' precession periods divide 8H by various integers, mostly non-Fibonacci.
 
-**Laws 2-3 -- Inclination Constant & Balance**: Each planet's inclination amplitude = `psi / (d x sqrt(m))` where d is a Fibonacci divisor and psi is a universal constant. The angular-momentum-weighted oscillations of the seven in-phase planets balance against Saturn alone (anti-phase) to **99.9975% balance**.
+**Laws 2-3 -- Inclination Constant & Balance**: Each planet's inclination amplitude = `psi / (d x sqrt(m))` where d is a Fibonacci divisor and psi is a universal constant. The angular-momentum-weighted oscillations of the seven in-phase planets balance against Saturn alone (anti-phase) to **99.9974% balance**.
 
 **Laws 4-5 -- Eccentricity Constant & Balance**: A single constant K predicts all 8 eccentricity amplitudes. The mass- and distance-weighted eccentricities of seven planets balance against Saturn's alone — using the same Fibonacci divisors and phase groups as Law 3. Saturn's eccentricity is independently predicted to within 0.3%.
 
@@ -141,9 +141,9 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 | `InvPlaneInclinationJ2000` | <!--v:mercuryInclJ2000-->6.3472858<!--/v--> deg | Incl. to invariable plane |
 | `LongitudePerihelion` | <!--v:mercuryPeriLongJ2000Full-->77.4569131<!--/v--> deg | Perihelion longitude (JPL J2000) |
 | `AscendingNode` | <!--v:mercuryAscNodeEclJ2000-->48.33033155<!--/v--> deg | Ecliptic ascending node (SPICE) |
-| `AngleCorrection` | 0.9709 deg | Perihelion alignment fine-tune |
-| `PerihelionEclipticYears` | H/(1+3/8) | Perihelion precession period |
-| `Startpos` | 83.653 deg | Starting orbital position |
+| `AngleCorrection` | 0.9716 deg | Perihelion alignment fine-tune |
+| `PerihelionEclipticYears` | 8H/11 | Perihelion precession period |
+| `Startpos` | 83.652 deg | Starting orbital position |
 | `InvPlaneInclinationMean` | <!--v:mercuryInclMean-->6.703216<!--/v--> deg | Inclination oscillation center (Mercury, post n=7 re-anchor) |
 | `InvPlaneInclinationAmplitude` | <!--v:mercuryInclAmp-->0.386488<!--/v--> deg | Inclination oscillation range |
 | `InclinationCycleAnchor` | Per-planet | ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v--> (e.g. Mercury: <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->°) |
@@ -215,7 +215,7 @@ Already in the codebase:
 - `findOptimalEarthRAAngle()` -- optimizes 3 Earth parameters against IAU 2006
 - `analyzeSensitivity()` -- measures parameter sensitivity
 - `OrbitalFormulas.secularPrecessionContribution()` -- Laplace-Lagrange secular perturbation theory
-- ~80 standalone Node.js optimization scripts in `docs/archive/testscripts/` (untracked archive; e.g., `mercury-optimize-params.js`, `all-planets-optimization-v2.js`)
+- ~70 standalone Node.js optimization scripts in `docs/archive/testscripts/` (untracked archive; e.g., `mercury-optimize-params.js`, `all-planets-optimization-v2.js`)
 
 ---
 

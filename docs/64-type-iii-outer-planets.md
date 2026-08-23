@@ -270,8 +270,8 @@ applies to planets: the off-center orbit geometry already provides ~50% of the
 speed variation, so the EoC uses approximately half the eccentricity as a
 starting point.
 
-For Type III planets, the actual fractions cluster near 0.50 (ranging from 0.48
-to 0.54) because of the interaction between each planet's orbital geometry and
+For Type III planets, the actual fractions cluster near 0.50 (ranging from 0.495
+to 0.585) because of the interaction between each planet's orbital geometry and
 the geocentric viewpoint. These per-planet `eocFraction` values have been
 derived empirically (see "Per-Planet EoC Fractions" below):
 
@@ -473,6 +473,8 @@ differs based on its specific parameters (period, eccentricity, perihelion
 alignment with Earth).
 
 ### Final tuned values
+
+*(RMS/Entries are the tuning-time record; the reference sets have since been enriched to ~5,000–7,000 points per planet — current RMS in [doc 67 §5](67-planet-parallax-corrections.md).)*
 
 | Planet  | eocFraction | startpos | RMS     | Entries | Notes |
 |---------|-------------|----------|---------|---------|-------|

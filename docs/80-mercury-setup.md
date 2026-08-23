@@ -125,7 +125,7 @@ The orbit center places Mercury's perihelion point at the correct distance and d
    - `angleCorrection` = 0.972° (fitted offset so the model's perihelion RA matches JPL at J2000; see [optimization](61-optimization-execution-plan.md))
    - The two components of orbitCenter are the X and Y projections:
      - `orbitCentera` = cos(angle + 90°) × distance = cos(168.43°) × 6.6024 = **−6.4682**
-     - `orbitCenterb` = cos(90° − (angle − 90°)) × distance = sin(168.43°) × 6.6024 = **−1.3244**
+     - `orbitCenterb` = cos(90° − (angle − 90°)) × distance = cos(101.57°) × 6.6024 = **−1.3244**
    - (The `+90°` and the `90−(x−90)` formulas are the simulation's convention for converting ecliptic longitude to scene-graph X/Y coordinates.)
 
 **In plain terms**: the perihelion point is placed 6.60 scene units from the Sun, in the direction 78.4° ecliptic longitude. This matches Mercury's observed perihelion direction at J2000.
@@ -165,7 +165,7 @@ Inputs:
   √m              = 4.074×10⁻⁴            (mass fraction √(1.66×10⁻⁷))
   a^1.5           = 0.2408                 (= 0.38711^1.5)
 
-  numerator       = 3.4149×10⁻⁶ × 1.466×10⁻⁴ × 4.583 = 2.295×10⁻⁹
+  numerator       = 3.4143×10⁻⁶ × 1.466×10⁻⁴ × 4.583 = 2.294×10⁻⁹
   denominator     = 4.074×10⁻⁴ × 0.2408              = 9.81×10⁻⁵
   e_amp           = 2.295×10⁻⁹ / 9.81×10⁻⁵           ≈ 2.34×10⁻⁵
 ```

@@ -182,9 +182,9 @@ Transforms coordinates from ecliptic frame to invariable plane frame.
 
 **Step 2: Convert to ecliptic coordinates**
 ```
-1/ecliptic_rate = 1/ICRF_rate + 1/general_rate
+1/ecliptic_period = 1/ICRF_period + 1/reference_period
 ```
-(Rates add because both orbital plane and ecliptic precess in same direction)
+(Periods combine reciprocally — equivalently, the RATES add directly — because both the orbital plane and the ecliptic precess in the same direction)
 
 **Step 3: Calculate height above invariable plane**
 ```
@@ -371,16 +371,18 @@ const _liveDataTiltMatrix = new THREE.Matrix4();
 
 ### 6.3 Function Locations
 
-| Function | Line | Purpose |
-|----------|------|---------|
-| `longitudeToRARad()` | 11758 | Ecliptic → Equatorial |
-| `longitudeToRAHMS()` | 11784 | Ecliptic → RA (HMS format) |
-| `precessionEclipticToICRF()` | 917 | Precession frame conversion |
-| `precessionICRFToEcliptic()` | 927 | Inverse precession conversion |
-| `heliocentricLatitude()` | 728 | Latitude calculation |
-| `updatePlanetInvariablePlaneHeights()` | 18737 | Height above invariable plane |
-| `updateDynamicInclinations()` | 19109 | Dynamic inclination updates |
-| `computePlanetInvPlaneInclinationDynamic()` | 19905 | Laplace-Lagrange inclination |
+| Function | Purpose |
+|----------|---------|
+| `longitudeToRARad()` | Ecliptic → Equatorial |
+| `longitudeToRAHMS()` | Ecliptic → RA (HMS format) |
+| `precessionEclipticToICRF()` | Precession frame conversion |
+| `precessionICRFToEcliptic()` | Inverse precession conversion |
+| `heliocentricLatitude()` | Latitude calculation |
+| `updatePlanetInvariablePlaneHeights()` | Height above invariable plane |
+| `updateDynamicInclinations()` | Dynamic inclination updates |
+| `computePlanetInvPlaneInclinationDynamic()` | Laplace-Lagrange inclination |
+
+(All in `src/script.js` — search the function name.)
 
 ---
 

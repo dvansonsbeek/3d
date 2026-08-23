@@ -50,7 +50,7 @@ An exhaustive LL-constrained search tested 127 million (d-value, group) combinat
 - ~100% scalar inclination balance (99.997%)
 - ~99.9% scalar eccentricity balance (phase-derived bases)
 - 4/4 mirror symmetry (Me=Ur=21, Ve=Ne=34, Ma=Ju=5, Ea=Sa=3)
-- 8/8 LL bounds pass (Saturn: +0.028° excess, within 0.03° LL uncertainty)
+- 7/8 LL bounds pass (Saturn: +0.030° excess over its upper bound — the documented margin case)
 
 No other configuration achieves this combination. The d-values are uniquely determined by the scalar balance condition. **The d-values, antiPhase grouping, and the Saturn-only anti-phase assignment from this finding are all unchanged in the current model.** The 2026-04-09 audit only refit `ascendingNodeCyclesIn8H` and four cycle anchors, not the d-values themselves.
 
@@ -85,7 +85,7 @@ These integers were selected by `tools/explore/anchor-and-ascnode-audit.js`.
 The "third Fibonacci level" framing therefore needs reformulation:
 - **Level 1**: d-values are Fibonacci numbers (Law 2) — *unchanged*
 - **Level 2**: Earth's ICRF perihelion period is H/Fibonacci (H/3, Law 1's hierarchy). Jupiter and Saturn fall *near* clean Fibonacci anchors in the ICRF (H/8, H/21 — Law 6) but the balance uses their *8H-lattice secular* ICRF periods, 8H/65 and 8H/169, which are one 8H-lattice integer off (and factor through 13: 65 = 5×13, 169 = 13²). The other five planets' ICRF perihelion periods are 8H/N (mostly non-Fibonacci).
-- **Level 3**: Asc-node periods are 8H/N for an integer set selected to fit JPL trends — *the integers no longer match s₁–s₈, but they remain small integers and several factor as products of small Fibonacci numbers* (Mercury 9 = 3², J/S 36 = 4×9, Uranus 12 = 4×3, Neptune 3 = F₄). Whether the new integers themselves form a Fibonacci-style structure is an open question for further work.
+- **Level 3**: Asc-node periods are 8H/N for an integer set selected to fit JPL trends — *the integers no longer match s₁–s₈, but they remain small integers and several factor as products of small Fibonacci numbers* (Mercury 9 = 3², J/S 36 = 4×9, Uranus 11, Neptune 3 = F₄). Whether the new integers themselves form a Fibonacci-style structure is an open question for further work.
 
 ### 1D. JPL inclination rates cannot determine d-values
 
@@ -174,7 +174,7 @@ The 2026-04-05 ICRF-period-for-Ω workaround was making two errors that happened
 | Constraint | Result | Status |
 |:--|:--|:--|
 | Fibonacci d-values | Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34 (unchanged) | ✓ |
-| LL bounds | 8/8 (Saturn +0.028° — within 0.03° LL uncertainty) | ✓ |
+| LL bounds | 7/8 (Saturn +0.030° over its upper bound — the documented margin case) | ✓ |
 | Scalar inclination balance | ~100% (99.997%) | ✓ |
 | Scalar eccentricity balance | ~99.9% (phase-derived bases) | ✓ |
 | Trend directions (J2000-fixed frame) | 7/7 fitted planets match JPL | ✓ |
@@ -188,12 +188,12 @@ The 2026-04-05 ICRF-period-for-Ω workaround was making two errors that happened
 
 ### 2A. Saturn LL bound excess is within source precision
 
-the default configuration exceeds Saturn's LL upper bound by 0.027° (98.6″). However:
+the default configuration exceeds Saturn's LL upper bound by 0.030° (108.6″). However:
 - The LL bounds come from **Brouwer & van Woerkom first-order secular theory** (Farside Table 10.4)
 - These are NOT high-precision numerical integration values (like Laskar 2004)
 - The values have **3 significant figures** (Saturn max = 1.02, could be 1.015–1.025)
 - First-order secular theory has inherent accuracy limits of ~5-10% in amplitudes
-- The 0.027° excess is **well within this uncertainty**
+- The 0.030° excess is **at the edge of this uncertainty** (the documented Law-1 margin case)
 
 **Conclusion**: Saturn's marginal LL bound failure is not a real constraint violation. the default configuration with d=3 for Saturn is consistent with the secular theory within its precision.
 
@@ -236,7 +236,7 @@ The d-values, antiPhase grouping, and Saturn's role as the sole anti-phase plane
 | Constraint | Result | Status |
 |:--|:--|:--:|
 | Fibonacci d-values (unchanged) | Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34 | ✓ |
-| LL bounds | 8/8 (Saturn within 0.03° LL uncertainty) | ✓ |
+| LL bounds | 7/8 (Saturn +0.030° over its upper bound — the documented margin case) | ✓ |
 | Scalar inclination balance (Law 3) | ~100% (99.997%) | ✓ |
 | Scalar eccentricity balance (Law 5) | ~99.9% (phase-derived bases) | ✓ |
 | Trend directions (J2000-fixed frame) | 7/7 fitted planets match JPL | ✓ |

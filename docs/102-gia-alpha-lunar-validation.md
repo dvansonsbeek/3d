@@ -179,7 +179,11 @@ function earthMoiFactorAtAge(t_Ma) {
 ```
 
 Sign convention: warmer (lower δ¹⁸O, interglacial) ↔ less continental ice
-↔ mass shifts equatorward ↔ smaller α. Peltier & Wu 1984.
+↔ mantle rebounds poleward under the vanished ice sheets ↔ smaller α
+(Peltier & Wu 1984). NOTE the direction comes from the mantle-rebound
+channel, not the surface-water redistribution channel, which taken alone
+gives the OPPOSITE sign — doc 99 § "the single easiest way to get this
+subject backwards".
 
 **Anchored physical constants** (all from independent literature, none
 fitted to eclipses):
@@ -1304,7 +1308,7 @@ The choice among them prioritizes structural criteria (gcd-compliance
 with H) over marginal empirical differences.
 
 Under Bond OFF baseline, the §14 scan finds n=1920 (period 1397 yr =
-15 ÷ Earth ICRF perihelion, at 0.00% error) as top divisor with ΔR² ≈
+Earth's perihelion cycle H/16 ÷ 15, at 0.00% error) as top divisor with ΔR² ≈
 +0.075 — small relative improvement over n=1830. §17 dual-harmonic test
 confirms **n=1830, n=1851, and n=1920 are all Fourier-degenerate**
 (dual fits differ by <0.001 R²). The current choice n=1830 wins on
@@ -1365,7 +1369,8 @@ Espenak/Meeus polynomial — the numbers reported in the L-5b Result
 section above.
 
 **Philosophical status — the zero-fit claim**: Bond's amplitude
-(375 s peak) and phase (−63.8°) come from fitting
+and phase (shipped: 360.1 s, +66.2° in the artifact's cos/sin
+convention — `data/deltaT-4flag-fit.json`) come from fitting
 `Stephenson_residual = polynomial_detrend + cos_A · cos(ωy) +
 sin_A · sin(ωy)` at n=1830. The shipped coefficients now come from
 `tools/fit/dt-corrections-fit.js` (Node, cascaded LSQ with the three
@@ -1515,8 +1520,8 @@ result is attributed to monsoon δ¹⁸O being dominated by orbital-scale
 forcing at 640 kyr, obscuring the weaker solar-activity signal.
 
 **Amplitude — 80 s constrained**: joint Bond+Hallstatt fit against
-Stephenson ΔT residual gave Hallstatt free-fit amplitude 256 s with
-Bond phase shift of +14° (partial collinearity signature). Physical
+Stephenson ΔT residual gave Hallstatt free-fit amplitude 276 s with
+a Bond phase shift of ~13° (partial collinearity signature). Physical
 prior for solar-activity → ΔT coupling is ~30–100 s. Shipped
 amplitude is 80 s (moderate constraint balancing observation against
 physical prior); phase preserved from the joint fit and scaled
@@ -1583,7 +1588,7 @@ H-lattice-compliant by the gcd rule.
 **Physical interpretation**: closest match to **4 × Jose period**
 (4 × 178.735 yr = 714.94 yr, offset **0.083%** — the tightest structural
 anchor of any gcd-compliant 600–800 yr candidate, tighter than Bond's
-0.26% match to 74×J-S synodic). Same SIM/Jose family as Jose5 (5×Jose,
+0.22% match to 74×J-S synodic). Same SIM/Jose family as Jose5 (5×Jose,
 897 yr).
 Structurally degenerate with Bond/2 ≈ 733 yr at ~2.5% level, but the
 4×Jose anchor is 30× tighter so the shipped interpretation attributes
@@ -1611,21 +1616,22 @@ behind solar forcing. Within the Jose-family preset scan (2×–8× Jose),
 4×Jose is UNIQUELY strong — the only Jose multiple with cross-archive
 significance in both solar AND climate archives.
 
-**Amplitude — 35 s free-fit (cap-only)**: 4-cycle joint fit (Bond +
-Hallstatt + Jose5 + Jose4) gave Jose4 free-fit amplitude 35.3 s at
-phase −46.2°. Since 35 s < 50 s prior, no cap applied — Jose4 ships
-at its free-fit value. Adding Jose4 drops the fit-residual RMS from
-19.4 s (Stage C, 3-flag) to 13.9 s (Stage D, 4-flag) — a 28% reduction.
+**Amplitude — 50 s shipped**: the current 4-cycle joint fit (Bond +
+Hallstatt + Jose5 + Jose4) gives Jose4 free-fit amplitude 47.1 s at
+phase −39.6°; the shipped artifact carries 50 s at that phase
+(`data/deltaT-4flag-fit.json`). Note the stage_* RMS metrics do NOT
+rank the stages (Stage C rms_post 19.7 s vs Stage D 21.2 s — the
+doc-105 trap: they are fit-internal residuals, not comparable model
+quality); Jose4 earns its place via the L-5b MWP improvement below,
+not via stage RMS.
 In L-5b: global RMS essentially unchanged (1625 → 1629 s, +4 s neutral),
 but MWP peak improved from **−638 s @ year 990** (3-flag) to
 **−580 s @ year 1000** (4-flag) — a ~58 s reduction of the medieval
 bump at the target year.
 
-**Cap-only shipping logic** (introduced with Jose4): the target
-amplitude is treated as a MAX cap, never a floor. If free-fit < prior,
-use free-fit as-is (Jose4 case, 35 s < 50 s prior). If free-fit >
-prior, scale DOWN preserving phase (Hallstatt 272 s → 80 s cap; Jose5
-76 s → 50 s cap). This prevents inflating a modest empirically-found
+**Cap shipping logic**: amplitudes above the physical prior are scaled
+DOWN preserving phase (Hallstatt 276 s → 80 s cap; Jose5 74 s → 50 s
+cap; Jose4 ships at the 50 s prior with free-fit 47.1 s). This prevents inflating a modest empirically-found
 signal above what the joint fit actually finds.
 
 **Research infrastructure**:
@@ -2095,7 +2101,7 @@ What we are NOT claiming:
 2. **α(t) is driven by the L1 orbital layer of the canonical Climate
    Formula** (see § "The physical constants and modern calibration").
    The L1 layer captures the Milankovitch orbital forcing of glacial
-   cycles; higher climate layers (L2 obliquity band, L3+ millennial)
+   cycles; the higher climate layers (L2, the 405-kyr carbon-thermostat family; L3, the boundary-condition steps)
    are not currently coupled into α(t). For the historical eclipse
    window (~2.7 kyr) the L1 layer carries essentially all the
    glacial-cycle amplitude relevant to α; the higher-frequency

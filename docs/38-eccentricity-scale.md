@@ -68,20 +68,20 @@ Jupiter's mass advantage is almost exactly cancelled by its Fibonacci disadvanta
 
 ---
 
-## Building Saturn's Offset (0.512254 AU)
+## Building Saturn's Offset (0.5134 AU)
 
-Saturn's perihelion offset is the weighted sum of the in-phase group:
+Saturn's perihelion offset is the weighted sum of the in-phase group (offsets = e_base × a with the shipped base eccentricities and model semi-major axes; weights shown to 3 decimals — exact weights close the sum on Saturn's 0.5134 AU):
 
 | Planet | Offset (e×a) | × Weight | = Contribution | Cumulative | % of Saturn |
 |--------|-------------|----------|---------------|------------|-------------|
-| Jupiter | 0.2507 AU | × 1.046 | = 0.2623 AU | 0.2623 AU | 51.2% |
-| Uranus | 0.9064 AU | × 0.209 | = 0.1896 AU | 0.4519 AU | 88.2% |
-| Neptune | 0.2601 AU | × 0.224 | = 0.0583 AU | 0.5102 AU | 99.6% |
-| Mars | 0.1422 AU | × 0.010 | = 0.0014 AU | 0.5116 AU | 99.9% |
-| Earth | 0.0154 AU | × 0.033 | = 0.0005 AU | 0.5121 AU | 100.0% |
-| Mercury | 0.0795 AU | × 0.002 | = 0.0002 AU | 0.5123 AU | 100.0% |
-| Venus | 0.0044 AU | × 0.008 | = 0.0000 AU | 0.5123 AU | 100.0% |
-| **Total** | | | | **0.512254 AU** | **= Saturn** |
+| Jupiter | 0.2516 AU | × 1.046 | = 0.2632 AU | 0.2632 AU | 51.3% |
+| Uranus | 0.9043 AU | × 0.209 | = 0.1890 AU | 0.4522 AU | 88.1% |
+| Neptune | 0.2573 AU | × 0.224 | = 0.0576 AU | 0.5098 AU | 99.3% |
+| Mars | 0.1396 AU | × 0.010 | = 0.0014 AU | 0.5112 AU | 99.6% |
+| Earth | 0.0154 AU | × 0.033 | = 0.0005 AU | 0.5117 AU | 99.7% |
+| Mercury | 0.0796 AU | × 0.002 | = 0.0002 AU | 0.5119 AU | 99.7% |
+| Venus | 0.0056 AU | × 0.008 | = 0.0000 AU | 0.5119 AU | 99.7% |
+| **Total** | | | | **≈ 0.5134 AU** | **= Saturn (to weight rounding)** |
 
 The scale formulation is a rewriting of the Law 5 balance equation in physical terms. Its value lies in revealing the structure: which planets dominate, how the contributions build up, and why certain ratios emerge.
 

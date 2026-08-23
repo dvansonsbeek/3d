@@ -25,8 +25,10 @@ With phase-derived base eccentricities (computed at runtime from the balanced-ye
 
 | Quantity | Value | Signed gap (in-phase − anti-phase) |
 |---|---:|---:|
-| Inclination balance | 99.997236% | Σw_in − Σw_anti = **−9.6 × 10⁻⁷** |
-| Eccentricity balance | 99.861842% | Σv_in − Σv_anti = **−4.27 × 10⁻⁵** |
+| Inclination balance | 99.997229% | Σw_in − Σw_anti = **−9.63 × 10⁻⁷** |
+| Eccentricity balance | 99.862304% | Σv_in − Σv_anti = **−4.26 × 10⁻⁵** |
+
+*(Figures from `dual-balance-optimizer.js`; its Law-5 number differs in the fourth decimal from the canonical `verify-laws.js` value 99.8636% — a slightly different weight computation over the same structure.)*
 
 The eccentricity gap is the larger of the two and is the focus of this analysis. The sign tells us that anti-phase Σv (Saturn alone) **exceeds** in-phase Σv (seven planets summed) — to close the gap, the in-phase side needs additional v, or the anti-phase side needs less.
 
@@ -72,7 +74,7 @@ Derived from the partial derivatives of v with respect to each parameter:
 
 The inner-planet shifts are astronomical (1000%+) because their v contribution is microscopic — they have zero leverage. The four giant planets are the only realistic single-parameter levers.
 
-**Smallest single-parameter shift that closes the gap: Saturn Δa/a = −0.184%** (Saturn's orbital period would need to be 0.184% shorter than 29.46 years).
+**Smallest single-parameter shift that closes the gap: Saturn Δa/a = −0.184%** (via Kepler's third law that is an orbital period 0.276% shorter than 29.46 years).
 
 ---
 
@@ -385,6 +387,6 @@ This perturbs each planet's mass within its 1-σ relative uncertainty (10⁻⁹ 
 - [doc 10 — Fibonacci Laws of Planetary Motion](10-fibonacci-laws.md) — Laws 3 and 5, exhaustive search, configuration uniqueness
 - [doc 20 — Constants Reference](20-constants-reference.md) — H, ψ, K, mass and eccentricity sources
 - [doc 25 — Universal Mass-from-Moon Formula](25-universal-mass-from-moon-formula.md) — how `massFraction.earth` is derived (Δa correction); related to the ~9 ppm Earth-mass refinement that triggered the recent balance-presets regeneration
-- [doc 53 — Balance Explorer Reference](53-balance-explorer-reference.md) — interactive UI panel showing the 42 deep-analysis survivors
+- [doc 53 — Balance Explorer Reference](53-balance-explorer-reference.md) — interactive UI panel showing the 15 deep-analysis survivors
 - [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); the balance-gap analysis is structural and epoch-invariant
 - [doc 55 — Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — full per-planet 8H/n period table

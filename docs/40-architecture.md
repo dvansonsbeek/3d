@@ -10,7 +10,7 @@ status: current
 **Version:** 2.1
 **Status:** Current Implementation Documentation
 
-> **Scope note (ESSRT).** This document describes the simulation's code architecture and rendering pipeline. The orbital-mechanics implementations (Keplerian solvers, precession cycles, predictive formula system, invariable plane calculations) are scale-invariant by construction. The current architecture additionally supports **deep-time mode** (`DEEP_TIME_MODE_ENABLED` in `src/script.js`, on by default): when the user scrubs the date by millions of years, per-frame integrators update length-of-day, the Earth Fundamental Cycle H, planet orbital periods, Moon distance, and ΔT according to the [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md). The deep-time integrators are tagged in the scene graph (`_dtCycleN`, `_dtMoonIntegrator`, `_dtPlanetIntegrator`, `_dtPerihelionDivisor`) — see [doc 41 §Part 14 — Deep-Time Mode](41-scene-graph-hierarchy.md) for the per-tag specifications.
+> **Scope note (ESSRT).** This document describes the simulation's code architecture and rendering pipeline. The orbital-mechanics implementations (Keplerian solvers, precession cycles, predictive formula system, invariable plane calculations) are scale-invariant by construction. The current architecture additionally supports **deep-time mode** (`DEEP_TIME_MODE_ENABLED` in `src/script.js`, on by default): when the user scrubs the date by millions of years, per-frame integrators update length-of-day, the Earth Fundamental Cycle H, planet orbital periods, Moon distance, and ΔT according to the [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md). The deep-time integrators are tagged in the scene graph (`_dtCycleN`, `_dtMoonIntegrator`, `_dtPlanetIntegrator`, `_dtPerihelionDivisor`) — see [doc 41 §Part 15 — Deep-Time Mode](41-scene-graph-hierarchy.md) for the per-tag specifications.
 
 ---
 
@@ -41,7 +41,7 @@ The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astron
 - 13 celestial bodies with full orbital mechanics
 - 50+ astronomical calculation functions
 - Real-time 3D visualization at 60 FPS
-- Support for date ranges spanning ±50,000 years
+- Support for date ranges from millennia (snapshot mode) to millions of years (deep-time mode, the shipped default)
 
 **Core Capabilities:**
 - Accurate planetary positions using Keplerian orbital mechanics
@@ -173,7 +173,7 @@ WebGL Render (60 FPS target)
 │
 ├── tools/
 │   ├── fit/                    # Pipeline CLI shims (implementations in packages/fitting)
-│   ├── verify/                 # 24 scripts: 6 gate · 4 liftable · 10 narrative · 4 generator
+│   ├── verify/                 # 26 scripts: 7 gate · 4 liftable · 10 narrative · 5 generator
 │   ├── explore/                # Exploratory analysis scripts (~140 one-offs)
 │   ├── constants/              # generate.mjs — the generated-constants pipeline
 │   ├── docs/                   # Doc machinery (marker renderer, frontmatter stamper)
@@ -219,7 +219,7 @@ The monolithic script.js (~59,800 lines) is organized into logical sections. Con
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  CONSTANTS & FORMULAS (Lines 17-2078)                               │
+│  CONSTANTS & FORMULAS (top of file)                                 │
 │  A. Model parameters: H, Earth params, Moon, planet configs         │
 │  B. Fitted coefficients: year harmonics, predictive formula (429    │
 │     terms × 7 planets), parallax/gravitation/elongation corrections,│
@@ -233,13 +233,13 @@ The monolithic script.js (~59,800 lines) is organized into logical sections. Con
 │     conversions, frame transforms, Laplace coefficients)            │
 │  F. Display-only constants                                          │
 ├─────────────────────────────────────────────────────────────────────┤
-│  OBJECT DEFINITIONS (Lines ~2082-4550)                              │
+│  OBJECT DEFINITIONS                                                 │
 │  - Data objects for every celestial body (Type I/II/III)            │
 │  - Planet hierarchical precession layers                            │
 │  - Moon precession layers                                           │
 │  - Obliquity cycles, planet parallax corrections                    │
 ├─────────────────────────────────────────────────────────────────────┤
-│  MASTER ARRAYS & SCENE SETUP (Lines ~4550-7590)                     │
+│  MASTER ARRAYS & SCENE SETUP                                        │
 │  - planetObjects / tracePlanets arrays                              │
 │  - Global state object 'o'                                          │
 │  - Renderer, camera, orbit controls                                 │
@@ -247,27 +247,27 @@ The monolithic script.js (~59,800 lines) is organized into logical sections. Con
 │  - Invariable plane system, node markers                            │
 │  - PLANET_TEST_DATES verification data (~8,000 entries)             │
 ├─────────────────────────────────────────────────────────────────────┤
-│  VISUAL SYSTEMS (Lines ~7590-17800)                                 │
+│  VISUAL SYSTEMS                                                     │
 │  - Orbit visualization, starfield, constellations                   │
 │  - Planet inspector and hierarchy display                           │
 │  - Trace path rendering, visual effects                             │
 │  - Export functions (planet reports, year analysis, solar day)       │
 ├─────────────────────────────────────────────────────────────────────┤
-│  BALANCE EXPLORER & SCALE (Lines ~17800-20850)                      │
+│  BALANCE EXPLORER & SCALE                                           │
 │  - Fibonacci Balance Explorer (interactive config testing)          │
 │  - Eccentricity Balance Scale visualization                         │
 ├─────────────────────────────────────────────────────────────────────┤
-│  GUI SETUP (Lines ~20855-22575)                                     │
+│  GUI SETUP                                                          │
 │  - Tweakpane folder structure (About, Controls, Celestial, Reports, │
 │    Tools)                                                           │
 │  - Control bindings and event handlers                              │
 ├─────────────────────────────────────────────────────────────────────┤
-│  RENDER LOOP (Lines ~22576-22900)                                   │
+│  RENDER LOOP                                                        │
 │  - Main animation frame callback                                    │
 │  - Throttled update cycles (20/10/5/30 Hz)                          │
 │  - Performance monitoring                                           │
 ├─────────────────────────────────────────────────────────────────────┤
-│  UPDATE & CALCULATION FUNCTIONS (Lines ~22900-43600)                │
+│  UPDATE & CALCULATION FUNCTIONS (the back ~2/3 of the file)         │
 │  - Cardinal point detection (solstice/equinox by declination)       │
 │  - Days & Years report, Solar Day report                            │
 │  - Position update functions (moveModel, updatePositions)           │
@@ -536,7 +536,7 @@ A 429-term feature matrix system for computing dynamic geocentric perihelion pre
 
 ```
 Architecture:
-├── PERI_HARMONICS (21 terms) → Earth perihelion longitude model
+├── PERI_HARMONICS (25 terms) → Earth perihelion longitude model
 ├── calcEarthPerihelionPredictive(year) → Earth perihelion at any year
 ├── calcERD(year) → Earth Rate Deviation (derivative)
 ├── buildPredictiveFeatures(year, period, theta0) → 429-term feature vector

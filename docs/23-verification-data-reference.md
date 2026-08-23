@@ -14,7 +14,7 @@ This document describes the astronomical verification data embedded in the simul
 - [51 - Planet Inspector Reference](51-planet-inspector-reference.md) - Where reports are displayed
 - [20 - Constants Reference](20-constants-reference.md) - Orbital constants and sources
 - [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) - Deep-time integrator machinery referenced in the "Deep-time integration" subsection
-- [100 - ΔT model validation via historical solar eclipses](100-delta-t-model-validation.md) - Companion deep-time validation against historical solar eclipses
+- [102 - GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) and [106 - Deep-time validation dossier](106-deep-time-validation-dossier.md) - the live deep-time validation docs (the old doc 100 is archived in `docs/archive/old-documents/100-deltat-validation.md`)
 
 ---
 
@@ -22,7 +22,7 @@ This document describes the astronomical verification data embedded in the simul
 
 The simulation includes over 8,000 verification data points from authoritative astronomical sources. These allow users to compare the model's calculated positions against historically observed events such as planetary transits, oppositions, conjunctions, mutual occultations, and historical observations (notably Tycho Brahe's Mars observations).
 
-**Location:** `script.js` line ~11398 (`PLANET_TEST_DATES`)
+**Location:** `src/script.js` (`PLANET_TEST_DATES`)
 
 ---
 
@@ -165,7 +165,7 @@ Each verification entry has the following structure:
 - Ecliptic longitude at Jupiter-Saturn conjunctions
 - Occultation dates with Venus, Mercury, Mars
 
-**Date Range:** JD 1363901 to JD 2626372 (~800 BC to ~2400 AD)
+**Date Range:** JD 1363901 to JD 2626372 (~980 BC to ~2480 AD)
 
 **Purpose:** Great conjunctions (Jupiter-Saturn alignments) occur every ~20 years and have been recorded since ancient times.
 
@@ -177,7 +177,7 @@ Each verification entry has the following structure:
 - Ecliptic longitude at Saturn-Jupiter conjunctions
 - Occultation dates with Venus, Mercury, Mars
 
-**Date Range:** JD 1359024 to JD 2640765 (~800 BC to ~2300 AD)
+**Date Range:** JD 1359024 to JD 2640765 (~990 BC to ~2520 AD)
 
 **Purpose:** Paired with Jupiter data to verify both planets at conjunction dates.
 
@@ -199,7 +199,7 @@ Each verification entry has the following structure:
 - Ecliptic longitude at Neptune-Jupiter conjunctions
 - Occultation dates with various planets
 
-**Date Range:** JD 1405723 to JD 2639740 (~800 BC to ~2300 AD)
+**Date Range:** JD 1405723 to JD 2639740 (~860 BC to ~2520 AD)
 
 **Purpose:** Verify Neptune position during conjunctions and occultations.
 
@@ -215,7 +215,7 @@ Each verification entry has the following structure:
 
 ### Planet Report Generation
 
-The `generatePlanetReport()` function (line ~20624) iterates through `PLANET_TEST_DATES` for the selected planet:
+The `generatePlanetReport()` function iterates through `PLANET_TEST_DATES` for the selected planet:
 
 1. **Jump to date:** Simulation moves to the verification date (JD)
 2. **Calculate position:** Model computes RA/Dec or longitude
@@ -333,6 +333,8 @@ The V-shape against JPL turned out to be a red herring. At the epochs where dire
 | **Mars** | **0.177° (n=913 Tycho)** | 0.240° | **1.04×** |
 | Venus | 0.101° (n=8) | 0.117° | 1.20× |
 
+*(Note: the ratio column comes from the validation script's full run and does not exactly equal the quotient of the two displayed dec-only medians — treat the ratios as indicative of the tier comparison, not as derived from this table.)*
+
 The Mars row (Tycho 1572-1601, post-cleanup) is the most robust: **913 pre-telescopic naked-eye observations matched at median 0.18° dec error** — fully comparable to IMCCE INPOP19 at the same epoch, on a sample large enough to be statistically meaningful.
 
 For five of seven planets, the model fits independent observations 5-11× better than JPL/IMCCE does at the same epochs. The remaining two (Venus, Mars) are essentially even.
@@ -348,7 +350,7 @@ The result is narrow and defensible. It is **not** the claim that "this model is
 - **Sample sizes** are small for most Tier 1 datasets (n=2-29). Only Mars (n=913) has a statistically robust sample.
 - **Most Tier 1 is declination-only** — we cannot test joint RA+Dec against independent observations for most planets.
 - **JPL within its observation-fit window** (telescopic 1750+, radio ranging 1960+, spacecraft tracking 1970+, LLR 1969+) is the modern definition of where planets are; the model is calibrated to that window and cannot logically outperform it there.
-- The "model matches Tycho's Mars positions ~2× better than IMCCE INPOP19" is the cleanest, most statistically robust statement.
+- The Mars-vs-Tycho comparison is the cleanest, most statistically robust statement: the model matches Tycho's Mars positions fully comparably to IMCCE INPOP19 (T1/T2 ≈ 1.0 — essentially even with a modern ephemeris on 400-year-old naked-eye data).
 
 ### Deep-time integration is not the lever here
 
@@ -413,9 +415,9 @@ To add new verification entries:
 
 | Function | Location | Description |
 |----------|----------|-------------|
-| `generatePlanetReport()` | Line ~20624 | Main report generator |
-| `buildDateSection()` | Line ~20458 | Formats individual date comparison |
-| `collectPlanetDataForDate()` | Line ~20146 | Computes model RA/Dec |
+| `generatePlanetReport()` | `src/script.js` | Main report generator |
+| `buildDateSection()` | `src/script.js` | Formats individual date comparison |
+| `collectPlanetDataForDate()` | `src/script.js` | Computes model RA/Dec |
 
 ---
 

@@ -93,11 +93,11 @@ Each planet's inclination cycle anchor is the ICRF perihelion longitude where th
 | Neptune | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
 | Pluto | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | — | — | — | Retrograde | — |
 
-\* Jupiter, Saturn, and Uranus have ICRF perihelion periods that divide H exactly, so their phase at n=7 coincides numerically with their phase at n=0. The conceptual anchor is still n=7 — the oldest balanced year of the current 8H octave.
+\* Uranus's ICRF perihelion period (H/10) divides H exactly, so its phase at n=7 coincides numerically with its phase at n=0; Jupiter (8H/65) and Saturn (8H/169) carry non-integer cycles per H, so their per-anchor phases differ. The conceptual anchor is n=7 — the oldest balanced year of the current 8H octave.
 
 **Key insights**:
 - All seven fitted planets share the same balanced-year anchor (n=7, ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v--> = the **start of the current Solar System Resonance Cycle**).
-- Earth's cycle anchor is set independently from the IAU obliquity model and is locked to the n=0 reference; this is consistent with n=7 because Earth's H/3 ICRF return divides 8H seven times.
+- Earth's cycle anchor is set independently from the IAU obliquity model and is locked to the n=0 reference; this is consistent with n=7 because Earth's H/3 ICRF return divides H exactly (3×), so every balanced year (spaced H apart) lands at the same H/3 phase.
 - Balance groups are determined by the **invariable plane balance condition**: Σ(in-phase) w = Σ(anti-phase) w (Law 3, scalar form).
 - Saturn is **anti-phase**: its inclination is at MAX at n=7 while all other planets are at MIN.
 - Earth is the **sole planet** with prograde ICRF perihelion motion (+H/3); all others are retrograde.
@@ -155,7 +155,7 @@ The inclination oscillation period equals the absolute ICRF perihelion period fo
 |--------|----------------|-------------|----------------|
 | Mercury | `H × 8/11` | `8H/93` ≈ <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr | Retrograde |
 | Venus | `−8H/6` | `8H/110` ≈ <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr | Retrograde |
-| Earth | `H / 3` | `H/3` ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | Prograde (sole) |
+| Earth | `H / 16` | `H/3` ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | Prograde (sole) |
 | Mars | `H × 8/36` | `8H/68` ≈ <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr | Retrograde |
 | Jupiter | `8H/39` | `8H/65` ≈ <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | Retrograde |
 | Saturn | `−8H/65` | `8H/169` ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr | Retrograde |

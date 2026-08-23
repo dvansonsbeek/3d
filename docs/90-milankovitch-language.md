@@ -7,7 +7,7 @@ status: current
 
 # Milankovitch Language of the Holistic Model
 
-> **TL;DR.** The Holistic model has **five** natural Milankovitch-band periods, all integer divisors of H, structured into a closed Fibonacci algebra: **H/3 inclination precession (<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr), H/5 ecliptic precession (<!--v:hDiv5-->67,063<!--/v--> yr), H/8 obliquity oscillation (<!--v:hDiv8-->41,915<!--/v--> yr), H/13 axial precession (<!--v:earthAxialPeriod-->25,794<!--/v--> yr), and H/16 perihelion precession (<!--v:earthPeriPeriod-->20,957<!--/v--> yr)**. These satisfy four beat-frequency identities (13−5=8, 13+3=16, 8−5=3, 13−8=5) that close *only because* the divisors are Fibonacci. Standard secular theory recovers the same periods to within 0.06–2.8 % — including all six Berger 1978 climatic-precession peaks (at ~19–24 kyr) within 0.4 % when expressed as 8H/n integer divisors. *Note: in this framework H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr is **perihelion precession** (the rotation of Earth's apsidal line in the ecliptic frame), distinct from **climatic precession** (~23.7 kyr dominant, the parameter e·sin ϖ that drives seasonal insolation — captured in the 8H lattice at n=113 and n=120).*
+> **TL;DR.** The Holistic model has **five** natural Milankovitch-band periods, all integer divisors of H, structured into a closed Fibonacci algebra: **H/3 inclination precession (<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr), H/5 ecliptic precession (<!--v:hDiv5-->67,063<!--/v--> yr), H/8 obliquity oscillation (<!--v:hDiv8-->41,915<!--/v--> yr), H/13 axial precession (<!--v:earthAxialPeriod-->25,794<!--/v--> yr), and H/16 perihelion precession (<!--v:earthPeriPeriod-->20,957<!--/v--> yr)**. These satisfy four beat-frequency identities (13−5=8, 13+3=16, 8−5=3, 13−8=5) that close *only because* the divisors are Fibonacci. Standard secular theory recovers the same periods to within 0.06–2.8 % — including all six Berger 1978 climatic-precession peaks (at ~19–24 kyr) within 0.7 % when expressed as 8H/n integer divisors. *Note: in this framework H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr is **perihelion precession** (the rotation of Earth's apsidal line in the ecliptic frame), distinct from **climatic precession** (~23.7 kyr dominant, the parameter e·sin ϖ that drives seasonal insolation — captured in the 8H lattice at n=113 and n=120).*
 >
 > For the **100-kyr ice age problem**, the model's H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr inclination precession lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
 >
@@ -96,7 +96,7 @@ All five model periods are integer divisors of H with **zero free parameters** �
 
 The **Solar System Resonance Cycle** is 8H = **<!--v:eightH-->2,682,536<!--/v--> yr (at J2000)** — the smallest period in which every planet's principal precession cycles return to alignment simultaneously (each cycle's period divides 8H by some integer). See [website fundamental-cycles](https://www.holisticuniverse.com/en/model/fundamental-cycles).
 
-The Berger climatic-precession spectrum is a **set of six** peaks from `g_j + k` beats (apsidal eigenfrequencies plus axial precession k). Every Berger peak matches integer divisors of 8H to within 0.4 %:
+The Berger climatic-precession spectrum is a **set of six** peaks from `g_j + k` beats (apsidal eigenfrequencies plus axial precession k). Every Berger peak matches integer divisors of 8H to within 0.7 %:
 
 | Berger period (yr) | Eigenmode (Berger label) | Resonance Cycle / n | Deviation | Holistic model attribution |
 |---:|---|---:|---:|---|
@@ -118,17 +118,17 @@ The Laskar (La2004) secular solution decomposes eccentricity and inclination int
 | Combination | Physical meaning | Period (yr) | Deviation |
 |---|---|---:|---:|
 | Total apsidal rate (Earth) | Earth perihelion precession (~11.6″/yr) | ~111,000 | **0.6 %** |
-| g₃ − g₁ | Earth–Mercury eccentricity beat | 109,950 | **1.2 %** |
-| \|s₂ − s₃\| | Venus–Earth inclination beat | 109,851 | **1.3 %** |
+| g₃ − g₁ | Earth–Mercury eccentricity beat | 109,950 | **1.7 %** |
+| \|s₂ − s₃\| | Venus–Earth inclination beat | 109,851 | **1.8 %** |
 
 **H/5 = <!--v:hDiv5-->67,063<!--/v--> yr** matches two combinations:
 
 | Combination | Physical meaning | Period (yr) | Deviation |
 |---|---|---:|---:|
-| s₃ | Earth nodal regression eigenfrequency | 68,761 | **2.9 %** |
-| \|s₂ − s₆\| | Venus–Saturn inclination beat | 67,158 | **0.57 %** |
+| s₃ | Earth nodal regression eigenfrequency | 68,761 | **2.5 %** |
+| \|s₂ − s₆\| | Venus–Saturn inclination beat | 67,158 | **0.14 %** |
 
-The ~111-kyr region is "crowded": three distinct physical mechanisms all land within ±1.3 % of H/3. This convergence is **not** required by any theory we know — secular eigenfrequencies depend on all planet masses and semi-major axes, and there is no a-priori reason for these combinations to converge.
+The ~111-kyr region is "crowded": three distinct physical mechanisms all land within ±1.8 % of H/3. This convergence is **not** required by any theory we know — secular eigenfrequencies depend on all planet masses and semi-major axes, and there is no a-priori reason for these combinations to converge.
 
 ### 4.4 Deep-time Fibonacci multiples (3H, 13H)
 
@@ -194,7 +194,7 @@ The model treats the inclination cycle as a *permanent formation-epoch feature* 
 
 This document is the *framework* — what the model says about Milankovitch.
 
-The empirical evidence lives in [doc 91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md): spectral analysis of LR04 + Cheng 2016 + EPICA + CENOGRID, the 31-component **8H Orbital Forcing Formula**, per-planet contributions, the MPT amplitude-growth analysis, a pre-registered super-cycle hypothesis test (NULL), fourteen falsifiable follow-up tests (16 positives / 2 partials / 5 nulls), and the 405-kyr off-lattice characterization as a Layer-2 carbon-cycle thermostat resonance.
+The empirical evidence lives in [doc 91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md): spectral analysis of LR04 + Cheng 2016 + EPICA + CENOGRID, the 32-component **8H Orbital Forcing Formula**, per-planet contributions, the MPT amplitude-growth analysis, a pre-registered super-cycle hypothesis test (NULL), fourteen falsifiable follow-up tests (16 positives / 2 partials / 5 nulls), and the 405-kyr off-lattice characterization as a Layer-2 carbon-cycle thermostat resonance.
 
 The canonical L1 + L2 + L3 modular formula — per-regime ridge fitting across LR04 / CENOGRID / EPICA / CenCO2PIP, stitched per-regime evaluation, and the Climate Formula Explorer modal in `src/script.js` — is documented in [doc 92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md).
 
@@ -204,7 +204,7 @@ The canonical L1 + L2 + L3 modular formula — per-regime ridge fitting across L
 2. **Mars dominates the per-planet climate fingerprint** (two exclusive direct matches in LR04 full, three more in pre-MPT).
 3. **The 100-kyr glacial cycle is an inclination-side eigenmode beat** (Mercury-Mars s₁−s₄ nodal at 107 kyr), not direct eccentricity forcing — vindicates Muller-MacDonald 1997's framing.
 4. Pre-MPT and post-MPT differ in **climate sensitivity, not orbital forcing**.
-5. Forward projection: the next natural glacial maximum is predicted at ~58,000 years from now (~ 60,000 CE), with the strongest glacial in the next 250 kyr at ~198,000 years from now. Orbital-only — see [doc 92 §13.7](92-climate-formula.md) for the anthropogenic-CO₂ caveat (Ganopolski 2016 vs Caillon 2003 framing).
+5. Forward projection: the next natural glacial maximum is predicted at ~58,000 years from now (~ 60,000 CE), with the strongest glacial in the next 250 kyr at ~198,000 years from now. Orbital-only — see [doc 92 §9.7](92-climate-formula.md#97-forward-projection-scope) and doc 58 for the anthropogenic-CO₂ caveat (Ganopolski 2016 framing).
 
 The framework laid out in §§ 1–5 of this document (five H-divisor periods, Fibonacci closure, Berger 1978 spectrum match, eigenmode convergence at H/3 and H/5, cross-planet validation) **stands independently** of the specific 100-kyr-cycle attribution. See [doc 91 §4.8](91-milankovitch-evidence.md#48-what-stands-independently-of-the-100-kyr-cycle-attribution) for what remains robust regardless of how the 100-kyr question resolves.
 

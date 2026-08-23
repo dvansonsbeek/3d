@@ -130,7 +130,7 @@ Note: The letter T is skipped as a coefficient name to avoid confusion with the 
 
 ### Discovery Process
 
-The correction grew incrementally from 6 to 36 parameters:
+The correction grew incrementally from 6 to 78 parameters:
 
 1. **6→11 params**: Added time drift (C), 3rd harmonic (H,I), and time-modulated harmonics (J,K) based on residual analysis showing secular trends and higher-order oscillations.
 2. **11→15 params**: Added heliocentric distance terms (L,M,N,O) after discovering that residuals correlate with 1/sunDist and 1/d².

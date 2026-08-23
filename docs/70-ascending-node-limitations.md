@@ -127,7 +127,7 @@ The formula `dΩ/dε = -sin(Ω) / tan(i)` has `tan(i)` in the denominator:
 | Mars | 1.85° | 0.032 | 31× |
 | Neptune | 1.77° | 0.031 | 32× |
 | Jupiter | 1.31° | 0.023 | 44× |
-| Uranus | 0.77° | 0.013 | **77×** |
+| Uranus | 0.77° | 0.013 | **74×** |
 
 Uranus and Neptune have very low inclinations, causing extreme amplification. This may indicate the formula is not appropriate for near-coplanar orbits.
 

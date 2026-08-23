@@ -9,7 +9,7 @@ status: current
 
 **Status**: Complete (dynamic implementation, sensitivity analysis done)
 
-> **Scope note (ESSRT).** The Type II hybrid formula (`eo = eccDist/2 − eo_geocentric/2`), the dynamic-geocentric update, and the `e/(1+e)` derivation are scale-invariant. The perihelion-period denominators (`H/(4+3/8)`, `H × 8/36`) stay constant at any epoch. Literal J2000-anchored values (H = <!--v:H-->335,317<!--/v--> in the §"Perihelion precession" prose, the balanced year n=7 ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, `solarYearCount` = 178,289, `perihelionRef_JD` = 2456505.6, and the JPL 2000-2200 + Tycho 1582-1600 calibration baselines) reflect the present epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally. The Mars implementation this document describes is the J2000 snapshot of an underlying scale-invariant structure.
+> **Scope note (ESSRT).** The Type II hybrid formula (`eo = eccDist/2 − eo_geocentric/2`), the dynamic-geocentric update, and the `e/(1+e)` derivation are scale-invariant. The perihelion-period denominator (`8H/36`) stays constant at any epoch. Literal J2000-anchored values (H = <!--v:H-->335,317<!--/v--> in the §"Perihelion precession" prose, the balanced year n=7 ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, `solarYearCount` = 178,289, `perihelionRef_JD` = 2456499.441, and the JPL 2000-2200 + Tycho 1582-1600 calibration baselines) reflect the present epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally. The Mars implementation this document describes is the J2000 snapshot of an underlying scale-invariant structure.
 
 ---
 
@@ -69,7 +69,7 @@ eo = (e_Mars * d * 100) / 2  -  (2 * e_Earth * 100 * sin(delta_omega)) / 2
 ```
 
 Where:
-- `e_Mars` = Mars orbital eccentricity (0.09146580)
+- `e_Mars` = Mars orbital eccentricity (J2000: <!--v:marsEccJ2000-->0.09339<!--/v-->; phase-derived base 0.09165)
 - `d` = Mars orbit distance in AU (<!--v:marsSemiMajor-->1.5237<!--/v-->, from Kepler's 3rd law)
 - `e_Earth` = Earth's orbital eccentricity (<!--v:j2000Eccentricity-->0.01671022<!--/v-->)
 - `delta_omega` = angle between Earth's and Mars's ecliptic perihelion
@@ -120,7 +120,7 @@ The legacy formula remains in script.js as a historical artifact.
 
 ## Derived Eccentricity: e/(1+e) Circular-Orbit Equivalent
 
-Mars uses `e/(1+e) = 0.08380088` (from base e = 0.09146580) for the orbit
+Mars uses `e/(1+e) = 0.08542` (from J2000 e = 0.0933941) for the orbit
 offset calculation. See the
 [Type III doc, "Perihelion Distance: Circular-Orbit Eccentricity e/(1+e)"](64-type-iii-outer-planets.md#perihelion-distance-circular-orbit-eccentricity-e1e)
 section for the full derivation and physical basis.
@@ -198,20 +198,20 @@ calculation on the first frame, so its exact value is inconsequential.
 ### Code locations
 
 **`src/script.js`:**
-- Mars constants: lines 122-133
+- Mars constants (planet constants block)
 - `marsElipticOrbit` static computation (search the identifier)
-- `marsRealPerihelionAtSun` object: lines 3009-3035
-- Dynamic update in `moveModel()`: lines 29449-29466
+- `marsRealPerihelionAtSun` object (search the identifier)
+- Dynamic update in `moveModel()`
 - `perihelionLongitudeEcliptic()` helper
 
 **`tools/lib/scene-graph.js`:**
-- Type II derived values: `computePlanetDerived()` lines 299-305
-- Type II speed/startPos: `getPlanetSceneData()` lines 288-290
-- Dynamic update: `moveModel()` lines 784-795
+- Type II derived values: `computePlanetDerived()`
+- Type II speed/startPos: `getPlanetSceneData()`
+- Dynamic update: `moveModel()`
 
 **`tools/lib/constants.js`:**
 - Mars planet entry: lines 79-97
-- Mars perihelion reference JD: `perihelionRef_JD` (`2458669.2`, phase-optimized from 2018 Sep 16)
+- Mars perihelion reference JD: `perihelionRef_JD` (`2456499.441`, phase-optimized)
 
 ---
 
@@ -233,7 +233,7 @@ theta += 2 * (e * eocFraction) * sin(M) + 1.25 * (e * eocFraction)^2 * sin(2M)
 With a phase-optimized perihelion reference:
 
 ```
-perihelionRef_JD: 2456505.6  (phase-optimized)
+perihelionRef_JD: 2456499.441  (phase-optimized)
 ```
 
 ### Why the fraction is near zero
@@ -290,7 +290,9 @@ The `setupVisualTiltGroup()` function zeroes the container rotation on
 
 ---
 
-## Current Baseline (JPL, 2000-2200)
+## Baseline at tuning time (JPL, 2000-2200)
+
+*(Historical record. The reference set has since been enriched to ~5,000 points; the current Mars RMS is 0.090° — [doc 67 §5](67-planet-parallax-corrections.md).)*
 
 184 reference points, Tier 2 (JPL Horizons DE441, 2000-2200):
 
@@ -481,7 +483,7 @@ optimizations.
 | Dominant eccentricity        | Planet's own (e=0.093)            | Earth's (e=0.017)                   |
 | Static orbit offset          | eccDist / 2                       | 2 * e_Earth * sin(delta_omega)      |
 | Dynamic geocentric           | eccDist/2 - eo_geo/2              | eo_geo (full)                       |
-| Equation of center           | eocFraction=-0.07 (near zero)     | Per-planet eocFraction (0.49-0.56)  |
+| Equation of center           | eocFraction=-0.07 (near zero)     | Per-planet eocFraction (0.495-0.585)  |
 | Planet speed sign             | Negative (-2pi/count)             | Positive (+2pi/count)               |
 | RealPeri speed               | Synodic rate                      | -2pi (annual)                       |
 | Mirror pair                  | Jupiter                           | N/A                                 |
@@ -537,10 +539,10 @@ most of the speed variation effect.
 | Planet  | omega_planet | delta_omega | elipticOrbit | Formula      | EoC          |
 |---------|-------------|-------------|-------------|--------------|--------------|
 | Mars    | 336.1 deg   | -233.1 deg  | ~5.78       | eccDist/2 - eo_geo/2 | frac=-0.07   |
-| Jupiter | 14.3 deg    | 88.6 deg    | +3.34       | 2*e_E*sin(dw)| frac=0.51    |
-| Saturn  | 92.4 deg    | 10.5 deg    | +0.61       | 2*e_E*sin(dw)| frac=0.56    |
-| Uranus  | 170.9 deg   | -68.0 deg   | -3.10       | 2*e_E*sin(dw)| frac=0.54    |
-| Neptune | 44.9 deg    | 58.0 deg    | +2.83       | 2*e_E*sin(dw)| frac=0.55    |
+| Jupiter | 14.3 deg    | 88.6 deg    | +3.34       | 2*e_E*sin(dw)| frac=0.495   |
+| Saturn  | 92.4 deg    | 10.5 deg    | +0.61       | 2*e_E*sin(dw)| frac=0.54    |
+| Uranus  | 170.9 deg   | -68.0 deg   | -3.10       | 2*e_E*sin(dw)| frac=0.53    |
+| Neptune | 44.9 deg    | 58.0 deg    | +2.83       | 2*e_E*sin(dw)| frac=0.585   |
 
 Mars's elipticOrbit (~5.78 dynamically) is the largest because it includes
 the planet's own eccentricity. For Type III planets, the elipticOrbit is
@@ -575,10 +577,10 @@ orbitalEccentricityBase:       (phase-derived at runtime)
 eocFraction:               -0.066224     (EoC multiplier, near-zero = mostly geometric)
 longitudePerihelion:       336.0650681   (ecliptic longitude of perihelion, degrees)
 ascendingNode:             49.55737662   (ecliptic ascending node, degrees)
-angleCorrection:           -2.1094       (perihelion alignment offset, degrees)
-startpos:                  121.475       (orbital phase at model start, degrees)
+angleCorrection:           -2.1102627    (perihelion alignment offset, degrees)
+startpos:                  121.4634462   (orbital phase at model start, degrees)
 perihelionEclipticYears:   H × 8/36     (perihelion precession period)
-perihelionRef_JD:          2456505.6     (phase-optimized)
+perihelionRef_JD:          2456499.441   (phase-optimized)
 inclinationCycleAnchor:    236.07        (ICRF perihelion longitude where MAX inclination occurs, at balanced year n=7 ≈ -2,649,854 BC, degrees)
 ascNodeToolCorrection:     130.44        (180 - ascendingNode, tilt placement frame correction)
 type:                      'II'          (formula selector)

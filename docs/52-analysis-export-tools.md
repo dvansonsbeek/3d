@@ -21,7 +21,7 @@ This document describes all data export, report generation, and validation syste
 
 ## Overview
 
-The simulation provides four export / validation systems:
+The simulation provides five export / validation systems (the fifth, the **Solar Day** report under Reports → Solar Day, exports the Layer-taxonomy solar-day values — see doc 11 and doc 99 § the H/5 LOD correction):
 
 | System | Purpose | Output Format | Location |
 |--------|---------|---------------|----------|

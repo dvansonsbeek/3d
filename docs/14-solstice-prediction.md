@@ -11,7 +11,7 @@ status: current
 
 The Holistic Universe Model predicts the timing and position of all four cardinal
 points (VE, SS, AE, WS) using **23 harmonics + the ecc-braid/joint/derived term families** per cardinal point:
-5 Fibonacci fundamentals (H/3, H/5, H/8, H/13, H/16) plus 19 overtones from
+4 Fibonacci fundamentals (H/3, H/5, H/8, H/13 — H/16 is NOT in the divisor set; its content lives in the ECC_TERMS braid) plus 19 overtones from
 nonlinear interactions between the precession cycles.
 
 These harmonics replace the conventional Meeus polynomial approach, extending
@@ -33,7 +33,7 @@ The RA position requires **zero observations** — it is fully derived from mode
 | **SS** (Summer Solstice) | Max declination | **1.0 min** | <!--v:juneSolstice2000JD-->2451716.575<!--/v--> (Jun 21, 01:48 UTC) |
 | **VE** (Vernal Equinox) | Dec crosses 0° ascending | **0.05 min** | 2451623.738 (Mar 20, 05:42 UTC) |
 | **AE** (Autumnal Equinox) | Dec crosses 0° descending | **0.6 min** | 2451810.304 (Sep 22, 19:18 UTC) |
-| **WS** (Winter Solstice) | Min declination | **1.0 min** | 2451900.067 (Dec 21, 01:37 UTC) |
+| **WS** (Winter Solstice) | Min declination | **1.0 min** | 2451900.067 (Dec 21, 13:37 UTC) |
 
 > **Scope note (ESSRT).** This document describes cardinal-point prediction within a single Earth Fundamental Cycle evaluated at J2000. The Fibonacci divisors (H/3, H/5, H/8, H/13, H/16, …) are scale-invariant L1 lattice structure — they remain integer divisors at any epoch. The literal year counts (<!--v:H-->335,317<!--/v-->; <!--v:earthPeriPeriod-->20,957<!--/v-->; mean year length `meanSolarYearDays`) and the full-cycle harmonic fits (335,318 rows per type, 1-year steps) are J2000-anchored: under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) and `meanSolarYearSeconds` evolve via Driver 1 (Earth-Moon tidal LOD growth) and Driver 2 (solar mass loss → Kepler), so the absolute timings would shift at deep time even though the harmonic structure does not. See [doc 20](20-constants-reference.md) for the J2000 → `meanSiderealYearSecondsAtAge` / `meanHAtAge` helper map.
 
@@ -84,7 +84,7 @@ exactly mirroring the obliquity formula where both components use the same ampli
 
 ## Formula 2: Cardinal Point Timing (Julian Day)
 
-Each cardinal point has its own 24-harmonic Fourier fit, anchored at the observed J2000
+Each cardinal point has its own 23-harmonic Fourier fit, anchored at the observed J2000
 value. Harmonics are self-corrected to return the exact anchor at year 2000:
 
 ```
@@ -171,8 +171,8 @@ cardinal point**, which includes the full equation-of-center modulation
 (days-scale, via the ecc-braid terms above).
 
 The ~98-second spread between cardinal point year lengths documented in
-[doc 11](11-length-day-year-formulas.md) manifests here as the H/16 amplitude of
-±1.77–1.81 days accumulated over the <!--v:earthPeriPeriod-->20,957<!--/v-->-year (at J2000) perihelion precession cycle.
+[doc 11](11-length-day-year-formulas.md) manifests here as ±1.77–1.81 days of
+event-time offset accumulated over the <!--v:earthPeriPeriod-->20,957<!--/v-->-year (at J2000) perihelion precession cycle. (In the shipped model this content is carried by the `CARDINAL_POINT_ECC_TERMS` braid on the H/16 phase, not by literal H/16 sinusoids — see § "The equation-of-center content" above.)
 
 ---
 
@@ -205,22 +205,25 @@ small H/16 and higher-order terms in RA), not of free-parameter tuning.
 
 ### 2. Fibonacci fundamentals dominate
 
-The 5 Fibonacci fundamental periods (H/3, H/5, H/8, H/13, H/16) carry the largest
-amplitudes. The 19 additional overtones provide progressively finer corrections,
+The 4 Fibonacci fundamental periods in the divisor set (H/3, H/5, H/8, H/13) carry the largest
+amplitudes; the H/16 perihelion content enters via the ECC_TERMS braid. The 19 additional overtones provide progressively finer corrections,
 with many being sums or multiples of the fundamentals (e.g., 6=3+3, 11=3+8, 24=8+16).
 
-### 3. H/16 phase rotates 90° between consecutive cardinal points
+### 3. The perihelion phase rotates 90° between consecutive cardinal points
 
 The variable-speed effect (equation of center) creates a timing shift that rotates
 with perihelion precession. At SS it's sin-dominated, at VE it's cos-dominated,
 at AE it's −cos, at WS it's −sin. This is the perihelion precession "sweeping"
 through the cardinal points over the <!--v:earthPeriPeriod-->20,957<!--/v-->-year (at J2000) H/16 cycle.
+(In the shipped model this 90° rotation is exactly the `e·sin M` carrier of the
+ECC_TERMS braid — the four cardinal points read one rotating perihelion vector
+through fixed 90° rotations; see the doc 99 braid-law section.)
 
 ### 4. Obliquity mean is derived from the Pythagorean tilt model
 
 The simple geometric obliquity formula `earthtiltMean − A·cos(H/3) + A·cos(H/8)` has a
 mean of <!--v:meanObliquity-->23.41353<!--/v-->° (the time-average of cosines is zero). But the obliquity **actually
-measured at the summer solstice** (max declination) averages 23.45326° — a systematic
+measured at the summer solstice** (max declination) averages 23.45338° — a systematic
 +0.040° (143") offset.
 
 This offset is **physically derived** from the scene graph's 3D geometry. The precession
@@ -237,13 +240,13 @@ obliquityMean = <sqrt((ε + δε)² + (earthRAAngle·cos(φ₁₆))² + (inclMea
 ```
 
 where `<...>` denotes the time-average over one full H. This formula uses only existing
-model parameters and produces 23.45326° — matching the simulation data to **1.4 arcsec**.
+model parameters and produces 23.45338° — matching the simulation data to **1.4 arcsec**.
 
 The `computeObliquityEarth()` function computes this derived mean at startup (no hardcoded
 value), then adds 16 fitted harmonics for the oscillation.
 
 Many of the same overtone harmonics appear as in the cardinal point JD fits (H/5, H/6, H/11,
-H/13, H/16, H/19, H/24), confirming these are universal interaction terms
+H/13, H/19, H/24), confirming these are universal interaction terms
 of the Fibonacci precession hierarchy.
 
 ### 5. Long-term calendar implications
@@ -286,7 +289,7 @@ All implementations return exact J2000 anchor values by construction. Legacy `SO
 |----------|-------|--------|
 | `CARDINAL_POINT_ANCHORS` | 4 × JD values | Astronomical observation (J2000 cardinal points) |
 | `CARDINAL_POINT_HARMONICS` | 4 × 23 × [div, sin, cos] (+ ECC_TERMS / JOINT_TERMS / DERIVED families) | Fitted from 335,318 simulation observations per type |
-| `SOLSTICE_OBLIQUITY_MEAN` | 23.45326° | **Derived at startup** from Pythagorean tilt model (zero fitting) |
+| `SOLSTICE_OBLIQUITY_MEAN` | 23.45338° | **Derived at startup** from Pythagorean tilt model (zero fitting) |
 | `SOLSTICE_OBLIQUITY_HARMONICS` | 16 × [div, sin, cos] | Fitted from 335,318 SS observations |
 | `earthInvPlaneInclinationMean` | <!--v:earthInclMean-->1.48113<!--/v-->° | Model parameter (mean orbital plane tilt to invariable plane) |
 | `earthRAAngle` | 1.25478° | Scene graph parameter (perihelion precession tilt) |

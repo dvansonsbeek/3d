@@ -28,7 +28,7 @@ The simulation includes several interactive panels for inspecting planetary data
 | **Climate Formula Explorer** | L1+L2+L3 climate formula visualized across LR04 / CENOGRID / EPICA / CenCO2PIP, multiple time windows — see [doc 58](58-climate-formula-explorer.md) |
 | **ESSRT Explorer** | Deep-time evolution of H, LOD, year length, Moon distance under Expanding Solar System Resonance Theory — see [doc 59](59-essrt-explorer.md) |
 | **LOD-Climate Rhythm** | dLOD/dt driver layers (Tidal (L1) / + GIA (L2) / + Cycles (L3) / + Core-mantle (L4)) vs named climate periods + GISP2/LR04 temperature; Σ_stack ↔ Bond 2001 IRD comparison — physics in [doc 102](102-gia-alpha-lunar-validation.md) + [doc 104](104-millennial-rotation-swing.md) |
-| **Formula Verification** | Model vs published celestial-mechanics formulas (±12,000 yr, 9 quantities) — see [doc 57](57-formula-verification.md) |
+| **Formula Verification** | Model vs published celestial-mechanics formulas (±12,000 yr, 10 quantities) — see [doc 57](57-formula-verification.md) |
 
 > **Scope note (ESSRT).** Each panel is intrinsically a present-epoch UI that reads from the live simulation state — what users see at any time reflects whatever date is currently active. When users scrub the simulation date by millions of years, the panels reflect ESSRT-evolved values automatically (per `DEEP_TIME_MODE_ENABLED` in `src/script.js`). The Solar System Resonance Cycle panel displays integer divisors (scale-invariant); the ESSRT Explorer is the dedicated visualization for how those divisors' literal year-counts evolve at deep time. See [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the formalism.
 
@@ -230,7 +230,7 @@ For Mercury through Neptune, the "Perihelion Precession" group includes dynamica
 | **Missing advance of perihelion** | `predictGeocentricPrecession()` − baseline | Fluctuation above/below heliocentric rate at current year |
 | **Perihelion precession (Geocentric)** | `predictGeocentricPrecession()` | Total geocentric rate at current year (baseline + fluctuation) |
 
-These use the 429-term predictive formula system (ported from Python) with trained coefficients per planet.
+These use the unified predictive formula system (ported from Python; ~2,400 coefficients per planet in `PREDICT_COEFFS_PHYSICAL`).
 
 #### Mercury-Specific Rows
 
@@ -245,12 +245,12 @@ Mercury has additional grouped rows comparing the model to General Relativity:
 
 | Component | Location |
 |-----------|----------|
-| `TAB_CONFIG` | script.js:~26140 |
-| `planetStats` row definitions | script.js:~21689–26135 |
-| `updateDomLabel()` | script.js:~26770 (renders rows, tab filtering, color classes) |
-| `buildObliquityChart()` | script.js:~26280 |
-| `buildPerihelionChart()` | script.js:~26489 |
-| `predictGeocentricPrecession()` | script.js:~30641 |
+| `TAB_CONFIG` | `src/script.js` (search the identifier) |
+| `planetStats` row definitions | `src/script.js` |
+| `updateDomLabel()` | `src/script.js` (renders rows, tab filtering, color classes) |
+| `buildObliquityChart()` | `src/script.js` |
+| `buildPerihelionChart()` | `src/script.js` |
+| `predictGeocentricPrecession()` | `src/script.js` |
 | Collapsible sidebar CSS | style.css (`.pl-handle`, `.pl-collapsed`, `@keyframes pl-pulse`) |
 | Tab bar + color coding CSS | style.css (`.pl-tab-bar`, `.pl-static`, `.pl-dynamic`) |
 
@@ -403,8 +403,8 @@ An interactive modal for testing different planetary group assignments and Fibon
 
 ### Accessing the Explorer
 
-1. Expand the "Observed Positions" folder, then the "Invariable Plane Analysis" subfolder
-2. Click "Invariable Plane Balance Explorer"
+1. Open the Tweakpane **Tools** folder
+2. Click **"Invariable Plane Inspector"**
 
 ### Key Features
 
@@ -422,7 +422,7 @@ An interactive modal for testing different planetary group assignments and Fibon
 
 - Inclination balance: **~100%** (99.997%)
 - Eccentricity balance: **~99.9%**
-- LL bounds: **8/8 pass** (Saturn: +0.028° excess, within 0.03° LL uncertainty)
+- LL bounds: **7/8 pass** (Saturn: +0.030° excess over its upper bound — the documented margin case)
 - Trend directions: **7/7 fitted planets match JPL** (J2000-fixed frame)
 - Total trend error: **~4.3″/century** across the 7 fitted planets
 
@@ -520,14 +520,14 @@ See [56 — WebGeoCalc Explorer](56-webgeocalc-explorer.md) for the complete obs
 
 ### Purpose
 
-Modal that visualizes the canonical **L1+L2+L3 climate formula** (see [doc 92](92-climate-formula.md)) overlaid on each of the four climate proxy records — CenCO2PIP (66 Myr), CENOGRID (67 Myr), LR04 (5.3 Myr) — with multiple sub-windows on LR04 (1.2 Myr post-MPT extended, 800 kyr EPICA, 700 kyr post-MPT, 200 kyr past, forward projection). Lets the user toggle each layer (Total / L1 / L2 / L3) and switch the CENOGRID proxy between δ¹⁸O and δ¹³C.
+Modal that visualizes the canonical **L1+L2+L3 climate formula** (see [doc 92](92-climate-formula.md)) overlaid on each of the four climate proxy records — CenCO2PIP (66 Myr), CENOGRID (67 Myr), LR04 (5.3 Myr), EPICA CO₂ (800 kyr) — with multiple sub-windows on LR04 (1.2 Myr post-MPT extended, 800 kyr EPICA, 700 kyr post-MPT, 200 kyr past, forward projection). Lets the user toggle each layer (Total / L1 / L2 / L3) and switch the CENOGRID proxy between δ¹⁸O and δ¹³C.
 
 ### Accessing the Explorer
 
 1. Open the Tweakpane Tools folder
 2. Click "Climate Formula Explorer"
 3. Use the time-window tabs across the top to switch records
-4. Use the layer toggles (Total / L1 / L2 / L3) to add or remove formula layers
+4. Use the three layer checkboxes (Total / L1 / L2 — L3 is folded into every curve) to add or remove formula layers
 5. On CENOGRID, use the δ¹⁸O / δ¹³C sub-toggle
 
 ### Key Features
@@ -535,7 +535,7 @@ Modal that visualizes the canonical **L1+L2+L3 climate formula** (see [doc 92](9
 | Feature | Description |
 |---------|-------------|
 | **Eight time-window tabs** | CenCO2PIP 66M, CENOGRID 67M, LR04 5.3M, LR04 1.2M, EPICA 800k, LR04 700k, LR04 200k, forward projection |
-| **Layer toggles** | Total (baseline + L1 + L2 + L3), L1 only (orbital lattice — 31 integer divisors of 8H at J2000), L2 (carbon-cycle thermostat 405/202/135 kyr family), L3 (6 Heaviside step components at PETM/EOT/Mi-1/MMCT/iNHG/MPT) |
+| **Layer toggles (3 checkboxes)** | Total (baseline + L1 + L2 + L3), L1 only (orbital lattice — 32 integer divisors of 8H at J2000), L2 (carbon-cycle thermostat 405/202/135 kyr family); the L3 Heaviside steps (PETM/EOT/Mi-1/MMCT/iNHG/MPT) are folded into every curve |
 | **Proxy chart** | Observed proxy data + the formula evaluated at the same timestamps |
 | **CENOGRID proxy sub-toggle** | δ¹⁸O vs δ¹³C |
 | **Forward projection tab** | Predicts climate forcing forward — Holocene correctly identified as interglacial; next natural glaciation predicted ~58 kyr ahead |
@@ -551,21 +551,21 @@ See [doc 58 — Climate Formula Explorer](58-climate-formula-explorer.md) for th
 
 ### Purpose
 
-Modal that visualizes the **Expanding Solar System Resonance Theory (ESSRT)** — how the Earth Fundamental Cycle H, length-of-day, sidereal year, Moon distance, and ΔT evolve across deep time. The Solar System Resonance Cycle (8H ≈ 2.68 Myr today) and its integer-divisor lattice are structural invariants, but H itself expands monotonically across geological time via two physically independent drivers: **Earth-Moon tidal evolution (Driver 1)** lengthens LOD; **solar mass loss (Driver 2)** expands every orbit via Kepler's third law. The integers in the lattice stay fixed; only the literal time unit scales.
+Modal that visualizes the **Expanding Solar System Resonance Theory (ESSRT)** — how the Earth Fundamental Cycle H, axial precession, obliquity period, length-of-day, year length, AU distance, and Moon distance evolve across deep time. The Solar System Resonance Cycle (8H ≈ 2.68 Myr today) and its integer-divisor lattice are structural invariants, but H itself expands monotonically across geological time via two physically independent drivers: **Earth-Moon tidal evolution (Driver 1)** lengthens LOD; **solar mass loss (Driver 2)** expands every orbit via Kepler's third law. The integers in the lattice stay fixed; only the literal time unit scales.
 
 ### Accessing the Explorer
 
 1. Open the Tweakpane Tools folder
 2. Click "ESSRT Explorer"
-3. Use the **Quantity** tabs (top row) to select what to plot: H, LOD, sidereal year, tropical year, Moon distance, ΔT, etc.
-4. Use the **Range** tabs (second row, teal accent) to select the time range: full Hadean → +1 Gyr, Phanerozoic 650 Ma, etc.
+3. Use the **Quantity** tabs (top row, 7 tabs) to select what to plot: H-Period, Axial Precession, Obliquity period, Length of Day, Length of Year, AU Distance, Moon Distance
+4. Use the **Range** tabs (second row, teal accent) to select the time range: full (−4.5 Gyr genesis → +1 Gyr), Phanerozoic 650 Ma, etc.
 
 ### Key Features
 
 | Feature | Description |
 |---------|-------------|
-| **Quantity tabs (gold)** | H(t), LOD, sidereal/tropical year length, Moon distance, ΔT — all derived from Farhat 2022 Moon-distance polynomial + angular-momentum conservation + Driver 2 solar mass loss |
-| **Range tabs (teal)** | Full deep-time (Hadean ~−4.54 Gyr → +1 Gyr), Phanerozoic 650 Ma, finer-grained sub-ranges |
+| **Quantity tabs (gold, 7)** | H-Period, Axial Precession, Obliquity period, Length of Day, Length of Year, AU Distance, Moon Distance — all derived from the regime-aware recession history + angular-momentum conservation + Driver 2 solar mass loss |
+| **Range tabs (teal)** | Full deep-time (genesis −4.498 Gyr → +1 Gyr), Phanerozoic 650 Ma, finer-grained sub-ranges |
 | **Hover tooltip** | Year and value at any point on the chart, with snap-to-nearest-sample |
 | **Export buttons** | "Export Full" and "Export Phanerozoic" — produce paper-style SVG (white background) for the selected quantity over those ranges |
 | **Validation references** | Curves pass through anchored data points from cyclostratigraphy (Wu 2024, Boulila 2018), tidal-rhythmite measurements (Williams 2000), Devonian coral growth bands (Wells 1963), and the Patterson 1956 Pb-Pb age constraint |
@@ -588,7 +588,7 @@ It is the interactive home of the **Σ_stack ↔ Bond 2001 IRD comparison** — 
 
 1. Open the Tweakpane Tools folder
 2. Click "LOD-Climate Rhythm"
-3. Pick an **epoch tab** (six windows; default **750–2050 AD**, the culturally-recognizable MWP → LIA → Modern window)
+3. Pick an **epoch tab** (7 windows; default **750–2050 AD**, the culturally-recognizable MWP → LIA → Modern window)
 4. Toggle layers with the legend checkboxes; open the three collapsible evidence panels below the chart
 
 ### Key Features
@@ -615,13 +615,13 @@ GISP2 + Bond live in `public/input/climate-proxy.json`; all are loaded/derived b
 
 | Item | Location |
 |------|----------|
-| Modal block (comment header → close) | `src/script.js` ~lines 24198–25445, CSS prefix `.lcr-` (reuses `.cfm-*` modal chrome) |
-| `LCR_RANGE_TABS` / `LCR_CLIMATE_PERIODS` / `LCR_BOND_EVENTS` / `LCR_SIGN_CHECK_EVENTS` | ~24627 / ~24640 / ~24233 / ~24374 |
-| `lcrComputeSeries` (rate curves + crossings, cached per tab) | ~24661 |
-| `lcrRenderChart` / `lcrExport` | ~24712 / ~25078 |
-| `lcrComputeCorrelations` / `lcrRenderCorrelationPanel` / `lcrRenderSignCheckPanel` / `lcrRenderBondMatchTable` | ~24268 / ~24438 / ~24387 / ~24499 |
-| `createLcrPanel` / `openLcrPanel` / `closeLcrPanel` | ~25240 / ~25431 / ~25441 |
-| Tools folder button | ~30279 |
+| Modal block (comment header → close) | `src/script.js`, CSS prefix `.lcr-` (reuses `.cfm-*` modal chrome) |
+| `LCR_RANGE_TABS` / `LCR_CLIMATE_PERIODS` / `LCR_BOND_EVENTS` / `LCR_SIGN_CHECK_EVENTS` | `src/script.js` (search the identifiers) |
+| `lcrComputeSeries` (rate curves + crossings, cached per tab) | `src/script.js` |
+| `lcrRenderChart` / `lcrExport` | `src/script.js` |
+| `lcrComputeCorrelations` / `lcrRenderCorrelationPanel` / `lcrRenderSignCheckPanel` / `lcrRenderBondMatchTable` | `src/script.js` |
+| `createLcrPanel` / `openLcrPanel` / `closeLcrPanel` | `src/script.js` |
+| Tools folder button | `src/script.js` (Tweakpane Tools folder) |
 
 ### Full Reference
 
@@ -639,13 +639,13 @@ Compares the model's predictions against published closed-form formulas from cel
 
 1. Open the Tweakpane Tools folder
 2. Click "Formula Verification"
-3. Navigate between the 9 categories with the `‹` / `›` arrows or click the category name to open a dropdown
+3. Navigate between the 10 categories with the `‹` / `›` arrows or click the category name to open a dropdown
 
 ### Key Features
 
 | Feature | Description |
 |---------|-------------|
-| **Nine categories** | Eccentricity, obliquity, inclination (inv. plane), ascending node (inv. plane), perihelion longitude, tropical year, solar day, sidereal year, axial precession |
+| **Ten categories** | Eccentricity, obliquity, inclination (inv. plane), ascending node (inv. plane), perihelion longitude, tropical year, solar day, sidereal year, axial precession, ΔT (TT − UT1) |
 | **Main chart** | Model curve (amber) + all reference formulas on a −12,000 BC to +12,000 AD axis, with J2000 gridline |
 | **Residual chart** | `reference − model` in arcseconds, seconds, milliseconds, degrees, or AU depending on the category |
 | **J2000 comparison table** | Every reference formula's value at J2000 + Δ vs Model, with source links |
@@ -693,7 +693,7 @@ The tilt is then: `arccos(L_total.y / |L_total|)`
 | Souami & Souchay (2012) | 1.5787° | Reference |
 | Our calculation | 1.5786° | 0.0001° (0.36 arcsec) |
 
-This <!--v:balanceThreshold-->99.994%<!--/v--> accuracy validates that our orbital elements are consistent with published values.
+This 99.994% agreement validates that our orbital elements are consistent with published values.
 
 ---
 

@@ -258,7 +258,9 @@ audit split 3 confirmed · 13 off-peak · 5 regional · 0 ΔT-signal ·
 penumbra can still cover these sites; under the U1 umbra-tier chain —
 the package besselian, the single umbra implementation since the
 strangler — the entire first-hand ancient corpus is off-peak class —
-Lu 29 km, Nabonidus 111, Nineveh 174, Thales 212, Babylon −135 206 —
+Lu 29 km, Nabonidus 111, Nineveh 174, Thales 212, Babylon −135 206 at the
+U1 landing (current audit run: Lu 9, Nabonidus 104, Nineveh 174, Thales 211,
+Babylon 194 — doc 103) —
 1973 Agadez rises to confirmed, and the remaining geographic five are
 the four adjudicated Said-Stephenson Cairo attributions plus the −647
 early-diary partial; prior batch splits live in git history);
@@ -791,7 +793,7 @@ The apsidal/nodal values carry a micro-recalibration for the 8H-count layer
 rates (hence the last-digit drift from the first anchoring pass). The
 anchoring meter's node-rate row reads the **world frame**: the nodal layer
 spins at the of-date period (6798.33 d, −19.3411°/yr) in its local frame, and
-Earth's axial-precession parent adds the equinox precession (<!--v:eccentricityMin-->~0.0140<!--/v-->°/yr, both
+Earth's axial-precession parent adds the equinox precession (~0.0140°/yr, both
 retrograde), so the measured world-frame regression is the star-referenced
 −19.3551°/yr.
 
@@ -1078,7 +1080,8 @@ below the +1.4″ fleet mean; the era split refutes anchor
 double-counting, the modern era improves most). The owner shipped on
 the principle that the fleet-wide JPL truth governs and every value is
 derived; the ≤8″ api gate holds. Final location-tier state: all-phase
-Sun 2.12″ / Moon λ 3.03″ / β 0.65″; syzygy 3.82″; tracked centerlines
+Sun 2.12″ / Moon λ 3.03″ / β 0.65″ (the 20.3h round-2 Delaunay tail later
+closed λ to 2.96″); syzygy 3.82″; tracked centerlines
 2.7″ mean, 6.7″ max (current audit run, 14 events / 42 points).
 
 ### Geocentric parallax limit
@@ -1248,10 +1251,10 @@ the source of the -135 residual.** Under the current 26-event eclipse
 alignment audit (see
 [Historical Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)
 and [doc 103](103-135-babylonian-case-study.md)), -135 reports BestGap
-BestGap 1221 km (geographic verdict, at the regional boundary; audit
-history: 949 km legacy arguments → 1032 → 1088 → 1221 → 1323 (post-§10g
-quadrature-locked sidebands + symmetric divisor set) across the
-certified batches) with the framework's predicted UT within 16 minutes of
+**194 km (off-peak verdict)** under the certified framework-native chain
+(historical audit progression through the Meeus-era batches: 949 km legacy
+arguments → 1032 → 1088 → 1221 → 1323, before the E4/E5 Sun and umbra
+strangler collapsed it) with the framework's predicted UT within 9 minutes of
 the documented UT — a *where* residual carried by Sun-side longitude, GMST
 convention, and umbra geometry, primarily not a *when* residual and
 not a Moon-series error. The Babylonian-era Meeus residual sweep of

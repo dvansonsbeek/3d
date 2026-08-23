@@ -199,7 +199,7 @@ and therefore the most significant eccentricity oscillations.
 **Derivation of base eccentricities:**
 
 - **Earth**: eccentricityBase = <!--v:eccentricityBase-->0.015386<!--/v--> (tuned parameter in the model)
-- **Saturn**: 0.05386607 (dual-balance optimized, sole anti-phase group member)
+- **Saturn**: 0.05386582 (dual-balance optimized, sole anti-phase group member)
 - **Jupiter, Uranus**: Dual-balanced from Law 5 optimization
 - **Venus, Mars**: Derived by fitting a cosine to JPL Horizons eccentricity
   data (originally fitted at H/16 period; to be re-fitted with per-planet eccentricity cycles).
@@ -246,7 +246,7 @@ The JPL J2000 values represent the actual eccentricity at that epoch:
 | Uranus  | <!--v:uranusEccJ2000Full-->0.04725744<!--/v-->    | <!--v:uranusEccJ2000Full-->0.04725744<!--/v-->    |  0.000%       |
 | Neptune | <!--v:neptuneEccJ2000Full-->0.00859048<!--/v-->    | <!--v:neptuneEccJ2000Full-->0.00859048<!--/v-->    |  0.000%       |
 
-At J2000, **Earth and Mars are above their base eccentricities** (Earth: <!--v:earthEccJ2000-->0.01671<!--/v--> vs base <!--v:earthEccBase-->0.01539<!--/v-->; Mars: <!--v:marsEccJ2000-->0.09339<!--/v--> vs base 0.09147), while **Venus is below its base** (<!--v:venusEccJ2000-->0.00678<!--/v--> vs <!--v:venusEccBase-->0.00771<!--/v-->). The differences reflect each planet's phase in its own eccentricity oscillation at the J2000 epoch. The outer giants (Jupiter, Saturn, Uranus, Neptune) have base eccentricities calibrated very close to their J2000 values (differences ≤ 1.5×10⁻⁵, well below 0.1%), so their J2000 model values match the base values at the precision shown above. The current phase-derived calibration makes the outer-planet differences much smaller than under earlier calibrations, where Laplace-Lagrange secular exchange was invoked to explain ~0.2–1.1% offsets (see Section 10).
+At J2000, **Earth and Mars are above their base eccentricities** (Earth: <!--v:earthEccJ2000-->0.01671<!--/v--> vs base <!--v:earthEccBase-->0.01539<!--/v-->; Mars: <!--v:marsEccJ2000-->0.09339<!--/v--> vs base <!--v:marsEccBase-->0.09165<!--/v-->), while **Venus is below its base** (<!--v:venusEccJ2000-->0.00678<!--/v--> vs <!--v:venusEccBase-->0.00771<!--/v-->). The differences reflect each planet's phase in its own eccentricity oscillation at the J2000 epoch. The outer giants (Jupiter, Saturn, Uranus, Neptune) have base eccentricities calibrated very close to their J2000 values (differences ≤ 1.5×10⁻⁵, well below 0.1%), so their J2000 model values match the base values at the precision shown above. The current phase-derived calibration makes the outer-planet differences much smaller than under earlier calibrations, where Laplace-Lagrange secular exchange was invoked to explain ~0.2–1.1% offsets (see Section 10).
 
 ### Law 5 Weight Contributions
 
@@ -269,12 +269,12 @@ At J2000, **Earth and Mars are above their base eccentricities** (Earth: <!--v:e
 
 | Planet  | Mean Incl (deg) | Amplitude (deg) | J2000 Incl (deg) | Range (deg)      |
 |---------|-----------------|------------------|-------------------|------------------|
-| Mercury |  6.703207       | 0.386478         | <!--v:mercuryInclJ2000-->6.3472858<!--/v-->         | 6.32 to 7.09    |
-| Venus   |  <!--v:venusInclMean-->2.151359<!--/v-->       | 0.062165         | <!--v:venusInclJ2000-->2.1545441<!--/v-->         | 2.09 to 2.21    |
+| Mercury |  <!--v:mercuryInclMean-->6.703216<!--/v-->       | <!--v:mercuryInclAmp-->0.386488<!--/v-->         | <!--v:mercuryInclJ2000-->6.3472858<!--/v-->         | 6.32 to 7.09    |
+| Venus   |  <!--v:venusInclMean-->2.151359<!--/v-->       | <!--v:venusInclAmp-->0.062166<!--/v-->         | <!--v:venusInclJ2000-->2.1545441<!--/v-->         | 2.09 to 2.21    |
 | Earth   |  <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> | <!--v:earthInclJ2000-->1.57869<!--/v--> | 0.85 to 2.12    |
 | Mars    |  <!--v:marsInclMean-->1.833256<!--/v-->       | <!--v:marsInclAmp-->1.164246<!--/v-->         | <!--v:marsInclJ2000-->1.6311858<!--/v-->         | 0.67 to 3.00    |
 | Jupiter |  <!--v:jupiterInclMean-->0.321086<!--/v-->       | <!--v:jupiterInclAmp-->0.021404<!--/v-->         | <!--v:jupiterInclJ2000-->0.3219652<!--/v-->         | 0.30 to 0.34    |
-| Saturn  |  0.984965       | 0.065193         | <!--v:saturnInclJ2000-->0.9254704<!--/v-->         | 0.92 to 1.05    |
+| Saturn  |  <!--v:saturnInclMean-->0.984967<!--/v-->       | <!--v:saturnInclAmp-->0.065194<!--/v-->         | <!--v:saturnInclJ2000-->0.9254704<!--/v-->         | 0.92 to 1.05    |
 | Uranus  |  <!--v:uranusInclMean-->1.015182<!--/v-->       | <!--v:uranusInclAmp-->0.023831<!--/v-->         | <!--v:uranusInclJ2000-->0.9946692<!--/v-->         | 0.99 to 1.04    |
 | Neptune |  <!--v:neptuneInclMean-->0.743803<!--/v-->       | <!--v:neptuneInclAmp-->0.013551<!--/v-->         | <!--v:neptuneInclJ2000-->0.7354155<!--/v-->         | 0.73 to 0.76    |
 
@@ -304,8 +304,8 @@ All other planets match exactly. (The mean-vs-instantaneous distinction for Eart
 
 | Check                          | Result       |
 |--------------------------------|-------------|
-| Law 3 vector balance (mean ecc) | 100.0000%   |
-| Law 3 vector balance (J2000 ecc) | 100.0000% |
+| Law 3 vector balance (mean ecc) | 99.9974%   |
+| Law 3 vector balance (J2000 ecc) | 99.9974% |
 
 The inclination balance is not a tuned result — it is a consequence of the
 Fibonacci d-values, phase assignments, and PSI formula. The tiny residual
@@ -343,11 +343,14 @@ For each planet, six parameters fully describe the orbital dynamics:
 Note: Columns 2 and 6 are identical — the amplitude of axial tilt oscillation IS the
 amplitude of inclination oscillation, both derived from PSI / (d * sqrt(m)).
 
-**Earth's amplitude: mean vs instantaneous.**
-The ψ formula gives the **mean amplitude over the full H cycle**: 0.632469°.
-This is the structural value that achieves 100% Law 3 inclination balance.
-However, the IAU obliquity rate at J2000 (<!--v:obliquityRateArcsecPerCy-->-46.836769<!--/v-->"/cy) constrains the
-**instantaneous amplitude** to 0.636055° — a 0.57% difference (12.9 arcsec).
+**Earth's amplitude: mean vs instantaneous (historical derivation).**
+An earlier full-H-cycle averaging analysis estimated a mean amplitude of
+0.632469° against the IAU-rate-constrained **instantaneous amplitude** of
+0.636055° (a 0.57% difference, 12.9 arcsec). In the shipped model this
+distinction is retired: ψ is *defined from* the IAU-pinned amplitude
+(<!--v:earthInclAmp-->0.63605<!--/v-->°), and the IAU obliquity rate at J2000
+(<!--v:obliquityRateArcsecPerCy-->-46.836769<!--/v-->"/cy) is the single constraint.
+The paragraphs below record the original phase analysis.
 
 This is not an exception but a predictable phase effect. The instantaneous
 amplitude depends on where J2000 falls in the H/3 and H/8 cycles:
@@ -510,18 +513,18 @@ their effect on Law 5 weights is negligible for the dominant planets.
 
 ## 12. Code References
 
-| Constant / Section                    | File                        | Line(s)     |
+| Constant / Section                    | File                        | Anchor      |
 |---------------------------------------|-----------------------------|-------------|
-| eccentricityBase (Earth mean)         | src/script.js               | 46          |
-| eccentricityAmplitude (Earth)         | src/script.js               | 47          |
-| Planet eccentricities (phase-derived) | src/script.js               | 133-244     |
-| Inclination mean/amplitude            | src/script.js               | 393-424     |
-| BALANCE_CONFIG                        | src/script.js               | 11657-11770 |
-| Law 5 formula                         | src/script.js               | 11865-11877 |
-| Law 3 formula                         | src/script.js               | 11845-11863 |
-| PSI constant                          | tools/lib/constants.js      | 421         |
-| Mass fractions                        | tools/lib/constants.js      | 407-418     |
-| eccentricityAmplitudeK (K)           | tools/lib/constants.js      | 66          |
+| eccentricityBase (Earth mean)         | src/script.js               | search `eccentricityBase` |
+| eccentricityAmplitude (Earth)         | src/script.js               | search `eccentricityAmplitude` |
+| Planet eccentricities (phase-derived) | src/script.js               | constants block |
+| Inclination mean/amplitude            | src/script.js               | constants block |
+| BALANCE_CONFIG                        | src/script.js               | search `BALANCE_CONFIG` |
+| Law 5 formula                         | src/script.js               | search `Law 5` |
+| Law 3 formula                         | src/script.js               | search `Law 3` |
+| PSI constant                          | tools/lib/constants.js      | search `PSI` |
+| Mass fractions                        | tools/lib/constants.js      | search `massFraction` |
+| eccentricityAmplitudeK (K)           | tools/lib/constants.js      | search `eccentricityAmplitudeK` |
 | orbitalEccentricityAmplitude (per planet) | tools/lib/constants.js  |             |
 | axialTiltJ2000 (per planet)           | tools/lib/constants.js      |             |
 | Balance search script                 | tools/verify/balance-search.js |          |
