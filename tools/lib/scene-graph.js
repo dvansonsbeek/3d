@@ -69,7 +69,7 @@ function _frameworkSunLon(jd_ut) {
   } else {
     T_tropical_days = C.meanSolarYearDays;
   }
-  const L0_j2000_deg = 280.46646;   // Sun mean lon at J2000 (matches Meeus anchor)
+  const L0_j2000_deg = C.ASTRO_REFERENCE.sunMeanLongitudeJ2000_deg;   // Sun mean lon at J2000 (astro-reference.json — was a duplicated 280.46646 literal, value-identical)
   const L_deg = L0_j2000_deg + 360 * days_from_j2000 / T_tropical_days;
 
   // ── Perihelion longitude (H/16 cycle; framework's precession) ──────────
