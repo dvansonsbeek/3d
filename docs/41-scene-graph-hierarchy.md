@@ -236,8 +236,10 @@ This 14.5-cycle offset positions the obliquity fluctuation to correctly explain 
 | startPos | `correctionSun` | June 21, 2000 alignment correction |
 | rotation tilt | -7.155° | Solar axis inclination |
 
-**The δ overlay (SW campaign).** On top of the wheel's legacy longitude stack
-(linear tropical rate + Kepler EoC + `sunLongitudeCorrection` harmonics),
+**The δ overlay (SW campaign).** On top of the wheel's own longitude stack
+(linear tropical rate + full Kepler EoC — exact by derivation since FQ-3, which
+retired the fitted `sunLongitudeCorrection` harmonics from this path via the
+split-completion corrector, doc 65 §The Exact-Kepler Wheel),
 `moveModel` adds one term δ = λ_certified − λ_twin — the difference between the
 certified E4/E5 framework-native Sun and the wheel's own twin evaluation —
 applied inside the clock-convention window (full weight ≤ 3,000 yr from J2000,

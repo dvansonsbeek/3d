@@ -407,7 +407,7 @@ the δ overlay):
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `SUN_LONGITUDE_HARMONICS` | 3-term array | Fitted sun-longitude harmonics, ~279″ annual span |
+| `SUN_LONGITUDE_HARMONICS` | 3-term array | Fitted sun-longitude harmonics, ~279″ annual span. RETIRED from the scene display path (FQ-3 exact-Kepler corrector, doc 65); registry entry retained — Step 0 remains its fitter, the D2 completion's PAIRED hash fingerprints it, and the Step-6a instrument still applies it |
 | `SUN_LONGITUDE_MEAN` | −0.0018807° | Fitted mean offset (~−6.8″) |
 
 ## Earth Perihelion Harmonics

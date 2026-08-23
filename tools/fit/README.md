@@ -48,6 +48,13 @@ the H-lattice filter applied at runtime — the [168] term is automatically
 skipped, only the 3 year-multiple terms (1 yr, ½ yr, ⅓ yr) and any future
 lunar-precession or small-precession-divisor terms are applied. Sun-only
 application (NOT barycenter) keeps planet baselines pristine. See Step 0.
+**Status 2026-08 (FQ-3):** the harmonics are RETIRED from the moveModel
+display path in both runtimes — the exact-Kepler split-completion corrector
+(`FQ3_EXACT_SUN`, doc 65 §The Exact-Kepler Wheel) removes the split error at
+the geometry level (twin−wheel 279″ → 0.8″). They stay registry constants:
+Step 0 remains their fitter, the D2 completion's PAIRED hash fingerprints
+them, and `computeSunPositionFast` (the Step-6a instrument) plus the
+legacy A/B path (`FQ3_EXACT_SUN=0`) still apply them.
 
 **Status 2026-07-15:** Sun harmonic whitelist further tightened. Previously
 clause (d) `sharesFactorWithH` (gcd(d, H) > 1) admitted mid-range divisors
@@ -202,7 +209,7 @@ then `npm run constants:generate` (Step 9).
 | `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-solar-measurements.csv` |
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
 | `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/02-solar-measurements.csv` |
-| `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (H-lattice terms; **see design rule above** — only divisors n where H/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime H-lattice filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. |
+| `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (H-lattice terms; **see design rule above** — only divisors n where H/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime H-lattice filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. **2026-08 (FQ-3): retired from the moveModel display path** (exact-Kepler corrector, doc 65); still consumed by the Step-6a instrument + the legacy A/B path, and still fitter-owned here. |
 | `sun-planetary-completion-fit.js` | NOTHING (read-only, the Step-0 companion — 20.3h, SUPERSEDED by Stage D2) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Was the dev record behind the v1 fitted 10-term table; the shipped table is now the DERIVED 68-term Stage-D2 extraction (`tools/explore/d2-derived-sun.mjs` → `d2-sun-table-extraction.mjs` → `d2-joint-preview.mjs`), so its coefficient-drift part no longer applies — its syzygy + NASA-centerline scoreboards remain valid verification. After ANY Step-0 refit, re-run the D2 chain and re-embed the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |

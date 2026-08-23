@@ -178,10 +178,15 @@ The geometric orbit offset parameters are **unchanged**:
 
 ### Results
 
-Sun baseline vs JPL Horizons (2000-2025, 26 yearly dates):
+Sun baseline vs JPL Horizons at the time of this derivation (2000-2025,
+26 yearly dates):
 - RMS Total: 0.065 degrees (with IAU precession correction applied)
 - RMS Dec: 0.0004 degrees
 - Entries: 26
+
+Current state (dense JPL baseline, exact-Kepler wheel — see § The
+Exact-Kepler Wheel below): RMS Total 0.0029° — the fitted-correction
+path reads 0.0037° on the same run.
 
 Year lengths:
 - Mean Tropical Year: 365.242190835 days (IAU: 365.242200, diff +0.10s)
@@ -336,6 +341,16 @@ Per-planet fractions and implementation details:
 > eclipse finders' un-injected default. This section remains the record
 > of what Z-B is and why it exists (the in-window absorber of the
 > geometric-split wheel's annual imperfection).
+>
+> **RETIRED FROM THE DISPLAY PATH (FQ-3, exact-Kepler wheel).** The
+> split error Z-B absorbed has since been DERIVED and removed at the
+> geometry level (see § The Exact-Kepler Wheel below): with
+> `FQ3_EXACT_SUN(_ENABLED)` on (the default in both runtimes) the
+> moveModel sun no longer evaluates this correction at all. The fitted
+> terms remain registry constants (Step 0 stays their fitter; the D2
+> completion's PAIRED hash fingerprints them; `computeSunPositionFast`
+> — the declared Step-6a instrument — and the legacy A/B path still
+> apply them), but nothing on the display path consumes them.
 
 ### What it adds
 
@@ -567,6 +582,67 @@ and what was learned from each.
 
 ---
 
+## The Exact-Kepler Wheel (FQ-3) — the split error derived and removed
+
+The Z-B section above absorbed the geometric-split wheel's annual
+imperfection with three fitted terms. The FQ-3 campaign (plan §12i)
+first ATTRIBUTED that imperfection exactly, then replaced the fitted
+absorber with a derived corrector.
+
+**The attribution (W0, instrument
+`tools/explore/fq3-wheel-sun-attribution.mjs`).** The raw wheel's error
+against the analytic full-Kepler twin measures 278.98″ annual + 8.93″
+semiannual + 0.11″ third-harmonic + 4.93″ constant — identical to the
+fitted Z-B content (279.0″/8.96″/0.13″, mean −6.77″) to 0.1″: the
+absorber was exactly the split error, nothing else. The mechanism
+closes in two named parts:
+
+1. **Amplitudes** — the split composition (parent center-offset at
+   magnitude e toward the perihelion direction, plus the sun node's
+   2nd-order EoC at `eocEccentricity = e − base/2`) differs from full
+   Kepler at first order by exactly `e − base` = 273.1″ at J2000;
+   closure 97.7% annual / 98.9% semi / 100% third.
+2. **Phase** — the wheel's REALIZED offset-vector direction (the
+   composition `−base·û(θ_p1) + amp·û(θ_p1+θ_p2)` of the peri-layer
+   phases) sits 1.035° from the law's ϖ direction, predicting a 62.3″
+   annual-quadrature component vs the measured 61.8″ residual.
+
+Combined mechanism share ~100%; the offset magnitude tracks the
+H/16 e-law to six decimals at every probe epoch.
+
+**The corrector (W1).** In difference form the mean longitude cancels,
+so the exact-Kepler completion is a pure function of the branch's own
+live values — zero constants, no anchor or frame quantity:
+
+```
+Δλ = EoC_full(e) − EoC_half(e − base/2) − geoTerm(d⃗, θ_sun)
+d⃗  = −base·û(θ_p1) + amp·û(θ_p1 + θ_p2)      (live peri-layer phases)
+θ  += Δλ / J                                   (first-order Jacobian)
+```
+
+Shipped in both runtimes (`FQ3_EXACT_SUN` in `tools/lib/scene-graph.js`,
+`FQ3_EXACT_SUN_ENABLED` in `src/script.js`; default ON, `=0` restores
+the fitted path). The offset vector reads the already-animated parent
+phases, so the form is integrated-phase correct in deep-time mode by
+construction. One convention trap is recorded in the code comment:
+node-ry angles are λ-handed — only the raw world-frame `atan2(z,x)`
+extraction runs opposite ecliptic longitude.
+
+**Measured (W2, instrument `tools/explore/fq3-w1-verify.mjs`).**
+twin − wheel: 279.0″ annual / 197.4″ sd → **0.80″ annual / 0.57″ sd**;
+the legacy control reproduces the W0 numbers byte-identically; deep
+time stays bounded (17.8″ at −135, 29.4″ at −3000, 6.6″ at +20000);
+the Sun-vs-JPL optimizer baseline improves 0.0037° → 0.0029°; planet
+baselines unchanged at recorded precision (the sub-5″ fixture-visible
+planet shifts are the documented scaffold coupling through the
+corrections' heliocentric-distance regressor). The ~4.4″ constant
+residual against the twin is anchor-class — named and left honest, not
+absorbed. The certified eclipse chain is untouched by construction
+(tier-driven since the umbra strangler); the audit artifact regenerated
+with every value reproduced.
+
+---
+
 ## Verification Checklist
 
 After any future changes to this system:
@@ -581,7 +657,17 @@ After any future changes to this system:
 8. Run `node tools/optimize.js diagnose sun` -- eccentricity ratio ~1.08
 9. Run `node tools/optimize.js baseline sun` -- RA drift ~54 arcsec/yr (frame effect)
 
-### Phase Z-B (Sun Longitude Harmonics) verification
+### FQ-3 (exact-Kepler wheel) verification
+
+- `node tools/explore/fq3-w1-verify.mjs` — expect twin − wheel ~0.80″
+  annual / ~0.57″ sd; the control
+  (`FQ3_EXACT_SUN=0 SUN_HARMONICS_DISABLED=1`) must reproduce the W0
+  content (279.0″ annual / 197.4″ sd).
+- `node tools/optimize.js baseline all` — planet baselines unchanged;
+  Sun RMS Total ~0.0029°.
+
+### Phase Z-B (Sun Longitude Harmonics) verification — legacy path
+(`FQ3_EXACT_SUN=0`; the display default no longer evaluates Z-B)
 
 10. Confirm `SUN_HARMONICS_ENABLED = true` in `src/script.js`
 11. Run `node tools/explore/sun-annual-correction.js` -- expect:

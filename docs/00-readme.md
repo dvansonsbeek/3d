@@ -119,7 +119,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 62 | [Type I Inner Planets](62-type-i-inner-planets.md) | Mercury & Venus implementation |
 | 63 | [Type II Earth-Crossers](63-type-ii-earth-crossers.md) | Mars eccentricity corrections & calibration |
 | 64 | [Type III Outer Planets](64-type-iii-outer-planets.md) | Jupiter, Saturn, Uranus, Neptune implementation |
-| 65 | [Equation of Center](65-equation-of-center.md) | Variable-speed orbit implementation. The display Sun now rides the certified E4/E5 framework-native longitude via the δ overlay (see doc 99 § The framework-native Sun); the fitted Z-B harmonics remain as the legacy stack underneath |
+| 65 | [Equation of Center](65-equation-of-center.md) | Variable-speed orbit implementation. The display Sun rides the certified E4/E5 framework-native longitude via the δ overlay (see doc 99 § The framework-native Sun); since FQ-3 the wheel underneath is EXACT-KEPLER by derivation — the split error attributed to ~100% (amplitude = e−base; phase = the realized offset direction) and the fitted Z-B harmonics retired from the display path (§The Exact-Kepler Wheel) |
 | 66 | [Moon Meeus Corrections](66-moon-meeus-corrections.md) | Meeus-based moon corrections |
 | 67 | [Planet Parallax Corrections](67-planet-parallax-corrections.md) | Geocentric parallax correction implementation |
 | 68 | [Orbital Period Calibration](68-orbital-period-calibration.md) | Calibration with ancient observations |
