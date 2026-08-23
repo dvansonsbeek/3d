@@ -37,7 +37,7 @@ The attribution is rock-solid — and the framework now agrees with it at the of
 
 ## Framework prediction at -135 Apr 15
 
-The certified eclipse chain computes the Sun via the E4/E5 framework-native assembly (see the update at the top). Since the SW campaign the SCENE's wheel Sun rides the SAME certified Sun through one δ term added on top of its legacy stack (δ = λ_certified − λ_twin, applied inside the clock-convention window — full weight in the corpus era, tapering off where a TT-clock Sun would clash with the deliberately-UT deep-time scene); the legacy stack underneath remains linear tropical-year rate + Kepler equation of center + the `sunLongitudeCorrection` harmonics, whose fit quality the display no longer depends on. Moon position via Meeus Ch. 47 60-term polynomial. Earth ΔT from the L1-orbital-coupled α(t) tidal integrator (`meanDeltaTSecondsAtAge`).
+The certified eclipse chain computes the Sun via the E4/E5 framework-native assembly (see the update at the top). Since the SW campaign the SCENE's wheel Sun rides the SAME certified Sun through one δ term added on top of its legacy stack (δ = λ_certified − λ_twin, applied inside the clock-convention window — full weight in the corpus era, tapering off where a TT-clock Sun would clash with the deliberately-UT deep-time scene); the legacy stack underneath remains linear tropical-year rate + Kepler equation of center + the `sunLongitudeCorrection` harmonics, whose fit quality the display no longer depends on. Moon position via the framework's full derived lunar series (Meeus Ch. 47 base + the derived Delaunay extension terms; λ 2.96″ / β 0.65″ vs JPL). Earth ΔT from the L1-orbital-coupled α(t) tidal integrator (`meanDeltaTSecondsAtAge`).
 
 Audit-26 result for -135 Apr 15 (documented UT 06:14):
 
@@ -151,6 +151,10 @@ At -135 Apr 15 (t_Ma = 0.002135), rough magnitudes:
 
 ## GMST (Earth-rotation frame) drift
 
+> **Update (certified chain):** re-measured under the certified framework
+> chain this drift is **0.358°**; the figures below are the Meeus-era
+> measurements, kept because the mechanism discussion still applies.
+
 Component-level audit at NASA-UT reveals framework's implicit GMST is **0.70° behind** the IAU standard (Meeus eq. 12.4):
 
 ```
@@ -197,7 +201,7 @@ is <!--v:babylon135BestGapKm-->194<!--/v--> km. The components:
 | Moon arguments (D/M substitution) | ≤ 0.0061° / 39 km | Exonerated |
 | Umbra "greatest" convention (piercing point vs radial projection) | Definitional spread between catalog conventions | Not physics |
 
-The residual ~205 km is the composite of the remaining along-track dial
+The residual ~194 km is the composite of the remaining along-track dial
 degeneracy, the certified skeleton's own instant residual class vs DE441
 (a series-accuracy topic, 20.3h), and scan-grid sampling. Prior
 decompositions of the pre-injection chain live in git history.
@@ -216,7 +220,7 @@ Implication: the α(t) constants shipped in the framework (α = <!--v:alphaJ2000
 
 ## Interpretation
 
-Framework places the -135 Apr 15 umbra track within **~220 km of Babylon** at its best scan point, agreeing with the documented UT to 9 minutes; the local-circumstance instrument reads magnitude **0.986** at the site on the traditional date, and the ΔT-free identification cascade selects that date uniquely with the required ΔT inside Stephenson's published totality window — the framework's reduction and Stephenson's overlap. The diary's record (Venus, Mercury, and "Normal Stars" visible) is consistent with the deep-totality-boundary circumstances the framework now computes at the site.
+Framework places the -135 Apr 15 umbra track within **194 km of Babylon** at its best scan point, agreeing with the documented UT to 9 minutes; the local-circumstance instrument reads magnitude **0.988** at the site on the traditional date, and the ΔT-free identification cascade selects that date uniquely with the required ΔT inside Stephenson's published totality window — the framework's reduction and Stephenson's overlap. The diary's record (Venus, Mercury, and "Normal Stars" visible) is consistent with the deep-totality-boundary circumstances the framework now computes at the site.
 
 The former disagreement classes are resolved or exonerated per the component table above; what remains is dial-degenerate along-track budget and the certified series' own instant residual class.
 
@@ -230,8 +234,8 @@ Under the current shipped stack (LLR α₁ + L1-orbital α(t) + 4-flag lattice s
 
 | Verdict | Count | Meaning |
 |---|---:|---|
-| ✓ confirmed | 2 | UT and geography match within 300 km at the framework's own UT |
-| ↻ off-peak observer | 14 | Site on the path; observer wasn't at greatest moment |
+| ✓ confirmed | 3 | UT and geography match within 300 km at the framework's own UT |
+| ↻ off-peak observer | 13 | Site on the path; observer wasn't at greatest moment |
 | ↶ regional match | 5 | Umbra in the same region as site (300-1000 km) |
 | ◇ ΔT-signal (any) | 0 | Framework agrees with the documented UT on every event |
 | ⚠ geographic offset | 5 | Umbra *centerline* >1000 km from site at every scanned moment (an umbra-distance gate, not visibility — the penumbra can still cover the site) |
@@ -282,7 +286,7 @@ The Moon polynomial audit (§ above) rules out lunar theory as a closable compon
 
 The asymmetry this section originally identified — the framework accepting Meeus Moon's empirical T² terms while rejecting Meeus Sun's (linear-rate philosophy) — is resolved. The framework-native fundamental arguments are the shipped default: the M′/F secular content is expressed through the framework's own channels (frame-convention linear rates + the solar-eccentricity T²/T³ channel — full derivation record in [doc 66 §1](66-moon-meeus-corrections.md)), the scene hierarchy is J2000-element anchored, and the configuration is certified within ±2 events of pure Meeus across the full NASA canon. The old "Brown m² wrong sign" blocker dissolved: the Precession Invariant governs the tidal MEAN rate while the eccentricity channel is a bounded oscillation around it.
 
-With the framework-native Moon complete and the ΔT stack shipped, the -135 prediction stands at the off-peak class (umbra within ~220 km, UT within 9 minutes). Path (b) of option 1 — accepting the linear-rate Sun at antiquity as a design consequence — is the adopted position; the Meeus-Moon-internal-Sun observation is measured and closed (≤ 39 km).
+With the framework-native Moon complete and the ΔT stack shipped, the -135 prediction stands at the off-peak class (umbra within 194 km, UT within 9 minutes). Path (b) of option 1 — accepting the linear-rate Sun at antiquity as a design consequence — is the adopted position; the Meeus-Moon-internal-Sun observation is measured and closed (≤ 39 km).
 
 ### The deep-branch lunar secular — closed and certified
 
@@ -335,4 +339,4 @@ Independent published sources for cross-checking framework's interpretation:
 
 - **Russian geology repository — historical-eclipse compilation** ([link](https://repository.geologyscience.ru/server/api/core/bitstreams/6dd0f726-52e0-4e06-a7c4-28fb9cfa2aa6/content)) — discussion in the context of Earth-rotation history; independent third source for path-geometry / ΔT-sensitivity framing.
 
-These external sources establish the context every reconstruction shares: the eclipse's geographic placement at Babylon depends critically on the exact Sun precision, ΔT model, and greatest-eclipse convention — the IMCCE-acknowledged "limits of current celestial mechanics." Within that context the framework's current prediction (umbra track within ~220 km of Babylon, UT within 9 minutes, deep-totality-boundary local circumstances at the site) places the traditional identification on solid footing.
+These external sources establish the context every reconstruction shares: the eclipse's geographic placement at Babylon depends critically on the exact Sun precision, ΔT model, and greatest-eclipse convention — the IMCCE-acknowledged "limits of current celestial mechanics." Within that context the framework's current prediction (umbra track within 194 km of Babylon, UT within 9 minutes, deep-totality-boundary local circumstances at the site) places the traditional identification on solid footing.

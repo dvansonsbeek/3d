@@ -85,7 +85,7 @@ All numbers from the canonical regression scripts:
 | Berger insolation alone (model e/ϖ) | R² = 0.049 | R² = 0.188 | R² = 0.096 |
 | **Berger insolation alone (Laskar e/ϖ)** | — | **R² = 0.293** | **R² = 0.172** |
 | L1+L2+L3 + Berger insolation (model) | R² = 0.8776 → ΔR² = +0.0041 | R² = 0.9436 → +0.00123 | R² = 0.8494 → +0.0042 |
-| **L1+L2+L3 + Berger insolation (Laskar)** | — | **R² = 0.9424 → +0.00000** | **R² = 0.9230 → +0.00001** |
+| **L1+L2+L3 + Berger insolation (Laskar)** | — | **R² = 0.9424 → +0.00000** | **R² = 0.8452 → +0.00001** |
 
 Three lines tell the story:
 

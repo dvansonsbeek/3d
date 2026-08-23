@@ -129,7 +129,7 @@ Applied to the −708 window (±30 yr, local magnitude ≥ 0.6 at Qufu
 (−708 total 1.019 · −703 partial 0.869 · −687 partial 0.697) **→ the
 record's totality ("ji", complete) keeps exactly one** — the
 traditional −708-07-17, on which the framework independently computes
-totality at the site (audit BestGap 51 km). The traditional
+totality at the site (audit BestGap 9 km). The traditional
 identification survives a filter that never consulted the chronology it
 confirms.
 

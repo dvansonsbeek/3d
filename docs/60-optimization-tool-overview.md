@@ -17,7 +17,7 @@ status: current
 - [64-type-iii-outer-planets.md](64-type-iii-outer-planets.md) — Type III eccentricity (Jupiter–Neptune)
 - [65-equation-of-center.md](65-equation-of-center.md) — Variable speed / Kepler's 2nd law
 - [66-moon-meeus-corrections.md](66-moon-meeus-corrections.md) — Meeus Ch. 47 lunar perturbations
-- [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) — Up to 42-parameter parallax correction
+- [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) — Up to 78-parameter parallax correction
 - [68-orbital-period-calibration.md](68-orbital-period-calibration.md) — Ancient observation calibration
 - [69-optimization-baseline.md](69-optimization-baseline.md) — Baseline results
 - [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); optimization runs against modern-era JPL/Horizons reference data are present-epoch
@@ -153,7 +153,7 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 |--------|---------|-----------|
 | Mercury | H/(1+3/8) | Prograde |
 | Venus | −8H/6 | **Retrograde** |
-| Mars | H/(4+3/8) | Prograde |
+| Mars | 8H/36 | Prograde |
 | Jupiter | 8H/39 | Prograde |
 | Saturn | −8H/65 | **Retrograde** |
 | Uranus | H/3 | Prograde |

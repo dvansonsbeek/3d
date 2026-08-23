@@ -256,7 +256,7 @@ Mars's precession fluctuation is driven by:
 
 1. **Relative geometry**: The angle between Mars's perihelion and Earth's perihelion (δ = θE - θMars)
 2. **Earth Rate Deviation (ERD)**: Variations in Earth's axial precession rate
-3. **Mars's own perihelion precession**: Period of H×8/35
+3. **Mars's own perihelion precession**: Period of 8H/36
 4. **Jupiter-Mars resonance**: Mars is strongly influenced by Jupiter's gravitational perturbations
 
 ### 6.2 Formula Summary
@@ -387,7 +387,7 @@ For implementation details, see [predictive_formula.py](../tools/lib/python/pred
 > | Uranus | Zeros (not needed) | 0.999618 |
 > | Neptune | Not used | 0.999902 |
 >
-> This mathematical requirement provides strong evidence that **Saturn drives Earth's obliquity cycle**. The period synchronization (both = H/8) and the necessity of explicit coupling for accurate modeling suggest a causal relationship: Saturn's gravitational influence modulates Earth's axial tilt oscillation.
+> This mathematical requirement provides strong evidence that **Saturn drives Earth's obliquity cycle**. The near-synchronization (Earth obliquity H/8 = 8H/64, Saturn's ecliptic perihelion −8H/65 — one lattice step apart) and the necessity of explicit coupling for accurate modeling suggest a causal relationship: Saturn's gravitational influence modulates Earth's axial tilt oscillation.
 >
 > This challenges the standard Milankovitch interpretation, which attributes obliquity variations to general gravitational torque without identifying a specific planetary driver.
 
@@ -505,7 +505,7 @@ The table below shows two sets of formula accuracy values:
 | Property | Mercury | Venus | Mars | Jupiter | Saturn | Uranus | Neptune |
 |----------|---------|-------|------|---------|--------|--------|---------|
 | Eccentricity | <!--v:mercuryEccJ2000-->0.20564<!--/v--> | <!--v:venusEccJ2000-->0.00678<!--/v--> | <!--v:marsEccJ2000-->0.09339<!--/v--> | <!--v:jupiterEccJ2000-->0.04839<!--/v--> | <!--v:saturnEccJ2000-->0.05386<!--/v--> | <!--v:uranusEccJ2000-->0.04726<!--/v--> | <!--v:neptuneEccJ2000-->0.00859<!--/v--> |
-| Period | H×8/11 | −8H/6 | H×8/35 | H/5 | H/8 | H/3 | H×2 |
+| Period | H×8/11 | −8H/6 | 8H/36 | 8H/39 | −8H/65 | H/3 | H×2 |
 
 ### Observed Formula Accuracy (using Excel data)
 
@@ -531,7 +531,7 @@ The table below shows two sets of formula accuracy values:
 | Uranus | 0.999618 | 1.40 | 429 |
 | Neptune | 0.999902 | 0.25 | 429 |
 
-> **Why the difference?** Observed formulas use actual planetary positions from the Excel data, while predictive formulas must calculate everything from just the year. Venus's near-circular orbit (e = 0.007) makes its perihelion position poorly defined, so the observed formula achieves much better accuracy (0.46 vs 6.22 arcsec).
+> **Why the difference?** Observed formulas use actual planetary positions from the Excel data, while predictive formulas must calculate everything from just the year. Venus's near-circular orbit (e = 0.007) makes its perihelion position poorly defined, so the observed formula achieves much better accuracy (0.46 vs 3.47 arcsec).
 
 ### Key Observations
 
@@ -550,7 +550,7 @@ The table below shows two sets of formula accuracy values:
 - **Uranus** and **Neptune** achieve the best fits (RMSE = 0.01–0.02 arcsec/century)
 - **Saturn** has ecliptic-retrograde precession, creating the resonance loop
 
-> **Physical Interpretation**: The Fibonacci hierarchy organizes the entire solar system's precession dynamics. Planetary periods correspond to integer divisors of 8H: Jupiter (8H/39), Saturn (−8H/65), Mars (H×8/35), Uranus (H/3), Venus (−8H/6), and Neptune (H×2). The near-perfect fits achieved across all planets suggest the solar system is deeply organized around this mathematical structure.
+> **Physical Interpretation**: The Fibonacci hierarchy organizes the entire solar system's precession dynamics. Planetary periods correspond to integer divisors of 8H: Jupiter (8H/39), Saturn (−8H/65), Mars (8H/36), Uranus (H/3), Venus (−8H/6), and Neptune (H×2). The near-perfect fits achieved across all planets suggest the solar system is deeply organized around this mathematical structure.
 
 ---
 
@@ -573,7 +573,7 @@ The fundamental periods are model parameters, not independently derived values:
 | **Planetary perihelion periods** | | | |
 | Mercury | H×8/11 | Fibonacci | Mercury fluctuation formula |
 | Venus | −8H/6 (ecliptic-retrograde) | Fibonacci | Venus fluctuation formula |
-| Mars | H×8/35 | Fibonacci | Mars fluctuation formula |
+| Mars | 8H/36 | 8H lattice | Mars fluctuation formula |
 | Jupiter | 8H/39 | dynamical | Jupiter fluctuation, beat frequencies |
 | Saturn | −8H/65 (ecliptic-retrograde) | dynamical | Saturn fluctuation, resonance loop |
 | Uranus | H/3 | Fibonacci | Uranus fluctuation formula |
@@ -759,7 +759,7 @@ All planetary formulas are implemented in Python for consistency and to handle t
 |--------|-----|-------------|----------|----------------|
 | Mercury | 0.999994 | 0.22 | 225 | H×8/11 |
 | Venus | **0.999999** | **0.46** | **328** | −8H/6 |
-| Mars | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.03 | 225 | H×8/35 |
+| Mars | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.03 | 225 | 8H/36 |
 | Jupiter | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.06 | 225 | 8H/39 |
 | Saturn | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.05 | 225 | −8H/65 |
 | Uranus | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.01 | 225 | H/3 |
@@ -795,7 +795,7 @@ where `inclination(t)` is the dynamic invariable-plane inclination from `calc_pl
 | Mercury | <!--v:mercuryObliqCycle-->894,179<!--/v--> yr | 8H/3 | Confirmed (0.1% vs ~895 kyr, Bills 2005) |
 | Venus | N/A | — | Tidally damped at 177° |
 | Earth | <!--v:hDiv8-->41,915<!--/v--> yr | H/8 | Confirmed (2% vs ~41 kyr) |
-| Mars | 125,744 yr | 3H/8 | Confirmed (0.8% vs ~124,800 yr, Laskar 2004) |
+| Mars | <!--v:marsObliqCycle-->127,740<!--/v--> yr | 8H/21 | Confirmed (2.4% vs ~124,800 yr, Laskar 2004) |
 | Jupiter | <!--v:hDiv2-->167,659<!--/v--> yr | H/2 | Prediction |
 | Saturn | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | H/3 | Prediction (mirror-pair with Earth) |
 | Uranus | <!--v:hDiv2-->167,659<!--/v--> yr | H/2 | Prediction (tentative) |

@@ -65,7 +65,7 @@ This rational subdivision creates the interconnected cycles that produce Earth's
 
 ---
 
-## Part 2: Object Structure
+## Part 3: Object Structure
 
 Every object in the scene follows this internal structure:
 
@@ -105,7 +105,7 @@ Where:
 
 ---
 
-## Part 3: Complete Scene Hierarchy
+## Part 4: Complete Scene Hierarchy
 
 The complete nesting order from the technical guide:
 
@@ -124,14 +124,14 @@ startingPoint (scene root)
     │                       ├── PERIHELION-OF-EARTH   ← sibling
     │                       └── [All planet chains]   ← siblings of Sun
     │
-    └── Moon Hierarchy (see Part 7)
+    └── Moon Hierarchy (see Part 8)
 ```
 
 Each nesting layer applies its rotation to all children, creating composite precession movements.
 
 ---
 
-## Part 4: Earth Precession Layers
+## Part 5: Earth Precession Layers
 
 ### 4.1 Earth Layer (Core)
 
@@ -200,7 +200,7 @@ The paired inverse rotations maintain equilibrium during Earth's two counter-mot
 
 ---
 
-## Part 5: The Balanced Year
+## Part 6: The Balanced Year
 
 The **Balanced Year** is a critical concept for understanding the model's phase alignments.
 
@@ -219,7 +219,7 @@ This 14.5-cycle offset positions the obliquity fluctuation to correctly explain 
 
 ---
 
-## Part 6: Sun and Perihelion Point
+## Part 7: Sun and Perihelion Point
 
 ### 6.1 Barycenter Sun
 
@@ -238,7 +238,7 @@ This 14.5-cycle offset positions the obliquity fluctuation to correctly explain 
 
 ---
 
-## Part 7: Moon Hierarchy
+## Part 8: Moon Hierarchy
 
 The Moon has its own set of precession cycles nested within Earth's frame:
 
@@ -275,7 +275,7 @@ RA/Dec override).
 
 ---
 
-## Part 8: Outer Planet Hierarchy
+## Part 9: Outer Planet Hierarchy
 
 All planets from Mercury to Neptune (plus Pluto, Halley's Comet, and Eros) are **siblings** of the Sun under `barycenterEarthAndSun`, not children of the Sun.
 
@@ -303,9 +303,9 @@ For current computed values, see [Constants Reference](20-constants-reference.md
 |--------|-----------|-----------|
 | Mercury | H / (1+3/8) | Prograde |
 | Venus | −8H / 6 | **Retrograde** |
-| Mars | H / (4+3/8) | Prograde |
-| Jupiter | H / 5 | Prograde |
-| Saturn | −H / 8 | **Retrograde** |
+| Mars | 8H / 36 | Prograde |
+| Jupiter | 8H / 39 | Prograde |
+| Saturn | −8H / 65 | **Retrograde** |
 | Uranus | H / 3 | Prograde |
 | Neptune | H × 2 | Prograde |
 
@@ -313,7 +313,7 @@ For current computed values, see [Constants Reference](20-constants-reference.md
 
 ---
 
-## Part 9: How Rotations Compose
+## Part 10: How Rotations Compose
 
 ### 9.1 The Transformation Chain
 
@@ -335,7 +335,7 @@ This is why Mercury's perihelion precession appears to fluctuate when measured f
 
 ---
 
-## Part 10: RA/Declination Calculation
+## Part 11: RA/Declination Calculation
 
 The browser calculates celestial positions deterministically:
 
@@ -349,7 +349,7 @@ Updates occur after every precession frame, reflecting live tilt changes.
 
 ---
 
-## Part 11: Mathematical Constants
+## Part 12: Mathematical Constants
 
 For current values, see [Constants Reference](20-constants-reference.md).
 
@@ -364,7 +364,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 ---
 
-## Part 12: Key Composition Principles
+## Part 13: Key Composition Principles
 
 ### 12.1 Balancing Counter-Motions
 
@@ -385,7 +385,7 @@ This applies throughout the model:
 
 ---
 
-## Part 13: Summary Diagram
+## Part 14: Summary Diagram
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -416,7 +416,7 @@ This applies throughout the model:
 
 ---
 
-## Part 14: Deep-Time Mode (DEEP_TIME_MODE_ENABLED)
+## Part 15: Deep-Time Mode (DEEP_TIME_MODE_ENABLED)
 
 The scene graph described above operates in two rendering modes, selected by the `DEEP_TIME_MODE_ENABLED` flag in `src/script.js`.
 
@@ -441,7 +441,7 @@ Deep-time / Phanerozoic / Hadean simulation. The same scene graph is rendered, b
 | `_dtPlanetIntegrator`, `_dtPlanetAnchor`, `_dtPlanetSign` | TT (`_currentYearSI_TT`) | Planet orbital nodes (Mercury–Neptune, 7 nodes) | `obj._dtPlanetIntegrator(anchor, year)` |
 | `_dtPerihelionDivisor`, `_dtPerihelionAnchor` | UT for Sun, TT for planets | Equation-of-center perihelion-phase term | `cyclesBetweenYears(anchor, year, divisor)` inline |
 
-The asymmetric time-base treatment (Moon-chain stays on UT, planet orbitals go to TT) is principled, not arbitrary: doc 101's eclipse-visibility validation (19/19) was co-developed under the Moon-chain UT convention, while planets have no analogous validation tied to the time-base choice. The full rationale is in [`hidden/old-documents/IP-planet-deep-time-scene-graph.md`](hidden/old-documents/IP-planet-deep-time-scene-graph.md) § "Why the asymmetry... is principled, not arbitrary".
+The asymmetric time-base treatment (Moon-chain stays on UT, planet orbitals go to TT) is principled, not arbitrary: doc 101's eclipse-visibility validation (19/19) was co-developed under the Moon-chain UT convention, while planets have no analogous validation tied to the time-base choice. The full rationale is in `docs/archive/old-documents/IP-planet-deep-time-scene-graph.md` (untracked archive) § "Why the asymmetry... is principled, not arbitrary".
 
 ### 14.3 Both modes use the same scene graph
 
@@ -466,7 +466,7 @@ In short: **Layer 3 governs all validated rotation physics, Layer 2 governs epoc
 
 ### 14.5 References
 
-- [`hidden/old-documents/IP-planet-deep-time-scene-graph.md`](hidden/old-documents/IP-planet-deep-time-scene-graph.md) — full implementation history (Phases P-A through P-F) including the math problem, frame-composition risk, per-phase rollout, naming convention summary, and the "Future Phase Z" discussion of Moon-chain TT correctness
+- `docs/archive/old-documents/IP-planet-deep-time-scene-graph.md` (untracked archive) — full implementation history (Phases P-A through P-F) including the math problem, frame-composition risk, per-phase rollout, naming convention summary, and the "Future Phase Z" discussion of Moon-chain TT correctness
 - [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — canonical 9-step chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, planet orbital + synodic periods
 - [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) — J2000-constant → `mean*AtAge(t_Ma)` helper map
 

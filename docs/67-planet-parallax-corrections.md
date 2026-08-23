@@ -7,7 +7,7 @@ status: current
 
 # Planet Geocentric Parallax Corrections — Implementation Reference
 
-**Status**: Complete (up to 78-term correction for inner planets, 68 for outer, JPL-verified)
+**Status**: Complete (up to 78-term correction for Mercury/Venus, 68 for Mars and the outer planets, JPL-verified)
 
 ---
 
@@ -39,7 +39,7 @@ The scene graph models each planet's orbital plane as a tilted circle. The tilt 
 
 ## 2. The Correction Formula
 
-Applied to both RA and Dec independently (up to 78 coefficients for inner planets, 68 for outer):
+Applied to both RA and Dec independently (up to 78 coefficients for Mercury/Venus, 68 for Mars and the outer planets):
 
 ```
 dX = A + B/d + C·T
@@ -139,7 +139,7 @@ The correction grew incrementally from 6 to 36 parameters:
 5. **24→30→36 params**: Extended with cross-distance terms (1/(d·s), harmonics/(d·s)), quadratic heliocentric terms (harmonics/s²), triple-distance coupling (harmonics/(d²·s)), and 4th harmonic. Applied after enriching reference data to 2000+ points for Venus, Jupiter, Saturn. Per-planet tier selection via LOOCV determines optimal count.
 6. **36→42 params**: Added 4th harmonic parallax terms (AL,AM), precessing close-approach terms (AN,AO), and cubic close-approach terms (AP,AQ) targeting Venus inferior conjunction errors. Venus enriched to 3800+ points with IC-dense sampling.
 7. **42→68 params**: Added Jupiter-Saturn conjunction phase terms (AR–AW), Sun mean longitude eccentricity-offset terms (AX–BE), nonlinear close-approach × Sun longitude cross-terms (BF–BK), quadratic time drift (BL–BN), and high-order close-approach terms (BO–BQ). All 7 planets enriched to 5000+ points.
-8. **68→78 params (inner planets only)**: Added mean anomaly (M) basis functions (BR–CA) for Mercury, Venus, Mars. These capture the unmodeled EoC residual — the difference between the model's partial `eocFraction` and the full Kepler equation. Mercury (e=0.206, 47% unmodeled) gained 45% improvement. M is computed dynamically from the EoC animation, not a static formula. Outer planets excluded because their slow M cycles (17–133 in 400yr) cause collinearity with existing slow-varying terms.
+8. **68→78 params (Mercury and Venus only)**: Added mean anomaly (M) basis functions (BR–CA); Mars was tried but cross-validation kept it at 68p. These capture the unmodeled EoC residual — the difference between the model's partial `eocFraction` and the full Kepler equation. Mercury (e=0.206, 47% unmodeled) gained 45% improvement. M is computed dynamically from the EoC animation, not a static formula. Outer planets excluded because their slow M cycles (17–133 in 400yr) cause collinearity with existing slow-varying terms.
 
 ### Fitting Method
 
@@ -151,13 +151,13 @@ The sin/cos decomposition eliminates phase parameters — `amplitude·sin(u − 
 
 ## 3. Per-Planet Tier Selection
 
-Not all planets benefit from all terms. Each planet uses the tier with the lowest 10-fold cross-validation error. Inner planets (Mercury, Venus, Mars) can use up to 78 terms including mean anomaly; outer planets use up to 68:
+Not all planets benefit from all terms. Each planet uses the tier with the lowest 10-fold cross-validation error. Mercury and Venus use up to 78 terms including mean anomaly; Mars and the outer planets use up to 68:
 
 | Planet | n pts | Tier | RMS Tot | Notes |
 |--------|-------|------|---------|-------|
 | Mercury | ~5k | 78p (A–CA) | 0.079° | Mean anomaly terms, 1600–2400 |
 | Venus | ~9k | 78p (A–CA) | 0.041° | 1600–2400 |
-| Mars | ~5k | 78p (A–CA) | 0.090° | Mean anomaly terms, 1600–2400 |
+| Mars | ~5k | 68p (A–BQ) | 0.090° | 1600–2400 |
 | Jupiter | ~7k | 68p (A–BQ) | 0.052° | No M terms (too few cycles) |
 | Saturn | ~7k | 68p (A–BQ) | 0.072° | No M terms (too few cycles) |
 | Uranus | ~5k | 68p (A–BQ) | 0.016° | No M terms (too few cycles) |
@@ -169,11 +169,11 @@ Absent coefficients evaluate to zero via `(dc.X || 0)` fallback in the formula.
 
 ## 4. Overfitting Protection
 
-**LOOCV / k-fold CV**: For each candidate tier (15p, 18p, 24p, 30p, 36p, 42p), every data point is held out once (LOOCV for small datasets) or 10-fold CV is used (for enriched datasets with 2000+ points). The tier with lowest CV error wins.
+**LOOCV / k-fold CV**: For each candidate tier (15p, 18p, 24p, 30p, 36p, 42p, 68p, 78p), every data point is held out once (LOOCV for small datasets) or 10-fold CV is used (for enriched datasets with 2000+ points). The tier with lowest CV error wins.
 
 **Multicollinearity rejection**: Outer planets develop huge coefficients (millions) for 1/s² and 1/(d²·s) terms because at large heliocentric distances these become nearly collinear with simpler terms. These tiers are rejected even when CV appears slightly better, as the coefficients are numerically unstable for extrapolation beyond the training range.
 
-**Data ratio**: At 42 params (84 coefficients for RA+Dec), a planet needs substantial data for reliable fitting. Uranus (41 pts) is restricted to 24p. Enriched planets (Venus with 3800+ pts, Jupiter/Saturn with 2400+ pts) can support higher tiers where cross-validation confirms benefit.
+**Data ratio**: At 68+ params (136+ coefficients for RA+Dec), a planet needs substantial data for reliable fitting. Historically Uranus (41 pts) was restricted to 24p; after enrichment (~5,000+ points per planet) every planet supports its top tier where cross-validation confirms benefit.
 
 ---
 
@@ -187,7 +187,7 @@ RMS is computed over all training data (1800–2200 primary window + observed pr
 |--------|------|---------|-------|
 | Mercury | 78p | **0.079°** | Mean anomaly terms give 45% improvement |
 | Venus | 78p | **0.041°** | |
-| Mars | 78p | **0.090°** | Close approach limit (e=0.093) |
+| Mars | 68p | **0.090°** | Close approach limit (e=0.093) |
 | Jupiter | 68p | **0.052°** | |
 | Saturn | 68p | **0.072°** | |
 | Uranus | 68p | **0.016°** | |
@@ -345,5 +345,5 @@ The empirical approach works because it operates directly in RA/Dec output space
 
 Reference data in `data/reference-data.json` contains two tiers per planet:
 
-- **Tier 2 (weight > 0)**: 41–3812 data points per planet, spanning ~1800–2200 for most planets (Uranus: 2000–2200 only). Sources include JPL Horizons API, NASA Mercury Transit Catalog, and Meeus opposition tables. RA/Dec in J2000 frame — the precession module (`tools/lib/precession.js`) converts to of-date frame before comparison with the model. Venus has been enriched to 3812 points (including IC-dense sampling near 125 inferior conjunctions). Jupiter and Saturn have been enriched to ~2500 points for robust higher-tier fitting.
+- **Tier 2 (weight > 0)**: ~5,000–9,000 data points per planet, spanning ~1600–2400. Sources include JPL Horizons API, NASA Mercury Transit Catalog, and Meeus opposition tables. RA/Dec in J2000 frame — the precession module (`tools/lib/precession.js`) converts to of-date frame before comparison with the model. Venus is the densest (~9,000 points, including IC-dense sampling near inferior conjunctions).
 - **Tier 3 (weight = 0)**: Ancient observation data back to ~1000 BC from ISAW and mutual planetary event catalogs. Available for visual comparison but excluded from RMS calculations and parallax fitting.

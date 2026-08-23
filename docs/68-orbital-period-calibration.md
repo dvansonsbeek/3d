@@ -80,8 +80,9 @@ RMS values below are from the time of calibration (before parallax correction wa
 
 - **Jupiter** was the biggest win: 42% RMS improvement with near-zero drift.
   Further refined from 4330.65 to 4330.5 to optimize invariable plane balance
-  (the default configuration achieves ~99.9% balance). This shifts count from 28254 to 28255
-  (boundary at ~4330.455), which slightly changes the effective SMA
+  (the default configuration achieves ~99.9% balance). This shifted the integer orbit
+  count by one (boundary at ~4330.455), which slightly changes the effective SMA —
+  the current count at solarYearInput 4330.53 is 28,281 (Quantization table below)
 - **Mars** improved both drift (10.65 -> 3.89 deg) and RMS (-5.1%)
 - **Venus** improved modestly on both metrics
 - **Saturn** traded modern RMS (+0.1 deg) for near-zero ancient drift (+0.21 deg).

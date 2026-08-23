@@ -97,7 +97,7 @@ Era labels render rotated −32° below the chart, with overlap-avoidance heuris
 
 ### Wu et al. 2024 anchor overlay
 
-For three quantities (LOD, year, axial precession period, Moon distance — those where Wu 2024 provides direct cyclostratigraphic measurements), the panel overlays the Wu compilation's anchor points with ±2σ error bars:
+For four quantities (LOD, year, axial precession period, Moon distance — those where Wu 2024 provides direct cyclostratigraphic measurements), the panel overlays the Wu compilation's anchor points with ±2σ error bars:
 
 | Anchor age (Ma) | LOD (hr) | Moon (Earth radii) | Axial period (arcsec/yr) |
 |---:|---:|---:|---:|
@@ -146,7 +146,7 @@ The modal's curves pass through anchored data points from multiple independent s
 | Quantity | Anchor source | Range | Agreement |
 |---|---|---|---|
 | LOD | Wells 1963 (coral growth rings) | Devonian (~380 Ma) | Sub-percent |
-| LOD + Moon | Wu et al. 2024 (cyclostratigraphy) | 100–650 Ma | Within ±2σ at all 6 anchors |
+| LOD + Moon | Wu et al. 2024 (cyclostratigraphy) | 100–650 Ma | Within ±2σ at all 7 anchors |
 | Moon distance | Farhat 2022 (Moon-distance polynomial) | 0–4.5 Ga | <0.5% over full range |
 | Earth-Moon genesis | Patterson 1956 (Pb-Pb meteorite age) | 4.54 Ga | Moon at Roche limit at this epoch |
 | Williams 2000 (620 Ma tidal rhythmites) | rhythmite varves | 620 Ma | Discrepancy with Wu; doc 99 discusses |

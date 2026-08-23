@@ -149,9 +149,9 @@ Key differences from Type III:
 
 ### Perihelion precession
 
-Mars's perihelion precesses with period `H / (4 + 3/8)` years, where
-`H = 335317` solar years (at J2000). This corresponds to the 4+3/8 Fibonacci-derived
-divisor. The precession is split into two counter-rotating ecliptic layers
+Mars's perihelion precesses with period `8H / 36` (= H / 4.5, ~74,515 yr), where
+`H = 335317` solar years (at J2000) — an integer divisor of the 8H Solar System
+Resonance Cycle. The precession is split into two counter-rotating ecliptic layers
 that bracket the PerihelionFromEarth annual wobble, ensuring the perihelion
 direction tracks correctly in the ecliptic frame.
 

@@ -220,7 +220,7 @@ Where:
 
 ### Time Evolution of Ω
 
-Both Earth's and each planet's ascending node on the invariable plane evolve linearly over time. They are **distinct angles from the ICRF perihelion** that drives the inclination oscillation, and they evolve at **different rates**. Each planet's Ω regression period is `−(8H)/N` for an integer N stored as `ascendingNodeCyclesIn8H` in `data/planets.json`. Literal Ω period values shown are J2000-evaluated; the divisor integers N stay constant at any epoch:
+Both Earth's and each planet's ascending node on the invariable plane evolve linearly over time. They are **distinct angles from the ICRF perihelion** that drives the inclination oscillation, and they evolve at **different rates**. Each planet's Ω regression period is `−(8H)/N` for an integer N stored as `ascendingNodeCyclesIn8H` in `public/input/model-parameters.json`. Literal Ω period values shown are J2000-evaluated; the divisor integers N stay constant at any epoch:
 
 | Body | N | Ω period (yr) | Notes |
 |------|---|---------------|-------|
@@ -436,11 +436,11 @@ The ecliptic inclination of each planet varies cyclically due to:
 
 ### Special Cases: Mars, Saturn, and Uranus
 
-**Mars** has an invariable plane inclination range (1.36° - 5.84°) that overlaps Earth's range (0.85° - 2.12°). When their inclinations are equal and ascending nodes align, Mars's orbital plane can become **nearly parallel to the ecliptic** (ecliptic inclination approaching 0°).
+**Mars** has an invariable plane inclination range (0.67° - 3.00°) that overlaps Earth's range (0.85° - 2.12°). When their inclinations are equal and ascending nodes align, Mars's orbital plane can become **nearly parallel to the ecliptic** (ecliptic inclination approaching 0°).
 
-**Saturn** (0.78° - 1.11°) and **Uranus** (0.92° - 1.04°) also have ranges that overlap Earth's minimum values. These planets can experience very low ecliptic inclinations when the geometry aligns.
+**Saturn** (0.92° - 1.05°) and **Uranus** (0.99° - 1.04°) also have ranges inside Earth's range. These planets can experience very low ecliptic inclinations when the geometry aligns.
 
-**Jupiter** (0.28° - 0.41°) and **Neptune** (0.62° - 0.74°) have inclination ranges entirely **below** Earth's minimum (0.85°), so their planes can never become exactly parallel to the ecliptic, but they can get relatively close (minimum ecliptic inclination ~0.4° for Jupiter).
+**Jupiter** (0.30° - 0.34°) and **Neptune** (0.73° - 0.76°) have inclination ranges entirely **below** Earth's minimum (0.85°), so their planes can never become exactly parallel to the ecliptic, but they can get relatively close.
 
 ---
 
@@ -509,7 +509,7 @@ The planet information panels display four invariable plane values:
 | **ω̃ at Max Inclination** | ICRF perihelion longitude where inclination reaches maximum (= cycle anchor) |
 | **Current Oscillation Phase** | Position in oscillation cycle (0° = max, 180° = min) |
 
-**Note**: The ascending node values use ecliptic coordinates (precession period H/16), while the oscillation phase uses ICRF perihelion coordinates (per-planet ICRF period).
+**Note**: The ascending node values use invariable-plane coordinates (per-planet regression period −(8H)/N), while the oscillation phase uses ICRF perihelion coordinates (per-planet ICRF period).
 
 ---
 

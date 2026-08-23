@@ -9,14 +9,14 @@ status: current
 
 > **TL;DR.** Law 4 — `e_amp = K · sin(tilt) · √d / (√m · a^(3/2))` — is *bidirectional*. Solved for `sin(tilt)`, it predicts axial obliquity from secular eccentricity amplitude. Applied to 17 known TNOs under the proxy assumption `e_obs ≈ e_amp`, all require `sin(tilt) ≫ 1` — but this assumption is known to break for resonant and scattered-disk bodies, whose observed eccentricity is dominated by **base** eccentricity (resonance-forced or scattered), not by the **amplitude** Law 4 actually constrains. For 16 of the 17 the test is **inconclusive, not refutational**: their secular `e_amp` is not directly measured.
 >
-> Where independent secular-amplitude estimates exist (e.g. Pluto's `e_amp ≈ 0.025` from Williams-Benson / Malhotra integrations), Law 4 predicts an **intrinsic** amplitude of ~0.001; the additional ~0.024 is Neptune-resonance forcing on top. This is not a failed test of Law 4 — it's a decomposition: intrinsic (Law-4 amount) + external (Neptune-driven) ≈ 1 : 25 for Pluto. The honest verdict is that known TNO dynamics are dominated by external coupling (Neptune resonance, scattering, galactic tides), so Law 4's intrinsic component is overwhelmed and not separately observable from current data.
+> Where independent secular-amplitude estimates exist (e.g. Pluto's `e_amp ≈ 0.025` from Williams-Benson / Malhotra integrations), Law 4 predicts an **intrinsic** amplitude of ~0.001; the additional ~0.024 is Neptune-resonance forcing on top. This is not a failed test of Law 4 — it's a decomposition: intrinsic (Law-4 amount) + external (Neptune-driven) ≈ 1 : 24 for Pluto. The honest verdict is that known TNO dynamics are dominated by external coupling (Neptune resonance, scattering, galactic tides), so Law 4's intrinsic component is overwhelmed and not separately observable from current data.
 >
 > The genuine falsifier remains: a 100-km classical KBO at `a ≈ 45 AU`, `e ≈ 0.05` (where `e_obs ≈ e_amp` is plausible because no strong resonance forces a non-zero base) is predicted by Law 4 to have **tilt ≈ 36.6°**. But this is a **population-statistical** claim over sub-200-km cold-classical-belt KBOs — no individually catalogued/named TNO is testable, because every named body sits above the Law-4 admissibility curve. Comets and main-belt asteroids also fail to provide a clean test (§2.5). LSST is expected to constrain small-KBO rotation poles by ~2030–2035. The same Law-4 compliance test rejects all Planet Nine candidates ([doc 15](15-planet-nine-prediction.md)).
 >
 > **Scope interpretation (§7):** the body classes Law 4 admits are exactly those the IAU classifies as planets. "Cleared the neighborhood" (IAU) and "intrinsic Law-4 closure" (framework) are two formalisations of the same physical fact — a planet evolves under its own dynamics; everything else is externally forced. The framework's contribution is to make this quantitative and predictive.
 
 **Related documents:**
-- [10 — Fibonacci Laws](10-fibonacci-laws.md) — Law 4 derivation, K = 3.4149×10⁻⁶
+- [10 — Fibonacci Laws](10-fibonacci-laws.md) — Law 4 derivation, K = 3.4143×10⁻⁶
 - [15 — Planet Nine Prediction](15-planet-nine-prediction.md) — same two-tier methodology applied to ETNO candidates
 - [19 — Dual-Balance Sensitivity Analysis](19-balance-sensitivity-analysis.md) — Approach 2 (Law-4 natural) reading of v-balance
 - [38 — Eccentricity Balance Scale](38-eccentricity-scale.md) — K constant in context
@@ -36,7 +36,7 @@ The framework's Law 4 (eccentricity amplitude scaling) is normally written in th
 e_amp = K · sin(tilt) · √d / (√m · a^(3/2))
 ```
 
-with K = 3.4149 × 10⁻⁶ (the universal eccentricity-amplitude constant derived from Earth). For the 8 primary planets, all four quantities — `m`, `a`, `d` (Fibonacci divisor), and `tilt` (axial obliquity) — are independently observed, and the law closes to <1% across the full set.
+with K = 3.4143 × 10⁻⁶ (the universal eccentricity-amplitude constant derived from Earth; the analysis in this doc was run with the pre-refit value 3.4149 × 10⁻⁶ — a 0.02% difference, far below the 8–7658× failure margins reported here). For the 8 primary planets, all four quantities — `m`, `a`, `d` (Fibonacci divisor), and `tilt` (axial obliquity) — are independently observed, and the law closes to <1% across the full set.
 
 Solved for `sin(tilt)`:
 
@@ -260,7 +260,7 @@ A uniform-random expectation for `sin(tilt)` (Lambert's law over a sphere) is `�
 [Doc 15](15-planet-nine-prediction.md) introduced the two-tier compatibility test for proposed Planet Nine candidates:
 
 - **Tier 1 (Law-4 compliance)**: observed eccentricity must be reachable as `e_amp` for some `(d, tilt)` pair. Failure: `sin(tilt) > 1` for all d.
-- **Tier 2 (v-balance integration)**: even if Tier 1 passes, the candidate must integrate into the framework's mirror-pair v-balance without breaking Law 5 (99.862%).
+- **Tier 2 (v-balance integration)**: even if Tier 1 passes, the candidate must integrate into the framework's mirror-pair v-balance without breaking Law 5 (99.8636%).
 
 The TNO obliquity analysis applies Tier 1 in inverse mode **under the `e_obs ≈ e_amp` proxy (reading (a))**. The 17 known TNOs all fail Tier 1 by 8–7658× under that proxy.
 
@@ -270,7 +270,7 @@ For Planet Nine candidates the situation is different: the rejection is robust t
 
 ### 5.2 The d-pool
 
-The Fibonacci d-pool `[1, 2, 3, 5, 8, 13, 21, 34, 55]` is the same one used by `balance-search.js` ([doc 80](#)). For TNO obliquity prediction the *largest* d minimises required `sin(tilt)`, so all reported values are at `d = 55`. This is the most-favourable choice for the body; a tighter d would push every prediction even further into the unphysical region.
+The Fibonacci d-pool `[1, 2, 3, 5, 8, 13, 21, 34, 55]` is the same one used by `balance-search.js` ([doc 19](19-balance-sensitivity-analysis.md)). For TNO obliquity prediction the *largest* d minimises required `sin(tilt)`, so all reported values are at `d = 55`. This is the most-favourable choice for the body; a tighter d would push every prediction even further into the unphysical region.
 
 ### 5.3 Mass values
 

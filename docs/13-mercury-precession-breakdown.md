@@ -13,7 +13,7 @@ This document outlines the implementation of a **Perihelion Precession Breakdown
 
 ## The Goal
 
-For any planet (e.g., Mars with ~1,793 arcsec/century), show:
+For any planet (e.g., Mars with ~1,739 arcsec/century), show:
 - Individual contributions from **all 8 major planets** (all prograde in first-order diagonal theory)
 - Whether the perturber is inner (α weighting) or outer (α² weighting)
 - The sum total compared to the observed value
@@ -237,10 +237,10 @@ conventions).
 says Saturn's ecliptic retrograde rate is a transient phase of the
 Great-Inequality oscillation (~900-yr period) and will reverse within
 ~450 yr. The Holistic Universe Model says Saturn's ecliptic rate is
-permanently retrograde at `−H/8 = −3,092 ″/cy` because that's the correct
+permanently retrograde at `−8H/65 = −3,140 ″/cy` because that's the correct
 date-frame expression of the stable ICRF structure. Long-baseline JPL
 DE441 integrations (13 000 BC → 17 000 AD) can in principle distinguish
-these. See [docs/10-fibonacci-laws.md §Saturn's Ecliptic-Retrograde Perihelion Precession](10-fibonacci-laws.md) for the full discussion.
+these. See [docs/10-fibonacci-laws.md §Law 6](10-fibonacci-laws.md#law-6-saturn-jupiter-earth-resonance) for the full discussion.
 
 ---
 
@@ -566,14 +566,14 @@ With the full formula including eccentricity and inclination corrections, we exp
 | Neptune | Outer | 0.051 | +0.4 | <1% |
 | **First-order L-L total (A_ii)** | | | **~1,776** | |
 | **WebGeoCalc observed (1900–2100)** | | | **~<!--v:marsObservedRate-->1,600<!--/v-->** | |
-| **Model Fibonacci long-term mean (H×8/35)** | | | **1,691** | |
+| **Model Fibonacci long-term mean (8H/36)** | | | **1,739** | |
 
 **Insight:** Jupiter dominates (~83%) because:
 - Largest mass (1/1047 of Sun)
 - Closest giant planet to Mars (α = 0.293)
 - Inner planets (Earth, Venus, Mercury) also contribute prograde — the second-biggest contribution is Earth, not Saturn.
 
-The first-order L-L estimate (~1,776) overshoots both the WebGeoCalc short-baseline observation (~<!--v:marsObservedRate-->1,600<!--/v-->) and the model's Fibonacci long-term mean (1,691) by ~5–10 %. That's consistent with the known first-order theory accuracy.
+The first-order L-L estimate (~1,776) overshoots both the WebGeoCalc short-baseline observation (~<!--v:marsObservedRate-->1,600<!--/v-->) and the model's Fibonacci long-term mean (1,739) by ~2–11 %. That's consistent with the known first-order theory accuracy.
 
 ### 3.2 Mercury Precession Breakdown
 
@@ -633,7 +633,7 @@ The first-order L-L total (~553) matches Mercury's observed rate (~570) to withi
 
 The retrograde signal that first-order L-L misses is dominated by the Jupiter–Saturn 5:2 "Great Inequality" near-resonance, which secular theory treats as slowly averaging out but which in practice produces a large retrograde signal during the current epoch. The model's dynamical secular rate (−8H/65 = −3,140 ″/cy retrograde) sits within the observed window-spread; first-order L-L has the wrong sign entirely.
 
-See docs/10-fibonacci-laws.md §"Saturn's Ecliptic-Retrograde Perihelion Precession" for more on this discrepancy.
+See docs/10-fibonacci-laws.md §"Law 6: Saturn-Jupiter-Earth Resonance" for more on this discrepancy.
 
 ---
 
@@ -844,7 +844,7 @@ The table below compares, for each planet:
 | Mercury | ~570 | ~553 | 531 (H × 8/11) | L-L matches obs to ~3 % |
 | Venus | ~0 | ~1,199 | −290 (−8H/6) | L-L fails catastrophically (low-e singularity) |
 | Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> | ~1,280 | 6,187 (H/16) | Fibonacci matches obs exactly; L-L gives inertial rate (different frame) |
-| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> | ~1,776 | 1,691 (H × 8/35) | L-L over by ~11 %; Fibonacci matches obs to ~5 % |
+| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> | ~1,776 | 1,739 (8H/36) | L-L over by ~11 %; Fibonacci matches obs to ~9 % |
 | Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> | ~754 | 1,884 (8H/39) | L-L under by ~58 %; dynamical secular matches obs to ~5 % |
 | Saturn | retrograde, magnitude window-sensitive (~−1,800 to −3,600) | +1,867 | −3,140 (−8H/65) | L-L has wrong sign; dynamical secular sits within the observed window-spread |
 | Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> | ~278 | 1,160 (H/3) | L-L under by ~75 %; Fibonacci matches obs to ~5 % |
@@ -911,7 +911,7 @@ This feature brings that same analysis to all planets!
 
 ## Related Documents
 
-- [10-fibonacci-laws.md](10-fibonacci-laws.md) — Six Fibonacci Laws (incl. Saturn's ecliptic-retrograde discussion)
+- [10-fibonacci-laws.md](10-fibonacci-laws.md) — Six Fibonacci Laws (Saturn's ecliptic-retrograde perihelion is covered under Law 6)
 - [12-perihelion-precession.md](12-perihelion-precession.md) — Earth-frame vs ecliptic-frame perihelion methods
 - [37-planets-precession-cycles.md](37-planets-precession-cycles.md) — Per-planet precession-cycle tabulation
 - [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) — Complete 8H/N period table (32-component L1 lattice)

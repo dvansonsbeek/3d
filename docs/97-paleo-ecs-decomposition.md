@@ -683,7 +683,7 @@ appropriate L1 sub-band:
 | 22 | 121.9 | s₁+s₂ (Mercury-Venus nodal) | +3.8% | 6.5% |
 | 14 | 191.6 | g₂-g₈ (Venus-Neptune) | -3.3% | 8.5% |
 | **65** | **41.3** | **k+s₃ obliquity main** | -1.7% | **3.9%** |
-| **66** | **40.6** | **k+s₄ obliquity main** | -0.8% | **2.4%** |
+| **66** | **40.6** | **obliquity-band centroid** | -0.8% | **2.4%** |
 | **68** | **39.4** | **k+s₄ obliquity sub** | +0.6% | **2.6%** |
 | 113 | 23.7 | k+g₅ climatic precession | +16.7% | 21.4% |
 | 120 | 22.4 | k+g₂ climatic precession | +24.0% | 28.9% |
@@ -698,7 +698,7 @@ The drift values above measure observed LA2004 peaks against the *fixed modern l
 | 25 | 107.3 | s₁-s₄ nodal (100-kyr centroid) | 10.8% | 10.4% | -0.5% |
 | **28** | **95.8** | **g₄-g₅ (Berger 95-kyr ecc)** | **2.3%** | **3.4%** | **+1.1%** |
 | **65** | **41.3** | **k+s₃ (obliquity main, Berger 41-kyr)** | **3.9%** | **3.5%** | **-0.4%** |
-| **66** | **40.6** | **k+s₄ (obliquity sub)** | **2.4%** | **2.0%** | **-0.4%** |
+| **66** | **40.6** | **obliquity-band centroid** | **2.4%** | **2.0%** | **-0.4%** |
 | **68** | **39.4** | **k+s₄ (obliquity sub)** | **2.6%** | **2.9%** | **+0.3%** |
 | 113 | 23.7 | k+g₅ climatic precession | 21.4% | 22.0% | +0.6% |
 | 120 | 22.4 | k+g₂ climatic precession | 28.9% | 29.6% | +0.7% |
@@ -1294,6 +1294,12 @@ If (2) finds the predicted modulation, the framework's bounded-LOD
 model is supported as an alternative to monotonic tidal recession.
 
 #### Test C-PaleoLOD — Framework vs paleo-tidal data (external sources)
+
+> **Later work supersedes this open question:** the framework-vs-mainstream LOD
+> discrimination was subsequently tested directly against re-reduced ancient
+> eclipse data — see [doc 106](106-deep-time-validation-dossier.md), where the
+> dLOD/dt stack survives its falsification test (χ² consistent with the pinned
+> column).
 
 The LOD model differences (framework bounded-oscillator vs mainstream
 monotonic recession) cannot be cleanly distinguished from LA2004

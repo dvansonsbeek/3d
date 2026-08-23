@@ -9,7 +9,7 @@ status: current
 
 This document is the **single source of truth** for all constants used in the Holistic Universe Model simulation. Other documents should reference this document rather than duplicating values.
 
-> **Last synchronized with `tools/lib/constants.js` on 2026-03-29.**
+> **Synchronized with `tools/lib/constants.js`** — the frontmatter `coefficients` hash records the exact coefficient state this doc tracks.
 
 ### Code organization
 
@@ -47,7 +47,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 
 H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr; at J2000 H = <!--v:H-->335,317<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->352,600<!--/v--> yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
 
-For the canonical 9-step derivation chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the canonical reference at `docs/hidden/old-documents/IP-deep-time-extension.md`. For the Solar System Resonance Cycle (8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000) period table covering all major planetary cycles as integer divisors of 8H, see [Doc 55](55-solar-system-resonance-cycle-periods.md).
+For the canonical 9-step derivation chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the canonical reference at `docs/archive/old-documents/IP-deep-time-extension.md` (untracked archive). For the Solar System Resonance Cycle (8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000) period table covering all major planetary cycles as integer divisors of 8H, see [Doc 55](55-solar-system-resonance-cycle-periods.md).
 
 ---
 
@@ -377,17 +377,17 @@ Eclipse cycles (from derived months): Saros = 223 synodic ≈ 6585.32 days, Exel
 
 ## Year-Length Fourier Harmonics
 
-Year-length variations are modelled with Fourier harmonics. The **means are derived** from `inputmeanlengthsolaryearindays` via `round(input × H/8) / (H/8)` and the standard sidereal/anomalistic ratios. Only the harmonic coefficients are fitted (from data spanning full H at stepYears=23 steps).
+Year-length variations are modelled with Fourier harmonics. The **means are derived** from `inputmeanlengthsolaryearindays` via `round(input × H/8) / (H/8)` and the standard sidereal/anomalistic ratios. Only the harmonic coefficients are fitted (from data spanning full H at 1-year steps, 335,318 rows).
 
 Each array entry: `[period_divisor, sin_coeff, cos_coeff]` — period = H / divisor.
 
 | Array | Terms | RMS | Dominant term |
 |-------|-------|-----|---------------|
 | `TROPICAL_YEAR_HARMONICS` | 12 | 0.002 s | H/8 (obliquity) |
-| `SIDEREAL_YEAR_HARMONICS` | 5 | 0.001 s | H/8 + H/3 |
+| `SIDEREAL_YEAR_HARMONICS` | 6 | 0.001 s | H/8 + H/3 |
 | `ANOMALISTIC_YEAR_HARMONICS` | 8 | 0.002 s | H/24 (beat) |
 
-Note: The tropical year at runtime uses `CARDINAL_POINT_HARMONICS` (24 terms per type, derivative-based), not `TROPICAL_YEAR_HARMONICS`. The latter is used by pipeline tools only.
+Note: The tropical year's **primary display path** is `TROPICAL_YEAR_HARMONICS` via `computeSolarYearDaysDirect` (Step 6c). The `CARDINAL_POINT_HARMONICS` derivative route (23 harmonics per type + ECC/JOINT/DERIVED families) is kept for chart consistency in cardinal-point report paths.
 
 ## Earth Perihelion Harmonics
 
@@ -746,7 +746,7 @@ Note: these values are computed at runtime by constants.js — not stored in JSO
 
 ## Planet Eccentricity Amplitudes & Coupling Constant
 
-Eccentricity oscillation amplitudes from the tilt formula: `e_amp = K × sin(tilt) × √d / (√m × a^(3/2))`. See [doc 35 §4-5](35-tilt-and-definitive-balance-calculations.md).
+Eccentricity oscillation amplitudes from the tilt formula: `e_amp = K × sin(tilt) × √d / (√m × a^(3/2))`. See [doc 36 §4-5](36-tilt-and-definitive-balance-calculations.md).
 
 | Constant | Formula | Value | Description |
 |----------|---------|-------|-------------|
@@ -848,9 +848,9 @@ Per-planet configuration for the predictive perihelion precession formula:
 |--------|---------------|---------------|---------------------|
 | Mercury | H × 8/11 | <!--v:mercuryPeriLongJ2000Full-->77.4569131<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
 | Venus | -8H / 6 | <!--v:venusPeriLongJ2000Full-->131.5765919<!--/v--> | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
-| Mars | H × 8/35 | <!--v:marsPeriLongJ2000Full-->336.0650681<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Jupiter | H / 5 | <!--v:jupiterPeriLongJ2000Full-->14.70659401<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Saturn | H / 8 | <!--v:saturnPeriLongJ2000Full-->92.12794343<!--/v--> | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
+| Mars | 8H / 36 | <!--v:marsPeriLongJ2000Full-->336.0650681<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Jupiter | 8H / 39 | <!--v:jupiterPeriLongJ2000Full-->14.70659401<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Saturn | -8H / 65 | <!--v:saturnPeriLongJ2000Full-->92.12794343<!--/v--> | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
 | Uranus | H / 3 | <!--v:uranusPeriLongJ2000Full-->170.7308251<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
 | Neptune | H × 2 | <!--v:neptunePeriLongJ2000Full-->45.80124471<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
 

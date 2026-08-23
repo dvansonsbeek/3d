@@ -32,13 +32,13 @@ where:
 | Planet | e_base | e_amplitude | e_structural | structural % |
 |--------|--------|-------------|-------------|-------------|
 | Mercury | 0.205630 | 2.338e-5 | 0.205607 | 99.99% |
-| Venus | 0.007707 | 9.526e-4 | 0.006754 | 87.64% |
+| Venus | 0.007706 | 9.524e-4 | 0.006754 | 87.64% |
 | Earth | <!--v:eccentricityBase-->0.015386<!--/v--> | 1.356e-3 | 0.014030 | 91.19% |
-| Mars | 0.091466 | 3.066e-3 | 0.088400 | 96.65% |
+| Mars | 0.091646 | 3.056e-3 | 0.088590 | 96.67% |
 | Jupiter | 0.048386 | 1.134e-6 | 0.048385 | 100.00% |
 | Saturn | 0.053866 | 5.360e-6 | 0.053861 | 99.99% |
 | Uranus | 0.047243 | 2.802e-5 | 0.047215 | 99.94% |
-| Neptune | 0.008597 | 8.039e-6 | 0.008589 | 99.91% |
+| Neptune | 0.008597 | 8.037e-6 | 0.008589 | 99.91% |
 
 The gas giants have negligible amplitudes (tiny axial tilts → tiny sin(tilt)), so their base and structural values are nearly identical. The inner planets, especially Venus and Earth, have significant amplitude contributions.
 

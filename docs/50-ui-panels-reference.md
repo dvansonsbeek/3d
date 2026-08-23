@@ -413,7 +413,7 @@ An interactive modal for testing different planetary group assignments and Fibon
 | **Phase angle selection** | Choose between per-planet model phases, Laplace-Lagrange eigenmodes, or custom angles |
 | **Fibonacci divisor dropdown** | Common Fibonacci values (1–55) plus custom input |
 | **Editable precession periods** | Modify ascending node precession rates |
-| **42 presets** | Deep-analysis survivors: pass inclination balance ≥<!--v:balanceThreshold-->99.994%<!--/v-->, eccentricity balance ≥99%, LL bounds, direction match ≤5″ (per-config optimised). Sorted by eccentricity balance. |
+| **15 presets** | Deep-analysis survivors: pass inclination balance ≥<!--v:balanceThreshold-->99.994%<!--/v-->, eccentricity balance ≥99%, LL bounds, direction match ≤5″ (per-config optimised). Sorted by eccentricity balance. |
 | **Dual balance display** | Inclination (Law 3) and eccentricity (Law 5) balance percentages |
 | **Per-planet results table** | Amplitude, mean, range, LL bounds check, trend comparison |
 | **Earth locked** | Earth's parameters (d=3, in-phase, 21.77°) are derived from the temperature model and cannot be changed |
@@ -633,7 +633,7 @@ The physics and validation methodology live in [doc 102 — GIA α(t) lunar vali
 
 ### Purpose
 
-Compares the model's predictions against published closed-form formulas from celestial-mechanics literature (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Peters, Harkness) across nine Earth quantities over a ±12,000-year window. This is the **analytical twin** of the WebGeoCalc Explorer — where WebGeoCalc compares the model against *observed JPL data*, Formula Verification compares it against *published analytical formulas*. Together they validate the model from two independent directions.
+Compares the model's predictions against published closed-form formulas from celestial-mechanics literature (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Peters, Harkness) across ten Earth quantities over a ±12,000-year window. This is the **analytical twin** of the WebGeoCalc Explorer — where WebGeoCalc compares the model against *observed JPL data*, Formula Verification compares it against *published analytical formulas*. Together they validate the model from two independent directions.
 
 ### Accessing the Panel
 
@@ -650,7 +650,7 @@ Compares the model's predictions against published closed-form formulas from cel
 | **Residual chart** | `reference − model` in arcseconds, seconds, milliseconds, degrees, or AU depending on the category |
 | **J2000 comparison table** | Every reference formula's value at J2000 + Δ vs Model, with source links |
 | **Export buttons** | "Export for Paper" (±12 k yr) and "Export Cycles" (±~250 k yr, eccentricity/obliquity only) produce publication-grade SVG |
-| **Earth-only** | All nine quantities describe Earth's orbit + spin axis; per-planet observational validation lives in the WebGeoCalc Explorer |
+| **Earth-only** | All ten quantities describe Earth's orbit + spin axis (+ ΔT); per-planet observational validation lives in the WebGeoCalc Explorer |
 
 ### Full Reference
 

@@ -65,7 +65,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Mars | 1.850° | **Within** (0.85° - 2.12°) | **Yes** |
 | Jupiter | 1.305° | **Within** (0.85° - 2.12°) | **Yes** |
 | Saturn | 2.485° | ABOVE (> 2.12°) | No |
-| Uranus | 0.772° | BELOW (< 0.93°) | No |
+| Uranus | 0.772° | BELOW (< 0.85°) | No |
 | Neptune | 1.770° | **Within** (0.85° - 2.12°) | **Yes** |
 | Pluto | 17.142° | ABOVE (> 2.12°) | No |
 
@@ -148,7 +148,7 @@ const segmentEffect = segRate * inclDirection * deltaObl;
 
 ### Impact of Dynamic Planet Inclination
 
-Over the 200-year fitting window (1800–2200), the effect of dynamic planet inclination is small because the perihelion precession periods are very long (67,000–670,000 years at J2000). Over longer timescales, Mars is the most affected:
+Over the 200-year fitting window (1800–2200), the effect of dynamic planet inclination is small because the perihelion precession periods are very long (~41,000–670,000 years at J2000). Over longer timescales, Mars is the most affected:
 
 | Timescale | Mars i range | Rate change |
 |-----------|-------------|-------------|

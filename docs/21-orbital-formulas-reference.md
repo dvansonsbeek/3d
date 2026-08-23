@@ -233,8 +233,8 @@ Naming taxonomy: `_Kinematic` = framework kinematic day units; `_Real` = physica
 
 | Variable | Description |
 |----------|-------------|
-| `o.lodKinematic` | Current epoch-specific kinematic day (SI seconds), = IAU_sid_sec / Fourier sid_days ≈ 86400.000009 s at J2000 |
-| `predictions.lodReal` | Physical LOD (Layer 3): `o.lodKinematic + h5Correction + dtCycleLodCorrectionSum`. Displayed as "Solar Day = REAL" in the Predictions panel. |
+| `o.lodKinematic` | Current epoch-specific kinematic day (SI seconds), = IAU_sid_sec / Fourier sid_days ≈ 86399.999995 s at J2000 |
+| `predictions.lodReal` | Physical LOD (Layer 4): `o.lodKinematic + h5Correction + dtCycleLodCorrectionSum`. Displayed as "Solar Day = REAL" in the Predictions panel. |
 | `o.siderealDayReal` | Current sidereal day length (SI seconds) |
 | `o.stellarDayReal` | Current stellar day length (SI seconds) |
 | `o.solarYearDays` | Current solar year length (days) |
@@ -1107,7 +1107,15 @@ const MASS_RATIO_EARTH_MOON = 81.30056816;
 // - This represents the "effective radius" reconciling Kepler-derived with measured GM values
 ```
 
-**Final Implementation:**
+> **SUPERSEDED — the apogee/AU divisor below is no longer shipped.** The live
+> implementation (`tools/lib/constants.js`, `packages/physics/src/model.js`)
+> computes `GM_EARTH_ALONE = GM_EARTH_MOON_SYSTEM × ratio/(ratio+1)` with **no**
+> apogee/AU divisor; the Sun's effect enters upstream instead, as the
+> `moonOrbitalShift` distance correction (Sun's tidal coupling to the Earth–Moon
+> barycentric wobble, closing G(M_E+M_M) to ~3.7 ppm of DE440). The derivation
+> below is kept as the historical rationale.
+
+**Historical implementation (retired):**
 ```javascript
 // Earth's gravitational parameter (corrected for Moon's mass and solar perturbation)
 // GM_Earth = GM_system × (ratio / (ratio + 1)) / (1 - moonApogee/AU)
@@ -1837,9 +1845,9 @@ precessionEclipticToICRF: (ecliptic_years, reference_years) => {
 ```
 
 **Example for Mercury:**
-- ICRF period: ~<!--v:mercuryPeriPeriod-->243,867<!--/v--> years
+- Ecliptic period: ~<!--v:mercuryPeriPeriod-->243,867<!--/v--> years
 - Reference (H/13): <!--v:axialPrecRound-->~25,794<!--/v--> years
-- Ecliptic period: ~<!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> years
+- ICRF period: ~<!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> years
 
 #### 10.2.2 ICRF to Ecliptic Transformation
 
@@ -1868,11 +1876,11 @@ precessionICRFToEcliptic: (ICRF_years, reference_years) => {
 | Planet | Ratio | Expression |
 |--------|-------|------------|
 | Mercury | 1.375 | holisticyearLength / (1+3/8) |
-| Venus | ~0.5 | holisticyearLength * 2 |
-| Earth | 3 | holisticyearLength / 3 |
-| Mars | 4.375 | holisticyearLength / (4+3/8) |
-| Jupiter | 5 | holisticyearLength / 5 |
-| Saturn | -8 | -holisticyearLength / 8 (retrograde) |
+| Venus | -0.75 | -holisticyearLength × 8/6 (retrograde) |
+| Earth | 16 | holisticyearLength / 16 |
+| Mars | 4.5 | holisticyearLength / (4+4/8) |
+| Jupiter | 4.875 | holisticyearLength / (4+7/8) |
+| Saturn | -8.125 | -holisticyearLength / (8+1/8) (retrograde) |
 | Uranus | 3 | holisticyearLength / 3 |
 | Neptune | ~0.5 | holisticyearLength * 2 |
 
@@ -2007,14 +2015,14 @@ precessionRatio: (rate1_arcsec, rate2_arcsec) => {
 
 For current computed values, see [Constants Reference](20-constants-reference.md).
 
-| Planet | ICRF Period | Ecliptic Period | Holistic Ratio |
-|--------|-------------|-----------------|----------------|
-| **Mercury** | `mercuryPerihelionEcliptic` | derived | H / (1+3/8) |
+| Planet | Ecliptic Period | ICRF Period | Holistic Ratio |
+|--------|-----------------|-------------|----------------|
+| **Mercury** | `mercuryPerihelionEcliptic` | derived | 8H / 11 |
 | **Venus** | `venusPerihelionEcliptic` | derived | −8H / 6 (retrograde) |
-| **Earth** | H/3 | derived | 3 |
-| **Mars** | `marsPerihelionEcliptic` | derived | H / (4+3/8) |
-| **Jupiter** | `jupiterPerihelionEcliptic` | derived | H / 5 |
-| **Saturn** | `saturnPerihelionEcliptic` | derived | −H / 8 (retrograde) |
+| **Earth** | H/16 | derived | 16 |
+| **Mars** | `marsPerihelionEcliptic` | derived | 8H / 36 |
+| **Jupiter** | `jupiterPerihelionEcliptic` | derived | 8H / 39 |
+| **Saturn** | `saturnPerihelionEcliptic` | derived | −8H / 65 (retrograde) |
 | **Uranus** | `uranusPerihelionEcliptic` | derived | H / 3 |
 | **Neptune** | `neptunePerihelionEcliptic` | derived | H × 2 |
 

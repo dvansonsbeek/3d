@@ -29,12 +29,15 @@ Raw Model Position (from scene-graph rotation hierarchy)
   │                         Planet-planet gravitational perturbations
   │                         Source: GRAVITATION_CORRECTION
   │
-  ├─ 3. ELONGATION          21 basis functions (inner planets only)
+  ├─ 3. ELONGATION          21 basis functions (Venus and Mars only)
   │                         Viewing angle × Earth perihelion geometry
   │                         Source: ELONGATION_CORRECTION
   │
   └─ 4. MOON MEEUS          6 sin/cos terms (Moon only)
                              Source: MOON_CORRECTION
+                             (+ MOON_CORRECTION_RESIDUAL — same basis,
+                             fitted on the residual after the framework-
+                             native lunar series)
                              Type: INDEPENDENT
 ```
 
@@ -135,8 +138,8 @@ The generated module carries the JSON's lowercase keys verbatim; `src/script.js`
 | `tools/lib/correction-stack.js` | Layer definitions, `prepareForFitting()`, name conversion |
 | `tools/lib/scene-graph.js` | Applies all corrections in order |
 | `tools/lib/constants.js` | Loads and exports correction data |
-| `tools/fit/parallax-correction.js` | Fits Layer 1 (parallax) |
-| `tools/fit/gravitation-correction.js` | Fits Layers 2+3 (gravitation + elongation) |
+| `tools/fit/parallax-correction.js` | Fits Layer 1 (parallax) — CLI shim; implementation in `packages/fitting/src` |
+| `tools/fit/gravitation-correction.js` | Fits Layers 2+3 (gravitation + elongation) — CLI shim; implementation in `packages/fitting/src` |
 | `public/input/fitted-coefficients.json` | Single source of truth for all coefficients |
 | `tools/constants/generate.mjs` | Generates the constants module `src/script.js` imports, from the JSON |
 

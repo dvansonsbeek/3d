@@ -635,7 +635,7 @@ The structural near-invariant `H × days/yr ≈ TOTAL_DAYS_IN_H` is verified in 
 
 **Modern → Devonian fractional change**: −8.7% in LOD, −8.7% in H, +9.5% in days/yr — these track each other through the structural identity.
 
-**Note on Williams 2000 (Ediacaran, 620 Ma):** Williams's tidal-rhythmite count gives 400.3 days/yr at this epoch. Our proper-physics formula gives 416.9 days/yr — a ~4% discrepancy. This is honest: Farhat 2022 (which we fit) has the smooth Earth-Moon evolution curve dipping shallower than Williams's direct measurement suggests, possibly because the Ediacaran-Cryogenian Snowball Earth interval (~650–580 Ma) had unusual ocean-tidal Q that Farhat's model averages over. The smooth formula passes between Williams's measurement and the modern Phanerozoic rate. See Mitchell-Kirscher 2023 for analysis of this Precambrian transition.
+**Note on Williams 2000 (Ediacaran, 620 Ma):** Williams's tidal-rhythmite count gives 400.3 days/yr at this epoch. Our proper-physics formula gives <!--v:anchorWilliams620Pred-->423.11<!--/v--> days/yr — a <!--v:anchorWilliams620DeltaPct-->+5.70<!--/v-->% discrepancy. This is honest: Farhat 2022 (which we fit) has the smooth Earth-Moon evolution curve dipping shallower than Williams's direct measurement suggests, possibly because the Ediacaran-Cryogenian Snowball Earth interval (~650–580 Ma) had unusual ocean-tidal Q that Farhat's model averages over. The smooth formula passes between Williams's measurement and the modern Phanerozoic rate. See Mitchell-Kirscher 2023 for analysis of this Precambrian transition.
 
 ---
 
@@ -900,11 +900,11 @@ Framework predictions at direct paleontological anchor points:
 |---|---:|---:|---:|
 | Cretaceous 100 Ma | 374.24 | 372 ± 3 | +0.60% |
 | Triassic 230 Ma | 386.07 | 385 ± 3 | +0.28% |
-| **Devonian 380 Ma** (Wells 1963) | **400.06** | **400 ± 4** | **+0.02%** |
+| **Devonian 380 Ma** (Wells 1963) | **399.96** | **400 ± 4** | **−0.01%** |
 | Silurian 440 Ma | 405.66 | 405 ± 4 | +0.16% |
-| Cambrian 500 Ma (Wu 2024) | 411.41 | 412 ± 6 | −0.14% |
+| Cambrian 500 Ma (Wu 2024) | 411.37 | 412 ± 6 | −0.15% |
 
-Framework's Wells 1963 flagship 380 Ma coral count matches to 0.02% — within measurement uncertainty. Moon-at-Roche crossing at ~4.498 Ga matches the standard giant-impact-4.5-Ga date directly.
+Framework's Wells 1963 flagship 380 Ma coral count matches to 0.01% — within measurement uncertainty. Moon-at-Roche crossing at ~4.498 Ga matches the standard giant-impact-4.5-Ga date directly.
 
 ---
 
@@ -1070,7 +1070,7 @@ Other useful conversions (all anchored at modern LLR 3.82 cm/yr da/dt, Dickey 19
 
 So in 1 Gyr (1,000 Myr), H would grow by about **22 %** under the linear approximation. This means **linear extrapolation: 1 Gyr ago H ≈ 78 % of current**. The proper-physics formula (with the α₃·t³ + α₄·t⁴ curvature) gives a more nuanced value: H at 1 Gyr ago = **80.6 %** of current. Farhat 2022's full ocean-tidal model gives **75 %**. All three are within ~3–5 % of each other — close enough that for narrative purposes "about 75–80 % of modern" is the right framing.
 
-**Each 8H cycle (~2.68 Myr) the framework's structure stretches by ~197 years in H (or ~1,580 years in 8H).** Over ~3,200 cycles since Earth-Moon genesis, this compounds to the full ~21 % → 100 % increase.
+**Each 8H cycle (~2.68 Myr) the framework's structure stretches by ~197 years in H (or ~1,580 years in 8H).** Over ~3,540 cycles since Earth-Moon genesis, this compounds to the full ~21 % → 100 % increase.
 
 **Important caveat: the rate isn't constant.** It was much higher at Moon formation (Earth-Moon system far from equilibrium, strong tidal coupling) and slows asymptotically as the system approaches tidal-lock equilibrium. The 0.022 %/Myr current value is the *modern* rate, not a time-average. The proper-physics formula captures this curvature via the α₃·t³ + α₄·t⁴ terms.
 
@@ -1132,7 +1132,7 @@ Replaces the earlier piecewise (Phanerozoic-linear + Proterozoic-stall + Hadean-
 - Modern LOD = 86,400 s exactly (anchor preserved)
 - Modern lunar recession = 3.82 cm/yr at J2000 (LLR anchor, Dickey 1994 / Chapront 2002)
 - Past 4.5 Gyr matches Farhat 2022 within ≤7.5 % max error
-- Hadean Moon distance lands at Roche limit (~3 R_E) **naturally** — physics validates itself
+- Hadean Moon distance lands at the rigid Roche limit (~1.5 R_E) **naturally** — physics validates itself
 - Future LOD approaches the tidal-lock asymptote (LOD → ∞ at a → <!--v:tidalLockKm-->555,623<!--/v--> km, reached ~50 Gyr ahead)
 - Single smooth formula, no piecewise discontinuities
 
@@ -1213,7 +1213,7 @@ The framework reveals not just *that* the Moon drifts away, but *why it must*.
 
 ### The structural cause
 
-The framework's structural near-invariant `H × days/yr ≈ TOTAL_DAYS_IN_H = 122,471,920` (exact at J2000; drifting −71 ppm at Devonian and −850 ppm at Hadean via Driver 2 / solar mass loss) is preserved at the modern epoch and varies smoothly with geological time. This requires:
+The framework's structural near-invariant `H × days/yr ≈ TOTAL_DAYS_IN_H = 122,471,920` (exact at J2000; drifting −71 ppm at Devonian and −850 ppm at Hadean from Driver 2 / solar mass loss alone — <!--v:driftAtDevonianPpm-->−74<!--/v--> ppm and <!--v:driftAtHadeanPpm-->−999<!--/v--> ppm total) is preserved at the modern epoch and varies smoothly with geological time. This requires:
 - Earth's rotation rate (LOD) must slowly change
 - The orbital year length (in seconds) must stay fixed
 - Therefore `days/yr = year_seconds / LOD` must change inversely with LOD
@@ -1598,7 +1598,7 @@ See `docs/102-gia-alpha-lunar-validation.md` for:
 
 #### Climate-driven α(t) — the L1-orbital coupling
 
-The framework binds α(t) directly to the L1 orbital layer of the canonical Climate Formula (docs/18-climate-formula.md). The physical chain is:
+The framework binds α(t) directly to the L1 orbital layer of the canonical Climate Formula ([docs/92-climate-formula.md](92-climate-formula.md)). The physical chain is:
 
 ```
 Planetary eigenmodes → Milankovitch orbital forcing →
@@ -1837,7 +1837,7 @@ This is itself an interesting result: it validates that the **framework's free-a
 
 The Phanerozoic-averaged Wells rate (`dLOD/dt = 0.00526 hr/Ma` from Wells 1963 corals) gives an extrapolated `LOD = 0` at **4.563 Gyr ago — within 0.5 % of Patterson 1956's Pb-Pb Earth age (4.54 Gyr)**.
 
-This is NOT a coincidence. It's a structural signature. The proper-physics formula reproduces this insight: with α₁ anchored at LLR (3.82 cm/yr J2000, Dickey 1994 / Chapront 2002) and α₃, α₄ fit to Farhat 2022, the polynomial's Phanerozoic-averaged rate matches Wells corals to 0.95% at 380 Ma, and the same polynomial naturally places Moon at the Roche limit at t = 4.54 Gyr (no Hadean constraint used in the fit). The structural identity `24 hr / 4.56 Gyr ≈ Wells rate` is self-validating across three independent calibrations (LLR modern instantaneous + Phanerozoic paleo data + Hadean Earth age).
+This is NOT a coincidence. It's a structural signature. The proper-physics formula reproduces this insight: with α₁ anchored at LLR (3.82 cm/yr J2000, Dickey 1994 / Chapront 2002) and α₃, α₄ fit to Farhat 2022, the formula's Phanerozoic-averaged rate matches Wells corals to −0.01% at 380 Ma, and the same formula naturally places Moon at the rigid Roche limit at t = <!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr (no Hadean constraint used in the fit). The structural identity `24 hr / 4.56 Gyr ≈ Wells rate` is self-validating across three independent calibrations (LLR modern instantaneous + Phanerozoic paleo data + Hadean Earth age).
 
 ### Two independent derivations agree to 0.5 %
 
@@ -1865,8 +1865,8 @@ The math `24 hr / 4.56 Gyr = Wells rate` reveals that:
 The proper-physics two-layer formula has α₁ set from LLR (3.82 cm/yr Moon recession at J2000, Dickey 1994 / Chapront 2002) and α₃, α₄ fit to Farhat 2022 deep-time anchors. As a self-validation, it produces:
 - **Modern lunar recession = 3.82 cm/yr** (LLR anchor, direct observation)
 - **Modern LOD = 24 hr exactly** (anchored)
-- **Phanerozoic days/yr match Wells 1963 corals to 0.95%** at 380 Ma
-- **Moon at the Roche limit at t = 4.54 Gyr** (Patterson's Earth age) — naturally, with no Hadean constraint used
+- **Phanerozoic days/yr match Wells 1963 corals to −0.01%** at 380 Ma
+- **Moon at the rigid Roche limit at t = <!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr** — naturally, with no Hadean constraint used
 - **Match to Farhat 2022's deep-time anchors** at ≤7.5 % across the full 4.5 Gyr range
 
 The "non-coincidence" insight is that four independent calibrations converge: LLR (modern J2000 instantaneous), Wells (Phanerozoic paleontological average), Patterson (Hadean radiometric chronology), and Farhat (full tidal-modelling). The polynomial α₃, α₄ terms carry the deep-time curvature that reconciles the modern LLR rate with the Phanerozoic-averaged Wells rate.
@@ -1929,7 +1929,7 @@ The Sun begins its red giant phase in ~5 Gyr and the inner solar system likely d
 A: The proper-physics formula reaches `a_lock` at approximately +3 Gyr. Beyond this, the formula returns `null` because Moon has absorbed all of Earth's spin angular momentum. Independent angular-momentum calculations (with explicit tidal-Q decay) suggest the *true* tidal-lock equilibrium is approached over ~50 Gyr — far beyond Sun's main-sequence lifetime.
 
 **Q: When will LOD = 0?**
-A: **Never**. LOD has been monotonically increasing for ~4.5 Gyr (Layer 2) and will continue to. Going backward, the canonical Wells rate's linear extrapolation gives LOD = 0 at 4.56 Gyr ago — within 0.5 % of Patterson's Earth age (4.54 Gyr) — but the proper-physics formula naturally stops at the Roche-limit Moon distance (3.0 R_E, 4.54 Gyr ago) rather than reaching LOD = 0.
+A: **Never**. LOD has been monotonically increasing for ~4.5 Gyr (Layer 2) and will continue to. Going backward, the canonical Wells rate's linear extrapolation gives LOD = 0 at 4.56 Gyr ago — within 0.5 % of Patterson's Earth age (4.54 Gyr) — but the proper-physics formula naturally stops at the rigid-Roche Moon distance (<!--v:anchorHadeanRochePred-->1.48<!--/v--> R_E, <!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr ago) rather than reaching LOD = 0.
 
 **Q: When will days/year = 1?**
 A: **Never** with the Moon present. The bounded tidal-lock equilibrium has Earth's day = Moon's orbital period = **~47 days** (in current units), which gives ~7.8 days/year — well above "1 day per year" but well below current 365. Days/year decreases monotonically: 365 (now) → 349 (+200 Myr) → ~280 (+1 Gyr) → ~7.8 at tidal-lock asymptote.
@@ -1938,12 +1938,12 @@ A: **Never** with the Moon present. The bounded tidal-lock equilibrium has Earth
 
 > **The 8H cycle has a beginning, a middle (us), and an end.**
 >
-> - **Genesis**: Moon at Roche limit (~3 R_E) at **4.54 Gyr ago** (Patterson Pb-Pb Earth age; matches our formula's natural Hadean placement). 8H ≈ 0.56 Myr.
+> - **Genesis**: Moon at the rigid Roche limit (~1.5 R_E) at **<!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr ago** (between Patterson's 4.54 Pb-Pb Earth age and Farhat's 4.42 Hf-W formation epoch). 8H ≈ 0.519 Myr.
 > - **Modern (now)**: 8H = 2.683 Myr.
 > - **Formula horizon**: Moon reaches tidal-lock asymptote at +3 Gyr. 8H ≈ 7+ Myr (formal divergence).
 > - **Effective endpoint**: Sun's red giant phase at +5 Gyr — inner solar system unlikely to survive.
 >
-> Total span of the framework's effective domain: **~7.5 Gyr** (genesis 4.54 Gyr ago → Sun's red giant 5 Gyr from now). Current epoch sits at ~61 % of the way through.
+> Total span of the framework's effective domain: **~9.5 Gyr** (genesis ~4.5 Gyr ago → Sun's red giant 5 Gyr from now). Current epoch sits at ~48 % of the way through.
 >
 > The framework's structure isn't eternal. We're observing a finite-lifetime physical phenomenon, expanding from a Roche-limit beginning toward a tidal-lock asymptote that won't be reached before the Sun ends. The 0.059 %/cycle growth is the local tangent of a smooth, bounded trajectory that has cumulative shape over Gyr scales.
 
@@ -2035,7 +2035,7 @@ This is distinct from the tidal-channel coupling (which is faster, direct, and w
 | Question | Status |
 |:---|:---|
 | Exact deep-past rate of H evolution (variable tidal-Q regimes) | Open — proper-physics formula averages over Earth's complex tidal history via polynomial fit to Farhat 2022. Specific regimes (Bartlett-Stevenson Proterozoic stall, Snowball-boundary spike) are smoothed over. |
-| Williams 2000 (Ediacaran 620 Ma) ~4 % regression | Open — formula matches Wells/Pannella/Winter to ≤1.4 % but misses Williams's rhythmite count by 4 %. Whether this is Farhat's curve over-smoothing the Cryogenian or Williams's count being locally biased is unresolved. |
+| Williams 2000 (Ediacaran 620 Ma) +5.70 % regression | Open — formula matches Wells/Pannella/Winter to ≤1.4 % but misses Williams's rhythmite count by +5.70 %. Whether this is Farhat's curve over-smoothing the Cryogenian or Williams's count being locally biased is unresolved. |
 | Whether all L1 integers truly scale together (view 2) or only k-involving ones (view 1) | Genuinely undecided by current empirical data; both views consistent within uncertainty. |
 | The mechanism by which planetary g_i, s_j frequencies would scale with H (per view 2) | Not yet derived — view 2 requires coupling between Earth's spin and planetary perihelion motions that standard physics doesn't predict. |
 | The role of L2 (carbon-cycle 405-kyr line) — confirmed NOT scaling | Established; L2 is carbon-cycle resonance, not orbital. See doc 92 §6 (Doc 99's 405-kyr investigation). |
@@ -2091,4 +2091,4 @@ All values from the proper-physics two-layer formula. The `H × days/yr` near-in
 
 ## Net theory statement
 
-> The solar system has a structural lattice of integer-divisor periods, closing on the Solar System Resonance Cycle 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000, encoded in invariant Fibonacci integer relationships (Config #7, Laws 1–6). H itself is not a fixed cosmic constant but **expands monotonically** with geological time, driven by two independent physical processes: **Driver 1**, Earth-Moon tidal evolution (which slows Earth's rotation → slows axial precession → enlarges H via the H/13 Fibonacci coupling), and **Driver 2**, solar mass loss (which expands every planet's orbit via adiabatic conservation of `a × M_Sun`). The current 8H is the now-snapshot of a smoothly-expanding system whose modern epoch sits about **61 %** through its effective lifespan from Earth-Moon genesis (Moon at Roche limit ~4.54 Gyr ago, 8H ≈ 0.56 Myr) to the Sun's red-giant phase (~5 Gyr from now). Past: H was smaller (~<!--v:hAtDevonian-->306,189<!--/v--> yr in the Devonian). Future: H will be larger (~<!--v:hAt200MyrFuture-->352,600<!--/v--> yr in 200 Myr) and approaches a physical tidal-lock asymptote at ~+3 Gyr where the proper-physics formula reaches the Moon's angular-momentum-limit distance of <!--v:tidalLockKm-->555,623<!--/v--> km. ESSRT's structural relations — Fibonacci coupling integers, action-angle closure, L1/L2/L3 architecture — remain **invariant across all epochs**. Only the absolute periods expand.
+> The solar system has a structural lattice of integer-divisor periods, closing on the Solar System Resonance Cycle 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000, encoded in invariant Fibonacci integer relationships (Config #7, Laws 1–6). H itself is not a fixed cosmic constant but **expands monotonically** with geological time, driven by two independent physical processes: **Driver 1**, Earth-Moon tidal evolution (which slows Earth's rotation → slows axial precession → enlarges H via the H/13 Fibonacci coupling), and **Driver 2**, solar mass loss (which expands every planet's orbit via adiabatic conservation of `a × M_Sun`). The current 8H is the now-snapshot of a smoothly-expanding system whose modern epoch sits about **48 %** through its effective lifespan from Earth-Moon genesis (Moon at the rigid Roche limit ~<!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr ago, 8H ≈ 0.519 Myr) to the Sun's red-giant phase (~5 Gyr from now). Past: H was smaller (~<!--v:hAtDevonian-->306,189<!--/v--> yr in the Devonian). Future: H will be larger (~<!--v:hAt200MyrFuture-->352,600<!--/v--> yr in 200 Myr) and approaches a physical tidal-lock asymptote at ~+3 Gyr where the proper-physics formula reaches the Moon's angular-momentum-limit distance of <!--v:tidalLockKm-->555,623<!--/v--> km. ESSRT's structural relations — Fibonacci coupling integers, action-angle closure, L1/L2/L3 architecture — remain **invariant across all epochs**. Only the absolute periods expand.

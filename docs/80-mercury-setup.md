@@ -159,7 +159,7 @@ Mercury's mean obliquity is nearly zero under the System Reset anchor — very c
 e_amp = K × sin(|obliquityMean|) × √d / (√m × a^1.5)
 
 Inputs:
-  K               = 3.4149×10⁻⁶          (derived from Earth)
+  K               = 3.4143×10⁻⁶          (derived from Earth)
   sin(0.0084°)    = 1.466×10⁻⁴           (tilt → tiny)
   √d = √21        = 4.583                 (Mercury's Fibonacci divisor)
   √m              = 4.074×10⁻⁴            (mass fraction √(1.66×10⁻⁷))
@@ -264,7 +264,7 @@ The planet's starting position within its orbit is measured from the ascending n
 
 ### Why startPos = 83.652°?
 
-This is the only fitted value per planet (besides angleCorrection). It's optimised by `tools/optimize.js` so that Mercury's computed Right Ascension at J2000 (January 1, 2000) matches JPL Horizons to < 0.01°. The optimizer sweeps startPos until the scene-graph output aligns with the JPL reference. See [Step 2 in the fitting pipeline](../tools/fit/README.md).
+This is the only fitted value per planet (besides angleCorrection). It's optimised by `tools/optimize.js` so that Mercury's computed Right Ascension at the model start epoch (June 21, 2000 — the year-2000 summer solstice) matches JPL Horizons to < 0.01°. The optimizer sweeps startPos until the scene-graph output aligns with the JPL reference. See [Step 2 in the fitting pipeline](../tools/fit/README.md).
 
 ---
 

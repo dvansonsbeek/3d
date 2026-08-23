@@ -132,9 +132,9 @@ J2000 perihelion longitudes. This works well for the current epoch (+-2000
 years), where the relative precession is only ~6 deg. But over full precession
 cycles (~20,000+ years), perihelion longitudes drift significantly:
 
-- Earth precesses at ~11.6 arcsec/year (H/16 period)
-- Jupiter precesses at ~6.2 arcsec/year
-- Saturn precesses at ~19.5 arcsec/year
+- Earth precesses at ~61.8 arcsec/year (H/16 period)
+- Jupiter precesses at ~18.8 arcsec/year (8H/39)
+- Saturn precesses at ~31.4 arcsec/year retrograde (−8H/65)
 
 Over 20,000 years, the relative angle `delta_omega` can change by tens of
 degrees, meaning the static correction becomes increasingly wrong.
@@ -506,6 +506,8 @@ Implementation: `tools/lib/precession.js` provides `j2000ToOfDate()` which is
 called automatically in `optimizer.js` during baseline evaluation.
 
 Impact on Type III baselines (with precession correction vs without):
+
+(The RMS values below come from a different optimization pass than the baseline table above — reference sets and windows differ slightly between the two records.)
 
 | Planet  | RMS without | RMS with | Improvement |
 |---------|------------|----------|-------------|

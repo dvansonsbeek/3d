@@ -19,7 +19,7 @@ The **invariable plane** is the plane passing through the solar system's barycen
 
 1. **It is truly fixed** - Unlike the ecliptic, it doesn't change over time
 2. **Defined by physics** - Perpendicular to the total angular momentum
-3. **Dominated by giant planets** - Jupiter contributes 60.3%, Saturn 24.5%, Neptune 7.9%, Uranus 5.3%
+3. **Dominated by giant planets** - Jupiter contributes 61.6%, Saturn 24.9%, Neptune 8.0%, Uranus 5.4% (orbital angular momentum ∝ m·√a, computed from the table below)
 
 The invariable plane is within 0.5° of Jupiter's orbital plane (specifically 0.32°).
 
@@ -245,16 +245,16 @@ L_z = L × (-sin(i) × cos(Ω))
 
 | Planet | Mass (kg) | a (AU) | L (% of total) |
 |--------|-----------|--------|----------------|
-| Mercury | 3.30 × 10²³ | 0.387 | 0.01% |
-| Venus | 4.87 × 10²⁴ | 0.723 | 2.0% |
-| Earth | 5.97 × 10²⁴ | 1.000 | 2.9% |
-| Mars | 6.42 × 10²³ | 1.524 | 0.5% |
-| **Jupiter** | 1.90 × 10²⁷ | 5.203 | **60.2%** |
-| **Saturn** | 5.68 × 10²⁶ | 9.537 | **24.5%** |
-| Uranus | 8.68 × 10²⁵ | 19.19 | 5.2% |
-| Neptune | 1.02 × 10²⁶ | 30.07 | 6.8% |
+| Mercury | 3.30 × 10²³ | 0.387 | 0.003% |
+| Venus | 4.87 × 10²⁴ | 0.723 | 0.06% |
+| Earth | 5.97 × 10²⁴ | 1.000 | 0.08% |
+| Mars | 6.42 × 10²³ | 1.524 | 0.01% |
+| **Jupiter** | 1.90 × 10²⁷ | 5.203 | **61.6%** |
+| **Saturn** | 5.68 × 10²⁶ | 9.537 | **24.9%** |
+| Uranus | 8.68 × 10²⁵ | 19.19 | 5.4% |
+| Neptune | 1.02 × 10²⁶ | 30.07 | 8.0% |
 
-**Key insight**: Jupiter (60%) and Saturn (25%) contribute ~85% of the total angular momentum. The invariable plane orientation is dominated by these two gas giants.
+**Key insight**: Jupiter (62%) and Saturn (25%) contribute ~86% of the total angular momentum. The invariable plane orientation is dominated by these two gas giants.
 
 ### Option B: Published Reference Data (Souami & Souchay 2012)
 

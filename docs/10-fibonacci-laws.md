@@ -170,7 +170,7 @@ Or equivalently, in terms of orbital period `T_j ∝ a_j^(3/2)`:
 v_j = T_j × e_j × √(m_j / d_j)
 ```
 
-**Result: 99.8632% balance** (phase-derived base eccentricities). See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment and [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation as a balance scale.
+**Result: 99.8636% balance** (phase-derived base eccentricities). See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment and [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation as a balance scale.
 
 The eccentricity amplitudes used in the balance are predicted by Law 4 (the K constant). See [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation of the balance as a scale.
 
@@ -235,12 +235,12 @@ The group assignment is constrained by: (1) each planet's oscillation range must
 
 | Planet | Expression |
 |--------|------------|
-| Mercury | H × 8/11 |
+| Mercury | 8H/11 |
 | Venus | −8H/6 |
-| Earth | H/3 |
-| Mars | H × 8/35 |
-| Jupiter | H/5 |
-| Saturn | −H/8 |
+| Earth | H/16 |
+| Mars | 8H/36 |
+| Jupiter | 8H/39 |
+| Saturn | −8H/65 |
 | Uranus | H/3 |
 | Neptune | 2H |
 
@@ -319,7 +319,7 @@ e_Saturn = Σ(in-phase group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 
 **Epoch independence:** The agreement is not specific to the J2000 epoch. The mirror pairs act as communicating vessels that exchange AMD (Angular Momentum Deficit) secularly: when Saturn's eccentricity rises, Earth's falls, and vice versa. When all four pairs co-evolve with AMD conservation, Law 5's balance stays within 99.8–99.9% across Saturn's entire upper secular range (e = 0.054–0.088), compared to a 36–100% swing if Saturn oscillated alone. See [epoch-independence.js](../tools/verify/epoch-independence.js) for the full analysis.
 
-With phase-derived base eccentricities, Law 5's balance reaches 99.8632% — naturally, with no forced constraints. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the static analysis.
+With phase-derived base eccentricities, Law 5's balance reaches 99.8636% — naturally, with no forced constraints. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the static analysis.
 
 ---
 
@@ -444,7 +444,7 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 Σ(in-phase) v = 1.543 × 10⁻²
 Σ(anti-phase)  v = 1.547 × 10⁻²
 
-Balance: 99.8632%
+Balance: 99.8636%
 ```
 
 Saturn alone carries the entire anti-phase contribution. The in-phase group is dominated by Jupiter (<!--v:jupiterEccWeightSci-->7.928 × 10⁻³<!--/v-->), Uranus (<!--v:uranusEccWeightSci-->5.705 × 10⁻³<!--/v-->), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.6 × 10⁻⁵ combined.
@@ -519,7 +519,7 @@ The eccentricity balance (Law 5) operates on linear e rather than e², suggestin
 
 **LL bounds: 8/8 pass** — All 8 planets' inclination ranges fit within Laplace-Lagrange secular theory bounds.
 
-The non-trivial test is that these Fibonacci divisors simultaneously satisfy three independent constraints: (1) all 8 planets fit within their Laplace-Lagrange bounds (within 0.03° uncertainty), (2) the inclination structural weights balance to 99.9975% (Law 3), and (3) the eccentricity weights balance to 99.8632% (Law 5). The fact that pure Fibonacci numbers achieve all three is the core prediction of the theory.
+The non-trivial test is that these Fibonacci divisors simultaneously satisfy three independent constraints: (1) all 8 planets fit within their Laplace-Lagrange bounds (within 0.03° uncertainty), (2) the inclination structural weights balance to 99.9975% (Law 3), and (3) the eccentricity weights balance to 99.8636% (Law 5). The fact that pure Fibonacci numbers achieve all three is the core prediction of the theory.
 
 ### Worked Example: Earth's Inclination Amplitude
 
@@ -604,7 +604,7 @@ function computeInclinationBalance(planets) {
 
   const residual = Math.abs(sumPro - sumAnti);
   const balance = 1 - residual / (sumPro + sumAnti);
-  return { sumPro, sumAnti, balance };  // balance ≈ 0.999998
+  return { sumPro, sumAnti, balance };  // balance ≈ 0.999974
 }
 
 // Verify the eccentricity balance condition (Law 5)
@@ -641,7 +641,7 @@ Verify `Σ(in-phase) w_j = Σ(anti-phase) w_j` to 99.9975% balance.
 
 ### Test 4: Eccentricity Balance
 
-Verify `Σ(in-phase) v_j = Σ(anti-phase) v_j` to 99.8632% balance.
+Verify `Σ(in-phase) v_j = Σ(anti-phase) v_j` to 99.8636% balance.
 
 ### Test 5: Saturn Eccentricity Prediction from Law 5
 

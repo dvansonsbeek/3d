@@ -141,7 +141,7 @@ The following chain describes what happens for each planet:
 
 **Step 1 — Fixed orbital eccentricity (base value).**
 Each planet's orbit has a fixed offset between its geometric center and the Sun.
-For Earth this offset is eccentricityBase = <!--v:eccentricityBase-->0.015386<!--/v--> AU. This base eccentricity
+For Earth this offset is eccentricityBase = <!--v:eccentricityBase-->0.015386<!--/v--> (dimensionless; ×a for the offset in AU). This base eccentricity
 does not change over time. Only the direction of the perihelion precesses — the
 perihelion point rotates around the Sun, but its distance remains the same.
 
@@ -164,7 +164,7 @@ DIFFERENT periods, their combined effect produces a real eccentricity fluctuatio
 at the planet's eccentricity cycle — the meeting frequency where axial precession
 meets inclination precession. Each planet has its own eccentricity cycle (see
 Section 10 and `docs/37-planets-precession-cycles.md`). For Earth the eccentricity
-cycle is H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> years, resulting in an amplitude of <!--v:eccentricityAmplitude-->0.001356<!--/v--> AU.
+cycle is H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> years, resulting in an amplitude of <!--v:eccentricityAmplitude-->0.001356<!--/v--> (dimensionless).
 
 **Step 6 — Eccentricity balance is maintained at every epoch.**
 The mean perihelion distances (base eccentricities) achieve ~99.9% Law 5 balance.
@@ -219,7 +219,7 @@ full derivation chain. The eccentricity balance (Law 5) emerges naturally at ~99
 
 Note: the fits below were originally performed using the universal H/16 period.
 With per-planet eccentricity cycles, the Mars and Venus fits should be re-run using
-their respective periods (Mars: ~50,251 yr, Venus: ~14,056 yr). The
+their respective periods (Mars: ~51,587 yr, Venus: ~141,186 yr — `wobblePeriod` per doc 37). The
 amplitudes are expected to remain similar since they depend on tilt, not period.
 
 | Planet  | Fit Amp       | Tilt-Predicted Amp | Ratio | R²    |
@@ -272,7 +272,7 @@ At J2000, **Earth and Mars are above their base eccentricities** (Earth: <!--v:e
 | Mercury |  6.703207       | 0.386478         | <!--v:mercuryInclJ2000-->6.3472858<!--/v-->         | 6.32 to 7.09    |
 | Venus   |  <!--v:venusInclMean-->2.151359<!--/v-->       | 0.062165         | <!--v:venusInclJ2000-->2.1545441<!--/v-->         | 2.09 to 2.21    |
 | Earth   |  <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> | <!--v:earthInclJ2000-->1.57869<!--/v--> | 0.85 to 2.12    |
-| Mars    |  1.915105       | 1.164222         | <!--v:marsInclJ2000-->1.6311858<!--/v-->         | 0.75 to 3.08    |
+| Mars    |  <!--v:marsInclMean-->1.833256<!--/v-->       | <!--v:marsInclAmp-->1.164246<!--/v-->         | <!--v:marsInclJ2000-->1.6311858<!--/v-->         | 0.67 to 3.00    |
 | Jupiter |  <!--v:jupiterInclMean-->0.321086<!--/v-->       | <!--v:jupiterInclAmp-->0.021404<!--/v-->         | <!--v:jupiterInclJ2000-->0.3219652<!--/v-->         | 0.30 to 0.34    |
 | Saturn  |  0.984965       | 0.065193         | <!--v:saturnInclJ2000-->0.9254704<!--/v-->         | 0.92 to 1.05    |
 | Uranus  |  <!--v:uranusInclMean-->1.015182<!--/v-->       | <!--v:uranusInclAmp-->0.023831<!--/v-->         | <!--v:uranusInclJ2000-->0.9946692<!--/v-->         | 0.99 to 1.04    |
@@ -297,9 +297,8 @@ Inclination amplitudes are derived from the PSI formula:
 | Uranus  |  21 | 6.6078e-3      | <!--v:uranusInclAmp-->0.023831<!--/v-->             | <!--v:uranusInclAmp-->0.023831<!--/v-->         | Yes   |
 | Neptune |  34 | 7.1772e-3      | <!--v:neptuneInclAmp-->0.013551<!--/v-->             | <!--v:neptuneInclAmp-->0.013551<!--/v-->         | Yes   |
 
-Earth shows a ~0.5% mismatch because its amplitude was independently tuned for IAU 2006
-precession rate (<!--v:earthInclAmp-->0.63605<!--/v-->). The Fibonacci formula (ψ/(d×√m)) gives 0.636, matching exactly since ψ is derived from Earth.
-All other planets match exactly.
+Earth matches by construction: ψ is defined from Earth's amplitude (ψ = 3 × <!--v:earthInclAmp-->0.63605<!--/v--> × √m_E, pinned by the IAU 2006 obliquity rate), so the Fibonacci formula (ψ/(d×√m)) returns it identically.
+All other planets match exactly. (The mean-vs-instantaneous distinction for Earth is discussed under "Earth's amplitude" below.)
 
 ### Inclination Balance Result
 
@@ -464,7 +463,7 @@ The kinematic mismatch that previously ruled out the tilt mechanism for the gian
 
 The outer planet phases are set to the value that places the dynamic eccentricity closest to the JPL J2000 observed value: 180° when J2000 > base (maximum eccentricity) and 0° when J2000 < base
 (minimum eccentricity). This maximizes the dynamic eccentricity balance at
-J2000 (99.9845%) while the amplitude remains negligible.
+J2000 (99.8753%) while the amplitude remains negligible.
 
 ### Phase Constants (J2000)
 
@@ -474,7 +473,7 @@ Eccentricity phases are now derived at runtime from the balanced-year phase: `ph
 
 | Symbol | Value | Source |
 |--------|-------|--------|
-| K | 3.4149201316e-6 | `eccentricityAmplitudeK` in constants.js |
+| K | 3.4143332013e-6 | `eccentricityAmplitudeK` in constants.js |
 | T_wobble (Earth) | <!--v:earthPeriPeriod-->20,957<!--/v--> years | `perihelionCycleLength` in script.js |
 | T_wobble (per planet) | Varies | `calcWobblePeriod()` in script.js, see doc 37 |
 | e_amplitude per planet | See Section 5 table | `orbitalEccentricityAmplitude` in constants.js |
@@ -486,12 +485,12 @@ Eccentricity phases are now derived at runtime from the balanced-year phase: `ph
 
 | Balance Check                    | Result              |
 |----------------------------------|---------------------|
-| Law 5 base eccentricities        | 100.0000%           |
-| Law 5 J2000 eccentricities       | 99.8909%            |
-| Law 3 inclination balance         | 100.0000%           |
+| Law 5 base eccentricities        | 99.8636%            |
+| Law 5 J2000 eccentricities       | 99.8753%            |
+| Law 3 inclination balance         | 99.9974%            |
 
-The Law 5 eccentricity balance reaches ~99.9% with phase-derived base eccentricities.
-Both balances are exact by construction: dual-balance optimizer finds outer planet base eccentricities that simultaneously satisfy both Law 3 and Law 5.
+The Law 5 eccentricity balance reaches 99.8636% with phase-derived base eccentricities (`tools/verify/eccentricity-balance.js`).
+The dual-balance optimizer finds outer-planet base eccentricities that honour Law 3 and Law 5 simultaneously to the precision above.
 
 ### Why the Balance Holds at All Epochs
 

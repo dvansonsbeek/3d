@@ -758,7 +758,7 @@ match them with sub-percent precision:
 | 15 (Miocene) | obliquity (k+s₃) | 40.50 | 41.19 | +1.7% ✓ |
 | 90 (Late Cretaceous) | obliquity (k+s₃) | 39.00 | 39.87 | +2.2% ✓ |
 | 200 (Late Triassic) | obliquity (k+s₃) | 37.70 | 38.46 | +2.0% ✓ |
-| **380 (Devonian)** | **obliquity (k+s₃)** | **35.90** | **35.99** | **+0.3% ✓** |
+| **380 (Devonian)** | **obliquity (n=68 line — see item 3 below; holding k+s₃ n=65 fixed gives 37.68, +5.0%)** | **35.90** | **35.99** | **+0.3% ✓** |
 | 200 (Late Triassic) | precession (k+g₂) | 21.00 | 21.52 | +2.5% ✓ |
 | **380 (Devonian)** | **precession (k+g₄)** | **17.70** | **17.76** | **+0.3% ✓** |
 
@@ -786,8 +786,8 @@ The framework's invariants are:
 3. The closure of the 8H lattice (with appropriate paleo-correction)
 
 The framework's epoch-dependent quantities:
-1. The specific value of H (<!--v:H-->335,317<!--/v--> yr now, was ~309,000 yr in Devonian under the proper-physics two-layer formula — see doc 99 § "Proper-physics LOD formula")
-2. The specific value of 8H (2.68 Myr now, was 2.47 Myr in Devonian)
+1. The specific value of H (<!--v:H-->335,317<!--/v--> yr now, ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr in Devonian — see doc 99 § "Proper-physics LOD formula")
+2. The specific value of 8H (2.68 Myr now, ≈ 2.450 Myr in Devonian)
 3. The specific L1 integer labels (n=65 for obliquity main now, n=68
    in Devonian — i.e., the obliquity period shifts to a different lattice integer at deep time)
 

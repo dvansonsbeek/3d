@@ -41,7 +41,7 @@ The rate at which the perihelion longitude advances in the ecliptic frame. All p
 The ecliptic rate minus general precession (H/13). This is the rate that drives the inclination oscillation on the invariable plane. Earth is the sole prograde planet in the ICRF. All ICRF periods divide 8H evenly.
 
 ### 4. Ascending Node Regression
-The rate at which the ascending node on the invariable plane regresses. These rates correspond to the Laplace-Lagrange secular eigenfrequencies (s₁...s₈) — a third level of Fibonacci structure.
+The rate at which the ascending node on the invariable plane regresses. These integers were originally compared to the Laplace-Lagrange secular eigenfrequencies (s₁...s₈); the 2026-04 node audit abandoned that framing — the integers are fit to JPL ecliptic-inclination trends in the J2000-fixed frame (see [doc 70](70-ascending-node-limitations.md)).
 
 ### 5. Obliquity Oscillation
 The period of the planet's axial tilt oscillation. This is a beat frequency derived from the Fibonacci decomposition of the ecliptic perihelion rate. For Earth: obliquity = beat of inclination (H/3) and ecliptic precession (H/5) = H/8. Venus and Neptune have obliquity cycle = |ICRF period| per planet (Venus: 8H/110, Neptune: 8H/100) — the two-component formula cancels exactly, producing constant obliquity.
@@ -91,7 +91,7 @@ Notes:
 ## Notable Patterns
 
 ### Mirror Symmetry in Periods
-- **Mercury ↔ Uranus**: ecliptic precession 8H/8 = H (identical)
+- **Mercury ↔ Uranus**: mirror pair, shared Fibonacci divisor d = 21
 - **Mars ↔ Jupiter**: axial↔obliquity swap (16↔21), identical sum (37)
 - **Earth ICRF = Uranus ecliptic**: both 8H/24
 - **Jupiter = Saturn**: ascending node 8H/36 (gas-giant lockstep)
@@ -131,7 +131,7 @@ ICRF perihelion ←── beat ──→ Ecliptic perihelion = Obliquity cycle
 
 Ecliptic perihelion ←── minus H/13 ──→ ICRF perihelion
 
-Ascending node ←── matches eigenfrequency s₁...s₈ ──→ Secular theory
+Ascending node ←── fit to JPL inclination trends (s₁...s₈ framing abandoned, doc 70) ──→ J2000-fixed frame
 ```
 
 ### Integer Arithmetic Identities
@@ -146,7 +146,7 @@ N_ICRF = 104 − N_ecl    (for prograde ecliptic planets)
 | Planet | N_ecl + N_ICRF | = 104? |
 |--------|---------------|--------|
 | Mercury | 11 + 93 | ✓ |
-| Mars | 35 + 69 | ✓ |
+| Mars | 36 + 68 | ✓ |
 | Jupiter | 39 + 65 | ✓ |
 | Uranus | 24 + 80 | ✓ |
 | Neptune | 4 + 100 | ✓ |
@@ -173,7 +173,7 @@ N_ecc = N_axial + N_ICRF = 128    (Earth — fast beat = perihelion precession H
 | Mercury | \|9 − 93\| | 84 |
 | Venus | \|91 − 110\| | 19 |
 | **Earth** | **104 + 24** | **128** |
-| Mars | \|16 − 69\| | 53 |
+| Mars | \|16 − 68\| | 52 |
 | Jupiter | \|21 − 65\| | 44 |
 | Saturn | \|6 − 169\| | 163 |
 | Uranus | Axial ≈ 0 → Ecc = ICRF | 80 |
@@ -199,7 +199,7 @@ N_ecl = N_obliq + N_eclPrec
 | Mercury | 11 | 3 + 8 | H (<!--v:H-->335,317<!--/v--> yr) |
 | Venus | 6 | 110 + (−104) | H/13 (<!--v:earthAxialPeriod-->25,794<!--/v--> yr) |
 | Earth | 128 | 64 + 64 | H/8 (<!--v:hDiv8-->41,915<!--/v--> yr) |
-| Mars | 35 | 21 + 14 | 8H/14 (191,610 yr) |
+| Mars | 36 | 21 + 15 | 8H/15 (178,836 yr) |
 | Jupiter | 40 | 16 + 24 | H/3 (<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr) |
 | Saturn | 64 | 24 + 40 | H/5 (<!--v:hDiv5-->67,063<!--/v--> yr) |
 | Uranus | 24 | 16 + 8 | H (<!--v:H-->335,317<!--/v--> yr) |

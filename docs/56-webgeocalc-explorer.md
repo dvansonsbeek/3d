@@ -41,7 +41,7 @@ Collapsed by default so the primary `ϖ` chart gets full attention. The model's 
 
 ### 3. Argument of Periapsis — `ω` (collapsible)
 
-The angle from the ascending node to the perihelion, measured within the orbital plane. `ω = ϖ − Ω`. Its time derivative is the argument-of-periapsis rate. Standish Table 1 (1800–2050) and Table 2a (3000 BC–3000 AD) disagree on the *sign* of `ω̇` for Saturn — the ecliptic-retrograde phenomenon the model predicts. See [docs/10-fibonacci-laws.md § Saturn's Ecliptic-Retrograde Perihelion Precession](10-fibonacci-laws.md) for the details.
+The angle from the ascending node to the perihelion, measured within the orbital plane. `ω = ϖ − Ω`. Its time derivative is the argument-of-periapsis rate. Standish Table 1 (1800–2050) and Table 2a (3000 BC–3000 AD) disagree on the *sign* of `ω̇` for Saturn — the ecliptic-retrograde phenomenon the model predicts. See [docs/10-fibonacci-laws.md § Law 6](10-fibonacci-laws.md#law-6-saturn-jupiter-earth-resonance) for the details.
 
 ## Observed rates at a glance
 
@@ -52,7 +52,7 @@ The WebGeoCalc trends extracted by the Explorer for the 1900–2026 window are s
 | Mercury | ~570 ″/cy prograde | ✓ resolvable | 531 (H × 8/11) |
 | Venus | ~0 ″/cy (flips sign across windows) | ✗ un-determined | −290 (−8H/6) |
 | Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> ″/cy prograde (wrt equinox) | ✓ resolvable | 6,187 (H/16) |
-| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> ″/cy prograde | ✓ resolvable | 1,691 (H × 8/35) |
+| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> ″/cy prograde | ✓ resolvable | 1,739 (8H/36) |
 | Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> ″/cy prograde (current epoch) | ✗ un-determined | 1,884 (8H/39) |
 | Saturn | retrograde, ~−1,800 to −3,600 ″/cy depending on window | ✗ un-determined (magnitude window-sensitive) | −3,140 (−8H/65) |
 | Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> ″/cy (current epoch) | ✗ un-determined | 1,160 (H/3) |

@@ -11,7 +11,7 @@ status: current
 >
 > For the **100-kyr ice age problem**, the model's H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr inclination precession lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
 >
-> Companion docs: [17 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) (empirical 31-component 8H Orbital Forcing Formula + 14 hypothesis tests + 405-kyr off-lattice characterization); [18 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md) (canonical L1+L2+L3 modular formula + per-regime ridge fits across LR04 / CENOGRID / EPICA / CenCO2PIP + Climate Formula Explorer modal).
+> Companion docs: [91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) (empirical 32-component 8H Orbital Forcing Formula + 14 hypothesis tests + 405-kyr off-lattice characterization); [92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md) (canonical L1+L2+L3 modular formula + per-regime ridge fits across LR04 / CENOGRID / EPICA / CenCO2PIP + Climate Formula Explorer modal).
 
 **Related documents:**
 - [10 — Fibonacci Laws](10-fibonacci-laws.md)
@@ -103,8 +103,8 @@ The Berger climatic-precession spectrum is a **set of six** peaks from `g_j + k`
 | 23,716 | g₅ + k (Jupiter) | n = 113 → 23,739 | 0.10 % | Earth.Axial(104) + Mercury.Obliq(3) + Saturn.Axial(6) (3-term) |
 | 23,159 | g₁ + k (Mercury) | n = 116 → 23,125 | 0.15 % | — (not in canonical L1) |
 | 22,428 | g₂ + k (Venus) | n = 120 → 22,354 | 0.33 % | **Earth.Axial(104) + Jupiter.Obliq(16)** (clean 2-term beat) |
-| 19,155 | g₃ + k (Earth) | n = 140 → 19,161 | 0.03 % | — (not in canonical L1) |
-| 18,976 | g₄ + k (Mars) | n = 141 → 19,025 | 0.26 % | Earth.Axial(104) + Jupiter.Axial(21) + Jupiter.Obliq(16) (3-term) |
+| 19,155 | g₃ + k (Earth) | n = 141 → 19,025 | 0.68 % | **In canonical L1 as the Berger-quintet completion (k+g₃, doc 92 §2.3)** |
+| 18,976 | g₄ + k (Mars) | n = 141 → 19,025 | 0.26 % | — (nearest n=141 is attributed to k+g₃; k+g₄ enters via sideband n=152) |
 | 16,469 | g₆ + k (Saturn) | n = 163 → <!--v:saturnEccCycle-->16,457<!--/v--> | 0.07 % | — (not in canonical L1) |
 
 All six peaks match an integer-divisor position. **Berger names each peak after a single planet** (g_j + k convention) while the Holistic model derives the same LR04 lattice peaks via **multi-planet beats from PLANET_CYCLES** — see [doc 93 — L1 attribution reference](93-l1-attribution-reference.md) for all 32 L1 lattice components with full ranked attribution alternatives. The structural decomposition is `n = 104 + δ_j` where 104 = 8 × 13 is Earth's axial precession integer (see website [eigenfrequencies.mdx §"Berger climatic precession peaks"](https://www.holisticuniverse.com/model/eigenfrequencies#berger-climatic-precession-peaks)).
@@ -200,7 +200,7 @@ The canonical L1 + L2 + L3 modular formula — per-regime ridge fitting across L
 
 **Five headline findings from doc 91 §1**:
 
-1. Every significant LR04 climate peak sits at an integer divisor of 8H (30 of 31 with clean physical interpretations as Berger/Laskar eigenmode beats or direct planet periods; n=66 is the obliquity-band centroid added by this framework — see [doc 92 §2.4](92-climate-formula.md#24-the-31-lattice-integers--per-line-identities)).
+1. Every significant LR04 climate peak sits at an integer divisor of 8H (31 of 32 with clean physical interpretations as Berger/Laskar eigenmode beats or direct planet periods; n=66 is the obliquity-band centroid added by this framework — see [doc 92 §2.3](92-climate-formula.md#23-the-32-lattice-integers--per-line-identities)).
 2. **Mars dominates the per-planet climate fingerprint** (two exclusive direct matches in LR04 full, three more in pre-MPT).
 3. **The 100-kyr glacial cycle is an inclination-side eigenmode beat** (Mercury-Mars s₁−s₄ nodal at 107 kyr), not direct eccentricity forcing — vindicates Muller-MacDonald 1997's framing.
 4. Pre-MPT and post-MPT differ in **climate sensitivity, not orbital forcing**.

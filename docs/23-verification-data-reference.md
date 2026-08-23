@@ -141,7 +141,7 @@ Each verification entry has the following structure:
 
 **Sources:**
 - Tycho Brahe Mars observations (~7,384 entries) — historical declination measurements
-- Jean Meeus tables, nakedeyeplanets.com, stjerneskinn.com (~196 opposition entries)
+- Jean Meeus tables, nakedeyeplanets.com, stjerneskinn.com (~197 opposition entries)
 - Mutual occultation data (~12 entries)
 
 **Data Types:**
@@ -149,7 +149,7 @@ Each verification entry has the following structure:
 - Declination at opposition (when Mars is opposite the Sun from Earth)
 - Occultation dates
 
-**Date Range:** JD 1382451 to JD 2571132 (~1200 AD to ~2300 AD)
+**Date Range:** JD 1382451 to JD 2571132 (~930 BC to ~2330 AD)
 
 **Purpose:** The Tycho Brahe dataset provides a dense grid of historical Mars positions for optimizer training. Mars oppositions are prime observing opportunities where declination indicates sky position.
 
@@ -187,7 +187,7 @@ Each verification entry has the following structure:
 
 **Data Type:** Occultation dates with Jupiter, Venus, Mercury, Mars
 
-**Date Range:** JD 1466919 to JD 2604944 (~1000 BC to ~2200 AD)
+**Date Range:** JD 1466919 to JD 2604944 (~700 BC to ~2420 AD)
 
 **Purpose:** Verify Uranus position during rare mutual planetary occultations.
 
@@ -292,7 +292,7 @@ Larger errors at ancient dates are acceptable because:
 
 The verification data above is consumed in two distinct ways:
 - **Runtime planet reports** (the `generatePlanetReport()` flow described in [How Verification Data Is Used](#how-verification-data-is-used)) — interactive comparisons displayed in the UI.
-- **Offline batch validation** — two new scripts in [`tools/fit/`](../tools/fit/) that compute aggregate RMS statistics across the full dataset and stratify by epoch / data tier.
+- **Offline batch validation** — two scripts in [`tools/verify/`](../tools/verify/) that compute aggregate RMS statistics across the full dataset and stratify by epoch / data tier.
 
 ### New validation scripts
 

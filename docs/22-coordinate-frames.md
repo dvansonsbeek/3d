@@ -267,9 +267,9 @@ i_app = arccos(n_ecl · n_planet)
   - `o.{planet}EclipticInclinationDynamic` (J2000-verified nodes)
   - `o.{planet}EclipticInclinationSouamiSouchayDynamic` (original S&S nodes)
 
-### 3.3 Earth Obliquity
+### 3.3 Earth Inclination to the Invariable Plane
 
-Earth's axial tilt oscillates with the Earth Fundamental Cycle.
+Earth's orbital inclination to the invariable plane oscillates with the Earth Fundamental Cycle. (Axial tilt — obliquity — is a separate quantity; see `computeObliquityEarth()`.)
 
 **Formula:**
 ```
@@ -278,8 +278,8 @@ i = i_mean - A × cos(phase)
 
 **Range:** ~0.85° to ~2.12° (inclination to invariable plane)
 
-**Implementation (lines 19862-19881):**
-- Function: `computeInclinationEarth()`
+**Implementation:**
+- Function: `computeInclinationEarth()` in `src/script.js`
 - Related: `computeObliquityEarth()` for axial tilt
 
 ---
@@ -338,7 +338,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Constant | Description |
 |----------|-------------|
 | `earthtiltMean` | Mean obliquity |
-| Default fallback | <!--v:obliquityCurrent-->23.4393<!--/v-->° | Used when dynamic value unavailable |
+| Default fallback | <!--v:obliquityCurrent-->23.4393<!--/v-->° — used when dynamic value unavailable |
 
 ### 5.3 General Precession
 

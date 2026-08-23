@@ -9,7 +9,7 @@ status: current
 
 ## Overview
 
-The **Formula Verification** panel is a modal in the Tools menu that compares the Holistic Universe Model's predictions against published analytical formulas from celestial-mechanics literature — Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Peters, Harkness. For nine separate quantities (eccentricity, obliquity, inclination, ascending node, perihelion longitude, tropical year, sidereal year, solar day length, axial precession period) it plots the model and every available reference on a common time axis spanning **12,000 BC → 12,000 AD**, shows a residual chart of each reference minus the model, and a J2000 comparison table that reports every formula's value at J2000 and its delta from the model.
+The **Formula Verification** panel is a modal in the Tools menu that compares the Holistic Universe Model's predictions against published analytical formulas from celestial-mechanics literature — Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Peters, Harkness. For ten separate quantities (eccentricity, obliquity, inclination, ascending node, perihelion longitude, tropical year, sidereal year, solar day length, axial precession period, ΔT) it plots the model and every available reference on a common time axis spanning **12,000 BC → 12,000 AD**, shows a residual chart of each reference minus the model, and a J2000 comparison table that reports every formula's value at J2000 and its delta from the model.
 
 This is the analytical twin of the [WebGeoCalc Explorer](56-webgeocalc-explorer.md):
 
@@ -20,7 +20,7 @@ Together the two panels let you check the model from two independent directions:
 
 > **Scope note (ESSRT).** The default ±12,000 yr comparison range is modern-era for ESSRT purposes — H(t) drift over this span is sub-ppm and well below the noise floor of the published polynomial and trigonometric formulas being compared. The Export Cycles long-baseline plots (−248,000 BC to +102,000 AD, ~350 kyr) push into the regime where ESSRT scaling becomes marginally non-negligible (~0.04% H drift over 250 kyr per Drivers 1 and 2 — see [doc 99](99-expanding-solar-system-resonance-theory.md)), but Laskar's La2004/La2010 N-body integrations the model is compared against also do not incorporate this drift, so any discrepancy at long range reflects framework differences rather than ESSRT scaling. The Fibonacci structure the model formulas test is intrinsically scale-invariant.
 
-## The nine categories
+## The ten categories
 
 Each category has: the quantity being plotted, the unit of the y-axis, a primary reference (highlighted on the J2000 table as the comparison baseline), and a list of secondary references. The model's curve is always drawn in amber (`#f0b040`) as the top layer; each reference gets its own colour.
 
@@ -35,6 +35,7 @@ Each category has: the quantity being plotted, the unit of the y-axis, a primary
 | 7 | Solar Day Length | s | `meansiderealyearlengthinSeconds / computeLengthofsiderealYear(year)` | Bills & Ray 1999 |
 | 8 | Sidereal Year | days | `computeLengthofsiderealYear(year)` | Chapront 2002 |
 | 9 | Axial Precession Period | yr | `computeAxialPrecessionRealLOD(...)` | Capitaine 2003, Vondrák 2011 |
+| 10 | ΔT (TT − UT1) | s | calibrated ΔT trend (deltaTStart + Layer-2 integral + H/5 LOD + cycle stack) | Espenak & Meeus history (1650–2017) |
 
 Each category also lists **J2000 observed reference values** separately — NASA/JPL, IAU, or Souami & Souchay (2012) for the invariable-plane quantities — shown in the J2000 table as "extras" (red, `#ef5350`) so the reader can see where observed reality sits relative to model and formulas.
 
@@ -65,8 +66,8 @@ A small table with three columns: **Formula name** (with an arrow-link to the pu
 ## Time range and navigation
 
 - Default range: **−12 000 BC to +12 000 AD** (24 000 years). The same range applies to every category.
-- Navigation: prev/next arrows ([`‹`] / [`›`]) to step through the 9 categories, or click the category name to open a dropdown for direct jump.
-- Category order: eccentricity → obliquity → inclination → ascending node → perihelion → tropical year → solar day → sidereal year → axial precession.
+- Navigation: prev/next arrows ([`‹`] / [`›`]) to step through the 10 categories, or click the category name to open a dropdown for direct jump.
+- Category order: eccentricity → obliquity → inclination → ascending node → perihelion → tropical year → solar day → sidereal year → axial precession → ΔT.
 
 The panel closes on "×" click, Escape, or overlay click.
 
@@ -141,7 +142,7 @@ Cases where the model *disagrees* with a reference are also documented in the pa
 
 ## Scope and limitations
 
-1. **Earth only.** All nine categories describe Earth quantities (Earth's orbit + Earth's spin axis). Planet-specific perihelion motion lives in the WebGeoCalc Explorer.
+1. **Earth only.** All ten categories describe Earth quantities (Earth's orbit + Earth's spin axis + Earth's rotation clock ΔT). Planet-specific perihelion motion lives in the WebGeoCalc Explorer.
 2. **No interactive year slider.** The charts are plotted over a fixed range (−12 000 to +12 000). To inspect values at a specific year, read the J2000 table or advance the simulation's date and re-open the panel.
 3. **Reference formulas go stale outside their range.** A polynomial fit to ±2 000 years *will* give nonsense at year −10 000. The panel plots them anyway (with the range note) so the reader can see the divergence — useful for understanding *why* N-body solutions are needed at long range.
 4. **Paper-export is SVG-only.** No PNG / PDF export. Use browser screenshot or an external SVG-to-PDF converter.
@@ -172,9 +173,9 @@ Cases where the model *disagrees* with a reference are also documented in the pa
 | Component | Location |
 |-----------|----------|
 | Panel modal (build + open/close) | `createVerificationPanel()` / `openVerificationPanel()` / `closeVerificationPanel()` in `src/script.js` |
-| Category data (9 entries) | `VFP_CATEGORIES` array in `src/script.js` |
+| Category data (10 entries) | `VFP_CATEGORIES` array in `src/script.js` |
 | Main chart + residual renderer | `renderVFPChart(category, currentYear)` in `src/script.js` |
-| Paper-export renderers | `exportVFPPaper()` / `exportVFPPaperAlt()` in `src/script.js` |
+| Paper-export renderers | `exportVFPPaper()` / `exportVFPPaperAlt()` / `exportVFPPaperRecent()` in `src/script.js` |
 | Year→JD helper | `yearToJDApprox(year)` in `src/script.js` |
 | Reference formulas (polynomial) | `eccMeeus`, `eccHarkness`, `obliquityChapront2002`, `perihelionMeeus`, `perihelionMeeusEarth`, `tropicalYearLaskar`, `solarDayPeters`, `siderealYearChapront`, `axialPrecessionCapitaine2009` in `src/script.js` |
 | Reference formulas (trig series) | `eccBerger1978`, `obliquityBerger1978`, `axialPrecessionVondrak2011` in `src/script.js` |

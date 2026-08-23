@@ -201,7 +201,7 @@ Each body's ascending node Ω on the invariable plane precesses linearly at a bo
 | Uranus | 11 | −<!--v:mercuryPeriPeriod-->243,867<!--/v--> yr | |
 | Neptune | 3 | −<!--v:mercuryObliqCycle-->894,179<!--/v--> yr | |
 
-The signed period is negative because Ω regresses (retrograde) for every body. The per-planet `N` integer is stored as `ascendingNodeCyclesIn8H` in `data/planets.json`; constants.js precomputes the corresponding signed period as `ascendingNodePeriod = -(8H)/N`. The integers were chosen to fit JPL ecliptic-inclination trends to <2″/century each in the J2000-fixed frame; see [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) for the full derivation.
+The signed period is negative because Ω regresses (retrograde) for every body. The per-planet `N` integer is stored as `ascendingNodeCyclesIn8H` in `public/input/model-parameters.json`; constants.js precomputes the corresponding signed period as `ascendingNodePeriod = -(8H)/N`. The integers were chosen to fit JPL ecliptic-inclination trends to <2″/century each in the J2000-fixed frame; see [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) for the full derivation.
 
 ### Implementation
 
@@ -279,7 +279,7 @@ This uses `o.<planet>AscendingNode` (the **ecliptic** ascending node from `calcu
 
 ### Resolution
 
-To obtain a stable ω_inv, both values would need to be in the same frame. The model has `perihelionLongitudeEcliptic()` (line 28207) which reads the perihelion longitude directly from the precession layer rotation in ecliptic/ICRF coordinates — this gives a perfectly stable precession rate. Using that instead of `apparentRaFromPdA()` would produce a constant ω_inv.
+To obtain a stable ω_inv, both values would need to be in the same frame. The model has `perihelionLongitudeEcliptic()` (in `src/script.js`) which reads the perihelion longitude directly from the precession layer rotation in ecliptic/ICRF coordinates — this gives a perfectly stable precession rate. Using that instead of `apparentRaFromPdA()` would produce a constant ω_inv. (Proposed, not implemented — the displayed ω_inv still uses the mixed-frame route.)
 
 ### Earth: Special Case
 

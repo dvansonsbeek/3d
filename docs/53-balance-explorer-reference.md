@@ -83,7 +83,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 
 ### Preset Dropdown
 
-A dropdown in the header offers **42 deep-analysis survivors** — configurations passing all five physical filters (inclination balance ≥<!--v:balanceThreshold-->99.994%<!--/v-->, eccentricity balance ≥99%, LL bounds, direction match ≤5″, per-config optimised anchor and ascending nodes). Each candidate's eccentricity balance is computed with its own recomputed bases (not the default config's) for a fair comparison. Sorted by this per-config eccentricity balance, grouped by Jupiter/Saturn scenario:
+A dropdown in the header offers **15 deep-analysis survivors** (of 96 candidates) — configurations passing all five physical filters (inclination balance ≥<!--v:balanceThreshold-->99.994%<!--/v-->, eccentricity balance ≥99%, LL bounds, direction match ≤5″, per-config optimised anchor and ascending nodes). Each candidate's eccentricity balance is computed with its own recomputed bases (not the default config's) for a fair comparison. Sorted by this per-config eccentricity balance, grouped by Jupiter/Saturn scenario:
 
 | Scenario | Jupiter d | Saturn d |
 |----------|-----------|----------|
@@ -212,7 +212,7 @@ Useful experiments to try:
 | Change Saturn to in-phase group | Balance collapses (all planets on one side) |
 | Increase Neptune d from 34 to 55 | Amplitude decreases, may still pass LL bounds |
 | Set Jupiter d to large value (e.g., 55) | Jupiter amplitude shrinks, balance breaks |
-| Use Preset dropdown | See all 41 surviving configurations |
+| Use Preset dropdown | See all 15 surviving configurations |
 | Look for the default configuration (Scenario A) | The unique mirror-symmetric solution |
 
 ### Why Earth Is Locked
@@ -251,7 +251,7 @@ Expected results:
 - Trend directions: **7/7 fitted planets match JPL direction** (J2000-fixed frame)
 - Total trend error: **~4.3″/century** across all 7 fitted planets
 
-This is the default configuration out of 42 survivors (ranked #11 by eccentricity balance) — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
+This is the default configuration out of 15 survivors (ranked #4 by eccentricity balance) — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
 
 ---
 
@@ -425,7 +425,7 @@ fits = (mean − amplitude ≥ LL_min − 0.01) AND (mean + amplitude ≤ LL_max
 | Component | Location |
 |-----------|----------|
 | `BALANCE_PLANETS` array | [script.js:9207](../src/script.js#L9207) |
-| `BALANCE_PRESETS` (41 configs) | [script.js:9216](../src/script.js#L9216) |
+| `BALANCE_PRESETS` (15 configs, loaded from `data/balance-presets.json`) | `const BALANCE_PRESETS = FIT.BALANCE_PRESETS` in `src/script.js` |
 | `D_VALUE_OPTIONS` | [script.js:9330](../src/script.js#L9330) |
 | `BALANCE_CONFIG` | [script.js:9348](../src/script.js#L9348) |
 | `computeBalanceResults()` | [script.js:9497](../src/script.js#L9497) |

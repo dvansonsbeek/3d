@@ -258,7 +258,7 @@ Current H-based fits used in the simulation:
 | Venus | `venusAxialPrecessionYears` | `8H/91` | <!--v:venusAxialPeriod-->29,478<!--/v--> yr | Prograde | ~29 kyr | Cottereau & Souchay 2009 |
 | Mars | `marsAxialPrecessionYears` | `-H/2` | <!--v:hDiv2-->167,659<!--/v--> yr | Retrograde | 170,400 yr | Konopliv+ 2020 |
 | Jupiter | `jupiterAxialPrecessionYears` | `−8H/21` (F₈) | <!--v:jupiterAxialPeriod-->127,740<!--/v--> yr | Retrograde | 113–136 kyr | Saillenfest+ 2020 |
-| Saturn | `saturnAxialPrecessionYears` | `-H×4/3` | 446,677 yr | Retrograde | 400–480 kyr | Saillenfest+ 2021 |
+| Saturn | `saturnAxialPrecessionYears` | `-H×4/3` | 447,089 yr | Retrograde | 400–480 kyr | Saillenfest+ 2021 |
 | Uranus | `uranusAxialPrecessionYears` | `H×610` (F15) | 204 Myr | Prograde | ~40–50 Myr (bare) | Saillenfest+ 2022 |
 | Neptune | `neptuneAxialPrecessionYears` | `-H×68` (2×F9) | 22.8 Myr | Retrograde | ~70 Myr (est.) | Ward & Hamilton 2004 |
 
@@ -278,7 +278,6 @@ from two independently known quantities:
 2. **Axial precession** — the planet's spin-axis cone rate (`AxialPrecessionYears`)
 
 The wobble is the **meeting frequency** of these two motions:
- Which values do we now 
 - **Opposite directions** (one prograde, one retrograde):
   `1/T_wobble = 1/|T_axial| + 1/|T_peri_ICRF|`
 - **Same direction** (both retrograde or both prograde):
@@ -312,7 +311,7 @@ Earth is the only planet with prograde perihelion ICRF.
 | Earth | <!--v:earthAxialPeriod-->25,794<!--/v--> yr | −H/13 | Retrograde |
 | Mars | <!--v:hDiv2-->167,659<!--/v--> yr | −H/2 | Retrograde |
 | Jupiter | <!--v:jupiterAxialPeriod-->127,740<!--/v--> yr | −8H/21 | Retrograde |
-| Saturn | 446,677 yr | −H×4/3 | Retrograde |
+| Saturn | 447,089 yr | −H×4/3 | Retrograde |
 | Uranus | 204 Myr | +H×610 | Prograde (obliq 98°) |
 | Neptune | 22.8 Myr | −H×68 | Retrograde |
 
@@ -323,7 +322,7 @@ Earth is the only planet with prograde perihelion ICRF.
 | Mercury | retro | retro | same: \|diff\| | 84/(8H) | <!--v:mercuryEccCycle-->31,935<!--/v--> yr | 2H/21 |
 | Venus | pro | retro | opp: sum | 191/(8H) | 14,045 yr | 8H/191 |
 | Earth | retro | pro | opp: sum | 16/H | <!--v:earthPeriPeriod-->20,957<!--/v--> yr | **H/16** |
-| Mars | retro | retro | same: \|diff\| | 20/(3H) | 50,298 yr | 3H/20 |
+| Mars | retro | retro | same: \|diff\| | 52/(8H) | <!--v:marsEccCycle-->51,587<!--/v--> yr | 8H/52 |
 | Jupiter | retro | retro | same: \|diff\| | 44/(8H) | <!--v:jupiterEccCycle-->60,967<!--/v--> yr | 8H/44 |
 | Saturn | retro | retro | same: \|diff\| | 163/(8H) | <!--v:saturnEccCycle-->16,457<!--/v--> yr | 8H/163 |
 | Uranus | pro | retro | opp: sum | ≈10/H | <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr | ≈H/10 |
@@ -386,10 +385,10 @@ both the obliquity and ecliptic precession rates.
 |--------|-------------|------|---|--------|-----------|--------|----------|-------|
 | Mercury | 11/(8H) | 1/(8H) | 11 | 3 + 8 | 3/(8H) | 8H/3 = <!--v:mercuryObliqCycle-->894,179<!--/v--> yr | ~895 kyr (Bills 2005, theoretical) | 0.1% |
 | Earth | 8/H (obliquity level) | 1/H | 8 | 5 + 3 | 8/H | H/8 = <!--v:hDiv8-->41,915<!--/v--> yr | ~41,000 yr | 2% |
-| Mars | 35/(8H) | 1/(8H) | 35 | 8 + 27 | 8/(8H) | 8H/8 = <!--v:H-->335,317<!--/v--> yr | ~124,800 yr | — |
+| Mars | 36/(8H) | 1/(8H) | 36 | 15 + 21 | 21/(8H) | 8H/21 = <!--v:marsObliqCycle-->127,740<!--/v--> yr | ~124,800 yr | 2.4% |
 
-All three confirmed obliquity cycles involve the Fibonacci number **8** in the period
-expression: 8H/3, H/8, 3H/8.
+All three confirmed obliquity cycles involve a Fibonacci number in the period
+expression: 8H/3, H/8, 8H/21.
 
 ### Cross-planet connections
 
@@ -449,11 +448,11 @@ eccentricity cycle rate to obliquity rate shows a pattern:
 | Planet | Ecc cycle rate | Obliq rate | Ratio |
 |--------|---------------|------------|-------|
 | Earth | 128/(8H) | 64/(8H) | **2** |
-| Mars | 53/(8H) | 21/(8H) | **53/21 ≈ 2.52** |
-| Jupiter | 43/(8H) | 16/(8H) | **43/16 ≈ 2.69** |
+| Mars | 52/(8H) | 21/(8H) | **52/21 ≈ 2.48** |
+| Jupiter | 44/(8H) | 16/(8H) | **44/16 = 2.75** |
 
 All ratios are close to Fibonacci convergents (2, 5/2, 8/3) but with the integer
-8H/N values the exact ratios are 2, 53/21, and 43/16.
+8H/N values the exact ratios are 2, 52/21, and 44/16.
 
 ### Physical interpretation
 

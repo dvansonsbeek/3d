@@ -25,11 +25,12 @@ inputmeanlengthsolaryearindays = 365.2422
         │
         ├──► Tropical year (runtime):
         │    Mean of 4 cardinal point derivatives
-        │    (CARDINAL_POINT_HARMONICS, 24 terms per type)
+        │    (CARDINAL_POINT_HARMONICS, 23 harmonics per
+        │    type + ECC/JOINT/DERIVED term families)
         │    Measured at solstices (max/min dec) and
         │    equinoxes (dec=0 crossing)
         │
-        ├──► Sidereal year: Fourier harmonics (5 terms)
+        ├──► Sidereal year: Fourier harmonics (6 terms)
         │    Y(t) = mean + Σ [sᵢ·sin(2πt/Tᵢ) + cᵢ·cos(2πt/Tᵢ)]
         │
         └──► Anomalistic year: Fourier harmonics (8 terms)
@@ -75,7 +76,7 @@ The ratios `H/(H−13)` and `H/(H−16)` come from the coin rotation paradox:
 
 ## Fourier Harmonic Variations
 
-Year-length variations are modelled as Fourier series around the derived means. Coefficients were fitted from measured data points spanning the full H cycle (stepYears=23 steps). The reference time is `t = year − balancedYear`.
+Year-length variations are modelled as Fourier series around the derived means. Coefficients were fitted from measured data points spanning the full H cycle (1-year steps, 335,318 rows). The reference time is `t = year − balancedYear`.
 
 ### Tropical Year
 
@@ -83,12 +84,12 @@ The tropical year is measured at the actual solstices and equinoxes (declination
 
 Two paths compute the tropical year:
 
-- `computeSolarYearDaysDirect(year)` — Step 6d direct year-length Fourier fit (TROPICAL_YEAR_HARMONICS, 12 terms). J2000-anchored to the CSV year-2000 measurement (365.24219037 at J2000). **This is the primary display path — used by the Predictions panel Solar Year (days) row and the modal tropical-year chart.**
-- `computeSolarYearDaysFromCardinals(year)` — analytical derivative of the cardinal-point harmonic formula (CARDINAL_POINT_HARMONICS, 24 harmonics per type, averaged over all 4 CPs). Kept for chart consistency in `charts/report` code paths that already display cardinal-point data.
+- `computeSolarYearDaysDirect(year)` — Step 6c direct year-length Fourier fit (TROPICAL_YEAR_HARMONICS, 12 terms). J2000-anchored to the CSV year-2000 measurement (365.24219037 at J2000). **This is the primary display path — used by the Predictions panel Solar Year (days) row and the modal tropical-year chart.**
+- `computeSolarYearDaysFromCardinals(year)` — analytical derivative of the cardinal-point harmonic formula (CARDINAL_POINT_HARMONICS, 23 harmonics per type plus the ECC/JOINT/DERIVED term families, averaged over all 4 CPs). Kept for chart consistency in `charts/report` code paths that already display cardinal-point data.
 
-Both paths converge at year 2000 within ~2 μd (Step 6c fit residual vs Step 6d anchor).
+Both paths converge at year 2000 within ~2 μd (the Step 6c year-length fit vs the Step 6d cardinal-point derivative at their shared J2000 anchor).
 
-### Sidereal Year (5 harmonics)
+### Sidereal Year (6 harmonics)
 
 ```
 Y_sid(t) = meanSiderealYear + Σ harmonics
@@ -332,7 +333,7 @@ The obliquity used follows the family of the sidereal day it is applied to: `OBL
 
 ### JavaScript (`script.js`)
 
-The tropical year primary display path uses the direct year-length Fourier fit (Step 6d, TROPICAL_YEAR_HARMONICS, 12 terms):
+The tropical year primary display path uses the direct year-length Fourier fit (Step 6c, TROPICAL_YEAR_HARMONICS, 12 terms):
 
 ```javascript
 function computeSolarYearDaysDirect(currentYear) {
@@ -381,10 +382,10 @@ If `H` or `inputmeanlengthsolaryearindays` changes:
 
 1. **Means update automatically** — they are derived formulas, not constants
 2. **Harmonic coefficients must be refitted** from solar measurement data:
-   - Run `export-solar-measurements.js` (step 6a) — full H at stepYears-year steps
-   - Tropical year: derived from cardinal point harmonics (step 6c)
-   - Sidereal/anomalistic: run `year-length-harmonics.js` (step 6d)
-3. **stepYears must divide H evenly** — current: H=<!--v:H-->335,317<!--/v-->, stepYears=23
+   - Run `export-solar-measurements.js` (step 6a) — full H at 1-year steps
+   - Tropical/sidereal/anomalistic year: run `year-length-harmonics.js` (step 6c)
+   - Cardinal points: run `cardinal-point-harmonics.js` (step 6d)
+3. **stepYears must divide H evenly** — current: H=<!--v:H-->335,317<!--/v-->, stepYears=1 (335,318 rows)
 
 Training data: `data/02-solar-measurements.csv`
 

@@ -9,7 +9,7 @@ status: current
 
 > **TL;DR.** The canonical 8H climate formula is **32 integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr (at J2000)** (L1 lattice: 25 framework integers from Berger 1978 + Laskar 2004 eigenmode beats + framework direct planet cycles from doc 55, plus 6 precession-band sidebands surfaced by doc 91 §12.12 Test L, plus n=141 Berger-quintet completion) **+ a 3-line 405-kyr carbon thermostat family** (L2) **+ up to 6 Heaviside step terms** (L3), fitted per regime with sequential ridge regression. Per-regime fits reach **R² = 0.8735 post-MPT**, **R² = 0.8452 EPICA CO₂**, **R² = 0.7626 CenCO2PIP 0–66 Ma**; the full-LR04 fit is **R² = 0.2553** (L1+L2+L3). This doc decomposes the residual into a layered taxonomy — **(L1) orbital lattice**, **(L2) climate-system internal periodic** (canonical: 405-kyr silicate-weathering thermostat + its 202 / 135 kyr harmonics; investigated but not deployed: 13H Boulila libration, 9-Myr long-period carbon resonance), **(L3) boundary-condition shifts** (MPT regime change, iNHG, Cenozoic secular trend, tectonic gateways), **(L4) chronology**, **(L5) stochastic residual** — and reports measured ΔR² for each addition.
 
-> **Scope note (ESSRT).** The L1 lattice integer-divisor structure (32 integers, n = 11, 13, ..., 185) and the layered taxonomy (L1 orbital lattice / L2 carbon / L3 boundary shifts) are scale-invariant — they hold at any epoch. The literal year counts (8H = <!--v:eightH-->2,682,536<!--/v--> yr; the per-line periods 8H/n in the L1 catalogues at §2.3; 13H = <!--v:thirteenH-->4,359,121<!--/v--> yr; the 405-kyr / 202-kyr / 135-kyr L2 lines) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent over the LR04 5.3-Myr window covered by the post-MPT / iNHG-MPT / pre-iNHG ridge fits, modest over the 67-Myr CENOGRID window, and starting to matter for the 13H ≈ 4.36 Myr Boulila comparison. See doc 99 for the per-driver Δ-H formulas.
+> **Scope note (ESSRT).** The L1 lattice integer-divisor structure (32 integers, n = 9, 12, ..., 185) and the layered taxonomy (L1 orbital lattice / L2 carbon / L3 boundary shifts) are scale-invariant — they hold at any epoch. The literal year counts (8H = <!--v:eightH-->2,682,536<!--/v--> yr; the per-line periods 8H/n in the L1 catalogues at §2.3; 13H = <!--v:thirteenH-->4,359,121<!--/v--> yr; the 405-kyr / 202-kyr / 135-kyr L2 lines) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent over the LR04 5.3-Myr window covered by the post-MPT / iNHG-MPT / pre-iNHG ridge fits, modest over the 67-Myr CENOGRID window, and starting to matter for the 13H ≈ 4.36 Myr Boulila comparison. See doc 99 for the per-driver Δ-H formulas.
 >
 > **Canonical formula measurements** (`scripts/milankovitch_climate_formula.py`, 32-integer L1 + 3-line L2 + 6-step L3, sequential ridge λ=1):
 > - **LR04 regime split is the biggest single jump**: pre-iNHG (2.7–5.32 Ma) R² = **0.4298**, iNHG-MPT (1.0–2.7 Ma) R² = **0.7289**, post-MPT (0–1.0 Ma) R² = **0.8735** — the 8H lattice explains ~87% of post-MPT LR04 variance once the MPT regime change is removed.
@@ -48,8 +48,8 @@ status: current
 > Deterministic, no random seeds.
 
 **Related documents:**
-- [16 — Milankovitch language](90-milankovitch-language.md) — terminology primer
-- [17 — Milankovitch evidence](91-milankovitch-evidence.md) — five headline findings (§1), how orbital forcing reaches climate (§2), per-planet contributions (§3), 100-kyr-band centroid (§4), pre-MPT/post-MPT analysis (§5), pre-registered super-cycle null (§§8–11), 14 hypothesis tests (§12) — incl. Test L which surfaced the 6 precession sidebands now in L1, 405-kyr off-lattice characterization (§13)
+- [90 — Milankovitch language](90-milankovitch-language.md) — terminology primer
+- [91 — Milankovitch evidence](91-milankovitch-evidence.md) — five headline findings (§1), how orbital forcing reaches climate (§2), per-planet contributions (§3), 100-kyr-band centroid (§4), pre-MPT/post-MPT analysis (§5), pre-registered super-cycle null (§§8–11), 14 hypothesis tests (§12) — incl. Test L which surfaced the 6 precession sidebands now in L1, 405-kyr off-lattice characterization (§13)
 - Code: [`scripts/milankovitch_climate_formula.py`](../scripts/milankovitch_climate_formula.py), [`scripts/milankovitch_8h_variance_budget.py`](../scripts/milankovitch_8h_variance_budget.py)
 
 ---
@@ -1093,10 +1093,10 @@ Sequential ridge regression on detrended + normalized CO₂ over 0–800 kyr:
 
 | Layer | Cumulative R² | ΔR² |
 |---|---:|---:|
-| L1 (31-lattice) only | **0.8329** | 0.8329 |
-| + L2 (405k + 202k + 135k) | 0.8444 | +0.0115 |
-| + L3 (no transition inside window; MPT at 1000 kyr is the boundary) | 0.8444 | 0.0000 |
-| **Total** | **0.8444** | |
+| L1 (32-lattice) only | **0.8336** | 0.8336 |
+| + L2 (405k + 202k + 135k) | 0.8452 | +0.0115 |
+| + L3 (no transition inside window; MPT at 1000 kyr is the boundary) | 0.8452 | 0.0000 |
+| **Total** | **0.8452** | |
 
 L1 alone explains **83 %** of CO₂ variance over 800 kyr — strong cross-proxy validation. The same orbital lattice that drives ice volume also drives atmospheric carbon-cycle dynamics.
 
@@ -1115,7 +1115,7 @@ For each L1 lattice integer n, the ratio of EPICA-fitted amplitude to LR04-post-
 | 66 | 40.6 | 0.278 | 0.511 | 1.84× | obliquity-band centroid |
 | 28 | 95.8 | 0.752 | 0.555 | 0.74× | g₄−g₅ Mars-Jupiter ecc (Berger 95k) |
 
-(Top 8 of 31 lines by ratio. Full table is in the `carbon_amplification_ratios` block of `public/input/climate-formula-coefficients.json` under regime `epica-co2`.)
+(Top 8 of 32 lines by ratio. Full table is in the `carbon_amplification_ratios` block of `public/input/climate-formula-coefficients.json` under regime `epica-co2`.)
 
 **Interpretation**: Lines like n=14, 18, 16, 30 (ratios 5–11×) are amplified in atmospheric CO₂ relative to ice volume — they manifest primarily through carbon-cycle dynamics (silicate weathering, ocean alkalinity, marine productivity), not through ice-sheet ablation/accretion. The classical Berger 95k line (n=28) shows a low ratio (0.74×), confirming it's primarily an ice-volume signature.
 
@@ -1147,7 +1147,7 @@ Sequential ridge regression on detrended + normalized CO₂ over 0–66 Ma:
 
 | Layer | Cumulative R² | ΔR² |
 |---|---:|---:|
-| L1 (31-lattice) only | 0.1611 | 0.1611 |
+| L1 (32-lattice) only | 0.1611 | 0.1611 |
 | + L2 (405k + 202k + 135k) | 0.1610 | +0.0000 |
 | + L3 (6 Cenozoic transitions inside window) | **0.7626** | **+0.6016** |
 | **Total** | **0.7626** | |

@@ -115,7 +115,7 @@ The base eccentricities (mean eccentricities around which each planet oscillates
 
 ## System Reset
 
-The System Reset epoch is the year where all 7 non-Earth planets simultaneously reach their inclination extremes. For the default configuration, it falls at anchor n=7 within the Solar System Resonance Cycle (≈ −<!--v:systemResetYearPlain-->2,649,854<!--/v-->). Other viable configurations may have a different optimal anchor (n ∈ {0..7}); the deep analysis in `balance-search.js` determines the best n for each. **Each candidate's eccentricity balance is computed using its OWN bases** — recomputed with the candidate's d-values, anti-phase assignments, and optimal anchor — not the default config's bases. This makes the ranking a fair physical comparison.
+The System Reset epoch is the year where all 7 non-Earth planets simultaneously reach their inclination extremes. For the default configuration, it falls at anchor n=7 within the Solar System Resonance Cycle (≈ −<!--v:systemResetYearPlain-->2,649,854<!--/v-->). Other viable configurations may have a different optimal anchor (n ∈ {0..7}); the deep analysis in `tools/verify/balance-search.js` determines the best n for each, and `tools/explore/anchor-and-ascnode-audit.js` audits the shipped anchor and ascending-node assignments. **Each candidate's eccentricity balance is computed using its OWN bases** — recomputed with the candidate's d-values, anti-phase assignments, and optimal anchor — not the default config's bases. This makes the ranking a fair physical comparison.
 
 - In-phase planets (Mercury, Venus, Mars, Jupiter, Uranus, Neptune): all at **minimum** inclination
 - Anti-phase planet (Saturn): also at **minimum** inclination in the model's sign convention. The "anti-phase" designation refers to Saturn's *opposite contribution to the angular-momentum-weighted balance sum*, not the opposite inclination extreme. Concretely: the model formula `i(t) = mean + antiPhaseSign × amp × cos(ω̃ − cycleAnchor)` uses `antiPhaseSign = −1` for Saturn so that its oscillation enters the balance sum with reversed sign; at the System Reset all 7 planets land at MIN inclination simultaneously, and Saturn's reversed sign is what makes the weighted sum cancel to ≈ 99.998%.
@@ -134,13 +134,13 @@ The System Reset occurs once per Solar System Resonance Cycle (8H = <!--v:eightH
 
 ## The Complete Picture
 
-The model has 6 free parameters:
+The model has 6 degrees of freedom across 5 parameter groups:
 
 1. **H** — the Earth Fundamental Cycle (<!--v:H-->335,317<!--/v--> years at J2000) — 1 DOF
 2. **Fibonacci divisors** — {3, 5, 8, 13, 21, 34} — 3 DOF (assumed, not derived)
 3. **Mean obliquity** — Earth's mean axial tilt (<!--v:meanObliquity-->23.41353<!--/v-->°) — 1 DOF
 4. **Inclination amplitude** — Earth's invariable-plane amplitude (0.6360°) — 1 DOF
-5. **Planet configuration** — which d goes to which planet — 0 DOF (unique mirror-symmetric solution among 42 viable candidates from <!--v:configSearchSpace-->7,558,272<!--/v--> exhaustively tested; five successive physical filters)
+5. **Planet configuration** — which d goes to which planet — 0 DOF (unique mirror-symmetric solution among the 15 deep-analysis survivors, from 96 candidates out of <!--v:configSearchSpace-->7,558,272<!--/v--> exhaustively tested; five successive physical filters)
 
 From these free parameters, the model derives:
 

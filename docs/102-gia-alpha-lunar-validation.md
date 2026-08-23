@@ -7,7 +7,7 @@ status: current
 
 # Pure-tidal + L1-orbital-coupled α(t) validates against the historical lunar record
 
-**Status**: Validation complete — 267 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 (LLR-anchored α₁ giving da/dt = 3.82 cm/yr at J2000) + L1-orbital-coupled α(t) GIA model. Under the joint world (4-flag stack + Core-mantle swing, doc 104), framework mean |residual| **20.2 min (1212 s)**, with **117/267 events (43.8%)** falling closer to observation than NASA Espenak/Meeus's polynomial. NASA polynomial mean |residual|: 20.0 min (1199 s); Stephenson 2016 spline polynomial: 20.2 min (1211 s) — both are fit to essentially this exact dataset, so per-event residuals against either index fit quality against a smoothed representation of the observations rather than physical validity; the framework's excess over Stephenson's own fit is **2 s** — the dataset noise floor. The framework's independent validation is the [26-event solar-eclipse alignment audit](https://holisticuniverse.com/model/historical-eclipse-validation): 12/26 confirmed+off-peak, 6 regional, 0 with residual ΔT-signal (framework agrees with the documented UT on every event), 8 geographic-class events (umbra-*centerline* >1,000 km from the site — a centerline-distance gate, not visibility: at high γ the shadow strikes the tilted Earth obliquely and the penumbra can still cover the site with a deep partial, as at −135 Babylon; the class collects penumbra-only sites, attribution debates, and one 1000-km boundary case — all unrelated to physics).
+**Status**: Validation complete — 267 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 (LLR-anchored α₁ giving da/dt = 3.82 cm/yr at J2000) + L1-orbital-coupled α(t) GIA model. Under the joint world (4-flag stack + Core-mantle swing, doc 104), framework mean |residual| **20.2 min (1212 s)**, with **117/267 events (43.8%)** falling closer to observation than NASA Espenak/Meeus's polynomial. NASA polynomial mean |residual|: 20.0 min (1199 s); Stephenson 2016 spline polynomial: 20.2 min (1211 s) — both are fit to essentially this exact dataset, so per-event residuals against either index fit quality against a smoothed representation of the observations rather than physical validity; the framework's excess over Stephenson's own fit is **2 s** — the dataset noise floor. The framework's independent validation is the [26-event solar-eclipse alignment audit](https://holisticuniverse.com/model/historical-eclipse-validation): 3 confirmed + 13 off-peak, 5 regional, 0 with residual ΔT-signal (framework agrees with the documented UT on every event), 5 geographic-class events (umbra-*centerline* >1,000 km from the site — a centerline-distance gate, not visibility: at high γ the shadow strikes the tilted Earth obliquely and the penumbra can still cover the site with a deep partial; the class collects penumbra-only sites and attribution debates — all unrelated to physics).
 
 ---
 
@@ -63,7 +63,9 @@ resolution cannot.
 ### Four validation-infrastructure pieces
 
 1. **Predictive lunar-eclipse finder** (`findLunarEclipsesInRange`): Meeus
-   Ch. 47 Moon position + Ch. 25 Sun longitude, bisection on Sun-Moon
+   Ch. 47 Moon position + Ch. 25 Sun longitude (Ch. 25 is the un-injected
+   default — the shipped chain injects the certified framework-native Sun
+   via `frameworkSunDeps`), bisection on Sun-Moon
    opposition (180° ecliptic separation), classification by geocentric
    Moon latitude vs per-event shadow geometry computed from `R_EARTH_M`,
    `moonDistance`, `currentAUDistance` and diameters.
@@ -380,20 +382,19 @@ polynomial are fit to (essentially) this exact observation dataset —
 per-event residuals against either measure model distance from a
 smoothed representation of the observations, not physical validity.
 The framework's independent validation is the 26-event solar-eclipse
-alignment audit (joint world, after the 1133 + −584 preset
-re-registrations): 12/26 confirmed umbra reaching the observation
-site (1 confirmed at greatest moment + 11 off-peak alignments), 6/26
-regional (framework umbra in same continental band but off site),
-0/26 with residual ΔT-signal — the framework agrees with the
-documented UT on every event (max ΔJD 18 min) — and 8/26
-geographic-class events (umbra-*centerline* >1,000 km from the site;
-the gate measures centerline distance, not visibility — at high γ the
-penumbral footprint on the tilted Earth spans thousands of km, so
-these sites can still see a deep partial, as at −135 Babylon; the
-class collects penumbra-only sites, attribution debates, and the
-−708 boundary case at 1002 km vs the 1000-km threshold —
-unrelated to physics). That audit uses the framework's own predicted
-UT and umbra track with no ΔT polynomial in the loop.
+alignment audit (current certified-chain run): 16/26 with the umbra
+reaching the observation site (3 confirmed at greatest moment + 13
+off-peak alignments — including −135 Babylon at 194 km and −708 Lu
+at 9 km), 5/26 regional (framework umbra in same continental band
+but off site), 0/26 with residual ΔT-signal — the framework agrees
+with the documented UT on every event — and 5/26 geographic-class
+events (umbra-*centerline* >1,000 km from the site; the gate measures
+centerline distance, not visibility — at high γ the penumbral
+footprint on the tilted Earth spans thousands of km, so these sites
+can still see a deep partial; the class collects penumbra-only sites
+and attribution debates — unrelated to physics). That audit uses the
+framework's own predicted UT and umbra track with no ΔT polynomial
+in the loop.
 
 ### Convergence story: each physical constant swapped in isolation
 
@@ -1166,10 +1167,11 @@ The analysis under L1-orbital α(t), including the follow-up predictive
 tests (Path A, Test 5) and the drift-origin diagnostic sequence
 (§14–§17), leaves the following open:
 
-1. **Independent amplitude/phase calibration for the three shipped
+1. **Independent amplitude/phase calibration for the four shipped
    sub-Milankovitch 8H harmonics** — the framework predicts each PERIOD
    (Bond 1466 yr = 74 × J-S synodic gcd=61; Hallstatt 2430 yr = H/138
-   gcd=23; Jose5 897 yr = 5×Jose gcd=61 — all zero-fit structural
+   gcd=23; Jose5 897 yr = 5×Jose gcd=61; Jose4 716 yr = 4×Jose, the
+   Jose5-coupled companion — all zero-fit structural
    predictions), but amplitudes and phases are currently fit-derived
    against the Stephenson ΔT residual and would need to be calibrated
    against independent paleoclimate proxies (Bond 1997 IRD for Bond,
@@ -1748,6 +1750,12 @@ close the residual.
 
 ### Diagnostic 2 (§15): does the J2000 LOD anchor value explain the drift?
 
+> *(Run in the pre-joint world with anchor 86400.00001 s. The shipped joint
+> fit — 4-flag stack + Core-mantle swing, doc 104 — closes on the USNO
+> 86,400.0017 s measured-day basis instead; see doc 99 § "The two J2000 day
+> bases". The verdict below is unchanged: the anchor value is not the drift
+> source.)*
+
 Tests whether the residual drift is attributable to a mismatch in the
 J2000 LOD anchor value. Under Bond ON (n=1830 correction active), the
 residual has slope −0.966 s/yr → equivalent constant LOD bias
@@ -2080,8 +2088,9 @@ What we are NOT claiming:
 
 1. **Stephenson 2016 observation noise** is ~20 min per observation
    (RMS), dominant at the per-event level. Neither the framework nor
-   NASA can do better than this. The 1.3-min framework-vs-NASA gap is
-   the structural disagreement on top of the noise floor.
+   NASA can do better than this. The ~13-s framework-vs-NASA gap in
+   mean |residual| is the structural disagreement on top of the noise
+   floor.
 
 2. **α(t) is driven by the L1 orbital layer of the canonical Climate
    Formula** (see § "The physical constants and modern calibration").
@@ -2208,7 +2217,7 @@ first.
 
 | Button | Purpose |
 |---|---|
-| **L-1: Verify lunar eclipse finder (vs 14 known NASA events)** | Scans 2020-2026, cross-checks 14 NASA Canon events. Expects 14/14 match with 13/14 type classifications correct (1 known boundary case at 2021-05-26: model mag 0.989 vs NASA 1.009, an event total by only 0.9%). |
+| **L-1: Verify lunar eclipse finder (vs 14 known NASA events)** | Scans 2020-2026, cross-checks 14 NASA Canon events. Expects 14/14 match with 13/14 type classifications correct (1 known boundary case at 2021-05-26: model mag 0.988 vs NASA 1.009, an event total by only 0.9%). |
 | **L-1: Validate LUNAR_ECLIPSE_PRESETS catalog entries** | Sanity test for the 14-event tweakpane catalog: JD ↔ label date ↔ model-predicted opposition ↔ catalog-asserted type. |
 
 ### Predictive finders
@@ -2393,11 +2402,12 @@ URLs / files.
   (Independent confirmation of the Holme mantle-core secular-rate
   range from a separate geomagnetic-secular-variation inversion.)
 
-- Doc 100 (archived): `docs/hidden/old-documents/100-deltat-validation.md` (prior 35-eclipse residual
+- Doc 100 (archived): `docs/archive/old-documents/100-deltat-validation.md` (prior 35-eclipse residual
   comparison)
 - Doc 103: `docs/103-135-babylonian-case-study.md` (-135 Babylonian
-  focused case study — decomposes the framework's one persistent
-  historical-eclipse residual into ΔT (~270 km, α(t)-uncloseable),
-  Meeus β-residual (~440 km), and other Meeus terms (~450 km); provides
-  the direct empirical sensitivity test of doc 102's GIA α(t) constants
-  under Peltier ICE-6G defaults)
+  focused case study. Its original Meeus-era decomposition of the
+  residual — ΔT ~270 km, Meeus β-residual ~440 km, other Meeus terms
+  ~450 km — is superseded: under the certified framework-native chain
+  the umbra centerline lands 194 km from Babylon, verdict off-peak.
+  Still provides the direct empirical sensitivity test of doc 102's
+  GIA α(t) constants under Peltier ICE-6G defaults)
