@@ -89,6 +89,7 @@ const debugOn                    = false;  // Debug button flag (developer only)
 let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge (~L7080)
 let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction (Phase Z-B) — rationale ~L7066
 let   E5_WHEEL_SUN_ENABLED       = true;   // SW-1: wheel Sun rides the certified E5 tier Sun via δ = λ_cert − λ_twin (see moveModel sun block)
+let   FQ3_EXACT_SUN_ENABLED      = true;   // FQ-3 W1: exact-Kepler wheel Sun — the derived Δ corrector replaces the fitted SUN_LONGITUDE_HARMONICS on the display path (see moveModel sun block; mirrors tools/lib/scene-graph.js FQ3_EXACT_SUN)
 let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 8H/1830 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
 let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research toggle) — rationale + associated constants ~L5039
 let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
@@ -54233,6 +54234,40 @@ function moveModel(pos) {
       const M = θ - perihelionPhase;  // mean anomaly measured from current perihelion direction
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
       obj._meanAnomaly = M; // Store for parallax correction (BR-CA terms)
+      if (FQ3_EXACT_SUN_ENABLED && obj === sun && obj._eocDerived) {
+        // FQ-3 W1 (mirrors tools/lib/scene-graph.js moveModel): exact-Kepler
+        // wheel Sun. Δλ = EoC_full(e) − EoC_half(e−base/2) − geoTerm — the
+        // mean longitude cancels in this difference, so no anchor or frame
+        // constant enters. The offset vector is the wheel's own realized
+        // geometry, −base·û(θ_p1) + amp·û(θ_p1+θ_p2), read from the
+        // already-animated peri layers (planetObjects order animates them
+        // before the sun; integrated-phase correct in deep-time mode by
+        // construction); common-ancestor rotations cancel in the relative
+        // angle, and node-ry angles are λ-handed (the E5 δ block adds
+        // λ-space deltas to θ directly). Applied with the first-order
+        // Jacobian; the fitted harmonics retire from this display path
+        // (engine measured: twin−wheel 279.0″ annual → 0.80″, sd 0.57″).
+        const eF = e + eccentricityBase / 2;
+        const e2F = eF * eF, e3F = e2F * eF, e4F = e3F * eF;
+        const eocFull = (2 * eF - e3F / 4) * Math.sin(M)
+          + (1.25 * e2F - (11 / 24) * e4F) * Math.sin(2 * M)
+          + ((13 / 12) * e3F) * Math.sin(3 * M)
+          + ((103 / 96) * e4F) * Math.sin(4 * M);
+        const eocHalf = 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
+        const th1 = earthPerihelionPrecession1.orbitObj.rotation.y;
+        const th2 = th1 + earthPerihelionPrecession2.orbitObj.rotation.y;
+        const ox = -eccentricityBase * Math.cos(th1) + eccentricityAmplitude * Math.cos(th2);
+        const oy = -eccentricityBase * Math.sin(th1) + eccentricityAmplitude * Math.sin(th2);
+        const dOff = Math.hypot(ox, oy);
+        const dphi = Math.atan2(oy, ox) - (th2 + θ);
+        const geo = Math.atan2(dOff * Math.sin(dphi), 1 + dOff * Math.cos(dphi));
+        const Jac = 1 - (dOff * Math.cos(dphi) + dOff * dOff)
+          / (1 + 2 * dOff * Math.cos(dphi) + dOff * dOff);
+        θ += (eocFull - eocHalf - geo) / Jac;
+        obj._fq3Applied = true;
+      } else if (obj === sun) {
+        obj._fq3Applied = false;
+      }
     }
 
     // Phase Z-B (2026-06): Sun longitude harmonic correction — RE-ENABLED.
@@ -54249,7 +54284,10 @@ function moveModel(pos) {
     // remaining shift is ±25" — typically below visible resolution.
     //
     // Subtract: model thinks Sun is at θ_raw, true λ is θ_raw − Δλ → rotate back.
-    if (SUN_HARMONICS_ENABLED && obj === sun) {
+    // FQ-3 W1: superseded on this path when the exact-Kepler corrector above
+    // applied (the fitted terms absorbed exactly the split error the
+    // corrector now removes at the geometry level).
+    if (SUN_HARMONICS_ENABLED && obj === sun && !obj._fq3Applied) {
       θ -= sunLongitudeCorrection(o.julianDay) * (Math.PI / 180);
     }
     // SW-1 (mirrors tools/lib/scene-graph.js moveModel): the wheel Sun rides

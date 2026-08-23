@@ -722,6 +722,19 @@ const { createSunLongitudeCorrection } = require('@essrt/physics/sun/longitude-c
 // moveModel sun block); computeSunPositionFast is deliberately untouched
 // (the Step-6a fit instrument — SW-0 measured the fits invariant anyway).
 const _E5_WHEEL_SUN = process.env.E5_WHEEL_SUN !== '0';   // default ON (mirrors the browser flag); E5_WHEEL_SUN=0 restores legacy
+// FQ-3 W1 (plan §12i FQ-3): exact-Kepler wheel Sun. The raw wheel realizes
+// the split composition (parent center-offset + half-EoC at e−base/2),
+// which sits 279.0″ annual + 8.96″ semi from full Kepler — the content the
+// fitted SUN_LONGITUDE_HARMONICS were absorbing (W0 attribution: the match
+// is exact to 0.1″, incl. the 61.8″ quadrature from the realized offset
+// direction). With this flag ON the sun node applies the DERIVED corrector
+// Δ = EoC_full(e) − EoC_half(e−base/2) − geoTerm(offset vector, live parent
+// phases) in θ-space with the first-order Jacobian, and the fitted
+// harmonics are retired from this display path (registry constants stay;
+// computeSunPositionFast is the declared Step-6a instrument and keeps the
+// legacy geometric wheel). Zero fitted constants; every input is the
+// branch's own live value, so the form holds in both epoch modes.
+const _FQ3_EXACT_SUN = process.env.FQ3_EXACT_SUN !== '0'; // default ON; FQ3_EXACT_SUN=0 restores the fitted-correction path
 let _e5TierM = null;
 function _e5Tier() {
   if (!_e5TierM) _e5TierM = require('@essrt/physics').createModel();
@@ -1224,6 +1237,39 @@ function moveModel(graph, pos) {
       const M = θ - perihelionPhase;
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
       nodes._meanAnomaly = M; // Store for parallax correction use
+      if (_FQ3_EXACT_SUN && nodes === graph.sunNodes && def._eocDerived) {
+        // FQ-3 W1 — exact-Kepler wheel Sun (see the flag comment above).
+        // Δλ = EoC_full(e) − EoC_half(e−base/2) − geoTerm: the mean
+        // longitude cancels in this difference, so no anchor or frame
+        // constant enters. The offset vector is the wheel's own realized
+        // geometry, −base·û(θ_p1) + amp·û(θ_p1+θ_p2), read from the
+        // already-animated parent phases (integrated-phase correct in
+        // deep-time mode by construction); common-ancestor rotations
+        // cancel in the relative angle. Node-ry angles are λ-handed
+        // (the E5 δ block adds λ-space deltas to θ directly), so the
+        // relative angle needs NO handedness flip — only the raw
+        // world-frame atan2(z,x) extraction runs opposite λ.
+        const eF = e + C.eccentricityBase / 2;
+        const e2F = eF * eF, e3F = e2F * eF, e4F = e3F * eF;
+        const eocFull = (2 * eF - e3F / 4) * Math.sin(M)
+          + (1.25 * e2F - (11 / 24) * e4F) * Math.sin(2 * M)
+          + ((13 / 12) * e3F) * Math.sin(3 * M)
+          + ((103 / 96) * e4F) * Math.sin(4 * M);
+        const eocHalf = 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
+        const th1 = graph.earthPeriPrec1.orbit.ry;
+        const th2 = th1 + graph.earthPeriPrec2.orbit.ry;
+        const ox = -C.eccentricityBase * Math.cos(th1) + C.eccentricityAmplitude * Math.cos(th2);
+        const oy = -C.eccentricityBase * Math.sin(th1) + C.eccentricityAmplitude * Math.sin(th2);
+        const dOff = Math.hypot(ox, oy);
+        const dphi = Math.atan2(oy, ox) - (th2 + θ);
+        const geo = Math.atan2(dOff * Math.sin(dphi), 1 + dOff * Math.cos(dphi));
+        const Jac = 1 - (dOff * Math.cos(dphi) + dOff * dOff)
+          / (1 + 2 * dOff * Math.cos(dphi) + dOff * dOff);
+        θ += (eocFull - eocHalf - geo) / Jac;
+        nodes._fq3Applied = true;
+      } else if (nodes === graph.sunNodes) {
+        nodes._fq3Applied = false;
+      }
     }
     // Phase Z-B (2026-06): Sun longitude harmonics applied to SUN NODE only.
     // ────────────────────────────────────────────────────────────────────
@@ -1256,10 +1302,14 @@ function moveModel(graph, pos) {
     // Everything else (gcd(d,H)=1 mid-range) is design-rule violating and
     // silently skipped.
     const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
-    if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
+    if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS
+        && !nodes._fq3Applied) {
       // 9-1 S-P8: the filtered harmonic stack lives ONCE in @essrt/physics/
       // sun/longitude-correction (J2000-fixed deps — the fitted convention).
       // Recover JD via epoch-consistent mSY so pos→jd round-trip is exact.
+      // FQ-3 W1: superseded on this path when the exact-Kepler corrector
+      // applied above (the fitted terms absorbed exactly the split error
+      // the corrector now removes at the geometry level).
       θ -= _sunLonCorr().correctionDegAt(_jdFromPosTools(pos)) * d2r;
     }
     if (_e5SunNode) {
