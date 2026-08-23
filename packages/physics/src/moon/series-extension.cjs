@@ -56,6 +56,30 @@
  * (max 6.2″). Coefficients are stored with the run→real argument
  * mapping already applied (the extraction's heliocentric-planet vs
  * geocentric-sun π-offset is folded into the signs).
+ *
+ * THE J2 NODE FAMILY (FQ-7 Round 3, plan §12i) — five derived terms on
+ * Ω-family arguments (NOT expressible on the integer Delaunay lattice,
+ * which is why every earlier extraction missed them; the 200-yr band
+ * probe named them, the dense 2-day JPL sample confirmed them real, and
+ * the channel isolation identified them as EARTH'S J2 acting on the
+ * lunar orbit — the same channel whose secular piece DLT-1 derives as
+ * the Earth-figure +0.1925″/cy² T² term). Extracted from the B−A
+ * differential of epoch-phased 3-body twin integrations (J2 on vs off,
+ * identical ICs; per-run fits on each run's OWN mean angles — fitting
+ * the raw differential leaks A·δrate·t quadrature, measured as 2.4″
+ * fake rows), dt-halving converged ≤0.003″. TWO DOCUMENTED CONTROLS
+ * certify the channel and calibrate the run→instrument frame mapping:
+ * the derived pure-Ω λ term reproduces the Meeus flattening additive
+ * (+1962e-6 sin(Lp−F)) at 1.028, and the derived β sin(Lp) reproduces
+ * the −2235e-6 additive at 0.971 — both already shipped via the
+ * catalog additive family and therefore NOT re-shipped here. JPL
+ * out-of-sample (validation only, never fit): official all-phase λ
+ * 2.964 → 2.922″, β 0.653 → 0.606″; dense 2-day λ 2.378 → 2.321″,
+ * β 0.655 → 0.601″; syzygy-fleet elongation improves. Instruments:
+ * fq7-band-probe.mjs · fq7-jpl-band.mjs · fq7-j2-node.mjs ·
+ * fq7-r3-ship.mjs · fq7-r3-preview.mjs. The Ω carrier polynomial is an
+ * IAU-class instrument literal — the same DECLARED-INPUT status as the
+ * Delaunay carriers above (Ω ≡ Lp − F of the same catalog class).
  */
 
 'use strict';
@@ -198,6 +222,27 @@ const PLANETARY_LON_TERMS = [
   [[0, 1, 0, -1, 0, 0, -1], -0.0077, 0.2235],
 ];
 
+/** Lunar mean-node polynomial [deg at J2000, deg/cy, deg/cy²] TT —
+ *  the Ω carrier for the J2 node family (declared input, see header). */
+const OMEGA = [125.0445479, -1934.1362891, 0.0020754];
+
+/**
+ * The J2 node family (see header): [[kD,kM,kMp,kF,kΩ], sin″] — pure
+ * sin-parity (the derivation's cos components read ≤0.005″), ADD-composed
+ * like the Delaunay tail.
+ * @type {Array<[number[], number]>}
+ */
+const NODE_LON_TERMS = [
+  [[0, 0, 1, 0, -1], -0.544],
+  [[0, 0, 1, 0, 1], 0.546],
+  [[0, 0, 0, 2, 1], 0.371],
+  [[2, 0, 0, 0, 1], 0.103],
+];
+/** @type {Array<[number[], number]>} */
+const NODE_LAT_TERMS = [
+  [[0, 0, 0, 1, -1], -0.375],
+];
+
 const D2R = Math.PI / 180;
 
 /**
@@ -219,6 +264,9 @@ function moonSeriesExtensionDeg(T) {
     const th = k[0] * l[0] + k[1] * l[1] + k[2] * l[2] + k[3] * l[3] + k[4] * l[4] + k[5] * D + k[6] * Mp;
     lon += cA * Math.cos(th) + sA * Math.sin(th);
   }
+  const Om = poly(OMEGA);
+  for (const [k, s] of NODE_LON_TERMS) lon += s * Math.sin(k[0] * D + k[1] * M + k[2] * Mp + k[3] * F + k[4] * Om);
+  for (const [k, s] of NODE_LAT_TERMS) lat += s * Math.sin(k[0] * D + k[1] * M + k[2] * Mp + k[3] * F + k[4] * Om);
   return { dLonDeg: lon / 3600, dLatDeg: lat / 3600 };
 }
 
