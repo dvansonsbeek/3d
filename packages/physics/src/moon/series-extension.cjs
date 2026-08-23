@@ -80,6 +80,29 @@
  * fq7-r3-ship.mjs · fq7-r3-preview.mjs. The Ω carrier polynomial is an
  * IAU-class instrument literal — the same DECLARED-INPUT status as the
  * Delaunay carriers above (Ω ≡ Lp − F of the same catalog class).
+ *
+ * THE FQ-7 DUST ROUND (plan §12i) — 43 λ + 33 β derived Delaunay terms
+ * appended to LON_TERMS/LAT_TERMS below. The broadband-dust census
+ * (fq7-dust-census.mjs, secular-guarded v2: cubic detrend + T/T²
+ * quadrature absorbers on the head arguments, without which the
+ * doctrine-blocked T-modulated parameter class masquerades as fake
+ * 184-yr sideband families) ranked the post-R3 capturable content; the
+ * dense-JPL arbitration (fq7-dust-arbitration.mjs) measured EVERY
+ * trusted leader REAL at ratio 0.9–1.1; the labels bit-match MPP02
+ * main-problem catalog rows below the Meeus ~0.4″ truncation cutoff, in
+ * argument classes no earlier extraction catalog enumerated (odd kD,
+ * |kM| = 3, |kF| = 4/5). Main-problem ⇒ the D1 3-body lab derives them:
+ * one 120-yr run, λ and β columns, head fidelity 0.51%/0.07%,
+ * dt-halving drift 0.000″, lab/census ratio ∈ [0.7, 1.4] required
+ * (4 λ census rows the lab does NOT fully produce stay unshipped —
+ * derive or don't ship). Lab signs match the MPP02 catalog signs row
+ * for row (the frame-consistency control). JPL out-of-sample: official
+ * all-phase λ 2.922 → 2.840″, β 0.606 → 0.353″ — the β endpoint AT the
+ * R1-measured MPP02-vs-JPL floor (~0.33″); dense 2-day λ 2.321 →
+ * 2.219″, β 0.601 → 0.384″; syzygy fleet improves; the sign-flip
+ * control degrades every gate. Instruments: fq7-dust-census.mjs ·
+ * fq7-dust-arbitration.mjs · fq7-dust-extraction.mjs ·
+ * fq7-dust-preview.mjs.
  */
 
 'use strict';
@@ -155,6 +178,52 @@ const LON_TERMS = [
   [4, 0, -2, 2, -0.169],
   [4, -2, -2, 0, 0.161],
   [0, 0, 5, 0, 0.112],
+  // FQ-7 DUST ROUND — the argument classes no earlier catalog enumerated
+  // (odd kD, |kM| = 3, |kF| = 4); lab-derived, MPP02-catalog-certified,
+  // JPL-arbitrated (see header note):
+  [0, 0, 0, 4, 0.422],
+  [3, 0, 0, 0, 0.402],
+  [2, -3, 0, 0, 0.341],
+  [3, 1, -1, 0, 0.275],
+  [3, 0, 0, -2, -0.250],
+  [2, -3, -1, 0, 0.240],
+  [3, -1, -1, 0, -0.233],
+  [3, 1, 0, 0, 0.147],
+  [0, 3, 0, 0, -0.096],
+  [4, -1, -3, 0, 0.096],
+  [2, -1, 3, 0, 0.094],
+  [2, 0, -3, -2, -0.093],
+  [0, 0, 1, 4, 0.092],
+  [6, -1, -2, 0, 0.091],
+  [1, 1, 2, 0, 0.090],
+  [4, 0, 0, 2, -0.084],
+  [3, -1, -2, 0, -0.082],
+  [0, 0, 1, -4, -0.081],
+  [2, 0, 4, 0, 0.078],
+  [2, 0, 0, -4, -0.078],
+  [0, 1, 0, -2, 0.074],
+  [2, -1, 1, 2, -0.073],
+  [2, -1, -1, -2, -0.073],
+  [6, -1, -1, 0, 0.072],
+  [2, 1, -1, 2, 0.068],
+  [2, 0, -5, 0, 0.067],
+  [2, 1, 0, 2, 0.066],
+  [4, 0, 1, -2, -0.065],
+  [2, -2, 2, 0, 0.065],
+  [2, -2, 0, -2, 0.065],
+  [3, -1, 0, 0, 0.063],
+  [0, 2, 2, 0, -0.062],
+  [5, 0, -2, 0, -0.059],
+  [0, 1, -2, -2, 0.050],
+  [4, 1, 1, 0, -0.050],
+  [0, 1, -4, 0, -0.048],
+  [0, 1, 2, 2, 0.045],
+  [1, 0, 1, 2, 0.044],
+  [3, 0, -3, 0, -0.043],
+  [1, 0, 3, 0, -0.042],
+  [1, 2, 0, 0, -0.041],
+  [0, 3, -1, 0, -0.038],
+  [1, -2, 0, 0, 0.037],
 ];
 
 /** Latitude tail: [kD, kM, kMp, kF, sin″] — 30 derived terms ≥ 0.1″
@@ -190,6 +259,41 @@ const LAT_TERMS = [
   [1, 0, -2, -1, -0.1093],
   [2, 2, -1, 1, -0.1044],
   [1, 1, 1, 1, 0.1014],
+  // FQ-7 DUST ROUND — lab-derived, MPP02-catalog-certified,
+  // JPL-arbitrated (see header note):
+  [3, 0, 0, -1, -0.352],
+  [3, 0, -1, -1, -0.305],
+  [4, -1, -2, 1, 0.214],
+  [3, 0, -1, 1, -0.206],
+  [0, 2, -1, 1, -0.094],
+  [6, 0, -1, -1, 0.094],
+  [0, 0, 4, -1, 0.091],
+  [2, -1, 0, -3, 0.087],
+  [6, 0, -2, -1, 0.081],
+  [1, 0, -2, 1, -0.078],
+  [0, 1, -3, -1, -0.075],
+  [2, 1, -2, -1, 0.073],
+  [2, -2, 1, -1, 0.069],
+  [2, 0, -2, 3, -0.065],
+  [1, 0, 2, 1, -0.064],
+  [2, -1, -2, 1, -0.064],
+  [2, 1, 2, -1, -0.063],
+  [4, 0, 0, -3, 0.062],
+  [0, 1, 3, 1, -0.062],
+  [6, 0, -2, 1, 0.060],
+  [2, -2, 1, 1, 0.059],
+  [2, 1, 0, -3, -0.059],
+  [4, -1, 1, -1, 0.057],
+  [0, 2, 0, 1, -0.055],
+  [0, 2, 1, 1, -0.054],
+  [2, -1, -3, -1, 0.054],
+  [4, -1, -2, -1, 0.052],
+  [4, 1, -1, 1, -0.051],
+  [1, 1, -1, 1, -0.051],
+  [2, 1, -2, 1, 0.049],
+  [3, 0, -2, 1, -0.048],
+  [4, 0, 2, -1, 0.048],
+  [6, 0, -1, 1, 0.042],
 ];
 
 /** Planetary mean-longitude polynomials, degrees per Julian century TT
