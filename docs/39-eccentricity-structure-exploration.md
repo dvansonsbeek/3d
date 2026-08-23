@@ -54,6 +54,12 @@ where `θ = 2π·(year - refYear) / (H/16)` and `refYear` is derived from the J2
 
 This formula arises from the model's geocentric geometry: Earth orbits the wobble-center at radius `amplitude`, while the wobble-center (perihelion point) orbits the Sun at radius `base`. The distance between Earth and Sun varies as the two orbits precess relative to each other with period H/16.
 
+**Certified-chain addition (E4):** for Earth the framework-native Sun's e(t)
+carries one further derived term on top of the H/16 law — the H/3 inclination
+coupling `Δe₃ = −(e_base/2)(cos φ₃ − cos φ₃(2000))` on the integrated lattice
+phase, with no fitted coefficient. See doc 38's amplitude section and
+[doc 99 § The framework-native Sun](99-expanding-solar-system-resonance-theory.md#the-framework-native-sun-e4e5--the-certified-apparent-solar-longitude).
+
 **Phase at J2000** (`eccentricityPhaseJ2000`): derived analytically from the law of cosines inverted at J2000:
 
 ```

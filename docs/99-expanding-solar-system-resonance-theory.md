@@ -339,6 +339,60 @@ structure detection — the model's seasonal asymmetries, from the ±50 s
 per-point year lengths at J2000 down to the sub-minute sideband comb, are a
 single geometric object: the rotating perihelion vector.
 
+## The framework-native Sun (E4/E5) — the certified apparent solar longitude
+
+The eclipse chain's Sun is assembled entirely from framework structure — **zero
+fitted solar constants** — and since the scene-wheel unification the visible
+simulator rides the same certified longitude. The assembly (in
+`packages/physics/src/model.js`, exported as `eclipse.frameworkSunDeps` and
+consumed identically by the package tier finders/besselian, `eclipse-audit.js`,
+and the browser's `_eclipseM` — the three-runtimes rule):
+
+```
+L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
+λ(t) = L(t) + equation of centre with e(t)          (apparent longitude)
+```
+
+**The drift term D(t)** integrates the year-length physics itself:
+
+1. **f(Y) year harmonics** — the 12-term `TROPICAL_YEAR_HARMONICS` (H/8
+   amplitude 19.28 s, H/3 amplitude 7.23 s, in an exact 8:3 ratio = one
+   oscillation per equinox cycle). Their amplitude is **derived**, A·cotε with
+   A = `earthInvPlaneInclinationAmplitude` (0.63605°, itself pinned by the IAU
+   dε/dt −46.837″/cy) — not fitted.
+2. **The obliquity-torque term (E5)** — the classical luni-solar torque makes
+   the precession rate obliquity-dependent, δp = −p₀·tanε·δε with
+   δε = A(−cos φ₃ + cos φ₈). Integrated on the lattice this *scales* the two
+   drift harmonics by 1 + p₀·tan²ε·H/(2π·div) = **1.306 (H/8)** and
+   **1.815 (H/3)**. Both mechanisms lengthen the year at obliquity maximum —
+   they add (the original "quadrature ⇒ 3%" dismissal was a sign error,
+   caught by measurement).
+3. **Closed form on the integrated lattice phase (SW Phase B)** — D(t) is
+   evaluated analytically: each harmonic contributes its antiderivative
+   (H/2πk)·[sin/−cos] on the integrated phase plus a sin-saturated rebase ramp
+   (H/2πk)·sin(Δφₖ) — extending the ramp linearly would be the fitted-linear-
+   slope trap. Drift and slope vanish at year 2000 by construction. No lookup
+   table, no domain window in the certified chain.
+
+**e(t)** is the H/16 law plus the **derived H/3 inclination coupling**
+−(e_base/2)(cos φ₃ − cos φ₃(2000)) on the integrated phase — the same
+derived-e channel the cardinal-point braid uses.
+
+**Accuracy**: 0.95″ RMS vs JPL over the modern window (the Meeus Ch. 25
+reference itself sits at 1.28″). At antiquity the closed form tracks the
+retired ±3000-yr trapezoid table to −0.3″ at −135 and −6.8″ at the ±3000
+edge.
+
+**The scene-wheel overlay (SW)**: the visible wheel Sun adds one term on top
+of its untouched legacy stack, δ = λ_certified − λ_twin, applied inside the
+clock-convention window (full weight where eclipse truth lives, ≤ 3,000 yr
+from J2000; cos² taper to 20,000 yr where the TT-clock Sun would clash with
+the deliberately-UT deep-time scene — both endpoints derived, only the cos²
+easing shape is a convention). Measured: in-window −2..+7″; −135:
+1,138″ → 10″; −3000: 5,953″ → 164″. Replacing the legacy stack outright was
+measured and rejected — it double-counts the wheel's geometric-split ellipse
+(~1° error).
+
 ## The H/5 LOD correction — REAL_LOD from ecliptic precession
 
 Two structural relations sit between the framework's kinematic mean LOD and the observed physical LOD (USNO Earth Orientation Center measurement):

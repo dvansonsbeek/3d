@@ -389,6 +389,27 @@ Each array entry: `[period_divisor, sin_coeff, cos_coeff]` — period = H / divi
 
 Note: The tropical year's **primary display path** is `TROPICAL_YEAR_HARMONICS` via `computeSolarYearDaysDirect` (Step 6c). The `CARDINAL_POINT_HARMONICS` derivative route (23 harmonics per type + ECC/JOINT/DERIVED families) is kept for chart consistency in cardinal-point report paths.
 
+## Sun Longitude — the certified chain and the legacy harmonics
+
+The certified apparent solar longitude is **assembled, not fitted** (E4/E5
+framework-native Sun, `packages/physics/src/model.js`, exported as
+`eclipse.frameworkSunDeps`): mean tropical rate + the closed-form f(Y)
+year-harmonic drift (scaled by the derived obliquity-torque factors 1.306 /
+1.815) + equation of centre with the H/16 + derived-H/3 e(t). It carries
+**zero fitted solar constants**; accuracy 0.95″ RMS vs JPL (modern window).
+The scene wheel displays the same longitude via the δ overlay
+(δ = λ_certified − λ_twin, clock-convention window). See
+[doc 99 § The framework-native Sun](99-expanding-solar-system-resonance-theory.md#the-framework-native-sun-e4e5--the-certified-apparent-solar-longitude).
+
+The **legacy fitted family** remains in the coefficients file and is still
+evaluated inside the wheel's legacy stack (superseded on the display path by
+the δ overlay):
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `SUN_LONGITUDE_HARMONICS` | 3-term array | Fitted sun-longitude harmonics, ~279″ annual span |
+| `SUN_LONGITUDE_MEAN` | −0.0018807° | Fitted mean offset (~−6.8″) |
+
 ## Earth Perihelion Harmonics
 
 The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier terms (RMSE 0.0006°, J2000 exact).

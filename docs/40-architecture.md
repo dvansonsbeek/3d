@@ -37,7 +37,7 @@ status: current
 The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astronomical visualization tool that implements the Holistic Universe Model. It provides accurate planetary positions, precession cycles, and orbital mechanics calculations spanning hundreds of thousands of years.
 
 **Key Statistics:**
-- Single monolithic script.js (~45,600 lines)
+- Single monolithic script.js (~59,800 lines)
 - 13 celestial bodies with full orbital mechanics
 - 50+ astronomical calculation functions
 - Real-time 3D visualization at 60 FPS
@@ -138,7 +138,7 @@ WebGL Render (60 FPS target)
 3d/
 ├── src/
 │   ├── index.html              # Entry point (minimal HTML wrapper)
-│   ├── script.js               # Main application (~43,000 lines)
+│   ├── script.js               # Main application (~59,800 lines)
 │   └── style.css               # GUI and label styling
 │
 ├── public/
@@ -163,14 +163,24 @@ WebGL Render (60 FPS target)
 │   ├── reference-data.json                # JPL-enriched verification data
 │   └── balance-presets.json               # 767 balance configurations (≥99.994% inclination balance)
 │
+├── packages/                   # Published npm workspace (@essrt scope)
+│   ├── physics/                # @essrt/physics — the full analytic model incl. the
+│   │                           #   certified eclipse chain (framework-native Sun,
+│   │                           #   full-series Moon, besselian umbra) and MCP/api
+│   ├── model-values/           # @essrt/model-values — the rendered value registry
+│   ├── fitting/                # Fitter implementations (tools/fit are CLI shims)
+│   └── fixtures/               # Golden masters for the regression gates
+│
 ├── tools/
-│   ├── fit/                    # Pipeline fitting scripts (Steps 1-9)
-│   ├── verify/                 # Law verification and balance analysis
-│   ├── explore/                # Exploratory analysis scripts
-│   ├── lib/                    # Shared libraries (constants, scene-graph, orbital-engine)
+│   ├── fit/                    # Pipeline CLI shims (implementations in packages/fitting)
+│   ├── verify/                 # 24 scripts: 6 gate · 4 liftable · 10 narrative · 4 generator
+│   ├── explore/                # Exploratory analysis scripts (~140 one-offs)
+│   ├── constants/              # generate.mjs — the generated-constants pipeline
+│   ├── docs/                   # Doc machinery (marker renderer, frontmatter stamper)
+│   ├── lib/                    # Shared libraries (constants, scene-graph, orbital-engine, deep-time)
 │   └── results/                # Baseline values and pipeline logs
 │
-├── docs/                       # Documentation (docs 00-71)
+├── docs/                       # Documentation (docs 00-107)
 │
 ├── package.json                # Dependencies and scripts
 ├── .gitignore
@@ -205,7 +215,7 @@ WebGL Render (60 FPS target)
 
 ### script.js Organization
 
-The monolithic script.js (~43,000 lines) is organized into logical sections. Constants are grouped by source file (A = model-parameters.json, B = fitted-coefficients.json, C = astro-reference.json, D = meeus-lunar-tables.json, E = derived, F = display-only).
+The monolithic script.js (~59,800 lines) is organized into logical sections. Constants are grouped by source file (A = model-parameters.json, B = fitted-coefficients.json, C = astro-reference.json, D = meeus-lunar-tables.json, E = derived, F = display-only).
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -499,10 +509,10 @@ Critical ordering for dependent calculations:
 | Cycle | Period | Description |
 |-------|--------|-------------|
 | **Axial Precession** | H/13 | Earth's rotational axis wobble |
-| **Perihelion Precession** | H/3 | Closest approach point shifts |
+| **Perihelion Precession** | H/16 | Closest approach point shifts (climatic precession) |
 | **Inclination Precession** | H/3 | Orbital plane tilt variation |
 | **Obliquity Cycle** | H/8 | Axial tilt oscillation (~22.2° - ~24.7°) |
-| **Eccentricity Cycle** | ~413,000 years | Orbital shape variation |
+| **Eccentricity Cycle** | H/16 (+ derived H/3 coupling) | Orbital shape variation |
 
 ### Invariable Plane System
 
@@ -543,7 +553,7 @@ Ported from Python (`tools/lib/python/predictive_formula.py`). Reuses existing `
 
 | Body | Type | Orbital Elements | Special Features |
 |------|------|------------------|------------------|
-| Sun | Star | Fixed at origin | Lens flare, glow |
+| Sun | Star | Wheel longitude = legacy stack + δ overlay (λ_certified − λ_twin, clock-convention window) | Lens flare, glow; certified E4/E5 longitude |
 | Mercury | Planet | Full Keplerian | Perihelion precession demo |
 | Venus | Planet | Full Keplerian | Retrograde rotation |
 | Earth | Planet | Full Keplerian | Clouds, atmosphere shader, axial tilt |
@@ -739,7 +749,7 @@ eccentricAnomaly: (M_deg, e) => {
 
 ### True Anomaly (`updatePlanetAnomalies`, line ~26774)
 
-True anomaly is computed geometrically from world-space positions using `atan2`, not from the eccentric anomaly. The function reads each planet's 3D position relative to the Sun and computes the angular position directly.
+True anomaly is computed geometrically from world-space positions using `atan2`, not from the eccentric anomaly. The function reads each planet's 3D position relative to the Sun and computes the angular position directly. (Planet *mean* anomaly, by contrast, is the textbook `M = M₀ + n·Δt` with a Kepler-equation solve — the position-based alternative was rejected; see the banner on [doc 30](30-anomaly-calculations.md). The Moon keeps the geometric method.)
 
 ### Height Above Invariable Plane (`updatePlanetInvariablePlaneHeights`)
 
@@ -782,5 +792,5 @@ The balance calculation lives inside `updateInvariablePlaneBalance()`, summing `
 6. **Holistic Universe Model** - https://www.holisticuniverse.com
 
 ### Internal
-- [41 — Scene Graph Hierarchy](41-scene-graph-hierarchy.md) — full scene-graph structure with §Part 14 covering deep-time integrator tags
+- [41 — Scene Graph Hierarchy](41-scene-graph-hierarchy.md) — full scene-graph structure with §Part 15 covering deep-time integrator tags
 - [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time scaling formalism that the integrators implement

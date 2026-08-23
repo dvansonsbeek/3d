@@ -185,6 +185,18 @@ e(t) = √(e_base² + e_amp²) + (-e_amp - h₁·cos θ)·cos θ
 
 where θ = 360° × (t - t₀) / cycle_period and h₁ = √(e_base² + e_amp²) - e_base. The J2000 eccentricity is simply e(2000) — a snapshot of this oscillation. The base value is what the balance scale determines; the amplitude determines how far the planet departs from it.
 
+**Earth's derived H/3 inclination coupling (E4).** For Earth the certified
+chain adds one further *derived* term on top of the H/16 oscillation:
+
+```
+Δe₃(t) = −(e_base / 2) × (cos φ₃(t) − cos φ₃(2000))
+```
+
+with φ₃ the **integrated** H/3 lattice phase (the inclination-precession
+cycle). The factor e_base/2 comes from the same geometry as the derived-e
+channel — no fitted coefficient. This is the e(t) the framework-native Sun's
+equation of centre uses (doc 99 § "The framework-native Sun").
+
 ### Relationship between K and ψ
 
 Both constants are empirical, derived from Earth. Their ratio is:

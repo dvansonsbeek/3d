@@ -236,6 +236,18 @@ This 14.5-cycle offset positions the obliquity fluctuation to correctly explain 
 | startPos | `correctionSun` | June 21, 2000 alignment correction |
 | rotation tilt | -7.155° | Solar axis inclination |
 
+**The δ overlay (SW campaign).** On top of the wheel's legacy longitude stack
+(linear tropical rate + Kepler EoC + `sunLongitudeCorrection` harmonics),
+`moveModel` adds one term δ = λ_certified − λ_twin — the difference between the
+certified E4/E5 framework-native Sun and the wheel's own twin evaluation —
+applied inside the clock-convention window (full weight ≤ 3,000 yr from J2000,
+cos² taper to 20,000 yr where the TT-clock Sun would clash with the
+deliberately-UT deep-time scene). Both runtimes carry the identical block
+(`src/script.js` flag `E5_WHEEL_SUN_ENABLED`, engine env `E5_WHEEL_SUN`,
+default ON). The eclipse umbra never reads the wheel: since U1 the package
+besselian in `@essrt/physics` is the **single umbra implementation** end to
+end — the scene consumes its output.
+
 ---
 
 ## Part 8: Moon Hierarchy
