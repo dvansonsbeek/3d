@@ -44,17 +44,24 @@ import fibonacci_significance as fs  # noqa: E402
 
 LOCKED_OBSERVED = [
     # (test_id,                expected,       rel_tol)
-    ("law1_fib_denominators",  7.0,            0.0),        # integer count, exact
+    # Re-locked 2026-08 against the shipped lattice state (Mars 8H/36 refit,
+    # J/S 8H-lattice reframe, asc-node integers Ma64/Ur11, K = 3.414333e-6).
+    # law1: the perihelion-denominator set now carries 3 Fibonacci members
+    # (Uranus, Neptune, Mercury-class) — the gas giants deliberately sit one
+    # integer OFF the Fibonacci anchors (a Law 6 feature, doc 10). law6: the
+    # b_E + b_J = b_S identity is no longer exact under the reframe; the
+    # current residual is locked as the regression value.
+    ("law1_fib_denominators",  3.0,            0.0),        # integer count, exact
     ("law2_psi_full",          0.0,            1e-6),       # tautological, spread ≈ 0
-    ("law3_incl_balance",      99.9975,        1e-4),       # percentage
+    ("law3_incl_balance",      99.9974,        1e-4),       # percentage
     ("law4_k_amplitude",       4.5e-5,         0.05),       # relative error, wider tol
-    ("law5_ecc_balance",       99.8632,        1e-4),       # percentage
-    ("law6_ejs_resonance",     0.0,            1e-6),       # b_E + b_J = b_S exactly
+    ("law5_ecc_balance",       99.8636,        1e-4),       # percentage
+    ("law6_ejs_resonance",     0.353846,       1e-4),       # reframe residual (was 0.0 exact)
     ("f1_mirror_symmetry",     4.0,            0.0),        # integer count, exact
     ("f1b_d_set_fib_pairs",    1.0,            0.0),        # binary
-    ("f4_saturn_prediction",   0.002268,       0.01),       # relative error
-    ("f6_solo_planet",         0.002268,       0.01),       # relative error
-    ("year_length_beat",       4.772e-5,       0.05),       # relative error, moderate tol
+    ("f4_saturn_prediction",   0.0027239,      0.01),       # relative error
+    ("f6_solo_planet",         0.0027239,      0.01),       # relative error
+    ("year_length_beat",       5.7967e-5,      0.05),       # relative error, moderate tol
 ]
 
 
@@ -70,15 +77,17 @@ LOCKED_OBSERVED = [
 # allows for floating-point accumulation drift in the sum T = Σ z_i.
 
 LOCKED_PERM_PVALUES = {
-    "law3_incl_balance":     0.007391,
-    "law5_ecc_balance":      0.000719,
-    "f4_saturn_prediction":  0.000719,
-    "f6_solo_planet":        0.003993,
+    # Re-locked 2026-08 (exhaustive 8! permutation null; matches the
+    # regenerated data/significance-results.json bit-identically).
+    "law3_incl_balance":     0.0067956,
+    "law5_ecc_balance":      0.0009673,
+    "f4_saturn_prediction":  0.0009673,
+    "f6_solo_planet":        0.0050595,
 }
 
-LOCKED_JOINT_PERM_P = 9.92e-05        # ≈ 3.72σ
+LOCKED_JOINT_PERM_P = 1.488e-04       # ≈ 3.62σ
 LOCKED_JOINT_PERM_P_TOL = 5e-5        # absolute
-LOCKED_EMPIRICAL_R_PERM = 0.275       # average pairwise Pearson r
+LOCKED_EMPIRICAL_R_PERM = 0.283       # average pairwise Pearson r
 LOCKED_EMPIRICAL_R_TOL = 0.02
 
 

@@ -1,8 +1,8 @@
 {
-  "generated": "2026-08-06T20:43:57.951322+00:00",
+  "generated": "2026-08-23T12:20:32.465813+00:00",
   "trials": 1000000,
   "seed": 42,
-  "git_sha": "e905b7245c8bb351a9188ce81117ed5558c7dbc2",
+  "git_sha": "a961fc6575d62c4a5a6ab9d8ca20ee238cc51c5d",
   "method": {
     "headline": "joint_permutation.direct",
     "headline_description": "Direct joint permutation test: studentized T = \u03a3_i z_i with p = #{T_null \u2265 T_obs} / n. Model-independent; joint null captures inter-test correlation directly.",
