@@ -58,7 +58,7 @@ The model implements six laws — anchored on Earth and extending to all eight p
 5. **The Eccentricity Balance** — Seven planets' eccentricities balance against Saturn alone using the same Fibonacci divisors and phase groups as Law 3 (<!--v:balanceEccPct-->99.8636%<!--/v-->)
 6. **Saturn-Jupiter-Earth Resonance** — Jupiter's ICRF perihelion and Saturn's ecliptic perihelion lock to one period, 8H/65 (a structural balance, not a coincidence); this is the obliquity beat in Earth's climate record, one 8H-lattice step from Earth's Fibonacci obliquity H/8 (= 8H/64). The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock
 
-The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of <!--v:configSearchSpace-->7,558,272<!--/v--> candidate configurations, four successive physical filters (inclination balance ≥99.994%, eccentricity balance ≥99%, Laplace–Lagrange bounds, direction match) narrow the field to <!--v:deepSurvivorCount-->15<!--/v--> deep-analysis survivors — of which mirror symmetry then picks out only one (Config #7).
+The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of <!--v:configSearchSpace-->7,558,272<!--/v--> candidate configurations, five successive physical filters (inclination balance ≥99.994%, eccentricity balance ≥99%, Laplace–Lagrange bounds, direction match, rate error ≤6″) narrow the field to <!--v:deepSurvivorCount-->15<!--/v--> deep-analysis survivors — of which mirror symmetry then picks out only one (Config #7).
 
 See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full derivation, and [verify-laws.js](tools/verify/verify-laws.js) for comprehensive verification (49/50 checks pass — the one carried failure is Saturn's Laplace–Lagrange bound, documented).
 
@@ -153,7 +153,7 @@ npm run check             # the full gate chain (~9 min): lint, typecheck, bound
 npm run check:docs        # scoped tier (~20 s) for docs/registry/marker edits
 npm run check:engine      # scoped tier (~2 min) for tools/lib + packages/physics edits
 npm run test:browser      # golden masters in headless Chromium (builds first)
-npm run test:verify:list  # how the 24 tools/verify scripts classify
+npm run test:verify:list  # how the 26 tools/verify scripts classify
 npm run values:package    # packaged @essrt/model-values vs the live registry
 npm run check:artifacts   # campaign artifacts vs their recorded input hashes
 ```
@@ -172,10 +172,10 @@ Two things worth knowing before you read a red result as breakage:
   and required in CI** — a year's computed values do not depend on which epoch
   the scene happens to be set to, bit-exact on the round trip. Red there is a
   regression of a closed acceptance criterion, not a tracked state.
-- Of the 24 scripts in `tools/verify/`, only the six gates can actually fail —
+- Of the 26 scripts in `tools/verify/`, only the seven gates can actually fail —
   the rest print analysis without asserting anything. `test:verify` runs the real
-  gates and deliberately skips the four generators (`balance-search.js` plus the
-  three campaign-artifact generators), which regenerate tracked data files rather
+  gates and deliberately skips the five generators (`balance-search.js` plus the
+  four campaign-artifact generators), which regenerate tracked data files rather
   than checking them. The suite fails on any unclassified script, so the
   inventory cannot silently drift again.
 
@@ -185,13 +185,14 @@ Two things worth knowing before you read a red result as breakage:
 
 - Interactive 3D solar system with textured planets, rings, shadows, and starfield
 - Equation of center (variable speed) and empirical parallax corrections for all planets
-- **The Derived Moon (DLT-1)**: a framework-native lunar theory in Meeus Ch. 47's form with every constant derived, attributed, or anchored by design — periodic amplitudes reproduced from gravity alone (top-20 longitude at 100.0±0.1%, latitude family at 100.02%), the secular T²/T³ budget closed against primary sources with zero free parameters, analytic aberration replacing the fitted correction, and a J2000-anchored 5-layer precession hierarchy; RMS 0.0012° vs JPL Horizons over 6,088 positions
+- **The Derived Sun (DST-1)**: the certified apparent solar longitude assembled from framework structure with **zero fitted solar constants** — the mean tropical rate plus the closed-form integral of the model's own year-length harmonics (amplitudes derived as A·cotε, scaled by the derived obliquity-torque factors) plus a Kepler equation of centre on the derived H/16 + H/3 eccentricity law; 0.95″ RMS vs JPL (the Meeus Ch. 25 reference: 1.28″), and the same longitude drives the eclipse chain and the visible scene
+- **The Derived Moon (DLT-1)**: a framework-native lunar theory in Meeus Ch. 47's form with every constant derived, attributed, or anchored by design — periodic amplitudes reproduced from gravity alone (top-20 longitude at 100.0±0.1%, latitude family at 100.02%), the secular T²/T³ budget closed against primary sources with zero free parameters, analytic aberration replacing the fitted correction, and a J2000-anchored 5-layer precession hierarchy; extended with five derived Delaunay tail terms to λ 2.96″ / β 0.65″ RMS vs JPL, RMS 0.0012° over 6,088 positions
 - Time controls: play, pause, speed adjustment, and date navigation
 - Click any planet to focus the camera and see its orbital data
 - Planet info sidebar with per-planet data, charts, and precession analysis
 - [Eccentricity Balance Scale](docs/38-eccentricity-scale.md) for visualizing Law 5 balance per planet
 - [Invariable Plane Balance Explorer](docs/53-balance-explorer-reference.md) for interactive Fibonacci Law testing
-- **Orbital Forcing Formula Explorer** — Tools-menu modal plotting the 8H formula on top of LR04 across five tabs (full record → forward projection of the next natural glaciation)
+- **Climate Formula Explorer** — Tools-menu modal plotting the canonical L1+L2+L3 formula over four proxy records across eight time-window tabs (CenCO2PIP 66 Myr → forward projection of the next natural glaciation)
 - Console tests for year length, day length, and calibration verification
 - Export functionality for solstice dates and object positions
 - Built with [Three.js](https://threejs.org/) and [Tweakpane v4](https://tweakpane.github.io/docs/)
@@ -200,13 +201,13 @@ Two things worth knowing before you read a red result as breakage:
 
 ## Deep-Time Implementation — Hadean to +200 Myr
 
-The simulation is not limited to the modern era. The model's 6 free parameters apply at **all epochs from the Hadean (4.5 Gyr ago, Moon at the Roche limit) through J2000 and into the future tidal-lock asymptote at ~87 R_⊕**. A toggle in the developer panel enables deep-time mode, after which the time slider can be scrubbed across geological timescales and the entire 3D scene — Earth, Moon, all seven planets, plus the perihelion-ecliptic frames — updates in real time to the physically correct positions for the target epoch.
+The simulation is not limited to the modern era. The model's 6 free parameters apply at **all epochs from the Hadean (4.5 Gyr ago, Moon at the rigid Roche limit) through J2000 and into the future tidal-lock asymptote at ~87 R_⊕**. Deep-time mode is the shipped default: the time slider can be scrubbed across geological timescales and the entire 3D scene — Earth, Moon, all seven planets, plus the perihelion-ecliptic frames — updates in real time to the physically correct positions for the target epoch.
 
 The framework is documented in [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](docs/99-expanding-solar-system-resonance-theory.md): a canonical 9-step chain from `t_Ma` through length-of-day (LOD), the Earth Fundamental Cycle H(t), AU, solar mass loss, Kepler year, Moon distance, Moon synodic month, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods. The chain is anchored to modern Lunar Laser Ranging and the [Farhat 2022](https://www.aanda.org/articles/aa/full_html/2022/09/aa44329-22/aa44329-22.html) lunar-distance evolution polynomial; deep-time outputs are then independently validated against three external anchors that the model was **not** fit against:
 
 - **Wells 1963** (Devonian coral growth bands at 380 Ma): predicted Earth Fundamental Cycle H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr matches Wells's paleontological day-count essentially exactly (−0.01 %)
 - **Wu et al. 2024** (650-Myr cyclostratigraphy from sedimentary records): predicted H(t) matches Wu's reconstruction across the entire Phanerozoic to within ~1 %
-- **Patterson 1956 Pb-Pb Earth age** (4.55 Gyr): the model places the Moon at the Roche limit at that epoch — **no Hadean constraint was used in the fit**; the result emerges from the same proper-physics chain that produces the modern Moon distance
+- **The Earth-Moon genesis epoch**: the model places the Moon at the rigid Roche limit at 4.498 Gyr ago — between Patterson's 1956 Pb-Pb Earth age (4.55 Gyr) and the Hf-W giant-impact date (4.42 Gyr) — with **no Hadean constraint used in the fit**; the result emerges from the same proper-physics chain that produces the modern Moon distance
 
 The full evidence — 41 published anchors, per-anchor tolerances, the documented deviations, and the gate that re-checks all of it on every CI run — is assembled in the [Deep-Time Validation Dossier (Doc 106)](docs/106-deep-time-validation-dossier.md). Since 2026-08 the deep-time layer carries the **regime-aware lunar-recession history** (Driver 1½): the calibrated curve is bit-identical through the gated 0–1000 Ma era, and beyond it a fitted staircase (following Farhat 2022's resonant-crossing result) plus two explicit solar angular-momentum channels — the ocean solar-tide leak and the insolation-driven thermal-tide pump — match eleven published mid-Precambrian anchors within 1.3σ.
 
@@ -249,7 +250,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 **Investigation & Verification:**
 - [Python Scripts](scripts/) — Statistical significance tests, exoplanet Fibonacci tests, eccentricity analysis, Milankovitch paleoclimate tests
 - [Milankovitch & Climate (Docs 90–92)](docs/90-milankovitch-language.md) — Spectral analysis of five paleoclimate records (LR04, Cheng 2016, CENOGRID, EPICA CO₂, CenCO2PIP) demonstrating the 8H integer-divisor lattice, the 32-component **8H Orbital Forcing Formula**, and the canonical climate formula with its in-app Explorer modal. Doc 90 states the framework, [doc 91](docs/91-milankovitch-evidence.md) the evidence and falsifiable hypothesis tests, [doc 92](docs/92-climate-formula.md) the formula and reproducing pipeline.
-- [Historical Eclipse Validation (Docs 102–103)](docs/102-gia-alpha-lunar-validation.md) — The model's ΔT formula, with **zero parameters fitted to eclipse data in the α(t) machinery**, tested on two independent tracks: a 26-event solar-eclipse alignment audit spanning −762 BCE to 2026 CE (the framework agrees with the documented UT on every event; see the website's [Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)), and a 267-event primary-source lunar timing test — **<!--v:lunarResidualMinutes-->20.2<!--/v-->-min mean \|residual\|**, with **<!--v:lunarEventsBeatingNasa-->117<!--/v-->/267 events (<!--v:lunarBeatingNasaPct-->43.8<!--/v-->%) falling closer to observation than NASA Espenak/Meeus's polynomial**. [Doc 103](docs/103-135-babylonian-case-study.md) is the −135 Babylonian case study: predicted UT within 16 minutes of the documented time.
+- [Historical Eclipse Validation (Docs 102–103)](docs/102-gia-alpha-lunar-validation.md) — The model's ΔT formula, with **zero parameters fitted to eclipse data in the α(t) machinery**, tested on two independent tracks: a 26-event solar-eclipse alignment audit spanning −762 BCE to 2026 CE (the framework agrees with the documented UT on every event; see the website's [Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)), and a 267-event primary-source lunar timing test — **<!--v:lunarResidualMinutes-->20.2<!--/v-->-min mean \|residual\|**, with **<!--v:lunarEventsBeatingNasa-->117<!--/v-->/267 events (<!--v:lunarBeatingNasaPct-->43.8<!--/v-->%) falling closer to observation than NASA Espenak/Meeus's polynomial**. [Doc 103](docs/103-135-babylonian-case-study.md) is the −135 Babylonian case study: predicted UT within 9 minutes of the documented time, umbra centerline 194 km from Babylon.
 - [The Derived Moon — Doc 66 technical record](docs/66-moon-meeus-corrections.md) — the framework's lunar theory, **"The Derived Moon" (DLT-1)**: Meeus Ch. 47 with every constant derived, attributed, or anchored by design — periodic amplitudes reproduced from gravity alone, the secular budget closed against primary sources with zero free parameters, and certified statistically indistinguishable from the pure-Meeus polynomials across the 12,064-event NASA lunar canon while remaining bounded at deep time.
 - [Fitting Pipeline](tools/fit/README.md) — Pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, solar measurements, obliquity/cardinal-point/year-length harmonics
 - [Predictive Formula Guide](tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — ~2421-term physical-beat ML system for planetary precession prediction (R² > 0.99999 per planet; superseded the 429-term unified system on 2026-04-20)

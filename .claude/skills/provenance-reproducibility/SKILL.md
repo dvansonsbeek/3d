@@ -13,10 +13,18 @@ That is only true if every number can be traced to a source and a version.
 The same identifiers the API returns:
 
 ```
-modelVersion       v7.2    MAJOR = structural (a law, a divisor, H)
+modelVersion       v11.0   MAJOR = structural (a law, a divisor, H)
                            MINOR = refit (coefficients move, structure does not)
-coefficientsHash   sha256 of fitted-coefficients.json
+coefficientsHash   sha256 over ALL embedded coefficient sources —
+                   fitted-coefficients.json + the Meeus lunar tables +
+                   climate-formula-coefficients.json, labels included
 ```
+
+**The hash covers more than `fitted-coefficients.json`** — measured 2026-08:
+editing a display *label* in the climate coefficients moved the hash and CI
+correctly failed the push as a stale generated module. Any edit to any of the
+three coefficient sources requires `generate.mjs --write` plus the restamp
+cascade, and the full `npm run check` locally before pushing.
 
 A response, a document and a paper figure that quote the same `modelVersion` and
 `coefficientsHash` must produce the same numbers. If they cannot, the version

@@ -5,9 +5,9 @@ System Resonance Theory (ESSRT). The model is analytic and parametric, valid
 across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
-**Scale:** `src/script.js` ~59,300 lines · `tools/` 203 JS scripts across 7
-directories · 237 Python files · 71 docs · two web UIs (simulator, `dashboard/`).
-**`npm run check` enforces a nineteen-step gate chain; CI runs it plus a
+**Scale:** `src/script.js` ~59,800 lines · `tools/` 218 JS scripts across 10
+directories · 240 Python files · 73 docs · two web UIs (simulator, `dashboard/`).
+**`npm run check` enforces a twenty-two-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
 Golden masters live in `packages/fixtures/`. Of the 26 scripts in `tools/verify/`,
@@ -132,7 +132,7 @@ local run is only needed when the change touches what the heavy steps verify:
 |---|---|---|
 | `tools/docs/`, `docs/*.md`, markers | `npm run check:docs` | ~20 s |
 | `tools/lib/`, `packages/physics/` | `npm run check:engine` | ~2 min |
-| fit JSONs, `packages/fitting/`, `src/script.js`, `tools/constants/` | full `npm run check` | ~9 min |
+| ANY `public/input/*.json` (even a label — the constants hash embeds them wholesale), `packages/fitting/`, `src/script.js`, `tools/constants/` | full `npm run check` | ~9 min |
 
 `npm run test:browser` runs the `src/script.js` golden masters in headless
 Chromium — the only tier that guards Phase 8, which dissolves that file —
@@ -147,9 +147,10 @@ regression of the Phase 6 exit criterion, not a tracked state.
 nothing. `npm run test:verify:list` gives the classification: 7 gate · 4 liftable
 · 10 narrative · 5 generator (the suite FAILS on any unclassified script). **Never
 run a generator as a test** — `balance-search.js` rewrites the tracked
-`data/balance-presets.json`, and the three campaign generators
-(cassini-results / lod-climate-correlation / eclipse-audit) rewrite their
-`data/*.json` under `--write`. `verify-laws` is gated on its
+`data/balance-presets.json`, and the four campaign generators
+(cassini-results / lod-climate-correlation / eclipse-audit / lunar-alignment)
+rewrite their `data/*.json` under `--write` (the latter two REFUSE on
+divergence; `--rebaseline` is the conscious re-measurement path). `verify-laws` is gated on its
 check count (49/50, Saturn's Laplace–Lagrange bound the documented failure), not
 its exit code, so an unexplained *improvement* fails too.
 

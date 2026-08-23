@@ -100,8 +100,9 @@ happened to cancel a real +3.94 s offset.
 The fix was not a better average over the same grid. **Measure at the four
 cardinal points — SS, AE, WS, VE — because that is where the quantity is
 physically defined.** They are found by declination (solstice = extremum,
-equinox = zero crossing), not by world angle:
-`src/script.js:42633`.
+equinox = zero crossing), not by world angle — see the cardinal-point
+detection in `src/script.js` (search `computeSolarYearDaysFromCardinals` /
+`_cardinal`).
 
 Generalise: if a sampling grid is chosen for convenience rather than because the
 phenomenon is defined there, per-sample scatter is an artefact of the grid, and
