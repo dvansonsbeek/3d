@@ -998,7 +998,9 @@ out-of-sample: shipped-Moon residual λ 3.68″ → 3.12″ (the lab predicted
 3.08″) and β 1.04″ → 0.65″ (predicted 0.66″); the sign-flipped control
 degrades both — the integrator predicted reality.
 
-**Sun** (`eclipse/sun-planetary-completion.cjs` v2): twin epoch-phased
+**Sun** (`eclipse/sun-planetary-completion.cjs` — now v3, see the N3
+carrier-swap note at the end of this passage; the v2 record follows):
+twin epoch-phased
 8-body integrations (planet phases from the engine scene graph,
 full-vs-base3 differential, the EMB secular-perihelion channel projected
 out — it belongs to the framework's own ϖ(t)/e(t) laws) give the
@@ -1027,6 +1029,35 @@ The Moon extension alone had DEGRADED the original 5-event sample
 joint landing and the widening. The scene umbra has NOT adopted the D2
 tables (a separate conscious event); the eclipse-audit centerlines
 section records the scene state.
+
+**v3 — the FQ-5 N3 carrier swap (framework-native argument rates).**
+The six planetary mean-longitude RATES and the Moon-elongation rate are
+no longer IAU-class instrument literals: they are injected by `model.js`,
+computed live from the framework's own planet records (one revolution
+per the record's tropical period; Earth from the framework mean solar
+year; the elongation from the sidereal month/year identity), and the
+70-term table was RE-EXTRACTED on those carriers. The framework carriers
+are the derived signal's NATURAL basis — the lab's tones sit at framework
+synodic frequencies — and the re-extraction fits the signal BETTER than
+the v2 IAU-carrier projection (0.61″ vs 0.64″ fidelity; the V−E synodic
+main stable to 0.001″). Swap gates measured before landing
+(`tools/explore/n2-sun-framework-carriers.mjs` +
+`n3-carrier-swap-preview.mjs`): all-phase JPL sd 2.15″ → 2.14″; syzygy
+fleet unchanged to 0.01″; the v2/v3 composed tables agree 0.146″ RMS
+in-window and diverge only 0.93″ at ±600 yr (benign near-degenerate
+sideband repartition — no ill-conditioning); BCE arbitration detrended
+sd 0.199 min ≈ 5.5 km, below the ancient corpus's discriminating power
+(constant/trend parts ΔT-degenerate) — the corpus cannot falsify the
+swap, which therefore lands on doctrine (carriers derived, not
+declared). Endpoint moves at the rounding level: audit verdicts
+3/13/5/0/5 REPRODUCED exactly, centerlines mean/max 2.7″/6.7″
+reproduced, Babylon −135 194 → 188 km. The J2000 phase anchors
+(ARG_L0/PERI/D0) remain declared epoch constants; the Delaunay carriers
+in `moon/series-extension.cjs` remain DECLARED INPUTS by the N2
+stop-gate (the framework Mp composition carries a 16.9″/cy
+catalog-input residual ≡ 0.26 μd of sidereal month — not exact closure,
+and the extension's evaluation target is JPL reality where the
+DE-fitted literals are truth-class).
 Instruments: `tools/explore/d2-*.mjs`; their `.local.json` working data
 is gitignored and regenerates from the instruments themselves.
 
