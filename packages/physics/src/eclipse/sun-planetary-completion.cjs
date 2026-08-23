@@ -1,167 +1,178 @@
 /**
- * Sun planetary completion v2 — the DERIVED table (Stage D2, plan §12i
- * item 10; supersedes the v1 fitted 10-term table).
+ * Sun planetary completion v3 — the DERIVED table on FRAMEWORK carriers
+ * (FQ-5 N3, plan §12i; supersedes v2's IAU-literal argument rates, which
+ * superseded the v1 fitted 10-term table).
  *
  * DERIVATION, not fit: the table is extracted from the framework's OWN
  * physics — twin epoch-phased 8-body RK4 integrations (Sun, planets, EMB)
  * built entirely from framework constants, planet phases taken from the
  * engine scene graph, differenced full-vs-base3 to isolate the planetary
  * signal, with the EMB secular-perihelion channel projected out (that
- * channel belongs to the framework's own ϖ(t)/e(t) laws). The 68 terms
+ * channel belongs to the framework's own ϖ(t)/e(t) laws). The 70 terms
  * below are the analytic reading of that derived signal: main synodic
  * tones plus eccentricity-modulation sidebands (main ± mean anomaly of
- * the modulating planet, main ± M_E). Table-vs-signal fidelity 0.64″.
- * JPL Horizons enters only as VALIDATION, never as fit target: the
- * derived signal matches JPL residuals at corr −0.997 / slope −0.999
- * (0.60″ combined), and shipping it takes the all-phase Sun residual
- * 3.48″ → 2.12″, the 179-eclipse syzygy fleet 5.51″ → 3.99″, and the
- * NASA centerline reference set 5.30″ → 3.94″ shadow-plane (jointly
- * with the derived Moon series extension, moon/series-extension.cjs —
- * the pre-registered acceptance was all four gates, never a subset).
- * Instruments: tools/explore/d2-derived-sun.mjs (signal),
- * d2-sun-table-extraction.mjs (table), d2-joint-preview.mjs /
- * d2-widened-centerlines.mjs (validation).
+ * the modulating planet, main ± M_E). Table-vs-signal fidelity 0.61″
+ * (the v2 IAU-carrier projection read 0.64″ — the framework carriers are
+ * the signal's NATURAL basis, since the lab's tones sit at the framework
+ * synodic frequencies). JPL Horizons enters only as VALIDATION, never as
+ * fit target. Instruments: tools/explore/d2-derived-sun.mjs (signal),
+ * n2-sun-framework-carriers.mjs (carrier feasibility + conditioning),
+ * n3-carrier-swap-preview.mjs (table + the swap gates).
  *
- * DECLARED INPUTS (the three non-framework residues):
+ * THE CARRIERS (FQ-5 N3, the doctrine's final mile for the Sun side):
+ * the six planetary mean-longitude RATES are no longer instrument
+ * literals — they are INJECTED by the model wiring, computed live from
+ * the framework's own planet records (one revolution per the record's
+ * tropical period; Earth from the framework mean solar year), as is the
+ * Moon-elongation rate for the EMB-wobble carrier. The J2000 phase
+ * anchors (ARG_L0, PERI, D0) remain declared epoch constants — the
+ * "anchored by design" class; any constant phase offset is absorbed into
+ * the fitted cos/sin split exactly. N3 gates measured before the swap:
+ * all-phase JPL sd 2.15″ → 2.14″ (unchanged), syzygy fleet unchanged to
+ * 0.01″, BCE arbitration detrended sd 0.199 min ≈ 5.5 km — below the
+ * ancient corpus's discriminating power; conditioning probe: the v2 and
+ * v3 composed tables agree at 0.146″ RMS in-window, diverging only
+ * 0.93″ at ±600 yr (benign near-degenerate repartition, no
+ * ill-conditioning).
+ *
+ * DECLARED INPUTS (the remaining non-framework residues):
  *  (i)  planet/Sun mass ratios — observed IAU constants (shared with the
  *       whole framework; nothing here fits them);
- *  (ii) argument polynomials — IAU-class instrument literals, phase
- *       carriers only; their framework-native derivation is research
- *       item 20.3e;
+ *  (ii) the J2000 phase anchors ARG_L0 / PERI / D0 — epoch initial
+ *       conditions ("anchored by design" class; the RATES are now
+ *       framework-derived, injected);
  *  (iii) the 2lE term (+1.42″ sin 2lE) — DECLARED FITTED, not derived: a
- *       finder-annual artifact of the current SUN_HARMONICS chain, to be
- *       absorbed at the next Step-0 refit. Everything else in this file
- *       is derived. The Earth-around-EMB wobble, fitted −6.64″ in v1, is
- *       now DERIVED: amplitude a_M·μ/AU with μ = 1/(1+M_E/M_M), injected
- *       by the factory below from live package constants (6.4399″ at the
- *       current constants), sign negative in the subtract convention.
+ *       finder-annual artifact, measured chain-independent at E4/E5
+ *       (re-fit noise −0.12″/−0.03″). Everything else in this file is
+ *       derived. The Earth-around-EMB wobble is DERIVED: amplitude
+ *       a_M·μ/AU with μ = 1/(1+M_E/M_M), injected by the model wiring
+ *       from live package constants (6.4399″ at current constants), sign
+ *       negative in the subtract convention.
  *
  * THE CONSTANT-ATTRIBUTION RULE (v1's 20.3h-lite trap, still honored):
  * the table carries NO constant term — the constant is attributed to the
  * tier's existing anchors, so the terms ship without the +6″ syzygy-mean
  * penalty an eclipse-sample fit produced.
  *
- * Sign convention: unchanged from v1 — the evaluation models
- * (framework − truth), so consumers SUBTRACT it from the finder Sun
- * longitude. TERMS literals are stored in the extraction's native sign
- * (d2-sun-table.local.json) and negated in the evaluator, exactly as the
- * validated joint-preview instrument composes them.
+ * Sign convention: unchanged — the evaluation models (framework − truth),
+ * so consumers SUBTRACT it from the finder Sun longitude. TERMS literals
+ * are stored in the extraction's native sign
+ * (n3-framework-table.local.json) and negated in the evaluator.
  *
  * MATCHED PAIR: the amplitudes are the residual of the CURRENT finder
- * Sun chain (framework rate + EoC + SUN_HARMONICS) and must be
- * RE-DERIVED whenever that chain moves — a Step-0 SUN_HARMONICS refit,
- * an eccentricity/perihelion definition change, or 20.3e. Re-derivation
- * is the D2 instrument chain above (regenerate d2-sun-table.local.json,
- * re-embed). ENFORCED: PAIRED_SUN_HARMONICS_SHA256 below is the
- * fingerprint of the SUN_LONGITUDE_HARMONICS this table was derived
- * under; the create-model parity gate (test:model, in `npm run check`)
- * recomputes it from live constants and fails on mismatch. The api
- * centerline gate (≤8″ shadow-plane) backstops gross staleness
+ * Sun chain AND pair with the injected carrier rates — re-derive the
+ * table (the N2/N3 instrument chain) whenever either moves: a Step-0
+ * SUN_HARMONICS refit, an eccentricity/perihelion definition change, or
+ * a planet-record period change. ENFORCED: PAIRED_SUN_HARMONICS_SHA256
+ * below is the fingerprint of the SUN_LONGITUDE_HARMONICS this table was
+ * derived under; the create-model parity gate (test:model, in `npm run
+ * check`) recomputes it from live constants and fails on mismatch. The
+ * carrier↔table pairing is enforced by both living in this one module
+ * with the rates injected from the same constants the records read. The
+ * api centerline gate (≤8″ shadow-plane) backstops gross staleness
  * independently.
  *
- * E4/E5 PAIRING VERDICT (20.3h Phase 0): the framework-native Sun
- * landing REPLACED the finder Sun form (Meeus Ch. 25 → the assembled
- * framework Sun with the f(Y)+torque drift). The re-derivation this
- * header calls for was MEASURED INSTEAD: the residual 2lE re-fit under
- * the new chain is noise (−0.12″ sin / −0.03″ cos vs the declared-fitted
- * +1.42″ — tools/explore/e3b-native-sun.mjs §2), the all-phase Sun
- * residual improved to 0.95″, and every gate stayed green — the table's
- * planetary content is chain-independent physics and the pairing holds
- * WITHOUT re-extraction. The +1.42″ 2lE term is thereby measured to be
- * genuinely planetary-class, not a Meeus-EoC absorber.
+ * FQ-5 N2 RECORD (the carrier attribution): 8/10 carriers measured
+ * framework-expressible at <0.1″ induced error (e3b-argument-attribution
+ * E0); the Delaunay pair Mp/F FAILED exact closure (the framework
+ * composition carries a 16.9″/cy catalog-input residual ≡ 0.26 μd of
+ * sidereal month) and stays a DECLARED INPUT in moon/series-extension —
+ * the documented negative of the pre-registered stop-gate.
  */
 
 'use strict';
 
-/** Of-date mean-longitude polynomials, degrees per Julian century TT
- *  (IAU-class instrument literals — phase carriers, see header (ii)).
- *  Body order everywhere below: Mercury, Venus, Earth (EMB), Mars,
- *  Jupiter, Saturn. */
+/** J2000 mean-longitude phase anchors (deg), body order Mercury, Venus,
+ *  Earth (EMB), Mars, Jupiter, Saturn — declared epoch constants
+ *  (header (ii)); the RATES are injected (framework-derived). */
 const ARG_L0 = [252.250906, 181.979801, 100.466457, 355.433000, 34.351519, 50.077444];
-const ARG_L1 = [149472.674, 58517.815676, 36000.769780, 19141.696300, 3036.302389, 1223.511013];
 /** J2000 perihelion longitudes (deg), same body order — mean anomaly
  *  M_X = l_X − ϖ_X; slow ϖ drift is absorbed by the sidebands over the
  *  valid window. */
 const PERI = [77.456, 131.564, 102.937, 336.060, 14.331, 93.057];
-/** Moon mean elongation (deg/cy TT) — the EMB-wobble carrier. */
-const ARG_D = [297.8501921, 445267.1114034];
+/** Moon mean elongation J2000 phase anchor (deg) — the EMB-wobble
+ *  carrier; its rate is injected (framework-derived). */
+const ARG_D0 = 297.8501921;
 
 /**
  * The derived table, extraction-native sign (negated in the evaluator):
  * [[6 mean-longitude multipliers lMe,lV,lE,lM,lJ,lS],
  *  [6 mean-anomaly multipliers MMe,MV,ME,MMa,MJ,MS], cos″, sin″].
- * 68 terms ≥ 0.05″ from the D2 extraction (79-term LSQ, fidelity 0.64″).
+ * 70 terms ≥ 0.05″ from the N3 framework-carrier extraction (79-term
+ * LSQ on the D2 derived signal, fidelity 0.61″).
  * @type {Array<[number[], number[], number, number]>}
  */
 const TERMS = [
-  [[0, 0, 1, 0, -1, 0], [0, 0, 0, 0, 0, 0], -0.0841, -11.6309],
-  [[0, 0, 2, 0, -2, 0], [0, 0, -1, 0, 0, 0], -0.3235, 8.2645],
-  [[0, 0, 1, -1, 0, 0], [0, 0, 0, -1, 0, 0], -2.9917, -6.8503],
-  [[0, 0, 2, -2, 0, 0], [0, 0, -1, 0, 0, 0], -6.2197, -2.1203],
-  [[0, 2, -2, 0, 0, 0], [0, 0, 0, 0, 0, 0], 0.0199, -6.4326],
-  [[0, 0, 1, 0, -2, 0], [0, 0, 1, 0, 0, 0], 1.7254, 4.5991],
-  [[0, 1, -1, 0, 0, 0], [0, 0, 0, 0, 0, 0], 0.1362, 4.8325],
-  [[0, 0, 1, 0, -2, 0], [0, 0, 0, 0, 1, 0], 1.1469, 4.2788],
-  [[0, 0, 1, 0, -2, 0], [0, 0, 0, 0, 0, 0], -3.8890, 1.2230],
-  [[0, 0, 2, 0, -2, 0], [0, 0, 0, 0, 0, 0], 3.3414, 1.5744],
-  [[0, 0, 1, 0, -1, 0], [0, 0, 0, 0, -1, 0], -2.6985, -1.2967],
-  [[0, 3, -4, 0, 0, 0], [0, 0, 0, 0, 0, 0], 2.9374, -0.5408],
-  [[0, 0, 1, 0, -1, 0], [0, 0, -1, 0, 0, 0], -2.5406, -0.1812],
-  [[0, 0, 2, -2, 0, 0], [0, 0, 0, 0, 0, 0], 1.3755, -2.0301],
-  [[0, 0, 2, -3, 0, 0], [0, 0, 0, 1, 0, 0], -2.2367, -0.4398],
-  [[0, 0, -1, 2, 0, 0], [0, 0, 0, 0, 0, 0], 1.8705, 0.3499],
-  [[0, 3, -3, 0, 0, 0], [0, -1, 0, 0, 0, 0], -1.3492, 1.2893],
-  [[0, 0, 2, 0, -3, 0], [0, 0, 0, 0, 1, 0], 1.5453, 0.1289],
-  [[0, 2, -3, 0, 0, 0], [0, 0, 0, 0, 0, 0], 1.3344, -0.4621],
-  [[0, 3, -3, 0, 0, 0], [0, 0, -1, 0, 0, 0], -0.0755, -1.4049],
-  [[0, 0, -2, 4, 0, 0], [0, 0, 0, 0, 0, 0], 0.2780, 1.2111],
-  [[0, 0, -1, 2, 0, 0], [0, 0, -1, 0, 0, 0], -0.7161, 0.8440],
-  [[0, 3, -4, 0, 0, 0], [0, 0, -1, 0, 0, 0], 0.9894, 0.3587],
-  [[0, 0, 2, 0, -3, 0], [0, 0, 0, 0, 0, 0], 0.0063, 1.0463],
-  [[0, 2, -3, 0, 0, 0], [0, 0, 1, 0, 0, 0], 0.9834, 0.1318],
-  [[0, 0, 2, -3, 0, 0], [0, 0, 0, -1, 0, 0], 0.4834, 0.8318],
-  [[0, 1, -1, 0, 0, 0], [0, -1, 0, 0, 0, 0], -0.5335, 0.5905],
-  [[0, 0, 2, -2, 0, 0], [0, 0, 0, -1, 0, 0], 0.5371, -0.5685],
-  [[0, 0, 2, -3, 0, 0], [0, 0, 0, 0, 0, 0], -0.7373, -0.0880],
-  [[0, 2, -2, 0, 0, 0], [0, 0, -1, 0, 0, 0], 0.0163, -0.7372],
-  [[0, 0, -1, 2, 0, 0], [0, 0, 0, -1, 0, 0], -0.0119, 0.6500],
-  [[0, 0, 2, 0, -2, 0], [0, 0, 0, 0, 1, 0], 0.0023, -0.6287],
-  [[0, 0, 1, 0, -1, 0], [0, 0, 1, 0, 0, 0], 0.5714, -0.1358],
-  [[0, 0, -2, 4, 0, 0], [0, 0, -1, 0, 0, 0], -0.5046, 0.2858],
-  [[0, 0, 1, 0, -1, 0], [0, 0, 0, 0, 1, 0], -0.5567, 0.1036],
-  [[0, 2, -3, 0, 0, 0], [0, 0, -1, 0, 0, 0], 0.5469, -0.0167],
-  [[0, 2, -3, 0, 0, 0], [0, 1, 0, 0, 0, 0], -0.4309, 0.2809],
-  [[0, 0, 2, 0, -2, 0], [0, 0, 0, 0, -1, 0], 0.2206, -0.4616],
-  [[0, 3, -4, 0, 0, 0], [0, -1, 0, 0, 0, 0], -0.4549, -0.2097],
-  [[0, 0, 2, 0, -3, 0], [0, 0, -1, 0, 0, 0], 0.2809, 0.3489],
-  [[0, 0, 1, -1, 0, 0], [0, 0, 0, 0, 0, 0], 0.2863, 0.3116],
-  [[0, 0, 2, -3, 0, 0], [0, 0, -1, 0, 0, 0], -0.4141, -0.0359],
-  [[0, 0, 1, 0, 0, -1], [0, 0, 0, 0, 0, 0], 0.0863, -0.4015],
-  [[0, 0, -1, 2, 0, 0], [0, 0, 0, 1, 0, 0], -0.2200, 0.3372],
-  [[0, 1, -1, 0, 0, 0], [0, 0, -1, 0, 0, 0], -0.2017, 0.2910],
-  [[0, 2, -2, 0, 0, 0], [0, -1, 0, 0, 0, 0], 0.2499, -0.1777],
-  [[0, 0, 1, 0, -2, 0], [0, 0, 0, 0, -1, 0], -0.2254, 0.1676],
-  [[0, 3, -3, 0, 0, 0], [0, 0, 0, 0, 0, 0], -0.1859, -0.1961],
-  [[0, 0, 1, 0, 0, -1], [0, 0, 0, 0, 0, 1], -0.0710, 0.2499],
-  [[0, 0, -2, 4, 0, 0], [0, 0, 0, -1, 0, 0], 0.2125, -0.1175],
-  [[0, 0, 1, 0, 0, -1], [0, 0, -1, 0, 0, 0], -0.0460, 0.2379],
-  [[0, 3, -4, 0, 0, 0], [0, 1, 0, 0, 0, 0], -0.1410, 0.1566],
-  [[0, 0, 1, -1, 0, 0], [0, 0, 0, 1, 0, 0], -0.0476, 0.1897],
-  [[0, 2, -2, 0, 0, 0], [0, 0, 1, 0, 0, 0], -0.1559, -0.1155],
-  [[0, 0, 2, 0, -3, 0], [0, 0, 1, 0, 0, 0], 0.1631, -0.0164],
-  [[0, 1, -1, 0, 0, 0], [0, 1, 0, 0, 0, 0], 0.1307, -0.0678],
-  [[0, 0, 2, -3, 0, 0], [0, 0, 1, 0, 0, 0], 0.1331, -0.0291],
-  [[0, 0, -2, 4, 0, 0], [0, 0, 1, 0, 0, 0], 0.1227, 0.0482],
-  [[0, 0, 2, 0, 0, -2], [0, 0, 0, 0, 0, 0], -0.0388, 0.1044],
-  [[0, 0, 1, 0, 0, -1], [0, 0, 0, 0, 0, -1], -0.0309, 0.1027],
-  [[0, 0, 1, 0, -2, 0], [0, 0, -1, 0, 0, 0], -0.0741, 0.0308],
-  [[0, 0, 2, 0, -3, 0], [0, 0, 0, 0, -1, 0], 0.0102, 0.0783],
-  [[0, 1, -1, 0, 0, 0], [0, 0, 1, 0, 0, 0], -0.0026, 0.0765],
-  [[0, 0, 2, 0, -2, 0], [0, 0, 1, 0, 0, 0], -0.0084, 0.0686],
-  [[0, 3, -4, 0, 0, 0], [0, 0, 1, 0, 0, 0], 0.0273, -0.0576],
-  [[0, 0, 1, -1, 0, 0], [0, 0, 1, 0, 0, 0], 0.0570, 0.0117],
-  [[0, 0, 2, -2, 0, 0], [0, 0, 0, 1, 0, 0], 0.0426, -0.0336],
-  [[0, 0, 1, -1, 0, 0], [0, 0, -1, 0, 0, 0], -0.0335, -0.0395],
+  [[0, 0, 1, 0, -2, 0], [0, 0, 1, 0, 0, 0], 23.4846, 2.3099],
+  [[0, 0, 2, 0, -2, 0], [0, 0, 0, 0, 0, 0], -1.7235, -14.0062],
+  [[0, 0, 2, 0, -3, 0], [0, 0, 0, 0, 1, 0], 7.4894, -7.7252],
+  [[0, 3, -3, 0, 0, 0], [0, 0, -1, 0, 0, 0], 5.7813, 1.7078],
+  [[0, 3, -4, 0, 0, 0], [0, 0, 0, 0, 0, 0], 1.1877, 5.8649],
+  [[0, 0, 1, 0, -1, 0], [0, 0, 0, 0, 0, 0], 1.6357, -4.9485],
+  [[0, 2, -3, 0, 0, 0], [0, 0, 1, 0, 0, 0], -4.9053, -0.3900],
+  [[0, 1, -1, 0, 0, 0], [0, 0, 0, 0, 0, 0], 0.1351, 4.8331],
+  [[0, 0, 2, -3, 0, 0], [0, 0, 0, 1, 0, 0], -0.2239, -3.1687],
+  [[0, 0, 1, 0, -2, 0], [0, 0, 0, 0, 1, 0], -2.1749, -1.7705],
+  [[0, 0, 1, -1, 0, 0], [0, 0, 0, -1, 0, 0], 0.8107, -2.5127],
+  [[0, 0, 1, 0, -1, 0], [0, 0, -1, 0, 0, 0], -2.5403, -0.1821],
+  [[0, 0, -1, 2, 0, 0], [0, 0, 0, 0, 0, 0], -1.3152, -2.0575],
+  [[0, 2, -2, 0, 0, 0], [0, 0, 0, 0, 0, 0], -1.8073, -0.8142],
+  [[0, 3, -3, 0, 0, 0], [0, -1, 0, 0, 0, 0], -0.8611, 1.7708],
+  [[0, 0, -1, 2, 0, 0], [0, 0, -1, 0, 0, 0], 1.2659, 1.1195],
+  [[0, 0, 2, -2, 0, 0], [0, 0, -1, 0, 0, 0], 1.1646, 1.0865],
+  [[0, 0, 1, 0, -1, 0], [0, 0, 0, 0, -1, 0], 0.4560, -1.2051],
+  [[0, 0, -2, 4, 0, 0], [0, 0, 0, -1, 0, 0], -0.2198, 1.2107],
+  [[0, 3, -3, 0, 0, 0], [0, 0, 0, 0, 0, 0], 0.5260, -1.0137],
+  [[0, 2, -2, 0, 0, 0], [0, 0, -1, 0, 0, 0], -1.1195, 0.1107],
+  [[0, 0, 2, -2, 0, 0], [0, 0, 0, 0, 0, 0], 0.8202, -0.7125],
+  [[0, 3, -4, 0, 0, 0], [0, 0, -1, 0, 0, 0], 0.9722, 0.3524],
+  [[0, 0, 2, -3, 0, 0], [0, 0, 0, 0, 0, 0], 0.9763, -0.2018],
+  [[0, 3, -4, 0, 0, 0], [0, 0, 1, 0, 0, 0], 0.1162, 0.9095],
+  [[0, 0, 2, -2, 0, 0], [0, 0, 0, -1, 0, 0], 0.2940, 0.8000],
+  [[0, 2, -3, 0, 0, 0], [0, 0, 0, 0, 0, 0], 0.2210, -0.6939],
+  [[0, 0, 2, 0, -2, 0], [0, 0, 0, 0, -1, 0], -0.2188, 0.6572],
+  [[0, 0, 1, 0, -2, 0], [0, 0, 0, 0, 0, 0], 0.6135, 0.3150],
+  [[0, 1, -1, 0, 0, 0], [0, -1, 0, 0, 0, 0], 0.6161, -0.1008],
+  [[0, 0, 1, -1, 0, 0], [0, 0, 0, 1, 0, 0], 0.4387, -0.4123],
+  [[0, 0, 2, 0, -2, 0], [0, 0, -1, 0, 0, 0], -0.1825, 0.5176],
+  [[0, 2, -3, 0, 0, 0], [0, 1, 0, 0, 0, 0], 0.1125, -0.5348],
+  [[0, 0, -2, 4, 0, 0], [0, 0, -1, 0, 0, 0], -0.4800, 0.2245],
+  [[0, 0, 1, 0, 0, -1], [0, 0, 0, 0, 0, 0], 0.0845, -0.4012],
+  [[0, 0, 1, 0, -1, 0], [0, 0, 1, 0, 0, 0], 0.1622, -0.3517],
+  [[0, 0, 2, 0, -3, 0], [0, 0, -1, 0, 0, 0], 0.3786, 0.0361],
+  [[0, 0, 2, -3, 0, 0], [0, 0, 0, -1, 0, 0], 0.0701, -0.3556],
+  [[0, 0, 1, -1, 0, 0], [0, 0, 0, 0, 0, 0], -0.2643, -0.2045],
+  [[0, 0, 1, 0, -1, 0], [0, 0, 0, 0, 1, 0], 0.2650, -0.1462],
+  [[0, 0, 1, 0, 0, -1], [0, 0, 0, 0, 0, 1], 0.3016, 0.0060],
+  [[0, 0, -1, 2, 0, 0], [0, 0, 0, 1, 0, 0], -0.0582, -0.2912],
+  [[0, 0, 2, 0, -2, 0], [0, 0, 0, 0, 1, 0], -0.2051, -0.2135],
+  [[0, 0, 1, 0, -2, 0], [0, 0, 0, 0, -1, 0], 0.0858, 0.2762],
+  [[0, 0, 2, -3, 0, 0], [0, 0, -1, 0, 0, 0], 0.1911, 0.2163],
+  [[0, 0, -1, 2, 0, 0], [0, 0, 0, -1, 0, 0], 0.2815, -0.0450],
+  [[0, 2, -3, 0, 0, 0], [0, 0, -1, 0, 0, 0], 0.2490, 0.0551],
+  [[0, 0, 1, 0, 0, -1], [0, 0, -1, 0, 0, 0], -0.0456, 0.2371],
+  [[0, 0, 2, 0, -3, 0], [0, 0, 0, 0, 0, 0], 0.1560, -0.1469],
+  [[0, 3, -4, 0, 0, 0], [0, 1, 0, 0, 0, 0], -0.1412, 0.1568],
+  [[0, 3, -4, 0, 0, 0], [0, -1, 0, 0, 0, 0], -0.1616, -0.1314],
+  [[0, 0, -2, 4, 0, 0], [0, 0, 0, 0, 0, 0], 0.1728, -0.0849],
+  [[0, 1, -1, 0, 0, 0], [0, 0, -1, 0, 0, 0], -0.0449, 0.1649],
+  [[0, 0, 2, 0, -3, 0], [0, 0, 1, 0, 0, 0], 0.1632, -0.0164],
+  [[0, 2, -2, 0, 0, 0], [0, -1, 0, 0, 0, 0], 0.0534, -0.1430],
+  [[0, 0, 2, -3, 0, 0], [0, 0, 1, 0, 0, 0], 0.1316, -0.0275],
+  [[0, 0, -2, 4, 0, 0], [0, 0, 1, 0, 0, 0], 0.1216, 0.0451],
+  [[0, 0, 2, -2, 0, 0], [0, 0, 0, 1, 0, 0], -0.1046, 0.0620],
+  [[0, 0, 1, -1, 0, 0], [0, 0, 1, 0, 0, 0], -0.1075, -0.0488],
+  [[0, 0, 2, 0, 0, -2], [0, 0, 0, 0, 0, 0], -0.0385, 0.1030],
+  [[0, 0, 1, 0, 0, -1], [0, 0, 0, 0, 0, -1], -0.0308, 0.1049],
+  [[0, 1, -1, 0, 0, 0], [0, 1, 0, 0, 0, 0], -0.0875, -0.0250],
+  [[0, 0, 1, 0, -2, 0], [0, 0, -1, 0, 0, 0], -0.0738, 0.0295],
+  [[0, 0, 2, 0, -3, 0], [0, 0, 0, 0, -1, 0], 0.0097, 0.0787],
+  [[0, 1, -1, 0, 0, 0], [0, 0, 1, 0, 0, 0], -0.0016, 0.0762],
+  [[0, 2, -2, 0, 0, 0], [0, 0, 1, 0, 0, 0], 0.0562, -0.0490],
+  [[0, 3, -3, 0, 0, 0], [0, 0, 1, 0, 0, 0], 0.0638, -0.0362],
+  [[0, 0, 2, 0, -2, 0], [0, 0, 1, 0, 0, 0], -0.0085, 0.0686],
+  [[0, 2, -2, 0, 0, 0], [0, 1, 0, 0, 0, 0], -0.0453, 0.0505],
+  [[0, 0, 1, -1, 0, 0], [0, 0, -1, 0, 0, 0], -0.0353, -0.0379],
 ];
 
 /** The declared-fitted semiannual leftover (header (iii)): +1.42″ sin 2lE. */
@@ -170,15 +181,29 @@ const FITTED_2LE_ARCSEC = 1.42;
 const D2R = Math.PI / 180;
 
 /**
- * @param {{ embWobbleArcsec: number }} opts - the DERIVED Earth-around-EMB
- *   wobble amplitude a_M·μ/AU in arcsec (μ = 1/(1+M_E/M_M)); computed
- *   from live constants by the model wiring so it tracks the constants.
+ * @param {{ embWobbleArcsec: number,
+ *           carrierRatesDegPerCy: { planets: number[], moonElongation: number } }} opts
+ *   - embWobbleArcsec: the DERIVED Earth-around-EMB wobble amplitude
+ *     a_M·μ/AU in arcsec (μ = 1/(1+M_E/M_M));
+ *   - carrierRatesDegPerCy.planets: the six FRAMEWORK mean-longitude
+ *     rates (deg/Julian-century TT), body order Me,V,E,Ma,J,S — one
+ *     revolution per the model's own tropical period records;
+ *   - carrierRatesDegPerCy.moonElongation: the framework Moon
+ *     mean-elongation rate (deg/cy TT) for the EMB-wobble carrier.
+ *   All computed from live constants by the model wiring so the
+ *   carrier↔table matched pair tracks the constants.
  * @returns {{ sunPlanetaryCompletionDeg: (T: number) => number }}
  */
-function createSunPlanetaryCompletion({ embWobbleArcsec }) {
+function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy }) {
   if (!Number.isFinite(embWobbleArcsec)) {
     throw new Error('createSunPlanetaryCompletion: embWobbleArcsec must be a finite number (derived a_M·μ/AU in arcsec)');
   }
+  const rates = carrierRatesDegPerCy;
+  if (!rates || !Array.isArray(rates.planets) || rates.planets.length !== 6
+      || rates.planets.some((r) => !Number.isFinite(r)) || !Number.isFinite(rates.moonElongation)) {
+    throw new Error('createSunPlanetaryCompletion: carrierRatesDegPerCy must supply 6 finite planet rates (Me,V,E,Ma,J,S) and a finite moonElongation rate (deg/cy TT)');
+  }
+  const L1 = rates.planets, D1 = rates.moonElongation;
   /**
    * Planetary-completion correction to the finder Sun longitude.
    * @param {number} T - Julian centuries TT from J2000
@@ -187,7 +212,7 @@ function createSunPlanetaryCompletion({ embWobbleArcsec }) {
   function sunPlanetaryCompletionDeg(T) {
     const l = new Float64Array(6), M = new Float64Array(6);
     for (let i = 0; i < 6; i++) {
-      l[i] = (ARG_L0[i] + ARG_L1[i] * T) * D2R;
+      l[i] = (ARG_L0[i] + L1[i] * T) * D2R;
       M[i] = l[i] - PERI[i] * D2R;
     }
     let table = 0;
@@ -196,7 +221,7 @@ function createSunPlanetaryCompletion({ embWobbleArcsec }) {
       for (let i = 0; i < 6; i++) th += kl[i] * l[i] + kM[i] * M[i];
       table += cA * Math.cos(th) + sA * Math.sin(th);
     }
-    const D = (ARG_D[0] + ARG_D[1] * T) * D2R;
+    const D = (ARG_D0 + D1 * T) * D2R;
     const arcsec = -table - embWobbleArcsec * Math.sin(D)
       + FITTED_2LE_ARCSEC * Math.sin(2 * l[2]);
     return arcsec / 3600;
@@ -206,7 +231,8 @@ function createSunPlanetaryCompletion({ embWobbleArcsec }) {
 
 /** sha256/16 of JSON.stringify(FITTED_COEFFICIENTS.SUN_LONGITUDE_HARMONICS)
  *  at derivation time — the matched-pair fingerprint asserted by test:model.
- *  Unchanged from v1: SUN_HARMONICS did not move in the D2 landing. */
+ *  Unchanged from v1/v2: SUN_HARMONICS did not move in the D2 or N3
+ *  landings. */
 const PAIRED_SUN_HARMONICS_SHA256 = 'e2cf42e9770c9e0a';
 
 module.exports = { createSunPlanetaryCompletion, PAIRED_SUN_HARMONICS_SHA256 };

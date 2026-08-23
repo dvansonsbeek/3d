@@ -21,10 +21,18 @@ const { createSunPlanetaryCompletion } = await import(new URL('../../packages/ph
 
 const model = createModel(DEFAULT_CONSTANTS);
 const C = DEFAULT_CONSTANTS;
-// live shipped completion — the derived EMB wobble exactly as model.js wires it
+// live shipped completion — the derived EMB wobble exactly as model.js wires it.
+// POST-N3: the module is v3 (framework carriers, injected rates).
+const _n3H = C.foundational.holisticyearLength;
+const _n3mSY = Math.round(C.foundational.inputmeanlengthsolaryearindays * (_n3H / 8)) / (_n3H / 8);
+const _n3dpc = (/** @type {number} */ f) => 360 * 36525 * f;
 const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({
   embWobbleArcsec: (C.moonReference.moonDistance / (1 + C.physicalConstants.MASS_RATIO_EARTH_MOON)
     / C.physicalConstants.currentAUDistance) * (648000 / Math.PI),
+  carrierRatesDegPerCy: {
+    planets: ['mercury', 'venus', null, 'mars', 'jupiter', 'saturn'].map((k) => (k ? _n3dpc(1 / C.planetOrbitalElements[k].solarYearInput) : _n3dpc(1 / _n3mSY))),
+    moonElongation: _n3dpc(1 / C.moonReference.moonSiderealMonthInput - 1 / C.yearLengthRef.siderealYear),
+  },
 });
 const D2R = Math.PI / 180;
 const BRIDGE = C.earthOrbital.deltaTStart / 86400;

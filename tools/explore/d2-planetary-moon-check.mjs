@@ -136,9 +136,17 @@ console.log(`   β + planetary:          scatter ${sB1.s.toFixed(2)}″ (mean ${
 // ── 2. syzygy elongation fleet (shared cache from d2-joint-preview) ──────
 const SZ = JSON.parse(readFileSync(HERE + 'd2-syzygy-jpl-cache.local.json', 'utf8'));
 const { createSunPlanetaryCompletion } = await import(new URL('../../packages/physics/src/eclipse/sun-planetary-completion.cjs', import.meta.url).href).then((m) => m.default ?? m);
+// POST-N3: the module is v3 (framework carriers, injected rates).
+const _n3H = C.foundational.holisticyearLength;
+const _n3mSY = Math.round(C.foundational.inputmeanlengthsolaryearindays * (_n3H / 8)) / (_n3H / 8);
+const _n3dpc = (/** @type {number} */ f) => 360 * 36525 * f;
 const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({
   embWobbleArcsec: (C.moonReference.moonDistance / (1 + C.physicalConstants.MASS_RATIO_EARTH_MOON)
     / C.physicalConstants.currentAUDistance) * (648000 / Math.PI),
+  carrierRatesDegPerCy: {
+    planets: ['mercury', 'venus', null, 'mars', 'jupiter', 'saturn'].map((k) => (k ? _n3dpc(1 / C.planetOrbitalElements[k].solarYearInput) : _n3dpc(1 / _n3mSY))),
+    moonElongation: _n3dpc(1 / C.moonReference.moonSiderealMonthInput - 1 / C.yearLengthRef.siderealYear),
+  },
 });
 const e2s = [], e3s = [];
 for (const [jd, jplM, jplS] of SZ.rows) {

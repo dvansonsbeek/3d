@@ -967,7 +967,24 @@ export function assembleModel(C, F) {
   // μ = 1/(1+M_E/M_M) — 6.4399″ at current constants, tracks them live.
   const embWobbleArcsec = (moonDistanceKm / (MASS_RATIO_EARTH_MOON + 1) / currentAUDistance)
     * (648000 / Math.PI);
-  const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({ embWobbleArcsec });
+  // FQ-5 N3 — the completion's carriers are FRAMEWORK-derived: one
+  // revolution per the model's own tropical period records (Earth from
+  // the framework mean solar year; the Moon-elongation rate from the
+  // sidereal month/year identity). The v3 table's amplitudes were
+  // re-extracted on exactly these rates (the carrier↔table matched pair).
+  const degPerCyOf = /** @param {number} cyclesPerDay */ (cyclesPerDay) => 360 * 36525 * cyclesPerDay;
+  const carrierRatesDegPerCy = {
+    planets: [
+      degPerCyOf(1 / C.planetOrbitalElements.mercury.solarYearInput),
+      degPerCyOf(1 / C.planetOrbitalElements.venus.solarYearInput),
+      degPerCyOf(1 / meanSolarYearDays),
+      degPerCyOf(1 / C.planetOrbitalElements.mars.solarYearInput),
+      degPerCyOf(1 / C.planetOrbitalElements.jupiter.solarYearInput),
+      degPerCyOf(1 / C.planetOrbitalElements.saturn.solarYearInput),
+    ],
+    moonElongation: degPerCyOf(1 / moonSiderealMonthInput - 1 / meanSiderealYearDays),
+  };
+  const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy });
   const besselian = createBesselian({
     moonFullAtDaysTT: /** @param {number} dDaysTT */ (dDaysTT) => {
       const ev = moonSeries.sceneEvalAt(dDaysTT);

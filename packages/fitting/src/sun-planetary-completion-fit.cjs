@@ -47,9 +47,17 @@
 const { join } = require('node:path');
 const { readFileSync } = require('node:fs');
 const { createSunPlanetaryCompletion } = require('@essrt/physics/eclipse/sun-planetary-completion');
-// Frozen dev-record value of the derived EMB wobble (a_M·μ/AU); the live
-// model computes it from constants — this instrument only needs parity.
-const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({ embWobbleArcsec: 6.4399 });
+// Frozen dev-record values of the derived EMB wobble (a_M·μ/AU) and — since
+// the N3 carrier swap — the framework carrier rates (deg/cy TT, computed
+// live from the records by the model wiring; frozen here at the N3-landing
+// constants). This instrument only needs parity.
+const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({
+  embWobbleArcsec: 6.4399,
+  carrierRatesDegPerCy: {
+    planets: [149474.299265, 58519.326198, 36000.768446, 19141.688382, 3036.348900, 1223.504234],
+    moonElongation: 445267.111289,
+  },
+});
 
 const ROOT = join(__dirname, '..', '..', '..');
 

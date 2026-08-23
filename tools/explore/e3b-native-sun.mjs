@@ -151,7 +151,17 @@ const CACHE = new URL('./d2-moonval-jpl-cache.local.json', import.meta.url);
 const cache = JSON.parse(fs.readFileSync(CACHE, 'utf8'));
 const N = C.NUTATION_LEADING_TERMS_ARCSEC;
 const embW = (C.moonDistance / (1 + C.MASS_RATIO_EARTH_MOON) / C.currentAUDistance) * (648000 / Math.PI);
-const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({ embWobbleArcsec: embW });
+// POST-N3: the module is v3 (framework carriers, injected rates) — the
+// recorded E4/E5-era numbers in this instrument predate the swap (the
+// v2-vs-v3 composed tables differ 0.146″ RMS in-window).
+const _n3dpc = (/** @type {number} */ f) => 360 * 36525 * f;
+const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({
+  embWobbleArcsec: embW,
+  carrierRatesDegPerCy: {
+    planets: ['mercury', 'venus', null, 'mars', 'jupiter', 'saturn'].map((k) => (k ? _n3dpc(1 / C.planets[k].solarYearInput) : _n3dpc(1 / C.meanSolarYearDays))),
+    moonElongation: _n3dpc(1 / C.moonReference.moonSiderealMonthInput - 1 / (C.meanSiderealYearSeconds / 86400)),
+  },
+});
 const BRIDGE = AR.earthOrbital.deltaTStart / 86400;
 const rows = [];
 for (const [jd, , , jplSun] of cache.rows) {

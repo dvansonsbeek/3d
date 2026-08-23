@@ -21,9 +21,16 @@
  * gates, never a subset.
  *
  * Arguments are the instrument-grade Delaunay polynomials (IAU/Meeus
- * class, degrees/Julian-century TT) — phase carriers only, same
- * epistemic status as the Sun completion's argument literals (their
- * framework-native derivation is research item 20.3e).
+ * class, degrees/Julian-century TT) — phase carriers only, DECLARED
+ * INPUTS by the FQ-5 N2 stop-gate (the documented negative of research
+ * item 20.3e): the framework composition of Mp carries a measured
+ * 16.9″/cy catalog-input residual (≡ 0.26 μd of sidereal month —
+ * e3b-argument-attribution E0 + the N1 quantification), which is NOT
+ * exact closure, and the evaluation target here is JPL reality where
+ * the DE-fitted literals are truth-class. The Sun completion's
+ * PLANETARY carriers, by contrast, went framework-native at N3 (its
+ * derived signal is framework-frequency; see
+ * eclipse/sun-planetary-completion.cjs v3).
  *
  * Sign convention: sine terms, ADDED to the full-series Moon longitude
  * and latitude (the validated sense; see besselian.cjs bodiesAt).
