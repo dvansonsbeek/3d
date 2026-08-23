@@ -36,7 +36,7 @@ The framework's Law 4 (eccentricity amplitude scaling) is normally written in th
 e_amp = K · sin(tilt) · √d / (√m · a^(3/2))
 ```
 
-with K = 3.4143 × 10⁻⁶ (the universal eccentricity-amplitude constant derived from Earth; the analysis in this doc was run with the pre-refit value 3.4149 × 10⁻⁶ — a 0.02% difference, far below the 8–7658× failure margins reported here). For the 8 primary planets, all four quantities — `m`, `a`, `d` (Fibonacci divisor), and `tilt` (axial obliquity) — are independently observed, and the law closes to <1% across the full set.
+with K = 3.4143 × 10⁻⁶ (the universal eccentricity-amplitude constant derived from Earth; `tno_obliquity_prediction.py` now runs at this refit value — the 0.02% shift from the earlier 3.4149 × 10⁻⁶ moves the failure margins by less than one part in 6,000). For the 8 primary planets, all four quantities — `m`, `a`, `d` (Fibonacci divisor), and `tilt` (axial obliquity) — are independently observed, and the law closes to <1% across the full set.
 
 Solved for `sin(tilt)`:
 
@@ -67,7 +67,7 @@ We could choose two readings:
 
 Reading (a) is the **simplest and most generous** — if a body fails it, it fails the easiest possible compatibility test. Reading (b) is **astrophysically appropriate for almost every catalogued major TNO** — every one of them is in a resonance, scattered-disk, or detached regime.
 
-The script and the table in §2 below use reading (a). Therefore the "fails by 8–7658×" numbers are **upper bounds on tension**, not direct evidence Law 4 is wrong for these bodies. Where reading (b) is more appropriate (which is the majority of the sample), the test is **inconclusive**: we'd need an independent measurement of secular `e_amp` to apply Law 4 properly, and we don't have one for most TNOs.
+The script and the table in §2 below use reading (a). Therefore the "fails by 8–7660×" numbers are **upper bounds on tension**, not direct evidence Law 4 is wrong for these bodies. Where reading (b) is more appropriate (which is the majority of the sample), the test is **inconclusive**: we'd need an independent measurement of secular `e_amp` to apply Law 4 properly, and we don't have one for most TNOs.
 
 The conclusion that's robust to the assumption is **direction**, not magnitude: the framework expects much smaller `e_amp` values for distant low-mass bodies than the catalogue's `e_obs` values would naïvely imply.
 
@@ -85,7 +85,7 @@ Seventeen catalogued TNOs were tested across the full Fibonacci d-pool `[1, 2, 3
 | Makemake | 1.54×10⁻⁹ | 45.79 | 0.159 | **76×** | unphysical |
 | Gonggong | 9.00×10⁻¹⁰ | 67.49 | 0.503 | **330×** | unphysical |
 | Quaoar+Weywot | 7.00×10⁻¹⁰ | 43.69 | 0.039 | **12×** | unphysical |
-| Sedna | 4.00×10⁻¹⁰ | 506.00 | 0.852 | **7658×** | unphysical |
+| Sedna | 4.00×10⁻¹⁰ | 506.00 | 0.852 | **7660×** | unphysical |
 | Orcus+Vanth | 6.30×10⁻¹⁰ | 39.42 | 0.226 | **55×** | unphysical |
 | Salacia+Actaea | 4.92×10⁻¹⁰ | 42.18 | 0.106 | **25×** | unphysical |
 | Varuna | 2.00×10⁻¹⁰ | 42.70 | 0.054 | **8×** | unphysical |
@@ -97,7 +97,7 @@ Seventeen catalogued TNOs were tested across the full Fibonacci d-pool `[1, 2, 3
 | Chaos | 1.00×10⁻¹⁰ | 45.84 | 0.106 | **13×** | unphysical |
 | Varda | 1.40×10⁻¹⁰ | 45.93 | 0.144 | **21×** | unphysical |
 
-**Result under reading (a): 0 of 17 known TNOs satisfy `sin(tilt) ≤ 1`** at any Fibonacci d. The proxy `e_obs ≈ e_amp` returns failures from 8× (Varuna, lowest-eccentricity classical KBO in the sample) to 7658× (Sedna, the most eccentric).
+**Result under reading (a): 0 of 17 known TNOs satisfy `sin(tilt) ≤ 1`** at any Fibonacci d. The proxy `e_obs ≈ e_amp` returns failures from 8× (Varuna, lowest-eccentricity classical KBO in the sample) to 7660× (Sedna, the most eccentric).
 
 As argued in §1.2, this is **not yet a refutation** of Law 4 for these bodies — it's a refutation of the proxy. Reading (b) is more appropriate for almost the entire sample.
 
@@ -198,7 +198,7 @@ Comets and asteroids show a **different failure mode** from TNOs:
 
 | Class | Law 4 admits? (sin ≤ 1) | Predicted matches measured? |
 |---|:---:|:---:|
-| TNOs (Pluto, Varuna, ...) | No (sin = 8×–7658×) | Cannot test — admitted region not reached |
+| TNOs (Pluto, Varuna, ...) | No (sin = 8×–7660×) | Cannot test — admitted region not reached |
 | Comets (67P) | Yes (sin ≈ 0.0004) | No — predicted ~0°, measured 52° |
 | Main-belt asteroids (Ceres) | Yes (sin ≈ 0.3) | No — off by ~13° |
 
@@ -262,7 +262,7 @@ A uniform-random expectation for `sin(tilt)` (Lambert's law over a sphere) is `�
 - **Tier 1 (Law-4 compliance)**: observed eccentricity must be reachable as `e_amp` for some `(d, tilt)` pair. Failure: `sin(tilt) > 1` for all d.
 - **Tier 2 (v-balance integration)**: even if Tier 1 passes, the candidate must integrate into the framework's mirror-pair v-balance without breaking Law 5 (99.8636%).
 
-The TNO obliquity analysis applies Tier 1 in inverse mode **under the `e_obs ≈ e_amp` proxy (reading (a))**. The 17 known TNOs all fail Tier 1 by 8–7658× under that proxy.
+The TNO obliquity analysis applies Tier 1 in inverse mode **under the `e_obs ≈ e_amp` proxy (reading (a))**. The 17 known TNOs all fail Tier 1 by 8–7660× under that proxy.
 
 For TNOs, the proxy is generally inappropriate (§1.2), so the failure is an **upper-bound on tension**, not a direct refutation. The one body where reading (b) can be applied — Pluto — yields a clean intrinsic/external decomposition (~0.001 intrinsic + ~0.024 external, §2.1), with Law 4 correctly capturing the intrinsic component and Neptune resonance forcing the rest.
 
@@ -282,7 +282,7 @@ Masses are taken from current best estimates (NSSDC, Brown & Butler 2018, Grundy
 
 1. **Law 4 is bidirectional.** Solved for `sin(tilt)`, it predicts axial obliquity from the body's secular eccentricity *amplitude* (`e_amp`), mass, semi-major axis, and Fibonacci d-slot.
 2. **The critical distinction** between `e_obs` (snapshot eccentricity) and `e_amp` (secular oscillation amplitude) matters for TNOs. For resonant or scattered bodies, `e_obs` is dominated by **base** eccentricity, which Law 4 does not constrain.
-3. **Under the proxy `e_obs ≈ e_amp` (reading (a))** all 17 catalogued major TNOs fail by 8–7658×. This is an **upper bound on tension**, not a direct refutation — the proxy is inappropriate for most of the sample.
+3. **Under the proxy `e_obs ≈ e_amp` (reading (a))** all 17 catalogued major TNOs fail by 8–7660×. This is an **upper bound on tension**, not a direct refutation — the proxy is inappropriate for most of the sample.
 4. **Pluto is the only TNO** for which an independently-integrated `e_amp ≈ 0.025` is available. Under reading (b), Pluto's actual amplitude decomposes into an intrinsic Law-4 component (~0.001) plus a Neptune-resonance external component (~0.024) — ratio ≈ 1 : 24. Law 4 correctly predicts the intrinsic part; the rest is external forcing. This is the expected regime for a body locked in a 3:2 mean-motion resonance, not a refutation of Law 4.
 5. **For the remaining 16**, secular-amplitude measurements at usable precision are not in the literature. Per-body Myr-scale integrations would let us decompose each body's actual `e_amp` into intrinsic (Law-4) + external (resonance/scattering/tides) — as we did for Pluto. For classical KBOs (no strong resonance), Law-4 intrinsic should be close to actual; for plutinos and scattered-disk objects, large external/intrinsic ratios are expected.
 6. **No individual named TNO is testable.** Every catalogued body (Pluto, Eris, Haumea, ..., Varuna) sits above the Law-4 admissibility curve — too massive for its observed eccentricity. Varuna is closest at 8.4× tension; all others fail harder.

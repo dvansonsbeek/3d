@@ -92,7 +92,7 @@ FRAMEWORK_8PLANET_CLOSURE_PCT = 99.862
 FRAMEWORK_RESIDUAL_V = 4.27e-5   # signed gap |Σv_in − Σv_anti| from 8-planet sum
 
 # Framework's K constant (Law 4) — derived from Earth
-K_CONSTANT = 3.4149e-6
+K_CONSTANT = 3.414333e-6  # eccentricityAmplitudeK (2026-08 refit; was 3.4149e-6)
 
 # Assumed mean sin(axial obliquity) for TNOs (mostly unmeasured)
 # Random/isotropic distribution gives ⟨sin(tilt)⟩ = π/4 ≈ 0.785; "moderate"

@@ -198,7 +198,7 @@ def main():
         print(f"  Mass-uncertainty contribution: {sigma_gap_combined:.3e}  ({pct_of_residual_combined:.1f}%)")
         print(f"  Minor-body contribution:       {minor_body:.3e}  ({minor_body/FRAMEWORK_RESIDUAL_MAGNITUDE*100:.1f}%)")
         print()
-        K = 3.4149e-6
+        K = 3.414333e-6  # eccentricityAmplitudeK (2026-08 refit; was 3.4149e-6)
         sin_tilt = 0.5
         N_implied = (minor_body / (K * sin_tilt)) ** 2
         print(f"  Implied N (minor bodies) after removing mass-uncertainty:")
@@ -231,7 +231,7 @@ def main():
             "mass_uncertainty_v": float(sigma_gap_combined),
             "minor_body_v_implied": float(math.sqrt(max(0, residual_sq - mass_sq))),
             "minor_body_N_implied": float(math.sqrt(max(0, residual_sq - mass_sq)) /
-                                          (3.4149e-6 * 0.5)) ** 2 if (residual_sq - mass_sq) > 0 else None,
+                                          (3.414333e-6 * 0.5)) ** 2 if (residual_sq - mass_sq) > 0 else None,
         },
         "rng_seed": RNG_SEED,
     }, indent=2))

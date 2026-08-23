@@ -177,7 +177,7 @@
   "saturn_perihelion_deg": 93.06,
   "framework_8planet_closure_pct": 99.862,
   "framework_residual_v": 4.27e-05,
-  "K_constant": 3.4149e-06,
+  "K_constant": 3.414333e-06,
   "tno_sin_tilt_assumed": 0.5,
   "approach_1_observed_e_naive": {
     "description": "v per body = \u221am\u00b7a^(3/2)\u00b7e_observed/\u221ad. Naive \u2014 uses currently-observed e (~0.15).",
@@ -270,15 +270,15 @@
   },
   "approach_2_law4_natural": {
     "description": "v per body = K \u00b7 sin(tilt), uniform regardless of (m, a, d). Comes from substituting Law 4's e_amp into Law 5's v formula.",
-    "v_per_body": 1.70745e-06,
+    "v_per_body": 1.7071665e-06,
     "for_19_known_tnos": {
-      "worst_case_sum": 3.244155e-05,
-      "worst_case_vs_gap": 0.7597552693208431,
-      "random_sigma": 7.442602001148524e-06,
-      "random_sigma_vs_gap": 0.17429981267326755
+      "worst_case_sum": 3.2436163499999996e-05,
+      "worst_case_vs_gap": 0.7596291217798594,
+      "random_sigma": 7.44136625329803e-06,
+      "random_sigma_vs_gap": 0.1742708724425768
     },
-    "for_N_1000_tnos_random": 5.399430990854499e-05,
-    "for_N_10000_tnos_random": 0.000170745,
+    "for_N_1000_tnos_random": 5.3985344851378416e-05,
+    "for_N_10000_tnos_random": 0.00017071665,
     "interpretation": "Under the framework's own Law 4 extended to TNOs (assuming e_base \u2248 e_amp for distant low-mass bodies, as is the case for Neptune), every TNO contributes v = K\u00b7sin(tilt) \u2248 1.7e-6 \u2014 uniformly. The huge a^(3/2) factor cancels with the tiny e_amp. The 8-planet framework's 4.27e-5 residual is then quantitatively consistent with random \u00b1 contributions from ~600-1000 TNO-equivalent bodies (\u03c3 ~ 4-5e-5)."
   },
   "vector_cancellation": {

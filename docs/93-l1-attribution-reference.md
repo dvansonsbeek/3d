@@ -43,7 +43,7 @@ So the 32 components in this doc are the complete L1 set. For L2 + L3 attributio
 | n | T (kyr) | amp | LR04 4σ | Berger / secular | Our model top-1 | 3-step status |
 |---|--------:|----:|:-------:|------------------|-----------------|:-------------:|
 | 9 | 298.060 | 0.1238 | ✓ | g₂−g₇ Venus-Uranus ecc / Mercury Axial = 8H/9 | `[3-term]` Earth.Obliq(64) - Jupiter.Peri_ecl(39) - Jupiter.Obliq(16) | **PLANET ≠** |
-| 12 | 223.545 | 0.2087 | ✓ | s₅−s₁ Jupiter-Mercury nodal / Uranus AscNode = 8H/12 | `[3-term]` Earth.Axial(104) - Venus.Axial(91) - Venus.AscNode(1) | **PLANET ≠** |
+| 12 | 223.545 | 0.2087 | ✓ | s₅−s₁ Jupiter-Mercury nodal | `[3-term]` Earth.Axial(104) - Venus.Axial(91) - Venus.AscNode(1) | **PLANET ≠** |
 | 14 | 191.610 | 0.1000 |  | g₂−g₈ Venus-Neptune ecc | `[3-term]` Earth.Axial(104) - Mercury.Ecc(84) - Saturn.Axial(6) | **PLANET ≠** |
 | 16 | 167.659 | 0.1967 |  | Mars Axial = 8H/16 | `[3-term]` Earth.Axial(104) - Jupiter.Ecc(44) - Jupiter.Ecc(44) | (no Berger) |
 | 18 | 149.030 | 0.0823 | ✓ | s₄−s₆ Mars-Saturn nodal | `[3-term]` Earth.Axial(104) - Jupiter.Axial(21) - Jupiter.ICRF(65) | **PLANET ≠** |
@@ -54,12 +54,12 @@ So the 32 components in this doc are the complete L1 set. For L2 + L3 attributio
 | 28 | 95.805 | 0.7536 | ✓ | g₄−g₅ Mars-Jupiter ecc (Berger 95k) | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) - Saturn.Obliq(24) | **PLANET ≠** |
 | 30 | 89.418 | 0.0899 |  | g₃−g₇ Earth-Uranus ecc | `[3-term]` Earth.Axial(104) - Venus.Obliq(110) + Jupiter.AscNode(36) | **PLANET ≠** |
 | 31 | 86.533 | 0.4050 | ✓ | g₄−g₇ Mars-Uranus | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) - Jupiter.Axial(21) | **PLANET ≠** |
-| 35 | 76.644 | 0.2231 | ✓ | Mars apsidal = 8H/35 | `[3-term]` Earth.Axial(104) - Mercury.ICRF(93) + Saturn.Obliq(24) | (no Berger) |
+| 35 | 76.644 | 0.2231 | ✓ | Earth.Axial(104) − Mercury.ICRF(93) + Saturn.Obliq(24) (3... | `[3-term]` Earth.Axial(104) - Mercury.ICRF(93) + Saturn.Obliq(24) | (no Berger) |
 | 38 | 70.593 | 0.5379 |  | s₈−s₃ Neptune-Earth nodal | `[3-term]` Earth.Axial(104) - Venus.Obliq(110) + Jupiter.Ecc(44) | **PLANET ≠** |
 | 39 | 68.783 | 0.3702 | ✓ | s₅−s₃ Earth nodal | `[3-term]` Earth.Axial(104) - Jupiter.Axial(21) - Jupiter.Ecc(44) | **MECH ≠** |
 | 48 | 55.886 | 0.2065 | ✓ | s₇−s₆ Uranus-Saturn nodal | `[3-term]` Earth.Axial(104) + Jupiter.Ecc(44) - Neptune.Obliq(100) | **PLANET ≠** |
 | 50 | 53.651 | 0.1151 | ✓ | g₆−g₅ Saturn-Jupiter ecc | `[3-term]` Earth.Axial(104) + Mercury.Peri_ecl(11) - Jupiter.ICRF(65) | **PLANET ≠** |
-| 53 | 50.614 | 0.0556 | ✓ | Mars Ecc cycle = 8H/53 | `[3-term]` Earth.Axial(104) + Venus.AscNode(1) - Mars.Ecc(52) | (no Berger) |
+| 53 | 50.614 | 0.0556 | ✓ | Mars.AscNode(64) − Uranus.AscNode(11) s-beat (close to Ma... | `[3-term]` Earth.Axial(104) + Venus.AscNode(1) - Mars.Ecc(52) | (no Berger) |
 | 65 | 41.270 | 0.3713 | ✓ | k+s₃ Earth obliquity (Berger 41k) | `[2-term diff]` Earth.Axial(104) - Jupiter.Peri_ecl(39) | **PLANET ≠** |
 | 66 | 40.644 | 0.2786 |  | obliquity-band arithmetic-mean (Round 2 C10: EPICA CO₂ ra... | `[3-term]` Earth.Axial(104) - Jupiter.Ecc(44) + Saturn.Axial(6) | (no Berger) |
 | 68 | 39.449 | 0.1072 | ✓ | k+s₄ Berger Mars obliquity sub-peak | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) + Jupiter.Obliq(16) | **PLANET ≠** |
@@ -107,7 +107,7 @@ _**LR04 4σ peak**_
 
 _**LR04 4σ peak**_
 
-- **Berger / secular theory:** s₅−s₁ Jupiter-Mercury nodal / Uranus AscNode = 8H/12
+- **Berger / secular theory:** s₅−s₁ Jupiter-Mercury nodal
 - **Solar-system family matches** (3 families, 4 total combos):
   - `[g-beat]` Mars(36)-Uranus(24)
   - `[s-beat]` Mercury(9)+Neptune(3)
@@ -120,7 +120,7 @@ _**LR04 4σ peak**_
   4. `[3-term]` Earth.Obliq(64) - Venus.Axial(91) + Jupiter.Peri_ecl(39)  · score = 23
   5. `[3-term]` Earth.Obliq(64) - Jupiter.Obliq(16) - Saturn.AscNode(36)  · score = 21
   - _… 49 more combos in JSON (full ranked list)_
-- **3-step status:** **PLANET ≠** — Berger names jupiter, mercury, uranus; our top-1 names Venus.
+- **3-step status:** **PLANET ≠** — Berger names jupiter, mercury; our top-1 names Venus.
 
 ### n = 14   ·   T = 191.610 kyr   ·   amp = 0.1000
 
@@ -298,7 +298,7 @@ _**LR04 4σ peak**_
 
 _**LR04 4σ peak**_
 
-- **Berger / secular theory:** Mars apsidal = 8H/35
+- **Berger / secular theory:** Earth.Axial(104) − Mercury.ICRF(93) + Saturn.Obliq(24) (3-term beat; close to Mars apsidal at 8H/36)
 - **Solar-system family matches** (2 families, 4 total combos):
   - `[g-beat]` Mercury(11)+Uranus(24)
   - `[g-beat]` Jupiter(39)-Neptune(4)
@@ -384,7 +384,7 @@ _**LR04 4σ peak**_
 
 _**LR04 4σ peak**_
 
-- **Berger / secular theory:** Mars Ecc cycle = 8H/53
+- **Berger / secular theory:** Mars.AscNode(64) − Uranus.AscNode(11) s-beat (close to Mars Ecc cycle at 8H/52)
 - **Solar-system family matches** (1 families, 1 total combos):
   - `[s-beat]` Mars(64)-Uranus(11)
 - **Earth-planet beat candidates (top 5):**
@@ -621,16 +621,4 @@ _(subthreshold in LR04 full record)_
   5. `[3-term]` Earth.Axial(104) + Jupiter.ICRF(65) + Uranus.Obliq(16)  · score = 29
   - _… 21 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names venus; our top-1 names Jupiter.
-
----
-
-## Related Documents
-
-| Document | Purpose |
-|----------|---------|
-| [90 - Milankovitch Language](90-milankovitch-language.md) | Framework primer (Berger / Laskar eigenmode notation) |
-| [91 - Milankovitch Evidence](91-milankovitch-evidence.md) | Empirical 32-integer L1 fit (Test L surfaced the 6 precession-band sidebands) |
-| [92 - Climate Formula](92-climate-formula.md) | L1 + L2 + L3 architecture; canonical 32-integer set documented |
-| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Direct planet cycles (Mars Axial = 8H/16, Mercury Axial = 8H/9, etc.) referenced in attribution tables |
-| [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t) — integer divisor structure invariant, literal periods scale |
 

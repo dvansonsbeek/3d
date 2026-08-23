@@ -14,7 +14,7 @@ Solved for sin(tilt):
 This means for any body satisfying Law 4, its observed eccentricity-oscillation
 amplitude e_amp and its axial obliquity (sin of tilt) are linked. For the
 8 primary planets, both are independently observed and they fit Law 4 with
-the same universal K = 3.4149 × 10⁻⁶.
+the same universal K = 3.41433 × 10⁻⁶.
 
 For TNOs:
   - Eccentricity is observed (e_obs is a current snapshot)
@@ -42,7 +42,7 @@ from pathlib import Path
 
 OUT_PATH = Path(__file__).resolve().parent.parent / "data" / "tno-obliquity-predictions.json"
 
-K_CONSTANT = 3.4149e-6
+K_CONSTANT = 3.414333e-6  # eccentricityAmplitudeK (2026-08 refit; was 3.4149e-6)
 FIB_D = [1, 2, 3, 5, 8, 13, 21, 34, 55]
 
 # Known TNOs with orbital elements and (where available) measured rotation poles.
@@ -193,10 +193,13 @@ def main():
     print("    → Pluto does NOT follow Law 4. This is consistent with its 3:2 Neptune")
     print("    resonance (its dynamics dominated by Neptune coupling, not by Law 4).")
     print()
-    print("  • TESTABLE PREDICTION: if a 100-km classical-KBO (ρ ~ 2 g/cm³, m ~ 1e-12 M_sun)")
+    print("  • TESTABLE PREDICTION: if a ~124-km classical-KBO (m ~ 1e-12 M_sun at ρ ~ 2 g/cm³)")
     print("    at a = 45 AU with e = 0.05 has its axial obliquity measured, the framework")
     print(f"    predicts sin(tilt) ≈ {predict_sin_tilt(1e-12, 45, 0.05, 55):.3f}, i.e. tilt ≈ "
           f"{math.degrees(math.asin(min(1, predict_sin_tilt(1e-12, 45, 0.05, 55)))):.1f}°.")
+    print(f"    (A 100-km body at the same density is m ≈ 5.3e-13 M_sun → sin(tilt) ≈ "
+          f"{predict_sin_tilt(5.3e-13, 45, 0.05, 55):.2f} → tilt ≈ "
+          f"{math.degrees(math.asin(min(1, predict_sin_tilt(5.3e-13, 45, 0.05, 55)))):.0f}°.)")
     print()
 
     OUT_PATH.write_text(json.dumps({

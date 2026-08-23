@@ -303,7 +303,7 @@ def section_3_5():
     print("  Fibonacci-balanced primary planet — its (m, a, e) is structurally")
     print("  incompatible with Law 4. See doc 19 §5 for the framework-natural reading.")
     print()
-    K_const = 3.4149e-6
+    K_const = 3.414333e-6  # eccentricityAmplitudeK (2026-08 refit; was 3.4149e-6)
     sin_tilt = 0.5
 
     print(f"  Inputs: K = {K_const:.4e}, ⟨sin(tilt)⟩ = {sin_tilt}")

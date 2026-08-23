@@ -14,71 +14,71 @@
   "framework_residual_v_magnitude": 4.27e-05,
   "framework_closure_pct": 99.862,
   "baseline": {
-    "v_in_phase": 0.01542998098028195,
-    "v_anti_phase": 0.015472267741370742,
-    "gap": -4.22867610887917e-05,
-    "balance_pct": 99.86315959893507
+    "v_in_phase": 0.015430053939048421,
+    "v_anti_phase": 0.01547219785293234,
+    "gap": -4.214391388391789e-05,
+    "balance_pct": 99.86362186753375
   },
   "per_planet_contribution": {
     "Mercury": {
       "sigma_relative_mass": 1e-07,
-      "sigma_gap": 2.2013242546809502e-13,
-      "sigma_balance_pct": 7.123508306819493e-10,
-      "pct_of_residual": 5.155326123374591e-07
+      "sigma_gap": 2.2013243008273659e-13,
+      "sigma_balance_pct": 7.123507748385562e-10,
+      "pct_of_residual": 5.155326231445821e-07
     },
     "Venus": {
       "sigma_relative_mass": 1e-07,
-      "sigma_gap": 6.338431608568685e-14,
-      "sigma_balance_pct": 2.0511230964649674e-10,
-      "pct_of_residual": 1.4844102127795515e-07
+      "sigma_gap": 6.338302793173712e-14,
+      "sigma_balance_pct": 2.0510812078809488e-10,
+      "pct_of_residual": 1.4843800452397449e-07
     },
     "Earth": {
       "sigma_relative_mass": 3e-09,
-      "sigma_gap": 2.2997394596117547e-14,
-      "sigma_balance_pct": 7.441980939077632e-11,
-      "pct_of_residual": 5.3858066969830324e-08
+      "sigma_gap": 2.299773718808039e-14,
+      "sigma_balance_pct": 7.442091062777626e-11,
+      "pct_of_residual": 5.385886929292832e-08
     },
     "Mars": {
       "sigma_relative_mass": 1e-07,
-      "sigma_gap": 2.1968527058091604e-12,
-      "sigma_balance_pct": 7.109038327912564e-09,
-      "pct_of_residual": 5.144854111965246e-06
+      "sigma_gap": 2.201177308501025e-12,
+      "sigma_balance_pct": 7.123032079727723e-09,
+      "pct_of_residual": 5.154981987121839e-06
     },
     "Jupiter": {
       "sigma_relative_mass": 1e-08,
-      "sigma_gap": 3.974369702914454e-11,
-      "sigma_balance_pct": 1.2861101917575592e-07,
-      "pct_of_residual": 9.307657383874599e-05
+      "sigma_gap": 3.974363010194223e-11,
+      "sigma_balance_pct": 1.2861078982035812e-07,
+      "pct_of_residual": 9.307641710056728e-05
     },
     "Saturn": {
       "sigma_relative_mass": 3e-06,
-      "sigma_gap": 2.3167892076337205e-08,
-      "sigma_balance_pct": 7.497154101961469e-05,
-      "pct_of_residual": 0.05425735849259298
+      "sigma_gap": 2.3167787426667914e-08,
+      "sigma_balance_pct": 7.497119492334224e-05,
+      "pct_of_residual": 0.054257113411400264
     },
     "Uranus": {
       "sigma_relative_mass": 0.0005,
-      "sigma_gap": 1.426374295617593e-06,
-      "sigma_balance_pct": 0.004615762135841448,
-      "pct_of_residual": 3.340455024865557
+      "sigma_gap": 1.4263743684435048e-06,
+      "sigma_balance_pct": 0.0046157619129025855,
+      "pct_of_residual": 3.340455195418044
     },
     "Neptune": {
       "sigma_relative_mass": 0.0005,
-      "sigma_gap": 4.3327064113905196e-07,
-      "sigma_balance_pct": 0.0014020683253237374,
-      "pct_of_residual": 1.0146853422460234
+      "sigma_gap": 4.3327058739615405e-07,
+      "sigma_balance_pct": 0.001402068012107096,
+      "pct_of_residual": 1.0146852163844355
     }
   },
   "combined": {
-    "sigma_gap": 1.487826004367131e-06,
-    "sigma_balance_pct": 0.004814620507939398,
-    "pct_of_residual": 3.4843700336466767
+    "sigma_gap": 1.4878260570082467e-06,
+    "sigma_balance_pct": 0.004814620199924533,
+    "pct_of_residual": 3.484370156927978
   },
   "residual_split": {
     "framework_residual_v": 4.27e-05,
-    "mass_uncertainty_v": 1.487826004367131e-06,
-    "minor_body_v_implied": 4.267407144602831e-05,
-    "minor_body_N_implied": 624.6434209881061
+    "mass_uncertainty_v": 1.4878260570082467e-06,
+    "minor_body_v_implied": 4.267407144419299e-05,
+    "minor_body_N_implied": 624.8509005372521
   },
   "rng_seed": 20260522
 }
