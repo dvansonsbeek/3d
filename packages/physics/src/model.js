@@ -867,40 +867,64 @@ export function assembleModel(C, F) {
     return eccentricityAt(year) + (eccentricityBase / 2) * (cos3 - cos3J2000);
   };
   const sunMeanLongitudeDegAt = (() => {
-    const Y_LO = -3000, Y_HI = 3000, STEP = 10;
-    /** @type {Float64Array|null} */
-    let cum = null;
+    // SW PHASE B — the CLOSED FORM on the integrated lattice phase
+    // (supersedes the E5 ±3,000-yr trapezoid table; valid at EVERY epoch,
+    // no table, no domain window). drift = D_smooth + Σₖ D_k + D_torque:
+    //  · D_smooth — the deep chain's smooth SI tropical-year physics
+    //    (tropicalYearDaysBase × LOD), two-point trapezoid: the same
+    //    structure the scene twin uses, so the scene δ stays bounded.
+    //  · Each oscillatory term integrates ANALYTICALLY: the antiderivative
+    //    of cos/sin on the integrated phase is (H/2πk)·[sin/−cos] — the H
+    //    drift lives in the phase itself; the amplitude factor uses H_J2000
+    //    (ppm-class difference, negligible).
+    //  · THE REBASE (E5's corpus-preferred J2000 rate anchor) is applied
+    //    PER HARMONIC as a SIN-SATURATED ramp, (H/2πk)·sin(Δφₖ): equal to
+    //    the linear rebase for |Δφₖ| ≪ 1 (the corpus era) and bounded by
+    //    the harmonic's own period beyond — extending a linearized local
+    //    slope to deep time would be the fitted-linear-slope trap. Every
+    //    quantity is derived; zero new constants; each component and its
+    //    slope vanish at year 2000 by construction (the drift-only
+    //    property is exact, not tabulated).
+    const RATE_LIN = sunTropicalRateDegPerCy / 100;              // deg / SI yr
     const precessionP0DegPerYr = 13 * 360 / H;
     const tanEps = Math.tan(earthtiltMean * Math.PI / 180);
-    /** E5 — the two-component obliquity excursion, radians, integrated phase.
-     * @param {number} year @returns {number} */
-    const obliquityExcursionRad = (year) => (
-      -earthInclAmplitude * Math.cos(phaseRadians(balancedYear, year, 3))
-      + earthInclAmplitude * Math.cos(phaseRadians(balancedYear, year, 8))
-    ) * Math.PI / 180;
+    const A_RAD = earthInclAmplitude * Math.PI / 180;
     /** @param {number} year @returns {number} */
-    const rateSIYr = (year) => 360 * (365.25 * 86400)
-      / (tropicalYearDirectDays(year)
-        * (deepLod.lodSecondsAtAge(yearToTMa(year)) ?? meanLengthOfDay))
-      - precessionP0DegPerYr * tanEps * obliquityExcursionRad(year);
+    const rateSmooth = (year) => 360 * (365.25 * 86400)
+      / (tropicalYearDaysBase(year)
+        * (deepLod.lodSecondsAtAge(yearToTMa(year)) ?? meanLengthOfDay));
+    /** @type {{rateSm0: number, ph0: Map<number, number>}|null} */
+    let anchor = null;
     return /** @param {number} year @returns {number} */ (year) => {
-      if (cum === null) {
-        const n = (Y_HI - Y_LO) / STEP + 1;
-        cum = new Float64Array(n);
-        const ref = rateSIYr(2000);
-        let prev = rateSIYr(Y_LO) - ref;
-        for (let i = 1; i < n; i++) {
-          const next = rateSIYr(Y_LO + i * STEP) - ref;
-          cum[i] = cum[i - 1] + 0.5 * (prev + next) * STEP;
-          prev = next;
-        }
-        const at2000 = cum[(2000 - Y_LO) / STEP];
-        for (let i = 0; i < n; i++) cum[i] -= at2000;
+      if (anchor === null) {
+        const ph0 = new Map();
+        for (const [k] of F.TROPICAL_YEAR_HARMONICS) ph0.set(k, phaseRadians(balancedYear, 2000, k));
+        for (const k of [3, 8]) if (!ph0.has(k)) ph0.set(k, phaseRadians(balancedYear, 2000, k));
+        anchor = { rateSm0: rateSmooth(2000), ph0 };
       }
-      const x = (Math.min(Math.max(year, Y_LO), Y_HI) - Y_LO) / STEP;
-      const i = Math.min(Math.floor(x), cum.length - 2);
-      const drift = cum[i] + (x - i) * (cum[i + 1] - cum[i]);
-      return sunL0Deg + sunTropicalRateDegPerCy * (year - 2000) / 100 + drift;
+      const dy = year - 2000;
+      // smooth deep physics (two-point trapezoid; exact 0 at 2000)
+      let drift = 0.5 * (rateSmooth(year) - anchor.rateSm0) * dy;
+      // year-harmonic ripple: rate ≈ −(RATE_LIN/T̄)·h(y); antiderivative +
+      // sin-saturated per-harmonic rebase
+      const HK = H / (2 * Math.PI);
+      for (const [k, sK, cK] of F.TROPICAL_YEAR_HARMONICS) {
+        const ph = phaseRadians(balancedYear, year, k);
+        const ph0 = /** @type {number} */ (anchor.ph0.get(k));
+        const scale = -(RATE_LIN / meanSolarYearDays) * (HK / k);
+        const anti = (-sK) * (Math.cos(ph) - Math.cos(ph0)) + cK * (Math.sin(ph) - Math.sin(ph0));
+        const h0 = sK * Math.sin(ph0) + cK * Math.cos(ph0);
+        drift += scale * (anti - h0 * Math.sin(ph - ph0));
+      }
+      // torque (E5): rate = −p₀·tanε·δε, δε = A(−cos φ₃ + cos φ₈); same
+      // antiderivative + per-component sin-saturated rebase
+      for (const [k, sgn] of [[3, -1], [8, 1]]) {
+        const ph = phaseRadians(balancedYear, year, k);
+        const ph0 = /** @type {number} */ (anchor.ph0.get(k));
+        const scale = -precessionP0DegPerYr * tanEps * A_RAD * sgn * (HK / k);
+        drift += scale * ((Math.sin(ph) - Math.sin(ph0)) - Math.cos(ph0) * Math.sin(ph - ph0));
+      }
+      return sunL0Deg + sunTropicalRateDegPerCy * dy / 100 + drift;
     };
   })();
 

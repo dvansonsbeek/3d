@@ -717,6 +717,16 @@ function _jdFromPosTools(pos) {
 // convention). This engine's TWO former inline copies (moveModel + the
 // fast animator) both delegate through this lazy factory.
 const { createSunLongitudeCorrection } = require('@essrt/physics/sun/longitude-correction');
+// SW-1 EXPERIMENT (scene-wheel Sun unification): E5_WHEEL_SUN=1 makes the
+// moveModel Sun node ride the CERTIFIED tier Sun via one δ term (see the
+// moveModel sun block); computeSunPositionFast is deliberately untouched
+// (the Step-6a fit instrument — SW-0 measured the fits invariant anyway).
+const _E5_WHEEL_SUN = process.env.E5_WHEEL_SUN !== '0';   // default ON (mirrors the browser flag); E5_WHEEL_SUN=0 restores legacy
+let _e5TierM = null;
+function _e5Tier() {
+  if (!_e5TierM) _e5TierM = require('@essrt/physics').createModel();
+  return _e5TierM;
+}
 let _sunLonCorrM = null;
 function _sunLonCorr() {
   if (!_sunLonCorrM) {
@@ -1190,6 +1200,17 @@ function moveModel(graph, pos) {
     } else {
       θ = def.speed * pos - def.startPos * d2r;
     }
+    // SW-1 EXPERIMENT (E5_WHEEL_SUN=1): the wheel Sun rides the CERTIFIED
+    // tier Sun via ONE δ term ADDED ON TOP of the untouched legacy stack:
+    //   δ(jd) = λ_certified(jd) − λ_twin(jd)
+    // where λ_twin = _frameworkSunLon, the validated analytic reproduction
+    // of this scene's own Sun (UT clock, deep-time midpoint mSY, full
+    // Kepler EoC — 0.08° fidelity at Y+20000). The legacy geometry (split
+    // ellipse: parent center-offset + partial EoC − fitted correction)
+    // stays byte-identical, so δ shifts the WORLD longitude by exactly the
+    // certified-vs-twin difference — a full-EoC replacement was measured
+    // to double-count the parents' geometric ellipse share (~e·sin M, 1°).
+    const _e5SunNode = _E5_WHEEL_SUN && nodes === graph.sunNodes;
     if (C.useVariableSpeed && def.eccentricity && def.perihelionPhaseJ2000 !== undefined) {
       let e;
       if (def._eccentricityKey && dynEcc[def._eccentricityKey] !== undefined) {
@@ -1239,8 +1260,38 @@ function moveModel(graph, pos) {
       // 9-1 S-P8: the filtered harmonic stack lives ONCE in @essrt/physics/
       // sun/longitude-correction (J2000-fixed deps — the fitted convention).
       // Recover JD via epoch-consistent mSY so pos→jd round-trip is exact.
-      const jd = _jdFromPosTools(pos);
-      θ -= _sunLonCorr().correctionDegAt(jd) * d2r;
+      θ -= _sunLonCorr().correctionDegAt(_jdFromPosTools(pos)) * d2r;
+    }
+    if (_e5SunNode) {
+      // SW-1 (adopted form): δ = λ_certified − λ_twin, added on top of the
+      // untouched legacy stack. MEASURED: in-window wheel−certified drops
+      // to ~2.6″ annual sd; deep time collapses from 1,000–6,000″ to a
+      // ≤~100″ annual residue (the fitted correction's 365.25-day axis
+      // dephasing vs the true year — bounded, visually invisible against
+      // the Sun's 32′ disc; the exact-cancellation variant traded it for
+      // an in-window error and was reverted — see the SW campaign record).
+      // CLOCK-CONVENTION WINDOW (both endpoints DERIVED, not fitted —
+      // measured in the SW Phase-B analysis): the certified Sun lives on
+      // the TT clock (the corpus-validated E4/E5 convention); this scene's
+      // wheels are deliberately UT (see _frameworkSunLon's header). The
+      // window is the transition between the two clock regimes:
+      //   3,000 yr  = the certification boundary — where eclipse truth
+      //               (the ancient corpus) ends;
+      //   20,000 yr = where a TT-clock Sun becomes ~10°+ inconsistent
+      //               with the UT scene (rate·ΔT — the twin's own
+      //               documented 12° at Y+20000).
+      // Alternatives measured and rejected: a UT-assembled δ loses the
+      // corpus-era accuracy (0.19° at −135); no window loses the deep
+      // display consistency. The cos² shape only avoids a visible jump.
+      const _jdE5 = _jdFromPosTools(pos);
+      const _ayE5 = Math.abs(2000 + (_jdE5 - C.j2000JD) / 365.25 - 2000);
+      const _wE5 = _ayE5 <= 3000 ? 1
+        : _ayE5 >= 20000 ? 0
+        : Math.cos((_ayE5 - 3000) / (20000 - 3000) * Math.PI / 2) ** 2;
+      if (_wE5 > 0) {
+        const _dE5 = _e5Tier().eclipse.sunLonDegAtJD(_jdE5) - _frameworkSunLon(_jdE5);
+        θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * d2r;
+      }
     }
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
     // Meeus formulas require T from standard J2000.0 (JD 2451545.0) in Julian centuries (36525 days)

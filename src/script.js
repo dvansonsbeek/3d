@@ -88,6 +88,7 @@ const useVariableSpeed           = K.foundational.useVariableSpeed;   // Equatio
 const debugOn                    = false;  // Debug button flag (developer only)
 let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge (~L7080)
 let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction (Phase Z-B) — rationale ~L7066
+let   E5_WHEEL_SUN_ENABLED       = true;   // SW-1: wheel Sun rides the certified E5 tier Sun via δ = λ_cert − λ_twin (see moveModel sun block)
 let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 8H/1830 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
 let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research toggle) — rationale + associated constants ~L5039
 let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
@@ -54250,6 +54251,34 @@ function moveModel(pos) {
     // Subtract: model thinks Sun is at θ_raw, true λ is θ_raw − Δλ → rotate back.
     if (SUN_HARMONICS_ENABLED && obj === sun) {
       θ -= sunLongitudeCorrection(o.julianDay) * (Math.PI / 180);
+    }
+    // SW-1 (mirrors tools/lib/scene-graph.js moveModel): the wheel Sun rides
+    // the CERTIFIED tier Sun via ONE δ term on top of the untouched legacy
+    // stack: δ = λ_certified − λ_twin (_frameworkSunLon, the validated
+    // analytic reproduction of this scene's own Sun). Measured engine-side:
+    // in-window −2..+7″ (annual sd 2.6″); deep time collapses 1,000–6,000″
+    // → ≤~180″ bounded annual (the fitted correction's 365.25-day axis
+    // dephasing vs the true year — invisible vs the 32′ solar disc). A
+    // full-EoC replacement double-counts the parents' geometric-split
+    // ellipse share (~1°) — do not "simplify" this into the EoC block.
+    // CLOCK-CONVENTION WINDOW (mirrors the engine; both endpoints DERIVED,
+    // not fitted): the certified Sun lives on the TT clock, this scene's
+    // wheels are deliberately UT (_frameworkSunLon header). 3,000 yr = the
+    // certification boundary (where eclipse truth ends); 20,000 yr = where
+    // a TT-clock Sun becomes ~10°+ inconsistent with the UT scene (the
+    // twin's documented 12° at Y+20000). Measured alternatives fail: a
+    // UT-assembled δ costs 0.19° at −135; no window breaks the deep
+    // display. The cos² shape only avoids a visible jump.
+    if (E5_WHEEL_SUN_ENABLED && obj === sun) {
+      const _ayE5 = Math.abs((o.julianDay - j2000JD) / 365.25);
+      const _wE5 = _ayE5 <= 3000 ? 1
+        : _ayE5 >= 20000 ? 0
+        : Math.cos((_ayE5 - 3000) / (20000 - 3000) * Math.PI / 2) ** 2;
+      if (_wE5 > 0) {
+        if (_tierUmbraModel === null) _tierUmbraModel = createModel();
+        const _dE5 = _tierUmbraModel.eclipse.sunLonDegAtJD(o.julianDay) - _frameworkSunLon(o.julianDay);
+        θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * (Math.PI / 180);
+      }
     }
 
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude)
