@@ -489,7 +489,7 @@ section of the same gate measures the difference directly, on the TT axis
 bins ±40 yr, modern definitional baseline subtracted): a smooth secular
 drift reaching <!--v:lunarDrift800Minutes-->−3.2<!--/v--> min at the −750 era
 and vanishing toward the present — an effective
-Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.25<!--/v--> ″/cy² between the two
+Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.26<!--/v--> ″/cy² between the two
 theories. A re-reduction of the tablets with the framework's own Moon
 shifts each century's implied ΔT by exactly that drift, which converts
 the one-sided residual column above into sign-mixed, noise-class scatter:

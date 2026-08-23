@@ -37,7 +37,7 @@ The attribution is rock-solid — and the framework now agrees with it at the of
 
 ## Framework prediction at -135 Apr 15
 
-The certified eclipse chain computes the Sun via the E4 framework-native assembly (see the update at the top); the SCENE computes its wheel Sun via `moveModel`: linear tropical-year rate 2π/T_trop + Kepler equation of center (with framework's law-of-cosines eccentricity at H/16 perihelion phase) + `sunLongitudeCorrection` H-lattice harmonics (currently fit to 1900-2100). Moon position via Meeus Ch. 47 60-term polynomial. Earth ΔT from the L1-orbital-coupled α(t) tidal integrator (`meanDeltaTSecondsAtAge`).
+The certified eclipse chain computes the Sun via the E4/E5 framework-native assembly (see the update at the top). Since the SW campaign the SCENE's wheel Sun rides the SAME certified Sun through one δ term added on top of its legacy stack (δ = λ_certified − λ_twin, applied inside the clock-convention window — full weight in the corpus era, tapering off where a TT-clock Sun would clash with the deliberately-UT deep-time scene); the legacy stack underneath remains linear tropical-year rate + Kepler equation of center + the `sunLongitudeCorrection` harmonics, whose fit quality the display no longer depends on. Moon position via Meeus Ch. 47 60-term polynomial. Earth ΔT from the L1-orbital-coupled α(t) tidal integrator (`meanDeltaTSecondsAtAge`).
 
 Audit-26 result for -135 Apr 15 (documented UT 06:14):
 
@@ -55,7 +55,7 @@ The framework and the record agree on the eclipse UT to within 9 minutes, and th
 
 ## Root cause: Sun ecl_lon drift at antiquity
 
-**Pre-E4 attribution — historical.** This section documents the residual physics of the pre-E4 basis; since the E4 landing it applies only to the scene wheels' Sun (the certified eclipse chain carries the rate drift natively via the f(Y) year harmonics). The dominant contributor to the pre-E4 -135 residual was a **0.30° drift in the scene Sun's ecl_lon vs Meeus canonical** at year -135.
+**Pre-E4 attribution — historical.** This section documents the residual physics of the pre-E4 basis; since the E4 landing the certified eclipse chain carries the rate drift natively via the f(Y) year harmonics, and since the SW campaign the scene's displayed Sun rides the certified chain too (the raw wheel laws underneath remain linear-rate — the analysis below still describes THEM). The dominant contributor to the pre-E4 -135 residual was a **0.30° drift in the scene Sun's ecl_lon vs Meeus canonical** at year -135.
 
 Framework's Sun ecliptic longitude formula (implemented in `moveModel`) is:
 
@@ -305,7 +305,7 @@ inside the tablet's published totality window
 (`u2-dt-free-matcher.mjs`) — the framework's reduction and
 Stephenson's overlap. The theory-difference drift against ELP-class
 reductions is Δṅ ≈
-<!--v:lunarTheoryDriftDeltaNdot-->0.25<!--/v--> ″/cy² ([doc 102](102-gia-alpha-lunar-validation.md)).
+<!--v:lunarTheoryDriftDeltaNdot-->0.26<!--/v--> ″/cy² ([doc 102](102-gia-alpha-lunar-validation.md)).
 The scene umbra chain shares this accuracy class: with the
 series-injected Sun (both bodies from the certified of-date series;
 the scaffold Sun and its modern-calibration laws retired), the scene
