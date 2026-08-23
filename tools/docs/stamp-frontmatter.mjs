@@ -49,6 +49,8 @@ const HOLISTIC = process.argv.includes('--holistic');
 // ── The four HISTORICAL docs — explicit, justified, nothing by pattern ──────
 // (Phase 3 survey + read-based classification; everything else is current.)
 const HISTORICAL = new Set([
+  '30-anomaly-calculations.md',        // plan whose planet mean-anomaly design was rejected in code (2026-08 doc audit)
+  '34-j2000-calibration.md',           // implementation plan for a long-shipped feature (2026-08 doc audit)
   '61-optimization-execution-plan.md', // execution log of a finished campaign
   '69-optimization-baseline.md',       // explicitly a frozen before-snapshot
   '94-insolation-null-test.md',        // a completed null-test record

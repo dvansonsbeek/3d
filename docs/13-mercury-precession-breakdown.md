@@ -106,7 +106,7 @@ We use numerical integration (1000 steps) rather than series expansion because:
 | Perturber | α      | b₃/₂⁽¹⁾(α) |
 |-----------|--------|------------|
 | Venus     | 0.5352 | 3.036      |
-| Earth     | <!--v:mercurySemiMajor-->0.3871<!--/v--> | 1.576      |
+| Earth     | 0.3871 | 1.576      |
 | Mars      | 0.2541 | 0.864      |
 | Jupiter   | 0.0744 | 0.226      |
 | Saturn    | 0.0406 | 0.122      |

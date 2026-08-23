@@ -10,7 +10,7 @@ status: current
 ## Overview
 
 The Holistic Universe Model predicts the timing and position of all four cardinal
-points (VE, SS, AE, WS) using **24 harmonics** per cardinal point:
+points (VE, SS, AE, WS) using **23 harmonics + the ecc-braid/joint/derived term families** per cardinal point:
 5 Fibonacci fundamentals (H/3, H/5, H/8, H/13, H/16) plus 19 overtones from
 nonlinear interactions between the precession cycles.
 
@@ -35,7 +35,7 @@ The RA position requires **zero observations** — it is fully derived from mode
 | **AE** (Autumnal Equinox) | Dec crosses 0° descending | **0.6 min** | 2451810.304 (Sep 22, 19:18 UTC) |
 | **WS** (Winter Solstice) | Min declination | **1.0 min** | 2451900.067 (Dec 21, 01:37 UTC) |
 
-> **Scope note (ESSRT).** This document describes cardinal-point prediction within a single Earth Fundamental Cycle evaluated at J2000. The Fibonacci divisors (H/3, H/5, H/8, H/13, H/16, …) are scale-invariant L1 lattice structure — they remain integer divisors at any epoch. The literal year counts (<!--v:H-->335,317<!--/v-->; <!--v:earthPeriPeriod-->20,957<!--/v-->; mean year length `meanSolarYearDays`) and the 14,579-point harmonic fits are J2000-anchored: under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) and `meanSolarYearSeconds` evolve via Driver 1 (Earth-Moon tidal LOD growth) and Driver 2 (solar mass loss → Kepler), so the absolute timings would shift at deep time even though the harmonic structure does not. See [doc 20](20-constants-reference.md) for the J2000 → `meanSiderealYearSecondsAtAge` / `meanHAtAge` helper map.
+> **Scope note (ESSRT).** This document describes cardinal-point prediction within a single Earth Fundamental Cycle evaluated at J2000. The Fibonacci divisors (H/3, H/5, H/8, H/13, H/16, …) are scale-invariant L1 lattice structure — they remain integer divisors at any epoch. The literal year counts (<!--v:H-->335,317<!--/v-->; <!--v:earthPeriPeriod-->20,957<!--/v-->; mean year length `meanSolarYearDays`) and the full-cycle harmonic fits (335,318 rows per type, 1-year steps) are J2000-anchored: under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) and `meanSolarYearSeconds` evolve via Driver 1 (Earth-Moon tidal LOD growth) and Driver 2 (solar mass loss → Kepler), so the absolute timings would shift at deep time even though the harmonic structure does not. See [doc 20](20-constants-reference.md) for the J2000 → `meanSiderealYearSecondsAtAge` / `meanHAtAge` helper map.
 
 ---
 
@@ -63,7 +63,7 @@ and `baseRA` = 90° (SS), 270° (WS), 0° (VE), 180° (AE).
 - **Mean SS RA ≈ 86.85° = 5h 47m 22s** (at balanced year when all precession phases = 0)
 - **At J2000: SS ≈ 90°, WS ≈ 270°, VE ≈ 0°, AE ≈ 180°** (near current obliquity maximum)
 - **Range: 6.32°** (25.3 minutes of RA) oscillation over the full Earth Fundamental Cycle
-- **RMSE: 0.089°** (0.36 minutes of RA) — validated against 14,579 simulation data points
+- **RMSE: 0.089°** (0.36 minutes of RA) — validated against the full-cycle simulation data (335,318 rows per type)
 - **Zero fitted constants** — everything derived from earthRAAngle, A, and ε
 
 ### Physical structure
@@ -92,36 +92,34 @@ JD(year) = anchor + meanSolarYear × (year − 2000)
          + Σ harmonics(year − balanced) − Σ harmonics(2000 − balanced)
 ```
 
-The 24 harmonics per cardinal point consist of:
+The shipped cardinal-point model (the edge-trimmed 2026-08 refit) has
+FOUR term families per type — reading it as one harmonic array is the
+documented misreading:
 
-| Category | Harmonics | Physical origin |
+| Family | Content | Physical origin |
 |----------|-----------|-----------------|
-| **Fibonacci fundamentals** | H/3, H/5, H/8, H/13, H/16 | Direct precession chain |
-| **Second harmonics** | H/6, H/10, H/32 | Overtones of fundamentals |
-| **Cross-couplings** | H/9, H/11, H/14, H/17, H/19, H/22, H/24, H/27 | Interaction between precession cycles |
-| **Higher-order** | H/29, H/30, H/35, H/38, H/40, H/43, H/48 | Third-order and finer corrections |
+| `CARDINAL_POINT_HARMONICS` | 23 [div, sin, cos] terms per type; divisors 2–15, 17, 18, 19, 22, 23, 24, 29, 40, 48 | The precession-chain residual after the families below |
+| `CARDINAL_POINT_ECC_TERMS` | e(t)ⁿ·sin(nM) braid terms | **The equation-of-center modulation** — deliberately NOT the [div, sin, cos] shape (see below) |
+| `CARDINAL_POINT_JOINT_TERMS` | 26 counter-rotating joint sidebands (§10g) | order·λ_X − 2π·div·c — the sign is load-bearing |
+| `CARDINAL_POINT_DERIVED` | lincoef + H(c) — runtime uses verbatim | The deep-time linear/lattice base |
 
-The overtones arise from nonlinear interactions between the precession cycles.
+### The equation-of-center content — where it really lives
 
-### Amplitude structure across cardinal points
-
-The 5 Fibonacci fundamental amplitudes are nearly identical for all 4 types (~1.49d for H/3,
-~1.49d for H/8). The key difference is in the **H/16 phase**, which rotates exactly 90°
-between consecutive cardinal points:
-
-| Type | H/16 phase | Physical meaning |
-|------|-----------|-----------------|
-| **SS** | sin-dominated (+1.77, +0.09) | Perihelion near WS → Sun fast at SS |
-| **VE** | cos-dominated (−0.11, +1.78) | 90° shifted from SS |
-| **AE** | −cos-dominated (+0.07, −1.79) | Anti-phase to VE |
-| **WS** | −sin-dominated (−1.81, −0.09) | Anti-phase to SS |
-
-This 90° phase rotation is the **equation of center rotating with perihelion precession**.
-When perihelion is near a cardinal point, the Sun moves fastest there, shifting the timing.
+Earlier fit generations represented the EoC timing modulation as an
+H/16-family sinusoid whose phase rotated 90° between cardinal points
+(perihelion near a cardinal point → the Sun fast there → timing
+shifted; amplitude ±1.77–1.81 d). **That physical insight stands, but
+the shipped representation changed**: the modulation is carried by the
+`CARDINAL_POINT_ECC_TERMS` braid — `e(t)ⁿ·sin(nM)` on the true
+eccentricity and anomaly, not a fixed-amplitude lattice sinusoid. The
+code warns explicitly (`src/script.js`, the ECC_TERMS block): *"reading
+them as H/16 and H/32 sinusoids would be wrong by the whole braid,
+~1.78 d"* — the divisor 16 does not even appear in the shipped
+harmonic set above.
 
 ### RMSE by cardinal point
 
-| Type | 5 Fibonacci | 24 Harmonics | Improvement |
+| Type | 5 Fibonacci | Full shipped model | Improvement |
 |------|-------------|-------------|-------------|
 | SS | 107 min | **1.0 min** | 107× |
 | VE | 154 min | **0.05 min** | 3,080× |
@@ -150,7 +148,7 @@ Mean of 4: 365.24218 days (≈ meanSolarYearDays = 365.24219).
 
 ### Derivation path
 
-The JD coefficients were extracted from 14,579 simulation data points (23-year steps) by:
+The JD coefficients were extracted from the full-cycle simulation data (335,318 rows per type, 1-year steps) by:
 1. Fitting a linear trend: slope = `meanSolarYearDays` (fixed, not fitted)
 2. Computing residuals: δJD = JD_actual − JD_linear
 3. Greedy forward selection: starting with 5 Fibonacci fundamentals, then adding overtones
@@ -164,10 +162,13 @@ The JD coefficients were extracted from 14,579 simulation data points (23-year s
 ### Why the amplitudes differ from the mean tropical year harmonics
 
 The existing `TROPICAL_YEAR_HARMONICS` in the model have much smaller amplitudes
-(H/8: 1.82s, H/3: 0.69s, H/16: 0.03s). This is because those harmonics describe
+(the shipped 12-term set: H/8: 19.28 s, H/3: 7.23 s, H/16: 0.55 s — in the
+exact 8:3 amplitude ratio for H/8:H/3, the signature of one underlying
+equinox displacement). This is because those harmonics describe
 the **4-point mean tropical year** (averaged over all four cardinal points), which
-cancels the variable-speed effect. The cardinal point timing formula describes a **single
-cardinal point**, which includes the full equation-of-center modulation.
+cancels most of the variable-speed effect. The cardinal point timing formula describes a **single
+cardinal point**, which includes the full equation-of-center modulation
+(days-scale, via the ecc-braid terms above).
 
 The ~98-second spread between cardinal point year lengths documented in
 [doc 11](11-length-day-year-formulas.md) manifests here as the H/16 amplitude of
@@ -180,9 +181,9 @@ The ~98-second spread between cardinal point year lengths documented in
 | Property | Meeus `solarLongitudeDeg()` | Fibonacci harmonics |
 |----------|---------------------------|---------------------|
 | Valid range | ±2,000 years (safely) | ±167,500 years (full H) |
-| Method | Polynomial (T, T², T³) | Fourier (24 harmonics) |
+| Method | Polynomial (T, T², T³) | Fourier (23 harmonics + term families) |
 | Cardinal points | SS only (separate formulas for others) | All 4 with same structure |
-| Parameters | 6 polynomial coefficients | RA: 0 fitted; JD: 48 fitted + 1 anchor per type |
+| Parameters | 6 polynomial coefficients | RA: 0 fitted; JD: 46 harmonic coefficients + the ecc-braid/joint/derived families + 1 anchor per type |
 | Physical basis | Empirical fit to modern data | Derived from precession hierarchy |
 | Accuracy at J2000 | ±1 second | JD: exact (anchored at observed value) |
 | Accuracy over full H | Diverges beyond ±5,000 yr | RA: 0.089° RMSE; JD: 0.05–1.0 min RMSE |
@@ -259,8 +260,8 @@ be at 5h 35m RA (the minimum).
 Cardinal point observations generated from the headless scene-graph (no browser needed):
 - Script: `tools/fit/export-solar-measurements.js` (single-pass, configurable step size)
 - File: [../data/02-solar-measurements.csv](../data/02-solar-measurements.csv)
-- ~87,000 data points (6 types × ~14,579 steps) spanning one full Earth Fundamental Cycle
-- Step: stepYears (from model-parameters.json), grid-aligned
+- 2,011,908 data points (6 types × 335,318 rows) spanning one full Earth Fundamental Cycle
+- Step: 1 year (single-pass export)
 - Columns: Type, Model Year, JD, RA (°), Obliquity (°), World Angle (°), Distance (AU)
 - Detection: SS/WS by max/min declination (parabolic interpolation), VE/AE by declination
   zero crossing (linear interpolation)
@@ -284,9 +285,9 @@ All implementations return exact J2000 anchor values by construction. Legacy `SO
 | Constant | Value | Origin |
 |----------|-------|--------|
 | `CARDINAL_POINT_ANCHORS` | 4 × JD values | Astronomical observation (J2000 cardinal points) |
-| `CARDINAL_POINT_HARMONICS` | 4 × 24 × [div, sin, cos] | Fitted from 14,579 simulation observations per type |
+| `CARDINAL_POINT_HARMONICS` | 4 × 23 × [div, sin, cos] (+ ECC_TERMS / JOINT_TERMS / DERIVED families) | Fitted from 335,318 simulation observations per type |
 | `SOLSTICE_OBLIQUITY_MEAN` | 23.45326° | **Derived at startup** from Pythagorean tilt model (zero fitting) |
-| `SOLSTICE_OBLIQUITY_HARMONICS` | 16 × [div, sin, cos] | Fitted from 14,579 SS observations |
+| `SOLSTICE_OBLIQUITY_HARMONICS` | 16 × [div, sin, cos] | Fitted from 335,318 SS observations |
 | `earthInvPlaneInclinationMean` | <!--v:earthInclMean-->1.48113<!--/v-->° | Model parameter (mean orbital plane tilt to invariable plane) |
 | `earthRAAngle` | 1.25478° | Scene graph parameter (perihelion precession tilt) |
 | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63605<!--/v-->° | Model parameter (inclination oscillation) |

@@ -23,7 +23,8 @@ theta += 2 * e * sin(M) + 1.25 * e^2 * sin(2M)
 Where `e` is the eccentricity and `M` is the mean anomaly from perihelion.
 
 Gated by `useVariableSpeed` flag. When false, all orbits use constant angular
-velocity and `correctionSun` should be set to 0.913280.
+velocity (the historical `correctionSun = 0.913280` companion value for that
+mode predates the current `correctionSunDeg` anchor and is no longer used).
 
 ---
 
@@ -321,6 +322,21 @@ Per-planet fractions and implementation details:
 
 ## Sun Longitude Harmonics — Phase Z-B Correction Layer
 
+> **SUPERSEDED ON THE DISPLAY PATH (SW campaign).** Since the
+> scene-wheel Sun unification, the displayed Sun's accuracy is owned by
+> the CERTIFIED framework-native Sun (E4/E5: L₀ + mean tropical rate +
+> the f(Y) year-harmonic drift + the derived cos-ε torque term; e = the
+> H/16 law + the derived H/3 coupling; ZERO fitted sun constants;
+> 0.95″ vs JPL) — the wheel rides it through a δ overlay
+> (`E5_WHEEL_SUN_ENABLED`, the moveModel sun block, inside the
+> clock-convention window). The Z-B correction below is still
+> EVALUATED underneath (the δ is defined against the legacy stack), but
+> it no longer determines the displayed Sun's accuracy, and Meeus
+> Ch. 25 is no longer the certified reference — it survives only as the
+> eclipse finders' un-injected default. This section remains the record
+> of what Z-B is and why it exists (the in-window absorber of the
+> geometric-split wheel's annual imperfection).
+
 ### What it adds
 
 Layered **on top of** the EoC formula above, the Sun Longitude Harmonics
@@ -362,8 +378,9 @@ divisor type, applying ONLY:
 
 Any other divisor is **silently skipped** at runtime — this is a design-rule
 safeguard. The legacy `[168, 0.0048, -0.0050]` term (period 1996 yr,
-`gcd(168, H) = 1`) remains in the JSON but is filtered out automatically
-because divisor 168 doesn't match any allowed category.
+`gcd(168, H) = 1`) was removed from the JSON entirely during the Phase-9
+Espenak-swap coefficient regeneration; the runtime filter remains as the
+safeguard for any future out-of-lattice term.
 
 The design rule (see [tools/fit/README.md](../tools/fit/README.md) "Design
 rule: only cyclic, lattice-compatible corrections"): every correction
@@ -378,12 +395,13 @@ After the runtime filter:
 
 | Divisor | Period | sin coefficient | cos coefficient | Amplitude |
 |---:|---|---:|---:|---:|
-| <!--v:HPlain-->335317<!--/v--> | 1 yr | +0.076405 ° | +0.013550 ° | ~280" (dominant) |
-| 670634 | ½ yr | +0.002478 ° | +0.000226 ° | ~9" |
-| <!--v:threeH-->1,005,951<!--/v--> | ⅓ yr | +0.000033 ° | +0.000009 ° | ~0.1" |
-| ~~168~~ | ~~1996 yr~~ | ~~+0.004832 °~~ | ~~−0.004998 °~~ | ~~~25" — FILTERED OUT~~ |
+| <!--v:HPlain-->335317<!--/v--> | 1 yr | +0.076336 ° | +0.013429 ° | ~279" (dominant) |
+| 670634 | ½ yr | +0.002478 ° | +0.000221 ° | ~9" |
+| <!--v:threeH-->1,005,951<!--/v--> | ⅓ yr | +0.000034 ° | +0.000008 ° | ~0.1" |
 
-`SUN_LONGITUDE_MEAN = -0.001122 °` (~−4", the constant DC component from
+(The legacy 168-divisor row is gone from the JSON — see above.)
+
+`SUN_LONGITUDE_MEAN = -0.0018807 °` (~−6.8", the constant DC component from
 the smart J2000 anchor — small per the design rule "should be ≈ 0 in a
 well-formed model").
 
@@ -423,6 +441,11 @@ To disable for comparison:
   `SUN_HARMONICS_DISABLED=1` when invoking. Example:
   `SUN_HARMONICS_DISABLED=1 node tools/optimize.js baseline sun`
 
+Post-SW note: with the E5 δ overlay active (`E5_WHEEL_SUN_ENABLED` /
+`E5_WHEEL_SUN`), toggling Z-B alone no longer isolates the displayed
+Sun — the δ is defined against the legacy stack INCLUDING Z-B, so a
+clean A/B of the display requires toggling the δ overlay too.
+
 The toggle bypasses the entire correction; useful for measuring the
 correction's impact on any downstream consumer.
 
@@ -446,20 +469,29 @@ per `docs/hidden/lessons-learned-lunar-framework-native.md` Addendum 5
 (Path A2 lesson on drift proxies).
 
 The current 3-term active set (1 yr, ½ yr, ⅓ yr) is therefore the
-**complete H-lattice-compliant Sun correction available** in the modern
-window. Residual drift at ±1000 yr extremes (~161" RMS over the full
-range) is the framework's intrinsic long-term drift vs Meeus — not
-addressable without violating the design rule.
+complete correction available **within this fitted-harmonic family**.
+The ceiling was ultimately passed by a different route entirely: the
+E4/E5 certified Sun DERIVES the long-term drift (the f(Y) year
+harmonics + the cos-ε torque term) instead of fitting it, and the SW δ
+overlay carries that onto the display — see the supersession note at
+the top of this section. The residual drift vs Meeus quoted here
+(~161" RMS at ±1000 yr) described the pre-E4 state.
 
 ### Relationship to the EoC formula above
 
-The full Sun longitude computation now layers three corrections in order:
+The full Sun longitude computation now layers four terms in order:
 
 ```
 θ_kinematic    = base scene-graph rotation (constant rate × pos − startPos)
 θ_with_EoC     = θ_kinematic + 2·e·sin(M) + 1.25·e²·sin(2M)        ← EoC (this doc above)
 θ_with_harms   = θ_with_EoC − Δλ_harmonics(t)                       ← Phase Z-B
+θ_displayed    = θ_with_harms + w(t)·(λ_certified − λ_twin)         ← SW δ overlay (owns accuracy)
 ```
+
+The δ overlay (weight w(t) = 1 in the corpus era, tapering off at the
+clock-convention boundary) steers the world-frame Sun onto the
+certified E4/E5 chain; the three legacy layers below it are byte-
+identical to the pre-SW scene.
 
 The EoC correction captures the Kepler 2nd-law speed variation analytically
 to the precision allowed by the `eocEccentricity = 0.007753` value (derived

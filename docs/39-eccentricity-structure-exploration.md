@@ -166,7 +166,7 @@ Ten directions were explored in search of a universal eccentricity constant (ana
 
 ### The regression formula (exploratory, not a law)
 
-The best multivariate fit (5 parameters, R² = <!--v:meeusPearsonR-->0.9945<!--/v-->):
+The best multivariate fit (5 parameters, R² = 0.9945):
 
 ```
 e = χ × a^0.59 × m^(-0.48) × tilt^(-0.40) × i_amp^(-0.35) × T_prec^(-1.44)

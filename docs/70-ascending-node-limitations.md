@@ -7,6 +7,20 @@ status: current
 
 # Ascending Node Calculations: Limitations and JPL Discrepancy
 
+> **READ WITH THE 2026-04 NODE AUDIT.** This document predates the
+> `ascendingNodeCyclesIn8H` re-fit and analyses only the GEOCENTRIC
+> dΩ/dε appearance effect. The model has since shipped an
+> invariable-plane node model — per-planet integer rates −(8H)/N
+> (Me 9 / Ve 1 / Ma 64 / Ju 36 / Sa 36 / Ur 11 / Ne 3), jointly fit to
+> the JPL ecliptic-INCLINATION trends and matching all 7 fitted
+> planets' trend directions (docs 31–33, 54, 55). The "model doesn't
+> match JPL" comparison below concerns dΩ/dt of the geometric
+> appearance channel, a different quantity from the audited dI/dt
+> trends; the s₁–s₈ eigenfrequency framing in the closing section was
+> abandoned at the re-fit (doc 55 §4 note), and the Recommendations
+> below have been superseded by that work. Kept for the geometric
+> analysis, which remains valid.
+
 ## Overview
 
 This document describes the limitations of the current ascending node calculations in the Holistic Universe Model. The model calculates ascending node precession from a **geocentric** perspective, which produces values that differ significantly from JPL's published rates.

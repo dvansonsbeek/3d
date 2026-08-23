@@ -2,10 +2,22 @@
 docVersion: 1.0
 modelVersion: v11.0
 coefficients: sha256:17f2ead87bad401e
-status: current
+status: historical
 ---
 
 # J2000-Verified Ascending Nodes Implementation
+
+> **HISTORICAL — this is the original implementation PLAN for a feature
+> that has long shipped.** The step-by-step "add constants after line
+> 234" instructions and every line anchor refer to a ~2025-era
+> `script.js` and no longer resolve; the shipped implementation uses
+> the DYNAMIC per-planet inclinations (as the closing "Note on Dynamic
+> Inclinations" here anticipated, not the fixed S&S values in the
+> Step-3 listing) and the per-planet −(8H)/N node rates (docs 32/33),
+> not the generic `precessionYears` sketched below. For the as-built
+> node model see docs 31–33 and doc 54; for the J2000-verified
+> constants themselves see `tools/lib/constants.js`. Kept as the
+> calibration-methodology record.
 
 ## Overview
 

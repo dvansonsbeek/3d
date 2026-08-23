@@ -732,7 +732,7 @@ The 8H framework predicts that the next long-period climate eigenmode after 8H i
 | Relative difference | 3.1 % | model vs central |
 | Within published range? | **yes** | |
 
-**Verdict: POSITIVE.** The 13H eigenmode falls inside the Boulila 2018 empirical libration range with a 3.1 % central-estimate match. This is a quantitative cross-check against a completely independent paleoclimate result.
+**Verdict: POSITIVE on the period match.** The 13H eigenmode falls inside the Boulila 2018 empirical libration range with a 3.1 % central-estimate match — a quantitative cross-check against a completely independent paleoclimate result. Standing qualifier (doc 92 §8.4, R3-4): the mode's own coherence tests later failed (amp CV 42–50%, phase ≈ uniform-random), so 13H remains an investigated candidate, not a canonical framework cycle.
 
 Data: [data/milankovitch-13H-boulila-test.json](../data/milankovitch-13H-boulila-test.json).
 
@@ -1226,7 +1226,7 @@ This refines the carbon-cycle interpretation: **the silicate-weathering thermost
 
 Data: [data/milankovitch-8h-g4g3-carbon-cycle.json](../data/milankovitch-8h-g4g3-carbon-cycle.json).
 
-### 13.8 13H = 4.36 Myr is on the lattice AND carbon-amplified
+### 13.8 13H = 4.36 Myr — carbon-amplified (an eigenmode candidate, NOT an 8H-lattice divisor)
 
 A surprising additional finding from the same g₄−g₃ test: the **4.5-Myr Boulila 2018 secular-resonance libration period** (which matches the framework's **13H = 4.36 Myr** within 3.1%; see Test A §12.1) shows the **strongest δ¹³C/δ¹⁸O amplification of any cycle tested**:
 
@@ -1241,7 +1241,16 @@ Two independent observations now converge on the framework's 13H prediction:
 1. **Test A**: 13H = 4.36 Myr matches Boulila 2018's published libration period within 3.1% (cross-check against external scientific literature)
 2. **§13.8**: 4.5-Myr cycle is empirically strongly carbon-amplified in CENOGRID δ¹³C (F = 5.40, ratio 2.76 — highest in the entire test suite)
 
-The 4.5-Myr / 13H cycle is **on the 8H lattice** (n=13 is a clean framework integer corresponding to 8H/N where N = 8 × H_year / 13H_year structure) AND **strongly expressed in climate records via carbon-cycle response**. This is an additional positive empirical result for the 13H framework prediction.
+Terminology correction (doc 92 §3.2 is authoritative): 13H is a
+framework EIGENMODE CANDIDATE, **not** an 8H-lattice divisor — 8H/13H
+= 8/13 is non-integer, so it sits OUTSIDE the 8H/n divisor set. And
+under the R3-4 stability tests (doc 92 §8.4) it does not behave as a
+single coherent oscillator (amp CV 42–50%, circular phase std 97.9°),
+so it is NOT promoted to canonical L1/L2. What this section adds is
+the empirical observation that the 4.5-Myr band is **strongly
+carbon-amplified** (δ¹³C-only, the purest carbon signature in the
+suite) — an interesting correspondence for the candidate, not a
+lattice validation.
 
 Data: [data/milankovitch-8h-g4g3-carbon-cycle.json](../data/milankovitch-8h-g4g3-carbon-cycle.json).
 
@@ -1290,7 +1299,7 @@ This two-layer view clarifies which physical mechanisms operate at which scales:
 | 100-kyr band | ✓ (n=21–31) | ice-sheet hysteresis (post-MPT) |
 | **405 kyr** | ❌ (between n=6, n=7) | **carbon-cycle resonance, δ¹³C preference — primary explanation** |
 | 2.4 Myr | not resolved on lattice | weak / not present in either proxy |
-| **4.5 Myr (13H)** | **✓ (13H)** | **carbon-cycle amplification, δ¹³C only** |
+| **4.5 Myr (13H)** | candidate eigenmode — off the 8H/n divisor set (doc 92 §3.2) | **carbon-cycle amplification, δ¹³C only** |
 | 9 Myr | not on lattice | candidate Layer-2: δ¹³C/δ¹⁸O ratio 2.05 (inside carbon-amplified cluster, between 405 kyr and 4.5 Myr), but F-stat not significant individually — signature present, statistical confirmation pending. [Doc 92 §3.3](92-climate-formula.md#33-the-9-myr-candidate-tier-a4) revisits this via joint-fit variance decomposition: ΔR² CENOGRID δ¹³C = +0.078 with variance ratio 4.2 — promoted to **investigated Layer-2 candidate**, though not deployed in the canonical formula (§9.1) pending Round-3-style cross-window stability tests. |
 
 ### 13.10 The framework's claim, refined
@@ -1317,8 +1326,8 @@ The combined picture from §4 + §5 is sharp: the 8H framework's claims hold str
 | 100-kyr-band centroid = Mercury-Mars s₁−s₄ nodal beat | ✅ supported (§4.2, §7.2) |
 | 100-kyr-band coupled to obliquity via shared inclination eigenspace | ✅ supported (Test D2) |
 | 32-component formula beats random-period nulls | ✅ supported (Test C — p ≤ 0.015 on all 3 null types) |
-| 13H long-period eigenmode | ✅ supported (Tests A, §13.8) |
-| Forward projection of next glaciation (~38 kyr) | ✅ supported (Test E) |
+| 13H long-period eigenmode | ✅ period match (Test A, §13.8) — but NOT promoted to canonical: fails the R3-4 coherence tests (doc 92 §8.4) |
+| Forward projection of next glaciation (~58 kyr) | ✅ supported (Test E) |
 | Integer-divisor positions stable under sample-parity cross-validation | ✅ supported (Test F3 — train 0.2373, test 0.2395, ratio 1.009) |
 | Model correctly times Pleistocene glacial maxima | ✅ supported (Test G — 54.5% within ±5 kyr, p = 0.001) |
 | Pre-MPT vs post-MPT amplitude non-stationarity (across MPT split fits) | ✅ supported (Tests F1, F2 — physical feature) |

@@ -176,7 +176,7 @@ The bare formula's output `GM_P_system` covers **planet + all moons**. To conver
 | Planet | Moons' share of system mass | DE440 Sun/System | DE440 Sun/Planet-Alone | Multiplier `Sun/alone ÷ Sun/system` |
 |---|---|---|---|---|
 | Earth | **1.2151%** | 328,900.56 | **332,946.05** | 1.012301 |
-| Mars | 0.0000% | 3,098,703.55 | 3,098,703.71 | <!--v:saturnPredR2-->1.000000<!--/v--> |
+| Mars | 0.0000% | 3,098,703.55 | 3,098,703.71 | 1.000000 |
 | Jupiter | 0.0207% | 1,047.349 | **1,047.566** | 1.000207 |
 | Saturn | 0.0247% | 3,497.902 | **3,498.769** | 1.000247 |
 | Uranus | 0.0104% | <!--v:uranusMassRatioDE440-->22,902.944<!--/v--> | **22,905.337** | 1.000105 |

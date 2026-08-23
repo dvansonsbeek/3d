@@ -342,7 +342,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 | Earth | H / 16 | <!--v:periPrecYears-->~20,957<!--/v--> |
 | Mars | H × 8/36 | ~<!--v:marsPeriPeriod-->74,515<!--/v--> |
 | Jupiter | 8H / 39 | ~<!--v:jupiterPeriPeriod-->68,783<!--/v--> |
-| Saturn | -8H / 65 | ~<!--v:jupiterIcrfPeriod-->-41,270<!--/v--> (retrograde) |
+| Saturn | -8H / 65 | ~-<!--v:saturnPeriPeriod-->41,270<!--/v--> (retrograde) |
 | Uranus | H / 3 | <!--v:inclPrecYears-->~111,772<!--/v--> |
 | Neptune | H × 2 | ~<!--v:neptunePeriPeriod-->670,634<!--/v--> |
 

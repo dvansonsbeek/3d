@@ -2,12 +2,27 @@
 docVersion: 1.0
 modelVersion: v11.0
 coefficients: sha256:17f2ead87bad401e
-status: current
+status: historical
 ---
 
 # Anomaly Calculation Approach
 
-**Status:** ✅ Implemented
+> **HISTORICAL — the position-based Mean Anomaly this plan proposes was
+> later REJECTED for planets.** The shipped code computes the textbook
+> mean anomaly (`M = M₀ + n·Δt`, advancing linearly in time, with
+> Kepler's equation solved via `OrbitalFormulas.eccentricAnomaly` for
+> E and ν) — see the comment block at `updatePlanetAnomalies()` in
+> `src/script.js`: the "angle at orbit center from perihelion to
+> planet" described below is a geometric ellipse angle close to the
+> ECCENTRIC anomaly, not M, and the difference matters for
+> Mercury/Pluto-class eccentricities. The MOON still uses the
+> geometric-at-P method (`updateMoonOrbitalElements`). True anomaly IS
+> computed geometrically from world positions, as planned here. The
+> line numbers below refer to a ~2025-era `script.js` and no longer
+> resolve. Kept as the design record of the exploration; for the
+> as-built behaviour see doc 26 §M_b and doc 40 §Anomalies.
+
+**Status:** superseded — see the banner above
 
 ## Overview
 

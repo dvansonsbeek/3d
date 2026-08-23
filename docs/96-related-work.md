@@ -23,7 +23,7 @@ status: current
 
 **Related synthesis:** [Doc 95 — Climate summary](95-climate-summary.md) — the conclusion this doc situates.
 
-> **Scope note (ESSRT).** This document positions the framework against external literature; the comparative claims (integer-divisor unification, dual attribution, ΔR² = 0 with Laskar substitution) are structural and scale-invariant. The literal 8H = <!--v:eightH-->2,682,536<!--/v--> yr value and the 13H = 9.04 Myr reference are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler); the external papers cited here (Boulila 2019 9-Myr cycle, Dutkiewicz 2024 2.4-Myr cycle, Zeebe-Lantink 2024 g₂−g₅ disruption) all operate in present-epoch comparison space, so the positioning is epoch-consistent without further adjustment.
+> **Scope note (ESSRT).** This document positions the framework against external literature; the comparative claims (integer-divisor unification, dual attribution, ΔR² = 0 with Laskar substitution) are structural and scale-invariant. The literal 8H = <!--v:eightH-->2,682,536<!--/v--> yr value and the 13H = 4.36 Myr reference are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler); the external papers cited here (Boulila 2019 9-Myr cycle, Dutkiewicz 2024 2.4-Myr cycle, Zeebe-Lantink 2024 g₂−g₅ disruption) all operate in present-epoch comparison space, so the positioning is epoch-consistent without further adjustment.
 
 ---
 
@@ -43,7 +43,7 @@ This is the **closest published parallel** to HUM's gravitational-coupling claim
 **Where HUM extends further:**
 - Dutkiewicz documents **one cycle** (2.4 Myr = g₄−g₃)
 - HUM's framework documents **32 cycles unified under one fundamental period** — the 2.4-Myr cycle is just one of them (specifically off-lattice, captured by L2 / L_extended depending on regime)
-- HUM also documents the 1.2-Myr obliquity-band Grand cycle (s₄−s₃) and the 9-Myr 13H cycle, neither of which Dutkiewicz covers
+- HUM also documents the 1.2-Myr obliquity-band Grand cycle (s₄−s₃) and the 13H = 4.36 Myr eigenmode candidate (not promoted to canonical — see R3-4), neither of which Dutkiewicz covers
 
 ---
 
@@ -97,7 +97,17 @@ Counter-argument:
 
 Documented **~9 Myr and ~36 Myr Grand cycles** in 115-Myr benthic foraminifera δ¹⁸O. Major Cenozoic climatic events (PETM, EOT, Mi-1, etc.) occur preferentially at extremes of these cycles.
 
-**Where HUM aligns:** HUM's framework has the 9-Myr cycle as **13H = 9.04 Myr** (see [doc 91 §13](91-milankovitch-evidence.md), [doc 92 §3.2 / R3-4](92-climate-formula.md)). The convergence is not a free parameter — it is a structural consequence of the 8H fundamental period (8H × 13/8 ≈ 4.36 Myr... wait, our number is different; 13H comes from a different structural argument). HUM tested 13H stability under R3-4 and found it does not behave as a single coherent oscillator (amp CV 42–50%, circular phase std 97.9°), so it is not promoted to canonical L1/L2 — consistent with the Grand-cycle being a multi-mechanism phenomenon.
+**Where HUM aligns — with a correction to earlier drafts:** HUM's 13H
+eigenmode candidate is **4.36 Myr** (13 × H = 13 × 335,317 yr; doc 92
+§3.2), NOT 9 Myr — Boulila's ~9-Myr Grand cycle is roughly TWICE 13H,
+and HUM makes no lattice claim for it (the closest expressions, ~2×13H
+or ~27H, are outside the canonical divisor set). The genuine adjacency
+is at the phenomenological level: both frameworks read multi-Myr
+δ¹⁸O structure as astronomically paced. HUM tested 13H stability under
+R3-4 and found it does not behave as a single coherent oscillator
+(amp CV 42–50%, circular phase std 97.9°), so it is not promoted to
+canonical L1/L2 — consistent with the Grand-cycle being a
+multi-mechanism phenomenon.
 
 Saillenfest et al. (a series of 2019–2021 papers on Saturn's obliquity drift and Neptune resonance) work in the same secular-coupling-as-climate-driver framing. Their 2021 work on Saturn-Neptune resonance and Saturn's tilt evolution is structurally adjacent.
 

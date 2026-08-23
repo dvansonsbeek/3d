@@ -95,7 +95,7 @@ The integer `solarYearCount` means periods change in discrete steps:
 
 | Planet  | Count   | Step size (days) |
 |---------|---------|------------------|
-| Mercury | 1,392,228 | <!--v:innerFourEccWeight-->0.00006<!--/v-->          |
+| Mercury | 1,392,228 | 0.00006          |
 | Venus   | 545,059  | 0.0004           |
 | Mars    | 178,289  | 0.004            |
 | Jupiter | 28,281   | 0.15             |
