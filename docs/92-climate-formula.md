@@ -136,12 +136,12 @@ The 25 canonical integers come from Berger 1978 + Laskar 2004 eigenmode beats + 
 | **28** | **95.8** | g-beat | g₄−g₅ Mars-Jupiter eccentricity — **Berger 1978 classic 95-kyr peak** |
 | 30 | 89.4 | g-beat | g₃−g₇ Earth-Uranus eccentricity |
 | 31 | 86.5 | g-beat | g₄−g₇ Mars-Uranus eccentricity |
-| 35 | 76.6 | 3-term beat | Earth.Axial(104) − Mercury.ICRF(93) + Saturn.Obliq(24) — close to Mars perihelion at 8H/36 |
+| 35 | 76.6 | s-beat / 8H sideband | **s₄−s₈ Mars-Neptune nodal** (75.98 kyr, 0.9%); lattice-exact: Mars.Peri_ecl(36) − Venus.AscNode(1) — the 8H-modulation sideband of the Mars perihelion line (the carrier n=36 is itself not in L1: sideband-without-carrier, the signature of multiplicative forcing) |
 | 38 | 70.6 | s-beat | s₈−s₃ Neptune-Earth nodal |
 | 39 | 68.8 | Direct | Jupiter ecliptic perihelion = 8H/39 (≈ Laskar s₃) |
 | 48 | 55.9 | s-beat | s₇−s₆ Uranus-Saturn nodal |
 | 50 | 53.7 | g-beat | g₆−g₅ Saturn-Jupiter eccentricity |
-| 53 | 50.6 | s-beat | Mars.AscNode(64) − Uranus.AscNode(11) — close to Mars Ecc cycle at 8H/52 |
+| 53 | 50.6 | s-beat / 8H sideband | **s₆−s₈ Saturn-Neptune nodal** (50.52 kyr, 0.2%); lattice-exact: Mars.AscNode(64) − Uranus.AscNode(11) (= Mars.Ecc(52) + Venus.AscNode(1), the 8H sideband of the Mars eccentricity line) |
 | **65** | **41.3** | Obliquity / Direct | k+s₃ obliquity beat = Saturn ecliptic = Jupiter ICRF perihelion (Law 6 lock) — **Berger 1978 classic 41-kyr peak** |
 | 66 | 40.6 | Obliquity centroid | Obliquity-band arithmetic-mean (Round 2 C10: EPICA CO₂ amplification 15.79) |
 | 68 | 39.4 | Obliquity | k+s₄ Mars obliquity sub-peak |
@@ -161,7 +161,7 @@ The 25 canonical integers come from Berger 1978 + Laskar 2004 eigenmode beats + 
 
 **Berger precession quintet**: with n=141 now included, the model carries all five canonical Berger climatic-precession peaks — n=113 (k+g₅ Jupiter, 23.7 kyr), n=120 (k+g₂ Venus, 22.4 kyr), n=141 (k+g₃ Earth, 19.0 kyr), and the sideband-attributed n=152 (k+g₄ Mars, 17.6 kyr) and n=185 (k+g₂ Venus sub, 14.5 kyr). The Wigley 1976 combination tone `1/95 ≈ 1/141 − 1/113 = 1/28 → 95 kyr` (eccentricity at n=28) is now structurally explicit in the lattice.
 
-**Composition summary**: 7 direct planetary periods (Mercury / Mars / Jupiter axial-obliquity-apsidal-eccentricity, obliquity centroid, Mars nodal harmonic) + 8 g-beats (eccentricity band) + 8 s-beats (nodal / obliquity band, including k+s₃ and k+s₄ which are climatic-precession-style additions to s-rates) + 2 canonical climatic-precession lines (n=113, n=120) + 6 MTM-significant sidebands added in Tier B Round 1 + **1 Berger-quintet completion (n=141)** = **32 total**.
+**Composition summary**: 5 direct planetary periods (Mercury / Mars / Jupiter axial-obliquity, the obliquity centroid, the Mars nodal harmonic) + 8 g-beats (eccentricity band) + 10 s-beats (nodal / obliquity band, including k+s₃ and k+s₄ which are climatic-precession-style additions to s-rates, and the two Mars-line 8H-sidebands n=35 and n=53, re-attributed 2026-08 after the Mars 8H/36 refit) + 2 canonical climatic-precession lines (n=113, n=120) + 6 MTM-significant sidebands added in Tier B Round 1 + **1 Berger-quintet completion (n=141)** = **32 total**.
 
 Source: `L1_LABELS` dict in `scripts/milankovitch_climate_formula.py`. The same labels populate the L1 hover-tooltip in the Climate Formula Explorer modal (see §13.2).
 

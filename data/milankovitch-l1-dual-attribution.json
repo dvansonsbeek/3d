@@ -13081,7 +13081,7 @@
       "period_kyr": 76.64388571428572,
       "amp_normalized": 0.22305721109394258,
       "lr04_4sigma": true,
-      "berger_label": "Earth.Axial(104) \u2212 Mercury.ICRF(93) + Saturn.Obliq(24) (3-term beat; close to Mars apsidal at 8H/36)",
+      "berger_label": "s\u2084\u2212s\u2088 Mars-Neptune nodal (75.98 kyr, 0.9%) \u2014 lattice-exact: Mars.Peri_ecl(36) \u2212 Venus.AscNode(1), the 8H-modulation sideband of the Mars perihelion line",
       "solar_system_families": [
         {
           "family": "g-beat",
@@ -17519,7 +17519,7 @@
       "period_kyr": 50.61388679245283,
       "amp_normalized": 0.055567697420849674,
       "lr04_4sigma": true,
-      "berger_label": "Mars.AscNode(64) \u2212 Uranus.AscNode(11) s-beat (close to Mars Ecc cycle at 8H/52)",
+      "berger_label": "s\u2086\u2212s\u2088 Saturn-Neptune nodal (50.52 kyr, 0.2%) \u2014 lattice-exact: Mars.AscNode(64) \u2212 Uranus.AscNode(11) (= Mars.Ecc(52) + Venus.AscNode(1), the 8H sideband of the Mars eccentricity line)",
       "solar_system_families": [
         {
           "family": "s-beat",

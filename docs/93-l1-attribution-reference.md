@@ -54,12 +54,12 @@ So the 32 components in this doc are the complete L1 set. For L2 + L3 attributio
 | 28 | 95.805 | 0.7536 | ✓ | g₄−g₅ Mars-Jupiter ecc (Berger 95k) | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) - Saturn.Obliq(24) | **PLANET ≠** |
 | 30 | 89.418 | 0.0899 |  | g₃−g₇ Earth-Uranus ecc | `[3-term]` Earth.Axial(104) - Venus.Obliq(110) + Jupiter.AscNode(36) | **PLANET ≠** |
 | 31 | 86.533 | 0.4050 | ✓ | g₄−g₇ Mars-Uranus | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) - Jupiter.Axial(21) | **PLANET ≠** |
-| 35 | 76.644 | 0.2231 | ✓ | Earth.Axial(104) − Mercury.ICRF(93) + Saturn.Obliq(24) (3... | `[3-term]` Earth.Axial(104) - Mercury.ICRF(93) + Saturn.Obliq(24) | (no Berger) |
+| 35 | 76.644 | 0.2231 | ✓ | s₄−s₈ Mars-Neptune nodal (75.98 kyr, 0.9%) — lattice-exac... | `[3-term]` Earth.Axial(104) - Mercury.ICRF(93) + Saturn.Obliq(24) | **PLANET ≠** |
 | 38 | 70.593 | 0.5379 |  | s₈−s₃ Neptune-Earth nodal | `[3-term]` Earth.Axial(104) - Venus.Obliq(110) + Jupiter.Ecc(44) | **PLANET ≠** |
 | 39 | 68.783 | 0.3702 | ✓ | s₅−s₃ Earth nodal | `[3-term]` Earth.Axial(104) - Jupiter.Axial(21) - Jupiter.Ecc(44) | **MECH ≠** |
 | 48 | 55.886 | 0.2065 | ✓ | s₇−s₆ Uranus-Saturn nodal | `[3-term]` Earth.Axial(104) + Jupiter.Ecc(44) - Neptune.Obliq(100) | **PLANET ≠** |
 | 50 | 53.651 | 0.1151 | ✓ | g₆−g₅ Saturn-Jupiter ecc | `[3-term]` Earth.Axial(104) + Mercury.Peri_ecl(11) - Jupiter.ICRF(65) | **PLANET ≠** |
-| 53 | 50.614 | 0.0556 | ✓ | Mars.AscNode(64) − Uranus.AscNode(11) s-beat (close to Ma... | `[3-term]` Earth.Axial(104) + Venus.AscNode(1) - Mars.Ecc(52) | (no Berger) |
+| 53 | 50.614 | 0.0556 | ✓ | s₆−s₈ Saturn-Neptune nodal (50.52 kyr, 0.2%) — lattice-ex... | `[3-term]` Earth.Axial(104) + Venus.AscNode(1) - Mars.Ecc(52) | **PLANET ≠** |
 | 65 | 41.270 | 0.3713 | ✓ | k+s₃ Earth obliquity (Berger 41k) | `[2-term diff]` Earth.Axial(104) - Jupiter.Peri_ecl(39) | **PLANET ≠** |
 | 66 | 40.644 | 0.2786 |  | obliquity-band arithmetic-mean (Round 2 C10: EPICA CO₂ ra... | `[3-term]` Earth.Axial(104) - Jupiter.Ecc(44) + Saturn.Axial(6) | (no Berger) |
 | 68 | 39.449 | 0.1072 | ✓ | k+s₄ Berger Mars obliquity sub-peak | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) + Jupiter.Obliq(16) | **PLANET ≠** |
@@ -78,8 +78,8 @@ So the 32 components in this doc are the complete L1 set. For L2 + L3 attributio
 **Status tally:**
 - _agree_: 0 components — Berger predicts AND we match
 - _MECH ≠_: 1 — same planet, different mechanism
-- _PLANET ≠_: 26 — different planet entirely
-- _(no Berger)_: 5 — Berger has no secular prediction
+- _PLANET ≠_: 28 — different planet entirely
+- _(no Berger)_: 3 — Berger has no secular prediction
 - **Total:** 32 L1 components
 
 ---
@@ -298,7 +298,7 @@ _**LR04 4σ peak**_
 
 _**LR04 4σ peak**_
 
-- **Berger / secular theory:** Earth.Axial(104) − Mercury.ICRF(93) + Saturn.Obliq(24) (3-term beat; close to Mars apsidal at 8H/36)
+- **Berger / secular theory:** s₄−s₈ Mars-Neptune nodal (75.98 kyr, 0.9%) — lattice-exact: Mars.Peri_ecl(36) − Venus.AscNode(1), the 8H-modulation sideband of the Mars perihelion line
 - **Solar-system family matches** (2 families, 4 total combos):
   - `[g-beat]` Mercury(11)+Uranus(24)
   - `[g-beat]` Jupiter(39)-Neptune(4)
@@ -311,7 +311,7 @@ _**LR04 4σ peak**_
   4. `[3-term]` Earth.Axial(104) - Saturn.ICRF(169) + Neptune.Ecc(100)  · score = 21
   5. `[3-term]` Earth.Axial(104) - Saturn.Peri_ecl(65) - Neptune.Peri_ecl(4)  · score = 20
   - _… 43 more combos in JSON (full ranked list)_
-- **3-step status:** _(no Berger)_ — Berger / secular theory does not predict this peak; our model attributes it via an Earth-planet beat.
+- **3-step status:** **PLANET ≠** — Berger names mars, neptune, venus; our top-1 names Mercury, Saturn.
 
 ### n = 38   ·   T = 70.593 kyr   ·   amp = 0.5379
 
@@ -384,7 +384,7 @@ _**LR04 4σ peak**_
 
 _**LR04 4σ peak**_
 
-- **Berger / secular theory:** Mars.AscNode(64) − Uranus.AscNode(11) s-beat (close to Mars Ecc cycle at 8H/52)
+- **Berger / secular theory:** s₆−s₈ Saturn-Neptune nodal (50.52 kyr, 0.2%) — lattice-exact: Mars.AscNode(64) − Uranus.AscNode(11) (= Mars.Ecc(52) + Venus.AscNode(1), the 8H sideband of the Mars eccentricity line)
 - **Solar-system family matches** (1 families, 1 total combos):
   - `[s-beat]` Mars(64)-Uranus(11)
 - **Earth-planet beat candidates (top 5):**
@@ -394,7 +394,7 @@ _**LR04 4σ peak**_
   4. `[3-term]` Earth.Obliq(64) - Venus.Axial(91) + Uranus.ICRF(80)  · score = 14
   5. `[2-term diff]` Earth.Obliq(64) - Uranus.AscNode(11)  · score = 12
   - _… 12 more combos in JSON (full ranked list)_
-- **3-step status:** _(no Berger)_ — Berger / secular theory does not predict this peak; our model attributes it via an Earth-planet beat.
+- **3-step status:** **PLANET ≠** — Berger names mars, neptune, saturn, uranus, venus; our top-1 names Mars, Venus.
 
 ### n = 65   ·   T = 41.270 kyr   ·   amp = 0.3713
 

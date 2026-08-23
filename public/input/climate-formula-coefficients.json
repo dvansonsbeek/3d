@@ -1669,7 +1669,7 @@
           "lr04_post_mpt_amp": 0.22305721109394244,
           "epica_amp": 0.20139430079862528,
           "ratio": 0.9028818203676291,
-          "label": "Earth.Axial(104) \u2212 Mercury.ICRF(93) + Saturn.Obliq(24) (3-term beat; close to Mars apsidal at 8H/36)"
+          "label": "s\u2084\u2212s\u2088 Mars-Neptune nodal (75.98 kyr, 0.9%) \u2014 lattice-exact: Mars.Peri_ecl(36) \u2212 Venus.AscNode(1), the 8H-modulation sideband of the Mars perihelion line"
         },
         "38": {
           "n": 38,
@@ -1709,7 +1709,7 @@
           "lr04_post_mpt_amp": 0.055567697420850166,
           "epica_amp": 0.11341146031290357,
           "ratio": 2.0409602264777162,
-          "label": "Mars.AscNode(64) \u2212 Uranus.AscNode(11) s-beat (close to Mars Ecc cycle at 8H/52)"
+          "label": "s\u2086\u2212s\u2088 Saturn-Neptune nodal (50.52 kyr, 0.2%) \u2014 lattice-exact: Mars.AscNode(64) \u2212 Uranus.AscNode(11) (= Mars.Ecc(52) + Venus.AscNode(1), the 8H sideband of the Mars eccentricity line)"
         },
         "65": {
           "n": 65,
