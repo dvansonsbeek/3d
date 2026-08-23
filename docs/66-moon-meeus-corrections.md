@@ -1080,9 +1080,9 @@ below the +1.4″ fleet mean; the era split refutes anchor
 double-counting, the modern era improves most). The owner shipped on
 the principle that the fleet-wide JPL truth governs and every value is
 derived; the ≤8″ api gate holds. Final location-tier state: all-phase
-Sun 2.12″ / Moon λ 3.03″ / β 0.65″ (the 20.3h round-2 Delaunay tail later
-closed λ to 2.96″); syzygy 3.82″; tracked centerlines
-2.7″ mean, 6.7″ max (current audit run, 14 events / 42 points).
+Sun 2.12″ / Moon λ 3.03″ / β <!--v:moonSeriesLatVsJplRms-->0.65<!--/v-->″ (the 20.3h round-2 Delaunay tail later
+closed λ to <!--v:moonSeriesLonVsJplRms-->2.96<!--/v-->″); syzygy 3.82″; tracked centerlines
+<!--v:centerlinesMeanArcsec-->2.7<!--/v-->″ mean, <!--v:centerlinesMaxArcsec-->6.7<!--/v-->″ max (current audit run, <!--v:centerlinesEvents-->14<!--/v--> events / <!--v:centerlinesPoints-->42<!--/v--> points).
 
 ### Geocentric parallax limit
 - The 0.81-degree RMS is the **theoretical best** for geocentric coordinates.

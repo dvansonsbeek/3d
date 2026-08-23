@@ -616,6 +616,10 @@ export declare const REFERENCE_DATA: {
     "sunModelTrueErrorDeg": number;
     "sunTropicalYearDiffSeconds": number;
     "sunSiderealYearDiffSeconds": number;
+    "frameworkSunVsJplRmsArcsec": number;
+    "meeusCh25SunVsJplRmsArcsec": number;
+    "moonSeriesLonVsJplRmsArcsec": number;
+    "moonSeriesLatVsJplRmsArcsec": number;
     "mercuryNewtonianArcsecCy": number;
     "mercuryObservedICRFArcsecCy": number;
     "mercuryPark2017RateArcsecCy": number;

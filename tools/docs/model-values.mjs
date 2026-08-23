@@ -1182,6 +1182,16 @@ export const VALUES = {
       babylon135BestDeltaUT: { get: () => b135.bestDeltaUT, render: (v) => String(v) },
       babylon135FrameworkUT: { get: () => b135.frameworkUT, render: (v) => String(v) },
       babylon135DocumentedUT: { get: () => b135.documentedUT, render: (v) => String(v) },
+      // NASA centerline instrument — DERIVED live from the generated
+      // eclipse-audit artifact's per-point shadow-plane residuals, so a
+      // regenerated audit run moves these automatically (no hand-typed copy).
+      centerlinesEvents: { get: () => ecl.centerlines.events.length, render: (v) => thousands(v), note: 'derived: NASA eclipse-path reference events tracked' },
+      centerlinesPoints: { get: () => ecl.centerlines.events.reduce((n, e) => n + e.points.length, 0), render: (v) => thousands(v), note: 'derived: fixed-UT reference points across the tracked events' },
+      centerlinesMeanArcsec: { get: () => {
+        const pts = ecl.centerlines.events.flatMap((e) => e.points.map((p) => p.shadowPlaneArcsec));
+        return pts.reduce((a, b) => a + b, 0) / pts.length;
+      }, render: (v) => Number(v).toFixed(1), unit: '″', note: 'derived: mean shadow-plane centerline residual over all tracked points' },
+      centerlinesMaxArcsec: { get: () => Math.max(...ecl.centerlines.events.flatMap((e) => e.points.map((p) => p.shadowPlaneArcsec))), render: (v) => Number(v).toFixed(1), unit: '″', note: 'derived: worst shadow-plane centerline residual' },
     };
   })(),
 
@@ -1383,6 +1393,10 @@ export const VALUES = {
       meeusJPLDecRMS:         { get: () => astro.knownValues.meeusJplDecRmsDeg, render: (v) => Number(v).toFixed(2), unit: '°' },
       sunModelDecRMS:    { get: () => astro.knownValues.sunModelDecRmsDeg, render: (v) => String(v), unit: '°' },
       sunModelTrueError: { get: () => astro.knownValues.sunModelTrueErrorDeg, render: (v) => String(v), unit: '°' },
+      frameworkSunVsJplRms:  { get: () => astro.knownValues.frameworkSunVsJplRmsArcsec, render: (v) => Number(v).toFixed(2), unit: '″', note: 'E4/E5 certified apparent solar longitude vs JPL, modern window (doc 99)' },
+      meeusCh25SunVsJplRms:  { get: () => astro.knownValues.meeusCh25SunVsJplRmsArcsec, render: (v) => Number(v).toFixed(2), unit: '″', note: 'Meeus Ch. 25 reference on the same window/instrument' },
+      moonSeriesLonVsJplRms: { get: () => astro.knownValues.moonSeriesLonVsJplRmsArcsec, render: (v) => Number(v).toFixed(2), unit: '″', note: 'shipped derived lunar series, all-phase λ vs JPL after the 20.3h round-2 Delaunay tail (doc 66)' },
+      moonSeriesLatVsJplRms: { get: () => astro.knownValues.moonSeriesLatVsJplRmsArcsec, render: (v) => Number(v).toFixed(2), unit: '″', note: 'shipped derived lunar series, all-phase β vs JPL (doc 66)' },
       sunTropicalYearDiff: { get: () => astro.knownValues.sunTropicalYearDiffSeconds, render: (v) => fmtSignedPct(v, 2), unit: 's' },
       sunSiderealYearDiff: { get: () => astro.knownValues.sunSiderealYearDiffSeconds, render: (v) => fmtSignedPct(v, 2), unit: 's' },
       sunDiameter: { get: () => astro.bodyDiametersKm.sun, render: (v) => thousands(v), unit: 'km' },

@@ -378,8 +378,8 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
 −(e_base/2)(cos φ₃ − cos φ₃(2000)) on the integrated phase — the same
 derived-e channel the cardinal-point braid uses.
 
-**Accuracy**: 0.95″ RMS vs JPL over the modern window (the Meeus Ch. 25
-reference itself sits at 1.28″). At antiquity the closed form tracks the
+**Accuracy**: <!--v:frameworkSunVsJplRms-->0.95<!--/v-->″ RMS vs JPL over the modern window (the Meeus Ch. 25
+reference itself sits at <!--v:meeusCh25SunVsJplRms-->1.28<!--/v-->″). At antiquity the closed form tracks the
 retired ±3000-yr trapezoid table to −0.3″ at −135 and −6.8″ at the ±3000
 edge.
 
@@ -1056,7 +1056,7 @@ The proper-physics two-layer formula naturally bounds the past evolution. Run ba
 |:---|---:|
 | LOD | **4.64 hr** (= 16,704 s) |
 | H | **<!--v:hAtHadean-->64,614<!--/v--> yr** (19.3 % of modern) |
-| 8H | **0.519 Myr** (19.3 % of modern) |
+| 8H | **<!--v:eightHAtHadean-->0.517<!--/v--> Myr** (19.3 % of modern) |
 | Moon distance | **<!--v:moonDistanceAtHadean-->9,471<!--/v--> km = 1.49 R_E** (rigid Roche) |
 | Fluid Roche zone (~2.9 R_E) | crossed at ~4,444 Ma |
 
@@ -1079,7 +1079,7 @@ Two parallel views — Farhat 2022 published values (left) and proper-physics fo
 
 | Age (Gyr) | LOD<sub>Farhat</sub> | 8H<sub>Farhat</sub> | LOD<sub>formula</sub> | 8H<sub>formula</sub> |
 |---:|---:|---:|---:|---:|
-| **4.498 (genesis, rigid Roche)** | — | — | **4.64 hr** | **0.519 Myr** |
+| **4.498 (genesis, rigid Roche)** | — | — | **4.64 hr** | **0.517 Myr** |
 | **4.42 (Farhat Moon-formation)** | **5.25 hr** | **0.587 Myr** | 5.67 hr | 0.634 Myr |
 | 3.25 | 10.00 hr | 1.118 Myr | 14.87 hr | 1.662 Myr |
 | 2.50 | 13.00 hr | 1.453 Myr | 16.98 hr | 1.897 Myr |
@@ -1199,7 +1199,7 @@ Replaces the earlier piecewise (Phanerozoic-linear + Proterozoic-stall + Hadean-
 | 550 (Cambrian) | 75,809.7 | 21.058 | 362,983 | 294,216 | 2.354 |
 | 1,000 (Mesoproterozoic) | 68,113.0 | 18.920 | 343,784 | 264,346 | 2.115 |
 | 2,500 (Archean) | 61,111.6 | 16.975 | 322,160 | 237,173 | 1.897 |
-| 4,498 (Earth-Moon genesis, rigid Roche) | 16,718.2 | 4.644 | **<!--v:moonDistanceAtHadean-->9,471<!--/v-->** | <!--v:hAtHadean-->64,614<!--/v--> | 0.519 |
+| 4,498 (Earth-Moon genesis, rigid Roche) | 16,718.2 | 4.644 | **<!--v:moonDistanceAtHadean-->9,471<!--/v-->** | <!--v:hAtHadean-->64,614<!--/v--> | <!--v:eightHAtHadean-->0.517<!--/v--> |
 | **−200 (+200 Ma future)** | 90,853.4 | 25.237 | <!--v:moonDistanceAt200MyrFuture-->392,059<!--/v--> | <!--v:hAt200MyrFuture-->352,600<!--/v--> | 2.821 |
 | **−1,000 (+1 Gyr future)** | 116,016.1 | 32.227 | 425,119 | 450,257 | 3.602 |
 | **−3,000 (+3 Gyr future)** | — | — | — | — | beyond tidal lock |
@@ -1992,7 +1992,7 @@ A: **Never** with the Moon present. The bounded tidal-lock equilibrium has Earth
 
 > **The 8H cycle has a beginning, a middle (us), and an end.**
 >
-> - **Genesis**: Moon at the rigid Roche limit (~1.5 R_E) at **<!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr ago** (between Patterson's 4.54 Pb-Pb Earth age and Farhat's 4.42 Hf-W formation epoch). 8H ≈ 0.519 Myr.
+> - **Genesis**: Moon at the rigid Roche limit (~1.5 R_E) at **<!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr ago** (between Patterson's 4.54 Pb-Pb Earth age and Farhat's 4.42 Hf-W formation epoch). 8H ≈ <!--v:eightHAtHadean-->0.517<!--/v--> Myr.
 > - **Modern (now)**: 8H = 2.683 Myr.
 > - **Formula horizon**: Moon reaches tidal-lock asymptote at +3 Gyr. 8H ≈ 7+ Myr (formal divergence).
 > - **Effective endpoint**: Sun's red giant phase at +5 Gyr — inner solar system unlikely to survive.
@@ -2145,4 +2145,4 @@ All values from the proper-physics two-layer formula. The `H × days/yr` near-in
 
 ## Net theory statement
 
-> The solar system has a structural lattice of integer-divisor periods, closing on the Solar System Resonance Cycle 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000, encoded in invariant Fibonacci integer relationships (Config #7, Laws 1–6). H itself is not a fixed cosmic constant but **expands monotonically** with geological time, driven by two independent physical processes: **Driver 1**, Earth-Moon tidal evolution (which slows Earth's rotation → slows axial precession → enlarges H via the H/13 Fibonacci coupling), and **Driver 2**, solar mass loss (which expands every planet's orbit via adiabatic conservation of `a × M_Sun`). The current 8H is the now-snapshot of a smoothly-expanding system whose modern epoch sits about **48 %** through its effective lifespan from Earth-Moon genesis (Moon at the rigid Roche limit ~<!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr ago, 8H ≈ 0.519 Myr) to the Sun's red-giant phase (~5 Gyr from now). Past: H was smaller (~<!--v:hAtDevonian-->306,189<!--/v--> yr in the Devonian). Future: H will be larger (~<!--v:hAt200MyrFuture-->352,600<!--/v--> yr in 200 Myr) and approaches a physical tidal-lock asymptote at ~+3 Gyr where the proper-physics formula reaches the Moon's angular-momentum-limit distance of <!--v:tidalLockKm-->555,623<!--/v--> km. ESSRT's structural relations — Fibonacci coupling integers, action-angle closure, L1/L2/L3 architecture — remain **invariant across all epochs**. Only the absolute periods expand.
+> The solar system has a structural lattice of integer-divisor periods, closing on the Solar System Resonance Cycle 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000, encoded in invariant Fibonacci integer relationships (Config #7, Laws 1–6). H itself is not a fixed cosmic constant but **expands monotonically** with geological time, driven by two independent physical processes: **Driver 1**, Earth-Moon tidal evolution (which slows Earth's rotation → slows axial precession → enlarges H via the H/13 Fibonacci coupling), and **Driver 2**, solar mass loss (which expands every planet's orbit via adiabatic conservation of `a × M_Sun`). The current 8H is the now-snapshot of a smoothly-expanding system whose modern epoch sits about **48 %** through its effective lifespan from Earth-Moon genesis (Moon at the rigid Roche limit ~<!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr ago, 8H ≈ <!--v:eightHAtHadean-->0.517<!--/v--> Myr) to the Sun's red-giant phase (~5 Gyr from now). Past: H was smaller (~<!--v:hAtDevonian-->306,189<!--/v--> yr in the Devonian). Future: H will be larger (~<!--v:hAt200MyrFuture-->352,600<!--/v--> yr in 200 Myr) and approaches a physical tidal-lock asymptote at ~+3 Gyr where the proper-physics formula reaches the Moon's angular-momentum-limit distance of <!--v:tidalLockKm-->555,623<!--/v--> km. ESSRT's structural relations — Fibonacci coupling integers, action-angle closure, L1/L2/L3 architecture — remain **invariant across all epochs**. Only the absolute periods expand.
