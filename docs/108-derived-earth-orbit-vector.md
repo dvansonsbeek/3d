@@ -17,6 +17,19 @@ the framework's own inputs and zero fitted constants, as a single
 rotating vector — and what that vector says about the model's laws at
 the modern epoch and at deep time.
 
+**What this is, and what it is not.** The derivation in §3 is standard
+secular dynamics — first-order Laplace–Lagrange theory and an N-body
+integration — run on standard inputs (DE440 mass ratios, J2000 orbital
+elements, the framework's periods). Reproducing Laskar's eccentricity
+history with it is therefore *expected*, not a discovery about the
+solar system: Laskar did the same, to higher order and with more care.
+The derivation used no lattice ingredient, and the eigenfrequencies it
+produced are not on the lattice (g5 → 8H/8.75). It is **not evidence
+for the lattice**. What is ours is listed in §7: a real defect found and
+fixed, a governing rule for which lattice periods may appear in which
+quantities, an honest recalibration of the model's deep-time claims,
+and a tool the framework did not have.
+
 Instruments: `tools/explore/fq7s-ecc-consistency.mjs`,
 `fq7s-orbit-vector-vs-laskar.mjs`, `fq7s-laplace-lagrange-e.mjs`,
 `fq7s-nbody-g.mjs`, `fq7s-annual-channel.mjs`.
@@ -98,9 +111,12 @@ N-body value gives: the Jupiter–Saturn frequency was the only gap.
 The lattice reading follows the site's own framing
 (`eigenfrequencies.mdx`): the eigenmodes are mathematical objects, the
 lattice claim lives in their **beats**. The derived g3 − g5 beat is
-95.3 kyr against 8H/28 = 95.8 kyr; the derived g's themselves are not
-on 8H/n (8.75, 15.2, 35.9, …) — the first framework-side datum for the
-page's open question 1, and it says what the page already suspected.
+95.3 kyr against 8H/28 = 95.8 kyr — the same empirical correspondence
+the site already documents, neither strengthened nor weakened here. The
+derived g's themselves are not on 8H/n (8.75, 15.2, 35.9, …). That is
+the first framework-side datum for the page's open question 1 ("do the
+g's converge on H/n?") and the answer it gives is **no** for g5 at the
+0.8% level — recorded as such.
 
 ## 4. Deep time: the vector against La2004
 
@@ -113,7 +129,9 @@ page's open question 1, and it says what the page already suspected.
 
 Over 500 kyr the derived vector reads corr 0.93, over 1 Myr 0.90, over
 2 Myr 0.73; its spectrum carries the 96 / 125 / 405-kyr eccentricity
-beats at Laskar-class amplitude (sd 0.012 vs 0.013). The shipped scalar
+beats at Laskar-class amplitude (sd 0.012 vs 0.013). That agreement is
+the expected outcome of standard dynamics on standard inputs (see the
+status note); the informative row is the other one: the shipped scalar
 laws carry no deep-time eccentricity signal at all — they are correct
 *local* laws at J2000 and nothing more.
 
@@ -167,7 +185,31 @@ single law for all three paths: the eclipse Sun, the Moon's E-factor,
 and the cardinal points — the latter a deep-time-alignment-class
 landing (CSV regeneration, Step-6d refit, the matched-pair rule), and
 one that changes what the model says about deep-time cardinal timing by
-days, while making it a derived claim that tracks La2004 at 0.97.
+days, while making it a derived claim that tracks La2004 at 0.97. That
+adoption would also say plainly that deep-time eccentricity is governed
+by standard secular dynamics rather than by an H/16-class lattice law —
+which the model's own rule already allows (structural identities stay
+kinematic; data and period tables go dynamical; an eccentricity
+*history* is data-class). The lattice keeps exactly what it had: the
+empirical beat correspondence, no more and no less.
+
+## 7. What is ours
+
+1. **A defect found and fixed.** Three eccentricity laws for one
+   quantity, one of them carrying a frame period; the fix (C-small) is
+   a measured model improvement independent of any external theory —
+   Sun 0.93 → 0.80″, centerlines 2.2 → 2.1″, Babylon 186 → 170 km.
+2. **A governing rule.** e = |z| may carry only fixed-frame divisors;
+   of-date divisors belong to ϖ; H/16 is a composite (13 + 3), not a
+   fundamental eccentricity period. Every future Earth-orbit law is
+   constrained by it.
+3. **An honest recalibration.** The H/16 and H/3 matches are local
+   J2000 rates of a non-uniformly rotating vector; the scalar laws do
+   not track eccentricity at deep time; the deep-time cardinal timing
+   carries a days-class law uncertainty the Step-6d figure did not
+   express. Knowing this is worth more than the 0.967.
+4. **A tool.** The framework computes its own secular solution — and
+   its own g5 to 0.8% — from its own inputs in about a minute.
 
 ---
 
