@@ -17,9 +17,14 @@ import { createRequire } from 'node:module';
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 const require = createRequire(import.meta.url);
 
-const TABLE_FILE = process.argv[2] || 'fq7s-v4-table.local.json';
-const CAND = JSON.parse(readFileSync(HERE + TABLE_FILE, 'utf8'));
-console.log(`candidate: ${TABLE_FILE} (${CAND.terms.length} terms, fidelity ${CAND.pass2Rms.toFixed(3)}″)`);
+// --no-2le: candidate = the SHIPPED v3 completion with the declared-fitted
+// +1.42″ sin(2lE) term removed (the annual-channel attribution measured
+// the residual's 2M family ≡ that term's negative — a stale compensator)
+const NO_2LE = process.argv.includes('--no-2le');
+const TABLE_FILE = NO_2LE ? null : (process.argv[2] || 'fq7s-v4-table.local.json');
+const CAND = TABLE_FILE ? JSON.parse(readFileSync(HERE + TABLE_FILE, 'utf8')) : null;
+console.log(NO_2LE ? 'candidate: shipped v3 completion WITHOUT the fitted +1.42″ sin(2lE) term'
+  : `candidate: ${TABLE_FILE} (${CAND.terms.length} terms, fidelity ${CAND.pass2Rms.toFixed(3)}″)`);
 
 const { createModel, DEFAULT_CONSTANTS: C } = await import(new URL('../../packages/physics/src/index.js', import.meta.url).href);
 const { createSunPlanetaryCompletion } = require('../../packages/physics/src/eclipse/sun-planetary-completion.cjs');
@@ -55,6 +60,10 @@ const PERI = [77.456, 131.564, 102.937, 336.060, 14.331, 93.057];
 const ARG_D0 = 297.8501921;
 const L1 = carrierRatesDegPerCy.planets, D1 = carrierRatesDegPerCy.moonElongation;
 const candCompletionDeg = (T) => {
+  if (NO_2LE) {
+    const lE = (ARG_L0[2] + L1[2] * T) * D2R;
+    return sunPlanetaryCompletionDeg(T) - 1.42 * Math.sin(2 * lE) / 3600;
+  }
   const l = new Float64Array(6), M = new Float64Array(6);
   for (let i = 0; i < 6; i++) {
     l[i] = (ARG_L0[i] + L1[i] * T) * D2R;
