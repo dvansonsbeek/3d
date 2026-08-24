@@ -104,16 +104,18 @@ const sd = (v) => { const m = v.reduce((a, q) => a + q, 0) / v.length; return Ma
   console.log(`1. JPL Sun cache (n ${r0.length}, 1900–2100, full bridge): sd ${sd(r0).toFixed(3)}″ → ${sd(r1).toFixed(3)}″`);
   const inWin = (rows) => rows.filter((r) => r.T >= -0.3 && r.T <= 0.49).map((r) => r.y);
   console.log(`   registry window 1970–2049 (n ${inWin(rows0).length}): sd ${sd(inWin(rows0)).toFixed(3)}″ → ${sd(inWin(rows1)).toFixed(3)}″   [frameworkSunVsJplRmsArcsec]`);
-  const tsin = (rows) => {   // small family fit: const, T, T², sinM, cosM, T·sinM, T·cosM
-    const K = 7, G = Array.from({ length: K }, () => new Float64Array(K)), b = new Float64Array(K);
-    for (const r of rows) { const v = [1, r.T, r.T * r.T, Math.sin(r.M), Math.cos(r.M), r.T * Math.sin(r.M), r.T * Math.cos(r.M)]; for (let k = 0; k < K; k++) { b[k] += v[k] * r.y; for (let j = 0; j < K; j++) G[k][j] += v[k] * v[j]; } }
+  const tsin = (rows) => {   // family fit: const, T, T², T³, sinM, cosM, T·sinM, T·cosM, T²·sinM, T²·cosM
+    const K = 10, G = Array.from({ length: K }, () => new Float64Array(K)), b = new Float64Array(K);
+    for (const r of rows) { const s = Math.sin(r.M), c = Math.cos(r.M), T = r.T; const v = [1, T, T * T, T ** 3, s, c, T * s, T * c, T * T * s, T * T * c]; for (let k = 0; k < K; k++) { b[k] += v[k] * r.y; for (let j = 0; j < K; j++) G[k][j] += v[k] * v[j]; } }
     const Gm = G.map((r) => Array.from(r)), x = Array.from(b);
     for (let c = 0; c < K; c++) for (let r = c + 1; r < K; r++) { const f = Gm[r][c] / Gm[c][c]; for (let cc = c; cc < K; cc++) Gm[r][cc] -= f * Gm[c][cc]; x[r] -= f * x[c]; }
     const co = new Float64Array(K); for (let c = K - 1; c >= 0; c--) { let s = x[c]; for (let cc = c + 1; cc < K; cc++) s -= Gm[c][cc] * co[cc]; co[c] = s / Gm[c][c]; }
-    return { tSin: co[5], tCos: co[6] };
+    const res = rows.map((r) => { const s = Math.sin(r.M), c = Math.cos(r.M), T = r.T; const v = [1, T, T * T, T ** 3, s, c, T * s, T * c, T * T * s, T * T * c]; return r.y - v.reduce((q, vv, k) => q + vv * co[k], 0); });
+    return { tSin: co[6], tCos: co[7], t2Sin: co[8], t2Cos: co[9], post: sd(res) };
   };
   const a0 = tsin(rows0), a1 = tsin(rows1);
   console.log(`2. annual channel T·sinM: ${a0.tSin.toFixed(3)}″/cy → ${a1.tSin.toFixed(3)}″/cy  (δė ${(a0.tSin / 2 / R2AS).toExponential(2)} → ${(a1.tSin / 2 / R2AS).toExponential(2)});  T·cosM ${a0.tCos.toFixed(3)} → ${a1.tCos.toFixed(3)}`);
+  console.log(`   CURVATURE CHECK T²·sinM: ${a0.t2Sin.toFixed(3)}″/cy² → ${a1.t2Sin.toFixed(3)}″/cy²  (δë ${(a0.t2Sin / 2 / R2AS).toExponential(2)} → ${(a1.t2Sin / 2 / R2AS).toExponential(2)});  T²·cosM ${a0.t2Cos.toFixed(3)} → ${a1.t2Cos.toFixed(3)};  post-family residual ${a0.post.toFixed(3)}″ → ${a1.post.toFixed(3)}″`);
 }
 
 // (3): syzygy fleet

@@ -860,11 +860,28 @@ export function assembleModel(C, F) {
   // D2 completion table is unchanged (residual 2lE re-fit ≈ 0.1″ — noise).
   const sunL0Deg = C.earthOrbital.sunMeanLongitudeJ2000_deg;
   const sunTropicalRateDegPerCy = 360 * julianCenturyDays / meanSolarYearDays;
+  // FQ-7-Sun option C-small — ONE eccentricity law for Sun and Moon in the
+  // eclipse chain. Eccentricity is frame-invariant (e = |z|, z = e·e^{iϖ}),
+  // so it may carry only FIXED-FRAME lattice content: the H/3 line the Moon's
+  // E-factor already rides (moon/ecc-channel.cjs). H/16 is the OF-DATE
+  // perihelion period (13 + 3 = 16: the H/3 apsidal rotation seen from the
+  // H/13 equinox) — it belongs to ϖ_of-date, not to e. The previous form
+  // added the H/16 law's own slope (−0.84e-5/cy) on top of the H/3 line,
+  // and that slope WAS the measured Sun-side ė tension (annual channel
+  // T·sinM −3.7″/cy; JPL sides with the H/3 line: fq7s-ecc-consistency.mjs).
+  // Anchor: the H/16 law's J2000 value (the observed e, anchored by design),
+  // evaluated once — an explicit law change, not a hidden freeze; the
+  // cardinal-point path keeps the H/16 law (eccentricityAt) unchanged.
+  // Measured at the swap: JPL Sun 2.123 → 1.487″ (1900–2100), registry
+  // window 0.93 → 0.80″, syzygy fleet 3.756 → 3.719″, T·sinM −3.65 → −0.19″/cy,
+  // curvature term unchanged in size; the H/16 term at the corpus epochs
+  // detrends to 0.174 min — below the ancient corpus's discrimination.
+  const sunEccentricityJ2000 = eccentricityAt(2000);
   /** @param {number} year @returns {number} */
   const sunEccentricityAt = (year) => {
     const cos3 = -Math.cos(phaseRadians(balancedYear, year, 3));
     const cos3J2000 = -Math.cos(phaseRadians(balancedYear, 2000, 3));
-    return eccentricityAt(year) + (eccentricityBase / 2) * (cos3 - cos3J2000);
+    return sunEccentricityJ2000 + (eccentricityBase / 2) * (cos3 - cos3J2000);
   };
   const sunMeanLongitudeDegAt = (() => {
     // SW PHASE B — the CLOSED FORM on the integrated lattice phase

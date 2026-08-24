@@ -764,7 +764,7 @@ export const REFERENCE_DATA = Object.freeze({
     "sunModelTrueErrorDeg": 0.003,
     "sunTropicalYearDiffSeconds": 0.1,
     "sunSiderealYearDiffSeconds": 0.02,
-    "frameworkSunVsJplRmsArcsec": 0.93,
+    "frameworkSunVsJplRmsArcsec": 0.8,
     "meeusCh25SunVsJplRmsArcsec": 1.22,
     "moonSeriesLonVsJplRmsArcsec": 2.84,
     "moonSeriesLatVsJplRmsArcsec": 0.35,
