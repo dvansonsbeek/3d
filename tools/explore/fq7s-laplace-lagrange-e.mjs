@@ -18,7 +18,7 @@
 // Usage: node tools/explore/fq7s-laplace-lagrange-e.mjs [myr=2]
 
 import { createRequire } from 'node:module';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 const require = createRequire(new URL('../../package.json', import.meta.url).pathname);
 const TL = require('./tools/lib/constants.js');
 const { DEFAULT_CONSTANTS: C } = require('@essrt/physics');
@@ -75,6 +75,25 @@ for (let sweep = 0; sweep < 100; sweep++) {
   }
 }
 const g = Array.from({ length: N }, (_, i) => S[i][i]);                       // rad/yr
+// DIAGNOSTIC ONLY (argv[3] = 'laskar-g5g7'): substitute Laskar's g5/g7 for
+// the first-order values to test whether the J–S frequency error alone
+// explains the >0.5 Myr dephasing. Not a derivation — a sensitivity probe.
+if (process.argv[3] === 'laskar-g5g7') {
+  const sortedIdx = g.map((v, i) => i).sort((a, b) => g[b] - g[a]);
+  const i5 = sortedIdx[5], i7 = sortedIdx[6];   // 6th and 7th highest = g5-class (3.74) and g7-class (2.73)
+  g[i5] = 4.2575 / AS; g[i7] = 3.0876 / AS;
+  console.log('DIAGNOSTIC: g5/g7 replaced by Laskar 4.2575/3.0876 ″/yr (eigenvectors unchanged)');
+}
+// DERIVATION (argv[3] = 'g5=<value>'): the g5-class frequency from the
+// FRAMEWORK'S OWN 9-body integration (fq7s-nbody-g.mjs: 4.224 ″/yr over
+// 100 kyr, Laskar 4.2575) — eigenvectors from LL, g5 from the framework
+// N-body: every input is the framework's. Zero fitted constants.
+const g5arg = process.argv.slice(3).find((a) => a.startsWith('g5='));
+if (g5arg) {
+  const sortedIdx = g.map((v, i) => i).sort((a, b) => g[b] - g[a]);
+  g[sortedIdx[5]] = parseFloat(g5arg.slice(3)) / AS;
+  console.log(`DERIVED g5 substituted from the framework N-body: ${g5arg.slice(3)} ″/yr (eigenvectors from LL)`);
+}
 const E = Array.from({ length: N }, (_, j) => Float64Array.from({ length: N }, (_, i) => V[j][i] / Math.sqrt(L[j])));   // eigenvectors of A
 // order by frequency
 const order = g.map((v, i) => i).sort((a, b) => g[b] - g[a]);
@@ -124,6 +143,18 @@ console.log(`  (for scale: the shipped H/3 line vs La2004 read RMS 2.2e-2 over 2
 // J2000 slope/curvature
 const e0 = Math.hypot(...zE(0)), e1 = Math.hypot(...zE(-100)), e2 = Math.hypot(...zE(-200));
 console.log(`  J2000: e ${e0.toFixed(6)} (obs 0.016710) · ė ${((e0 - e1) / 1).toExponential(3)}/cy (obs −4.20e-5) · ë ${((e0 - 2 * e1 + e2)).toExponential(2)}/cy² (Laskar 1-kyr −1.2e-6, Simon −2.5e-7)`);
+// emit the LL orbital elements in the la2010-orbital-elements.json shape
+// (0…−500 kyr, 1-kyr steps) so the LR04 insolation check can run a V3 =
+// "framework-derived LL e/ϖ" through its V2 (Laskar) hook via
+// LA2010_PATH override. ϖ is the fixed-J2000-ecliptic longitude of
+// perihelion (arg z); the La2010 file's frame is the invariable plane
+// (~1.6° apart — a first-test approximation, recorded).
+{
+  const data = [];
+  for (let k = 0; k <= 500; k++) { const t = -k * 1000; const [re, im] = zE(t); data.push({ year: t, eccentricity: Math.hypot(re, im), inclination: 0, perihelionLong: ((Math.atan2(im, re) / D2R) + 360) % 360, ascendingNode: 0 }); }
+  writeFileSync(new URL('./fq7s-ll-orbital-elements.local.json', import.meta.url), JSON.stringify({ source: 'framework Laplace–Lagrange (fq7s-laplace-lagrange-e.mjs)', frame: 'J2000 ecliptic (fixed)', columns: { year: 'yr from J2000', eccentricity: 'e = |z|', perihelionLong: 'arg z (deg)' }, data }));
+  console.log('  wrote fq7s-ll-orbital-elements.local.json (0…−500 kyr) for the LR04 insolation V3 test');
+}
 // spectrum peaks of LL e(t)
 {
   const m = mean(eM), n = eM.length, out = [];

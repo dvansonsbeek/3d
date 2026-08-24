@@ -38,6 +38,7 @@ Output: data/insolation-laskar-check-results.json
 
 from __future__ import annotations
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -57,8 +58,11 @@ from milankovitch_insolation_extension import (
 
 REPO_ROOT = SCRIPT_DIR.parent
 DATA_DIR  = REPO_ROOT / "data"
-LA2010_PATH = REPO_ROOT / "public" / "input" / "la2010-orbital-elements.json"
-OUT_PATH = DATA_DIR / "insolation-laskar-check-results.json"
+# Env overrides (FQ-7-Sun option C-large): point the "Laskar" variant at a
+# framework-derived orbital-elements file (same JSON shape) and redirect the
+# output so the canonical tracked results are never overwritten by a probe.
+LA2010_PATH = Path(os.environ.get("LA2010_PATH", str(REPO_ROOT / "public" / "input" / "la2010-orbital-elements.json")))
+OUT_PATH = Path(os.environ.get("INSOLATION_CHECK_OUT", str(DATA_DIR / "insolation-laskar-check-results.json")))
 
 WINDOW_KYR = (0, 500)  # set by La2010 coverage limit
 
