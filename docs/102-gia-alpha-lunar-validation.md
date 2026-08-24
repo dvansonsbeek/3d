@@ -503,8 +503,8 @@ the one-sided residual column above into sign-mixed, noise-class scatter:
 |---|---:|---:|
 | -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.04<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+0.8<!--/v--> min |
 | -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.11<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−4.4<!--/v--> min |
-| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.11<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−3.9<!--/v--> min |
-| -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−9.4<!--/v--> min |
+| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.11<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−4.0<!--/v--> min |
+| -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−9.3<!--/v--> min |
 | -400…-301 | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr | <!--v:lunarPredictedReduced400Minutes-->−12.4<!--/v--> min |
 
 These predictions are recorded in the gate BEFORE the contact-time

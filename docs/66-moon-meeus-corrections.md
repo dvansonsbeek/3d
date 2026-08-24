@@ -965,8 +965,8 @@ unshipped even though "fitting" them would improve the gates
 AT the R1-measured MPP02-vs-JPL comparison floor (~0.33″); dense 2-day
 λ 2.32 → 2.22″, β 0.60 → 0.38″; syzygy fleet improves 9.34″; the
 sign-flip control degrades every gate. Audit: verdicts 3/13/5/0/5
-reproduced, Babylon −135 <!--v:babylon135BestGapKm-->186<!--/v--> km,
-centerlines mean flat at <!--v:centerlinesMeanArcsec-->2.2<!--/v-->″
+reproduced, Babylon −135 <!--v:babylon135BestGapKm-->170<!--/v--> km,
+centerlines mean flat at <!--v:centerlinesMeanArcsec-->2.1<!--/v-->″
 with Antarctica halved 2.2 → 1.0″ and the recorded tension that the
 2001 Atlantic max moves 5.6 → <!--v:centerlinesMaxArcsec-->6.3<!--/v-->″
 (the known series-tail-anatomy point; the A2-class correlated-subsample
@@ -1110,14 +1110,14 @@ nutation on a SUN-ALONE metric; nutation is a frame rotation common to
 Sun and Moon, the chain keeps both mean-of-date, so the term was a
 frame inconsistency for elongation. REMOVED: nutation-free syzygy
 fleet 3.877 → 3.756″, fuller-bridged Sun 2.344 → 2.123″, centerlines
-mean 2.4 → <!--v:centerlinesMeanArcsec-->2.2<!--/v-->″ (Texas 1.9 → 1.4,
+mean 2.4 → <!--v:centerlinesMeanArcsec-->2.1<!--/v-->″ (Texas 1.9 → 1.4,
 US 3.2 → 2.0; Antarctica 1.0 → 1.7; max
 <!--v:centerlinesMaxArcsec-->6.3<!--/v-->″ unchanged), Babylon −135
-<!--v:babylon135BestGapKm-->186<!--/v--> km, verdicts 3/13/5/0/5
+<!--v:babylon135BestGapKm-->170<!--/v--> km, verdicts 3/13/5/0/5
 reproduced; the registry Sun keys are now INSTRUMENT-OWNED
 (`fq7s-sun-registry-metric.mjs`: modern window 1970–2049, full
 nutation bridge, mean removed — certified
-<!--v:frameworkSunVsJplRms-->0.93<!--/v-->″ vs the Meeus Ch. 25 basis
+<!--v:frameworkSunVsJplRms-->0.80<!--/v-->″ vs the Meeus Ch. 25 basis
 with the same completion <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″;
 bare Meeus 10.06″). (b) T·sinM −3.66″/cy ≡ the chain's e(t) local slope
 −5.11e-5/cy vs −4.20e-5 (Simon/JPL); (c) T·cosM +1.08″/cy ≡ ϖ̇ 6151.5
@@ -1130,6 +1130,42 @@ audit events, up to 38″ at −760, ΔT-degenerate const+T+T² detrended)
 leaves 0.187 min event-to-event — under the ~0.2-min discriminating
 power. The laws stand as derived; the modern local-slope differences
 are recorded as prediction-level tensions, not tuned.
+
+**FQ-7-Sun option C-small — ONE eccentricity law for Sun and Moon.**
+The joint Sun–Moon look (`fq7s-ecc-consistency.mjs`) found the chain
+carrying THREE e(t) laws: the H/16 beat law (cardinal points,
+ė −0.84e-5/cy at J2000), the H/3 line of `moon/ecc-channel.cjs` (the
+Moon's E-factor; ė ≈ −4.27e-5/cy, the "+1.7% prediction" above), and
+the Sun's H/16 + H/3-imprint sum (ė −5.11e-5/cy). Algebraically the
+Sun's slope = the Moon's line + the H/16 law's own slope, and that
+H/16 slope IS the annual-channel δė measured above; JPL sides with the
+Moon's line. The structural reading: eccentricity is FRAME-INVARIANT
+(e = |z|, z = e·e^{iϖ}) and may carry only fixed-frame lattice content
+(H/3, 8H-class beats); H/16 is the OF-DATE perihelion period — the H/3
+apsidal rotation seen from the H/13 equinox (13 + 3 = 16) — and belongs
+to ϖ_of-date, not to e. The frame-invariance audit finds the
+eccentricity laws to be the ONLY place a frame period sits inside a
+frame-invariant quantity. LANDED: the eclipse Sun's eccentricity is now
+the J2000-anchored H/3 line (the H/16 law's J2000 value + the H/3
+variable part — the Moon's own law); the cardinal-point path keeps the
+H/16 law (`eccentricityAt`) unchanged. Measured: JPL Sun 1900–2100
+2.123 → 1.487″; registry window
+<!--v:frameworkSunVsJplRms-->0.80<!--/v-->″ (was 0.93); syzygy fleet
+3.756 → 3.719″; T·sinM −3.65 → −0.19″/cy (δė ≈ 0); the curvature term
+unchanged in size (T²·sinM −0.125 → +0.101″/cy², post-family residual
+0.631″ both); the H/16 term at the 26 corpus epochs (up to 78″ EoC at
+−762) detrends to 0.174 min — below the corpus's discrimination.
+Also recorded, not landed: the besselian Sun DISTANCE still rides the
+H/16 law (`eccentricityAt` — 1e-4-relative, ~0.1″ of solar radius); and
+the deep-time vector comparison (`fq7s-orbit-vector-vs-laskar.mjs`):
+over 250 kyr NONE of the model's e-laws track La2004 (model e ≈ 0.015
+with 0.001–0.008 swings vs Laskar 0.014–0.050, mean 0.033 — the
+off-lattice eccentricity beats), ϖ_of-date drifts ~100° RMS (Laskar's
+mean climatic-precession period 22,973 yr vs H/16 20,957), ε 0.79° RMS
+with the period right (41,667 vs H/8 41,915). That is option C-LARGE:
+e = |z| from frame-invariant lattice modes with Laskar-class
+amplitudes — research-class, to be tested against the cardinal-point
+fit and the paleo record, not JPL alone.
 
 Measured jointly (the pre-registered acceptance — all four, never a
 subset): all-phase JPL Sun 3.48″ → 2.12″; syzygy fleet 5.51″ → 3.99″
@@ -1231,7 +1267,7 @@ closed λ to 2.96″, the FQ-7 J2 node family to 2.92″ with β
 0.65 → 0.61″, and the FQ-7 dust round to
 <!--v:moonSeriesLonVsJplRms-->2.84<!--/v-->″ /
 <!--v:moonSeriesLatVsJplRms-->0.35<!--/v-->″); syzygy 3.82″; tracked centerlines
-<!--v:centerlinesMeanArcsec-->2.2<!--/v-->″ mean, <!--v:centerlinesMaxArcsec-->6.3<!--/v-->″ max (current audit run, <!--v:centerlinesEvents-->14<!--/v--> events / <!--v:centerlinesPoints-->42<!--/v--> points).
+<!--v:centerlinesMeanArcsec-->2.1<!--/v-->″ mean, <!--v:centerlinesMaxArcsec-->6.3<!--/v-->″ max (current audit run, <!--v:centerlinesEvents-->14<!--/v--> events / <!--v:centerlinesPoints-->42<!--/v--> points).
 
 ### Geocentric parallax limit
 - The 0.81-degree RMS is the **theoretical best** for geocentric coordinates.
