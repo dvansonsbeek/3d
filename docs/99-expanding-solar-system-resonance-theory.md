@@ -378,8 +378,8 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
 −(e_base/2)(cos φ₃ − cos φ₃(2000)) on the integrated phase — the same
 derived-e channel the cardinal-point braid uses.
 
-**Accuracy**: <!--v:frameworkSunVsJplRms-->0.95<!--/v-->″ RMS vs JPL over the modern window (the Meeus Ch. 25
-reference itself sits at <!--v:meeusCh25SunVsJplRms-->1.28<!--/v-->″). At antiquity the closed form tracks the
+**Accuracy**: <!--v:frameworkSunVsJplRms-->0.93<!--/v-->″ RMS vs JPL over the modern window (the Meeus Ch. 25
+reference itself sits at <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″). At antiquity the closed form tracks the
 retired ±3000-yr trapezoid table to −0.3″ at −135 and −6.8″ at the ±3000
 edge.
 

@@ -396,7 +396,7 @@ framework-native Sun, `packages/physics/src/model.js`, exported as
 `eclipse.frameworkSunDeps`): mean tropical rate + the closed-form f(Y)
 year-harmonic drift (scaled by the derived obliquity-torque factors 1.306 /
 1.815) + equation of centre with the H/16 + derived-H/3 e(t). It carries
-**zero fitted solar constants**; accuracy <!--v:frameworkSunVsJplRms-->0.95<!--/v-->″ RMS vs JPL (modern window; the Meeus Ch. 25 reference: <!--v:meeusCh25SunVsJplRms-->1.28<!--/v-->″).
+**zero fitted solar constants**; accuracy <!--v:frameworkSunVsJplRms-->0.93<!--/v-->″ RMS vs JPL (modern window; the Meeus Ch. 25 reference: <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″).
 The scene wheel displays the same longitude via the δ overlay
 (δ = λ_certified − λ_twin, clock-convention window). See
 [doc 99 § The framework-native Sun](99-expanding-solar-system-resonance-theory.md#the-framework-native-sun-e4e5--the-certified-apparent-solar-longitude).

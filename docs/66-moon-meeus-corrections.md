@@ -965,8 +965,8 @@ unshipped even though "fitting" them would improve the gates
 AT the R1-measured MPP02-vs-JPL comparison floor (~0.33″); dense 2-day
 λ 2.32 → 2.22″, β 0.60 → 0.38″; syzygy fleet improves 9.34″; the
 sign-flip control degrades every gate. Audit: verdicts 3/13/5/0/5
-reproduced, Babylon −135 <!--v:babylon135BestGapKm-->187<!--/v--> km,
-centerlines mean flat at <!--v:centerlinesMeanArcsec-->2.4<!--/v-->″
+reproduced, Babylon −135 <!--v:babylon135BestGapKm-->186<!--/v--> km,
+centerlines mean flat at <!--v:centerlinesMeanArcsec-->2.2<!--/v-->″
 with Antarctica halved 2.2 → 1.0″ and the recorded tension that the
 2001 Atlantic max moves 5.6 → <!--v:centerlinesMaxArcsec-->6.3<!--/v-->″
 (the known series-tail-anatomy point; the A2-class correlated-subsample
@@ -1086,8 +1086,50 @@ single terms are sidebands (2(E−J)−M_E 8.3″, E−M−M_Ma 7.5″), invisib
 to a stability filter that expects constant tones. The v1 fitted wobble
 −6.64″ is replaced by the DERIVED parallactic amplitude a_M·μ/AU
 (6.4399″, computed live from package constants in `model.js`); the one
-declared-fitted survivor is the +1.42″ 2lE finder-annual artifact, to be
-absorbed at the next Step-0.
+declared-fitted survivor was the +1.42″ 2lE "finder-annual artifact" —
+RETIRED by the FQ-7-Sun annual-channel attribution (record below): it
+was the semiannual nutation term in disguise, and a Sun-only nutation
+term is a frame inconsistency for elongation in a mean-of-date chain.
+The completion now carries zero fitted constants.
+
+**FQ-7-Sun — the annual-channel attribution (the deeper-completion
+round's measured negative, then the finding).** The deeper-completion
+attempt (`fq7s-*.mjs`) measured the completion IC-realization-bound,
+not table-bound: a deeper catalog reads the banked twin signal
+0.614 → 0.546″ but moves JPL by ~0.005″; a 10-body twin
+(Uranus+Neptune, 400 yr) closes JPL at 0.63″ vs 0.60; a t0 ensemble
+spreads 0.51–0.81″ with gate deltas ±0.08″ — the size of any gain, so
+selecting the best member by gate would be fitting (not shipped; wake
+condition FQ-1's epoch-real planets). The annual channel then
+decomposed (`fq7s-annual-channel.mjs`, EoC ≈ 2e·sin M on the certified
+Sun vs JPL 1900–2100): (a) the residual's 2M family ≡ the negative of
+the fitted +1.42″ sin 2lE term under a fuller nutation bridge and 0.13″
+under the leading-term bridge the term was fitted against — the term
+had been compensating the −1.32″ sin(2F−2D+2Ω) ≡ sin 2lE semiannual
+nutation on a SUN-ALONE metric; nutation is a frame rotation common to
+Sun and Moon, the chain keeps both mean-of-date, so the term was a
+frame inconsistency for elongation. REMOVED: nutation-free syzygy
+fleet 3.877 → 3.756″, fuller-bridged Sun 2.344 → 2.123″, centerlines
+mean 2.4 → <!--v:centerlinesMeanArcsec-->2.2<!--/v-->″ (Texas 1.9 → 1.4,
+US 3.2 → 2.0; Antarctica 1.0 → 1.7; max
+<!--v:centerlinesMaxArcsec-->6.3<!--/v-->″ unchanged), Babylon −135
+<!--v:babylon135BestGapKm-->186<!--/v--> km, verdicts 3/13/5/0/5
+reproduced; the registry Sun keys are now INSTRUMENT-OWNED
+(`fq7s-sun-registry-metric.mjs`: modern window 1970–2049, full
+nutation bridge, mean removed — certified
+<!--v:frameworkSunVsJplRms-->0.93<!--/v-->″ vs the Meeus Ch. 25 basis
+with the same completion <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″;
+bare Meeus 10.06″). (b) T·sinM −3.66″/cy ≡ the chain's e(t) local slope
+−5.11e-5/cy vs −4.20e-5 (Simon/JPL); (c) T·cosM +1.08″/cy ≡ ϖ̇ 6151.5
+vs 6190″/cy. Both are LOCAL-SLOPE differences of long-period laws:
+both laws pass the 1246 perihelion–solstice anchor (chain 1246.0, the
+JPL-class linear law 1247.6 — the anchor is a decade-wide plateau and
+cannot discriminate), and the corpus test
+(`fq7s-law-tension-corpus.mjs`: JPL-class − chain EoC at the 26
+audit events, up to 38″ at −760, ΔT-degenerate const+T+T² detrended)
+leaves 0.187 min event-to-event — under the ~0.2-min discriminating
+power. The laws stand as derived; the modern local-slope differences
+are recorded as prediction-level tensions, not tuned.
 
 Measured jointly (the pre-registered acceptance — all four, never a
 subset): all-phase JPL Sun 3.48″ → 2.12″; syzygy fleet 5.51″ → 3.99″
@@ -1189,7 +1231,7 @@ closed λ to 2.96″, the FQ-7 J2 node family to 2.92″ with β
 0.65 → 0.61″, and the FQ-7 dust round to
 <!--v:moonSeriesLonVsJplRms-->2.84<!--/v-->″ /
 <!--v:moonSeriesLatVsJplRms-->0.35<!--/v-->″); syzygy 3.82″; tracked centerlines
-<!--v:centerlinesMeanArcsec-->2.4<!--/v-->″ mean, <!--v:centerlinesMaxArcsec-->6.3<!--/v-->″ max (current audit run, <!--v:centerlinesEvents-->14<!--/v--> events / <!--v:centerlinesPoints-->42<!--/v--> points).
+<!--v:centerlinesMeanArcsec-->2.2<!--/v-->″ mean, <!--v:centerlinesMaxArcsec-->6.3<!--/v-->″ max (current audit run, <!--v:centerlinesEvents-->14<!--/v--> events / <!--v:centerlinesPoints-->42<!--/v--> points).
 
 ### Geocentric parallax limit
 - The 0.81-degree RMS is the **theoretical best** for geocentric coordinates.
