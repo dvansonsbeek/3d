@@ -143,6 +143,13 @@ console.log(`  (for scale: the shipped H/3 line vs La2004 read RMS 2.2e-2 over 2
 // J2000 slope/curvature
 const e0 = Math.hypot(...zE(0)), e1 = Math.hypot(...zE(-100)), e2 = Math.hypot(...zE(-200));
 console.log(`  J2000: e ${e0.toFixed(6)} (obs 0.016710) · ė ${((e0 - e1) / 1).toExponential(3)}/cy (obs −4.20e-5) · ë ${((e0 - 2 * e1 + e2)).toExponential(2)}/cy² (Laskar 1-kyr −1.2e-6, Simon −2.5e-7)`);
+// emit Earth's mode table — z_E(t) = Σ (re_i + i·im_i)·e^{i g_i t}, t in yr
+// from J2000 — the runtime-evaluable form of the derived vector
+{
+  const modes = order.map((i) => ({ gArcsecPerYr: g[i] * AS, re: E[iE][i] * cRe[i], im: E[iE][i] * cIm[i] }));
+  writeFileSync(new URL('./fq7s-ll-modes.local.json', import.meta.url), JSON.stringify({ source: 'fq7s-laplace-lagrange-e.mjs', g5: g5arg ? g5arg.slice(3) : 'first-order', modes }, null, 1));
+  console.log('  wrote fq7s-ll-modes.local.json (Earth mode table)');
+}
 // emit the LL orbital elements in the la2010-orbital-elements.json shape
 // (0…−500 kyr, 1-kyr steps) so the LR04 insolation check can run a V3 =
 // "framework-derived LL e/ϖ" through its V2 (Laskar) hook via

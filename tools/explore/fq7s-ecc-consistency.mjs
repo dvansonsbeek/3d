@@ -41,9 +41,17 @@ const BRIDGE = C.earthOrbital.deltaTStart / 86400;
 const NU = C.physicalConstants.nutationLeadingTermsArcsec;
 const wrap = (d) => ((((d + 540) % 360) + 360) % 360) - 180;
 
-// the variant law
+// the variant law — default: the Moon's H/3 line; --derived: the C-large
+// vector e = |z| from the LL + N-body mode table (fq7s-ll-modes.local.json)
 const e16_2000 = model.earth.eccentricity(2000);
-const eccMoonLine = (y) => e16_2000 + (deps.eccentricityAt(y) - model.earth.eccentricity(y));
+const eccMoonLineBase = (y) => e16_2000 + (deps.eccentricityAt(y) - model.earth.eccentricity(y));
+let eccMoonLine = eccMoonLineBase;
+if (process.argv.includes('--derived')) {
+  const MT = JSON.parse(readFileSync(HERE + 'fq7s-ll-modes.local.json', 'utf8'));
+  const R2AS_ = 206264.806;
+  eccMoonLine = (y) => { const t = y - 2000; let re = 0, im = 0; for (const m of MT.modes) { const ph = m.gArcsecPerYr / R2AS_ * t; re += m.re * Math.cos(ph) - m.im * Math.sin(ph); im += m.re * Math.sin(ph) + m.im * Math.cos(ph); } return Math.hypot(re, im); };
+  console.log(`VARIANT = the DERIVED vector e = |z| (mode table, g5 ${MT.g5}); e(2000) = ${eccMoonLine(2000).toFixed(7)}`);
+}
 console.log('ė over 1900–2100 (per cy):');
 console.log(`  Sun (shipped)      ${((deps.eccentricityAt(2100) - deps.eccentricityAt(1900)) / 2).toExponential(3)}`);
 console.log(`  Moon line (variant)${((eccMoonLine(2100) - eccMoonLine(1900)) / 2).toExponential(3)}`);
