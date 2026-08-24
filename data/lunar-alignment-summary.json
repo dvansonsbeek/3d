@@ -12,10 +12,10 @@
     "unmatchedCanon": 0,
     "typeAgree": 1447,
     "meanAbsResidualMinutes": 8.531,
-    "meanAbsResidualMinutesFull": 8.531393147028727,
-    "rmsResidualMinutes": 9.842,
-    "rmsResidualMinutesFull": 9.842129239287406,
-    "maxAbsResidualMinutes": 19.756
+    "meanAbsResidualMinutesFull": 8.530642863799786,
+    "rmsResidualMinutes": 9.84,
+    "rmsResidualMinutesFull": 9.839560949141665,
+    "maxAbsResidualMinutes": 19.68
   },
   "visibility": {
     "entriesChecked": 14,
@@ -106,7 +106,7 @@
       {
         "label": "2020 Nov 30 Penumbral",
         "bestInsideCity": "Kansas City",
-        "bestInsideAltitudeDeg": 42.83,
+        "bestInsideAltitudeDeg": 42.84,
         "insideVisible": true,
         "outsideCity": "Berlin",
         "outsideVisible": false
@@ -141,11 +141,11 @@
     "found": true,
     "type": "Partial",
     "canonType": "Partial",
-    "magnitudeUmbral": 0.9084,
+    "magnitudeUmbral": 0.9127,
     "canonMagnitudeUmbral": 0.9199,
-    "ttResidualMinutes": -3.41,
+    "ttResidualMinutes": -0.67,
     "visibleFromBabylon": true,
-    "babylonMoonAltitudeDeg": 34.67
+    "babylonMoonAltitudeDeg": 34.11
   },
   "dtBands": {
     "overall": {
@@ -284,7 +284,7 @@
     "bins": {
       "100": {
         "n": 196,
-        "signedMeanMinutes": 0.87
+        "signedMeanMinutes": 0.86
       },
       "500": {
         "n": 201,
@@ -292,7 +292,7 @@
       },
       "1000": {
         "n": 191,
-        "signedMeanMinutes": 1.2
+        "signedMeanMinutes": 1.19
       },
       "1500": {
         "n": 180,
@@ -308,7 +308,7 @@
       },
       "-750": {
         "n": 190,
-        "signedMeanMinutes": -2.16
+        "signedMeanMinutes": -2.2
       },
       "-650": {
         "n": 204,
@@ -316,107 +316,107 @@
       },
       "-550": {
         "n": 204,
-        "signedMeanMinutes": -1.65
+        "signedMeanMinutes": -1.62
       },
       "-450": {
-        "n": 192,
-        "signedMeanMinutes": -1
+        "n": 193,
+        "signedMeanMinutes": -1.07
       },
       "-350": {
         "n": 186,
-        "signedMeanMinutes": -0.36
+        "signedMeanMinutes": -0.37
       },
       "-250": {
         "n": 183,
-        "signedMeanMinutes": -0.93
+        "signedMeanMinutes": -0.92
       },
       "-100": {
         "n": 201,
-        "signedMeanMinutes": 0.42
+        "signedMeanMinutes": 0.43
       }
     },
     "driftVsModernMinutes": {
-      "100": -0.15,
+      "100": -0.16,
       "500": 0.37,
-      "1000": 0.18,
+      "1000": 0.17,
       "1500": -0.06,
       "1800": -0.03,
       "2000": 0.1,
-      "-750": -3.18,
+      "-750": -3.22,
       "-650": -2.17,
-      "-550": -2.67,
-      "-450": -2.02,
-      "-350": -1.38,
-      "-250": -1.95,
-      "-100": -0.6
+      "-550": -2.64,
+      "-450": -2.09,
+      "-350": -1.39,
+      "-250": -1.94,
+      "-100": -0.59
     },
     "effectiveDeltaNdotArcsecPerCy2": 0.26,
     "predictedReducedResidualMinutes": {
       "-800": 0.8,
       "-700": -4.4,
-      "-600": -3.9,
-      "-500": -9.4,
+      "-600": -4,
+      "-500": -9.3,
       "-400": -12.4
     }
   },
   "phaseC": {
     "window": "S01/S02/S04, years −800..−301, weight>0 (null=1)",
-    "identified": 69,
+    "identified": 68,
     "viaYearStraddle": 4,
-    "ambiguous": 1,
+    "ambiguous": 2,
     "dropped": 1,
     "perCentury": {
       "-800": {
-        "n": 2,
-        "medianMinutes": 13.5,
-        "seMinutes": 39.8,
+        "n": 1,
+        "medianMinutes": -24.6,
+        "seMinutes": 0,
         "preRegisteredMinutes": 0.8,
-        "z": 0.3
+        "z": null
       },
       "-700": {
         "n": 6,
-        "medianMinutes": -21.4,
-        "seMinutes": 8.2,
+        "medianMinutes": -20.4,
+        "seMinutes": 9.3,
         "preRegisteredMinutes": -4.4,
-        "z": -2.1
+        "z": -1.7
       },
       "-600": {
         "n": 21,
-        "medianMinutes": -10.5,
-        "seMinutes": 6,
-        "preRegisteredMinutes": -3.9,
-        "z": -1.1
+        "medianMinutes": -11.2,
+        "seMinutes": 5.7,
+        "preRegisteredMinutes": -4,
+        "z": -1.3
       },
       "-500": {
         "n": 13,
-        "medianMinutes": -20,
-        "seMinutes": 13.9,
-        "preRegisteredMinutes": -9.4,
+        "medianMinutes": -20.9,
+        "seMinutes": 14.6,
+        "preRegisteredMinutes": -9.3,
         "z": -0.8
       },
       "-400": {
         "n": 27,
-        "medianMinutes": -10.4,
+        "medianMinutes": -11.5,
         "seMinutes": 2.7,
         "preRegisteredMinutes": -12.4,
-        "z": 0.7
+        "z": 0.3
       }
     },
-    "chi2": 6.7,
-    "chi2Centuries": 5
+    "chi2": 5.3,
+    "chi2Centuries": 4
   },
   "denseTargets": {
     "window": "S01/S02/S04/S05/S09, years −800..+1280, weight>0 (null=1); S07 excluded (unmarked lunar/solar mix)",
-    "identified": 244,
+    "identified": 243,
     "viaYearStraddle": 10,
-    "ambiguous": 2,
+    "ambiguous": 3,
     "dropped": 1,
     "weightZeroExcluded": 9,
     "perCentury": {
       "400": {
         "n": 5,
-        "medianSeconds": -390,
-        "seSeconds": 440
+        "medianSeconds": -391,
+        "seSeconds": 441
       },
       "500": {
         "n": 11,
@@ -425,68 +425,68 @@
       },
       "800": {
         "n": 5,
-        "medianSeconds": 433,
-        "seSeconds": 272
+        "medianSeconds": 430,
+        "seSeconds": 276
       },
       "900": {
         "n": 17,
-        "medianSeconds": -474,
-        "seSeconds": 235
+        "medianSeconds": -490,
+        "seSeconds": 242
       },
       "1000": {
         "n": 38,
-        "medianSeconds": 83,
-        "seSeconds": 122
+        "medianSeconds": 80,
+        "seSeconds": 123
       },
       "1100": {
         "n": 4,
-        "medianSeconds": 759,
-        "seSeconds": 248
+        "medianSeconds": 784,
+        "seSeconds": 240
       },
       "1200": {
         "n": 17,
-        "medianSeconds": 348,
+        "medianSeconds": 347,
         "seSeconds": 145
       },
       "-800": {
-        "n": 2,
-        "medianSeconds": 810,
-        "seSeconds": 2391
+        "n": 1,
+        "medianSeconds": -1478,
+        "seSeconds": 0
       },
       "-700": {
         "n": 6,
-        "medianSeconds": -1285,
-        "seSeconds": 495
+        "medianSeconds": -1227,
+        "seSeconds": 559
       },
       "-600": {
         "n": 21,
-        "medianSeconds": -633,
-        "seSeconds": 358
+        "medianSeconds": -672,
+        "seSeconds": 340
       },
       "-500": {
         "n": 13,
-        "medianSeconds": -1198,
-        "seSeconds": 834
+        "medianSeconds": -1256,
+        "seSeconds": 875
       },
       "-400": {
         "n": 27,
-        "medianSeconds": -627,
-        "seSeconds": 164
+        "medianSeconds": -688,
+        "seSeconds": 163
       },
       "-300": {
         "n": 13,
-        "medianSeconds": -1244,
-        "seSeconds": 1184
+        "medianSeconds": -1272,
+        "seSeconds": 1151
       },
       "-200": {
         "n": 50,
-        "medianSeconds": -101,
-        "seSeconds": 211
+        "medianSeconds": -42,
+        "seSeconds": 207
       },
       "-100": {
         "n": 15,
-        "medianSeconds": 39,
-        "seSeconds": 377
+        "medianSeconds": 42,
+        "seSeconds": 388
       }
     },
     "chi2CenturiesUsed": [
@@ -505,13 +505,13 @@
       "1200"
     ],
     "ablationChi2": {
-      "fullStack": 46,
-      "minus_bond": 59.3,
-      "minus_hallstatt": 45.8,
-      "minus_jose5": 44.9,
-      "minus_jose4": 40.5,
-      "minus_resonator": 135.6,
-      "noCycles": 95.2
+      "fullStack": 47.9,
+      "minus_bond": 58.9,
+      "minus_hallstatt": 47.9,
+      "minus_jose5": 47.2,
+      "minus_jose4": 41.9,
+      "minus_resonator": 141.2,
+      "noCycles": 96.6
     }
   },
   "inputs": {
