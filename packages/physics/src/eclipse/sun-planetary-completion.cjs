@@ -41,10 +41,21 @@
  *  (ii) the J2000 phase anchors ARG_L0 / PERI / D0 — epoch initial
  *       conditions ("anchored by design" class; the RATES are now
  *       framework-derived, injected);
- *  (iii) the 2lE term (+1.42″ sin 2lE) — DECLARED FITTED, not derived: a
- *       finder-annual artifact, measured chain-independent at E4/E5
- *       (re-fit noise −0.12″/−0.03″). Everything else in this file is
- *       derived. The Earth-around-EMB wobble is DERIVED: amplitude
+ *  (iii) RETIRED (FQ-7-Sun annual-channel attribution): the former
+ *       declared-fitted +1.42″ sin 2lE term. It was fitted against a
+ *       Sun-ALONE JPL comparison bridged by the leading nutation term
+ *       only, and the attribution measured it as the semiannual
+ *       nutation term −1.32″ sin(2F−2D+2Ω) ≡ −1.32″ sin 2lE in disguise
+ *       (2M residual 0.13″ under that bridge, 1.43″ ≡ the term's
+ *       negative under the fuller bridge). Nutation in longitude is a
+ *       frame rotation common to Sun AND Moon — this chain keeps both
+ *       bodies MEAN-of-date (mean obliquity, mean sidereal time; see
+ *       besselian.cjs), so a Sun-only nutation term is a frame
+ *       inconsistency for elongation. Removed: the nutation-free syzygy
+ *       fleet improves 3.877 → 3.756″ and the fuller-bridged Sun
+ *       comparison 2.344 → 2.123″ (fq7s-jpl-preview.mjs --no-2le;
+ *       fq7s-annual-channel.mjs). This file now carries ZERO fitted
+ *       constants. The Earth-around-EMB wobble is DERIVED: amplitude
  *       a_M·μ/AU with μ = 1/(1+M_E/M_M), injected by the model wiring
  *       from live package constants (6.4399″ at current constants), sign
  *       negative in the subtract convention.
@@ -175,9 +186,6 @@ const TERMS = [
   [[0, 0, 1, -1, 0, 0], [0, 0, -1, 0, 0, 0], -0.0353, -0.0379],
 ];
 
-/** The declared-fitted semiannual leftover (header (iii)): +1.42″ sin 2lE. */
-const FITTED_2LE_ARCSEC = 1.42;
-
 const D2R = Math.PI / 180;
 
 /**
@@ -222,8 +230,7 @@ function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy })
       table += cA * Math.cos(th) + sA * Math.sin(th);
     }
     const D = (ARG_D0 + D1 * T) * D2R;
-    const arcsec = -table - embWobbleArcsec * Math.sin(D)
-      + FITTED_2LE_ARCSEC * Math.sin(2 * l[2]);
+    const arcsec = -table - embWobbleArcsec * Math.sin(D);
     return arcsec / 3600;
   }
   return { sunPlanetaryCompletionDeg };
