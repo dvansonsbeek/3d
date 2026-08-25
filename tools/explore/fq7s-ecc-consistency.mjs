@@ -46,6 +46,12 @@ const wrap = (d) => ((((d + 540) % 360) + 360) % 360) - 180;
 const e16_2000 = model.earth.eccentricity(2000);
 const eccMoonLineBase = (y) => e16_2000 + (deps.eccentricityAt(y) - model.earth.eccentricity(y));
 let eccMoonLine = eccMoonLineBase;
+if (process.argv.includes('--h16')) {
+  // owner question: "what if both Sun and Moon rode the H/16 law?" — the Sun on
+  // the pure H/16 beat law (the cardinal-point path's eccentricityAt)
+  eccMoonLine = (y) => model.earth.eccentricity(y);
+  console.log(`VARIANT = the pure H/16 law (cardinal path); ė over 1900–2100 ${((eccMoonLine(2100) - eccMoonLine(1900)) / 2).toExponential(3)}/cy vs observed −4.20e-5`);
+}
 if (process.argv.includes('--derived')) {
   const MT = JSON.parse(readFileSync(HERE + 'fq7s-ll-modes.local.json', 'utf8'));
   const R2AS_ = 206264.806;
