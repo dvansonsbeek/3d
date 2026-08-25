@@ -86,7 +86,10 @@ export function assembleModel(C, F) {
 
   const earthtiltMean = C.earth.earthtiltMean;
   const earthInclAmplitude = C.earth.earthInvPlaneInclinationAmplitude;
-  const eccentricityBase = C.earth.eccentricityBase;
+  // eccentricityAmplitude: the v11 H/16-beat amplitude, RETAINED ONLY as the
+  // Law-4 K calibration input (plan IP-eccentricity-unification, decision D2:
+  // K keeps its value). Earth's eccentricity law no longer uses it — see
+  // eccentricityAt (base' derived) below.
   const eccentricityAmplitude = C.earth.eccentricityAmplitude;
   const earthRAAngle = 2 * earthInclAmplitude - (earthInclAmplitude * earthInclAmplitude) / earthtiltMean;
   const earthInclMean = C.earthOrbital.earthInclinationJ2000_deg
@@ -305,12 +308,42 @@ export function assembleModel(C, F) {
     }
     return obliq;
   };
+  // ECCENTRICITY UNIFICATION — ONE law for the whole model (plan
+  // IP-eccentricity-unification, decision D1 = form (e)). Earth's orbital
+  // eccentricity is the magnitude of a vector sum, e = |v₁ + v₂|: v₁ of
+  // length base' along the ICRF perihelion (rotating once per H/3), v₂ of
+  // length base'/2 FIXED in space along the inclination-cycle anchor
+  // direction. Their relative angle θ rides the System-Reset lattice phase
+  // (θ(t) = 3(t − balancedYear)/H·360° − 180°, θ(J2000) = 81.178°) — the
+  // SAME anchor the inclination law and the Moon channel ride (their
+  // extremes coincide: max −23,200, min −79,100). Then
+  //     e(t) = base' · (1 + cos θ(t) / 2),   base' = e(J2000) / (1 + cos θ(J2000) / 2)
+  // base' is DERIVED from the observed J2000 eccentricity and the anchor
+  // (0.015520; the Law-5 balance moves 99.8636 → 99.8645%, Earth's weight
+  // there being 0.05%). No new constants. Why H/3 and not the former H/16
+  // beat law: eccentricity is frame-invariant and may carry only fixed-frame
+  // lattice periods; H/16 is the OF-DATE perihelion period (13 + 3 = 16 —
+  // the H/3 rotation seen from the H/13 equinox) and belongs to ϖ_of-date;
+  // measured, the H/16 law's present ė (−0.84e-5/cy) is 5× below the
+  // observed −4.20e-5 while this law reads −4.31e-5 (Phase-0 record:
+  // tools/explore/fq7s-h3-law-candidate.mjs; JPL Sun 1.49″, registry 0.80″,
+  // syzygy 3.72″). Consumers: the eclipse Sun (equation of centre), the
+  // besselian Sun distance, the Moon channel (E-factor, perigee/node T²),
+  // and the cardinal-point braid — one eccentricity everywhere.
+  /** cos θ on the System-Reset phase (the sign flip is the −180° in θ). @param {number} year @returns {number} */
+  const eccentricityPhaseCos = (year) => -Math.cos(phaseRadians(balancedYear, year, 3));
+  const eccentricityBaseDerived = C.earthOrbital.earthEccentricityJ2000 / (1 + eccentricityPhaseCos(2000) / 2);
   /** @param {number} year @returns {number} */
-  const eccentricityAt = (year) => {
-    const th = phaseRadians(balancedYear, year, 16);
-    return Math.sqrt(eccentricityBase * eccentricityBase
-      + eccentricityAmplitude * eccentricityAmplitude
-      - 2 * eccentricityBase * eccentricityAmplitude * Math.cos(th));
+  const eccentricityAt = (year) => eccentricityBaseDerived * (1 + eccentricityPhaseCos(year) / 2);
+  /** de/dyear of the one law (analytic; the cardinal braid's equation-of-centre
+   *  derivative rides it): d/dy[−cos φ₃] = sin φ₃ · dφ₃/dy, with φ₃ the
+   *  integrated H/3 lattice phase — its rate taken as the two-point
+   *  difference of the phase counter over ±1 yr (exact for a linear phase,
+   *  ppm-class otherwise). @param {number} year @returns {number} */
+  const eccentricityRateAt = (year) => {
+    const phi = phaseRadians(balancedYear, year, 3);
+    const dphi = (phaseRadians(balancedYear, year + 1, 3) - phaseRadians(balancedYear, year - 1, 3)) / 2;
+    return (eccentricityBaseDerived / 2) * Math.sin(phi) * dphi;
   };
   /** @param {number} year @returns {number} */
   const inclinationDeg = (year) => earthInclMean
@@ -379,8 +412,6 @@ export function assembleModel(C, F) {
       balancedYear,
       meanSolarYearDays,
       hJ2000: H,
-      eccentricityBase,
-      eccentricityAmplitude,
       tiltMeanDeg: earthtiltMean,
       raAngleDeg: earthRAAngle,
       inclAmplitudeDeg: earthInclAmplitude,
@@ -396,6 +427,7 @@ export function assembleModel(C, F) {
       meanHAtAgeMa: (tMa) => deepLod.hAtAge(tMa),
       meanYearRealLodDays: (tMa) => deepLod.yearInDaysAtAge(tMa),
       eccentricityAt,
+      eccentricityRateAt,
     },
   });
   /** Tropical year: mean of the four cardinal intervals. @param {number} year @returns {number} */
@@ -612,11 +644,12 @@ export function assembleModel(C, F) {
   const moonAnomalisticMonthDays = totalDaysInH / (nSid - nApsidalEJ2000);
   const moonSynodicMonthDays = totalDaysInH / (nSid + 13 - H);
 
-  // The framework H/3 eccentricity line (the Moon channel's view of the
-  // wobble movement — NOT the H/16 orbital eccentricity above)
+  // The Moon channel rides the model's ONE eccentricity law (base' derived,
+  // the shared System-Reset anchor): its e(J2000) is the observed value
+  // exactly, its E-factor e(t)/e(J2000) and perigee/node T² channel follow.
   const moonEcc = createMoonEccChannel({
     cyclesBetween,
-    eccentricityBase,
+    eccentricityBase: eccentricityBaseDerived,
     perihelionLongitudeJ2000Deg: C.earthOrbital.earthPerihelionLongitudeJ2000,
     inclinationCycleAnchorDeg: C.earthOrbital.earthInclinationCycleAnchor,
   });
@@ -860,29 +893,11 @@ export function assembleModel(C, F) {
   // D2 completion table is unchanged (residual 2lE re-fit ≈ 0.1″ — noise).
   const sunL0Deg = C.earthOrbital.sunMeanLongitudeJ2000_deg;
   const sunTropicalRateDegPerCy = 360 * julianCenturyDays / meanSolarYearDays;
-  // FQ-7-Sun option C-small — ONE eccentricity law for Sun and Moon in the
-  // eclipse chain. Eccentricity is frame-invariant (e = |z|, z = e·e^{iϖ}),
-  // so it may carry only FIXED-FRAME lattice content: the H/3 line the Moon's
-  // E-factor already rides (moon/ecc-channel.cjs). H/16 is the OF-DATE
-  // perihelion period (13 + 3 = 16: the H/3 apsidal rotation seen from the
-  // H/13 equinox) — it belongs to ϖ_of-date, not to e. The previous form
-  // added the H/16 law's own slope (−0.84e-5/cy) on top of the H/3 line,
-  // and that slope WAS the measured Sun-side ė tension (annual channel
-  // T·sinM −3.7″/cy; JPL sides with the H/3 line: fq7s-ecc-consistency.mjs).
-  // Anchor: the H/16 law's J2000 value (the observed e, anchored by design),
-  // evaluated once — an explicit law change, not a hidden freeze; the
-  // cardinal-point path keeps the H/16 law (eccentricityAt) unchanged.
-  // Measured at the swap: JPL Sun 2.123 → 1.487″ (1900–2100), registry
-  // window 0.93 → 0.80″, syzygy fleet 3.756 → 3.719″, T·sinM −3.65 → −0.19″/cy,
-  // curvature term unchanged in size; the H/16 term at the corpus epochs
-  // detrends to 0.174 min — below the ancient corpus's discrimination.
-  const sunEccentricityJ2000 = eccentricityAt(2000);
-  /** @param {number} year @returns {number} */
-  const sunEccentricityAt = (year) => {
-    const cos3 = -Math.cos(phaseRadians(balancedYear, year, 3));
-    const cos3J2000 = -Math.cos(phaseRadians(balancedYear, 2000, 3));
-    return sunEccentricityJ2000 + (eccentricityBase / 2) * (cos3 - cos3J2000);
-  };
+  // The eclipse Sun's eccentricity IS the model's one eccentricity law
+  // (eccentricityAt above) — the former sunEccentricityAt (FQ-7-Sun option
+  // C-small: the J2000-anchored H/3 line) was the additive-anchor form of the
+  // same movement and is retired by the unification (measured identical on
+  // every modern gate).
   const sunMeanLongitudeDegAt = (() => {
     // SW PHASE B — the CLOSED FORM on the integrated lattice phase
     // (supersedes the E5 ±3,000-yr trapezoid table; valid at EVERY epoch,
@@ -960,7 +975,7 @@ export function assembleModel(C, F) {
     frameworkSun: {
       sunMeanLongitudeJ2000Deg: sunL0Deg,
       tropicalRateDegPerCy: sunTropicalRateDegPerCy,
-      eccentricityAt: sunEccentricityAt,
+      eccentricityAt,
       perihelionLongitudeDegAt: earthPerihelionDeg,
       meanLongitudeDegAt: sunMeanLongitudeDegAt,
     },
@@ -1104,7 +1119,7 @@ export function assembleModel(C, F) {
       frameworkSunDeps: Object.freeze({
         sunMeanLongitudeJ2000Deg: sunL0Deg,
         tropicalRateDegPerCy: sunTropicalRateDegPerCy,
-        eccentricityAt: sunEccentricityAt,
+        eccentricityAt,
         perihelionLongitudeDegAt: earthPerihelionDeg,
         meanLongitudeDegAt: sunMeanLongitudeDegAt,
       }),

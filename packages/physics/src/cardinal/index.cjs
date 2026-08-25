@@ -60,8 +60,6 @@ const DRIFT_SIMPSON_N_MIN = 64;
  *     balancedYear: number,
  *     meanSolarYearDays: number,
  *     hJ2000: number,
- *     eccentricityBase: number,
- *     eccentricityAmplitude: number,
  *     tiltMeanDeg: number,
  *     raAngleDeg: number,
  *     inclAmplitudeDeg: number,
@@ -72,6 +70,7 @@ const DRIFT_SIMPSON_N_MIN = 64;
  *     meanHAtAgeMa: (tMa: number) => (number | null),
  *     meanYearRealLodDays: (tMa: number) => (number | null),
  *     eccentricityAt: (year: number) => number,
+ *     eccentricityRateAt: (year: number) => number,
  *   },
  * }} deps
  */
@@ -86,8 +85,6 @@ function createCardinalModel({ isDeepTime, constants, fns }) {
     balancedYear,
     meanSolarYearDays,
     hJ2000,
-    eccentricityBase,
-    eccentricityAmplitude,
     tiltMeanDeg,           // for RA
     raAngleDeg,
     inclAmplitudeDeg,
@@ -97,7 +94,8 @@ function createCardinalModel({ isDeepTime, constants, fns }) {
     analyticTropicalDays,  // (year) => SI days | null — the drift integrand base
     meanHAtAgeMa,          // (t_Ma) => H | null — the derivative's dc/dY
     meanYearRealLodDays,   // (t_Ma) => days | null — real-LOD drift convention
-    eccentricityAt,        // (year) => e(t), law of cosines on the H/16 phase
+    eccentricityAt,        // (year) => e(t) — the model's ONE eccentricity law (H/3 vector sum, plan IP-eccentricity-unification)
+    eccentricityRateAt,    // (year) => de/dyear of the same law — the braid's EoC derivative rides it
   } = fns;
 
   /** @param {number} year */
@@ -272,7 +270,10 @@ function createCardinalModel({ isDeepTime, constants, fns }) {
       const th16 = 2 * Math.PI * 16 * cY;
       const thp = 2 * Math.PI * 16 * dcdY;
       const e = eccentricityAt(year);
-      const de = eccentricityBase * eccentricityAmplitude * Math.sin(th16) * thp / e;
+      // de/dyear from the one law (formerly the H/16 law-of-cosines derivative).
+      // The braid's own phase θ16 stays: it is the perihelion-OF-DATE phase the
+      // equation of centre is seen through — an H/16 quantity by nature.
+      const de = eccentricityRateAt(year);
       for (const t of ecc) {
         const n = t.order, nth = n * th16;
         const eN = Math.pow(e, n), eN1 = Math.pow(e, n - 1);
