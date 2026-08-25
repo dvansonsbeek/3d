@@ -30,9 +30,9 @@ const MEEUS_EDOT = { mercury: 0.000020407, venus: -0.000047765, earth: -0.000042
 const cache = JSON.parse(readFileSync(new URL('./../../data/planet_eccentricity_cache.json', import.meta.url), 'utf8'));
 const jplSlope = (name) => {
   const rec = cache[name]; if (!rec) return NaN;
-  const ys = rec.years, es = rec.eccentricity || rec.ecc || rec.e || rec.values;
+  const ys = rec.years, es = rec.eccentricities;   // cache: years 1700–2500 (10-yr steps)
   if (!es) return NaN;
-  const pts = ys.map((y, i) => [y, es[i]]).filter(([y]) => y >= -1000 && y <= 1000 || (ys[ys.length - 1] < 0 && y >= -2000));
+  const pts = ys.map((y, i) => [y, es[i]]).filter(([y, e]) => Number.isFinite(e) && y >= 1800 && y <= 2200);
   const n = pts.length, mx = pts.reduce((s, p) => s + p[0], 0) / n, my = pts.reduce((s, p) => s + p[1], 0) / n;
   let sxy = 0, sxx = 0; for (const [x, y] of pts) { sxy += (x - mx) * (y - my); sxx += (x - mx) ** 2; }
   return sxy / sxx * 100;   // per century
