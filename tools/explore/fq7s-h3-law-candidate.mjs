@@ -56,11 +56,17 @@ const lawA = (y) => base * (1 + Math.cos(th0anchor + 2 * Math.PI * cyc3(y)) / 2)
 const th0solved = Math.acos(2 * (e0obs / base - 1));
 const lawC = (y) => base * (1 + Math.cos(th0solved + 2 * Math.PI * cyc3(y)) / 2);
 const lawD = (y) => deps.eccentricityAt(y);                                   // shipped C-small
+// (e) ONE anchor (System Reset, θ₀ = 81.178°), v₂ = base'/2, base' DERIVED from
+// the observed e(J2000): base' = e0 / (1 + cos θ₀ / 2) — pure vector sum,
+// exact at J2000; Law-5 balance moves 99.8636 → 99.8645% (Earth weight 0.05%)
+const baseE = e0obs / (1 + Math.cos(th0anchor) / 2);
+const lawE = (y) => baseE * (1 + Math.cos(th0anchor + 2 * Math.PI * cyc3(y)) / 2);
 const lawH16 = e16;
 const rate = (f) => (f(2100) - f(1900)) / 2;
+console.log(`(e) base' = ${baseE.toFixed(6)} (+${((baseE / base - 1) * 100).toFixed(2)}% vs Law-5 base ${base.toFixed(6)})`);
 console.log(`θ₀ anchor ${(th0anchor / D2R).toFixed(2)}° · θ₀ solved ${(th0solved / D2R).toFixed(2)}° (Δ ${((th0solved - th0anchor) / D2R).toFixed(2)}° = ${(((th0solved - th0anchor) / (2 * Math.PI)) * H / 3).toFixed(0)} yr)`);
 console.log('form  e(2000)     ė/cy       range');
-for (const [nm, f, lo, hi] of [['(a)', lawA, base / 2, 1.5 * base], ['(c)', lawC, base / 2, 1.5 * base], ['(d)', lawD, NaN, NaN], ['H/16', lawH16, NaN, NaN]]) {
+for (const [nm, f, lo, hi] of [['(a)', lawA, base / 2, 1.5 * base], ['(c)', lawC, base / 2, 1.5 * base], ['(e)', lawE, baseE / 2, 1.5 * baseE], ['(d)', lawD, NaN, NaN], ['H/16', lawH16, NaN, NaN]]) {
   console.log(`${nm.padEnd(5)} ${f(2000).toFixed(6)}  ${rate(f).toExponential(3)}  ${Number.isFinite(lo) ? lo.toFixed(4) + '…' + hi.toFixed(4) : '—'}`);
 }
 console.log(`observed: e ${e0obs}  ė −4.204e-5/cy`);
@@ -95,7 +101,7 @@ const LP = C.moon.moonMeeusLpCorrection;
 const jdLo = J2000 + (1970 - 2000) * 365.25, jdHi = J2000 + (2049 - 2000) * 365.25;
 console.log('\nMODERN GATES (Sun on each law; Moon unchanged):');
 console.log('form   JPL 1900–2100   registry 1970–2049   T·sinM ″/cy   syzygy fleet');
-for (const [nm, f] of [['(a)', lawA], ['(c)', lawC], ['(d)', lawD], ['H/16', lawH16]]) {
+for (const [nm, f] of [['(a)', lawA], ['(c)', lawC], ['(e)', lawE], ['(d)', lawD], ['H/16', lawH16]]) {
   const fd = mk(f); const y = [], yw = [], rows = [];
   for (const [jd, jplLon] of sunCache.rows) {
     const jb = jd + BRIDGE, T = (jb - J2000) / 36525;
@@ -124,7 +130,7 @@ console.log('\nMOON CHANNEL T² (perigee/node) under each phase — Meeus ϖ −
 {
   const LPR = 481267.88123421, MPR = 477198.8675055, FR = 483202.0175233;
   const WDOT = LPR - MPR, NDOT = LPR - FR, S_W = 2.407, S_N = 1.018;
-  for (const [nm, f] of [['(a) anchor phase', lawA], ['(c) solved phase', lawC]]) {
+  for (const [nm, f] of [['(a) anchor phase', lawA], ['(c) solved phase', lawC], ['(e) anchor, base\'', lawE]]) {
     const e = f(2000), ed = rate(f);
     const KAPPA = 3 * e * ed / (1 - e * e);
     console.log(`  ${nm.padEnd(18)} e ${e.toFixed(6)} ė ${ed.toExponential(3)} → ϖ T² ${(S_W * WDOT * KAPPA / 2).toFixed(6)}  Ω T² ${(S_N * NDOT * KAPPA / 2).toFixed(7)}`);
