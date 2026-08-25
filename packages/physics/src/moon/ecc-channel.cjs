@@ -8,10 +8,14 @@
  * max. The observed J2000 e (−0.86%), ė (+1.7%) and the sign of ë are
  * PREDICTIONS of this line, not inputs.
  *
- * NOT the same quantity as the Sun machinery's eccentricity: Earth's own
- * orbital e for the cardinal-point/EoC path keeps the H/16 perihelion law
- * (`cardinal`'s injected eccentricityAt). This line is the MOON channel's
- * view of the H/3 movement — two different laws, deliberately.
+ * ONE law for the eclipse chain (FQ-7-Sun option C-small, doc 66 §5): the
+ * eclipse Sun's equation of centre rides this same H/3 line (anchored at
+ * its J2000 value, model.js sunEccentricityAt) — eccentricity is
+ * frame-invariant and may carry only fixed-frame lattice periods; the
+ * H/16 perihelion cycle is the H/3 rotation seen from the H/13 equinox
+ * (13 + 3 = 16) and belongs to ϖ, not e (doc 108). Only the
+ * cardinal-point/deep-time path still keeps the H/16 law (`cardinal`'s
+ * injected eccentricityAt) — a recorded, not yet resolved, split.
  *
  * Extracted VERBATIM from src/script.js (_FW_ECC, _fwEarthEcc,
  * _eCompModulation, _fwChannelIntegral, the framework branch of _fwEFactor),

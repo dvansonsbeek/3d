@@ -374,9 +374,17 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    slope trap. Drift and slope vanish at year 2000 by construction. No lookup
    table, no domain window in the certified chain.
 
-**e(t)** is the H/16 law plus the **derived H/3 inclination coupling**
-−(e_base/2)(cos φ₃ − cos φ₃(2000)) on the integrated phase — the same
-derived-e channel the cardinal-point braid uses.
+**e(t)** is the framework's H/3 eccentricity line anchored at J2000 —
+e(2000) − (e_base/2)(cos φ₃ − cos φ₃(2000)) on the integrated phase —
+**the same law the Moon's E-factor rides** (doc 66 §1). An earlier form
+added the H/16 law's slope on top of it; that slope was measured to be
+the Sun's entire eccentricity-rate error against JPL (1900–2100) and
+was retired (FQ-7-Sun option C-small, doc 66 §5). The reason is
+structural: eccentricity is frame-invariant and may carry only
+fixed-frame lattice periods; H/16 is the H/3 rotation seen from the
+H/13-precessing equinox (13 + 3 = 16) and belongs to the perihelion
+longitude. The cardinal-point braid keeps the H/16 law for its own
+of-date quantities (doc 108).
 
 **Accuracy**: <!--v:frameworkSunVsJplRms-->0.80<!--/v-->″ RMS vs JPL over the modern window (the Meeus Ch. 25
 reference itself sits at <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″). At antiquity the closed form tracks the
