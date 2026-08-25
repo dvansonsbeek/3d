@@ -25,10 +25,12 @@ history with it is therefore *expected*, not a discovery about the
 solar system: Laskar did the same, to higher order and with more care.
 The derivation used no lattice ingredient, and the eigenfrequencies it
 produced are not on the lattice (g5 → 8H/8.75). It is **not evidence
-for the lattice**. What is ours is listed in §7: a real defect found and
-fixed, a governing rule for which lattice periods may appear in which
-quantities, an honest recalibration of the model's deep-time claims,
-and a tool the framework did not have.
+for the lattice**. What is ours is listed in §7: a governing rule for
+which lattice periods may appear in which quantities, an honest
+recalibration of the model's deep-time claims, and a tool the framework
+did not have. The improvement to the derived Sun and Moon that this
+work produced (one eccentricity law for both in the eclipse chain) is
+documented where it belongs, in doc 66.
 
 Instruments: `tools/explore/fq7s-ecc-consistency.mjs`,
 `fq7s-orbit-vector-vs-laskar.mjs`, `fq7s-laplace-lagrange-e.mjs`,
@@ -36,25 +38,20 @@ Instruments: `tools/explore/fq7s-ecc-consistency.mjs`,
 
 ---
 
-## 1. The finding that started it: three eccentricity laws
+## 1. The starting point: the model's eccentricity laws
 
-The joint Sun–Moon look (owner: "look at the Moon and the Sun together")
-found the eclipse chain carrying three laws for one physical quantity:
+The model carries two eccentricity laws for Earth's orbit, in two
+places:
 
-| law | who rode it | ė at J2000 |
-|---|---|---:|
-| H/16 beat law (`earth.eccentricity`) | cardinal points / deep time | −0.84e-5/cy |
-| H/3 line (`moon/ecc-channel.cjs`, e = base·(1 + cos θ/2)) | the Moon's E-factor | ≈ −4.27e-5/cy |
-| H/16 + H/3 imprint (`sunEccentricityAt`, pre-C-small) | the Sun's equation of centre | −5.11e-5/cy |
-| *observed (JPL/Simon)* | | *−4.20e-5/cy* |
+| law | where | period | e range |
+|---|---|---:|---:|
+| H/16 beat law (`earth.eccentricity`) | cardinal points / deep time | 21 kyr | 0.0140–0.0167 |
+| H/3 line (`moon/ecc-channel.cjs`, e = base·(1 + cos θ/2)) | the Moon's E-factor; since C-small also the eclipse Sun (doc 66) | 112 kyr | 0.0077–0.023 |
 
-The Sun's slope was algebraically the Moon's line plus the H/16 law's
-own slope, and that H/16 slope was exactly the Sun-side ė tension the
-annual-channel attribution had measured (T·sinM −3.7″/cy). JPL sides
-with the Moon's line. Option C-small moved the eclipse Sun onto the H/3
-line (registry Sun 0.93 → <!--v:frameworkSunVsJplRms-->0.80<!--/v-->″,
-centerlines → <!--v:centerlinesMeanArcsec-->2.1<!--/v-->″, Babylon
-<!--v:babylon135BestGapKm-->170<!--/v--> km — doc 66).
+Both are correct *local* laws — their J2000 rates match the observed
+ones (the H/3 line's ė to 1.7%). The question this record answers is
+what they are physically, and what they say — and cannot say — about
+eccentricity away from the present epoch.
 
 ## 2. The principle: eccentricity is frame-invariant
 
@@ -195,21 +192,25 @@ empirical beat correspondence, no more and no less.
 
 ## 7. What is ours
 
-1. **A defect found and fixed.** Three eccentricity laws for one
-   quantity, one of them carrying a frame period; the fix (C-small) is
-   a measured model improvement independent of any external theory —
-   Sun 0.93 → 0.80″, centerlines 2.2 → 2.1″, Babylon 186 → 170 km.
-2. **A governing rule.** e = |z| may carry only fixed-frame divisors;
+1. **A governing rule.** e = |z| may carry only fixed-frame divisors;
    of-date divisors belong to ϖ; H/16 is a composite (13 + 3), not a
    fundamental eccentricity period. Every future Earth-orbit law is
    constrained by it.
-3. **An honest recalibration.** The H/16 and H/3 matches are local
+2. **An honest recalibration.** The H/16 and H/3 matches are local
    J2000 rates of a non-uniformly rotating vector; the scalar laws do
    not track eccentricity at deep time; the deep-time cardinal timing
    carries a days-class law uncertainty the Step-6d figure did not
    express. Knowing this is worth more than the 0.967.
-4. **A tool.** The framework computes its own secular solution — and
-   its own g5 to 0.8% — from its own inputs in about a minute.
+3. **A tool.** The framework computes its own secular solution — and
+   its own g5 to 0.4% (2-Myr run) — from its own inputs in minutes.
+
+The two layers this separates: **dynamics** (how the planets perturb
+each other over millions of years — no competing theory here; the
+model's inputs integrate to the mainstream answer) and **the lattice**
+(the claim that the observable rates today, and the Milankovitch beats,
+sit at integer divisors of one H). The lattice bet lives on the local
+rates and the beats, not on the eigenfrequencies; the frame rule is the
+fence between the layers.
 
 ---
 
