@@ -101,6 +101,15 @@ const earthInvPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
   ASTRO_REFERENCE.earthPerihelionLongitudeJ2000, ASTRO_REFERENCE.earthInclinationCycleAnchor);
 const eccentricityBase = modelParams.earth.eccentricityBase;
 const eccentricityAmplitude = modelParams.earth.eccentricityAmplitude;
+// ECCENTRICITY UNIFICATION (plan IP-eccentricity-unification, D1 = form (e)):
+// the one law's mean base' = e(J2000) / (1 + cos θ₀/2), θ₀ = ϖ_ICRF(J2000) −
+// the inclination-cycle anchor (the System-Reset phase in anchor form) —
+// DERIVED, matched with moon/ecc-channel.cjs (which derives the same value
+// from the same inputs). eccentricityBase (Law-5 solved, v11) and
+// eccentricityAmplitude (the v11 H/16 amplitude, now only the Law-4 K
+// calibration input) remain as constants.
+const eccentricityBaseDerived = ASTRO_REFERENCE.earthEccentricityJ2000
+  / (1 + Math.cos((ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - ASTRO_REFERENCE.earthInclinationCycleAnchor) * Math.PI / 180) / 2);
 // K derived at runtime from Earth (see section after PSI below)
 let eccentricityAmplitudeK;  // assigned after massFraction is computed
 const perihelionRefJD = ASTRO_REFERENCE.perihelionPassageJ2000_JD;
@@ -237,7 +246,9 @@ const STELLAR_DAY_RA_PROJECTION =
 const meanStellarDay = (meanSiderealDay / (H / 13)) / (meanSolarYearDays + 1)
   * STELLAR_DAY_RA_PROJECTION + meanSiderealDay;
 const meanAnomalisticYearDays = (meanSolarYearDays / (perihelionCycleLength - 1)) + meanSolarYearDays;
-const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
+// Unification: the mean of the one law IS base' (formerly the H/16 beat's
+// geometric mean √(base² + A²) = 0.01545).
+const eccentricityDerivedMean = eccentricityBaseDerived;
 const totalDaysInH = H * meanSolarYearDays;
 
 // ── Step size and grid year (derived from H and startmodelYear) ──────────
@@ -307,8 +318,14 @@ const _nJeff = 360 / _Tj + 360 / planets.jupiter.perihelionEclipticYears;
 const _nSeff = 360 / _Ts + 360 / planets.saturn.perihelionEclipticYears;
 const tripleSynodicYears = 3 * 360 / (_nJeff - _nSeff);
 
-// Equation of center eccentricity — derived, not a free parameter.
-const eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2;
+// Equation of center eccentricity — derived, not a free parameter. The wheel's
+// split: the geometry supplies base'·sin M, the EoC term the rest — so the
+// static (J2000) value is e(J2000) − base'/2 (unification; matches the
+// dynamic split dynEcc.earth − base'/2 at J2000).
+// Unification: the Sun node's EoC eccentricity is HALF the one law's e(t) (the
+// geometric offset −e(t)·û(ϖ), animated every frame, supplies the other half);
+// this const is its J2000 value — the scene overrides it per frame.
+const eocEccentricity = ASTRO_REFERENCE.earthEccentricityJ2000 / 2;
 
 // Perihelion phase offset — derived from geometric perihelion direction vs reference perihelion date.
 const perihelionPhaseOffset = (((startModelYearWithCorrection - balancedYear) / (H / 16) * 360
@@ -665,6 +682,7 @@ module.exports = {
   earthInvPlaneInclinationAmplitude,
   earthAscendingNodeInvPlane,
   eccentricityBase,
+  eccentricityBaseDerived,
   eccentricityAmplitude,
   eccentricityAmplitudeK,
   perihelionRefJD,

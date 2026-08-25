@@ -101,8 +101,15 @@ let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argumen
 const earthtiltMean = K.earth.earthtiltMean;              // Scene-geometry solved: obliquity at J2000 = IAU 2006 23.4392794°
 const earthInvPlaneInclinationAmplitude = K.earth.earthInvPlaneInclinationAmplitude; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
 // The optimizer must NEVER touch this — it is set by the Law 5 balance constraint.
-const eccentricityBase = K.earth.eccentricityBase;        // Law 5 balance-locked
-const eccentricityAmplitude = K.earth.eccentricityAmplitude;  // Solved: e(J2000) = 0.01671022
+const eccentricityBase = K.earth.eccentricityBase;        // Law 5 balance-locked (v11 constant; Earth's weight in the balance is 0.05%)
+const eccentricityAmplitude = K.earth.eccentricityAmplitude;  // v11 H/16 amplitude — RETAINED ONLY as the Law-4 K calibration input (unification, decision D2)
+// ECCENTRICITY UNIFICATION (plan IP-eccentricity-unification, D1 = form (e)):
+// the one law's mean base' = e(J2000) / (1 + cos θ₀/2), θ₀ = ϖ_ICRF(J2000) −
+// the inclination-cycle anchor (the System-Reset phase in anchor form) —
+// DERIVED; matched bit-for-bit with tools/lib/constants.js and the channel
+// (moon/ecc-channel.cjs derives the same value from the same inputs).
+const eccentricityBaseDerived = K.earthOrbital.earthEccentricityJ2000
+  / (1 + Math.cos((K.earthOrbital.earthPerihelionLongitudeJ2000 - K.earthOrbital.earthInclinationCycleAnchor) * Math.PI / 180) / 2);
 // PSI is derived from Earth's inclination amplitude — see section E2c below
 // K is derived from Earth's eccentricity amplitude + mean obliquity — see section E2d below
 // Same NUMBER as ascendingNodesSouamiSouchay.earth, different ROLE — which is
@@ -562,7 +569,9 @@ const PERI_HARMONICS = FIT.PERI_HARMONICS_RAW.map(([n, c, s]) => [H / n, c, s]);
 // one and leave the other behind.
 const PERI_OFFSET = FIT.PERI_OFFSET;
 // PREDICT_OBLIQ_MEAN: uses OBLIQUITY_MEAN (computed later) — referenced directly at usage site
-const PREDICT_ECC_MEAN = Math.sqrt(eccentricityBase**2 + eccentricityAmplitude**2);
+// Eccentricity unification: the mean of the ONE law is base′ (matched with
+// tools/lib/orbital-engine.js createPredictModel).
+const PREDICT_ECC_MEAN = eccentricityBaseDerived;
 
 const PREDICT_PLANETS = {
   mercury: { period: planets.mercury.perihelionEclipticYears,  theta0: planets.mercury.longitudePerihelion,  baseline: 1296000/planets.mercury.perihelionEclipticYears*100 },
@@ -1097,14 +1106,21 @@ const MEAN_ANOMALISTIC_YEAR_MEANLODDAYS = MEAN_ANOMALISTIC_YEAR_SEC / MEAN_LOD_S
 
 const MEAN_PRECESSION = MEAN_SIDEREAL_YEAR_SEC / (MEAN_SIDEREAL_YEAR_SEC - MEAN_TROPICAL_YEAR_SEC); // = H/13 exactly
 
-const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
+// Unification: the mean of the one law IS base' (formerly the H/16 beat's
+// geometric mean √(base² + A²) = 0.01545). Mirrors tools/lib/constants.js.
+const eccentricityDerivedMean = eccentricityBaseDerived;
 // psiConstant is derived from Earth's inclination amplitude — see section E2c below
 
 // --- 9b. Equation of center (EoC) derived parameters ---
 // Equation of center eccentricity — derived, not a free parameter.
 // The off-center orbit geometry provides apparent speed variation with amplitude e_geom (first order).
 // The explicit EoC adds 2·eoc. Total must equal Keplerian 2·e_real → eoc = e_real - e_geom/2.
-const eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2;
+// Unification: the static (J2000) value is e(J2000) − base'/2 — the same split
+// the wheel applies dynamically (dynEcc − base'/2). Mirrors tools/lib/constants.js.
+// Unification: the Sun node's EoC eccentricity is HALF the one law's e(t) (the
+// geometric offset −e(t)·û(ϖ), animated every frame in moveModel, supplies the
+// other half); this const is its J2000 value — moveModel overrides it per frame.
+const eocEccentricity = K.earthOrbital.earthEccentricityJ2000 / 2;
 
 // Perihelion phase offset — derived from geometric perihelion direction vs reference perihelion date.
 // Aligns the EoC perihelion with the geometric perihelion set by the EP1 precession phase at J2000.
@@ -3639,14 +3655,11 @@ function _frameworkSunLon(jd_ut) {
   // ── Mean anomaly ───────────────────────────────────────────────────────
   const M_rad = M_deg * _d2r;
 
-  // ── Eccentricity (framework's law of cosines, matches computeEccentricityEarth) ──
-  // e(t) = √(base² + amp² − 2·base·amp·cos(θ)) where θ = (year - balancedYear)/H_16 × 2π
-  // NOT the additive form. At J2000 gives e ≈ 0.01671 (IAU) via specific phase.
-  const perihelionPhase_rad = 2 * Math.PI * _phaseCycles(year, 16);
-  const _e_base = eccentricityBase;
-  const _e_amp  = eccentricityAmplitude;
-  const e = Math.sqrt(_e_base * _e_base + _e_amp * _e_amp
-                    - 2 * _e_base * _e_amp * Math.cos(perihelionPhase_rad));
+  // ── Eccentricity: the model's ONE law (unification) — the H/3 line with
+  // base' derived from e(J2000); matches packages/physics model.js
+  // eccentricityAt and the scene's dynEcc.earth. (The H/16 law-of-cosines
+  // form that used to sit here belongs to ϖ, not e — doc 108.)
+  const e = computeEccentricityEarthAtYear(year);
 
   // ── Equation of Center (Kepler higher-order, to e⁴) ────────────────────
   const e2 = e * e, e3 = e2 * e, e4 = e3 * e;
@@ -4256,12 +4269,21 @@ const _moonEcc = (() => {
         eccentricityBase,
         perihelionLongitudeJ2000Deg: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg,
         inclinationCycleAnchorDeg: earthInclinationCycleAnchor,
+        // ECCENTRICITY UNIFICATION: the one law — base' derived from the
+        // observed J2000 eccentricity inside the channel (matched with
+        // packages/physics model.js and tools/lib/deep-time.js).
+        eccentricityJ2000: ASTRO_REFERENCE.eccentricityJ2000,
       });
     }
     return m;
   };
 })();
 function _fwEarthEcc(t_yr) { return _moonEcc().eccAt(t_yr); }
+/** Earth's eccentricity at a decimal year — the model's ONE law (eccentricity
+ *  unification): every Earth consumer (scene, cardinal braid, predictions,
+ *  reports, charts) goes through this; the 5-argument
+ *  `computeEccentricityEarth` below stays ONLY for the planets' wobble laws. */
+function computeEccentricityEarthAtYear(year) { return _fwEarthEcc(year - 2000); }
 
 /** Integral of the PHASE-AWARE channel rate: ∫₀ᵀ [(g(e(t))/g₀)^s − 1] dt′ in
  *  Julian centuries. The perigee/node rates are NOT constants — they speed up
@@ -6690,6 +6712,8 @@ const earthWobbleCenter = {
   isNotPhysicalObject: true,
 };
 
+// ECCENTRICITY UNIFICATION: the reference orbit's radius is the one law's
+// mean offset base' (visual reference only — the Node engine has no twin node).
 const midEccentricityOrbit = {
   name: "EARTH-MID-ECCENTRICITY-ORBIT",
   startPos: -(cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 3) * 360
@@ -6697,7 +6721,7 @@ const midEccentricityOrbit = {
   speed: Math.PI*2/(holisticyearLength/13),
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: eccentricityBase*100,
+  orbitRadius: eccentricityBaseDerived*100,   // unification: the one law's mean offset base'
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -6856,7 +6880,7 @@ const earthPerihelionPrecession2 = {
   speed: -Math.PI*2/(holisticyearLength/16),
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -eccentricityBase*100,
+  orbitCentera: -eccentricityBaseDerived*100,   // the one law's mean offset base' (unification; mirrors scene-graph.js)
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -6934,7 +6958,12 @@ const barycenterEarthAndSun = {
   startPos: 0,
   speed: 0,
   tilt: 0,
-  orbitRadius: eccentricityAmplitude*100,
+  // ECCENTRICITY UNIFICATION: the second eccentricity arm (radius A, net
+  // rotation −H/13 = co-rotating with the axial precession) is RETIRED —
+  // |e| is frame-invariant; the modulation is the analytic e(t) the wheel
+  // evaluates every frame. This node is now the Sun's orbit centre itself.
+  // Mirrors tools/lib/scene-graph.js.
+  orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -16838,7 +16867,7 @@ const ECC_BASE_SCALE = {
 const ECC_J2000_SCALE = {
   mercury: computeEccentricityEarth(2000, 2000 - (planets.mercury.eccentricityPhaseJ2000 / 360) * mercuryWobblePeriod, mercuryWobblePeriod, planets.mercury.orbitalEccentricityBase, planets.mercury.orbitalEccentricityAmplitude),
   venus:   computeEccentricityEarth(2000, 2000 - (planets.venus.eccentricityPhaseJ2000   / 360) * venusWobblePeriod,   venusWobblePeriod,   planets.venus.orbitalEccentricityBase,   planets.venus.orbitalEccentricityAmplitude),
-  earth:   computeEccentricityEarth(2000, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude),
+  earth:   computeEccentricityEarthAtYear(2000),
   mars:    computeEccentricityEarth(2000, 2000 - (planets.mars.eccentricityPhaseJ2000    / 360) * marsWobblePeriod,    marsWobblePeriod,    planets.mars.orbitalEccentricityBase,    planets.mars.orbitalEccentricityAmplitude),
   jupiter: computeEccentricityEarth(2000, 2000 - (planets.jupiter.eccentricityPhaseJ2000 / 360) * jupiterWobblePeriod, jupiterWobblePeriod, planets.jupiter.orbitalEccentricityBase, planets.jupiter.orbitalEccentricityAmplitude),
   saturn:  computeEccentricityEarth(2000, 2000 - (planets.saturn.eccentricityPhaseJ2000  / 360) * saturnWobblePeriod,  saturnWobblePeriod,  planets.saturn.orbitalEccentricityBase,  planets.saturn.orbitalEccentricityAmplitude),
@@ -22003,11 +22032,11 @@ const VFP_CATEGORIES = [
       excludeRefs: ['Meeus (1991)'], // polynomial diverges beyond ±10k years
       noJ2000: true,
       refLines: [
-        { value: () => Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude), label: 'mean (0.01545)', color: '#888', dash: true, yOffset: 0 },
+        { value: () => eccentricityDerivedMean, label: 'mean (base′ 0.01552)', color: '#888', dash: true, yOffset: 0 },
       ],
     },
     model: { name: 'This model', color: '#f0b040',
-      fn: year => computeEccentricityEarth(year, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude) },  // Phase 8
+      fn: year => computeEccentricityEarthAtYear(year) },  // the ONE law (unification)
     references: [
       { name: 'Meeus (1991)', color: '#4fc3f7', fn: eccMeeus, sourceUrl: 'https://en.wikipedia.org/wiki/Orbital_eccentricity' },
       { name: 'Berger (1978)', color: '#ce93d8', fn: eccBerger1978, sourceUrl: 'https://doi.org/10.1175/1520-0469(1978)035%3C2362:LTVODI%3E2.0.CO;2' },
@@ -39066,9 +39095,7 @@ async function runBalancedYearStateDiagnostic() {
   console.log('═══════════════════════════════════════════════════════════════════════════');
   console.log('SECTION 3: FORMULA values (via computeEccentricityEarth, computeObliquityEarth)');
   console.log('═══════════════════════════════════════════════════════════════════════════');
-  const formula_e = computeEccentricityEarth(o.currentYear, BALANCED_YEAR_J2000_FIXED,
-                                              PERIHELION_CYCLE_LENGTH_J2000_FIXED,
-                                              eccentricityBase, eccentricityAmplitude);
+  const formula_e = computeEccentricityEarthAtYear(o.currentYear);
   const formula_obl = computeObliquityEarth(_formulaYearFromJD(o.julianDay));
   console.log(`  computeEccentricityEarth:  ${formula_e?.toFixed(8) ?? 'null'}`);
   console.log(`    Expected if AT balanced year: ${e_min.toFixed(8)} (= e_min)`);
@@ -39174,7 +39201,6 @@ async function runBalancedYearStateDiagnostic() {
   console.log('');
   const H_J2000 = HOLISTIC_YEAR_J2000;
   const BAL = BALANCED_YEAR_J2000_FIXED;
-  const cycleLen_scan = PERIHELION_CYCLE_LENGTH_J2000_FIXED;
   const fmtN = (v, d) => Number.isFinite(v) ? v.toFixed(d) : '   -   ';
   const fmtE = (v, d) => Number.isFinite(v) ? v.toExponential(d) : '   -    ';
 
@@ -39191,7 +39217,7 @@ async function runBalancedYearStateDiagnostic() {
     const jd = DEEP_TIME_MODE_ENABLED ? yearToJD(Y) : yearToJDApprox(Y);
     const Y_rt = (jd !== null) ? julianDateToDecimalYear(jd) : null;
     const cyc = (Y_rt !== null) ? cyclesBetweenYears(BAL, Y_rt, 1) : null;
-    const e_at = (Y_rt !== null) ? computeEccentricityEarth(Y_rt, BAL, cycleLen_scan, eccentricityBase, eccentricityAmplitude) : null;
+    const e_at = (Y_rt !== null) ? computeEccentricityEarthAtYear(Y_rt) : null;
     const ob_at = (jd !== null) ? computeObliquityEarth(_formulaYearFromJD(jd)) : null;
     console.log(
       `  ${N >= 0 ? ' ' : ''}${N} | ${fmtN(Y, 3).padStart(13)} → ${fmtN(jd, 2).padStart(17)} → ${fmtN(Y_rt, 3).padStart(13)} `
@@ -39208,7 +39234,7 @@ async function runBalancedYearStateDiagnostic() {
     const jd = yearToJDApprox(Y);
     const Y_rt = julianDateToDecimalYear(jd);
     const cyc = cyclesBetweenYears(BAL, Y_rt, 1);
-    const e_at = computeEccentricityEarth(Y_rt, BAL, cycleLen_scan, eccentricityBase, eccentricityAmplitude);
+    const e_at = computeEccentricityEarthAtYear(Y_rt);
     const ob_at = computeObliquityEarth(_formulaYearFromJD(jd));
     console.log(
       `  ${N >= 0 ? ' ' : ''}${N} | ${fmtN(Y, 3).padStart(13)} → ${fmtN(jd, 2).padStart(17)} → ${fmtN(Y_rt, 3).padStart(13)} `
@@ -39263,7 +39289,7 @@ async function runBalancedYearStateDiagnostic() {
   console.log(`    julianDateToDecimalYear(lastBalancedJD_H) = ${lastYr}`);
   console.log(`    julianDateToDecimalYear(nextBalancedJD_H) = ${nextYr}`);
   if (lastYr !== null) {
-    const e_at_last = computeEccentricityEarth(lastYr, BAL, cycleLen_scan, eccentricityBase, eccentricityAmplitude);
+    const e_at_last = computeEccentricityEarthAtYear(lastYr);
     const ob_at_last = computeObliquityEarth(_formulaYearFromJD(o.lastBalancedJD_H));
     console.log(`    → e at that year                       = ${e_at_last}   (Δ from e_min: ${(e_at_last - e_min).toExponential(3)})`);
     console.log(`    → obliquity at that year               = ${ob_at_last}°   (Δ: ${((ob_at_last - oblExpectedAtBalanced) * 3600).toFixed(2)}″)`);
@@ -39468,7 +39494,7 @@ async function run8HConfigurationVerification() {
   const earthInclMean = earthInvPlaneInclinationMean;
   const earthInclActual = computeInclinationEarth(o.currentYear, null, null, earthInclMean, earthInclAmp);
   const earthObliq = computeObliquityEarth(_formulaYearFromJD(o.julianDay));
-  const earthEcc   = computeEccentricityEarth(o.currentYear, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);
+  const earthEcc   = computeEccentricityEarthAtYear(o.currentYear);
   const earthCyclesIn8H = EIGHT_H / PERIHELION_CYCLE_LENGTH_J2000_FIXED;  // = 8 × 16 = 128
   console.log(`  Earth inclination:  ${earthInclActual.toFixed(6)}° (mean ${earthInclMean.toFixed(4)} ± ${earthInclAmp.toFixed(4)} → MIN expected)`);
   console.log(`  Earth obliquity:    ${earthObliq.toFixed(6)}° (vs OBLIQUITY_MEAN ${OBLIQUITY_MEAN.toFixed(4)} → at MEAN, Earth-only property — integer N_icrf=3 & N_obliq=8 fully cancel at balanced years)`);
@@ -44246,7 +44272,7 @@ async function analyzeSolarDayMultiEpoch() {
       const obliquity = getObliquityAtYear(epochYear);
       const inclination = getEarthInclinationAtYear(epochYear);
       const eclipticInclination = obliquity - inclination;
-      const ecc = computeEccentricityEarth(epochYear, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);  // Phase 8
+      const ecc = computeEccentricityEarthAtYear(epochYear);  // the ONE law (unification)
       const tropicalYearDays = computeSolarYearDaysFromCardinals(epochYear);
       const siderealYearDays = computeSiderealYearDaysDirect(epochYear);
       const anomalisticYearDays = evalYearFourier(epochYear,
@@ -54085,6 +54111,22 @@ function moveModel(pos) {
 
   let earthTheta = 0;                     // we need this afterwards
 
+  // ECCENTRICITY UNIFICATION: the geometric eccentricity offset (the
+  // earthPerihelionPrecession2 centre) carries the one law's e(t) EVERY
+  // FRAME. The planet chains replicate the Sun geometrically (centre offset
+  // + circle, no equation of centre), so they must inherit the FULL vector
+  // e(t)·û(ϖ) — a constant base' left them 0.0012 AU short (Venus −80″ mean
+  // vs JPL, measured in the engine twin). The Sun node then carries only the
+  // remaining half of its EoC (the split below) and the FQ-3 corrector closes
+  // it exactly on this same realized offset. Mirrors tools/lib/scene-graph.js
+  // moveModel; the year is derived exactly as the EoC block's `_eccYear`.
+  {
+    const _eccYearFrame = DEEP_TIME_MODE_ENABLED
+      ? _jdToSIyear(o.julianDay)
+      : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
+    earthPerihelionPrecession2.containerObj.position.x = -computeEccentricityEarthAtYear(_eccYearFrame) * 100;
+  }
+
   planetObjects.forEach(obj => {
 
     // current angular position (mean anomaly for uniform motion)
@@ -54212,7 +54254,7 @@ function moveModel(pos) {
       const _eccNow = obj._eccentricityKey ? _eccentricityInline(obj._eccentricityKey, _eccYear) : undefined;
       if (_eccNow !== undefined) {
         e = obj._eocDerived
-          ? _eccNow - eccentricityBase / 2       // Sun: eoc = e_dynamic - e_base/2
+          ? _eccNow / 2   // Sun: eoc = e(t)/2 (the geometric offset e(t)·û(ϖ) supplies the other half; unification)
           : _eccNow * obj._eocFraction;          // Planets: eoc = e_dynamic × fraction
       } else {
         e = typeof obj.eccentricity === 'number' ? obj.eccentricity : (o.eccentricityEarth || ASTRO_REFERENCE.eccentricityJ2000);
@@ -54247,7 +54289,7 @@ function moveModel(pos) {
         // λ-space deltas to θ directly). Applied with the first-order
         // Jacobian; the fitted harmonics retire from this display path
         // (engine measured: twin−wheel 279.0″ annual → 0.80″, sd 0.57″).
-        const eF = e + eccentricityBase / 2;
+        const eF = _eccNow;   // the full e(t) of the one law (node e is its half)
         const e2F = eF * eF, e3F = e2F * eF, e4F = e3F * eF;
         const eocFull = (2 * eF - e3F / 4) * Math.sin(M)
           + (1.25 * e2F - (11 / 24) * e4F) * Math.sin(2 * M)
@@ -54256,8 +54298,11 @@ function moveModel(pos) {
         const eocHalf = 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
         const th1 = earthPerihelionPrecession1.orbitObj.rotation.y;
         const th2 = th1 + earthPerihelionPrecession2.orbitObj.rotation.y;
-        const ox = -eccentricityBase * Math.cos(th1) + eccentricityAmplitude * Math.cos(th2);
-        const oy = -eccentricityBase * Math.sin(th1) + eccentricityAmplitude * Math.sin(th2);
+        // Unification: the realized offset is the single arm −e(t)·û(θ_p1)
+        // (the A arm is retired; th2 stays the barycenter frame the Sun's
+        // annual angle is measured in). Mirrors tools/lib/scene-graph.js.
+        const ox = -_eccNow * Math.cos(th1);
+        const oy = -_eccNow * Math.sin(th1);
         const dOff = Math.hypot(ox, oy);
         const dphi = Math.atan2(oy, ox) - (th2 + θ);
         const geo = Math.atan2(dOff * Math.sin(dphi), 1 + dOff * Math.cos(dphi));
@@ -56540,7 +56585,7 @@ function updatePredictions() {
   // Compute obliquity and eccentricity first - needed for year calculations
   predictions.obliquityEarth = o.obliquityEarth = computeObliquityEarth(yearForFormula);
   // Phase 8: use J2000-FIXED anchor + cycle length for frame-independent integrated phase
-  predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(yearForFormula, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude);
+  predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarthAtYear(yearForFormula);
 
   // Phase 9.11: Balanced-year navigation — past/future H and 8H balanced events.
   // H lattice cycles 0, ±1, ±2, ... anchored at BALANCED_YEAR_J2000_FIXED.
@@ -57219,8 +57264,10 @@ function computeAxialPrecessionRealLOD(
  *  Returns undefined for an unknown key so the caller can fall back. */
 function _eccentricityInline(key, year) {
   if (key === 'eccentricityEarth') {
-    return computeEccentricityEarth(year, BALANCED_YEAR_J2000_FIXED, PERIHELION_CYCLE_LENGTH_J2000_FIXED,
-                                    eccentricityBase, eccentricityAmplitude);
+    // ECCENTRICITY UNIFICATION: Earth rides the model's ONE law — the H/3
+    // line (_fwEarthEcc, the channel with base' derived from e(J2000)); the
+    // H/16 law-of-cosines form below stays for the PLANETS' wobble laws.
+    return _fwEarthEcc(year - 2000);
   }
   // Planets: same formula, per-body J2000-fixed anchor / wobble period / base / amplitude.
   const p = key.startsWith('eccentricity') ? key.slice('eccentricity'.length).toLowerCase() : null;
@@ -57372,8 +57419,6 @@ function _cardinal() {
       balancedYear: BALANCED_YEAR_J2000_FIXED,
       meanSolarYearDays: MEAN_SOLAR_YEAR_J2000_DAYS,
       hJ2000: HOLISTIC_YEAR_J2000,
-      eccentricityBase,
-      eccentricityAmplitude,
       tiltMeanDeg: earthtiltMean,
       raAngleDeg: earthRAAngle,
       inclAmplitudeDeg: earthInvPlaneInclinationAmplitude,
@@ -57383,8 +57428,9 @@ function _cardinal() {
       analyticTropicalDays: _cpAnalyticTropDays,
       meanHAtAgeMa: (t_Ma) => meanHAtAge(t_Ma),
       meanYearRealLodDays: (t_Ma) => meanYearInDaysAtAge(t_Ma),
-      eccentricityAt: (y) => computeEccentricityEarth(y, BALANCED_YEAR_J2000_FIXED,
-        PERIHELION_CYCLE_LENGTH_J2000_FIXED, eccentricityBase, eccentricityAmplitude),
+      eccentricityAt: (y) => computeEccentricityEarthAtYear(y),
+      // One eccentricity law (unification): EoC derivative from the same channel.
+      eccentricityRateAt: (y) => _moonEcc().eccRateAt(y - 2000),
     },
   });
   return _cardinalM;
@@ -57597,8 +57643,7 @@ function _predict() {
       calcEarthPerihelionDeg: (year) => calcEarthPerihelionPredictive(year),
       calcErdRate: (year) => calcERD(year),
       computeObliquityEarthDeg: (year) => computeObliquityEarth(year),
-      computeEccentricityEarth: (year) =>
-        computeEccentricityEarth(year, balancedYear, holisticyearLength / 16, eccentricityBase, eccentricityAmplitude),
+      computeEccentricityEarth: (year) => computeEccentricityEarthAtYear(year),
       obliquityMeanDeg: OBLIQUITY_MEAN,
       eccentricityMean: PREDICT_ECC_MEAN,
     });

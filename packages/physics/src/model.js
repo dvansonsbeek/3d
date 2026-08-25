@@ -330,21 +330,24 @@ export function assembleModel(C, F) {
   // syzygy 3.72″). Consumers: the eclipse Sun (equation of centre), the
   // besselian Sun distance, the Moon channel (E-factor, perigee/node T²),
   // and the cardinal-point braid — one eccentricity everywhere.
-  /** cos θ on the System-Reset phase (the sign flip is the −180° in θ). @param {number} year @returns {number} */
-  const eccentricityPhaseCos = (year) => -Math.cos(phaseRadians(balancedYear, year, 3));
-  const eccentricityBaseDerived = C.earthOrbital.earthEccentricityJ2000 / (1 + eccentricityPhaseCos(2000) / 2);
+  // ONE implementation for all three runtimes: moon/ecc-channel.cjs (the
+  // Node engine's deep-time.js and the browser's script.js instantiate the
+  // same channel with the same inputs). Its phase counter runs from J2000
+  // (θ₀ = ϖ_ICRF(J2000) − 21.77° = 81.178°, the System-Reset anchor in
+  // anchor form — doc 66 §1); base' is derived inside from the observed
+  // J2000 eccentricity.
+  const moonEcc = createMoonEccChannel({
+    cyclesBetween,
+    eccentricityBase: C.earth.eccentricityBase,
+    perihelionLongitudeJ2000Deg: C.earthOrbital.earthPerihelionLongitudeJ2000,
+    inclinationCycleAnchorDeg: C.earthOrbital.earthInclinationCycleAnchor,
+    eccentricityJ2000: C.earthOrbital.earthEccentricityJ2000,
+  });
   /** @param {number} year @returns {number} */
-  const eccentricityAt = (year) => eccentricityBaseDerived * (1 + eccentricityPhaseCos(year) / 2);
-  /** de/dyear of the one law (analytic; the cardinal braid's equation-of-centre
-   *  derivative rides it): d/dy[−cos φ₃] = sin φ₃ · dφ₃/dy, with φ₃ the
-   *  integrated H/3 lattice phase — its rate taken as the two-point
-   *  difference of the phase counter over ±1 yr (exact for a linear phase,
-   *  ppm-class otherwise). @param {number} year @returns {number} */
-  const eccentricityRateAt = (year) => {
-    const phi = phaseRadians(balancedYear, year, 3);
-    const dphi = (phaseRadians(balancedYear, year + 1, 3) - phaseRadians(balancedYear, year - 1, 3)) / 2;
-    return (eccentricityBaseDerived / 2) * Math.sin(phi) * dphi;
-  };
+  const eccentricityAt = (year) => moonEcc.eccAt(year - 2000);
+  /** de/dyear of the one law — the cardinal braid's equation-of-centre
+   *  derivative rides it. @param {number} year @returns {number} */
+  const eccentricityRateAt = (year) => moonEcc.eccRateAt(year - 2000);
   /** @param {number} year @returns {number} */
   const inclinationDeg = (year) => earthInclMean
     - earthInclAmplitude * Math.cos(phaseRadians(balancedYear, year, 3));
@@ -644,15 +647,9 @@ export function assembleModel(C, F) {
   const moonAnomalisticMonthDays = totalDaysInH / (nSid - nApsidalEJ2000);
   const moonSynodicMonthDays = totalDaysInH / (nSid + 13 - H);
 
-  // The Moon channel rides the model's ONE eccentricity law (base' derived,
-  // the shared System-Reset anchor): its e(J2000) is the observed value
-  // exactly, its E-factor e(t)/e(J2000) and perigee/node T² channel follow.
-  const moonEcc = createMoonEccChannel({
-    cyclesBetween,
-    eccentricityBase: eccentricityBaseDerived,
-    perihelionLongitudeJ2000Deg: C.earthOrbital.earthPerihelionLongitudeJ2000,
-    inclinationCycleAnchorDeg: C.earthOrbital.earthInclinationCycleAnchor,
-  });
+  // moonEcc — the model's ONE eccentricity law — is created above (with
+  // eccentricityAt); the Moon channel's E-factor e(t)/e(J2000) and its
+  // perigee/node T² channel ride it, e(J2000) being the observed value exactly.
 
   // Layer-2 month/precession chain (Brouwer-Clemence m² scaling × the
   // e_E-line modulation)

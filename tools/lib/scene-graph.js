@@ -84,14 +84,11 @@ function _frameworkSunLon(jd_ut) {
   // ── Mean anomaly ───────────────────────────────────────────────────────
   const M_rad = (L_deg - perihelion_deg) * _d2r;
 
-  // ── Eccentricity (framework's law of cosines, matches computeEccentricityEarth) ──
-  // e(t) = √(base² + amp² − 2·base·amp·cos(θ)) where θ = (year - balancedYear)/H_16 × 2π
-  // NOT the additive form. At J2000 gives e ≈ 0.01671 (IAU) via specific phase.
-  const perihelionPhase_rad = 2 * Math.PI * _phaseCycles(year, 16);
-  const _base = C.eccentricityBase;
-  const _amp  = C.eccentricityAmplitude;
-  const e = Math.sqrt(_base * _base + _amp * _amp
-                    - 2 * _base * _amp * Math.cos(perihelionPhase_rad));
+  // ── Eccentricity: the model's ONE law (unification) — the H/3 line with
+  // base' derived from e(J2000); twin of src/script.js _eclSunLon and of
+  // packages/physics model.js eccentricityAt. (The H/16 law-of-cosines form
+  // that used to sit here belongs to ϖ, not e — doc 108.)
+  const e = OE.computeEccentricityEarth(year);
 
   // ── Equation of Center (Kepler higher-order, to e⁴) ────────────────────
   const e2 = e * e, e3 = e2 * e, e4 = e3 * e;
@@ -918,7 +915,7 @@ function buildSceneGraph() {
 
   const earthPeriPrec2 = makePrecessionNode('earthPerihelionPrecession2', {
     orbitRadius: 0,
-    orbitCentera: -C.eccentricityBase * 100, orbitCenterb: 0, orbitCenterc: 0,
+    orbitCentera: -C.eccentricityBaseDerived * 100, orbitCenterb: 0, orbitCenterc: 0,   // the one law's mean offset base' (unification)
     orbitTilta: 0, orbitTiltb: 0,
     tilt: 0,
     startPos: -((C.balancedYear - startModelYearWithCorrection) / (H / 16) * 360),
@@ -928,8 +925,14 @@ function buildSceneGraph() {
   });
   earthPeriPrec1.pivot.addChild(earthPeriPrec2.container);
 
+  // ECCENTRICITY UNIFICATION (plan IP-eccentricity-unification, Phase 2):
+  // the second eccentricity arm (radius A, net rotation −H/13 through the
+  // chain = co-rotating with the axial precession) is RETIRED — |e| is
+  // frame-invariant and the model's one law is base'(1 + cos θ₃/2), whose
+  // modulation the wheel evaluates analytically every frame (dynEcc.earth).
+  // The barycenter node is now the Sun's orbit centre itself.
   const barycenter = makePrecessionNode('barycenter', {
-    orbitRadius: C.eccentricityAmplitude * 100,
+    orbitRadius: 0,
     orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: 0,
     tilt: 0,
@@ -1166,7 +1169,17 @@ function moveModel(graph, pos) {
   // from the integrated conversion, and its epoch-local mSY made the offset
   // (startmodelJD - balancedJD)/mSY drift with epoch.
   const currentYear = C.startModelYearWithCorrection + pos;
-  const dynEcc = { earth: OE.computeEccentricity(currentYear, C.balancedYear, C.perihelionCycleLength, C.eccentricityBase, C.eccentricityAmplitude) };
+  // Unification: Earth's per-frame eccentricity is the ONE law (H/3 line);
+  // the H/16 law-of-cosines form below serves only the planets' wobble laws.
+  const dynEcc = { earth: OE.computeEccentricityEarth(currentYear) };
+  // Unification: the geometric eccentricity offset (the PeriPrec2 centre)
+  // carries the one law's e(t) EVERY FRAME. The planet chains replicate the
+  // Sun geometrically (centre offset + circle, no equation of centre), so
+  // they must inherit the FULL vector e(t)·û(ϖ) — a constant base' left them
+  // 0.0012 AU short (Venus −80″ mean vs JPL, measured). The Sun node then
+  // needs only the remaining half of its EoC (split below) and the FQ-3
+  // corrector closes it exactly on the same realized offset.
+  graph.earthPeriPrec2.container.px = -dynEcc.earth * 100;
   for (const [key, p] of Object.entries(C.planets)) {
     if (p.eccentricityPhaseJ2000 !== undefined) {
       // 8.3-1 S-P1: the oscillation rides each planet's OWN wobble period
@@ -1228,7 +1241,7 @@ function moveModel(graph, pos) {
       let e;
       if (def._eccentricityKey && dynEcc[def._eccentricityKey] !== undefined) {
         e = def._eocDerived
-          ? dynEcc[def._eccentricityKey] - C.eccentricityBase / 2   // Sun: eoc = e_dynamic - e_base/2
+          ? dynEcc[def._eccentricityKey] / 2   // Sun: eoc = e(t)/2 (the geometric offset e(t)·û(ϖ) supplies the other half)
           : dynEcc[def._eccentricityKey] * def._eocFraction;        // Planets: eoc = e_dynamic × fraction
       } else {
         e = def.eccentricity;                                        // Moon, Pluto, etc: static
@@ -1249,7 +1262,7 @@ function moveModel(graph, pos) {
         // (the E5 δ block adds λ-space deltas to θ directly), so the
         // relative angle needs NO handedness flip — only the raw
         // world-frame atan2(z,x) extraction runs opposite λ.
-        const eF = e + C.eccentricityBase / 2;
+        const eF = dynEcc.earth;   // the full e(t) of the one law (node e is its half)
         const e2F = eF * eF, e3F = e2F * eF, e4F = e3F * eF;
         const eocFull = (2 * eF - e3F / 4) * Math.sin(M)
           + (1.25 * e2F - (11 / 24) * e4F) * Math.sin(2 * M)
@@ -1258,8 +1271,11 @@ function moveModel(graph, pos) {
         const eocHalf = 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
         const th1 = graph.earthPeriPrec1.orbit.ry;
         const th2 = th1 + graph.earthPeriPrec2.orbit.ry;
-        const ox = -C.eccentricityBase * Math.cos(th1) + C.eccentricityAmplitude * Math.cos(th2);
-        const oy = -C.eccentricityBase * Math.sin(th1) + C.eccentricityAmplitude * Math.sin(th2);
+        // Unification: the realized offset is the single arm −e(t)·û(θ_p1)
+        // (the A arm is retired; th2 stays the barycenter frame the Sun's
+        // annual angle is measured in).
+        const ox = -dynEcc.earth * Math.cos(th1);
+        const oy = -dynEcc.earth * Math.sin(th1);
         const dOff = Math.hypot(ox, oy);
         const dphi = Math.atan2(oy, ox) - (th2 + θ);
         const geo = Math.atan2(dOff * Math.sin(dphi), 1 + dOff * Math.cos(dphi));
@@ -1772,7 +1788,8 @@ function computeSunPositionFast(jd) {
   // pos IS the tropical-year count from startmodelJD (see the block at
   // computePositions): startModelYearWithCorrection + pos, one convention.
   const currentYear = C.startModelYearWithCorrection + pos;
-  const earthEcc = OE.computeEccentricity(currentYear, C.balancedYear, C.perihelionCycleLength, C.eccentricityBase, C.eccentricityAmplitude);
+  const earthEcc = OE.computeEccentricityEarth(currentYear);   // the ONE law (unification)
+  graph.earthPeriPrec2.container.px = -earthEcc * 100;   // geometric offset = full e(t) (mirrors moveModel)
 
   // Animate a single node: orbit.ry = θ (with EoC if applicable)
   function animateFast(nodes, def) {
@@ -1788,7 +1805,7 @@ function computeSunPositionFast(jd) {
     }
     if (C.useVariableSpeed && def.eccentricity && def.perihelionPhaseJ2000 !== undefined) {
       const e = def._eocDerived
-        ? earthEcc - C.eccentricityBase / 2
+        ? earthEcc / 2   // Sun: eoc = e(t)/2 (the geometric offset supplies the other half; unification)
         : def.eccentricity;
       const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos;
       const M = θ - perihelionPhase;

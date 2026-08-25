@@ -87,7 +87,7 @@ function beatPair(t1, t2) {
  * @property {(year: number) => number} computeObliquityEarthDeg
  * @property {(year: number) => number} computeEccentricityEarth
  * @property {number} obliquityMeanDeg - the fitted solstice-obliquity mean
- * @property {number} eccentricityMean - sqrt(base² + amplitude²)
+ * @property {number} eccentricityMean - Earth's mean eccentricity (the one law's base′)
  */
 
 /**

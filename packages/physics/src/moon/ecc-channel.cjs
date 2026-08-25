@@ -43,6 +43,7 @@
  * @param {{
  *   cyclesBetween: (yearA: number, yearB: number, divisorN: number) => (number | null),
  *   eccentricityBase: number,
+ *   eccentricityJ2000?: number,
  *   perihelionLongitudeJ2000Deg: number,
  *   inclinationCycleAnchorDeg: number,
  * }} deps — cyclesBetween MUST be the engine's own H-lattice phase counter
@@ -55,10 +56,21 @@ function createMoonEccChannel({
   eccentricityBase,
   perihelionLongitudeJ2000Deg,
   inclinationCycleAnchorDeg,
+  eccentricityJ2000,
 }) {
   const th0 = (perihelionLongitudeJ2000Deg - inclinationCycleAnchorDeg) * Math.PI / 180;
-  const amplitude = eccentricityBase / 2;
-  const mean = eccentricityBase;
+  // ECCENTRICITY UNIFICATION (plan IP-eccentricity-unification, D1 = form
+  // (e)): this line is the model's ONE eccentricity law for every consumer
+  // (eclipse Sun, Sun distance, Moon E-factor and T² channel, cardinal
+  // braid, scene). When the observed J2000 eccentricity is supplied the
+  // mean is DERIVED from it and the shared anchor — base' = e0 / (1 +
+  // cos θ₀ / 2) = 0.015520 — so e(J2000) is exact by construction; the
+  // legacy form (mean = the Law-5 base, e(J2000) a −0.86% prediction) is
+  // kept for callers that do not supply it.
+  const mean = eccentricityJ2000 !== undefined
+    ? eccentricityJ2000 / (1 + Math.cos(th0) / 2)
+    : eccentricityBase;
+  const amplitude = mean / 2;
   const e0 = mean + amplitude * Math.cos(th0);        // J2000 anchor, exact by construction
   const g0 = Math.pow(1 - e0 * e0, -1.5);             // (1−e²)^(−3/2) at the anchor
 
@@ -106,7 +118,21 @@ function createMoonEccChannel({
     return eccAt(tYr) / e0;
   }
 
-  return { eccAt, modulation, channelIntegral, eFactorAt, th0, amplitude, mean, e0, g0 };
+  /** de/dyear of the line at tYr years from J2000 (the cardinal braid's
+   *  equation-of-centre derivative): −amplitude·sin(θ)·dθ/dt, with dθ/dt
+   *  from the phase counter's two-point difference over ±1 yr (exact for a
+   *  linear phase, ppm-class under the integrated one). Returns 0 past the
+   *  tidal-lock asymptote, where eccAt returns the mean.
+   *  @param {number} tYr @returns {number} */
+  function eccRateAt(tYr) {
+    const c = cyclesBetween(2000, 2000 + tYr, 3);
+    if (c === null) return 0;
+    const cp = cyclesBetween(2000, 2000 + tYr + 1, 3), cm = cyclesBetween(2000, 2000 + tYr - 1, 3);
+    const dth = 2 * Math.PI * ((cp === null || cm === null) ? 0 : (cp - cm) / 2);
+    return -amplitude * Math.sin(th0 + 2 * Math.PI * c) * dth;
+  }
+
+  return { eccAt, eccRateAt, modulation, channelIntegral, eFactorAt, th0, amplitude, mean, e0, g0 };
 }
 
 module.exports = { createMoonEccChannel };

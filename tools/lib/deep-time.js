@@ -896,11 +896,18 @@ function _moonEcc() {
       eccentricityBase: C.eccentricityBase,
       perihelionLongitudeJ2000Deg: AR.earthPerihelionLongitudeJ2000,
       inclinationCycleAnchorDeg: AR.earthInclinationCycleAnchor,
+      // ECCENTRICITY UNIFICATION: the one law — base' derived from the
+      // observed J2000 eccentricity inside the channel (matched with
+      // packages/physics model.js and src/script.js).
+      eccentricityJ2000: AR.earthEccentricityJ2000,
     });
   }
   return _moonEccM;
 }
 function _fwEarthEcc(t_yr) { return _moonEcc().eccAt(t_yr); }
+/** de/dyear of the one eccentricity law (unification) — the cardinal braid's
+ *  equation-of-centre derivative; mirrors packages/physics model.js. */
+function _fwEarthEccRate(t_yr) { return _moonEcc().eccRateAt(t_yr); }
 
 function _eCompModulation(t_Ma, s) {
   return _moonEcc().modulation(t_Ma, s);
@@ -1354,6 +1361,7 @@ function posFromJD(jd) {
 module.exports = {
   // Framework e_E: H/3 fluctuation line (production) + Laskar-band composite (A/B research)
   _fwEarthEcc,
+  _fwEarthEccRate,
   // The shared @essrt/physics moon eccentricity channel (8.2-2) — scene-graph's
   // E-factor and channel-integral mirrors read it from here so the anchors
   // e0/g0 stay the channel's consts (never eccAt(0) — the R3 drift

@@ -1610,7 +1610,7 @@ export const VALUES = {
     out.moonStartposNodalDeg = { get: () => model.moon.moonStartposNodal, render: (v) => String(v), unit: 'deg', note: 'J2000-element anchored (docs/66 §4)' };
     out.moonStartposMoonDeg = { get: () => model.moon.moonStartposMoon, render: (v) => String(v), unit: 'deg', note: 'J2000-element anchored (docs/66 §4)' };
     out.correctionSunDeg = { get: () => model.foundational.correctionSun, render: (v) => v.toFixed(5), unit: 'deg', note: 'tuned (optimizer step 1)' };
-    out.eocEccentricityValue = { get: () => C.eocEccentricity, render: (v) => v.toFixed(5), note: 'derived: derivedMean − base/2' };
+    out.eocEccentricityValue = { get: () => C.eocEccentricity, render: (v) => v.toFixed(5), note: 'derived: e(J2000)/2 — the Sun node\'s EoC half under the one eccentricity law' };
     out.periPhaseOffsetDeg = { get: () => C.perihelionPhaseOffset, render: (v) => v.toFixed(4), unit: 'deg', note: 'derived (constants.js)' };
     out.perihelionPassageJD = { get: () => astro.earthOrbital.perihelionPassageJ2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (2000 Jan 3)' };
     out.juneSolstice2000JD = { get: () => astro.earthOrbital.juneSolstice2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (June 21, 2000)' };

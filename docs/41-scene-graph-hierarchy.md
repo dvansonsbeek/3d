@@ -113,7 +113,7 @@ The complete nesting order from the technical guide:
 startingPoint (scene root)
 └── Earth (pivot)                                     ← Axial Precession: H/13
     ├── Inclination Precession (container)            ← H/3
-    │   ├── Mid-Eccentricity Orbit (container)        ← Reference for eccentricity
+    │   ├── Mid-Eccentricity Orbit (container)        ← base′ reference circle (the one law's mean)
     │   │
     │   └── Ecliptic Precession (container)           ← H/5
     │       └── Obliquity Cycle (container)           ← H/8
@@ -139,7 +139,7 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| orbitRadius | -`eccentricityAmplitude` × 100 | Derived from constants |
+| orbitRadius | -`eccentricityAmplitude` × 100 | Earth's wobble circle — cancels in every geocentric vector; retained as the Law-4 K calibration amplitude (eccentricity unification, decision D2) |
 | speed | -2π / (H/13) | Clockwise axial precession |
 | rotationSpeed | 2π × sidereal rotations per SI year — **locked to the J2000 sidereal day** in both modes (see §14.4) | Daily spin |
 | tilt | -`earthtiltMean` | Mean axial tilt (obliquity) |
@@ -181,11 +181,28 @@ Both layers use the same period but opposite signs:
 |----------|--------------|--------------|
 | speed | +2π / (H/16) | -2π / (H/16) |
 | orbitTilta | -`earthRAAngle` | 0 |
-| orbitCentera | 0 | -eccentricityBase × 100 |
+| orbitCentera | 0 | −e(t) × 100 — **animated every frame** |
 
 **Purpose:** "Both have complete opposite values for 'Startpos' and 'Speed' because the movement of Axial precession and Inclination precession are balancing out in both ways."
 
 The paired inverse rotations maintain equilibrium during Earth's two counter-motions.
+
+**Eccentricity unification — the one law in the scene.** Earth's
+eccentricity is one function, e(t) = base′·(1 + cos θ₃(t)/2) on the H/3
+inclination phase (the same line the Moon channel and the eclipse Sun
+ride; base′ derived from e(J2000) and the shared anchor). The scene
+realizes it as ONE arm: Perihelion Precession 2's centre carries
+−e(t)·100 every frame (`moveModel` in both twins), pointing at the
+perihelion phase +180° — an ellipse centre, measured θ_p1 ≡ the Sun's
+perihelion phase at every epoch. The former second arm (the Barycenter's
+`eccentricityAmplitude` radius, net co-rotating with the axial
+precession) is retired. The full vector matters beyond the Sun: the
+planet chains replicate the Sun *geometrically* (centre + circle, no
+equation of centre), so a constant mean offset left them 0.0012 AU short
+(Venus −80″ vs JPL, measured). The Sun node then carries only half its
+equation of centre (`eocEccentricity` = e(J2000)/2, overridden per frame
+with e(t)/2) and the FQ-3 corrector closes it exactly on the same
+realized offset.
 
 ### 5.6 Summary Table
 
@@ -225,7 +242,7 @@ This 14.5-cycle offset positions the obliquity fluctuation to correctly explain 
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| orbitRadius | eccentricityAmplitude × 100 | Marks center of Sun's oscillation |
+| orbitRadius | 0 | The Sun's orbit centre itself — the second eccentricity arm (`eccentricityAmplitude` × 100) is retired under the one eccentricity law (see §5.5) |
 
 ### 7.2 Sun Position
 
@@ -373,8 +390,9 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | 1 AU | 100 scene units | <!--v:oneAU-->149,597,870.698828<!--/v--> km |
 | Mean obliquity | `earthtiltMean` | Earth's mean axial tilt |
 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | Earth's orbital tilt oscillation |
-| Base eccentricity | `eccentricityBase` | Earth's base orbital eccentricity |
-| Eccentricity amplitude | `eccentricityAmplitude` | Earth's eccentricity oscillation |
+| Base eccentricity | `eccentricityBase` | Earth's Law-5 balance eccentricity |
+| Mean eccentricity | `eccentricityBaseDerived` (base′) | The one law's mean, derived from e(J2000) and the shared anchor; the scene's per-frame offset carries e(t) |
+| Eccentricity amplitude | `eccentricityAmplitude` | Retained only as the Law-4 K calibration input (no longer a scene arm) |
 
 ---
 

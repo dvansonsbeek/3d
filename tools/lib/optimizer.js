@@ -137,10 +137,13 @@ function solveAmplitudeForJ2000(base) {
  * Keeps eccentricityDerivedMean and eocEccentricity in sync.
  */
 function recomputeEccentricityDerived() {
-  C.eccentricityDerivedMean = Math.sqrt(
-    C.eccentricityBase * C.eccentricityBase + C.eccentricityAmplitude * C.eccentricityAmplitude
-  );
-  C.eocEccentricity = C.eccentricityDerivedMean - C.eccentricityBase / 2;
+  // Unification: Earth's mean eccentricity is the one law's base' (derived
+  // from e(J2000) and the shared anchor — independent of the Law-5 base),
+  // and the Sun node's EoC eccentricity is e(J2000)/2. Neither moves with
+  // eccentricityBase/eccentricityAmplitude any more; kept as the single sync
+  // point so callers stay correct.
+  C.eccentricityDerivedMean = C.eccentricityBaseDerived;
+  C.eocEccentricity = C.ASTRO_REFERENCE.earthEccentricityJ2000 / 2;
 }
 
 /**

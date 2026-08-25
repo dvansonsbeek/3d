@@ -248,7 +248,12 @@ function computeAxialTiltRelative(planetName, currentYear) {
  * @returns {number} eccentricity at that year
  */
 function computeEccentricityEarth(currentYear) {
-  return computeEccentricity(currentYear, C.balancedYear, C.perihelionCycleLength, C.eccentricityBase, C.eccentricityAmplitude);
+  // ECCENTRICITY UNIFICATION: Earth rides the model's ONE law — the H/3 line
+  // of moon/ecc-channel.cjs with base' derived from e(J2000) (deep-time's
+  // _fwEarthEcc, the same channel instance the lunar chain uses; the browser
+  // twin is script.js _fwEarthEcc). The H/16 law-of-cosines form below
+  // (computeEccentricity) remains for the PLANETS' wobble laws (D4).
+  return dtm()._fwEarthEcc(currentYear - 2000);
 }
 
 /**
@@ -1008,8 +1013,6 @@ function _cardinal() {
       balancedYear: C.balancedYear,
       meanSolarYearDays: C.meanSolarYearDays,
       hJ2000: C.H,
-      eccentricityBase: C.eccentricityBase,
-      eccentricityAmplitude: C.eccentricityAmplitude,
       tiltMeanDeg: C.earthtiltMean,
       raAngleDeg: C.earthRAAngle,
       inclAmplitudeDeg: C.earthInvPlaneInclinationAmplitude,
@@ -1020,6 +1023,9 @@ function _cardinal() {
       meanHAtAgeMa: (t_Ma) => require('./deep-time').meanHAtAge(t_Ma),
       meanYearRealLodDays: (t_Ma) => require('./deep-time').meanYearInDaysAtAge(t_Ma),
       eccentricityAt: computeEccentricityEarth,
+      // One eccentricity law (unification): the EoC derivative comes from the
+      // same channel as the value — no separate H/16 derivative anywhere.
+      eccentricityRateAt: (year) => dtm()._fwEarthEccRate(year - 2000),
     },
   });
   return _cardinalM;
@@ -1107,7 +1113,7 @@ function _predict() {
       computeObliquityEarthDeg: computeObliquityEarth,
       computeEccentricityEarth: (year) => computeEccentricityEarth(year),
       obliquityMeanDeg: C.SOLSTICE_OBLIQUITY_MEAN,
-      eccentricityMean: Math.sqrt(C.eccentricityBase ** 2 + C.eccentricityAmplitude ** 2),
+      eccentricityMean: C.eccentricityBaseDerived,   // the ONE law's mean (unification)
     });
   }
   return _predictM;
