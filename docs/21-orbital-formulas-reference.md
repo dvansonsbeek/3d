@@ -1096,31 +1096,17 @@ const MASS_RATIO_EARTH_MOON = 81.30056816;
 // Moon's fraction: 1 / (ratio + 1) ≈ 0.0121
 ```
 
-**Step 3: Solar Perturbation Correction**
-```javascript
-// Solar perturbation correction factor using Moon's apogee ratio to AU
-// The 1/(1 - moonApogee/AU) factor ≈ 1.00271 corrects for solar perturbation effects:
-// - Kepler's law applied to Moon's orbit uses observed distance/period which include solar effects
-// - At apogee, Moon is closest to Earth's Hill sphere edge, maximizing solar influence
-// - The quadrupole solar perturbation (~5.6×10⁻³) scales with orbital size ratio
-// - Reference: https://farside.ph.utexas.edu/teaching/celestial/Celestial/node100.html
-// - This represents the "effective radius" reconciling Kepler-derived with measured GM values
-```
+**Step 3: Earth's own GM and mass**
 
-> **SUPERSEDED — the apogee/AU divisor below is no longer shipped.** The live
-> implementation (`tools/lib/constants.js`, `packages/physics/src/model.js`)
-> computes `GM_EARTH_ALONE = GM_EARTH_MOON_SYSTEM × ratio/(ratio+1)` with **no**
-> apogee/AU divisor; the Sun's effect enters upstream instead, as the
-> `moonOrbitalShift` distance correction (Sun's tidal coupling to the Earth–Moon
-> barycentric wobble, closing G(M_E+M_M) to ~3.7 ppm of DE440). The derivation
-> below is kept as the historical rationale.
+The Sun's effect enters upstream, as the `moonOrbitalShift` distance
+correction (the Sun's tidal coupling to the Earth–Moon barycentric wobble,
+closing G(M_E+M_M) to ~3.7 ppm of DE440), so the separation is a pure mass-
+ratio split with no further divisor (`tools/lib/constants.js`,
+`packages/physics/src/model.js`):
 
-**Historical implementation (retired):**
 ```javascript
-// Earth's gravitational parameter (corrected for Moon's mass and solar perturbation)
-// GM_Earth = GM_system × (ratio / (ratio + 1)) / (1 - moonApogee/AU)
-const GM_EARTH_ALONE = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1))
-               / (1 - moonAtApogee / meanAUDistance);
+// Earth's gravitational parameter: the system GM times Earth's mass fraction
+const GM_EARTH_ALONE = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1));
 // Result: ~398,600 km³/s² (matches JPL value)
 
 // Earth's mass derived from gravitational parameter (kg)

@@ -327,30 +327,23 @@ Per-planet fractions and implementation details:
 
 ## Sun Longitude Harmonics — Phase Z-B Correction Layer
 
-> **SUPERSEDED ON THE DISPLAY PATH (SW campaign).** Since the
-> scene-wheel Sun unification, the displayed Sun's accuracy is owned by
+> **Not on the display path.** The displayed Sun's accuracy is owned by
 > the CERTIFIED framework-native Sun (E4/E5: L₀ + mean tropical rate +
 > the f(Y) year-harmonic drift + the derived cos-ε torque term; e = the
 > one H/3 eccentricity law; ZERO fitted sun constants;
 > 0.95″ vs JPL) — the wheel rides it through a δ overlay
 > (`E5_WHEEL_SUN_ENABLED`, the moveModel sun block, inside the
-> clock-convention window). The Z-B correction below is still
-> EVALUATED underneath (the δ is defined against the legacy stack), but
-> it no longer determines the displayed Sun's accuracy, and Meeus
-> Ch. 25 is no longer the certified reference — it survives only as the
-> eclipse finders' un-injected default. This section remains the record
-> of what Z-B is and why it exists (the in-window absorber of the
-> geometric-split wheel's annual imperfection).
->
-> **RETIRED FROM THE DISPLAY PATH (FQ-3, exact-Kepler wheel).** The
-> split error Z-B absorbed has since been DERIVED and removed at the
-> geometry level (see § The Exact-Kepler Wheel below): with
-> `FQ3_EXACT_SUN(_ENABLED)` on (the default in both runtimes) the
-> moveModel sun no longer evaluates this correction at all. The fitted
-> terms remain registry constants (Step 0 stays their fitter; the D2
-> completion's PAIRED hash fingerprints them; `computeSunPositionFast`
-> — the declared Step-6a instrument — and the legacy A/B path still
-> apply them), but nothing on the display path consumes them.
+> clock-convention window), and with `FQ3_EXACT_SUN(_ENABLED)` on (the
+> default in both runtimes) the moveModel sun does not evaluate the Z-B
+> correction at all — the split error Z-B absorbs is derived and removed
+> at the geometry level (see § The Exact-Kepler Wheel below). Meeus
+> Ch. 25 is the eclipse finders' un-injected default, not the certified
+> reference. The fitted Z-B terms remain registry constants (Step 0 is
+> their fitter; the planetary completion's PAIRED hash fingerprints
+> them; `computeSunPositionFast` — the declared Step-6a instrument — and
+> the legacy A/B path apply them), but nothing on the display path
+> consumes them. This section documents what Z-B is (the in-window
+> absorber of the geometric-split wheel's annual imperfection).
 
 ### What it adds
 
@@ -358,9 +351,9 @@ Layered **on top of** the EoC formula above, the Sun Longitude Harmonics
 correction closes a residual ~200" annual oscillation between the framework's
 kinematic Sun (geometric off-center orbit + 2-term EoC) and the Meeus Ch.25
 reference Sun. The residual originates from a **definitional difference in
-Earth's eccentricity**: the framework's `eccentricityDerivedMean = 0.01545`
-(= √(eccentricityBase² + eccentricityAmplitude²)) differs from Meeus's IAU
-J2000 value `0.016708634` by ~8 %. This eccentricity gap propagates through
+Earth's eccentricity**: the legacy path's mean eccentricity
+(`eccentricityDerivedMean` = <!--v:eccentricityDerivedMean-->0.0155200<!--/v-->, the one law's base′)
+differs from Meeus's IAU J2000 value (<!--v:j2000Eccentricity-->0.01671022<!--/v-->). This eccentricity gap propagates through
 the first-order EoC term `2e·sin(M)` to produce a sin(M)+cos(M) residual of
 amplitude ~280" at the annual frequency.
 

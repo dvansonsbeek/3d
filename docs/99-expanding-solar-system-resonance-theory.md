@@ -342,8 +342,8 @@ single geometric object: the rotating perihelion vector.
 ## The framework-native Sun (E4/E5) — the certified apparent solar longitude
 
 The eclipse chain's Sun is assembled entirely from framework structure — **zero
-fitted solar constants** — and since the scene-wheel unification the visible
-simulator rides the same certified longitude. The assembly (in
+fitted solar constants** — and the visible simulator rides the same
+certified longitude. The assembly (in
 `packages/physics/src/model.js`, exported as `eclipse.frameworkSunDeps` and
 consumed identically by the package tier finders/besselian, `eclipse-audit.js`,
 and the browser's `_eclipseM` — the three-runtimes rule):
@@ -374,23 +374,21 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    slope trap. Drift and slope vanish at year 2000 by construction. No lookup
    table, no domain window in the certified chain.
 
-**e(t)** is the framework's H/3 eccentricity line anchored at J2000 —
-e(2000) − (e_base/2)(cos φ₃ − cos φ₃(2000)) on the integrated phase —
-**the same law the Moon's E-factor rides** (doc 66 §1). An earlier form
-added the H/16 law's slope on top of it; that slope was measured to be
-the Sun's entire eccentricity-rate error against JPL (1900–2100) and
-was retired (FQ-7-Sun option C-small, doc 66 §5). The reason is
-structural: eccentricity is frame-invariant and may carry only
-fixed-frame lattice periods; H/16 is the H/3 rotation seen from the
-H/13-precessing equinox (13 + 3 = 16) and belongs to the perihelion
-longitude. The cardinal-point chain rides the same one law: the scene
+**e(t)** is the framework's H/3 eccentricity line —
+e(t) = base′·(1 + cos θ₃/2) on the integrated phase, base′ derived from
+the observed e(J2000) and the shared System-Reset anchor —
+**the same law the Moon's E-factor rides** (doc 66 §1). The reason it
+carries no H/16 term is structural: eccentricity is frame-invariant and
+may carry only fixed-frame lattice periods; H/16 is the H/3 rotation
+seen from the H/13-precessing equinox (13 + 3 = 16) and belongs to the
+perihelion longitude. The cardinal-point chain rides the same one law: the scene
 offset carries e(t)·û(ϖ) every frame, the cardinal fit (Step 6d) is
 Earth-frame, and H/16 enters only as the perihelion-direction period and
 the Law-4 A construction (doc 108; docs/10 §Law 4).
 
 **Accuracy**: <!--v:frameworkSunVsJplRms-->0.80<!--/v-->″ RMS vs JPL over the modern window (the Meeus Ch. 25
-reference itself sits at <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″). At antiquity the closed form tracks the
-retired ±3000-yr trapezoid table to −0.3″ at −135 and −6.8″ at the ±3000
+reference itself sits at <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″). At antiquity the closed form tracks a
+±3000-yr trapezoid integration to −0.3″ at −135 and −6.8″ at the ±3000
 edge.
 
 **The scene-wheel overlay (SW)**: the visible wheel Sun adds one term on top
