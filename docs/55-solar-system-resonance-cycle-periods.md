@@ -47,7 +47,7 @@ The rate at which the ascending node on the invariable plane regresses. These in
 The period of the planet's axial tilt oscillation. This is a beat frequency derived from the Fibonacci decomposition of the ecliptic perihelion rate. For Earth: obliquity = beat of inclination (H/3) and ecliptic precession (H/5) = H/8. Venus and Neptune have obliquity cycle = |ICRF period| per planet (Venus: 8H/110, Neptune: 8H/100) — the two-component formula cancels exactly, producing constant obliquity.
 
 ### 6. Eccentricity Cycle (Wobble Period)
-The wobble period: the beat frequency between the axial precession and the ICRF perihelion precession. This determines how long the eccentricity takes to complete one full oscillation. For Earth this is H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr (the perihelion precession period). Computed via `calcWobblePeriod()`.
+The wobble period: the beat frequency between the axial precession and the ICRF perihelion precession. For the seven planets this determines how long the eccentricity takes to complete one full oscillation. Computed via `calcWobblePeriod()`. **Earth is the exception since the eccentricity unification (v12):** Earth's |e| rides the one H/3 law (cycle ≈ 111,772 yr), while Earth's wobble beat H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr is the perihelion-*direction* (of-date) period — the table's Earth "Ecc. cycle" column entry is that of-date beat, kept for the family structure (docs/10 §Law 4, doc 108).
 
 ## Complete Period Table
 

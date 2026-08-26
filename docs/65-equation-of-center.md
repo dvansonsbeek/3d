@@ -331,7 +331,8 @@ Per-planet fractions and implementation details:
 > scene-wheel Sun unification, the displayed Sun's accuracy is owned by
 > the CERTIFIED framework-native Sun (E4/E5: L₀ + mean tropical rate +
 > the f(Y) year-harmonic drift + the derived cos-ε torque term; e = the
-> H/16 law + the derived H/3 coupling; ZERO fitted sun constants;
+> ONE H/3 law (v12 unification; formerly the H/16 law + H/3 coupling);
+> ZERO fitted sun constants;
 > 0.95″ vs JPL) — the wheel rides it through a δ overlay
 > (`E5_WHEEL_SUN_ENABLED`, the moveModel sun block, inside the
 > clock-convention window). The Z-B correction below is still

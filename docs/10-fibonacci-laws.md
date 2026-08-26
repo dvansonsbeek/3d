@@ -152,6 +152,14 @@ Both constants are empirical — derived from Earth's fitted parameters — and 
 
 **Note on base eccentricities:** Laws 2 and 4 predict oscillation *amplitudes*. The base (mean) eccentricities are partially constrained by Law 5, which predicts Saturn's from the other seven. The remaining seven base eccentricities are structural values set at formation, analogous to how the eight mean inclinations are derived from J2000 values rather than predicted by ψ.
 
+**Earth's amplitude A is derived, not fitted (v12 re-basing).** Under the one-eccentricity-law unification, Earth's |e|(t) rides the single H/3 line e(t) = base′·(1 + cos θ₃/2) — the H/16 period belongs to the perihelion *direction* ϖ (the 13+3 of-date beat), not to |e|. Earth's Law-4 input A is therefore an of-date-class quantity with an exact geometric derivation, the **1246 triangle closure**:
+
+```
+e(J2000)² = base² + A² + 2·base·A·cos φ,   φ = 360° × (2000 − 1246.03) / (H/16) = 12.95°
+```
+
+with base the Law-5 constant and 1246.03 the perihelion–solstice alignment epoch on the lattice. This reproduces the stored A = 0.0013559440 to ~1e-8 (≈2 km of the ≈203,000 km wobble-marker distance), and the closure is sharp: A 5% too small forces the alignment year to 2000 AD, 5% too large to 690 AD. K derives from A at runtime (`eccentricityAmplitudeK` in the engine constants). Earth's *base* is likewise derived under the one law: base′ = e(J2000) / (1 + cos θ₀/2) on the shared System-Reset anchor (θ₀ = 81.18° at J2000). The 1246 alignment itself is untouched — it constrains ϖ; only its former "= eccentricity maximum" reading is retired (the e-extremes now ride the H/3 anchor: last max ≈ −23,200, next min ≈ +32,700).
+
 ### Law 5: The Eccentricity Balance
 
 **The mass- and distance-weighted eccentricities of seven planets balance against Saturn's alone — using the same Fibonacci divisors and phase groups as Law 3.**

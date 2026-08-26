@@ -13,7 +13,7 @@ The planetary eccentricities are determined by a balance scale — not by indivi
 
 The eccentricities used in this balance are the **base eccentricities** — the long-term mean values around which each planet's eccentricity oscillates over its eccentricity cycle. These differ slightly from the J2000 measured values (e.g., Earth's base = <!--v:eccentricityBase-->0.015386<!--/v--> vs J2000 = 0.016710).
 
-> **Scope note (ESSRT).** The balance equation, weight formula `W_j = √(m_j/m_target × d_target/d_j × a_j/a_target)`, and amplitude formula `e_amp = K × sin(tilt) × √d / (√m × a^1.5)` are scale-invariant — they hold at any epoch. K, the base eccentricities, axial tilts, and Earth's <!--v:periPrecYears-->~20,957<!--/v-->-yr eccentricity cycle (H/16) are J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally. The balance machinery this document describes therefore applies at any epoch with epoch-consistent inputs — Open Question §2 below already addresses temporal stability.
+> **Scope note (ESSRT).** The balance equation, weight formula `W_j = √(m_j/m_target × d_target/d_j × a_j/a_target)`, and amplitude formula `e_amp = K × sin(tilt) × √d / (√m × a^1.5)` are scale-invariant — they hold at any epoch. K, the base eccentricities, axial tilts, and Earth's H/3 ≈ 111,772-yr eccentricity cycle (v12: the one-law line; the <!--v:periPrecYears-->~20,957<!--/v-->-yr H/16 beat is the perihelion-*direction* cycle) are J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally. The balance machinery this document describes therefore applies at any epoch with epoch-consistent inputs — Open Question §2 below already addresses temporal stability.
 
 The balance equation (Law 5) can be expressed as a physical scale:
 
@@ -177,7 +177,7 @@ K = <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> — derived from Earth's mean par
 
 **SYSTEM/ALONE mass convention** (same as for ψ — see [doc 10 §Universal Constants](10-fibonacci-laws.md#the-universal-constants-ψ-and-k) and [doc 25 §Sun/System vs Sun/Planet-Alone](25-universal-mass-from-moon-formula.md#sunsystem-vs-sunplanet-alone)): Earth uses M_Earth_ALONE in K calibration; other planets use M_planet_SYSTEM in the e_amp formula above. The Moon's contribution is empirically absorbed into the fitted `e_amp_Earth`.
 
-Each planet's eccentricity oscillates around its base value over an **eccentricity cycle** (the meeting frequency of axial and perihelion precession in ICRF). For Earth this cycle is <!--v:periPrecYears-->~20,957<!--/v--> years; other planets have their own cycle periods. At any given time:
+Each planet's eccentricity oscillates around its base value over an **eccentricity cycle** (the meeting frequency of axial and perihelion precession in ICRF). Earth is the exception (v12): its |e| rides the one H/3 law — e(t) = base′·(1 + cos θ₃/2), cycle ≈ 111,772 years — while the <!--v:periPrecYears-->~20,957<!--/v-->-year H/16 beat belongs to Earth's perihelion *direction*; other planets keep their own wobble-beat cycle periods. At any given time:
 
 ```
 e(t) = √(e_base² + e_amp²) + (-e_amp - h₁·cos θ)·cos θ

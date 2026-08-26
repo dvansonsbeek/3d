@@ -52,13 +52,16 @@ e(t) = sqrt(base² + amp² - 2·base·amp·cos(θ))
 
 where `θ = 2π·(year - refYear) / (H/16)` and `refYear` is derived from the J2000 phase angle.
 
-This formula arises from the model's geocentric geometry: Earth orbits the wobble-center at radius `amplitude`, while the wobble-center (perihelion point) orbits the Sun at radius `base`. The distance between Earth and Sun varies as the two orbits precess relative to each other with period H/16.
+This formula arose from the model's v11 geocentric geometry: Earth orbited the wobble-center at radius `amplitude`, while the wobble-center orbited at radius `base`, the two precessing relative to each other with period H/16.
 
-**Certified-chain addition (E4):** for Earth the framework-native Sun's e(t)
-carries one further derived term on top of the H/16 law — the H/3 inclination
-coupling `Δe₃ = −(e_base/2)(cos φ₃ − cos φ₃(2000))` on the integrated lattice
-phase, with no fitted coefficient. See doc 38's amplitude section and
-[doc 99 § The framework-native Sun](99-expanding-solar-system-resonance-theory.md#the-framework-native-sun-e4e5--the-certified-apparent-solar-longitude).
+> **SUPERSEDED (v12, eccentricity unification).** Earth's |e|(t) now rides the
+> ONE H/3 law e(t) = base′·(1 + cos θ₃/2) on the System-Reset anchor — for the
+> Sun, the Moon's E-factor, the cardinal-point chain and the scene offset alike.
+> The H/16 period belongs to the perihelion *direction* (the 13+3 of-date
+> beat), and `amplitude` survives only as the Law-4 A construction (the 1246
+> triangle closure, docs/10 §Law 4); the wobble circle itself is retired (D6)
+> and the visible wobble-centre is a display-only marker (D7, doc 41). The
+> two-component decomposition below is the v11 research record that led here.
 
 **Phase at J2000** (`eccentricityPhaseJ2000`): derived analytically from the law of cosines inverted at J2000:
 

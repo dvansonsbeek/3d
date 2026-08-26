@@ -112,6 +112,7 @@ The complete nesting order from the technical guide:
 ```
 startingPoint (scene root)
 └── Earth (pivot)                                     ← Axial Precession: H/13
+    ├── EARTH-WOBBLE-CENTER (marker)                  ← D7: DISPLAY-ONLY, radius A at H/13 (the Law-4 amplitude distance; no instrument reads it)
     ├── Inclination Precession (container)            ← H/3
     │   ├── Mid-Eccentricity Orbit (container)        ← base′ reference circle (the one law's mean)
     │   │
@@ -139,7 +140,7 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| orbitRadius | -`eccentricityAmplitude` × 100 | Earth's wobble circle — cancels in every geocentric vector; retained as the Law-4 K calibration amplitude (eccentricity unification, decision D2) |
+| orbitRadius | 0 | **D6 (eccentricity unification): the Earth wobble circle is RETIRED** — its cancelling partner (the barycenter A-arm) is gone, so a nonzero radius made the wobble-frame perihelion 8% fast. Earth sits at the scene origin; every instrument measures from `earth.planetObj`. The visible wobble-centre marker is a D7 display-only *child* of Earth at +`eccentricityAmplitude`×100, circling at H/13 — it shows the Law-4 amplitude distance A (the 1246 triangle closure, docs/10 §Law 4) and the solstice direction, and nothing reads it |
 | speed | -2π / (H/13) | Clockwise axial precession |
 | rotationSpeed | 2π × sidereal rotations per SI year — **locked to the J2000 sidereal day** in both modes (see §14.4) | Daily spin |
 | tilt | -`earthtiltMean` | Mean axial tilt (obliquity) |

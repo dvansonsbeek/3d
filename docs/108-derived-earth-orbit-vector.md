@@ -9,9 +9,13 @@ status: current
 
 **Status**: research record of the FQ-7-Sun "option C" campaign (plan §12i).
 Nothing in this document is shipped in the eclipse chain or the
-deep-time path; the shipped state after option C-small is one
+deep-time path; the shipped state after option C-small was one
 eccentricity law for Sun and Moon in the eclipse chain (the H/3 line,
-doc 66) and the H/16 law in the cardinal-point path. What this document
+doc 66) with the H/16 law still in the cardinal-point path — and since
+the eccentricity-unification campaign (v12) the cardinal path rides the
+SAME H/3 law: the H/16 e-law is fully retired, exactly as this
+document's doctrine argument (§"the H/16 period belongs to ϖ")
+recommended. What this document
 records is a **derivation**: Earth's eccentricity and perihelion, from
 the framework's own inputs and zero fitted constants, as a single
 rotating vector — and what that vector says about the model's laws at

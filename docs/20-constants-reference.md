@@ -133,8 +133,8 @@ The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce 
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Base Eccentricity | `eccentricityBase` | <!--v:eccentricityBase-->0.015386<!--/v--> | Base orbital eccentricity (derived from perihelion longitude) |
-| Eccentricity Amplitude | `eccentricityAmplitude` | <!--v:eccentricityAmplitude-->0.001356<!--/v--> | Oscillation amplitude (derived from base + e(J2000) constraint) |
+| Base Eccentricity | `eccentricityBase` | <!--v:eccentricityBase-->0.015386<!--/v--> | Law-5 constant (v11 heritage). Earth's SHIPPED e(t) mean is the derived `eccentricityBaseDerived` = e(J2000)/(1 + cos θ₀/2) on the System-Reset anchor — the one-H/3-law world (v12) |
+| Eccentricity Amplitude | `eccentricityAmplitude` | <!--v:eccentricityAmplitude-->0.001356<!--/v--> | The Law-4 K input A — **derived, not fitted**: the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos(12.95°), φ from the 1246.03 perihelion–solstice alignment at the H/16 beat (reproduces the stored value to ~1e-8; ±5% forces the alignment to 690/2000 AD). Under the one law A no longer enters e(t) — it is the wobble-marker distance and Law-4 calibration only (see docs/10 §Law 4) |
 | Mean Obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v--> deg | Mean axial tilt (derived from obliquity at J2000) |
 | RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
 | Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | <!--v:earthInclMean-->1.48113<!--/v--> deg | Mean orbital inclination to invariable plane (derived) |
@@ -778,7 +778,7 @@ All 8 planet amplitudes are derived at runtime from K using model mean obliquity
 
 ## Planet Eccentricity Phase Constants (J2000)
 
-Phase angles for the eccentricity oscillation are now derived at runtime from the balanced-year phase: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. Earth's phase is independently determined by the Sun optimizer. The phases are no longer stored in JSON — they are computed by constants.js and script.js (section E2d).
+Phase angles for the planets' eccentricity oscillations are derived at runtime from the balanced-year phase: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. Earth is NOT in this family (v12): its e(t) rides the one H/3 law on the System-Reset anchor (θ₃(J2000) = 81.18°, shared with the inclination law, the Moon channel and the Sun imprint) — the legacy Sun-optimizer solve of Earth's eccentricity phase is retired. The phases are no longer stored in JSON — they are computed by constants.js and script.js.
 
 ## Per-Planet EoC Fractions
 
