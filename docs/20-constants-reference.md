@@ -468,6 +468,7 @@ These come from external astronomical sources and do not change with the model.
 | Anomalistic year | `anomalisticYearJ2000` | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days | JPL Horizons |
 | Sidereal year | `siderealYearJ2000` | <!--v:siderealYearInputDays-->365.256363004<!--/v--> days | JPL Horizons (adjusted for LOD=86400) |
 | Solar day | `solarDayJ2000` | 86400.0 s | SI definition |
+| Measured mean solar day (D8 declared scene basis) | `measuredMeanSolarDayJ2000Seconds` | <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000427<!--/v--> s | Derived in place: IAU sidereal seconds / the Step-6c measured sidereal year — the day the scene's measured year lengths are counted in. Five day bases coexist (SI · LOD_mean · Fourier-kinematic <!--v:lodKinematicFourierJ2000Seconds-->86,400.000107<!--/v--> · measured · LOD_real); see [doc 11 §Day bases](11-length-day-year-formulas.md#day-types) |
 | Sidereal day | `siderealDayJ2000` | 86164.09053083288 s (~23h 56m 4.0905s) | IERS |
 | Stellar day | `stellarDayJ2000` | 86164.0989036905 s (~23h 56m 4.0989s) | IERS |
 
