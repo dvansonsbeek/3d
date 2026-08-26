@@ -290,6 +290,24 @@ export const VALUES = {
     unit: 's',
     note: 'Layer-4 physical solar day at J2000 (tweakpane Solar Day, display basis) — closes on usnoLodJ2000 in the fit\'s measured-day basis',
   },
+  measuredMeanSolarDayJ2000Seconds: {
+    // D8 (ecc-unification Phase 3b, owner decision): THE DECLARED SCENE DAY
+    // BASIS — the measured mean solar day, sidereal-pinned: IAU sidereal
+    // seconds over the Step-6c measured sidereal year
+    // (YEAR_LENGTH_J2000_ANCHOR.sidereal). Derived in place from the anchor —
+    // no stored copy, so it cannot detach from the fit that defines it; the
+    // lodRealPhysical gate above ties the same family to the ΔT joint fit.
+    // Scene year-length DAYS are counted in this basis; the panel SECONDS
+    // column uses the Fourier twin (computeLodKinematicSecondsAtEpoch). One
+    // basis cannot close all three year types: pinning sidereal leaves
+    // tropical +0.03 s/yr and anomalistic +0.06 s/yr vs IAU — recorded model
+    // structure, not a unit artifact (per-type closing days
+    // 86400.000346 / .000427 / .000250 s). See docs/11 "Day bases".
+    get: () => C.meanSiderealYearSeconds / rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR.sidereal,
+    render: (v) => thousands(v, 6),
+    unit: 's',
+    note: 'D8: the declared scene day basis — measured mean solar day (sidereal-pinned, J2000) = IAU sidereal seconds / the 6c measured sidereal year',
+  },
   lodH5Only: {
     get: () => dtl().computeLodKinematicSecondsAtEpoch(2000) + dtl().h5Correction(2000),
     render: (v) => thousands(v, 6),

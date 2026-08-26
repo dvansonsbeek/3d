@@ -165,9 +165,25 @@ Separately (physical/USNO branch — does NOT feed the derivation chain above):
 **Solar day** — the time for the Sun to return to the same local meridian (noon to noon). The solar day varies throughout the year due to orbital eccentricity and obliquity (equation of time). The framework maintains **two mean-LOD values**:
 
 - **LOD_mean** = `siderealYearSeconds / siderealYear(days_kinematic)` ≈ <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s at J2000 — the kinematic baseline used inside all sidereal↔tropical conversions and the calibrated ΔT correction stack.
-- **LOD_real** = lod_kinematic + lod_kinematic/((H/5) × mSY) + DT cycle sum = <!--v:lodRealPhysical-->86,400.001480<!--/v--> s at J2000 — Layer 4: adds the H/5 ecliptic missing-motion correction (~3.5 ms) + the Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (Layer 3) + the Core-mantle swing. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0018<!--/v--> s in the fit's measured-day basis (doc 99 § "The two J2000 day bases"). Used in the user-facing physical LOD display. NOTE the baseline is `o.lodKinematic` (Fourier-direct), NOT LOD_mean — the two differ by 0.32 ms.
+- **LOD_real** = lod_kinematic + lod_kinematic/((H/5) × mSY) + DT cycle sum = <!--v:lodRealPhysical-->86,400.001480<!--/v--> s at J2000 — Layer 4: adds the H/5 ecliptic missing-motion correction (~3.5 ms) + the Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (Layer 3) + the Core-mantle swing. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0018<!--/v--> s in the fit's measured-day basis (doc 99 § "The two J2000 day bases"). Used in the user-facing physical LOD display. NOTE the baseline is `o.lodKinematic` (Fourier-direct), NOT LOD_mean — the two differ by the day-basis spread (≈0.4 ms at J2000; see the D8 declaration below).
 
 Both fluctuate over millennia as the sidereal year in days changes. See § "The H/5 LOD Correction" below.
+
+**The declared scene day basis (D8, ecc-unification Phase 3b).** The scene's measured year lengths — the Step-6c/6d fits, the tweakpane *days* rows — are counted in the **measured mean solar day**, sidereal-pinned at J2000:
+
+`measuredDay = siderealYearSeconds(IAU) / siderealYearDays(6c anchor)` = <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000427<!--/v--> s
+
+It is derived in place from the 6c anchor (no stored copy — it cannot detach from the fit) and the `lodRealPhysical` basis-consistency gate ties the same family to the ΔT joint fit. Five day quantities coexist and must not be conflated:
+
+| basis | J2000 value | role |
+|---|---|---|
+| SI day | 86,400 s exactly | the JD axis and all IAU references |
+| LOD_mean (H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | kinematic baseline (kinematic sidereal days) |
+| Fourier-kinematic day (`o.lodKinematic`) | ≈86,400.0001 s | the panel *seconds* column — pins the sidereal year to IAU seconds by construction |
+| **measured mean solar day — the DECLARED scene basis** | <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000427<!--/v--> s | the day the scene's measured year lengths are counted in |
+| LOD_real (physical observable) | <!--v:lodRealPhysical-->86,400.001480<!--/v--> s | Layer-4 display (adds H/5 + ΔT cycles + swing) |
+
+One day basis cannot close all three year types: pinning sidereal leaves tropical +0.03 s/yr and anomalistic +0.06 s/yr against IAU (per-type closing days 86,400.000346 / .000427 / .000250 s) — recorded model-vs-IAU structure, not a unit artifact.
 
 **Sidereal day** — the time for Earth to rotate 360° relative to the vernal equinox. Shorter than the solar day because Earth's orbital motion means the Sun drifts ~1°/day eastward, requiring extra rotation to reach the next noon. Formula:
 
@@ -184,7 +200,7 @@ The rate that matters here is precession in **right ascension** (along the equat
 | Quantity | Model value | Reference |
 |----------|-------------|-----------|
 | Mean solar day — **LOD_mean** (H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | — (kinematic) |
-| Mean solar day — **LOD_real** (Layer 4: +H/5 + DT cycles + swing, physical) | <!--v:lodRealPhysical-->86,400.001480<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0018<!--/v--> s (fit's measured-day basis; 0.32 ms basis spread) |
+| Mean solar day — **LOD_real** (Layer 4: +H/5 + DT cycles + swing, physical) | <!--v:lodRealPhysical-->86,400.001480<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0018<!--/v--> s (fit's measured-day basis — the D8 declared scene day; ≈0.4 ms basis spread) |
 | Sidereal day | 86164.091 s | 86164.091 s (IAU) |
 | Stellar day | 86164.099 s | 86164.099 s (IAU) |
 
