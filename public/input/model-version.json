@@ -1,7 +1,8 @@
 {
   "_description": "The model version identifier (IP-unified-architecture §10). MAJOR = structural change (a law, a divisor set, H). MINOR = refit (coefficients move, structure does not). Deliberately OUTSIDE model-parameters.json: a version label must not change the model's content identity (CONSTANTS_HASH). Seeded at v10.0 continuing the repo's existing v9/v10 tag lineage (owner decision); MAJOR/MINOR bumps proceed from here under this scheme. Content identity is carried separately by CONSTANTS_HASH (model parameters) and COEFFICIENTS_HASH (the fit) in packages/physics/src/constants/.",
-  "modelVersion": "v11.0",
+  "modelVersion": "v12.0",
   "_v11Note": "v10.0 → v11.0 (2026-08): the Driver 1½ regime-aware lunar recession history — a new term family (the staircase spline beyond 1000 Ma + the two solar angular-momentum channels: ocean leak and thermal-tide pump). The gated 0–1000 Ma era is bit-identical to v10.0.",
+  "_v12Note": "v11.0 → v12.0 (2026-08): the eccentricity unification — ONE eccentricity law for Sun, Moon, cardinal points and scene, e(t) = base′·(1 + cos θ₃/2) on the System-Reset anchor (a core-law change: the H/16 eccentricity law and the two-arm scene geometry are gone; H/16 is the perihelion-direction period only). Earth measured from the scene origin (wobble circle radius 0, the wobble-centre a display marker at the Law-4 A distance); Earth-frame refit 6b–6d + 5c + the ΔT joint re-close (USNO optimum 86400.0018); the declared measured-day basis (measuredMeanSolarDayJ2000Seconds).",
   "_preprintDoiNote": "The canonical preprint DOI — SINGLE SOURCE. Programmatic consumers import PREPRINT_DOI from @essrt/physics; doc prose uses the preprintDoi registry key; markdown link URLs (which markers cannot transclude) are checked against this value by the docs:values gate.",
   "preprintDoi": "10.21203/rs.3.rs-8758810/v4",
   "scheme": {

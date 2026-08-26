@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v11.0
+modelVersion: v12.0
 coefficients: sha256:a4b818dc588e46e8
 status: current
 ---
@@ -23,8 +23,7 @@ theta += 2 * e * sin(M) + 1.25 * e^2 * sin(2M)
 Where `e` is the eccentricity and `M` is the mean anomaly from perihelion.
 
 Gated by `useVariableSpeed` flag. When false, all orbits use constant angular
-velocity (the historical `correctionSun = 0.913280` companion value for that
-mode predates the current `correctionSunDeg` anchor and is no longer used).
+velocity.
 
 ---
 
@@ -33,8 +32,9 @@ mode predates the current `correctionSunDeg` anchor and is no longer used).
 ### Two speed mechanisms in the model
 
 The model approximates an elliptical orbit using a **circular orbit with an
-offset center**. Earth sits at `eccentricityBase * 100` units (~1.54 units)
-from the circle center. This design correctly reproduces the distance variation
+offset center**. Earth sits at `e(t) × 100` units from the circle center — the
+full eccentricity of the one H/3 law, carried by the Perihelion Precession 2
+centre every frame. This design correctly reproduces the distance variation
 between perihelion and aphelion.
 
 However, it also creates **apparent angular speed variation from geometry
@@ -104,33 +104,26 @@ model constants** -- they are not tunable free parameters.
 
 ### eocEccentricity
 
-**Formula:**
+**Formula (per frame):**
 ```
-eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2
+eoc(t) = e(t) / 2
 ```
 
-Where:
-- `eccentricityDerivedMean = sqrt(eccentricityBase^2 + eccentricityAmplitude^2)` -- the mean geometric eccentricity over a full precession cycle
-- `eccentricityBase` -- the fixed component of the Earth-barycenter offset
+Where `e(t) = base′·(1 + cos θ₃(t)/2)` is the one eccentricity law (the same
+line the Moon channel and the eclipse Sun ride), and the geometric offset
+carries the full `e(t)` along the perihelion direction.
 
 **Physics:**
-- The geometric offset provides apparent speed variation with amplitude `e_geom` (first order)
+- The geometric offset provides apparent speed variation with amplitude `e_geom = e(t)` (first order)
 - The explicit EoC adds `2 * eoc`
-- Total must equal the real Keplerian amplitude `2 * e_real`
-- Therefore: `eoc = e_real - e_geom / 2`
+- Total must equal the real Keplerian amplitude `2 * e_real` with `e_real = e(t)`
+- Therefore: `eoc = e(t) - e(t) / 2 = e(t) / 2`
 
-**Why eccentricityDerivedMean is the right e_real:**
-The Earth-barycenter distance oscillates over the H/16 precession cycle. The
-*mean* distance over a full cycle equals `sqrt(base^2 + amp^2)` -- this is a
-mathematical identity for the mean of a vector sum where one component is fixed
-and the other rotates. Using the mean ensures the EoC is correct on average
-across all precession phases.
+The higher orders (the geometric offset's exact parallax vs the full Kepler
+series) are closed exactly by the exact-Kepler wheel corrector (see § The
+Exact-Kepler Wheel below), so the split introduces no residual.
 
-**Numerical value:** `sqrt(0.015386^2 + 0.001356^2) - 0.015386/2 = 0.007753`
-
-**Previous hardcoded value was 0.0085** -- this overshot the total EoC effect
-by 310 arcsec. The correction was discovered through numerical analysis using
-the scene-graph tools (`tools/explore/eoc-constants.js`).
+**Numerical value at J2000:** `eocEccentricityValue` = <!--v:eocEccentricityValue-->0.00836<!--/v--> (= e(J2000)/2; the constants seed `C.eocEccentricity`, superseded per frame by `e(t)/2` in `moveModel`).
 
 ### perihelionPhaseOffset
 
@@ -156,10 +149,6 @@ computes the angular difference between:
 from earthRAAngle; full scene-graph computation gives -0.79 degrees, but the
 difference has negligible effect on Sun position: <0.001 degrees)
 
-**Previous hardcoded value was 2 degrees** -- this was co-tuned with the
-incorrect eocEccentricity of 0.0085 to jointly compensate for the EoC
-overshoot.
-
 ### correctionSun
 
 The only remaining tunable parameter. Sets the Sun's starting angular position
@@ -167,14 +156,14 @@ on its orbit to align cardinal points (solstices/equinoxes) with observed dates.
 
 | Parameter | Value | How determined |
 |-----------|-------|----------------|
-| `eocEccentricity` | 0.007753 | **Derived**: `eccentricityDerivedMean - eccentricityBase / 2` |
+| `eocEccentricity` | e(t)/2 (<!--v:eocEccentricityValue-->0.00836<!--/v--> at J2000) | **Derived**: half the one-law eccentricity, per frame |
 | `perihelionPhaseOffset` | ~0.51 deg | **Derived**: from EP1 precession phase + correctionSun + perihelion date |
 | `correctionSun` | <!--v:correctionSunDeg-->0.49715<!--/v--> | **Tuned**: aligns summer solstice timing + Sun RA |
 | `useVariableSpeed` | true | Toggle |
 
-The geometric orbit offset parameters are **unchanged**:
-- `eccentricityBase` = <!--v:eccentricityBase-->0.015386<!--/v--> (offset of circle center from Earth)
-- `eccentricityAmplitude` = <!--v:eccentricityAmplitude-->0.001356<!--/v--> (oscillation amplitude over H/16 cycle)
+The geometric offset carries `e(t)·û(ϖ)` itself:
+- `eccentricityDerivedMean` = <!--v:eccentricityDerivedMean-->0.0155200<!--/v--> — base′, the one law's mean (derived from e(J2000) and the System-Reset anchor)
+- `eccentricityAmplitude` = <!--v:eccentricityAmplitude-->0.001356<!--/v--> — the Law-4 input A and the wobble-marker distance; not a scene arm
 
 ### Results
 
