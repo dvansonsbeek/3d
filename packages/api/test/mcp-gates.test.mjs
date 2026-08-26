@@ -62,7 +62,7 @@ const toolCall = (name, args) => {
     ['essrt_earth', { year: 2000 }, (d) => (Math.abs(d.years[0].obliquityDeg - 23.4393) < 0.0002 ? null : `obliquity: ${d.years[0].obliquityDeg}`)],
     ['essrt_moon', { year: 2000 }, (d) => (Math.abs(d.years[0].distanceKm - 384400) < 1000 ? null : `moon distance: ${d.years[0].distanceKm}`)],
     ['essrt_bodies', { body: 'mercury' }, (d) => (Math.round(d.record.perihelionEclipticYears) === 243867 ? null : `mercury: ${d.record.perihelionEclipticYears}`)],
-    ['essrt_values', { key: 'usnoLodJ2000' }, (d) => (d.value === '86,400.0017' ? null : `usnoLodJ2000: ${d.value}`)],
+    ['essrt_values', { key: 'usnoLodJ2000' }, (d) => (d.value === '86,400.0018' ? null : `usnoLodJ2000: ${d.value}`)],   // ecc-unification 7c re-close
     ['essrt_derivations', { quantity: 'axialPrecession' }, (d) => (d.latticeDivisor === 13 ? null : `divisor: ${d.latticeDivisor}`)],
     ['essrt_climate', { year: 2000 }, (d) => (typeof d.years[0].l1OrbitalPermil === 'number' ? null : 'no L1 value')],
     ['essrt_cross_validation', { curve: 'obliquity-berger1978', year: 2000 }, (d) => (Math.abs(d.years[0].model - d.years[0].published) < 0.05 ? null : `Berger delta: ${d.years[0].delta}`)],

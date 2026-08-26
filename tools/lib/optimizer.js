@@ -248,6 +248,16 @@ function solveEarthtiltMeanForObliquity() {
  * Requires constants (eccentricityBase, eccentricityAmplitude, etc.) to already be set.
  * Invalidates and rebuilds the scene graph, so call only when constants have changed.
  */
+/** Equatorial RA (deg) of an ecliptic-longitude direction (β = 0) at the
+ *  J2000 mean obliquity — the frame computePerihelionRA() measures in. */
+function perihelionLongitudeToRaDeg(lambdaDeg) {
+  const d2r = Math.PI / 180;
+  const l = lambdaDeg * d2r, eps = C.ASTRO_REFERENCE.obliquityJ2000_deg * d2r;
+  let ra = Math.atan2(Math.sin(l) * Math.cos(eps), Math.cos(l)) / d2r;
+  if (ra < 0) ra += 360;
+  return ra;
+}
+
 function computePerihelionRA() {
   const j2000JD = C.j2000JD;
   sg._invalidateGraph();
@@ -1009,61 +1019,34 @@ function nelderMead(planet, paramNames, options = {}) {
       paramNames = paramNames.filter(p => !derived.includes(p));
     }
 
-    // Three-step solver: obliquity and eccentricityBase are weakly coupled.
-    // Step A: Solve obliquity exactly (rate + value) with current base.
-    // Step B: Bisect eccentricityBase for perihelion longitude (fixed obliquity → monotonic RA).
-    // Step C: Re-solve obliquity for the new base (small correction).
-    // Repeat A-B-C if needed (typically 2 passes suffice).
-    const targetRA = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
-    const RA_TOL = 0.0001; // degrees (~0.36 arcsec)
-    const MAX_PASSES = 5;
+    // ECCENTRICITY UNIFICATION: the former three-step solver bisected
+    // eccentricityBase (and solved the H/16 amplitude for e(J2000)) so that the
+    // scene's two-arm offset pointed at the IAU perihelion longitude. Under the
+    // one law the scene offset is −e(t)·û(θ_p1) with θ_p1 ≡ the Sun's perihelion
+    // phase by construction, e(J2000) is exact by construction (base' derived
+    // in the channel), eccentricityBase is the LOCKED Law-5 balance value and
+    // eccentricityAmplitude is retained only as the Law-4 K input — neither
+    // responds to the scene any more (the retired solver ran to its bounds:
+    // base 0.0054 / amplitude 0.49999, measured). Only the obliquity solves
+    // remain; the perihelion longitude is REPORTED, not solved.
+    // FRAME: computePerihelionRA() returns an equatorial RA; the IAU value is
+    // an ECLIPTIC longitude. The retired solver compared the two directly and
+    // thereby forced the old two-arm offset 1.1° off the true perihelion
+    // (RA(λ=102.947°) = 104.067°; the scene reads 104.073°) — an error the
+    // planets' fitted corrections silently absorbed.
+    const targetRA = perihelionLongitudeToRaDeg(C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000);
+    const solvedAmpl = solveAmplitudeForObliquityRate();
+    C.earthInvPlaneInclinationAmplitude = solvedAmpl;
+    recomputeInclinationDerived();
+    const solvedTilt = solveEarthtiltMeanForObliquity();
+    C.earthtiltMean = solvedTilt;
+    recomputeInclinationDerived();
+    sg._invalidateGraph();
+    const passRA = computePerihelionRA();
+    const raErr = passRA - targetRA;
+    console.warn(`[optimizer] Sun: obliquity solved — tilt=${solvedTilt.toFixed(8)} inclAmpl=${solvedAmpl.toFixed(8)}; perihelion RA=${passRA.toFixed(6)}° (target ${targetRA}°, diff ${(raErr*3600).toFixed(1)}" — reported, not solved)`);
 
-    for (let pass = 1; pass <= MAX_PASSES; pass++) {
-      // Step A: Solve obliquity with current eccentricityBase
-      const solvedAmpl = solveAmplitudeForObliquityRate();
-      C.earthInvPlaneInclinationAmplitude = solvedAmpl;
-      recomputeInclinationDerived();
-      const solvedTilt = solveEarthtiltMeanForObliquity();
-      C.earthtiltMean = solvedTilt;
-      recomputeInclinationDerived();
-      sg._invalidateGraph();
-
-      // Step B: Bisect base for perihelion longitude (obliquity held fixed)
-      const step = 0.002;
-      let lo = Math.max(0.001, C.eccentricityBase - step);
-      let hi = Math.min(C.ASTRO_REFERENCE.earthEccentricityJ2000 - 1e-6, C.eccentricityBase + step);
-
-      for (let bi = 0; bi < 50; bi++) {
-        const mid = (lo + hi) / 2;
-        const amp = solveAmplitudeForJ2000(mid);
-        if (amp === null) { lo = mid; continue; }
-        C.eccentricityBase = mid;
-        C.eccentricityAmplitude = amp;
-        recomputeEccentricityDerived();
-        sg._invalidateGraph();
-        const midRA = computePerihelionRA();
-        if (midRA < targetRA) lo = mid; else hi = mid;
-        if (hi - lo < 1e-10) break;
-      }
-      const newBase = (lo + hi) / 2;
-      const newAmp = solveAmplitudeForJ2000(newBase);
-      C.eccentricityBase = newBase;
-      C.eccentricityAmplitude = newAmp;
-      recomputeEccentricityDerived();
-      sg._invalidateGraph();
-
-      // Measure final RA for this pass
-      const passRA = computePerihelionRA();
-      const raErr = passRA - targetRA;
-      console.warn(`[optimizer] Sun pass ${pass}: base=${newBase.toFixed(8)} RA=${passRA.toFixed(6)}° err=${(raErr*3600).toFixed(1)}" tilt=${solvedTilt.toFixed(8)} inclAmpl=${solvedAmpl.toFixed(8)}`);
-
-      if (Math.abs(raErr) < RA_TOL) {
-        console.warn(`[optimizer] Sun: converged at pass ${pass} — perihelion RA within ${(raErr*3600).toFixed(1)}" of target`);
-        break;
-      }
-    }
-
-    console.warn(`[optimizer] Sun: final eccentricityBase = ${C.eccentricityBase.toFixed(8)}`);
+    console.warn(`[optimizer] Sun: eccentricityBase (Law-5, locked) = ${C.eccentricityBase.toFixed(8)}`);
     console.warn(`            eccentricityAmplitude = ${C.eccentricityAmplitude.toFixed(10)}`);
     console.warn(`            earthtiltMean = ${C.earthtiltMean.toFixed(8)}`);
     console.warn(`            earthInvPlaneInclinationAmplitude = ${C.earthInvPlaneInclinationAmplitude.toFixed(8)}`);
@@ -1250,7 +1233,8 @@ function nelderMead(planet, paramNames, options = {}) {
 
     // Perihelion longitude verification: measure actual RA at J2000
     const perihelionRA = computePerihelionRA();
-    const perihelionTarget = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
+    // Same frame as the measurement (RA), see the note at the Sun solver above.
+    const perihelionTarget = perihelionLongitudeToRaDeg(C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000);
 
     // Obliquity value + rate check — measure with optimized NM params applied.
     const solsticeJ2000 = C.ASTRO_REFERENCE.juneSolstice2000_JD;

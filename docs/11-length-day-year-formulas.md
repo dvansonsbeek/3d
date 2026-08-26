@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v11.0
-coefficients: sha256:c6b0f26097c7945c
+coefficients: sha256:a4b818dc588e46e8
 status: current
 ---
 
@@ -165,7 +165,7 @@ Separately (physical/USNO branch — does NOT feed the derivation chain above):
 **Solar day** — the time for the Sun to return to the same local meridian (noon to noon). The solar day varies throughout the year due to orbital eccentricity and obliquity (equation of time). The framework maintains **two mean-LOD values**:
 
 - **LOD_mean** = `siderealYearSeconds / siderealYear(days_kinematic)` ≈ <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s at J2000 — the kinematic baseline used inside all sidereal↔tropical conversions and the calibrated ΔT correction stack.
-- **LOD_real** = lod_kinematic + lod_kinematic/((H/5) × mSY) + DT cycle sum = <!--v:lodRealPhysical-->86,400.001380<!--/v--> s at J2000 — Layer 4: adds the H/5 ecliptic missing-motion correction (~3.5 ms) + the Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (Layer 3) + the Core-mantle swing. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0017<!--/v--> s in the fit's measured-day basis (doc 99 § "The two J2000 day bases"). Used in the user-facing physical LOD display. NOTE the baseline is `o.lodKinematic` (Fourier-direct), NOT LOD_mean — the two differ by 0.32 ms.
+- **LOD_real** = lod_kinematic + lod_kinematic/((H/5) × mSY) + DT cycle sum = <!--v:lodRealPhysical-->86,400.001480<!--/v--> s at J2000 — Layer 4: adds the H/5 ecliptic missing-motion correction (~3.5 ms) + the Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (Layer 3) + the Core-mantle swing. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0018<!--/v--> s in the fit's measured-day basis (doc 99 § "The two J2000 day bases"). Used in the user-facing physical LOD display. NOTE the baseline is `o.lodKinematic` (Fourier-direct), NOT LOD_mean — the two differ by 0.32 ms.
 
 Both fluctuate over millennia as the sidereal year in days changes. See § "The H/5 LOD Correction" below.
 
@@ -184,7 +184,7 @@ The rate that matters here is precession in **right ascension** (along the equat
 | Quantity | Model value | Reference |
 |----------|-------------|-----------|
 | Mean solar day — **LOD_mean** (H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | — (kinematic) |
-| Mean solar day — **LOD_real** (Layer 4: +H/5 + DT cycles + swing, physical) | <!--v:lodRealPhysical-->86,400.001380<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0017<!--/v--> s (fit's measured-day basis; 0.32 ms basis spread) |
+| Mean solar day — **LOD_real** (Layer 4: +H/5 + DT cycles + swing, physical) | <!--v:lodRealPhysical-->86,400.001480<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0018<!--/v--> s (fit's measured-day basis; 0.32 ms basis spread) |
 | Sidereal day | 86164.091 s | 86164.091 s (IAU) |
 | Stellar day | 86164.099 s | 86164.099 s (IAU) |
 
@@ -262,7 +262,7 @@ The coin rotation paradox manifests at every timescale:
 | Sidereal year | 365.256363 days | 365.256363 days (IAU) |
 | Anomalistic year | 365.259633 days | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days (IAU) |
 | LOD_mean (kinematic, H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | — |
-| LOD_real (Layer 4: physical, +H/5 correction + DT cycles + swing) | <!--v:lodRealPhysical-->86,400.001380<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0017<!--/v--> s (fit's measured-day basis) |
+| LOD_real (Layer 4: physical, +H/5 correction + DT cycles + swing) | <!--v:lodRealPhysical-->86,400.001480<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0018<!--/v--> s (fit's measured-day basis) |
 | Sidereal day | 86164.091 s | 86164.091 s (IAU) |
 | Stellar day | 86164.099 s | 86164.099 s (IAU) |
 | Axial precession | <!--v:axialPrecJ2000-->25,771<!--/v--> yr | <!--v:axialPrecJ2000-->25,771<!--/v--> yr (instantaneous J2000 rate) |

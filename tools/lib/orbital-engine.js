@@ -15,6 +15,10 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('./constants');
+// perf: cached lazy requirer (see tools/lib/scene-graph.js) — per-call
+// `require()` re-runs module resolution (~30 µs each); lazy order preserved.
+const _modCache = Object.create(null);
+const _req = (p) => _modCache[p] || (_modCache[p] = require(p));
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PRECOMPUTED OBLIQUITY EXTREMA
@@ -162,7 +166,7 @@ function computePlanetObliquity(planetName, currentYear) {
   const icrfPeriod_J2000 = 1 / (1 / p.perihelionEclipticYears - 13 / C.H);
   const N_icrf = C.H / Math.abs(icrfPeriod_J2000);
   const N_obliq = C.H / Math.abs(p.obliquityCycle);
-  const cyclesBetween = require('./deep-time').cyclesBetweenYears;
+  const cyclesBetween = dtm().cyclesBetweenYears;
   const phaseAdv = (yearA, yearB, N) => {
     const c = cyclesBetween(yearA, yearB, N);
     return c === null ? null : c * 2 * Math.PI;
@@ -279,13 +283,13 @@ function computeEccentricity(currentYear, balancedYear, cycleLength, base, ampli
   const snapshot = (currentYear - balancedYear) * divisor_N / C.H;
   let cycles = snapshot;
   if (process.env.SG_DEEP_TIME !== '0') {
-    const c = require('./deep-time').cyclesBetweenYears(balancedYear, currentYear, divisor_N);
+    const c = dtm().cyclesBetweenYears(balancedYear, currentYear, divisor_N);
     if (c !== null) cycles = c;   // null past the tidal-lock asymptote → keep snapshot
   }
   // Phase 8.3 L3: the law of cosines lives ONCE in
   // @essrt/physics/planets/ecc-channel (this engine keeps its documented R6
   // snapshot-fallback dispatch above; cycles is always a number here).
-  return require('@essrt/physics/planets/ecc-channel').eccentricityFromCycles(cycles, base, amplitude);
+  return _req('@essrt/physics/planets/ecc-channel').eccentricityFromCycles(cycles, base, amplitude);
 }
 
 /**
@@ -398,7 +402,7 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentY
   const ascendingNodeDeg = ((staticOmegaDeg % 360) + 360) % 360;
   const inclinationDeg = Math.sqrt(orbitTilta * orbitTilta + orbitTiltb * orbitTiltb);
 
-  return require('@essrt/physics/planets/asc-node-integrator').integrateAscendingNode(
+  return _req('@essrt/physics/planets/asc-node-integrator').integrateAscendingNode(
     { ascendingNodeDeg, inclinationDeg }, currentYear, {
       obliquityAt: computeObliquityEarth,
       earthInclinationAt: computeInclinationEarth,
@@ -422,7 +426,7 @@ function computeAscendingNodeInvPlane(planetName, year) {
   const p = C.planets[planetName];
   if (!p) return 0;
   // 8.3 L4: the linear year-2000 node convention lives in @essrt/physics.
-  return require('@essrt/physics/planets/orientation').ascendingNodeInvPlaneLinearAt(p, year);
+  return _req('@essrt/physics/planets/orientation').ascendingNodeInvPlaneLinearAt(p, year);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -506,7 +510,7 @@ function calcERD(year) {
  */
 function calcPlanetPerihelionLong(theta0, period, year) {
   // 8.3 L9: the linear form lives in @essrt/physics/planets/predict.
-  return require('@essrt/physics/planets/predict').calcPlanetPerihelionLongDeg(theta0, period, year);
+  return _req('@essrt/physics/planets/predict').calcPlanetPerihelionLongDeg(theta0, period, year);
 }
 
 /**
@@ -571,7 +575,7 @@ function computePlanetInvPlaneInclinationDynamic(planetName, currentYear, julian
   // scene-JD coupling — see the module header).
   const jd = julianDay || C.yearToJD(currentYear);
   const yearsSinceBalanced = (jd - C.balancedJD) / C.meanSolarYearDays;
-  return require('@essrt/physics/planets/orientation').invPlaneInclinationAt({
+  return _req('@essrt/physics/planets/orientation').invPlaneInclinationAt({
     isEarth: planetName === 'earth',
     invPlaneInclinationJ2000: p.invPlaneInclinationJ2000,
     invPlaneInclinationMean: p.invPlaneInclinationMean,
@@ -632,7 +636,7 @@ function computeEclipticInclinationFromBalanced(key, yearsSinceBalanced) {
   // 8.3 L4: the canonical dot-product form lives in @essrt/physics
   // (moved VERBATIM; scene-graph keeps delegating here, so positions ride
   // one implementation end to end).
-  return require('@essrt/physics/planets/orientation').eclipticInclinationFromBalanced(
+  return _req('@essrt/physics/planets/orientation').eclipticInclinationFromBalanced(
     C.planets[key], {
       invPlanePrecessionYears: C.ASTRO_REFERENCE.earthInvPlanePrecessionYears,
       inclinationMean: C.earthInvPlaneInclinationMean,
@@ -732,9 +736,9 @@ function computeEclipticPrecession(axialPrecession) {
  */
 // Lazy, memoised deep-time accessor. This module is required by deep-time's
 // own dependency chain, so a top-level require would be circular — the existing
-// inline `require('./deep-time')` calls exist for the same reason.
+// inline `dtm()` calls exist for the same reason.
 let _dtMod = null;
-const dtm = () => (_dtMod || (_dtMod = require('./deep-time')));
+const dtm = () => (_dtMod || (_dtMod = require('./deep-time')));   // perf: the ONE lazy resolution of deep-time (every in-function use goes through dtm())
 const deepTimeOn = () => process.env.SG_DEEP_TIME !== '0';
 
 // ─── §10 / §5c-ii-g — analytic deep-time year shape ──────────────────────
@@ -797,7 +801,7 @@ function evalYearFourier(year, mean, harmonics, kind) {
  *  snapshot mode or past the tidal-lock asymptote. */
 function computeLengthOfSimplifiedSolarYear(year) {
   const base = (deepTimeOn()
-    ? require('./deep-time').meanYearInDaysAtAge((2000 - year) / 1e6)
+    ? dtm().meanYearInDaysAtAge((2000 - year) / 1e6)
     : null) ?? C.meanSolarYearDays;
   return evalYearFourier(year, base, C.TROPICAL_YEAR_HARMONICS);
 }
@@ -818,7 +822,7 @@ function computeLengthOfSolarYear(year) {
  *  the tidal-lock asymptote. */
 function computeLengthOfSiderealYear(year) {
   const t_Ma = (2000 - year) / 1e6;
-  const dt = require('./deep-time');
+  const dt = dtm();
   const T_sid_s = dt.meanSiderealYearSecondsAtAge(t_Ma);
   const LOD_s   = dt.meanLodSecondsAtAge(t_Ma);
   const base    = (LOD_s === null) ? C.meanSiderealYearDays : (T_sid_s / LOD_s);
@@ -833,7 +837,7 @@ function computeLengthOfSiderealYear(year) {
  *  to the J2000 constant past the tidal-lock asymptote. */
 function anomalisticYearDaysBase(year) {
   const t_Ma = (2000 - year) / 1e6;
-  const dt = require('./deep-time');
+  const dt = dtm();
   const Ht    = dt.meanHAtAge(t_Ma);
   const tropD = dt.meanYearInDaysAtAge(t_Ma);
   if (Ht === null || tropD === null) return C.meanAnomalisticYearDays;
@@ -892,7 +896,7 @@ function computeLengthOfSiderealYearSec() {
  */
 function computeLengthOfDay(t_Ma) {
   if (t_Ma === undefined || t_Ma === 0) return C.meanLengthOfDay;
-  return require('./deep-time').meanLodSecondsAtAge(t_Ma);
+  return dtm().meanLodSecondsAtAge(t_Ma);
 }
 
 /**
@@ -908,7 +912,7 @@ function computeLengthOfDay(t_Ma) {
  */
 function computeSiderealDay(t_Ma) {
   if (t_Ma === undefined || t_Ma === 0) return C.meanSiderealDay;
-  return require('./deep-time').meanSiderealDayAtAge(t_Ma);
+  return dtm().meanSiderealDayAtAge(t_Ma);
 }
 
 /**
@@ -930,7 +934,7 @@ function computeSiderealDay(t_Ma) {
  */
 function computeStellarDay(t_Ma) {
   if (t_Ma === undefined || t_Ma === 0) return C.meanStellarDay;
-  return require('./deep-time').meanStellarDayAtAge(t_Ma);
+  return dtm().meanStellarDayAtAge(t_Ma);
 }
 
 /**
@@ -997,7 +1001,7 @@ function computeStellarSiderealOffset(stellarDay, siderealDay) {
 // self-correction (R11), the drift Simpson, the Ih closed form, the joint
 // sidebands, the exact derivative — and every load-bearing comment that
 // used to sit here — moved into the package.
-const { createCardinalModel } = require('@essrt/physics/cardinal');
+const { createCardinalModel } = _req('@essrt/physics/cardinal');
 let _cardinalM = null;
 function _cardinal() {
   if (_cardinalM !== null) return _cardinalM;
@@ -1020,8 +1024,8 @@ function _cardinal() {
     fns: {
       cyclesBetween: (a, b, n) => dtm().cyclesBetweenYears(a, b, n),
       analyticTropicalDays: (year) => analyticYearDaysAt('tropical', year),
-      meanHAtAgeMa: (t_Ma) => require('./deep-time').meanHAtAge(t_Ma),
-      meanYearRealLodDays: (t_Ma) => require('./deep-time').meanYearInDaysAtAge(t_Ma),
+      meanHAtAgeMa: (t_Ma) => dtm().meanHAtAge(t_Ma),
+      meanYearRealLodDays: (t_Ma) => dtm().meanYearInDaysAtAge(t_Ma),
       eccentricityAt: computeEccentricityEarth,
       // One eccentricity law (unification): the EoC derivative comes from the
       // same channel as the value — no separate H/16 derivative anywhere.
@@ -1099,7 +1103,7 @@ function computeSolsticeYearLength(year, type) { return _cardinal().computeSolst
 // This engine injects its J2000-anchored Earth scalar forms (the browser
 // injects its deep-time epoch-aware ones); the PREDICT_* dot products and
 // their guard semantics stay engine-side below.
-const { createPredictivePrecession } = require('@essrt/physics/planets/predict');
+const { createPredictivePrecession } = _req('@essrt/physics/planets/predict');
 
 let _predictM = null;
 function _predict() {

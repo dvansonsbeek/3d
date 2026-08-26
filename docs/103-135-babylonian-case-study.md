@@ -1,13 +1,13 @@
 ---
 docVersion: 1.0
 modelVersion: v11.0
-coefficients: sha256:c6b0f26097c7945c
+coefficients: sha256:a4b818dc588e46e8
 status: current
 ---
 
 # -135 Babylonian solar eclipse — case study
 
-**Status**: Framework places -135 Apr 15 Babylon at **BestGap <!--v:babylon135BestGapKm-->170<!--/v--> km at ΔUT <!--v:babylon135BestDeltaUT-->-0h53<!--/v-->** within the ±4h scan window; verdict **off-peak** — the umbra centerline reaches within ~200 km of Babylon, comfortably inside the regional class and consistent with the diary's totality report at the identification-cascade level (the ΔT-free matcher places the traditional date as the unique survivor with required-ΔT inside Stephenson's published totality window; local magnitude 0.986 in the pre-E4 matcher run). The framework's own predicted UT (<!--v:babylon135FrameworkUT-->06:06<!--/v-->) sits within 9 min of the documented UT (<!--v:babylon135DocumentedUT-->06:14<!--/v-->) — not a ΔT-signal event. Values are generated (`tools/verify/eclipse-audit.js --write`) through the UMBRA TIER — since U1 (the umbra strangler) the package besselian is the single umbra implementation, the same `@essrt/physics` chain the api centerline gate certifies: the E4 framework-native Sun with the derived 70-term planetary completion on framework-native carriers (FQ-5 N3 — the argument rates injected from the model's own planet records), the full-series Moon with the derived Delaunay + planetary tails, the elliptical Sun distance, the exact axis∩ellipsoid ground mapping, and the WGS84 geodetic output convention, with the doc-66 §1 deep-branch secular completions in the arguments. Prior certified-batch values (the retired scene-umbra chain) live in git history.
+**Status**: Framework places -135 Apr 15 Babylon at **BestGap <!--v:babylon135BestGapKm-->194<!--/v--> km at ΔUT <!--v:babylon135BestDeltaUT-->-0h54<!--/v-->** within the ±4h scan window; verdict **off-peak** — the umbra centerline reaches within ~200 km of Babylon, comfortably inside the regional class and consistent with the diary's totality report at the identification-cascade level (the ΔT-free matcher places the traditional date as the unique survivor with required-ΔT inside Stephenson's published totality window; local magnitude 0.986 in the pre-E4 matcher run). The framework's own predicted UT (<!--v:babylon135FrameworkUT-->06:05<!--/v-->) sits within 9 min of the documented UT (<!--v:babylon135DocumentedUT-->06:14<!--/v-->) — not a ΔT-signal event. Values are generated (`tools/verify/eclipse-audit.js --write`) through the UMBRA TIER — since U1 (the umbra strangler) the package besselian is the single umbra implementation, the same `@essrt/physics` chain the api centerline gate certifies: the E4 framework-native Sun with the derived 70-term planetary completion on framework-native carriers (FQ-5 N3 — the argument rates injected from the model's own planet records), the full-series Moon with the derived Delaunay + planetary tails, the elliptical Sun distance, the exact axis∩ellipsoid ground mapping, and the WGS84 geodetic output convention, with the doc-66 §1 deep-branch secular completions in the arguments. Prior certified-batch values (the retired scene-umbra chain) live in git history.
 
 **E4/E5 update — the framework-native Sun is now the certified basis.** Exploration 3b landed the assembled framework Sun in the eclipse chain across all three runtimes (package tier, audit, browser finders): mean longitude = L₀ + the mean tropical rate + the f(Y) year-harmonic drift shape in SI/TT **plus the derived torque term (E5)** — the year harmonics carry only the geometric equinox displacement of the tilt nodes (the exact 8:3 amplitude signature), and the classical luni-solar torque adds the precession-rate modulation δp = −p₀·tan ε·δε(t) on the model's own two-component obliquity law, per-divisor drift scale 1 + p₀·tan²ε·H/(2π·div) — and eccentricity = the H/16 channel law + the derived H/3 inclination-coupling imprint (amplitude base/2, lattice phase) — since the FQ-7-Sun option-C-small landing the eclipse Sun's eccentricity is the J2000-anchored H/3 line alone (the same frame-invariant law the Moon's E-factor rides; the H/16 term retired from the eclipse Sun — doc 66). Zero fitted sun constants end to end; the Meeus Ch. 25 polynomial remains only as the finders' un-injected default. Under this basis the values above regenerated: **194 km — better than the 206 km of the Meeus-era basis** (the torqueless E4 intermediate read 277 km; the ancient corpus blind-selected the torque term's per-divisor structure before its derivation existed; the later FQ-5 N3 carrier swap — the completion table re-extracted on framework-native argument rates — moved it again to the current 188 km); the audit-26 verdict counts reproduce exactly, −708 Lu drops to 9 km, and the −135 required-ΔT sits inside Stephenson's window (12,012 s in [11,220, 12,140]). The assembled Sun beats the Meeus basis against JPL in-window (0.95″ vs 1.28″ scatter) and against the ancient corpus timing structure. The "Sun ecl_lon drift at antiquity" section below is the pre-E4 attribution — it now applies only to the scene wheels' linear-rate Sun, not to the certified eclipse chain, which carries the drift natively.
 
@@ -43,10 +43,10 @@ Audit-26 result for -135 Apr 15 (documented UT 06:14):
 
 | Quantity | Value |
 |---|---:|
-| Framework's own eclipse UT (MdlUT) | <!--v:babylon135FrameworkUT-->06:06<!--/v--> |
+| Framework's own eclipse UT (MdlUT) | <!--v:babylon135FrameworkUT-->06:05<!--/v--> |
 | Documented UT | <!--v:babylon135DocumentedUT-->06:14<!--/v--> |
-| BestΔUT (offset giving minimum umbra↔site distance) | <!--v:babylon135BestDeltaUT-->-0h53<!--/v--> |
-| **BestGap (umbra↔site at BestΔUT)** | **<!--v:babylon135BestGapKm-->170<!--/v--> km** |
+| BestΔUT (offset giving minimum umbra↔site distance) | <!--v:babylon135BestDeltaUT-->-0h54<!--/v--> |
+| **BestGap (umbra↔site at BestΔUT)** | **<!--v:babylon135BestGapKm-->194<!--/v--> km** |
 | Verdict | **off-peak** |
 
 The framework and the record agree on the eclipse UT to within 9 minutes, and the umbra track passes within ~200 km of the site within the scan window. (Generated rows — `tools/verify/eclipse-audit.js --write`; prior certified-batch values live in git history.)
@@ -190,7 +190,7 @@ A separate 5000+ km discrepancy exists between two geometric definitions of "gre
 Under the current umbra chain (the U1 umbra tier — the package besselian,
 certified Sun with the derived planetary completion + full-series Moon
 with the derived tails + exact ellipsoid mapping), the BestGap
-is <!--v:babylon135BestGapKm-->170<!--/v--> km. The components:
+is <!--v:babylon135BestGapKm-->194<!--/v--> km. The components:
 
 | Component | Current state at −135 | Assessment |
 |---|---|---|
@@ -309,7 +309,7 @@ inside the tablet's published totality window
 (`u2-dt-free-matcher.mjs`) — the framework's reduction and
 Stephenson's overlap. The theory-difference drift against ELP-class
 reductions is Δṅ ≈
-<!--v:lunarTheoryDriftDeltaNdot-->0.26<!--/v--> ″/cy² ([doc 102](102-gia-alpha-lunar-validation.md)).
+<!--v:lunarTheoryDriftDeltaNdot-->0.27<!--/v--> ″/cy² ([doc 102](102-gia-alpha-lunar-validation.md)).
 The scene umbra chain shares this accuracy class: with the
 series-injected Sun (both bodies from the certified of-date series;
 the scaffold Sun and its modern-calibration laws retired), the scene

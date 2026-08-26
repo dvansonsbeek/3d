@@ -20,6 +20,10 @@
 const C = require('./constants');
 const fs = require('fs');
 const path = require('path');
+// perf: cached lazy requirer (see tools/lib/scene-graph.js) — per-call
+// `require()` re-runs module resolution (~30 µs each); lazy order preserved.
+const _modCache = Object.create(null);
+const _req = (p) => _modCache[p] || (_modCache[p] = require(p));
 
 // ─── Physical constants (literature-anchored, not framework-derived) ──────
 
@@ -145,7 +149,7 @@ function _evalClimateL1Orbital(year) {
   // 8.4-4: the L1 harmonic loop lives in @essrt/physics/climate/l1-orbital;
   // the regime selection stays here.
   const r = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
-  return require('@essrt/physics/climate/l1-orbital').evalClimateL1OrbitalPermil(year, {
+  return _req('@essrt/physics/climate/l1-orbital').evalClimateL1OrbitalPermil(year, {
     l1Terms: r.L1,
     yStdDenormalization: r.denormalization.y_std,
     eightHKyr: CLIMATE_FORMULA_COEFFS.config.eight_H_kyr,
@@ -186,7 +190,7 @@ function iEarthAtAge(t_Ma) {
 // @essrt/physics/moon/month-chain; this engine delegates, injecting its own
 // layer-0/1 evaluators, J2000 anchors, and the shared ecc channel's
 // modulation. Lazy so every module const exists at first use.
-const { createMoonMonthChain } = require('@essrt/physics/moon/month-chain');
+const { createMoonMonthChain } = _req('@essrt/physics/moon/month-chain');
 let _moonChainM = null;
 function _moonChain() {
   if (_moonChainM === null) {
@@ -227,7 +231,7 @@ function meanMoonDistanceAtAge(t_Ma) { return _moonChain().distanceKmAtAge(t_Ma)
 // angular-momentum channels live ONCE in @essrt/physics/deltat/
 // recession-history. The quartic stays bit-identical ≤ jointMa; the
 // channels are explicit only beyond it. Lazy for module-const ordering.
-const { createMoonRecessionHistory, createSolarChannelBudget } = require('@essrt/physics/deltat/recession-history');
+const { createMoonRecessionHistory, createSolarChannelBudget } = _req('@essrt/physics/deltat/recession-history');
 let _recessionM = null;
 function _recessionHistory() {
   if (!_recessionM) {
@@ -267,7 +271,7 @@ function _solarBudget() {
 // lattice-α pin machinery stays engine-side in earthMoiFactorAtAge), the
 // IAU Fourier evaluator, and its env-gated cycle sums. The ΔT cache and
 // the sequential post-integration adds stay below.
-const { createDeepTimeLod } = require('@essrt/physics/deltat/deep-time');
+const { createDeepTimeLod } = _req('@essrt/physics/deltat/deep-time');
 let _deepLodM = null;
 function _deepLod() {
   if (!_deepLodM) {
@@ -333,7 +337,7 @@ function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
 // ─── Driver 2 — AU and year_s ─────────────────────────────────────────────
 function meanAuAtAge(t_Ma) {
   // Phase 8.3 L6: the linear mass-loss law lives in @essrt/physics.
-  return require('@essrt/physics/planets/orbit-chain')
+  return _req('@essrt/physics/planets/orbit-chain')
     .massLossScaledLinearAtAge(t_Ma, C.currentAUDistance, SOLAR_MASS_LOSS_FRAC_PER_YR);
 }
 
@@ -424,7 +428,7 @@ const HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR = C.DT_STACK_TAPER_TOTAL_HALFWIDTH_YR;
 // browser injects FIT.DT_STACK/FIT.DT_RESONATOR) and keeps its env-var
 // gates. The factory is lazy: the RES_* scalars below it are read at first
 // call, after module evaluation.
-const { createDeltaTCycles } = require('@essrt/physics/deltat/cycles');
+const { createDeltaTCycles } = _req('@essrt/physics/deltat/cycles');
 let _dtCyclesM = null;
 function _dtCycles() {
   if (!_dtCyclesM) {
@@ -621,7 +625,7 @@ function dtCycleLodCorrectionSum(year) {
 // Layer-0 instance for the epoch-aware base — same parameter bundle and α
 // channel the browser's _L0 is built from (the layer0 identity gate pins the
 // two constructions equal).
-const { createEpochPrimitives } = require('@essrt/physics');
+const { createEpochPrimitives } = _req('@essrt/physics');
 let _l0M = null;
 function _l0() {
   if (!_l0M) _l0M = createEpochPrimitives({ params: EPOCH_PARAMS, alphaAtAgeMa: earthMoiFactorAtAge });
@@ -886,7 +890,7 @@ function _fwEarthEccComposite(t_yr) {
 // 8.2-1 S1 alignment made the two engines bit-exact first, so this delegation
 // is provably behaviour-preserving). This engine injects its own
 // cyclesBetweenYears (always integrated here — DT has no snapshot toggle).
-const { createMoonEccChannel } = require('@essrt/physics/moon/ecc-channel');
+const { createMoonEccChannel } = _req('@essrt/physics/moon/ecc-channel');
 let _moonEccM = null;
 function _moonEcc() {
   if (_moonEccM === null) {
@@ -976,7 +980,7 @@ function meanPlanetSemiMajorAxisAtAge(planetName, t_Ma) {
   if (a_J2000 === undefined) return null;
   // Phase 8.3 L6: same linear mass-loss law as meanAuAtAge (S-P11 resolved —
   // the engines shared this driver all along; units are the caller's).
-  return require('@essrt/physics/planets/orbit-chain')
+  return _req('@essrt/physics/planets/orbit-chain')
     .massLossScaledLinearAtAge(t_Ma, a_J2000, SOLAR_MASS_LOSS_FRAC_PER_YR);
 }
 
@@ -1010,7 +1014,7 @@ const _CUMUL_INTEGRAL_STEP     = 10000;    // 10 kyr per cell (matches browser)
 // OWN H(t) twin as the integrand — the twins dissolve into Layer 0 at
 // Phase 8. R2 is honoured at construction: ensureTable() runs under
 // _withLatticeAlpha, so every invH evaluation sees the constant MOI.
-const { createPhaseMachinery } = require('@essrt/physics/phase');
+const { createPhaseMachinery } = _req('@essrt/physics/phase');
 let _phaseM = null;
 function _phase() {
   if (_phaseM !== null) return _phaseM;

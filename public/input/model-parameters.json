@@ -7,7 +7,7 @@
     "startmodelJD": 2451716.5,
     "startmodelYear": 2000.5,
     "correctionDays": -0.828832119703292,
-    "correctionSun": 0.4968839022012559,
+    "correctionSun": 0.4971540149655503,
     "temperatureGraphMostLikely": 14.5,
     "startAngleModel": 89.91949879,
     "useVariableSpeed": true,
@@ -16,8 +16,8 @@
     "_systemResetNNote": "Eccentricity anchor offset (0..7) in units of H. 0 = balancedYear (n=0), 7 = System Reset. Shifts all eccentricity phase calculations."
   },
   "earth": {
-    "earthtiltMean": 23.413527499101747,
-    "earthInvPlaneInclinationAmplitude": 0.6360475695866625,
+    "earthtiltMean": 23.413526608469965,
+    "earthInvPlaneInclinationAmplitude": 0.636069722432876,
     "eccentricityBase": 0.015386009686374918,
     "eccentricityAmplitude": 0.0013559440307290061
   },
@@ -25,14 +25,14 @@
     "moonStartposApsidal": 347.5476,
     "moonStartposNodal": 64.0435,
     "moonStartposMoon": 67.8443,
-    "moonMeeusLpCorrection": 0.009081766072295829
+    "moonMeeusLpCorrection": 0.00908174470925335
   },
   "planets": {
     "mercury": {
       "name": "Mercury",
       "eocFraction": -0.527,
-      "startpos": 83.65212772217342,
-      "angleCorrection": 0.971595956003533,
+      "startpos": 83.64651142941864,
+      "angleCorrection": 0.9727205912043573,
       "perihelionEclipticFraction": [
         8,
         11
@@ -61,7 +61,7 @@
       "name": "Venus",
       "eocFraction": 0.436,
       "startpos": 249.28769121856186,
-      "angleCorrection": -2.7506208719906127,
+      "angleCorrection": -2.789778861448692,
       "perihelionEclipticFraction": [
         -8,
         6
@@ -87,7 +87,7 @@
       "name": "Mars",
       "eocFraction": -0.066224,
       "startpos": 121.4634461571797,
-      "angleCorrection": -2.110262688821635,
+      "angleCorrection": -2.104652936098656,
       "perihelionEclipticFraction": [
         8,
         36
@@ -116,7 +116,7 @@
       "name": "Jupiter",
       "eocFraction": 0.495,
       "startpos": 13.887946755371052,
-      "angleCorrection": 0.9306112039524912,
+      "angleCorrection": 0.9333205235053406,
       "perihelionEclipticFraction": [
         8,
         39
@@ -144,8 +144,8 @@
     "saturn": {
       "name": "Saturn",
       "eocFraction": 0.54,
-      "startpos": 11.279046793476084,
-      "angleCorrection": -0.17887349563889998,
+      "startpos": 11.279308392461772,
+      "angleCorrection": -0.1784695052193328,
       "perihelionEclipticFraction": [
         -8,
         65
@@ -174,7 +174,7 @@
       "name": "Uranus",
       "eocFraction": 0.53,
       "startpos": 44.900388945775106,
-      "angleCorrection": -0.7329070274012324,
+      "angleCorrection": -0.7343433510960402,
       "perihelionEclipticFraction": [
         1,
         3
@@ -204,7 +204,7 @@
       "name": "Neptune",
       "eocFraction": 0.585,
       "startpos": 47.9552024382285,
-      "angleCorrection": 2.332347646694906,
+      "angleCorrection": 2.3327665835675617,
       "perihelionEclipticFraction": [
         2,
         1

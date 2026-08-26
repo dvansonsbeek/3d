@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v11.0
-coefficients: sha256:c6b0f26097c7945c
+coefficients: sha256:a4b818dc588e46e8
 status: current
 ---
 
@@ -169,7 +169,7 @@ on its orbit to align cardinal points (solstices/equinoxes) with observed dates.
 |-----------|-------|----------------|
 | `eocEccentricity` | 0.007753 | **Derived**: `eccentricityDerivedMean - eccentricityBase / 2` |
 | `perihelionPhaseOffset` | ~0.51 deg | **Derived**: from EP1 precession phase + correctionSun + perihelion date |
-| `correctionSun` | <!--v:correctionSunDeg-->0.49688<!--/v--> | **Tuned**: aligns summer solstice timing + Sun RA |
+| `correctionSun` | <!--v:correctionSunDeg-->0.49715<!--/v--> | **Tuned**: aligns summer solstice timing + Sun RA |
 | `useVariableSpeed` | true | Toggle |
 
 The geometric orbit offset parameters are **unchanged**:

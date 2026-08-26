@@ -6688,12 +6688,24 @@ const startingPoint = {
 
 const earthWobbleCenter = {
   name: "EARTH-WOBBLE-CENTER",
-  startPos: -(cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 3) * 360
-            - (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) * 360 - 180)),
+  // D7 (ecc unification): DISPLAY-ONLY marker — child of earth.pivotObj (see
+  // the assembly block), so it inherits Earth's animated H/13 orbit phase
+  // (snapshot + deep-time) and circles Earth once per H/13, marking the
+  // axial-precession / solstice direction where the pre-D6 wobble centre sat
+  // relative to Earth. NOT a physics node: the instruments that read it were
+  // re-pointed to earth.planetObj (D6 — measuring from the wobble frame ran
+  // the perihelion 8% fast). startPos/speed MUST stay 0: the offset direction
+  // comes from Earth's own orbit phase. The radius is the Law-4 amplitude A —
+  // not free but the 1246 triangle closure: e(J2000)² = base² + A² +
+  // 2·base·A·cos φ, φ = 360°·(2000 − 1246.03)/(H/16) = 12.95° (the arm-to-arm
+  // beat since the perihelion–solstice alignment); Law-4 K derives from it
+  // (constants eccentricityAmplitudeK). Under the one H/3 law A no longer
+  // enters e(t) itself.
+  startPos: 0,
   speed: 0,
   tilt: 0,
   rotationSpeed: -Math.PI*2/(holisticyearLength/13),
-  orbitRadius: 0,
+  orbitRadius: eccentricityAmplitude*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -6757,7 +6769,15 @@ const earth = {
   // chain reads 223/51/46 — measured 2026-08, the fresh-vs-healed split).
   rotationPhase: -Math.PI/SI_TROPICAL_YEAR_DAYS,
   tilt: -earthtiltMean,
-  orbitRadius: -eccentricityAmplitude*100,
+  // ECCENTRICITY UNIFICATION (D6): the Earth wobble circle (radius
+  // eccentricityAmplitude·100, H/13) is RETIRED — its partner arm on the
+  // barycenter is gone, so measured from the "wobble centre" the perihelion
+  // advanced 8% too fast (report Method B: 365.2611 d vs IAU 365.2596),
+  // while from Earth the one-law scene reproduces IAU. With radius 0 the
+  // wobble centre IS Earth: Method A ≡ Method B, the Step-3/6a exports are
+  // Earth-frame by construction. Mirrors tools/lib/scene-graph.js.
+  // eccentricityAmplitude survives only as the Law-4 K calibration input.
+  orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -10066,6 +10086,7 @@ updatePlanetSizes(0);
 
 //Now adding the order of all objects
 startingPoint.pivotObj.add(earth.containerObj);
+earth.pivotObj.add(earthWobbleCenter.containerObj);   // D7: display-only marker rides Earth's H/13 frame (same pattern as the planet wobble centres)
 
 earth.pivotObj.add(earthInclinationPrecession.containerObj);
 earthInclinationPrecession.pivotObj.add(midEccentricityOrbit.containerObj);
@@ -10424,7 +10445,10 @@ zodiac.add(zLabel);
 // Add to scene
 earth.pivotObj.add(zodiac);
 zodiac.position.y = 0;
-zodiac.position.z = -(eccentricityAmplitude*Math.PI*2)/(holisticyearLength/13)*(startmodelyearwithCorrection-(perihelionalignmentYear-(1.5*(holisticyearLength/16))+(Math.round((startmodelyearwithCorrection-perihelionalignmentYear+((1.5*(holisticyearLength/16))))/(holisticyearLength/156)))*(holisticyearLength/156)))*100; //To align to start Aquarius
+// ECCENTRICITY UNIFICATION (D6): the former offset compensated the Earth
+// wobble circle's displacement (A·2π/(H/13)·Δt); with the circle retired the
+// zodiac ring is centred on Earth. (Was: −(eccentricityAmplitude·2π/(H/13))·Δt·100 "to align to start Aquarius".)
+zodiac.position.z = 0;
 zodiac.visible = false;
 
 // Add Glow effect of zodiac (64 segments is sufficient for a smooth glow ring)
@@ -37486,8 +37510,8 @@ function perihelionForYearMethodB(year, debug = false, prevPerihelionJD = null) 
     jumpToJulianDay(jd);
     forceSceneUpdate('minimal');
 
-    // Get WobbleCenter-Sun distance instead of Earth-Sun distance
-    earthWobbleCenter.planetObj.getWorldPosition(WOBBLE_POS);
+    // D6/D7: Earth-Sun distance — the wobble marker is display-only now
+    earth.planetObj.getWorldPosition(WOBBLE_POS);
     sun.planetObj.getWorldPosition(SUN_POS);
     const distance = WOBBLE_POS.distanceTo(SUN_POS) / 100;  // scene units to AU
 
@@ -37587,8 +37611,8 @@ function aphelionForYearMethodB(year, debug = false, prevAphelionJD = null) {
     jumpToJulianDay(jd);
     forceSceneUpdate('minimal');
 
-    // Get WobbleCenter-Sun distance instead of Earth-Sun distance
-    earthWobbleCenter.planetObj.getWorldPosition(WOBBLE_POS);
+    // D6/D7: Earth-Sun distance — the wobble marker is display-only now
+    earth.planetObj.getWorldPosition(WOBBLE_POS);
     sun.planetObj.getWorldPosition(SUN_POS);
     const distance = WOBBLE_POS.distanceTo(SUN_POS) / 100;  // scene units to AU
 
@@ -37970,7 +37994,7 @@ async function runYearAnalysisExport(years) {
   const _cpWobblePos = new THREE.Vector3();
   const captureWorldAngleAndDist = () => {
     sun.planetObj.getWorldPosition(_cpSunPos);
-    earthWobbleCenter.planetObj.getWorldPosition(_cpWobblePos);
+    earth.planetObj.getWorldPosition(_cpWobblePos);   // D6/D7: Earth-frame (the wobble marker is display-only)
     const wa = ((Math.atan2(_cpSunPos.z, _cpSunPos.x) * 180 / Math.PI) % 360 + 360) % 360;
     const dist = _cpSunPos.distanceTo(_cpWobblePos) / 100; // AU
     return { worldAngle: wa, distance: dist };
@@ -39050,8 +39074,12 @@ async function runBalancedYearStateDiagnostic() {
   console.log('╚══════════════════════════════════════════════════════════════════════════╝');
   console.log('');
 
-  const e_min = Math.abs(eccentricityBase - eccentricityAmplitude);
-  const e_max = eccentricityBase + eccentricityAmplitude;
+  // Unification: the one law's extremes are base′·(1 ∓ ½); the balanced
+  // year is NOT an eccentricity extreme any more (θ₃ ≠ 0 there — the law's
+  // last maximum is ≈ −23,200, last minimum ≈ −79,100).
+  const e_min = eccentricityDerivedMean * 0.5;
+  const e_max = eccentricityDerivedMean * 1.5;
+  const e_bal = computeEccentricityEarthAtYear(BALANCED_YEAR_J2000_FIXED);   // the law's value AT the balanced year
   const oblExpectedAtBalanced = (() => {
     let v = OBLIQUITY_MEAN;
     for (const [, , cosC] of OBLIQUITY_HARMONICS) v += cosC;
@@ -39098,9 +39126,8 @@ async function runBalancedYearStateDiagnostic() {
   const formula_e = computeEccentricityEarthAtYear(o.currentYear);
   const formula_obl = computeObliquityEarth(_formulaYearFromJD(o.julianDay));
   console.log(`  computeEccentricityEarth:  ${formula_e?.toFixed(8) ?? 'null'}`);
-  console.log(`    Expected if AT balanced year: ${e_min.toFixed(8)} (= e_min)`);
-  console.log(`    Range: [${e_min.toFixed(6)}, ${e_max.toFixed(6)}]`);
-  console.log(`    Drift from e_min: ${formula_e !== null ? (formula_e - e_min).toExponential(3) : 'null'}`);
+  console.log(`    Expected if AT balanced year: ${e_bal.toFixed(8)} (the one law's e(balanced year); range [${e_min.toFixed(6)}, ${e_max.toFixed(6)}])`);
+  console.log(`    Drift from e(balanced): ${formula_e !== null ? (formula_e - e_bal).toExponential(3) : 'null'}`);
   console.log('');
   console.log(`  computeObliquityEarth:     ${formula_obl?.toFixed(6) ?? 'null'}°`);
   console.log(`    Expected if AT balanced year: ${oblExpectedAtBalanced.toFixed(6)}° (= OBLIQUITY_MEAN + Σ cosC)`);
@@ -39171,18 +39198,18 @@ async function runBalancedYearStateDiagnostic() {
   const distToCheck = distFromIntegerH1 !== null ? distFromIntegerH1 : distFromIntegerRaw;
   if (distToCheck !== null && Math.abs(distToCheck) < 1e-3) {
     console.log('  ✓ Scene IS at a corrected-integer cycle (navigation landed correctly)');
-    if (formula_e !== null && Math.abs(formula_e - e_min) < 0.0001) {
-      console.log('  ✓ Formula eccentricity ≈ e_min (harmonic phases aligned at balanced year)');
+    if (formula_e !== null && Math.abs(formula_e - e_bal) < 0.0001) {
+      console.log('  ✓ Formula eccentricity ≈ e(balanced year) (the one law, integrated H/3 phase)');
     } else {
       console.log('  ✗ Formula eccentricity DRIFTED');
-      console.log(`    Diff: ${(formula_e - e_min).toExponential(3)}`);
+      console.log(`    Diff: ${(formula_e - e_bal).toExponential(3)}`);
     }
     const sceneE = (typeof earthPerihelionFromEarth !== 'undefined') ? earthPerihelionFromEarth.distAU : null;
-    if (sceneE !== null && Math.abs(sceneE - e_min) < 0.0001) {
-      console.log('  ✓ Scene eccentricity ≈ e_min (Phase 9.12 Option B integral-form rendering active)');
+    if (sceneE !== null && Math.abs(sceneE - e_bal) < 0.0001) {
+      console.log('  ✓ Scene eccentricity ≈ e(balanced year) (the per-frame e(t) offset — unification)');
     } else if (sceneE !== null) {
-      const diff = sceneE - e_min;
-      console.log(`  ✗ Scene eccentricity off e_min by ${diff.toFixed(8)} (${Math.abs(diff/e_min*100).toFixed(2)}%)`);
+      const diff = sceneE - e_bal;
+      console.log(`  ✗ Scene eccentricity off e(balanced) by ${diff.toFixed(8)} (${Math.abs(diff/e_bal*100).toFixed(2)}%)`);
       console.log('    If diff > 0.0001: likely a planet wobble-center or other H-cycle scene object missing Phase 9.12 tag');
     }
   } else {
@@ -39387,7 +39414,7 @@ async function run8HConfigurationVerification() {
   console.log('      inclination → also at MIN per code formula (doc 72 says MAX — see note below);');
   console.log('      eccentricity anchored at phase 270° (falling through base)');
   console.log('');
-  console.log('Earth (in-phase, separate anchor): at e_min (phase 0°) at every H balanced year.');
+  console.log('Earth: ONE eccentricity law e = base′(1 + cos θ₃/2) on the H/3 inclination cycle (unification) — the balanced year is no longer an e extreme (last max ≈ −23,200, last min ≈ −79,100).');
   console.log('Each non-Earth planet now returns to its anchor phase at every 8H (post 2026-06-16');
   console.log('_wobbleDivisorFor fix to axial-vs-ICRF beat — see eccentricity-wobble-formula-analysis.md).');
   console.log('');
@@ -39498,8 +39525,8 @@ async function run8HConfigurationVerification() {
   const earthCyclesIn8H = EIGHT_H / PERIHELION_CYCLE_LENGTH_J2000_FIXED;  // = 8 × 16 = 128
   console.log(`  Earth inclination:  ${earthInclActual.toFixed(6)}° (mean ${earthInclMean.toFixed(4)} ± ${earthInclAmp.toFixed(4)} → MIN expected)`);
   console.log(`  Earth obliquity:    ${earthObliq.toFixed(6)}° (vs OBLIQUITY_MEAN ${OBLIQUITY_MEAN.toFixed(4)} → at MEAN, Earth-only property — integer N_icrf=3 & N_obliq=8 fully cancel at balanced years)`);
-  console.log(`  Earth eccentricity: ${earthEcc.toFixed(7)}     (base ${eccentricityBase.toFixed(7)} − amp ${eccentricityAmplitude.toFixed(7)} = ${(eccentricityBase - eccentricityAmplitude).toFixed(7)} = e_min)`);
-  console.log(`  Earth uses anchor = BALANCED (no phase offset) and cycle = H/16. 8H/(H/16) = ${earthCyclesIn8H} cycles → always at e_min at every H/8H.`);
+  console.log(`  Earth eccentricity: ${earthEcc.toFixed(7)}     (one law: mean base′ ${eccentricityDerivedMean.toFixed(7)}, range ${(eccentricityDerivedMean * 0.5).toFixed(7)}–${(eccentricityDerivedMean * 1.5).toFixed(7)} on H/3)`);
+  console.log(`  Earth's PERIHELION cycle stays H/16 (8H/(H/16) = ${earthCyclesIn8H} cycles per 8H); its ECCENTRICITY rides H/3 → not an extreme at balanced years (unification).`);
   console.log('');
 
   // ─── Step 3: summary ───
@@ -41066,11 +41093,12 @@ async function analyzeSiderealYear(startYear, endYear) {
     return ((angle % 360) + 360) % 360;
   };
 
-  // Method B: WobbleCenter→Sun angle (from Earth's wobble center)
+  // Method B: Earth→Sun angle (D6/D7: the wobble marker is display-only;
+  // Method B ≡ Method A by construction)
   const getAngleMethodB = (jd) => {
     jumpToJulianDay(jd);
     forceSceneUpdate('minimal');
-    earthWobbleCenter.planetObj.getWorldPosition(_wobblePos);
+    earth.planetObj.getWorldPosition(_wobblePos);
     sun.planetObj.getWorldPosition(_sunPos);
     _direction.copy(_sunPos).sub(_wobblePos);
     let angle = Math.atan2(_direction.z, _direction.x) * 180 / Math.PI;
@@ -41089,13 +41117,13 @@ async function analyzeSiderealYear(startYear, endYear) {
     return ((angle % 360) + 360) % 360;
   };
 
-  // Method D: Heliocentric Sun→WobbleCenter angle (WobbleCenter as seen from Sun)
-  // This removes Earth's wobble and should match Methods A/B exactly
+  // Method D: Heliocentric Sun→Earth angle (D6/D7: Earth is the frame point —
+  // the wobble marker is display-only). Should match Methods A/B exactly.
   const getAngleMethodD = (jd) => {
     jumpToJulianDay(jd);
     forceSceneUpdate('minimal');
     sun.planetObj.getWorldPosition(_sunPos);
-    earthWobbleCenter.planetObj.getWorldPosition(_wobblePos);
+    earth.planetObj.getWorldPosition(_wobblePos);
     _direction.copy(_wobblePos).sub(_sunPos);
     let angle = Math.atan2(_direction.z, _direction.x) * 180 / Math.PI;
     return ((angle % 360) + 360) % 360;
@@ -41718,9 +41746,10 @@ async function analyzeAllAlignments(startYear, endYear) {
       return d.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
     };
 
-    // Get earthWobbleCenter world position (should be at origin 0,0,0)
+    // Get Earth world position (D6/D7: Earth is the frame point, at origin —
+    // the wobble marker is display-only and now sits at the Law-4 A distance)
     const wobbleWorldPos = new THREE.Vector3();
-    earthWobbleCenter.planetObj.getWorldPosition(wobbleWorldPos);
+    earth.planetObj.getWorldPosition(wobbleWorldPos);
 
     // Get Sun's world position
     const sunWorldPos = new THREE.Vector3();
@@ -47529,7 +47558,7 @@ const planetStats = {
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => earthPerihelionFromEarth.distAU, dec:8, sep:',' },{ small: 'AU' }],
-       hover : [`Observed eccentricity from 3D scene. Base: ${eccentricityBase}. Phase: ω+90° = 192.95°. Eccentricity cycle: ${fmtNum(perihelionCycleLength, 0, ',')} years (at J2000)`],
+       hover : [`Observed eccentricity from the 3D scene (the realized offset Earth → perihelion point). ONE law for Sun and Moon: e(t) = base′·(1 + cos θ/2) on the H/3 inclination cycle — mean base′ = ${eccentricityDerivedMean.toFixed(6)}, range ${(eccentricityDerivedMean * 0.5).toFixed(6)}–${(eccentricityDerivedMean * 1.5).toFixed(6)}, cycle ${fmtNum(holisticyearLength / 3, 0, ',')} years (at J2000); last maximum ≈ −23,200, last minimum ≈ −79,100, next maximum ≈ +88,600.`],
        tpLink: true, observed: true},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.obliquityEarth-radiansToDecDecimal(earthWobbleCenter.dec), dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -47861,8 +47890,8 @@ const planetStats = {
        value : [ { small: earthtiltMean },{ v: () => o.obliquityEarth, dec:12, sep:',' }],
        hover : [`Left = mean obliquity (base tilt). Right = current dynamic value. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over an Earth Fundamental Cycle. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years (at J2000)`]},
       {label : () => `Orbital Eccentricity`,
-       value : [ { small: eccentricityBase },{ v: () => o.eccentricityEarth, dec:13, sep:',' }],
-       hover : [`Left = base eccentricity. Right = current dynamic value. Phase: ω+90° = 192.95°. Eccentricity cycle: ${fmtNum(perihelionCycleLength, 0, ',')} years (at J2000)`]},
+       value : [ { small: eccentricityDerivedMean },{ v: () => o.eccentricityEarth, dec:13, sep:',' }],
+       hover : [`Left = mean eccentricity base′ (the one law's mean, derived from e(J2000) and the System-Reset anchor). Right = current value e(t) = base′·(1 + cos θ/2) on the H/3 inclination cycle: ${fmtNum(holisticyearLength / 3, 0, ',')} years (at J2000); range ${(eccentricityDerivedMean * 0.5).toFixed(6)}–${(eccentricityDerivedMean * 1.5).toFixed(6)}.`]},
       {label : () => `Inclination to Invariable plane (degrees)`,
        value : [ { small: earthInvPlaneInclinationMean },{ v: () => o.earthInvPlaneInclinationDynamic, dec:13, sep:',' }],
        hover : [`Left = mean inclination. Right = current dynamic value. Oscillates ~${(earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude).toFixed(2)}° relative to the invariable plane`]},
@@ -53576,7 +53605,10 @@ const _wobbleRA_SPHERICAL = new THREE.Spherical();
  */
 function calculateRAFromWobbleCenter(obj) {
   obj.planetObj.getWorldPosition(_wobbleRA_PLANET_POS);
-  earthWobbleCenter.planetObj.getWorldPosition(_wobbleRA_WOBBLE_POS);
+  // D6/D7: the stable point is Earth itself (the marker is display-only and
+  // sits at the Law-4 A distance — reading it here would re-inject a ~4.7'
+  // parallax into solar-day timing).
+  earth.planetObj.getWorldPosition(_wobbleRA_WOBBLE_POS);
 
   // Direction from wobble center (origin) to planet
   _wobbleRA_DIRECTION.copy(_wobbleRA_PLANET_POS).sub(_wobbleRA_WOBBLE_POS);
@@ -53727,7 +53759,7 @@ function updatePositions() {
   // 1.  anchor points in world space
   earth.rotationAxis.getWorldPosition(EARTH_POS);  // Earth centre
   sun.planetObj.getWorldPosition(SUN_POS);         // Sun   centre
-  earthWobbleCenter.planetObj.getWorldPosition(WOBBLE_POS);         // Sun   centre
+  earth.planetObj.getWorldPosition(WOBBLE_POS);         // D6/D7: Earth-frame (feeds only the unused perihelionDistAU field)
   barycenterEarthAndSun.planetObj.getWorldPosition(PERIHELION_OF_EARTH_POS);         // PERIHELION-OF-EARTH   centre
 
   // Keep o.obliquityEarth fresh in ALL modes (light + full). updatePredictions
@@ -55740,7 +55772,7 @@ function updatePlanetInvariablePlaneHeights() {
       // sun.ra is in radians
       const sunLongDeg = sun.ra * 180 / Math.PI;
       eclipticLongitude = (sunLongDeg + 180 + 360) % 360;
-      distanceAU = earthWobbleCenter.sunDistAU || 1.0;
+      distanceAU = sun.distAU || 1.0;   // D6/D7: Earth-Sun distance (the wobble marker is display-only)
 
     } else {
       // Get planet's true anomaly (already calculated in updatePlanetAnomalies)

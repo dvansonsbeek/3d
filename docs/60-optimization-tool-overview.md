@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v11.0
-coefficients: sha256:c6b0f26097c7945c
+coefficients: sha256:a4b818dc588e46e8
 status: current
 ---
 
@@ -144,8 +144,8 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 | `AngleCorrection` | 0.9716 deg | Perihelion alignment fine-tune |
 | `PerihelionEclipticYears` | 8H/11 | Perihelion precession period |
 | `Startpos` | 83.652 deg | Starting orbital position |
-| `InvPlaneInclinationMean` | <!--v:mercuryInclMean-->6.703216<!--/v--> deg | Inclination oscillation center (Mercury, post n=7 re-anchor) |
-| `InvPlaneInclinationAmplitude` | <!--v:mercuryInclAmp-->0.386488<!--/v--> deg | Inclination oscillation range |
+| `InvPlaneInclinationMean` | <!--v:mercuryInclMean-->6.703228<!--/v--> deg | Inclination oscillation center (Mercury, post n=7 re-anchor) |
+| `InvPlaneInclinationAmplitude` | <!--v:mercuryInclAmp-->0.386501<!--/v--> deg | Inclination oscillation range |
 | `InclinationCycleAnchor` | Per-planet | ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v--> (e.g. Mercury: <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->°) |
 
 ### 3.2 Perihelion Precession Periods (ecliptic frame, as used by the simulation)
@@ -548,8 +548,8 @@ These are the raw input values at the top of `script.js`. Changing them is strai
 | `SolarYearInput` | <!--v:mercuryOrbitalPeriodInputDays-->87.9683<!--/v--> days | Orbital period -> feeds into `SolarYearCount` -> `OrbitDistance` (Kepler's 3rd) -> `PerihelionDistance` -> orbit speed, orbit radius | **High cascade**: changing this changes orbit size, speed, and all derived geometry |
 | `Startpos` | 83.653 deg | Starting orbital angle at model epoch | **Isolated**: only affects where the planet is at JD <!--v:startModelJD-->2,451,716.5<!--/v--> |
 | `AngleCorrection` | 0.9709 deg | Fine-tunes perihelion alignment -> feeds into `orbitCentera`/`orbitCenterb` of the PerihelionFromEarth object | **Medium cascade**: affects perihelion direction vector |
-| `InvPlaneInclinationMean` | <!--v:mercuryInclMean-->6.703216<!--/v--> deg | Center of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
-| `InvPlaneInclinationAmplitude` | <!--v:mercuryInclAmp-->0.386488<!--/v--> deg | Range of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
+| `InvPlaneInclinationMean` | <!--v:mercuryInclMean-->6.703228<!--/v--> deg | Center of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
+| `InvPlaneInclinationAmplitude` | <!--v:mercuryInclAmp-->0.386501<!--/v--> deg | Range of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
 | `InclinationCycleAnchor` | Per-planet | Cycle anchor of inclination oscillation (ICRF perihelion longitude where MAX inclination occurs, at the balanced year) | **Constrained**: per-planet value derived from balanced year |
 
 **Earth input constants -- HIGH IMPACT, change with extreme care:**

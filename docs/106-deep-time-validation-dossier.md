@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v11.0
-coefficients: sha256:c6b0f26097c7945c
+coefficients: sha256:a4b818dc588e46e8
 status: current
 ---
 
@@ -89,9 +89,9 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->170<!--/v--> km from Babylon at
-  ΔUT <!--v:babylon135BestDeltaUT-->-0h53<!--/v--> (framework
-  <!--v:babylon135FrameworkUT-->06:06<!--/v--> vs documented
+  totality path <!--v:babylon135BestGapKm-->194<!--/v--> km from Babylon at
+  ΔUT <!--v:babylon135BestDeltaUT-->-0h54<!--/v--> (framework
+  <!--v:babylon135FrameworkUT-->06:05<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
   [doc 103](103-135-babylonian-case-study.md), eclipse-audit artifacts under
   freshness guard.
@@ -111,9 +111,9 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   documented visibility regions vs the api observer tier
   (<!--v:lunarVisibilityInsideAgree-->14<!--/v-->/<!--v:lunarVisibilityChecked-->14<!--/v-->
   both directions); the −746 Feb 6 Babylonian partial (magnitude
-  <!--v:lunarBabylon746MagnitudeUmbral-->0.913<!--/v--> vs canon
+  <!--v:lunarBabylon746MagnitudeUmbral-->0.908<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
-  Babylon at <!--v:lunarBabylon746AltitudeDeg-->34.1<!--/v-->°); the
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->33.8<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
   (framework ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,212<!--/v--> s —
   statistically identical to Stephenson's own fitted spline at
@@ -125,7 +125,7 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s contains the
   framework's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,012<!--/v--> s);
   and the measured framework-vs-ELP lunar-theory drift
-  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.26<!--/v--> ″/cy²) with the
+  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.27<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time
   machinery existed — and now MEASURED against it: the Phase C
   differential re-reduction (69/75 Babylonian observations identified)

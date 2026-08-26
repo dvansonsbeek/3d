@@ -11,6 +11,13 @@
 const C = require('./constants');
 const OE = require('./orbital-engine');
 const DT = require('./deep-time');
+// perf: cached lazy requirer. A bare `require()` inside a per-call function
+// re-runs module RESOLUTION every call (~30 µs: internalModuleStat +
+// package.json reads) — measured 65% of computeSunPositionFast's 0.25 ms,
+// which made the Step-6a export ~13 h instead of ~2 h. The laziness (circular
+// import order) is preserved; the module object is identical, so bit-exact.
+const _modCache = Object.create(null);
+const _req = (p) => _modCache[p] || (_modCache[p] = require(p));
 const MEEUS_LUNAR = JSON.parse(require('fs').readFileSync(
   require('path').resolve(__dirname, '..', '..', 'public', 'input', 'meeus-lunar-tables.json'), 'utf8'));
 
@@ -130,7 +137,7 @@ const _FW_A3_RATE = 360 * 36525 / C.moonSiderealMonth;
 // gap class as the Phase 9.13 Moon mirror). One period fn per planet, stable
 // identity, so the shared chain-cycles tables key correctly.
 const _mcPlanet = {};
-const { driver2PeriodSecondsAtAge } = require('@essrt/physics/planets/orbit-chain');
+const { driver2PeriodSecondsAtAge } = _req('@essrt/physics/planets/orbit-chain');
 for (const _pk of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
   const T0 = C.planets[_pk].solarYearInput * 86400;
   // 8.3 L6: Driver 2 shared; one period fn per planet (stable identity for
@@ -146,11 +153,11 @@ const _mcJupiter = _mcPlanet.jupiter;   // the deep-time A2 argument feed (uncha
 // the two bounded Lp carriers with the anchor-const e0 (this mirror used
 // _fwEarthEcc(0)), and both argument branches). This engine injects its own
 // chain wrappers; env toggles ride along.
-const { createMoonArguments, jdToDecimalYear } = require('@essrt/physics/moon/arguments');
+const { createMoonArguments, jdToDecimalYear } = _req('@essrt/physics/moon/arguments');
 let _moonArgsMTools = null;
 function _moonArgsM() {
   if (_moonArgsMTools === null) {
-    const DTmod = require('./deep-time');
+    const DTmod = DT;   // perf: the top-level binding — no per-call module resolution
     const AR = C.ASTRO_REFERENCE;
     _moonArgsMTools = createMoonArguments({
       constants: {
@@ -204,7 +211,7 @@ function _moonArgsM() {
  *  exactly the anchor (the R3 drift correction); the channel's g₀ const is
  *  the browser's convention and now the only one. */
 function _fwChannelIntegralTools(T, s) {
-  return require('./deep-time')._moonEcc().channelIntegral(T, s);
+  return DT._moonEcc().channelIntegral(T, s);
 }
 
 // S3 closed: the shared module evaluates the Sun secular deviations on the
@@ -229,7 +236,7 @@ const _jdToSIyearTools = (jd) => C.startModelYearWithCorrection + (jd - C.startm
 //         startmodelYear (2000.5, the scene's t_Ma convention);
 //   (the table still anchors C(2000) = 0 — grid anchor ≠ age anchor,
 //   deliberately, cf. the phase machinery's anchor pair).
-const { createChainCycleIntegrator } = require('@essrt/physics/chain-cycles');
+const { createChainCycleIntegrator } = _req('@essrt/physics/chain-cycles');
 let _chainCyclesM = null;
 function _chainCyclesT() {
   if (_chainCyclesM === null) {
@@ -281,7 +288,7 @@ function _sunGeoVecEqD5Tools(jd) { return _moonApparentM().sunGeoVecEqD5(jd); }
 // Phase 8.2-7: the D5 optics + RA/Dec override live ONCE in
 // @essrt/physics/moon/apparent (S8: obliquity stays engine-injected — this
 // engine recomputes it for the scene year).
-const { createMoonApparent } = require('@essrt/physics/moon/apparent');
+const { createMoonApparent } = _req('@essrt/physics/moon/apparent');
 let _moonApparentMTools = null;
 function _moonApparentM() {
   if (_moonApparentMTools === null) {
@@ -364,11 +371,11 @@ function _moonArgsAtTools(jd_tt) {
 }
 
 // Phase 8.2-6: the Meeus Ch. 47 series lives ONCE in @essrt/physics/moon/series.
-const { createMoonSeries } = require('@essrt/physics/moon/series');
+const { createMoonSeries } = _req('@essrt/physics/moon/series');
 let _moonSeriesMTools = null;
 function _moonSeriesM() {
   if (_moonSeriesMTools === null) {
-    const DTmod = require('./deep-time');
+    const DTmod = DT;   // perf: the top-level binding — no per-call module resolution
     _moonSeriesMTools = createMoonSeries({
       constants: {
         moonL: MEEUS_LUNAR.longitudeTerms.terms,
@@ -418,7 +425,7 @@ function _fwEFactorTools(d_days, T, T2) {
   // The shared channel's eFactorAt divides by its e0 anchor CONST, not
   // eccAt(0) — under integrated phase cycles(2000→2000) carries the R3
   // drift correction and is not exactly zero (8.2-1/8.2-2).
-  return require('./deep-time')._moonEcc().eFactorAt(d_days / C.inputMeanSolarYear);
+  return DT._moonEcc().eFactorAt(d_days / C.inputMeanSolarYear);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -713,7 +720,7 @@ function _jdFromPosTools(pos) {
 // @essrt/physics/sun/longitude-correction (J2000-fixed deps — the fitted
 // convention). This engine's TWO former inline copies (moveModel + the
 // fast animator) both delegate through this lazy factory.
-const { createSunLongitudeCorrection } = require('@essrt/physics/sun/longitude-correction');
+const { createSunLongitudeCorrection } = _req('@essrt/physics/sun/longitude-correction');
 // SW-1 EXPERIMENT (scene-wheel Sun unification): E5_WHEEL_SUN=1 makes the
 // moveModel Sun node ride the CERTIFIED tier Sun via one δ term (see the
 // moveModel sun block); computeSunPositionFast is deliberately untouched
@@ -734,7 +741,7 @@ const _E5_WHEEL_SUN = process.env.E5_WHEEL_SUN !== '0';   // default ON (mirrors
 const _FQ3_EXACT_SUN = process.env.FQ3_EXACT_SUN !== '0'; // default ON; FQ3_EXACT_SUN=0 restores the fitted-correction path
 let _e5TierM = null;
 function _e5Tier() {
-  if (!_e5TierM) _e5TierM = require('@essrt/physics').createModel();
+  if (!_e5TierM) _e5TierM = _req('@essrt/physics').createModel();
   return _e5TierM;
 }
 let _sunLonCorrM = null;
@@ -854,7 +861,17 @@ function buildSceneGraph() {
   const earthDef = {
     orbitTilta: 0, orbitTiltb: 0,
     orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-    orbitRadius: -C.eccentricityAmplitude * 100,
+    // ECCENTRICITY UNIFICATION (D6): the Earth wobble circle (radius
+    // eccentricityAmplitude·100, H/13) is RETIRED — its partner, the second
+    // eccentricity arm on the barycenter, is gone, so the "wobble centre" no
+    // longer cancels anything: measured from it the perihelion advanced 8%
+    // too fast (anomalistic year 365.2611 d vs IAU 365.2596; A/e ≈ 8.8%),
+    // while from Earth the one-law scene reproduces IAU (365.25962 d,
+    // 1.7180 °/cy). With radius 0 the wobble centre IS Earth, so every
+    // instrument that reads "from the wobble centre" (getWobbleSunDistAU, the
+    // Step-6a export, the report's Method B) is Earth-frame by construction.
+    // eccentricityAmplitude survives only as the Law-4 K calibration input.
+    orbitRadius: 0,
     tilt: -C.earthtiltMean,
     startPos: 0,
     speed: -Math.PI * 2 / (H / 13),
@@ -1608,7 +1625,7 @@ function computePlanetPosition(target, jd) {
     // at five slots; any last-bit drift is measured by the fixtures).
     const _pState = { u, invD, invS, T, cp: conjPhase, Lsun: _Lsun,
                       sinM: sinMplanet, cosM: cosMplanet, sin2M: sin2Mplanet, cos2M: cos2Mplanet };
-    const _evalParallax = require('@essrt/physics/planets/corrections').evaluateParallaxBasis;
+    const _evalParallax = _req('@essrt/physics/planets/corrections').evaluateParallaxBasis;
     const dc = C.ASTRO_REFERENCE.decCorrection[target];
     if (dc) {
       sph.phi += _evalParallax(dc, _pState) * d2r;
@@ -1626,7 +1643,7 @@ function computePlanetPosition(target, jd) {
   const gravCorr = C.GRAVITATION_CORRECTION && C.GRAVITATION_CORRECTION[target];
   if (gravCorr) {
     const _yr = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
-    const _gravDeltas = require('@essrt/physics/planets/corrections').gravitationTermDeltasDeg(gravCorr, _yr - 2000);
+    const _gravDeltas = _req('@essrt/physics/planets/corrections').gravitationTermDeltasDeg(gravCorr, _yr - 2000);
     for (const gt of _gravDeltas) {
       sph.theta -= gt.raDeg * d2r;
       sph.phi += gt.decDeg * d2r;
@@ -1654,7 +1671,7 @@ function computePlanetPosition(target, jd) {
     const _plCount = Math.round(C.totalDaysInH / C.planets[target].solarYearInput);
     const _synVE = 1 / Math.abs(1 - _plCount / C.H);
     const _synPhase = 2 * Math.PI * (_yr - 2000) / _synVE;
-    const _evalElong = require('@essrt/physics/planets/corrections').evaluateElongationBasis;
+    const _evalElong = _req('@essrt/physics/planets/corrections').evaluateElongationBasis;
     const _elState = { elongRad: _elong, vFromWERad: _vFromWE, synPhaseRad: _synPhase, invD: 1 / distAU };
     sph.theta -= _evalElong(_elCorr, _elState, 'ra') * d2r;
     sph.phi += _evalElong(_elCorr, _elState, 'dec') * d2r;

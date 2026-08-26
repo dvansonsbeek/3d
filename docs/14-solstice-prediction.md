@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v11.0
-coefficients: sha256:c6b0f26097c7945c
+coefficients: sha256:a4b818dc588e46e8
 status: current
 ---
 
@@ -293,7 +293,7 @@ All implementations return exact J2000 anchor values by construction. Legacy `SO
 | `SOLSTICE_OBLIQUITY_HARMONICS` | 16 × [div, sin, cos] | Fitted from 335,318 SS observations |
 | `earthInvPlaneInclinationMean` | <!--v:earthInclMean-->1.48113<!--/v-->° | Model parameter (mean orbital plane tilt to invariable plane) |
 | `earthRAAngle` | 1.25478° | Scene graph parameter (perihelion precession tilt) |
-| `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63605<!--/v-->° | Model parameter (inclination oscillation) |
+| `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | Model parameter (inclination oscillation) |
 | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | Model parameter (mean obliquity) |
 | `meanSolarYearDays` | <!--v:meanSolarYearDaysFull-->365.242203646102<!--/v--> | Derived from H/8 quantization |
 

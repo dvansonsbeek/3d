@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v11.0
-coefficients: sha256:c6b0f26097c7945c
+coefficients: sha256:a4b818dc588e46e8
 status: current
 ---
 
@@ -68,7 +68,7 @@ The six true degrees of freedom that define the model. Everything else is derive
 | 2 | Balanced year | `balancedYear` | −<!--v:anchorYearOffset-->302,635<!--/v--> (derived) | 0 | [Part 2 — Time Constants](#time-constants) |
 | 3 | Fibonacci divisors | — | 3, 5, 8, 13, 21, 34 | 3 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
 | 4 | Mean obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
-| 5 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63605<!--/v-->° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
+| 5 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
 | 6 | Planet config | the default configuration | Unique mirror-symmetric solution | 0 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
 
 Total: **6 DOF** (items 2 and 6 are derived/constrained, not independently free).
@@ -138,7 +138,7 @@ The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce 
 | Mean Obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v--> deg | Mean axial tilt (derived from obliquity at J2000) |
 | RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
 | Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | <!--v:earthInclMean-->1.48113<!--/v--> deg | Mean orbital inclination to invariable plane (derived) |
-| Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63605<!--/v--> deg | Oscillation amplitude (derived from obliquity rate) |
+| Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v--> deg | Oscillation amplitude (derived from obliquity rate) |
 | Inclination Cycle Anchor | `earthInclinationCycleAnchor` | 21.77 deg | ICRF perihelion longitude where Earth reaches MAX inclination (anchor for the oscillation) |
 | Perihelion Ref JD | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | JD of Earth perihelion 2000 (Jan 3.542) |
 
@@ -237,8 +237,8 @@ Input constants used in the formulas above:
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
 | Derived Mean Eccentricity | `eccentricityDerivedMean` | sqrt(base² + amplitude²) | ~<!--v:eccentricityDerivedMean-->0.0154456<!--/v--> |
-| EoC Eccentricity | `eocEccentricity` | derivedMean - base/2 | ~<!--v:eocEccentricityValue-->0.00775<!--/v--> |
-| Perihelion Phase Offset | `perihelionPhaseOffset` | (see constants.js derivation) | ~<!--v:periPhaseOffsetDeg-->0.4828<!--/v--> deg |
+| EoC Eccentricity | `eocEccentricity` | derivedMean - base/2 | ~<!--v:eocEccentricityValue-->0.00836<!--/v--> |
+| Perihelion Phase Offset | `perihelionPhaseOffset` | (see constants.js derivation) | ~<!--v:periPhaseOffsetDeg-->0.4830<!--/v--> deg |
 
 ## Ascending Node Frame Corrections
 
@@ -284,7 +284,7 @@ massFraction.earth = (GM_Earth / G) / M_Sun
 
 | Constant | Formula | Value |
 |----------|---------|-------|
-| ψ (psi) | d_E × amp_E × √m_E (from Earth) | <!--v:psiValue-->3.3069 × 10⁻³<!--/v--> |
+| ψ (psi) | d_E × amp_E × √m_E (from Earth) | <!--v:psiValue-->3.3070 × 10⁻³<!--/v--> |
 | K | e_amp_E × √m_E / (sin(tilt_E) × √d_E) (from Earth) | <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> |
 
 ### J2000 Eccentricities (eccJ2000)
@@ -309,14 +309,14 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | <!--v:mercuryInclMean-->6.703216<!--/v--> | <!--v:mercuryInclAmp-->0.386488<!--/v--> | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | 8H/93 ≈ <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr |
+| Mercury | <!--v:mercuryInclMean-->6.703228<!--/v--> | <!--v:mercuryInclAmp-->0.386501<!--/v--> | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | 8H/93 ≈ <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr |
 | Venus | <!--v:venusInclMean-->2.151359<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | 8H/110 ≈ <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr |
-| Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63605<!--/v--> | 0.85 - 2.12 | <!--v:earthInclCycleAnchor-->21.77<!--/v-->° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr |
-| Mars | <!--v:marsInclMean-->1.833256<!--/v--> | <!--v:marsInclAmp-->1.164246<!--/v--> | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | 8H/68 ≈ <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
-| Jupiter | <!--v:jupiterInclMean-->0.321086<!--/v--> | <!--v:jupiterInclAmp-->0.021404<!--/v--> | 0.30 - 0.34 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | 8H/65 ≈ <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr |
-| Saturn | <!--v:saturnInclMean-->0.984967<!--/v--> | <!--v:saturnInclAmp-->0.065194<!--/v--> | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | 8H/169 ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr |
-| Uranus | <!--v:uranusInclMean-->1.015182<!--/v--> | <!--v:uranusInclAmp-->0.023831<!--/v--> | 0.99 - 1.04 | 21.33° | H/10 ≈ <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr |
-| Neptune | <!--v:neptuneInclMean-->0.743803<!--/v--> | <!--v:neptuneInclAmp-->0.013551<!--/v--> | 0.73 - 0.76 | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | 2H/25 ≈ <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr |
+| Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthInclCycleAnchor-->21.77<!--/v-->° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr |
+| Mars | <!--v:marsInclMean-->1.833263<!--/v--> | <!--v:marsInclAmp-->1.164287<!--/v--> | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | 8H/68 ≈ <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
+| Jupiter | <!--v:jupiterInclMean-->0.321086<!--/v--> | <!--v:jupiterInclAmp-->0.021405<!--/v--> | 0.30 - 0.34 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | 8H/65 ≈ <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr |
+| Saturn | <!--v:saturnInclMean-->0.984969<!--/v--> | <!--v:saturnInclAmp-->0.065196<!--/v--> | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | 8H/169 ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr |
+| Uranus | <!--v:uranusInclMean-->1.015183<!--/v--> | <!--v:uranusInclAmp-->0.023832<!--/v--> | 0.99 - 1.04 | 21.33° | H/10 ≈ <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr |
+| Neptune | <!--v:neptuneInclMean-->0.743803<!--/v--> | <!--v:neptuneInclAmp-->0.013552<!--/v--> | 0.73 - 0.76 | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | 2H/25 ≈ <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr |
 | Pluto | <!--v:plutoInclMean-->15.716200<!--/v--> | <!--v:plutoInclAmp-->0.717024<!--/v--> | 15.00 - 16.43 | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | H/12 ≈ <!--v:plutoPeriPeriodICRF-->27,943<!--/v--> yr |
 
 **Formula**: `i(t) = mean + amplitude × cos(ω̃_ICRF(t) - cycleAnchor)` (Saturn: sign flipped, anti-phase)
@@ -423,7 +423,7 @@ The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier t
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->55.85<!--/v--> s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0017<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
+| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->55.47<!--/v--> s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0018<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
 
 ## Perihelion Longitude Formula Parameters
 
@@ -743,7 +743,7 @@ These values result from the optimization campaign (2025-2026) and may change in
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Correction Sun | `correctionSun` | <!--v:correctionSunDeg-->0.49688<!--/v--> deg | Degree correction for Sun position (dynamic EoC); optimizer step 1 |
+| Correction Sun | `correctionSun` | <!--v:correctionSunDeg-->0.49715<!--/v--> deg | Degree correction for Sun position (dynamic EoC); optimizer step 1 |
 
 ## Planet Orbital Periods (Tuned)
 
@@ -798,13 +798,13 @@ The Equation of Center fraction determines how much of a planet's Keplerian vari
 
 | Planet | `angleCorrection` (deg) | `startpos` (deg) |
 |--------|------------------------|------------------|
-| Mercury | <!--v:mercuryAngleCorrectionDeg-->0.971596<!--/v--> | <!--v:mercuryStartPosDeg-->83.65<!--/v--> |
-| Venus | <!--v:venusAngleCorrectionDeg-->-2.750621<!--/v--> | <!--v:venusStartPosDeg-->249.29<!--/v--> |
-| Mars | <!--v:marsAngleCorrectionDeg-->-2.110263<!--/v--> | <!--v:marsStartPosDeg-->121.46<!--/v--> |
-| Jupiter | <!--v:jupiterAngleCorrectionDeg-->0.930611<!--/v--> | <!--v:jupiterStartPosDeg-->13.89<!--/v--> |
-| Saturn | <!--v:saturnAngleCorrectionDeg-->-0.178873<!--/v--> | <!--v:saturnStartPosDeg-->11.28<!--/v--> |
-| Uranus | <!--v:uranusAngleCorrectionDeg-->-0.732907<!--/v--> | <!--v:uranusStartPosDeg-->44.90<!--/v--> |
-| Neptune | <!--v:neptuneAngleCorrectionDeg-->2.332348<!--/v--> | <!--v:neptuneStartPosDeg-->47.96<!--/v--> |
+| Mercury | <!--v:mercuryAngleCorrectionDeg-->0.972721<!--/v--> | <!--v:mercuryStartPosDeg-->83.65<!--/v--> |
+| Venus | <!--v:venusAngleCorrectionDeg-->-2.789779<!--/v--> | <!--v:venusStartPosDeg-->249.29<!--/v--> |
+| Mars | <!--v:marsAngleCorrectionDeg-->-2.104653<!--/v--> | <!--v:marsStartPosDeg-->121.46<!--/v--> |
+| Jupiter | <!--v:jupiterAngleCorrectionDeg-->0.933321<!--/v--> | <!--v:jupiterStartPosDeg-->13.89<!--/v--> |
+| Saturn | <!--v:saturnAngleCorrectionDeg-->-0.178470<!--/v--> | <!--v:saturnStartPosDeg-->11.28<!--/v--> |
+| Uranus | <!--v:uranusAngleCorrectionDeg-->-0.734343<!--/v--> | <!--v:uranusStartPosDeg-->44.90<!--/v--> |
+| Neptune | <!--v:neptuneAngleCorrectionDeg-->2.332767<!--/v--> | <!--v:neptuneStartPosDeg-->47.96<!--/v--> |
 
 ## J2000-Verified Ascending Nodes (Optimized)
 

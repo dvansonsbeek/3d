@@ -13,8 +13,14 @@
     "gmstMeanSiderealT2Deg": 0.000387933,
     "nutationLeadingTermsArcsec": {
       "_description": "IAU 1980 nutation, four leading terms. dPsi (longitude) = psiOmega*sin(Om) + psi2Ls*sin(2Ls) + psi2Lm*sin(2Lm) + psi2Omega*sin(2Om); dEps (obliquity) = epsOmega*cos(Om) + eps2Ls*cos(2Ls) + eps2Lm*cos(2Lm) + eps2Omega*cos(2Om). Om = lunar ascending node longitude (the model's own nodal machinery is the driver), Ls/Lm = mean solar/lunar longitudes. Units arcsec.",
-      "psiOmega": -17.20, "psi2Ls": -1.32, "psi2Lm": -0.23, "psi2Omega": 0.21,
-      "epsOmega": 9.20, "eps2Ls": 0.57, "eps2Lm": 0.10, "eps2Omega": -0.09,
+      "psiOmega": -17.2,
+      "psi2Ls": -1.32,
+      "psi2Lm": -0.23,
+      "psi2Omega": 0.21,
+      "epsOmega": 9.2,
+      "eps2Ls": 0.57,
+      "eps2Lm": 0.1,
+      "eps2Omega": -0.09,
       "omegaNodeJ2000Deg": 125.04452
     },
     "solarLuminosityW": 3.828e+26,
@@ -69,7 +75,7 @@
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
     "earthInclinationRate_arcsecPerCentury": -18,
-    "deltaTStart": 55.85417672145975,
+    "deltaTStart": 55.47104318258222,
     "sunTilt": 7.155
   },
   "bodyDiametersKm": {
@@ -275,7 +281,7 @@
   "giaCoxChaoPeltier": {
     "_description": "GIA calibration literature anchors: Cox & Chao (2002, Science 297) satellite-gravimetry dJ2/dt and the Peltier ICE-6G LOD-coupling axisymmetric-GIA J2-to-alpha conversion factor. The SHIPPED product is the calibrated alphaClimateScalePerMille (model-parameters deepTime — calibrated so dalpha/dt at J2000 = dJ2Dt/factor = -1.35e-11/yr); these two are the citation inputs of that calibration, consumed only by the model-values registry (coxChaoDJ2Dt / giaJ2ToAlphaFactor / derived dAlphaDtJ2000 keys). The browser carries them in comments only (script.js ~:2375).",
     "dJ2DtPerYr": -2.7e-11,
-    "j2ToAlphaFactor": 2.0
+    "j2ToAlphaFactor": 2
   },
   "obliquityChapront2002": {
     "_description": "Chapront, Chapront-Touze & Francou (2002, A&A 387, 700) obliquity citation values at the ±12 kyr comparison epochs. Consumed by the model-values registry (obliqChapront* keys) for the Model-vs-literature obliquity tables; the website previously typed these as literals.",
@@ -385,10 +391,10 @@
     "meeusJplDecRmsDeg": 0.02,
     "sunModelDecRmsDeg": 0.002,
     "sunModelTrueErrorDeg": 0.003,
-    "sunTropicalYearDiffSeconds": 0.10,
+    "sunTropicalYearDiffSeconds": 0.1,
     "sunSiderealYearDiffSeconds": 0.02,
     "_frameworkAccuracyNote": "E4/E5 + 20.3h campaign accuracy measurements (registry keys frameworkSun*/moonSeries*): the certified framework-native Sun's apparent-longitude RMS vs JPL over the modern window, the Meeus Ch. 25 reference measured on the same window and instrument, and the shipped derived lunar series' all-phase lambda/beta RMS vs JPL after the round-2 Delaunay tail (docs 66 and 99).",
-    "frameworkSunVsJplRmsArcsec": 0.80,
+    "frameworkSunVsJplRmsArcsec": 0.8,
     "meeusCh25SunVsJplRmsArcsec": 1.22,
     "moonSeriesLonVsJplRmsArcsec": 2.84,
     "moonSeriesLatVsJplRmsArcsec": 0.35,
@@ -436,7 +442,7 @@
     "testCInvariantObliquityPct": 100,
     "testCInvariantRandomPct": 68,
     "testCBalanceSaturnMult": 1.96,
-    "testCBalancePValue": 4e-4,
+    "testCBalancePValue": 0.0004,
     "testCLibrationPValue": 0.23,
     "testC50WindowMyr": -50,
     "_meeusPeriLongNote": "Meeus (1998) Earth perihelion-longitude citation values at the comparison epochs (registry periLongMeeus* keys).",

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v11.0
-coefficients: sha256:c6b0f26097c7945c
+coefficients: sha256:a4b818dc588e46e8
 status: current
 ---
 
@@ -106,7 +106,7 @@ A single constant ψ predicts all eight inclination amplitudes from Fibonacci di
 d × amplitude × √m = ψ     →     amplitude = ψ / (d × √m)
 ```
 
-ψ = <!--v:psiValue-->3.3069 × 10⁻³<!--/v-->, derived from Earth's fitted inclination amplitude. This holds for all 8 planets with zero free parameters.
+ψ = <!--v:psiValue-->3.3070 × 10⁻³<!--/v-->, derived from Earth's fitted inclination amplitude. This holds for all 8 planets with zero free parameters.
 
 ### Law 3: The Inclination Balance
 
@@ -143,7 +143,7 @@ K = <!--v:kValue-->3.4143 × 10⁻⁶<!--/v-->, derived from Earth's eccentricit
 | | Law 2 (inclination) | Law 4 (eccentricity) |
 |---|---|---|
 | **Formula** | amp = ψ / (d × √m) | e_amp = K × sin(tilt) × √d / (√m × a^1.5) |
-| **Constant** | ψ = <!--v:psiValue-->3.3069 × 10⁻³<!--/v--> | K = <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> |
+| **Constant** | ψ = <!--v:psiValue-->3.3070 × 10⁻³<!--/v--> | K = <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> |
 | **Variables** | d, m | d, m, a, tilt |
 | **Predicts** | 8 inclination amplitudes | 8 eccentricity amplitudes |
 | **Free parameters** | 0 | 0 |
@@ -527,12 +527,12 @@ Earth has Fibonacci divisor d = 3 (= F₄). Step by step:
 
 | Quantity | Expression | Value |
 |----------|-----------|-------|
-| ψ | d_E × amp_E × √m_E | <!--v:psiValue-->3.3069 × 10⁻³<!--/v--> |
+| ψ | d_E × amp_E × √m_E | <!--v:psiValue-->3.3070 × 10⁻³<!--/v--> |
 | d | F₄ | 3 |
 | m | Earth mass (JPL DE440) | 3.0027 × 10⁻⁶ M☉ |
 | √m | | 1.7331 × 10⁻³ |
 | d × √m | 3 × 1.7331 × 10⁻³ | 5.1992 × 10⁻³ |
-| **amplitude** | **<!--v:psiValue-->3.3069 × 10⁻³<!--/v--> / 5.1992 × 10⁻³** | **0.636 °** |
+| **amplitude** | **<!--v:psiValue-->3.3070 × 10⁻³<!--/v--> / 5.1992 × 10⁻³** | **0.636 °** |
 
 The mean is computed from the J2000 constraint:
 
