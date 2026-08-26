@@ -112,7 +112,7 @@ The complete nesting order from the technical guide:
 ```
 startingPoint (scene root)
 └── Earth (pivot)                                     ← Axial Precession: H/13
-    ├── EARTH-WOBBLE-CENTER (marker)                  ← D7: DISPLAY-ONLY, radius A at H/13 (the Law-4 amplitude distance; no instrument reads it)
+    ├── EARTH-WOBBLE-CENTER (marker)                  ← display-only, radius A at H/13 (the Law-4 amplitude distance; no instrument reads it)
     ├── Inclination Precession (container)            ← H/3
     │   ├── Mid-Eccentricity Orbit (container)        ← base′ reference circle (the one law's mean)
     │   │
@@ -140,7 +140,7 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| orbitRadius | 0 | **D6 (eccentricity unification): the Earth wobble circle is RETIRED** — its cancelling partner (the barycenter A-arm) is gone, so a nonzero radius made the wobble-frame perihelion 8% fast. Earth sits at the scene origin; every instrument measures from `earth.planetObj`. The visible wobble-centre marker is a D7 display-only *child* of Earth at +`eccentricityAmplitude`×100, circling at H/13 — it shows the Law-4 amplitude distance A (the 1246 triangle closure, docs/10 §Law 4) and the solstice direction, and nothing reads it |
+| orbitRadius | 0 | Earth sits at the scene origin; every instrument measures from `earth.planetObj` (measuring from a displaced wobble centre would run the perihelion 8% fast — the offset chain carries the full e(t)·û(ϖ) itself). The visible wobble-centre marker is a display-only *child* of Earth at +`eccentricityAmplitude`×100, circling at H/13 — it shows the Law-4 amplitude distance A (the 1246 triangle closure, docs/10 §Law 4) and the solstice direction, and nothing reads it |
 | speed | -2π / (H/13) | Clockwise axial precession |
 | rotationSpeed | 2π × sidereal rotations per SI year — **locked to the J2000 sidereal day** in both modes (see §14.4) | Daily spin |
 | tilt | -`earthtiltMean` | Mean axial tilt (obliquity) |
@@ -188,16 +188,17 @@ Both layers use the same period but opposite signs:
 
 The paired inverse rotations maintain equilibrium during Earth's two counter-motions.
 
-**Eccentricity unification — the one law in the scene.** Earth's
+**The one eccentricity law in the scene.** Earth's
 eccentricity is one function, e(t) = base′·(1 + cos θ₃(t)/2) on the H/3
 inclination phase (the same line the Moon channel and the eclipse Sun
 ride; base′ derived from e(J2000) and the shared anchor). The scene
 realizes it as ONE arm: Perihelion Precession 2's centre carries
 −e(t)·100 every frame (`moveModel` in both twins), pointing at the
 perihelion phase +180° — an ellipse centre, measured θ_p1 ≡ the Sun's
-perihelion phase at every epoch. The former second arm (the Barycenter's
-`eccentricityAmplitude` radius, net co-rotating with the axial
-precession) is retired. The full vector matters beyond the Sun: the
+perihelion phase at every epoch. There is no second arm: the Barycenter
+sits at the Sun's orbit centre itself (`eccentricityAmplitude` is the
+Law-4 input and the wobble-marker distance, not a scene arm). The full
+vector matters beyond the Sun: the
 planet chains replicate the Sun *geometrically* (centre + circle, no
 equation of centre), so a constant mean offset left them 0.0012 AU short
 (Venus −80″ vs JPL, measured). The Sun node then carries only half its
@@ -243,7 +244,7 @@ This 14.5-cycle offset positions the obliquity fluctuation to correctly explain 
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| orbitRadius | 0 | The Sun's orbit centre itself — the second eccentricity arm (`eccentricityAmplitude` × 100) is retired under the one eccentricity law (see §5.5) |
+| orbitRadius | 0 | The Sun's orbit centre itself — the one eccentricity law has a single arm, carried by Perihelion Precession 2 (see §5.5) |
 
 ### 7.2 Sun Position
 

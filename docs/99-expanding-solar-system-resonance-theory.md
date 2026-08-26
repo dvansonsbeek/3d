@@ -383,12 +383,10 @@ was retired (FQ-7-Sun option C-small, doc 66 §5). The reason is
 structural: eccentricity is frame-invariant and may carry only
 fixed-frame lattice periods; H/16 is the H/3 rotation seen from the
 H/13-precessing equinox (13 + 3 = 16) and belongs to the perihelion
-longitude. Since the eccentricity unification (v12) the cardinal-point
-chain rides the SAME one law — the H/16 e-law is fully retired: the
-scene offset carries e(t)·û(ϖ) per frame, the Earth-frame refit
-(Step 6d) re-achieved the campaign-era cardinal residual over ±H, and H/16 survives only as
-the perihelion-direction period and the Law-4 A construction (doc 108;
-docs/10 §Law 4).
+longitude. The cardinal-point chain rides the same one law: the scene
+offset carries e(t)·û(ϖ) every frame, the cardinal fit (Step 6d) is
+Earth-frame, and H/16 enters only as the perihelion-direction period and
+the Law-4 A construction (doc 108; docs/10 §Law 4).
 
 **Accuracy**: <!--v:frameworkSunVsJplRms-->0.80<!--/v-->″ RMS vs JPL over the modern window (the Meeus Ch. 25
 reference itself sits at <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″). At antiquity the closed form tracks the

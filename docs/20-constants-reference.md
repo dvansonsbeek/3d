@@ -133,8 +133,8 @@ The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce 
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Base Eccentricity | `eccentricityBase` | <!--v:eccentricityBase-->0.015386<!--/v--> | Law-5 constant (v11 heritage). Earth's SHIPPED e(t) mean is the derived `eccentricityBaseDerived` = e(J2000)/(1 + cos θ₀/2) on the System-Reset anchor — the one-H/3-law world (v12) |
-| Eccentricity Amplitude | `eccentricityAmplitude` | <!--v:eccentricityAmplitude-->0.001356<!--/v--> | The Law-4 K input A — **derived, not fitted**: the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos φ, φ = <!--v:aClosurePhaseDeg-->12.95<!--/v-->° from the <!--v:periAlignYearRound-->1246.03<!--/v--> perihelion–solstice alignment at the H/16 beat (closure A = <!--v:aDerivedFrom1246-->0.0013559<!--/v-->; ±5% forces the alignment to <!--v:aClosureYearAPlus5Pct-->690<!--/v-->/<!--v:aClosureYearAMinus5Pct-->2,000<!--/v--> AD). Under the one law A no longer enters e(t) — it is the wobble-marker distance and Law-4 calibration only (see docs/10 §Law 4) |
+| Base Eccentricity | `eccentricityBase` | <!--v:eccentricityBase-->0.015386<!--/v--> | The Law-5 constant. Earth's shipped e(t) mean is the derived `eccentricityBaseDerived` = e(J2000)/(1 + cos θ₀/2) on the System-Reset anchor (the one H/3 eccentricity law) |
+| Eccentricity Amplitude | `eccentricityAmplitude` | <!--v:eccentricityAmplitude-->0.001356<!--/v--> | The Law-4 K input A — **derived, not fitted**: the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos φ, φ = <!--v:aClosurePhaseDeg-->12.95<!--/v-->° from the <!--v:periAlignYearRound-->1246.03<!--/v--> perihelion–solstice alignment at the H/16 beat (closure A = <!--v:aDerivedFrom1246-->0.0013559<!--/v-->; ±5% forces the alignment to <!--v:aClosureYearAPlus5Pct-->690<!--/v-->/<!--v:aClosureYearAMinus5Pct-->2,000<!--/v--> AD). A does not enter e(t) — it is the wobble-marker distance and the Law-4 calibration (see docs/10 §Law 4) |
 | Mean Obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v--> deg | Mean axial tilt (derived from obliquity at J2000) |
 | RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
 | Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | <!--v:earthInclMean-->1.48113<!--/v--> deg | Mean orbital inclination to invariable plane (derived) |
@@ -468,7 +468,7 @@ These come from external astronomical sources and do not change with the model.
 | Anomalistic year | `anomalisticYearJ2000` | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days | JPL Horizons |
 | Sidereal year | `siderealYearJ2000` | <!--v:siderealYearInputDays-->365.256363004<!--/v--> days | JPL Horizons (adjusted for LOD=86400) |
 | Solar day | `solarDayJ2000` | 86400.0 s | SI definition |
-| Measured mean solar day (D8 declared scene basis) | `measuredMeanSolarDayJ2000Seconds` | <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000427<!--/v--> s | Derived in place: IAU sidereal seconds / the Step-6c measured sidereal year — the day the scene's measured year lengths are counted in. Five day bases coexist (SI · LOD_mean · Fourier-kinematic <!--v:lodKinematicFourierJ2000Seconds-->86,400.000107<!--/v--> · measured · LOD_real); see [doc 11 §Day bases](11-length-day-year-formulas.md#day-types) |
+| Measured mean solar day (the declared scene basis) | `measuredMeanSolarDayJ2000Seconds` | <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000427<!--/v--> s | Derived in place: IAU sidereal seconds / the Step-6c measured sidereal year — the day the scene's measured year lengths are counted in. Five day bases coexist (SI · LOD_mean · Fourier-kinematic <!--v:lodKinematicFourierJ2000Seconds-->86,400.000107<!--/v--> · measured · LOD_real); see [doc 11 §Day bases](11-length-day-year-formulas.md#day-types) |
 | Sidereal day | `siderealDayJ2000` | 86164.09053083288 s (~23h 56m 4.0905s) | IERS |
 | Stellar day | `stellarDayJ2000` | 86164.0989036905 s (~23h 56m 4.0989s) | IERS |
 
@@ -779,7 +779,7 @@ All 8 planet amplitudes are derived at runtime from K using model mean obliquity
 
 ## Planet Eccentricity Phase Constants (J2000)
 
-Phase angles for the planets' eccentricity oscillations are derived at runtime from the balanced-year phase: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. Earth is NOT in this family (v12): its e(t) rides the one H/3 law on the System-Reset anchor (θ₃(J2000) = <!--v:earthEccPhaseH3J2000-->81.18<!--/v-->°, shared with the inclination law, the Moon channel and the Sun imprint) — the legacy Sun-optimizer solve of Earth's eccentricity phase is retired. The phases are no longer stored in JSON — they are computed by constants.js and script.js.
+Phase angles for the planets' eccentricity oscillations are derived at runtime from the balanced-year phase: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. Earth is not in this family: its e(t) rides the one H/3 law on the System-Reset anchor (θ₃(J2000) = <!--v:earthEccPhaseH3J2000-->81.18<!--/v-->°, shared with the inclination law, the Moon channel and the Sun imprint), so nothing solves an Earth eccentricity phase. The phases are not stored in JSON — they are computed by constants.js and script.js.
 
 ## Per-Planet EoC Fractions
 
