@@ -509,22 +509,29 @@ export const VALUES = {
     render: (v) => Number(v).toFixed(8),
     note: 'JPL DE440 observed reference — a calibration input, not a fit product',
   },
+  // ── v12 eccentricity unification: |e| rides the ONE H/3 law
+  //    e(t) = base′·(1 + cos θ₃/2) on the System-Reset anchor. Extremes are
+  //    analytic: min = base′/2 at θ₃ = 180°, max = 3·base′/2 at θ₃ = 0°;
+  //    epochs from balancedYear (min at bY + k·H/3, max at bY + (k+½)·H/3).
   eccentricityDerivedMean: {
-    get: () => Math.hypot(model.earth.eccentricityBase, model.earth.eccentricityAmplitude),
+    get: () => C.eccentricityBaseDerived,
     render: (v) => Number(v).toFixed(7),
+    note: "base′ of the one H/3 law — derived: e(J2000)/(1 + cos θ₀/2) on the System-Reset anchor",
   },
   eccentricityMin: {
-    get: () => model.earth.eccentricityBase - model.earth.eccentricityAmplitude,
+    get: () => C.eccentricityBaseDerived * 0.5,
     render: (v) => `~${Number(v).toFixed(4)}`,
+    note: 'one-law minimum: base′/2 at θ₃ = 180°',
   },
   eccentricityMax: {
-    get: () => model.earth.eccentricityBase + model.earth.eccentricityAmplitude,
+    get: () => C.eccentricityBaseDerived * 1.5,
     render: (v) => `~${Number(v).toFixed(4)}`,
+    note: 'one-law maximum: 3·base′/2 at θ₃ = 0°',
   },
   eccentricityAmplitude: {
     get: () => model.earth.eccentricityAmplitude,
     render: (v) => Number(v).toFixed(6),
-    note: 'fitted pair with eccentricityBase',
+    note: 'the Law-4 A input — derived: the 1246 triangle closure (docs/10 §Law 4); NOT the modulation half-range of e(t), which is base′/2',
   },
 
   // ── Earth–Sun distances and insolation (from the AU chain + eccentricity) ─
@@ -1291,10 +1298,10 @@ export const VALUES = {
       periAlignYear:    { get: () => C.perihelionalignmentYear, render: (v) => String(v) },
       periAlignYearRound: { get: () => C.perihelionalignmentYear, render: (v) => Number(v).toFixed(2) },
       periAlignJD:      { get: () => C.perihelionalignmentJD, render: (v) => thousands(v), unit: 'JD' },
-      eccNextMax:  { get: () => Math.round(C.perihelionalignmentYear + HDIV16()), render: (v) => thousands(v), note: 'perihelion alignment + H/16' },
-      eccNextMin:  { get: () => Math.round(C.perihelionalignmentYear + HDIV16() / 2), render: (v) => thousands(v) },
+      eccNextMax:  { get: () => Math.round(C.balancedYear + 7 * C.H / 6), render: (v) => thousands(v), note: 'v12 one-law: next θ₃ = 0° epoch (balancedYear + 7H/6)' },
+      eccNextMin:  { get: () => Math.round(C.balancedYear + C.H), render: (v) => thousands(v), note: 'v12 one-law: next θ₃ = 180° epoch (balancedYear + H)' },
       eccPrevMin:  { get: () => Math.round(Math.abs(C.perihelionalignmentYear - HDIV16() / 2)), render: (v) => thousands(v) },
-      eccPrevMinBC: { get: () => Math.round(Math.abs(C.perihelionalignmentYear - HDIV16() / 2)), render: (v) => thousands(v) + ' BC' },
+      eccPrevMinBC: { get: () => Math.round(Math.abs(C.balancedYear + 2 * C.H / 3)), render: (v) => thousands(v) + ' BC', note: 'v12 one-law: last θ₃ = 180° epoch (balancedYear + 2H/3)' },
       eccPrevMinJD: { get: () => C.perihelionalignmentJD - (HDIV16() * C.meanSolarYearDays / 2), render: (v) => thousands(v, 1), unit: 'JD' },
       nextBalancedYear: { get: () => C.balancedYear + C.H, render: (v) => thousands(v) },
       tempGraphMostLikely: { get: () => C.temperatureGraphMostLikely, render: (v) => String(v), note: 'temperature-graph phase pick (14.5 H/16 cycles)' },
@@ -1326,7 +1333,7 @@ export const VALUES = {
     const nApsidal = () => Math.round(8 * TOTAL_DAYS() / C.moonApsidalPrecessionDaysInputICRF) / 8;
     const nNodal = () => Math.round(8 * TOTAL_DAYS() / C.moonNodalPrecessionDaysInputICRF) / 8;
     return {
-      wobbleCenterKm:    { get: () => Math.round(model.earth.eccentricityAmplitude * C.currentAUDistance), render: (v) => thousands(v), unit: 'km', note: 'eccentricity amplitude × model AU' },
+      wobbleCenterKm:    { get: () => Math.round(model.earth.eccentricityAmplitude * C.currentAUDistance), render: (v) => thousands(v), unit: 'km', note: 'Law-4 A × model AU — the D7 display-marker distance (1246 triangle closure); no longer an e(t) mechanism (v12)' },
       perihelionPointKm: { get: () => Math.round(model.earth.eccentricityBase * C.currentAUDistance), render: (v) => thousands(v), unit: 'km', note: 'eccentricity base × model AU' },
       fullMoonCycleEarth:      { get: () => C.moonFullMoonCycleEarth, render: (v) => thousands(v, 2), unit: 'd', note: 'observed supermoon cycle' },
       fullMoonCycleEarthExact: { get: () => C.moonFullMoonCycleEarth, render: (v) => thousands(v, 10), unit: 'd' },
@@ -1633,7 +1640,7 @@ export const VALUES = {
     out.perihelionPassageJD = { get: () => astro.earthOrbital.perihelionPassageJ2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (2000 Jan 3)' };
     out.juneSolstice2000JD = { get: () => astro.earthOrbital.juneSolstice2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (June 21, 2000)' };
     out.iauPrecessionInputYears = { get: () => astro.yearLengthRef.iauPrecessionJ2000, render: (v) => thousands(v, 2), unit: 'yr', note: 'stored iauPrecessionJ2000 input — IAU 2006 rate on the model day basis' };
-    out.earthEccCycle = { get: () => C.H / 16, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'eccentricity cycle = ecliptic perihelion period (H/16)' };
+    out.earthEccCycle = { get: () => C.H / 16, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the of-date wobble beat (H/16 = 13+3) — the perihelion-DIRECTION cycle kept for the planet-family table; Earth |e| itself rides the H/3 one-law cycle (v12, doc 55 §6)' };
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const n = model.planets[p].ascendingNodeCyclesIn8H;
       out[`${p}AscNodeCycleYears`] = { get: () => (8 * C.H) / n, render: (v) => thousands(Math.round(v)), unit: 'yr', note: `asc-node cycle = 8H/${n}` };

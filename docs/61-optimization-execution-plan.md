@@ -81,7 +81,7 @@ Note: `earthWobbleCenter` is NOT in the main chain (used for labels/tracking onl
 - **Observed eccentricity** = distance between Earth and PERIHELION-OF-EARTH at any given time
   - **Maximum** (same side): `eccentricityBase + eccentricityAmplitude` — matches J2000 observed <!--v:j2000Eccentricity-->0.01671022<!--/v-->
   - **Minimum** (opposite sides): `eccentricityBase − eccentricityAmplitude`
-  - Range: ~0.0139 to <!--v:eccentricityMax-->~0.0167<!--/v-->, oscillating with the H/16 perihelion cycle
+  - Range: ~0.0139 to <!--v:eccentricityMax-->~0.0233<!--/v-->, oscillating with the H/16 perihelion cycle
 - At J2000 we are near maximum eccentricity (last perihelion alignment: 1246 AD)
 - The model correctly reproduces the J2000 eccentricity without additional tuning
 
@@ -108,7 +108,7 @@ The Sun is a child of `barycenterEarthAndSun` with:
 
 **The standard claim**: In heliocentric astronomy, Earth's elliptical orbit (e ~ 0.0167) causes the Sun's apparent angular speed to vary by +/-3.3%, producing the "equation of center" (~2 deg annual variation). The model's circular Sun orbit at constant speed cannot reproduce this.
 
-**But in our geocentric model**, the Sun orbits the `barycenterEarthAndSun` (= PERIHELION-OF-EARTH) at 1 AU. This point is NOT at Earth's center — it is offset by the eccentricity distance (<!--v:eccentricityMax-->~0.0167<!--/v--> AU at J2000). The offset arises from the counter-rotating precession layers: `earthPerihelionPrecession2` carries `orbitCentera: -eccentricityBase*100` and `barycenterEarthAndSun` carries `orbitRadius: eccentricityAmplitude*100`. Because the Sun orbits an off-center point at constant speed, its apparent angular speed as seen from Earth naturally varies through the year — faster when the Sun is closer (perihelion), slower when farther (aphelion). **The question is whether this existing mechanism already captures the observed variation, partially captures it, or misses it entirely.**
+**But in our geocentric model**, the Sun orbits the `barycenterEarthAndSun` (= PERIHELION-OF-EARTH) at 1 AU. This point is NOT at Earth's center — it is offset by the eccentricity distance (<!--v:eccentricityMax-->~0.0233<!--/v--> AU at J2000). The offset arises from the counter-rotating precession layers: `earthPerihelionPrecession2` carries `orbitCentera: -eccentricityBase*100` and `barycenterEarthAndSun` carries `orbitRadius: eccentricityAmplitude*100`. Because the Sun orbits an off-center point at constant speed, its apparent angular speed as seen from Earth naturally varies through the year — faster when the Sun is closer (perihelion), slower when farther (aphelion). **The question is whether this existing mechanism already captures the observed variation, partially captures it, or misses it entirely.**
 
 **What is observationally established (model-independent):**
 - The seasons are unequal in length (known since Hipparchus, ~150 BCE)

@@ -236,7 +236,7 @@ Input constants used in the formulas above:
 
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
-| Derived Mean Eccentricity | `eccentricityDerivedMean` | sqrt(base² + amplitude²) | ~<!--v:eccentricityDerivedMean-->0.0154456<!--/v--> |
+| Derived Mean Eccentricity | `eccentricityDerivedMean` | sqrt(base² + amplitude²) | ~<!--v:eccentricityDerivedMean-->0.0155200<!--/v--> |
 | EoC Eccentricity | `eocEccentricity` | derivedMean - base/2 | ~<!--v:eocEccentricityValue-->0.00836<!--/v--> |
 | Perihelion Phase Offset | `perihelionPhaseOffset` | (see constants.js derivation) | ~<!--v:periPhaseOffsetDeg-->0.4830<!--/v--> deg |
 
