@@ -533,6 +533,115 @@ export const VALUES = {
     render: (v) => Number(v).toFixed(6),
     note: 'the Law-4 A input — derived: the 1246 triangle closure (docs/10 §Law 4); NOT the modulation half-range of e(t), which is base′/2',
   },
+  // ── v12 derived companions (D7 A-closure, one-law rate test, D8 day bases,
+  //    the perihelion-at-June-solstice epochs that eccNextMin/PrevMinBC used
+  //    to mean). All derived — no stored literals (feedback: use value tags).
+  earthEccPhaseH3J2000: {
+    get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000 - astro.earthOrbital.earthInclinationCycleAnchor,
+    render: (v) => Number(v).toFixed(2), unit: '°',
+    note: 'θ₃(J2000) of the one H/3 law = ϖ_ICRF(J2000) − the inclination-cycle anchor',
+  },
+  earthEccDotModelJ2000: {
+    get: () => {
+      const th = (astro.earthOrbital.earthPerihelionLongitudeJ2000 - astro.earthOrbital.earthInclinationCycleAnchor) * Math.PI / 180;
+      return -(C.eccentricityBaseDerived / 2) * Math.sin(th) * (2 * Math.PI * 3 / C.H) * 100;
+    },
+    render: (v) => Number(v).toPrecision(3).replace('-', '−'), unit: '/cy',
+    note: 'the one law\'s de/dt at J2000 — a prediction (zero fitted inputs); compare earthEccDotJ2000 (observed)',
+  },
+  earthEccDotAgreementPct: {
+    get: () => {
+      const th = (astro.earthOrbital.earthPerihelionLongitudeJ2000 - astro.earthOrbital.earthInclinationCycleAnchor) * Math.PI / 180;
+      const model = -(C.eccentricityBaseDerived / 2) * Math.sin(th) * (2 * Math.PI * 3 / C.H) * 100;
+      return Math.abs(model / astro.earthOrbital.earthEccentricityDotJ2000 - 1) * 100;
+    },
+    render: (v) => Number(v).toFixed(1), unit: '%',
+    note: '|model ė / observed ė − 1| at J2000',
+  },
+  periJuneSolsticeNextAD: {
+    get: () => Math.round(C.perihelionalignmentYear + C.H / 32),
+    render: (v) => thousands(v),
+    note: 'perihelion at the June solstice: the 1246 alignment + half an H/16 beat (the ϖ event the v11 eccNextMin used to mean)',
+  },
+  periJuneSolsticePrevBC: {
+    get: () => Math.round(Math.abs(C.perihelionalignmentYear - C.H / 32)),
+    render: (v) => thousands(v) + ' BC',
+    note: 'perihelion at the June solstice, previous: the 1246 alignment − half an H/16 beat',
+  },
+  aClosurePhaseDeg: {
+    get: () => 360 * (2000 - C.perihelionalignmentYear) / (C.H / 16),
+    render: (v) => Number(v).toFixed(2), unit: '°',
+    note: 'arm-to-arm phase advanced from the 1246 alignment to J2000 at the H/16 beat (the A-closure angle)',
+  },
+  aDerivedFrom1246: {
+    get: () => {
+      const base = model.earth.eccentricityBase, e0 = astro.earthOrbital.earthEccentricityJ2000;
+      const phi = 360 * (2000 - C.perihelionalignmentYear) / (C.H / 16) * Math.PI / 180;
+      const b = 2 * base * Math.cos(phi);
+      return (-b + Math.sqrt(b * b - 4 * (base * base - e0 * e0))) / 2;
+    },
+    render: (v) => Number(v).toFixed(7),
+    note: 'A from the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos φ — reproduces eccentricityAmplitude',
+  },
+  aClosureYearAMinus5Pct: {
+    get: () => {
+      const base = model.earth.eccentricityBase, e0 = astro.earthOrbital.earthEccentricityJ2000, A = model.earth.eccentricityAmplitude * 0.95;
+      return Math.round(2000 - Math.acos(Math.min(1, (e0 * e0 - base * base - A * A) / (2 * base * A))) / (2 * Math.PI) * (C.H / 16));
+    },
+    render: (v) => thousands(v), unit: 'AD',
+    note: 'alignment year the closure would force if A were 5% too small',
+  },
+  aClosureYearAPlus5Pct: {
+    get: () => {
+      const base = model.earth.eccentricityBase, e0 = astro.earthOrbital.earthEccentricityJ2000, A = model.earth.eccentricityAmplitude * 1.05;
+      return Math.round(2000 - Math.acos(Math.min(1, (e0 * e0 - base * base - A * A) / (2 * base * A))) / (2 * Math.PI) * (C.H / 16));
+    },
+    render: (v) => thousands(v), unit: 'AD',
+    note: 'alignment year the closure would force if A were 5% too large',
+  },
+  closingDayTropicalSeconds: {
+    get: () => 86400 * astro.yearLengthRef.tropicalYearMean / rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR.tropical,
+    render: (v) => thousands(v, 6), unit: 's',
+    note: 'D8: the day length that closes the measured tropical year on the IAU value',
+  },
+  closingDaySiderealSeconds: {
+    get: () => 86400 * C.meanSiderealYearDays / rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR.sidereal,
+    render: (v) => thousands(v, 6), unit: 's',
+    note: 'D8: the day length that closes the measured sidereal year (= the declared measured mean solar day)',
+  },
+  closingDayAnomalisticSeconds: {
+    get: () => 86400 * C.meanAnomalisticYearDays / rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR.anomalistic,
+    render: (v) => thousands(v, 6), unit: 's',
+    note: 'D8: the day length that closes the measured anomalistic year',
+  },
+  yearResidualTropicalSecPerYr: {
+    get: () => {
+      const fc = rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR;
+      const sid = 86400 * C.meanSiderealYearDays / fc.sidereal, trop = 86400 * astro.yearLengthRef.tropicalYearMean / fc.tropical;
+      return (sid - trop) * astro.yearLengthRef.tropicalYearMean;
+    },
+    render: (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(3), unit: 's/yr',
+    note: 'D8: tropical-year residual vs IAU after pinning the sidereal year (one day basis cannot close all three)',
+  },
+  yearResidualAnomalisticSecPerYr: {
+    get: () => {
+      const fc = rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR;
+      const sid = 86400 * C.meanSiderealYearDays / fc.sidereal, anom = 86400 * C.meanAnomalisticYearDays / fc.anomalistic;
+      return (sid - anom) * C.meanAnomalisticYearDays;
+    },
+    render: (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(3), unit: 's/yr',
+    note: 'D8: anomalistic-year residual vs IAU after pinning the sidereal year',
+  },
+  lodKinematicFourierJ2000Seconds: {
+    get: () => dtl().computeLodKinematicSecondsAtEpoch(2000),
+    render: (v) => thousands(v, 6), unit: 's',
+    note: 'o.lodKinematic at J2000: IAU sidereal seconds / the Fourier sidereal-year days (the panel seconds basis)',
+  },
+  dayBasisSpreadMs: {
+    get: () => (C.meanSiderealYearSeconds / rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR.sidereal - dtl().computeLodKinematicSecondsAtEpoch(2000)) * 1000,
+    render: (v) => Number(v).toFixed(2), unit: 'ms',
+    note: 'the §12h day-basis spread: measured day − Fourier-kinematic day at J2000',
+  },
 
   // ── Earth–Sun distances and insolation (from the AU chain + eccentricity) ─
   // AU = currentAUDistance — the parallax-chain value astro-reference ships

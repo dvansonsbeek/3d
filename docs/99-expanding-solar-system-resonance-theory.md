@@ -386,7 +386,7 @@ H/13-precessing equinox (13 + 3 = 16) and belongs to the perihelion
 longitude. Since the eccentricity unification (v12) the cardinal-point
 chain rides the SAME one law — the H/16 e-law is fully retired: the
 scene offset carries e(t)·û(ϖ) per frame, the Earth-frame refit
-(Step 6d) re-achieved 0.26–0.29 min over ±H, and H/16 survives only as
+(Step 6d) re-achieved the campaign-era cardinal residual over ±H, and H/16 survives only as
 the perihelion-direction period and the Law-4 A construction (doc 108;
 docs/10 §Law 4).
 

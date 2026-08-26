@@ -155,10 +155,10 @@ Both constants are empirical — derived from Earth's fitted parameters — and 
 **Earth's amplitude A is derived, not fitted (v12 re-basing).** Under the one-eccentricity-law unification, Earth's |e|(t) rides the single H/3 line e(t) = base′·(1 + cos θ₃/2) — the H/16 period belongs to the perihelion *direction* ϖ (the 13+3 of-date beat), not to |e|. Earth's Law-4 input A is therefore an of-date-class quantity with an exact geometric derivation, the **1246 triangle closure**:
 
 ```
-e(J2000)² = base² + A² + 2·base·A·cos φ,   φ = 360° × (2000 − 1246.03) / (H/16) = 12.95°
+e(J2000)² = base² + A² + 2·base·A·cos φ,   φ = 360° × (2000 − periAlignYear) / (H/16)
 ```
 
-with base the Law-5 constant and 1246.03 the perihelion–solstice alignment epoch on the lattice. This reproduces the stored A = 0.0013559440 to ~1e-8 (≈2 km of the ≈203,000 km wobble-marker distance), and the closure is sharp: A 5% too small forces the alignment year to 2000 AD, 5% too large to 690 AD. K derives from A at runtime (`eccentricityAmplitudeK` in the engine constants). Earth's *base* is likewise derived under the one law: base′ = e(J2000) / (1 + cos θ₀/2) on the shared System-Reset anchor (θ₀ = 81.18° at J2000). The 1246 alignment itself is untouched — it constrains ϖ; only its former "= eccentricity maximum" reading is retired (the e-extremes now ride the H/3 anchor: last max ≈ −23,200, next min ≈ +32,700).
+with base the Law-5 constant, the alignment epoch <!--v:periAlignYearRound-->1246.03<!--/v--> on the lattice, and φ = <!--v:aClosurePhaseDeg-->12.95<!--/v-->°. The closure gives A = <!--v:aDerivedFrom1246-->0.0013559<!--/v--> against the stored <!--v:eccentricityAmplitude-->0.001356<!--/v--> (the ≈<!--v:wobbleCenterKm-->202,846<!--/v--> km wobble-marker distance), and it is sharp: A 5% too small forces the alignment year to <!--v:aClosureYearAMinus5Pct-->2,000<!--/v--> AD, 5% too large to <!--v:aClosureYearAPlus5Pct-->690<!--/v--> AD. K derives from A at runtime (`eccentricityAmplitudeK` in the engine constants). Earth's *base* is likewise derived under the one law: base′ = e(J2000) / (1 + cos θ₀/2) on the shared System-Reset anchor (θ₀ = <!--v:earthEccPhaseH3J2000-->81.18<!--/v-->° at J2000). The 1246 alignment itself is untouched — it constrains ϖ; only its former "= eccentricity maximum" reading is retired (the e-extremes now ride the H/3 anchor: last max <!--v:inclinationLastMaxYear-->23,204 BC<!--/v-->, next min <!--v:eccNextMin-->32,682<!--/v--> AD).
 
 ### Law 5: The Eccentricity Balance
 
