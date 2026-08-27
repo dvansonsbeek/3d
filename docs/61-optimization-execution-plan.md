@@ -60,7 +60,7 @@ startingPoint -> earth -> earthInclinationPrecession -> earthEclipticPrecession
 Note: `earthWobbleCenter` is NOT in the main chain (used for labels/tracking only). `midEccentricityOrbit` is a **sibling** of `earthEclipticPrecession` under `earthInclinationPrecession` (visualization only, not in the positional chain).
 
 **Key geometric mechanism — counter-rotating motions:**
-- **Earth** orbits EARTH-WOBBLE-CENTER clockwise at H/13 (mean axial precession)
+- **EARTH-WOBBLE-CENTER** circles Earth clockwise at H/13 (mean axial precession; a display-only marker — Earth sits at the scene origin)
 - **PERIHELION-OF-EARTH** orbits the Sun counter-clockwise at H/3 (inclination precession)
 - Because they rotate in **opposite directions**, their meeting frequency is additive: 1/(H/13) + 1/(H/3) = 16/H (perihelion precession cycle, H/16)
 - The **observed/experienced** precession period (<!--v:mainstreamAxialPrecExact-->~25,771<!--/v--> yr currently) differs from the mean (H/13) because the instantaneous rate varies through the cycle. The model's H/13 mean is correct.

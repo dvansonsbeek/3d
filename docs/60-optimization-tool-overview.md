@@ -168,17 +168,18 @@ The simulation uses a **nested scene graph hierarchy** -- each level applies one
 **Earth hierarchy (8 nodes to barycenter):**
 ```
 startingPoint (origin)
-  -> earth                             speed: -2pi / (H/13), radius: -eccAmplitude x 100
+  -> earth                             speed: -2pi / (H/13), radius: 0 (Earth at the origin)
+    -> earthWobbleCenter               radius: +eccAmplitude x 100 (display-only marker, not in the positional chain)
     -> earthInclinationPrecession      speed: 2pi / (H/3)
       -> earthEclipticPrecession       speed: 2pi / (H/5), tiltb: -inclAmplitude
         -> earthObliquityPrecession    speed: -2pi / (H/8), tiltb: +inclAmplitude
           -> earthPerihelionPrecession1  speed: 2pi / (H/16), tilta: -earthRAAngle
-            -> earthPerihelionPrecession2  speed: -2pi / (H/16), centera: -eccBase x 100
-              -> barycenterEarthAndSun   radius: eccAmplitude x 100
+            -> earthPerihelionPrecession2  speed: -2pi / (H/16), centera: -e(t) x 100 per frame (the one H/3 law; base' seed)
+              -> barycenterEarthAndSun   radius: 0 (the Sun's orbit centre itself)
                 -> sun / earthPerihelionFromEarth
 ```
-Counter-rotating motions: Earth orbits EARTH-WOBBLE-CENTER (CW, H/13) while PERIHELION-OF-EARTH orbits Sun (CCW, H/3). Meeting frequency: 1/(H/13) + 1/(H/3) = 16/H → H/16 perihelion cycle.
-Observed eccentricity = distance(Earth, PERIHELION-OF-EARTH): ranges 0.0139 (opposite) to 0.0167 (aligned, matches J2000).
+Counter-rotating motions: EARTH-WOBBLE-CENTER circles Earth (CW, H/13; a display-only marker, Earth itself sits at the scene origin) while PERIHELION-OF-EARTH orbits Sun (CCW, H/3). Meeting frequency: 1/(H/13) + 1/(H/3) = 16/H → H/16 perihelion-direction cycle.
+Eccentricity = the one H/3 law e(t) = base′·(1 + cos θ₃/2), carried by the PeriPrec2 offset every frame (doc 41); the offset's direction turns at H/16, its length on H/3.
 Note: `earthWobbleCenter` and `midEccentricityOrbit` are NOT in the positional chain (used for visualization/tracking only).
 
 **Per-planet chain (5 levels under barycenter):**
