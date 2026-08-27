@@ -83,7 +83,7 @@ would silently churn a structural claim for a rounding-level gain.
   Back it up before regenerating (2 h 24 m).
 - **The deep-time alignment campaign is COMPLETE** — engine ≡ CSV bit-exact,
   all sixteen R-items closed, the cardinal-point fit (now Step 6d; "6c" in
-  campaign-era docs) at 0.28–0.37 min over ±270 kyr via the §10
+  campaign-era docs) at 0.26–0.29 min over ±270 kyr (Earth-frame) via the §10
   derived form + edge-trim + the §10g quadrature-locked joint sidebands. Do
   not regenerate the CSV: 2 h 24 m for an identical file. Coefficients and
   runtime evaluation form are a MATCHED PAIR — never ship one without the

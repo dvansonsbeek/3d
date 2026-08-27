@@ -42,18 +42,20 @@ Instruments: `tools/explore/fq7s-ecc-consistency.mjs`,
 
 ## 1. The starting point: the model's eccentricity laws
 
-The model carries two eccentricity laws for Earth's orbit, in two
-places:
+This record was made when the model carried two eccentricity laws for
+Earth's orbit, in two places:
 
-| law | where | period | e range |
+| law | where (at the time of this record) | period | e range |
 |---|---|---:|---:|
 | H/16 beat law (`earth.eccentricity`) | cardinal points / deep time | 21 kyr | 0.0140–0.0167 |
-| H/3 line (`moon/ecc-channel.cjs`, e = base·(1 + cos θ/2)) | the Moon's E-factor; since C-small also the eclipse Sun (doc 66) | 112 kyr | 0.0077–0.023 |
+| H/3 line (`moon/ecc-channel.cjs`, e = base·(1 + cos θ/2)) | the Moon's E-factor and the eclipse Sun (doc 66) | 112 kyr | 0.0077–0.023 |
 
-Both are correct *local* laws — their J2000 rates match the observed
+Both were correct *local* laws — their J2000 rates matched the observed
 ones (the H/3 line's ė to 1.7%). The question this record answers is
 what they are physically, and what they say — and cannot say — about
-eccentricity away from the present epoch.
+eccentricity away from the present epoch. The model now carries the H/3
+line everywhere (docs/10 §Law 4, doc 99), as this record's doctrine
+argument recommended.
 
 ## 2. The principle: eccentricity is frame-invariant
 
