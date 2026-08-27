@@ -68,7 +68,7 @@ See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full d
 
 The Sun is still the center of our solar system. The model uses a geo-heliocentric frame — viewing from Earth's perspective — to make the two counter-rotating precession motions visible:
 
-- **Earth wobbles** clockwise around a reference point (the EARTH-WOBBLE-CENTER) in <!--v:axialPrecRound-->~25,794<!--/v--> years — this is axial precession
+- **Earth's wobble center** (the EARTH-WOBBLE-CENTER marker) circles Earth clockwise in <!--v:axialPrecRound-->~25,794<!--/v--> years — this is axial precession
 - **Earth's perihelion point** wobbles counter-clockwise around the Sun in <!--v:inclPrecYears-->~111,772<!--/v--> years — this is inclination precession
 - These two motions **meet every <!--v:periPrecYears-->~20,957<!--/v--> years** — producing perihelion precession
 - Earth orbits its perihelion point (close to the Sun) in 1 solar year, and all planets orbit their own perihelion points following Kepler's 3rd law
