@@ -677,26 +677,30 @@ export const VALUES = {
     render: (v) => Number(v).toFixed(1),
     unit: '%',
   },
+  // The insolation extremes ride the one H/3 law's extremes: e_max = 3·base′/2,
+  // e_min = base′/2 (see eccentricityMax / eccentricityMin above).
   earthInsolationIncreaseMaxPct: {
     get: () => {
-      const e = model.earth.eccentricityBase + model.earth.eccentricityAmplitude;
+      const e = C.eccentricityBaseDerived * 1.5;
       return (1 / Math.sqrt(1 - e * e) - 1) * 100;
     },
     render: (v) => Number(v).toFixed(3),
     unit: '%',
+    note: 'orbit-averaged flux excess over circular at the one-law maximum e = 3·base′/2',
   },
   earthInsolationIncreaseMinPct: {
     get: () => {
-      const e = model.earth.eccentricityBase - model.earth.eccentricityAmplitude;
+      const e = C.eccentricityBaseDerived * 0.5;
       return (1 / Math.sqrt(1 - e * e) - 1) * 100;
     },
     render: (v) => Number(v).toFixed(3),
     unit: '%',
+    note: 'orbit-averaged flux excess over circular at the one-law minimum e = base′/2',
   },
   earthInsolationDifferencePct: {
     get: () => {
-      const hi = model.earth.eccentricityBase + model.earth.eccentricityAmplitude;
-      const lo = model.earth.eccentricityBase - model.earth.eccentricityAmplitude;
+      const hi = C.eccentricityBaseDerived * 1.5;
+      const lo = C.eccentricityBaseDerived * 0.5;
       return ((1 / Math.sqrt(1 - hi * hi)) - (1 / Math.sqrt(1 - lo * lo))) * 100;
     },
     render: (v) => Number(v).toFixed(3),
