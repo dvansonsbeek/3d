@@ -4234,32 +4234,29 @@ function _fwEarthEccComposite(t_yr) {
 }
 const _ECOMP_G0 = Math.pow(1 - _fwEarthEccComposite(0) ** 2, -1.5);   // g at the composite's OWN J2000 anchor (its KKT-constrained e(0), from the La2010 fit — deliberately NOT astro-reference, so the composite's modulation ≡ 1 at J2000; A/B research only, production uses _FW_ECC_G0)
 
-/** Framework-native Earth-eccentricity fluctuation for the LUNAR machinery —
- *  ONE movement, FULLY DERIVED, zero solved values:
+/** Earth's eccentricity — the model's ONE law, shared by every Earth
+ *  consumer (scene offset, Sun equation of centre, cardinal braid, the Moon's
+ *  E-factor and rate channel, predictions, reports, charts):
  *
- *      e(t) = eccentricityBase · (1 + cos θ_i(t) / 2)
+ *      e(t) = base′ · (1 + cos θ₃(t) / 2)
  *
- *  The H/3 wobble cycle that drives Earth's inclination (anchor 21.77°) also
- *  carries the eccentricity fluctuation the lunar rate channel senses: mean
- *  c = eccentricityBase (Law 5), amplitude A = base/2 (the half-base factor
- *  the framework already carries — cf. eocEccentricity = mean − base/2),
- *  phase θ₀ = ϖ_ICRF(J2000) − 21.77° = 81.18° past max. NOTHING is fitted;
- *  the observed J2000 values become PREDICTIONS: e = 0.016566 (−0.86% vs
- *  astro-reference 0.0167102), ė = −4.273×10⁻⁵/cy (+1.7% vs secular theory's
- *  −4.204×10⁻⁵), ë = −3.7×10⁻⁸ (same sign as Meeus's −2.5×10⁻⁷), E-factor at
- *  −135/−584 within ~0.5% of Meeus. Cross-checks: solving (A, θ) freely from
- *  the observed (e, ė) with c = base returns θ = 79.96° (framework: 81.18°)
- *  and A = 0.4936·base — the data hands back this structure on its own.
- *  Earth's own orbital eccentricity for the Sun machinery keeps the H/16
- *  perihelion law (e-max 1246, _eclSunLon) — this line is the Moon channel's
- *  view of the H/3 movement. Bounded [base/2, 3·base/2]; e-mean crossing
- *  ≈ 4739, locked to the inclination's; turning points ≈ −23,200 / +32,700.
- *  Deep-time aware via cyclesBetweenYears (integrated ∫3/H(t)dt when on).
+ *  θ₃ is the H/3 inclination-cycle phase on the System-Reset anchor
+ *  (θ₃(J2000) = ϖ_ICRF(J2000) − earthInclinationCycleAnchor ≈ 81.18°), so
+ *  the eccentricity extremes coincide with the inclination's. base′ is
+ *  DERIVED — e(J2000) / (1 + cos θ₀/2) — from the observed J2000 eccentricity
+ *  and the shared anchor; nothing is fitted, and e(J2000) is exact by
+ *  construction. Range [base′/2, 3·base′/2]; the modulation half-range is
+ *  base′/2 (distinct from `eccentricityAmplitude`, the Law-4 A input that is
+ *  the wobble-marker distance, not a term of this law). ė(J2000) is a
+ *  prediction of the law (registry earthEccDotModelJ2000 vs the observed
+ *  earthEccDotJ2000). The H/16 perihelion cycle is the DIRECTION ϖ of the
+ *  offset vector e(t)·û(ϖ), never a term of |e|. Deep-time aware via
+ *  cyclesBetweenYears (integrated ∫3/H(t)dt when on).
  *
- *  Phase 8.2-2: the line lives ONCE in @essrt/physics/moon/ecc-channel; this
- *  engine delegates, injecting its OWN cyclesBetweenYears so the deep-time /
+ *  The law lives ONCE in @essrt/physics/moon/ecc-channel; this engine
+ *  delegates, injecting its OWN cyclesBetweenYears so the deep-time /
  *  snapshot toggle semantics ride along. Anchors e0/g0 are consts inside the
- *  channel (never eccAt(0) — the R3 drift correction). */
+ *  channel (never eccAt(0)). */
 const _moonEcc = (() => {
   let m = null;
   return () => {
