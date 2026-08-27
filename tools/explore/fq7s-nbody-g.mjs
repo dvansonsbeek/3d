@@ -69,7 +69,8 @@ const hk = (i) => {
   return [ev[1], ev[0]];   // h = e sinϖ ≈ ev_y, k = e cosϖ ≈ ev_x (ecliptic-plane projection)
 };
 
-const h = DT * DAY, steps = Math.round(YEARS * 365.25 / DT), sampleEvery = Math.max(1, Math.round(100 / DT));   // 100-day samples
+const SAMPLE_DAYS = parseFloat(process.argv[4] || '100');   // argv[4]: sampling interval in days (Myr-class runs: 365250 = 1 kyr)
+const h = DT * DAY, steps = Math.round(YEARS * 365.25 / DT), sampleEvery = Math.max(1, Math.round(SAMPLE_DAYS / DT));
 const k1 = new Float64Array(6 * n), k2 = new Float64Array(6 * n), k3 = new Float64Array(6 * n), k4 = new Float64Array(6 * n), tmp = new Float64Array(6 * n);
 const T = [], HJ = [], KJ = [], HS = [], KS = [];
 const iJ = 1 + names.indexOf('jupiter'), iS = 1 + names.indexOf('saturn');
