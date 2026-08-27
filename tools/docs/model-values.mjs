@@ -648,6 +648,59 @@ export const VALUES = {
   // (matched pair of earthParallaxRadiusKm). Distances use the OBSERVED
   // e(J2000); the insolation extremes use the model's base ∓ amplitude, i.e.
   // 1/√(1−e²) − 1 at the eccentricity-cycle extremes.
+  // ── Insolation extension test (doc 94): tracked results of the three
+  //    instruments scripts/milankovitch_insolation_{extension,laskar_check,
+  //    stability}.py — re-measured on the one-law e(t). ΔR² rendered signed.
+  ...(() => {
+    const sdr = (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(4);
+    const ext = () => rd('data/insolation-extension-results.json');
+    const las = () => rd('data/insolation-laskar-check-results.json');
+    const stb = () => rd('data/insolation-stability-results.json');
+    const out = {};
+    for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full'], ['EpicaCo2', 'epica-co2']]) {
+      out[`insolExtDeltaR2${key}`] = { get: () => ext().regime_results[reg].delta_r2_linsol, render: sdr, note: `in-sample ΔR² of L_insol (model e, ϖ, ε) on L1+L2+L3, regime ${reg}` };
+      out[`insolExtR2Canon${key}`] = { get: () => ext().regime_results[reg].r2_l1_l2_l3, render: (v) => Number(v).toFixed(4), note: `R² of the canonical L1+L2+L3 fit, regime ${reg}` };
+      out[`insolExtR2Full${key}`] = { get: () => ext().regime_results[reg].r2_l1_l2_l3_linsol, render: (v) => Number(v).toFixed(4), note: `R² with L_insol added, regime ${reg}` };
+    }
+    out.insolExtMaxDeltaR2 = { get: () => ext().max_delta_r2, render: sdr, note: 'max in-sample ΔR² across the LR04 regimes + EPICA (the pre-registered decision statistic)' };
+    for (const [key, field] of [['Eps', 'gamma_eps_anom'], ['Ecc', 'gamma_ecc'], ['ESin', 'gamma_e_sin_peri'], ['ECos', 'gamma_e_cos_peri']]) {
+      out[`insolExtGamma${key}PostMpt`] = { get: () => ext().regime_results['post-mpt'].linsol_coefs[field], render: sdr, note: `standardized L_insol coefficient ${field}, post-MPT regime` };
+    }
+    out.insolExtVerdict = { get: () => ext().verdict, render: (v) => String(v), note: 'the extension script\'s own verdict string under its pre-registered bands' };
+    out.insolLaskarV1DeltaR2Lr04 = { get: () => las().lr04_three_way.v1_delta_r2, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(5), note: '0–500 kyr LR04: ΔR² with MODEL insolation features' };
+    out.insolLaskarV2DeltaR2Lr04 = { get: () => las().lr04_three_way.v2_delta_r2, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(5), note: '0–500 kyr LR04: ΔR² with La2010a insolation features' };
+    out.insolLaskarV1DeltaR2Epica = { get: () => las().epica_three_way.v1_delta_r2, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(5), note: '0–500 kyr EPICA CO₂: ΔR² with MODEL insolation features' };
+    out.insolLaskarV2DeltaR2Epica = { get: () => las().epica_three_way.v2_delta_r2, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(5), note: '0–500 kyr EPICA CO₂: ΔR² with La2010a insolation features' };
+    out.insolLaskarVerdict = { get: () => las().verdict, render: (v) => String(v) };
+    for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
+      out[`insolStabModelCv${key}`] = { get: () => stb().regime_results[reg].model_cv_delta_r2, render: sdr, note: `split-half cross-validated ΔR² of L_insol with the MODEL features, regime ${reg}` };
+      out[`insolStabLaskarDeltaR2${key}`] = { get: () => stb().regime_results[reg].laskar_delta_r2, render: sdr, note: `in-sample ΔR² with La2004 e, ϖ (model ε), regime ${reg}` };
+      out[`insolStabLaskarCv${key}`] = { get: () => stb().regime_results[reg].laskar_cv_delta_r2, render: sdr, note: `split-half cross-validated ΔR² with La2004 features, regime ${reg}` };
+    }
+    out.insolStabMaxModelCv = { get: () => stb().max_model_cv_delta_r2, render: sdr, note: 'max cross-validated ΔR² (model features) across the LR04 regimes' };
+    out.insolStabMaxLaskarCv = { get: () => stb().max_laskar_cv_delta_r2, render: sdr, note: 'max cross-validated ΔR² (La2004 features) across the LR04 regimes' };
+    out.insolStabEccMinModel = { get: () => stb().ecc_range_model_0_5320kyr[0], render: (v) => Number(v).toFixed(4), note: 'the one-law e(t) minimum over the LR04 span (0–5320 kyr)' };
+    out.insolStabEccMaxModel = { get: () => stb().ecc_range_model_0_5320kyr[1], render: (v) => Number(v).toFixed(4), note: 'the one-law e(t) maximum over the LR04 span (0–5320 kyr)' };
+    out.insolStabEccMinLaskar = { get: () => stb().ecc_range_laskar_0_5320kyr[0], render: (v) => Number(v).toFixed(4), note: 'La2004 e(t) minimum over the LR04 span' };
+    out.insolStabEccMaxLaskar = { get: () => stb().ecc_range_laskar_0_5320kyr[1], render: (v) => Number(v).toFixed(4), note: 'La2004 e(t) maximum over the LR04 span' };
+    for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
+      out[`insolExtInsolOnlyR2${key}`] = { get: () => ext().regime_results._insol_only_r2[reg], render: (v) => Number(v).toFixed(4), note: `R² of the four classical insolation features ALONE (no L1/L2/L3), regime ${reg}` };
+      out[`insolExtR2L1${key}`] = { get: () => ext().regime_results[reg].r2_l1, render: (v) => Number(v).toFixed(3), note: `R² of L1 alone, regime ${reg}` };
+      out[`insolExtL1OverInsol${key}`] = { get: () => ext().regime_results[reg].r2_l1 / ext().regime_results._insol_only_r2[reg], render: (v) => `${Math.round(Number(v))}×`, note: `R²(L1) / R²(insolation alone), regime ${reg}` };
+    }
+    for (const [key, blk] of [['Lr04', 'lr04_insol_only'], ['Epica', 'epica_insol_only']]) {
+      out[`insolLaskarModelOnlyR2${key}`] = { get: () => las()[blk].model_only_r2, render: (v) => Number(v).toFixed(3), note: `0–500 kyr ${key}: R² of the MODEL insolation features alone (no L1/L2/L3)` };
+      out[`insolLaskarLaskarOnlyR2${key}`] = { get: () => las()[blk].laskar_only_r2, render: (v) => Number(v).toFixed(3), note: `0–500 kyr ${key}: R² of the La2010a insolation features alone` };
+      out[`insolLaskarOnlyGainPct${key}`] = { get: () => (las()[blk].laskar_only_r2 / las()[blk].model_only_r2 - 1) * 100, render: (v) => `${Math.round(Number(v))}%`, note: `0–500 kyr ${key}: how much more variance La2010a's features alone explain than the model's` };
+    }
+    for (const [key, blk] of [['Lr04', 'lr04_three_way'], ['Epica', 'epica_three_way']]) {
+      out[`insolLaskarV0R2${key}`] = { get: () => las()[blk].r2_l1_l2_l3, render: (v) => Number(v).toFixed(4), note: `0–500 kyr ${key}: R² of L1+L2+L3 only` };
+      out[`insolLaskarV1R2${key}`] = { get: () => las()[blk].v1_model_r2, render: (v) => Number(v).toFixed(4), note: `0–500 kyr ${key}: R² with MODEL insolation features` };
+      out[`insolLaskarV2R2${key}`] = { get: () => las()[blk].v2_laskar_r2, render: (v) => Number(v).toFixed(4), note: `0–500 kyr ${key}: R² with La2010a insolation features` };
+    }
+    return out;
+  })(),
+
   earthSunOffsetKm: {
     get: () => Math.round(astro.earthOrbital.earthEccentricityJ2000 * astro.physicalConstants.currentAUDistance),
     render: (v) => thousands(v),

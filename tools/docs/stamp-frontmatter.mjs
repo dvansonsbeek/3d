@@ -53,7 +53,6 @@ const HISTORICAL = new Set([
   '34-j2000-calibration.md',           // implementation plan for a long-shipped feature (2026-08 doc audit)
   '61-optimization-execution-plan.md', // execution log of a finished campaign
   '69-optimization-baseline.md',       // explicitly a frozen before-snapshot
-  '94-insolation-null-test.md',        // a completed null-test record
   '97-paleo-ecs-decomposition.md',     // frozen first-pass analysis
 ]);
 // No doc is superseded today (§10a survey: zero point forward to a successor).
