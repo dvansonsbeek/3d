@@ -38,10 +38,12 @@
     "check": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:purity && npm run test:layer0 && npm run test:layer1 && npm run test:constants && npm run test:counterfactual && npm run test:planet-model && npm run test:model && npm run test:api && npm run test:mcp && npm run test:fixtures && npm run test:literals && npm run test:py-physics && npm run test:docs-fresh && npm run check:artifacts && npm run check:data && npm run docs:values && npm run values:package && npm run test:verify && npm run test:pipeline",
     "check:artifacts": "node tools/verify/artifact-freshness.js",
     "check:data": "node tools/verify/data-provenance.js",
-    "check:docs": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:literals && npm run test:docs-fresh && npm run check:artifacts && npm run docs:values && npm run values:package",
+    "check:docs": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:literals && npm run test:docs-fresh && npm run check:artifacts && npm run docs:values && npm run docs:tables && npm run values:package",
     "check:engine": "npm run check:docs && npm run test:purity && npm run test:layer0 && npm run test:layer1 && npm run test:constants && npm run test:counterfactual && npm run test:planet-model && npm run test:verify && npm run test:fixtures",
     "docs:values": "node tools/docs/render-doc-values.mjs",
     "docs:values:write": "node tools/docs/render-doc-values.mjs --write",
+    "docs:tables": "python3 scripts/generate_doc97_tables.py --check",
+    "docs:tables:write": "python3 scripts/generate_doc97_tables.py",
     "values:package": "node tools/docs/export-model-values-package.mjs",
     "values:package:write": "node tools/docs/export-model-values-package.mjs --write"
   },

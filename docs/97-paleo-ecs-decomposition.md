@@ -115,14 +115,16 @@ alone. This yielded "ESS ≈ 11 K at the 100-kyr band" — well above all
 literature paleo-ECS estimates. The diagnostic test: include ice-albedo and
 other-GHG forcing explicitly.
 
+<!-- generated:ecs-co2-vs-full -->
 | Band | CO₂-only ECS | Full-forcing ECS | Reduction | Ice share of ΔF |
 |---|---:|---:|---:|---:|
-| Obliquity (35–50 kyr) | 9.95 K | **2.42 K** | 76% | 64% |
-| 100-kyr band (75–130 kyr) | 16.00 K | **4.13 K** | 74% | 57% |
+| Obliquity (35–50 kyr) | 9.94 K | **2.41 K** | 76% | 64% |
+| 100-kyr band (75–130 kyr) | 15.63 K | **4.07 K** | 74% | 57% |
 | Precession (18–26 kyr) | 11.58 K | **2.37 K** | 80% | 69% |
-| Long (>130 kyr) | 5.99 K | 2.17 K | 64% | 46% |
-| Short (<18 kyr) | 7.30 K | 1.97 K | 73% | 49% |
-| **Total ΔT-weighted** | **12.87 K** | **3.60 K** | **72%** | — |
+| Long (>130 kyr) | 6.08 K | 2.20 K | 64% | 46% |
+| Short (<18 kyr) | 7.31 K | 1.97 K | 73% | 57% |
+| **Total ΔT-weighted** | **12.79 K** | **3.59 K** | **72%** | — |
+<!-- /generated:ecs-co2-vs-full -->
 
 **The "ESS = 11 K" finding was a methodological artifact**, not a real
 disagreement with literature. At orbital frequencies where ice sheets respond
@@ -135,16 +137,19 @@ disagreement with literature. At orbital frequencies where ice sheets respond
 Marginalized over uniform priors on the four calibration constants (N = 5,000
 draws):
 
+<!-- generated:ecs-mc -->
 | Band | Median ECS (K) | 90% CI | 50% CI |
-|---|---:|:---:|:---:|
+|---|:---:|:---:|:---:|
 | Obliquity (35–50) | 2.43 | [1.96, 2.98] | [2.22, 2.66] |
 | 100-kyr band | 4.09 | [3.38, 4.90] | [3.78, 4.43] |
 | Precession (18–26) | 2.39 | [1.90, 2.98] | [2.17, 2.63] |
 | Long (>130) | 2.22 | [1.89, 2.56] | [2.07, 2.37] |
 | **Overall ΔT-weighted** | **3.61** | **[3.00, 4.29]** | **[3.35, 3.90]** |
+<!-- /generated:ecs-mc -->
 
 **Comparison to literature:**
 
+<!-- generated:ecs-lit -->
 | Source | Charney (K) | Method |
 |---|:---:|---|
 | IPCC AR6 best | 3.0 | Multi-line synthesis |
@@ -152,7 +157,8 @@ draws):
 | Sherwood et al. 2020 (66% CI) | 2.6 – 3.9 | Bayesian synthesis |
 | Hansen 2013 paleo | 3.0 ± 0.5 | LGM-to-Holocene time-domain |
 | PALAEOSENS / Köhler 2017 | 3.0 – 4.5 | Multi-proxy paleo |
-| **This work (8H lattice MC)** | **3.63 [3.01–4.31]** | **8H integer-lattice frequency-domain** |
+| **This work (8H lattice MC)** | **3.61 [3.00–4.29]** | **8H integer-lattice frequency-domain** |
+<!-- /generated:ecs-lit -->
 
 The framework's marginalized Charney sensitivity is consistent with **all four**
 published reference values within their respective uncertainties.
@@ -162,13 +168,15 @@ published reference values within their respective uncertainties.
 A novel output of this framework: ice-albedo fraction of total ΔF at each
 orbital band.
 
+<!-- generated:ice-share -->
 | Band | Ice share | Interpretation |
 |---|:---:|---|
 | 100-kyr (75–130) | 57% | Ice-sheet feedback dominates post-MPT — consistent with 100-kyr glacial cycles being an ice-volume signal |
 | Obliquity (35–50) | 64% | Substantial ice response at obliquity-paced insolation, as predicted by Willeit 2019 |
 | Precession (18–26) | 69% | High ice-share despite precession being "fast" — reflects ice sheet response *integrated* over precession-modulated NH summer insolation |
 | Long (>130 kyr) | 46% | CO₂/GHG forcing becomes proportionally more important at long periods |
-| Short (<18 kyr) | 49% | Mixed — Heinrich/D-O scale, partly internal variability |
+| Short (<18 kyr) | 57% | Mixed — Heinrich/D-O scale, partly internal variability |
+<!-- /generated:ice-share -->
 
 Standard paleoclimate references give a *single* number for ice-albedo
 contribution at LGM (Hansen 2013: ~3.5 W/m², ~55% of total). This framework
@@ -179,11 +187,13 @@ been published in this form.
 
 Three internal consistency checks:
 
+<!-- generated:cross-method -->
 | Cross-check | Result |
 |---|---|
 | LR04 × κ=2.5 → Charney | Bootstrap CI [4.20, 5.05] K under α_slow = 0.5; consistent with full-forcing 3.6 K at upper edge |
-| Snyder GAST direct (no κ) | Bootstrap CI [5.32, 13.76] K obliquity-band CO₂-only → drops to 2.42 K under full-forcing |
-| Cheng 2016 cross-proxy | L1 lattice fits Cheng with R² = 0.68 (entirely independent chronology + mechanism); 1/5 top-5 lines shared with LR04 (obliquity n=66) |
+| Snyder GAST direct (no κ) | Bootstrap CI [5.30, 13.75] K obliquity-band CO₂-only → drops to 2.41 K under full-forcing |
+| Cheng 2016 cross-proxy | L1 lattice fits Cheng with R² = 0.68 (entirely independent chronology + mechanism); 1/5 top-5 lines shared with LR04 (n=66) |
+<!-- /generated:cross-method -->
 
 The cross-proxy test (Cheng 2016) is a **strong structural validation of the
 L1 framework**: the same 33-integer lattice that fits LR04 δ¹⁸O (R² = 0.93)
@@ -196,11 +206,13 @@ Snyder GAST extends to 2003 kyr; CenCO2PIP covers full Pleistocene (100-kyr
 smoothed, caveats apply). Testing the Willeit-2019 prediction: did the MPT
 shift which orbital frequencies drive ice response?
 
+<!-- generated:per-regime -->
 | Band | post-MPT (0–800 kyr) | iNHG-MPT (1000–2000 kyr) | Δ ice-share |
 |---|:---:|:---:|:---:|
-| Obliquity | ECS 2.42 K, ice 64%, ΔT 0.51 K | ECS 7.82 K, ice **95%**, ΔT 0.28 K | **+31 pp ↑ pre-MPT** |
-| 100-kyr | ECS 4.13 K, ice 57%, ΔT 0.84 K | ECS 5.46 K, ice 55%, ΔT 0.63 K | +1 pp (flat) |
-| Precession | ECS 2.37 K, ice 69%, ΔT 0.20 K | ECS 12.17 K, ice 93%, ΔT 0.11 K | +25 pp ↑ pre-MPT |
+| Obliquity | ECS 2.41 K, ice 64%, ΔT 0.51 K | ECS 7.82 K, ice **95%**, ΔT 0.28 K | **+31 pp ↑ pre-MPT** |
+| 100-kyr | ECS 4.07 K, ice 57%, ΔT 0.75 K | ECS 6.65 K, ice 54%, ΔT 0.64 K | -3 pp (flat) |
+| Precession | ECS 2.37 K, ice 69%, ΔT 0.20 K | ECS 12.11 K, ice **94%**, ΔT 0.11 K | **+25 pp ↑ pre-MPT** |
+<!-- /generated:per-regime -->
 
 The obliquity-band ice-share is **31 percentage points larger pre-MPT**
 (95% vs 64%). Two interpretations:
@@ -216,7 +228,7 @@ The obliquity-band ice-share is **31 percentage points larger pre-MPT**
    argues that the differential (30 pp) is genuine signal, with the absolute
    level inflated by the CO₂ smoothing artifact.
 
-**Caveat**: the iNHG-MPT ECS values (7.82 K obliquity, 5.46 K 100-kyr) are
+**Caveat**: the iNHG-MPT ECS values (<!--v:ecsInhgObliquityK-->7.82<!--/v--> K obliquity, <!--v:ecsInhgHundredK-->6.65<!--/v--> K 100-kyr) are
 likely biased high due to the CenCO2PIP smoothing. The *ratio* and the
 *ice-share contrast* are more robust than absolute ECS at iNHG-MPT.
 
@@ -225,10 +237,12 @@ likely biased high due to the CenCO2PIP smoothing. The *ratio* and the
 Per Doc 92 (LR04 windowed analysis): obliquity-band 0.72× (shrank), 100-kyr
 1.64× (grew). Our Snyder-GAST results:
 
+<!-- generated:dt-shift -->
 | Band | post-MPT ΔT (K) | iNHG-MPT ΔT (K) | Ratio (post/pre) |
 |---|---:|---:|:---:|
 | Obliquity (35–50) | 0.51 | 0.28 | **1.83×** |
-| 100-kyr band | 0.84 | 0.63 | 1.34× |
+| 100-kyr band | 0.75 | 0.64 | 1.18× |
+<!-- /generated:dt-shift -->
 
 Both bands' *absolute* amplitudes grew post-MPT (consistent with larger
 glacial-interglacial range overall after MPT). Doc 92's "obliquity shrank
@@ -251,11 +265,13 @@ amplitude to LR04 amplitude at that frequency.
 
 **Per-band frequency-dependent ice fraction** (Spratt & Lisiecki / LR04):
 
+<!-- generated:tight-fice -->
 | Band | f_ice (was 0.6 constant) |
 |---|---:|
 | Obliquity (35–50 kyr) | **0.77** (HIGHER — ice dominates obliquity response) |
-| 100-kyr band | 0.63 (≈ same as constant) |
+| 100-kyr band | 0.62 (≈ same as constant) |
 | Precession (18–26 kyr) | 0.53 (LOWER — precession is more SST-driven than ice) |
+<!-- /generated:tight-fice -->
 
 This is physically expected: slow ice sheets respond fully at obliquity, less
 at precession. The constant-f_ice approximation **under-weighted ice at
@@ -264,19 +280,23 @@ obliquity** (where ice dominates) and **over-weighted ice at precession**.
 **Three-regime per-band ECS** (with bootstrap N=200, full forcing including
 freq-dep f_ice):
 
+<!-- generated:tight-regimes -->
 | Band | Post-MPT (0–800 kyr) | iNHG-MPT (1000–2000 kyr) | Pre-iNHG (2700–5300 kyr) |
 |---|:---:|:---:|:---:|
-| Obliquity | **2.44 K**, ice 65%, ΔT 0.51 K | 6.38 K, ice **95%**, ΔT 0.28 K | 2.82 K, ice **95%**, ΔT 0.10 K |
-| 100-kyr | **3.65 K**, ice 59%, ΔT 0.84 K | 5.04 K, ice 57%, ΔT 0.63 K | 2.91 K, ice **78%**, ΔT 0.04 K |
-| Precession | 2.76 K, ice 64%, ΔT 0.20 K | 10.13 K, ice **95%**, ΔT 0.11 K | 3.12 K, ice **92%**, ΔT 0.02 K |
+| Obliquity | **2.44 K**, ice 65%, ΔT 0.51 K | 6.36 K, ice **95%**, ΔT 0.28 K | 2.81 K, ice **95%**, ΔT 0.10 K |
+| 100-kyr | **3.63 K**, ice 59%, ΔT 0.75 K | 6.64 K, ice 55%, ΔT 0.64 K | 2.81 K, ice **76%**, ΔT 0.04 K |
+| Precession | 2.76 K, ice 64%, ΔT 0.20 K | 10.07 K, ice **95%**, ΔT 0.11 K | 3.12 K, ice **92%**, ΔT 0.02 K |
+<!-- /generated:tight-regimes -->
 
 **Ice-share contrast across MPT and pre-iNHG**:
 
+<!-- generated:tight-shift -->
 | Band | post-MPT → iNHG-MPT | iNHG-MPT → pre-iNHG | Net (post → pre) |
 |---|:---:|:---:|:---:|
 | Obliquity | **+30 pp** | 0 pp | +30 pp |
-| 100-kyr | -2 pp | +21 pp | +19 pp |
+| 100-kyr | -4 pp | +21 pp | +17 pp |
 | Precession | +31 pp | -3 pp | +28 pp |
+<!-- /generated:tight-shift -->
 
 **Key new findings from the tightened analysis:**
 
@@ -298,7 +318,7 @@ freq-dep f_ice):
    the 100-kyr cycle is a post-MPT post-hysteresis-onset phenomenon — not
    an orbital signal that ice sheets responded to before the MPT.
 
-4. **Post-MPT 100-kyr-band ECS = 3.65 K** (down from 4.13 K under constant
+4. **Post-MPT 100-kyr-band ECS = <!--v:ecsTightPostHundredK-->3.63<!--/v--> K** (down from <!--v:ecsFullForcingHundredK-->4.07<!--/v--> K under constant
    f_ice). Closer to the IPCC AR6 best of 3.0 K and Hansen 2013 Charney of
    3.0 ± 0.5 K. The freq-dep ice fraction tightens the result.
 
@@ -339,14 +359,16 @@ pre-iNHG; Martinez-Boti and de la Vega as cross-validation.
 
 **Headline comparison — boron-derived ECS vs CenCO2PIP-derived (§4.7):**
 
+<!-- generated:boron-compare -->
 | Regime / Band | CenCO2PIP (§4.7) | Boron (§4.8) | Δ ECS |
 |---|---:|---:|---:|
 | Post-MPT obliquity | 2.44 K | 2.79 K | +0.35 |
-| Post-MPT 100-kyr | 3.65 K | 3.57 K | -0.08 |
-| **iNHG-MPT obliquity** | **6.38 K** | **1.83 K** | **-4.55** |
-| iNHG-MPT 100-kyr | 5.04 K | 1.24 K | -3.80 |
-| **Pre-iNHG obliquity** | **2.82 K** | **1.71 K** | **-1.11** |
-| Pre-iNHG 100-kyr | 2.91 K | 1.03 K | -1.88 |
+| Post-MPT 100-kyr | 3.65 K | 3.52 K | -0.13 |
+| **iNHG-MPT obliquity** | **6.38 K** | **1.82 K** | **-4.56** |
+| iNHG-MPT 100-kyr | 5.04 K | 1.26 K | -3.78 |
+| **Pre-iNHG obliquity** | **2.82 K** | **1.80 K** | **-1.02** |
+| Pre-iNHG 100-kyr | 2.91 K | 0.80 K | -2.11 |
+<!-- /generated:boron-compare -->
 
 **Three findings:**
 
@@ -356,14 +378,14 @@ genuine independent cross-validation: completely different reconstruction
 methodology and source data, agreeing on the answer to within ~10%.
 
 **(b) The CenCO2PIP smoothing artifact is real and is now resolved.** At
-iNHG-MPT obliquity, ECS drops from 6.38 K → 1.83 K when boron CO₂ replaces
+iNHG-MPT obliquity, ECS drops from <!--v:ecsTightInhgObliquityK-->6.36<!--/v--> K → <!--v:ecsBoronInhgObliquityK-->1.82<!--/v--> K when boron CO₂ replaces
 the 100-kyr-smoothed CenCO2PIP. The §4.5/§4.7 caveats about "absolute values
 biased HIGH at deep-time regimes" are now confirmed and quantified at ~3-4×
 inflation at obliquity band, ~4× at 100-kyr band.
 
 **(c) NEW result: pre-MPT ECS is ~half of post-MPT.** Pre-iNHG obliquity ECS
-= 1.71 K, cross-validated by de la Vega (1.80 K, same window) and
-Martinez-Boti (1.60 K, iNHG-boundary window). **Three independent boron
+= <!--v:ecsBoronPreObliquityDyezK-->1.80<!--/v--> K, cross-validated by de la Vega (<!--v:ecsBoronPreObliquityDelavegaK-->1.81<!--/v--> K, same window) and
+Martinez-Boti (<!--v:ecsBoronMbObliquityK-->1.59<!--/v--> K, iNHG-boundary window). **Three independent boron
 sources agree.** This *quantitatively confirms* Martinez-Boti et al. 2015's
 qualitative argument that "Pliocene Earth System Sensitivity was half as
 strong as Pleistocene" — but it goes further: we get the same result for
@@ -373,11 +395,13 @@ different feedback engagement, not just absence of ice sheets.
 
 **Cross-source agreement on pre-iNHG obliquity ECS:**
 
+<!-- generated:boron-sources -->
 | Source | Window | ECS (K) | 90% CI |
 |---|---|---:|:---:|
-| Dyez 2018 | 2700–4580 kyr | 1.71 | [0.3, 1.9] |
-| de la Vega 2020 | 2700–4200 kyr | 1.80 | [0.5, 1.9] |
-| Martinez-Boti 2015 | 2400–3200 kyr | 1.60 | [0.5, 2.4] |
+| Dyez 2018 | 2700–4580 kyr | 1.80 | [0.3, 1.8] |
+| de la Vega 2020 | 2700–4200 kyr | 1.81 | [0.5, 1.9] |
+| Martinez-Boti 2015 | 2400–3200 kyr | 1.59 | [0.5, 2.4] |
+<!-- /generated:boron-sources -->
 
 Three independent boron datasets at three different sites give 1.6–1.8 K.
 The result is robust against single-study calibration choices.
@@ -677,21 +701,26 @@ appropriate L1 sub-band:
 
 **Per-integer drift across the entire -50 Myr Cenozoic (modern-lattice baseline, original first-pass analysis):**
 
+<!-- generated:c50-drift -->
 | n | Period (kyr) | Identity | Mean shift | Max \|shift\| |
 |---|---:|---|---:|---:|
-| 28 | 95.8 | g₄-g₅ (Mars-Jupiter ecc) | +1.1% | **2.3%** |
+| **28** | **95.8** | **g₄-g₅ (Mars-Jupiter ecc)** | +1.1% | **2.3%** |
 | 22 | 121.9 | s₁+s₂ (Mercury-Venus nodal) | +3.8% | 6.5% |
-| 14 | 191.6 | g₂-g₈ (Venus-Neptune) | -3.3% | 8.5% |
+| 14 | 191.6 | g₂−g₈ (Venus-Neptune) | -3.3% | 8.4% |
+| 25 | 107.3 | s₁−s₄ (100-kyr centroid) | -7.7% | 10.8% |
+| 9 | 298.1 | g₂−g₇ (Venus-Uranus ecc) | +1.8% | 36.9% |
 | **65** | **41.3** | **k+s₃ obliquity main** | -1.7% | **3.9%** |
 | **66** | **40.6** | **obliquity-band centroid** | -0.8% | **2.4%** |
 | **68** | **39.4** | **k+s₄ obliquity sub** | +0.6% | **2.6%** |
 | 113 | 23.7 | k+g₅ climatic precession | +16.7% | 21.4% |
 | 120 | 22.4 | k+g₂ climatic precession | +24.0% | 28.9% |
+<!-- /generated:c50-drift -->
 
 **Re-analysis under the ESSRT proper-physics lattice (doc 99):**
 
 The drift values above measure observed LA2004 peaks against the *fixed modern lattice* (8H/n with H = 335.317 kyr held constant). Following ESSRT formalization in [doc 99](99-expanding-solar-system-resonance-theory.md), lattice positions should be computed at each window center via the proper-physics formula: `8H(t)/n` where `H(t)` follows from the Farhat 2022 Moon-distance polynomial + angular-momentum conservation (anchored at modern `H = 335.317 kyr`; ~1.0% smaller at -50 Myr). The script `scripts/l1_vs_laskar_published_50myr.py` has been updated to compute both baselines side-by-side.
 
+<!-- generated:c50-essrt -->
 | n | P at modern (kyr) | Identity | Max \|shift\| modern lattice | Max \|shift\| proper-physics lattice | Δ |
 |---|---:|---|---:|---:|---:|
 | 22 | 121.9 | s₂-s₄ nodal (Berger 121-kyr cousin) | 6.5% | 7.4% | +0.9% |
@@ -702,6 +731,7 @@ The drift values above measure observed LA2004 peaks against the *fixed modern l
 | **68** | **39.4** | **k+s₄ (obliquity sub)** | **2.6%** | **2.9%** | **+0.3%** |
 | 113 | 23.7 | k+g₅ climatic precession | 21.4% | 22.0% | +0.6% |
 | 120 | 22.4 | k+g₂ climatic precession | 28.9% | 29.6% | +0.7% |
+<!-- /generated:c50-essrt -->
 
 **The "<4% drift across canonical Milankovitch beats" verdict holds under both baselines.** The four canonical Milankovitch beats (bolded: n=28, 65, 66, 68) stay below the 4% threshold whether measured against the fixed modern lattice or the proper-physics ESSRT lattice. The synthesis verdict below is therefore unchanged.
 
@@ -726,11 +756,13 @@ across the entire 50-Myr backward extension.
 
 **Match-fraction trend by epoch**:
 
+<!-- generated:c50-epoch -->
 | Epoch | Median match <5% |
 |---|---:|
 | Modern (>-10 Myr) | 83.3% |
 | Mid (-30 to -10 Myr) | 75.0% |
 | Deep (< -30 Myr) | 70.8% |
+<!-- /generated:c50-epoch -->
 
 A modest 13 pp decline across -50 Myr — not collapse.
 
@@ -813,10 +845,12 @@ Then test correlation between drift and Fibonacci-distance.
 
 **Results — overall hypothesis test:**
 
+<!-- generated:cfib-stats -->
 | Test | Statistic | p-value | Verdict |
 |---|---:|---:|---|
-| Spearman ρ (drift vs Fib-distance) | +0.33 | 0.064 | Trending, not significant |
-| Mann-Whitney U (near vs far split) | 104 | 0.19 | Trending, not significant |
+| Spearman ρ (drift vs Fib-distance) | +0.28 | 0.118 | Not significant |
+| Mann-Whitney U (near vs far split) | 132 | 0.46 | Not significant |
+<!-- /generated:cfib-stats -->
 
 The overall hypothesis "Fibonacci-distance predicts drift" receives
 *suggestive* support but does not pass strict significance testing on
@@ -824,13 +858,15 @@ N=33 integers.
 
 **Results — by specific Fibonacci divisor:**
 
+<!-- generated:cfib-groups -->
 | Nearest Fibonacci | n integers | Median drift | Mean drift |
 |---|---:|---:|---:|
 | **H/8 obliquity (8H/64)** | **7** | **2.6%** | **3.0%** |
 | H/5 ecliptic | 5 | 8.9% | 7.6% |
 | H/13 axial | 4 | 10.2% | 9.6% |
-| H/3 inclination | 11 | 9.6% | 12.2% |
+| H/3 inclination | 12 | 10.2% | 12.2% |
 | H/16 perihelion | 5 | 13.4% | 15.6% |
+<!-- /generated:cfib-groups -->
 
 **The H/8 obliquity divisor cluster shows ~4× lower drift than any other
 Fibonacci-anchor group.** Integers near 8H/64 (n=65, 66, 68, 73, 76, 50,
@@ -894,15 +930,21 @@ integers via Mann-Whitney U.
 Mann-Whitney U test (L1 vs non-L1 drift): p = 0.50 — statistically
 indistinguishable. Rankings of our L1 picks among 71 scanned integers:
 
+<!-- generated:ch8-l1rows -->
 | L1 n | Period | Rank | Drift | Beat |
 |---:|---:|---:|---:|:---|
-| 110 | 24.4 kyr | 2/71 | 1.1% | k-s₇ |
-| 107 | 25.1 kyr | 5/71 | 1.1% | k-s₈ |
+| 110 | 24.4 kyr | 2/71 | 1.1% | k−s₇ |
+| 107 | 25.1 kyr | 5/71 | 1.1% | k−s₈ |
 | 76 | 35.3 kyr | 10/71 | 1.4% | s₃+s₄ |
 | 66 | 40.6 kyr | 31/71 | 2.4% | s₁+s₆ |
+| 96 | 27.9 kyr | 34/71 | 2.5% | k−g₅ |
 | 68 | 39.4 kyr | 38/71 | 2.6% | k+s₄ |
+| 53 | 50.6 kyr | 42/71 | 2.9% | s₆−s₈ |
+| 73 | 36.7 kyr | 51/71 | 3.5% | g₃+g₄ |
+| 50 | 53.7 kyr | 55/71 | 3.8% | k+s₆ |
 | 65 | 41.3 kyr | 56/71 | 3.9% | g₆+g₇ |
-| 48 | 55.9 kyr | **71/71** | 6.8% | s₆-s₇ |
+| 48 | 55.9 kyr | **71/71** | 6.8% | s₆−s₇ |
+<!-- /generated:ch8-l1rows -->
 
 n=65 — the framework's "obliquity main" — ranks 56th of 71. n=48 is the
 *least* stable integer in the entire scanned range. The Test C-Fib
@@ -1552,8 +1594,8 @@ Scripts: `scripts/precession_band_disambiguation.py`.
    from at least the Pliocene (>5 Ma) and was specifically silenced at MPT
    (~1 Ma), not gradually over the iNHG-to-MPT interval.
 
-5. **Frequency-dependent ice fraction** (obliquity 0.77, 100-kyr 0.63,
-   precession 0.53) directly measured from Spratt & Lisiecki 2016 sea-level
+5. **Frequency-dependent ice fraction** (obliquity <!--v:tightFiceObliquity-->0.77<!--/v-->, 100-kyr <!--v:tightFiceHundred-->0.62<!--/v-->,
+   precession <!--v:tightFicePrecession-->0.53<!--/v-->) directly measured from Spratt & Lisiecki 2016 sea-level
    stack ÷ LR04 amplitude ratio. The standard paleoclimate literature uses a
    single ice/T deconvolution factor (Bintanja & van de Wal 2008); this
    provides the frequency-resolved version.
@@ -1639,8 +1681,8 @@ peaks). However:
 
 - ~~The "ice fraction" assignment to LR04 (60%) is itself frequency-dependent
   in reality; we use a constant.~~ **RESOLVED in §4.7** via Spratt & Lisiecki
-  2016 sea-level / LR04 amplitude ratio per L1 line (obliquity 0.77, 100-kyr
-  0.63, precession 0.53).
+  2016 sea-level / LR04 amplitude ratio per L1 line (obliquity <!--v:tightFiceObliquity-->0.77<!--/v-->, 100-kyr
+  <!--v:tightFiceHundred-->0.62<!--/v-->, precession <!--v:tightFicePrecession-->0.53<!--/v-->).
 - The "other GHG" multiplier of 0.5 follows Hansen 2013's LGM ratio. At other
   orbital frequencies this ratio could differ.
 - Quasi-equilibrium response assumption: Charney sensitivity assumes the
@@ -1702,6 +1744,11 @@ python3 scripts/l1_fibonacci_stability_test.py
 # 15. Granular scan of H/8 sub-band — are L1 picks the optimal positions?
 #     Result: NO. L1 picks are climate-driven, not stability-maximizing.
 python3 scripts/h8_subband_scan.py
+
+# 16. Rewrite this document's numeric tables from the artifacts above
+#     (every table between <!-- generated:… --> markers is owned by this script;
+#      `npm run docs:tables` fails the docs gate if they drift)
+python3 scripts/generate_doc97_tables.py
 ```
 
 All results land in `data/climate-ecs-*.json`.

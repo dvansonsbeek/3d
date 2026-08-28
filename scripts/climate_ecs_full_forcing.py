@@ -313,6 +313,9 @@ def main():
         s_co2 = stats(rows, "ecs_co2only_K")
         s_full = stats(rows, "ecs_full_K")
         band_stats[bname] = {"co2_only": s_co2, "full": s_full}
+        if rows:  # ΔT-weighted ice share of the total forcing in this band (doc 97 §4.1/§4.3)
+            band_stats[bname]["ice_share_weighted"] = float(np.average(
+                [r["ice_share_of_dF"] for r in rows], weights=[r["amp_T_K"] for r in rows]))
         if s_co2 and s_full:
             red = (s_co2["weighted_mean_K"] - s_full["weighted_mean_K"]) / s_co2["weighted_mean_K"] * 100
             print(f"   {bname:<25}{s_co2['n_lines']:>4}"

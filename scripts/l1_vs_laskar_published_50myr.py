@@ -545,7 +545,7 @@ def main():
             "(Farhat 2022 quartic) + angular-momentum conservation. "
             "Anchored at modern 335.317 kyr, validated against Devonian "
             "(380 Ma) 309.083 kyr. Across Cenozoic (-50 Myr), H shrinks "
-            "smoothly from 335.317 to ~331.86 kyr (-1.03%). All 32 L1 integer "
+            "smoothly from 335.317 to ~331.86 kyr (-1.03%). All L1 integer "
             "predictions track this expansion via 8H(t)/n; per the framework's "
             "integer-label-invariance claim (doc 98), the integer labels stay "
             "the same while the absolute periods rescale with H(t)."

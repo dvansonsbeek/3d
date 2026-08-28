@@ -363,8 +363,9 @@ def main():
         fi = f_ice_per_line[n]
         print(f"   {n:>4}{EIGHT_H/n:>9.1f}{aL:>11.4f}{aS:>10.3f}{fi:>8.2f}")
 
-    # Show per-band mean f_ice
+    # Show per-band mean f_ice (also written to the artifact — doc 97 §4.7 reads it)
     print()
+    band_f_ice = {}
     for bname, ranges in BANDS.items():
         in_band = [(n, f_ice_per_line[n], amps_lr_sl[n]["amp"])
                    for n in L1_LATTICE_INTEGERS
@@ -374,6 +375,7 @@ def main():
             fs = [x[1] for x in in_band]
             ws = [x[2] for x in in_band]
             mean_f = float(np.average(fs, weights=ws))
+            band_f_ice[bname] = {"f_ice": mean_f, "n_lines": len(in_band)}
             print(f"   Band {bname:<25}: mean f_ice = {mean_f:.2f}  (n_lines = {len(in_band)})")
 
     # ── Step 2 + 3: Per-regime analysis with bootstrap ──
@@ -451,6 +453,7 @@ def main():
             "t_per_permil_lr04_K": T_PER_PERMIL_LR04,
         },
         "freq_dep_ice_fraction": {str(n): f_ice_per_line[n] for n in L1_LATTICE_INTEGERS},
+        "band_f_ice": band_f_ice,
         "regimes": {
             "post_mpt": {"window_kyr": [0, 800], "by_band": bands_post, "spectrum": spec_post},
             "inhg_mpt": {
