@@ -2679,6 +2679,11 @@ export const VALUES = {
     const share = (regime, band) => 100 * reg()[regime].by_band[band].ice_share_weighted;
     const residual = (p) => bal().deepAnalysis.configs[11].bestAnchor.perPlanet[p].errArcsec;
     const kv = () => astro.knownValues;
+    // l1-invariant-test.json can carry Infinity (CV of a zero-variance control) — tolerate it.
+    const rdx = (p) => JSON.parse(readFileSync(join(ROOT, p), 'utf8').replace(/\bInfinity\b/g, '1e308').replace(/\bNaN\b/g, 'null'));
+    let invM = null, libM = null;
+    const inv = () => { if (!invM) invM = rdx('data/l1-invariant-test.json'); return invM; };
+    const lib = () => { if (!libM) libM = rdx('data/l1-libration-test.json'); return libM; };
     const out = {
       charneyECS:     { get: () => ecs().overall.median, render: (v) => Number(v).toFixed(2), unit: 'K' },
       charneyECSLow:  { get: () => ecs().overall.p5, render: (v) => Number(v).toFixed(2), unit: 'K' },
@@ -2695,16 +2700,30 @@ export const VALUES = {
         unit: 'pp',
         note: 'derived from the artifact pre/post shares',
       },
-      chengR2: { get: () => kv().chengR2, render: (v) => String(v) },
+      // Re-run campaign artifacts (33-divisor lattice) — bound to their generators, not snapshots.
+      chengR2: { get: () => rd('data/climate-ecs-cross-proxy.json').cheng_R2_L1, render: (v) => Number(v).toFixed(2), note: 'full L1 lattice fitted to Cheng 2016 Asian-monsoon δ¹⁸O (climate_ecs_cross_proxy.py)' },
       testAObliquityLagPercentile: { get: () => kv().testAObliquityLagPercentile, render: (v) => String(v), unit: '%' },
       testAObliquityPeakMatch: { get: () => kv().testAObliquityPeakMatch, render: (v) => String(v) },
       testAEccentricityNull: { get: () => kv().testAEccentricityNullPct, render: (v) => String(v), unit: '%' },
       eightHDerivabilityTopPct: { get: () => kv().eightHDerivabilityTopPct, render: (v) => String(v), unit: '%' },
-      testCInvariantObliquityPct: { get: () => kv().testCInvariantObliquityPct, render: (v) => String(v), unit: '%' },
-      testCInvariantRandomPct: { get: () => kv().testCInvariantRandomPct, render: (v) => String(v), unit: '%' },
+      testCInvariantObliquityPct: { get: () => 100 * inv().band_width_sensitivity['7.5'].obl_mean, render: (v) => String(Math.round(v)), unit: '%', note: 'LA2004 obliquity PSD fraction inside ±7.5% bands around the L1 integers, mean over sliding 5-Myr windows (l1_invariant_test.py)' },
+      testCInvariantRandomPct: { get: () => 100 * inv().control_summary.obl_mean_mean, render: (v) => String(Math.round(v)), unit: '%', note: 'the same obliquity fraction for random same-size integer sets at ±5% bands (200 controls)' },
+      testCInvariantEccPct15: { get: () => 100 * inv().band_width_sensitivity['15.0'].ecc_mean, render: (v) => Number(v).toFixed(1), unit: '%', note: 'LA2004 eccentricity PSD fraction inside ±15% bands around the L1 integers' },
+      testCInvariantEccOffLatticePct15: { get: () => 100 * (1 - inv().band_width_sensitivity['15.0'].ecc_mean), render: (v) => Number(v).toFixed(1), unit: '%', note: 'eccentricity power outside the ±15% lattice bands' },
+      testCInvariantEccPct5: { get: () => 100 * inv().band_width_sensitivity['5.0'].ecc_mean, render: (v) => Number(v).toFixed(1), unit: '%', note: 'eccentricity on-lattice fraction at ±5% bands' },
+      testCInvariantRandomEccPct5: { get: () => 100 * inv().control_summary.ecc_mean_mean, render: (v) => Number(v).toFixed(1), unit: '%', note: 'random same-size integer sets, eccentricity fraction at ±5% bands' },
+      testCInvariantControlsBeatingL1Ecc: { get: () => Math.round(inv().n_controls * inv().L1_percentile_within_controls.ecc_mean_pct_better / 100), render: (v) => String(v), note: 'number of the random controls whose ±5% eccentricity on-lattice fraction exceeds L1\'s' },
+      testCInvariantControls: { get: () => inv().n_controls, render: (v) => String(v), note: 'random same-size integer sets drawn' },
+      testCInvariantEccFrac5: { get: () => inv().band_width_sensitivity['5.0'].ecc_mean, render: (v) => Number(v).toFixed(3), note: 'L1 eccentricity on-lattice fraction at ±5% bands (mean over windows)' },
+      testCInvariantRandomEccFrac5: { get: () => inv().control_summary.ecc_mean_mean, render: (v) => Number(v).toFixed(3), note: 'random controls, eccentricity on-lattice fraction at ±5% bands (mean of the controls)' },
+      testCInvariantEccCv: { get: () => inv().band_width_sensitivity['5.0'].ecc_cv, render: (v) => Number(v).toFixed(3), note: 'CV across sliding windows of the L1 eccentricity fraction (±5%)' },
+      testCInvariantRandomEccCv: { get: () => inv().control_summary.ecc_cv_mean, render: (v) => Number(v).toFixed(3), note: 'mean CV across windows of the random controls (±5%)' },
+      testCInvariantEccMeanPctBetter: { get: () => inv().L1_percentile_within_controls.ecc_mean_pct_better, render: (v) => Number(v).toFixed(1), unit: '%', note: 'share of controls whose mean eccentricity fraction beats L1' },
+      testCInvariantEccCvPctBetter: { get: () => inv().L1_percentile_within_controls.ecc_cv_pct_better, render: (v) => Number(v).toFixed(1), unit: '%', note: 'share of controls whose CV across windows is lower than L1' },
+      testCInvariantEccRatio5: { get: () => inv().band_width_sensitivity['5.0'].ecc_mean / inv().control_summary.ecc_mean_mean, render: (v) => `${Number(v).toFixed(1)}×`, note: 'L1 ÷ random eccentricity on-lattice fraction at ±5% bands' },
       testCBalanceSaturnMult: { get: () => kv().testCBalanceSaturnMult, render: (v) => String(v) },
       testCBalancePValue: { get: () => kv().testCBalancePValue, render: (v) => fmtSci(v, 0) },
-      testCLibrationPValue: { get: () => kv().testCLibrationPValue, render: (v) => String(v) },
+      testCLibrationPValue: { get: () => lib().aggregate_bias.t_pvalue, render: (v) => Number(v).toFixed(2), note: 'two-sided t-test of the aggregate LA2004 period bias against zero (equilibrium_libration_test.py)' },
       testC50Window: { get: () => kv().testC50WindowMyr, render: (v) => `−${Math.abs(v)}`, unit: 'Myr' },
     };
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {

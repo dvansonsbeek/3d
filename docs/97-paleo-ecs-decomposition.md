@@ -1067,19 +1067,19 @@ should be no better than a random integer selection.
 **Method.** For each sliding 5-Myr window, compute Welch PSD for LA2004
 eccentricity and obliquity (-51 to 0 Myr). For band half-widths from
 ±2.5% to ±20% around each 8H/n, sum the power inside the lattice bands
-and divide by total power over periods 10–500 kyr. Compare to 200
-random 32-integer lattices in n ∈ [5, 200].
+and divide by total power over periods 10–500 kyr. Compare to <!--v:testCInvariantControls-->200<!--/v-->
+random 33-integer lattices in n ∈ [5, 200].
 
 **Result — eccentricity vs random null:**
 
-| Metric | L1 | Random 32-integer controls | L1 percentile |
+| Metric | L1 | Random 33-integer controls | L1 percentile |
 |:---|---:|---:|---:|
-| Mean fraction (±5% bands) | 0.638 | 0.250 (mean of 200) | **best (0% beat L1)** |
-| CV across windows | 0.105 | 0.127 (mean) | 33.5% |
+| Mean fraction (±5% bands) | <!--v:testCInvariantEccFrac5-->0.645<!--/v--> | <!--v:testCInvariantRandomEccFrac5-->0.259<!--/v--> (mean of <!--v:testCInvariantControls-->200<!--/v-->) | **<!--v:testCInvariantEccMeanPctBetter-->0.5<!--/v-->% beat L1** |
+| CV across windows | <!--v:testCInvariantEccCv-->0.104<!--/v--> | <!--v:testCInvariantRandomEccCv-->0.129<!--/v--> (mean) | <!--v:testCInvariantEccCvPctBetter-->29.5<!--/v-->% |
 
-L1 captures **more than 2.5× the power** of any random integer selection
-in the same range — none of 200 controls beat it. p < 1/200 for L1's
-mean capture.
+L1 captures **<!--v:testCInvariantEccRatio5-->2.5×<!--/v--> the power** of the random integer selections
+in the same range — <!--v:testCInvariantControlsBeatingL1Ecc-->1<!--/v--> of <!--v:testCInvariantControls-->200<!--/v--> controls beats it (p ≈ 1/200 for L1's
+mean capture).
 
 **Result — band-width sensitivity (drift vs off-lattice noise):**
 
@@ -1101,7 +1101,7 @@ entire 50 Myr. The 8H lattice is the complete spectral description of
 Earth's obliquity dynamics.
 
 **(2) Eccentricity is a dominant attractor on the 8H lattice, but not
-strict.** The plateau reaches **73.8%** at ±15% bands — meaning ~26% of
+strict.** The plateau reaches **<!--v:testCInvariantEccPct15-->73.8<!--/v-->%** at ±15% bands — meaning ~26% of
 LA2004 eccentricity power lies in genuinely off-lattice frequencies that
 no L1 band can capture. The on-lattice fraction beats every random
 control (p<1/200), but the lattice is not a complete description.
@@ -1119,7 +1119,7 @@ chaos showing up in eccentricity's off-lattice 26%.
 | Channel | On-lattice | Off-lattice | Interpretation |
 |:---|---:|---:|:---|
 | Obliquity | **100.0%** | 0.0% | 8H lattice IS the complete dynamics. Laskar's obliquity integration confirms the framework's lattice with no leakage. |
-| Eccentricity | 73.8% | 26.2% | 8H lattice is the dominant attractor; off-lattice 26% is inner-planet eccentricity chaos. |
+| Eccentricity | <!--v:testCInvariantEccPct15-->73.8<!--/v-->% | <!--v:testCInvariantEccOffLatticePct15-->26.2<!--/v-->% | 8H lattice is the dominant attractor; off-lattice ~26% is inner-planet eccentricity chaos. |
 
 The Earth-Saturn axis (Config #7, Law 6, k+g₆) is specifically a **spin
 / obliquity** coupling axis. And obliquity is precisely the channel
