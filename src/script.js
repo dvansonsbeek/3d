@@ -16908,7 +16908,7 @@ const ECC_AMP_SCALE = {
 const ECC_CYCLE_SCALE = {
   mercury: mercuryWobblePeriod,
   venus:   venusWobblePeriod,
-  earth:   perihelionCycleLength,
+  earth:   earthPerihelionICRFYears,  // H/3 — Earth's |e| rides the one eccentricity law; the H/16 = 13+3 beat is the perihelion direction only
   mars:    marsWobblePeriod,
   jupiter: jupiterWobblePeriod,
   saturn:  saturnWobblePeriod,
@@ -17402,7 +17402,7 @@ function createGHOPanel() {
     'ICRF perihelion precession = inclination oscillation cycle. Ecliptic rate minus general precession (H/13).',
     'Ascending node regression on the invariable plane. Integer divisors of 8H, fit to JPL J2000-fixed-frame trends.',
     'Obliquity oscillation: axial tilt variation period. Beat of axial precession and ICRF perihelion.',
-    'Eccentricity cycle: orbital eccentricity oscillation period. Beat of axial precession and ICRF perihelion (wobble period).',
+    'Eccentricity cycle: orbital eccentricity oscillation period. Beat of axial precession and ICRF perihelion (wobble period). Earth is the exception: its |e| rides the H/3 eccentricity law; the H/16 = 13+3 beat is the perihelion direction only.',
   ];
 
   panel.innerHTML = `

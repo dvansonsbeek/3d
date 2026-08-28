@@ -683,6 +683,39 @@ export const VALUES = {
     out.insolStabEccMaxModel = { get: () => stb().ecc_range_model_0_5320kyr[1], render: (v) => Number(v).toFixed(4), note: 'the one-law e(t) maximum over the LR04 span (0–5320 kyr)' };
     out.insolStabEccMinLaskar = { get: () => stb().ecc_range_laskar_0_5320kyr[0], render: (v) => Number(v).toFixed(4), note: 'La2004 e(t) minimum over the LR04 span' };
     out.insolStabEccMaxLaskar = { get: () => stb().ecc_range_laskar_0_5320kyr[1], render: (v) => Number(v).toFixed(4), note: 'La2004 e(t) maximum over the LR04 span' };
+    // L1 attribution of the pre-iNHG e(t) gain: the lattice line n = 24 (8H/24 = H/3)
+    const n24 = () => rd('data/l1-n24-attribution-results.json');
+    const pre = () => n24().regime_results['pre-inhg'];
+    const f4 = (v) => Number(v).toFixed(4);
+    out.l1N24LineN = { get: () => n24().metadata.line_n, render: (v) => String(v), note: 'the lattice divisor tested: 8H/n = H/3' };
+    out.l1N24PeriodKyr = { get: () => n24().metadata.line_period_kyr, render: (v) => Number(v).toFixed(1), note: '8H/24 in kyr — the one-law eccentricity line' };
+    out.l1N24NeighbourLo = { get: () => n24().metadata.l1_neighbours[0], render: (v) => String(v), note: 'nearest L1 divisor below 24' };
+    out.l1N24NeighbourHi = { get: () => n24().metadata.l1_neighbours[1], render: (v) => String(v), note: 'nearest L1 divisor above 24' };
+    out.l1N24EccCvPreInhg = { get: () => pre().ecc_only.cv, render: sdr, note: 'CV ΔR² of the model e(t) feature ALONE (fixed H/3 phase), pre-iNHG' };
+    out.l1N24EccInSamplePreInhg = { get: () => pre().ecc_only.in_sample, render: sdr, note: 'in-sample ΔR² of the model e(t) feature alone, pre-iNHG' };
+    out.l1N24LineCvPreInhg = { get: () => pre().line_pair.cv, render: sdr, note: 'CV ΔR² of the free-phase 8H/24 cos/sin pair, pre-iNHG' };
+    out.l1N24LineInSamplePreInhg = { get: () => pre().line_pair.in_sample, render: sdr, note: 'in-sample ΔR² of the free-phase 8H/24 pair, pre-iNHG' };
+    out.l1N24PeriPairCvPreInhg = { get: () => pre().peri_pair.cv, render: sdr, note: 'CV ΔR² of the e·sin ϖ / e·cos ϖ pair alone, pre-iNHG' };
+    out.l1N24EpsCvPreInhg = { get: () => pre().eps_only.cv, render: sdr, note: 'CV ΔR² of the ε anomaly alone, pre-iNHG' };
+    out.l1N24EccOnTopOfLineInSample = { get: () => pre().ecc_on_top_of_line.in_sample, render: sdr, note: 'in-sample ΔR² the model e(t) adds ON TOP of the 8H/24 pair, pre-iNHG' };
+    out.l1N24R2EccByLine = { get: () => pre().r2_ecc_by_line_pair, render: (v) => Number(v).toFixed(3), note: 'R² of the standardized model e(t) feature explained by a free-phase 8H/24 pair, pre-iNHG window' };
+    out.l1N24ScanCv235 = { get: () => pre().scan_cv['23.5'], render: sdr, note: 'CV ΔR² of a free-phase 8H/23.5 pair (specificity control), pre-iNHG' };
+    out.l1N24ScanCv245 = { get: () => pre().scan_cv['24.5'], render: sdr, note: 'CV ΔR² of a free-phase 8H/24.5 pair (specificity control), pre-iNHG' };
+    out.l1N24ScanCv22 = { get: () => pre().scan_cv['22'], render: sdr, note: 'CV ΔR² of a free-phase 8H/22 pair (the lower L1 neighbour), pre-iNHG' };
+    out.l1N24ScanCv25 = { get: () => pre().scan_cv['25'], render: sdr, note: 'CV ΔR² of a free-phase 8H/25 pair (the upper L1 neighbour), pre-iNHG' };
+    out.l1N24PhaseDataPreInhg = { get: () => pre().phase_data_deg, render: (v) => Number(v).toFixed(1), note: 'best-fit phase of the 8H/24 line in the pre-iNHG canonical residual, degrees' };
+    out.l1N24PhaseModelPreInhg = { get: () => pre().phase_model_deg, render: (v) => Number(v).toFixed(1), note: 'phase of the model H/3 eccentricity line on the same convention, degrees' };
+    out.l1N24PhaseDiffDegPreInhg = { get: () => pre().phase_diff_deg, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(1), note: 'data − model phase of the 8H/24 line, pre-iNHG, degrees' };
+    out.l1N24PhaseDiffKyrPreInhg = { get: () => Math.abs(pre().phase_diff_kyr), render: (v) => Number(v).toFixed(1), note: '|data − model| phase of the 8H/24 line as a time offset, kyr' };
+    out.l1N24PhaseDiffDegLr04Full = { get: () => n24().regime_results['lr04-full'].phase_diff_deg, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(1), note: 'data − model phase of the 8H/24 line over the full LR04 record, degrees' };
+    for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
+      out[`l1N24LatticeDeltaR2${key}`] = { get: () => n24().regime_results[reg].lattice_plus_line.delta_r2, render: sdr, note: `ΔR² of the canonical L1+L2+L3 fit when 24 is ADDED to the lattice, regime ${reg}` };
+      out[`l1N24AmpOverMedian${key}`] = { get: () => n24().regime_results[reg].lattice_plus_line.amp_line_over_median, render: (v) => Number(v).toFixed(2), note: `n = 24 amplitude / median L1 amplitude in the 33-divisor fit, regime ${reg}` };
+      out[`l1N24Rank${key}`] = { get: () => n24().regime_results[reg].lattice_plus_line.rank_of_line, render: (v) => String(v), note: `rank of the n = 24 amplitude among the 33 divisors, regime ${reg}` };
+    }
+    out.l1N24R2CanonPreInhg = { get: () => pre().r2_l1_l2_l3, render: f4, note: 'R² of the canonical 32-divisor fit, pre-iNHG' };
+    out.l1N24R2WithLinePreInhg = { get: () => pre().lattice_plus_line.r2_l1_l2_l3, render: f4, note: 'R² of the canonical fit with 24 added (33 divisors), pre-iNHG' };
+    out.l1N24AdmissionRule = { get: () => n24().summary.admission_rule_x_median, render: (v) => `${Number(v)}×`, note: 'the doc 91 lattice admission rule: amplitude ≥ this × the median, full LR04' };
     for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
       out[`insolExtInsolOnlyR2${key}`] = { get: () => ext().regime_results._insol_only_r2[reg], render: (v) => Number(v).toFixed(4), note: `R² of the four classical insolation features ALONE (no L1/L2/L3), regime ${reg}` };
       out[`insolExtR2L1${key}`] = { get: () => ext().regime_results[reg].r2_l1, render: (v) => Number(v).toFixed(3), note: `R² of L1 alone, regime ${reg}` };
@@ -1806,7 +1839,7 @@ export const VALUES = {
     out.perihelionPassageJD = { get: () => astro.earthOrbital.perihelionPassageJ2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (2000 Jan 3)' };
     out.juneSolstice2000JD = { get: () => astro.earthOrbital.juneSolstice2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (June 21, 2000)' };
     out.iauPrecessionInputYears = { get: () => astro.yearLengthRef.iauPrecessionJ2000, render: (v) => thousands(v, 2), unit: 'yr', note: 'stored iauPrecessionJ2000 input — IAU 2006 rate on the model day basis' };
-    out.earthEccCycle = { get: () => C.H / 16, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the of-date wobble beat (H/16 = 13+3) — the perihelion-DIRECTION cycle kept for the planet-family table; Earth |e| itself rides the H/3 eccentricity law (doc 55 §6)' };
+    out.earthEccCycle = { get: () => C.H / 3, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the period of Earth\'s |e| oscillation — the one H/3 eccentricity law (doc 55 §6). The H/16 = 13+3 wobble beat is the perihelion-DIRECTION cycle (periPrecYears), not the eccentricity cycle' };
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const n = model.planets[p].ascendingNodeCyclesIn8H;
       out[`${p}AscNodeCycleYears`] = { get: () => (8 * C.H) / n, render: (v) => thousands(Math.round(v)), unit: 'yr', note: `asc-node cycle = 8H/${n}` };

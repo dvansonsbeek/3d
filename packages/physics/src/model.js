@@ -86,10 +86,9 @@ export function assembleModel(C, F) {
 
   const earthtiltMean = C.earth.earthtiltMean;
   const earthInclAmplitude = C.earth.earthInvPlaneInclinationAmplitude;
-  // eccentricityAmplitude: the v11 H/16-beat amplitude, RETAINED ONLY as the
-  // Law-4 K calibration input (plan IP-eccentricity-unification, decision D2:
-  // K keeps its value). Earth's eccentricity law no longer uses it — see
-  // eccentricityAt (base' derived) below.
+  // eccentricityAmplitude: the Law-4 input A (the 1246 triangle closure; the
+  // wobble-marker distance). It is the K calibration input ONLY — Earth's
+  // eccentricity law does not use it; see eccentricityAt (base' derived) below.
   const eccentricityAmplitude = C.earth.eccentricityAmplitude;
   const earthRAAngle = 2 * earthInclAmplitude - (earthInclAmplitude * earthInclAmplitude) / earthtiltMean;
   const earthInclMean = C.earthOrbital.earthInclinationJ2000_deg

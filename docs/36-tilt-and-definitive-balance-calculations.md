@@ -163,8 +163,12 @@ Because the axial tilt oscillation and the inclination oscillation operate at
 DIFFERENT periods, their combined effect produces a real eccentricity fluctuation
 at the planet's eccentricity cycle — the meeting frequency where axial precession
 meets inclination precession. Each planet has its own eccentricity cycle (see
-Section 10 and `docs/37-planets-precession-cycles.md`). For Earth the eccentricity
-cycle is H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> years, resulting in an amplitude of <!--v:eccentricityAmplitude-->0.001356<!--/v--> (dimensionless).
+Section 10 and `docs/37-planets-precession-cycles.md`). Earth is the exception:
+its 13+3 beat (H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> years) governs the
+perihelion *direction* only, and Earth's |e| oscillates on the one H/3 law,
+e(t) = base′·(1 + cos θ₃/2), with amplitude base′/2 (docs 55 §6, 21). The
+Law-4 input A = <!--v:eccentricityAmplitude-->0.001356<!--/v--> is the 1246
+triangle closure (the wobble-marker distance), not an eccentricity amplitude.
 
 **Step 6 — Eccentricity balance is maintained at every epoch.**
 The mean perihelion distances (base eccentricities) achieve ~99.9% Law 5 balance.

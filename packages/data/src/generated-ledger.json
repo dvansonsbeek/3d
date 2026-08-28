@@ -24,6 +24,7 @@
     "insolation-extension-results.json": "scripts/milankovitch_insolation_extension.py",
     "insolation-laskar-check-results.json": "scripts/milankovitch_insolation_laskar_check.py",
     "insolation-stability-results.json": "scripts/milankovitch_insolation_stability.py",
+    "l1-n24-attribution-results.json": "scripts/milankovitch_l1_n24_attribution.py",
     "jpl-cache.json": "tools/lib/horizons-client.js",
     "lattice-scan-shipped.json": "scripts/lattice_harmonic_scan.py",
     "milankovitch-8h-all-integer-mtm.json": "scripts/milankovitch_8h_all_integer_mtm.py",

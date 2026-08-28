@@ -57,7 +57,7 @@ All periods expressed as 8H/N where 8H = <!--v:eightH-->2,682,536<!--/v--> years
 |--------|:-----:|:----------:|:----------:|:---------:|:---------:|:----------:|
 | Mercury | **−8H/9** | 8H/11 | −8H/93 | **−8H/9** | 8H/3 | 8H/84 |
 | Venus | +8H/91 | −8H/6 | −8H/110 | **−8H/1** | 8H/110 | 8H/19 |
-| **Earth** | **−8H/104** | **8H/128** | **+8H/24** | **−8H/40** | **8H/64** | **8H/128** |
+| **Earth** | **−8H/104** | **8H/128** | **+8H/24** | **−8H/40** | **8H/64** | **8H/24** (\|e\| rides the H/3 law; the 8H/128 = H/16 beat is the perihelion direction) |
 | Mars | −8H/16 | 8H/36 | −8H/68 | **−8H/64** | 8H/21 | 8H/52 |
 | Jupiter | −8H/21 | 8H/39 | −8H/65 | **−8H/36** | 8H/16 | 8H/44 |
 | Saturn | −8H/6 | −8H/65 | −8H/169 | **−8H/36** | 8H/24 | 8H/163 |
@@ -79,7 +79,7 @@ Notes:
 |--------|--:|--:|--:|--:|--:|--:|
 | Mercury | **−<!--v:mercuryAxialPeriod-->298,060<!--/v-->** | <!--v:mercuryPeriPeriod-->243,867<!--/v--> | −<!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> | **−<!--v:mercuryAscNodeCycleYears-->298,060<!--/v-->** | <!--v:mercuryObliqCycle-->894,179<!--/v--> | <!--v:mercuryEccCycle-->31,935<!--/v--> |
 | Venus | +<!--v:venusAxialPeriod-->29,478<!--/v--> | −<!--v:venusPeriPeriod-->447,089<!--/v--> | −<!--v:venusPeriPeriodICRF-->24,387<!--/v--> | **−<!--v:venusAscNodeCycleYears-->2,682,536<!--/v-->** | <!--v:venusObliqCycle-->24,387<!--/v--> | <!--v:venusEccCycle-->141,186<!--/v--> |
-| **Earth** | **−<!--v:earthAxialPeriod-->25,794<!--/v-->** | **<!--v:earthPeriPeriod-->20,957<!--/v-->** | **+<!--v:earthPeriPeriodICRF-->111,772<!--/v-->** | **−<!--v:hDiv5-->67,063<!--/v-->** | **<!--v:hDiv8-->41,915<!--/v-->** | **<!--v:earthEccCycle-->20,957<!--/v-->** |
+| **Earth** | **−<!--v:earthAxialPeriod-->25,794<!--/v-->** | **<!--v:earthPeriPeriod-->20,957<!--/v-->** | **+<!--v:earthPeriPeriodICRF-->111,772<!--/v-->** | **−<!--v:hDiv5-->67,063<!--/v-->** | **<!--v:hDiv8-->41,915<!--/v-->** | **<!--v:earthEccCycle-->111,772<!--/v-->** |
 | Mars | −<!--v:marsAxialPeriod-->167,659<!--/v--> | <!--v:marsPeriPeriod-->74,515<!--/v--> | −<!--v:marsPeriPeriodICRF-->39,449<!--/v--> | **−<!--v:marsAscNodeCycleYears-->41,915<!--/v-->** | <!--v:marsObliqCycle-->127,740<!--/v--> | <!--v:marsEccCycle-->51,587<!--/v--> |
 | Jupiter | −<!--v:jupiterAxialPeriod-->127,740<!--/v--> | <!--v:jupiterPeriPeriod-->68,783<!--/v--> | −<!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> | **−<!--v:jupiterAscNodeCycleYears-->74,515<!--/v-->** | <!--v:jupiterObliqCycle-->167,659<!--/v--> | <!--v:jupiterEccCycle-->60,967<!--/v--> |
 | Saturn | −<!--v:saturnAxialPeriod-->447,089<!--/v--> | −<!--v:saturnPeriPeriod-->41,270<!--/v--> | −<!--v:saturnPeriPeriodICRF-->15,873<!--/v--> | **−<!--v:saturnAscNodeCycleYears-->74,515<!--/v-->** | <!--v:saturnObliqCycle-->111,772<!--/v--> | <!--v:saturnEccCycle-->16,457<!--/v--> |

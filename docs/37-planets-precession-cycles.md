@@ -321,7 +321,7 @@ Earth is the only planet with prograde perihelion ICRF.
 |--------|-----------|---------------|---------|-------------|--------|--------|
 | Mercury | retro | retro | same: \|diff\| | 84/(8H) | <!--v:mercuryEccCycle-->31,935<!--/v--> yr | 2H/21 |
 | Venus | pro | retro | \|diff\| | 19/(8H) | <!--v:venusEccCycle-->141,186<!--/v--> yr | 8H/19 |
-| Earth | retro | pro | opp: sum | 16/H | <!--v:earthPeriPeriod-->20,957<!--/v--> yr | **H/16** |
+| Earth | retro | pro | opp: sum → 16/H = perihelion *direction* only | 3/H | <!--v:earthEccCycle-->111,772<!--/v--> yr | **H/3** (\|e\| rides the one eccentricity law; the 13+3 beat governs ϖ, doc 55 §6) |
 | Mars | retro | retro | same: \|diff\| | 52/(8H) | <!--v:marsEccCycle-->51,587<!--/v--> yr | 8H/52 |
 | Jupiter | retro | retro | same: \|diff\| | 44/(8H) | <!--v:jupiterEccCycle-->60,967<!--/v--> yr | 8H/44 |
 | Saturn | retro | retro | same: \|diff\| | 163/(8H) | <!--v:saturnEccCycle-->16,457<!--/v--> yr | 8H/163 |
