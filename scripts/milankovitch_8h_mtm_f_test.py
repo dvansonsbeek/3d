@@ -127,9 +127,8 @@ def load_integers():
         formula = json.loads(FORMULA_JSON.read_text())
         return formula["meta"]["integers"]
     except (FileNotFoundError, KeyError):
-        return [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
-                113, 120, 134, 141, 152, 185]
+        from milankovitch_climate_formula import L1_LATTICE_INTEGERS  # the shipped lattice
+        return list(L1_LATTICE_INTEGERS)
 
 
 def main():

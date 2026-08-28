@@ -70,6 +70,13 @@
       "significant": false
     },
     {
+      "n": 24,
+      "period_kyr": 111.77233333333334,
+      "F_stat": 0.5461332599734061,
+      "p_value": 0.5993373143519083,
+      "significant": false
+    },
+    {
       "n": 25,
       "period_kyr": 107.30144,
       "F_stat": 3.4992045084854793,
@@ -239,8 +246,8 @@
     }
   ],
   "n_formula_significant": 13,
-  "n_formula_total": 32,
-  "fraction_formula_significant": 0.40625,
+  "n_formula_total": 33,
+  "fraction_formula_significant": 0.3939393939393939,
   "permutation_test": {
     "n_permutations": 1000,
     "null_mean_significant_count": 0.0,

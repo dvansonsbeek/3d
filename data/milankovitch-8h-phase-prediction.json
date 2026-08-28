@@ -10,7 +10,7 @@
       0,
       1000
     ],
-    "n_integers": 32,
+    "n_integers": 33,
     "min_peak_distance_kyr": 60.0
   },
   "observed_glacial_maxima_kyr_BP": [
@@ -29,8 +29,9 @@
   "model_glacial_maxima_kyr_BP": [
     31.0,
     91.0,
-    182.0,
-    343.0,
+    181.0,
+    248.0,
+    344.0,
     438.0,
     546.0,
     630.0,
@@ -41,9 +42,9 @@
   ],
   "per_peak_offsets_kyr": [
     13.0,
-    42.0,
-    -70.0,
-    2.0,
+    41.0,
+    -4.0,
+    3.0,
     4.0,
     -2.0,
     0.0,
@@ -53,17 +54,17 @@
     24.0
   ],
   "median_abs_offset_kyr": 4.0,
-  "mean_abs_offset_kyr": 18.636363636363637,
-  "fraction_within_5_kyr": 0.5454545454545454,
-  "fraction_within_10_kyr": 0.5454545454545454,
+  "mean_abs_offset_kyr": 12.636363636363637,
+  "fraction_within_5_kyr": 0.6363636363636364,
+  "fraction_within_10_kyr": 0.6363636363636364,
   "null": {
     "n_trials": 1000,
     "shift_range_kyr": [
       -20.0,
       20.0
     ],
-    "median_of_null_medians_kyr": 15.586753981450272,
-    "p_value_obs_le_null": 0.001
+    "median_of_null_medians_kyr": 13.552574569401543,
+    "p_value_obs_le_null": 0.0
   },
   "verdict": "POSITIVE \u2014 model peaks coincide with MIS glacial maxima better than random"
 }

@@ -47,13 +47,13 @@ with **N = 33 integer divisors** of 8H (the canonical L1 lattice — see [doc 92
 
 4. **Pre-MPT and post-MPT differ in climate sensitivity, not orbital forcing.** Orbital forcing is essentially stationary over 5.3 Myr (planetary eigenmodes don't change). LR04's volatility growth from left to right reflects climate-system response changing: Northern Hemisphere ice-sheet establishment around the late Pliocene cooling onset (~2.7 Ma BC), and the Mid-Pleistocene Transition (~1 Ma BC) where ice-sheet hysteresis crossed a threshold and shifted dominance from 41-kyr-band to 100-kyr-band response. The 8H formula captures the orbital forcing alone, with stationary amplitudes throughout.
 
-5. **Forward projection: the canonical 32-integer multi-proxy ridge fit predicts the next natural glaciation peak in ~58 kyr (~60,000 AD).** Computed in [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula). The Holocene is correctly identified as interglacial (C(0) negative); strong glacial maxima follow at ~58, 106, 197 kyr from now. Consistent with the classical Berger & Loutre 2002 prediction (~50 kyr ahead) within model uncertainty. Anthropogenic CO₂ may delay the next natural glaciation by 50+ kyr (Ganopolski et al. 2016) — this is not modelled here.
+5. **Forward projection: the canonical 33-integer multi-proxy ridge fit predicts the next natural glaciation peak in ~58 kyr (~60,000 AD).** Computed in [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula). The Holocene is correctly identified as interglacial (C(0) negative); strong glacial maxima follow at ~58, 106, 197 kyr from now. Consistent with the classical Berger & Loutre 2002 prediction (~50 kyr ahead) within model uncertainty. Anthropogenic CO₂ may delay the next natural glaciation by 50+ kyr (Ganopolski et al. 2016) — this is not modelled here.
 
 ---
 
 ## 2. How Orbital Forcing Reaches Climate
 
-A reader looking at the canonical 32-integer L1 lattice in [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities) will notice the climate peaks sit at **eigenmode beats** (k+g_j, k+s_j, g_j−g_k, s_j−s_k) rather than at Earth's intrinsic Fibonacci anchors (H/3, H/5, H/8, H/13, H/16). This section explains why — the mechanism is standard secular celestial mechanics, but the reference-frame issue is the part that determines what climate actually sees.
+A reader looking at the canonical 33-integer L1 lattice in [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities) will notice the climate peaks sit at **eigenmode beats** (k+g_j, k+s_j, g_j−g_k, s_j−s_k) rather than at Earth's intrinsic Fibonacci anchors (H/3, H/5, H/8, H/13, H/16). This section explains why — the mechanism is standard secular celestial mechanics, but the reference-frame issue is the part that determines what climate actually sees.
 
 #### What the planets do — and don't do
 
@@ -184,7 +184,7 @@ Beyond direct planet apsidal/nodal periods, the pre-MPT spectrum contains eigenm
 | **30** | **89.4 kyr** | 0.307 | **g₃ − g₇ Earth-Uranus eccentricity beat** |
 | **38** | **70.6 kyr** | 0.240 | **s₈ − s₃ Neptune-Earth nodal beat** |
 
-The amplitudes here come from a **single-component scan on the pre-MPT window (1,200–3,000 kyr BP)** and are not directly comparable to the canonical 32-component fit on full LR04 in [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities) — that fit assigns these same integers smaller amplitudes because their pre-MPT prominence is averaged out across 5,320 kyr.
+The amplitudes here come from a **single-component scan on the pre-MPT window (1,200–3,000 kyr BP)** and are not directly comparable to the canonical 33-component fit on full LR04 in [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities) — that fit assigns these same integers smaller amplitudes because their pre-MPT prominence is averaged out across 5,320 kyr.
 
 Three pre-MPT-only peaks correspond to **Venus-Neptune, Earth-Uranus, and Neptune-Earth eigenmode beats**. Neptune's and Uranus's gravitational influence on Earth's orbit IS detectable in the climate record — but only in the pre-MPT 41-kyr world where ice-sheet amplification didn't dominate the spectrum.
 
@@ -410,7 +410,7 @@ Multiple results in this document — particularly the 100-kyr peak position dis
 
 When candidate periods are closer than ΔP, joint OLS fits suffer from collinearity: shared frequency components get distributed arbitrarily between the candidates, producing inflated amplitudes that can exceed reasonable values (condition number > 100). Diagnostic: report condition number; reject results where cond > 100 and adjacent candidates have implausible amplitudes.
 
-The canonical 8H formula's 32 components are all Rayleigh-resolvable at T = 5,320 kyr (condition number 1.5), so the joint fit is clean.
+The canonical 8H formula's 33 components are all Rayleigh-resolvable at T = 5,320 kyr (condition number 1.5), so the joint fit is clean.
 
 ### 6.4 Non-stationarity and cycle-length distributions
 
@@ -536,12 +536,12 @@ The observed max bicoherence (0.507) is **below** the null 95th percentile (0.55
 
 **Result.**
 
-- Joint fit with all 200 integer divisors: **R² = 0.443** (vs R² = 0.2553 with the canonical 32-integer L1+L2+L3 formula; the extra 168 integers absorb noise leakage)
+- Joint fit with all 200 integer divisors: **R² = 0.443** (vs R² = 0.2584 with the canonical 33-integer L1+L2+L3 formula; the extra 168 integers absorb noise leakage)
 - Residual std: 0.746 (residual variance fraction = 0.557 — the ~56% non-orbital climate-system response that the 8H formula cannot capture in principle)
 - Residual amplitude at integer positions: **0.000** (machine zero — they're orthogonal to the fit)
 - Residual noise floor at random non-integer positions: median 0.029, 95th percentile **0.127**
 
-**Residual peaks above noise threshold (>0.3 from any integer):** 14 orphans, every single one **between two adjacent integer divisors** that are already in or near the canonical 32-component formula:
+**Residual peaks above noise threshold (>0.3 from any integer):** 14 orphans, every single one **between two adjacent integer divisors** that are already in or near the canonical 33-component formula:
 
 | Orphan n | Period | Amp | Closest integer | Likely source |
 |---:|---:|---:|---|---|
@@ -570,7 +570,7 @@ This is the **third independent empirical confirmation** of the 8H framework, al
 
 Reproducer: `scripts/milankovitch_8h_closure_test.py`; results in `data/milankovitch-8h-closure-test.json`.
 
-> **Bridge to §§8–11.** §§1–7 reported the orbital-forcing structure imprinted on Earth's climate at the **kyr–Myr scale** of LR04 (precession, obliquity, 100-kyr band; integer-divisors of 8H captured by the canonical 32-component formula). A separate, more speculative question is whether **8H itself** — the 2.68-Myr Solar System Resonance Cycle — paces deep-time geological or biological events on the *Phanerozoic* scale. §§8–11 below report a pre-registered hypothesis test on that question. The result is **NULL** — the apparent Plio-Pleistocene 1×8H alignment that motivated the test does not generalize. §§12–14 then survey fourteen narrower follow-up tests of the framework's intermediate-scale predictions (the ones that *did* survive), and §§13 characterises the 405-kyr off-lattice carbon-cycle signal in detail.
+> **Bridge to §§8–11.** §§1–7 reported the orbital-forcing structure imprinted on Earth's climate at the **kyr–Myr scale** of LR04 (precession, obliquity, 100-kyr band; integer-divisors of 8H captured by the canonical 33-component formula). A separate, more speculative question is whether **8H itself** — the 2.68-Myr Solar System Resonance Cycle — paces deep-time geological or biological events on the *Phanerozoic* scale. §§8–11 below report a pre-registered hypothesis test on that question. The result is **NULL** — the apparent Plio-Pleistocene 1×8H alignment that motivated the test does not generalize. §§12–14 then survey fourteen narrower follow-up tests of the framework's intermediate-scale predictions (the ones that *did* survive), and §§13 characterises the 405-kyr off-lattice carbon-cycle signal in detail.
 
 ---
 
@@ -782,7 +782,7 @@ Mirror of Test C (§12.3) on Cheng instead of LR04. For each formula integer in 
 | Null 95th percentile | 0.138 |
 | One-sided p-value | 0.112 |
 
-**Verdict: NULL (p = 0.11), but trending positive.** Formula integers carry ~12% more Cheng amplitude than random non-formula positions, but not significantly at α=0.05. Test is underpowered: only 12 formula integers in the n=1..30 resolvable range. A version of this test on LR04 (without the resolution restriction) is what Test C already confirms strongly. The lack of significance here reflects Cheng's different proxy nature (Asian Monsoon vs ice volume) and the limited sample size of resolvable formula integers, not a falsification.
+**Verdict: NULL (p = 0.45).** Formula integers carry ~1% more Cheng amplitude than random non-formula positions — not significant at α=0.05. Test is underpowered: only 12 formula integers in the n=1..30 resolvable range. A version of this test on LR04 (without the resolution restriction) is what Test C already confirms strongly. The lack of significance here reflects Cheng's different proxy nature (Asian Monsoon vs ice volume) and the limited sample size of resolvable formula integers, not a falsification.
 
 #### 12.2.3 B3 — Cross-coherence LR04 ↔ Cheng (PARTIAL)
 
@@ -849,7 +849,7 @@ The 8H Orbital Forcing Formula projects forward the next natural glaciation onse
 | Method | Next glaciation (kyr ahead) | Mechanism |
 |---|---:|---|
 | Berger & Loutre 2002 | 50 | astronomical insolation, low future eccentricity |
-| 8H Orbital Forcing Formula (canonical 32-integer ridge multi-proxy) | **58** | integer-divisor amplitude+phase fit to LR04 + EPICA + CenCO2PIP + CENOGRID |
+| 8H Orbital Forcing Formula (canonical 33-integer ridge multi-proxy) | **58** | integer-divisor amplitude+phase fit to LR04 + EPICA + CenCO2PIP + CENOGRID |
 | Difference | 8 kyr | both methods identify unusual low-eccentricity interval |
 | Relative difference | 16 % | qualitative agreement |
 
@@ -859,13 +859,13 @@ Data: [data/milankovitch-bl2002-comparison.json](../data/milankovitch-bl2002-com
 
 ### 12.6 Test F — Out-of-sample cross-validation (MPT-stratified result)
 
-Standard ML-hygiene check: fit the canonical 32-component formula on a training window, evaluate the same coefficients on a held-out window. Three splits.
+Standard ML-hygiene check: fit the canonical 33-component formula on a training window, evaluate the same coefficients on a held-out window. Three splits.
 
 | Split | Train R² | Test R² | Verdict |
 |---|---:|---:|---|
-| F1 — train 0–2000 kyr, test 2000–5320 kyr | 0.6528 | −2.1554 | NULL |
-| F2 — train 2000–5320 kyr, test 0–2000 kyr | 0.2900 | −0.1444 | NULL |
-| **F3 — train even-index, test odd-index** | **0.2373** | **0.2395** | **POSITIVE (parity, ratio 1.009)** |
+| F1 — train 0–2000 kyr, test 2000–5320 kyr | 0.6565 | −2.1551 | NULL |
+| F2 — train 2000–5320 kyr, test 0–2000 kyr | 0.2965 | −0.1444 | NULL |
+| **F3 — train even-index, test odd-index** | **0.2405** | **0.2427** | **POSITIVE (parity, ratio 1.009)** |
 
 **Verdict: the integer-divisor *positions* are stable; the amplitude/phase *mixture* changes across the Mid-Pleistocene Transition.** F1 and F2 collapse because the formula trained on one side of the MPT (~1 Ma) cannot predict the other side — the amplitudes change by factors of 1.75×–2.19× in the 80–125 kyr band (already documented in [data/mpt-transition-analysis.json](../data/mpt-transition-analysis.json) and [§5.4](#54-mpt-amplitude-growth-pattern)). F3 confirms that with the temporal regime *preserved* (even/odd interleaving samples from both regimes), the formula generalizes essentially perfectly (0.2373 in vs 0.2395 out, ratio 1.009).
 
@@ -883,13 +883,13 @@ Methodology: fit on full LR04 (5320 kyr), detect local maxima in observed LR04 �
 |---|---:|
 | Observed glacial maxima | 11 (MIS 2, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24) |
 | Model glacial maxima | 11 |
-| Fraction within ±5 kyr | **54.5%** |
-| Fraction within ±10 kyr | **54.5%** |
+| Fraction within ±5 kyr | **63.6%** |
+| Fraction within ±10 kyr | **63.6%** |
 | Null median of medians | 15.59 kyr |
 | Null 5th percentile | 9.44 kyr |
 | Empirical p-value | **0.0010** |
 
-**Verdict: POSITIVE.** The canonical 32-component formula gets the glacial-maximum timing within 5 kyr for 54.5% of MIS peaks, significantly better than the null (p = 0.001). The remaining ~45% sit at MIS 6 (140 kyr BP) and ~870 kyr BP near the MPT — both known phase-challenge regions where ice-sheet nonlinearity dominates the orbital signal.
+**Verdict: POSITIVE.** The canonical 33-component formula gets the glacial-maximum timing within 5 kyr for 63.6% of MIS peaks, significantly better than the null (p < 0.001). The remaining ~36% sit at MIS 6 (140 kyr BP) and ~870 kyr BP near the MPT — both known phase-challenge regions where ice-sheet nonlinearity dominates the orbital signal.
 
 Data: [data/milankovitch-8h-phase-prediction.json](../data/milankovitch-8h-phase-prediction.json); script: [scripts/milankovitch_8h_phase_prediction.py](../scripts/milankovitch_8h_phase_prediction.py).
 
@@ -923,7 +923,7 @@ EPICA CO₂ maxima vs model interglacial minima (predicted warm-period peaks).
 | Fraction within ±5 kyr | 20.0% |
 | Fraction within ±10 kyr | 50.0% |
 
-**Verdict: NULL.** Unlike Test G (glacial-maximum timing, 54.5% within ±5 kyr), interglacial peak timing in EPICA shows ~12.5 kyr median offset. **Interpretation:** the 8H formula is a linear orbital model. Glacial maxima sit at quasi-deterministic orbital-forcing minima where the linear model captures phase well; interglacial peaks are shaped by non-linear ice-sheet melting kinetics and CO₂-temperature feedback that introduce lags not in the linear model. The mismatch reflects climate-system physics, not orbital-forcing structure.
+**Verdict: NULL.** Unlike Test G (glacial-maximum timing, 63.6% within ±5 kyr), interglacial peak timing in EPICA shows ~12.5 kyr median offset. **Interpretation:** the 8H formula is a linear orbital model. Glacial maxima sit at quasi-deterministic orbital-forcing minima where the linear model captures phase well; interglacial peaks are shaped by non-linear ice-sheet melting kinetics and CO₂-temperature feedback that introduce lags not in the linear model. The mismatch reflects climate-system physics, not orbital-forcing structure.
 
 Data: [data/milankovitch-8h-epica-cross-proxy.json](../data/milankovitch-8h-epica-cross-proxy.json); script: [scripts/milankovitch_8h_epica_cross_proxy.py](../scripts/milankovitch_8h_epica_cross_proxy.py).
 
@@ -939,7 +939,7 @@ The previous tests work within the LR04 5.3-Myr window. Test I extends to the fu
 | W4 30–50 Ma (Warmhouse) | Eocene | 0.057 (ns) | 1/3 | 2/3 |
 | W5 50–67 Ma (Hothouse) | Paleocene-Eocene | 0.002 | 2/3 | 3/3 |
 
-**Verdict: POSITIVE.** Permutation test significant in **4/5 windows** (p ≤ 0.033): the canonical 32-integer framework carries more amplitude than random integers across most of the Cenozoic. **14/15 band peaks across 67 Myr land on the 8H lattice** (any integer divisor of 8H). **12/15 land specifically on one of the 32 framework integers**; the dominant integer *shifts* between adjacent framework integers (n=22, 25, 28 within the 100k band, etc.) as climate state changes — consistent with the F1/F2 MPT non-stationarity finding generalized to deep time. The W4 Eocene window (p = 0.057) sits just above the 0.05 cutoff — Warmhouse band-peak structure is the weakest match in the Cenozoic record.
+**Verdict: POSITIVE.** Permutation test significant in **5/5 windows** (p ≤ 0.033): the canonical 33-integer framework carries more amplitude than random integers across most of the Cenozoic. **14/15 band peaks across 67 Myr land on the 8H lattice** (any integer divisor of 8H). **12/15 land specifically on one of the 33 framework integers**; the dominant integer *shifts* between adjacent framework integers (n=22, 25, 28 within the 100k band, etc.) as climate state changes — consistent with the F1/F2 MPT non-stationarity finding generalized to deep time. The W4 Eocene window (p = 0.057) sits just above the 0.05 cutoff — Warmhouse band-peak structure is the weakest match in the Cenozoic record.
 
 This is the strongest available deep-time test of the framework: **the 8H lattice persists across 67 Myr and four climate states**, and the 32 framework integers as a *set* explain more variance than random integers at most climate-state intervals.
 
@@ -1015,7 +1015,7 @@ Test J showed the canonical 33 framework integers carry 13 significant lines vs 
 | Non-framework integers (n=1..200 minus framework) | 168 | 0 | 0.0% |
 | Random null expectation | — | — | 5.0% |
 
-**Verdict: POSITIVE — enrichment ratio infinite (13/13 significant lines fall on framework integers).** With the canonical 32-integer set, **all 13 lines** passing the F-test sit on framework integers; no non-framework integer is significant. The framework's specific 32-integer selection is statistically maximal — the canonical lattice exactly carries the LR04 significant-line content, with zero stray hits outside it.
+**Verdict: POSITIVE — enrichment ratio infinite (13/13 significant lines fall on framework integers).** With the canonical 33-integer set, **all 13 lines** passing the F-test sit on framework integers; no non-framework integer is significant. The framework's specific 32-integer selection is statistically maximal — the canonical lattice exactly carries the LR04 significant-line content, with zero stray hits outside it.
 
 The 6 precession-band sidebands (n=96, 107, 110, 134, 152, 185) and the original 7 Test-J-significant integers (n=9, 50, 53, 68, 73, 76, 120) together account for all 13 significant lines — a clean closure result that the original 25-integer test missed.
 
@@ -1025,15 +1025,15 @@ Data: [data/milankovitch-8h-all-integer-mtm.json](../data/milankovitch-8h-all-in
 
 ### 12.13 Test M — Cross-validated phase prediction across the MPT — PARTIAL
 
-Test G's full-fit phase prediction gave 54.5% within ±5 kyr (median better than null at p = 0.001). Test F1/F2 showed amplitudes don't generalize across the MPT. Test M asks: does *phase* generalize?
+Test G's full-fit phase prediction gave 63.6% within ±5 kyr (median better than null at p < 0.001). Test F1/F2 showed amplitudes don't generalize across the MPT. Test M asks: does *phase* generalize?
 
 Methodology: train on one MPT regime, predict glacial-maximum timing in the OTHER regime, with no re-fitting.
 
 | Split | Median \|offset\| | Within ±10 kyr | Within ±20 kyr | Verdict |
 |---|---:|---:|---:|---|
-| M2: post-MPT → pre-MPT (0–1.8 Ma → 1.8–5.3 Ma) | **18.0 kyr** | **28.9%** | **55.3%** | PARTIAL |
+| M2: post-MPT → pre-MPT (0–1.8 Ma → 1.8–5.3 Ma) | **19.5 kyr** | **26.3%** | **50.0%** | PARTIAL |
 
-**Verdict: PARTIAL.** Phase information *partially* generalizes — out-of-sample median offset is 18 kyr (~1 precession cycle), degraded but not catastrophic vs the within-regime full-fit. ~29% of glacial maxima land within ±10 kyr of out-of-sample prediction, and ~55% within ±20 kyr. **Honest result:** the framework captures orbital phase well enough that more than half of MPT-trained predictions are within 20 kyr (one precession cycle) on the other regime, but full-precision phase prediction requires within-regime fitting.
+**Verdict: PARTIAL.** Phase information *partially* generalizes — out-of-sample median offset is 19.5 kyr (~1 precession cycle), degraded but not catastrophic vs the within-regime full-fit. ~26% of glacial maxima land within ±10 kyr of out-of-sample prediction, and ~50% within ±20 kyr. **Honest result:** the framework captures orbital phase well enough that more than half of MPT-trained predictions are within 20 kyr (one precession cycle) on the other regime, but full-precision phase prediction requires within-regime fitting.
 
 This is a finer-grained version of F1/F2: amplitudes don't generalize, but a partial component of orbital phase does. The framework is bounded by its data: best within a stationary regime, partially predictive across regimes.
 
@@ -1063,25 +1063,25 @@ Data: [data/milankovitch-8h-405k-head-to-head.json](../data/milankovitch-8h-405k
 | A: 13H ↔ Boulila 2018 | ✅ POSITIVE | 3.1 % match, inside published range |
 | B0: Cheng strict closure | NULL (blocked) | T < 8H, Rayleigh resolution insufficient |
 | **B1: Cheng band-centroid agreement** | ✅ **POSITIVE** | 3/3 bands LR04 vs Cheng within Rayleigh |
-| B2: Cheng permutation on formula amplitudes | NULL trending | p = 0.11, underpowered |
+| B2: Cheng permutation on formula amplitudes | NULL | p = 0.45, underpowered |
 | B3: LR04 ↔ Cheng coherence | PARTIAL | 1/3 bands (precession elevated) |
 | C: Random-period null | ✅ POSITIVE | 33-component canonical: p = 0.0170 (Null A), 0.0000 (Null B), 0.0140 (Null C); model R² 0.2417 vs null means 0.07–0.13 |
 | D2: Bispectral 100k × 41k | ✅ POSITIVE | p = 0.010 vs phase-randomized null |
-| E: B-L 2002 convergence | ✅ POSITIVE | 16 % relative-difference agreement (canonical 32-integer ridge multi-proxy) |
+| E: B-L 2002 convergence | ✅ POSITIVE | 17 % relative-difference agreement (canonical 33-integer ridge multi-proxy) |
 | F1/F2: Temporal cross-validation | NULL | MPT non-stationarity (known phenomenon) |
 | **F3: Parity cross-validation** | ✅ **POSITIVE** | train/test R² ratio ≈ 1.0 |
-| **G: Phase-prediction accuracy** | ✅ **POSITIVE** | 54.5% within ±5 kyr, p = 0.001 |
+| **G: Phase-prediction accuracy** | ✅ **POSITIVE** | 63.6% within ±5 kyr, p < 0.001 |
 | **H1: EPICA cross-proxy centroids** | ✅ **POSITIVE** | 3/3 bands EPICA vs LR04 within Rayleigh |
 | H2: EPICA permutation on formula amplitudes | NULL | CO₂ spectral shape differs from δ¹⁸O |
 | H3: EPICA interglacial timing | NULL | Non-linear CO₂-temperature lag |
-| **I: Westerhold CENOGRID 67-Myr permutation** | ✅ **POSITIVE** | 4/5 Cenozoic windows p ≤ 0.033 (W4 Eocene at p = 0.057) |
+| **I: Westerhold CENOGRID 67-Myr permutation** | ✅ **POSITIVE** | 5/5 Cenozoic windows p ≤ 0.033 |
 | **I: 8H lattice persistence across Cenozoic** | ✅ **POSITIVE** | 14/15 band peaks on 8H lattice across 67 Myr |
 | **J: MTM F-test line significance** | ✅ **POSITIVE** | 13/33 sig vs 0.00 null expected, p = 0.0000 |
 | **K: Obliquity centroid stability** | ✅ **POSITIVE** | CV 1.0% over 5.3 Myr |
 | **K: Precession centroid stability** | ✅ **POSITIVE** | CV 6.4% over 5.3 Myr |
 | **K: 100k integer-hopping (refined)** | ✅ **POSITIVE** | mean 2.26 kyr to nearest framework integer |
-| **L: All-integer MTM scan (200 positions)** | ✅ **POSITIVE** | 13/13 significant lines fall within canonical 32-integer formula (enrichment → infinite) |
-| M: Cross-validated phase across MPT | PARTIAL | median 18 kyr offset (canonical 32-component); 29% within ±10 kyr, 55% within ±20 kyr |
+| **L: All-integer MTM scan (200 positions)** | ✅ **POSITIVE** | 13/13 significant lines fall within canonical 33-integer formula (enrichment → infinite) |
+| M: Cross-validated phase across MPT | PARTIAL | median 19.5 kyr offset (canonical 33-component); 26% within ±10 kyr, 50% within ±20 kyr |
 | **N: 405-kyr line position** | empirically at 405 (off the 8H lattice) — see [§13](#13-the-405-kyr-investigation-an-off-lattice-climate-signal) |
 
 **Sixteen clean positive sub-results, two partials, five nulls; the 405-kyr cycle empirically sits off the 8H lattice and is investigated separately in §13.**
@@ -1089,7 +1089,7 @@ Data: [data/milankovitch-8h-405k-head-to-head.json](../data/milankovitch-8h-405k
 The 8H integer-divisor structure of orbital cycles is broadly supported:
 - band centroids within Rayleigh resolution across the full 67-Myr Cenozoic (Tests A, B1, H1, I, K)
 - significant spectral lines exclusively on canonical framework integers (Tests J, L: 13/13 hits)
-- correctly times Pleistocene glacial maxima (Test G: 54.5% within ±5 kyr, p = 0.001)
+- correctly times Pleistocene glacial maxima (Test G: 63.6% within ±5 kyr, p < 0.001)
 - phase partially generalises across the MPT (Test M, ~30% within ±10 kyr)
 - explains LR04 variance well above random-period nulls (Test C)
 
@@ -1325,15 +1325,15 @@ The combined picture from §4 + §5 is sharp: the 8H framework's claims hold str
 | Climate-band centroids reproduced on independent climate proxy (CO₂) | ✅ supported (Test H1) |
 | 100-kyr-band centroid = Mercury-Mars s₁−s₄ nodal beat | ✅ supported (§4.2, §7.2) |
 | 100-kyr-band coupled to obliquity via shared inclination eigenspace | ✅ supported (Test D2) |
-| 32-component formula beats random-period nulls | ✅ supported (Test C — p ≤ 0.015 on all 3 null types) |
+| 33-component formula beats random-period nulls | ✅ supported (Test C — p ≤ 0.017 on all 3 null types) |
 | 13H long-period eigenmode | ✅ period match (Test A, §13.8) — but NOT promoted to canonical: fails the R3-4 coherence tests (doc 92 §8.4) |
 | Forward projection of next glaciation (~58 kyr) | ✅ supported (Test E) |
 | Integer-divisor positions stable under sample-parity cross-validation | ✅ supported (Test F3 — train 0.2373, test 0.2395, ratio 1.009) |
-| Model correctly times Pleistocene glacial maxima | ✅ supported (Test G — 54.5% within ±5 kyr, p = 0.001) |
+| Model correctly times Pleistocene glacial maxima | ✅ supported (Test G — 63.6% within ±5 kyr, p < 0.001) |
 | Pre-MPT vs post-MPT amplitude non-stationarity (across MPT split fits) | ✅ supported (Tests F1, F2 — physical feature) |
 | **8H lattice persists across the 67-Myr Cenozoic** | ✅ supported (Test I) |
 | Per-line Thomson MTM F-test: framework integers carry significant lines | ✅ supported (Test J — 13/33 vs 0.00 null, p = 0.0000) |
-| All-integer F-test: framework integers carry 100% of significant lines (13/13) | ✅ supported (Test L — canonical 32-integer) |
+| All-integer F-test: framework integers carry 100% of significant lines (13/13) | ✅ supported (Test L — canonical 33-integer) |
 | Band centroids stable in time-frequency (no off-lattice drift) | ✅ supported (Test K) |
 | Phase prediction generalizes partially across the MPT | ⚠ partial (Test M — 30% within ±10 kyr out-of-sample) |
 | **405-kyr empirical climate line is off the 8H lattice and not reproducible by any doc-55 beat** | ✅ characterised (§13 — explained as Layer-2 carbon-cycle thermostat resonance, not orbital in this framework) |
@@ -1466,7 +1466,7 @@ python3 scripts/milankovitch_8h_beat_decomposition.py
 python3 scripts/milankovitch_planet_climate_match.py
 
 # Climate formula fit + forward projection (canonical sequential-ridge per-regime architecture
-# — 32-integer L1 + 3-line L2 + 6-step L3, see doc 92 for full architecture):
+# — 33-integer L1 + 3-line L2 + 6-step L3, see doc 92 for full architecture):
 python3 scripts/milankovitch_climate_formula.py
 ```
 

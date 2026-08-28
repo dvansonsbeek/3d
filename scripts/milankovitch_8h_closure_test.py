@@ -233,9 +233,8 @@ def main():
     # The canonical 32-component formula uses integers: 9, 12, 14, 16, 18, 20, 21, 22,
     # 25, 28, 30, 31, 35, 38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110, 113,
     # 120, 134, 141, 152, 185
-    formula_integers = {9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                        38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
-                        113, 120, 134, 141, 152, 185}
+    from milankovitch_climate_formula import L1_LATTICE_INTEGERS  # the shipped lattice
+    formula_integers = set(L1_LATTICE_INTEGERS)
     far_from_any_int_orphans = []
     for n, a in orphans:
         # "Far" = > 1.0 from the nearest INTEGER (not just formula integer)

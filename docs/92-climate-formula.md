@@ -376,9 +376,9 @@ For the 8H lattice fit to work on CENOGRID, the secular cooling trend must be re
 
 After L1 + L2 + L3 are accounted for, the remaining residual is L4 + L5 combined. Since L4 is bounded small, L5 is approximately the remainder.
 
-> **Estimated L5 floor (post-MPT, canonical 32-component)**: 1 − 0.8735 ≈ `0.13` (i.e., ~13% of post-MPT LR04 variance is true climate stochastic / sub-LR04-resolution noise).
-> **Estimated L5 floor (iNHG-MPT, canonical 32-component)**: 1 − 0.7289 ≈ `0.27`.
-> **Estimated L5 floor (pre-iNHG, canonical 32-component)**: 1 − 0.4298 ≈ `0.57` (older record carries more dating noise and the obliquity-dominated regime has weaker forcing).
+> **Estimated L5 floor (post-MPT, canonical 33-component)**: 1 − 0.8743 ≈ `0.13` (i.e., ~13% of post-MPT LR04 variance is true climate stochastic / sub-LR04-resolution noise).
+> **Estimated L5 floor (iNHG-MPT, canonical 33-component)**: 1 − 0.7345 ≈ `0.27`.
+> **Estimated L5 floor (pre-iNHG, canonical 33-component)**: 1 − 0.4493 ≈ `0.55` (older record carries more dating noise and the obliquity-dominated regime has weaker forcing).
 
 This L5 floor includes:
 - AMOC / MOC variability (decade-millennium internal variability)
@@ -438,7 +438,7 @@ What this means honestly:
 
 | Quantity | What it actually means |
 |---------|----------------------|
-| Post-MPT R² = 0.8735 | "There exists a 41-component fit (32 L1 + 3 L2 + 6 L3) on the 8H lattice that explains ~87% of post-MPT LR04" |
+| Post-MPT R² = 0.8743 | "There exists a 42-component fit (33 L1 + 3 L2 + 6 L3) on the 8H lattice that explains ~87% of post-MPT LR04" |
 | Same R² as a prediction | **NOT supported by the framework**. The post-MPT amplitude/phase structure is not derivable from pre-MPT |
 | The 8H lattice itself | A *frequency framework* — it tells you where lines should sit. It does NOT predict their amplitudes/phases without additional regime-specific calibration |
 | The L2 lines | Empirical lines whose response amplitudes are regime-dependent. Only the 405-kyr line is structurally distinct (C2 confirms unique cross-proxy phase coherence) |
@@ -1046,7 +1046,7 @@ From `forward_projection_250kyr` in the canonical JSON output:
 
 **Canonical forward-projection summary:**
 
-| | Canonical (sequential ridge multi-proxy, 32-integer L1 + 3-line L2 + 6-step L3) |
+| | Canonical (sequential ridge multi-proxy, 33-integer L1 + 3-line L2 + 6-step L3) |
 |---|---:|
 | Next glacial onset | **~58,500 yr** |
 | Strongest peak in window | ~196,500 yr |
@@ -1172,7 +1172,7 @@ The PETM (−393 ppm older-than-PETM) and EOT (+392 ppm older-than-EOT) signs ar
 
 ### 11.4 Cross-proxy convergence
 
-The structural claim of doc 92 — that the **same 32-integer L1 lattice + L2 thermostat + L3 step terms explain three independent climate proxies** — now has three confirming fits:
+The structural claim of doc 92 — that the **same 33-integer L1 lattice + L2 thermostat + L3 step terms explain three independent climate proxies** — now has three confirming fits:
 
 | Dataset | Window | Proxy | R² breakdown | Total R² |
 |---|---|---|---|---:|

@@ -70,9 +70,8 @@ WINDOWS = [
     ("W5_50_67Ma", (50000, 67000), "Hothouse — Paleocene-Eocene + early-Eocene Climatic Optimum"),
 ]
 
-FORMULA_INTEGERS = [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                    38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
-                    113, 120, 134, 141, 152, 185]
+from milankovitch_climate_formula import L1_LATTICE_INTEGERS  # noqa: E402 — the shipped lattice
+FORMULA_INTEGERS = list(L1_LATTICE_INTEGERS)
 
 N_PERMUTATIONS = 1000
 RNG_SEED = 20260520
