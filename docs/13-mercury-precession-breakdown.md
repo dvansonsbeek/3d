@@ -225,7 +225,11 @@ planet the model stores:
   the rate in the inertial frame after subtracting general precession
 
 The two are related by `ω_ICRF = ω_ecliptic − ω_gen` where
-`ω_gen = 2π / T_H13` is the general-precession rate. **The model treats the
+`ω_gen = 2π / T_H13` is the general-precession rate. This relation is
+applied as a formula; inside the scene the equatorial frame and the star
+field share the H/13 rotation, so a scene measurement cannot separate
+"relative to the equinox" from "relative to the stars" — see §1.8, "Frames,
+measured". **The model treats the
 ICRF as the stable foundation** — it's the frame in which the Fibonacci
 structure (H/3, H/5, H/8, H/13, H/16) is anchored — and derives the
 ecliptic rate from it via this relation. That's why the model's ecliptic

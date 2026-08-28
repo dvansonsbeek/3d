@@ -17,9 +17,9 @@ This document describes the three methods used to calculate perihelion longitude
 
 ### Method 1: Earth-Frame (Equatorial RA)
 
-**What it measures:** The apparent Right Ascension of a planet's perihelion as observed from Earth's equatorial coordinate system.
+**What it measures:** The right ascension of a planet's perihelion direction in the scene's equatorial frame (`earth.rotationAxis`), measured from the perihelion-of-Earth point.
 
-**Physical meaning:** This is what an astronomer on Earth would measure when determining the direction of a planet's perihelion point, expressed in the Earth's equatorial coordinate system.
+**Physical meaning:** The ecliptic advance projected into the equatorial frame, plus the term the changing obliquity adds to any right ascension — rate_RA = rate_ecl · dα/dλ + ∂α/∂ε · ε̇ (+ a coupling ≤ 0.7 ″/cy), pinned for all seven planets by `tools/verify/perihelion-projection-closure.js` (doc 13 §1.8). In the scene the equatorial frame and the star field share the H/13 rotation, so this rate is the same relative to the equinox and relative to the stars; the frame wording for the physical statement is settled in doc 13 §1.8.
 
 **Characteristics:**
 - Fluctuates over time due to Earth's precession cycles
