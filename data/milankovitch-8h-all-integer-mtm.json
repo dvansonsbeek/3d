@@ -11,7 +11,7 @@
     "alpha": 0.05,
     "F_critical": 4.458970107524511,
     "n_max": 200,
-    "n_formula_integers": 32
+    "n_formula_integers": 33
   },
   "scan": [
     {
@@ -204,7 +204,7 @@
       "F_stat": 0.5461332599734061,
       "p_value": 0.5993373143519083,
       "significant": false,
-      "in_formula": false
+      "in_formula": true
     },
     {
       "n": 25,
@@ -1618,7 +1618,7 @@
   "n_significant_total": 13,
   "n_significant_in_formula": 13,
   "n_significant_not_in_formula": 0,
-  "rate_in_formula": 0.40625,
+  "rate_in_formula": 0.3939393939393939,
   "rate_not_in_formula": 0.0,
   "enrichment_ratio": Infinity,
   "verdict": "POSITIVE \u2014 framework integers strongly enriched in significant lines"

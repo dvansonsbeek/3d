@@ -96,13 +96,10 @@ def thomson_f_at_freq(y, freq, tapers, U_even, even_idx, dt=DT_KYR):
 
 
 def load_integers():
-    try:
-        formula = json.loads(FORMULA_JSON.read_text())
-        return formula["meta"]["integers"]
-    except (FileNotFoundError, KeyError):
-        return [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
-                113, 120, 134, 141, 152, 185]
+    # The shipped lattice is the single source of truth (the formula JSON carries
+    # no `meta.integers`; the former fallback silently pinned a stale 32-list).
+    from milankovitch_climate_formula import L1_LATTICE_INTEGERS
+    return list(L1_LATTICE_INTEGERS)
 
 
 def main():

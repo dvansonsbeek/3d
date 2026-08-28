@@ -811,15 +811,15 @@ Data: [data/milankovitch-8h-cheng-chronology-validation.json](../data/milankovit
 
 ### 12.3 Test C — Random-period null baseline ✅ POSITIVE
 
-The canonical 32-integer 8H Orbital Forcing Formula achieves full-LR04 R² = **0.2385** (L1-only, plain OLS at the 32 integer divisors). A natural concern: with 32 × 2 free amplitude+phase parameters, could *any* 32 periods do this well? Three null distributions tested (1000 trials each, against the 32-component canonical lattice):
+The canonical 33-integer 8H Orbital Forcing Formula achieves full-LR04 R² = **0.2417** (L1-only, plain OLS at the 33 integer divisors). A natural concern: with 33 × 2 free amplitude+phase parameters, could *any* 33 periods do this well? Three null distributions tested (1000 trials each, against the 32-component canonical lattice):
 
 | Null model | Description | Mean R² | 95th-%ile | p (model ≥ null) |
 |---|---|---:|---:|---:|
-| A | 32 random periods uniform in [22, 400] kyr | 0.1349 | 0.1927 | **0.0090** |
-| B | 32 random integers in {1..200}, periods 8H/n | 0.0696 | 0.1120 | **0.0000** |
-| C | 32 random half-integer offsets from the 8H lattice | 0.0772 | 0.2089 | **0.0150** |
+| A | 33 random periods uniform in [22, 400] kyr | 0.1412 | 0.2002 | **0.0170** |
+| B | 33 random integers in {1..200}, periods 8H/n | 0.0732 | 0.1201 | **0.0000** |
+| C | 33 random half-integer offsets from the 8H lattice | 0.0797 | 0.2099 | **0.0140** |
 
-**Verdict: POSITIVE on all three nulls.** The canonical model's $R^2 = 0.2385$ is significantly above every null distribution — even Null A (which has the most flexibility, drawing from the Milankovitch band continuously) only reaches mean 0.135 with 95th-percentile 0.193, still below the model. Null B (random integer 8H/n divisors) gives the cleanest comparison since it samples the same lattice the model uses; the model R² is achieved by **0/1000** trials there. The 8H lattice positions chosen by the framework reflect a real concentration of climate variance at the predicted integer positions; the result is not an artifact of fitting freedom.
+**Verdict: POSITIVE on all three nulls.** The canonical model's $R^2 = 0.2417$ is significantly above every null distribution — even Null A (which has the most flexibility, drawing from the Milankovitch band continuously) only reaches mean 0.141 with 95th-percentile 0.200, still below the model. Null B (random integer 8H/n divisors) gives the cleanest comparison since it samples the same lattice the model uses; the model R² is achieved by **0/1000** trials there. The 8H lattice positions chosen by the framework reflect a real concentration of climate variance at the predicted integer positions; the result is not an artifact of fitting freedom.
 
 Data: [data/milankovitch-random-period-null.json](../data/milankovitch-random-period-null.json).
 
@@ -968,7 +968,7 @@ Configuration: full LR04 (5320 kyr), DPSS multitaper with K = 5 tapers and time-
 | n=185 | 14.50 | 5.368 | 0.033 | ✅ |
 | (other 19 integers, incl. n=141) | — | F < 4.46 | > 0.05 | — |
 
-**Permutation test:** **13/32 framework integers significant.** Null: random 32 non-formula integers from {1..200}, 1000 trials. Mean null significant count = **0.00**, 95th percentile = 0.00 (no random 32-set produced any significant lines in 1000 trials). **Observed 13 vs null expected 0.00 → p = 0.0000.**
+**Permutation test:** **13/33 framework integers significant.** Null: random 32 non-formula integers from {1..200}, 1000 trials. Mean null significant count = **0.00**, 95th percentile = 0.00 (no random 32-set produced any significant lines in 1000 trials). **Observed 13 vs null expected 0.00 → p = 0.0000.**
 
 **Verdict: POSITIVE.** Framework integers carry **infinitely more significant lines** than random non-formula integers under the strict Thomson F-test (no random selection of 32 integers reaches even 1 significant line in 1000 trials, while the canonical 32 carry 13). The most significant lines (n=73 F=14.2; n=50 F=12.7) are Mars-related obliquity sidebands (s₄, g₄) — the framework's mid-band integers that the closure test already flagged as dominant. All 6 Tier-A1 precession-band sidebands (96, 107, 110, 134, 152, 185) are now F-test significant under the expanded analysis.
 
@@ -1007,11 +1007,11 @@ Data: [data/milankovitch-8h-wavelet-stability.json](../data/milankovitch-8h-wave
 
 ### 12.12 Test L — All-integer MTM F-test scan ✅ POSITIVE
 
-Test J showed the canonical 32 framework integers carry 13 significant lines vs random null 0.00 (no random 32-set produces any). The natural falsification follow-up: of ALL 200 8H/n integers, how many are significant? If most light up, the framework's specific choice is meaningless; if mainly the framework integers do, the choice is empirically right.
+Test J showed the canonical 33 framework integers carry 13 significant lines vs random null 0.00 (no random 32-set produces any). The natural falsification follow-up: of ALL 200 8H/n integers, how many are significant? If most light up, the framework's specific choice is meaningless; if mainly the framework integers do, the choice is empirically right.
 
 | Set | n | Significant at α=0.05 | Rate |
 |---|---:|---:|---:|
-| Canonical framework integers | 32 | 13 | **40.6%** |
+| Canonical framework integers | 33 | 13 | **39.4%** |
 | Non-framework integers (n=1..200 minus framework) | 168 | 0 | 0.0% |
 | Random null expectation | — | — | 5.0% |
 
@@ -1065,7 +1065,7 @@ Data: [data/milankovitch-8h-405k-head-to-head.json](../data/milankovitch-8h-405k
 | **B1: Cheng band-centroid agreement** | ✅ **POSITIVE** | 3/3 bands LR04 vs Cheng within Rayleigh |
 | B2: Cheng permutation on formula amplitudes | NULL trending | p = 0.11, underpowered |
 | B3: LR04 ↔ Cheng coherence | PARTIAL | 1/3 bands (precession elevated) |
-| C: Random-period null | ✅ POSITIVE | 32-component canonical: p = 0.0090 (Null A), 0.0000 (Null B), 0.0150 (Null C); model R² 0.2385 vs null means 0.07–0.13 |
+| C: Random-period null | ✅ POSITIVE | 33-component canonical: p = 0.0170 (Null A), 0.0000 (Null B), 0.0140 (Null C); model R² 0.2417 vs null means 0.07–0.13 |
 | D2: Bispectral 100k × 41k | ✅ POSITIVE | p = 0.010 vs phase-randomized null |
 | E: B-L 2002 convergence | ✅ POSITIVE | 16 % relative-difference agreement (canonical 32-integer ridge multi-proxy) |
 | F1/F2: Temporal cross-validation | NULL | MPT non-stationarity (known phenomenon) |
@@ -1076,7 +1076,7 @@ Data: [data/milankovitch-8h-405k-head-to-head.json](../data/milankovitch-8h-405k
 | H3: EPICA interglacial timing | NULL | Non-linear CO₂-temperature lag |
 | **I: Westerhold CENOGRID 67-Myr permutation** | ✅ **POSITIVE** | 4/5 Cenozoic windows p ≤ 0.033 (W4 Eocene at p = 0.057) |
 | **I: 8H lattice persistence across Cenozoic** | ✅ **POSITIVE** | 14/15 band peaks on 8H lattice across 67 Myr |
-| **J: MTM F-test line significance** | ✅ **POSITIVE** | 13/32 sig vs 0.00 null expected, p = 0.0000 |
+| **J: MTM F-test line significance** | ✅ **POSITIVE** | 13/33 sig vs 0.00 null expected, p = 0.0000 |
 | **K: Obliquity centroid stability** | ✅ **POSITIVE** | CV 1.0% over 5.3 Myr |
 | **K: Precession centroid stability** | ✅ **POSITIVE** | CV 6.4% over 5.3 Myr |
 | **K: 100k integer-hopping (refined)** | ✅ **POSITIVE** | mean 2.26 kyr to nearest framework integer |
@@ -1332,7 +1332,7 @@ The combined picture from §4 + §5 is sharp: the 8H framework's claims hold str
 | Model correctly times Pleistocene glacial maxima | ✅ supported (Test G — 54.5% within ±5 kyr, p = 0.001) |
 | Pre-MPT vs post-MPT amplitude non-stationarity (across MPT split fits) | ✅ supported (Tests F1, F2 — physical feature) |
 | **8H lattice persists across the 67-Myr Cenozoic** | ✅ supported (Test I) |
-| Per-line Thomson MTM F-test: framework integers carry significant lines | ✅ supported (Test J — 13/32 vs 0.00 null, p = 0.0000) |
+| Per-line Thomson MTM F-test: framework integers carry significant lines | ✅ supported (Test J — 13/33 vs 0.00 null, p = 0.0000) |
 | All-integer F-test: framework integers carry 100% of significant lines (13/13) | ✅ supported (Test L — canonical 32-integer) |
 | Band centroids stable in time-frequency (no off-lattice drift) | ✅ supported (Test K) |
 | Phase prediction generalizes partially across the MPT | ⚠ partial (Test M — 30% within ±10 kyr out-of-sample) |

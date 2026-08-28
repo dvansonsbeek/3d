@@ -4,11 +4,11 @@
     0,
     640
   ],
-  "lr04_R2_L1": 0.9274539609765102,
-  "cheng_R2_L1": 0.6841769951764529,
-  "epica_R2_L1": 0.8852928438161556,
-  "pearson_correlation": 0.2480826540045249,
-  "spearman_correlation": 0.1792521994134897,
+  "lr04_R2_L1": 0.9275846083572967,
+  "cheng_R2_L1": 0.6842395624228366,
+  "epica_R2_L1": 0.8852089867898322,
+  "pearson_correlation": 0.24249955602128362,
+  "spearman_correlation": 0.1029411764705882,
   "shared_top5_n": [
     66
   ],
@@ -16,290 +16,299 @@
     {
       "n": 9,
       "period_kyr": 298.05955555555556,
-      "amp_lr04_permil": 0.10768012953674844,
-      "amp_cheng_permil": 0.24403925298183457,
-      "amp_epica_ppm": 12.98198895734315,
-      "ratio_cheng_lr04": 2.266335061368498,
-      "phase_diff_deg": 156.29638844936028
+      "amp_lr04_permil": 0.10603458224323509,
+      "amp_cheng_permil": 0.24525060714030125,
+      "amp_epica_ppm": 12.912117576490648,
+      "ratio_cheng_lr04": 2.312930385086211,
+      "phase_diff_deg": 155.80930243384213
     },
     {
       "n": 12,
       "period_kyr": 223.54466666666667,
-      "amp_lr04_permil": 0.07847017309456511,
-      "amp_cheng_permil": 0.3702809113785946,
-      "amp_epica_ppm": 15.115739734650694,
-      "ratio_cheng_lr04": 4.718747223003647,
-      "phase_diff_deg": 95.51068850965507
+      "amp_lr04_permil": 0.07134476707537474,
+      "amp_cheng_permil": 0.3776471110298377,
+      "amp_epica_ppm": 14.90097076077403,
+      "ratio_cheng_lr04": 5.293269941309906,
+      "phase_diff_deg": 92.3410960298985
     },
     {
       "n": 14,
       "period_kyr": 191.6097142857143,
-      "amp_lr04_permil": 0.060716698296229527,
-      "amp_cheng_permil": 0.4799550219514109,
-      "amp_epica_ppm": 14.660638107813737,
-      "ratio_cheng_lr04": 7.904827426711637,
-      "phase_diff_deg": 62.50681137323429
+      "amp_lr04_permil": 0.0542818089141129,
+      "amp_cheng_permil": 0.48791634465676365,
+      "amp_epica_ppm": 14.466778157960565,
+      "ratio_cheng_lr04": 8.988579312615883,
+      "phase_diff_deg": 57.6532430853812
     },
     {
       "n": 16,
       "period_kyr": 167.6585,
-      "amp_lr04_permil": 0.09751488306761362,
-      "amp_cheng_permil": 0.19831406520714928,
-      "amp_epica_ppm": 5.482841468950442,
-      "ratio_cheng_lr04": 2.03367997754399,
-      "phase_diff_deg": 112.01648479633934
+      "amp_lr04_permil": 0.09210515114769792,
+      "amp_cheng_permil": 0.1981785127816221,
+      "amp_epica_ppm": 5.375633144825429,
+      "ratio_cheng_lr04": 2.151655041136919,
+      "phase_diff_deg": 105.99512163884121
     },
     {
       "n": 18,
       "period_kyr": 149.02977777777778,
-      "amp_lr04_permil": 0.1181383423220122,
-      "amp_cheng_permil": 0.16363051231636946,
-      "amp_epica_ppm": 16.85219912031188,
-      "ratio_cheng_lr04": 1.3850754048195317,
-      "phase_diff_deg": 52.721113634400744
+      "amp_lr04_permil": 0.10184685733221248,
+      "amp_cheng_permil": 0.18621433200785614,
+      "amp_epica_ppm": 16.381290062511493,
+      "ratio_cheng_lr04": 1.8283758270561739,
+      "phase_diff_deg": 48.808567536127605
     },
     {
       "n": 20,
       "period_kyr": 134.1268,
-      "amp_lr04_permil": 0.12344735864231096,
-      "amp_cheng_permil": 0.06768708762536405,
-      "amp_epica_ppm": 5.933857530000453,
-      "ratio_cheng_lr04": 0.5483072976999658,
-      "phase_diff_deg": -140.92386686171025
+      "amp_lr04_permil": 0.11233024970164078,
+      "amp_cheng_permil": 0.05154172354163737,
+      "amp_epica_ppm": 5.619832018994944,
+      "ratio_cheng_lr04": 0.45884099499944864,
+      "phase_diff_deg": -145.61896903620715
     },
     {
       "n": 21,
       "period_kyr": 127.73980952380953,
-      "amp_lr04_permil": 0.05241768425424533,
-      "amp_cheng_permil": 0.06598912039311221,
-      "amp_epica_ppm": 6.37494183073585,
-      "ratio_cheng_lr04": 1.2589094946094976,
-      "phase_diff_deg": -22.745508640784426
+      "amp_lr04_permil": 0.05566408683903721,
+      "amp_cheng_permil": 0.08267381233042612,
+      "amp_epica_ppm": 6.101046184030118,
+      "ratio_cheng_lr04": 1.4852271370137162,
+      "phase_diff_deg": -40.437330204702896
     },
     {
       "n": 22,
       "period_kyr": 121.93345454545455,
-      "amp_lr04_permil": 0.17347613844966903,
-      "amp_cheng_permil": 0.04976289415645488,
-      "amp_epica_ppm": 14.322355813770951,
-      "ratio_cheng_lr04": 0.28685728539485955,
-      "phase_diff_deg": -178.55884945154833
+      "amp_lr04_permil": 0.13919228431759437,
+      "amp_cheng_permil": 0.020696519524578738,
+      "amp_epica_ppm": 13.30275243249255,
+      "ratio_cheng_lr04": 0.14869013484508659,
+      "phase_diff_deg": 56.680644982973824
+    },
+    {
+      "n": 24,
+      "period_kyr": 111.77233333333334,
+      "amp_lr04_permil": 0.124026345784961,
+      "amp_cheng_permil": 0.14558696308287492,
+      "amp_epica_ppm": 3.817324677801508,
+      "ratio_cheng_lr04": 1.1738390110702455,
+      "phase_diff_deg": -121.49027146982006
     },
     {
       "n": 25,
       "period_kyr": 107.30144,
-      "amp_lr04_permil": 0.19992318773404527,
-      "amp_cheng_permil": 0.21114691494389545,
-      "amp_epica_ppm": 12.625191187930325,
-      "ratio_cheng_lr04": 1.0561401973280904,
-      "phase_diff_deg": -79.74660122357439
+      "amp_lr04_permil": 0.16212211608797353,
+      "amp_cheng_permil": 0.11222431467975806,
+      "amp_epica_ppm": 12.435281339530222,
+      "ratio_cheng_lr04": 0.6922208850201594,
+      "phase_diff_deg": -64.02991471806068
     },
     {
       "n": 28,
       "period_kyr": 95.80485714285714,
-      "amp_lr04_permil": 0.34026779687750447,
-      "amp_cheng_permil": 0.21216358724599346,
-      "amp_epica_ppm": 17.788646461365087,
-      "ratio_cheng_lr04": 0.6235194431942432,
-      "phase_diff_deg": -150.6341534638286
+      "amp_lr04_permil": 0.3392321604156928,
+      "amp_cheng_permil": 0.20860041660405906,
+      "amp_epica_ppm": 17.77071479789017,
+      "ratio_cheng_lr04": 0.6149193412217802,
+      "phase_diff_deg": -150.18058271855685
     },
     {
       "n": 30,
       "period_kyr": 89.41786666666667,
-      "amp_lr04_permil": 0.12256446144597397,
-      "amp_cheng_permil": 0.05774580457530436,
-      "amp_epica_ppm": 7.765222391370251,
-      "ratio_cheng_lr04": 0.4711463983445032,
-      "phase_diff_deg": -116.99638780070242
+      "amp_lr04_permil": 0.13449821813214233,
+      "amp_cheng_permil": 0.0694961535854689,
+      "amp_epica_ppm": 8.096279886936829,
+      "ratio_cheng_lr04": 0.5167068720359556,
+      "phase_diff_deg": -117.11919073566277
     },
     {
       "n": 31,
       "period_kyr": 86.53341935483871,
-      "amp_lr04_permil": 0.20590066799337073,
-      "amp_cheng_permil": 0.19781950722258843,
-      "amp_epica_ppm": 5.746140622661746,
-      "ratio_cheng_lr04": 0.9607521391283563,
-      "phase_diff_deg": -134.24413045658585
+      "amp_lr04_permil": 0.2016931590223317,
+      "amp_cheng_permil": 0.19176453257741777,
+      "amp_epica_ppm": 5.624381214879966,
+      "ratio_cheng_lr04": 0.9507736083214671,
+      "phase_diff_deg": -134.45807221449527
     },
     {
       "n": 35,
       "period_kyr": 76.64388571428572,
-      "amp_lr04_permil": 0.10117402962167525,
-      "amp_cheng_permil": 0.05426916922718415,
-      "amp_epica_ppm": 8.99529619473592,
-      "ratio_cheng_lr04": 0.5363942647151189,
-      "phase_diff_deg": 43.25214844119265
+      "amp_lr04_permil": 0.10520953987230929,
+      "amp_cheng_permil": 0.051135458586242334,
+      "amp_epica_ppm": 8.895662767461033,
+      "ratio_cheng_lr04": 0.486034428515745,
+      "phase_diff_deg": 49.484704516907975
     },
     {
       "n": 38,
       "period_kyr": 70.59305263157894,
-      "amp_lr04_permil": 0.3040567028697877,
-      "amp_cheng_permil": 0.44398079844312516,
-      "amp_epica_ppm": 29.341596222857973,
-      "ratio_cheng_lr04": 1.4601907941929502,
-      "phase_diff_deg": -96.7453299786862
+      "amp_lr04_permil": 0.3137845366130644,
+      "amp_cheng_permil": 0.44671233655533255,
+      "amp_epica_ppm": 29.345393521217247,
+      "ratio_cheng_lr04": 1.4236276311671303,
+      "phase_diff_deg": -96.19504425836004
     },
     {
       "n": 39,
       "period_kyr": 68.78297435897436,
-      "amp_lr04_permil": 0.06862500954355924,
-      "amp_cheng_permil": 0.28014985195322656,
-      "amp_epica_ppm": 16.11604632724342,
-      "ratio_cheng_lr04": 4.082328786787322,
-      "phase_diff_deg": -84.73251065600246
+      "amp_lr04_permil": 0.07660773039070287,
+      "amp_cheng_permil": 0.2819702924506376,
+      "amp_epica_ppm": 16.05405511563615,
+      "ratio_cheng_lr04": 3.6807028613506287,
+      "phase_diff_deg": -82.06705256645043
     },
     {
       "n": 48,
       "period_kyr": 55.88616666666667,
-      "amp_lr04_permil": 0.07054119839810317,
-      "amp_cheng_permil": 0.13826355103524685,
-      "amp_epica_ppm": 8.547879871715587,
-      "ratio_cheng_lr04": 1.9600397239489582,
-      "phase_diff_deg": 72.07103486507852
+      "amp_lr04_permil": 0.07035140694549738,
+      "amp_cheng_permil": 0.13893297334442672,
+      "amp_epica_ppm": 8.527582700730983,
+      "ratio_cheng_lr04": 1.9748428549845611,
+      "phase_diff_deg": 74.51579467744111
     },
     {
       "n": 50,
       "period_kyr": 53.65072,
-      "amp_lr04_permil": 0.06081954949941688,
-      "amp_cheng_permil": 0.2968952764030843,
-      "amp_epica_ppm": 7.025339143650877,
-      "ratio_cheng_lr04": 4.881576382046875,
-      "phase_diff_deg": 137.03889211207016
+      "amp_lr04_permil": 0.06322777045114232,
+      "amp_cheng_permil": 0.29801062269291506,
+      "amp_epica_ppm": 7.063035985511256,
+      "ratio_cheng_lr04": 4.71328690805562,
+      "phase_diff_deg": 139.0753956942248
     },
     {
       "n": 53,
       "period_kyr": 50.61388679245283,
-      "amp_lr04_permil": 0.0817028133878752,
-      "amp_cheng_permil": 0.08401321984196772,
-      "amp_epica_ppm": 4.687464016017208,
-      "ratio_cheng_lr04": 1.0282781749892027,
-      "phase_diff_deg": -69.8215174189051
+      "amp_lr04_permil": 0.08314763813271571,
+      "amp_cheng_permil": 0.08488720928875876,
+      "amp_epica_ppm": 4.727472457789774,
+      "ratio_cheng_lr04": 1.0209214740804355,
+      "phase_diff_deg": -70.61953066257524
     },
     {
       "n": 65,
       "period_kyr": 41.269784615384616,
-      "amp_lr04_permil": 0.05710389616869827,
-      "amp_cheng_permil": 0.431707397815211,
-      "amp_epica_ppm": 8.787169591686753,
-      "ratio_cheng_lr04": 7.560034021844085,
-      "phase_diff_deg": -81.72775637598555
+      "amp_lr04_permil": 0.060610572434927935,
+      "amp_cheng_permil": 0.4337348462856666,
+      "amp_epica_ppm": 8.697337185384779,
+      "ratio_cheng_lr04": 7.15609222716595,
+      "phase_diff_deg": -82.07067230759743
     },
     {
       "n": 66,
       "period_kyr": 40.64448484848485,
-      "amp_lr04_permil": 0.23694463326161233,
-      "amp_cheng_permil": 0.8360096722956657,
-      "amp_epica_ppm": 12.890099768790225,
-      "ratio_cheng_lr04": 3.5282912332208056,
-      "phase_diff_deg": 18.882811987826564
+      "amp_lr04_permil": 0.23527264095327904,
+      "amp_cheng_permil": 0.8391518409999845,
+      "amp_epica_ppm": 12.756107292982565,
+      "ratio_cheng_lr04": 3.566720880081527,
+      "phase_diff_deg": 17.732028026586022
     },
     {
       "n": 68,
       "period_kyr": 39.44905882352941,
-      "amp_lr04_permil": 0.06355722246096389,
-      "amp_cheng_permil": 0.1537309321319169,
-      "amp_epica_ppm": 0.6416607944728361,
-      "ratio_cheng_lr04": 2.4187798991111777,
-      "phase_diff_deg": -7.510344457877464
+      "amp_lr04_permil": 0.06428522646868459,
+      "amp_cheng_permil": 0.15447300616658416,
+      "amp_epica_ppm": 0.5993114644642,
+      "ratio_cheng_lr04": 2.402931663339989,
+      "phase_diff_deg": -9.004446771153468
     },
     {
       "n": 73,
       "period_kyr": 36.747068493150685,
-      "amp_lr04_permil": 0.031591961031489035,
-      "amp_cheng_permil": 0.34338340961305813,
-      "amp_epica_ppm": 2.5274590364726697,
-      "ratio_cheng_lr04": 10.869328727988536,
-      "phase_diff_deg": -120.88453719402342
+      "amp_lr04_permil": 0.0317220104337668,
+      "amp_cheng_permil": 0.3435882163464698,
+      "amp_epica_ppm": 2.532289858676142,
+      "ratio_cheng_lr04": 10.83122449202444,
+      "phase_diff_deg": -120.7014751414994
     },
     {
       "n": 76,
       "period_kyr": 35.29652631578947,
-      "amp_lr04_permil": 0.00486503062603537,
-      "amp_cheng_permil": 0.10971061208309958,
-      "amp_epica_ppm": 1.0771473260575877,
-      "ratio_cheng_lr04": 22.550857438795898,
-      "phase_diff_deg": 4.500452133822989
+      "amp_lr04_permil": 0.004800104326266561,
+      "amp_cheng_permil": 0.10983739113510417,
+      "amp_epica_ppm": 1.0799656082899642,
+      "ratio_cheng_lr04": 22.882292481449838,
+      "phase_diff_deg": 5.163024531324034
     },
     {
       "n": 96,
       "period_kyr": 27.943083333333334,
-      "amp_lr04_permil": 0.04881543623778583,
-      "amp_cheng_permil": 0.11796222882891265,
-      "amp_epica_ppm": 1.7292064539767598,
-      "ratio_cheng_lr04": 2.416494410790565,
-      "phase_diff_deg": -14.964211657435431
+      "amp_lr04_permil": 0.04891809248081005,
+      "amp_cheng_permil": 0.1179018507469556,
+      "amp_epica_ppm": 1.7325620981761887,
+      "ratio_cheng_lr04": 2.4101890480134114,
+      "phase_diff_deg": -14.931224703922593
     },
     {
       "n": 107,
       "period_kyr": 25.070429906542056,
-      "amp_lr04_permil": 0.07193857619752791,
-      "amp_cheng_permil": 0.04889284847714532,
-      "amp_epica_ppm": 3.2395581065014434,
-      "ratio_cheng_lr04": 0.6796471526333248,
-      "phase_diff_deg": 102.50680872554379
+      "amp_lr04_permil": 0.07169237540068035,
+      "amp_cheng_permil": 0.048883869026586126,
+      "amp_epica_ppm": 3.2338937347970482,
+      "ratio_cheng_lr04": 0.6818558982511023,
+      "phase_diff_deg": 102.41995264619686
     },
     {
       "n": 110,
       "period_kyr": 24.38669090909091,
-      "amp_lr04_permil": 0.08796676174200137,
-      "amp_cheng_permil": 0.2206127890473545,
-      "amp_epica_ppm": 4.125898187135665,
-      "ratio_cheng_lr04": 2.5079107685513313,
-      "phase_diff_deg": 42.43808278856256
+      "amp_lr04_permil": 0.08760946181992708,
+      "amp_cheng_permil": 0.22073445417265394,
+      "amp_epica_ppm": 4.117918561216872,
+      "ratio_cheng_lr04": 2.5195275668551944,
+      "phase_diff_deg": 42.371013581507704
     },
     {
       "n": 113,
       "period_kyr": 23.739256637168143,
-      "amp_lr04_permil": 0.12454204893810616,
-      "amp_cheng_permil": 0.7424648086932447,
-      "amp_epica_ppm": 6.736196972090449,
-      "ratio_cheng_lr04": 5.9615592888007525,
-      "phase_diff_deg": 47.34410281553355
+      "amp_lr04_permil": 0.12423403969442358,
+      "amp_cheng_permil": 0.7425907907734524,
+      "amp_epica_ppm": 6.727584284585448,
+      "ratio_cheng_lr04": 5.977353651221442,
+      "phase_diff_deg": 47.287344355451886
     },
     {
       "n": 120,
       "period_kyr": 22.354466666666667,
-      "amp_lr04_permil": 0.098261991808809,
-      "amp_cheng_permil": 0.7413964903207279,
-      "amp_epica_ppm": 3.075512004951957,
-      "ratio_cheng_lr04": 7.545099347907408,
-      "phase_diff_deg": 12.339098997166248
+      "amp_lr04_permil": 0.09821710399356257,
+      "amp_cheng_permil": 0.7413849650694516,
+      "amp_epica_ppm": 3.07359410631957,
+      "ratio_cheng_lr04": 7.548430313299037,
+      "phase_diff_deg": 12.382731314863644
     },
     {
       "n": 134,
       "period_kyr": 20.01892537313433,
-      "amp_lr04_permil": 0.011093644414987312,
-      "amp_cheng_permil": 0.021366430361065985,
-      "amp_epica_ppm": 0.5786045038946555,
-      "ratio_cheng_lr04": 1.9260064196938138,
-      "phase_diff_deg": -156.28200480329096
+      "amp_lr04_permil": 0.011158720702083716,
+      "amp_cheng_permil": 0.021421807771373987,
+      "amp_epica_ppm": 0.5777528852444269,
+      "ratio_cheng_lr04": 1.919736889496105,
+      "phase_diff_deg": -155.87291893460656
     },
     {
       "n": 141,
       "period_kyr": 19.0250780141844,
-      "amp_lr04_permil": 0.04721416784955078,
-      "amp_cheng_permil": 0.47556509052179047,
-      "amp_epica_ppm": 1.6482282194679023,
-      "ratio_cheng_lr04": 10.072508151307282,
-      "phase_diff_deg": 6.263488219889575
+      "amp_lr04_permil": 0.04722669360221201,
+      "amp_cheng_permil": 0.4755391370297082,
+      "amp_epica_ppm": 1.6479329664442797,
+      "ratio_cheng_lr04": 10.06928710773508,
+      "phase_diff_deg": 6.251290648911554
     },
     {
       "n": 152,
       "period_kyr": 17.648263157894736,
-      "amp_lr04_permil": 0.021120302774338618,
-      "amp_cheng_permil": 0.07497717890550606,
-      "amp_epica_ppm": 0.6810062345585142,
-      "ratio_cheng_lr04": 3.5500049268519054,
-      "phase_diff_deg": -11.447208456843784
+      "amp_lr04_permil": 0.02121104514589937,
+      "amp_cheng_permil": 0.07494261806754146,
+      "amp_epica_ppm": 0.678690473254554,
+      "ratio_cheng_lr04": 3.533188372003902,
+      "phase_diff_deg": -11.308656561479436
     },
     {
       "n": 185,
       "period_kyr": 14.500194594594594,
-      "amp_lr04_permil": 0.032651403121051914,
-      "amp_cheng_permil": 0.15163136468340924,
-      "amp_epica_ppm": 2.2278109534713497,
-      "ratio_cheng_lr04": 4.64394636032181,
-      "phase_diff_deg": -23.06739848380054
+      "amp_lr04_permil": 0.032715527499872235,
+      "amp_cheng_permil": 0.15159496230083136,
+      "amp_epica_ppm": 2.226814500985107,
+      "ratio_cheng_lr04": 4.633731255026329,
+      "phase_diff_deg": -22.95821100746491
     }
   ],
   "snyder_available": true,

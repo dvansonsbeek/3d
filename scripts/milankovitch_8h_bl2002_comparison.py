@@ -47,9 +47,17 @@ def extract_8h_predictions():
     Schema is doc 91 §6 forward_projection: lists of glacial maxima and
     interglacial peaks each with kyr_from_now and C_normalized."""
     formula = json.loads(FORMULA_JSON.read_text())
-    fp = formula.get("forward_projection", {})
-    glacials = fp.get("glacial_maxima_future_kyrBP", [])
-    interglacials = fp.get("interglacial_peaks_future_kyrBP", [])
+    # Current schema (milankovitch_climate_formula.py): forward_projection_250kyr
+    # with [kyr_from_now, C_normalized] pairs. The former dict-of-records schema
+    # is accepted too, so old artifacts still read.
+    fp = formula.get("forward_projection_250kyr") or formula.get("forward_projection", {})
+
+    def _records(key_new, key_old):
+        raw = fp.get(key_new) or fp.get(key_old, [])
+        return [r if isinstance(r, dict) else {"kyr_from_now": r[0], "C_normalized": r[1]} for r in raw]
+
+    glacials = _records("glacial_maxima_kyr_from_now", "glacial_maxima_future_kyrBP")
+    interglacials = _records("interglacial_peaks_kyr_from_now", "interglacial_peaks_future_kyrBP")
 
     # Forward order by time from now
     glacials_sorted = sorted(glacials, key=lambda d: d.get("kyr_from_now", 1e9))

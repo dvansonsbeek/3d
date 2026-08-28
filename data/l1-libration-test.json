@@ -127,6 +127,21 @@
     },
     {
       "n_observations": 48,
+      "predicted_yr": 111772.33333333333,
+      "mean_observed_yr": 105330.21233603505,
+      "bias_pct": -5.763609656502601,
+      "std_pct": 4.013090384321454,
+      "linear_slope_pct_per_Myr": -0.046492406533208394,
+      "trend_range_pct": 2.185143107060795,
+      "residual_std_pct": 3.9610678029113457,
+      "trend_p_value": 0.2758412866177211,
+      "classification": "equilibrium_shifted",
+      "n": 24,
+      "predicted_period_kyr": 111.77233333333332,
+      "proxy": "obl"
+    },
+    {
+      "n_observations": 48,
       "predicted_yr": 107301.44,
       "mean_observed_yr": 96643.41512917448,
       "bias_pct": -9.932788293265704,
@@ -489,15 +504,15 @@
   "classification_counts": {
     "libration": 1,
     "real_drift": 13,
-    "equilibrium_shifted": 8,
+    "equilibrium_shifted": 9,
     "mixed": 10
   },
   "aggregate_bias": {
-    "mean_pct": 1.9509434053956065,
-    "median_pct": 2.2773515869688006,
-    "std_pct": 8.89701776048521,
-    "t_statistic_vs_zero": 1.2209027180662284,
-    "t_pvalue": 0.23132794710468632
+    "mean_pct": 1.71716907018657,
+    "median_pct": 1.3838858965424865,
+    "std_pct": 8.86042010325562,
+    "t_statistic_vs_zero": 1.0963109015804573,
+    "t_pvalue": 0.2811249793485739
   },
-  "verdict": "? MIXED. 3% libration, 41% drift, 25% equilibrium-shifted. The 8H lattice is partially the equilibrium but not universally. Some integers behave as libration centers; others show systematic shift."
+  "verdict": "? MIXED. 3% libration, 39% drift, 27% equilibrium-shifted. The 8H lattice is partially the equilibrium but not universally. Some integers behave as libration centers; others show systematic shift."
 }

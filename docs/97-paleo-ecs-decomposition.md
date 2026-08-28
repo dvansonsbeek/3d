@@ -138,10 +138,10 @@ draws):
 | Band | Median ECS (K) | 90% CI | 50% CI |
 |---|---:|:---:|:---:|
 | Obliquity (35–50) | 2.43 | [1.96, 2.98] | [2.22, 2.66] |
-| 100-kyr band | 4.15 | [3.43, 4.97] | [3.84, 4.50] |
+| 100-kyr band | 4.09 | [3.38, 4.90] | [3.78, 4.43] |
 | Precession (18–26) | 2.39 | [1.90, 2.98] | [2.17, 2.63] |
-| Long (>130) | 2.18 | [1.86, 2.53] | [2.04, 2.33] |
-| **Overall ΔT-weighted** | **3.63** | **[3.01, 4.31]** | **[3.36, 3.91]** |
+| Long (>130) | 2.22 | [1.89, 2.56] | [2.07, 2.37] |
+| **Overall ΔT-weighted** | **3.61** | **[3.00, 4.29]** | **[3.35, 3.90]** |
 
 **Comparison to literature:**
 
@@ -1179,10 +1179,10 @@ drift* (trend >> residual); *mixed*.
 
 | Statistic | Value |
 |:---|---:|
-| Mean bias across 32 L1 integers | **+1.95%** |
-| Median bias | +2.28% |
+| Mean bias across 33 L1 integers | **+1.72%** |
+| Median bias | +1.38% |
 | t-test vs 0 | t=1.22, p=**0.23** |
-| L1 integers with \|bias\| < 5% | 13/32 |
+| L1 integers with \|bias\| < 5% | 13/33 |
 
 The aggregate bias is statistically indistinguishable from zero. On
 average, observed periods sit *on* the framework's lattice, not

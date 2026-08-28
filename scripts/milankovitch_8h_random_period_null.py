@@ -44,7 +44,8 @@ H_KYR = 335.317
 EIGHT_H = 8 * H_KYR
 DT_KYR = 1.0
 WINDOW = (0, 5320)
-N_COMPONENTS = 32
+from milankovitch_climate_formula import L1_LATTICE_INTEGERS  # noqa: E402 — the shipped lattice sizes the nulls
+N_COMPONENTS = len(L1_LATTICE_INTEGERS)   # the nulls must carry as many free periods as the model
 N_TRIALS = 1000
 PERIOD_BAND_KYR = (22.0, 400.0)
 RNG_SEED = 20260520

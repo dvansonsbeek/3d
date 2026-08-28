@@ -93,6 +93,15 @@
         "frac_sig_bonf_01": 0.0
       },
       {
+        "n": 24,
+        "period_kyr": 111.77233333333334,
+        "F_median": 0.8312083776882205,
+        "F_max": 10.034632651960417,
+        "frac_sig_plain_05": 0.0625,
+        "frac_sig_plain_01": 0.015625,
+        "frac_sig_bonf_01": 0.0
+      },
+      {
         "n": 25,
         "period_kyr": 107.30144,
         "F_median": 0.47700034883654874,
@@ -393,16 +402,16 @@
       }
     },
     "control_test": {
-      "n_lattice_F_samples": 2048,
+      "n_lattice_F_samples": 2112,
       "n_offlattice_F_samples": 6400,
-      "lattice_F_median": 0.7697899632906064,
-      "lattice_F_mean": 1.3058344037342726,
-      "lattice_F_p95": 4.510919017093064,
+      "lattice_F_median": 0.7705134583160311,
+      "lattice_F_mean": 1.3095169588123947,
+      "lattice_F_p95": 4.533825436827824,
       "offlattice_F_median": 0.7833839800186541,
       "offlattice_F_mean": 1.3289564964854588,
       "offlattice_F_p95": 4.344728063929014,
-      "KS_statistic": 0.008046875,
-      "KS_p_value": 0.8125375758181035,
+      "KS_statistic": 0.00893465909090909,
+      "KS_p_value": 0.7703088798807896,
       "verdict": "No significant lattice vs off-lattice difference"
     }
   },
@@ -503,6 +512,15 @@
         "F_median": 0.845387553741,
         "F_max": 4.633348706669239,
         "frac_sig_plain_05": 0.1111111111111111,
+        "frac_sig_plain_01": 0.0,
+        "frac_sig_bonf_01": 0.0
+      },
+      {
+        "n": 24,
+        "period_kyr": 111.77233333333334,
+        "F_median": 0.39244418463459524,
+        "F_max": 3.043997527999403,
+        "frac_sig_plain_05": 0.0,
         "frac_sig_plain_01": 0.0,
         "frac_sig_bonf_01": 0.0
       },
@@ -705,7 +723,7 @@
         "frac_sig_bonf_01": 0.0
       }
     ],
-    "aggregate_fraction_sig_bonf_01": 0.006944444444444444,
+    "aggregate_fraction_sig_bonf_01": 0.006734006734006734,
     "by_epoch": {
       "Pleistocene-Pliocene": {
         "window_Ma": [
@@ -713,20 +731,20 @@
           5.3
         ],
         "n_windows": 9,
-        "fraction_sig_bonf_01": 0.006944444444444444
+        "fraction_sig_bonf_01": 0.006734006734006734
       }
     },
     "control_test": {
-      "n_lattice_F_samples": 288,
+      "n_lattice_F_samples": 297,
       "n_offlattice_F_samples": 900,
-      "lattice_F_median": 1.0340471467863606,
-      "lattice_F_mean": 2.74706333133228,
-      "lattice_F_p95": 11.894354723754695,
-      "offlattice_F_median": 0.538299558230957,
-      "offlattice_F_mean": 0.9782135500488272,
-      "offlattice_F_p95": 3.2868763168528092,
-      "KS_statistic": 0.2115277777777778,
-      "KS_p_value": 2.4572812855971262e-09,
+      "lattice_F_median": 0.9884647349430945,
+      "lattice_F_mean": 2.6841705632385353,
+      "lattice_F_p95": 11.87010543958721,
+      "offlattice_F_median": 0.5469963333806639,
+      "offlattice_F_mean": 0.9842750175141939,
+      "offlattice_F_p95": 3.299907112834883,
+      "KS_statistic": 0.2016835016835017,
+      "KS_p_value": 9.745242999388608e-09,
       "verdict": "LATTICE significantly higher than off-lattice"
     }
   }

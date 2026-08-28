@@ -66,6 +66,14 @@
       "category": "incl-beat"
     },
     {
+      "n": 24,
+      "lattice_period_yr": 111772.33333333333,
+      "best_laskar_beat": "g2+g5",
+      "laskar_period_yr": 110669.91161777893,
+      "fractional_error": 0.009961349922839377,
+      "category": "ecc-beat"
+    },
+    {
       "n": 25,
       "lattice_period_yr": 107301.44,
       "best_laskar_beat": "s1-s4",
@@ -259,10 +267,10 @@
     }
   ],
   "test1_summary": {
-    "median_err": 0.004418554121516967,
-    "n_match_1pct": 25,
-    "n_match_5pct": 31,
-    "n_match_10pct": 31
+    "median_err": 0.004807131091617899,
+    "n_match_1pct": 26,
+    "n_match_5pct": 32,
+    "n_match_10pct": 32
   },
   "test2_nbody_spectra": {
     "ecc_Earth": [

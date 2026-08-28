@@ -1,7 +1,21 @@
 {
   "method": "Per-integer drift measurement across LA2004 -50 to 0 Myr (5-Myr windows), correlated with framework-internal Fibonacci classification (distance to nearest Earth Fibonacci divisor 8H/24, 40, 64, 104, 128) and Laskar beat class (inner/outer/mixed eigenmode involvement).",
-  "n_integers_measured": 32,
+  "n_integers_measured": 33,
   "per_integer": [
+    {
+      "n": 24,
+      "period_yr": 111772.33333333333,
+      "proxy": "eccentricity",
+      "n_windows": 10,
+      "max_abs_shift_pct": 12.526859429555351,
+      "median_abs_shift_pct": 12.295290605558078,
+      "fibonacci_distance_pct": 0.0,
+      "nearest_fibonacci": "H/3 inclination",
+      "nearest_fib_N": 24,
+      "laskar_beat": "g2+g5",
+      "laskar_beat_period_yr": 110669.91161777893,
+      "beat_class": "inner-outer-mixed"
+    },
     {
       "n": 65,
       "period_yr": 41269.78461538462,
@@ -452,18 +466,23 @@
     }
   ],
   "spearman_drift_vs_fibonacci_distance": {
-    "rho": 0.33079677079954606,
-    "p_value": 0.06441903485352277,
+    "rho": 0.27735520269207126,
+    "p_value": 0.11812622358447826,
     "verdict": "\u2717 No significant correlation \u2014 Fibonacci structure does NOT predict drift."
   },
   "mann_whitney_near_vs_far": {
-    "median_drift_near_pct": 5.85889639698509,
-    "median_drift_far_pct": 9.039668895249712,
-    "U_stat": 104.0,
-    "p_value": 0.1878924138405797,
+    "median_drift_near_pct": 8.674823177451845,
+    "median_drift_far_pct": 7.338034094742117,
+    "U_stat": 132.0,
+    "p_value": 0.4639895690025787,
     "verdict": "\u2717 No significant difference between near-Fibonacci and far."
   },
   "by_fibonacci": {
+    "H/3 inclination": {
+      "n": 12,
+      "median_pct": 10.228721190382903,
+      "mean_pct": 12.240804141979046
+    },
     "H/8 obliquity": {
       "n": 7,
       "median_pct": 2.6179426217487567,
@@ -479,11 +498,6 @@
       "median_pct": 10.19830200704229,
       "mean_pct": 9.571934960198334
     },
-    "H/3 inclination": {
-      "n": 11,
-      "median_pct": 9.630886743052395,
-      "mean_pct": 12.214799115835747
-    },
     "H/16 perihelion": {
       "n": 5,
       "median_pct": 13.42773538808344,
@@ -491,15 +505,15 @@
     }
   },
   "by_beat_class": {
+    "inner-outer-mixed": {
+      "n": 15,
+      "median_pct": 9.376870015894527,
+      "mean_pct": 11.049040608963226
+    },
     "outer-only": {
       "n": 3,
       "median_pct": 4.322220514667341,
       "mean_pct": 4.246916935551087
-    },
-    "inner-outer-mixed": {
-      "n": 14,
-      "median_pct": 9.117760079244393,
-      "mean_pct": 10.943482121778077
     },
     "k+outer": {
       "n": 7,
