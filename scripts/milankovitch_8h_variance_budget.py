@@ -54,7 +54,12 @@ SIDEBANDS_6 = [96, 107, 110, 134, 152, 185]
 # Subthreshold in LR04 (amp/median 2.03×), 3σ in Cheng monsoon (3.60×).
 BERGER_QUINTET_141 = [141]
 
-EXTENDED_32 = sorted(BASE_25 + SIDEBANDS_6 + BERGER_QUINTET_141)
+# The extended set IS the shipped lattice (single source of truth); BASE_25 /
+# SIDEBANDS_6 / 141 above record how it was constructed. Whatever the shipped
+# list carries beyond the 25 (sidebands, 141, the regime-admitted 24) is the A1 step.
+from milankovitch_climate_formula import L1_LATTICE_INTEGERS  # noqa: E402
+EXTENDED_32 = sorted(set(L1_LATTICE_INTEGERS))
+ADDED_BEYOND_BASE = [n for n in EXTENDED_32 if n not in BASE_25]
 EXTENDED_31 = EXTENDED_32  # backward-compat alias (former name)
 
 # Layer-2 explicit line periods (in kyr)
@@ -199,7 +204,7 @@ def run_tier_a(label, t, y):
     fit1 = fit_components(t, y, periods_31)
     out["a1_extended_31"] = {
         "integers": EXTENDED_31,
-        "added_sidebands": SIDEBANDS_6,
+        "added_sidebands": ADDED_BEYOND_BASE,
         "r2": fit1["r2"],
         "delta_r2_vs_a0": fit1["r2"] - fit0["r2"],
         "condition": fit1["condition"],

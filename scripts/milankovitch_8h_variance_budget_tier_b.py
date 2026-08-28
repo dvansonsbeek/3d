@@ -57,7 +57,8 @@ BASE_25 = [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
            38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
 SIDEBANDS_6 = [96, 107, 110, 134, 152, 185]
 BERGER_QUINTET_141 = [141]  # k+g3 Earth at ~19 kyr (added 2026-05-28)
-EXTENDED_32 = sorted(BASE_25 + SIDEBANDS_6 + BERGER_QUINTET_141)
+from milankovitch_climate_formula import L1_LATTICE_INTEGERS  # noqa: E402 — the shipped lattice is the extended set
+EXTENDED_32 = sorted(set(L1_LATTICE_INTEGERS))
 EXTENDED_31 = EXTENDED_32  # backward-compat alias
 
 PERIOD_405K = 404.5
