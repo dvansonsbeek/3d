@@ -2226,6 +2226,48 @@ export const VALUES = {
   ...(() => {
     const pm = predictiveMachinery;
     const out = {};
+    // ── Perihelion-advance projection (plan IP-mercury-anomaly-projection, P1) ──
+    // The equatorial projection of each planet's ecliptic perihelion advance:
+    //   rate_RA = rate_ecl × dα/dλ,   dα/dλ = cos ε / (cos²λ + sin²λ cos²ε)   (β = 0)
+    // at the IAU J2000 longitude of perihelion (reading A, the physical
+    // perihelion) and at the scene marker's longitude λ + angleCorrection
+    // (reading B — the marker is placed so that its RA equals the catalogue
+    // value; angleCorrection IS the inverse RA→λ conversion, verified for all
+    // seven planets to 0.001°). The obliquity-rate term ∂α/∂ε · ε̇ is what
+    // separates the projection from the Earth-frame rate the export measures
+    // (Mercury: 574.1 + 4.3 + ~1 = 579.9). The GR perihelion advance is
+    // derived from the same constants (6π GM/(c² a (1−e²)) per orbit) so the
+    // comparison carries no cited number. Closure gate:
+    // tools/verify/perihelion-projection-closure.js.
+    const D2R = Math.PI / 180;
+    const epsJ2000 = () => astro.earthOrbital.obliquityJ2000_deg;
+    const raSlope = (lamDeg, epsDeg) => { const l = lamDeg * D2R, e = epsDeg * D2R; return Math.cos(e) / (Math.cos(l) ** 2 + Math.sin(l) ** 2 * Math.cos(e) ** 2); };
+    const dAlphaDeps = (lamDeg, epsDeg) => { const l = lamDeg * D2R, e = epsDeg * D2R; return -Math.sin(l) * Math.cos(l) * Math.sin(e) / (Math.cos(l) ** 2 + Math.sin(l) ** 2 * Math.cos(e) ** 2); };
+    const epsRateArcsecCy = () => { const f = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js')).computeObliquityEarth; return (f(2050) - f(1950)) * 3600; };
+    const eclRate = (p) => 1296000 / C.planets[p].perihelionEclipticYears * 100;
+    const grAdvance = (p) => {   // ″/cy, 6π GM_sun / (c² a (1 − e²)) per orbit × orbits per century
+      const P = C.planets[p];
+      const aAU = Math.pow(P.solarYearInput / C.meanSiderealYearDays, 2 / 3);
+      const aKm = aAU * C.currentAUDistance;
+      const perOrbit = 6 * Math.PI * C.GM_SUN / (C.speedOfLight ** 2 * aKm * (1 - P.orbitalEccentricityJ2000 ** 2));
+      return perOrbit * (36525 / P.solarYearInput) * 206264.806;
+    };
+    for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      const lamA = () => C.planets[p].longitudePerihelion;
+      const lamB = () => C.planets[p].longitudePerihelion + C.planets[p].angleCorrection;
+      out[`${p}PeriRateEclipticArcsecCy`] = { get: () => eclRate(p), render: (v) => thousands(v, 2), unit: '″/cy', note: 'the lattice divisor: 1296000 / perihelionEclipticYears × 100' };
+      out[`${p}PeriRaSlopeJ2000`] = { get: () => raSlope(lamA(), epsJ2000()), render: (v) => Number(v).toFixed(5), note: 'dα/dλ at the IAU J2000 perihelion longitude, IAU 2006 obliquity' };
+      out[`${p}PeriRateRaProjectedJ2000`] = { get: () => eclRate(p) * raSlope(lamA(), epsJ2000()), render: (v) => thousands(v, 2), unit: '″/cy' };
+      out[`${p}PeriProjectionExcessJ2000`] = { get: () => eclRate(p) * (raSlope(lamA(), epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy', note: 'reading A: the projected rate minus the ecliptic rate' };
+      out[`${p}PeriRaSlopeMarkerJ2000`] = { get: () => raSlope(lamB(), epsJ2000()), render: (v) => Number(v).toFixed(5), note: 'reading B: at the scene marker longitude (IAU λ + angleCorrection)' };
+      out[`${p}PeriProjectionExcessMarkerJ2000`] = { get: () => eclRate(p) * (raSlope(lamB(), epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy' };
+      out[`${p}PeriObliquityRateTermJ2000`] = { get: () => eclRate(p) === 0 ? 0 : dAlphaDeps(lamB(), epsJ2000()) * epsRateArcsecCy(), render: (v) => thousands(v, 2), unit: '″/cy', note: '∂α/∂ε · ε̇ at J2000 (shipped obliquity law, ±50 yr)' };
+      out[`${p}PeriRateEarthFrameMeasuredJ2000`] = { get: () => pm().totalPrecession(2000, p), render: (v) => thousands(v, 2), unit: '″/cy', note: 'the export/predict Earth-frame rate (RA) at J2000' };
+      out[`${p}PeriAnomalyGrArcsecCy`] = { get: () => grAdvance(p), render: (v) => Number(v).toFixed(2), unit: '″/cy', note: 'general-relativistic advance from the model constants (GM_SUN, c, a from the period, e)' };
+    }
+    out.earthPeriRateEclipticOfDateArcsecCy = { get: () => 1296000 / (C.H / 16) * 100, render: (v) => thousands(v, 2), unit: '″/cy', note: 'H/16 — the perihelion OF DATE (not the inertial advance)' };
+    out.earthPeriProjectionExcessJ2000 = { get: () => 1296000 / (C.H / 16) * 100 * (raSlope(astro.earthOrbital.earthPerihelionLongitudeJ2000, epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy' };
+    out.obliquityRateJ2000ArcsecCy = { get: epsRateArcsecCy, render: (v) => thousands(v, 1), unit: '″/cy', note: 'shipped obliquity law, central difference 1950–2050' };
     for (const y of [1800, 1900, 2000, 2100]) {
       out[`mercuryHelio${y}`] = { get: () => pm().totalPrecession(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy' };
       out[`mercuryGeo${y}`] = { get: () => pm().totalPrecession(y, 'mercury') + astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy' };

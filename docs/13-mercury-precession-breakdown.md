@@ -273,6 +273,83 @@ The small overestimate reflects the limitations of first-order theory, which doe
 
 **No calibration factors are used** - values are calculated from first principles, with all their inherent limitations.
 
+### 1.8 The Earth-frame rate is the equatorial projection of the ecliptic advance
+
+The Earth-frame perihelion rate the model measures (the right ascension of
+the perihelion direction in the scene's equatorial frame — the Step-3 export's
+`<Planet> Perihelion ICRF` column, and at J2000 the shipped predict basis) is
+not a new quantity: it is the ecliptic advance projected into that frame,
+plus the term the changing obliquity adds to any right ascension:
+
+```
+rate_RA  =  rate_ecl · dα/dλ(λ, ε)  +  ∂α/∂ε(λ, ε) · ε̇  +  κ
+
+dα/dλ  =  cos ε / (cos²λ + sin²λ cos²ε)                  (β = 0)
+∂α/∂ε  =  −sin λ cos λ sin ε / (cos²λ + sin²λ cos²ε)
+```
+
+with ε̇ = <!--v:obliquityRateJ2000ArcsecCy-->-46.8<!--/v--> ″/cy from the shipped
+obliquity law and κ a small of-date coupling (≤ 0.7 ″/cy, measured). The gate
+`tools/verify/perihelion-projection-closure.js` pins this for all seven
+planets at 1900/2000/2100 to 1 ″/cy.
+
+**Mercury.** The ecliptic advance is the lattice divisor,
+<!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> ″/cy (8H/11). At the
+IAU J2000 perihelion longitude (77.457°) and the IAU 2006 obliquity the slope
+is <!--v:mercuryPeriRaSlopeJ2000-->1.08036<!--/v-->, the projected rate
+<!--v:mercuryPeriRateRaProjectedJ2000-->574.14<!--/v--> ″/cy, and the excess
+over the ecliptic advance **<!--v:mercuryPeriProjectionExcessJ2000-->42.71<!--/v--> ″/cy**.
+The general-relativistic advance derived from the same model constants
+(6π GM/(c² a (1 − e²)) per orbit) is
+<!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> ″/cy. Adding the obliquity-rate
+term (<!--v:mercuryPeriObliquityRateTermJ2000-->4.31<!--/v-->) and κ gives the
+Earth-frame rate the model measures,
+<!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->579.83<!--/v--> ″/cy — the "+48"
+above 531.44 that is flat over the last millennium and oscillates around the
+ecliptic value over a full H.
+
+Two longitudes are in circulation and the difference between them is a
+convention, not a measurement. The scene places each perihelion marker so that
+its **RA** equals the catalogue longitude (pipeline Step 2 solves
+`angleCorrection` for that; it is the inverse RA→λ conversion at each
+planet's longitude, verified for all seven to 0.001°). Reading A takes the
+catalogue value as a true ecliptic longitude (λ = 77.457°, excess 42.71);
+reading B takes the marker's longitude (λ = 78.43°, excess
+<!--v:mercuryPeriProjectionExcessMarkerJ2000-->43.45<!--/v-->). Both are within
+1 % of the GR value; they differ by 0.74 ″/cy.
+
+**All planets.** The same projection, same constants:
+
+| planet | ecliptic ″/cy | dα/dλ | projected ″/cy | excess ″/cy | GR advance ″/cy | Earth-frame measured ″/cy |
+|---|---|---|---|---|---|---|
+| Mercury | <!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> | <!--v:mercuryPeriRaSlopeJ2000-->1.08036<!--/v--> | <!--v:mercuryPeriRateRaProjectedJ2000-->574.14<!--/v--> | <!--v:mercuryPeriProjectionExcessJ2000-->42.71<!--/v--> | <!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> | <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->579.83<!--/v--> |
+| Venus | <!--v:venusPeriRateEclipticArcsecCy-->-289.87<!--/v--> | <!--v:venusPeriRaSlopeJ2000-->1.00661<!--/v--> | <!--v:venusPeriRateRaProjectedJ2000-->-291.79<!--/v--> | <!--v:venusPeriProjectionExcessJ2000-->-1.92<!--/v--> | <!--v:venusPeriAnomalyGrArcsecCy-->8.62<!--/v--> | <!--v:venusPeriRateEarthFrameMeasuredJ2000-->-303.98<!--/v--> |
+| Mars | <!--v:marsPeriRateEclipticArcsecCy-->1,739.25<!--/v--> | <!--v:marsPeriRaSlopeJ2000-->0.94201<!--/v--> | <!--v:marsPeriRateRaProjectedJ2000-->1,638.40<!--/v--> | <!--v:marsPeriProjectionExcessJ2000-->-100.85<!--/v--> | <!--v:marsPeriAnomalyGrArcsecCy-->1.35<!--/v--> | <!--v:marsPeriRateEarthFrameMeasuredJ2000-->1,638.38<!--/v--> |
+| Jupiter | <!--v:jupiterPeriRateEclipticArcsecCy-->1,884.19<!--/v--> | <!--v:jupiterPeriRaSlopeJ2000-->0.92693<!--/v--> | <!--v:jupiterPeriRateRaProjectedJ2000-->1,746.52<!--/v--> | <!--v:jupiterPeriProjectionExcessJ2000-->-137.67<!--/v--> | <!--v:jupiterPeriAnomalyGrArcsecCy-->0.06<!--/v--> | <!--v:jupiterPeriRateEarthFrameMeasuredJ2000-->1,753.54<!--/v--> |
+| Saturn | <!--v:saturnPeriRateEclipticArcsecCy-->-3,140.31<!--/v--> | <!--v:saturnPeriRaSlopeJ2000-->1.08966<!--/v--> | <!--v:saturnPeriRateRaProjectedJ2000-->-3,421.86<!--/v--> | <!--v:saturnPeriProjectionExcessJ2000-->-281.55<!--/v--> | <!--v:saturnPeriAnomalyGrArcsecCy-->0.01<!--/v--> | <!--v:saturnPeriRateEarthFrameMeasuredJ2000-->-3,422.06<!--/v--> |
+| Uranus | <!--v:uranusPeriRateEclipticArcsecCy-->1,159.50<!--/v--> | <!--v:uranusPeriRaSlopeJ2000-->0.92126<!--/v--> | <!--v:uranusPeriRateRaProjectedJ2000-->1,068.21<!--/v--> | <!--v:uranusPeriProjectionExcessJ2000-->-91.29<!--/v--> | <!--v:uranusPeriAnomalyGrArcsecCy-->0.00<!--/v--> | <!--v:uranusPeriRateEarthFrameMeasuredJ2000-->1,065.58<!--/v--> |
+| Neptune | <!--v:neptunePeriRateEclipticArcsecCy-->193.25<!--/v--> | <!--v:neptunePeriRaSlopeJ2000-->0.99870<!--/v--> | <!--v:neptunePeriRateRaProjectedJ2000-->193.00<!--/v--> | <!--v:neptunePeriProjectionExcessJ2000-->-0.25<!--/v--> | <!--v:neptunePeriAnomalyGrArcsecCy-->0.00<!--/v--> | <!--v:neptunePeriRateEarthFrameMeasuredJ2000-->204.75<!--/v--> |
+
+The projection excess reproduces the GR advance for Mercury and for no other
+planet (Venus −1.92 vs 8.62; Mars −100.85 vs 1.35; the outer planets' excesses
+are large where their GR advances are negligible). Earth's own perihelion of
+date (H/16, <!--v:earthPeriRateEclipticOfDateArcsecCy-->6,184.00<!--/v--> ″/cy)
+projects with an excess of <!--v:earthPeriProjectionExcessJ2000-->493.18<!--/v--> ″/cy
+against a GR advance of 3.84. This table is the pre-registered test of the
+statement "the Mercury anomaly is the equatorial projection of the ecliptic
+advance" applied to all planets; the statement's scope, frame wording and
+public form are decided in the plan `IP-mercury-anomaly-projection.md`
+(private repo), not here.
+
+**Frames, measured.** In the scene the equatorial frame (`earth.rotationAxis`)
+and the star field (`zodiac`, a child of `earth.pivotObj`) share the H/13
+rotation, so a perihelion marker's rate is the same relative to the equinox
+and relative to the stars (Mercury: 532 ″/cy for both), whereas physically
+the two differ by the general precession. The "ICRF rate" of §1.5a
+(ω_ICRF = ω_ecl − ω_gen) is a formula applied outside the scene. The
+projection slope depends only on λ and ε and is unaffected; the words
+"of date" around it are the open frame decision of the plan.
+
 ---
 
 ## Part 2: Implementation

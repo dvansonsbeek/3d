@@ -42,6 +42,8 @@ const MANIFEST = [
     note: 'Its own output contains `✓ saturn J2000 match < 0.1": 0.0000"` — the anchor tautology. Do not treat that line as a gate. Checks 46-50 are the Config-7 falsification gate (§2j); each was shown to fail under injection.' },
 
   { n: 'dual-balance-optimizer.js', class: 'gate', ms: 658 },
+  { n: 'perihelion-projection-closure.js', class: 'gate', ms: 400,
+    note: 'Earth-frame perihelion rate ≡ ecliptic advance × dα/dλ + ∂α/∂ε·ε̇ (+κ ≤ 1 ″/cy) for all seven planets at 1900/2000/2100 — the decomposition behind the Mercury-anomaly projection statement (doc 13 §1.8).' },
 
   { n: 'ascending-node-verification.js', class: 'liftable', ms: 49, markers: 8 },
   { n: 'inclination-verification.js', class: 'liftable', ms: 61, markers: 20 },
