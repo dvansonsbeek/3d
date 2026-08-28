@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:ca274807cc67982a
+coefficients: sha256:8ba33b5f301719c5
 status: current
 ---
 
@@ -502,8 +502,8 @@ the one-sided residual column above into sign-mixed, noise-class scatter:
 | Century | residual today | **pre-registered** residual after framework re-reduction |
 |---|---:|---:|
 | -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.03<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+1.6<!--/v--> min |
-| -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−3.7<!--/v--> min |
-| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−3.2<!--/v--> min |
+| -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−3.8<!--/v--> min |
+| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−3.3<!--/v--> min |
 | -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−9.2<!--/v--> min |
 | -400…-301 | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr | <!--v:lunarPredictedReduced400Minutes-->−12.3<!--/v--> min |
 

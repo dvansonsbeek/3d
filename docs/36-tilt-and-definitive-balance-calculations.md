@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:ca274807cc67982a
+coefficients: sha256:8ba33b5f301719c5
 status: current
 ---
 
@@ -441,7 +441,7 @@ Phase angles are stored as `<planet>EccentricityPhaseJ2000` in `src/script.js`.
 
 Earth's eccentricity phase relates to its longitude of perihelion:
 
-    φ_Earth = ω + 90° = 102.947° + <!--v:periLongModel1246AD-->90.000<!--/v-->° ≈ <!--v:earthEccPhaseJ2000-->192.95<!--/v-->°
+    φ_Earth = ω + 90° = 102.947° + <!--v:periLongModel1246AD-->89.993<!--/v-->° ≈ <!--v:earthEccPhaseJ2000-->192.95<!--/v-->°
 
 This anchors Earth's phase to an observable orbital parameter. The exact
 analytical solution gives 193.0129° ≈ ω + 90.07° (0.002% match).

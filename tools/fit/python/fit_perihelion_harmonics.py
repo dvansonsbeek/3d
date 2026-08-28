@@ -2,17 +2,23 @@
 """
 Fit Earth perihelion longitude harmonics from simulation data.
 
-Reads 'Earth Perihelion (Ecliptic)' from data/01-holistic-year-objects-data.xlsx
-(14,579 data points, 23-year steps) and fits a 21-term Fourier series to the
-residuals after removing the linear precession trend.
+Reads 'Earth Perihelion ICRF' from data/01-holistic-year-objects-data.xlsx — the
+perihelion direction's right ascension in the of-date equatorial frame, as the
+browser export measures it — converts it to ecliptic longitude of date with the
+export's own obliquity column (β = 0), and fits the SHIPPED divisor set (read from fitted-coefficients.json) to the
+residuals after removing the linear precession trend. The greedy search is a
+diagnostic only; --write never stores it (the fitters-write-the-shipped-set rule).
+Requires a deep-time-OFF export (Step 3 protocol): a deep-time export carries
+α(t)'s H-drift and does not close over H (measured: 0.16° RMSE vs 0.0004°).
 
 Produced constants:
-    PERI_HARMONICS_RAW  — [divisor, sin_coeff, cos_coeff] × 21 terms
-    PERI_OFFSET         — DC offset (degrees)
+    PERI_HARMONICS_RAW  — [divisor, sin_coeff, cos_coeff] × shipped terms
+    PERI_OFFSET         — DC offset (degrees), J2000-anchored
 
-Usage: python tools/fit/python/fit_perihelion_harmonics.py
+Usage: python tools/fit/python/fit_perihelion_harmonics.py [--write]
 """
 
+import json
 import math
 import sys
 from pathlib import Path
@@ -31,8 +37,21 @@ PERI_PERIOD = H / 16  # perihelion precession cycle in years
 EXCEL_PATH = Path(__file__).resolve().parent.parent.parent.parent / 'data' / '01-holistic-year-objects-data.xlsx'
 
 
+def perihelion_ra_to_ecliptic_longitude_deg(ra_deg, obliquity_deg):
+    """Of-date equatorial RA of the perihelion direction → ecliptic longitude of
+    date (β = 0): tan λ = tan α / cos ε. The export column 'Earth Perihelion ICRF'
+    is the RA the browser measures in earth.rotationAxis; every consumer of
+    PERI_HARMONICS (framework Sun, cardinal points, ERD) treats ϖ as ecliptic
+    longitude, so the fit must be made on λ. Fitting the RA directly carries a
+    tan²(ε/2)·sin 2λ wave (2.47° at H/32) and an 8% rate error at J2000
+    (66.7″/yr vs the H/16 mean 61.8″/yr) — measured on the Step-3 export."""
+    a = np.deg2rad(ra_deg)
+    eps = np.deg2rad(obliquity_deg)
+    return np.rad2deg(np.arctan2(np.sin(a), np.cos(a) * np.cos(eps))) % 360.0
+
+
 def load_data():
-    """Load Earth perihelion ecliptic longitude and unwrap."""
+    """Load Earth perihelion ecliptic longitude of date and unwrap."""
     df = pd.read_excel(str(EXCEL_PATH), sheet_name='Holistic_objects_PerihelionPlan')
 
     # Downsample by stepYears for fitting efficiency (same RMSE, much faster)
@@ -40,7 +59,9 @@ def load_data():
     df = df.iloc[::step].reset_index(drop=True)
 
     years = df['Model Year'].values.astype(float)
-    peri_raw = df['Earth Perihelion ICRF'].values.astype(float)
+    peri_raw = perihelion_ra_to_ecliptic_longitude_deg(
+        df['Earth Perihelion ICRF'].values.astype(float),
+        df['EARTH OBLIQUITY (deg)'].values.astype(float))
 
     # Unwrap: perihelion longitude advances ~360° per H/16 years.
     # np.unwrap works in radians, so convert, unwrap, convert back.
@@ -183,10 +204,11 @@ def main():
     j2000_idx = np.argmin(np.abs(years - 2000))
     print(f'J2000 perihelion: {peri[j2000_idx] % 360:.4f}° (expected ~102.947°)')
 
-    # ─── Fit with current 21 divisors ────────────────────────────────
-    current_divisors = [16, 32, 48, 64, 3, 29, 24, 8, 40, 13, 45, 80, 272, 56, 61, 35, 544, 21, 5, 96, 816]
+    # ─── Fit the SHIPPED divisor set (the structural claim; never the greedy result) ──
+    json_path = Path(__file__).resolve().parent.parent.parent.parent / 'public' / 'input' / 'fitted-coefficients.json'
+    current_divisors = [int(d) for d, _, _ in json.loads(json_path.read_text())['PERI_HARMONICS_RAW']]
     current_divisors.sort()
-    print(f'\n── Current {len(current_divisors)} harmonics ──')
+    print(f'\n── Shipped {len(current_divisors)} harmonics ──')
     harmonics, offset, rmse = fit_harmonics(years, peri, current_divisors)
     print(f'RMSE = {rmse:.6f}°')
     print(f'PERI_OFFSET = {offset:.6f}')
@@ -212,45 +234,46 @@ def main():
         phase = 2 * math.pi * t_2000 / (H / div)
         pred_2000g += sc * math.sin(phase) + cc * math.cos(phase)
 
-    # ─── Smart anchor: adjust offset so formula gives IAU value at J2000 ──
+    print(f'  Greedy diagnostic: {len(greedy_divs)} terms, RMSE = {greedy_rmse:.6f}°, '
+          f'J2000 = {pred_2000g % 360:.4f}° (NOT written — the shipped set is)')
+
+    # ─── Smart anchor: adjust the SHIPPED-set offset so the formula gives IAU at J2000 ──
     iau_j2000 = C.get('earthPerihelionLongitudeJ2000', 102.947)
-    anchor_shift = iau_j2000 - (pred_2000g % 360)
-    greedy_offset += anchor_shift
+    anchor_shift = iau_j2000 - (pred_2000 % 360)
+    offset += anchor_shift
     print(f'\n── Smart anchor (J2000) ──')
     print(f'  IAU perihelion at J2000: {iau_j2000}°')
-    print(f'  Formula before anchor:   {pred_2000g % 360:.6f}°')
+    print(f'  Formula before anchor:   {pred_2000 % 360:.6f}°')
     print(f'  Shift:                   {anchor_shift * 3600:.1f}"')
-    print(f'  Adjusted PERI_OFFSET:    {greedy_offset:.12f}')
+    print(f'  Adjusted PERI_OFFSET:    {offset:.12f}')
     print(f'  Formula after anchor:    {iau_j2000}° (exact)')
 
     # ─── Output ───────────────────────────────────────────────────────
     print(f'\n═══════════════════════════════════════════════════════════════')
-    print(f'  COPY-PASTE OUTPUT')
+    print(f'  COPY-PASTE OUTPUT (shipped set)')
     print(f'═══════════════════════════════════════════════════════════════')
 
-    print(f'\n// Perihelion harmonics — {len(greedy_divs)} terms, RMSE = {greedy_rmse:.4f}°')
-    print(f'// Fitted from {len(years)} simulation data points (29-yr steps)')
+    print(f'\n// Perihelion harmonics — {len(current_divisors)} terms, RMSE = {rmse:.4f}°')
+    print(f'// Fitted from {len(years)} simulation data points')
     print(f'const PERI_HARMONICS_RAW = [')
-    for div, sc, cc in greedy_harm:
+    for div, sc, cc in harmonics:
         amp = math.sqrt(sc**2 + cc**2)
         print(f'  [{div:>4},  {sc:>10.6f},  {cc:>10.6f}],  // H/{div}  amp={amp:.6f}°')
     print(f'];')
-    print(f'const PERI_OFFSET = {greedy_offset:.6f};')
+    print(f'const PERI_OFFSET = {offset:.6f};')
 
-    print(f'\nJ2000: {pred_2000g % 360:.4f}° (data: {peri[j2000_idx] % 360:.4f}°, ref: 102.947°)')
+    print(f'\nJ2000: {iau_j2000:.4f}° (data: {peri[j2000_idx] % 360:.4f}° RA, ref: {iau_j2000}° ecliptic)')
 
     # Summary
     print(f'\n── Summary ──')
-    print(f'Current ({len(current_divisors)} terms): RMSE = {rmse:.6f}°, offset = {offset:.6f}')
-    print(f'Greedy  ({len(greedy_divs)} terms):  RMSE = {greedy_rmse:.6f}°, offset = {greedy_offset:.6f}')
+    print(f'Shipped ({len(current_divisors)} terms): RMSE = {rmse:.6f}°, offset = {offset:.6f}  ← written')
+    print(f'Greedy  ({len(greedy_divs)} terms):  RMSE = {greedy_rmse:.6f}° (diagnostic only)')
 
     # ─── Write to fitted-coefficients.json if --write flag is present ───
-    import json
     if '--write' in sys.argv:
-        json_path = Path(__file__).resolve().parent.parent.parent.parent / 'public' / 'input' / 'fitted-coefficients.json'
         fc = json.loads(json_path.read_text())
-        fc['PERI_HARMONICS_RAW'] = [[int(d), s, c] for d, s, c in greedy_harm]
-        fc['PERI_OFFSET'] = greedy_offset
+        fc['PERI_HARMONICS_RAW'] = [[int(d), s, c] for d, s, c in harmonics]   # shipped set, anchored
+        fc['PERI_OFFSET'] = offset
         json_path.write_text(json.dumps(fc, indent=2) + '\n')
         print(f'\n✓ Written PERI_HARMONICS to fitted-coefficients.json')
     else:

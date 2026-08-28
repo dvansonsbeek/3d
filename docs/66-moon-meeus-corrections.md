@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:ca274807cc67982a
+coefficients: sha256:8ba33b5f301719c5
 status: current
 ---
 
@@ -965,8 +965,8 @@ unshipped even though "fitting" them would improve the gates
 AT the R1-measured MPP02-vs-JPL comparison floor (~0.33″); dense 2-day
 λ 2.32 → 2.22″, β 0.60 → 0.38″; syzygy fleet improves 9.34″; the
 sign-flip control degrades every gate. Audit: verdicts 3/13/5/0/5
-reproduced, Babylon −135 <!--v:babylon135BestGapKm-->193<!--/v--> km,
-centerlines mean flat at <!--v:centerlinesMeanArcsec-->2.3<!--/v-->″
+reproduced, Babylon −135 <!--v:babylon135BestGapKm-->198<!--/v--> km,
+centerlines mean flat at <!--v:centerlinesMeanArcsec-->2.2<!--/v-->″
 with Antarctica halved 2.2 → 1.0″ and the recorded tension that the
 2001 Atlantic max moves 5.6 → <!--v:centerlinesMaxArcsec-->6.7<!--/v-->″
 (the known series-tail-anatomy point; the A2-class correlated-subsample
@@ -1110,10 +1110,10 @@ nutation on a SUN-ALONE metric; nutation is a frame rotation common to
 Sun and Moon, the chain keeps both mean-of-date, so the term was a
 frame inconsistency for elongation. REMOVED: nutation-free syzygy
 fleet 3.877 → 3.756″, fuller-bridged Sun 2.344 → 2.123″, centerlines
-mean 2.4 → <!--v:centerlinesMeanArcsec-->2.3<!--/v-->″ (Texas 1.9 → 1.4,
+mean 2.4 → <!--v:centerlinesMeanArcsec-->2.2<!--/v-->″ (Texas 1.9 → 1.4,
 US 3.2 → 2.0; Antarctica 1.0 → 1.7; max
 <!--v:centerlinesMaxArcsec-->6.7<!--/v-->″ unchanged), Babylon −135
-<!--v:babylon135BestGapKm-->193<!--/v--> km, verdicts 3/13/5/0/5
+<!--v:babylon135BestGapKm-->198<!--/v--> km, verdicts 3/13/5/0/5
 reproduced; the registry Sun keys are now INSTRUMENT-OWNED
 (`fq7s-sun-registry-metric.mjs`: modern window 1970–2049, full
 nutation bridge, mean removed — certified
@@ -1267,7 +1267,7 @@ closed λ to 2.96″, the FQ-7 J2 node family to 2.92″ with β
 0.65 → 0.61″, and the FQ-7 dust round to
 <!--v:moonSeriesLonVsJplRms-->2.84<!--/v-->″ /
 <!--v:moonSeriesLatVsJplRms-->0.35<!--/v-->″); syzygy 3.82″; tracked centerlines
-<!--v:centerlinesMeanArcsec-->2.3<!--/v-->″ mean, <!--v:centerlinesMaxArcsec-->6.7<!--/v-->″ max (current audit run, <!--v:centerlinesEvents-->14<!--/v--> events / <!--v:centerlinesPoints-->42<!--/v--> points).
+<!--v:centerlinesMeanArcsec-->2.2<!--/v-->″ mean, <!--v:centerlinesMaxArcsec-->6.7<!--/v-->″ max (current audit run, <!--v:centerlinesEvents-->14<!--/v--> events / <!--v:centerlinesPoints-->42<!--/v--> points).
 
 ### Geocentric parallax limit
 - The 0.81-degree RMS is the **theoretical best** for geocentric coordinates.

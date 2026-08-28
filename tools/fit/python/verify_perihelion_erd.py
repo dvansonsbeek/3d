@@ -33,6 +33,7 @@ sys.path.insert(0, str(_LIB_PYTHON)) # predictive_formula.py, constants_scripts.
 
 from load_constants import C
 from predictive_formula import calc_earth_perihelion, calc_erd
+from fit_perihelion_harmonics import perihelion_ra_to_ecliptic_longitude_deg
 
 # ─── Configuration ────────────────────────────────────────────────────────────
 EXCEL_PATH = _REPO / 'data' / '01-holistic-year-objects-data.xlsx'
@@ -53,7 +54,9 @@ ERD_STEP_YEARS  = int(C.get('stepYears', 20))  # data step size (years), used fo
 
 
 def load_truth():
-    """Load Earth Perihelion ICRF from the Excel simulation data and unwrap."""
+    """Load Earth Perihelion ICRF from the Excel simulation data, convert it to
+    ecliptic longitude of date (the same conversion the fitter applies — the
+    formula is an ecliptic longitude, the export column is an RA) and unwrap."""
     df = pd.read_excel(str(EXCEL_PATH), sheet_name=SHEET_NAME)
 
     # Downsample by stepYears for consistency with fitting scripts
@@ -61,7 +64,9 @@ def load_truth():
     df = df.iloc[::step].reset_index(drop=True)
 
     years = df['Model Year'].values.astype(float)
-    peri_raw = df['Earth Perihelion ICRF'].values.astype(float)
+    peri_raw = perihelion_ra_to_ecliptic_longitude_deg(
+        df['Earth Perihelion ICRF'].values.astype(float),
+        df['EARTH OBLIQUITY (deg)'].values.astype(float))
     peri_unwrapped = np.rad2deg(np.unwrap(np.deg2rad(peri_raw)))
     print(f'  Downsampled by {step}: {len(years)} points')
     return years, peri_unwrapped

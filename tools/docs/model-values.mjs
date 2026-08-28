@@ -117,7 +117,7 @@ function predictiveMachinery() {
         },
         computeEccentricityEarth: (year) => oe.computeEccentricityEarth(year),
         obliquityMeanDeg: C.SOLSTICE_OBLIQUITY_MEAN,
-        eccentricityMean: Math.sqrt(C.eccentricityBase ** 2 + C.eccentricityAmplitude ** 2),
+        eccentricityMean: C.eccentricityBaseDerived,   // the ONE law's mean — mirrors orbital-engine _predict (unification)
       });
     }
     return predictM;

@@ -295,16 +295,20 @@ def calc_obliquity(year: int) -> float:
 
 
 def calc_eccentricity(year: int) -> float:
-    """Calculate Earth's orbital eccentricity at given year.
+    """Calculate Earth's orbital eccentricity at given year — the model's ONE law.
 
-    Formula: e(t) = e₀ + (-A - (e₀ - e_base)·cos(φ))·cos(φ)
-    where e₀ = sqrt(e_base² + A²), e_base = 0.015372, A = 0.00137032
-    Only 2 free parameters: extremes are exactly e_base ± A.
+    e(t) = base' · (1 + cos θ(t) / 2),  θ(t) = 2π · 3t/H − π  (the H/3 System-Reset
+    lattice phase, t from BALANCE_YEAR; θ(J2000) = 81.178°). base' = EARTH_ECC_MEAN
+    (eccentricityDerivedMean, derived from e(J2000) and the anchor). This is the
+    J2000-anchored snapshot form of @essrt/physics moon/ecc-channel.cjs eccAt —
+    the SAME law both engines inject into the predict feature basis
+    (computeEccentricityEarth), so the trained coefficients and the runtime
+    features are a matched pair. The former H/16 law-of-cosines form remains
+    for the PLANETS' wobble laws only.
     """
     t = time_offset(year)
-    cos_phi = math.cos(2 * math.pi * t / EARTH_PERI_PERIOD)
-    h1 = EARTH_ECC_MEAN - EARTH_ECC_BASE
-    return EARTH_ECC_MEAN + (-EARTH_ECC_AMP - h1 * cos_phi) * cos_phi
+    cos_theta = -math.cos(2 * math.pi * t / INCLIN_CYCLE)   # θ = 2π·3t/H − π
+    return EARTH_ECC_MEAN * (1 + cos_theta / 2)
 
 
 def calc_inclination(year: int) -> float:

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:ca274807cc67982a
+coefficients: sha256:8ba33b5f301719c5
 status: current
 ---
 
@@ -89,7 +89,7 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->193<!--/v--> km from Babylon at
+  totality path <!--v:babylon135BestGapKm-->198<!--/v--> km from Babylon at
   ΔUT <!--v:babylon135BestDeltaUT-->-0h54<!--/v--> (framework
   <!--v:babylon135FrameworkUT-->06:05<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
@@ -111,9 +111,9 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   documented visibility regions vs the api observer tier
   (<!--v:lunarVisibilityInsideAgree-->14<!--/v-->/<!--v:lunarVisibilityChecked-->14<!--/v-->
   both directions); the −746 Feb 6 Babylonian partial (magnitude
-  <!--v:lunarBabylon746MagnitudeUmbral-->0.908<!--/v--> vs canon
+  <!--v:lunarBabylon746MagnitudeUmbral-->0.909<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
-  Babylon at <!--v:lunarBabylon746AltitudeDeg-->33.8<!--/v-->°); the
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->33.7<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
   (framework ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,213<!--/v--> s —
   statistically identical to Stephenson's own fitted spline at

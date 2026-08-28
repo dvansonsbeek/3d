@@ -462,11 +462,33 @@ Step 3:  Export from browser GUI              → data/01-holistic-year-objects-
            to within numerical noise. This is the framework's cyclical
            closure property and a quick correctness check on the export.
 
+           The SENSITIVE column is `Earth Perihelion ICRF` (61.9″/yr):
+           a deep-time-ON export reads +0.19° first-vs-last and fits at
+           0.16° RMSE (α(t)'s H-drift folded into the window — a "+0.6″/cy
+           ramp" plus an H/1 ladder that no lattice term absorbs), where
+           the snapshot export reads 0.000° and 0.0004°. Eccentricity and
+           obliquity barely register (they are functions of the year).
+           Decisive test before Step 4a: the Node mirror of that column
+           (`graph.barycenter.pivot` RA in `earthNodes.rotAxis`, SG_DEEP_TIME=0,
+           linear JD→pos) must reproduce the export to ~1e-6°; with deep
+           time ON it reproduces a deep-time export instead.
+
 ── Phase 3: Earth perihelion & ML training ────────────────────────
 
 Step 4a: python/fit_perihelion_harmonics.py   → PERI_HARMONICS_RAW, PERI_OFFSET
          (Earth perihelion longitude & ERD from file 01)
          Downsampled by stepYears for efficiency.
+         The export column `Earth Perihelion ICRF` is the perihelion
+         direction's RIGHT ASCENSION in the of-date equatorial frame; the
+         script converts it to ecliptic longitude of date with the export's
+         own obliquity column (β = 0, tan λ = tan α / cos ε) before fitting,
+         because every consumer of PERI_HARMONICS (framework Sun, cardinal
+         points, ERD) treats ϖ as ecliptic longitude. Fitting the RA
+         directly carries a tan²(ε/2)·sin 2λ wave (2.47° at H/32) and an 8%
+         rate error at J2000 (66.7″/yr vs the H/16 mean 61.8″/yr).
+         Fits and writes the SHIPPED divisor set (read from
+         fitted-coefficients.json); the greedy search is printed as a
+         diagnostic only and is never written.
          Updates: fitted-coefficients.json (auto-updated by script)
 
 Step 4b: python/verify_perihelion_erd.py      → pass/fail verification
