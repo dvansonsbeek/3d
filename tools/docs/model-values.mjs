@@ -2833,7 +2833,21 @@ export const VALUES = {
         note: 'derived: 2π·AU / sidereal year — one source (item 5 decision)',
       },
     };
+    // The OBSERVED formula (Step 4d, tools/lib/python/observed_formula.py — a
+    // Python-only validation formula, no runtime consumer) has no JSON
+    // artifact; its fit quality is what train_observed.py writes into the
+    // coefficient-file header ("RMSE: x arcsec/century", "R²: y", "(N-term
+    // system)"). Read THAT, never re-derive (the doc-35 literals had drifted).
+    const obsHeader = (p) => {
+      const src = readFileSync(join(ROOT, 'tools', 'lib', 'python', 'coefficients', `${p}_coeffs.py`), 'utf8');
+      const num = (re) => { const m = src.match(re); if (!m) throw new Error(`${p}_coeffs.py header: ${re} not found`); return Number(m[1]); };
+      return { rmse: num(/^RMSE:\s*([0-9.]+)\s*arcsec\/century/m), r2: num(/^R²:\s*([0-9.]+)/m), terms: num(/\((\d+)-term system\)/) };
+    };
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      out[`${p}ObsR2`] = { get: () => obsHeader(p).r2, render: (v) => Number(v).toFixed(6), note: 'Step 4d observed formula — from the coefficient-file header the trainer wrote' };
+      out[`${p}ObsRmse`] = { get: () => obsHeader(p).rmse, render: (v) => Number(v).toFixed(2), unit: '″/cy' };
+      out[`${p}ObsTerms`] = { get: () => obsHeader(p).terms, render: (v) => String(v) };
+      out[`${p}PredTerms`] = { get: () => stats().planets[p].terms, render: (v) => String(v), note: 'Step 4c physical-beat basis size' };
       out[`${p}PredR2`] = { get: () => stats().planets[p].r2, render: (v) => Number(v).toFixed(6), note: 'shipped arrays scored against the training data (generated artifact)' };
       out[`${p}PredRmse`] = { get: () => stats().planets[p].rmse_arcsec_cy, render: (v) => Number(v).toFixed(4), unit: '″/cy' };
     }

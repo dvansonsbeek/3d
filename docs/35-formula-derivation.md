@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:8ba33b5f301719c5
+coefficients: sha256:56d7365a511916d5
 status: current
 ---
 
@@ -181,7 +181,7 @@ Where δ = θ_E − θ_M (relative angle) and σ = θ_E + θ_M (sum angle).
 **Accuracy: R² = 0.9986** (explains 99.86% of variance across full H-year cycle)
 **RMSE: 2.83 arcsec/century**
 
-*Note: The observed formula (Section 14) achieves R² = 0.999994 with 225 terms by using actual perihelion data from Excel. The unified 429-term predictive system achieves R² = 0.999929, RMSE = 0.75″/cy.*
+*Note: The observed formula (Section 14) achieves R² = <!--v:mercuryObsR2-->0.999992<!--/v--> with <!--v:mercuryObsTerms-->225<!--/v--> terms by using actual perihelion data from Excel. The shipped predictive system (the <!--v:mercuryPredTerms-->2421<!--/v-->-term physical-beat basis, year-only input) achieves R² = <!--v:mercuryPredR2-->0.999992<!--/v-->, RMSE = <!--v:mercuryPredRmse-->0.0974<!--/v-->″/cy.*
 
 > **Note on ERD Terms**: The ERD² × Periodic terms (10 terms) were the key to reaching 99.8% accuracy. The largest coefficients are the ERD²×cos(t/(H/16)) and ERD²×sin(t/(H/16)) terms, indicating that the squared rate deviation interacting with Earth's effective perihelion cycle is a dominant correction term.
 
@@ -189,7 +189,7 @@ Where δ = θ_E − θ_M (relative angle) and σ = θ_E + θ_M (sum angle).
 
 ## 5. Venus Formula: Coefficient Breakdown (Observed Formula)
 
-> **Formula Type**: This section documents the **observed formula** (uses Excel data, 328 terms, R² = 0.999999, RMSE = 0.46″/cy). Venus also has a **predictive formula** (unified 429-term system, year-only input, R² = 0.999955, RMSE = 3.47″/cy).
+> **Formula Type**: This section documents the **observed formula** (uses Excel data, <!--v:venusObsTerms-->328<!--/v--> terms, R² = <!--v:venusObsR2-->0.999975<!--/v-->, RMSE = <!--v:venusObsRmse-->0.10<!--/v-->″/cy). Venus also has a **predictive formula** (the shipped <!--v:venusPredTerms-->2421<!--/v-->-term physical-beat basis, year-only input, R² = <!--v:venusPredR2-->0.999975<!--/v-->, RMSE = <!--v:venusPredRmse-->0.0972<!--/v-->″/cy).
 
 Venus presents a fundamentally different challenge than Mercury. With an eccentricity of only <!--v:venusEccJ2000-->0.00678<!--/v--> (compared to Mercury's <!--v:mercuryEccJ2000-->0.20564<!--/v-->), Venus has a nearly circular orbit where geometric modulation effects are minimal. Instead, Venus's fluctuation is dominated by **variations in Earth's axial precession rate**.
 
@@ -239,8 +239,8 @@ Where δ = θ_E − θ_V (relative angle between Earth and Venus perihelions).
 
 **Total: 328 non-zero coefficients** (observed formula)
 
-**Accuracy: R² = 0.999999** (explains 100% of variance)
-**RMSE: 0.46 arcsec/century** (using observed perihelion from Excel)
+**Accuracy: R² = <!--v:venusObsR2-->0.999975<!--/v-->**
+**RMSE: <!--v:venusObsRmse-->0.10<!--/v--> arcsec/century** (using observed perihelion from Excel)
 
 > **Key Finding**: The critical terms are the **ERD² × Periodic** terms — particularly ERD²×cos(H×2) and ERD²×cos(H/16) — which capture the quadratic relationship between Earth's precession rate variation and the Venus fluctuation amplitude. These quadratic rate terms, together with **ERD × Periodic × Angle** triple interactions, are what make Venus's near-circular orbit (e = 0.007) predictable despite its poorly-defined perihelion.
 
@@ -265,9 +265,9 @@ Mars's precession fluctuation is driven by:
 |----------|-------|
 | **Perihelion period** | H×8/36 (~<!--v:marsPeriPeriod-->74,515<!--/v--> years) |
 | **Eccentricity** | <!--v:marsEccJ2000-->0.09339<!--/v--> |
-| **Formula R²** | **<!--v:saturnPredR2-->1.000000<!--/v-->** |
-| **RMSE** | 0.03 arcsec/century |
-| **Features** | 225 terms |
+| **Formula R²** | **<!--v:marsObsR2-->0.999999<!--/v-->** |
+| **RMSE** | <!--v:marsObsRmse-->0.10<!--/v--> arcsec/century |
+| **Features** | <!--v:marsObsTerms-->225<!--/v--> terms |
 
 > **Why Mars achieves perfect fit**: Using the **actual observed perihelion** from orbital data (rather than calculating from assumed periods) allows the formula to capture Mars's complex precession pattern with near-perfect accuracy. Mars's intermediate eccentricity means both geometric and ERD effects are significant.
 
@@ -304,9 +304,9 @@ Jupiter's precession fluctuation is driven by:
 |----------|-------|
 | **Perihelion period (ecliptic)** | 8H/39 (~<!--v:jupiterPeriPeriod-->68,783<!--/v--> yr) |
 | **Eccentricity** | <!--v:jupiterEccJ2000-->0.04839<!--/v--> |
-| **Formula R²** | **<!--v:saturnPredR2-->1.000000<!--/v-->** |
-| **RMSE** | 0.06 arcsec/century |
-| **Features** | 225 terms |
+| **Formula R²** | **<!--v:jupiterObsR2-->0.999999<!--/v-->** |
+| **RMSE** | <!--v:jupiterObsRmse-->0.10<!--/v--> arcsec/century |
+| **Features** | <!--v:jupiterObsTerms-->225<!--/v--> terms |
 
 > **Jupiter's Fibonacci connection**: Jupiter's Fibonacci anchor H/5 is a fundamental Fibonacci division (its 8H-lattice secular perihelion sits one integer off at 8H/39). This explains why Jupiter appears in the beat frequency calculations for Mercury, Venus, and all other planets. Jupiter acts as a **gravitational anchor** for the outer solar system.
 
@@ -345,9 +345,9 @@ Saturn's precession fluctuation is driven by:
 |----------|-------|
 | **Perihelion period (ecliptic)** | 8H/65 (~<!--v:saturnPeriPeriod-->41,270<!--/v--> yr) — **ECLIPTIC-RETROGRADE** |
 | **Eccentricity** | <!--v:saturnEccJ2000-->0.05386<!--/v--> |
-| **Formula R²** | **<!--v:saturnPredR2-->1.000000<!--/v-->** |
-| **RMSE** | 0.05 arcsec/century |
-| **Features** | 225 terms |
+| **Formula R²** | **<!--v:saturnObsR2-->1.000000<!--/v-->** |
+| **RMSE** | <!--v:saturnObsRmse-->0.10<!--/v--> arcsec/century |
+| **Features** | <!--v:saturnObsTerms-->225<!--/v--> terms |
 
 > **Ecliptic-retrograde precession**: Saturn's perihelion precesses **opposite** to its orbital direction in the ecliptic frame. This creates the resonance loop with Jupiter and Earth that appears throughout the Holistic model. When calculating beat frequencies, Saturn's ecliptic rate must be treated as negative.
 
@@ -412,9 +412,9 @@ Uranus's precession fluctuation is driven by:
 |----------|-------|
 | **Perihelion period** | H/3 (<!--v:inclPrecYears-->~111,772<!--/v--> years) |
 | **Eccentricity** | <!--v:uranusEccJ2000-->0.04726<!--/v--> |
-| **Formula R²** | **<!--v:saturnPredR2-->1.000000<!--/v-->** |
-| **RMSE** | 0.01 arcsec/century |
-| **Features** | 225 terms |
+| **Formula R²** | **<!--v:uranusObsR2-->0.999998<!--/v-->** |
+| **RMSE** | <!--v:uranusObsRmse-->0.10<!--/v--> arcsec/century |
+| **Features** | <!--v:uranusObsTerms-->225<!--/v--> terms |
 
 > **Near-perfect fit**: Uranus achieves the best fit among all planets (RMSE = 0.01 arcsec/century). This remarkable precision suggests that Uranus's precession is particularly well-described by the Fibonacci hierarchy. The match with Earth's inclination cycle (H/3) indicates a deep resonance in the solar system's structure.
 
@@ -447,8 +447,8 @@ Neptune's precession fluctuation is driven by:
 |----------|-------|
 | **Perihelion period** | H×2 (~<!--v:neptunePeriPeriod-->670,634<!--/v--> years) |
 | **Eccentricity** | <!--v:neptuneEccJ2000-->0.00859<!--/v--> (nearly circular) |
-| **Formula R²** | **0.999999** |
-| **RMSE** | 0.02 arcsec/century |
+| **Formula R²** | **<!--v:neptuneObsR2-->0.999950<!--/v-->** |
+| **RMSE** | <!--v:neptuneObsRmse-->0.10<!--/v--> arcsec/century |
 | **Features** | 225 terms |
 
 For full implementation details, see [neptune_coeffs.py](../tools/lib/python/coefficients/neptune_coeffs.py).
@@ -511,15 +511,18 @@ The table below shows two sets of formula accuracy values:
 
 | Planet | R² | RMSE (″/cy) | Features |
 |--------|-----|-------------|----------|
-| Mercury | 0.999994 | 0.22 | 225 |
-| Venus | **0.999999** | **0.46** | **328** |
-| Mars | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.03 | 225 |
-| Jupiter | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.06 | 225 |
-| Saturn | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.05 | 225 |
-| Uranus | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.01 | 225 |
-| Neptune | 0.999999 | 0.02 | 225 |
+| Mercury | <!--v:mercuryObsR2-->0.999992<!--/v--> | <!--v:mercuryObsRmse-->0.10<!--/v--> | <!--v:mercuryObsTerms-->225<!--/v--> |
+| Venus | <!--v:venusObsR2-->0.999975<!--/v--> | <!--v:venusObsRmse-->0.10<!--/v--> | <!--v:venusObsTerms-->328<!--/v--> |
+| Mars | <!--v:marsObsR2-->0.999999<!--/v--> | <!--v:marsObsRmse-->0.10<!--/v--> | <!--v:marsObsTerms-->225<!--/v--> |
+| Jupiter | <!--v:jupiterObsR2-->0.999999<!--/v--> | <!--v:jupiterObsRmse-->0.10<!--/v--> | <!--v:jupiterObsTerms-->225<!--/v--> |
+| Saturn | <!--v:saturnObsR2-->1.000000<!--/v--> | <!--v:saturnObsRmse-->0.10<!--/v--> | <!--v:saturnObsTerms-->225<!--/v--> |
+| Uranus | <!--v:uranusObsR2-->0.999998<!--/v--> | <!--v:uranusObsRmse-->0.10<!--/v--> | <!--v:uranusObsTerms-->225<!--/v--> |
+| Neptune | <!--v:neptuneObsR2-->0.999950<!--/v--> | <!--v:neptuneObsRmse-->0.10<!--/v--> | <!--v:neptuneObsTerms-->225<!--/v--> |
 
-### Predictive Formula Accuracy (year-only input, unified 429-term system)
+Every planet sits at the ~0.1 ″/cy floor of the 5-point numerical derivative
+the export uses; the values are the trainer's own (coefficient-file headers).
+
+### Predictive Formula Accuracy (year-only input, unified 429-term system — legacy, not shipped; the shipped physical-beat basis is scored in the table below)
 
 | Planet | R² | RMSE (″/cy) | Features |
 |--------|-----|-------------|----------|
@@ -531,6 +534,20 @@ The table below shows two sets of formula accuracy values:
 | Uranus | 0.999618 | 1.40 | 429 |
 | Neptune | 0.999902 | 0.25 | 429 |
 
+### Shipped Predictive Formula Accuracy (physical-beat basis, year-only input)
+
+The shipped arrays scored against the training data (`data/planet-prediction-fit-stats.json`, Step 7g):
+
+| Planet | R² | RMSE (″/cy) | Features |
+|--------|-----|-------------|----------|
+| Mercury | <!--v:mercuryPredR2-->0.999992<!--/v--> | <!--v:mercuryPredRmse-->0.0974<!--/v--> | <!--v:mercuryPredTerms-->2421<!--/v--> |
+| Venus | <!--v:venusPredR2-->0.999975<!--/v--> | <!--v:venusPredRmse-->0.0972<!--/v--> | <!--v:venusPredTerms-->2421<!--/v--> |
+| Mars | <!--v:marsPredR2-->0.999999<!--/v--> | <!--v:marsPredRmse-->0.0972<!--/v--> | <!--v:marsPredTerms-->2421<!--/v--> |
+| Jupiter | <!--v:jupiterPredR2-->0.999999<!--/v--> | <!--v:jupiterPredRmse-->0.0964<!--/v--> | <!--v:jupiterPredTerms-->2435<!--/v--> |
+| Saturn | <!--v:saturnPredR2-->1.000000<!--/v--> | <!--v:saturnPredRmse-->0.0967<!--/v--> | <!--v:saturnPredTerms-->2421<!--/v--> |
+| Uranus | <!--v:uranusPredR2-->0.999998<!--/v--> | <!--v:uranusPredRmse-->0.0965<!--/v--> | <!--v:uranusPredTerms-->2407<!--/v--> |
+| Neptune | <!--v:neptunePredR2-->0.999951<!--/v--> | <!--v:neptunePredRmse-->0.0959<!--/v--> | <!--v:neptunePredTerms-->2393<!--/v--> |
+
 > **Why the difference?** Observed formulas use actual planetary positions from the Excel data, while predictive formulas must calculate everything from just the year. Venus's near-circular orbit (e = 0.007) makes its perihelion position poorly defined, so the observed formula achieves much better accuracy (0.46 vs 3.47 arcsec).
 
 ### Key Observations
@@ -538,16 +555,15 @@ The table below shows two sets of formula accuracy values:
 **Inner Planets (Mercury, Venus)**:
 - Mercury's high eccentricity (0.21) creates strong, predictable geometric modulation
 - Venus's near-circular orbit (e = 0.007) means precession fluctuation is dominated by ERD² effects
-- Venus requires 328 features (including ERD³, 4δ harmonics, and obliquity/eccentricity coupling) to achieve 0.46 arcsec accuracy
+- Venus requires <!--v:venusObsTerms-->328<!--/v--> features (including ERD³, 4δ harmonics, and obliquity/eccentricity coupling) to reach the <!--v:venusObsRmse-->0.10<!--/v--> arcsec floor
 
 **Mars (Transition)**:
 - Intermediate eccentricity (0.09) shows both geometric and ERD effects
-- Achieves perfect fit (R² = <!--v:saturnPredR2-->1.000000<!--/v-->) when using observed perihelion data
+- Achieves R² = <!--v:marsObsR2-->0.999999<!--/v--> when using observed perihelion data
 - Acts as a bridge between inner planet and outer planet dynamics
 
 **Outer Planets (Jupiter, Saturn, Uranus, Neptune)**:
-- All achieve excellent fits (R² ≥ 0.999999) with 225 features
-- **Uranus** and **Neptune** achieve the best fits (RMSE = 0.01–0.02 arcsec/century)
+- All reach the ~0.1 arcsec/century floor with 225 features (R² <!--v:jupiterObsR2-->0.999999<!--/v--> Jupiter, <!--v:saturnObsR2-->1.000000<!--/v--> Saturn, <!--v:uranusObsR2-->0.999998<!--/v--> Uranus, <!--v:neptuneObsR2-->0.999950<!--/v--> Neptune — the R² spread follows each planet's fluctuation amplitude, not the fit residual)
 - **Saturn** has ecliptic-retrograde precession, creating the resonance loop
 
 > **Physical Interpretation**: The Fibonacci hierarchy organizes the entire solar system's precession dynamics. Planetary periods correspond to integer divisors of 8H: Jupiter (8H/39), Saturn (−8H/65), Mars (8H/36), Uranus (H/3), Venus (−8H/6), and Neptune (H×2). The near-perfect fits achieved across all planets suggest the solar system is deeply organized around this mathematical structure.
@@ -716,7 +732,7 @@ With coefficients $e_1$ (obliquity) and $e_2$ (eccentricity) determined by least
 
 **Result units:** arcseconds per century (″/century)
 
-**Accuracy:** R² = 0.999994, RMSE = 0.22″/cy (225 terms). For the predictive formula (year-only input): R² = 0.999929, RMSE = 0.75″/cy (429 terms) — see [PREDICTIVE_FORMULA_GUIDE.mdx](../tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx).
+**Accuracy:** R² = <!--v:mercuryObsR2-->0.999992<!--/v-->, RMSE = <!--v:mercuryObsRmse-->0.10<!--/v-->″/cy (<!--v:mercuryObsTerms-->225<!--/v--> terms). For the shipped predictive formula (year-only input, physical-beat basis): R² = <!--v:mercuryPredR2-->0.999992<!--/v-->, RMSE = <!--v:mercuryPredRmse-->0.0974<!--/v-->″/cy (<!--v:mercuryPredTerms-->2421<!--/v--> terms) — see [PREDICTIVE_FORMULA_GUIDE.mdx](../tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx).
 
 For predicted fluctuation values over time, see [Section 11](#11-time-varying-fluctuation).
 
@@ -730,7 +746,7 @@ $$
 
 Where δ = θ_E − θ_V and periods are H×2, H, H/3, H/8, H/16, H/48. Key drivers are ERD² × periodic terms and triple interactions (ERD × periodic × angle). Uses the shared ERD helper from column **DR**.
 
-**R² = 0.999999, RMSE = 0.46″/cy.** For coefficients and physical explanation, see [Section 5](#5-venus-formula-coefficient-breakdown-observed-formula) and [observed_formula.py](../tools/lib/python/observed_formula.py).
+**R² = <!--v:venusObsR2-->0.999975<!--/v-->, RMSE = <!--v:venusObsRmse-->0.10<!--/v-->″/cy.** For coefficients and physical explanation, see [Section 5](#5-venus-formula-coefficient-breakdown-observed-formula) and [observed_formula.py](../tools/lib/python/observed_formula.py).
 
 ### All Planets: Python Implementation Reference
 
@@ -757,13 +773,13 @@ All planetary formulas are implemented in Python for consistency and to handle t
 
 | Planet | R² | RMSE (″/cy) | Features | Period (years) |
 |--------|-----|-------------|----------|----------------|
-| Mercury | 0.999994 | 0.22 | 225 | H×8/11 |
-| Venus | **0.999999** | **0.46** | **328** | −8H/6 |
-| Mars | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.03 | 225 | 8H/36 |
-| Jupiter | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.06 | 225 | 8H/39 |
-| Saturn | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.05 | 225 | −8H/65 |
-| Uranus | <!--v:saturnPredR2-->1.000000<!--/v--> | 0.01 | 225 | H/3 |
-| Neptune | 0.999999 | 0.02 | 225 | H×2 |
+| Mercury | <!--v:mercuryObsR2-->0.999992<!--/v--> | <!--v:mercuryObsRmse-->0.10<!--/v--> | <!--v:mercuryObsTerms-->225<!--/v--> | H×8/11 |
+| Venus | <!--v:venusObsR2-->0.999975<!--/v--> | <!--v:venusObsRmse-->0.10<!--/v--> | <!--v:venusObsTerms-->328<!--/v--> | −8H/6 |
+| Mars | <!--v:marsObsR2-->0.999999<!--/v--> | <!--v:marsObsRmse-->0.10<!--/v--> | <!--v:marsObsTerms-->225<!--/v--> | 8H/36 |
+| Jupiter | <!--v:jupiterObsR2-->0.999999<!--/v--> | <!--v:jupiterObsRmse-->0.10<!--/v--> | <!--v:jupiterObsTerms-->225<!--/v--> | 8H/39 |
+| Saturn | <!--v:saturnObsR2-->1.000000<!--/v--> | <!--v:saturnObsRmse-->0.10<!--/v--> | <!--v:saturnObsTerms-->225<!--/v--> | −8H/65 |
+| Uranus | <!--v:uranusObsR2-->0.999998<!--/v--> | <!--v:uranusObsRmse-->0.10<!--/v--> | <!--v:uranusObsTerms-->225<!--/v--> | H/3 |
+| Neptune | <!--v:neptuneObsR2-->0.999950<!--/v--> | <!--v:neptuneObsRmse-->0.10<!--/v--> | <!--v:neptuneObsTerms-->225<!--/v--> | H×2 |
 
 > **Python Implementation**: A unified Python script provides all implementations:
 >

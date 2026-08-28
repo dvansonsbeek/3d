@@ -54620,26 +54620,25 @@ function timeToPos(value) {
  * local coordinates (see updatePositions). This is Earth's equatorial frame, which
  * includes axial tilt (~23.4°), axial precession, and other Earth orientation effects.
  *
- * 2D PROJECTION LIMITATION:
- * This function uses a 2D projection that ignores declination:
- *   x = r * cos(ra),  z = r * sin(ra)
+ * PROJECTION: each body is projected onto the equatorial plane with its
+ * declination — ρ = r·sin(φ), where φ is the .dec THREE polar angle measured
+ * from the rotation axis (so sin φ = cos δ):
+ *   x = ρ * cos(ra),  z = ρ * sin(ra)
+ * The apparent RA is then the RA of the 3D vector A → B, exactly.
  *
- * The correct 3D formula would be:
- *   x = r * cos(dec) * cos(ra),  z = r * cos(dec) * sin(ra)
+ * The former form used r itself (declination ignored). Measured on the
+ * Step-3 export (Node scene mirror, snapshot mode): the reference point A
+ * (perihelion-of-Earth, e·AU ≈ 0.017 AU) and a planet's perihelion marker
+ * (~0.3–30 AU) sit at very different declinations, and the omission
+ * generated 96% of Venus's exported "precession fluctuation" (std 513 →
+ * 20 ″/cy; Mercury 96 → 35 ″/cy) as harmonics 8–15 of the H/13 equatorial
+ * rotation with H/3 and H/8 sidebands — the 1.7–3.2 kyr band no feature
+ * basis spanned after the eccentricity unification.
  *
- * Impact of ignoring declination:
- * - For points at the same declination: No error (same scaling factor)
- * - For points at different declinations: Angular errors can occur
- * - Maximum error: ~8% radial compression at dec=±23.4° (ecliptic poles)
- * - For perihelion markers (near ecliptic, similar dec): Error is small
- *
- * For high-precision work with objects at significantly different declinations,
- * a full 3D approach should be used instead.
- *
- * @param {object} pdA - Reference object with .ra (radians) and .distKm
- * @param {object} pdB - Target object with .ra (radians) and .distKm
+ * @param {object} pdA - Reference object with .ra, .dec (radians) and .distKm
+ * @param {object} pdB - Target object with .ra, .dec (radians) and .distKm
  * @returns {number} Opposite apparent RA in degrees [0, 360)
- * @throws {TypeError} If ra or distKm values are invalid
+ * @throws {TypeError} If ra, dec or distKm values are invalid
  * @throws {RangeError} If objects share identical coordinates
  */
 function apparentRaFromPdA(pdA, pdB) {
@@ -54675,12 +54674,22 @@ function apparentRaFromPdA(pdA, pdB) {
     throw new TypeError(`distKm for ${pdB.name} is invalid: ${pdB.distKm}`);
   }
 
-  // 4) Project each body's position onto the equatorial plane (2D approximation)
-  //    NOTE: This ignores declination. Full 3D would use r * cos(dec) * cos/sin(ra)
-  const x1 = r1 * Math.cos(θ1);
-  const z1 = r1 * Math.sin(θ1);
-  const x2 = r2 * Math.cos(θ2);
-  const z2 = r2 * Math.sin(θ2);
+  // 4) Project each body's position onto the equatorial plane WITH its
+  //    declination: ρ = r·sin(φ), φ = .dec (THREE polar angle from the axis).
+  const φ1 = Number(pdA.dec);
+  const φ2 = Number(pdB.dec);
+  if (!Number.isFinite(φ1)) {
+    throw new TypeError(`dec for ${pdA.name} is invalid: ${pdA.dec}`);
+  }
+  if (!Number.isFinite(φ2)) {
+    throw new TypeError(`dec for ${pdB.name} is invalid: ${pdB.dec}`);
+  }
+  const ρ1 = r1 * Math.sin(φ1);
+  const ρ2 = r2 * Math.sin(φ2);
+  const x1 = ρ1 * Math.cos(θ1);
+  const z1 = ρ1 * Math.sin(θ1);
+  const x2 = ρ2 * Math.cos(θ2);
+  const z2 = ρ2 * Math.sin(θ2);
 
   // 5) Vector from A → B in the equatorial plane
   const dx = x2 - x1;

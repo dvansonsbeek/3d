@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:8ba33b5f301719c5
+coefficients: sha256:56d7365a511916d5
 status: current
 ---
 
@@ -580,15 +580,13 @@ Finds the aphelion (farthest point from Sun) for a given year.
 
 ### apparentRaFromPdA(pdA, pdB)
 
-Calculates the apparent Right Ascension angle between two planet data objects in Earth's equatorial frame.
-
-**Location**: line ~26429
+Calculates the apparent Right Ascension of `pdB` as seen from `pdA` in Earth's equatorial frame (each body projected onto the equatorial plane with its declination, ρ = r·sin φ), returned as the 180°-opposite direction.
 
 **Parameters**:
-- `pdA` - First planet data object
-- `pdB` - Second planet data object
+- `pdA` - Reference object (`.ra`, `.dec` in radians, `.distKm`)
+- `pdB` - Target object (`.ra`, `.dec` in radians, `.distKm`)
 
-**Returns**: Angle in radians
+**Returns**: Angle in degrees [0, 360)
 
 **Usage**: Used for perihelion longitude calculations. See [12-perihelion-precession.md](12-perihelion-precession.md) for details.
 

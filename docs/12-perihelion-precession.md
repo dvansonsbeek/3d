@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:8ba33b5f301719c5
+coefficients: sha256:56d7365a511916d5
 status: current
 ---
 
@@ -85,11 +85,12 @@ function apparentRaFromPdA(pdA, pdB) {
   const ra1 = pdA.ra;  // Earth's perihelion RA
   const ra2 = pdB.ra;  // Planet's perihelion RA
 
-  // 2. Project to 2D equatorial plane (ignoring declination)
-  const x1 = r1 * Math.cos(ra1);
-  const z1 = r1 * Math.sin(ra1);
-  const x2 = r2 * Math.cos(ra2);
-  const z2 = r2 * Math.sin(ra2);
+  // 2. Project onto the equatorial plane WITH declination: ρ = r·sin(φ),
+  //    φ = .dec (THREE polar angle from the axis, so sin φ = cos δ)
+  const x1 = r1 * Math.sin(dec1) * Math.cos(ra1);
+  const z1 = r1 * Math.sin(dec1) * Math.sin(ra1);
+  const x2 = r2 * Math.sin(dec2) * Math.cos(ra2);
+  const z2 = r2 * Math.sin(dec2) * Math.sin(ra2);
 
   // 3. Calculate apparent angle from Earth perihelion to planet perihelion
   const dx = x2 - x1;
@@ -101,56 +102,30 @@ function apparentRaFromPdA(pdA, pdB) {
 }
 ```
 
-#### 2D Projection Limitation
+#### Projection with declination
 
-**Important:** This function uses a 2D projection that ignores declination.
+The projection carries each body's declination, so the result is exactly the
+right ascension of the 3D vector from the Earth-perihelion point to the
+planet's perihelion marker:
 
-**Current 2D approach:**
 ```
-x = r × cos(ra)
-z = r × sin(ra)
-```
-
-**Correct 3D approach would be:**
-```
-x = r × cos(dec) × cos(ra)
-z = r × cos(dec) × sin(ra)
-y = r × sin(dec)
+ρ = r × sin(φ)          φ = .dec, the THREE polar angle from the rotation axis (sin φ = cos δ)
+x = ρ × cos(ra)
+z = ρ × sin(ra)
 ```
 
-**Impact of ignoring declination:**
-
-| Declination Difference | Radial Error | Angular Error | Impact |
-|------------------------|--------------|---------------|--------|
-| 0° (same dec) | 0% | 0° | None |
-| 5° | ~0.4% | ~2-3° | Minor |
-| 10° | ~1.5% | ~5-8° | Noticeable |
-| 23.4° (max ecliptic) | ~8% | Up to ~26° | Significant |
-
-**Why this matters:**
-- The ecliptic is tilted ~23.4° from the equator
-- Perihelion markers on the ecliptic can have declinations up to ±23.4°
-- When comparing two points at **different** declinations, the 2D projection introduces errors
-- When comparing two points at **similar** declinations, errors largely cancel out
-
-**For perihelion precession measurements:**
-- Perihelion markers typically stay at similar declinations over short time periods
-- The 2D approximation is acceptable for relative angular changes
-- For high-precision absolute positions, a 3D approach would be more accurate
-
-**Potential 3D improvement:**
-```javascript
-// Full 3D position calculation
-const x1 = r1 * Math.cos(dec1) * Math.cos(ra1);
-const z1 = r1 * Math.cos(dec1) * Math.sin(ra1);
-const x2 = r2 * Math.cos(dec2) * Math.cos(ra2);
-const z2 = r2 * Math.cos(dec2) * Math.sin(ra2);
-
-// Then compute angle in the equatorial plane
-const dx = x2 - x1;
-const dz = z2 - z1;
-let angle = Math.atan2(dz, dx);
-```
+**Why the declination term is load-bearing.** The reference point (the
+perihelion-of-Earth marker, e·AU ≈ 0.017 AU from Earth) and a planet's
+perihelion marker (0.3–30 AU) sit at very different declinations. Projecting
+with the full distance instead of ρ was measured (Node scene mirror of the
+Step-3 export, snapshot mode) to generate 96 % of Venus's exported
+"precession fluctuation" — std 513 → 20 ″/cy with the declination term,
+Mercury 96 → 35 ″/cy — as harmonics 8–15 of the H/13 equatorial rotation
+with H/3 and H/8 sidebands (a 1.7–3.2 kyr band). That band is a property of
+the projection, not of the orbits; the Step-4c/4d feature bases are built
+for the orbital signal and could not span it. With the term in place every
+planet's Step-4c/4d fit sits at the ~0.1 ″/cy numerical floor
+(Venus <!--v:venusPredRmse-->0.0972<!--/v--> ″/cy).
 
 ### Ecliptic-Frame Calculation (`perihelionLongitudeEcliptic`)
 
