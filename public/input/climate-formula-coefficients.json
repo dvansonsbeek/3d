@@ -1673,7 +1673,7 @@
           "lr04_post_mpt_amp": 0.4692236249310246,
           "epica_amp": 0.18472089291612892,
           "ratio": 0.3936734706043045,
-          "label": ""
+          "label": "Earth's own H/3 eccentricity line (the one-law e(t); no secular-theory counterpart \u2014 pre-iNHG regime admission, doc 94 \u00a710)"
         },
         "25": {
           "n": 25,
@@ -2114,6 +2114,8 @@
   },
   "meta": {
     "script": "export_climate_formula_browser.py",
-    "consumer": "src/script.js \u2014 Climate Formula Explorer modal"
+    "consumer": "src/script.js \u2014 Climate Formula Explorer modal",
+    "stitched_lr04_r2": 0.9430285700049614,
+    "stitched_lr04_note": "R\u00b2 of the three-regime stitched curve (post-MPT / iNHG-MPT / pre-iNHG blocks) against the raw gridded LR04 stack, 0-5320 kyr"
   }
 }

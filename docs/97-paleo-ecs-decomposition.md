@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:b121f90e431d946f
+coefficients: sha256:ca274807cc67982a
 status: historical
 ---
 
@@ -190,7 +190,7 @@ Three internal consistency checks:
 <!-- generated:cross-method -->
 | Cross-check | Result |
 |---|---|
-| LR04 × κ=2.5 → Charney | Bootstrap CI [4.20, 5.05] K under α_slow = 0.5; consistent with full-forcing 3.6 K at upper edge |
+| LR04 × κ=2.5 → Charney | ESS 7.71 K (ΔT-weighted, phase-concordant lines) × (1 − α_slow = 0.5) = 3.86 K; block-bootstrap 90% CI [0.98, 7.87] K — brackets the full-forcing 3.6 K |
 | Snyder GAST direct (no κ) | Bootstrap CI [5.30, 13.75] K obliquity-band CO₂-only → drops to 2.41 K under full-forcing |
 | Cheng 2016 cross-proxy | L1 lattice fits Cheng with R² = 0.68 (entirely independent chronology + mechanism); 1/5 top-5 lines shared with LR04 (n=66) |
 <!-- /generated:cross-method -->

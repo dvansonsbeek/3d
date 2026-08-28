@@ -652,16 +652,12 @@ export declare const REFERENCE_DATA: {
     "tidalLockApproachGyr": number;
     "essrtFormulaHorizonGyr": number;
     "iceAlbedoShareLongPct": number;
-    "chengR2": number;
     "testAObliquityLagPercentile": number;
     "testAObliquityPeakMatch": string;
     "testAEccentricityNullPct": number;
     "eightHDerivabilityTopPct": number;
-    "testCInvariantObliquityPct": number;
-    "testCInvariantRandomPct": number;
     "testCBalanceSaturnMult": number;
     "testCBalancePValue": number;
-    "testCLibrationPValue": number;
     "testC50WindowMyr": number;
     "meeusPeriLong1000AD": number;
     "meeusPeriLong1246AD": number;

@@ -2754,6 +2754,17 @@ export const VALUES = {
         }
         o.canonR2Epica = { get: () => cf().epica_evaluation.r2_l1_l2_l3, render: f4, note: 'canonical formula on EPICA CO₂ (0–800 kyr)' };
         o.canonR2L1PostMpt = { get: () => cf().regime_fits['post-mpt'].r2_l1_only, render: f4, note: 'canonical fit, L1 layer only, post-MPT' };
+        // the eight-regime R² breakdown the browser explorer and the paper table use (climate-formula-coefficients.json)
+        const cc = () => rd('public/input/climate-formula-coefficients.json');
+        const f3s = (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(3);
+        for (const [key, reg] of [['PostMpt', 'lr04-post-mpt'], ['InhgMpt', 'lr04-inhg-mpt'], ['PreInhg', 'lr04-pre-inhg'], ['Lr04Full', 'lr04-full'],
+                                  ['EpicaCo2', 'epica-co2'], ['Cenco2pip', 'cenco2pip'], ['CenogridD18o', 'cenogrid-d18o'], ['CenogridD13c', 'cenogrid-d13c']]) {
+          o[`canon${key}L1Only`] = { get: () => cc().regimes[reg].r2.l1_only, render: f3, note: `canonical formula, L1 layer alone, ${reg}` };
+          o[`canon${key}DeltaL2`] = { get: () => cc().regimes[reg].r2.delta_l2, render: f3s, note: `canonical formula, ΔR² from L2, ${reg}` };
+          o[`canon${key}DeltaL3`] = { get: () => cc().regimes[reg].r2.delta_l3, render: f3s, note: `canonical formula, ΔR² from L3, ${reg}` };
+          o[`canon${key}Total`] = { get: () => cc().regimes[reg].r2.l1_l2_l3, render: f3, note: `canonical formula, total R², ${reg}` };
+        }
+        o.canonR2Stitched = { get: () => cc().meta.stitched_lr04_r2, render: f2, note: 'three-regime stitched canonical fit evaluated over the full LR04 record (export_climate_formula_browser.py)' };
         o.canonR2CenCo2pip = { get: () => cf().cenco2pip_evaluation.r2_l1_l2_l3, render: f4, note: 'canonical formula on CenCO2PIP CO₂ (0–66 Ma)' };
         o.canonL5FloorPostMpt = { get: () => 100 * (1 - cf().regime_fits['post-mpt'].r2_l1_l2_l3), render: (v) => String(Math.round(v)), unit: '%', note: 'post-MPT L5 stochastic floor, 1 − R²' };
         return o;

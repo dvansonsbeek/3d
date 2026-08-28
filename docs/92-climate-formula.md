@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:b121f90e431d946f
+coefficients: sha256:ca274807cc67982a
 status: current
 ---
 
@@ -1193,7 +1193,7 @@ The Quaternary fits (LR04 + EPICA) emphasize L1; the Cenozoic-scale fit (CenCO2P
 
 ## 12. Stitched per-regime evaluation
 
-For chart views that span multiple regimes (Full LR04, Post-MPT extended, CENOGRID δ¹⁸O), a single joint fit dilutes the per-regime amplitudes (recall: lr04-full single fit gives R² = 0.25 vs per-regime stitched gives R² = 0.93 against the same LR04 data). The solution is a **stitched evaluation** that routes each time t through the appropriate regime's coefficients.
+For chart views that span multiple regimes (Full LR04, Post-MPT extended, CENOGRID δ¹⁸O), a single joint fit dilutes the per-regime amplitudes (recall: lr04-full single fit gives R² = 0.25 vs per-regime stitched gives R² = <!--v:canonR2Stitched-->0.94<!--/v--> against the same LR04 data). The solution is a **stitched evaluation** that routes each time t through the appropriate regime's coefficients.
 
 ### 12.1 Routing rules
 

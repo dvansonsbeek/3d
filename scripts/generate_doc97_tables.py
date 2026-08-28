@@ -116,13 +116,17 @@ def blocks():
         rows.append(f"| {label} | {pct(share)} | {ICE_INTERP[key]} |")
     B["ice-share"] = rows
 
-    # §4.4 cross-method rows (the LR04×κ bootstrap row is prose; Snyder + Cheng are artifact-bound)
+    # §4.4 cross-method rows — all three artifact-bound
+    pl = rd("climate-ecs-phase-lag.json")
+    pleist = next(p for p in pl["pairs"] if "LR04" in p["label"] and "EPICA" in p["label"])
+    conc = pleist["concordant_only"]; a_slow = 0.5
     sob = sn["by_band"]["obliquity (35-50 kyr)"]
     full_ob = ff["by_band"]["obliquity (35-50)"]["full"]["weighted_mean_K"]
     shared = cp["shared_top5_n"]
     B["cross-method"] = ["| Cross-check | Result |", "|---|---|",
-                         "| LR04 × κ=2.5 → Charney | Bootstrap CI [4.20, 5.05] K under α_slow = 0.5; consistent with full-forcing "
-                         f"{ff['overall_full']['weighted_mean_K']:.1f} K at upper edge |",
+                         f"| LR04 × κ={pleist['kappa_K_per_permil']:g} → Charney | ESS {conc['weighted_mean_K']:.2f} K (ΔT-weighted, phase-concordant lines) × (1 − α_slow = {a_slow}) = "
+                         f"{conc['weighted_mean_K'] * (1 - a_slow):.2f} K; block-bootstrap 90% CI [{conc['p5_K'] * (1 - a_slow):.2f}, {conc['p95_K'] * (1 - a_slow):.2f}] K — "
+                         f"brackets the full-forcing {ff['overall_full']['weighted_mean_K']:.1f} K |",
                          f"| Snyder GAST direct (no κ) | Bootstrap CI [{sob['p5_K']:.2f}, {sob['p95_K']:.2f}] K obliquity-band CO₂-only → drops to {full_ob:.2f} K under full-forcing |",
                          f"| Cheng 2016 cross-proxy | L1 lattice fits Cheng with R² = {cp['cheng_R2_L1']:.2f} (entirely independent chronology + mechanism); "
                          f"{len(shared)}/5 top-5 lines shared with LR04 ({', '.join('n=' + str(n) for n in shared)}) |"]

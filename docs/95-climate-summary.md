@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:b121f90e431d946f
+coefficients: sha256:ca274807cc67982a
 status: current
 ---
 
@@ -44,7 +44,7 @@ These three are themselves derived from the gravitational coupling among the pla
 
 ### 1.2 The 8H-lattice paradigm (this framework)
 
-Climate is driven by the **gravitational rhythm of the entire solar system**, parameterized as integer divisors of the 8H = <!--v:eightH-->2,682,536<!--/v-->-yr (at J2000) Solar System Resonance Cycle. Each integer corresponds to a specific planet–planet beat or a direct planet-cycle harmonic. The full L1 set is 32 integers (see [doc 93](93-l1-attribution-reference.md) for per-integer attribution).
+Climate is driven by the **gravitational rhythm of the entire solar system**, parameterized as integer divisors of the 8H = <!--v:eightH-->2,682,536<!--/v-->-yr (at J2000) Solar System Resonance Cycle. Each integer corresponds to a specific planet–planet beat or a direct planet-cycle harmonic. The full L1 set is 33 integers (see [doc 93](93-l1-attribution-reference.md) for per-integer attribution).
 
 The two paradigms are **not contradictory** — they describe the same gravitational physics. They differ in:
 
@@ -80,8 +80,8 @@ All numbers from the canonical regression scripts:
 
 | Test | LR04 (post-MPT, 0–1000 kyr) | LR04 (0–500 kyr, Laskar window) | EPICA CO₂ (0–800 kyr) |
 |------|----------------------------:|--------------------------------:|----------------------:|
-| **L1 alone** (33 lattice integers) | **R² = 0.870** | R² ≈ 0.93 | R² = 0.8336 |
-| **L1+L2+L3** (canonical formula) | **R² = 0.8735** | **R² = 0.9424** | **R² = 0.8452** |
+| **L1 alone** (33 lattice integers) | **R² = <!--v:canonPostMptL1Only-->0.871<!--/v-->** | R² ≈ 0.93 | R² = <!--v:canonEpicaCo2L1Only-->0.834<!--/v--> |
+| **L1+L2+L3** (canonical formula) | **R² = <!--v:canonR2PostMpt-->0.8743<!--/v-->** | **R² = 0.9424** | **R² = <!--v:canonR2Epica-->0.8453<!--/v-->** |
 | Berger insolation alone (model e/ϖ) | R² = 0.049 | R² = 0.188 | R² = 0.096 |
 | **Berger insolation alone (Laskar e/ϖ)** | — | **R² = 0.293** | **R² = 0.172** |
 | L1+L2+L3 + Berger insolation (model) | R² = 0.8776 → ΔR² = +0.0041 | R² = 0.9436 → +0.00123 | R² = 0.8494 → +0.0042 |

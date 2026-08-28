@@ -225,6 +225,22 @@ def main():
     print(f"  R² L1_only={sum6.r2_l1_only:.4f}, +L2={sum6.delta_r2_l2:+.4f}, "
           f"+L3={sum6.delta_r2_l3:+.4f}, total={sum6.r2_l1_l2_l3:.4f}")
 
+    # ─── Stitched three-regime evaluation over the full LR04 record ───
+    # The Full-LR04 tab routes each t through its regime block (doc 92 §12);
+    # this is the R² of that stitched curve against the raw stack — the number
+    # docs 92/97, the website and the paper quote as "stitched R²".
+    stitched_pred = np.empty_like(t2)
+    for (f, tt, s, i) in ((f1, t1, s1, i1), (f1b, t1b, s1b, i1b), (f1c, t1c, s1c, i1c)):
+        lo, hi = tt[0], tt[-1]
+        m = (t2 >= lo) & (t2 <= hi)
+        y_norm = f.evaluate(t2[m])
+        stitched_pred[m] = y_norm * f._fit_y_std + f._fit_y_mean + (s * t2[m] + i)
+    raw_full = y2 + (s2 * t2 + i2)  # undo the full-record detrend → raw gridded LR04
+    ss_res = float(np.sum((raw_full - stitched_pred) ** 2))
+    ss_tot = float(np.sum((raw_full - raw_full.mean()) ** 2))
+    stitched_r2 = 1.0 - ss_res / ss_tot
+    print(f"\nStitched three-regime fit over full LR04: R² = {stitched_r2:.4f}")
+
     # ─── Assemble ───
     out = {
         "config": {
@@ -251,6 +267,8 @@ def main():
         "meta": {
             "script": "export_climate_formula_browser.py",
             "consumer": "src/script.js — Climate Formula Explorer modal",
+            "stitched_lr04_r2": stitched_r2,
+            "stitched_lr04_note": "R² of the three-regime stitched curve (post-MPT / iNHG-MPT / pre-iNHG blocks) against the raw gridded LR04 stack, 0-5320 kyr",
         },
     }
 
