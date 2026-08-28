@@ -18,14 +18,14 @@ Doc 97 established that the 8H/L1 lattice is **real spectral structure**
 in solar-system orbital dynamics. The strongest individual results:
 
 - **Test C-Invariant**: Earth obliquity is 100% on the L1 lattice
-  (Welch PSD bands ±5% around 32 integers capture all LA2004 obliquity
-  power; random 32-integer selections capture ~68%).
+  (Welch PSD bands ±5% around 33 integers capture all LA2004 obliquity
+  power; random 33-integer selections capture ~69%).
 - **Test C-Balance**: Saturn dominates the stability sub-lattice
   1.96×, p=4×10⁻⁴. Mercury and Mars are completely absent. This
   matches the framework's Laws 3/5 (Saturn as anti-phase anchor)
   prediction made independently of the stability test.
-- **Test C-Libration aggregate**: bias across 32 L1 integers
-  indistinguishable from zero (t-test p=0.23) — the lattice IS the
+- **Test C-Libration aggregate**: bias across 33 L1 integers
+  indistinguishable from zero (t-test p=0.28) — the lattice IS the
   equilibrium positions Laskar oscillates around.
 
 But doc 97's tests are all "is the lattice real?" type. They don't
@@ -363,7 +363,7 @@ questions are:
    derivation of 8H from Laplace-Lagrange secular theory would close
    the loop.
 
-2. **What climate-activity criterion selects L1's 32 integers from the
+2. **What climate-activity criterion selects L1's 33 integers from the
    broader integer-divisor set?** This is doc 92's territory but now
    reframed: not "why these integers?" (answer: they're integer
    divisors of 8H) but "why these specific 32 of the integer
@@ -871,7 +871,7 @@ structural transition at the Snowball-Earth thermal-tide-lock break
 
 ## Questions 2 and 3 — Status
 
-**Question 2 (climate-activity selection of L1's 32 integers):** Already
+**Question 2 (climate-activity selection of L1's 33 integers):** Already
 addressed in doc 92's selection criteria (canonical Berger / Mars-
 Jupiter integers + 6 precession sidebands + 1 quintet completion). The
 framework's L1 is the climate-active subset of the integer-divisor set;
@@ -925,8 +925,8 @@ the whole system.
 |----------|---------|
 | [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | The 8H/N integer divisor lattice this doc seeks the mechanism for |
 | [90 - Milankovitch Language](90-milankovitch-language.md) | Framework terminology and Berger/Laskar eigenmode notation |
-| [91 - Milankovitch Evidence](91-milankovitch-evidence.md) | Empirical L1 lattice fit (32 integers); foundational test data |
-| [92 - Climate Formula](92-climate-formula.md) | L1+L2+L3 canonical formula (32 integers + selection criteria for L1) |
+| [91 - Milankovitch Evidence](91-milankovitch-evidence.md) | Empirical L1 lattice fit (33 integers); foundational test data |
+| [92 - Climate Formula](92-climate-formula.md) | L1+L2+L3 canonical formula (33 integers + selection criteria for L1) |
 | [93 - L1 Lattice Attribution Reference](93-l1-attribution-reference.md) | Per-integer Berger vs Holistic attribution |
 | [97 - Paleo-ECS Decomposition](97-paleo-ecs-decomposition.md) | Test C-Invariant + Test C-Balance + Test C-Libration referenced in this doc's intro; Test C-50 ESSRT re-analysis |
 | [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t); the formalism behind the proper-physics lattice used in Test C-50 re-analysis |

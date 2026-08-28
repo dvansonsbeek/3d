@@ -11,7 +11,7 @@ status: current
 
 The **ESSRT Explorer** is a modal panel in the Tools menu that visualizes the **Expanding Solar System Resonance Theory** (see [doc 99](99-expanding-solar-system-resonance-theory.md)) — how the Earth Fundamental Cycle H, length-of-day, sidereal/tropical year length, Moon distance, and Earth-Sun distance evolve across deep time.
 
-The Solar System Resonance Cycle (8H ≈ 2.68 Myr today) and its 32-integer L1 lattice are **structural invariants** — the integers stay fixed at any epoch. What changes is the literal time unit: H itself expands monotonically across geological time via two physically independent drivers:
+The Solar System Resonance Cycle (8H ≈ 2.68 Myr today) and its 33-integer L1 lattice are **structural invariants** — the integers stay fixed at any epoch. What changes is the literal time unit: H itself expands monotonically across geological time via two physically independent drivers:
 
 - **Driver 1 — Earth-Moon tidal evolution**: lunar tidal friction slows Earth's spin, lengthening LOD; H ∝ LOD via the structural identity `H = 13 × axial precession period` (where axial precession scales with LOD).
 - **Driver 2 — Solar mass loss**: the Sun loses ~10⁹ kg/s in solar wind; by angular-momentum conservation `a × M = const`, each planet's semi-major axis slowly expands; Kepler's third law `T² ∝ a³ / M` then sets each planet's orbital period.

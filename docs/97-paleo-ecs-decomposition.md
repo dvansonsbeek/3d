@@ -16,7 +16,7 @@ status: historical
 ## 1. Research question
 
 The canonical climate formula (L1 + L2 + L3, doc 92) fits paleoclimate δ¹⁸O
-and CO₂ records using a fixed 32-integer lattice on the 8H Solar System Resonance
+and CO₂ records using a fixed 33-integer lattice on the 8H Solar System Resonance
 Cycle. Each L1 line is an exact integer divisor of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000, anchored
 in orbital theory and **not** fit to climate data.
 
@@ -47,7 +47,7 @@ All proxies are processed through the same sequential-ridge climate-formula fit
 
 ## 3. Method
 
-For each L1 lattice integer $n$ (32 lines) and each fitted proxy:
+For each L1 lattice integer $n$ (33 lines) and each fitted proxy:
 
 $$
 A_x(n) = \sqrt{a_n^2 + b_n^2} \cdot \sigma_y \qquad \text{(amplitude in physical units)}
@@ -186,7 +186,7 @@ Three internal consistency checks:
 | Cheng 2016 cross-proxy | L1 lattice fits Cheng with R² = 0.68 (entirely independent chronology + mechanism); 1/5 top-5 lines shared with LR04 (obliquity n=66) |
 
 The cross-proxy test (Cheng 2016) is a **strong structural validation of the
-L1 framework**: the same 32-integer lattice that fits LR04 δ¹⁸O (R² = 0.93)
+L1 framework**: the same 33-integer lattice that fits LR04 δ¹⁸O (R² = 0.93)
 also fits Asian Monsoon δ¹⁸O (R² = 0.68) — a record with no orbital tuning
 whatsoever and a completely different physical mechanism.
 
@@ -430,7 +430,7 @@ Script: `scripts/solar_8H_lattice_test.py`. Output: `data/solar-8H-lattice-test.
 
 #### Test B — CENOGRID 67-Myr deep-time lattice validation (positive)
 
-If the 32-integer L1 lattice is a real physical feature of the climate
+If the 33-integer L1 lattice is a real physical feature of the climate
 system's orbital response — not an artifact tuned to recent ice-age data —
 the same integers should explain variance across the entire Cenozoic. The
 test: sliding 2-Myr windows across CENOGRID δ¹⁸O 0–67 Ma; record L1-alone R²
@@ -453,7 +453,7 @@ per window position.
 
 **Findings:**
 
-1. **The 32-integer L1 lattice retains 17-40% explanatory power across the
+1. **The 33-integer L1 lattice retains 17-40% explanatory power across the
    entire Cenozoic.** No epoch shows R²_L1 → 0. If the lattice were a
    Pleistocene fitting artifact, deep-time R²_L1 should collapse — it
    doesn't.
@@ -499,7 +499,7 @@ a sharper question: "is there a sinusoid at this frequency that's
 significant against red/white noise?" Under H₀ (no sinusoid), F ~ F(2, 2K-2)
 for K Slepian tapers.
 
-We run MTM F-test at each of the 32 L1 frequencies across sliding windows
+We run MTM F-test at each of the 33 L1 frequencies across sliding windows
 (4-Myr CENOGRID, 1-Myr LR04). Critical follow-up: a Kolmogorov–Smirnov
 control test compares lattice F-distributions to 100 randomly-drawn
 off-lattice frequencies in the same range.
@@ -530,7 +530,7 @@ level of statistical rigor.**
 | Lattice F summary | median 0.77, mean 1.31 |
 | Off-lattice F summary | median 0.78, mean 1.33 |
 
-**The 32 specific L1 integers cannot be statistically distinguished from
+**The 33 specific L1 integers cannot be statistically distinguished from
 random orbital-band frequencies in deep-time CENOGRID.** The earlier
 R²-based result (mean 0.17–0.40 across the Cenozoic) reflected amplitude
 that doesn't survive the no-sinusoid null test.
@@ -575,15 +575,15 @@ the L1 lattice integers physically meaningful (Laskar eigenmode beats), or
 is the lattice partially a mathematical convenience? Three sub-tests using
 the in-repo 10-Myr N-body cache:
 
-**Test C-1 (analytical):** For each of 32 L1 integers, find the closest
+**Test C-1 (analytical):** For each of 33 L1 integers, find the closest
 beat among all g_i±g_j, s_i±s_j, k±s_j, k±g_j combinations of Laskar 2004
 eigenfrequencies.
 
 | Result | Value |
 |---|---|
-| L1 integers matching a Laskar beat <1% | **25/32 (78%)** |
-| L1 integers matching <5% | **31/32 (97%)** |
-| Median fractional error | **0.44%** |
+| L1 integers matching a Laskar beat <1% | **26/33 (79%)** |
+| L1 integers matching <5% | **32/33 (97%)** |
+| Median fractional error | **0.48%** |
 | Only outlier | n=185 (14.5 kyr) at 11.9% from k+g₆ |
 
 Key matches (representative):
@@ -616,7 +616,7 @@ period's origin. Test C lets us evaluate them:
 | D — Modern Laskar parameterization | Good modern match; drift pre-modern | Compatible at 10 Myr; deeper time untested |
 | E — Mathematical artifact | Poor match to Laskar | **REJECTED** (97% match too high for chance) |
 
-The 97% match between our 32 L1 integers and Laskar 2004 eigenmode beats
+The 97% match between our 33 L1 integers and Laskar 2004 eigenmode beats
 **rules out the "mathematical artifact" interpretation**. The integers are
 physically meaningful — they are specific combinations of g_j, s_j
 eigenfrequencies that happen to divide 8H near-evenly.
@@ -634,7 +634,7 @@ Two questions remain open:
 #### What this implies for the LR04 vs CENOGRID discrepancy
 
 Test C reveals that the deep-time CENOGRID failure (Test B-MTM, KS p=0.81)
-is *not* a failure of the lattice's physical reality. The 32 specific L1
+is *not* a failure of the lattice's physical reality. The 33 specific L1
 integers are real Laskar eigenmode beats at modern epoch — that's a strong
 constraint that survives the Bonferroni-strict MTM test on LR04. The
 CENOGRID failure must instead reflect one of:
@@ -803,7 +803,7 @@ structural classification (Fibonacci-based) predict WHICH integers are
 stable vs which drift? If yes, the framework provides a structural
 prediction that mainstream Laskar theory doesn't make on its own.
 
-**Method.** For each of 32 L1 integers, compute:
+**Method.** For each of 33 L1 integers, compute:
 - Max |shift| in LA2004 spectral peak position across all 10 sliding
   5-Myr windows (its dynamical drift)
 - Distance to nearest Earth Fibonacci divisor: 8H/24 (H/3), 8H/40 (H/5),
@@ -820,7 +820,7 @@ Then test correlation between drift and Fibonacci-distance.
 
 The overall hypothesis "Fibonacci-distance predicts drift" receives
 *suggestive* support but does not pass strict significance testing on
-N=32 integers.
+N=33 integers.
 
 **Results — by specific Fibonacci divisor:**
 
@@ -1059,7 +1059,7 @@ dominance). That recurrence prompts a natural physics question: is the
 system stays *on*, even where individual frequencies drift?
 
 Concretely: in any 5-Myr LA2004 window, what fraction of the total
-spectral power lies in narrow bands around the 32 L1 integers? If the
+spectral power lies in narrow bands around the 33 L1 integers? If the
 lattice is the invariant, this fraction should be high and roughly
 constant across the 50 Myr. If the lattice is incidental, the fraction
 should be no better than a random integer selection.
@@ -1163,7 +1163,7 @@ showed precession-sideband "drift" of 16-24% over 50 Myr; this test
 asks whether that drift is chaos, libration, or something structured
 in between.
 
-**Method.** For each of 32 L1 integers, track the nearest spectral peak
+**Method.** For each of 33 L1 integers, track the nearest spectral peak
 in LA2004 across 48 sliding 4-Myr windows (1-Myr step) of both
 eccentricity and obliquity. For each integer, compute:
 
@@ -1568,12 +1568,12 @@ Scripts: `scripts/precession_band_disambiguation.py`.
    *attribute* the reduction to either (a) lower temperature sensitivity per
    unit forcing in warmer climates, or (b) different feedback engagement.
 
-7. **The 32 L1 lattice integers correspond to real Laskar 2004 secular
-   eigenmode beats.** 31/32 integers match a (g_i±g_j) / (s_i±s_j) / (k±s_j)
-   combination within 5% (median 0.44% error). 10-Myr N-body integration
+7. **The 33 L1 lattice integers correspond to real Laskar 2004 secular
+   eigenmode beats.** 32/33 integers match a (g_i±g_j) / (s_i±s_j) / (k±s_j)
+   combination within 5% (median 0.48% error). 10-Myr N-body integration
    shows ~0% drift in eigenfrequencies between 0-5 and 5-10 Myr halves.
    This rules out the "mathematical artifact" interpretation of the 8H
-   lattice and establishes that the framework's specific 32 integer
+   lattice and establishes that the framework's specific 33 integer
    divisors of 8H are physically meaningful Laskar eigenmode beats at
    modern epoch. The doc 92 §4.9 closure test now has independent
    mechanistic backing: orbital dynamics, not arbitrary integers.
@@ -1593,7 +1593,7 @@ Scripts: `scripts/precession_band_disambiguation.py`.
 
 **Not findings, but framework-level results worth noting:**
 
-5. The L1 lattice (32 integers on 8H, from doc 92) survives **four**
+5. The L1 lattice (33 integers on 8H, from doc 92) survives **four**
    independent cross-validations: LR04 (R²=0.93), EPICA (R²=0.89), Cheng 2016
    (R²=0.68 — different mechanism, no chronological tuning), Snyder GAST
    (R²=0.74). This is a structural validation of the orbital framework, not a
@@ -1688,7 +1688,7 @@ python3 scripts/cenogrid_l1_lattice_extension.py
 python3 scripts/cenogrid_mtm_ftest.py
 
 # 12. L1 integers vs Laskar 2004 eigenmode beats + N-body stability
-#     31/32 L1 integers match Laskar beat <5% (median 0.44%); 10-Myr stable
+#     32/33 L1 integers match Laskar beat <5% (median 0.48%); 10-Myr stable
 python3 scripts/l1_vs_laskar_eigenmodes.py
 
 # 13. Deep-time (-50 Myr) stability test on published LA2004 nominal solution
@@ -1787,7 +1787,7 @@ Items 1, 2, 3, 4 from the original follow-up list are now **completed** in
     integers are unremarkable. Is this a stationarity issue (4 Myr too
     long?), or does deep-time obliquity actually live at slightly
     different lattice integers? A windowed search over n ∈ {60..75}
-    rather than just our pre-specified 32 could surface this.
+    rather than just our pre-specified 33 could surface this.
 
 15. ~~**Extend the 10-Myr N-body integration backward to -50 Myr.**~~
     **DONE in §4.9 Test C-50** via the published LA2004 nominal solution
@@ -1810,7 +1810,7 @@ Items 1, 2, 3, 4 from the original follow-up list are now **completed** in
     La2011). The Test C-50 result establishes agreement with LA2004
     specifically. Laskar published the alternative solutions precisely
     because of inner-planet chaos: they diverge from each other past
-    ~40 Myr. If our 32 integers match LA2004 but diverge from
+    ~40 Myr. If our 33 integers match LA2004 but diverge from
     La2010a-d in deep time, we are tracking *LA2004 specifically*
     rather than *the consensus Laskar dynamics*. If they match all
     alternatives within similar drift bounds, the framework's

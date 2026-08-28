@@ -201,7 +201,7 @@ All numbers reproducible with `python3 scripts/milankovitch_*.py` (deterministic
 
 ## 7. The framing in one paragraph
 
-For the climate-modeling community: replace "Milankovitch insolation forcing" with **"solar-system gravitational coupling, projected onto Earth's climate-relevant axes."** The 8H integer-divisor lattice is the canonical decomposition; the Berger insolation parameterization is a special case (a 4-feature projection that loses information relative to the 32-integer lattice).
+For the climate-modeling community: replace "Milankovitch insolation forcing" with **"solar-system gravitational coupling, projected onto Earth's climate-relevant axes."** The 8H integer-divisor lattice is the canonical decomposition; the Berger insolation parameterization is a special case (a 4-feature projection that loses information relative to the 33-integer lattice).
 
 For everyone else: Earth's climate has rhythms because the solar system has rhythms. The Sun and the other seven planets are pulling on Earth's orbit at all times; the integer-divisor structure of the combined pull is what shows up in deep-sea sediments, in ice cores, and in atmospheric CO₂. We did not "discover" this — it is in Laskar's secular theory already. What this framework adds is an explicit, more-complete decomposition basis and the empirical demonstration that it strictly subsumes the classical insolation parameterization.
 

@@ -11,7 +11,7 @@ status: current
 
 The **Climate Formula Explorer** is a modal panel in the Tools menu that visualizes the canonical **L1+L2+L3 climate formula** (the orbital-forcing + carbon-cycle-thermostat + boundary-condition-step decomposition; see [doc 92](92-climate-formula.md)) overlaid on each of the four climate proxy records — **CenCO2PIP** (deep-time atmospheric CO₂, 0–66 Ma), **CENOGRID** (Cenozoic benthic δ¹⁸O / δ¹³C, 0–67 Ma), **LR04** (Pliocene-Pleistocene benthic δ¹⁸O, 0–5.3 Ma), and **EPICA Dome C** (atmospheric CO₂, 0–800 kyr). The modal exposes the same formula evaluated across 8 time windows from the deep-time 67-Myr CENOGRID record down to a forward projection of the next 250 kyr.
 
-This is the panel that grounds the Holistic Universe Model's climate claims in *observation*. The 32-integer L1 lattice (orbital integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000), the 3-line L2 carbon thermostat family (405 / 202 / 135 kyr), and the 6-step L3 Heaviside boundary-condition transitions (PETM, EOT, Mi-1, MMCT, iNHG, MPT) are all fitted with sequential ridge regression per regime — see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula) for the canonical architecture.
+This is the panel that grounds the Holistic Universe Model's climate claims in *observation*. The 33-integer L1 lattice (orbital integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000), the 3-line L2 carbon thermostat family (405 / 202 / 135 kyr), and the 6-step L3 Heaviside boundary-condition transitions (PETM, EOT, Mi-1, MMCT, iNHG, MPT) are all fitted with sequential ridge regression per regime — see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula) for the canonical architecture.
 
 > **Scope note (ESSRT).** The L1 lattice integer-divisor structure (n where T = 8H/n) is scale-invariant — the integers stay fixed at any epoch. The 8H = <!--v:eightH-->2,682,536<!--/v--> yr literal value and the per-line periods (8H/n in kyr) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent drift over the LR04 5.3-Myr window, ~0.04% over the 67-Myr CENOGRID window, and starts to matter for the 13H ≈ 4.36 Myr Boulila libration comparison covered in doc 92.
 
@@ -138,7 +138,7 @@ Re-running scripts only needed after dataset updates or refit changes — see [d
 ## Related documentation
 
 - [doc 90 — Milankovitch language](90-milankovitch-language.md) — terminology primer (g_j, s_j, k, eigenmode beats)
-- [doc 91 — Milankovitch evidence](91-milankovitch-evidence.md) — empirical 32-integer L1 fit, per-planet contributions, 14 hypothesis tests, 405-kyr off-lattice characterization
+- [doc 91 — Milankovitch evidence](91-milankovitch-evidence.md) — empirical 33-integer L1 fit, per-planet contributions, 14 hypothesis tests, 405-kyr off-lattice characterization
 - [doc 92 — Climate Formula architecture](92-climate-formula.md) — complete L1+L2+L3 derivation, per-regime ridge-fit R² values, variance-decomposition Tier A / B analyses, forward-projection limits
 - [doc 93 — L1 attribution reference](93-l1-attribution-reference.md) — per-integer Berger vs Holistic top-1 attribution
 - [doc 94 — Insolation null test](94-insolation-null-test.md) — empirical anchor for the "lattice subsumes Berger insolation" claim (ΔR² ≈ 0)

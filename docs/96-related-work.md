@@ -192,7 +192,7 @@ When discussing this framework with paleoclimate or solar-system-dynamics audien
 
 ### 8.1 The framing that lands
 
-> "We propose a unified integer-divisor lattice (32 integers under 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000) as a more complete decomposition basis than the classical 4-feature Berger insolation parameterization. Empirically, adding Berger features to the fitted lattice yields ΔR² ≈ 0 on LR04 and EPICA CO₂ — the lattice already contains the information the projection produces. The framework is structurally compatible with recent revisions to classical Milankovitch theory (Zeebe-Lantink 2024, Dutkiewicz 2024) and extends them by providing a unified parameterization basis."
+> "We propose a unified integer-divisor lattice (33 integers under 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000) as a more complete decomposition basis than the classical 4-feature Berger insolation parameterization. Empirically, adding Berger features to the fitted lattice yields ΔR² ≈ 0 on LR04 and EPICA CO₂ — the lattice already contains the information the projection produces. The framework is structurally compatible with recent revisions to classical Milankovitch theory (Zeebe-Lantink 2024, Dutkiewicz 2024) and extends them by providing a unified parameterization basis."
 
 ### 8.2 The framing that does not land
 
