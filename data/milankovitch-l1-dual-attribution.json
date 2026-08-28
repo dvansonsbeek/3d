@@ -100,7 +100,7 @@
     {
       "n": 9,
       "period_kyr": 298.05955555555556,
-      "amp_normalized": 0.12378050678154813,
+      "amp_normalized": 0.12581681630207958,
       "lr04_4sigma": true,
       "berger_label": "g\u2082\u2212g\u2087 Venus-Uranus ecc / Mercury Axial = 8H/9",
       "solar_system_families": [
@@ -828,7 +828,7 @@
     {
       "n": 12,
       "period_kyr": 223.54466666666667,
-      "amp_normalized": 0.20867246161945804,
+      "amp_normalized": 0.19935707333810118,
       "lr04_4sigma": true,
       "berger_label": "s\u2085\u2212s\u2081 Jupiter-Mercury nodal",
       "solar_system_families": [
@@ -2173,7 +2173,7 @@
     {
       "n": 14,
       "period_kyr": 191.6097142857143,
-      "amp_normalized": 0.09999995786236582,
+      "amp_normalized": 0.05946924685101625,
       "lr04_4sigma": false,
       "berger_label": "g\u2082\u2212g\u2088 Venus-Neptune ecc",
       "solar_system_families": [
@@ -2543,7 +2543,7 @@
     {
       "n": 16,
       "period_kyr": 167.6585,
-      "amp_normalized": 0.19667606309241115,
+      "amp_normalized": 0.1858068514649574,
       "lr04_4sigma": false,
       "berger_label": "Mars Axial = 8H/16",
       "solar_system_families": [
@@ -3977,7 +3977,7 @@
     {
       "n": 18,
       "period_kyr": 149.02977777777778,
-      "amp_normalized": 0.08229746834474372,
+      "amp_normalized": 0.04559968074246084,
       "lr04_4sigma": true,
       "berger_label": "s\u2084\u2212s\u2086 Mars-Saturn nodal",
       "solar_system_families": [
@@ -4996,7 +4996,7 @@
     {
       "n": 20,
       "period_kyr": 134.1268,
-      "amp_normalized": 0.2913603820764407,
+      "amp_normalized": 0.3401613842117097,
       "lr04_4sigma": true,
       "berger_label": "g\u2083\u2212g\u2082 Earth-Venus ecc",
       "solar_system_families": [
@@ -6846,7 +6846,7 @@
     {
       "n": 21,
       "period_kyr": 127.73980952380953,
-      "amp_normalized": 0.27774307743282617,
+      "amp_normalized": 0.19284971459240577,
       "lr04_4sigma": false,
       "berger_label": "Mars Obliq / Jupiter Axial = 8H/21",
       "solar_system_families": [
@@ -7649,7 +7649,7 @@
     {
       "n": 22,
       "period_kyr": 121.93345454545455,
-      "amp_normalized": 0.5293385133413004,
+      "amp_normalized": 0.4001276278049907,
       "lr04_4sigma": true,
       "berger_label": "s\u2082\u2212s\u2084 Venus-Mars nodal / g\u2084\u2212g\u2082 (Round 1 C8: highest L2 ratio at 12.84)",
       "solar_system_families": [
@@ -8384,9 +8384,1330 @@
       ]
     },
     {
+      "n": 24,
+      "period_kyr": 111.77233333333334,
+      "amp_normalized": 0.4692236249310783,
+      "lr04_4sigma": false,
+      "berger_label": "Earth's own H/3 eccentricity line (the one-law e(t); no secular-theory counterpart \u2014 pre-iNHG regime admission, doc 94 \u00a710)",
+      "solar_system_families": [
+        {
+          "family": "direct",
+          "source": "Saturn.Obliq"
+        },
+        {
+          "family": "direct",
+          "source": "Uranus.Peri_ecl"
+        },
+        {
+          "family": "s-beat",
+          "source": "Earth(40)-Mars(64)"
+        },
+        {
+          "family": "k+g",
+          "source": "k-Earth.Peri_ecl(128)"
+        }
+      ],
+      "n_families": 3,
+      "our_best_earth_planet": {
+        "kind": "3-term",
+        "terms": [
+          [
+            "Earth",
+            "Axial",
+            104
+          ],
+          [
+            "Jupiter",
+            "AscNode",
+            36
+          ],
+          [
+            "Jupiter",
+            "Ecc",
+            44
+          ]
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ],
+        "score": 31,
+        "label": "Earth.Axial(104) - Jupiter.AscNode(36) - Jupiter.Ecc(44)"
+      },
+      "all_earth_planet_combos": [
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Jupiter",
+              "AscNode",
+              36
+            ],
+            [
+              "Jupiter",
+              "Ecc",
+              44
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 31,
+          "label": "Earth.Axial(104) - Jupiter.AscNode(36) - Jupiter.Ecc(44)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Jupiter",
+              "Ecc",
+              44
+            ],
+            [
+              "Saturn",
+              "AscNode",
+              36
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 28,
+          "label": "Earth.Axial(104) - Jupiter.Ecc(44) - Saturn.AscNode(36)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Mars",
+              "Peri_ecl",
+              36
+            ],
+            [
+              "Jupiter",
+              "Ecc",
+              44
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 27,
+          "label": "Earth.Axial(104) - Mars.Peri_ecl(36) - Jupiter.Ecc(44)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Mars",
+              "AscNode",
+              64
+            ],
+            [
+              "Jupiter",
+              "Obliq",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 27,
+          "label": "Earth.Axial(104) - Mars.AscNode(64) - Jupiter.Obliq(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Jupiter",
+              "Obliq",
+              16
+            ],
+            [
+              "Saturn",
+              "Obliq",
+              24
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 27,
+          "label": "Earth.Obliq(64) - Jupiter.Obliq(16) - Saturn.Obliq(24)"
+        },
+        {
+          "kind": "2-term diff",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Uranus",
+              "Ecc",
+              80
+            ]
+          ],
+          "signs": [
+            1,
+            -1
+          ],
+          "score": 25,
+          "label": "Earth.Axial(104) - Uranus.Ecc(80)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Mercury",
+              "Peri_ecl",
+              11
+            ],
+            [
+              "Venus",
+              "Axial",
+              91
+            ]
+          ],
+          "signs": [
+            1,
+            1,
+            -1
+          ],
+          "score": 25,
+          "label": "Earth.Axial(104) + Mercury.Peri_ecl(11) - Venus.Axial(91)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Venus",
+              "Ecc",
+              19
+            ],
+            [
+              "Jupiter",
+              "Axial",
+              21
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 25,
+          "label": "Earth.Obliq(64) - Venus.Ecc(19) - Jupiter.Axial(21)"
+        },
+        {
+          "kind": "2-term diff",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Uranus",
+              "ICRF",
+              80
+            ]
+          ],
+          "signs": [
+            1,
+            -1
+          ],
+          "score": 22,
+          "label": "Earth.Axial(104) - Uranus.ICRF(80)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Venus",
+              "Axial",
+              91
+            ],
+            [
+              "Uranus",
+              "AscNode",
+              11
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            1
+          ],
+          "score": 22,
+          "label": "Earth.Axial(104) - Venus.Axial(91) + Uranus.AscNode(11)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Mars",
+              "Axial",
+              16
+            ],
+            [
+              "Mars",
+              "AscNode",
+              64
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 22,
+          "label": "Earth.Axial(104) - Mars.Axial(16) - Mars.AscNode(64)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Mars",
+              "Axial",
+              16
+            ],
+            [
+              "Saturn",
+              "Obliq",
+              24
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 22,
+          "label": "Earth.Obliq(64) - Mars.Axial(16) - Saturn.Obliq(24)"
+        },
+        {
+          "kind": "2-term diff",
+          "terms": [
+            [
+              "Earth",
+              "AscNode",
+              40
+            ],
+            [
+              "Jupiter",
+              "Obliq",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1
+          ],
+          "score": 20,
+          "label": "Earth.AscNode(40) - Jupiter.Obliq(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Jupiter",
+              "Obliq",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 19,
+          "label": "Earth.Axial(104) - Earth.Obliq(64) - Jupiter.Obliq(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Mars",
+              "AscNode",
+              64
+            ],
+            [
+              "Uranus",
+              "Obliq",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 19,
+          "label": "Earth.Axial(104) - Mars.AscNode(64) - Uranus.Obliq(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Mercury",
+              "Ecc",
+              84
+            ],
+            [
+              "Jupiter",
+              "Ecc",
+              44
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            1
+          ],
+          "score": 19,
+          "label": "Earth.Obliq(64) - Mercury.Ecc(84) + Jupiter.Ecc(44)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Saturn",
+              "Obliq",
+              24
+            ],
+            [
+              "Uranus",
+              "Obliq",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 19,
+          "label": "Earth.Obliq(64) - Saturn.Obliq(24) - Uranus.Obliq(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Mercury",
+              "Ecc",
+              84
+            ],
+            [
+              "Neptune",
+              "Peri_ecl",
+              4
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            1
+          ],
+          "score": 18,
+          "label": "Earth.Axial(104) - Mercury.Ecc(84) + Neptune.Peri_ecl(4)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Venus",
+              "Ecc",
+              19
+            ],
+            [
+              "Mars",
+              "Obliq",
+              21
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 18,
+          "label": "Earth.Obliq(64) - Venus.Ecc(19) - Mars.Obliq(21)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Jupiter",
+              "Obliq",
+              16
+            ],
+            [
+              "Uranus",
+              "Peri_ecl",
+              24
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 18,
+          "label": "Earth.Obliq(64) - Jupiter.Obliq(16) - Uranus.Peri_ecl(24)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Venus",
+              "AscNode",
+              1
+            ],
+            [
+              "Jupiter",
+              "Peri_ecl",
+              39
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 16,
+          "label": "Earth.Obliq(64) - Venus.AscNode(1) - Jupiter.Peri_ecl(39)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Jupiter",
+              "Ecc",
+              44
+            ],
+            [
+              "Neptune",
+              "Peri_ecl",
+              4
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            1
+          ],
+          "score": 16,
+          "label": "Earth.Obliq(64) - Jupiter.Ecc(44) + Neptune.Peri_ecl(4)"
+        },
+        {
+          "kind": "2-term diff",
+          "terms": [
+            [
+              "Earth",
+              "AscNode",
+              40
+            ],
+            [
+              "Mars",
+              "Axial",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1
+          ],
+          "score": 15,
+          "label": "Earth.AscNode(40) - Mars.Axial(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Mars",
+              "AscNode",
+              64
+            ],
+            [
+              "Saturn",
+              "Obliq",
+              24
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            1
+          ],
+          "score": 15,
+          "label": "Earth.Obliq(64) - Mars.AscNode(64) + Saturn.Obliq(24)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Mars",
+              "Axial",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 14,
+          "label": "Earth.Axial(104) - Earth.Obliq(64) - Mars.Axial(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Mars",
+              "Axial",
+              16
+            ],
+            [
+              "Uranus",
+              "Peri_ecl",
+              24
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 13,
+          "label": "Earth.Obliq(64) - Mars.Axial(16) - Uranus.Peri_ecl(24)"
+        },
+        {
+          "kind": "2-term diff",
+          "terms": [
+            [
+              "Earth",
+              "AscNode",
+              40
+            ],
+            [
+              "Uranus",
+              "Obliq",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1
+          ],
+          "score": 12,
+          "label": "Earth.AscNode(40) - Uranus.Obliq(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Jupiter",
+              "AscNode",
+              36
+            ],
+            [
+              "Neptune",
+              "Peri_ecl",
+              4
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 12,
+          "label": "Earth.Obliq(64) - Jupiter.AscNode(36) - Neptune.Peri_ecl(4)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Uranus",
+              "Obliq",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 11,
+          "label": "Earth.Axial(104) - Earth.Obliq(64) - Uranus.Obliq(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Uranus",
+              "Peri_ecl",
+              24
+            ],
+            [
+              "Uranus",
+              "Obliq",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 10,
+          "label": "Earth.Obliq(64) - Uranus.Peri_ecl(24) - Uranus.Obliq(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Saturn",
+              "AscNode",
+              36
+            ],
+            [
+              "Neptune",
+              "Peri_ecl",
+              4
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 9,
+          "label": "Earth.Obliq(64) - Saturn.AscNode(36) - Neptune.Peri_ecl(4)"
+        },
+        {
+          "kind": "2-term diff",
+          "terms": [
+            [
+              "Earth",
+              "AscNode",
+              40
+            ],
+            [
+              "Mars",
+              "AscNode",
+              64
+            ]
+          ],
+          "signs": [
+            -1,
+            1
+          ],
+          "score": 8,
+          "label": "Mars.AscNode(64) - Earth.AscNode(40)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Mars",
+              "Peri_ecl",
+              36
+            ],
+            [
+              "Neptune",
+              "Peri_ecl",
+              4
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 8,
+          "label": "Earth.Obliq(64) - Mars.Peri_ecl(36) - Neptune.Peri_ecl(4)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Mars",
+              "AscNode",
+              64
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            1
+          ],
+          "score": 7,
+          "label": "Earth.Obliq(64) - Earth.Axial(104) + Mars.AscNode(64)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Mars",
+              "AscNode",
+              64
+            ],
+            [
+              "Uranus",
+              "Peri_ecl",
+              24
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            1
+          ],
+          "score": 6,
+          "label": "Earth.Obliq(64) - Mars.AscNode(64) + Uranus.Peri_ecl(24)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Earth",
+              "ICRF",
+              24
+            ],
+            [
+              "Jupiter",
+              "Obliq",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 5,
+          "label": "Earth.Obliq(64) - Earth.ICRF(24) - Jupiter.Obliq(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Earth",
+              "ICRF",
+              24
+            ],
+            [
+              "Mars",
+              "Axial",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": 0,
+          "label": "Earth.Obliq(64) - Earth.ICRF(24) - Mars.Axial(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Earth",
+              "ICRF",
+              24
+            ],
+            [
+              "Uranus",
+              "Obliq",
+              16
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": -3,
+          "label": "Earth.Obliq(64) - Earth.ICRF(24) - Uranus.Obliq(16)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Earth",
+              "AscNode",
+              40
+            ],
+            [
+              "Uranus",
+              "Ecc",
+              80
+            ]
+          ],
+          "signs": [
+            1,
+            1,
+            -1
+          ],
+          "score": -6,
+          "label": "Earth.Obliq(64) + Earth.AscNode(40) - Uranus.Ecc(80)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Earth",
+              "ICRF",
+              24
+            ],
+            [
+              "Mars",
+              "AscNode",
+              64
+            ]
+          ],
+          "signs": [
+            1,
+            1,
+            -1
+          ],
+          "score": -7,
+          "label": "Earth.Obliq(64) + Earth.ICRF(24) - Mars.AscNode(64)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Obliq",
+              64
+            ],
+            [
+              "Earth",
+              "AscNode",
+              40
+            ],
+            [
+              "Uranus",
+              "ICRF",
+              80
+            ]
+          ],
+          "signs": [
+            1,
+            1,
+            -1
+          ],
+          "score": -9,
+          "label": "Earth.Obliq(64) + Earth.AscNode(40) - Uranus.ICRF(80)"
+        },
+        {
+          "kind": "2-term sum",
+          "terms": [
+            [
+              "Mercury",
+              "Obliq",
+              3
+            ],
+            [
+              "Mars",
+              "Obliq",
+              21
+            ]
+          ],
+          "signs": [
+            1,
+            1
+          ],
+          "score": -1000000000.0,
+          "label": "Mercury.Obliq(3) + Mars.Obliq(21)"
+        },
+        {
+          "kind": "2-term sum",
+          "terms": [
+            [
+              "Mercury",
+              "Obliq",
+              3
+            ],
+            [
+              "Jupiter",
+              "Axial",
+              21
+            ]
+          ],
+          "signs": [
+            1,
+            1
+          ],
+          "score": -1000000000.0,
+          "label": "Mercury.Obliq(3) + Jupiter.Axial(21)"
+        },
+        {
+          "kind": "2-term diff",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Earth",
+              "Peri_ecl",
+              128
+            ]
+          ],
+          "signs": [
+            -1,
+            1
+          ],
+          "score": -1000000000.0,
+          "label": "Earth.Peri_ecl(128) - Earth.Axial(104)"
+        },
+        {
+          "kind": "2-term diff",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Earth",
+              "Ecc",
+              128
+            ]
+          ],
+          "signs": [
+            -1,
+            1
+          ],
+          "score": -1000000000.0,
+          "label": "Earth.Ecc(128) - Earth.Axial(104)"
+        },
+        {
+          "kind": "2-term diff",
+          "terms": [
+            [
+              "Earth",
+              "AscNode",
+              40
+            ],
+            [
+              "Earth",
+              "Obliq",
+              64
+            ]
+          ],
+          "signs": [
+            -1,
+            1
+          ],
+          "score": -1000000000.0,
+          "label": "Earth.Obliq(64) - Earth.AscNode(40)"
+        },
+        {
+          "kind": "2-term diff",
+          "terms": [
+            [
+              "Mars",
+              "ICRF",
+              68
+            ],
+            [
+              "Jupiter",
+              "Ecc",
+              44
+            ]
+          ],
+          "signs": [
+            1,
+            -1
+          ],
+          "score": -1000000000.0,
+          "label": "Mars.ICRF(68) - Jupiter.Ecc(44)"
+        },
+        {
+          "kind": "2-term sum",
+          "terms": [
+            [
+              "Mars",
+              "Obliq",
+              21
+            ],
+            [
+              "Neptune",
+              "AscNode",
+              3
+            ]
+          ],
+          "signs": [
+            1,
+            1
+          ],
+          "score": -1000000000.0,
+          "label": "Mars.Obliq(21) + Neptune.AscNode(3)"
+        },
+        {
+          "kind": "2-term sum",
+          "terms": [
+            [
+              "Jupiter",
+              "Axial",
+              21
+            ],
+            [
+              "Neptune",
+              "AscNode",
+              3
+            ]
+          ],
+          "signs": [
+            1,
+            1
+          ],
+          "score": -1000000000.0,
+          "label": "Jupiter.Axial(21) + Neptune.AscNode(3)"
+        },
+        {
+          "kind": "3-term",
+          "terms": [
+            [
+              "Earth",
+              "Axial",
+              104
+            ],
+            [
+              "Earth",
+              "AscNode",
+              40
+            ],
+            [
+              "Earth",
+              "AscNode",
+              40
+            ]
+          ],
+          "signs": [
+            1,
+            -1,
+            -1
+          ],
+          "score": -1000000000.0,
+          "label": "Earth.Axial(104) - Earth.AscNode(40) - Earth.AscNode(40)"
+        }
+      ]
+    },
+    {
       "n": 25,
       "period_kyr": 107.30144,
-      "amp_normalized": 0.4674449335287923,
+      "amp_normalized": 0.7785895567530674,
       "lr04_4sigma": true,
       "berger_label": "s\u2081\u2212s\u2084 Mercury-Mars nodal (100-kyr centroid)",
       "solar_system_families": [
@@ -9556,7 +10877,7 @@
     {
       "n": 28,
       "period_kyr": 95.80485714285714,
-      "amp_normalized": 0.7535705061904123,
+      "amp_normalized": 0.6423724834489869,
       "lr04_4sigma": true,
       "berger_label": "g\u2084\u2212g\u2085 Mars-Jupiter ecc (Berger 95k)",
       "solar_system_families": [
@@ -11213,7 +12534,7 @@
     {
       "n": 30,
       "period_kyr": 89.41786666666667,
-      "amp_normalized": 0.08989973817528125,
+      "amp_normalized": 0.12259179869608952,
       "lr04_4sigma": false,
       "berger_label": "g\u2083\u2212g\u2087 Earth-Uranus ecc",
       "solar_system_families": [
@@ -12277,7 +13598,7 @@
     {
       "n": 31,
       "period_kyr": 86.53341935483871,
-      "amp_normalized": 0.4050380590583354,
+      "amp_normalized": 0.3122349938805535,
       "lr04_4sigma": true,
       "berger_label": "g\u2084\u2212g\u2087 Mars-Uranus",
       "solar_system_families": [
@@ -13079,7 +14400,7 @@
     {
       "n": 35,
       "period_kyr": 76.64388571428572,
-      "amp_normalized": 0.22305721109394258,
+      "amp_normalized": 0.20794203531412903,
       "lr04_4sigma": true,
       "berger_label": "s\u2084\u2212s\u2088 Mars-Neptune nodal (75.98 kyr, 0.9%) \u2014 lattice-exact: Mars.Peri_ecl(36) \u2212 Venus.AscNode(1), the 8H-modulation sideband of the Mars perihelion line",
       "solar_system_families": [
@@ -14280,7 +15601,7 @@
     {
       "n": 38,
       "period_kyr": 70.59305263157894,
-      "amp_normalized": 0.5378750524448507,
+      "amp_normalized": 0.5371863026750304,
       "lr04_4sigma": false,
       "berger_label": "s\u2088\u2212s\u2083 Neptune-Earth nodal",
       "solar_system_families": [],
@@ -14651,7 +15972,7 @@
     {
       "n": 39,
       "period_kyr": 68.78297435897436,
-      "amp_normalized": 0.37024662510066747,
+      "amp_normalized": 0.3596514006613675,
       "lr04_4sigma": true,
       "berger_label": "s\u2085\u2212s\u2083 Earth nodal",
       "solar_system_families": [
@@ -15757,7 +17078,7 @@
     {
       "n": 48,
       "period_kyr": 55.88616666666667,
-      "amp_normalized": 0.2064949773461109,
+      "amp_normalized": 0.20300194663544535,
       "lr04_4sigma": true,
       "berger_label": "s\u2087\u2212s\u2086 Uranus-Saturn nodal",
       "solar_system_families": [
@@ -17147,7 +18468,7 @@
     {
       "n": 50,
       "period_kyr": 53.65072,
-      "amp_normalized": 0.11512842959420275,
+      "amp_normalized": 0.11313626454088156,
       "lr04_4sigma": true,
       "berger_label": "g\u2086\u2212g\u2085 Saturn-Jupiter ecc",
       "solar_system_families": [
@@ -17517,7 +18838,7 @@
     {
       "n": 53,
       "period_kyr": 50.61388679245283,
-      "amp_normalized": 0.055567697420849674,
+      "amp_normalized": 0.055760134679423944,
       "lr04_4sigma": true,
       "berger_label": "s\u2086\u2212s\u2088 Saturn-Neptune nodal (50.52 kyr, 0.2%) \u2014 lattice-exact: Mars.AscNode(64) \u2212 Uranus.AscNode(11) (= Mars.Ecc(52) + Venus.AscNode(1), the 8H sideband of the Mars eccentricity line)",
       "solar_system_families": [
@@ -17959,7 +19280,7 @@
     {
       "n": 65,
       "period_kyr": 41.269784615384616,
-      "amp_normalized": 0.3712810553368371,
+      "amp_normalized": 0.3712043046476743,
       "lr04_4sigma": true,
       "berger_label": "k+s\u2083 Earth obliquity (Berger 41k)",
       "solar_system_families": [
@@ -18544,7 +19865,7 @@
     {
       "n": 66,
       "period_kyr": 40.64448484848485,
-      "amp_normalized": 0.27859351421742357,
+      "amp_normalized": 0.27939118809914226,
       "lr04_4sigma": false,
       "berger_label": "obliquity-band arithmetic-mean (Round 2 C10: EPICA CO\u2082 ratio 15.79)",
       "solar_system_families": [],
@@ -19098,7 +20419,7 @@
     {
       "n": 68,
       "period_kyr": 39.44905882352941,
-      "amp_normalized": 0.1072327728557452,
+      "amp_normalized": 0.10636865544665436,
       "lr04_4sigma": true,
       "berger_label": "k+s\u2084 Berger Mars obliquity sub-peak",
       "solar_system_families": [
@@ -20229,7 +21550,7 @@
     {
       "n": 73,
       "period_kyr": 36.747068493150685,
-      "amp_normalized": 0.06440004068378309,
+      "amp_normalized": 0.06366086643711996,
       "lr04_4sigma": true,
       "berger_label": "2|s\u2084| Mars nodal harmonic",
       "solar_system_families": [
@@ -20764,7 +22085,7 @@
     {
       "n": 76,
       "period_kyr": 35.29652631578947,
-      "amp_normalized": 0.06612754550466139,
+      "amp_normalized": 0.0654810703475591,
       "lr04_4sigma": true,
       "berger_label": "g\u2084\u2212s\u2083 Mars-Earth beat",
       "solar_system_families": [
@@ -22912,7 +24233,7 @@
     {
       "n": 96,
       "period_kyr": 27.943083333333334,
-      "amp_normalized": 0.02089118649487519,
+      "amp_normalized": 0.02083389213749051,
       "lr04_4sigma": false,
       "berger_label": "k+g\u2086 Saturn climatic precession sub-peak (Round 1 A1 sideband)",
       "solar_system_families": [],
@@ -24336,7 +25657,7 @@
     {
       "n": 107,
       "period_kyr": 25.070429906542056,
-      "amp_normalized": 0.05056241647764529,
+      "amp_normalized": 0.050548952982060746,
       "lr04_4sigma": false,
       "berger_label": "k+g\u2087 Uranus climatic precession sub-peak (Round 1 A1)",
       "solar_system_families": [
@@ -25591,7 +26912,7 @@
     {
       "n": 110,
       "period_kyr": 24.38669090909091,
-      "amp_normalized": 0.0575355408244984,
+      "amp_normalized": 0.05733703250597248,
       "lr04_4sigma": false,
       "berger_label": "k+g\u2083 Earth secondary precession sideband (Round 1 A1)",
       "solar_system_families": [
@@ -26127,7 +27448,7 @@
     {
       "n": 113,
       "period_kyr": 23.739256637168143,
-      "amp_normalized": 0.18900410417456065,
+      "amp_normalized": 0.18837384379993263,
       "lr04_4sigma": true,
       "berger_label": "k+g\u2085 Jupiter climatic precession (Berger 23.7k)",
       "solar_system_families": [
@@ -26836,7 +28157,7 @@
     {
       "n": 120,
       "period_kyr": 22.354466666666667,
-      "amp_normalized": 0.197266306640154,
+      "amp_normalized": 0.19722320887599717,
       "lr04_4sigma": true,
       "berger_label": "k+g\u2082 Venus climatic precession = H/15",
       "solar_system_families": [],
@@ -27975,7 +29296,7 @@
     {
       "n": 134,
       "period_kyr": 20.01892537313433,
-      "amp_normalized": 0.04162424166864031,
+      "amp_normalized": 0.041654416763754504,
       "lr04_4sigma": false,
       "berger_label": "k+g\u2085 Jupiter precession sub-peak (Round 1 A1)",
       "solar_system_families": [
@@ -29065,7 +30386,7 @@
     {
       "n": 141,
       "period_kyr": 19.0250780141844,
-      "amp_normalized": 0.1106163487258054,
+      "amp_normalized": 0.11025792513950751,
       "lr04_4sigma": false,
       "berger_label": "k+g\u2083 Earth climatic precession \u2014 Berger quintet 19-kyr peak (subthreshold LR04, 3\u03c3 in Cheng monsoon; beats with n=113 to form n=28 per Wigley 1976)",
       "solar_system_families": [],
@@ -29697,7 +31018,7 @@
     {
       "n": 152,
       "period_kyr": 17.648263157894736,
-      "amp_normalized": 0.029672116873991322,
+      "amp_normalized": 0.029782871130490267,
       "lr04_4sigma": false,
       "berger_label": "k+g\u2084 Mars climatic precession sub-peak (Round 1 A1)",
       "solar_system_families": [
@@ -31099,7 +32420,7 @@
     {
       "n": 185,
       "period_kyr": 14.500194594594594,
-      "amp_normalized": 0.0413807666086575,
+      "amp_normalized": 0.04138161131032256,
       "lr04_4sigma": false,
       "berger_label": "k+g\u2082 Venus precession sub-peak (Round 1 A1)",
       "solar_system_families": [],

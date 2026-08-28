@@ -307,7 +307,7 @@
     "alpha1PerMa": -0.000099375895103,
     "alpha3PerMa3": -6.4186463489e-12,
     "alpha4PerMa4": 1.3619800519e-16,
-    "alphaClimateScalePerMille": -3.93e-7,
+    "alphaClimateScalePerMille": -3.665e-7,
     "dtStackTaperFullHalfwidthYr": 300000,
     "dtStackTaperTotalHalfwidthYr": 400000,
     "recessionRegime": {

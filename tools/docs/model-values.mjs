@@ -716,6 +716,29 @@ export const VALUES = {
     out.l1N24R2CanonPreInhg = { get: () => pre().r2_l1_l2_l3, render: f4, note: 'R² of the canonical 32-divisor fit, pre-iNHG' };
     out.l1N24R2WithLinePreInhg = { get: () => pre().lattice_plus_line.r2_l1_l2_l3, render: f4, note: 'R² of the canonical fit with 24 added (33 divisors), pre-iNHG' };
     out.l1N24AdmissionRule = { get: () => n24().summary.admission_rule_x_median, render: (v) => `${Number(v)}×`, note: 'the doc 91 lattice admission rule: amplitude ≥ this × the median, full LR04' };
+    // L1 divisor audit (every shipped divisor on the doc-94 footing) and the eccentricity period scan
+    const aud = () => rd('data/l1-divisor-audit-results.json');
+    const scn = () => rd('data/ecc-period-scan-results.json');
+    out.l1DivisorCount = { get: () => aud().metadata.n_divisors, render: (v) => String(v), note: 'number of shipped L1 lattice divisors' };
+    out.l1AuditN24RankCvPreInhg = { get: () => aud().regime_results['pre-inhg'].rows['24'].rank_cv, render: (v) => String(v), note: 'rank of n = 24 among the shipped divisors by cross-validated pair ΔR², pre-iNHG' };
+    out.l1AuditN24RankInPreInhg = { get: () => aud().regime_results['pre-inhg'].rows['24'].rank_in, render: (v) => String(v), note: 'rank of n = 24 by in-sample leave-one-out R² loss, pre-iNHG' };
+    out.l1AuditN24RankCvLr04Full = { get: () => aud().regime_results['lr04-full'].rows['24'].rank_cv, render: (v) => String(v), note: 'rank of n = 24 by cross-validated pair ΔR² on the full LR04 record' };
+    out.l1AuditCvPositiveLr04Full = { get: () => aud().regime_results['lr04-full'].n_cv_positive, render: (v) => String(v), note: 'shipped divisors with a positive cross-validated pair ΔR² on the full record' };
+    out.l1AuditCvPositivePreInhg = { get: () => aud().regime_results['pre-inhg'].n_cv_positive, render: (v) => String(v), note: 'shipped divisors with a positive cross-validated pair ΔR², pre-iNHG' };
+    for (const n of [96, 107, 110, 134, 152, 185]) {
+      out[`l1AuditSidebandMaxLooIn${n}`] = { get: () => Math.max(...['post-mpt', 'inhg-mpt', 'pre-inhg', 'lr04-full'].map((r) => aud().regime_results[r].rows[String(n)].loo_in)), render: sdr, note: `largest in-sample leave-one-out R² loss of the MTM sideband n = ${n} across the four regimes` };
+    }
+    out.eccScanPreInhgCvBestKyr = { get: () => scn().summary.pre_inhg_cv_best_kyr_open, render: (v) => Number(v).toFixed(1), note: 'pre-iNHG cross-validated best free period for Earth\'s eccentricity line (band-open baseline), kyr' };
+    out.eccScanPreInhgCvBestN = { get: () => scn().summary.pre_inhg_cv_best_n_open, render: (v) => Number(v).toFixed(2), note: 'the same as a lattice index n = 8H/period' };
+    out.eccScanPreInhgCvHalfmaxLoKyr = { get: () => scn().summary.pre_inhg_cv_halfmax_kyr_open[0], render: (v) => Number(v).toFixed(1), note: 'lower edge of the CV half-max band, kyr' };
+    out.eccScanPreInhgCvHalfmaxHiKyr = { get: () => scn().summary.pre_inhg_cv_halfmax_kyr_open[1], render: (v) => Number(v).toFixed(1), note: 'upper edge of the CV half-max band, kyr' };
+    out.eccScanOffsetFromModelPct = { get: () => scn().summary.offset_from_model_pct, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(1), note: 'record\'s best period vs the model\'s 8H/24, percent' };
+    out.eccScanPreInhgCvAt23 = { get: () => scn().summary.pre_inhg_cv_at_23_open, render: sdr, note: 'CV ΔR² of a free-phase 8H/23 line, pre-iNHG, band-open baseline' };
+    out.eccScanPreInhgCvAt24 = { get: () => scn().summary.pre_inhg_cv_at_24_open, render: sdr, note: 'CV ΔR² of a free-phase 8H/24 line, pre-iNHG, band-open baseline' };
+    out.eccScanPreInhgCvAt25 = { get: () => scn().summary.pre_inhg_cv_at_25_open, render: sdr, note: 'CV ΔR² of a free-phase 8H/25 line, pre-iNHG, band-open baseline' };
+    out.eccScanPreInhgInBestKyr = { get: () => scn().regime_results['pre-inhg'].open.argmax_in_kyr, render: (v) => Number(v).toFixed(1), note: 'pre-iNHG IN-SAMPLE best free period (the non-stationary ~100-kyr power), kyr' };
+    out.eccScanPreInhgInBestCv = { get: () => scn().regime_results['pre-inhg'].open.at_integer_n['27'].cv, render: sdr, note: 'CV ΔR² at the in-sample power peak (n = 27), pre-iNHG — negative: not phase-stable' };
+    out.eccScanPostMptCvBestKyr = { get: () => scn().regime_results['post-mpt'].open.argmax_cv_kyr, render: (v) => Number(v).toFixed(1), note: 'post-MPT cross-validated best free period in the band (band-open baseline), kyr' };
     for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
       out[`insolExtInsolOnlyR2${key}`] = { get: () => ext().regime_results._insol_only_r2[reg], render: (v) => Number(v).toFixed(4), note: `R² of the four classical insolation features ALONE (no L1/L2/L3), regime ${reg}` };
       out[`insolExtR2L1${key}`] = { get: () => ext().regime_results[reg].r2_l1, render: (v) => Number(v).toFixed(3), note: `R² of L1 alone, regime ${reg}` };

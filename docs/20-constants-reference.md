@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:a4b818dc588e46e8
+coefficients: sha256:b121f90e431d946f
 status: current
 ---
 
@@ -45,7 +45,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 | Planet orbital periods (Part 4 `solarYearInput`) | `meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s)` |
 | α(t) GIA correction → ΔT | `meanDeltaTSecondsAtAge(t_Ma)` |
 
-H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr; at J2000 H = <!--v:H-->335,317<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->352,600<!--/v--> yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
+H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr; at J2000 H = <!--v:H-->335,317<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->352,601<!--/v--> yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
 
 For the canonical 9-step derivation chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the canonical reference at `docs/archive/old-documents/IP-deep-time-extension.md` (untracked archive). For the Solar System Resonance Cycle (8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000) period table covering all major planetary cycles as integer divisors of 8H, see [Doc 55](55-solar-system-resonance-cycle-periods.md).
 
@@ -423,7 +423,7 @@ The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier t
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->55.47<!--/v--> s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0018<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
+| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->55.16<!--/v--> s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0018<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
 
 ## Perihelion Longitude Formula Parameters
 

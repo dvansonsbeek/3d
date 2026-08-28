@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:a4b818dc588e46e8
+coefficients: sha256:b121f90e431d946f
 status: current
 ---
 
@@ -27,10 +27,11 @@ status: current
 > (2.7–5.3 Myr) and survives cross-validation there
 > (<!--v:insolStabModelCvPreInhg-->+0.0212<!--/v-->). La2004's e(t) does not reproduce
 > it. §10 attributes the gain: it is the single lattice line n = 24
-> (8H/24 = H/3, <!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr), which is not among L1's
-> 32 divisors — a free-phase 8H/24 pair gives the identical cross-validated
+> (8H/24 = H/3, <!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr), which was not among L1's
+> original 32 divisors — a free-phase 8H/24 pair gives the identical cross-validated
 > gain and e(t) adds nothing on top of it. A lattice attribution, not an
-> insolation effect and not a layer. Climate is driven by gravitational
+> insolation effect and not a layer; n = 24 is now admitted to L1 (§10.3), the
+> record's own best period for the line is 8H/24 within 0.8% (§10.4). Climate is driven by gravitational
 > rhythms; classical insolation is a downstream proxy, not a primary driver.
 
 > **Scope note (ESSRT).** The augmented-regression test and the L1 lattice integer-divisor structure are scale-invariant. The 8H = <!--v:eightH-->2,682,536<!--/v--> yr value and the climate-test windows (LR04 0-5320 kyr, EPICA 0-800 kyr, La2010 0-500 kyr) are J2000-evaluated / present-epoch. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent drift over the post-MPT 0-1 Myr window where the test is most discriminative; modest over the full 5.3 Myr LR04 record. The result that L1 fully absorbs Laskar's insolation is structural (per §5.1) and therefore epoch-invariant.
@@ -206,14 +207,13 @@ Read with §9, the statistic splits into two statements:
    the canonical fit is weakest (R² = <!--v:insolExtR2CanonPreInhg-->0.4298<!--/v-->).
    Because La2004's e(t) does not reproduce it, this is not an insolation
    effect. §10 identifies it as the single lattice line n = 24
-   (8H/24 = H/3, <!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr), which is not among
-   L1's 32 divisors: a free-phase 8H/24 pair reproduces the model e(t)
+   (8H/24 = H/3, <!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr), which was not among
+   L1's original 32 divisors: a free-phase 8H/24 pair reproduces the model e(t)
    feature (R² <!--v:l1N24R2EccByLine-->0.998<!--/v-->) and the identical
    cross-validated gain, e(t) adds nothing on top of it, and the data's phase
    agrees with the model's fixed H/3 phase to
-   <!--v:l1N24PhaseDiffDegPreInhg-->−8.5<!--/v-->°. Attributed; whether n = 24
-   joins the lattice is a separate structural decision (§10.3), not a
-   climate-formula layer.
+   <!--v:l1N24PhaseDiffDegPreInhg-->−8.5<!--/v-->°. Attributed and, after the
+   whole-lattice audit of §10.3, admitted to L1 — not a climate-formula layer.
 
 The canonical formula `C(t) = c₀ + L1(t) + L2(t) + L3(t)` stands.
 
@@ -480,9 +480,9 @@ Output: [`data/insolation-stability-results.json`](../data/insolation-stability-
 ## 10. L1 attribution — the gain is the lattice line n = 24
 
 The model's e(t) is a single line on 8H/24 = H/3 =
-<!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr, and **n = 24 is not one of L1's 32
-divisors** — the list runs <!--v:l1N24NeighbourLo-->22<!--/v--> →
-<!--v:l1N24NeighbourHi-->25<!--/v-->. So the §9 gain has two candidate
+<!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr, and **n = 24 was not one of L1's
+original 32 divisors** — that list ran <!--v:l1N24NeighbourLo-->22<!--/v--> →
+<!--v:l1N24NeighbourHi-->25<!--/v-->. So the §9 gain had two candidate
 readings: the missing lattice line, or something specific to e(t)'s shape and
 its ϖ-products. [`scripts/milankovitch_l1_n24_attribution.py`](../scripts/milankovitch_l1_n24_attribution.py)
 separates them on the same canonical residual, ridge and split-half CV as §9.
@@ -533,19 +533,74 @@ Refitting the canonical formula with 24 added (33 divisors):
 | pre-iNHG | **<!--v:l1N24LatticeDeltaR2PreInhg-->+0.0196<!--/v-->** (R² <!--v:l1N24R2CanonPreInhg-->0.4298<!--/v--> → <!--v:l1N24R2WithLinePreInhg-->0.4493<!--/v-->) | <!--v:l1N24AmpOverMedianPreInhg-->1.64<!--/v-->× | <!--v:l1N24RankPreInhg-->5<!--/v--> |
 | lr04-full | <!--v:l1N24LatticeDeltaR2Lr04Full-->+0.0031<!--/v--> | <!--v:l1N24AmpOverMedianLr04Full-->0.79<!--/v-->× | <!--v:l1N24RankLr04Full-->24<!--/v--> |
 
-### 10.3 Standing
+### 10.3 Every divisor on the same footing — the audit that decided admission
 
-The attribution is settled: the pre-iNHG sensitivity is the 8H/24 lattice line.
-Admission of n = 24 to L1 is a structural decision, not made here. Against it:
-on the full LR04 record the line is
-<!--v:l1N24AmpOverMedianLr04Full-->0.79<!--/v-->× the median amplitude, below
-the <!--v:l1N24AdmissionRule-->3×<!--/v--> rule of [doc 91](91-milankovitch-evidence.md).
-For it: the precedent of the pre-MPT-only divisors admitted as "visible in
-pre-MPT data" (doc 91 §3.3–3.4), and that it would be the only divisor
-attributed to Earth's own eccentricity line rather than to a planetary beat.
-The lattice ships as 32 until that decision is taken.
+Before admitting n = 24, every shipped divisor was put through the same
+instrument ([`scripts/milankovitch_l1_divisor_audit.py`](../scripts/milankovitch_l1_divisor_audit.py)):
+drop the divisor, refit the canonical formula on the full regime, and re-add
+it as a free-phase pair on the residual, in-sample and split-half
+cross-validated. (A naive half-window leave-one-out of the whole 33-term
+formula is numerically ill-conditioned and was discarded.) Read a negative
+cross-validated value as *non-stationary amplitude across the window* — doc
+91's regime thesis — not as "spurious".
 
-Output: [`data/l1-n24-attribution-results.json`](../data/l1-n24-attribution-results.json).
+- **Pre-iNHG**, the regime where the line lives, n = 24 ranks
+  <!--v:l1AuditN24RankCvPreInhg-->3<!--/v--> of <!--v:l1DivisorCount-->33<!--/v--> by
+  cross-validated gain and <!--v:l1AuditN24RankInPreInhg-->6<!--/v--> by in-sample
+  leave-one-out loss — ahead of most of the shipped lattice there.
+- **Full record**, it is one of only <!--v:l1AuditCvPositiveLr04Full-->8<!--/v-->
+  divisors with a positive cross-validated gain
+  (rank <!--v:l1AuditN24RankCvLr04Full-->5<!--/v-->), while remaining
+  subthreshold in amplitude (<!--v:l1N24AmpOverMedianLr04Full-->0.79<!--/v-->× median).
+- The six MTM-enrichment sidebands (96, 107, 110, 134, 152, 185) explain no
+  variance in any regime (largest leave-one-out loss
+  <!--v:l1AuditSidebandMaxLooIn96-->+0.0068<!--/v--> for n = 96, the rest ≤
+  <!--v:l1AuditSidebandMaxLooIn107-->+0.0034<!--/v-->); they are spectral-criterion
+  members (Test L) and this variance audit neither admits nor retires them.
+
+**Admitted.** n = 24 joins L1 as its <!--v:l1DivisorCount-->33<!--/v-->rd divisor on
+the regime clause of the admission rule stated in
+[doc 91 §1](91-milankovitch-evidence.md) (≥ 1.5× median *and* cross-validated
+positive in a named regime — the same basis as the six pre-MPT-only members).
+Consequence for the LOD chain: the deep-time α(t) reads the post-MPT L1 layer,
+so the admission refit moved it; `alphaClimateScalePerMille` was recalibrated
+to hold dα/dt(J2000) at the Cox–Chao target and the ΔT stack re-closed
+(Step 7c), see [doc 104](104-millennial-rotation-swing.md).
+
+### 10.4 Turned around — which period does the record want?
+
+[`scripts/milankovitch_ecc_period_scan.py`](../scripts/milankovitch_ecc_period_scan.py)
+scans a free-phase line over n = 18…34 (149 → 79 kyr) in 0.05 steps against
+the raw record, the canonical residual with the 100-kyr band members
+22/24/25/28 removed (band open — the line under test must be out, or the scan
+looks at its own hole), and the pre-admission lattice (every divisor but 24).
+The cross-validated argmax is the phase-stable line; the in-sample argmax just
+follows the power.
+
+- **Pre-iNHG, band open:** the stationary line is at
+  <!--v:eccScanPreInhgCvBestKyr-->112.7<!--/v--> kyr
+  (n = <!--v:eccScanPreInhgCvBestN-->23.80<!--/v-->), CV half-max
+  <!--v:eccScanPreInhgCvHalfmaxLoKyr-->112.0<!--/v-->–<!--v:eccScanPreInhgCvHalfmaxHiKyr-->113.2<!--/v--> kyr —
+  <!--v:eccScanOffsetFromModelPct-->+0.8<!--/v-->% from the model's 8H/24, inside the
+  ~1% orbital-tuning uncertainty of LR04's Pliocene chronology and far inside
+  the Rayleigh resolution (Δn ≈ 1). The neighbouring lattice integers are
+  rejected out of sample: 8H/23 <!--v:eccScanPreInhgCvAt23-->−0.0587<!--/v-->,
+  8H/25 <!--v:eccScanPreInhgCvAt25-->−0.0155<!--/v--> (8H/24
+  <!--v:eccScanPreInhgCvAt24-->+0.0064<!--/v-->).
+- The in-sample power peak sits at <!--v:eccScanPreInhgInBestKyr-->98.4<!--/v--> kyr
+  (the classical ~100k) but does not cross-validate
+  (<!--v:eccScanPreInhgInBestCv-->−0.0164<!--/v-->); post-MPT the band's stationary
+  line is at <!--v:eccScanPostMptCvBestKyr-->102.0<!--/v--> kyr — the multi-planet
+  beat band of doc 91, not Earth's line.
+
+So the answer to "8H/24 or 8H/23 or something else" is 8H/24: on the lattice
+only 24 survives; off the lattice the record's best is 0.8% away with no fitted
+phase needed. The pre-iNHG record thereby bounds Earth's eccentricity line to
+112.7 ± ~0.6 kyr, consistent with H/3; H/3 ± 4% is excluded.
+
+Outputs: [`data/l1-n24-attribution-results.json`](../data/l1-n24-attribution-results.json),
+[`data/l1-divisor-audit-results.json`](../data/l1-divisor-audit-results.json),
+[`data/ecc-period-scan-results.json`](../data/ecc-period-scan-results.json).
 
 ---
 

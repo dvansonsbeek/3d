@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:a4b818dc588e46e8
+coefficients: sha256:b121f90e431d946f
 status: current
 ---
 
@@ -15,22 +15,22 @@ status: current
 
 **PLANET_CYCLES used:** the current canonical state (matches `public/input/model-parameters.json` and `src/script.js`).
 
-## Scope — this doc covers L1 only (32 of 41 formula components)
+## Scope — this doc covers L1 only (33 of 42 formula components)
 
-The canonical climate formula has **three layers** totalling **41 components**:
+The canonical climate formula has **three layers** totalling **42 components**:
 
 | Layer | Count | Nature | Attribution framework | Where documented |
 |-------|------:|--------|------------------------|-------------------|
-| **L1** | 32 | Orbital lattice — integer divisors of 8H | Berger secular theory **vs** Earth-planet beat (this doc) | doc 93 (here) |
+| **L1** | 33 | Orbital lattice — integer divisors of 8H | Berger secular theory **vs** Earth-planet beat (this doc) | doc 93 (here) |
 | **L2** | 3 | Off-lattice carbon thermostat (405, 202, 135 kyr) | Silicate-weathering / carbon-cycle internal resonance — **NOT** orbital beats | [doc 92 §3](92-climate-formula.md) |
 | **L3** | 6 | Heaviside step components (PETM, EOT, Mi-1, MMCT, iNHG, MPT) | Tectonic / cryosphere regime shifts — **NOT** periodic | [doc 92 §4](92-climate-formula.md) |
-| **Total** | **41** | | | |
+| **Total** | **42** | | | |
 
 **Why L2 and L3 are excluded from this doc:** the Earth-planet beat search assumes orbital integer-divisor structure. L2 is off-lattice (405 kyr is not a divisor of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000) and arises from carbon-cycle internal resonance, not orbital forcing directly. L3 is non-periodic — boundary-condition step shifts at known Cenozoic transitions. Different mechanism class, different attribution.
 
-**The n=7 LR04 4σ peak is L2's shadow, not L1.** The LR04 full-record spectrum has a 4σ peak at T = 383.22 kyr (= 8H/7). The well-established 405-kyr eccentricity line sits 21.8 kyr away and is **off the 8H lattice** — its spectral energy leaks into the nearest lattice bin (n=7), which the divisor-spectrum then detects but classifies as "Unpredicted" (no family-level beat predicts 383 kyr exactly). Including n=7 in L1 would double-count with L2. It is correctly excluded from the canonical L1 list of 32 integers.
+**The n=7 LR04 4σ peak is L2's shadow, not L1.** The LR04 full-record spectrum has a 4σ peak at T = 383.22 kyr (= 8H/7). The well-established 405-kyr eccentricity line sits 21.8 kyr away and is **off the 8H lattice** — its spectral energy leaks into the nearest lattice bin (n=7), which the divisor-spectrum then detects but classifies as "Unpredicted" (no family-level beat predicts 383 kyr exactly). Including n=7 in L1 would double-count with L2. It is correctly excluded from the canonical L1 list of 33 integers.
 
-So the 32 components in this doc are the complete L1 set. For L2 + L3 attribution, see [doc 92](92-climate-formula.md).
+So the 33 components in this doc are the complete L1 set. For L2 + L3 attribution, see [doc 92](92-climate-formula.md).
 
 ## Summary table — Berger vs our model top-1, with 3-step status
 
@@ -42,51 +42,52 @@ So the 32 components in this doc are the complete L1 set. For L2 + L3 attributio
 
 | n | T (kyr) | amp | LR04 4σ | Berger / secular | Our model top-1 | 3-step status |
 |---|--------:|----:|:-------:|------------------|-----------------|:-------------:|
-| 9 | 298.060 | 0.1238 | ✓ | g₂−g₇ Venus-Uranus ecc / Mercury Axial = 8H/9 | `[3-term]` Earth.Obliq(64) - Jupiter.Peri_ecl(39) - Jupiter.Obliq(16) | **PLANET ≠** |
-| 12 | 223.545 | 0.2087 | ✓ | s₅−s₁ Jupiter-Mercury nodal | `[3-term]` Earth.Axial(104) - Venus.Axial(91) - Venus.AscNode(1) | **PLANET ≠** |
-| 14 | 191.610 | 0.1000 |  | g₂−g₈ Venus-Neptune ecc | `[3-term]` Earth.Axial(104) - Mercury.Ecc(84) - Saturn.Axial(6) | **PLANET ≠** |
-| 16 | 167.659 | 0.1967 |  | Mars Axial = 8H/16 | `[3-term]` Earth.Axial(104) - Jupiter.Ecc(44) - Jupiter.Ecc(44) | (no Berger) |
-| 18 | 149.030 | 0.0823 | ✓ | s₄−s₆ Mars-Saturn nodal | `[3-term]` Earth.Axial(104) - Jupiter.Axial(21) - Jupiter.ICRF(65) | **PLANET ≠** |
-| 20 | 134.127 | 0.2914 | ✓ | g₃−g₂ Earth-Venus ecc | `[3-term]` Earth.Axial(104) + Jupiter.Obliq(16) - Neptune.Obliq(100) | **PLANET ≠** |
-| 21 | 127.740 | 0.2777 |  | Mars Obliq / Jupiter Axial = 8H/21 | `[3-term]` Earth.Axial(104) - Jupiter.Peri_ecl(39) - Jupiter.Ecc(44) | (no Berger) |
-| 22 | 121.933 | 0.5293 | ✓ | s₂−s₄ Venus-Mars nodal / g₄−g₂ (Round 1 C8: highest L2 ra... | `[3-term]` Earth.Obliq(64) - Jupiter.Axial(21) - Jupiter.Axial(21) | **PLANET ≠** |
-| 25 | 107.301 | 0.4674 | ✓ | s₁−s₄ Mercury-Mars nodal (100-kyr centroid) | `[3-term]` Earth.Axial(104) + Jupiter.Axial(21) - Neptune.Obliq(100) | **PLANET ≠** |
-| 28 | 95.805 | 0.7536 | ✓ | g₄−g₅ Mars-Jupiter ecc (Berger 95k) | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) - Saturn.Obliq(24) | **PLANET ≠** |
-| 30 | 89.418 | 0.0899 |  | g₃−g₇ Earth-Uranus ecc | `[3-term]` Earth.Axial(104) - Venus.Obliq(110) + Jupiter.AscNode(36) | **PLANET ≠** |
-| 31 | 86.533 | 0.4050 | ✓ | g₄−g₇ Mars-Uranus | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) - Jupiter.Axial(21) | **PLANET ≠** |
-| 35 | 76.644 | 0.2231 | ✓ | s₄−s₈ Mars-Neptune nodal (75.98 kyr, 0.9%) — lattice-exac... | `[3-term]` Earth.Axial(104) - Mercury.ICRF(93) + Saturn.Obliq(24) | **PLANET ≠** |
-| 38 | 70.593 | 0.5379 |  | s₈−s₃ Neptune-Earth nodal | `[3-term]` Earth.Axial(104) - Venus.Obliq(110) + Jupiter.Ecc(44) | **PLANET ≠** |
-| 39 | 68.783 | 0.3702 | ✓ | s₅−s₃ Earth nodal | `[3-term]` Earth.Axial(104) - Jupiter.Axial(21) - Jupiter.Ecc(44) | **MECH ≠** |
-| 48 | 55.886 | 0.2065 | ✓ | s₇−s₆ Uranus-Saturn nodal | `[3-term]` Earth.Axial(104) + Jupiter.Ecc(44) - Neptune.Obliq(100) | **PLANET ≠** |
-| 50 | 53.651 | 0.1151 | ✓ | g₆−g₅ Saturn-Jupiter ecc | `[3-term]` Earth.Axial(104) + Mercury.Peri_ecl(11) - Jupiter.ICRF(65) | **PLANET ≠** |
-| 53 | 50.614 | 0.0556 | ✓ | s₆−s₈ Saturn-Neptune nodal (50.52 kyr, 0.2%) — lattice-ex... | `[3-term]` Earth.Axial(104) + Venus.AscNode(1) - Mars.Ecc(52) | **PLANET ≠** |
-| 65 | 41.270 | 0.3713 | ✓ | k+s₃ Earth obliquity (Berger 41k) | `[2-term diff]` Earth.Axial(104) - Jupiter.Peri_ecl(39) | **PLANET ≠** |
-| 66 | 40.644 | 0.2786 |  | obliquity-band arithmetic-mean (Round 2 C10: EPICA CO₂ ra... | `[3-term]` Earth.Axial(104) - Jupiter.Ecc(44) + Saturn.Axial(6) | (no Berger) |
-| 68 | 39.449 | 0.1072 | ✓ | k+s₄ Berger Mars obliquity sub-peak | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) + Jupiter.Obliq(16) | **PLANET ≠** |
-| 73 | 36.747 | 0.0644 | ✓ | 2|s₄| Mars nodal harmonic | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) + Jupiter.Axial(21) | **PLANET ≠** |
-| 76 | 35.297 | 0.0661 | ✓ | g₄−s₃ Mars-Earth beat | `[3-term]` Earth.Axial(104) + Jupiter.Obliq(16) - Jupiter.Ecc(44) | **PLANET ≠** |
-| 96 | 27.943 | 0.0209 |  | k+g₆ Saturn climatic precession sub-peak (Round 1 A1 side... | `[3-term]` Earth.Axial(104) + Jupiter.Obliq(16) - Saturn.Obliq(24) | **PLANET ≠** |
-| 107 | 25.070 | 0.0506 |  | k+g₇ Uranus climatic precession sub-peak (Round 1 A1) | `[3-term]` Earth.Axial(104) - Jupiter.Axial(21) + Saturn.Obliq(24) | **PLANET ≠** |
-| 110 | 24.387 | 0.0575 |  | k+g₃ Earth secondary precession sideband (Round 1 A1) | `[2-term sum]` Earth.Axial(104) + Saturn.Axial(6) | **PLANET ≠** |
-| 113 | 23.739 | 0.1890 | ✓ | k+g₅ Jupiter climatic precession (Berger 23.7k) | `[3-term]` Earth.Axial(104) + Mercury.Obliq(3) + Saturn.Axial(6) | **PLANET ≠** |
-| 120 | 22.354 | 0.1973 | ✓ | k+g₂ Venus climatic precession = H/15 | `[2-term sum]` Earth.Axial(104) + Jupiter.Obliq(16) | **PLANET ≠** |
-| 134 | 20.019 | 0.0416 |  | k+g₅ Jupiter precession sub-peak (Round 1 A1) | `[3-term]` Earth.Axial(104) + Mercury.Axial(9) + Jupiter.Axial(21) | **PLANET ≠** |
-| 141 | 19.025 | 0.1106 |  | k+g₃ Earth climatic precession — Berger quintet 19-kyr pe... | `[3-term]` Earth.Axial(104) + Jupiter.Axial(21) + Jupiter.Obliq(16) | **PLANET ≠** |
-| 152 | 17.648 | 0.0297 |  | k+g₄ Mars climatic precession sub-peak (Round 1 A1) | `[3-term]` Earth.Axial(104) + Saturn.Obliq(24) + Saturn.Obliq(24) | **PLANET ≠** |
+| 9 | 298.060 | 0.1258 | ✓ | g₂−g₇ Venus-Uranus ecc / Mercury Axial = 8H/9 | `[3-term]` Earth.Obliq(64) - Jupiter.Peri_ecl(39) - Jupiter.Obliq(16) | **PLANET ≠** |
+| 12 | 223.545 | 0.1994 | ✓ | s₅−s₁ Jupiter-Mercury nodal | `[3-term]` Earth.Axial(104) - Venus.Axial(91) - Venus.AscNode(1) | **PLANET ≠** |
+| 14 | 191.610 | 0.0595 |  | g₂−g₈ Venus-Neptune ecc | `[3-term]` Earth.Axial(104) - Mercury.Ecc(84) - Saturn.Axial(6) | **PLANET ≠** |
+| 16 | 167.659 | 0.1858 |  | Mars Axial = 8H/16 | `[3-term]` Earth.Axial(104) - Jupiter.Ecc(44) - Jupiter.Ecc(44) | (no Berger) |
+| 18 | 149.030 | 0.0456 | ✓ | s₄−s₆ Mars-Saturn nodal | `[3-term]` Earth.Axial(104) - Jupiter.Axial(21) - Jupiter.ICRF(65) | **PLANET ≠** |
+| 20 | 134.127 | 0.3402 | ✓ | g₃−g₂ Earth-Venus ecc | `[3-term]` Earth.Axial(104) + Jupiter.Obliq(16) - Neptune.Obliq(100) | **PLANET ≠** |
+| 21 | 127.740 | 0.1928 |  | Mars Obliq / Jupiter Axial = 8H/21 | `[3-term]` Earth.Axial(104) - Jupiter.Peri_ecl(39) - Jupiter.Ecc(44) | (no Berger) |
+| 22 | 121.933 | 0.4001 | ✓ | s₂−s₄ Venus-Mars nodal / g₄−g₂ (Round 1 C8: highest L2 ra... | `[3-term]` Earth.Obliq(64) - Jupiter.Axial(21) - Jupiter.Axial(21) | **PLANET ≠** |
+| 24 | 111.772 | 0.4692 |  | Earth's own H/3 eccentricity line (the one-law e(t); no s... | `[3-term]` Earth.Axial(104) - Jupiter.AscNode(36) - Jupiter.Ecc(44) | (no Berger) |
+| 25 | 107.301 | 0.7786 | ✓ | s₁−s₄ Mercury-Mars nodal (100-kyr centroid) | `[3-term]` Earth.Axial(104) + Jupiter.Axial(21) - Neptune.Obliq(100) | **PLANET ≠** |
+| 28 | 95.805 | 0.6424 | ✓ | g₄−g₅ Mars-Jupiter ecc (Berger 95k) | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) - Saturn.Obliq(24) | **PLANET ≠** |
+| 30 | 89.418 | 0.1226 |  | g₃−g₇ Earth-Uranus ecc | `[3-term]` Earth.Axial(104) - Venus.Obliq(110) + Jupiter.AscNode(36) | **PLANET ≠** |
+| 31 | 86.533 | 0.3122 | ✓ | g₄−g₇ Mars-Uranus | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) - Jupiter.Axial(21) | **PLANET ≠** |
+| 35 | 76.644 | 0.2079 | ✓ | s₄−s₈ Mars-Neptune nodal (75.98 kyr, 0.9%) — lattice-exac... | `[3-term]` Earth.Axial(104) - Mercury.ICRF(93) + Saturn.Obliq(24) | **PLANET ≠** |
+| 38 | 70.593 | 0.5372 |  | s₈−s₃ Neptune-Earth nodal | `[3-term]` Earth.Axial(104) - Venus.Obliq(110) + Jupiter.Ecc(44) | **PLANET ≠** |
+| 39 | 68.783 | 0.3597 | ✓ | s₅−s₃ Earth nodal | `[3-term]` Earth.Axial(104) - Jupiter.Axial(21) - Jupiter.Ecc(44) | **MECH ≠** |
+| 48 | 55.886 | 0.2030 | ✓ | s₇−s₆ Uranus-Saturn nodal | `[3-term]` Earth.Axial(104) + Jupiter.Ecc(44) - Neptune.Obliq(100) | **PLANET ≠** |
+| 50 | 53.651 | 0.1131 | ✓ | g₆−g₅ Saturn-Jupiter ecc | `[3-term]` Earth.Axial(104) + Mercury.Peri_ecl(11) - Jupiter.ICRF(65) | **PLANET ≠** |
+| 53 | 50.614 | 0.0558 | ✓ | s₆−s₈ Saturn-Neptune nodal (50.52 kyr, 0.2%) — lattice-ex... | `[3-term]` Earth.Axial(104) + Venus.AscNode(1) - Mars.Ecc(52) | **PLANET ≠** |
+| 65 | 41.270 | 0.3712 | ✓ | k+s₃ Earth obliquity (Berger 41k) | `[2-term diff]` Earth.Axial(104) - Jupiter.Peri_ecl(39) | **PLANET ≠** |
+| 66 | 40.644 | 0.2794 |  | obliquity-band arithmetic-mean (Round 2 C10: EPICA CO₂ ra... | `[3-term]` Earth.Axial(104) - Jupiter.Ecc(44) + Saturn.Axial(6) | (no Berger) |
+| 68 | 39.449 | 0.1064 | ✓ | k+s₄ Berger Mars obliquity sub-peak | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) + Jupiter.Obliq(16) | **PLANET ≠** |
+| 73 | 36.747 | 0.0637 | ✓ | 2|s₄| Mars nodal harmonic | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) + Jupiter.Axial(21) | **PLANET ≠** |
+| 76 | 35.297 | 0.0655 | ✓ | g₄−s₃ Mars-Earth beat | `[3-term]` Earth.Axial(104) + Jupiter.Obliq(16) - Jupiter.Ecc(44) | **PLANET ≠** |
+| 96 | 27.943 | 0.0208 |  | k+g₆ Saturn climatic precession sub-peak (Round 1 A1 side... | `[3-term]` Earth.Axial(104) + Jupiter.Obliq(16) - Saturn.Obliq(24) | **PLANET ≠** |
+| 107 | 25.070 | 0.0505 |  | k+g₇ Uranus climatic precession sub-peak (Round 1 A1) | `[3-term]` Earth.Axial(104) - Jupiter.Axial(21) + Saturn.Obliq(24) | **PLANET ≠** |
+| 110 | 24.387 | 0.0573 |  | k+g₃ Earth secondary precession sideband (Round 1 A1) | `[2-term sum]` Earth.Axial(104) + Saturn.Axial(6) | **PLANET ≠** |
+| 113 | 23.739 | 0.1884 | ✓ | k+g₅ Jupiter climatic precession (Berger 23.7k) | `[3-term]` Earth.Axial(104) + Mercury.Obliq(3) + Saturn.Axial(6) | **PLANET ≠** |
+| 120 | 22.354 | 0.1972 | ✓ | k+g₂ Venus climatic precession = H/15 | `[2-term sum]` Earth.Axial(104) + Jupiter.Obliq(16) | **PLANET ≠** |
+| 134 | 20.019 | 0.0417 |  | k+g₅ Jupiter precession sub-peak (Round 1 A1) | `[3-term]` Earth.Axial(104) + Mercury.Axial(9) + Jupiter.Axial(21) | **PLANET ≠** |
+| 141 | 19.025 | 0.1103 |  | k+g₃ Earth climatic precession — Berger quintet 19-kyr pe... | `[3-term]` Earth.Axial(104) + Jupiter.Axial(21) + Jupiter.Obliq(16) | **PLANET ≠** |
+| 152 | 17.648 | 0.0298 |  | k+g₄ Mars climatic precession sub-peak (Round 1 A1) | `[3-term]` Earth.Axial(104) + Saturn.Obliq(24) + Saturn.Obliq(24) | **PLANET ≠** |
 | 185 | 14.500 | 0.0414 |  | k+g₂ Venus precession sub-peak (Round 1 A1) | `[3-term]` Earth.Axial(104) + Jupiter.ICRF(65) + Jupiter.Obliq(16) | **PLANET ≠** |
 
 **Status tally:**
 - _agree_: 0 components — Berger predicts AND we match
 - _MECH ≠_: 1 — same planet, different mechanism
 - _PLANET ≠_: 28 — different planet entirely
-- _(no Berger)_: 3 — Berger has no secular prediction
-- **Total:** 32 L1 components
+- _(no Berger)_: 4 — Berger has no secular prediction
+- **Total:** 33 L1 components
 
 ---
 
 ## Per-integer details (sorted by n)
 
-### n = 9   ·   T = 298.060 kyr   ·   amp = 0.1238
+### n = 9   ·   T = 298.060 kyr   ·   amp = 0.1258
 
 _**LR04 4σ peak**_
 
@@ -103,7 +104,7 @@ _**LR04 4σ peak**_
   - _… 22 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names mercury, uranus, venus; our top-1 names Jupiter.
 
-### n = 12   ·   T = 223.545 kyr   ·   amp = 0.2087
+### n = 12   ·   T = 223.545 kyr   ·   amp = 0.1994
 
 _**LR04 4σ peak**_
 
@@ -122,7 +123,7 @@ _**LR04 4σ peak**_
   - _… 49 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names jupiter, mercury; our top-1 names Venus.
 
-### n = 14   ·   T = 191.610 kyr   ·   amp = 0.1000
+### n = 14   ·   T = 191.610 kyr   ·   amp = 0.0595
 
 _(subthreshold in LR04 full record)_
 
@@ -138,7 +139,7 @@ _(subthreshold in LR04 full record)_
   - _… 8 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names neptune, venus; our top-1 names Mercury, Saturn.
 
-### n = 16   ·   T = 167.659 kyr   ·   amp = 0.1967
+### n = 16   ·   T = 167.659 kyr   ·   amp = 0.1858
 
 _(subthreshold in LR04 full record)_
 
@@ -156,7 +157,7 @@ _(subthreshold in LR04 full record)_
   - _… 50 more combos in JSON (full ranked list)_
 - **3-step status:** _(no Berger)_ — Berger / secular theory does not predict this peak; our model attributes it via an Earth-planet beat.
 
-### n = 18   ·   T = 149.030 kyr   ·   amp = 0.0823
+### n = 18   ·   T = 149.030 kyr   ·   amp = 0.0456
 
 _**LR04 4σ peak**_
 
@@ -173,7 +174,7 @@ _**LR04 4σ peak**_
   - _… 35 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names mars, saturn; our top-1 names Jupiter.
 
-### n = 20   ·   T = 134.127 kyr   ·   amp = 0.2914
+### n = 20   ·   T = 134.127 kyr   ·   amp = 0.3402
 
 _**LR04 4σ peak**_
 
@@ -190,7 +191,7 @@ _**LR04 4σ peak**_
   - _… 70 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names venus; our top-1 names Jupiter, Neptune.
 
-### n = 21   ·   T = 127.740 kyr   ·   amp = 0.2777
+### n = 21   ·   T = 127.740 kyr   ·   amp = 0.1928
 
 _(subthreshold in LR04 full record)_
 
@@ -207,7 +208,7 @@ _(subthreshold in LR04 full record)_
   - _… 25 more combos in JSON (full ranked list)_
 - **3-step status:** _(no Berger)_ — Berger / secular theory does not predict this peak; our model attributes it via an Earth-planet beat.
 
-### n = 22   ·   T = 121.933 kyr   ·   amp = 0.5293
+### n = 22   ·   T = 121.933 kyr   ·   amp = 0.4001
 
 _**LR04 4σ peak**_
 
@@ -224,7 +225,26 @@ _**LR04 4σ peak**_
   - _… 23 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names mars, venus; our top-1 names Jupiter.
 
-### n = 25   ·   T = 107.301 kyr   ·   amp = 0.4674
+### n = 24   ·   T = 111.772 kyr   ·   amp = 0.4692
+
+_(subthreshold in LR04 full record)_
+
+- **Berger / secular theory:** Earth's own H/3 eccentricity line (the one-law e(t); no secular-theory counterpart — pre-iNHG regime admission, doc 94 §10)
+- **Solar-system family matches** (3 families, 4 total combos):
+  - `[direct]` Saturn.Obliq
+  - `[direct]` Uranus.Peri_ecl
+  - `[s-beat]` Earth(40)-Mars(64)
+  - `[k+g]` k-Earth.Peri_ecl(128)
+- **Earth-planet beat candidates (top 5):**
+  1. `[3-term]` Earth.Axial(104) - Jupiter.AscNode(36) - Jupiter.Ecc(44)  · score = 31 ⭐
+  2. `[3-term]` Earth.Axial(104) - Jupiter.Ecc(44) - Saturn.AscNode(36)  · score = 28
+  3. `[3-term]` Earth.Axial(104) - Mars.Peri_ecl(36) - Jupiter.Ecc(44)  · score = 27
+  4. `[3-term]` Earth.Axial(104) - Mars.AscNode(64) - Jupiter.Obliq(16)  · score = 27
+  5. `[3-term]` Earth.Obliq(64) - Jupiter.Obliq(16) - Saturn.Obliq(24)  · score = 27
+  - _… 45 more combos in JSON (full ranked list)_
+- **3-step status:** _(no Berger)_ — Berger / secular theory does not predict this peak; our model attributes it via an Earth-planet beat.
+
+### n = 25   ·   T = 107.301 kyr   ·   amp = 0.7786
 
 _**LR04 4σ peak**_
 
@@ -242,7 +262,7 @@ _**LR04 4σ peak**_
   - _… 42 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names mars, mercury; our top-1 names Jupiter, Neptune.
 
-### n = 28   ·   T = 95.805 kyr   ·   amp = 0.7536
+### n = 28   ·   T = 95.805 kyr   ·   amp = 0.6424
 
 _**LR04 4σ peak**_
 
@@ -261,7 +281,7 @@ _**LR04 4σ peak**_
   - _… 61 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names jupiter, mars; our top-1 names Mars, Saturn.
 
-### n = 30   ·   T = 89.418 kyr   ·   amp = 0.0899
+### n = 30   ·   T = 89.418 kyr   ·   amp = 0.1226
 
 _(subthreshold in LR04 full record)_
 
@@ -278,7 +298,7 @@ _(subthreshold in LR04 full record)_
   - _… 38 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names uranus; our top-1 names Jupiter, Venus.
 
-### n = 31   ·   T = 86.533 kyr   ·   amp = 0.4050
+### n = 31   ·   T = 86.533 kyr   ·   amp = 0.3122
 
 _**LR04 4σ peak**_
 
@@ -294,7 +314,7 @@ _**LR04 4σ peak**_
   - _… 24 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names mars, uranus; our top-1 names Jupiter, Mars.
 
-### n = 35   ·   T = 76.644 kyr   ·   amp = 0.2231
+### n = 35   ·   T = 76.644 kyr   ·   amp = 0.2079
 
 _**LR04 4σ peak**_
 
@@ -313,7 +333,7 @@ _**LR04 4σ peak**_
   - _… 43 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names mars, neptune, venus; our top-1 names Mercury, Saturn.
 
-### n = 38   ·   T = 70.593 kyr   ·   amp = 0.5379
+### n = 38   ·   T = 70.593 kyr   ·   amp = 0.5372
 
 _(subthreshold in LR04 full record)_
 
@@ -328,7 +348,7 @@ _(subthreshold in LR04 full record)_
   - _… 8 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names neptune; our top-1 names Jupiter, Venus.
 
-### n = 39   ·   T = 68.783 kyr   ·   amp = 0.3702
+### n = 39   ·   T = 68.783 kyr   ·   amp = 0.3597
 
 _**LR04 4σ peak**_
 
@@ -348,7 +368,7 @@ _**LR04 4σ peak**_
   - _… 36 more combos in JSON (full ranked list)_
 - **3-step status:** **MECH ≠** — same planet, but Berger says `s-beat` while our top-1 is `k + (Axial, Ecc)`.
 
-### n = 48   ·   T = 55.886 kyr   ·   amp = 0.2065
+### n = 48   ·   T = 55.886 kyr   ·   amp = 0.2030
 
 _**LR04 4σ peak**_
 
@@ -364,7 +384,7 @@ _**LR04 4σ peak**_
   - _… 50 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names saturn, uranus; our top-1 names Jupiter, Neptune.
 
-### n = 50   ·   T = 53.651 kyr   ·   amp = 0.1151
+### n = 50   ·   T = 53.651 kyr   ·   amp = 0.1131
 
 _**LR04 4σ peak**_
 
@@ -380,7 +400,7 @@ _**LR04 4σ peak**_
   - _… 8 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names jupiter, saturn; our top-1 names Jupiter, Mercury.
 
-### n = 53   ·   T = 50.614 kyr   ·   amp = 0.0556
+### n = 53   ·   T = 50.614 kyr   ·   amp = 0.0558
 
 _**LR04 4σ peak**_
 
@@ -396,7 +416,7 @@ _**LR04 4σ peak**_
   - _… 12 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names mars, neptune, saturn, uranus, venus; our top-1 names Mars, Venus.
 
-### n = 65   ·   T = 41.270 kyr   ·   amp = 0.3713
+### n = 65   ·   T = 41.270 kyr   ·   amp = 0.3712
 
 _**LR04 4σ peak**_
 
@@ -414,7 +434,7 @@ _**LR04 4σ peak**_
   - _… 17 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names ; our top-1 names Jupiter.
 
-### n = 66   ·   T = 40.644 kyr   ·   amp = 0.2786
+### n = 66   ·   T = 40.644 kyr   ·   amp = 0.2794
 
 _(subthreshold in LR04 full record)_
 
@@ -429,7 +449,7 @@ _(subthreshold in LR04 full record)_
   - _… 15 more combos in JSON (full ranked list)_
 - **3-step status:** _(no Berger)_ — Berger / secular theory does not predict this peak; our model attributes it via an Earth-planet beat.
 
-### n = 68   ·   T = 39.449 kyr   ·   amp = 0.1072
+### n = 68   ·   T = 39.449 kyr   ·   amp = 0.1064
 
 _**LR04 4σ peak**_
 
@@ -447,7 +467,7 @@ _**LR04 4σ peak**_
   - _… 39 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names mars; our top-1 names Jupiter, Mars.
 
-### n = 73   ·   T = 36.747 kyr   ·   amp = 0.0644
+### n = 73   ·   T = 36.747 kyr   ·   amp = 0.0637
 
 _**LR04 4σ peak**_
 
@@ -463,7 +483,7 @@ _**LR04 4σ peak**_
   - _… 15 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names mars; our top-1 names Jupiter, Mars.
 
-### n = 76   ·   T = 35.297 kyr   ·   amp = 0.0661
+### n = 76   ·   T = 35.297 kyr   ·   amp = 0.0655
 
 _**LR04 4σ peak**_
 
@@ -481,7 +501,7 @@ _**LR04 4σ peak**_
   - _… 78 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names mars; our top-1 names Jupiter.
 
-### n = 96   ·   T = 27.943 kyr   ·   amp = 0.0209
+### n = 96   ·   T = 27.943 kyr   ·   amp = 0.0208
 
 _(subthreshold in LR04 full record)_
 
@@ -496,7 +516,7 @@ _(subthreshold in LR04 full record)_
   - _… 49 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names saturn; our top-1 names Jupiter, Saturn.
 
-### n = 107   ·   T = 25.070 kyr   ·   amp = 0.0506
+### n = 107   ·   T = 25.070 kyr   ·   amp = 0.0505
 
 _(subthreshold in LR04 full record)_
 
@@ -512,7 +532,7 @@ _(subthreshold in LR04 full record)_
   - _… 43 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names uranus; our top-1 names Jupiter, Saturn.
 
-### n = 110   ·   T = 24.387 kyr   ·   amp = 0.0575
+### n = 110   ·   T = 24.387 kyr   ·   amp = 0.0573
 
 _(subthreshold in LR04 full record)_
 
@@ -529,7 +549,7 @@ _(subthreshold in LR04 full record)_
   - _… 14 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names ; our top-1 names Saturn.
 
-### n = 113   ·   T = 23.739 kyr   ·   amp = 0.1890
+### n = 113   ·   T = 23.739 kyr   ·   amp = 0.1884
 
 _**LR04 4σ peak**_
 
@@ -545,7 +565,7 @@ _**LR04 4σ peak**_
   - _… 21 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names jupiter; our top-1 names Mercury, Saturn.
 
-### n = 120   ·   T = 22.354 kyr   ·   amp = 0.1973
+### n = 120   ·   T = 22.354 kyr   ·   amp = 0.1972
 
 _**LR04 4σ peak**_
 
@@ -560,7 +580,7 @@ _**LR04 4σ peak**_
   - _… 38 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names venus; our top-1 names Jupiter.
 
-### n = 134   ·   T = 20.019 kyr   ·   amp = 0.0416
+### n = 134   ·   T = 20.019 kyr   ·   amp = 0.0417
 
 _(subthreshold in LR04 full record)_
 
@@ -576,7 +596,7 @@ _(subthreshold in LR04 full record)_
   - _… 36 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names jupiter; our top-1 names Jupiter, Mercury.
 
-### n = 141   ·   T = 19.025 kyr   ·   amp = 0.1106
+### n = 141   ·   T = 19.025 kyr   ·   amp = 0.1103
 
 _(subthreshold in LR04 full record)_
 
@@ -591,7 +611,7 @@ _(subthreshold in LR04 full record)_
   - _… 17 more combos in JSON (full ranked list)_
 - **3-step status:** **PLANET ≠** — Berger names ; our top-1 names Jupiter.
 
-### n = 152   ·   T = 17.648 kyr   ·   amp = 0.0297
+### n = 152   ·   T = 17.648 kyr   ·   amp = 0.0298
 
 _(subthreshold in LR04 full record)_
 

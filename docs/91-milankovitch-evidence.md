@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:a4b818dc588e46e8
+coefficients: sha256:b121f90e431d946f
 status: current
 ---
 
@@ -31,11 +31,11 @@ The structural difference is what makes the model **falsifiable in a way standar
 
 $$C(t) \;=\; c_0 \;+\; \sum_{n \in N} \left[\, a_n \cos\!\left(\tfrac{2\pi n t}{8H}\right) + b_n \sin\!\left(\tfrac{2\pi n t}{8H}\right) \,\right]$$
 
-with **N = 32 integer divisors** of 8H (the canonical L1 lattice — see [doc 92 §2.3](92-climate-formula.md#23-the-32-lattice-integers--per-line-identities)), fitted via sequential ridge regression per regime on LR04 (T = 5,320 kyr; full-LR04 R² = 0.2553 L1+L2+L3, post-MPT R² = 0.8735). Each integer corresponds to a specific eigenmode beat or direct planet apsidal/nodal period from the model's doc 55 period table.
+with **N = 32 integer divisors** of 8H (the canonical L1 lattice — see [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)), fitted via sequential ridge regression per regime on LR04 (T = 5,320 kyr; full-LR04 R² = 0.2553 L1+L2+L3, post-MPT R² = 0.8735). Each integer corresponds to a specific eigenmode beat or direct planet apsidal/nodal period from the model's doc 55 period table.
 
 ### Five headline findings
 
-1. **Every significant LR04 climate peak sits at an integer divisor of 8H.** The canonical formula carries **32 such integers** — 25 framework integers (with 19 above the 3× median significance threshold in full LR04, plus 6 more visible in pre-MPT data) + 6 precession-band sidebands surfaced by MTM enrichment (Test L) + 1 Berger-quintet completion at n=141 (k+g₃ Earth at 19 kyr, 3σ in Cheng monsoon). All have clean physical interpretations as standard celestial-mechanics beats (k+g_j climatic precession, k+s_j obliquity sub-peaks, g_j−g_k eccentricity beats, s_j−s_k nodal beats) or direct planet apsidal/nodal cycles from doc 55 (Mercury, Mars, Jupiter, Uranus). The exception is n=66 — not a distinct eigenmode beat but the arithmetic-mean cycle length in the obliquity band; it resolves to near-zero amplitude at full LR04 resolution (see §6.6). **Every one of these 32 integers also has an explicit Holistic-model attribution as a multi-planet beat from PLANET_CYCLES** — different from Berger / secular theory's single-planet attribution for every integer; the full dual-attribution table is at [doc 93 — L1 attribution reference](93-l1-attribution-reference.md). Headline example: n=120 (the 22.4 kyr peak Berger labels "k+g₂ Venus") is in the Holistic model the clean 2-term beat **Earth.Axial(104) + Jupiter.Obliq(16)** — Jupiter, not Venus.
+1. **Every significant LR04 climate peak sits at an integer divisor of 8H.** The canonical formula carries **33 such integers** — 25 framework integers (with 19 above the 3× median significance threshold in full LR04, plus 6 more visible in pre-MPT data) + 6 precession-band sidebands surfaced by MTM enrichment (Test L) + 1 Berger-quintet completion at n=141 (k+g₃ Earth at 19 kyr, 3σ in Cheng monsoon) + 1 regime-admitted line at n=24 (Earth's own H/3 eccentricity line, <!--v:l1N24AmpOverMedianPreInhg-->1.64<!--/v-->× median and cross-validated positive in the pre-iNHG regime, [doc 94 §10](94-insolation-null-test.md); the only divisor attributed to Earth's eccentricity rather than a planetary beat, with no secular-theory counterpart). **Admission rule** (stated so it cannot drift): a divisor joins L1 if it is ≥ 3× median amplitude on full LR04, *or* ≥ 1.5× median **and** split-half cross-validated positive in a named regime (the six pre-MPT-only members and n=24), *or* MTM-significant on the full record (Test L, the six sidebands). All have clean physical interpretations as standard celestial-mechanics beats (k+g_j climatic precession, k+s_j obliquity sub-peaks, g_j−g_k eccentricity beats, s_j−s_k nodal beats) or direct planet apsidal/nodal cycles from doc 55 (Mercury, Mars, Jupiter, Uranus). The exception is n=66 — not a distinct eigenmode beat but the arithmetic-mean cycle length in the obliquity band; it resolves to near-zero amplitude at full LR04 resolution (see §6.6). **Every one of these 32 integers also has an explicit Holistic-model attribution as a multi-planet beat from PLANET_CYCLES** — different from Berger / secular theory's single-planet attribution for every integer; the full dual-attribution table is at [doc 93 — L1 attribution reference](93-l1-attribution-reference.md). Headline example: n=120 (the 22.4 kyr peak Berger labels "k+g₂ Venus") is in the Holistic model the clean 2-term beat **Earth.Axial(104) + Jupiter.Obliq(16)** — Jupiter, not Venus.
 
 2. **Mars dominates the per-planet climate fingerprint.** Two exclusive direct matches in LR04 (n=16 Mars Axial = 8H/16, n=21 Mars Obliquity = 8H/21), plus participation in additional LR04 peaks at n=25 (the Mercury–Mars s₁−s₄ nodal beat, the 100-kyr-band centroid), n=53 (the Mars.AscNode(64)−Uranus.AscNode(11) s-beat sitting close to the Mars eccentricity cycle at 8H/52), and n=35 (a 3-term beat close to Mars's perihelion ecliptic at 8H/36 — a period that exactly equals Jupiter's ascending-node period, creating a Mars-Jupiter resonance lock). Mars's strong gravitational coupling to Earth — Earth's nearest outer rocky neighbour, with similar apsidal eigenmode rate (g₃ ≈ 17.4″/yr, g₄ ≈ 17.9″/yr) — produces the cleanest planet-coupling signal of any planet. Neptune contributes nothing directly in LR04 full but appears via pre-MPT eigenmode beats (Venus-Neptune n=14, Neptune-Earth nodal n=38) — visible only when the post-MPT ice-sheet response doesn't dominate.
 
@@ -53,7 +53,7 @@ with **N = 32 integer divisors** of 8H (the canonical L1 lattice — see [doc 92
 
 ## 2. How Orbital Forcing Reaches Climate
 
-A reader looking at the canonical 32-integer L1 lattice in [doc 92 §2.3](92-climate-formula.md#23-the-32-lattice-integers--per-line-identities) will notice the climate peaks sit at **eigenmode beats** (k+g_j, k+s_j, g_j−g_k, s_j−s_k) rather than at Earth's intrinsic Fibonacci anchors (H/3, H/5, H/8, H/13, H/16). This section explains why — the mechanism is standard secular celestial mechanics, but the reference-frame issue is the part that determines what climate actually sees.
+A reader looking at the canonical 32-integer L1 lattice in [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities) will notice the climate peaks sit at **eigenmode beats** (k+g_j, k+s_j, g_j−g_k, s_j−s_k) rather than at Earth's intrinsic Fibonacci anchors (H/3, H/5, H/8, H/13, H/16). This section explains why — the mechanism is standard secular celestial mechanics, but the reference-frame issue is the part that determines what climate actually sees.
 
 #### What the planets do — and don't do
 
@@ -105,7 +105,7 @@ Both descriptions of the same physics are valid — they measure the same geomet
 
 #### Why 8H still survives the frame transformation
 
-If each planetary apsidal and nodal eigenmode (g_j, s_j) is itself an integer divisor of 8H — the model's deeper claim, established in [doc 55 — Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — then any sum or difference of two such eigenmodes (`k + g_j`, `g_j − g_k`, …) is also an integer divisor of 8H. The frame transformation moves the climate signal from one 8H-divisor integer to another, but never *off* the integer lattice. That is why every observed climate peak in the canonical L1 lattice ([doc 92 §2.3](92-climate-formula.md#23-the-32-lattice-integers--per-line-identities)) still lands on an integer n, even though the integers are offset from the pure Fibonacci anchors of Earth in isolation. 8H is the synchronisation period of the entire solar system; the climate spectrum inherits that synchronisation, with the specific n determined by which two clocks are beating against each other.
+If each planetary apsidal and nodal eigenmode (g_j, s_j) is itself an integer divisor of 8H — the model's deeper claim, established in [doc 55 — Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — then any sum or difference of two such eigenmodes (`k + g_j`, `g_j − g_k`, …) is also an integer divisor of 8H. The frame transformation moves the climate signal from one 8H-divisor integer to another, but never *off* the integer lattice. That is why every observed climate peak in the canonical L1 lattice ([doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)) still lands on an integer n, even though the integers are offset from the pure Fibonacci anchors of Earth in isolation. 8H is the synchronisation period of the entire solar system; the climate spectrum inherits that synchronisation, with the specific n determined by which two clocks are beating against each other.
 
 #### The eigenmodes are real; only the attribution differs
 
@@ -123,7 +123,7 @@ What differs between frameworks is **physical attribution**:
 
 ---
 
-> **Reader's lookup.** Throughout this document, climate-cycle periods are referenced by integer **n** denoting the 8H/n divisor (e.g. n = 25 corresponds to period 8H/25 = 107.3 kyr). The canonical per-line reference lookup for every n used here is **[doc 92 §2.3 — The 32 lattice integers](92-climate-formula.md#23-the-32-lattice-integers--per-line-identities)** — its third column tells you which eigenmode beat or direct planet cycle each integer represents.
+> **Reader's lookup.** Throughout this document, climate-cycle periods are referenced by integer **n** denoting the 8H/n divisor (e.g. n = 25 corresponds to period 8H/25 = 107.3 kyr). The canonical per-line reference lookup for every n used here is **[doc 92 §2.3 — The 32 lattice integers](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)** — its third column tells you which eigenmode beat or direct planet cycle each integer represents.
 
 > **Canonical climate formula → doc 92.** The canonical climate formula is **doc 92's three-layer architecture**: **32 L1 integers** (25 framework integers + 6 precession-band sidebands surfaced by Test L + n=141 Berger-quintet completion); L2 carbon-cycle thermostat (3 lines); L3 climate-state Heaviside transitions (6 steps); ridge regression λ=1 on L1; sequential per-regime fitting on LR04/CENOGRID/EPICA/CenCO2PIP. Canonical R²: full LR04 = 0.2553, post-MPT = 0.8735, iNHG-MPT = 0.7289, pre-iNHG = 0.4298, EPICA CO₂ = 0.8452, CenCO2PIP 0–66 Ma = 0.7626. For the canonical architecture and forward projection see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula).
 
@@ -184,7 +184,7 @@ Beyond direct planet apsidal/nodal periods, the pre-MPT spectrum contains eigenm
 | **30** | **89.4 kyr** | 0.307 | **g₃ − g₇ Earth-Uranus eccentricity beat** |
 | **38** | **70.6 kyr** | 0.240 | **s₈ − s₃ Neptune-Earth nodal beat** |
 
-The amplitudes here come from a **single-component scan on the pre-MPT window (1,200–3,000 kyr BP)** and are not directly comparable to the canonical 32-component fit on full LR04 in [doc 92 §2.3](92-climate-formula.md#23-the-32-lattice-integers--per-line-identities) — that fit assigns these same integers smaller amplitudes because their pre-MPT prominence is averaged out across 5,320 kyr.
+The amplitudes here come from a **single-component scan on the pre-MPT window (1,200–3,000 kyr BP)** and are not directly comparable to the canonical 32-component fit on full LR04 in [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities) — that fit assigns these same integers smaller amplitudes because their pre-MPT prominence is averaged out across 5,320 kyr.
 
 Three pre-MPT-only peaks correspond to **Venus-Neptune, Earth-Uranus, and Neptune-Earth eigenmode beats**. Neptune's and Uranus's gravitational influence on Earth's orbit IS detectable in the climate record — but only in the pre-MPT 41-kyr world where ice-sheet amplification didn't dominate the spectrum.
 
@@ -387,7 +387,7 @@ Reproducer: `scripts/mpt_transition_analysis.py`; results in `data/mpt-transitio
 | Lomb-Scargle (astropy fast) | §4 (Cheng2016 spectrum) | Handles irregular sampling natively |
 | Hinich bispectrum | §7.2 (eccentricity beat coupling) | Reveals nonlinear (beat-coupling) signatures |
 | Multi-component OLS amplitude fit | §2 (formula fit); §4 (centroid test) | Bypasses Rayleigh peak-resolution limit by treating known candidates as parameters; collinearity-aware |
-| Single-component OLS amplitude scan | [doc 92 §2.3](92-climate-formula.md#23-the-32-lattice-integers--per-line-identities) (8H integer-divisor spectrum); §6.5 (window-length sweep) | No FFT-bin snapping; evaluates amplitude at exact candidate periods |
+| Single-component OLS amplitude scan | [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities) (8H integer-divisor spectrum); §6.5 (window-length sweep) | No FFT-bin snapping; evaluates amplitude at exact candidate periods |
 
 All methods deterministic. Bootstrap CIs via resampling where reported.
 
@@ -465,7 +465,7 @@ n=66 is therefore an **emergent windowing-and-statistics phenomenon**, not a sep
 | Method | MTM with NW = 3, K = 5 DPSS tapers |
 | Search bands (locked) | 18–26 kyr (precession), 30–50 kyr (obliquity), 80–125 kyr (100-kyr), 380–440 kyr (405-kyr) |
 
-**Result.** Highest spectral amplitude in each band (MTM power-spectral density units — not directly comparable to the canonical OLS-fit amplitudes in [doc 92 §2.3](92-climate-formula.md#23-the-32-lattice-integers--per-line-identities); only ratios within this table are meaningful):
+**Result.** Highest spectral amplitude in each band (MTM power-spectral density units — not directly comparable to the canonical OLS-fit amplitudes in [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities); only ratios within this table are meaningful):
 
 | Band (kyr) | Peak period (kyr) | Amplitude (MTM) | Identification |
 |---|---|---|---|
@@ -1019,7 +1019,7 @@ Test J showed the canonical 32 framework integers carry 13 significant lines vs 
 
 The 6 precession-band sidebands (n=96, 107, 110, 134, 152, 185) and the original 7 Test-J-significant integers (n=9, 50, 53, 68, 73, 76, 120) together account for all 13 significant lines — a clean closure result that the original 25-integer test missed.
 
-> **Doc 92 follow-up.** These six sidebands plus n=141 (Berger-quintet k+g₃ Earth) are included in the canonical climate formula as the **L1 extension from 25 to 32 integers**, alongside the original 25. The expanded L1 lattice is the basis for the sequential ridge-regression fit reported in [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula), with the per-line identities catalogued in [doc 92 §2.3](92-climate-formula.md#23-the-32-lattice-integers--per-line-identities).
+> **Doc 92 follow-up.** These six sidebands plus n=141 (Berger-quintet k+g₃ Earth) are included in the canonical climate formula as the **L1 extension from 25 to 32 integers**, alongside the original 25. The expanded L1 lattice is the basis for the sequential ridge-regression fit reported in [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula), with the per-line identities catalogued in [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities).
 
 Data: [data/milankovitch-8h-all-integer-mtm.json](../data/milankovitch-8h-all-integer-mtm.json); script: [scripts/milankovitch_8h_all_integer_mtm.py](../scripts/milankovitch_8h_all_integer_mtm.py).
 

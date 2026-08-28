@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:a4b818dc588e46e8
+coefficients: sha256:b121f90e431d946f
 status: current
 ---
 
@@ -116,7 +116,7 @@ Five of six sit in the precession band [17–28 kyr], consistent with sub-domina
 
 `milankovitch_8h_all_integer_mtm.py` already scanned all 200 integer divisors of 8H. The full-200 joint fit hits R² = 0.443 — but with high collinearity (many integers within 1 Rayleigh element of each other → spurious gains). The gap from the canonical 32-integer fit (R² ≈ 0.25) to the full-200 fit (0.443) is dominated by collinear redundancy, not real new orbital signal. Honest Layer-1 ceiling on full LR04 stays close to **R² ≈ 0.24–0.26** with the canonical 32-integer set.
 
-### 2.3 The 32 lattice integers — per-line identities
+### 2.3 The 33 lattice integers — per-line identities
 
 Reference table of all 32 L1 lattice members in ascending n order with their periods and physical interpretation. Notation: `g_i` = planet *i*'s apsidal-precession rate, `s_i` = planet *i*'s nodal-precession rate (Laskar 2004 secular eigenfrequencies); `k` = Earth's general precession in longitude (~50.4″/yr). "Direct" = planet's own axial / obliquity / apsidal / eccentricity period; "Eigenmode beat" = difference between two planets' secular rates; "Climatic precession" = `k + g_i` (Earth axial precession × planet *i*'s apsidal motion).
 

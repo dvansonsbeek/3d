@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:a4b818dc588e46e8
+coefficients: sha256:b121f90e431d946f
 status: current
 ---
 
@@ -200,7 +200,7 @@ The canonical L1 + L2 + L3 modular formula — per-regime ridge fitting across L
 
 **Five headline findings from doc 91 §1**:
 
-1. Every significant LR04 climate peak sits at an integer divisor of 8H (31 of 32 with clean physical interpretations as Berger/Laskar eigenmode beats or direct planet periods; n=66 is the obliquity-band centroid added by this framework — see [doc 92 §2.3](92-climate-formula.md#23-the-32-lattice-integers--per-line-identities)).
+1. Every significant LR04 climate peak sits at an integer divisor of 8H (31 of 32 with clean physical interpretations as Berger/Laskar eigenmode beats or direct planet periods; n=66 is the obliquity-band centroid added by this framework — see [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)).
 2. **Mars dominates the per-planet climate fingerprint** (two exclusive direct matches in LR04 full, three more in pre-MPT).
 3. **The 100-kyr glacial cycle is an inclination-side eigenmode beat** (Mercury-Mars s₁−s₄ nodal at 107 kyr), not direct eccentricity forcing — vindicates Muller-MacDonald 1997's framing.
 4. Pre-MPT and post-MPT differ in **climate sensitivity, not orbital forcing**.

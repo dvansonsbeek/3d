@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TRIPLE ATTRIBUTION — all 32 L1 lattice components attributed in three columns:
+TRIPLE ATTRIBUTION — every L1 lattice component attributed in three columns:
   Column 1: Standard Berger / secular-theory label (from canonical JSON).
   Column 2: Solar-system resonance — family-level matches (direct, g-beat,
             s-beat, k+g, k+s, 2|g|, 2|s|). May or may not include Earth;
@@ -622,16 +622,18 @@ def write_reference_doc(rows, DOC_PATH):
     lines.append("")
 
     # ── Scope note: where L1 ends and L2/L3 begin ──
-    lines.append("## Scope — this doc covers L1 only (32 of 41 formula components)")
+    n_l1 = len(rows)
+    n_total = n_l1 + 3 + 6
+    lines.append(f"## Scope — this doc covers L1 only ({n_l1} of {n_total} formula components)")
     lines.append("")
-    lines.append("The canonical climate formula has **three layers** totalling **41 components**:")
+    lines.append(f"The canonical climate formula has **three layers** totalling **{n_total} components**:")
     lines.append("")
     lines.append("| Layer | Count | Nature | Attribution framework | Where documented |")
     lines.append("|-------|------:|--------|------------------------|-------------------|")
-    lines.append("| **L1** | 32 | Orbital lattice — integer divisors of 8H | Berger secular theory **vs** Earth-planet beat (this doc) | doc 93 (here) |")
+    lines.append(f"| **L1** | {n_l1} | Orbital lattice — integer divisors of 8H | Berger secular theory **vs** Earth-planet beat (this doc) | doc 93 (here) |")
     lines.append("| **L2** | 3 | Off-lattice carbon thermostat (405, 202, 135 kyr) | Silicate-weathering / carbon-cycle internal resonance — **NOT** orbital beats | [doc 92 §3](92-climate-formula.md) |")
     lines.append("| **L3** | 6 | Heaviside step components (PETM, EOT, Mi-1, MMCT, iNHG, MPT) | Tectonic / cryosphere regime shifts — **NOT** periodic | [doc 92 §4](92-climate-formula.md) |")
-    lines.append("| **Total** | **41** | | | |")
+    lines.append(f"| **Total** | **{n_total}** | | | |")
     lines.append("")
     lines.append("**Why L2 and L3 are excluded from this doc:** the Earth-planet beat search "
                  "assumes orbital integer-divisor structure. L2 is off-lattice (405 kyr is not a "
@@ -646,9 +648,9 @@ def write_reference_doc(rows, DOC_PATH):
                  "energy leaks into the nearest lattice bin (n=7), which the divisor-spectrum then "
                  "detects but classifies as \"Unpredicted\" (no family-level beat predicts 383 kyr "
                  "exactly). Including n=7 in L1 would double-count with L2. It is correctly "
-                 "excluded from the canonical L1 list of 32 integers.")
+                 f"excluded from the canonical L1 list of {n_l1} integers.")
     lines.append("")
-    lines.append("So the 32 components in this doc are the complete L1 set. For L2 + L3 "
+    lines.append(f"So the {n_l1} components in this doc are the complete L1 set. For L2 + L3 "
                  "attribution, see [doc 92](92-climate-formula.md).")
     lines.append("")
 

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:a4b818dc588e46e8
+coefficients: sha256:b121f90e431d946f
 status: current
 ---
 
@@ -149,7 +149,7 @@ The angle between Earth's rotational axis and the perpendicular to its orbital p
 ## Scientific References
 
 ### Expanding Solar System Resonance Theory (ESSRT)
-The unifying theoretical framework for the model's deep-time / scale-invariant structure. Two physically independent drivers expand the solar system's master cycles across geological time: **Driver 1** — Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** — solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). The **L1 integer-divisor lattice** (32 components, n = 9, 12, ..., 65, 66, 68, ..., 185) and the [Solar System Resonance Cycle](#solar-system-resonance-cycle-8h) (8H) are scale-invariant structural constants; only the literal year counts scale with H(t). At J2000 H = <!--v:H-->335,317<!--/v--> yr; at Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->352,600<!--/v--> yr. Validated against Wells 1963 (Devonian coral growth bands), Wu et al. 2024 (650-Myr cyclostratigraphy), Patterson 1956 (Pb-Pb Earth age → Hadean Moon at Roche limit). Full theory: [Doc 99](99-expanding-solar-system-resonance-theory.md).
+The unifying theoretical framework for the model's deep-time / scale-invariant structure. Two physically independent drivers expand the solar system's master cycles across geological time: **Driver 1** — Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** — solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). The **L1 integer-divisor lattice** (32 components, n = 9, 12, ..., 65, 66, 68, ..., 185) and the [Solar System Resonance Cycle](#solar-system-resonance-cycle-8h) (8H) are scale-invariant structural constants; only the literal year counts scale with H(t). At J2000 H = <!--v:H-->335,317<!--/v--> yr; at Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->352,601<!--/v--> yr. Validated against Wells 1963 (Devonian coral growth bands), Wu et al. 2024 (650-Myr cyclostratigraphy), Patterson 1956 (Pb-Pb Earth age → Hadean Moon at Roche limit). Full theory: [Doc 99](99-expanding-solar-system-resonance-theory.md).
 
 ### Deep-Time Invariants
 A family of structural relations preserved across epochs under the ESSRT drivers, distinct from the J2000-static Fibonacci Laws. Three known members: (1) **Day-Count Near-Invariant** — `H × days/yr ≈ TOTAL_DAYS_IN_H` (the J2000 anchor value is <!--v:totalDaysInH-->122,471,920<!--/v--> days; the plain product drifts smoothly at deep time via Driver 2, ~−850 ppm at Hadean; the ONE canonical constant serves both year frames via the dual-divisor identity — solar-year days = TOTALDAYS/H, sidereal-year days = TOTALDAYS/(H−13) — and its **exact form** `H × (sidYear_s/LOD) × (AU₀/AU)² = TOTAL_DAYS_IN_H × H₀/(H₀−13)` absorbs the Driver-2 drift through the Kepler `T ∝ AU²` factor, an algebraic identity of the model at 0 ppm at every epoch — see the day-count table in Doc 99); (2) **Planetary Adiabatic Invariant** — `a × M_Sun = const` per planet (Driver 2); (3) **Lunar Precession Invariant** — `T_apsidal × H = const`, `T_nodal × H = const` (Driver 1 + Brown m²; structurally exact at every epoch). See [Doc 99](99-expanding-solar-system-resonance-theory.md).

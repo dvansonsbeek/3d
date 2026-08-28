@@ -89,8 +89,8 @@
   "collinearity_warnings": [],
   "optimum": {
     "usno_target_lod_s": 86400.0018,
-    "deltaTStart": 55.47104318258222,
-    "espenak_rms_s": 12.598972543062517,
+    "deltaTStart": 55.15957982403355,
+    "espenak_rms_s": 12.536449285874676,
     "selected_by": "joint mode (--joint --write; flags + resonator, hard closure, caps)"
   },
   "usno_anchor": {
@@ -102,7 +102,7 @@
       "fitted_sidereal_days_at_2000": 365.25636119704734,
       "h5_correction_s": 0.003527339164765279
     },
-    "shipped_sum_lod_at_j2000_s": -0.0021547669264678003,
+    "shipped_sum_lod_at_j2000_s": -0.002154766926569648,
     "drift_from_target_s": -6.505213034913027e-19,
     "fit_stage": "D",
     "soft_constraint_weight": 1000000,
@@ -121,44 +121,44 @@
     "bond": {
       "lattice_n": 1830,
       "period_yr": 1465.8666666666666,
-      "cos_coeff_s": 145.46391570713055,
-      "sin_coeff_s": 329.5868003187309,
-      "raw_at_j2000_s": 152.30151322426124,
-      "amplitude_s": 360.25991966521923,
-      "phase_deg": 66.18562070723598,
+      "cos_coeff_s": 148.26933713189177,
+      "sin_coeff_s": 330.2516334328276,
+      "raw_at_j2000_s": 150.95486504281644,
+      "amplitude_s": 362.0082011758592,
+      "phase_deg": 65.82189005333076,
       "source": "Stage D anchored fit (USNO LOD constraint active)",
       "joint_mode": true
     },
     "hallstatt": {
       "lattice_n": 1104,
       "period_yr": 2429.8333333333335,
-      "cos_coeff_s": -73.13088218333944,
-      "sin_coeff_s": 32.43260814499085,
-      "raw_at_j2000_s": -61.49242652145553,
+      "cos_coeff_s": -73.33079911959572,
+      "sin_coeff_s": 31.978022147742323,
+      "raw_at_j2000_s": -61.17358420327916,
       "amplitude_s": 80,
-      "phase_deg": 156.08332791287557,
+      "phase_deg": 156.43899466747342,
       "target_amp_source": "CAPPED from anchored quad-fit free amp 100.73 s → 80 s prior",
       "joint_mode": true
     },
     "jose5": {
       "lattice_n": 2989,
       "period_yr": 897.469387755102,
-      "cos_coeff_s": -34.46309120013669,
-      "sin_coeff_s": 36.22561724706787,
-      "raw_at_j2000_s": 31.251283552913705,
+      "cos_coeff_s": -35.578915023568946,
+      "sin_coeff_s": 35.130340245230485,
+      "raw_at_j2000_s": 30.015637616623437,
       "amplitude_s": 50.00000000000001,
-      "phase_deg": 133.57170421208576,
+      "phase_deg": 135.36347571073165,
       "target_amp_source": "CAPPED from anchored quad-fit free amp 86.44 s → 50 s prior",
       "joint_mode": true
     },
     "jose4": {
       "lattice_n": 3749,
       "period_yr": 715.5337423312883,
-      "cos_coeff_s": 38.44485484091242,
-      "sin_coeff_s": -31.96862737530612,
-      "raw_at_j2000_s": 41.44548615656676,
+      "cos_coeff_s": 38.529320295825094,
+      "sin_coeff_s": -31.866777018420297,
+      "raw_at_j2000_s": 41.37132504221651,
       "amplitude_s": 49.99999999999999,
-      "phase_deg": -39.745047844803125,
+      "phase_deg": -39.593423168723014,
       "target_amp_source": "unconstrained: quad-fit free amp 47.06 s (below 50 s prior — no cap applied)",
       "joint_mode": true
     }

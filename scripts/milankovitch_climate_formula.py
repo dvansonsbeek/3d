@@ -119,6 +119,14 @@ L1_LATTICE_INTEGERS = sorted([
     # Combines with k+g₅ (n=113) to produce the 95-kyr eccentricity beat at n=28
     # (Wigley 1976 / Berger 1978 combination tone: 1/95 ≈ 1/19 − 1/23.7).
     141,
+    # Earth's own eccentricity line: 8H/24 = H/3 = 111.8 kyr, the one-law e(t)
+    # (doc 94 §10). Admitted on the regime rule (doc 91): 1.64× median amplitude
+    # and cross-validated positive (+0.0144) in pre-iNHG, rank 3/33 there; the
+    # record's own free-period best is 112.7 kyr (8H/23.8), 8H/23 and 8H/25
+    # rejected out of sample. Subthreshold on full LR04 (0.79× median), like
+    # the six pre-MPT-only members. The only divisor attributed to Earth's
+    # eccentricity rather than a planetary beat; no secular-theory counterpart.
+    24,
 ])
 
 L2_THERMOSTAT_FAMILY = {
@@ -146,6 +154,7 @@ L1_LABELS = {
     20:  "g₃−g₂ Earth-Venus ecc",
     21:  "Mars Obliq / Jupiter Axial = 8H/21",
     22:  "s₂−s₄ Venus-Mars nodal / g₄−g₂ (Round 1 C8: highest L2 ratio at 12.84)",
+    24:  "Earth's own H/3 eccentricity line (the one-law e(t); no secular-theory counterpart — pre-iNHG regime admission, doc 94 §10)",
     25:  "s₁−s₄ Mercury-Mars nodal (100-kyr centroid)",
     28:  "g₄−g₅ Mars-Jupiter ecc (Berger 95k)",
     30:  "g₃−g₇ Earth-Uranus ecc",

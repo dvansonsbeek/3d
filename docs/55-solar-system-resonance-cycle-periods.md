@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v12.0
-coefficients: sha256:a4b818dc588e46e8
+coefficients: sha256:b121f90e431d946f
 status: current
 ---
 
@@ -47,7 +47,7 @@ The rate at which the ascending node on the invariable plane regresses. These in
 The period of the planet's axial tilt oscillation. This is a beat frequency derived from the Fibonacci decomposition of the ecliptic perihelion rate. For Earth: obliquity = beat of inclination (H/3) and ecliptic precession (H/5) = H/8. Venus and Neptune have obliquity cycle = |ICRF period| per planet (Venus: 8H/110, Neptune: 8H/100) — the two-component formula cancels exactly, producing constant obliquity.
 
 ### 6. Eccentricity Cycle (Wobble Period)
-The wobble period: the beat frequency between the axial precession and the ICRF perihelion precession. For the seven planets this determines how long the eccentricity takes to complete one full oscillation. Computed via `calcWobblePeriod()`. **Earth is the exception:** Earth's |e| rides the one H/3 law (cycle <!--v:inclPrecYears-->~111,772<!--/v--> yr), while Earth's wobble beat H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr is the perihelion-*direction* (of-date) period — the table's Earth "Ecc. cycle" column entry is that of-date beat, kept for the family structure (docs/10 §Law 4, doc 108).
+The wobble period: the beat frequency between the axial precession and the ICRF perihelion precession. For the seven planets this determines how long the eccentricity takes to complete one full oscillation. Computed via `calcWobblePeriod()`. **Earth is the exception:** Earth's |e| rides the one H/3 law, so its eccentricity cycle is <!--v:earthEccCycle-->111,772<!--/v--> yr (8H/24), which the tables list. Earth's wobble beat H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr is the perihelion-*direction* (of-date) period, not an eccentricity period (docs/10 §Law 4, doc 108).
 
 ## Complete Period Table
 
@@ -71,7 +71,7 @@ Notes:
 - Venus and Neptune obliquity cycle = |ICRF period| (Venus: 8H/110, Neptune: 8H/100): the two-component formula cancels exactly, producing constant obliquity
 - Mercury's axial precession period = ascending node period (Cassini state, confirmed by MESSENGER)
 - ICRF perihelion = inclination cycle (same physical driver)
-- Earth's eccentricity cycle = perihelion precession period (H/16)
+- Earth's eccentricity cycle = the H/3 inclination cycle (8H/24); the H/16 = 13+3 beat is the perihelion-direction cycle
 
 ## Periods in Years (at J2000)
 
