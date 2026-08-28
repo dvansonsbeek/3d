@@ -8409,33 +8409,36 @@
       ],
       "n_families": 3,
       "our_best_earth_planet": {
-        "kind": "3-term",
+        "kind": "earth-direct",
         "terms": [
           [
             "Earth",
-            "Axial",
-            104
-          ],
-          [
-            "Jupiter",
-            "AscNode",
-            36
-          ],
-          [
-            "Jupiter",
-            "Ecc",
-            44
+            "ICRF",
+            24
           ]
         ],
         "signs": [
-          1,
-          -1,
-          -1
+          1
         ],
-        "score": 31,
-        "label": "Earth.Axial(104) - Jupiter.AscNode(36) - Jupiter.Ecc(44)"
+        "score": 1000,
+        "label": "Earth.ICRF(24) \u2014 Earth's own cycle, direct"
       },
       "all_earth_planet_combos": [
+        {
+          "kind": "earth-direct",
+          "terms": [
+            [
+              "Earth",
+              "ICRF",
+              24
+            ]
+          ],
+          "signs": [
+            1
+          ],
+          "score": 1000,
+          "label": "Earth.ICRF(24) \u2014 Earth's own cycle, direct"
+        },
         {
           "kind": "3-term",
           "terms": [

@@ -192,9 +192,21 @@ def find_combos(target_n):
 
     results = []
 
-    # NOTE: 1-term direct skipped — does not satisfy "Earth–planet beat" requirement.
-    # A direct match (e.g. Mars.Axial = 8H/16) is captured in the Berger column when
-    # applicable; here we want Earth's response to a planet's forcing.
+    # NOTE: 1-term direct matches of OTHER planets are skipped — they do not satisfy
+    # the "Earth–planet beat" requirement (a direct match such as Mars.Axial = 8H/16 is
+    # captured in the Berger column when applicable; here we want Earth's response to
+    # a planet's forcing). The ONE exception is Earth's own cycles: when the integer
+    # IS an Earth divisor (n = 24 = Earth.ICRF, the H/3 eccentricity line admitted to
+    # L1 per doc 94 §10), the honest top-1 is that direct cycle, not a multi-planet
+    # combination that happens to sum to the same integer. It outranks every beat.
+    for elem, n in PLANET_CYCLES["Earth"].items():
+        if n == target_n:
+            results.append({
+                "kind": "earth-direct",
+                "terms": [("Earth", elem, n)], "signs": [+1],
+                "score": 1000,
+                "label": f"Earth.{elem}({n}) — Earth's own cycle, direct",
+            })
 
     # 2-term sums and differences
     for i in range(len(cycles)):

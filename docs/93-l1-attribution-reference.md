@@ -50,7 +50,7 @@ So the 33 components in this doc are the complete L1 set. For L2 + L3 attributio
 | 20 | 134.127 | 0.3402 | ✓ | g₃−g₂ Earth-Venus ecc | `[3-term]` Earth.Axial(104) + Jupiter.Obliq(16) - Neptune.Obliq(100) | **PLANET ≠** |
 | 21 | 127.740 | 0.1928 |  | Mars Obliq / Jupiter Axial = 8H/21 | `[3-term]` Earth.Axial(104) - Jupiter.Peri_ecl(39) - Jupiter.Ecc(44) | (no Berger) |
 | 22 | 121.933 | 0.4001 | ✓ | s₂−s₄ Venus-Mars nodal / g₄−g₂ (Round 1 C8: highest L2 ra... | `[3-term]` Earth.Obliq(64) - Jupiter.Axial(21) - Jupiter.Axial(21) | **PLANET ≠** |
-| 24 | 111.772 | 0.4692 |  | Earth's own H/3 eccentricity line (the one-law e(t); no s... | `[3-term]` Earth.Axial(104) - Jupiter.AscNode(36) - Jupiter.Ecc(44) | (no Berger) |
+| 24 | 111.772 | 0.4692 |  | Earth's own H/3 eccentricity line (the one-law e(t); no s... | `[earth-direct]` Earth.ICRF(24) — Earth's own cycle, direct | (no Berger) |
 | 25 | 107.301 | 0.7786 | ✓ | s₁−s₄ Mercury-Mars nodal (100-kyr centroid) | `[3-term]` Earth.Axial(104) + Jupiter.Axial(21) - Neptune.Obliq(100) | **PLANET ≠** |
 | 28 | 95.805 | 0.6424 | ✓ | g₄−g₅ Mars-Jupiter ecc (Berger 95k) | `[3-term]` Earth.Axial(104) - Mars.Ecc(52) - Saturn.Obliq(24) | **PLANET ≠** |
 | 30 | 89.418 | 0.1226 |  | g₃−g₇ Earth-Uranus ecc | `[3-term]` Earth.Axial(104) - Venus.Obliq(110) + Jupiter.AscNode(36) | **PLANET ≠** |
@@ -236,12 +236,12 @@ _(subthreshold in LR04 full record)_
   - `[s-beat]` Earth(40)-Mars(64)
   - `[k+g]` k-Earth.Peri_ecl(128)
 - **Earth-planet beat candidates (top 5):**
-  1. `[3-term]` Earth.Axial(104) - Jupiter.AscNode(36) - Jupiter.Ecc(44)  · score = 31 ⭐
-  2. `[3-term]` Earth.Axial(104) - Jupiter.Ecc(44) - Saturn.AscNode(36)  · score = 28
-  3. `[3-term]` Earth.Axial(104) - Mars.Peri_ecl(36) - Jupiter.Ecc(44)  · score = 27
-  4. `[3-term]` Earth.Axial(104) - Mars.AscNode(64) - Jupiter.Obliq(16)  · score = 27
-  5. `[3-term]` Earth.Obliq(64) - Jupiter.Obliq(16) - Saturn.Obliq(24)  · score = 27
-  - _… 45 more combos in JSON (full ranked list)_
+  1. `[earth-direct]` Earth.ICRF(24) — Earth's own cycle, direct  · score = 1000 ⭐
+  2. `[3-term]` Earth.Axial(104) - Jupiter.AscNode(36) - Jupiter.Ecc(44)  · score = 31
+  3. `[3-term]` Earth.Axial(104) - Jupiter.Ecc(44) - Saturn.AscNode(36)  · score = 28
+  4. `[3-term]` Earth.Axial(104) - Mars.Peri_ecl(36) - Jupiter.Ecc(44)  · score = 27
+  5. `[3-term]` Earth.Axial(104) - Mars.AscNode(64) - Jupiter.Obliq(16)  · score = 27
+  - _… 46 more combos in JSON (full ranked list)_
 - **3-step status:** _(no Berger)_ — Berger / secular theory does not predict this peak; our model attributes it via an Earth-planet beat.
 
 ### n = 25   ·   T = 107.301 kyr   ·   amp = 0.7786
