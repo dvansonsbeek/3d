@@ -312,6 +312,15 @@ Earth-frame rate the model measures,
 above 531.44 that is flat over the last millennium and oscillates around the
 ecliptic value over a full H.
 
+The observational precision matters here: the ranging determinations pin the
+inertial excess at 42.980 ± 0.002 ″/cy (Pireaux & Rozelot 2003; Pitjeva's
+EPM2008 residual to the GR-inclusive rate −0.004 ± 0.005 ″/cy), so 42.71
+differs from the observed excess by 0.27 ″/cy — a 0.6 % agreement, not an
+exact one. The classical determinations (Le Verrier 1859: transits, plus
+meridian observations reduced to apparent geocentric *longitude*; Newcomb
+1882/1895; Clemence 1947) form the perihelion correction as an ecliptic
+element; no rate is formed in right ascension anywhere in those chains.
+
 Two longitudes are in circulation and the difference between them is a
 convention, not a measurement. The scene places each perihelion marker so that
 its **RA** equals the catalogue longitude (pipeline Step 2 solves
@@ -336,7 +345,13 @@ reading B takes the marker's longitude (λ = 78.43°, excess
 
 The projection excess reproduces the GR advance for Mercury and for no other
 planet (Venus −1.92 vs 8.62; Mars −100.85 vs 1.35; the outer planets' excesses
-are large where their GR advances are negligible). Earth's own perihelion of
+are large where their GR advances are negligible). The ranging ephemerides
+confirm the relativistic advances of all four inner planets directly:
+Pitjeva's EPM2008 residual corrections to the GR-inclusive perihelion rates
+are Mercury −0.004 ± 0.005, Venus +0.024 ± 0.033, Earth +0.006 ± 0.007,
+Mars −0.007 ± 0.007 ″/cy — the inertial excesses equal 42.98 / 8.62 / 3.84 /
+1.35 ″/cy to those precisions, and the projection values are excluded as
+their cause by three orders of magnitude for Venus and Mars. Earth's own perihelion of
 date (H/16, <!--v:earthPeriRateEclipticOfDateArcsecCy-->6,184.00<!--/v--> ″/cy)
 projects with an excess of <!--v:earthPeriProjectionExcessJ2000-->493.18<!--/v--> ″/cy
 against a GR advance of 3.84. This table is the pre-registered test of the
