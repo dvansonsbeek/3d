@@ -5,8 +5,8 @@ System Resonance Theory (ESSRT). The model is analytic and parametric, valid
 across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
-**Scale:** `src/script.js` ~59,800 lines · `tools/` 218 JS scripts across 10
-directories · 240 Python files · 73 docs · two web UIs (simulator, `dashboard/`).
+**Scale:** `src/script.js` ~59,900 lines · `tools/` ~300 JS scripts across 10
+directories · ~245 Python files · 74 docs · two web UIs (simulator, `dashboard/`).
 **`npm run check` enforces a twenty-two-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
@@ -105,6 +105,18 @@ would silently churn a structural claim for a rounding-level gain.
   ends sit at H/16 phase ≈ 0°. Check the edge/interior split before believing
   any phase-binned feature; the cardinal-point fitter (Step 6d) edge-trims
   8%/side for this reason.
+- **A structural list has ONE home.** The L1 divisor list lived in
+  `milankovitch_climate_formula.py` — and in twelve hard-coded copies (eight
+  test scripts, the four variance-budget scripts) that a ledger-driven re-run
+  could not see, plus a registry key whose note said "kept for the family
+  table". When a structural set changes, grep for the **literal list**, not
+  for imports; a registry key carrying a "kept for X" exception IS the stale
+  value — fix the key, not its consumers.
+- **A number a doc cannot reproduce from an artifact gets written BY the
+  script**, not re-derived in a generator. Two guesses at the §4.7 f_ice
+  recipe gave 0.70 and 0.73 against the documented 0.77; the script's own
+  recipe (stored since) reproduces it exactly. Docs 92/97 result tables are
+  now generated blocks (`npm run docs:tables`) for the same reason.
 
 ---
 
@@ -130,7 +142,7 @@ local run is only needed when the change touches what the heavy steps verify:
 
 | changed | local gate | ~time |
 |---|---|---|
-| `tools/docs/`, `docs/*.md`, markers | `npm run check:docs` | ~20 s |
+| `tools/docs/`, `docs/*.md`, markers, the generated table blocks of docs 92/97 (`docs:tables`) | `npm run check:docs` | ~20 s |
 | `tools/lib/`, `packages/physics/` | `npm run check:engine` | ~2 min |
 | ANY `public/input/*.json` (even a label — the constants hash embeds them wholesale), `packages/fitting/`, `src/script.js`, `tools/constants/` | full `npm run check` | ~9 min |
 
@@ -194,7 +206,7 @@ what actually made corrections stick here.
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | 140 research one-offs — findings live in `docs/` |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |
-| `docs/` | 71 numbered docs; `40-architecture`, `99-essrt` are cross-referenced |
+| `docs/` | 74 numbered docs; `40-architecture`, `99-essrt` are cross-referenced |
 
 The simulator at 3d.holisticuniverse.com auto-deploys from every green main
 push (the Pages job in ci.yml) — nothing is hand-uploaded anywhere.
