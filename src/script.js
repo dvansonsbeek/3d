@@ -18965,7 +18965,7 @@ function cfmRenderChart(tabKey) {
     postMPT:    `<b>The formula's best-fit regime (R² = 0.87).</b> Seven glacial-interglacial cycles. L1 is dominated by the 100-kyr eccentricity-modulated band; L2 carbon thermostat adds little; no L3 transitions inside the window.`,
     past200:    `<b>Current glacial cycle in detail.</b> Termination I ended the LGM (~20 kyr BP); MIS 6 was the previous deep glacial; we are at the Holocene warm peak (~3.1 ‰ δ¹⁸O).`,
     cenogrid:   `<b>Stitched Cenozoic view.</b> The δ¹⁸O curve routes through the LR04 regime fits for the last 5.3 Myr (so Quaternary amplitudes aren't diluted by the 67-Myr joint fit) and the cenogrid-d18o fit for older times. L3 step terms carry the deep-time variance — PETM, EOT, Mi-1, MMCT, iNHG, MPT. δ¹³C uses the cenogrid-d13c fit only (no LR04 δ¹³C stack exists).`,
-    epica:      `<b>Cross-proxy validation.</b> The same 32 integer-divisor L1 lattice fitted to <i>atmospheric CO₂</i> from Antarctic ice cores (an independent recording mechanism, independent age model, different physics from benthic δ¹⁸O). R² L1 alone = <b>0.83</b>: the same orbital structure that drives ice volume also drives carbon-cycle dynamics. The amplification-ratio table below identifies which L1 lines manifest <i>primarily</i> through carbon-cycle response (high ratio) vs ice-volume response (low ratio).`,
+    epica:      `<b>Cross-proxy validation.</b> The same 33 integer-divisor L1 lattice fitted to <i>atmospheric CO₂</i> from Antarctic ice cores (an independent recording mechanism, independent age model, different physics from benthic δ¹⁸O). R² L1 alone = <b>0.83</b>: the same orbital structure that drives ice volume also drives carbon-cycle dynamics. The amplification-ratio table below identifies which L1 lines manifest <i>primarily</i> through carbon-cycle response (high ratio) vs ice-volume response (low ratio).`,
     cenco2pip:  `<b>Deep-time atmospheric CO₂.</b> The CenCO2PIP Consortium (2023, <i>Science</i>) Bayesian synthesis of multi-proxy paleo-CO₂ data — boron isotopes, phytoplankton, paleosols, stomata, liverworts — over the full Cenozoic. CO₂ ranges from ~280 ppm today to peaks of ~1500 ppm in the Eocene (~50 Ma). The L3 step components capture the major Cenozoic CO₂ shifts (PETM spike, EOT decline, Mi-1 / MMCT, NHG cooling). Total R² ≈ 0.76 across 66 Myr.`,
   };
   const tabNote = tabNotes[tabKey]
@@ -19396,7 +19396,7 @@ async function createClimateFormulaPanel() {
       <label class="cfm-layer-check" title="L1 only — Orbital forcing applied to the baseline.
 Displayed curve = baseline + L1 contributions (the formula's prediction with ONLY L1 enabled).
 
-Structural claim: every L1 line is an EXACT integer divisor of 8H = 2,682,360 yr (the Solar System Resonance Cycle). The framework FIXES the 31 frequencies — only the amplitudes (a, b) are fitted. If the data demanded peaks at non-integer-divisor frequencies, the framework would be falsified.
+Structural claim: every L1 line is an EXACT integer divisor of 8H = 2,682,536 yr (the Solar System Resonance Cycle). The framework FIXES the 33 frequencies — only the amplitudes (a, b) are fitted. If the data demanded peaks at non-integer-divisor frequencies, the framework would be falsified.
 
 Three classic Berger peaks anchor the lattice:
  • 95.8 kyr  n=28  g₄−g₅ Mars-Jupiter eccentricity
@@ -19409,6 +19409,8 @@ Composition (gᵢ = planet i's apsidal rate, sᵢ = nodal rate, k = Earth axial 
  • 8 s-beats (nodal / obliquity band: s₅−s₁, s₄−s₆, s₁−s₄, s₈−s₃, s₅−s₃, s₇−s₆, k+s₃ Earth obliquity, k+s₄ Mars obliquity)
  • 2 canonical climatic precession lines (k+g₅ Jupiter 23.7 kyr, k+g₂ Venus 22.4 kyr)
  • 6 precession-band sidebands added per doc 92 Round 1 (MTM-significant): k+g₆ Saturn (27.9 kyr), k+g₇ Uranus (25.1 kyr), k+g₃ Earth (24.4 kyr), k+g₅ Jupiter sub (20.0 kyr), k+g₄ Mars (17.6 kyr), k+g₂ Venus sub (14.5 kyr)
+ • 1 Berger-quintet completion: k+g₃ Earth climatic precession (19.0 kyr, n=141)
+ • 1 regime-admitted line: Earth's own H/3 eccentricity line (111.8 kyr, n=24 — no secular-theory counterpart; doc 94 §10)
 
 Fitted via sequential ridge regression — see doc 92 §9."><input type="checkbox" data-layer="l1" ${cfmLayerVisibility.l1 ? 'checked' : ''}/><span class="cfm-swatch cfm-swatch-l1"></span>L1 alone</label>
       <label class="cfm-layer-check" title="L2 alone — formula evaluated with ONLY the carbon thermostat enabled.
