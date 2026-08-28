@@ -51,7 +51,7 @@ The canonical climate formula (doc 92) is
 C(t) = c₀ + L1(t) + L2(t) + L3(t)
 ```
 
-L1 = 32 integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000 (orbital-coupling lattice)
+L1 = 32 integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000 (orbital-coupling lattice — the pre-admission lattice; §§1–9 are measured against it, and that measurement is what led to admitting n = 24 as the 33rd divisor in §10)
 L2 = 3 carbon-thermostat lines (405 / 202 / 135 kyr)
 L3 = 6 Heaviside step components
 
@@ -70,7 +70,7 @@ quantity. So we asked:
 > L1+L2+L3?**
 
 If yes — adopt them as a 4th canonical layer (L_insol).
-If no — L1's 32 lattice integers already encode whatever insolation contributes.
+If no — L1's lattice integers already encode whatever insolation contributes.
 
 ---
 
@@ -231,7 +231,7 @@ The three quantities ε(t), e(t), ϖ(t) are themselves *products* of the same
 gravitational coupling among solar-system bodies that produces the 8H lattice.
 Berger's secular theory derives ε(t) and e(t) as sums of beats among
 Laskar's fundamental frequencies (g₁..g₈, s₁..s₈). Those beats are L1's
-32 integers (see [doc 93](93-l1-attribution-reference.md) for the
+33 integers (see [doc 93](93-l1-attribution-reference.md) for the
 dual-attribution mapping). Once L1 is in the formula, adding the
 literally-derived quantities is double-counting.
 

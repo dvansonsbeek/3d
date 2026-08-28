@@ -7,11 +7,11 @@ status: current
 
 # Climate Formula — Architecture, Variance Decomposition & Implementation
 
-> **TL;DR.** The canonical 8H climate formula is **32 integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr (at J2000)** (L1 lattice: 25 framework integers from Berger 1978 + Laskar 2004 eigenmode beats + framework direct planet cycles from doc 55, plus 6 precession-band sidebands surfaced by doc 91 §12.12 Test L, plus n=141 Berger-quintet completion) **+ a 3-line 405-kyr carbon thermostat family** (L2) **+ up to 6 Heaviside step terms** (L3), fitted per regime with sequential ridge regression. Per-regime fits reach **R² = 0.8735 post-MPT**, **R² = 0.8452 EPICA CO₂**, **R² = 0.7626 CenCO2PIP 0–66 Ma**; the full-LR04 fit is **R² = 0.2553** (L1+L2+L3). This doc decomposes the residual into a layered taxonomy — **(L1) orbital lattice**, **(L2) climate-system internal periodic** (canonical: 405-kyr silicate-weathering thermostat + its 202 / 135 kyr harmonics; investigated but not deployed: 13H Boulila libration, 9-Myr long-period carbon resonance), **(L3) boundary-condition shifts** (MPT regime change, iNHG, Cenozoic secular trend, tectonic gateways), **(L4) chronology**, **(L5) stochastic residual** — and reports measured ΔR² for each addition.
+> **TL;DR.** The canonical 8H climate formula is **33 integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr (at J2000)** (L1 lattice: 25 framework integers from Berger 1978 + Laskar 2004 eigenmode beats + framework direct planet cycles from doc 55, plus 6 precession-band sidebands surfaced by doc 91 §12.12 Test L, plus n=141 Berger-quintet completion) **+ a 3-line 405-kyr carbon thermostat family** (L2) **+ up to 6 Heaviside step terms** (L3), fitted per regime with sequential ridge regression. Per-regime fits reach **R² = 0.8735 post-MPT**, **R² = 0.8452 EPICA CO₂**, **R² = 0.7626 CenCO2PIP 0–66 Ma**; the full-LR04 fit is **R² = 0.2553** (L1+L2+L3). This doc decomposes the residual into a layered taxonomy — **(L1) orbital lattice**, **(L2) climate-system internal periodic** (canonical: 405-kyr silicate-weathering thermostat + its 202 / 135 kyr harmonics; investigated but not deployed: 13H Boulila libration, 9-Myr long-period carbon resonance), **(L3) boundary-condition shifts** (MPT regime change, iNHG, Cenozoic secular trend, tectonic gateways), **(L4) chronology**, **(L5) stochastic residual** — and reports measured ΔR² for each addition.
 
-> **Scope note (ESSRT).** The L1 lattice integer-divisor structure (32 integers, n = 9, 12, ..., 185) and the layered taxonomy (L1 orbital lattice / L2 carbon / L3 boundary shifts) are scale-invariant — they hold at any epoch. The literal year counts (8H = <!--v:eightH-->2,682,536<!--/v--> yr; the per-line periods 8H/n in the L1 catalogues at §2.3; 13H = <!--v:thirteenH-->4,359,121<!--/v--> yr; the 405-kyr / 202-kyr / 135-kyr L2 lines) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent over the LR04 5.3-Myr window covered by the post-MPT / iNHG-MPT / pre-iNHG ridge fits, modest over the 67-Myr CENOGRID window, and starting to matter for the 13H ≈ 4.36 Myr Boulila comparison. See doc 99 for the per-driver Δ-H formulas.
+> **Scope note (ESSRT).** The L1 lattice integer-divisor structure (33 integers, n = 9, 12, ..., 185) and the layered taxonomy (L1 orbital lattice / L2 carbon / L3 boundary shifts) are scale-invariant — they hold at any epoch. The literal year counts (8H = <!--v:eightH-->2,682,536<!--/v--> yr; the per-line periods 8H/n in the L1 catalogues at §2.3; 13H = <!--v:thirteenH-->4,359,121<!--/v--> yr; the 405-kyr / 202-kyr / 135-kyr L2 lines) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent over the LR04 5.3-Myr window covered by the post-MPT / iNHG-MPT / pre-iNHG ridge fits, modest over the 67-Myr CENOGRID window, and starting to matter for the 13H ≈ 4.36 Myr Boulila comparison. See doc 99 for the per-driver Δ-H formulas.
 >
-> **Canonical formula measurements** (`scripts/milankovitch_climate_formula.py`, 32-integer L1 + 3-line L2 + 6-step L3, sequential ridge λ=1):
+> **Canonical formula measurements** (`scripts/milankovitch_climate_formula.py`, 33-integer L1 + 3-line L2 + 6-step L3, sequential ridge λ=1):
 > - **LR04 regime split is the biggest single jump**: pre-iNHG (2.7–5.32 Ma) R² = **0.4298**, iNHG-MPT (1.0–2.7 Ma) R² = **0.7289**, post-MPT (0–1.0 Ma) R² = **0.8735** — the 8H lattice explains ~87% of post-MPT LR04 variance once the MPT regime change is removed.
 > - **CENOGRID δ¹⁸O** (0–67 Ma) R² = **0.6177** (L1+L2+L3); δ¹³C R² = **0.3514**. L3 step components carry the dominant CENOGRID variance (Cenozoic secular cooling captured by 6 Heavisides at PETM/EOT/Mi-1/MMCT/iNHG/MPT).
 >
@@ -118,7 +118,7 @@ Five of six sit in the precession band [17–28 kyr], consistent with sub-domina
 
 ### 2.3 The 33 lattice integers — per-line identities
 
-Reference table of all 32 L1 lattice members in ascending n order with their periods and physical interpretation. Notation: `g_i` = planet *i*'s apsidal-precession rate, `s_i` = planet *i*'s nodal-precession rate (Laskar 2004 secular eigenfrequencies); `k` = Earth's general precession in longitude (~50.4″/yr). "Direct" = planet's own axial / obliquity / apsidal / eccentricity period; "Eigenmode beat" = difference between two planets' secular rates; "Climatic precession" = `k + g_i` (Earth axial precession × planet *i*'s apsidal motion).
+Reference table of all 33 L1 lattice members in ascending n order with their periods and physical interpretation. Notation: `g_i` = planet *i*'s apsidal-precession rate, `s_i` = planet *i*'s nodal-precession rate (Laskar 2004 secular eigenfrequencies); `k` = Earth's general precession in longitude (~50.4″/yr). "Direct" = planet's own axial / obliquity / apsidal / eccentricity period; "Eigenmode beat" = difference between two planets' secular rates; "Climatic precession" = `k + g_i` (Earth axial precession × planet *i*'s apsidal motion).
 
 The 25 canonical integers come from Berger 1978 + Laskar 2004 eigenmode beats + framework direct planet cycles from doc 55. The 6 precession-band sidebands (n = 96, 107, 110, 134, 152, 185) were added in this document's Tier B Round 1 (§8.2 A1) — MTM-significant lines that the canonical 25 missed. The 32nd integer (**n = 141**, k+g₃ Earth climatic precession at ~19 kyr) was added to complete the Berger precession quintet: subthreshold in LR04 (amp/median 2.03×, just below the 3σ cutoff) but **3σ-significant in the Cheng full Asian-monsoon speleothem record** (amp/median 3.60×). Its inclusion closes the canonical Wigley 1976 / Berger 1978 combination tone `1/95 ≈ 1/19 − 1/23.7` — n=141 beats with n=113 (k+g₅) to produce n=28 (the 95-kyr eccentricity peak), complementing the existing g-beat attribution.
 
@@ -132,6 +132,7 @@ The 25 canonical integers come from Berger 1978 + Laskar 2004 eigenmode beats + 
 | 20 | 134.1 | g-beat | g₃−g₂ Earth-Venus eccentricity |
 | 21 | 127.7 | Direct | Mars obliquity / Jupiter axial = 8H/21 |
 | **22** | **121.9** | s-beat / g-beat | s₂−s₄ Venus-Mars nodal / g₄−g₂ — **highest carbon-amplification on LR04 (ratio 12.84, Round 1 C8)** |
+| **24** | **111.8** | Earth direct (H/3) | **Earth's own eccentricity line** — the one-law e(t) = base′·(1 + cos θ₃/2) on H/3; no secular-theory counterpart. Regime-admitted: <!--v:l1N24AmpOverMedianPreInhg-->1.64<!--/v-->× median and CV-positive pre-iNHG, the record's own best period 8H/23.8 ([doc 94 §10](94-insolation-null-test.md)) |
 | **25** | **107.3** | s-beat | s₁−s₄ Mercury-Mars nodal — **the empirical 100-kyr-band centroid (doc 91 §4)** |
 | **28** | **95.8** | g-beat | g₄−g₅ Mars-Jupiter eccentricity — **Berger 1978 classic 95-kyr peak** |
 | 30 | 89.4 | g-beat | g₃−g₇ Earth-Uranus eccentricity |
@@ -422,7 +423,7 @@ The canonical post-MPT R² (0.8735) sits below the Tier-A "post-MPT + full L2 st
 
 ### 6.2 Reachable ceiling — and what it does NOT mean (Tier B Round 2 reality check)
 
-Per-regime fits with the canonical 32-integer L1 + 3-line L2 + 6-step L3 pipeline:
+Per-regime fits with the canonical 33-integer L1 + 3-line L2 + 6-step L3 pipeline:
 - **Post-MPT (0–1 Myr) R² = 0.8735** (L1+L2+L3; L1-only 0.8702)
 - **iNHG-MPT (1.0–2.7 Ma) R² = 0.7289**
 - **Pre-iNHG (2.7–5.32 Ma) R² = 0.4298**
@@ -536,7 +537,7 @@ The step-component approach is preferred for downstream work — it preserves th
 ✓ **A2**: 405-kyr explicit line. ΔR² LR04 = +0.0059; CENOGRID δ¹³C = +0.0077 with **carbon-amplification ratio 2.2** — Layer-2 confirmed.
 ✓ **A3**: 13H = 4.36 Myr explicit line. ΔR² LR04 = +0.0747 (largely residual-trend absorption at 1.25 cycles); CENOGRID δ¹⁸O = +0.0036 — small per-cycle, *not* carbon-amplified at variance level (ratio 0.58) despite doc 91 §13's high amplitude-ratio finding.
 ✓ **A4**: 9-Myr candidate. ΔR² CENOGRID δ¹³C = **+0.078 with carbon-amplification ratio 4.2** — the strongest L2 signature in the original Tier-A suite. **Investigated, not deployed** (rejected by R3-4 stability test for variance attribution, though pattern is real).
-✓ **A5**: regime-split LR04 (canonical 32-integer L1 + 3-line L2 + 6-step L3) — **pre-iNHG R² = 0.4298, iNHG-MPT R² = 0.7289, post-MPT R² = 0.8735** — biggest single jump in the entire decomposition.
+✓ **A5**: regime-split LR04 (canonical 33-integer L1 + 3-line L2 + 6-step L3) — **pre-iNHG R² = 0.4298, iNHG-MPT R² = 0.7289, post-MPT R² = 0.8735** — biggest single jump in the entire decomposition.
 
 **Headline rewrite for the framework**: LR04 R² is **0.8735 (post-MPT) / 0.7289 (iNHG-MPT) / 0.4298 (pre-iNHG) — not 0.2553 (full conflated)**. The framework explains a near-complete fraction of post-MPT LR04 variance once the MPT regime change is treated explicitly.
 
@@ -838,13 +839,13 @@ into a canonical, deployable formula at
 
 ### Inclusion / exclusion summary
 
-The canonical formula is **32 + 3 + 6 = 41 structural components**. The variance-budget research investigated more — some were absorbed into L1 by collinearity, some failed cross-window stability, some were captured implicitly via existing components, some failed promotion criteria. The full inventory:
+The canonical formula is **33 + 3 + 6 = 42 structural components**. The variance-budget research investigated more — some were absorbed into L1 by collinearity, some failed cross-window stability, some were captured implicitly via existing components, some failed promotion criteria. The full inventory:
 
 **Deployed in canonical formula (41 components):**
 
 | Layer | Count | What | Investigation trail |
 |---|---:|---|---|
-| **L1** lattice | 32 integers | 25 canonical (Berger 1978 eigenmode beats + framework direct planet cycles from doc 55) + 6 precession-band sidebands (96, 107, 110, 134, 152, 185) + 1 Berger-quintet completion (141) | Doc 91 §12.12 Test L MTM enrichment; doc 92 §2.1 Tier A1 sideband ΔR²; doc 92 §2.3 (n=141 closure) |
+| **L1** lattice | 33 integers | 25 canonical (Berger 1978 eigenmode beats + framework direct planet cycles from doc 55) + 6 precession-band sidebands (96, 107, 110, 134, 152, 185) + 1 Berger-quintet completion (141) + 1 regime-admitted Earth H/3 eccentricity line (24, doc 94 §10) | Doc 91 §12.12 Test L MTM enrichment; doc 92 §2.1 Tier A1 sideband ΔR²; doc 92 §2.3 (n=141 closure) |
 | **L2** thermostat | 3 lines | 405-kyr fundamental + 202-kyr 2nd harmonic + 135-kyr 3rd harmonic | Doc 91 §13 405-kyr investigation; doc 92 §3.1 Tier A2; doc 92 §3.4 Tier B1 nonlinear-silicate-weathering |
 | **L3** steps | 6 Heaviside | PETM (56 Ma), EOT (34 Ma), Mi-1 (23 Ma), MMCT (14 Ma), iNHG (2.7 Ma), MPT (1 Ma) | Doc 92 §4.1 Tier A5 regime split; doc 92 §8.3 B5 step components; doc 92 §11.3 CenCO2PIP cross-validation |
 
@@ -881,7 +882,7 @@ C(t) = c₀
 ```
 
 Where:
-- **L1 integers** (32 of 200 possible 8H/N divisors) = the canonical 25 (Berger eigenmode beats + Mars/Jupiter direct cycles from doc 55) plus 6 MTM-significant precession-band sidebands (96, 107, 110, 134, 152, 185) from Round 1 A1 plus 1 Berger-quintet-completion sideband (141 = k+g₃ Earth at ~19 kyr; subthreshold in LR04 at amp/median 2.03×, 3σ in Cheng monsoon at 3.60×; closes the Wigley 1976 combination tone `1/95 ≈ 1/141 − 1/113`)
+- **L1 integers** (33 of 200 possible 8H/N divisors) = the canonical 25 (Berger eigenmode beats + Mars/Jupiter direct cycles from doc 55) plus 6 MTM-significant precession-band sidebands (96, 107, 110, 134, 152, 185) from Round 1 A1 plus 1 Berger-quintet-completion sideband (141 = k+g₃ Earth at ~19 kyr; subthreshold in LR04 at amp/median 2.03×, 3σ in Cheng monsoon at 3.60×; closes the Wigley 1976 combination tone `1/95 ≈ 1/141 − 1/113`)
 - **L2 periods** (3 lines, the silicate-weathering thermostat family) = 405-kyr fundamental + 202.25-kyr 2nd harmonic + 134.83-kyr 3rd harmonic — confirmed carbon-amplified across LR04, CENOGRID, and EPICA
 - **L3 transitions** (up to 6, applied only when inside the fit window) = PETM (56 Ma), EOT (34 Ma), Mi-1 (23 Ma), MMCT (14 Ma), iNHG (2.7 Ma), MPT (1 Ma)
 
@@ -946,7 +947,7 @@ These are not curve-fitted noise — they independently recover textbook Cenozoi
 
 ### 9.5 Under-determined L1 lattice & ridge regularization
 
-The L1 layer has 32 sinusoid pairs. Whether this is well-determined depends on the **fit-window length** vs the **lattice spacing**:
+The L1 layer has 33 sinusoid pairs. Whether this is well-determined depends on the **fit-window length** vs the **lattice spacing**:
 
 | Quantity | Value | Meaning |
 |---|---:|---|

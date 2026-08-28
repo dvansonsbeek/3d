@@ -3,7 +3,8 @@
     "script": "milankovitch_l1_n24_attribution.py",
     "line_n": 24,
     "line_period_kyr": 111.77233333333334,
-    "line_in_l1": false,
+    "line_in_l1": true,
+    "baseline": "shipped lattice minus the line under test",
     "l1_neighbours": [
       22,
       25
@@ -25,7 +26,7 @@
       29,
       30
     ],
-    "runtime_sec": 0.20245623588562012
+    "runtime_sec": 0.20403599739074707
   },
   "regime_results": {
     "post-mpt": {

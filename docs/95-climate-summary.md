@@ -48,7 +48,7 @@ Climate is driven by the **gravitational rhythm of the entire solar system**, pa
 
 The two paradigms are **not contradictory** — they describe the same gravitational physics. They differ in:
 
-- **Granularity:** L1 enumerates 32 integer-divisor frequencies; Berger collapses these into 3 time-domain functions.
+- **Granularity:** L1 enumerates 33 integer-divisor frequencies; Berger collapses these into 3 time-domain functions.
 - **Channel:** Berger's reduction implicitly assumes insolation is the sole transmission mechanism. The lattice paradigm is agnostic about transmission — it captures the rhythm itself.
 - **Expressivity:** Adding Berger insolation features to L1+L2+L3 yields ΔR² ≈ 0 (see §3). The lattice contains the variance the projection produces; the reverse is not true.
 
@@ -80,7 +80,7 @@ All numbers from the canonical regression scripts:
 
 | Test | LR04 (post-MPT, 0–1000 kyr) | LR04 (0–500 kyr, Laskar window) | EPICA CO₂ (0–800 kyr) |
 |------|----------------------------:|--------------------------------:|----------------------:|
-| **L1 alone** (32 lattice integers) | **R² = 0.870** | R² ≈ 0.93 | R² = 0.8336 |
+| **L1 alone** (33 lattice integers) | **R² = 0.870** | R² ≈ 0.93 | R² = 0.8336 |
 | **L1+L2+L3** (canonical formula) | **R² = 0.8735** | **R² = 0.9424** | **R² = 0.8452** |
 | Berger insolation alone (model e/ϖ) | R² = 0.049 | R² = 0.188 | R² = 0.096 |
 | **Berger insolation alone (Laskar e/ϖ)** | — | **R² = 0.293** | **R² = 0.172** |
@@ -89,7 +89,7 @@ All numbers from the canonical regression scripts:
 
 Three lines tell the story:
 
-1. **The 8H lattice (L1) carries the variance.** R² = 0.87 on post-MPT LR04 — the lattice alone, 32 sinusoids at fixed gravitational-rhythm frequencies.
+1. **The 8H lattice (L1) carries the variance.** R² = 0.87 on post-MPT LR04 — the lattice alone, 33 sinusoids at fixed gravitational-rhythm frequencies.
 2. **Classical insolation alone explains very little.** R² = 0.05 (with our model's e) → R² = 0.29 (with Laskar's full-range e). Significant absolute, but **a fraction of what L1 captures.**
 3. **The two parameterizations carry overlapping, not independent, information.** Adding Laskar's better-parameterized insolation to L1+L2+L3 yields **ΔR² = 0.000** on LR04 and **ΔR² = 0.00001** on EPICA. The lattice already contains all of it.
 
@@ -126,7 +126,7 @@ The conventional summary "climate is driven by Milankovitch insolation forcing" 
 
 ### 5.1 For climate science
 
-- **Fitted lattice coefficients ARE the orbital-forcing signature**, not a separate quantity that needs reconciliation with Berger. The 32 L1 amplitudes (and 3 L2 amplitudes, and 6 L3 step betas) are the canonical decomposition of Cenozoic climate (see [doc 92](92-climate-formula.md)).
+- **Fitted lattice coefficients ARE the orbital-forcing signature**, not a separate quantity that needs reconciliation with Berger. The 33 L1 amplitudes (and 3 L2 amplitudes, and 6 L3 step betas) are the canonical decomposition of Cenozoic climate (see [doc 92](92-climate-formula.md)).
 - **Off-lattice candidates** for climate forcing (e.g., 13H Boulila libration, 9-Myr long-period carbon resonance) should be tested **on top of L1** to establish independence — many turn out to be lattice shadows under spectral leakage (see [doc 91 §13](91-milankovitch-evidence.md)).
 - **L2 silicate-weathering thermostat (405-kyr family) is the most important off-lattice mechanism.** It is independent of L1 because it requires both an orbital trigger AND nonlinear carbon-cycle amplification. It is the second pillar of the canonical formula.
 - **L3 boundary-condition steps** at PETM, EOT, Mi-1, MMCT, iNHG, MPT carry the dominant CENOGRID variance — they are not orbital, they are tectonic / cryosphere regime shifts. Forward-prediction across L3 boundaries fails catastrophically (R² ≈ −0.9).
@@ -184,7 +184,7 @@ Each row is a measured quantity with a script that reproduces it:
 | Quantity | Value | Source / script |
 |----------|-------|-----------------|
 | 8H Solar System Resonance Cycle | <!--v:eightH-->2,682,536<!--/v--> yr (at J2000) | [doc 55](55-solar-system-resonance-cycle-periods.md), `model-parameters.json` |
-| L1 lattice integers | 32 | [doc 93](93-l1-attribution-reference.md) |
+| L1 lattice integers | 33 | [doc 93](93-l1-attribution-reference.md) |
 | L1 alone, post-MPT LR04 | R² = 0.870 | `scripts/milankovitch_climate_formula.py` |
 | L1+L2+L3, post-MPT LR04 | R² = 0.8735 | `data/milankovitch-climate-formula.json` |
 | L1+L2+L3, EPICA CO₂ | R² = 0.8452 | same |
@@ -192,7 +192,7 @@ Each row is a measured quantity with a script that reproduces it:
 | Berger insolation alone, LR04 0–500 kyr | R² = 0.293 (Laskar e) | `scripts/milankovitch_insolation_laskar_check.py` |
 | Berger insolation added to L1+L2+L3 | ΔR² = 0.00000 (LR04), 0.00001 (EPICA CO₂) | same |
 | L3 step at MPT (LR04 jump) | β = +1.13 | `data/milankovitch-climate-formula.json` |
-| L1 dual-attribution rate | 32 / 32 Holistic attributions (29 / 32 also carry a Berger label) | [doc 93](93-l1-attribution-reference.md) |
+| L1 dual-attribution rate | 33 / 33 Holistic attributions (29 / 33 also carry a Berger label; n = 24 is Earth's own line, no secular counterpart) | [doc 93](93-l1-attribution-reference.md) |
 | Forward-projection R² across MPT | −0.87 (failure) | doc 92 Tier B R3-3 |
 
 All numbers reproducible with `python3 scripts/milankovitch_*.py` (deterministic, no random seeds).

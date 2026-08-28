@@ -39,7 +39,7 @@ Earth's H is the model's master cycle, but it isn't the largest. **Eight Earth F
 
 The unifying theory is the **Expanding Solar System Resonance Theory (ESSRT)** ([Doc 99](docs/99-expanding-solar-system-resonance-theory.md)):
 
-- The **L1 integer labels** (n = 9, 12, …, 65, 66, 68, …, 185 — 32 components in total) are **scale-invariant** structural constants of the solar system. Same integers at every epoch.
+- The **L1 integer labels** (n = 9, 12, …, 65, 66, 68, …, 185 — 33 components in total) are **scale-invariant** structural constants of the solar system. Same integers at every epoch.
 - The **literal periods** scale with the current value of H(t): in the Devonian H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr, today H = <!--v:H-->335,317<!--/v--> yr, in 200 Myr H ≈ <!--v:hAt200MyrFuture-->352,601<!--/v--> yr — but `8H/65` is still the obliquity beat, `8H/104` is still axial precession, etc.
 - Two physically independent drivers expand H(t): **Driver 1** is Earth-Moon tidal evolution (Moon recedes 3.82 cm/yr at J2000, Earth's length-of-day grows); **Driver 2** is solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). Both act simultaneously; the structural invariant `H × days/year` ≈ <!--v:totalDaysInH-->122,471,920<!--/v--> couples them at the per-planet observational level.
 

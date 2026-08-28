@@ -68,10 +68,13 @@ def main():
     t0 = time.time()
     ages, vals = load_lr04()
     model = load_insolation_features()
-    base_list = list(L1_LATTICE_INTEGERS)
+    # The test is DEFINED against the pre-admission lattice (every shipped divisor
+    # except the line under test); it must stay reproducible after n = 24 joined L1.
+    base_list = [d for d in L1_LATTICE_INTEGERS if d != LINE_N]
     out = {"metadata": {"script": Path(__file__).name, "line_n": LINE_N,
                         "line_period_kyr": EIGHT_H / LINE_N,
-                        "line_in_l1": LINE_N in base_list,
+                        "line_in_l1": LINE_N in list(L1_LATTICE_INTEGERS),
+                        "baseline": "shipped lattice minus the line under test",
                         "l1_neighbours": [max(n for n in base_list if n < LINE_N), min(n for n in base_list if n > LINE_N)],
                         "ridge_lambda": RIDGE_LAMBDA,
                         "cv": "split-half, both directions, canonical baseline fitted on the full regime",
