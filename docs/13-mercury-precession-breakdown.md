@@ -320,6 +320,27 @@ exact one. The classical determinations (Le Verrier 1859: transits, plus
 meridian observations reduced to apparent geocentric *longitude*; Newcomb
 1882/1895; Clemence 1947) form the perihelion correction as an ecliptic
 element; no rate is formed in right ascension anywhere in those chains.
+Le Verrier's Paris meridian series alone (1801–1842, 187 equations of
+condition in apparent geocentric longitude, re-solved in
+`tools/explore/leverrier-meridian-refit.py`) gives δπ′ = 43.1 ± 16.5 ″/cy —
+the excess is present in longitude-reduced positions with no transit and no
+modern constant in the chain.
+
+**The two coordinates, kept apart** (`tools/explore/mercury-perihelion-frames.mjs`).
+The advance is one motion in two coordinates: (a) ecliptic longitude of date,
+λ̇ = ϖ̇_sidereal + p_A — what Le Verrier, Newcomb and Clemence measured; (b)
+right ascension of date, α̇ = λ̇·dα/dλ + ∂α/∂ε·ε̇ — what the scene's export
+measures for its marker and what no observer has published. Converting
+either way closes exactly, and the missing advance is the same gap in both:
+classical system (Newcomb p_A 5,025.645) observed 5,599.74 vs model
+5,557.08 → 42.66 ″/cy in longitude, 46.09 in RA (= 42.66 × slope); modern
+system (IAU 2006 p_A 5,028.8) Park-implied 5,604.11 vs model 5,560.24 →
+43.87 in longitude (0.89 of it the baseline 532.33 − 531.44). The scene's
+579.8 is the RA rate in an equator that co-moves with its stars (no p_A);
+converted back to longitude it is 531.44 again — the projection adds nothing
+to the longitude rate, in which the anomaly is defined. A sum that applies
+the slope to the sidereal rate but not to p_A, or takes the obliquity term
+with the opposite sign, mixes the two coordinates and is not a decomposition.
 
 Two longitudes are in circulation and the difference between them is a
 convention, not a measurement. The scene places each perihelion marker so that
