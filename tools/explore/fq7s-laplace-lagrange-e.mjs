@@ -159,7 +159,10 @@ console.log(`  J2000: e ${e0.toFixed(6)} (obs 0.016710) · ė ${((e0 - e1) / 1).
 {
   const data = [];
   for (let k = 0; k <= 500; k++) { const t = -k * 1000; const [re, im] = zE(t); data.push({ year: t, eccentricity: Math.hypot(re, im), inclination: 0, perihelionLong: ((Math.atan2(im, re) / D2R) + 360) % 360, ascendingNode: 0 }); }
-  writeFileSync(new URL('./fq7s-ll-orbital-elements.local.json', import.meta.url), JSON.stringify({ source: 'framework Laplace–Lagrange (fq7s-laplace-lagrange-e.mjs)', frame: 'J2000 ecliptic (fixed)', columns: { year: 'yr from J2000', eccentricity: 'e = |z|', perihelionLong: 'arg z (deg)' }, data }));
+  // g5 is recorded so a consumer can tell a first-order file (g5 3.74, 12% low:
+  // derived |z| corr 0.894) from the derivation (g5=4.224: corr 0.967) — the
+  // two are silent look-alikes otherwise.
+  writeFileSync(new URL('./fq7s-ll-orbital-elements.local.json', import.meta.url), JSON.stringify({ source: 'framework Laplace–Lagrange (fq7s-laplace-lagrange-e.mjs)', g5: g5arg ? g5arg.slice(3) : 'first-order', frame: 'J2000 ecliptic (fixed)', columns: { year: 'yr from J2000', eccentricity: 'e = |z|', perihelionLong: 'arg z (deg)' }, data }));
   console.log('  wrote fq7s-ll-orbital-elements.local.json (0…−500 kyr) for the LR04 insolation V3 test');
 }
 // spectrum peaks of LL e(t)
