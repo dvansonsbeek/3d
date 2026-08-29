@@ -9512,6 +9512,7 @@ let o = {
   mercuryPerihelion: 0,
   venusPerihelion: 0,
   earthPerihelion: 0,
+  earthPerihelionEcliptic: 0,
   marsPerihelion: 0,
   jupiterPerihelion: 0,
   saturnPerihelion: 0,
@@ -17937,19 +17938,12 @@ function wgcRenderPlanet(planetKey) {
       if (Math.abs(d.yrArr[i] - 2000) < Math.abs(d.yrArr[j2000Idx] - 2000)) j2000Idx = i;
     }
     modelValues = new Array(d.yrArr.length);
-    modelValues[j2000Idx] = modelPlanet.longitudePerihelion;
-    // Trapezoidal integration of rate("/cy) → degrees (÷ 360000)
-    for (let i = j2000Idx + 1; i < d.yrArr.length; i++) {
-      const dt = d.yrArr[i] - d.yrArr[i - 1];
-      const rateAvg = 0.5 * (predictGeocentricPrecession(d.yrArr[i - 1], modelPlanetKey)
-                           + predictGeocentricPrecession(d.yrArr[i], modelPlanetKey));
-      modelValues[i] = modelValues[i - 1] + rateAvg * dt / 360000;
-    }
-    for (let i = j2000Idx - 1; i >= 0; i--) {
-      const dt = d.yrArr[i + 1] - d.yrArr[i];
-      const rateAvg = 0.5 * (predictGeocentricPrecession(d.yrArr[i], modelPlanetKey)
-                           + predictGeocentricPrecession(d.yrArr[i + 1], modelPlanetKey));
-      modelValues[i] = modelValues[i + 1] - rateAvg * dt / 360000;
+    // WebGeoCalc's ϖ(t) is an ECLIPTIC longitude, so the comparable model curve is the
+    // lattice advance in ecliptic longitude — a straight line at 360°/perihelionEclipticYears
+    // through the J2000 longitude. (The Earth-frame RA rate the predictive formula produces
+    // is a different coordinate — doc 13 §1.8 — and is reported separately below.)
+    for (let i = 0; i < d.yrArr.length; i++) {
+      modelValues[i] = modelPlanet.longitudePerihelion + (360 / modelPlanet.perihelionEclipticYears) * (d.yrArr[i] - 2000);
     }
     modelRateAtJ2000 = predictGeocentricPrecession(2000, modelPlanetKey);
     modelMissingAdvance = modelRateAtJ2000 - modelBaselineCy;
@@ -17960,7 +17954,7 @@ function wgcRenderPlanet(planetKey) {
       <div class="wgc-planet-title">${planetKey} PERIHELION PRECESSION</div>
       <div class="wgc-planet-summary">
         <div><span style="color:#268bd2">\u2501\u2501</span> <b>Observed:</b> ${undeterminedTrend ? '<span style="color:#cb4b16;">\u26a0 trend cannot be determined from 1900\u20132026 baseline</span>' : `[raw OLS] ${rateRawCy.toFixed(1)} \u2033/cy \u2022 [sin+lin] ${rateSinCy.toFixed(1)} \u2033/cy`}</div>
-        ${modelRateAtJ2000 !== null ? `<div><span style="color:#ff5252">\u2501\u2501</span> <b>Model:</b> ${modelRateAtJ2000.toFixed(1)} \u2033/cy <span style="color:#aaa">(baseline ${modelBaselineCy.toFixed(1)} + missing advance ${modelMissingAdvance.toFixed(1)})</span></div>` : ''}
+        ${modelRateAtJ2000 !== null ? (() => { const fb = perihelionFrameBreakdown(modelPlanetKey, 2000); return `<div><span style="color:#ff5252">\u2501\u2501</span> <b>Model, ecliptic (lattice):</b> ${modelBaselineCy.toFixed(1)} \u2033/cy <span style="color:#aaa">\u2014 the comparable coordinate; observed \u2212 model = ${(undeterminedTrend ? NaN : rateSinCy - modelBaselineCy).toFixed(1)} \u2033/cy</span></div><div><span style="color:#aaa">Same advance in right ascension (fixed equator): ${fb.projectedRa.toFixed(1)} \u2033/cy \u2022 Earth-frame RA (scene equator, the export/predict quantity): ${modelRateAtJ2000.toFixed(1)} \u2033/cy \u2014 different coordinates, not comparable with WebGeoCalc</span></div>`; })() : ''}
       </div>
       <div class="wgc-planet-method">
         Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}${undeterminedTrend ? '<br><span style="color:#cb4b16;">\u26a0 Long-term trend <b>cannot be determined</b> from 1900\u20132026 observations \u2014 short-baseline trend flips sign across sub-windows (1800\u20131900, 1900\u20132026, 2026\u20132100). Only Mercury, Mars, and Saturn have reliably resolvable trends from observation.</span>' : ''}
@@ -25460,15 +25454,18 @@ function setupGUI() {
   );
   const periFmt = v => v.toFixed(6);
   // [planetKey, geoKey, label, precessionYears] — Earth has no detail row
+  // Gauges show the ECLIPTIC longitude of perihelion (the coordinate observers publish);
+  // the scene's Earth-frame RA of the same direction lives in the planet's Orbital
+  // Orientation rows and the Cycles breakdown (doc 13 §1.8).
   const periPlanets = [
-    ['mercury', 'mercuryPerihelion', 'Mercury', planets.mercury.perihelionEclipticYears],
-    ['venus', 'venusPerihelion', 'Venus', planets.venus.perihelionEclipticYears],
-    ['earth', 'earthPerihelion', 'Earth', earthPerihelionICRFYears],
-    ['mars', 'marsPerihelion', 'Mars', planets.mars.perihelionEclipticYears],
-    ['jupiter', 'jupiterPerihelion', 'Jupiter', planets.jupiter.perihelionEclipticYears],
-    ['saturn', 'saturnPerihelion', 'Saturn', planets.saturn.perihelionEclipticYears],
-    ['uranus', 'uranusPerihelion', 'Uranus', planets.uranus.perihelionEclipticYears],
-    ['neptune', 'neptunePerihelion', 'Neptune', planets.neptune.perihelionEclipticYears]
+    ['mercury', 'mercuryPerihelionEcliptic', 'Mercury', planets.mercury.perihelionEclipticYears],
+    ['venus', 'venusPerihelionEcliptic', 'Venus', planets.venus.perihelionEclipticYears],
+    ['earth', 'earthPerihelionEcliptic', 'Earth', earthPerihelionICRFYears],
+    ['mars', 'marsPerihelionEcliptic', 'Mars', planets.mars.perihelionEclipticYears],
+    ['jupiter', 'jupiterPerihelionEcliptic', 'Jupiter', planets.jupiter.perihelionEclipticYears],
+    ['saturn', 'saturnPerihelionEcliptic', 'Saturn', planets.saturn.perihelionEclipticYears],
+    ['uranus', 'uranusPerihelionEcliptic', 'Uranus', planets.uranus.perihelionEclipticYears],
+    ['neptune', 'neptunePerihelionEcliptic', 'Neptune', planets.neptune.perihelionEclipticYears]
   ];
   periPlanets.forEach(([planetKey, geoKey, name, precYears]) => {
     // Geocentric row with gauge bar (always visible)
@@ -47527,15 +47524,32 @@ function perihelionFrameBreakdown(planetKey, year) {
   const p = planets[planetKey];
   const D2R = Math.PI / 180;
   const lattice = 1296000 / p.perihelionEclipticYears * 100;                                    // (a) ″/cy
-  const lam = (p.longitudePerihelion + (360 / p.perihelionEclipticYears) * (year - 2000)) * D2R;
   const eps = computeObliquityEarth(year) * D2R;
   const epsRate = (computeObliquityEarth(year + 50) - computeObliquityEarth(year - 50)) * 3600;  // ″/cy
-  const den = Math.cos(lam) ** 2 + Math.sin(lam) ** 2 * Math.cos(eps) ** 2;
-  const projection = lattice * (Math.cos(eps) / den - 1);
-  const obliquityTerm = (-Math.sin(lam) * Math.cos(lam) * Math.sin(eps) / den) * epsRate;
+  // projection excess and obliquity-rate term for a direction at ecliptic longitude lamDeg
+  const terms = (lamDeg) => {
+    const lam = lamDeg * D2R;
+    const den = Math.cos(lam) ** 2 + Math.sin(lam) ** 2 * Math.cos(eps) ** 2;
+    return { proj: lattice * (Math.cos(eps) / den - 1),
+             obl: (-Math.sin(lam) * Math.cos(lam) * Math.sin(eps) / den) * epsRate };
+  };
+  const lamIAU = p.longitudePerihelion + (360 / p.perihelionEclipticYears) * (year - 2000);
+  const atIAU = terms(lamIAU);
+  const atMarker = terms(lamIAU + p.angleCorrection);          // where the scene's marker actually sits (Step 2)
+  const projection = atIAU.proj;
+  const obliquityTerm = atIAU.obl;
+  const projectedRa = lattice + projection;                                                       // lattice × dα/dλ
   const earthFrame = predictGeocentricPrecession(year, planetKey);                              // (b) ″/cy
-  const coupling = earthFrame - lattice - projection - obliquityTerm;
-  return { lattice, projection, obliquityTerm, coupling, earthFrame };
+  const markerOffset = (atMarker.proj + atMarker.obl) - (atIAU.proj + atIAU.obl);              // the angleCorrection effect
+  const kappa = earthFrame - lattice - projection - obliquityTerm - markerOffset;               // the chain's of-date coupling
+  const coupling = markerOffset + kappa;
+  return { lattice, projection, obliquityTerm, projectedRa, markerOffset, kappa, coupling, earthFrame };
+}
+// Right ascension of an ecliptic-of-date direction (β = 0) in the equatorial frame of the same date.
+function eclipticLongitudeToRaDeg(lamDeg, year) {
+  const D2R = Math.PI / 180;
+  const l = lamDeg * D2R, e = computeObliquityEarth(year) * D2R;
+  return ((Math.atan2(Math.sin(l) * Math.cos(e), Math.cos(l)) / D2R) % 360 + 360) % 360;
 }
 // The general-relativistic perihelion advance from the model's own constants:
 // 6π GM☉ / (c² a (1 − e²)) per orbit, a from the period (Kepler III), × orbits per century.
@@ -47752,11 +47766,17 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
-      {label : () => `Longitude of perihelion (ϖ)`,
-       value : [ { v: () => ((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360).toFixed(8), dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Sum of longitude of ascending node (Ω) and argument of periapsis (ω): ϖ = Ω + ω`],
+      {label : () => `Longitude of perihelion (ϖ), ecliptic`,
+       value : [ { v: () => calcEarthPerihelionPredictive(o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Ecliptic longitude of date of Earth's perihelion — the model's perihelion law (270° + 360°·cycles(H/16) + harmonics); the coordinate observers publish (IAU J2000: 102.947°)`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
+      {label : () => `Perihelion direction in RA (fixed equator)`,
+       value : [ { v: () => eclipticLongitudeToRaDeg(calcEarthPerihelionPredictive(o.currentYear), o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The same ecliptic direction expressed as right ascension with the obliquity of date (β = 0): tan α = tan λ · cos ε. A coordinate conversion, not a second longitude`]},
+      {label : () => `Perihelion RA, Earth-frame (scene equator)`,
+       value : [ { v: () => ((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360).toFixed(8), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The scene's own measurement: the RA of the perihelion-of-Earth point in earth.rotationAxis (the export column 'Earth Perihelion ICRF'). The scene equator co-moves with its stars; this is the quantity Step 4a converts to ecliptic longitude before fitting`]},
       {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.earthArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle from ascending node to perihelion, measured in orbital plane: ω = ϖ - Ω`],
@@ -48657,11 +48677,17 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
-      {label : () => `Longitude of perihelion (ϖ)`,
-       value : [ { v: () => o.mercuryPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Sum of longitude of ascending node (Ω) and argument of periapsis (ω): ϖ = Ω + ω`],
+      {label : () => `Longitude of perihelion (ϖ), ecliptic`,
+       value : [ { v: () => o.mercuryPerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Ecliptic longitude of date of the perihelion (ϖ = Ω + ω): the J2000 value advanced at the lattice rate — the coordinate observers publish`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
+      {label : () => `Perihelion direction in RA (fixed equator)`,
+       value : [ { v: () => eclipticLongitudeToRaDeg(o.mercuryPerihelionEcliptic, o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The same ecliptic direction expressed as right ascension with the obliquity of date (β = 0): tan α = tan λ · cos ε. A coordinate conversion, not a second longitude`]},
+      {label : () => `Perihelion RA, Earth-frame (scene equator)`,
+       value : [ { v: () => o.mercuryPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The scene's own measurement (apparentRaFromPdA): the RA of the perihelion marker seen from the perihelion-of-Earth point, in earth.rotationAxis — the export column 'Perihelion ICRF'. Includes the Step-2 marker convention (angleCorrection); not an observable`]},
       {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.mercuryArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle from ascending node to perihelion, measured in orbital plane: ω = ϖ - Ω`],
@@ -48810,9 +48836,12 @@ const planetStats = {
       {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
        value : [ { v: () => perihelionFrameBreakdown('mercury', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The change of a direction's right ascension caused by the changing obliquity (ε̇ ≈ −47″/cy at J2000)`]},
-      {label : () => `├ Scene coupling (marker λ + of-date)`,
-       value : [ { v: () => perihelionFrameBreakdown('mercury', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`The scene's own conventions: the perihelion marker sits at the IAU longitude + angleCorrection (pipeline Step 2), and the chain carries a small of-date coupling. Closes the sum to the Earth-frame rate below`]},
+      {label : () => `├ Marker offset (angleCorrection)`,
+       value : [ { v: () => perihelionFrameBreakdown('mercury', o.currentYear).markerOffset, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The projection + obliquity-rate terms evaluated where the scene's marker actually sits (IAU λ + angleCorrection, pipeline Step 2) minus the same terms at the IAU λ — the effect of the marker convention on the RA rate`]},
+      {label : () => `├ Of-date coupling (κ)`,
+       value : [ { v: () => perihelionFrameBreakdown('mercury', o.currentYear).kappa, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The remaining residual: the chain's precession-layer tilts make the marker's ecliptic-of-date rate differ slightly from the lattice rate. Closes the sum to the Earth-frame rate below`]},
       {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
        value : [ { v: () => perihelionFrameBreakdown('mercury', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame (which co-moves with its stars) — the quantity the Earth-frame export and the predictive formula produce. No observer publishes this coordinate; every published perihelion rate is an ecliptic longitude`]},
@@ -49027,11 +49056,17 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
-      {label : () => `Longitude of perihelion (ϖ)`,
-       value : [ { v: () => o.venusPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Sum of longitude of ascending node (Ω) and argument of periapsis (ω): ϖ = Ω + ω`],
+      {label : () => `Longitude of perihelion (ϖ), ecliptic`,
+       value : [ { v: () => o.venusPerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Ecliptic longitude of date of the perihelion (ϖ = Ω + ω): the J2000 value advanced at the lattice rate — the coordinate observers publish`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
+      {label : () => `Perihelion direction in RA (fixed equator)`,
+       value : [ { v: () => eclipticLongitudeToRaDeg(o.venusPerihelionEcliptic, o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The same ecliptic direction expressed as right ascension with the obliquity of date (β = 0): tan α = tan λ · cos ε. A coordinate conversion, not a second longitude`]},
+      {label : () => `Perihelion RA, Earth-frame (scene equator)`,
+       value : [ { v: () => o.venusPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The scene's own measurement (apparentRaFromPdA): the RA of the perihelion marker seen from the perihelion-of-Earth point, in earth.rotationAxis — the export column 'Perihelion ICRF'. Includes the Step-2 marker convention (angleCorrection); not an observable`]},
       {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.venusArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle from ascending node to perihelion, measured in orbital plane: ω = ϖ - Ω`],
@@ -49180,9 +49215,12 @@ const planetStats = {
       {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
        value : [ { v: () => perihelionFrameBreakdown('venus', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
-      {label : () => `├ Scene coupling (marker λ + of-date)`,
-       value : [ { v: () => perihelionFrameBreakdown('venus', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `├ Marker offset (angleCorrection)`,
+       value : [ { v: () => perihelionFrameBreakdown('venus', o.currentYear).markerOffset, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The projection and obliquity terms re-evaluated at the scene marker's longitude (IAU λ + angleCorrection) minus the same terms at the IAU λ: the Step-2 marker convention, not physics`]},
+      {label : () => `├ Of-date coupling (κ)`,
+       value : [ { v: () => perihelionFrameBreakdown('venus', o.currentYear).kappa, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`Residual of the chain's of-date coupling: Earth-frame rate − (lattice + projection + obliquity term + marker offset). Bounded by the closure gate (|κ| ≤ 0.71″/cy across all planets)`]},
       {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
        value : [ { v: () => perihelionFrameBreakdown('venus', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
@@ -49369,11 +49407,17 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
-      {label : () => `Longitude of perihelion (ϖ)`,
-       value : [ { v: () => o.marsPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Sum of longitude of ascending node (Ω) and argument of periapsis (ω): ϖ = Ω + ω`],
+      {label : () => `Longitude of perihelion (ϖ), ecliptic`,
+       value : [ { v: () => o.marsPerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Ecliptic longitude of date of the perihelion (ϖ = Ω + ω): the J2000 value advanced at the lattice rate — the coordinate observers publish`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
+      {label : () => `Perihelion direction in RA (fixed equator)`,
+       value : [ { v: () => eclipticLongitudeToRaDeg(o.marsPerihelionEcliptic, o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The same ecliptic direction expressed as right ascension with the obliquity of date (β = 0): tan α = tan λ · cos ε. A coordinate conversion, not a second longitude`]},
+      {label : () => `Perihelion RA, Earth-frame (scene equator)`,
+       value : [ { v: () => o.marsPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The scene's own measurement (apparentRaFromPdA): the RA of the perihelion marker seen from the perihelion-of-Earth point, in earth.rotationAxis — the export column 'Perihelion ICRF'. Includes the Step-2 marker convention (angleCorrection); not an observable`]},
       {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.marsArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle from ascending node to perihelion, measured in orbital plane: ω = ϖ - Ω`],
@@ -49522,9 +49566,12 @@ const planetStats = {
       {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
        value : [ { v: () => perihelionFrameBreakdown('mars', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
-      {label : () => `├ Scene coupling (marker λ + of-date)`,
-       value : [ { v: () => perihelionFrameBreakdown('mars', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `├ Marker offset (angleCorrection)`,
+       value : [ { v: () => perihelionFrameBreakdown('mars', o.currentYear).markerOffset, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The projection and obliquity terms re-evaluated at the scene marker's longitude (IAU λ + angleCorrection) minus the same terms at the IAU λ: the Step-2 marker convention, not physics`]},
+      {label : () => `├ Of-date coupling (κ)`,
+       value : [ { v: () => perihelionFrameBreakdown('mars', o.currentYear).kappa, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`Residual of the chain's of-date coupling: Earth-frame rate − (lattice + projection + obliquity term + marker offset). Bounded by the closure gate (|κ| ≤ 0.71″/cy across all planets)`]},
       {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
        value : [ { v: () => perihelionFrameBreakdown('mars', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
@@ -49711,11 +49758,17 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
-      {label : () => `Longitude of perihelion (ϖ)`,
-       value : [ { v: () => o.jupiterPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Sum of ascending node longitude and argument of periapsis: ϖ = Ω + ω`],
+      {label : () => `Longitude of perihelion (ϖ), ecliptic`,
+       value : [ { v: () => o.jupiterPerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Ecliptic longitude of date of the perihelion (ϖ = Ω + ω): the J2000 value advanced at the lattice rate — the coordinate observers publish`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
+      {label : () => `Perihelion direction in RA (fixed equator)`,
+       value : [ { v: () => eclipticLongitudeToRaDeg(o.jupiterPerihelionEcliptic, o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The same ecliptic direction expressed as right ascension with the obliquity of date (β = 0): tan α = tan λ · cos ε. A coordinate conversion, not a second longitude`]},
+      {label : () => `Perihelion RA, Earth-frame (scene equator)`,
+       value : [ { v: () => o.jupiterPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The scene's own measurement (apparentRaFromPdA): the RA of the perihelion marker seen from the perihelion-of-Earth point, in earth.rotationAxis — the export column 'Perihelion ICRF'. Includes the Step-2 marker convention (angleCorrection); not an observable`]},
       {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.jupiterArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle from ascending node to perihelion, measured in orbital plane: ω = ϖ - Ω`],
@@ -49863,9 +49916,12 @@ const planetStats = {
       {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
        value : [ { v: () => perihelionFrameBreakdown('jupiter', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
-      {label : () => `├ Scene coupling (marker λ + of-date)`,
-       value : [ { v: () => perihelionFrameBreakdown('jupiter', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `├ Marker offset (angleCorrection)`,
+       value : [ { v: () => perihelionFrameBreakdown('jupiter', o.currentYear).markerOffset, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The projection and obliquity terms re-evaluated at the scene marker's longitude (IAU λ + angleCorrection) minus the same terms at the IAU λ: the Step-2 marker convention, not physics`]},
+      {label : () => `├ Of-date coupling (κ)`,
+       value : [ { v: () => perihelionFrameBreakdown('jupiter', o.currentYear).kappa, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`Residual of the chain's of-date coupling: Earth-frame rate − (lattice + projection + obliquity term + marker offset). Bounded by the closure gate (|κ| ≤ 0.71″/cy across all planets)`]},
       {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
        value : [ { v: () => perihelionFrameBreakdown('jupiter', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
@@ -50052,11 +50108,17 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
-      {label : () => `Longitude of perihelion (ϖ)`,
-       value : [ { v: () => o.saturnPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Sum of longitude of ascending node (Ω) and argument of periapsis (ω): ϖ = Ω + ω`],
+      {label : () => `Longitude of perihelion (ϖ), ecliptic`,
+       value : [ { v: () => o.saturnPerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Ecliptic longitude of date of the perihelion (ϖ = Ω + ω): the J2000 value advanced at the lattice rate — the coordinate observers publish`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
+      {label : () => `Perihelion direction in RA (fixed equator)`,
+       value : [ { v: () => eclipticLongitudeToRaDeg(o.saturnPerihelionEcliptic, o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The same ecliptic direction expressed as right ascension with the obliquity of date (β = 0): tan α = tan λ · cos ε. A coordinate conversion, not a second longitude`]},
+      {label : () => `Perihelion RA, Earth-frame (scene equator)`,
+       value : [ { v: () => o.saturnPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The scene's own measurement (apparentRaFromPdA): the RA of the perihelion marker seen from the perihelion-of-Earth point, in earth.rotationAxis — the export column 'Perihelion ICRF'. Includes the Step-2 marker convention (angleCorrection); not an observable`]},
       {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.saturnArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle from ascending node to perihelion, measured in orbital plane: ω = ϖ - Ω`],
@@ -50205,9 +50267,12 @@ const planetStats = {
       {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
        value : [ { v: () => perihelionFrameBreakdown('saturn', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
-      {label : () => `├ Scene coupling (marker λ + of-date)`,
-       value : [ { v: () => perihelionFrameBreakdown('saturn', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `├ Marker offset (angleCorrection)`,
+       value : [ { v: () => perihelionFrameBreakdown('saturn', o.currentYear).markerOffset, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The projection and obliquity terms re-evaluated at the scene marker's longitude (IAU λ + angleCorrection) minus the same terms at the IAU λ: the Step-2 marker convention, not physics`]},
+      {label : () => `├ Of-date coupling (κ)`,
+       value : [ { v: () => perihelionFrameBreakdown('saturn', o.currentYear).kappa, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`Residual of the chain's of-date coupling: Earth-frame rate − (lattice + projection + obliquity term + marker offset). Bounded by the closure gate (|κ| ≤ 0.71″/cy across all planets)`]},
       {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
        value : [ { v: () => perihelionFrameBreakdown('saturn', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
@@ -50394,11 +50459,17 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
-      {label : () => `Longitude of perihelion (ϖ)`,
-       value : [ { v: () => o.uranusPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Sum of longitude of ascending node (Ω) and argument of periapsis (ω): ϖ = Ω + ω`],
+      {label : () => `Longitude of perihelion (ϖ), ecliptic`,
+       value : [ { v: () => o.uranusPerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Ecliptic longitude of date of the perihelion (ϖ = Ω + ω): the J2000 value advanced at the lattice rate — the coordinate observers publish`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
+      {label : () => `Perihelion direction in RA (fixed equator)`,
+       value : [ { v: () => eclipticLongitudeToRaDeg(o.uranusPerihelionEcliptic, o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The same ecliptic direction expressed as right ascension with the obliquity of date (β = 0): tan α = tan λ · cos ε. A coordinate conversion, not a second longitude`]},
+      {label : () => `Perihelion RA, Earth-frame (scene equator)`,
+       value : [ { v: () => o.uranusPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The scene's own measurement (apparentRaFromPdA): the RA of the perihelion marker seen from the perihelion-of-Earth point, in earth.rotationAxis — the export column 'Perihelion ICRF'. Includes the Step-2 marker convention (angleCorrection); not an observable`]},
       {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.uranusArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle from ascending node to perihelion, measured in orbital plane: ω = ϖ - Ω`],
@@ -50547,9 +50618,12 @@ const planetStats = {
       {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
        value : [ { v: () => perihelionFrameBreakdown('uranus', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
-      {label : () => `├ Scene coupling (marker λ + of-date)`,
-       value : [ { v: () => perihelionFrameBreakdown('uranus', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `├ Marker offset (angleCorrection)`,
+       value : [ { v: () => perihelionFrameBreakdown('uranus', o.currentYear).markerOffset, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The projection and obliquity terms re-evaluated at the scene marker's longitude (IAU λ + angleCorrection) minus the same terms at the IAU λ: the Step-2 marker convention, not physics`]},
+      {label : () => `├ Of-date coupling (κ)`,
+       value : [ { v: () => perihelionFrameBreakdown('uranus', o.currentYear).kappa, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`Residual of the chain's of-date coupling: Earth-frame rate − (lattice + projection + obliquity term + marker offset). Bounded by the closure gate (|κ| ≤ 0.71″/cy across all planets)`]},
       {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
        value : [ { v: () => perihelionFrameBreakdown('uranus', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
@@ -50736,11 +50810,17 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
-      {label : () => `Longitude of perihelion (ϖ)`,
-       value : [ { v: () => o.neptunePerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Sum of longitude of ascending node (Ω) and argument of periapsis (ω): ϖ = Ω + ω`],
+      {label : () => `Longitude of perihelion (ϖ), ecliptic`,
+       value : [ { v: () => o.neptunePerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Ecliptic longitude of date of the perihelion (ϖ = Ω + ω): the J2000 value advanced at the lattice rate — the coordinate observers publish`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
+      {label : () => `Perihelion direction in RA (fixed equator)`,
+       value : [ { v: () => eclipticLongitudeToRaDeg(o.neptunePerihelionEcliptic, o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The same ecliptic direction expressed as right ascension with the obliquity of date (β = 0): tan α = tan λ · cos ε. A coordinate conversion, not a second longitude`]},
+      {label : () => `Perihelion RA, Earth-frame (scene equator)`,
+       value : [ { v: () => o.neptunePerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The scene's own measurement (apparentRaFromPdA): the RA of the perihelion marker seen from the perihelion-of-Earth point, in earth.rotationAxis — the export column 'Perihelion ICRF'. Includes the Step-2 marker convention (angleCorrection); not an observable`]},
       {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.neptuneArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle from ascending node to perihelion, measured in orbital plane: ω = ϖ - Ω`],
@@ -50889,9 +50969,12 @@ const planetStats = {
       {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
        value : [ { v: () => perihelionFrameBreakdown('neptune', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
-      {label : () => `├ Scene coupling (marker λ + of-date)`,
-       value : [ { v: () => perihelionFrameBreakdown('neptune', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `├ Marker offset (angleCorrection)`,
+       value : [ { v: () => perihelionFrameBreakdown('neptune', o.currentYear).markerOffset, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The projection and obliquity terms re-evaluated at the scene marker's longitude (IAU λ + angleCorrection) minus the same terms at the IAU λ: the Step-2 marker convention, not physics`]},
+      {label : () => `├ Of-date coupling (κ)`,
+       value : [ { v: () => perihelionFrameBreakdown('neptune', o.currentYear).kappa, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`Residual of the chain's of-date coupling: Earth-frame rate − (lattice + projection + obliquity term + marker offset). Bounded by the closure gate (|κ| ≤ 0.71″/cy across all planets)`]},
       {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
        value : [ { v: () => perihelionFrameBreakdown('neptune', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
@@ -51079,11 +51162,17 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
-      {label : () => `Longitude of perihelion (ϖ)`,
-       value : [ { v: () => o.plutoPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Sum of longitude of ascending node (Ω) and argument of periapsis (ω): ϖ = Ω + ω`],
+      {label : () => `Longitude of perihelion (ϖ), ecliptic`,
+       value : [ { v: () => o.plutoPerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Ecliptic longitude of date of the perihelion (ϖ = Ω + ω): the J2000 value advanced at the lattice rate — the coordinate observers publish`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
+      {label : () => `Perihelion direction in RA (fixed equator)`,
+       value : [ { v: () => eclipticLongitudeToRaDeg(o.plutoPerihelionEcliptic, o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The same ecliptic direction expressed as right ascension with the obliquity of date (β = 0): tan α = tan λ · cos ε. A coordinate conversion, not a second longitude`]},
+      {label : () => `Perihelion RA, Earth-frame (scene equator)`,
+       value : [ { v: () => o.plutoPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The scene's own measurement (apparentRaFromPdA): the RA of the perihelion marker seen from the perihelion-of-Earth point, in earth.rotationAxis — the export column 'Perihelion ICRF'. Includes the Step-2 marker convention (angleCorrection); not an observable`]},
       {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.plutoArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle from ascending node to perihelion, measured in orbital plane: ω = ϖ - Ω`],
@@ -51396,11 +51485,17 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
-      {label : () => `Longitude of perihelion (ϖ)`,
-       value : [ { v: () => o.halleysPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Sum of longitude of ascending node (Ω) and argument of periapsis (ω): ϖ = Ω + ω`],
+      {label : () => `Longitude of perihelion (ϖ), ecliptic`,
+       value : [ { v: () => o.halleysPerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Ecliptic longitude of date of the perihelion (ϖ = Ω + ω): the J2000 value advanced at the lattice rate — the coordinate observers publish`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
+      {label : () => `Perihelion direction in RA (fixed equator)`,
+       value : [ { v: () => eclipticLongitudeToRaDeg(o.halleysPerihelionEcliptic, o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The same ecliptic direction expressed as right ascension with the obliquity of date (β = 0): tan α = tan λ · cos ε. A coordinate conversion, not a second longitude`]},
+      {label : () => `Perihelion RA, Earth-frame (scene equator)`,
+       value : [ { v: () => o.halleysPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The scene's own measurement (apparentRaFromPdA): the RA of the perihelion marker seen from the perihelion-of-Earth point, in earth.rotationAxis — the export column 'Perihelion ICRF'. Includes the Step-2 marker convention (angleCorrection); not an observable`]},
       {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.halleysArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle from ascending node to perihelion, measured in orbital plane: ω = ϖ - Ω`],
@@ -51699,11 +51794,17 @@ const planetStats = {
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
-      {label : () => `Longitude of perihelion (ϖ)`,
-       value : [ { v: () => o.erosPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Sum of longitude of ascending node (Ω) and argument of periapsis (ω): ϖ = Ω + ω`],
+      {label : () => `Longitude of perihelion (ϖ), ecliptic`,
+       value : [ { v: () => o.erosPerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Ecliptic longitude of date of the perihelion (ϖ = Ω + ω): the J2000 value advanced at the lattice rate — the coordinate observers publish`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
+      {label : () => `Perihelion direction in RA (fixed equator)`,
+       value : [ { v: () => eclipticLongitudeToRaDeg(o.erosPerihelionEcliptic, o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The same ecliptic direction expressed as right ascension with the obliquity of date (β = 0): tan α = tan λ · cos ε. A coordinate conversion, not a second longitude`]},
+      {label : () => `Perihelion RA, Earth-frame (scene equator)`,
+       value : [ { v: () => o.erosPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The scene's own measurement (apparentRaFromPdA): the RA of the perihelion marker seen from the perihelion-of-Earth point, in earth.rotationAxis — the export column 'Perihelion ICRF'. Includes the Step-2 marker convention (angleCorrection); not an observable`]},
       {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.erosArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle from ascending node to perihelion, measured in orbital plane: ω = ϖ - Ω`],
@@ -56203,6 +56304,7 @@ function updateDynamicInclinations() {
   // Earth: harmonic formula minus general precession
   const _gprRate = 360 / (holisticyearLength / 13);  // general precession rate (°/yr)
   const earthEclPeri = calcEarthPerihelionPredictive(o.currentYear);
+  o.earthPerihelionEcliptic = earthEclPeri;   // ecliptic longitude of date (the perihelion gauge)
   o.earthPerihelionLongICRF = ((earthEclPeri - _gprRate * (o.currentYear - 2000)) % 360 + 360) % 360;
   // Planets: linear at ICRF rate from J2000 longitudePerihelion
   const _calcPeriICRF = (key) => {

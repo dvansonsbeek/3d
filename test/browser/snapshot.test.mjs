@@ -109,6 +109,9 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     v[`periFrames.${p}.projection@2000`] = b.projection;
     v[`periFrames.${p}.obliquityTerm@2000`] = b.obliquityTerm;
     v[`periFrames.${p}.coupling@2000`] = b.coupling;
+    v[`periFrames.${p}.markerOffset@2000`] = b.markerOffset;
+    v[`periFrames.${p}.kappa@2000`] = b.kappa;
+    v[`periFrames.${p}.projectedRa@2000`] = b.projectedRa;
     v[`periFrames.${p}.earthFrame@2000`] = b.earthFrame;
   }
   v['periFrames.mercury.grAdvance'] = T.relativisticPerihelionAdvanceArcsecCy('mercury');
