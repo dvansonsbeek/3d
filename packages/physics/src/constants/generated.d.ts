@@ -636,6 +636,9 @@ export declare const REFERENCE_DATA: {
     "neptuneObservedRateArcsecCy": number;
     "ascNodeJointRmsArcsec": number;
     "generalPrecessionArcsecCy": number;
+    "generalPrecessionNewcombArcsecCy": number;
+    "mercuryObservedLonOfDateClemenceArcsecCy": number;
+    "mercuryNewtonianClassicalArcsecCy": number;
     "bepiColomboPrecisionArcsec": number;
     "chandlerWobbleCycleMonths": number;
     "chandlerWobbleAmplitudeRange": string;

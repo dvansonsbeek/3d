@@ -22,16 +22,16 @@ This document describes the three methods used to calculate perihelion longitude
 **Physical meaning:** The ecliptic advance projected into the equatorial frame, plus the term the changing obliquity adds to any right ascension — rate_RA = rate_ecl · dα/dλ + ∂α/∂ε · ε̇ (+ a coupling ≤ 0.7 ″/cy), pinned for all seven planets by `tools/verify/perihelion-projection-closure.js` (doc 13 §1.8). In the scene the equatorial frame and the star field share the H/13 rotation, so this rate is the same relative to the equinox and relative to the stars; the frame wording for the physical statement is settled in doc 13 §1.8.
 
 **Characteristics:**
-- Fluctuates over time due to Earth's precession cycles
-- Shows apparent precession rates that vary significantly from the true heliocentric rate
-- Over very long periods (~300,000 years), the average converges to the Ecliptic value
+- A right ascension in the scene's equatorial frame (coordinate b) — no observer publishes this quantity; every published perihelion rate is an ecliptic longitude (coordinate a, Method 2)
+- Fluctuates over time because the projection slope dα/dλ and the obliquity move with Earth's precession cycles
+- Over a full H the average returns to the ecliptic (lattice) value
 
-| Metric | Mercury Example |
+| Metric | Mercury |
 |--------|-----------------|
-| Current rate (year 2000) | ~570 arcsec/century |
-| Long-term average | ~531 arcsec/century |
-| Fluctuation range | ±100 arcsec/century |
-| Fluctuation period | ~7,450 years |
+| Rate at J2000 (Earth-frame RA) | <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->579.83<!--/v--> ″/cy = <!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> × dα/dλ + <!--v:mercuryPeriObliquityRateTermJ2000-->4.31<!--/v--> (+κ) |
+| Lattice (ecliptic) rate | <!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> ″/cy |
+| Earth-frame range over H | <!--v:mercuryFluctuationMin-->-47<!--/v--> to <!--v:mercuryFluctuationMax-->+48<!--/v--> ″/cy about the lattice rate |
+| Dominant Earth-frame period | ~<!--v:mercuryOscillationPeriod-->7,451<!--/v--> years (H/45) |
 
 ### Method 2: Ecliptic-Frame (J2000 Ecliptic)
 
@@ -147,9 +147,9 @@ function perihelionLongitudeEcliptic(precessionLayer, longitudePerihelion) {
 
 This method reads directly from `precessionLayer.orbitObj.rotation.y`, which represents the pure precession angle in the ecliptic plane (rotation around the world Y-axis). This completely bypasses the scene graph hierarchy and Earth's reference frame effects.
 
-### Method 3: Predictive Dynamic (429-term formula)
+### Method 3: Predictive Dynamic (the shipped physical-beat formula)
 
-**What it measures:** The instantaneous geocentric perihelion precession rate at any simulation year, computed analytically from a trained predictive formula.
+**What it measures:** The instantaneous Earth-frame right-ascension rate (coordinate b, Method 1) at any simulation year, computed analytically from the trained physical-beat basis (~2,400 terms; the 429-term system described below is the legacy predecessor and is not shipped).
 
 **Physical meaning:** A machine-learned model of how Earth's reference frame distorts the observed precession rate, capturing all significant harmonics from Earth's obliquity, eccentricity, and perihelion cycles.
 
@@ -161,8 +161,8 @@ This method reads directly from `precessionLayer.orbitObj.rotation.y`, which rep
 
 | Metric | Mercury Example |
 |--------|-----------------|
-| Rate at year 1900 | ~574 arcsec/century |
-| Rate at year 2000 | ~570 arcsec/century |
+| Earth-frame RA rate at 1900 | <!--v:mercuryEarthFrameRa1900-->579.84<!--/v--> arcsec/century |
+| Earth-frame RA rate at 2000 | <!--v:mercuryEarthFrameRa2000-->579.83<!--/v--> arcsec/century |
 | Fluctuation range | ±100 arcsec/century (varies by epoch) |
 | Feature count | 429 terms in 25 groups |
 
