@@ -47510,13 +47510,36 @@ function loadTexture( url, onLoad ) {
 // the predict factory (`_predict`, declared much later) and other late-declared
 // helpers — computing at module load throws TDZ. First render happens at J2000
 // state (before any setEpoch), so lazy computation captures the J2000 value.
-let _mercuryMissingAdvance1900Cache = null;
-function getMercuryMissingAdvance1900() {
-  if (_mercuryMissingAdvance1900Cache === null) {
-    _mercuryMissingAdvance1900Cache =
-      predictGeocentricPrecession(1900, 'mercury') - PREDICT_PLANETS.mercury.baseline;
-  }
-  return _mercuryMissingAdvance1900Cache;
+// ── Perihelion rate in its two coordinates (doc 13 §1.8; gate tools/verify/perihelion-projection-closure.js) ──
+// (a) ecliptic longitude — what observers publish: the lattice rate 360°/perihelionEclipticYears.
+// (b) right ascension in the scene's equator (which co-moves with its stars) — what the
+//     Earth-frame export and the predict basis produce; no observer publishes it:
+//        rate_RA = rate_ecl · dα/dλ(λ, ε) + ∂α/∂ε(λ, ε) · ε̇ + κ
+//     dα/dλ = cos ε / (cos²λ + sin²λ cos²ε),  ∂α/∂ε = −sin λ cos λ sin ε / (cos²λ + sin²λ cos²ε),
+//     λ the IAU J2000 perihelion longitude advanced at the lattice rate, ε the shipped obliquity
+//     law, ε̇ its ±50-yr central difference; κ = the scene's own conventions (the marker sits at
+//     λ + angleCorrection, and the chain's of-date coupling) — |κ| ≤ ~1.4″/cy, measured.
+function perihelionFrameBreakdown(planetKey, year) {
+  const p = planets[planetKey];
+  const D2R = Math.PI / 180;
+  const lattice = 1296000 / p.perihelionEclipticYears * 100;                                    // (a) ″/cy
+  const lam = (p.longitudePerihelion + (360 / p.perihelionEclipticYears) * (year - 2000)) * D2R;
+  const eps = computeObliquityEarth(year) * D2R;
+  const epsRate = (computeObliquityEarth(year + 50) - computeObliquityEarth(year - 50)) * 3600;  // ″/cy
+  const den = Math.cos(lam) ** 2 + Math.sin(lam) ** 2 * Math.cos(eps) ** 2;
+  const projection = lattice * (Math.cos(eps) / den - 1);
+  const obliquityTerm = (-Math.sin(lam) * Math.cos(lam) * Math.sin(eps) / den) * epsRate;
+  const earthFrame = predictGeocentricPrecession(year, planetKey);                              // (b) ″/cy
+  const coupling = earthFrame - lattice - projection - obliquityTerm;
+  return { lattice, projection, obliquityTerm, coupling, earthFrame };
+}
+// The general-relativistic perihelion advance from the model's own constants:
+// 6π GM☉ / (c² a (1 − e²)) per orbit, a from the period (Kepler III), × orbits per century.
+function relativisticPerihelionAdvanceArcsecCy(planetKey) {
+  const p = planets[planetKey];
+  const aKm = Math.pow(p.solarYearInput / (meansiderealyearlengthinSeconds / 86400), 2 / 3) * AU_J2000_KM;
+  const perOrbit = 6 * Math.PI * GM_SUN / (speedOfLight * speedOfLight * aKm * (1 - p.orbitalEccentricityJ2000 ** 2));
+  return perOrbit * (36525 / p.solarYearInput) * 206264.806;
 }
 
 // 0 — per-frame stats
@@ -48774,23 +48797,29 @@ const planetStats = {
       { viz: 'perihelion-chart', planet: 'mercury' },
     null,
     null,
-      {label : () => `┌ Perihelion precession (Heliocentric)`,
+      {label : () => `┌ Perihelion precession, ecliptic (lattice)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.mercury.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`1,296,000 / ${fmtNum(planets.mercury.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.mercury.perihelionEclipticYears),2,',')} arcsec/century (at J2000). Evolves under deep time via H(t)`]},
-      {label : () => `├ Missing advance of perihelion`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'mercury') - PREDICT_PLANETS.mercury.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Fluctuation above/below baseline heliocentric rate at current year`]},
-      {label : () => `└ Perihelion precession (Geocentric)`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'mercury'), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Total geocentric perihelion precession rate at current year (baseline + fluctuation)`]},
+      {label : () => `├ Equatorial projection excess (dα/dλ − 1)`,
+       value : [ { v: () => perihelionFrameBreakdown('mercury', o.currentYear).projection, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The ecliptic (lattice) rate × (dα/dλ − 1): what the same advance gains when expressed as right ascension in the equatorial frame, at the IAU J2000 perihelion longitude and the current obliquity. A coordinate effect, not an observable`]},
+      {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
+       value : [ { v: () => perihelionFrameBreakdown('mercury', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The change of a direction's right ascension caused by the changing obliquity (ε̇ ≈ −47″/cy at J2000)`]},
+      {label : () => `├ Scene coupling (marker λ + of-date)`,
+       value : [ { v: () => perihelionFrameBreakdown('mercury', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The scene's own conventions: the perihelion marker sits at the IAU longitude + angleCorrection (pipeline Step 2), and the chain carries a small of-date coupling. Closes the sum to the Earth-frame rate below`]},
+      {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
+       value : [ { v: () => perihelionFrameBreakdown('mercury', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame (which co-moves with its stars) — the quantity the Earth-frame export and the predictive formula produce. No observer publishes this coordinate; every published perihelion rate is an ecliptic longitude`]},
     null,
-      {label : () => `┌ Missing advance around 1900 AD (Model)`,
-       value : [ { v: () => getMercuryMissingAdvance1900(), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Holistic model prediction for Mercury's missing perihelion advance at year 1900 — frozen at first-access (J2000 state; does not evolve with deep-time scrubbing, since 1900 AD is a fixed historical epoch)`],
-       observed: true},
-      {label : () => `└ Missing advance (GR)`,
-       value : [ { v: () => 42.98, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Einstein's General Relativity prediction: 42.98″/century for Mercury's perihelion advance due to spacetime curvature`],
+      {label : () => `┌ Projection excess at J2000 (model)`,
+       value : [ { v: () => perihelionFrameBreakdown('mercury', 2000).projection, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`531.44 × (dα/dλ − 1) at λ = 77.457°, ε = 23.439°: three inputs (the 8H/11 divisor, the IAU perihelion longitude, the IAU 2006 obliquity), no fit. Agrees with the relativistic advance to 0.6 % — not exactly: the observed excess is 42.980 ± 0.002″/cy, a longitude quantity, 0.27″/cy above this projection`],
+       static: true},
+      {label : () => `└ Relativistic advance (from the model constants)`,
+       value : [ { v: () => relativisticPerihelionAdvanceArcsecCy('mercury'), dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`6π GM☉ / (c² a (1 − e²)) per orbit × orbits per century, from the model's own GM☉, c, a (Kepler III from the period) and e — General Relativity's prediction, 42.98″/cy; confirmed by ranging to ± 0.002″/cy`],
        static: true},
 
     {header : '—  Theorized Precession Breakdown —',
@@ -49138,15 +49167,21 @@ const planetStats = {
       { viz: 'perihelion-chart', planet: 'venus' },
     null,
     null,
-      {label : () => `┌ Perihelion precession (Heliocentric)`,
+      {label : () => `┌ Perihelion precession, ecliptic (lattice)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.venus.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`1,296,000 / ${fmtNum(planets.venus.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.venus.perihelionEclipticYears),2,',')} arcsec/century (at J2000). Evolves under deep time via H(t)`]},
-      {label : () => `├ Missing advance of perihelion`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'venus') - PREDICT_PLANETS.venus.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Fluctuation above/below baseline heliocentric rate at current year`]},
-      {label : () => `└ Perihelion precession (Geocentric)`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'venus'), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Total geocentric perihelion precession rate at current year (baseline + fluctuation)`]},
+      {label : () => `├ Equatorial projection excess (dα/dλ − 1)`,
+       value : [ { v: () => perihelionFrameBreakdown('venus', o.currentYear).projection, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The ecliptic (lattice) rate × (dα/dλ − 1): what the same advance gains when expressed as right ascension in the equatorial frame. A coordinate effect, not an observable`]},
+      {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
+       value : [ { v: () => perihelionFrameBreakdown('venus', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
+      {label : () => `├ Scene coupling (marker λ + of-date)`,
+       value : [ { v: () => perihelionFrameBreakdown('venus', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
+       value : [ { v: () => perihelionFrameBreakdown('venus', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
 
     ],
 
@@ -49474,15 +49509,21 @@ const planetStats = {
       { viz: 'perihelion-chart', planet: 'mars' },
     null,
     null,
-      {label : () => `┌ Perihelion precession (Heliocentric)`,
+      {label : () => `┌ Perihelion precession, ecliptic (lattice)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.mars.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`1,296,000 / ${fmtNum(planets.mars.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.mars.perihelionEclipticYears),2,',')} arcsec/century (at J2000). Evolves under deep time via H(t)`]},
-      {label : () => `├ Missing advance of perihelion`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'mars') - PREDICT_PLANETS.mars.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Fluctuation above/below baseline heliocentric rate at current year`]},
-      {label : () => `└ Perihelion precession (Geocentric)`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'mars'), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Total geocentric perihelion precession rate at current year (baseline + fluctuation)`]},
+      {label : () => `├ Equatorial projection excess (dα/dλ − 1)`,
+       value : [ { v: () => perihelionFrameBreakdown('mars', o.currentYear).projection, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The ecliptic (lattice) rate × (dα/dλ − 1): what the same advance gains when expressed as right ascension in the equatorial frame. A coordinate effect, not an observable`]},
+      {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
+       value : [ { v: () => perihelionFrameBreakdown('mars', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
+      {label : () => `├ Scene coupling (marker λ + of-date)`,
+       value : [ { v: () => perihelionFrameBreakdown('mars', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
+       value : [ { v: () => perihelionFrameBreakdown('mars', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
 
     ],
 
@@ -49809,15 +49850,21 @@ const planetStats = {
       { viz: 'perihelion-chart', planet: 'jupiter' },
     null,
     null,
-      {label : () => `┌ Perihelion precession (Heliocentric)`,
+      {label : () => `┌ Perihelion precession, ecliptic (lattice)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.jupiter.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`1,296,000 / ${fmtNum(planets.jupiter.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.jupiter.perihelionEclipticYears),2,',')} arcsec/century (at J2000). Evolves under deep time via H(t)`]},
-      {label : () => `├ Missing advance of perihelion`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'jupiter') - PREDICT_PLANETS.jupiter.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Fluctuation above/below baseline heliocentric rate at current year`]},
-      {label : () => `└ Perihelion precession (Geocentric)`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'jupiter'), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Total geocentric perihelion precession rate at current year (baseline + fluctuation)`]},
+      {label : () => `├ Equatorial projection excess (dα/dλ − 1)`,
+       value : [ { v: () => perihelionFrameBreakdown('jupiter', o.currentYear).projection, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The ecliptic (lattice) rate × (dα/dλ − 1): what the same advance gains when expressed as right ascension in the equatorial frame. A coordinate effect, not an observable`]},
+      {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
+       value : [ { v: () => perihelionFrameBreakdown('jupiter', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
+      {label : () => `├ Scene coupling (marker λ + of-date)`,
+       value : [ { v: () => perihelionFrameBreakdown('jupiter', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
+       value : [ { v: () => perihelionFrameBreakdown('jupiter', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
 
     ],
 
@@ -50145,15 +50192,21 @@ const planetStats = {
       { viz: 'perihelion-chart', planet: 'saturn' },
     null,
     null,
-      {label : () => `┌ Perihelion precession (Heliocentric)`,
+      {label : () => `┌ Perihelion precession, ecliptic (lattice)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.saturn.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`1,296,000 / ${fmtNum(planets.saturn.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.saturn.perihelionEclipticYears),2,',')} arcsec/century (at J2000). Evolves under deep time via H(t)`]},
-      {label : () => `├ Missing advance of perihelion`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'saturn') - PREDICT_PLANETS.saturn.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Fluctuation above/below baseline heliocentric rate at current year`]},
-      {label : () => `└ Perihelion precession (Geocentric)`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'saturn'), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Total geocentric perihelion precession rate at current year (baseline + fluctuation)`]},
+      {label : () => `├ Equatorial projection excess (dα/dλ − 1)`,
+       value : [ { v: () => perihelionFrameBreakdown('saturn', o.currentYear).projection, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The ecliptic (lattice) rate × (dα/dλ − 1): what the same advance gains when expressed as right ascension in the equatorial frame. A coordinate effect, not an observable`]},
+      {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
+       value : [ { v: () => perihelionFrameBreakdown('saturn', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
+      {label : () => `├ Scene coupling (marker λ + of-date)`,
+       value : [ { v: () => perihelionFrameBreakdown('saturn', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
+       value : [ { v: () => perihelionFrameBreakdown('saturn', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
 
     ],
 
@@ -50481,15 +50534,21 @@ const planetStats = {
       { viz: 'perihelion-chart', planet: 'uranus' },
     null,
     null,
-      {label : () => `┌ Perihelion precession (Heliocentric)`,
+      {label : () => `┌ Perihelion precession, ecliptic (lattice)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.uranus.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`1,296,000 / ${fmtNum(planets.uranus.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.uranus.perihelionEclipticYears),2,',')} arcsec/century (at J2000). Evolves under deep time via H(t)`]},
-      {label : () => `├ Missing advance of perihelion`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'uranus') - PREDICT_PLANETS.uranus.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Fluctuation above/below baseline heliocentric rate at current year`]},
-      {label : () => `└ Perihelion precession (Geocentric)`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'uranus'), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Total geocentric perihelion precession rate at current year (baseline + fluctuation)`]},
+      {label : () => `├ Equatorial projection excess (dα/dλ − 1)`,
+       value : [ { v: () => perihelionFrameBreakdown('uranus', o.currentYear).projection, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The ecliptic (lattice) rate × (dα/dλ − 1): what the same advance gains when expressed as right ascension in the equatorial frame. A coordinate effect, not an observable`]},
+      {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
+       value : [ { v: () => perihelionFrameBreakdown('uranus', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
+      {label : () => `├ Scene coupling (marker λ + of-date)`,
+       value : [ { v: () => perihelionFrameBreakdown('uranus', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
+       value : [ { v: () => perihelionFrameBreakdown('uranus', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
 
     ],
 
@@ -50817,15 +50876,21 @@ const planetStats = {
       { viz: 'perihelion-chart', planet: 'neptune' },
     null,
     null,
-      {label : () => `┌ Perihelion precession (Heliocentric)`,
+      {label : () => `┌ Perihelion precession, ecliptic (lattice)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.neptune.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`1,296,000 / ${fmtNum(planets.neptune.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.neptune.perihelionEclipticYears),2,',')} arcsec/century (at J2000). Evolves under deep time via H(t)`]},
-      {label : () => `├ Missing advance of perihelion`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'neptune') - PREDICT_PLANETS.neptune.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Fluctuation above/below baseline heliocentric rate at current year`]},
-      {label : () => `└ Perihelion precession (Geocentric)`,
-       value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'neptune'), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`Total geocentric perihelion precession rate at current year (baseline + fluctuation)`]},
+      {label : () => `├ Equatorial projection excess (dα/dλ − 1)`,
+       value : [ { v: () => perihelionFrameBreakdown('neptune', o.currentYear).projection, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The ecliptic (lattice) rate × (dα/dλ − 1): what the same advance gains when expressed as right ascension in the equatorial frame. A coordinate effect, not an observable`]},
+      {label : () => `├ Obliquity-rate term (∂α/∂ε · ε̇)`,
+       value : [ { v: () => perihelionFrameBreakdown('neptune', o.currentYear).obliquityTerm, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The change of a direction's right ascension caused by the changing obliquity`]},
+      {label : () => `├ Scene coupling (marker λ + of-date)`,
+       value : [ { v: () => perihelionFrameBreakdown('neptune', o.currentYear).coupling, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The scene's own conventions (marker at the IAU longitude + angleCorrection; the chain's of-date coupling). Closes the sum to the Earth-frame rate below`]},
+      {label : () => `└ Perihelion precession, Earth-frame RA (scene equator)`,
+       value : [ { v: () => perihelionFrameBreakdown('neptune', o.currentYear).earthFrame, dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`The right ascension rate of the perihelion direction in the scene's equatorial frame — what the Earth-frame export and the predictive formula produce. Not an observable; published perihelion rates are ecliptic longitudes`]},
 
     ],
     pluto: [
@@ -51141,13 +51206,13 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.pluto.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr. Derived from perihelion ecliptic period which scales with H(t) — evolves under deep time`]},
     null,
-      {label : () => `┌ Perihelion precession (Heliocentric)`,
+      {label : () => `┌ Perihelion precession, ecliptic (lattice)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.pluto.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`1,296,000 / ${fmtNum(planets.pluto.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.pluto.perihelionEclipticYears),2,',')} arcsec/century (at J2000). Evolves under deep time via H(t)`]},
-      {label : () => `├ Missing advance of perihelion`,
+      {label : () => `├ Earth-frame RA excess (1900–2000)`,
        value : [ { v: () => calculateMissingPerihelionAdvance('pluto'), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Geocentric)`,
+      {label : () => `└ Perihelion precession, Earth-frame RA (1900–2000)`,
        value : [ { v: () => calculateEarthFramePrecession('pluto'), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
@@ -51444,13 +51509,13 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.halleys.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr. Derived from perihelion ecliptic period which scales with H(t) — evolves under deep time`]},
     null,
-      {label : () => `┌ Perihelion precession (Heliocentric)`,
+      {label : () => `┌ Perihelion precession, ecliptic (lattice)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.halleys.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`1,296,000 / ${fmtNum(planets.halleys.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.halleys.perihelionEclipticYears),2,',')} arcsec/century (at J2000). Evolves under deep time via H(t)`]},
-      {label : () => `├ Missing advance of perihelion`,
+      {label : () => `├ Earth-frame RA excess (1900–2000)`,
        value : [ { v: () => calculateMissingPerihelionAdvance('halleys'), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Geocentric)`,
+      {label : () => `└ Perihelion precession, Earth-frame RA (1900–2000)`,
        value : [ { v: () => calculateEarthFramePrecession('halleys'), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
@@ -51747,13 +51812,13 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.eros.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr. Derived from perihelion ecliptic period which scales with H(t) — evolves under deep time`]},
     null,
-      {label : () => `┌ Perihelion precession (Heliocentric)`,
+      {label : () => `┌ Perihelion precession, ecliptic (lattice)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.eros.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`1,296,000 / ${fmtNum(planets.eros.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.eros.perihelionEclipticYears),2,',')} arcsec/century (at J2000). Evolves under deep time via H(t)`]},
-      {label : () => `├ Missing advance of perihelion`,
+      {label : () => `├ Earth-frame RA excess (1900–2000)`,
        value : [ { v: () => calculateMissingPerihelionAdvance('eros'), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Geocentric)`,
+      {label : () => `└ Perihelion precession, Earth-frame RA (1900–2000)`,
        value : [ { v: () => calculateEarthFramePrecession('eros'), dec:2, sep:',' },{ small: '″/100yr' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
