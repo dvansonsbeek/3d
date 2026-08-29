@@ -389,6 +389,37 @@ the two differ by the general precession. The "ICRF rate" of §1.5a
 projection slope depends only on λ and ε and is unaffected; the words
 "of date" around it are the open frame decision of the plan.
 
+**Transits, measured.** A transit is the Sun–Mercury–Earth alignment, so
+its instant depends on where the apsidal line physically points and on no
+observer coordinate — no equator, equinox or ecliptic of date enters. That
+makes the transit record the frame-free test of whether the apsis turns at
+the Newtonian rate or 43 ″/cy faster. `tools/explore/mercury-transit-apsidal-test.mjs`
+runs it: two-body Kepler orbits from the Standish J2000-ecliptic elements,
+light-time included, Mercury's ϖ rate the only quantity varied (Standish
+577.7 ″/cy in the fixed J2000 frame = Newton + GR, versus that minus 42.98),
+a linear ΔL₀ + Δn·T fitted per hypothesis so mean-motion errors cannot pose
+as an apsidal signal, against the 53 catalogue mid-transit instants
+1631–2019. The discriminating signature is that a wrong apsidal rate moves
+the November transits (near perihelion, cos M > 0) and the May transits
+(near aphelion, cos M < 0) in opposite directions, which no linear term or
+ΔT error can absorb. Measured: Newton + GR leaves RMS 87 s with residual
+drifts of −9 (Nov) and +17 (May) s/cy — the two-body noise floor; the
+Newton-only apsis leaves RMS 244 s with the families walking apart at +67
+and −159 s/cy. A scan over the rate offset minimises at +0.1 ″/cy (577.8
+″/cy) on the full record; restricted to 1800–2019 the bowl is shallow and
+minimises at +18 ″/cy — the two-body model's unmodelled perturbations
+(±5-min outliers such as 1832 and 1891) limit a two-century window to
+roughly ±15 ″/cy on the rate, while the Newton-only apsis stays excluded
+there too (RMS 177 s vs 82 s, drifts +97 / −246 s/cy). The catalogue
+instants are ephemeris-computed (they reproduce the 2016/2019 observed
+contacts to seconds), so the precision statement of the same test is
+Morrison & Ward 1975 (MNRAS 173, 183): ~2,400 observed internal contacts
+1677–1973, the perihelion excess over Newtonian a free parameter,
+**+41.9 ± 0.5 ″/cy**. The physical apsidal line turns ~43 ″/cy faster than
+Newton in a measurement that never touches the equator; the projection
+excess of this section, being zero in every equator-free coordinate,
+cannot be that motion.
+
 ---
 
 ## Part 2: Implementation
