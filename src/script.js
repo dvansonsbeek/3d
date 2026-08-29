@@ -5962,6 +5962,10 @@ function currentEpochTMa() { return currentEpoch_t_Ma; }
 if (typeof window !== 'undefined') {
   window.__test__ = {
     setEpochByAge, setEpoch, resetEpochToJ2000, currentEpochTMa, isDeepTimeMode,
+    // Cycles-tab perihelion breakdown (doc 13 §1.8): the two coordinates and the
+    // relativistic advance from the model constants — probed by the browser golden
+    // so the panel can never drift from the registry / closure gate silently.
+    perihelionFrameBreakdown, relativisticPerihelionAdvanceArcsecCy,
     // f(Y) — the plan §5a "year lengths" row
     computeSolarYearDaysFromCardinals,
     computeSiderealYearDaysDirect,
