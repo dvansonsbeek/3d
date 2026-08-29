@@ -342,15 +342,14 @@ to the longitude rate, in which the anomaly is defined. A sum that applies
 the slope to the sidereal rate but not to p_A, or takes the obliquity term
 with the opposite sign, mixes the two coordinates and is not a decomposition.
 
-Two longitudes are in circulation and the difference between them is a
-convention, not a measurement. The scene places each perihelion marker so that
-its **RA** equals the catalogue longitude (pipeline Step 2 solves
-`angleCorrection` for that; it is the inverse RA→λ conversion at each
-planet's longitude, verified for all seven to 0.001°). Reading A takes the
-catalogue value as a true ecliptic longitude (λ = 77.457°, excess 42.71);
-reading B takes the marker's longitude (λ = 78.43°, excess
-<!--v:mercuryPeriProjectionExcessMarkerJ2000-->43.45<!--/v-->). Both are within
-1 % of the GR value; they differ by 0.74 ″/cy.
+The derivation uses the IAU longitude (λ = 77.457°). The scene's own
+perihelion marker sits 0.97° further (λ + `angleCorrection` = 78.43°) because
+pipeline Step 2 places each marker so that its **RA** equals the catalogue
+longitude — a scene convention that the two-vector orbit construction needs
+(marker vector M plus a node-perpendicular vector E, |E| = |M|/2 for Type I;
+measured for all seven planets), not a second physical longitude. The
+`…Marker…` registry keys record that convention; they are not a reading of
+the anomaly.
 
 **All planets.** The same projection, same constants:
 
