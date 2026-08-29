@@ -5966,6 +5966,9 @@ if (typeof window !== 'undefined') {
     // relativistic advance from the model constants — probed by the browser golden
     // so the panel can never drift from the registry / closure gate silently.
     perihelionFrameBreakdown, relativisticPerihelionAdvanceArcsecCy,
+    // WebGeoCalc explorer: the two model curves (A lattice ecliptic, B + equatorial
+    // projection) and the two renderers, so the overlay can be smoke-tested headlessly
+    wgcModelCurves, wgcRenderChart, wgcPaperChartPanel,
     // f(Y) — the plan §5a "year lengths" row
     computeSolarYearDaysFromCardinals,
     computeSiderealYearDaysDirect,
@@ -17794,7 +17797,7 @@ function wgcLinearFit(x, y) {
 }
 
 /** Render an SVG line chart with data + trend line. */
-function wgcRenderChart(title, yrArr, values, color, label, modelValues, omitRate) {
+function wgcRenderChart(title, yrArr, values, color, label, modelValues, omitRate, modelValues2) {
   const W = 800, H = 180;
   const margin = { top: 18, right: 20, bottom: 24, left: 60 };
   const plotW = W - margin.left - margin.right;
@@ -17803,12 +17806,14 @@ function wgcRenderChart(title, yrArr, values, color, label, modelValues, omitRat
   const unwrapped = wgcUnwrap(values);
   const fit = wgcLinearFit(yrArr, unwrapped);
 
-  // Optional modelValues: parallel array to yrArr with model's predicted ϖ(t)
-  // (baseline + missing advance integrated from J2000). Plotted as red polyline.
+  // Optional modelValues (curve A, lattice in ecliptic longitude — red, solid) and
+  // modelValues2 (curve B, lattice + equatorial projection — orange, dashed): parallel
+  // arrays to yrArr, see wgcModelCurves.
 
-  // Find min/max of UNWRAPPED values + trend line + model line for scaling
+  // Find min/max of UNWRAPPED values + trend line + model lines for scaling
   const allY = [...unwrapped];
   if (modelValues) allY.push(...modelValues);
+  if (modelValues2) allY.push(...modelValues2);
   const ymin = Math.min(...allY);
   const ymax = Math.max(...allY);
   const yPad = (ymax - ymin) * 0.05 || 1;
@@ -17862,6 +17867,7 @@ function wgcRenderChart(title, yrArr, values, color, label, modelValues, omitRat
         ${yticks.join('')}
         ${xticks.join('')}
         ${modelValues ? `<path d="${modelValues.map((v, i) => (i === 0 ? 'M' : 'L') + sx(yrArr[i]).toFixed(1) + ',' + sy(v).toFixed(1)).join(' ')}" fill="none" stroke="#ff5252" stroke-width="1.4" opacity="0.95"/>` : ''}
+        ${modelValues2 ? `<path d="${modelValues2.map((v, i) => (i === 0 ? 'M' : 'L') + sx(yrArr[i]).toFixed(1) + ',' + sy(v).toFixed(1)).join(' ')}" fill="none" stroke="#ffa726" stroke-width="1.4" stroke-dasharray="5,3" opacity="0.95"/>` : ''}
         <path d="${pathPoints}" fill="none" stroke="${color}" stroke-width="1.4" opacity="0.95"/>
         ${(() => {
           const xJ2000 = sx(2000);
@@ -17873,11 +17879,13 @@ function wgcRenderChart(title, yrArr, values, color, label, modelValues, omitRat
         <text x="${W - margin.right}" y="${margin.top - 4}" text-anchor="end" font-size="10" font-family="Inter,system-ui,sans-serif" fill="#ccc">start: ${startVal.toFixed(3)}\u00B0 &#8594; end: ${endVal.toFixed(3)}\u00B0</text>
         ${modelValues ? `
         <g font-family="Inter,system-ui,sans-serif" font-size="9">
-          <rect x="${(margin.left + 6).toFixed(1)}" y="${(margin.top + 4).toFixed(1)}" width="84" height="26" fill="rgba(0,0,0,0.55)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5" rx="3"/>
+          <rect x="${(margin.left + 6).toFixed(1)}" y="${(margin.top + 4).toFixed(1)}" width="196" height="${modelValues2 ? 38 : 26}" fill="rgba(0,0,0,0.55)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5" rx="3"/>
           <line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 11).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 11).toFixed(1)}" stroke="${color}" stroke-width="1.6"/>
-          <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 14).toFixed(1)}" fill="#ccc">Observed</text>
+          <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 14).toFixed(1)}" fill="#ccc">Observed (WebGeoCalc, ecliptic)</text>
           <line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 23).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 23).toFixed(1)}" stroke="#ff5252" stroke-width="1.6"/>
-          <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 26).toFixed(1)}" fill="#ccc">Model</text>
+          <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 26).toFixed(1)}" fill="#ccc">Model A: lattice, ecliptic</text>
+          ${modelValues2 ? `<line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 35).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 35).toFixed(1)}" stroke="#ffa726" stroke-width="1.6" stroke-dasharray="4,2"/>
+          <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 38).toFixed(1)}" fill="#ccc">Model B: + equatorial projection (hypothesis)</text>` : ''}
         </g>` : ''}
       </svg>
       <div class="wgc-chart-footer">
@@ -17921,45 +17929,24 @@ function wgcRenderPlanet(planetKey) {
   // Only Mercury and Mars have reliably resolvable trends from this baseline.
   const undeterminedTrend = ['VENUS', 'JUPITER', 'SATURN', 'URANUS', 'NEPTUNE'].includes(planetKey.toUpperCase());
 
-  // Model's predicted trajectory using predictGeocentricPrecession(year, planet):
-  //   baseline rate + missing-advance formula (fitted to observations).
-  // We integrate the instantaneous rate to build the full ϖ(t) curve.
-  const modelPlanetKey = planetKey.toLowerCase();
-  const modelPlanet = planets[modelPlanetKey];
-  const modelBaselineCy = modelPlanet ? (360 / modelPlanet.perihelionEclipticYears) * 3600 * 100 : null;
-  const modelBaselinePeriodYr = modelPlanet ? Math.abs(modelPlanet.perihelionEclipticYears) : null;
-  let modelValues = null;
-  let modelRateAtJ2000 = null;
-  let modelMissingAdvance = null;
-  if (modelPlanet && typeof predictGeocentricPrecession === 'function' && PREDICT_PLANETS && PREDICT_PLANETS[modelPlanetKey]) {
-    // Find index nearest to year 2000 (J2000 anchor)
-    let j2000Idx = 0;
-    for (let i = 1; i < d.yrArr.length; i++) {
-      if (Math.abs(d.yrArr[i] - 2000) < Math.abs(d.yrArr[j2000Idx] - 2000)) j2000Idx = i;
-    }
-    modelValues = new Array(d.yrArr.length);
-    // WebGeoCalc's ϖ(t) is an ECLIPTIC longitude, so the comparable model curve is the
-    // lattice advance in ecliptic longitude — a straight line at 360°/perihelionEclipticYears
-    // through the J2000 longitude. (The Earth-frame RA rate the predictive formula produces
-    // is a different coordinate — doc 13 §1.8 — and is reported separately below.)
-    for (let i = 0; i < d.yrArr.length; i++) {
-      modelValues[i] = modelPlanet.longitudePerihelion + (360 / modelPlanet.perihelionEclipticYears) * (d.yrArr[i] - 2000);
-    }
-    modelRateAtJ2000 = predictGeocentricPrecession(2000, modelPlanetKey);
-    modelMissingAdvance = modelRateAtJ2000 - modelBaselineCy;
-  }
+  // The two model curves (A: lattice in ecliptic longitude; B: lattice + equatorial
+  // projection, the projection hypothesis) — see wgcModelCurves.
+  const model = wgcModelCurves(planetKey, d);
+  const diffStr = (rate) => undeterminedTrend ? '—' : `${(rateSinCy - rate) >= 0 ? '+' : ''}${(rateSinCy - rate).toFixed(1)}`;
 
   return `
     <div class="wgc-planet-content">
       <div class="wgc-planet-title">${planetKey} PERIHELION PRECESSION</div>
       <div class="wgc-planet-summary">
         <div><span style="color:#268bd2">\u2501\u2501</span> <b>Observed:</b> ${undeterminedTrend ? '<span style="color:#cb4b16;">\u26a0 trend cannot be determined from 1900\u20132026 baseline</span>' : `[raw OLS] ${rateRawCy.toFixed(1)} \u2033/cy \u2022 [sin+lin] ${rateSinCy.toFixed(1)} \u2033/cy`}</div>
-        ${modelRateAtJ2000 !== null ? (() => { const fb = perihelionFrameBreakdown(modelPlanetKey, 2000); return `<div><span style="color:#ff5252">\u2501\u2501</span> <b>Model, ecliptic (lattice):</b> ${modelBaselineCy.toFixed(1)} \u2033/cy <span style="color:#aaa">\u2014 the comparable coordinate; observed \u2212 model = ${(undeterminedTrend ? NaN : rateSinCy - modelBaselineCy).toFixed(1)} \u2033/cy</span></div><div><span style="color:#aaa">Same advance in right ascension (fixed equator): ${fb.projectedRa.toFixed(1)} \u2033/cy \u2022 Earth-frame RA (scene equator, the export/predict quantity): ${modelRateAtJ2000.toFixed(1)} \u2033/cy \u2014 different coordinates, not comparable with WebGeoCalc</span></div>`; })() : ''}
+        ${model ? `<div><span style="color:#ff5252">\u2501\u2501</span> <b>Model A, lattice (ecliptic):</b> ${model.latticeCy.toFixed(1)} \u2033/cy <span style="color:#aaa">\u2014 observed \u2212 model = ${diffStr(model.latticeCy)} \u2033/cy</span></div>
+        <div><span style="color:#ffa726">\u254c\u254c</span> <b>Model B, lattice + equatorial projection (d\u03b1/d\u03bb \u2212 1):</b> ${model.projectedCy.toFixed(1)} \u2033/cy <span style="color:#aaa">\u2014 observed \u2212 model = ${diffStr(model.projectedCy)} \u2033/cy \u2022 projection hypothesis, doc 13 \u00a71.8 (excess ${model.excessCy >= 0 ? '+' : ''}${model.excessCy.toFixed(2)} \u2033/cy at J2000)</span></div>
+        ${model.grCy !== null ? `<div><span style="color:#aaa">&nbsp;&nbsp;&nbsp;&nbsp; reference: relativistic advance from the model constants ${model.grCy >= 0 ? '+' : ''}${model.grCy.toFixed(2)} \u2033/cy \u2192 lattice + GR = ${(model.latticeCy + model.grCy).toFixed(1)} \u2033/cy</span></div>` : ''}` : ''}
       </div>
       <div class="wgc-planet-method">
         Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}${undeterminedTrend ? '<br><span style="color:#cb4b16;">\u26a0 Long-term trend <b>cannot be determined</b> from 1900\u20132026 observations \u2014 short-baseline trend flips sign across sub-windows (1800\u20131900, 1900\u20132026, 2026\u20132100). Only Mercury, Mars, and Saturn have reliably resolvable trends from observation.</span>' : ''}
       </div>
-      ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#ff5252">red line = model (baseline + missing advance)</span>`, modelValues, undeterminedTrend)}
+      ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#ff5252">red = model A (lattice, ecliptic)</span> \u2022 <span style="color:#ffa726">orange dashed = model B (+ equatorial projection, hypothesis)</span>`, model ? model.lattice : null, undeterminedTrend, model ? model.projected : null)}
       <div class="wgc-frame-note">
         <b>Frame note:</b> All angles (\u03A9, \u03C9, \u03D6) are measured in the <b>ECLIPJ2000</b> frame \u2014
         Earth\u2019s mean ecliptic at J2000, an inertial reference plane. Earth\u2019s current orbital plane
@@ -17977,34 +17964,34 @@ function wgcRenderPlanet(planetKey) {
   `;
 }
 
-// Compute the model perihelion curve (for paper export) — mirrors the integration
-// logic in wgcRenderPlanet so the exported figure carries the same red model overlay.
-function wgcComputeModelCurve(planetKey, d) {
+// The two model curves drawn against WebGeoCalc's ϖ(t) — shared by the
+// on-screen explorer and the paper export so both carry the same overlay.
+//   A  lattice, ecliptic:  ϖ = λ₀ + (360°/perihelionEclipticYears)·(y − 2000)
+//      — the comparable coordinate (WebGeoCalc's ϖ is an ECLIPJ2000 longitude).
+//   B  lattice + equatorial projection (dα/dλ − 1), the projection hypothesis
+//      of doc 13 §1.8: ϖ = λ₀ + (projectedRa/360000)·(y − 2000), i.e. the same
+//      advance re-expressed in right ascension on a fixed equator (Mercury
+//      531.44 + 42.71 = 574.14). Drawn for every planet by the same rule so
+//      the chart itself is the pre-registered test: for Mercury B lands next
+//      to the data; the relativistic advance from the model constants is
+//      reported beside it for the comparison.
+// The Earth-frame RA rate (predictGeocentricPrecession, the export/predict
+// quantity) is a third coordinate and stays on the Cycles tab, not here.
+function wgcModelCurves(planetKey, d) {
   const modelPlanetKey = planetKey.toLowerCase();
   const modelPlanet = planets[modelPlanetKey];
-  if (!modelPlanet || typeof predictGeocentricPrecession !== 'function' || !PREDICT_PLANETS || !PREDICT_PLANETS[modelPlanetKey]) return null;
-  let j2000Idx = 0;
-  for (let i = 1; i < d.yrArr.length; i++) {
-    if (Math.abs(d.yrArr[i] - 2000) < Math.abs(d.yrArr[j2000Idx] - 2000)) j2000Idx = i;
+  if (!modelPlanet || typeof perihelionFrameBreakdown !== 'function' || !PREDICT_PLANETS || !PREDICT_PLANETS[modelPlanetKey]) return null;
+  const fb = perihelionFrameBreakdown(modelPlanetKey, 2000);
+  const latticeCy = 1296000 / modelPlanet.perihelionEclipticYears * 100;   // ″/cy in ecliptic longitude
+  const projectedCy = fb.projectedRa;                                     // ″/cy in RA (fixed equator)
+  const lattice = new Array(d.yrArr.length), projected = new Array(d.yrArr.length);
+  for (let i = 0; i < d.yrArr.length; i++) {
+    const dy = d.yrArr[i] - 2000;
+    lattice[i]   = modelPlanet.longitudePerihelion + latticeCy   / 360000 * dy;
+    projected[i] = modelPlanet.longitudePerihelion + projectedCy / 360000 * dy;
   }
-  const mv = new Array(d.yrArr.length);
-  mv[j2000Idx] = modelPlanet.longitudePerihelion;
-  for (let i = j2000Idx + 1; i < d.yrArr.length; i++) {
-    const dt = d.yrArr[i] - d.yrArr[i - 1];
-    const r = 0.5 * (predictGeocentricPrecession(d.yrArr[i - 1], modelPlanetKey)
-                   + predictGeocentricPrecession(d.yrArr[i], modelPlanetKey));
-    mv[i] = mv[i - 1] + r * dt / 360000;
-  }
-  for (let i = j2000Idx - 1; i >= 0; i--) {
-    const dt = d.yrArr[i + 1] - d.yrArr[i];
-    const r = 0.5 * (predictGeocentricPrecession(d.yrArr[i], modelPlanetKey)
-                   + predictGeocentricPrecession(d.yrArr[i + 1], modelPlanetKey));
-    mv[i] = mv[i + 1] - r * dt / 360000;
-  }
-  const modelBaselineCy = (360 / modelPlanet.perihelionEclipticYears) * 3600 * 100;
-  const modelRateAtJ2000 = predictGeocentricPrecession(2000, modelPlanetKey);
-  const modelMissingAdvance = modelRateAtJ2000 - modelBaselineCy;
-  return { values: mv, baselineCy: modelBaselineCy, rateAtJ2000: modelRateAtJ2000, missingAdvance: modelMissingAdvance };
+  const grCy = (typeof relativisticPerihelionAdvanceArcsecCy === 'function') ? relativisticPerihelionAdvanceArcsecCy(modelPlanetKey) : null;
+  return { lattice, projected, latticeCy, projectedCy, excessCy: fb.projection, grCy, earthFrameCy: fb.earthFrame };
 }
 
 // Paper-styled single chart panel for the export SVG.
@@ -18012,13 +17999,13 @@ function wgcComputeModelCurve(planetKey, d) {
 // in paper-friendly colors against a near-white plot area.
 function wgcPaperChartPanel(xOff, yOff, W, H, opts) {
   const xmlEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const { title, yrArr, values, color, modelValues, label, omitRate } = opts;
+  const { title, yrArr, values, color, modelValues, modelValues2, label, omitRate } = opts;
   const m = { top: 30, right: 24, bottom: 32, left: 70 };
   const plotW = W - m.left - m.right;
   const plotH = H - m.top - m.bottom;
   const unwrapped = wgcUnwrap(values);
   const fit = wgcLinearFit(yrArr, unwrapped);
-  const allY = [...unwrapped]; if (modelValues) allY.push(...modelValues);
+  const allY = [...unwrapped]; if (modelValues) allY.push(...modelValues); if (modelValues2) allY.push(...modelValues2);
   const ymin = Math.min(...allY), ymax = Math.max(...allY);
   const yPad = (ymax - ymin) * 0.05 || 1;
   const y0 = ymin - yPad, y1 = ymax + yPad;
@@ -18058,11 +18045,16 @@ function wgcPaperChartPanel(xOff, yOff, W, H, opts) {
     s += `<line x1="${xJ2000.toFixed(1)}" y1="${(yOff + m.top).toFixed(1)}" x2="${xJ2000.toFixed(1)}" y2="${(yOff + m.top + plotH).toFixed(1)}" stroke="#888" stroke-width="0.6" stroke-dasharray="2,3"/>`;
     s += `<text x="${xJ2000.toFixed(1)}" y="${(yOff + m.top + 10).toFixed(1)}" text-anchor="middle" font-size="9" fill="#888">J2000</text>`;
   }
-  // Model line (red) drawn first, observed (blue) on top
+  // Model lines (A red solid, B orange dashed) drawn first, observed (blue) on top
   if (modelValues) {
     let p = '';
     for (let i = 0; i < modelValues.length; i++) p += (i === 0 ? 'M' : 'L') + sx(yrArr[i]).toFixed(1) + ',' + sy(modelValues[i]).toFixed(1) + ' ';
     s += `<path d="${p.trim()}" fill="none" stroke="#cc3333" stroke-width="1.4" opacity="0.95"/>`;
+  }
+  if (modelValues2) {
+    let p = '';
+    for (let i = 0; i < modelValues2.length; i++) p += (i === 0 ? 'M' : 'L') + sx(yrArr[i]).toFixed(1) + ',' + sy(modelValues2[i]).toFixed(1) + ' ';
+    s += `<path d="${p.trim()}" fill="none" stroke="#e08a00" stroke-width="1.4" stroke-dasharray="5,3" opacity="0.95"/>`;
   }
   // Observed data line
   let p = '';
@@ -18076,11 +18068,15 @@ function wgcPaperChartPanel(xOff, yOff, W, H, opts) {
   // Legend (only on chart with model overlay)
   if (modelValues) {
     const lx = xOff + m.left + 8, ly = yOff + m.top + 8;
-    s += `<rect x="${lx}" y="${ly}" width="100" height="32" fill="rgba(255,255,255,0.85)" stroke="#ccc" stroke-width="0.5" rx="3"/>`;
+    s += `<rect x="${lx}" y="${ly}" width="250" height="${modelValues2 ? 45 : 32}" fill="rgba(255,255,255,0.85)" stroke="#ccc" stroke-width="0.5" rx="3"/>`;
     s += `<line x1="${lx + 6}" y1="${ly + 11}" x2="${lx + 22}" y2="${ly + 11}" stroke="${color}" stroke-width="1.6"/>`;
-    s += `<text x="${lx + 27}" y="${ly + 14}" font-size="10" fill="${COL_TEXT}">Observed</text>`;
+    s += `<text x="${lx + 27}" y="${ly + 14}" font-size="10" fill="${COL_TEXT}">Observed (WebGeoCalc, ecliptic)</text>`;
     s += `<line x1="${lx + 6}" y1="${ly + 24}" x2="${lx + 22}" y2="${ly + 24}" stroke="#cc3333" stroke-width="1.6"/>`;
-    s += `<text x="${lx + 27}" y="${ly + 27}" font-size="10" fill="${COL_TEXT}">Model</text>`;
+    s += `<text x="${lx + 27}" y="${ly + 27}" font-size="10" fill="${COL_TEXT}">Model A: lattice, ecliptic</text>`;
+    if (modelValues2) {
+      s += `<line x1="${lx + 6}" y1="${ly + 37}" x2="${lx + 22}" y2="${ly + 37}" stroke="#e08a00" stroke-width="1.6" stroke-dasharray="4,2"/>`;
+      s += `<text x="${lx + 27}" y="${ly + 40}" font-size="10" fill="${COL_TEXT}">Model B: + equatorial projection (hypothesis)</text>`;
+    }
   }
   // Rate footer (omitted when omitRate is true — for planets whose long-term trend
   // cannot be determined from the 1900–2026 baseline)
@@ -18112,7 +18108,7 @@ function wgcRenderPaperSVG(planetKey, opts) {
   const nCycles = baselineYr / oscPeriod;
   const reliable = nCycles >= 4;
   const undeterminedTrend = ['VENUS', 'JUPITER', 'SATURN', 'URANUS', 'NEPTUNE'].includes(planetKey.toUpperCase());
-  const model = wgcComputeModelCurve(planetKey, d);
+  const model = wgcModelCurves(planetKey, d);
 
   // Layout
   const W = 1100;
@@ -18137,7 +18133,8 @@ function wgcRenderPaperSVG(planetKey, opts) {
     : `Observed: raw OLS ${rateRawCy.toFixed(1)} ″/cy · sin+lin ${rateSinCy.toFixed(1)} ″/cy`;
   s += `<text x="40" y="72" font-size="12" fill="${COL_TEXT}">${xmlEsc(observedLine)}</text>`;
   if (model) {
-    const modelLine = `Model: ${model.rateAtJ2000.toFixed(1)} ″/cy (baseline ${model.baselineCy.toFixed(1)} + missing advance ${model.missingAdvance.toFixed(1)})`;
+    const grPart = model.grCy !== null ? ` · reference: relativistic advance from the model constants ${model.grCy.toFixed(2)} ″/cy` : '';
+    const modelLine = `Model A, lattice (ecliptic): ${model.latticeCy.toFixed(1)} ″/cy · Model B, + equatorial projection (hypothesis): ${model.projectedCy.toFixed(1)} ″/cy (excess ${model.excessCy.toFixed(2)})${grPart}`;
     s += `<text x="40" y="88" font-size="12" fill="${COL_TEXT}">${xmlEsc(modelLine)}</text>`;
   }
   s += `<text x="40" y="${model ? 104 : 88}" font-size="11" fill="${COL_DIM}">Baseline: ${Math.round(baselineYr)} yr · ${nCycles.toFixed(1)}× dominant oscillation period (${oscPeriod} yr) · ${reliable ? 'raw OLS reliable' : '⚠ too few cycles — use sin+lin'}</text>`;
@@ -18147,7 +18144,7 @@ function wgcRenderPaperSVG(planetKey, opts) {
   s += wgcPaperChartPanel(0, HEADER_H, W, CHART_H, {
     title: 'Longitude of perihelion vs. Time (ϖ = Ω + ω)',
     yrArr: d.yrArr, values: d.piArr, color: '#1976d2',
-    modelValues: model ? model.values : null, label: piLabel, omitRate: undeterminedTrend,
+    modelValues: model ? model.lattice : null, modelValues2: model ? model.projected : null, label: piLabel, omitRate: undeterminedTrend,
   });
   if (includeAll) {
     s += wgcPaperChartPanel(0, HEADER_H + CHART_H + CHART_GAP, W, CHART_H, {
