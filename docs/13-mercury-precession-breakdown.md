@@ -441,6 +441,33 @@ data want ≈ 0 and the rule gives −101; a constant fraction of the
 Newtonian rate, k/a, and the nearest 8H/N slot fail. The lattice-native
 slot is empty; a proposal is scored by defining its function there.
 
+**Observation-first audit — what is measured, what is integrated, what is a
+mean.** Three quantities get conflated in perihelion discussions: (A) an
+eigenfrequency or first-order secular *mean* (a ≥ 10⁵-yr average of one
+mode), (B) the instantaneous secular rate at this epoch (what an N-body
+integration gives now), and (C) a short-window trend through an osculating
+element (WebGeoCalc, 1800–2100). Saturn is the worked example: first-order
+Laplace–Lagrange gives +1,867 (A); the observed window trend is −1,600 (C);
+and the standard mean elements for 1800–2050 already read −1,508 (B) — the
+theory does not "assume prograde", the first-order *approximation* does,
+and nobody predicts with it. `tools/explore/perihelion-observation-audit.mjs`
+puts B beside C for every planet using the model's own 9-body Newtonian
+integrator (DE440 mass ratios, no relativistic term anywhere), seeded from
+the observed J2000 state vectors (JPL Horizons; seeding from Standish's
+*mean* elements loses the phase of the 883-yr great-inequality term and
+mis-states Saturn by 1,300 ″/cy — measured, kept as an option), at a step
+size where the integrator's own spurious apsidal drift is 0.01 ″/cy (dt
+0.5 d gave +85 ″/cy for Mercury, measured). Result, N-body − WebGeoCalc
+over the same window with the same estimator: Mercury **−43.0**, Earth
+−6.3, Mars −1.4, Jupiter −32, Saturn +23 (−1,577 vs −1,600: the
+retrograde motion is reproduced), Uranus +0.3; Venus and Neptune have
+ill-conditioned ϖ (e < 0.01). Every planet sits inside the window scatter
+(inner ≲ 6, the great-inequality pair ≲ 30) except Mercury, whose −43 is
+the excess apsidal advance, produced by Newton's law and the measured
+masses alone. The lattice 8H/N column is quantity A — the long-term-mean
+layer — and is not comparable with B or C; that is the model's own
+kinematic-vs-dynamical rule, now with the numbers beside it.
+
 ---
 
 ## Part 2: Implementation
