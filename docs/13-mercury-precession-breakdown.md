@@ -420,6 +420,27 @@ Newton in a measurement that never touches the equator; the projection
 excess of this section, being zero in every equator-free coordinate,
 cannot be that motion.
 
+**Pre-registered slot for a lattice-native cause.** Since the excess is a
+property of the orbit, any explanation must be a rule that acts at the
+body — one formula for every body from lattice/orbital quantities only (H,
+8H/N, a, e, period, masses), with no obliquity and no longitude measured
+from the equinox, and no parameter fitted to the targets (or fitted on
+Mercury alone and then predicting the rest). The harness
+`tools/explore/perihelion-excess-candidates.mjs` scores such rules against
+the non-circular targets — Mercury 41.9 ± 0.5 (transits, free parameter),
+Icarus ≈ 9.9 ± 2 (radar, free parameter; uncertainty a placeholder to be
+refined from Shapiro et al. 1968/1971, Lieske & Null 1969), and Mars
+≈ +0.6 ± 3, the ecliptic-longitude trend of the model's own WebGeoCalc
+series minus the Newtonian rate from the masses — with the GR-inclusive
+fit residuals (Venus, Earth, Mars) shown separately as informative only.
+As shipped: GR (zero parameters) passes; the equatorial projection passes
+Mercury and Icarus (a second ~5 % coincidence: at ϖ = 119° the RA stretch
+is ~4 %, and so is GR/Newtonian for Icarus) and fails Mars by 34σ, because
+in ecliptic longitude the projection is identically zero while the Mars
+data want ≈ 0 and the rule gives −101; a constant fraction of the
+Newtonian rate, k/a, and the nearest 8H/N slot fail. The lattice-native
+slot is empty; a proposal is scored by defining its function there.
+
 ---
 
 ## Part 2: Implementation
