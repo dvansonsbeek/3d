@@ -41,6 +41,17 @@ does not "assume prograde"; the first-order *approximation* does, and nobody
 predicts with it. The lattice's 8H/N divisors are A-type claims and can only
 be tested against A-type quantities.
 
+Even C is not one number: the same DE series
+(`public/input/wgc-perihelion-data.json`, its `windowRates` fields) fits
+−1,599 over the full 300-yr window (15 cycles of the 19.9-yr Jupiter–Saturn
+oscillation — the wiggle averages out, and the value agrees with the
+mean-element B) but −3,337 / −3,669 / −3,094 over its three century-scale
+sub-windows (1800–1900, 1900–2026, 2026–2100 — only 4–6 wiggle cycles each,
+so the fit is dominated by the wiggle's edge phase). The site's reference
+value ~−3,400 (`saturnObservedRateArcsecCy`) is the rounded representative
+of that century-window family; the −1,600 used in §2 is the 300-yr fit.
+Same data, different spans — a C-type number must state its window.
+
 ## 2. Observation-first audit — what is measured, what is integrated
 
 `perihelion-observation-audit.mjs` puts B beside C for every planet using
