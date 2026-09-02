@@ -145,9 +145,11 @@ export { createSunLongitudeCorrection } from './sun/longitude-correction.cjs';
  * even though the body is empty.
  *
  * @param {Constants} [constants]
+ * @param {{ laws?: { eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number } }} [opts]
+ *   `laws` — research overrides for Earth's orbit laws (doc 109 §7); absent = the shipped laws, bit-identical. Not part of the hash.
  * @returns {Model}
  */
-export const createModel = (constants = GENERATED) => {
+export const createModel = (constants = GENERATED, opts = {}) => {
   // Validation targets are not merely absent from DEFAULT_CONSTANTS — they are
   // REFUSED here. Absence alone only stops the spread form
   // `{...DEFAULT_CONSTANTS, x}`; nothing stopped a caller passing a bound
@@ -183,7 +185,9 @@ export const createModel = (constants = GENERATED) => {
 
   // The §7a assembly: every factory wired from THIS context, so counterfactual
   // constants flow through the entire motion model.
-  const surfaces = assembleModel(ctx, FITTED);
+  // opts.laws — research overrides for Earth's orbit laws (see assembleModel);
+  // absent = the shipped laws, bit-identical. Never part of the hash.
+  const surfaces = assembleModel(ctx, FITTED, opts.laws ?? {});
 
   return {
     constants: ctx,

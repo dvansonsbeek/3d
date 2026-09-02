@@ -81,7 +81,29 @@ const SG = require('../lib/scene-graph.js');
 // empirically pinned ground-mapping constants stay out of the certified
 // numbers. require(esm): Node ≥22.12 (local 22.19, CI node 22).
 const { createModel } = require('@essrt/physics');
-const TIER = createModel();
+// RESEARCH PROBE (doc 109 §7): ECLIPSE_AUDIT_LAWS=curvature:<ddot per cy²> replaces
+// Earth's eccentricity law by the shipped H/3 line plus a curvature correction
+//   Δe(t) = ½ (ddot − ddot_H3) t²   (t in centuries from J2000; ddot_H3 measured
+//   from the shipped law), so value and slope at J2000 are untouched and only the
+// curvature — the term the secular dynamics put at ≈ −2.5e-7/cy² against the
+// H/3 line's −3.8e-8 — is tested against the eclipse record. Probe only: --write
+// is refused under an override (the artifact must never carry a research law).
+const LAWS_SPEC = process.env.ECLIPSE_AUDIT_LAWS || '';
+const laws = (() => {
+  if (!LAWS_SPEC) return {};
+  const m = LAWS_SPEC.match(/^curvature:(-?[\d.eE+-]+)$/);
+  if (!m) throw new Error(`ECLIPSE_AUDIT_LAWS: unknown spec "${LAWS_SPEC}" (expected curvature:<ddot>)`);
+  const base = createModel().eclipse.frameworkSunDeps;
+  const e = base.eccentricityAt;
+  const ddotH3 = (e(2100) - 2 * e(2000) + e(1900));           // per cy²
+  const dd = parseFloat(m[1]) - ddotH3;
+  console.log(`RESEARCH OVERRIDE: eccentricity = H/3 line + ½·(${parseFloat(m[1]).toExponential(2)} − ${ddotH3.toExponential(2)})·t²  (Δddot ${dd.toExponential(2)}/cy²) — probe only, --write refused`);
+  return {
+    eccentricityAt: (year) => { const t = (year - 2000) / 100; return e(year) + 0.5 * dd * t * t; },
+    eccentricityRateAt: (year) => { const t = (year - 2000) / 100; return base.eccentricityRateAt ? base.eccentricityRateAt(year) + dd * t / 100 : (e(year + 0.5) - e(year - 0.5)) + dd * t / 100; },
+  };
+})();
+const TIER = createModel(undefined, { laws });
 /** Tier umbra in the audit's {lat, lon} shape. @param {number} jd @returns {{lat:number,lon:number}|null} */
 function umbraTierAtJd(jd) {
   const u = TIER.eclipse.umbraGroundAtJD(jd);
@@ -92,6 +114,7 @@ const { createEclipseFinders } = require('@essrt/physics/eclipse/finders');
 const OUT = path.join(ROOT, 'data', 'eclipse-audit-summary.json');
 const WRITE = process.argv.includes('--write');
 const REBASELINE = process.argv.includes('--rebaseline');
+if (WRITE && LAWS_SPEC) { console.error('eclipse-audit: --write refused under ECLIPSE_AUDIT_LAWS (research override) — the artifact carries the shipped laws only'); process.exit(2); }
 
 const INPUT_FILES = [
   'tools/verify/eclipse-audit.js',

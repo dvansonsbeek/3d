@@ -65,9 +65,16 @@ const MOON_ECC_SENSITIVITY_NODE = 1.018;
  *
  * @param {Readonly<Record<string, any>>} C  the frozen constants context
  * @param {Readonly<Record<string, any>>} F  the fitted coefficients
+ * @param {{ eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number }} [laws]
+ *   RESEARCH OVERRIDES for Earth's orbit laws (doc 109 §7): an alternative e(t),
+ *   de/dt(t) and ϖ_of-date(t) flow through every consumer (the eclipse Sun, the
+ *   Moon's E-factor, the cardinal points) exactly as the shipped laws do. Default
+ *   {} = the shipped laws, bit-identical to before this parameter existed. Not a
+ *   counterfactual in the §2d sense (no hash change) — callers must say when
+ *   they used it; the generators refuse to --write under an override.
  * @returns the assembled surfaces (epoch, earth, lengths, cardinal, moon) — type inferred so ReturnType stays precise
  */
-export function assembleModel(C, F) {
+export function assembleModel(C, F, laws = {}) {
   // ── Derived constants (constants.js §9 order) ─────────────────────────────
   const H = C.foundational.holisticyearLength;
   const meanSolarYearDays = Math.round(C.foundational.inputmeanlengthsolaryearindays * (H / 8)) / (H / 8);
@@ -290,14 +297,14 @@ export function assembleModel(C, F) {
 
   // ── Earth scalars (integrated-phase display semantics) ────────────────────
   /** @param {number} year @returns {number} */
-  const earthPerihelionDeg = (year) => {
+  const earthPerihelionDeg = laws.perihelionLongitudeDegAt ?? ((year) => {
     let longitude = 270.0 + 360.0 * cyclesBetween(balancedYear, year, 16);
     for (const [div, sinC, cosC] of F.PERI_HARMONICS_RAW) {
       const ph = phaseRadians(balancedYear, year, div);
       longitude += sinC * Math.sin(ph) + cosC * Math.cos(ph);
     }
     return (((longitude + F.PERI_OFFSET) % 360) + 360) % 360;
-  };
+  });
   /** @param {number} year @returns {number} */
   const obliquityDeg = (year) => {
     let obliq = solsticeObliquityMean;
@@ -343,10 +350,10 @@ export function assembleModel(C, F) {
     eccentricityJ2000: C.earthOrbital.earthEccentricityJ2000,
   });
   /** @param {number} year @returns {number} */
-  const eccentricityAt = (year) => moonEcc.eccAt(year - 2000);
+  const eccentricityAt = laws.eccentricityAt ?? ((year) => moonEcc.eccAt(year - 2000));
   /** de/dyear of the one law — the cardinal braid's equation-of-centre
    *  derivative rides it. @param {number} year @returns {number} */
-  const eccentricityRateAt = (year) => moonEcc.eccRateAt(year - 2000);
+  const eccentricityRateAt = laws.eccentricityRateAt ?? ((year) => moonEcc.eccRateAt(year - 2000));
   /** @param {number} year @returns {number} */
   const inclinationDeg = (year) => earthInclMean
     - earthInclAmplitude * Math.cos(phaseRadians(balancedYear, year, 3));

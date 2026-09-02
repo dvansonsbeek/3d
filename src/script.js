@@ -17267,7 +17267,7 @@ function ghoComputeData() {
 
   const obliqCycles = [mercuryObliquityCycle, venusObliquityCycle, H / 8,
     marsObliquityCycle, jupiterObliquityCycle, saturnObliquityCycle, uranusObliquityCycle, neptuneObliquityCycle];
-  const wobblePeriods = [mercuryWobblePeriod, venusWobblePeriod, H / 16,
+  const wobblePeriods = [mercuryWobblePeriod, venusWobblePeriod, H / 3,   // Earth: the one eccentricity law (unification) — H/16 is the perihelion-of-date beat, not |e|
     marsWobblePeriod, jupiterWobblePeriod, saturnWobblePeriod, uranusWobblePeriod, neptuneWobblePeriod];
 
   // Scientific reference values: { observed, source, predicted } per cycle per planet

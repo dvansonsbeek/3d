@@ -28,6 +28,12 @@
 //     the equinox, nothing that depends on Earth's spin axis or on a coordinate grid;
 //   • no parameter fitted to the targets (or: fitted on Mercury alone and then
 //     PREDICTING the others — say which);
+//   • RADIAL and NODE-NEUTRAL: the mass experiments (perihelion-observation-audit,
+//     scale= and elem=node) show the perturber masses reproduce every NODE rate to
+//     0.1 ″/cy and every perihelion but Mercury's; a mass re-balance that fixes
+//     Mercury's perihelion breaks the nodes by 10–65 ″/cy. So the rule must act on
+//     the apsidal line without touching the node, and preferentially at Mercury
+//     (∝ 1/a-class or steeper) — the relativistic term has exactly that form;
 //   • PASS = every T1 target within 3σ.
 //
 //   node tools/explore/perihelion-excess-candidates.mjs
