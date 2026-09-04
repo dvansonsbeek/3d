@@ -21,6 +21,14 @@ same structure extends to the other planets.
 | 4 | Axial precession | H/13 | Spin axis traces a cone (direction changes, tilt stays same) |
 | 5 | Perihelion precession (ecliptic) | H/16 | Perihelion point advances against ecliptic |
 
+**Value-tag convention in this doc.** Pure H-fraction periods are bound to a
+single registry key wherever the same fraction appears — e.g. `hDiv2` /
+`marsAxialPeriod` both render H/2, and `earthPeriPeriodICRF` /
+`inclPrecYears` both render H/3, including in Uranus and Jupiter cells. The
+reuse is a NUMERIC identity of the H-fraction, not a claim that the tagged
+quantities are the same physical thing; per-planet keys arrive with the
+registry retype (plan 02 §10 Batch D).
+
 **Earth's Fibonacci rate identities** (rates ω = 1/period, in units of 1/H):
 
 ```
@@ -144,6 +152,12 @@ allows obliquity to wander 0°–60°+.
 | Obliquity cycle | ~124,800 yr (s₃+s₄ weighted) | **8H/21** = <!--v:marsObliqCycle-->127,740<!--/v--> yr | 21/(8H) | 2.4% |
 | Perihelion ecliptic (ϖ) | 76,644 yr (WebGeoCalc) | **8H/36** = <!--v:marsPeriPeriod-->74,515<!--/v--> yr | 36/(8H) | 2.8% |
 | Axial precession | 170,400 yr (InSight) | **H/2** = <!--v:hDiv2-->167,659<!--/v--> yr | 2/H | 1.7% |
+
+Note on the node value: docs 54/55 carry Mars's ascending node as **−8H/64**;
+the **8H/68** in this table rests on the stated identification inclination ≈
+ICRF perihelion (s₄ ≈ −g₄, first row). The two numbers coexist only under
+that assumption — it is an assumption of this doc's decomposition, not a
+measured identity.
 
 Note: Mars's apsidal eigenfrequency g₄ = 17.916"/yr and nodal eigenfrequency
 |s₄| = 17.755"/yr differ by only 0.9%. The model places Mars perihelion at

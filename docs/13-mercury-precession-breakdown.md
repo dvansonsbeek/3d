@@ -767,12 +767,12 @@ The first-order L-L estimate (~1,776) overshoots both the WebGeoCalc short-basel
 | Neptune | Outer | 0.013 | <0.1 | <1% |
 | **First-order L-L total (A_ii)** | | | **~553** | |
 | **WebGeoCalc observed (1900–2100)** | | | **~570** | |
-| **Model Fibonacci long-term mean (H×8/11)** | | | **531** | |
+| **Model Fibonacci — present-epoch rate (H×8/11)** | | | **531** | |
 
 **Insight:** All planets are outer to Mercury, so all contributions are positive.
 Venus dominates despite lower mass because of highest α ratio (0.535).
 
-The first-order L-L total (~553) matches Mercury's observed rate (~570) to within ~3 %, which is near the expected first-order accuracy limit. The 531 ″/cy Fibonacci long-term mean (H × 8/11) is lower because the observed rate includes ~38–40 ″/cy of current-epoch harmonic fluctuation above the long-term mean.
+The first-order L-L total (~553) is the Newton-only bare rate; the observed ~570 additionally carries the ~43 ″/cy relativistic term. The 531 ″/cy Fibonacci value (H × 8/11) is a **present-epoch rate** descriptor (quantity type per doc 109 §9): it sits within 0.5 % of Mercury's present-epoch Newtonian secular rate (~529). Mercury's **long-term mean** is a different quantity — g₁ ≈ 512 ″/cy Newton-only, ≈ 560 with relativity.
 
 **Historical note:** Urbain Le Verrier's original 19th-century calculation of Mercury's Newtonian perihelion advance gave ~532 ″/cy — differing from the full observed ~575 ″/cy by ~43 ″/cy, which Einstein 's General Relativity (1915) then explained as the effect of spacetime curvature near the Sun. The modern first-order L-L calculation (this doc, ~553 ″/cy) reproduces Le Verrier's result with small numerical refinements.
 
@@ -789,9 +789,9 @@ The first-order L-L total (~553) matches Mercury's observed rate (~570) to withi
 | Mercury | Inner | 0.074 | <0.1 | <1% |
 | **First-order L-L total (A_ii)** | | | **~754** | |
 | **WebGeoCalc observed (1900–2100)** | | | **~<!--v:jupiterObservedRate-->1,800<!--/v-->** | |
-| **Model dynamical secular mean (8H/39)** | | | **1,884** | |
+| **Model window-epoch value (8H/39)** | | | **1,884** | |
 
-**Insight:** Saturn dominates Jupiter's diagonal A_ii rate almost entirely. First-order L-L gives ~754 ″/cy, but the WebGeoCalc observed rate is ~<!--v:jupiterObservedRate-->1,800<!--/v--> ″/cy. The 2.4× gap reflects strong Jupiter–Saturn off-diagonal coupling and the 5:2 near-resonance ("Great Inequality") — effects that first-order diagonal theory cannot capture. The model's dynamical secular value (8H/39 = 1,884 ″/cy) is closer to WebGeoCalc than to first-order L-L because the framework reproduces the observed secular rate, not the L-L diagonal.
+**Insight:** Saturn dominates Jupiter's diagonal A_ii rate almost entirely. First-order L-L gives ~754 ″/cy, but the WebGeoCalc observed rate is ~<!--v:jupiterObservedRate-->1,800<!--/v--> ″/cy. The 2.4× gap reflects strong Jupiter–Saturn off-diagonal coupling and the 5:2 near-resonance ("Great Inequality") — effects that first-order diagonal theory cannot capture. The model's 8H/39 = 1,884 ″/cy is a **window-epoch descriptor** (doc 109 §9): it tracks the observed 1800–2100 trend. Jupiter's **long-term mean** is a different quantity again — g₅ ≈ 426 ″/cy — which neither the window trend nor the first-order diagonal shows.
 
 ### 3.4 Saturn Precession Breakdown
 
@@ -806,11 +806,11 @@ The first-order L-L total (~553) matches Mercury's observed rate (~570) to withi
 | Mercury | Inner | 0.041 | <0.1 | <1% |
 | **First-order L-L total (A_ii)** | | | **+1,867** | |
 | **WebGeoCalc observed (1900–2100)** | | | **retrograde, magnitude window-dependent (~−1,800 to −3,600)** | |
-| **Model dynamical secular mean (−8H/65)** | | | **−3,140** | |
+| **Model window-epoch value (−8H/65)** | | | **−3,140** | |
 
 **Insight:** Jupiter's gravitational perturbation dominates Saturn's diagonal rate. First-order L-L predicts +1,867 ″/cy **prograde**, but WebGeoCalc shows Saturn moving **retrograde** across the 1800–2100 window — the direction is *opposite* to first-order prediction. The retrograde *direction* is robust across plausible 126-year sub-windows; the *magnitude*, however, varies by ~2× depending on which window you measure (sliding-window OLS gives anywhere from −<!--v:jupiterObservedRate-->1,800<!--/v--> to −3,600 ″/cy, with non-linear midpoint residuals of 0.4° suggesting longer-period structure underneath). The WebGeoCalc Explorer therefore flags Saturn as un-determined and lets the user read the trend visually. This is one of the largest known failures of first-order secular theory.
 
-The retrograde signal that first-order L-L misses is dominated by the Jupiter–Saturn 5:2 "Great Inequality" near-resonance, which secular theory treats as slowly averaging out but which in practice produces a large retrograde signal during the current epoch. The model's dynamical secular rate (−8H/65 = −3,140 ″/cy retrograde) sits within the observed window-spread; first-order L-L has the wrong sign entirely.
+The retrograde signal that first-order L-L misses is dominated by the Jupiter–Saturn 5:2 "Great Inequality" near-resonance, which secular theory treats as slowly averaging out but which in practice produces a large retrograde signal during the current epoch. The model's −8H/65 = −3,140 ″/cy is a **window-epoch descriptor** (doc 109 §1/§9) sitting within the observed century-window spread; Saturn's **long-term mean** is prograde (g₆ ≈ +2,824 ″/cy), and first-order L-L misses the window's retrograde sign entirely.
 
 See docs/10-fibonacci-laws.md §"Law 6: Saturn-Jupiter-Earth Resonance" for more on this discrepancy.
 
@@ -1016,7 +1016,7 @@ See §1.5a for the reference-frame explanation of why L-L cannot produce the dat
 The table below compares, for each planet:
 - **WebGeoCalc observed** — JPL/NAIF's short-baseline (1900–2100) measurement, the actual observed perihelion precession rate.
 - **First-order L-L A_ii** — what this breakdown computes from Laplace-Lagrange secular theory (diagonal only).
-- **Model Fibonacci** — the Holistic Universe Model's long-term mean rate from the Fibonacci framework (H-fraction).
+- **Model Fibonacci** — the Holistic Universe Model's H-fraction value; its quantity TYPE differs per planet (doc 109 §9): Mars = long-term mean, Mercury = present-epoch rate, Jupiter/Saturn/Uranus = window-epoch values.
 
 | Planet | WebGeoCalc observed | First-order A_ii | Model Fibonacci | Notes |
 |--------|--------------------|-----------------|-----------------|-------|
