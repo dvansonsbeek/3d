@@ -66,6 +66,7 @@
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { makeWH } from './nbody-wh.mjs';
+import { HZ } from './j2000-state.mjs';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(ROOT + 'package.json');
 const P = require(ROOT + 'tools/explore/derive-planetary-lunar-terms.js');
@@ -85,16 +86,7 @@ const GM_S = TL.GM_SUN, GM_EM = P.GM_EM, H = TL.H;
 const names = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const gmOf = (k) => (k === 'earth' ? GM_EM : GM_S / TL.massRatioDE440[k]);
 // JPL Horizons, heliocentric ecliptic J2000, JD 2451545.0 TDB, km & km/s (see perihelion-observation-audit.mjs)
-const HORIZONS_J2000 = {
-  mercury: [-1.946172635585e+7, -6.691327526352e+7, -3.679854343750e+6, 3.699499185728e+1, -1.116441592562e+1, -4.307628118658e+0],
-  venus:   [-1.074564940522e+8, -4.885014975873e+6, 6.135634299718e+6, 1.381906029263e+0, -3.514029517645e+1, -5.600423382821e-1],
-  earth:   [-2.650257688971e+7, 1.446939556280e+8, -1.704331902042e+2, -2.978644078798e+1, -5.478176822344e+0, 4.197340759138e-5],
-  mars:    [2.080481406418e+8, -2.007052628224e+6, -5.156288959273e+6, 1.162672436605e+0, 2.629606453968e+1, 5.222970066951e-1],
-  jupiter: [5.985675835979e+8, 4.396047284920e+8, -1.522686065302e+7, -7.909837688567e+0, 1.115613309734e+1, 1.308626770728e-1],
-  saturn:  [9.583851242197e+8, 9.828564572112e+8, -5.521304749180e+7, -7.432021997941e+0, 6.735913712660e+0, 1.782497576763e-1],
-  uranus:  [2.158975019759e+9, -2.054625247237e+9, -3.562548941967e+7, 4.637024235952e+0, 4.627657581334e+0, -4.289175880417e-2],
-  neptune: [2.515046428529e+9, -3.738714513276e+9, 1.903227194039e+7, 4.465902049825e+0, 3.076627073142e+0, -1.660633585828e-1],
-};
+const HORIZONS_J2000 = HZ;   // the one home: j2000-state.mjs
 
 const DIAG = [];   // conservation diagnostics per integration direction (B1)
 const ROTS = {};   // readout rotations by frame name; set after the initial state is built (invariable plane needs it)

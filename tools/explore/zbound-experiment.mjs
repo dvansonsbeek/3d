@@ -35,6 +35,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { makeWH } from './nbody-wh.mjs';
 import { FORCES, setZboundTargets, setZboundCompensation, eboundDiag } from './nbody-forces.mjs';
+import { HZ, NAMES, gmOf } from './j2000-state.mjs';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(ROOT + 'package.json');
 const TL = require(ROOT + 'tools/lib/constants.js');
@@ -48,19 +49,8 @@ const FILTER_YR = parseFloat(KV.filter || '50');
 // The ΔL is not a defect: the comb targets' own L_z breathes 3.4e-4 pk-pk over
 // the 8H cycle (periodic, bounded) and the measured ΔL follows it.
 const COMP = KV.comp === '1';
-const DAY = 86400, GM_S = TL.GM_SUN, GM_EM = 403504.747706457;
-const names = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-const gmOf = (k) => (k === 'earth' ? GM_EM : GM_S / TL.massRatioDE440[k]);
-const HZ = {
-  mercury: [-1.946172635585e+7, -6.691327526352e+7, -3.679854343750e+6, 3.699499185728e+1, -1.116441592562e+1, -4.307628118658e+0],
-  venus:   [-1.074564940522e+8, -4.885014975873e+6, 6.135634299718e+6, 1.381906029263e+0, -3.514029517645e+1, -5.600423382821e-1],
-  earth:   [-2.650257688971e+7, 1.446939556280e+8, -1.704331902042e+2, -2.978644078798e+1, -5.478176822344e+0, 4.197340759138e-5],
-  mars:    [2.080481406418e+8, -2.007052628224e+6, -5.156288959273e+6, 1.162672436605e+0, 2.629606453968e+1, 5.222970066951e-1],
-  jupiter: [5.985675835979e+8, 4.396047284920e+8, -1.522686065302e+7, -7.909837688567e+0, 1.115613309734e+1, 1.308626770728e-1],
-  saturn:  [9.583851242197e+8, 9.828564572112e+8, -5.521304749180e+7, -7.432021997941e+0, 6.735913712660e+0, 1.782497576763e-1],
-  uranus:  [2.158975019759e+9, -2.054625247237e+9, -3.562548941967e+7, 4.637024235952e+0, 4.627657581334e+0, -4.289175880417e-2],
-  neptune: [2.515046428529e+9, -3.738714513276e+9, 1.903227194039e+7, 4.465902049825e+0, 3.076627073142e+0, -1.660633585828e-1],
-};
+const DAY = 86400, GM_S = TL.GM_SUN;
+const names = NAMES;
 function build() {
   const gms = [GM_S, ...names.map(gmOf)], n = gms.length;
   const st = [{ r: [0, 0, 0], v: [0, 0, 0] }, ...names.map((k) => ({ r: HZ[k].slice(0, 3), v: HZ[k].slice(3, 6) }))];
@@ -88,6 +78,35 @@ const COMB_RAD = 2 * Math.PI / (8 * TL.H);   // rad/yr per comb line N
 // Phases anchored at J2000: θ0 = osculating ϖ, ψ0 from e(2000) = base′(1+cosψ0/2)
 // with sinψ0 > 0 (e declining). The other seven stay on their free-fitted comb shapes.
 const EARTH_H3 = KV.earth === 'h3';
+// targets=model — X2, THE MODEL UNIVERSE (owner-approved 2026-09-02): every
+// planet held on the model's OWN doc-55 ecliptic divisor line (single mode:
+// amplitude = J2000 osculating e, phase = J2000 ϖ, rate = ±N·comb), Earth on
+// the three-line H/3 law. freeEarth=1 releases Earth entirely (no target) —
+// the decisive X2 question: does free Earth, inside the model-configured
+// system, move at H/3 by gravity alone? PRE-REGISTERED RISK: Jupiter's line
+// 8H/39 = 18.84 ″/yr sits ~1 ″/yr from Earth's g3/g4 response frequencies —
+// the E15 resonant-pumping neighbourhood, with Earth as the free victim.
+const TARGETS_MODE = KV.targets || 'naff';   // naff | model
+const FREE_EARTH = KV.freeEarth === '1';
+// hold=earth[,venus,…] — C2, THE MINIMAL-(ii) UNIVERSE (X3 assessment): steer
+// ONLY the listed planets; everyone else runs free. The zbound force maps
+// bodies to targets by osculating a (±12 %), so a filtered target list leaves
+// the others untouched. hold=earth earth=h3 = Earth held on the H/3 law inside
+// the otherwise-FREE system — reading (ii)'s minimal form. Pre-registered:
+// Earth's controller now fights the full free g₅/g₂ forcing (E18's comb
+// neighbours only forced comb lines), so the force cost should exceed E18's
+// 2.2e-9 m/s²; the strata question runs in pibound-strata-run.mjs hold=earth.
+// RESULT (60 kyr): tracking WORKS — ϖ̇ 1159.8 vs line 1159.5, e on the law
+// with the familiar ~1e-3 origin-pass undershoot; force mean 6.4e-10 m/s²
+// (LOWER than E18's 2.2e-9 — that cost was the seven other controllers), gate
+// exact 0 in-window, ΔL 2.1e-7. Free Venus rearranges +8.7e-3 in 60 kyr — the
+// leading edge of the 800-kyr Venus pumping (see pibound-strata-run RESULT).
+const HOLD = KV.hold ? KV.hold.split(',') : null;
+const MODEL_N = { mercury: 11, venus: -6, mars: 36, jupiter: 39, saturn: -65, uranus: 24, neptune: 4 };
+// mlines=jupiter:50,saturn:-80,… — override individual model lines (the
+// second-sparse-universe certification: the proper line must reappear at the
+// same frequency under a DIFFERENT far-line configuration)
+if (KV.mlines) for (const kv of KV.mlines.split(',')) { const [p, n] = kv.split(':'); MODEL_N[p] = parseInt(n, 10); }
 function earthH3Modes() {
   const OE = require(ROOT + 'tools/lib/orbital-engine.js');
   const base = TL.eccentricityBase;
@@ -102,21 +121,40 @@ function osculThetaOf(p) {
   const h = [r[1] * v[2] - r[2] * v[1], r[2] * v[0] - r[0] * v[2], r[0] * v[1] - r[1] * v[0]];
   return Math.atan2((v[2] * h[0] - v[0] * h[2]) / mu - r[1] / rn, (v[1] * h[2] - v[2] * h[1]) / mu - r[0] / rn);
 }
-const TARGETS = names.map((p) => {
-  const modes = p === 'earth' && EARTH_H3 ? earthH3Modes() : (NAFF.modes[p].z || [])
-    .filter((md) => Math.hypot(md.re, md.im) >= AMP_MIN)
-    .slice(0, MAX_MODES)
-    .map((md) => { const N = Math.round(md.omegaRadPerYr / COMB_RAD); return { w: N * COMB_RAD, N, re: md.re, im: md.im, wFree: md.omegaRadPerYr }; });
-  return { aRefAU: REF_A[p], gm: gmOf(p), modes, gateYr: GATE, filterYr: FILTER_YR };
-});
-if (EARTH_H3) console.log('EARTH ON THE H/3 LAW: three-line target N0+N24+N48, base', TL.eccentricityBase.toFixed(6));
+function osculEOf(p) {
+  const r = HZ[p].slice(0, 3), v = HZ[p].slice(3, 6), mu = GM_S + gmOf(p), rn = Math.hypot(...r);
+  const h = [r[1] * v[2] - r[2] * v[1], r[2] * v[0] - r[0] * v[2], r[0] * v[1] - r[1] * v[0]];
+  return Math.hypot((v[1] * h[2] - v[2] * h[1]) / mu - r[0] / rn, (v[2] * h[0] - v[0] * h[2]) / mu - r[1] / rn, (v[0] * h[1] - v[1] * h[0]) / mu - r[2] / rn);
+}
+function modelSingleMode(p) {
+  const th0 = osculThetaOf(p), e0 = osculEOf(p), N = MODEL_N[p];
+  return [{ w: N * COMB_RAD, N, re: e0 * Math.cos(th0), im: e0 * Math.sin(th0), wFree: N * COMB_RAD }];
+}
+const TARGETS = names
+  .filter((p) => !(p === 'earth' && FREE_EARTH) && (!HOLD || HOLD.includes(p)))
+  .map((p) => {
+    const modes = TARGETS_MODE === 'model'
+      ? (p === 'earth' ? earthH3Modes() : modelSingleMode(p))
+      : p === 'earth' && EARTH_H3 ? earthH3Modes() : (NAFF.modes[p].z || [])
+        .filter((md) => Math.hypot(md.re, md.im) >= AMP_MIN)
+        .slice(0, MAX_MODES)
+        .map((md) => { const N = Math.round(md.omegaRadPerYr / COMB_RAD); return { w: N * COMB_RAD, N, re: md.re, im: md.im, wFree: md.omegaRadPerYr }; });
+    return { aRefAU: REF_A[p], gm: gmOf(p), modes, gateYr: GATE, filterYr: FILTER_YR };
+  });
+if (TARGETS_MODE === 'model') console.log(`THE MODEL UNIVERSE: doc-55 divisor lines ${names.filter((p) => p !== 'earth').map((p) => `${p} 8H/${MODEL_N[p]}`).join(' ')}; Earth ${FREE_EARTH ? 'FREE (released — the X2 question)' : 'on the three-line H/3 law'}`);
+else if (EARTH_H3) console.log('EARTH ON THE H/3 LAW: three-line target N0+N24+N48, base', TL.eccentricityBase.toFixed(6));
+const TARGET_NAMES = names.filter((p) => !(p === 'earth' && FREE_EARTH) && (!HOLD || HOLD.includes(p)));
+if (HOLD) console.log(`HOLD LIST: only [${HOLD.join(', ')}] steered — all others FREE (the minimal-(ii) universe)`);
 console.log('snapped comb targets (N = 8H/N line; detune % vs NAFF):');
-for (const [i, p] of names.entries()) {
-  console.log(' ', p.padEnd(8), TARGETS[i].modes.map((m) => `N${m.N}${m.N !== 0 ? ` (${((m.w - m.wFree) / Math.abs(m.wFree) * 100).toFixed(1)}%)` : ''}`).join(' '));
+for (const [i, p] of TARGET_NAMES.entries()) {
+  console.log(' ', p.padEnd(8), TARGETS[i].modes.map((m) => `N${m.N}${m.N !== 0 && m.w !== m.wFree ? ` (${((m.w - m.wFree) / Math.abs(m.wFree) * 100).toFixed(1)}%)` : ''}`).join(' '));
 }
 
 function run(withForce) {
   const { gms, Y0 } = build();
+  // dump=<name>: write the bounded run's Earth elements (200-yr cadence) as a
+  // NAFF-compatible .local.json for mode diagnosis (naff-frequencies.mjs file=…)
+  const dumpArr = withForce && KV.dump ? { t: [], e: [], w: [], inc: [], Om: [] } : null;
   eboundDiag.maxAccel = 0; eboundDiag.sumAccel = 0; eboundDiag.samples = 0;
   setZboundTargets(TARGETS);
   if (COMP) {
@@ -128,8 +166,9 @@ function run(withForce) {
   const sim = makeWH({ gms, Y0, dt: DT * DAY, gr: true, order: 2, extraForces: withForce ? [FORCES.zbound(TAU)] : [] });
   const L0 = sim.angularMomentum(), Ln0 = Math.hypot(...L0);
   const rows = [];
-  const steps = Math.round(YEARS * 365.25 / DT), every = Math.round(1000 * 365.25 / DT);
+  const steps = Math.round(YEARS * 365.25 / DT), every = Math.round(1000 * 365.25 / DT), everyTh = Math.round(200 * 365.25 / DT);
   let win300 = null;
+  const thE = { t: [], v: [] }; let thPrev = null, thAcc = 0;
   for (let s = 0; s <= steps; s++) {
     const tYr = s * DT / 365.25;
     if (s % every === 0) {
@@ -137,14 +176,39 @@ function run(withForce) {
       for (const [i, k] of names.entries()) { const h = sim.helio(i + 1); row[k] = oscul(h.r, h.v, GM_S + gms[i + 1]); }
       rows.push(row);
     }
+    if (s % everyTh === 0) {   // Earth apsidal-angle tracking (unwrapped) + optional NAFF dump
+      const h = sim.helio(3), rn = Math.hypot(...h.r), mu = GM_S + gms[3];
+      const hv = [h.r[1] * h.v[2] - h.r[2] * h.v[1], h.r[2] * h.v[0] - h.r[0] * h.v[2], h.r[0] * h.v[1] - h.r[1] * h.v[0]];
+      const ex = (h.v[1] * hv[2] - h.v[2] * hv[1]) / mu - h.r[0] / rn, ey = (h.v[2] * hv[0] - h.v[0] * hv[2]) / mu - h.r[1] / rn;
+      let th = Math.atan2(ey, ex);
+      if (thPrev !== null) { let d = th - thPrev; if (d > Math.PI) d -= 2 * Math.PI; else if (d < -Math.PI) d += 2 * Math.PI; thAcc += d; }
+      thPrev = th; thE.t.push(tYr); thE.v.push(thAcc);
+      if (dumpArr) {
+        const hn = Math.hypot(...hv), R2D = 180 / Math.PI;
+        dumpArr.t.push(+tYr.toFixed(1));
+        dumpArr.e.push(+Math.hypot(ex, ey, (h.v[0] * hv[1] - h.v[1] * hv[0]) / mu - h.r[2] / rn).toFixed(7));
+        dumpArr.w.push(+(th * R2D).toFixed(4));
+        dumpArr.inc.push(+(Math.acos(hv[2] / hn) * R2D).toFixed(5));
+        dumpArr.Om.push(+(Math.atan2(hv[0], -hv[1]) * R2D).toFixed(4));
+      }
+    }
     sim.step();
     if (win300 === null && tYr >= 300) win300 = { mean: eboundDiag.sumAccel / Math.max(1, eboundDiag.samples), max: eboundDiag.maxAccel };
   }
   const L1 = sim.angularMomentum();
+  const n = thE.t.length, mt = thE.t.reduce((a, b) => a + b, 0) / n, mv = thE.v.reduce((a, b) => a + b, 0) / n;
+  let nu = 0, de2 = 0; for (let i = 0; i < n; i++) { nu += (thE.t[i] - mt) * (thE.v[i] - mv); de2 += (thE.t[i] - mt) ** 2; }
+  const earthPomDotCy = nu / de2 * 206264.806 * 100;
+  if (dumpArr) {
+    const { writeFileSync } = require('node:fs');
+    const out = { integrator: `wh-zbound targets=${TARGETS_MODE}${FREE_EARTH ? ' freeEarth' : ''}`, dt: DT, frame: 'ecliptic', gr: true, t: dumpArr.t, elements: { earth: { e: dumpArr.e, w: dumpArr.w, inc: dumpArr.inc, Om: dumpArr.Om } } };
+    writeFileSync(new URL(`./${KV.dump}.local.json`, import.meta.url), JSON.stringify(out));
+    console.log(`dumped Earth elements → tools/explore/${KV.dump}.local.json (${dumpArr.t.length} samples)`);
+  }
   return {
     rows, win300, dL: Math.hypot(L1[0] - L0[0], L1[1] - L0[1], L1[2] - L0[2]) / Ln0,
     dLz: Math.abs(L1[2] - L0[2]) / Ln0, dLxy: Math.hypot(L1[0] - L0[0], L1[1] - L0[1]) / Ln0,
-    diag: { ...eboundDiag },
+    earthPomDotCy, diag: { ...eboundDiag },
   };
 }
 console.log(`\ncontrol run (free dynamics, 1PN on), then zbound (τ = ${TAU} kyr, gate ${GATE} yr, torque compensation ${COMP ? 'ON' : 'OFF'}), ${YEARS / 1000} kyr forward…`);
@@ -159,3 +223,7 @@ for (const [i, r] of exp.rows.entries()) {
 console.log(`\nforce: FIRST 300 YR mean |a| ${(exp.win300.mean * 1e3).toExponential(2)} m/s², max ${(exp.win300.max * 1e3).toExponential(2)} m/s²  (in-window footprint; gate keeps it 0)`);
 console.log(`       full span mean |a| ${(exp.diag.sumAccel / Math.max(1, exp.diag.samples) * 1e3).toExponential(2)} m/s², max ${(exp.diag.maxAccel * 1e3).toExponential(2)} m/s²`);
 console.log(`total angular momentum: control |ΔL|/L ${ctl.dL.toExponential(1)}; bounded ${exp.dL.toExponential(1)} (z ${exp.dLz.toExponential(1)}, xy ${exp.dLxy.toExponential(1)})`);
+if (TARGETS_MODE === 'model' || FREE_EARTH || HOLD) {
+  const eE = exp.rows.map((r) => r.earth.e);
+  console.log(`Earth in the ${TARGETS_MODE} universe${FREE_EARTH ? ' (FREE)' : ''}: mean ϖ̇ ${exp.earthPomDotCy.toFixed(1)} ″/cy (H/3 line: 1159.5; free-universe mean: ${ctl.earthPomDotCy.toFixed(1)}) | e range ${Math.min(...eE).toFixed(4)}–${Math.max(...eE).toFixed(4)} (H/3 law: 0.0077–0.0231)`);
+}

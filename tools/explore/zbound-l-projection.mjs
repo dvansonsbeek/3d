@@ -41,6 +41,7 @@
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { NAMES, gmOf } from './j2000-state.mjs';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(ROOT + 'package.json');
 const TL = require(ROOT + 'tools/lib/constants.js');
@@ -48,10 +49,9 @@ const NAFF = require(ROOT + 'tools/explore/naff-modes-ecliptic-1000000-gr.local.
 const KV = Object.fromEntries(process.argv.slice(2).filter((a) => a.includes('=')).map((a) => { const i = a.indexOf('='); return [a.slice(0, i), a.slice(i + 1)]; }));
 const AMP_MIN = parseFloat(KV.ampMin || '3e-4'), MAX_MODES = parseInt(KV.maxModes || '6', 10), M_MAX = parseInt(KV.mMax || '12', 10);
 const COMB = 2 * Math.PI / (8 * TL.H);
-const GM_S = TL.GM_SUN, GM_EM = 403504.747706457;
-const names = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+const GM_S = TL.GM_SUN;
+const names = NAMES;
 const REF_A = { mercury: 0.387, venus: 0.723, earth: 1.0, mars: 1.524, jupiter: 5.203, saturn: 9.537, uranus: 19.19, neptune: 30.07 };
-const gmOf = (k) => (k === 'earth' ? GM_EM : GM_S / TL.massRatioDE440[k]);
 const LAM = names.map((p) => gmOf(p) * Math.sqrt((GM_S + gmOf(p)) * REF_A[p]));   // L_z scale per unit (1−e²/2); common factors cancel in C=0
 
 // amps[j] = [{N, re, im}] per planet, snapped

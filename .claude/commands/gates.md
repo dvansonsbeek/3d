@@ -45,7 +45,8 @@ that file reports `count: 767`, `allPassCount: 0`, `currentConfig.rank: 4`.
 
 - These are **not** a test suite. They are 17 manual scripts that encode real
   gates but are not automated, not in CI, and have no shared harness.
-  Converting them into one is Phase 4 of `docs/hidden/IP-unified-architecture.md`.
+  Converting them into one is Phase 4 of the governing plan
+  (`holisticuniverse/docs/plans/01 IP-unified-architecture.md`).
 - `epoch-independence.js` tests **eccentricity-balance** epoch independence. It
   is *not* the referential-transparency gate (`f(Y)` invariant to scene epoch),
   which does not exist yet and currently **fails**. Do not conflate them.

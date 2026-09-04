@@ -42,6 +42,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { makeWH } from './nbody-wh.mjs';
 import { FORCES, setPiboundTargets, setEboundTarget, setEboundLaw5, setZboundTargets, osculTheta } from './nbody-forces.mjs';
+import { HZ, NAMES, gmOf } from './j2000-state.mjs';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(ROOT + 'package.json');
 const TL = require(ROOT + 'tools/lib/constants.js');
@@ -56,20 +57,51 @@ const BOUND = KV.bound || 'pi';
 // lines N0+N24+N48, see zbound-experiment.mjs); pre-registered strata prediction:
 // a single 111.8-kyr Earth-e line, no 405 and no 447.
 const EARTH_H3 = KV.earth === 'h3';
+// hold=earth[,…] — C2, THE MINIMAL-(ii) UNIVERSE (X3 assessment): with bound=z,
+// steer only the listed planets (target matching is by osculating a, so the
+// filtered list leaves the rest free). hold=earth earth=h3 = the X3 door test:
+// Earth held on the H/3 law inside the otherwise-free system. Pre-registered:
+// bounded Earth e-spectrum has NO 405-kyr line (joint LS 405 ≈ noise, the H/3
+// 112-kyr line ≈ base′/2 = 7.7e-3); free Venus/Mars keep their g₂/g₅ structure
+// (⇒ Mars polar strata discriminate reading (i) from (ii)); a 405-kyr leak
+// into held-Earth would OPEN door (c) of the assessment.
+// RESULT hold=earth earth=h3 (800 kyr): DOOR (c) STAYS CLOSED — held-Earth's
+// 405-band collapses ~9× (1.29e-2 → 1.45e-3, a smooth declining tail with NO
+// local peak at 405), the H/3 line reads 7.70e-3 = base′/2 EXACTLY as
+// pre-registered, and the z-spectrum g-lines collapse 30–60× under the imposed
+// +11.595 line (1.30e-2). CAUTION: the joint-LS numbers at 800 kyr are the
+// documented ill-conditioning trap (405/447 = 0.19 and 405/383 = 0.11 Rayleigh
+// elements — unresolvable); read the single-line DFT here, joint LS only at
+// ≥ 4.3 Myr. NEW FINDING: the minimal-(ii) universe DESTABILISES VENUS —
+// e_V pumped monotonically 0.028 → 0.165 in 500 kyr, plateau ~0.17 (3× the
+// free max 0.06): holding Earth alone removes it from the V–E secular
+// exchange and Venus absorbs the difference. Reading (ii) therefore needs at
+// least Venus held too — the E16 cascade re-enters. Mars keeps its band
+// structure (95-kyr 1.76e-2 vs free 1.90e-2) — the Mars-strata discriminator
+// is measurable.
+// RESULT 4.3 Myr (the configuration run; zAll recorded): the held-Earth
+// universe is STABLE the full span and the cascade SATURATES at Venus —
+// e_V plateau 0.173 for all 4.3 Myr (no growth after ~500 kyr), Mercury
+// INSIDE its free envelope (max 0.2888 vs free 0.2882), Mars ≈ free
+// (0.057–0.125), giants bit-identical (1e-4). The emergent configuration =
+// the analytic 7-planet forced-response prediction (held_earth_config.mjs,
+// scratchpad) certified line by line: forced epicycles at Earth's 11.595
+// line Me 5.62e-2 (pred 5.45e-2), V 0.131 (pred 0.163, nonlinear shave),
+// Ma 9.95e-3 (pred 1.08e-2); Venus's proper mode migrates 7.46 → ~12
+// (free g2 content collapses 2.14e-2 → 2.5e-4) because without Earth's
+// back-reaction g2′ = 12.18, 0.58 ″/yr from the imposed line — the C2 Venus
+// pumping IS this near-resonance. METRONOME: at 4.3-Myr resolution the 405
+// is erased from Earth (joint LS 1.0e-4 vs free 1.04e-2) AND Venus (4.8e-4
+// vs 1.25e-2), replaced by H/3-locked beats (Earth 112 kyr = 7.64e-3 =
+// base′/2; Venus/Mars ~173 kyr = E-line − g5). CORRECTION of the 800-kyr
+// reading: Mars's apparent 3-4e-3 at the 405 probe was leakage — Mars's own
+// free 405 content is only ~5e-4, so Mars strata do NOT discriminate the
+// readings; the discriminator is EARTH's strata, where the free universe
+// alone carries the 405.
+const HOLD = KV.hold ? KV.hold.split(',') : null;
 const ASPC = Math.PI / 180 / 3600 / 100;
-const DAY = 86400, GM_S = TL.GM_SUN, GM_EM = 403504.747706457;
-const names = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-const gmOf = (k) => (k === 'earth' ? GM_EM : GM_S / TL.massRatioDE440[k]);
-const HZ = {
-  mercury: [-1.946172635585e+7, -6.691327526352e+7, -3.679854343750e+6, 3.699499185728e+1, -1.116441592562e+1, -4.307628118658e+0],
-  venus:   [-1.074564940522e+8, -4.885014975873e+6, 6.135634299718e+6, 1.381906029263e+0, -3.514029517645e+1, -5.600423382821e-1],
-  earth:   [-2.650257688971e+7, 1.446939556280e+8, -1.704331902042e+2, -2.978644078798e+1, -5.478176822344e+0, 4.197340759138e-5],
-  mars:    [2.080481406418e+8, -2.007052628224e+6, -5.156288959273e+6, 1.162672436605e+0, 2.629606453968e+1, 5.222970066951e-1],
-  jupiter: [5.985675835979e+8, 4.396047284920e+8, -1.522686065302e+7, -7.909837688567e+0, 1.115613309734e+1, 1.308626770728e-1],
-  saturn:  [9.583851242197e+8, 9.828564572112e+8, -5.521304749180e+7, -7.432021997941e+0, 6.735913712660e+0, 1.782497576763e-1],
-  uranus:  [2.158975019759e+9, -2.054625247237e+9, -3.562548941967e+7, 4.637024235952e+0, 4.627657581334e+0, -4.289175880417e-2],
-  neptune: [2.515046428529e+9, -3.738714513276e+9, 1.903227194039e+7, 4.465902049825e+0, 3.076627073142e+0, -1.660633585828e-1],
-};
+const DAY = 86400, GM_S = TL.GM_SUN;
+const names = NAMES;
 function build() {
   const gms = [GM_S, ...names.map(gmOf)], n = gms.length;
   const st = [{ r: [0, 0, 0], v: [0, 0, 0] }, ...names.map((k) => ({ r: HZ[k].slice(0, 3), v: HZ[k].slice(3, 6) }))];
@@ -111,7 +143,7 @@ function run(bounded) {
       const mk = (N, amp, ang) => ({ w: N * COMB_RAD, re: amp * Math.cos(ang), im: amp * Math.sin(ang) });
       return [mk(24, base, th0e), mk(48, base / 4, th0e + psi0), mk(0, base / 4, th0e - psi0)];
     };
-    setZboundTargets(names.map((p) => ({
+    setZboundTargets(names.filter((p) => !HOLD || HOLD.includes(p)).map((p) => ({
       aRefAU: REF_A[p], gm: gmOf(p), gateYr: GATE,
       modes: p === 'earth' && EARTH_H3 ? earthH3() : (NAFF.modes[p].z || []).filter((md) => Math.hypot(md.re, md.im) >= 3e-4).slice(0, 6)
         .map((md) => ({ w: Math.round(md.omegaRadPerYr / COMB_RAD) * COMB_RAD, re: md.re, im: md.im })),
@@ -120,6 +152,9 @@ function run(bounded) {
   const boundForces = BOUND === 'z' ? [FORCES.zbound(TAU)] : [FORCES.eboundlaw5(TAU), FORCES.pibound(TAU)];
   const sim = makeWH({ gms, Y0, dt: DT * DAY, gr: true, order: 2, extraForces: bounded ? boundForces : [] });
   const eE = [], kE = [], hE = [], eV = [], eMa = [];
+  // hold mode: record EVERY planet's z — the emergent all-planet configuration
+  // of the held-Earth universe is the measurement (NAFF-able per planet)
+  const zAll = HOLD ? names.map(() => ({ k: [], h: [] })) : null;
   const steps = Math.round(YEARS * 365.25 / DT), every = Math.round(SAMPLE * 365.25 / DT);
   for (let s = 0; s <= steps; s++) {
     if (s % every === 0) {
@@ -128,10 +163,11 @@ function run(bounded) {
       const v = sim.helio(2), m = sim.helio(4);
       const zv = zOf(v.r, v.v, GM_S + gms[2]), zm = zOf(m.r, m.v, GM_S + gms[4]);
       eV.push(Math.hypot(zv.k, zv.h)); eMa.push(Math.hypot(zm.k, zm.h));
+      if (zAll) for (let i = 0; i < names.length; i++) { const hp = sim.helio(i + 1), zp = zOf(hp.r, hp.v, GM_S + gms[i + 1]); zAll[i].k.push(+zp.k.toFixed(6)); zAll[i].h.push(+zp.h.toFixed(6)); }
     }
     sim.step();
   }
-  return { eE, kE, hE, eV, eMa };
+  return { eE, kE, hE, eV, eMa, zAll };
 }
 // Hann-windowed DFT amplitude at period P (years)
 function amp(series, dtYr, Pyr) {
@@ -161,7 +197,7 @@ console.log(`strata run: control + gated all-planet ${BOUND === 'z' ? 'SHAPE bou
 const t0 = Date.now();
 const ctl = run(false); console.log(`control done (${((Date.now() - t0) / 60000).toFixed(1)} min)`);
 const bnd = run(true); console.log(`bounded done (${((Date.now() - t0) / 60000).toFixed(1)} min)`);
-const outName = BOUND === 'z' ? (EARTH_H3 ? './zbound-strata-h3.local.json' : './zbound-strata.local.json') : './pibound-strata.local.json';
+const outName = BOUND === 'z' ? (HOLD ? './zbound-strata-hold.local.json' : EARTH_H3 ? './zbound-strata-h3.local.json' : './zbound-strata.local.json') : './pibound-strata.local.json';
 writeFileSync(new URL(outName, import.meta.url), JSON.stringify({ years: YEARS, gate: GATE, tauKyr: TAU, bound: BOUND, sampleYears: SAMPLE, control: ctl, bounded: bnd }));
 console.log(`wrote tools/explore/${outName.slice(2)}\n`);
 console.log('Earth e(t) amplitude spectrum (Hann DFT), the strata beats:');
@@ -203,3 +239,19 @@ console.log('\nVenus / Mars e ranges: free V', Math.min(...ctl.eV).toFixed(4), '
   ' bnd V', Math.min(...bnd.eV).toFixed(4), '–', Math.max(...bnd.eV).toFixed(4),
   ' | free Ma', Math.min(...ctl.eMa).toFixed(4), '–', Math.max(...ctl.eMa).toFixed(4),
   ' bnd Ma', Math.min(...bnd.eMa).toFixed(4), '–', Math.max(...bnd.eMa).toFixed(4));
+if (HOLD) {   // C2: do the FREE neighbours keep the metronome while held-Earth loses it?
+  console.log('\nfree-neighbour e-spectra at the metronome probes (Hann DFT):');
+  console.log('  period kyr    Venus free  Venus bnd   Mars free   Mars bnd');
+  for (const P of [447, 405, 383, 173, 112, 95]) {
+    console.log(`  ${String(P).padStart(8)}    ${amp(ctl.eV, SAMPLE, P * 1000).toExponential(2)}   ${amp(bnd.eV, SAMPLE, P * 1000).toExponential(2)}   ${amp(ctl.eMa, SAMPLE, P * 1000).toExponential(2)}   ${amp(bnd.eMa, SAMPLE, P * 1000).toExponential(2)}`);
+  }
+  const jv = jointAmp(bnd.eV, SAMPLE, 405000, 447000), jm = jointAmp(bnd.eMa, SAMPLE, 405000, 447000);
+  console.log(`joint LS 405/447 (bounded universe): Venus ${jv.a1.toExponential(2)} / ${jv.a2.toExponential(2)}   Mars ${jm.a1.toExponential(2)} / ${jm.a2.toExponential(2)}`);
+  console.log('\nper-planet e ranges — the emergent held-Earth configuration:');
+  const mm = (a) => a.reduce((s, x) => [Math.min(s[0], x), Math.max(s[1], x)], [Infinity, -Infinity]);
+  for (const [i, p] of names.entries()) {
+    const eOf = (zc) => zc.k.map((k2, j2) => Math.hypot(k2, zc.h[j2]));
+    const [cLo, cHi] = mm(eOf(ctl.zAll[i])), [bLo, bHi] = mm(eOf(bnd.zAll[i]));
+    console.log(`  ${p.padEnd(8)} free ${cLo.toFixed(4)}–${cHi.toFixed(4)}   bnd ${bLo.toFixed(4)}–${bHi.toFixed(4)}`);
+  }
+}

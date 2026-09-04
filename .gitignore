@@ -43,3 +43,7 @@ data/rahmstorf-2015-amoc-index.txt
 # own *.local.json (integration dumps; JPL caches rebuild deterministically
 # from seeded epoch lists). The instruments are tracked, their data is not.
 tools/explore/*.local.json
+# third-party papers/SI datasets (Lantink 2022 PNAS SI + datasets, Lantink
+# 2024 SAJG) — we have the right to USE them, not to REDISTRIBUTE them in a
+# public repo (PROVENANCE discipline); local reference material only
+data/pnas/
