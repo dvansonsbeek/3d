@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v12.0
+modelVersion: v13.0
 coefficients: sha256:56d7365a511916d5
 status: current
 ---
@@ -577,10 +577,10 @@ The GUI is built with Tweakpane v4, using `addBinding()` for data-bound controls
 `addButton()` for actions, and `addFolder()` for collapsible sections.
 
 ```
-Tweakpane Root ("Fibonacci Laws of Planetary Motion")
+Tweakpane Root ("Expanding Solar System Resonance Theory")
 │
 ├─▼ About                          (collapsed)
-│  ├─▼ The Six Laws               (custom DOM, full-width)
+│  ├─▼ The Six Relations          (custom DOM, full-width)
 │  ├─▼ Free Parameters (6 DOF)    (0 DOF items dimmed)
 │  ├─▼ Calibration Inputs (75)    (from astro-reference.json: Earth & Time 26, Moon 14, Planets 5×7)
 │  ├─▼ Model Parameters (70)      (from model-parameters.json: Earth 11, Moon 3, Planets 8×7)

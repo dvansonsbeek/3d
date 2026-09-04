@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v12.0
+modelVersion: v13.0
 coefficients: sha256:56d7365a511916d5
 status: current
 ---
@@ -9,9 +9,9 @@ status: current
 
 ## Overview
 
-The **Solar System Resonance Cycle** (8H = <!--v:eightH-->2,682,536<!--/v--> years at J2000) is the fundamental super-period of the solar system. Every major planetary cycle — axial precession, perihelion precession, inclination oscillation, ascending node regression, obliquity oscillation, and eccentricity oscillation — divides 8H evenly as an integer.
+The **Solar System Resonance Cycle** (8H = <!--v:eightH-->2,682,536<!--/v--> years at J2000) is the super-period of the **Earth-family lattice**, and this document is the model's **typed reference table**: every cycle below carries an 8H/N label, and each label is a **typed descriptor** of a measured quantity per the doc-109 §9 typing — A = long-term mean (Mars perihelion 8H/36, Earth node −8H/40), B = present-epoch rate (Mercury perihelion 8H/11), C = window-epoch value (Jupiter 8H/39, Saturn −8H/65, Uranus 8H/24 and the non-Earth nodes), L = epoch-local law (Earth's H/3, H/16). A descriptor is exact for the quantity and era it names, and silent beyond.
 
-> **ESSRT scope.** The **integer divisors** in every table below (3, 5, 8, 13, 24, 39, 65, 104, 128, ...) are **scale-invariant structural constants** of the solar system — the same at every epoch. The **literal periods in years** scale with the current value of H(t): 8H_Devonian ≈ 2,472,664 yr, 8H_J2000 = <!--v:eightH-->2,682,536<!--/v--> yr, 8H_+200Myr ≈ 2,805,320 yr. This is the deep principle of the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md) — the integer-divisor structure documented here is preserved across geological time, while the literal year counts shift via Driver 1 (Earth-Moon tidal evolution) and Driver 2 (solar mass loss). All numeric "years" values in the tables below are J2000-anchored.
+> **ESSRT scope (restated per [Doc 99](99-expanding-solar-system-resonance-theory.md)).** The **Earth-family** divisors (H/3, H/5, H/8, H/13, H/16 and the k-involving L1 members) are structural: their integer labels are epoch-invariant and their literal periods scale with H(t) — 8H_Devonian ≈ 2,472,664 yr, 8H_J2000 = <!--v:eightH-->2,682,536<!--/v--> yr, 8H_+200Myr ≈ 2,805,320 yr — via Driver 1 (Earth-Moon tidal evolution). The **planetary** divisors are era-typed descriptors of motions whose long-term dynamics is standard secular theory (the g/s modes, reproduced by the model's own N-body engine — [Doc 109](109-model-nbody-engine-and-lattice-test.md)); they do not scale with H, and their only long-term drift is Driver 2's solar-mass tier (∝ 1/M_Sun). All numeric "years" values in the tables below are J2000-anchored.
 
 ### System Reset
 

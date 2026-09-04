@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v12.0
+modelVersion: v13.0
 coefficients: sha256:56d7365a511916d5
 status: current
 ---
@@ -14,13 +14,42 @@ Active theory draft — Expanding Solar System Resonance Theory (ESSRT). Full sc
 
 ## Core thesis
 
-**The Solar System Resonance Cycle (8H) and the integer-divisor lattice it closes are structural invariants of solar-system dynamics; the period H(t) itself expands monotonically with geological time, driven by Earth-Moon tidal evolution and solar mass loss.**
+**The two-engine + two-expansions reading — the measured form (doc 109 is
+the evidence record).** The solar system expands on TWO measured tiers, and
+ESSRT's lattice is the structure of the FIRST:
 
-The L1 integer LABELS are scale-invariant constants of the system (n=9, 12, ..., 65, 66, 68, ..., 185). Their LITERAL PERIODS scale with the current value of H. As Earth's length-of-day grows under tidal recession of the Moon — and as solar mass loss slowly enlarges every planet's orbit via Kepler's third law — the framework's H value, the Solar System Resonance Cycle 8H, and every H/N divisor period expand together. The integer structure stays fixed; only the unit of time within the lattice scales.
+- **The tidal tier (Earth–Moon — where the lattice lives).** H(t), the
+  Solar System Resonance Cycle 8H, and the H-carrying L1 families (the
+  precession and obliquity bands) are structural to the Earth–Moon
+  spin/tide system and expand with H as the Moon recedes — confirmed
+  against the rock to 2.46 Ga (precession ~12 kyr at Joffre, ~17 kyr at
+  Xiamaling). Earth's orbital laws (H/3, H/16 = 13+3) are exact
+  **epoch-local** laws of the present era (5 % era −2,634…+2,847 yr,
+  bit-exact in the observation window — doc 109 §12).
+- **The mass-loss tier (the whole planetary system).** Solar mass loss
+  expands every orbit adiabatically (a ∝ 1/M_Sun); the first rock-based
+  measurement of the ancient Sun's mass reads μ(2.48 Ga) = M/M₀ =
+  1.00 ± 0.07 (the Kuruman count-bracket inversion — the two-expansions
+  programme).
+- **Planetary orbital SHAPES (perihelia, nodes, eccentricity vectors) are
+  standard secular dynamics**, which the model's own N-body engine
+  reproduces (doc 109: the g/s eigenfrequencies to 0.1–1 % of Laskar, the
+  405-kyr metronome from gravity alone). The planetary 8H/N divisors are
+  TYPED DESCRIPTORS of particular quantities at particular eras (doc 109
+  §9) — Mars ≈ its long-term mean, Mercury ≈ its present-epoch rate,
+  Jupiter/Saturn/Uranus window-epoch values — not dynamics; the measured
+  eigenfrequencies are incommensurate with EVERY base period (doc 109-class
+  null, `tools/explore/lattice-base-scan.mjs`).
+
+The Earth-family L1 integer LABELS are scale-invariant constants (the
+k-involving members); their LITERAL PERIODS scale with the current H. The
+eccentricity-band L1 members are planetary g-beats and do NOT scale — the
+405-kyr family is measured stable while the precession band moves, and
+that split IS the two-tier structure, confirmed at 1.4 and 2.46 Ga.
 
 > **In the past, H was smaller (~<!--v:hAtDevonian-->306,189<!--/v--> yr at 380 Ma vs <!--v:H-->335,317<!--/v--> yr today).**
 > **In the future, H will be larger (~<!--v:hAt200MyrFuture-->352,601<!--/v--> yr in 200 Myr, growing asymptotically toward the tidal-lock limit).**
-> **The integer structure (n=65 for obliquity main, n=39 for Jupiter perihelion ecliptic, etc.) remains fixed across all epochs.**
+> **The Earth-family integer structure (n=65 for obliquity main, n=141-class precession sidebands, H/13, H/8) remains fixed across all epochs; the planetary divisors are era-typed descriptors, not eternal integers.**
 
 > 📐 **Mean values vs actual values** — All quantities tabulated in this document
 > (H, LOD, T_sidereal, Moon distance, etc.) are **MEAN values for the corresponding
@@ -60,10 +89,14 @@ H = 13 × precession period increases (Fibonacci coupling, structural)
     ↓
 8H increases (Solar System Resonance Cycle scales)
     ↓
-All L1 periods 8H/n scale proportionally (the integers n are invariant)
+All Earth-family L1 periods 8H/n scale proportionally (the integers n are invariant)
     ↓
-All k-involving beats AND all planetary g_i±g_j, s_i±s_j beats scale
-    (under view 2 — the framework's claim that all L1 are 8H-lattice beats)
+All k-involving beats scale (the precession + obliquity bands).
+The planetary g_i±g_j, s_i±s_j beats do NOT scale — MEASURED: the 405-kyr
+(g2−g5) family is stable while the precession band moves (Lantink 2022 at
+2.46 Ga, Meyers & Malinverno 2018 at 1.4 Ga; our own engine derives the
+405 from gravity, doc 109 §12). The former "view 2" (all L1 scale) is
+RETIRED by measurement; "view 1" (k-involving only) is the theory.
 ```
 
 ### Driver 2 — Solar mass loss (controls every planet's orbital period)
@@ -760,7 +793,7 @@ This is documented honestly as a known small-epoch discrepancy of the smooth for
 
 ### The mid-Precambrian window (1–3.5 Ga) — the regime-aware recession history (Driver 1½)
 
-This window — between the last Wu 2024 gate at 650 Ma and the genesis endpoint — was, until 2026-08, ungated and divergent: Farhat 2022's central result is that lunar recession followed a resonant **staircase** (long slow-recession plateaus between ocean-resonance crossings, with most of the recession concentrated late), and the earlier single smooth quartic ran −26% fast on LOD at 2.46 Ga and −37% low on Moon distance at 3.2 Ga against the proxies Farhat fit (the pre-regime state is preserved in git history and in `tools/explore/farhat-divergence-probe.js`).
+This window — between the last Wu 2024 gate at 650 Ma and the genesis endpoint — was previously ungated and divergent: Farhat 2022's central result is that lunar recession followed a resonant **staircase** (long slow-recession plateaus between ocean-resonance crossings, with most of the recession concentrated late), and the earlier single smooth quartic ran −26% fast on LOD at 2.46 Ga and −37% low on Moon distance at 3.2 Ga against the proxies Farhat fit (the pre-regime state is preserved in git history and in `tools/explore/farhat-divergence-probe.js`).
 
 **The shipped model now carries the regime-aware history** (`@essrt/physics/deltat/recession-history`, parameters in `model-parameters.json → deepTime.recessionRegime`): the calibrated quartic stays **bit-identical through the entire gated 0–1000 Ma era**, a monotone spline through five fitted knots runs beyond it to the rigid Roche limit at the unchanged 4,498 Ma genesis, and two explicit solar angular-momentum channels make L_EM time-dependent there — the ocean solar-tide leak (β₀ (a/a₀)⁶ of the lunar torque) and the insolation-driven **thermal-tide pump** (Zahnle–Walker 1987; Bartlett–Stevenson 2016; Mitchell–Kirscher 2023), which carries angular momentum from the Sun into the Earth-Moon system through the atmosphere. The fit (`tools/explore/fit-regime-recession.js`) runs against eleven published anchors — Lantink 2022 (Joffre), Weeli Wolli, Zhou 2024's three paired distance+LOD epochs, Meyers–Malinverno 2018 (Xiamaling), Nanfen 2023, and Moodies — all reproduced within 1.3σ; shipped residuals: <!--v:anchorFarhatJoffre2460DeltaPct-->+0.16<!--/v-->% on LOD at 2.46 Ga, <!--v:anchorFarhatWeeliwolli2450DeltaPct-->−5.24<!--/v-->% at 2.45 Ga (inside the wide ±1.32 h rhythmite uncertainty), <!--v:anchorFarhatMoodies3200DeltaPct-->−0.03<!--/v-->% on Moon distance at 3.2 Ga. All eleven are agreement rows in `data/paleo-validation-anchors.json`, checked by the paleo-anchors gate on every CI run.
 
@@ -913,6 +946,14 @@ Periods in **kyr**. Computed as `8H(t) / n` using the proper-physics two-layer f
 
 ## Predicted L1 periods at each age — eccentricity band
 
+> **Retyped.** The eccentricity-band L1 members are planetary
+> g-beats and **do not scale with H** — the measured verdict (the 405-kyr
+> family stable at 1.4/2.46 Ga while the precession band moves; doc 109).
+> The table below is RETAINED AS THE RETIRED VIEW-2 PREDICTION for the
+> record. Under the measured reading the e-band periods stay at their
+> modern values at every epoch (up to the tiny solar-mass drift of the
+> mass-loss tier, ∝ 1/M — ~0.02 % at 2.46 Ga under the measured μ).
+
 | Age (Ma) | H (yr) | n=9 | n=12 | n=14 | n=16 | n=18 | n=20 | n=21 | n=22 | n=25 | n=28 |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | +200 | <!--v:hAt200MyrFuture-->352,601<!--/v--> | 313.4 | 235.1 | 201.5 | 176.3 | 156.7 | 141.0 | 134.3 | 128.2 | 112.8 | 100.7 |
@@ -928,9 +969,7 @@ Periods in **kyr**. Computed as `8H(t) / n` using the proper-physics two-layer f
 - n=25 (modern 107 kyr) → **98 kyr** in Devonian
 - n=28 (modern 96 kyr) → **87 kyr** in Devonian
 
-Da Silva 2020 measured 5 cycles in 490 kyr (radiometric anchors) → **98 kyr/cycle empirical**. If interpreted as n=25 cycles, matches view 2 prediction (98.0 kyr) **within 0.1 %** — essentially exact.
-
-If interpreted as n=28 cycles, modern n=28 = 96 kyr fits at 2 % (view 1), but view 2's 87 kyr fits at 11 % off. So this depends on identification of which beat dominates Devonian short-eccentricity. Both views remain viable; see doc 97 Test C-PrecessionBand notes.
+Da Silva 2020 measured 5 cycles in 490 kyr (radiometric anchors) → **98 kyr/cycle empirical**. Under the retired view 2 this read as an n=25-scaled match (0.1 %); under the MEASURED reading the datum is equally consistent with the UNSCALED standard short-eccentricity band (modern n=28 = 95.8 kyr fits at 2 %; the 95–107-kyr family straddles 98) — so the Devonian datum never discriminated the views. What did discriminate them: the deeper record (1.4/2.46 Ga), where the precession band moves ~2× while the long-eccentricity band stays ~405-class. See doc 97 Test C notes.
 
 ---
 
@@ -972,7 +1011,13 @@ Framework's Wells 1963 flagship 380 Ma coral count matches to 0.01% — within m
 
 ## Predicted planetary perihelion precession periods through time
 
-All L1 integers including planetary ecliptic perihelion precessions scale with H (per framework view 2). Devonian and future values from the proper-physics two-layer formula.
+> **Retyped.** The planetary perihelion divisors are TYPED
+> DESCRIPTORS of era-local quantities (doc 109 §9), not scaling laws: the
+> true long-term planetary apsidal motions are the secular g-modes, which
+> do not scale with H (they drift only ∝ M_Sun on the mass-loss tier).
+> The table below is RETAINED AS THE RETIRED VIEW-2 PREDICTION for the
+> record; under the measured reading only the EARTH rows (H/3, H/16
+> family) carry deep-time content, as epoch-local laws of the present era.
 
 | Quantity | Integer | Modern | Devonian (−380 Ma) | +200 Myr Future |
 |:---|:---|---:|---:|---:|
@@ -987,7 +1032,7 @@ All L1 integers including planetary ecliptic perihelion precessions scale with H
 | Earth ICRF perihelion | +H/3 = 8H/24 | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr | **102,063 yr** | **117,533 yr** |
 | Jupiter ICRF perihelion | 8H/65 (retrograde) | <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | **37,685 yr** | **43,397 yr** |
 
-**Note on the Saturn-Jupiter resonance lock (Law 6)**: The framework's Law 6 — Saturn ecliptic perihelion = Jupiter ICRF perihelion = 8H/65 — is preserved across all epochs because both scale with H. The structural identity persists; only the absolute period evolves.
+**Note on Law 6 (restated)**: Law 6 is an **Earth-frame beat identity at J2000** — Saturn's ecliptic perihelion and Jupiter's ICRF perihelion coincide at 8H/65 in the model's frames at the present epoch, and the striking 0.04/0.12 % Laskar matches of the Law-6 family are matches against |s₃| and k+s₃ (Earth-frame beats), not against Jupiter's or Saturn's own secular frequencies. The identity is exact where stated; the former claim that it persists across all epochs is retired with view 2 (the planetary g-modes do not scale with H).
 
 **Note on solar mass loss**: planetary orbital periods *themselves* (sidereal years, not their perihelion precession) drift by Driver 2 (~71 ppm at Devonian, ~845 ppm at Hadean). The L1 perihelion precessions above are computed as `8H(t) / n`, which scales the perihelion period with H — but the underlying orbital period was also slightly shorter in the past, so the framework's structural ratios `(planet_orbits per 8H)` stay near-invariant.
 
@@ -2053,9 +2098,9 @@ If ESSRT is correct, the following predictions should hold. All values from the 
 Devonian (380 Ma) obliquity main beat (n=65) should be at **37.68 kyr** (vs modern 41.27 kyr — 8.7 % shorter).
 **Status**: Confirmed by Wells 1963 / Boulila 2018 / Meyers 2008 — published values 36–38 kyr, within 5 % of framework prediction.
 
-### 2. Deep-time short-eccentricity periods expand with H (view 2)
-Devonian short-eccentricity peaks should be at **87.5, 98.0, 111.3 kyr** (vs modern 95.8, 107.3, 121.9 kyr).
-**Status**: Mixed. Da Silva 2020 measured 98 kyr/cycle (matches view 2 n=25 prediction at ~1 %), but interpretation as n=25 vs n=28 isn't unambiguous. Decisive test requires more multi-epoch cyclostratigraphy.
+### 2. Deep-time short-eccentricity periods expand with H (view 2) — RESOLVED AGAINST
+Devonian short-eccentricity peaks would have been at **87.5, 98.0, 111.3 kyr** under view 2 (vs modern 95.8, 107.3, 121.9 kyr).
+**Status**: RESOLVED AGAINST view 2. The deeper record decided it: at 1.4 and 2.46 Ga the precession band moves with H while the eccentricity bands stay at their modern classes (Meyers & Malinverno 2018; Lantink et al. 2022), and the model's own N-body derives the eccentricity beats from the fixed planetary g-modes (doc 109). The Devonian datum (Da Silva 98 kyr) never discriminated — it fits the unscaled band at 2 %. The e-band's only true drift is the mass-loss tier's ∝ 1/M_Sun.
 
 ### 3. Earth axial precession period expands with H
 Devonian axial precession (H/13) should be at **<!--v:axialPrecAtDevonian-->23,553<!--/v--> yr** (vs modern <!--v:earthAxialPeriod-->25,794<!--/v--> yr).
@@ -2065,9 +2110,9 @@ Devonian axial precession (H/13) should be at **<!--v:axialPrecAtDevonian-->23,5
 In 200 Myr, Earth's ~41-kyr obliquity cycle should be ~43.40 kyr (+5.2 %).
 **Status**: Not yet testable empirically; ESSRT prediction.
 
-### 5. Saturn-Jupiter resonance lock at 8H/65 persists across epochs
-ESSRT's Law 6 structural identity (Saturn ecliptic perihelion = Jupiter ICRF perihelion) must hold in all epochs.
-**Status**: Theoretical prediction; would be confirmed by sufficiently detailed deep-time observation of planetary orbital evolution.
+### 5. Saturn-Jupiter resonance lock at 8H/65 persists across epochs — RETIRED, replaced
+The former prediction (the Law-6 identity holds in all epochs) is RETIRED with view 2: the planetary g-modes do not scale with H, so the identity is an exact Earth-frame statement at J2000, not an eternal lock (see the Law 6 restatement above).
+**Replacement prediction (the two-tier split itself, already twice confirmed and forward-testable)**: every newly dated Precambrian cyclostratigraphic section must show the precession band at the H(t)-predicted period (spin tier scales) while the long-eccentricity band stays at its modern class scaled only by 1/μ (mass tier) — the Kuruman count-bracket already reads μ(2.48 Ga) = 1.00 ± 0.07. A section violating either half falsifies the corresponding tier.
 
 ### 6. Earth-Moon genesis at the rigid Roche limit at the giant-impact age
 The proper-physics formula, run backwards, crosses the rigid Roche limit at **<!--v:moonDistanceAtHadean-->9,471<!--/v--> km ≈ 1.49 R_E** at ~4.498 Ga — the canonical giant-impact Moon-formation age (~4.5 Ga, isotope-dated), ~40 Myr after Patterson's Pb-Pb Earth age of 4.54 Gyr. The fluid Roche zone (~2.9 R_E) is crossed at ~4.44 Ga. No Hadean constraint was used in the fit.
@@ -2098,8 +2143,8 @@ This is distinct from the tidal-channel coupling (which is faster, direct, and w
 |:---|:---|
 | Exact deep-past rate of H evolution (variable tidal-Q regimes) | Open — proper-physics formula averages over Earth's complex tidal history via polynomial fit to Farhat 2022. Specific regimes (Bartlett-Stevenson Proterozoic stall, Snowball-boundary spike) are smoothed over. |
 | Williams 2000 (Ediacaran 620 Ma) +5.70 % regression | Open — formula matches Wells/Pannella/Winter to ≤1.4 % but misses Williams's rhythmite count by +5.70 %. Whether this is Farhat's curve over-smoothing the Cryogenian or Williams's count being locally biased is unresolved. |
-| Whether all L1 integers truly scale together (view 2) or only k-involving ones (view 1) | Genuinely undecided by current empirical data; both views consistent within uncertainty. |
-| The mechanism by which planetary g_i, s_j frequencies would scale with H (per view 2) | Not yet derived — view 2 requires coupling between Earth's spin and planetary perihelion motions that standard physics doesn't predict. |
+| Whether all L1 integers truly scale together (view 2) or only k-involving ones (view 1) | **DECIDED: view 1, by measurement** — the precession band moves with H while the eccentricity bands stay fixed (1.4/2.46-Ga sections; doc 109's engine derivation of the e-beats from the fixed g-modes). |
+| The mechanism by which planetary g_i, s_j frequencies would scale with H (per view 2) | **Moot** — no such coupling exists; the campaign measured the planetary shapes as standard secular dynamics (doc 109, E1–E25), and the g-modes' only drift is ∝ M_Sun (the mass-loss tier). |
 | The role of L2 (carbon-cycle 405-kyr line) — confirmed NOT scaling | Established; L2 is carbon-cycle resonance, not orbital. See doc 92 §6 (Doc 99's 405-kyr investigation). |
 | Whether L3 transitions (PETM, EOT, etc.) are coupled to H evolution | Likely no; these are climate-system threshold transitions, not orbital periods. |
 | Future projections beyond +3 Gyr (proper-physics formula horizon) | Formula returns null; would require explicit tidal-Q decay model to project to Sun's red-giant phase. |
@@ -2123,10 +2168,10 @@ All values from the proper-physics two-layer formula. The `H × days/yr` near-in
 | Short ecc dominant (n=28, kyr) | 95.80 | 91.72 | 87.48 | 100.7 |
 | Long ecc 405 (L2, NOT scaled, kyr) | 405 | 405 | 405 | 405 |
 | Axial precession (H/13, yr) | <!--v:earthAxialPeriod-->25,794<!--/v--> | 24,695 | <!--v:axialPrecAtDevonian-->23,553<!--/v--> | <!--v:axialPrecAt200MyrFuture-->27,123<!--/v--> |
-| Jupiter perihelion ecliptic (8H/39, yr) | <!--v:jupiterPeriPeriod-->68,783<!--/v--> | 65,852 | 62,808 | 72,328 |
-| Saturn perihelion ecliptic (8H/65, yr) | <!--v:saturnPeriPeriod-->41,270<!--/v--> | 39,511 | 37,685 | 43,397 |
+| Jupiter perihelion ecliptic (8H/39, yr — window-epoch descriptor) | <!--v:jupiterPeriPeriod-->68,783<!--/v--> | does not scale | does not scale | does not scale |
+| Saturn perihelion ecliptic (8H/65, yr — window-epoch descriptor) | <!--v:saturnPeriPeriod-->41,270<!--/v--> | does not scale | does not scale | does not scale |
 
-**Key observation**: the bottom rows (periods) all expand together with H(t), reflecting Driver 1 (tidal evolution). The structural near-invariant `H × days/year ≈ TOTAL_DAYS_IN_H` drifts smoothly with t_Ma under Driver 2 (solar mass loss): −35 ppm at Jurassic, −74 ppm at Devonian, +39 ppm at +200 Myr future (year_s shifts longer in future because Sun has lost more mass). The drift is monotonic and small but real — about 5 ppm per 50 Ma. This combination of strict structural lattice scaling + tracked Driver 2 drift is ESSRT's deepest self-consistency check.
+**Key observation**: the EARTH-family period rows expand together with H(t), reflecting Driver 1 (tidal evolution); the planetary divisor rows are J2000 window-epoch descriptors that do not scale (their long-term referents are the fixed g-modes — see the restated core thesis), and the 405-kyr L2 row never scaled. The structural near-invariant `H × days/year ≈ TOTAL_DAYS_IN_H` drifts smoothly with t_Ma under Driver 2 (solar mass loss): −35 ppm at Jurassic, −74 ppm at Devonian, +39 ppm at +200 Myr future (year_s shifts longer in future because Sun has lost more mass). The drift is monotonic and small but real — about 5 ppm per 50 Ma. This combination of strict structural lattice scaling + tracked Driver 2 drift is ESSRT's deepest self-consistency check.
 
 ---
 
@@ -2153,4 +2198,4 @@ All values from the proper-physics two-layer formula. The `H × days/yr` near-in
 
 ## Net theory statement
 
-> The solar system has a structural lattice of integer-divisor periods, closing on the Solar System Resonance Cycle 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000, encoded in invariant Fibonacci integer relationships (Config #7, Laws 1–6). H itself is not a fixed cosmic constant but **expands monotonically** with geological time, driven by two independent physical processes: **Driver 1**, Earth-Moon tidal evolution (which slows Earth's rotation → slows axial precession → enlarges H via the H/13 Fibonacci coupling), and **Driver 2**, solar mass loss (which expands every planet's orbit via adiabatic conservation of `a × M_Sun`). The current 8H is the now-snapshot of a smoothly-expanding system whose modern epoch sits about **48 %** through its effective lifespan from Earth-Moon genesis (Moon at the rigid Roche limit ~<!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr ago, 8H ≈ <!--v:eightHAtHadean-->0.517<!--/v--> Myr) to the Sun's red-giant phase (~5 Gyr from now). Past: H was smaller (~<!--v:hAtDevonian-->306,189<!--/v--> yr in the Devonian). Future: H will be larger (~<!--v:hAt200MyrFuture-->352,601<!--/v--> yr in 200 Myr) and approaches a physical tidal-lock asymptote at ~+3 Gyr where the proper-physics formula reaches the Moon's angular-momentum-limit distance of <!--v:tidalLockKm-->555,623<!--/v--> km. ESSRT's structural relations — Fibonacci coupling integers, action-angle closure, L1/L2/L3 architecture — remain **invariant across all epochs**. Only the absolute periods expand.
+> The solar system expands on two measured tiers. On the **tidal tier**, the Earth–Moon system carries a structural lattice of integer-divisor periods closing on the Solar System Resonance Cycle 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000: the spin/tide family (H/13 axial precession, H/8 obliquity beat, the L1 precession and obliquity bands, the LOD stack) — where the model's validated results live (eclipses, LOD, cardinal points, 41 paleo anchors) — plus Earth's exact **epoch-local** orbital laws (H/3, H/16 = 13+3) of the present era. H expands monotonically as the Moon recedes (**Driver 1**): smaller in the past (~<!--v:hAtDevonian-->306,189<!--/v--> yr in the Devonian), larger in the future (~<!--v:hAt200MyrFuture-->352,601<!--/v--> yr in 200 Myr), from Earth-Moon genesis at the rigid Roche limit ~<!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr ago (8H ≈ <!--v:eightHAtHadean-->0.517<!--/v--> Myr) toward the tidal-lock asymptote at <!--v:tidalLockKm-->555,623<!--/v--> km. On the **mass-loss tier** (**Driver 2**), solar mass loss expands every planetary orbit via adiabatic conservation of `a × M_Sun`; the ancient Sun's mass is now rock-measured (μ(2.48 Ga) = 1.00 ± 0.07). Planetary orbital shapes — perihelia, nodes, eccentricity vectors, and their beats including the 405-kyr metronome — follow standard secular dynamics, which the model's own N-body engine reproduces (doc 109); the planetary 8H/N divisors are era-typed descriptors of those motions, exact where stated and silent beyond. The Earth-family structural relations remain invariant across all epochs; the two tiers' scaling split (spin periods move with H, the 405 does not) is confirmed at 1.4 and 2.46 Ga and is the theory's standing falsifier.

@@ -1,6 +1,6 @@
 # Fibonacci Laws — Investigation & Verification Scripts
 
-Python (and a few JavaScript) scripts for investigating, verifying, and reproducing the results of the [Fibonacci Laws of Planetary Motion](https://www.holisticuniverse.com).
+Python (and a few JavaScript) scripts for investigating, verifying, and reproducing the results of the [Expanding Solar System Resonance Theory (ESSRT)](https://www.holisticuniverse.com).
 
 These scripts were used during the research to discover and verify the six Fibonacci Laws that connect planetary orbital tilts, eccentricities, and precession rates to the Earth Fundamental Cycle timescale (H; see [Constants Reference](../docs/20-constants-reference.md)).
 

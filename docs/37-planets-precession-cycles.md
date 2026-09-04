@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v12.0
+modelVersion: v13.0
 coefficients: sha256:56d7365a511916d5
 status: current
 ---
@@ -26,8 +26,8 @@ single registry key wherever the same fraction appears — e.g. `hDiv2` /
 `marsAxialPeriod` both render H/2, and `earthPeriPeriodICRF` /
 `inclPrecYears` both render H/3, including in Uranus and Jupiter cells. The
 reuse is a NUMERIC identity of the H-fraction, not a claim that the tagged
-quantities are the same physical thing; per-planet keys arrive with the
-registry retype (plan 02 §10 Batch D).
+quantities are the same physical thing; a future registry retype will give
+these quantities their own per-planet keys.
 
 **Earth's Fibonacci rate identities** (rates ω = 1/period, in units of 1/H):
 

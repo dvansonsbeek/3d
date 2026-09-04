@@ -11,7 +11,7 @@ directories · ~245 Python files · 74 docs · two web UIs (simulator, `dashboar
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
 Golden masters live in `packages/fixtures/`. Of the 26 scripts in `tools/verify/`,
-only 7 can actually fail — see the Verification section.
+only 5 can actually fail — see the Verification section.
 
 ---
 
@@ -155,27 +155,43 @@ round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
 `/gates` runs the standalone model checks. `tools/verify/` holds 26 scripts, and
-**19 of them cannot fail** — no exit path, no assertion, so running them proves
-nothing. `npm run test:verify:list` gives the classification: 7 gate · 4 liftable
-· 10 narrative · 5 generator (the suite FAILS on any unclassified script). **Never
+**21 of them cannot fail** — no exit path, no assertion, so running them proves
+nothing. `npm run test:verify:list` gives the classification: 5 gate · 3 liftable
+· 13 narrative · 5 generator (the suite FAILS on any unclassified script). **Never
 run a generator as a test** — `balance-search.js` rewrites the tracked
 `data/balance-presets.json`, and the four campaign generators
 (cassini-results / lod-climate-correlation / eclipse-audit / lunar-alignment)
 rewrite their `data/*.json` under `--write` (the latter two REFUSE on
-divergence; `--rebaseline` is the conscious re-measurement path). `verify-laws` is gated on its
-check count (49/50, Saturn's Laplace–Lagrange bound the documented failure), not
-its exit code, so an unexplained *improvement* fails too.
+divergence; `--rebaseline` is the conscious re-measurement path).
 
-Reference values: Law 4 K = 3.4143e-6 · Law 5 balance = 99.8636% (use **base**
-eccentricity, not J2000) · Saturn Law 5 = 0.05371910.
+**The Fibonacci-law retirement.** `verify-laws`, `dual-balance-optimizer` and
+`config1-proof` are narrative class (kept as the record, no longer gates): the
+structural claims they gated — exact eccentricity balance, the Saturn
+e-prediction, Config #7 mirror uniqueness, the node integers — were
+re-evaluated with the engine's own dynamical inputs
+(`tools/explore/balance-with-dynamical-nodes.mjs`; doc 109 is the evidence
+record) and retired. What survives as a documented observation: under the
+Fibonacci weights the 8-planet eccentricity balance holds to ~98 % with the
+engine's long-term mean eccentricities (99.8636 % was the tuned-inputs
+figure). The Law-4/Law-5 constants remain scene-implementation parameters
+(`K = 3.4143e-6`; base eccentricities from the balance construction) until
+the planet chains move to engine-D elements.
 
-**The falsification criterion** (checks 46–50 of `verify-laws`). The model is one
-configuration out of 7,558,272: Saturn antiphase, the rest in phase, all eight
-mirror-paired. In `data/balance-presets.json` that is the *unique* deep-analysis
-candidate with `mirror === true`. If a regenerated file no longer contains it,
-the model is invalid. Do not confuse this with `allPass`: `allPassCount` is 0 and
-Config 7 reports `allPass: false` — a stricter question about all four physical
-constraints, and **not** what makes the model valid.
+**The falsification criterion.** The model stands falsifiable on three named,
+pre-registered legs: (1) **the deep-time scaling split** — the spin-family
+periods (axial precession, obliquity band) must scale with H(t) per the
+recession history while the long-eccentricity band stays at its modern class
+(scaled only by the measured solar-mass history); every newly dated
+Precambrian cyclostratigraphic section tests both halves (confirmed so far
+at 1.4 and 2.46 Ga), and a section violating either half falsifies the
+corresponding tier. (2) **Historical-era exactness** — the fail-proven gate
+suite: eclipses (`eclipse-audit`), the LOD/ΔT stack, cardinal points, the
+41-anchor paleo bands (`paleo-anchors`, where an unexplained *improvement*
+fails too). (3) **Two-expansions μ-consistency** — the rock-measured
+long-eccentricity period must track 405.6 kyr / μ under the measured solar
+mass history (currently μ(2.48 Ga) = 1.00 ± 0.07). The former Config-#7
+criterion (checks 46–50 of `verify-laws`, the mirror-unique configuration in
+`data/balance-presets.json`) is retired with its record.
 
 ## Skills
 
@@ -202,7 +218,7 @@ what actually made corrections stick here.
 | `src/script.js` | browser scene + UI + formulas (monolith) |
 | `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
-| `tools/verify/` | 26 scripts: 7 gate · 4 liftable · 10 narrative · 5 generator (`npm run test:verify:list`) |
+| `tools/verify/` | 26 scripts: 5 gate · 3 liftable · 13 narrative · 5 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | 140 research one-offs — findings live in `docs/` |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |

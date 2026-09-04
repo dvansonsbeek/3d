@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v12.0
+modelVersion: v13.0
 coefficients: sha256:56d7365a511916d5
 status: current
 ---
@@ -218,5 +218,5 @@ For how this conclusion relates to recent peer-reviewed work — Zeebe & Lantink
 - [Doc 94 — Insolation null test](94-insolation-null-test.md) — empirical basis for the conclusion synthesized here
 - [Doc 96 — Related work](96-related-work.md) — position of this framework in the 2024 climate-forcing literature
 - [Doc 55 — Solar System Resonance Cycle periods](55-solar-system-resonance-cycle-periods.md) — what each L1 integer is
-- [Doc 10 — Fibonacci laws of planetary motion](10-fibonacci-laws.md) — the structural identities the integer divisors encode
+- [Doc 10 — The six Fibonacci relations](10-fibonacci-laws.md) — the structural identities the integer divisors encode
 - [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); the structural "gravity not insolation" thesis is epoch-independent

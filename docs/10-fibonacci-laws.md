@@ -1,17 +1,35 @@
 ---
 docVersion: 1.0
-modelVersion: v12.0
+modelVersion: v13.0
 coefficients: sha256:56d7365a511916d5
 status: current
 ---
 
-# Fibonacci Laws of Planetary Motion
+# The Six Fibonacci Relations
 
-This document describes the Fibonacci Laws of Planetary Motion as implemented in the Holistic Universe Model. Six laws form a symmetric architecture anchored on Earth and extending to all eight planets through Fibonacci numbers: an Earth-specific cycle hierarchy, paired inclination and eccentricity laws (amplitude constants + collective balance), and a three-planet coupling at H/8.
+This document describes the six Fibonacci relations (published under their historical name, "Fibonacci Laws of Planetary Motion") as implemented in the Holistic Universe Model. The six relations form a symmetric architecture anchored on Earth and extending to all eight planets through Fibonacci numbers: an Earth-specific cycle hierarchy, paired inclination and eccentricity relations (amplitude constants + collective balance), and a three-planet coupling at H/8.
 
 ---
 
 ## Overview
+
+> **Status (the restatement).** The model's own N-body engine re-evaluated
+> this document's structural claims with dynamical inputs
+> ([Doc 109](109-model-nbody-engine-and-lattice-test.md);
+> `tools/explore/balance-with-dynamical-nodes.mjs`). The measured verdicts:
+> the Law-5 balance reads **~98 %** with the engine's long-term mean
+> eccentricities (99.8636 % is the tuned-inputs figure) — it survives as an
+> **approximate, typed observation**, not an exactness claim; the Saturn
+> e-prediction misses Saturn's dynamical mean by 3.6 % and is retired (its
+> 0.27 %-vs-J2000 match was a property of the tuned inputs); Config #7's
+> mirror uniqueness is input-dependent survivorship and is retired as a
+> falsification criterion (the model's current criterion is in CLAUDE.md
+> §Verification); Law 6 is an **Earth-frame beat identity at J2000** (the
+> Laskar matches are against |s₃| and k + s₃); the node integers are retired
+> (only Earth's −8H/40 tracks a real quantity within 5 %); Laws 2/4 remain
+> untested empirical amplitude laws, kept as open predictions. The
+> derivations below are retained in full as the record of how the structure
+> was found.
 
 The six Fibonacci Laws form a symmetric architecture, organized by structural role rather than by physical domain:
 
@@ -79,7 +97,7 @@ Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invari
 
 ---
 
-## The Six Laws
+## The Six Relations
 
 ### Law 1: Fibonacci Cycle Hierarchy
 
@@ -745,7 +763,7 @@ npm run constants:generate
 
 4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of the valid configurations, only one is also mirror-symmetric — the default configuration.
 
-5. **Saturn eccentricity prediction from Law 5** — Law 5 (eccentricity balance) is one equation in eight unknowns, sufficient to uniquely determine Saturn's eccentricity from the other seven. The prediction (0.05372) matches the J2000 observed value (<!--v:saturnEccJ2000-->0.05386<!--/v-->) to ~0.27%. The d-values were originally chosen to match Laws 1, 2, and 3 — *not* tuned for eccentricity — yet they produce a Law 5 balance equation that nevertheless predicts Saturn's eccentricity to sub-percent accuracy.
+5. **Saturn eccentricity prediction from Law 5 — retired.** Law 5 (eccentricity balance) is one equation in eight unknowns, sufficient to determine Saturn's eccentricity from the other seven; the value (0.05372) matches the J2000 observed value (<!--v:saturnEccJ2000-->0.05386<!--/v-->) to ~0.27%. Re-evaluated with dynamical inputs, the same construction misses Saturn's long-term mean eccentricity by 3.6% — the sub-percent J2000 match was a property of the tuned base eccentricities, and the prediction claim is retired (the balance itself survives as the ~98% approximate observation).
 
 ### Assessment
 
@@ -753,7 +771,7 @@ The balance conditions (Laws 3 and 5) combine known conservation principles with
 
 Laws 2 and 4 (the amplitude constants ψ and K) are the most genuinely novel claims — no existing theory predicts that Fibonacci divisors should produce universal constants for either inclination or eccentricity amplitudes across all eight planets.
 
-The key unresolved question is **why Fibonacci numbers work**: do they encode something about the secular eigenmode structure (real physics), or is the Fibonacci restriction a coincidence made possible by having enough number choices? The mirror symmetry and the uniqueness of the default configuration argue against coincidence, but a theoretical derivation from first principles — or a successful prediction for an independent system such as exoplanetary or satellite systems — would be needed to settle the question definitively.
+The key question — **why Fibonacci numbers work** — was put to measurement: the model's own N-body engine found the eigenfrequencies incommensurate with every base period (the any-base scan, chance-level P ≈ 0.5), the d-assignment's edge over random assignments to be input-dependent survivorship, and the balance approximate (~98 %) rather than exact under dynamical inputs. The measured answer for the *planetary* structure is therefore: a good era-local description, not eigenmode physics. What remains genuinely open is the Earth side — the spin/tide family's Fibonacci hierarchy (Law 1), which scales with H(t) and keeps passing its deep-time tests, and the untested amplitude laws (2/4). A successful amplitude prediction for an independent system (exoplanetary or satellite) would still be decisive for those.
 
 ---
 

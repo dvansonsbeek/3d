@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v12.0
+modelVersion: v13.0
 coefficients: sha256:56d7365a511916d5
 status: current
 ---
@@ -384,7 +384,7 @@ This perturbs each planet's mass within its 1-σ relative uncertainty (10⁻⁹ 
 
 ## 10. Related documents
 
-- [doc 10 — Fibonacci Laws of Planetary Motion](10-fibonacci-laws.md) — Laws 3 and 5, exhaustive search, configuration uniqueness
+- [doc 10 — The Six Fibonacci Relations](10-fibonacci-laws.md) — Laws 3 and 5, exhaustive search, configuration uniqueness
 - [doc 20 — Constants Reference](20-constants-reference.md) — H, ψ, K, mass and eccentricity sources
 - [doc 25 — Universal Mass-from-Moon Formula](25-universal-mass-from-moon-formula.md) — how `massFraction.earth` is derived (Δa correction); related to the ~9 ppm Earth-mass refinement that triggered the recent balance-presets regeneration
 - [doc 53 — Balance Explorer Reference](53-balance-explorer-reference.md) — interactive UI panel showing the 15 deep-analysis survivors

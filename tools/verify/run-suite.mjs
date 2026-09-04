@@ -36,20 +36,32 @@ const V = (n) => join(ROOT, 'tools/verify', n);
  *   generator — writes tracked artifacts; MUST NOT run in a suite
  */
 const MANIFEST = [
-  { n: 'verify-laws.js', class: 'gate', ms: 53,
-    expect: { passed: 49, total: 50 },
-    knownFailure: 'Saturn Laplace-Lagrange bound [0.920,1.050] not inside [0.797,1.020] — documented, not a regression',
-    note: 'Its own output contains `✓ saturn J2000 match < 0.1": 0.0000"` — the anchor tautology. Do not treat that line as a gate. Checks 46-50 are the Config-7 falsification gate (§2j); each was shown to fail under injection.' },
+  // THE FIBONACCI-LAW RETIREMENT (the model restatement): verify-laws and the
+  // balance suite are RECLASSIFIED gate→narrative. The structural claims they
+  // gated (exact balance, the Saturn e-prediction, Config #7 mirror
+  // uniqueness, the node integers) were re-evaluated with the engine's own
+  // dynamical inputs (tools/explore/balance-with-dynamical-nodes.mjs): Law 5
+  // reads 98.19 % under long-term mean e's (99.8636 was the tuned-inputs
+  // figure), the Saturn prediction misses the dynamical mean by 3.6 %, the
+  // node integers sit 22–97 % off the s-modes, and the mirror uniqueness is
+  // input-dependent survivorship. The scripts are KEPT as the record and
+  // still run under --all; the model's falsifiability now rests on the
+  // three-falsifier criterion (CLAUDE.md §Verification). What survives as a
+  // documented observation: the ~98 % approximate balance under the
+  // Fibonacci weights.
+  { n: 'verify-laws.js', class: 'narrative', ms: 53,
+    note: 'RETIRED AS A GATE (was gate 49/50 with the documented Saturn L-L failure). Kept as the record of Laws 1–6 + the former Config-7 falsification checks 46–50; its `✓ saturn J2000 match` line is the anchor tautology — never a gate.' },
 
-  { n: 'dual-balance-optimizer.js', class: 'gate', ms: 658 },
+  { n: 'dual-balance-optimizer.js', class: 'narrative', ms: 658,
+    note: 'RETIRED AS A GATE with the balance laws — the dual-balance diagnostic; kept as the sensitivity record (doc 19).' },
   { n: 'perihelion-projection-closure.js', class: 'gate', ms: 400,
     note: 'Earth-frame perihelion rate ≡ ecliptic advance × dα/dλ + ∂α/∂ε·ε̇ (+κ ≤ 1 ″/cy) for all seven planets at 1900/2000/2100 — the decomposition behind the Mercury-anomaly projection statement (doc 13 §1.8).' },
 
   { n: 'ascending-node-verification.js', class: 'liftable', ms: 49, markers: 8 },
   { n: 'inclination-verification.js', class: 'liftable', ms: 61, markers: 20 },
   { n: 'inclination-optimization.js', class: 'liftable', ms: 51, markers: 10 },
-  { n: 'config1-proof.js', class: 'liftable', ms: null, markers: 20, slow: true,
-    note: 'exceeds 60 s — a full Fibonacci d-value x group scan' },
+  { n: 'config1-proof.js', class: 'narrative', ms: null, markers: 20, slow: true,
+    note: 'exceeds 60 s — the full Fibonacci d-value x group scan behind the retired Config-7 uniqueness claim; kept as the record (was liftable)' },
 
   { n: 'balance-search.js', class: 'generator', ms: 2645,
     writes: 'data/balance-presets.json (tracked)' },

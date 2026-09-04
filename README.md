@@ -1,4 +1,4 @@
-# Fibonacci Laws of Planetary Motion — Interactive 3D Solar System Simulation
+# ESSRT — Interactive 3D Solar System Simulation
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-10-green.svg)](https://github.com/dvansonsbeek/3d/releases/tag/v10)
@@ -14,7 +14,7 @@
 
 What if the orbits of all eight planets, the wobble of Earth's axis, and the rhythm of ice ages are all governed by the same mathematical structure?
 
-This interactive 3D simulation visualizes the **Fibonacci Laws of Planetary Motion** — six laws that connect every planet's orbital tilt, shape, and precession to a single timescale. Built with just **6 free parameters**, the simulation accurately reproduces the geocentric positions of the Sun, Moon, and all seven planets — verified against JPL Horizons ephemeris data (~1800–2200 AD) and over 700 historical astronomical observations (~2000 BC to ~4000 AD). From the same geometric framework, it simultaneously produces obliquity, eccentricity, perihelion precession, and inclination oscillation for all planets.
+This interactive 3D simulation implements the **Expanding Solar System Resonance Theory (ESSRT)** — a geocentric model built on a single timescale, with six Fibonacci relations describing every planet's orbital tilt, shape, and precession. Built with just **6 free parameters**, the simulation accurately reproduces the geocentric positions of the Sun, Moon, and all seven planets — verified against JPL Horizons ephemeris data (~1800–2200 AD) and over 700 historical astronomical observations (~2000 BC to ~4000 AD). From the same geometric framework, it simultaneously produces obliquity, eccentricity, perihelion precession, and inclination oscillation for all planets.
 
 ---
 
@@ -35,7 +35,7 @@ Everything comes together in the **Earth Fundamental Cycle (H)**: a <!--v:H-->33
 
 ## The Solar System Resonance Cycle (8H) — ESSRT
 
-Earth's H is the model's master cycle, but it isn't the largest. **Eight Earth Fundamental Cycles — 8H = <!--v:eightH-->2,682,536<!--/v--> years at J2000 — is the Solar System Resonance Cycle**: the super-period at which every major planetary cycle (axial precession, perihelion precession, inclination oscillation, ascending node regression, obliquity oscillation, eccentricity oscillation) across all eight planets divides evenly as an integer. This is the **8H integer-divisor lattice** that the climate work (docs 90–92) demonstrates from the LR04 + CENOGRID paleoclimate records, the Fibonacci Laws use (Law 6 lock at 8H/65, axial precession H/13 = 8H/104), and the deep-time framework expands across geological time.
+Earth's H is the model's master cycle, but it isn't the largest. **Eight Earth Fundamental Cycles — 8H = <!--v:eightH-->2,682,536<!--/v--> years at J2000 — is the Solar System Resonance Cycle**: the super-period of the **Earth-family lattice** — Earth's spin/tide cycles (axial precession H/13 = 8H/104, the obliquity beat 8H/65) and the climate lattice the paleoclimate work (docs 90–92) demonstrates from the LR04 + CENOGRID records — which the deep-time framework expands across geological time. The other planets' cycles carry 8H/N labels as **era-typed descriptors** of their measured motions (exact for the quantity and era each names — [Doc 109](docs/109-model-nbody-engine-and-lattice-test.md) is the typing record); their long-term orbital dynamics is standard secular theory, which the model's own N-body engine reproduces.
 
 The unifying theory is the **Expanding Solar System Resonance Theory (ESSRT)** ([Doc 99](docs/99-expanding-solar-system-resonance-theory.md)):
 
@@ -47,20 +47,20 @@ ESSRT therefore unifies the **modern-era 8H climate lattice** (docs 90–92), th
 
 ---
 
-## The Six Fibonacci Laws
+## The Six Fibonacci Relations — restated
 
-The model implements six laws — anchored on Earth and extending to all eight planets through Fibonacci numbers:
+The model's six laws are kept with their honest, measured status (the model's own N-body engine re-evaluated the structural claims — [Doc 109](docs/109-model-nbody-engine-and-lattice-test.md) is the evidence record):
 
-1. **Fibonacci Cycle Hierarchy** — Earth's major precession periods divide H by Fibonacci numbers (H/3, H/5, H/8, H/13). A hierarchy unique to Earth.
-2. **Inclination Amplitude Constant** — A single constant ψ predicts all eight inclination amplitudes from Fibonacci divisors and mass alone
-3. **The Inclination Balance** — Seven planets' angular-momentum-weighted oscillations balance against Saturn alone (anti-phase) to <!--v:balanceInclPct-->99.9974%<!--/v-->
-4. **Eccentricity Amplitude Constant** — A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt
-5. **The Eccentricity Balance** — Seven planets' eccentricities balance against Saturn alone using the same Fibonacci divisors and phase groups as Law 3 (<!--v:balanceEccPct-->99.8636%<!--/v-->)
-6. **Saturn-Jupiter-Earth Resonance** — Jupiter's ICRF perihelion and Saturn's ecliptic perihelion lock to one period, 8H/65 (a structural balance, not a coincidence); this is the obliquity beat in Earth's climate record, one 8H-lattice step from Earth's Fibonacci obliquity H/8 (= 8H/64). The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock
+1. **Fibonacci Cycle Hierarchy** — Earth's major precession periods divide H by Fibonacci numbers (H/3, H/5, H/8, H/13). A hierarchy unique to Earth; the spin-family members scale with H(t) and are confirmed against the rock to 2.46 Ga.
+2. **Inclination Amplitude Constant** — A single constant ψ predicts all eight inclination amplitudes from Fibonacci divisors and mass alone (an empirical amplitude law; untested by the N-body campaign, kept as an open prediction)
+3. **The Inclination Balance** — Seven planets' angular-momentum-weighted contributions balance against Saturn alone (anti-phase) to <!--v:balanceInclPct-->99.9974%<!--/v--> (a mass-geometry identity given the divisors; dynamics-insensitive by construction)
+4. **Eccentricity Amplitude Constant** — A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt (empirical amplitude law, kept as an open prediction)
+5. **The Eccentricity Balance** — Seven planets' eccentricities balance against Saturn alone using the same Fibonacci divisors and phase groups as Law 3: <!--v:balanceEccPct-->99.8636%<!--/v--> with the model's tuned base eccentricities, **~98% with the engine's dynamical long-term means** — an approximate, honestly-typed observation, no longer an exactness claim (the former Saturn e-prediction missed the dynamical mean by 3.6% and is retired)
+6. **Saturn-Jupiter-Earth Resonance** — an **Earth-frame beat identity at J2000**: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion read one period, 8H/65, in the model's frames at the present epoch — the obliquity beat in Earth's climate record (k + s₃), one 8H-lattice step from Earth's Fibonacci obliquity H/8 (= 8H/64). Exact where stated; the quantities matched are Earth-frame beats, not the giants' own secular frequencies
 
-The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of <!--v:configSearchSpace-->7,558,272<!--/v--> candidate configurations, five successive physical filters (inclination balance ≥99.994%, eccentricity balance ≥99%, Laplace–Lagrange bounds, direction match, rate error ≤6″) narrow the field to <!--v:deepSurvivorCount-->15<!--/v--> deep-analysis survivors — of which mirror symmetry then picks out only one (Config #7).
+The mirror-symmetric configuration search (Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter; <!--v:configSearchSpace-->7,558,272<!--/v--> candidates narrowed to <!--v:deepSurvivorCount-->15<!--/v--> survivors, mirror symmetry selecting Config #7) is kept as the record of how the divisors were found; its uniqueness claim did not survive dynamical inputs (it is input-dependent survivorship) and is retired as a falsification criterion. **The model's falsifiability now rests on three pre-registered legs** — the deep-time scaling split (spin-family periods scale with H(t), the 405-kyr band does not; confirmed at 1.4 and 2.46 Ga, tested afresh by every newly dated Precambrian section), the fail-proven historical-era gate suite (eclipses, LOD/ΔT, cardinal points, 41 paleo anchors), and the two-expansions solar-mass consistency (μ(2.48 Ga) = 1.00 ± 0.07 measured from rock) — see `CLAUDE.md` §Verification.
 
-See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full derivation, and [verify-laws.js](tools/verify/verify-laws.js) for comprehensive verification (49/50 checks pass — the one carried failure is Saturn's Laplace–Lagrange bound, documented).
+See the [Fibonacci relations documentation](docs/10-fibonacci-laws.md) for the full derivation, and [verify-laws.js](tools/verify/verify-laws.js), kept as the record of the law checks (narrative class since the restatement).
 
 ---
 
@@ -190,8 +190,7 @@ Two things worth knowing before you read a red result as breakage:
 - Time controls: play, pause, speed adjustment, and date navigation
 - Click any planet to focus the camera and see its orbital data
 - Planet info sidebar with per-planet data, charts, and precession analysis
-- [Eccentricity Balance Scale](docs/38-eccentricity-scale.md) for visualizing Law 5 balance per planet
-- [Invariable Plane Balance Explorer](docs/53-balance-explorer-reference.md) for interactive Fibonacci Law testing
+- ~~Eccentricity Balance Scale · Invariable Plane Balance Explorer~~ — removed from the simulator with the Fibonacci-law retirement (the reference docs [38](docs/38-eccentricity-scale.md) and [53](docs/53-balance-explorer-reference.md) remain as the record)
 - **Climate Formula Explorer** — Tools-menu modal plotting the canonical L1+L2+L3 formula over four proxy records across eight time-window tabs (CenCO2PIP 66 Myr → forward projection of the next natural glaciation)
 - Console tests for year length, day length, and calibration verification
 - Export functionality for solstice dates and object positions
@@ -223,7 +222,7 @@ The model's gravitational parameters (`GM_Sun`, `GM_Earth`, `GM_Moon`, `GM_plane
 - **[Doc 25 — Universal Mass-from-Moon Formula](docs/25-universal-mass-from-moon-formula.md)** — Packages three classical terms (Newton's two-body Kepler + Hill-Brown's solar perturbation + Brouwer's J2 oblateness) as a single closed-form formula and verifies it against 22 moons of 7 planets. Matches DE440 to 3–340 ppm — a synthesis demonstration, not a new physical law
 - **[Doc 26 — Universal Sun-side Δa Formula](docs/26-universal-sun-side-delta-a.md)** — An algebraic identity: the symmetric `Δa = a·(1 − ((μ_S+μ_E−μ_b)/(μ_S+μ_E))^(1/3))` makes the elaborate two-body Kepler form algebraically identical to the simple `T = 2π·√(a³/(μ_S+μ_E))` for every planet. Useful as a conceptual lens; the model uses the simple form
 
-These are calibration findings, not Fibonacci Laws, and not improvements on Newton. The physics is fully classical; the contribution is pedagogical — cleaner notation, a closed-form derivation of a textbook value, and a unified-formula demonstration across all moon-bearing planets in DE440. Suitable for an undergraduate astrodynamics or physics-education context.
+These are calibration findings, not part of the Fibonacci relations, and not improvements on Newton. The physics is fully classical; the contribution is pedagogical — cleaner notation, a closed-form derivation of a textbook value, and a unified-formula demonstration across all moon-bearing planets in DE440. Suitable for an undergraduate astrodynamics or physics-education context.
 
 **Headline numbers:** The model derives `GM_Earth` and `GM_Moon` to ~4 ppm and `GM_Sun` to 0.07 ppm against JPL DE440. These residuals sit at the precision floor of Kepler-from-Moon-orbit derivations (Hill-Brown m⁴-and-beyond terms), and fall inside the ~22 ppm uncertainty in `G` that bounds any mass-in-kg statement.
 
@@ -236,7 +235,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 | Range | Category | Start here |
 |-------|----------|------------|
 | 00–09 | Getting Started & Overview | [Introduction](docs/01-introduction.md), [User Guide](docs/02-user-guide.md), [Glossary](docs/03-glossary.md) |
-| 10–19 | Theory & Model | [Fibonacci Laws](docs/10-fibonacci-laws.md) |
+| 10–19 | Theory & Model | [Fibonacci Relations](docs/10-fibonacci-laws.md) |
 | 20–29 | Technical Reference | [Constants Reference](docs/20-constants-reference.md), [Formulas](docs/21-orbital-formulas-reference.md) |
 | 30–39 | Calculations | [Anomaly](docs/30-anomaly-calculations.md), [Ascending Nodes](docs/31-ascending-node-calculations.md), [Inclination](docs/32-inclination-calculations.md) |
 | 40–49 | Architecture & Code | [Architecture](docs/40-architecture.md), [Scene Graph](docs/41-scene-graph-hierarchy.md) |

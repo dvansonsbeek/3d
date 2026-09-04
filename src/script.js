@@ -25,7 +25,7 @@ const capitalisePlanetKeys = (o) =>
   Object.fromEntries(Object.entries(o).map(([k, v]) => [k.charAt(0).toUpperCase() + k.slice(1), v]));
 
 /*
-  Fibonacci Laws of Planetary Motion — Holistic Universe Model
+  Expanding Solar System Resonance Theory (ESSRT) — Holistic Universe Model
   (model version: see MODEL_VERSION from the generated constants)
 
   Copyright (C) 2025-2026 D. van Sonsbeek
@@ -43,7 +43,7 @@ const capitalisePlanetKeys = (o) =>
   <https://www.gnu.org/licenses/>
 
   Interactive 3D simulation of the solar system modelled from a geo-heliocentric
-  frame of reference. Six Fibonacci Laws and only 6 free parameters describe the
+  frame of reference. Six Fibonacci relations and only 6 free parameters describe the
   precession, eccentricity, inclination, obliquity and perihelion movements of
   all planets. The Earth Fundamental Cycle (H = 335,317 yr at J2000) unifies
   axial precession (H/13), inclination precession (H/3) and perihelion precession
@@ -16076,10 +16076,10 @@ function createBalanceExplorerPanel() {
           <div class="fbe-section-title">Planet Assignments</div>
           <div class="fbe-grid-header">
             <span>Planet</span>
-            <span class="fbe-header-tip">Group <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Balance group: <b>in-phase</b> planets reach minimum inclination at the balanced year. <b>Anti-phase</b> planets reach maximum. The two groups must have equal structural weights for the invariable plane to remain stable.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a></span></span>
+            <span class="fbe-header-tip">Group <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Balance group: <b>in-phase</b> planets reach minimum inclination at the balanced year. <b>Anti-phase</b> planets reach maximum. The two groups must have equal structural weights for the invariable plane to remain stable.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">The Fibonacci relations \u2192</a></span></span>
             <span class="fbe-header-tip">Anchor \u03C6 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Per-planet cycle anchor: the ICRF perihelion longitude where MAX inclination occurs, evaluated at the <b>balanced year</b>. The balanced year is determined by the anchor position (n) within the Solar System Resonance Cycle (8H = 2,682,360 yr). Each config may have a different optimal anchor.<br><br>In-phase planets: \u03C6 = \u03D6(balanced year) \u2212 180\u00B0 (at the balanced year they are at MIN, so MAX is 180\u00B0 away)<br>Anti-phase planets: \u03C6 = \u03D6(balanced year) (at the balanced year they are at MAX)</span></span>
             <span class="fbe-header-tip">\u03D6 J2000 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ICRF perihelion longitude at J2000 epoch. Read-only reference.</span></span>
-            <span class="fbe-header-tip">d <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The Fibonacci divisor d determines each planet\u2019s inclination amplitude via:<br><br><b>amp = \u03C8 / (d \u00D7 \u221Am)</b><br><br>A larger d means a smaller oscillation. Each planet is assigned a Fibonacci number (1, 2, 3, 5, 8, 13, 21, 34, 55) as its divisor.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a></span></span>
+            <span class="fbe-header-tip">d <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The Fibonacci divisor d determines each planet\u2019s inclination amplitude via:<br><br><b>amp = \u03C8 / (d \u00D7 \u221Am)</b><br><br>A larger d means a smaller oscillation. Each planet is assigned a Fibonacci number (1, 2, 3, 5, 8, 13, 21, 34, 55) as its divisor.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">The Fibonacci relations \u2192</a></span></span>
             <span class="fbe-header-tip">N <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Ascending node cycles in 8H (Solar System Resonance Cycle). The ascending node regression period = \u22128H/N years.<br><br>Per-config optimized to minimize the ecliptic inclination rate error against JPL trends. Each planet\u2019s N is independent (trend only depends on that planet\u2019s own ascending node + Earth\u2019s fixed \u03A9 at \u2212H/5).</span></span>
             <span class="fbe-header-tip">Incl. cycle <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The inclination oscillation period (years): how long for the planet\u2019s invariable-plane inclination to complete one full cycle (min \u2192 max \u2192 min).<br><br>This equals the ICRF perihelion period (ecliptic rate minus general precession H/13). Negative = retrograde ICRF precession. All ICRF periods divide the Solar System Resonance Cycle (8H) evenly.</span></span>
             <span class="fbe-header-tip">Ecl. period <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ecliptic perihelion precession period (years) \u2014 the period visible in the simulation. All ecliptic periods are H/Fibonacci fractions.</span></span>
@@ -16091,7 +16091,7 @@ function createBalanceExplorerPanel() {
               const disabled = cfg.locked ? 'disabled' : '';
               const eclPeriod = key === 'earth' ? holisticyearLength / 16 : planets[key].perihelionEclipticYears;
               return `<div class="fbe-planet-row ${locked}" data-planet="${key}">
-                <span class="fbe-planet-name">${cfg.name}${cfg.locked ? ' <span class="fbe-lock-tip">\uD83D\uDD12<span class="fbe-lock-tip-content">Earth is locked because the formula <b>amp = \u03C8 / (d \u00D7 \u221Am)</b> was derived from Earth\u2019s observed inclination amplitude (0.6329789\u00B0) with Fibonacci divisor d\u2009=\u20093.<br><br>All other planet amplitudes follow from this calibration.<br><br><a href="https://github.com/dvansonsbeek/3d/blob/main/docs/10-fibonacci-laws.md" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a></span></span>' : ''}</span>
+                <span class="fbe-planet-name">${cfg.name}${cfg.locked ? ' <span class="fbe-lock-tip">\uD83D\uDD12<span class="fbe-lock-tip-content">Earth is locked because the formula <b>amp = \u03C8 / (d \u00D7 \u221Am)</b> was derived from Earth\u2019s observed inclination amplitude (0.6329789\u00B0) with Fibonacci divisor d\u2009=\u20093.<br><br>All other planet amplitudes follow from this calibration.<br><br><a href="https://github.com/dvansonsbeek/3d/blob/main/docs/10-fibonacci-laws.md" target="_blank" rel="noopener">The Fibonacci relations \u2192</a></span></span>' : ''}</span>
                 <div class="fbe-group-cell">
                   ${fbeBuildGroupToggle(key, cfg.defaultAntiPhase)}
                 </div>
@@ -20039,7 +20039,7 @@ function essrtRenderChart(qtyKey, rangeKey) {
     lod:        '<strong>Driver 1</strong> — Earth-Moon tidal recession (Layer-2 angular-momentum conservation, Farhat 2022 polynomial fit).',
     year:       '<strong>Drivers 1+2</strong> — days/year = (tropical year_s) / LOD. Driver 2 sets year-in-seconds (Kepler dT/T = −2 dM/M); Driver 1 sets day-in-seconds (Farhat 2022). The product H × days/year ≈ 122,463,880 days is a near-invariant of the ESSRT framework. Wu et al. days/year are derived from their LOD: at 400 Ma → ~403 days/yr (matches Wells 1963 coral bands).',
     h:          '<strong>Driver 1</strong> — H(t) ∝ LOD(t) via the H/13 Fibonacci coupling (Layer-2 angular-momentum conservation, Farhat 2022 fit).',
-    axial:      '<strong>Driver 1</strong> — axial precession = H(t)/13 (Fibonacci structural identity, Law 1).',
+    axial:      '<strong>Driver 1</strong> — axial precession = H(t)/13 (Fibonacci structural identity, Relation 1).',
     obliqCycle: '<strong>Driver 1</strong> — obliquity cycle period = H(t)/8 (Fibonacci structural identity).',
     au:         '<strong>Driver 2</strong> — solar mass loss: a × M = const (Kepler dT/T = −2 dM/M, ~9.3×10⁻¹⁴ /yr).',
     moon:       '<strong>Driver 1</strong> — tidal recession via the Farhat 2022 LSQ polynomial fit a(t)/a_now = 1 + α₁t + α₃t³ + α₄t⁴.',
@@ -24540,7 +24540,7 @@ const _lunarEclipseState = { idx: 0 };
 
 setupGUI()
 function setupGUI() {
-  const gui = new Pane({ title: 'Fibonacci Laws of Planetary Motion', expanded: true });
+  const gui = new Pane({ title: 'Expanding Solar System Resonance Theory', expanded: true });
   gui.element.id = 'gui';
   gui.element.setAttribute('role', 'region');
   gui.element.setAttribute('aria-label', 'Simulation Controls');
@@ -24578,10 +24578,10 @@ function setupGUI() {
     versionEl.textContent = 'Holistic Universe Model ' + MODEL_VERSION;
     versionEl.title =
       MODEL_VERSION + ' highlights:\n' +
-      '• Regime-aware lunar recession history (Driver 1½): the calibrated curve holds bit-identical through 0–1000 Ma; beyond it a fitted staircase spline (Farhat 2022 resonant crossings) runs to the rigid Roche limit at genesis.\n' +
-      '• Two explicit solar angular-momentum channels beyond 1 Ga: the ocean solar-tide leak and the insolation-driven atmospheric thermal-tide pump (Zahnle-Walker / Bartlett-Stevenson / Mitchell-Kirscher; strength fitted, Zhou 2024 counter-reading recorded).\n' +
-      '• Mid-Precambrian validation: eleven published anchors (Lantink/Joffre, Weeli Wolli, Zhou 2024 paired distance+LOD, Xiamaling, Nanfen, Moodies) reproduced within their published uncertainties, 1.1–3.2 Ga.\n' +
-      '• Deep-time H/LOD/Moon curves in this panel and the ESSRT explorer follow the regime-aware history; the Phanerozoic and modern eras are unchanged.';
+      '• The restatement (two engines + two expansions): the Earth-family core (spin, tides, H(t), eclipses, LOD, deep-time climate) stands validated; planetary orbits follow standard secular dynamics, re-measured with the model’s own N-body engine.\n' +
+      '• The Fibonacci structural claims for planetary orbits retire to typed observations; the six relations remain documented with per-relation statuses (one exact epoch-local law, one identity, two open predictions, two typed observations).\n' +
+      '• The solar-mass-loss expansion tier joins the tidal tier: all secular frequencies scale with solar mass, giving the first rock-based weighing of the ancient Sun (μ(2.48 Ga) = 1.00 ± 0.07).\n' +
+      '• The physics numbers are unchanged — every Earth-family gate bit-identical to v12.0.';
     titleEl.appendChild(versionEl);
   }
 
@@ -24664,7 +24664,7 @@ function setupGUI() {
 
   // ── About ── (Laws, Free Parameters, Calibration Inputs, Model Parameters)
   const aboutFolder = gui.addFolder({ title: 'About', expanded: false });
-  addFolderTooltip(aboutFolder, 'Six Fibonacci Laws, 6 free parameters, and all calibration and model parameters that define the solar system.');
+  addFolderTooltip(aboutFolder, 'Six Fibonacci relations, 6 free parameters, and all calibration and model parameters that define the solar system.');
 
   // --- Model Identity (§10 two-axis provenance: cite as "model vX.Y") ---
   {
@@ -24700,7 +24700,7 @@ function setupGUI() {
     const a = (href, text) => '<a href="' + href + '" target="_blank" rel="noopener" '
       + 'style="color: hsla(210,60%,65%,1); text-decoration: none;">' + text + '</a>';
 
-    line('Holistic Universe Model — Fibonacci Laws of Planetary Motion');
+    line('Holistic Universe Model — Expanding Solar System Resonance Theory');
     line('Copyright © 2025–2026 D. van Sonsbeek');
     line('Licensed under ' + a('https://www.gnu.org/licenses/agpl-3.0.html', 'AGPL-3.0')
        + ' · ' + a('https://github.com/dvansonsbeek/3d', 'Source code'));
@@ -24716,22 +24716,22 @@ function setupGUI() {
     line('Full attribution: ' + a('https://github.com/dvansonsbeek/3d/blob/master/NOTICE', 'NOTICE'), true);
   }
 
-  // --- The Six Laws (custom DOM for full-width readability) ---
+  // --- The Six Relations (custom DOM for full-width readability) ---
   {
-    const lawsFolder = aboutFolder.addFolder({ title: 'The Six Laws', expanded: false });
+    const lawsFolder = aboutFolder.addFolder({ title: 'The Six Relations', expanded: false });
     const laws = [
       { n: 1, title: 'Fibonacci Cycle Hierarchy',
         desc: 'Earth\u2019s major precession periods divide the Earth Fundamental Cycle (H) by Fibonacci numbers \u2014 H/3, H/5, H/8, H/13. Unique to Earth.' },
       { n: 2, title: 'Inclination Amplitude Constant',
-        desc: 'A single constant \u03C8 predicts all eight inclination amplitudes from Fibonacci divisors and mass alone.' },
+        desc: 'A single constant \u03C8 predicts all eight inclination amplitudes from Fibonacci divisors and mass alone (an open, untested empirical prediction).' },
       { n: 3, title: 'The Inclination Balance',
-        desc: 'Seven planets\u2019 angular-momentum-weighted inclination oscillations balance Saturn alone (99.9975%).' },
+        desc: 'Seven planets\u2019 angular-momentum-weighted inclination oscillations balance Saturn alone (99.9975% \u2014 a mass-geometry identity given the divisors).' },
       { n: 4, title: 'Eccentricity Amplitude Constant',
-        desc: 'A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt.' },
+        desc: 'A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt (an open, untested empirical prediction).' },
       { n: 5, title: 'The Eccentricity Balance',
-        desc: 'Seven planets\u2019 eccentricities balance Saturn alone \u2014 same Fibonacci divisors and phase groups as Law 3 (99.8632%).' },
+        desc: 'Seven planets\u2019 eccentricities balance Saturn alone \u2014 same Fibonacci divisors and phase groups as Relation 3. 99.8632% with the model\u2019s tuned base eccentricities, ~98% with dynamical long-term means: an approximate observation, no longer an exactness claim (the Saturn e-prediction is retired).' },
       { n: 6, title: 'Saturn-Jupiter-Earth Resonance',
-        desc: 'Jupiter\u2019s ICRF perihelion and Saturn\u2019s ecliptic perihelion lock to one period, 8H/65 (~41,000 yr) \u2014 a structural balance, not a coincidence, and the obliquity beat in Earth\u2019s climate record. It\u2019s Earth\u2019s axial precession (H/13) beating against the gas giants\u2019 ecliptic period (8H/39); against Law 1\u2019s anchor H/5 the same beat gives H/8 (= 8H/64), one lattice step away.' },
+        desc: 'Jupiter\u2019s ICRF perihelion and Saturn\u2019s ecliptic perihelion lock to one period, 8H/65 (~41,000 yr) \u2014 an Earth-frame beat identity at J2000, and the obliquity beat in Earth\u2019s climate record. It\u2019s Earth\u2019s axial precession (H/13) beating against the gas giants\u2019 ecliptic period (8H/39); against Relation 1\u2019s anchor H/5 the same beat gives H/8 (= 8H/64), one lattice step away.' },
     ];
     // Inject after all Tweakpane children are set up
     const lawsContainer = lawsFolder.element.querySelector('.tp-fldv_c');
@@ -24741,7 +24741,7 @@ function setupGUI() {
       item.title = l.desc;
       const num = document.createElement('span');
       num.style.cssText = 'color: hsla(210,60%,65%,1); font-weight: 600; margin-right: 6px;';
-      num.textContent = 'Law ' + l.n;
+      num.textContent = 'Relation ' + l.n;
       const title = document.createElement('span');
       title.style.fontWeight = '500';
       title.textContent = l.title;
@@ -24765,7 +24765,7 @@ function setupGUI() {
       fpFibDivisors: '3, 5, 8, 13, 21, 34',
       fpMeanObliquity: earthtiltMean + '\u00B0',
       fpAmplitude: earthInvPlaneInclinationAmplitude + '\u00B0',
-      fpConfig: 'Config #' + (fbeMatchDefaultPreset() || '?') + ' (unique mirror-symmetric)',
+      fpConfig: 'Config #' + (fbeMatchDefaultPreset() || '?') + ' (mirror-symmetric)',
     };
     addTooltip(freeFolder.addBinding(freeParams, 'fpHolisticYear', { label: 'Earth Fundamental Cycle', readonly: true }),
       '1 DOF \u2014 Fitted to match 1246 AD alignment + J2000 longitude of perihelion.');
@@ -24779,7 +24779,7 @@ function setupGUI() {
     addTooltip(freeFolder.addBinding(freeParams, 'fpAmplitude', { label: 'Amplitude', readonly: true }),
       '1 DOF \u2014 Earth inclination amplitude on the invariable plane. Fibonacci predicts 0.6329789\u00B0.');
     const configBlade = addTooltip(freeFolder.addBinding(freeParams, 'fpConfig', { label: 'Planet config', readonly: true }),
-      '0 DOF \u2014 Exhaustive search of 7,558,272 configurations yields exactly 1 unique mirror-symmetric solution.');
+      '0 DOF \u2014 Found by an exhaustive search of 7,558,272 configurations (mirror symmetry selected it). The uniqueness claim is retired: re-evaluated with dynamical inputs it is input-dependent \u2014 kept as the record of how the divisors were found (doc 10 Status).');
     configBlade.element.style.opacity = '0.65';
   }
 
@@ -25323,8 +25323,13 @@ function setupGUI() {
 
   folderT.element.querySelector('.tp-fldv_c').appendChild(chipContainer);
 
-  // ── Fibonacci Balance — live-updating balance indicators ──
-  {
+  // ── Fibonacci Balance — REMOVED with the Fibonacci-law retirement (the
+  // model restatement): the Law-3/Law-5 gauge folder was an exactness-claim
+  // surface (doc 10 Status carries the measured verdicts; the ~98 %
+  // observation is documented there). Dead block (if-false), to be excised
+  // wholesale with the fbe*/gho* subsystems at the P5 chain rewrite; the
+  // o.fib* fields are still computed each frame for exports/diagnostics.
+  if (false) {
     const fibFolder = gui.addFolder({ title: 'Fibonacci Balance', expanded: true });
     fibFolder.element.dataset.category = 'calculated';
     addFolderTooltip(fibFolder, 'Live Fibonacci balance indicators. All three oscillate over per-planet eccentricity cycles and fluctuate around their equilibrium values.');
@@ -25334,9 +25339,9 @@ function setupGUI() {
 
     // Inclination balance (Law 3)
     const inclB = fibFolder.addBinding(o, 'fibInclinationBalance', {
-      label: 'Inclination (Law 3)', readonly: true, format: fibPctFmt
+      label: 'Inclination (Relation 3)', readonly: true, format: fibPctFmt
     });
-    addTooltip(inclB, 'Fibonacci Law 3: w = \u221A(m\u00B7a(1\u2212e\u00B2)) / d \u2014 structural weight balance (Saturn vs rest). Uses current dynamic eccentricities. Nearly constant because the weight depends on e only through the (1\u2212e\u00B2) term.');
+    addTooltip(inclB, 'Fibonacci relation 3: w = \u221A(m\u00B7a(1\u2212e\u00B2)) / d \u2014 structural weight balance (Saturn vs rest). Uses current dynamic eccentricities. Nearly constant because the weight depends on e only through the (1\u2212e\u00B2) term.');
     const inclValEl = inclB.element.querySelector('.tp-lblv_v');
     inclValEl.classList.add('fib-gauge');
     setFibGaugeProps(inclValEl, o.fibInclinationBalance);
@@ -25344,9 +25349,9 @@ function setupGUI() {
 
     // Eccentricity balance (Law 5)
     const eccB = fibFolder.addBinding(o, 'fibEccentricityBalance', {
-      label: 'Eccentricity (Law 5)', readonly: true, format: fibPctFmt
+      label: 'Eccentricity (Relation 5)', readonly: true, format: fibPctFmt
     });
-    addTooltip(eccB, 'Fibonacci Law 5: v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad \u2014 eccentricity weight balance (Saturn vs rest). Uses current dynamic eccentricities (oscillating at per-planet eccentricity cycles). Approaches 100% when planets pass through their base eccentricity.');
+    addTooltip(eccB, 'Fibonacci relation 5: v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad \u2014 eccentricity weight balance (Saturn vs rest). Uses current dynamic eccentricities (oscillating at per-planet eccentricity cycles). Approaches 100% when planets pass through their base eccentricity.');
     const eccValEl = eccB.element.querySelector('.tp-lblv_v');
     eccValEl.classList.add('fib-gauge');
     setFibGaugeProps(eccValEl, o.fibEccentricityBalance);
@@ -25355,6 +25360,25 @@ function setupGUI() {
     // Mass height balance (invariable plane)
     const massB = fibFolder.addBinding(o, 'massWeightedBalance', {
       label: 'Mass height (inv. plane)', readonly: true, format: fibAUFmt
+    });
+    addTooltip(massB, 'Mass-weighted average height of all planets above the invariable plane. Oscillates around zero, validating the invariable plane geometry.');
+    const massValEl = massB.element.querySelector('.tp-lblv_v');
+    massValEl.classList.add('inv-gauge');
+    setInvGaugeProps(massValEl, o.massWeightedBalance, 0.01);
+    fibGaugeEls.massHeight = massValEl;
+  }
+
+  // ── Invariable Plane — the mass-height check (kept when the Fibonacci
+  // Balance folder retired: this gauge is invariable-plane geometry, not a
+  // law claim — the mass-weighted height oscillates around zero by angular-
+  // momentum conservation) ──
+  {
+    const invPlaneFolder = gui.addFolder({ title: 'Invariable Plane', expanded: true });
+    invPlaneFolder.element.dataset.category = 'calculated';
+    addFolderTooltip(invPlaneFolder, 'Mass-weighted average height of all planets above the invariable plane. Oscillates around zero, validating the invariable-plane geometry.');
+    const invAUFmt = v => (v >= 0 ? '+' : '') + v.toFixed(4);
+    const massB = invPlaneFolder.addBinding(o, 'massWeightedBalance', {
+      label: 'Mass height (inv. plane)', readonly: true, format: invAUFmt
     });
     addTooltip(massB, 'Mass-weighted average height of all planets above the invariable plane. Oscillates around zero, validating the invariable plane geometry.');
     const massValEl = massB.element.querySelector('.tp-lblv_v');
@@ -25735,7 +25759,7 @@ function setupGUI() {
   // ── Positions (Invariable Plane) — top-level, calculated category ──
   const invPlaneFolder = gui.addFolder({ title: 'Positions (Invariable Plane)', expanded: false });
   invPlaneFolder.element.dataset.category = 'calculated';
-  addFolderTooltip(invPlaneFolder, 'Planet heights in the invariable plane reference frame. Validates the Fibonacci Laws of Planetary Motion.');
+  addFolderTooltip(invPlaneFolder, 'Planet heights in the invariable plane reference frame, with the mass-weighted balance (a documented observation of the ESSRT model).');
 
   // Invariable plane heights with centered gauge bars + expandable detail rows
   const invPlaneFmt = v => (v >= 0 ? '+' : '') + v.toFixed(4);
@@ -25915,7 +25939,7 @@ function setupGUI() {
   // ── Model Predictions for Earth (compact: inline Δ shows IAU difference) ──
   const astroFolder = gui.addFolder({ title: 'Predictions for Earth', expanded: false });
   astroFolder.element.dataset.category = 'calculated';
-  addFolderTooltip(astroFolder, 'Analytical predictions from the Fibonacci Laws of Planetary Motion.');
+  addFolderTooltip(astroFolder, 'Analytical predictions from the ESSRT model.');
 
   // ── Phase 9.11: Balanced-Year Julian Dates (top of Predictions for Earth) ──
   const balancedJdFolder = astroFolder.addFolder({ title: 'Balanced Year Julian Dates', expanded: false });
@@ -26612,16 +26636,15 @@ function setupGUI() {
   // ── Tools ──
   const toolsFolder = gui.addFolder({ title: 'Tools', expanded: false });
   toolsFolder.element.dataset.category = 'tools';
-  addFolderTooltip(toolsFolder, 'Planet hierarchy inspector, invariable plane inspector, and console validation tests.');
+  addFolderTooltip(toolsFolder, 'Planet hierarchy inspector and console validation tests.');
 
   addTooltip(toolsFolder.addButton({ title: 'Planet Inspector' }).on('click', () => openHierarchyInspector()),
     'Open the planet hierarchy inspector. Shows orbital elements, scene graph, and live positional data for each planet.');
-  addTooltip(toolsFolder.addButton({ title: 'Invariable Plane Inspector' }).on('click', () => openBalanceExplorer()),
-    'Open the invariable plane inspector. Test Fibonacci d-value and phase group assignments to verify vector balance theory.');
-  addTooltip(toolsFolder.addButton({ title: 'Eccentricity Balance Scale' }).on('click', () => openEccBalanceScale()),
-    'Show how each planet\u2019s eccentricity is the weighted sum of all other planets\u2019 perihelion offsets. Select any planet as the balance target.');
-  addTooltip(toolsFolder.addButton({ title: 'Solar System Resonance Cycle' }).on('click', () => openGHOPanel()),
-    'All planetary periods as integer divisors of 8H = 2,682,360 years. Axial precession, perihelion, inclination, ascending node, obliquity, and eccentricity cycles.');
+  // The Invariable Plane Inspector, Eccentricity Balance Scale and Solar
+  // System Resonance Cycle panels were removed with the Fibonacci-law
+  // retirement (the model restatement; doc 10 Status + doc 109 carry the
+  // record). Their subsystems (fbe*/gho*/eccScale*) are unreachable and are
+  // excised wholesale when the planet chains move to engine-D elements.
   addTooltip(toolsFolder.addButton({ title: 'WebGeoCalc Explorer' }).on('click', () => openWGCPanel()),
     'Observed perihelion precession rates for all 8 planets (1900\u20132026) from JPL WebGeoCalc. Three charts per planet: ascending node, argument of periapsis, longitude of perihelion.');
   addTooltip(toolsFolder.addButton({ title: 'LOD-Climate Rhythm' }).on('click', () => openLcrPanel()),
@@ -36624,9 +36647,8 @@ function render(now) {
     updatePlanetInvariablePlaneHeights();
     updateDynamicInclinations();
     updateInvariablePlaneBalance();
-    // Update Fibonacci Balance gauge bars
-    if (fibGaugeEls.inclination) setFibGaugeProps(fibGaugeEls.inclination, o.fibInclinationBalance);
-    if (fibGaugeEls.eccentricity) setFibGaugeProps(fibGaugeEls.eccentricity, o.fibEccentricityBalance);
+    // (The Law-3/Law-5 gauge bars retired with the Fibonacci laws; the
+    // invariable-plane mass-height gauge is kept)
     if (fibGaugeEls.massHeight) setInvGaugeProps(fibGaugeEls.massHeight, o.massWeightedBalance, 0.01);
     updateBalanceTrendAnalysis();
     updateBalanceMinMax();

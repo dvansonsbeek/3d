@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 //
 // This script COMPUTES inclination mean and amplitude values for each planet
-// using the Fibonacci Laws of Planetary Motion.
+// using the Fibonacci relations (doc 10).
 //
 // The amplitudes are derived from: amplitude = ψ / (d × √m)
 // where ψ is the universal constant, d is the Fibonacci quantum number,

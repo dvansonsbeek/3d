@@ -1,22 +1,29 @@
 ---
 docVersion: 1.0
-modelVersion: v12.0
+modelVersion: v13.0
 coefficients: sha256:56d7365a511916d5
 status: current
 ---
 
 # Invariable Plane Balance Explorer
 
+> **Status.** The Balance Explorer panel was removed from the simulator's
+> tools menu with the Fibonacci-law retirement (the model restatement —
+> doc 10 Status carries the measured verdicts, doc 109 the evidence). This
+> document remains as the reference for the exploration tool that produced
+> the balance record; the underlying code is dead in `src/script.js` until
+> its wholesale excision with the planet-chain rewrite.
+
 ## Overview
 
-The Invariable Plane Balance Explorer is an interactive modal for testing planetary group assignments and Fibonacci divisors for the [Fibonacci Laws of Planetary Motion](10-fibonacci-laws.md). It provides instant visual feedback on whether a given configuration satisfies the inclination balance (Law 3), eccentricity balance (Law 5), and fits within Laplace-Lagrange secular theory bounds.
+The Invariable Plane Balance Explorer is an interactive modal for testing planetary group assignments and Fibonacci divisors for the [six Fibonacci relations](10-fibonacci-laws.md). It provides instant visual feedback on whether a given configuration satisfies the inclination balance (Law 3), eccentricity balance (Law 5), and fits within Laplace-Lagrange secular theory bounds.
 
 The explorer allows users to experiment with alternative configurations to understand why certain planetary assignments are uniquely constrained — for example, why the mirror-symmetric d-assignments are the only solution satisfying all six laws simultaneously.
 
 > **Scope note (ESSRT).** The balance machinery this explorer evaluates (Law 3 inclination balance, Law 5 eccentricity balance, the amplitude formula `ψ/(d·√m)`, the d-value choices) is scale-invariant — the formulas hold at any epoch. ψ, the balanced-year anchor (~<!--v:balancedYearBC-->302,635 BC<!--/v-->), J2000 ICRF perihelion longitudes, JPL trend values (1900–2100), and H = <!--v:H-->335,317<!--/v--> are J2000-anchored snapshots; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts and the balanced-year date proportionally. The explorer's interactive UI is intrinsically a present-epoch exploration tool; the underlying structural laws it tests are not.
 
 **Related Documentation:**
-- [Fibonacci Laws of Planetary Motion](10-fibonacci-laws.md) — the six laws and their derivations
+- [The Six Fibonacci Relations](10-fibonacci-laws.md) — the six relations and their derivations
 - [UI Panels Reference](50-ui-panels-reference.md) — overview of all UI panels
 - [Invariable Plane Calculations](33-invariable-plane-calculations.md) — height calculation formulas
 
@@ -519,4 +526,4 @@ The eight integers jointly reproduce JPL's J2000-fixed-frame ascending-node tren
 
 ---
 
-**Previous**: [10 - Fibonacci Laws of Planetary Motion](10-fibonacci-laws.md)
+**Previous**: [10 - The Six Fibonacci Relations](10-fibonacci-laws.md)
