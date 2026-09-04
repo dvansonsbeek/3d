@@ -88,6 +88,18 @@ Notes:
 
 (+ = prograde, − = retrograde, ~∞ = frozen)
 
+> **The relativistic supplement (design choice A).** Mercury's perihelion
+> descriptor is the Newtonian lattice rate; the observed motion carries the
+> general-relativistic advance on top of it:
+> 8H/11 = <!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> ″/cy +
+> <!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> ″/cy (derived from the
+> model's own constants, zero fitted values) =
+> <!--v:mercuryPeriRateWithRelativisticArcsecCy-->574.4<!--/v--> ″/cy — the
+> observed window family. The supplement is additive and stated, never folded
+> into a divisor; per-planet values and the frame analysis are in
+> [doc 13 §1.8](13-mercury-precession-breakdown.md) (only Mercury's is
+> observable at the model's window precision).
+
 ## Notable Patterns
 
 ### Mirror Symmetry in Periods
@@ -200,7 +212,7 @@ N_ecl = N_obliq + N_eclPrec
 | Venus | 6 | 110 + (−104) | H/13 (<!--v:earthAxialPeriod-->25,794<!--/v--> yr) |
 | Earth | 128 | 64 + 64 | H/8 (<!--v:hDiv8-->41,915<!--/v--> yr) |
 | Mars | 36 | 21 + 15 | 8H/15 (178,836 yr) |
-| Jupiter | 40 | 16 + 24 | H/3 (<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr) |
+| Jupiter | 40 | 16 + 24 | H/3 (<!--v:hDiv3-->111,772<!--/v--> yr) |
 | Saturn | 64 | 24 + 40 | H/5 (<!--v:hDiv5-->67,063<!--/v--> yr) |
 | Uranus | 24 | 16 + 8 | H (<!--v:H-->335,317<!--/v--> yr) |
 | Neptune | 4 | 100 + (−96) | 8H/96 (27,943 yr) |

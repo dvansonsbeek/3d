@@ -21,13 +21,13 @@ same structure extends to the other planets.
 | 4 | Axial precession | H/13 | Spin axis traces a cone (direction changes, tilt stays same) |
 | 5 | Perihelion precession (ecliptic) | H/16 | Perihelion point advances against ecliptic |
 
-**Value-tag convention in this doc.** Pure H-fraction periods are bound to a
-single registry key wherever the same fraction appears — e.g. `hDiv2` /
-`marsAxialPeriod` both render H/2, and `earthPeriPeriodICRF` /
-`inclPrecYears` both render H/3, including in Uranus and Jupiter cells. The
-reuse is a NUMERIC identity of the H-fraction, not a claim that the tagged
-quantities are the same physical thing; a future registry retype will give
-these quantities their own per-planet keys.
+**Value-tag convention in this doc.** Each planet's quantity binds to its
+OWN registry key (`uranusPeriPeriod`, `neptunePeriPeriod`, …), and a pure
+H-fraction that appears as a fraction — a prediction stated as "H/3" — binds
+to the generic fraction key (`hDiv3`, `hDiv5`, `twoH`, …), never to another
+planet's quantity key. Where two keys render the same number (e.g. `hDiv2`
+and `marsAxialPeriod`), that is a NUMERIC identity of the H-fraction, not a
+claim that the tagged quantities are the same physical thing.
 
 **Earth's Fibonacci rate identities** (rates ω = 1/period, in units of 1/H):
 
@@ -84,8 +84,8 @@ precession hierarchy.
 | Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> | ~81 kyr | H × 8/36 | 1,739.3 | <!--v:marsPeriPeriod-->74,515<!--/v--> yr |
 | Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> | ~72 kyr | 8H/39 | <!--v:jupiterModelBaseline-->1,884.2<!--/v--> | <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr |
 | Saturn | ~−3,400 | ~38 kyr (r) | −8H/65 | −3,140.0 | <!--v:saturnPeriPeriod-->41,270<!--/v--> yr |
-| Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> | ~118 kyr | H/3 | <!--v:uranusModelBaseline-->1,159.5<!--/v--> | <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr |
-| Neptune | ~200 | ~648 kyr | H × 2 | 193.3 | <!--v:twoH-->670,634<!--/v--> yr |
+| Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> | ~118 kyr | H/3 | <!--v:uranusModelBaseline-->1,159.5<!--/v--> | <!--v:uranusPeriPeriod-->111,772<!--/v--> yr |
+| Neptune | ~200 | ~648 kyr | H × 2 | 193.3 | <!--v:neptunePeriPeriod-->670,634<!--/v--> yr |
 
 Observed: WebGeoCalc (JPL/NAIF, 1900–2100 observation window). The observed rates
 are approximate total advance rates measured over a short baseline. The H-predicted
@@ -533,10 +533,10 @@ Under the System Reset (n=7) anchor convention:
 | # | Prediction | Value | Current status | How to test |
 |---|-----------|-------|----------------|-------------|
 | 1 | Jupiter obliquity cycle | H/2 = ~<!--v:jupiterObliqCycle-->167,659<!--/v--> yr | "No regular cycle" (Saillenfest+ 2020) | Long-term numerical integration of spin-axis evolution |
-| 2 | Saturn obliquity cycle | H/3 = <!--v:inclPrecYears-->~111,772<!--/v--> yr or H/5 = <!--v:eclPrecYears-->~67,063<!--/v--> yr | "No regular cycle" (Saillenfest+ 2021) | Long-term numerical integration |
+| 2 | Saturn obliquity cycle | H/3 = <!--v:hDiv3-->111,772<!--/v--> yr or H/5 = <!--v:hDiv5-->67,063<!--/v--> yr | "No regular cycle" (Saillenfest+ 2021) | Long-term numerical integration |
 | 3 | Uranus obliquity cycle | H/2 = ~<!--v:uranusObliqCycle-->167,659<!--/v--> yr or H = <!--v:H-->335,317<!--/v--> yr | "Frozen at 98°" (Saillenfest+ 2022) | Extremely long timescale simulation |
 | 4 | Mars ecliptic precession | 3H/5 = ~201,190 yr | Not measured | Secular perturbation analysis |
-| 5 | Jupiter ecliptic precession | H/3 = <!--v:inclPrecYears-->~111,772<!--/v--> yr | Not measured | Secular perturbation analysis |
+| 5 | Jupiter ecliptic precession | H/3 = <!--v:hDiv3-->111,772<!--/v--> yr | Not measured | Secular perturbation analysis |
 | 6 | Mercury ecliptic precession | H = <!--v:H-->335,317<!--/v--> yr | Not measured | Secular perturbation analysis |
 | 7 | Mars-Jupiter reciprocity | Mars obliq = Ju axial, Ju obliq = Mars axial | Mars confirmed, Jupiter untested | Jupiter spin-axis modeling |
 
@@ -563,7 +563,7 @@ oscillations superimposed on the trend — would constitute a confirmation.
 
 3. **Saturn obliquity**: ~~ambiguous~~ **resolved**. The Fibonacci decomposition 8 = 5 + 3
    gives H/3 (the Earth-Saturn mirror-pair argument). This is now a model prediction:
-   Saturn's obliquity oscillates at H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr. See [The Closed Loop](72-the-closed-loop.md).
+   Saturn's obliquity oscillates at H/3 = <!--v:hDiv3-->111,772<!--/v--> yr. See [The Closed Loop](72-the-closed-loop.md).
 
 4. **Perihelion Fibonacci pattern**: The WebGeoCalc perihelion rates reveal a
    striking *Fibonacci-anchor* structure: Jupiter≈H/5, Saturn≈H/8 (retrograde),

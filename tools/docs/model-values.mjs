@@ -404,7 +404,7 @@ export const VALUES = {
     unit: 'yr',
   },
   // Bare divisors and multiples of H, rounded to whole years.
-  ...Object.fromEntries([2, 5, 8, 21, 34].map((d) => [`hDiv${d}`, {
+  ...Object.fromEntries([2, 3, 5, 8, 16, 21, 34].map((d) => [`hDiv${d}`, {
     get: () => C.H / d,
     render: (v) => thousands(Math.round(v)),
     unit: 'yr',
@@ -1733,6 +1733,20 @@ export const VALUES = {
       return `${sign}${n}H/${den}`;
     };
     const out = {};
+    // Doc-109 §9 / doc-55 typing of each planet's lattice descriptor (the
+    // restatement, Batch D): the values do not move; the type says WHAT the
+    // 8H/N label describes. A = long-term mean · B = present-epoch rate ·
+    // C = window-epoch value. Engine-D means live in <p>PeriFreqArcsecPerYr.
+    const PERI_TYPE = {
+      mercury: 'type B — present-epoch Newtonian rate (the long-term mean is g₁; see mercuryPeriFreqArcsecPerYr)',
+      venus: 'type C — window-epoch descriptor (small-e z is mode-mixed; ill-conditioned in short windows)',
+      mars: 'type A — long-term mean (2.7 % under the g₄ eigenfrequency)',
+      jupiter: 'type C — window-epoch descriptor (the long-term mean is g₅ ≈ 426 ″/cy)',
+      saturn: 'type C — window-epoch descriptor (retrograde in the present window; the long-term mean g₆ ≈ +2,824 ″/cy is PROGRADE)',
+      uranus: 'type C — window-epoch descriptor',
+      neptune: 'type C — window-epoch descriptor',
+      pluto: 'window-epoch descriptor (untyped in doc 55)',
+    };
     for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto']) {
       const periodYears = () => {
         const [num, den] = periFraction(planet);
@@ -1742,8 +1756,9 @@ export const VALUES = {
         get: periodYears,
         render: (v) => thousands(Math.round(v)),
         unit: 'yr',
+        note: PERI_TYPE[planet],
       };
-      out[`${planet}PeriFormula`] = { get: () => periLabel(periFraction(planet)), render: (v) => String(v) };
+      out[`${planet}PeriFormula`] = { get: () => periLabel(periFraction(planet)), render: (v) => String(v), note: PERI_TYPE[planet] };
       if (planet !== 'pluto') {
         out[`${planet}PeriRate`] = {
           get: () => {
@@ -1752,6 +1767,7 @@ export const VALUES = {
           },
           render: (v) => thousands(v, 6),
           unit: '°/yr',
+          note: PERI_TYPE[planet],
         };
       }
     }
@@ -1770,6 +1786,41 @@ export const VALUES = {
     };
     for (const [planet, get] of Object.entries(eccSources)) {
       out[`${planet}EccJ2000`] = { get, render: (v) => Number(v).toFixed(5), note: 'JPL DE440 J2000 element' };
+    }
+    return out;
+  })(),
+
+  // ── Engine-D secular frequencies (Batch D: P1b of the restatement) ──────
+  // The A/B-typed keys read data/nbody-secular-frequencies.json — the
+  // governed artifact written by tools/verify/nbody-secular.js (--write)
+  // from the model's own WH+NAFF pipeline (1PN on; g = leading ecliptic
+  // z-mode, s = leading INVARIABLE ζ mode; Laskar 2004 labels are reference
+  // only). The derived relativistic supplement's ONE home is
+  // <p>PeriAnomalyGrArcsecCy (the P1 projection group below); the generator
+  // re-derives the same formula only as the P8b closure assertion.
+  ...(() => {
+    const nsf = () => rd('data/nbody-secular-frequencies.json');
+    const planets8 = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    const out = {};
+    for (const p of planets8) {
+      out[`${p}PeriFreqArcsecPerYr`] = {
+        get: () => nsf().g[p].arcsecPerYr,
+        render: (v) => Number(v).toFixed(3),
+        unit: '″/yr',
+        note: 'type A — engine-D long-term apsidal frequency (leading z-mode, 1-Myr WH+NAFF, 1PN on); the artifact records the nearest Laskar 2004 g-mode (Earth and Uranus lead with g5, not their own mode)',
+      };
+      out[`${p}NodeFreqArcsecPerYr`] = {
+        get: () => nsf().s[p].arcsecPerYr,
+        render: (v) => Number(v).toFixed(3),
+        unit: '″/yr',
+        note: 'type A — engine-D long-term nodal frequency (leading ζ-mode, invariable plane, 1-Myr WH+NAFF); nearest Laskar 2004 s-mode in the artifact (Jupiter’s own s5 ≡ 0 by definition of the plane)',
+      };
+      out[`${p}PeriRateNowArcsecCy`] = {
+        get: () => nsf().windowRatesArcsecCy.gr[p],
+        render: (v) => (v >= 0 ? '' : '−') + thousands(Math.abs(v), 1),
+        unit: '″/cy',
+        note: 'type B — engine-D mean ecliptic dϖ/dt over 1800–2100 (1PN on), the present-epoch window rate',
+      };
     }
     return out;
   })(),
@@ -2276,6 +2327,25 @@ export const VALUES = {
       out[`${p}PeriRateEarthFrameMeasuredJ2000`] = { get: () => pm().totalPrecession(2000, p), render: (v) => thousands(v, 2), unit: '″/cy', note: 'the export/predict Earth-frame rate (RA) at J2000' };
       out[`${p}PeriAnomalyGrArcsecCy`] = { get: () => grAdvance(p), render: (v) => Number(v).toFixed(2), unit: '″/cy', note: 'general-relativistic advance from the model constants (GM_SUN, c, a from the period, e)' };
     }
+    // P8a (Batch D): Earth's supplement (C.planets has no earth entry) and
+    // Mercury's split statement. Same one-home formula as grAdvance above.
+    out.earthPeriAnomalyGrArcsecCy = {
+      get: () => {
+        const aKm = C.currentAUDistance;
+        const e = astro.earthOrbital.earthEccentricityJ2000;
+        const perOrbit = 6 * Math.PI * C.GM_SUN / (C.speedOfLight ** 2 * aKm * (1 - e ** 2));
+        return perOrbit * (36525 / C.meanSolarYearDays) * 206264.806;
+      },
+      render: (v) => Number(v).toFixed(2),
+      unit: '″/cy',
+      note: 'general-relativistic advance from the model constants (a = 1 AU, e J2000) — documentation-grade beside Earth’s H/16 chain',
+    };
+    out.mercuryPeriRateWithRelativisticArcsecCy = {
+      get: () => eclRate('mercury') + grAdvance('mercury'),
+      render: (v) => thousands(v, 1),
+      unit: '″/cy',
+      note: 'Mercury’s stated total (P8a, design choice A): the lattice present-epoch Newtonian rate (8H/11 = 531.4 ″/cy) + the derived 1PN supplement (43.0) = 574.4 — additive and stated, never folded into a divisor; lands on the observed 572-window / 560-mean family',
+    };
     out.earthPeriRateEclipticOfDateArcsecCy = { get: () => 1296000 / (C.H / 16) * 100, render: (v) => thousands(v, 2), unit: '″/cy', note: 'H/16 — the perihelion OF DATE (not the inertial advance)' };
     out.earthPeriProjectionExcessJ2000 = { get: () => 1296000 / (C.H / 16) * 100 * (raSlope(astro.earthOrbital.earthPerihelionLongitudeJ2000, epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy' };
     out.obliquityRateJ2000ArcsecCy = { get: epsRateArcsecCy, render: (v) => thousands(v, 1), unit: '″/cy', note: 'shipped obliquity law, central difference 1950–2050' };

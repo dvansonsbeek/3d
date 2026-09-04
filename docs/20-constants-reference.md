@@ -343,8 +343,17 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 | Mars | H × 8/36 | ~<!--v:marsPeriPeriod-->74,515<!--/v--> |
 | Jupiter | 8H / 39 | ~<!--v:jupiterPeriPeriod-->68,783<!--/v--> |
 | Saturn | -8H / 65 | ~-<!--v:saturnPeriPeriod-->41,270<!--/v--> (retrograde) |
-| Uranus | H / 3 | <!--v:inclPrecYears-->~111,772<!--/v--> |
+| Uranus | H / 3 | ~<!--v:uranusPeriPeriod-->111,772<!--/v--> |
 | Neptune | H × 2 | ~<!--v:neptunePeriPeriod-->670,634<!--/v--> |
+
+These are the model's typed lattice descriptors (doc 55 gives each planet's
+type). Mercury's row is the Newtonian rate; the observed motion adds the
+derived relativistic supplement:
+<!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> +
+<!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> =
+<!--v:mercuryPeriRateWithRelativisticArcsecCy-->574.4<!--/v--> ″/cy
+(design choice A — additive and stated, never folded into a divisor; see
+[doc 13 §1.8](13-mercury-precession-breakdown.md)).
 
 ## Moon Derived Cycles
 

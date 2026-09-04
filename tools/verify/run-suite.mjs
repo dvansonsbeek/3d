@@ -71,6 +71,8 @@ const MANIFEST = [
     writes: 'data/lod-climate-correlation-summary.json (tracked; --write only)' },
   { n: 'eclipse-audit.js', class: 'generator', ms: 180000, slow: true,
     writes: 'data/eclipse-audit-summary.json (tracked; --write only, REFUSES on divergence — --rebaseline is the conscious re-measurement path)' },
+  { n: 'nbody-secular.js', class: 'generator', ms: 1200000, slow: true,
+    writes: 'data/nbody-secular-frequencies.json (tracked; --write only — one 1-Myr WH frame=both run + NAFF, ~15-20 min). Engine-D g/s frequencies (A), 1800–2100 window rates (B), the derived 1PN supplement + the P8b Mercury closure assertion (Batch D of the restatement)' },
   { n: 'lunar-alignment.js', class: 'generator', ms: 82000, slow: true,
     writes: 'data/lunar-alignment-summary.json (tracked; same convention as eclipse-audit: plain run = reproduction check, --write refuses on divergence, --rebaseline adopts). Sections: canon TT-axis geometry 1600-2200 · documented visibility via the api observer tier · the -746 Babylonian lunar anchor · Stephenson-2016 raw-timing deltaT bands vs framework + spline' },
 

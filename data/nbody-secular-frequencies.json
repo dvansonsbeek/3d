@@ -1,0 +1,212 @@
+{
+ "_description": "Engine-D secular frequencies from the model’s own N-body pipeline (WH 1-Myr, 1PN on, NAFF), the 1800–2100 window rates (B), and the derived instantaneous 1PN apsidal supplement. Frames: g ecliptic-J2000 z-modes, s INVARIABLE-plane ζ-modes. Laskar 2004 values are external reference labels (theory), never inputs. See tools/verify/nbody-secular.js for the assertions carried.",
+ "meta": {
+  "integrator": "wh",
+  "order": 2,
+  "dtDays": 2,
+  "spanYears": 1000000,
+  "sampleDays": 1000,
+  "gr": true,
+  "seed": "JPL Horizons J2000 heliocentric state vectors (tools/explore/j2000-state.mjs, the one home)",
+  "masses": "DE440 mass ratios (astro-reference physicalConstants)",
+  "naffTerms": 8,
+  "windowYears": [
+   1800,
+   2100
+  ],
+  "laskarRef": "Laskar, J. et al. (2004), A&A 428, 261–285, Table 3",
+  "conservationMaxDE": 1.1113907520896154e-8,
+  "note1PN": "Mercury eigen-level 1PN shift ≈ +0.473 ″/yr (cycle-average of 1/(1−e²)) vs +0.430 instantaneous — not a discrepancy; only the instantaneous value is asserted (P8b)."
+ },
+ "g": {
+  "mercury": {
+   "arcsecPerYr": 5.575712797823945,
+   "amplitude": 0.17545096694269685,
+   "nearestLaskar": {
+    "mode": "g1",
+    "arcsecPerYr": 5.5965
+   }
+  },
+  "venus": {
+   "arcsecPerYr": 7.405845742227483,
+   "amplitude": 0.022570769830788477,
+   "nearestLaskar": {
+    "mode": "g2",
+    "arcsecPerYr": 7.4555
+   }
+  },
+  "earth": {
+   "arcsecPerYr": 4.346410041032439,
+   "amplitude": 0.019341964493845513,
+   "nearestLaskar": {
+    "mode": "g5",
+    "arcsecPerYr": 4.2575
+   }
+  },
+  "mars": {
+   "arcsecPerYr": 17.916696630844026,
+   "amplitude": 0.08882914197372903,
+   "nearestLaskar": {
+    "mode": "g4",
+    "arcsecPerYr": 17.9159
+   }
+  },
+  "jupiter": {
+   "arcsecPerYr": 4.256769523195223,
+   "amplitude": 0.044182672664934045,
+   "nearestLaskar": {
+    "mode": "g5",
+    "arcsecPerYr": 4.2575
+   }
+  },
+  "saturn": {
+   "arcsecPerYr": 28.245581358956457,
+   "amplitude": 0.04819349426795283,
+   "nearestLaskar": {
+    "mode": "g6",
+    "arcsecPerYr": 28.2455
+   }
+  },
+  "uranus": {
+   "arcsecPerYr": 3.921148698318919,
+   "amplitude": 0.0332189082697614,
+   "nearestLaskar": {
+    "mode": "g5",
+    "arcsecPerYr": 4.2575
+   }
+  },
+  "neptune": {
+   "arcsecPerYr": 0.6065154396549126,
+   "amplitude": 0.009569000717364112,
+   "nearestLaskar": {
+    "mode": "g8",
+    "arcsecPerYr": 0.673
+   }
+  }
+ },
+ "s": {
+  "mercury": {
+   "arcsecPerYr": -5.586173808637174,
+   "amplitude": 0.059409340430501154,
+   "nearestLaskar": {
+    "mode": "s1",
+    "arcsecPerYr": -5.6197
+   }
+  },
+  "venus": {
+   "arcsecPerYr": -18.3363903851603,
+   "amplitude": 0.013576723462640201,
+   "nearestLaskar": {
+    "mode": "s3",
+    "arcsecPerYr": -18.8506
+   }
+  },
+  "earth": {
+   "arcsecPerYr": -18.39611848918824,
+   "amplitude": 0.01184463735421656,
+   "nearestLaskar": {
+    "mode": "s3",
+    "arcsecPerYr": -18.8506
+   }
+  },
+  "mars": {
+   "arcsecPerYr": -17.545402434182556,
+   "amplitude": 0.021473581268835227,
+   "nearestLaskar": {
+    "mode": "s4",
+    "arcsecPerYr": -17.7553
+   }
+  },
+  "jupiter": {
+   "arcsecPerYr": -26.347747510182444,
+   "amplitude": 0.0031511446932465333,
+   "nearestLaskar": {
+    "mode": "s6",
+    "arcsecPerYr": -26.3475
+   }
+  },
+  "saturn": {
+   "arcsecPerYr": -26.34770515585438,
+   "amplitude": 0.007853480398801458,
+   "nearestLaskar": {
+    "mode": "s6",
+    "arcsecPerYr": -26.3475
+   }
+  },
+  "uranus": {
+   "arcsecPerYr": -2.999782557988895,
+   "amplitude": 0.008744980387074497,
+   "nearestLaskar": {
+    "mode": "s7",
+    "arcsecPerYr": -2.9927
+   }
+  },
+  "neptune": {
+   "arcsecPerYr": -0.7119237190344891,
+   "amplitude": 0.005960579851589255,
+   "nearestLaskar": {
+    "mode": "s8",
+    "arcsecPerYr": -0.6919
+   }
+  }
+ },
+ "windowRatesArcsecCy": {
+  "gr": {
+   "mercury": 572.0163954148283,
+   "venus": 22.72580010599836,
+   "earth": 1154.4288756665303,
+   "mars": 1597.8081246982024,
+   "jupiter": 488.52901897634354,
+   "saturn": -1576.6419790262526,
+   "uranus": 806.6031271547791,
+   "neptune": 9101.672820143169
+  },
+  "newton": {
+   "mercury": 529.0318184207404,
+   "venus": 14.090631090521121,
+   "earth": 1150.5947011086469,
+   "mars": 1596.4568002639046,
+   "jupiter": 488.4665375503103,
+   "saturn": -1576.655982201358,
+   "uranus": 806.6007460587327,
+   "neptune": 9101.678202054029
+  }
+ },
+ "relativisticSupplementArcsecCy": {
+  "mercury": 42.98142753750674,
+  "venus": 8.624988679409013,
+  "earth": 3.838964853078437,
+  "mars": 1.3510691613456707,
+  "jupiter": 0.06243854269534776,
+  "saturn": 0.013727538363259385,
+  "uranus": 0.0023997870642552053,
+  "neptune": 0.0007833188044413818
+ },
+ "checks": {
+  "mercuryClosureArcsecCy": {
+   "measuredWindowDelta": 42.98457699408789,
+   "derivedInstantaneous": 42.98142753750674,
+   "diff": 0.003149456581148513,
+   "tolerance": 0.1
+  },
+  "saturnG6": {
+   "measured": 28.245581358956457,
+   "laskar": 28.2455
+  },
+  "jupiterG5": {
+   "measured": 4.256769523195223,
+   "laskar": 4.2575
+  }
+ },
+ "inputs": {
+  "generator": "node tools/verify/nbody-secular.js --write",
+  "files": {
+   "public/input/astro-reference.json": "sha256:0e61f5bec0ee3c44016781599498db75067070e74aeddc89b2f5bd6bc2782918",
+   "tools/explore/j2000-state.mjs": "sha256:08e14e0ad8a0e6e7e3ac297a728a4e0864267a2ff4b8051395e0c0a0c30b5229",
+   "tools/explore/lattice-long-window-test.mjs": "sha256:e6ed8dcfa22692017e1b8bd10c0c4c67787a302f8340d5426187e09ea3f5232f",
+   "tools/explore/naff-frequencies.mjs": "sha256:85178139faf0894c8cf62a7aa0a92395dab7afa6ab33efee93b63712ef257ed2",
+   "tools/explore/nbody-wh.mjs": "sha256:cad4f589bf80d3d108ed4b6e55671eff768996cf9916ed01b9ae54daeba3cd39",
+   "tools/verify/nbody-secular.js": "sha256:4621d047c54e86680fc6a3aafc24c298fd06916d0dfd192bbcebc5fa5c14565a"
+  }
+ }
+}

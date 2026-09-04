@@ -58,6 +58,8 @@ const REQUIRED = [
   'data/lod-climate-correlation-summary.json',
   // stamped in Phase 3 (lunar/solar sections; audit26/babylon135 still hand-recorded):
   'data/eclipse-audit-summary.json',
+  // stamped at Batch D of the restatement (engine-D secular frequencies):
+  'data/nbody-secular-frequencies.json',
 ];
 
 const DATA = path.join(ROOT, 'data');
