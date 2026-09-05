@@ -2248,8 +2248,6 @@ export const VALUES = {
     const out = {
       mercuryOscillationPeriod: { get: () => Math.round(C.H / 45), render: (v) => thousands(v), unit: 'yr', note: 'H/45 — beat of H/3 and H/5' },
       equinoxDriftRate: { get: () => astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 1), unit: '″/cy', note: 'IAU general precession — citation' },
-      mercuryObservedGeocentric: { get: () => Math.round(astro.knownValues.mercuryObservedICRFArcsecCy + astro.knownValues.generalPrecessionArcsecCy), render: (v) => thousands(v), unit: '″/cy' },
-      mercuryNewtonianGeocentric: { get: () => Math.round(astro.knownValues.mercuryNewtonianArcsecCy + astro.knownValues.generalPrecessionArcsecCy), render: (v) => thousands(v), unit: '″/cy' },
       mercuryFluctuationMin: { get: () => scan().mercury.mn, render: fmtSignedInt, unit: '″/cy' },
       mercuryFluctuationMax: { get: () => scan().mercury.mx, render: fmtSignedInt, unit: '″/cy' },
       mercuryFluctuationMinYear: { get: () => scan().mercury.mnY, render: (v) => thousands(v) },
@@ -2388,7 +2386,6 @@ export const VALUES = {
     for (const y of [1800, 1900, 2000, 2100]) {
       out[`mercuryHelio${y}`] = { get: () => pm().totalPrecession(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'LEGACY name (not heliocentric) — Earth-frame RA rate, frame (b); use mercuryEarthFrameRa{y}' };
       out[`mercuryEarthFrameRa${y}`] = { get: () => pm().totalPrecession(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'Earth-frame RA rate (scene equator co-moving with its stars); not an observable' };
-      out[`mercuryGeo${y}`] = { get: () => pm().totalPrecession(y, 'mercury') + astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'LEGACY — Earth-frame RA rate + p_A: a coordinate mix (RA rate plus a longitude precession); no observable corresponds to it' };
       out[`mercuryAnomaly${y}`] = { get: () => pm().fluct(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'LEGACY name — Earth-frame RA fluctuation (projection + obliquity-rate term), NOT the longitude anomaly; use mercuryEarthFrameExcess{y}' };
       out[`mercuryEarthFrameExcess${y}`] = { get: () => pm().fluct(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'Earth-frame RA rate minus the lattice rate' };
     }
@@ -2396,8 +2393,7 @@ export const VALUES = {
     out.generalPrecessionNewcombArcsecCy = { get: () => astro.knownValues.generalPrecessionNewcombArcsecCy, render: (v) => thousands(v, 3), unit: '″/cy', note: 'Newcomb general precession used in the Le Verrier→Clemence reductions — citation' };
     out.mercuryLonOfDateModel = { get: () => 1296000 / C.planets.mercury.perihelionEclipticYears * 100 + astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'lattice rate + IAU 2006 p_A — the model in frame (a), modern system' };
     out.mercuryLonOfDateModelClassical = { get: () => 1296000 / C.planets.mercury.perihelionEclipticYears * 100 + astro.knownValues.generalPrecessionNewcombArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'lattice rate + Newcomb p_A — the model in frame (a), classical system' };
-    out.mercuryObservedLonOfDateClemence = { get: () => astro.knownValues.mercuryObservedLonOfDateClemenceArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'Clemence 1947: 1765–1937 longitudes vs the equinox of date (± 0.41) — the only equinox-referred OBSERVATION' };
-    out.mercuryObservedLonOfDateImplied = { get: () => astro.knownValues.mercuryPark2017RateArcsecCy + astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'Park 2017 ICRF + IAU 2006 p_A — implied by definition, not measured' };
+    out.mercuryObservedLonOfDateClemence = { get: () => astro.knownValues.mercuryObservedLonOfDateClemenceArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'Clemence 1947: 1765–1937 longitudes vs the equinox of date (± 0.41) — the only equinox-referred OBSERVATION; a modern-system equinox total does NOT exist and must not be manufactured by adding p_A to an ICRF rate' };
     out.mercuryNewtonianClassical = { get: () => astro.knownValues.mercuryNewtonianClassicalArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'Clemence 1947 Newtonian subtotal 5,557.18 − Newcomb p_A — citation' };
     out.mercuryNewtonianModern = { get: () => astro.knownValues.mercuryPark2017RateArcsecCy - grAdvance('mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'Park 2017 ICRF total minus the GR advance derived from the model constants' };
     Object.assign(out, {

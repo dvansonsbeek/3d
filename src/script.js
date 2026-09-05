@@ -84,16 +84,16 @@ const systemResetN = K.foundational.systemResetN;         // Eccentricity anchor
 // harmonics) lives in the doc-block at the original call site — the pointers
 // below reference those source-of-truth locations. This section collects the
 // declarations at the top of the file for discoverability.
-const useVariableSpeed           = K.foundational.useVariableSpeed;   // Equation of Center on planet orbits — see moveModel (~L54142). tools/lib reads the same JSON key; this was a hardcoded `true` that could silently diverge.
+const useVariableSpeed           = K.foundational.useVariableSpeed;   // Equation of Center on planet orbits — see moveModel. tools/lib reads the same JSON key; this was a hardcoded `true` that could silently diverge.
 const debugOn                    = false;  // Debug button flag (developer only)
-let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge (~L7080)
-let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction (Phase Z-B) — rationale ~L7066
+let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge
+let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction — rationale at the "Phase Z-B" doc block
 let   E5_WHEEL_SUN_ENABLED       = true;   // SW-1: wheel Sun rides the certified E5 tier Sun via δ = λ_cert − λ_twin (see moveModel sun block)
 let   FQ3_EXACT_SUN_ENABLED      = true;   // FQ-3 W1: exact-Kepler wheel Sun — the derived Δ corrector replaces the fitted SUN_LONGITUDE_HARMONICS on the display path (see moveModel sun block; mirrors tools/lib/scene-graph.js FQ3_EXACT_SUN)
-let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 8H/1830 ΔT correction (Option B research toggle) — rationale + associated constants ~L4919
-let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research toggle) — rationale + associated constants ~L5039
-let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + associated constants ~L5109
-let   JOSE4_DT_CORRECTION_ENABLED = true;  // Jose4 8H/3749 ≈ 715.5 yr ΔT correction (4×Jose period, structural gcd=23) — cross-archive coherent in Steinhilber Φ + EPICA CO2; rationale + associated constants ~L5209
+let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 8H/1830 ΔT correction (Option B research toggle) — rationale + constants at the BOND_LATTICE_N block
+let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research toggle) — rationale + constants at the HALLSTATT_LATTICE_N block
+let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + constants at the JOSE5_LATTICE_N block
+let   JOSE4_DT_CORRECTION_ENABLED = true;  // Jose4 8H/3749 ≈ 715.5 yr ΔT correction (4×Jose period, structural gcd=23) — cross-archive coherent in Steinhilber Φ + EPICA CO2; rationale + constants at the JOSE4_LATTICE_N block
 let   RESONATOR_DT_CORRECTION_ENABLED = true;  // Core-mantle swing (Resonator driver) — episode of the core eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q=1.8) + locked bond−hallstatt drive tone. DEFAULT ON since the JOINT-world flip (2026-07-23): fitted JOINTLY with the 4 flags (dt-corrections-fit.js --joint; anchors USNO 86400.0014 / deltaTStart 56.05 moved with the coefficients, Espenak RMS 12.60 s). doc 104 §6/§8; constants + rationale near the Jose4 block
 let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argument skeleton (_fwMoonArgs via _moonArgsAt) feeding the _eclMoon* dispatchers: frame-decomposed rates + solar-eccentricity-channel T²/T³ (derivation record: docs/66 §1). OFF = pure Meeus Ch. 47 argument polynomials (A/B reference; flip via console for comparison runs)
 
@@ -3633,7 +3633,7 @@ function _phaseCycles(year, divisor_N) {
 /** Framework-native Sun ecliptic longitude in degrees [0, 360).
  *  Uses:
  *    - Framework's tropical year (snapshot/integrated via DEEP_TIME_MODE_ENABLED)
- *    - Framework's eccentricity harmonic (varies at H/16 perihelion cycle)
+ *    - Framework's eccentricity (the ONE H/3 law — H/16 is the perihelion direction only)
  *    - Framework's perihelion precession (H/16)
  *    - Kepler higher-order Equation of Center (to e⁴)
  *  NO Meeus polynomial. NO T²/T³ secular artifacts.

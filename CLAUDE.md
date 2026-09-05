@@ -5,13 +5,13 @@ System Resonance Theory (ESSRT). The model is analytic and parametric, valid
 across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
-**Scale:** `src/script.js` ~59,900 lines · `tools/` ~300 JS scripts across 10
-directories · ~245 Python files · 74 docs · two web UIs (simulator, `dashboard/`).
+**Scale:** `src/script.js` ~60,000 lines · `tools/` ~330 JS scripts across 10
+directories · ~245 Python files · 75 docs · two web UIs (simulator, `dashboard/`).
 **`npm run check` enforces a twenty-two-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
-Golden masters live in `packages/fixtures/`. Of the 26 scripts in `tools/verify/`,
-only 5 can actually fail — see the Verification section.
+Golden masters live in `packages/fixtures/`. Of the 28 scripts in `tools/verify/`,
+only 6 can actually fail — see the Verification section.
 
 ---
 
@@ -27,7 +27,7 @@ phase, a refactor that might need abandoning wholesale — runs in a git worktre
 (`EnterWorktree`), not the main tree. Abandoning is then a `remove`, never a
 `git checkout` over a dirty tree. Two gotchas: a worktree branches from
 `origin/main`, so **uncommitted work does not come with it** — commit first; and
-it contains tracked files only, so the gitignored 166 MB CSV and `docs/archive/`
+it contains tracked files only, so the gitignored 160 MB CSV and `docs/archive/`
 are **absent** inside one.
 
 **No polynomial corrections.** Motion-model corrections stay harmonic on
@@ -79,7 +79,7 @@ would silently churn a structural claim for a rounding-level gain.
   not a formula bug.
 - **Capture a baseline before touching shared machinery.** Two minutes; it has
   caught a 583.7″ regression.
-- `data/02-solar-measurements.csv` is 166 MB and gitignored — no git recovery.
+- `data/02-solar-measurements.csv` is 160 MB and gitignored — no git recovery.
   Back it up before regenerating (2 h 24 m).
 - **The deep-time alignment campaign is COMPLETE** — engine ≡ CSV bit-exact,
   all sixteen R-items closed, the cardinal-point fit (now Step 6d; "6c" in
@@ -154,12 +154,13 @@ chain at ±1/±5 Myr; the golden master cannot catch that class).
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
-`/gates` runs the standalone model checks. `tools/verify/` holds 26 scripts, and
-**21 of them cannot fail** — no exit path, no assertion, so running them proves
-nothing. `npm run test:verify:list` gives the classification: 5 gate · 3 liftable
-· 13 narrative · 5 generator (the suite FAILS on any unclassified script). **Never
+`/gates` runs the standalone model checks. `tools/verify/` holds 28 scripts, and
+**22 of them cannot fail** — no exit path, no assertion, so running them proves
+nothing. `npm run test:verify:list` gives the classification: 6 gate · 3 liftable
+· 13 narrative · 6 generator (the suite FAILS on any unclassified script). **Never
 run a generator as a test** — `balance-search.js` rewrites the tracked
-`data/balance-presets.json`, and the four campaign generators
+`data/balance-presets.json`, `nbody-secular.js` rewrites
+`data/nbody-secular-frequencies.json`, and the four campaign generators
 (cassini-results / lod-climate-correlation / eclipse-audit / lunar-alignment)
 rewrite their `data/*.json` under `--write` (the latter two REFUSE on
 divergence; `--rebaseline` is the conscious re-measurement path).
@@ -218,11 +219,11 @@ what actually made corrections stick here.
 | `src/script.js` | browser scene + UI + formulas (monolith) |
 | `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
-| `tools/verify/` | 26 scripts: 5 gate · 3 liftable · 13 narrative · 5 generator (`npm run test:verify:list`) |
+| `tools/verify/` | 28 scripts: 6 gate · 3 liftable · 13 narrative · 6 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
-| `tools/explore/` | 140 research one-offs — findings live in `docs/` |
+| `tools/explore/` | ~200 research one-offs — findings live in `docs/` |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |
-| `docs/` | 74 numbered docs; `40-architecture`, `99-essrt` are cross-referenced |
+| `docs/` | 75 numbered docs; `40-architecture`, `99-essrt` are cross-referenced |
 
 The simulator at 3d.holisticuniverse.com auto-deploys from every green main
 push (the Pages job in ci.yml) — nothing is hand-uploaded anywhere.

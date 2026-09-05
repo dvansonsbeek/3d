@@ -1,7 +1,7 @@
 # ESSRT — Interactive 3D Solar System Simulation
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-10-green.svg)](https://github.com/dvansonsbeek/3d/releases/tag/v10)
+[![Model version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdvansonsbeek%2F3d%2Fmaster%2Fpublic%2Finput%2Fmodel-version.json&query=%24.modelVersion&label=model&color=green)](public/input/model-version.json)
 [![Three.js](https://img.shields.io/badge/Three.js-0.183-orange.svg)](https://threejs.org/)
 [![npm @essrt/physics](https://img.shields.io/npm/v/%40essrt%2Fphysics?label=%40essrt%2Fphysics)](https://www.npmjs.com/package/@essrt/physics)
 [![npm @essrt/model-values](https://img.shields.io/npm/v/%40essrt%2Fmodel-values?label=%40essrt%2Fmodel-values)](https://www.npmjs.com/package/@essrt/model-values)
@@ -27,7 +27,7 @@ The model starts from a single observation: two of Earth's precession motions ro
 | Axial Precession | Clockwise | <!--v:axialPrecRound-->~25,794<!--/v--> years |
 | Inclination Precession | Counter-clockwise | <!--v:inclPrecYears-->~111,772<!--/v--> years |
 
-These two counter-rotating motions interact in a **Fibonacci ratio of 3:13**. From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and the orbital-forcing component of climate (the timing of glacial-interglacial cycles).
+These two counter-rotating motions interact in a **Fibonacci ratio of 3:13** — the measured J2000 configuration (the restated relations below carry the honest typing). From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and the orbital-forcing component of climate (the timing of glacial-interglacial cycles).
 
 Everything comes together in the **Earth Fundamental Cycle (H)**: a <!--v:H-->335,317<!--/v-->-year master cycle at J2000 (H slowly evolves on geological timescales via Earth-Moon tidal evolution — see the deep-time section below) from which Earth's major precession periods emerge as Fibonacci divisions (H/3, H/5, H/8, H/13) — and this simulation visualizes it all in one interactive view.
 
@@ -100,7 +100,7 @@ The simulation will open in your browser at `http://localhost:1234`
 
 The complete physics core — constants, fitted coefficients, every factory —
 is published as [`@essrt/physics`](https://www.npmjs.com/package/@essrt/physics)
-(AGPL-3.0), and the 1,000+ rendered display values as
+(AGPL-3.0), and the 1,600+ rendered display values as
 [`@essrt/model-values`](https://www.npmjs.com/package/@essrt/model-values).
 Every published version immutably ships one recorded model identity
 (`modelVersion` + coefficient hashes), so any number you compute from a pinned
@@ -172,12 +172,12 @@ Two things worth knowing before you read a red result as breakage:
   and required in CI** — a year's computed values do not depend on which epoch
   the scene happens to be set to, bit-exact on the round trip. Red there is a
   regression of a closed acceptance criterion, not a tracked state.
-- Of the 26 scripts in `tools/verify/`, only the seven gates can actually fail —
+- Of the 28 scripts in `tools/verify/`, only the six gates can actually fail —
   the rest print analysis without asserting anything. `test:verify` runs the real
-  gates and deliberately skips the five generators (`balance-search.js` plus the
-  four campaign-artifact generators), which regenerate tracked data files rather
-  than checking them. The suite fails on any unclassified script, so the
-  inventory cannot silently drift again.
+  gates and deliberately skips the six generators (`balance-search.js`, the four
+  campaign-artifact generators, and the engine-D N-body frequencies generator),
+  which regenerate tracked data files rather than checking them. The suite fails
+  on any unclassified script, so the inventory cannot silently drift again.
 
 ---
 
@@ -239,7 +239,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 | 20–29 | Technical Reference | [Constants Reference](docs/20-constants-reference.md), [Formulas](docs/21-orbital-formulas-reference.md) |
 | 30–39 | Calculations | [Anomaly](docs/30-anomaly-calculations.md), [Ascending Nodes](docs/31-ascending-node-calculations.md), [Inclination](docs/32-inclination-calculations.md) |
 | 40–49 | Architecture & Code | [Architecture](docs/40-architecture.md), [Scene Graph](docs/41-scene-graph-hierarchy.md) |
-| 50–59 | UI & Tools | [UI Panels](docs/50-ui-panels-reference.md), [Balance Explorer](docs/53-balance-explorer-reference.md) |
+| 50–59 | UI & Tools | [UI Panels](docs/50-ui-panels-reference.md), [Resonance Cycle Periods](docs/55-solar-system-resonance-cycle-periods.md) |
 | 60–69 | Optimization & Fitting | [Overview](docs/60-optimization-tool-overview.md), [Fitting Pipeline](tools/fit/README.md), [Moon Implementation (Doc 66)](docs/66-moon-meeus-corrections.md) |
 | 70–79 | Verification | [Ascending Node Limitations](docs/70-ascending-node-limitations.md) |
 | 80–89 | Per-Planet Setup | [Mercury Scene Graph Setup](docs/80-mercury-setup.md) |
@@ -252,7 +252,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 - [Historical Eclipse Validation (Docs 102–103)](docs/102-gia-alpha-lunar-validation.md) — The model's ΔT formula, with **zero parameters fitted to eclipse data in the α(t) machinery**, tested on two independent tracks: a 26-event solar-eclipse alignment audit spanning −762 BCE to 2026 CE (the framework agrees with the documented UT on every event; see the website's [Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)), and a 267-event primary-source lunar timing test — **<!--v:lunarResidualMinutes-->20.2<!--/v-->-min mean \|residual\|**, with **<!--v:lunarEventsBeatingNasa-->118<!--/v-->/267 events (<!--v:lunarBeatingNasaPct-->44.2<!--/v-->%) falling closer to observation than NASA Espenak/Meeus's polynomial**. [Doc 103](docs/103-135-babylonian-case-study.md) is the −135 Babylonian case study: predicted UT within 9 minutes of the documented time, umbra centerline 194 km from Babylon.
 - [The Derived Moon — Doc 66 technical record](docs/66-moon-meeus-corrections.md) — the framework's lunar theory, **"The Derived Moon" (DLT-1)**: Meeus Ch. 47 with every constant derived, attributed, or anchored by design — periodic amplitudes reproduced from gravity alone, the secular budget closed against primary sources with zero free parameters, and certified statistically indistinguishable from the pure-Meeus polynomials across the 12,064-event NASA lunar canon while remaining bounded at deep time.
 - [Fitting Pipeline](tools/fit/README.md) — Pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, solar measurements, obliquity/cardinal-point/year-length harmonics
-- [Predictive Formula Guide](tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — ~2421-term physical-beat ML system for planetary precession prediction (R² > 0.99999 per planet; superseded the 429-term unified system on 2026-04-20)
+- [Predictive Formula Guide](tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — ~2421-term physical-beat ML system for planetary precession prediction (R² > 0.99999 per planet; superseded the earlier 429-term unified system)
 
 ---
 

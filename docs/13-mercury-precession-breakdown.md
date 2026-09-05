@@ -334,8 +334,11 @@ measures for its marker and what no observer has published. Converting
 either way closes exactly, and the missing advance is the same gap in both:
 classical system (Newcomb p_A 5,025.645) observed 5,599.74 vs model
 5,557.08 → 42.66 ″/cy in longitude, 46.09 in RA (= 42.66 × slope); modern
-system (IAU 2006 p_A 5,028.8) Park-implied 5,604.11 vs model 5,560.24 →
-43.87 in longitude (0.89 of it the baseline 532.33 − 531.44). The scene's
+system, compared directly in ICRF (no equinox-referred determination
+exists there, and none may be manufactured by adding p_A to a ranging
+value): Park 575.31 vs model lattice 531.44 → 43.87 in longitude (0.89 of
+it the baseline 532.33 − 531.44); p_A, common to both sides of an of-date
+statement, cancels in any within-system subtraction. The scene's
 579.8 is the RA rate in an equator that co-moves with its stars (no p_A);
 converted back to longitude it is 531.44 again — the projection adds nothing
 to the longitude rate, in which the anomaly is defined. A sum that applies
