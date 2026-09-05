@@ -70,6 +70,144 @@ that split IS the two-tier structure, confirmed at 1.4 and 2.46 Ga.
 
 ---
 
+## One solar system, two engines, two clocks
+
+There is one solar system and one force. Gravity acts on two different
+KINDS of degrees of freedom, and they have fundamentally different physics:
+
+1. **Where bodies go — the orbits.** Conservative, nearly time-reversible,
+   no friction. Point masses exchanging momentum: the g/s secular modes,
+   the eccentricity and inclination oscillations, the 405-kyr metronome.
+   Nothing here carries an arrow of time over millions of years.
+2. **How bodies spin and deform — rotation and tides.** Dissipative.
+   Earth's tidal bulge drags, energy becomes heat, the day lengthens, the
+   Moon recedes — irreversibly. This is why H(t) *evolves*: dissipation
+   gives this half of the physics an arrow of time the orbital half does
+   not have.
+
+The model's two engines are these two halves — not two theories of the same
+thing. The seam between them is not a modelling choice; nature put it there.
+
+| | **Engine K — rotation & tides** | **Engine D — orbits** |
+|---|---|---|
+| Headline clock | axial precession (H/13) | perihelion / inclination precession (the g/s modes) |
+| Full family | day length (LOD), the obliquity band, lunar recession, H(t), the eclipse/ΔT timing chain | *all* orbital-element motions of *all* planets: apsidal, nodal, eccentricity and inclination oscillations, the 405-kyr beat |
+| Interaction | Earth–Moon (tidal, dissipative) | planet–planet (gravitational, conservative) |
+| Its expansion tier | **the tidal expansion**: the Moon recedes, the day lengthens, H(t) grows | **the solar-mass expansion**: every orbit swells as 1/M_Sun as the Sun loses mass |
+
+**The coupling across the seam is one-way.** The orbits force the spin
+system — the planets set Earth's eccentricity and inclination, the Sun and
+Moon torque Earth's bulge — but Earth's spin state feeds nothing measurable
+back to the planets. That one-way arrow is why the split into two engines
+is clean rather than an approximation. The wall is by degree of freedom,
+not airtight: a third of the axial-precession torque is solar — an
+orbital-side quantity (and the M⁴ cross-coupling under mass loss,
+`tools/explore/w3-precession-crosscoupling.mjs`) — but the *ownership*
+follows the degree of freedom even where one engine's number appears
+inside the other's formula.
+
+**Earth is the interface — and the Fibonacci structure is the interface's
+signature.** Earth is the one body where both halves meet at full strength:
+a massive moon (strong dissipation), a fast spin, and a climate record that
+writes both halves into rock. The Fibonacci relations were never properties
+of the planets' orbits (the retirement above); they are the J2000 signature
+of Earth's spin–orbit–tide interface — H/13 and H/8 on the spin side, H/3
+and H/16 as the epoch-local tangents of the orbital side, meeting in one
+hierarchy at the anchor.
+
+### The composition is what nature measures
+
+The strongest evidence that this is one system, not two bolted-together
+models: the two engines COMPOSED predict something neither can alone.
+Earth's physical axial-precession rate at age t is
+ψ̇(t) = [ω(t)/ω₀] · (solar torque + lunar torque on the recession history) —
+engine K supplying ω(t) and a_moon(t), engine D's side the solar term
+(solar share today <!--v:earthPrecSolarShareJ2000Pct-->31.6<!--/v--> %):
+
+| age | the two engines composed (″/yr) | structural H(t)/13 alone (″/yr) | external reading |
+|---|---|---|---|
+| J2000 | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.2<!--/v--> | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.2<!--/v--> | IAU: 50.29 (measured) |
+| 650 Ma | **<!--v:earthPrecComposed650MaArcsecPerYr-->67.8<!--/v-->** | <!--v:earthPrecStructural650MaArcsecPerYr-->58.6<!--/v--> | **Wu et al. 2024: 67.64** (cyclostratigraphic inference) |
+| 1400 Ma | <!--v:earthPrecComposed1400MaArcsecPerYr-->86.5<!--/v--> | <!--v:earthPrecStructural1400MaArcsecPerYr-->65.2<!--/v--> | — |
+| 2460 Ma | <!--v:earthPrecComposed2460MaArcsecPerYr-->104.5<!--/v--> | <!--v:earthPrecStructural2460MaArcsecPerYr-->70.9<!--/v--> | — |
+
+At J2000 the two columns coincide — that is where the lattice is exact. At
+650 Ma they split by 14 %, and the rock-derived inference sides with the
+COMPOSITION to 0.2 % — a number engine D cannot produce (it knows nothing
+of Earth's day length) and engine K's bare structural clock misses by
+9 ″/yr. Labels: both model columns are theory; Wu's rate is inferred from
+cyclostratigraphy through an assumed astronomical model (see "Structural vs
+physical axial precession" below); the IAU J2000 rate is the measured
+anchor.
+
+### Why 13:3 is a reading, not a gearing
+
+A fair challenge: the "13" (axial precession) evolves slowly and
+monotonically with the tides, while the "3" (Earth's inclination/perihelion
+motion) is an engine-D quantity that planetary perturbations make wander —
+the model's own dynamics puts Earth's inertial perihelion rate within 0.3 %
+of the H/3 line today but more than double it ~20 kyr from now (the
+origin-pass forecast, doc 109). Doesn't that set the two engines against
+each other?
+
+No — because no quantity has two owners. Engine D owns Earth's ϖ, e, i, Ω
+at every epoch. Engine K owns the spin and the tides, and where it uses
+orbital quantities (the H/3 phase in the eccentricity law, H/16 in the
+cardinal-point machinery) it uses them as LOCAL CHARTS of engine D's
+motion: tangent lines anchored at J2000, typed L in the doc-109 §9 scheme,
+valid across the era where everything engine K is validated on actually
+lives (the 5 % era, roughly −2,600…+2,850 yr — the eclipse corpus, the
+ancient observations, the historical ΔT record). Inside that era the
+tangent and the dynamics agree to measurement precision — which is why the
+eclipse predictions work. Outside it, engine K makes no claim on the "3".
+A tangent is not wrong; it is local.
+
+The asymmetry inside 13:3 is real and is now the model's structure:
+
+- **The 13 is definitional.** H is anchored on the spin side — H = 13 ×
+  the axial-precession period, tied to LOD and the tidal chain. That clock
+  genuinely scales with H(t) into deep time, and the rock confirms it (the
+  falsification criterion's first leg).
+- **The 3 is observational.** "Inclination precession = H/3" is the J2000
+  reading of a wandering dynamical quantity that sits on the Fibonacci
+  anchor now. The snap-epoch search (doc 109) made this sharp: J2000 *is*
+  the epoch where the free dynamics and the lattice line touch.
+
+One thing is not epoch-local: **the addition identities are frame
+arithmetic, and frame arithmetic holds always.** Perihelion-of-date =
+equinox precession + inertial perihelion motion (16 = 13 + 3) is true at
+every epoch by construction; likewise 8 = 5 + 3. What is epoch-local is
+that the addends land on H/13 and H/3. The relations' FORM is permanent;
+their Fibonacci VALUES are the J2000 configuration — whether coincidence
+or selection is open, and the model claims no mechanism.
+
+### The path to one engine
+
+The composition above is already the unification at the formula level:
+one calculation, both engines as its halves. Making the whole model read
+that way is a staged path:
+
+1. **Forcing flows one way in the code as it does in nature.** Engine D's
+   outputs enter engine K as forcing (the solar torque term, the g/s beats
+   in the climate formula's L1 layer, Earth's orbital tangents) — already
+   the case; nothing flows back.
+2. **The visible product renders the dynamics** — the planet chains move
+   from the retired two-vector construction to Kepler orbits on engine-D
+   elements (plan: the P5 phase). After it, one story runs from the
+   physics to the pixels.
+3. **The research horizon: one integrator.** A single spin–orbit–tide
+   integration (N-body + Earth's rotation + tidal dissipation + GM_Sun(t))
+   would compute both columns of the table above in one pass. The pieces
+   exist — the WH engine, the recession history, the torque split; the
+   two-expansions W5 item (time-varying GM_Sun in the WH drifts) is the
+   first step of that assembly.
+
+One system, one force; the split is conservative vs dissipative; the
+coupling is one-way; Earth is where they meet; 13:3 is the J2000 reading
+of the meeting point.
+
+---
+
 ## The unified scaling principle
 
 ESSRT has **two physically independent drivers** that together expand the lattice. Both act simultaneously, and the framework's `H × days/year = TOTAL_DAYS_IN_H` invariant ties them together.

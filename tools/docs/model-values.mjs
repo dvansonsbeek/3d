@@ -1790,6 +1790,42 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── The two-engine composed precession (doc 99 "one solar system") ──────
+  // The W3 forward model as derived keys: Earth's PHYSICAL axial-precession
+  // rate at age t is the two engines composed — engine K's spin ω(t) and
+  // recession history a_m(t) carrying the lunar torque, engine D's side the
+  // solar torque: ψ̇(t) = [ω(t)/ω₀]·(p_S + p_L·(a_m0/a_m(t))³) at μ = 1.
+  // The STRUCTURAL clock is H(t)/13 (exact at J2000). All inputs from the
+  // shared homes (E20); the instrument twin is
+  // tools/explore/w3-precession-crosscoupling.mjs.
+  ...(() => {
+    const D2R = Math.PI / 180;
+    const split = () => {
+      const eE = astro.earthOrbital.earthEccentricityJ2000;
+      const sol = (C.GM_SUN / C.currentAUDistance ** 3) * Math.pow(1 - eE * eE, -1.5);
+      const lun = (C.GM_MOON_ALONE / C.moonDistance ** 3) * Math.pow(1 - C.moonOrbitalEccentricity ** 2, -1.5)
+        * (1 - 1.5 * Math.sin(C.moonEclipticInclinationJ2000 * D2R) ** 2);
+      return sol / (sol + lun);
+    };
+    const p0 = () => 1296000 / (C.H / 13);
+    const composedAt = (ageMa) => {
+      const d = dtl();
+      const fS = split();
+      return (d.LOD_NOW_H13_S / d.meanLodSecondsAtAge(ageMa))
+        * (p0() * fS + p0() * (1 - fS) * Math.pow(d.A_MOON_NOW_M / d.meanMoonDistanceMetresAtAge(ageMa), 3));
+    };
+    const structuralAt = (ageMa) => 1296000 / (dtl().meanHAtAge(ageMa) / 13);
+    const out = {
+      earthPrecSolarShareJ2000Pct: { get: () => 100 * split(), render: (v) => Number(v).toFixed(1), unit: '%', note: 'solar fraction of Earth’s J2000 precession torque, derived from the shared constants (the W3 split; the lunar part is the rest)' },
+      earthPrecRateJ2000ArcsecPerYr: { get: p0, render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'the model’s J2000 axial-precession rate, 1,296,000 / (H/13)' },
+    };
+    for (const age of [650, 1400, 2460]) {
+      out[`earthPrecComposed${age}MaArcsecPerYr`] = { get: () => composedAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the two engines composed at ${age} Ma: ω(t) × (solar torque + lunar torque on the recession history), μ = 1` };
+      out[`earthPrecStructural${age}MaArcsecPerYr`] = { get: () => structuralAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the structural clock H(${age} Ma)/13 alone — exact at J2000, diverges at depth by the lunar 1/a³ term` };
+    }
+    return out;
+  })(),
+
   // ── Engine-D secular frequencies (Batch D: P1b of the restatement) ──────
   // The A/B-typed keys read data/nbody-secular-frequencies.json — the
   // governed artifact written by tools/verify/nbody-secular.js (--write)

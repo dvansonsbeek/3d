@@ -30,6 +30,22 @@ This document describes the six Fibonacci relations (published under their histo
 > untested empirical amplitude laws, kept as open predictions. The
 > derivations below are retained in full as the record of how the structure
 > was found.
+>
+> **What is permanent, and what is a J2000 reading.** The addition
+> identities' FORM is frame arithmetic and holds at every epoch:
+> perihelion-of-date = equinox precession + inertial perihelion motion
+> (16 = 13 + 3), and 8 = 5 + 3 likewise. What is epoch-local is that the
+> addends land on H/13 and H/3 — the "3" is engine-D's wandering
+> perihelion motion, on the H/3 line today and typed L (epoch-local) in
+> the doc-109 §9 scheme. Whether anything makes 13:3 MORE than the J2000
+> reading was pursued to exhaustion and closed on every doorway
+> ([Doc 109 §13](109-model-nbody-engine-and-lattice-test.md)): no lock, no
+> capture, no preferred base period, and not even the statistical mode of
+> the rate distribution (H/3 sits at the 75th percentile of Earth's ϖ̇
+> over ±500 kyr). The relations' architecture is permanent; their
+> Fibonacci values are the measured J2000 configuration — the signature of
+> Earth's spin–orbit–tide interface at the anchor (see
+> [Doc 99, "One solar system"](99-expanding-solar-system-resonance-theory.md)).
 
 The six Fibonacci Laws form a symmetric architecture, organized by structural role rather than by physical domain:
 

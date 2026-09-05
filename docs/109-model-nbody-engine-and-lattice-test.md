@@ -414,6 +414,62 @@ tested window, silent about deep time — and the planetary secular system
 belongs to the free dynamics, while the model's spin-family results
 (precession, LOD, eclipses, ice ages) are untouched by any of this.
 
+## 13. The 13:3 permanence question — closed on every doorway
+
+The 13:3 ratio (axial precession H/13 against inclination/perihelion
+precession H/3) is exact at J2000 and generated H itself. Whether anything
+makes it MORE than the J2000 reading — a permanent structure — was pursued
+to exhaustion. The doorway list, each measured:
+
+- **Frames, masses, projection** (§10-class + the E22 round): the diagonal
+  mass theorem, frame-rotation cancellation and the cross-frame projection
+  close the candidate reinterpretations of the rates.
+- **Held universes** (§12): any Earth held permanently on the H/3 law
+  loses the 405-kyr line the strata demand, and the minimal held
+  configuration pumps Venus to e ≈ 0.17 through the g₂′ near-resonance.
+- **Any-base lattice scan** (`lattice-base-scan.mjs`): no base period
+  hosts the g-frequencies — the best base anywhere performs at the
+  random-null median (P ≈ 0.5); 8H sits in the bottom 15 %.
+- **Mechanism, lock-onset and snap-epoch hunts**: no lock mechanism found;
+  nothing special at any candidate onset epoch; the epoch where the free
+  dynamics touches the lattice line **is** J2000.
+- **Added forces** (§10): capped at ~1 % reach on secular frequencies and
+  excluded by Kepler-III consistency.
+- **Secular spin–orbit capture** (the Saturn-locked-to-s₈ class): capture
+  locks a spin precession to a FIXED eigenfrequency, never to a
+  superposition wandering on 20-kyr scales against Myr-class libration;
+  the literature's future precession-resonance crossings give obliquity
+  chaos, not capture (Néron de Surgy & Laskar 1997).
+- **The statistical mode** (`pomega-rate-distribution.mjs` — the last
+  doorway): even without a lock, H/3 could have labeled the system's
+  TYPICAL state if 11.59 ″/yr were the mode of Earth's wandering inertial
+  ϖ̇. Measured on the ±500-kyr 1PN run (36,452 sliding 2-kyr rates): the
+  mode is ≈ 8 ″/yr (14 % bin share), the median 7.9, and the H/3 line
+  sits at the **75th percentile**; time within ±5 % of H/3 is 5.8 %
+  against a 4.8 % uniform-null. Not the mode; barely above chance.
+  (Theory-vs-theory: the referee is the model's own engine D.)
+
+Structurally, permanence was never available across the seam: engine-K
+frequencies scale with 1/H(t) (the tidal clock, ~10 % per 380 Myr) while
+engine-D frequencies scale with M_Sun (the mass clock, ~0.003 % over the
+same span) — five orders of magnitude apart. A permanent cross-seam
+integer ratio would require the tidal clock enslaved to the mass clock,
+which nothing measured supports.
+
+**What survives, permanently:** the addition identities' FORM — perihelion
+-of-date = equinox precession + inertial perihelion motion (16 = 13 + 3)
+and 8 = 5 + 3 are frame arithmetic, true at every epoch by construction;
+what is epoch-local is only that the addends land on H/13 and H/3. The
+spin family's H(t)-scaling is rock-confirmed, and the composed two-engine
+precession matches the deep-time inferences (doc 99, "One solar system").
+The longest-lived Fibonacci touch is Earth's own **nodal mean ≈ −H/5**
+(the one A-type lattice match, anchored on the s₃ eigenfrequency — it
+stands for tens of Myr, though H's growth eventually walks away from it
+too). Of all epochs, the one where the free dynamics kisses the Fibonacci
+lattice is the one with observers in it; selection mechanisms were tested
+and none found, so the model claims no structure — and no one gets to call
+it understood, either.
+
 ## Related documents
 
 - [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) — §1.8: the projection identity, the transit test, the candidate slot
