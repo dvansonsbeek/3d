@@ -53942,6 +53942,14 @@ function _kcHelioAU(nameLower, jd) {
   const p = kcComputeHeliocentricEclipticFromElements(el);
   return [p.xAU, p.yAU, p.zAU];
 }
+// P5/K5 — perihelion-of-date from the chain: ϖ(t) straight from the
+// elements-of-date (the multi-mode secular skeleton + derived terms — the
+// true apsidal wander, not a fixed divisor rate).
+function _kcPerihelionEclLonDeg(nameLower, jd) {
+  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+  const year = KC_ANCHOR_EPOCH_YEAR + (jd - KC_ANCHOR_EPOCH_JD) / 365.25;
+  return kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
+}
 function _kcTriad(p, q) {
   const u = p;
   const w0 = [p[1] * q[2] - p[2] * q[1], p[2] * q[0] - p[0] * q[2], p[0] * q[1] - p[1] * q[0]];
@@ -55282,6 +55290,24 @@ function updatePerihelion() {
   o["plutoPerihelionEcliptic"] = perihelionLongitudeEcliptic(plutoPerihelionDurationEcliptic1, planets.pluto.longitudePerihelion);
   o["halleysPerihelionEcliptic"] = perihelionLongitudeEcliptic(halleysPerihelionDurationEcliptic1, planets.halleys.longitudePerihelion);
   o["erosPerihelionEcliptic"] = perihelionLongitudeEcliptic(erosPerihelionDurationEcliptic1, planets.eros.longitudePerihelion);
+
+  // P5/K5 — under the Keplerian flag the SEVEN PLANETS' perihelion panels
+  // read the engine-D chain's elements-of-date: ϖ(t) from the multi-mode
+  // secular skeleton + derived terms (the true apsidal wander). The fixed
+  // divisor rates above (8H/11 etc.) are retired to window-epoch DESCRIPTORS
+  // (doc 109 §9: Mercury's 531″/cy is the present-epoch rate, not a mean).
+  // The RA channel uses the established λ-projection convention
+  // (eclipticLongitudeToRaDeg — the doc-37 "RA of a Keplerian apsis").
+  // Earth stays on its engine-K law (the two-engine interface);
+  // Pluto/Halleys/Eros have no chain and stay legacy.
+  if (KEPLER_CHAINS) {
+    for (const _p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      const _lp = _kcPerihelionEclLonDeg(_p, o.julianDay);
+      o[_p + 'PerihelionEcliptic'] = _lp;
+      o[_p + 'Perihelion'] = eclipticLongitudeToRaDeg(_lp, o.currentYear);
+    }
+  }
+
   // Update perihelion gauge bars
   for (const key in periGaugeEls) {
     if (periGaugeEls[key]) periGaugeEls[key].style.setProperty('--elong-pct', ((o[key] / 360) * 100) + '%');

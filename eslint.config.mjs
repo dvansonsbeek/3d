@@ -34,6 +34,10 @@ export default [
       'src/**', 'tools/**', 'scripts/**', 'dashboard/**', 'public/**',
       'data/**', 'docs/**', 'web-bundles/**',
       'packages/research/**', 'packages/analysis/**',
+      // Harness workspace — a KEPT git worktree under .claude/worktrees/ is a
+      // full duplicate tree; without this ignore it swept 46k phantom lint
+      // errors into the chain (measured, P5 K5b session).
+      '.claude/**',
     ],
   },
 
