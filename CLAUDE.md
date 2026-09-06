@@ -189,8 +189,10 @@ corresponding tier. (2) **Historical-era exactness** — the fail-proven gate
 suite: eclipses (`eclipse-audit`), the LOD/ΔT stack, cardinal points, the
 41-anchor paleo bands (`paleo-anchors`, where an unexplained *improvement*
 fails too). (3) **Two-expansions μ-consistency** — the rock-measured
-long-eccentricity period must track 405.6 kyr / μ under the measured solar
-mass history (currently μ(2.48 Ga) = 1.00 ± 0.07). The former Config-#7
+long-eccentricity period must track 405.6 kyr / μ^1.153 (the engine-measured
+beat response, W5; 1/μ is the first-order case) under the measured solar
+mass history (currently μ(2.48 Ga) = 1.00 ± 0.07, quoted through the
+conservative first-order slope). The former Config-#7
 criterion (checks 46–50 of `verify-laws`, the mirror-unique configuration in
 `data/balance-presets.json`) is retired with its record.
 

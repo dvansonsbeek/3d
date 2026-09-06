@@ -205,7 +205,7 @@
    "tools/explore/j2000-state.mjs": "sha256:08e14e0ad8a0e6e7e3ac297a728a4e0864267a2ff4b8051395e0c0a0c30b5229",
    "tools/explore/lattice-long-window-test.mjs": "sha256:e6ed8dcfa22692017e1b8bd10c0c4c67787a302f8340d5426187e09ea3f5232f",
    "tools/explore/naff-frequencies.mjs": "sha256:85178139faf0894c8cf62a7aa0a92395dab7afa6ab33efee93b63712ef257ed2",
-   "tools/explore/nbody-wh.mjs": "sha256:cad4f589bf80d3d108ed4b6e55671eff768996cf9916ed01b9ae54daeba3cd39",
+   "tools/explore/nbody-wh.mjs": "sha256:c10e74238a60722bef913fef6b460de651dfa788a31f0af4c7aea9348c61c018",
    "tools/verify/nbody-secular.js": "sha256:4621d047c54e86680fc6a3aafc24c298fd06916d0dfd192bbcebc5fa5c14565a"
   }
  }

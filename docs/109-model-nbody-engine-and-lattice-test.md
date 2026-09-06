@@ -470,6 +470,62 @@ lattice is the one with observers in it; selection mechanisms were tested
 and none found, so the model claims no structure — and no one gets to call
 it understood, either.
 
+## 14. The mass-scaling of the secular modes — measured beyond first order (W5)
+
+The two-expansions programme's scaling law — every Newtonian secular
+frequency ∝ M☉ under adiabatic solar mass loss, hence the 405-kyr g₂−g₅
+metronome period ∝ 1/M☉ — is exact **at first order** (it is the
+Laplace–Lagrange result; `tools/explore/solar-mass-scaling.mjs` measures
+exponent 1.000 on every L-L slot *by construction*, and the same
+first-order matrix puts the beat period at 347 kyr against the true
+405.6 — a 17 % miss that is entirely g₅'s missing second-order content).
+W5 measured the response of the **real** system: time-varying GM☉ in the
+WH engine (`nbody-wh.mjs` `gmSunOfT`, slow-ramp approximation, constant
+path bit-identical), a 1 % mass step between two 4-Myr constant-mass
+windows, NAFF per window, and a constant-mass twin whose window-to-window
+ratio removes the system's natural frequency wander
+(`tools/explore/w5-gm-ramp.mjs`; full tables in its RESULT header).
+
+Measured, controlled (twin-referenced), reproduced at δ = 1 % and 0.5 %:
+
+- **Adiabat exact in flight**: windowed-mean a·M invariant to 1e-9
+  (inner planets) across the ramp; e untouched.
+- **The planets' own modes scale**: g₁ +125/+65 ppm, g₂ +38/+21,
+  g₄ +91/+43 off the exact-∝M prediction — first-order law confirmed
+  dynamically at the 1e-4 level.
+- **The giant modes under-scale**: g₅ (read identically through Earth,
+  Jupiter and Uranus) has a mass-independent share s = 11.7 %; g₆
+  s = 10.1 % — O((m/M)²) secular content, Great-Inequality-amplified,
+  scaling as M⁰ (n·(m/M)² → λ²·λ⁻²), matching the Brouwer–van Woerkom
+  second-order magnitude for g₅ (~13 %) and the L-L-vs-true gap above.
+- **The 405-kyr ruler**: the g₂−g₅ beat responds as
+  **M^(1.153 ± 0.002)** (exponents 1.154 and 1.152 at the two step
+  sizes), i.e. P₄₀₅ ∝ M^−1.153 at the J2000 configuration — ~15 % more
+  mass-sensitive than the first-order 1/M statement. Spalding 2018's
+  published 1/M relation is the first-order case, quoted at a precision
+  (~1 significant figure) that cannot resolve the correction.
+
+**The analytic bracket** (engine-independent inputs: Laskar 2004's true
+g's; the first-order L-L values cross-checkable against the published
+Brouwer–van Woerkom linear theory): the total second-order content of g₅
+is the L-L gap, 1 − 3.685/4.2575 = 13.4 %. If ALL of it were
+mass-independent the beat exponent would be
+1 + 0.134·g₅/(g₂−g₅) − 0.005·g₂/(g₂−g₅) ≈ **1.167** — the upper bound.
+The measured 1.153 says 87 % of the gap is the M⁰ part; the remaining
+13 % of the gap carries mass-dependence. That the gap and the share are
+NOT the same thing in general is proven by g₆: its L-L gap is ~22 %
+(linear g₆ ≈ 22.0 vs true 28.25 — the famously large GI correction)
+while its measured M⁰ share is 10.1 %. So the analytic route brackets
+(1.000 < exponent ≤ 1.167) and the dynamical measurement places the
+value inside the bracket; it cannot replace the measurement.
+
+**Status**: single-source at full precision (this engine), analytically
+bracketed (above); the μ(2.48 Ga) = 1.00 ± 0.07 bound stays quoted
+through the conservative first-order slope (the measured exponent would
+tighten it to ±0.061). Full adoption awaits a true independent leg — a
+from-scratch second-order derivation, or an external integration at
+better than 1-significant-figure precision.
+
 ## Related documents
 
 - [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) — §1.8: the projection identity, the transit test, the candidate slot

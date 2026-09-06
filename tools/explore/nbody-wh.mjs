@@ -57,9 +57,24 @@
 //   sim.step(k)           advance k steps (dt may be negative for backward runs)
 //   sim.helio(i)          { r, v } heliocentric position/velocity of planet i (1-based)
 //   sim.t                 elapsed time, seconds
+//   sim.gm                the Sun's GM in force for the current step (= gms[0] unless gmSunOfT)
 //   sim.energy()          total energy (barycentric), for drift diagnostics
 //   sim.angularMomentum() total orbital angular momentum vector
 //   keplerStep(mu, r, v, dt)  the universal-variable two-body propagator (exported for tests)
+//
+// TIME-VARYING SOLAR MASS (W5, plan 04 — Driver 2 in the engine):
+//   makeWH({ ..., gmSunOfT: (tSec) => GM })  — when supplied, GM_sun is re-sampled
+//   ONCE PER OUTER STEP at the step midpoint and held constant through that step's
+//   substeps (the slow-ramp approximation: for any physical or instrument ramp of
+//   %-per-Myr class the per-step relative change is ≲ 1e-10, far below the O(ε dt²)
+//   splitting error, so substep-level sampling would buy nothing). Physical content:
+//   isotropic adiabatic mass loss — planet positions and velocities are untouched by
+//   the mass change itself; orbits respond dynamically (a ∝ 1/M, e adiabatically
+//   invariant, every Newtonian secular frequency ∝ M). The democratic-heliocentric
+//   constraint (v_sun ≡ −Σ m V / GM_sun) implies an O(δ · v_sun) frame artifact as
+//   GM changes; it is a common boost that cancels from the relative dynamics.
+//   WITHOUT gmSunOfT the constant is never reassigned — bit-identical to the
+//   pre-W5 engine (the nbody-secular gate re-verified unchanged on regeneration).
 
 const C_KM_S = 299792.458;
 
@@ -99,10 +114,11 @@ export function keplerStep(mu, r, v, dt) {
   return { r: rn, v: vn };
 }
 
-export function makeWH({ gms, Y0, dt, gr = false, order = 2, extraForces = [] }) {
+export function makeWH({ gms, Y0, dt, gr = false, order = 2, extraForces = [], gmSunOfT = null }) {
   // extraForces: [accel(rHelio, vHelio, tSec, GM_S) → km/s²] from nbody-forces.mjs,
   // applied in the kick to every planet (reaction on the Sun by momentum conservation)
-  const N = gms.length - 1, GM_S = gms[0];
+  const N = gms.length - 1;
+  let GM_S = gms[0];  // mutable only under gmSunOfT (W5); otherwise never reassigned
   const m = gms.slice(1);
   // democratic heliocentric state from the barycentric Y0
   const Q = new Float64Array(3 * N), V = new Float64Array(3 * N);
@@ -162,7 +178,8 @@ export function makeWH({ gms, Y0, dt, gr = false, order = 2, extraForces = [] })
 
   return {
     get t() { return t; },
-    step(k = 1) { for (let s = 0; s < k; s++) { stepOne(dt); t += dt; } },
+    get gm() { return GM_S; },
+    step(k = 1) { for (let s = 0; s < k; s++) { if (gmSunOfT) GM_S = gmSunOfT(t + dt / 2); stepOne(dt); t += dt; } },
     helio(i) { const vs = sunVel(); const j = i - 1; return { r: [Q[3 * j], Q[3 * j + 1], Q[3 * j + 2]], v: [V[3 * j] - vs[0], V[3 * j + 1] - vs[1], V[3 * j + 2] - vs[2]] }; },
     energy() {
       const vs = sunVel(); let E = 0.5 * GM_S * (vs[0] * vs[0] + vs[1] * vs[1] + vs[2] * vs[2]);
