@@ -44,7 +44,11 @@ The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astron
 - Support for date ranges from millennia (snapshot mode) to millions of years (deep-time mode, the shipped default)
 
 **Core Capabilities:**
-- Accurate planetary positions using Keplerian orbital mechanics
+- Accurate planetary positions from the model's own N-body element chain
+  (`@essrt/physics/planets/keplerian-chain` + the governed artifact
+  `data/nbody-secular-frequencies.json`; the geometric planet chains and
+  their fitted corrections described in this document remain as the
+  `?keplerChains=0` legacy opt-out — see doc 41's engine-D rendering note)
 - Long-term precession cycles (axial, perihelion, inclination)
 - Invariable plane visualization and validation
 - Multiple calendar systems (Gregorian, Julian, Perihelion)

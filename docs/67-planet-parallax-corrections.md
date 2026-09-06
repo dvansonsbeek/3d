@@ -7,7 +7,7 @@ status: current
 
 # Planet Geocentric Parallax Corrections — Implementation Reference
 
-**Status**: Complete (up to 78-term correction for Mercury/Venus, 68 for Mars and the outer planets, JPL-verified)
+**Status**: Complete (up to 78-term correction for Mercury/Venus, 68 for Mars and the outer planets, JPL-verified). **Since the P5 flip these corrections ride only the legacy geometric planet chains (`?keplerChains=0`)** — the default planets render from the engine-D element chain, which carries no observation-fitted corrections.
 
 ---
 

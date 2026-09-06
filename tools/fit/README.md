@@ -11,6 +11,14 @@
 All scripts that produce fitted coefficients or derived constants live here.
 Output values are stored in `public/input/fitted-coefficients.json`.
 
+> **P5 flip note:** the PLANET-facing fitted stack (the parallax /
+> gravitation / elongation correction fitters, the planet Step-2 geometry,
+> `PREDICT_COEFFS_PHYSICAL`) serves the **legacy geometric planet chains**,
+> which are the `?keplerChains=0` opt-out since the flip — by default the
+> seven planets render from engine D's governed artifact
+> (`tools/verify/nbody-secular.js --write` is that path's regeneration).
+> Earth, Moon and Sun fitting is unaffected; it remains the shipped path.
+
 ## Design rule for scene-graph corrections
 
 **Any correction added to the framework's motion model (scene-graph rotations

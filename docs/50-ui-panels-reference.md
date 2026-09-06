@@ -55,6 +55,12 @@ barycenterEarthAndSun (root for all planets)
 
 ### What Each Step Does
 
+> Since the P5 flip this device chain is the **legacy opt-out path**
+> (`?keplerChains=0`): by default the planet meshes and the
+> `PERIHELION [PLANET]` markers are overridden each frame with the
+> engine-D chain's positions (the hierarchy below still exists and
+> rotates, but no longer places what you see).
+
 | Step | Object Name Pattern | Purpose |
 |------|---------------------|---------|
 | 1 | `[Planet]PerihelionDurationEcliptic1` | Forward perihelion precession (+ω rate) |
@@ -492,7 +498,7 @@ See [55 — Solar System Resonance Cycle Period Table](55-solar-system-resonance
 
 ### Purpose
 
-Shows the actual observed perihelion-precession history of each planet from JPL NAIF WebGeoCalc over 1900–2026, plotted alongside the model's own prediction for direct comparison. For each planet the panel displays three charts (longitude of perihelion ϖ, ascending node Ω, argument of periapsis ω) in the ecliptic-of-date frame. This is the panel that grounds the model's Fibonacci perihelion rates in observation — the rates are calibrated to match what JPL reports, not what first-order secular theory predicts.
+Shows the actual observed perihelion-precession history of each planet from JPL NAIF WebGeoCalc over 1900–2026, plotted alongside the model's own N-body prediction for direct comparison. For each planet the panel displays three charts (longitude of perihelion ϖ, ascending node Ω, argument of periapsis ω) in the ecliptic-of-date frame. The model line is the chain's ϖ(t) — the 1800–2100 window rate splits as Newtonian + the derived relativistic (1PN) share, nothing calibrated to the observations; the 8H/N divisor values remain as window-epoch descriptor labels (doc 109 §9).
 
 ### Accessing the Explorer
 

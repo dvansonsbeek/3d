@@ -68,7 +68,7 @@ All three angles are measured in the **ecliptic-of-date** frame — the plane th
 ω_ICRF = ω_ecliptic − ω_gen              (ω_gen = 2π / (H/13))
 ```
 
-For the Holistic Universe Model this distinction is load-bearing: the model anchors its Fibonacci structure in the ICRF frame and derives ecliptic rates from there via the relation above. The WebGeoCalc Explorer measures the date-frame (what JPL reports), which is the frame the model is calibrated to match. See [docs/13-mercury-precession-breakdown.md § 1.5a Reference Frames](13-mercury-precession-breakdown.md) for the full discussion of why ecliptic-only first-order L-L fails where a two-frame treatment succeeds.
+For the Holistic Universe Model this distinction is load-bearing: the panel's model line is the N-body chain's ϖ(t) in the plotted frame — nothing is calibrated to the observations; agreement (Mercury: observed 572.0 vs the engine's 572.0 ″/cy window rate, relativity inside as a derived term) is the measurement. See [docs/13-mercury-precession-breakdown.md § 1.5a Reference Frames](13-mercury-precession-breakdown.md) for the full discussion of why ecliptic-only first-order L-L fails where a two-frame treatment succeeds.
 
 ## Data pipeline
 
@@ -99,9 +99,10 @@ Re-running `node tools/explore/wgc-perihelion-rates.js` regenerates the JSON fro
 │  [Mercury] [Venus] [Mars] [Jupiter] [Saturn] ...        │  ← tab row
 ├─────────────────────────────────────────────────────────┤
 │  MERCURY PERIHELION PRECESSION                          │
-│  ── Observed: raw 574.6 ″/cy · sin+lin 573.8 ″/cy       │
-│  ── Model:    570.3 ″/cy (baseline 531.4 + missing 38.9)│
-│  Baseline: 126 yr, 18× oscillation — OLS reliable       │
+│  ── Observed: raw 572.0 ″/cy · sin+lin 572.0 ″/cy       │
+│  ── Model (N-body): 572.0 ″/cy (1800–2100 window)       │
+│     = Newtonian 529.0 + relativistic 42.99 (1PN)        │
+│  Baseline: 300 yr, 75× oscillation — OLS reliable       │
 │                                                         │
 │  ┌─── Longitude of perihelion ϖ vs Time ──────┐         │
 │  │              ▗▖▗▖                          │         │

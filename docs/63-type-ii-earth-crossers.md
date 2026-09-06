@@ -7,6 +7,10 @@ status: current
 
 # Type II Mars -- Eccentricity Corrections & Calibration
 
+> **Legacy-path record (P5 flip):** these calibrations drive the legacy
+> geometric planet chains — the `?keplerChains=0` opt-out. The default
+> planets render from the engine-D element chain.
+
 **Status**: Complete (dynamic implementation, sensitivity analysis done)
 
 > **Scope note (ESSRT).** The Type II hybrid formula (`eo = eccDist/2 − eo_geocentric/2`), the dynamic-geocentric update, and the `e/(1+e)` derivation are scale-invariant. The perihelion-period denominator (`8H/36`) stays constant at any epoch. Literal J2000-anchored values (H = <!--v:H-->335,317<!--/v--> in the §"Perihelion precession" prose, the balanced year n=7 ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, `solarYearCount` = 178,289, `perihelionRef_JD` = 2456499.441, and the JPL 2000-2200 + Tycho 1582-1600 calibration baselines) reflect the present epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally. The Mars implementation this document describes is the J2000 snapshot of an underlying scale-invariant structure.

@@ -7,6 +7,11 @@ status: current
 
 # Type I Inner Planets -- Mercury & Venus Implementation
 
+> **Legacy-path record (P5 flip):** the Type I/II/III scene conventions
+> documented here drive the legacy geometric planet chains — the
+> `?keplerChains=0` opt-out. The default planets render from the engine-D
+> element chain.
+
 **Status**: Complete (e/(1+e) derivation, EoC with phase-optimized fractions, period calibration)
 
 > **Scope note (ESSRT).** The Type I geometric formulas (`realOrbitalEccentricity = e/(1+e)`, `perihelionDistance = orbitDistance × realOrbitalEccentricity × 100`, EoC speed variation) are scale-invariant. Perihelion-period denominators are Fibonacci/8H expressions (`H/(1+3/8)`, `−8H/6`) that stay constant at any epoch. Literal J2000-anchored values (the balanced year n=7 ≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, `solarYearCount` values 1,392,228 / 545,059, `perihelionRef_JD` constants, and the JPL 2000-2200 calibration baseline) reflect the present epoch; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling these proportionally. The Type I scene-graph configuration this document describes is therefore the J2000 snapshot of an underlying scale-invariant structure.

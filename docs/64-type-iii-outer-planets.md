@@ -7,6 +7,10 @@ status: current
 
 # Type III Planets -- Eccentricity Corrections & Calibration
 
+> **Legacy-path record (P5 flip):** these calibrations drive the legacy
+> geometric planet chains — the `?keplerChains=0` opt-out. The default
+> planets render from the engine-D element chain.
+
 **Status**: Complete (dynamic implementation, e/(1+e), per-planet EoC, precession correction)
 
 > **Scope note (ESSRT).** The Type III geometric machinery (`elipticOrbit = 2 × e_Earth × sin(Δω)`, the `e/(1+e)` circular-orbit equivalent, per-planet EoC) is scale-invariant — the formulas hold at any epoch. Perihelion-period denominators are scale-invariant H/N expressions. J2000-anchored literal values (per-planet JPL perihelion reference JDs, `startpos` values, `eocFraction` values, IAU 1976 precession correction, the JPL DE441 calibration baseline) reflect the present epoch. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling the literal periods proportionally; the Type III implementation this document describes is the J2000 snapshot of an underlying scale-invariant structure.

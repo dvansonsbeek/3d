@@ -345,14 +345,15 @@ to the longitude rate, in which the anomaly is defined. A sum that applies
 the slope to the sidereal rate but not to p_A, or takes the obliquity term
 with the opposite sign, mixes the two coordinates and is not a decomposition.
 
-The derivation uses the IAU longitude (λ = 77.457°). The scene's own
-perihelion marker sits 0.97° further (λ + `angleCorrection` = 78.43°) because
-pipeline Step 2 places each marker so that its **RA** equals the catalogue
-longitude — a scene convention that the two-vector orbit construction needs
-(marker vector M plus a node-perpendicular vector E, |E| = |M|/2 for Type I;
-measured for all seven planets), not a second physical longitude. The
-`…Marker…` registry keys record that convention; they are not a reading of
-the anomaly.
+The derivation uses the IAU longitude (λ = 77.457°). The scene's perihelion
+marker shows the model's own N-body longitude of perihelion of date
+(ϖ(2000) = 77.455° from the governed element chain — the same value the
+perihelion panels display). The legacy two-vector construction placed the
+marker 0.97° further (λ + `angleCorrection` = 78.43°, pipeline Step 2's
+RA-equals-catalogue convention with marker vector M plus a
+node-perpendicular vector E, |E| = |M|/2 for Type I); that convention now
+lives only on the legacy opt-out path, and the `…Marker…` registry keys
+record it — they are not a reading of the anomaly.
 
 **All planets.** The same projection, same constants:
 
