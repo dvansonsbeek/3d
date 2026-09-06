@@ -118,6 +118,10 @@ export * as planetOrientation from './planets/orientation.cjs';
 export { integrateAscendingNode } from './planets/asc-node-integrator.cjs';
 export * as planetOrbitChain from './planets/orbit-chain.cjs';
 export { evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis } from './planets/corrections.cjs';
+// P5/K4.6c — the engine-D Keplerian chain (pure evaluator + the embedded
+// governed artifact; the browser flag path consumes exactly these).
+export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from './planets/keplerian-chain.cjs';
+export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from './planets/chain-artifact.js';
 export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from './planets/predict.cjs';
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).

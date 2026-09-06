@@ -66,7 +66,7 @@
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { makeWH } from './nbody-wh.mjs';
-import { HZ } from './j2000-state.mjs';
+import { HZ, AU_KM } from './j2000-state.mjs';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(ROOT + 'package.json');
 const P = require(ROOT + 'tools/explore/derive-planetary-lunar-terms.js');
@@ -106,7 +106,15 @@ function oscul(Y, i, n, gms, R = ROT) {
   let om = Math.acos(Math.max(-1, Math.min(1, (Math.cos(Om) * ev[0] + Math.sin(Om) * ev[1]) / en)));
   if (ev[2] < 0) om = 2 * Math.PI - om;
   if (inc < 1e-6) om = Math.atan2(ev[1], ev[0]) - Om;
-  return { w: (Om + om) / D2R, Om: Om / D2R, e: en, inc: inc / D2R };
+  // K2.1 (P5): mean longitude L and semi-major axis a join the dump — the
+  // Keplerian chain's governed inputs (window mean motions; t=0 anchor).
+  const aKm = 1 / (2 / rn - (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]) / mu);
+  let nu = Math.acos(Math.max(-1, Math.min(1, (ev[0] * r[0] + ev[1] * r[1] + ev[2] * r[2]) / (en * rn))));
+  if (r[0] * v[0] + r[1] * v[1] + r[2] * v[2] < 0) nu = 2 * Math.PI - nu;
+  const Ean = Math.atan2(Math.sqrt(1 - en * en) * Math.sin(nu), en + Math.cos(nu));
+  const Man = Ean - en * Math.sin(Ean);
+  const L = ((((Om + om + Man) / D2R) % 360) + 360) % 360;
+  return { w: (Om + om) / D2R, Om: Om / D2R, e: en, inc: inc / D2R, L, a: aKm / AU_KM };
 }
 function integrate(gms, Y, years, sampleDays, onSample) {
   const n = gms.length;
@@ -185,7 +193,7 @@ const FRAMES_OUT = FRAME === 'both' ? ['ecliptic', 'invariable'] : [FRAME];
 // moves ~0.4° per 1000 d) and the whole run under ~100 MB.
 const SAMPLE_DAYS = parseFloat(KV.sample || POS[2] || '1000');
 const t0 = Date.now();
-const ELEMS = ['w', 'Om', 'e', 'inc'];
+const ELEMS = ['w', 'Om', 'e', 'inc', 'L', 'a'];
 // one sample store per readout frame (frame=both keeps two, from the same trajectory)
 const mk = () => Object.fromEntries(FRAMES_OUT.map((fr) => [fr, { t: [], ...Object.fromEntries(ELEMS.map((el) => [el, Object.fromEntries(names.map((k) => [k, []]))])) }]));
 const fwd = mk(), bwd = mk();

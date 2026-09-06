@@ -22,7 +22,10 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const TL = createRequire(ROOT + 'package.json')(ROOT + 'tools/lib/constants.js');
 
-export const AU_KM = 149597870.7;
+// The model's OWN AU (astro-reference via constants — 149597870.698828, the
+// value the GM chain is derived from), not the IAU literal (…70.700): the
+// P5/K2 no-hardcoded-values audit repointed this to the single home.
+export const AU_KM = TL.currentAUDistance;
 export const GM_SUN = TL.GM_SUN;
 export const GM_EM = TL.GM_EARTH_MOON_SYSTEM;
 export const NAMES = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];

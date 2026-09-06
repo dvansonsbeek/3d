@@ -430,6 +430,44 @@ function buildCoefficients() {
   return { out, hash, missing };
 }
 
+// ── the engine-D chain artifact (P5/K4.6c) ──────────────────────────────────
+// Source of truth: data/nbody-secular-frequencies.json — GENERATOR-OWNED by
+// tools/verify/nbody-secular.js and guarded artifact↔engine by check:artifacts.
+// THIS embed guards the second leg, embed↔artifact: the browser scene renders
+// the Keplerian flag path from this module (script.js cannot fs-read, and a
+// runtime fetch would break offline === hosted). Emitted VERBATIM (the
+// coefficients rounding lesson); lifecycle = pipeline output, like §2j.
+const CHAIN_ARTIFACT_PATH = join(ROOT, 'data/nbody-secular-frequencies.json');
+const OUT_CHAIN = join(ROOT, 'packages/physics/src/planets/chain-artifact.js');
+
+function buildChainArtifact() {
+  const raw = readFileSync(CHAIN_ARTIFACT_PATH, 'utf8');
+  const art = JSON.parse(raw);
+  const hash = createHash('sha256').update(raw).digest('hex').slice(0, 16);
+  return { art, hash };
+}
+
+function emitChainArtifact({ art, hash }) {
+  return `/**
+ * GENERATED — do not edit. Regenerate:
+ *   node tools/constants/generate.mjs --write
+ *
+ * Source: data/nbody-secular-frequencies.json (the governed engine-D
+ * artifact), emitted VERBATIM. Two gates guard the two legs of the causal
+ * chain: check:artifacts pins artifact ↔ engine (input hashes name the
+ * regeneration command), this module's staleness check pins embed ↔ artifact.
+ * A changed planet mass therefore propagates engine → artifact → here → the
+ * browser scene, or a gate goes red.
+ */
+
+/** @type {string} */
+export const CHAIN_ARTIFACT_HASH = ${JSON.stringify(hash)};
+
+/** @type {Readonly<Record<string, unknown>>} */
+export const CHAIN_ARTIFACT = Object.freeze(${JSON.stringify(art)});
+`;
+}
+
 function emitCoefficients({ out, hash }) {
   const keys = Object.keys(out).sort();
   return `/**
@@ -480,27 +518,33 @@ const dts = emitDts(result);
 const write = process.argv.includes('--write');
 
 const coeffJs = emitCoefficients(coeffs);
+const chainArt = buildChainArtifact();
+const chainJs = emitChainArtifact(chainArt);
 
 if (write) {
   mkdirSync(dirname(OUT_JS), { recursive: true });
   writeFileSync(OUT_JS, js);
   writeFileSync(OUT_DTS, dts);
   writeFileSync(OUT_COEFFS, coeffJs);
+  writeFileSync(OUT_CHAIN, chainJs);
   console.log(`generated ${countLeaves(result.included)} values in ${Object.keys(result.included).length} blocks`);
   console.log(`  constants hash    ${result.hash}`);
   console.log(`  coefficients hash ${coeffs.hash}  (${Object.keys(coeffs.out).length} arrays, full precision)`);
+  console.log(`  chain artifact    ${chainArt.hash}  (engine-D governed artifact, verbatim)`);
   console.log(`  excluded: ${Object.entries(result.excluded).map(([b, c]) => `${b} (${c})`).join(', ')}`);
-  console.log('  -> packages/physics/src/constants/{generated.js,generated.d.ts,coefficients.js}');
+  console.log('  -> packages/physics/src/constants/{generated.js,generated.d.ts,coefficients.js} + planets/chain-artifact.js');
   process.exit(0);
 }
 
 let current = null;
 let currentDts = null;
 let currentCoeffs = null;
+let currentChain = null;
 try {
   current = readFileSync(OUT_JS, 'utf8');
   currentDts = readFileSync(OUT_DTS, 'utf8');
   currentCoeffs = readFileSync(OUT_COEFFS, 'utf8');
+  currentChain = readFileSync(OUT_CHAIN, 'utf8');
 } catch { /* handled below */ }
 
 console.log('GENERATED CONSTANTS — check');
@@ -509,11 +553,11 @@ console.log(`  ${countLeaves(result.included)} values · ${Object.keys(result.in
 console.log(`  excluded (never injectable): ${Object.keys(result.excluded).join(', ')}`);
 console.log(`  coefficients: ${Object.keys(coeffs.out).length} arrays · hash ${coeffs.hash}`);
 
-if (current === null || currentCoeffs === null) {
+if (current === null || currentCoeffs === null || currentChain === null) {
   console.log('\nFAIL — a generated module is missing. Run with --write.');
   process.exit(1);
 }
-if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs) {
+if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs || currentChain !== chainJs) {
   console.log('\nFAIL — a generated module is STALE relative to the JSON source of truth.');
   console.log('Run: node tools/constants/generate.mjs --write');
   process.exit(1);

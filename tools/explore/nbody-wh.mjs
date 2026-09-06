@@ -76,7 +76,11 @@
 //   WITHOUT gmSunOfT the constant is never reassigned — bit-identical to the
 //   pre-W5 engine (the nbody-secular gate re-verified unchanged on regeneration).
 
-const C_KM_S = 299792.458;
+import { createRequire } from 'node:module';
+// Speed of light from the model's single home (astro-reference.json via
+// constants.js) — never a literal in the engine, per the no-hardcoded-values
+// doctrine (P5/K2 audit; the value is the exact SI definition either way).
+const C_KM_S = createRequire(new URL('../../package.json', import.meta.url))('./tools/lib/constants.js').speedOfLight;
 
 // Universal-variable Kepler propagator (Danby 1988 §6.9 / Stumpff functions).
 // Advances (r, v) around a point mass mu by dt seconds. Exact for the two-body problem.
