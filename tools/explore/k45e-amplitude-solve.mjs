@@ -42,6 +42,7 @@
 //   · Saturn's δz 348µ (the split z multiplet) is the remaining open item.
 //   Verdict (k4-observational-verdict): 1600–1800 the chain beats the
 //   shipped path for all seven planets; 1800–2100 all but Neptune.
+//   K4.6b RESULT (measured): — filled after the inner-planet run —
 //
 //   node tools/explore/k45e-amplitude-solve.mjs
 
@@ -56,8 +57,19 @@ const KC = require(ROOT + 'tools/lib/keplerian-chain.js');
 const fs = require('node:fs');
 
 const YR = 365.25 * 86400, D2R = Math.PI / 180;
-const SPAN_YR = 2500, CAD_YR = 0.5;
-const PLANETS = ['mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+// K4.6b — the inner-planet refinement: Mercury/Venus join. Their key gain
+// is the era-typed window AFFINE (the truncated 5-mode secular skeleton's
+// local ϖ̇ read 533.6″/cy vs the engine's 572.0 window rate — the constant
+// remainder pins the value but carries no rate; the affine k/h slopes
+// restore it). Cadence 0.1 yr resolves their synodic element wobbles
+// (0.24–1.6 yr) instead of aliasing them; the solve integrates at dt 0.5 d
+// because Mercury's dt = 2 d trajectory carries ~100″-class integration
+// error over the window (k46 measured 107″ → 37″) that terms must not bake
+// in. Seeds: extraction covers the giants; Mercury/Venus self-seed through
+// the golden-refined augmentation (the Mars precedent).
+const SPAN_YR = 2500, CAD_YR = 0.1;
+const SOLVE_DT_DAYS = 0.5;
+const PLANETS = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const gms = Object.fromEntries(NAMES.map((k) => [k, gmOf(k)]));
 const chains = KC.buildPlanetChainsFromArtifact({ skeletonOnly: true });   // the raw skeleton — a terms-bearing chain here would solve against its own output
 // NAFF-extraction seed lines (k45-residual-naff runs first in the pipeline):
@@ -80,8 +92,8 @@ function seedBary() {
 const { gmsArr, Y0 } = seedBary();
 const recs = [];
 for (const dir of [-1, +1]) {
-  const sim = makeWH({ gms: gmsArr, Y0: Float64Array.from(Y0), dt: dir * 2 * 86400, gr: true, order: 2 });
-  const stepsPer = Math.round(CAD_YR * YR / (2 * 86400));
+  const sim = makeWH({ gms: gmsArr, Y0: Float64Array.from(Y0), dt: dir * SOLVE_DT_DAYS * 86400, gr: true, order: 2 });
+  const stepsPer = Math.round(CAD_YR * YR / (SOLVE_DT_DAYS * 86400));
   for (let s = 0; s <= Math.round(SPAN_YR / CAD_YR); s++) {
     if (s > 0) sim.step(stepsPer);
     const year = KC.ANCHOR_EPOCH_YEAR + sim.t / YR;   // the integrator's OWN clock (time-label trap)
@@ -144,9 +156,14 @@ function dftAmp(resid, w) {
   for (let i = 0; i < resid.length; i++) { re += resid[i] * hann[i] * Math.cos(w * t[i]); im += resid[i] * hann[i] * Math.sin(w * t[i]); }
   return 2 * Math.hypot(re, im) / hSum;
 }
-function scanPeaks(resid, floor, maxAdd) {
-  // periods capped at 2× the half-span (beyond manufactures lines), floor 3 yr
-  const Pmin = 3, Pmax = 2 * SPAN_YR, NP = 1600;
+function scanPeaks(resid, floor, maxAdd, pminYr) {
+  // Periods capped at 2× the half-span (beyond manufactures lines). The
+  // LOWER bound is PER-PLANET (K4.6b lesson, measured): the sub-year scan
+  // (0.25 yr) exists FOR the inner planets' synodic lines; opened to the
+  // giants it admitted noise-class short lines that overfit in-sample and
+  // DOUBLED their JPL-facing verdict (Uranus δz 39→102µ, Neptune 36→129µ)
+  // — the giants keep their proven 3-yr band.
+  const Pmin = pminYr, Pmax = 2 * SPAN_YR, NP = 2000;
   const grid = [];
   for (let k = 0; k <= NP; k++) grid.push(2 * Math.PI / (Pmin * Math.pow(Pmax / Pmin, k / NP)));
   const amps = grid.map((w) => dftAmp(resid, w));
@@ -181,7 +198,7 @@ for (const p of PLANETS) {
   const PR = PRIOR[p] || {};
   const seed = (list) => dedupe((list || []).map((x2) => x2.omegaRadPerYr));
   // ── scalar channels (λ̄ arcsec, a ppm): era affine + lines
-  const fitScalar = (y, ws0, floor, maxAdd) => {
+  const fitScalar = (y, ws0, floor, maxAdd, pminYr) => {
     let ws = ws0.slice(), x, resid;
     for (let pass = 0; pass < 3; pass++) {
       const rows = t.map((ty) => {
@@ -191,14 +208,14 @@ for (const p of PLANETS) {
       });
       x = solveLSQ(rows, y);
       resid = y.map((v, i) => v - rows[i].reduce((s, c, j) => s + c * x[j], 0));
-      if (pass < 2) ws = dedupe(ws.concat(scanPeaks(resid, floor, maxAdd)));
+      if (pass < 2) ws = dedupe(ws.concat(scanPeaks(resid, floor, maxAdd, pminYr)));
     }
     const rms = (a2) => Math.sqrt(a2.reduce((s, v) => s + v * v, 0) / a2.length);
     return { ws, x, rms0: rms(y), rms1: rms(resid) };
   };
   // ── complex channels (z = k+ih, ζ = q+ip): joint two-row form; a scalar
   //    scan cannot sign the circulation sense, so ±ω both enter and LSQ splits
-  const fitComplex = (yk, yh, ws0, floor, maxAdd) => {
+  const fitComplex = (yk, yh, ws0, floor, maxAdd, pminYr) => {
     let ws = ws0.slice(), x, residK, residH;
     for (let pass = 0; pass < 3; pass++) {
       const rows = [], y = [];
@@ -213,7 +230,7 @@ for (const p of PLANETS) {
       const resid = y.map((v, i) => v - rows[i].reduce((s, c, j) => s + c * x[j], 0));
       residK = resid.filter((_, i) => i % 2 === 0); residH = resid.filter((_, i) => i % 2 === 1);
       if (pass < 2) {
-        const found = scanPeaks(residK, floor, maxAdd).concat(scanPeaks(residH, floor, maxAdd));
+        const found = scanPeaks(residK, floor, maxAdd, pminYr).concat(scanPeaks(residH, floor, maxAdd, pminYr));
         ws = dedupe(ws.concat(found.flatMap((w) => [w, -w])));
       }
     }
@@ -222,10 +239,14 @@ for (const p of PLANETS) {
     return { ws, x, rms0: rms(yk.concat(yh)), rms1 };
   };
 
-  const M = fitScalar(recs.map((r) => r.dmlon[p]), seed(PR.mlonArcsec), 3, 14);
-  const A = fitScalar(recs.map((r) => r.daPpm[p]), seed(PR.aPpm), 20, 12);
-  const Z = fitComplex(recs.map((r) => r.dk[p]), recs.map((r) => r.dh[p]), seed(PR.z), 12e-6, 12);
-  const E = fitComplex(recs.map((r) => r.dq[p]), recs.map((r) => r.dp[p]), seed(PR.zeta), 4e-6, 6);
+  // Per-planet scan band: the sub-year window belongs to the inner planets
+  // (their synodic element lines live at 0.24–2.3 yr); the giants keep the
+  // proven 3-yr band (the K4.6b overfit lesson in the scanPeaks header).
+  const PMIN_YR = (p === 'mercury' || p === 'venus' || p === 'mars') ? 0.25 : 3;
+  const M = fitScalar(recs.map((r) => r.dmlon[p]), seed(PR.mlonArcsec), 3, 14, PMIN_YR);
+  const A = fitScalar(recs.map((r) => r.daPpm[p]), seed(PR.aPpm), 20, 12, PMIN_YR);
+  const Z = fitComplex(recs.map((r) => r.dk[p]), recs.map((r) => r.dh[p]), seed(PR.z), 12e-6, 12, PMIN_YR);
+  const E = fitComplex(recs.map((r) => r.dq[p]), recs.map((r) => r.dp[p]), seed(PR.zeta), 4e-6, 6, PMIN_YR);
 
   console.log(`  ${p.padEnd(8)} δλ̄ ${M.rms0.toFixed(1)} → ${M.rms1.toFixed(1)}″ (${M.ws.length}f)` +
     ` · δa ${A.rms0.toFixed(0)} → ${A.rms1.toFixed(0)}ppm (${A.ws.length}f)` +

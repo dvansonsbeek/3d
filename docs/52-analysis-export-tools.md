@@ -112,10 +112,10 @@ Earth-specific position data from different reference frames.
 | Earth Longitude Dec | Dec from longitude frame |
 | Earth Longitude Dist Earth | Distance (AU) |
 | Earth Longitude Dist Sun | Sun distance (AU) |
-| Mid-eccentricity Orbit RA | RA from mean eccentricity frame |
-| Mid-eccentricity Orbit Dec | Dec from mean eccentricity frame |
-| Mid-eccentricity Orbit Dist Earth | Distance (AU) |
-| Mid-eccentricity Orbit Dist Sun | Sun distance (AU) |
+
+(The four `Mid-eccentricity Orbit …` columns were removed with the
+EARTH-MID-ECCENTRICITY-ORBIT object at the P5 flip — header and rows
+left the export together.)
 
 #### Sheet 2: Perihelion Planets
 

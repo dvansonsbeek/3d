@@ -113,13 +113,9 @@ This gray sphere represents the gravitational center around which Earth's axis w
 
 ### PERIHELION-OF-EARTH (White Dot)
 
-This white dot marks the point closest to the Sun in Earth's orbit. It slowly moves counter-clockwise over H/3 years.
+This white dot marks the point closest to the Sun in Earth's orbit. It moves at the model's measured apsidal rate — in the current era one revolution per ≈ H/3 years (the epoch-local law); the displayed direction follows the model's own N-body dynamics.
 
 **To observe**: Speed up time to 10,000+ years and watch it drift through the zodiac.
-
-### MID-ECCENTRICITY-POINT
-
-A helper point used for calculating day and year lengths. It maintains a fixed distance from Earth, representing the mean orbital distance.
 
 ### The Invariable Plane
 

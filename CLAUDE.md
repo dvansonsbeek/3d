@@ -174,9 +174,16 @@ re-evaluated with the engine's own dynamical inputs
 record) and retired. What survives as a documented observation: under the
 Fibonacci weights the 8-planet eccentricity balance holds to ~98 % with the
 engine's long-term mean eccentricities (99.8636 % was the tuned-inputs
-figure). The Law-4/Law-5 constants remain scene-implementation parameters
-(`K = 3.4143e-6`; base eccentricities from the balance construction) until
-the planet chains move to engine-D elements.
+figure). **The planet chains moved to engine-D elements (the P5 flip,
+9aa91a6): the simulator renders the seven planets, their perihelion
+markers and panels from the model's own N-body chain by default**
+(`@essrt/physics/planets/keplerian-chain` + the governed artifact;
+`KEPLER_CHAINS=0` / `?keplerChains=0` opts back into the legacy geometric
+chains). The Law-4/Law-5 constants (`K = 3.4143e-6`; base eccentricities
+from the balance construction) now serve only that legacy opt-out path
+and retire with its excision. Earth, the Moon and the Sun stay on the
+engine-K hierarchy — the two-engine interface; the historical gate suite
+is calibrated on it.
 
 **The falsification criterion.** The model stands falsifiable on three named,
 pre-registered legs: (1) **the deep-time scaling split** — the spin-family

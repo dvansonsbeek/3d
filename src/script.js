@@ -5205,10 +5205,6 @@ function recomputeTimeUnitsForEpoch(t_Ma) {
 // Properties added/restored: traceLength, traceStep (only). Other config
 // (color, visibility, etc.) untouched.
 function updateAllTracesForEpoch() {
-  if (typeof midEccentricityOrbit !== 'undefined') {
-    midEccentricityOrbit.traceLength = sYear * 1000000;
-    midEccentricityOrbit.traceStep   = sYear;
-  }
   earth.traceLength                = sYear * 1000000;
   earth.traceStep                  = sYear;
   earthPerihelionFromEarth.traceLength = sYear * 1000000;
@@ -6745,35 +6741,10 @@ const earthWobbleCenter = {
   isNotPhysicalObject: true,
 };
 
-// ECCENTRICITY UNIFICATION: the reference orbit's radius is the one law's
-// mean offset base' (visual reference only — the Node engine has no twin node).
-const midEccentricityOrbit = {
-  name: "EARTH-MID-ECCENTRICITY-ORBIT",
-  startPos: -(cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 3) * 360
-            - (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) * 360 - 180)),
-  speed: Math.PI*2/(holisticyearLength/13),
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: eccentricityBaseDerived*100,   // unification: the one law's mean offset base'
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-  
-  size: 0.011,   
-  color: 0x0096FF,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/earth_mean_eccentricity.png',
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  traceLength : sYear * 1000000,
-  traceStep : sYear,
-  traceOn: true,
-  isNotPhysicalObject: true,
-};
+// EARTH-MID-ECCENTRICITY-ORBIT: REMOVED (P5/K5b, owner-ruled) — the law's
+// mean-offset visual reference lost its purpose once the chain owns the
+// planet story; the one law's base' itself lives on in the engine-K Earth
+// machinery (eccentricityBaseDerived), untouched.
 
 const earth = {
   name: "Earth",
@@ -6979,7 +6950,6 @@ const earthPerihelionPrecession2 = {
 // DEEP_TIME=true.
 earth.                       _dtCycleN = 13; earth.                       _dtCycleSign = -1;
 earth.                       _dtCycleAnchor = STARTMODEL_YEAR_SI;
-midEccentricityOrbit.        _dtCycleN = 13; midEccentricityOrbit.        _dtCycleSign = +1;
 earthInclinationPrecession.  _dtCycleN =  3; earthInclinationPrecession.  _dtCycleSign = +1;
 earthEclipticPrecession.     _dtCycleN =  5; earthEclipticPrecession.     _dtCycleSign = +1;
 earthObliquityPrecession.    _dtCycleN =  8; earthObliquityPrecession.    _dtCycleSign = -1;
@@ -9200,9 +9170,9 @@ neptune._dtPerihelionAnchor  = STARTMODEL_YEAR_SI;
 //*************************************************************
 // ADD CONSTANTS
 //*************************************************************
-const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonLunarLevelingCyclePrecession, moonNodalPrecession, moon, mercuryPerihelionDurationEcliptic1, venusPerihelionDurationEcliptic1, marsPerihelionDurationEcliptic1, jupiterPerihelionDurationEcliptic1, saturnPerihelionDurationEcliptic1, uranusPerihelionDurationEcliptic1, neptunePerihelionDurationEcliptic1, plutoPerihelionDurationEcliptic1, halleysPerihelionDurationEcliptic1, erosPerihelionDurationEcliptic1, mercuryPerihelionDurationEcliptic2, mercuryRealPerihelionAtSun, mercury, mercuryFixedPerihelionAtSun, venusPerihelionDurationEcliptic2, venusRealPerihelionAtSun, venus, venusFixedPerihelionAtSun, marsPerihelionDurationEcliptic2, marsRealPerihelionAtSun, mars, marsFixedPerihelionAtSun, jupiterPerihelionDurationEcliptic2, jupiterRealPerihelionAtSun, jupiter, jupiterFixedPerihelionAtSun, saturnPerihelionDurationEcliptic2, saturnRealPerihelionAtSun, saturn, saturnFixedPerihelionAtSun, uranusPerihelionDurationEcliptic2, uranusRealPerihelionAtSun, uranus, uranusFixedPerihelionAtSun, neptunePerihelionDurationEcliptic2, neptuneRealPerihelionAtSun, neptune, neptuneFixedPerihelionAtSun, plutoPerihelionDurationEcliptic2, plutoRealPerihelionAtSun, pluto, plutoFixedPerihelionAtSun, halleysPerihelionDurationEcliptic2, halleysRealPerihelionAtSun, halleys, halleysFixedPerihelionAtSun, erosPerihelionDurationEcliptic2, erosRealPerihelionAtSun, eros, erosFixedPerihelionAtSun, mercuryWobbleCenter, venusWobbleCenter, marsWobbleCenter, jupiterWobbleCenter, saturnWobbleCenter, uranusWobbleCenter, neptuneWobbleCenter]
+const planetObjects = [startingPoint, earthWobbleCenter, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonLunarLevelingCyclePrecession, moonNodalPrecession, moon, mercuryPerihelionDurationEcliptic1, venusPerihelionDurationEcliptic1, marsPerihelionDurationEcliptic1, jupiterPerihelionDurationEcliptic1, saturnPerihelionDurationEcliptic1, uranusPerihelionDurationEcliptic1, neptunePerihelionDurationEcliptic1, plutoPerihelionDurationEcliptic1, halleysPerihelionDurationEcliptic1, erosPerihelionDurationEcliptic1, mercuryPerihelionDurationEcliptic2, mercuryRealPerihelionAtSun, mercury, mercuryFixedPerihelionAtSun, venusPerihelionDurationEcliptic2, venusRealPerihelionAtSun, venus, venusFixedPerihelionAtSun, marsPerihelionDurationEcliptic2, marsRealPerihelionAtSun, mars, marsFixedPerihelionAtSun, jupiterPerihelionDurationEcliptic2, jupiterRealPerihelionAtSun, jupiter, jupiterFixedPerihelionAtSun, saturnPerihelionDurationEcliptic2, saturnRealPerihelionAtSun, saturn, saturnFixedPerihelionAtSun, uranusPerihelionDurationEcliptic2, uranusRealPerihelionAtSun, uranus, uranusFixedPerihelionAtSun, neptunePerihelionDurationEcliptic2, neptuneRealPerihelionAtSun, neptune, neptuneFixedPerihelionAtSun, plutoPerihelionDurationEcliptic2, plutoRealPerihelionAtSun, pluto, plutoFixedPerihelionAtSun, halleysPerihelionDurationEcliptic2, halleysRealPerihelionAtSun, halleys, halleysFixedPerihelionAtSun, erosPerihelionDurationEcliptic2, erosRealPerihelionAtSun, eros, erosFixedPerihelionAtSun, mercuryWobbleCenter, venusWobbleCenter, marsWobbleCenter, jupiterWobbleCenter, saturnWobbleCenter, uranusWobbleCenter, neptuneWobbleCenter]
 
-const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentricityOrbit, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto, halleys, eros]
+const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto, halleys, eros]
 
 //*************************************************************
 // ADD ALL CALENDAR CONSTANTS
@@ -10111,7 +10081,6 @@ startingPoint.pivotObj.add(earth.containerObj);
 earth.pivotObj.add(earthWobbleCenter.containerObj);   // D7: display-only marker rides Earth's H/13 frame (same pattern as the planet wobble centres)
 
 earth.pivotObj.add(earthInclinationPrecession.containerObj);
-earthInclinationPrecession.pivotObj.add(midEccentricityOrbit.containerObj);
 earthInclinationPrecession.pivotObj.add(earthEclipticPrecession.containerObj);
 earthEclipticPrecession.pivotObj.add(earthObliquityPrecession.containerObj);
 earthObliquityPrecession.pivotObj.add(earthPerihelionPrecession1.containerObj);
@@ -10260,7 +10229,11 @@ periLabelDiv.innerHTML =
   '<div style="margin-top:3px;color:rgba(254,170,13,.35);font-size:8px;line-height:1;">&#9660;</div>';
 const periLabelObj = new CSS2DObject(periLabelDiv);
 periLabelObj.position.set(0, 0.08, 0);
-earthPerihelionFromEarth.rotationAxis.add(periLabelObj);
+// P5/K5b: parent the label to the MESH, not rotationAxis — under the
+// Keplerian flag the marker mesh carries the chain-true perihelion position
+// (updatePositions override); rotationAxis stays on the legacy hierarchy.
+// Flag-off the two coincide (zero-radius marker), so this is convention-safe.
+earthPerihelionFromEarth.planetObj.add(periLabelObj);
 earthPerihelionFromEarth.labelObj = periLabelObj;
 earthPerihelionFromEarth._labelDiv = periLabelDiv;
 
@@ -17897,7 +17870,7 @@ function wgcRenderChart(title, yrArr, values, color, label, modelValues, omitRat
           <line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 11).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 11).toFixed(1)}" stroke="${color}" stroke-width="1.6"/>
           <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 14).toFixed(1)}" fill="#ccc">Observed (WebGeoCalc, ecliptic)</text>
           <line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 23).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 23).toFixed(1)}" stroke="#ff5252" stroke-width="1.6"/>
-          <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 26).toFixed(1)}" fill="#ccc">Model (lattice + equatorial projection)</text>
+          <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 26).toFixed(1)}" fill="#ccc">${KEPLER_CHAINS ? 'Model (N-body)' : 'Era descriptor (lattice + equatorial projection)'}</text>
         </g>` : ''}
       </svg>
       <div class="wgc-chart-footer">
@@ -17951,13 +17924,23 @@ function wgcRenderPlanet(planetKey) {
       <div class="wgc-planet-title">${planetKey} PERIHELION PRECESSION</div>
       <div class="wgc-planet-summary">
         <div><span style="color:#268bd2">\u2501\u2501</span> <b>Observed:</b> ${undeterminedTrend ? '<span style="color:#cb4b16;">\u26a0 trend cannot be determined from 1900\u20132026 baseline</span>' : `[raw OLS] ${rateRawCy.toFixed(1)} \u2033/cy \u2022 [sin+lin] ${rateSinCy.toFixed(1)} \u2033/cy`}</div>
-        ${model ? `<div><span style="color:#ff5252">\u2501\u2501</span> <b>Model:</b> ${model.projectedCy.toFixed(1)} \u2033/cy <span style="color:#aaa">= lattice ${model.latticeCy.toFixed(1)} (${wgcLatticeLabel(planetKey)}, ecliptic) + equatorial projection ${model.excessCy >= 0 ? '+' : ''}${model.excessCy.toFixed(2)} (d\u03b1/d\u03bb \u2212 1 at the perihelion's longitude) \u2014 observed \u2212 model = ${diffStr(model.projectedCy)} \u2033/cy</span></div>
-        ${model.grCy !== null ? `<div><span style="color:#aaa">&nbsp;&nbsp;&nbsp;&nbsp; the ${model.excessCy.toFixed(2)} is the model's account of the ${model.grCy.toFixed(2)} relativistic advance (derived from the same constants) \u2014 doc 13 \u00a71.8</span></div>` : ''}` : ''}
+        ${(() => {
+          // P8c/P5 \u2014 the split of record (E22 owner decision): the dynamics
+          // line is engine D's own 1800\u20132100 window rate from the embedded
+          // governed artifact (Newtonian + the derived 1PN supplement, the
+          // P8b closure asserts their difference = 3n\u00b3a\u00b2/c\u00b2(1\u2212e\u00b2)); every
+          // number bound, none retyped.
+          const _wr = CHAIN_ARTIFACT.windowRatesArcsecCy;
+          const _pk = planetKey.toLowerCase();
+          if (!_wr || _wr.gr[_pk] === undefined) return '';
+          const _gr = _wr.gr[_pk], _nw = _wr.newton[_pk], _rel = _gr - _nw;
+          return `<div><span style="color:#859900">\u2501\u2501</span> <b>Model (N-body):</b> ${_gr.toFixed(1)} \u2033/cy <span style="color:#aaa">(1800\u20132100 window) = Newtonian ${_nw.toFixed(1)} + relativistic ${_rel.toFixed(2)} (1PN, derived from the model's constants)</span></div>`;
+        })()}
       </div>
       <div class="wgc-planet-method">
         Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}${undeterminedTrend ? '<br><span style="color:#cb4b16;">\u26a0 Long-term trend <b>cannot be determined</b> from 1900\u20132026 observations \u2014 short-baseline trend flips sign across sub-windows (1800\u20131900, 1900\u20132026, 2026\u20132100). Only Mercury, Mars, and Saturn have reliably resolvable trends from observation.</span>' : ''}
       </div>
-      ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#ff5252">red line = model (lattice + equatorial projection)</span>`, model ? model.values : null, undeterminedTrend)}
+      ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#ff5252">red line = ${KEPLER_CHAINS ? 'model (own N-body)' : 'era descriptor (lattice + equatorial projection)'}</span>`, model ? model.values : null, undeterminedTrend)}
       <div class="wgc-frame-note">
         <b>Frame note:</b> All angles (\u03A9, \u03C9, \u03D6) are measured in the <b>ECLIPJ2000</b> frame \u2014
         Earth\u2019s mean ecliptic at J2000, an inertial reference plane. Earth\u2019s current orbital plane
@@ -18004,7 +17987,26 @@ function wgcModelCurves(planetKey, d) {
   const projectedCy = fb.projectedRa;                                     // ″/cy, lattice + equatorial projection
   const values = new Array(d.yrArr.length);
   for (let i = 0; i < d.yrArr.length; i++) {
-    values[i] = modelPlanet.longitudePerihelion + projectedCy / 360000 * (d.yrArr[i] - 2000);
+    if (KEPLER_CHAINS) {
+      // P5/K5b (owner-ruled): the red curve IS Engine D — the chain's real
+      // ϖ(t) in ECLIPJ2000 (the plotted frame), not the retired descriptor
+      // line. The jd construction mirrors the chain's own year coordinate
+      // exactly (round-trip identity, no calendar slip).
+      values[i] = _kcPerihelionEclLonDeg(modelPlanetKey, KC_ANCHOR_EPOCH_JD + (d.yrArr[i] - 2000) * 365.25);
+    } else {
+      values[i] = modelPlanet.longitudePerihelion + projectedCy / 360000 * (d.yrArr[i] - 2000);
+    }
+  }
+  // Unwrap the curve (owner-corrected: Neptune's near-zero e lets ϖ wobble
+  // across 0° — the wrapped series jumped to ~360) and align its branch to
+  // the observed series' start so both plot on one continuous scale.
+  for (let i = 1; i < values.length; i++) {
+    while (values[i] - values[i - 1] > 180) values[i] -= 360;
+    while (values[i] - values[i - 1] < -180) values[i] += 360;
+  }
+  if (d.piArr && d.piArr.length) {
+    const shift = Math.round((d.piArr[0] - values[0]) / 360) * 360;
+    if (shift !== 0) for (let i = 0; i < values.length; i++) values[i] += shift;
   }
   const grCy = (typeof relativisticPerihelionAdvanceArcsecCy === 'function') ? relativisticPerihelionAdvanceArcsecCy(modelPlanetKey) : null;
   return { values, latticeCy, projectedCy, excessCy: fb.projection, grCy, earthFrameCy: fb.earthFrame };
@@ -25282,7 +25284,6 @@ function setupGUI() {
   // Short display names for chips
   const chipNames = {
     'EARTH-WOBBLE-CENTER': 'Wobble',
-    'EARTH-MID-ECCENTRICITY-ORBIT': 'Mid-Ecc',
     'PERIHELION-OF-EARTH': 'Earth',
     'PERIHELION MERCURY': 'Mercury',
     'PERIHELION VENUS': 'Venus',
@@ -25527,7 +25528,7 @@ function setupGUI() {
       '</span>' +
       '<span class="inv-detail-item">' +
         '<span class="inv-detail-label">Prec.</span>' +
-        '<span class="inv-detail-val" style="color:' + precColor + '">' + precSign + Math.abs(precYears).toFixed(0) + ' yr</span>' +
+        '<span class="inv-detail-val" data-prec="1" style="color:' + precColor + '">' + precSign + Math.abs(precYears).toFixed(0) + ' yr</span>' +
       '</span>';
     b._detailEl = detail;
     periDetailEls[geoKey] = {
@@ -25535,6 +25536,11 @@ function setupGUI() {
       bladeEl: b.element,
       ascEl: ascKey ? detail.querySelector('[data-key="' + ascKey + '"]') : null,
       argEl: detail.querySelector('[data-key="' + argKey + '"]'),
+      // P5/K5b: the Prec. cell goes DYNAMIC under the Keplerian flag (the
+      // secular apsidal period from the chain); the static divisor value
+      // above is the initial text and the flag-off display.
+      precEl: detail.querySelector('[data-prec]'),
+      planetKey: planetKey,
       ascKey: ascKey,
       argKey: argKey
     };
@@ -26248,7 +26254,6 @@ function setupGUI() {
     'Starting Point': null,  // exclude from UI
     'Barycenter Earth and Sun': 'Barycenter',
     'EARTH-WOBBLE-CENTER': 'Wobble Center',
-    'EARTH-MID-ECCENTRICITY-ORBIT': 'Mid-Eccentricity',
     'Halleys': "Halley's",
   };
 
@@ -41960,7 +41965,7 @@ async function analyzeAllAlignments(startYear, endYear) {
 
   if (invertedCount >= 3) {
     console.log('│ ⚠️  PATTERN INVERTED: Suggests 180° phase error in eccentricity/perihelion alignment │');
-    console.log('│     The midEccentricityOrbit may be rotating opposite to physical perihelion         │');
+    console.log('│     The eccentricity/perihelion device may be rotating opposite to physical perihelion│');
   } else if (correctCount >= 3) {
     console.log('│ ✓ Pattern matches expected IAU cardinal point variations                             │');
   } else {
@@ -45729,7 +45734,7 @@ async function runRATest() {
   }
 
   /* headers */
-  const earthRows  = [['JD', 'Date', 'Time', 'Model Year', 'Earth Wobble RA', 'Earth Wobble Dec', 'Earth Wobble Dist Earth', 'Earth Wobble Dist Sun', 'Earth Longitude RA', 'Earth Longitude Dec', 'Earth Longitude Dist Earth', 'Earth Longitude Dist Sun', 'Mid-eccentricity RA', 'Mid-eccentricity Dec', 'Mid-eccentricity Dist Earth', 'Mid-eccentricity Dist Sun']];
+  const earthRows  = [['JD', 'Date', 'Time', 'Model Year', 'Earth Wobble RA', 'Earth Wobble Dec', 'Earth Wobble Dist Earth', 'Earth Wobble Dist Sun', 'Earth Longitude RA', 'Earth Longitude Dec', 'Earth Longitude Dist Earth', 'Earth Longitude Dist Sun']];
   const periRows   = [['JD', 'Date', 'Time', 'Model Year',
     'Mercury Perihelion ICRF', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury Asc Node InvPlane ICRF', 'Mercury Asc Node InvPlane MaxIncl', 'Mercury Inclination Phase Angle', 'Mercury InvPlane Inclination', '* Mercury Perihelion (Ecliptic)', '* Mercury Asc Node InvPlane (Ecliptic)',
     'Venus Perihelion ICRF', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus Asc Node InvPlane ICRF', 'Venus Asc Node InvPlane MaxIncl', 'Venus Inclination Phase Angle', 'Venus InvPlane Inclination', '* Venus Perihelion (Ecliptic)', '* Venus Asc Node InvPlane (Ecliptic)',
@@ -45771,10 +45776,6 @@ async function runRATest() {
     const earthPerDec    = 90-(earthPerihelionFromEarth.dec * 180 / Math.PI);
     const earthPerDistE  = earthPerihelionFromEarth.distAU;
     const earthPerDistS  = earthPerihelionFromEarth.sunDistAU;
-    const earthMidRA     = (midEccentricityOrbit.ra   * 180 / Math.PI + 360) % 360;
-    const earthMidDec    = 90-(midEccentricityOrbit.dec * 180 / Math.PI);
-    const earthMidDistE  = midEccentricityOrbit.distAU;
-    const earthMidDistS  = midEccentricityOrbit.sunDistAU;
                             
     const mercuryPer   = o.mercuryPerihelion;
     const mercuryPerEcl = o.mercuryPerihelionEcliptic;
@@ -45907,7 +45908,7 @@ async function runRATest() {
     const erosDistS     = eros.sunDistAU;
         
         const modelYear = Math.floor(jdToModelYear(jd));
-        earthRows.push([jd, date, time, modelYear, earthWobbRA.toFixed(6), earthWobbDec.toFixed(6), earthWobbDistE.toFixed(8), earthWobbDistS.toFixed(8), earthPerRA.toFixed(6), earthPerDec.toFixed(6), earthPerDistE.toFixed(8), earthPerDistS.toFixed(8), earthMidRA.toFixed(6), earthMidDec.toFixed(6), earthMidDistE.toFixed(8), earthMidDistS.toFixed(8)]);
+        earthRows.push([jd, date, time, modelYear, earthWobbRA.toFixed(6), earthWobbDec.toFixed(6), earthWobbDistE.toFixed(8), earthWobbDistS.toFixed(8), earthPerRA.toFixed(6), earthPerDec.toFixed(6), earthPerDistE.toFixed(8), earthPerDistS.toFixed(8)]);
     
 //    periRows.push([jd, date, time, mercuryPer.toFixed(6), venusPer.toFixed(6), earthPerRA.toFixed(6), marsPer.toFixed(6), jupiterPer.toFixed(6), saturnPer.toFixed(6), uranusPer.toFixed(6), neptunePer.toFixed(6), plutoPer.toFixed(6), halleysPer.toFixed(6), erosPer.toFixed(6)]);
 
@@ -53942,13 +53943,60 @@ function _kcHelioAU(nameLower, jd) {
   const p = kcComputeHeliocentricEclipticFromElements(el);
   return [p.xAU, p.yAU, p.zAU];
 }
-// P5/K5 — perihelion-of-date from the chain: ϖ(t) straight from the
-// elements-of-date (the multi-mode secular skeleton + derived terms — the
-// true apsidal wander, not a fixed divisor rate).
-function _kcPerihelionEclLonDeg(nameLower, jd) {
+// P5/K5 — elements-of-date from the chain (the multi-mode secular skeleton
+// + derived terms): ϖ(t), Ω(t), e(t), i(t) — the true element wander, not
+// fixed divisor rates.
+function _kcElementsOfDate(nameLower, jd) {
   if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   const year = KC_ANCHOR_EPOCH_YEAR + (jd - KC_ANCHOR_EPOCH_JD) / 365.25;
-  return kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
+  return kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
+}
+function _kcPerihelionEclLonDeg(nameLower, jd) {
+  return _kcElementsOfDate(nameLower, jd).lonPeriEclipticDeg;
+}
+// P5/K5b — the VISIBLE perihelion markers ("PERIHELION MERCURY" …): under
+// the flag their DIRECTION is the chain's ϖ(t) while the PRESENTATION stays
+// the established device convention — a direction indicator at the legacy
+// display radius (perihelionDistance) around the PERIHELION-OF-EARTH
+// construction (barycenterEarthAndSun, the device's own parent), NOT the
+// physical heliocentric perihelion point (first attempt; the markers jumped
+// shells — owner-corrected). Planar in the ϖ direction so the marker's
+// Positions-(Ecliptic) readout matches the perihelion-longitude panels
+// exactly. Anchor and radius are read from the device's own hierarchy, so
+// any scene-convention change propagates. EARTH (owner-ruled, option A):
+// the DISPLAY values and marker direction ride the chain like every planet
+// — but the LOAD-BEARING spine does not: barycenterEarthAndSun's rotation
+// (which positions the SUN and everything the historical gate suite is
+// calibrated on — eclipses, cardinal points, LOD) stays on the engine-K
+// law. In the historical era the two agree to ~0.03° (chain ϖ̇ 11.62″/yr
+// vs the H/3 law's 11.60 — the epoch-local-tangent result); at deep time
+// the display shows the true wander + the 405-kyr eccentricity beat.
+// Pluto/Halleys/Eros: no chain.
+const _KC_PERI_MARKERS = {
+  'PERIHELION MERCURY': 'mercury', 'PERIHELION VENUS': 'venus',
+  'PERIHELION MARS': 'mars', 'PERIHELION JUPITER': 'jupiter',
+  'PERIHELION SATURN': 'saturn', 'PERIHELION URANUS': 'uranus',
+  'PERIHELION NEPTUNE': 'neptune', 'PERIHELION-OF-EARTH': 'earth',
+};
+const _KC_ANCHOR = new THREE.Vector3();   // scratch for the device origin
+// The WINDOW apsidal period of date: ±150-yr central difference of ϖ on the
+// FULL chain. The baseline is load-bearing: short synodic terms (≲60-yr
+// periods) average out across 300 yr, while the Great-Inequality terms
+// (~900–1000 yr) keep their local slope — this is the window-rate family of
+// doc 109 §9 (the quantity the old static labels approximated), now
+// evaluated at the scrubbed date. Signed: Saturn reads RETROGRADE in the
+// current window because the GI dynamics put it there; a very large value
+// means the apse is near-stationary at that date (physical, not an error).
+function _kcApsidalPeriodYears(nameLower, jd) {
+  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+  const year = KC_ANCHOR_EPOCH_YEAR + (jd - KC_ANCHOR_EPOCH_JD) / 365.25;
+  const D = 150;
+  const w1 = kcComputePlanetElementsAtYear(year - D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
+  const w2 = kcComputePlanetElementsAtYear(year + D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
+  let d = w2 - w1;
+  while (d > 180) d -= 360;
+  while (d < -180) d += 360;
+  return d === 0 ? Infinity : 360 * (2 * D) / d;
 }
 function _kcTriad(p, q) {
   const u = p;
@@ -53992,6 +54040,49 @@ function _kcDeriveFrameR() {
   _kcR = R;
 }
 const _KC_V = new THREE.Vector3();   // scratch for the visual override
+// P5/K5b — the chain position AT AN ARBITRARY MOMENT, for consumers that
+// re-animate the scene to past epochs (the trace sampler): the overridden
+// meshes carry only the CURRENT date's chain offset, so a time-travelling
+// reader must re-evaluate the chain at the sampled jd. This mirrors the two
+// updatePositions override branches — keep them in step.
+const _KC_TS = new THREE.Vector3(), _KC_TE = new THREE.Vector3(), _KC_TA = new THREE.Vector3();
+function _kcChainWorldPos(obj, jd, out) {
+  if (!KEPLER_CHAINS || !_kcR) return false;
+  const _R = _kcR;
+  const periKey = _KC_PERI_MARKERS[obj.name];
+  const isPlanet = _KC_PLANET_NAMES.has(obj.name);
+  if (!periKey && !isPlanet) return false;
+  sun.planetObj.getWorldPosition(_KC_TS);          // updates ancestor matrices
+  if (isPlanet) {
+    const nm = obj.name.toLowerCase();
+    const toW = (hv) => out.set(
+      _KC_TS.x + 100 * (_R[0][0] * hv[0] + _R[0][1] * hv[1] + _R[0][2] * hv[2]),
+      _KC_TS.y + 100 * (_R[1][0] * hv[0] + _R[1][1] * hv[1] + _R[1][2] * hv[2]),
+      _KC_TS.z + 100 * (_R[2][0] * hv[0] + _R[2][1] * hv[1] + _R[2][2] * hv[2]));
+    earth.rotationAxis.getWorldPosition(_KC_TE);
+    toW(_kcHelioAU(nm, jd));
+    const dAU = out.distanceTo(_KC_TE) / 100;
+    const tauDays = auToKm(dAU) / speedOfLight / 86400;
+    toW(_kcHelioAU(nm, jd - tauDays));
+    return true;
+  }
+  const lp = _kcPerihelionEclLonDeg(periKey, jd) * (Math.PI / 180);
+  const sgn = periKey === 'earth' ? 1 : -1;
+  const h0 = sgn * Math.cos(lp), h1 = sgn * Math.sin(lp);
+  obj.containerObj.parent.getWorldPosition(_KC_TA);
+  let ax = _KC_TA.x, ay = _KC_TA.y, az = _KC_TA.z;
+  let D = obj.containerObj.position.length();
+  if (periKey === 'earth') {
+    earth.rotationAxis.getWorldPosition(_KC_TE);
+    D = _KC_TA.distanceTo(_KC_TE);
+    ax = _KC_TE.x; ay = _KC_TE.y; az = _KC_TE.z;
+  }
+  out.set(
+    ax + D * (_R[0][0] * h0 + _R[0][1] * h1),
+    ay + D * (_R[1][0] * h0 + _R[1][1] * h1),
+    az + D * (_R[2][0] * h0 + _R[2][1] * h1));
+  return true;
+}
 window._setKeplerChains = (on) => {
   KEPLER_CHAINS = !!on; _kcR = null;
   // toggling back to the legacy chains restores the meshes' hierarchy positions
@@ -54084,6 +54175,46 @@ function updatePositions() {
       obj.planetObj.parent.worldToLocal(_KC_V);
       obj.planetObj.position.copy(_KC_V);
       obj.planetObj.updateMatrixWorld(true);   // same-tick consumers read fresh world matrices
+    }
+
+    // P5/K5b — the perihelion MARKERS onto the chain: chain ϖ(t) direction
+    // at the LEGACY anchor + display radius (see _KC_PERI_MARKERS above).
+    const _kcPeri = KEPLER_CHAINS ? _KC_PERI_MARKERS[obj.name] : undefined;
+    if (_kcPeri) {
+      const _R = _kcR;
+      const _lpRad = _kcPerihelionEclLonDeg(_kcPeri, o.julianDay) * (Math.PI / 180);
+      // GEOCENTRIC DEVICE CONVENTIONS (owner-verified against the legacy
+      // build, one planet at a time): the PLANET markers sit on the
+      // SUN-side — anti-ϖ, +180° (the June-21 start / "Perihelion ICRF"
+      // export family) — while EARTH's construction point sits on the +ϖ
+      // side (the Sun-ring eccentric-center geometry is offset from Earth
+      // TOWARD the perihelion direction). The PANEL values stay the
+      // conventional heliocentric ϖ in every case.
+      const _sgn = _kcPeri === 'earth' ? 1 : -1;
+      const _hv = [_sgn * Math.cos(_lpRad), _sgn * Math.sin(_lpRad), 0];   // ecliptic-J2000 unit
+      obj.containerObj.parent.getWorldPosition(_KC_ANCHOR);  // the device origin: the perihelion-of-Earth construction
+      let _ax = _KC_ANCHOR.x, _ay = _KC_ANCHOR.y, _az = _KC_ANCHOR.z;
+      let _D = obj.containerObj.position.length();           // the legacy display radius (perihelionDistance, scene units)
+      if (_kcPeri === 'earth') {
+        // PERIHELION-OF-EARTH has no shell — it sits AT the construction
+        // point. Chain version: EARTH + the same construction distance in
+        // the chain's ϖ_earth direction. Only this display mesh moves; the
+        // barycenter NODE (the Sun's parent — the calibrated spine) stays
+        // on the engine-K law.
+        _D = Math.hypot(_KC_ANCHOR.x - EARTH_POS.x, _KC_ANCHOR.y - EARTH_POS.y, _KC_ANCHOR.z - EARTH_POS.z);
+        _ax = EARTH_POS.x; _ay = EARTH_POS.y; _az = EARTH_POS.z;
+      }
+      const _wp = [
+        _ax + _D * (_R[0][0] * _hv[0] + _R[0][1] * _hv[1]),
+        _ay + _D * (_R[1][0] * _hv[0] + _R[1][1] * _hv[1]),
+        _az + _D * (_R[2][0] * _hv[0] + _R[2][1] * _hv[1]),
+      ];
+      PLANET_POS.set(_wp[0], _wp[1], _wp[2]);
+      if (obj._kcOrigPos === undefined) obj._kcOrigPos = obj.planetObj.position.clone();
+      _KC_V.set(_wp[0], _wp[1], _wp[2]);
+      obj.planetObj.parent.worldToLocal(_KC_V);
+      obj.planetObj.position.copy(_KC_V);
+      obj.planetObj.updateMatrixWorld(true);
     }
 
     /*  EARTH → PLANET  (distance)  */
@@ -54430,7 +54561,15 @@ function tracePlanet(obj, pos) {
     iterations++;
     moveModel(nextPos);
     earth.containerObj.updateMatrixWorld();
-    obj.planetObj.getWorldPosition(_tracePos);
+    // P5/K5b — chain-driven objects (the seven planets + the perihelion
+    // markers) are re-evaluated AT the sampled moment via jdFromPos (the
+    // model's own pos→JD conversion, the R4 rule): the overridden mesh only
+    // carries the CURRENT date's chain position, so reading it under past
+    // pivot rotations traced circles around the device anchor (owner-found:
+    // "drawn from the Sun").
+    if (!_kcChainWorldPos(obj, jdFromPos(nextPos), _tracePos)) {
+      obj.planetObj.getWorldPosition(_tracePos);
+    }
 
     const writeIndex = (obj.traceArrIndex % pointCount) * 3;
     vertArray[writeIndex + 0] = _tracePos.x;
@@ -55717,6 +55856,23 @@ function updateAscendingNodes() {
   );
   o.erosArgumentOfPeriapsis = ((o.erosPerihelion - o.erosAscendingNode) % 360 + 360) % 360;
 
+  // P5/K5b — under the Keplerian flag the SEVEN PLANETS' nodes ride the
+  // chain's elements-of-date: Ω(t) from the ζ-vector secular skeleton +
+  // derived terms, ω = ϖ − Ω from the SAME element set (proper ecliptic
+  // arguments — the legacy line above mixed the RA-channel ϖ with an
+  // ecliptic Ω). Pluto/Halleys/Eros have no chain and keep the legacy
+  // tilt integration, as does the flag-off path. Placed BEFORE
+  // updateOrbitalPlaneRotations so the VISUAL orbital planes follow the
+  // same Ω.
+  if (KEPLER_CHAINS) {
+    for (const _p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      const _el = _kcElementsOfDate(_p, o.julianDay);
+      o[_p + 'AscendingNode'] = _el.ascNodeEclipticDeg;
+      o[_p + 'DescendingNode'] = (_el.ascNodeEclipticDeg + 180) % 360;
+      o[_p + 'ArgumentOfPeriapsis'] = ((_el.lonPeriEclipticDeg - _el.ascNodeEclipticDeg) % 360 + 360) % 360;
+    }
+  }
+
   // Update the visual orbital plane markers to reflect the dynamic ascending nodes
   updateOrbitalPlaneRotations();
 }
@@ -55911,6 +56067,16 @@ function updatePlanetAnomalies() {
     if (dt) {
       if (dt.ascEl) dt.ascEl.textContent = (o[dt.ascKey] || 0).toFixed(2) + '\u00B0';
       if (dt.argEl) dt.argEl.textContent = (o[dt.argKey] || 0).toFixed(2) + '\u00B0';
+      // P5/K5b \u2014 the Prec. period is DYNAMIC under the flag: the window
+      // apsidal period of date from the chain (signed \u2014 Saturn reads
+      // retrograde in the current window). Earth included (option A,
+      // owner-ruled): in-window it reads \u2248 the H/3 law (+111.5k vs
+      // +111,772 yr \u2014 the epoch-local tangent), wandering at deep time.
+      if (KEPLER_CHAINS && dt.precEl) {
+        const _T = _kcApsidalPeriodYears(dt.planetKey, o.julianDay);
+        dt.precEl.textContent = (_T >= 0 ? '+' : '\u2212') + (isFinite(_T) ? Math.abs(_T).toFixed(0) : '\u221E') + ' yr';
+        dt.precEl.style.color = _T >= 0 ? 'hsla(140, 65%, 55%, 1)' : 'hsla(0, 70%, 60%, 1)';
+      }
     }
   }
 }
@@ -56467,6 +56633,17 @@ function updateDynamicInclinations() {
   const earthEclPeri = calcEarthPerihelionPredictive(o.currentYear);
   o.earthPerihelionEcliptic = earthEclPeri;   // ecliptic longitude of date (the perihelion gauge)
   o.earthPerihelionLongICRF = ((earthEclPeri - _gprRate * (o.currentYear - 2000)) % 360 + 360) % 360;
+  // P5/K5b option A (owner-ruled) — Earth's perihelion DISPLAY rides the
+  // chain like every planet: the chain ϖ is the J2000-frame longitude
+  // (→ the ICRF row directly), the of-date gauge adds the same general-
+  // precession term the legacy line uses. The engine-K law above stays the
+  // flag-off path AND the load-bearing machinery (the Sun's chain rides
+  // barycenterEarthAndSun, untouched).
+  if (KEPLER_CHAINS) {
+    const _wE = _kcPerihelionEclLonDeg('earth', o.julianDay);
+    o.earthPerihelionLongICRF = ((_wE % 360) + 360) % 360;
+    o.earthPerihelionEcliptic = ((_wE + _gprRate * (o.currentYear - 2000)) % 360 + 360) % 360;
+  }
   // Planets: linear at ICRF rate from J2000 longitudePerihelion
   const _calcPeriICRF = (key) => {
     const p = planets[key];
@@ -56735,9 +56912,13 @@ function goldenspiralPerihelionObjects(...args) {
 
   function updateGoldenSpiralLine() {
 
-    /* 3-a. gather **all** perihelion helpers into pre-allocated vectors */
+    /* 3-a. gather **all** perihelion helpers into pre-allocated vectors.
+       P5/K5b: read the MESH (planetObj), not the pivot — under the Keplerian
+       flag the marker mesh carries the chain-true perihelion position (the
+       pivot still rides the legacy device); with the flag off the two
+       coincide (orbitRadius 0 puts the mesh at the pivot origin). */
      for (let i = 0; i < pds.length; i++) {
-       pds[i].pivotObj.getWorldPosition(visiblePts[i]);
+       pds[i].planetObj.getWorldPosition(visiblePts[i]);
      }
 
     /* 3-b. build Catmull-Rom curve & sample points ------------------ */

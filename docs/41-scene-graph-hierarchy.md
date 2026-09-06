@@ -9,6 +9,8 @@ status: current
 
 This document describes the Three.js scene graph hierarchy used in the Holistic Universe Model simulation. Understanding this nested structure is essential because **all astronomical motions are implemented through composed rotations** of parent-child relationships.
 
+**Engine-D rendering (the default since the P5 flip):** the seven planets' rendered positions, perihelion markers and perihelion panels are computed from the model's own N-body chain (`@essrt/physics/planets/keplerian-chain` + the governed artifact `data/nbody-secular-frequencies.json`) and OVERRIDE the geometric hierarchy below each frame; Earth, the Moon and the Sun stay on the hierarchy (the two-engine interface — the Sun's chain hangs from the perihelion-of-Earth construction and every historical gate is calibrated on it). The legacy geometric planet chains below remain functional behind the `?keplerChains=0` opt-out. The `Mid-Eccentricity Orbit` node (the one law's base′ reference circle) was removed with the flip.
+
 **Related Documents:**
 - [12 - Perihelion Precession](12-perihelion-precession.md) - How precession affects apparent measurements
 - [40 - Architecture](40-architecture.md) - Overall code structure
@@ -114,8 +116,6 @@ startingPoint (scene root)
 └── Earth (pivot)                                     ← Axial Precession: H/13
     ├── EARTH-WOBBLE-CENTER (marker)                  ← display-only, radius A at H/13 (the Law-4 amplitude distance; no instrument reads it)
     ├── Inclination Precession (container)            ← H/3
-    │   ├── Mid-Eccentricity Orbit (container)        ← base′ reference circle (the one law's mean)
-    │   │
     │   └── Ecliptic Precession (container)           ← H/5
     │       └── Obliquity Cycle (container)           ← H/8
     │           └── Perihelion Precession 1           ← H/16

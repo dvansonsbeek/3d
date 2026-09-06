@@ -57,7 +57,7 @@ startingPoint -> earth -> earthInclinationPrecession -> earthEclipticPrecession
     -> earthPerihelionPrecession2 -> barycenterEarthAndSun -> sun / earthPerihelionFromEarth
 ```
 
-Note: `earthWobbleCenter` is NOT in the main chain (used for labels/tracking only). `midEccentricityOrbit` is a **sibling** of `earthEclipticPrecession` under `earthInclinationPrecession` (visualization only, not in the positional chain).
+Note: `earthWobbleCenter` is NOT in the main chain (used for labels/tracking only). (`midEccentricityOrbit`, formerly a sibling of `earthEclipticPrecession` under `earthInclinationPrecession`, was removed at the P5 flip.)
 
 **Key geometric mechanism — counter-rotating motions:**
 - **EARTH-WOBBLE-CENTER** circles Earth clockwise at H/13 (mean axial precession; a display-only marker — Earth sits at the scene origin)

@@ -180,7 +180,7 @@ startingPoint (origin)
 ```
 Counter-rotating motions: EARTH-WOBBLE-CENTER circles Earth (CW, H/13; a display-only marker, Earth itself sits at the scene origin) while PERIHELION-OF-EARTH orbits Sun (CCW, H/3). Meeting frequency: 1/(H/13) + 1/(H/3) = 16/H → H/16 perihelion-direction cycle.
 Eccentricity = the one H/3 law e(t) = base′·(1 + cos θ₃/2), carried by the PeriPrec2 offset every frame (doc 41); the offset's direction turns at H/16, its length on H/3.
-Note: `earthWobbleCenter` and `midEccentricityOrbit` are NOT in the positional chain (used for visualization/tracking only).
+Note: `earthWobbleCenter` is NOT in the positional chain (used for visualization/tracking only). (`midEccentricityOrbit` — the same class — was removed at the P5 flip.)
 
 **Per-planet chain (5 levels under barycenter):**
 ```

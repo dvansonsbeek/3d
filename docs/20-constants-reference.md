@@ -434,15 +434,6 @@ The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier t
 |----------|----------|-------|-------------|
 | Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->55.16<!--/v--> s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0018<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
 
-## Perihelion Longitude Formula Parameters
-
-| Constant | Variable | Value | Description |
-|----------|----------|-------|-------------|
-| Mid-Eccentricity Amplitude | `mideccentricitypointAmplitude` | 2.4587 deg | Amplitude of mid-eccentricity-point variation |
-| Helion Point Amplitude | `helionpointAmplitude` | 5.05 deg | Amplitude of perihelion-point variation |
-
-Used by `computeLongitudePerihelion()` to estimate Earth's longitude of perihelion from the balanced year and precession cycle.
-
 ---
 
 # Part 3 — External Reference Values
