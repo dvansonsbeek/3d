@@ -29,7 +29,9 @@
 
 /** @typedef {{aAU:number,e:number,inclEclipticDeg:number,ascNodeEclipticDeg:number,
  *             lonPeriEclipticDeg:number,meanLonEclipticDeg:number,
- *             meanMotionDegPerYr?:number,argPeriDeg?:number,meanAnomalyDeg?:number}} KcElements */
+ *             meanMotionDegPerYr?:number,argPeriDeg?:number,meanAnomalyDeg?:number,
+ *             inclInvPlaneDeg?:number,ascNodeInvPlaneDeg?:number}} KcElements */
+/** @typedef {{inclEclipticDeg:number,ascNodeEclipticDeg:number}} KcInvariablePlane */
 /** @typedef {{omegaRadPerYr:number,cos:number,sin:number}} KcCosSinTerm */
 /** @typedef {{omegaRadPerYr:number,re:number,im:number}} KcComplexTerm */
 /** @typedef {{comps:Array<{planet:string,sLam?:number,sPom?:number}>,cos:number,sin:number}} KcPoissonCosSinTerm */
@@ -41,7 +43,8 @@
 /** @typedef {{anchor:KcElements,periRateArcsecCy:number,meanMotionDegPerYr:(number|null),
  *             windowRates?:{meanMotionDegPerYr?:number,nodeRateArcsecCy?:number,eccDotPerCy?:number,inclDotArcsecCy?:number},
  *             secularModes?:({z:KcComplexTerm[],zeta:KcComplexTerm[]}|null),
- *             periodicTerms?:(KcPeriodicTerms|undefined)}} KcPlanetChain */
+ *             periodicTerms?:(KcPeriodicTerms|undefined),
+ *             invariablePlane?:(KcInvariablePlane|undefined)}} KcPlanetChain */
 
 const D2R = Math.PI / 180;
 
@@ -168,6 +171,7 @@ function computePlanetElementsAtYear(year, planetChain, allChains) {
   const n = planetChain.meanMotionDegPerYr ?? a.meanMotionDegPerYr ?? 0;
   const r = planetChain.windowRates || {};   // K2.1 era-typed drifts (legacy linear path)
   const wrap = (/** @type {number} */ x) => ((x % 360) + 360) % 360;
+  /** @type {KcElements} */
   const out = {
     aAU: a.aAU,
     meanLonEclipticDeg: wrap(a.meanLonEclipticDeg + n * dt),
@@ -257,6 +261,29 @@ function computePlanetElementsAtYear(year, planetChain, allChains) {
       out.ascNodeEclipticDeg = wrap(Math.atan2(p0, q0) / D2R);
     }
   }
+  // K5c — the INVARIABLE-plane inclination/node of date: rotate the ecliptic
+  // elements into the engine's own invariable plane (the artifact-banked
+  // orientation — pole from the J2000 seed's total angular momentum), EXACT
+  // orbit-normal rotation, no small-angle shortcuts. Frame convention: the
+  // s-frame x-axis is ecliptic-X projected into the plane (the extraction
+  // convention of the dump script); node longitudes are measured from it.
+  const IP = planetChain.invariablePlane;
+  if (IP) {
+    const fi = IP.inclEclipticDeg * D2R, fO = IP.ascNodeEclipticDeg * D2R;
+    const zf = [Math.sin(fi) * Math.sin(fO), -Math.sin(fi) * Math.cos(fO), Math.cos(fi)];
+    let xf = [1 - zf[0] * zf[0], -zf[0] * zf[1], -zf[0] * zf[2]];
+    const xn = Math.hypot(xf[0], xf[1], xf[2]); xf = [xf[0] / xn, xf[1] / xn, xf[2] / xn];
+    const yf = [zf[1] * xf[2] - zf[2] * xf[1], zf[2] * xf[0] - zf[0] * xf[2], zf[0] * xf[1] - zf[1] * xf[0]];
+    const oi = out.inclEclipticDeg * D2R, oO = out.ascNodeEclipticDeg * D2R;
+    const nO = [Math.sin(oi) * Math.sin(oO), -Math.sin(oi) * Math.cos(oO), Math.cos(oi)];  // orbit normal, ecliptic coords
+    const nz = nO[0] * zf[0] + nO[1] * zf[1] + nO[2] * zf[2];
+    out.inclInvPlaneDeg = Math.acos(Math.min(1, Math.max(-1, nz))) / D2R;
+    // ascending node direction in the inv frame: ẑ_inv × n̂, expressed on (x̂,ŷ)
+    const c = [zf[1] * nO[2] - zf[2] * nO[1], zf[2] * nO[0] - zf[0] * nO[2], zf[0] * nO[1] - zf[1] * nO[0]];
+    const cx = c[0] * xf[0] + c[1] * xf[1] + c[2] * xf[2];
+    const cy = c[0] * yf[0] + c[1] * yf[1] + c[2] * yf[2];
+    out.ascNodeInvPlaneDeg = wrap(Math.atan2(cy, cx) / D2R);
+  }
   return out;
 }
 
@@ -284,6 +311,7 @@ function buildPlanetChainsFromArtifactData(art, opts = {}) {
       meanMotionDegPerYr: n,
       windowRates: art.windowElementRates[key],
       secularModes: art.secularModes ? art.secularModes[key] : null,   // K4.7 multi-mode skeleton
+      invariablePlane: art.invariablePlane || undefined,               // K5c s-frame definition (shared)
     };
     if (!opts.skeletonOnly && art.periodicTerms && art.periodicTerms[key]) {
       chains[key].periodicTerms = art.periodicTerms[key];

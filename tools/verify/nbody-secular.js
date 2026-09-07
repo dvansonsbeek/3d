@@ -229,6 +229,16 @@ function main() {
   const dEarthArcsecYr = (windowElementRates.earth.meanMotionDegPerYr - nSiderealDegPerYr) * 3600;
   if (!(Math.abs(dEarthArcsecYr) < 2)) throw new Error(`Earth window mean motion off the model sidereal anchor by ${dEarthArcsecYr.toFixed(3)} ″/yr (tol 2)`);
 
+  // K5c — the engine's OWN invariable plane (unit total angular momentum of
+  // the J2000 seed state, computed by the dump script, ecliptic-J2000
+  // coords). Literature planes (Souami & Souchay 2012: 1.5787°) are external
+  // reference labels, never inputs — the sanity band only catches a broken
+  // basis, not a mismatch with theory.
+  const invariablePlane = dumpLong.invariablePlane;
+  if (!invariablePlane || !(invariablePlane.inclEclipticDeg > 1.4 && invariablePlane.inclEclipticDeg < 1.8)) {
+    throw new Error(`invariable-plane orientation missing or implausible: ${JSON.stringify(invariablePlane)} (expected incl ~1.4–1.8° to ECLIPJ2000)`);
+  }
+
   const rel = {};
   for (const p of PLANETS) rel[p] = relativisticSupplementArcsecCy(p);
   if (Math.abs(rel.mercury - 42.98) > 0.1) throw new Error(`derived Mercury 1PN supplement ${rel.mercury.toFixed(3)} ″/cy off the GR reference 42.98`);
@@ -257,6 +267,11 @@ function main() {
     windowRatesArcsecCy: windowRates,
     windowElementRates,
     j2000AnchorElements,
+    // K5c — the s-frame definition: the engine's own invariable plane in
+    // ecliptic-J2000 coords (pole from the J2000 seed's total angular
+    // momentum; node = the plane's ascending node on the ecliptic). The
+    // evaluator rotates ecliptic elements-of-date into this frame exactly.
+    invariablePlane,
     relativisticSupplementArcsecCy: rel,
     checks: {
       mercuryClosureArcsecCy: { measuredWindowDelta: mercuryClosure, derivedInstantaneous: rel.mercury, diff: mercuryClosure - rel.mercury, tolerance: 0.1 },

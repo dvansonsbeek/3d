@@ -846,6 +846,10 @@
    "meanLonEclipticDeg": 305.20853660850446
   }
  },
+ "invariablePlane": {
+  "inclEclipticDeg": 1.5785089212841052,
+  "ascNodeEclipticDeg": 107.5823599360674
+ },
  "relativisticSupplementArcsecCy": {
   "mercury": 42.98142753750674,
   "venus": 8.624988679409013,
@@ -881,16 +885,16 @@
  "inputs": {
   "generator": "node tools/verify/nbody-secular.js --write",
   "files": {
-   "packages/physics/src/planets/keplerian-chain.cjs": "sha256:1adb5ac0df1cbb36ad9ccfa855eae8d339f894883ad7e06ec799ccc1110a7871",
+   "packages/physics/src/planets/keplerian-chain.cjs": "sha256:ac48a70bef8668b8cde7e2ef28f398d96cf03cf46bc4ba742f60c315c5cbeb52",
    "public/input/astro-reference.json": "sha256:0e61f5bec0ee3c44016781599498db75067070e74aeddc89b2f5bd6bc2782918",
    "tools/explore/j2000-state.mjs": "sha256:ef15efde06948b36b589e3f790e6c5ccda64b8c1e1899cb4ff1e5f1571149611",
    "tools/explore/k45-residual-naff.mjs": "sha256:228eb4874adca9171d61c1697ffbbaac3ce82891476a34762bf882840ccae406",
    "tools/explore/k45e-amplitude-solve.mjs": "sha256:d5ce9f8d3e38d49988b089542882833dd4c631125b5b4e21eff13b119eee45e8",
-   "tools/explore/lattice-long-window-test.mjs": "sha256:893ff6900a458b9a6f8d4f0978e496495f58be792cbaf1379629d62ab3d42626",
+   "tools/explore/lattice-long-window-test.mjs": "sha256:d45dea6a754b8ab6502432ecb0cd463ef2d5780418b0fecd694ac1d5c1bed11f",
    "tools/explore/naff-frequencies.mjs": "sha256:85178139faf0894c8cf62a7aa0a92395dab7afa6ab33efee93b63712ef257ed2",
    "tools/explore/nbody-wh.mjs": "sha256:42947b7492e81dd412a97e0a794412706d16d6a42f2fde38310877fd1051c777",
    "tools/lib/keplerian-chain.js": "sha256:7be1a96b20174d8c2726ec984250646093a847a5cf7e06d8e1e2ffae926ff5c9",
-   "tools/verify/nbody-secular.js": "sha256:f71112a27cca71d97811597fb86cf762a2ccab21c6af7d1ca8c0340acdaf8d81"
+   "tools/verify/nbody-secular.js": "sha256:95873972aab80bc156ec4c709e6a4e197699a7c0d2f4db1159a08178ffc3e3d8"
   }
  },
  "periodicTerms": {

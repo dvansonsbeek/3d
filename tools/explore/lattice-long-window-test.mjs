@@ -210,7 +210,17 @@ if (DIAG.length) console.log('conservation (B1): ' + DIAG.map((d) => `${d.years 
 if (KV.dump !== '0') {
   const { writeFileSync } = await import('node:fs');
   for (const fr of FRAMES_OUT) {
-    const out = { years: YEARS, integrator: INTEGRATOR, dt: DT, gr: GR_ON, frame: fr, sampleDays: SAMPLE_DAYS, conservation: DIAG, t: Array.from(T), elements: {} };
+    // K5c — the engine's own invariable-plane orientation (unit total angular
+    // momentum of the J2000 seed state, ecliptic-J2000 coords), banked with the
+    // dump so the governed artifact can carry the s-frame definition. Node =
+    // ascending node of the invariable plane on the ecliptic (λ of ẑ_ecl × ẑ_inv).
+    const _zInv = ROTS.invariable[2];
+    const out = { years: YEARS, integrator: INTEGRATOR, dt: DT, gr: GR_ON, frame: fr, sampleDays: SAMPLE_DAYS, conservation: DIAG,
+      invariablePlane: {
+        inclEclipticDeg: Math.acos(_zInv[2]) / D2R,
+        ascNodeEclipticDeg: ((Math.atan2(_zInv[0], -_zInv[1]) / D2R) % 360 + 360) % 360,
+      },
+      t: Array.from(T), elements: {} };
     for (const k of names) out.elements[k] = Object.fromEntries(ELEMS.map((el) => [el, Array.from(ELF[fr][el][k])]));
     const file = ROOT + `tools/explore/lattice-long-window-${fr}-${YEARS}${GR_ON ? '-gr' : ''}.local.json`;
     const txt = JSON.stringify(out); writeFileSync(file, txt);
