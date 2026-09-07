@@ -500,16 +500,20 @@ All seven fitted planets match JPL's J2000-fixed-frame trends in both sign and m
 
 ### Planet Inspector Panel
 
-The planet information panels display four invariable plane values:
+For the seven chain planets and Earth, the panels' inclination values —
+"Ecliptic Inclination (i)", "Inclination to Inv. plane (I)" and the
+derived height/latitude rows — read the chain's elements of date (K5c:
+the ecliptic inclination and the exact rotation into the engine's own
+invariable plane). The legacy oscillation-law rows ("Ω at Max
+Inclination", "Current Oscillation Phase") were removed for those bodies;
+Pluto, Halley's and Eros keep the legacy display. The remaining
+invariable-plane node rows on the panels still use the legacy ICRF
+convention (K5c follow-up in the plan):
 
 | UI Label | Description |
 |----------|-------------|
-| **Ascending Node on Inv. Plane (Ω)** | Current ascending node in ecliptic coordinates |
+| **Ascending Node on Inv. Plane** | Legacy ICRF-convention node (chain s-frame conversion pending) |
 | **Descending Node on Inv. Plane** | Ascending node + 180° |
-| **ω̃ at Max Inclination** | ICRF perihelion longitude where inclination reaches maximum (= cycle anchor) |
-| **Current Oscillation Phase** | Position in oscillation cycle (0° = max, 180° = min) |
-
-**Note**: The ascending node values use invariable-plane coordinates (per-planet regression period −(8H)/N), while the oscillation phase uses ICRF perihelion coordinates (per-planet ICRF period).
 
 ---
 

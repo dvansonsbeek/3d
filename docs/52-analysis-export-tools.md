@@ -119,22 +119,30 @@ left the export together.)
 
 #### Sheet 2: Perihelion Planets
 
-Orbital elements for all planets (Mercury through Neptune).
+Orbital elements for the seven chain planets plus Earth — every value from
+the chain's elements of date (K5c). The provenance comment block in each
+export states the frame conventions.
 
 | Column | Description |
 |--------|-------------|
 | JD | Julian Day number |
 | Date | Formatted date |
 | Time | Formatted time |
-| Year | Calendar year |
-| {Planet} Perihelion | Longitude of perihelion (deg) |
-| {Planet} Ascending Node | Ascending node on ecliptic (deg) |
-| {Planet} Arg Periapsis | Argument of periapsis (deg) |
-| {Planet} Ecliptic Inclination | Inclination to ecliptic (deg) |
-| {Planet} Asc Node InvPlane | Ascending node on invariable plane, ICRF (deg) |
-| {Planet} Asc Node InvPlane Max Incl | Node at maximum inclination, ICRF (deg) |
-| {Planet} Inclination Phase Angle | Phase angle for inclination oscillation (deg) |
-| {Planet} InvPlane Inclination | Dynamic inclination to invariable plane (deg) |
+| Model Year | Calendar year |
+| {Planet} Perihelion ICRF | RA projection of the chain's ϖ of date (the historic RA channel) |
+| {Planet} Asc Node | Chain ascending node on the ecliptic, of date (deg) |
+| {Planet} Arg Peri | Chain ecliptic argument of periapsis, ω = ϖ − Ω (deg) |
+| {Planet} Ecliptic Inclination | Chain inclination to the ecliptic, of date (deg) |
+| {Planet} InvPlane Inclination | Chain inclination to the engine's own invariable plane (deg) |
+| {Planet} Asc Node InvPlane (s-frame) | Chain node in the s-frame (node origin = ecliptic-X projected into the plane) |
+| \* {Planet} Perihelion (Ecliptic) | Chain ecliptic ϖ of date — the published coordinate (Earth: the perihelion law) |
+| {Planet} Perihelion rate (arcsec / century) | Finite difference on the ecliptic perihelion column |
+
+Earth's block leads with the `EARTH Eccentricity` / `EARTH OBLIQUITY`
+device columns and omits the Asc Node / Arg Peri columns (Earth's ecliptic
+node is 0° by definition). The former lattice-family columns (ICRF/MaxIncl
+node conventions, Inclination Phase Angle, Precession Fluctuation vs the
+lattice base rates) left the export with K5c.
 
 #### Sheet 3: Sun & Planets
 

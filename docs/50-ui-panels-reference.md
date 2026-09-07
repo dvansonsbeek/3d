@@ -179,9 +179,15 @@ Rows are distributed across tabs to reduce scrolling. The tab bar appears betwee
 | Tab 0: GENERAL | Tab 1: ORBIT | Tab 2: POSITION | Tab 3: PRECESSION |
 |----------------|--------------|------------------|-------------------|
 | General Characteristics | Orbital Period & Motion | Orbital Orientation to Ecliptic | Perihelion Precession |
-| Gravitational Influence Zones | Orbital Shape & Geometry | Orbital Orientation to Invariable Plane | Theorized Precession Breakdown |
+| Gravitational Influence Zones | Orbital Shape & Geometry | Orbital Orientation to Invariable Plane | |
 | Surface & Physical Properties | Velocities | Position & Anomalies | |
 | | Energy & Momentum | Time Calculations | |
+
+(The Perihelion Precession section carries the secular-shape block — base
+mode / largest companion / remainder with amplitude shares, plus the
+perihelion rate of date — all computed live from the governed artifact.
+The former "Theorized Precession Breakdown" section and its Laplace-style
+first-order machinery were removed with the P5/K5b panel pass.)
 
 #### Tab Behavior
 

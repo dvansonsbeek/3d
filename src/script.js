@@ -21796,20 +21796,23 @@ function inclinationLa2010(year) { return _la2010Interp(year - 2000, 2); }
 function ascNodeLa2010(year) { return _la2010Interp(year - 2000, 4); }
 
 /** Model ascending node on invariable plane — retrograde at -H/5 (confirmed by La2010 N-body solution) */
-function ascNodeModel(year) {
-  return ((earthAscendingNodeInvPlaneVerified + (360 / (-holisticyearLength / 5)) * (year - 2000)) % 360 + 360) % 360;
-}
-
-// K5c — the model curve for the inv-plane INCLINATION: the chain's secular
+// K5c — the model curves for the inv-plane elements: the chain's secular
 // skeleton evaluated at the calendar year (engine D's own s-modes — the
 // long-term claim, legitimately comparable to La2010 across the chart's
-// ±500 kyr span; inclination is convention-free). The ascending-node section
-// above stays on the H/5 line until the node-origin convention mapping
-// (chain s-frame ↔ the La2010/S&S conventions) is measured — a raw swap
-// would paint the constant origin offset into the residual.
+// ±500 kyr span; inclination is convention-free). NODE CONVENTIONS
+// (measured, −500 kyr → 0 vs the raw 1-Myr engine series): the chain node
+// matches the engine's s-frame readout (origin = ecliptic-X projected into
+// the plane); La2010's node origin sits ≈3.4° away (constant class,
+// spread 0.29°) — each curve is plotted in ITS OWN convention, and the
+// residual carries that documented offset plus the ζ-skeleton node wander
+// (±4.4° rms vs the engine; arg ζ swings fast near inclination minima).
 function inclInvPlaneModel(year) {
   if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   return kcComputePlanetElementsAtYear(year, _kcChains.earth, _kcChains).inclInvPlaneDeg;
+}
+function ascNodeInvPlaneModel(year) {
+  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+  return kcComputePlanetElementsAtYear(year, _kcChains.earth, _kcChains).ascNodeInvPlaneDeg;
 }
 
 // ── Category definitions ─────────────────────────────────────────
@@ -21897,14 +21900,10 @@ const VFP_CATEGORIES = [
     fixedYRange: [0, 360], fixedYTicks: [0, 60, 120, 180, 240, 300, 360],
     paperRange: [-500000, 2000], paperTitle: 'Ascending Node on Invariable Plane',
     paperYRange: [0, 400], paperYTicks: [0, 50, 100, 150, 200, 250, 300, 350, 400],
-    model: { name: 'This model', color: '#f0b040',
-      fn: ascNodeModel },
+    model: { name: 'This model (s-frame)', color: '#f0b040',
+      fn: ascNodeInvPlaneModel },
     references: [
-      { name: 'La2010 (Laskar)', color: '#4fc3f7', fn: ascNodeLa2010, sourceUrl: 'https://doi.org/10.1051/0004-6361/201116836' },
-    ],
-    j2000extras: [
-      { name: 'Souami & Souchay (2012)', color: '#ef5350',
-        value: () => earthAscendingNodeInvPlaneVerified },
+      { name: 'La2010 (Laskar, own node origin)', color: '#4fc3f7', fn: ascNodeLa2010, sourceUrl: 'https://doi.org/10.1051/0004-6361/201116836' },
     ],
   },
   {
@@ -47583,22 +47582,15 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.earthAscendingNodeInvPlaneEcliptic, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where Earth's orbit crosses the invariable plane going north (precesses faster than ICRF due to ecliptic plane motion)`]},
-      {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.earthAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going south (ecliptic coords): Ω + 180°`]},
-      {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => ((((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360) - o.earthAscendingNodeInvPlaneEcliptic + 360) % 360), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle from invariable plane ascending node to perihelion: ω = ϖ − Ω_inv(ecliptic). Oscillates ~±7° around mean value of 180° − i (dynamic inclination to inv. plane).`]},
-    null,
-      {label : () => `ICRF Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.earthAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where Earth's orbit crosses the invariable plane going north`],
+       value : [ { v: () => _kcElementsOfDate('earth', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
-      {label : () => `ICRF Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.earthAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+      {label : () => `Descending Node on Inv. Plane`,
+       value : [ { v: () => (_kcElementsOfDate('earth', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
+      {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
+       value : [ { v: () => _kcArgPeriInvPlaneDeg('earth', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
        value : [ { v: () => o.earthHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }],
@@ -48498,15 +48490,15 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
        {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.mercuryAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => _kcElementsOfDate('mercury', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.mercuryAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcElementsOfDate('mercury', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => ((o.mercuryPerihelion - o.mercuryAscendingNodeInvPlane + 360) % 360), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle from invariable plane ascending node to perihelion: ω = ϖ − Ω_inv`]},
+       value : [ { v: () => _kcArgPeriInvPlaneDeg('mercury', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
        value : [ { v: () => o.mercuryHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }],
@@ -48823,15 +48815,15 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.venusAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => _kcElementsOfDate('venus', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.venusAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcElementsOfDate('venus', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => ((o.venusPerihelion - o.venusAscendingNodeInvPlane + 360) % 360), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle from invariable plane ascending node to perihelion: ω = ϖ − Ω_inv`]},
+       value : [ { v: () => _kcArgPeriInvPlaneDeg('venus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
        value : [ { v: () => o.venusHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }],
@@ -49158,15 +49150,15 @@ const planetStats = {
   
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.marsAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => _kcElementsOfDate('mars', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.marsAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcElementsOfDate('mars', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => ((o.marsPerihelion - o.marsAscendingNodeInvPlane + 360) % 360), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle from invariable plane ascending node to perihelion: ω = ϖ − Ω_inv`]},
+       value : [ { v: () => _kcArgPeriInvPlaneDeg('mars', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
        value : [ { v: () => o.marsHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }],
@@ -49493,15 +49485,15 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.jupiterAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => _kcElementsOfDate('jupiter', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.jupiterAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcElementsOfDate('jupiter', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => ((o.jupiterPerihelion - o.jupiterAscendingNodeInvPlane + 360) % 360), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle from invariable plane ascending node to perihelion: ω = ϖ − Ω_inv`]},
+       value : [ { v: () => _kcArgPeriInvPlaneDeg('jupiter', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
        value : [ { v: () => o.jupiterHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }],
@@ -49827,15 +49819,15 @@ const planetStats = {
    
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.saturnAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => _kcElementsOfDate('saturn', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.saturnAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcElementsOfDate('saturn', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => ((o.saturnPerihelion - o.saturnAscendingNodeInvPlane + 360) % 360), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle from invariable plane ascending node to perihelion: ω = ϖ − Ω_inv`]},
+       value : [ { v: () => _kcArgPeriInvPlaneDeg('saturn', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
        value : [ { v: () => o.saturnHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }],
@@ -50162,15 +50154,15 @@ const planetStats = {
   
    {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.uranusAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => _kcElementsOfDate('uranus', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.uranusAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcElementsOfDate('uranus', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => ((o.uranusPerihelion - o.uranusAscendingNodeInvPlane + 360) % 360), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle from invariable plane ascending node to perihelion: ω = ϖ − Ω_inv`]},
+       value : [ { v: () => _kcArgPeriInvPlaneDeg('uranus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
        value : [ { v: () => o.uranusHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }],
@@ -50497,15 +50489,15 @@ const planetStats = {
  
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.neptuneAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => _kcElementsOfDate('neptune', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.neptuneAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcElementsOfDate('neptune', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => ((o.neptunePerihelion - o.neptuneAscendingNodeInvPlane + 360) % 360), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle from invariable plane ascending node to perihelion: ω = ϖ − Ω_inv`]},
+       value : [ { v: () => _kcArgPeriInvPlaneDeg('neptune', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
        value : [ { v: () => o.neptuneHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }],
@@ -53525,6 +53517,34 @@ function _kcElementsOfDate(nameLower, jd) {
 }
 function _kcPerihelionEclLonDeg(nameLower, jd) {
   return _kcElementsOfDate(nameLower, jd).lonPeriEclipticDeg;
+}
+// K5c — the EXACT invariable-plane argument of periapsis: the in-orbit-plane
+// angle from the orbit's ascending node ON THE INVARIABLE PLANE to the
+// perihelion direction (vector construction — no frame-mixed shortcut like
+// the retired ϖ_RA − Ω_ICRF difference).
+function _kcArgPeriInvPlaneDeg(nameLower, jd) {
+  const el = _kcElementsOfDate(nameLower, jd);
+  const D2R = Math.PI / 180;
+  const O = el.ascNodeEclipticDeg * D2R, inc = el.inclEclipticDeg * D2R;
+  const w = (el.lonPeriEclipticDeg - el.ascNodeEclipticDeg) * D2R;
+  // perihelion unit vector + orbit normal, ecliptic-J2000 coords
+  const p = [
+    Math.cos(O) * Math.cos(w) - Math.sin(O) * Math.sin(w) * Math.cos(inc),
+    Math.sin(O) * Math.cos(w) + Math.cos(O) * Math.sin(w) * Math.cos(inc),
+    Math.sin(w) * Math.sin(inc),
+  ];
+  const nO = [Math.sin(inc) * Math.sin(O), -Math.sin(inc) * Math.cos(O), Math.cos(inc)];
+  // invariable-plane pole from the artifact's banked s-frame
+  const IP = CHAIN_ARTIFACT.invariablePlane;
+  const fi = IP.inclEclipticDeg * D2R, fO = IP.ascNodeEclipticDeg * D2R;
+  const zf = [Math.sin(fi) * Math.sin(fO), -Math.sin(fi) * Math.cos(fO), Math.cos(fi)];
+  // ascending-node direction of the orbit on the inv plane: ẑ_inv × n̂_orbit
+  let l = [zf[1] * nO[2] - zf[2] * nO[1], zf[2] * nO[0] - zf[0] * nO[2], zf[0] * nO[1] - zf[1] * nO[0]];
+  const ln = Math.hypot(l[0], l[1], l[2]); l = [l[0] / ln, l[1] / ln, l[2] / ln];
+  const cx = l[0] * p[0] + l[1] * p[1] + l[2] * p[2];
+  const cr = [l[1] * p[2] - l[2] * p[1], l[2] * p[0] - l[0] * p[2], l[0] * p[1] - l[1] * p[0]];
+  const sx = cr[0] * nO[0] + cr[1] * nO[1] + cr[2] * nO[2];
+  return ((Math.atan2(sx, cx) / D2R) % 360 + 360) % 360;
 }
 // P5/K5b — the VISIBLE perihelion markers ("PERIHELION MERCURY" …): under
 // the flag their DIRECTION is the chain's ϖ(t) while the PRESENTATION stays
