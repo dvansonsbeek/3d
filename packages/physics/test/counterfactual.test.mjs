@@ -15,7 +15,7 @@
  *   exit 0 — injection works end to end
  *   exit 1 — a counterfactual is not expressible; §2d has regressed
  */
-import { createModel, DEFAULT_CONSTANTS, CONSTANTS_HASH } from '../src/index.js';
+import { createModel, DEFAULT_CONSTANTS, CONSTANTS_HASH, CHAIN_ARTIFACT, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear } from '../src/index.js';
 import { REFERENCE_DATA } from '../src/constants/index.js';
 
 let failed = 0;
@@ -101,6 +101,36 @@ check('REFERENCE_DATA carries the validation targets',
   Object.keys(REFERENCE_DATA).length >= 6,
   Object.keys(REFERENCE_DATA).join(', '));
 check('REFERENCE_DATA is frozen', Object.isFrozen(REFERENCE_DATA));
+
+// ── the PLANET-CHAIN counterfactual (K6, plan 02) ────────────────────────────
+// The scene's planets read the governed artifact through the pure evaluator;
+// a perturbed artifact must change the evaluated elements — the artifact is a
+// PARAMETER of the chain, never a hidden import the evaluator bypasses. (The
+// mass → artifact leg is the measured demonstration in
+// tools/explore/k6-mass-counterfactual.mjs — engine reruns are minutes-class,
+// not gate material; this tier gates the injection plumbing.)
+{
+  const baseChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+  const el0 = computePlanetElementsAtYear(2100, baseChains.mercury, baseChains);
+  const nep0 = computePlanetElementsAtYear(2100, baseChains.neptune, baseChains);
+
+  const art2 = JSON.parse(JSON.stringify(CHAIN_ARTIFACT));
+  // Perturb Mercury's engine-extracted anchor ϖ by 0.1° — the skeleton is
+  // anchor-differenced, so the anchor is the most legible injection point
+  // (a mode-amplitude perturbation nearly cancels at short dt by design).
+  art2.j2000AnchorElements.mercury.lonPeriEclipticDeg += 0.1;
+  const cfChains = buildPlanetChainsFromArtifactData(art2);
+  const el1 = computePlanetElementsAtYear(2100, cfChains.mercury, cfChains);
+  const nep1 = computePlanetElementsAtYear(2100, cfChains.neptune, cfChains);
+
+  check('chain: perturbed artifact changes the evaluated elements',
+    el1.lonPeriEclipticDeg !== el0.lonPeriEclipticDeg || el1.e !== el0.e,
+    `ϖ ${el0.lonPeriEclipticDeg.toFixed(6)} -> ${el1.lonPeriEclipticDeg.toFixed(6)}°`);
+  check('chain: the untouched planet is bit-identical (locality of injection)',
+    nep1.lonPeriEclipticDeg === nep0.lonPeriEclipticDeg && nep1.e === nep0.e && nep1.inclEclipticDeg === nep0.inclEclipticDeg);
+  const el1b = computePlanetElementsAtYear(2100, buildPlanetChainsFromArtifactData(art2).mercury, cfChains);
+  check('chain: the counterfactual reproduces', el1b.lonPeriEclipticDeg === el1.lonPeriEclipticDeg);
+}
 
 console.log(`\n${'='.repeat(74)}`);
 if (failed) {
