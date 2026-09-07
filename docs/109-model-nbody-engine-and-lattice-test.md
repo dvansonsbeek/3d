@@ -526,6 +526,62 @@ tighten it to ±0.061). Full adoption awaits a true independent leg — a
 from-scratch second-order derivation, or an external integration at
 better than 1-significant-figure precision.
 
+## 15. The mass counterfactual — the causal chain closed, measured (K6)
+
+The two-engine restatement's central claim is causal: the planets the
+simulator renders hang off the governed artifact, the artifact hangs off
+the N-body engine, and the engine hangs off the constants — so changing
+one planet's mass must propagate to every other planet's element drifts.
+DE440 is a fit and La2010 is someone else's integration; neither can
+answer "what if Jupiter were 1 % heavier". K6 measured this model's
+answer (`tools/explore/k6-mass-counterfactual.mjs`, ~2 s, re-runnable;
+the probe imports the one-home integrator and seed and carries an
+independent window-rate readout — no pipeline file involved):
+
+```
+GM_Jupiter × 1.01 — two fresh 1800–2100 window runs (WH o2, dt 2 d, 1PN):
+
+planet    banked gr   baseline    Δ(closure)   counterfactual   RESPONSE Δϖ̇
+mercury      572.0      572.0        0.00          573.6  +   1.536 ″/cy
+venus         22.7       22.7       -0.07           29.2  +   6.526
+earth       1154.4     1154.4        0.00         1161.5  +   7.048
+mars        1597.8     1597.8       -0.01         1610.4  +  12.647
+jupiter      488.5      488.3       -0.20          492.8  +   4.429
+saturn     -1576.6    -1576.0        0.63        -1588.2   -12.151
+uranus       806.6      806.7        0.11          806.8  +   0.080
+neptune     9101.7     9103.5        1.79         9214.0  + 110.510
+```
+
+Three readings, each labelled:
+
+- **The closure (theory ≡ its own artifact).** The baseline reproduces
+  the banked window rates (worst Neptune 1.79 ″/cy on a 9,100 ″/cy rate
+  — 0.02 % relative, the near-stationary-apse readout class). The
+  scene's elements are exactly what a fresh integration of the constants
+  gives; no hidden layer intervenes.
+- **The response (theory-vs-theory, and it lands on L-L's doorstep).**
+  Mercury answers +1.536 ″/cy against the first-order Laplace–Lagrange
+  expectation of ≈ +1.54 (1 % of Jupiter's ≈ 153.6 ″/cy share — an
+  external reference label, never an input). Saturn responds NEGATIVE
+  (a heavier Jupiter deepens its retrograde window — the GI pair);
+  Uranus barely moves (it rides Jupiter's own g₅, which shifts with
+  its carrier); Neptune's +110 is the near-stationary-apse
+  hypersensitivity, not a large physical precession change.
+- **The gate.** `test:counterfactual` now carries a planet-chain
+  injection tier (perturbed artifact ⇒ changed elements; untouched
+  planets bit-identical; reproducible; fail-proven on a no-op) — the
+  plumbing half is enforced on every `npm run check`, the physics half
+  is this section's measured record.
+
+Measured the same day, same class (`tools/explore/k5c-invplane-probe.mjs`
+and the inline comparison recorded in plan 02): Earth's inclination to
+the invariable plane from the model's own 1-Myr WH run agrees with
+La2010 to **RMS 0.003° / max 0.011° over −500 kyr → 0** (theory-vs-theory
+— two independent integrations from nothing but the J2000 seed and DE440
+masses). The runtime chart's visible gap against La2010 is the 8-mode
+ζ-skeleton compression of our own engine (0.204° RMS, chain-vs-engine ≈
+chain-vs-La2010 to the fourth decimal), not a physics difference.
+
 ## Related documents
 
 - [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) — §1.8: the projection identity, the transit test, the candidate slot
