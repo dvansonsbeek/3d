@@ -135,7 +135,9 @@ export { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
 export { createEclipseFinders } from './eclipse/finders.cjs';
 // Phase 8.6 — the published reference curves (external comparison formulas
 // and datasets, exactly as published; comparison references, never inputs).
-export * as publishedCurves from './reference/published-curves.cjs';
+// (reference/published-curves MIGRATED to @essrt/reference at the 4.0.0
+// major — the published model package carries no comparison references;
+// the K2 one-way wall is package-structural.)
 // Phase 9 — S-P8: the fitted sun-longitude harmonic stack (three copies → one).
 export { createSunLongitudeCorrection } from './sun/longitude-correction.cjs';
 

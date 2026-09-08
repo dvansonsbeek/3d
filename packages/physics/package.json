@@ -1,6 +1,6 @@
 {
   "name": "@essrt/physics",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core \u2014 pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
     "modelVersion": "v13.0",
@@ -54,7 +54,6 @@
     "./climate/l1-orbital": "./src/climate/l1-orbital.cjs",
     "./eclipse/finders": "./src/eclipse/finders.cjs",
     "./eclipse/sun-planetary-completion": "./src/eclipse/sun-planetary-completion.cjs",
-    "./reference/published-curves": "./src/reference/published-curves.cjs",
     "./sun/longitude-correction": "./src/sun/longitude-correction.cjs"
   },
   "license": "AGPL-3.0-or-later"

@@ -24,6 +24,7 @@ The simulation includes several interactive panels for inspecting planetary data
 | ~~Invariable Plane Balance Explorer~~ | REMOVED (Fibonacci-law retirement; code excised with the legacy chains) — [doc 53](53-balance-explorer-reference.md) is the record |
 | ~~Eccentricity Balance Scale~~ | REMOVED (Fibonacci-law retirement; code excised with the legacy chains) — [doc 38](38-eccentricity-scale.md) is the record |
 | ~~Solar System Resonance Cycle~~ | REMOVED (Fibonacci-law retirement; code excised with the legacy chains) — [doc 55](55-solar-system-resonance-cycle-periods.md) carries the period table |
+| **Standard Model (VSOP87)** | K8 reference overlay: pale-blue ghost bodies (Sun + seven planets) at the standard theory's positions + live per-body Δ readout (″, astrometric both sides). Truncated VSOP87A, measured 0.3–3.6″ RMS vs JPL 1600–2400; one-way reference — nothing in the model consumes it |
 | **WebGeoCalc Explorer** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet — see [doc 56](56-webgeocalc-explorer.md) |
 | **Climate Formula Explorer** | L1+L2+L3 climate formula visualized across LR04 / CENOGRID / EPICA / CenCO2PIP, multiple time windows — see [doc 58](58-climate-formula-explorer.md) |
 | **ESSRT Explorer** | Deep-time evolution of H, LOD, year length, Moon distance under Expanding Solar System Resonance Theory — see [doc 59](59-essrt-explorer.md) |

@@ -36,7 +36,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { buildInputsBlock } = require('../lib/artifact-inputs');
-const { stephensonDeltaT } = require('@essrt/physics/reference/published-curves');
+const { stephensonDeltaT } = require('@essrt/reference/published-curves');   // comparison band only (one-way)
 const DT = require('../lib/deep-time.js');
 
 const ROOT = path.join(__dirname, '..', '..');

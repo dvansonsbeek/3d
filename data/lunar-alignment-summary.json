@@ -522,7 +522,7 @@
       "data/rspa20160404supp2/Table-S12.txt": "sha256:f8f24b020db4af857c184cc164212e07d5109efda2a9c6da7551130022f1abc6",
       "data/rspa20160404supp2/Table-S13.txt": "sha256:515a56e47aeec316f35f509ab699187a3ed8f0b220ad131c34133ec34dddc7ce",
       "data/rspa20160404supp2/Table-S14.txt": "sha256:67485e0c349f5c2e7ec3aa4f7952e93832fc1d6728f4bd8f4bfbcd26f7c6a6e6",
-      "packages/api/src/app.js": "sha256:3d65beb6339fc0cc6c936e40041442430d223bd9fcedfa9c02078137aca0992e",
+      "packages/api/src/app.js": "sha256:4697b98474228b39c1f0c4ab4ae2636653ad3a2c44f7e2a6c072a70ce6a1029c",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
       "packages/physics/src/moon/apparent.cjs": "sha256:fba578d19fa107d66cb6b655a56b5d81b4b11219ab88296022abd9379f53df37",
       "packages/physics/src/moon/series.cjs": "sha256:d8bdbefbbbefec74f168c7d87ff58cdb758abf8d23476c8b59addbe46335d0cf",
@@ -533,7 +533,7 @@
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/model-parameters.json": "sha256:e4add264813ec19a2ad50281b7da5eace84e13c6c2dc9bec82952cdc71bddd72",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
-      "tools/verify/lunar-alignment.js": "sha256:13f43de1837ea86881ee8b9df4588fd679a53e4a155b12639e9c2dc69f4d016b"
+      "tools/verify/lunar-alignment.js": "sha256:5da1a8d1f9d079002d239897dfa9123a7025716aaff38ab809c8921f13f3483a"
     }
   }
 }

@@ -11,7 +11,12 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+// K8 — the reference package: ONE-WAY imports (comparison only;
+// @essrt/reference is private-by-construction and nothing in the model
+// chain depends on it). publishedCurves migrated here from
+// @essrt/physics at its 4.0.0 major.
+import { vsop87AstrometricGeoEclipticAU, publishedCurves as _PC } from '@essrt/reference';
 
 
 /*
@@ -9430,6 +9435,17 @@ let o = {
   massWeightedBalance: 0,           // Mass-weighted height balance (AU)
   planetsAboveInvPlane: 0,          // Count of planets above
   planetsBelowInvPlane: 0,          // Count of planets below
+
+  // K8 — the standard-model reference overlay (VSOP87A ghosts + live Δ)
+  showStandardModel: false,
+  stdDeltaSunArcsec: 0,
+  stdDeltaMercuryArcsec: 0,
+  stdDeltaVenusArcsec: 0,
+  stdDeltaMarsArcsec: 0,
+  stdDeltaJupiterArcsec: 0,
+  stdDeltaSaturnArcsec: 0,
+  stdDeltaUranusArcsec: 0,
+  stdDeltaNeptuneArcsec: 0,
 
   // Validation: Option A vs Option B comparison
   calculatedPlaneTilt: 0,           // Calculated tilt from angular momentum (°) - J2000 fixed
@@ -19781,20 +19797,20 @@ function siderealYearChapront(year) { return _pubCurves().siderealYearChapront(y
 function axialPrecessionCapitaine2009(year) { return _pubCurves().axialPrecessionCapitaine2009(year); }
 
 // ── Berger (1978) trigonometric series ────────────────────────────
-// 8.6-1: series + evaluators live in @essrt/physics/reference/published-curves.
+// 8.6-1: series + evaluators live in @essrt/reference/published-curves.
 
 function eccBerger1978(year) { return _PC.eccBerger1978(year); }
 
 function obliquityBerger1978(year) { return _PC.obliquityBerger1978(year); }
 
 // ── Vondrák et al. (2011) long-term precession ──────────────────
-// 8.6-1: table + evaluator live in @essrt/physics/reference/published-curves.
+// 8.6-1: table + evaluator live in @essrt/reference/published-curves.
 
 function axialPrecessionVondrak2011(year) { return _PC.axialPrecessionVondrak2011(year); }
 
 // ── Laskar La2004 N-body solution (IMCCE) ────────────────────────
 // 8.6-1: the 351-row published table + interpolants live in
-// @essrt/physics/reference/published-curves.
+// @essrt/reference/published-curves.
 
 function eccLa2004(year) { return _PC.eccLa2004(year); }
 function obliquityLa2004(year) { return _PC.obliquityLa2004(year); }
@@ -23313,6 +23329,26 @@ function setupGUI() {
     const dt = periDetailEls[geoKey];
     if (dt && dt.bladeEl) dt.bladeEl.after(dt.row);
   });
+
+  // ── K8: the Standard-Model overlay — top-level, observed category ──
+  {
+    const stdFolder = gui.addFolder({ title: 'Standard Model (VSOP87)', expanded: false });
+    stdFolder.element.dataset.category = 'observed';
+    addFolderTooltip(stdFolder, 'The Sun and the seven planets AS THE CURRENT SCIENTIFIC MODEL predicts them (VSOP87A, truncated series measured at 0.3–3.6″ RMS vs JPL Horizons over 1600–2400), shown as pale-blue ghost bodies next to the model’s own, with the live angular separation per body. Both sides use the same astrometric convention. The comparison is published either way it falls — nothing in the model is tuned to it. Beyond ±4,000 years the ghosts are a stated extrapolation of the standard theory: the divergence you see at deep time is part of the model’s claim.');
+    addTooltip(stdFolder.addBinding(o, 'showStandardModel', { label: 'Show ghost bodies' }),
+      'Toggle the VSOP87 ghost markers in the 3D scene. Ghosts share each body’s size and follow the standard theory’s positions.');
+    const stdFmt = { readonly: true, format: (v) => v.toFixed(1) + '″' };
+    const stdRows = [
+      ['stdDeltaSunArcsec', 'Δ Sun'], ['stdDeltaMercuryArcsec', 'Δ Mercury'],
+      ['stdDeltaVenusArcsec', 'Δ Venus'], ['stdDeltaMarsArcsec', 'Δ Mars'],
+      ['stdDeltaJupiterArcsec', 'Δ Jupiter'], ['stdDeltaSaturnArcsec', 'Δ Saturn'],
+      ['stdDeltaUranusArcsec', 'Δ Uranus'], ['stdDeltaNeptuneArcsec', 'Δ Neptune'],
+    ];
+    for (const [key, label] of stdRows) {
+      addTooltip(stdFolder.addBinding(o, key, { label, ...stdFmt }),
+        'Geocentric angular separation between the model’s rendered body and the VSOP87 standard position (astrometric, same light-time convention both sides). Updates only while the overlay is on.');
+    }
+  }
 
   // ── Solar & Lunar Eclipses — top-level, observed category ──
   // Catalog of well-known historical eclipses with Prev/Next navigation that
@@ -51733,6 +51769,77 @@ function _kcUpdateOrbitLine(obj, nm, jd) {
   line.position.copy(SUN_POS);
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// K8 — THE STANDARD-MODEL REFERENCE OVERLAY: the Sun and the seven planets
+// AS THE CURRENT SCIENTIFIC MODEL predicts them (VSOP87A, truncated +
+// JPL-cache-measured 0.3–3.6″ RMS over 1600–2400 — the k8-vsop-probe
+// record), rendered as ghost bodies next to the model's own, with a live
+// per-body Δ readout (geocentric angular separation, model vs standard).
+// BOTH sides share one convention: astrometric (body retarded by
+// light-time, Earth at reception time), the same construction the chain
+// flip uses. ONE-WAY BOUNDARY (the K2 doctrine): the reference evaluator
+// renders and compares only — nothing in the model chain consumes it.
+// The comparison is published either way it falls; nothing is tuned to it.
+// Beyond ±4 kyr the overlay is a stated extrapolation of the standard
+// theory — the deep-time divergence is part of the product.
+// ═══════════════════════════════════════════════════════════════════════════
+const _K8_BODIES = [
+  ['sun', null], ['mercury', null], ['venus', null], ['mars', null],
+  ['jupiter', null], ['saturn', null], ['uranus', null], ['neptune', null],
+];
+let _k8Ghosts = null;
+const _K8_V = new THREE.Vector3(), _K8_W = new THREE.Vector3(), _K8_S = new THREE.Vector3();
+function _k8BodyObj(name) {
+  return ({ sun, mercury, venus, mars, jupiter, saturn, uranus, neptune })[name];
+}
+function _k8EnsureGhosts() {
+  if (_k8Ghosts) return;
+  _k8Ghosts = {};
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0x7fd4ff, transparent: true, opacity: 0.38, depthWrite: false,
+  });
+  for (const [name] of _K8_BODIES) {
+    const body = _k8BodyObj(name);
+    const ghost = new THREE.Mesh(body.planetObj.geometry, mat);   // shared geometry — same size as the real mesh
+    ghost.name = 'K8-standard-' + name;
+    ghost.visible = false;
+    scene.add(ghost);
+    _k8Ghosts[name] = ghost;
+  }
+}
+function _k8UpdateStandardOverlay() {
+  if (!o.showStandardModel) {
+    if (_k8Ghosts) for (const g of Object.values(_k8Ghosts)) g.visible = false;
+    return;
+  }
+  _k8EnsureGhosts();
+  const R = _kcR;
+  const lightDaysPerAU = auToKm(1) / speedOfLight / 86400;   // from the model's own c/AU homes
+  for (const [name] of _K8_BODIES) {
+    const body = _k8BodyObj(name);
+    const ghost = _k8Ghosts[name];
+    // the standard side: VSOP87A astrometric geocentric, ecliptic J2000 →
+    // scene world through the SAME frame bridge and Earth anchor the chain
+    // rendering uses
+    const g = vsop87AstrometricGeoEclipticAU(name, o.julianDay, lightDaysPerAU);
+    _K8_V.set(
+      EARTH_POS.x + 100 * (R[0][0] * g[0] + R[0][1] * g[1] + R[0][2] * g[2]),
+      EARTH_POS.y + 100 * (R[1][0] * g[0] + R[1][1] * g[1] + R[1][2] * g[2]),
+      EARTH_POS.z + 100 * (R[2][0] * g[0] + R[2][1] * g[1] + R[2][2] * g[2]));
+    ghost.position.copy(_K8_V);
+    body.planetObj.getWorldScale(_K8_S);
+    ghost.scale.copy(_K8_S);
+    ghost.visible = body === sun ? true : body.visible !== false;
+    // the model side: the rendered body's geocentric direction
+    if (body === sun) _K8_W.copy(SUN_POS); else body.planetObj.getWorldPosition(_K8_W);
+    _K8_W.sub(EARTH_POS).normalize();
+    _K8_V.sub(EARTH_POS).normalize();
+    const sepArcsec = Math.acos(Math.min(1, Math.max(-1, _K8_W.dot(_K8_V)))) * (180 / Math.PI) * 3600;
+    const key = 'stdDelta' + name.charAt(0).toUpperCase() + name.slice(1) + 'Arcsec';
+    o[key] = sepArcsec;
+  }
+}
+
 function updatePositions() {
   // Derive the frame rotation BEFORE the anchor reads (the triad
   // probe re-animates the graph to its own epochs, then restores).
@@ -51944,6 +52051,10 @@ function updatePositions() {
     const perihelionRadius   = DELTA.length();
     obj.perihelionDistAU     = perihelionRadius / 100;
   }
+
+  // K8 — the standard-model ghosts + Δ readout (after the planet loop:
+  // EARTH_POS/SUN_POS, the frame bridge and the rendered meshes are fresh)
+  _k8UpdateStandardOverlay();
 
   // ─────────────────────── camera read-out ─────────────────────────
   camera.getWorldPosition(CAMERA_POS);

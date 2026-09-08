@@ -15,7 +15,10 @@
 import { readFileSync } from 'node:fs';
 import { URL } from 'node:url';
 import { createModel, DEFAULT_CONSTANTS } from '../../physics/src/index.js';
-import * as curves from '../../physics/src/reference/published-curves.cjs';
+// Comparison curves from @essrt/reference (one-way: the api's
+// cross-validation endpoints COMPARE against them, nothing more;
+// migrated from @essrt/physics at its 4.0.0 major).
+import * as curves from '../../reference/src/published-curves.cjs';
 import { MODEL_VALUES, MODEL_VALUES_META } from '../../model-values/src/index.js';
 import { envelope, API_VERSION } from './envelope.js';
 import { problem, notFound, methodNotAllowed } from './problem.js';

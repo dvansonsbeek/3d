@@ -52,6 +52,9 @@ The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astron
   and their fitted corrections are deleted — see doc 41's engine-D
   rendering note and docs 62–64/67/71 for the records)
 - Long-term precession cycles (axial, perihelion, inclination)
+- The standard-model reference overlay (K8): VSOP87A ghost bodies for the
+  Sun + seven planets with a live per-body Δ readout — one-way reference,
+  comparison published either way it falls (docs 50/109 §16)
 - Invariable plane visualization and validation
 - Multiple calendar systems (Gregorian, Julian, Perihelion)
 - Interactive time control with variable speed simulation

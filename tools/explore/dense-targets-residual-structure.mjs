@@ -48,7 +48,7 @@ const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const require2 = createRequire(join(ROOT, 'package.json'));
 const DT = require2('./tools/lib/deep-time.js');
 const C = require2('./tools/lib/constants.js');
-const { stephensonDeltaT } = require2('@essrt/physics/reference/published-curves');
+const { stephensonDeltaT } = require2('@essrt/reference/published-curves');
 
 const model = createModel(DEFAULT_CONSTANTS);
 const steph = JSON.parse(readFileSync(join(ROOT, 'public/input/lunar-eclipses-stephenson-2016.json'), 'utf8'));
