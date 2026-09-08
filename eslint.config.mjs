@@ -69,6 +69,7 @@ export default [
         { type: 'data',         pattern: 'packages/data/*' },
         { type: 'model-values', pattern: 'packages/model-values/*' },
         { type: 'fitting',   pattern: 'packages/fitting/*' },
+        { type: 'reference', pattern: 'packages/reference/*' },
         { type: 'adapter',   pattern: 'packages/(api|mcp|render)/*', capture: ['name'] },
         { type: 'app',       pattern: 'packages/(simulator|dashboard)/*', capture: ['name'] },
       ],
@@ -124,12 +125,26 @@ export default [
 
           // Who may depend on whom. Adapters and apps may use physics and data,
           // never each other, and nothing may depend upward.
-          { from: { element: { type: 'physics' } },  disallow: { to: { element: { types: { anyOf: ['data', 'fitting', 'adapter', 'app'] } } } }, message: 'physics may depend on nothing but physics (§2b).' },
-          { from: { element: { type: 'fixtures' } }, disallow: { to: { element: { types: { anyOf: ['data', 'fitting', 'adapter', 'app'] } } } }, message: 'fixtures imports only physics (§2b).' },
-          { from: { element: { type: 'data' } },     disallow: { to: { element: { types: { anyOf: ['fitting', 'adapter', 'app'] } } } }, message: 'data may not depend on its consumers (§2b).' },
-          { from: { element: { type: 'model-values' } }, disallow: { to: { element: { types: { anyOf: ['physics', 'data', 'fitting', 'adapter', 'app'] } } } }, message: 'model-values is rendered output — it depends on nothing (the registry generates it).' },
+          { from: { element: { type: 'physics' } },  disallow: { to: { element: { types: { anyOf: ['data', 'fitting', 'adapter', 'app', 'reference'] } } } }, message: 'physics may depend on nothing but physics (§2b); @essrt/reference is comparison material — the K2/K8 one-way wall.' },
+          { from: { element: { type: 'fixtures' } }, disallow: { to: { element: { types: { anyOf: ['data', 'fitting', 'adapter', 'app', 'reference'] } } } }, message: 'fixtures imports only physics (§2b).' },
+          { from: { element: { type: 'data' } },     disallow: { to: { element: { types: { anyOf: ['fitting', 'adapter', 'app', 'reference'] } } } }, message: 'data may not depend on its consumers (§2b) — nor on the reference wall (K2/K8).' },
+          { from: { element: { type: 'model-values' } }, disallow: { to: { element: { types: { anyOf: ['physics', 'data', 'fitting', 'adapter', 'app', 'reference'] } } } }, message: 'model-values is rendered output — it depends on nothing (the registry generates it).' },
+          // NOTE: no fitting→reference policy here — '@essrt/reference'
+          // resolves through the workspace symlink and classifies as
+          // EXTERNAL origin, so an element-type policy never matches it
+          // (proven: a planted require passed). physics/fixtures/
+          // model-values catch it via their blanket external bans; for the
+          // packages that legitimately import externals (fitting, data) the
+          // wall is the scoped core-rule block further down ("K2/K8
+          // one-way reference wall").
           { from: { element: { type: 'adapter' } },  disallow: { to: { element: { types: { anyOf: ['adapter', 'app', 'fitting'] } } } }, message: 'adapters may use physics and data, never each other (§2b).' },
           { from: { element: { type: 'app' } },      disallow: { to: { element: { types: { anyOf: ['adapter', 'app', 'fitting'] } } } }, message: 'apps may use physics and data, never each other (§2b).' },
+          // The reference package is STANDALONE comparison material (K2/K8):
+          // it evaluates published theories from data/ JSON and depends on no
+          // model package (adapters and apps may consume IT — one way only).
+          { from: { element: { type: 'reference' } }, disallow: { to: { element: { types: { anyOf: ['physics', 'fixtures', 'data', 'model-values', 'fitting', 'adapter', 'app'] } } } }, message: '@essrt/reference is standalone comparison material — it may not depend on the model (K2/K8).' },
+          { from: { element: { type: 'reference' } }, disallow: { to: { module: { origin: 'external' } } }, message: '@essrt/reference must import nothing external — it is bundled for browsers and stays self-contained.' },
+          { from: { element: { type: 'reference' } }, disallow: { to: { module: { origin: 'core' } } }, message: '@essrt/reference must not import Node builtins — it runs in a browser too.' },
         ],
       }],
 
@@ -238,6 +253,30 @@ export default [
         console: 'readonly', process: 'readonly', URL: 'readonly', Buffer: 'readonly',
         __dirname: 'readonly', require: 'readonly', module: 'readonly',
       },
+    },
+  },
+
+  {
+    /* K2/K8 — the ONE-WAY reference wall for the packages whose external
+     * imports are otherwise legitimate (fitting, data): @essrt/reference
+     * (VSOP87 · MPP02 · the published comparison curves) is comparison
+     * material, and FITTING the model to it is exactly what the doctrine
+     * forbids. The boundaries matrix cannot express this ban — the
+     * workspace symlink classifies '@essrt/reference' as external origin,
+     * so an element-type policy never fires (proven: a planted require
+     * passed) — hence core rules: no-restricted-imports for ESM and a
+     * require()-selector for CJS. Both directions fail-proven. */
+    files: ['packages/fitting/**/*.js', 'packages/fitting/**/*.mjs', 'packages/fitting/**/*.cjs',
+            'packages/data/**/*.js', 'packages/data/**/*.mjs', 'packages/data/**/*.cjs'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [{ group: ['@essrt/reference', '@essrt/reference/*', '**/packages/reference/**'],
+          message: 'ONE-WAY BOUNDARY (K2/K8): the model chain must not consume @essrt/reference — comparison surfaces only.' }],
+      }],
+      'no-restricted-syntax': ['error', {
+        selector: 'CallExpression[callee.name="require"][arguments.0.value=/^@essrt\\u002freference|packages\\u002freference/]',
+        message: 'ONE-WAY BOUNDARY (K2/K8): the model chain must not consume @essrt/reference — comparison surfaces only.',
+      }],
     },
   },
 

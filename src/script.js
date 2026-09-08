@@ -16,7 +16,7 @@ import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
 // @essrt/physics at its 4.0.0 major.
-import { vsop87AstrometricGeoEclipticAU, mpp02AstrometricGeoEclipticJ2000Km, publishedCurves as _PC } from '@essrt/reference';
+import { vsop87AstrometricGeoEclipticAU, vsop87HelioEclipticAU, mpp02AstrometricGeoEclipticJ2000Km, publishedCurves as _PC } from '@essrt/reference';
 
 
 /*
@@ -23335,7 +23335,7 @@ function setupGUI() {
   {
     const stdFolder = gui.addFolder({ title: 'Standard Model (VSOP87 · MPP02)', expanded: false });
     stdFolder.element.dataset.category = 'observed';
-    addFolderTooltip(stdFolder, 'The Sun, Moon and the seven planets AS THE CURRENT SCIENTIFIC MODEL predicts them (planets/Sun: VSOP87A, truncated series measured at 0.3–3.6″ RMS vs JPL Horizons over 1600–2400; Moon: ELP/MPP02, measured 0.22″ RMS over the observed-ΔT era, on the standard Stephenson-2016 ΔT), shown as pale-blue ghost bodies next to the model’s own, with the live angular separation per body. Both sides use the same astrometric convention. The comparison is published either way it falls — nothing in the model is tuned to it. Beyond ±4,000 years the ghosts are a stated extrapolation of the standard theory: the divergence you see at deep time is part of the model’s claim.');
+    addFolderTooltip(stdFolder, 'The Sun, Moon and the seven planets AS THE CURRENT SCIENTIFIC MODEL predicts them (planets/Sun: VSOP87A, truncated series measured at 0.3–3.6″ RMS vs JPL Horizons over 1600–2400; Moon: ELP/MPP02, measured 0.22″ RMS over the observed-ΔT era, on the standard Stephenson-2016 ΔT), shown as pale-blue ghost bodies — the planets with the standard theory’s own orbit rings — next to the model’s own, with the live angular separation per body. Both sides use the same astrometric convention. The comparison is published either way it falls — nothing in the model is tuned to it. Beyond ±4,000 years the ghosts are a stated extrapolation of the standard theory: the divergence you see at deep time is part of the model’s claim.');
     addTooltip(stdFolder.addBinding(o, 'showStandardModel', { label: 'Show ghost bodies' }),
       'Toggle the VSOP87 ghost markers in the 3D scene. Ghosts share each body’s size and follow the standard theory’s positions.');
     const stdFmt = { readonly: true, format: (v) => v.toFixed(1) + '″' };
@@ -51809,9 +51809,67 @@ function _k8EnsureGhosts() {
     _k8Ghosts[name] = ghost;
   }
 }
+// K8 — the STANDARD orbit rings: each planet ghost carries the standard
+// theory's own heliocentric path over one orbital period, sampled from
+// VSOP87A and anchored at the STANDARD Sun's position (the whole ghost
+// system hangs together — no model quantity enters). The period span
+// comes from a two-pass estimate on VSOP itself (r(jd) → coarse loop →
+// a = (r_min+r_max)/2 → P), the frame rotation and anchor are applied
+// per frame, and vertices resample on the same cadence as the chain
+// rings. At deep time the ring shows the standard theory's polynomial
+// extrapolation deforming honestly — that divergence is the product.
+const _K8_ORBIT_SEGS = 192;
+const _K8_SUNPOS = new THREE.Vector3();
+function _k8UpdateGhostOrbit(name, ghost) {
+  let line = ghost._k8Orbit;
+  if (!line) {
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array((_K8_ORBIT_SEGS + 1) * 3), 3));
+    line = new THREE.Line(geom, new THREE.LineBasicMaterial({
+      color: 0x7fd4ff, transparent: true, opacity: 0.22, depthWrite: false,
+    }));
+    line.frustumCulled = false;
+    scene.add(line);
+    ghost._k8Orbit = line;
+  }
+  const jd = o.julianDay;
+  if (line._k8SampleJD === undefined || Math.abs(jd - line._k8SampleJD) > _KC_ORBIT_RESAMPLE_DAYS) {
+    const r0 = vsop87HelioEclipticAU(name, jd);
+    let p = 365.25 * Math.pow(Math.hypot(r0[0], r0[1], r0[2]), 1.5);   // first-pass span from |r|
+    let rMin = Infinity, rMax = 0;
+    for (let i = 0; i < 16; i++) {
+      const h = vsop87HelioEclipticAU(name, jd + (i / 16 - 0.5) * p * 1.4);
+      const r = Math.hypot(h[0], h[1], h[2]);
+      if (r < rMin) rMin = r;
+      if (r > rMax) rMax = r;
+    }
+    p = 365.25 * Math.pow((rMin + rMax) / 2, 1.5);                     // second pass: a = (min+max)/2
+    const arr = line.geometry.attributes.position.array;
+    for (let i = 0; i <= _K8_ORBIT_SEGS; i++) {
+      const h = vsop87HelioEclipticAU(name, jd + (i / _K8_ORBIT_SEGS - 0.5) * p);
+      arr[i * 3] = 100 * h[0]; arr[i * 3 + 1] = 100 * h[1]; arr[i * 3 + 2] = 100 * h[2];
+    }
+    line.geometry.attributes.position.needsUpdate = true;
+    line._k8SampleJD = jd;
+  }
+  const R = _kcR;
+  _KC_M4.set(R[0][0], R[0][1], R[0][2], 0,
+             R[1][0], R[1][1], R[1][2], 0,
+             R[2][0], R[2][1], R[2][2], 0,
+             0, 0, 0, 1);
+  line.setRotationFromMatrix(_KC_M4);
+  line.position.copy(_K8_SUNPOS);
+  line.visible = ghost.visible;
+}
+
 function _k8UpdateStandardOverlay() {
   if (!o.showStandardModel) {
-    if (_k8Ghosts) for (const g of Object.values(_k8Ghosts)) g.visible = false;
+    if (_k8Ghosts) {
+      for (const g of Object.values(_k8Ghosts)) {
+        g.visible = false;
+        if (g._k8Orbit) g._k8Orbit.visible = false;
+      }
+    }
     return;
   }
   _k8EnsureGhosts();
@@ -51844,6 +51902,10 @@ function _k8UpdateStandardOverlay() {
     body.planetObj.getWorldScale(_K8_S);
     ghost.scale.copy(_K8_S);
     ghost.visible = body === sun ? true : body.visible !== false;
+    // the standard Sun anchors the ghost orbit rings; each planet ghost
+    // then carries the standard theory's own orbit path
+    if (name === 'sun') _K8_SUNPOS.copy(_K8_V);
+    else if (name !== 'moon') _k8UpdateGhostOrbit(name, ghost);
     // the model side: the rendered body's geocentric direction
     if (body === sun) _K8_W.copy(SUN_POS); else body.planetObj.getWorldPosition(_K8_W);
     _K8_W.sub(EARTH_POS).normalize();
