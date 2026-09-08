@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+// ⚠ HISTORICAL INSTRUMENT (pre-K5-excision): this script drove the scene's
+// legacy/chain flag (SG._setKeplerChains), REMOVED with the K5 legacy-chain
+// excision — the chain is the only planet path and the legacy side of this
+// comparison no longer exists in the code. The measured findings recorded
+// below are the permanent record; the script no longer runs as written.
+//
 // P5/K3 — old-vs-new parity: the geometric two-vector chains (shipped) vs the
 // engine-D-driven Keplerian flag path, as geocentric RA/Dec through the SAME
 // readout (computePlanetPosition), toggled in-process.

@@ -2,10 +2,19 @@
 docVersion: 1.0
 modelVersion: v13.0
 coefficients: sha256:9e0460662933228f
-status: current
+status: historical
 ---
 
 # 71 — Correction Stack Architecture
+
+> **Status: HISTORICAL — the stack this doc describes was deleted in the K5
+> legacy-chain excision.** The seven planets render from the engine-D
+> Keplerian chain (`@essrt/physics/planets/keplerian-chain` + the governed
+> artifact), which has no fitted display corrections; the parallax /
+> gravitation / elongation layers, their fitters (ex-Steps 5a–5b) and their
+> `fitted-coefficients.json` keys are gone. The Moon Meeus layer
+> (`MOON_CORRECTION`) is unaffected and remains shipped. This doc is kept as
+> the record of what the fitted stack was and why it was built.
 
 ## Overview
 

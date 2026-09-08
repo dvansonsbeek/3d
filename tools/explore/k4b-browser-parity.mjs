@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+// ⚠ HISTORICAL INSTRUMENT (pre-K5-excision): this script toggled the
+// legacy/chain flag in BOTH engines (window._setKeplerChains /
+// SG._setKeplerChains), REMOVED with the K5 legacy-chain excision — the
+// chain is the only planet path. The parity finding recorded below is the
+// permanent record; the script no longer runs as written. (The chain-side
+// injection hook SG._injectKeplerChains still exists for live instruments.)
+//
 // P5/K4b — BROWSER↔NODE PARITY OF THE KEPLERIAN FLAG PATH: the same chain
 // (one evaluator home in @essrt/physics, the same embedded/on-disk governed
 // artifact, the same runtime frame-bridge derivation) evaluated through the

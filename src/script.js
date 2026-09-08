@@ -46263,13 +46263,13 @@ const planetStats = {
     {header : '—  Sun-SSB Barycentric Motion —' },
       {label : () => `Sun-SSB offset`,
        value : [ { v: () => computeSunSSBOffset(o.currentYear).magnitude, dec:0, sep:',' },{ small: 'km' }],
-       hover : [`Distance from the Sun's center to the Solar System Barycenter (SSB) at the current simulated date. The SSB is the mass-weighted average position of every body in the solar system. Computed as Σ M_b · r_b / M_S where the sum runs over all planets. Maximum ≈ 2.2 R☉ when planets align (Jose 1965). Jupiter+Saturn dominate. This is a center-of-mass calculation, not a gravity simulation. See doc 26 §"Mirror Diagram" and the README's "Mass Calibration Chain" section.`]},
+       hover : [`Distance from the Sun's center to the Solar System Barycenter (SSB) at the current simulated date. The SSB is the mass-weighted average position of every body in the solar system. Computed as Σ M_b · r_b / M_S over the chain's heliocentric planet positions of date. Maximum ≈ 2.2 R☉ when planets align (Jose 1965). Jupiter+Saturn dominate. This is a center-of-mass calculation, not a gravity simulation. See doc 26 §"Mirror Diagram" and the README's "Mass Calibration Chain" section.`]},
       {label : () => `In solar radii`,
        value : [ { v: () => computeSunSSBOffset(o.currentYear).magnitude / (diameters.sunDiameter / 2), dec:3, sep:',' },{ small: 'R☉' }],
        hover : [`Sun-SSB distance in units of solar radius (R☉ = ${fmtNum(diameters.sunDiameter/2, 0, ',')} km). Values < 1 mean SSB sits inside the Sun; > 1 means outside. The Sun's surface passes near or outside the SSB roughly every Jupiter-Saturn synodic period (~20 years).`]},
       {label : () => `Direction (ecliptic λ)`,
        value : [ { v: () => computeSunSSBOffset(o.currentYear).direction, dec:2, sep:',' },{ small: '°' }],
-       hover : [`Heliocentric ecliptic longitude pointing from Sun toward SSB. This is roughly the angular position of the dominant pulling planet (usually Jupiter).`]},
+       hover : [`In-plane longitude (measured in the engine's own invariable plane from the s-frame origin — within ~1.6° of ecliptic longitude) pointing from Sun toward SSB. This is roughly the angular position of the dominant pulling planet (usually Jupiter).`]},
       {label : () => `Inside Sun?`,
        value : [ { v: () => computeSunSSBOffset(o.currentYear).magnitude < (diameters.sunDiameter / 2) ? 'Yes' : 'No' }],
        hover : [`Whether the SSB currently lies inside the Sun's body (R☉ = ${fmtNum(diameters.sunDiameter/2, 0, ',')} km). Famously sometimes outside — e.g., when Jupiter and Saturn align around 1990, 2000-2002, 2017-2018.`]},
@@ -49664,71 +49664,42 @@ function autoOpenGroups(stats, selName, threshold = 25) {
  *  doc 26). Jupiter and Saturn dominate; outer planets matter a little; inner
  *  planets are negligible (<100 km vs Jupiter's ~743,000 km).
  *
- *  This is NOT a gravity simulation — it's a mass-weighted vector sum from
- *  analytical mean orbital motions. See doc 26 and the README's Mass
- *  Calibration Chain section for the derivation.
+ *  This is NOT a gravity simulation — it's a mass-weighted vector sum over
+ *  the chain's heliocentric positions of date. See doc 26 and the README's
+ *  Mass Calibration Chain section for the derivation.
  * ═══════════════════════════════════════════════════════════════════════════ */
 function computeSunSSBOffset(year) {
   // 3D mass-weighted SSB offset (x, y, z in km from Sun's center).
-  // Reference plane: INVARIABLE PLANE — consistent with the model's Fibonacci
-  // balance framework (Law 3 uses inv-plane inclinations).
+  // Reference plane: the ENGINE'S OWN INVARIABLE PLANE (the K5c s-frame:
+  // x̂ = ecliptic-X projected into the plane, ẑ = the banked plane normal).
   //
-  // Fully Keplerian eccentric orbits, fully anchored on the simulation's LIVE
-  // runtime state. For each planet at target year t:
-  //   1. M(t) = o.<planet>MeanAnomaly + 360°·(t − o.currentYear) / T_b
-  //   2. E    = solve Kepler's eq:  M = E − e·sin(E)
-  //   3. ν    = 2·atan2(√(1+e)·sin(E/2), √(1-e)·cos(E/2))     (true anomaly)
-  //   4. r    = a·(1 − e²) / (1 + e·cos ν)                     (heliocentric dist)
-  //   5. argLat = (ω̃ + ν) − Ω                                  (true longitude − asc. node)
-  //   6. (x,y,z) rotated by Ω, i into invariable-plane frame
-  // All five orbital anchors are live runtime values that evolve with the sim:
-  //   M_live  = o.<planet>MeanAnomaly                  (textbook M, linear in time)
-  //   ω̃_live  = o.<planet>Perihelion                    (precesses over ~10⁴ yr)
-  //   i_live  = o.<planet>InvPlaneInclinationDynamic   (oscillates over ~10⁵ yr)
-  //   Ω_live  = o.<planet>AscendingNodeInvPlane        (regresses over ~10⁴ yr)
-  //   e_live  = o.eccentricity<Planet>                  (oscillates over ~10⁴-10⁵ yr)
-  // Fallbacks to J2000 references are kept for first-frame initialization.
-  const dt = year - o.currentYear;
-  const DEG = Math.PI / 180;
+  // K5 excision — the eight body vectors are the CHAIN's heliocentric
+  // positions of date (ecliptic J2000, then projected into the plane); the
+  // per-body Kepler reconstruction from legacy o.* element readouts is gone
+  // with the legacy chains. The sum is unchanged: Δr = Σ M_b · r⃗_b / M_S
+  // (doc 26 — a center-of-mass calculation, not a gravity simulation).
+  const jd = KC_ANCHOR_EPOCH_JD + (year - 2000) * 365.25;
 
   const planetList = [
-    { key: 'mercury', mass: M_MERCURY_SYSTEM, a_km: mercuryOrbitDistance * AU_J2000_KM, periodYr: holisticyearLength / mercurySolarYearCount, M0: o.mercuryMeanAnomaly ?? 0, peri: o.mercuryPerihelion ?? planets.mercury.longitudePerihelion, e: o.eccentricityMercury ?? planets.mercury.orbitalEccentricityBase, i: o.mercuryInvPlaneInclinationDynamic ?? planets.mercury.invPlaneInclinationJ2000, Omega: o.mercuryAscendingNodeInvPlane ?? planets.mercury.ascendingNodeInvPlane },
-    { key: 'venus',   mass: M_VENUS_SYSTEM,   a_km: venusOrbitDistance   * AU_J2000_KM, periodYr: holisticyearLength / venusSolarYearCount,   M0: o.venusMeanAnomaly   ?? 0, peri: o.venusPerihelion   ?? planets.venus.longitudePerihelion,   e: o.eccentricityVenus   ?? planets.venus.orbitalEccentricityBase,   i: o.venusInvPlaneInclinationDynamic   ?? planets.venus.invPlaneInclinationJ2000,   Omega: o.venusAscendingNodeInvPlane   ?? planets.venus.ascendingNodeInvPlane   },
-    { key: 'earth',   mass: M_EARTH_SYSTEM,   a_km: AU_J2000_KM,                         periodYr: 1,                                                  M0: o.earthMeanAnomaly   ?? 0, peri: o.earthPerihelion   ?? ASTRO_REFERENCE.perihelionLongitudeJ2000_deg, e: o.eccentricityEarth   ?? eccentricityBase,                       i: o.earthInvPlaneInclinationDynamic   ?? ASTRO_REFERENCE.earthInclinationJ2000_deg, Omega: o.earthAscendingNodeInvPlane   ?? earthAscendingNodeInvPlaneVerified },
-    { key: 'mars',    mass: M_MARS_SYSTEM,    a_km: marsOrbitDistance    * AU_J2000_KM, periodYr: holisticyearLength / marsSolarYearCount,    M0: o.marsMeanAnomaly    ?? 0, peri: o.marsPerihelion    ?? planets.mars.longitudePerihelion,    e: o.eccentricityMars    ?? planets.mars.orbitalEccentricityBase,    i: o.marsInvPlaneInclinationDynamic    ?? planets.mars.invPlaneInclinationJ2000,    Omega: o.marsAscendingNodeInvPlane    ?? planets.mars.ascendingNodeInvPlane    },
-    { key: 'jupiter', mass: M_JUPITER_SYSTEM, a_km: jupiterOrbitDistance * AU_J2000_KM, periodYr: holisticyearLength / jupiterSolarYearCount, M0: o.jupiterMeanAnomaly ?? 0, peri: o.jupiterPerihelion ?? planets.jupiter.longitudePerihelion, e: o.eccentricityJupiter ?? planets.jupiter.orbitalEccentricityBase, i: o.jupiterInvPlaneInclinationDynamic ?? planets.jupiter.invPlaneInclinationJ2000, Omega: o.jupiterAscendingNodeInvPlane ?? planets.jupiter.ascendingNodeInvPlane },
-    { key: 'saturn',  mass: M_SATURN_SYSTEM,  a_km: saturnOrbitDistance  * AU_J2000_KM, periodYr: holisticyearLength / saturnSolarYearCount,  M0: o.saturnMeanAnomaly  ?? 0, peri: o.saturnPerihelion  ?? planets.saturn.longitudePerihelion,  e: o.eccentricitySaturn  ?? planets.saturn.orbitalEccentricityBase,  i: o.saturnInvPlaneInclinationDynamic  ?? planets.saturn.invPlaneInclinationJ2000,  Omega: o.saturnAscendingNodeInvPlane  ?? planets.saturn.ascendingNodeInvPlane  },
-    { key: 'uranus',  mass: M_URANUS_SYSTEM,  a_km: uranusOrbitDistance  * AU_J2000_KM, periodYr: holisticyearLength / uranusSolarYearCount,  M0: o.uranusMeanAnomaly  ?? 0, peri: o.uranusPerihelion  ?? planets.uranus.longitudePerihelion,  e: o.eccentricityUranus  ?? planets.uranus.orbitalEccentricityBase,  i: o.uranusInvPlaneInclinationDynamic  ?? planets.uranus.invPlaneInclinationJ2000,  Omega: o.uranusAscendingNodeInvPlane  ?? planets.uranus.ascendingNodeInvPlane  },
-    { key: 'neptune', mass: M_NEPTUNE_SYSTEM, a_km: neptuneOrbitDistance * AU_J2000_KM, periodYr: holisticyearLength / neptuneSolarYearCount, M0: o.neptuneMeanAnomaly ?? 0, peri: o.neptunePerihelion ?? planets.neptune.longitudePerihelion, e: o.eccentricityNeptune ?? planets.neptune.orbitalEccentricityBase, i: o.neptuneInvPlaneInclinationDynamic ?? planets.neptune.invPlaneInclinationJ2000, Omega: o.neptuneAscendingNodeInvPlane ?? planets.neptune.ascendingNodeInvPlane },
+    { key: 'mercury', mass: M_MERCURY_SYSTEM },
+    { key: 'venus',   mass: M_VENUS_SYSTEM },
+    { key: 'earth',   mass: M_EARTH_SYSTEM },
+    { key: 'mars',    mass: M_MARS_SYSTEM },
+    { key: 'jupiter', mass: M_JUPITER_SYSTEM },
+    { key: 'saturn',  mass: M_SATURN_SYSTEM },
+    { key: 'uranus',  mass: M_URANUS_SYSTEM },
+    { key: 'neptune', mass: M_NEPTUNE_SYSTEM },
   ];
 
   let x = 0, y = 0, z = 0;
   const contributions = {};
 
   for (const p of planetList) {
-    // 1. Mean anomaly at target year
-    const M_deg = p.M0 + 360 * dt / p.periodYr;
-    // 2. Solve Kepler's equation for eccentric anomaly E
-    const E_deg = OrbitalFormulas.eccentricAnomaly(((M_deg % 360) + 360) % 360, p.e);
-    const E_rad = E_deg * DEG;
-    // 3. True anomaly ν from E
-    const nu = 2 * Math.atan2(Math.sqrt(1 + p.e) * Math.sin(E_rad / 2),
-                              Math.sqrt(1 - p.e) * Math.cos(E_rad / 2));
-    // 4. Heliocentric distance (varies with ν, ranges from a(1-e) at perihelion to a(1+e) at aphelion)
-    const r = p.a_km * (1 - p.e * p.e) / (1 + p.e * Math.cos(nu));
-    // 5. True longitude (ω̃ + ν) minus ascending node = argument of latitude
-    const Om = p.Omega * DEG;
-    const ii = p.i * DEG;
-    const argLat = (p.peri * DEG + nu) - Om;
-    // 6. 3D rotation into invariable-plane frame
-    const dx_planet = r * (Math.cos(Om) * Math.cos(argLat) - Math.sin(Om) * Math.sin(argLat) * Math.cos(ii));
-    const dy_planet = r * (Math.sin(Om) * Math.cos(argLat) + Math.cos(Om) * Math.sin(argLat) * Math.cos(ii));
-    const dz_planet = r * Math.sin(argLat) * Math.sin(ii);
-    // Sun-SSB contribution: scale by mass fraction
-    const scale = p.mass / M_SUN;
-    const cx = dx_planet * scale;
-    const cy = dy_planet * scale;
-    const cz = dz_planet * scale;
+    const r = _kcHelioAU(p.key, jd);   // AU, ecliptic J2000
+    const scale = (p.mass / M_SUN) * AU_J2000_KM;
+    const cx = (r[0] * _KC_IP_X[0] + r[1] * _KC_IP_X[1] + r[2] * _KC_IP_X[2]) * scale;
+    const cy = (r[0] * _KC_IP_Y[0] + r[1] * _KC_IP_Y[1] + r[2] * _KC_IP_Y[2]) * scale;
+    const cz = (r[0] * _KC_IP_Z[0] + r[1] * _KC_IP_Z[1] + r[2] * _KC_IP_Z[2]) * scale;
     x += cx;  y += cy;  z += cz;
     contributions[p.key] = Math.sqrt(cx * cx + cy * cy + cz * cz);
   }
@@ -51527,6 +51498,31 @@ function _kcArgPeriInvPlaneDeg(nameLower, jd) {
   const sx = cr[0] * nO[0] + cr[1] * nO[1] + cr[2] * nO[2];
   return ((Math.atan2(sx, cx) / D2R) % 360 + 360) % 360;
 }
+// K5 excision — the banked invariable-plane BASIS (the K5c s-frame, shared
+// with the evaluator's construction verbatim): ẑ = the plane normal from
+// the governed artifact, x̂ = ecliptic-X projected into the plane (the
+// s-frame node origin), ŷ = ẑ × x̂. Serves the machinery that the legacy
+// linear-precession construction used to feed: the heights above the
+// plane, the mass-weighted balance gauge and the Sun-SSB offset.
+const _KC_IP_Z = (() => {
+  const D2R = Math.PI / 180, IP = CHAIN_ARTIFACT.invariablePlane;
+  const fi = IP.inclEclipticDeg * D2R, fO = IP.ascNodeEclipticDeg * D2R;
+  return [Math.sin(fi) * Math.sin(fO), -Math.sin(fi) * Math.cos(fO), Math.cos(fi)];
+})();
+const _KC_IP_X = (() => {
+  const z = _KC_IP_Z;
+  const x = [1 - z[0] * z[0], -z[0] * z[1], -z[0] * z[2]];
+  const n = Math.hypot(x[0], x[1], x[2]);
+  return [x[0] / n, x[1] / n, x[2] / n];
+})();
+const _KC_IP_Y = [
+  _KC_IP_Z[1] * _KC_IP_X[2] - _KC_IP_Z[2] * _KC_IP_X[1],
+  _KC_IP_Z[2] * _KC_IP_X[0] - _KC_IP_Z[0] * _KC_IP_X[2],
+  _KC_IP_Z[0] * _KC_IP_X[1] - _KC_IP_Z[1] * _KC_IP_X[0],
+];
+// The planet-family bodies the inv-plane machinery reads from the chain
+// (option A: Earth's DISPLAY rides the chain with the other seven).
+const _KC_IP_BODY_KEYS = new Set(['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']);
 // P5/K5b — the VISIBLE perihelion markers ("PERIHELION MERCURY" …): under
 // the flag their DIRECTION is the chain's ϖ(t) while the PRESENTATION stays
 // the established device convention — a direction indicator at the legacy
@@ -53758,14 +53754,14 @@ function updateMoonOrbitalElements() {
  * perpendicular to the total angular momentum vector. Each planet crosses this
  * plane twice per orbit (at ascending and descending nodes).
  *
- * Height = sin(inclination_to_inv_plane) * sin(angle_from_ascending_node) * distance
- *
- * The ascending nodes on the invariable plane precess over time.
- * Precession rates use <planet>PerihelionEclipticYears constants (earthPerihelionICRFYears for Earth).
+ * K5 excision — the planet-family bodies (the seven chain planets + Earth)
+ * read the CHAIN: height = r⃗ · ẑ_inv exactly (the chain's heliocentric
+ * vector against the engine's own banked invariable plane, K5c s-frame),
+ * and the node fields carry the element set of date. The legacy
+ * sin(i)·sin(u)·r construction with linearly-precessing nodes remains only
+ * for the no-chain bodies (Pluto, Halley, Eros).
  *
  * Called each frame after updatePlanetAnomalies().
- *
- * Reference: Souami & Souchay (2012), "The solar system's invariable plane"
  */
 function updatePlanetInvariablePlaneHeights() {
   const DEG2RAD = Math.PI / 180;
@@ -53798,6 +53794,37 @@ function updatePlanetInvariablePlaneHeights() {
   ];
 
   for (const { key, obj, getIncl, ascNodeJ2000, ascNodeJ2000Verified, precessionYears } of planetConfigs) {
+    // K5 excision — the planet-family bodies read the CHAIN: the node ON the
+    // engine's own invariable plane (K5c s-frame) and the ecliptic node come
+    // from the element set of date, and the height is the exact projection
+    // h = r⃗ · ẑ_inv of the chain's heliocentric vector — no per-frame
+    // reconstruction from legacy anomaly/node/inclination readouts. The
+    // linear-precession construction below remains only for the no-chain
+    // bodies (Pluto, Halley, Eros).
+    if (_KC_IP_BODY_KEYS.has(key)) {
+      const el = _kcElementsOfDate(key, o.julianDay);
+      o[key + 'AscendingNodeInvPlane'] = el.ascNodeInvPlaneDeg;
+      o[key + 'AscendingNodeInvPlaneEcliptic'] = el.ascNodeEclipticDeg;
+      const r = _kcHelioAU(key, o.julianDay);
+      const height = r[0] * _KC_IP_Z[0] + r[1] * _KC_IP_Z[1] + r[2] * _KC_IP_Z[2];
+      o[key + 'HeightAboveInvPlane'] = height;
+      o[key + 'AboveInvPlane'] = height > 0;
+      const gaugeKey = key + 'HeightAboveInvPlane';
+      const el2 = invPlaneGaugeEls[gaugeKey];
+      if (el2 && invPlaneMaxes[gaugeKey]) setInvGaugeProps(el2, height, invPlaneMaxes[gaugeKey]);
+      const dt2 = invPlaneTooltipEls[gaugeKey];
+      if (dt2) {
+        dt2.periICRFEl.textContent = o[dt2.periICRFKey].toFixed(2) + '°';
+        dt2.inclEl.textContent = o[dt2.inclKey].toFixed(4) + '°';
+        // increasing/decreasing from the chain's own slope (±100 yr), not
+        // the retired legacy phase rule
+        const di = _kcElementsOfDate(key, o.julianDay + 36525).inclInvPlaneDeg - el.inclInvPlaneDeg;
+        dt2.inclEl.style.color = di >= 0
+          ? 'hsla(140, 65%, 55%, 1)'  // green = increasing
+          : 'hsla(0, 70%, 60%, 1)';   // red = decreasing
+      }
+      continue;
+    }
     let eclipticLongitude;
     let distanceAU;
     let inclToInvPlane;
@@ -53847,15 +53874,9 @@ function updatePlanetInvariablePlaneHeights() {
     // Get dynamic inclination to invariable plane (with J2000 fallback)
     inclToInvPlane = getIncl();
 
-    if (key === 'earth') {
-      // Earth is special: we don't have o.earthTrueAnomaly etc.
-      // Instead, use sun.ra (Sun's ecliptic longitude from Earth's view) + 180° to get Earth's heliocentric longitude
-      // sun.ra is in radians
-      const sunLongDeg = sun.ra * 180 / Math.PI;
-      eclipticLongitude = (sunLongDeg + 180 + 360) % 360;
-      distanceAU = sun.distAU || 1.0;   // D6/D7: Earth-Sun distance (the wobble marker is display-only)
-
-    } else {
+    // (The chain branch above handles the planet-family bodies, Earth
+    // included — only the no-chain trio reaches this construction.)
+    {
       // Get planet's true anomaly (already calculated in updatePlanetAnomalies)
       const trueAnomaly = o[key + 'TrueAnomaly'] || 0;
 
@@ -54179,16 +54200,17 @@ function updateDynamicInclinations() {
   const DEG2RAD = Math.PI / 180;
   const RAD2DEG = 180 / Math.PI;
 
-  // First, compute dynamic inclinations for all planets
-  // Uses J2000-calibrated oscillations with planet-specific phase offsets
-  // At J2000, these return exactly the Souami & Souchay values
-  o.mercuryInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('mercury', o.currentYear);
-  o.venusInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('venus', o.currentYear);
-  o.marsInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('mars', o.currentYear);
-  o.jupiterInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('jupiter', o.currentYear);
-  o.saturnInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('saturn', o.currentYear);
-  o.uranusInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('uranus', o.currentYear);
-  o.neptuneInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('neptune', o.currentYear);
+  // K5 excision — the seven chain planets' inv-plane inclination of date is
+  // the CHAIN's (i to the engine's own invariable plane, K5c). The legacy
+  // J2000-calibrated oscillation law remains only for the no-chain bodies
+  // below (and as the probe-pinned reference implementation).
+  o.mercuryInvPlaneInclinationDynamic = _kcElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg;
+  o.venusInvPlaneInclinationDynamic = _kcElementsOfDate('venus', o.julianDay).inclInvPlaneDeg;
+  o.marsInvPlaneInclinationDynamic = _kcElementsOfDate('mars', o.julianDay).inclInvPlaneDeg;
+  o.jupiterInvPlaneInclinationDynamic = _kcElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg;
+  o.saturnInvPlaneInclinationDynamic = _kcElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg;
+  o.uranusInvPlaneInclinationDynamic = _kcElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg;
+  o.neptuneInvPlaneInclinationDynamic = _kcElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg;
   o.plutoInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('pluto', o.currentYear);
   o.halleysInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('halleys', o.currentYear);
   o.erosInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('eros', o.currentYear);

@@ -46,13 +46,15 @@ const WRITE = process.argv.includes('--write');
 const CHECK = process.argv.includes('--check');
 const HOLISTIC = process.argv.includes('--holistic');
 
-// ── The four HISTORICAL docs — explicit, justified, nothing by pattern ──────
+// ── The HISTORICAL docs — explicit, justified, nothing by pattern ───────────
 // (Phase 3 survey + read-based classification; everything else is current.)
 const HISTORICAL = new Set([
   '30-anomaly-calculations.md',        // plan whose planet mean-anomaly design was rejected in code (2026-08 doc audit)
   '34-j2000-calibration.md',           // implementation plan for a long-shipped feature (2026-08 doc audit)
   '61-optimization-execution-plan.md', // execution log of a finished campaign
+  '67-planet-parallax-corrections.md', // record of the fitted correction stack, deleted in the K5 legacy-chain excision
   '69-optimization-baseline.md',       // explicitly a frozen before-snapshot
+  '71-correction-stack-architecture.md', // architecture of the correction stack, deleted in the K5 legacy-chain excision
   '97-paleo-ecs-decomposition.md',     // frozen first-pass analysis
 ]);
 // No doc is superseded today (§10a survey: zero point forward to a successor).

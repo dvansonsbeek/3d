@@ -2,12 +2,12 @@
 docVersion: 1.0
 modelVersion: v13.0
 coefficients: sha256:9e0460662933228f
-status: current
+status: historical
 ---
 
 # Planet Geocentric Parallax Corrections — Implementation Reference
 
-**Status**: Complete (up to 78-term correction for Mercury/Venus, 68 for Mars and the outer planets, JPL-verified). **Since the P5 flip these corrections ride only the legacy geometric planet chains (`?keplerChains=0`)** — the default planets render from the engine-D element chain, which carries no observation-fitted corrections.
+**Status**: HISTORICAL — **these corrections were deleted in the K5 legacy-chain excision** along with the legacy geometric planet chains they rode (the `?keplerChains=0` opt-out is gone; the planets render from the engine-D element chain, which carries no observation-fitted corrections). The `PARALLAX_DEC/RA_CORRECTION` keys, the fitter (ex-Step 5a) and the evaluators no longer exist in the code. This doc is kept as the record of the fitted parallax layer as it shipped (up to 78-term correction for Mercury/Venus, 68 for Mars and the outer planets, JPL-verified at the time).
 
 ---
 
