@@ -230,6 +230,9 @@ if (process.argv.includes('--write')) {
       'tools/lib/scene-graph.js',
       'packages/physics/src/planets/keplerian-chain.cjs',
       'packages/physics/src/planets/chain-artifact.js',
+      // the ONE eccentricity law body — the Moon rows ride its E-factor
+      // (Stage A′ of the engine-switch record):
+      'packages/physics/src/moon/ecc-channel.cjs',
     ]),
   };
   const outPath = path.resolve(__dirname, '..', '..', 'data', 'chain-vs-jpl-rms.json');

@@ -60,6 +60,9 @@ const INPUT_FILES = [
   'data/rspa20160404supp2/Table-S14.txt',
   'packages/physics/src/eclipse/finders.cjs',
   'packages/physics/src/moon/series.cjs',
+  // the ONE eccentricity law body (Sun EoC + E-factor flow through it;
+  // Stage A′ of the engine-switch record):
+  'packages/physics/src/moon/ecc-channel.cjs',
   'packages/physics/src/moon/apparent.cjs',
   'packages/api/src/app.js',
   'public/input/model-parameters.json',

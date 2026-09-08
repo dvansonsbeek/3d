@@ -19878,12 +19878,15 @@ const VFP_CATEGORIES = [
       excludeRefs: ['Meeus (1991)'], // polynomial diverges beyond ±10k years
       noJ2000: true,
       refLines: [
-        { value: () => eccentricityDerivedMean, label: 'mean (base′ 0.01552)', color: '#888', dash: true, yOffset: 0 },
+        { value: () => eccentricityDerivedMean, label: 'H/3-law mean (base′ 0.01552)', color: '#888', dash: true, yOffset: 0 },
       ],
     },
-    model: { name: 'This model', color: '#f0b040',
-      fn: year => computeEccentricityEarthAtYear(year) },  // the ONE law (unification)
+    // Engine-switch Stage A: the published Earth element is the chain's; the
+    // engine-K H/3 law stays as a labeled reference curve (epoch-local tangent).
+    model: { name: 'This model (chain)', color: '#f0b040',
+      fn: year => _kcElementsOfDate('earth', yearToJDApprox(year)).e },
     references: [
+      { name: 'H/3 law (epoch-local)', color: '#90a4ae', fn: year => computeEccentricityEarthAtYear(year), sourceUrl: 'https://doi.org/10.21203/rs.3.rs-8758810/v4' },
       { name: 'Meeus (1991)', color: '#4fc3f7', fn: eccMeeus, sourceUrl: 'https://en.wikipedia.org/wiki/Orbital_eccentricity' },
       { name: 'Berger (1978)', color: '#ce93d8', fn: eccBerger1978, sourceUrl: 'https://doi.org/10.1175/1520-0469(1978)035%3C2362:LTVODI%3E2.0.CO;2' },
       { name: 'La2004 (Laskar)', color: '#ff8a65', fn: eccLa2004, sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
@@ -19962,14 +19965,20 @@ const VFP_CATEGORIES = [
     paperTitle: 'Longitude Perihelion Comparison',
     paperRange: [-23000, 23000], paperYRange: [0, 400], paperYTicks: [0, 50, 100, 150, 200, 250, 300, 350, 400],
     fixedYRange: [0, 360], fixedYTicks: [0, 60, 120, 180, 240, 300, 360],
-    model: { name: 'This model', color: '#f0b040',
-      fn: year => calcEarthPerihelionPredictive(year) },
+    // Engine-switch Stage A: the published ϖ is the chain's of-date longitude
+    // (chain J2000-frame ϖ + the same general-precession term the gauge
+    // writer uses); the engine-K H/16 law stays as a labeled reference curve.
+    model: { name: 'This model (chain)', color: '#f0b040',
+      fn: year => (((_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / (holisticyearLength / 13)) * (year - 2000)) % 360) + 360) % 360 },
     references: [
+      { name: 'H/16 law (epoch-local)', color: '#90a4ae', fn: year => calcEarthPerihelionPredictive(year), sourceUrl: 'https://doi.org/10.21203/rs.3.rs-8758810/v4' },
       { name: 'Meeus (1991)', color: '#81c784', fn: perihelionMeeusEarth, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/1994A%26A...282..663S' },
       { name: 'La2004 (Laskar)', color: '#e53935', fn: perihelionLa2004, sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
     ],
     j2000extras: [
-      { name: 'NASA/JPL (observed)', color: '#ef5350',
+      // 102.947° is the IAU/Standish MEAN-elements convention, not an
+      // observation; the chain speaks the osculating/secular convention.
+      { name: 'IAU mean elements (Standish)', color: '#ef5350',
         value: () => ASTRO_REFERENCE.perihelionLongitudeJ2000_deg },
     ],
   },
@@ -24018,16 +24027,16 @@ function setupGUI() {
   const orbitalFolder = astroFolder.addFolder({ title: 'Orbital Elements' });
   addTooltip(orbitalFolder.addBinding(predictions, 'eccentricityEarth', {
     label: 'Eccentricity', readonly: true, format: v => v.toFixed(8)
-  }), 'Shape of Earth\u2019s orbit. 0 = circle, 1 = parabola.');
+  }), 'Shape of Earth\u2019s orbit. 0 = circle, 1 = parabola. Engine-K H/3 law value (epoch-local machinery); the published chain element is on the Earth panel.');
   addTooltip(orbitalFolder.addBinding(predictions, 'obliquityEarth', {
     label: 'Obliquity (\u00B0)', readonly: true, format: v => v.toFixed(6)
   }), 'Axial tilt relative to the ecliptic. Drives the seasons.');
   addTooltip(orbitalFolder.addBinding(predictions, 'earthInvPlaneInclinationDynamic', {
     label: 'Inclination (\u00B0)', readonly: true, format: v => v.toFixed(6)
-  }), 'Tilt of Earth\u2019s orbital plane relative to the invariable plane.');
+  }), 'Tilt of Earth\u2019s orbital plane relative to the invariable plane. Engine-K H/3 law value (epoch-local machinery); the published chain element is on the Earth panel.');
   addTooltip(orbitalFolder.addBinding(predictions, 'longitudePerihelion', {
     label: 'Long. Perihelion (\u00B0)', readonly: true, format: v => v.toFixed(6)
-  }), 'Ecliptic longitude where Earth is closest to the Sun.');
+  }), 'Ecliptic longitude where Earth is closest to the Sun. Engine-K H/16 law value (epoch-local machinery, doc-13 \u00A71.8 device); the published chain \u03D6 is on the Earth panel and the perihelion gauge.');
   addTooltip(orbitalFolder.addBinding(predictions, 'lengthofAU', {
     label: 'Length of AU (km)', readonly: true, format: v => v.toFixed(3)
   }), 'Mean Sun\u2013Earth distance derived from the model.');
@@ -45416,8 +45425,8 @@ const planetStats = {
        hover : [`Obliquity of the ecliptic: angle between equator and orbital plane. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over an Earth Fundamental Cycle. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years (at J2000)`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => earthPerihelionFromEarth.distAU, dec:8, sep:',' },{ small: 'AU' }],
-       hover : [`Observed eccentricity from the 3D scene (the realized offset Earth → perihelion point). ONE law for Sun and Moon: e(t) = base′·(1 + cos θ/2) on the H/3 inclination cycle — mean base′ = ${eccentricityDerivedMean.toFixed(6)}, range ${(eccentricityDerivedMean * 0.5).toFixed(6)}–${(eccentricityDerivedMean * 1.5).toFixed(6)}, cycle ${fmtNum(holisticyearLength / 3, 0, ',')} years (at J2000); last maximum ≈ −23,200, last minimum ≈ −79,100, next maximum ≈ +88,600.`],
+       value : [ { v: () => _kcElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
+       hover : [`Engine-D chain eccentricity of date — the model's published Earth element (J2000: 0.016702, matching JPL's osculating seed state and La2004; the IAU mean-elements value is 0.016710). The scene's orbit machinery rides the engine-K H/3 law e(t) = base′·(1 + cos θ/2) — mean base′ = ${eccentricityDerivedMean.toFixed(6)}, cycle ${fmtNum(holisticyearLength / 3, 0, ',')} years — its epoch-local tangent, within 6e-5 of the chain across the historical era.`],
        tpLink: true, observed: true},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.obliquityEarth-radiansToDecDecimal(earthWobbleCenter.dec), dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -45586,8 +45595,8 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Ecliptic —' },
       {label : () => `Longitude of perihelion (ϖ), ecliptic`,
-       value : [ { v: () => calcEarthPerihelionPredictive(o.currentYear), dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude of date of Earth's perihelion — the model's perihelion law (270° + 360°·cycles(H/16) + harmonics); the coordinate observers publish (IAU J2000: 102.947°)`],
+       value : [ { v: () => o.earthPerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Engine-D chain ecliptic longitude of perihelion of date. J2000: 102.9179° — the osculating/secular convention (JPL's own J2000 state vector and La2004 both give ~102.918°; the IAU mean-elements table gives 102.947°). The engine-K H/16 law remains the clock's epoch-local machinery.`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
       {label : () => `Argument of periapsis (ω)`,
@@ -45653,11 +45662,11 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Equation_of_the_center'},
     null,
       {label : () => `Mean Longitude (L)`,
-       value : [ { v: () => OrbitalFormulas.meanLongitude(o.earthMeanAnomaly, calcEarthPerihelionPredictive(o.currentYear)), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.meanLongitude(o.earthMeanAnomaly, o.earthPerihelionEcliptic), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Mean ecliptic longitude: L = M + ϖ (mean anomaly + longitude of perihelion)`],
        info  : 'https://en.wikipedia.org/wiki/Mean_longitude'},
       {label : () => `True Longitude (λ)`,
-       value : [ { v: () => OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, calcEarthPerihelionPredictive(o.currentYear)), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, o.earthPerihelionEcliptic), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Ecliptic longitude: λ = ν + ϖ (true anomaly + longitude of perihelion)`],
        info  : 'https://en.wikipedia.org/wiki/True_longitude'},
       {label : () => `Argument of Latitude (u)`,
