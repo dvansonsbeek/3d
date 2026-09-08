@@ -16,7 +16,7 @@ import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
 // @essrt/physics at its 4.0.0 major.
-import { vsop87AstrometricGeoEclipticAU, publishedCurves as _PC } from '@essrt/reference';
+import { vsop87AstrometricGeoEclipticAU, mpp02AstrometricGeoEclipticJ2000Km, publishedCurves as _PC } from '@essrt/reference';
 
 
 /*
@@ -9436,9 +9436,10 @@ let o = {
   planetsAboveInvPlane: 0,          // Count of planets above
   planetsBelowInvPlane: 0,          // Count of planets below
 
-  // K8 — the standard-model reference overlay (VSOP87A ghosts + live Δ)
+  // K8 — the standard-model reference overlay (VSOP87A/MPP02 ghosts + live Δ)
   showStandardModel: false,
   stdDeltaSunArcsec: 0,
+  stdDeltaMoonArcsec: 0,
   stdDeltaMercuryArcsec: 0,
   stdDeltaVenusArcsec: 0,
   stdDeltaMarsArcsec: 0,
@@ -23332,14 +23333,15 @@ function setupGUI() {
 
   // ── K8: the Standard-Model overlay — top-level, observed category ──
   {
-    const stdFolder = gui.addFolder({ title: 'Standard Model (VSOP87)', expanded: false });
+    const stdFolder = gui.addFolder({ title: 'Standard Model (VSOP87 · MPP02)', expanded: false });
     stdFolder.element.dataset.category = 'observed';
-    addFolderTooltip(stdFolder, 'The Sun and the seven planets AS THE CURRENT SCIENTIFIC MODEL predicts them (VSOP87A, truncated series measured at 0.3–3.6″ RMS vs JPL Horizons over 1600–2400), shown as pale-blue ghost bodies next to the model’s own, with the live angular separation per body. Both sides use the same astrometric convention. The comparison is published either way it falls — nothing in the model is tuned to it. Beyond ±4,000 years the ghosts are a stated extrapolation of the standard theory: the divergence you see at deep time is part of the model’s claim.');
+    addFolderTooltip(stdFolder, 'The Sun, Moon and the seven planets AS THE CURRENT SCIENTIFIC MODEL predicts them (planets/Sun: VSOP87A, truncated series measured at 0.3–3.6″ RMS vs JPL Horizons over 1600–2400; Moon: ELP/MPP02, measured 0.22″ RMS over the observed-ΔT era, on the standard Stephenson-2016 ΔT), shown as pale-blue ghost bodies next to the model’s own, with the live angular separation per body. Both sides use the same astrometric convention. The comparison is published either way it falls — nothing in the model is tuned to it. Beyond ±4,000 years the ghosts are a stated extrapolation of the standard theory: the divergence you see at deep time is part of the model’s claim.');
     addTooltip(stdFolder.addBinding(o, 'showStandardModel', { label: 'Show ghost bodies' }),
       'Toggle the VSOP87 ghost markers in the 3D scene. Ghosts share each body’s size and follow the standard theory’s positions.');
     const stdFmt = { readonly: true, format: (v) => v.toFixed(1) + '″' };
     const stdRows = [
-      ['stdDeltaSunArcsec', 'Δ Sun'], ['stdDeltaMercuryArcsec', 'Δ Mercury'],
+      ['stdDeltaSunArcsec', 'Δ Sun'], ['stdDeltaMoonArcsec', 'Δ Moon'],
+      ['stdDeltaMercuryArcsec', 'Δ Mercury'],
       ['stdDeltaVenusArcsec', 'Δ Venus'], ['stdDeltaMarsArcsec', 'Δ Mars'],
       ['stdDeltaJupiterArcsec', 'Δ Jupiter'], ['stdDeltaSaturnArcsec', 'Δ Saturn'],
       ['stdDeltaUranusArcsec', 'Δ Uranus'], ['stdDeltaNeptuneArcsec', 'Δ Neptune'],
@@ -51784,13 +51786,13 @@ function _kcUpdateOrbitLine(obj, nm, jd) {
 // theory — the deep-time divergence is part of the product.
 // ═══════════════════════════════════════════════════════════════════════════
 const _K8_BODIES = [
-  ['sun', null], ['mercury', null], ['venus', null], ['mars', null],
+  ['sun', null], ['moon', null], ['mercury', null], ['venus', null], ['mars', null],
   ['jupiter', null], ['saturn', null], ['uranus', null], ['neptune', null],
 ];
 let _k8Ghosts = null;
 const _K8_V = new THREE.Vector3(), _K8_W = new THREE.Vector3(), _K8_S = new THREE.Vector3();
 function _k8BodyObj(name) {
-  return ({ sun, mercury, venus, mars, jupiter, saturn, uranus, neptune })[name];
+  return ({ sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune })[name];
 }
 function _k8EnsureGhosts() {
   if (_k8Ghosts) return;
@@ -51818,10 +51820,22 @@ function _k8UpdateStandardOverlay() {
   for (const [name] of _K8_BODIES) {
     const body = _k8BodyObj(name);
     const ghost = _k8Ghosts[name];
-    // the standard side: VSOP87A astrometric geocentric, ecliptic J2000 →
-    // scene world through the SAME frame bridge and Earth anchor the chain
-    // rendering uses
-    const g = vsop87AstrometricGeoEclipticAU(name, o.julianDay, lightDaysPerAU);
+    // the standard side: VSOP87A (planets/Sun) or ELP/MPP02 (Moon)
+    // astrometric geocentric, ecliptic J2000 → scene world through the
+    // SAME frame bridge and Earth anchor the chain rendering uses. The
+    // MOON's standard side runs on TT via the STANDARD ΔT (Stephenson
+    // 2016 spline; the published long-term parabola outside its window —
+    // the model's own ΔT stack stays out of the reference side). Until
+    // the async poly loads, the Moon ghost stays hidden.
+    let g;
+    if (name === 'moon') {
+      if (!_stephensonDtPoly) { loadStephensonDtPolynomial(); ghost.visible = false; continue; }
+      const dT = _PC.stephensonDeltaTExtended(o.currentYear, _stephensonDtPoly);
+      const gKm = mpp02AstrometricGeoEclipticJ2000Km(o.julianDay + dT / 86400, lightDaysPerAU, auToKm(1));
+      g = [gKm[0] / auToKm(1), gKm[1] / auToKm(1), gKm[2] / auToKm(1)];
+    } else {
+      g = vsop87AstrometricGeoEclipticAU(name, o.julianDay, lightDaysPerAU);
+    }
     _K8_V.set(
       EARTH_POS.x + 100 * (R[0][0] * g[0] + R[0][1] * g[1] + R[0][2] * g[2]),
       EARTH_POS.y + 100 * (R[1][0] * g[0] + R[1][1] * g[1] + R[1][2] * g[2]),

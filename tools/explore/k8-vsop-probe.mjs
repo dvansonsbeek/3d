@@ -9,8 +9,9 @@
 // (one re-evaluation at jd − τ).
 //
 // GATE (exit 1 on failure): per-planet RMS ≤ 5″ and max ≤ 25″; Sun RMS
-// ≤ 5″. VSOP87-vs-DE alone is sub-arcsec-to-arcsec class in this window,
-// so a violation means an ingest/frame/truncation defect, not physics.
+// ≤ 5″; Moon (ELP/MPP02 truncated) RMS ≤ 1″ and max ≤ 3″. The theories
+// vs DE are sub-arcsec-to-arcsec class in this window, so a violation
+// means an ingest/frame/truncation defect, not physics.
 
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
@@ -18,6 +19,9 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(ROOT + 'package.json');
 const { vsop87AstrometricGeoEclipticAU } = require(ROOT + 'packages/reference/src/vsop87.cjs');
+const { mpp02AstrometricGeoEclipticJ2000Km } = require(ROOT + 'packages/reference/src/elp-mpp02.cjs');
+const { stephensonDeltaT } = require(ROOT + 'packages/reference/src/published-curves.cjs');
+const dtPoly = JSON.parse(require('node:fs').readFileSync(ROOT + 'public/input/stephenson-2016-deltaT-polynomial.json', 'utf8'));
 const C = require(ROOT + 'tools/lib/constants.js');
 const { TARGET_CODES } = require(ROOT + 'tools/lib/horizons-client.js');
 const fs = require('node:fs');
@@ -27,9 +31,10 @@ const cache = JSON.parse(fs.readFileSync(ROOT + 'data/jpl-cache.json', 'utf8'));
 // One-home rule: NAIF codes from the horizons client (inverted), AU/c/ε
 // from the model's constants homes — nothing hardcoded here.
 const NAIF = Object.fromEntries(
-  Object.entries(TARGET_CODES).filter(([n]) => n !== 'moon').map(([n, code]) => [code, n]));
+  Object.entries(TARGET_CODES).map(([n, code]) => [code, n]));
 const AU_KM = C.currentAUDistance;
 const C_KM_S = C.speedOfLight;
+const J2000_JD = 2451545.0;
 const EPS_J2000 = C.ASTRO_REFERENCE.obliquityJ2000_deg * Math.PI / 180;   // ecliptic → equatorial J2000 (IAU 2006 anchor)
 
 function raDecJ2000(vecEcl) {
@@ -53,8 +58,24 @@ for (const key of Object.keys(cache)) {
   const e = cache[key];
   if (!e || typeof e.ra !== 'number') continue;
 
-  // astrometric: body at t − τ, Earth at reception time t (quantity-1)
-  const v = vsop87AstrometricGeoEclipticAU(body, jd, AU_KM / C_KM_S / 86400);
+  // astrometric: body at t − τ, Earth at reception time t (quantity-1).
+  // Moon: TT via the STANDARD ΔT (Stephenson 2016 spline) + the
+  // BCRS light-time construction (geo(t−τ) − v⊕·τ). Gated on the
+  // observed-ΔT era only (≤2015.5): at the spline's 2016 data/projection
+  // boundary and beyond, the cache's Horizons ΔT and the Stephenson
+  // model diverge (boundary spike ~40″, then ~100″/cy Moon-equivalent —
+  // both measured), which is a ΔT-model difference, not an ingest
+  // defect.
+  let v;
+  if (body === 'moon') {
+    const yr = 2000 + (jd - J2000_JD) / 365.25;
+    if (yr > 2015.5) continue;
+    const jdTT = jd + stephensonDeltaT(yr, dtPoly) / 86400;
+    const g = mpp02AstrometricGeoEclipticJ2000Km(jdTT, AU_KM / C_KM_S / 86400, AU_KM);
+    v = [g[0] / AU_KM, g[1] / AU_KM, g[2] / AU_KM];
+  } else {
+    v = vsop87AstrometricGeoEclipticAU(body, jd, AU_KM / C_KM_S / 86400);
+  }
 
   const [ra, dec] = raDecJ2000(v);
   let dRA = ra - e.ra;
@@ -74,7 +95,9 @@ let fail = false;
 for (const [name, a] of Object.entries(acc)) {
   if (a.n === 0) continue;
   const rms = Math.sqrt(a.sum2 / a.n);
-  const bad = rms > 5 || (name !== 'sun' && a.max > 25);
+  const bad = name === 'moon'
+    ? (rms > 1 || a.max > 3)   // sub-arcsec measured over the observed-ΔT era (≤2015.5)
+    : (rms > 5 || (name !== 'sun' && a.max > 25));
   if (bad) fail = true;
   console.log(`${name.padEnd(8)} │ ${String(a.n).padStart(6)} │ ${rms.toFixed(2).padStart(6)} │ ${a.max.toFixed(2).padStart(6)}${bad ? '  ✗' : ''}`);
 }

@@ -192,6 +192,21 @@ function stephensonDeltaT(year, poly) {
   return null;
 }
 
+/** Stephenson, Morrison & Hohenkerk (2016) ΔT with their published
+ * LONG-TERM PARABOLA outside the spline window: ΔT = −320 + 32.5·t²
+ * seconds, t = (year − 1825)/100 (the paper's eq. 4.1 fit). Used by the
+ * K8 standard-model overlay so the standard side has a ΔT at any epoch;
+ * inside [−720, 2016] the spline is authoritative.
+ * @param {number} year - calendar year
+ * @param {{segments: Array<{y0:number,y1:number,a:number[]}>}|null} poly - the app-loaded spline JSON (null → parabola only)
+ * @returns {number} ΔT in seconds */
+function stephensonDeltaTExtended(year, poly) {
+  const spline = poly ? stephensonDeltaT(year, poly) : null;
+  if (spline !== null) return spline;
+  const t = (year - 1825) / 100;
+  return -320 + 32.5 * t * t;
+}
+
 /** Meeus (1998) eq. 22.2 first-order mean obliquity, RADIANS — the IAU
  * 1976/1980 convention, deliberately (see the module header).
  * @param {number} T - Julian centuries TT from J2000 @returns {number} */
@@ -244,5 +259,5 @@ module.exports = {
   createPublishedCurves,
   eccBerger1978, obliquityBerger1978, axialPrecessionVondrak2011,
   eccLa2004, obliquityLa2004, perihelionLa2004,
-  stephensonDeltaT, meeusMeanObliquityRad,
+  stephensonDeltaT, stephensonDeltaTExtended, meeusMeanObliquityRad,
 };
