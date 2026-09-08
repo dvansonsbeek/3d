@@ -11,13 +11,15 @@
 All scripts that produce fitted coefficients or derived constants live here.
 Output values are stored in `public/input/fitted-coefficients.json`.
 
-> **P5 flip note:** the PLANET-facing fitted stack (the parallax /
-> gravitation / elongation correction fitters, the planet Step-2 geometry,
-> `PREDICT_COEFFS_PHYSICAL`) serves the **legacy geometric planet chains**,
-> which are the `?keplerChains=0` opt-out since the flip — by default the
-> seven planets render from engine D's governed artifact
-> (`tools/verify/nbody-secular.js --write` is that path's regeneration).
-> Earth, Moon and Sun fitting is unaffected; it remains the shipped path.
+> **P5 note (post-excision):** the seven planets render from engine D's
+> governed artifact (`tools/verify/nbody-secular.js --write` is that path's
+> regeneration). The parallax / gravitation / elongation correction fitters
+> (former Steps 5a–5b) and their `PARALLAX_*`/`GRAVITATION_`/`ELONGATION_
+> CORRECTION` keys were **retired with the K5 legacy-chain excision** — the
+> corrected geometric RA/Dec path they fitted no longer exists.
+> `PREDICT_COEFFS_PHYSICAL` remains: it powers the Earth-frame RA rate
+> device (doc 13 §1.8). Earth, Moon and Sun fitting is unaffected; it
+> remains the shipped path.
 
 ## Design rule for scene-graph corrections
 
@@ -220,9 +222,6 @@ then `npm run constants:generate` (Step 9).
 | `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (H-lattice terms; **see design rule above** — only divisors n where H/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime H-lattice filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. **2026-08 (FQ-3): retired from the moveModel display path** (exact-Kepler corrector, doc 65); still consumed by the Step-6a instrument + the legacy A/B path, and still fitter-owned here. |
 | `sun-planetary-completion-fit.js` | NOTHING (read-only, the Step-0 companion — 20.3h, SUPERSEDED by Stage D2) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Was the dev record behind the v1 fitted 10-term table; the shipped table is now the DERIVED 70-term extraction on FRAMEWORK-native carriers (FQ-5 N3: `tools/explore/d2-derived-sun.mjs` → `n2-sun-framework-carriers.mjs` → `n3-carrier-swap-preview.mjs`; the carrier rates are injected live from the planet records by `model.js`), so its coefficient-drift part no longer applies — its syzygy + NASA-centerline scoreboards remain valid verification. After ANY Step-0 refit OR planet-record period change, re-run the N3 extraction chain and re-embed the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
-| `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |
-| `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
-| `gravitation-correction.js` | `GRAVITATION_CORRECTION` + `ELONGATION_CORRECTION` (Step 5b two-stage post-parallax correction) | `data/reference-data.json` |
 | `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
 | `moon-eclipse-optimizer.js` | `moonMeeusLpCorrection`, `MOON_CORRECTION` | 58 solar eclipses (2000–2025) + JPL baseline — run separately, not part of standard pipeline. `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
 | `python/fit_perihelion_harmonics.py` | `PERI_HARMONICS_RAW`, `PERI_OFFSET` | `data/01-holistic-year-objects-data.xlsx` |
@@ -289,8 +288,9 @@ When model parameters change, refit in this order. The logic:
    eccentricity-definition gap between the framework's
    `eccentricityDerivedMean` and Meeus IAU). They shift the scene-graph
    Sun by up to ±49" at Jan/Jul, so every downstream step needs to see
-   them already applied. Running Step 0 first means Steps 1 → 5a → 5b
-   all calibrate against the corrected Sun frame in a single pass.
+   them already applied. Running Step 0 first means Step 1 (and, before
+   the K5 excision, the planet-correction steps) calibrates against the
+   corrected Sun frame in a single pass.
    The coefficients themselves are stable across normal refits — re-run
    Step 0 only when H, the eccentricity definition, or the Meeus
    reference changes.
@@ -398,16 +398,16 @@ Step 1:  node tools/optimize.js optimize sun correctionSun
          Updates: model-parameters.json (5 Earth orbital constants)
          Verify: RMS < 0.004°, perihelion longitude < 0.01" from IAU
 
-Step 2:  node tools/optimize.js optimize <planet> startpos   (for each planet)
-         → angleCorrection (derived from longitudePerihelion, not a free param)
-         Updates: model-parameters.json (startpos + angleCorrection per planet)
-         Verify: Scene perihelion RA = longitudePerihelion exactly (diff < 0.000001°)
-         Planets: mercury, venus, mars, jupiter, saturn, uranus, neptune
+(Step 2 — per-planet startpos alignment — RETIRED for the planets with the
+K5 legacy-chain excision: the seven planets render from the engine-D
+Keplerian chain, anchored by the governed artifact's elements, not by
+fitted scene angles. The `optimize <planet> startpos` command remains as a
+diagnostic only.)
 
 ── Phase 2: Generate input data (manual) ──────────────────────────
 
 Step 2-sync: npm run constants:generate && npm run build
-         Regenerate the constants module from the JSON Steps 1–2 wrote, then
+         Regenerate the constants module from the JSON Step 1 wrote, then
          rebuild the bundle. REQUIRED before Step 3: the browser reads the
          built bundle, so without this Step 3 exports pre-optimization values.
 
@@ -534,19 +534,13 @@ Step 4d: python/train_observed.py             → tools/lib/python/coefficients/
          (225-term observed coefficients)
          Updates: coefficients/*_coeffs.py + fitted-coefficients.json (auto-written by script)
 
-── Phase 4: Planet positions & corrections ────────────────────────
+── Phase 4: Moon ───────────────────────────────────────────────────
 
-Step 5a: parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
-         Fits up to 78-parameter RA/Dec correction per planet via cross-validation.
-         Uses prepareForFitting() to disable parallax layer.
-         Updates: fitted-coefficients.json (auto-updated by script)
-
-Step 5b: gravitation-correction.js            → GRAVITATION_CORRECTION + ELONGATION_CORRECTION
-         Two-stage post-parallax correction:
-         1. Synodic gravitation terms (sin/cos at per-planet periods)
-         2. Elongation offset correction (21 basis functions for Mercury/Venus/Mars)
-         Uses prepareForFitting() to disable gravitation + elongation layers.
-         Updates: fitted-coefficients.json (auto-updated by script)
+(Steps 5a–5b — the parallax and gravitation/elongation planet-correction
+fitters — were RETIRED with the K5 legacy-chain excision: the planets
+render from the engine-D Keplerian chain, and the corrected geometric
+RA/Dec path they fitted no longer exists. The id 5c is kept — this
+numbering is shared vocabulary.)
 
          Optional diagnostics (skip in standard refit):
          • eoc-fractions.js — scans EoC fraction for Type III planets. No --write.
@@ -561,7 +555,6 @@ Step 5c: moon-eclipse-optimizer.js            → moonMeeusLpCorrection + MOON_C
          moonStartpos* values are J2000-element anchored via the in-sim
          meters (docs/66 §4) — NO LONGER fitted; the startPos scan in
          the tool is a flat-gradient diagnostic only, never written.
-         Independent of the planet correction stack (Steps 5a/5b).
          Updates: model-parameters.json (Lp) + fitted-coefficients.json
          Verify: RMS separation < 0.85° (geocentric-parallax floor ~0.81°), individual eclipses < 2°
 
@@ -725,14 +718,11 @@ Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
          eclipse accuracy.
          CAVEAT: changing SUN_LONGITUDE_HARMONICS shifts what every
          downstream step sees. The Step 0 ordering exists exactly to
-         absorb this: running Step 0 first means Steps 1 → 5a → 5b
-         all naturally calibrate against the corrected Sun, with no
-         follow-up re-fits needed. If you must re-run this script
-         AFTER the main pipeline (e.g. ad-hoc diagnostic refit), then
-         also re-run Step 1 (correctionSun) and Steps 5a/5b (planet
-         baselines) afterwards — Venus and Saturn are the most
-         sensitive (inner+outer that lean hardest on Sun-relative
-         geometry in the correction stack).
+         absorb this: running Step 0 first means Step 1 naturally
+         calibrates against the corrected Sun, with no follow-up
+         re-fits needed. If you must re-run this script AFTER the
+         main pipeline (e.g. ad-hoc diagnostic refit), then also
+         re-run Step 1 (correctionSun) afterwards.
 
 ── Phase 5b: Eccentricity amplitudes & balance law verification ──
 
@@ -965,10 +955,10 @@ The cardinal-point-derived tropical year (Step 6d) is the authoritative runtime 
 | `eccentricityBase` / `eccentricityAmplitude` | **0, 1, 3→4a, 6a→6d** (re-fit Step 0 because eccentricity gap definition changed; then re-run pipeline) |
 | `correctionDays` | 3, 6a→6d |
 | `useVariableSpeed` | ALL (1→10) |
-| Planet `startpos` | 2 (re-solve angleCorrection), 5 |
-| Planet `eocFraction` | 3, 5 |
-| Planet `solarYearInput` | 2, 4c→4d, 5 |
-| Planet `orbitalEccentricityBase` | 2, 5 |
+| Planet `startpos` | — (Steps 2/5a-5b retired — K5 excision; legacy scene angle) |
+| Planet `eocFraction` | 3 (5a-5b retired — K5 excision) |
+| Planet `solarYearInput` | 4c→4d (Steps 2/5a-5b retired — K5 excision) |
+| Planet `orbitalEccentricityBase` | — (Steps 2/5a-5b retired — K5 excision; legacy law constant) |
 | `perihelionalignmentYear` | 1, 3→4a, 6a→6d |
 | `stepYears` | Must divide H evenly. Affects 4a→4d, 6a→6d (downsampling) |
 | `siderealYearJ2000` (in yearLengthRef) | Derived: `meansiderealyearlengthinSeconds = siderealYearJ2000 × 86400` |
@@ -1019,9 +1009,8 @@ Why this matters:
 - Regeneration is idempotent: the module is a pure function of the JSON.
   `npm run test:constants` is the same generator in check mode and prints
   `PASS — generated modules match the JSON` when nothing has drifted.
-- The tool is auto-invoked again in Step 2-sync after Phase 1 optimizers
-  update per-planet `startpos` — that later invocation will also carry
-  any leftover JSON diffs.
+- The tool is auto-invoked again in Step 2-sync after the Step 1 optimizer
+  runs — that later invocation will also carry any leftover JSON diffs.
 
 This step is a no-op on routine refits (JSON unchanged) but essential when
 foundational constants have been re-derived (e.g. an H recalibration).
@@ -1031,22 +1020,20 @@ foundational constants have been re-derived (e.g. an H recalibration).
 Instead of running each step manually, use `run-pipeline.js`:
 
 ```bash
-node tools/fit/run-pipeline.js --phase1        # Steps 1-2 only (~2 min)
+node tools/fit/run-pipeline.js --phase1        # Step 1 only (Step 2 retired — K5 excision)
 node tools/fit/run-pipeline.js --phase2        # Steps 4a-10 (~2.5 hrs, requires Step 3 data)
-node tools/fit/run-pipeline.js --all           # Steps 1-2, then 4a-10
-node tools/fit/run-pipeline.js --from 5a       # Resume from Step 5a onwards
-node tools/fit/run-pipeline.js --iterate 20    # Repeat Steps 5a-5b 20 times
-node tools/fit/run-pipeline.js --converge      # Repeat Steps 5a-5b until improvement < 0.001°
+node tools/fit/run-pipeline.js --all           # Step 1, then 4a-10
+node tools/fit/run-pipeline.js --from 5c       # Resume from Step 5c onwards
 ```
 
 Output is logged to `tools/results/pipeline.log`. Stops on any step failure.
 Step 3 (browser export) is always manual — the runner checks the data file exists.
 
 **Observed timings (2026-07-15 H=335,317 recalibration):**
-- Phase 1 (Steps 1-2): **~2 min** (8 optimizers, first run needs `baseline sun` JPL cache refresh)
+- Phase 1 (Step 1): **~15 s** (the Sun optimizer; first run needs `baseline sun` JPL cache refresh. Was ~2 min with the retired per-planet Step 2)
 - Step 4a (Perihelion harmonics): **~7 min**
 - Steps 4b-d (ML training): **~10 min combined**
-- Steps 5a-c (Planet corrections): **~1 min combined**
+- Step 5c (Moon): **~1 min** (5a-5b retired — K5 excision)
 - **Step 6a (CSV export): ~2 hours** — this is the pipeline bottleneck. Default step timeout raised to 3 h.
 - Step 6b (Obliquity): ~90 sec
 - Step 6c (Year-length): ~2 min
@@ -1054,12 +1041,6 @@ Step 3 (browser export) is always manual — the runner checks the data file exi
 - Steps 7a-7c, 8-10 (balance, ΔT joint fit, verify, constants, dashboard): ~5-10 min combined
 - Steps 7f-7i (campaign-artifact generators): ~10-15 min combined, dominated by 7g (prediction-fit evaluation, ~7 min) and 7i (eclipse audit, ~2-4 min)
 - **TOTAL Phase 2: ~2.5-3 hours** dominated by Step 6a.
-
-The `--iterate` / `--converge` flags repeat the planet correction fitting steps (5a parallax →
-5b gravitation + elongation) iteratively. Each pass, the parallax sees cleaner residuals
-and reallocates its terms, allowing the elongation correction to capture more signal.
-Typically converges in 15-20 passes. Venus improves from ~0.10° to ~0.05°.
-The Moon step (5c) runs once after the iteration completes.
 
 ### Manual step-by-step
 
@@ -1079,15 +1060,9 @@ SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write   # S
 # (Step 1 will calibrate correctionSun WITH Step 0's harmonics already
 # applied → single-pass convergence, no follow-up re-run required.)
 node tools/optimize.js optimize sun correctionSun --write                    # Step 1
-node tools/optimize.js optimize mercury startpos --write                     # Step 2
-node tools/optimize.js optimize venus startpos --write                       # Step 2
-node tools/optimize.js optimize mars startpos --write                        # Step 2
-node tools/optimize.js optimize jupiter startpos --write                     # Step 2
-node tools/optimize.js optimize saturn startpos --write                      # Step 2
-node tools/optimize.js optimize uranus startpos --write                      # Step 2
-node tools/optimize.js optimize neptune startpos --write                     # Step 2
+# (Step 2 — per-planet startpos — retired with the K5 excision)
 
-# Step 2-sync: push startpos/angleCorrection + any Fibonacci changes to script.js
+# Step 2-sync: push Step 1's values to script.js
 # so the browser simulation uses the post-optimization values
 npm run constants:generate && npm run build                                  # Step 2-sync
 
@@ -1109,9 +1084,7 @@ python3 tools/fit/python/verify_perihelion_erd.py                            # S
 python3 tools/fit/python/train_precession_physical.py --write                # Step 4c
 python3 tools/fit/python/train_observed.py --write                           # Step 4d
 
-# Phase 4: Planet positions & corrections
-node tools/fit/parallax-correction.js --write                                # Step 5a
-node tools/fit/gravitation-correction.js --write                             # Step 5b
+# Phase 4: Moon (Steps 5a-5b retired — K5 excision)
 # node tools/fit/eoc-fractions.js              # optional diagnostic
 # node tools/fit/ascnode-correction.js          # optional diagnostic
 node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5c
@@ -1217,8 +1190,6 @@ Fitting scripts write to JSON, then `constants:generate` (Step 9) regenerates th
     fit_perihelion_harmonics.py  → fitted-coefficients.json  (Step 4a)
     train_precession_physical.py → fitted-coefficients.json  (Step 4c)
     train_observed.py            → fitted-coefficients.json  (Step 4d)
-    parallax-correction.js       → fitted-coefficients.json  (Step 5a)
-    gravitation-correction.js    → fitted-coefficients.json  (Step 5b)
     moon-eclipse-optimizer.js    → model-parameters.json     (Step 5c)
     obliquity-harmonics.js       → fitted-coefficients.json  (Step 6b)
     year-length-harmonics.js     → fitted-coefficients.json  (Step 6c)
@@ -1228,18 +1199,16 @@ Fitting scripts write to JSON, then `constants:generate` (Step 9) regenerates th
     fibonacci_significance.py    → data/significance-results.json (Step 7d)
 ```
 
-## Correction Stack
+## Correction Stack (RETIRED — K5 excision)
 
-Planet positions go through 4 correction layers after the raw scene-graph computation.
-The architecture is managed by `tools/lib/correction-stack.js` with `prepareForFitting()`
-to safely disable layers during fitting.
-
-**Layers:** Parallax (78p) → Gravitation → Elongation (21p) → Moon Meeus
-
-Steps 5a and 5b use `prepareForFitting()` which disables the target layer(s) so the
-fitter sees residuals without its own layer's contribution.
-
-For full details see [docs/71 — Correction Stack Architecture](../../docs/71-correction-stack-architecture.md).
+The planet positions formerly went through fitted correction layers
+(Parallax → Gravitation → Elongation) after the raw scene-graph computation,
+managed by a `correction-stack` registry with `prepareForFitting()`. That
+whole stack retired with the K5 legacy-chain excision — the planets render
+from the engine-D Keplerian chain, which has no fitted display corrections.
+The Moon Meeus layer (`MOON_CORRECTION`, Step 5c) is unaffected.
+[docs/71 — Correction Stack Architecture](../../docs/71-correction-stack-architecture.md)
+remains as the historical record.
 
 ## ΔT stack diagnostic hooks (dt-corrections-fit.js)
 

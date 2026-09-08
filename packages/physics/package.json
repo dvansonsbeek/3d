@@ -44,7 +44,6 @@
     "./planets/orientation": "./src/planets/orientation.cjs",
     "./planets/asc-node-integrator": "./src/planets/asc-node-integrator.cjs",
     "./planets/orbit-chain": "./src/planets/orbit-chain.cjs",
-    "./planets/corrections": "./src/planets/corrections.cjs",
     "./planets/keplerian-chain": "./src/planets/keplerian-chain.cjs",
     "./planets/predict": "./src/planets/predict.cjs",
     "./planets/model": "./src/planets/model.cjs",

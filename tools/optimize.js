@@ -40,8 +40,7 @@ Commands:
 Targets: mercury, venus, mars, jupiter, saturn, uranus, neptune, sun, moon
 Planet params: startpos, solarYearInput, longitudePerihelion,
                ascendingNode, eclipticInclinationJ2000, orbitalEccentricityBase,
-               perihelionEclipticYears, eocFraction, perihelionRef_JD,
-               decCorrA, decCorrB, decCorrC, decCorrD, decCorrE, decCorrF
+               perihelionEclipticYears, eocFraction, perihelionRef_JD
 Sun params:    correctionSun, eccentricityBase, eccentricityAmplitude, earthtiltMean
 Moon params:   moonStartposApsidal, moonStartposNodal, moonStartposMoon,
                moonTilt, moonEclipticInclinationJ2000, moonOrbitalEccentricity

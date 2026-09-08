@@ -59,8 +59,12 @@ def load_data():
     df = df.iloc[::step].reset_index(drop=True)
 
     years = df['Model Year'].values.astype(float)
+    # K5 excision: the export column was renamed 'Earth Perihelion RA' (an
+    # honest RA of the Keplerian apsis); pre-rename exports carry the old
+    # 'Earth Perihelion ICRF' header — accept both.
+    peri_col = 'Earth Perihelion RA' if 'Earth Perihelion RA' in df.columns else 'Earth Perihelion ICRF'
     peri_raw = perihelion_ra_to_ecliptic_longitude_deg(
-        df['Earth Perihelion ICRF'].values.astype(float),
+        df[peri_col].values.astype(float),
         df['EARTH OBLIQUITY (deg)'].values.astype(float))
 
     # Unwrap: perihelion longitude advances ~360° per H/16 years.

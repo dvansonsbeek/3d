@@ -11,18 +11,8 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, evaluateParallaxBasis, gravitationTermDeltasDeg, evaluateElongationBasis, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, publishedCurves as _PC, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
 
-/**
- * The correction tables key planets lowercase in JSON and capitalised here
- * (`mercury` -> `Mercury`). ~90 call sites read the capitalised form, so the
- * rename happens once, on import, rather than at every use.
- *
- * @param {Record<string, unknown>} o
- * @returns {Record<string, unknown>}
- */
-const capitalisePlanetKeys = (o) =>
-  Object.fromEntries(Object.entries(o).map(([k, v]) => [k.charAt(0).toUpperCase() + k.slice(1), v]));
 
 /*
   Expanding Solar System Resonance Theory (ESSRT) — Holistic Universe Model
@@ -585,11 +575,8 @@ const PREDICT_PLANETS = {
 
 const PREDICT_COEFFS = FIT.PREDICT_COEFFS_PHYSICAL;
 
-// ─── B3. Parallax correction coefficients (fitted) ───────────────────────
-// Post-hoc RA/Dec correction for geocentric parallax effect.
-// Source: public/input/fitted-coefficients.json
-const PARALLAX_DEC_CORRECTION = capitalisePlanetKeys(FIT.PARALLAX_DEC_CORRECTION);
-const PARALLAX_RA_CORRECTION = capitalisePlanetKeys(FIT.PARALLAX_RA_CORRECTION);
+// ─── B3. (The fitted planet-path corrections — parallax, gravitation,
+// elongation — were EXCISED with the legacy planet chains, K5.) ──────────
 
 // ─── B3b. Moon post-Meeus correction (fitted to JPL DE440 residuals) ─────
 // 3-term correction: D (mean elongation), M' (Moon mean anomaly), M (Sun mean anomaly)
@@ -613,18 +600,6 @@ const MOON_CORRECTION = FIT.MOON_CORRECTION;
 // tools/explore/derive-moon-correction-content.js).
 const MOON_CORRECTION_RESIDUAL = FIT.MOON_CORRECTION_RESIDUAL;
 
-// ─── B3c. Gravitation correction (planet-planet perturbations, per-planet synodic periods) ─
-// Each planet has 1-2 terms at its dominant perturber's synodic period.
-// Source: public/input/fitted-coefficients.json
-// @AUTO:GRAVITATION_CORRECTION
-const GRAVITATION_CORRECTION = capitalisePlanetKeys(FIT.GRAVITATION_CORRECTION);
-
-// ─── B3d. Elongation correction (elongation × Earth perihelion geometry) ─
-// Captures the interaction between planet position, Sun elongation, and Earth's
-// eccentricity offset direction. 21 basis functions fitted to JPL residuals.
-// Source: public/input/fitted-coefficients.json
-// @AUTO:ELONGATION_CORRECTION
-const ELONGATION_CORRECTION = capitalisePlanetKeys(FIT.ELONGATION_CORRECTION);
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
 // Source: public/input/fitted-coefficients.json
 // Data-derived solstice mean (more accurate than Pythagorean time-average)
@@ -4539,11 +4514,10 @@ function recomputeEpochAnchors(t_Ma) {
 
 // ───── PHASE 6 — Module-load derived anchors that affect per-frame math ─────
 // Re-derives 13 Earth-cycle anchors that downstream code (notably
-// `computeEccentricityEarth` called every frame) reads as identifiers,
-// plus `ECC_CYCLE_SCALE.earth` which is a captured property snapshot.
+// `computeEccentricityEarth` called every frame) reads as identifiers.
 //
 // Tier 1 (math-critical): perihelionCycleLength, balancedYear,
-//   _eccentricityAnchor, perihelionPhaseOffset, ECC_CYCLE_SCALE.earth
+//   _eccentricityAnchor, perihelionPhaseOffset
 // Tier 2 (display): meanearthRotationsinDays, earthPerihelionICRFYears,
 //   meanSiderealday, meanStellarday, perihelionCoinRotationMs(+Yearly),
 //   axialCoinRotationMs(+Yearly), meanAnomalisticYearinDays
@@ -4568,11 +4542,6 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
   perihelionPhaseOffset = (((startmodelyearwithCorrection - BALANCED_YEAR_J2000_FIXED) / PERIHELION_CYCLE_LENGTH_J2000_FIXED * 360
     + correctionSun
     + 360 * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays) % 360 + 360) % 360;
-  // ECC_CYCLE_SCALE is `const` (immutable reference) but its properties
-  // are writable — mutate just the Earth slot for our scaling.
-  if (typeof ECC_CYCLE_SCALE !== 'undefined') {
-    ECC_CYCLE_SCALE.earth = perihelionCycleLength;
-  }
 
   // Tier 2 — display-only re-derivations
   meanearthRotationsinDays  = meansolaryearlengthinDays + 1;
@@ -6021,10 +5990,10 @@ if (typeof window !== 'undefined') {
       draconic: meanMoonDraconicOrbitsBetween(yearA, yearB),
     }),
     // P5/K4 parity probe: the seven planets' readout (ra/dec/dist) after a
-    // full scene update at the target JD — the moonSceneState pattern; the
-    // Keplerian flag path toggles via window._setKeplerChains, so the Node
-    // mirror (tools/lib/scene-graph.js) can be compared epoch-for-epoch
-    // (tools/explore/k4b-browser-parity.mjs is the record).
+    // full scene update at the target JD — the moonSceneState pattern, so
+    // the Node mirror (tools/lib/scene-graph.js) can be compared
+    // epoch-for-epoch (tools/explore/k4b-browser-parity.mjs is the record;
+    // the chain is the only planet path since the K5 excision).
     planetsSceneStateAt: (jd) => {
       const savedJD = o.julianDay;
       jumpToJulianDay(jd);
@@ -15245,76 +15214,17 @@ function closeHierarchyInspector() {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// FIBONACCI BALANCE EXPLORER
-// Interactive modal for testing ψ-group, phase group, and d-value assignments
-// See docs/10-fibonacci-laws.md for theory
-// ═══════════════════════════════════════════════════════════════════════════
+// ─── Fibonacci-balance REMNANT (K5 excision) ─────────────────────────────
+// The interactive Balance Explorer, Eccentricity Balance Scale and Solar
+// System Resonance Cycle panels were removed with the Fibonacci-law
+// retirement and excised with the legacy chains (doc 10 Status + doc 109
+// carry the measured record). What remains — BALANCE_PRESETS,
+// fbeMatchDefaultPreset and BALANCE_CONFIG — serves only the
+// About → Free Parameters Config-# row.
 
-const BALANCE_PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-
-// 742 preset configurations with >= 99.994% vector balance (TNO margin)
-// Generated by exhaustive search over Fibonacci d-values {1,2,3,5,8,13,21,34,55}
-// and two balance groups (Saturn anti-phase vs rest) — see tools/verify/balance-search.js
-// Format: [scenario, balance%, me_d, me_phase, ve_d, ve_phase, ma_d, ma_phase, ju_d, ju_phase, sa_d, sa_phase, ur_d, ur_phase, ne_d, ne_phase]
-// Phase: 0 = in-phase (rest), 1 = anti-phase (Saturn)
-// Scenarios: A = Ju5/Sa3, B = Ju8/Sa5, C = Ju13/Sa8, D = Ju21/Sa13
-/* eslint-disable */
+// 742 preset configurations with >= 99.994% vector balance (TNO margin) —
+// see tools/verify/balance-search.js (the generator) for the format.
 const BALANCE_PRESETS = FIT.BALANCE_PRESETS;
-/* eslint-enable */
-
-// Decode a preset row into a state object
-function fbeDecodePreset(row) {
-  // Extended row format (deep-analysis survivors):
-  // [0] scenario, [1] inclBalance,
-  // [2..15] per-planet d + group (same as before),
-  // [16] eccBalance, [17] anchor_n, [18] dirCount, [19] totalErr, [20] mirror,
-  // [21..27] per-planet ascending node N (me,ve,ma,ju,sa,ur,ne),
-  // [28..34] per-planet optimized phase angle (me,ve,ma,ju,sa,ur,ne)
-  //
-  // If the row has the extended fields (length > 16), use the per-config
-  // optimized phase angles. Otherwise fall back to the default (legacy rows).
-  const hasDeep = row.length > 20;
-  const phaseOf = (fallbackKey, deepIdx) =>
-    hasDeep && row[deepIdx] != null ? row[deepIdx] : BALANCE_CONFIG[fallbackKey].defaultPhaseAngle;
-  return {
-    mercury:  { d: row[2],  phase: phaseOf('mercury', 28),  group: row[3] },
-    venus:    { d: row[4],  phase: phaseOf('venus',   29),  group: row[5] },
-    earth:    { d: 3,       phase: earthInclinationCycleAnchor,   group: 0 },
-    mars:     { d: row[6],  phase: phaseOf('mars',    30),  group: row[7] },
-    jupiter:  { d: row[8],  phase: phaseOf('jupiter', 31),  group: row[9] },
-    saturn:   { d: row[10], phase: phaseOf('saturn',  32),  group: row[11] },
-    uranus:   { d: row[12], phase: phaseOf('uranus',  33),  group: row[13] },
-    neptune:  { d: row[14], phase: phaseOf('neptune', 34),  group: row[15] },
-    // Deep-analysis metadata (available if extended row):
-    eccBalance: hasDeep ? row[16] : null,
-    anchorN:    hasDeep ? row[17] : null,
-    dirCount:   hasDeep ? row[18] : null,
-    totalErr:   hasDeep ? row[19] : null,
-    mirror:     hasDeep ? row[20] : null,
-    ascNodes: hasDeep ? {
-      mercury: row[21], venus: row[22], mars: row[23], jupiter: row[24],
-      saturn: row[25], uranus: row[26], neptune: row[27],
-    } : null,
-  };
-}
-
-// Build dropdown label for a preset
-function fbePresetLabel(row, index) {
-  const gLabel = (g) => g === 0 ? 'in' : 'anti';
-  const hasDeep = row.length > 20;
-  const planetConfigs = ['Me','Ve','Ma','Ju','Sa','Ur','Ne'];
-  const indices = [2,4,6,8,10,12,14]; // d positions in row
-  const parts = planetConfigs.map((p, i) => `${p}${row[indices[i]]}@${gLabel(row[indices[i]+1])}`);
-  const incl = row[1].toFixed(4);
-  if (hasDeep) {
-    const ecc = row[16].toFixed(2);
-    const dir = row[18];
-    const mir = row[20] ? '★' : '';
-    return `#${index+1} i:${incl}% e:${ecc}% d:${dir}/7 ${mir} ${parts.join(' ')} [${row[0]}]`;
-  }
-  return `#${index+1} ${incl}% ${parts.join(' ')} [${row[0]}]`;
-}
 
 // Find which preset number matches the default BALANCE_CONFIG settings
 function fbeMatchDefaultPreset() {
@@ -15343,26 +15253,12 @@ function fbeMatchDefaultPreset() {
   return null;
 }
 
-// d-value dropdown options: common Fibonacci values
-const D_VALUE_OPTIONS = [
-  { value: 1,        label: '1 (F₁)' },
-  { value: 2,        label: '2 (F₃)' },
-  { value: 3,        label: '3 (F₄)' },
-  { value: 5,        label: '5 (F₅)' },
-  { value: 8,        label: '8 (F₆)' },
-  { value: 13,       label: '13 (F₇)' },
-  { value: 21,       label: '21 (F₈)' },
-  { value: 34,       label: '34 (F₉)' },
-  { value: 55,       label: '55 (F₁₀)' },
-  { value: 'custom', label: 'Custom...' }
-];
-
 // Earth J2000 inclination (not stored as a named constant — computed here)
 const earthInvPlaneInclJ2000 = earthInvPlaneInclinationMean +
   earthInvPlaneInclinationAmplitude *
   Math.cos((ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - earthInclinationCycleAnchor) * Math.PI / 180);
 
-// ICRF perihelion periods for balance explorer (inclination oscillation uses ICRF, not ecliptic)
+// ICRF perihelion periods (inclination oscillation uses ICRF, not ecliptic)
 const _balGP = 1 / (holisticyearLength / 13);
 const _balICRF = (k) => 1 / (1 / planets[k].perihelionEclipticYears - _balGP);
 const BALANCE_CONFIG = {
@@ -15496,1871 +15392,10 @@ const BALANCE_CONFIG = {
   }
 };
 
-// Ecliptic trend calculation: apparent inclination at a given year.
-// Two angles per planet evolve at different rates and must be tracked separately:
-//   - ICRF perihelion ϖ_ICRF: drives the inclination oscillation cosine,
-//     advances at the ICRF perihelion period.
-//   - Ascending node Ω: defines the orientation of the orbital plane normal,
-//     advances at the asc-node period (asc-node-specific or ecliptic perihelion).
-// Earth's ascending node Ω regresses at -H/5 (ecliptic precession rate);
-// Earth's inclination oscillates at H/3 (the ICRF perihelion period).
-function fbeCalcApparentIncl(
-  year, planetMean, planetAmplitude,
-  planetPeriICRFPeriod, planetPeriICRFJ2000, planetPhaseAngle,
-  planetAscNodeJ2000, planetAscNodePeriod,
-  antiPhaseSign,
-  fixedEarth
-) {
-  const DEG2RAD = Math.PI / 180;
-  const RAD2DEG = 180 / Math.PI;
-  if (antiPhaseSign === undefined) antiPhaseSign = 1;
-
-  // Planet inclination — driven by ICRF perihelion advancing at the ICRF rate.
-  // antiPhaseSign = +1 for in-phase planets, -1 for the anti-phase planet (Saturn).
-  const planetPeriICRF = planetPeriICRFJ2000 + (360 / planetPeriICRFPeriod) * (year - 2000);
-  const planetPhase = (planetPeriICRF - planetPhaseAngle) * DEG2RAD;
-  const planetI = (planetMean + antiPhaseSign * planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
-
-  // Planet ascending node Ω — advances at the asc-node period (NOT the ICRF perihelion rate)
-  const planetAscNode = (planetAscNodeJ2000 + (360 / planetAscNodePeriod) * (year - 2000)) * DEG2RAD;
-
-  // Earth plane:
-  //   - moving:    real dynamic plane at year `year` (the model's actual ecliptic-of-date).
-  //                This is what an Earth-bound observer at year t would measure.
-  //   - fixedEarth=true: Earth's plane FROZEN at J2000. This matches JPL's published
-  //                "mean ecliptic and equinox of J2000" frame so that the resulting
-  //                trend can be compared directly to JPL's catalog dI/dt.
-  let earthI, earthOmega;
-  if (fixedEarth) {
-    earthI = earthInvPlaneInclJ2000 * DEG2RAD;
-    earthOmega = earthAscendingNodeInvPlaneVerified * DEG2RAD;
-  } else {
-    const earthICRFPeriod = holisticyearLength / 3;   // ICRF perihelion period (for inclination oscillation)
-    const earthAscPeriod = -holisticyearLength / 5;    // ascending node regression period (for plane normal Ω)
-    const earthCosPhase0 = (earthInvPlaneInclJ2000 - earthInvPlaneInclinationMean) / earthInvPlaneInclinationAmplitude;
-    const earthPhase0 = Math.acos(earthCosPhase0);
-    const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthICRFPeriod;
-    earthI = (earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude * Math.cos(earthPhase)) * DEG2RAD;
-    earthOmega = (earthAscendingNodeInvPlaneVerified + (360 / earthAscPeriod) * (year - 2000)) * DEG2RAD;
-  }
-
-  // Normal vectors
-  const pnx = Math.sin(planetI) * Math.sin(planetAscNode);
-  const pny = Math.sin(planetI) * Math.cos(planetAscNode);
-  const pnz = Math.cos(planetI);
-
-  const enx = Math.sin(earthI) * Math.sin(earthOmega);
-  const eny = Math.sin(earthI) * Math.cos(earthOmega);
-  const enz = Math.cos(earthI);
-
-  const dot = pnx * enx + pny * eny + pnz * enz;
-  return Math.acos(Math.max(-1, Math.min(1, dot))) * RAD2DEG;
-}
-
-// Main calculation engine
-function computeBalanceResults(state) {
-  const PSI = psiConstant;
-  const DEG2RAD = Math.PI / 180;
-
-  // Structural weight: w = sqrt(m * a * (1-e^2)) / d
-  function w(key) {
-    const cfg = BALANCE_CONFIG[key];
-    const d = state[key].d;
-    if (d <= 0) return 0;
-    return Math.sqrt(cfg.mass * cfg.sma * (1 - cfg.ecc * cfg.ecc)) / d;
-  }
-
-  // Per-planet results
-  const planetResults = {};
-  for (const key of BALANCE_PLANETS) {
-    const cfg = BALANCE_CONFIG[key];
-    const d = state[key].d;
-    const sqrtM = Math.sqrt(cfg.mass);
-    const amplitude = (d > 0) ? PSI / (d * sqrtM) : NaN;
-    const cosPhaseJ2000 = Math.cos((cfg.periLongJ2000 - state[key].phaseAngle) * DEG2RAD);
-    const isAntiPhase = state[key].group === 1;
-    const antiPhaseSign = isAntiPhase ? -1 : 1;
-    const mean = cfg.inclJ2000 - antiPhaseSign * amplitude * cosPhaseJ2000;
-    const rangeMin = mean - amplitude;
-    const rangeMax = mean + amplitude;
-    // LL bounds: three-state check
-    //   'strict'    — within [min, max] exactly
-    //   'tolerance' — outside strict but within [min−0.03°, max+0.03°] (LL theory uncertainty)
-    //   'fail'      — outside even with tolerance
-    const LL_TOL = 0.03;
-    const fitsLLStrict = rangeMin >= cfg.llBounds.min && rangeMax <= cfg.llBounds.max;
-    const fitsLLTolerance = rangeMin >= cfg.llBounds.min - LL_TOL && rangeMax <= cfg.llBounds.max + LL_TOL;
-    const fitsLL = fitsLLTolerance;  // backward compat: true if passes with tolerance
-    const llState = fitsLLStrict ? 'strict' : (fitsLLTolerance ? 'tolerance' : 'fail');
-    const dxixsqrtm = d * amplitude * sqrtM;
-
-    // Ecliptic trend (skip for Earth — it defines the ecliptic)
-    //
-    // We compute TWO trends per planet:
-    //
-    //   trend (moving Earth):  the real angle a year-t observer would
-    //     measure between the planet's plane and Earth's *current* plane.
-    //     This is the model's actual physical observable.
-    //
-    //   trendFixed (J2000-frozen Earth): the same angle but with Earth's
-    //     plane locked to its J2000 orientation. This matches JPL's
-    //     catalog frame ("mean ecliptic and equinox of J2000") and so
-    //     equals what JPL would measure with their conventions.
-    //
-    // JPL's published dI/dt is in the J2000-frozen frame, so it cannot
-    // be compared directly to our moving-Earth `trend`. We re-express
-    // JPL's value into our moving frame via:
-    //
-    //   frameCorrection  = trend − trendFixed
-    //   jplTrendMoving   = cfg.trendJPL + frameCorrection
-    //
-    // The displayed JPL value (jplTrendMoving) is then directly
-    // comparable to the model's apparent trend, and the trendError /
-    // directionMatch indicators become meaningful.
-    let trend = NaN, trendFixed = NaN, jplTrendMoving = NaN;
-    let trendError = NaN, directionMatch = false;
-    if (key !== 'earth') {
-      // Asc-node period: use per-config N from state (deep analysis) if available,
-      // otherwise fall back to the global model parameter (current model's values).
-      const ascNodeN = state[key].ascNodeN || planets[key].ascendingNodeCyclesIn8H;
-      const ascNodePeriod = ascNodeN
-        ? -(8 * holisticyearLength) / ascNodeN
-        : planets[key].perihelionEclipticYears;
-      const fbeAntiPhaseSign = isAntiPhase ? -1 : 1;
-      // Moving-Earth trend (the model's actual ecliptic-of-date observable)
-      const i1900 = fbeCalcApparentIncl(
-        1900, mean, amplitude,
-        state[key].period, cfg.periLongJ2000, state[key].phaseAngle,
-        cfg.omegaJ2000, ascNodePeriod, fbeAntiPhaseSign
-      );
-      const i2100 = fbeCalcApparentIncl(
-        2100, mean, amplitude,
-        state[key].period, cfg.periLongJ2000, state[key].phaseAngle,
-        cfg.omegaJ2000, ascNodePeriod, fbeAntiPhaseSign
-      );
-      trend = (i2100 - i1900) / 2;
-      // J2000-frozen Earth trend (matches JPL's frame)
-      const i1900f = fbeCalcApparentIncl(
-        1900, mean, amplitude,
-        state[key].period, cfg.periLongJ2000, state[key].phaseAngle,
-        cfg.omegaJ2000, ascNodePeriod, fbeAntiPhaseSign, true
-      );
-      const i2100f = fbeCalcApparentIncl(
-        2100, mean, amplitude,
-        state[key].period, cfg.periLongJ2000, state[key].phaseAngle,
-        cfg.omegaJ2000, ascNodePeriod, fbeAntiPhaseSign, true
-      );
-      trendFixed = (i2100f - i1900f) / 2;
-      // Re-express JPL's catalog value into our moving frame
-      const frameCorrection = trend - trendFixed;
-      jplTrendMoving = cfg.trendJPL + frameCorrection;
-      trendError = Math.abs(trend - jplTrendMoving);
-      directionMatch = (jplTrendMoving >= 0) === (trend >= 0);
-    }
-
-    planetResults[key] = {
-      amplitude, mean, rangeMin, rangeMax, fitsLL, llState, dxixsqrtm,
-      trend, trendFixed, jplTrendMoving, trendError, directionMatch,
-    };
-  }
-
-  // Inclination balance (Law 3): w = √(m·a(1-e²)) / d — group sums
-  let inclSum203 = 0, inclSum23 = 0;
-  let balanceCos = 0, balanceSin = 0, totalLamp = 0;
-  for (const key of BALANCE_PLANETS) {
-    const cfg = BALANCE_CONFIG[key];
-    const d = state[key].d;
-    if (d <= 0) continue;
-    const wVal = Math.sqrt(cfg.mass * cfg.sma * (1 - cfg.ecc * cfg.ecc)) / d;
-    if (state[key].group !== 1) inclSum203 += wVal; else inclSum23 += wVal;  // group 0=in-phase, 1=anti-phase
-    // Vector balance verification
-    const L = cfg.mass * Math.sqrt(cfg.sma * (1 - cfg.ecc * cfg.ecc));
-    const Lamp = L * planetResults[key].amplitude;
-    const phaseRad = state[key].phaseAngle * DEG2RAD;
-    balanceCos += Lamp * Math.cos(phaseRad);
-    balanceSin += Lamp * Math.sin(phaseRad);
-    totalLamp += Lamp;
-  }
-  // Scalar balance: in-phase sum vs anti-phase sum (Saturn)
-  const inclTotal = inclSum203 + inclSum23;
-  const inclResidual = Math.abs(inclSum203 - inclSum23);
-  const imbalance = inclTotal > 0 ? (inclResidual / inclTotal) * 100 : 0;
-  // Vector balance kept for reference
-  const balanceResidual = Math.sqrt(balanceCos * balanceCos + balanceSin * balanceSin);
-
-  // Eccentricity balance (Law 5): v = √m × a^(3/2) × e / √d
-  let eccSum203 = 0, eccSum23 = 0;
-  for (const key of BALANCE_PLANETS) {
-    const cfg = BALANCE_CONFIG[key];
-    const d = state[key].d;
-    if (d <= 0) continue;
-    const v = Math.sqrt(cfg.mass) * Math.pow(cfg.sma, 1.5) * cfg.ecc / Math.sqrt(d);
-    planetResults[key].eccWeight = v;
-    if (state[key].group !== 1) eccSum203 += v; else eccSum23 += v;  // group 0=in-phase, 1=anti-phase
-  }
-  const eccResidual = Math.abs(eccSum203 - eccSum23);
-  const eccTotal = eccSum203 + eccSum23;
-  const eccImbalance = eccTotal > 0 ? (eccResidual / eccTotal) * 100 : 0;
-
-  return { PSI, planetResults, inclSum203, inclSum23, balanceCos, balanceSin, balanceResidual, totalLamp, imbalance, eccSum203, eccSum23, eccImbalance };
-}
-
-// Build d-value select HTML
-function fbeBuildDSelect(planet, defaultD) {
-  const disabled = BALANCE_CONFIG[planet].locked ? 'disabled' : '';
-  let options = D_VALUE_OPTIONS.map(opt => {
-    if (opt.value === 'custom') {
-      return `<option value="custom">${opt.label}</option>`;
-    }
-    const selected = Math.abs(opt.value - defaultD) < 0.0001 ? 'selected' : '';
-    return `<option value="${opt.value}" ${selected}>${opt.label}</option>`;
-  }).join('');
-
-  // If default is not in presets, add it
-  const isPreset = D_VALUE_OPTIONS.some(o => o.value !== 'custom' && Math.abs(o.value - defaultD) < 0.0001);
-  if (!isPreset) {
-    options = `<option value="${defaultD}" selected>${defaultD}</option>` + options;
-  }
-
-  return `<select class="fbe-d-select" data-planet="${planet}" ${disabled}>${options}</select>` +
-    `<input type="number" class="fbe-d-custom" data-planet="${planet}" step="0.001" min="0.001" placeholder="d" ${disabled}>`;
-}
-
-// Build phase angle read-only display
-function fbeBuildPhaseDisplay(planet, defaultPhase) {
-  return `<span class="fbe-phase-display" data-planet="${planet}">${defaultPhase.toFixed(2)}\u00B0</span>`;
-}
-
-// Build group toggle (in-phase / anti-phase)
-function fbeBuildGroupToggle(planet, isAntiPhase) {
-  const locked = BALANCE_CONFIG[planet].locked;
-  const cls = isAntiPhase ? 'fbe-group-anti' : 'fbe-group-in';
-  const label = isAntiPhase ? 'anti-phase' : 'in-phase';
-  if (locked) {
-    return `<span class="fbe-group-toggle ${cls} fbe-group-locked" data-planet="${planet}">${label}</span>`;
-  }
-  return `<button class="fbe-group-toggle ${cls}" data-planet="${planet}" title="Click to toggle between in-phase and anti-phase">${label}</button>`;
-}
-
-// Derive phase angle from balanced year, period, and group
-function fbeComputePhaseAngle(planet, period, isAntiPhase) {
-  const cfg = BALANCE_CONFIG[planet];
-  const icrfRate = 360 / period;
-  // Use the System Reset (systemResetN × H backwards from balanced year) as
-  // the phase anchor — where all planets are at their inclination extremes.
-  // Both inclination and eccentricity use the same anchor (systemResetN).
-  const systemReset = balancedYear - systemResetN * holisticyearLength;
-  const periAtSR = ((cfg.periLongJ2000 + icrfRate * (systemReset - 2000)) % 360 + 360) % 360;
-  return isAntiPhase ? periAtSR : ((periAtSR - 180 + 360) % 360);
-}
-
-let balanceExplorerPanel = null;
-let balanceExplorerState = null;
-
-function createBalanceExplorerPanel() {
-  const panel = document.createElement('div');
-  panel.id = 'fibBalanceExplorer';
-
-  // Initialize state with defaults
-  const state = {};
-  for (const key of BALANCE_PLANETS) {
-    const cfg = BALANCE_CONFIG[key];
-    state[key] = {
-      phaseAngle: cfg.defaultPhaseAngle,
-      period: cfg.period,
-      d: cfg.defaultD,
-      group: cfg.defaultAntiPhase ? 1 : 0,  // 0=in-phase, 1=anti-phase
-      ascNodeN: key !== 'earth' ? planets[key].ascendingNodeCyclesIn8H : 40,  // default: current model's values
-    };
-  }
-  state._anchorN = null;  // deep-analysis anchor offset (null = using default balanced year)
-  balanceExplorerState = state;
-
-  const defaultConfigNum = fbeMatchDefaultPreset();
-
-  const defaultIdx = defaultConfigNum ? defaultConfigNum - 1 : null;
-
-  // If the default config is in the presets, load its deep-analysis parameters
-  // (per-config ascending nodes, phase angles, anchor) into the initial state.
-  if (defaultIdx != null && BALANCE_PRESETS[defaultIdx]) {
-    const preset = fbeDecodePreset(BALANCE_PRESETS[defaultIdx]);
-    state._anchorN = preset.anchorN;
-    for (const key of BALANCE_PLANETS) {
-      if (BALANCE_CONFIG[key].locked) continue;
-      if (preset[key].phase != null) state[key].phaseAngle = preset[key].phase;
-      if (preset.ascNodes && preset.ascNodes[key] != null) state[key].ascNodeN = preset.ascNodes[key];
-    }
-  }
-
-  panel.innerHTML = `
-    <div class="fbe-overlay"></div>
-    <div class="fbe-dialog">
-      <div class="fbe-header">
-        <h2>Invariable Plane Balance Explorer</h2>
-        <div class="fbe-header-right">
-          <select class="fbe-preset-select">
-            ${BALANCE_PRESETS.map((row, i) => {
-              const sel = (i === defaultIdx) ? ' selected' : '';
-              return '<option value="' + i + '"' + sel + '>' + fbePresetLabel(row, i) + '</option>';
-            }).join('')}
-          </select>
-          <div class="fbe-close" title="Close"></div>
-        </div>
-      </div>
-      <div class="fbe-body">
-        <div class="fbe-context-banner">
-          <div class="fbe-context-main">
-            ${defaultConfigNum
-              ? '\u2605 Current model: <b>#' + defaultConfigNum + '</b> of ' + BALANCE_PRESETS.length + ' \u2014 the only mirror-symmetric configuration'
-              : BALANCE_PRESETS.length + ' configurations available'}
-          </div>
-          <div class="fbe-context-detail">
-            ${BALANCE_PRESETS.length.toLocaleString()} survive from ${(7558272).toLocaleString()} tested (incl \u226599.994%, ecc \u226599%, LL bounds, direction match, rate error \u22645\u2033, Jupiter\u2013Saturn shared N)
-          </div>
-        </div>
-        <div class="fbe-section">
-          <div class="fbe-section-title">Planet Assignments</div>
-          <div class="fbe-grid-header">
-            <span>Planet</span>
-            <span class="fbe-header-tip">Group <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Balance group: <b>in-phase</b> planets reach minimum inclination at the balanced year. <b>Anti-phase</b> planets reach maximum. The two groups must have equal structural weights for the invariable plane to remain stable.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">The Fibonacci relations \u2192</a></span></span>
-            <span class="fbe-header-tip">Anchor \u03C6 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Per-planet cycle anchor: the ICRF perihelion longitude where MAX inclination occurs, evaluated at the <b>balanced year</b>. The balanced year is determined by the anchor position (n) within the Solar System Resonance Cycle (8H = 2,682,360 yr). Each config may have a different optimal anchor.<br><br>In-phase planets: \u03C6 = \u03D6(balanced year) \u2212 180\u00B0 (at the balanced year they are at MIN, so MAX is 180\u00B0 away)<br>Anti-phase planets: \u03C6 = \u03D6(balanced year) (at the balanced year they are at MAX)</span></span>
-            <span class="fbe-header-tip">\u03D6 J2000 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ICRF perihelion longitude at J2000 epoch. Read-only reference.</span></span>
-            <span class="fbe-header-tip">d <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The Fibonacci divisor d determines each planet\u2019s inclination amplitude via:<br><br><b>amp = \u03C8 / (d \u00D7 \u221Am)</b><br><br>A larger d means a smaller oscillation. Each planet is assigned a Fibonacci number (1, 2, 3, 5, 8, 13, 21, 34, 55) as its divisor.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">The Fibonacci relations \u2192</a></span></span>
-            <span class="fbe-header-tip">N <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Ascending node cycles in 8H (Solar System Resonance Cycle). The ascending node regression period = \u22128H/N years.<br><br>Per-config optimized to minimize the ecliptic inclination rate error against JPL trends. Each planet\u2019s N is independent (trend only depends on that planet\u2019s own ascending node + Earth\u2019s fixed \u03A9 at \u2212H/5).</span></span>
-            <span class="fbe-header-tip">Incl. cycle <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The inclination oscillation period (years): how long for the planet\u2019s invariable-plane inclination to complete one full cycle (min \u2192 max \u2192 min).<br><br>This equals the ICRF perihelion period (ecliptic rate minus general precession H/13). Negative = retrograde ICRF precession. All ICRF periods divide the Solar System Resonance Cycle (8H) evenly.</span></span>
-            <span class="fbe-header-tip">Ecl. period <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ecliptic perihelion precession period (years) \u2014 the period visible in the simulation. All ecliptic periods are H/Fibonacci fractions.</span></span>
-          </div>
-          <div class="fbe-planet-grid">
-            ${BALANCE_PLANETS.map(key => {
-              const cfg = BALANCE_CONFIG[key];
-              const locked = cfg.locked ? 'locked' : '';
-              const disabled = cfg.locked ? 'disabled' : '';
-              const eclPeriod = key === 'earth' ? holisticyearLength / 16 : planets[key].perihelionEclipticYears;
-              return `<div class="fbe-planet-row ${locked}" data-planet="${key}">
-                <span class="fbe-planet-name">${cfg.name}${cfg.locked ? ' <span class="fbe-lock-tip">\uD83D\uDD12<span class="fbe-lock-tip-content">Earth is locked because the formula <b>amp = \u03C8 / (d \u00D7 \u221Am)</b> was derived from Earth\u2019s observed inclination amplitude (0.6329789\u00B0) with Fibonacci divisor d\u2009=\u20093.<br><br>All other planet amplitudes follow from this calibration.<br><br><a href="https://github.com/dvansonsbeek/3d/blob/main/docs/10-fibonacci-laws.md" target="_blank" rel="noopener">The Fibonacci relations \u2192</a></span></span>' : ''}</span>
-                <div class="fbe-group-cell">
-                  ${fbeBuildGroupToggle(key, cfg.defaultAntiPhase)}
-                </div>
-                <div class="fbe-phase-cell">
-                  ${fbeBuildPhaseDisplay(key, cfg.defaultPhaseAngle)}
-                </div>
-                <div class="fbe-omega-cell">
-                  <span class="fbe-omega-display">${cfg.periLongJ2000.toFixed(2)}\u00B0</span>
-                </div>
-                <div class="fbe-d-cell">
-                  ${fbeBuildDSelect(key, cfg.defaultD)}
-                </div>
-                <div class="fbe-ascn-cell">
-                  <span class="fbe-ascn-display" data-planet="${key}">${key === 'earth' ? '40' : (planets[key].ascendingNodeCyclesIn8H || '\u2014')}</span><span class="fbe-ascn-period" data-planet="${key}">${(() => { const n = key === 'earth' ? 40 : planets[key].ascendingNodeCyclesIn8H; return n ? Math.round(-(8 * holisticyearLength) / n).toLocaleString() + ' yr' : ''; })()}</span>
-                </div>
-                <div class="fbe-period-cell">
-                  <span class="fbe-period-display ${cfg.period > 0 ? 'fbe-prograde' : 'fbe-retrograde'}" data-planet="${key}">${cfg.period > 0 ? '' : '\u2212'}${Math.round(Math.abs(cfg.period)).toLocaleString()}</span>
-                </div>
-                <div class="fbe-ecl-period-cell">
-                  <span class="fbe-ecl-period-display ${eclPeriod < 0 ? 'fbe-retrograde' : ''}" data-planet="${key}">${eclPeriod < 0 ? '\u2212' : ''}${Math.round(Math.abs(eclPeriod)).toLocaleString()}</span>
-                </div>
-              </div>`;
-            }).join('')}
-          </div>
-        </div>
-        <div class="fbe-section">
-          <div class="fbe-section-title">Balance Results</div>
-          <div class="fbe-ratio-row">
-            <div class="fbe-ratio-display fbe-ratio-incl">
-              <div class="fbe-ratio-label">Inclination Balance (Law 3)</div>
-              <div class="fbe-ratio-value"></div>
-              <div class="fbe-ratio-formula">w = \u221A(m\u00B7a(1\u2212e\u00B2)) / d</div>
-            </div>
-            <div class="fbe-ratio-display fbe-ratio-ecc">
-              <div class="fbe-ratio-label">Eccentricity Balance (Law 5)</div>
-              <div class="fbe-ratio-ecc-value"></div>
-              <div class="fbe-ratio-formula">v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad</div>
-            </div>
-          </div>
-          <div class="fbe-deep-info" style="margin-top:8px;padding:6px 10px;background:rgba(255,255,255,0.04);border-radius:6px;font-size:11px;color:#aaa;display:none">
-            <span class="fbe-deep-anchor"></span>
-            <span class="fbe-deep-dir" style="margin-left:12px"></span>
-            <span class="fbe-deep-err" style="margin-left:12px"></span>
-            <span class="fbe-deep-mirror" style="margin-left:12px"></span>
-          </div>
-        </div>
-        <div class="fbe-section">
-          <div class="fbe-section-title">Per-Planet Results</div>
-          <div class="fbe-table-wrapper">
-            <table class="fbe-results-table">
-              <thead>
-                <tr>
-                  <th>Planet</th>
-                  <th>Amplitude</th>
-                  <th>Mean</th>
-                  <th>Range</th>
-                  <th>LL</th>
-                  <th><span class="fbe-ll-tip">Trend (\u00B0/cy)<span class="fbe-ll-tip-content">Model's apparent ecliptic-inclination trend over 1900–2100, measured against Earth's orbital plane <b>at each year</b> (the real moving plane). This is what an Earth-bound observer would actually measure.</span></span></th>
-                  <th><span class="fbe-ll-tip">JPL (\u00B0/cy)<span class="fbe-ll-tip-content">JPL's catalog dI/dt is published in the <b>J2000-frozen</b> ecliptic frame. To compare with the model's moving-frame trend (left column), the catalog value is re-expressed into the moving frame by adding the frame correction: <i>JPL_displayed = JPL_catalog + (trend_moving \u2212 trend_J2000)</i>. The result is directly comparable to the model column.</span></span></th>
-                  <th>Frame corr</th>
-                  <th>Err</th>
-                  <th>Dir</th>
-                  <th>d\u00D7i\u00D7\u221Am</th>
-                  <th>v (ecc)</th>
-                </tr>
-              </thead>
-              <tbody class="fbe-results-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="fbe-section fbe-vector-section">
-          <div class="fbe-section-title fbe-vector-header" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" title="Click to expand/collapse">
-            <span>\u25B6 Vector Balance Diagram</span>
-            <button class="fbe-mode-toggle" title="Toggle between single-mode (one \u03A9 rate per planet) and multi-mode (7 eigenfrequencies from 8H). Multi-mode gives 100% vector balance for ANY set of integer divisors of 8H.">
-              <span class="fbe-mode-single">Single-mode</span>
-              <span class="fbe-mode-multi">Multi-mode</span>
-            </button>
-          </div>
-          <div class="fbe-vector-collapsible" style="display:none">
-            <div class="fbe-balance-explain fbe-mode-explain" style="margin-bottom:4px">Each planet\u2019s orbital tilt creates a force on the invariable plane. Arrows show force direction (\u03A9) and strength (L\u00D7sin\u2009i). Dots show current ICRF perihelion (\u03D6). Dashed lines show fixed cycle anchors (\u03C6).</div>
-            <div class="fbe-vector-diagram">
-              <svg class="fbe-polar-svg" viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg"></svg>
-            </div>
-          </div>
-        </div>
-        <div class="fbe-section">
-          <div class="fbe-section-title">Balance Verification</div>
-          <div class="fbe-balance-line fbe-balance-incl-line"></div>
-          <div class="fbe-balance-line fbe-balance-ecc-line"></div>
-          <div class="fbe-status"></div>
-          <div class="fbe-psi-line"></div>
-          <div class="fbe-balance-explain"><b>Inclination balance</b> (Law 3): each planet\u2019s inclination oscillates with amplitude \u03C8/(d\u00D7\u221Am) around its mean, with phase timed by cycle anchor \u03B3. The structural weights w = \u221A(m\u00B7a(1\u2212e\u00B2))/d of the two balance groups must cancel: \u03A3(in-phase) w = \u03A3(anti-phase) w. At 100%, the invariable plane is a perfect center of symmetry.</div>
-          <div class="fbe-balance-explain" style="margin-top:6px"><b>Eccentricity balance</b> (Law 5): an independent constraint using different powers of mass, distance, and d. The eccentricity weights v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad of the same two balance groups balance: \u03A3(in-phase) v = \u03A3(anti-phase) v. This uses 1/\u221Ad scaling instead of 1/d, confirming d encodes real physics.</div>
-          <div class="fbe-balance-explain" style="margin-top:6px">Note: this balance considers only the 8 major planets, which carry 99.994% of the solar system\u2019s orbital angular momentum. Trans-Neptunian Objects (TNOs) contribute the remaining ~0.006%, tilting the invariable plane by approximately 1.25\u2033 (<a href="https://arxiv.org/abs/1909.11293" target="_blank" rel="noopener">Li, Xia & Zhou 2019</a>).</div>
-          <div class="fbe-balance-explain" style="margin-top:10px"><b>What determines the ascending node periods?</b> The model assigns each planet an ascending node period as an integer divisor of 8H (the Solar System Resonance Cycle). The integers are jointly fit to JPL\u2019s J2000-fixed-frame ascending-node trends (~4.3\u2033/century total across 7 fitted planets), with Jupiter and Saturn locked to a shared N=36. However, the vector balance diagram gives 100% for <i>any</i> set of frequencies \u2014 this is a mathematical property of the eigenmode solver (33 degrees of freedom), not a unique validation of specific periods.</div>
-          <div class="fbe-balance-explain" style="margin-top:6px">The <b>genuine constraints</b> are the scalar inclination balance (Law 3) and eccentricity balance (Law 5) shown above \u2014 these select the Fibonacci d-values and cannot be achieved by arbitrary configurations. The ascending node periods describe motion over 50,000\u20132,000,000 year timescales. With only ~4,000 years of recorded astronomy, the periods cannot be observationally verified by direct observation of a complete cycle.</div>
-        </div>
-      </div>
-    </div>`;
-
-  document.body.appendChild(panel);
-
-  // Close handlers
-  panel.querySelector('.fbe-close').addEventListener('click', closeBalanceExplorer);
-  panel.querySelector('.fbe-overlay').addEventListener('click', closeBalanceExplorer);
-
-  // Preset config dropdown handler
-  panel.querySelector('.fbe-preset-select').addEventListener('change', (e) => {
-    const idx = parseInt(e.target.value);
-    if (isNaN(idx)) return;
-    const preset = fbeDecodePreset(BALANCE_PRESETS[idx]);
-    // Store deep-analysis anchor (null if legacy row)
-    state._anchorN = preset.anchorN;
-    for (const key of BALANCE_PLANETS) {
-      const cfg = BALANCE_CONFIG[key];
-      if (cfg.locked) continue;
-      state[key].d = preset[key].d;
-      state[key].group = preset[key].group;
-      // Use per-config optimized phase angle from deep analysis if available;
-      // otherwise fall back to re-computing from the model's default balanced year.
-      if (preset[key].phase != null) {
-        state[key].phaseAngle = preset[key].phase;
-      } else {
-        state[key].phaseAngle = fbeComputePhaseAngle(key, state[key].period, preset[key].group === 1);
-      }
-      // Use per-config optimized ascending node N from deep analysis if available;
-      // otherwise keep the model's default.
-      if (preset.ascNodes && preset.ascNodes[key] != null) {
-        state[key].ascNodeN = preset.ascNodes[key];
-      } else {
-        state[key].ascNodeN = key !== 'earth' ? planets[key].ascendingNodeCyclesIn8H : 40;
-      }
-      // Update group toggle UI
-      const groupBtn = panel.querySelector(`.fbe-group-toggle[data-planet="${key}"]`);
-      if (groupBtn) {
-        groupBtn.className = 'fbe-group-toggle ' + (preset[key].group === 1 ? 'fbe-group-anti' : 'fbe-group-in');
-        groupBtn.textContent = preset[key].group === 1 ? 'anti-phase' : 'in-phase';
-      }
-      // Update phase display
-      const phaseDisplay = panel.querySelector(`.fbe-phase-display[data-planet="${key}"]`);
-      if (phaseDisplay) phaseDisplay.textContent = state[key].phaseAngle.toFixed(2) + '\u00B0';
-      // Update N display + period in the upper table
-      const ascnDisplay = panel.querySelector(`.fbe-ascn-display[data-planet="${key}"]`);
-      if (ascnDisplay) ascnDisplay.textContent = String(state[key].ascNodeN);
-      const ascnPeriod = panel.querySelector(`.fbe-ascn-period[data-planet="${key}"]`);
-      if (ascnPeriod) {
-        const n = state[key].ascNodeN;
-        ascnPeriod.textContent = n ? Math.round(-(8 * holisticyearLength) / n).toLocaleString() + ' yr' : '';
-      }
-      // Update d select UI
-      const dSel = panel.querySelector(`.fbe-d-select[data-planet="${key}"]`);
-      const dCustom = panel.querySelector(`.fbe-d-custom[data-planet="${key}"]`);
-      const dMatch = Array.from(dSel.options).find(o => o.value !== 'custom' && Math.abs(parseFloat(o.value) - preset[key].d) < 0.0001);
-      if (dMatch) {
-        dSel.value = dMatch.value;
-        dCustom.classList.remove('visible');
-      } else {
-        dSel.value = 'custom';
-        dCustom.classList.add('visible');
-        dCustom.value = preset[key].d;
-      }
-    }
-    updateBalanceExplorerResults(panel, state);
-  });
-
-  // Group toggle handlers (in-phase ↔ anti-phase)
-  panel.querySelectorAll('.fbe-group-toggle:not(.fbe-group-locked)').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const planet = e.target.dataset.planet;
-      const newGroup = state[planet].group === 1 ? 0 : 1;
-      state[planet].group = newGroup;
-      // Update button appearance
-      e.target.className = 'fbe-group-toggle ' + (newGroup === 1 ? 'fbe-group-anti' : 'fbe-group-in');
-      e.target.textContent = newGroup === 1 ? 'anti-phase' : 'in-phase';
-      // Recompute phase angle from balanced year
-      state[planet].phaseAngle = fbeComputePhaseAngle(planet, state[planet].period, newGroup === 1);
-      // Update phase display
-      const phaseDisplay = panel.querySelector(`.fbe-phase-display[data-planet="${planet}"]`);
-      if (phaseDisplay) phaseDisplay.textContent = state[planet].phaseAngle.toFixed(2) + '\u00B0';
-      updateBalanceExplorerResults(panel, state);
-    });
-  });
-
-  // d-value select handlers
-  panel.querySelectorAll('.fbe-d-select:not([disabled])').forEach(sel => {
-    sel.addEventListener('change', (e) => {
-      const planet = e.target.dataset.planet;
-      const customInput = panel.querySelector(`.fbe-d-custom[data-planet="${planet}"]`);
-      if (e.target.value === 'custom') {
-        customInput.classList.add('visible');
-        customInput.focus();
-      } else {
-        customInput.classList.remove('visible');
-        state[planet].d = parseFloat(e.target.value);
-        updateBalanceExplorerResults(panel, state);
-      }
-    });
-  });
-
-  // d-value custom input handlers
-  panel.querySelectorAll('.fbe-d-custom:not([disabled])').forEach(inp => {
-    inp.addEventListener('input', (e) => {
-      const planet = e.target.dataset.planet;
-      const val = parseFloat(e.target.value);
-      if (val > 0 && isFinite(val)) {
-        state[planet].d = val;
-        updateBalanceExplorerResults(panel, state);
-      }
-    });
-  });
-
-  // Initial calculation
-  updateBalanceExplorerResults(panel, state);
-
-  // Vector diagram collapse/expand toggle
-  const vectorHeader = panel.querySelector('.fbe-vector-header');
-  const vectorBody = panel.querySelector('.fbe-vector-collapsible');
-  if (vectorHeader && vectorBody) {
-    vectorHeader.addEventListener('click', (e) => {
-      // Don't toggle if the mode-toggle button was clicked
-      if (e.target.closest('.fbe-mode-toggle')) return;
-      const isHidden = vectorBody.style.display === 'none';
-      vectorBody.style.display = isHidden ? '' : 'none';
-      const titleSpan = vectorHeader.querySelector('span');
-      if (titleSpan) titleSpan.textContent = (isHidden ? '\u25BC' : '\u25B6') + ' Vector Balance Diagram';
-      // Render diagram on first expand
-      if (isHidden) fbeRenderVectorDiagram(panel, state);
-    });
-  }
-
-  // Vector balance mode toggle
-  const modeToggle = panel.querySelector('.fbe-mode-toggle');
-  const modeExplain = panel.querySelector('.fbe-mode-explain');
-  if (modeToggle) {
-    modeToggle.addEventListener('click', () => {
-      fbeMultiMode = !fbeMultiMode;
-      modeToggle.classList.toggle('fbe-mode-active', fbeMultiMode);
-      modeExplain.textContent = fbeMultiMode
-        ? 'Multi-mode: 7 eigenfrequencies from 8H/N. Each mode independently balances to zero \u2014 total balance is always 100%. Note: this works for ANY set of 7 frequencies (the solver has 33 spare degrees of freedom). The real constraints are the scalar balance Laws 3 + 5 above.'
-        : 'Single-mode: each \u03A9 precesses at one rate (8H/N). Balance degrades over time because different planets precess at different speeds. Arrows show force direction (\u03A9) and strength (L\u00D7sin\u2009i). Dots show ICRF perihelion (\u03D6).';
-      if (fbeMultiMode) fbeInitEigenmodes();
-      fbeRenderVectorDiagram(panel, state);
-    });
-  }
-
-  return panel;
-}
-
-function updateBalanceExplorerResults(panel, state) {
-  const results = computeBalanceResults(state);
-
-  // Update context banner — highlight if showing the default (mirror-symmetric) config
-  const banner = panel.querySelector('.fbe-context-banner');
-  if (banner) {
-    const isMirror = state.mercury.d === state.uranus.d &&
-                     state.venus.d === state.neptune.d &&
-                     state.mars.d === state.jupiter.d;
-    const isDefault = BALANCE_PLANETS.every(k => state[k].d === BALANCE_CONFIG[k].defaultD &&
-      state[k].group === (BALANCE_CONFIG[k].defaultAntiPhase ? 1 : 0));
-    if (isDefault) {
-      banner.style.borderColor = 'rgba(76, 175, 80, 0.2)';
-      banner.style.background = 'rgba(76, 175, 80, 0.08)';
-    } else {
-      banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-      banner.style.background = 'rgba(255, 255, 255, 0.03)';
-    }
-    const mainEl = banner.querySelector('.fbe-context-main');
-    if (mainEl) {
-      const sel = panel.querySelector('.fbe-preset-select');
-      const selIdx = sel ? parseInt(sel.value) : -1;
-      const num = selIdx >= 0 ? selIdx + 1 : '?';
-      if (isDefault) {
-        mainEl.innerHTML = '\u2605 Current model: <b>#' + num + '</b> of ' + BALANCE_PRESETS.length + ' \u2014 the only mirror-symmetric configuration';
-      } else if (isMirror) {
-        mainEl.innerHTML = 'Showing <b>#' + num + '</b> of ' + BALANCE_PRESETS.length + ' \u2014 mirror-symmetric';
-      } else {
-        mainEl.innerHTML = 'Showing <b>#' + num + '</b> of ' + BALANCE_PRESETS.length + ' (not mirror-symmetric)';
-      }
-    }
-  }
-
-  // Inclination balance percentage display
-  const inclPct = 100 - results.imbalance;
-  const inclDisplay = panel.querySelector('.fbe-ratio-incl');
-  const inclValue = panel.querySelector('.fbe-ratio-value');
-  inclValue.textContent = inclPct.toFixed(4) + '%';
-  inclDisplay.classList.toggle('invalid', inclPct < 90);
-
-  // Eccentricity balance percentage display
-  const eccPct = 100 - results.eccImbalance;
-  const eccDisplay = panel.querySelector('.fbe-ratio-ecc');
-  const eccValue = panel.querySelector('.fbe-ratio-ecc-value');
-  eccValue.textContent = eccPct.toFixed(2) + '%';
-  eccDisplay.classList.toggle('invalid', eccPct < 90);
-
-  // Deep-analysis info bar (anchor n, direction count, total error, mirror)
-  const deepInfo = panel.querySelector('.fbe-deep-info');
-  if (deepInfo && state._anchorN != null) {
-    deepInfo.style.display = '';
-    const anchorYear = Math.round(balancedYear - (state._anchorN || 0) * holisticyearLength);
-    panel.querySelector('.fbe-deep-anchor').textContent = 'Anchor: n=' + state._anchorN + ' (year ' + anchorYear.toLocaleString('en-US') + ')';
-    // Compute dir/err from current results
-    let deepDir = 0, deepErr = 0;
-    for (const key of BALANCE_PLANETS) {
-      const r = results.planetResults[key];
-      if (key !== 'earth') {
-        if (r.directionMatch) deepDir++;
-        deepErr += r.trendError * 3600;
-      }
-    }
-    panel.querySelector('.fbe-deep-dir').textContent = 'Dir: ' + deepDir + '/7';
-    panel.querySelector('.fbe-deep-err').textContent = 'Rate err: ' + deepErr.toFixed(1) + '\u2033';
-    // Mirror check from preset (stored as state._mirror or from the current row)
-    const mirEl = panel.querySelector('.fbe-deep-mirror');
-    // Check mirror symmetry from current state
-    const isMirror = state.mercury.d === state.uranus.d &&
-                     state.venus.d === state.neptune.d &&
-                     state.mars.d === state.jupiter.d;
-    mirEl.textContent = isMirror ? '\u2605 Mirror symmetric' : '';
-    mirEl.style.color = isMirror ? '#4CAF50' : '#aaa';
-  } else if (deepInfo) {
-    deepInfo.style.display = 'none';
-  }
-
-  // Status line: LL pass count and direction match count
-  let llPass = 0, dirPass = 0;
-  for (const key of BALANCE_PLANETS) {
-    const r = results.planetResults[key];
-    if (r.fitsLL) llPass++;
-    if (key !== 'earth' && r.directionMatch) dirPass++;
-  }
-  const status = panel.querySelector('.fbe-status');
-  status.textContent =
-    `LL bounds: ${llPass}/8  |  Direction: ${dirPass}/7  |  ` +
-    `amp = \u03C8 / (d \u00D7 \u221Am)`;
-
-  // PSI formula line
-  const psiLine = panel.querySelector('.fbe-psi-line');
-  psiLine.textContent =
-    `\u03C8 = d\u2091 \u00D7 amp\u2091 \u00D7 \u221Am\u2091 = ${results.PSI.toExponential(6)}`;
-
-  // Per-planet table
-  const tbody = panel.querySelector('.fbe-results-tbody');
-  tbody.innerHTML = BALANCE_PLANETS.map(key => {
-    const r = results.planetResults[key];
-    const cfg = BALANCE_CONFIG[key];
-
-    const ampStr = r.amplitude.toFixed(4) + '\u00B0';
-    const meanStr = r.mean.toFixed(4) + '\u00B0';
-    const rangeStr = `[${r.rangeMin.toFixed(2)}, ${r.rangeMax.toFixed(2)}]`;
-
-    let trendStr, jplStr, frameStr, errStr, dirStr;
-    if (key === 'earth') {
-      trendStr = '\u2014';
-      jplStr = '\u2014';
-      frameStr = '\u2014';
-      errStr = '\u2014';
-      dirStr = '\u2014';
-    } else {
-      trendStr = (r.trend >= 0 ? '+' : '') + r.trend.toFixed(5);
-      jplStr = (r.jplTrendMoving >= 0 ? '+' : '') + r.jplTrendMoving.toFixed(5);
-      const frameCorr = r.trend - r.trendFixed;
-      frameStr = (frameCorr >= 0 ? '+' : '') + frameCorr.toFixed(5);
-      errStr = (r.trendError * 3600).toFixed(1) + '"';
-      dirStr = r.directionMatch ? '\u2713' : '\u2717';
-    }
-
-    const dxiStr = r.dxixsqrtm.toExponential(3);
-    const eccStr = r.eccWeight != null ? r.eccWeight.toExponential(3) : '\u2014';
-
-    return `<tr>
-      <td class="planet-cell">${cfg.name}</td>
-      <td>${ampStr}</td>
-      <td>${meanStr}</td>
-      <td>${rangeStr}</td>
-      <td class="${r.llState === 'strict' ? 'pass' : r.llState === 'tolerance' ? 'warn' : 'fail'} fbe-ll-cell"><span class="fbe-ll-tip">${r.llState === 'fail' ? '\u2717' : '\u2713'}<span class="fbe-ll-tip-content">Laplace-Lagrange bounds for ${cfg.name}:<br><b>${cfg.llBounds.min.toFixed(3)}\u00B0 \u2013 ${cfg.llBounds.max.toFixed(3)}\u00B0</b>${r.llState === 'tolerance' ? '<br><span style="color:#FFB300">\u26A0 Within \u00B10.03\u00B0 tolerance</span>' : ''}<br>3D model predicted range: ${r.rangeMin.toFixed(3)}\u00B0 \u2013 ${r.rangeMax.toFixed(3)}\u00B0<br><br><a href="https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html" target="_blank" rel="noopener">Farside: Table 10.4 \u2192</a></span></span></td>
-      <td>${trendStr}</td>
-      <td>${jplStr}</td>
-      <td>${frameStr}</td>
-      <td>${errStr}</td>
-      <td class="${key === 'earth' ? '' : (r.directionMatch ? 'pass' : 'fail')}">${dirStr}</td>
-      <td>${dxiStr}</td>
-      <td>${eccStr}</td>
-    </tr>`;
-  }).join('');
-
-  // Inclination balance verification line
-  const inclLine = panel.querySelector('.fbe-balance-incl-line');
-  const inclPctVal = 100 - results.imbalance;
-  inclLine.innerHTML =
-    `<b>Incl:</b>  \u03A3(pro) w = ${results.inclSum203.toExponential(4)}  |  ` +
-    `\u03A3(anti) w = ${results.inclSum23.toExponential(4)}  |  ` +
-    `Balance: ${inclPctVal.toFixed(4)}% ` +
-    (results.imbalance < 1
-      ? '<span class="pass">\u2713</span>'
-      : '<span class="fail">\u26A0</span>');
-
-  // Eccentricity balance verification line
-  const eccLine = panel.querySelector('.fbe-balance-ecc-line');
-  const eccPctVal = 100 - results.eccImbalance;
-  eccLine.innerHTML =
-    `<b>Ecc:</b>   \u03A3(pro) v = ${results.eccSum203.toExponential(4)}  |  ` +
-    `\u03A3(anti) v = ${results.eccSum23.toExponential(4)}  |  ` +
-    `Balance: ${eccPctVal.toFixed(2)}% ` +
-    (results.eccImbalance < 1
-      ? '<span class="pass">\u2713</span>'
-      : '<span class="fail">\u26A0</span>');
-
-  // ── Vector Balance Diagram (only if expanded) ──
-  const vectorCollapsible = panel.querySelector('.fbe-vector-collapsible');
-  if (vectorCollapsible && vectorCollapsible.style.display !== 'none') {
-    fbeRenderVectorDiagram(panel, state);
-  }
-}
-
-// ── Multi-mode eigenmode solver (model's own 8H/N frequencies) ──
-// Uses the model's ascending node periods (ascendingNodeCyclesIn8H) as eigenfrequencies.
-// These are integer divisors of 8H — the model's Fibonacci-level prediction.
-// Computes eigenvector amplitudes once, then reconstruct(year) gives
-// the p,q state for all 8 planets at any year with guaranteed 100% balance.
-let _eigenX = null, _eigenY = null, _eigenPlanets = null;
-let fbeMultiMode = false;
-
-function fbeInitEigenmodes() {
-  if (_eigenX) return; // already initialized
-  const DEG = Math.PI / 180;
-  const KEYS = BALANCE_PLANETS;
-  const NP = 8;
-  const _8H = 8 * holisticyearLength;
-
-  // Model's own ascending-node periods from ascendingNodeCyclesIn8H (8H/N, all retrograde)
-  // Read from planet config; Earth uses 40 (= 8H/40 = H/5, ecliptic precession)
-  const ascCycles = KEYS.map(key =>
-    key === 'earth' ? 40 : planets[key].ascendingNodeCyclesIn8H
-  );
-  const S_RAD = ascCycles.map(n => -2 * Math.PI / (_8H / n));  // retrograde
-
-  // Planet angular momenta and J2000 states
-  const pls = KEYS.map(key => {
-    const cfg = BALANCE_CONFIG[key];
-    const L = cfg.mass * Math.sqrt(cfg.sma * (1 - cfg.ecc * cfg.ecc));
-    return { key, L, inclJ2000: cfg.inclJ2000, omegaJ2000: cfg.omegaJ2000 };
-  });
-  _eigenPlanets = pls;
-
-  const p0 = pls.map(pl => Math.sin(pl.inclJ2000 * DEG) * Math.sin(pl.omegaJ2000 * DEG));
-  const q0 = pls.map(pl => Math.sin(pl.inclJ2000 * DEG) * Math.cos(pl.omegaJ2000 * DEG));
-
-  // JPL rates (arcsec/yr for nodes, arcsec/cy for inclinations)
-  const nodeRates = { mercury: -6.592, venus: -7.902, earth: -18.851, mars: -17.635, jupiter: -25.934, saturn: -26.578, uranus: -3.087, neptune: -0.673 };
-  const inclRates = { mercury: -23.89, venus: -2.86, earth: -46.94, mars: -18.72, jupiter: -2.48, saturn: +6.68, uranus: -3.64, neptune: +0.68 };
-
-  const dp0 = [], dq0 = [];
-  for (let j = 0; j < NP; j++) {
-    const key = KEYS[j];
-    const dO = nodeRates[key] / 3600 * DEG;
-    const dI = inclRates[key] / 100 / 3600 * DEG;
-    const I = pls[j].inclJ2000 * DEG, O = pls[j].omegaJ2000 * DEG;
-    dp0.push(Math.cos(I) * Math.sin(O) * dI + Math.sin(I) * Math.cos(O) * dO);
-    dq0.push(Math.cos(I) * Math.cos(O) * dI - Math.sin(I) * Math.sin(O) * dO);
-  }
-
-  // Least-squares solver
-  function solveLSQ(rows, rhs, n) {
-    const m = rows.length;
-    const ATA = Array.from({ length: n }, () => Array(n).fill(0));
-    const ATb = Array(n).fill(0);
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) for (let k = 0; k < m; k++) ATA[i][j] += rows[k][i] * rows[k][j];
-      for (let k = 0; k < m; k++) ATb[i] += rows[k][i] * rhs[k];
-    }
-    const M = ATA.map((r, i) => [...r, ATb[i]]);
-    for (let col = 0; col < n; col++) {
-      let mx = 0, mr = col;
-      for (let r = col; r < n; r++) if (Math.abs(M[r][col]) > mx) { mx = Math.abs(M[r][col]); mr = r; }
-      [M[col], M[mr]] = [M[mr], M[col]];
-      if (Math.abs(M[col][col]) < 1e-30) continue;
-      for (let r = col + 1; r < n; r++) { const f = M[r][col] / M[col][col]; for (let j = col; j <= n; j++) M[r][j] -= f * M[col][j]; }
-    }
-    const x = Array(n).fill(0);
-    for (let i = n - 1; i >= 0; i--) { x[i] = M[i][n]; for (let j = i + 1; j < n; j++) x[i] -= M[i][j] * x[j]; if (Math.abs(M[i][i]) > 1e-30) x[i] /= M[i][i]; }
-    return x;
-  }
-
-  function solveSubsystem(planetIdxs, modeIdxs) {
-    const np = planetIdxs.length, nm = modeIdxs.length;
-    function build(sv, rv) {
-      const rows = [], rhs = [];
-      for (let jj = 0; jj < np; jj++) {
-        const j = planetIdxs[jj];
-        const rP = Array(np * nm).fill(0), rR = Array(np * nm).fill(0);
-        for (let ii = 0; ii < nm; ii++) { rP[jj * nm + ii] = 1; rR[jj * nm + ii] = S_RAD[modeIdxs[ii]]; }
-        rows.push(rP); rhs.push(sv[j]); rows.push(rR); rhs.push(rv[j]);
-      }
-      for (let ii = 0; ii < nm; ii++) {
-        const row = Array(np * nm).fill(0);
-        for (let jj = 0; jj < np; jj++) row[jj * nm + ii] = pls[planetIdxs[jj]].L;
-        rows.push(row); rhs.push(0);
-      }
-      return solveLSQ(rows, rhs, np * nm);
-    }
-    const a_flat = build(p0, dq0.map(v => -v));
-    const b_flat = build(q0, dp0);
-    const a = [], b = [];
-    for (let jj = 0; jj < np; jj++) { a.push(a_flat.slice(jj * nm, (jj + 1) * nm)); b.push(b_flat.slice(jj * nm, (jj + 1) * nm)); }
-    return { a, b };
-  }
-
-  const inner = solveSubsystem([0, 1, 2, 3], [0, 1, 2, 3]);
-  const outer = solveSubsystem([4, 5, 6, 7], [4, 5, 6]);
-
-  const X = Array.from({ length: 7 }, () => Array(8).fill(0));
-  const Y = Array.from({ length: 7 }, () => Array(8).fill(0));
-  for (let ii = 0; ii < 4; ii++) for (let jj = 0; jj < 4; jj++) { X[ii][jj] = inner.a[jj][ii]; Y[ii][jj] = inner.b[jj][ii]; }
-  for (let ii = 0; ii < 3; ii++) for (let jj = 0; jj < 4; jj++) { X[4 + ii][4 + jj] = outer.a[jj][ii]; Y[4 + ii][4 + jj] = outer.b[jj][ii]; }
-
-  // Enforce angular momentum constraint
-  for (let i = 0; i < 7; i++) {
-    let sLX = 0, sLY = 0, sLL = 0;
-    for (let j = 0; j < NP; j++) { sLX += pls[j].L * X[i][j]; sLY += pls[j].L * Y[i][j]; sLL += pls[j].L * pls[j].L; }
-    for (let j = 0; j < NP; j++) { X[i][j] -= (sLX / sLL) * pls[j].L; Y[i][j] -= (sLY / sLL) * pls[j].L; }
-  }
-
-  _eigenX = X; _eigenY = Y;
-  _eigenX._S_RAD = S_RAD;
-}
-
-function fbeReconstructMultiMode(year) {
-  if (!_eigenX) fbeInitEigenmodes();
-  const t = year - 2000;
-  const RAD2DEG = 180 / Math.PI;
-  const S_RAD = _eigenX._S_RAD;
-  return _eigenPlanets.map((pl, j) => {
-    let p = 0, q = 0;
-    for (let i = 0; i < 7; i++) {
-      const c = Math.cos(S_RAD[i] * t), s = Math.sin(S_RAD[i] * t);
-      p += c * _eigenX[i][j] + s * _eigenY[i][j];
-      q += c * _eigenY[i][j] - s * _eigenX[i][j];
-    }
-    const sinI = Math.sqrt(p * p + q * q);
-    const incl = Math.asin(Math.min(1, sinI)) * RAD2DEG;
-    const omega = ((Math.atan2(p, q) * RAD2DEG) % 360 + 360) % 360;
-    return { key: pl.key, L: pl.L, incl, omega, p, q };
-  });
-}
-
-function fbeRenderVectorDiagram(panel, state) {
-  const svg = panel.querySelector('.fbe-polar-svg');
-  if (!svg) return;
-
-  const CX = 220, CY = 180, R = 130;
-  const DEG = Math.PI / 180;
-  const year = o.currentYear || 2000;
-  const genPrecRate = 1 / (holisticyearLength / 13);
-
-  // Detect if current config matches the model's default configuration
-  const isDefaultConfig = BALANCE_PLANETS.every(k => state[k].d === BALANCE_CONFIG[k].defaultD);
-
-  const planetColors = {
-    mercury: '#a0a0a0', venus: '#e8c46a', earth: '#3399ff', mars: '#b03a2e',
-    jupiter: '#c97e4f', saturn: '#d9b65c', uranus: '#37c6d0', neptune: '#2c539e'
-  };
-
-  // Compute per-planet data (single-mode from simulation, or multi-mode from eigenmodes)
-  const multiData = fbeMultiMode ? fbeReconstructMultiMode(year) : null;
-  const data = [];
-  let totalMag = 0;
-  for (let idx = 0; idx < BALANCE_PLANETS.length; idx++) {
-    const key = BALANCE_PLANETS[idx];
-    const cfg = BALANCE_CONFIG[key];
-    const periICRF = key === 'earth' ? o.earthPerihelionLongICRF : (o[key + 'PerihelionLongICRF'] || 0);
-    const phaseAngle = state[key].phaseAngle;
-    const isAnti = state[key].group === 1;
-
-    let L, incl, omega, Lp, Lq;
-    if (multiData) {
-      // Multi-mode: use eigenmode reconstruction (100% balance guaranteed)
-      const m = multiData[idx];
-      L = m.L; incl = m.incl; omega = m.omega;
-      Lp = m.L * m.p; Lq = m.L * m.q;
-    } else {
-      // Single-mode: use simulation ascending nodes
-      L = cfg.mass * Math.sqrt(cfg.sma * (1 - cfg.ecc * cfg.ecc));
-      incl = key === 'earth' ? o.earthInvPlaneInclinationDynamic : (o[key + 'InvPlaneInclinationDynamic'] || 0);
-      omega = key === 'earth' ? o.earthAscendingNodeInvPlane : (o[key + 'AscendingNodeInvPlane'] || 0);
-      Lp = L * Math.sin(incl * DEG) * Math.sin(omega * DEG);
-      Lq = L * Math.sin(incl * DEG) * Math.cos(omega * DEG);
-    }
-    const mag = Math.sqrt(Lp * Lp + Lq * Lq);
-    totalMag += mag;
-
-    data.push({ key, Lp, Lq, mag, omega, incl, periICRF, phaseAngle, isAnti, color: planetColors[key] });
-  }
-
-  // Residual
-  let sumP = 0, sumQ = 0;
-  data.forEach(d => { sumP += d.Lp; sumQ += d.Lq; });
-  const residual = Math.sqrt(sumP * sumP + sumQ * sumQ);
-  const balance = totalMag > 0 ? (1 - residual / totalMag) * 100 : 100;
-
-
-
-  const planetNames = {
-    mercury: 'Mercury', venus: 'Venus', earth: 'Earth', mars: 'Mars',
-    jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune'
-  };
-  const planetFull = {
-    mercury: 'Mercury', venus: 'Venus', earth: 'Earth', mars: 'Mars',
-    jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune'
-  };
-
-  // Counter-clockwise angle → SVG coords (0° = right = Aries, CCW positive)
-  const px = (angle, r) => CX + r * Math.cos(angle * DEG);
-  const py = (angle, r) => CY - r * Math.sin(angle * DEG);
-
-  let html = '';
-  html += '<defs><style>';
-  html += '.fbe-vd-group { cursor: pointer; } ';
-  html += '.fbe-vd-group:hover .fbe-vd-arrow { opacity: 1; stroke-width: 3; } ';
-  html += '.fbe-vd-group:hover .fbe-vd-head { opacity: 1; } ';
-  html += '.fbe-vd-group:hover .fbe-vd-dot { r: 7; } ';
-  html += '</style></defs>';
-
-  // Background circles
-  html += `<circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
-  html += `<circle cx="${CX}" cy="${CY}" r="${R * 0.5}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>`;
-
-  // Axis lines and degree labels (every 30°)
-  for (let deg = 0; deg < 360; deg += 30) {
-    html += `<line x1="${CX}" y1="${CY}" x2="${px(deg, R)}" y2="${py(deg, R)}" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>`;
-    html += `<text x="${px(deg, R + 14)}" y="${py(deg, R + 14)}" fill="rgba(255,255,255,0.2)" font-size="8" text-anchor="middle" dominant-baseline="central">${deg}\u00B0</text>`;
-  }
-
-  // Phase angle markers (fixed reference — thin dashed lines from center)
-  for (const d of data) {
-    const x = px(d.phaseAngle, R * 0.85), y = py(d.phaseAngle, R * 0.85);
-    html += `<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" stroke="${d.color}" stroke-width="0.5" stroke-dasharray="2,4" opacity="0.25"/>`;
-    html += `<circle cx="${x}" cy="${y}" r="2" fill="${d.color}" opacity="0.25"/>`;
-  }
-
-  // Vector balance arrows (direction = Ω ascending node, length ∝ L×sin(i))
-  const maxArrow = R * 0.75;
-  const maxMag = Math.max(...data.map(d => d.mag));
-  for (const d of data) {
-    if (d.mag < 1e-15) continue;
-    const arrowColor = d.isAnti ? '#d9534f' : '#5cb85c';
-    const pct = totalMag > 0 ? (d.mag / totalMag * 100) : 0;
-    const arrowLen = (d.mag / maxMag) * maxArrow;
-    const ex = px(d.omega, arrowLen), ey = py(d.omega, arrowLen);
-
-    // Build tooltip
-    const tip = `${planetFull[d.key]}${d.isAnti ? ' (anti-phase)' : ''}\n` +
-      `\u03A9 = ${d.omega.toFixed(1)}\u00B0  (ascending node direction)\n` +
-      `i = ${d.incl.toFixed(4)}\u00B0  (inclination)\n` +
-      `\u03D6 ICRF = ${d.periICRF.toFixed(2)}\u00B0  (perihelion)\n` +
-      `Phase \u03C6 = ${d.phaseAngle.toFixed(2)}\u00B0  (fixed)\n` +
-      `Force: ${pct.toFixed(1)}% of total`;
-
-    html += `<g class="fbe-vd-group"><title>${tip}</title>`;
-
-    // Arrow line
-    html += `<line class="fbe-vd-arrow" x1="${CX}" y1="${CY}" x2="${ex}" y2="${ey}" stroke="${arrowColor}" stroke-width="1.5" opacity="0.6"/>`;
-    // Arrowhead
-    const hl = 5;
-    const a = Math.atan2(CY - ey, ex - CX);
-    html += `<polygon class="fbe-vd-head" points="${ex},${ey} ${ex - hl * Math.cos(a - 0.4)},${ey + hl * Math.sin(a - 0.4)} ${ex - hl * Math.cos(a + 0.4)},${ey + hl * Math.sin(a + 0.4)}" fill="${arrowColor}" opacity="0.6"/>`;
-
-    html += `</g>`;
-  }
-
-  // ICRF perihelion dots — anti-collision label placement
-  const labelSlots = data.map(d => ({
-    ...d,
-    pct: totalMag > 0 ? (d.mag / totalMag * 100) : 0,
-    labelAngle: d.periICRF
-  }));
-  // Push labels apart when too close
-  const slotsSorted = [...labelSlots].sort((a, b) => a.labelAngle - b.labelAngle);
-  const minGap = 18;
-  for (let pass = 0; pass < 8; pass++) {
-    for (let i = 0; i < slotsSorted.length; i++) {
-      const cur = slotsSorted[i], nxt = slotsSorted[(i + 1) % slotsSorted.length];
-      let gap = nxt.labelAngle - cur.labelAngle;
-      if (gap < 0) gap += 360;
-      if (gap < minGap) {
-        const push = (minGap - gap) / 2 + 0.5;
-        cur.labelAngle = (cur.labelAngle - push + 360) % 360;
-        nxt.labelAngle = (nxt.labelAngle + push) % 360;
-      }
-    }
-  }
-
-  for (const d of labelSlots) {
-    const dotX = px(d.periICRF, R), dotY = py(d.periICRF, R);
-    const tip = `${planetFull[d.key]}${d.isAnti ? ' (anti-phase)' : ''}\n\n` +
-      `\u03A9 = ${d.omega.toFixed(1)}\u00B0  (ascending node \u2192 force direction)\n` +
-      `i = ${d.incl.toFixed(4)}\u00B0  (inclination to inv. plane)\n` +
-      `\u03D6 ICRF = ${d.periICRF.toFixed(2)}\u00B0  (perihelion in J2000)\n` +
-      `Phase \u03C6 = ${d.phaseAngle.toFixed(2)}\u00B0  (fixed reference)\n` +
-      `Force: ${d.pct.toFixed(1)}% of total`;
-
-    html += `<g class="fbe-vd-group"><title>${tip}</title>`;
-    // Dot at true ICRF position
-    html += `<circle class="fbe-vd-dot" cx="${dotX}" cy="${dotY}" r="6" fill="${d.color}" stroke="${d.isAnti ? '#d9534f' : 'rgba(255,255,255,0.5)'}" stroke-width="${d.isAnti ? 2 : 0.7}"/>`;
-    // Connecting line from dot to label when label was pushed away
-    const lR = R + 30;
-    const lx = px(d.labelAngle, lR), ly = py(d.labelAngle, lR);
-    if (Math.abs(d.labelAngle - d.periICRF) > 5) {
-      html += `<line x1="${dotX}" y1="${dotY}" x2="${px(d.labelAngle, R + 10)}" y2="${py(d.labelAngle, R + 10)}" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>`;
-    }
-    // Label at adjusted angle — name + force %
-    const a = d.labelAngle;
-    const anchor = (a > 110 && a < 250) ? 'end' : (a >= 70 && a <= 110) || (a >= 250 && a <= 290) ? 'middle' : 'start';
-    html += `<text x="${lx}" y="${ly - 4}" fill="${d.color}" font-size="11" font-weight="700" text-anchor="${anchor}" dominant-baseline="central">${planetNames[d.key]}</text>`;
-    html += `<text x="${lx}" y="${ly + 9}" fill="rgba(255,255,255,0.55)" font-size="9" text-anchor="${anchor}" dominant-baseline="central">${d.pct.toFixed(1)}%</text>`;
-    html += `</g>`;
-  }
-
-  // Residual: small dashed circle at center (imbalance shown in side panel)
-  if (totalMag > 0) {
-    const imbalancePct = (residual / totalMag) * 100;
-    const resRadius = Math.max(4, Math.min(imbalancePct * 8, 20));
-    html += `<g><title>Net imbalance: ${imbalancePct.toFixed(4)}%\nResidual magnitude: ${residual.toExponential(3)}\n\nAt 99.6% balance, the residual direction\nis dominated by numerical precision.\nJupiter + Saturn nearly perfectly cancel.</title>`;
-    html += `<circle cx="${CX}" cy="${CY}" r="${resRadius}" fill="none" stroke="#ffd700" stroke-width="2" opacity="0.6" stroke-dasharray="3,2"/>`;
-    html += `</g>`;
-  }
-
-  // Group sums computed for legend row
-  let inPhasePct = 0, antiPhasePct = 0;
-  for (const d of data) {
-    const pct = totalMag > 0 ? (d.mag / totalMag * 100) : 0;
-    if (d.isAnti) antiPhasePct += pct; else inPhasePct += pct;
-  }
-  const imbalancePct = totalMag > 0 ? (residual / totalMag) * 100 : 0;
-
-  // Balance readout below diagram
-  const BY = R + CY + 58;
-  const modeLabel = fbeMultiMode ? ' (multi-mode)' : ' (single-mode)';
-  html += `<text x="${CX}" y="${BY}" fill="rgba(255,255,255,0.85)" font-size="14" font-weight="700" text-anchor="middle">Vector Balance: `;
-  html += `<tspan fill="${balance > 99 ? '#5cb85c' : '#ffd700'}">${balance.toFixed(2)}%</tspan>`;
-  html += `<tspan fill="rgba(255,255,255,0.35)" font-size="9">${modeLabel}</tspan></text>`;
-
-  // Legend: two rows — labels on top, percentages below
-  const LY = BY + 20;
-  // Row 1: legend symbols + labels
-  html += `<line x1="50" y1="${LY}" x2="65" y2="${LY}" stroke="#5cb85c" stroke-width="2.5"/>`;
-  html += `<text x="70" y="${LY}" fill="rgba(255,255,255,0.5)" font-size="9" dominant-baseline="central">In-phase (\u03A9)</text>`;
-  html += `<line x1="175" y1="${LY}" x2="190" y2="${LY}" stroke="#d9534f" stroke-width="2.5"/>`;
-  html += `<text x="195" y="${LY}" fill="rgba(255,255,255,0.5)" font-size="9" dominant-baseline="central">Anti-phase (\u03A9)</text>`;
-  html += `<circle cx="315" cy="${LY}" r="5" fill="none" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="2,2"/>`;
-  html += `<text x="326" y="${LY}" fill="rgba(255,255,255,0.5)" font-size="9" dominant-baseline="central">Net imbalance</text>`;
-  // Row 2: percentages aligned under each legend item
-  const LY2 = LY + 14;
-  html += `<text x="70" y="${LY2}" fill="#5cb85c" font-size="10" font-weight="700" dominant-baseline="central">${inPhasePct.toFixed(1)}%</text>`;
-  html += `<text x="195" y="${LY2}" fill="#d9534f" font-size="10" font-weight="700" dominant-baseline="central">${antiPhasePct.toFixed(1)}%</text>`;
-  html += `<text x="326" y="${LY2}" fill="#ffd700" font-size="10" font-weight="700" dominant-baseline="central">${imbalancePct.toFixed(2)}%</text>`;
-
-  // Note when non-Config-1 is selected
-  if (!isDefaultConfig && fbeMultiMode) {
-    const NY = LY2 + 18;
-    html += `<text x="${CX}" y="${NY}" fill="rgba(255,200,50,0.6)" font-size="8" font-style="italic" text-anchor="middle" dominant-baseline="central">Note: Vector balance is independent of d-value configuration \u2014 it works for any integer divisors of 8H.</text>`;
-    html += `<text x="${CX}" y="${NY + 12}" fill="rgba(255,200,50,0.6)" font-size="8" font-style="italic" text-anchor="middle" dominant-baseline="central">The real constraints are the scalar Inclination Balance (Law 3) and Eccentricity Balance (Law 5) above.</text>`;
-  }
-
-  svg.innerHTML = html;
-}
-
-function openBalanceExplorer() {
-  if (!balanceExplorerPanel) {
-    balanceExplorerPanel = createBalanceExplorerPanel();
-  }
-  balanceExplorerPanel.classList.add('visible');
-}
-
-function closeBalanceExplorer() {
-  if (balanceExplorerPanel) {
-    balanceExplorerPanel.classList.remove('visible');
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// ECCENTRICITY BALANCE SCALE — Interactive visualization
-// Shows how each planet's perihelion offset is built from the contributions
-// of all other planets via the Law 5 balance equation.
-// ═══════════════════════════════════════════════════════════════════════════
-
-const BALANCE_PLANETS_SCALE = ['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune'];
-const PHASE_ANGLE_SCALE = Object.fromEntries(BALANCE_PLANETS_SCALE.map(k => [k, BALANCE_CONFIG[k].defaultAntiPhase ? 23 : 203]));
-
-// Use BASE eccentricities for the scale (Law 5 balance is tuned on these)
-const ECC_BASE_SCALE = {
-  mercury: planets.mercury.orbitalEccentricityBase,
-  venus:   planets.venus.orbitalEccentricityBase,
-  earth:   eccentricityBase,
-  mars:    planets.mars.orbitalEccentricityBase,
-  jupiter: planets.jupiter.orbitalEccentricityBase,
-  saturn:  planets.saturn.orbitalEccentricityBase,
-  uranus:  planets.uranus.orbitalEccentricityBase,
-  neptune: planets.neptune.orbitalEccentricityBase,
-};
-// Model-derived J2000 eccentricities: e(2000) from computeEccentricityEarth
-const ECC_J2000_SCALE = {
-  mercury: computeEccentricityEarth(2000, 2000 - (planets.mercury.eccentricityPhaseJ2000 / 360) * mercuryWobblePeriod, mercuryWobblePeriod, planets.mercury.orbitalEccentricityBase, planets.mercury.orbitalEccentricityAmplitude),
-  venus:   computeEccentricityEarth(2000, 2000 - (planets.venus.eccentricityPhaseJ2000   / 360) * venusWobblePeriod,   venusWobblePeriod,   planets.venus.orbitalEccentricityBase,   planets.venus.orbitalEccentricityAmplitude),
-  earth:   computeEccentricityEarthAtYear(2000),
-  mars:    computeEccentricityEarth(2000, 2000 - (planets.mars.eccentricityPhaseJ2000    / 360) * marsWobblePeriod,    marsWobblePeriod,    planets.mars.orbitalEccentricityBase,    planets.mars.orbitalEccentricityAmplitude),
-  jupiter: computeEccentricityEarth(2000, 2000 - (planets.jupiter.eccentricityPhaseJ2000 / 360) * jupiterWobblePeriod, jupiterWobblePeriod, planets.jupiter.orbitalEccentricityBase, planets.jupiter.orbitalEccentricityAmplitude),
-  saturn:  computeEccentricityEarth(2000, 2000 - (planets.saturn.eccentricityPhaseJ2000  / 360) * saturnWobblePeriod,  saturnWobblePeriod,  planets.saturn.orbitalEccentricityBase,  planets.saturn.orbitalEccentricityAmplitude),
-  uranus:  computeEccentricityEarth(2000, 2000 - (planets.uranus.eccentricityPhaseJ2000  / 360) * uranusWobblePeriod,  uranusWobblePeriod,  planets.uranus.orbitalEccentricityBase,  planets.uranus.orbitalEccentricityAmplitude),
-  neptune: computeEccentricityEarth(2000, 2000 - (planets.neptune.eccentricityPhaseJ2000 / 360) * neptuneWobblePeriod, neptuneWobblePeriod, planets.neptune.orbitalEccentricityBase, planets.neptune.orbitalEccentricityAmplitude),
-};
-const ECC_AMP_SCALE = {
-  mercury: planets.mercury.orbitalEccentricityAmplitude,
-  venus:   planets.venus.orbitalEccentricityAmplitude,
-  earth:   eccentricityAmplitude,
-  mars:    planets.mars.orbitalEccentricityAmplitude,
-  jupiter: planets.jupiter.orbitalEccentricityAmplitude,
-  saturn:  planets.saturn.orbitalEccentricityAmplitude,
-  uranus:  planets.uranus.orbitalEccentricityAmplitude,
-  neptune: planets.neptune.orbitalEccentricityAmplitude,
-};
-const ECC_CYCLE_SCALE = {
-  mercury: mercuryWobblePeriod,
-  venus:   venusWobblePeriod,
-  earth:   earthPerihelionICRFYears,  // H/3 — Earth's |e| rides the one eccentricity law; the H/16 = 13+3 beat is the perihelion direction only
-  mars:    marsWobblePeriod,
-  jupiter: jupiterWobblePeriod,
-  saturn:  saturnWobblePeriod,
-  uranus:  uranusWobblePeriod,
-  neptune: neptuneWobblePeriod,
-};
-
-function computeEccScaleData(targetKey) {
-  const bc = BALANCE_CONFIG;
-  const t = bc[targetKey];
-  const tEcc = ECC_BASE_SCALE[targetKey];
-  const tPhase = PHASE_ANGLE_SCALE[targetKey];
-  const offset_t = tEcc * t.sma;
-  const results = [];
-  for (const key of BALANCE_PLANETS_SCALE) {
-    if (key === targetKey) continue;
-    const p = bc[key];
-    const pPhase = PHASE_ANGLE_SCALE[key];
-    const pEcc = ECC_BASE_SCALE[key];
-    const W = Math.sqrt(p.mass * t.defaultD * p.sma / (t.mass * p.defaultD * t.sma));
-    const sign = pPhase !== tPhase ? +1 : -1;
-    const offset = pEcc * p.sma;
-    const contribution = sign * W * offset;
-    results.push({
-      key, name: p.name, offset, weight: W, sign, contribution,
-      mass: p.mass, d: p.defaultD, sma: p.sma, ecc: pEcc
-    });
-  }
-  results.sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
-  let cumulative = 0;
-  for (const r of results) {
-    cumulative += r.contribution;
-    r.cumulative = cumulative;
-    r.pctOfTarget = offset_t > 0 ? (cumulative / offset_t) * 100 : 0;
-  }
-  return { target: targetKey, targetName: t.name, targetOffset: offset_t, targetPhase: tPhase,
-           targetMass: t.mass, targetD: t.defaultD, targetSma: t.sma, targetEcc: tEcc,
-           targetEccJ2000: ECC_J2000_SCALE[targetKey], targetEccAmp: ECC_AMP_SCALE[targetKey],
-           targetEccCycle: ECC_CYCLE_SCALE[targetKey],
-           items: results, total: cumulative };
-}
-
-function hexToCSS(hex) {
-  return '#' + ((hex >> 16) & 0xff).toString(16).padStart(2,'0')
-             + ((hex >> 8) & 0xff).toString(16).padStart(2,'0')
-             + (hex & 0xff).toString(16).padStart(2,'0');
-}
-
-function renderEccWaterfallSVG(data) {
-  const items = data.items;
-  const targetOffset = data.targetOffset;
-  const residual = targetOffset - data.total;
-  // Compute max cumulative excursion to determine scale
-  let cumTest = 0, maxCum = 0;
-  for (const item of items) { cumTest += item.contribution; maxCum = Math.max(maxCum, Math.abs(cumTest)); }
-  const maxVal = Math.max(maxCum, Math.abs(targetOffset)) * 1.15;
-  const svgW = 900, barH = 22, padTop = 10, padBottom = 30, padLeft = 80, padRight = 140;
-  const chartW = svgW - padLeft - padRight;
-  const rowCount = items.length + 1;  // +1 for residual row
-  const svgH = padTop + rowCount * barH + padBottom;
-  const scale = chartW / maxVal;
-  const maxAbsC = Math.max(...items.map(i => Math.abs(i.contribution)), Math.abs(residual));
-  const valColX = svgW - padRight + 8; // left edge of value column
-  const valColW = padRight - 16;       // width available for background bars
-  let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">`;
-  svg += `<rect width="${svgW}" height="${svgH}" fill="transparent"/>`;
-  // Target marker line
-  const targetX = padLeft + Math.abs(targetOffset) * scale;
-  svg += `<line x1="${targetX}" y1="${padTop - 2}" x2="${targetX}" y2="${svgH - padBottom + 4}" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
-  svg += `<text x="${targetX}" y="${svgH - padBottom + 18}" fill="#f0b040" font-size="10" text-anchor="middle" font-family="var(--pl-mono-font)">e=${data.targetEcc.toFixed(6)}</text>`;
-  // Bars — cumulative buildup
-  let cumX = padLeft;
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    const y = padTop + i * barH;
-    const col = hexToCSS(planetColorHex[item.key] || 0xaaaaaa);
-    const barWidth = Math.abs(item.contribution) * scale;
-    const isPositive = item.sign > 0;
-    // Planet label (left of chart)
-    svg += `<circle cx="${padLeft - 14}" cy="${y + barH/2}" r="4" fill="${col}"/>`;
-    svg += `<text x="${padLeft - 22}" y="${y + barH/2 + 4}" fill="#ccc" font-size="11" text-anchor="end" font-family="var(--pl-body-font)">${item.name}</text>`;
-    // Bar
-    const barX = isPositive ? cumX : cumX - barWidth;
-    const fillColor = isPositive ? 'rgba(80,180,120,0.7)' : 'rgba(200,80,80,0.6)';
-    svg += `<rect x="${Math.max(barX, padLeft)}" y="${y + 4}" width="${Math.min(barWidth, chartW)}" height="${barH - 8}" rx="3" fill="${fillColor}" stroke="${col}" stroke-width="1"/>`;
-    // Update cumulative position
-    cumX += item.contribution * scale;
-    // Value label with background bar on right side (right-aligned to match table)
-    const signStr = item.contribution >= 0 ? '+' : '';
-    const valBarPct = maxAbsC > 0 ? Math.abs(item.contribution) / maxAbsC : 0;
-    const valBarW = Math.max(valBarPct * valColW, 2); // minimum 2px visibility
-    const valBarColor = isPositive ? 'rgba(76,175,80,0.2)' : 'rgba(239,83,80,0.2)';
-    svg += `<rect x="${svgW - 8 - valBarW}" y="${y + 3}" width="${valBarW}" height="${barH - 6}" rx="2" fill="${valBarColor}"/>`;
-    svg += `<text x="${svgW - 12}" y="${y + barH/2 + 4}" fill="${isPositive ? 'rgba(76,175,80,0.9)' : 'rgba(239,83,80,0.9)'}" font-size="10" text-anchor="end" font-family="var(--pl-mono-font)">${signStr}${item.contribution.toFixed(4)}</text>`;
-    // Cumulative tick
-    if (cumX >= padLeft && cumX <= svgW - padRight) {
-      svg += `<line x1="${cumX}" y1="${y + barH - 2}" x2="${cumX}" y2="${y + barH + 2}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`;
-    }
-  }
-  // Residual bar — the Law 5 imbalance closure that makes the sum = target's offset
-  {
-    const y = padTop + items.length * barH;
-    const residualWidth = Math.abs(residual) * scale;
-    const isResidualPositive = residual >= 0;
-    svg += `<circle cx="${padLeft - 14}" cy="${y + barH/2}" r="4" fill="#888"/>`;
-    svg += `<text x="${padLeft - 22}" y="${y + barH/2 + 4}" fill="#ccc" font-size="11" text-anchor="end" font-family="var(--pl-body-font)" font-style="italic">Residual</text>`;
-    const residualBarX = isResidualPositive ? cumX : cumX - residualWidth;
-    const residualFillColor = isResidualPositive ? 'rgba(80,180,120,0.5)' : 'rgba(200,80,80,0.45)';
-    svg += `<rect x="${Math.max(residualBarX, padLeft)}" y="${y + 4}" width="${Math.min(residualWidth, chartW)}" height="${barH - 8}" rx="3" fill="${residualFillColor}" stroke="#888" stroke-width="1" stroke-dasharray="3,2"/>`;
-    cumX += residual * scale;
-    const residualSignStr = residual >= 0 ? '+' : '';
-    const residualValBarPct = maxAbsC > 0 ? Math.abs(residual) / maxAbsC : 0;
-    const residualValBarW = Math.max(residualValBarPct * valColW, 2);
-    const residualValBarColor = isResidualPositive ? 'rgba(76,175,80,0.2)' : 'rgba(239,83,80,0.2)';
-    svg += `<rect x="${svgW - 8 - residualValBarW}" y="${y + 3}" width="${residualValBarW}" height="${barH - 6}" rx="2" fill="${residualValBarColor}"/>`;
-    svg += `<text x="${svgW - 12}" y="${y + barH/2 + 4}" fill="${isResidualPositive ? 'rgba(76,175,80,0.9)' : 'rgba(239,83,80,0.9)'}" font-size="10" text-anchor="end" font-family="var(--pl-mono-font)">${residualSignStr}${residual.toFixed(4)}</text>`;
-  }
-  // Zero line
-  svg += `<line x1="${padLeft}" y1="${padTop - 2}" x2="${padLeft}" y2="${svgH - padBottom + 4}" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>`;
-  // Separator between chart and value column
-  svg += `<line x1="${svgW - padRight}" y1="${padTop - 2}" x2="${svgW - padRight}" y2="${svgH - padBottom + 4}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
-  // Total in value column — same row as eccentricity label (now equals target offset exactly)
-  svg += `<text x="${svgW - 12}" y="${svgH - padBottom + 18}" fill="rgba(143,188,143,.85)" font-size="11" font-weight="600" text-anchor="end" font-family="var(--pl-mono-font)">${data.targetOffset.toFixed(6)}</text>`;
-  svg += '</svg>';
-  return svg;
-}
-
-function renderEccBuildupTable(data) {
-  const items = data.items;
-  // Residual: what's needed to close the balance so sum = target's offset.
-  // This represents the Law 5 imbalance (~0.14%) that the other 7 planets
-  // alone cannot account for — a real contribution to the target's eccentricity.
-  const residual = data.targetOffset - data.total;
-  // Compute total absolute contributions INCLUDING residual for meaningful percentages
-  const totalAbsContrib = items.reduce((s, i) => s + Math.abs(i.contribution), 0) + Math.abs(residual);
-  const maxAbsContrib = Math.max(...items.map(i => Math.abs(i.contribution)), Math.abs(residual));
-  let html = '<table class="ebs-table">';
-  html += '<colgroup><col style="width:12%"><col style="width:13%"><col style="width:5%"><col style="width:13%"><col style="width:13%"><col style="width:9%"><col style="width:15.6%"></colgroup>';
-  html += '<thead><tr>';
-  html += '<th>Planet</th><th title="Planet mass in solar masses (M\u2609). A fixed constant.">Mass (M\u2609)</th><th title="Fibonacci divisor from the balance configuration. A fixed constant that determines each planet\u2019s coupling strength.">d</th><th title="Perihelion offset: eccentricity \u00D7 semi-major axis. The physical distance (AU) between the Sun and the orbit center.">Offset (e\u00D7a)</th><th title="Scale weight: \u221A(m/m_target \u00D7 d_target/d \u00D7 a/a_target). Combines mass ratio, Fibonacci divisor ratio, and distance ratio.">Weight</th><th title="Each planet\u2019s share of the total absolute contributions (always sums to 100%).">Share</th><th class="ebs-col-contrib" title="Weight \u00D7 Offset \u00D7 Sign. Positive (+) if the planet is in the opposite phase group, negative (\u2212) if in the same group.">Contribution</th>';
-  html += '</tr></thead><tbody>';
-  for (const item of items) {
-    const col = hexToCSS(planetColorHex[item.key] || 0xaaaaaa);
-    const signClass = item.sign > 0 ? 'ebs-positive' : 'ebs-negative';
-    // Share = |contribution| / total absolute contributions (always positive, sums to 100%)
-    const sharePct = totalAbsContrib > 0 ? (Math.abs(item.contribution) / totalAbsContrib) * 100 : 0;
-    // Background bar percentages
-    const contribBarPct = maxAbsContrib > 0 ? (Math.abs(item.contribution) / maxAbsContrib) * 100 : 0;
-    const contribBarColor = item.sign > 0 ? 'rgba(76,175,80,0.2)' : 'rgba(239,83,80,0.2)';
-    const shareBarColor = 'rgba(255,255,255,0.08)';
-    // Format mass: use exponential for very small values, fixed otherwise
-    const massFmt = item.mass < 0.0001 ? item.mass.toExponential(2) : item.mass.toFixed(6);
-    html += `<tr>`;
-    html += `<td><span class="ebs-dot" style="background:${col}"></span>${item.name}</td>`;
-    html += `<td class="ebs-mono ebs-fixed">${massFmt}</td>`;
-    html += `<td class="ebs-mono ebs-fixed">${item.d}</td>`;
-    html += `<td class="ebs-mono ebs-fixed">${item.offset.toFixed(4)}</td>`;
-    html += `<td class="ebs-mono">${item.weight.toFixed(4)}</td>`;
-    html += `<td class="ebs-mono" style="background:linear-gradient(270deg,${shareBarColor} ${sharePct.toFixed(1)}%,transparent ${sharePct.toFixed(1)}%)">${sharePct.toFixed(1)}%</td>`;
-    html += `<td class="ebs-mono ebs-col-contrib ${signClass}" style="background:linear-gradient(270deg,${contribBarColor} ${contribBarPct.toFixed(1)}%,transparent ${contribBarPct.toFixed(1)}%)">${item.contribution >= 0 ? '+' : ''}${item.contribution.toFixed(4)}</td>`;
-    html += '</tr>';
-  }
-  // Residual row: represents the Law 5 imbalance closure.
-  // Sign and bar color follow the residual's sign (positive = adds to target, negative = subtracts).
-  const residualSignClass = residual > 0 ? 'ebs-positive' : 'ebs-negative';
-  const residualSharePct = totalAbsContrib > 0 ? (Math.abs(residual) / totalAbsContrib) * 100 : 0;
-  const residualBarPct = maxAbsContrib > 0 ? (Math.abs(residual) / maxAbsContrib) * 100 : 0;
-  const residualBarColor = residual > 0 ? 'rgba(76,175,80,0.2)' : 'rgba(239,83,80,0.2)';
-  const residualShareBarColor = 'rgba(255,255,255,0.08)';
-  html += `<tr>`;
-  html += `<td title="The Law 5 imbalance (~0.14%). This small residual, together with the seven planet contributions, sets the target\u2019s eccentricity exactly."><span class="ebs-dot" style="background:#888"></span><em>Residual</em></td>`;
-  html += `<td class="ebs-mono ebs-fixed">—</td>`;
-  html += `<td class="ebs-mono ebs-fixed">—</td>`;
-  html += `<td class="ebs-mono ebs-fixed">—</td>`;
-  html += `<td class="ebs-mono">—</td>`;
-  html += `<td class="ebs-mono" style="background:linear-gradient(270deg,${residualShareBarColor} ${residualSharePct.toFixed(1)}%,transparent ${residualSharePct.toFixed(1)}%)">${residualSharePct.toFixed(1)}%</td>`;
-  html += `<td class="ebs-mono ebs-col-contrib ${residualSignClass}" style="background:linear-gradient(270deg,${residualBarColor} ${residualBarPct.toFixed(1)}%,transparent ${residualBarPct.toFixed(1)}%)">${residual >= 0 ? '+' : ''}${residual.toFixed(4)}</td>`;
-  html += '</tr>';
-  // Summary row — now sums to exactly the target's offset
-  html += `<tr class="ebs-summary"><td colspan="5">TOTAL &rarr; e <small>base</small> = <span class="ebs-ecc">${data.targetEcc.toFixed(6)}</span></td>`;
-  html += `<td class="ebs-mono">100%</td>`;
-  html += `<td class="ebs-mono ebs-col-contrib ebs-fixed">${data.targetOffset.toFixed(6)} AU</td></tr>`;
-  html += '</tbody></table>';
-  return html;
-}
-
-let eccBalanceScalePanel = null;
-
-function createEccBalanceScalePanel() {
-  // Fixed container (same pattern as #fibBalanceExplorer)
-  const panel = document.createElement('div');
-  panel.id = 'eccBalanceScale';
-  // Backdrop overlay
-  const overlay = document.createElement('div');
-  overlay.className = 'ebs-overlay';
-  overlay.addEventListener('click', () => closeEccBalanceScale());
-  panel.appendChild(overlay);
-  // Dialog
-  const dialog = document.createElement('div');
-  dialog.className = 'ebs-dialog';
-  panel.appendChild(dialog);
-  // Header — title and close button
-  const header = document.createElement('div');
-  header.className = 'ebs-header';
-  header.innerHTML = '<h2>\u2696\uFE0F Eccentricity Balance Scale</h2>';
-  const close = document.createElement('div');
-  close.className = 'ebs-close';
-  close.addEventListener('click', closeEccBalanceScale);
-  header.appendChild(close);
-  dialog.appendChild(header);
-  // Planet navigation bar — full width, prominent (like planetStats)
-  const nav = document.createElement('div');
-  nav.className = 'ebs-nav';
-  const navPrev = document.createElement('button');
-  navPrev.className = 'ebs-nav-arrow';
-  navPrev.textContent = '\u2039';
-  navPrev.addEventListener('click', () => {
-    const idx = BALANCE_PLANETS_SCALE.indexOf(panel._currentTarget);
-    if (idx > 0) { panel._currentTarget = BALANCE_PLANETS_SCALE[idx - 1]; updateEccBalanceScale(panel._currentTarget); }
-  });
-  nav.appendChild(navPrev);
-  const navName = document.createElement('button');
-  navName.className = 'ebs-nav-name';
-  nav.appendChild(navName);
-  const navNext = document.createElement('button');
-  navNext.className = 'ebs-nav-arrow';
-  navNext.textContent = '\u203A';
-  navNext.addEventListener('click', () => {
-    const idx = BALANCE_PLANETS_SCALE.indexOf(panel._currentTarget);
-    if (idx < BALANCE_PLANETS_SCALE.length - 1) { panel._currentTarget = BALANCE_PLANETS_SCALE[idx + 1]; updateEccBalanceScale(panel._currentTarget); }
-  });
-  nav.appendChild(navNext);
-  // Planet dropdown (hidden, shown on name click)
-  const dropdown = document.createElement('div');
-  dropdown.className = 'ebs-dropdown';
-  dropdown.style.display = 'none';
-  for (const key of BALANCE_PLANETS_SCALE) {
-    const item = document.createElement('div');
-    item.className = 'ebs-dropdown-item';
-    const dcol = hexToCSS(planetColorHex[key] || 0xaaaaaa);
-    item.innerHTML = `<span class="ebs-dot" style="background:${dcol}"></span>${BALANCE_CONFIG[key].name}`;
-    item.addEventListener('click', () => { panel._currentTarget = key; dropdown.style.display = 'none'; updateEccBalanceScale(key); });
-    dropdown.appendChild(item);
-  }
-  nav.appendChild(dropdown);
-  navName.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none'; });
-  dialog.appendChild(nav);
-  panel._navName = navName;
-  panel._navPrev = navPrev;
-  panel._navNext = navNext;
-  panel._dropdown = dropdown;
-  // Body
-  const body = document.createElement('div');
-  body.className = 'ebs-body';
-  dialog.appendChild(body);
-  document.body.appendChild(panel);
-  panel._body = body;
-  panel._currentTarget = 'saturn';
-  return panel;
-}
-
-function updateEccBalanceScale(targetKey) {
-  if (!eccBalanceScalePanel) return;
-  const body = eccBalanceScalePanel._body;
-  const panel = eccBalanceScalePanel;
-  panel._currentTarget = targetKey;
-  const data = computeEccScaleData(targetKey);
-  // Update nav
-  const col = hexToCSS(planetColorHex[targetKey] || 0xaaaaaa);
-  panel._navName.innerHTML = `<span class="ebs-dot" style="background:${col}"></span>${data.targetName}`;
-  const idx = BALANCE_PLANETS_SCALE.indexOf(targetKey);
-  panel._navPrev.disabled = idx <= 0;
-  panel._navNext.disabled = idx >= BALANCE_PLANETS_SCALE.length - 1;
-  panel._dropdown.style.display = 'none';
-  const phaseLabel = BALANCE_CONFIG[data.target].defaultAntiPhase ? 'anti-phase' : 'in-phase';
-  const hasAllPositive = data.items.every(i => i.sign > 0);
-  let html = '';
-  // Hero card — key numbers at a glance
-  html += `<div class="ebs-hero">`;
-  const eccCycleYrs = data.targetEccCycle;
-  const eccCycleFmt = eccCycleYrs >= 1000 ? fmtNum(eccCycleYrs, 0, ',') : eccCycleYrs.toFixed(1);
-  html += `<div class="ebs-hero-stat" title="The long-term mean eccentricity (how oval the orbit is). 0 = perfect circle, 1 = parabola.\n\nJ2000 value: ${data.targetEccJ2000.toFixed(8)} (measured at epoch 2000)\nAmplitude: \u00B1${data.targetEccAmp.toExponential(4)} (oscillation from universal K constant)\nEccentricity cycle: ${eccCycleFmt} years"><div class="ebs-hero-value ebs-ecc">${data.targetEcc.toFixed(6)}</div><div class="ebs-hero-label">Base Eccentricity (e)</div><div class="ebs-hero-sub">J2000: ${data.targetEccJ2000.toFixed(6)}</div></div>`;
-  html += `<div class="ebs-hero-stat" title="Perihelion offset: the physical distance (in AU) between the Sun and the geometric center of the orbit. Equals eccentricity \u00D7 semi-major axis."><div class="ebs-hero-value ebs-fixed">${data.targetOffset.toFixed(6)}</div><div class="ebs-hero-label">Offset e\u00D7a (AU)</div></div>`;
-  html += `<div class="ebs-hero-stat" title="Semi-major axis: the average distance from the planet to the Sun, in Astronomical Units (1 AU = Earth\u2013Sun distance)."><div class="ebs-hero-value">${data.targetSma.toFixed(4)}</div><div class="ebs-hero-label">Semi-major (AU)</div></div>`;
-  html += `<div class="ebs-hero-stat" title="Balance group: Saturn is anti-phase (MAX inclination at balanced year), all other planets are in-phase (MIN at balanced year). The two groups must balance like a scale."><div class="ebs-hero-value">${phaseLabel}</div><div class="ebs-hero-label">Balance group</div></div>`;
-  html += `</div>`;
-  // Insight callout
-  if (hasAllPositive) {
-    const pushTotal = data.items.reduce((s, i) => s + i.contribution, 0).toFixed(6);
-    const topItem = data.items[0]; // sorted by |contribution| descending
-    const topPct = (Math.abs(topItem.contribution) / Math.abs(data.total) * 100).toFixed(1);
-    html += `<div class="ebs-callout ebs-callout-info">${data.targetName} is anti-phase (sole balance opponent). All other planets contribute to its total of <span class="ebs-fixed">${pushTotal}</span> AU. ${topItem.name} provides ${topPct}% \u2014 W \u2248 1 means its offset passes through unchanged, giving a ${data.targetName}/${topItem.name} ratio of <strong>\u2248 1:2</strong>.</div>`;
-  } else {
-    const satContrib = data.items.find(i => i.key === 'saturn');
-    const satPush = satContrib ? Math.abs(satContrib.contribution).toFixed(2) : '?';
-    const pullers = data.items.filter(i => i.sign < 0);
-    const pullTotal = Math.abs(pullers.reduce((s, i) => s + i.contribution, 0)).toFixed(2);
-    html += `<div class="ebs-callout ebs-callout-tug">`;
-    html += `Saturn pulls one way with <span class="ebs-positive">+${satPush}</span> AU, the others pull back with <span class="ebs-negative">\u2212${pullTotal}</span> AU. `;
-    html += `Together with the Law 5 residual, they sum to ${data.targetName}\u2019s offset e\u00D7a = <span class="ebs-fixed">${data.targetOffset.toFixed(6)}</span> AU, giving base e = <span class="ebs-ecc">${data.targetEcc.toFixed(6)}</span>.</div>`;
-  }
-  // SVG chart
-  html += `<div class="ebs-chart">${renderEccWaterfallSVG(data)}</div>`;
-  // Weight formula — compact inline
-  html += `<div class="ebs-formula">`;
-  html += `W<sub>j</sub> = &radic;( m<sub>j</sub>/m<sub>${data.targetName}</sub> &times; d<sub>${data.targetName}</sub>/d<sub>j</sub> &times; a<sub>j</sub>/a<sub>${data.targetName}</sub> )`;
-  html += `<span class="ebs-formula-note">&nbsp;&mdash;&nbsp;<em>mass ratio</em> &times; <em>Fibonacci ratio</em> &times; <em>distance ratio</em></span>`;
-  html += `</div>`;
-  // Buildup table
-  html += `<div class="ebs-section-title">Cumulative buildup of ${data.targetName}</div>`;
-  html += renderEccBuildupTable(data);
-  body.innerHTML = html;
-}
-
-function openEccBalanceScale() {
-  if (!eccBalanceScalePanel) {
-    eccBalanceScalePanel = createEccBalanceScalePanel();
-  }
-  eccBalanceScalePanel.classList.add('visible');
-  // Start with the currently focused planet, or Saturn as fallback
-  const curName = (o.lookAtObj?.name || '').toLowerCase();
-  const startPlanet = BALANCE_PLANETS_SCALE.includes(curName) ? curName : 'saturn';
-  updateEccBalanceScale(startPlanet);
-}
-
-function closeEccBalanceScale() {
-  if (eccBalanceScalePanel) {
-    eccBalanceScalePanel.classList.remove('visible');
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// SOLAR SYSTEM RESONANCE CYCLE PERIOD TABLE — Modal panel
-// Shows all planetary periods as 8H/N fractions
-// ═══════════════════════════════════════════════════════════════════
-
-let ghoPanel = null;
-let ghoShowAs8H = false; // false = years, true = 8H/N
-
-function ghoComputeData() {
-  const H = holisticyearLength;
-  const S = 8 * H;
-  const gp = H / 13;
-  const keys = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-  const names = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
-  const colors = [planetColorHex.mercury, planetColorHex.venus, 0x3399ff, planetColorHex.mars,
-                  planetColorHex.jupiter, planetColorHex.saturn, planetColorHex.uranus, planetColorHex.neptune];
-
-  const obliqCycles = [mercuryObliquityCycle, venusObliquityCycle, H / 8,
-    marsObliquityCycle, jupiterObliquityCycle, saturnObliquityCycle, uranusObliquityCycle, neptuneObliquityCycle];
-  const wobblePeriods = [mercuryWobblePeriod, venusWobblePeriod, H / 3,   // Earth: the one eccentricity law (unification) — H/16 is the perihelion-of-date beat, not |e|
-    marsWobblePeriod, jupiterWobblePeriod, saturnWobblePeriod, uranusWobblePeriod, neptuneWobblePeriod];
-
-  // Scientific reference values: { observed, source, predicted } per cycle per planet
-  // observed = published value, source = citation, predicted = true if no observation exists
-  const sci = {
-    mercury: {
-      axial:  { observed: '~300 kyr', source: 'Peale 2006 (theoretical); Cassini state (MESSENGER) \u2192 = asc. node', error: '0.7%' },
-      ecl:    { observed: '~227 kyr (~570\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
-      icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '231,842 yr (s\u2081)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
-      obliq:  { observed: '~895 kyr', source: 'Bills 2005 (theoretical); free prediction via Fibonacci decomposition', error: '0.1%' },
-      ecc:    { predicted: true, source: 'Free prediction (beat of axial \u00d7 ICRF perihelion)' },
-    },
-    venus: {
-      axial:  { observed: '~29 kyr', source: 'Cottereau & Souchay 2009' },
-      ecl:    { observed: '~0\u2033/cy', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
-      icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '183,830 yr (s\u2082)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
-      obliq:  { observed: 'Constant (tidally damped)', source: 'Correia & Laskar 2003; obliq cycle = ICRF \u2192 cancels' },
-      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
-    },
-    earth: {
-      axial:  { observed: '25,771 yr', source: 'IAU 2006 (50.29\u2033/yr)', error: '0.1%' },
-      ecl:    { observed: '~20,956 yr (~6,186\u2033/cy)', source: 'Derived (axial + inclination rates)' },
-      icrf:   { observed: '68,753 yr (s\u2083)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
-      asc:    { observed: '68,753 yr (s\u2083)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
-      obliq:  { observed: '~41,000 yr', source: 'Laskar+ 1993 (Milankovitch)', error: '2%' },
-      ecc:    { observed: '~100 kyr / ~413 kyr', source: 'Berger 1978 (Milankovitch, theoretical)', theory: true },
-    },
-    mars: {
-      axial:  { observed: '170,400 yr', source: 'Konopliv+ 2020 (InSight/RISE, 7604\u00B16 mas/yr)', error: '1.7%' },
-      ecl:    { observed: '~81 kyr (~1,600\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
-      icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '72,991 yr (s\u2084)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
-      obliq:  { observed: '~124,800 yr', source: 'Ward 1973; Laskar+ 2004 (modes s\u2083+s\u2084)', error: '2.4%' },
-      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
-    },
-    jupiter: {
-      axial:  { observed: '113\u2013136 kyr', source: 'Saillenfest+ 2020 (A&A)' },
-      ecl:    { observed: '~72 kyr (~1,800\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
-      icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '\u221E (s\u2085=0, inv. plane)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
-      obliq:  { observed: 'No regular cycle', source: 'Saillenfest+ 2020', predicted: true },
-      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
-    },
-    saturn: {
-      axial:  { observed: '400\u2013480 kyr', source: 'Saillenfest+ 2021 (Nature Astron.)' },
-      ecl:    { observed: '~38 kyr (~3,400\u2033/cy, retro)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
-      icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '49,187 yr (s\u2086)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
-      obliq:  { observed: 'No regular cycle', source: 'Saillenfest+ 2021', predicted: true },
-      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
-    },
-    uranus: {
-      axial:  { observed: '~40\u201350 Myr', source: 'Saillenfest+ 2022 (A&A)' },
-      ecl:    { observed: '~118 kyr (~1,100\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
-      icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '433,010 yr (s\u2087)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
-      obliq:  { observed: 'Frozen at ~98\u00B0', source: 'Saillenfest+ 2022', predicted: true },
-      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
-    },
-    neptune: {
-      axial:  { observed: '~70 Myr (est.)', source: 'Ward & Hamilton 2004' },
-      ecl:    { observed: '~648 kyr (~200\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
-      icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '1,872,832 yr (s\u2088)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
-      obliq:  { observed: 'Constant (~28\u00B0)', source: 'Rogoszinski & Hamilton 2020; obliq cycle = ICRF \u2192 cancels' },
-      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
-    },
-  };
-  const sciKeys = ['axial', 'ecl', 'icrf', 'asc', 'obliq', 'ecc'];
-
-  const rows = [];
-  for (let i = 0; i < 8; i++) {
-    const key = keys[i];
-    const p = key === 'earth' ? null : planets[key];
-
-    const axialP = key === 'earth' ? -H / 13 : p.axialPrecessionYears;  // Earth axial precession is retrograde (clockwise)
-    const eclP = key === 'earth' ? H / 16 : p.perihelionEclipticYears;
-    const icrfP = key === 'earth' ? H / 3 : (eclP * (H / 13)) / ((H / 13) - eclP);
-    const ascP = S / (key === 'earth' ? 40 : p.ascendingNodeCyclesIn8H);
-    const obliqP = obliqCycles[i];
-    const eccP = wobblePeriods[i];
-
-    const s = sci[key];
-    const mkHover = (sk, period) => {
-      const ref = s[sk];
-      const yr = Math.round(Math.abs(period)).toLocaleString('en-US');
-      const label = ref.theory ? 'Theory' : 'Observed';
-      let status;
-      if (ref.predicted) status = '\u26AB Prediction';
-      else if (ref.theory) status = '\uD83D\uDD2C Theoretical';
-      else if (ref.error) status = `\u2705 Confirmed (${ref.error})`;
-      else status = '\u2705 Observed';
-      return `Model: ${yr} yr\n${label}: ${ref.observed}\nSource: ${ref.source}\n${status}`;
-    };
-
-    rows.push({
-      key, name: names[i], color: colors[i],
-      cycles: [
-        { label: 'Axial', period: axialP, n: Math.round(S / Math.abs(axialP)), frozen: Math.abs(axialP) > 1e7, hover: mkHover('axial', axialP) },
-        { label: 'Peri. ecl.', period: eclP, n: Math.round(S / Math.abs(eclP)), hover: mkHover('ecl', eclP) },
-        { label: 'ICRF / Incl.', period: icrfP, n: Math.round(S / Math.abs(icrfP)), hover: mkHover('icrf', icrfP) },
-        { label: 'Asc. node', period: -Math.abs(ascP), n: Math.round(S / Math.abs(ascP)), hover: mkHover('asc', ascP) },
-        { label: 'Obliquity', period: obliqP, n: obliqP ? Math.round(S / obliqP) : null, oscillation: true, hover: mkHover('obliq', obliqP || 0) },
-        { label: 'Ecc. cycle', period: eccP, n: isFinite(eccP) ? Math.round(S / eccP) : null, oscillation: true, hover: mkHover('ecc', eccP) },
-      ]
-    });
-  }
-  return { rows, S, H };
-}
-
-function ghoCellContent(cycle, showAs8H) {
-  if (cycle.n === null || cycle.frozen) {
-    // Return object with content and a flag to center the cell
-    return { html: cycle.frozen ? '\u221E' : '\u2014', center: true };
-  }
-  const isRetro = cycle.period < 0;
-  // Oscillation periods (obliquity, eccentricity) have no direction — show neutral color
-  const isOsc = cycle.oscillation;
-  const cls = isOsc ? 'gho-osc' : (isRetro ? 'gho-retro' : 'gho-pro');
-  const sign = isOsc ? '' : (isRetro ? '\u2212' : '');
-  if (showAs8H) {
-    return { html: '<span class="gho-n ' + cls + '">' + sign + '8H/' + cycle.n + '</span>', center: false };
-  }
-  const yr = Math.round(Math.abs(cycle.period));
-  return { html: '<span class="gho-yr ' + cls + '">' + sign + yr.toLocaleString('en-US') + '</span>', center: false };
-}
-
-function createGHOPanel() {
-  const data = ghoComputeData();
-  const panel = document.createElement('div');
-  panel.id = 'ghoPanel';
-  panel.className = 'gho-modal';
-
-  const cycleLabels = ['Axial', 'Peri. ecl.', 'ICRF / Incl.', 'Asc. node', 'Obliquity', 'Ecc. cycle'];
-  const cycleTips = [
-    'Axial precession: the wobble of the planet\u2019s spin axis.',
-    'Ecliptic perihelion precession: orbital shape rotation in the ecliptic frame.',
-    'ICRF perihelion precession = inclination oscillation cycle. Ecliptic rate minus general precession (H/13).',
-    'Ascending node regression on the invariable plane. Integer divisors of 8H, fit to JPL J2000-fixed-frame trends.',
-    'Obliquity oscillation: axial tilt variation period. Beat of axial precession and ICRF perihelion.',
-    'Eccentricity cycle: orbital eccentricity oscillation period. Beat of axial precession and ICRF perihelion (wobble period). Earth is the exception: its |e| rides the H/3 eccentricity law; the H/16 = 13+3 beat is the perihelion direction only.',
-  ];
-
-  panel.innerHTML = `
-    <div class="gho-overlay"></div>
-    <div class="gho-container">
-      <div class="gho-header">
-        <div class="gho-title-block">
-          <div class="gho-title">Solar System Resonance Cycle</div>
-          <div class="gho-subtitle">8H = ${data.S.toLocaleString('en-US')} years \u2014 all planetary periods divide evenly</div>
-        </div>
-        <div class="gho-controls">
-          <button class="gho-toggle" title="Toggle between years and 8H/N notation">
-            <span class="gho-toggle-yr">Years</span>
-            <span class="gho-toggle-8h">8H/N</span>
-          </button>
-          <button class="gho-export-btn" data-gho-export="years" title="Open a paper-styled SVG view of the SSRC table (in years) in a new tab">Export SSRC in years</button>
-          <button class="gho-export-btn" data-gho-export="8h" title="Open a paper-styled SVG view of the SSRC table (in 8H/N notation) in a new tab">Export SSRC in 8H</button>
-        </div>
-        <div class="gho-close" title="Close"></div>
-      </div>
-      <div class="gho-body">
-        <div class="gho-table">
-          <div class="gho-table-header">
-            <span class="gho-th-planet">Planet</span>
-            ${cycleLabels.map((label, i) => `<span class="gho-th gho-th-${i}" title="${cycleTips[i]}">${label}</span>`).join('')}
-          </div>
-          ${data.rows.map(row => {
-            const colorHex = '#' + (row.color || 0xaaaaaa).toString(16).padStart(6, '0');
-            return `<div class="gho-row${row.key === 'earth' ? ' gho-row-earth' : ''}" data-planet="${row.key}">
-              <span class="gho-planet"><span class="gho-dot" style="background:${colorHex}"></span>${row.name}</span>
-              ${row.cycles.map((c, ci) => { const r = ghoCellContent(c, ghoShowAs8H); return `<span class="gho-cell gho-col-${ci}${r.center ? ' gho-cell-center' : ''}" title="${(c.hover || '').replace(/"/g, '&quot;')}">${r.html}</span>`; }).join('')}
-            </div>`;
-          }).join('')}
-        </div>
-        <div class="gho-footer">All ${data.rows.length} planets \u00D7 6 cycle types = integer divisors of 8H \u2002\u2022\u2002 H = ${data.H.toLocaleString('en-US')} years (Earth Fundamental Cycle)</div>
-      </div>
-    </div>
-  `;
-
-  // Event: close
-  panel.querySelector('.gho-close').addEventListener('click', closeGHOPanel);
-  panel.querySelector('.gho-overlay').addEventListener('click', closeGHOPanel);
-
-  // Event: toggle
-  panel.querySelector('.gho-toggle').addEventListener('click', () => {
-    ghoShowAs8H = !ghoShowAs8H;
-    panel.querySelector('.gho-toggle').classList.toggle('gho-toggle-active', ghoShowAs8H);
-    // Update all cells
-    const rows = data.rows;
-    for (const row of rows) {
-      const rowEl = panel.querySelector(`.gho-row[data-planet="${row.key}"]`);
-      if (!rowEl) continue;
-      const cells = rowEl.querySelectorAll('.gho-cell');
-      cells.forEach((cell, ci) => {
-        const r = ghoCellContent(row.cycles[ci], ghoShowAs8H);
-        cell.innerHTML = r.html;
-        cell.classList.toggle('gho-cell-center', r.center);
-      });
-    }
-  });
-
-  // Event: export buttons
-  const exportYearsBtn = panel.querySelector('[data-gho-export="years"]');
-  const export8HBtn = panel.querySelector('[data-gho-export="8h"]');
-  if (exportYearsBtn) exportYearsBtn.addEventListener('click', () => exportGHOPaper({ showAs8H: false }));
-  if (export8HBtn) export8HBtn.addEventListener('click', () => exportGHOPaper({ showAs8H: true }));
-
-  document.body.appendChild(panel);
-  return panel;
-}
-
-function openGHOPanel() {
-  // Recreate panel each time to pick up any changes
-  if (ghoPanel) { ghoPanel.remove(); ghoPanel = null; }
-  ghoPanel = createGHOPanel();
-  ghoPanel.classList.add('visible');
-}
-
-function closeGHOPanel() {
-  if (ghoPanel) ghoPanel.classList.remove('visible');
-}
-
-// Render the SSRC table as a self-contained paper-styled SVG. opts.showAs8H
-// toggles between years notation (false) and 8H/N notation (true).
-function ghoRenderPaperSVG(opts) {
-  opts = opts || {};
-  const showAs8H = !!opts.showAs8H;
-  const data = ghoComputeData();
-  const xmlEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  const W = 1200, HGT = 720;
-  const PAD_X = 30, PAD_TOP = 30;
-  const TITLE_H = 32, SUBTITLE_H = 22, NOTATION_H = 22, SPACER = 14;
-  const TABLE_TOP = PAD_TOP + TITLE_H + SUBTITLE_H + NOTATION_H + SPACER;
-  const HEADER_H = 38, ROW_H = 46;
-  const TABLE_BOT = TABLE_TOP + HEADER_H + 8 * ROW_H;
-
-  const cycleLabels = ['Axial', 'Peri. ecl.', 'ICRF / Incl.', 'Asc. node', 'Obliquity', 'Ecc. cycle'];
-  const planetColW = 160;
-  const cycleColW = (W - 2 * PAD_X - planetColW) / 6;
-
-  const COL_PRO   = '#2a9d3a';
-  const COL_RETRO = '#cc3333';
-  const COL_OSC   = '#6b6b6b';
-  const COL_NA    = '#aaaaaa';
-  const COL_TEXT  = '#222222';
-  const COL_DIM   = '#666666';
-  const COL_HDR_BG = '#eeeeee';
-  const COL_EARTH_BG = '#eef4fc';
-  const COL_BORDER = '#d6d6d6';
-
-  let s = '';
-  s += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${HGT}" width="${W}" height="${HGT}" font-family="Inter, system-ui, sans-serif">`;
-  s += `<rect x="0" y="0" width="${W}" height="${HGT}" fill="#ffffff"/>`;
-
-  // Title block
-  s += `<text x="${W/2}" y="${PAD_TOP + TITLE_H - 6}" text-anchor="middle" font-size="22" font-weight="700" fill="${COL_TEXT}">Solar System Resonance Cycle</text>`;
-  s += `<text x="${W/2}" y="${PAD_TOP + TITLE_H + SUBTITLE_H - 4}" text-anchor="middle" font-size="13" fill="${COL_DIM}">8H = ${data.S.toLocaleString('en-US')} years — all planetary periods divide evenly</text>`;
-  s += `<text x="${W/2}" y="${PAD_TOP + TITLE_H + SUBTITLE_H + NOTATION_H - 2}" text-anchor="middle" font-size="11" font-style="italic" fill="${COL_DIM}">(${showAs8H ? 'in 8H/N notation' : 'in years'})</text>`;
-
-  // Table header background
-  s += `<rect x="${PAD_X}" y="${TABLE_TOP}" width="${W - 2*PAD_X}" height="${HEADER_H}" fill="${COL_HDR_BG}"/>`;
-  s += `<text x="${PAD_X + 14}" y="${TABLE_TOP + HEADER_H/2 + 5}" font-size="12" font-weight="700" fill="${COL_TEXT}">Planet</text>`;
-  for (let i = 0; i < 6; i++) {
-    const cx = PAD_X + planetColW + i * cycleColW + cycleColW / 2;
-    s += `<text x="${cx}" y="${TABLE_TOP + HEADER_H/2 + 5}" text-anchor="middle" font-size="12" font-weight="700" fill="${COL_TEXT}">${xmlEsc(cycleLabels[i])}</text>`;
-  }
-
-  // Planet rows
-  for (let ri = 0; ri < data.rows.length; ri++) {
-    const row = data.rows[ri];
-    const ry = TABLE_TOP + HEADER_H + ri * ROW_H;
-    if (row.key === 'earth') {
-      s += `<rect x="${PAD_X}" y="${ry}" width="${W - 2*PAD_X}" height="${ROW_H}" fill="${COL_EARTH_BG}"/>`;
-    }
-    s += `<line x1="${PAD_X}" y1="${ry + ROW_H}" x2="${W - PAD_X}" y2="${ry + ROW_H}" stroke="${COL_BORDER}" stroke-width="0.5"/>`;
-
-    const colorHex = '#' + (row.color || 0xaaaaaa).toString(16).padStart(6, '0');
-    const dotX = PAD_X + 14;
-    const dotY = ry + ROW_H / 2;
-    s += `<circle cx="${dotX + 5}" cy="${dotY}" r="5" fill="${colorHex}"/>`;
-    s += `<text x="${dotX + 18}" y="${dotY + 5}" font-size="13" font-weight="600" fill="${COL_TEXT}">${xmlEsc(row.name)}</text>`;
-
-    for (let ci = 0; ci < row.cycles.length; ci++) {
-      const cyc = row.cycles[ci];
-      const cx = PAD_X + planetColW + ci * cycleColW + cycleColW / 2;
-      const cy = ry + ROW_H / 2 + 5;
-
-      let text, color;
-      if (cyc.n === null || cyc.frozen) {
-        text = cyc.frozen ? '∞' : '—';
-        color = COL_NA;
-      } else {
-        const isRetro = cyc.period < 0;
-        const isOsc = cyc.oscillation;
-        color = isOsc ? COL_OSC : (isRetro ? COL_RETRO : COL_PRO);
-        const sign = isOsc ? '' : (isRetro ? '−' : '');
-        if (showAs8H) {
-          text = `${sign}8H/${cyc.n}`;
-        } else {
-          const yr = Math.round(Math.abs(cyc.period));
-          text = `${sign}${yr.toLocaleString('en-US')}`;
-        }
-      }
-      s += `<text x="${cx}" y="${cy}" text-anchor="middle" font-size="13" font-weight="500" fill="${color}">${xmlEsc(text)}</text>`;
-    }
-  }
-
-  // Outer table border
-  s += `<rect x="${PAD_X}" y="${TABLE_TOP}" width="${W - 2*PAD_X}" height="${TABLE_BOT - TABLE_TOP}" fill="none" stroke="${COL_BORDER}" stroke-width="1"/>`;
-
-  // Footer + legend
-  const footerY = TABLE_BOT + 28;
-  s += `<text x="${W/2}" y="${footerY}" text-anchor="middle" font-size="11" fill="${COL_DIM}">All ${data.rows.length} planets × 6 cycle types = integer divisors of 8H · H = ${data.H.toLocaleString('en-US')} years (Earth Fundamental Cycle)</text>`;
-
-  const legendY = footerY + 26;
-  const legend = [
-    { color: COL_PRO,   label: 'Prograde' },
-    { color: COL_RETRO, label: 'Retrograde' },
-    { color: COL_OSC,   label: 'Oscillation' },
-  ];
-  const itemW = 120;
-  const legendStartX = (W - legend.length * itemW) / 2;
-  for (let i = 0; i < legend.length; i++) {
-    const lx = legendStartX + i * itemW;
-    s += `<rect x="${lx}" y="${legendY - 10}" width="14" height="14" fill="${legend[i].color}"/>`;
-    s += `<text x="${lx + 20}" y="${legendY + 2}" font-size="11" fill="${COL_DIM}">${legend[i].label}</text>`;
-  }
-
-  s += '</svg>';
-  return s;
-}
-
-function exportGHOPaper(opts) {
-  opts = opts || {};
-  const showAs8H = !!opts.showAs8H;
-  const svg = ghoRenderPaperSVG({ showAs8H });
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  if (win) {
-    win.document.title = 'Solar System Resonance Cycle — ' + (showAs8H ? 'in 8H/N' : 'in years');
-  }
-}
+// (K5 excision) The Fibonacci Balance Explorer, the Eccentricity Balance
+// Scale and the Solar System Resonance Cycle period table lived here —
+// retired panels whose entry buttons left with the Fibonacci-law
+// retirement; excised wholesale with the legacy chains.
 
 // ═══════════════════════════════════════════════════════════════════
 // WEBGEOCALC EXPLORER PANEL (.wgc-)
@@ -17626,7 +15661,7 @@ function wgcRenderChart(title, yrArr, values, color, label, modelValues, omitRat
           <line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 11).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 11).toFixed(1)}" stroke="${color}" stroke-width="1.6"/>
           <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 14).toFixed(1)}" fill="#ccc">Observed (WebGeoCalc, ecliptic)</text>
           <line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 23).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 23).toFixed(1)}" stroke="#ff5252" stroke-width="1.6"/>
-          <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 26).toFixed(1)}" fill="#ccc">${KEPLER_CHAINS ? 'Model (N-body)' : 'Era descriptor (lattice + equatorial projection)'}</text>
+          <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 26).toFixed(1)}" fill="#ccc">Model (N-body)</text>
         </g>` : ''}
       </svg>
       <div class="wgc-chart-footer">
@@ -17696,7 +15731,7 @@ function wgcRenderPlanet(planetKey) {
       <div class="wgc-planet-method">
         Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}${undeterminedTrend ? '<br><span style="color:#cb4b16;">\u26a0 Long-term trend <b>cannot be determined</b> from 1900\u20132026 observations \u2014 short-baseline trend flips sign across sub-windows (1800\u20131900, 1900\u20132026, 2026\u20132100). Only Mercury, Mars, and Saturn have reliably resolvable trends from observation.</span>' : ''}
       </div>
-      ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#ff5252">red line = ${KEPLER_CHAINS ? 'model (own N-body)' : 'era descriptor (lattice + equatorial projection)'}</span>`, model ? model.values : null, undeterminedTrend)}
+      ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#ff5252">red line = model (own N-body)</span>`, model ? model.values : null, undeterminedTrend)}
       <div class="wgc-frame-note">
         <b>Frame note:</b> All angles (\u03A9, \u03C9, \u03D6) are measured in the <b>ECLIPJ2000</b> frame \u2014
         Earth\u2019s mean ecliptic at J2000, an inertial reference plane. Earth\u2019s current orbital plane
@@ -17743,15 +15778,11 @@ function wgcModelCurves(planetKey, d) {
   const projectedCy = fb.projectedRa;                                     // ″/cy, lattice + equatorial projection
   const values = new Array(d.yrArr.length);
   for (let i = 0; i < d.yrArr.length; i++) {
-    if (KEPLER_CHAINS) {
-      // P5/K5b (owner-ruled): the red curve IS Engine D — the chain's real
-      // ϖ(t) in ECLIPJ2000 (the plotted frame), not the retired descriptor
-      // line. The jd construction mirrors the chain's own year coordinate
-      // exactly (round-trip identity, no calendar slip).
-      values[i] = _kcPerihelionEclLonDeg(modelPlanetKey, KC_ANCHOR_EPOCH_JD + (d.yrArr[i] - 2000) * 365.25);
-    } else {
-      values[i] = modelPlanet.longitudePerihelion + projectedCy / 360000 * (d.yrArr[i] - 2000);
-    }
+    // P5/K5b (owner-ruled): the red curve IS Engine D — the chain's real
+    // ϖ(t) in ECLIPJ2000 (the plotted frame). The jd construction mirrors
+    // the chain's own year coordinate exactly (round-trip identity, no
+    // calendar slip).
+    values[i] = _kcPerihelionEclLonDeg(modelPlanetKey, KC_ANCHOR_EPOCH_JD + (d.yrArr[i] - 2000) * 365.25);
   }
   // Unwrap the curve (owner-corrected: Neptune's near-zero e lets ϖ wobble
   // across 0° — the wrapped series jumped to ~360) and align its branch to
@@ -24201,11 +22232,6 @@ function computeDynamicFibonacciBalance() {
   o.fibEccentricityBalance = eccTotal > 0 ? 100 - (Math.abs(eccSum203 - eccSum23) / eccTotal) * 100 : 0;
 }
 
-function setFibGaugeProps(el, pct) {
-  el.style.setProperty('--fib-pct', Math.min(pct, 100) + '%');
-  const color = pct >= 99 ? 'hsla(140, 65%, 45%, 0.35)' : pct >= 95 ? 'hsla(40, 80%, 45%, 0.35)' : 'hsla(0, 70%, 45%, 0.35)';
-  el.style.setProperty('--fib-color', color);
-}
 const aboveColor = 'hsla(35, 70%, 50%, 0.30)';
 const belowColor = 'hsla(210, 60%, 45%, 0.30)';
 function setInvGaugeProps(el, value, maxH) {
@@ -25114,47 +23140,9 @@ function setupGUI() {
   // ── Fibonacci Balance — REMOVED with the Fibonacci-law retirement (the
   // model restatement): the Law-3/Law-5 gauge folder was an exactness-claim
   // surface (doc 10 Status carries the measured verdicts; the ~98 %
-  // observation is documented there). Dead block (if-false), to be excised
-  // wholesale with the fbe*/gho* subsystems at the P5 chain rewrite; the
-  // o.fib* fields are still computed each frame for exports/diagnostics.
-  if (false) {
-    const fibFolder = gui.addFolder({ title: 'Fibonacci Balance', expanded: true });
-    fibFolder.element.dataset.category = 'calculated';
-    addFolderTooltip(fibFolder, 'Live Fibonacci balance indicators. All three oscillate over per-planet eccentricity cycles and fluctuate around their equilibrium values.');
-
-    const fibPctFmt = v => v.toFixed(4) + '%';
-    const fibAUFmt = v => (v >= 0 ? '+' : '') + v.toFixed(4);
-
-    // Inclination balance (Law 3)
-    const inclB = fibFolder.addBinding(o, 'fibInclinationBalance', {
-      label: 'Inclination (Relation 3)', readonly: true, format: fibPctFmt
-    });
-    addTooltip(inclB, 'Fibonacci relation 3: w = \u221A(m\u00B7a(1\u2212e\u00B2)) / d \u2014 structural weight balance (Saturn vs rest). Uses current dynamic eccentricities. Nearly constant because the weight depends on e only through the (1\u2212e\u00B2) term.');
-    const inclValEl = inclB.element.querySelector('.tp-lblv_v');
-    inclValEl.classList.add('fib-gauge');
-    setFibGaugeProps(inclValEl, o.fibInclinationBalance);
-    fibGaugeEls.inclination = inclValEl;
-
-    // Eccentricity balance (Law 5)
-    const eccB = fibFolder.addBinding(o, 'fibEccentricityBalance', {
-      label: 'Eccentricity (Relation 5)', readonly: true, format: fibPctFmt
-    });
-    addTooltip(eccB, 'Fibonacci relation 5: v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad \u2014 eccentricity weight balance (Saturn vs rest). Uses current dynamic eccentricities (oscillating at per-planet eccentricity cycles). Approaches 100% when planets pass through their base eccentricity.');
-    const eccValEl = eccB.element.querySelector('.tp-lblv_v');
-    eccValEl.classList.add('fib-gauge');
-    setFibGaugeProps(eccValEl, o.fibEccentricityBalance);
-    fibGaugeEls.eccentricity = eccValEl;
-
-    // Mass height balance (invariable plane)
-    const massB = fibFolder.addBinding(o, 'massWeightedBalance', {
-      label: 'Mass height (inv. plane)', readonly: true, format: fibAUFmt
-    });
-    addTooltip(massB, 'Mass-weighted average height of all planets above the invariable plane. Oscillates around zero, validating the invariable plane geometry.');
-    const massValEl = massB.element.querySelector('.tp-lblv_v');
-    massValEl.classList.add('inv-gauge');
-    setInvGaugeProps(massValEl, o.massWeightedBalance, 0.01);
-    fibGaugeEls.massHeight = massValEl;
-  }
+  // observation is documented there). The dead if-false block was excised
+  // with the legacy chains (K5); the o.fib* fields are still computed each
+  // frame for exports/diagnostics.
 
   // ── Invariable Plane — the mass-height check (kept when the Fibonacci
   // Balance folder retired: this gauge is invariable-plane geometry, not a
@@ -26435,8 +24423,8 @@ function setupGUI() {
   // The Invariable Plane Inspector, Eccentricity Balance Scale and Solar
   // System Resonance Cycle panels were removed with the Fibonacci-law
   // retirement (the model restatement; doc 10 Status + doc 109 carry the
-  // record). Their subsystems (fbe*/gho*/eccScale*) are unreachable and are
-  // excised wholesale when the planet chains move to engine-D elements.
+  // record); their fbe*/gho* subsystems were excised with the legacy
+  // chains (K5).
   addTooltip(toolsFolder.addButton({ title: 'WebGeoCalc Explorer' }).on('click', () => openWGCPanel()),
     'Observed perihelion precession rates for all 8 planets (1900\u20132026) from JPL WebGeoCalc. Three charts per planet: ascending node, argument of periapsis, longitude of perihelion.');
   addTooltip(toolsFolder.addButton({ title: 'LOD-Climate Rhythm' }).on('click', () => openLcrPanel()),
@@ -45522,14 +43510,14 @@ async function runRATest() {
   // node conventions, phase angles, MaxIncl anchors) and the lattice
   // "Precession Fluctuation" columns left the report — plan 02 K5c.
   const periRows   = [['JD', 'Date', 'Time', 'Model Year',
-    'Mercury Perihelion ICRF', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury InvPlane Inclination', 'Mercury Asc Node InvPlane (s-frame)', '* Mercury Perihelion (Ecliptic)',
-    'Venus Perihelion ICRF', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus InvPlane Inclination', 'Venus Asc Node InvPlane (s-frame)', '* Venus Perihelion (Ecliptic)',
-    'Earth Perihelion (Ecliptic)', 'Earth Perihelion ICRF', 'Earth InvPlane Inclination', 'Earth Asc Node InvPlane (s-frame)',
-    'Mars Perihelion ICRF', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars InvPlane Inclination', 'Mars Asc Node InvPlane (s-frame)', '* Mars Perihelion (Ecliptic)',
-    'Jupiter Perihelion ICRF', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter InvPlane Inclination', 'Jupiter Asc Node InvPlane (s-frame)', '* Jupiter Perihelion (Ecliptic)',
-    'Saturn Perihelion ICRF', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn InvPlane Inclination', 'Saturn Asc Node InvPlane (s-frame)', '* Saturn Perihelion (Ecliptic)',
-    'Uranus Perihelion ICRF', 'Uranus Asc Node', 'Uranus Arg Peri', 'Uranus Ecliptic Inclination', 'Uranus InvPlane Inclination', 'Uranus Asc Node InvPlane (s-frame)', '* Uranus Perihelion (Ecliptic)',
-    'Neptune Perihelion ICRF', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Ecliptic Inclination', 'Neptune InvPlane Inclination', 'Neptune Asc Node InvPlane (s-frame)', '* Neptune Perihelion (Ecliptic)'
+    'Mercury Perihelion RA', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury InvPlane Inclination', 'Mercury Asc Node InvPlane (s-frame)', '* Mercury Perihelion (Ecliptic)',
+    'Venus Perihelion RA', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus InvPlane Inclination', 'Venus Asc Node InvPlane (s-frame)', '* Venus Perihelion (Ecliptic)',
+    'Earth Perihelion (Ecliptic)', 'Earth Perihelion RA', 'Earth InvPlane Inclination', 'Earth Asc Node InvPlane (s-frame)',
+    'Mars Perihelion RA', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars InvPlane Inclination', 'Mars Asc Node InvPlane (s-frame)', '* Mars Perihelion (Ecliptic)',
+    'Jupiter Perihelion RA', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter InvPlane Inclination', 'Jupiter Asc Node InvPlane (s-frame)', '* Jupiter Perihelion (Ecliptic)',
+    'Saturn Perihelion RA', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn InvPlane Inclination', 'Saturn Asc Node InvPlane (s-frame)', '* Saturn Perihelion (Ecliptic)',
+    'Uranus Perihelion RA', 'Uranus Asc Node', 'Uranus Arg Peri', 'Uranus Ecliptic Inclination', 'Uranus InvPlane Inclination', 'Uranus Asc Node InvPlane (s-frame)', '* Uranus Perihelion (Ecliptic)',
+    'Neptune Perihelion RA', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Ecliptic Inclination', 'Neptune InvPlane Inclination', 'Neptune Asc Node InvPlane (s-frame)', '* Neptune Perihelion (Ecliptic)'
   ]];
   //const periRows   = [['JD', 'Date', 'Time', 'Mercury Perihelion', 'Venus Perihelion', 'Earth Perihelion', 'Mars Perihelion', 'Jupiter Perihelion', 'Saturn Perihelion', 'Uranus Perihelion', 'Neptune Perihelion', 'Pluto Perihelion', 'Halleys Perihelion', 'Eros Perihelion']]; 
   const planetRows = [['JD', 'Date', 'Time', 'Model Year', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun']]; 
@@ -45573,13 +43561,13 @@ async function runRATest() {
     const mercuryPerEcl = o.mercuryPerihelionEcliptic;
     const mercuryAsc   = o.mercuryAscendingNode;
     const mercuryArg   = o.mercuryArgumentOfPeriapsis;
-    const mercuryAppIncl = KEPLER_CHAINS ? mercuryEl.inclEclipticDeg : o.mercuryEclipticInclinationDynamic;
+    const mercuryAppIncl = mercuryEl.inclEclipticDeg;
     const venusEl      = _kcElementsOfDate('venus', o.julianDay);
     const venusPer     = o.venusPerihelion;
     const venusPerEcl  = o.venusPerihelionEcliptic;
     const venusAsc     = o.venusAscendingNode;
     const venusArg     = o.venusArgumentOfPeriapsis;
-    const venusAppIncl = KEPLER_CHAINS ? venusEl.inclEclipticDeg : o.venusEclipticInclinationDynamic;
+    const venusAppIncl = venusEl.inclEclipticDeg;
     const earthEl      = _kcElementsOfDate('earth', o.julianDay);
     // The perihelion law's ecliptic ϖ of date — the same source as the panel
     // and the simulator. (The old derivation Ω_inv,ecl + (180° − i) was the
@@ -45590,31 +43578,31 @@ async function runRATest() {
     const marsPerEcl   = o.marsPerihelionEcliptic;
     const marsAsc      = o.marsAscendingNode;
     const marsArg      = o.marsArgumentOfPeriapsis;
-    const marsAppIncl  = KEPLER_CHAINS ? marsEl.inclEclipticDeg : o.marsEclipticInclinationDynamic;
+    const marsAppIncl  = marsEl.inclEclipticDeg;
     const jupiterEl    = _kcElementsOfDate('jupiter', o.julianDay);
     const jupiterPer   = o.jupiterPerihelion;
     const jupiterPerEcl = o.jupiterPerihelionEcliptic;
     const jupiterAsc   = o.jupiterAscendingNode;
     const jupiterArg   = o.jupiterArgumentOfPeriapsis;
-    const jupiterAppIncl = KEPLER_CHAINS ? jupiterEl.inclEclipticDeg : o.jupiterEclipticInclinationDynamic;
+    const jupiterAppIncl = jupiterEl.inclEclipticDeg;
     const saturnEl     = _kcElementsOfDate('saturn', o.julianDay);
     const saturnPer    = o.saturnPerihelion;
     const saturnPerEcl = o.saturnPerihelionEcliptic;
     const saturnAsc    = o.saturnAscendingNode;
     const saturnArg    = o.saturnArgumentOfPeriapsis;
-    const saturnAppIncl = KEPLER_CHAINS ? saturnEl.inclEclipticDeg : o.saturnEclipticInclinationDynamic;
+    const saturnAppIncl = saturnEl.inclEclipticDeg;
     const uranusEl     = _kcElementsOfDate('uranus', o.julianDay);
     const uranusPer    = o.uranusPerihelion;
     const uranusPerEcl = o.uranusPerihelionEcliptic;
     const uranusAsc    = o.uranusAscendingNode;
     const uranusArg    = o.uranusArgumentOfPeriapsis;
-    const uranusAppIncl = KEPLER_CHAINS ? uranusEl.inclEclipticDeg : o.uranusEclipticInclinationDynamic;
+    const uranusAppIncl = uranusEl.inclEclipticDeg;
     const neptuneEl    = _kcElementsOfDate('neptune', o.julianDay);
     const neptunePer   = o.neptunePerihelion;
     const neptunePerEcl = o.neptunePerihelionEcliptic;
     const neptuneAsc   = o.neptuneAscendingNode;
     const neptuneArg   = o.neptuneArgumentOfPeriapsis;
-    const neptuneAppIncl = KEPLER_CHAINS ? neptuneEl.inclEclipticDeg : o.neptuneEclipticInclinationDynamic;
+    const neptuneAppIncl = neptuneEl.inclEclipticDeg;
 
     const plutoPer     = o.plutoPerihelion;
     const halleysPer   = o.halleysPerihelion;
@@ -45766,14 +43754,14 @@ async function runRATest() {
     // device columns)
     periRows[0] = [
       'JD', 'Date', 'Time', 'Model Year',
-      'Mercury Perihelion ICRF', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury InvPlane Inclination', 'Mercury Asc Node InvPlane (s-frame)', '* Mercury Perihelion (Ecliptic)', 'Mercury Perihelion rate (arcsec / century)',
-      'Venus Perihelion ICRF', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus InvPlane Inclination', 'Venus Asc Node InvPlane (s-frame)', '* Venus Perihelion (Ecliptic)', 'Venus Perihelion rate (arcsec / century)',
-      'EARTH Eccentricity', 'EARTH OBLIQUITY (deg)', 'Earth Perihelion (Ecliptic)', 'Earth Perihelion ICRF', 'Earth InvPlane Inclination', 'Earth Asc Node InvPlane (s-frame)', 'Earth Perihelion rate (arcsec / century)',
-      'Mars Perihelion ICRF', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars InvPlane Inclination', 'Mars Asc Node InvPlane (s-frame)', '* Mars Perihelion (Ecliptic)', 'Mars Perihelion rate (arcsec / century)',
-      'Jupiter Perihelion ICRF', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter InvPlane Inclination', 'Jupiter Asc Node InvPlane (s-frame)', '* Jupiter Perihelion (Ecliptic)', 'Jupiter Perihelion rate (arcsec / century)',
-      'Saturn Perihelion ICRF', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn InvPlane Inclination', 'Saturn Asc Node InvPlane (s-frame)', '* Saturn Perihelion (Ecliptic)', 'Saturn Perihelion rate (arcsec / century)',
-      'Uranus Perihelion ICRF', 'Uranus Asc Node', 'Uranus Arg Peri', 'Uranus Ecliptic Inclination', 'Uranus InvPlane Inclination', 'Uranus Asc Node InvPlane (s-frame)', '* Uranus Perihelion (Ecliptic)', 'Uranus Perihelion rate (arcsec / century)',
-      'Neptune Perihelion ICRF', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Ecliptic Inclination', 'Neptune InvPlane Inclination', 'Neptune Asc Node InvPlane (s-frame)', '* Neptune Perihelion (Ecliptic)', 'Neptune Perihelion rate (arcsec / century)',
+      'Mercury Perihelion RA', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury InvPlane Inclination', 'Mercury Asc Node InvPlane (s-frame)', '* Mercury Perihelion (Ecliptic)', 'Mercury Perihelion rate (arcsec / century)',
+      'Venus Perihelion RA', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus InvPlane Inclination', 'Venus Asc Node InvPlane (s-frame)', '* Venus Perihelion (Ecliptic)', 'Venus Perihelion rate (arcsec / century)',
+      'EARTH Eccentricity', 'EARTH OBLIQUITY (deg)', 'Earth Perihelion (Ecliptic)', 'Earth Perihelion RA', 'Earth InvPlane Inclination', 'Earth Asc Node InvPlane (s-frame)', 'Earth Perihelion rate (arcsec / century)',
+      'Mars Perihelion RA', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars InvPlane Inclination', 'Mars Asc Node InvPlane (s-frame)', '* Mars Perihelion (Ecliptic)', 'Mars Perihelion rate (arcsec / century)',
+      'Jupiter Perihelion RA', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter InvPlane Inclination', 'Jupiter Asc Node InvPlane (s-frame)', '* Jupiter Perihelion (Ecliptic)', 'Jupiter Perihelion rate (arcsec / century)',
+      'Saturn Perihelion RA', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn InvPlane Inclination', 'Saturn Asc Node InvPlane (s-frame)', '* Saturn Perihelion (Ecliptic)', 'Saturn Perihelion rate (arcsec / century)',
+      'Uranus Perihelion RA', 'Uranus Asc Node', 'Uranus Arg Peri', 'Uranus Ecliptic Inclination', 'Uranus InvPlane Inclination', 'Uranus Asc Node InvPlane (s-frame)', '* Uranus Perihelion (Ecliptic)', 'Uranus Perihelion rate (arcsec / century)',
+      'Neptune Perihelion RA', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Ecliptic Inclination', 'Neptune InvPlane Inclination', 'Neptune Asc Node InvPlane (s-frame)', '* Neptune Perihelion (Ecliptic)', 'Neptune Perihelion rate (arcsec / century)',
     ];
 
     // Step 3: rebuild each data row with the rate column appended per block
@@ -53482,22 +51470,15 @@ function _moonAberrationRaDec(jd, ra, dec) { return _moonApparent().moonAberrati
 // compensator.)
 const _moonVisualMatrix = new THREE.Matrix4();
 
-// ── P5/K4 — the engine-D Keplerian flag path (browser mirror; DEFAULT OFF) ──
-// Renders the seven planets' READOUT (ra/dec/dist) from the governed engine-D
-// chain (@essrt/physics/planets/keplerian-chain + the embedded CHAIN_ARTIFACT,
-// verbatim from data/nbody-secular-frequencies.json) instead of the geometric
-// two-vector chains. Earth, Moon and Sun are untouched, and the OBSERVATION-
-// FITTED post-hoc corrections (parallax/gravitation/elongation) do not ride
-// this path — the source-of-truth doctrine (plan 02 §P5). The mesh/orbit-ring
-// VISUALS stay on the geometric chains until the K5 flip. Node mirror:
-// tools/lib/scene-graph.js (K3 frame probe + K4 verdict are the measured
-// record: giants 18.5–21.1″ vs JPL in-window, all seven planets better than
-// the fitted chains at 1600–1800). Enable: ?keplerChains=1 or
-// _setKeplerChains(true) from the console.
-// THE P5 FLIP (owner-approved): DEFAULT ON — ?keplerChains=0 opts back into
-// the legacy geometric chains (kept functional until their excision).
-let KEPLER_CHAINS = true;
-try { if (new URLSearchParams(window.location.search).get('keplerChains') === '0') KEPLER_CHAINS = false; } catch (_e) { /* non-browser harness */ }
+// ── P5 — the engine-D Keplerian chain (the ONLY planet path since the K5
+// excision) ── Renders the seven planets from the governed engine-D chain
+// (@essrt/physics/planets/keplerian-chain + the embedded CHAIN_ARTIFACT,
+// verbatim from data/nbody-secular-frequencies.json). Earth, Moon and Sun
+// stay on the engine-K hierarchy (the two-engine interface), and
+// Pluto/Halleys/Eros (no chain) stay on the geometric construction. The
+// legacy geometric planet chains and their observation-fitted correction
+// stack were EXCISED with K5 — the K3/K4 instrument headers and doc 109
+// carry the measured record of both paths.
 let _kcChains = null, _kcR = null;
 const _KC_PLANET_NAMES = new Set(['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']);
 function _kcHelioAU(nameLower, jd) {
@@ -53669,7 +51650,7 @@ const _KC_V = new THREE.Vector3();   // scratch for the visual override
 // updatePositions override branches — keep them in step.
 const _KC_TS = new THREE.Vector3(), _KC_TE = new THREE.Vector3(), _KC_TA = new THREE.Vector3();
 function _kcChainWorldPos(obj, jd, out) {
-  if (!KEPLER_CHAINS || !_kcR) return false;
+  if (!_kcR) return false;
   const _R = _kcR;
   const periKey = _KC_PERI_MARKERS[obj.name];
   const isPlanet = _KC_PLANET_NAMES.has(obj.name);
@@ -53705,22 +51686,61 @@ function _kcChainWorldPos(obj, jd, out) {
     az + D * (_R[2][0] * h0 + _R[2][1] * h1));
   return true;
 }
-window._setKeplerChains = (on) => {
-  KEPLER_CHAINS = !!on; _kcR = null;
-  // toggling back to the legacy chains restores the meshes' hierarchy positions
-  // (rings ride along with the mesh on the flag path — restore them to their
-  // creation origin under rotationAxis too)
-  if (!on) for (const p of tracePlanets) if (p._kcOrigPos) {
-    p.planetObj.position.copy(p._kcOrigPos);
-    if (p.ringObj) p.ringObj.position.set(0, 0, 0);
-  }
-};
 window._kcDebug = () => ({ R: _kcR, chains: !!_kcChains });   // K4b parity probe: the derived frame bridge
 
+// K5 excision — the ORBIT LINE onto the chain: the rendered ring is the
+// chain's own heliocentric path over one orbital period (the same curve the
+// trace draws), replacing the legacy geometric ellipse. Vertices sample the
+// chain in ecliptic-J2000 AU and resample rarely — the shape drifts on the
+// apsidal timescale (arcsec/yr) — while the frame rotation and the Sun
+// anchor are applied per frame, exactly as for the planet mesh itself. The
+// GUI 'Orbits' toggle keeps working: obj.orbitLineObj is repointed to the
+// chain ring and the legacy ellipse leaves the graph.
+const _KC_ORBIT_SEGS = 256;
+const _KC_ORBIT_RESAMPLE_DAYS = 3652.5;   // ~10 yr between vertex resamples
+const _KC_M4 = new THREE.Matrix4();
+function _kcUpdateOrbitLine(obj, nm, jd) {
+  let line = obj._kcOrbitLine;
+  if (!line) {
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array((_KC_ORBIT_SEGS + 1) * 3), 3));
+    const legacy = obj.orbitLineObj;
+    const mat = legacy ? legacy.material
+      : new THREE.LineBasicMaterial({ color: obj.color, transparent: true, opacity: 0.4 });
+    line = new THREE.Line(geom, mat);
+    line.frustumCulled = false;    // vertices move with the epoch; skip stale bounds
+    if (legacy) {
+      line.visible = legacy.visible;
+      legacy.parent.remove(legacy);
+      legacy.geometry.dispose();
+    }
+    scene.add(line);
+    obj.orbitLineObj = line;
+    obj._kcOrbitLine = line;
+  }
+  if (line._kcSampleJD === undefined || Math.abs(jd - line._kcSampleJD) > _KC_ORBIT_RESAMPLE_DAYS) {
+    const pDays = 365.25 * Math.pow(_kcElementsOfDate(nm, jd).aAU, 1.5);   // Kepler III, solar-mass unit
+    const arr = line.geometry.attributes.position.array;
+    for (let i = 0; i <= _KC_ORBIT_SEGS; i++) {
+      const hv = _kcHelioAU(nm, jd + (i / _KC_ORBIT_SEGS - 0.5) * pDays);
+      arr[i * 3] = 100 * hv[0]; arr[i * 3 + 1] = 100 * hv[1]; arr[i * 3 + 2] = 100 * hv[2];
+    }
+    line.geometry.attributes.position.needsUpdate = true;
+    line._kcSampleJD = jd;
+  }
+  const R = _kcR;
+  _KC_M4.set(R[0][0], R[0][1], R[0][2], 0,
+             R[1][0], R[1][1], R[1][2], 0,
+             R[2][0], R[2][1], R[2][2], 0,
+             0, 0, 0, 1);
+  line.setRotationFromMatrix(_KC_M4);
+  line.position.copy(SUN_POS);
+}
+
 function updatePositions() {
-  // Flag path: derive the frame rotation BEFORE the anchor reads (the triad
+  // Derive the frame rotation BEFORE the anchor reads (the triad
   // probe re-animates the graph to its own epochs, then restores).
-  if (KEPLER_CHAINS && !_kcR) _kcDeriveFrameR();
+  if (!_kcR) _kcDeriveFrameR();
   // 0.  Update world matrices for objects we need (optimized)
   //     Instead of scene.updateMatrixWorld(true) which traverses ALL objects,
   //     we only update the specific branches we actually use:
@@ -53780,7 +51800,7 @@ function updatePositions() {
     // (astrometric — K4.6 measured the uncorrected gap decoding exactly as
     // motion × delay): re-evaluate the planet at jd − τ, τ = geocentric
     // distance / c — c and AU from the model's single homes.
-    const _kcOn = KEPLER_CHAINS && _KC_PLANET_NAMES.has(obj.name);
+    const _kcOn = _KC_PLANET_NAMES.has(obj.name);
     if (_kcOn) {
       const _R = _kcR, _nm = obj.name.toLowerCase();
       const _toWorld = (hv) => [
@@ -53795,9 +51815,8 @@ function updatePositions() {
       PLANET_POS.set(_wp[0], _wp[1], _wp[2]);
       // THE VISUAL FLIP: the rendered planet IS the chain planet (world →
       // the mesh parent's local; parent matrices are current from step 0).
-      // Orbit rings and traces stay geometric — decorative, arcmin-class
-      // mismatch — until the legacy-chain excision.
-      if (obj._kcOrigPos === undefined) obj._kcOrigPos = obj.planetObj.position.clone();
+      // The orbit ring and the trace are chain-sampled too
+      // (_kcUpdateOrbitLine below / _kcChainWorldPos in the trace sampler).
       _KC_V.set(_wp[0], _wp[1], _wp[2]);
       obj.planetObj.parent.worldToLocal(_KC_V);
       obj.planetObj.position.copy(_KC_V);
@@ -53807,11 +51826,12 @@ function updatePositions() {
       // followed the chain mesh).
       if (obj.ringObj) obj.ringObj.position.copy(_KC_V);
       obj.planetObj.updateMatrixWorld(true);   // same-tick consumers read fresh world matrices
+      _kcUpdateOrbitLine(obj, _nm, o.julianDay);
     }
 
     // P5/K5b — the perihelion MARKERS onto the chain: chain ϖ(t) direction
     // at the LEGACY anchor + display radius (see _KC_PERI_MARKERS above).
-    const _kcPeri = KEPLER_CHAINS ? _KC_PERI_MARKERS[obj.name] : undefined;
+    const _kcPeri = _KC_PERI_MARKERS[obj.name];
     if (_kcPeri) {
       const _R = _kcR;
       const _lpRad = _kcPerihelionEclLonDeg(_kcPeri, o.julianDay) * (Math.PI / 180);
@@ -53842,7 +51862,6 @@ function updatePositions() {
         _az + _D * (_R[2][0] * _hv[0] + _R[2][1] * _hv[1]),
       ];
       PLANET_POS.set(_wp[0], _wp[1], _wp[2]);
-      if (obj._kcOrigPos === undefined) obj._kcOrigPos = obj.planetObj.position.clone();
       _KC_V.set(_wp[0], _wp[1], _wp[2]);
       obj.planetObj.parent.worldToLocal(_KC_V);
       obj.planetObj.position.copy(_KC_V);
@@ -53868,91 +51887,13 @@ function updatePositions() {
     obj.ra  = SPHERICAL.theta;                       // radians
     obj.dec = SPHERICAL.phi;                         // radians
 
-    // Post-hoc RA/Dec correction for geocentric parallax (15/18/24-param model)
-    // Model: dX = A + B/d + C*T + (D*sin + E*cos + F*sin2 + G*cos2 + H*sin3 + I*cos3)/d
-    //            + T*(J*sin + K*cos)/d + L/s + M*sin(u)/d² + N*sin(2u)/s + O*cos(u)/s
-    //            + P*T*sin(2u)/d + Q*T*cos(2u)/d + R*T*sin(u)/s
-    //            + S*T/d + U*cos(u)/d² + V/s² + W*sin(u)/s² + X*cos(3u)/s + Y*sin(3u)/s
-    // (the flag path skips ALL three OBSERVATION-FITTED blocks below —
-    // doctrine; the K4.6b ladder measured the cost of a leaked guard:
-    // Saturn 109″ / Mars 89″ of double-counted perturbations)
-    const _dc = !_kcOn && PARALLAX_DEC_CORRECTION[obj.name];
-    const _rc = !_kcOn && PARALLAX_RA_CORRECTION && PARALLAX_RA_CORRECTION[obj.name];
-    if (_dc || _rc) {
-      const _ascNode = o[_planetAscNodeDynKey[obj.name]] || _planetAscNodeLookup[obj.name];
-      const _u = (obj.ra * (180 / Math.PI) - _ascNode) * (Math.PI / 180);
-      const _invD = 1 / obj.distAU;
-      DELTA.subVectors(PLANET_POS, SUN_POS);
-      const _invS = 100 / DELTA.length();
-      const _T = (o.julianDay - j2000JD) / julianCenturyDays;
-      // Conjunction phase (triple synodic period ~59.5yr, Jupiter-Saturn interaction)
-      const _yr = startmodelYear + (o.julianDay - startmodelJD) / meansolaryearlengthinDays;
-      const _cp = 2 * Math.PI * (_yr - 2000) / tripleSynodicYears;
-      // Sun mean longitude (for Lsun basis functions AX-BK)
-      const _dtJ = o.julianDay - j2000JD;
-      const _Lsun = (280.460 + 0.9856474 * _dtJ) * (Math.PI / 180);
-      // Planet mean anomaly for heliocentric orbital phase terms (BR-CA)
-      // Uses dynamic M from EoC computation (stored on obj._meanAnomaly during animation)
-      // Only for inner planets (Mercury, Venus, Mars) — outer planets have too few M cycles
-      const _pName = obj.name;
-      const _isInner = (_pName === 'Mercury' || _pName === 'Venus' || _pName === 'Mars');
-      let _sinM = 0, _cosM = 0, _sin2M = 0, _cos2M = 0;
-      if (_isInner && obj._meanAnomaly != null) {
-        const _Mpl = obj._meanAnomaly; // already in radians from EoC computation
-        _sinM = Math.sin(_Mpl); _cosM = Math.cos(_Mpl);
-        _sin2M = Math.sin(2 * _Mpl); _cos2M = Math.cos(2 * _Mpl);
-      }
-      // Phase 8.3 L8: the fitted 80-slot parallax basis lives ONCE in
-      // @essrt/physics/planets/corrections (matched pair with the tables;
-      // the state derivation above stays engine-side).
-      const _pState = { u: _u, invD: _invD, invS: _invS, T: _T, cp: _cp, Lsun: _Lsun, sinM: _sinM, cosM: _cosM, sin2M: _sin2M, cos2M: _cos2M };
-      if (_dc) {
-        obj.dec += evaluateParallaxBasis(_dc, _pState) * (Math.PI / 180);
-      }
-      if (_rc) {
-        obj.ra -= evaluateParallaxBasis(_rc, _pState) * (Math.PI / 180);
-      }
-    }
-
-    // Gravitation correction (planet-planet perturbations, per-planet synodic periods)
-    // 8.3: term evaluation shared (@essrt/physics/planets/corrections); applied
-    // PER TERM here — order and sign are engine application semantics.
-    const _conjTerms = !_kcOn && GRAVITATION_CORRECTION[obj.name];
-    if (_conjTerms) {
-      const _cyr = startmodelYear + (o.julianDay - startmodelJD) / meansolaryearlengthinDays;
-      for (const _gt of gravitationTermDeltasDeg(_conjTerms, _cyr - 2000)) {
-        obj.ra -= _gt.raDeg * (Math.PI / 180);
-        obj.dec += _gt.decDeg * (Math.PI / 180);
-      }
-    }
-
-    // Elongation offset correction (elongation × Earth perihelion geometry)
-    // Applied to inner planets: Mercury, Venus, Mars
-    // 8.3: the fitted 21-slot basis lives ONCE in @essrt/physics/planets/
-    // corrections (browser association form — precomputed invD²); the
-    // frame-state derivation (this frame's sun.ra, the exact synodic count)
-    // stays here.
-    const _elCorr = !_kcOn && ELONGATION_CORRECTION && ELONGATION_CORRECTION[obj.name];
-    if (_elCorr) {
-      const _vyr = startmodelYear + (o.julianDay - startmodelJD) / meansolaryearlengthinDays;
-      // Sun RA for elongation (use stored sun position from this frame)
-      const _sunRAv = sun.ra || 0;
-      const _venusRAv = obj.ra;
-      const _elong = _venusRAv - _sunRAv;
-      // Earth perihelion angle
-      const _wEv = (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + 360 / (holisticyearLength / 16) * (_vyr - 2000)) * (Math.PI / 180);
-      const _vFromWE = _venusRAv - _wEv;
-      const _d2r = Math.PI / 180;
-      // Planet-Earth synodic phase (exact from integer orbit count)
-      const _plName = obj.name.toLowerCase();
-      const _plSolarYearInput = planets[_plName] ? planets[_plName].solarYearInput : planets.venus.solarYearInput;
-      const _vCnt = Math.round(holisticyearLength * meansolaryearlengthinDays / _plSolarYearInput);
-      const _synVE = 1 / Math.abs(1 - _vCnt / holisticyearLength);
-      const _synPh = 2 * Math.PI * (_vyr - 2000) / _synVE;
-      const _elState = { elongRad: _elong, vFromWERad: _vFromWE, synPhaseRad: _synPh, invD: 1 / obj.distAU };
-      obj.ra -= evaluateElongationBasis(_elCorr, _elState, 'ra') * _d2r;
-      obj.dec += evaluateElongationBasis(_elCorr, _elState, 'dec') * _d2r;
-    }
+    // The observation-fitted post-hoc corrections (parallax 15/18/24-param,
+    // gravitation, elongation) were EXCISED with the legacy planet chains
+    // (K5): the chain renders the engine raw, and the correction sets only
+    // ever carried the seven chain planets. K4.6b measured the cost of a
+    // correction leaking onto the chain while both paths coexisted
+    // (Saturn 109″ / Mars 89″ double-count — k46c-scene-share.mjs is the
+    // record).
 
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.
     // The hierarchy provides the orbit ring visual; this puts the Moon mesh at the correct position.
@@ -55071,7 +53012,7 @@ function updatePerihelion() {
   // (eclipticLongitudeToRaDeg — the doc-37 "RA of a Keplerian apsis").
   // Earth stays on its engine-K law (the two-engine interface);
   // Pluto/Halleys/Eros have no chain and stay legacy.
-  if (KEPLER_CHAINS) {
+  {
     for (const _p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const _lp = _kcPerihelionEclLonDeg(_p, o.julianDay);
       o[_p + 'PerihelionEcliptic'] = _lp;
@@ -55488,15 +53429,14 @@ function updateAscendingNodes() {
   );
   o.erosArgumentOfPeriapsis = ((o.erosPerihelion - o.erosAscendingNode) % 360 + 360) % 360;
 
-  // P5/K5b — under the Keplerian flag the SEVEN PLANETS' nodes ride the
-  // chain's elements-of-date: Ω(t) from the ζ-vector secular skeleton +
-  // derived terms, ω = ϖ − Ω from the SAME element set (proper ecliptic
-  // arguments — the legacy line above mixed the RA-channel ϖ with an
-  // ecliptic Ω). Pluto/Halleys/Eros have no chain and keep the legacy
-  // tilt integration, as does the flag-off path. Placed BEFORE
-  // updateOrbitalPlaneRotations so the VISUAL orbital planes follow the
-  // same Ω.
-  if (KEPLER_CHAINS) {
+  // P5/K5b — the SEVEN PLANETS' nodes ride the chain's elements-of-date:
+  // Ω(t) from the ζ-vector secular skeleton + derived terms, ω = ϖ − Ω
+  // from the SAME element set (proper ecliptic arguments — the legacy
+  // line above mixed the RA-channel ϖ with an ecliptic Ω).
+  // Pluto/Halleys/Eros have no chain and keep the legacy tilt
+  // integration. Placed BEFORE updateOrbitalPlaneRotations so the
+  // VISUAL orbital planes follow the same Ω.
+  {
     for (const _p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const _el = _kcElementsOfDate(_p, o.julianDay);
       o[_p + 'AscendingNode'] = _el.ascNodeEclipticDeg;
@@ -55675,7 +53615,7 @@ function updatePlanetAnomalies() {
     // ECLIPTIC channel (the panel's ϖ row source, the perihelion law);
     // earthLonPeri above is the scene-equator RA channel and stays the
     // true-anomaly reference because sun.ra lives in the same channel.
-    o.earthArgumentOfPeriapsis = KEPLER_CHAINS ? calcEarthPerihelionPredictive(o.currentYear) : earthLonPeri;
+    o.earthArgumentOfPeriapsis = calcEarthPerihelionPredictive(o.currentYear);
 
     // Get current eccentricity (dynamic)
     const earthE = o.eccentricityEarth || eccentricityBase;
@@ -55708,7 +53648,7 @@ function updatePlanetAnomalies() {
       // retrograde in the current window). Earth included (option A,
       // owner-ruled): in-window it reads \u2248 the H/3 law (+111.5k vs
       // +111,772 yr \u2014 the epoch-local tangent), wandering at deep time.
-      if (KEPLER_CHAINS && dt.precEl) {
+      if (dt.precEl) {
         const _T = _kcApsidalPeriodYears(dt.planetKey, o.julianDay);
         dt.precEl.textContent = (_T >= 0 ? '+' : '\u2212') + (isFinite(_T) ? Math.abs(_T).toFixed(0) : '\u221E') + ' yr';
         dt.precEl.style.color = _T >= 0 ? 'hsla(140, 65%, 55%, 1)' : 'hsla(0, 70%, 60%, 1)';
@@ -56272,10 +54212,10 @@ function updateDynamicInclinations() {
   // P5/K5b option A (owner-ruled) — Earth's perihelion DISPLAY rides the
   // chain like every planet: the chain ϖ is the J2000-frame longitude
   // (→ the ICRF row directly), the of-date gauge adds the same general-
-  // precession term the legacy line uses. The engine-K law above stays the
-  // flag-off path AND the load-bearing machinery (the Sun's chain rides
+  // precession term the legacy line uses. The engine-K law above stays
+  // the load-bearing machinery (the Sun's chain rides
   // barycenterEarthAndSun, untouched).
-  if (KEPLER_CHAINS) {
+  {
     const _wE = _kcPerihelionEclLonDeg('earth', o.julianDay);
     o.earthPerihelionLongICRF = ((_wE % 360) + 360) % 360;
     o.earthPerihelionEcliptic = ((_wE + _gprRate * (o.currentYear - 2000)) % 360 + 360) % 360;
@@ -56294,15 +54234,6 @@ function updateDynamicInclinations() {
   o.saturnPerihelionLongICRF  = _calcPeriICRF('saturn');
   o.uranusPerihelionLongICRF  = _calcPeriICRF('uranus');
   o.neptunePerihelionLongICRF = _calcPeriICRF('neptune');
-
-  // Live-update vector balance diagram only if the Balance Explorer is open
-  // AND the vector diagram section is expanded (not collapsed).
-  if (balanceExplorerPanel && balanceExplorerPanel.classList.contains('visible') && balanceExplorerState) {
-    const vc = balanceExplorerPanel.querySelector('.fbe-vector-collapsible');
-    if (vc && vc.style.display !== 'none') {
-      fbeRenderVectorDiagram(balanceExplorerPanel, balanceExplorerState);
-    }
-  }
 
   // Get Earth's current orbital plane normals (ecliptic normals)
   // We need TWO ecliptic normals: one for S&S calculations, one for Verified calculations
@@ -56440,7 +54371,7 @@ function updateOrbitOrientations() {
     // 28.05° tilt-derived vs 29.14° chain) and were silently overwriting
     // that override every frame — keep them only for the legacy path and
     // the three non-chain bodies.
-    if (KEPLER_CHAINS && ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'].includes(name)) continue;
+    if (['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'].includes(name)) continue;
     o[`${name}AscendingNode`]      = r.ascending;        // Ω
     o[`${name}DescendingNode`]     = r.descending;       // Ω + 180°
     o[`${name}ArgumentOfPeriapsis`] = r.argument;        // ω

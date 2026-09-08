@@ -502,12 +502,6 @@ function getParamAccessors(target) {
     perihelionEclipticYears:{ get: () => p.perihelionEclipticYears, set: v => { p.perihelionEclipticYears = v; } },
     eocFraction:            { get: () => p.eocFraction,            set: v => { p.eocFraction = v; } },
     perihelionRef_JD:       { get: () => C.ASTRO_REFERENCE[target + 'PerihelionRef_JD'], set: v => { C.ASTRO_REFERENCE[target + 'PerihelionRef_JD'] = v; } },
-    decCorrA:               { get: () => (C.ASTRO_REFERENCE.decCorrection[target] || {}).A || 0, set: v => { if (!C.ASTRO_REFERENCE.decCorrection[target]) C.ASTRO_REFERENCE.decCorrection[target] = {}; C.ASTRO_REFERENCE.decCorrection[target].A = v; } },
-    decCorrB:               { get: () => (C.ASTRO_REFERENCE.decCorrection[target] || {}).B || 0, set: v => { if (!C.ASTRO_REFERENCE.decCorrection[target]) C.ASTRO_REFERENCE.decCorrection[target] = {}; C.ASTRO_REFERENCE.decCorrection[target].B = v; } },
-    decCorrC:               { get: () => (C.ASTRO_REFERENCE.decCorrection[target] || {}).C || 0, set: v => { if (!C.ASTRO_REFERENCE.decCorrection[target]) C.ASTRO_REFERENCE.decCorrection[target] = {}; C.ASTRO_REFERENCE.decCorrection[target].C = v; } },
-    decCorrD:               { get: () => (C.ASTRO_REFERENCE.decCorrection[target] || {}).D || 0, set: v => { if (!C.ASTRO_REFERENCE.decCorrection[target]) C.ASTRO_REFERENCE.decCorrection[target] = {}; C.ASTRO_REFERENCE.decCorrection[target].D = v; } },
-    decCorrE:               { get: () => (C.ASTRO_REFERENCE.decCorrection[target] || {}).E || 0, set: v => { if (!C.ASTRO_REFERENCE.decCorrection[target]) C.ASTRO_REFERENCE.decCorrection[target] = {}; C.ASTRO_REFERENCE.decCorrection[target].E = v; } },
-    decCorrF:               { get: () => (C.ASTRO_REFERENCE.decCorrection[target] || {}).F || 0, set: v => { if (!C.ASTRO_REFERENCE.decCorrection[target]) C.ASTRO_REFERENCE.decCorrection[target] = {}; C.ASTRO_REFERENCE.decCorrection[target].F = v; } },
   };
 }
 

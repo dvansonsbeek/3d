@@ -71,16 +71,6 @@ const COEFFICIENT_KEYS = [
   'SOLSTICE_OBLIQUITY_HARMONICS',
   'SUN_LONGITUDE_HARMONICS',
 
-  // Correction tables. Audited for the same rounding: fmtParallax wrote FOUR
-  // decimals and the gravitation/elongation formatters six, but all four blocks
-  // came out bit-exact — the fitter already stores them at that precision, so
-  // the formatter had nothing to round away. Emitted verbatim regardless, so the
-  // question cannot arise again.
-  'PARALLAX_DEC_CORRECTION',
-  'PARALLAX_RA_CORRECTION',
-  'GRAVITATION_CORRECTION',
-  'ELONGATION_CORRECTION',
-
   // Moon RA/Dec patches. MOON_CORRECTION_RESIDUAL carries a `_comment` the
   // embedded copy does not — stripped like every other documentation key.
   'MOON_CORRECTION',

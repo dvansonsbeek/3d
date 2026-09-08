@@ -1534,22 +1534,18 @@ function _invalidateGraph() {
 // UT→TT shift, after which the lock measured dA/dN ≈ 0 at every epoch and
 // was removed.)
 
-// ── P5/K3 — the Keplerian flag path (plan 02 §P5; DEFAULT OFF) ────────────
-// KEPLER_CHAINS=1 renders the seven planets from the engine-D-driven
-// Keplerian chain (tools/lib/keplerian-chain.js — anchors + era-typed window
-// rates, ALL from the governed artifact) instead of the geometric two-vector
-// chains. Earth, Moon and Sun are untouched. The ecliptic-J2000 → scene-world
-// rotation R is DERIVED at runtime from the scene's own Earth triad (never a
-// pasted matrix — tools/explore/k3-frame-probe.mjs is the measured record:
-// inertial frame, −68.23° azimuth convention, pole 1.6′ mean-plane offset,
-// residuals ≤9″ annual + 0.55″/yr longitude-convention drift). The post-hoc
-// OBSERVATION-FITTED RA/Dec corrections do not ride this path — the flag
-// path renders the engine raw (the source-of-truth doctrine).
-// THE P5 FLIP (owner-approved): the engine-D chain is the DEFAULT planet
-// renderer; KEPLER_CHAINS=0 opts back into the legacy geometric chains
-// (kept functional until their wholesale excision — their fitted stack
-// stays with them, never on this path).
-let KEPLER_CHAINS = process.env.KEPLER_CHAINS !== '0';
+// ── P5 — the engine-D Keplerian chain (the ONLY planet path since the K5
+// excision) ── Renders the seven planets from the engine-D-driven Keplerian
+// chain (tools/lib/keplerian-chain.js — anchors + era-typed window rates,
+// ALL from the governed artifact). Earth, Moon and Sun stay on the engine-K
+// hierarchy. The ecliptic-J2000 → scene-world rotation R is DERIVED at
+// runtime from the scene's own Earth triad (never a pasted matrix —
+// tools/explore/k3-frame-probe.mjs is the measured record: inertial frame,
+// −68.23° azimuth convention, pole 1.6′ mean-plane offset, residuals ≤9″
+// annual + 0.55″/yr longitude-convention drift). The chain renders the
+// engine raw — no observation-fitted correction rides it (the
+// source-of-truth doctrine); the legacy geometric planet chains and their
+// fitted stack were EXCISED with K5.
 let _kcModule = null, _kcChains = null, _kcR = null;
 function _kc() { if (!_kcModule) _kcModule = require('./keplerian-chain.js'); return _kcModule; }
 function _kcHelioAU(target, jd) {
@@ -1594,7 +1590,7 @@ function computePlanetPosition(target, jd) {
 
   // Flag path: derive the frame rotation BEFORE the main animate (the triad
   // probe re-animates the graph to its own epochs).
-  if (KEPLER_CHAINS && !_kcR && target !== 'moon' && target !== 'sun') _kcFrameR(graph);
+  if (!_kcR && target !== 'moon' && target !== 'sun') _kcFrameR(graph);
 
   // Sync epoch cache from this JD (no-op when DEEP_TIME_ENABLED=false).
   // Must precede pos computation so pos uses the epoch-appropriate mSY.
@@ -1618,27 +1614,23 @@ function computePlanetPosition(target, jd) {
   } else {
     const pm = graph.planetNodeMap[target];
     if (!pm) throw new Error(`Unknown target: ${target}`);
-    if (KEPLER_CHAINS) {
-      // engine-D-driven position: sun + 100·R·helio (scene units, 100/AU),
-      // with LIGHT-TIME (astrometric; K4.6 measured the uncorrected gap
-      // decoding exactly as motion × delay): re-evaluate the planet at
-      // jd − τ, τ = geocentric distance / c — c and AU from the model's
-      // single homes. Proper physics, not a correction fit.
-      const R = _kcR;
-      const sun = graph.sunNodes.pivot.getWorldPosition();
-      const earthW = graph.earthNodes.rotAxis.getWorldPosition();
-      const toWorld = (hv) => [
-        sun[0] + 100 * (R[0][0] * hv[0] + R[0][1] * hv[1] + R[0][2] * hv[2]),
-        sun[1] + 100 * (R[1][0] * hv[0] + R[1][1] * hv[1] + R[1][2] * hv[2]),
-        sun[2] + 100 * (R[2][0] * hv[0] + R[2][1] * hv[1] + R[2][2] * hv[2]),
-      ];
-      let wp = toWorld(_kcHelioAU(target, jd));
-      const dKm = Math.hypot(wp[0] - earthW[0], wp[1] - earthW[1], wp[2] - earthW[2]) / 100 * C.currentAUDistance;
-      const tauDays = dKm / C.speedOfLight / 86400;
-      targetWP = toWorld(_kcHelioAU(target, jd - tauDays));
-    } else {
-      targetWP = pm.planet.pivot.getWorldPosition();
-    }
+    // engine-D-driven position: sun + 100·R·helio (scene units, 100/AU),
+    // with LIGHT-TIME (astrometric; K4.6 measured the uncorrected gap
+    // decoding exactly as motion × delay): re-evaluate the planet at
+    // jd − τ, τ = geocentric distance / c — c and AU from the model's
+    // single homes. Proper physics, not a correction fit.
+    const R = _kcR;
+    const sun = graph.sunNodes.pivot.getWorldPosition();
+    const earthW = graph.earthNodes.rotAxis.getWorldPosition();
+    const toWorld = (hv) => [
+      sun[0] + 100 * (R[0][0] * hv[0] + R[0][1] * hv[1] + R[0][2] * hv[2]),
+      sun[1] + 100 * (R[1][0] * hv[0] + R[1][1] * hv[1] + R[1][2] * hv[2]),
+      sun[2] + 100 * (R[2][0] * hv[0] + R[2][1] * hv[1] + R[2][2] * hv[2]),
+    ];
+    const wp = toWorld(_kcHelioAU(target, jd));
+    const dKm = Math.hypot(wp[0] - earthW[0], wp[1] - earthW[1], wp[2] - earthW[2]) / 100 * C.currentAUDistance;
+    const tauDays = dKm / C.speedOfLight / 86400;
+    targetWP = toWorld(_kcHelioAU(target, jd - tauDays));
   }
 
   // Get Sun world position for sun distance
@@ -1663,104 +1655,13 @@ function computePlanetPosition(target, jd) {
   // Convert to spherical (matches Three.js Spherical.setFromVector3)
   const sph = cartesianToSpherical(local[0], local[1], local[2]);
 
-  // Post-hoc RA/Dec corrections for geocentric parallax + precession drift (15/18/24-param)
-  // Model: dX = A + B/d + C*T + (D*sin(u) + E*cos(u) + F*sin(2u) + G*cos(2u)
-  //              + H*sin(3u) + I*cos(3u))/d + T*(J*sin(u) + K*cos(u))/d
-  //              + L/s + M*sin(u)/d² + N*sin(2u)/s + O*cos(u)/s
-  //              + P*T*sin(2u)/d + Q*T*cos(2u)/d + R*T*sin(u)/s
-  //              + S*T/d + U*cos(u)/d² + V/s² + W*sin(u)/s² + X*cos(3u)/s + Y*sin(3u)/s
-  //   where u = RA - ascendingNode(t), d = geocentric dist, s = sunDist, T = centuries from J2000
-  // The flag path renders the engine raw: NO observation-fitted correction
-  // may ride it (doctrine). K4.6b measured the cost of a leak: the
-  // gravitation + elongation blocks below initially lacked this guard and
-  // double-counted the chain's own derived perturbation terms (Saturn 109″ /
-  // Mars 89″ scene share — k46c-scene-share.mjs is the record).
-  const _kcActive = KEPLER_CHAINS && target !== 'moon' && target !== 'sun';
-  if (!_kcActive && target !== 'moon' && target !== 'sun') {
-    const _p = C.planets[target];
-    const _currentYear = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
-    const ascNode = OE.calculateDynamicAscendingNodeFromTilts(_p.orbitTilta, _p.orbitTiltb, _currentYear, target);
-    const u = (sph.theta / d2r - ascNode) * d2r;
-    const invD = 1 / distAU;
-    const invS = 1 / sunDistAU;
-    const T = (jd - C.j2000JD) / C.julianCenturyDays;  // centuries from J2000
-
-    // Conjunction phase for Jupiter-Saturn interaction terms (AR-AW)
-    const _yr = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
-    const conjPhase = 2 * Math.PI * (_yr - 2000) / C.tripleSynodicYears;
-
-    // Sun mean longitude for eccentricity-offset terms (AX-BA)
-    const _Lsun = (280.460 + 0.9856474 * (jd - C.j2000JD)) * d2r;
-
-    // Planet mean anomaly for heliocentric orbital phase terms (BR-CA)
-    // Uses dynamic M from EoC computation in animateObject (stored on planet node)
-    // Only for inner planets (Mercury, Venus, Mars) — outer planets have too few M cycles
-    const _useM = (target === 'mercury' || target === 'venus' || target === 'mars');
-    let sinMplanet = 0, cosMplanet = 0, sin2Mplanet = 0, cos2Mplanet = 0;
-    if (_useM) {
-      const _pm = graph.planetNodeMap[target];
-      const _Mplanet = _pm && _pm.planet._meanAnomaly != null ? _pm.planet._meanAnomaly : 0;
-      sinMplanet = Math.sin(_Mplanet); cosMplanet = Math.cos(_Mplanet);
-      sin2Mplanet = Math.sin(2 * _Mplanet); cos2Mplanet = Math.cos(2 * _Mplanet);
-    }
-
-    // Phase 8.3 L8: the fitted 80-slot basis lives ONCE in
-    // @essrt/physics/planets/corrections (browser association order — this
-    // mirror carried invD2·invD where the basis uses the precomputed invD3
-    // at five slots; any last-bit drift is measured by the fixtures).
-    const _pState = { u, invD, invS, T, cp: conjPhase, Lsun: _Lsun,
-                      sinM: sinMplanet, cosM: cosMplanet, sin2M: sin2Mplanet, cos2M: cos2Mplanet };
-    const _evalParallax = _req('@essrt/physics/planets/corrections').evaluateParallaxBasis;
-    const dc = C.ASTRO_REFERENCE.decCorrection[target];
-    if (dc) {
-      sph.phi += _evalParallax(dc, _pState) * d2r;
-    }
-
-    const rc = C.ASTRO_REFERENCE.raCorrection && C.ASTRO_REFERENCE.raCorrection[target];
-    if (rc) {
-      sph.theta -= _evalParallax(rc, _pState) * d2r;
-    }
-  }
-
-  // Gravitation correction (per-planet synodic periods, planet-planet perturbations)
-  // 8.3: term evaluation shared (@essrt/physics/planets/corrections); applied
-  // PER TERM here — order and sign are engine application semantics.
-  const gravCorr = C.GRAVITATION_CORRECTION && C.GRAVITATION_CORRECTION[target];
-  if (gravCorr && !_kcActive) {
-    const _yr = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
-    const _gravDeltas = _req('@essrt/physics/planets/corrections').gravitationTermDeltasDeg(gravCorr, _yr - 2000);
-    for (const gt of _gravDeltas) {
-      sph.theta -= gt.raDeg * d2r;
-      sph.phi += gt.decDeg * d2r;
-    }
-  }
-
-  // Elongation offset correction (elongation × Earth perihelion geometry)
-  // Applied to inner planets: Venus, Mars
-  // 8.3: the fitted 21-slot basis lives ONCE in @essrt/physics/planets/
-  // corrections, in the BROWSER association form (precomputed invD²) — this
-  // mirror carried inline invD·invD at the six d² slots per table; the
-  // fixture recorders measured the last-bit drift at extraction.
-  const _elCorr = C.ELONGATION_CORRECTION && C.ELONGATION_CORRECTION[target];
-  if (_elCorr && !_kcActive) {
-    const _yr = C.startmodelYear + (jd - C.startmodelJD) / _epochCache.mSY;
-    // Compute Sun RA for elongation
-    const _sunSph = computePlanetPosition('sun', jd, graph);
-    const _sunRA = _sunSph.ra;  // radians
-    const _venusRA = sph.theta; // radians (already corrected by parallax + conjunction)
-    const _elong = _venusRA - _sunRA;
-    // Earth perihelion angle
-    const _wE = (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 + 360 / (C.H / 16) * (_yr - 2000)) * d2r;
-    const _vFromWE = _venusRA - _wE;
-    // Planet-Earth synodic phase (exact from integer orbit count)
-    const _plCount = Math.round(C.totalDaysInH / C.planets[target].solarYearInput);
-    const _synVE = 1 / Math.abs(1 - _plCount / C.H);
-    const _synPhase = 2 * Math.PI * (_yr - 2000) / _synVE;
-    const _evalElong = _req('@essrt/physics/planets/corrections').evaluateElongationBasis;
-    const _elState = { elongRad: _elong, vFromWERad: _vFromWE, synPhaseRad: _synPhase, invD: 1 / distAU };
-    sph.theta -= _evalElong(_elCorr, _elState, 'ra') * d2r;
-    sph.phi += _evalElong(_elCorr, _elState, 'dec') * d2r;
-  }
+  // The observation-fitted post-hoc corrections (parallax 15/18/24-param,
+  // gravitation, elongation) were EXCISED with the legacy planet chains
+  // (K5): the chain renders the engine raw, and the correction sets only
+  // ever carried the seven chain planets. K4.6b measured the cost of a
+  // correction leaking onto the chain while both paths coexisted
+  // (Saturn 109″ / Mars 89″ double-count — k46c-scene-share.mjs is the
+  // record).
 
   // Planet offset correction (time-dependent, fitted from Tier 1 observed data)
   // PLANET_OFFSET_CORRECTION removed — the inclination geometry residual for Mercury
@@ -1975,8 +1876,6 @@ module.exports = {
   Node,
   cartesianToSpherical,
   _getGraphForProbe: () => getGraph(),   // research probes: the internal graph AFTER a computePlanetPosition call
-  _setKeplerChains: (on) => { KEPLER_CHAINS = !!on; },   // research probes (K3 parity): toggle the flag path in-process
-  _keplerChainsOn: () => KEPLER_CHAINS,
   _injectKeplerChains: (chains) => { _kcChains = chains; },   // research probes (K4.5 acceptance): override the flag path's chains (null → reload from the artifact)
   _kcDebugR: () => _kcR,   // research probes (K4b parity): the derived frame bridge
   _moonSeriesForProbe: () => _moonSeriesM(),   // research probes: the shared Meeus series (incl. the truncated eclipse-finder forms)

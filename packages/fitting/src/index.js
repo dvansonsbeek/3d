@@ -11,5 +11,3 @@
  * full gate chain green.
  */
 
-// 9-3a — the correction-layer registry (dependency-free infrastructure).
-export * as correctionStack from './correction-stack.cjs';

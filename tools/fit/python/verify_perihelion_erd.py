@@ -64,8 +64,11 @@ def load_truth():
     df = df.iloc[::step].reset_index(drop=True)
 
     years = df['Model Year'].values.astype(float)
+    # K5 excision: renamed export column 'Earth Perihelion RA'; accept the
+    # pre-rename 'Earth Perihelion ICRF' header from older exports too.
+    peri_col = 'Earth Perihelion RA' if 'Earth Perihelion RA' in df.columns else 'Earth Perihelion ICRF'
     peri_raw = perihelion_ra_to_ecliptic_longitude_deg(
-        df['Earth Perihelion ICRF'].values.astype(float),
+        df[peri_col].values.astype(float),
         df['EARTH OBLIQUITY (deg)'].values.astype(float))
     peri_unwrapped = np.rad2deg(np.unwrap(np.deg2rad(peri_raw)))
     print(f'  Downsampled by {step}: {len(years)} points')

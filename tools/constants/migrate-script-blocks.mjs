@@ -32,10 +32,6 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const SCRIPT = join(ROOT, 'src/script.js');
 
-const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-/** JSON stores planet keys lowercase; script.js capitalises them. */
-const capKeys = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [cap(k), v]));
-
 /**
  * Each entry: the script.js identifier, where the value comes from in the
  * generated module, and any reshape needed to make the two comparable.
@@ -44,27 +40,6 @@ const capKeys = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [cap
  * value-identical to `expected` — the tool proves that before writing.
  */
 const BLOCKS = [
-  {
-    name: 'PARALLAX_DEC_CORRECTION',
-    expected: (fit) => capKeys(fit.PARALLAX_DEC_CORRECTION),
-    expr: 'capitalisePlanetKeys(FIT.PARALLAX_DEC_CORRECTION)',
-    note: 'JSON keys are lowercase; script.js uses Mercury/Venus/...',
-  },
-  {
-    name: 'PARALLAX_RA_CORRECTION',
-    expected: (fit) => capKeys(fit.PARALLAX_RA_CORRECTION),
-    expr: 'capitalisePlanetKeys(FIT.PARALLAX_RA_CORRECTION)',
-  },
-  {
-    name: 'GRAVITATION_CORRECTION',
-    expected: (fit) => capKeys(fit.GRAVITATION_CORRECTION),
-    expr: 'capitalisePlanetKeys(FIT.GRAVITATION_CORRECTION)',
-  },
-  {
-    name: 'ELONGATION_CORRECTION',
-    expected: (fit) => capKeys(fit.ELONGATION_CORRECTION),
-    expr: 'capitalisePlanetKeys(FIT.ELONGATION_CORRECTION)',
-  },
   {
     name: 'MOON_CORRECTION',
     expected: (fit) => fit.MOON_CORRECTION,

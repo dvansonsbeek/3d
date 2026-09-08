@@ -43,8 +43,7 @@ const ASTRO_REFERENCE = {
   // Cardinal point anchors
   cardinalPointAnchors: astroRef.cardinalPointAnchors,
   // Additional fields attached below after planets are defined:
-  //   ascNodeTiltCorrection, decCorrection, raCorrection,
-  //   earthInvPlanePrecessionYears, <planet>PerihelionRef_JD
+  //   ascNodeTiltCorrection, earthInvPlanePrecessionYears, <planet>PerihelionRef_JD
 };
 
 const yearLengthRef = astroRef.yearLengthRef;
@@ -388,19 +387,9 @@ const moonDraconicYearEarth = totalDaysInH / ((totalDaysInH / moonDraconicYearIC
 // Model-derived value (not an astronomical reference, but consumed via ASTRO_REFERENCE)
 ASTRO_REFERENCE.earthInvPlanePrecessionYears = H / 3;
 
-// Parallax corrections (fitted, from fitted-coefficients.js)
-ASTRO_REFERENCE.decCorrection = fitted.PARALLAX_DEC_CORRECTION;
-ASTRO_REFERENCE.raCorrection = fitted.PARALLAX_RA_CORRECTION;
-
 // Moon post-Meeus RA/Dec correction (fitted to JPL DE440 residuals)
 const MOON_CORRECTION = fitted.MOON_CORRECTION || null;
 const MOON_CORRECTION_RESIDUAL = fitted.MOON_CORRECTION_RESIDUAL || null;   // D5: residual after analytic-aberration subtraction
-
-// Gravitation correction (per-planet synodic periods, planet-planet perturbations)
-const GRAVITATION_CORRECTION = fitted.GRAVITATION_CORRECTION || null;
-
-// Elongation correction for inner planets (Venus, Mars)
-const ELONGATION_CORRECTION = fitted.ELONGATION_CORRECTION || null;
 
 // Planet perihelion passage references (model-tuned, from model-parameters.json)
 for (const [key, jd] of Object.entries(modelParams.perihelionPassageRef)) {
@@ -698,8 +687,6 @@ module.exports = {
   moonMeeusLpCorrection,
   MOON_CORRECTION,
   MOON_CORRECTION_RESIDUAL,
-  GRAVITATION_CORRECTION,
-  ELONGATION_CORRECTION,
   moonOrbitalEccentricity,
   moonObliquityEclipticJ2000,
   moonTilt,

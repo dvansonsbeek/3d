@@ -158,24 +158,8 @@ for (const name of ['TROPICAL_YEAR_HARMONICS', 'SIDEREAL_YEAR_HARMONICS', 'ANOMA
 }
 console.log(`  ✓ YEAR_LENGTH harmonics: all 3 types match\n`);
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 7. Verify PARALLAX corrections
-// ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 7: PARALLAX corrections consistency ═══');
-for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-  const decS = stored.PARALLAX_DEC_CORRECTION[planet];
-  const decF = fitted.PARALLAX_DEC_CORRECTION[planet];
-  const raS = stored.PARALLAX_RA_CORRECTION[planet];
-  const raF = fitted.PARALLAX_RA_CORRECTION[planet];
-
-  for (const k of Object.keys(decS)) {
-    check(`DEC.${planet}.${k}`, decF[k], decS[k]);
-  }
-  for (const k of Object.keys(raS)) {
-    check(`RA.${planet}.${k}`, raF[k], raS[k]);
-  }
-}
-console.log(`  ✓ PARALLAX corrections: all 7 planets match\n`);
+// (Step 7 — PARALLAX corrections consistency — retired with the K5
+// legacy-chain excision: the fitted planet-correction keys no longer exist.)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 8. Verify planet derived values (orbitTilt, invPlaneInclination)
@@ -459,22 +443,9 @@ console.log('');
 console.log('  All bases derived from balanced-year phase, amplitudes from K.');
 console.log('  Reachable: J2000 eccentricity within [base-amp, base+amp] range\n');
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 9b. Correction stack validation — ensure all corrections are loaded
-// ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 9b: Correction stack validation ═══');
-const { validateCorrectionState } = require('./correction-stack.cjs');
-const corrState = validateCorrectionState(C);
-if (corrState.ok) {
-  console.log('  ✓ All correction layers loaded\n');
-  totalChecks++;
-} else {
-  for (const w of corrState.warnings) {
-    console.log(`  WARNING: ${w}`);
-  }
-  console.log('');
-  totalErrors += corrState.warnings.length;
-}
+// (Step 9b — correction-stack validation — retired with the K5 legacy-chain
+// excision: the planet-correction layers are gone, and MOON_CORRECTION
+// consistency is covered by the constants-embed gate.)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 10. Baseline regression check — compare RMS against stored baselines
