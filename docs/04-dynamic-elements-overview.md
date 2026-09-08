@@ -107,8 +107,10 @@ dΩ/dε = -sin(Ω) / tan(i)
 **Output**: `o.<planet>AscendingNode` (degrees, 0-360°)
 
 **Used by**:
-- UI display values
-- Parallax correction `u` angle: `u = RA − Ω(t)`
+- UI display values (for the seven chain planets these are OVERRIDDEN by the
+  chain's element set since the K5 excision — this construction serves the
+  no-chain bodies; the parallax-correction `u`-angle consumer was deleted
+  with the fitted correction stack)
 - Planet container tilt direction in `moveModel()` / `updateOrbitalPlaneRotations()`
 
 **Direction Rule**:
