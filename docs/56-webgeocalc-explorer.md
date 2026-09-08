@@ -148,7 +148,7 @@ The yellow and blue curves tracking each other over 1900–2026 is the visual va
 
 ## Scope and limitations
 
-1. **Only perihelion-related angles** — the Explorer does not show eccentricity, inclination, or semi-major-axis evolution. Those are handled elsewhere (the Eccentricity Balance Scale, the Solar System Resonance Cycle panel, the planetStats panel).
+1. **Only perihelion-related angles** — the Explorer does not show eccentricity, inclination, or semi-major-axis evolution. Those are handled elsewhere (the planetStats panel's chain element rows; the former Eccentricity Balance Scale and Solar System Resonance Cycle panels were removed at the Fibonacci-law retirement).
 2. **No ICRF frame variant** — all angles are in the ecliptic-of-date frame; the ICRF-frame rate is noted but not plotted. Future work: add an optional ICRF-frame chart that subtracts general precession.
 3. **Earth is excluded** — ecliptic inclination zero by definition ⇒ `Ω` undefined. WebGeoCalc's reference charts also omit Earth.
 4. **Baseline is fixed at 1900–2026** — extending the pipeline script to broader windows (say 1600–2200) is possible but introduces ephemeris extrapolation issues outside DE441's validated span.

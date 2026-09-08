@@ -25,7 +25,7 @@ At the System Reset, every planet's ICRF perihelion phase = 180° (in-phase) or 
 | Balanced Year (n=0) | ≈ <!--v:balancedYear-->-302,635<!--/v--> | Jupiter, Saturn, Uranus (+ Earth by definition) |
 | n=1 through n=6 | intermediate | Planet-dependent subsets |
 
-This document describes the "Solar System Resonance Cycle Period Table" modal panel, which visualizes all planetary periods as **8H/N** fractions.
+This document is the reference table of all planetary periods as **8H/N** fractions. (The interactive "Solar System Resonance Cycle" modal panel that visualized this table was removed with the Fibonacci-law retirement and its code excised with the legacy chains — this doc carries the table itself.)
 
 ## The Six Cycle Types
 
@@ -263,25 +263,13 @@ Every 8H years, ALL planetary cycles return to their starting configuration:
 
 This is what makes 8H the fundamental super-period of the solar system.
 
-## UI Panel Design
+## UI Panel (REMOVED — historical description)
 
-### Implementation
-A single modal panel with a **Years / 8H/N toggle** button:
-- **Years mode** (default): shows periods in years with thousand separators
-- **8H/N mode**: shows the integer divisor N
-
-### Color Coding
-- **Green**: prograde precession (positive period)
-- **Red**: retrograde precession (negative period)
-- **White/neutral**: oscillation periods (obliquity, eccentricity — no direction)
-- **∞**: frozen (axial precession > 10 Myr)
-- **—**: N/A (Venus/Neptune obliquity)
-
-### Layout
-- Header with title, subtitle ("8H = <!--v:eightH-->2,682,536<!--/v--> years at J2000"), and toggle button
-- 8 rows × 6 columns grid with planet color dots
-- Earth row highlighted
-- Footer with planet/cycle count and H value
+The table was visualized by a modal panel with a **Years / 8H/N toggle**
+(green = prograde, red = retrograde, neutral = oscillation, ∞ = frozen;
+8 rows × 6 columns; Earth row highlighted; paper-SVG export). The panel
+was removed with the Fibonacci-law retirement and its code (`gho*`)
+excised in the K5 legacy-chain excision.
 
 ## Related Documentation
 
@@ -301,11 +289,8 @@ Run `node tools/explore/grand-holistic-octave-periods.js` to verify all periods 
 
 | Component | Location |
 |-----------|----------|
-| Period table modal | `createGHOPanel()` / `openGHOPanel()` in `src/script.js` |
-| Period computation | `ghoComputeData()` in `src/script.js` |
+| Period table modal | REMOVED (`gho*` excised in the K5 legacy-chain excision) |
 | Wobble period formula | `calcWobblePeriod()` in `src/script.js` |
 | Axial precession values | `axialPrecessionYears` in planet objects, `src/script.js` |
 | Obliquity cycles | `mercuryObliquityCycle` etc. in `src/script.js` |
 | Ascending node cycles | `ascendingNodeCyclesIn8H` in planet objects |
-| Button | Tools folder in Tweakpane: "Solar System Resonance Cycle" |
-| CSS | `.gho-*` classes in `src/style.css` |

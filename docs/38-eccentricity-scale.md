@@ -2,10 +2,21 @@
 docVersion: 1.0
 modelVersion: v13.0
 coefficients: sha256:9e0460662933228f
-status: current
+status: historical
 ---
 
 # 38 — The Eccentricity Balance Scale
+
+> **Status: HISTORICAL.** This doc describes the Law-5 balance
+> construction and its interactive panel. The panel (Tools → Eccentricity
+> Balance Scale) was removed with the Fibonacci-law retirement and its
+> code excised in the K5 legacy-chain excision; the exactness claim was
+> re-evaluated with the engine's own dynamical inputs and retired (doc 10
+> Status + doc 109 carry the measured verdicts — the ~98 % balance under
+> engine long-term mean eccentricities is the surviving documented
+> observation). The base-eccentricity values live on only in the legacy
+> scene scaffolding and the no-chain bodies; the shipped planets render
+> from the engine-D element chain.
 
 ## Overview
 
@@ -236,9 +247,9 @@ The current system:
 
 ---
 
-## Interactive Panel
+## Interactive Panel (REMOVED — historical description)
 
-The balance can be explored live in the 3D simulation via a modal panel under **Tools → Eccentricity Balance Scale**. The panel lets you pick any of the 8 planets as the balance target and see the per-planet contributions that make up (or cancel out) its perihelion offset.
+The balance could be explored live in the 3D simulation via a modal panel under **Tools → Eccentricity Balance Scale** (removed with the Fibonacci-law retirement; code excised in the K5 legacy-chain excision). The panel let you pick any of the 8 planets as the balance target and see the per-planet contributions that made up (or cancelled out) its perihelion offset.
 
 ### Panel layout
 

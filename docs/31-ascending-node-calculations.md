@@ -7,6 +7,14 @@ status: current
 
 # Dynamic Ascending Node Calculation
 
+> **Status (K5 excision).** For the SEVEN CHAIN PLANETS the displayed and
+> machinery-consumed node values (`o.<planet>AscendingNode`, the inv-plane
+> node fields) now come from the engine-D element chain — the element set
+> of date, not this construction. The tilt-derived calculation described
+> here remains in the code for the no-chain bodies (Pluto, Halley, Eros)
+> and as the probe-pinned reference implementation
+> (`calculateDynamicAscendingNodeFromTilts`).
+
 ## Overview
 
 This document describes the dynamic calculation of the longitude of ascending node for all planets in the Holistic Universe Model. The ascending node shifts over time as Earth's obliquity (axial tilt) changes, with the effect depending on the relationship between Earth's orbital inclination and each planet's orbital inclination.

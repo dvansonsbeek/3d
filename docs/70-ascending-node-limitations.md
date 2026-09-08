@@ -2,11 +2,17 @@
 docVersion: 1.0
 modelVersion: v13.0
 coefficients: sha256:9e0460662933228f
-status: current
+status: historical
 ---
 
 # Ascending Node Calculations: Limitations and JPL Discrepancy
 
+> **Status (K5 excision):** the geometric appearance channel this doc
+> analyses belonged to the legacy planet path, deleted in the K5
+> legacy-chain excision — the seven planets' node values now come from
+> the engine-D element chain. Kept as the record of the legacy channel's
+> limitation.
+>
 > **READ WITH THE 2026-04 NODE AUDIT.** This document predates the
 > `ascendingNodeCyclesIn8H` re-fit and analyses only the GEOCENTRIC
 > dΩ/dε appearance effect. The model has since shipped an

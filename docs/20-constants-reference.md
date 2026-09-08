@@ -492,8 +492,8 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
 | Sidereal Month | `moonSiderealMonthInput` | <!--v:moonSiderealMonthInput-->27.32166156<!--/v--> days | Return to same star |
-| Anomalistic Month | `moonAnomalisticMonthInput` | 27.55454988 days | Perigee to perigee |
-| Nodal Month | `moonNodalMonthInput` | 27.21222082 days | Node to node |
+| Anomalistic Month | `moonAnomalisticMonth` | 27.55454988 days | Perigee to perigee — DERIVED: `totalDaysInH / (N_sid − N_apsidalE)`, not an input |
+| Nodal Month | `moonNodalMonth` | 27.21222082 days | Node to node — DERIVED: `totalDaysInH / (N_sid + N_nodalE)`, not an input |
 | Mean Distance | `moonDistance` | <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km | Mean Earth-Moon distance |
 | Orbital Eccentricity | `moonOrbitalEccentricity` | <!--v:moonOrbitalEccentricityFull-->0.054900489<!--/v--> | |
 | Ecliptic Inclination | `moonEclipticInclinationJ2000` | <!--v:moonEclipticInclination-->5.1573<!--/v--> deg | Dynamical mean osculating inclination (v4 E3c); the Brown/ELP theory constant <!--v:moonInclinationConstantBrownELP-->5.1453964<!--/v--> (latitude sinF normalization) is kept as `moonInclinationConstantBrownELP` |
@@ -781,9 +781,9 @@ All 8 planet amplitudes are derived at runtime from K using model mean obliquity
 
 Phase angles for the planets' eccentricity oscillations are derived at runtime from the balanced-year phase: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. Earth is not in this family: its e(t) rides the one H/3 law on the System-Reset anchor (θ₃(J2000) = <!--v:earthEccPhaseH3J2000-->81.18<!--/v-->°, shared with the inclination law, the Moon channel and the Sun imprint), so nothing solves an Earth eccentricity phase. The phases are not stored in JSON — they are computed by constants.js and script.js.
 
-## Per-Planet EoC Fractions
+## Per-Planet EoC Fractions (legacy scaffolding since the K5 excision)
 
-The Equation of Center fraction determines how much of a planet's Keplerian variable-speed behavior is captured by the EoC formula vs the geometric offset. See [Equation of Center](65-equation-of-center.md).
+The Equation of Center fraction determines how much of a planet's Keplerian variable-speed behavior is captured by the EoC formula vs the geometric offset. See [Equation of Center](65-equation-of-center.md). Since the K5 legacy-chain excision these values drive only the geometric scene scaffolding (device anchors) and the no-chain bodies — the rendered planets come from the engine-D element chain.
 
 | Planet | `eocFraction` | Type | Description |
 |--------|--------------|------|-------------|
@@ -795,7 +795,9 @@ The Equation of Center fraction determines how much of a planet's Keplerian vari
 | Uranus | <!--v:uranusEocFraction-->0.53<!--/v--> | III | Above 0.50 |
 | Neptune | <!--v:neptuneEocFraction-->0.585<!--/v--> | III | Above 0.50 |
 
-## Planet Angle Corrections & Start Positions (Tuned)
+## Planet Angle Corrections & Start Positions (Tuned — legacy scaffolding since the K5 excision)
+
+These were the retired pipeline Step 2's fitted scene angles. Since the K5 legacy-chain excision they position only the geometric scaffolding (device anchors); the rendered planets and every displayed element come from the engine-D chain, and the Step-2 fitter is retired.
 
 | Planet | `angleCorrection` (deg) | `startpos` (deg) |
 |--------|------------------------|------------------|
@@ -880,10 +882,8 @@ Per-planet configuration for the predictive perihelion precession formula:
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Obliquity mean | `PREDICT_OBLIQ_MEAN` | 23.414 deg | Normalization center for obliquity features |
-| Eccentricity base | `PREDICT_ECC_BASE` | 0.015321 | Training normalization (frozen at training-time value) |
-| Eccentricity amplitude | `PREDICT_ECC_AMP` | 0.0014226 | Training normalization (frozen at training-time value) |
-| Eccentricity mean | `PREDICT_ECC_MEAN` | sqrt(base² + amp²) ≈ <!--v:earthEccBase-->0.01539<!--/v--> | Normalization center |
+| Obliquity mean | `OBLIQUITY_MEAN` | 23.414 deg | Normalization center for obliquity features (referenced directly at the usage site) |
+| Eccentricity mean | `PREDICT_ECC_MEAN` | = `eccentricityBaseDerived` ≈ <!--v:earthEccBase-->0.01539<!--/v--> | Normalization center — the ONE eccentricity law's base′ (the frozen training-time `PREDICT_ECC_BASE`/`PREDICT_ECC_AMP` pair was retired at the eccentricity unification) |
 
 ### Predictive Coefficients (`PREDICT_COEFFS`)
 

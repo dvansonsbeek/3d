@@ -2,10 +2,17 @@
 docVersion: 1.0
 modelVersion: v13.0
 coefficients: sha256:9e0460662933228f
-status: current
+status: historical
 ---
 
 # 80 — Mercury: Scene Graph Setup
+
+> **Status: HISTORICAL — legacy-path record.** The 5-layer geometric
+> hierarchy this doc explains no longer places what you see: since the K5
+> legacy-chain excision Mercury's rendered position, orbit ring, panels
+> and machinery all come from the engine-D element chain, and the
+> hierarchy survives only as anchor scaffolding for the display devices.
+> This doc is the record of why each legacy value was set the way it was.
 
 This document explains **why** each value in Mercury's 5-layer scene graph hierarchy is set the way it is. It serves as a companion to the [Planet Inspector](51-planet-inspector-reference.md) and the [Scene Graph Hierarchy](41-scene-graph-hierarchy.md).
 

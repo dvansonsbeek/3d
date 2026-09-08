@@ -582,6 +582,34 @@ masses). The runtime chart's visible gap against La2010 is the 8-mode
 ζ-skeleton compression of our own engine (0.204° RMS, chain-vs-engine ≈
 chain-vs-La2010 to the fourth decimal), not a physics difference.
 
+## 16. The rendered planets vs JPL — the published comparison (K7)
+
+With the K5 legacy-chain excision the seven rendered planets ARE the
+engine-D element chain — zero observation-fitted terms — so the
+scene-vs-JPL measurement is the chain's published accuracy. Per the K2
+doctrine it is model content either way it falls: agreement and
+divergence are both reported, and nothing is tuned to the comparison.
+
+The instrument is `tools/verify/measure-rms-by-epoch.js` (joint RA+Dec
+RMS, of-date frame, the verify-pipeline Step-10 metric, ~108k JPL
+Horizons cache samples); `--write` banks the century-bucket summary as
+the governed artifact `data/chain-vs-jpl-rms.json` (inputs-stamped —
+the freshness gate re-hashes the cache, the scene, the evaluator and
+the embedded artifact on every check). The registry keys
+`<planet>ChainVsJplRms2000sArcsec` / `…EarliestArcsec` /
+`…EarliestWindow` and `moonVsJplRms2000sArcsec` read the artifact — the
+website binds to those keys. **Read the live values from the artifact
+or the keys, never from this paragraph.**
+
+The shape of the record at banking time: reference-century (2000–2099)
+RMS ≈ 20–41″ across the seven planets (Mercury ≈ 26″, the giants
+≈ 19–25″), degrading gently toward the cache edges (the earliest full
+centuries sit at ≈ 16–100″; Venus is the widest, the giants barely
+move) — the raw dynamics extrapolate instead of unravelling, which was
+the K4 observational verdict's inner-planet finding now made a standing,
+gate-guarded exhibit. The Moon row (engine-K lunar series) sits at ≈ 4″
+in the reference century.
+
 ## Related documents
 
 - [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) — §1.8: the projection identity, the transit test, the candidate slot

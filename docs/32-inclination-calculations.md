@@ -7,6 +7,15 @@ status: current
 
 # Inclination Calculations
 
+> **Status (K5 excision).** For the SEVEN CHAIN PLANETS the displayed and
+> machinery-consumed inclinations (ecliptic and invariable-plane, panels
+> and gauges alike) now come from the engine-D element chain — the element
+> set of date against the engine's own banked invariable plane (K5c). The
+> oscillation law described here (`i(t) = mean + amplitude × cos(…)`)
+> remains in the code for the no-chain bodies (Pluto, Halley, Eros,
+> Ceres), for Earth's engine-K devices, and as the probe-pinned reference
+> implementation (`computePlanetInvPlaneInclinationDynamic`).
+
 This document describes how planetary orbital inclinations are calculated in the Holistic Universe Model. Inclination calculations involve two distinct but related concepts:
 
 1. **Inclination to the Invariable Plane** - How much each planet's orbital plane tilts relative to the solar system's fundamental reference plane (oscillates over time)

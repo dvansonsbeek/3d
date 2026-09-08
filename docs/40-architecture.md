@@ -46,9 +46,11 @@ The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astron
 **Core Capabilities:**
 - Accurate planetary positions from the model's own N-body element chain
   (`@essrt/physics/planets/keplerian-chain` + the governed artifact
-  `data/nbody-secular-frequencies.json`; the geometric planet chains and
-  their fitted corrections described in this document remain as the
-  `?keplerChains=0` legacy opt-out — see doc 41's engine-D rendering note)
+  `data/nbody-secular-frequencies.json` — the ONLY planet path since the
+  K5 legacy-chain excision; the geometric planet chains described in this
+  document survive only as scene scaffolding and for the no-chain bodies,
+  and their fitted corrections are deleted — see doc 41's engine-D
+  rendering note and docs 62–64/67/71 for the records)
 - Long-term precession cycles (axial, perihelion, inclination)
 - Invariable plane visualization and validation
 - Multiple calendar systems (Gregorian, Julian, Perihelion)
@@ -256,10 +258,6 @@ The monolithic script.js (~59,800 lines) is organized into logical sections. Con
 │  - Planet inspector and hierarchy display                           │
 │  - Trace path rendering, visual effects                             │
 │  - Export functions (planet reports, year analysis, solar day)       │
-├─────────────────────────────────────────────────────────────────────┤
-│  BALANCE EXPLORER & SCALE                                           │
-│  - Fibonacci Balance Explorer (interactive config testing)          │
-│  - Eccentricity Balance Scale visualization                         │
 ├─────────────────────────────────────────────────────────────────────┤
 │  GUI SETUP                                                          │
 │  - Tweakpane folder structure (About, Controls, Celestial, Reports, │
@@ -624,7 +622,6 @@ Tweakpane Root ("Expanding Solar System Resonance Theory")
 │  ├─▼ [Planet subfolders]        RA, Dec, distances
 │  ├─▼ Helper Objects
 │  └─▼ Invariable Plane Analysis
-│     ├─ Balance Explorer           [button]
 │     ├─ Mercury–Neptune (AU)       [live values]
 │     ├─ Mass Balance (AU)          [live value]
 │     ├─ Planets Above / Below      [counts]
@@ -665,8 +662,6 @@ Tweakpane Root ("Expanding Solar System Resonance Theory")
 │
 └─▼ Tools
    ├─ Planet Inspector           [button]
-   ├─ Invariable Plane Inspector [button]
-   ├─ Eccentricity Balance Scale [button]
    ├─ Data Explorer              [button → holisticuniverse.com]
    ├─▼ Console Tests (F12)       (buttons, not toggles)
    ├─▼ Camera

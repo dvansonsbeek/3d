@@ -129,7 +129,7 @@ export states the frame conventions.
 | Date | Formatted date |
 | Time | Formatted time |
 | Model Year | Calendar year |
-| {Planet} Perihelion ICRF | RA projection of the chain's ϖ of date (the historic RA channel) |
+| {Planet} Perihelion RA | RA projection of the chain's ϖ of date (the historic RA channel; named `… Perihelion ICRF` in pre-K5-excision exports) |
 | {Planet} Asc Node | Chain ascending node on the ecliptic, of date (deg) |
 | {Planet} Arg Peri | Chain ecliptic argument of periapsis, ω = ϖ − Ω (deg) |
 | {Planet} Ecliptic Inclination | Chain inclination to the ecliptic, of date (deg) |

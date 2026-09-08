@@ -1861,6 +1861,81 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── Engine-D chain elements of date at J2000 (K7: the element-set keys) ─
+  // Evaluated by the SHIPPED evaluator over the embedded governed artifact
+  // (@essrt/physics/planets/keplerian-chain + chain-artifact) — the same
+  // numbers the simulator panels and the website calculator display at
+  // year 2000. Of-date values AT J2000, not catalog inputs (compare the
+  // …J2000Full catalog family below). Inv-plane pair = the ENGINE'S OWN
+  // banked invariable plane (K5c s-frame).
+  ...(() => {
+    let cache = null;
+    const el = (p) => {
+      if (!cache) {
+        const KC = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'keplerian-chain.cjs'));
+        const ART = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'chain-artifact.js')).CHAIN_ARTIFACT;
+        const chains = KC.buildPlanetChainsFromArtifactData(ART);
+        cache = { KC, chains, ART };
+      }
+      return cache.KC.computePlanetElementsAtYear(2000, cache.chains[p], cache.chains);
+    };
+    const planets8 = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    const out = {};
+    for (const p of planets8) {
+      out[`${p}ChainEccJ2000`] = { get: () => el(p).e, render: (v) => Number(v).toFixed(6), note: 'engine-D chain eccentricity of date at J2000 (dimensionless)' };
+      out[`${p}ChainPeriLongJ2000Deg`] = { get: () => el(p).lonPeriEclipticDeg, render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'engine-D chain ecliptic longitude of perihelion of date at J2000' };
+      out[`${p}ChainInclEclJ2000Deg`] = { get: () => el(p).inclEclipticDeg, render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'engine-D chain inclination to the ecliptic, of date at J2000' };
+      out[`${p}ChainAscNodeEclJ2000Deg`] = { get: () => el(p).ascNodeEclipticDeg, render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'engine-D chain ascending node on the ecliptic, of date at J2000' };
+      out[`${p}ChainInclInvJ2000Deg`] = { get: () => el(p).inclInvPlaneDeg, render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'engine-D chain inclination to the engine’s own invariable plane (K5c), of date at J2000' };
+      out[`${p}ChainAscNodeInvJ2000Deg`] = { get: () => el(p).ascNodeInvPlaneDeg, render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'engine-D chain node on the engine’s own invariable plane (K5c s-frame; node origin = ecliptic-X projected into the plane), of date at J2000' };
+    }
+    const art = () => {
+      el('earth');   // ensure cache
+      return cache.ART.invariablePlane;
+    };
+    out.invPlaneInclEngineDeg = { get: () => art().inclEclipticDeg, render: (v) => Number(v).toFixed(5), unit: 'deg', note: 'the ENGINE’S OWN invariable plane: inclination to ecliptic J2000 (banked from the J2000-seed total angular momentum; S&S 2012 give 1.5787 as the external reference)' };
+    out.invPlaneNodeEngineDeg = { get: () => art().ascNodeEclipticDeg, render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'the ENGINE’S OWN invariable plane: node on the ecliptic (banked, K5c; S&S 2012 give 107.58 as the external reference)' };
+    return out;
+  })(),
+
+  // ── Scene-vs-JPL published comparison (K6/K7 verdict keys) ──────────────
+  // Reads data/chain-vs-jpl-rms.json — the governed artifact banked by
+  // tools/verify/measure-rms-by-epoch.js --write (joint RA+Dec RMS,
+  // of-date frame, verify-pipeline Step-10 metric). PUBLISHED model
+  // content: agreement and divergence are both reported, never tuned.
+  ...(() => {
+    const cj = () => rd('data/chain-vs-jpl-rms.json');
+    const out = {};
+    for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      out[`${p}ChainVsJplRms2000sArcsec`] = {
+        get: () => cj().perTarget[p].refRmsArcsec,
+        render: (v) => Number(v).toFixed(1), unit: '″',
+        note: 'the rendered chain planet vs the JPL Horizons cache, joint RA+Dec RMS over 2000–2099 (published comparison, never tuned)',
+      };
+      const earliest = () => {
+        const b = cj().perTarget[p].buckets;
+        const label = Object.keys(b).find((k) => k !== '<1600') || Object.keys(b)[0];
+        return { label, rms: b[label].rmsArcsec };
+      };
+      out[`${p}ChainVsJplRmsEarliestArcsec`] = {
+        get: () => earliest().rms,
+        render: (v) => Number(v).toFixed(1), unit: '″',
+        note: 'the rendered chain planet vs the JPL Horizons cache over its earliest full cache century — the extrapolation end (published comparison, never tuned)',
+      };
+      out[`${p}ChainVsJplRmsEarliestWindow`] = {
+        get: () => earliest().label,
+        render: (v) => String(v),
+        note: 'the century window the …EarliestArcsec key measures (cache coverage varies per planet)',
+      };
+    }
+    out.moonVsJplRms2000sArcsec = {
+      get: () => cj().perTarget.moon.refRmsArcsec,
+      render: (v) => Number(v).toFixed(1), unit: '″',
+      note: 'the rendered Moon (engine-K lunar series) vs the JPL Horizons cache, joint RA+Dec RMS over 2000–2099',
+    };
+    return out;
+  })(),
+
   // ── Full-precision J2000 catalog elements (doc-20 reference tables) ─────
   // Straight reads of astro-reference planetOrbitalElements — the JPL/SPICE
   // catalog inputs, rendered at stored precision (String of the raw value).

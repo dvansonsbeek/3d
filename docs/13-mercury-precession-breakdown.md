@@ -281,7 +281,8 @@ The small overestimate reflects the limitations of first-order theory, which doe
 
 The Earth-frame perihelion rate the model measures (the right ascension of
 the perihelion direction in the scene's equatorial frame — the Step-3 export's
-`<Planet> Perihelion ICRF` column, and at J2000 the shipped predict basis) is
+`<Planet> Perihelion RA` column, named `… Perihelion ICRF` before the K5
+excision's honest-name pass, and at J2000 the shipped predict basis) is
 not a new quantity: it is the ecliptic advance projected into that frame,
 plus the term the changing obliquity adds to any right ascension:
 
@@ -349,11 +350,12 @@ The derivation uses the IAU longitude (λ = 77.457°). The scene's perihelion
 marker shows the model's own N-body longitude of perihelion of date
 (ϖ(2000) = 77.455° from the governed element chain — the same value the
 perihelion panels display). The legacy two-vector construction placed the
-marker 0.97° further (λ + `angleCorrection` = 78.43°, pipeline Step 2's
-RA-equals-catalogue convention with marker vector M plus a
-node-perpendicular vector E, |E| = |M|/2 for Type I); that convention now
-lives only on the legacy opt-out path, and the `…Marker…` registry keys
-record it — they are not a reading of the anomaly.
+marker 0.97° further (λ + `angleCorrection` = 78.43°, the retired pipeline
+Step 2's RA-equals-catalogue convention with marker vector M plus a
+node-perpendicular vector E, |E| = |M|/2 for Type I); that convention was
+**deleted with the K5 legacy-chain excision** (the opt-out is gone), and
+the `…Marker…` registry keys record it as the historical convention — they
+are not a reading of the anomaly.
 
 **All planets.** The same projection, same constants:
 
@@ -457,6 +459,16 @@ the perihelia breaks the nodes); and the 1PN term raises Mercury's
 long-term g₁ by 0.473 ″/yr — the same physics at the quantity-A level.
 
 ---
+
+> **Status of Parts 2–6 (K5b/K5 — historical implementation record).** The
+> planetStats "Theorized Precession Breakdown" display these parts specify
+> was REMOVED in the K5b UI pass together with its Laskar-style
+> calculation machinery: the panels now show the CHAIN's secular-shape
+> attribution instead (base mode / largest companion / remainder with %
+> shares, plus the rate of date — read live from the governed element
+> chain via `_kcSecularShape`). Part 1 (the physics, the limitations, and
+> the §1.8 Earth-frame projection device — which ships in the WebGeoCalc
+> explorer) remains the live reference.
 
 ## Part 2: Implementation
 

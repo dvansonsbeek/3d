@@ -85,7 +85,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 35 | [Formula Derivation](35-formula-derivation.md) | Planetary precession formula derivation: Fibonacci hierarchy, resonance loops, coefficient breakdowns |
 | 36 | [Tilt & Balance Calculations](36-tilt-and-definitive-balance-calculations.md) | Tilt, inclination, and eccentricity: definitive balance calculations across all epochs |
 | 37 | [Planetary Precession & Obliquity Cycles](37-planets-precession-cycles.md) | Each planet's up-to-five distinct precession/oscillation phenomena. Investigates whether the Earth's Fibonacci 1/H rate structure extends to the other planets |
-| 38 | [Eccentricity Balance Scale](38-eccentricity-scale.md) | Eccentricity as a balance system: weight formula, per-planet breakdowns, amplitude constant |
+| 38 | [Eccentricity Balance Scale](38-eccentricity-scale.md) | HISTORICAL — the Law-5 balance construction + its panel (retired law; panel excised with the legacy chains) |
 | 39 | [Eccentricity Structure Exploration](39-eccentricity-structure-exploration.md) | Two-component decomposition, mirror pair conservation, statistical significance, exhaustive negative results |
 
 ### 40–49 Architecture & Code Structure
@@ -102,8 +102,8 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 50 | [UI Panels Reference](50-ui-panels-reference.md) | Tweakpane control panel and sidebar implementations |
 | 51 | [Planet Inspector Reference](51-planet-inspector-reference.md) | Planet hierarchy inspector — calculation logic and display |
 | 52 | [Analysis & Export Tools](52-analysis-export-tools.md) | Report generation, data export, and console validation tests |
-| 53 | [Balance Explorer Reference](53-balance-explorer-reference.md) | Invariable Plane Balance Explorer — interactive Fibonacci Law testing |
-| 54 | [Vector Balance Analysis](54-vector-balance-analysis.md) | Dynamic angular-momentum vector balance + configuration verification. Default config (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34, Saturn anti-phase) shown to be the most likely correct Fibonacci d-value configuration |
+| 53 | [Balance Explorer Reference](53-balance-explorer-reference.md) | HISTORICAL — reference for the Balance Explorer panel (removed at the Fibonacci-law retirement; code excised with the legacy chains) |
+| 54 | [Vector Balance Analysis](54-vector-balance-analysis.md) | HISTORICAL — frozen vector-balance + Config-7 verification record (claims re-evaluated at the retirement; doc 10 Status carries the verdicts) |
 | 55 | [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Period table for the 8H = <!--v:eightH-->2,682,536<!--/v--> yr Solar System Resonance Cycle. Every major planetary cycle divides 8H evenly as an integer; documents the System Reset epoch (~-<!--v:systemResetYearPlain-->2,649,854<!--/v-->) |
 | 56 | [WebGeoCalc Explorer](56-webgeocalc-explorer.md) | Tools-menu modal showing actual observed perihelion-precession history (1900–2026 JPL NAIF WebGeoCalc) for each planet. Grounds the framework's `perihelionEclipticYears` calibration in observation rather than secular theory |
 | 57 | [Formula Verification](57-formula-verification.md) | Tools-menu modal comparing the framework's predictions against published analytical formulas (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Peters, Harkness) across ±12,000 yr for 9 quantities. Analytical twin of the WebGeoCalc Explorer (doc 56) |
@@ -116,12 +116,12 @@ Documents are organized in numbered ranges by category, with gaps for future add
 |---|----------|-------------|
 | 60 | [Overview](60-optimization-tool-overview.md) | Architecture and constraints |
 | 61 | [Execution Plan](61-optimization-execution-plan.md) | Step-by-step execution plan |
-| 62 | [Type I Inner Planets](62-type-i-inner-planets.md) | Mercury & Venus implementation |
-| 63 | [Type II Earth-Crossers](63-type-ii-earth-crossers.md) | Mars eccentricity corrections & calibration |
-| 64 | [Type III Outer Planets](64-type-iii-outer-planets.md) | Jupiter, Saturn, Uranus, Neptune implementation |
+| 62 | [Type I Inner Planets](62-type-i-inner-planets.md) | HISTORICAL — Mercury & Venus legacy-path record (geometric chains deleted in the K5 excision) |
+| 63 | [Type II Earth-Crossers](63-type-ii-earth-crossers.md) | HISTORICAL — Mars legacy-path record (geometric chains deleted in the K5 excision) |
+| 64 | [Type III Outer Planets](64-type-iii-outer-planets.md) | HISTORICAL — outer-planet legacy-path record (geometric chains deleted in the K5 excision) |
 | 65 | [Equation of Center](65-equation-of-center.md) | Variable-speed orbit implementation. The display Sun rides the certified E4/E5 framework-native longitude via the δ overlay (see doc 99 § The framework-native Sun); since FQ-3 the wheel underneath is EXACT-KEPLER by derivation — the split error attributed to ~100% (amplitude = e−base; phase = the realized offset direction) and the fitted Z-B harmonics retired from the display path (§The Exact-Kepler Wheel) |
 | 66 | [Moon Meeus Corrections](66-moon-meeus-corrections.md) | Meeus-based moon corrections |
-| 67 | [Planet Parallax Corrections](67-planet-parallax-corrections.md) | Geocentric parallax correction implementation |
+| 67 | [Planet Parallax Corrections](67-planet-parallax-corrections.md) | HISTORICAL — record of the fitted parallax layer (deleted in the K5 excision) |
 | 68 | [Orbital Period Calibration](68-orbital-period-calibration.md) | Calibration with ancient observations |
 | 69 | [Baseline Report](69-optimization-baseline.md) | Baseline measurements before optimization |
 
@@ -129,15 +129,15 @@ Documents are organized in numbered ranges by category, with gaps for future add
 
 | # | Document | Description |
 |---|----------|-------------|
-| 70 | [Ascending Node Limitations](70-ascending-node-limitations.md) | Limitations of ascending node model and JPL discrepancy |
-| 71 | [Correction Stack Architecture](71-correction-stack-architecture.md) | Layer ordering, prepareForFitting(), parallax + gravitation + elongation |
+| 70 | [Ascending Node Limitations](70-ascending-node-limitations.md) | HISTORICAL — limitation analysis of the legacy geometric node channel (deleted in the K5 excision) |
+| 71 | [Correction Stack Architecture](71-correction-stack-architecture.md) | HISTORICAL — record of the fitted correction stack (deleted in the K5 excision; the Moon Meeus layer lives on) |
 | 72 | [The Closed Loop](72-the-closed-loop.md) | How PSI and K derive all orbital oscillations from Earth alone |
 
 ### 80–89 Per-Planet Setup
 
 | # | Document | Description |
 |---|----------|-------------|
-| 80 | [Mercury Scene Graph Setup](80-mercury-setup.md) | Why each value in Mercury's 5-layer scene graph hierarchy is set the way it is. Companion to docs 41 (Scene Graph Hierarchy) and 51 (Planet Inspector) |
+| 80 | [Mercury Scene Graph Setup](80-mercury-setup.md) | HISTORICAL — why each value in Mercury's legacy 5-layer hierarchy was set (anchor scaffolding only since the K5 excision) |
 
 ### 90–99 Climate Analysis
 

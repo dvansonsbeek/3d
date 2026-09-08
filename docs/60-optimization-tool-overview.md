@@ -7,6 +7,14 @@ status: current
 
 # Optimization Tool — Architecture & Constraints
 
+> **Status (K5 excision).** The PLANET-facing optimization described here
+> is retired: pipeline Step 2 (per-planet `startpos`) and the planet
+> correction fitters (ex-Steps 5a–5b) were deleted with the legacy chains
+> — the planets render from the engine-D element chain, which is not
+> fitted to observations. The tool itself remains live for the Sun and
+> Moon (Step 1, Step 5c), and `optimize <planet> …` / `baseline` remain
+> as diagnostics (baseline now measures the chain vs JPL).
+
 **Goal**: Build a standalone tool that Claude can run autonomously to tune the model (planets, Moon, and Sun) against scientific reference data
 
 **Related documents:**

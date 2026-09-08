@@ -2,15 +2,19 @@
 docVersion: 1.0
 modelVersion: v13.0
 coefficients: sha256:9e0460662933228f
-status: current
+status: historical
 ---
 
 # Type I Inner Planets -- Mercury & Venus Implementation
 
-> **Legacy-path record (P5 flip):** the Type I/II/III scene conventions
-> documented here drive the legacy geometric planet chains — the
-> `?keplerChains=0` opt-out. The default planets render from the engine-D
-> element chain.
+> **Status: HISTORICAL — legacy-path record.** The Type I/II/III scene
+> conventions documented here drove the legacy geometric planet chains,
+> whose rendering path (and the `?keplerChains=0` opt-out) was **deleted
+> in the K5 legacy-chain excision** — the planets render from the
+> engine-D element chain, full stop. The geometric hierarchy survives
+> only as scene scaffolding (device anchors) and for the no-chain bodies
+> (Pluto, Halley, Eros). This document is the record of how the legacy
+> path worked and why its values were set.
 
 **Status**: Complete (e/(1+e) derivation, EoC with phase-optimized fractions, period calibration)
 

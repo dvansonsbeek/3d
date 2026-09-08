@@ -21,9 +21,9 @@ The simulation includes several interactive panels for inspecting planetary data
 | **PlanetStats Panel** | Per-planet data display with collapsible groups, charts, and dynamic rows |
 | **Invariable Plane Analysis** | View planet heights above/below the invariable plane |
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
-| **Invariable Plane Balance Explorer** | Test Fibonacci Law assignments interactively |
-| **Eccentricity Balance Scale** | Visualize Law 5 balance per target planet (waterfall chart + buildup table) |
-| **Solar System Resonance Cycle** | All periods as integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000 (8 planets × 6 cycles) |
+| ~~Invariable Plane Balance Explorer~~ | REMOVED (Fibonacci-law retirement; code excised with the legacy chains) — [doc 53](53-balance-explorer-reference.md) is the record |
+| ~~Eccentricity Balance Scale~~ | REMOVED (Fibonacci-law retirement; code excised with the legacy chains) — [doc 38](38-eccentricity-scale.md) is the record |
+| ~~Solar System Resonance Cycle~~ | REMOVED (Fibonacci-law retirement; code excised with the legacy chains) — [doc 55](55-solar-system-resonance-cycle-periods.md) carries the period table |
 | **WebGeoCalc Explorer** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet — see [doc 56](56-webgeocalc-explorer.md) |
 | **Climate Formula Explorer** | L1+L2+L3 climate formula visualized across LR04 / CENOGRID / EPICA / CenCO2PIP, multiple time windows — see [doc 58](58-climate-formula-explorer.md) |
 | **ESSRT Explorer** | Deep-time evolution of H, LOD, year length, Moon distance under Expanding Solar System Resonance Theory — see [doc 59](59-essrt-explorer.md) |
@@ -55,11 +55,12 @@ barycenterEarthAndSun (root for all planets)
 
 ### What Each Step Does
 
-> Since the P5 flip this device chain is the **legacy opt-out path**
-> (`?keplerChains=0`): by default the planet meshes and the
-> `PERIHELION [PLANET]` markers are overridden each frame with the
-> engine-D chain's positions (the hierarchy below still exists and
-> rotates, but no longer places what you see).
+> Since the P5 flip — and definitively since the K5 legacy-chain
+> excision (the `?keplerChains=0` opt-out is gone) — this device chain
+> is **scene scaffolding**: the planet meshes, orbit rings and the
+> `PERIHELION [PLANET]` markers are placed each frame from the engine-D
+> chain's positions. The hierarchy below still exists and rotates, but
+> serves only as anchor geometry for the display devices.
 
 | Step | Object Name Pattern | Purpose |
 |------|---------------------|---------|
@@ -407,96 +408,18 @@ o.balanceMaxSeen = 0;                // Maximum observed
 
 ---
 
-## Invariable Plane Balance Explorer
+## Removed panels (Fibonacci-law retirement → K5 excision)
 
-### Purpose
+Three interactive panels were REMOVED from the Tools menu with the
+Fibonacci-law retirement (the model restatement — doc 10 Status carries
+the measured verdicts) and their code was excised wholesale in the K5
+legacy-chain excision:
 
-An interactive modal for testing different planetary group assignments and Fibonacci divisors for the six Fibonacci relations (doc 10). Users can experiment with alternative configurations and see instant feedback on inclination balance (Law 3), eccentricity balance (Law 5), Laplace-Lagrange bounds, and ecliptic trend matching.
-
-### Accessing the Explorer
-
-1. Open the Tweakpane **Tools** folder
-2. Click **"Invariable Plane Inspector"**
-
-### Key Features
-
-| Feature | Description |
-|---------|-------------|
-| **Phase angle selection** | Choose between per-planet model phases, Laplace-Lagrange eigenmodes, or custom angles |
-| **Fibonacci divisor dropdown** | Common Fibonacci values (1–55) plus custom input |
-| **Editable precession periods** | Modify ascending node precession rates |
-| **15 presets** | Deep-analysis survivors: pass inclination balance ≥<!--v:balanceThreshold-->99.994%<!--/v-->, eccentricity balance ≥99%, LL bounds, direction match ≤5″ (per-config optimised). Sorted by eccentricity balance. |
-| **Dual balance display** | Inclination (Relation 3) and eccentricity (Relation 5) balance percentages |
-| **Per-planet results table** | Amplitude, mean, range, LL bounds check, trend comparison |
-| **Earth locked** | Earth's parameters (d=3, in-phase, 21.77°) are derived from the temperature model and cannot be changed |
-
-### Default Configuration Result
-
-- Inclination balance: **~100%** (99.997%)
-- Eccentricity balance: **~99.9%**
-- LL bounds: **7/8 pass** (Saturn: +0.030° excess over its upper bound — the documented margin case)
-- Trend directions: **7/7 fitted planets match JPL** (J2000-fixed frame)
-- Total trend error: **~4.3″/century** across the 7 fitted planets
-
-### Full Reference
-
-See [53 - Balance Explorer Reference](53-balance-explorer-reference.md) for complete documentation including calculation details, all controls, and interpretation guide.
-
----
-
-## Eccentricity Balance Scale
-
-### Purpose
-
-Visualizes how each planet's base eccentricity is the weighted sum of the other 7 planets' perihelion offsets (Law 5 / eccentricity balance). For a selected target planet, the panel computes per-planet weights from mass, Fibonacci divisor, and semi-major-axis ratios, and shows them as a waterfall SVG chart plus a detailed buildup table. Saturn sits alone on one side (sole anti-phase member); the other 7 balance it.
-
-### Accessing the Scale
-
-1. Open the Tweakpane Tools folder
-2. Click "Eccentricity Balance Scale"
-3. Use the planet nav bar (dropdown + left/right arrows) to switch targets
-
-### Key Features
-
-| Feature | Description |
-|---------|-------------|
-| **Waterfall SVG chart** | Green bars (positive push) and red bars (negative pull) showing each planet's contribution to the target's eccentricity |
-| **Buildup table** | Columns: Mass, d, offset (AU), weight, contribution, share (%) |
-| **Planet nav bar** | Full-width dropdown + arrows; starts at the currently focused planet |
-| **Uses base eccentricities** | Long-term mean values (not J2000 instantaneous) — the balance is the model's structural claim |
-| **Color coding** | Amber `#f0b040` = eccentricity values, green = positive contribution, red = negative contribution |
-
-### Full Reference
-
-See [38 — The Eccentricity Balance Scale](38-eccentricity-scale.md) for the physics derivation, per-planet weight formulas `W_j = √(m_j/m_target × d_target/d_j × a_j/a_target)`, and the Saturn-eccentricity prediction from the other 7 planets.
-
----
-
-## Solar System Resonance Cycle
-
-### Purpose
-
-Shows all 8 planets × 6 cycle types (axial precession, ecliptic perihelion, ICRF perihelion / inclination, ascending node regression, obliquity oscillation, eccentricity cycle) as integer divisors of the Solar System Resonance Cycle 8H = <!--v:eightH-->2,682,536<!--/v--> years (at J2000). Every cycle for every planet divides 8H evenly — this is the super-period that resets the whole system once every ~2.68 million years.
-
-### Accessing the Panel
-
-1. Open the Tweakpane Tools folder
-2. Click "Solar System Resonance Cycle"
-3. Use the **Years / 8H/N** toggle button in the header to switch display modes
-
-### Key Features
-
-| Feature | Description |
-|---------|-------------|
-| **8 × 6 grid** | Every planet row, every cycle column, one cell per combination |
-| **Years / 8H/N toggle** | Values shown as years with thousand separators, or as the 8H/N integer divisor |
-| **Color coding** | Green = prograde, red = retrograde, neutral = oscillation (no direction), ∞ = frozen, — = N/A |
-| **Earth row highlighted** | Earth is the reference planet for all derived cycles |
-| **Scientific-reference hover** | Each cell hover shows observed value, source (WebGeoCalc, Laskar, Cottereau, Saillenfest, etc.), and pass/fail status |
-
-### Full Reference
-
-See [55 — Solar System Resonance Cycle Period Table](55-solar-system-resonance-cycle-periods.md) for the complete period table (both years and 8H/N), the three Fibonacci identities linking cycles, mirror-symmetry patterns, and the Earth cycle chain.
+| Removed panel | What it did | Record |
+|---|---|---|
+| **Invariable Plane Balance Explorer** | Interactive testing of planetary group assignments and Fibonacci divisors against the balance relations | [doc 53](53-balance-explorer-reference.md) |
+| **Eccentricity Balance Scale** | Waterfall chart + buildup table of the Law-5 balance per target planet | [doc 38](38-eccentricity-scale.md) |
+| **Solar System Resonance Cycle** | 8 planets × 6 cycle types as integer divisors of 8H, with Years / 8H/N toggle and paper-SVG export | [doc 55](55-solar-system-resonance-cycle-periods.md) |
 
 ---
 

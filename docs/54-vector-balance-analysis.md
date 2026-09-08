@@ -2,10 +2,19 @@
 docVersion: 1.0
 modelVersion: v13.0
 coefficients: sha256:9e0460662933228f
-status: current
+status: historical
 ---
 
 # Vector Balance Analysis & Configuration Verification
+
+> **Status: HISTORICAL.** This is the frozen analysis record of the
+> dynamic vector balance and the Config-#7 verification. The claims were
+> re-evaluated with the engine's own dynamical inputs at the Fibonacci-law
+> retirement (doc 10 Status + doc 109 carry the verdicts: mirror
+> uniqueness holds; the four-constraint exactness does not), and the
+> Balance Explorer panel this analysis rode was excised in the K5
+> legacy-chain excision. The shipped planets render from the engine-D
+> element chain.
 
 ## Overview
 

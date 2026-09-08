@@ -51,9 +51,17 @@ const HOLISTIC = process.argv.includes('--holistic');
 const HISTORICAL = new Set([
   '30-anomaly-calculations.md',        // plan whose planet mean-anomaly design was rejected in code (2026-08 doc audit)
   '34-j2000-calibration.md',           // implementation plan for a long-shipped feature (2026-08 doc audit)
+  '38-eccentricity-scale.md',          // Law-5 balance construction + its panel — retired law, panel excised (K5/K7)
+  '53-balance-explorer-reference.md',  // reference for the excised Balance Explorer panel (K5/K7)
+  '54-vector-balance-analysis.md',     // frozen vector-balance/Config-7 analysis record; claims re-evaluated at the retirement (K7)
   '61-optimization-execution-plan.md', // execution log of a finished campaign
+  '62-type-i-inner-planets.md',        // legacy-path record — the geometric planet chains, deleted in the K5 excision
+  '63-type-ii-earth-crossers.md',      // legacy-path record — the geometric planet chains, deleted in the K5 excision
+  '64-type-iii-outer-planets.md',      // legacy-path record — the geometric planet chains, deleted in the K5 excision
   '67-planet-parallax-corrections.md', // record of the fitted correction stack, deleted in the K5 legacy-chain excision
   '69-optimization-baseline.md',       // explicitly a frozen before-snapshot
+  '70-ascending-node-limitations.md',  // limitation analysis of the legacy geometric node channel, deleted in the K5 excision
+  '80-mercury-setup.md',               // legacy-path record — Mercury's geometric hierarchy values (scaffolding-only since K5)
   '71-correction-stack-architecture.md', // architecture of the correction stack, deleted in the K5 legacy-chain excision
   '97-paleo-ecs-decomposition.md',     // frozen first-pass analysis
 ]);

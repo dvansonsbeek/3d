@@ -2,17 +2,19 @@
 docVersion: 1.0
 modelVersion: v13.0
 coefficients: sha256:9e0460662933228f
-status: current
+status: historical
 ---
 
 # Invariable Plane Balance Explorer
 
-> **Status.** The Balance Explorer panel was removed from the simulator's
-> tools menu with the Fibonacci-law retirement (the model restatement —
-> doc 10 Status carries the measured verdicts, doc 109 the evidence). This
-> document remains as the reference for the exploration tool that produced
-> the balance record; the underlying code is dead in `src/script.js` until
-> its wholesale excision with the planet-chain rewrite.
+> **Status: HISTORICAL.** The Balance Explorer panel was removed from the
+> simulator's tools menu with the Fibonacci-law retirement (the model
+> restatement — doc 10 Status carries the measured verdicts, doc 109 the
+> evidence), and its code was **excised wholesale in the K5 legacy-chain
+> excision** (`BALANCE_PRESETS` and the default-config matcher survive
+> only for the About → Free Parameters Config-# row). This document
+> remains as the reference for the exploration tool that produced the
+> balance record.
 
 ## Overview
 

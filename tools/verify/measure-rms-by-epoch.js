@@ -1,7 +1,16 @@
 #!/usr/bin/env node
 /**
- * Phase A measurement script — quantify how the current J2000-only model
- * degrades against JPL Horizons at epochs outside the calibration window.
+ * Scene-vs-JPL measurement — the rendered bodies against the JPL Horizons
+ * cache, bucketed by century. Since the K5 legacy-chain excision the seven
+ * planets in the scene ARE the engine-D element chain, so this instrument
+ * measures the CHAIN's published accuracy (the Moon rides the engine-K
+ * lunar series as always). Under --write it banks the summary as the
+ * governed artifact data/chain-vs-jpl-rms.json (inputs-stamped; the K6/K7
+ * "published either way it falls" comparison — agreement and divergence
+ * are both model content, never tuned).
+ *
+ * (Historically: the Phase A instrument that quantified how the J2000-only
+ * geometric model degraded outside the calibration window.)
  *
  * For each planet, bucket the JPL cache by 100-year epochs and compute the
  * combined RA+Dec joint RMS error (same metric used by tools/lib/optimizer.js
@@ -188,3 +197,42 @@ console.log('Interpretation:');
 console.log('  • Ratio ≈ 1× → J2000-only model is flat across this time range; deep-time would NOT help measurably.');
 console.log('  • Ratio ≫ 1× → model degrades far from calibration; deep-time integration is the candidate fix.');
 console.log('  • Moon is the prime suspect for ≫1× ratios at extended epochs (secular acceleration ~25.85"/cy²).');
+
+// ─── --write: bank the summary as the governed artifact ────────────────────
+// data/chain-vs-jpl-rms.json — the published scene-vs-JPL comparison (K6/K7).
+// Registry keys (tools/docs/model-values.mjs) and doc 109 §16 read this file;
+// the freshness gate re-hashes the inputs on every check.
+if (process.argv.includes('--write')) {
+  const { buildInputsBlock } = require('../lib/artifact-inputs.js');
+  const perTarget = {};
+  for (const name of TARGET_LIST) {
+    const buckets = {};
+    for (let i = 0; i < BUCKETS.length; i++) {
+      const a = acc[name][i];
+      if (a.n === 0) continue;
+      const rmsDeg = Math.sqrt((a.sumRA2 + a.sumDec2) / a.n);
+      buckets[BUCKETS[i].label] = { rmsDeg: Number(rmsDeg.toFixed(6)), rmsArcsec: Number((rmsDeg * 3600).toFixed(1)), n: a.n };
+    }
+    const ref = buckets['2000-2099'] || null;
+    perTarget[name] = { buckets, refWindow: '2000-2099', refRmsArcsec: ref ? ref.rmsArcsec : null };
+  }
+  const out = {
+    _description: 'Scene-vs-JPL joint RA+Dec RMS by century bucket — the rendered bodies (the seven planets = the engine-D element chain since the K5 excision; the Moon = the engine-K lunar series) against the JPL Horizons cache, of-date frame, verify-pipeline Step-10 metric. PUBLISHED model content: agreement and divergence are both reported, never tuned (doc 109 §16).',
+    meta: {
+      metric: 'rmsTotal = sqrt(mean(dRA^2 + dDec^2)), joint RA+Dec, of-date frame',
+      samples: totalProcessed,
+      skipped: totalSkipped,
+    },
+    perTarget,
+    inputs: buildInputsBlock('node tools/verify/measure-rms-by-epoch.js --write', [
+      'tools/verify/measure-rms-by-epoch.js',
+      'data/jpl-cache.json',
+      'tools/lib/scene-graph.js',
+      'packages/physics/src/planets/keplerian-chain.cjs',
+      'packages/physics/src/planets/chain-artifact.js',
+    ]),
+  };
+  const outPath = path.resolve(__dirname, '..', '..', 'data', 'chain-vs-jpl-rms.json');
+  fs.writeFileSync(outPath, JSON.stringify(out, null, 2) + '\n');
+  console.log(`\n✓ wrote data/chain-vs-jpl-rms.json (${totalProcessed} samples banked)`);
+}
