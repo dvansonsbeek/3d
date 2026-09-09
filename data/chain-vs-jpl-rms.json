@@ -340,7 +340,7 @@
     "files": {
       "data/jpl-cache.json": "sha256:221582af7d1e956fd20e58a2b32f2c956a6d1ec1f8d17d3f24c7730a269205d1",
       "packages/physics/src/moon/ecc-channel.cjs": "sha256:e986b8ca3dbfdaa8508f49f315bc81718503b91eb56298d9ad4d7c29186fc691",
-      "packages/physics/src/planets/chain-artifact.js": "sha256:bd9cdecfa765e9a45a52f64d19363cd18eeecdc912570cef0296e2f63187eba4",
+      "packages/physics/src/planets/chain-artifact.js": "sha256:38767887915f9bae607db55ce08328b50c303f858a51f1fd60d942cbeeb6af7a",
       "packages/physics/src/planets/keplerian-chain.cjs": "sha256:ac48a70bef8668b8cde7e2ef28f398d96cf03cf46bc4ba742f60c315c5cbeb52",
       "tools/lib/scene-graph.js": "sha256:626d89bfb9931925e4c39694861067c627f65174fefbf0515f09cd27288581b9",
       "tools/verify/measure-rms-by-epoch.js": "sha256:b19c35ca9ce42b0a69cc3226062e8184c1679016995386e5005dc9053803fa59"

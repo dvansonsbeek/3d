@@ -710,6 +710,24 @@ dissolves the scene's amplitude-solve) is the registered Stage-C arc in
 the plan; until it lands, the fitted law remains the certified basis
 and this section is evidence content.
 
+**The deep-time statement — the sharpened falsification leg 1
+(owner-adopted).** At deep time the hybrid's two sides scale on the
+two measured tiers: the spin precession p(t) rides H(t) per the
+recession history (engine K — the confirmed tier), while s₃ is a
+DYNAMICAL-tier frequency, scaled only by the measured solar-mass
+history (μ(2.48 Ga) = 1.00 ± 0.07 — effectively fixed). The obliquity
+band therefore follows the BEAT, **2π/(ψ̇(t) − |s₃|)** — never pure
+H-scaling. The registry keys `obliqBeatJ2000Kyr` /
+`obliqH8ScaledJ2000Kyr` (and the `…1400Ma…` / `…2460Ma…` pairs) carry
+the fork: today the two readings are degenerate (p ≫ s₃ — which is
+why "H/8" has always fit), while at 2.46 Ga they split by ~19% — a
+level cyclostratigraphy can discriminate. The existing 1.4/2.46-Ga
+confirmations are precession-band/LOD anchors; the deep-time
+obliquity PERIOD itself is undiscriminated, so this is a
+pre-registered prediction awaiting a precisely dated Precambrian
+obliquity band, stated before any such measurement is compared.
+**Read the live fork values from the keys, never this paragraph.**
+
 ## 19. The solar-system spin landscape on the engine's own node lines (C-4)
 
 **What is and is not claimed.** The individual mechanisms below are
@@ -756,6 +774,51 @@ A documented limit: the quasi-periodic mode tables show enlarged
 response near resonances, never true chaotic diffusion — the full
 Laskar–Robutel wandering is a statement about the class, not
 reproduced pointwise.
+
+## 20. The invariable-plane node origin — derived, not fitted (K5c closure)
+
+Two longitude origins live on the engine's own invariable plane. The K5c
+evaluator outputs node longitudes in the **s-frame** (origin = the equinox
+projected into the banked plane — the NAFF extraction convention). The
+external references measure from a different point on the same plane:
+**the invariable plane's ascending node on the ICRF equator**. The gap
+read as a per-planet "offset" of 1.7–10.2° against Souami & Souchay
+(2012) and a measured ≈3.4° constant against La2010 — both convention
+class, and the standing rule said: never subtract the measured constant
+(a fitted alignment); derive the origin and apply the exact conversion.
+
+The derivation (`packages/physics/src/planets/inv-plane-frame.cjs`):
+from nothing but the banked plane orientation and the J2000 mean
+obliquity, the equator-node direction and its s-frame longitude follow
+exactly — zero fitted constants. Verification, all measured:
+
+- the derived node's RA reproduces S&S's published 3°51′9.4″ to 0.4 mdeg;
+- converting the eight J2000 s-frame nodes collapses the apparent offsets
+  to the element-class residual (chain elements-of-date vs S&S *mean*
+  elements), max |ΔΩ|·sin(i_inv) = 0.038° — inside the same ≤0.05°
+  pole-class band the K5c i_inv probe already gates (a node offset is a
+  pole offset divided by sin i_inv, which is why Jupiter's small i_inv
+  showed the largest raw ΔΩ);
+- the legacy Appendix-C "calibrated" nodes independently agree with the
+  converted values (mostly ≤1°) — the old calibration was unknowingly
+  compensating for exactly this origin difference;
+- La2010's node origin is the SAME axis: the converted chain node lands
+  on La2010's J2000 value to 0.0001°, and the former −3.42° constant
+  offset over −500 kyr → 0 becomes a +0.04° mean over 251 rows — gone,
+  derived not fitted. The remaining 4.3° rms is the ζ-skeleton node
+  wander (zero-mean element class).
+
+Published surfaces (simulator panels, the report export, the VFP node
+chart, the website ELEMENTS tab) now speak the S&S/La2010 convention via
+this conversion; the s-frame stays the internal machinery convention.
+The registry carries the derived origin (`invPlaneNodeOriginSFrameDeg`)
+and the converted J2000 nodes (`<planet>ChainAscNodeInvSSJ2000Deg`)
+alongside the s-frame keys; the per-planet `<planet>OmegaDelta` keys now
+read chain-converted minus S&S. **Read the live values from the keys,
+never from this paragraph.** The gate is
+`tools/explore/k5c-invplane-probe.mjs` — both its node gates are
+fail-proven (a silent frame swap trips the pole-class gate; a
+pole-sign bug trips the origin-RA gate).
 
 ## Related documents
 

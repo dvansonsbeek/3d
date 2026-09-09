@@ -15,7 +15,7 @@ status: current
 > the added layer has no cross-window-stable gain in any LR04 regime —
 > ΔR² = <!--v:insolLaskarV2DeltaR2Lr04-->+0.00000<!--/v--> on LR04 0–500 kyr,
 > <!--v:insolLaskarV2DeltaR2Epica-->+0.00001<!--/v--> on EPICA CO₂, and a maximum
-> cross-validated <!--v:insolStabMaxLaskarCv-->+0.0051<!--/v--> anywhere in the record.
+> cross-validated <!--v:insolStabMaxLaskarCv-->+0.0050<!--/v--> anywhere in the record.
 > Classical insolation features **alone** explain only
 > R² = <!--v:insolExtInsolOnlyR2PostMpt-->0.0544<!--/v--> of post-MPT LR04 (vs L1 alone at
 > R² = <!--v:insolExtR2L1PostMpt-->0.870<!--/v-->). The 8H gravitational-coupling lattice
@@ -24,14 +24,17 @@ status: current
 > **What the model's own e(t) does (§4, §9):** with the model's H/3 eccentricity
 > line in the features, the pre-registered statistic reads
 > max ΔR² = <!--v:insolExtMaxDeltaR2-->+0.0297<!--/v--> in the pre-iNHG regime
-> (2.7–5.3 Myr) and survives cross-validation there
-> (<!--v:insolStabModelCvPreInhg-->+0.0212<!--/v-->). La2004's e(t) does not reproduce
+> (2.7–5.3 Myr) and survives cross-validation there against the pre-admission
+> lattice (e(t) feature alone:
+> <!--v:l1N24EccCvPreInhg-->+0.0144<!--/v-->). La2004's e(t) does not reproduce
 > it. §10 attributes the gain: it is the single lattice line n = 24
 > (8H/24 = H/3, <!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr), which was not among L1's
 > original 32 divisors — a free-phase 8H/24 pair gives the identical cross-validated
 > gain and e(t) adds nothing on top of it. A lattice attribution, not an
 > insolation effect and not a layer; n = 24 is now admitted to L1 (§10.3), the
-> record's own best period for the line is 8H/24 within 0.8% (§10.4). Climate is driven by gravitational
+> record's own best period for the line is 8H/24 within 0.8% (§10.4). With the
+> line inside the shipped lattice, the features retain nothing further out of
+> sample (<!--v:insolStabModelCvPreInhg-->+0.0024<!--/v-->, §9). Climate is driven by gravitational
 > rhythms; classical insolation is a downstream proxy, not a primary driver.
 
 > **Scope note (ESSRT).** The augmented-regression test and the L1 lattice integer-divisor structure are scale-invariant. The 8H = <!--v:eightH-->2,682,536<!--/v--> yr value and the climate-test windows (LR04 0-5320 kyr, EPICA 0-800 kyr, La2010 0-500 kyr) are J2000-evaluated / present-epoch. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent drift over the post-MPT 0-1 Myr window where the test is most discriminative; modest over the full 5.3 Myr LR04 record. The result that L1 fully absorbs Laskar's insolation is structural (per §5.1) and therefore epoch-invariant.
@@ -186,9 +189,10 @@ LR04 time window tested.
 ## 4. Verdict — null for classical insolation; a pre-iNHG sensitivity to the model's own e(t)
 
 ```
-Max ΔR² (model features)  = <!--v:insolExtMaxDeltaR2-->+0.0297<!--/v-->   pre-iNHG, in-sample   → POSITIVE band
-Cross-validated, same regime, model features   = <!--v:insolStabModelCvPreInhg-->+0.0212<!--/v-->  (stable)
-Cross-validated, same regime, La2004 features  = <!--v:insolStabLaskarCvPreInhg-->−0.0274<!--/v-->  (no gain)
+Max ΔR² (model features)  = <!--v:insolExtMaxDeltaR2-->+0.0297<!--/v-->   pre-iNHG, in-sample, pre-admission lattice → POSITIVE band
+Cross-validated, pre-admission lattice, e(t) alone      = <!--v:l1N24EccCvPreInhg-->+0.0144<!--/v-->  (survives → the §10 attribution)
+Cross-validated, shipped lattice (n = 24 admitted, §10.3) = <!--v:insolStabModelCvPreInhg-->+0.0024<!--/v-->  (nothing left on top)
+Cross-validated, same regime, La2004 features  = <!--v:insolStabLaskarCvPreInhg-->−0.0211<!--/v-->  (no gain)
 Every other regime, cross-validated, either set ≤ +0.005
 ```
 
@@ -447,24 +451,35 @@ the full regime exactly as the extension test does, the L_insol coefficients
 are fitted on one half of the window and scored on the other, both
 directions, mean reported.
 
+The baseline is the **shipped** lattice — which, since the §10.3 admission,
+includes n = 24. The CV columns therefore answer the post-admission question
+(*is anything left on top of the shipped formula?*); the in-sample model
+column carries the extension test's pre-admission measurement (§3, pre-iNHG
+baseline R² = <!--v:insolExtR2CanonPreInhg-->0.4298<!--/v--> without the line
+vs <!--v:l1N24R2WithLinePreInhg-->0.4493<!--/v--> with it). The pre-admission
+cross-validated reading is §10's.
+
 | Regime | Window (kyr) | ΔR² model (in-sample) | ΔR² La2004 (in-sample) | CV ΔR² model | CV ΔR² La2004 |
 |--------|-------------:|----------------------:|-----------------------:|-------------:|--------------:|
 | post-MPT  | 0–1000    | <!--v:insolExtDeltaR2PostMpt-->+0.0038<!--/v--> | <!--v:insolStabLaskarDeltaR2PostMpt-->+0.0008<!--/v--> | <!--v:insolStabModelCvPostMpt-->+0.0032<!--/v--> | <!--v:insolStabLaskarCvPostMpt-->−0.0048<!--/v--> |
-| iNHG-MPT  | 1000–2700 | <!--v:insolExtDeltaR2InhgMpt-->+0.0069<!--/v--> | <!--v:insolStabLaskarDeltaR2InhgMpt-->+0.0010<!--/v--> | <!--v:insolStabModelCvInhgMpt-->−0.0126<!--/v--> | <!--v:insolStabLaskarCvInhgMpt-->−0.0134<!--/v--> |
-| pre-iNHG  | 2700–5320 | **<!--v:insolExtDeltaR2PreInhg-->+0.0297<!--/v-->** | <!--v:insolStabLaskarDeltaR2PreInhg-->+0.0046<!--/v--> | **<!--v:insolStabModelCvPreInhg-->+0.0212<!--/v-->** | <!--v:insolStabLaskarCvPreInhg-->−0.0274<!--/v--> |
-| lr04-full | 0–5320    | <!--v:insolExtDeltaR2Lr04Full-->+0.0035<!--/v--> | <!--v:insolStabLaskarDeltaR2Lr04Full-->+0.0245<!--/v--> | <!--v:insolStabModelCvLr04Full-->−0.0094<!--/v--> | <!--v:insolStabLaskarCvLr04Full-->+0.0051<!--/v--> |
+| iNHG-MPT  | 1000–2700 | <!--v:insolExtDeltaR2InhgMpt-->+0.0069<!--/v--> | <!--v:insolStabLaskarDeltaR2InhgMpt-->+0.0028<!--/v--> | <!--v:insolStabModelCvInhgMpt-->−0.0116<!--/v--> | <!--v:insolStabLaskarCvInhgMpt-->−0.0127<!--/v--> |
+| pre-iNHG  | 2700–5320 | **<!--v:insolExtDeltaR2PreInhg-->+0.0297<!--/v-->** | <!--v:insolStabLaskarDeltaR2PreInhg-->+0.0103<!--/v--> | **<!--v:insolStabModelCvPreInhg-->+0.0024<!--/v-->** | <!--v:insolStabLaskarCvPreInhg-->−0.0211<!--/v--> |
+| lr04-full | 0–5320    | <!--v:insolExtDeltaR2Lr04Full-->+0.0035<!--/v--> | <!--v:insolStabLaskarDeltaR2Lr04Full-->+0.0233<!--/v--> | <!--v:insolStabModelCvLr04Full-->−0.0167<!--/v--> | <!--v:insolStabLaskarCvLr04Full-->+0.0050<!--/v--> |
 
 Reading:
 
 - **La2004 features never pass the stability bar.** Their one in-sample gain
   (lr04-full, +0.02) collapses out of sample to
-  <!--v:insolStabLaskarCvLr04Full-->+0.0051<!--/v-->; the maximum cross-validated
+  <!--v:insolStabLaskarCvLr04Full-->+0.0050<!--/v-->; the maximum cross-validated
   gain with the real orbital elements anywhere is
-  <!--v:insolStabMaxLaskarCv-->+0.0051<!--/v-->. Classical insolation adds nothing
+  <!--v:insolStabMaxLaskarCv-->+0.0050<!--/v-->. Classical insolation adds nothing
   the lattice does not already carry — the §4 verdict.
-- **The model's e(t) has one stable gain, in pre-iNHG only**
-  (<!--v:insolStabModelCvPreInhg-->+0.0212<!--/v--> out of sample, both halves
-  positive). Its e(t) spans
+- **The model's e(t) gain lives in pre-iNHG only — and the shipped lattice
+  has already absorbed it.** Against the pre-admission lattice it
+  cross-validates at <!--v:l1N24EccCvPreInhg-->+0.0144<!--/v--> (§10); with
+  n = 24 admitted, the features retain only
+  <!--v:insolStabModelCvPreInhg-->+0.0024<!--/v--> on top (both halves
+  positive, below the stability bar). Its e(t) spans
   <!--v:insolStabEccMinModel-->0.0078<!--/v-->–<!--v:insolStabEccMaxModel-->0.0233<!--/v-->
   over the record as a single H/3 line; La2004's spans
   <!--v:insolStabEccMinLaskar-->0.0002<!--/v-->–<!--v:insolStabEccMaxLaskar-->0.0578<!--/v-->
@@ -491,7 +506,7 @@ separates them on the same canonical residual, ridge and split-half CV as §9.
 
 | Regressor on the L1+L2+L3 residual | in-sample ΔR² | CV ΔR² |
 |---|---:|---:|
-| all four model features (§9) | <!--v:insolExtDeltaR2PreInhg-->+0.0297<!--/v--> | <!--v:insolStabModelCvPreInhg-->+0.0212<!--/v--> |
+| all four model features (§9) | <!--v:insolExtDeltaR2PreInhg-->+0.0297<!--/v--> | <!--v:insolStabModelCvPreInhg-->+0.0024<!--/v--> |
 | model e(t) alone — fixed H/3 phase, one parameter | <!--v:l1N24EccInSamplePreInhg-->+0.0187<!--/v--> | <!--v:l1N24EccCvPreInhg-->+0.0144<!--/v--> |
 | pure lattice pair cos/sin(2π·24·t/8H) — free phase | <!--v:l1N24LineInSamplePreInhg-->+0.0191<!--/v--> | **<!--v:l1N24LineCvPreInhg-->+0.0144<!--/v-->** |
 | e·sin ϖ, e·cos ϖ pair alone | — | <!--v:l1N24PeriPairCvPreInhg-->−0.0062<!--/v--> |

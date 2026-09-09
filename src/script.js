@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -19936,20 +19936,25 @@ function _epsHybridEraAt(year) {
 // K5c — the model curves for the inv-plane elements: the chain's secular
 // skeleton evaluated at the calendar year (engine D's own s-modes — the
 // long-term claim, legitimately comparable to La2010 across the chart's
-// ±500 kyr span; inclination is convention-free). NODE CONVENTIONS
-// (measured, −500 kyr → 0 vs the raw 1-Myr engine series): the chain node
-// matches the engine's s-frame readout (origin = ecliptic-X projected into
-// the plane); La2010's node origin sits ≈3.4° away (constant class,
-// spread 0.29°) — each curve is plotted in ITS OWN convention, and the
-// residual carries that documented offset plus the ζ-skeleton node wander
-// (±4.4° rms vs the engine; arg ζ swings fast near inclination minima).
+// ±500 kyr span; inclination is convention-free). NODE CONVENTION — the
+// K5c node-origin DERIVATION closed the former ≈3.4° two-convention gap:
+// La2010 measures node longitudes from the invariable plane's ascending
+// node on the ICRF equator (the S&S 2012 origin), and the derived
+// conversion (inv-plane-frame.cjs; banked plane + J2000 mean obliquity,
+// zero fitted constants) lands the chain node on La2010's to 0.0001° at
+// J2000 with a +0.04° mean over −500 kyr → 0 (251 rows) — the constant
+// offset is GONE, derived not fitted. The remaining residual is the
+// ζ-skeleton node wander (4.3° rms; arg ζ swings fast near inclination
+// minima), zero-mean element class.
 function inclInvPlaneModel(year) {
   if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   return kcComputePlanetElementsAtYear(year, _kcChains.earth, _kcChains).inclInvPlaneDeg;
 }
 function ascNodeInvPlaneModel(year) {
   if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-  return kcComputePlanetElementsAtYear(year, _kcChains.earth, _kcChains).ascNodeInvPlaneDeg;
+  return convertNodeSFrameToEquatorOriginDeg(
+    kcComputePlanetElementsAtYear(year, _kcChains.earth, _kcChains).ascNodeInvPlaneDeg,
+    _kcNodeOriginSSDeg());
 }
 
 // ── Category definitions ─────────────────────────────────────────
@@ -20045,10 +20050,10 @@ const VFP_CATEGORIES = [
     fixedYRange: [0, 360], fixedYTicks: [0, 60, 120, 180, 240, 300, 360],
     paperRange: [-500000, 2000], paperTitle: 'Ascending Node on Invariable Plane',
     paperYRange: [0, 400], paperYTicks: [0, 50, 100, 150, 200, 250, 300, 350, 400],
-    model: { name: 'This model (s-frame)', color: '#f0b040',
+    model: { name: 'This model (S&S/La2010 node origin, derived)', color: '#f0b040',
       fn: ascNodeInvPlaneModel },
     references: [
-      { name: 'La2010 (Laskar, own node origin)', color: '#4fc3f7', fn: ascNodeLa2010, sourceUrl: 'https://doi.org/10.1051/0004-6361/201116836' },
+      { name: 'La2010 (Laskar)', color: '#4fc3f7', fn: ascNodeLa2010, sourceUrl: 'https://doi.org/10.1051/0004-6361/201116836' },
     ],
   },
   {
@@ -43651,14 +43656,14 @@ async function runRATest() {
   // node conventions, phase angles, MaxIncl anchors) and the lattice
   // "Precession Fluctuation" columns left the report — plan 02 K5c.
   const periRows   = [['JD', 'Date', 'Time', 'Model Year',
-    'Mercury Perihelion RA', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury InvPlane Inclination', 'Mercury Asc Node InvPlane (s-frame)', '* Mercury Perihelion (Ecliptic)',
-    'Venus Perihelion RA', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus InvPlane Inclination', 'Venus Asc Node InvPlane (s-frame)', '* Venus Perihelion (Ecliptic)',
-    'Earth Perihelion (Ecliptic)', 'Earth Perihelion RA', 'Earth InvPlane Inclination', 'Earth Asc Node InvPlane (s-frame)',
-    'Mars Perihelion RA', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars InvPlane Inclination', 'Mars Asc Node InvPlane (s-frame)', '* Mars Perihelion (Ecliptic)',
-    'Jupiter Perihelion RA', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter InvPlane Inclination', 'Jupiter Asc Node InvPlane (s-frame)', '* Jupiter Perihelion (Ecliptic)',
-    'Saturn Perihelion RA', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn InvPlane Inclination', 'Saturn Asc Node InvPlane (s-frame)', '* Saturn Perihelion (Ecliptic)',
-    'Uranus Perihelion RA', 'Uranus Asc Node', 'Uranus Arg Peri', 'Uranus Ecliptic Inclination', 'Uranus InvPlane Inclination', 'Uranus Asc Node InvPlane (s-frame)', '* Uranus Perihelion (Ecliptic)',
-    'Neptune Perihelion RA', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Ecliptic Inclination', 'Neptune InvPlane Inclination', 'Neptune Asc Node InvPlane (s-frame)', '* Neptune Perihelion (Ecliptic)'
+    'Mercury Perihelion RA', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury InvPlane Inclination', 'Mercury Asc Node InvPlane (S&S origin)', '* Mercury Perihelion (Ecliptic)',
+    'Venus Perihelion RA', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus InvPlane Inclination', 'Venus Asc Node InvPlane (S&S origin)', '* Venus Perihelion (Ecliptic)',
+    'Earth Perihelion (Ecliptic)', 'Earth Perihelion RA', 'Earth InvPlane Inclination', 'Earth Asc Node InvPlane (S&S origin)',
+    'Mars Perihelion RA', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars InvPlane Inclination', 'Mars Asc Node InvPlane (S&S origin)', '* Mars Perihelion (Ecliptic)',
+    'Jupiter Perihelion RA', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter InvPlane Inclination', 'Jupiter Asc Node InvPlane (S&S origin)', '* Jupiter Perihelion (Ecliptic)',
+    'Saturn Perihelion RA', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn InvPlane Inclination', 'Saturn Asc Node InvPlane (S&S origin)', '* Saturn Perihelion (Ecliptic)',
+    'Uranus Perihelion RA', 'Uranus Asc Node', 'Uranus Arg Peri', 'Uranus Ecliptic Inclination', 'Uranus InvPlane Inclination', 'Uranus Asc Node InvPlane (S&S origin)', '* Uranus Perihelion (Ecliptic)',
+    'Neptune Perihelion RA', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Ecliptic Inclination', 'Neptune InvPlane Inclination', 'Neptune Asc Node InvPlane (S&S origin)', '* Neptune Perihelion (Ecliptic)'
   ]];
   //const periRows   = [['JD', 'Date', 'Time', 'Mercury Perihelion', 'Venus Perihelion', 'Earth Perihelion', 'Mars Perihelion', 'Jupiter Perihelion', 'Saturn Perihelion', 'Uranus Perihelion', 'Neptune Perihelion', 'Pluto Perihelion', 'Halleys Perihelion', 'Eros Perihelion']]; 
   const planetRows = [['JD', 'Date', 'Time', 'Model Year', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun']]; 
@@ -43800,14 +43805,14 @@ async function runRATest() {
 //    periRows.push([jd, date, time, mercuryPer.toFixed(6), venusPer.toFixed(6), earthPerRA.toFixed(6), marsPer.toFixed(6), jupiterPer.toFixed(6), saturnPer.toFixed(6), uranusPer.toFixed(6), neptunePer.toFixed(6), plutoPer.toFixed(6), halleysPer.toFixed(6), erosPer.toFixed(6)]);
 
         periRows.push([jd, date, time, modelYear,
-          mercuryPer.toFixed(6), mercuryAsc.toFixed(6), mercuryArg.toFixed(6), mercuryAppIncl.toFixed(6), mercuryEl.inclInvPlaneDeg.toFixed(6), mercuryEl.ascNodeInvPlaneDeg.toFixed(6), mercuryPerEcl.toFixed(6),
-          venusPer.toFixed(6), venusAsc.toFixed(6), venusArg.toFixed(6), venusAppIncl.toFixed(6), venusEl.inclInvPlaneDeg.toFixed(6), venusEl.ascNodeInvPlaneDeg.toFixed(6), venusPerEcl.toFixed(6),
-          earthPerEcl.toFixed(6), earthPerRA.toFixed(6), earthEl.inclInvPlaneDeg.toFixed(6), earthEl.ascNodeInvPlaneDeg.toFixed(6),
-          marsPer.toFixed(6), marsAsc.toFixed(6), marsArg.toFixed(6), marsAppIncl.toFixed(6), marsEl.inclInvPlaneDeg.toFixed(6), marsEl.ascNodeInvPlaneDeg.toFixed(6), marsPerEcl.toFixed(6),
-          jupiterPer.toFixed(6), jupiterAsc.toFixed(6), jupiterArg.toFixed(6), jupiterAppIncl.toFixed(6), jupiterEl.inclInvPlaneDeg.toFixed(6), jupiterEl.ascNodeInvPlaneDeg.toFixed(6), jupiterPerEcl.toFixed(6),
-          saturnPer.toFixed(6), saturnAsc.toFixed(6), saturnArg.toFixed(6), saturnAppIncl.toFixed(6), saturnEl.inclInvPlaneDeg.toFixed(6), saturnEl.ascNodeInvPlaneDeg.toFixed(6), saturnPerEcl.toFixed(6),
-          uranusPer.toFixed(6), uranusAsc.toFixed(6), uranusArg.toFixed(6), uranusAppIncl.toFixed(6), uranusEl.inclInvPlaneDeg.toFixed(6), uranusEl.ascNodeInvPlaneDeg.toFixed(6), uranusPerEcl.toFixed(6),
-          neptunePer.toFixed(6), neptuneAsc.toFixed(6), neptuneArg.toFixed(6), neptuneAppIncl.toFixed(6), neptuneEl.inclInvPlaneDeg.toFixed(6), neptuneEl.ascNodeInvPlaneDeg.toFixed(6), neptunePerEcl.toFixed(6),
+          mercuryPer.toFixed(6), mercuryAsc.toFixed(6), mercuryArg.toFixed(6), mercuryAppIncl.toFixed(6), mercuryEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(mercuryEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), mercuryPerEcl.toFixed(6),
+          venusPer.toFixed(6), venusAsc.toFixed(6), venusArg.toFixed(6), venusAppIncl.toFixed(6), venusEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(venusEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), venusPerEcl.toFixed(6),
+          earthPerEcl.toFixed(6), earthPerRA.toFixed(6), earthEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(earthEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6),
+          marsPer.toFixed(6), marsAsc.toFixed(6), marsArg.toFixed(6), marsAppIncl.toFixed(6), marsEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(marsEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), marsPerEcl.toFixed(6),
+          jupiterPer.toFixed(6), jupiterAsc.toFixed(6), jupiterArg.toFixed(6), jupiterAppIncl.toFixed(6), jupiterEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(jupiterEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), jupiterPerEcl.toFixed(6),
+          saturnPer.toFixed(6), saturnAsc.toFixed(6), saturnArg.toFixed(6), saturnAppIncl.toFixed(6), saturnEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(saturnEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), saturnPerEcl.toFixed(6),
+          uranusPer.toFixed(6), uranusAsc.toFixed(6), uranusArg.toFixed(6), uranusAppIncl.toFixed(6), uranusEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(uranusEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), uranusPerEcl.toFixed(6),
+          neptunePer.toFixed(6), neptuneAsc.toFixed(6), neptuneArg.toFixed(6), neptuneAppIncl.toFixed(6), neptuneEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(neptuneEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), neptunePerEcl.toFixed(6),
           earthPerDistE.toFixed(8), (o.obliquityEarth || 0).toFixed(6)
         ]);
     
@@ -43895,14 +43900,14 @@ async function runRATest() {
     // device columns)
     periRows[0] = [
       'JD', 'Date', 'Time', 'Model Year',
-      'Mercury Perihelion RA', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury InvPlane Inclination', 'Mercury Asc Node InvPlane (s-frame)', '* Mercury Perihelion (Ecliptic)', 'Mercury Perihelion rate (arcsec / century)',
-      'Venus Perihelion RA', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus InvPlane Inclination', 'Venus Asc Node InvPlane (s-frame)', '* Venus Perihelion (Ecliptic)', 'Venus Perihelion rate (arcsec / century)',
-      'EARTH Eccentricity', 'EARTH OBLIQUITY (deg)', 'Earth Perihelion (Ecliptic)', 'Earth Perihelion RA', 'Earth InvPlane Inclination', 'Earth Asc Node InvPlane (s-frame)', 'Earth Perihelion rate (arcsec / century)',
-      'Mars Perihelion RA', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars InvPlane Inclination', 'Mars Asc Node InvPlane (s-frame)', '* Mars Perihelion (Ecliptic)', 'Mars Perihelion rate (arcsec / century)',
-      'Jupiter Perihelion RA', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter InvPlane Inclination', 'Jupiter Asc Node InvPlane (s-frame)', '* Jupiter Perihelion (Ecliptic)', 'Jupiter Perihelion rate (arcsec / century)',
-      'Saturn Perihelion RA', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn InvPlane Inclination', 'Saturn Asc Node InvPlane (s-frame)', '* Saturn Perihelion (Ecliptic)', 'Saturn Perihelion rate (arcsec / century)',
-      'Uranus Perihelion RA', 'Uranus Asc Node', 'Uranus Arg Peri', 'Uranus Ecliptic Inclination', 'Uranus InvPlane Inclination', 'Uranus Asc Node InvPlane (s-frame)', '* Uranus Perihelion (Ecliptic)', 'Uranus Perihelion rate (arcsec / century)',
-      'Neptune Perihelion RA', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Ecliptic Inclination', 'Neptune InvPlane Inclination', 'Neptune Asc Node InvPlane (s-frame)', '* Neptune Perihelion (Ecliptic)', 'Neptune Perihelion rate (arcsec / century)',
+      'Mercury Perihelion RA', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury InvPlane Inclination', 'Mercury Asc Node InvPlane (S&S origin)', '* Mercury Perihelion (Ecliptic)', 'Mercury Perihelion rate (arcsec / century)',
+      'Venus Perihelion RA', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus InvPlane Inclination', 'Venus Asc Node InvPlane (S&S origin)', '* Venus Perihelion (Ecliptic)', 'Venus Perihelion rate (arcsec / century)',
+      'EARTH Eccentricity', 'EARTH OBLIQUITY (deg)', 'Earth Perihelion (Ecliptic)', 'Earth Perihelion RA', 'Earth InvPlane Inclination', 'Earth Asc Node InvPlane (S&S origin)', 'Earth Perihelion rate (arcsec / century)',
+      'Mars Perihelion RA', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars InvPlane Inclination', 'Mars Asc Node InvPlane (S&S origin)', '* Mars Perihelion (Ecliptic)', 'Mars Perihelion rate (arcsec / century)',
+      'Jupiter Perihelion RA', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter InvPlane Inclination', 'Jupiter Asc Node InvPlane (S&S origin)', '* Jupiter Perihelion (Ecliptic)', 'Jupiter Perihelion rate (arcsec / century)',
+      'Saturn Perihelion RA', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn InvPlane Inclination', 'Saturn Asc Node InvPlane (S&S origin)', '* Saturn Perihelion (Ecliptic)', 'Saturn Perihelion rate (arcsec / century)',
+      'Uranus Perihelion RA', 'Uranus Asc Node', 'Uranus Arg Peri', 'Uranus Ecliptic Inclination', 'Uranus InvPlane Inclination', 'Uranus Asc Node InvPlane (S&S origin)', '* Uranus Perihelion (Ecliptic)', 'Uranus Perihelion rate (arcsec / century)',
+      'Neptune Perihelion RA', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Ecliptic Inclination', 'Neptune InvPlane Inclination', 'Neptune Asc Node InvPlane (S&S origin)', '* Neptune Perihelion (Ecliptic)', 'Neptune Perihelion rate (arcsec / century)',
     ];
 
     // Step 3: rebuild each data row with the rate column appended per block
@@ -45711,12 +45716,12 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcElementsOfDate('earth', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
+       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('earth', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcElementsOfDate('earth', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('earth', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
        value : [ { v: () => _kcArgPeriInvPlaneDeg('earth', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
@@ -46619,12 +46624,12 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
        {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcElementsOfDate('mercury', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
+       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('mercury', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcElementsOfDate('mercury', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('mercury', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
        value : [ { v: () => _kcArgPeriInvPlaneDeg('mercury', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
@@ -46944,12 +46949,12 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcElementsOfDate('venus', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
+       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('venus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcElementsOfDate('venus', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('venus', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
        value : [ { v: () => _kcArgPeriInvPlaneDeg('venus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
@@ -47279,12 +47284,12 @@ const planetStats = {
   
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcElementsOfDate('mars', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
+       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('mars', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcElementsOfDate('mars', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('mars', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
        value : [ { v: () => _kcArgPeriInvPlaneDeg('mars', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
@@ -47614,12 +47619,12 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcElementsOfDate('jupiter', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
+       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('jupiter', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcElementsOfDate('jupiter', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('jupiter', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
        value : [ { v: () => _kcArgPeriInvPlaneDeg('jupiter', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
@@ -47948,12 +47953,12 @@ const planetStats = {
    
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcElementsOfDate('saturn', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
+       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('saturn', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcElementsOfDate('saturn', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('saturn', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
        value : [ { v: () => _kcArgPeriInvPlaneDeg('saturn', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
@@ -48283,12 +48288,12 @@ const planetStats = {
   
    {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcElementsOfDate('uranus', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
+       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('uranus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcElementsOfDate('uranus', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('uranus', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
        value : [ { v: () => _kcArgPeriInvPlaneDeg('uranus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
@@ -48618,12 +48623,12 @@ const planetStats = {
  
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcElementsOfDate('neptune', o.julianDay).ascNodeInvPlaneDeg, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`The chain's node of date on the engine's own invariable plane (s-frame: node origin = ecliptic-X projected into the plane)`],
+       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('neptune', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcElementsOfDate('neptune', o.julianDay).ascNodeInvPlaneDeg + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`s-frame longitude where the orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('neptune', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
        value : [ { v: () => _kcArgPeriInvPlaneDeg('neptune', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
@@ -51610,6 +51615,22 @@ function _kcElementsOfDate(nameLower, jd) {
 }
 function _kcPerihelionEclLonDeg(nameLower, jd) {
   return _kcElementsOfDate(nameLower, jd).lonPeriEclipticDeg;
+}
+// K5c node-origin derivation — the chain's invariable-plane node expressed
+// in the Souami & Souchay (2012) longitude origin (the plane's ascending
+// node on the ICRF equator), via the DERIVED conversion
+// (@essrt/physics/planets/inv-plane-frame: banked plane + J2000 mean
+// obliquity, zero fitted constants). The engine s-frame stays the internal
+// machinery convention; published surfaces speak this one.
+let _kcNodeOriginSSDegCache = null;
+function _kcNodeOriginSSDeg() {
+  if (_kcNodeOriginSSDegCache === null) {
+    _kcNodeOriginSSDegCache = computeEquatorNodeOriginSFrameDeg(CHAIN_ARTIFACT.invariablePlane, K.earthOrbital.obliquityJ2000_deg);
+  }
+  return _kcNodeOriginSSDegCache;
+}
+function _kcAscNodeInvPlaneSSDeg(nameLower, jd) {
+  return convertNodeSFrameToEquatorOriginDeg(_kcElementsOfDate(nameLower, jd).ascNodeInvPlaneDeg, _kcNodeOriginSSDeg());
 }
 // K5c — the EXACT invariable-plane argument of periapsis: the in-orbit-plane
 // angle from the orbit's ascending node ON THE INVARIABLE PLANE to the

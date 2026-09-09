@@ -194,13 +194,18 @@ hierarchy — the two-engine interface; the historical gate suite is
 calibrated on it.
 
 **The falsification criterion.** The model stands falsifiable on three named,
-pre-registered legs: (1) **the deep-time scaling split** — the spin-family
-periods (axial precession, obliquity band) must scale with H(t) per the
-recession history while the long-eccentricity band stays at its modern class
-(scaled only by the measured solar-mass history); every newly dated
-Precambrian cyclostratigraphic section tests both halves (confirmed so far
-at 1.4 and 2.46 Ga), and a section violating either half falsifies the
-corresponding tier. (2) **Historical-era exactness** — the fail-proven gate
+pre-registered legs: (1) **the deep-time scaling split** — the axial
+precession must scale with H(t) per the recession history, **the obliquity
+band must follow the beat 2π/(ψ̇(t) − |s₃|)** (p H-scaled; s₃ at its
+dynamical value under the measured solar-mass history — the two readings
+are degenerate today and split ~19% at 2.46 Ga, registry keys
+`obliqBeat*Kyr`/`obliqH8Scaled*Kyr`, doc 109 §18), while the
+long-eccentricity band stays at its modern class (scaled only by the
+measured solar-mass history); every newly dated Precambrian
+cyclostratigraphic section tests these halves (the precession/LOD side
+confirmed so far at 1.4 and 2.46 Ga; the deep obliquity PERIOD is the
+pre-registered, not-yet-discriminated prediction), and a section violating
+any half falsifies the corresponding tier. (2) **Historical-era exactness** — the fail-proven gate
 suite: eclipses (`eclipse-audit`), the LOD/ΔT stack, cardinal points, the
 41-anchor paleo bands (`paleo-anchors`, where an unexplained *improvement*
 fails too). (3) **Two-expansions μ-consistency** — the rock-measured

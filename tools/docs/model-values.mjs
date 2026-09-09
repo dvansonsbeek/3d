@@ -870,27 +870,50 @@ export const VALUES = {
   // OmegaSS: Souami & Souchay (2012) Table 2 invariable-plane nodes — the
   //   website TYPES these as literals; we derive them from astro-reference's
   //   ascendingNodesSouamiSouchay block (same digits, one source).
-  // OmegaDelta: the model's invariable-plane node minus the S&S reference —
-  //   the "verified delta" the site quotes per planet.
-  ...Object.fromEntries(['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']
-    .flatMap((p) => [
-      [`${p}InclEcl`, {
-        get: () => C.planets[p].eclipticInclinationJ2000,
-        render: (v) => Number(v).toFixed(3),
-        unit: '°',
-      }],
-      [`${p}OmegaSS`, {
-        get: () => astro.ascendingNodesSouamiSouchay[p],
-        render: (v) => Number(v).toFixed(2),
-        unit: '°',
-        note: 'Souami & Souchay 2012, external reference',
-      }],
-      [`${p}OmegaDelta`, {
-        get: () => C.planets[p].ascendingNodeInvPlane - astro.ascendingNodesSouamiSouchay[p],
-        render: (v) => fmtSignedPct(v, 2),
-        unit: '°',
-      }],
-    ])),
+  // OmegaDelta: the CHAIN's invariable-plane node of date at J2000, expressed
+  //   in the S&S longitude origin via the DERIVED conversion (the K5c
+  //   node-origin derivation; inv-plane-frame.cjs), minus the S&S reference —
+  //   the honest delta from the path that ships (formerly the legacy
+  //   Appendix-C calibrated constants). Residual is element class (chain
+  //   elements-of-date vs S&S mean elements), scaling as 1/sin(i_inv).
+  ...(() => {
+    let chainCache = null;
+    const chainNodeSS = (p) => {
+      if (!chainCache) {
+        const KC = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'keplerian-chain.cjs'));
+        const IPF = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'inv-plane-frame.cjs'));
+        const ART = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'chain-artifact.js')).CHAIN_ARTIFACT;
+        const chains = KC.buildPlanetChainsFromArtifactData(ART);
+        const origin = IPF.computeEquatorNodeOriginSFrameDeg(ART.invariablePlane, astro.earthOrbital.obliquityJ2000_deg);
+        chainCache = { KC, chains, origin };
+      }
+      const s = chainCache.KC.computePlanetElementsAtYear(2000, chainCache.chains[p], chainCache.chains).ascNodeInvPlaneDeg;
+      return (((s - chainCache.origin) % 360) + 360) % 360;
+    };
+    return Object.fromEntries(['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']
+      .flatMap((p) => [
+        [`${p}InclEcl`, {
+          get: () => C.planets[p].eclipticInclinationJ2000,
+          render: (v) => Number(v).toFixed(3),
+          unit: '°',
+        }],
+        [`${p}OmegaSS`, {
+          get: () => astro.ascendingNodesSouamiSouchay[p],
+          render: (v) => Number(v).toFixed(2),
+          unit: '°',
+          note: 'Souami & Souchay 2012, external reference',
+        }],
+        [`${p}OmegaDelta`, {
+          get: () => {
+            const d = chainNodeSS(p) - astro.ascendingNodesSouamiSouchay[p];
+            return ((d + 540) % 360) - 180;
+          },
+          render: (v) => fmtSignedPct(v, 2),
+          unit: '°',
+          note: 'chain node (S&S convention, derived conversion) minus S&S 2012 — element class (of-date vs mean elements)',
+        }],
+      ]));
+  })(),
 
   // ── Obliquity family ────────────────────────────────────────────────────
   // Two distinct means, per the model's taxonomy: earthtiltMean (the solved
@@ -1888,11 +1911,18 @@ export const VALUES = {
       out[`${p}ChainAscNodeEclJ2000Deg`] = { get: () => el(p).ascNodeEclipticDeg, render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'engine-D chain ascending node on the ecliptic, of date at J2000' };
       out[`${p}ChainInclInvJ2000Deg`] = { get: () => el(p).inclInvPlaneDeg, render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'engine-D chain inclination to the engine’s own invariable plane (K5c), of date at J2000' };
       out[`${p}ChainAscNodeInvJ2000Deg`] = { get: () => el(p).ascNodeInvPlaneDeg, render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'engine-D chain node on the engine’s own invariable plane (K5c s-frame; node origin = ecliptic-X projected into the plane), of date at J2000' };
+      out[`${p}ChainAscNodeInvSSJ2000Deg`] = { get: () => convertToSS(el(p).ascNodeInvPlaneDeg), render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'engine-D chain node on the engine’s own invariable plane, of date at J2000, expressed in the Souami & Souchay (2012) longitude origin (the inv plane’s ascending node on the ICRF equator) via the DERIVED conversion — zero fitted constants (inv-plane-frame.cjs)' };
     }
     const art = () => {
       el('earth');   // ensure cache
       return cache.ART.invariablePlane;
     };
+    const originSS = () => {
+      const IPF = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'inv-plane-frame.cjs'));
+      return IPF.computeEquatorNodeOriginSFrameDeg(art(), astro.earthOrbital.obliquityJ2000_deg);
+    };
+    const convertToSS = (sFrameDeg) => (((sFrameDeg - originSS()) % 360) + 360) % 360;
+    out.invPlaneNodeOriginSFrameDeg = { get: () => originSS(), render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'the S&S (2012) longitude origin — the invariable plane’s ascending node on the ICRF equator — expressed as an engine s-frame longitude; DERIVED from the banked plane + the J2000 mean obliquity (reproduces S&S’s published node RA 3°51′9.4″ to 0.4 mdeg)' };
     out.invPlaneInclEngineDeg = { get: () => art().inclEclipticDeg, render: (v) => Number(v).toFixed(5), unit: 'deg', note: 'the ENGINE’S OWN invariable plane: inclination to ecliptic J2000 (banked from the J2000-seed total angular momentum; S&S 2012 give 1.5787 as the external reference)' };
     out.invPlaneNodeEngineDeg = { get: () => art().ascNodeEclipticDeg, render: (v) => Number(v).toFixed(4), unit: 'deg', note: 'the ENGINE’S OWN invariable plane: node on the ecliptic (banked, K5c; S&S 2012 give 107.58 as the external reference)' };
     return out;
@@ -2091,6 +2121,38 @@ export const VALUES = {
       marsSpinPrecObsArcsecPerYr: { get: () => sp.marsSpinPrecessionArcsecPerYr, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'OBSERVED Mars spin precession (Konopliv 2016 / InSight) — sits INSIDE the engine’s inner s-band: the chaotic-obliquity regime (citation target, never an input)' },
       jupiterSpinPrecObsArcsecPerYr: { get: () => sp.jupiterSpinPrecessionApproxArcsecPerYr, render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'Jupiter spin precession ≈ (Saillenfest 2020, MoI-dependent −2.7…−2.9) — adjacent to the engine’s s7 (citation target)' },
       saturnSpinPrecLongTermArcsecPerYr: { get: () => sp.saturnSpinPrecessionPresentArcsecPerYr / sp.saturnPresentToLongTermFraction, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'Saturn’s long-term pole rate (present −0.45 ÷ 0.68, the Titan-cycle fraction; Ward & Hamilton 2004) — sits on the engine’s s8 to ~4% (citation-derived target)' },
+    };
+  })(),
+
+  // ── The sharpened leg-1 obliquity statement (owner-adopted) ─────────────
+  // The obliquity band follows the BEAT 2π/(ψ̇(t) − |s₃|): the spin
+  // precession p H-scaled per the recession history (engine K), s₃ at its
+  // dynamical value under the measured μ ≈ 1 (engine D). Degenerate with
+  // pure H/8-scaling today (p ≫ s₃); discriminable at Precambrian ages —
+  // the pre-registered fork (plan 02 §8; doc 109 §18).
+  ...(() => {
+    const DT = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
+    const s3 = () => {
+      const z = rd('data/nbody-deep-secular-modes.json').modes.earth.zeta
+        .filter((m) => Math.abs(m.omegaRadPerYr) > 1e-9)
+        .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
+      return Math.abs(z.omegaRadPerYr * 180 / Math.PI) * 3600;   // ″/yr
+    };
+    const axialYr = (tMa) => {
+      const dt = DT();
+      const sid = dt.meanSiderealYearSecondsAtAge(tMa), trop = dt.meanTropicalYearSecondsAtAge(tMa);
+      return sid / (sid - trop);
+    };
+    const beatKyr = (tMa) => 1296000 / (1296000 / axialYr(tMa) - s3()) / 1000;
+    const h8Kyr = (tMa) => axialYr(tMa) * 13 / 8 / 1000;
+    const mk = (name, tMa, label) => ({
+      [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ − |s₃|) at ${label} — p H-scaled, s₃ dynamical under measured μ (the adopted leg-1 form)` },
+      [`obliqH8Scaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the pure H/8-scaling reading (axial × 13/8) at ${label} — degenerate with the beat today, the discriminated alternative at depth` },
+    });
+    return {
+      ...mk('J2000', 0.000001, 'J2000'),
+      ...mk('1400Ma', 1400, '1.4 Ga'),
+      ...mk('2460Ma', 2460, '2.46 Ga'),
     };
   })(),
 
