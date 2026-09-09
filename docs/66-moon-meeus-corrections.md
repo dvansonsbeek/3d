@@ -94,11 +94,13 @@ classical constant:
   (`tools/explore/v4-frame-audit.js`). The effective form runs in the
   runtime (exact vs Meeus by construction); an explicit bounded frame
   carrier for the argument rates is registered future work.
-- **e_E itself — fully derived (see "Framework-native e_E" below).** The
-  channel's eccentricity history is the framework's own H/3 fluctuation;
-  the observed J2000 eccentricity, its rate, and its curvature are
-  PREDICTIONS of that line (−0.9%, +1.7%, and sign-correct respectively),
-  not inputs. The astro-reference (e₀, ė₀, ë₀) values are retained as the
+- **e_E itself — the engine's own deep z-vector (decision (ii); see
+  "Framework-native e_E" below for the H/3 line's record).** The lunar
+  channel's eccentricity history is the ±10-Myr deep mode table
+  (doc 109 §17), anchored exactly at the JPL J2000 seed; the H/3 line —
+  whose J2000 e, ė and curvature were PREDICTIONS (−0.9%, +1.7%,
+  sign-correct) — remains its epoch-local tangent and the clock-side
+  basis. The astro-reference (e₀, ė₀, ë₀) values are retained as the
   documented Taylor-check anchors.
 - **The sign paradox dissolved.** Brown's m²-scaling predicts apsidal
   precession ACCELERATING while Meeus's M′ T² says decelerating — the old
@@ -288,6 +290,16 @@ from pure gravity (2.486/0.880) and the of-date record minus the IAU frame
 acceleration requires 2.479/0.867 — agreement 100.3%/101.5%. The runtime's
 effective pair absorbs the frame term and is exact vs Meeus by
 construction: the sensitivities are attributed, not fitted.
+
+> **Current implementation (engine-switch decision (ii), doc 109 §17):**
+> the e_E behind the lunar chain — the rate channel, the E-factor and the
+> factored deep-time law — is now the ENGINE'S OWN deep z-vector (the
+> ±10-Myr mode table, `moon/deep-ecc-channel.cjs`), which carries the
+> 405-kyr-class deep spectrum the single H/3 line cannot. The H/3 line
+> described below remains the clock-side basis (eclipse Sun equation of
+> centre, cardinal braid) and the EPOCH-LOCAL TANGENT of the deep e —
+> the two agree within 4.2e-5 across the historical era, so this
+> section's measured comparisons stand at their stated precision.
 
 **Framework-native e_E: the fully-derived H/3 fluctuation.** The e_E behind
 the rate channel, the E-factor, and the factored deep-time law is ONE
