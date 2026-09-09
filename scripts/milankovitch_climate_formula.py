@@ -331,11 +331,24 @@ class ClimateFormula:
             X_l1 = self._build_l1_matrix(t)  # intercept + 31 cos/sin pairs
             # Ridge solve (intercept un-penalized). Equivalent to OLS when
             # the lattice is well-resolved by the window length.
+            # HARDENED (2026-09, the environment-sensitivity finding): the
+            # former normal-equations solve (XtX + lambda*I) SQUARES the
+            # design's condition number - with the lattice's unresolved
+            # groups inside short windows, the LU result rode BLAS/LAPACK
+            # version rounding (measured: the banked pre-iNHG verdict was
+            # not reproducible across numpy/scipy upgrades with byte-
+            # identical inputs). The SAME ridge problem is now solved via
+            # the SVD-based augmented least squares
+            #     min ||X b - y||^2 + lambda*||b_noint||^2
+            #  =  lstsq([X; sqrt(lambda)*D], [y; 0]),  D = I with D00 = 0
+            # - mathematically identical, condition number square-rooted,
+            # stable across LAPACK versions to the SVD's own tolerance.
             p = X_l1.shape[1]
-            I_reg = np.eye(p)
-            I_reg[0, 0] = 0.0
-            XtX = X_l1.T @ X_l1
-            beta_l1 = np.linalg.solve(XtX + L1_RIDGE_LAMBDA * I_reg, X_l1.T @ y_sub)
+            D_reg = np.eye(p)
+            D_reg[0, 0] = 0.0
+            X_aug = np.vstack([X_l1, np.sqrt(L1_RIDGE_LAMBDA) * D_reg])
+            y_aug = np.concatenate([y_sub, np.zeros(p)])
+            beta_l1, _, _, _ = np.linalg.lstsq(X_aug, y_aug, rcond=1e-10)
             # Condition number of the *centered* sinusoid columns (excl. intercept)
             svals_l1 = np.linalg.svd(X_l1[:, 1:] - X_l1[:, 1:].mean(axis=0),
                                        compute_uv=False)

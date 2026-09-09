@@ -80,7 +80,9 @@ def canonical_residual(t, y, regime):
     s = f.fit(t, y, regime=regime)
     y_hat = f.evaluate(t, layer="all")
     y_norm = (y - y.mean()) / max(y.std(), 1e-12)
-    return y_norm - y_hat, y_norm, float(s.r2_l1_l2_l3)
+    # condition_number recorded per regime (the hardening round): the L1
+    # design's conditioning is the fragility diagnostic.
+    return y_norm - y_hat, y_norm, float(s.r2_l1_l2_l3), float(s.condition_number)
 
 
 def ridge(X, r, lam=RIDGE_LAMBDA):
@@ -112,21 +114,33 @@ def main():
     ages, vals = load_lr04()
     model = load_insolation_features()
     laskar = load_la2004_feats(model)
+    import platform
+    import numpy
+    import scipy
     out = {"metadata": {"script": Path(__file__).name,
                         "laskar_source": "La2004 (Laskar et al. 2004) Earth elements, data/la2004-earth-51myr-back.asc",
                         "obliquity_source": "model (computeObliquityEarth) - held identical in both feature sets",
-                        "ridge_lambda": RIDGE_LAMBDA, "cv": "split-half, both directions, canonical baseline fitted on the full regime"},
+                        "ridge_lambda": RIDGE_LAMBDA, "cv": "split-half, both directions, canonical baseline fitted on the full regime",
+                        # the hardening round (2026-09): the L1 solve is now
+                        # SVD-based augmented ridge (see the formula module);
+                        # the environment stamp records the numerical stack a
+                        # bank was produced under - the fragility finding.
+                        "solver": "L1 SVD-augmented ridge (lstsq rcond=1e-10); L2/L3 lstsq rcond=1e-10",
+                        "environment": {"python": platform.python_version(),
+                                        "numpy": numpy.__version__,
+                                        "scipy": scipy.__version__}},
            "regime_results": {}}
     print(f"{'regime':10} {'window':12} {'R2 canon':>8} | {'dR2 model':>9} {'dR2 Laskar':>10} | {'CV model':>9} {'CV Laskar':>10}")
     for regime in REGIMES:
         t, y = preprocess(ages, vals, window=REGIME_WINDOWS[regime])
-        res, y_norm, r2c = canonical_residual(t, y, regime)
+        res, y_norm, r2c, cond_l1 = canonical_residual(t, y, regime)
         Xm, Xl = design(t, model), design(t, laskar)
         dm, dl = in_sample_dr2(res, y_norm, r2c, Xm), in_sample_dr2(res, y_norm, r2c, Xl)
         cvm, hm = cv_dr2(res, y_norm, Xm)
         cvl, hl = cv_dr2(res, y_norm, Xl)
         out["regime_results"][regime] = {
             "window_kyr": list(REGIME_WINDOWS[regime]), "n_samples": int(len(t)), "r2_l1_l2_l3": r2c,
+            "l1_condition_number": cond_l1,
             "model_delta_r2": dm, "laskar_delta_r2": dl,
             "model_cv_delta_r2": cvm, "model_cv_halves": hm,
             "laskar_cv_delta_r2": cvl, "laskar_cv_halves": hl,
