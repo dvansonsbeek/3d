@@ -2045,6 +2045,32 @@ export const VALUES = {
     };
   })(),
 
+  // ── The deep-source insolation features (Stage C-2) ─────────────────────
+  // Reads data/insolation-stability-deep-results.json — the stability/null
+  // instrument run on data/insolation-features-deep.csv (hybrid ε + deep
+  // z/ζ + the physical of-date climatic precession). Published BESIDE the
+  // H/3-law record (insolStab*Model keys), never over it.
+  ...(() => {
+    const sd = () => rd('data/insolation-stability-deep-results.json');
+    return {
+      insolStabEccMinDeep: {
+        get: () => sd().ecc_range_model_0_5320kyr[0],
+        render: (v) => Number(v).toFixed(5),
+        note: 'the DEEP-source e(t) minimum over the LR04 span (0–5320 kyr) — beside insolStabEccMinLaskar; the law’s envelope gap closes',
+      },
+      insolStabEccMaxDeep: {
+        get: () => sd().ecc_range_model_0_5320kyr[1],
+        render: (v) => Number(v).toFixed(5),
+        note: 'the DEEP-source e(t) maximum over the LR04 span — matches the La2004 envelope where the H/3 line reads 0.0233',
+      },
+      insolDeepMaxCvDeltaR2: {
+        get: () => sd().max_model_cv_delta_r2,
+        render: (v) => Number(v).toExponential(2),
+        note: 'the deep-source features’ best cross-validated ΔR² on LR04 across regimes — the NULL verdict (no stable positive regime): the climate signal is not a direct e/ε feature, matching the L1 attribution doctrine',
+      },
+    };
+  })(),
+
   // ── Full-precision J2000 catalog elements (doc-20 reference tables) ─────
   // Straight reads of astro-reference planetOrbitalElements — the JPL/SPICE
   // catalog inputs, rendered at stored precision (String of the raw value).

@@ -1,0 +1,104 @@
+{
+  "metadata": {
+    "script": "milankovitch_insolation_stability.py",
+    "laskar_source": "La2004 (Laskar et al. 2004) Earth elements, data/la2004-earth-51myr-back.asc",
+    "obliquity_source": "model (computeObliquityEarth) - held identical in both feature sets",
+    "ridge_lambda": 0.01,
+    "cv": "split-half, both directions, canonical baseline fitted on the full regime",
+    "runtime_sec": 0.21477556228637695
+  },
+  "regime_results": {
+    "post-mpt": {
+      "window_kyr": [
+        0,
+        1000
+      ],
+      "n_samples": 1001,
+      "r2_l1_l2_l3": 0.874269135110301,
+      "model_delta_r2": 0.00045210261373607175,
+      "laskar_delta_r2": 0.0007866255811469491,
+      "model_cv_delta_r2": -0.006419434174892433,
+      "model_cv_halves": [
+        -0.010180318815225789,
+        -0.002658549534559077
+      ],
+      "laskar_cv_delta_r2": -0.0045337960867933465,
+      "laskar_cv_halves": [
+        -0.007499686107296927,
+        -0.0015679060662897668
+      ]
+    },
+    "inhg-mpt": {
+      "window_kyr": [
+        1000,
+        2700
+      ],
+      "n_samples": 1701,
+      "r2_l1_l2_l3": 0.7344500987322314,
+      "model_delta_r2": 0.0017713233941250017,
+      "laskar_delta_r2": 0.0011384643208153244,
+      "model_cv_delta_r2": -0.013029227502550499,
+      "model_cv_halves": [
+        -0.015066038688306046,
+        -0.01099241631679495
+      ],
+      "laskar_cv_delta_r2": -0.011025726367951539,
+      "laskar_cv_halves": [
+        -0.012140866247724038,
+        -0.00991058648817904
+      ]
+    },
+    "pre-inhg": {
+      "window_kyr": [
+        2700,
+        5320
+      ],
+      "n_samples": 2621,
+      "r2_l1_l2_l3": 0.44934717636584065,
+      "model_delta_r2": 0.004428032949777672,
+      "laskar_delta_r2": 0.0058970200688853724,
+      "model_cv_delta_r2": -0.03350549418874478,
+      "model_cv_halves": [
+        -0.05297365738386703,
+        -0.014037330993622525
+      ],
+      "laskar_cv_delta_r2": -0.034606172590294026,
+      "laskar_cv_halves": [
+        -0.05845997512966506,
+        -0.010752370050923
+      ]
+    },
+    "lr04-full": {
+      "window_kyr": [
+        0,
+        5320
+      ],
+      "n_samples": 5321,
+      "r2_l1_l2_l3": 0.25838651033141213,
+      "model_delta_r2": 0.026746458752310076,
+      "laskar_delta_r2": 0.040359317788049465,
+      "model_cv_delta_r2": -0.055984936979164526,
+      "model_cv_halves": [
+        -0.06274662393060151,
+        -0.04922325002772754
+      ],
+      "laskar_cv_delta_r2": -0.0013259622227287226,
+      "laskar_cv_halves": [
+        0.018769763836219953,
+        -0.021421688281677398
+      ]
+    }
+  },
+  "max_model_cv_delta_r2": -0.006419434174892433,
+  "max_laskar_cv_delta_r2": -0.0013259622227287226,
+  "stable_positive_regimes_model": [],
+  "stable_positive_regimes_laskar": [],
+  "ecc_range_model_0_5320kyr": [
+    0.0008378949513266346,
+    0.05781380968799896
+  ],
+  "ecc_range_laskar_0_5320kyr": [
+    0.0002459848440094854,
+    0.05781453947997662
+  ]
+}

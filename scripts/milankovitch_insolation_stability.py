@@ -25,6 +25,7 @@ This script IS that check, applied per regime:
 Output: data/insolation-stability-results.json
 """
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -38,7 +39,10 @@ from milankovitch_insolation_extension import load_insolation_features, interp_f
 
 DATA_DIR = SCRIPT_DIR.parent / "data"
 LA2004_PATH = DATA_DIR / "la2004-earth-51myr-back.asc"
-OUT_PATH = DATA_DIR / "insolation-stability-results.json"
+# INSOL_STABILITY_OUT overrides the output (Stage C-2: the deep-source
+# verdict data/insolation-stability-deep-results.json, run with
+# INSOL_FEATURES_CSV pointing at the deep CSV); default unchanged.
+OUT_PATH = Path(os.environ.get("INSOL_STABILITY_OUT", str(DATA_DIR / "insolation-stability-results.json")))
 REGIMES = ["post-mpt", "inhg-mpt", "pre-inhg", "lr04-full"]
 RIDGE_LAMBDA = 0.01   # identical to the extension test
 

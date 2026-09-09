@@ -36,6 +36,7 @@ Output: data/insolation-extension-results.json
 
 from __future__ import annotations
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -54,7 +55,10 @@ from milankovitch_climate_formula import (
 )
 
 DATA_DIR = SCRIPT_DIR.parent / "data"
-INSOL_CSV = DATA_DIR / "insolation-features.csv"
+# INSOL_FEATURES_CSV overrides the feature source (Stage C-2: the deep-source
+# variant data/insolation-features-deep.csv); default = the H/3-law CSV, so
+# every prior invocation is unchanged.
+INSOL_CSV = Path(os.environ.get("INSOL_FEATURES_CSV", str(DATA_DIR / "insolation-features.csv")))
 OUT_PATH = DATA_DIR / "insolation-extension-results.json"
 
 
