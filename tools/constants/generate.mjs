@@ -490,6 +490,18 @@ function buildDeepModes(chainArt) {
       // the era ζ tier (its OWN 8-term extraction): the of-date panel
       // readout's tier — measured 0.3″ rms vs IAU-2006 over 1900–2100
       earthZetaEra: art.earthZetaEra,
+      // C-4 "labels' spin lines return" (plan 02 design; doc 109 §19):
+      // the leading proper ζ mode per planet in ″/yr — the engine's own
+      // s-lines the zoom labels quote beside the cited observed spin
+      // rates. SAME recipe as the deepNode*ArcsecPerYr registry keys:
+      // strongest non-constant mode by amplitude.
+      planetLeadingZetaArcsecPerYr: Object.fromEntries(
+        Object.keys(art.modes).map((p) => {
+          const m = art.modes[p].zeta
+            .filter((x) => Math.abs(x.omegaRadPerYr) > 1e-9)
+            .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
+          return [p, (m.omegaRadPerYr * 180 / Math.PI) * 3600];
+        })),
       anchorE: anchor.e,
       anchorPeriEclipticDeg: anchor.lonPeriEclipticDeg,
       anchorInclEclipticDeg: anchor.inclEclipticDeg,
@@ -507,8 +519,10 @@ function emitDeepModes({ hash, payload }) {
  * Earth-z mode table, engine-switch Stage B), earth z-modes + verdict
  * emitted VERBATIM, plus the J2000 anchor pair (e, ϖ) joined from
  * data/nbody-secular-frequencies.json j2000AnchorElements.earth — the
- * anchor's ONE home. Two gates guard the chain: check:artifacts pins
- * artifact ↔ engine; generate.mjs check mode pins this embed ↔ artifact.
+ * anchor's ONE home, plus the per-planet leading proper ζ modes (″/yr,
+ * the C-4 s-lines for the zoom labels — doc 109 §19). Two gates guard
+ * the chain: check:artifacts pins artifact ↔ engine; generate.mjs
+ * check mode pins this embed ↔ artifact.
  * CJS because the lunar-chain consumers are CommonJS modules.
  */
 'use strict';

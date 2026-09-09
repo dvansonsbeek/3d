@@ -9966,11 +9966,18 @@ const helperLabelStyle =
 const helperPointer = '<div style="margin-top:3px;color:rgba(255,255,255,.3);font-size:8px;line-height:1;">&#9660;</div>';
 
 /* — Earth Wobble Center label — */
+/* C-4 SPIN reading for Earth (doc 109 §19): p derived from the measured
+   year lengths (the ratio identity above), the s-lines from the embedded
+   deep ζ table — both computed, no literals. */
+const _earthSpinPArcsecYr = 1296000 / ASTRO_REFERENCE.iauPrecessionJ2000;
+const _earthSpinMaxS = Math.max(...Object.values(DEEP_MODES_ARTIFACT.planetLeadingZetaArcsecPerYr || { x: NaN }).map(Math.abs));
 const wobbleLabelDiv = document.createElement('div');
 wobbleLabelDiv.style.cssText = helperLabelStyle;
 wobbleLabelDiv.innerHTML =
   '<div style="font:600 10px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.9);letter-spacing:.03em;">Precession Center</div>' +
   '<div style="font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.45);margin-top:2px;">axis of Earth\'s wobble</div>' +
+  '<div style="font:500 9px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.7);margin-top:3px;font-variant-numeric:tabular-nums;">p = ' + _earthSpinPArcsecYr.toFixed(2) + ' ″/yr — ' + (_earthSpinPArcsecYr / _earthSpinMaxS).toFixed(1) + '× above our highest s-line</div>' +
+  '<div style="font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.45);margin-top:2px;">no spin resonance reachable — Moon-raised; without the Moon, p falls into the band and the obliquity envelope doubles</div>' +
   helperPointer;
 const wobbleLabelObj = new CSS2DObject(wobbleLabelDiv);
 wobbleLabelObj.position.set(0, 0.04, 0);
@@ -10011,7 +10018,40 @@ for (const wc of [mercuryWobbleCenter, venusWobbleCenter, marsWobbleCenter,
    both live) plus the observed J2000 tilt. The lattice spin-family lines
    (axial precession, obliquity cycle, eccentricity cycle, tilt/ecc
    amplitudes) LEFT the label with K8b (plan 02) and return only when
-   re-derived on the chain, uniformly for all planets. */
+   re-derived on the chain, uniformly for all planets — that rule stands.
+   What the SPIN group below shows instead is the C-4 landscape reading
+   (doc 109 §19): each planet's CITED observed spin precession against
+   the engine's own zero-fitted s-lines (deep ζ leading modes, embedded
+   via DEEP_MODES_ARTIFACT). No model spin-rate claims. Observed values
+   mirror the astro-reference planetSpinObserved TARGET block (citations,
+   never inputs); they sit below the check-literals distinctiveness
+   cutoff, so GREP THAT BLOCK when editing it — these are the copies. */
+const _dmLeadZeta = DEEP_MODES_ARTIFACT.planetLeadingZetaArcsecPerYr || {};
+const _spinRowsFor = (key) => {
+  const s1 = _dmLeadZeta.mercury, s7 = _dmLeadZeta.uranus, s8 = _dmLeadZeta.neptune;
+  switch (key) {
+    case 'mercury': return [
+      ['val', 'Cassini-locked — 3:2 state'],
+      ['sub', 'Margot 2007 — observational anchor'],
+    ];
+    case 'mars': return [
+      ['val', 'Observed: −7.606 ″/yr (cited)'],
+      ['val', 'Inside our inner s-multiplet (s1 ' + s1.toFixed(3) + ')'],
+      ['sub', 'Chaotic obliquity class — ±6° response'],
+    ];
+    case 'jupiter': return [
+      ['val', 'Observed: ≈−2.8 ″/yr (cited)'],
+      ['val', 'Our s7: ' + s7.toFixed(3) + ' ″/yr → adjacent'],
+      ['sub', 'Slow tilting — Saillenfest 2020'],
+    ];
+    case 'saturn': return [
+      ['val', 'Long-term obs.: ' + (-0.45 / 0.68).toFixed(3) + ' ″/yr (cited)'],
+      ['val', 'Our s8: ' + s8.toFixed(3) + ' ″/yr → on resonance'],
+      ['sub', 'Capture — Ward & Hamilton 2004'],
+    ];
+    default: return null;   // venus/uranus/neptune: nothing claimed (bare label)
+  }
+};
 const _planetWobbleCenters = [
   { obj: mercuryWobbleCenter, body: mercury, name: "Mercury", key: 'mercury', tilt: planets.mercury.axialTiltJ2000 },
   { obj: venusWobbleCenter,   body: venus,   name: "Venus",   key: 'venus',   tilt: planets.venus.axialTiltJ2000 },
@@ -10047,6 +10087,13 @@ for (const wc of _planetWobbleCenters) {
   const sep = 'margin-top:6px;padding-top:4px;border-top:1px solid rgba(255,255,255,.1);';
   const grp = 'font:600 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.55);letter-spacing:.05em;text-transform:uppercase;margin-top:6px;';
 
+  // C-4 SPIN group (doc 109 §19): observed (cited) vs the engine's node lines
+  const spinRows = _spinRowsFor(wc.key);
+  const spinHtml = spinRows
+    ? '<div style="' + grp + sep + '">Spin</div>' +
+      spinRows.map(([cls, text]) =>
+        '<div style="' + (cls === 'val' ? val : sub) + '">' + text + '</div>').join('')
+    : '';
   inner.innerHTML =
     '<div style="font:600 10px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.9);letter-spacing:.03em;">' + wc.name + ' — Elements of Date</div>' +
     '<div style="' + sub + '">from the model\'s N-body chain</div>' +
@@ -10054,6 +10101,7 @@ for (const wc of _planetWobbleCenters) {
     '<div style="' + val + '">Perihelion (of date): </div>' +
     '<div style="' + grp + sep + '">Axial</div>' +
     '<div style="' + val + '">Tilt (J2000): ' + wc.tilt.toFixed(2) + '°</div>' +
+    spinHtml +
     '<div style="' + grp + sep + '">Eccentricity</div>' +
     '<div style="' + val + '">Current: </div>' +
     helperPointer;
