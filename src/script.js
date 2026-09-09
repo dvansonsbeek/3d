@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -3718,10 +3718,11 @@ const _moonArgsM = (() => {
           eccentricityDotDotJ2000: ASTRO_REFERENCE.eccentricityDotDotJ2000,
           elpEarthFigureJ2ArcsecPerCy2: ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2.earthFigureJ2,
           elpGeneralPrecessionPA_T2ArcsecPerCy2: ASTRO_REFERENCE.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976,
-          eccE0: _moonEcc().e0,
+          // Decision (ii): the lunar chain reads the ONE deep e end to end
+          eccE0: _deepEcc().e0,
         },
         fns: {
-          eccAt: _fwEarthEcc,
+          eccAt: (tYr) => _deepEcc().eccAt(tYr),
           channelIntegral: _fwChannelIntegral,
           computeObliquityEarth,
           jdToSIyear: (jd) => _jdToSIyear(jd),
@@ -4256,10 +4257,22 @@ const _moonEcc = (() => {
   };
 })();
 function _fwEarthEcc(t_yr) { return _moonEcc().eccAt(t_yr); }
-/** Earth's eccentricity at a decimal year — the model's ONE law (eccentricity
- *  unification): every Earth consumer (scene, cardinal braid, predictions,
- *  reports, charts) goes through this; the 5-argument
- *  `computeEccentricityEarth` below stays ONLY for the planets' wobble laws. */
+
+/** Engine-switch decision (ii) (plan 02 §8): the ONE deep e — the engine's
+ *  own ±10-Myr mode table, anchored form — feeds the ENTIRE lunar chain
+ *  (modulation/cycle counts, arguments eccAt/channelIntegral, E-factor).
+ *  The Sun/clock machinery (_fwEarthEcc above: scene Sun offset, cardinal
+ *  braid) stays on the H/3 channel — a certification split, not a physics
+ *  one (the two agree within 4.2e-5 in-era). */
+const _deepEcc = (() => {
+  let m = null;
+  return () => { if (!m) m = createDeepEccChannel(DEEP_MODES_ARTIFACT); return m; };
+})();
+/** Earth's eccentricity at a decimal year — the H/3 law (the epoch-local
+ *  clock-side line): the scene, cardinal braid, predictions, reports and
+ *  charts go through this; the lunar chain rides _deepEcc (decision (ii));
+ *  the 5-argument `computeEccentricityEarth` below stays ONLY for the
+ *  planets' wobble laws. */
 function computeEccentricityEarthAtYear(year) { return _fwEarthEcc(year - 2000); }
 
 /** Integral of the PHASE-AWARE channel rate: ∫₀ᵀ [(g(e(t))/g₀)^s − 1] dt′ in
@@ -4268,7 +4281,7 @@ function computeEccentricityEarthAtYear(year) { return _fwEarthEcc(year - 2000);
  *  polynomial was this integral's Taylor truncation at J2000. Composite
  *  Simpson: 3 evaluations in-window (the integrand barely bends over
  *  centuries), step ≤ ~4,000 yr at deep time. Bounded at every epoch. */
-function _fwChannelIntegral(T, s) { return _moonEcc().channelIntegral(T, s); }
+function _fwChannelIntegral(T, s) { return _deepEcc().channelIntegral(T, s); }   // decision (ii): the ONE deep e
 
 /** Bounded planetary Lp carrier: the record's planetary T² remainder
  *  (T2_LP − T2_LP_TIDAL, +7.247″/cy²) is the J2000 Taylor truncation of
@@ -4313,8 +4326,8 @@ function _fwLpPlanetaryCarrier(T) { return _moonArgsM().planetaryCarrier(T); }
 function _fwLpObliquityCarrier(T) { return _moonArgsM().obliquityCarrier(T); }
 
 /** e_E-channel rate modulation [g(t)/g₀]^s at age t_Ma (positive = past). ≡ 1 at J2000.
- *  Uses the framework H/3 fluctuation line (was: the Laskar-band composite). */
-function _eCompModulation(t_Ma, s) { return _moonEcc().modulation(t_Ma, s); }
+ *  Decision (ii): rides the ONE deep e (was: the H/3 fluctuation line). */
+function _eCompModulation(t_Ma, s) { return _deepEcc().modulation(t_Ma, s); }
 
 // Phase 8.2-3: the month/precession chain lives ONCE in
 // @essrt/physics/moon/month-chain; this engine delegates, injecting its own
@@ -4345,6 +4358,7 @@ const _moonChain = (() => {
           meanSiderealYearSecondsAtAge,
           meanHAtAge,
           distanceMetresAtAge: _recessionHistory().distanceMetresAtAge,
+          // Decision (ii): _eCompModulation now rides the ONE deep e
           modulation: _eCompModulation,
         },
       });
@@ -4363,7 +4377,8 @@ const _moonChain = (() => {
  *  amplitudes). Flag-consistent: pure-Meeus A/B mode keeps the polynomial. */
 function _fwEFactor(jd_tt, T, T2) {
   if (!MOON_ARGS_FRAMEWORK_NATIVE) return 1 - 0.002516 * T - 0.0000074 * T2;
-  return _moonEcc().eFactorAt((jd_tt - j2000JD) / inputmeanlengthsolaryearindays);
+  // decision (ii): the ONE deep e
+  return _deepEcc().eFactorAt((jd_tt - j2000JD) / inputmeanlengthsolaryearindays);
 }
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×

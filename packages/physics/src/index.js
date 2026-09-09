@@ -121,6 +121,10 @@ export * as planetOrbitChain from './planets/orbit-chain.cjs';
 // governed artifact; the browser flag path consumes exactly these).
 export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from './planets/keplerian-chain.cjs';
 export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from './planets/chain-artifact.js';
+// Engine-switch Stage B, T5d-(d): the deep-time Earth-z channel (the deep
+// lunar-chain modulation rides it; era consumers stay on the H/3 channel).
+export { createDeepEccChannel } from './moon/deep-ecc-channel.cjs';
+export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from './moon/deep-modes-artifact.cjs';
 export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from './planets/predict.cjs';
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).

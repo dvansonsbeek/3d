@@ -173,11 +173,12 @@ function _moonArgsM() {
         eccentricityDotDotJ2000: AR.earthEccentricityDotDotJ2000,
         elpEarthFigureJ2ArcsecPerCy2: AR.elpW1T2Decomposition_arcsecPerCy2.earthFigureJ2,
         elpGeneralPrecessionPA_T2ArcsecPerCy2: AR.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976,
-        eccE0: DTmod._moonEcc().e0,
+        // Decision (ii): the lunar chain reads the ONE deep e end to end
+        eccE0: DTmod._deepEcc().e0,
       },
       fns: {
-        eccAt: DTmod._fwEarthEcc,
-        channelIntegral: (T, s) => DTmod._moonEcc().channelIntegral(T, s),
+        eccAt: (tYr) => DTmod._deepEcc().eccAt(tYr),
+        channelIntegral: (T, s) => DTmod._deepEcc().channelIntegral(T, s),
         computeObliquityEarth: OE.computeObliquityEarth,
         jdToSIyear: _jdToSIyearTools,
         tropicalOrbitsBetween: _mcTropical,
@@ -211,7 +212,7 @@ function _moonArgsM() {
  *  exactly the anchor (the R3 drift correction); the channel's g₀ const is
  *  the browser's convention and now the only one. */
 function _fwChannelIntegralTools(T, s) {
-  return DT._moonEcc().channelIntegral(T, s);
+  return DT._deepEcc().channelIntegral(T, s);   // decision (ii): the ONE deep e
 }
 
 // S3 closed: the shared module evaluates the Sun secular deviations on the
@@ -422,10 +423,9 @@ function _fwEFactorTools(d_days, T, T2) {
     const EC = MEEUS_LUNAR.eccentricityCorrection;
     return 1 + EC.e1 * T + EC.e2 * T2;
   }
-  // The shared channel's eFactorAt divides by its e0 anchor CONST, not
-  // eccAt(0) — under integrated phase cycles(2000→2000) carries the R3
-  // drift correction and is not exactly zero (8.2-1/8.2-2).
-  return DT._moonEcc().eFactorAt(d_days / C.inputMeanSolarYear);
+  // Decision (ii): the ONE deep e (its eFactorAt divides by the e0 anchor
+  // const — exact at J2000 by the anchored-remainder construction).
+  return DT._deepEcc().eFactorAt(d_days / C.inputMeanSolarYear);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

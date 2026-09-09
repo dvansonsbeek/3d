@@ -458,6 +458,57 @@ export const CHAIN_ARTIFACT = Object.freeze(${JSON.stringify(art)});
 `;
 }
 
+// ── the deep-time Earth-z mode table (engine-switch Stage B, T5d-(d)) ──────
+// Source: data/nbody-deep-secular-modes.json — GENERATOR-OWNED by
+// tools/verify/deep-secular-modes.js and guarded artifact↔engine by
+// check:artifacts. THIS embed guards embed↔artifact exactly like the chain
+// artifact above. The J2000 anchor pair (e, ϖ) is JOINED at emission time
+// from the chain artifact's j2000AnchorElements — the anchor's ONE home —
+// so the anchored evaluator form needs no retyped value. Emitted as CJS:
+// the lunar-chain consumers (moon/*.cjs) are CommonJS modules.
+const DEEP_MODES_PATH = join(ROOT, 'data/nbody-deep-secular-modes.json');
+const OUT_DEEP_MODES = join(ROOT, 'packages/physics/src/moon/deep-modes-artifact.cjs');
+
+function buildDeepModes(chainArt) {
+  const raw = readFileSync(DEEP_MODES_PATH, 'utf8');
+  const art = JSON.parse(raw);
+  const hash = createHash('sha256').update(raw).digest('hex').slice(0, 16);
+  const anchor = chainArt.art.j2000AnchorElements.earth;
+  return {
+    hash,
+    payload: {
+      meta: art.meta,
+      verdict: art.verdict,
+      earthZ: art.modes.earth.z,
+      anchorE: anchor.e,
+      anchorPeriEclipticDeg: anchor.lonPeriEclipticDeg,
+    },
+  };
+}
+
+function emitDeepModes({ hash, payload }) {
+  return `/**
+ * GENERATED — do not edit. Regenerate:
+ *   node tools/constants/generate.mjs --write
+ *
+ * Source: data/nbody-deep-secular-modes.json (the governed deep-time
+ * Earth-z mode table, engine-switch Stage B), earth z-modes + verdict
+ * emitted VERBATIM, plus the J2000 anchor pair (e, ϖ) joined from
+ * data/nbody-secular-frequencies.json j2000AnchorElements.earth — the
+ * anchor's ONE home. Two gates guard the chain: check:artifacts pins
+ * artifact ↔ engine; generate.mjs check mode pins this embed ↔ artifact.
+ * CJS because the lunar-chain consumers are CommonJS modules.
+ */
+'use strict';
+
+const DEEP_MODES_ARTIFACT_HASH = ${JSON.stringify(hash)};
+
+const DEEP_MODES_ARTIFACT = Object.freeze(${JSON.stringify(payload)});
+
+module.exports = { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH };
+`;
+}
+
 function emitCoefficients({ out, hash }) {
   const keys = Object.keys(out).sort();
   return `/**
@@ -510,6 +561,8 @@ const write = process.argv.includes('--write');
 const coeffJs = emitCoefficients(coeffs);
 const chainArt = buildChainArtifact();
 const chainJs = emitChainArtifact(chainArt);
+const deepModes = buildDeepModes(chainArt);
+const deepJs = emitDeepModes(deepModes);
 
 if (write) {
   mkdirSync(dirname(OUT_JS), { recursive: true });
@@ -517,12 +570,14 @@ if (write) {
   writeFileSync(OUT_DTS, dts);
   writeFileSync(OUT_COEFFS, coeffJs);
   writeFileSync(OUT_CHAIN, chainJs);
+  writeFileSync(OUT_DEEP_MODES, deepJs);
   console.log(`generated ${countLeaves(result.included)} values in ${Object.keys(result.included).length} blocks`);
   console.log(`  constants hash    ${result.hash}`);
   console.log(`  coefficients hash ${coeffs.hash}  (${Object.keys(coeffs.out).length} arrays, full precision)`);
   console.log(`  chain artifact    ${chainArt.hash}  (engine-D governed artifact, verbatim)`);
+  console.log(`  deep-modes embed  ${deepModes.hash}  (deep-time Earth-z table, verbatim + joined anchor)`);
   console.log(`  excluded: ${Object.entries(result.excluded).map(([b, c]) => `${b} (${c})`).join(', ')}`);
-  console.log('  -> packages/physics/src/constants/{generated.js,generated.d.ts,coefficients.js} + planets/chain-artifact.js');
+  console.log('  -> packages/physics/src/constants/{generated.js,generated.d.ts,coefficients.js} + planets/chain-artifact.js + moon/deep-modes-artifact.cjs');
   process.exit(0);
 }
 
@@ -530,11 +585,13 @@ let current = null;
 let currentDts = null;
 let currentCoeffs = null;
 let currentChain = null;
+let currentDeep = null;
 try {
   current = readFileSync(OUT_JS, 'utf8');
   currentDts = readFileSync(OUT_DTS, 'utf8');
   currentCoeffs = readFileSync(OUT_COEFFS, 'utf8');
   currentChain = readFileSync(OUT_CHAIN, 'utf8');
+  currentDeep = readFileSync(OUT_DEEP_MODES, 'utf8');
 } catch { /* handled below */ }
 
 console.log('GENERATED CONSTANTS — check');
@@ -543,11 +600,11 @@ console.log(`  ${countLeaves(result.included)} values · ${Object.keys(result.in
 console.log(`  excluded (never injectable): ${Object.keys(result.excluded).join(', ')}`);
 console.log(`  coefficients: ${Object.keys(coeffs.out).length} arrays · hash ${coeffs.hash}`);
 
-if (current === null || currentCoeffs === null || currentChain === null) {
+if (current === null || currentCoeffs === null || currentChain === null || currentDeep === null) {
   console.log('\nFAIL — a generated module is missing. Run with --write.');
   process.exit(1);
 }
-if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs || currentChain !== chainJs) {
+if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs || currentChain !== chainJs || currentDeep !== deepJs) {
   console.log('\nFAIL — a generated module is STALE relative to the JSON source of truth.');
   console.log('Run: node tools/constants/generate.mjs --write');
   process.exit(1);

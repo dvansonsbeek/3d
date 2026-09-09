@@ -647,8 +647,24 @@ ingredient's shift measured separately) is queued as a research
 follow-up. Two standing readings: the falsification criterion keeps
 using the ROCK metronome, never the engine's reproduction of it; and
 per the registered two-tier decision the 1-Myr era-local table remains
-the in-window evaluator — this deep table owns deep time and NO
-consumer reads it until its per-consumer T5d-revised gate passes.
+the in-window evaluator — this deep table owns deep time.
+
+Its T5d-(d) gate ran and the owner adopted decision (ii): **the entire
+lunar chain rides this table's e** (E-factor, perigee/node modulation
+and the integrated cycle counts, the argument Δe² and of-date rates —
+`moon/deep-ecc-channel.cjs`, one factory across all three runtimes),
+while the Sun/clock machinery (eclipse Sun equation of centre,
+besselian Sun distance, cardinal braid) stays on the H/3 line — a
+certification split, not a physics one (the two agree within 4.2e-5
+across the historical era; the H/3 line keeps its E18 epoch-local-
+tangent role). Acceptance, measured and rebaselined: all 41 paleo
+anchors in bands; the ancient-eclipse dense-target χ² IMPROVED
+(full stack 44.7 → 32.9, Phase-C 5.4 → 4.7, ablation ordering
+preserved) — explained, not tuned: this e is La2004-corroborated
+in-era, 3× closer than the H/3 line; audit-26 3/12/5/0/6 (the one
+mover is −430 Athens/Thucydides crossing the geographic boundary at
+1043 km); Babylon −135 inside its 16-min UT window (12 min); the
+ΔT-band comparison bit-identical; cross-engine 157/157 bit-exact.
 
 ## Related documents
 

@@ -214,6 +214,7 @@ function _moonChain() {
         meanLodSecondsAtAge,
         meanSiderealYearSecondsAtAge,
         meanHAtAge,
+        // Decision (ii): _eCompModulation now rides the ONE deep e
         modulation: _eCompModulation,
         distanceMetresAtAge: _recessionHistory().distanceMetresAtAge,
       },
@@ -909,12 +910,28 @@ function _moonEcc() {
   return _moonEccM;
 }
 function _fwEarthEcc(t_yr) { return _moonEcc().eccAt(t_yr); }
-/** de/dyear of the one eccentricity law (unification) — the cardinal braid's
- *  equation-of-centre derivative; mirrors packages/physics model.js. */
+/** de/dyear of the H/3 law — the cardinal braid's equation-of-centre
+ *  derivative; mirrors packages/physics model.js. */
 function _fwEarthEccRate(t_yr) { return _moonEcc().eccRateAt(t_yr); }
 
+// Engine-switch decision (ii) (plan 02 §8): the ONE deep e — the engine's
+// own ±10-Myr mode table, anchored form — feeds the ENTIRE lunar chain
+// (modulation/cycle counts, arguments eccAt/channelIntegral, E-factor).
+// The Sun/clock machinery (_fwEarthEcc/_fwEarthEccRate above: scene Sun
+// offset, cardinal braid) stays on the H/3 channel — a certification
+// split, not a physics one (the two agree within 4.2e-5 in-era).
+const { createDeepEccChannel } = _req('@essrt/physics/moon/deep-ecc-channel');
+const { DEEP_MODES_ARTIFACT } = _req('@essrt/physics/moon/deep-modes-artifact');
+let _deepEccM = null;
+function _deepEcc() {
+  if (_deepEccM === null) _deepEccM = createDeepEccChannel(DEEP_MODES_ARTIFACT);
+  return _deepEccM;
+}
+
+/** e_E-channel rate modulation [g(t)/g₀]^s at age t_Ma — the ONE deep e
+ *  (decision (ii); was the H/3 fluctuation line). ≡ 1 at J2000. */
 function _eCompModulation(t_Ma, s) {
-  return _moonEcc().modulation(t_Ma, s);
+  return _deepEcc().modulation(t_Ma, s);
 }
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
@@ -1365,6 +1382,7 @@ function posFromJD(jd) {
 module.exports = {
   // Framework e_E: H/3 fluctuation line (production) + Laskar-band composite (A/B research)
   _fwEarthEcc,
+  _deepEcc,
   _fwEarthEccRate,
   // The shared @essrt/physics moon eccentricity channel (8.2-2) — scene-graph's
   // E-factor and channel-integral mirrors read it from here so the anchors

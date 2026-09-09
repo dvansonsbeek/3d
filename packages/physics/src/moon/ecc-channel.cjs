@@ -8,14 +8,17 @@
  * max. The observed J2000 e (−0.86%), ė (+1.7%) and the sign of ë are
  * PREDICTIONS of this line, not inputs.
  *
- * ONE law for the eclipse chain (FQ-7-Sun option C-small, doc 66 §5): the
- * eclipse Sun's equation of centre rides this same H/3 line (anchored at
- * its J2000 value, model.js sunEccentricityAt) — eccentricity is
- * frame-invariant and may carry only fixed-frame lattice periods; the
- * H/16 perihelion cycle is the H/3 rotation seen from the H/13 equinox
- * (13 + 3 = 16) and belongs to ϖ, not e (doc 108). Only the
- * cardinal-point/deep-time path still keeps the H/16 law (`cardinal`'s
- * injected eccentricityAt) — a recorded, not yet resolved, split.
+ * DOMAIN (engine-switch decision (ii) restatement, plan 02 §8): this H/3
+ * line is the CLOCK-side e — the eclipse Sun's equation of centre (FQ-7-Sun
+ * option C-small, doc 66 §5), the besselian Sun distance, the cardinal
+ * braid and the scene machinery ride it. The LUNAR chain (E-factor,
+ * modulation, channelIntegral, argument Δe²) rides the ONE deep e
+ * (deep-ecc-channel.cjs — the engine's own ±10-Myr z-vector); the two
+ * agree within 4.2e-5 across the historical era, and this line keeps its
+ * E18 role as the epoch-local tangent. Eccentricity remains
+ * frame-invariant (fixed-frame periods only); the H/16 perihelion cycle
+ * (the H/3 rotation seen from the H/13 equinox, 13 + 3 = 16) belongs to
+ * ϖ, not e (doc 108).
  *
  * Extracted VERBATIM from src/script.js (_FW_ECC, _fwEarthEcc,
  * _eCompModulation, _fwChannelIntegral, the framework branch of _fwEFactor),

@@ -1,6 +1,6 @@
 {
   "name": "@essrt/physics",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core \u2014 pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
     "modelVersion": "v13.0",
@@ -32,6 +32,8 @@
     "./phase": "./src/phase/index.cjs",
     "./cardinal": "./src/cardinal/index.cjs",
     "./moon/ecc-channel": "./src/moon/ecc-channel.cjs",
+    "./moon/deep-ecc-channel": "./src/moon/deep-ecc-channel.cjs",
+    "./moon/deep-modes-artifact": "./src/moon/deep-modes-artifact.cjs",
     "./moon/month-chain": "./src/moon/month-chain.cjs",
     "./chain-cycles": "./src/chain-cycles/index.cjs",
     "./moon/arguments": "./src/moon/arguments.cjs",

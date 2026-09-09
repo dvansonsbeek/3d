@@ -27,6 +27,8 @@ import { createDeepTimeLod } from './deltat/deep-time.cjs';
 import { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
 import { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
 import { createMoonEccChannel } from './moon/ecc-channel.cjs';
+import { createDeepEccChannel } from './moon/deep-ecc-channel.cjs';
+import { DEEP_MODES_ARTIFACT } from './moon/deep-modes-artifact.cjs';
 import { createMoonMonthChain } from './moon/month-chain.cjs';
 import { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 import { createMoonArguments, jdToDecimalYear } from './moon/arguments.cjs';
@@ -333,9 +335,13 @@ export function assembleModel(C, F, laws = {}) {
   // measured, the H/16 law's present ė (−0.84e-5/cy) is 5× below the
   // observed −4.20e-5 while this law reads −4.31e-5 (Phase-0 record:
   // tools/explore/fq7s-h3-law-candidate.mjs; JPL Sun 1.49″, registry 0.80″,
-  // syzygy 3.72″). Consumers: the eclipse Sun (equation of centre), the
-  // besselian Sun distance, the Moon channel (E-factor, perigee/node T²),
-  // and the cardinal-point braid — one eccentricity everywhere.
+  // syzygy 3.72″). Consumers (engine-switch decision (ii) restatement,
+  // plan 02 §8): the eclipse Sun (equation of centre), the besselian Sun
+  // distance and the cardinal-point braid — the CLOCK-side machinery. The
+  // LUNAR chain (E-factor, perigee/node modulation/T², argument Δe² and
+  // of-date rates) rides the ONE deep e (deep-ecc-channel.cjs — the
+  // engine's own ±10-Myr z-vector); this H/3 line is its epoch-local
+  // tangent (E18), agreeing within 4.2e-5 across the historical era.
   // ONE implementation for all three runtimes: moon/ecc-channel.cjs (the
   // Node engine's deep-time.js and the browser's script.js instantiate the
   // same channel with the same inputs). Its phase counter runs from J2000
@@ -349,6 +355,14 @@ export function assembleModel(C, F, laws = {}) {
     inclinationCycleAnchorDeg: C.earthOrbital.earthInclinationCycleAnchor,
     eccentricityJ2000: C.earthOrbital.earthEccentricityJ2000,
   });
+  // Engine-switch decision (ii) (plan 02 §8): the ONE deep e — the engine's
+  // own ±10-Myr mode table, anchored form — feeds the ENTIRE lunar chain
+  // (modulation, cycle counts, arguments eccAt/channelIntegral, E-factor).
+  // The Sun/clock machinery (eclipse Sun EoC, besselian Sun distance,
+  // cardinal braid) stays on the H/3 channel above — a certification
+  // split, not a physics one (the two agree within 4.2e-5 in-era). The
+  // laws hook deliberately does NOT reach this channel.
+  const deepEcc = createDeepEccChannel(DEEP_MODES_ARTIFACT);
   /** @param {number} year @returns {number} */
   const eccentricityAt = laws.eccentricityAt ?? ((year) => moonEcc.eccAt(year - 2000));
   /** de/dyear of the one law — the cardinal braid's equation-of-centre
@@ -682,7 +696,13 @@ export function assembleModel(C, F, laws = {}) {
       meanLodSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.lodSecondsAtAge(tMa),
       meanSiderealYearSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.siderealYearSecondsAtAge(tMa),
       meanHAtAge: /** @param {number} tMa */ (tMa) => deepLod.hAtAge(tMa),
-      modulation: /** @param {number} tMa @param {number} s */ (tMa, s) => moonEcc.modulation(tMa, s),
+      // Decision (ii) (owner-approved MODEL CHANGE, plan 02 §8): the whole
+      // lunar chain — this modulation, the integrated cycle counts it
+      // drives, the arguments' eccAt/channelIntegral and the E-factor —
+      // reads the ONE deep e. The era shift in the ancient eclipse stack is
+      // accepted and rebaselined with its explanation (deep e is
+      // La2004-corroborated in-era).
+      modulation: /** @param {number} tMa @param {number} s */ (tMa, s) => deepEcc.modulation(tMa, s),
       distanceMetresAtAge: moonDistanceMetresAtAge,
     },
   });
@@ -757,11 +777,12 @@ export function assembleModel(C, F, laws = {}) {
       eccentricityDotDotJ2000: C.earthOrbital.earthEccentricityDotDotJ2000,
       elpEarthFigureJ2ArcsecPerCy2: C.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.earthFigureJ2,
       elpGeneralPrecessionPA_T2ArcsecPerCy2: C.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976,
-      eccE0: moonEcc.e0,
+      // Decision (ii): the lunar chain reads ONE deep e end to end
+      eccE0: deepEcc.e0,
     },
     fns: {
-      eccAt: /** @param {number} tYr */ (tYr) => moonEcc.eccAt(tYr),
-      channelIntegral: /** @param {number} T @param {number} s */ (T, s) => moonEcc.channelIntegral(T, s),
+      eccAt: /** @param {number} tYr */ (tYr) => deepEcc.eccAt(tYr),
+      channelIntegral: /** @param {number} T @param {number} s */ (T, s) => deepEcc.channelIntegral(T, s),
       computeObliquityEarth: obliquitySnapshotDeg,
       jdToSIyear: yearFromJD,
       tropicalOrbitsBetween: mcTropical,
@@ -809,10 +830,10 @@ export function assembleModel(C, F, laws = {}) {
     return Number.isFinite(dT) ? dT : 0;
   };
 
-  // Bounded Meeus E-factor from the H/3 line (framework-native branch only;
-  // the pure-Meeus polynomial A/B branch stays engine-local)
+  // Bounded Meeus E-factor from the ONE deep e (decision (ii); the
+  // pure-Meeus polynomial A/B branch stays engine-local)
   /** @param {number} dDays @returns {number} */
-  const fwEFactor = (dDays) => moonEcc.eFactorAt(dDays / C.foundational.inputmeanlengthsolaryearindays);
+  const fwEFactor = (dDays) => deepEcc.eFactorAt(dDays / C.foundational.inputmeanlengthsolaryearindays);
 
   // D2 derived additional-argument rates (deg/cy, J2000 8H-lattice months;
   // record: tools/explore/derive-a1a2a3.js)
