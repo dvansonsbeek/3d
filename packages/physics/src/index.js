@@ -125,6 +125,9 @@ export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from './planets/chain-artifact.js
 // lunar-chain modulation rides it; era consumers stay on the H/3 channel).
 export { createDeepEccChannel } from './moon/deep-ecc-channel.cjs';
 export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from './moon/deep-modes-artifact.cjs';
+// Stage C-3: the ONE home of the obliquity-hybrid / deep-orbital-history
+// mathematics (published-ε surfaces + the deep insolation features).
+export { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from './planets/predict.cjs';
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).

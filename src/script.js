@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -19858,6 +19858,80 @@ function _la2010Interp(yearFromJ2000, col) {
 function inclinationLa2010(year) { return _la2010Interp(year - 2000, 2); }
 function ascNodeLa2010(year) { return _la2010Interp(year - 2000, 4); }
 
+// ── Stage C-3: the published ε — the obliquity hybrid (doc 109 §18) ────────
+// ds/dt = α(ŝ·n̂)(ŝ×n̂): the orbit plane from engine D's deep ζ-modes (the
+// generated embed), ONE engine-K anchor α = ψ̇_J2000/cos ε₀ from the
+// engine's own year lengths. ZERO fitted constants. The mathematics lives
+// ONCE in @essrt/physics/earth/deep-orbital-history; the ERA machinery
+// (frames, lunar D5, besselian, the scene's A-solve) stays on the fitted
+// law — measured within 5″ rms of the hybrid in 1900–2100 (the same
+// certification split as e and ϖ).
+const _deepHist = (() => {
+  let m = null;
+  return () => {
+    if (!m) {
+      const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
+      m = createDeepOrbitalHistory({
+        zModes: DEEP_MODES_ARTIFACT.earthZ,
+        zetaModes: DEEP_MODES_ARTIFACT.earthZeta,
+        anchorE: DEEP_MODES_ARTIFACT.anchorE,
+        anchorPeriEclipticDeg: DEEP_MODES_ARTIFACT.anchorPeriEclipticDeg,
+        anchorInclEclipticDeg: DEEP_MODES_ARTIFACT.anchorInclEclipticDeg,
+        anchorAscNodeEclipticDeg: DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg,
+        axialPrecessionYearsJ2000: sid / (sid - sol),
+        obliquityJ2000Deg: ASTRO_REFERENCE.obliquityJ2000_deg,
+      });
+    }
+    return m;
+  };
+})();
+// The ERA ζ tier — its OWN 8-term extraction, the tier where J2000-local
+// quantities live (measured vs the observationally anchored IAU-2006
+// polynomial: 0.3″ rms over 1900–2100, 0.6″ over 1600–2400 — sub-arcsec,
+// unfitted; it also beats the fitted law beyond ±2 kyr). The panel's
+// of-date readout rides it; the Myr-scale chart curve rides the deep tier.
+const _deepHistEra = (() => {
+  let m = null;
+  return () => {
+    if (!m) {
+      const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
+      m = createDeepOrbitalHistory({
+        zModes: DEEP_MODES_ARTIFACT.earthZ,
+        zetaModes: DEEP_MODES_ARTIFACT.earthZetaEra,
+        anchorE: DEEP_MODES_ARTIFACT.anchorE,
+        anchorPeriEclipticDeg: DEEP_MODES_ARTIFACT.anchorPeriEclipticDeg,
+        anchorInclEclipticDeg: DEEP_MODES_ARTIFACT.anchorInclEclipticDeg,
+        anchorAscNodeEclipticDeg: DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg,
+        axialPrecessionYearsJ2000: sid / (sid - sol),
+        obliquityJ2000Deg: ASTRO_REFERENCE.obliquityJ2000_deg,
+      });
+    }
+    return m;
+  };
+})();
+let _epsHybridSampler = null, _epsHybridRangeYr = 0;
+/** Hybrid ε (deg), DEEP ζ tier, at a decimal year — cached grid, grown on demand. */
+function _epsHybridAt(year) {
+  const t = year - 2000;
+  const need = Math.max(20000, Math.abs(t) * 1.25);
+  if (!_epsHybridSampler || need > _epsHybridRangeYr) {
+    _epsHybridRangeYr = need;
+    _epsHybridSampler = _deepHist().build(need, -need, 100);
+  }
+  return _epsHybridSampler.at(t).epsDeg;
+}
+let _epsHybridEraSampler = null, _epsHybridEraRangeYr = 0;
+/** Hybrid ε (deg), ERA ζ tier, at a decimal year — the of-date readout. */
+function _epsHybridEraAt(year) {
+  const t = year - 2000;
+  const need = Math.max(20000, Math.abs(t) * 1.25);
+  if (!_epsHybridEraSampler || need > _epsHybridEraRangeYr) {
+    _epsHybridEraRangeYr = need;
+    _epsHybridEraSampler = _deepHistEra().build(need, -need, 100);
+  }
+  return _epsHybridEraSampler.at(t).epsDeg;
+}
+
 /** Model ascending node on invariable plane — retrograde at -H/5 (confirmed by La2010 N-body solution) */
 // K5c — the model curves for the inv-plane elements: the chain's secular
 // skeleton evaluated at the calendar year (engine D's own s-modes — the
@@ -19927,9 +20001,14 @@ const VFP_CATEGORIES = [
       ],
     },
     fixedYRange: [22, 25], fixedYTicks: [22, 23, 24, 25],
-    model: { name: 'This model', color: '#f0b040',
-      fn: year => computeObliquityEarth(_formulaYearFromJD(yearToJDApprox(year))) },
+    // Stage C-3: the published ε is the hybrid (derived, zero fitted
+    // constants); the 16-harmonic fitted law stays as the labeled era
+    // device — the chart shows the derivation beside the fit.
+    model: { name: 'This model (hybrid, deep ζ)', color: '#f0b040',
+      fn: year => _epsHybridAt(year) },
     references: [
+      { name: 'hybrid (era ζ tier)', color: '#ffd54f', fn: year => _epsHybridEraAt(year), sourceUrl: 'https://doi.org/10.21203/rs.3.rs-8758810/v4' },
+      { name: 'fitted law (era device)', color: '#90a4ae', fn: year => computeObliquityEarth(_formulaYearFromJD(yearToJDApprox(year))), sourceUrl: 'https://doi.org/10.21203/rs.3.rs-8758810/v4' },
       { name: 'Laskar (1986)', color: '#4fc3f7', fn: meanObliquityLaskar1986, sourceUrl: 'https://en.wikipedia.org/wiki/Axial_tilt' },
       { name: 'Capitaine (2006)', color: '#81c784', fn: meanObliquityIAU2006, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
       { name: 'Chapront (2002)', color: '#ce93d8', fn: obliquityChapront2002, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
@@ -45436,8 +45515,8 @@ const planetStats = {
        constant: true},
     null,
       {label : () => `Axial tilt`,
-       value : [ { v: () => o.obliquityEarth, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Obliquity of the ecliptic: angle between equator and orbital plane. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over an Earth Fundamental Cycle. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years (at J2000)`],
+       value : [ { v: () => _epsHybridEraAt(o.currentYear), dec:6, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Obliquity of the ecliptic — the DERIVED hybrid ε, era ζ-tier (engine-D node modes + the H/13 anchor, zero fitted constants; dε/dt at J2000 = −46.96″/cy vs IAU −46.84; measured 0.3″ rms vs the IAU-2006 polynomial over 1900–2100 — doc 109 §18). The scene machinery rides the fitted era law, within ~0.5″ of this value in the modern era. Obliquity cycle |ψ̇|−|s₃| ≈ ${fmtNum(holisticyearLength/8, 0, ',')} years (H/8, at J2000)`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _kcElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],

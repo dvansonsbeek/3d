@@ -480,8 +480,17 @@ function buildDeepModes(chainArt) {
       meta: art.meta,
       verdict: art.verdict,
       earthZ: art.modes.earth.z,
+      // C-3: the deep ζ table + the plane anchors join the embed so the
+      // browser's published-ε surfaces (VFP chart, panel row) can build the
+      // obliquity hybrid from the same one-home factory.
+      earthZeta: art.modes.earth.zeta,
+      // the era ζ tier (its OWN 8-term extraction): the of-date panel
+      // readout's tier — measured 0.3″ rms vs IAU-2006 over 1900–2100
+      earthZetaEra: art.earthZetaEra,
       anchorE: anchor.e,
       anchorPeriEclipticDeg: anchor.lonPeriEclipticDeg,
+      anchorInclEclipticDeg: anchor.inclEclipticDeg,
+      anchorAscNodeEclipticDeg: anchor.ascNodeEclipticDeg,
     },
   };
 }
