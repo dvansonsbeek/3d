@@ -84,12 +84,15 @@ def main():
     for regime in REGIMES:
         t, y = preprocess(ages, vals, window=REGIME_WINDOWS[regime])
         mcf.L1_LATTICE_INTEGERS = base_list
-        res, y_norm, r2c = canonical_residual(t, y, regime)
+        # hardening round: canonical_residual also returns the L1 condition
+        # number diagnostic (recorded in the metadata below)
+        res, y_norm, r2c, cond_l1 = canonical_residual(t, y, regime)
         f = interp_features(model, t)
         cols = {k: std(np.asarray(f[k])) for k in ["eps_anom", "ecc", "e_sin_peri", "e_cos_peri"]}
         X_all = design(t, model)
         P = lattice_pair(t, LINE_N)
-        r = {"window_kyr": list(REGIME_WINDOWS[regime]), "n_samples": int(len(t)), "r2_l1_l2_l3": r2c}
+        r = {"window_kyr": list(REGIME_WINDOWS[regime]), "n_samples": int(len(t)), "r2_l1_l2_l3": r2c,
+             "l1_condition_number": cond_l1}
         # A
         r["all4"] = both(res, y_norm, r2c, X_all)
         r["ecc_only"] = both(res, y_norm, r2c, cols["ecc"][:, None])
