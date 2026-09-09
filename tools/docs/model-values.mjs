@@ -2071,6 +2071,29 @@ export const VALUES = {
     };
   })(),
 
+  // ── The C-4 spin/Cassini landscape (doc 109 §19) ────────────────────────
+  // OUR deep node lines (data/nbody-deep-secular-modes.json — the leading
+  // proper ζ mode per planet) beside the OBSERVED spin-precession constants
+  // (astro-reference planetSpinObserved — a TARGET block: citations, never
+  // inputs). The landscape verdicts live in the two Stage-C-4 labs.
+  ...(() => {
+    const dm = () => rd('data/nbody-deep-secular-modes.json');
+    const lead = (p) => {
+      const m = dm().modes[p].zeta.filter((x) => Math.abs(x.omegaRadPerYr) > 1e-9)
+        .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
+      return (m.omegaRadPerYr * 180 / Math.PI) * 3600;
+    };
+    const sp = astro.planetSpinObserved;
+    return {
+      deepNodeS8ArcsecPerYr: { get: () => lead('neptune'), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the engine’s OWN s8 (Neptune’s proper nodal mode, deep ζ table) — the line Saturn’s spin is captured at (Ward & Hamilton 2004); Laskar gives −0.692' },
+      deepNodeS7ArcsecPerYr: { get: () => lead('uranus'), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the engine’s OWN s7 (Uranus’s proper nodal mode) — the line Jupiter’s spin is entering (Saillenfest 2020); Laskar gives −2.993' },
+      deepNodeS1ArcsecPerYr: { get: () => lead('mercury'), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the engine’s OWN s1 (Mercury’s proper nodal mode) — the node Mercury’s Cassini-locked spin follows (Margot 2007)' },
+      marsSpinPrecObsArcsecPerYr: { get: () => sp.marsSpinPrecessionArcsecPerYr, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'OBSERVED Mars spin precession (Konopliv 2016 / InSight) — sits INSIDE the engine’s inner s-band: the chaotic-obliquity regime (citation target, never an input)' },
+      jupiterSpinPrecObsArcsecPerYr: { get: () => sp.jupiterSpinPrecessionApproxArcsecPerYr, render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'Jupiter spin precession ≈ (Saillenfest 2020, MoI-dependent −2.7…−2.9) — adjacent to the engine’s s7 (citation target)' },
+      saturnSpinPrecLongTermArcsecPerYr: { get: () => sp.saturnSpinPrecessionPresentArcsecPerYr / sp.saturnPresentToLongTermFraction, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'Saturn’s long-term pole rate (present −0.45 ÷ 0.68, the Titan-cycle fraction; Ward & Hamilton 2004) — sits on the engine’s s8 to ~4% (citation-derived target)' },
+    };
+  })(),
+
   // ── Full-precision J2000 catalog elements (doc-20 reference tables) ─────
   // Straight reads of astro-reference planetOrbitalElements — the JPL/SPICE
   // catalog inputs, rendered at stored precision (String of the raw value).

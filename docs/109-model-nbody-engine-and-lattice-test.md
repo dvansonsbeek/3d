@@ -710,6 +710,53 @@ dissolves the scene's amplitude-solve) is the registered Stage-C arc in
 the plan; until it lands, the fitted law remains the certified basis
 and this section is evidence content.
 
+## 19. The solar-system spin landscape on the engine's own node lines (C-4)
+
+**What is and is not claimed.** The individual mechanisms below are
+established literature — Saturn's s8 resonance capture (Ward &
+Hamilton 2004, AJ 128, 2501), Jupiter's approach to the s7 resonance
+(Saillenfest, Lari & Courtot 2020, A&A 640, A11), Mars's chaotic
+obliquity and the Moon's stabilization of Earth (Laskar & Robutel
+1993; Laskar, Joutel & Robutel 1993), Mercury's Cassini lock (Margot
+et al. 2007, Science 316, 710). What is the model's own content is
+that **the entire landscape hangs on OUR OWN s-lines** — the nodal
+eigenfrequencies of the same zero-fitted-constant N-body chain, seeded
+once at J2000, that already carries the 405-kyr metronome (§17) and
+the obliquity band (§18). One engine, one seed: the deep-time climate
+pacemakers AND the solar system's spin-stability map are the same
+frequency table read twice.
+
+The instruments are the two Stage-C-4 labs
+(`tools/explore/stage-c4-cassini-landscape.mjs`,
+`…-cassini-response.mjs`); the observed spin constants are CITATION
+targets in the astro-reference `planetSpinObserved` block (sources in
+its `_description` — never model inputs), and the registry keys
+`deepNodeS8ArcsecPerYr` / `deepNodeS7ArcsecPerYr` /
+`deepNodeS1ArcsecPerYr` beside `marsSpinPrecObsArcsecPerYr`,
+`jupiterSpinPrecObsArcsecPerYr` and
+`saturnSpinPrecLongTermArcsecPerYr` carry the comparison pairs. **Read
+the live values from the keys, never from this paragraph.**
+
+The landscape, measured: Mercury and the Moon are Cassini-LOCKED (the
+Moon closed by this model's own v4 Euler campaign — two observational
+anchors). Mars's observed spin rate sits INSIDE the engine's dense
+inner s-multiplet — the chaotic-obliquity regime as a property of our
+mode spread; the response lab integrating Mars's spin on OUR plane
+history reproduces the Laskar-class ±6° band. Jupiter's rate sits
+adjacent to OUR s7; Saturn's long-term rate sits on OUR s8 to ~4% —
+and the response lab shows the Ward–Hamilton structure on our modes:
+started at the observed 26.73° the high-obliquity state HOLDS, started
+low it is never entered with a static rate (capture needs migration).
+Earth's spin precession sits 1.9× ABOVE the engine's highest s-line —
+no spin-node resonance is reachable — and the control experiment
+(α reduced to its solar third, the Moon removed) drops Earth into the
+band and doubles the obliquity envelope: the Moon-stabilization
+result, restated as a property of the engine's own frequency table.
+A documented limit: the quasi-periodic mode tables show enlarged
+response near resonances, never true chaotic diffusion — the full
+Laskar–Robutel wandering is a statement about the class, not
+reproduced pointwise.
+
 ## Related documents
 
 - [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) — §1.8: the projection identity, the transit test, the candidate slot

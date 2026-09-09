@@ -197,6 +197,9 @@ const CLASSIFICATION = {
     // Chapront et al. (2002) obliquity citation values — Model-vs-literature
     // comparison tables only (registry obliqChapront* keys), never an input.
     obliquityChapront2002: 'target',
+    // Observed planetary spin-precession constants + obliquities (C-4 spin/
+    // Cassini landscape citations, doc 109 §19) — comparison targets only.
+    planetSpinObserved: 'target',
     // Cox & Chao dJ2/dt + Peltier factor — citation inputs of the shipped
     // alphaClimateScale calibration; consumed only by the registry.
     giaCoxChaoPeltier: 'target',

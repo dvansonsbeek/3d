@@ -288,6 +288,16 @@
     "deg10000BC": 24.3053,
     "deg10000AD": 22.637
   },
+  "planetSpinObserved": {
+    "_description": "Observed planetary spin-precession constants and J2000 obliquities — CITATION values for the Stage-C-4 spin/Cassini landscape (doc 109 §19; the labs tools/explore/stage-c4-*.mjs and the spinLandscape* registry keys). Comparison targets ONLY, never model inputs. Sources: Mars spin precession −7608.3 ± 2.1 mas/yr (Konopliv et al. 2016, Icarus 274, 253; InSight combined −7605 ± 3, Kahan et al. 2021, PSS 199) quoted at −7.606 ″/yr; Jupiter α ≈ −2.7…−2.9 ″/yr moment-of-inertia-dependent (Saillenfest, Lari & Courtot 2020, A&A 640, A11), quoted midrange −2.8; Saturn present pole rate ≈ −0.45 ″/yr = ~68% of the long-term rate via the 700-yr Titan cycle, captured in the s8 resonance (Ward & Hamilton 2004, AJ 128, 2501); Mercury Cassini-state lock confirmed by Margot et al. (2007, Science 316, 710). Obliquities (IAU/Archinal et al. WGCCRE): Mars 25.19°, Jupiter 3.13°, Saturn 26.73°.",
+    "marsSpinPrecessionArcsecPerYr": -7.606,
+    "jupiterSpinPrecessionApproxArcsecPerYr": -2.8,
+    "saturnSpinPrecessionPresentArcsecPerYr": -0.45,
+    "saturnPresentToLongTermFraction": 0.68,
+    "marsObliquityJ2000Deg": 25.19,
+    "jupiterObliquityJ2000Deg": 3.13,
+    "saturnObliquityJ2000Deg": 26.73
+  },
   "ascendingNodesSouamiSouchay": {
     "_description": "Raw ascending nodes on invariable plane from Souami & Souchay (2012) Table 2. invariablePlaneOnEclipticDeg is the PLANE's own ascending node on the ecliptic (107°34'56\" — docs/05), consumed only by the model-values registry.",
     "invariablePlaneOnEclipticDeg": 107.582,

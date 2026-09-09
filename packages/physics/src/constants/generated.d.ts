@@ -741,4 +741,13 @@ export declare const REFERENCE_DATA: {
       "max": number;
     };
   };
+  readonly planetSpinObserved: {
+    "marsSpinPrecessionArcsecPerYr": number;
+    "jupiterSpinPrecessionApproxArcsecPerYr": number;
+    "saturnSpinPrecessionPresentArcsecPerYr": number;
+    "saturnPresentToLongTermFraction": number;
+    "marsObliquityJ2000Deg": number;
+    "jupiterObliquityJ2000Deg": number;
+    "saturnObliquityJ2000Deg": number;
+  };
 };

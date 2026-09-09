@@ -14,6 +14,7 @@
  *   moonGrailWilliams2014            target
  *   giaCoxChaoPeltier                target
  *   obliquityChapront2002            target
+ *   planetSpinObserved               target
  *   ascendingNodesSouamiSouchay      target
  *   laplaceLagrangeBounds            target
  *   jplEclipticInclinationTrends     target
@@ -912,5 +913,14 @@ export const REFERENCE_DATA = Object.freeze({
       "min": -200,
       "max": 200
     }
+  },
+  planetSpinObserved: {
+    "marsSpinPrecessionArcsecPerYr": -7.606,
+    "jupiterSpinPrecessionApproxArcsecPerYr": -2.8,
+    "saturnSpinPrecessionPresentArcsecPerYr": -0.45,
+    "saturnPresentToLongTermFraction": 0.68,
+    "marsObliquityJ2000Deg": 25.19,
+    "jupiterObliquityJ2000Deg": 3.13,
+    "saturnObliquityJ2000Deg": 26.73
   },
 });
