@@ -610,6 +610,46 @@ the K4 observational verdict's inner-planet finding now made a standing,
 gate-guarded exhibit. The Moon row (engine-K lunar series) sits at ≈ 4″
 in the reference century.
 
+## 17. The deep-time metronome from the engine's own gravity (Stage B, T5c)
+
+The pre-registered P6 run (Wisdom–Holman order 2, dt 2 d, 1PN, ±10 Myr
+from the JPL J2000 seed, DE440 masses — zero observation-fitted terms)
+was executed and its NAFF mode table extracted at 18 terms. The
+registered T5c criterion — the one the single epoch-local H/3 line can
+never meet — asked whether the engine's OWN dynamics carry the deep
+e-spectrum the rock record shows: the ~405-kyr long-eccentricity
+metronome as the STRONGEST line, with the ~124 and ~95-kyr companions
+present. **It does** — the strongest beat of the derived Earth z lands
+inside the registered 395–415 window with both companions present and
+correctly ranked (confirmed by an independent spectral cross-check).
+
+The instrument is `tools/verify/deep-secular-modes.js` (generator
+class): `--write` re-extracts from the ±10-Myr dump (the 3.4-h run
+command is in its header) and banks the mode tables plus the verdict as
+the governed artifact `data/nbody-deep-secular-modes.json`. The registry
+keys `earthDeepBeatPeriodKyr`, `earthDeepBeatLa2004PeriodKyr`,
+`earthDeepBeatRockKyr`, `earthDeepBeatCompanion124Kyr` /
+`…95Kyr`, `earthDeepG5ArcsecPerYr` / `earthDeepG2ArcsecPerYr`,
+`deepRunSpanYears` and `deepRunConservationMaxDE` read the artifact.
+**Read the live values from the artifact or the keys, never from this
+paragraph.**
+
+Anatomy of the residual gap to the rock value (measured, plan 02 §8
+Stage-B record): the engine's g5 matches La2004 to 0.0002 ″/yr; the
+whole beat gap is g2 sitting ≈ 0.4 % low, which decomposes into the
+deliberately minimal ingredient list (the Earth–Moon pair merged into
+its barycenter, no asteroids — the measured sensitivity class: 1PN
+alone moves g1 by +0.47 ″/yr) plus g2's own chaotic diffusion (measured
+in our own data as a 0.027 ″/yr shift between the 1-Myr and 20-Myr
+window estimates — the size of the entire gap). The attribution
+experiment (Moon as a tenth body + the big-four asteroids, each
+ingredient's shift measured separately) is queued as a research
+follow-up. Two standing readings: the falsification criterion keeps
+using the ROCK metronome, never the engine's reproduction of it; and
+per the registered two-tier decision the 1-Myr era-local table remains
+the in-window evaluator — this deep table owns deep time and NO
+consumer reads it until its per-consumer T5d-revised gate passes.
+
 ## Related documents
 
 - [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) — §1.8: the projection identity, the transit test, the candidate slot

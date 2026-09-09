@@ -1936,6 +1936,63 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── The deep-time metronome verdict (engine-switch Stage B, T5c) ────────
+  // Reads data/nbody-deep-secular-modes.json — the governed ±10-Myr deep
+  // mode table banked by tools/verify/deep-secular-modes.js --write. The
+  // engine's OWN dynamics (JPL seed, zero fitted constants) must carry the
+  // 405-kyr long-eccentricity metronome; La2004 values are theory reference
+  // labels, and the falsification criterion keeps the ROCK 405.6 kyr.
+  ...(() => {
+    const dm = () => rd('data/nbody-deep-secular-modes.json');
+    return {
+      earthDeepBeatPeriodKyr: {
+        get: () => dm().verdict.strongestBeatPeriodKyr,
+        render: (v) => Number(v).toFixed(1), unit: 'kyr',
+        note: 'the STRONGEST eccentricity beat of the engine’s own ±10-Myr Earth z (g2−g5 class) — the deep-time metronome, from gravity alone (T5c PASS window 395–415)',
+      },
+      earthDeepBeatLa2004PeriodKyr: {
+        get: () => dm().verdict.la2004BeatPeriodKyr,
+        render: (v) => Number(v).toFixed(1), unit: 'kyr',
+        note: 'the same beat from La2004 Table-3 g2−g5 (THEORY reference label, never an input)',
+      },
+      earthDeepBeatRockKyr: {
+        get: () => dm().verdict.rockMetronomeKyr,
+        render: (v) => Number(v).toFixed(1), unit: 'kyr',
+        note: 'the rock-record long-eccentricity metronome — the OBSERVED reference the falsification criterion keeps (plan-04 leg; the engine value reproduces it, never replaces it)',
+      },
+      earthDeepBeatCompanion124Kyr: {
+        get: () => dm().verdict.companion124Kyr,
+        render: (v) => Number(v).toFixed(1), unit: 'kyr',
+        note: 'the ~124-kyr companion line of the deep e-spectrum (g4−g2 class), present and correctly ranked',
+      },
+      earthDeepBeatCompanion95Kyr: {
+        get: () => dm().verdict.companion95Kyr,
+        render: (v) => Number(v).toFixed(1), unit: 'kyr',
+        note: 'the ~95-kyr companion line of the deep e-spectrum (g4−g5 class), present and correctly ranked',
+      },
+      earthDeepG5ArcsecPerYr: {
+        get: () => dm().verdict.earthLeadingModesArcsecPerYr[0],
+        render: (v) => Number(v).toFixed(4), unit: '″/yr',
+        note: 'Earth deep z leading mode (g5, Jupiter’s term) from the ±10-Myr NAFF — La2004 gives 4.2575 (theory label)',
+      },
+      earthDeepG2ArcsecPerYr: {
+        get: () => dm().verdict.earthLeadingModesArcsecPerYr[1],
+        render: (v) => Number(v).toFixed(4), unit: '″/yr',
+        note: 'Earth deep z second mode (g2, Venus’s term) — La2004 gives 7.452; the 0.4% gap is the measured omitted-body + chaotic-diffusion budget (plan 02 §8 Stage-B anatomy)',
+      },
+      deepRunSpanYears: {
+        get: () => dm().meta.spanYears,
+        render: (v) => String(v), unit: 'yr',
+        note: 'total span of the deep N-body run behind the metronome verdict (±10 Myr, WH order-2, dt 2 d, 1PN)',
+      },
+      deepRunConservationMaxDE: {
+        get: () => dm().meta.conservationMaxDE,
+        render: (v) => Number(v).toExponential(1),
+        note: 'max |ΔE/E| of the deep run — the symplectic-bound diagnostic',
+      },
+    };
+  })(),
+
   // ── Full-precision J2000 catalog elements (doc-20 reference tables) ─────
   // Straight reads of astro-reference planetOrbitalElements — the JPL/SPICE
   // catalog inputs, rendered at stored precision (String of the raw value).

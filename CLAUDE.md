@@ -10,7 +10,7 @@ directories · ~245 Python files · 75 docs · two web UIs (simulator, `dashboar
 **`npm run check` enforces a twenty-two-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
-Golden masters live in `packages/fixtures/`. Of the 28 scripts in `tools/verify/`,
+Golden masters live in `packages/fixtures/`. Of the 29 scripts in `tools/verify/`,
 only 6 can actually fail — see the Verification section.
 
 ---
@@ -154,13 +154,14 @@ chain at ±1/±5 Myr; the golden master cannot catch that class).
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
-`/gates` runs the standalone model checks. `tools/verify/` holds 28 scripts, and
-**22 of them cannot fail** — no exit path, no assertion, so running them proves
+`/gates` runs the standalone model checks. `tools/verify/` holds 29 scripts, and
+**23 of them cannot fail** — no exit path, no assertion, so running them proves
 nothing. `npm run test:verify:list` gives the classification: 6 gate · 3 liftable
-· 12 narrative · 7 generator (the suite FAILS on any unclassified script). **Never
+· 12 narrative · 8 generator (the suite FAILS on any unclassified script). **Never
 run a generator as a test** — `balance-search.js` rewrites the tracked
 `data/balance-presets.json`, `nbody-secular.js` rewrites
-`data/nbody-secular-frequencies.json`, `measure-rms-by-epoch.js` rewrites
+`data/nbody-secular-frequencies.json`, `deep-secular-modes.js` rewrites
+`data/nbody-deep-secular-modes.json`, `measure-rms-by-epoch.js` rewrites
 `data/chain-vs-jpl-rms.json` under `--write` (a plain run only prints), and
 the four campaign generators (cassini-results / lod-climate-correlation /
 eclipse-audit / lunar-alignment) rewrite their `data/*.json` under
@@ -235,7 +236,7 @@ what actually made corrections stick here.
 | `src/script.js` | browser scene + UI + formulas (monolith) |
 | `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
-| `tools/verify/` | 28 scripts: 6 gate · 3 liftable · 12 narrative · 7 generator (`npm run test:verify:list`) |
+| `tools/verify/` | 29 scripts: 6 gate · 3 liftable · 12 narrative · 8 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | ~200 research one-offs — findings live in `docs/` |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |
