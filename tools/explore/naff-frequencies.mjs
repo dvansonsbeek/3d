@@ -146,7 +146,11 @@ for (const k of Object.keys(D.elements)) {
   zModes.forEach((f, i) => { const asy = f.omega / D2R * 3600; console.log(`   ${i + 1}  ${asy.toFixed(4).padStart(10)} ${(asy * 100).toFixed(1).padStart(8)} ${(360 * 3600 / asy).toFixed(0).padStart(12)} ${f.ampl.toFixed(5).padStart(9)}   ${nearest8HN(asy).padStart(12)}   ${nearestLaskar(asy, LASKAR.g)}`); });
   console.log(`   ζ = sin(i/2)·e^{iΩ} (nodal)`);
   console.log('   #    freq ″/yr    ″/cy     period yr     ampl     nearest 8H/N   nearest Laskar s');
-  const sModes = naff(sr, si, Math.min(NTERMS, 8));
+  // zterms=N sets the ζ depth INDEPENDENTLY of terms= when given
+  // explicitly (the Stage-C era-ζ pass runs terms=1 zterms=8 — ζ is
+  // independent of z); without it, the historical min(terms, 8) cap holds
+  // so every prior invocation is unchanged.
+  const sModes = naff(sr, si, KV.zterms ? Number(KV.zterms) : Math.min(NTERMS, 8));
   sModes.forEach((f, i) => { const asy = f.omega / D2R * 3600; console.log(`   ${i + 1}  ${asy.toFixed(4).padStart(10)} ${(asy * 100).toFixed(1).padStart(8)} ${(360 * 3600 / asy).toFixed(0).padStart(12)} ${f.ampl.toFixed(5).padStart(9)}   ${nearest8HN(asy).padStart(12)}   ${nearestLaskar(asy, LASKAR.s)}`); });
   const toRow = (f) => ({ omegaRadPerYr: f.omega, re: f.ampl * Math.cos(f.phaseDeg * D2R), im: f.ampl * Math.sin(f.phaseDeg * D2R) });
   MODES[k] = { z: zModes.map(toRow), zeta: sModes.map(toRow) };

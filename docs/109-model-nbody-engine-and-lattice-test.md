@@ -666,6 +666,50 @@ mover is −430 Athens/Thucydides crossing the geographic boundary at
 1043 km); Babylon −135 inside its 16-min UT window (12 min); the
 ΔT-band comparison bit-identical; cross-engine 157/157 bit-exact.
 
+## 18. The obliquity hybrid — the spin family meets the chain (Stage C)
+
+The two engines produce Earth's obliquity history jointly, from one
+averaged precession equation and zero fitted constants: the spin axis
+integrated under ds/dt = α (ŝ·n̂)(ŝ×n̂), with the orbit normal n̂(t)
+from ENGINE D (the deep ζ-modes of `data/nbody-deep-secular-modes.json`,
+anchored at the JPL J2000 seed) and a single ENGINE-K anchor,
+α = (H/13 rate)/cos ε₀. Nothing else enters.
+
+Three results, banked as the governed artifact
+`data/obliquity-hybrid-verdict.json` by `tools/verify/obliquity-hybrid.js`
+(generator class; it runs the one-home lab
+`tools/explore/stage-c-obliquity-hybrid.mjs`). The registry keys
+`epsHybridRateJ2000ArcsecCy` / `epsHybridIauRateArcsecCy`,
+`epsHybridAlphaArcsecPerYr`, `epsHybridBeatKyr`,
+`epsHybridEraRms13KyrArcsec` / `epsFittedLawRms13KyrArcsec` and
+`epsHybridDeepRms1MyrArcsec` / `epsHybridDeepCorr1Myr` read the
+artifact. **Read the live values from the artifact or the keys, never
+from this paragraph.**
+
+First, **an input becomes an output**: the scene machinery *solves* its
+tilt amplitude against the IAU obliquity rate; the hybrid *derives*
+that rate from the engine's own node modes plus the H/13 anchor, to a
+quarter-percent. Second, **the H/8 identity is derived, not asserted**:
+the dominant obliquity beat emerges as |ψ̇| − |s₃| ≈ 41 kyr — the
+lattice's spin-side reading produced natively by the dynamics. Third,
+**the fidelity ladder** (vs La2004, a theory reference): the era
+ζ-slice beats the shipped 16-harmonic fitted law by an order of
+magnitude in the 13-kyr insolation window, and the full deep ζ-table
+holds a flat ~0.1° error profile with correlation ≈ 0.99 across the
+entire megayear, where the fitted law decorrelates beyond ~50 kyr. The
+two-tier structure (era slice vs deep table) is the same measured
+era-local/deep-global tension the eccentricity story showed, resolved
+the same way. Also derived en route, from shared constants alone: the
+solar fraction of the precession torque, f_S ≈ 0.316 (the literature
+value). The convention catch worth recording: the J2000 celestial pole
+sits at ecliptic longitude +90°; the −90° choice produces a perfect
+ANTI-correlation — the instant tell.
+
+The shipping design (whether this replaces the fitted ε law and
+dissolves the scene's amplitude-solve) is the registered Stage-C arc in
+the plan; until it lands, the fitted law remains the certified basis
+and this section is evidence content.
+
 ## Related documents
 
 - [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) — §1.8: the projection identity, the transit test, the candidate slot

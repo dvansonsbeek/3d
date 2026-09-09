@@ -73,6 +73,8 @@ const MANIFEST = [
     writes: 'data/eclipse-audit-summary.json (tracked; --write only, REFUSES on divergence — --rebaseline is the conscious re-measurement path)' },
   { n: 'nbody-secular.js', class: 'generator', ms: 1200000, slow: true,
     writes: 'data/nbody-secular-frequencies.json (tracked; --write only — one 1-Myr WH frame=both run + NAFF, ~15-20 min). Engine-D g/s frequencies (A), 1800–2100 window rates (B), the derived 1PN supplement + the P8b Mercury closure assertion (Batch D of the restatement)' },
+  { n: 'obliquity-hybrid.js', class: 'generator', ms: 90000, slow: true,
+    writes: 'data/obliquity-hybrid-verdict.json (tracked; --write only — runs the one-home Stage-C lab: the derived deps/dt(J2000) beside the IAU target, the two-tier eps-vs-La2004 window tables, the H/8 beat). A plain run only prints the banked verdict' },
   { n: 'deep-secular-modes.js', class: 'generator', ms: 4800000, slow: true,
     writes: 'data/nbody-deep-secular-modes.json (tracked; --write only — needs the untracked ±10-Myr dump, produced by a separate 3.4-h run named in the header; then decimate + NAFF 18 terms, ~75 min). The two-tier deep-time Earth-z law + the T5c metronome verdict (engine-switch Stage B); NO consumer reads it until its T5d-revised gate passes. A plain run only prints the banked verdict' },
   { n: 'lunar-alignment.js', class: 'generator', ms: 82000, slow: true,

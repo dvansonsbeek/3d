@@ -62,6 +62,12 @@ const DUMP = path.join(ROOT, 'tools', 'explore', 'lattice-long-window-ecliptic-2
 const RUN_CMD = 'node tools/explore/lattice-long-window-test.mjs years=20000000 integrator=wh dt=2 order=2 gr=1 frame=both sample=20000';
 const DECIMATE = 4;
 const NAFF_TERMS = 18;
+// Stage C: the obliquity hybrid consumes the deep ζ table — 16 terms
+// (the z rows are unaffected; NAFF is deterministic, so re-extraction
+// reproduces them bit-for-bit and the lunar chain's embed is unchanged
+// in content).
+const NAFF_ZETA_TERMS = 16;
+const NAFF_ZETA_TERMS_ERA = 8;   // the era-tier ζ table is its OWN extraction
 const RAD2AS = (180 / Math.PI) * 3600;
 // Laskar 2004 Table 3 reference values — THEORY labels, never inputs.
 const LA2004 = { g5: 4.2575, g2: 7.452 };
@@ -122,10 +128,20 @@ const tmpModes = path.join(os.tmpdir(), 'deep-secular-modes.tmp.json');
   fs.writeFileSync(tmpDump, JSON.stringify(dec));
 }
 
-console.log(`NAFF at ${NAFF_TERMS} terms (the one-home analyzer; ~75 min) …`);
-execFileSync('node', [path.join(ROOT, 'tools', 'explore', 'naff-frequencies.mjs'), `file=${tmpDump}`, `terms=${NAFF_TERMS}`, `out=${tmpModes}`],
+console.log(`NAFF at ${NAFF_TERMS} terms (the one-home analyzer; ~2 h) …`);
+execFileSync('node', [path.join(ROOT, 'tools', 'explore', 'naff-frequencies.mjs'), `file=${tmpDump}`, `terms=${NAFF_TERMS}`, `zterms=${NAFF_ZETA_TERMS}`, `out=${tmpModes}`],
   { stdio: ['ignore', 'inherit', 'inherit'], env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=8192' } });
 const MT = JSON.parse(fs.readFileSync(tmpModes, 'utf8'));
+
+// SECOND ζ pass — the ERA tier (Stage C two-tier verdict). A top-8 SLICE of
+// the deep table is NOT the pure 8-term extraction (Gram–Schmidt on the
+// later multiplet terms reshapes the early amplitudes — measured: the
+// sliced era rate drifts 0.5″/cy). The era tier is therefore its own
+// extraction: zterms=8 (terms=1 skips the z work — ζ is independent of z).
+console.log('NAFF era-ζ pass (zterms=8; ~15 min) …');
+execFileSync('node', [path.join(ROOT, 'tools', 'explore', 'naff-frequencies.mjs'), `file=${tmpDump}`, 'terms=1', `zterms=${NAFF_ZETA_TERMS_ERA}`, `out=${tmpModes}`],
+  { stdio: ['ignore', 'inherit', 'inherit'], env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=8192' } });
+const MT_ERA = JSON.parse(fs.readFileSync(tmpModes, 'utf8'));
 fs.unlinkSync(tmpDump); fs.unlinkSync(tmpModes);
 
 // verdict + assertions
@@ -150,8 +166,9 @@ const art = {
     dumpFile: 'tools/explore/lattice-long-window-ecliptic-20000000-gr.local.json (untracked, 337 MB)',
     dumpSha256: dumpSha,
     conservationMaxDE: maxDE,
-    decimation: DECIMATE, naffTerms: NAFF_TERMS,
-    frame: 'ecliptic-J2000 (z-modes; the invariable-plane ζ deep table is not banked — no registered consumer)',
+    decimation: DECIMATE, naffTerms: NAFF_TERMS, naffZetaTerms: NAFF_ZETA_TERMS,
+    naffZetaTermsEra: NAFF_ZETA_TERMS_ERA,
+    frame: 'ecliptic-J2000 (z-modes for the lunar-chain e; ζ-modes for the Stage-C obliquity hybrid — the invariable-frame ζ table remains unbanked, no consumer)',
     laskarRef: 'Laskar, J. et al. (2004), A&A 428, 261–285, Table 3 (theory reference labels)',
   },
   verdict: {
@@ -166,6 +183,9 @@ const art = {
     note: 'g5 matches La2004 to 0.0002 ″/yr; the beat gap vs 405.6 is g2 (chaotic-diffusion window sensitivity + omitted separate-Moon/asteroid terms) — the anatomy is the plan’s Stage-B record.',
   },
   modes: MT.modes,
+  // The era-tier ζ table (pure 8-term extraction — the Stage-C obliquity
+  // hybrid's J2000-local tier; NOT a slice of the deep table, see above).
+  earthZetaEra: MT_ERA.modes.earth.zeta,
   inputs: buildInputsBlock('node tools/verify/deep-secular-modes.js --write', [
     'tools/verify/deep-secular-modes.js',
     'tools/explore/naff-frequencies.mjs',

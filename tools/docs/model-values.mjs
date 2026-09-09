@@ -1993,6 +1993,58 @@ export const VALUES = {
     };
   })(),
 
+  // ── The Stage-C obliquity hybrid (engine-switch record, K8b-3 opener) ───
+  // Reads data/obliquity-hybrid-verdict.json — banked by
+  // tools/verify/obliquity-hybrid.js --write from the one-home lab: ε(t)
+  // from the averaged precession equation, orbit plane from engine D's deep
+  // ζ-modes, ONE engine-K anchor α = (H/13 rate)/cos ε₀, zero fitted
+  // constants. La2004 is a THEORY reference label.
+  ...(() => {
+    const oh = () => rd('data/obliquity-hybrid-verdict.json');
+    return {
+      epsHybridRateJ2000ArcsecCy: {
+        get: () => oh().verdict.rateEraArcsecPerCy,
+        render: (v) => Number(v).toFixed(2), unit: '″/cy',
+        note: 'dε/dt at J2000 DERIVED by the hybrid (engine-D ζ-modes + the H/13 anchor, zero fitted constants; the era ζ-tier, where J2000-local quantities live) — the quantity the shipped scene A-solve TARGETS',
+      },
+      epsHybridIauRateArcsecCy: {
+        get: () => oh().verdict.iauRateArcsecPerCy,
+        render: (v) => Number(v).toFixed(2), unit: '″/cy',
+        note: 'the IAU obliquity-rate reference beside the derived value (astro-reference home)',
+      },
+      epsHybridAlphaArcsecPerYr: {
+        get: () => oh().verdict.alphaArcsecPerYr,
+        render: (v) => Number(v).toFixed(3), unit: '″/yr',
+        note: 'the precession constant α = (H/13 rate)/cos ε₀ — the hybrid’s single engine-K anchor (literature ~54.9)',
+      },
+      epsHybridBeatKyr: {
+        get: () => oh().verdict.beatKyr,
+        render: (v) => Number(v).toFixed(1), unit: 'kyr',
+        note: 'the dominant obliquity beat |ψ̇| − |s₃| derived by the hybrid — the H/8 identity, produced natively',
+      },
+      epsHybridEraRms13KyrArcsec: {
+        get: () => oh().verdict.windowsEra['13'].hybridRmsArcsec,
+        render: (v) => Number(v).toFixed(0), unit: '″',
+        note: 'hybrid ε vs La2004 over 0–13 kyr (the era ζ-slice of the two-tier verdict)',
+      },
+      epsFittedLawRms13KyrArcsec: {
+        get: () => oh().verdict.windowsEra['13'].fittedLawRmsArcsec,
+        render: (v) => Number(v).toFixed(0), unit: '″',
+        note: 'the shipped 16-harmonic fitted ε law vs La2004 over the same 0–13 kyr window — the budget the hybrid beats',
+      },
+      epsHybridDeepRms1MyrArcsec: {
+        get: () => oh().verdict.windowsFull['1000'].hybridRmsArcsec,
+        render: (v) => Number(v).toFixed(0), unit: '″',
+        note: 'hybrid ε vs La2004 over the full megayear (the deep ζ-table tier) — a flat error profile where the fitted law decorrelates',
+      },
+      epsHybridDeepCorr1Myr: {
+        get: () => oh().verdict.windowsFull['1000'].hybridCorr,
+        render: (v) => Number(v).toFixed(3),
+        note: 'hybrid-vs-La2004 correlation over the full megayear (the fitted law’s is negative there)',
+      },
+    };
+  })(),
+
   // ── Full-precision J2000 catalog elements (doc-20 reference tables) ─────
   // Straight reads of astro-reference planetOrbitalElements — the JPL/SPICE
   // catalog inputs, rendered at stored precision (String of the raw value).
