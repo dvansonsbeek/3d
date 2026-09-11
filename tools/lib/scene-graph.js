@@ -599,6 +599,7 @@ class Node {
     this.worldMatrix = new Mat4();
     this.children = [];
     this.parent = null;
+    this.extraMatrix = null;               // one-source tilt hook (see updateWorldMatrix)
   }
 
   addChild(child) {
@@ -609,6 +610,13 @@ class Node {
 
   updateWorldMatrix() {
     this.localMatrix.compose(this.px, this.py, this.pz, this.rx, this.ry, this.rz);
+    // One-source tilt correction hook (C-4b): an optional PRE-multiplied
+    // local matrix — the exact Node twin of the browser's wrapper Group
+    // (a parent-frame rotation about this node's origin). null when the
+    // one-source option is off; nothing else ever sets it.
+    if (this.extraMatrix) {
+      this.localMatrix.multiplyMatrices(this.extraMatrix, this.localMatrix);
+    }
     if (this.parent) {
       this.worldMatrix.multiplyMatrices(this.parent.worldMatrix, this.localMatrix);
     } else {
@@ -1175,6 +1183,95 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
 // MOVE MODEL — Update all rotations/positions for a given pos
 // ═══════════════════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════════════════
+// ONE-SOURCE MOVEMENT (C-4b) — the CSV re-base mode. When enabled, Earth's
+// scene ε(t) and e(t) come from the SAME construction the browser's
+// ?hybridSpin runs (tools/lib/deep-orbital-history.createOneSourceMovement:
+// banked engine series inside ±10 Myr, deep mode tail beyond, α(t) on the
+// SECULAR H(t) scaling): e substitutes at the two scene-driving sites
+// (moveModel dynEcc.earth / computeSunPositionFast earthEcc — the geometric
+// PeriPrec2 offset and the Sun EoC inherit it), and ε is driven
+// geometrically by the extraMatrix twin of the browser's tilt-correction
+// wrapper (rotation about the node line û = a×n by ε_geom − ε_target,
+// pulled into the rotAxis parent frame; Earth sits at the origin —
+// orbitRadius 0 — so the pure rotation IS the wrapper). DEFAULT OFF: the
+// certified exporters and every fixture run the K device byte-identical.
+// Enable via setOneSourceMovement(true) or env SG_ONE_SOURCE=1.
+// ═══════════════════════════════════════════════════════════════════════════
+let _osmRequested = process.env.SG_ONE_SOURCE === '1';
+let _osmInstance;   // undefined = unresolved · null = series artifact absent · else {epsDeg, e}
+function setOneSourceMovement(on) {
+  _osmRequested = !!on;
+  if (!on) _osmInstance = undefined;   // re-resolve on the next enable
+}
+function _oneSourceM() {
+  if (!_osmRequested) return null;
+  if (_osmInstance === undefined) {
+    _osmInstance = require('./deep-orbital-history.js').createOneSourceMovement();
+    if (!_osmInstance) throw new Error('one-source movement requested but data/nbody-secular-series.json is absent');
+  }
+  return _osmInstance;
+}
+// The sampling year: the browser's _yearForObliquity convention exactly —
+// SI-year mapping in deep-time mode, the linear tropical count otherwise.
+function _osmYearForJD(jd, linearYear) {
+  return DEEP_TIME_ENABLED ? _jdToSIyearTools(jd) : linearYear;
+}
+// The tilt correction (mirror of src/script.js updatePredictions' wrapper
+// block): reset, read the K geometry (rotAxis world Y vs barycenter-pivot
+// world Y — no scale anywhere, so the matrix Y columns ARE the rotated unit
+// vectors), rotate about û = a×n by (ε_geom − ε_target) in world, expressed
+// in the parent frame as Rpᵀ·K·Rp. Self-clears when the option is off.
+function _applyOneSourceTiltCorr(graph, year) {
+  const ra = graph.earthNodes.rotAxis;
+  const M = _oneSourceM();
+  if (!M) {
+    if (ra.extraMatrix) { ra.extraMatrix = null; graph.root.updateWorldMatrix(); }
+    return;
+  }
+  if (ra.extraMatrix) { ra.extraMatrix = null; graph.root.updateWorldMatrix(); }
+  const ae = ra.worldMatrix.e, ne = graph.barycenter.pivot.worldMatrix.e;
+  let ax = ae[4], ay = ae[5], az = ae[6];
+  { const s = Math.hypot(ax, ay, az); ax /= s; ay /= s; az /= s; }
+  let nx = ne[4], ny = ne[5], nz = ne[6];
+  { const s = Math.hypot(nx, ny, nz); nx /= s; ny /= s; nz /= s; }
+  const epsGeom = Math.acos(Math.min(1, Math.max(-1, ax * nx + ay * ny + az * nz)));
+  const epsTarget = M.epsDeg(year) * Math.PI / 180;
+  let ux = ay * nz - az * ny, uy = az * nx - ax * nz, uz = ax * ny - ay * nx;
+  const ul = Math.hypot(ux, uy, uz);
+  if (ul * ul <= 1e-12) return;
+  ux /= ul; uy /= ul; uz /= ul;
+  const th = epsGeom - epsTarget;
+  const c = Math.cos(th), s = Math.sin(th), t = 1 - c;
+  // Rodrigues, row-major K[r][c] (world frame)
+  const K = [
+    [t * ux * ux + c,      t * ux * uy - s * uz, t * ux * uz + s * uy],
+    [t * ux * uy + s * uz, t * uy * uy + c,      t * uy * uz - s * ux],
+    [t * ux * uz - s * uy, t * uy * uz + s * ux, t * uz * uz + c],
+  ];
+  // Parent world rotation Rp (row-major from the column-major Mat4)
+  const pe = ra.parent.worldMatrix.e;
+  const Rp = [
+    [pe[0], pe[4], pe[8]],
+    [pe[1], pe[5], pe[9]],
+    [pe[2], pe[6], pe[10]],
+  ];
+  // X = Rpᵀ · K · Rp
+  const KR = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++)
+    for (let k = 0; k < 3; k++) KR[i][j] += K[i][k] * Rp[k][j];
+  const X = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++)
+    for (let k = 0; k < 3; k++) X[i][j] += Rp[k][i] * KR[k][j];
+  const m = new Mat4();
+  const e = m.e;
+  e[0] = X[0][0]; e[1] = X[1][0]; e[2] = X[2][0];
+  e[4] = X[0][1]; e[5] = X[1][1]; e[6] = X[2][1];
+  e[8] = X[0][2]; e[9] = X[1][2]; e[10] = X[2][2];
+  ra.extraMatrix = m;
+  graph.root.updateWorldMatrix();
+}
+
 function moveModel(graph, pos) {
   // Compute dynamic eccentricities for all planets (oscillate at H/16)
   // Uses _epochCache.mSY so the pos→JD→year round-trip is consistent with
@@ -1188,7 +1285,13 @@ function moveModel(graph, pos) {
   const currentYear = C.startModelYearWithCorrection + pos;
   // Unification: Earth's per-frame eccentricity is the ONE law (H/3 line);
   // the H/16 law-of-cosines form below serves only the planets' wobble laws.
-  const dynEcc = { earth: OE.computeEccentricityEarth(currentYear) };
+  // One-source movement (C-4b): under the option, Earth's e(t) substitutes
+  // from the banked engine series (the browser _sceneEccTargetAt twin) — the
+  // PeriPrec2 geometric offset and the Sun's EoC inherit it below.
+  const _osmM = _oneSourceM();
+  const dynEcc = { earth: _osmM
+    ? _osmM.e(_osmYearForJD(_jdFromPosTools(pos), currentYear))
+    : OE.computeEccentricityEarth(currentYear) };
   // Unification: the geometric eccentricity offset (the PeriPrec2 centre)
   // carries the one law's e(t) EVERY FRAME. The planet chains replicate the
   // Sun geometrically (centre offset + circle, no equation of centre), so
@@ -1488,6 +1591,10 @@ function moveModel(graph, pos) {
 
   // Update all world matrices from root
   graph.root.updateWorldMatrix();
+
+  // One-source movement (C-4b): drive the visible tilt to the series ε —
+  // the browser wrapper's Node twin. No-op (self-clearing) when off.
+  _applyOneSourceTiltCorr(graph, _osmYearForJD(currentJD, currentYear));
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1800,7 +1907,12 @@ function computeSunPositionFast(jd) {
   // pos IS the tropical-year count from startmodelJD (see the block at
   // computePositions): startModelYearWithCorrection + pos, one convention.
   const currentYear = C.startModelYearWithCorrection + pos;
-  const earthEcc = OE.computeEccentricityEarth(currentYear);   // the ONE law (unification)
+  // One-source movement (C-4b): under the option e(t) substitutes from the
+  // banked engine series (mirrors the moveModel site; the EoC below inherits).
+  const _osmM = _oneSourceM();
+  const earthEcc = _osmM
+    ? _osmM.e(_osmYearForJD(jd, currentYear))
+    : OE.computeEccentricityEarth(currentYear);   // the ONE law (unification)
   graph.earthPeriPrec2.container.px = -earthEcc * 100;   // geometric offset = full e(t) (mirrors moveModel)
 
   // Animate a single node: orbit.ry = θ (with EoC if applicable)
@@ -1849,6 +1961,11 @@ function computeSunPositionFast(jd) {
   // Update world matrices from root
   graph.root.updateWorldMatrix();
 
+  // One-source movement (C-4b): the tilt correction goes on BEFORE the
+  // extraction — sun ra/dec here are read from the graph geometry via
+  // rotAxis.worldToLocal, so ε must already be the series ε.
+  _applyOneSourceTiltCorr(graph, _osmYearForJD(jd, currentYear));
+
   // Extract Sun position in Earth's equatorial frame
   const earthRotAxisWP = graph.earthNodes.rotAxis.getWorldPosition();
   const sunWP = graph.sunNodes.pivot.getWorldPosition();
@@ -1879,6 +1996,7 @@ module.exports = {
   thetaToRaHours,
   buildSceneGraph,
   moveModel,
+  setOneSourceMovement,   // C-4b: the CSV re-base mode (series ε/e drive the scene; default off)
   _invalidateGraph,
   // Expose internals for testing
   Mat4,

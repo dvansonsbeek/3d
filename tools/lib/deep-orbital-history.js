@@ -47,4 +47,69 @@ function createDeepOrbitalHistory() {
   });
 }
 
-module.exports = { createDeepOrbitalHistory };
+/**
+ * THE ONE-SOURCE MOVEMENT — Node binding (the CSV re-base precursor,
+ * plan 02 Stage C / C-4b): ε(t) and e(t) from the SAME construction the
+ * browser's ?hybridSpin runs — the banked engine series inside ±10 Myr
+ * (data/nbody-secular-series.json), the deep mode tables as the tail, and
+ * α(t) = ψ̇(t)/cos ε₀ with the SECULAR H(t) scaling only
+ * (period₀·H(t)/H₀ — the leg-1 claim; the instantaneous year-length beat
+ * double-counts the equinox wobble, the measured C-4b catch).
+ *
+ * Returns { epsDeg(year), e(year) } over a grown cached grid (the browser
+ * sampler pattern, 250-aligned tiers per the factory's stepping contract),
+ * or null when the series artifact is absent. Consumers: the scene-graph
+ * one-source option (setOneSourceMovement — the CSV exporter's re-base
+ * mode) and the cross-engine parity probes.
+ */
+function createOneSourceMovement() {
+  let seriesArt;
+  try {
+    seriesArt = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8'));
+  } catch (e) { return null; }
+  const ART = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-deep-secular-modes.json'), 'utf8'));
+  const { CHAIN_ARTIFACT } = require('../../packages/physics/src/planets/chain-artifact.js');
+  const { createDeepOrbitalHistory: factory } = require('../../packages/physics/src/earth/deep-orbital-history.cjs');
+  const DT = require('./deep-time.js');
+  const C = require('./constants.js');
+
+  const AE = CHAIN_ARTIFACT.j2000AnchorElements.earth;
+  const sidDays = DT.computeSiderealYearDaysDirect(2000);
+  const solDays = DT.computeSolarYearDaysDirect(2000);
+  const axial0 = sidDays / (sidDays - solDays);
+  const H0 = DT.meanHAtAge(0);
+  const eb = seriesArt.bodies.earth;
+
+  const tier = factory({
+    zModes: ART.modes.earth.z,
+    zetaModes: ART.modes.earth.zeta,
+    zetaSeries: { t0Yr: seriesArt.t0Yr, stepYr: eb.stepYr, q: eb.zetaQ, p: eb.zetaP },
+    zSeries: { t0Yr: seriesArt.t0Yr, stepYr: eb.stepYr, q: eb.zQ, p: eb.zP },
+    anchorE: AE.e,
+    anchorPeriEclipticDeg: AE.lonPeriEclipticDeg,
+    anchorInclEclipticDeg: AE.inclEclipticDeg,
+    anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
+    axialPrecessionYearsJ2000: axial0,
+    obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
+    axialPrecessionYearsAtYearFn: (yr) => axial0 * DT.meanHAtAge((2000 - yr) / 1e6) / H0,
+  });
+
+  // grown-grid sampler (the browser's tiers: 250-aligned beyond ±50 kyr)
+  let sampler = null, rangeYr = 0;
+  const gridStep = (need) => (need <= 50000 ? 100 : need <= 2000000 ? 1000 : 5000);
+  const sampleAt = (year) => {
+    const t = year - 2000;
+    const need = Math.max(20000, Math.abs(t) * 1.25);
+    if (!sampler || need > rangeYr) {
+      rangeYr = need;
+      sampler = tier.build(need, -need, gridStep(need));
+    }
+    return sampler.at(t);
+  };
+  return {
+    epsDeg: (year) => sampleAt(year).epsDeg,
+    e: (year) => sampleAt(year).e,
+  };
+}
+
+module.exports = { createDeepOrbitalHistory, createOneSourceMovement };
