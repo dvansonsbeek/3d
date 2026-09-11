@@ -34,6 +34,8 @@
  * @param {{
  *   zModes: ReadonlyArray<{omegaRadPerYr: number, re: number, im: number}>,
  *   zetaModes: ReadonlyArray<{omegaRadPerYr: number, re: number, im: number}>,
+ *   zetaSeries?: {t0Yr: number, stepYr: number,
+ *                 q: ReadonlyArray<number>, p: ReadonlyArray<number>},
  *   anchorE: number,
  *   anchorPeriEclipticDeg: number,
  *   anchorInclEclipticDeg: number,
@@ -44,10 +46,18 @@
  *   per consumer: era = its own 8-term extraction, deep = the 16-term
  *   table; NEVER a slice); anchors from the chain artifact's one home; the
  *   axial-precession years and ε₀ from the injecting engine's certified
- *   surfaces.
+ *   surfaces. zetaSeries (C-2, the ONE-SOURCE evaluator): the BANKED engine
+ *   ζ series (data/nbody-earth-zeta-series.json) — when supplied, n̂(t)
+ *   reads the series itself inside its span (no mode extraction, no tiers;
+ *   measured at the 500-yr artifact cadence: 0.16″/0.18″ rms vs IAU-2006
+ *   over 1900–2100/1600–2400 vs the era tier's 0.31″/0.63″, and 0.0396°
+ *   vs La2004 over −200 kyr vs the deep tier's 0.069° — the C-1 verdict,
+ *   plan 02) and zetaModes serves only as the TAIL beyond the span (the
+ *   seam at the span edge is the extraction residual, far outside every
+ *   certified window).
  */
 function createDeepOrbitalHistory({
-  zModes, zetaModes,
+  zModes, zetaModes, zetaSeries,
   anchorE, anchorPeriEclipticDeg, anchorInclEclipticDeg, anchorAscNodeEclipticDeg,
   axialPrecessionYearsJ2000, obliquityJ2000Deg,
 }) {
@@ -70,8 +80,28 @@ function createDeepOrbitalHistory({
     return (/** @type {number} */ t) => { const [x, y] = sum(t); return [x + R[0], y + R[1]]; };
   };
   const s2h = Math.sin(anchorInclEclipticDeg / 2 * D2R);
-  const zetaAt = mkAnchored(zetaModes,
+  const zetaAnchor = /** @type {[number, number]} */ (
     [s2h * Math.cos(anchorAscNodeEclipticDeg * D2R), s2h * Math.sin(anchorAscNodeEclipticDeg * D2R)]);
+  const zetaModeSum = mkAnchored(zetaModes, zetaAnchor);
+  // C-2 one-source path: inside the banked series span, n̂(t) reads the
+  // engine's own ζ series (anchored at J2000 exactly like the mode sums);
+  // outside it, the anchored mode sum is the tail. Without zetaSeries the
+  // mode sum serves at every t — the pre-C-2 behavior, bit-identical.
+  let zetaAt = zetaModeSum;
+  if (zetaSeries) {
+    const { t0Yr, stepYr, q: sq, p: sp } = zetaSeries;
+    const nS = sq.length, tEndYr = t0Yr + (nS - 1) * stepYr;
+    const li = (/** @type {ReadonlyArray<number>} */ arr, /** @type {number} */ tt) => {
+      const x = (tt - t0Yr) / stepYr;
+      const i = Math.max(0, Math.min(nS - 2, Math.floor(x)));
+      const f = x - i;
+      return arr[i] * (1 - f) + arr[i + 1] * f;
+    };
+    const R = [zetaAnchor[0] - li(sq, 0), zetaAnchor[1] - li(sp, 0)];
+    zetaAt = (/** @type {number} */ t) => (t >= t0Yr && t <= tEndYr)
+      ? [li(sq, t) + R[0], li(sp, t) + R[1]]
+      : zetaModeSum(t);
+  }
   const zAt = mkAnchored(zModes,
     [anchorE * Math.cos(anchorPeriEclipticDeg * D2R), anchorE * Math.sin(anchorPeriEclipticDeg * D2R)]);
 
