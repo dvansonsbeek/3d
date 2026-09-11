@@ -168,8 +168,9 @@ function loadData() {
       // phaseAdvanceRadians -> cyclesBetweenYears(BAL, _jdToSIyear(jd), div)).
       // Replaces the snapshot argument (year - balancedYear)/H: `Model Year` is
       // a chaining step counter, not a year, so it is not a phase under deep
-      // time. See tools/fit/obliquity-harmonics.js for the measured comparison
-      // (SI axis 0.006" vs calendar axis 0.377" on the same data).
+      // time. See tools/fit/archive/obliquity-harmonics.cjs (the retired 6b
+      // fitter) for the measured comparison (SI axis 0.006" vs calendar axis
+      // 0.377" on the same data).
       //
       // Labelled at the SS ENDPOINT, matching the existing `year` label, even
       // though the value is a mean over the preceding `step` years and is

@@ -18,6 +18,7 @@ __pycache__/
 docs/archive/
 docs/scripts/archive/
 tools/explore/archive/
+tools/fit/archive/
 scripts/archive/
 web-bundles/
 tools/cardinal-points-training.json

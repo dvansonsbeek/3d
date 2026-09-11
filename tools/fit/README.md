@@ -216,7 +216,6 @@ then `npm run constants:generate` (Step 9).
 |--------|----------|-------------|
 | `derive-eccentricity-amplitudes.js` | Verification only (no output) | Verifies K-derived amplitudes match runtime |
 | `export-solar-measurements.js` | `data/02-solar-measurements.csv` | Scene-graph simulation (1-year steps, single pass) |
-| `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-solar-measurements.csv` |
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
 | `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/02-solar-measurements.csv` |
 | `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (H-lattice terms; **see design rule above** — only divisors n where H/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime H-lattice filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. **2026-08 (FQ-3): retired from the moveModel display path** (exact-Kepler corrector, doc 65); still consumed by the Step-6a instrument + the legacy A/B path, and still fitter-owned here. |
@@ -307,12 +306,9 @@ When model parameters change, refit in this order. The logic:
    from a single scene-graph pass at 1-year steps (depends on everything above).
    Fitting scripts downsample by `stepYears` for efficiency.
 7. Tropical year is derived from cardinal point harmonics (no separate step)
-8. `SOLSTICE_OBLIQUITY_MEAN_FITTED` (Step 6b) feeds back into the scene graph,
-   creating a circular dependency. For full self-consistency after parameter
-   changes, run the pipeline twice. The first pass establishes the correct
-   obliquity mean; the second pass ensures all downstream steps use the
-   corrected value. In practice the effect is small (~1.5" obliquity shift),
-   but a second pass guarantees convergence.
+8. `SOLSTICE_OBLIQUITY_MEAN_FITTED` still feeds the scene graph's K device,
+   but its fitter (Step 6b) is RETIRED — coefficients frozen, so the old
+   circular dependency (second full pipeline pass, ~1.5" effect) is closed.
 9. The Sun T² polynomial correction (Meeus Ch.25 +0.0003032°/T²) that
    formerly paired with the Sun harmonics has been **REMOVED 2026-06**
    per the H-lattice design rule (polynomial-in-T terms grow without
@@ -569,11 +565,23 @@ Step 6a: export-solar-measurements.js         → data/02-solar-measurements.csv
          1-year steps over full H. All 6 event types use computeSunPositionFast().
          Output columns: Type, Model Year, JD, RA, Obliquity, World Angle, Distance
          Test range: --start -25000 --end 25000
+         ONE-SOURCE MODE (Stage C-4b onward): regeneration runs under
+         `SG_ONE_SOURCE=1` — the scene's ε(t)/e(t) come from the banked
+         engine series (tools/lib/scene-graph.js setOneSourceMovement),
+         so the CSV measures the one-source movement. A plain run (option
+         off) reproduces the legacy K-movement CSV and is only for
+         baseline-capture comparisons. BEFORE any regeneration: back up
+         the current CSV outside the repo (159 MB, gitignored — no git
+         recovery), and remember the 6c/6d coefficients pair with the CSV
+         that fitted them (the 6c mtime stamp + 6d guard enforce this).
 
-Step 6b: obliquity-harmonics.js               → SOLSTICE_OBLIQUITY_HARMONICS
-         Reads SS obliquity from 02-solar-measurements.csv (downsampled by stepYears).
-         16 harmonics, RMSE 0.004", J2000-anchored (exact IAU obliquity).
-         Updates: fitted-coefficients.json (auto-updated by script)
+Step 6b: RETIRED (D1-revised, Stage C) — script archived in
+         tools/fit/archive/obliquity-harmonics.cjs. The shipped
+         SOLSTICE_OBLIQUITY_HARMONICS are FROZEN at their last K-scene fit
+         and keep serving the flag-off K path until the D4 flip; the
+         movement's obliquity source is the banked engine series. Never
+         re-fit them against a one-source CSV (cross-family fit). The id
+         6b is never reused — this numbering is shared vocabulary.
 
 RENAME: the year-length fit is now **Step 6c** and runs BEFORE the
 cardinal-point fit, now **Step 6d** — the §10e-bis reordering made the
@@ -919,10 +927,13 @@ Step 11 (= pipeline step 7c — the runner executes it in a normal pass;
 > **The engine, the CSV and the fits are ALIGNED (Phases C + D).**
 > `data/02-solar-measurements.csv` was produced by the deep-time-ON,
 > pos↔JD-integrated engine; Phase C restored that engine (a 1990–2010
-> re-export reproduces the CSV bit-exactly — do not regenerate, 2 h 24 m for
-> an identical file, no git copy), and Phase D refit 6b → 6c → 6d
+> re-export reproduces the CSV bit-exactly — never regenerate casually,
+> 2 h 24 m and no git copy), and Phase D refit 6b → 6c → 6d
 > (obliquity → year-length → cardinal-point; pre-rename it read "6b → 6d →
-> 6c") against it
+> 6c") against it — the last fit of the K-movement era: the ONE deliberate
+> regeneration since is the Stage C-4b one-source re-base
+> (`SG_ONE_SOURCE=1`, backup first, then 6c → 6d refit and 5c; 6b stays
+> decommissioned — see Phase 5 below)
 > on the corrected basis: per-row cycle axis (R12/R13), event-row anchors
 > (R14), shipped divisor sets (R10), and the §10 derived cardinal form
 > (R5/R7/R8/R9) with its runtime mirrors (R11).
@@ -934,7 +945,7 @@ Step 11 (= pipeline step 7c — the runner executes it in a normal pass;
 
 Note: `data/02-solar-measurements.csv` is generated by Step 6a (~2 h for full H at 1-year steps).
 It contains all solar events (cardinal points + perihelion/aphelion) with world-angles.
-All downstream fitting steps (6b-6d) read from this single CSV and downsample by `stepYears`
+The downstream fitting steps (6c-6d) read from this single CSV and downsample by `stepYears`
 (currently 23) — no separate exports needed.
 Tropical year harmonics are fitted alongside sidereal and anomalistic (Step 6c).
 The cardinal-point-derived tropical year (Step 6d) is the authoritative runtime version.
@@ -946,21 +957,21 @@ The cardinal-point-derived tropical year (Step 6d) is the authoritative runtime 
 | `H` (holisticyearLength) | ALL (1→10) — and Phase 8 (Step 11 = 7c) because `BOND_PERIOD_YR = 8·H / BOND_LATTICE_N`, so `ω = 2π/period` re-derives for all four cycles. |
 | `longitudePerihelion` (any planet) | 2 (that planet only) |
 | `solarYearInput` (any planet) / `inputmeanlengthsolaryearindays` / `moonSiderealMonthInput` / `yearLengthRef.siderealYear` | **The v3 Sun-completion carriers ride these** (FQ-5 N3: `model.js` computes the carrier rates live). Re-run the N3 extraction chain (`tools/explore/n2-sun-framework-carriers.mjs` → `n3-carrier-swap-preview.mjs`), re-embed the TERMS + `PAIRED_CARRIER_RATES_SHA256` in `eclipse/sun-planetary-completion.cjs` — the test:model fingerprint gate FAILS until you do (fail-proven). Plus the planet's own step 2 where applicable. |
-| `earthtiltMean` | 1, 3→4d, 6a→6d |
-| `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a→6d |
-| `earthInvPlaneInclinationMean` | 3, 6a→6d |
-| `correctionSun` | 1, 6a→6d |
+| `earthtiltMean` | 1, 3→4d, 6a, 6c→6d |
+| `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a, 6c→6d |
+| `earthInvPlaneInclinationMean` | 3, 6a, 6c→6d |
+| `correctionSun` | 1, 6a, 6c→6d |
 | `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | **Step 0 is the source.** Re-run Step 0 (`SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write`) when any of these change: (a) `holisticyearLength` — the H-lattice divisor whitelist and the year-multiple seed harmonics all shift; (b) `perihelionalignmentYear` or `balancedYear` — the phase anchor moves; (c) `eccentricityBase` / `eccentricityAmplitude` — the ~8% Meeus vs framework eccentricity gap shifts, changing the ~280" annual harmonic amplitude; (d) `moonApsidalPrecessionDaysInputICRF` / `moonNodalPrecessionDaysInputICRF` — the auto-derived N_apsidal / N_nodal divisors on the whitelist shift; (e) `_eclSunLon` (Meeus Ch.25) or `_meeusMoonLon` change; (f) `SUN_HARMONICS_ENABLED` toggles between framework-native and Meeus-parity mode. After Step 0 --write, re-run the full pipeline (1 → 2 → … → 9) so all downstream steps re-calibrate against the new Sun frame. The harmonics are NOT re-fit as part of ordinary refits. Runtime H-lattice filter automatically skips design-rule-violating divisors. |
 | ~~Sun T² polynomial (inline in `moveModel`)~~ | **REMOVED 2026-06** — violates design rule (polynomial-in-T not cyclic). Do not re-introduce. |
-| `eccentricityBase` / `eccentricityAmplitude` | **0, 1, 3→4a, 6a→6d** (re-fit Step 0 because eccentricity gap definition changed; then re-run pipeline) |
-| `correctionDays` | 3, 6a→6d |
+| `eccentricityBase` / `eccentricityAmplitude` | **0, 1, 3→4a, 6a, 6c→6d** (re-fit Step 0 because eccentricity gap definition changed; then re-run pipeline) |
+| `correctionDays` | 3, 6a, 6c→6d |
 | `useVariableSpeed` | ALL (1→10) |
 | Planet `startpos` | — (Steps 2/5a-5b retired — K5 excision; legacy scene angle) |
 | Planet `eocFraction` | 3 (5a-5b retired — K5 excision) |
 | Planet `solarYearInput` | 4c→4d (Steps 2/5a-5b retired — K5 excision) |
 | Planet `orbitalEccentricityBase` | — (Steps 2/5a-5b retired — K5 excision; legacy law constant) |
-| `perihelionalignmentYear` | 1, 3→4a, 6a→6d |
-| `stepYears` | Must divide H evenly. Affects 4a→4d, 6a→6d (downsampling) |
+| `perihelionalignmentYear` | 1, 3→4a, 6a, 6c→6d |
+| `stepYears` | Must divide H evenly. Affects 4a→4d, 6a, 6c→6d (downsampling) |
 | `siderealYearJ2000` (in yearLengthRef) | Derived: `meansiderealyearlengthinSeconds = siderealYearJ2000 × 86400` |
 | Bond / Hallstatt / Jose5 / Jose4 `_LATTICE_N` (divisor of 8H) | Step 11 (= 7c; independent of the orbital steps). The 4-flag ΔT stack has no upstream dependency on Steps 1–10; the fit re-runs against the Stephenson residual, reaches `src/script.js` and `tools/lib/deep-time.js` through the JSON (Step 9 / direct read), and the website via the republished `@essrt/physics` (see "Publishing to the website"). |
 | `_TAPER_FULL_HALFWIDTH_YR` / `_TAPER_TOTAL_HALFWIDTH_YR` (Holocene taper) | None — the taper is applied at runtime and does not affect the shipped cos/sin coefficients. Verify L-5b after change. |
@@ -1035,7 +1046,6 @@ Step 3 (browser export) is always manual — the runner checks the data file exi
 - Steps 4b-d (ML training): **~10 min combined**
 - Step 5c (Moon): **~1 min** (5a-5b retired — K5 excision)
 - **Step 6a (CSV export): ~2 hours** — this is the pipeline bottleneck. Default step timeout raised to 3 h.
-- Step 6b (Obliquity): ~90 sec
 - Step 6c (Year-length): ~2 min
 - **Step 6d (Cardinal-point): ~40 min** — greedy fit × 4 CPs × 24 harmonics per CP. Default step timeout was 10 min (too short); raised to 60 min. Observed to complete in ~30 min.
 - Steps 7a-7c, 8-10 (balance, ΔT joint fit, verify, constants, dashboard): ~5-10 min combined
@@ -1090,10 +1100,13 @@ python3 tools/fit/python/train_observed.py --write                           # S
 node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5c
 
 # Phase 5: Solar measurements & harmonic fits
-node tools/fit/export-solar-measurements.js                                  # Step 6a (~2 h)
-node tools/fit/obliquity-harmonics.js --write                                # Step 6b
-node tools/fit/year-length-harmonics.js --write                              # Step 6c (BEFORE 6d — 6d derives from it)
-node tools/fit/cardinal-point-harmonics.js --write                           # Step 6d
+# FIRST: back up the CSV outside the repo — 159 MB, gitignored, NO git recovery.
+cp data/02-solar-measurements.csv ~/holistic-archive/02-solar-measurements.$(date +%Y%m%d).csv
+SG_ONE_SOURCE=1 node tools/fit/export-solar-measurements.js                  # Step 6a (~2 h; one-source movement — see Step 6a notes)
+# (Step 6b obliquity fit RETIRED — archived; coefficients frozen. See Step 6b.)
+node tools/fit/year-length-harmonics.js --write                              # Step 6c (BEFORE 6d — 6d derives from it; stamps the CSV mtime)
+node tools/fit/cardinal-point-harmonics.js --write                           # Step 6d (refuses if 6c's CSV stamp is stale)
+node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5c AGAIN if 6d's anchors moved (moon re-anchors on them)
 # (Sun longitude harmonics moved to Phase 0 — see top of this block.
 # It does NOT need to re-run here as part of routine refits.)
 
@@ -1191,7 +1204,6 @@ Fitting scripts write to JSON, then `constants:generate` (Step 9) regenerates th
     train_precession_physical.py → fitted-coefficients.json  (Step 4c)
     train_observed.py            → fitted-coefficients.json  (Step 4d)
     moon-eclipse-optimizer.js    → model-parameters.json     (Step 5c)
-    obliquity-harmonics.js       → fitted-coefficients.json  (Step 6b)
     year-length-harmonics.js     → fitted-coefficients.json  (Step 6c)
     cardinal-point-harmonics.js  → fitted-coefficients.json  (Step 6d)
     optimize.js                  → model-parameters.json       (Steps 1, 2)

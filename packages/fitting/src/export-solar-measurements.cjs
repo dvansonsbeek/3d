@@ -14,15 +14,15 @@
  * No two-pass needed — each event is close to prevJD + meanYear.
  *
  * Downstream consumers:
- *   - obliquity-harmonics.js (step 6b) — reads SS obliquity
  *   - year-length-harmonics.js (step 6c) — reads cardinal JDs, world-angles and
  *     PERI/APH JDs; one --write fits all three year types incl. tropical
  *   - cardinal-point-harmonics.js (step 6d) — reads cardinal point JDs and
  *     derives from 6c's year-length model (must run AFTER 6c)
+ *   (step 6b obliquity fit RETIRED — archived in tools/fit/archive/; coefficients frozen)
  *
- * Usage:
- *   node tools/fit/export-solar-measurements.js                    # full H (~50 min)
- *   node tools/fit/export-solar-measurements.js --start -25000 --end 25000  # test range
+ * Usage (SG_ONE_SOURCE=1 is the standing regeneration mode since Stage C-4b):
+ *   SG_ONE_SOURCE=1 node tools/fit/export-solar-measurements.js    # full H (~2 h 24 m measured)
+ *   node tools/fit/export-solar-measurements.js --start -25000 --end 25000  # test range (legacy K movement)
  */
 
 const fs = require('fs');
@@ -273,6 +273,18 @@ const DT = require(path.join(TOOLS_LIB, 'deep-time.js'));
   const dtOff = process.env.SG_DEEP_TIME === '0';
   const chainYear = dtOff ? C.meanSolarYearDays : DT.SI_TROPICAL_YEAR_DAYS;
   console.error(`Deep time: ${dtOff ? 'OFF (SG_DEEP_TIME=0)' : 'ON'}`);
+  // One-source movement (Stage C-4b): the standing regeneration mode. A run
+  // WITHOUT it produces the legacy K-movement CSV — valid only for
+  // baseline-capture comparisons, never for a shipped 6c/6d fit basis.
+  const osmOn = process.env.SG_ONE_SOURCE === '1';
+  console.error(`One-source movement: ${osmOn ? 'ON (SG_ONE_SOURCE=1)' : 'OFF'}`);
+  if (!osmOn) {
+    console.error('');
+    console.error('  ⚠  K-MOVEMENT CSV. Since Stage C-4b the shipped fit basis is the');
+    console.error('     one-source movement (SG_ONE_SOURCE=1). Only run without it to');
+    console.error('     capture a legacy-baseline comparison window.');
+    console.error('');
+  }
   console.error(`Chaining year: ${chainYear.toFixed(9)} d`);
   if (dtOff) {
     console.error('');

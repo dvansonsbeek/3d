@@ -136,10 +136,16 @@ const STEPS = [
   // Phase 5: Solar measurements & harmonic fits
   // 6a observed: ~2h 3min at H=335,317 (14,579 samples × 6 event types × cardinal-point
   // bisection with ±2-day narrow window). 3h timeout gives generous margin.
-  { id: '6a', phase: 2, name: 'Export solar measurements (~2 hr)',
-    cmd: 'node tools/fit/export-solar-measurements.js', timeout: 3 * 60 * 60 * 1000 },
-  { id: '6b', phase: 2, name: 'Obliquity harmonics',
-    cmd: 'node tools/fit/obliquity-harmonics.js --write' },
+  // SG_ONE_SOURCE=1 (Stage C-4b): the scene's ε(t)/e(t) come from the banked
+  // engine series — the standing regeneration mode. BACK UP THE CSV FIRST
+  // (159 MB, gitignored, no git recovery — see the README's Phase 5 block).
+  { id: '6a', phase: 2, name: 'Export solar measurements (~2 hr, one-source movement)',
+    cmd: 'SG_ONE_SOURCE=1 node tools/fit/export-solar-measurements.js', timeout: 3 * 60 * 60 * 1000 },
+  // (Step 6b — the obliquity-harmonics fit — RETIRED with the one-source
+  // movement, D1-revised: SOLSTICE_OBLIQUITY_HARMONICS are frozen at their
+  // last K-scene fit; re-fitting against a one-source CSV would be a
+  // cross-family fit. Script archived in tools/fit/archive/. The id 6b is
+  // never reused — README numbering is shared vocabulary.)
   // ORDER + RENAME: year-length is 6c and runs BEFORE the
   // cardinal-point fit, which is now 6d. The §10e-bis reordering made the
   // year-length model the authoritative source of secular year-length
