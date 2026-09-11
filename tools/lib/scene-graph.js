@@ -1552,7 +1552,16 @@ function _kcHelioAU(target, jd) {
   const KCm = _kc();
   if (!_kcChains) _kcChains = KCm.buildPlanetChainsFromArtifact();
   const year = KCm.ANCHOR_EPOCH_YEAR + (jd - KCm.ANCHOR_EPOCH_JD) / 365.25;
-  const el = KCm.computePlanetElementsAtYear(year, _kcChains[target], _kcChains);
+  let el = KCm.computePlanetElementsAtYear(year, _kcChains[target], _kcChains);
+  // D5/one-source: beyond a planet's measured handover boundary the secular
+  // elements substitute from the banked engine series (the SAME
+  // @essrt/physics module the browser runs — cross-engine parity); inside
+  // the boundary this is a no-op. NB the browser ADDITIONALLY applies the
+  // D5b relative-plane DISPLAY rotation (mounting on the visible sun
+  // plane); this mirror stays in the raw engine J2000 frame — the physics
+  // content, not the display placement.
+  const ov = KCm.secularSeriesOverride();
+  if (ov) el = ov.applyToElements(target, year, el);
   const p = KCm.computeHeliocentricEclipticFromElements(el);
   return [p.xAU, p.yAU, p.zAU];
 }

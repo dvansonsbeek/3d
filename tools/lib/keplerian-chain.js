@@ -26,6 +26,35 @@ function loadEngineDArtifact() {
   return JSON.parse(fs.readFileSync(ARTIFACT_PATH, 'utf8'));
 }
 
+// D5/one-source — the secular-series element override, NODE BINDING: the
+// SAME @essrt/physics/planets/secular-series module the browser runs,
+// constructed from the banked artifacts on disk (the series bank + the
+// deep-modes embed + the chain anchors). Beyond a planet's MEASURED
+// handover boundary the era chain's extrapolation is unphysical (the
+// owner-found Mercury e 0.62 / i 31° at +1.35 Myr); inside it this is a
+// no-op. Returns null when the series artifact is absent — the override
+// is then inactive, mirroring the browser's fetch-failure path.
+const SERIES_PATH = path.join(ROOT, 'data', 'nbody-secular-series.json');
+let _seriesOverride;   // undefined = not built yet; null = unavailable
+function secularSeriesOverride() {
+  if (_seriesOverride === undefined) {
+    try {
+      const S = JSON.parse(fs.readFileSync(SERIES_PATH, 'utf8'));
+      const art = loadEngineDArtifact();
+      const { DEEP_MODES_ARTIFACT } = require(path.join(ROOT, 'packages', 'physics', 'src', 'moon', 'deep-modes-artifact.cjs'));
+      const { createSecularSeriesOverride } = require('@essrt/physics/planets/secular-series');
+      _seriesOverride = createSecularSeriesOverride({
+        series: S,
+        anchorElements: art.j2000AnchorElements,
+        invariablePlane: art.invariablePlane,
+        planetZModes: DEEP_MODES_ARTIFACT.planetZ,
+        planetZetaModes: DEEP_MODES_ARTIFACT.planetZeta,
+      });
+    } catch (e) { _seriesOverride = null; }
+  }
+  return _seriesOverride;
+}
+
 /** Full osculating elements from a heliocentric ecliptic-J2000 state vector,
  *  in the model's own AU (bound here — the pure core takes auKm explicitly).
  *  @param {number[]} rKm @param {number[]} vKmS @param {number} muKm3S2
@@ -67,6 +96,7 @@ module.exports = {
   ANCHOR_EPOCH_YEAR: KC.ANCHOR_EPOCH_YEAR,
   ANCHOR_EPOCH_JD: KC.ANCHOR_EPOCH_JD,
   buildPlanetChainsFromArtifact,
+  secularSeriesOverride,
   computePoissonArgRad: KC.computePoissonArgRad,
   computeOsculatingElements,
   solveKeplerRad: KC.solveKeplerRad,

@@ -49,6 +49,7 @@
     "./planets/orbit-chain": "./src/planets/orbit-chain.cjs",
     "./planets/keplerian-chain": "./src/planets/keplerian-chain.cjs",
     "./planets/inv-plane-frame": "./src/planets/inv-plane-frame.cjs",
+    "./planets/secular-series": "./src/planets/secular-series.cjs",
     "./planets/predict": "./src/planets/predict.cjs",
     "./planets/model": "./src/planets/model.cjs",
     "./deltat/cycles": "./src/deltat/cycles.cjs",

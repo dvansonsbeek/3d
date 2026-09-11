@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -20110,24 +20110,13 @@ let _zetaSeriesEndYr = 0;
         _zetaSeriesData = { t0Yr: a.t0Yr, stepYr: eb.stepYr, q: eb.zetaQ, p: eb.zetaP };
         _zSeriesData = { t0Yr: a.t0Yr, stepYr: eb.stepYr, q: eb.zQ, p: eb.zP };
         _zetaSeriesEndYr = a.t0Yr + (eb.zetaQ.length - 1) * eb.stepYr;
-        // D5: the seven planets' blocks + their MEASURED chain-handover
-        // boundaries (banked in the artifact verdict) — beyond a planet's
-        // boundary its secular elements read the series (the era chain's
-        // extrapolation is unphysical there: the ring-blowup fix).
-        const rows = (a.verdict && a.verdict.planetHandover && a.verdict.planetHandover.rows) || {};
-        _planetSeriesData = {};
-        for (const [nm, B] of Object.entries(a.bodies)) {
-          if (nm === 'earth') continue;
-          const hv = rows[nm] || { pastKyr: 50, futureKyr: 50 };
-          _planetSeriesData[nm] = {
-            t0Yr: a.t0Yr, stepYr: B.stepYr,
-            zetaQ: B.zetaQ, zetaP: B.zetaP, zQ: B.zQ, zP: B.zP,
-            endYr: a.t0Yr + (B.zetaQ.length - 1) * B.stepYr,
-            pastYr: hv.pastKyr * 1000, futureYr: hv.futureKyr * 1000,
-            _R: null,   // per-planet J2000 anchor offsets, computed lazily
-          };
-        }
-        console.log(`secular series loaded from ${url} (earth + ${Object.keys(_planetSeriesData).length} planets) — planet deep-time elements DEFAULT-ON${HYBRID_SPIN_REQUESTED ? '; Earth ε/e one-source ACTIVE (?hybridSpin=1)' : ''}`);
+        // D5: the raw artifact feeds the ONE-HOME override
+        // (@essrt/physics/planets/secular-series — the same module the
+        // Node engine mirror consumes, cross-engine-probed): per-planet
+        // MEASURED handover boundaries, series-inside-span, mode-tail
+        // beyond (the ring-blowup fix).
+        _planetSeriesData = a;
+        console.log(`secular series loaded from ${url} (earth + ${Object.keys(a.bodies).length - 1} planets) — planet deep-time elements DEFAULT-ON${HYBRID_SPIN_REQUESTED ? '; Earth ε/e one-source ACTIVE (?hybridSpin=1)' : ''}`);
         return;
       } catch (e) { /* try the next candidate */ }
     }
@@ -51912,64 +51901,23 @@ function _kcModeSum(modes, t) {
   }
   return [re, im];
 }
+// The override MATH lives ONCE in @essrt/physics/planets/secular-series
+// (the same module the Node engine mirror consumes — cross-engine-probed);
+// this is the browser's thin construction over the fetched artifact + the
+// embedded chain anchors and deep mode tables.
+let _kcSeriesOverrideM = null;
 function _kcSeriesSecularEl(nm, year, el) {
   if (!_planetSeriesData) return el;
-  const B = _planetSeriesData[nm];
-  if (!B) return el;
-  const t = year - 2000;
-  if (t >= -B.pastYr && t <= B.futureYr) return el;   // the chain's certified/display zone
-  const D2R = Math.PI / 180, R2D = 180 / Math.PI;
-  if (B._R === null) {
-    const A = CHAIN_ARTIFACT.j2000AnchorElements[nm];
-    const s2h = Math.sin(A.inclEclipticDeg / 2 * D2R);
-    const li0 = (arr) => { const x = -B.t0Yr / B.stepYr, i = Math.max(0, Math.min(arr.length - 2, Math.floor(x))), f = x - i; return arr[i] * (1 - f) + arr[i + 1] * f; };
-    const mz0 = _kcModeSum(DEEP_MODES_ARTIFACT.planetZ[nm], 0);
-    const mq0 = _kcModeSum(DEEP_MODES_ARTIFACT.planetZeta[nm], 0);
-    B._R = {
-      sz: [A.e * Math.cos(A.lonPeriEclipticDeg * D2R) - li0(B.zQ), A.e * Math.sin(A.lonPeriEclipticDeg * D2R) - li0(B.zP)],
-      sq: [s2h * Math.cos(A.ascNodeEclipticDeg * D2R) - li0(B.zetaQ), s2h * Math.sin(A.ascNodeEclipticDeg * D2R) - li0(B.zetaP)],
-      mz: [A.e * Math.cos(A.lonPeriEclipticDeg * D2R) - mz0[0], A.e * Math.sin(A.lonPeriEclipticDeg * D2R) - mz0[1]],
-      mq: [s2h * Math.cos(A.ascNodeEclipticDeg * D2R) - mq0[0], s2h * Math.sin(A.ascNodeEclipticDeg * D2R) - mq0[1]],
-    };
+  if (!_kcSeriesOverrideM) {
+    _kcSeriesOverrideM = createSecularSeriesOverride({
+      series: _planetSeriesData,
+      anchorElements: CHAIN_ARTIFACT.j2000AnchorElements,
+      invariablePlane: CHAIN_ARTIFACT.invariablePlane,
+      planetZModes: DEEP_MODES_ARTIFACT.planetZ,
+      planetZetaModes: DEEP_MODES_ARTIFACT.planetZeta,
+    });
   }
-  let zx, zy, qx, qy;
-  if (t >= B.t0Yr && t <= B.endYr) {
-    const li = (arr, tt) => { const x = (tt - B.t0Yr) / B.stepYr, i = Math.max(0, Math.min(arr.length - 2, Math.floor(x))), f = x - i; return arr[i] * (1 - f) + arr[i + 1] * f; };
-    zx = li(B.zQ, t) + B._R.sz[0]; zy = li(B.zP, t) + B._R.sz[1];
-    qx = li(B.zetaQ, t) + B._R.sq[0]; qy = li(B.zetaP, t) + B._R.sq[1];
-  } else {
-    const mz = _kcModeSum(DEEP_MODES_ARTIFACT.planetZ[nm], t);
-    const mq = _kcModeSum(DEEP_MODES_ARTIFACT.planetZeta[nm], t);
-    zx = mz[0] + B._R.mz[0]; zy = mz[1] + B._R.mz[1];
-    qx = mq[0] + B._R.mq[0]; qy = mq[1] + B._R.mq[1];
-  }
-  const out = Object.assign({}, el);
-  out.e = Math.hypot(zx, zy);
-  out.lonPeriEclipticDeg = ((Math.atan2(zy, zx) * R2D) % 360 + 360) % 360;
-  const si2 = Math.min(1, Math.hypot(qx, qy));
-  out.inclEclipticDeg = 2 * Math.asin(si2) * R2D;
-  out.ascNodeEclipticDeg = ((Math.atan2(qy, qx) * R2D) % 360 + 360) % 360;
-  // K5c inv-plane pair, recomputed from the substituted ecliptic elements
-  // (the evaluator's EXACT rotation, mirrored; keplerian-chain.cjs is the
-  // one home — edits there trigger the 30-min artifact regen, so the
-  // mirror lives here with this pointer).
-  const IP = CHAIN_ARTIFACT.invariablePlane;
-  if (IP) {
-    const fi = IP.inclEclipticDeg * D2R, fO = IP.ascNodeEclipticDeg * D2R;
-    const zf = [Math.sin(fi) * Math.sin(fO), -Math.sin(fi) * Math.cos(fO), Math.cos(fi)];
-    let xf = [1 - zf[0] * zf[0], -zf[0] * zf[1], -zf[0] * zf[2]];
-    const xn = Math.hypot(xf[0], xf[1], xf[2]); xf = [xf[0] / xn, xf[1] / xn, xf[2] / xn];
-    const yf = [zf[1] * xf[2] - zf[2] * xf[1], zf[2] * xf[0] - zf[0] * xf[2], zf[0] * xf[1] - zf[1] * xf[0]];
-    const oi = out.inclEclipticDeg * D2R, oO = out.ascNodeEclipticDeg * D2R;
-    const nO = [Math.sin(oi) * Math.sin(oO), -Math.sin(oi) * Math.cos(oO), Math.cos(oi)];
-    const nz = nO[0] * zf[0] + nO[1] * zf[1] + nO[2] * zf[2];
-    out.inclInvPlaneDeg = Math.acos(Math.min(1, Math.max(-1, nz))) * R2D;
-    const c = [zf[1] * nO[2] - zf[2] * nO[1], zf[2] * nO[0] - zf[0] * nO[2], zf[0] * nO[1] - zf[1] * nO[0]];
-    const cx = c[0] * xf[0] + c[1] * xf[1] + c[2] * xf[2];
-    const cy = c[0] * yf[0] + c[1] * yf[1] + c[2] * yf[2];
-    out.ascNodeInvPlaneDeg = ((Math.atan2(cy, cx) * R2D) % 360 + 360) % 360;
-  }
-  return out;
+  return _kcSeriesOverrideM.applyToElements(nm, year, el);
 }
 // D5b — THE RELATIVE-PLANE CORRECTION (owner finding: "the universe becomes
 // too chaotic"). The engine-true planet planes wander vs the FIXED J2000

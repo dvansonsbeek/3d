@@ -893,7 +893,7 @@
    "tools/explore/lattice-long-window-test.mjs": "sha256:d45dea6a754b8ab6502432ecb0cd463ef2d5780418b0fecd694ac1d5c1bed11f",
    "tools/explore/naff-frequencies.mjs": "sha256:d875f65e0346346bde09402a0620f8109e3d0fc90e052ce8900b6f4af4ac0e5f",
    "tools/explore/nbody-wh.mjs": "sha256:42947b7492e81dd412a97e0a794412706d16d6a42f2fde38310877fd1051c777",
-   "tools/lib/keplerian-chain.js": "sha256:7be1a96b20174d8c2726ec984250646093a847a5cf7e06d8e1e2ffae926ff5c9",
+   "tools/lib/keplerian-chain.js": "sha256:620299515d5520bb3a03fba5affafc7a036fb151fca3457a5194e8771cc97fb8",
    "tools/verify/nbody-secular.js": "sha256:95873972aab80bc156ec4c709e6a4e197699a7c0d2f4db1159a08178ffc3e3d8"
   }
  },
