@@ -6026,6 +6026,27 @@ if (typeof window !== 'undefined') {
       forceSceneUpdate('light');
       return out;
     },
+    // C-3 acceptance probe (?hybridSpin): scene state at a target JD — the
+    // one-source scalar, the POST-CORRECTION geometric tilt (axis vs the
+    // sun-plane normal, the same vectors the wrapper drives), and the sun's
+    // readout declination. Flag-off: active=false, scalar = K device,
+    // epsGeom = the K geometry — the pre-C-3 scene.
+    hybridSpinProbe: (jd) => {
+      const savedJD = o.julianDay;
+      jumpToJulianDay(jd);
+      forceSceneUpdate('light');
+      const a = new THREE.Vector3(0, 1, 0).applyQuaternion(earth.rotationAxis.getWorldQuaternion(new THREE.Quaternion())).normalize();
+      const n = new THREE.Vector3(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(new THREE.Quaternion())).normalize();
+      const r = {
+        active: _hybridSpinActive(),
+        obliquityEarthDeg: o.obliquityEarth,
+        epsGeomDeg: Math.acos(Math.min(1, Math.max(-1, a.dot(n)))) * 180 / Math.PI,
+        sunDecDeg: radiansToDecDecimal(sun.dec),
+      };
+      jumpToJulianDay(savedJD);
+      forceSceneUpdate('light');
+      return r;
+    },
     // The production Moon (doc 66): scene series + RA/Dec override, read from
     // the moon object after a full scene update at the target JD.
     moonSceneState: (jd) => {
@@ -9949,6 +9970,35 @@ erosPerihelionDurationEcliptic2.pivotObj.add(erosFixedPerihelionAtSun.containerO
 // b) We need to be able to point to polaris + pointing to the EARTH-WOBBLE-CENTER at RA 6h
 // c) Close to J2000 values so we can check and compare all values
 earth.containerObj.rotation.y = (Math.PI/2)*whichSolsticeOrEquinox;
+
+//*************************************************************
+// C-3 (?hybridSpin): the tilt-correction wrapper — a Group inserted between
+// earth.rotationAxis and its parent ONLY when the flag is requested, so the
+// flag-off scene graph (and its golden masters) stays bit-identical. Each
+// frame the wrapper's quaternion rotates the whole axis subtree about the
+// NODE LINE (axis × sun-plane normal = the equinox direction) by exactly
+// (ε_geometry − ε_target), driving the VISIBLE tilt to the one-source ε
+// while leaving the precession phase untouched (a rotation about the node
+// line preserves the node line). Earth sits at the scene origin
+// (orbitRadius 0), so the wrapper pivot coincides with the Earth centre.
+// The flag itself is declared HERE (the earliest consumer) — the loader,
+// factory and sampler live with the other hybrid machinery further down.
+const HYBRID_SPIN_REQUESTED = (() => {
+  try { return new URLSearchParams(window.location.search).get('hybridSpin') === '1'; }
+  catch (e) { return false; }
+})();
+let _hybridTiltCorr = null;
+const _HTC_A = new THREE.Vector3(), _HTC_N = new THREE.Vector3(), _HTC_U = new THREE.Vector3();
+const _HTC_Q1 = new THREE.Quaternion(), _HTC_Q2 = new THREE.Quaternion(),
+      _HTC_Q3 = new THREE.Quaternion(), _HTC_Q4 = new THREE.Quaternion(),
+      _HTC_Q5 = new THREE.Quaternion();
+if (HYBRID_SPIN_REQUESTED) {
+  _hybridTiltCorr = new THREE.Group();
+  _hybridTiltCorr.name = 'hybridSpinTiltCorrection';
+  const _htcParent = earth.rotationAxis.parent;
+  _htcParent.add(_hybridTiltCorr);
+  _hybridTiltCorr.add(earth.rotationAxis);
+}
 
 //*************************************************************
 // FLOATING LABELS for helper objects (CSS2DObject)
@@ -19978,6 +20028,87 @@ function _epsHybridEraAt(year) {
     _epsHybridEraSampler = _deepHistEra().build(need, -need, 100);
   }
   return _epsHybridEraSampler.at(t).epsDeg;
+}
+
+// ── C-3: ONE SOURCE FOR THE MOVEMENT (?hybridSpin=1 — plan 02 Stage C) ─────
+// Under the flag the RENDERED obliquity (the visual tilt AND the scalar
+// o.obliquityEarth every readout consumes) rides the engine-D hybrid on the
+// BANKED ζ-series artifact (data/nbody-earth-zeta-series.json — the C-1/C-2
+// verdict: the series beats both mode tiers, 0.16″/0.18″ vs IAU-2006 in-era
+// and 0.0396° vs La2004 over −200 kyr). Scope: INSIDE the series' ±10-Myr
+// span (the engine's integration range — the physical boundary); beyond it
+// the K device continues (the H(t)-scaled lattice claim; the hybrid's
+// constant-α form is a ±Myr-class instrument). Flag OFF = the pre-C-3
+// scene, bit-identical (no wrapper node is inserted, no override runs).
+// (HYBRID_SPIN_REQUESTED is declared at the tilt-correction wrapper — the
+// earliest module-init consumer; a declaration here would be a TDZ.)
+let _zetaSeriesData = null;          // {t0Yr, stepYr, q, p} once fetched
+let _zetaSeriesEndYr = 0;
+if (HYBRID_SPIN_REQUESTED) {
+  (async () => {
+    const candidates = [
+      'data/nbody-earth-zeta-series.json',
+      '../data/nbody-earth-zeta-series.json',
+      'nbody-earth-zeta-series.json',
+      'https://raw.githubusercontent.com/dvansonsbeek/3d/master/data/nbody-earth-zeta-series.json',
+    ];
+    for (const url of candidates) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const a = await res.json();
+        if (!Array.isArray(a.q) || !Array.isArray(a.p)) continue;
+        _zetaSeriesData = { t0Yr: a.t0Yr, stepYr: a.stepYr, q: a.q, p: a.p };
+        _zetaSeriesEndYr = a.t0Yr + (a.q.length - 1) * a.stepYr;
+        console.log(`hybridSpin: ζ-series loaded from ${url} (${a.q.length} samples @ ${a.stepYr} yr) — ε rides the engine-D hybrid inside ±10 Myr`);
+        return;
+      } catch (e) { /* try the next candidate */ }
+    }
+    console.error('hybridSpin: ζ-series artifact not reachable — staying on the K device');
+  })();
+}
+// The series-driven hybrid (the ONE evaluator): factory built lazily AFTER
+// the series arrives; deep ζ modes remain only the beyond-span tail.
+let _deepHistSeriesM = null;
+function _deepHistSeries() {
+  if (!_deepHistSeriesM) {
+    const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
+    _deepHistSeriesM = createDeepOrbitalHistory({
+      zModes: DEEP_MODES_ARTIFACT.earthZ,
+      zetaModes: DEEP_MODES_ARTIFACT.earthZeta,
+      zetaSeries: _zetaSeriesData,
+      anchorE: DEEP_MODES_ARTIFACT.anchorE,
+      anchorPeriEclipticDeg: DEEP_MODES_ARTIFACT.anchorPeriEclipticDeg,
+      anchorInclEclipticDeg: DEEP_MODES_ARTIFACT.anchorInclEclipticDeg,
+      anchorAscNodeEclipticDeg: DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg,
+      axialPrecessionYearsJ2000: sid / (sid - sol),
+      obliquityJ2000Deg: ASTRO_REFERENCE.obliquityJ2000_deg,
+    });
+  }
+  return _deepHistSeriesM;
+}
+let _epsSeriesSampler = null, _epsSeriesRangeYr = 0;
+function _epsHybridSeriesAt(year) {
+  const t = year - 2000;
+  const need = Math.max(20000, Math.abs(t) * 1.25);
+  if (!_epsSeriesSampler || need > _epsSeriesRangeYr) {
+    _epsSeriesRangeYr = need;
+    _epsSeriesSampler = _deepHistSeries().build(need, -need, 100);
+  }
+  return _epsSeriesSampler.at(t).epsDeg;
+}
+/** Is the one-source drive live (flag on + series loaded)? */
+function _hybridSpinActive() { return HYBRID_SPIN_REQUESTED && _zetaSeriesData !== null; }
+/** The scene's ε target (deg) at a decimal year — THE one source under the
+ *  flag: the series-hybrid inside the banked span, the K device outside it
+ *  and whenever the flag is off/pending. Every ε surface (the visual tilt
+ *  correction, o.obliquityEarth, the panel row) reads THIS. */
+function _sceneEpsTargetDeg(year) {
+  if (_hybridSpinActive()) {
+    const t = year - 2000;
+    if (t >= _zetaSeriesData.t0Yr && t <= _zetaSeriesEndYr) return _epsHybridSeriesAt(year);
+  }
+  return computeObliquityEarth(year);
 }
 
 /** Model ascending node on invariable plane — retrograde at -H/5 (confirmed by La2010 N-body solution) */
@@ -45568,8 +45699,8 @@ const planetStats = {
        constant: true},
     null,
       {label : () => `Axial tilt`,
-       value : [ { v: () => _epsHybridEraAt(o.currentYear), dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Obliquity of the ecliptic — the DERIVED hybrid ε, era ζ-tier (engine-D node modes + the H/13 anchor, zero fitted constants; dε/dt at J2000 = −46.96″/cy vs IAU −46.84; measured 0.3″ rms vs the IAU-2006 polynomial over 1900–2100 — doc 109 §18). The scene machinery rides the fitted era law, within ~0.5″ of this value in the modern era. Obliquity cycle |ψ̇|−|s₃| ≈ ${fmtNum(holisticyearLength/8, 0, ',')} years (H/8, at J2000)`],
+       value : [ { v: () => o.obliquityEarth, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Obliquity of the ecliptic — the SCENE's rendered tilt (this value IS the Sun's maximum declination at every epoch, by construction). Under ?hybridSpin=1 it rides the engine-D hybrid on the banked ζ-series inside ±10 Myr (one source — measured 0.16″ rms vs IAU-2006 in-era, 0.04° vs La2004 at −200 kyr; doc 109 §18 + plan Stage C); otherwise the engine-K device law. The derived hybrid tiers stay on the Formula Verification chart. Obliquity cycle |ψ̇|−|s₃| ≈ ${fmtNum(holisticyearLength/8, 0, ',')} years (H/8, at J2000)`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _kcElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
@@ -52139,7 +52270,31 @@ function updatePositions() {
   const _yearForObliquity = DEEP_TIME_MODE_ENABLED
     ? _jdToSIyear(o.julianDay)
     : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
-  o.obliquityEarth = computeObliquityEarth(_yearForObliquity);
+  // C-3 one source: under ?hybridSpin this is the series-hybrid ε (the same
+  // value the visual tilt correction drives to); otherwise the K device.
+  o.obliquityEarth = _sceneEpsTargetDeg(_yearForObliquity);
+
+  // C-3 (?hybridSpin): drive the VISIBLE tilt to the same one-source ε.
+  // Reset the wrapper, read the K geometry (axis vs sun-plane normal),
+  // rotate about the node line by (ε_geom − ε_target) — derivation: a
+  // rotation of the axis about û = normalize(a×n) by +θ reduces the
+  // axis-plane angle by exactly θ, and preserves the node line (equinox).
+  if (_hybridTiltCorr && _hybridSpinActive()) {
+    _hybridTiltCorr.quaternion.set(0, 0, 0, 1);
+    _hybridTiltCorr.updateMatrixWorld(true);
+    const a = _HTC_A.set(0, 1, 0).applyQuaternion(earth.rotationAxis.getWorldQuaternion(_HTC_Q1)).normalize();
+    const n = _HTC_N.set(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(_HTC_Q2)).normalize();
+    const epsGeom = Math.acos(Math.min(1, Math.max(-1, a.dot(n))));
+    const epsTarget = o.obliquityEarth * Math.PI / 180;
+    const u = _HTC_U.crossVectors(a, n);
+    if (u.lengthSq() > 1e-12) {
+      u.normalize();
+      const qParent = _hybridTiltCorr.parent.getWorldQuaternion(_HTC_Q3);
+      const qw = _HTC_Q4.setFromAxisAngle(u, epsGeom - epsTarget);
+      _hybridTiltCorr.quaternion.copy(_HTC_Q5.copy(qParent).invert().multiply(qw).multiply(qParent));
+      _hybridTiltCorr.updateMatrixWorld(true);
+    }
+  }
 
   // ───────────────────────── each planet ───────────────────────────
   for (let i = 0, L = tracePlanets.length; i < L; i++) {
@@ -55092,7 +55247,7 @@ function updatePredictions() {
     : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
 
   // Compute obliquity and eccentricity first - needed for year calculations
-  predictions.obliquityEarth = o.obliquityEarth = computeObliquityEarth(yearForFormula);
+  predictions.obliquityEarth = o.obliquityEarth = _sceneEpsTargetDeg(yearForFormula);
   // Phase 8: use J2000-FIXED anchor + cycle length for frame-independent integrated phase
   predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarthAtYear(yearForFormula);
 
