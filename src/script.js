@@ -6034,14 +6034,43 @@ if (typeof window !== 'undefined') {
     hybridSpinProbe: (jd) => {
       const savedJD = o.julianDay;
       jumpToJulianDay(jd);
-      forceSceneUpdate('light');
+      // FULL update: the scalar readouts (o.obliquityEarth is kept fresh in
+      // light mode, but o.eccentricityEarth is written by updatePredictions,
+      // full mode only — the documented light-mode staleness the EoC's
+      // inline compute exists to avoid). The probe reads live values.
+      forceSceneUpdate();
       const a = new THREE.Vector3(0, 1, 0).applyQuaternion(earth.rotationAxis.getWorldQuaternion(new THREE.Quaternion())).normalize();
       const n = new THREE.Vector3(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(new THREE.Quaternion())).normalize();
       const r = {
         active: _hybridSpinActive(),
+        planetsDefault: _planetSeriesData !== null,   // the early planet flip
         obliquityEarthDeg: o.obliquityEarth,
         epsGeomDeg: Math.acos(Math.min(1, Math.max(-1, a.dot(n)))) * 180 / Math.PI,
         sunDecDeg: radiansToDecDecimal(sun.dec),
+        // C-4a: the scene's e — scalar and the applied geometric offset
+        eccentricityEarth: o.eccentricityEarth,
+        eccGeomOffset: -earthPerihelionPrecession2.containerObj.position.x / 100,
+        // D5: the planets' flag-aware secular elements (ring + position source)
+        // + D5b: the VISIBLE tilt — the rendered orbit-plane normal (from
+        // corrected helio vectors) vs the scene's sun-plane normal; must
+        // equal the true MUTUAL inclination planet-vs-Earth-engine.
+        planets: Object.fromEntries(['mercury', 'venus', 'mars', 'jupiter'].map((nm) => {
+          const el = _kcElementsOfDate(nm, jd);
+          const pDays = 365.25 * Math.pow(el.aAU, 1.5);
+          const h0 = _kcHelioAU(nm, jd), h1 = _kcHelioAU(nm, jd + pDays / 4), h2 = _kcHelioAU(nm, jd + pDays / 2);
+          const v1 = [h1[0] - h0[0], h1[1] - h0[1], h1[2] - h0[2]];
+          const v2 = [h2[0] - h0[0], h2[1] - h0[1], h2[2] - h0[2]];
+          let nn = [v1[1] * v2[2] - v1[2] * v2[1], v1[2] * v2[0] - v1[0] * v2[2], v1[0] * v2[1] - v1[1] * v2[0]];
+          const nl = Math.hypot(nn[0], nn[1], nn[2]); nn = [nn[0] / nl, nn[1] / nl, nn[2] / nl];
+          // scene plane normal pulled into helio-J2000: Rᵀ · world-Y-of-barycenter
+          const nsW = new THREE.Vector3(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(new THREE.Quaternion())).normalize();
+          const R = _kcR;
+          const nsH = [R[0][0] * nsW.x + R[1][0] * nsW.y + R[2][0] * nsW.z,
+                       R[0][1] * nsW.x + R[1][1] * nsW.y + R[2][1] * nsW.z,
+                       R[0][2] * nsW.x + R[1][2] * nsW.y + R[2][2] * nsW.z];
+          const visTilt = Math.acos(Math.min(1, Math.abs(nn[0] * nsH[0] + nn[1] * nsH[1] + nn[2] * nsH[2]))) * 180 / Math.PI;
+          return [nm, { e: el.e, i: el.inclEclipticDeg, visTiltDeg: visTilt }];
+        })),
       };
       jumpToJulianDay(savedJD);
       forceSceneUpdate('light');
@@ -20007,6 +20036,15 @@ const _deepHistEra = (() => {
     return m;
   };
 })();
+// D1 grid-step tiers: the factory integrates 250-yr beyond ±50 kyr, and
+// builds reaching there need 250-aligned grids (the factory throws
+// otherwise). Tiers keep node counts bounded while sampling the ~41-kyr
+// obliquity cycle densely at every range.
+function _hybridGridStep(need) {
+  if (need <= 50000) return 100;
+  if (need <= 2000000) return 1000;
+  return 5000;
+}
 let _epsHybridSampler = null, _epsHybridRangeYr = 0;
 /** Hybrid ε (deg), DEEP ζ tier, at a decimal year — cached grid, grown on demand. */
 function _epsHybridAt(year) {
@@ -20014,7 +20052,7 @@ function _epsHybridAt(year) {
   const need = Math.max(20000, Math.abs(t) * 1.25);
   if (!_epsHybridSampler || need > _epsHybridRangeYr) {
     _epsHybridRangeYr = need;
-    _epsHybridSampler = _deepHist().build(need, -need, 100);
+    _epsHybridSampler = _deepHist().build(need, -need, _hybridGridStep(need));
   }
   return _epsHybridSampler.at(t).epsDeg;
 }
@@ -20025,7 +20063,7 @@ function _epsHybridEraAt(year) {
   const need = Math.max(20000, Math.abs(t) * 1.25);
   if (!_epsHybridEraSampler || need > _epsHybridEraRangeYr) {
     _epsHybridEraRangeYr = need;
-    _epsHybridEraSampler = _deepHistEra().build(need, -need, 100);
+    _epsHybridEraSampler = _deepHistEra().build(need, -need, _hybridGridStep(need));
   }
   return _epsHybridEraSampler.at(t).epsDeg;
 }
@@ -20042,29 +20080,58 @@ function _epsHybridEraAt(year) {
 // scene, bit-identical (no wrapper node is inserted, no override runs).
 // (HYBRID_SPIN_REQUESTED is declared at the tilt-correction wrapper — the
 // earliest module-init consumer; a declaration here would be a TDZ.)
-let _zetaSeriesData = null;          // {t0Yr, stepYr, q, p} once fetched
+let _zetaSeriesData = null;          // {t0Yr, stepYr, q, p} once fetched (Earth ζ)
+let _zSeriesData = null;             // {t0Yr, stepYr, q, p} once fetched (Earth z, C-4a)
+let _planetSeriesData = null;        // D5: per-planet {t0Yr, stepYr, zetaQ.., pastYr, futureYr, _R*}
 let _zetaSeriesEndYr = 0;
-if (HYBRID_SPIN_REQUESTED) {
+// THE EARLY PLANET FLIP (owner, 2026-09-13): the artifact loads on EVERY
+// page (the build ships it in dist/data), and the PLANET element override
+// + the relative-plane correction are DEFAULT-ON once it arrives — the
+// era chain beyond its measured validity boundary is wrong, flag or no
+// flag (the owner-found Mars e 0.21 / i 12.4° at +564 kyr; series truth
+// 0.069 / 6.4°). Every fixture year sits INSIDE the boundaries, so the
+// golden masters are untouched. Earth's ε/e one-source stays gated on
+// ?hybridSpin=1 until the D4 flip (it touches the certified clock).
+{
   (async () => {
     const candidates = [
-      'data/nbody-earth-zeta-series.json',
-      '../data/nbody-earth-zeta-series.json',
-      'nbody-earth-zeta-series.json',
-      'https://raw.githubusercontent.com/dvansonsbeek/3d/master/data/nbody-earth-zeta-series.json',
+      'data/nbody-secular-series.json',
+      '../data/nbody-secular-series.json',
+      'nbody-secular-series.json',
+      'https://raw.githubusercontent.com/dvansonsbeek/3d/master/data/nbody-secular-series.json',
     ];
     for (const url of candidates) {
       try {
         const res = await fetch(url);
         if (!res.ok) continue;
         const a = await res.json();
-        if (!Array.isArray(a.q) || !Array.isArray(a.p)) continue;
-        _zetaSeriesData = { t0Yr: a.t0Yr, stepYr: a.stepYr, q: a.q, p: a.p };
-        _zetaSeriesEndYr = a.t0Yr + (a.q.length - 1) * a.stepYr;
-        console.log(`hybridSpin: ζ-series loaded from ${url} (${a.q.length} samples @ ${a.stepYr} yr) — ε rides the engine-D hybrid inside ±10 Myr`);
+        const eb = a.bodies && a.bodies.earth;
+        if (!eb || !Array.isArray(eb.zetaQ) || !Array.isArray(eb.zQ)) continue;
+        _zetaSeriesData = { t0Yr: a.t0Yr, stepYr: eb.stepYr, q: eb.zetaQ, p: eb.zetaP };
+        _zSeriesData = { t0Yr: a.t0Yr, stepYr: eb.stepYr, q: eb.zQ, p: eb.zP };
+        _zetaSeriesEndYr = a.t0Yr + (eb.zetaQ.length - 1) * eb.stepYr;
+        // D5: the seven planets' blocks + their MEASURED chain-handover
+        // boundaries (banked in the artifact verdict) — beyond a planet's
+        // boundary its secular elements read the series (the era chain's
+        // extrapolation is unphysical there: the ring-blowup fix).
+        const rows = (a.verdict && a.verdict.planetHandover && a.verdict.planetHandover.rows) || {};
+        _planetSeriesData = {};
+        for (const [nm, B] of Object.entries(a.bodies)) {
+          if (nm === 'earth') continue;
+          const hv = rows[nm] || { pastKyr: 50, futureKyr: 50 };
+          _planetSeriesData[nm] = {
+            t0Yr: a.t0Yr, stepYr: B.stepYr,
+            zetaQ: B.zetaQ, zetaP: B.zetaP, zQ: B.zQ, zP: B.zP,
+            endYr: a.t0Yr + (B.zetaQ.length - 1) * B.stepYr,
+            pastYr: hv.pastKyr * 1000, futureYr: hv.futureKyr * 1000,
+            _R: null,   // per-planet J2000 anchor offsets, computed lazily
+          };
+        }
+        console.log(`secular series loaded from ${url} (earth + ${Object.keys(_planetSeriesData).length} planets) — planet deep-time elements DEFAULT-ON${HYBRID_SPIN_REQUESTED ? '; Earth ε/e one-source ACTIVE (?hybridSpin=1)' : ''}`);
         return;
       } catch (e) { /* try the next candidate */ }
     }
-    console.error('hybridSpin: ζ-series artifact not reachable — staying on the K device');
+    console.error('secular-series artifact not reachable — planet deep-time elements stay on the era chain (invalid beyond its boundary!)' + (HYBRID_SPIN_REQUESTED ? '; Earth one-source inactive' : ''));
   })();
 }
 // The series-driven hybrid (the ONE evaluator): factory built lazily AFTER
@@ -20077,26 +20144,39 @@ function _deepHistSeries() {
       zModes: DEEP_MODES_ARTIFACT.earthZ,
       zetaModes: DEEP_MODES_ARTIFACT.earthZeta,
       zetaSeries: _zetaSeriesData,
+      zSeries: _zSeriesData,
       anchorE: DEEP_MODES_ARTIFACT.anchorE,
       anchorPeriEclipticDeg: DEEP_MODES_ARTIFACT.anchorPeriEclipticDeg,
       anchorInclEclipticDeg: DEEP_MODES_ARTIFACT.anchorInclEclipticDeg,
       anchorAscNodeEclipticDeg: DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg,
       axialPrecessionYearsJ2000: sid / (sid - sol),
       obliquityJ2000Deg: ASTRO_REFERENCE.obliquityJ2000_deg,
+      // D1-revised: the SECULAR H(t) coupling — period(t) = period₀·H(t)/H₀
+      // (leg 1's scaling; the model's own recession history via meanHAtAge).
+      // NOT the instantaneous year-length beat: that carries the equinox
+      // wobble the hybrid's n̂(t) already generates (double-count — the
+      // generator's refuse-gate measured 0.14°/1.05° distortions).
+      axialPrecessionYearsAtYearFn: ((axial0, H0) =>
+        (yr) => axial0 * meanHAtAge((2000 - yr) / 1e6) / H0
+      )(sid / (sid - sol), meanHAtAge(0)),
     });
   }
   return _deepHistSeriesM;
 }
 let _epsSeriesSampler = null, _epsSeriesRangeYr = 0;
-function _epsHybridSeriesAt(year) {
+/** The ONE evaluator's sample at a decimal year (grown-grid cache):
+ *  {epsDeg, e, periOfDateDeg, …} — series inside ±10 Myr, the α(H(t))
+ *  mode-tail beyond. Both ε and e targets read THIS. */
+function _hybridSeriesSampleAt(year) {
   const t = year - 2000;
   const need = Math.max(20000, Math.abs(t) * 1.25);
   if (!_epsSeriesSampler || need > _epsSeriesRangeYr) {
     _epsSeriesRangeYr = need;
-    _epsSeriesSampler = _deepHistSeries().build(need, -need, 100);
+    _epsSeriesSampler = _deepHistSeries().build(need, -need, _hybridGridStep(need));
   }
-  return _epsSeriesSampler.at(t).epsDeg;
+  return _epsSeriesSampler.at(t);
 }
+function _epsHybridSeriesAt(year) { return _hybridSeriesSampleAt(year).epsDeg; }
 /** Is the one-source drive live (flag on + series loaded)? */
 function _hybridSpinActive() { return HYBRID_SPIN_REQUESTED && _zetaSeriesData !== null; }
 /** The scene's ε target (deg) at a decimal year — THE one source under the
@@ -20104,11 +20184,25 @@ function _hybridSpinActive() { return HYBRID_SPIN_REQUESTED && _zetaSeriesData !
  *  and whenever the flag is off/pending. Every ε surface (the visual tilt
  *  correction, o.obliquityEarth, the panel row) reads THIS. */
 function _sceneEpsTargetDeg(year) {
-  if (_hybridSpinActive()) {
-    const t = year - 2000;
-    if (t >= _zetaSeriesData.t0Yr && t <= _zetaSeriesEndYr) return _epsHybridSeriesAt(year);
-  }
+  // D1-revised (owner): the hybrid speaks at EVERY epoch under the flag —
+  // the banked series inside ±10 Myr, the α(H(t))-coupled integration on
+  // the ζ mode tail beyond it. The K device remains only the flag-off path
+  // (and the VFP comparison curve — the rendered leg-1 fork).
+  if (_hybridSpinActive()) return _epsHybridSeriesAt(year);
   return computeObliquityEarth(year);
+}
+/** C-4a: the scene's e target at a decimal year — same one-source pattern:
+ *  the banked z series inside the span (read directly — e = |z|; no
+ *  integration needed), the K H/3 law outside it and flag-off/pending.
+ *  Under the flag this feeds o.eccentricityEarth (readouts + the sun's
+ *  equation of center) — the CLOCK's certified basis (LOD/paleo fits, the
+ *  cardinal coefficients) stays K until the C-4b re-base. */
+function _sceneEccTargetAt(year) {
+  // D1-revised: e rides the SAME one evaluator at every epoch under the
+  // flag (the factory sampler: banked z series inside ±10 Myr, the deep-z
+  // mode tail beyond — J2000-anchored inside the factory). K law flag-off.
+  if (_hybridSpinActive()) return _hybridSeriesSampleAt(year).e;
+  return computeEccentricityEarthAtYear(year);
 }
 
 /** Model ascending node on invariable plane — retrograde at -H/5 (confirmed by La2010 N-body solution) */
@@ -45703,8 +45797,8 @@ const planetStats = {
        hover : [`Obliquity of the ecliptic — the SCENE's rendered tilt (this value IS the Sun's maximum declination at every epoch, by construction). Under ?hybridSpin=1 it rides the engine-D hybrid on the banked ζ-series inside ±10 Myr (one source — measured 0.16″ rms vs IAU-2006 in-era, 0.04° vs La2004 at −200 kyr; doc 109 §18 + plan Stage C); otherwise the engine-K device law. The derived hybrid tiers stay on the Formula Verification chart. Obliquity cycle |ψ̇|−|s₃| ≈ ${fmtNum(holisticyearLength/8, 0, ',')} years (H/8, at J2000)`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => _kcElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
-       hover : [`Engine-D chain eccentricity of date — the model's published Earth element (J2000: 0.016702, matching JPL's osculating seed state and La2004; the IAU mean-elements value is 0.016710). The scene's orbit machinery rides the engine-K H/3 law e(t) = base′·(1 + cos θ/2) — mean base′ = ${eccentricityDerivedMean.toFixed(6)}, cycle ${fmtNum(holisticyearLength / 3, 0, ',')} years — its epoch-local tangent, within 6e-5 of the chain across the historical era.`],
+       value : [ { v: () => _hybridSpinActive() ? o.eccentricityEarth : _kcElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
+       hover : [`Engine-D eccentricity of date — the model's published Earth element (J2000: 0.016702, matching JPL's osculating seed state and La2004; the IAU mean-elements value is 0.016710). Under ?hybridSpin=1 this row IS the scene's rendered e (the banked engine series inside ±10 Myr — one source: the geometric offset, the equation of center and this readout share one value; series-vs-chain 1e-5 in 1600–2400). Otherwise: the era chain of date, while the scene's orbit machinery rides the engine-K H/3 law e(t) = base′·(1 + cos θ/2) — mean base′ = ${eccentricityDerivedMean.toFixed(6)}, cycle ${fmtNum(holisticyearLength / 3, 0, ',')} years — its epoch-local tangent, within 6e-5 of the chain across the historical era.`],
        tpLink: true, observed: true},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.obliquityEarth-radiansToDecDecimal(earthWobbleCenter.dec), dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -51780,9 +51874,174 @@ const _KC_PLANET_NAMES = new Set(['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn
 function _kcHelioAU(nameLower, jd) {
   if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   const year = KC_ANCHOR_EPOCH_YEAR + (jd - KC_ANCHOR_EPOCH_JD) / 365.25;
-  const el = kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
+  let el = kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
+  // D5: positions and rings share the SAME override (DEFAULT-ON, the early
+  // flip) — the planet stays on its ring by construction at every epoch.
+  if (_planetSeriesData) el = _kcSeriesSecularEl(nameLower, year, el);
   const p = kcComputeHeliocentricEclipticFromElements(el);
+  // D5b: the relative-plane correction (engine-Earth plane → the scene's
+  // sun plane) — one rotation, applied to the helio vector so positions,
+  // rings and traces all inherit it through this one path.
+  if (_kcPlaneCorrM) {
+    const M = _kcPlaneCorrM;
+    return [
+      M[0][0] * p.xAU + M[0][1] * p.yAU + M[0][2] * p.zAU,
+      M[1][0] * p.xAU + M[1][1] * p.yAU + M[1][2] * p.zAU,
+      M[2][0] * p.xAU + M[2][1] * p.yAU + M[2][2] * p.zAU,
+    ];
+  }
   return [p.xAU, p.yAU, p.zAU];
+}
+// D5 (?hybridSpin) — the planets' deep-time secular elements: beyond a
+// planet's MEASURED handover boundary (banked in the artifact verdict —
+// Mercury ±22–36 kyr, Jupiter/Saturn Myr-class) the era chain's
+// extrapolation is unphysical (measured: Mercury e 0.62 / i 31° at
+// +1.35 Myr — the owner-found ring blowup), so e/ϖ/i/Ω substitute from
+// the banked engine series (inside ±10 Myr) or the embedded deep mode
+// tables (beyond — the same tail role the obliquity hybrid uses). aAU
+// and the mean longitude stay the chain's: the fast angle is
+// well-behaved (the secular/fast split). The inv-plane pair is
+// recomputed from the substituted ecliptic elements with the SAME K5c
+// exact rotation the evaluator uses.
+function _kcModeSum(modes, t) {
+  let re = 0, im = 0;
+  for (const m of modes) {
+    const c = Math.cos(m.omegaRadPerYr * t), s = Math.sin(m.omegaRadPerYr * t);
+    re += m.re * c - m.im * s;
+    im += m.re * s + m.im * c;
+  }
+  return [re, im];
+}
+function _kcSeriesSecularEl(nm, year, el) {
+  if (!_planetSeriesData) return el;
+  const B = _planetSeriesData[nm];
+  if (!B) return el;
+  const t = year - 2000;
+  if (t >= -B.pastYr && t <= B.futureYr) return el;   // the chain's certified/display zone
+  const D2R = Math.PI / 180, R2D = 180 / Math.PI;
+  if (B._R === null) {
+    const A = CHAIN_ARTIFACT.j2000AnchorElements[nm];
+    const s2h = Math.sin(A.inclEclipticDeg / 2 * D2R);
+    const li0 = (arr) => { const x = -B.t0Yr / B.stepYr, i = Math.max(0, Math.min(arr.length - 2, Math.floor(x))), f = x - i; return arr[i] * (1 - f) + arr[i + 1] * f; };
+    const mz0 = _kcModeSum(DEEP_MODES_ARTIFACT.planetZ[nm], 0);
+    const mq0 = _kcModeSum(DEEP_MODES_ARTIFACT.planetZeta[nm], 0);
+    B._R = {
+      sz: [A.e * Math.cos(A.lonPeriEclipticDeg * D2R) - li0(B.zQ), A.e * Math.sin(A.lonPeriEclipticDeg * D2R) - li0(B.zP)],
+      sq: [s2h * Math.cos(A.ascNodeEclipticDeg * D2R) - li0(B.zetaQ), s2h * Math.sin(A.ascNodeEclipticDeg * D2R) - li0(B.zetaP)],
+      mz: [A.e * Math.cos(A.lonPeriEclipticDeg * D2R) - mz0[0], A.e * Math.sin(A.lonPeriEclipticDeg * D2R) - mz0[1]],
+      mq: [s2h * Math.cos(A.ascNodeEclipticDeg * D2R) - mq0[0], s2h * Math.sin(A.ascNodeEclipticDeg * D2R) - mq0[1]],
+    };
+  }
+  let zx, zy, qx, qy;
+  if (t >= B.t0Yr && t <= B.endYr) {
+    const li = (arr, tt) => { const x = (tt - B.t0Yr) / B.stepYr, i = Math.max(0, Math.min(arr.length - 2, Math.floor(x))), f = x - i; return arr[i] * (1 - f) + arr[i + 1] * f; };
+    zx = li(B.zQ, t) + B._R.sz[0]; zy = li(B.zP, t) + B._R.sz[1];
+    qx = li(B.zetaQ, t) + B._R.sq[0]; qy = li(B.zetaP, t) + B._R.sq[1];
+  } else {
+    const mz = _kcModeSum(DEEP_MODES_ARTIFACT.planetZ[nm], t);
+    const mq = _kcModeSum(DEEP_MODES_ARTIFACT.planetZeta[nm], t);
+    zx = mz[0] + B._R.mz[0]; zy = mz[1] + B._R.mz[1];
+    qx = mq[0] + B._R.mq[0]; qy = mq[1] + B._R.mq[1];
+  }
+  const out = Object.assign({}, el);
+  out.e = Math.hypot(zx, zy);
+  out.lonPeriEclipticDeg = ((Math.atan2(zy, zx) * R2D) % 360 + 360) % 360;
+  const si2 = Math.min(1, Math.hypot(qx, qy));
+  out.inclEclipticDeg = 2 * Math.asin(si2) * R2D;
+  out.ascNodeEclipticDeg = ((Math.atan2(qy, qx) * R2D) % 360 + 360) % 360;
+  // K5c inv-plane pair, recomputed from the substituted ecliptic elements
+  // (the evaluator's EXACT rotation, mirrored; keplerian-chain.cjs is the
+  // one home — edits there trigger the 30-min artifact regen, so the
+  // mirror lives here with this pointer).
+  const IP = CHAIN_ARTIFACT.invariablePlane;
+  if (IP) {
+    const fi = IP.inclEclipticDeg * D2R, fO = IP.ascNodeEclipticDeg * D2R;
+    const zf = [Math.sin(fi) * Math.sin(fO), -Math.sin(fi) * Math.cos(fO), Math.cos(fi)];
+    let xf = [1 - zf[0] * zf[0], -zf[0] * zf[1], -zf[0] * zf[2]];
+    const xn = Math.hypot(xf[0], xf[1], xf[2]); xf = [xf[0] / xn, xf[1] / xn, xf[2] / xn];
+    const yf = [zf[1] * xf[2] - zf[2] * xf[1], zf[2] * xf[0] - zf[0] * xf[2], zf[0] * xf[1] - zf[1] * xf[0]];
+    const oi = out.inclEclipticDeg * D2R, oO = out.ascNodeEclipticDeg * D2R;
+    const nO = [Math.sin(oi) * Math.sin(oO), -Math.sin(oi) * Math.cos(oO), Math.cos(oi)];
+    const nz = nO[0] * zf[0] + nO[1] * zf[1] + nO[2] * zf[2];
+    out.inclInvPlaneDeg = Math.acos(Math.min(1, Math.max(-1, nz))) * R2D;
+    const c = [zf[1] * nO[2] - zf[2] * nO[1], zf[2] * nO[0] - zf[0] * nO[2], zf[0] * nO[1] - zf[1] * nO[0]];
+    const cx = c[0] * xf[0] + c[1] * xf[1] + c[2] * xf[2];
+    const cy = c[0] * yf[0] + c[1] * yf[1] + c[2] * yf[2];
+    out.ascNodeInvPlaneDeg = ((Math.atan2(cy, cx) * R2D) % 360 + 360) % 360;
+  }
+  return out;
+}
+// D5b — THE RELATIVE-PLANE CORRECTION (owner finding: "the universe becomes
+// too chaotic"). The engine-true planet planes wander vs the FIXED J2000
+// ecliptic (Laskar-validated: Earth vs La2010 rms 0.0031°, Venus/Mars
+// ranges match the published secular spans), but the SCENE's visible
+// ecliptic (the K sun plane) stays within ~1.3° of J2000 while Earth's
+// TRUE plane wanders to ~3-4° — so J2000-frame planet placement showed
+// each planet tilted by up to Earth's own wander relative to the visible
+// plane. A geocentric display must place planets RELATIVE TO EARTH'S
+// PLANE OF DATE, mounted on the scene's sun plane: one minimal rotation
+// (engine-Earth normal → scene-plane normal), applied in the helio-J2000
+// frame so positions, rings and traces all inherit it through the one
+// _kcHelioAU path. The visible tilts then ARE the true mutual
+// inclinations (Mercury ~8°, Mars ~5° at +1.35 Myr).
+let _kcPlaneCorrM = null;   // 3×3 in helio-J2000 coords, or null when inactive
+function _kcEarthEngineOrbitNormalJ2000(year) {
+  const t = year - 2000;
+  const D2R = Math.PI / 180;
+  let qx, qy;
+  if (_zetaSeriesData && t >= _zetaSeriesData.t0Yr && t <= _zetaSeriesEndYr) {
+    const S = _zetaSeriesData;
+    const li = (arr, tt) => { const x = (tt - S.t0Yr) / S.stepYr, i = Math.max(0, Math.min(arr.length - 2, Math.floor(x))), f = x - i; return arr[i] * (1 - f) + arr[i + 1] * f; };
+    const s2h = Math.sin(DEEP_MODES_ARTIFACT.anchorInclEclipticDeg / 2 * D2R);
+    qx = li(S.q, t) + (s2h * Math.cos(DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg * D2R) - li(S.q, 0));
+    qy = li(S.p, t) + (s2h * Math.sin(DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg * D2R) - li(S.p, 0));
+  } else {
+    const [mr, mi] = _kcModeSum(DEEP_MODES_ARTIFACT.earthZeta, t);
+    const [m0r, m0i] = _kcModeSum(DEEP_MODES_ARTIFACT.earthZeta, 0);
+    const s2h = Math.sin(DEEP_MODES_ARTIFACT.anchorInclEclipticDeg / 2 * D2R);
+    qx = mr + (s2h * Math.cos(DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg * D2R) - m0r);
+    qy = mi + (s2h * Math.sin(DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg * D2R) - m0i);
+  }
+  const i = 2 * Math.asin(Math.min(1, Math.hypot(qx, qy))), Om = Math.atan2(qy, qx);
+  return [Math.sin(i) * Math.sin(Om), -Math.sin(i) * Math.cos(Om), Math.cos(i)];
+}
+/** Recompute the per-frame correction (call from updatePositions when the
+ *  flag is live; matrices must be current). */
+function _kcUpdatePlaneCorr(year) {
+  // Active with the planet override (the early flip): once the planets are
+  // engine-true, the relative-plane placement is required regardless of
+  // the Earth one-source flag (its Earth-plane input is the series ζ,
+  // which arrives in the same artifact).
+  if (!_planetSeriesData || !_kcR) { _kcPlaneCorrM = null; return; }
+  const R = _kcR;
+  const ne = _kcEarthEngineOrbitNormalJ2000(year);
+  // world-frame normals: engine-Earth (through the chain frame) and the scene plane
+  const new_ = [
+    R[0][0] * ne[0] + R[0][1] * ne[1] + R[0][2] * ne[2],
+    R[1][0] * ne[0] + R[1][1] * ne[1] + R[1][2] * ne[2],
+    R[2][0] * ne[0] + R[2][1] * ne[1] + R[2][2] * ne[2],
+  ];
+  const ns = _HTC_N.set(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(_HTC_Q1)).normalize();
+  const nsw = [ns.x, ns.y, ns.z];
+  // minimal rotation new_ → nsw (Rodrigues), then pulled back to J2000:
+  // M_J2000 = Rᵀ · K · R  so that world = R·(M·hv) = K·(R·hv).
+  const ax = [new_[1] * nsw[2] - new_[2] * nsw[1], new_[2] * nsw[0] - new_[0] * nsw[2], new_[0] * nsw[1] - new_[1] * nsw[0]];
+  const s = Math.hypot(ax[0], ax[1], ax[2]);
+  const c = Math.min(1, Math.max(-1, new_[0] * nsw[0] + new_[1] * nsw[1] + new_[2] * nsw[2]));
+  if (s < 1e-12) { _kcPlaneCorrM = null; return; }
+  const u = [ax[0] / s, ax[1] / s, ax[2] / s];
+  const C = 1 - c;
+  const K = [
+    [c + u[0] * u[0] * C, u[0] * u[1] * C - u[2] * s, u[0] * u[2] * C + u[1] * s],
+    [u[1] * u[0] * C + u[2] * s, c + u[1] * u[1] * C, u[1] * u[2] * C - u[0] * s],
+    [u[2] * u[0] * C - u[1] * s, u[2] * u[1] * C + u[0] * s, c + u[2] * u[2] * C],
+  ];
+  // M = Rᵀ K R
+  const KR = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  for (let r = 0; r < 3; r++) for (let cc = 0; cc < 3; cc++) KR[r][cc] = K[r][0] * R[0][cc] + K[r][1] * R[1][cc] + K[r][2] * R[2][cc];
+  const M = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  for (let r = 0; r < 3; r++) for (let cc = 0; cc < 3; cc++) M[r][cc] = R[0][r] * KR[0][cc] + R[1][r] * KR[1][cc] + R[2][r] * KR[2][cc];
+  _kcPlaneCorrM = M;
 }
 // P5/K5 — elements-of-date from the chain (the multi-mode secular skeleton
 // + derived terms): ϖ(t), Ω(t), e(t), i(t) — the true element wander, not
@@ -51790,7 +52049,10 @@ function _kcHelioAU(nameLower, jd) {
 function _kcElementsOfDate(nameLower, jd) {
   if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   const year = KC_ANCHOR_EPOCH_YEAR + (jd - KC_ANCHOR_EPOCH_JD) / 365.25;
-  return kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
+  const el = kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
+  // Planet override DEFAULT-ON once the series is loaded (the early flip);
+  // inside each planet's measured boundary this is a no-op (chain serves).
+  return _planetSeriesData ? _kcSeriesSecularEl(nameLower, year, el) : el;
 }
 function _kcPerihelionEclLonDeg(nameLower, jd) {
   return _kcElementsOfDate(nameLower, jd).lonPeriEclipticDeg;
@@ -52279,6 +52541,10 @@ function updatePositions() {
   // rotate about the node line by (ε_geom − ε_target) — derivation: a
   // rotation of the axis about û = normalize(a×n) by +θ reduces the
   // axis-plane angle by exactly θ, and preserves the node line (equinox).
+  // D5b: refresh the relative-plane correction for the chain planets
+  // (engine-Earth plane → the scene's sun plane; null when the flag is off).
+  _kcUpdatePlaneCorr(_yearForObliquity);
+
   if (_hybridTiltCorr && _hybridSpinActive()) {
     _hybridTiltCorr.quaternion.set(0, 0, 0, 1);
     _hybridTiltCorr.updateMatrixWorld(true);
@@ -52622,21 +52888,23 @@ function tracePlanet(obj, pos) {
   const pointCount = vertArray.length / 3;
 
   // Adaptive step: at high speeds, increase step size to reduce iterations
-  // Calculate how many iterations would be needed with base step
-  const gap = pos - nextPos;
-  const baseIterations = gap / obj.traceStep;
-
-  // Target max ~50 iterations per frame for smooth performance
-  const TARGET_ITERATIONS = 50;
-  let effectiveStep = obj.traceStep;
-
-  if (baseIterations > TARGET_ITERATIONS) {
-    // Scale up the step to limit iterations
-    const stepMultiplier = Math.ceil(baseIterations / TARGET_ITERATIONS);
-    effectiveStep = obj.traceStep * stepMultiplier;
+  // C-4 follow-up (the jump-scribble, owner finding): NEVER scale the
+  // sampling step. The old adaptive step covered ANY gap with ~50 samples,
+  // so a +242-kyr jump sampled orbits ~4,800 yr apart — effectively random
+  // orbital phases, the jagged scribble. Instead: history beyond the trace
+  // window is unrepresentable in the ring buffer anyway, so on a jump past
+  // the window, fast-forward the fill start to pos − window; then always
+  // fill at the TRUE traceStep, ≤ MAX_ITERATIONS samples per frame,
+  // RESUMING on subsequent frames (traceCurrPos carries the progress; the
+  // early-exit guard above re-enters until caught up). The trail redraws
+  // itself progressively with always-true positions at bounded cost.
+  const windowPos = pointCount * obj.traceStep;
+  if (pos - nextPos > windowPos) {
+    nextPos = pos - windowPos;
+    obj.traceArrIndex = 0;
   }
+  const effectiveStep = obj.traceStep;
 
-  // Safety limit in case calculation is off
   const MAX_ITERATIONS = 100;
   let iterations = 0;
 
@@ -52690,7 +52958,10 @@ function moveModel(pos) {
     const _eccYearFrame = DEEP_TIME_MODE_ENABLED
       ? _jdToSIyear(o.julianDay)
       : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
-    earthPerihelionPrecession2.containerObj.position.x = -computeEccentricityEarthAtYear(_eccYearFrame) * 100;
+    // C-4a one source: under ?hybridSpin the geometric e offset (the sun-orbit
+    // eccentric displacement, e×100 scene units) rides the banked z series
+    // inside its span — same one-source function as the scalar.
+    earthPerihelionPrecession2.containerObj.position.x = -_sceneEccTargetAt(_eccYearFrame) * 100;
   }
 
   planetObjects.forEach(obj => {
@@ -55249,7 +55520,7 @@ function updatePredictions() {
   // Compute obliquity and eccentricity first - needed for year calculations
   predictions.obliquityEarth = o.obliquityEarth = _sceneEpsTargetDeg(yearForFormula);
   // Phase 8: use J2000-FIXED anchor + cycle length for frame-independent integrated phase
-  predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarthAtYear(yearForFormula);
+  predictions.eccentricityEarth = o.eccentricityEarth = _sceneEccTargetAt(yearForFormula);
 
   // Phase 9.11: Balanced-year navigation — past/future H and 8H balanced events.
   // H lattice cycles 0, ±1, ±2, ... anchored at BALANCED_YEAR_J2000_FIXED.
@@ -55931,7 +56202,10 @@ function _eccentricityInline(key, year) {
     // ECCENTRICITY UNIFICATION: Earth rides the model's ONE law — the H/3
     // line (_fwEarthEcc, the channel with base' derived from e(J2000)); the
     // H/16 law-of-cosines form below stays for the PLANETS' wobble laws.
-    return _fwEarthEcc(year - 2000);
+    // C-4a one source: under ?hybridSpin the SAME one-source function that
+    // drives the geometric offset and the scalar also feeds the sun's
+    // equation of center — the scene's e is one value everywhere.
+    return _sceneEccTargetAt(year);
   }
   // Planets: same formula, per-body J2000-fixed anchor / wobble period / base / amplitude.
   const p = key.startsWith('eccentricity') ? key.slice('eccentricity'.length).toLowerCase() : null;

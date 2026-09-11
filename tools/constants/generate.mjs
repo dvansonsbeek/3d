@@ -502,6 +502,17 @@ function buildDeepModes(chainArt) {
             .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
           return [p, (m.omegaRadPerYr * 180 / Math.PI) * 3600];
         })),
+      // D5 (the deep-time planet elements): the seven planets' FULL z and ζ
+      // mode tables, verbatim — the beyond-±10-Myr TAIL for the series-
+      // driven element override (the same role earthZ/earthZeta play for
+      // the obliquity hybrid). Few KB; sane where the era chain's
+      // extrapolation blows up (the owner-found ring failure).
+      planetZ: Object.fromEntries(
+        Object.keys(art.modes).filter((p) => p !== 'earth')
+          .map((p) => [p, art.modes[p].z])),
+      planetZeta: Object.fromEntries(
+        Object.keys(art.modes).filter((p) => p !== 'earth')
+          .map((p) => [p, art.modes[p].zeta])),
       anchorE: anchor.e,
       anchorPeriEclipticDeg: anchor.lonPeriEclipticDeg,
       anchorInclEclipticDeg: anchor.inclEclipticDeg,

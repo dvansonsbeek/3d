@@ -23,26 +23,26 @@
     "fittedLawCorr": 0.6148901434239137
    },
    "130": {
-    "hybridRmsArcsec": 273.9786555588668,
-    "hybridCorr": 0.99759521787199,
+    "hybridRmsArcsec": 273.98055216709395,
+    "hybridCorr": 0.9975951542231352,
     "fittedLawRmsArcsec": 2243.0300972212854,
     "fittedLawCorr": 0.5848211055646957
    },
    "270": {
-    "hybridRmsArcsec": 294.3895444926349,
-    "hybridCorr": 0.9953988346212538,
+    "hybridRmsArcsec": 294.39478166565164,
+    "hybridCorr": 0.9953986279026165,
     "fittedLawRmsArcsec": 2918.7753068727206,
     "fittedLawCorr": 0.3230912957080654
    },
    "600": {
-    "hybridRmsArcsec": 290.365739397916,
-    "hybridCorr": 0.9924660438699214,
+    "hybridRmsArcsec": 290.3777062932621,
+    "hybridCorr": 0.9924655525819415,
     "fittedLawRmsArcsec": 3440.6513708534003,
     "fittedLawCorr": -0.08980403349994259
    },
    "1000": {
-    "hybridRmsArcsec": 359.7575454008969,
-    "hybridCorr": 0.9848387726509853,
+    "hybridRmsArcsec": 359.77205255623176,
+    "hybridCorr": 0.9848380629822698,
     "fittedLawRmsArcsec": 3431.364542311616,
     "fittedLawCorr": -0.24902080832936696
    }
@@ -61,26 +61,26 @@
     "fittedLawCorr": 0.6148901434239137
    },
    "130": {
-    "hybridRmsArcsec": 400.861532881441,
-    "hybridCorr": 0.9886087852874946,
+    "hybridRmsArcsec": 400.860562648008,
+    "hybridCorr": 0.9886088487434808,
     "fittedLawRmsArcsec": 2243.0300972212854,
     "fittedLawCorr": 0.5848211055646957
    },
    "270": {
-    "hybridRmsArcsec": 544.0198733380264,
-    "hybridCorr": 0.9770499538558266,
+    "hybridRmsArcsec": 544.0238732642955,
+    "hybridCorr": 0.9770496240070597,
     "fittedLawRmsArcsec": 2918.7753068727206,
     "fittedLawCorr": 0.3230912957080654
    },
    "600": {
-    "hybridRmsArcsec": 652.3030073662511,
-    "hybridCorr": 0.9593469495683493,
+    "hybridRmsArcsec": 652.3121161411663,
+    "hybridCorr": 0.9593459787522827,
     "fittedLawRmsArcsec": 3440.6513708534003,
     "fittedLawCorr": -0.08980403349994259
    },
    "1000": {
-    "hybridRmsArcsec": 714.9106139158002,
-    "hybridCorr": 0.9351996729181392,
+    "hybridRmsArcsec": 714.9207351367141,
+    "hybridCorr": 0.9351984042196663,
     "fittedLawRmsArcsec": 3431.364542311616,
     "fittedLawCorr": -0.24902080832936696
    }

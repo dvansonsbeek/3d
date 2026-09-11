@@ -60,7 +60,10 @@ function main() {
   const H = createDeepOrbitalHistory();
   const maxAge = ages[ages.length - 1];
   console.log(`integrating the hybrid once over 0..−${maxAge} kyr …`);
-  const S = H.build(0, -(maxAge * 1000 + 2000), 100);
+  // D1 stepping contract: deep builds need 250-aligned grids (the factory
+  // integrates at 250-yr steps beyond ±50 kyr and throws on misaligned
+  // grids). 250 yr still oversamples the CSV's kyr-scale consumers.
+  const S = H.build(0, -(maxAge * 1000 + 2000), 250);
 
   // first pass: collect for the inclination mean (incl_anom centres on the
   // deep series' own mean — the law CSV centres on the law's 1.48128)

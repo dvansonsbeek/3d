@@ -36,12 +36,15 @@
  *   zetaModes: ReadonlyArray<{omegaRadPerYr: number, re: number, im: number}>,
  *   zetaSeries?: {t0Yr: number, stepYr: number,
  *                 q: ReadonlyArray<number>, p: ReadonlyArray<number>},
+ *   zSeries?: {t0Yr: number, stepYr: number,
+ *              q: ReadonlyArray<number>, p: ReadonlyArray<number>},
  *   anchorE: number,
  *   anchorPeriEclipticDeg: number,
  *   anchorInclEclipticDeg: number,
  *   anchorAscNodeEclipticDeg: number,
  *   axialPrecessionYearsJ2000: number,
  *   obliquityJ2000Deg: number,
+ *   axialPrecessionYearsAtYearFn?: (year: number) => number,
  * }} deps — mode tables from the governed deep artifact (choose the ζ tier
  *   per consumer: era = its own 8-term extraction, deep = the 16-term
  *   table; NEVER a slice); anchors from the chain artifact's one home; the
@@ -57,9 +60,10 @@
  *   certified window).
  */
 function createDeepOrbitalHistory({
-  zModes, zetaModes, zetaSeries,
+  zModes, zetaModes, zetaSeries, zSeries,
   anchorE, anchorPeriEclipticDeg, anchorInclEclipticDeg, anchorAscNodeEclipticDeg,
   axialPrecessionYearsJ2000, obliquityJ2000Deg,
+  axialPrecessionYearsAtYearFn,
 }) {
   const D2R = Math.PI / 180, R2D = 180 / Math.PI;
 
@@ -102,8 +106,26 @@ function createDeepOrbitalHistory({
       ? [li(sq, t) + R[0], li(sp, t) + R[1]]
       : zetaModeSum(t);
   }
-  const zAt = mkAnchored(zModes,
+  const zAnchor = /** @type {[number, number]} */ (
     [anchorE * Math.cos(anchorPeriEclipticDeg * D2R), anchorE * Math.sin(anchorPeriEclipticDeg * D2R)]);
+  const zModeSum = mkAnchored(zModes, zAnchor);
+  // C-4a: the z-side one-source path — same construction as zetaSeries
+  // (anchored engine series inside the span, anchored mode sum as the tail).
+  let zAt = zModeSum;
+  if (zSeries) {
+    const { t0Yr, stepYr, q: sq, p: sp } = zSeries;
+    const nS = sq.length, tEndYr = t0Yr + (nS - 1) * stepYr;
+    const li = (/** @type {ReadonlyArray<number>} */ arr, /** @type {number} */ tt) => {
+      const x = (tt - t0Yr) / stepYr;
+      const i = Math.max(0, Math.min(nS - 2, Math.floor(x)));
+      const f = x - i;
+      return arr[i] * (1 - f) + arr[i + 1] * f;
+    };
+    const R = [zAnchor[0] - li(sq, 0), zAnchor[1] - li(sp, 0)];
+    zAt = (/** @type {number} */ t) => (t >= t0Yr && t <= tEndYr)
+      ? [li(sq, t) + R[0], li(sp, t) + R[1]]
+      : zModeSum(t);
+  }
 
   /** @param {number} t */
   const inclNode = (t) => {
@@ -119,13 +141,25 @@ function createDeepOrbitalHistory({
   const psiDot = (2 * Math.PI) / axialPrecessionYearsJ2000;
   const EPS0 = obliquityJ2000Deg * D2R;
   const ALPHA = psiDot / Math.cos(EPS0);
+  // D1-revised (plan 02, owner 2026-09-13): when the injecting engine
+  // supplies its epoch-aware axial-precession evaluator, α follows the
+  // model's own H(t) recession history — α(t) = ψ̇(t)/cos ε₀ — and the
+  // integrated deep-time obliquity IS the sharpened falsification-leg-1
+  // form (the beat 2π/(ψ̇(t) − |s₃|), p H-scaled, s₃ dynamical). No new
+  // constants: ψ̇(t) comes from the same certified year-length machinery
+  // as the J2000 anchor. Absent the option, α stays constant (the
+  // pre-D1 ±Myr-class behavior, bit-identical).
+  const alphaAt = axialPrecessionYearsAtYearFn
+    ? (/** @type {number} */ t) =>
+        ((2 * Math.PI) / axialPrecessionYearsAtYearFn(2000 + t)) / Math.cos(EPS0)
+    : () => ALPHA;
 
   const cross = (/** @type {number[]} */ a, /** @type {number[]} */ b) =>
     [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
   const dot = (/** @type {number[]} */ a, /** @type {number[]} */ b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   const deriv = (/** @type {number[]} */ s, /** @type {number} */ t) => {
     const n = orbitNormal(t);
-    const k = ALPHA * dot(s, n);
+    const k = alphaAt(t) * dot(s, n);
     const c = cross(s, n);
     return [k * c[0], k * c[1], k * c[2]];
   };
@@ -175,22 +209,41 @@ function createDeepOrbitalHistory({
    */
   function build(t0Yr, t1Yr, stepYr) {
     const tMin = Math.min(t0Yr, t1Yr, 0), tMax = Math.max(t0Yr, t1Yr, 0);
+    // D1 stepping contract: a build reaching beyond the ±50-kyr fine zone
+    // integrates at 250-yr steps there, so its grid must be 250-aligned or
+    // at() would meet missing keys. Fail loud, not subtly coarse.
+    if (Math.max(Math.abs(tMin), Math.abs(tMax)) > 50000 && stepYr % 250 !== 0) {
+      throw new Error(`deep-orbital-history: builds beyond ±50 kyr need stepYr % 250 === 0 (got ${stepYr})`);
+    }
     const grid = new Map();
     const S0 = [0, Math.sin(EPS0), Math.cos(EPS0)];
-    const H_STEP = 5;
+    // D1-revised adaptive stepping: 5-yr RK4 near the era (the certified-
+    // precision zone), 250-yr beyond ±50 kyr — still 103 steps per
+    // precession cycle and ≥196 samples of the fastest ζ mode (49 kyr), so
+    // the integration stays deep in RK4's convergence regime while ±500 Myr
+    // becomes a seconds-class one-time build (measured: coarse-vs-fine
+    // agree to <1e-4° at ±1 Myr — the generator's regression gate).
+    // STRICT < so the walk switches AT the ±50,000 boundary (50,000 is
+    // 250-aligned; switching one fine-step later would leave the coarse walk
+    // permanently off-grid — measured: every key beyond ±50 kyr missing).
+    const hStepAt = (/** @type {number} */ t) => (Math.abs(t) < 50000 ? 5 : 250);
     for (const dir of [-1, +1]) {
       let s = S0, t = 0;
       grid.set(0, sampleAt(s, 0));
       const end = dir < 0 ? tMin : tMax;
       while (dir < 0 ? t > end : t < end) {
+        const H_STEP = hStepAt(t);
         s = rk4(s, t, dir * H_STEP);
         t += dir * H_STEP;
-        // Store ONLY at true step multiples: an end-of-range sample under a
-        // ROUNDED key collides with a real grid node (measured during C-3:
-        // build(+200, …, 1000) stored ε(+200) under key 0, clobbering the
-        // t = 0 sample by 94″ — the verdict generator's rms caught it).
-        // Partial edge segments are covered by at()'s a-side fallback.
-        if (Math.abs(t % stepYr) < H_STEP / 2) grid.set(Math.round(t / stepYr) * stepYr, sampleAt(s, t));
+        // Store ONLY at EXACT step multiples: an off-grid sample under a
+        // ROUNDED key collides with (or shifts) a real grid node (measured
+        // during C-3: build(+200, …, 1000) stored ε(+200) under key 0,
+        // clobbering the t = 0 sample by 94″; and the D1 variable step made
+        // the old |t % stepYr| < H_STEP/2 window store 250-yr samples under
+        // 100-yr keys, 50 yr off). Exact alignment is guaranteed by the
+        // guard below (coarse builds use 250-aligned grids; the 50,000-yr
+        // zone boundary is itself 250-aligned, so the walk stays on-grid).
+        if (Math.abs(t - Math.round(t / stepYr) * stepYr) < 1e-6) grid.set(Math.round(t / stepYr) * stepYr, sampleAt(s, t));
       }
     }
     return {
