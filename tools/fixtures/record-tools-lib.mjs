@@ -232,6 +232,7 @@ function measure() {
       for (const y of [2000, -11000, -100000, -220000]) {
         const s = M.cardinal.spreadSeconds(y);
         v[`cardinalOS.meanSeconds@${y}`] = s.meanSeconds;
+        v[`cardinalOS.anomalisticSeconds@${y}`] = M.cardinal.anomalisticYearSeconds(y);
         for (const tp of ['VE', 'SS', 'AE', 'WS']) {
           v[`cardinalOS.spread.${tp}@${y}`] = s[tp];
           v[`cardinalOS.eocOffset.${tp}@${y}`] = M.cardinal.eocOffsetSeconds(y, tp);

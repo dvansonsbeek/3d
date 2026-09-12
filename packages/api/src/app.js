@@ -215,6 +215,7 @@ export function createApi() {
         return {
           year: y,
           meanTropicalYearSeconds: spread.meanSeconds,
+          anomalisticYearSeconds: model.cardinalStructure.anomalisticYearSeconds(y),
           points: Object.fromEntries(types.map((type) => [type, {
             yearLengthSeconds: model.cardinalStructure.yearLengthSeconds(y, /** @type {any} */ (type)),
             eocOffsetSeconds: model.cardinalStructure.eocOffsetSeconds(y, /** @type {any} */ (type)),

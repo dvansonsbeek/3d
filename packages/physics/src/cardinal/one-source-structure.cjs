@@ -102,6 +102,31 @@ function createCardinalStructure({ sampleAt, tropicalYearSecondsAtYearFn }) {
   }
 
   /**
+   * The ANOMALISTIC year — time between successive perihelion passages,
+   * SI seconds. At perihelion the equation of center is ZERO by definition
+   * (M = 0), so perihelion passages are pure mean-anomaly events and the
+   * closed form needs no EoC term at all:
+   *
+   *   T_anom(year) = T_mean(year+½) · 360 / (360 − Δϖ_yr)
+   *
+   * with Δϖ_yr = ϖ(year+1) − ϖ(year) (wrapped; the year-over-year apsidal
+   * advance RELATIVE TO THE EQUINOX — periOfDateDeg is equinox-referenced,
+   * so this is the climatic-precession rate, ~0.017°/yr ≈ +25 min at
+   * J2000). Exact difference form; driven by the ENGINE's ϖ(t) — this is
+   * the model's physics, replacing the retired K-family anomalistic
+   * harmonic fit (the family that measured worst against the one-source
+   * movement: 0.41 s broadband).
+   * @param {number} year the interval starts at this year's perihelion
+   * @returns {number} seconds
+   */
+  function anomalisticYearSeconds(year) {
+    const p0 = sampleAt(year).periOfDateDeg;
+    const p1 = sampleAt(year + 1).periOfDateDeg;
+    const dPeriDeg = ((p1 - p0 + 540) % 360) - 180;   // wrapped, prograde +
+    return tropicalYearSecondsAtYearFn(year + 0.5) * 360 / (360 - dPeriDeg);
+  }
+
+  /**
    * The four year lengths minus the mean — the e(t)-proportional spread.
    * @param {number} year
    * @returns {{VE: number, SS: number, AE: number, WS: number, meanSeconds: number}}
@@ -116,7 +141,7 @@ function createCardinalStructure({ sampleAt, tropicalYearSecondsAtYearFn }) {
     return out;
   }
 
-  return { eocOffsetSeconds, yearLengthSeconds, spreadSeconds };
+  return { eocOffsetSeconds, yearLengthSeconds, spreadSeconds, anomalisticYearSeconds };
 }
 
 module.exports = { createCardinalStructure, equationOfCenterDeg, CARDINAL_LONGITUDE_DEG };

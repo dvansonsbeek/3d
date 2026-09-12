@@ -1175,6 +1175,7 @@ export function assembleModel(C, F, laws = {}) {
       yearLengthSeconds: /** @param {number} year @param {'VE'|'SS'|'AE'|'WS'} type @returns {number} */ (year, type) => cardinalStructureM.yearLengthSeconds(year, type),
       eocOffsetSeconds: /** @param {number} year @param {'VE'|'SS'|'AE'|'WS'} type @returns {number} */ (year, type) => cardinalStructureM.eocOffsetSeconds(year, type),
       spreadSeconds: /** @param {number} year */ (year) => cardinalStructureM.spreadSeconds(year),
+      anomalisticYearSeconds: /** @param {number} year @returns {number} */ (year) => cardinalStructureM.anomalisticYearSeconds(year),
     }),
     moon: Object.freeze({
       distanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,
