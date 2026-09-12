@@ -131,16 +131,29 @@ function createDeepOrbitalHistory({
   // engine's own ζ series (anchored at J2000 exactly like the mode sums);
   // outside it, the anchored mode sum is the tail. Without zetaSeries the
   // mode sum serves at every t — the pre-C-2 behavior, bit-identical.
+  // C1 series interpolation (D4g, measured): the 500-yr LINEAR series lerp
+  // put kinks in n̂(t)/z(t) at its nodes, and the equinox RATE inherited
+  // them — the grid-dependent bump around J2000 in per-year P(t) (the same
+  // interpolation-order disease as the spin grid, one level down). Cubic
+  // Hermite with central-difference node slopes (one-sided at the ends);
+  // exact at nodes, so the J2000 anchors are unchanged.
+  const mkSeriesCubic = (/** @type {number} */ t0Yr, /** @type {number} */ stepYr, /** @type {number} */ nS) =>
+    (/** @type {ReadonlyArray<number>} */ arr, /** @type {number} */ tt) => {
+      const x = (tt - t0Yr) / stepYr;
+      const i = Math.max(0, Math.min(nS - 2, Math.floor(x)));
+      const f = x - i;
+      const y0 = arr[i], y1 = arr[i + 1];
+      const m0 = i > 0 ? (y1 - arr[i - 1]) / 2 : y1 - y0;
+      const m1 = i + 2 < nS ? (arr[i + 2] - y0) / 2 : y1 - y0;
+      const f2 = f * f, f3 = f2 * f;
+      return (2 * f3 - 3 * f2 + 1) * y0 + (f3 - 2 * f2 + f) * m0
+        + (-2 * f3 + 3 * f2) * y1 + (f3 - f2) * m1;
+    };
   let zetaAt = zetaModeSum;
   if (zetaSeries) {
     const { t0Yr, stepYr, q: sq, p: sp } = zetaSeries;
     const nS = sq.length, tEndYr = t0Yr + (nS - 1) * stepYr;
-    const li = (/** @type {ReadonlyArray<number>} */ arr, /** @type {number} */ tt) => {
-      const x = (tt - t0Yr) / stepYr;
-      const i = Math.max(0, Math.min(nS - 2, Math.floor(x)));
-      const f = x - i;
-      return arr[i] * (1 - f) + arr[i + 1] * f;
-    };
+    const li = mkSeriesCubic(t0Yr, stepYr, nS);
     const R = [zetaAnchor[0] - li(sq, 0), zetaAnchor[1] - li(sp, 0)];
     zetaAt = (/** @type {number} */ t) => (t >= t0Yr && t <= tEndYr)
       ? [li(sq, t) + R[0], li(sp, t) + R[1]]
@@ -155,12 +168,7 @@ function createDeepOrbitalHistory({
   if (zSeries) {
     const { t0Yr, stepYr, q: sq, p: sp } = zSeries;
     const nS = sq.length, tEndYr = t0Yr + (nS - 1) * stepYr;
-    const li = (/** @type {ReadonlyArray<number>} */ arr, /** @type {number} */ tt) => {
-      const x = (tt - t0Yr) / stepYr;
-      const i = Math.max(0, Math.min(nS - 2, Math.floor(x)));
-      const f = x - i;
-      return arr[i] * (1 - f) + arr[i + 1] * f;
-    };
+    const li = mkSeriesCubic(t0Yr, stepYr, nS);   // C1 (see mkSeriesCubic)
     const R = [zAnchor[0] - li(sq, 0), zAnchor[1] - li(sp, 0)];
     zAt = (/** @type {number} */ t) => (t >= t0Yr && t <= tEndYr)
       ? [li(sq, t) + R[0], li(sp, t) + R[1]]
@@ -212,8 +220,28 @@ function createDeepOrbitalHistory({
   // the injected anchor exactly (dp/dα = 1 to first order — one
   // fixed-point step lands on target, measured). H(t) shape preserved
   // (constant factor on the caller's evaluator).
+
+  // THE ANCHORED SPIN AXIS (measured): ε₀ is defined against the ECLIPTIC
+  // — Earth's own mean orbit plane — never against the chain artifact's
+  // coordinate pole. The anchor elements carry i₀ ≈ 0.37″ of integrator-
+  // frame residue, and tilting ŝ(0) from the coordinate pole projected
+  // −0.2865″ of it straight into ε(J2000) (the C-1 era gate's offset,
+  // masked until the C1 series interpolation removed the lerp kink at the
+  // J2000 node). Build ŝ(0) FROM n̂(0): tilt ε₀ about the J2000 equinox
+  // direction projected into the orbit plane. Frame-invariant (the
+  // artifact's coordinate frame drops out) and ε(J2000) ≡ ε₀ by
+  // construction; reduces to [0, sin ε₀, cos ε₀] exactly when n̂(0) = ẑ.
+  const S0A = (() => {
+    const n0 = orbitNormal(0);
+    const px = [1 - n0[0] * n0[0], -n0[0] * n0[1], -n0[0] * n0[2]];
+    const pm = Math.hypot(px[0], px[1], px[2]);
+    const u = [px[0] / pm, px[1] / pm, px[2] / pm];
+    const v = cross(n0, u);
+    return [0, 1, 2].map((i) => Math.cos(EPS0) * n0[i] + Math.sin(EPS0) * v[i]);
+  })();
+
   const K_LUNI = (() => {
-    const S0P = [0, Math.sin(EPS0), Math.cos(EPS0)];
+    const S0P = S0A;
     const dv = (/** @type {number[]} */ s, /** @type {number} */ t) => {
       const n = orbitNormal(t);
       const k = alphaAtGeneral(t) * dot(s, n);
@@ -258,6 +286,14 @@ function createDeepOrbitalHistory({
     return [o[0] / r, o[1] / r, o[2] / r];
   };
 
+  /** Equinox-node longitude only (J2000 ecliptic frame) — the light read
+   *  used for the node-rate finite difference at store time. */
+  function eqLonOnlyDeg(/** @type {number[]} */ s, /** @type {number} */ t) {
+    const n = orbitNormal(t);
+    const g = cross(s, n);
+    return Math.atan2(g[1], g[0]) * R2D;
+  }
+
   /** One quantity bundle at time t (years from J2000) from spin axis s. */
   function sampleAt(/** @type {number[]} */ s, /** @type {number} */ t) {
     const n = orbitNormal(t);
@@ -300,6 +336,7 @@ function createDeepOrbitalHistory({
       // (the browser tropical-year chart is the reference implementation).
       // The LONGITUDE itself is raw geometry and needs no correction.
       equinoxLonJ2000Deg: ((Math.atan2(gu[1], gu[0]) * R2D) % 360 + 360) % 360,
+      equinoxLonRateDegPerYr: 0,   // filled at store time (build's ±2.5-yr central difference)
     };
   }
 
@@ -318,7 +355,7 @@ function createDeepOrbitalHistory({
       throw new Error(`deep-orbital-history: builds beyond ±50 kyr need stepYr % 250 === 0 (got ${stepYr})`);
     }
     const grid = new Map();
-    const S0 = [0, Math.sin(EPS0), Math.cos(EPS0)];
+    const S0 = S0A;
     // D1-revised adaptive stepping: 5-yr RK4 near the era (the certified-
     // precision zone), 250-yr beyond ±50 kyr — still 103 steps per
     // precession cycle and ≥196 samples of the fastest ζ mode (49 kyr), so
@@ -331,7 +368,23 @@ function createDeepOrbitalHistory({
     const hStepAt = (/** @type {number} */ t) => (Math.abs(t) < 50000 ? 5 : 250);
     for (const dir of [-1, +1]) {
       let s = S0, t = 0;
-      grid.set(0, sampleAt(s, 0));
+      // Each stored node also carries the equinox-node RATE (deg/yr) from a
+      // ±2.5-yr central difference on the integrator's own state — the C1
+      // (Hermite) interpolation input. Linear interpolation of the node
+      // longitude made the realized equinox rate PIECEWISE-CONSTANT per
+      // grid cell — the report's per-year precession column showed flat
+      // centuries with steps at the 1700/1800/1900/2000 cell edges
+      // (measured; the levels were the real wobble at 100-yr resolution,
+      // the staircase was this interpolation order).
+      const storeWithRate = (/** @type {number} */ key, /** @type {number[]} */ sv, /** @type {number} */ tv) => {
+        const smp = sampleAt(sv, tv);
+        const hR = 2.5;
+        const lp = eqLonOnlyDeg(rk4(sv, tv, +hR), tv + hR);
+        const lm = eqLonOnlyDeg(rk4(sv, tv, -hR), tv - hR);
+        smp.equinoxLonRateDegPerYr = (((lp - lm + 540) % 360) - 180) / (2 * hR);
+        grid.set(key, smp);
+      };
+      storeWithRate(0, s, 0);
       const end = dir < 0 ? tMin : tMax;
       while (dir < 0 ? t > end : t < end) {
         const H_STEP = hStepAt(t);
@@ -345,7 +398,7 @@ function createDeepOrbitalHistory({
         // 100-yr keys, 50 yr off). Exact alignment is guaranteed by the
         // guard below (coarse builds use 250-aligned grids; the 50,000-yr
         // zone boundary is itself 250-aligned, so the walk stays on-grid).
-        if (Math.abs(t - Math.round(t / stepYr) * stepYr) < 1e-6) grid.set(Math.round(t / stepYr) * stepYr, sampleAt(s, t));
+        if (Math.abs(t - Math.round(t / stepYr) * stepYr) < 1e-6) storeWithRate(Math.round(t / stepYr) * stepYr, s, t);
       }
     }
     return {
@@ -364,7 +417,21 @@ function createDeepOrbitalHistory({
           eSinPeri: lerp(a.eSinPeri, b.eSinPeri),
           eCosPeri: lerp(a.eCosPeri, b.eCosPeri),
           inclEclDeg: lerp(a.inclEclDeg, b.inclEclDeg),
-          equinoxLonJ2000Deg: ((dAng(a.equinoxLonJ2000Deg, b.equinoxLonJ2000Deg) % 360) + 360) % 360,
+          // C1 (cubic Hermite) — linear interpolation here made the
+          // realized equinox RATE piecewise-constant per grid cell (the
+          // measured per-year precession staircase). Node rates come from
+          // the build's own ±2.5-yr central differences.
+          equinoxLonJ2000Deg: (() => {
+            const l0 = a.equinoxLonJ2000Deg;
+            const dl = ((b.equinoxLonJ2000Deg - l0 + 540) % 360) - 180;   // unwrapped segment
+            const m0 = a.equinoxLonRateDegPerYr * stepYr;
+            const m1 = (b.equinoxLonRateDegPerYr ?? a.equinoxLonRateDegPerYr) * stepYr;
+            const f2 = f * f, f3 = f2 * f;
+            const v = (2 * f3 - 3 * f2 + 1) * l0 + (f3 - 2 * f2 + f) * m0
+              + (-2 * f3 + 3 * f2) * (l0 + dl) + (f3 - f2) * m1;
+            return ((v % 360) + 360) % 360;
+          })(),
+          equinoxLonRateDegPerYr: lerp(a.equinoxLonRateDegPerYr, b.equinoxLonRateDegPerYr ?? a.equinoxLonRateDegPerYr),
         };
       },
     };

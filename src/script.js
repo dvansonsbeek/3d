@@ -20214,23 +20214,51 @@ function _hybridSpinActive() { return HYBRID_SPIN_REQUESTED && _zetaSeriesData !
 // rotation about the sun-plane normal BEFORE the ε correction — the C-3
 // wrapper's node-line preservation was the LAST scene-K element (measured
 // as ±45-60 s of mean-tropical-year structure in the deep bands).
-let _osmEqxAnchorB = null;
-function _osmEquinoxDeltaRadBrowser() {
-  if (!_hybridSpinActive() || !DEEP_TIME_MODE_ENABLED) return 0;
-  if (!_osmEqxAnchorB) {
-    const y2000 = _jdToSIyear(2451545.0);
-    _osmEqxAnchorB = {
-      engDeg: _hybridSeriesSampleAt(y2000).equinoxLonJ2000Deg,
-      cyc: cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, y2000, 13) ?? 0,
+// D4d-rev (the K-reference correction — twin of tools/lib): the K term is
+// the K scene's FULL geometric equinox motion, read from the uncorrected
+// node line û = a×n (the analytic H/13 wheel alone under-subtracted the K
+// plane-wheels' node term — measured 0.057″/yr = −1.2 s of tropical year).
+// The J2000 anchor is captured once by a jump-probe of the PURE-K scene
+// (wrapper quaternion reset first; light update — the wrapper block only
+// runs in full updates). λ_K azimuth: û against world-x projected into the
+// sun plane.
+let _osmEqxGeoAnchorB = null;   // {lamK2000Rad, hyb2000Deg}
+let _osmEqxCapturingB = false;  // reentrancy guard: jumpToJulianDay triggers a full update → the wrapper block again
+function _osmNodeAzimuthRadB(a, n) {
+  const u = new THREE.Vector3().crossVectors(a, n);
+  if (u.lengthSq() < 1e-12) return 0;
+  u.normalize();
+  const xp = new THREE.Vector3(1, 0, 0).addScaledVector(n, -n.x).normalize();
+  const yp = new THREE.Vector3().crossVectors(n, xp);
+  return Math.atan2(u.dot(yp), u.dot(xp));
+}
+function _osmEqxEnsureAnchorB() {
+  if (_osmEqxGeoAnchorB || _osmEqxCapturingB || !_hybridSpinActive() || !DEEP_TIME_MODE_ENABLED) return;
+  _osmEqxCapturingB = true;
+  try {
+    const savedJD = o.julianDay;
+    _hybridTiltCorr.quaternion.set(0, 0, 0, 1);
+    jumpToJulianDay(2451545.0);
+    forceSceneUpdate('light');
+    _hybridTiltCorr.quaternion.set(0, 0, 0, 1);
+    _hybridTiltCorr.updateMatrixWorld(true);
+    const a = new THREE.Vector3(0, 1, 0).applyQuaternion(earth.rotationAxis.getWorldQuaternion(_HTC_Q1)).normalize();
+    const n = new THREE.Vector3(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(_HTC_Q2)).normalize();
+    _osmEqxGeoAnchorB = {
+      lamK2000Rad: _osmNodeAzimuthRadB(a, n),
+      hyb2000Deg: _hybridSeriesSampleAt(_jdToSIyear(2451545.0)).equinoxLonJ2000Deg,
     };
+    jumpToJulianDay(savedJD);
+    forceSceneUpdate('light');
+  } finally {
+    _osmEqxCapturingB = false;
   }
+}
+function _osmEqxHybAdvanceRad() {
+  if (!_hybridSpinActive() || !DEEP_TIME_MODE_ENABLED || !_osmEqxGeoAnchorB) return null;
   const ySI = _jdToSIyear(o.julianDay);
-  const dEng = (((_hybridSeriesSampleAt(ySI).equinoxLonJ2000Deg - _osmEqxAnchorB.engDeg + 540) % 360) - 180) * (Math.PI / 180);
-  const cycNow = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, ySI, 13);
-  const dK = -(((cycNow ?? 0) - _osmEqxAnchorB.cyc) * 2 * Math.PI);
-  const dKW = Math.atan2(Math.sin(dK), Math.cos(dK));
-  const d = dEng - dKW;
-  return Math.atan2(Math.sin(d), Math.cos(d));
+  const d = (((_hybridSeriesSampleAt(ySI).equinoxLonJ2000Deg - _osmEqxGeoAnchorB.hyb2000Deg + 540) % 360) - 180);
+  return d * (Math.PI / 180);
 }
 
 let _osmPeriAnchorB = null;
@@ -52725,18 +52753,26 @@ function updatePositions() {
   // (engine-Earth plane → the scene's sun plane; null when the flag is off).
   _kcUpdatePlaneCorr(_yearForObliquity);
 
-  if (_hybridTiltCorr && _hybridSpinActive()) {
+  if (_hybridTiltCorr && _hybridSpinActive() && !_osmEqxCapturingB) {
+    _osmEqxEnsureAnchorB();   // one-time J2000 pure-K anchor capture (jump-probe; guarded)
     _hybridTiltCorr.quaternion.set(0, 0, 0, 1);
     _hybridTiltCorr.updateMatrixWorld(true);
     const a = _HTC_A.set(0, 1, 0).applyQuaternion(earth.rotationAxis.getWorldQuaternion(_HTC_Q1)).normalize();
     const n = _HTC_N.set(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(_HTC_Q2)).normalize();
     const epsGeom = Math.acos(Math.min(1, Math.max(-1, a.dot(n))));
     const epsTarget = o.obliquityEarth * Math.PI / 180;
-    // D4d: the azimuth correction FIRST — rotate the axis about the
-    // sun-plane normal by Δψ (the hybrid-vs-K equinox phase; the angle to
-    // n is invariant, so εGeom needs no recompute — only the node line
-    // moves). qw = q_tilt(û′) · q_azimuth(n).
-    const dpsi = _osmEquinoxDeltaRadBrowser();
+    // D4d-rev: the azimuth correction FIRST — Δψ = (hybrid equinox advance)
+    // − (K scene's FULL geometric equinox advance), both J2000-anchored;
+    // λ_K read from the uncorrected a×n THIS frame. The angle to n is
+    // invariant under the azimuth, so εGeom needs no recompute.
+    let dpsi = 0;
+    const dHyb = _osmEqxHybAdvanceRad();
+    if (dHyb !== null) {
+      let dK = _osmNodeAzimuthRadB(a, n) - _osmEqxGeoAnchorB.lamK2000Rad;
+      dK = Math.atan2(Math.sin(dK), Math.cos(dK));
+      const d = dHyb - dK;
+      dpsi = Math.atan2(Math.sin(d), Math.cos(d));
+    }
     if (dpsi !== 0) {
       const qAz = _HTC_QAZ.setFromAxisAngle(n, dpsi);
       a.applyQuaternion(qAz);
