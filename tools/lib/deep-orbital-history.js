@@ -94,15 +94,24 @@ function createOneSourceMovement() {
     axialPrecessionYearsAtYearFn: (yr) => axial0 * DT.meanHAtAge((2000 - yr) / 1e6) / H0,
   });
 
-  // grown-grid sampler (the browser's tiers: 250-aligned beyond ±50 kyr)
+  // grown-grid sampler (the browser's tiers: 250-aligned beyond ±50 kyr).
+  // TIER-FILLING growth: build each grid tier to its FULL span the first time
+  // a probe enters it. The integrator walk (adaptive 5/250-yr stepping) and
+  // the exact-aligned grid stores are endpoint-independent, so the values at
+  // every shared t are IDENTICAL to a need-sized build — only the rebuild
+  // pattern changes. The previous |t|·1.25 headroom rebuilt the whole
+  // integration nearly every chained year of an outward walk — measured as
+  // the Step-6a exporter blowup (>5.5× instead of ~2×; ~9,000 rebuilds).
   let sampler = null, rangeYr = 0;
   const gridStep = (need) => (need <= 50000 ? 100 : need <= 2000000 ? 1000 : 5000);
+  const tierSpan = (need) =>
+    (need <= 50000 ? 50000 : need <= 2000000 ? 2000000 : Math.ceil(need * 1.25 / 5000) * 5000);
   const sampleAt = (year) => {
     const t = year - 2000;
     const need = Math.max(20000, Math.abs(t) * 1.25);
     if (!sampler || need > rangeYr) {
-      rangeYr = need;
-      sampler = tier.build(need, -need, gridStep(need));
+      rangeYr = tierSpan(need);
+      sampler = tier.build(rangeYr, -rangeYr, gridStep(rangeYr));
     }
     return sampler.at(t);
   };

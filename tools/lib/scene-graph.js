@@ -1218,18 +1218,28 @@ function _osmYearForJD(jd, linearYear) {
   return DEEP_TIME_ENABLED ? _jdToSIyearTools(jd) : linearYear;
 }
 // The tilt correction (mirror of src/script.js updatePredictions' wrapper
-// block): reset, read the K geometry (rotAxis world Y vs barycenter-pivot
-// world Y — no scale anywhere, so the matrix Y columns ARE the rotated unit
-// vectors), rotate about û = a×n by (ε_geom − ε_target) in world, expressed
-// in the parent frame as Rpᵀ·K·Rp. Self-clears when the option is off.
+// block): read the K geometry (rotAxis world Y vs barycenter-pivot world Y —
+// no scale anywhere, so the matrix Y columns ARE the rotated unit vectors),
+// rotate about û = a×n by (ε_geom − ε_target) in world, expressed in the
+// parent frame as Rpᵀ·K·Rp. COST CONTRACT (the Step-6a exporter runs this
+// per probe): the caller clears extraMatrix BEFORE its own full
+// updateWorldMatrix (that pass IS the reset — see the clears at the top of
+// moveModel / computeSunPositionFast), and the final recompute touches only
+// the rotAxis LEAF — the Sun and barycenter are NOT under rotAxis (measured;
+// rotAxis has no children), so nothing else changes. Self-clears when off.
+const _OSM_MAT = new Mat4();   // reused scratch — all 9 rotation entries rewritten per call
 function _applyOneSourceTiltCorr(graph, year) {
   const ra = graph.earthNodes.rotAxis;
   const M = _oneSourceM();
   if (!M) {
-    if (ra.extraMatrix) { ra.extraMatrix = null; graph.root.updateWorldMatrix(); }
+    if (ra.extraMatrix) { ra.extraMatrix = null; ra.updateWorldMatrix(); }
     return;
   }
-  if (ra.extraMatrix) { ra.extraMatrix = null; graph.root.updateWorldMatrix(); }
+  if (ra.extraMatrix) {
+    // Defensive: a caller that did not pre-clear — restore the K geometry
+    // for the read below (leaf-only; parent matrices are current).
+    ra.extraMatrix = null; ra.updateWorldMatrix();
+  }
   const ae = ra.worldMatrix.e, ne = graph.barycenter.pivot.worldMatrix.e;
   let ax = ae[4], ay = ae[5], az = ae[6];
   { const s = Math.hypot(ax, ay, az); ax /= s; ay /= s; az /= s; }
@@ -1263,16 +1273,19 @@ function _applyOneSourceTiltCorr(graph, year) {
   const X = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
   for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++)
     for (let k = 0; k < 3; k++) X[i][j] += Rp[k][i] * KR[k][j];
-  const m = new Mat4();
-  const e = m.e;
+  const e = _OSM_MAT.e;
   e[0] = X[0][0]; e[1] = X[1][0]; e[2] = X[2][0];
   e[4] = X[0][1]; e[5] = X[1][1]; e[6] = X[2][1];
   e[8] = X[0][2]; e[9] = X[1][2]; e[10] = X[2][2];
-  ra.extraMatrix = m;
-  graph.root.updateWorldMatrix();
+  ra.extraMatrix = _OSM_MAT;
+  ra.updateWorldMatrix();   // leaf-only: nothing else is under rotAxis
 }
 
 function moveModel(graph, pos) {
+  // One-source cost contract: clear the tilt correction BEFORE the animation
+  // pass so the full updateWorldMatrix at the end of this function doubles as
+  // the correction's reset read (see _applyOneSourceTiltCorr). No-op when off.
+  if (graph.earthNodes.rotAxis.extraMatrix) graph.earthNodes.rotAxis.extraMatrix = null;
   // Compute dynamic eccentricities for all planets (oscillate at H/16)
   // Uses _epochCache.mSY so the pos→JD→year round-trip is consistent with
   // the caller's pos = _epochCache.sDay × (jd - C.startmodelJD).
@@ -1900,6 +1913,9 @@ function getWobbleSunDistAU(jd) {
 
 function computeSunPositionFast(jd) {
   const graph = getGraph();
+  // One-source cost contract: clear the tilt correction BEFORE the animation
+  // pass (the full updateWorldMatrix below doubles as its reset read).
+  if (graph.earthNodes.rotAxis.extraMatrix) graph.earthNodes.rotAxis.extraMatrix = null;
   _syncEpochForJD(jd);
   const pos = _posFromJDTools(jd);
 
