@@ -6031,6 +6031,21 @@ if (typeof window !== 'undefined') {
     // sun-plane normal, the same vectors the wrapper drives), and the sun's
     // readout declination. Flag-off: active=false, scalar = K device,
     // epsGeom = the K geometry — the pre-C-3 scene.
+    // D4b acceptance probe: the one-source cardinal panel at a target JD —
+    // the panel-written predictions (date/JD/RA/year-length per point) plus
+    // the runtime anchor offsets, read after a FULL update at jd.
+    cardinalPanelProbe: (jd) => {
+      const savedJD = o.julianDay;
+      jumpToJulianDay(jd);
+      forceSceneUpdate();
+      const r = { active: _hybridSpinActive(), cpYear: Math.floor(o.currentYear), anchorDelta: _osCardinalAnchorDelta && { ..._osCardinalAnchorDelta } };
+      for (const cp of ['SS', 'WS', 'VE', 'AE']) {
+        r[cp] = { jd: predictions['cp' + cp + 'JD'], ra: predictions['cp' + cp + 'RA'], yearLen: predictions['cp' + cp + 'YearLen'] };
+      }
+      jumpToJulianDay(savedJD);
+      forceSceneUpdate();
+      return r;
+    },
     hybridSpinProbe: (jd) => {
       const savedJD = o.julianDay;
       jumpToJulianDay(jd);
@@ -43845,6 +43860,114 @@ function subSolarFromSceneAtJd(jd) {
   return { lat, lon };
 }
 
+// ─── D4b — ONE-SOURCE CARDINAL POINTS (one calculation for every era) ──────
+// The panel's cardinal dates/RA/year-lengths under the one-source movement:
+// a LOCAL inversion at the requested year — the frozen-device value seeds a
+// dec-based solve on the RENDERED scene (equinox = dec zero-crossing via
+// Newton, solstice = dec extremum via the exporter's parabolic vertex), so
+// no global chain is integrated (the rate-vs-point accumulation trap) and
+// the result follows the movement at EVERY epoch. The per-type J2000 ANCHOR
+// OFFSET (CARDINAL_POINT_ANCHORS_ADJUSTED − the scene's own year-2000
+// event, computed at runtime — no pasted numbers) absorbs the measured
+// convention split between the K-calibrated sun-longitude chain and the
+// engine e (±76 s equinoxes / ±18 s solstices, the 2Δe signature), so at
+// J2000 the panel equals the certified IAU-anchored values EXACTLY and
+// drifts only as the movement itself does. Fidelity vs the banked
+// one-source CSV (335,318 measured events): the analytic layer closes to
+// bias ~1 s / rms ~100 s; the scene polish makes the displayed values
+// exact against the rendered movement. Cached per integer year — the
+// probes (a few dozen 'light' scene updates, the umbra-meter pattern) run
+// once per year change, not per frame.
+const _OSC_SUNV = new THREE.Vector3(), _OSC_EARTHV = new THREE.Vector3(),
+      _OSC_GEO = new THREE.Vector3(), _OSC_Q = new THREE.Quaternion(), _OSC_QI = new THREE.Quaternion();
+function _osSunEqAtJd(jd) {
+  jumpToJulianDay(jd);
+  forceSceneUpdate('light');
+  sun.planetObj.getWorldPosition(_OSC_SUNV);
+  earth.planetObj.getWorldPosition(_OSC_EARTHV);
+  _OSC_GEO.copy(_OSC_SUNV).sub(_OSC_EARTHV);
+  earth.rotationAxis.getWorldQuaternion(_OSC_Q);
+  _OSC_QI.copy(_OSC_Q).invert();
+  _OSC_GEO.applyQuaternion(_OSC_QI);
+  const r = _OSC_GEO.length();
+  const decDeg = 90 - Math.acos(Math.min(1, Math.max(-1, _OSC_GEO.y / r))) * 180 / Math.PI;
+  let raDeg = Math.atan2(_OSC_GEO.x, _OSC_GEO.z) * 180 / Math.PI;   // the 6a/CSV convention
+  raDeg = ((raDeg % 360) + 360) % 360;
+  return { raDeg, decDeg };
+}
+// dec rate scale for the equinox Newton step (deg/day): n·sin ε·(1+2e·cos M).
+function _osDecRateDegPerDay(jd, sign) {
+  const yr = DEEP_TIME_MODE_ENABLED ? _jdToSIyear(jd) : (jd - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
+  const s = _hybridSeriesSampleAt(yr);
+  const eps = s.epsDeg * Math.PI / 180;
+  return sign * (360 / 365.2422) * Math.sin(eps);   // convergence-grade; Newton polishes
+}
+function _osCardinalSolve(cp, seedJD) {
+  if (cp === 'VE' || cp === 'AE') {
+    // dec zero-crossing: ascending at VE, descending at AE
+    const sign = cp === 'VE' ? 1 : -1;
+    let jd = seedJD;
+    let probe = null;
+    for (let i = 0; i < 4; i++) {
+      probe = _osSunEqAtJd(jd);
+      const step = -probe.decDeg / _osDecRateDegPerDay(jd, sign);
+      jd += step;
+      if (Math.abs(step) < 1e-6) break;    // < 0.1 s
+    }
+    probe = _osSunEqAtJd(jd);
+    return { jd, raDeg: probe.raDeg };
+  }
+  // solstice: dec extremum — parabolic-vertex passes (the 6a method). The
+  // first stencil is WIDE: the frozen-device seed can be ~5 days off at
+  // deep time (its measured worst case), and a narrow parabola far from a
+  // cosine's vertex extrapolates poorly.
+  let jd = seedJD;
+  for (const h of [4, 0.5, 0.02]) {
+    const ym = _osSunEqAtJd(jd - h).decDeg, y0 = _osSunEqAtJd(jd).decDeg, yp = _osSunEqAtJd(jd + h).decDeg;
+    const denom = ym - 2 * y0 + yp;
+    if (Math.abs(denom) > 1e-12) jd += (h / 2) * (ym - yp) / denom;
+  }
+  const probe = _osSunEqAtJd(jd);
+  return { jd, raDeg: probe.raDeg };
+}
+let _osCardinalAnchorDelta = null;      // per-type: registry J2000 anchor − scene year-2000 event
+let _osCardinalCacheYear = null, _osCardinalCacheVals = null, _osCardinalLastMs = 0;
+function _osCardinalAt(cpYear) {
+  if (_osCardinalCacheYear === cpYear && _osCardinalCacheVals) return _osCardinalCacheVals;
+  // Fast time-lapse guard: crossing a year boundary every frame must not
+  // re-run the ~50-probe solve per frame — during rapid scrubbing the panel
+  // holds the previous year's values for up to 300 ms, then settles.
+  const nowMs = performance.now();
+  if (_osCardinalCacheVals && nowMs - _osCardinalLastMs < 300) return _osCardinalCacheVals;
+  _osCardinalLastMs = nowMs;
+  const _saveJD = o.julianDay;
+  try {
+    if (!_osCardinalAnchorDelta) {
+      _osCardinalAnchorDelta = {};
+      for (const cp of ['SS', 'WS', 'VE', 'AE']) {
+        const raw2000 = _osCardinalSolve(cp, computeSolsticeJD(2000, cp));
+        _osCardinalAnchorDelta[cp] = CARDINAL_POINT_ANCHORS[cp] - raw2000.jd;
+      }
+    }
+    const vals = {};
+    for (const cp of ['SS', 'WS', 'VE', 'AE']) {
+      const a = _osCardinalSolve(cp, computeSolsticeJD(cpYear, cp));
+      const b = _osCardinalSolve(cp, computeSolsticeJD(cpYear + 1, cp));
+      vals[cp] = {
+        jd: a.jd + _osCardinalAnchorDelta[cp],
+        raDeg: a.raDeg,
+        yearLenDays: b.jd - a.jd,          // anchor offset cancels in the difference
+      };
+    }
+    _osCardinalCacheYear = cpYear;
+    _osCardinalCacheVals = vals;
+    return vals;
+  } finally {
+    jumpToJulianDay(_saveJD);
+    forceSceneUpdate('light');
+  }
+}
+
 /** Great-circle distance in km between two (lat, lon) points. Uses
  * diameters.earthDiameter/2 for consistency with the rest of the
  * codebase. */
@@ -55781,19 +55904,35 @@ function updatePredictions() {
   }
 
   // Cardinal point predictions (solstices & equinoxes)
-  // Use integer year so values stay fixed for the entire calendar year
+  // Use integer year so values stay fixed for the entire calendar year.
+  // D4b: under the one-source movement (the default) the values come from
+  // the ONE calculation for every era — the scene-solved events with the
+  // runtime J2000 anchor offsets (see _osCardinalAt; cached per year).
+  // ?hybridSpin=0 shows the frozen-device values, as before.
   const cpYear = Math.floor(o.currentYear);
-  for (const cp of ['SS', 'WS', 'VE', 'AE']) {
-    const jd = computeSolsticeJD(cpYear, cp);
-    const dt = jdToDateString(jd);
-    const ra = computeSolsticeRA(cpYear, cp);
-    const yr = computeSolsticeYearLength(cpYear, cp);
-    predictions['cp' + cp + 'Date'] = dt.date + ' ' + dt.time;
-    predictions['cp' + cp + 'JD'] = jd;
-    predictions['cp' + cp + 'RA'] = ra;
-    predictions['cp' + cp + 'YearLen'] = yr;
+  if (_hybridSpinActive()) {
+    const cv = _osCardinalAt(cpYear);
+    for (const cp of ['SS', 'WS', 'VE', 'AE']) {
+      const dt = jdToDateString(cv[cp].jd);
+      predictions['cp' + cp + 'Date'] = dt.date + ' ' + dt.time;
+      predictions['cp' + cp + 'JD'] = cv[cp].jd;
+      predictions['cp' + cp + 'RA'] = cv[cp].raDeg;
+      predictions['cp' + cp + 'YearLen'] = cv[cp].yearLenDays;
+    }
+    predictions.cpSolsticeObliquity = _sceneEpsTargetDeg(cpYear);
+  } else {
+    for (const cp of ['SS', 'WS', 'VE', 'AE']) {
+      const jd = computeSolsticeJD(cpYear, cp);
+      const dt = jdToDateString(jd);
+      const ra = computeSolsticeRA(cpYear, cp);
+      const yr = computeSolsticeYearLength(cpYear, cp);
+      predictions['cp' + cp + 'Date'] = dt.date + ' ' + dt.time;
+      predictions['cp' + cp + 'JD'] = jd;
+      predictions['cp' + cp + 'RA'] = ra;
+      predictions['cp' + cp + 'YearLen'] = yr;
+    }
+    predictions.cpSolsticeObliquity = computeObliquityEarth(cpYear);
   }
-  predictions.cpSolsticeObliquity = computeObliquityEarth(cpYear);
 
   // IAU comparison differences (Model − IAU reference)
   predictions.diffSolarDay = (predictions.lodReal - ASTRO_REFERENCE.solarDayJ2000) * 1000;
