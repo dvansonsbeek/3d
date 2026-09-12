@@ -1227,6 +1227,36 @@ function _osmYearForJD(jd, linearYear) {
 // moveModel / computeSunPositionFast), and the final recompute touches only
 // the rotAxis LEAF — the Sun and barycenter are NOT under rotAxis (measured;
 // rotAxis has no children), so nothing else changes. Self-clears when off.
+// D4c — THE APSIDAL-WHEEL FLIP: the last scene-K element. The wheel pair
+// (earthPeriPrec1/2, the constant-rate H/16 device) keeps its K animation,
+// and under the one-source option a RELATIVE correction rotates it onto the
+// engine's ϖ(t): Δrel = Δϖ_engine − Δphase_K, both measured from J2000 —
+// zero at J2000 by construction (era continuity; the anchor is captured at
+// runtime, no pasted numbers). Applied to θ_p1 (+) and θ_p2 (−, the exact
+// mirror — preserving the barycenter frame's net-zero rotation) AND to the
+// Sun's EoC mean-anomaly phase (the offset direction and the EoC phase must
+// never disagree — the 6c anomalistic blowup was that disagreement,
+// measured). Deep-time-ON only: the K phase term uses the integrated ∫1/H
+// wheel form; under SG_DEEP_TIME=0 the wheel stays K (the documented
+// snapshot-mode caveat class). Wrapped ϖ is safe — the wheel angle enters
+// only trigonometrically (S¹), so 360° branch jumps are invisible.
+let _osmPeriAnchor = null;   // {engDeg, cyc} at J2000, captured once
+function _osmPeriDeltaRad(jd, currentYear) {
+  const M = _oneSourceM();
+  if (!M || !DEEP_TIME_ENABLED) return 0;
+  if (!_osmPeriAnchor) {
+    const y2000 = C.startModelYearWithCorrection + _posFromJDTools(2451545.0);
+    _osmPeriAnchor = {
+      engDeg: M.periOfDateDeg(_osmYearForJD(2451545.0, y2000)),
+      cyc: DT.cyclesBetweenYears(C.balancedYear, y2000, 16) ?? 0,
+    };
+  }
+  const dEng = (M.periOfDateDeg(_osmYearForJD(jd, currentYear)) - _osmPeriAnchor.engDeg) * d2r;
+  const cycNow = DT.cyclesBetweenYears(C.balancedYear, currentYear, 16);
+  const dK = ((cycNow ?? 0) - _osmPeriAnchor.cyc) * 2 * Math.PI;   // PeriPrec1 sign +1
+  return dEng - dK;
+}
+
 const _OSM_MAT = new Mat4();   // reused scratch — all 9 rotation entries rewritten per call
 function _applyOneSourceTiltCorr(graph, year) {
   const ra = graph.earthNodes.rotAxis;
@@ -1305,6 +1335,9 @@ function moveModel(graph, pos) {
   const dynEcc = { earth: _osmM
     ? _osmM.e(_osmYearForJD(_jdFromPosTools(pos), currentYear))
     : OE.computeEccentricityEarth(currentYear) };
+  // D4c: the apsidal-wheel correction (0 when the option is off) — applied
+  // to the wheel pair after the layers animate, and to the Sun's EoC phase.
+  const _periDelta = _osmM ? _osmPeriDeltaRad(_jdFromPosTools(pos), currentYear) : 0;
   // Unification: the geometric eccentricity offset (the PeriPrec2 centre)
   // carries the one law's e(t) EVERY FRAME. The planet chains replicate the
   // Sun geometrically (centre offset + circle, no equation of centre), so
@@ -1379,7 +1412,10 @@ function moveModel(graph, pos) {
       } else {
         e = def.eccentricity;                                        // Moon, Pluto, etc: static
       }
-      const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos;
+      // D4c: the Sun's mean-anomaly phase rides the SAME engine ϖ(t) as the
+      // wheel (the _eocDerived guard keeps the planets on their own phases).
+      const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos
+        + (def._eocDerived ? _periDelta : 0);
       const M = θ - perihelionPhase;
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
       nodes._meanAnomaly = M; // Store for parallax correction use
@@ -1539,6 +1575,16 @@ function moveModel(graph, pos) {
     [graph.barycenter, graph.barycenter.def],
   ];
   for (const [nodes, def] of precLayers) animateObject(nodes, def);
+
+  // D4c: rotate the apsidal wheel pair onto the engine ϖ(t) (Δrel is 0 at
+  // J2000 and when the option is off). θ_p2 mirrors θ_p1 exactly, keeping
+  // the barycenter frame's net rotation zero — every consumer downstream
+  // (the geometric offset direction, FQ-3, earthPeriEcl, the Type II/III
+  // planet corrections, the perihelion markers) inherits the flip.
+  if (_periDelta !== 0) {
+    graph.earthPeriPrec1.orbit.ry += _periDelta;
+    graph.earthPeriPrec2.orbit.ry -= _periDelta;
+  }
 
   // Sun
   animateObject(graph.sunNodes, graph.sunNodes.def);
@@ -1929,6 +1975,8 @@ function computeSunPositionFast(jd) {
   const earthEcc = _osmM
     ? _osmM.e(_osmYearForJD(jd, currentYear))
     : OE.computeEccentricityEarth(currentYear);   // the ONE law (unification)
+  // D4c: the apsidal-wheel correction (mirrors moveModel).
+  const _periDelta = _osmM ? _osmPeriDeltaRad(jd, currentYear) : 0;
   graph.earthPeriPrec2.container.px = -earthEcc * 100;   // geometric offset = full e(t) (mirrors moveModel)
 
   // Animate a single node: orbit.ry = θ (with EoC if applicable)
@@ -1947,7 +1995,8 @@ function computeSunPositionFast(jd) {
       const e = def._eocDerived
         ? earthEcc / 2   // Sun: eoc = e(t)/2 (the geometric offset supplies the other half; unification)
         : def.eccentricity;
-      const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos;
+      const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos
+        + (def._eocDerived ? _periDelta : 0);   // D4c: the engine-ϖ phase (mirrors moveModel)
       const M = θ - perihelionPhase;
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
     }
@@ -1972,6 +2021,11 @@ function computeSunPositionFast(jd) {
     [graph.barycenter, graph.barycenter.def],
   ];
   for (const [nodes, def] of precLayers) animateFast(nodes, def);
+  // D4c: the apsidal wheel pair onto the engine ϖ(t) (mirrors moveModel).
+  if (_periDelta !== 0) {
+    graph.earthPeriPrec1.orbit.ry += _periDelta;
+    graph.earthPeriPrec2.orbit.ry -= _periDelta;
+  }
   animateFast(graph.sunNodes, graph.sunNodes.def);
 
   // Update world matrices from root

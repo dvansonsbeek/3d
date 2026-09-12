@@ -131,7 +131,8 @@ function createOneSourceMovement() {
   return {
     epsDeg: (year) => sampleAt(year).epsDeg,
     e: (year) => sampleAt(year).e,
-    cardinal,                        // {eocOffsetSeconds, yearLengthSeconds, spreadSeconds}
+    periOfDateDeg: (year) => sampleAt(year).periOfDateDeg,   // equinox-referenced ϖ of date (D4c wheel flip)
+    cardinal,                        // {eocOffsetSeconds, yearLengthSeconds, spreadSeconds, anomalisticYearSeconds}
   };
 }
 

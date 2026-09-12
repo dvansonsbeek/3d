@@ -20200,6 +20200,28 @@ function _hybridSeriesSampleAt(year) {
 function _epsHybridSeriesAt(year) { return _hybridSeriesSampleAt(year).epsDeg; }
 /** Is the one-source drive live (flag on + series loaded)? */
 function _hybridSpinActive() { return HYBRID_SPIN_REQUESTED && _zetaSeriesData !== null; }
+// D4c — THE APSIDAL-WHEEL FLIP (the last scene-K element; twin of
+// tools/lib/scene-graph.js _osmPeriDeltaRad): the relative correction that
+// rotates the K H/16 wheel pair onto the engine's ϖ(t).
+// Δrel = Δϖ_engine − Δphase_K, both measured from J2000 — zero at J2000 by
+// construction (runtime anchor, no pasted numbers). Deep-time-ON only (the
+// K term uses the integrated ∫1/H wheel form). Wrapped ϖ is safe: the wheel
+// angle enters only trigonometrically, so 360° branch jumps are invisible.
+let _osmPeriAnchorB = null;
+function _osmPeriDeltaRadBrowser() {
+  if (!_hybridSpinActive() || !DEEP_TIME_MODE_ENABLED) return 0;
+  if (!_osmPeriAnchorB) {
+    const y2000 = _jdToSIyear(2451545.0);
+    _osmPeriAnchorB = {
+      engDeg: _hybridSeriesSampleAt(y2000).periOfDateDeg,
+      cyc: cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, y2000, 16) ?? 0,
+    };
+  }
+  const ySI = _jdToSIyear(o.julianDay);
+  const dEng = (_hybridSeriesSampleAt(ySI).periOfDateDeg - _osmPeriAnchorB.engDeg) * (Math.PI / 180);
+  const cycNow = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, ySI, 16);
+  return dEng - ((cycNow ?? 0) - _osmPeriAnchorB.cyc) * 2 * Math.PI;
+}
 /** The scene's ε target (deg) at a decimal year — THE one source under the
  *  flag: the series-hybrid inside the banked span, the K device outside it
  *  and whenever the flag is off/pending. Every ε surface (the visual tilt
@@ -53052,6 +53074,11 @@ function moveModel(pos) {
     earthPerihelionPrecession2.containerObj.position.x = -_sceneEccTargetAt(_eccYearFrame) * 100;
   }
 
+  // D4c: the apsidal-wheel correction for THIS frame (0 when the one-source
+  // drive is inactive) — applied to the wheel pair inside the loop below and
+  // to the Sun's EoC mean-anomaly phase (they must never disagree).
+  const _periDeltaFrame = _osmPeriDeltaRadBrowser();
+
   planetObjects.forEach(obj => {
 
     // current angular position (mean anomaly for uniform motion)
@@ -53129,6 +53156,15 @@ function moveModel(pos) {
       θ = obj.speed * pos - obj.startPos * (Math.PI / 180);
     }
 
+    // D4c: rotate the apsidal wheel pair onto the engine ϖ(t) — θ_p2 mirrors
+    // θ_p1 exactly, preserving the barycenter frame's net-zero rotation;
+    // every consumer downstream (the geometric offset direction, FQ-3, the
+    // perihelion markers, the Type II/III planet corrections) inherits.
+    if (_periDeltaFrame !== 0) {
+      if (obj === earthPerihelionPrecession1) θ += _periDeltaFrame;
+      else if (obj === earthPerihelionPrecession2) θ -= _periDeltaFrame;
+    }
+
     // ─── TEMPORARILY DISABLED 2026-06 (Sun T² correction) ───────────────
     // Bug investigation: Sun-only angular corrections shift visible Sun but
     // leave planets at their original angles, so planets visibly orbit a
@@ -53198,6 +53234,9 @@ function moveModel(pos) {
       } else {
         perihelionPhase = obj.perihelionPhaseJ2000 + (obj.perihelionPrecessionRate || 0) * pos;
       }
+      // D4c: the Sun's mean-anomaly phase rides the SAME engine ϖ(t) as the
+      // wheel (the _eocDerived guard keeps the planets on their own phases).
+      if (obj._eocDerived) perihelionPhase += _periDeltaFrame;
       const M = θ - perihelionPhase;  // mean anomaly measured from current perihelion direction
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
       obj._meanAnomaly = M; // Store for parallax correction (BR-CA terms)
