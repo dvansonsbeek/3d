@@ -13,12 +13,13 @@
  * 1-year steps allow a narrow search window (±2 days) and simple forward chaining.
  * No two-pass needed — each event is close to prevJD + meanYear.
  *
- * Downstream consumers:
- *   - year-length-harmonics.js (step 6c) — reads cardinal JDs, world-angles and
- *     PERI/APH JDs; one --write fits all three year types incl. tropical
- *   - cardinal-point-harmonics.js (step 6d) — reads cardinal point JDs and
- *     derives from 6c's year-length model (must run AFTER 6c)
- *   (step 6b obliquity fit RETIRED — archived in tools/fit/archive/; coefficients frozen)
+ * Downstream consumers: NONE in the fitting pipeline — the harmonic-clock
+ * fits (obliquity, year-length, cardinal-point) are retired with their
+ * coefficients FROZEN as the certified era clock (a harmonic re-fit against
+ * the one-source movement is a cross-family fit, measured 30-60× RMS
+ * blowup; scripts in tools/fit/archive/ — see "The frozen era clock" in
+ * tools/fit/README.md). The CSV is the banked RECORD of the one-source
+ * movement — validation and research consumers only.
  *
  * Usage (SG_ONE_SOURCE=1 is the standing regeneration mode since Stage C-4b):
  *   SG_ONE_SOURCE=1 node tools/fit/export-solar-measurements.js    # full H (~2 h 24 m measured)

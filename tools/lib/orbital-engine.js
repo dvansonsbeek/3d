@@ -742,8 +742,9 @@ const dtm = () => (_dtMod || (_dtMod = require('./deep-time')));   // perf: the 
 const deepTimeOn = () => process.env.SG_DEEP_TIME !== '0';
 
 // ─── §10 / §5c-ii-g — analytic deep-time year shape ──────────────────────
-// EXACT mirror of src/script.js analyticYearShape and of
-// tools/fit/year-length-harmonics.js analyticShape. Step 6d SUBTRACTS this
+// EXACT mirror of src/script.js analyticYearShape and of the retired 6c
+// fitter's analyticShape (tools/fit/archive/year-length-harmonics.cjs —
+// coefficients frozen as the certified K-era clock). Step 6d SUBTRACTED this
 // before fitting, so it MUST be added back — a deep-time year length carries a
 // secular trend a Fourier basis on H-divisors provably cannot represent, worth
 // ~0.93 s (measured 1.03 / 0.98 / 0.97 s without it, vs 0.008 / 0.002 / 0.018

@@ -146,20 +146,17 @@ const STEPS = [
   // last K-scene fit; re-fitting against a one-source CSV would be a
   // cross-family fit. Script archived in tools/fit/archive/. The id 6b is
   // never reused — README numbering is shared vocabulary.)
-  // ORDER + RENAME: year-length is 6c and runs BEFORE the
-  // cardinal-point fit, which is now 6d. The §10e-bis reordering made the
-  // year-length model the authoritative source of secular year-length
-  // behaviour; the cardinal-point fit derives its linear terms from
-  // TROPICAL_YEAR_HARMONICS + YEAR_LENGTH_J2000_ANCHOR and hard-fails
-  // without them. One bare --write fits ALL THREE year types (the old
-  // --type sidereal/anomalistic split no longer exists). In docs written
-  // before this rename, "6c" = cardinal-point and "6d"/"6e" = year-length.
-  { id: '6c', phase: 2, name: 'Year-length harmonics (tropical+sidereal+anomalistic)',
-    cmd: 'node tools/fit/year-length-harmonics.js --write' },
-  // 6d observed: SS+WS+VE+AE greedy fit, ~10 min per CP × 4 = ~40 min total.
-  // Default 10-min per-step timeout would abort mid-VE. Use 60 min.
-  { id: '6d', phase: 2, name: 'Cardinal point harmonics (~40 min)',
-    cmd: 'node tools/fit/cardinal-point-harmonics.js --write', timeout: 60 * 60 * 1000 },
+  // (Steps 6c/6d — the year-length and cardinal-point harmonic fits —
+  // RETIRED with 6b (option A, C-4b adjudication): the shipped coefficients
+  // are FROZEN as the certified K-era clock. A harmonic re-fit against the
+  // one-source CSV is a CROSS-FAMILY fit — MEASURED: interior RMS 0.23-0.37
+  // min → 8.8-16 min, equinox J2000 anchors ±2 h off IAU, day-scale
+  // amplitudes chasing the engine's off-lattice secular spectrum (s-modes,
+  // g-modes, the 405-kyr g2−g5 beat). The movement's consumers read the
+  // one-source evaluator directly at D4. Scripts archived in
+  // tools/fit/archive/. The ids 6c/6d are never reused — README numbering
+  // is shared vocabulary. In docs written before the §10e-bis rename,
+  // "6c" = cardinal-point and "6d"/"6e" = year-length.)
   // Step 6f (sun-longitude-harmonics) intentionally OMITTED — see header
   // comment. It runs once as Phase 0 prerequisite, not as part of the
   // routine cascade.
