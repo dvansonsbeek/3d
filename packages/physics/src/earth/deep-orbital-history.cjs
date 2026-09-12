@@ -83,6 +83,46 @@ function createDeepOrbitalHistory({
     const s0 = sum(0), R = [anchor[0] - s0[0], anchor[1] - s0[1]];
     return (/** @type {number} */ t) => { const [x, y] = sum(t); return [x + R[0], y + R[1]]; };
   };
+  // CO-ROTATING anchor (the ϖ̇ fix, measured): the DC residual above is a
+  // spurious zero-frequency mode — it preserves the J2000 VALUE but dilutes
+  // the local argument rate by |sum(0)|/|anchor| (z: 11.47 → 7.93″/yr, a
+  // 92 s-class anomalistic-year bias in the mode tier). Here the residual
+  // ROTATES at the raw sum's own local arg-rate g* = Im(ż·z̄)/|z|²
+  // (analytic), so at t=0 both the value AND the rate are exact, and at
+  // depth the residual is one |R|-amplitude term at a physical frequency
+  // instead of a DC offset (deep envelope measured unchanged:
+  // [0.0001, 0.0672] → [0.0003, 0.0678] over 10–50 Myr).
+  // z ONLY: ζ keeps the DC anchor DELIBERATELY — its anchor is ~0 by
+  // definition (Earth's inclination to the J2000 ecliptic at J2000), i.e.
+  // the coordinate origin; a rotating residual there would inject a fake
+  // wobble into n̂(t).
+  const mkAnchoredCoRot = (
+    /** @type {ReadonlyArray<{omegaRadPerYr: number, re: number, im: number}>} */ modes,
+    /** @type {[number, number]} */ anchor,
+  ) => {
+    const sum = (/** @type {number} */ t) => {
+      let re = 0, im = 0;
+      for (const m of modes) {
+        const c = Math.cos(m.omegaRadPerYr * t), s = Math.sin(m.omegaRadPerYr * t);
+        re += m.re * c - m.im * s;
+        im += m.re * s + m.im * c;
+      }
+      return [re, im];
+    };
+    let q0 = 0, p0 = 0, dq0 = 0, dp0 = 0;
+    for (const m of modes) {
+      q0 += m.re; p0 += m.im;
+      dq0 += -m.omegaRadPerYr * m.im;
+      dp0 += m.omegaRadPerYr * m.re;
+    }
+    const gStar = (dp0 * q0 - dq0 * p0) / (q0 * q0 + p0 * p0);
+    const R = [anchor[0] - q0, anchor[1] - p0];
+    return (/** @type {number} */ t) => {
+      const [x, y] = sum(t);
+      const c = Math.cos(gStar * t), s = Math.sin(gStar * t);
+      return [x + R[0] * c - R[1] * s, y + R[0] * s + R[1] * c];
+    };
+  };
   const s2h = Math.sin(anchorInclEclipticDeg / 2 * D2R);
   const zetaAnchor = /** @type {[number, number]} */ (
     [s2h * Math.cos(anchorAscNodeEclipticDeg * D2R), s2h * Math.sin(anchorAscNodeEclipticDeg * D2R)]);
@@ -108,7 +148,7 @@ function createDeepOrbitalHistory({
   }
   const zAnchor = /** @type {[number, number]} */ (
     [anchorE * Math.cos(anchorPeriEclipticDeg * D2R), anchorE * Math.sin(anchorPeriEclipticDeg * D2R)]);
-  const zModeSum = mkAnchored(zModes, zAnchor);
+  const zModeSum = mkAnchoredCoRot(zModes, zAnchor);   // co-rotating residual — the ϖ̇ fix (see mkAnchoredCoRot)
   // C-4a: the z-side one-source path — same construction as zetaSeries
   // (anchored engine series inside the span, anchored mode sum as the tail).
   let zAt = zModeSum;
