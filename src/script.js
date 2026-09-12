@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createSiderealYearChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -20155,6 +20155,24 @@ let _zetaSeriesEndYr = 0;
     console.error('secular-series artifact not reachable — planet deep-time elements stay on the era chain (invalid beyond its boundary!)' + (HYBRID_SPIN_REQUESTED ? '; Earth ε/e falls back to the K device' : ''));
   })();
 }
+// D6: the sidereal-year-of-date channel — the banked λ̇ ratio (planetary
+// epoch drift, constant-GM run) times the H-chain mass-loss law. Chart
+// surface only: the scene's sidereal frame stays the certified H/13
+// identity. Built lazily once the artifact (with lamDotRel) arrives;
+// null = artifact absent or pre-D6 → callers fall back to mass-loss only.
+let _siderealChannelM = null;
+function _siderealYearOneSourceSeconds(year) {
+  const a = _planetSeriesData, eb = a && a.bodies && a.bodies.earth;
+  if (!eb || !Array.isArray(eb.lamDotRel)) return null;
+  if (!_siderealChannelM) {
+    _siderealChannelM = createSiderealYearChannel({
+      t0Yr: a.t0Yr, stepYr: eb.stepYr, lamDotRel: eb.lamDotRel,
+      massLossSiderealSecondsAtYearFn: (y) => meanSiderealYearSecondsAtAge((startmodelYear - y) / 1e6),
+    });
+  }
+  return _siderealChannelM.siderealYearSecondsAtYear(year);
+}
+
 // The series-driven hybrid (the ONE evaluator): factory built lazily AFTER
 // the series arrives; deep ζ modes remain only the beyond-span tail.
 let _deepHistSeriesM = null;
@@ -20497,18 +20515,13 @@ const VFP_CATEGORIES = [
     // the frozen 6c harmonics encoded: the n̂(t) geometry generates the
     // equinox-rate wobble (the Laskar-1986 arc — measured: max ~365.24261
     // near −8000, 365.24182 at +12000, matching the reference's shape and
-    // endpoints). THE DOUBLE-COUNT ANCHOR: the mean planetary-precession
-    // term appears in BOTH α's sid/(sid−sol) anchor and the n̂ geometry
-    // (measured 0.097″/yr ≈ 2.4 s of year length at J2000). The wobble is
-    // DIFFERENTIAL, the double-count is a CONSTANT rate — so it is removed
-    // by a runtime anchor: δ = p_geom(2000) − 360/axial0, computed once
-    // from the sampler itself (no pasted numbers), subtracted from p at
-    // every epoch. J2000 then reads the anchored mean exactly while the
-    // arc keeps its shape. (The root fix — anchoring α to the LUNISOLAR
-    // rate — is the C-5 adjudication: it re-witnesses the banked ε gates.
-    // Any future consumer of the equinox RATE must apply this same anchor
-    // until then.) Falls back to the smooth secular mean when the series
-    // is not loaded / opted out.
+    // endpoints). The rate is read RAW: since the factory's lunisolar
+    // self-anchor (K_LUNI — the root fix for the old planetary-mean
+    // double-count), the realized general precession hits sid/(sid−sol)
+    // at J2000 by construction, so the former runtime δ anchor
+    // (δ = p_geom(2000) − 360/axial0) self-measured ≈0 and is retired.
+    // Falls back to the smooth secular mean when the series is not
+    // loaded / opted out.
     model: { name: 'This model (one-source)', color: '#f0b040',
       fn: (() => {
         let a = null;
@@ -20518,13 +20531,11 @@ const VFP_CATEGORIES = [
         return (year) => {
           if (!a) {
             const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
-            a = { axial0: sid / (sid - sol), H0: meanHAtAge(0), deltaPYr: null };
+            a = { axial0: sid / (sid - sol), H0: meanHAtAge(0) };
           }
           const tMa = (2000 - year) / 1e6;
           if (_hybridSpinActive()) {
-            if (a.deltaPYr === null) a.deltaPYr = pGeomYr(2000) - 360 / a.axial0;
-            const pYr = pGeomYr(year) - a.deltaPYr;
-            return meanSiderealYearSecondsAtAge(tMa) / 86400 * (1 - pYr / 360);
+            return meanSiderealYearSecondsAtAge(tMa) / 86400 * (1 - pGeomYr(year) / 360);
           }
           const h = meanHAtAge(tMa);
           return meanSiderealYearSecondsAtAge(tMa) / 86400
@@ -20622,27 +20633,31 @@ const VFP_CATEGORIES = [
     residualLabel: 'seconds', residualScale: 86400,
     paperTitle: 'Sidereal Year Comparison',
     fixedYRange: [365.25635, 365.256375], fixedYTicks: [365.25635, 365.256355, 365.25636, 365.256365, 365.25637, 365.256375],
-    // SI 86400-s day form. Uses the framework's own deep-time chain
-    // (meanSiderealYearSecondsAtAge) which captures Driver 2 (solar mass loss)
-    // as a smooth monotonic slope: past years are SHORTER (Sun was more
-    // massive → planets orbit faster → sidereal year shrinks). At J2000 the
-    // framework's anchor equals the IAU value 31,558,149.7635 s by construction
-    // of the H/13 identity, so year-2000 in SI 86400-s days = 365.256363004
-    // (same numeric value as IAU published — this is the framework's own
-    // answer, not just a display of the IAU literal). At epochs away from
-    // J2000 the mass-loss slope gives a monotonic prediction — for example
-    // at 10,000 BC ≈ 365.256362189 SI days, ~0.07 s shorter than J2000.
+    // SI 86400-s day form. D6: ONE-SOURCE line — the H-chain mass-loss
+    // slope (Driver 2: past years SHORTER, IAU-anchored at J2000 via the
+    // H/13 identity: 31,558,149.7635 s = 365.256363004 SI days) DIVIDED by
+    // the banked λ̇ ratio (nbody-secular-series lamDotRel): the planetary
+    // epoch drift of the mean longitude, extracted from the model's own
+    // constant-GM N-body run — so the two tiers separate cleanly and the
+    // J2000 anchor is untouched (lamDotRel ≡ 1 there by construction).
+    // MEASURED: the engine's λ̇ reproduces the Chapront slope to ~0.1 s
+    // over ±12 kyr (the generator's banked refuse-gate) — the reference's
+    // steepness is real planetary dynamics, NOT derivable from the ζ/z
+    // subsystem (the naive 360/(n + ϖ̇) construction errs ±50 s).
+    // Falls back to mass-loss only when the artifact (or the lamDotRel
+    // field) is absent or the one-source movement is opted out.
     //
     // A Fourier-ripple variant was tried here but rejected: the
     // SIDEREAL_YEAR_HARMONICS fit captures only periodic H/8 obliquity
-    // ripples (which do not dominate the sidereal year over ±12 kyr) and
-    // MISSES the secular mass-loss slope, producing the wrong direction
-    // (values higher in the past instead of shorter). The Chapront curve's
-    // slope is dominated by planetary perturbations + GR + tidal back-
-    // reaction — which the framework's mass-loss-only chain intentionally
-    // does not model. See modelNote for the intended physics interpretation.
-    model: { name: 'This model', color: '#f0b040',
-      fn: year => meanSiderealYearSecondsAtAge((startmodelYear - year) / 1e6) / 86400 },
+    // ripples and MISSES the secular mass-loss slope (wrong direction).
+    model: { name: 'This model (one-source)', color: '#f0b040',
+      fn: year => {
+        if (_hybridSpinActive()) {
+          const os = _siderealYearOneSourceSeconds(year);
+          if (os !== null) return os / 86400;
+        }
+        return meanSiderealYearSecondsAtAge((startmodelYear - year) / 1e6) / 86400;
+      }},
     references: [
       { name: 'Chapront (2002)', color: '#4fc3f7', fn: siderealYearChapront, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
     ],
@@ -20650,7 +20665,7 @@ const VFP_CATEGORIES = [
       { name: 'NASA/JPL (observed)', color: '#ef5350',
         value: () => ASTRO_REFERENCE.siderealYearJ2000 },
     ],
-    modelNote: `Both curves are in <strong>SI 86400-s days</strong>. The model curve is the framework's own sidereal year via <code>meanSiderealYearSecondsAtAge(t_Ma) / 86400</code> — a smooth monotonic slope capturing <strong>solar mass loss only</strong> (Driver 2). At J2000 the framework's H/13 anchor identity fixes the value at exactly the IAU sidereal-year seconds (31,558,149.7635 s → 365.256363004 SI days); at other epochs the framework's mass-loss slope diverges from Chapront's steeper polynomial, which additionally includes <strong>planetary perturbations, GR perihelion precession, and tidal back-reaction</strong>. The gap between the two curves at any year IS precisely those missing terms.`,
+    modelNote: `Both curves are in <strong>SI 86400-s days</strong>. The model curve is the one-source sidereal year of date: the framework's mass-loss law (Driver 2, IAU-anchored at J2000 via the H/13 identity: 31,558,149.7635 s → 365.256363004 SI days) divided by the model's own banked <strong>mean-longitude-rate ratio</strong> λ̇(y)/λ̇(2000) — the planetary epoch drift measured from the framework's ±10 Myr N-body run at <em>constant</em> solar mass, so the two tiers separate cleanly. That planetary drift is what makes Chapront's polynomial steep, and the engine reproduces it to ~0.1 s over ±12 kyr (banked gate); the residual gap is the polynomial's own extrapolation class. With the one-source movement opted out the line falls back to the mass-loss slope alone.`,
   },
   {
     id: 'axial-precession', label: 'Axial Precession Period', unit: ' yr', precision: 2,
@@ -20659,34 +20674,44 @@ const VFP_CATEGORIES = [
     paperRange: [-23000, 23000], paperTitle: 'Axial Precession Period Comparison',
     fixedYRange: [25000, 26600], fixedYTicks: [25000, 25400, 25800, 26200, 26600],
     fmtValue: v => Number.isFinite(v) ? v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A',
-    // T_axial(year) = T_sid / (T_sid − T_trop) — evaluated in SI 86400-s day form
-    // so the result is precession period in SI-anchored years.
-    //
-    // Both year-length inputs use FROZEN J2000 baselines evaluated with their
-    // Step 6d harmonic fits — matches the tropical-year chart's source of truth
-    // exactly, so at any year Y the tropical value implied here equals the
-    // value shown on the "Tropical Year" chart (cross-consistent).
+    // D4 review: ONE model line — the ONE-SOURCE instantaneous precession
+    // period P(y) = 360° / p_yr, with p_yr the year-over-year RETROGRADE
+    // advance of the movement's own equinox node (the sampler's
+    // equinoxLonJ2000Deg — the SAME field the Tropical Year chart reads,
+    // so the two charts are cross-consistent by construction:
+    // P = T_sid/(T_sid − T_trop) ⇔ 360/p algebraically). Measured against
+    // Vondrák (2011) over the chart's ±21 kyr: rms 14 yr, single-digit
+    // years through ±15 kyr (the frozen-clock harmonic line read 251 yr
+    // rms, up to 745 yr at −21000 — the era harmonics are certified for
+    // era year lengths, and the P ratio amplifies year-length residue
+    // ~20× per second, so extrapolating them this deep is outside their
+    // certification). Falls back to the frozen era-clock form when the
+    // series is not loaded / opted out:
     //   • sid_days  = SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 + Σ SIDEREAL_YEAR_HARMONICS(year)
-    //                 (framework-native H/13 identity baseline — matches
-    //                  computeSiderealYearDaysDirect used elsewhere; NOT the
+    //                 (framework-native H/13 identity baseline — NOT the
     //                  IAU ASTRO_REFERENCE.siderealYearJ2000, which differs by
     //                  1.37 μdays and produces a ~2.5 yr axialPrec shift due
     //                  to the sid/(sid−sol) formula's high sensitivity).
     //   • sol_days  = MEAN_SOLAR_YEAR_J2000_DAYS + Σ TROPICAL_YEAR_HARMONICS(year)
     //   • lod       = MEAN_SIDEREAL_YEAR_J2000_S / sid_days   (kinematic; cancels
     //                                                          in the precession ratio)
-    // Independent of sim epoch, no LOD-day contamination.
-    model: { name: 'This model', color: '#f0b040',
-      fn: year => {
-        // Chart x-axis is a JULIAN year shared with the Laskar reference curve;
-        // the fitted harmonics live on the SI axis. Convert so model and
-        // literature are sampled at the same instant (see _formulaYearFromJD).
-        const yF = _formulaYearFromJD(yearToJDApprox(year));
-        const sidDays = evalYearFourier(yF, SIDEREAL_YEAR_DAYS_KINEMATIC_J2000, SIDEREAL_YEAR_HARMONICS);
-        const solYear = evalYearFourier(yF, MEAN_SOLAR_YEAR_J2000_DAYS,      TROPICAL_YEAR_HARMONICS);
-        const lod = MEAN_SIDEREAL_YEAR_J2000_S / sidDays;
-        return computeAxialPrecessionRealLOD(MEAN_SIDEREAL_YEAR_J2000_S, solYear, lod);
-      }},
+    model: { name: 'This model (one-source)', color: '#f0b040',
+      fn: (() => {
+        const wrap180 = (d) => ((d + 540) % 360) - 180;
+        const pGeomYr = (year) => wrap180(_hybridSeriesSampleAt(year - 0.5).equinoxLonJ2000Deg
+          - _hybridSeriesSampleAt(year + 0.5).equinoxLonJ2000Deg);   // retrograde → positive
+        return (year) => {
+          if (_hybridSpinActive()) return 360 / pGeomYr(year);
+          // Chart x-axis is a JULIAN year shared with the reference curves;
+          // the fitted harmonics live on the SI axis. Convert so model and
+          // literature are sampled at the same instant (see _formulaYearFromJD).
+          const yF = _formulaYearFromJD(yearToJDApprox(year));
+          const sidDays = evalYearFourier(yF, SIDEREAL_YEAR_DAYS_KINEMATIC_J2000, SIDEREAL_YEAR_HARMONICS);
+          const solYear = evalYearFourier(yF, MEAN_SOLAR_YEAR_J2000_DAYS,      TROPICAL_YEAR_HARMONICS);
+          const lod = MEAN_SIDEREAL_YEAR_J2000_S / sidDays;
+          return computeAxialPrecessionRealLOD(MEAN_SIDEREAL_YEAR_J2000_S, solYear, lod);
+        };
+      })() },
     references: [
       { name: 'Capitaine (2003)', color: '#4fc3f7', fn: axialPrecessionCapitaine2009, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
       { name: 'Vondr\u00e1k (2011)', color: '#81c784', fn: axialPrecessionVondrak2011, sourceUrl: 'https://doi.org/10.1051/0004-6361/201117274' },

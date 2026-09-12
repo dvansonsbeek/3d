@@ -125,11 +125,12 @@ const SMOOTH_YR = 1000;
 // (its block feeds the certified hybrid integration and its gates).
 const SMOOTH_PLANET_YR = 4000;
 const smooth = (/** @type {Float64Array} */ arr, widthYr = SMOOTH_YR) => {
+  const NA = arr.length;
   const half = Math.max(1, Math.round(widthYr / 2 / rDt));
-  const out = new Float64Array(NR);
+  const out = new Float64Array(NA);
   let acc = 0, lo = 0, hi = -1;
-  for (let i = 0; i < NR; i++) {
-    const nlo = Math.max(0, i - half), nhi = Math.min(NR - 1, i + half);
+  for (let i = 0; i < NA; i++) {
+    const nlo = Math.max(0, i - half), nhi = Math.min(NA - 1, i + half);
     while (hi < nhi) acc += arr[++hi];
     while (lo < nlo) acc -= arr[lo++];
     out[i] = acc / (hi - lo + 1);
@@ -171,6 +172,40 @@ for (let i = 0; i < NR; i++) {
 console.log(`earth: resampled ${n} samples @ ${STEP_YR} yr (boxcar ${SMOOTH_YR} yr) · resample fidelity ζ ${maxResample.toExponential(2)} · z ${maxResampleZ.toExponential(2)} · removed short-period content ζ ${maxRemoved.toExponential(2)} · z ${maxRemovedZ.toExponential(2)}`);
 if (maxResample > 2e-5) { console.error('REFUSING: ζ resample fidelity exceeds 2e-5 — cadence too coarse for this series'); process.exit(1); }
 if (maxResampleZ > 2e-5) { console.error('REFUSING: z resample fidelity exceeds 2e-5 — cadence too coarse for the z series'); process.exit(1); }
+
+// ── D6: the Earth mean-motion channel (λ̇ drift → sidereal year of date) ──
+// The sidereal year is 360°/λ̇, and λ̇'s small secular drift (the epoch
+// drift of the mean longitude under planetary perturbations + GR) is its
+// OWN dynamical channel — measured: it is NOT derivable from the banked
+// ζ/z subsystem (the naive 360/(n + ϖ̇) with the movement's apsidal rate
+// errs ±50 s where the true drift is ~1 s per 12 kyr), and the engine's
+// λ̇ reproduces the Chapront polynomial slope to ~0.2 s over ±12 kyr
+// with CONSTANT GM — pure planetary dynamics, cleanly separable from the
+// mass-loss tier (which the run does not contain). Banked as a RATIO to
+// the J2000 value so consumers multiply their own mass-loss law by it.
+// Per-step rate from the dump's L, unwrapped: the integer revolutions per
+// ~54.76-yr raw step are unambiguous (the fractional drift is ~1e-7).
+const LAMDOT_WINDOW_YR = 2000;
+const lamDotRaw = new Float64Array(NR - 1);
+{
+  const expRev = rDt * 365.25 / 365.2563630;   // ≈ revolutions per raw step
+  for (let i = 1; i < NR; i++) {
+    let f = (E.L[i] - E.L[i - 1]) / 360;
+    f -= Math.floor(f);                         // fractional revolutions [0,1)
+    const k = Math.round(expRev - f);           // integer revolutions
+    lamDotRaw[i - 1] = ((k + f) * 360) / rDt;   // deg per Julian year, at the step midpoint
+  }
+}
+const lamDotS = smooth(lamDotRaw, LAMDOT_WINDOW_YR);
+const liMid = (/** @type {Float64Array} */ arr, /** @type {number} */ tt) => {
+  // midpoint grid: value j sits at rT0 + (j + 0.5)·rDt
+  const x = (tt - rT0) / rDt - 0.5, i = Math.max(0, Math.min(NR - 3, Math.floor(x))), f = x - i;
+  return arr[i] * (1 - f) + arr[i + 1] * f;
+};
+const lamDot0 = liMid(lamDotS, 0);
+const lamDotRel = Array.from({ length: n }, (_, i) =>
+  Number((liMid(lamDotS, t0Yr + i * STEP_YR) / lamDot0).toFixed(12)));
+console.log(`earth λ̇ channel: ${n} samples (boxcar ${LAMDOT_WINDOW_YR} yr) · λ̇(J2000) ${lamDot0.toFixed(6)} °/yr · rel range [${Math.min(...lamDotRel).toFixed(9)}, ${Math.max(...lamDotRel).toFixed(9)}]`);
 
 // ── D5: the seven planets' blocks (same recipe; 1000-yr display cadence) ──
 // Consumers are the deep-time ELEMENT readouts (rings/positions beyond the
@@ -418,6 +453,29 @@ console.log(`deep-deep ±500 Myr ε band: [${ddMin.toFixed(2)}°, ${ddMax.toFixe
 if (maxEraAlphaDiff > 0.01) { console.error('REFUSING: α(t) departs α₀ in-era beyond 0.01″ — the coupling must be a no-op in-era'); process.exit(1); }
 if (ddMin < 10 || ddMax > 40) { console.error('REFUSING: deep-deep ε leaves the physical band [10°, 40°]'); process.exit(1); }
 
+// D6: the λ̇ channel vs Chapront — the ONE cross-validation home for the
+// sidereal-year drift. Chapront/Capitaine sidereal-year polynomial (days;
+// via Capitaine et al. 2003, A&A 412, 567 lineage — same source as the
+// chart reference): the channel-implied planetary drift must track its
+// slope. Bound 0.5 s at ±12 kyr = 2× the measured agreement class
+// (0.03–0.25 s); the channel carries NO mass loss (the dump's GM is
+// constant), matching the polynomial's fit-era physics.
+// t below is YEARS FROM J2000 (the series axis; calendar = 2000 + t)
+const chapDriftS = (/** @type {number} */ t) => {
+  const T = t / 100;
+  const d = (1.139e-7 * T - 7.6e-11 * T * T - 1.69e-12 * T ** 3);
+  return d * 86400;                              // drift vs J2000, seconds
+};
+const lamRelAtNode = (/** @type {number} */ t) => lamDotRel[Math.round((t - t0Yr) / STEP_YR)];
+const chanDriftS = (/** @type {number} */ t) =>
+  31558149.7635 * (1 / lamRelAtNode(t) - 1);     // T ∝ 1/λ̇, IAU-anchored scale
+const sidChk = [-12000, -8000, -4000, 4000, 8000, 12000].map((t) =>
+  ({ t, chanS: chanDriftS(t), chapS: chapDriftS(t), diffS: chanDriftS(t) - chapDriftS(t) }));
+const sidMaxDiff = Math.max(...sidChk.map((r) => Math.abs(r.diffS)));
+console.log(`λ̇ channel vs Chapront (drift, s): −12k ${chanDriftS(-12000).toFixed(2)}/${chapDriftS(-12000).toFixed(2)} · +12k ${chanDriftS(12000).toFixed(2)}/${chapDriftS(12000).toFixed(2)} · max |Δ| ${sidMaxDiff.toFixed(3)} s`);
+if (Math.abs(lamRelAtNode(0) - 1) > 1e-12) { console.error('REFUSING: λ̇ channel is not 1 at the J2000 node — anchor construction broken'); process.exit(1); }
+if (sidMaxDiff > 0.5) { console.error('REFUSING: λ̇-channel sidereal-year drift departs the Chapront polynomial by >0.5 s inside ±12 kyr'); process.exit(1); }
+
 // z-side refuse-gates (bounds = 2× the C-4a measured values: e-vs-chain
 // 9.9e-6 rms / ϖ 0.0071° in 1600–2400; e-vs-La2004 2.85e-4 at −200 kyr)
 if (eraES.rms > 5e-5) { console.error('REFUSING: series e departs the era-certified chain by >5e-5 rms in 1600–2400'); process.exit(1); }
@@ -429,7 +487,7 @@ if (Math.abs(rateJ2000 - iauRate) > Math.abs(iauRate) * 0.01) { console.error(`R
 if (d200.rms > 0.05) { console.error('REFUSING: −200..0 kyr ε rms vs La2004 exceeds 0.05°'); process.exit(1); }
 
 const artifact = {
-  _description: 'Earth ζ = sin(i/2)·e^{iΩ} (zetaQ/zetaP) AND z = e·e^{iϖ} (zQ/zP) series (ecliptic-J2000), resampled at 500-yr cadence from the model\'s own ±10-Myr Wisdom–Holman run (1PN, DE440 masses, Horizons J2000 seed) — the ONE-SOURCE orbit-plane and eccentricity-vector histories for the Stage-C movement (deep-orbital-history.cjs zetaSeries/zSeries options; C-2 banked ζ, C-4a added z). No mode extraction: the C-1 verdict (plan 02) measured that no flat mode table serves both the certified era and deep time; the series itself does. The deep mode tables (nbody-deep-secular-modes.json) remain the TAIL beyond the ±10-Myr span. Verdict block = the banked quality gate. Times are years from J2000: t_i = t0Yr + i·stepYr.',
+  _description: 'Earth ζ = sin(i/2)·e^{iΩ} (zetaQ/zetaP) AND z = e·e^{iϖ} (zQ/zP) series (ecliptic-J2000), resampled at 500-yr cadence from the model\'s own ±10-Myr Wisdom–Holman run (1PN, DE440 masses, Horizons J2000 seed) — the ONE-SOURCE orbit-plane and eccentricity-vector histories for the Stage-C movement (deep-orbital-history.cjs zetaSeries/zSeries options; C-2 banked ζ, C-4a added z). D6 adds earth.lamDotRel — the mean-longitude-rate ratio to J2000 (planetary-only λ̇ drift; the run\'s GM is constant), the sidereal-year-of-date channel: T_sid(y) = massLossLaw(y)/lamDotRel(y). No mode extraction: the C-1 verdict (plan 02) measured that no flat mode table serves both the certified era and deep time; the series itself does. The deep mode tables (nbody-deep-secular-modes.json) remain the TAIL beyond the ±10-Myr span. Verdict block = the banked quality gate. Times are years from J2000: t_i = t0Yr + i·stepYr.',
   meta: {
     dumpFile: path.relative(ROOT, DUMP),
     dumpSha256,
@@ -445,7 +503,7 @@ const artifact = {
   },
   t0Yr,
   bodies: {
-    earth: { stepYr: STEP_YR, zetaQ: q, zetaP: p, zQ: zq, zP: zp },
+    earth: { stepYr: STEP_YR, zetaQ: q, zetaP: p, zQ: zq, zP: zp, lamDotRel, lamDotWindowYr: LAMDOT_WINDOW_YR },
     ...planetBodies,
   },
   verdict: {
@@ -466,6 +524,12 @@ const artifact = {
       eVsEraChainRms16002400: eraES.rms, eVsEraChainMax16002400: eraES.max,
       periVsEraChainRmsDeg16002400: eraPS.rms, periVsEraChainMaxDeg16002400: eraPS.max,
       note: 'the C-4a z-side hand-off: the series vs the era-certified chain evaluator in 1600–2400 (the chain is the era element authority, JPL-validated), and vs La2004 (theory label) at depth',
+    },
+    siderealYear: {
+      lamDotJ2000DegPerYr: lamDot0,
+      rows: sidChk.map((r) => ({ tYr: r.t, channelDriftS: Number(r.chanS.toFixed(4)), chaprontDriftS: Number(r.chapS.toFixed(4)) })),
+      maxAbsDiffS: Number(sidMaxDiff.toFixed(4)),
+      note: 'D6: the banked λ̇ channel (lamDotRel) vs the Chapront/Capitaine sidereal-year polynomial — planetary-only drift (the dump\'s GM is constant); consumers multiply their own mass-loss law by 1/lamDotRel. THE one cross-validation home for the sidereal-year drift.',
     },
     planetHandover: {
       rows: planetHandover,

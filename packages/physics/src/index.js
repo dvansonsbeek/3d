@@ -135,6 +135,8 @@ export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from './moon/deep-modes
 // Stage C-3: the ONE home of the obliquity-hybrid / deep-orbital-history
 // mathematics (published-ε surfaces + the deep insolation features).
 export { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
+// D6: the sidereal-year-of-date channel (banked λ̇ ratio × the caller's mass-loss law)
+export { createSiderealYearChannel } from './earth/sidereal-year-channel.cjs';
 export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from './planets/predict.cjs';
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).
