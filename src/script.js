@@ -10001,20 +10001,22 @@ erosPerihelionDurationEcliptic2.pivotObj.add(erosFixedPerihelionAtSun.containerO
 earth.containerObj.rotation.y = (Math.PI/2)*whichSolsticeOrEquinox;
 
 //*************************************************************
-// C-3 (?hybridSpin): the tilt-correction wrapper — a Group inserted between
-// earth.rotationAxis and its parent ONLY when the flag is requested, so the
-// flag-off scene graph (and its golden masters) stays bit-identical. Each
-// frame the wrapper's quaternion rotates the whole axis subtree about the
-// NODE LINE (axis × sun-plane normal = the equinox direction) by exactly
-// (ε_geometry − ε_target), driving the VISIBLE tilt to the one-source ε
-// while leaving the precession phase untouched (a rotation about the node
-// line preserves the node line). Earth sits at the scene origin
-// (orbitRadius 0), so the wrapper pivot coincides with the Earth centre.
-// The flag itself is declared HERE (the earliest consumer) — the loader,
-// factory and sampler live with the other hybrid machinery further down.
+// C-3/D4 (the one-source spin): the tilt-correction wrapper — a Group
+// inserted between earth.rotationAxis and its parent when the one-source
+// drive is requested. Each frame the wrapper's quaternion rotates the whole
+// axis subtree about the NODE LINE (axis × sun-plane normal = the equinox
+// direction) by exactly (ε_geometry − ε_target), driving the VISIBLE tilt
+// to the one-source ε while leaving the precession phase untouched (a
+// rotation about the node line preserves the node line). Earth sits at the
+// scene origin (orbitRadius 0), so the wrapper pivot coincides with the
+// Earth centre. D4 FLIP: the one-source drive is the DEFAULT — ?hybridSpin=0
+// is the opt-out (A/B comparison and escape hatch; the K device remains the
+// automatic fallback when the series artifact fails to load). The flag is
+// declared HERE (the earliest consumer) — the loader, factory and sampler
+// live with the other hybrid machinery further down.
 const HYBRID_SPIN_REQUESTED = (() => {
-  try { return new URLSearchParams(window.location.search).get('hybridSpin') === '1'; }
-  catch (e) { return false; }
+  try { return new URLSearchParams(window.location.search).get('hybridSpin') !== '0'; }
+  catch (e) { return true; }
 })();
 let _hybridTiltCorr = null;
 const _HTC_A = new THREE.Vector3(), _HTC_N = new THREE.Vector3(), _HTC_U = new THREE.Vector3();
@@ -20045,14 +20047,26 @@ function _hybridGridStep(need) {
   if (need <= 2000000) return 1000;
   return 5000;
 }
+// TIER-FILLING growth (D4, the Node twin's measured fix): build each grid
+// tier to its FULL span the first time a probe enters it. The integrator
+// walk and the exact-aligned stores are endpoint-independent, so values at
+// every shared t are IDENTICAL — only the rebuild pattern changes. The
+// previous |t|·1.25 headroom rebuilt the whole integration nearly every
+// year of an outward walk (measured in the Node exporter as a >5.5×
+// blowup; in the browser, a per-year hiccup during long animations).
+function _hybridTierSpan(need) {
+  if (need <= 50000) return 50000;
+  if (need <= 2000000) return 2000000;
+  return Math.ceil(need * 1.25 / 5000) * 5000;
+}
 let _epsHybridSampler = null, _epsHybridRangeYr = 0;
 /** Hybrid ε (deg), DEEP ζ tier, at a decimal year — cached grid, grown on demand. */
 function _epsHybridAt(year) {
   const t = year - 2000;
   const need = Math.max(20000, Math.abs(t) * 1.25);
   if (!_epsHybridSampler || need > _epsHybridRangeYr) {
-    _epsHybridRangeYr = need;
-    _epsHybridSampler = _deepHist().build(need, -need, _hybridGridStep(need));
+    _epsHybridRangeYr = _hybridTierSpan(need);
+    _epsHybridSampler = _deepHist().build(_epsHybridRangeYr, -_epsHybridRangeYr, _hybridGridStep(_epsHybridRangeYr));
   }
   return _epsHybridSampler.at(t).epsDeg;
 }
@@ -20062,22 +20076,23 @@ function _epsHybridEraAt(year) {
   const t = year - 2000;
   const need = Math.max(20000, Math.abs(t) * 1.25);
   if (!_epsHybridEraSampler || need > _epsHybridEraRangeYr) {
-    _epsHybridEraRangeYr = need;
-    _epsHybridEraSampler = _deepHistEra().build(need, -need, _hybridGridStep(need));
+    _epsHybridEraRangeYr = _hybridTierSpan(need);
+    _epsHybridEraSampler = _deepHistEra().build(_epsHybridEraRangeYr, -_epsHybridEraRangeYr, _hybridGridStep(_epsHybridEraRangeYr));
   }
   return _epsHybridEraSampler.at(t).epsDeg;
 }
 
-// ── C-3: ONE SOURCE FOR THE MOVEMENT (?hybridSpin=1 — plan 02 Stage C) ─────
-// Under the flag the RENDERED obliquity (the visual tilt AND the scalar
-// o.obliquityEarth every readout consumes) rides the engine-D hybrid on the
-// BANKED ζ-series artifact (data/nbody-earth-zeta-series.json — the C-1/C-2
-// verdict: the series beats both mode tiers, 0.16″/0.18″ vs IAU-2006 in-era
-// and 0.0396° vs La2004 over −200 kyr). Scope: INSIDE the series' ±10-Myr
-// span (the engine's integration range — the physical boundary); beyond it
-// the K device continues (the H(t)-scaled lattice claim; the hybrid's
-// constant-α form is a ±Myr-class instrument). Flag OFF = the pre-C-3
-// scene, bit-identical (no wrapper node is inserted, no override runs).
+// ── C-3/D4: ONE SOURCE FOR THE MOVEMENT (plan 02 Stage C) ──────────────────
+// DEFAULT-ON since the D4 flip: the RENDERED obliquity (the visual tilt AND
+// the scalar o.obliquityEarth every readout consumes) rides the engine-D
+// hybrid on the BANKED ζ-series artifact (the C-1/C-2 verdict: the series
+// beats both mode tiers, 0.16″/0.18″ vs IAU-2006 in-era and 0.0396° vs
+// La2004 over −200 kyr), at EVERY epoch (series inside ±10 Myr, the α(H(t))
+// mode-tail beyond — D1-revised). ?hybridSpin=0 opts out to the pre-C-3 K
+// scene, bit-identical (no wrapper node is inserted, no override runs);
+// the same K fallback engages automatically if the artifact fails to load.
+// The frozen harmonic era clock (tools/fit/README.md "The frozen era
+// clock") remains the certified era device beside this.
 // (HYBRID_SPIN_REQUESTED is declared at the tilt-correction wrapper — the
 // earliest module-init consumer; a declaration here would be a TDZ.)
 let _zetaSeriesData = null;          // {t0Yr, stepYr, q, p} once fetched (Earth ζ)
@@ -20090,8 +20105,10 @@ let _zetaSeriesEndYr = 0;
 // era chain beyond its measured validity boundary is wrong, flag or no
 // flag (the owner-found Mars e 0.21 / i 12.4° at +564 kyr; series truth
 // 0.069 / 6.4°). Every fixture year sits INSIDE the boundaries, so the
-// golden masters are untouched. Earth's ε/e one-source stays gated on
-// ?hybridSpin=1 until the D4 flip (it touches the certified clock).
+// golden masters are untouched. D4 (owner-approved): Earth's ε/e
+// one-source is ALSO default-on now — the harmonic era clock froze
+// (C-4b adjudication), so the certified-clock coupling that gated this
+// is resolved; the frozen clock stays the era certification record.
 {
   (async () => {
     const candidates = [
@@ -20116,11 +20133,11 @@ let _zetaSeriesEndYr = 0;
         // MEASURED handover boundaries, series-inside-span, mode-tail
         // beyond (the ring-blowup fix).
         _planetSeriesData = a;
-        console.log(`secular series loaded from ${url} (earth + ${Object.keys(a.bodies).length - 1} planets) — planet deep-time elements DEFAULT-ON${HYBRID_SPIN_REQUESTED ? '; Earth ε/e one-source ACTIVE (?hybridSpin=1)' : ''}`);
+        console.log(`secular series loaded from ${url} (earth + ${Object.keys(a.bodies).length - 1} planets) — planet deep-time elements + Earth ε/e one-source ${HYBRID_SPIN_REQUESTED ? 'DEFAULT-ON (D4; ?hybridSpin=0 opts out)' : 'planets on; Earth OPTED OUT (?hybridSpin=0 — the K device drives ε/e)'}`);
         return;
       } catch (e) { /* try the next candidate */ }
     }
-    console.error('secular-series artifact not reachable — planet deep-time elements stay on the era chain (invalid beyond its boundary!)' + (HYBRID_SPIN_REQUESTED ? '; Earth one-source inactive' : ''));
+    console.error('secular-series artifact not reachable — planet deep-time elements stay on the era chain (invalid beyond its boundary!)' + (HYBRID_SPIN_REQUESTED ? '; Earth ε/e falls back to the K device' : ''));
   })();
 }
 // The series-driven hybrid (the ONE evaluator): factory built lazily AFTER
@@ -20160,8 +20177,8 @@ function _hybridSeriesSampleAt(year) {
   const t = year - 2000;
   const need = Math.max(20000, Math.abs(t) * 1.25);
   if (!_epsSeriesSampler || need > _epsSeriesRangeYr) {
-    _epsSeriesRangeYr = need;
-    _epsSeriesSampler = _deepHistSeries().build(need, -need, _hybridGridStep(need));
+    _epsSeriesRangeYr = _hybridTierSpan(need);   // tier-filling growth (see _hybridTierSpan)
+    _epsSeriesSampler = _deepHistSeries().build(_epsSeriesRangeYr, -_epsSeriesRangeYr, _hybridGridStep(_epsSeriesRangeYr));
   }
   return _epsSeriesSampler.at(t);
 }
@@ -45783,11 +45800,11 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => o.obliquityEarth, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Obliquity of the ecliptic — the SCENE's rendered tilt (this value IS the Sun's maximum declination at every epoch, by construction). Under ?hybridSpin=1 it rides the engine-D hybrid on the banked ζ-series inside ±10 Myr (one source — measured 0.16″ rms vs IAU-2006 in-era, 0.04° vs La2004 at −200 kyr; doc 109 §18 + plan Stage C); otherwise the engine-K device law. The derived hybrid tiers stay on the Formula Verification chart. Obliquity cycle |ψ̇|−|s₃| ≈ ${fmtNum(holisticyearLength/8, 0, ',')} years (H/8, at J2000)`],
+       hover : [`Obliquity of the ecliptic — the SCENE's rendered tilt (this value IS the Sun's maximum declination at every epoch, by construction). It rides the engine-D hybrid on the banked ζ-series inside ±10 Myr, the α(H(t)) mode-tail beyond (ONE SOURCE, the D4 default — measured 0.16″ rms vs IAU-2006 in-era, 0.04° vs La2004 at −200 kyr; doc 109 §18 + plan Stage C); ?hybridSpin=0 opts out to the engine-K device law. The derived hybrid tiers stay on the Formula Verification chart. Obliquity cycle |ψ̇|−|s₃| ≈ ${fmtNum(holisticyearLength/8, 0, ',')} years (H/8, at J2000)`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _hybridSpinActive() ? o.eccentricityEarth : _kcElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
-       hover : [`Engine-D eccentricity of date — the model's published Earth element (J2000: 0.016702, matching JPL's osculating seed state and La2004; the IAU mean-elements value is 0.016710). Under ?hybridSpin=1 this row IS the scene's rendered e (the banked engine series inside ±10 Myr — one source: the geometric offset, the equation of center and this readout share one value; series-vs-chain 1e-5 in 1600–2400). Otherwise: the era chain of date, while the scene's orbit machinery rides the engine-K H/3 law e(t) = base′·(1 + cos θ/2) — mean base′ = ${eccentricityDerivedMean.toFixed(6)}, cycle ${fmtNum(holisticyearLength / 3, 0, ',')} years — its epoch-local tangent, within 6e-5 of the chain across the historical era.`],
+       hover : [`Engine-D eccentricity of date — the model's published Earth element (J2000: 0.016702, matching JPL's osculating seed state and La2004; the IAU mean-elements value is 0.016710). This row IS the scene's rendered e (the banked engine series inside ±10 Myr, the mode-tail beyond — ONE SOURCE, the D4 default: the geometric offset, the equation of center and this readout share one value; series-vs-chain 1e-5 in 1600–2400). Under ?hybridSpin=0: the era chain of date, while the scene's orbit machinery rides the engine-K H/3 law e(t) = base′·(1 + cos θ/2) — mean base′ = ${eccentricityDerivedMean.toFixed(6)}, cycle ${fmtNum(holisticyearLength / 3, 0, ',')} years — its epoch-local tangent, within 6e-5 of the chain across the historical era.`],
        tpLink: true, observed: true},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.obliquityEarth-radiansToDecDecimal(earthWobbleCenter.dec), dec:6, sep:',' },{ small: 'degrees (°)' }],
