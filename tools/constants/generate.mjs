@@ -472,6 +472,60 @@ export const CHAIN_ARTIFACT = Object.freeze(${JSON.stringify(art)});
 const DEEP_MODES_PATH = join(ROOT, 'data/nbody-deep-secular-modes.json');
 const OUT_DEEP_MODES = join(ROOT, 'packages/physics/src/moon/deep-modes-artifact.cjs');
 
+// D6: the Earth λ̇ channel (sidereal year of date) — the ONLY slice of the
+// 8 MB secular-series artifact the package embeds (~200 KB at its own
+// 2-kyr cadence). Same two-gate guard as the deep-modes embed:
+// check:artifacts pins artifact ↔ engine, generate.mjs check pins
+// embed ↔ artifact.
+const SECULAR_SERIES_PATH = join(ROOT, 'data/nbody-secular-series.json');
+const OUT_SIDEREAL = join(ROOT, 'packages/physics/src/earth/sidereal-channel-artifact.cjs');
+
+function buildSiderealChannel() {
+  const art = JSON.parse(readFileSync(SECULAR_SERIES_PATH, 'utf8'));
+  const eb = art.bodies.earth;
+  if (!Array.isArray(eb.lamDotRel) || !eb.lamDotStepYr) {
+    throw new Error('secular-series artifact carries no λ̇ channel — regenerate it first (node tools/verify/secular-series.js --write)');
+  }
+  const payload = {
+    t0Yr: art.t0Yr,
+    stepYr: eb.lamDotStepYr,
+    windowYr: eb.lamDotWindowYr,
+    lamDotRel: eb.lamDotRel,
+    meta: {
+      dumpSha256: art.meta.dumpSha256,
+      source: 'data/nbody-secular-series.json bodies.earth.lamDotRel (verbatim)',
+      chaprontGate: art.verdict.siderealYear ? art.verdict.siderealYear.maxAbsDiffS : null,
+    },
+  };
+  const hash = createHash('sha256').update(JSON.stringify(payload)).digest('hex').slice(0, 16);
+  return { hash, payload };
+}
+
+function emitSiderealChannel({ hash, payload }) {
+  return `/**
+ * GENERATED — do not edit. Regenerate:
+ *   node tools/constants/generate.mjs --write
+ *
+ * Source: data/nbody-secular-series.json bodies.earth.lamDotRel — the
+ * D6 mean-longitude-rate ratio to J2000 (planetary epoch drift, from the
+ * model's own constant-GM ±10 Myr run; 2-kyr boxcar, own 2-kyr cadence,
+ * ratio ≡ 1 at the J2000 node). The sidereal-year-of-date data source
+ * for createSiderealYearChannel: T_sid(y) = massLossLaw(y)/lamDotRel(y).
+ * Cross-validated against the Chapront polynomial by the generator's
+ * banked refuse-gate (verdict.siderealYear). Two gates guard the chain:
+ * check:artifacts pins artifact ↔ engine; generate.mjs check mode pins
+ * this embed ↔ artifact. CJS for the .cjs channel consumer.
+ */
+'use strict';
+
+const SIDEREAL_CHANNEL_ARTIFACT_HASH = ${JSON.stringify(hash)};
+
+const SIDEREAL_CHANNEL_ARTIFACT = Object.freeze(${JSON.stringify(payload)});
+
+module.exports = { SIDEREAL_CHANNEL_ARTIFACT, SIDEREAL_CHANNEL_ARTIFACT_HASH };
+`;
+}
+
 function buildDeepModes(chainArt) {
   const raw = readFileSync(DEEP_MODES_PATH, 'utf8');
   const art = JSON.parse(raw);
@@ -600,6 +654,8 @@ const chainArt = buildChainArtifact();
 const chainJs = emitChainArtifact(chainArt);
 const deepModes = buildDeepModes(chainArt);
 const deepJs = emitDeepModes(deepModes);
+const siderealChan = buildSiderealChannel();
+const siderealJs = emitSiderealChannel(siderealChan);
 
 if (write) {
   mkdirSync(dirname(OUT_JS), { recursive: true });
@@ -608,13 +664,15 @@ if (write) {
   writeFileSync(OUT_COEFFS, coeffJs);
   writeFileSync(OUT_CHAIN, chainJs);
   writeFileSync(OUT_DEEP_MODES, deepJs);
+  writeFileSync(OUT_SIDEREAL, siderealJs);
   console.log(`generated ${countLeaves(result.included)} values in ${Object.keys(result.included).length} blocks`);
   console.log(`  constants hash    ${result.hash}`);
   console.log(`  coefficients hash ${coeffs.hash}  (${Object.keys(coeffs.out).length} arrays, full precision)`);
   console.log(`  chain artifact    ${chainArt.hash}  (engine-D governed artifact, verbatim)`);
   console.log(`  deep-modes embed  ${deepModes.hash}  (deep-time Earth-z table, verbatim + joined anchor)`);
+  console.log(`  sidereal embed    ${siderealChan.hash}  (D6 λ̇ channel, ${siderealChan.payload.lamDotRel.length} samples @ ${siderealChan.payload.stepYr} yr)`);
   console.log(`  excluded: ${Object.entries(result.excluded).map(([b, c]) => `${b} (${c})`).join(', ')}`);
-  console.log('  -> packages/physics/src/constants/{generated.js,generated.d.ts,coefficients.js} + planets/chain-artifact.js + moon/deep-modes-artifact.cjs');
+  console.log('  -> packages/physics/src/constants/{generated.js,generated.d.ts,coefficients.js} + planets/chain-artifact.js + moon/deep-modes-artifact.cjs + earth/sidereal-channel-artifact.cjs');
   process.exit(0);
 }
 
@@ -623,12 +681,14 @@ let currentDts = null;
 let currentCoeffs = null;
 let currentChain = null;
 let currentDeep = null;
+let currentSidereal = null;
 try {
   current = readFileSync(OUT_JS, 'utf8');
   currentDts = readFileSync(OUT_DTS, 'utf8');
   currentCoeffs = readFileSync(OUT_COEFFS, 'utf8');
   currentChain = readFileSync(OUT_CHAIN, 'utf8');
   currentDeep = readFileSync(OUT_DEEP_MODES, 'utf8');
+  currentSidereal = readFileSync(OUT_SIDEREAL, 'utf8');
 } catch { /* handled below */ }
 
 console.log('GENERATED CONSTANTS — check');
@@ -637,11 +697,11 @@ console.log(`  ${countLeaves(result.included)} values · ${Object.keys(result.in
 console.log(`  excluded (never injectable): ${Object.keys(result.excluded).join(', ')}`);
 console.log(`  coefficients: ${Object.keys(coeffs.out).length} arrays · hash ${coeffs.hash}`);
 
-if (current === null || currentCoeffs === null || currentChain === null || currentDeep === null) {
+if (current === null || currentCoeffs === null || currentChain === null || currentDeep === null || currentSidereal === null) {
   console.log('\nFAIL — a generated module is missing. Run with --write.');
   process.exit(1);
 }
-if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs || currentChain !== chainJs || currentDeep !== deepJs) {
+if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs || currentChain !== chainJs || currentDeep !== deepJs || currentSidereal !== siderealJs) {
   console.log('\nFAIL — a generated module is STALE relative to the JSON source of truth.');
   console.log('Run: node tools/constants/generate.mjs --write');
   process.exit(1);

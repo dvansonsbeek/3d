@@ -20161,16 +20161,19 @@ let _zetaSeriesEndYr = 0;
 // identity. Built lazily once the artifact (with lamDotRel) arrives;
 // null = artifact absent or pre-D6 → callers fall back to mass-loss only.
 let _siderealChannelM = null;
-function _siderealYearOneSourceSeconds(year) {
-  const a = _planetSeriesData, eb = a && a.bodies && a.bodies.earth;
-  if (!eb || !Array.isArray(eb.lamDotRel)) return null;
+function _siderealChannel() {
   if (!_siderealChannelM) {
+    // Data source: the EMBEDDED artifact inside @essrt/physics (the one
+    // home, generate.mjs-pinned to the governed series artifact) — no
+    // fetch dependency, available at module init.
     _siderealChannelM = createSiderealYearChannel({
-      t0Yr: a.t0Yr, stepYr: eb.stepYr, lamDotRel: eb.lamDotRel,
       massLossSiderealSecondsAtYearFn: (y) => meanSiderealYearSecondsAtAge((startmodelYear - y) / 1e6),
     });
   }
-  return _siderealChannelM.siderealYearSecondsAtYear(year);
+  return _siderealChannelM;
+}
+function _siderealYearOneSourceSeconds(year) {
+  return _siderealChannel().siderealYearSecondsAtYear(year);
 }
 
 // The series-driven hybrid (the ONE evaluator): factory built lazily AFTER
@@ -20507,6 +20510,16 @@ const VFP_CATEGORIES = [
     residualLabel: 'seconds', residualScale: 86400,
     paperTitle: 'Tropical Year Comparison',
     fixedYRange: [365.2418, 365.2426], fixedYTicks: [365.2418, 365.2420, 365.2422, 365.2424, 365.2426],
+    // Cycles view (the standard Export Cycles range): the equinox-rate
+    // wobble over ±250 kyr (measured one-source span 365.24151–365.24266);
+    // the Laskar fit-era formula rides along for comparison and visibly
+    // departs beyond its ±10-kyr class validity.
+    paperAlt: {
+      range: [-248000, 102000], title: 'Tropical Year Cycles',
+      yRange: [365.2414, 365.2428],
+      yTicks: [365.2414, 365.2416, 365.2418, 365.2420, 365.2422, 365.2424, 365.2426, 365.2428],
+      yDecimals: 4,
+    },
     // D4 review: ONE model line — the ONE-SOURCE tropical year OF DATE,
     // SI 86400-s days: T_trop(y) = T_sid_SI(y)·(1 − p_yr/360°) with p_yr
     // the year-over-year RETROGRADE advance of the movement's own equinox
@@ -20544,6 +20557,18 @@ const VFP_CATEGORIES = [
       })() },
     references: [
       { name: 'Laskar (1986)', color: '#4fc3f7', fn: tropicalYearLaskar, sourceUrl: 'https://en.wikipedia.org/wiki/Tropical_year' },
+      // The LONG-PERIOD reference (cycles view): T_trop = T_sid·(1 − 1/P)
+      // with P from Vondrák's Table-3 periodic series — valid ±200 kyr,
+      // unlike the fit-era Laskar polynomial (single-cycle). T_sid held at
+      // the J2000 baseline: its own variation is seconds-class, second-
+      // order against the ~±50 s precession wobble carried by P. Measured
+      // vs the one-source line: rms 3.4 s inside ±198 kyr, 0.03 s at J2000.
+      { name: 'Vondrák (2011), derived', color: '#81c784',
+        fn: year => {
+          const P = axialPrecessionVondrak2011(year);
+          return Number.isFinite(P) ? SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 * (1 - 1 / P) : NaN;
+        },
+        sourceUrl: 'https://doi.org/10.1051/0004-6361/201117274' },
     ],
     j2000extras: [
       { name: 'IAU (observed)', color: '#ef5350',
@@ -20633,6 +20658,18 @@ const VFP_CATEGORIES = [
     residualLabel: 'seconds', residualScale: 86400,
     paperTitle: 'Sidereal Year Comparison',
     fixedYRange: [365.25635, 365.256375], fixedYTicks: [365.25635, 365.256355, 365.25636, 365.256365, 365.25637, 365.256375],
+    // D6 cycles view (the standard Export Cycles range): the planetary λ̇
+    // drift's ~20-kyr cycles + envelope over the mass-loss slope
+    // (measured span 365.256329–365.256375 over this range).
+    paperAlt: {
+      range: [-248000, 102000], title: 'Sidereal Year Cycles',
+      yRange: [365.25632, 365.25638],
+      yTicks: [365.25632, 365.25633, 365.25634, 365.25635, 365.25636, 365.25637, 365.25638],
+      yDecimals: 5,
+      // Chapront rides along for comparison (owner request, matching the
+      // short-period Export for Paper); its fit-era polynomial visibly
+      // leaves the frame beyond ~±12 kyr — that departure IS the point.
+    },
     // SI 86400-s day form. D6: ONE-SOURCE line — the H-chain mass-loss
     // slope (Driver 2: past years SHORTER, IAU-anchored at J2000 via the
     // H/13 identity: 31,558,149.7635 s = 365.256363004 SI days) DIVIDED by
@@ -21282,7 +21319,8 @@ function renderVFPPaperChartAlt(category, altConfig) {
   const xScale = yr => PAD.l + (yr - yearMin) / (yearMax - yearMin) * plotW;
   const yScale = v => PAD.t + (1 - (v - yMin) / (yMax - yMin)) * plotH;
 
-  function fmtY(v) { return v.toFixed(2); }
+  const yDecimals = alt.yDecimals !== undefined ? alt.yDecimals : 2;
+  function fmtY(v) { return v.toFixed(yDecimals); }
 
   // Build path
   function buildPath(data) {

@@ -12,13 +12,16 @@
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
-import { createModel } from '../src/index.js';
+import { createModel, createSiderealYearChannel } from '../src/index.js';
 
 const require = createRequire(import.meta.url);
 const ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 const dt = require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
 
 const model = createModel();
+const engineSiderealChannel = createSiderealYearChannel({
+  massLossSiderealSecondsAtYearFn: (year) => dt.meanSiderealYearSecondsAtAge((2000 - year) / 1e6),
+});
 
 const YEARS = [2000, 2026, 1000, 0, -2000, -100000, -302635, 1e6, -1e6, 5e6, -5e6, 1e8, -1e8, 2e8, -2e8];
 /** @param {number|null} a @param {number|null} b @returns {number} */
@@ -41,7 +44,11 @@ for (const year of YEARS) {
   check('LOD(t)', year, model.epoch.lodSecondsAtYear(year), dt.meanLodSecondsAtAge(tMa));
   check('alpha(t)', year, model.epoch.alphaAtYear(year), dt.earthMoiFactorAtAge(tMa));
   check('moonDistance(t)', year, model.epoch.moonDistanceKmAtYear(year), dt.meanMoonDistanceMetresAtAge(tMa) / 1000);
-  check('siderealYearSeconds(t)', year, model.epoch.siderealYearSecondsAtYear(year), dt.meanSiderealYearSecondsAtAge(tMa));
+  // D6: the model's epoch sidereal year is OF DATE (mass-loss law / the
+  // banked λ̇ ratio); the engine reference applies the SAME package
+  // channel over the engine's own mass-loss law, so the gate still pins
+  // model ≡ engine + embed bit-exactly (an embed↔model divergence fails).
+  check('siderealYearSeconds(t)', year, model.epoch.siderealYearSecondsAtYear(year), engineSiderealChannel.siderealYearSecondsAtYear(year));
 }
 
 // ΔT parity: engine meanDeltaTSecondsAtAge is the trend WITHOUT deltaTStart.

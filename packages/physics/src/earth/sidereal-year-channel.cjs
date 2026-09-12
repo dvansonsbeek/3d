@@ -23,20 +23,27 @@
 // identity — a 3e-8 relative frame change is invisible in the render and
 // would disturb the certified frozen-clock pair.
 
+const { SIDEREAL_CHANNEL_ARTIFACT } = require('./sidereal-channel-artifact.cjs');
+
 /**
  * @param {{
- *   t0Yr: number,
- *   stepYr: number,
- *   lamDotRel: number[],
+ *   t0Yr?: number,
+ *   stepYr?: number,
+ *   lamDotRel?: number[],
  *   massLossSiderealSecondsAtYearFn: (year: number) => number,
  * }} opts
- *   t0Yr/stepYr/lamDotRel: the banked series geometry (t in years from
- *   J2000: t_i = t0Yr + i·stepYr). massLossSiderealSecondsAtYearFn: the
- *   caller's secular mass-loss sidereal-year law, SI seconds (year =
- *   calendar year).
+ *   t0Yr/stepYr/lamDotRel: the banked channel geometry (t in years from
+ *   J2000: t_i = t0Yr + i·stepYr) — default: the embedded
+ *   SIDEREAL_CHANNEL_ARTIFACT (generate.mjs-owned, pinned to the governed
+ *   series artifact), so callers normally pass only the mass-loss law.
+ *   massLossSiderealSecondsAtYearFn: the caller's secular mass-loss
+ *   sidereal-year law, SI seconds (year = calendar year).
  */
 function createSiderealYearChannel(opts) {
-  const { t0Yr, stepYr, lamDotRel, massLossSiderealSecondsAtYearFn } = opts;
+  const t0Yr = opts.t0Yr ?? SIDEREAL_CHANNEL_ARTIFACT.t0Yr;
+  const stepYr = opts.stepYr ?? SIDEREAL_CHANNEL_ARTIFACT.stepYr;
+  const lamDotRel = opts.lamDotRel ?? SIDEREAL_CHANNEL_ARTIFACT.lamDotRel;
+  const { massLossSiderealSecondsAtYearFn } = opts;
   const nS = lamDotRel.length;
 
   // C1 cubic (Catmull-Rom node slopes), exact at nodes — the same
@@ -60,6 +67,23 @@ function createSiderealYearChannel(opts) {
     /** The sidereal year of date, SI seconds. @param {number} year */
     siderealYearSecondsAtYear: (year) =>
       massLossSiderealSecondsAtYearFn(year) / relAt(year - 2000),
+    /**
+     * Apply the λ̇ drift COHERENTLY to any year length (tropical,
+     * anomalistic, …): every year is 360/(λ̇ + X) for some geometric rate
+     * X (equinox p, apsidal −ϖ̇, 0 for sidereal), and the channel scales
+     * λ̇ only — so the correction is on the RATE, not the period:
+     *   1/T' = 1/T + (rel − 1)/T_sid_raw
+     * (for the sidereal year itself this reduces exactly to T/rel).
+     * Correcting periods by division instead would corrupt beat-derived
+     * quantities (P = sid/(sid − trop) amplifies ~20×/s); this form
+     * leaves every beat invariant to second order.
+     * @param {number} year @param {number} yearSeconds
+     */
+    correctedYearSeconds: (year, yearSeconds) => {
+      const rel = relAt(year - 2000);
+      if (rel === 1) return yearSeconds;
+      return 1 / (1 / yearSeconds + (rel - 1) / massLossSiderealSecondsAtYearFn(year));
+    },
   };
 }
 

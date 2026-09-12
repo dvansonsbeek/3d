@@ -23,6 +23,7 @@ import * as planetOrientation from './planets/orientation.cjs';
 import { createPhaseMachinery } from './phase/index.cjs';
 import { createCardinalModel } from './cardinal/index.cjs';
 import { createCardinalStructure } from './cardinal/one-source-structure.cjs';
+import { createSiderealYearChannel } from './earth/sidereal-year-channel.cjs';
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
@@ -499,6 +500,19 @@ export function assembleModel(C, F, laws = {}) {
     };
     return createCardinalStructure({ sampleAt, tropicalYearSecondsAtYearFn });
   })();
+
+  // D6: the sidereal-year-of-date channel — the banked λ̇ ratio (planetary
+  // epoch drift, embedded artifact) over the model's own mass-loss law.
+  // Surface-layer only: the internal laws, the beat constructions
+  // (axialPrecessionYears* — invariant by design), the scene engine and
+  // the frozen era clock all stay on the uncorrected family; the model's
+  // OF-DATE year lengths (epoch.siderealYearSecondsAtYear, the cardinal
+  // structure's year lengths) gain the drift so the API serves accurate
+  // values. EoC offsets and spreads keep the raw form: the correction is
+  // μs-class on an offset and cancels to second order in a spread.
+  const siderealChannelM = createSiderealYearChannel({
+    massLossSiderealSecondsAtYearFn: (year) => deepLod.siderealYearSecondsAtAge(yearToTMa(year)),
+  });
 
   /** Tropical year: mean of the four cardinal intervals. @param {number} year @returns {number} */
   const tropicalYearDays = (year) => cardinalM.computeTropicalYearLength(year);
@@ -1129,7 +1143,9 @@ export function assembleModel(C, F, laws = {}) {
       lodSecondsAtYear: /** @param {number} year @returns {number|null} */ (year) => deepLod.lodSecondsAtAge(yearToTMa(year)),
       alphaAtYear: /** @param {number} year @returns {number} */ (year) => earthMoiFactorAtAge(yearToTMa(year)),
       moonDistanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,
-      siderealYearSecondsAtYear: /** @param {number} year @returns {number} */ (year) => deepLod.siderealYearSecondsAtAge(yearToTMa(year)),
+      // D6: OF-DATE — mass-loss law / the banked planetary λ̇ ratio
+      // (identical at J2000 where the ratio ≡ 1 by construction)
+      siderealYearSecondsAtYear: /** @param {number} year @returns {number} */ (year) => siderealChannelM.siderealYearSecondsAtYear(year),
       deltaTSecondsAtYear: deltaTSeconds,
       cyclesBetween,
       // The DYNAMICAL axial precession period (the tweakpane identity):
@@ -1172,10 +1188,13 @@ export function assembleModel(C, F, laws = {}) {
     // dates deliberately absent; `cardinal` above stays the certified era
     // device for those.
     cardinalStructure: Object.freeze({
-      yearLengthSeconds: /** @param {number} year @param {'VE'|'SS'|'AE'|'WS'} type @returns {number} */ (year, type) => cardinalStructureM.yearLengthSeconds(year, type),
+      // D6: year LENGTHS gain the λ̇ drift coherently (rate-form
+      // correction — beats stay invariant); offsets/spreads keep the raw
+      // form (μs-class / second-order there).
+      yearLengthSeconds: /** @param {number} year @param {'VE'|'SS'|'AE'|'WS'} type @returns {number} */ (year, type) => siderealChannelM.correctedYearSeconds(year, cardinalStructureM.yearLengthSeconds(year, type)),
       eocOffsetSeconds: /** @param {number} year @param {'VE'|'SS'|'AE'|'WS'} type @returns {number} */ (year, type) => cardinalStructureM.eocOffsetSeconds(year, type),
       spreadSeconds: /** @param {number} year */ (year) => cardinalStructureM.spreadSeconds(year),
-      anomalisticYearSeconds: /** @param {number} year @returns {number} */ (year) => cardinalStructureM.anomalisticYearSeconds(year),
+      anomalisticYearSeconds: /** @param {number} year @returns {number} */ (year) => siderealChannelM.correctedYearSeconds(year, cardinalStructureM.anomalisticYearSeconds(year)),
     }),
     moon: Object.freeze({
       distanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,

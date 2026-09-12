@@ -186,6 +186,10 @@ if (maxResampleZ > 2e-5) { console.error('REFUSING: z resample fidelity exceeds 
 // Per-step rate from the dump's L, unwrapped: the integer revolutions per
 // ~54.76-yr raw step are unambiguous (the fractional drift is ~1e-7).
 const LAMDOT_WINDOW_YR = 2000;
+// Banked at its own 2-kyr cadence: the boxcar already removed sub-2-kyr
+// content, so the 500-yr series cadence oversamples it 4× for nothing —
+// and the coarser grid is what the physics package embeds (~200 KB).
+const LAMDOT_STEP_YR = 2000;
 const lamDotRaw = new Float64Array(NR - 1);
 {
   const expRev = rDt * 365.25 / 365.2563630;   // ≈ revolutions per raw step
@@ -203,9 +207,10 @@ const liMid = (/** @type {Float64Array} */ arr, /** @type {number} */ tt) => {
   return arr[i] * (1 - f) + arr[i + 1] * f;
 };
 const lamDot0 = liMid(lamDotS, 0);
-const lamDotRel = Array.from({ length: n }, (_, i) =>
-  Number((liMid(lamDotS, t0Yr + i * STEP_YR) / lamDot0).toFixed(12)));
-console.log(`earth λ̇ channel: ${n} samples (boxcar ${LAMDOT_WINDOW_YR} yr) · λ̇(J2000) ${lamDot0.toFixed(6)} °/yr · rel range [${Math.min(...lamDotRel).toFixed(9)}, ${Math.max(...lamDotRel).toFixed(9)}]`);
+const nLam = Math.floor((tR[NR - 1] - rT0) / LAMDOT_STEP_YR) + 1;
+const lamDotRel = Array.from({ length: nLam }, (_, i) =>
+  Number((liMid(lamDotS, t0Yr + i * LAMDOT_STEP_YR) / lamDot0).toFixed(12)));
+console.log(`earth λ̇ channel: ${nLam} samples @ ${LAMDOT_STEP_YR} yr (boxcar ${LAMDOT_WINDOW_YR} yr) · λ̇(J2000) ${lamDot0.toFixed(6)} °/yr · rel range [${Math.min(...lamDotRel).toFixed(9)}, ${Math.max(...lamDotRel).toFixed(9)}]`);
 
 // ── D5: the seven planets' blocks (same recipe; 1000-yr display cadence) ──
 // Consumers are the deep-time ELEMENT readouts (rings/positions beyond the
@@ -466,7 +471,7 @@ const chapDriftS = (/** @type {number} */ t) => {
   const d = (1.139e-7 * T - 7.6e-11 * T * T - 1.69e-12 * T ** 3);
   return d * 86400;                              // drift vs J2000, seconds
 };
-const lamRelAtNode = (/** @type {number} */ t) => lamDotRel[Math.round((t - t0Yr) / STEP_YR)];
+const lamRelAtNode = (/** @type {number} */ t) => lamDotRel[Math.round((t - t0Yr) / LAMDOT_STEP_YR)];
 const chanDriftS = (/** @type {number} */ t) =>
   31558149.7635 * (1 / lamRelAtNode(t) - 1);     // T ∝ 1/λ̇, IAU-anchored scale
 const sidChk = [-12000, -8000, -4000, 4000, 8000, 12000].map((t) =>
@@ -503,7 +508,7 @@ const artifact = {
   },
   t0Yr,
   bodies: {
-    earth: { stepYr: STEP_YR, zetaQ: q, zetaP: p, zQ: zq, zP: zp, lamDotRel, lamDotWindowYr: LAMDOT_WINDOW_YR },
+    earth: { stepYr: STEP_YR, zetaQ: q, zetaP: p, zQ: zq, zP: zp, lamDotRel, lamDotStepYr: LAMDOT_STEP_YR, lamDotWindowYr: LAMDOT_WINDOW_YR },
     ...planetBodies,
   },
   verdict: {
