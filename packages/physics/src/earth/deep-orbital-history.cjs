@@ -324,17 +324,19 @@ function createDeepOrbitalHistory({
       // date, wobble included (the n̂(t) geometry generates the equinox
       // wobble; ψ̇ itself is the secular α(H(t))). Consumers derive the
       // tropical year of date from it: T_trop = T_sid·(1 − p_yr/360°).
-      // ⚠ RATE-CONSUMER CONTRACT (measured): the raw rate DOUBLE-COUNTS
-      // the mean planetary precession — α's sid/(sid−sol) anchor is the
-      // GENERAL rate, and the n̂(t) geometry re-adds the planetary mean
-      // (+0.097″/yr ≈ +2.4 s of tropical year at J2000; a secular equinox
-      // -phase drift ~0.27°/10 kyr vs reality at deep time). Until α is
-      // re-anchored to the LUNISOLAR rate (the recorded root fix — it
-      // re-witnesses the banked ε gates), every consumer of this field's
-      // RATE must subtract the runtime anchor
-      //   δ = p_geom(J2000) − 360/axialPrecessionYearsJ2000
-      // (the browser tropical-year chart is the reference implementation).
-      // The LONGITUDE itself is raw geometry and needs no correction.
+      // ⚠ RATE-CONSUMER CONTRACT (measured): this field's rate is correct
+      // AS IS — α is self-anchored to the LUNISOLAR rate at construction
+      // (K_LUNI, the one-RK4-step probe above), so the realized general
+      // precession p_geom(J2000) equals 360/axialPrecessionYearsJ2000 by
+      // construction. No correction, no δ subtraction. History (why this
+      // contract exists): before the self-anchor, α carried the GENERAL
+      // sid/(sid−sol) rate and the n̂(t) geometry re-added the planetary
+      // mean — a double-count of +0.097″/yr ≈ +2.4 s of tropical year at
+      // J2000 — and consumers had to subtract the runtime anchor
+      //   δ = p_geom(J2000) − 360/axialPrecessionYearsJ2000.
+      // A consumer may still measure δ at runtime as a SELF-CHECK; it
+      // must read ≈0 (sub-1e-4 ″/yr class). The LONGITUDE itself is raw
+      // geometry and has always needed no correction.
       equinoxLonJ2000Deg: ((Math.atan2(gu[1], gu[0]) * R2D) % 360 + 360) % 360,
       equinoxLonRateDegPerYr: 0,   // filled at store time (build's ±2.5-yr central difference)
     };
