@@ -1257,7 +1257,41 @@ function _osmPeriDeltaRad(jd, currentYear) {
   return dEng - dK;
 }
 
+// D4d — THE EQUINOX-PHASE FLIP (the actual last scene-K element, found by
+// the tropical-year-vs-CSV comparison: the C-3 wrapper preserved the node
+// line BY DESIGN, so the scene's axial-precession phase stayed on the K
+// H/13 wheel — measured as ±45-60 s of mean-tropical-year structure in the
+// deep bands vs the hybrid's own equinox). Same relative construction as
+// the D4c apsidal flip: Δψ = Δλ_eq,hybrid − Δphase_K(H/13), both measured
+// from J2000 (runtime anchor, zero at J2000 by construction; the K wheel
+// is RETROGRADE, sign −1, exactly the earth _dtCycleN=13 device). Applied
+// as an azimuth rotation about the sun-plane normal BEFORE the ε
+// correction about the resulting node line. Deep-time-ON only.
+let _osmEqxAnchor = null;   // {engDeg, cyc} at J2000, captured once
+function _osmEquinoxDeltaRad(jd, currentYear) {
+  const M = _oneSourceM();
+  if (!M || !DEEP_TIME_ENABLED) return 0;
+  if (!_osmEqxAnchor) {
+    const y2000 = C.startModelYearWithCorrection + _posFromJDTools(2451545.0);
+    _osmEqxAnchor = {
+      engDeg: M.equinoxLonJ2000Deg(_osmYearForJD(2451545.0, y2000)),
+      cyc: DT.cyclesBetweenYears(C.balancedYear, y2000, 13) ?? 0,
+    };
+  }
+  const dEng = ((M.equinoxLonJ2000Deg(_osmYearForJD(jd, currentYear)) - _osmEqxAnchor.engDeg + 540) % 360 - 180) * d2r
+    + 0;   // wrapped small-angle: |Δrel| stays ≪ 180° (both terms retrograde together)
+  const cycNow = DT.cyclesBetweenYears(C.balancedYear, currentYear, 13);
+  const dK = -((cycNow ?? 0) - _osmEqxAnchor.cyc) * 2 * Math.PI;   // K axial precession: retrograde (sign −1)
+  // dEng is the WRAPPED difference; dK accumulates many revolutions — take
+  // the K delta mod 2π before differencing so both live on S¹:
+  const dKWrapped = Math.atan2(Math.sin(dK), Math.cos(dK));
+  let d = dEng - dKWrapped;
+  d = Math.atan2(Math.sin(d), Math.cos(d));   // the relative correction is small
+  return d;
+}
+
 const _OSM_MAT = new Mat4();   // reused scratch — all 9 rotation entries rewritten per call
+let _osmAzimuthDeltaRad = 0;   // per-frame Δψ (D4d) — set by the callers just before the correction
 function _applyOneSourceTiltCorr(graph, year) {
   const ra = graph.earthNodes.rotAxis;
   const M = _oneSourceM();
@@ -1277,18 +1311,40 @@ function _applyOneSourceTiltCorr(graph, year) {
   { const s = Math.hypot(nx, ny, nz); nx /= s; ny /= s; nz /= s; }
   const epsGeom = Math.acos(Math.min(1, Math.max(-1, ax * nx + ay * ny + az * nz)));
   const epsTarget = M.epsDeg(year) * Math.PI / 180;
+  // D4d: the azimuth correction FIRST — rotate the axis about the sun-plane
+  // normal n by Δψ (the hybrid-vs-K equinox phase). The angle to n is
+  // invariant under this rotation, so εGeom needs no recompute; only the
+  // node line moves. R_total = R_tilt(û′) · R_azimuth(n).
+  const rod = (/** @type {number} */ x, /** @type {number} */ y, /** @type {number} */ z, /** @type {number} */ th) => {
+    const c = Math.cos(th), s = Math.sin(th), t = 1 - c;
+    return [
+      [t * x * x + c,     t * x * y - s * z, t * x * z + s * y],
+      [t * x * y + s * z, t * y * y + c,     t * y * z - s * x],
+      [t * x * z - s * y, t * y * z + s * x, t * z * z + c],
+    ];
+  };
+  const azRad = _osmAzimuthDeltaRad;   // set by the caller for this frame (0 when inactive)
+  let A = null;
+  if (azRad !== 0) {
+    A = rod(nx, ny, nz, azRad);
+    const ax2 = A[0][0] * ax + A[0][1] * ay + A[0][2] * az;
+    const ay2 = A[1][0] * ax + A[1][1] * ay + A[1][2] * az;
+    const az2 = A[2][0] * ax + A[2][1] * ay + A[2][2] * az;
+    ax = ax2; ay = ay2; az = az2;
+  }
   let ux = ay * nz - az * ny, uy = az * nx - ax * nz, uz = ax * ny - ay * nx;
   const ul = Math.hypot(ux, uy, uz);
   if (ul * ul <= 1e-12) return;
   ux /= ul; uy /= ul; uz /= ul;
   const th = epsGeom - epsTarget;
-  const c = Math.cos(th), s = Math.sin(th), t = 1 - c;
-  // Rodrigues, row-major K[r][c] (world frame)
-  const K = [
-    [t * ux * ux + c,      t * ux * uy - s * uz, t * ux * uz + s * uy],
-    [t * ux * uy + s * uz, t * uy * uy + c,      t * uy * uz - s * ux],
-    [t * ux * uz - s * uy, t * uy * uz + s * ux, t * uz * uz + c],
-  ];
+  let K = rod(ux, uy, uz, th);
+  if (A) {
+    // K_total = K_tilt · K_azimuth
+    const KT = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++)
+      for (let k = 0; k < 3; k++) KT[i][j] += K[i][k] * A[k][j];
+    K = KT;
+  }
   // Parent world rotation Rp (row-major from the column-major Mat4)
   const pe = ra.parent.worldMatrix.e;
   const Rp = [
@@ -1651,8 +1707,9 @@ function moveModel(graph, pos) {
   // Update all world matrices from root
   graph.root.updateWorldMatrix();
 
-  // One-source movement (C-4b): drive the visible tilt to the series ε —
-  // the browser wrapper's Node twin. No-op (self-clearing) when off.
+  // One-source movement (C-4b + D4d): drive the visible tilt to the series
+  // ε AND the axis azimuth to the hybrid equinox phase. No-op when off.
+  _osmAzimuthDeltaRad = _osmEquinoxDeltaRad(currentJD, currentYear);
   _applyOneSourceTiltCorr(graph, _osmYearForJD(currentJD, currentYear));
 }
 
@@ -2031,9 +2088,11 @@ function computeSunPositionFast(jd) {
   // Update world matrices from root
   graph.root.updateWorldMatrix();
 
-  // One-source movement (C-4b): the tilt correction goes on BEFORE the
-  // extraction — sun ra/dec here are read from the graph geometry via
-  // rotAxis.worldToLocal, so ε must already be the series ε.
+  // One-source movement (C-4b + D4d): the tilt + azimuth correction goes on
+  // BEFORE the extraction — sun ra/dec here are read from the graph
+  // geometry via rotAxis.worldToLocal, so the axis must already carry the
+  // series ε and the hybrid equinox phase.
+  _osmAzimuthDeltaRad = _osmEquinoxDeltaRad(jd, currentYear);
   _applyOneSourceTiltCorr(graph, _osmYearForJD(jd, currentYear));
 
   // Extract Sun position in Earth's equatorial frame

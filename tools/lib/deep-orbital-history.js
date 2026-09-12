@@ -132,6 +132,7 @@ function createOneSourceMovement() {
     epsDeg: (year) => sampleAt(year).epsDeg,
     e: (year) => sampleAt(year).e,
     periOfDateDeg: (year) => sampleAt(year).periOfDateDeg,   // equinox-referenced ϖ of date (D4c wheel flip)
+    equinoxLonJ2000Deg: (year) => sampleAt(year).equinoxLonJ2000Deg,   // ŝ×n̂ node longitude (D4d equinox-phase flip)
     cardinal,                        // {eocOffsetSeconds, yearLengthSeconds, spreadSeconds, anomalisticYearSeconds}
   };
 }

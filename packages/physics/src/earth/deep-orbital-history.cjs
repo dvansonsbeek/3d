@@ -189,7 +189,7 @@ function createDeepOrbitalHistory({
   // constants: ψ̇(t) comes from the same certified year-length machinery
   // as the J2000 anchor. Absent the option, α stays constant (the
   // pre-D1 ±Myr-class behavior, bit-identical).
-  const alphaAt = axialPrecessionYearsAtYearFn
+  const alphaAtGeneral = axialPrecessionYearsAtYearFn
     ? (/** @type {number} */ t) =>
         ((2 * Math.PI) / axialPrecessionYearsAtYearFn(2000 + t)) / Math.cos(EPS0)
     : () => ALPHA;
@@ -197,6 +197,51 @@ function createDeepOrbitalHistory({
   const cross = (/** @type {number[]} */ a, /** @type {number[]} */ b) =>
     [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
   const dot = (/** @type {number[]} */ a, /** @type {number[]} */ b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+
+  // THE LUNISOLAR SELF-ANCHOR (D4e — measured, plan 02): the injected
+  // anchor axialPrecessionYearsJ2000 = sid/(sid−sol) is the GENERAL
+  // precession period, but ŝ must precess at the LUNISOLAR rate — the
+  // n̂(t) geometry supplies the planetary part itself, so integrating at
+  // the general rate DOUBLE-COUNTS the planetary mean (measured:
+  // −0.0966″/yr of equinox rate → +2.4 s of tropical year at J2000, and
+  // 0.19% of ε wobble phasing — the dominant term of the old 0.039° rms
+  // vs La2004 over −200 kyr; the lunisolar anchor collapses it to
+  // 0.0048°). Self-anchored at construction, no pasted numbers: a one-RK4
+  // -step probe at the general rate measures the realized equinox rate at
+  // J2000; the deficit rescales α so the REALIZED general precession hits
+  // the injected anchor exactly (dp/dα = 1 to first order — one
+  // fixed-point step lands on target, measured). H(t) shape preserved
+  // (constant factor on the caller's evaluator).
+  const K_LUNI = (() => {
+    const S0P = [0, Math.sin(EPS0), Math.cos(EPS0)];
+    const dv = (/** @type {number[]} */ s, /** @type {number} */ t) => {
+      const n = orbitNormal(t);
+      const k = alphaAtGeneral(t) * dot(s, n);
+      const c = cross(s, n);
+      return [k * c[0], k * c[1], k * c[2]];
+    };
+    const step = (/** @type {number[]} */ s, /** @type {number} */ t, /** @type {number} */ h) => {
+      const k1 = dv(s, t);
+      const k2 = dv([s[0] + h / 2 * k1[0], s[1] + h / 2 * k1[1], s[2] + h / 2 * k1[2]], t + h / 2);
+      const k3 = dv([s[0] + h / 2 * k2[0], s[1] + h / 2 * k2[1], s[2] + h / 2 * k2[2]], t + h / 2);
+      const k4 = dv([s[0] + h * k3[0], s[1] + h * k3[1], s[2] + h * k3[2]], t + h);
+      const o = [0, 1, 2].map((i) => s[i] + h / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+      const r = Math.hypot(o[0], o[1], o[2]);
+      return [o[0] / r, o[1] / r, o[2] / r];
+    };
+    const eqLonDeg = (/** @type {number[]} */ s, /** @type {number} */ t) => {
+      const n = orbitNormal(t);
+      const g = cross(s, n);
+      return Math.atan2(g[1], g[0]) * R2D;
+    };
+    const lM = eqLonDeg(step(S0P, 0, -0.5), -0.5);
+    const lP = eqLonDeg(step(S0P, 0, +0.5), +0.5);
+    const pProbeDegYr = ((lM - lP + 540) % 360) - 180;   // retrograde → positive
+    const pTargetDegYr = 360 / axialPrecessionYearsJ2000;
+    const psiDot0 = alphaAtGeneral(0) * Math.cos(EPS0);
+    return (psiDot0 + (pTargetDegYr - pProbeDegYr) * D2R) / psiDot0;
+  })();
+  const alphaAt = (/** @type {number} */ t) => alphaAtGeneral(t) * K_LUNI;
   const deriv = (/** @type {number[]} */ s, /** @type {number} */ t) => {
     const n = orbitNormal(t);
     const k = alphaAt(t) * dot(s, n);
@@ -238,6 +283,23 @@ function createDeepOrbitalHistory({
       eSinPeri: e * Math.sin(periOfDateDeg * D2R),
       eCosPeri: e * Math.cos(periOfDateDeg * D2R),
       inclEclDeg: i * R2D,
+      // The equinox node (ŝ×n̂) longitude in the J2000 ecliptic frame —
+      // its year-over-year retrograde advance IS the general precession of
+      // date, wobble included (the n̂(t) geometry generates the equinox
+      // wobble; ψ̇ itself is the secular α(H(t))). Consumers derive the
+      // tropical year of date from it: T_trop = T_sid·(1 − p_yr/360°).
+      // ⚠ RATE-CONSUMER CONTRACT (measured): the raw rate DOUBLE-COUNTS
+      // the mean planetary precession — α's sid/(sid−sol) anchor is the
+      // GENERAL rate, and the n̂(t) geometry re-adds the planetary mean
+      // (+0.097″/yr ≈ +2.4 s of tropical year at J2000; a secular equinox
+      // -phase drift ~0.27°/10 kyr vs reality at deep time). Until α is
+      // re-anchored to the LUNISOLAR rate (the recorded root fix — it
+      // re-witnesses the banked ε gates), every consumer of this field's
+      // RATE must subtract the runtime anchor
+      //   δ = p_geom(J2000) − 360/axialPrecessionYearsJ2000
+      // (the browser tropical-year chart is the reference implementation).
+      // The LONGITUDE itself is raw geometry and needs no correction.
+      equinoxLonJ2000Deg: ((Math.atan2(gu[1], gu[0]) * R2D) % 360 + 360) % 360,
     };
   }
 
@@ -302,12 +364,19 @@ function createDeepOrbitalHistory({
           eSinPeri: lerp(a.eSinPeri, b.eSinPeri),
           eCosPeri: lerp(a.eCosPeri, b.eCosPeri),
           inclEclDeg: lerp(a.inclEclDeg, b.inclEclDeg),
+          equinoxLonJ2000Deg: ((dAng(a.equinoxLonJ2000Deg, b.equinoxLonJ2000Deg) % 360) + 360) % 360,
         };
       },
     };
   }
 
-  return { build, alphaArcsecPerYr: ALPHA * R2D * 3600 };
+  return {
+    build,
+    alphaArcsecPerYr: ALPHA * R2D * 3600,   // the injected GENERAL-anchor form (input echo, unchanged semantics)
+    // D4e diagnostics: the self-anchored lunisolar rate actually integrated.
+    alphaLunisolarArcsecPerYr: ALPHA * K_LUNI * R2D * 3600,
+    axialPrecessionYearsLunisolarJ2000: axialPrecessionYearsJ2000 / K_LUNI,
+  };
 }
 
 module.exports = { createDeepOrbitalHistory };

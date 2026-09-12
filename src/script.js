@@ -10037,7 +10037,7 @@ let _hybridTiltCorr = null;
 const _HTC_A = new THREE.Vector3(), _HTC_N = new THREE.Vector3(), _HTC_U = new THREE.Vector3();
 const _HTC_Q1 = new THREE.Quaternion(), _HTC_Q2 = new THREE.Quaternion(),
       _HTC_Q3 = new THREE.Quaternion(), _HTC_Q4 = new THREE.Quaternion(),
-      _HTC_Q5 = new THREE.Quaternion();
+      _HTC_Q5 = new THREE.Quaternion(), _HTC_QAZ = new THREE.Quaternion();
 if (HYBRID_SPIN_REQUESTED) {
   _hybridTiltCorr = new THREE.Group();
   _hybridTiltCorr.name = 'hybridSpinTiltCorrection';
@@ -20207,6 +20207,32 @@ function _hybridSpinActive() { return HYBRID_SPIN_REQUESTED && _zetaSeriesData !
 // construction (runtime anchor, no pasted numbers). Deep-time-ON only (the
 // K term uses the integrated ∫1/H wheel form). Wrapped ϖ is safe: the wheel
 // angle enters only trigonometrically, so 360° branch jumps are invisible.
+// D4d — THE EQUINOX-PHASE FLIP (browser twin of tools/lib
+// _osmEquinoxDeltaRad): Δψ = Δλ_eq,hybrid − Δphase_K(H/13), both from
+// J2000 (runtime anchor; the K axial wheel is RETROGRADE, sign −1 — the
+// earth _dtCycleN=13 device). Applied by the tilt wrapper as an azimuth
+// rotation about the sun-plane normal BEFORE the ε correction — the C-3
+// wrapper's node-line preservation was the LAST scene-K element (measured
+// as ±45-60 s of mean-tropical-year structure in the deep bands).
+let _osmEqxAnchorB = null;
+function _osmEquinoxDeltaRadBrowser() {
+  if (!_hybridSpinActive() || !DEEP_TIME_MODE_ENABLED) return 0;
+  if (!_osmEqxAnchorB) {
+    const y2000 = _jdToSIyear(2451545.0);
+    _osmEqxAnchorB = {
+      engDeg: _hybridSeriesSampleAt(y2000).equinoxLonJ2000Deg,
+      cyc: cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, y2000, 13) ?? 0,
+    };
+  }
+  const ySI = _jdToSIyear(o.julianDay);
+  const dEng = (((_hybridSeriesSampleAt(ySI).equinoxLonJ2000Deg - _osmEqxAnchorB.engDeg + 540) % 360) - 180) * (Math.PI / 180);
+  const cycNow = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, ySI, 13);
+  const dK = -(((cycNow ?? 0) - _osmEqxAnchorB.cyc) * 2 * Math.PI);
+  const dKW = Math.atan2(Math.sin(dK), Math.cos(dK));
+  const d = dEng - dKW;
+  return Math.atan2(Math.sin(d), Math.cos(d));
+}
+
 let _osmPeriAnchorB = null;
 function _osmPeriDeltaRadBrowser() {
   if (!_hybridSpinActive() || !DEEP_TIME_MODE_ENABLED) return 0;
@@ -20263,14 +20289,42 @@ function _sceneEccTargetAt(year) {
 // ζ-skeleton node wander (4.3° rms; arg ζ swings fast near inclination
 // minima), zero-mean element class.
 function inclInvPlaneModel(year) {
-  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-  return kcComputePlanetElementsAtYear(year, _kcChains.earth, _kcChains).inclInvPlaneDeg;
+  // D4 review: the ONE-SOURCE i_inv — the engine Earth orbit normal (series
+  // ζ inside ±10 Myr, mode tail beyond, via _kcEarthEngineOrbitNormalJ2000)
+  // against the artifact's invariable plane. The era chain's inclInvPlaneDeg
+  // that used to sit here is the 8-mode ζ SKELETON: its ~0.204° rms gap vs
+  // La2010 is OUR compression, not physics — the engine series matches
+  // La2010 at rms 0.003° over −500 kyr (the banked headline finding this
+  // chart now actually shows).
+  const D2R = Math.PI / 180;
+  const ip = CHAIN_ARTIFACT.invariablePlane;
+  const si = Math.sin(ip.inclEclipticDeg * D2R), ci = Math.cos(ip.inclEclipticDeg * D2R);
+  const nInv = [si * Math.sin(ip.ascNodeEclipticDeg * D2R), -si * Math.cos(ip.ascNodeEclipticDeg * D2R), ci];
+  const nE = _kcEarthEngineOrbitNormalJ2000(year);
+  const d = nE[0] * nInv[0] + nE[1] * nInv[1] + nE[2] * nInv[2];
+  return Math.acos(Math.min(1, Math.max(-1, d))) / D2R;
 }
 function ascNodeInvPlaneModel(year) {
-  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-  return convertNodeSFrameToEquatorOriginDeg(
-    kcComputePlanetElementsAtYear(year, _kcChains.earth, _kcChains).ascNodeInvPlaneDeg,
-    _kcNodeOriginSSDeg());
+  // D4 review: the ONE-SOURCE node — the engine Earth normal's ascending
+  // node on the invariable plane, in the chain's S-frame convention
+  // (measured: the S-frame zero sits at −Ω_ip along the plane, so
+  // S-frame Ω = vector angle from the plane's ecliptic node + Ω_ip;
+  // matches the era chain at J2000 to 0.007°), then the same S&S origin
+  // conversion the chain path used. Replaces the 8-mode skeleton line
+  // (same reasoning as inclInvPlaneModel above).
+  const D2R = Math.PI / 180;
+  const ip = CHAIN_ARTIFACT.invariablePlane;
+  const si = Math.sin(ip.inclEclipticDeg * D2R), ci = Math.cos(ip.inclEclipticDeg * D2R);
+  const nInv = [si * Math.sin(ip.ascNodeEclipticDeg * D2R), -si * Math.cos(ip.ascNodeEclipticDeg * D2R), ci];
+  const xIp = [Math.cos(ip.ascNodeEclipticDeg * D2R), Math.sin(ip.ascNodeEclipticDeg * D2R), 0];
+  const yIp = [nInv[1] * xIp[2] - nInv[2] * xIp[1], nInv[2] * xIp[0] - nInv[0] * xIp[2], nInv[0] * xIp[1] - nInv[1] * xIp[0]];
+  const nE = _kcEarthEngineOrbitNormalJ2000(year);
+  let N = [nInv[1] * nE[2] - nInv[2] * nE[1], nInv[2] * nE[0] - nInv[0] * nE[2], nInv[0] * nE[1] - nInv[1] * nE[0]];
+  const L = Math.hypot(N[0], N[1], N[2]);
+  N = [N[0] / L, N[1] / L, N[2] / L];
+  const sFrameDeg = ((Math.atan2(N[0] * yIp[0] + N[1] * yIp[1] + N[2] * yIp[2],
+    N[0] * xIp[0] + N[1] * xIp[1] + N[2] * xIp[2]) / D2R + ip.ascNodeEclipticDeg) % 360 + 360) % 360;
+  return convertNodeSFrameToEquatorOriginDeg(sFrameDeg, _kcNodeOriginSSDeg());
 }
 
 // ── Category definitions ─────────────────────────────────────────
@@ -20280,23 +20334,22 @@ const VFP_CATEGORIES = [
     id: 'eccentricity', label: 'Eccentricity', unit: '', precision: 8,
     yLabel: 'eccentricity',
     residualLabel: 'AU', residualScale: 1,
-    primaryRef: 1, // Meeus
+    primaryRef: 0, // Meeus
     paperRange: [-23000, 23000], paperTitle: 'Eccentricity Comparison',
     paperAlt: {
       range: [-248000, 102000], title: 'Eccentricity Cycles',
       yRange: [0, 0.06], yTicks: [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06],
       excludeRefs: ['Meeus (1991)'], // polynomial diverges beyond ±10k years
       noJ2000: true,
-      refLines: [
-        { value: () => eccentricityDerivedMean, label: 'H/3-law mean (base′ 0.01552)', color: '#888', dash: true, yOffset: 0 },
-      ],
     },
-    // Engine-switch Stage A: the published Earth element is the chain's; the
-    // engine-K H/3 law stays as a labeled reference curve (epoch-local tangent).
-    model: { name: 'This model (chain)', color: '#f0b040',
-      fn: year => _kcElementsOfDate('earth', yearToJDApprox(year)).e },
+    // D4 review: "This model" IS the rendered movement — the one-source e
+    // (banked series inside ±10 Myr, mode tail beyond; the K law when the
+    // series has not loaded / opted out — _sceneEccTargetAt's own fallback).
+    // The retired H/3-law reference curve and its base′ mean line are gone
+    // (the frozen-clock family; the era chain stays available in panels).
+    model: { name: 'This model (one-source)', color: '#f0b040',
+      fn: year => _sceneEccTargetAt(year) },
     references: [
-      { name: 'H/3 law (epoch-local)', color: '#90a4ae', fn: year => computeEccentricityEarthAtYear(year), sourceUrl: 'https://doi.org/10.21203/rs.3.rs-8758810/v4' },
       { name: 'Meeus (1991)', color: '#4fc3f7', fn: eccMeeus, sourceUrl: 'https://en.wikipedia.org/wiki/Orbital_eccentricity' },
       { name: 'Berger (1978)', color: '#ce93d8', fn: eccBerger1978, sourceUrl: 'https://doi.org/10.1175/1520-0469(1978)035%3C2362:LTVODI%3E2.0.CO;2' },
       { name: 'La2004 (Laskar)', color: '#ff8a65', fn: eccLa2004, sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
@@ -20310,26 +20363,24 @@ const VFP_CATEGORIES = [
     id: 'obliquity', label: 'Obliquity', unit: '°', precision: 6,
     yLabel: 'degrees',
     residualLabel: 'arcseconds', residualScale: 3600,
-    primaryRef: 2, // Chapront+ 2002
+    primaryRef: 2, // Chapront (2002) — index into references after the D4 one-line cleanup
     paperRange: [-23000, 23000], paperTitle: 'Obliquity Comparison',
     paperYRange: [20, 28], paperYTicks: [20, 21, 22, 23, 24, 25, 26, 27, 28],
     paperAlt: {
       range: [-248000, 102000], title: 'Obliquity Cycles',
       yRange: [22, 25], yTicks: [22, 22.5, 23, 23.5, 24, 24.5, 25],
       excludeRefs: ['Laskar (1986)', 'Capitaine (2006)', 'Chapront (2002)'],
-      refLines: [
-        { value: () => earthtiltMean, label: 'mean (' + earthtiltMean.toFixed(2) + '\u00b0)', color: '#888', dash: true, yOffset: 0 },
-      ],
     },
     fixedYRange: [22, 25], fixedYTicks: [22, 23, 24, 25],
-    // Stage C-3: the published ε is the hybrid (derived, zero fitted
-    // constants); the 16-harmonic fitted law stays as the labeled era
-    // device — the chart shows the derivation beside the fit.
-    model: { name: 'This model (hybrid, deep ζ)', color: '#f0b040',
-      fn: year => _epsHybridAt(year) },
+    // D4 review: ONE model line — the rendered movement itself
+    // (_sceneEpsTargetDeg: the series hybrid inside ±10 Myr, the α(H(t))
+    // mode tail beyond, the K device when the series has not loaded / is
+    // opted out). The internal tier lines (deep ζ modes, era ζ tier), the
+    // frozen fitted-law line and the K-family mean refline are gone — the
+    // frozen era device lives on in the gates and registry, not here.
+    model: { name: 'This model (one-source)', color: '#f0b040',
+      fn: year => _sceneEpsTargetDeg(year) },
     references: [
-      { name: 'hybrid (era ζ tier)', color: '#ffd54f', fn: year => _epsHybridEraAt(year), sourceUrl: 'https://doi.org/10.21203/rs.3.rs-8758810/v4' },
-      { name: 'fitted law (era device)', color: '#90a4ae', fn: year => computeObliquityEarth(_formulaYearFromJD(yearToJDApprox(year))), sourceUrl: 'https://doi.org/10.21203/rs.3.rs-8758810/v4' },
       { name: 'Laskar (1986)', color: '#4fc3f7', fn: meanObliquityLaskar1986, sourceUrl: 'https://en.wikipedia.org/wiki/Axial_tilt' },
       { name: 'Capitaine (2006)', color: '#81c784', fn: meanObliquityIAU2006, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
       { name: 'Chapront (2002)', color: '#ce93d8', fn: obliquityChapront2002, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
@@ -20380,13 +20431,20 @@ const VFP_CATEGORIES = [
     paperTitle: 'Longitude Perihelion Comparison',
     paperRange: [-23000, 23000], paperYRange: [0, 400], paperYTicks: [0, 50, 100, 150, 200, 250, 300, 350, 400],
     fixedYRange: [0, 360], fixedYTicks: [0, 60, 120, 180, 240, 300, 360],
-    // Engine-switch Stage A: the published ϖ is the chain's of-date longitude
-    // (chain J2000-frame ϖ + the same general-precession term the gauge
-    // writer uses); the engine-K H/16 law stays as a labeled reference curve.
-    model: { name: 'This model (chain)', color: '#f0b040',
-      fn: year => (((_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / (holisticyearLength / 13)) * (year - 2000)) % 360) + 360) % 360 },
+    // D4 review: ONE model line — the one-source ϖ of date (the sampler's
+    // equinox-referenced periOfDateDeg: series inside ±10 Myr, the
+    // co-rotating mode tail beyond — the SAME ϖ(t) that drives the scene's
+    // apsidal wheel and the anomalistic year). Chain + kinematic H/13
+    // of-date term only as the not-loaded/opted-out fallback. The retired
+    // H/16-law reference line is gone, and primaryRef is now EXPLICIT:
+    // residuals previously defaulted to index 0 = our own H/16 law (the
+    // same primaryRef class as the obliquity find).
+    primaryRef: 1, // La2004 (of-date-capable across the full ±23 kyr window)
+    model: { name: 'This model (one-source)', color: '#f0b040',
+      fn: year => _hybridSpinActive()
+        ? _hybridSeriesSampleAt(year).periOfDateDeg
+        : (((_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / (holisticyearLength / 13)) * (year - 2000)) % 360) + 360) % 360 },
     references: [
-      { name: 'H/16 law (epoch-local)', color: '#90a4ae', fn: year => calcEarthPerihelionPredictive(year), sourceUrl: 'https://doi.org/10.21203/rs.3.rs-8758810/v4' },
       { name: 'Meeus (1991)', color: '#81c784', fn: perihelionMeeusEarth, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/1994A%26A...282..663S' },
       { name: 'La2004 (Laskar)', color: '#e53935', fn: perihelionLa2004, sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
     ],
@@ -20403,36 +20461,48 @@ const VFP_CATEGORIES = [
     residualLabel: 'seconds', residualScale: 86400,
     paperTitle: 'Tropical Year Comparison',
     fixedYRange: [365.2418, 365.2426], fixedYTicks: [365.2418, 365.2420, 365.2422, 365.2424, 365.2426],
-    // J2000-anchored, SI-86400-s-day form of tropical year at sample year Y.
-    // Two things need cleanup vs a naive (solDays/sidDays) × SID_S / 86400:
-    //
-    // 1) Sidereal rebase. computeSiderealYearDaysDirect reads the LIVE
-    //    `meansiderealyearlengthinDays` base, which recomputeEpochAnchors
-    //    mutates to the current sim epoch. Strip that live base off, add
-    //    ASTRO_REFERENCE.siderealYearJ2000 back on, and use the frozen
-    //    MEAN_SIDEREAL_YEAR_J2000_S seconds anchor. Otherwise the whole
-    //    curve shifts vertically depending on where the sim is parked.
-    //
-    // 2) Solar drift subtraction. Under DEEP_TIME_MODE_ENABLED,
-    //    computeSolsticeYearLength adds a (mSY_at_Y − MSY_J2000) drift term
-    //    that expresses the tropical year in the EPOCH-LOCAL LOD's days
-    //    ("real LOD days at Y"), NOT SI 86400-s days. At ±10 kyr the LOD
-    //    drift is ~0.17 s → solDays picks up a spurious ±61-s (~0.0007 d)
-    //    swing that reads as "too steep" against Laskar's pure-orbital
-    //    curve. Subtract the drift here so the chart shows the pure
-    //    orbital-precession Fourier contribution against a stable
-    //    MSY_J2000 base — matching Laskar's SI-day convention.
-    model: { name: 'This model', color: '#f0b040',
-      // SI 86400-s day form (matches Laskar's convention + the sidereal-year chart
-      // pattern `secondsAtAge / 86400`). Uses the FROZEN J2000 baseline
-      // MEAN_SOLAR_YEAR_J2000_DAYS rather than the LIVE `meansolaryearlengthinDays`
-      // (which deep-time mutates to the epoch-local LOD-day form). Without the
-      // freeze, the chart curve shifts vertically depending on where the sim is
-      // parked and the value at year Y drifts into "LOD-days at Y", NOT SI-days.
-      // TROPICAL_YEAR_HARMONICS were fit against the SI-day CSV so evaluated on
-      // the frozen baseline they produce the Laskar-matching orbital-precession
-      // curve without any LOD-drift contamination.
-      fn: year => evalYearFourier(_formulaYearFromJD(yearToJDApprox(year)), MEAN_SOLAR_YEAR_J2000_DAYS, TROPICAL_YEAR_HARMONICS) },
+    // D4 review: ONE model line — the ONE-SOURCE tropical year OF DATE,
+    // SI 86400-s days: T_trop(y) = T_sid_SI(y)·(1 − p_yr/360°) with p_yr
+    // the year-over-year RETROGRADE advance of the movement's own equinox
+    // node (the sampler's equinoxLonJ2000Deg — ŝ×n̂ in the J2000 ecliptic
+    // frame). This carries the REAL structure the 6a export measured and
+    // the frozen 6c harmonics encoded: the n̂(t) geometry generates the
+    // equinox-rate wobble (the Laskar-1986 arc — measured: max ~365.24261
+    // near −8000, 365.24182 at +12000, matching the reference's shape and
+    // endpoints). THE DOUBLE-COUNT ANCHOR: the mean planetary-precession
+    // term appears in BOTH α's sid/(sid−sol) anchor and the n̂ geometry
+    // (measured 0.097″/yr ≈ 2.4 s of year length at J2000). The wobble is
+    // DIFFERENTIAL, the double-count is a CONSTANT rate — so it is removed
+    // by a runtime anchor: δ = p_geom(2000) − 360/axial0, computed once
+    // from the sampler itself (no pasted numbers), subtracted from p at
+    // every epoch. J2000 then reads the anchored mean exactly while the
+    // arc keeps its shape. (The root fix — anchoring α to the LUNISOLAR
+    // rate — is the C-5 adjudication: it re-witnesses the banked ε gates.
+    // Any future consumer of the equinox RATE must apply this same anchor
+    // until then.) Falls back to the smooth secular mean when the series
+    // is not loaded / opted out.
+    model: { name: 'This model (one-source)', color: '#f0b040',
+      fn: (() => {
+        let a = null;
+        const wrap180 = (d) => ((d + 540) % 360) - 180;
+        const pGeomYr = (year) => wrap180(_hybridSeriesSampleAt(year - 0.5).equinoxLonJ2000Deg
+          - _hybridSeriesSampleAt(year + 0.5).equinoxLonJ2000Deg);   // retrograde → positive
+        return (year) => {
+          if (!a) {
+            const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
+            a = { axial0: sid / (sid - sol), H0: meanHAtAge(0), deltaPYr: null };
+          }
+          const tMa = (2000 - year) / 1e6;
+          if (_hybridSpinActive()) {
+            if (a.deltaPYr === null) a.deltaPYr = pGeomYr(2000) - 360 / a.axial0;
+            const pYr = pGeomYr(year) - a.deltaPYr;
+            return meanSiderealYearSecondsAtAge(tMa) / 86400 * (1 - pYr / 360);
+          }
+          const h = meanHAtAge(tMa);
+          return meanSiderealYearSecondsAtAge(tMa) / 86400
+            * (1 - 1 / (a.axial0 * (h === null ? 1 : h / a.H0)));
+        };
+      })() },
     references: [
       { name: 'Laskar (1986)', color: '#4fc3f7', fn: tropicalYearLaskar, sourceUrl: 'https://en.wikipedia.org/wiki/Tropical_year' },
     ],
@@ -52662,11 +52732,21 @@ function updatePositions() {
     const n = _HTC_N.set(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(_HTC_Q2)).normalize();
     const epsGeom = Math.acos(Math.min(1, Math.max(-1, a.dot(n))));
     const epsTarget = o.obliquityEarth * Math.PI / 180;
+    // D4d: the azimuth correction FIRST — rotate the axis about the
+    // sun-plane normal by Δψ (the hybrid-vs-K equinox phase; the angle to
+    // n is invariant, so εGeom needs no recompute — only the node line
+    // moves). qw = q_tilt(û′) · q_azimuth(n).
+    const dpsi = _osmEquinoxDeltaRadBrowser();
+    if (dpsi !== 0) {
+      const qAz = _HTC_QAZ.setFromAxisAngle(n, dpsi);
+      a.applyQuaternion(qAz);
+    }
     const u = _HTC_U.crossVectors(a, n);
     if (u.lengthSq() > 1e-12) {
       u.normalize();
       const qParent = _hybridTiltCorr.parent.getWorldQuaternion(_HTC_Q3);
       const qw = _HTC_Q4.setFromAxisAngle(u, epsGeom - epsTarget);
+      if (dpsi !== 0) qw.multiply(_HTC_QAZ);   // tilt ∘ azimuth (world)
       _hybridTiltCorr.quaternion.copy(_HTC_Q5.copy(qParent).invert().multiply(qw).multiply(qParent));
       _hybridTiltCorr.updateMatrixWorld(true);
     }
@@ -55807,7 +55887,15 @@ function updatePredictions() {
   // Fourier(2000) sits ~1.4e-6 d above YEAR_LENGTH_J2000_ANCHOR (the fit's
   // year-2000 residual; doc 99 § "The two J2000 day bases").
   // Consistent with sidereal + anomalistic displays (also Step 6d).
-  predictions.solarYearDays = o.solarYearDays = computeSolarYearDaysDirect(yearForFormula);
+  // D4d: under the one-source movement the model's solar year IS the
+  // scene-measured mean of the four cardinal intervals (the D4b panel's own
+  // event solves; Σδ_X cancels the EoC spread in the mean) — the panel, the
+  // chart and the rendered movement now agree. The frozen 6c device serves
+  // the ?hybridSpin=0 opt-out.
+  predictions.solarYearDays = o.solarYearDays = (_hybridSpinActive() && _osCardinalCacheVals)
+    ? (_osCardinalCacheVals.SS.yearLenDays + _osCardinalCacheVals.WS.yearLenDays
+       + _osCardinalCacheVals.VE.yearLenDays + _osCardinalCacheVals.AE.yearLenDays) / 4
+    : computeSolarYearDaysDirect(yearForFormula);
   o.siderealYearDays = computeSiderealYearDaysDirect(yearForFormula);
   // o.lodKinematic MUST be assigned BEFORE any downstream calc that uses it.
   // o.lodKinematic = epoch-specific kinematic = sidYear_s(Y) / Fourier_sid_days ≈ 86400.000000 at J2000.
