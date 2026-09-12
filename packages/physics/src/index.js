@@ -100,6 +100,11 @@ export { createDerivedViews } from './layer1/index.js';
 // re-exported here so bundled ESM consumers need only the package root).
 export { createPhaseMachinery } from './phase/index.cjs';
 export { createCardinalModel } from './cardinal/index.cjs';
+// D4b: the one-source cardinal structure — the EoC layer (year lengths,
+// crossing offsets, the e(t)-proportional spread) on the movement's own
+// e(t)/ϖ(t). Absolute dates deliberately excluded (per-renderer mean chain);
+// the frozen createCardinalModel stays the certified era device.
+export { createCardinalStructure } from './cardinal/one-source-structure.cjs';
 // Phase 8.2 — the lunar machinery, extracted layer by layer (survey order:
 // eccentricity channel → month chain → cycle tables → arguments → series →
 // apparent). Same CJS + root re-export convention.

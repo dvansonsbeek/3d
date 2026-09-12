@@ -115,9 +115,23 @@ function createOneSourceMovement() {
     }
     return sampler.at(t);
   };
+  // D4b: the one-source cardinal structure (the EoC layer — year lengths,
+  // crossing offsets, the e(t)-proportional spread) on THIS movement's own
+  // sampler. The mean tropical year is SI SECONDS by contract: the sidereal
+  // year of date (SI) reduced by the secular α(H(t)) equinox precession —
+  // the same construction the movement runs (a days-of-date year hides a
+  // ~2,400 s LOD-vs-SI bias at −300 kyr, measured).
+  const { createCardinalStructure } = require('../../packages/physics/src/cardinal/one-source-structure.cjs');
+  const tropicalYearSecondsAtYearFn = (year) => {
+    const tMa = (2000 - year) / 1e6;
+    return DT.meanSiderealYearSecondsAtAge(tMa) * (1 - 1 / (axial0 * DT.meanHAtAge(tMa) / H0));
+  };
+  const cardinal = createCardinalStructure({ sampleAt, tropicalYearSecondsAtYearFn });
+
   return {
     epsDeg: (year) => sampleAt(year).epsDeg,
     e: (year) => sampleAt(year).e,
+    cardinal,                        // {eocOffsetSeconds, yearLengthSeconds, spreadSeconds}
   };
 }
 

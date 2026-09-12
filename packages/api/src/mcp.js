@@ -62,6 +62,12 @@ const TOOLS = Object.freeze({
     request: (/** @type {any} */ a) => ({ method: 'GET', path: `/${API_VERSION}/cardinal-points`, query: queryOf(a) }),
     covers: ['/v1/cardinal-points'],
   },
+  essrt_cardinal_structure: {
+    description: 'One-source cardinal STRUCTURE at epoch(s): per-point year length, equation-of-center crossing offset and the e(t)-proportional spread around the mean tropical year (SI seconds), from the movement\'s own e(t)/ϖ(t) — valid at every epoch (mode tier). Absolute event dates are deliberately absent (per-renderer mean chain); essrt_cardinal_points is the certified era device for those. Types: SS, WS, VE, AE.',
+    inputSchema: { type: 'object', properties: { ...TIME_PROPS, types: { type: 'string', description: 'comma-list of SS,WS,VE,AE' } } },
+    request: (/** @type {any} */ a) => ({ method: 'GET', path: `/${API_VERSION}/cardinal-structure`, query: queryOf(a) }),
+    covers: ['/v1/cardinal-structure'],
+  },
   essrt_earth: {
     description: 'Earth elements at epoch(s): obliquity, eccentricity, inclination, perihelion longitude, ascending node.',
     inputSchema: { type: 'object', properties: { ...TIME_PROPS } },

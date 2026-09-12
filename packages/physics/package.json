@@ -31,6 +31,7 @@
     ".": "./src/index.js",
     "./phase": "./src/phase/index.cjs",
     "./cardinal": "./src/cardinal/index.cjs",
+    "./cardinal/one-source-structure": "./src/cardinal/one-source-structure.cjs",
     "./moon/ecc-channel": "./src/moon/ecc-channel.cjs",
     "./moon/deep-ecc-channel": "./src/moon/deep-ecc-channel.cjs",
     "./moon/deep-modes-artifact": "./src/moon/deep-modes-artifact.cjs",

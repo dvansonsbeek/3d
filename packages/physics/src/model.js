@@ -22,6 +22,9 @@ import * as FL from './planets/fibonacci-laws.cjs';
 import * as planetOrientation from './planets/orientation.cjs';
 import { createPhaseMachinery } from './phase/index.cjs';
 import { createCardinalModel } from './cardinal/index.cjs';
+import { createCardinalStructure } from './cardinal/one-source-structure.cjs';
+import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
+import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
 import { createDeepTimeLod } from './deltat/deep-time.cjs';
 import { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
@@ -453,6 +456,50 @@ export function assembleModel(C, F, laws = {}) {
       eccentricityRateAt,
     },
   });
+  // ── One-source cardinal structure (D4b) ───────────────────────────────────
+  // The EoC layer (year lengths, crossing offsets, the e(t)-proportional
+  // spread) on the one-source movement's own e(t)/ϖ(t) — the MODE tier (the
+  // package's embedded deep-modes artifact; the banked-series tier is the
+  // repo-data-bound instrument). Absolute dates deliberately absent — see
+  // cardinal/one-source-structure.cjs. The mean year is SI SECONDS: the
+  // sidereal year of date reduced by the SECULAR α(H(t)) equinox precession
+  // (axial0·H(t)/H0 — the movement's leg-1 convention, NOT the H/13
+  // kinematic identity; the two are a recorded 0.09% relation tension).
+  const cardinalStructureM = (() => {
+    const AEarth = /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements.earth;
+    const axial0 = meanSiderealYearDays / (meanSiderealYearDays - meanSolarYearDays);
+    const H0 = /** @type {number} */ (deepLod.hAtAge(0));
+    const hist = createDeepOrbitalHistory({
+      zModes: DEEP_MODES_ARTIFACT.earthZ,
+      zetaModes: DEEP_MODES_ARTIFACT.earthZeta,
+      anchorE: AEarth.e,
+      anchorPeriEclipticDeg: AEarth.lonPeriEclipticDeg,
+      anchorInclEclipticDeg: AEarth.inclEclipticDeg,
+      anchorAscNodeEclipticDeg: AEarth.ascNodeEclipticDeg,
+      axialPrecessionYearsJ2000: axial0,
+      obliquityJ2000Deg: obliquityDeg(2000),
+      axialPrecessionYearsAtYearFn: (yr) => {
+        const h = deepLod.hAtAge((startmodelYear - yr) / 1e6);
+        return axial0 * (h === null ? 1 : h / H0);
+      },
+    });
+    // grown-grid sampler, tier-filling (the measured rebuild-storm fix)
+    let sampler = /** @type {any} */ (null), rangeYr = 0;
+    const gridStep = (/** @type {number} */ n) => (n <= 50000 ? 100 : n <= 2000000 ? 1000 : 5000);
+    const tierSpan = (/** @type {number} */ n) => (n <= 50000 ? 50000 : n <= 2000000 ? 2000000 : Math.ceil(n * 1.25 / 5000) * 5000);
+    const sampleAt = (/** @type {number} */ year) => {
+      const t = year - 2000, need = Math.max(20000, Math.abs(t) * 1.25);
+      if (!sampler || need > rangeYr) { rangeYr = tierSpan(need); sampler = hist.build(rangeYr, -rangeYr, gridStep(rangeYr)); }
+      return sampler.at(t);
+    };
+    const tropicalYearSecondsAtYearFn = (/** @type {number} */ year) => {
+      const tMa = (startmodelYear - year) / 1e6;
+      const h = deepLod.hAtAge(tMa);
+      return deepLod.siderealYearSecondsAtAge(tMa) * (1 - 1 / (axial0 * (h === null ? 1 : h / H0)));
+    };
+    return createCardinalStructure({ sampleAt, tropicalYearSecondsAtYearFn });
+  })();
+
   /** Tropical year: mean of the four cardinal intervals. @param {number} year @returns {number} */
   const tropicalYearDays = (year) => cardinalM.computeTropicalYearLength(year);
   /** @param {number} year @returns {number} */
@@ -1119,6 +1166,15 @@ export function assembleModel(C, F, laws = {}) {
         return ((ra % 360) + 360) % 360;
       },
       yearLengthDays: /** @param {number} year @param {string} type @returns {number} */ (year, type) => cardinalM.computeSolsticeYearLength(year, type),
+    }),
+    // D4b: the one-source cardinal STRUCTURE — the EoC layer on the
+    // movement's own e(t)/ϖ(t), valid at every epoch (mode tier). Absolute
+    // dates deliberately absent; `cardinal` above stays the certified era
+    // device for those.
+    cardinalStructure: Object.freeze({
+      yearLengthSeconds: /** @param {number} year @param {'VE'|'SS'|'AE'|'WS'} type @returns {number} */ (year, type) => cardinalStructureM.yearLengthSeconds(year, type),
+      eocOffsetSeconds: /** @param {number} year @param {'VE'|'SS'|'AE'|'WS'} type @returns {number} */ (year, type) => cardinalStructureM.eocOffsetSeconds(year, type),
+      spreadSeconds: /** @param {number} year */ (year) => cardinalStructureM.spreadSeconds(year),
     }),
     moon: Object.freeze({
       distanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,

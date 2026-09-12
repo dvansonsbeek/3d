@@ -34,6 +34,7 @@ export const ROUTE_TEMPLATES = Object.freeze([
   '/v1/versions/{id}',
   '/v1/epoch',
   '/v1/cardinal-points',
+  '/v1/cardinal-structure',
   '/v1/earth',
   '/v1/moon',
   '/v1/bodies',
@@ -190,6 +191,37 @@ export function createApi() {
           yearLengthDays: model.cardinal.yearLengthDays(y, type),
         }])),
       }));
+      return envelope({ identity: id, inputEcho: { path, ...t.echo, types }, data: { years: rows } });
+    }
+
+    // ── /cardinal-structure ─────────────────────────────────────────────────
+    // D4b: the one-source cardinal STRUCTURE — the equation-of-center layer
+    // (per-point year lengths, crossing offsets, the e(t)-proportional
+    // spread) on the movement's own e(t)/ϖ(t), valid at every epoch (mode
+    // tier). Absolute event dates are DELIBERATELY absent — they need a
+    // per-renderer mean-sun chain; /cardinal-points remains the certified
+    // era device for those.
+    if (path === `/${API_VERSION}/cardinal-structure`) {
+      if (!get()) return methodNotAllowed(method, path);
+      const t = epochs(query);
+      if ('problem' in t) return t.problem;
+      const types = query.types ? query.types.split(',') : [...CARDINAL_TYPES];
+      const unknown = types.filter((s) => !CARDINAL_TYPES.includes(s));
+      if (unknown.length) {
+        return problem(400, 'unknown-cardinal-type', 'Unknown cardinal-point type', `No type(s): ${unknown.join(', ')}.`, { types: CARDINAL_TYPES });
+      }
+      const rows = t.years.map((y) => {
+        const spread = model.cardinalStructure.spreadSeconds(y);
+        return {
+          year: y,
+          meanTropicalYearSeconds: spread.meanSeconds,
+          points: Object.fromEntries(types.map((type) => [type, {
+            yearLengthSeconds: model.cardinalStructure.yearLengthSeconds(y, /** @type {any} */ (type)),
+            eocOffsetSeconds: model.cardinalStructure.eocOffsetSeconds(y, /** @type {any} */ (type)),
+            spreadSeconds: /** @type {Record<string, number>} */ (spread)[type],
+          }])),
+        };
+      });
       return envelope({ identity: id, inputEcho: { path, ...t.echo, types }, data: { years: rows } });
     }
 

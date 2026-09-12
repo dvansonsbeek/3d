@@ -221,6 +221,25 @@ function measure() {
     v[`sunPos.dec@${jd}`] = p.dec;
   }
 
+  // ─── D4b — the one-source cardinal structure ──────────────────────────────
+  // Pins the EoC layer (year lengths + the e(t)-proportional spread) through
+  // the shipped path: @essrt/physics createCardinalStructure wired by
+  // createOneSourceMovement. CSV-validated at bias ~1 s / rms ~101 s over
+  // 335k measured events; these fixture years pin the exact values.
+  {
+    const M = require(join(ROOT, 'tools/lib/deep-orbital-history.js')).createOneSourceMovement();
+    if (M) {
+      for (const y of [2000, -11000, -100000, -220000]) {
+        const s = M.cardinal.spreadSeconds(y);
+        v[`cardinalOS.meanSeconds@${y}`] = s.meanSeconds;
+        for (const tp of ['VE', 'SS', 'AE', 'WS']) {
+          v[`cardinalOS.spread.${tp}@${y}`] = s[tp];
+          v[`cardinalOS.eocOffset.${tp}@${y}`] = M.cardinal.eocOffsetSeconds(y, tp);
+        }
+      }
+    }
+  }
+
   return v;
 }
 
