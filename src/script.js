@@ -20548,28 +20548,21 @@ const VFP_CATEGORIES = [
     // the frozen 6c harmonics encoded: the n̂(t) geometry generates the
     // equinox-rate wobble (the Laskar-1986 arc — measured: max ~365.24261
     // near −8000, 365.24182 at +12000, matching the reference's shape and
-    // endpoints). The rate is read RAW: since the factory's lunisolar
-    // self-anchor (K_LUNI — the root fix for the old planetary-mean
-    // double-count), the realized general precession hits sid/(sid−sol)
-    // at J2000 by construction, so the former runtime δ anchor
-    // (δ = p_geom(2000) − 360/axial0) self-measured ≈0 and is retired.
-    // Falls back to the smooth secular mean when the series is not
-    // loaded / opted out.
+    // endpoints). S5 call-site convergence: the line IS the one family —
+    // _yearLengthsM().tropicalYearSecondsAtYear (the movement's equinox-
+    // rate mean + the λ̇ correction), identical to the Predictions panel,
+    // the report's Physics column and the API. Falls back to the smooth
+    // secular mean when the one-source movement is opted out.
     model: { name: 'This model (one-source)', color: '#f0b040',
       fn: (() => {
         let a = null;
-        const wrap180 = (d) => ((d + 540) % 360) - 180;
-        const pGeomYr = (year) => wrap180(_hybridSeriesSampleAt(year - 0.5).equinoxLonJ2000Deg
-          - _hybridSeriesSampleAt(year + 0.5).equinoxLonJ2000Deg);   // retrograde → positive
         return (year) => {
+          if (_hybridSpinActive()) return _yearLengthsM().tropicalYearSecondsAtYear(year) / 86400;
           if (!a) {
             const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
             a = { axial0: sid / (sid - sol), H0: meanHAtAge(0) };
           }
           const tMa = (2000 - year) / 1e6;
-          if (_hybridSpinActive()) {
-            return meanSiderealYearSecondsAtAge(tMa) / 86400 * (1 - pGeomYr(year) / 360);
-          }
           const h = meanHAtAge(tMa);
           return meanSiderealYearSecondsAtAge(tMa) / 86400
             * (1 - 1 / (a.axial0 * (h === null ? 1 : h / a.H0)));
@@ -20813,11 +20806,13 @@ const VFP_CATEGORIES = [
     //                                                          in the precession ratio)
     model: { name: 'This model (one-source)', color: '#f0b040',
       fn: (() => {
-        const wrap180 = (d) => ((d + 540) % 360) - 180;
-        const pGeomYr = (year) => wrap180(_hybridSeriesSampleAt(year - 0.5).equinoxLonJ2000Deg
-          - _hybridSeriesSampleAt(year + 0.5).equinoxLonJ2000Deg);   // retrograde → positive
+        // S5 call-site convergence: the one family's axial beat —
+        // sid/(sid − trop) from _yearLengthsM, ≡ 360/p_geom to second
+        // order (the λ̇ correction shifts both years coherently) and
+        // identical to the Predictions panel and the report's Physics
+        // beat column.
         return (year) => {
-          if (_hybridSpinActive()) return 360 / pGeomYr(year);
+          if (_hybridSpinActive()) return _yearLengthsM().axialPrecessionYearsAtYear(year);
           // Chart x-axis is a JULIAN year shared with the reference curves;
           // the fitted harmonics live on the SI axis. Convert so model and
           // literature are sampled at the same instant (see _formulaYearFromJD).
@@ -23995,26 +23990,8 @@ function setupGUI() {
     if (dt && dt.bladeEl) dt.bladeEl.after(dt.row);
   });
 
-  // ── K8: the Standard-Model overlay — top-level, observed category ──
-  {
-    const stdFolder = gui.addFolder({ title: 'Standard Model (VSOP87 · MPP02)', expanded: false });
-    stdFolder.element.dataset.category = 'observed';
-    addFolderTooltip(stdFolder, 'The Sun, Moon and the seven planets AS THE CURRENT SCIENTIFIC MODEL predicts them (planets/Sun: VSOP87A, truncated series measured at 0.3–3.6″ RMS vs JPL Horizons over 1600–2400; Moon: ELP/MPP02, measured 0.22″ RMS over the observed-ΔT era, on the standard Stephenson-2016 ΔT), shown as pale-blue ghost bodies — the planets with the standard theory’s own orbit rings — next to the model’s own, with the live angular separation per body. Both sides use the same astrometric convention. The comparison is published either way it falls — nothing in the model is tuned to it. Beyond ±4,000 years the ghosts are a stated extrapolation of the standard theory: the divergence you see at deep time is part of the model’s claim.');
-    addTooltip(stdFolder.addBinding(o, 'showStandardModel', { label: 'Show ghost bodies' }),
-      'Toggle the VSOP87 ghost markers in the 3D scene. Ghosts share each body’s size and follow the standard theory’s positions.');
-    const stdFmt = { readonly: true, format: (v) => v.toFixed(1) + '″' };
-    const stdRows = [
-      ['stdDeltaSunArcsec', 'Δ Sun'], ['stdDeltaMoonArcsec', 'Δ Moon'],
-      ['stdDeltaMercuryArcsec', 'Δ Mercury'],
-      ['stdDeltaVenusArcsec', 'Δ Venus'], ['stdDeltaMarsArcsec', 'Δ Mars'],
-      ['stdDeltaJupiterArcsec', 'Δ Jupiter'], ['stdDeltaSaturnArcsec', 'Δ Saturn'],
-      ['stdDeltaUranusArcsec', 'Δ Uranus'], ['stdDeltaNeptuneArcsec', 'Δ Neptune'],
-    ];
-    for (const [key, label] of stdRows) {
-      addTooltip(stdFolder.addBinding(o, key, { label, ...stdFmt }),
-        'Geocentric angular separation between the model’s rendered body and the VSOP87 standard position (astrometric, same light-time convention both sides). Updates only while the overlay is on.');
-    }
-  }
+  // (K8: the Standard-Model overlay moved into the Tools folder — owner:
+  // a comparison instrument, too prominent as a top-level menu item.)
 
   // ── Solar & Lunar Eclipses — top-level, observed category ──
   // Catalog of well-known historical eclipses with Prev/Next navigation that
@@ -25140,6 +25117,27 @@ function setupGUI() {
     'Compare the model against published formulas (Laskar, Meeus, Capitaine, etc.) for eccentricity, obliquity, year lengths, and precession over \u00B112,000 years.');
   addTooltip(toolsFolder.addButton({ title: 'Data Explorer' }).on('click', () => window.open('https://data.holisticuniverse.com', '_blank')),
     'Open the Orbital Data Explorer dashboard. Interactive charts for orbital elements, sky positions, and Earth predictions across the full Earth Fundamental Cycle.');
+
+  // ── K8: the Standard-Model overlay — a comparison INSTRUMENT, so it
+  // lives under Tools (owner: too prominent as a top-level menu item).
+  {
+    const stdFolder = toolsFolder.addFolder({ title: 'Standard Model (VSOP87 · MPP02)', expanded: false });
+    addFolderTooltip(stdFolder, 'The Sun, Moon and the seven planets AS THE CURRENT SCIENTIFIC MODEL predicts them (planets/Sun: VSOP87A, truncated series measured at 0.3–3.6″ RMS vs JPL Horizons over 1600–2400; Moon: ELP/MPP02, measured 0.22″ RMS over the observed-ΔT era, on the standard Stephenson-2016 ΔT), shown as pale-blue ghost bodies — the planets with the standard theory’s own orbit rings — next to the model’s own, with the live angular separation per body. Both sides use the same astrometric convention. The comparison is published either way it falls — nothing in the model is tuned to it. Beyond ±4,000 years the ghosts are a stated extrapolation of the standard theory: the divergence you see at deep time is part of the model’s claim.');
+    addTooltip(stdFolder.addBinding(o, 'showStandardModel', { label: 'Show ghost bodies' }),
+      'Toggle the VSOP87 ghost markers in the 3D scene. Ghosts share each body’s size and follow the standard theory’s positions.');
+    const stdFmt = { readonly: true, format: (v) => v.toFixed(1) + '″' };
+    const stdRows = [
+      ['stdDeltaSunArcsec', 'Δ Sun'], ['stdDeltaMoonArcsec', 'Δ Moon'],
+      ['stdDeltaMercuryArcsec', 'Δ Mercury'],
+      ['stdDeltaVenusArcsec', 'Δ Venus'], ['stdDeltaMarsArcsec', 'Δ Mars'],
+      ['stdDeltaJupiterArcsec', 'Δ Jupiter'], ['stdDeltaSaturnArcsec', 'Δ Saturn'],
+      ['stdDeltaUranusArcsec', 'Δ Uranus'], ['stdDeltaNeptuneArcsec', 'Δ Neptune'],
+    ];
+    for (const [key, label] of stdRows) {
+      addTooltip(stdFolder.addBinding(o, key, { label, ...stdFmt }),
+        'Geocentric angular separation between the model’s rendered body and the VSOP87 standard position (astrometric, same light-time convention both sides). Updates only while the overlay is on.');
+    }
+  }
 
   /* --- Console Tests (F12) ------------------------------------------------ */
   const calibFolder = toolsFolder.addFolder({ title: 'Console Tests (F12)', expanded: false });
@@ -52776,6 +52774,30 @@ function _k8UpdateStandardOverlay() {
     }
     return;
   }
+  // FAIL-SOFT (owner, after the missing-export freeze): the overlay is an
+  // optional comparison exhibit and must never be able to kill the render
+  // loop — this function runs inside updatePositions, where an uncaught
+  // per-frame throw freezes the whole scene (measured: the un-exported
+  // MPP02 evaluator froze it from the day K8 slice 2 landed). On any
+  // failure: log once, switch the overlay off, hide the ghosts.
+  try {
+    _k8UpdateStandardOverlayInner();
+  } catch (e) {
+    if (!_k8UpdateStandardOverlay._failed) {
+      _k8UpdateStandardOverlay._failed = true;
+      console.error('Standard-Model overlay failed — overlay disabled (the scene keeps running):', e);
+    }
+    o.showStandardModel = false;
+    if (_k8Ghosts) {
+      for (const g of Object.values(_k8Ghosts)) {
+        g.visible = false;
+        if (g._k8Orbit) g._k8Orbit.visible = false;
+      }
+    }
+  }
+}
+
+function _k8UpdateStandardOverlayInner() {
   _k8EnsureGhosts();
   const R = _kcR;
   const lightDaysPerAU = auToKm(1) / speedOfLight / 86400;   // from the model's own c/AU homes

@@ -16,5 +16,12 @@
 
 module.exports = {
   ...require('./vsop87.cjs'),
+  // K8 slice 2 — the Moon ghost's evaluator. This spread was MISSING from
+  // the day the module landed: the browser's named import came through as
+  // undefined, the Moon ghost threw a TypeError every frame inside
+  // updatePositions, and the whole scene froze the moment the overlay was
+  // toggled (owner-found; reproduced headlessly). No gate toggles the
+  // overlay — the snapshot probe added with this fix closes that hole.
+  ...require('./elp-mpp02.cjs'),
   publishedCurves: require('./published-curves.cjs'),
 };
