@@ -121,12 +121,25 @@ function createOneSourceMovement() {
   // year of date (SI) reduced by the secular α(H(t)) equinox precession —
   // the same construction the movement runs (a days-of-date year hides a
   // ~2,400 s LOD-vs-SI bias at −300 kyr, measured).
-  const { createCardinalStructure } = require('../../packages/physics/src/cardinal/one-source-structure.cjs');
-  const tropicalYearSecondsAtYearFn = (year) => {
-    const tMa = (2000 - year) / 1e6;
-    return DT.meanSiderealYearSecondsAtAge(tMa) * (1 - 1 / (axial0 * DT.meanHAtAge(tMa) / H0));
+  // S2 (owner: ONE implementation): the of-date year-length family comes
+  // from the ONE package factory — tropical = the movement's own equinox-
+  // rate mean (wobble included; the former smooth secular mean here was
+  // one of the duplicated implementations), sidereal = the λ̇ channel,
+  // anomalistic + per-cardinal from the structure on the SAME mean, all
+  // λ̇-corrected coherently. Identical construction in model.js (API) and
+  // script.js (browser).
+  const { createYearLengths } = require('../../packages/physics/src/earth/year-lengths.cjs');
+  const yearLengths = createYearLengths({
+    sampleAt,
+    massLossSiderealSecondsAtYearFn: (year) => DT.meanSiderealYearSecondsAtAge((2000 - year) / 1e6),
+  });
+  // Back-compat shape for the fixture recorder and existing callers.
+  const cardinal = {
+    eocOffsetSeconds: yearLengths.cardinal.eocOffsetSeconds,
+    yearLengthSeconds: yearLengths.cardinal.yearLengthSeconds,
+    spreadSeconds: yearLengths.cardinal.spreadSeconds,
+    anomalisticYearSeconds: yearLengths.anomalisticYearSecondsAtYear,
   };
-  const cardinal = createCardinalStructure({ sampleAt, tropicalYearSecondsAtYearFn });
 
   return {
     epsDeg: (year) => sampleAt(year).epsDeg,
@@ -134,6 +147,7 @@ function createOneSourceMovement() {
     periOfDateDeg: (year) => sampleAt(year).periOfDateDeg,   // equinox-referenced ϖ of date (D4c wheel flip)
     equinoxLonJ2000Deg: (year) => sampleAt(year).equinoxLonJ2000Deg,   // ŝ×n̂ node longitude (D4d equinox-phase flip)
     cardinal,                        // {eocOffsetSeconds, yearLengthSeconds, spreadSeconds, anomalisticYearSeconds}
+    yearLengths,                     // S2: the ONE of-date family (years + beats, SI seconds)
   };
 }
 

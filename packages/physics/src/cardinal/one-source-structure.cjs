@@ -83,8 +83,19 @@ function createCardinalStructure({ sampleAt, tropicalYearSecondsAtYearFn }) {
     const lam = CARDINAL_LONGITUDE_DEG[type];
     if (lam === undefined) throw new Error(`unknown cardinal type: ${type}`);
     const s = sampleAt(year);
-    let M = lam - s.periOfDateDeg;                       // first guess
-    M = lam - s.periOfDateDeg - equationOfCenterDeg(s.e, M);   // one fixed-point pass
+    // λ_X is the SUN's geocentric cardinal longitude, but periOfDateDeg is
+    // the EARTH's heliocentric longitude of perihelion (the standard ϖ,
+    // 102.9° at J2000) — the Sun's geocentric perigee sits at ϖ + 180°.
+    // Measured before this fix: the four year lengths came out canonical
+    // in VALUE but swapped in TYPE (VE↔AE, SS↔WS — the structure's VE
+    // read 48.50 min past 365 d 5 h where the scene MEASURES 49.02, the
+    // Meeus March-equinox value); the missing 180° flipped the mean
+    // anomaly fed to the equation of center. Found building the Bromberg
+    // cardinal-year-lengths chart — the mean, spread magnitude and
+    // anomalistic year (ϖ-difference form) were all unaffected.
+    const perigeeDeg = s.periOfDateDeg + 180;
+    let M = lam - perigeeDeg;                            // first guess
+    M = lam - perigeeDeg - equationOfCenterDeg(s.e, M);  // one fixed-point pass
     const T = tropicalYearSecondsAtYearFn(year);
     return -(T / 360) * equationOfCenterDeg(s.e, M);
   }

@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createSiderealYearChannel, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -20160,20 +20160,40 @@ let _zetaSeriesEndYr = 0;
 // surface only: the scene's sidereal frame stays the certified H/13
 // identity. Built lazily once the artifact (with lamDotRel) arrives;
 // null = artifact absent or pre-D6 → callers fall back to mass-loss only.
-let _siderealChannelM = null;
-function _siderealChannel() {
-  if (!_siderealChannelM) {
-    // Data source: the EMBEDDED artifact inside @essrt/physics (the one
-    // home, generate.mjs-pinned to the governed series artifact) — no
-    // fetch dependency, available at module init.
-    _siderealChannelM = createSiderealYearChannel({
+// S2 (owner: ONE implementation): the of-date year-length family — years,
+// per-cardinal lengths and precession beats — comes from the ONE package
+// factory (createYearLengths), built on the SERIES-tier movement sampler
+// (the same movement the scene renders) with the browser's mass-loss law.
+// Identical construction in model.js (API) and tools/lib (Node engine).
+// The λ̇ channel data is the EMBEDDED artifact inside @essrt/physics — no
+// fetch dependency, available at module init.
+let _yearLengthsCache = null;
+function _yearLengthsM() {
+  if (!_yearLengthsCache) {
+    _yearLengthsCache = createYearLengths({
+      sampleAt: (y) => _hybridSeriesSampleAt(y),
       massLossSiderealSecondsAtYearFn: (y) => meanSiderealYearSecondsAtAge((startmodelYear - y) / 1e6),
     });
   }
-  return _siderealChannelM;
+  return _yearLengthsCache;
 }
 function _siderealYearOneSourceSeconds(year) {
-  return _siderealChannel().siderealYearSecondsAtYear(year);
+  return _yearLengthsM().siderealYearSecondsAtYear(year);
+}
+// One-source year seconds by type: MEAN (tropical of date), ANOM
+// (anomalistic), or a cardinal VE/SS/AE/WS year. NaN when opted out.
+function _cardinalYearSeconds(year, type) {
+  if (!_hybridSpinActive()) return NaN;   // one-source display; ?hybridSpin=0 opts out
+  const yl = _yearLengthsM();
+  return type === 'MEAN' ? yl.tropicalYearSecondsAtYear(year)
+    : type === 'ANOM' ? yl.anomalisticYearSecondsAtYear(year)
+      : yl.cardinal.yearLengthSeconds(year, type);
+}
+// Display form: minutes past 365 d 5 h (the Bromberg axis — the four-curve
+// spread of ±2 min is illegible in day units).
+const _CARDINAL_YEAR_BASE_S = 365 * 86400 + 5 * 3600;
+function _cardinalYearExcessMinutes(year, type) {
+  return (_cardinalYearSeconds(year, type) - _CARDINAL_YEAR_BASE_S) / 60;
 }
 
 // The series-driven hybrid (the ONE evaluator): factory built lazily AFTER
@@ -20577,6 +20597,53 @@ const VFP_CATEGORIES = [
     modelNote: `Both curves are in <strong>SI 86400-s days</strong>. Our model derives the tropical year from the mean of 4 cardinal-point cadences (VE / SS / AE / WS), evaluated at each sample year with a <strong>J2000-anchored</strong> rebasing so the value is independent of where the simulation is currently parked. Captures <strong>Fourier-fitted orbital-precession structure</strong> across &plusmn;12 kyr and tracks Laskar's polynomial within ~0.2 s.`,
   },
   {
+    // The Bromberg exhibit (sym454.org/seasons): the four cardinal-point
+    // year lengths around the wobbling mean, from the model's own cardinal
+    // structure on the series-tier movement (+ the D6 λ̇ correction — the
+    // panel ≡ the API). Palette matches the reference figure. J2000
+    // canon check (Meeus): VE 49.02 · SS 47.94 · AE 48.51 · WS 49.55 min
+    // past 365 d 5 h — building this chart found and fixed the cardinal
+    // structure's 180° perigee-frame slip (VE↔AE, SS↔WS were swapped).
+    id: 'cardinal-year-lengths', label: 'Cardinal Year Lengths', unit: ' min', precision: 2,
+    yLabel: 'minutes past 365 d 5 h',
+    residualLabel: 'seconds', residualScale: 60,
+    chartRange: [-30000, 30000],
+    paperRange: [-30000, 30000], paperTitle: 'Cardinal Year Lengths',
+    // y-ranges from the MEASURED extremes with the wobbling of-date mean
+    // (era ±30 kyr: 47.08–50.21 · cycles: 45.36–51.60) — sized so no
+    // curve leaves the frame (owner-corrected: the smooth-mean sizing
+    // clipped the equinox curves).
+    fixedYRange: [46.5, 51], fixedYTicks: [47, 48, 49, 50, 51],
+    fmtValue: v => Number.isFinite(v) ? v.toFixed(2) : 'N/A',
+    // The four curves are the model's OWN decomposition around its own
+    // mean — Δ-vs-model numbers and a residual pane would just restate
+    // the chart (owner: comparisons against the mean have no value here).
+    noComparisons: true,
+    paperAlt: {
+      range: [-248000, 102000], title: 'Cardinal Year Lengths Cycles',
+      yRange: [45, 52],
+      yTicks: [45, 46, 47, 48, 49, 50, 51, 52],
+      yDecimals: 0,
+      refLines: [
+        { value: () => (computeSolarYearDaysDirect(2000) * 86400 - _CARDINAL_YEAR_BASE_S) / 60,
+          label: 'Mean tropical year at J2000', color: '#888', dash: true, yOffset: 0 },
+      ],
+    },
+    model: { name: 'Mean tropical year (of date)', color: '#f0b040',
+      fn: year => _cardinalYearExcessMinutes(year, 'MEAN') },
+    references: [
+      { name: 'VE year (northward equinox)', color: '#1a9c2e', preserveColor: true,
+        fn: year => _cardinalYearExcessMinutes(year, 'VE') },
+      { name: 'SS year (north solstice)', color: '#e23333', preserveColor: true,
+        fn: year => _cardinalYearExcessMinutes(year, 'SS') },
+      { name: 'AE year (southward equinox)', color: '#8b4513', preserveColor: true,
+        fn: year => _cardinalYearExcessMinutes(year, 'AE') },
+      { name: 'WS year (south solstice)', color: '#2251e0', preserveColor: true,
+        fn: year => _cardinalYearExcessMinutes(year, 'WS') },
+    ],
+    modelNote: `The four <strong>cardinal-point year lengths</strong> (successive same-event intervals: VE&rarr;VE, SS&rarr;SS, AE&rarr;AE, WS&rarr;WS) around the mean tropical year of date, in <strong>minutes past 365 d 5 h</strong>. All five curves come from the model's own one-source movement &mdash; the mean is the Tropical Year chart's line. <strong>How it is derived:</strong> the true Sun runs ahead of or behind the mean Sun by the <em>equation of center</em>, EoC(M) &asymp; 2e&middot;sin&thinsp;M (M = the Sun's angle from its perigee, which sits opposite Earth's perihelion &varpi;). Each cardinal event therefore occurs early or late by &Delta;t = &minus;(T/360&deg;)&middot;EoC, and the year measured between two same-type events is T<sub>X</sub> = T<sub>mean</sub> + d(&Delta;t)/dyr &mdash; the <em>drift</em> of that timing offset. As perihelion precesses through the seasons (the ~21 kyr apsidal-vs-equinox cycle), each curve swings around the mean with amplitude proportional to the <strong>eccentricity e(t)</strong>: today's e &asymp; 0.0167 gives the &plusmn;0.8 min swing, and in the Export Cycles view the envelope visibly breathes with the Eccentricity chart's 100/405-kyr cycles &mdash; shrinking toward e-minima. J2000 values match the canonical set (Meeus): VE 49.02, SS 47.94, AE 48.51, WS 49.55. Comparison figure: Bromberg's numerical-integration chart (site offline; <a href="https://web.archive.org/web/20241221111118/https://www.kalendis.free.nf/seasons.htm?i=1" target="_blank" rel="noopener">archived copy</a>) &mdash; this panel reproduces it from the analytic movement.`,
+  },
+  {
     id: 'solar-day', label: 'Solar Day Length', unit: ' s', precision: 6,
     yLabel: 'seconds',
     residualLabel: 'milliseconds', residualScale: 1000,
@@ -20710,6 +20777,18 @@ const VFP_CATEGORIES = [
     residualLabel: 'years', residualScale: 1,
     paperRange: [-23000, 23000], paperTitle: 'Axial Precession Period Comparison',
     fixedYRange: [25000, 26600], fixedYTicks: [25000, 25400, 25800, 26200, 26600],
+    // Cycles view (the standard Export Cycles range): the one-source
+    // instantaneous P over ±250 kyr (measured span 24621–26670 yr).
+    // Vondrák's long-period series tracks it cycle-for-cycle (rms 82 yr
+    // inside its ±200 kyr validity against the ~2000-yr swing); the
+    // Capitaine era polynomial rides along and visibly departs — the
+    // same in-era/out-of-era comparison as the year charts.
+    paperAlt: {
+      range: [-248000, 102000], title: 'Axial Precession Period Cycles',
+      yRange: [24400, 26800],
+      yTicks: [24400, 24800, 25200, 25600, 26000, 26400, 26800],
+      yDecimals: 0,
+    },
     fmtValue: v => Number.isFinite(v) ? v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A',
     // D4 review: ONE model line — the ONE-SOURCE instantaneous precession
     // period P(y) = 360° / p_yr, with p_yr the year-over-year RETROGRADE
@@ -21025,7 +21104,7 @@ function renderVFPChart(category, currentYear) {
   for (const curve of allCurves) {
     const v = curve.fn(2000);
     let diff = '';
-    if (curve !== category.model && Number.isFinite(v) && Number.isFinite(modelJ2000)) {
+    if (curve !== category.model && !category.noComparisons && Number.isFinite(v) && Number.isFinite(modelJ2000)) {
       let d = v - modelJ2000;
       if (category.wrap360) d = ((d + 180) % 360 + 360) % 360 - 180;
       diff = (d >= 0 ? '+' : '') + d.toExponential(3);
@@ -21068,7 +21147,7 @@ function renderVFPChart(category, currentYear) {
   const fmtYearLabel = (y) => y < 0
     ? `${Math.abs(y).toLocaleString('en-US')} BC`
     : `${y.toLocaleString('en-US')} AD`;
-  if (primaryRefFn && (Number.isFinite(diffAtStart) || Number.isFinite(diffAtEnd))) {
+  if (primaryRefFn && !category.noComparisons && (Number.isFinite(diffAtStart) || Number.isFinite(diffAtEnd))) {
     maxDiffHTML = `<div class="vfp-max-diff"><div class="vfp-max-diff-title">Difference vs ${primaryName} (in ${rLabel}):</div><div class="vfp-max-diff-row">`;
     if (Number.isFinite(diffAtStart)) {
       maxDiffHTML += `<span>At ${fmtYearLabel(yearMin)}: <strong>${fmtDiff(diffAtStart)} ${rLabel}</strong> <span class="vfp-max-diff-sep">\u00b7</span> <span class="vfp-max-diff-context">${fmtBase(modelValStart)} vs ${fmtBase(refValStart)}</span></span>`;
@@ -21091,7 +21170,7 @@ function renderVFPChart(category, currentYear) {
     <div class="vfp-chart-container">${mainSVG}</div>
     ${j2000Table}
     ${maxDiffHTML}
-    <div class="vfp-chart-container vfp-residual">${resSVG}</div>
+    ${category.noComparisons ? '' : `<div class="vfp-chart-container vfp-residual">${resSVG}</div>`}
     ${modelNote}
     ${rangeNote}`;
 }
@@ -24540,26 +24619,26 @@ function setupGUI() {
   const fmt2sec = v => v.toFixed(2);
   addTooltip(yearsFolder.addBinding(predictions, 'solarYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Tropical (solar) year in seconds — MEASURED days × o.lodKinematic (epoch-specific kinematic day). Equinox to equinox.');
+  }), 'Mean tropical (solar) year OF DATE in SI seconds — the one-source movement’s analytic mean (equinox rate + λ̇ correction; the Tropical Year chart’s line). ONE FAMILY with the sidereal/anomalistic rows, so the precession beats recompute exactly. The scene-MEASURED cardinal mean lives in the Days & Years report (agrees to sub-0.5 s). Opt-out (?hybridSpin=0): frozen-clock days × o.lodKinematic.');
   addTooltip(yearsFolder.addBinding(predictions, 'solarYearDays', {
     label: 'Model (days)', readonly: true, format: fmt8
-  }), 'Tropical (solar) year in days — Step 6d direct Fourier fit, J2000-anchored to CSV year-2000 measurement.');
+  }), 'Mean tropical (solar) year OF DATE in SI days (seconds / 86400). Opt-out: the frozen Step 6d Fourier law.');
 
   const siderealYrFolder = astroFolder.addFolder({ title: 'Sidereal Year' });
   addTooltip(siderealYrFolder.addBinding(predictions, 'siderealYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Sidereal year in seconds — MEASURED days × o.lodKinematic. Round-trip identity: sid_days × o.lodKinematic = sidYear_s(year), the Driver-2-aware Layer-0 sidereal year — equals the pure IAU 31,558,149.7635 s at J2000.');
+  }), 'Sidereal year OF DATE in SI seconds — the one-source λ̇ channel over the mass-loss law (the same evaluator the Sidereal Year chart and the API serve; = the IAU 31,558,149.7635 s at J2000 by anchor). Opt-out (?hybridSpin=0): frozen-clock days × o.lodKinematic.');
   addTooltip(siderealYrFolder.addBinding(predictions, 'siderealYearDays', {
     label: 'Model (days)', readonly: true, format: fmt8
-  }), 'Sidereal year in days — Step 6d direct Fourier fit, J2000-anchored.');
+  }), 'Sidereal year OF DATE in SI days (seconds / 86400). Opt-out: the frozen Step 6d Fourier law.');
 
   const anomalisticFolder = astroFolder.addFolder({ title: 'Anomalistic Year' });
   addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Anomalistic year in seconds — MEASURED days × o.lodKinematic. Perihelion to perihelion.');
+  }), 'Anomalistic year OF DATE in SI seconds (perihelion to perihelion) — the one-source cardinal structure the API serves: the engine’s own apsidal rate ϖ̇ + the λ̇ correction. Opt-out (?hybridSpin=0): the frozen Fourier fit × o.lodKinematic.');
   addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearDays', {
     label: 'Model (days)', readonly: true, format: v => v.toFixed(9)
-  }), 'Anomalistic year in days — Step 6d direct Fourier fit, J2000-anchored. Perihelion to perihelion.');
+  }), 'Anomalistic year OF DATE in SI days (seconds / 86400). Opt-out: the frozen Step 6d Fourier law.');
 
   const cpFolder = astroFolder.addFolder({ title: 'Cardinal Points', expanded: false });
   addFolderTooltip(cpFolder, 'Predicted dates of solstices and equinoxes from 24-harmonic Fibonacci formula. Valid across the full 335,317-year Earth Fundamental Cycle. See doc 14.');
@@ -24586,16 +24665,16 @@ function setupGUI() {
   const fmt2 = v => v.toFixed(2);
   addTooltip(precessionFolder.addBinding(predictions, 'perihelionPrecession', {
     label: 'Perihelion (yrs)', readonly: true, format: fmt2
-  }), 'Time for Earth\'s perihelion direction to complete one revolution. Measured from year lengths: anom_sec / (anom_sec \u2212 tropical_sec). Framework identity: H/16.');
+  }), 'Time for Earth\'s perihelion direction to complete one revolution vs the equinox. Beat of the DISPLAYED year rows: anom_sec / (anom_sec \u2212 tropical_sec) \u2014 one-source (dynamical, of date) when the movement is on. Kinematic framework identity: H/16.');
   addTooltip(precessionFolder.addBinding(predictions, 'axialPrecession', {
     label: 'Axial (yrs)', readonly: true, format: fmt2
-  }), 'Time for Earth\'s rotation axis to trace one full cone (precession of the equinoxes). Measured from year lengths: sid_sec / (sid_sec \u2212 tropical_sec). Framework identity: H/13.');
-  addTooltip(precessionFolder.addBinding(predictions, 'obliquityPrecession', {
-    label: 'Obliquity (yrs)', readonly: true, format: fmt2
-  }), 'Obliquity precession period \u2014 derived from measured axial precession: axial \u00d7 13/8. Framework identity: H/8.');
+  }), 'Time for Earth\'s rotation axis to trace one full cone (precession of the equinoxes). Beat of the DISPLAYED year rows: sid_sec / (sid_sec \u2212 tropical_sec) \u2014 one-source (matches the Axial Precession chart, \u2248 25,771.4 at J2000). Kinematic framework identity: H/13.');
+  // The obliquity row (H/8 structural constant, 41,914.63 yr) was removed
+  // from the panel (owner, panel review): a fixed lattice identity, not a
+  // measured prediction \u2014 it lives in the Reports charts and the registry.
   addTooltip(precessionFolder.addBinding(predictions, 'inclinationPrecession', {
     label: 'Inclination (yrs)', readonly: true, format: fmt2
-  }), 'Time for Earth\'s orbital plane to precess around the invariable plane. Measured from year lengths: anom_sec / (anom_sec \u2212 sid_sec). Framework identity: H/3.');
+  }), 'Time for Earth\'s orbital plane to precess around the invariable plane. Beat of the DISPLAYED year rows: anom_sec / (anom_sec \u2212 sid_sec) \u2014 one-source (dynamical, of date; hypersensitive: \u00b11 s of year length moves this \u2248 400 yr). Kinematic framework identity: H/3.');
   addTooltip(precessionFolder.addBinding(predictions, 'eclipticPrecession', {
     label: 'Ecliptic Cycle (yrs)', readonly: true, format: fmt2
   }), 'Ecliptic precession \u2014 derived from measured axial precession: axial \u00d7 13/5. Framework identity: H/5 (via H/13 \u00d7 13/5 = H/5).');
@@ -36801,14 +36880,18 @@ async function runYearAnalysisExport(years) {
   const aphByYear = new Map(aphelions.map(e => [e.year, e]));
   const orbParamsByYear = new Map(yearlyOrbitalParams.map(e => [e.year, e]));
 
-  // Sheet 2: Year Length & Days. Three views per year quantity:
-  //   - (Measured, SI):           scene's cardinal-event JD interval (SI 86400-s days)
-  //   - (Measured, epoch-local):  same scene measurement, converted to local-day count
-  //                                via × 86400/meanlengthofday — shows the "how many of
-  //                                THIS epoch's days fit in one orbit" view used by
-  //                                tweakpane and meaningful for deep-time observation
-  //   - (Physics, epoch-local):   pure formula prediction from computeLengthof*Year(year)
-  //                                — matches tweakpane to sub-microsecond precision
+  // Sheet 2: Year Length & Days. TWO views per year quantity (S4, owner:
+  // "move to 1" — the former triple showed three different tropical years):
+  //   - (Measured, SI):  the scene's cardinal-event JD interval (SI 86400-s
+  //                      days) — the measurement INSTRUMENT
+  //   - (Physics, SI):   THE one of-date family (_yearLengthsM — the same
+  //                      values the tweakpane, charts and API serve; blank
+  //                      under ?hybridSpin=0 — the frozen clock is the era
+  //                      device, not a member of this family)
+  // The epoch-local re-expressions were dropped: in an era report they
+  // duplicate the SI columns to ~9 digits, and the day-basis columns let
+  // any reader convert. Measured-vs-Physics is the report's purpose; the
+  // difference IS the method residue.
   // Day quantities do NOT follow that distinction — there is no measured day.
   // The scene rotates at exactly one solar day per JD and carries no ΔT, so a
   // scene-derived day only returns the seconds-per-day constant fed into it.
@@ -36823,23 +36906,25 @@ async function runYearAnalysisExport(years) {
       'VE JD', 'VE RA (°)', 'SS JD', 'SS RA (°)', 'AE JD', 'AE RA (°)', 'WS JD', 'WS RA (°)',
       // Block 3 — Cardinal intervals (measured tropical year per cardinal)
       'VE Interval', 'SS Interval', 'AE Interval', 'WS Interval',
-      // Block 4 — Mean Tropical Year aggregates (three views)
+      // Block 4 — Mean Tropical Year (measured instrument vs the one physics family)
       'Mean Tropical (Measured, SI)',
-      'Mean Tropical (Measured, epoch-local)',
-      'Mean Tropical (Physics, epoch-local)',
+      'Mean Tropical (Physics, SI)',
       // Block 5 — Perihelion / Aphelion raw data
       'Perihelion JD', 'Perihelion Dist (AU)', 'Peri Interval (days)',
       'Aphelion JD',   'Aphelion Dist (AU)',   'Aph Interval (days)',
-      // Block 6 — Mean Anomalistic Year aggregates (three views)
+      // Block 6 — Mean Anomalistic Year (measured vs physics)
       'Mean Anomalistic (Measured, SI)',
-      'Mean Anomalistic (Measured, epoch-local)',
-      'Mean Anomalistic (Physics, epoch-local)',
-      // Block 7 — Per-cardinal sidereal year (raw)
+      'Mean Anomalistic (Physics, SI)',
+      // Block 7 — Per-cardinal sidereal year (raw): the four measurements
+      // the Block-8 measured mean is built from (traceability — same
+      // reason Block 3 shows the per-cardinal tropical intervals; owner).
+      // NB the sidereal year is star-referenced, so the SPREAD between
+      // these four is method residue, not physics — read them as the
+      // instrument's inputs, not as four different sidereal years.
       'Sid at VE', 'Sid at SS', 'Sid at AE', 'Sid at WS',
-      // Block 8 — Mean Sidereal Year aggregates (three views)
+      // Block 8 — Mean Sidereal Year (measured vs physics)
       'Mean Sidereal (Measured, SI)',
-      'Mean Sidereal (Measured, epoch-local)',
-      'Mean Sidereal (Physics, epoch-local)',
+      'Mean Sidereal (Physics, SI)',
       // Block 9 — Day quantities, formula-only. NOTHING here is scene-measured:
       // the scene's JD-days are 86400-s by construction and carry no ΔT, so any
       // scene-derived day only returns the conversion constant (the same result
@@ -36849,16 +36934,18 @@ async function runYearAnalysisExport(years) {
       // day, which are built on the KINEMATIC LOD — see the note at their
       // computation for why the bases differ.
       'LOD real (s)', 'Sidereal Day (s)', 'Stellar Day (s)',
-      // Block 10 — Precession periods, in years, from THIS row's measured-SI
-      // year means (the same three values shown in the "(Measured, SI)" columns
-      // above). Each is a beat period between two year lengths:
+      // Block 10 — Precession periods, in years. Each is a beat period
+      // P = A/(A − B) between two year lengths:
       //   axial       = sid  / (sid  − trop)   — equinox regression   (≈ 25,772 yr)
-      //   inclination = anom / (anom − sid)    — inclination cycle    (≈ H/3)
-      //   perihelion  = anom / (anom − trop)   — apsidal vs equinox   (≈ 20,940 yr)
-      // Same construction as the Summary's axialPrec and the tweakpane's
-      // o.perihelionPrecession (script.js ~60862), which use seconds instead of
-      // days — the ratio is identical either way.
-      'Axial Precession (yr)', 'Inclination Precession (yr)', 'Perihelion Precession (yr)'
+      //   inclination = anom / (anom − sid)    — inclination cycle
+      //   perihelion  = anom / (anom − trop)   — apsidal vs equinox
+      // TWO flavors per beat (S4): Measured = from THIS row's measured-SI
+      // means (the instrument); Physics = the one family's beats
+      // (_yearLengthsM). NEVER mix members across families: at ~20×/s beat
+      // amplification a 0.5 s family mismatch reads as ~10 yr of P (the
+      // owner-caught 25,760.8).
+      'Axial Precession (Measured, yr)', 'Inclination Precession (Measured, yr)', 'Perihelion Precession (Measured, yr)',
+      'Axial Precession (Physics, yr)', 'Inclination Precession (Physics, yr)', 'Perihelion Precession (Physics, yr)'
     ]
   ];
 
@@ -36956,36 +37043,17 @@ async function runYearAnalysisExport(years) {
       _precSum.peri += perihelionPrecRow; _precSum.n++;
     }
 
-    // Phase 9.7c: Measured columns converted back to EPOCH-LOCAL days.
-    // The Measured columns are intrinsically in SI 86400-s days (from JD
-    // intervals between cardinal events). At deep time the "epoch observer's"
-    // calendar uses local days, not 86400-s days — so for deep-time visualization
-    // we convert via: epoch_local = SI × 86400 / meanlengthofday.
-    // At -380 Ma (LOD ≈ 79200 SI s) this gives ~398 days/year — the famous
-    // "more days per year in the deep past" effect. At J2000, conversion is
-    // essentially a no-op (LOD ≈ 86400).
-    const _siToLocal = 86400 / meanlengthofday;
-    const meanTropLocal = meanTrop !== null ? meanTrop * _siToLocal : null;
-    const meanSidLocal  = meanSid  !== null ? meanSid  * _siToLocal : null;
-    const meanAnomLocal = meanAnom !== null ? meanAnom * _siToLocal : null;
-
-    // Phase 9.7: Physics-truth values, computed directly from the model's
-    // formulas at this iteration year's t_Ma. These are ground truth —
-    // independent of scene measurement.
-    //
-    // Year-length Physics columns are returned in EPOCH-LOCAL DAYS — the
-    // convention tweakpane shows. This is the model's natural representation
-    // for "what an observer at THIS epoch would experience" — at -380 Ma the
-    // tropical year shows as ~398 epoch-local days, not 365.24 SI days.
-    // External cross-reference (Chapront, IAU) values can be reconstructed
-    // from epoch-local × meanlengthofday / 86400.
-    //
-    const tropPhys  = computeSolarYearDaysFromCardinals(year);
-    const sidPhys   = computeSiderealYearDaysDirect(year);
-    // computeAnomalisticYearSecFromDaysFourier returns seconds (= days × LOD);
-    // divide by LOD to recover epoch-local days.
-    const _anomSec_fourier = computeAnomalisticYearSecFromDaysFourier(year, meanlengthofday);
-    const anomPhys  = _anomSec_fourier / meanlengthofday;
+    // S4: the Physics columns are THE one of-date family (_yearLengthsM —
+    // identical values to the tweakpane, the charts and the API), SI days.
+    // Independent of scene measurement; blank under ?hybridSpin=0 (the
+    // frozen clock is the era-certification device, not this family).
+    const _ylRow = _hybridSpinActive() ? _yearLengthsM() : null;
+    const tropPhys = _ylRow ? _ylRow.tropicalYearSecondsAtYear(year) / 86400 : null;
+    const sidPhys  = _ylRow ? _ylRow.siderealYearSecondsAtYear(year) / 86400 : null;
+    const anomPhys = _ylRow ? _ylRow.anomalisticYearSecondsAtYear(year) / 86400 : null;
+    const axialPrecPhysRow       = _ylRow ? _ylRow.axialPrecessionYearsAtYear(year) : null;
+    const inclinationPrecPhysRow = _ylRow ? _ylRow.inclinationPrecessionYearsAtYear(year) : null;
+    const perihelionPrecPhysRow  = _ylRow ? _ylRow.perihelionPrecessionYearsAtYear(year) : null;
 
     detailedRows.push([
       // Block 1 — Reference info
@@ -37011,8 +37079,7 @@ async function runYearAnalysisExport(years) {
       // the sheet (its denominator is only 0.0033 d, so one unit in the last
       // printed digit moves it by 0.034 yr).
       meanTrop      !== null ? meanTrop.toFixed(12)     : '',
-      meanTropLocal !== null ? meanTropLocal.toFixed(9) : '',
-      tropPhys      !== null ? tropPhys.toFixed(9)      : '',
+      tropPhys      !== null ? tropPhys.toFixed(12)     : '',   // 12 dp — Physics beat input
       // Block 5 — Perihelion / Aphelion
       peri?.jd?.toFixed(6) || '',
       peri?.distance?.toFixed(8) || '',
@@ -37020,27 +37087,28 @@ async function runYearAnalysisExport(years) {
       aph?.jd?.toFixed(6) || '',
       aph?.distance?.toFixed(8) || '',
       getInterval(aphelionIntervalsByYear, year),
-      // Block 6 — Mean Anomalistic Year aggregates
+      // Block 6 — Mean Anomalistic Year
       meanAnom      !== null ? meanAnom.toFixed(12)     : '',   // 12 dp — Block 10 input
-      meanAnomLocal !== null ? meanAnomLocal.toFixed(9) : '',
-      anomPhys      !== null ? anomPhys.toFixed(9)      : '',
-      // Block 7 — Per-cardinal sidereal year
+      anomPhys      !== null ? anomPhys.toFixed(12)     : '',   // 12 dp — Physics beat input
+      // Block 7 — Per-cardinal sidereal year (the measured mean's inputs)
       getInterval(siderealData.VE.intervalsByYear, year),
       getInterval(siderealData.SS.intervalsByYear, year),
       getInterval(siderealData.AE.intervalsByYear, year),
       getInterval(siderealData.WS.intervalsByYear, year),
-      // Block 8 — Mean Sidereal Year aggregates
+      // Block 8 — Mean Sidereal Year
       meanSid      !== null ? meanSid.toFixed(12)     : '',   // 12 dp — Block 10 input
-      meanSidLocal !== null ? meanSidLocal.toFixed(9) : '',
-      sidPhys      !== null ? sidPhys.toFixed(9)      : '',
+      sidPhys      !== null ? sidPhys.toFixed(12)     : '',   // 12 dp — Physics beat input
       // Block 9 — Day quantities.
       lodRealRow.toFixed(6),
       siderealDayRow.toFixed(6),
       stellarDayRow.toFixed(6),
-      // Block 10 — Precession periods (years)
+      // Block 10 — Precession periods (years): measured beat, then physics beat
       axialPrecRow       !== null ? axialPrecRow.toFixed(3)       : '',
       inclinationPrecRow !== null ? inclinationPrecRow.toFixed(3) : '',
-      perihelionPrecRow  !== null ? perihelionPrecRow.toFixed(3)  : ''
+      perihelionPrecRow  !== null ? perihelionPrecRow.toFixed(3)  : '',
+      axialPrecPhysRow       !== null ? axialPrecPhysRow.toFixed(3)       : '',
+      inclinationPrecPhysRow !== null ? inclinationPrecPhysRow.toFixed(3) : '',
+      perihelionPrecPhysRow  !== null ? perihelionPrecPhysRow.toFixed(3)  : ''
     ]);
   }
 
@@ -55991,10 +56059,14 @@ function updatePredictions() {
   // event solves; Σδ_X cancels the EoC spread in the mean) — the panel, the
   // chart and the rendered movement now agree. The frozen 6c device serves
   // the ?hybridSpin=0 opt-out.
-  predictions.solarYearDays = o.solarYearDays = (_hybridSpinActive() && _osCardinalCacheVals)
+  // o.solarYearDays = the scene-MEASURED cardinal 4-mean (the measurement
+  // instrument; feeds the internal kinematic chain). The DISPLAYED days
+  // row is assigned after solarYearSeconds below — one analytic family.
+  o.solarYearDays = (_hybridSpinActive() && _osCardinalCacheVals)
     ? (_osCardinalCacheVals.SS.yearLenDays + _osCardinalCacheVals.WS.yearLenDays
        + _osCardinalCacheVals.VE.yearLenDays + _osCardinalCacheVals.AE.yearLenDays) / 4
     : computeSolarYearDaysDirect(yearForFormula);
+  predictions.solarYearDays = o.solarYearDays;   // provisional; refined to the one-source family below
   o.siderealYearDays = computeSiderealYearDaysDirect(yearForFormula);
   // o.lodKinematic MUST be assigned BEFORE any downstream calc that uses it.
   // o.lodKinematic = epoch-specific kinematic = sidYear_s(Y) / Fourier_sid_days ≈ 86400.000000 at J2000.
@@ -56009,7 +56081,16 @@ function updatePredictions() {
   // (includes SIDEREAL_YEAR_HARMONICS Fourier ripple).
   o.lodKinematic = _siderealYearSecondsPure(yearForFormula) / o.siderealYearDays;
   // Sidereal year in seconds = MEASURED days × o.lodKinematic (round-trip identity → = sidYear_s(year); = the IAU 31,558,149.7635 s at J2000 only).
-  predictions.siderealYearSeconds = o.siderealYearSeconds = o.siderealYearDays * o.lodKinematic;
+  o.siderealYearSeconds = o.siderealYearDays * o.lodKinematic;
+  // DISPLAY (D6, panel review): the one-source sidereal year OF DATE in SI
+  // seconds — the SAME evaluator the Sidereal Year chart and the API serve
+  // (mass-loss law / the banked λ̇ ratio). o.* stays the internal
+  // kinematic family: o.siderealYearDays anchors the scene's perihelion
+  // cycle and the lodKinematic purity identity (the certified pair) and
+  // must NOT carry the λ̇ drift.
+  predictions.siderealYearSeconds = _hybridSpinActive()
+    ? _siderealYearOneSourceSeconds(yearForFormula)
+    : o.siderealYearSeconds;
   // Tweakpane display: LOD_real = o.lodKinematic + H/5 ecliptic missing-motion + DT cyclic sum incl. swing (Layer 4).
   // At J2000: raw H/5 kinematic = 86400.003522 s → Layer 4 = 86400.003522 + (~−2.14 ms from
   // calibrated 4-flag stack + Core-mantle swing) = 86400.001380 s → closes on the USNO
@@ -56058,10 +56139,28 @@ function updatePredictions() {
   // Solar year in seconds = MEASURED (Fourier-fitted) days × o.lodKinematic (epoch-specific kinematic).
   // Using o.lodKinematic (not meanlengthofday) so the round-trip identity holds for sidereal:
   // sid_days × o.lodKinematic = meansiderealyearlengthinSeconds = 31,558,149.7635 (pure IAU).
-  predictions.solarYearSeconds = o.solarYearSeconds = o.solarYearDays * o.lodKinematic;
+  o.solarYearSeconds = o.solarYearDays * o.lodKinematic;
+  // DISPLAY (owner: ONE implementation — the panel's year rows are ONE
+  // FAMILY, the analytic one-source movement, so every beat recomputed
+  // from the rows reproduces the displayed precession. The scene-MEASURED
+  // cardinal 4-mean (o.solarYearDays under the flag) stays the report's /
+  // D4b panel's measurement instrument — measured and analytic agree to
+  // sub-0.5 s, but at 20×/s beat amplification a mixed pair costs ~10 yr
+  // of P (the owner-caught 25,760.8 vs 25,771.4).
+  predictions.solarYearSeconds = _hybridSpinActive()
+    ? _cardinalYearSeconds(yearForFormula, 'MEAN')
+    : o.solarYearSeconds;
+  if (_hybridSpinActive()) predictions.solarYearDays = predictions.solarYearSeconds / 86400;
   // Axial precession = sid_sec / (sid_sec − sol_sec). Both sec values consistently
   // derived from measured days × o.lodKinematic, equal to the pure days ratio.
-  predictions.axialPrecession = o.axialPrecession = computeAxialPrecessionRealLOD(o.siderealYearSeconds, o.solarYearDays, o.lodKinematic);
+  o.axialPrecession = computeAxialPrecessionRealLOD(o.siderealYearSeconds, o.solarYearDays, o.lodKinematic);
+  // DISPLAY: the beat of the DISPLAYED one-source rows (ONE family, SI
+  // basis) — recomputing sid/(sid−sol) from the panel rows reproduces this
+  // exactly, and it matches the Axial Precession chart's one-source line
+  // (≈25,771.4 at J2000, declining with date).
+  predictions.axialPrecession = _hybridSpinActive()
+    ? predictions.siderealYearSeconds / (predictions.siderealYearSeconds - predictions.solarYearSeconds)
+    : o.axialPrecession;
   // perihelionPrecession is computed after anomalistic year (depends on it)
 
   // Sidereal/stellar day in REAL epoch LOD — was hard-coded to 86,400 s
@@ -56075,18 +56174,41 @@ function updatePredictions() {
   //predictions.predictedDeltat = getDeltaT();
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();
   
-  predictions.siderealYearDays = o.siderealYearDays;
+  // DISPLAY (D6): one-source of-date days (SI); o.siderealYearDays stays kinematic.
+  predictions.siderealYearDays = _hybridSpinActive()
+    ? predictions.siderealYearSeconds / 86400
+    : o.siderealYearDays;
   // Anomalistic year in days = MEASURED (Fourier-fitted) directly, no round-trip.
   // Anomalistic year in seconds = MEASURED days × meanlengthofday (framework kinematic day unit).
   {
     const _anomDaysFourier = evalYearFourier(yearForFormula,
       _epochYearDaysBase('anomalistic', yearForFormula) ?? meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
-    predictions.anomalisticYearSeconds = o.anomalisticYearSeconds = _anomDaysFourier * o.lodKinematic;
-    predictions.anomalisticYearDays = o.anomalisticYearDays = _anomDaysFourier;
+    o.anomalisticYearSeconds = _anomDaysFourier * o.lodKinematic;
+    o.anomalisticYearDays = _anomDaysFourier;
+    // DISPLAY (D6): the one-source anomalistic of date — the SAME cardinal-
+    // structure evaluator the API and the Cardinal Year Lengths panel use
+    // (engine ϖ̇ + D6 λ̇ correction, SI seconds). The frozen Fourier fit
+    // (fitted to the pre-one-source movement) stays the o.* internal value
+    // and the ?hybridSpin=0 display.
+    predictions.anomalisticYearSeconds = _hybridSpinActive()
+      ? _cardinalYearSeconds(yearForFormula, 'ANOM')
+      : o.anomalisticYearSeconds;
+    predictions.anomalisticYearDays = _hybridSpinActive()
+      ? predictions.anomalisticYearSeconds / 86400
+      : o.anomalisticYearDays;
   }
 
-  predictions.perihelionPrecession = o.perihelionPrecession = o.anomalisticYearSeconds/(o.anomalisticYearSeconds-o.solarYearSeconds);
-  predictions.inclinationPrecession = o.inclinationPrecession = o.anomalisticYearSeconds/(o.anomalisticYearSeconds-o.siderealYearSeconds);
+  o.perihelionPrecession = o.anomalisticYearSeconds/(o.anomalisticYearSeconds-o.solarYearSeconds);
+  o.inclinationPrecession = o.anomalisticYearSeconds/(o.anomalisticYearSeconds-o.siderealYearSeconds);
+  // DISPLAY (D6): beats of the DISPLAYED one-source years — self-consistent
+  // with the year rows above (the engine's dynamical values; the H-lattice
+  // identities remain the kinematic family in the tooltips/registry).
+  predictions.perihelionPrecession = _hybridSpinActive()
+    ? predictions.anomalisticYearSeconds / (predictions.anomalisticYearSeconds - predictions.solarYearSeconds)
+    : o.perihelionPrecession;
+  predictions.inclinationPrecession = _hybridSpinActive()
+    ? predictions.anomalisticYearSeconds / (predictions.anomalisticYearSeconds - predictions.siderealYearSeconds)
+    : o.inclinationPrecession;
   // Obliquity + Ecliptic precession — use pure H-lattice framework values (H/8 and H/5)
   // NOT axial × 13/8 or axial × 13/5. The ratio form would inherit Fourier ripple from
   // axialPrecession, oscillating instead of staying at the framework structural value.

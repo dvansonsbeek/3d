@@ -137,6 +137,8 @@ export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from './moon/deep-modes
 export { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 // D6: the sidereal-year-of-date channel (banked λ̇ ratio × the caller's mass-loss law)
 export { createSiderealYearChannel } from './earth/sidereal-year-channel.cjs';
+// S2: THE ONE of-date year-length family (years + precession beats, SI seconds)
+export { createYearLengths } from './earth/year-lengths.cjs';
 export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from './planets/predict.cjs';
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).
@@ -166,7 +168,7 @@ export { createSunLongitudeCorrection } from './sun/longitude-correction.cjs';
  * even though the body is empty.
  *
  * @param {Constants} [constants]
- * @param {{ laws?: { eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number } }} [opts]
+ * @param {{ laws?: { eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number }, secularSeriesArtifact?: any }} [opts]
  *   `laws` — research overrides for Earth's orbit laws (doc 109 §7); absent = the shipped laws, bit-identical. Not part of the hash.
  * @returns {Model}
  */
@@ -208,7 +210,13 @@ export const createModel = (constants = GENERATED, opts = {}) => {
   // constants flow through the entire motion model.
   // opts.laws — research overrides for Earth's orbit laws (see assembleModel);
   // absent = the shipped laws, bit-identical. Never part of the hash.
-  const surfaces = assembleModel(ctx, FITTED, opts.laws ?? {});
+  // opts.secularSeriesArtifact — S3 tier unification: the governed
+  // secular-series artifact (data/nbody-secular-series.json, parsed).
+  // When present the of-date year-length family runs the SERIES tier
+  // exactly like the browser; absent (the bare npm package) the mode
+  // tail serves every epoch. Never part of the hash: it is the governed
+  // artifact, not a parameter.
+  const surfaces = assembleModel(ctx, FITTED, opts.laws ?? {}, opts.secularSeriesArtifact ?? null);
 
   return {
     constants: ctx,

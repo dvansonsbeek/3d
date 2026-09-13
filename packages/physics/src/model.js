@@ -22,8 +22,7 @@ import * as FL from './planets/fibonacci-laws.cjs';
 import * as planetOrientation from './planets/orientation.cjs';
 import { createPhaseMachinery } from './phase/index.cjs';
 import { createCardinalModel } from './cardinal/index.cjs';
-import { createCardinalStructure } from './cardinal/one-source-structure.cjs';
-import { createSiderealYearChannel } from './earth/sidereal-year-channel.cjs';
+import { createYearLengths } from './earth/year-lengths.cjs';
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
@@ -80,7 +79,7 @@ const MOON_ECC_SENSITIVITY_NODE = 1.018;
  *   they used it; the generators refuse to --write under an override.
  * @returns the assembled surfaces (epoch, earth, lengths, cardinal, moon) — type inferred so ReturnType stays precise
  */
-export function assembleModel(C, F, laws = {}) {
+export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type {any} */ (null)) {
   // ── Derived constants (constants.js §9 order) ─────────────────────────────
   const H = C.foundational.holisticyearLength;
   const meanSolarYearDays = Math.round(C.foundational.inputmeanlengthsolaryearindays * (H / 8)) / (H / 8);
@@ -466,13 +465,40 @@ export function assembleModel(C, F, laws = {}) {
   // sidereal year of date reduced by the SECULAR α(H(t)) equinox precession
   // (axial0·H(t)/H0 — the movement's leg-1 convention, NOT the H/13
   // kinematic identity; the two are a recorded 0.09% relation tension).
-  const cardinalStructureM = (() => {
+  // THE ONE of-date year-length family (owner: "move to 1 implementation")
+  // — createYearLengths owns tropical (equinox-rate mean, wobble included),
+  // sidereal (the D6 λ̇ channel), anomalistic (the cardinal structure on
+  // the SAME mean), all λ̇-corrected coherently, SI seconds, and the beats
+  // of that pair. The internal laws, the kinematic beat constructions
+  // (axialPrecessionYears*), the scene engine and the frozen era clock
+  // stay on their own families as before.
+  // S3 tier unification: when the caller injects the governed secular-
+  // series artifact (createModel opts.secularSeriesArtifact — the API/Node
+  // path; the npm package alone has no 8 MB series), the movement runs the
+  // SERIES tier exactly like the browser — killing the mode-vs-series
+  // value split (measured: 6 s on the anomalistic year at J2000).
+  const yearLengthsM = (() => {
     const AEarth = /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements.earth;
-    const axial0 = meanSiderealYearDays / (meanSiderealYearDays - meanSolarYearDays);
+    // The ψ̇ anchor: the CERTIFIED of-date laws at 2000 — identical to the
+    // engine/browser (computeSiderealYearDaysDirect / computeSolarYearDays
+    // Direct twins → 25,771.4). The FOUNDATIONAL mean pair used before
+    // (meanSiderealYearDays/meanSolarYearDays → 25,796) anchored this
+    // movement's realized precession 25 yr off the certified value — the
+    // hidden split behind the API's 365.242204 tropical mean (found in the
+    // owner's one-implementation drive).
+    const sidLaw2000 = evalYearFourier(2000, siderealYearDaysBase(2000), F.SIDEREAL_YEAR_HARMONICS);
+    const solLaw2000 = evalYearFourier(2000, tropicalYearDaysBase(2000), F.TROPICAL_YEAR_HARMONICS);
+    const axial0 = sidLaw2000 / (sidLaw2000 - solLaw2000);
     const H0 = /** @type {number} */ (deepLod.hAtAge(0));
+    const seriesArt = /** @type {any} */ (secularSeriesArtifact);
+    const sb = seriesArt && seriesArt.bodies && seriesArt.bodies.earth;
     const hist = createDeepOrbitalHistory({
       zModes: DEEP_MODES_ARTIFACT.earthZ,
       zetaModes: DEEP_MODES_ARTIFACT.earthZeta,
+      ...(sb ? {
+        zetaSeries: { t0Yr: seriesArt.t0Yr, stepYr: sb.stepYr, q: sb.zetaQ, p: sb.zetaP },
+        zSeries: { t0Yr: seriesArt.t0Yr, stepYr: sb.stepYr, q: sb.zQ, p: sb.zP },
+      } : {}),
       anchorE: AEarth.e,
       anchorPeriEclipticDeg: AEarth.lonPeriEclipticDeg,
       anchorInclEclipticDeg: AEarth.inclEclipticDeg,
@@ -493,26 +519,11 @@ export function assembleModel(C, F, laws = {}) {
       if (!sampler || need > rangeYr) { rangeYr = tierSpan(need); sampler = hist.build(rangeYr, -rangeYr, gridStep(rangeYr)); }
       return sampler.at(t);
     };
-    const tropicalYearSecondsAtYearFn = (/** @type {number} */ year) => {
-      const tMa = (startmodelYear - year) / 1e6;
-      const h = deepLod.hAtAge(tMa);
-      return deepLod.siderealYearSecondsAtAge(tMa) * (1 - 1 / (axial0 * (h === null ? 1 : h / H0)));
-    };
-    return createCardinalStructure({ sampleAt, tropicalYearSecondsAtYearFn });
+    return createYearLengths({
+      sampleAt,
+      massLossSiderealSecondsAtYearFn: (year) => deepLod.siderealYearSecondsAtAge(yearToTMa(year)),
+    });
   })();
-
-  // D6: the sidereal-year-of-date channel — the banked λ̇ ratio (planetary
-  // epoch drift, embedded artifact) over the model's own mass-loss law.
-  // Surface-layer only: the internal laws, the beat constructions
-  // (axialPrecessionYears* — invariant by design), the scene engine and
-  // the frozen era clock all stay on the uncorrected family; the model's
-  // OF-DATE year lengths (epoch.siderealYearSecondsAtYear, the cardinal
-  // structure's year lengths) gain the drift so the API serves accurate
-  // values. EoC offsets and spreads keep the raw form: the correction is
-  // μs-class on an offset and cancels to second order in a spread.
-  const siderealChannelM = createSiderealYearChannel({
-    massLossSiderealSecondsAtYearFn: (year) => deepLod.siderealYearSecondsAtAge(yearToTMa(year)),
-  });
 
   /** Tropical year: mean of the four cardinal intervals. @param {number} year @returns {number} */
   const tropicalYearDays = (year) => cardinalM.computeTropicalYearLength(year);
@@ -1145,7 +1156,7 @@ export function assembleModel(C, F, laws = {}) {
       moonDistanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,
       // D6: OF-DATE — mass-loss law / the banked planetary λ̇ ratio
       // (identical at J2000 where the ratio ≡ 1 by construction)
-      siderealYearSecondsAtYear: /** @param {number} year @returns {number} */ (year) => siderealChannelM.siderealYearSecondsAtYear(year),
+      siderealYearSecondsAtYear: /** @param {number} year @returns {number} */ (year) => yearLengthsM.siderealYearSecondsAtYear(year),
       deltaTSecondsAtYear: deltaTSeconds,
       cyclesBetween,
       // The DYNAMICAL axial precession period (the tweakpane identity):
@@ -1191,11 +1202,14 @@ export function assembleModel(C, F, laws = {}) {
       // D6: year LENGTHS gain the λ̇ drift coherently (rate-form
       // correction — beats stay invariant); offsets/spreads keep the raw
       // form (μs-class / second-order there).
-      yearLengthSeconds: /** @param {number} year @param {'VE'|'SS'|'AE'|'WS'} type @returns {number} */ (year, type) => siderealChannelM.correctedYearSeconds(year, cardinalStructureM.yearLengthSeconds(year, type)),
-      eocOffsetSeconds: /** @param {number} year @param {'VE'|'SS'|'AE'|'WS'} type @returns {number} */ (year, type) => cardinalStructureM.eocOffsetSeconds(year, type),
-      spreadSeconds: /** @param {number} year */ (year) => cardinalStructureM.spreadSeconds(year),
-      anomalisticYearSeconds: /** @param {number} year @returns {number} */ (year) => siderealChannelM.correctedYearSeconds(year, cardinalStructureM.anomalisticYearSeconds(year)),
+      yearLengthSeconds: /** @param {number} year @param {'VE'|'SS'|'AE'|'WS'} type @returns {number} */ (year, type) => yearLengthsM.cardinal.yearLengthSeconds(year, type),
+      eocOffsetSeconds: /** @param {number} year @param {'VE'|'SS'|'AE'|'WS'} type @returns {number} */ (year, type) => yearLengthsM.cardinal.eocOffsetSeconds(year, type),
+      spreadSeconds: /** @param {number} year */ (year) => yearLengthsM.cardinal.spreadSeconds(year),
+      anomalisticYearSeconds: /** @param {number} year @returns {number} */ (year) => yearLengthsM.anomalisticYearSecondsAtYear(year),
     }),
+    // THE ONE of-date year-length family + its beats (S2; SI seconds) —
+    // the single surface the panel, charts, API and website consume.
+    yearLengths: yearLengthsM,
     moon: Object.freeze({
       distanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,
       siderealMonthDaysAtYear: moonSiderealMonthDaysAt,

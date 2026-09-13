@@ -37,6 +37,7 @@
     "./moon/deep-modes-artifact": "./src/moon/deep-modes-artifact.cjs",
     "./earth/deep-orbital-history": "./src/earth/deep-orbital-history.cjs",
     "./earth/sidereal-year-channel": "./src/earth/sidereal-year-channel.cjs",
+    "./earth/year-lengths": "./src/earth/year-lengths.cjs",
     "./moon/month-chain": "./src/moon/month-chain.cjs",
     "./chain-cycles": "./src/chain-cycles/index.cjs",
     "./moon/arguments": "./src/moon/arguments.cjs",

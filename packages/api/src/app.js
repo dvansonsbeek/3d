@@ -83,7 +83,18 @@ const MAX_SOLAR_LOCATION_WINDOW_YEARS = 20;
  * @returns {{ handle: (req: {method: string, path: string, query?: Record<string, string>, body?: string}) => {status: number, headers: Record<string, string>, body: string}, model: ReturnType<typeof createModel> }}
  */
 export function createApi() {
-  const model = createModel();
+  // S3 tier unification: load the governed secular-series artifact so the
+  // of-date year-length family (epoch sidereal, cardinal structure) runs
+  // the SERIES tier — the same movement the browser renders (measured:
+  // the mode tail alone is 6 s coarser on the anomalistic year at J2000).
+  // The artifact lives in the repo's data/, not in the npm package; when
+  // absent (a package-only consumer) the mode tail serves every epoch.
+  let secularSeriesArtifact = null;
+  try {
+    secularSeriesArtifact = JSON.parse(readFileSync(
+      new URL('../../../data/nbody-secular-series.json', import.meta.url), 'utf8'));
+  } catch { /* package-only install: mode-tail tier */ }
+  const model = createModel(undefined, { secularSeriesArtifact });
   const id = model.identity;
 
   /** Derivations metadata: structural explanation per quantity (§7 "derivations"). */
@@ -377,7 +388,7 @@ export function createApi() {
       }
       /** @type {ReturnType<typeof createModel>} */
       let cf;
-      try { cf = createModel(altered); } catch (e) {
+      try { cf = createModel(altered, { secularSeriesArtifact }); } catch (e) {
         return problem(422, 'validation-target-injection', 'Validation targets cannot be injected', String(e instanceof Error ? e.message : e));
       }
       const data = {
