@@ -320,6 +320,29 @@ function buildPlanetChainsFromArtifactData(art, opts = {}) {
   return chains;
 }
 
+/**
+ * The SECULAR apsidal tangent of date — dϖ/dt of the chain's smooth
+ * mode-sum, deg per year, J2000-ecliptic frame, ±150-yr central stencil
+ * (the same rate family the panel's Prec. cell displays). The chain
+ * carries no short-period content, so the tangent is stencil-stable
+ * (measured: Earth 11.6160″/yr flat from ±1 to ±500 yr). ONE home: the
+ * year-length factory's anomalistic construction and every panel surface
+ * wire THIS, so the displayed apsidal beats agree by construction.
+ * @param {number} year decimal calendar year (epoch parameter first, per naming rule)
+ * @param {KcPlanetChain} planetChain the planet's chain (buildPlanetChainsFromArtifactData)
+ * @param {Object<string,KcPlanetChain>=} allChains the full chain map
+ * @returns {number} deg/yr, prograde positive
+ */
+function computeApsidalSecularDegPerYr(year, planetChain, allChains) {
+  const D = 150;
+  const w1 = computePlanetElementsAtYear(year - D, planetChain, allChains).lonPeriEclipticDeg;
+  const w2 = computePlanetElementsAtYear(year + D, planetChain, allChains).lonPeriEclipticDeg;
+  let d = w2 - w1;
+  while (d > 180) d -= 360;
+  while (d < -180) d += 360;
+  return d / (2 * D);
+}
+
 module.exports = {
   ANCHOR_EPOCH_YEAR,
   ANCHOR_EPOCH_JD,
@@ -328,5 +351,6 @@ module.exports = {
   computeHeliocentricEclipticFromElements,
   computePoissonArgRad,
   computePlanetElementsAtYear,
+  computeApsidalSecularDegPerYr,
   buildPlanetChainsFromArtifactData,
 };

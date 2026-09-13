@@ -7,7 +7,7 @@ across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 
 **Scale:** `src/script.js` ~60,000 lines · `tools/` ~240 tracked JS scripts
 across 9 directories (~360 on disk with the untracked local archives) · ~245 Python files · 47 docs (24 retired-machinery docs archived out of the tree — `docs/retired-record.md` is the public record; `docs/archive/retired/`, gitignored, holds the files — and the strip-and-restructure pass merged five more into their live homes) · two web UIs (simulator, `dashboard/`).
-**`npm run check` enforces a twenty-two-step gate chain; CI runs it plus a
+**`npm run check` enforces a twenty-three-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
 Golden masters live in `packages/fixtures/`. Of the 31 scripts in `tools/verify/`,
@@ -100,6 +100,21 @@ would silently churn a structural claim for a rounding-level gain.
   freezes deep time (the solar-day panel read 86400.006 where the model says
   86400.156). The epoch-consistency gate now pins the invariant; extend it
   when adding f(Y) evaluators.
+- **A cache that changes resolution is mutable state.** The one-source
+  movement's grown grid replaced its 100-yr tier with the 1000/5000-yr one
+  after any deep-time probe; rates read through it (±0.5-yr central
+  differences) became grid-segment averages — the anomalistic year read
+  +2.6 s, visit-order dependent, and 18 browser goldens were recorded
+  contaminated (exposed by the early-recorded "Fresh" twin of the same JD).
+  Per-tier routing + the fail-proven `test:sampler-purity` gate pin the
+  class: values pure in `year`.
+- **A displayed rate must name its window.** The engine's ϖ̇ reads
+  11.544/11.616/11.624/11.696 ″/yr depending on evaluator and stencil
+  (100-kyr window mean / chain tangent / series year-over-year / deep-mode
+  tail); two panel surfaces showing different windows of the same rate split
+  111,491 vs 111,570 yr. Surfaces quoting one physical rate ride ONE family —
+  the anomalistic takes the chain tangent the Prec. cell shows
+  (`computeApsidalSecularDegPerYr`, one home).
 - **A fit-window edge phase-locked to the lattice masquerades as physics.**
   The "e(t)-minimum residual peak" was window-edge divergence — both bracket
   ends sit at H/16 phase ≈ 0°. Check the edge/interior split before believing

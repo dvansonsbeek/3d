@@ -124,7 +124,7 @@ export { integrateAscendingNode } from './planets/asc-node-integrator.cjs';
 export * as planetOrbitChain from './planets/orbit-chain.cjs';
 // P5/K4.6c — the engine-D Keplerian chain (pure evaluator + the embedded
 // governed artifact; the browser flag path consumes exactly these).
-export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from './planets/keplerian-chain.cjs';
+export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, computeApsidalSecularDegPerYr, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from './planets/keplerian-chain.cjs';
 export { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from './planets/inv-plane-frame.cjs';
 export { createSecularSeriesOverride } from './planets/secular-series.cjs';
 export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from './planets/chain-artifact.js';

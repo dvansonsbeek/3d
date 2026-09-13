@@ -14,7 +14,7 @@
 
 What if the orbits of all eight planets, the wobble of Earth's axis, and the rhythm of ice ages are all governed by the same mathematical structure?
 
-This interactive 3D simulation implements the **Expanding Solar System Resonance Theory (ESSRT)** — a geocentric model built on a single timescale, with six Fibonacci relations describing every planet's orbital tilt, shape, and precession. Built with just **6 free parameters**, the simulation accurately reproduces the geocentric positions of the Sun, Moon, and all seven planets — verified against JPL Horizons ephemeris data (~1800–2200 AD) and over 700 historical astronomical observations (~2000 BC to ~4000 AD). From the same geometric framework, it simultaneously produces obliquity, eccentricity, perihelion precession, and inclination oscillation for all planets.
+This interactive 3D simulation implements the **Expanding Solar System Resonance Theory (ESSRT)** — a geocentric model built on a single timescale, with six Fibonacci relations — restated below with their honest, measured status — describing the system's tilts, shapes, and precessions. Built with just **6 free parameters**, the simulation accurately reproduces the geocentric positions of the Sun, Moon, and all seven planets — verified against JPL Horizons ephemeris data (~1800–2200 AD) and over 700 historical astronomical observations (~2000 BC to ~4000 AD). From the same geometric framework, it simultaneously produces obliquity, eccentricity, perihelion precession, and inclination oscillation for all planets.
 
 ---
 
@@ -71,7 +71,7 @@ The Sun is still the center of our solar system. The model uses a geo-heliocentr
 - **Earth's wobble center** (the EARTH-WOBBLE-CENTER marker) circles Earth clockwise in <!--v:axialPrecRound-->~25,794<!--/v--> years — this is axial precession
 - **Earth's perihelion point** wobbles counter-clockwise around the Sun in <!--v:inclPrecYears-->~111,772<!--/v--> years — this is inclination precession
 - These two motions **meet every <!--v:periPrecYears-->~20,957<!--/v--> years** — producing perihelion precession
-- Earth orbits its perihelion point (close to the Sun) in 1 solar year, and all planets orbit their own perihelion points following Kepler's 3rd law
+- Earth orbits its perihelion point (close to the Sun) in 1 solar year; the seven planets follow their own N-body element chains (Kepler ellipses of date)
 
 The result: obliquity, eccentricity, inclination, and all precession movements emerge from just two opposing forces in a 3:13 ratio.
 
@@ -153,7 +153,7 @@ npm run check             # the full gate chain (~9 min): lint, typecheck, bound
 npm run check:docs        # scoped tier (~20 s) for docs/registry/marker edits
 npm run check:engine      # scoped tier (~2 min) for tools/lib + packages/physics edits
 npm run test:browser      # golden masters in headless Chromium (builds first)
-npm run test:verify:list  # how the 26 tools/verify scripts classify
+npm run test:verify:list  # how the 31 tools/verify scripts classify
 npm run values:package    # packaged @essrt/model-values vs the live registry
 npm run check:artifacts   # campaign artifacts vs their recorded input hashes
 ```
@@ -172,10 +172,10 @@ Two things worth knowing before you read a red result as breakage:
   and required in CI** — a year's computed values do not depend on which epoch
   the scene happens to be set to, bit-exact on the round trip. Red there is a
   regression of a closed acceptance criterion, not a tracked state.
-- Of the 28 scripts in `tools/verify/`, only the six gates can actually fail —
+- Of the 31 scripts in `tools/verify/`, only the six gates can actually fail —
   the rest print analysis without asserting anything. `test:verify` runs the real
-  gates and deliberately skips the six generators (`balance-search.js`, the four
-  campaign-artifact generators, and the engine-D N-body frequencies generator),
+  gates and deliberately skips the ten generators (`balance-search.js`, the four
+  campaign-artifact generators, and the five engine-D artifact generators),
   which regenerate tracked data files rather than checking them. The suite fails
   on any unclassified script, so the inventory cannot silently drift again.
 
@@ -184,7 +184,7 @@ Two things worth knowing before you read a red result as breakage:
 ## Features
 
 - Interactive 3D solar system with textured planets, rings, shadows, and starfield
-- Equation of center (variable speed) and empirical parallax corrections for all planets
+- Equation of center (variable speed); the seven planets render from the model's own N-body element chain
 - **The Derived Sun (DST-1)**: the certified apparent solar longitude assembled from framework structure with **zero fitted solar constants** — the mean tropical rate plus the closed-form integral of the model's own year-length harmonics (amplitudes derived as A·cotε, scaled by the derived obliquity-torque factors) plus a Kepler equation of centre on the derived H/16 + H/3 eccentricity law; 0.95″ RMS vs JPL (the Meeus Ch. 25 reference: 1.28″), and the same longitude drives the eclipse chain and the visible scene
 - **The Derived Moon (DLT-1)**: a framework-native lunar theory in Meeus Ch. 47's form with every constant derived, attributed, or anchored by design — periodic amplitudes reproduced from gravity alone (top-20 longitude at 100.0±0.1%, latitude family at 100.02%), the secular T²/T³ budget closed against primary sources with zero free parameters, analytic aberration replacing the fitted correction, and a J2000-anchored 5-layer precession hierarchy; extended with five derived Delaunay tail terms to λ 2.96″ / β 0.65″ RMS vs JPL, RMS 0.0012° over 6,088 positions
 - Time controls: play, pause, speed adjustment, and date navigation
@@ -241,9 +241,9 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 **Investigation & Verification:**
 - [Python Scripts](scripts/) — Statistical significance tests, exoplanet Fibonacci tests, eccentricity analysis, Milankovitch paleoclimate tests
 - [Milankovitch & Climate (Docs 90–92)](docs/90-milankovitch-language.md) — Spectral analysis of five paleoclimate records (LR04, Cheng 2016, CENOGRID, EPICA CO₂, CenCO2PIP) demonstrating the 8H integer-divisor lattice, the 32-component **8H Orbital Forcing Formula**, and the canonical climate formula with its in-app Explorer modal. Doc 90 states the framework, [doc 91](docs/91-milankovitch-evidence.md) the evidence and falsifiable hypothesis tests, [doc 92](docs/92-climate-formula.md) the formula and reproducing pipeline.
-- [Historical Eclipse Validation (Docs 102–103)](docs/102-gia-alpha-lunar-validation.md) — The model's ΔT formula, with **zero parameters fitted to eclipse data in the α(t) machinery**, tested on two independent tracks: a 26-event solar-eclipse alignment audit spanning −762 BCE to 2026 CE (the framework agrees with the documented UT on every event; see the website's [Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)), and a 267-event primary-source lunar timing test — **<!--v:lunarResidualMinutes-->20.2<!--/v-->-min mean \|residual\|**, with **<!--v:lunarEventsBeatingNasa-->118<!--/v-->/267 events (<!--v:lunarBeatingNasaPct-->44.2<!--/v-->%) falling closer to observation than NASA Espenak/Meeus's polynomial**. [Doc 103](docs/103-135-babylonian-case-study.md) is the −135 Babylonian case study: predicted UT within 9 minutes of the documented time, umbra centerline 194 km from Babylon.
+- [Historical Eclipse Validation (Docs 102–103)](docs/102-gia-alpha-lunar-validation.md) — The model's ΔT formula, with **zero parameters fitted to eclipse data in the α(t) machinery**, tested on two independent tracks: a 26-event solar-eclipse alignment audit spanning −762 BCE to 2026 CE (the framework agrees with the documented UT on every event; see the website's [Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)), and a 267-event primary-source lunar timing test — **<!--v:lunarResidualMinutes-->20.2<!--/v-->-min mean \|residual\|**, with **<!--v:lunarEventsBeatingNasa-->118<!--/v-->/267 events (<!--v:lunarBeatingNasaPct-->44.2<!--/v-->%) falling closer to observation than NASA Espenak/Meeus's polynomial**. [Doc 103](docs/103-135-babylonian-case-study.md) is the −135 Babylonian case study: predicted UT within 9 minutes of the documented time, umbra centerline (BestGap) <!--v:babylon135BestGapKm-->366<!--/v--> km from Babylon within the scan window.
 - [The Derived Moon — Doc 66 technical record](docs/66-moon-meeus-corrections.md) — the framework's lunar theory, **"The Derived Moon" (DLT-1)**: Meeus Ch. 47 with every constant derived, attributed, or anchored by design — periodic amplitudes reproduced from gravity alone, the secular budget closed against primary sources with zero free parameters, and certified statistically indistinguishable from the pure-Meeus polynomials across the 12,064-event NASA lunar canon while remaining bounded at deep time.
-- [Fitting Pipeline](tools/fit/README.md) — Pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, solar measurements, obliquity/cardinal-point/year-length harmonics
+- [Fitting Pipeline](tools/fit/README.md) — Pipeline: Earth perihelion harmonics, ML precession prediction, solar measurements, obliquity/cardinal-point/year-length harmonics
 - [Predictive Formula Guide](tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — ~2421-term physical-beat ML system for planetary precession prediction (R² > 0.99999 per planet; superseded the earlier 429-term unified system)
 
 ---
@@ -259,7 +259,7 @@ node tools/fit/run-pipeline.js --phase2        # Steps 4a-10 (~2.5 hrs, requires
 node tools/fit/run-pipeline.js --from 5a       # resume from Step 5a onwards
 ```
 
-The pipeline runs in phases: Sun geometry → planet alignment → perihelion harmonics → ML training → parallax corrections → solar measurements & harmonic fits → verify → regenerate the constants module `src/script.js` imports. Step 3 (browser data export) is always manual. Step 6a (solar measurements) exports all cardinal points, perihelion/aphelion, and world-angles in a single scene-graph pass; steps 6b–6d fit harmonics from that data. See [tools/fit/README.md](tools/fit/README.md) for the full reference.
+The pipeline runs in phases: Sun geometry → planet alignment → perihelion harmonics → ML training → solar measurements & harmonic fits → verify → regenerate the constants module `src/script.js` imports. Step 3 (browser data export) is always manual. Step 6a (solar measurements) exports all cardinal points, perihelion/aphelion, and world-angles in a single scene-graph pass; steps 6b–6d fit harmonics from that data. See [tools/fit/README.md](tools/fit/README.md) for the full reference.
 
 The cardinal points (solstices/equinoxes) are **derived, not independently fitted**: their dates come from the tropical year-length model plus one shared braiding term ([the braid law, doc 99](docs/99-expanding-solar-system-resonance-theory.md)), reaching 0.28–0.37 min RMS per event over ±270,000 years with the seasonal spread emerging from the geometry rather than from per-point fitting.
 

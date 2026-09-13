@@ -25,6 +25,7 @@ import { createCardinalModel } from './cardinal/index.cjs';
 import { createYearLengths } from './earth/year-lengths.cjs';
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
+import { buildPlanetChainsFromArtifactData, computeApsidalSecularDegPerYr } from './planets/keplerian-chain.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
 import { createDeepTimeLod } from './deltat/deep-time.cjs';
 import { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
@@ -510,18 +511,34 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
         return axial0 * (h === null ? 1 : h / H0);
       },
     });
-    // grown-grid sampler, tier-filling (the measured rebuild-storm fix)
-    let sampler = /** @type {any} */ (null), rangeYr = 0;
+    // PER-TIER ROUTING (the anomalistic-contamination fix): one sampler PER
+    // grid tier, built on first entry and KEPT — a query always reads the
+    // tier its own span selects. The former single grown sampler replaced
+    // the 100-yr grid with the 1000/5000-yr one after any deep-time probe,
+    // and the year-length rates (±0.5-yr central differences through the
+    // grid) then returned grid-segment averages instead of local rates
+    // (anomalistic of date +2.63 s / +19 s, visit-order dependent).
+    const samplers = /** @type {Map<number|'deep', any>} */ (new Map());
+    let deepRangeYr = 0;
     const gridStep = (/** @type {number} */ n) => (n <= 50000 ? 100 : n <= 2000000 ? 1000 : 5000);
     const tierSpan = (/** @type {number} */ n) => (n <= 50000 ? 50000 : n <= 2000000 ? 2000000 : Math.ceil(n * 1.25 / 5000) * 5000);
     const sampleAt = (/** @type {number} */ year) => {
       const t = year - 2000, need = Math.max(20000, Math.abs(t) * 1.25);
-      if (!sampler || need > rangeYr) { rangeYr = tierSpan(need); sampler = hist.build(rangeYr, -rangeYr, gridStep(rangeYr)); }
-      return sampler.at(t);
+      const span = tierSpan(need);
+      const key = span > 2000000 ? /** @type {'deep'} */ ('deep') : span;
+      if (!samplers.has(key) || (key === 'deep' && span > deepRangeYr)) {
+        if (key === 'deep') deepRangeYr = span;
+        samplers.set(key, hist.build(span, -span, gridStep(span)));
+      }
+      return samplers.get(key).at(t);
     };
+    // The anomalistic rides the chain's SECULAR apsidal tangent (the same
+    // rate family the panel's Prec. cell shows) — ONE helper, keplerian-chain.
+    const kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
     return createYearLengths({
       sampleAt,
       massLossSiderealSecondsAtYearFn: (year) => deepLod.siderealYearSecondsAtAge(yearToTMa(year)),
+      apsidalSecularDegPerYrFn: (year) => computeApsidalSecularDegPerYr(year, kcChains.earth, kcChains),
     });
   })();
 

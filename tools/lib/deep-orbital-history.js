@@ -102,18 +102,29 @@ function createOneSourceMovement() {
   // pattern changes. The previous |t|·1.25 headroom rebuilt the whole
   // integration nearly every chained year of an outward walk — measured as
   // the Step-6a exporter blowup (>5.5× instead of ~2×; ~9,000 rebuilds).
-  let sampler = null, rangeYr = 0;
+  // PER-TIER ROUTING (the anomalistic-contamination fix): one sampler PER
+  // grid tier, built on first entry and KEPT — a query always reads the
+  // tier its own span selects. The former single grown sampler REPLACED the
+  // 100-yr grid with the 1000/5000-yr one after any deep-time probe, and
+  // the year-length rates (±0.5-yr central differences through the grid)
+  // then returned grid-segment AVERAGES instead of local rates: the
+  // anomalistic year of date read +2.63 s (1000-yr grid) / +19 s (5000-yr
+  // grid), visit-order dependent. Values are now pure in `year`.
+  const samplers = new Map();   // tier span → sampler; the >2-Myr tier grows in span
+  let deepRangeYr = 0;
   const gridStep = (need) => (need <= 50000 ? 100 : need <= 2000000 ? 1000 : 5000);
   const tierSpan = (need) =>
     (need <= 50000 ? 50000 : need <= 2000000 ? 2000000 : Math.ceil(need * 1.25 / 5000) * 5000);
   const sampleAt = (year) => {
     const t = year - 2000;
     const need = Math.max(20000, Math.abs(t) * 1.25);
-    if (!sampler || need > rangeYr) {
-      rangeYr = tierSpan(need);
-      sampler = tier.build(rangeYr, -rangeYr, gridStep(rangeYr));
+    const span = tierSpan(need);
+    const key = span > 2000000 ? 'deep' : span;
+    if (!samplers.has(key) || (key === 'deep' && span > deepRangeYr)) {
+      if (key === 'deep') deepRangeYr = span;
+      samplers.set(key, tier.build(span, -span, gridStep(span)));
     }
-    return sampler.at(t);
+    return samplers.get(key).at(t);
   };
   // D4b: the one-source cardinal structure (the EoC layer — year lengths,
   // crossing offsets, the e(t)-proportional spread) on THIS movement's own
@@ -129,9 +140,14 @@ function createOneSourceMovement() {
   // λ̇-corrected coherently. Identical construction in model.js (API) and
   // script.js (browser).
   const { createYearLengths } = require('../../packages/physics/src/earth/year-lengths.cjs');
+  // The anomalistic rides the chain's SECULAR apsidal tangent (the same
+  // rate family the panel's Prec. cell shows) — ONE helper, keplerian-chain.
+  const kcm = require('../../packages/physics/src/planets/keplerian-chain.cjs');
+  const kcChains = kcm.buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   const yearLengths = createYearLengths({
     sampleAt,
     massLossSiderealSecondsAtYearFn: (year) => DT.meanSiderealYearSecondsAtAge((2000 - year) / 1e6),
+    apsidalSecularDegPerYrFn: (year) => kcm.computeApsidalSecularDegPerYr(year, kcChains.earth, kcChains),
   });
   // Back-compat shape for the fixture recorder and existing callers.
   const cardinal = {

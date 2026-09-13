@@ -121,3 +121,36 @@ The CSV measures JD intervals = **SI days**. The ESSRT charts are **real (LOD)
 days**. Detrending one against the other injects a 2590 s ramp. Put the unit in
 every name. `divisor` and `period` are not interchangeable — that confusion
 between two engines was worth 643,653 s.
+
+## 11. A grid cache that changes resolution is mutable state
+
+A rate read through linear interpolation IS the grid-segment average — its
+window is the grid step, not your stencil. The one-source movement's grown
+cache replaced its 100-yr grid with the 1000/5000-yr tier after any deep-time
+probe, so a ±0.5-yr central difference silently became a millennium average:
+the anomalistic year read **+2.6 s** (5000-yr grid: **+19 s**),
+**visit-order dependent** — and 18 browser goldens were recorded through the
+contaminated state.
+
+Exposed by an early-recorded "Fresh" twin of the same quantity: recording a
+value both before and after unrelated probes is a free purity witness.
+
+Fix: route queries per tier and KEEP every tier — never replace a fine grid
+with a coarse one under a live consumer. Pin the class with an order-purity
+gate (fresh instance ≡ after-deep-probe, bit-exact — `test:sampler-purity`,
+fail-proven: 7 failures on the pre-fix code).
+
+## 12. A local rate has a window — name it
+
+The same physical rate (Earth's ϖ̇) reads 11.544 / 11.616 / 11.624 /
+11.696 ″/yr depending on evaluator and stencil: 100-kyr window mean, smooth
+chain tangent, series year-over-year, deep-mode tail. None is wrong — they
+are different windows. Two panel surfaces quoting different windows of one
+rate split 111,491 vs 111,570 yr on the derived beat.
+
+- A series sampled at 250 yr cannot state a rate below its band limit — the
+  spread across reasonable stencils IS the uncertainty.
+- The smooth mode-sum tangent is the stencil-stable local statement (flat
+  from ±1 to ±500 yr where the raw series wobbles ±0.015 ″/yr).
+- Every surface quoting one physical rate must ride ONE evaluator family
+  (`computeApsidalSecularDegPerYr` is the one home for the apsidal tangent).

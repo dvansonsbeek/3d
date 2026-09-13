@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -10063,18 +10063,14 @@ const helperLabelStyle =
 const helperPointer = '<div style="margin-top:3px;color:rgba(255,255,255,.3);font-size:8px;line-height:1;">&#9660;</div>';
 
 /* — Earth Wobble Center label — */
-/* C-4 SPIN reading for Earth (doc 109 §19): p derived from the measured
-   year lengths (the ratio identity above), the s-lines from the embedded
-   deep ζ table — both computed, no literals. */
-const _earthSpinPArcsecYr = 1296000 / ASTRO_REFERENCE.iauPrecessionJ2000;
-const _earthSpinMaxS = Math.max(...Object.values(DEEP_MODES_ARTIFACT.planetLeadingZetaArcsecPerYr || { x: NaN }).map(Math.abs));
+/* (The C-4 SPIN reading lines — p vs the highest s-line and the
+   no-spin-resonance note — were removed per owner: too much information
+   at this label; doc 109 §19 carries the reading.) */
 const wobbleLabelDiv = document.createElement('div');
 wobbleLabelDiv.style.cssText = helperLabelStyle;
 wobbleLabelDiv.innerHTML =
   '<div style="font:600 10px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.9);letter-spacing:.03em;">Precession Center</div>' +
   '<div style="font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.45);margin-top:2px;">axis of Earth\'s wobble</div>' +
-  '<div style="font:500 9px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.7);margin-top:3px;font-variant-numeric:tabular-nums;">p = ' + _earthSpinPArcsecYr.toFixed(2) + ' ″/yr — ' + (_earthSpinPArcsecYr / _earthSpinMaxS).toFixed(1) + '× above our highest s-line</div>' +
-  '<div style="font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.45);margin-top:2px;">no spin resonance reachable — Moon-raised; without the Moon, p falls into the band and the obliquity envelope doubles</div>' +
   helperPointer;
 const wobbleLabelObj = new CSS2DObject(wobbleLabelDiv);
 wobbleLabelObj.position.set(0, 0.04, 0);
@@ -20106,6 +20102,15 @@ function _yearLengthsM() {
     _yearLengthsCache = createYearLengths({
       sampleAt: (y) => _hybridSeriesSampleAt(y),
       massLossSiderealSecondsAtYearFn: (y) => meanSiderealYearSecondsAtAge((startmodelYear - y) / 1e6),
+      // The anomalistic rides the chain's SECULAR apsidal tangent — the
+      // same rate family the Perihelion Longitudes Prec. cell shows
+      // (_kcApsidalPeriodYears), so the Predictions beat and the Prec.
+      // cell agree by construction (owner-found: 111,491 vs 111,570).
+      // ONE helper: keplerian-chain computeApsidalSecularDegPerYr.
+      apsidalSecularDegPerYrFn: (y) => {
+        if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+        return kcApsidalSecularDegPerYr(y, _kcChains.earth, _kcChains);
+      },
     });
   }
   return _yearLengthsCache;
@@ -20158,18 +20163,32 @@ function _deepHistSeries() {
   }
   return _deepHistSeriesM;
 }
-let _epsSeriesSampler = null, _epsSeriesRangeYr = 0;
-/** The ONE evaluator's sample at a decimal year (grown-grid cache):
+// PER-TIER ROUTING (the anomalistic-contamination fix; twins in
+// tools/lib/deep-orbital-history.js and packages/physics model.js): one
+// sampler PER grid tier, built on first entry and KEPT — a query always
+// reads the tier its own span selects. The former single grown sampler
+// REPLACED the 100-yr grid with the 1000/5000-yr one after any deep-time
+// probe (a deep chart or jump), and the year-length rates (±0.5-yr central
+// differences through the grid) then returned grid-segment AVERAGES
+// instead of local rates: the tweakpane anomalistic year of date read
+// +2.63 s (1000-yr grid) / +19 s (5000-yr grid), visit-order dependent —
+// and the rendered ε/e picked up coarse-grid interpolation error too.
+// Values are now pure in `year`.
+const _epsSeriesSamplers = new Map();   // tier span → sampler; the >2-Myr tier grows in span
+let _epsSeriesDeepRangeYr = 0;
+/** The ONE evaluator's sample at a decimal year (per-tier grid cache):
  *  {epsDeg, e, periOfDateDeg, …} — series inside ±10 Myr, the α(H(t))
  *  mode-tail beyond. Both ε and e targets read THIS. */
 function _hybridSeriesSampleAt(year) {
   const t = year - 2000;
   const need = Math.max(20000, Math.abs(t) * 1.25);
-  if (!_epsSeriesSampler || need > _epsSeriesRangeYr) {
-    _epsSeriesRangeYr = _hybridTierSpan(need);   // tier-filling growth (see _hybridTierSpan)
-    _epsSeriesSampler = _deepHistSeries().build(_epsSeriesRangeYr, -_epsSeriesRangeYr, _hybridGridStep(_epsSeriesRangeYr));
+  const span = _hybridTierSpan(need);
+  const key = span > 2000000 ? 'deep' : span;
+  if (!_epsSeriesSamplers.has(key) || (key === 'deep' && span > _epsSeriesDeepRangeYr)) {
+    if (key === 'deep') _epsSeriesDeepRangeYr = span;
+    _epsSeriesSamplers.set(key, _deepHistSeries().build(span, -span, _hybridGridStep(span)));
   }
-  return _epsSeriesSampler.at(t);
+  return _epsSeriesSamplers.get(key).at(t);
 }
 function _epsHybridSeriesAt(year) { return _hybridSeriesSampleAt(year).epsDeg; }
 /** Is the one-source drive live (flag on + series loaded)? */
