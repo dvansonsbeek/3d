@@ -66,7 +66,7 @@
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { makeWH } from './nbody-wh.mjs';
-import { HZ, AU_KM } from './j2000-state.mjs';
+import { HZ, AU_KM, ASTEROIDS, LUNAR_QUAD_EFFECTIVE_FACTOR } from './j2000-state.mjs';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(ROOT + 'package.json');
 const P = require(ROOT + 'tools/explore/derive-planetary-lunar-terms.js');
@@ -79,7 +79,21 @@ const INTEGRATOR = (KV.integrator || 'wh').toLowerCase();   // wh (Wisdom–Holm
 const DT = parseFloat(KV.dt || POS[1] || (INTEGRATOR === 'wh' ? '2' : '0.2'));
 const WH_ORDER = parseInt(KV.order || '2', 10);
 const GR_ON = KV.gr === '1' || KV.gr === 'true';
+// lunar=1 — the LUNAR QUADRUPOLE on the Sun↔EMB interaction, at the
+// effective coefficient CALIBRATED against the real-Moon ground-truth run
+// (j2000-state LUNAR_QUAD_EFFECTIVE_FACTOR; the apsidal-fidelity sweep's
+// method-matched RK4 triple: real Moon Δϖ̇ +0.0659 ″/yr, reproduced by the
+// calibrated proxy digit-for-digit). Closes the measured 0.072 ″/yr Earth
+// apsidal-rate deficit of the EMB-point-mass run (chain/canonical route
+// convergence — plan 02 record).
+// asteroids=1 — Ceres/Vesta/Pallas as FORCE-ONLY bodies (elements never
+// dumped; 0.1–0.3 ″/cy class for Mars, measured null for Earth).
+const LUNAR_ON = KV.lunar === '1';
+const ASTEROIDS_ON = KV.asteroids === '1';
 const FRAME = (KV.frame || 'ecliptic').toLowerCase();   // ecliptic | equatorial | invariable — readout frame for the elements
+if ((LUNAR_ON || ASTEROIDS_ON) && (KV.integrator || 'wh').toLowerCase() !== 'wh') {
+  console.error('lunar=1 / asteroids=1 are wired for the WH integrator only'); process.exit(1);
+}
 const D2R = Math.PI / 180, DAY = 86400;
 const GM_S = TL.GM_SUN, GM_EM = P.GM_EM, H = TL.H;
 
@@ -116,12 +130,28 @@ function oscul(Y, i, n, gms, R = ROT) {
   const L = ((((Om + om + Man) / D2R) % 360) + 360) % 360;
   return { w: (Om + om) / D2R, Om: Om / D2R, e: en, inc: inc / D2R, L, a: aKm / AU_KM };
 }
+// The lunar-quadrupole extra force (Earth only; 0-based planet index 2 in
+// the names order). Coefficient (3/4)·q̃·a_EM² × the CALIBRATED effective
+// factor — q̃ and a_EM from the model's constants homes.
+const Q_TILDE_EM = TL.MASS_RATIO_EARTH_MOON / ((TL.MASS_RATIO_EARTH_MOON + 1) ** 2);
+const QUAD_K_EM = (3 / 4) * Q_TILDE_EM * TL.moonDistance * TL.moonDistance * LUNAR_QUAD_EFFECTIVE_FACTOR;
+const EARTH_PLANET_I0 = 2;
+const lunarQuadForce = (r, v, t, GMS, i) => {
+  if (i !== EARTH_PLANET_I0) return [0, 0, 0];
+  const r2 = r[0] * r[0] + r[1] * r[1] + r[2] * r[2];
+  const k = -GMS * QUAD_K_EM / (r2 * r2 * Math.sqrt(r2));
+  return [k * r[0], k * r[1], k * r[2]];
+};
+// Set for the MAIN run only (after the two-body calibration section —
+// the spurious-drift runs must stay pure numerics, no physics terms).
+let EXTRA_FORCES = [];
+
 function integrate(gms, Y, years, sampleDays, onSample) {
   const n = gms.length;
   if (INTEGRATOR === 'wh') {
     // Wisdom–Holman: exact Kepler drifts, perturbation kicks; onSample gets a
     // barycentric-layout state rebuilt from the heliocentric one so oscul() is unchanged
-    const sim = makeWH({ gms, Y0: Y, dt: Math.sign(years) * DT * DAY, gr: GR_ON, order: WH_ORDER });
+    const sim = makeWH({ gms, Y0: Y, dt: Math.sign(years) * DT * DAY, gr: GR_ON, order: WH_ORDER, extraForces: EXTRA_FORCES });
     const steps = Math.round(Math.abs(years) * 365.25 / DT), every = Math.max(1, Math.round(sampleDays / DT));
     const Ys = new Float64Array(6 * n);
     const snapshot = () => { Ys.fill(0); for (let i = 1; i < n; i++) { const h = sim.helio(i); for (let c = 0; c < 3; c++) { Ys[3 * i + c] = h.r[c]; Ys[3 * n + 3 * i + c] = h.v[c]; } } return Ys; };   // Sun at origin, heliocentric velocities: exactly what oscul() subtracts
@@ -166,9 +196,15 @@ for (const k of names) {
 }
 console.log(`two-body spurious drift at dt ${DT} d (″/cy, subtracted below): ` + names.map((k) => `${k} ${spurious[k].w.toFixed(2)}`).join(' · '));
 
-// 2) the 9-body run, ±YEARS/2, sampled every 100 d
-const gms = [GM_S, ...names.map(gmOf)], n = gms.length, Mtot = gms.reduce((s, x) => s + x, 0);
-const st = [{ r: [0, 0, 0], v: [0, 0, 0] }, ...names.map((k) => ({ r: HORIZONS_J2000[k].slice(0, 3), v: HORIZONS_J2000[k].slice(3, 6) }))];
+// 2) the main run, ±YEARS/2 — 9 bodies, +3 force-only asteroids under
+// asteroids=1 (appended AFTER the planets so every planet index is
+// unchanged; their elements are never sampled or dumped), + the lunar
+// quadrupole under lunar=1 (main run only — the two-body calibration
+// above stayed force-free).
+if (LUNAR_ON) EXTRA_FORCES = [lunarQuadForce];
+const intNames = ASTEROIDS_ON ? [...names, 'ceres', 'pallas', 'vesta'] : names;
+const gms = [GM_S, ...intNames.map((k) => ASTEROIDS[k] ? ASTEROIDS[k].gm : gmOf(k))], n = gms.length, Mtot = gms.reduce((s, x) => s + x, 0);
+const st = [{ r: [0, 0, 0], v: [0, 0, 0] }, ...intNames.map((k) => { const s = ASTEROIDS[k] ? ASTEROIDS[k].s : HORIZONS_J2000[k]; return { r: s.slice(0, 3), v: s.slice(3, 6) }; })];
 const rB = [0, 1, 2].map((c) => st.reduce((s, q, i) => s + gms[i] * q.r[c], 0) / Mtot), vB = [0, 1, 2].map((c) => st.reduce((s, q, i) => s + gms[i] * q.v[c], 0) / Mtot);
 const Y0 = new Float64Array(6 * n);
 for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) { Y0[3 * i + c] = st[i].r[c] - rB[c]; Y0[3 * n + 3 * i + c] = st[i].v[c] - vB[c]; }
@@ -197,7 +233,7 @@ const ELEMS = ['w', 'Om', 'e', 'inc', 'L', 'a'];
 // one sample store per readout frame (frame=both keeps two, from the same trajectory)
 const mk = () => Object.fromEntries(FRAMES_OUT.map((fr) => [fr, { t: [], ...Object.fromEntries(ELEMS.map((el) => [el, Object.fromEntries(names.map((k) => [k, []]))])) }]));
 const fwd = mk(), bwd = mk();
-const sampler = (S) => (t, Y) => { for (const fr of FRAMES_OUT) { S[fr].t.push(t); for (let i = 1; i < n; i++) { const o = oscul(Y, i, n, gms, ROTS[fr]); for (const el of ELEMS) S[fr][el][names[i - 1]].push(o[el]); } } };
+const sampler = (S) => (t, Y) => { for (const fr of FRAMES_OUT) { S[fr].t.push(t); for (let i = 1; i <= names.length; i++) { const o = oscul(Y, i, n, gms, ROTS[fr]); for (const el of ELEMS) S[fr][el][names[i - 1]].push(o[el]); } } };   // planets only — the force-only asteroids are never sampled
 integrate(gms, Float64Array.from(Y0), YEARS / 2, SAMPLE_DAYS, sampler(fwd));
 integrate(gms, Float64Array.from(Y0), -YEARS / 2, SAMPLE_DAYS, sampler(bwd));
 const primary = FRAMES_OUT[0];
@@ -216,6 +252,12 @@ if (KV.dump !== '0') {
     // ascending node of the invariable plane on the ecliptic (λ of ẑ_ecl × ẑ_inv).
     const _zInv = ROTS.invariable[2];
     const out = { years: YEARS, integrator: INTEGRATOR, dt: DT, gr: GR_ON, frame: fr, sampleDays: SAMPLE_DAYS, conservation: DIAG,
+      // the apsidal-fidelity physics content (plan 02 record): the run's
+      // provenance must say what forces/bodies produced it
+      physics: {
+        lunarQuadrupole: LUNAR_ON ? { qTilde: Q_TILDE_EM, aEmKm: TL.moonDistance, effectiveFactor: LUNAR_QUAD_EFFECTIVE_FACTOR, provenance: 'calibrated against the real-Moon RK4 triple (apsidal-fidelity-sweep RM/RQ)' } : null,
+        asteroids: ASTEROIDS_ON ? Object.fromEntries(['ceres', 'pallas', 'vesta'].map((k) => [k, ASTEROIDS[k].gm])) : null,
+      },
       invariablePlane: {
         inclEclipticDeg: Math.acos(_zInv[2]) / D2R,
         ascNodeEclipticDeg: ((Math.atan2(_zInv[0], -_zInv[1]) / D2R) % 360 + 360) % 360,
@@ -227,7 +269,7 @@ if (KV.dump !== '0') {
     console.log(`wrote ${file} (${(txt.length / 1e6).toFixed(1)} MB)`);
   }
 }
-console.log(`9-body run ±${YEARS / 2} yr, ${INTEGRATOR === 'wh' ? `Wisdom–Holman order ${WH_ORDER}` : 'RK4'} at dt ${DT} d${GR_ON ? ', 1PN on' : ', Newton only'}: ${((Date.now() - t0) / 1000).toFixed(0)} s, ${T.length} samples (every ${SAMPLE_DAYS} d)\n`);
+console.log(`${n - 1}-body run ±${YEARS / 2} yr, ${INTEGRATOR === 'wh' ? `Wisdom–Holman order ${WH_ORDER}` : 'RK4'} at dt ${DT} d${GR_ON ? ', 1PN on' : ', Newton only'}${LUNAR_ON ? `, lunar quadrupole (eff ${LUNAR_QUAD_EFFECTIVE_FACTOR})` : ''}${ASTEROIDS_ON ? ', +Ceres/Pallas/Vesta' : ''}: ${((Date.now() - t0) / 1000).toFixed(0)} s, ${T.length} samples (every ${SAMPLE_DAYS} d)\n`);
 
 const meanRate = (k, el, y0, y1) => { const idx = []; for (let i = 0; i < T.length; i++) if (T[i] >= y0 && T[i] <= y1) idx.push(i); const x = idx.map((i) => T[i]); const y = unwrapDeg(idx.map((i) => EL[el][k][i])); return ols(x, y) * 3600 * 100 - spurious[k][el]; };
 const latticeN = (rateAscy) => 129600000 / rateAscy / (8 * H);   // 8H/N ⇔ N = 8H·rate/(1296000·100)... written as N = 8H / period

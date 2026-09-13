@@ -42,6 +42,39 @@ export const HZ = {
   neptune: [2.515046428529e+9, -3.738714513276e+9, 1.903227194039e+7, 4.465902049825e+0, 3.076627073142e+0, -1.660633585828e-1],
 };
 
+// ── The apsidal-fidelity campaign's extra bodies (ONE home, same
+// convention as HZ: JPL Horizons heliocentric ecliptic-J2000 state at
+// JD 2451545.0 TDB, km & km/s; Horizons API COMMAND='Ceres;' etc. /
+// '399' / '301', CENTER='500@10', VEC_TABLE=2, REF_PLANE=ECLIPTIC).
+// The asteroid GMs (km³/s²) are Horizons object-header values — external
+// inputs like the HZ vectors themselves (no model home exists for
+// asteroid masses). The big three are FORCE-ONLY bodies in the
+// production dump (their elements are never banked); Earth-399/Moon-301
+// seed the sweep's real-Moon ground-truth runs (the EMB stays the
+// production 'earth').
+export const ASTEROIDS = {
+  ceres: { gm: 62.6284, s: [-3.559423585024965e8, 1.190030175899910e8, 6.926464763213266e7, -6.205936548273126e0, -1.832911310413905e1, 5.780531315566364e-1] },
+  pallas: { gm: 13.63, s: [-1.258325200874033e8, 2.473958969651368e8, -1.606515817893230e8, -2.032303521536241e1, -7.137021010411825e0, 6.609767786325174e0] },
+  vesta: { gm: 17.28828, s: [-2.024927512872042e8, -2.502976814062922e8, 3.214885339084460e7, 1.666493326029226e1, -1.281751776553609e1, -1.637447174520739e0] },
+};
+export const HZ_EARTH399 = [-2.649903367743050e7, 1.446972967925493e8, -6.111494259536266e2, -2.979426007043741e1, -5.469294939770602e0, 1.817836785027449e-4];
+export const HZ_MOON301 = [-2.679064206161821e7, 1.444223170508761e8, 3.566004720103741e4, -2.915072868144845e1, -6.200278922457702e0, -1.132468106068396e-2];
+
+// The Earth/Moon GM split — DERIVED from the model's own homes
+// (GM_EARTH_MOON_SYSTEM + MASS_RATIO_EARTH_MOON = m_E/m_M), never a
+// separate literal (owner correction: use the values we already have).
+export const GM_MOON = GM_EM / (1 + TL.MASS_RATIO_EARTH_MOON);
+export const GM_EARTH_ALONE = GM_EM - GM_MOON;
+
+// The lunar-quadrupole EFFECTIVE FACTOR on the coplanar-ring coefficient
+// (3/4)·q̃·a_EM² — MEASURED against the real-Moon ground-truth run (the
+// apsidal-fidelity sweep's method-matched RK4 triple: real-Moon Δϖ̇
+// +0.0659 ″/yr vs raw-ring +0.0772; the analytic ring form overshoots
+// because the lunar orbit responds dynamically to the solar
+// perturbation). Model-internal calibration, never a reference tune
+// (plan 02 record; memory feedback_two_route_convergence).
+export const LUNAR_QUAD_EFFECTIVE_FACTOR = 0.8537;
+
 /** Osculating elements from the J2000 vectors. @param {string} p planet name */
 export function osculAt(p) {
   const r = HZ[p].slice(0, 3), v = HZ[p].slice(3, 6), mu = GM_SUN + gmOf(p), rn = Math.hypot(...r);

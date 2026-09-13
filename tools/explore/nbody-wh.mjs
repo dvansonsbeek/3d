@@ -38,10 +38,16 @@
 //     ONE body at its barycentre), DE440 mass ratios, Newtonian gravity between all
 //     pairs, optional first-post-Newtonian Sun–planet term (Schwarzschild; adds the
 //     43 ″/cy at Mercury, ≈ 0.47 ″/yr to g1);
-//   not included: the Moon as a separate body, the Sun's oblateness J2 (≈ 0.03 ″/cy
-//     on Mercury's perihelion), asteroids (Ceres/Vesta/Pallas: sub-″/cy on Mars),
-//     planet–planet 1PN cross terms (EIH; ≲ 0.01 ″/cy), tides, Earth's spin (this is
-//     an ORBITAL integrator — obliquity/precession of Earth's axis are not computed).
+//   not included in the ENGINE itself: the Moon as a separate body, the Sun's
+//     oblateness J2 (≈ 0.03 ″/cy on Mercury's perihelion), planet–planet 1PN cross
+//     terms (EIH; ≲ 0.01 ″/cy), tides, Earth's spin (this is an ORBITAL integrator —
+//     obliquity/precession of Earth's axis are not computed).
+//   caller-wired via extraForces / extra bodies (the apsidal-fidelity campaign,
+//     lattice-long-window-test.mjs lunar=1 / asteroids=1): the LUNAR QUADRUPOLE on
+//     the Sun↔EMB interaction at the real-Moon-calibrated coefficient (closes the
+//     measured 0.072 ″/yr Earth apsidal-rate deficit of the EMB-point-mass run —
+//     the missing Moon, quantitatively), and Ceres/Vesta/Pallas as force-only
+//     bodies (0.1–0.3 ″/cy class on Mars; measured null for Earth).
 //   consequence: the secular g/s frequencies are the standard ones to ≲ 0.01 ″/yr
 //     (Laskar's long runs add the Moon and J2 mainly for Earth's spin); a single
 //     trajectory beyond ~5 Myr is one realisation of a chaotic system — frequencies
@@ -162,7 +168,10 @@ export function makeWH({ gms, Y0, dt, gr = false, order = 2, extraForces = [], g
       const vs = [-sx / GM_S, -sy / GM_S, -sz / GM_S];
       for (let i = 0; i < N; i++) {
         const r = [Q[3 * i], Q[3 * i + 1], Q[3 * i + 2]], v = [V[3 * i] - vs[0], V[3 * i + 1] - vs[1], V[3 * i + 2] - vs[2]];
-        for (const f of extraForces) { const a = f(r, v, t, GM_S); A[3 * i] += a[0]; A[3 * i + 1] += a[1]; A[3 * i + 2] += a[2]; }
+        // i (0-based planet index) added for per-body forces (the apsidal-
+        // fidelity sweep's lunar-quadrupole term applies to Earth only);
+        // existing force functions ignore the extra argument.
+        for (const f of extraForces) { const a = f(r, v, t, GM_S, i); A[3 * i] += a[0]; A[3 * i + 1] += a[1]; A[3 * i + 2] += a[2]; }
       }
     }
     for (let i = 0; i < 3 * N; i++) V[i] += h * A[i];
